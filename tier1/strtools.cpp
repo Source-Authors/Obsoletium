@@ -49,6 +49,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
+#include <cinttypes>
 
 #ifdef POSIX
 #include <iconv.h>
@@ -63,20 +64,13 @@
 #endif
 #endif
 
-#ifdef _WIN32
-#ifndef CP_UTF8
-#define CP_UTF8 65001
-#endif
-#endif
 #include "tier0/dbg.h"
 #include "tier0/basetypes.h"
 #include "tier1/utldict.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utlstring.h"
 #include "tier1/fmtstr.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
+
 #include "tier0/memdbgon.h"
 
 static int FastToLower( char c )
@@ -1120,8 +1114,8 @@ char *V_pretifynum( int64 inputValue )
 	}
 
 	// Print the leading batch of one to three digits.
-	int toPrint = value / divisor;
-	V_snprintf( pchRender, outEnd - pchRender, "%d", toPrint );
+	uint64 toPrint = value / divisor;
+	V_snprintf( pchRender, outEnd - pchRender, "%" PRIu64, toPrint );
 
 	for (;;)
 	{
@@ -1135,7 +1129,7 @@ char *V_pretifynum( int64 inputValue )
 
 		// The remaining blocks of digits always include a comma and three digits.
 		toPrint = value / divisor;
-		V_snprintf( pchRender, outEnd - pchRender, ",%03d", toPrint );
+		V_snprintf( pchRender, outEnd - pchRender, ",%03" PRIu64, toPrint );
 	}
 
 	return out;
