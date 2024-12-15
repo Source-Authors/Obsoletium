@@ -92,7 +92,7 @@ private:
 		float		weight;
 	};
 
-	CUtlRBTree< CritEntry_t, short > m_Lookup;
+	CUtlRBTree< CritEntry_t, int > m_Lookup;
 };
 
 #pragma pack(1)
