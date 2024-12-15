@@ -228,11 +228,10 @@ AI_Response &AI_Response::operator=( const AI_Response &from )
 	V_strcpy_safe( m_szMatchingRule, from.m_szMatchingRule );
 
 	delete m_pCriteria;
-	m_pCriteria = NULL;
 
 	// Copy criteria.
-	if (from.m_pCriteria)
-		m_pCriteria = new AI_CriteriaSet(*from.m_pCriteria);
+	m_pCriteria = from.m_pCriteria
+		? new AI_CriteriaSet(*from.m_pCriteria) : nullptr;
 
 	m_Params = from.m_Params;
 

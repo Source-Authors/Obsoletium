@@ -1758,12 +1758,15 @@ bool CResponseSystem::FindBestResponse( const AI_CriteriaSet& set, AI_Response& 
 		ResponseSearchResult result;
 		if ( GetBestResponse( result, &r, showResult, pFilter ) )
 		{
-			Q_strncpy( responseName, result.action->value, sizeof( responseName ) );
+			V_strcpy_safe( responseName, result.action->value );
 			responseType = result.action->GetType();
 			rp = result.group->rp;
+			
+			// dimhotepus: Init response only if response valid. Or leak criteria inside.
+			valid = true;
 		}
 
-		Q_strncpy( ruleName, m_Rules.GetElementName( bestRule ), sizeof( ruleName ) );
+		V_strcpy_safe( ruleName, m_Rules.GetElementName( bestRule ) );
 
 		// Disable the rule if it only allows for matching one time
 		if ( r.IsMatchOnce() )
@@ -1772,33 +1775,18 @@ bool CResponseSystem::FindBestResponse( const AI_CriteriaSet& set, AI_Response& 
 		}
 		context = r.GetContext();
 		bcontexttoworld = r.IsApplyContextToWorld();
-
-		valid = true;
 	}
 
 	if ( valid )
 	{
-		// dimhotepus: Init only if response valid. Or leak inside.
+		// dimhotepus: Init response only if response valid. Or leak criteria inside.
 		response.Init( responseType, responseName, set, rp, ruleName, context, bcontexttoworld );
 	}
 
-	if ( showResult )
+	if ( showResult && ( valid || showRules ) )
 	{
-		/*
-		// clipped -- chet doesn't really want this info
-		if ( valid )
-		{
-			// Rescore the winner and dump to console
-			ScoreCriteriaAgainstRule( set, bestRule, true );
-		}
-		*/
-		
-	
-		if ( valid || showRules )
-		{
-			// Describe the response, too
-			response.Describe();
-		}
+		// Describe the response, too
+		response.Describe();
 	}
 
 	return valid;
