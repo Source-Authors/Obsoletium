@@ -4335,11 +4335,11 @@ ModelInstanceHandle_t CModelRender::CreateInstance( IClientRenderable *pRenderab
 	instance.m_LightCacheHandle = 0;
 
 	instance.m_AmbientLightingState.ZeroLightingState();
-	for ( int i = 0; i < 6; ++i )
+	for ( auto &color : instance.m_AmbientLightingState.r_boxcolor )
 	{
 		// To catch errors with uninitialized m_AmbientLightingState...
 		// force to pure red
-		instance.m_AmbientLightingState.r_boxcolor[i].x = 1.0;
+		color.x = 1.0;
 	}
 
 #ifndef SWDS
@@ -4354,17 +4354,8 @@ ModelInstanceHandle_t CModelRender::CreateInstance( IClientRenderable *pRenderab
 		// validate static color meshes once, now at load/create time
 		ValidateStaticPropColorData( handle );
 	
-		// 360 persists the color meshes across same map loads
-		if ( !IsX360() || instance.m_ColorMeshHandle == DC_INVALID_HANDLE )
-		{
-			// builds out color meshes or loads disk colors, now at load/create time
-			RecomputeStaticLighting( handle );
-		}
-		else
-			if ( r_decalstaticprops.GetBool() && instance.m_LightCacheHandle )
-			{
-				instance.m_AmbientLightingState = *(LightcacheGetStatic( *pCache, NULL, LIGHTCACHEFLAGS_STATIC ));
-			}
+		// builds out color meshes or loads disk colors, now at load/create time
+		RecomputeStaticLighting( handle );
 	}
 	
 	return handle;
@@ -4596,17 +4587,7 @@ void CModelRender::DestroyInstance( ModelInstanceHandle_t handle )
 	g_pShadowMgr->RemoveAllShadowsFromModel( handle );
 #endif
 
-	// 360 holds onto static prop disk color data only, to avoid redundant work during same map load
-	// can only persist props with disk based lighting
-	// check for dvd mode as a reasonable assurance that the queued loader will be responsible for a possible purge
-	// if the queued loader doesn't run, the purge will get caught later than intended
-	bool bPersistLighting = IsX360() && 
-		( m_ModelInstances[handle].m_nFlags & MODEL_INSTANCE_HAS_DISKCOMPILED_COLOR ) && 
-		( g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT );
-	if ( !bPersistLighting )
-	{
-		DestroyStaticPropColorData( handle );
-	}
+	DestroyStaticPropColorData( handle );
 
 	m_ModelInstances.Remove( handle );
 }
