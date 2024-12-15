@@ -2717,12 +2717,14 @@ static constexpr char cIntToHexDigit( int nValue )
 static constexpr int iHexCharToInt( char cValue )
 {
 	int32 iValue = cValue;
-	if ( (uint32)( iValue - '0' ) < 10 )
-		return iValue - '0';
+
+	const int32 zero = iValue - '0';
+	if ( (uint32)zero < 10 ) return zero;
 
 	iValue |= 0x20;
-	if ( (uint32)( iValue - 'a' ) < 6 )
-		return iValue - 'a' + 10;
+
+	const int32 a = iValue - 'a';
+	if ( (uint32)a < 6 ) return a + 10;
 
 	return -1;
 }
