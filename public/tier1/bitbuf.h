@@ -596,7 +596,7 @@ public:
 // Byte functions (these still read data in bit-by-bit).
 public:
 	
-	BITBUF_INLINE int	ReadChar() { return (char)ReadUBitLong(8); }
+	BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(8); }
 	BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
 	BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
 	BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }

@@ -373,7 +373,7 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 
 	// Read filename, and check for the new message format version?
 	char szTemp[ MAX_PATH ];
-	int c = buffer.ReadChar();
+	char c = buffer.ReadChar();
 	bool bNewVersion = false;
 	if ( c == 1 )
 	{
@@ -382,7 +382,7 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 	}
 	else
 	{
-		szTemp[0] = (char)c;
+		szTemp[0] = c;
 		buffer.ReadString( szTemp+1, sizeof( szTemp)-1 );
 	}
 	if ( iCode == 0 )
