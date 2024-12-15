@@ -2974,13 +2974,13 @@ bool BGetLocalFormattedDateAndTime( time_t timeVal, char *pchDate, int cubDate, 
 #else // WINDOWS
 		// convert time_t to a SYSTEMTIME
 		SYSTEMTIME st;
-		st.wHour = tmToDisplay.tm_hour;
-		st.wMinute = tmToDisplay.tm_min;
-		st.wSecond = tmToDisplay.tm_sec;
-		st.wDay = tmToDisplay.tm_mday;
-		st.wMonth = tmToDisplay.tm_mon + 1;
-		st.wYear = tmToDisplay.tm_year + 1900;
-		st.wDayOfWeek = tmToDisplay.tm_wday;
+		st.wHour = static_cast<WORD>(tmToDisplay.tm_hour);
+		st.wMinute = static_cast<WORD>(tmToDisplay.tm_min);
+		st.wSecond = static_cast<WORD>(tmToDisplay.tm_sec);
+		st.wDay = static_cast<WORD>(tmToDisplay.tm_mday);
+		st.wMonth = static_cast<WORD>(tmToDisplay.tm_mon + 1);
+		st.wYear = static_cast<WORD>(tmToDisplay.tm_year + 1900);
+		st.wDayOfWeek = static_cast<WORD>(tmToDisplay.tm_wday);
 		st.wMilliseconds = 0;
 
 		WCHAR rgwch[ MAX_PATH ];
