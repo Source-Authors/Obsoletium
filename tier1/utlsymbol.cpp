@@ -273,7 +273,15 @@ void CUtlSymbolTable::RemoveAll()
 
 
 
-class CUtlFilenameSymbolTable::HashTable : public CUtlStableHashtable<CUtlConstString>
+class CUtlFilenameSymbolTable::HashTable
+	: public CUtlStableHashtable
+	<
+		CUtlConstString,
+		empty_t,
+		DefaultHashFunctor<CUtlConstString>,
+		DefaultEqualFunctor<CUtlConstString>,
+		uint32
+	>
 {
 };
 
