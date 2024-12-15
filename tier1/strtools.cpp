@@ -476,7 +476,7 @@ int V_atoi( const char *str )
 float V_atof (const char *str)
 {
 	AssertValidStringPtr( str );
-	double          val;
+	float           val;
 	int             sign;
 	int             c;
 	int             decimal, total;
@@ -523,7 +523,8 @@ float V_atof (const char *str)
 	//
 	if (str[0] == '\'')
 	{
-		return sign * str[1];
+		// dimhotepus: Safe to cast as withing float range.
+		return static_cast<float>(sign * str[1]);
 	}
 
 	//
@@ -559,7 +560,8 @@ float V_atof (const char *str)
 
 	if ( exponent != 0 )
 	{
-		val *= pow( 10.0, exponent );
+		// dimhotepus: Safe to cast as exponent within float range.
+		val *= powf( 10.0f, static_cast<float>(exponent) );
 	}
 	if (decimal == -1)
 		return val*sign;
