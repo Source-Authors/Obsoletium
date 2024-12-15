@@ -224,20 +224,21 @@ char *V_strnlwr( INOUT_Z_CAP(count) char *s, size_t count )
 	// Assert( count >= 0 ); tautology since size_t is unsigned
 	AssertValidStringPtr( s, count );
 
+	unsigned char *it = reinterpret_cast<unsigned char *>(s);
 	char* pRet = s;
 	if ( !s || !count )
 		return s;
 
 	while ( -- count > 0 )
 	{
-		if ( !*s )
+		if ( !*it )
 			return pRet; // reached end of string
 
-		*s = tolower( *s );
-		++s;
+		*it = static_cast<unsigned char>(tolower( static_cast<unsigned char>(*it) ));
+		++it;
 	}
 
-	*s = 0; // null-terminate original string at "count-1"
+	*it = 0; // null-terminate original string at "count-1"
 	return pRet;
 }
 
