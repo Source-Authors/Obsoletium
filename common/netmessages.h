@@ -381,7 +381,7 @@ public:	// member vars are public for faster handling
 #if defined( REPLAY_ENABLED )
 	bool		m_bIsReplay;	// Replay server ?
 #endif
-	char		m_cOS;			// L = linux, W = Win32
+	char		m_cOS;			// L = linux, W = Win32, M - MacOS
 	CRC32_t		m_nMapCRC;		// server map CRC (only used by older demos)
 	MD5Value_t	m_nMapMD5;		// server map MD5
 	int			m_nMaxClients;	// max number of clients on server

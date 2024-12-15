@@ -943,6 +943,8 @@ void CBaseServer::FillServerInfo(SVC_ServerInfo &serverinfo)
 	serverinfo.m_bIsDedicated	= IsDedicated();
 #ifdef _WIN32
 	serverinfo.m_cOS			= 'W';
+#elif defined(OSX)
+	serverinfo.m_cOS			= 'O';
 #else
 	serverinfo.m_cOS			= 'L';
 #endif
