@@ -814,7 +814,7 @@ CAI_TimedSemaphore *CAI_Expresser::GetMySpeechSemaphore( CBaseEntity *pNpc )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CAI_Expresser::SpeechMsg( CBaseEntity *pFlex, const char *pszFormat, ... )
+void CAI_Expresser::SpeechMsg( CBaseEntity *pFlex, PRINTF_FORMAT_STRING const char *pszFormat, ... )
 {
 	if ( !DebuggingSpeech() )
 		return;
