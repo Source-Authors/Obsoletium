@@ -244,8 +244,8 @@ void CHudCredits::ReadParams( KeyValues *pKeyValue )
 
 	m_cColor = pKeyValue->GetColor( "color" );
 
-	Q_strncpy( m_szLogo, pKeyValue->GetString( "logo", "HALF-LIFE'" ), sizeof( m_szLogo ) );
-	Q_strncpy( m_szLogo2, pKeyValue->GetString( "logo2", "" ), sizeof( m_szLogo2 ) );
+	V_strcpy_safe( m_szLogo, pKeyValue->GetString( "logo", "HALF-LIFE'" ) );
+	V_strcpy_safe( m_szLogo2, pKeyValue->GetString( "logo2", "" ) );
 }
 
 int CHudCredits::GetStringPixelWidth( wchar_t *pString, vgui::HFont hFont )
@@ -415,17 +415,13 @@ void CHudCredits::DrawLogo( void )
 
 	char szLogoFont[64];
 
-	if ( IsXbox() )
+	if ( hl2_episodic.GetBool() )
 	{
-		Q_snprintf( szLogoFont, sizeof( szLogoFont ), "WeaponIcons_Small" );
-	}
-	else if ( hl2_episodic.GetBool() )
-	{
-		Q_snprintf( szLogoFont, sizeof( szLogoFont ), "ClientTitleFont" );
+		V_strcpy_safe( szLogoFont, "ClientTitleFont" );
 	}
 	else
 	{
-		Q_snprintf( szLogoFont, sizeof( szLogoFont ), "WeaponIcons" );
+		V_strcpy_safe( szLogoFont, "WeaponIcons" );
 	}
 
 	vgui::HScheme scheme = vgui::scheme()->GetScheme( "ClientScheme" );
