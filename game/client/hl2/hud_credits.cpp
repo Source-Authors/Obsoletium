@@ -7,15 +7,15 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "hud_numericdisplay.h"
-#include <vgui_controls/Panel.h>
 #include "hud.h"
 #include "hud_suitpower.h"
 #include "hud_macros.h"
 #include "iclientmode.h"
+#include <vgui_controls/Panel.h>
 #include <vgui_controls/AnimationController.h>
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 #include "filesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -140,11 +140,9 @@ void CHudCredits::PrepareCredits( const char *pKeyName )
 {
 	Clear();
 
-	KeyValues *pKV= new KeyValues( "CreditsFile" );
+	auto pKV = KeyValues::AutoDelete( "CreditsFile" );
 	if ( !pKV->LoadFromFile( filesystem, CREDITS_FILE, "MOD" ) )
 	{
-		pKV->deleteThis();
-
 		AssertMsg( false, "env_credits couldn't be initialized!" );
 		return;
 	}
@@ -158,8 +156,6 @@ void CHudCredits::PrepareCredits( const char *pKeyName )
 
 	pKVSubkey = pKV->FindKey( "CreditsParams" );
 	ReadParams( pKVSubkey );
-
-	pKV->deleteThis();
 }
 
 using namespace vgui;
