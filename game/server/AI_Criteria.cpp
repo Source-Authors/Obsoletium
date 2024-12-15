@@ -151,11 +151,11 @@ float AI_CriteriaSet::GetWeight( int index ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void AI_CriteriaSet::Describe()
+void AI_CriteriaSet::Describe() const
 {
 	for ( short i = m_Lookup.FirstInorder(); i != m_Lookup.InvalidIndex(); i = m_Lookup.NextInorder( i ) )
 	{
-		CritEntry_t *entry = &m_Lookup[ i ];
+		const CritEntry_t *entry = &m_Lookup[ i ];
 
 		if ( entry->weight != 1.0f )
 		{
@@ -269,7 +269,7 @@ void AI_Response::Init( ResponseType_t type, const char *responseName, const AI_
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void AI_Response::Describe()
+void AI_Response::Describe() const
 {
 	if ( m_pCriteria )
 	{

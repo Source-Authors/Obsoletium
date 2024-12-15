@@ -28,7 +28,7 @@ public:
 	void AppendCriteria( const char *criteria, const char *value = "", float weight = 1.0f );
 	void RemoveCriteria( const char *criteria );
 	
-	void Describe();
+	void Describe() const;
 
 	int GetCount() const;
 	int			FindCriterionIndex( const char *name ) const;
@@ -199,9 +199,9 @@ public:
 	void			SetContext( const char *context );
 	const char *	GetContext( void ) const { return m_szContext.Length() ? m_szContext.Get() : NULL; }
 
-	bool			IsApplyContextToWorld( void ) { return m_bApplyContextToWorld; }
+	bool			IsApplyContextToWorld( void ) const { return m_bApplyContextToWorld; }
 
-	void Describe();
+	void Describe() const;
 
 	const AI_CriteriaSet* GetCriteria();
 
