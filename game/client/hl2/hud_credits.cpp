@@ -169,6 +169,7 @@ DECLARE_HUD_MESSAGE( CHudCredits, LogoTimeMsg );
 //-----------------------------------------------------------------------------
 CHudCredits::CHudCredits( const char *pElementName ) : CHudElement( pElementName ), BaseClass( NULL, "HudCredits" )
 {
+	m_hTextFont = INVALID_FONT;
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );
 }
