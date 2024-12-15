@@ -65,10 +65,10 @@ public:
 		return raw;
 	}
 
-	inline int r() const	{ return _color[0]; }
-	inline int g() const	{ return _color[1]; }
-	inline int b() const	{ return _color[2]; }
-	inline int a() const	{ return _color[3]; }
+	inline unsigned char r() const	{ return _color[0]; }
+	inline unsigned char g() const	{ return _color[1]; }
+	inline unsigned char b() const	{ return _color[2]; }
+	inline unsigned char a() const	{ return _color[3]; }
 	
 	component &operator[](size_t index)
 	{

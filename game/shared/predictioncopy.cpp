@@ -1836,7 +1836,7 @@ void CValueChangeTracker::GetValue( char *buf, size_t bufsize )
 	case FIELD_COLOR32:
 		{
 			const Color *color = ( const Color * )pInputData;
-			Q_snprintf( buf, bufsize, "%d %d %d %d", color->r(), color->g(), color->b(), color->a() );
+			Q_snprintf( buf, bufsize, "%hhu %hhu %hhu %hhu", color->r(), color->g(), color->b(), color->a() );
 		}
 		break;
 

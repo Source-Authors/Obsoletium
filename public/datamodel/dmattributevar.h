@@ -963,22 +963,22 @@ inline void CDmaColor::SetAlpha( int a )
 
 inline unsigned char CDmaColor::r() const
 {
-	return (unsigned char)Value().r();
+	return Value().r();
 }
 
 inline unsigned char CDmaColor::g() const
 {
-	return (unsigned char)Value().g();
+	return Value().g();
 }
 
 inline unsigned char CDmaColor::b() const
 {
-	return (unsigned char)Value().b();
+	return Value().b();
 }
 
 inline unsigned char CDmaColor::a() const
 {
-	return (unsigned char)Value().a();
+	return Value().a();
 }
 
 inline const unsigned char &CDmaColor::operator[](int index) const

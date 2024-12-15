@@ -935,9 +935,9 @@ void CDmeMesh::DrawWireframeFaceSet( CDmeFaceSet *pFaceSet, matrix3x4_t *pPoseTo
 	const int nFaceSetIndices = pFaceSet->NumIndices();
 	const int *pFaceSetIndices = pFaceSet->GetIndices();
 
-	int vR = 0;
-	int vG = 0;
-	int vB = 0;
+	unsigned char vR = 0;
+	unsigned char vG = 0;
+	unsigned char vB = 0;
 
 	if ( pDrawSettings )
 	{

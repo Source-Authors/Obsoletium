@@ -203,7 +203,7 @@ private:
 		float flFadeStartTime;
 		float flFadeLength;
 		float flFadeSustain;
-		int  iOriginalAlpha;
+		byte  iOriginalAlpha;
 	};
 
 	// format stream - describes changes in formatting for the text stream

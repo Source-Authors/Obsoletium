@@ -1017,11 +1017,11 @@ void CDescribeData::DescribeColor( const Color *invalue, int count )
 	{
 		if ( count == 1 )
 		{
-			Describe( " color (%i %i %i %i)\n", invalue[ i ].r(), invalue[ i ].g(), invalue[ i ].b(), invalue[ i ].a() );
+			Describe( " color (%hhu %hhu %hhu %hhu)\n", invalue[ i ].r(), invalue[ i ].g(), invalue[ i ].b(), invalue[ i ].a() );
 		}
 		else
 		{
-			Describe( "[%i] color (%i %i %i %i)\n", i, invalue[ i ].r(), invalue[ i ].g(), invalue[ i ].b(), invalue[ i ].a() );
+			Describe( "[%i] color (%hhu %hhu %hhu %hhu)\n", i, invalue[ i ].r(), invalue[ i ].g(), invalue[ i ].b(), invalue[ i ].a() );
 		}
 	}
 }
@@ -1373,7 +1373,7 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 	case FIELD_COLOR32:
 		{
 			Color c = *(( Color * )pInputData + iIndex );
-			Q_snprintf( sz, sizeof( sz ), "%d %d %d %d", c.r(), c.g(), c.b(), c.a() );
+			Q_snprintf( sz, sizeof( sz ), "%hhu %hhu %hhu %hhu", c.r(), c.g(), c.b(), c.a() );
 		}
 		break;
 		

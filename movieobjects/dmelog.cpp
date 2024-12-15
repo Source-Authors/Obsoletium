@@ -606,7 +606,7 @@ float LengthOf( const bool& value )
 template<>
 float LengthOf( const Color& value )
 {
-	return (float)sqrt( (float)( value.r() * value.r() +
+	return sqrt( (float)( value.r() * value.r() +
 		value.g() * value.g() +
 		value.b() * value.b() +
 		value.a() * value.a()) );

@@ -292,9 +292,9 @@ bool CClientTools::DrawSprite( IClientRenderable *pRenderable, float scale, floa
 	Vector forward, right, up;
 	C_SpriteRenderer::GetSpriteAxes( ( C_SpriteRenderer::SPRITETYPE )psprite->GetOrientation(), origin, angles, forward, right, up );
 
-	int r = color.r();
-	int g = color.g();
-	int b = color.b();
+	byte r = color.r();
+	byte g = color.g();
+	byte b = color.b();
 
 	float oldBlend = render->GetBlend();
 	if ( rendermode != kRenderNormal )
