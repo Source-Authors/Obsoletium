@@ -366,7 +366,8 @@ struct ResponseGroup
 	bool	IsEnabled() const { return m_bEnabled; }
 	void	SetEnabled( bool enabled ) { m_bEnabled = enabled; }
 
-	int		GetCurrentIndex() const { return m_nCurrentIndex; }
+	// dimhotepus: Changed return type int -> byte.
+	byte	GetCurrentIndex() const { return m_nCurrentIndex; }
 	void	SetCurrentIndex( byte idx ) { m_nCurrentIndex = idx; }
 
 	CUtlVector< Response >	group;
@@ -582,12 +583,12 @@ protected:
 
 	void		ResetResponseGroups();
 
-	float		LookForCriteria( const AI_CriteriaSet &criteriaSet, int iCriteria );
+	float		LookForCriteria( const AI_CriteriaSet &criteriaSet, unsigned short iCriteria );
 	float		RecursiveLookForCriteria( const AI_CriteriaSet &criteriaSet, Criteria *pParent );
 
 public:
 
-	void		CopyRuleFrom( Rule *pSrcRule, int iRule, CResponseSystem *pCustomSystem );
+	void		CopyRuleFrom( Rule *pSrcRule, short iRule, CResponseSystem *pCustomSystem );
 	void		CopyCriteriaFrom( Rule *pSrcRule, Rule *pDstRule, CResponseSystem *pCustomSystem );
 	void		CopyResponsesFrom( Rule *pSrcRule, Rule *pDstRule, CResponseSystem *pCustomSystem );
 	void		CopyEnumerationsFrom( CResponseSystem *pCustomSystem );
@@ -674,7 +675,7 @@ public:
 	void		ParseRule( void );
 	void		ParseEnumeration( void );
 
-	int			ParseOneCriterion( const char *criterionName );
+	short		ParseOneCriterion( const char *criterionName );
 	
 	bool		Compare( const char *setValue, Criteria *c, bool verbose = false );
 	bool		CompareUsingMatcher( const char *setValue, Matcher& m, bool verbose = false );
@@ -682,11 +683,11 @@ public:
 	void		ResolveToken( Matcher& matcher, char *token, size_t bufsize, char const *rawtoken );
 	float		LookupEnumeration( const char *name, bool& found );
 
-	int			FindBestMatchingRule( const AI_CriteriaSet& set, bool verbose );
+	short		FindBestMatchingRule( const AI_CriteriaSet& set, bool verbose );
 
-	float		ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, int irule, bool verbose = false );
+	float		ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, short irule, bool verbose = false );
 	float		RecursiveScoreSubcriteriaAgainstRule( const AI_CriteriaSet& set, Criteria *parent, bool& exclude, bool verbose /*=false*/ );
-	float		ScoreCriteriaAgainstRuleCriteria( const AI_CriteriaSet& set, int icriterion, bool& exclude, bool verbose = false );
+	float		ScoreCriteriaAgainstRuleCriteria( const AI_CriteriaSet& set, unsigned short icriterion, bool& exclude, bool verbose = false );
 	bool		GetBestResponse( ResponseSearchResult& result, Rule *rule, bool verbose = false, IResponseFilter *pFilter = NULL );
 	bool		ResolveResponse( ResponseSearchResult& result, int depth, const char *name, bool verbose = false, IResponseFilter *pFilter = NULL );
 	int			SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter );
@@ -827,7 +828,7 @@ void CResponseSystem::Clear()
 //-----------------------------------------------------------------------------
 float CResponseSystem::LookupEnumeration( const char *name, bool& found )
 {
-	int idx = m_Enumerations.Find( name );
+	auto idx = m_Enumerations.Find( name );
 	if ( idx == m_Enumerations.InvalidIndex() )
 	{
 		found = false;
@@ -1100,7 +1101,7 @@ float CResponseSystem::RecursiveScoreSubcriteriaAgainstRule( const AI_CriteriaSe
 	int subcount = parent->subcriteria.Count();
 	for ( int i = 0; i < subcount; i++ )
 	{
-		int icriterion = parent->subcriteria[ i ];
+		auto icriterion = parent->subcriteria[ i ];
 
 		bool excludesubrule = false;
 		if (verbose)
@@ -1121,14 +1122,14 @@ float CResponseSystem::RecursiveLookForCriteria( const AI_CriteriaSet &criteriaS
 	int nSubCount = pParent->subcriteria.Count();
 	for ( int iSub = 0; iSub < nSubCount; ++iSub )
 	{
-		int iCriteria = pParent->subcriteria[iSub];
+		auto iCriteria = pParent->subcriteria[iSub];
 		flScore += LookForCriteria( criteriaSet, iCriteria );
 	}
 
 	return flScore;
 }
 
-float CResponseSystem::LookForCriteria( const AI_CriteriaSet &criteriaSet, int iCriteria )
+float CResponseSystem::LookForCriteria( const AI_CriteriaSet &criteriaSet, unsigned short iCriteria )
 {
 	Criteria *pCriteria = &m_Criteria[iCriteria];
 	if ( pCriteria->IsSubCriteriaType() )
@@ -1147,7 +1148,7 @@ float CResponseSystem::LookForCriteria( const AI_CriteriaSet &criteriaSet, int i
 	return 1.0f;
 }
 
-float CResponseSystem::ScoreCriteriaAgainstRuleCriteria( const AI_CriteriaSet& set, int icriterion, bool& exclude, bool verbose /*=false*/ )
+float CResponseSystem::ScoreCriteriaAgainstRuleCriteria( const AI_CriteriaSet& set, unsigned short icriterion, bool& exclude, bool verbose /*=false*/ )
 {
 	Criteria *c = &m_Criteria[ icriterion ];
 
@@ -1213,7 +1214,7 @@ float CResponseSystem::ScoreCriteriaAgainstRuleCriteria( const AI_CriteriaSet& s
 	return score;
 }
 
-float CResponseSystem::ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, int irule, bool verbose /*=false*/ )
+float CResponseSystem::ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, short irule, bool verbose /*=false*/ )
 {
 	Rule *rule = &m_Rules[ irule ];
 	float score = 0.0f;
@@ -1247,14 +1248,10 @@ float CResponseSystem::ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, int 
 	}
 
 	// Iterate set criteria
-	int count = rule->m_Criteria.Count();
-	int i;
-	for ( i = 0; i < count; i++ )
+	for ( auto &c : rule->m_Criteria )
 	{
-		int icriterion = rule->m_Criteria[ i ];
-
 		bool exclude = false;
-		score += ScoreCriteriaAgainstRuleCriteria( set, icriterion, exclude, verbose );
+		score += ScoreCriteriaAgainstRuleCriteria( set, c, exclude, verbose );
 
 		if ( verbose )
 		{
@@ -1302,9 +1299,8 @@ void CResponseSystem::DebugPrint( int depth, const char *fmt, ... )
 //-----------------------------------------------------------------------------
 void CResponseSystem::ResetResponseGroups()
 {
-	int i;
-	int c = m_Responses.Count();
-	for ( i = 0; i < c; i++ )
+	auto c = m_Responses.Count();
+	for ( decltype(m_Responses)::IndexType_t i = 0; i < c; i++ )
 	{
 		m_Responses[ i ].Reset();
 	}
@@ -1477,7 +1473,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 //-----------------------------------------------------------------------------
 bool CResponseSystem::ResolveResponse( ResponseSearchResult& searchResult, int depth, const char *name, bool verbose /*= false*/, IResponseFilter *pFilter )
 {
-	int responseIndex = m_Responses.Find( name );
+	auto responseIndex = m_Responses.Find( name );
 	if ( responseIndex == m_Responses.InvalidIndex() )
 		return false;
 
@@ -1495,7 +1491,7 @@ bool CResponseSystem::ResolveResponse( ResponseSearchResult& searchResult, int d
 	if ( g->IsSequential() )
 	{
 		// See if next index is valid
-		int initialIndex = g->GetCurrentIndex();
+		byte initialIndex = g->GetCurrentIndex();
 		bool bFoundValid = false;
 
 		do 
@@ -1593,7 +1589,7 @@ bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule 
 		return false;
 
 	int index = random->RandomInt( 0, c - 1 );
-	int groupIndex = rule->m_Responses[ index ];
+	auto groupIndex = rule->m_Responses[ index ];
 
 	ResponseGroup *g = &m_Responses[ groupIndex ];
 
@@ -1610,7 +1606,7 @@ bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule 
 	if ( g->IsSequential() )
 	{
 		// See if next index is valid
-		int initialIndex = g->GetCurrentIndex();
+		byte initialIndex = g->GetCurrentIndex();
 		bool bFoundValid = false;
 
 		do 
@@ -1685,14 +1681,13 @@ bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule 
 //			verbose - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CResponseSystem::FindBestMatchingRule( const AI_CriteriaSet& set, bool verbose )
+short CResponseSystem::FindBestMatchingRule( const AI_CriteriaSet& set, bool verbose )
 {
-	CUtlVector< int >	bestrules;
+	CUtlVector< short >	bestrules;
 	float bestscore = 0.001f;
 
-	int c = m_Rules.Count();
-	int i;
-	for ( i = 0; i < c; i++ )
+	const auto c = m_Rules.Count();
+	for ( decltype(m_Rules)::IndexType_t i = 0; i < c; i++ )
 	{
 		float score = ScoreCriteriaAgainstRule( set, i, verbose );
 		// Check equals so that we keep track of all matching rules
@@ -1710,12 +1705,12 @@ int CResponseSystem::FindBestMatchingRule( const AI_CriteriaSet& set, bool verbo
 		}
 	}
 
-	int bestCount = bestrules.Count();
+	const intp bestCount = bestrules.Count();
 	if ( bestCount <= 0 )
 		return -1;
 
 	if ( bestCount == 1 )
-		return bestrules[ 0 ];
+		return bestrules[0];
 
 	// Randomly pick one of the tied matching rules
 	int idx = random->RandomInt( 0, bestCount - 1 );
@@ -1740,7 +1735,7 @@ bool CResponseSystem::FindBestResponse( const AI_CriteriaSet& set, AI_Response& 
 	bool showResult = ( iDbgResponse == 1 || iDbgResponse == 2 );
 
 	// Look for match. verbose mode used to be at level 2, but disabled because the writers don't actually care for that info.
-	int bestRule = FindBestMatchingRule( set, iDbgResponse == 3 ); 
+	short bestRule = FindBestMatchingRule( set, iDbgResponse == 3 ); 
 
 	ResponseType_t responseType = RESPONSE_NONE;
 	AI_ResponseParams rp;
@@ -1796,7 +1791,7 @@ bool CResponseSystem::FindBestResponse( const AI_CriteriaSet& set, AI_Response& 
 //-----------------------------------------------------------------------------
 void CResponseSystem::GetAllResponses( CUtlVector<AI_Response *> *pResponses )
 {
-	for ( int i = 0; i < (int)m_Responses.Count(); i++ )
+	for ( decltype(m_Responses)::IndexType_t i = 0; i < m_Responses.Count(); i++ )
 	{
 		ResponseGroup &group = m_Responses[i];
 
@@ -1826,7 +1821,7 @@ void CResponseSystem::Precache()
 	bool bTouchFiles = CommandLine()->FindParm( "-makereslists" ) != 0;
 
 	// enumerate and mark all the scripts so we know they're referenced
-	for ( int i = 0; i < (int)m_Responses.Count(); i++ )
+	for ( decltype(m_Responses)::IndexType_t i = 0; i < m_Responses.Count(); i++ )
 	{
 		ResponseGroup &group = m_Responses[i];
 
@@ -1965,7 +1960,7 @@ void CResponseSystem::LoadFromBuffer( const char *scriptfile, const char *buffer
 	{
 		char cur[ 256 ];
 		GetCurrentScript( cur, sizeof( cur ) );
-		DevMsg( 1, "CResponseSystem:  %s (%i rules, %i criteria, and %i responses)\n",
+		DevMsg( 1, "CResponseSystem:  %s (%hd rules, %hd criteria, and %hd responses)\n",
 			cur, m_Rules.Count(), m_Criteria.Count(), m_Responses.Count() );
 
 		if( rr_dumpresponses.GetBool() )
@@ -2106,7 +2101,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_ODDS;
-			rp->odds = clamp( atoi( token ), 0, 100 );
+			rp->odds = static_cast<short>(clamp( atoi( token ), 0, 100 ));
 			continue;
 		}
 		
@@ -2130,7 +2125,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_SOUNDLEVEL;
-			rp->soundlevel = (soundlevel_t)TextToSoundLevel( token );
+			rp->soundlevel = TextToSoundLevel( token );
 			continue;
 		}
 
@@ -2286,7 +2281,7 @@ void CResponseSystem::ParseResponse( void )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_ODDS;
-			rp->odds = clamp( atoi( token ), 0, 100 );
+			rp->odds = static_cast<short>(clamp( atoi( token ), 0, 100 ));
 			continue;
 		}
 		
@@ -2310,7 +2305,7 @@ void CResponseSystem::ParseResponse( void )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_SOUNDLEVEL;
-			rp->soundlevel = (soundlevel_t)TextToSoundLevel( token );
+			rp->soundlevel = TextToSoundLevel( token );
 			continue;
 		}
 
@@ -2325,7 +2320,7 @@ void CResponseSystem::ParseResponse( void )
 // Purpose: 
 // Input  : *criterion - 
 //-----------------------------------------------------------------------------
-int CResponseSystem::ParseOneCriterion( const char *criterionName )
+short CResponseSystem::ParseOneCriterion( const char *criterionName )
 {
 	char key[ 128 ];
 	char value[ 128 ];
@@ -2356,7 +2351,7 @@ int CResponseSystem::ParseOneCriterion( const char *criterionName )
 					break;
 
 				// Look up subcriteria index
-				int idx = m_Criteria.Find( token );
+				auto idx = m_Criteria.Find( token );
 				if ( idx != m_Criteria.InvalidIndex() )
 				{
 					newCriterion.subcriteria.AddToTail( idx );
@@ -2405,7 +2400,7 @@ int CResponseSystem::ParseOneCriterion( const char *criterionName )
 		return m_Criteria.InvalidIndex();
 	}
 
-	int idx = m_Criteria.Insert( criterionName, newCriterion );
+	short idx = m_Criteria.Insert( criterionName, newCriterion );
 	return idx;
 }
 
@@ -2551,7 +2546,7 @@ void CResponseSystem::ParseRule( void )
 			while ( TokenWaiting() )
 			{
 				ParseToken();
-				int idx = m_Responses.Find( token );
+				auto idx = m_Responses.Find( token );
 				if ( idx != m_Responses.InvalidIndex() )
 				{
 					MEM_ALLOC_CREDIT();
@@ -2574,7 +2569,7 @@ void CResponseSystem::ParseRule( void )
 			{
 				ParseToken();
 
-				int idx = m_Criteria.Find( token );
+				auto idx = m_Criteria.Find( token );
 				if ( idx != m_Criteria.InvalidIndex() )
 				{
 					MEM_ALLOC_CREDIT();
@@ -2592,7 +2587,7 @@ void CResponseSystem::ParseRule( void )
 		// It's an inline criteria, generate a name and parse it in
 		Q_snprintf( sz, sizeof( sz ), "[%s%03i]", ruleName, ++instancedCriteria );
 		Unget();
-		int idx = ParseOneCriterion( sz );
+		short idx = ParseOneCriterion( sz );
 		if ( idx != m_Criteria.InvalidIndex() )
 		{
 			newRule.m_Criteria.AddToTail( idx );
@@ -2645,14 +2640,14 @@ void CResponseSystem::ResponseWarning( const char *fmt, ... )
 void CResponseSystem::CopyCriteriaFrom( Rule *pSrcRule, Rule *pDstRule, CResponseSystem *pCustomSystem )
 {
 	// Add criteria from this rule to global list in custom response system.
-	int nCriteriaCount = pSrcRule->m_Criteria.Count();
-	for ( int iCriteria = 0; iCriteria < nCriteriaCount; ++iCriteria )
+	intp nCriteriaCount = pSrcRule->m_Criteria.Count();
+	for ( intp iCriteria = 0; iCriteria < nCriteriaCount; ++iCriteria )
 	{
-		int iSrcIndex = pSrcRule->m_Criteria[iCriteria];
+		auto iSrcIndex = pSrcRule->m_Criteria[iCriteria];
 		Criteria *pSrcCriteria = &m_Criteria[iSrcIndex];
 		if ( pSrcCriteria )
 		{
-			int iIndex = pCustomSystem->m_Criteria.Find( m_Criteria.GetElementName( iSrcIndex ) );
+			auto iIndex = pCustomSystem->m_Criteria.Find( m_Criteria.GetElementName( iSrcIndex ) );
 			if ( iIndex != pCustomSystem->m_Criteria.InvalidIndex() )
 			{
 				pDstRule->m_Criteria.AddToTail( iIndex );
@@ -2668,14 +2663,14 @@ void CResponseSystem::CopyCriteriaFrom( Rule *pSrcRule, Rule *pDstRule, CRespons
 			dstCriteria.required = pSrcCriteria->required;
 			dstCriteria.matcher = pSrcCriteria->matcher;
 
-			int nSubCriteriaCount = pSrcCriteria->subcriteria.Count();
-			for ( int iSubCriteria = 0; iSubCriteria < nSubCriteriaCount; ++iSubCriteria )
+			intp nSubCriteriaCount = pSrcCriteria->subcriteria.Count();
+			for ( intp iSubCriteria = 0; iSubCriteria < nSubCriteriaCount; ++iSubCriteria )
 			{
-				int iSrcSubIndex = pSrcCriteria->subcriteria[iSubCriteria];
+				auto iSrcSubIndex = pSrcCriteria->subcriteria[iSubCriteria];
 				Criteria *pSrcSubCriteria = &m_Criteria[iSrcSubIndex];
 				if ( pSrcCriteria )
 				{
-					int iSubIndex = pCustomSystem->m_Criteria.Find( pSrcSubCriteria->value );
+					auto iSubIndex = pCustomSystem->m_Criteria.Find( pSrcSubCriteria->value );
 					if ( iSubIndex != pCustomSystem->m_Criteria.InvalidIndex() )
 						continue;
 
@@ -2688,12 +2683,12 @@ void CResponseSystem::CopyCriteriaFrom( Rule *pSrcRule, Rule *pDstRule, CRespons
 					dstSubCriteria.required = pSrcSubCriteria->required;
 					dstSubCriteria.matcher = pSrcSubCriteria->matcher;
 
-					int iSubInsertIndex = pCustomSystem->m_Criteria.Insert( pSrcSubCriteria->value, dstSubCriteria );
+					auto iSubInsertIndex = pCustomSystem->m_Criteria.Insert( pSrcSubCriteria->value, dstSubCriteria );
 					dstCriteria.subcriteria.AddToTail( iSubInsertIndex );
 				}
 			}
 
-			int iInsertIndex = pCustomSystem->m_Criteria.Insert( m_Criteria.GetElementName( iSrcIndex ), dstCriteria );
+			auto iInsertIndex = pCustomSystem->m_Criteria.Insert( m_Criteria.GetElementName( iSrcIndex ), dstCriteria );
 			pDstRule->m_Criteria.AddToTail( iInsertIndex );
 		}
 	}
@@ -2705,10 +2700,10 @@ void CResponseSystem::CopyCriteriaFrom( Rule *pSrcRule, Rule *pDstRule, CRespons
 void CResponseSystem::CopyResponsesFrom( Rule *pSrcRule, Rule *pDstRule, CResponseSystem *pCustomSystem )
 {
 	// Add responses from this rule to global list in custom response system.
-	int nResponseGroupCount = pSrcRule->m_Responses.Count();
-	for ( int iResponseGroup = 0; iResponseGroup < nResponseGroupCount; ++iResponseGroup )
+	intp nResponseGroupCount = pSrcRule->m_Responses.Count();
+	for ( intp iResponseGroup = 0; iResponseGroup < nResponseGroupCount; ++iResponseGroup )
 	{
-		int iSrcResponseGroup = pSrcRule->m_Responses[iResponseGroup];
+		auto iSrcResponseGroup = pSrcRule->m_Responses[iResponseGroup];
 		ResponseGroup *pSrcResponseGroup = &m_Responses[iSrcResponseGroup];
 		if ( pSrcResponseGroup )
 		{
@@ -2725,8 +2720,8 @@ void CResponseSystem::CopyResponsesFrom( Rule *pSrcRule, Rule *pDstRule, CRespon
 			dstResponseGroup.m_bEnabled = pSrcResponseGroup->m_bEnabled;
 			dstResponseGroup.m_nCurrentIndex = pSrcResponseGroup->m_nCurrentIndex;
 
-			int nSrcResponseCount = pSrcResponseGroup->group.Count();
-			for ( int iResponse = 0; iResponse < nSrcResponseCount; ++iResponse )
+			intp nSrcResponseCount = pSrcResponseGroup->group.Count();
+			for ( intp iResponse = 0; iResponse < nSrcResponseCount; ++iResponse )
 			{
 				Response *pSrcResponse = &pSrcResponseGroup->group[iResponse];
 				if ( pSrcResponse )
@@ -2745,7 +2740,7 @@ void CResponseSystem::CopyResponsesFrom( Rule *pSrcRule, Rule *pDstRule, CRespon
 				}
 			}
 
-			int iInsertIndex = pCustomSystem->m_Responses.Insert( m_Responses.GetElementName( iSrcResponseGroup ), dstResponseGroup );
+			auto iInsertIndex = pCustomSystem->m_Responses.Insert( m_Responses.GetElementName( iSrcResponseGroup ), dstResponseGroup );
 			pDstRule->m_Responses.AddToTail( iInsertIndex );
 		}
 	}
@@ -2756,8 +2751,8 @@ void CResponseSystem::CopyResponsesFrom( Rule *pSrcRule, Rule *pDstRule, CRespon
 //-----------------------------------------------------------------------------
 void CResponseSystem::CopyEnumerationsFrom( CResponseSystem *pCustomSystem )
 {
-	int nEnumerationCount = m_Enumerations.Count();
-	for ( int iEnumeration = 0; iEnumeration < nEnumerationCount; ++iEnumeration )
+	auto nEnumerationCount = m_Enumerations.Count();
+	for ( decltype(m_Enumerations)::IndexType_t iEnumeration = 0; iEnumeration < nEnumerationCount; ++iEnumeration )
 	{
 		Enumeration *pSrcEnumeration = &m_Enumerations[iEnumeration];
 		if ( pSrcEnumeration )
@@ -2772,7 +2767,7 @@ void CResponseSystem::CopyEnumerationsFrom( CResponseSystem *pCustomSystem )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CResponseSystem::CopyRuleFrom( Rule *pSrcRule, int iRule, CResponseSystem *pCustomSystem )
+void CResponseSystem::CopyRuleFrom( Rule *pSrcRule, short iRule, CResponseSystem *pCustomSystem )
 {
 	// Verify data.
 	Assert( pSrcRule );
@@ -2890,7 +2885,7 @@ public:
 
 	CInstancedResponseSystem *FindResponseSystem( const char *scriptfile )
 	{
-		int idx = m_InstancedSystems.Find( scriptfile );
+		auto idx = m_InstancedSystems.Find( scriptfile );
 		if ( idx == m_InstancedSystems.InvalidIndex() )
 			return NULL;
 		return m_InstancedSystems[ idx ];
@@ -2917,7 +2912,7 @@ public:
 
 		sys->Precache();
 
-		return ( IResponseSystem * )sys;
+		return sys;
 	}
 
 	IResponseSystem *BuildCustomResponseSystemGivenCriteria( const char *pszBaseFile, const char *pszCustomName, AI_CriteriaSet &criteriaSet, float flCriteriaScore );
@@ -2988,18 +2983,18 @@ IResponseSystem *CDefaultResponseSystem::BuildCustomResponseSystemGivenCriteria(
 	pCustomSystem->Clear();
 
 	// Copy the relevant rules and data.
-	int nRuleCount = m_Rules.Count();
-	for ( int iRule = 0; iRule < nRuleCount; ++iRule )
+	auto nRuleCount = m_Rules.Count();
+	for ( decltype(m_Rules)::IndexType_t iRule = 0; iRule < nRuleCount; ++iRule )
 	{
 		Rule *pRule = &m_Rules[iRule];
 		if ( pRule )
 		{
 			float flScore = 0.0f;
 
-			int nCriteriaCount = pRule->m_Criteria.Count();
-			for ( int iCriteria = 0; iCriteria < nCriteriaCount; ++iCriteria )
+			intp nCriteriaCount = pRule->m_Criteria.Count();
+			for ( intp iCriteria = 0; iCriteria < nCriteriaCount; ++iCriteria )
 			{
-				int iRuleCriteria = pRule->m_Criteria[iCriteria];
+				auto iRuleCriteria = pRule->m_Criteria[iCriteria];
 
 				flScore += LookForCriteria( criteriaSet, iRuleCriteria );
 				if ( flScore >= flCriteriaScore )
@@ -3053,17 +3048,20 @@ static short RESPONSESYSTEM_SAVE_RESTORE_VERSION = 1;
 class CDefaultResponseSystemSaveRestoreBlockHandler : public CDefSaveRestoreBlockHandler
 {
 public:
-	const char *GetBlockName()
+	// dimhotepus: Initialize m_fDoLoad on startup.
+	CDefaultResponseSystemSaveRestoreBlockHandler() : m_fDoLoad{false} {}
+
+	const char *GetBlockName() override
 	{
 		return "ResponseSystem";
 	}
 
-	void WriteSaveHeaders( ISave *pSave )
+	void WriteSaveHeaders( ISave *pSave ) override
 	{
 		pSave->WriteShort( &RESPONSESYSTEM_SAVE_RESTORE_VERSION );
 	}
 	
-	void ReadRestoreHeaders( IRestore *pRestore )
+	void ReadRestoreHeaders( IRestore *pRestore ) override
 	{
 		// No reason why any future version shouldn't try to retain backward compatability. The default here is to not do so.
 		short version;
@@ -3071,13 +3069,13 @@ public:
 		m_fDoLoad = ( version == RESPONSESYSTEM_SAVE_RESTORE_VERSION );
 	}
 
-	void Save( ISave *pSave )
+	void Save( ISave *pSave ) override
 	{
 		CDefaultResponseSystem& rs = defaultresponsesytem;
 
 		int count = rs.m_Responses.Count();
 		pSave->WriteInt( &count );
-		for ( int i = 0; i < count; ++i )
+		for ( decltype(rs.m_Responses)::IndexType_t i = 0; i < static_cast<decltype(rs.m_Responses)::IndexType_t>(count); ++i )
 		{
 			pSave->StartBlock( "ResponseGroup" );
 
@@ -3100,35 +3098,38 @@ public:
 		}
 	}
 
-	void Restore( IRestore *pRestore, bool createPlayers )
+	void Restore( IRestore *pRestore, bool createPlayers ) override
 	{
 		if ( !m_fDoLoad )
 			return;
 
 		CDefaultResponseSystem& rs = defaultresponsesytem;
-
+		
+		char szResponseGroupBlockName[SIZE_BLOCK_NAME_BUF];
 		int count = pRestore->ReadInt();
 		for ( int i = 0; i < count; ++i )
 		{
-			char szResponseGroupBlockName[SIZE_BLOCK_NAME_BUF];
+			// dimhotepus: Null terminate.
+			szResponseGroupBlockName[0] = '\0';
 			pRestore->StartBlock( szResponseGroupBlockName );
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
-
 				char groupname[ 256 ];
 				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
 
 				// Try and find it
-				int idx = rs.m_Responses.Find( groupname );
+				auto idx = rs.m_Responses.Find( groupname );
 				if ( idx != rs.m_Responses.InvalidIndex() )
 				{
 					ResponseGroup *group = &rs.m_Responses[ idx ];
 					pRestore->ReadAll( group );
-
+					
+					char szResponseBlockName[SIZE_BLOCK_NAME_BUF];
 					short groupCount = pRestore->ReadShort();
 					for ( int j = 0; j < groupCount; ++j )
 					{
-						char szResponseBlockName[SIZE_BLOCK_NAME_BUF];
+						// dimhotepus: Null terminate.
+						szResponseBlockName[0] = '\0';
 
 						char responsename[ 256 ];
 						pRestore->StartBlock( szResponseBlockName );
@@ -3137,7 +3138,7 @@ public:
 							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
 
 							// Find it by name
-							int ri;
+							intp ri;
 							for ( ri = 0; ri < group->group.Count(); ++ri )
 							{
 								Response *response = &group->group[ ri ];
@@ -3187,7 +3188,7 @@ class CResponseSystemSaveRestoreOps : public CDefSaveRestoreOps
 {
 public:
 
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
 	{
 		CResponseSystem *pRS = *(CResponseSystem **)fieldInfo.pField;
 		if ( !pRS || pRS == &defaultresponsesytem )
@@ -3195,7 +3196,7 @@ public:
 		
 		int count = pRS->m_Responses.Count();
 		pSave->WriteInt( &count );
-		for ( int i = 0; i < count; ++i )
+		for ( decltype(pRS->m_Responses)::IndexType_t i = 0; i < static_cast<decltype(pRS->m_Responses)::IndexType_t>(count); ++i )
 		{
 			pSave->StartBlock( "ResponseGroup" );
 
@@ -3205,7 +3206,7 @@ public:
 
 			short groupCount = group->group.Count();
 			pSave->WriteShort( &groupCount );
-			for ( int j = 0; j < groupCount; ++j )
+			for ( intp j = 0; j < groupCount; ++j )
 			{
 				const Response *response = &group->group[ j ];
 				pSave->StartBlock( "Response" );
@@ -3218,34 +3219,38 @@ public:
 		}
 	}
 	
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
 		CResponseSystem *pRS = *(CResponseSystem **)fieldInfo.pField;
 		if ( !pRS || pRS == &defaultresponsesytem )
 			return;
-
+		
+		char szResponseGroupBlockName[SIZE_BLOCK_NAME_BUF];
 		int count = pRestore->ReadInt();
 		for ( int i = 0; i < count; ++i )
 		{
-			char szResponseGroupBlockName[SIZE_BLOCK_NAME_BUF];
+			// dimhotepus: Null terminate.
+			szResponseGroupBlockName[0] = '\0';
+
 			pRestore->StartBlock( szResponseGroupBlockName );
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
-
 				char groupname[ 256 ];
 				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
 
 				// Try and find it
-				int idx = pRS->m_Responses.Find( groupname );
+				auto idx = pRS->m_Responses.Find( groupname );
 				if ( idx != pRS->m_Responses.InvalidIndex() )
 				{
 					ResponseGroup *group = &pRS->m_Responses[ idx ];
 					pRestore->ReadAll( group );
-
+					
+					char szResponseBlockName[SIZE_BLOCK_NAME_BUF];
 					short groupCount = pRestore->ReadShort();
 					for ( int j = 0; j < groupCount; ++j )
 					{
-						char szResponseBlockName[SIZE_BLOCK_NAME_BUF];
+						// dimhotepus: Null terminate.
+						szResponseBlockName[0] = '\0';
 
 						char responsename[ 256 ];
 						pRestore->StartBlock( szResponseBlockName );
@@ -3254,7 +3259,7 @@ public:
 							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
 
 							// Find it by name
-							int ri;
+							intp ri;
 							for ( ri = 0; ri < group->group.Count(); ++ri )
 							{
 								Response *response = &group->group[ ri ];
@@ -3350,10 +3355,9 @@ void DestroyCustomResponseSystems()
 //-----------------------------------------------------------------------------
 void CResponseSystem::DumpRules()
 {
-	int c = m_Rules.Count();
-	int i;
+	auto c = m_Rules.Count();
 
-	for ( i = 0; i < c; i++ )
+	for ( decltype(m_Rules)::IndexType_t i = 0; i < c; i++ )
 	{
 		Msg("%s\n", m_Rules.GetElementName( i ) );
 	}
@@ -3365,34 +3369,34 @@ void CResponseSystem::DumpDictionary( const char *pszName )
 {
 	Msg( "\nDictionary: %s\n", pszName );
 
-	int nRuleCount = m_Rules.Count();
-	for ( int iRule = 0; iRule < nRuleCount; ++iRule )
+	const auto nRuleCount = m_Rules.Count();
+	for ( decltype(m_Rules)::IndexType_t iRule = 0; iRule < nRuleCount; ++iRule )
 	{
-		Msg("	Rule %d: %s\n", iRule, m_Rules.GetElementName( iRule ) );
+		Msg("	Rule %hd: %s\n", iRule, m_Rules.GetElementName( iRule ) );
 
 		Rule *pRule = &m_Rules[iRule];
 
-		int nCriteriaCount = pRule->m_Criteria.Count();
-		for( int iCriteria = 0; iCriteria < nCriteriaCount; ++iCriteria )
+		const intp nCriteriaCount{pRule->m_Criteria.Count()};
+		for( intp iCriteria = 0; iCriteria < nCriteriaCount; ++iCriteria )
 		{
-			int iRuleCriteria = pRule->m_Criteria[iCriteria];
+			auto iRuleCriteria = pRule->m_Criteria[iCriteria];
 			Criteria *pCriteria = &m_Criteria[iRuleCriteria];
-			Msg( "		Criteria %d: %s %s\n", iCriteria, pCriteria->name, pCriteria->value );
+			Msg( "		Criteria %zd: %s %s\n", iCriteria, pCriteria->name, pCriteria->value );
 		}
 
-		int nResponseGroupCount = pRule->m_Responses.Count();
-		for ( int iResponseGroup = 0; iResponseGroup < nResponseGroupCount; ++iResponseGroup )
+		const intp nResponseGroupCount{pRule->m_Responses.Count()};
+		for ( intp iResponseGroup = 0; iResponseGroup < nResponseGroupCount; ++iResponseGroup )
 		{
-			int iRuleResponse = pRule->m_Responses[iResponseGroup];
+			const auto iRuleResponse = pRule->m_Responses[iResponseGroup];
 			ResponseGroup *pResponseGroup = &m_Responses[iRuleResponse];
 
-			Msg( "		ResponseGroup %d: %s\n", iResponseGroup, m_Responses.GetElementName( iRuleResponse ) );
+			Msg( "		ResponseGroup %zd: %s\n", iResponseGroup, m_Responses.GetElementName( iRuleResponse ) );
 
-			int nResponseCount = pResponseGroup->group.Count();
-			for ( int iResponse = 0; iResponse < nResponseCount; ++iResponse )
+			const intp nResponseCount{pResponseGroup->group.Count()};
+			for ( intp iResponse = 0; iResponse < nResponseCount; ++iResponse )
 			{
 				Response *pResponse = &pResponseGroup->group[iResponse];
-				Msg( "			Response %d: %s\n", iResponse, pResponse->value );
+				Msg( "			Response %zd: %s\n", iResponse, pResponse->value );
 			}
 		}
 	}
