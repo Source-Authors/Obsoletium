@@ -281,7 +281,7 @@ bool CPanelMetaClassMgrImp::ParseSingleMetaClass( const char* pFileName,
 		return false;
 	}
 
-	unsigned short i = m_PanelTypeDict.Find( pPanelType );
+	auto i = m_PanelTypeDict.Find( pPanelType );
 	if (i == m_PanelTypeDict.InvalidIndex())
 	{
 		Warning( "Type %s of meta class %s undefined!\n", pPanelType, pMetaClassName );
@@ -337,7 +337,7 @@ void CPanelMetaClassMgrImp::LoadMetaClassDefinitionFile( const char *pFileName )
 		auto j = m_MetaClassDict.First();
 		while ( j != m_MetaClassDict.InvalidIndex() )
 		{
-			unsigned short next = m_MetaClassDict.Next(j);
+			auto next = m_MetaClassDict.Next(j);
 			if ( m_MetaClassDict[j].m_KeyValueIndex == i)
 			{
 				m_MetaClassDict.RemoveAt(j);
