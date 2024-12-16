@@ -190,7 +190,7 @@ CChoreoScene::CChoreoScene( const CChoreoScene& src )
 	m_SceneRamp = src.m_SceneRamp;
 
 	m_TimeZoomLookup.RemoveAll();
-	for ( int i = 0; i < (int)src.m_TimeZoomLookup.Count(); i++ )
+	for ( int i = 0; i < src.m_TimeZoomLookup.Count(); i++ )
 	{
 		m_TimeZoomLookup.Insert( src.m_TimeZoomLookup.GetElementName( i ), src.m_TimeZoomLookup[ i ] );
 	}
@@ -292,7 +292,7 @@ CChoreoScene& CChoreoScene::operator=( const CChoreoScene& src )
 	m_SceneRamp = src.m_SceneRamp;
 
 	m_TimeZoomLookup.RemoveAll();
-	for ( int i = 0; i < (int)src.m_TimeZoomLookup.Count(); i++ )
+	for ( int i = 0; i < src.m_TimeZoomLookup.Count(); i++ )
 	{
 		m_TimeZoomLookup.Insert( src.m_TimeZoomLookup.GetElementName( i ), src.m_TimeZoomLookup[ i ] );
 	}
@@ -1897,14 +1897,14 @@ void CCurveData::FileSave( CUtlBuffer& buf, int level, const char *name )
 void CChoreoScene::FileSaveScaleSettings( CUtlBuffer& buf, int level, CChoreoScene *scene )
 {
 	// Nothing to save?
-	intp c = scene->m_TimeZoomLookup.Count();
+	int c = scene->m_TimeZoomLookup.Count();
 	if ( c <= 0 )
 		return;
 
 	FilePrintf( buf, level, "scalesettings\n" );
 	FilePrintf( buf, level, "{\n" );
 
-	for ( intp i = 0; i < c; i++ )
+	for ( int i = 0; i < c; i++ )
 	{
 		int value = scene->m_TimeZoomLookup[ i ];
 
