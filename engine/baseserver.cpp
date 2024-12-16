@@ -276,9 +276,6 @@ CBaseServer::CBaseServer()
 	m_nUserid = 0;
 	m_nNumConnections = 0;
 	m_bIsDedicated = false;
-	m_fCPUPercent = 0;
-	m_fStartTime = 0;
-	m_fLastCPUCheckTime = 0;
 	
 	m_bMasterServerRulesDirty = true;
 	m_flLastMasterServerUpdateTime = 0;
