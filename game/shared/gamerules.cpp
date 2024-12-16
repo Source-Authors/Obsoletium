@@ -369,10 +369,10 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 		}
 
 		// blast's don't tavel into or out of water
-		if (bInWater && pEntity->GetWaterLevel() == 0)
+		if (bInWater && pEntity->GetWaterLevel() == WaterLevel::WL_NotInWater)
 			continue;
 
-		if (!bInWater && pEntity->GetWaterLevel() == 3)
+		if (!bInWater && pEntity->GetWaterLevel() == WaterLevel::WL_Eyes)
 			continue;
 
 		// Check that the explosion can 'see' this entity.

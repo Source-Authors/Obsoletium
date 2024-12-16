@@ -2049,7 +2049,7 @@ bool CBaseEntity::ShouldDrawUnderwaterBulletBubbles()
 {
 #if defined( HL2_DLL ) && defined( GAME_DLL )
 	CBaseEntity *pPlayer = ( gpGlobals->maxClients == 1 ) ? UTIL_GetLocalPlayer() : NULL;
-	return pPlayer && (pPlayer->GetWaterLevel() == 3);
+	return pPlayer && (pPlayer->GetWaterLevel() == WaterLevel::WL_Eyes);
 #else
 	return false;
 #endif
