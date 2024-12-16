@@ -177,13 +177,13 @@ StateSnapshot_t CTransitionTable::CreateStateSnapshot( ShadowStateId_t shadowSta
 //-----------------------------------------------------------------------------
 CTransitionTable::ShadowStateId_t CTransitionTable::CreateShadowState( const ShadowState_t &currentState )
 {
-	intp newShaderState = m_ShadowStateList.AddToTail();
+	ShadowStateId_t newShaderState = m_ShadowStateList.AddToTail();
 
 	// Copy our snapshot into the list
 	memcpy( &m_ShadowStateList[newShaderState], &currentState, sizeof(ShadowState_t) );
 
 	// all existing states must transition to the new state
-	intp i;
+	ShadowStateId_t i;
 	for ( i = 0; i < newShaderState; ++i )
 	{
 		// Add a new transition to all existing states
@@ -230,8 +230,8 @@ CTransitionTable::ShadowStateId_t CTransitionTable::FindShadowState( const Shado
 	CRC32_ProcessBuffer( &find.m_nChecksum, &currentState, sizeof(ShadowState_t) );
 	CRC32_Final( &find.m_nChecksum );
 	
-	int nDictCount = m_ShadowStateDict.Count();
-	int i = m_ShadowStateDict.FindLessOrEqual( find );
+	intp nDictCount = m_ShadowStateDict.Count();
+	intp i = m_ShadowStateDict.FindLessOrEqual( find );
 	if ( i < 0 )
 		return (ShadowStateId_t)-1;
 
@@ -274,8 +274,8 @@ StateSnapshot_t CTransitionTable::FindStateSnapshot( ShadowStateId_t id, const S
 	CRC32_ProcessBuffer( &find.m_nChecksum, &temp, sizeof(temp) );
 	CRC32_Final( &find.m_nChecksum );
 
-	int nDictCount = m_SnapshotDict.Count();
-	int i = m_SnapshotDict.FindLessOrEqual( find );
+	intp nDictCount = m_SnapshotDict.Count();
+	intp i = m_SnapshotDict.FindLessOrEqual( find );
 	if ( i < 0 )
 		return (StateSnapshot_t)-1;
 
@@ -1138,7 +1138,7 @@ int CTransitionTable::CreateNormalTransitions( const ShadowState_t& fromState, c
 	return numOps;
 }
 
-void CTransitionTable::CreateTransitionTableEntry( int to, int from )
+void CTransitionTable::CreateTransitionTableEntry( ShadowStateId_t to, ShadowStateId_t from )
 {
 	// You added or removed a state to the enums but not to the function table lists!
 	COMPILE_TIME_ASSERT( sizeof(s_pRenderFunctionTable) == sizeof(ApplyStateFunc_t) * RENDER_STATE_COUNT );
@@ -1391,7 +1391,7 @@ void CTransitionTable::TakeDefaultStateSnapshot( )
 //-----------------------------------------------------------------------------
 // Applies the transition list
 //-----------------------------------------------------------------------------
-void CTransitionTable::ApplyTransitionList( int snapshot, int nFirstOp, int nOpCount )
+void CTransitionTable::ApplyTransitionList( StateSnapshot_t snapshot, int nFirstOp, int nOpCount )
 {
 	VPROF("CTransitionTable::ApplyTransitionList");
 	// Don't bother if there's nothing to do
@@ -1424,7 +1424,7 @@ void CTransitionTable::ApplyTransitionList( int snapshot, int nFirstOp, int nOpC
 //-----------------------------------------------------------------------------
 // Apply startup snapshot
 //-----------------------------------------------------------------------------
-void CTransitionTable::ApplyTransition( TransitionList_t& list, int snapshot )
+void CTransitionTable::ApplyTransition( TransitionList_t& list, StateSnapshot_t snapshot )
 {
 	VPROF("CTransitionTable::ApplyTransition");
 	if ( g_pShaderDeviceDx8->IsDeactivated() )
@@ -1531,12 +1531,12 @@ StateSnapshot_t CTransitionTable::TakeSnapshot( )
 		shadowStateId = CreateShadowState( currentState );
 
 		// Now create new transition entries
-		for (int to = 0; to < shadowStateId; ++to)
+		for (ShadowStateId_t to = 0; to < shadowStateId; ++to)
 		{
 			CreateTransitionTableEntry( to, shadowStateId );
 		}
 
-		for (int from = 0; from < shadowStateId; ++from)
+		for (ShadowStateId_t from = 0; from < shadowStateId; ++from)
 		{
 			CreateTransitionTableEntry( shadowStateId, from );
 		}

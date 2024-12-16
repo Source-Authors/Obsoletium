@@ -9072,7 +9072,7 @@ void CShaderAPIDx8::SpewBoardState()
 	return;
 #ifdef DEBUG_BOARD_STATE
 	char buf[256];
-	sprintf(buf, "\nSnapshot id %d : \n", m_TransitionTable.CurrentSnapshot() );
+	sprintf(buf, "\nSnapshot id %zd : \n", m_TransitionTable.CurrentSnapshot() );
 	Plat_DebugString(buf);
 
 	ShadowState_t &boardState = m_TransitionTable.BoardState();
@@ -10731,21 +10731,17 @@ void CShaderAPIDx8::CommitPerPassFogMode( bool bUsingVertexAndPixelShaders )
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CommitPerPassStateChanges( StateSnapshot_t id )
 {
-	if ( IsX360() || UsesVertexAndPixelShaders(id) )
+	if ( UsesVertexAndPixelShaders(id) )
 	{
 		CommitPerPassVertexShaderTransforms();
 		CommitPerPassFogMode( true );
 		CallCommitFuncs( COMMIT_PER_PASS, false );
 	}
-	else if ( IsPC() )
+	else
 	{
 		CommitPerPassFixedFunctionTransforms();
 		CommitPerPassFogMode( false );
 		CallCommitFuncs( COMMIT_PER_PASS, true );
-	}
-	else
-	{
-		Assert( 0 );
 	}
 }
 
