@@ -201,8 +201,8 @@ void Interpolator_CurveInterpolate( int interpolationType,
 	switch ( interpolationType )
 	{
 	default:
-		Warning( "Unknown interpolation type %d\n",
-			(int)interpolationType );
+		Warning( "Unknown interpolation type %d\n", interpolationType );
+		[[fallthrough]];
 		// break; // Fall through and use catmull_rom as default
 	case INTERPOLATE_DEFAULT:
 	case INTERPOLATE_CATMULL_ROM_NORMALIZEX:
@@ -337,8 +337,8 @@ void Interpolator_CurveInterpolate_NonNormalized( int interpolationType,
 	switch ( interpolationType )
 	{
 	default:
-		Warning( "Unknown interpolation type %d\n",
-			(int)interpolationType );
+		Warning( "Unknown interpolation type %d\n", interpolationType );
+		[[fallthrough]];
 		// break; // Fall through and use catmull_rom as default
 	case INTERPOLATE_CATMULL_ROM_NORMALIZEX:
 	case INTERPOLATE_DEFAULT:
@@ -450,8 +450,8 @@ void Interpolator_CurveInterpolate_NonNormalized( int interpolationType,
 	switch ( interpolationType )
 	{
 	default:
-		Warning( "Unknown interpolation type %d\n",
-			(int)interpolationType );
+		Warning( "Unknown interpolation type %d\n", interpolationType );
+		[[fallthrough]];
 		// break; // Fall through and use catmull_rom as default
 	case INTERPOLATE_CATMULL_ROM_NORMALIZEX:
 	case INTERPOLATE_DEFAULT:
