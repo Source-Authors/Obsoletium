@@ -12,7 +12,6 @@
 #include "tier0/fasttimer.h"
 #include "r_areaportal.h"
 #include "cmodel_engine.h"
-#include "con_nprint.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -611,7 +610,7 @@ bool R_CullNode( Frustum_t *pAreaFrustum, mnode_t *pNode, int& nClipMask )
 }
 
 
-static ConVar r_portalscloseall( "r_portalscloseall", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY );
+static ConVar r_portalscloseall( "r_portalscloseall", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Close all portals" );
 static ConVar r_portalsopenall( "r_portalsopenall", "0", FCVAR_CHEAT, "Open all portals" );
 static ConVar r_ShowViewerArea( "r_ShowViewerArea", "0" );
 
