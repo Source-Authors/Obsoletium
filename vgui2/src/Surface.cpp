@@ -29,7 +29,6 @@
 #include <vgui/ILocalize.h>
 #include <vgui/IHTML.h>
 #include <vgui/IVGui.h>
-#include <vgui/IPanel.h>
 #include <vgui/IScheme.h>
 
 #include <vgui/Cursor.h>
@@ -665,7 +664,7 @@ bool CWin32Surface::TextureLessFunc(const Texture &lhs, const Texture &rhs)
 Texture *CWin32Surface::GetTextureById(int id)
 {
 	Texture findTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int index = m_VGuiSurfaceTextures.Find(findTex);
+	auto index = m_VGuiSurfaceTextures.Find(findTex);
 	if (m_VGuiSurfaceTextures.IsValidIndex(index))
 	{
 		return &m_VGuiSurfaceTextures[index];
@@ -677,7 +676,7 @@ Texture *CWin32Surface::GetTextureById(int id)
 Texture *CWin32Surface::AllocTextureForId(int id)
 {
 	Texture newTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int index = m_VGuiSurfaceTextures.Insert(newTex);
+	auto index = m_VGuiSurfaceTextures.Insert(newTex);
 	return &m_VGuiSurfaceTextures[index];
 }
 
@@ -1510,7 +1509,7 @@ bool CWin32Surface::DeleteTextureByID(int id)
 #endif
 
 	Texture findTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int index = m_VGuiSurfaceTextures.Find(findTex);
+	auto index = m_VGuiSurfaceTextures.Find(findTex);
 	if (m_VGuiSurfaceTextures.IsValidIndex(index))
 	{
 		Texture *texture = &m_VGuiSurfaceTextures[index];
@@ -1646,7 +1645,7 @@ bool CWin32Surface::DrawGetTextureFile(int id, char *filename, int maxlen )
 
 int	  CWin32Surface::DrawGetTextureId( char const *filename )
 {
-	int i = m_VGuiSurfaceTextures.FirstInorder();
+	auto i = m_VGuiSurfaceTextures.FirstInorder();
 	while ( i != m_VGuiSurfaceTextures.InvalidIndex() )
 	{
 		Texture *texture = &m_VGuiSurfaceTextures[i];
