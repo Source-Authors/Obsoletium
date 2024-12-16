@@ -35,8 +35,10 @@ namespace vgui
 {
 AnimationController *GetAnimationController()
 {
-	static AnimationController *s_pAnimationController = new AnimationController(NULL);
-	return s_pAnimationController;
+	// dimhotepus: Ensure no leak when app closes.
+	static std::unique_ptr<AnimationController> s_pAnimationController =
+		std::make_unique<AnimationController>(nullptr);
+	return s_pAnimationController.get();
 }
 }
 

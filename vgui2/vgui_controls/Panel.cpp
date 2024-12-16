@@ -768,25 +768,33 @@ Panel::~Panel()
 	_flags.ClearFlag( AUTODELETE_ENABLED );
 	_flags.SetFlag( MARKED_FOR_DELETION );
 
-	// remove panel from any list
-	SetParent((VPANEL)NULL);
-
-	// Stop our children from pointing at us, and delete them if possible
-	while (ipanel()->GetChildCount(GetVPanel()))
+	// dimhotepus: AnimationController destructor runs when ipanel is already unloaded.
+	if (ipanel())
 	{
-		VPANEL child = ipanel()->GetChild(GetVPanel(), 0);
-		if (ipanel()->IsAutoDeleteSet(child))
+		// remove panel from any list
+		SetParent((VPANEL)NULL);
+
+		// Stop our children from pointing at us, and delete them if possible
+		while (ipanel()->GetChildCount(GetVPanel()))
 		{
-			ipanel()->DeletePanel(child);
-		}
-		else
-		{
-			ipanel()->SetParent(child, NULL);
+			VPANEL child = ipanel()->GetChild(GetVPanel(), 0);
+			if (ipanel()->IsAutoDeleteSet(child))
+			{
+				ipanel()->DeletePanel(child);
+			}
+			else
+			{
+				ipanel()->SetParent(child, NULL);
+			}
 		}
 	}
-
-	// delete VPanel
-	ivgui()->FreePanel(_vpanel);
+	
+	// dimhotepus: AnimationController destructor runs when ivgui is already unloaded.
+	if (ivgui())
+	{
+		// delete VPanel
+		ivgui()->FreePanel(_vpanel);
+	}
 	// free our name
 	delete [] _panelName;
 
