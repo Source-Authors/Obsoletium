@@ -273,7 +273,7 @@ CSharedObjectCache::~CSharedObjectCache()
 //----------------------------------------------------------------------------
 CSharedObjectTypeCache *CSharedObjectCache::FindBaseTypeCache( int nClassID ) const
 {
-	int nIndex = m_mapObjects.Find( nClassID );
+	auto nIndex = m_mapObjects.Find( nClassID );
 	CSharedObjectTypeCache *pTypeCache = NULL;
 	if( m_mapObjects.IsValidIndex( nIndex ) )
 	{
