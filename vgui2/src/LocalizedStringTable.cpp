@@ -916,8 +916,8 @@ void CLocalizedStringTable::BuildFastValueLookup()
 	s_pTable = this;
 
 	// Build it
-	int c = m_Lookup.Count();
-	for ( int i = 0; i < c; ++i )
+	auto c = m_Lookup.Count();
+	for ( decltype(c) i = 0; i < c; ++i )
 	{
 		fastvalue_t val;
 		val.valueindex = m_Lookup[ i ].valueIndex;
