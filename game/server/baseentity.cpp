@@ -5424,15 +5424,15 @@ public:
 			return 0;
 		}
 
-		const char *cmdname = "ent_fire";
+		constexpr char cmdname[]{"ent_fire"};
 
-		char *substring = (char *)partial;
+		const char *substring = partial;
 		if ( Q_strstr( partial, cmdname ) )
 		{
-			substring = (char *)partial + strlen( cmdname ) + 1;
+			substring = partial + std::size( cmdname );
 		}
 
-		int checklen = 0;
+		intp checklen = 0;
 		char *space = Q_strstr( substring, " " );
 		if ( space )
 		{
@@ -5476,8 +5476,7 @@ public:
 			Q_strncpy( buf, name, sizeof( buf ) );
 			Q_strlower( buf );
 
-			CUtlString command;
-			command = CFmtStr( "%s %s", cmdname, buf );
+			CUtlString command = CFmtStr( "%s %s", cmdname, buf );
 			commands.AddToTail( command );
 		}
 
@@ -5486,12 +5485,12 @@ public:
 private:
 	int EntFire_AutoCompleteInput( const char *partial, CUtlVector< CUtlString > &commands )
 	{
-		const char *cmdname = "ent_fire";
+		constexpr char cmdname[]{"ent_fire"};
 
-		char *substring = (char *)partial;
+		const char *substring = partial;
 		if ( Q_strstr( partial, cmdname ) )
 		{
-			substring = (char *)partial + strlen( cmdname ) + 1;
+			substring = partial + std::size( cmdname );
 		}
 
 		intp checklen = 0;
@@ -5571,8 +5570,7 @@ private:
 			Q_strncpy( buf, name, sizeof( buf ) );
 			Q_strlower( buf );
 
-			CUtlString command;
-			command = CFmtStr( "%s %s %s", cmdname, targetEntity, buf );
+			CUtlString command = CFmtStr( "%s %s %s", cmdname, targetEntity, buf );
 			commands.AddToTail( command );
 		}
 
