@@ -52,7 +52,7 @@ size_t CStringPool::Count() const
 //-----------------------------------------------------------------------------
 const char * CStringPool::Find( const char *pszValue )
 {
-	unsigned short i = m_Strings.Find(pszValue);
+	auto i = m_Strings.Find(pszValue);
 	if ( m_Strings.IsValidIndex(i) )
 		return m_Strings[i];
 
@@ -63,8 +63,8 @@ const char * CStringPool::Allocate( const char *pszValue )
 {
 	char	*pszNew;
 
-	unsigned short i 	= m_Strings.Find(pszValue);
-	bool		   bNew = (i == m_Strings.InvalidIndex());
+	auto i 	= m_Strings.Find(pszValue);
+	bool bNew = (i == m_Strings.InvalidIndex());
 
 	if ( !bNew )
 		return m_Strings[i];
@@ -82,7 +82,7 @@ const char * CStringPool::Allocate( const char *pszValue )
 
 void CStringPool::FreeAll()
 {
-	unsigned short i = m_Strings.FirstInorder();
+	auto i = m_Strings.FirstInorder();
 	while ( i != m_Strings.InvalidIndex() )
 	{
 		free( (void *)m_Strings[i] );
