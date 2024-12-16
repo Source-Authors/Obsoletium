@@ -433,7 +433,7 @@ DmElementDictHandle_t CDmElementSerializationDictionary::FirstRootElement() cons
 	// NOTE: I don't have to use First/NextInorder here because there
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
-	intp nCount = m_Dict.Count();
+	DmElementDictHandle_t nCount = m_Dict.Count();
 	for ( DmElementDictHandle_t h = 0; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
@@ -450,7 +450,7 @@ DmElementDictHandle_t CDmElementSerializationDictionary::NextRootElement( DmElem
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
 	++h;
-	intp nCount = m_Dict.Count();
+	DmElementDictHandle_t nCount = m_Dict.Count();
 	for ( ; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
