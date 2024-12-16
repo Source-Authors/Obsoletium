@@ -1369,7 +1369,7 @@ HFont CScheme::FindFontInAliasList( const char *fontName )
 //-----------------------------------------------------------------------------
 char const *CScheme::GetFontName( const HFont& font )
 {
-	for (int i = m_FontAliases.Count(); --i >= 0; )
+	for (auto i = m_FontAliases.Count(); --i >= 0; )
 	{
 		HFont fnt = m_FontAliases[i]._font;
 		if ( fnt == font )
