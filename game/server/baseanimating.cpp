@@ -1905,7 +1905,7 @@ int CBaseAnimating::LookupAttachment( const char *szName )
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::LookupAttachment: model missing");
+		AssertMsg( false, "Attachment model %s missing.\n", szName );
 		return 0;
 	}
 
