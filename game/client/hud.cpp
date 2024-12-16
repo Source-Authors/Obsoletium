@@ -18,13 +18,11 @@
 #include "in_buttons.h"
 #include <vgui_controls/Controls.h>
 #include <vgui/ISurface.h>
-#include <KeyValues.h>
 #include "itextmessage.h"
-#include "mempool.h"
-#include <KeyValues.h>
+#include "tier1/mempool.h"
+#include "tier1/KeyValues.h"
 #include "filesystem.h"
 #include <vgui_controls/AnimationController.h>
-#include <vgui/ISurface.h>
 #include "hud_lcd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -549,19 +547,20 @@ void CHud::LevelShutdown( void )
 //-----------------------------------------------------------------------------
 CHud::~CHud()
 {
-	int c = m_Icons.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	const int iconsCount{m_Icons.Count()};
+	for ( int i = iconsCount - 1; i >= 0; i-- )
 	{
 		CHudTexture *tex = m_Icons[ i ];
 		g_HudTextureMemoryPool.Free( tex );
 	}
 	m_Icons.Purge();
 
-	c = m_RenderGroups.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	// dimhotepus: Use correct indexer type.
+	const unsigned short groupCount{m_RenderGroups.Count()};
+	for ( int i = static_cast<int>(groupCount) - 1; i >= 0; i-- )
 	{
-		CHudRenderGroup *group = m_RenderGroups[ i ];
-		m_RenderGroups.RemoveAt(i);
+		CHudRenderGroup *group = m_RenderGroups[ static_cast<unsigned short>(i) ];
+		m_RenderGroups.RemoveAt( static_cast<unsigned short>(i) );
 		delete group;
 	}
 }
