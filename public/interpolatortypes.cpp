@@ -3,10 +3,11 @@
 // Purpose: 
 //
 //=============================================================================
-#include "basetypes.h"
-#include "tier1/strtools.h"
 #include "interpolatortypes.h"
+
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+#include "tier1/strtools.h"
 #include "mathlib/mathlib.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -14,7 +15,7 @@
 
 struct InterpolatorNameMap_t
 {
-	int						type;
+	unsigned char			type;
 	char const				*name;
 	char const				*printname;
 };
@@ -23,13 +24,13 @@ static InterpolatorNameMap_t g_InterpolatorNameMap[] =
 {
 	{ INTERPOLATE_DEFAULT,						"default",					"Default" },
 	{ INTERPOLATE_CATMULL_ROM_NORMALIZEX,		"catmullrom_normalize_x",	"Catmull-Rom (Norm X)" },
-	{ INTERPOLATE_EASE_IN,						"easein",					"Ease In" },			
+	{ INTERPOLATE_EASE_IN,						"easein",					"Ease In" },
 	{ INTERPOLATE_EASE_OUT,						"easeout",					"Ease Out" },
-	{ INTERPOLATE_EASE_INOUT,					"easeinout",				"Ease In/Out" },			
-	{ INTERPOLATE_BSPLINE,						"bspline",					"B-Spline" },							
-	{ INTERPOLATE_LINEAR_INTERP,				"linear_interp",			"Linear Interp." },			
-	{ INTERPOLATE_KOCHANEK_BARTELS,				"kochanek",					"Kochanek-Bartels" },		
-	{ INTERPOLATE_KOCHANEK_BARTELS_EARLY,		"kochanek_early",			"Kochanek-Bartels Early" },	
+	{ INTERPOLATE_EASE_INOUT,					"easeinout",				"Ease In/Out" },
+	{ INTERPOLATE_BSPLINE,						"bspline",					"B-Spline" },
+	{ INTERPOLATE_LINEAR_INTERP,				"linear_interp",			"Linear Interp." },
+	{ INTERPOLATE_KOCHANEK_BARTELS,				"kochanek",					"Kochanek-Bartels" },
+	{ INTERPOLATE_KOCHANEK_BARTELS_EARLY,		"kochanek_early",			"Kochanek-Bartels Early" },
 	{ INTERPOLATE_KOCHANEK_BARTELS_LATE,		"kochanek_late",			"Kochanek-Bartels Late" },
 	{ INTERPOLATE_SIMPLE_CUBIC,					"simple_cubic",				"Simple Cubic" },
 	{ INTERPOLATE_CATMULL_ROM,					"catmullrom",				"Catmull-Rom" },
@@ -39,27 +40,25 @@ static InterpolatorNameMap_t g_InterpolatorNameMap[] =
 	{ INTERPOLATE_HOLD,							"hold",						"Hold" },
 };
 
-int Interpolator_InterpolatorForName( char const *name )
+unsigned char Interpolator_InterpolatorForName( char const *name )
 {
-	for ( int i = 0; i < NUM_INTERPOLATE_TYPES; ++i )
+	for ( auto &slot : g_InterpolatorNameMap )
 	{
-		InterpolatorNameMap_t *slot = &g_InterpolatorNameMap[ i ];
-		if ( !Q_stricmp( name, slot->name ) )
-			return slot->type;
+		if ( !Q_stricmp( name, slot.name ) )
+			return slot.type;
 	}
 	
-	AssertMsg( false, "Interpolator_InterpolatorForName failed!!!" );
+	AssertMsg( false, "Interpolator_InterpolatorForName failed for %s!!!", name );
 	return INTERPOLATE_DEFAULT;
 }
 
-char const *Interpolator_NameForInterpolator( int type, bool printname )
+char const *Interpolator_NameForInterpolator( unsigned char type, bool printname )
 {
-	int i = (int)type;
-	int c = ssize( g_InterpolatorNameMap );
+	size_t i = type;
+	size_t c = std::size( g_InterpolatorNameMap );
 	if ( i < 0 || i >= c )
 	{
-		AssertMsg( false, "!Interpolator_NameForInterpolator:  bogus type!" );
-		// returns "unspecified!!!";
+		AssertMsg( false, "!Interpolator_NameForInterpolator: bogus type %hhu!", type );
 		return printname ? g_InterpolatorNameMap[ 0 ].printname : g_InterpolatorNameMap[ 0 ].name;
 	}
 
@@ -94,10 +93,10 @@ static CurveNameMap_t g_CurveNameMap[] =
 int Interpolator_CurveTypeForName( const char *name )
 {
 	char sz[ 128 ];
-	Q_strncpy( sz, name, sizeof( sz ) );
+	V_strcpy_safe( sz, name );
 
-	int leftcurve = 0;
-	int rightcurve = 0;
+	unsigned char leftcurve = 0;
+	unsigned char rightcurve = 0;
 
 	intp skip = ssize( "curve_" ) - 1;
 
@@ -107,7 +106,7 @@ int Interpolator_CurveTypeForName( const char *name )
 		char *second = Q_stristr( p, "_to_curve_" );
 		
 		char save = *second;
-		*second = 0;
+		*second = '\0';
 
 		leftcurve = Interpolator_InterpolatorForName( p );
 
@@ -125,18 +124,18 @@ const char *Interpolator_NameForCurveType( int type, bool printname )
 {
 	static char outname[ 256 ];
 
-	int leftside = GET_LEFT_CURVE( type );
-	int rightside = GET_RIGHT_CURVE( type );
+	unsigned char leftside = GET_LEFT_CURVE( type );
+	unsigned char rightside = GET_RIGHT_CURVE( type );
 
 	if ( !printname )
 	{
-		Q_snprintf( outname, sizeof( outname ), "curve_%s_to_curve_%s", 
+		V_sprintf_safe( outname, "curve_%s_to_curve_%s", 
 			Interpolator_NameForInterpolator( leftside, printname ),
 			Interpolator_NameForInterpolator( rightside, printname ) );
 	}
 	else
 	{
-		Q_snprintf( outname, sizeof( outname ), "%s <-> %s", 
+		V_sprintf_safe( outname, "%s <-> %s", 
 			Interpolator_NameForInterpolator( leftside, printname ),
 			Interpolator_NameForInterpolator( rightside, printname ) );
 	}
@@ -152,12 +151,10 @@ void Interpolator_CurveInterpolatorsForType( int type, int& inbound, int& outbou
 
 int Interpolator_CurveTypeForHotkey( int key )
 {
-	int c = ssize( g_CurveNameMap );
-	for ( int i = 0; i < c; ++i )
+	for ( auto &m : g_CurveNameMap )
 	{
-		CurveNameMap_t *slot = &g_CurveNameMap[ i ];
-		if ( slot->hotkey == key )
-			return slot->type;
+		if ( m.hotkey == key )
+			return m.type;
 	}
 
 	return -1;
