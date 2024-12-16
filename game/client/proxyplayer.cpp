@@ -342,9 +342,8 @@ public:
 			m_pDefaultTexture->DecrementReferenceCount();
 		}
 
-		int c = m_Logos.Count();
-		int i;
-		for ( i = 0; i < c ; i++ )
+		auto c = m_Logos.Count();
+		for ( decltype(c) i = 0; i < c ; i++ )
 		{
 			PlayerLogo *logo = &m_Logos[ i ];
 			if( logo->texture )
