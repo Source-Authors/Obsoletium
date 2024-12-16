@@ -257,11 +257,11 @@ bool CDmxSerializer::Serialize( CUtlBuffer &buf, CDmxElement *pRoot, [[maybe_unu
 	}
 
 	// write out the string table
-	size_t nStrings = stringTable.Count();
-	if ( nStrings > 65535U )
-		return false;
-	buf.PutShort( (unsigned short)nStrings );
-	for ( unsigned short si = 0; si < (unsigned short)nStrings; ++si )
+	unsigned short nStrings{stringTable.Count()};
+	//if ( nStrings > 65535U )
+	//	return false;
+	buf.PutShort( nStrings );
+	for ( unsigned short si = 0; si < nStrings; ++si )
 	{
 		buf.PutString( stringTable[ si ] );
 	}
