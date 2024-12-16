@@ -73,7 +73,7 @@ int StringToButtonCode( const char *name )
 //-----------------------------------------------------------------------------
 void CControllerMap::OnKeyCodeTyped( vgui::KeyCode code )
 {
-	int idx = m_buttonMap.Find( code );
+	auto idx = m_buttonMap.Find( code );
 	if ( idx != m_buttonMap.InvalidIndex() )
 	{
 		GetParent()->OnCommand( m_buttonMap[idx].cmd.String() );
