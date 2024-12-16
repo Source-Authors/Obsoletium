@@ -768,11 +768,11 @@ int C_PropAirboat::DrawWake( void )
 		return 0;
 
 	// Make sure we're in water...
-	if ( GetWaterLevel() == 0 )
+	if ( GetWaterLevel() == WaterLevel::WL_NotInWater )
 		return 0;
 
 	//FIXME: For now, we don't draw slime this way
-	if ( GetWaterLevel() == 2 )
+	if ( GetWaterLevel() == WaterLevel::WL_Waist )
 		return 0;
 
 	bool bDriven = ( GetPassenger( VEHICLE_ROLE_DRIVER ) != NULL );

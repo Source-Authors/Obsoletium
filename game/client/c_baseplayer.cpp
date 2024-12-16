@@ -503,7 +503,7 @@ bool C_BasePlayer::AudioStateIsUnderwater( Vector vecMainViewOrigin )
 		return (cont & MASK_WATER);
 	}
 
-	return ( GetWaterLevel() >= WL_Eyes );
+	return ( GetWaterLevel() >= WaterLevel::WL_Eyes );
 }
 
 bool C_BasePlayer::IsHLTV() const
@@ -1325,7 +1325,7 @@ extern float UTIL_WaterLevel( const Vector &position, float minz, float maxz );
 void C_BasePlayer::CreateWaterEffects( void )
 {
 	// Must be completely submerged to bother
-	if ( GetWaterLevel() < 3 )
+	if ( GetWaterLevel() < WaterLevel::WL_Eyes )
 	{
 		m_bResampleWaterSurface = true;
 		return;
