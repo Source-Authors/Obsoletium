@@ -8,22 +8,22 @@
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
 #include <vgui_controls/AnimationController.h>
 #include "filesystem.h"
 #include "filesystem_helpers.h"
 
-#include <stdio.h>
-#include <math.h>
-#include "mempool.h"
-#include "utldict.h"
+#include "tier1/KeyValues.h"
+#include "tier1/mempool.h"
+#include "tier1/utldict.h"
+#include "tier1/characterset.h"
+#include "tier0/dbg.h"
+
 #include "mathlib/mathlib.h"
-#include "characterset.h"
+#include "vstdlib/random.h"
+
+#include <memory>
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/dbg.h>
-// for SRC
-#include <vstdlib/random.h>
 #include <tier0/memdbgon.h>
 
 using namespace vgui;
@@ -119,10 +119,10 @@ void AnimationController::ReloadScriptFile()
 	UpdateScreenSize();
 
 	// Reload each file we've loaded
-	for ( int i = 0; i < m_ScriptFileNames.Count(); i++ )
+	for ( const auto name : m_ScriptFileNames )
 	{
-		const char *lpszFilename = g_ScriptSymbols.String( m_ScriptFileNames[i] );
-		if ( lpszFilename[0] )
+		const char *lpszFilename = g_ScriptSymbols.String( name );
+		if ( !Q_isempty( lpszFilename ) )
 		{
 			if ( LoadScriptFile( lpszFilename ) == false )
 			{
@@ -148,18 +148,13 @@ bool AnimationController::LoadScriptFile(const char *fileName)
 	int size = g_pFullFileSystem->Size(f);
 	// read into temporary memory block
 	int nBufSize = size+1;
-	if ( IsXbox() )
-	{
-		nBufSize = AlignValue( nBufSize, 512 );
-	}
-	char *pMem = (char *)malloc(nBufSize);
-	int bytesRead = g_pFullFileSystem->ReadEx(pMem, nBufSize, size, f);
+	std::unique_ptr<char[]> mem = std::make_unique<char[]>(nBufSize);
+	int bytesRead = g_pFullFileSystem->ReadEx(mem.get(), nBufSize, size, f);
 	Assert(bytesRead <= size);
-	pMem[bytesRead] = 0;
+	mem[bytesRead] = 0;
 	g_pFullFileSystem->Close(f);
 	// parse
-	bool success = ParseScriptFile(pMem, bytesRead);
-	free(pMem);
+	bool success = ParseScriptFile(mem.get(), bytesRead);
 	return success;
 }
 
@@ -217,7 +212,7 @@ void AnimationController::SetupPosition( AnimCmdAnimate_t& cmd, float *output, c
 		if ( Q_strstr( psz, ")" ) )
 		{
 			char sz[ 256 ];
-			Q_strncpy( sz, psz, sizeof( sz ) );
+			V_strcpy_safe( sz, psz );
 
 			char *colon = Q_strstr( sz, ":" );
 			if ( colon )
@@ -666,7 +661,7 @@ bool AnimationController::ParseScriptFile(char *pMem, int length)
 		if ( bAccepted )
 		{
 			// Attempt to find a collision in the sequences, replacing the old one if found
-			int seqIterator;
+			intp seqIterator;
 			for ( seqIterator = 0; seqIterator < m_Sequences.Count()-1; seqIterator++ )	
 			{
 				if ( m_Sequences[seqIterator].name == nameIndex )
@@ -698,7 +693,7 @@ void AnimationController::UpdatePostedMessages(bool bRunToCompletion)
 	CUtlVector<RanEvent_t> eventsRanThisFrame;
 
 	// check all posted messages
-	for (int i = 0; i < m_PostedMessages.Count(); i++)
+	for (intp i = 0; i < m_PostedMessages.Count(); i++)
 	{
 		PostedMessage_t &msgRef = m_PostedMessages[i];
 
@@ -813,7 +808,7 @@ void AnimationController::UpdatePostedMessages(bool bRunToCompletion)
 void AnimationController::UpdateActiveAnimations(bool bRunToCompletion)
 {
 	// iterate all the currently active animations
-	for (int i = 0; i < m_ActiveAnimations.Count(); i++)
+	for (intp i = 0; i < m_ActiveAnimations.Count(); i++)
 	{
 		ActiveAnimation_t &anim = m_ActiveAnimations[i];
 
@@ -1061,7 +1056,7 @@ bool AnimationController::StartAnimationSequence(Panel *pWithinParent, const cha
 	RemoveQueuedAnimationCommands(seqName, pWithinParent);
 
 	// look through for the sequence
-	int i;
+	intp i;
 	for (i = 0; i < m_Sequences.Count(); i++)
 	{
 		if (m_Sequences[i].name == seqName)
@@ -1107,7 +1102,7 @@ void AnimationController::CancelAnimationsForPanel( Panel *pWithinParent )
 	// remove messages posted by this sequence
 	// if pWithinParent is specified, remove only messages under that parent
 	{
-		for (int i = 0; i < m_PostedMessages.Count(); i++)
+		for (intp i = 0; i < m_PostedMessages.Count(); i++)
 		{
 			if ( m_PostedMessages[i].parent == pWithinParent )
 			{
@@ -1119,15 +1114,13 @@ void AnimationController::CancelAnimationsForPanel( Panel *pWithinParent )
 
 	// remove all animations
 	// if pWithinParent is specified, remove only animations under that parent
-	for (int i = 0; i < m_ActiveAnimations.Count(); i++)
+	for (intp i = 0; i < m_ActiveAnimations.Count(); i++)
 	{
 		Panel *animPanel = m_ActiveAnimations[i].panel;
-
 		if ( !animPanel )
 			continue;
 
 		Panel *foundPanel = pWithinParent->FindChildByName(animPanel->GetName(),true);
-
 		if ( foundPanel != animPanel )
 			continue;
 
@@ -1198,7 +1191,7 @@ float AnimationController::GetAnimationSequenceLength(const char *sequenceName)
 		return 0.0f;
 
 	// look through for the sequence
-	int i;
+	intp i;
 	for (i = 0; i < m_Sequences.Count(); i++)
 	{
 		if (m_Sequences[i].name == seqName)
@@ -1220,7 +1213,7 @@ void AnimationController::RemoveQueuedAnimationCommands(UtlSymId_t seqName, Pane
 
 	// remove messages posted by this sequence
 	// if pWithinParent is specified, remove only messages under that parent
-	{for (int i = 0; i < m_PostedMessages.Count(); i++)
+	{for (intp i = 0; i < m_PostedMessages.Count(); i++)
 	{
 		if ( ( m_PostedMessages[i].seqName == seqName ) &&
 			 ( !pWithinParent || ( m_PostedMessages[i].parent == pWithinParent ) ) )
@@ -1232,7 +1225,7 @@ void AnimationController::RemoveQueuedAnimationCommands(UtlSymId_t seqName, Pane
 
 	// remove all animations
 	// if pWithinParent is specified, remove only animations under that parent
-	for (int i = 0; i < m_ActiveAnimations.Count(); i++)
+	for (intp i = 0; i < m_ActiveAnimations.Count(); i++)
 	{
 		if ( m_ActiveAnimations[i].seqName != seqName )
 			continue;
@@ -1241,12 +1234,10 @@ void AnimationController::RemoveQueuedAnimationCommands(UtlSymId_t seqName, Pane
 		if ( pWithinParent )
 		{
 			Panel *animPanel = m_ActiveAnimations[i].panel;
-
 			if ( !animPanel )
 				continue;
 
 			Panel *foundPanel = pWithinParent->FindChildByName(animPanel->GetName(),true);
-
 			if ( foundPanel != animPanel )
 				continue;
 		}
@@ -1261,11 +1252,12 @@ void AnimationController::RemoveQueuedAnimationCommands(UtlSymId_t seqName, Pane
 //-----------------------------------------------------------------------------
 void AnimationController::RemoveQueuedAnimationByType(vgui::Panel *panel, UtlSymId_t variable, UtlSymId_t sequenceToIgnore)
 {
-	for (int i = 0; i < m_ActiveAnimations.Count(); i++)
+	for (intp i = 0; i < m_ActiveAnimations.Count(); i++)
 	{
-		if (m_ActiveAnimations[i].panel == panel && m_ActiveAnimations[i].variable == variable && m_ActiveAnimations[i].seqName != sequenceToIgnore)
+		const auto &animation = m_ActiveAnimations[i];
+		if (animation.panel == panel && animation.variable == variable && animation.seqName != sequenceToIgnore)
 		{
-			// Msg("Removing queued anim %s::%s::%s\n", g_ScriptSymbols.String(m_ActiveAnimations[i].seqName), panel->GetName(), g_ScriptSymbols.String(variable));
+			// Msg("Removing queued anim %s::%s::%s\n", g_ScriptSymbols.String(animation.seqName), panel->GetName(), g_ScriptSymbols.String(variable));
 			m_ActiveAnimations.Remove(i);
 			break;
 		}
@@ -1374,9 +1366,10 @@ void AnimationController::RunCmd_StopPanelAnimations(PostedMessage_t &msg)
 
 	// loop through all the active animations cancelling any that 
 	// are operating on said panel,	except for the event specified
-	for (int i = 0; i < m_ActiveAnimations.Count(); i++)
+	for (intp i = 0; i < m_ActiveAnimations.Count(); i++)
 	{
-		if (m_ActiveAnimations[i].panel == panel && m_ActiveAnimations[i].seqName != msg.seqName)
+		const auto &animation = m_ActiveAnimations[i];
+		if (animation.panel == panel && animation.seqName != msg.seqName)
 		{
 			m_ActiveAnimations.Remove(i);
 			--i;
@@ -1403,7 +1396,6 @@ void AnimationController::RunCmd_StopAnimation(PostedMessage_t &msg)
 void AnimationController::RunCmd_SetFont( PostedMessage_t &msg )
 {
 	Panel *parent = msg.parent.Get();
-
 	if ( !parent )
 	{
 		parent = GetParent();
@@ -1413,14 +1405,14 @@ void AnimationController::RunCmd_SetFont( PostedMessage_t &msg )
 	Assert(panel != NULL);
 	if (!panel)
 		return;
-
-	KeyValues *inputData = new KeyValues(g_ScriptSymbols.String(msg.variable));
-	inputData->SetString(g_ScriptSymbols.String(msg.variable), g_ScriptSymbols.String(msg.variable2));
+	
+	const char *varName = g_ScriptSymbols.String(msg.variable);
+	auto inputData = KeyValues::AutoDelete(varName);
+	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
-	//	Assert(!("Unhandlable var in AnimationController::SetValue())"));
+		AssertMsg("Unknown animation font variable '%s'.\n", varName);
 	}
-	inputData->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -1432,14 +1424,14 @@ void AnimationController::RunCmd_SetTexture( PostedMessage_t &msg )
 	Assert(panel != NULL);
 	if (!panel)
 		return;
-
-	KeyValues *inputData = new KeyValues(g_ScriptSymbols.String(msg.variable));
-	inputData->SetString(g_ScriptSymbols.String(msg.variable), g_ScriptSymbols.String(msg.variable2));
+	
+	const char *varName = g_ScriptSymbols.String(msg.variable);
+	auto inputData = KeyValues::AutoDelete(varName);
+	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
-	//	Assert(!("Unhandlable var in AnimationController::SetValue())"));
+		AssertMsg("Unknown animation texture variable '%s'.\n", varName);
 	}
-	inputData->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -1452,13 +1444,13 @@ void AnimationController::RunCmd_SetString( PostedMessage_t &msg )
 	if (!panel)
 		return;
 
-	KeyValues *inputData = new KeyValues(g_ScriptSymbols.String(msg.variable));
-	inputData->SetString(g_ScriptSymbols.String(msg.variable), g_ScriptSymbols.String(msg.variable2));
+	const char *varName = g_ScriptSymbols.String(msg.variable);
+	auto inputData = KeyValues::AutoDelete(varName);
+	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
-	//	Assert(!("Unhandlable var in AnimationController::SetValue())"));
+		AssertMsg("Unknown animation string variable '%s'.\n", varName);
 	}
-	inputData->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -1574,11 +1566,12 @@ AnimationController::Value_t AnimationController::GetValue(ActiveAnimation_t& an
 	}
 	else
 	{
-		KeyValues *outputData = new KeyValues(g_ScriptSymbols.String(var));
+		const char *varName = g_ScriptSymbols.String(var);
+		auto outputData = KeyValues::AutoDelete(varName);
 		if (panel->RequestInfo(outputData))
 		{
 			// find the var and lookup it's type
-			KeyValues *kv = outputData->FindKey(g_ScriptSymbols.String(var));
+			KeyValues *kv = outputData->FindKey(varName);
 			if (kv && kv->GetDataType() == KeyValues::TYPE_FLOAT)
 			{
 				val.a = kv->GetFloat();
@@ -1597,9 +1590,8 @@ AnimationController::Value_t AnimationController::GetValue(ActiveAnimation_t& an
 		}
 		else
 		{
-		//	Assert(!("Unhandlable var in AnimationController::GetValue())"));
+			AssertMsg("Unknown animation variable '%s'.\n", varName);
 		}
-		outputData->deleteThis();
 	}
 	return val;
 }
@@ -1671,24 +1663,24 @@ void AnimationController::SetValue(ActiveAnimation_t& anim, Panel *panel, UtlSym
 	}
 	else
 	{
-		KeyValues *inputData = new KeyValues(g_ScriptSymbols.String(var));
+		const char *varName = g_ScriptSymbols.String(var);
+		auto inputData = KeyValues::AutoDelete(varName);
 		// set the custom value
 		if (value.b == 0.0f && value.c == 0.0f && value.d == 0.0f)
 		{
 			// only the first value is non-zero, so probably just a float value
-			inputData->SetFloat(g_ScriptSymbols.String(var), value.a);
+			inputData->SetFloat(varName, value.a);
 		}
 		else
 		{
 			// multivalue, set the color
 			Color col((unsigned char)value.a, (unsigned char)value.b, (unsigned char)value.c, (unsigned char)value.d);
-			inputData->SetColor(g_ScriptSymbols.String(var), col);
+			inputData->SetColor(varName, col);
 		}
 		if (!panel->SetInfo(inputData))
 		{
-		//	Assert(!("Unhandlable var in AnimationController::SetValue())"));
+			AssertMsg("Unknown animation variable '%s'.\n", varName);
 		}
-		inputData->deleteThis();
 	}
 }
 // Hooks between panels and  animation controller system
@@ -1719,7 +1711,7 @@ private:
 	void PanelAnimationDumpMap( PanelAnimationMap *map, bool recursive );
 
 	CClassMemoryPool< PanelAnimationMap > m_PanelAnimationMapPool;
-	CUtlDict< PanelAnimationMapDictionaryEntry, int > m_AnimationMaps;
+	CUtlDict< PanelAnimationMapDictionaryEntry, intp > m_AnimationMaps;
 };
 
 
@@ -1737,7 +1729,7 @@ char const *CPanelAnimationDictionary::StripNamespace( char const *className )
 //-----------------------------------------------------------------------------
 PanelAnimationMap *CPanelAnimationDictionary::FindPanelAnimationMap( char const *className )
 {
-	int lookup = m_AnimationMaps.Find( StripNamespace( className ) );
+	auto lookup = m_AnimationMaps.Find( StripNamespace( className ) );
 	if ( lookup != m_AnimationMaps.InvalidIndex() )
 	{
 		return m_AnimationMaps[ lookup ].map;
@@ -1771,11 +1763,9 @@ void CPanelAnimationDictionary::PanelAnimationDumpMap( PanelAnimationMap *map, b
 	{
 		Msg( "%s\n", (*map->pfnClassName)() );
 	}
-	int c = map->entries.Count();
-	for ( int i = 0; i < c; i++ )
+	for ( auto &e : map->entries )
 	{
-		PanelAnimationMapEntry *e = &map->entries[ i ];
-		Msg( "  %s %s\n", e->type(), e->name() );
+		Msg( "  %s %s\n", e.type(), e.name() );
 	}
 
 	if ( recursive && map->baseMap )
@@ -1791,7 +1781,7 @@ void CPanelAnimationDictionary::PanelAnimationDumpVars( char const *className )
 {
 	if ( className == NULL )
 	{
-		for ( int i = 0; i < (int)m_AnimationMaps.Count(); i++ )
+		for ( intp i = 0; i < m_AnimationMaps.Count(); i++ )
 		{
 			PanelAnimationDumpMap( m_AnimationMaps[ i ].map, false );
 		}
