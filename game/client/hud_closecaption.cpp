@@ -779,12 +779,12 @@ public:
 
 	void Clear()
 	{
-		for ( int file = 0; file < m_Db.Count(); ++file )
+		for ( intp file = 0; file < m_Db.Count(); ++file )
 		{
 			CUtlRBTree< AsyncCaption_t::BlockInfo_t, unsigned short >& requested = m_Db[ file ].m_RequestedBlocks;
 
-			int c = requested.Count();
-			for ( int i = 0; i  < c; ++i )
+			auto c = requested.Count();
+			for ( std::remove_reference_t<decltype(requested)>::IndexType_t i = 0; i  < c; ++i )
 			{
 				memhandle_t dat = requested[ i ].handle;
 				CacheRemove( dat );
