@@ -108,10 +108,7 @@ public:
 
 	unsigned short GetNumStrings( void ) const
 	{
-		const size_t count = m_Lookup.Count();
-		Assert(count <= USHRT_MAX);
-
-		return static_cast<unsigned short>(count);
+		return m_Lookup.Count();
 	}
 
 protected:
