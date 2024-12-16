@@ -5550,7 +5550,7 @@ private:
 
 				CUtlString sym = field->externalName;
 
-				int idx = symbols.Find( sym );
+				auto idx = symbols.Find( sym );
 				if ( idx == symbols.InvalidIndex() )
 				{
 					symbols.Insert( sym );
