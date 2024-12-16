@@ -2291,7 +2291,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 	if ( sorted.Count() <= 0 )
 		return;
 
-	for ( int i = sorted.FirstInorder(); 
+	for ( auto i = sorted.FirstInorder(); 
 		i != sorted.InvalidIndex(); 
 		i = sorted.NextInorder( i ) )
 	{

@@ -898,11 +898,11 @@ void CCvarUtilities::CvarList( const CCommand &args )
 	// Show total and syntax help...
 	if ( partial && partial[0] )
 	{
-		ConMsg("--------------\n%3i convars/concommands for [%s]\n", sorted.Count(), partial );
+		ConMsg("--------------\n%3hu convars/concommands for [%s]\n", sorted.Count(), partial );
 	}
 	else
 	{
-		ConMsg("--------------\n%3i total convars/concommands\n", sorted.Count() );
+		ConMsg("--------------\n%3hu total convars/concommands\n", sorted.Count() );
 	}
 
 	if ( bLogging )

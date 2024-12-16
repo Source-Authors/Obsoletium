@@ -225,7 +225,7 @@ void CMapListManager::Think( void )
 
 	m_bDirty = false;
 		
-	for ( intp i = m_Items.Count() - 1; i >= 0 ; i-- )
+	for ( auto i = m_Items.Count() - 1; i >= 0 ; i-- )
 	{
 		CMapListItem *item = &m_Items[ i ];
 		if ( item->GetValid() != CMapListItem::PENDING )
@@ -290,7 +290,7 @@ void CMapListManager::RefreshList( void )
 			*pExt = '\0';
 		}
 
-		int idx = m_Items.Find( szMapName );
+		auto idx = m_Items.Find( szMapName );
 		if ( idx == m_Items.InvalidIndex() )
 		{
 			CMapListItem item;
@@ -384,15 +384,9 @@ void CMapListManager::BuildList( void )
 	char const *findfn = Sys_FindFirst( mapwild, NULL, 0 );
 	while ( findfn )
 	{
-		if ( IsPC() && V_stristr( findfn, ".360.bsp" ) )
+		if ( V_stristr( findfn, ".360.bsp" ) )
 		{
 			// ignore 360 bsp
-			findfn = Sys_FindNext( NULL, 0 );
-			continue;
-		}
-		else if ( IsX360() && !V_stristr( findfn, ".360.bsp" ) )
-		{
-			// ignore pc bsp
 			findfn = Sys_FindNext( NULL, 0 );
 			continue;
 		}
@@ -414,7 +408,7 @@ void CMapListManager::BuildList( void )
 		item.SetValid( CMapListItem::PENDING );
 
 		// Insert into dictionary
-		int idx = m_Items.Find( szMapName );
+		auto idx = m_Items.Find( szMapName );
 		if ( idx == m_Items.InvalidIndex() )
 		{
 			m_Items.Insert( szMapName, item );

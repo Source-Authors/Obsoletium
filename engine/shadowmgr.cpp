@@ -312,7 +312,7 @@ private:
 	// Structures used to assign sort order handles
 	struct SortOrderInfo_t
 	{
-		intp	m_MaterialEnum;
+		IMaterial	*m_MaterialEnum;
 		int	m_RefCount;
 	};
 
@@ -605,12 +605,11 @@ void CShadowMgr::SetMaterial( Shadow_t& shadow, IMaterial* pMaterial, IMaterial*
 	}
 
 	// Search the sort order handles for an enumeration id match
-	intp materialEnum = (intp)pMaterial;
-	for (unsigned short i = m_SortOrderIds.Head(); i != m_SortOrderIds.InvalidIndex();
+	for (auto i = m_SortOrderIds.Head(); i != m_SortOrderIds.InvalidIndex();
 		i = m_SortOrderIds.Next(i) )
 	{
 		// Found a match, lets increment the refcount of this sort order id
-		if (m_SortOrderIds[i].m_MaterialEnum == materialEnum)
+		if (m_SortOrderIds[i].m_MaterialEnum == pMaterial)
 		{
 			++m_SortOrderIds[i].m_RefCount;
 			shadow.m_SortOrder = i;
@@ -620,7 +619,7 @@ void CShadowMgr::SetMaterial( Shadow_t& shadow, IMaterial* pMaterial, IMaterial*
 
 	// Didn't find it, lets assign a new sort order ID, with a refcount of 1
 	shadow.m_SortOrder = m_SortOrderIds.AddToTail();
-	m_SortOrderIds[shadow.m_SortOrder].m_MaterialEnum  = materialEnum;
+	m_SortOrderIds[shadow.m_SortOrder].m_MaterialEnum  = pMaterial;
 	m_SortOrderIds[shadow.m_SortOrder].m_RefCount = 1;
 
 	// Make sure the render queue has as many entries as the max sort order id.
