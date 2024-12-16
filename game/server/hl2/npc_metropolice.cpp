@@ -1303,14 +1303,14 @@ Vector CNPC_MetroPolice::StitchAimTarget( const Vector &posSrc, bool bNoisy )
 	if ( !IsEnemyInAnAirboat() )
 	{
 		Vector vecBodyTarget;
-		if ( ( GetEnemy()->GetWaterLevel() == 0 ) && ( GetEnemy()->GetFlags() & FL_ONGROUND ) )
+		if ( ( GetEnemy()->GetWaterLevel() == WaterLevel::WL_NotInWater ) && ( GetEnemy()->GetFlags() & FL_ONGROUND ) )
 		{
 			GetEnemy()->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.08f ), &vecBodyTarget );
 			return vecBodyTarget;
 		}
 
 		// Underwater? Just use the normal thing
-		if ( GetEnemy()->GetWaterLevel() == 3 )
+		if ( GetEnemy()->GetWaterLevel() == WaterLevel::WL_Eyes )
 			return GetShootTarget()->BodyTarget( posSrc, bNoisy );
 
 		// Trace down...
@@ -2390,7 +2390,7 @@ void CNPC_MetroPolice::FireBullets( const FireBulletsInfo_t &info )
 
 			// This makes it so that if the player gets hit underwater, 
 			// he won't take damage if his viewpoint is above water.
-			if ( !IsEnemyInAnAirboat() && ( pPlayer->GetWaterLevel() != 3 ) )
+			if ( !IsEnemyInAnAirboat() && ( pPlayer->GetWaterLevel() != WaterLevel::WL_Eyes ) )
 			{
 				actualInfo.m_nFlags |= FIRE_BULLETS_DONT_HIT_UNDERWATER;
 			}
@@ -4571,7 +4571,7 @@ void CNPC_MetroPolice::StartTask( const Task_t *pTask )
 		{
 			if( !( m_spawnflags & SF_METROPOLICE_NOCHATTER ) )
 			{
-				if( GetEnemy() && GetEnemy()->GetWaterLevel() > 0 )
+				if( GetEnemy() && GetEnemy()->GetWaterLevel() > WaterLevel::WL_NotInWater )
 				{
 					EmitSound( "NPC_MetroPolice.WaterSpeech" );
 				}

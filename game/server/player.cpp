@@ -1812,7 +1812,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 		{
 			idealActivity = m_Activity;
 		}
-		else if ( GetWaterLevel() > 1 )
+		else if ( GetWaterLevel() > WaterLevel::WL_Feet )
 		{
 			if ( speed == 0 )
 				idealActivity = ACT_HOVER;
@@ -1945,7 +1945,7 @@ void CBasePlayer::WaterMove()
 	// waterlevel 2 - waist in water (WL_Waist)
 	// waterlevel 3 - head in water (WL_Eyes)
 
-	if (GetWaterLevel() != WL_Eyes || CanBreatheUnderwater()) 
+	if (GetWaterLevel() != WaterLevel::WL_Eyes || CanBreatheUnderwater()) 
 	{
 		// not underwater
 		
@@ -4576,7 +4576,7 @@ void CBasePlayer::PostThink()
 				SetAnimation( PLAYER_IDLE );
 			else if ((GetAbsVelocity().x || GetAbsVelocity().y) && ( GetFlags() & FL_ONGROUND ))
 				SetAnimation( PLAYER_WALK );
-			else if (GetWaterLevel() > 1)
+			else if (GetWaterLevel() > WaterLevel::WL_Feet)
 				SetAnimation( PLAYER_WALK );
 		}
 
@@ -7070,7 +7070,8 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 	if ( pEntHit && pEntHit->m_takedamage != DAMAGE_NO && pEntHit->GetHealth() > 0 )
 	{
 		// don't look through water
-		if (!((GetWaterLevel() != 3 && pEntHit->GetWaterLevel() == 3) || (GetWaterLevel() == 3 && pEntHit->GetWaterLevel() == 0)))
+		if (!((GetWaterLevel() != WaterLevel::WL_Eyes && pEntHit->GetWaterLevel() == WaterLevel::WL_Eyes) ||
+			  (GetWaterLevel() == WaterLevel::WL_Eyes && pEntHit->GetWaterLevel() == WaterLevel::WL_NotInWater)))
 		{
 			if( pEntHit->ShouldAttractAutoAim(this) )
 			{
@@ -7135,7 +7136,8 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 				continue;
 
 			// don't look through water
-			if ((GetWaterLevel() != 3 && pEntity->GetWaterLevel() == 3) || (GetWaterLevel() == 3 && pEntity->GetWaterLevel() == 0))
+			if ((GetWaterLevel() != WaterLevel::WL_Eyes && pEntity->GetWaterLevel() == WaterLevel::WL_Eyes) ||
+				(GetWaterLevel() == WaterLevel::WL_Eyes && pEntity->GetWaterLevel() == WaterLevel::WL_NotInWater))
 				continue;
 
 			if( pEntity->MyNPCPointer() )

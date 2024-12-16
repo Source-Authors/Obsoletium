@@ -219,7 +219,7 @@ CNPC_Manhack::CNPC_Manhack()
 	m_vForceVelocity.Init();
 #endif
 	m_bDirtyPitch = true;
-	m_nLastWaterLevel = 0;
+	m_nLastWaterLevel = WaterLevel::WL_NotInWater;
 	m_nEnginePitch1 = -1;
 	m_nEnginePitch2 = -1;
 	m_flEnginePitch1Time = 0;
@@ -288,9 +288,9 @@ void CNPC_Manhack::PrescheduleThink( void )
 	// ----------------------------------------
 	//	Am I in water?
 	// ----------------------------------------
-	if ( GetWaterLevel() > 0 )
+	if ( GetWaterLevel() > WaterLevel::WL_NotInWater )
 	{
-		if( m_nLastWaterLevel == 0 )
+		if( m_nLastWaterLevel == WaterLevel::WL_NotInWater )
 		{
 			Splash( WorldSpaceCenter() );
 		}
@@ -306,7 +306,7 @@ void CNPC_Manhack::PrescheduleThink( void )
 	}
 	else
 	{
-		if( m_nLastWaterLevel != 0 )
+		if( m_nLastWaterLevel != WaterLevel::WL_NotInWater )
 		{
 			Splash( WorldSpaceCenter() );
 		}
@@ -1449,7 +1449,7 @@ bool CNPC_Manhack::IsHeldByPhyscannon( )
 void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr )
 {
 	// Don't hurt the player if I'm in water
-	if( GetWaterLevel() > 0 && pHitEntity->IsPlayer() )
+	if( GetWaterLevel() > WaterLevel::WL_NotInWater && pHitEntity->IsPlayer() )
 		return;
 
 	// Can't slice players holding it with the phys cannon
@@ -1947,7 +1947,7 @@ void CNPC_Manhack::MoveExecute_Alive(float flInterval)
 			m_vCurrentVelocity.z = 0.0;
 		}
 	}
-	else if( GetWaterLevel() > 0 )
+	else if( GetWaterLevel() > WaterLevel::WL_NotInWater )
 	{
 		// Allow the manhack to lift off, but not to go deeper.
 		m_vCurrentVelocity.z = MAX( m_vCurrentVelocity.z, 0 );
@@ -2100,14 +2100,14 @@ void CNPC_Manhack::SpinBlades(float flInterval)
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::MoveExecute_Dead(float flInterval)
 {
-	if( GetWaterLevel() > 0 )
+	if( GetWaterLevel() > WaterLevel::WL_NotInWater )
 	{
 		// No movement if sinking in water.
 		return;
 	}
 
 	// Periodically emit smoke.
-	if (gpGlobals->curtime > m_fSmokeTime && GetWaterLevel() == 0)
+	if (gpGlobals->curtime > m_fSmokeTime && GetWaterLevel() == WaterLevel::WL_NotInWater)
 	{
 //		UTIL_Smoke(GetAbsOrigin(), random->RandomInt(10, 15), 10);
 		m_fSmokeTime = gpGlobals->curtime + random->RandomFloat( 0.1F, 0.3F);

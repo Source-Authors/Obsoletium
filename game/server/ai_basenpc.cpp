@@ -9691,7 +9691,7 @@ Vector CAI_BaseNPC::GetActualShootTrajectory( const Vector &shootOrigin )
 
 	// If we're above water shooting at a player underwater, bias some of the shots forward of
 	// the player so that they see the cool bubble trails in the water ahead of them.
-	if (GetEnemy()->IsPlayer() && (GetWaterLevel() != 3) && (GetEnemy()->GetWaterLevel() == 3))
+	if (GetEnemy()->IsPlayer() && (GetWaterLevel() != WaterLevel::WL_Eyes) && (GetEnemy()->GetWaterLevel() == WaterLevel::WL_Eyes))
 	{
 #if 1
 		if (random->RandomInt(0, 4) < 3)

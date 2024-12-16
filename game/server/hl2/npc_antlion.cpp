@@ -1275,7 +1275,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 	if ( pEvent->event == AE_ANTLION_WORKER_EXPLODE_SCREAM )
 	{
-		if ( GetWaterLevel() < 2 )
+		if ( GetWaterLevel() < WaterLevel::WL_Waist )
 		{
 			EmitSound( "NPC_Antlion.PoisonBurstScream" );
 		}
@@ -3705,7 +3705,7 @@ void CNPC_Antlion::GatherConditions( void )
 		 IsCurSchedule(SCHED_FALL_TO_GROUND ) == false &&
 		 IsEffectActive( EF_NODRAW ) == false )
 	{
-		if( m_lifeState == LIFE_ALIVE && GetWaterLevel() > 1 )
+		if( m_lifeState == LIFE_ALIVE && GetWaterLevel() > WaterLevel::WL_Feet )
 		{
 			// Start Drowning!
 			SetCondition( COND_ANTLION_IN_WATER );
@@ -4387,7 +4387,7 @@ void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::DoPoisonBurst()
 {
-	if ( GetWaterLevel() < 2 )
+	if ( GetWaterLevel() < WaterLevel::WL_Waist )
 	{
 		CTakeDamageInfo info( this, this, sk_antlion_worker_burst_damage.GetFloat(), DMG_BLAST_SURFACE | ( ANTLION_WORKER_BURST_IS_POISONOUS() ? DMG_POISON : DMG_ACID ) );
 

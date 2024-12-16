@@ -1856,7 +1856,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 	{
 		if ( !( GetFlags() & FL_FLY ) )
 		{
-			if ( !( ( GetFlags() & FL_SWIM ) && ( GetWaterLevel() > 0 ) ) )
+			if ( !( ( GetFlags() & FL_SWIM ) && ( GetWaterLevel() > WaterLevel::WL_NotInWater ) ) )
 			{
 #if 0
 				if ( GetAbsVelocity()[2] < ( GetCurrentGravity() * -0.1 ) )

@@ -1056,7 +1056,7 @@ void CNPC_Ichthyosaur::Bite( void )
 
 			if ( pPlayer )
 			{
-				if ( ( ( m_flHoldTime < gpGlobals->curtime ) && ( pPlayer->m_iHealth < (pPlayer->m_iMaxHealth*0.5f)) ) || ( pPlayer->GetWaterLevel() < 1 ) )
+				if ( ( ( m_flHoldTime < gpGlobals->curtime ) && ( pPlayer->m_iHealth < (pPlayer->m_iMaxHealth*0.5f)) ) || ( pPlayer->GetWaterLevel() < WaterLevel::WL_Feet ) )
 				{
 					//EnsnareVictim( pHurt );
 				}
@@ -1171,9 +1171,9 @@ void CNPC_Ichthyosaur::PrescheduleThink( void )
 	}
 
 	//Check our water level
-	if ( GetWaterLevel() != 3 )
+	if ( GetWaterLevel() != WaterLevel::WL_Eyes )
 	{
-		if ( GetWaterLevel() < 2 )
+		if ( GetWaterLevel() < WaterLevel::WL_Waist )
 		{
 			DevMsg( 2, "Came out of water\n" );
 			

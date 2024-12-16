@@ -1032,7 +1032,7 @@ void CBaseHeadcrab::GatherConditions( void )
 
 	BaseClass::GatherConditions();
 
-	if( m_lifeState == LIFE_ALIVE && GetWaterLevel() > 1 )
+	if( m_lifeState == LIFE_ALIVE && GetWaterLevel() > WaterLevel::WL_Feet )
 	{
 		// Start Drowning!
 		SetCondition( COND_HEADCRAB_IN_WATER );

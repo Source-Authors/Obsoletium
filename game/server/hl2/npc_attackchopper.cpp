@@ -5271,7 +5271,7 @@ void CGrenadeHelicopter::PhysicsSimulate( void )
 
 	if (!m_bActivated && (GetMoveType() != MOVETYPE_VPHYSICS))
 	{
-		if ( GetWaterLevel() > 1 )
+		if ( GetWaterLevel() > WaterLevel::WL_Feet )
 		{
 			SetAbsVelocity( vec3_origin );
 			SetMoveType( MOVETYPE_NONE );
@@ -5373,7 +5373,7 @@ void CGrenadeHelicopter::DoExplosion( const Vector &vecOrigin, const Vector &vec
 	CEffectData data;
 
 	// If we're under water do a water explosion
-	if ( GetWaterLevel() != 0 && (GetWaterType() & CONTENTS_WATER) )
+	if ( GetWaterLevel() != WaterLevel::WL_NotInWater && (GetWaterType() & CONTENTS_WATER) )
 	{
 		data.m_vOrigin = WorldSpaceCenter();
 		data.m_flMagnitude = 128;

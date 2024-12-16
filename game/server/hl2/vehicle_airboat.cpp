@@ -1424,16 +1424,16 @@ void CPropAirboat::UpdateFanSound( CSoundEnvelopeController &controller, float s
 //-----------------------------------------------------------------------------
 void CPropAirboat::UpdateWaterSound( CSoundEnvelopeController &controller, float speedRatio )
 {
-	int nWaterLevel = GetWaterLevel();
+	WaterLevel nWaterLevel = GetWaterLevel();
 
 	// Manage the state of the water stopped sound (gentle lapping at the pontoons).
-	if ( nWaterLevel == 0 )
+	if ( nWaterLevel == WaterLevel::WL_NotInWater )
 	{
 		controller.SoundChangeVolume(m_pWaterStoppedSound, 0.0, 0.0);
 	}
 	else
 	{
-		if ( m_nPrevWaterLevel == 0 )
+		if ( m_nPrevWaterLevel == WaterLevel::WL_NotInWater )
 		{
 			Vector vecVelocityWorld;
 			GetVelocity( &vecVelocityWorld, NULL );
@@ -1477,7 +1477,7 @@ void CPropAirboat::UpdateWaterSound( CSoundEnvelopeController &controller, float
 	}
 
 	// Manage the state of the water fast sound (water hissing under the pontoons).
-	if ( nWaterLevel == 0 )
+	if ( nWaterLevel == WaterLevel::WL_NotInWater )
 	{
 		controller.SoundChangeVolume(m_pWaterFastSound, 0.0, 0.0);
 	}
@@ -1988,7 +1988,7 @@ void CPropAirboat::DampenUpMotion( Vector &vecVehicleEyePos, QAngle &vecVehicleE
 //-----------------------------------------------------------------------------
 void CPropAirboat::CreateSplash( int nSplashType )
 {
-	if ( GetWaterLevel( ) == 0 )
+	if ( GetWaterLevel() == WaterLevel::WL_NotInWater )
 		return;
 
 	Vector vecSplashPoint;

@@ -1143,7 +1143,7 @@ void CAPCMissile::SetGuidanceHint( const char *pHintName )
 //-----------------------------------------------------------------------------
 void CAPCMissile::DoExplosion( void )
 {
-	if ( GetWaterLevel() != 0 )
+	if ( GetWaterLevel() != WaterLevel::WL_NotInWater )
 	{
 		CEffectData data;
 		data.m_vOrigin = WorldSpaceCenter();

@@ -1179,7 +1179,7 @@ bool CHL2_Player::CanSprint()
 	return ( m_bSprintEnabled &&										// Only if sprint is enabled 
 			!IsWalking() &&												// Not if we're walking
 			!( m_Local.m_bDucked && !m_Local.m_bDucking ) &&			// Nor if we're ducking
-			(GetWaterLevel() != 3) &&									// Certainly not underwater
+			(GetWaterLevel() != WaterLevel::WL_Eyes) &&					// Certainly not underwater
 			(GlobalEntity_GetState("suit_no_sprint") != GLOBAL_ON) );	// Out of the question without the sprint module
 }
 
@@ -2320,10 +2320,10 @@ int	CHL2_Player::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if( info.GetDamageType() & DMG_BLAST_SURFACE )
 	{
-		if( GetWaterLevel() > 2 )
+		if( GetWaterLevel() > WaterLevel::WL_Waist )
 		{
 			// Don't take blast damage from anything above the surface.
-			if( info.GetInflictor()->GetWaterLevel() == 0 )
+			if( info.GetInflictor()->GetWaterLevel() == WaterLevel::WL_NotInWater )
 			{
 				return 0;
 			}
