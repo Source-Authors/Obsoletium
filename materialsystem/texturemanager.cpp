@@ -2410,7 +2410,7 @@ void CTextureManager::DebugPrintUsedTextures( void )
 
 	if ( m_TextureExcludes.Count() )
 	{
-		Msg( "\nExcluded Textures: (%zd)\n", m_TextureExcludes.Count() );
+		Msg( "\nExcluded Textures: (%hhu)\n", m_TextureExcludes.Count() );
 		for ( auto i = m_TextureExcludes.First(); i != m_TextureExcludes.InvalidIndex(); i = m_TextureExcludes.Next( i ) )
 		{
 			char buff[256];

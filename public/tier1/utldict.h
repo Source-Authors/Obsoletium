@@ -66,7 +66,7 @@ public:
 	void		SetElementName( I i, char const *pName );
 
 	// Number of elements
-	size_t Count() const;
+	I Count() const;
 
 	// Number of allocated slots
 	I MaxElement() const;
@@ -197,7 +197,7 @@ inline void CUtlDict<T, I>::SetElementName( I i, char const *pName )
 // Num elements
 //-----------------------------------------------------------------------------
 template <class T, class I>
-inline	size_t CUtlDict<T, I>::Count() const          
+inline	I CUtlDict<T, I>::Count() const          
 { 
 	return m_Elements.Count(); 
 }
