@@ -3668,7 +3668,7 @@ void CDmeTypedLog< T >::FlattenLayers( float threshold, int flags )
 			break;
 		}
 
-		int nNextIndex = events.NextInorder( idx );
+		auto nNextIndex = events.NextInorder( idx );
 
 		// We popped the last item off the stack
 		if ( nNextIndex == events.InvalidIndex() )
@@ -3682,7 +3682,7 @@ void CDmeTypedLog< T >::FlattenLayers( float threshold, int flags )
 		DmeTime_t layerFinishTime = nextevent->m_Time;
 
 		// The topmost layer is the active layer
-		int layernum = active.LastInorder();
+		auto layernum = active.LastInorder();
 		if ( layernum == active.InvalidIndex() )
 			break;
 
