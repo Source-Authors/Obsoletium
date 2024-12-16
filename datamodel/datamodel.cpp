@@ -161,7 +161,7 @@ void CDataModel::Shutdown()
 {
 #ifdef _ELEMENT_HISTOGRAM_
 	Msg( "element type histogram for %d elements allocated so far:\n", GetElementsAllocatedSoFar() );
-	for ( int i = g_typeHistogram.FirstInorder(); g_typeHistogram.IsValidIndex( i ); i = g_typeHistogram.NextInorder( i ) )
+	for ( auto i = g_typeHistogram.FirstInorder(); g_typeHistogram.IsValidIndex( i ); i = g_typeHistogram.NextInorder( i ) )
 	{
 		Msg( "%d\t%s\n", g_typeHistogram.Element( i ), GetString( g_typeHistogram.Key( i ) ) );
 	}
@@ -286,7 +286,7 @@ struct DmMemoryInfo_t
 
 struct DmMemorySortInfo_t
 {
-	int m_nIndex;
+	unsigned short m_nIndex;
 	int m_nTotalSize;
 };
 
@@ -313,7 +313,7 @@ void CDataModel::DisplayMemoryStats( )
 		if ( !pElement )
 			continue;
 
-		unsigned short j = typeHistogram.Find( pElement->GetType() );
+		auto j = typeHistogram.Find( pElement->GetType() );
 		if ( !typeHistogram.IsValidIndex( j ) )
 		{
 			j = typeHistogram.Insert( pElement->GetType() );
@@ -330,8 +330,8 @@ void CDataModel::DisplayMemoryStats( )
 
 	// Sort
 	DmMemorySortInfo_t* pSortInfo = (DmMemorySortInfo_t*)_alloca( typeHistogram.Count() * sizeof(DmMemorySortInfo_t) );
-	int nCount = 0;
-	for ( int i = typeHistogram.FirstInorder(); typeHistogram.IsValidIndex( i ); i = typeHistogram.NextInorder( i ) )
+	decltype(typeHistogram.FirstInorder()) nCount = 0;
+	for ( auto i = typeHistogram.FirstInorder(); typeHistogram.IsValidIndex( i ); i = typeHistogram.NextInorder( i ) )
 	{
 		pSortInfo[nCount].m_nIndex = i;
 		pSortInfo[nCount].m_nTotalSize = typeHistogram.Element( i ).m_nSize;
@@ -345,7 +345,7 @@ void CDataModel::DisplayMemoryStats( )
 	int nTotalData = 0;
 	memset( pTotals, 0, sizeof(pTotals) );
 	ConMsg( "Dm Memory usage: type\t\t\t\tcount\ttotalsize\twastage %%\touter\t\tinner\t\tdatamodel\trefs\t\ttree\t\tatts\t\tdata\t(att count)\n" );
-	for ( int i = 0; i < nCount; ++i )
+	for ( decltype(nCount) i = 0; i < nCount; ++i )
 	{
 		const DmMemoryInfo_t& info = typeHistogram.Element( pSortInfo[i].m_nIndex );
 		float flPercentOverhead = 1.0f - ( ( info.m_nSize != 0 ) ? ( (float)info.m_pCategories[MEMORY_CATEGORY_ATTRIBUTE_DATA] / (float)info.m_nSize ) : 0.0f );
