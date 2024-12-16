@@ -158,7 +158,7 @@ DmxSerializationHandle_t CDmxSerializationDictionary::FirstRootElement() const
 	// NOTE: I don't have to use First/NextInorder here because there
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
-	intp nCount = m_Dict.Count();
+	DmxSerializationHandle_t nCount = m_Dict.Count();
 	for ( DmxSerializationHandle_t h = 0; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
@@ -170,7 +170,7 @@ DmxSerializationHandle_t CDmxSerializationDictionary::FirstRootElement() const
 DmxSerializationHandle_t CDmxSerializationDictionary::NextRootElement( DmxSerializationHandle_t h ) const
 {
 	++h;
-	intp nCount = m_Dict.Count();
+	DmxSerializationHandle_t nCount = m_Dict.Count();
 	for ( ; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
