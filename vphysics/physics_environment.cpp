@@ -709,12 +709,12 @@ private:
 	}
 	void UpdatePairListPSI( CPhysicsEnvironment *pEnvironment )
 	{
-		unsigned short index = m_pairList.FirstInorder();
+		auto index = m_pairList.FirstInorder();
 		IVP_Time currentTime = pEnvironment->GetIVPEnvironment()->get_current_time();
 
 		while ( m_pairList.IsValidIndex(index) )
 		{
-			unsigned short next = m_pairList.NextInorder( index );
+			auto next = m_pairList.NextInorder( index );
 			corepair_t &test = m_pairList.Element(index);
 			
 			// only keep 1 seconds worth of data
@@ -748,7 +748,7 @@ CPhysicsListenerCollision::CPhysicsListenerCollision()
 void CPhysicsListenerCollision::event_friction_pair_created( IVP_Friction_Core_Pair *pair )
 {
 	corepair_t test(pair);
-	unsigned short index = m_pairList.Find( test );
+	auto index = m_pairList.Find( test );
 	if ( m_pairList.IsValidIndex( index ) )
 	{
 		corepair_t &save = m_pairList.Element(index);
@@ -775,7 +775,7 @@ void CPhysicsListenerCollision::event_friction_pair_created( IVP_Friction_Core_P
 void CPhysicsListenerCollision::event_friction_pair_deleted( IVP_Friction_Core_Pair *pair )
 {
 	corepair_t test(pair);
-	unsigned short index = m_pairList.Find( test );
+	auto index = m_pairList.Find( test );
 	if ( m_pairList.IsValidIndex( index ) )
 	{
 		corepair_t &save = m_pairList.Element(index);
