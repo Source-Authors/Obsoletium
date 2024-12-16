@@ -96,7 +96,7 @@ UsedWeaponSlot_t g_bUsedWeaponSlots[MAX_WEAPON_SLOTS][MAX_WEAPON_POSITIONS] = {}
 static WEAPON_FILE_INFO_HANDLE FindWeaponInfoSlot( const char *name )
 {
 	// Complain about duplicately defined metaclass names...
-	unsigned short lookup = m_WeaponInfoDatabase.Find( name );
+	auto lookup = m_WeaponInfoDatabase.Find( name );
 	if ( lookup != m_WeaponInfoDatabase.InvalidIndex() )
 	{
 		return lookup;
