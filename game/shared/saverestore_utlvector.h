@@ -69,7 +69,12 @@ public:
 		{
 			if ( nElems )
 			{
-				dataDesc.fieldSize = nElems;
+				// dimhotepus: Check do not truncate vector during save.
+				AssertMsg( nElems <= std::numeric_limits<decltype(dataDesc.fieldSize)>::max(),
+					"Trying to save vector of %d elements while max allowed is %zd.\n",
+					nElems, static_cast<intp>(std::numeric_limits<decltype(dataDesc.fieldSize)>::max()) );
+
+				dataDesc.fieldSize = static_cast<decltype(dataDesc.fieldSize)>(nElems);
 				dataDesc.fieldSizeInBytes = nElems * CDatamapFieldSizeDeducer<FIELD_TYPE>::FieldSize();
 				pSave->WriteFields("elems", &((*pUtlVector)[0]), &dataMap, &dataDesc, 1 );
 			}
@@ -126,7 +131,12 @@ public:
 		{
 			if ( nElems )
 			{
-				dataDesc.fieldSize = nElems;
+				// dimhotepus: Check do not truncate vector during restore.
+				AssertMsg( nElems <= std::numeric_limits<decltype(dataDesc.fieldSize)>::max(),
+					"Trying to restore vector of %d elements while max allowed is %zd.\n",
+					nElems, static_cast<intp>(std::numeric_limits<decltype(dataDesc.fieldSize)>::max()) );
+
+				dataDesc.fieldSize = static_cast<decltype(dataDesc.fieldSize)>(nElems);
 				dataDesc.fieldSizeInBytes = nElems * CDatamapFieldSizeDeducer<FIELD_TYPE>::FieldSize();
 				pRestore->ReadFields("elems", &((*pUtlVector)[0]), &dataMap, &dataDesc, 1 );
 			}
@@ -137,7 +147,7 @@ public:
 			dataDesc.fieldSizeInBytes = CDatamapFieldSizeDeducer<FIELD_TYPE>::FieldSize();
 			for ( int i = 0; i < nElems; i++ )
 				pRestore->ReadAll( &((*pUtlVector)[i]), &dataMap );
-		}		
+		}
 	}
 	
 	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
