@@ -520,12 +520,12 @@ void CDmElement::CopyAttributesTo( CDmElement *pCopy, TraversalDepth_t depth ) c
 	CopyAttributesTo( pCopy, refmap, depth );
 
 	CUtlHashFast< DmElementHandle_t > visited;
-	size_t nPow2Size = 1;
+	intp nPow2Size = 1;
 	while( nPow2Size < refmap.Count() )
 	{
 		nPow2Size <<= 1U;
 	}
-	visited.Init( static_cast<intp>(nPow2Size) );
+	visited.Init( nPow2Size );
 	pCopy->FixupReferences( visited, refmap, depth );
 }
 
@@ -1311,12 +1311,12 @@ void CopyElements( const CUtlVector< CDmElement* > &from, CUtlVector< CDmElement
 	}
 
 	CUtlHashFast< DmElementHandle_t > visited;
-	size_t nPow2Size = 1;
+	intp nPow2Size = 1;
 	while( nPow2Size < refmap.Count() )
 	{
 		nPow2Size <<= 1;
 	}
-	visited.Init( static_cast<intp>(nPow2Size) );
+	visited.Init( nPow2Size );
 
 	for ( intp i = 0; i < c; ++i )
 	{
