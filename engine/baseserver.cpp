@@ -1102,7 +1102,7 @@ void CBaseServer::CalculateCPUUsage( void )
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-	float curtime = Sys_FloatTime();
+	double curtime = Plat_FloatTime();
 
 	if ( m_fStartTime == 0 )
 	// record when we started
@@ -1114,7 +1114,7 @@ void CBaseServer::CalculateCPUUsage( void )
 	// only do this every 1 second
 	{
 #if defined ( _WIN32 ) 
-		static float lastAvg=0;
+		static double lastAvg=0;
 		static __int64 lastTotalTime=0,lastNow=0;
 
 		HANDLE handle;
@@ -1151,7 +1151,7 @@ void CBaseServer::CalculateCPUUsage( void )
 		}
 #elif defined ( POSIX )
 		static struct rusage s_lastUsage;
-		static float s_lastAvg = 0;
+		static double s_lastAvg = 0;
 		struct rusage currentUsage;
 
 		if ( getrusage( RUSAGE_SELF, &currentUsage ) == 0 )
