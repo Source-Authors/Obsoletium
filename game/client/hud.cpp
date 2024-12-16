@@ -523,9 +523,8 @@ void CHud::LevelInit( void )
 	}
 
 	// Unhide all render groups
-	size_t iCount = m_RenderGroups.Count();
-	Assert( iCount <= std::numeric_limits<unsigned short>::max() );
-	for ( unsigned short i = 0; i < static_cast<unsigned short>(iCount); i++ )
+	auto iCount = m_RenderGroups.Count();
+	for ( decltype(m_RenderGroups)::IndexType_t i = 0; i < iCount; i++ )
 	{
 		CHudRenderGroup *group = m_RenderGroups[ i ];
 		group->bHidden = false;
@@ -1017,8 +1016,7 @@ bool CHud::LockRenderGroup( int iGroupIndex, CHudElement *pLocker /* = NULL */ )
 	if ( !DoesRenderGroupExist(iGroupIndex) )
 		return false;
 
-	int iRenderGroup = m_RenderGroups.Find( iGroupIndex );
-
+	auto iRenderGroup = m_RenderGroups.Find( iGroupIndex );
 	Assert( m_RenderGroups.IsValidIndex( iRenderGroup ) );
 
 	CHudRenderGroup *group = m_RenderGroups.Element( iRenderGroup );
@@ -1066,8 +1064,7 @@ bool CHud::UnlockRenderGroup( int iGroupIndex, CHudElement *pLocker /* = NULL */
 	if ( !DoesRenderGroupExist(iGroupIndex) )
 		return false;
 
-	int iRenderGroup = m_RenderGroups.Find( iGroupIndex );
-
+	auto iRenderGroup = m_RenderGroups.Find( iGroupIndex );
 	Assert( m_RenderGroups.IsValidIndex( iRenderGroup ) );
 
 	CHudRenderGroup *group = m_RenderGroups.Element( iRenderGroup );
@@ -1105,8 +1102,7 @@ bool CHud::IsRenderGroupLockedFor( CHudElement *pHudElement, int iGroupIndex )
 	if ( !DoesRenderGroupExist(iGroupIndex) )
 		return false;
 
-	int i = m_RenderGroups.Find( iGroupIndex );
-
+	auto i = m_RenderGroups.Find( iGroupIndex );
 	Assert( m_RenderGroups.IsValidIndex(i) );
 
 	CHudRenderGroup *group = m_RenderGroups.Element(i);
