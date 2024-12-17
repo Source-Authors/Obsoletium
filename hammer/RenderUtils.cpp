@@ -6,8 +6,9 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "Render2D.h"
 #include "RenderUtils.h"
+
+#include "Render2D.h"
 #include "mapview2d.h"
 #include "toolinterface.h"
 
@@ -56,7 +57,7 @@ void DrawBoundsText(CRender2D *pRender, const Vector &Mins, const Vector &Maxs, 
 	pRender->SetTextColor( 255, 255, 255 );
 
     // horz
-     sprintf( extentText, "%.1f", Extents[pView->axHorz] );
+    sprintf( extentText, "%.1f", Extents[pView->axHorz] );
  	nTextFlags = CRender2D::TEXT_JUSTIFY_HORZ_CENTER;
     nTextX = projCenter.x;
 
