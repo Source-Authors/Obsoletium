@@ -24,6 +24,21 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
+// Strict types mode.
+#ifndef STRICT
+#define STRICT
+#endif
+
+// Access to Windows 10 features.
+#define _WIN32_WINNT 0x0A00
+
+// Disable unused things to speedup compile.
+#define NOMINMAX
+#define NOWINRES
+#define NOSERVICE
+#define NOMCX
+#define NOIME
+
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 #include <process.h>
@@ -47,13 +62,7 @@
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>			// MFC support for Windows 95 Common Controls
 #include <afxpriv.h>
-#pragma warning(push)
-#pragma warning(disable:4018)
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
-#pragma warning(pop)
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 #include "tier0/platform.h"
