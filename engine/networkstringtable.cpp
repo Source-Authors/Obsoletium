@@ -7,16 +7,16 @@
 #include "host.h"
 #include "sysexternal.h"
 #include "networkstringtable.h"
-#include "utlbuffer.h"
-#include "bitbuf.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/bitbuf.h"
 #include "netmessages.h"
 #include "net.h"
 #include "filesystem_engine.h"
 #include "baseclient.h"
 #include "vprof.h"
-#include <tier1/utlstring.h>
-#include <tier1/utlhashtable.h>
-#include <tier0/etwprof.h>
+#include "tier1/utlstring.h"
+#include "tier1/utlhashtable.h"
+#include "tier0/etwprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -67,7 +67,7 @@ static int GetBestPreviousString( CUtlVector< StringHistoryEntry >& history, cha
 	return bestindex;
 }
 
-bool CNetworkStringTable_LessFunc( FileNameHandle_t const &a, FileNameHandle_t const &b )
+static bool CNetworkStringTable_LessFunc( FileNameHandle_t const &a, FileNameHandle_t const &b )
 {
 	return a < b;
 }
@@ -88,35 +88,35 @@ public:
 		Purge();
 	}
 
-	unsigned int Count()
+	unsigned int Count() override
 	{
 		return m_Items.Count();
 	}
 
-	void Purge()
+	void Purge() override
 	{
 		m_Items.Purge();
 	}
 
-	const char *String( int index )
+	const char *String( int index ) override
 	{
 		char* pString = tmpstr512();
 		g_pFileSystem->String( m_Items.Key( index ), pString, 512 );
 		return pString;
 	}
 
-	bool IsValidIndex( int index )
+	bool IsValidIndex( int index ) override
 	{
 		return m_Items.IsValidIndex( index );
 	}
 
-	int Insert( const char *pString )
+	int Insert( const char *pString ) override
 	{
 		FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pString );
 		return m_Items.Insert( fnHandle );
 	}
 
-	int Find( const char *pString )
+	int Find( const char *pString ) override
 	{
 		FileNameHandle_t fnHandle = g_pFileSystem->FindFileName( pString );
 		if ( !fnHandle )
@@ -124,18 +124,18 @@ public:
 		return m_Items.Find( fnHandle );
 	}
 
-	CNetworkStringTableItem	&Element( int index )
+	CNetworkStringTableItem	&Element( int index ) override
 	{
 		return m_Items.Element( index );
 	}
 
-	const CNetworkStringTableItem &Element( int index ) const
+	const CNetworkStringTableItem &Element( int index ) const override
 	{
 		return m_Items.Element( index );
 	}
 
 private:
-	CUtlMap< FileNameHandle_t, CNetworkStringTableItem > m_Items;
+	CUtlMap< FileNameHandle_t, CNetworkStringTableItem, int > m_Items;
 };
 
 //-----------------------------------------------------------------------------
@@ -152,42 +152,42 @@ public:
 	{ 
 	}
 
-	unsigned int Count()
+	unsigned int Count() override
 	{
 		return m_Lookup.Count();
 	}
 
-	void Purge()
+	void Purge() override
 	{
 		m_Lookup.Purge();
 	}
 
-	const char *String( int index )
+	const char *String( int index ) override
 	{
 		return m_Lookup.Key( index ).Get();
 	}
 
-	bool IsValidIndex( int index )
+	bool IsValidIndex( int index ) override
 	{
 		return m_Lookup.IsValidHandle( index );
 	}
 
-	int Insert( const char *pString )
+	int Insert( const char *pString ) override
 	{
 		return m_Lookup.Insert( pString );
 	}
 
-	int Find( const char *pString )
+	int Find( const char *pString ) override
 	{
 		return pString ? m_Lookup.Find( pString ) : m_Lookup.InvalidHandle();
 	}
 
-	CNetworkStringTableItem	&Element( int index )
+	CNetworkStringTableItem	&Element( int index ) override
 	{
 		return m_Lookup.Element( index );
 	}
 
-	const CNetworkStringTableItem &Element( int index ) const
+	const CNetworkStringTableItem &Element( int index ) const override
 	{
 		return m_Lookup.Element( index );
 	}
