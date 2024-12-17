@@ -6,8 +6,9 @@
 //=============================================================================//
 
 #include <stdafx.h>
-#include "hammer.h"
 #include "ToolDisplace.h"
+
+#include "hammer.h"
 #include "MainFrm.h"
 #include "FaceEditSheet.h"
 #include "GlobalFunctions.h"
@@ -605,7 +606,7 @@ void CToolDisplace::Nudge_Do( void )
 		
 		// set the dynamic filter data
 		pFilter->m_DataType = DISPPAINT_CHANNEL_POSITION;
-		pFilter->m_Scale = ( delta * 0.25 ) * ( float )( ( int )( m_flPaintValueGeo / 10.0f ) + 1 ) ;
+		pFilter->m_Scale = ( delta * 0.25f ) * ( float )( ( int )( m_flPaintValueGeo / 10.0f ) + 1 ) ;
 		
 		// apply the filter to the displacement surface(s)
 		m_FilterRaiseLowerMgr.Apply( pFilter, pNudgeDisp, m_iPaintAxis, m_vecPaintAxis, m_bAutoSew );
@@ -761,7 +762,7 @@ void CToolDisplace::ApplySpatialPaintTool( UINT nFlags, const Vector2D &vPoint, 
 void CToolDisplace::ApplySculptSpatialPaintTool( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint )
 {
 	// Initialize the spatial paint data.
-	SpatialPaintData_t spatialData;
+	SpatialPaintData_t spatialData = {};
 
 	spatialData.m_vCenter.Init();
 
