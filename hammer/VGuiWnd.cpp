@@ -8,8 +8,9 @@
 //===========================================================================//
 
 #include "stdafx.h"
+
 #include "vguiwnd.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
@@ -21,7 +22,7 @@
 
 IMPLEMENT_DYNCREATE(CVGuiPanelWnd, CWnd)
 
-#define REPAINT_TIMER_ID	1042 //random value, hopfully no collisions	
+#define REPAINT_TIMER_ID	1042 //random value, hopefully no collisions
 
 class CBaseMainPanel : public vgui::EditablePanel
 {
