@@ -1055,7 +1055,8 @@ void CBaseAnimating::DispatchAnimEvents ( CBaseAnimating *eventHandler )
 
 	if ( !pstudiohdr )
 	{
-		Assert(!"CBaseAnimating::DispatchAnimEvents: model missing");
+		AssertMsg( false, "Dispatch animation events: model '%s' is missing.\n",
+			STRING( GetModelName() ) );
 		return;
 	}
 
@@ -1244,7 +1245,8 @@ float CBaseAnimating::GetPoseParameter( int iParameter )
 
 	if ( !pstudiohdr )
 	{
-		Assert(!"CBaseAnimating::GetPoseParameter: model missing");
+		AssertMsg( false, "Get pose parameter: model '%s' is missing.\n",
+			STRING( GetModelName() ) );
 		return 0.0;
 	}
 
@@ -1411,13 +1413,15 @@ void CBaseAnimating::GetBonePosition ( int iBone, Vector &origin, QAngle &angles
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBonePosition: model missing");
+		AssertMsg( false, "Get bone position: model '%s' is missing.\n",
+			STRING( GetModelName() ) );
 		return;
 	}
 
 	if (iBone < 0 || iBone >= pStudioHdr->numbones())
 	{
-		Assert(!"CBaseAnimating::GetBonePosition: invalid bone index");
+		AssertMsg( false, "Get bone position: model '%s' bone %d is out of range [0..%d).\n",
+			STRING( GetModelName() ), iBone, pStudioHdr->numbones() );
 		return;
 	}
 
@@ -1438,13 +1442,15 @@ void CBaseAnimating::GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld )
 
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBoneTransform: model missing");
+		AssertMsg( false, "Get bone transform: model '%s' is missing.\n",
+			STRING( GetModelName() ) );
 		return;
 	}
 
 	if (iBone < 0 || iBone >= pStudioHdr->numbones())
 	{
-		Assert(!"CBaseAnimating::GetBoneTransform: invalid bone index");
+		AssertMsg( false, "Get bone transform: model '%s' bone %d is out of range [0..%d).\n",
+			STRING( GetModelName() ), iBone, pStudioHdr->numbones() );
 		return;
 	}
 
@@ -1886,7 +1892,7 @@ int CBaseAnimating::GetNumBones ( void )
 	}
 	else
 	{
-		Assert(!"CBaseAnimating::GetNumBones: model missing");
+		AssertMsg( false, "Get bones count: model '%s' is missing.\n", STRING( GetModelName() ) );
 		return 0;
 	}
 }
@@ -1905,7 +1911,7 @@ int CBaseAnimating::LookupAttachment( const char *szName )
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 	{
-		AssertMsg( false, "Attachment model %s missing.\n", szName );
+		AssertMsg( false, "Lookup attachment: model '%s' is missing.\n", STRING( GetModelName() ) );
 		return 0;
 	}
 
@@ -1950,7 +1956,9 @@ bool CBaseAnimating::GetAttachment( int iAttachment, matrix3x4_t &attachmentToWo
 	if (!pStudioHdr)
 	{
 		MatrixCopy(EntityToWorldTransform(), attachmentToWorld);
-		AssertOnce(!"CBaseAnimating::GetAttachment: model missing");
+#ifdef _DEBUG
+		ExecuteOnce( AssertMsg( false, "Get attachment: model '%s' is missing.\n", STRING( GetModelName() ) ) );
+#endif
 		return false;
 	}
 
@@ -1987,9 +1995,21 @@ bool CBaseAnimating::GetAttachment( int iAttachment, matrix3x4_t &attachmentToWo
 int CBaseAnimating::GetAttachmentBone( int iAttachment )
 {
 	CStudioHdr *pStudioHdr = GetModelPtr( );
-	if (!pStudioHdr || iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments() )
+	if (!pStudioHdr)
 	{
-		AssertOnce(pStudioHdr && "CBaseAnimating::GetAttachment: model missing");
+#ifdef _DEBUG
+		ExecuteOnce(AssertMsg( false, "Get attachment bone: model '%s' is missing.\n",
+			STRING( GetModelName() ) ));
+#endif
+		return 0;
+	}
+
+	if (iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments() )
+	{
+#ifdef _DEBUG
+		ExecuteOnce(AssertMsg( false, "Get attachment bone: model '%s' attachment %d is out of range [1..%d].\n",
+			STRING( GetModelName() ), iAttachment, pStudioHdr->GetNumAttachments() ));
+#endif
 		return 0;
 	}
 
@@ -2064,7 +2084,8 @@ void CBaseAnimating::GetEyeballs( Vector &origin, QAngle &angles )
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetAttachment: model missing");
+		AssertMsg( false, "Get eyeballs: model '%s' is missing.\n",
+			STRING( GetModelName() ) );
 		return;
 	}
 
@@ -2677,7 +2698,9 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 	{
-		Assert(!"CBaseAnimating::GetBonePosition: model missing");
+		AssertMsg( false, "Test hitboxes: model '%s' is missing.\n",
+			STRING( GetModelName() ) );
+
 		return false;
 	}
 
