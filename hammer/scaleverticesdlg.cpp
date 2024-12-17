@@ -9,8 +9,8 @@
 //
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "ScaleVerticesDlg.h"
+#include "hammer.h"
 #include "MapDoc.h"
 #include "GlobalFunctions.h"
 
@@ -26,6 +26,8 @@ CScaleVerticesDlg::CScaleVerticesDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CScaleVerticesDlg)
 	//}}AFX_DATA_INIT
+	// dimhotepus: Init scale.
+	m_fScale = -1;
 }
 
 
@@ -54,7 +56,8 @@ void CScaleVerticesDlg::OnChangeScale()
 {
 	CString str;
 	m_cScale.GetWindowText(str);
-	m_fScale = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fScale = strtof(str, nullptr);
 
 	if (m_fScale <= 0)
 	{
@@ -71,7 +74,8 @@ void CScaleVerticesDlg::OnDeltaposScalespin(NMHDR* pNMHDR, LRESULT* pResult)
 
 	CString str;
 	m_cScale.GetWindowText(str);
-	m_fScale = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fScale = strtof(str, nullptr);
 	m_fScale += 0.1f * float(pNMUpDown->iDelta);
 	if(m_fScale <= 0)
 		m_fScale = 0;
