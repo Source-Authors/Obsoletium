@@ -27,7 +27,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 extern float g_MAX_MAP_COORD; // dvs: move these into Globals.h!!
 extern float g_MIN_MAP_COORD; // dvs: move these into Globals.h!!
@@ -569,13 +568,13 @@ bool Box3D::UpdateTranslation(const Vector &vUpdate, UINT uConstraints)
 
 		if (uConstraints & constrainSnap)
 		{
-			angle += 7.5;
-			angle -= fmod(double(angle), double(15.0));
+			angle += 7.5f;
+			angle -= fmod(angle, 15.0f);
 		}
 		else
 		{
-			angle += 0.25;
-			angle -= fmod(double(angle), double(.5));
+			angle += 0.25f;
+			angle -= fmod(angle, .5f);
 		}
 
         if ( volume < 0 )
