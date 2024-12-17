@@ -947,7 +947,7 @@ void CBaseServer::FillServerInfo(SVC_ServerInfo &serverinfo)
 #endif
 
 	// HACK to signal that the server is "new"
-	serverinfo.m_cOS = tolower( serverinfo.m_cOS );
+	serverinfo.m_cOS = static_cast<char>(tolower( serverinfo.m_cOS ));
 
 	serverinfo.m_fTickInterval	= GetTickInterval();
 	serverinfo.m_szGameDir		= gamedir;
