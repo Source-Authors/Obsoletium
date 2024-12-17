@@ -5785,11 +5785,18 @@ void CMapDoc::OnFileRunmap(void)
 	CString strEditExtension;
 	CString strCompileExtension;
 	GetFileExtensions(g_pGameConfig->GetMapFormat(), strEditExtension, strCompileExtension);
-
-	CRunMap dlg;
-	CRunMapExpertDlg dlgExpert;
-
+	
 	CString strFile = GetPathName();
+
+	int nFilenameBeginOffset = strFile.ReverseFind( '\\' ) + 1;
+	int nFilenameEndOffset = strFile.Find( '.' );
+	//get the filename of the map, between the leading '\' and the '.'
+	CString strMapTitle = strFile.Mid( nFilenameBeginOffset, nFilenameEndOffset - nFilenameBeginOffset );			
+
+	// dimhotepus: Add Map name to title.
+	CRunMap dlg{strMapTitle};
+	// dimhotepus: Add Map name to title.
+	CRunMapExpertDlg dlgExpert{strMapTitle};
 
 	bool bWasModified = (IsModified() == TRUE);
 

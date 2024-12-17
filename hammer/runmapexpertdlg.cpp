@@ -9,8 +9,8 @@
 //
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "RunMapExpertDlg.h"
+#include "hammer.h"
 #include "RunMapCfgDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -19,11 +19,13 @@
 /////////////////////////////////////////////////////////////////////////////
 // CRunMapExpertDlg dialog
 
-CRunMapExpertDlg::CRunMapExpertDlg(CWnd* pParent /*=NULL*/)
+CRunMapExpertDlg::CRunMapExpertDlg(const CString& mapName, CWnd* pParent /*=NULL*/)
 	: CDialog(CRunMapExpertDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CRunMapExpertDlg)
 	//}}AFX_DATA_INIT
+
+	m_strMapName = mapName;
 
 	m_pActiveSequence = NULL;
 	m_bNoUpdateCmd = FALSE;
@@ -119,6 +121,8 @@ BOOL CRunMapExpertDlg::HandleInsertCommand(UINT nID)
 		CFileDialog dlg(TRUE, "exe", NULL, OFN_HIDEREADONLY | 
 			OFN_FILEMUSTEXIST |	OFN_NOCHANGEDIR, 
 			"Executable Files|*.exe||", this);
+		dlg.m_ofn.lpstrTitle = "Open Executable File";
+
 		if(dlg.DoModal() == IDCANCEL)
 			return TRUE;
 		m_cCommand.SetWindowText(dlg.m_ofn.lpstrFile);
@@ -553,6 +557,12 @@ void CRunMapExpertDlg::InitSequenceList()
 BOOL CRunMapExpertDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+
+	CString title;
+	GetWindowText(title);
+	// dimhotepus: Add map name to title.
+	title.AppendFormat(" - [%s]", m_strMapName.GetString());
+	SetWindowText(title);
 	
 	int iSequence = AfxGetApp()->GetProfileInt("RunMapExpert", 
 		"LastSequence", 0);

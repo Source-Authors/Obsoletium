@@ -5,8 +5,9 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "RunMap.h"
+
+#include "hammer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -15,9 +16,10 @@
 static LPCTSTR pszSection = "Run Map";
 
 
-CRunMap::CRunMap(CWnd* pParent /*=NULL*/)
+CRunMap::CRunMap(const CString& mapName, CWnd* pParent /*=NULL*/)
 	: CDialog(CRunMap::IDD, pParent)
 {
+	m_strMapName = mapName;
 	m_bSwitchMode = FALSE;
 
 	//{{AFX_DATA_INIT(CRunMap)
@@ -85,5 +87,12 @@ void CRunMap::OnExpert()
 BOOL CRunMap::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+	
+	CString title;
+	GetWindowText(title);
+	// dimhotepus: Add map name to title.
+	title.AppendFormat(" - [%s]", m_strMapName.GetString());
+	SetWindowText(title);
+
 	return TRUE;
 }

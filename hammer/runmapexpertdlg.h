@@ -17,6 +17,7 @@
 
 #include "RunCommands.h"
 #include "MyCheckListBox.h"
+#include "resource.h"
 
 
 class CCommandSequence;
@@ -26,7 +27,7 @@ class CRunMapExpertDlg : public CDialog
 {
 // Construction
 public:
-	CRunMapExpertDlg(CWnd* pParent = NULL);   // standard constructor
+	CRunMapExpertDlg(const CString& mapName, CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CRunMapExpertDlg)
@@ -42,6 +43,8 @@ public:
 	CEdit	m_cCommand;
 	//}}AFX_DATA
 
+	// dimhotepus: Add map name.
+	CString m_strMapName;
 	BOOL m_bSwitchMode;
 
 	CMyCheckListBox	m_cCommandList;
@@ -83,7 +86,6 @@ protected:
 	afx_msg void OnUpdateParameters();
 	afx_msg void OnEnsurecheck();
 	afx_msg void OnUpdateEnsurefn();
-	afx_msg void OnLongfilenames();
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	afx_msg void OnSelchangeConfigurations();
