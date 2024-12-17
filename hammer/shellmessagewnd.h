@@ -23,6 +23,8 @@ class CShell;
 class CShellMessageWnd : public CWnd
 {
 	public:
+		// dimhotepus: Init members in ctor.
+		CShellMessageWnd() : m_pShell{nullptr} {}
 
 		bool Create(void);
 		void SetShell(CShell *pShell);
