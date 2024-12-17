@@ -7,13 +7,15 @@
 
 #include "stdafx.h"
 #include "soundsystem.h"
-#include "mmsystem.h"
+
 #include "filesystem.h"
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 #include "hammer.h"
 #include "HammerScene.h"
 #include "ScenePreviewDlg.h"
 #include "soundchars.h"
+
+#include <mmsystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -22,7 +24,7 @@
 // FIXME: Put gamesounds parsing into shared code somewhere
 #define MANIFEST_FILE			"scripts/game_sounds_manifest.txt"
 #define SOUNDGENDER_MACRO		"$gender"
-#define SOUNDGENDER_MACRO_LENGTH 7		// Length of above including $
+#define SOUNDGENDER_MACRO_LENGTH ssize(SOUNDGENDER_MACRO) - 1		// Length of above including $
 
 
 // Sounds we're playing are loaded into here for Windows to access while playing them.
@@ -134,7 +136,7 @@ void CSoundSystem::DestroyStringCache( CSoundSystem::StringCache_t *pCache )
 //-----------------------------------------------------------------------------
 char *CSoundSystem::AddStringToCache( SoundType_t type, const char *pString )
 {
-	int copyLen = V_strlen( pString ) + 1;
+	intp copyLen = V_strlen( pString ) + 1;
 
 	StringCache_t *pCache = m_SoundList[type].m_pStrings;
 	if ( (!pCache) || ( copyLen + pCache->m_nTailIndex > StringCache_t::STRING_CACHE_SIZE ) )
@@ -144,7 +146,7 @@ char *CSoundSystem::AddStringToCache( SoundType_t type, const char *pString )
 	}
 
 	char fixedString[MAX_PATH];
-	V_strncpy( fixedString, pString, sizeof( fixedString ) );
+	V_strcpy_safe( fixedString, pString );
 	V_FixSlashes( fixedString );
 	copyLen = V_strlen( fixedString ) + 1;
 
@@ -162,7 +164,7 @@ char *CSoundSystem::AddStringToCache( SoundType_t type, const char *pString )
 void CSoundSystem::AddSoundToList( SoundType_t type, const char *pSoundName, const char *pActualFile, const char *pSourceFile )
 {
 	// FIXME: Optimize the allocation pattern?
-	int i = m_SoundList[type].m_Sounds.AddToTail();
+	auto i = m_SoundList[type].m_Sounds.AddToTail();
 	SoundInfo_t &info = m_SoundList[type].m_Sounds[i];
 
 	info.m_pSoundName = AddStringToCache( type, pSoundName ); 
@@ -185,9 +187,9 @@ void CSoundSystem::AddSoundToList( SoundType_t type, const char *pSoundName, con
 //-----------------------------------------------------------------------------
 void CSoundSystem::BuildFileListInDirectory( char const* pDirectoryName, const char *pExt, SoundType_t soundType )
 {
-	Assert( Q_strlen( pExt ) <= 3 );
+	Assert( V_strlen( pExt ) <= 3 );
 
-	int nDirectoryNameLen = V_strlen( pDirectoryName );
+	intp nDirectoryNameLen = V_strlen( pDirectoryName );
 	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
 	Q_snprintf( pWildCard, nDirectoryNameLen + 7, "%s/*.%s", pDirectoryName, pExt );
 
@@ -199,7 +201,7 @@ void CSoundSystem::BuildFileListInDirectory( char const* pDirectoryName, const c
 			continue;
 
 		// Strip off the 'sound/' part of the sound name.
-		int nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
+		intp nAllocSize = nDirectoryNameLen + V_strlen(pFileName) + 2;
 		char *pFileNameWithPath = (char *)stackalloc( nAllocSize );
 		
 		const char *pStartPos = max( strchr( pDirectoryName, '/' ), strchr( pDirectoryName, '\\' ) );
@@ -224,12 +226,12 @@ bool CSoundSystem::RecurseIntoDirectories( char const* pDirectoryName, pDirCallb
 	if ( !(this->*fn)( pDirectoryName ) )
 		return false;
 
-	int nDirectoryNameLen = Q_strlen( pDirectoryName );
+	intp nDirectoryNameLen = V_strlen( pDirectoryName );
 
 	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 5 );
 	strcpy(pWildCard, pDirectoryName);
 	strcat(pWildCard, "/*.*");
-	int nPathStrLen = nDirectoryNameLen + 1;
+	intp nPathStrLen = nDirectoryNameLen + 1;
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = g_pFullFileSystem->FindFirst( pWildCard, &findHandle );
@@ -240,7 +242,7 @@ bool CSoundSystem::RecurseIntoDirectories( char const* pDirectoryName, pDirCallb
 			if( !g_pFullFileSystem->FindIsDirectory( findHandle ) )
 				continue;
 
-			int fileNameStrLen = Q_strlen( pFileName );
+			intp fileNameStrLen = V_strlen( pFileName );
 			char *pFileNameWithPath = ( char * )stackalloc( nPathStrLen + fileNameStrLen + 1 );
 			memcpy( pFileNameWithPath, pWildCard, nPathStrLen );
 			pFileNameWithPath[nPathStrLen] = '\0';
@@ -262,7 +264,7 @@ bool CSoundSystem::ProcessDirectory_RawFileList( char const* pDirectoryName )
 	if ( !g_pFileSystem )
 		return false;
 
-	Assert( Q_strnicmp( pDirectoryName, "sound", 5 ) == 0 );
+	Assert( V_strnicmp( pDirectoryName, "sound", 5 ) == 0 );
 
 	// Get all sound files out of this directory
 	BuildFileListInDirectory( pDirectoryName, "wav", SOUND_TYPE_RAW );
@@ -342,9 +344,9 @@ void CSoundSystem::AddGameSoundToList( const char *pGameSound, char const *pFile
 		return;
 	}
 
-	int offset = p - pFileName;
+	ptrdiff_t offset = p - pFileName;
 	Assert( offset >= 0 );
-	int duration = SOUNDGENDER_MACRO_LENGTH;
+	constexpr int duration = SOUNDGENDER_MACRO_LENGTH;
 
 	// Create a "male" version of the sound	only for browsing
 	char before[ 256 ], after[ 256 ];
@@ -366,10 +368,9 @@ void CSoundSystem::AddGameSoundToList( const char *pGameSound, char const *pFile
 //-----------------------------------------------------------------------------
 void CSoundSystem::AddGameSoundsFromFile( const char *pFileName )
 {
-	KeyValues *kv = new KeyValues( pFileName );
+	auto kv = KeyValues::AutoDelete( pFileName );
 	if ( !kv->LoadFromFile( g_pFileSystem, pFileName, "GAME" ) )
 	{
-		kv->deleteThis();
 		return;
 	}
 
@@ -399,11 +400,6 @@ void CSoundSystem::AddGameSoundsFromFile( const char *pFileName )
 			}
 		}
 	}
-
-	if ( kv )
-	{
-		kv->deleteThis();
-	}
 }
 
 
@@ -412,10 +408,9 @@ void CSoundSystem::AddGameSoundsFromFile( const char *pFileName )
 //-----------------------------------------------------------------------------
 bool CSoundSystem::BuildGameSoundList()
 {
-	KeyValues *manifest = new KeyValues( MANIFEST_FILE );
+	auto manifest = KeyValues::AutoDelete( MANIFEST_FILE );
 	if ( !manifest->LoadFromFile( g_pFileSystem, MANIFEST_FILE, "GAME" ) )
 	{
-		manifest->deleteThis();
 		return false;
 	}
 
@@ -429,7 +424,6 @@ bool CSoundSystem::BuildGameSoundList()
 			AddGameSoundsFromFile( sub->GetString() );
 		}
 	}
-	manifest->deleteThis();
 	return true;
 }
 
@@ -464,7 +458,7 @@ bool CSoundSystem::FindSoundByName( const char *pFilename, SoundType_t *type, in
 bool CSoundSystem::PlayScene( const char *pFileName )
 {
 	char fullFilename[MAX_PATH];
-	V_snprintf( fullFilename, sizeof( fullFilename ), "scenes%c%s", CORRECT_PATH_SEPARATOR, pFileName );
+	V_sprintf_safe( fullFilename, "scenes%c%s", CORRECT_PATH_SEPARATOR, pFileName );
 	CChoreoScene *pScene = HammerLoadScene( fullFilename );
 	if ( !pScene )
 		return false;
@@ -495,7 +489,7 @@ bool CSoundSystem::Play( SoundType_t type, int nIndex )
 	pFileName = PSkipSoundChars( pFileName );
 
 	char pRelativePath[MAX_PATH];
-	Q_snprintf( pRelativePath, MAX_PATH, "sound/%s", pFileName );
+	V_sprintf_safe( pRelativePath, "sound/%s", pFileName );
 
 	// Stop any previously-playing sound.
 	StopSound();
@@ -536,7 +530,7 @@ void CSoundSystem::OpenSource( SoundType_t type, int nIndex )
 	if ( pFileName )
 	{
 		char pRelativePath[MAX_PATH];
-		Q_snprintf( pRelativePath, MAX_PATH, "%s", pFileName );
+		V_sprintf_safe( pRelativePath, "%s", pFileName );
 
 		char pFullPath[MAX_PATH];
 		if ( g_pFullFileSystem->GetLocalPath( pRelativePath, pFullPath, MAX_PATH ) )
