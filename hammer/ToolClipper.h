@@ -13,6 +13,7 @@
 
 
 #include "MapClass.h"		// For CMapObjectList
+#include "mapdoc.h"
 #include "Tool3D.h"
 #include "ToolInterface.h"
 #include "Render2D.h"
@@ -93,7 +94,7 @@ inline CMapSolid *CClipGroup::GetClipSolid( int side )
 
 class Clipper3D : public Tool3D
 {
-    friend BOOL AddToClipList( CMapSolid *pSolid, Clipper3D *pClipper );
+    friend BOOL AddToClipList( CMapClass *mp, DWORD_PTR ctx );
 
 public:
 
