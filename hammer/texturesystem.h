@@ -13,8 +13,8 @@
 
 #include "IEditorTexture.h"
 #include "Material.h"
-#include "utlvector.h"
-#include "utldict.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
 #include "FileChangeWatcher.h"
 
 
@@ -106,7 +106,10 @@ struct TextureContext_t
 class CMaterialFileChangeWatcher : private CFileChangeWatcher::ICallbacks
 {
 public:
-	void Init( CTextureSystem *pSystem, int context );
+	// dimhotepus: Add members init.
+	CMaterialFileChangeWatcher() : m_pTextureSystem{nullptr}, m_Context{-1} {}
+
+	void Init( CTextureSystem *pSystem, intp context );
 	void Update();	// Call this periodically to update.
 
 private:
@@ -116,7 +119,8 @@ private:
 private:
 	CFileChangeWatcher m_Watcher;
 	CTextureSystem *m_pTextureSystem;
-	int m_Context;	
+	// dimhotepus: x86-64 port.
+	intp m_Context;	
 };
 
 
@@ -181,7 +185,7 @@ public:
 	void InformPaletteChanged(void);
 
 	// IMaterialEnumerator interface, Used to add all the world materials into the material list.
-	bool EnumMaterial( const char *pMaterialName, int nContext );
+	bool EnumMaterial( const char *pMaterialName, intp nContext ) override;
 
 	// Used to lazily load in all the textures during app idle.
 	void LazyLoadTextures();
@@ -214,7 +218,7 @@ protected:
 		k_eFileTypeVMT,
 		k_eFileTypeVTF
 	};
-	void OnFileChange( const char *pFilename, int context, EFileType eFileType );
+	void OnFileChange( const char *pFilename, intp context, EFileType eFileType );
 	void ReloadMaterialsUsingTexture( ITexture *pTestTexture );
 
 	static bool GetFileTypeFromFilename( const char *pFilename, CTextureSystem::EFileType *pFileType );

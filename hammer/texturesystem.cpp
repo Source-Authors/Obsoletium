@@ -8,6 +8,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "TextureSystem.h"
+
 #include <process.h>
 #include <io.h>
 #include <sys\stat.h>
@@ -18,7 +20,6 @@
 #include "MapDoc.h"
 #include "Material.h"			// Specific IEditorTexture implementation
 #include "Options.h"
-#include "TextureSystem.h"
 #include "WADTexture.h"			// Specific IEditorTexture implementation
 #include "WADTypes.h"
 #include "hammer.h"
@@ -31,10 +32,8 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 
-#define _GraphicCacheAllocate(n)	malloc(n)
 #define IsSortChr(ch) ((ch == '-') || (ch == '+'))
 
 
@@ -64,7 +63,7 @@ CTextureSystem g_Textures;
 //-----------------------------------------------------------------------------
 // CMaterialFileChangeWatcher implementation.
 //-----------------------------------------------------------------------------
-void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, int context )
+void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, intp context )
 {
 	m_pTextureSystem = pSystem;
 	m_Context = context;
@@ -611,11 +610,11 @@ void CTextureSystem::LoadMaterials(CGameConfig *pConfig)
 	m_pActiveContext->Groups.AddToTail(pGroup);
 
 	// Add all the materials to the group.
-	CMaterial::EnumerateMaterials( this, "materials", (int)pGroup, INCLUDE_WORLD_MATERIALS );
+	CMaterial::EnumerateMaterials( this, "materials", (intp)pGroup, INCLUDE_WORLD_MATERIALS );
 	
 	// Watch the materials directory recursively...
 	CMaterialFileChangeWatcher *pWatcher = new CMaterialFileChangeWatcher;
-	pWatcher->Init( this, (int)pGroup );
+	pWatcher->Init( this, (intp)pGroup );
 	m_ChangeWatchers.AddToTail( pWatcher );
 
 	Assert( m_pCubemapTexture == NULL );
@@ -662,7 +661,7 @@ void CTextureSystem::UpdateFileChangeWatchers()
 }
 
 
-void CTextureSystem::OnFileChange( const char *pFilename, int context, CTextureSystem::EFileType eFileType )
+void CTextureSystem::OnFileChange( const char *pFilename, intp context, CTextureSystem::EFileType eFileType )
 {
 	// It requires the forward slashes later...
 	char fixedSlashes[MAX_PATH];
@@ -1120,8 +1119,8 @@ bool CTextureSystem::HasTexturesForConfig(CGameConfig *pConfig)
 	if (!pContext)
 		return false;
 
-	int nCount = pContext->Groups.Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pContext->Groups.Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CTextureGroup *pGroup = pContext->Groups.Element(i);
 		if (pGroup->GetTextureFormat() == pConfig->GetTextureFormat())
@@ -1137,7 +1136,7 @@ bool CTextureSystem::HasTexturesForConfig(CGameConfig *pConfig)
 //-----------------------------------------------------------------------------
 // Used to add all the world materials into the material list
 //-----------------------------------------------------------------------------
-bool CTextureSystem::EnumMaterial( const char *pMaterialName, int nContext )
+bool CTextureSystem::EnumMaterial( const char *pMaterialName, intp nContext )
 {
 	CTextureGroup *pGroup = (CTextureGroup *)nContext;
 	CMaterial *pMaterial = CMaterial::CreateMaterial(pMaterialName, false);
@@ -1307,7 +1306,7 @@ IEditorTexture *CTextureGroup::GetTexture(int nIndex)
 //-----------------------------------------------------------------------------
 IEditorTexture *CTextureGroup::GetTexture( char const* pName )
 {
-	for (int i = 0; i < m_Textures.Count(); i++)
+	for (intp i = 0; i < m_Textures.Count(); i++)
 	{
 		if (!strcmp(pName, m_Textures[i]->GetName()))
 			return m_Textures[i];
