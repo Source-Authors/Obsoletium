@@ -6,15 +6,14 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "AngleBox.h"
+#include "hammer.h"
 #include "hammer_mathlib.h"
 #include "CustomMessages.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning(disable: 4244)
 
 
 BEGIN_MESSAGE_MAP(CAngleBox, CWnd)
@@ -32,8 +31,9 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CAngleBox::CAngleBox(void)
 {
-	m_vecAngles.Init();
+	m_bDifferent = false;
 	m_bDragging = false;
+	m_vecAngles.Init();
 	m_pEdit = NULL;
 }
 
@@ -143,11 +143,14 @@ void CAngleBox::DrawAngleLine(CDC *pDC)
 	GetClientRect(r);
 	m_ptClientCenter = r.CenterPoint();
 
-	double rad = r.Width() / 2 - 3;
+	float rad = r.Width() / 2 - 3;
+
+	float fSin, fCos;
+	DirectX::XMScalarSinCos(&fSin, &fCos, DEG2RAD(m_vecAngles[YAW] + 90));
 
 	CPoint pt;
-	pt.x = m_ptClientCenter.x + sin(DEG2RAD((double)(m_vecAngles[YAW] + 90))) * rad + 0.5;
-	pt.y = m_ptClientCenter.y + cos(DEG2RAD((double)(m_vecAngles[YAW] + 90))) * rad + 0.5;
+	pt.x = m_ptClientCenter.x + fSin * rad + 0.5f;
+	pt.y = m_ptClientCenter.y + fCos * rad + 0.5f;
 
 	pDC->MoveTo(m_ptClientCenter);
 	pDC->LineTo(pt);
@@ -283,7 +286,9 @@ void CAngleBox::SetAngles(const QAngle &vecAngles, bool bRedraw)
 void CAngleBox::SetAngles(const char *szAngles, bool bRedraw)
 {
 	QAngle vecAngles(0, 0, 0);
-	sscanf(szAngles, "%f %f %f", &vecAngles[PITCH], &vecAngles[YAW], &vecAngles[ROLL]);
+	[[maybe_unused]] const int scanned =
+		sscanf(szAngles, "%f %f %f", &vecAngles[PITCH], &vecAngles[YAW], &vecAngles[ROLL]);
+	Assert(scanned == 3);
 	SetAngles(vecAngles, bRedraw);
 }
 
