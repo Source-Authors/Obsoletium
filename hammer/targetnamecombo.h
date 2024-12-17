@@ -21,7 +21,11 @@
 
 #include <afxtempl.h>
 #include "FilteredComboBox.h"
-#include "utldict.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
+
+class CMapEntity;
+typedef CUtlVector<CMapEntity *> CMapEntityList;
 
 class CTargetNameComboBox : public CFilteredComboBox, protected CFilteredComboBox::ICallbacks
 {

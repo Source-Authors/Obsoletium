@@ -13,14 +13,14 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "MapEntity.h"
 #include "TargetNameCombo.h"
+
+#include "MapEntity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 BEGIN_MESSAGE_MAP(CTargetNameComboBox, CFilteredComboBox)
@@ -123,7 +123,7 @@ void CTargetNameComboBox::SetEntityList(const CMapEntityList *pEntityList)
 				// first entry in an entity list. The list is necessary because there
 				// may be several entities in the map with the same targetname.
 				//
-				int nIndex = m_EntityLists.Find( pszTargetName );
+				auto nIndex = m_EntityLists.Find( pszTargetName );
 				if (nIndex == m_EntityLists.InvalidIndex())
 				{
 					CMapEntityList *pList = new CMapEntityList;
@@ -150,7 +150,7 @@ void CTargetNameComboBox::SetEntityList(const CMapEntityList *pEntityList)
 
 	// Setup the suggestions.
 	CUtlVector<CString> suggestions;
-	for ( int i=m_EntityLists.First(); i != m_EntityLists.InvalidIndex(); i=m_EntityLists.Next( i ) )
+	for ( auto i=m_EntityLists.First(); i != m_EntityLists.InvalidIndex(); i=m_EntityLists.Next( i ) )
 	{
 		suggestions.AddToTail( m_EntityLists.GetElementName( i ) );
 	}
@@ -160,7 +160,7 @@ void CTargetNameComboBox::SetEntityList(const CMapEntityList *pEntityList)
 
 CMapEntityList* CTargetNameComboBox::GetSubEntityList( const char *pName )
 {
-	int testIndex = m_EntityLists.Find( pName );
+	auto testIndex = m_EntityLists.Find( pName );
 	if ( testIndex != m_EntityLists.InvalidIndex() )
 	{
 		return m_EntityLists[testIndex];
@@ -176,7 +176,7 @@ void CTargetNameComboBox::OnTextChanged( const char *pText )
 	CreateFonts();
 	
 	// Update the fonts.
-	int nCount = 0;
+	intp nCount = 0;
 	CMapEntityList *pList = GetSubEntityList( pText );
 	if ( pList )
 		nCount = pList->Count();
