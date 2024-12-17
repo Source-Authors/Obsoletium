@@ -6,11 +6,11 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "SearchReplaceDlg.h"
 #include "History.h"
 #include "GlobalFunctions.h"
 #include "MapDoc.h"
 #include "MapWorld.h"
-#include "SearchReplaceDlg.h"
 #include "hammer.h"
 #include "Selection.h"
 
@@ -115,7 +115,7 @@ bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, co
 
 	if (pszStart != NULL)
 	{
-		int nOffset = pszStart - pszIn;
+		ptrdiff_t nOffset = pszStart - pszIn;
 
 		strncpy(pszOut, pszIn, nOffset);
 		pszOut += nOffset;
@@ -223,7 +223,7 @@ bool FindCheck(CMapClass *pObject, FindObject_t &FindObject)
 	//
 	// Search keyvalues.
 	//
-	for ( int i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for ( auto i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		const char *pszValue = pEntity->GetKeyValue(i);
 		if (pszValue && MatchString(pszValue, FindObject))
@@ -267,7 +267,7 @@ int FindReplace(CMapEntity *pEntity, FindObject_t &FindObject, const char *pszRe
 	//
 	// Replace keyvalues.
 	//
-	for ( int i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for ( auto i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		const char *pszValue = pEntity->GetKeyValue(i);
 		char szNewValue[MAX_PATH];
@@ -540,7 +540,7 @@ BOOL CSearchReplaceDlg::OnFindReplace(UINT uCmd)
 			{
 				CString str;
 				str.Format("Finished searching for '%s'.", m_strFindText.GetBuffer());
-				MessageBox(str, "Find/Replace Text", MB_OK);
+				MessageBox(str, "Hammer - Find/Replace Text", MB_OK | MB_ICONINFORMATION);
 
 				// TODO: put the old selection back
 			}
@@ -548,7 +548,7 @@ BOOL CSearchReplaceDlg::OnFindReplace(UINT uCmd)
 			{
 				CString str;
 				str.Format("Replaced %d occurrences of the string '%s' with '%s'.", nReplaceCount, m_strFindText.GetBuffer(), m_strReplaceText.GetBuffer());
-				MessageBox(str, "Find/Replace Text", MB_OK);
+				MessageBox(str, "Hammer - Find/Replace Text", MB_OK | MB_ICONINFORMATION);
 			}
 
 			m_bNewSearch = true;
