@@ -6,12 +6,13 @@
 //=============================================================================//
 
 #include <stdafx.h>
+#include "TextureConverter.h"
+
 #include "MapWorld.h"
 #include "MessageWnd.h"
 #include "IEditorTexture.h"
 #include "GlobalFunctions.h"
 #include "TextureSystem.h"
-#include "TextureConverter.h"
 #include "filesystem.h"
 #include "Hammer.h"
 
@@ -86,7 +87,7 @@ void CTextureConverter::ConvertWorldTextures( CMapWorld * pWorld )
 		m_pProgDlg = NULL;
 	}
 
-	AfxMessageBox( "Conversion complete.  Check the Hammer \"Messages\" window for complete details." );
+	AfxMessageBox( "Conversion complete.\n\nCheck the Hammer \"Messages\" window for complete details.", MB_ICONINFORMATION );
 }
 
 
@@ -130,15 +131,13 @@ bool CTextureConverter::CountMapSolids( CMapSolid *, DWORD )
 //-----------------------------------------------------------------------------
 bool CTextureConverter::CheckSolidTextures( CMapSolid * pSolid, DWORD )
 {
-	int nFaceCount;
-
 	m_nCurrentSolid++;
 
 	if ( m_nCurrentSolid % 100 == 0 )
 		m_pProgDlg->SetPos( m_nCurrentSolid );
 
 	// check each face of the solid
-	nFaceCount = pSolid->GetFaceCount();
+	auto nFaceCount = pSolid->GetFaceCount();
 	while( nFaceCount-- )
 	{
 		CheckFaceTexture( pSolid->GetFace( nFaceCount ) );
@@ -565,7 +564,7 @@ void CTextureConverter::RescaleFaceTexture( CMapFace * pFace, IEditorTexture * p
 //			... - The remaining arguments of the *printf style message
 // Output : A status message is sent to the WC message window.
 //-----------------------------------------------------------------------------
-void CTextureConverter::MsgConvertFace( CMapFace * pFace, const char * format, ... )
+void CTextureConverter::MsgConvertFace( CMapFace * pFace, PRINTF_FORMAT_STRING const char * format, ... )
 {
 	va_list	ptr;
 	char	message[ 1024 ];
@@ -578,11 +577,11 @@ void CTextureConverter::MsgConvertFace( CMapFace * pFace, const char * format, .
 	va_end( ptr );
 
 	Msg(	mwStatus,
-			"[face] %s at (%d,%d,%d):  %s",
+			"[face] %s at (%.2f,%.2f,%.2f):  %s",
 			pFace->GetTexture()->GetName(),
-			(int)vecFaceCenter[ 0 ],
-			(int)vecFaceCenter[ 1 ],
-			(int)vecFaceCenter[ 2 ],
+			vecFaceCenter[ 0 ],
+			vecFaceCenter[ 1 ],
+			vecFaceCenter[ 2 ],
 			message
 	);
 }
@@ -595,7 +594,7 @@ void CTextureConverter::MsgConvertFace( CMapFace * pFace, const char * format, .
 //			... - The remaining arguments of the *printf style message
 // Output : A status message is sent to the WC message window.
 //-----------------------------------------------------------------------------
-void CTextureConverter::MsgConvertDecal( CMapEntity * pEnt, const char * format, ... )
+void CTextureConverter::MsgConvertDecal( CMapEntity * pEnt, PRINTF_FORMAT_STRING const char * format, ... )
 {
 	va_list	ptr;
 	char	message[ 1024 ];
@@ -608,11 +607,11 @@ void CTextureConverter::MsgConvertDecal( CMapEntity * pEnt, const char * format,
 	va_end( ptr );
 
 	Msg(	mwStatus,
-			"[decal] %s at (%d,%d,%d):  %s",
+			"[decal] %s at (%.2f,%.2f,%.2f):  %s",
 			pEnt->GetKeyValue("texture"),
-			(int) vecOrigin.x,
-			(int) vecOrigin.y,
-			(int) vecOrigin.z,
+			vecOrigin.x,
+			vecOrigin.y,
+			vecOrigin.z,
 			message
 	);
 }
