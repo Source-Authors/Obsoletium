@@ -9,7 +9,6 @@
 // CG: This file was added by the Progress Dialog component
 
 #include "stdafx.h"
-#include "resource.h"
 #include "ProgDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -96,7 +95,7 @@ void CProgressDlg::OnCancel()
     m_bCancel=TRUE;
 }
 
-void CProgressDlg::SetRange(int nLower,int nUpper)
+void CProgressDlg::SetRange(short nLower,short nUpper)
 {
     m_nLower = nLower;
     m_nUpper = nUpper;
@@ -171,24 +170,23 @@ BOOL CProgressDlg::CheckCancelButton()
 void CProgressDlg::UpdatePercent(int nNewPos)
 {
     CWnd *pWndPercent = GetDlgItem(CG_IDC_PROGDLG_PERCENT);
-    int nPercent;
     
-    int nDivisor = m_nUpper - m_nLower;
+    short nDivisor = m_nUpper - m_nLower;
     Assert(nDivisor>0);  // m_nLower should be smaller than m_nUpper
 
     int nDividend = (nNewPos - m_nLower);
     Assert(nDividend>=0);   // Current position should be greater than m_nLower
 
-    nPercent = nDividend * 100 / nDivisor;
+    int nPercent = nDividend * 100 / nDivisor;
 
     // Since the Progress Control wraps, we will wrap the percentage
     // along with it. However, don't reset 100% back to 0%
-    if(nPercent!=100)
+    if (nPercent != 100)
       nPercent %= 100;
 
     // Display the percentage
     CString strBuf;
-    strBuf.Format(_T("%d%c"),nPercent,_T('%'));
+    strBuf.Format(_T("%hd%c"),nPercent,_T('%'));
 
 	CString strCur; // get current percentage
     pWndPercent->GetWindowText(strCur);

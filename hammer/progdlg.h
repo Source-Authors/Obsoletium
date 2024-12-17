@@ -14,7 +14,9 @@
 #ifndef __PROGDLG_H__
 #define __PROGDLG_H__
 
-class CProgressDlg : public CDialog
+#include "resource.h"
+
+class CProgressDlg : public CBaseDlg
 {
 // Construction / Destruction
 public:
@@ -26,7 +28,7 @@ public:
     // Checking for Cancel button
     BOOL CheckCancelButton();
     // Progress Dialog manipulation
-    void SetRange(int nLower,int nUpper);
+    void SetRange(short nLower,short nUpper);
     int  SetStep(int nStep);
     int  SetPos(int nPos);
     int  OffsetPos(int nPos);
@@ -50,8 +52,9 @@ public:
 // Implementation
 protected:
 	UINT m_nCaptionID;
-    int m_nLower;
-    int m_nUpper;
+    // dimhotepus: int -> short as Window control expects.
+    short m_nLower;
+    short m_nUpper;
     int m_nStep;
     
     BOOL m_bCancel;
