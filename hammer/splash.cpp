@@ -5,8 +5,9 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "resource.h"
 #include "Splash.h"
+
+#include "resource.h"
 
 
 #define SPLASH_MIN_SHOW_TIME_MS	500
@@ -16,7 +17,8 @@
 #include <tier0/memdbgon.h>
 
 // Sorry Tom...   :(
-//#define HAMMER_TIME 1
+// dimhotepus: Reenable Hammer Time playing for first time.
+#define HAMMER_TIME 1
 #ifdef HAMMER_TIME
 #include <io.h>
 #include <fcntl.h>
@@ -128,16 +130,19 @@ void CantTouchThisThread( void * )
 	if ( file != -1 )
 	{
 		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer time!" );
-		SetStatusText(SBI_PROMPT, "Stop, Hammer time!");
+		// dimhotepus: Comment as threaded access to control is not allowed.
+		//SetStatusText(SBI_PROMPT, "Stop, Hammer time!");
 		bool fPlay = ( _write( file, g_CantTouchThis, sizeof( g_CantTouchThis ) ) == sizeof( g_CantTouchThis ) );
 		_close( file );
 		PlayMIDISong("hamrtime.mid", false );
 		CloseMIDIPlayer();
 		_unlink( "hamrtime.mid" );
-		SetStatusText(SBI_PROMPT, "You can't touch this");
+		// dimhotepus: Comment as threaded access to control is not allowed.
+		//SetStatusText(SBI_PROMPT, "You can't touch this");
 		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer" );
-		Sleep(1500);
-		SetStatusText(SBI_PROMPT, "For Help, press F1");
+		// dimhotepus: Comment as threaded access to control is not allowed.
+		// Sleep(1500);
+		//SetStatusText(SBI_PROMPT, "For Help, press F1");
 	}
 }
 
@@ -247,7 +252,7 @@ void CSplashWnd::HideSplashScreen()
 //-----------------------------------------------------------------------------
 // Purpose: Guarantees that the splash screen stays up long enough to see.
 //-----------------------------------------------------------------------------
-void CSplashWnd::OnTimer(UINT nIDEvent)
+void CSplashWnd::OnTimer(UINT_PTR nIDEvent)
 {
 	m_bMinTimerExpired = true;
 	KillTimer(nIDEvent);
