@@ -13,10 +13,7 @@
 #include "Tool3D.h"
 #include "ToolInterface.h"
 #include "utlvector.h"
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
 
 
 
@@ -123,7 +120,8 @@ private:
 	};
 
 	int m_iActiveCamera;
-	int m_nMovePositionIndex;
+	// dimhotepus: int -> unsigned.
+	unsigned m_nMovePositionIndex;
 	Vector m_vOrgPos;
 };
 
