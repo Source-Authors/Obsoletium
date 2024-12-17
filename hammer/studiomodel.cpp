@@ -5,16 +5,13 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <malloc.h>
+#include "StudioModel.h"
+
 #include "mapdoc.h"
 #include "MapWorld.h"
 #include "Material.h"
 #include "Render2D.h"
 #include "Render3D.h"
-#include "StudioModel.h"
 #include "ViewerSettings.h"
 #include "materialsystem/imesh.h"
 #include "TextureSystem.h"
@@ -38,7 +35,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable : 4244) // double to float
 
 
 
@@ -497,7 +493,10 @@ void StudioModel::SetUpBones( bool bUpdatePose, matrix3x4_t *pBoneToWorld )
 
 	for (int i = 0; i < pStudioHdr->numbones(); i++) 
 	{
-		if ( CalcProceduralBone( pStudioHdr, i, CBoneAccessor( pBoneToWorld ) ))
+		// dimhotepus: Assign to var as passed by ref.
+		CBoneAccessor boneAccessor( pBoneToWorld );
+
+		if ( CalcProceduralBone( pStudioHdr, i, boneAccessor ))
 			continue;
 
 		matrix3x4_t	bonematrix;
@@ -593,7 +592,6 @@ void StudioModel::DrawModel3D( CRender3D *pRender, float flAlpha, bool bWirefram
 		AngleMatrix(m_angles, fCurrentMatrix);
 		ConcatTransforms(matrix.As3x4(), fCurrentMatrix, fMatrixNew);
 
-		QAngle newAngles;
 		MatrixAngles(fMatrixNew, m_angles);
 
 		matrix3x4_t boneToWorld[MAXSTUDIOBONES];
@@ -656,7 +654,6 @@ void StudioModel::DrawModel2D( CRender2D *pRender, float flAlpha, bool bWireFram
 		AngleMatrix(m_angles, fCurrentMatrix);
 		ConcatTransforms(matrix.As3x4(), fCurrentMatrix, fMatrixNew);
 
-		QAngle newAngles;
 		MatrixAngles(fMatrixNew, m_angles);
 	}
 
@@ -977,14 +974,14 @@ void StudioModel::GetSequenceInfo( float *pflFrameRate, float *pflGroundSpeed )
 
 	if (t > 0)
 	{
-		*pflFrameRate = 1.0 / t;
+		*pflFrameRate = 1.0f / t;
 		*pflGroundSpeed = 0; // sqrt( pseqdesc->linearmovement[0]*pseqdesc->linearmovement[0]+ pseqdesc->linearmovement[1]*pseqdesc->linearmovement[1]+ pseqdesc->linearmovement[2]*pseqdesc->linearmovement[2] );
 		// *pflGroundSpeed = *pflGroundSpeed * pseqdesc->fps / (pseqdesc->numframes - 1);
 	}
 	else
 	{
-		*pflFrameRate = 1.0;
-		*pflGroundSpeed = 0.0;
+		*pflFrameRate = 1.0f;
+		*pflGroundSpeed = 0.0f;
 	}
 }
 
