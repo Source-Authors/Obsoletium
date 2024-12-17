@@ -11,10 +11,7 @@
 #pragma once
 #endif
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
 #include "mathlib/vector.h"
 #include "MapFace.h"
 
@@ -39,16 +36,17 @@ class StockSolid
 
 		virtual void CreateMapSolid(CMapSolid *pSolid, TextureAlignment_t eAlignment) = 0;
 
-		~StockSolid();
+		// dimhotepus: Virtual to fix destruction of children by base
+		virtual ~StockSolid();
 
 	protected:
 		StockSolid(int nFields);
 
-		typedef enum
+		enum STSDF_TYPE
 		{
 			DFTYPE_INTEGER,
 			DFTYPE_BOOLEAN
-		} STSDF_TYPE;
+		};
 
 		void AddDataField(STSDF_TYPE type, const char *pszName, int iRangeLower = -1,
 			int iRangeUpper = -1);
@@ -64,7 +62,7 @@ class StockSolid
 			DFFLAG_RANGED = 0x01
 		};
 
-		typedef struct
+		struct STSDATAFIELD
 		{
 			unsigned flags;
 			STSDF_TYPE type;
@@ -77,7 +75,7 @@ class StockSolid
 		// value:
 			int iValue;
 
-		} STSDATAFIELD;
+		};
 
 		STSDATAFIELD *pFields;
 		int nFields;
