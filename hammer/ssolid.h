@@ -15,6 +15,7 @@
 #pragma once
 #endif
 
+#include "blockarray.h"
 
 #include "MapFace.h"
 

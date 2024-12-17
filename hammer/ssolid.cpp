@@ -13,11 +13,12 @@
 //=============================================================================
 
 #include "stdafx.h"
+#include "SSolid.h"
+
 #include "BrushOps.h"
 #include "GameConfig.h"
 #include "MapSolid.h"
 #include "MapWorld.h"
-#include "SSolid.h"
 #include "StockSolids.h"
 #include "Options.h"
 #include "WorldSize.h"
@@ -183,7 +184,7 @@ BOOL CSSolid::GetHandleInfo(SSHANDLEINFO *pInfo, SSHANDLE id)
 
 		pInfo->Type = shtVertex;
 		pInfo->iIndex = i;
-		pInfo->pData = PVOID(& m_Vertices[i]);
+		pInfo->pData = & m_Vertices[i];
 		pInfo->p2DHandle = & m_Vertices[i];
 		pInfo->pos = m_Vertices[i].pos;
 
@@ -359,7 +360,7 @@ Vector * CSSolid::CreatePointList(CSSFace & face)
 			CString str;
 			str.Format("Conversion error!\n"
 				"edgeCur = %p, edgeNext = %p", edgeCur, edgeNext);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONERROR);
 			return NULL;
 		}
 
@@ -370,7 +371,7 @@ Vector * CSSolid::CreatePointList(CSSFace & face)
 			CString str;
 			str.Format("Conversion error!\n"
 				"hVertex = %08X", hVertex);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONERROR);
 			return NULL;
 		}
 
@@ -767,7 +768,7 @@ void CSSolid::FromMapSolid(CMapSolid *p, bool bSkipDisplacementFaces)
 					// YWB try filling in front side
 					//  rather than Assert(0) crash
 					pEdge->Faces[0] = pFace->id;
-					AfxMessageBox("Edge with both face id's already filled, skipping...");
+					AfxMessageBox("Edge with both face id's already filled, skipping...", MB_ICONINFORMATION);
 				}
 			}
 
@@ -888,7 +889,7 @@ void CSSolid::CheckFaces()
 		{
 			CString str;
 			str.Format("face %d - %s", i, cfi.szDescription);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONINFORMATION);
 		}
 
 		delete[] pts;
@@ -1315,6 +1316,8 @@ void CSSolid::DeleteFace(int iFace)
 	{
 		memcpy(&m_Faces[i2], &m_Faces[i2+1], sizeof(CSSFace));
 	}
+	Assert(m_nFaces > 0);
+
 	--m_nFaces;
 
 	m_Faces[m_nFaces].Init();
