@@ -5,8 +5,9 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "TextureBar.h"
+
+#include "hammer.h"
 #include "ControlBarIDs.h"
 #include "StockSolids.h"
 #include "MainFrm.h"
