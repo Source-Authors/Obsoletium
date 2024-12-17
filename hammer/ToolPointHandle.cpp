@@ -5,6 +5,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolPointHandle.h"
+
 #include "History.h"
 #include "MainFrm.h"			// FIXME: For ObjectProperties
 #include "MapDoc.h"
@@ -14,7 +16,6 @@
 #include "Render2D.h"
 #include "StatusBarIDs.h"		// For SetStatusText
 #include "ToolManager.h"
-#include "ToolPointHandle.h"
 #include "Selection.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -24,6 +25,8 @@
 class CToolPointHandleMsgWnd : public CWnd
 {
 	public:
+		// dimhotepus: Add ctor to set members.
+		CToolPointHandleMsgWnd() : m_pToolPointHandle{nullptr}, m_pView2D{nullptr} {}
 
 		bool Create(void);
 		void PreMenu2D(CToolPointHandle *pTool, CMapView2D *pView);
