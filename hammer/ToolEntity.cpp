@@ -5,6 +5,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolEntity.h"
+
 #include "History.h"
 #include "MainFrm.h"
 #include "MapDefs.h"
@@ -18,7 +20,6 @@
 #include "Render3D.h"
 #include "StatusBarIDs.h"
 #include "TextureSystem.h"
-#include "ToolEntity.h"
 #include "ToolManager.h"
 #include "hammer.h"
 #include "vgui/Cursor.h"
@@ -29,7 +30,6 @@
 #include <tier0/memdbgon.h>
 
 
-//#pragma warning(disable:4244)
 
 
 static HCURSOR s_hcurEntity = NULL;
@@ -38,6 +38,8 @@ static HCURSOR s_hcurEntity = NULL;
 class CToolEntityMessageWnd : public CWnd
 {
 	public:
+		// dimhotepus: Init members in ctor.
+		CToolEntityMessageWnd() : m_pToolEntity{nullptr}, m_pView2D{nullptr} {}
 
 		bool Create(void);
 		void PreMenu2D(CToolEntity *pTool, CMapView2D *pView);
@@ -207,7 +209,7 @@ void CToolEntity::RenderTool2D(CRender2D *pRender)
 	//
 	// Draw center rect.
 	//
-	pRender->DrawRectangle( v, v, false, 6.0f );
+	pRender->DrawRectangle( v, v, false, 6 );
 
 	//
 	// Draw crosshair
@@ -585,7 +587,7 @@ bool CToolEntity::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D 
 					// They checked "random yaw" on the object bar, so come up with a random yaw.
 					VMatrix vmRotate, vmT1, vmT2;
 					Vector vOrigin;
-					QAngle angRandom( 0, RandomInt( -180, 180 ), 0 );
+					QAngle angRandom( 0, RandomFloat( -180, 180 ), 0 );
 
 					pNewObject->GetOrigin( vOrigin );
 
@@ -685,7 +687,7 @@ void CToolEntity::CreateMapObject(CMapView2D *pView)
 
 		if (pPrefabObject == NULL)
 		{
-			pView->MessageBox("Unable to load prefab", "Error", MB_OK);
+			pView->MessageBox("Unable to load prefab.", "Hammer - Error", MB_OK | MB_ICONERROR);
 			SetEmpty();
 			return;
 		}
