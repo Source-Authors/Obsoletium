@@ -5,6 +5,8 @@
 //===========================================================================//
 
 #include "stdafx.h"
+#include "ToolSelection.h"
+
 #include "Gizmo.h"
 #include "GlobalFunctions.h"		// FIXME: For NotifyDuplicates
 #include "History.h"
@@ -20,7 +22,6 @@
 #include "ObjectProperties.h"
 #include "Options.h"
 #include "Render2D.h"
-#include "ToolSelection.h"
 #include "StatusBarIDs.h"
 #include "ToolManager.h"
 #include "hammer.h"
@@ -34,7 +35,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 
 // For debugging mouse messages
@@ -384,7 +384,7 @@ void Selection3D::RenderTool2D(CRender2D *pRender)
 			CMapClass *pobj = pSelList->Element(i);
 			
 			DrawObject(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD)pRender);
+			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD_PTR)pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -421,7 +421,7 @@ void Selection3D::RenderToolLogical( CRender2D *pRender )
 			CMapClass *pobj = pSelList->Element(i);
 			
 			DrawObjectLogical(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObjectLogical, (DWORD)pRender);
+			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObjectLogical, (DWORD_PTR)pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -491,7 +491,7 @@ void Selection3D::RenderTool3D(CRender3D *pRender)
 			CMapClass *pobj = pSelList->Element(i);
 
 			DrawObject(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD)pRender);
+			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD_PTR)pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -1578,7 +1578,7 @@ void Selection3D::EyedropperPick3D(CMapView3D *pView, const Vector2D &vPoint)
 	//
 	if ( !m_pSelection->IsAnEntitySelected() )
 	{
-		MessageBox( NULL, "No entities are selected, so the eyedropper has nothing to assign to.", "No selected entities", MB_OK);
+		MessageBox( NULL, "No entities are selected, so the eyedropper has nothing to assign to.", "Hammer - No selected entities", MB_OK | MB_ICONERROR);
 		return;
 	}
 
@@ -1621,7 +1621,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 		//
 		// They clicked on an entity with no name.
 		//
-		MessageBox( NULL, "The chosen entity has no name.", "No name to pick", MB_OK );
+		MessageBox( NULL, "The chosen entity has no name.", "Hammer - No name to pick", MB_OK | MB_ICONERROR );
 		return;
 	}
 
@@ -1664,7 +1664,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 		//
 		// No selected entities have keys of the appropriate type, so there's nothing we can do.
 		//
-		MessageBox( NULL, "No selected entities have keyvalues that accept an entity name, so the eyedropper has nothing to assign to.", "No eligible keyvalues", MB_OK );
+		MessageBox( NULL, "No selected entities have keyvalues that accept an entity name, so the eyedropper has nothing to assign to.", "Hammer - No eligible keyvalues", MB_OK | MB_ICONERROR );
 		return;
 	}
 
