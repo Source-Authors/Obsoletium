@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "hammer.h"
 #include "SelectEntityDlg.h"
+#include "hammer.h"
 #include "GlobalFunctions.h"
 #include "MapDoc.h"
 #include "MapEntity.h"
@@ -27,6 +28,8 @@ CSelectEntityDlg::CSelectEntityDlg(const CMapObjectList *pList,
 	//}}AFX_DATA_INIT
 
 	m_pEntityList = pList;
+	// dimhotepus: Init member.
+	m_pFinalEntity = nullptr;
 }
 
 
@@ -74,7 +77,7 @@ BOOL CSelectEntityDlg::OnInitDialog()
 		if(pEntity->IsPlaceholder())
 			continue;
 		int iIndex = m_cEntities.AddString(pEntity->GetClassName());
-		m_cEntities.SetItemData(iIndex, DWORD(pEntity));
+		m_cEntities.SetItemData(iIndex, DWORD_PTR(pEntity));
 	}
 
 	m_cEntities.SetCurSel(0);

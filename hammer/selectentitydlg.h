@@ -15,6 +15,7 @@
 
 
 #include "MapClass.h"	// dvs: For CMapObjectList
+#include "resource.h"
 
 
 class CSelectEntityDlg : public CDialog
