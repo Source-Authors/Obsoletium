@@ -38,7 +38,13 @@ public:
 	friend class CAnchorMgr;
 	
 	// You can use the first constructor for simple cases.
-	CAnchorDef() {}
+	CAnchorDef() : m_DlgItemID{-1}, m_hInputWnd{nullptr},
+		m_AnchorLeft{EAnchorHorz::k_eAnchorLeft}, m_AnchorRight{EAnchorHorz::k_eAnchorLeft},
+		m_AnchorTop{EAnchorVert::k_eAnchorTop}, m_AnchorBottom{EAnchorVert::k_eAnchorTop},
+		m_hWnd{nullptr}
+	{
+		memset(m_OriginalPos, 0xFF, sizeof(m_OriginalPos));
+	}
 	CAnchorDef( int dlgItemID, ESimpleAnchor eSimpleAnchor );
 	CAnchorDef( HWND hWnd, ESimpleAnchor eSimpleAnchor );
 
@@ -70,7 +76,10 @@ private:
 class CAnchorMgr
 {
 public:
-	CAnchorMgr();
+	CAnchorMgr() : m_hParentWnd{nullptr}
+	{
+		memset(m_OriginalParentSize, 0xFF, sizeof(m_OriginalParentSize));
+	}
 	void Init( HWND hParentWnd, CAnchorMgr::CAnchorDef *pAnchors, int nAnchors );
 
 	// Call this when the parent window's size changes and it'll resize all the subcontrols.
