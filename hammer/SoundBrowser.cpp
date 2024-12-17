@@ -5,9 +5,11 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "SoundBrowser.h"
-#include "mmsystem.h"
+
+#include "hammer.h"
+
+#include <mmsystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -185,7 +187,7 @@ void CSoundBrowser::PopulateSoundList()
 			CString str;
 			str.Format( _T(pSoundName) );
 			int nIndex = m_SoundList.AddString( str );
-			m_SoundList.SetItemDataPtr( nIndex, (PVOID)i );
+			m_SoundList.SetItemDataPtr( nIndex, (PVOID)(ptrdiff_t)i );
 		}
 	}
 
@@ -249,7 +251,7 @@ void CSoundBrowser::OnFilterChanged( const char *pFilter )
 // Purpose: Timer used to control updates when the filter terms change.
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CSoundBrowser::OnTimer(UINT nIDEvent) 
+void CSoundBrowser::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (!m_bFilterChanged)
 		return;
@@ -357,9 +359,9 @@ void CSoundBrowser::OnRefreshSounds()
 	SetWindowText( oldTitle );
 }
 
-int CSoundBrowser::DoModal() 
+INT_PTR CSoundBrowser::DoModal() 
 {	
-	int nRet = CDialog::DoModal();
+	INT_PTR nRet = CDialog::DoModal();
 	Shutdown();
 	return nRet;
 }
