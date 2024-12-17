@@ -9,8 +9,8 @@
 //
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "RunMapCfgDlg.h"
+#include "hammer.h"
 #include "StrDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -80,7 +80,7 @@ void CRunMapCfgDlg::OnRemove()
 	if(iSel == LB_ERR)
 		return;	// nothing selected
 	if(AfxMessageBox("Do you want to remove this configuration?",
-		MB_YESNO) == IDNO)
+		MB_YESNO | MB_ICONQUESTION) == IDNO)
 		return;	// don't want to
 	CCommandSequence *pSeq = (CCommandSequence*) 
 		m_cConfigurations.GetItemDataPtr(iSel);

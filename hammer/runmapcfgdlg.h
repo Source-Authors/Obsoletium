@@ -8,6 +8,8 @@
 // RunMapCfgDlg.h : header file
 //
 
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CRunMapCfgDlg dialog
 
@@ -23,7 +25,7 @@ public:
 	CListBox	m_cConfigurations;
 	//}}AFX_DATA
 
-	CHammer *m_pApp;
+	class CHammer *m_pApp;
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -32,7 +34,7 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
 
-	void AddSequenceToList(int iIndex, CCommandSequence *pSeq);
+	void AddSequenceToList(int iIndex, class CCommandSequence * pSeq);
 
 // Implementation
 protected:
