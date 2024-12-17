@@ -6,7 +6,6 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#pragma warning(disable:4701 4702 4530)
 #include "RichEditCtrlEx.h"
 
 
@@ -112,66 +111,66 @@ CRTFBuilder &doAddFont(CRTFBuilder &r, CString &s)
 }
 
 
-CControlManip write(CRichEditCtrl &c) throw ()
+CControlManip write(CRichEditCtrl &c) noexcept
 {
 	return CControlManip(&doWrite, c);
 }
 
-CIntManip size(int n) throw()
+CIntManip size(int n) noexcept
 {
 	return CIntManip(&doSize, n);
 }
 
 
-CIntManip color(int n) throw()
+CIntManip color(int n) noexcept
 {
 	return CIntManip(&doColor, n);
 }
 
 
-CIntManip backColor(int n) throw()
+CIntManip backColor(int n) noexcept
 {
 	return CIntManip(&doBackColor, n);
 }
 
 
-CIntManip addColor(int n) throw()
+CIntManip addColor(int n) noexcept
 {
 	return CIntManip(&doAddColor, n);
 }
 
 
-CStringManip font(LPCTSTR s) throw()
+CStringManip font(LPCTSTR s) noexcept
 {
 	return CStringManip(&doFont, s);
 }
 
 
-CStringManip addFont(LPCTSTR s) throw()
+CStringManip addFont(LPCTSTR s) noexcept
 {
 	return CStringManip(&doAddFont, s);
 }
 
 
-CBoolManip bold(bool b) throw()
+CBoolManip bold(bool b) noexcept
 {
 	return CBoolManip(&doBold, b);
 }
 
 
-CBoolManip strike(bool b) throw()
+CBoolManip strike(bool b) noexcept
 {
 	return CBoolManip(&doStrike, b);
 }
 
 
-CBoolManip italic(bool b) throw()
+CBoolManip italic(bool b) noexcept
 {
 	return CBoolManip(&doItalic, b);
 }
 
 
-CBoolManip underline(bool b) throw()
+CBoolManip underline(bool b) noexcept
 {
 	return CBoolManip(&doUnderline, b);
 }
@@ -390,7 +389,7 @@ void CRTFBuilder::normal()
 }
 
 
-static DWORD CALLBACK EditStreamCallBack(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+static DWORD CALLBACK EditStreamCallBack(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
 	CString *pstr = (CString *)dwCookie;
 
@@ -416,7 +415,7 @@ void CRTFBuilder::write(CRichEditCtrl &c)
 
 //	CRtfStringDlg d(m_string);
 
-	EDITSTREAM es = {(DWORD)&m_string, 0, EditStreamCallBack };
+	EDITSTREAM es = {(DWORD_PTR)&m_string, 0, EditStreamCallBack };
 
 	// richEd is the rich edit control
 	c.StreamIn(SF_RTF | SFF_SELECTION, es);

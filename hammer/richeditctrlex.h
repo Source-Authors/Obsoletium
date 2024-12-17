@@ -11,13 +11,10 @@
 #pragma once
 #endif
 
-#pragma warning(push, 1)
 #include <list>
 #include <stack>
-#pragma warning(pop)
 
 using namespace std;
-#pragma  warning(disable : 4786)
 
 
 #ifdef RICHED_IMPL
@@ -211,25 +208,32 @@ class RICHED_DECL CManip
 
 		CManip()
 		{ 
-			m_pFunc =  NULL; 
-			m_nVal = 0; 
 			m_strVal = ""; 
+			m_nVal = 0; 
+			m_pFunc =  NULL; 
+			m_bVal = false; 
 		}
 
 		CManip(LPVOID p, CString s)
 		{
-			m_pFunc = p;
 			m_strVal = s;
+			m_nVal = 0; 
+			m_pFunc = p;
+			m_bVal = false; 
 		}
 
 		CManip(LPVOID p, int n)
 		{
-			m_pFunc = p;
+			m_strVal = ""; 
 			m_nVal = n;
+			m_pFunc = p;
+			m_bVal = false; 
 		}
 
 		CManip(LPVOID p, bool b)
 		{
+			m_strVal = ""; 
+			m_nVal = 0;
 			m_pFunc = p;
 			m_bVal = b;
 		}
@@ -370,21 +374,21 @@ class RICHED_DECL CRTFBuilder
 };
 
 
-RICHED_DECL CControlManip	write		(CRichEditCtrl &);
+RICHED_DECL CControlManip	write		(CRichEditCtrl &) noexcept;
 RICHED_DECL CIntManip		normal		(int = 0);
 RICHED_DECL CIntManip		push		(int = 0);
 RICHED_DECL CIntManip		pop			(int = 0);
-RICHED_DECL CIntManip		size		(int);
-RICHED_DECL CIntManip		color		(int);
-RICHED_DECL CIntManip		backColor	(int);
-RICHED_DECL CIntManip		addColor	(int);
-RICHED_DECL CIntManip		font		(int);
-RICHED_DECL CStringManip	font		(LPCTSTR);
-RICHED_DECL CStringManip	addFont		(LPCTSTR);
-RICHED_DECL CBoolManip		bold		(bool);
-RICHED_DECL CBoolManip		strike		(bool);
-RICHED_DECL CBoolManip		italic		(bool);
-RICHED_DECL CBoolManip		underline	(bool);
+RICHED_DECL CIntManip		size		(int) noexcept;
+RICHED_DECL CIntManip		color		(int) noexcept;
+RICHED_DECL CIntManip		backColor	(int) noexcept;
+RICHED_DECL CIntManip		addColor	(int) noexcept;
+RICHED_DECL CIntManip		font		(int) noexcept;
+RICHED_DECL CStringManip	font		(LPCTSTR) noexcept;
+RICHED_DECL CStringManip	addFont		(LPCTSTR) noexcept;
+RICHED_DECL CBoolManip		bold		(bool) noexcept;
+RICHED_DECL CBoolManip		strike		(bool) noexcept;
+RICHED_DECL CBoolManip		italic		(bool) noexcept;
+RICHED_DECL CBoolManip		underline	(bool) noexcept;
 
 RICHED_DECL CRTFBuilder & operator<<(CRTFBuilder &, RTFSM_PFUNC);
 RICHED_DECL CRTFBuilder & operator<<(CRTFBuilder &, CManip & m);
