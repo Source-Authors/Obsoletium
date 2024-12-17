@@ -1377,7 +1377,8 @@ void CNPC_Manhack::Splash( const Vector &vecSplashPos )
 	{
 		// We're leaving the water so we have to reverify what it was
 		trace_t	tr;
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 256 ), (CONTENTS_WATER|CONTENTS_SLIME), this, COLLISION_GROUP_NONE, &tr );
+		// dimhotepus: Use direction from start to end and increase Z distance for checking water/slime contents.
+		UTIL_TraceLine( GetAbsOrigin() - Vector( 0, 0, 300 ), GetAbsOrigin(), (CONTENTS_WATER|CONTENTS_SLIME), this, COLLISION_GROUP_NONE, &tr );
 
 		// Re-validate this
 		if ( !(tr.contents&(CONTENTS_WATER|CONTENTS_SLIME)) )
