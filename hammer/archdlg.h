@@ -10,6 +10,10 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+
+#include "mathlib/vector.h"
+#include "resource.h"
+
 #define ARC_MAX_POINTS 4096
 
 class CArchDlg : public CDialog

@@ -5,9 +5,9 @@
 //=============================================================================
 
 #include "stdafx.h"
+#include "ArchDlg.h"
 #include "hammer.h"
 #include "hammer_mathlib.h"
-#include "ArchDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -37,10 +37,12 @@ CArchDlg::CArchDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
 	CString str;
 	m_iWallWidth = AfxGetApp()->GetProfileInt(pszSection, "Wall Width", 32);
 	str = AfxGetApp()->GetProfileString(pszSection, "Arc_", "180");
-	m_fArc = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fArc = strtof(str, nullptr);
 	m_iSides = AfxGetApp()->GetProfileInt(pszSection, "Sides", 8);
 	str = AfxGetApp()->GetProfileString(pszSection, "Start Angle_", "0");
-	m_fAngle = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fAngle = strtof(str, nullptr);
 	m_iAddHeight = AfxGetApp()->GetProfileInt(pszSection, "Add Height", 0);
 }
 
@@ -229,7 +231,7 @@ void CArchDlg::DrawArch(CDC* pDC)
 	BOOL bCreateSouthFace = TRUE;
 	float fCenter[3];
 	for (int i = 0; i < 3; i++)
-		fCenter[i] = (bmins[i] + bmaxs[i])/2.0;
+		fCenter[i] = (bmins[i] + bmaxs[i])/2.0f;
 	
 	if((iWallWidth*2+8)  >= (bmaxs[0] - bmins[0]) ||
 		(iWallWidth*2+8) >= (bmaxs[1] - bmins[1]))
