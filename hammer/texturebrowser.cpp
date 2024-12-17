@@ -5,11 +5,10 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "TextureBrowser.h"
+
 #include <oleauto.h>
 #include <oaidl.h>
-#if _MSC_VER < 1300
-#include <afxpriv.h>
-#endif
 #include "CustomMessages.h"
 #include "GlobalFunctions.h"
 #include "History.h"
@@ -19,7 +18,6 @@
 #include "MapDoc.h"
 #include "MapWorld.h"
 #include "ReplaceTexDlg.h"
-#include "TextureBrowser.h"
 #include "TextureSystem.h"
 #include "hammer.h"
 #include "Selection.h"
@@ -71,7 +69,7 @@ CTextureBrowser::CTextureBrowser(CWnd* pParent)
 	m_szNameFilter[0] = '\0';
 	szInitialTexture[0] = '\0';
 	m_bFilterChanged = FALSE;
-	m_uLastFilterChange = 0xffffffff;
+	m_uLastFilterChange = (time_t)-1;
 	m_bUsed = FALSE;
 	m_szLastKeywords[0] = '\0';
 }
@@ -461,7 +459,7 @@ void CTextureBrowser::OnUpdateKeywordsNOW()
 // Purpose: Timer used to control updates when the filter terms change.
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CTextureBrowser::OnTimer(UINT nIDEvent) 
+void CTextureBrowser::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (!m_bFilterChanged)
 	{
