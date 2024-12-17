@@ -25,9 +25,9 @@ class TextureWindowTexList : public CUtlVector<TextureWindowTex_t>
 {
 public:
 
-	inline int Find(IEditorTexture *pTex)
+	inline intp Find(IEditorTexture *pTex) const
 	{
-		for (int i = 0; i < Count(); i++)
+		for (intp i = 0; i < Count(); i++)
 		{
 			if (Element(i).pTex == pTex)
 			{

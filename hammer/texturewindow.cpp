@@ -5,12 +5,11 @@
 //=============================================================================
 
 #include "stdafx.h"
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
-#include <fstream>
-#pragma warning(pop)
-#include "hammer.h"
 #include "TextureWindow.h"
+
+#include <fstream>
+
+#include "hammer.h"
 #include "TextureBrowser.h"
 #include "CustomMessages.h"
 #include "IEditorTexture.h"
@@ -24,10 +23,10 @@
 #include <tier0/memdbgon.h>
 
 
-const DWORD NO_FILE_FILTER = 0xFFFFFFF0L;
-const int iPadding = 4;
-const int iTexNameFontHeight = 7;
-const int iTexIconHeight = 12;
+constexpr inline DWORD NO_FILE_FILTER = 0xFFFFFFF0L;
+constexpr inline int iPadding = 4;
+constexpr inline int iTexNameFontHeight = 7;
+constexpr inline int iTexIconHeight = 12;
 
 
 BEGIN_MESSAGE_MAP(CTextureWindow, CWnd)
@@ -50,6 +49,10 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CTextureWindow::CTextureWindow(void)
 {
+	total_x = -1;
+	total_y = -1;
+	iTexNameCharWidth = -1;
+
 	bFirstPaint = TRUE;
 
 	m_szFilter[0] = '\0';
@@ -212,7 +215,7 @@ BOOL CTextureWindow::EnumTexturePositions(TWENUMPOS *pTE, BOOL bStart)
 		// dvs: inefficient, the specific list should control the loop, not act as a filter
 		if (m_pSpecificList != NULL)
 		{
-			int nIndex = m_pSpecificList->Find(pTE->pTex);
+			intp nIndex = m_pSpecificList->Find(pTE->pTex);
 			if (nIndex == -1)
 				continue;
 	
@@ -519,7 +522,7 @@ void CTextureWindow::OnPaint(void)
 		if (bFirst)
 		{
 			bFirst = FALSE;
-			strcpy(szFirstDrawnTexture, szDrawTexture);
+			V_strcpy_safe(szFirstDrawnTexture, szDrawTexture);
 		}
 
 		// next texture & position
@@ -796,7 +799,7 @@ void CTextureWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	HighlightCurTexture();
 
 	// highlight new texture
-	strcpy(szCurTexture, szNewTexture);
+	V_strcpy_safe(szCurTexture, szNewTexture);
 	rectHighlight = CRect(&TE.texrect);
 	rectHighlight.InflateRect(2, 4);
 	HighlightCurTexture();
