@@ -1854,10 +1854,9 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 	if ( !g_pCVar )
 		return;
 
-	KeyValues *pKeyValues = new KeyValues( "config" );
+	auto pKeyValues = KeyValues::AutoDelete( "config" );
 	if ( !GetRecommendedConfigurationInfo( g_config.dxSupportLevel, pKeyValues ) )
 	{
-		pKeyValues->deleteThis();
 		return;
 	}
 
@@ -1908,8 +1907,6 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 			pConVar->SetValue( pKey->GetString() );
 		}
 	}
-
-	pKeyValues->deleteThis();
 }
 
 
