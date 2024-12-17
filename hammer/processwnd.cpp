@@ -1,21 +1,12 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-// $Workfile: $
-// $Date: $
-//
-//-----------------------------------------------------------------------------
-// $Log:  $
-//
-// $NoKeywords: $
-//=============================================================================//
+// Compile process window.
 
 #include "stdafx.h"
-#include <wincon.h>
-#include "hammer.h"
 #include "ProcessWnd.h"
-#include "osver.h"
+
+#include "hammer.h"
+#include <wincon.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -28,7 +19,7 @@
 LPCTSTR GetErrorString();
 
 
-CProcessWnd::CProcessWnd()
+CProcessWnd::CProcessWnd() : pEditBuf{nullptr}, uBufLen{0}, pFont{nullptr}
 {
 	Font.CreatePointFont(100, "Courier New");
 }
@@ -51,25 +42,26 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CProcessWnd operations
 
-int CProcessWnd::Execute(LPCTSTR pszCmd, ...)
+int CProcessWnd::Execute(PRINTF_FORMAT_STRING LPCTSTR pszCmd, ...)
 {
     CString strBuf;
 
 	va_list vl;
 	va_start(vl, pszCmd);
 
-	while(1)
+	while (true)
 	{
 		char *p = va_arg(vl, char*);
 		if(!p)
 			break;
+
 		strBuf += p;
 		strBuf += " ";
 	}
 
 	va_end(vl);
 
-	return Execute(pszCmd, (LPCTSTR)strBuf);
+	return Execute(pszCmd, strBuf.GetString());
 }
 
 void CProcessWnd::Clear()
@@ -82,31 +74,8 @@ void CProcessWnd::Clear()
 void CProcessWnd::Append(CString str)
 {
     m_EditText += str;
-	if (getOSVersion() >= eWinNT)
-	{
-		Edit.SetWindowText(m_EditText);
-	}
-	else
-	{
-		DWORD length = m_EditText.GetLength() / sizeof(TCHAR);
-
-		// Gracefully handle 64k edit control display on win9x (display last 64k of text)
-		// Copy to clipboard will work fine, as it copies the m_EditText contents 
-		// in its entirety to the clipboard
-		if (length >= 0x0FFFF)
-		{
-			LPTSTR string = m_EditText.GetBuffer(length + 1);
-			LPTSTR offset;
-			offset = string + length - 0x0FFFF;
-			Edit.SetWindowText(offset);
-			m_EditText.ReleaseBuffer();
-		}
-		else
-		{
-			Edit.SetWindowText(m_EditText);
-		}
-	}
-    Edit.LineScroll(Edit.GetLineCount());	
+	Edit.SetWindowText(m_EditText);
+    Edit.LineScroll(Edit.GetLineCount());
 	Edit.RedrawWindow();
 }
 
@@ -202,7 +171,7 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 // CProcessWnd message handlers
 
 
-void CProcessWnd::OnTimer(UINT nIDEvent) 
+void CProcessWnd::OnTimer(UINT_PTR nIDEvent) 
 {
 	CWnd::OnTimer(nIDEvent);
 }
@@ -258,12 +227,15 @@ void CProcessWnd::OnSize(UINT nType, int cx, int cy)
 // Purpose: Prepare the process window for display. If it has not been created
 //			yet, register the class and create it.
 //-----------------------------------------------------------------------------
-void CProcessWnd::GetReady(void)
+void CProcessWnd::GetReady(LPCTSTR pszDocName)
 {
 	if (!IsWindow(m_hWnd))
 	{
 		CString strClass = AfxRegisterWndClass(0, AfxGetApp()->LoadStandardCursor(IDC_ARROW), HBRUSH(GetStockObject(WHITE_BRUSH)));
-		CreateEx(0, strClass, "Compile Process Window", WS_OVERLAPPEDWINDOW, 50, 50, 600, 400, AfxGetMainWnd()->GetSafeHwnd(), HMENU(NULL));
+		CString title;
+		// dimhotepus: Add compiling map name to title.
+		title.Format("Compile - [%s]", pszDocName);
+		CreateEx(0, strClass, title.GetString(), WS_OVERLAPPEDWINDOW, 50, 50, 600, 400, AfxGetMainWnd()->GetSafeHwnd(), nullptr);
 	}
 
 	ShowWindow(SW_SHOW);
@@ -278,36 +250,36 @@ BOOL CProcessWnd::PreTranslateMessage(MSG* pMsg)
 	// it is getting the CONTEXTMENU message (as seen in Spy++)
 	::TranslateMessage(pMsg);
 	::DispatchMessage(pMsg);
+
 	return TRUE;
 }
 
 static void CopyToClipboard(const CString& text)
 {
-	if (OpenClipboard(NULL))
+	if (::OpenClipboard(NULL))
 	{
-		if (EmptyClipboard())
+		if (::EmptyClipboard())
 		{
-			HGLOBAL hglbCopy;
-			LPTSTR  tstrCopy;
-			
-			hglbCopy = GlobalAlloc(GMEM_DDESHARE, text.GetLength() + sizeof(TCHAR) ); 
-			
-			if (hglbCopy != NULL)
+			HGLOBAL hglbCopy = ::GlobalAlloc(GMEM_DDESHARE, text.GetLength() + sizeof(TCHAR) );
+			if (hglbCopy)
 			{
-				tstrCopy = (LPTSTR) GlobalLock(hglbCopy);
-				strcpy(tstrCopy, (LPCTSTR)text);
-				GlobalUnlock(hglbCopy);
-				
-				SetClipboardData(CF_TEXT, hglbCopy);
+				LPTSTR tstrCopy = static_cast<LPTSTR>(::GlobalLock(hglbCopy));
+				if (tstrCopy)
+				{
+					strcpy(tstrCopy, text.GetString());
+				}
+
+				::GlobalUnlock(hglbCopy);
+				::SetClipboardData(CF_TEXT, hglbCopy);
 			}
 		}
-		CloseClipboard();
+		::CloseClipboard();
 	}
 }
 
 void CProcessWnd::OnCopyAll()
 {
-	// Used to call m_Edit.SetSel(0,1); m_Edit.Copy(); m_Edit.Clear()  
+	// Used to call m_Edit.SetSel(0,1); m_Edit.Copy(); m_Edit.Clear()
 	// but in win9x the clipboard will only receive at most 64k of text from the control
 	CopyToClipboard(m_EditText);
 }
