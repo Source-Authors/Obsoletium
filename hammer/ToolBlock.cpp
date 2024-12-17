@@ -6,6 +6,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolBlock.h"
+
 #include "History.h"
 #include "MainFrm.h"
 #include "MapDefs.h"
@@ -14,7 +16,6 @@
 #include "MapView3D.h"
 #include "Options.h"
 #include "StatusBarIDs.h"
-#include "ToolBlock.h"
 #include "ToolManager.h"
 #include "vgui/Cursor.h"
 #include "Selection.h"
@@ -23,6 +24,8 @@
 class CToolBlockMessageWnd : public CWnd
 {
 	public:
+		// dimhotepus: Init members in ctor.
+		CToolBlockMessageWnd() : m_pToolBlock{nullptr}, m_pView2D{nullptr} {}
 
 		bool Create(void);
 		void PreMenu2D(CToolBlock *pTool, CMapView2D *pView);
@@ -425,7 +428,7 @@ void CToolBlock::CreateMapObject(CMapView *pView)
 
 	if (!(bmaxs[0] - bmins[0]) || !(bmaxs[1] - bmins[1]) || !(bmaxs[2] - bmins[2]))
 	{
-		AfxMessageBox("The box is empty.");
+		AfxMessageBox("The box is empty.", MB_ICONERROR);
 		SetEmpty();
 		return;
 	}
