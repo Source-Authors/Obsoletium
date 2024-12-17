@@ -3,6 +3,8 @@
 //
 
 #include <stdafx.h>
+#include "SculptOptions.h"
+
 #include "hammer.h"
 #include "CollisionUtils.h"
 #include "resource.h"
@@ -28,7 +30,6 @@
 #include "../materialsystem/itextureinternal.h"
 #include "pixelwriter.h"
 #include "TextureSystem.h"
-#include "SculptOptions.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -302,7 +303,7 @@ bool CSculptTool::DoPaint( CMapView3D *pView, const Vector2D &vPoint )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 			
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -586,7 +587,6 @@ bool CSculptTool::DoPaintSmoothOneOverExp( const Vector &vNewCenter, Vector &vPa
 							flFactor *= 1.0f / ( m_SpatialData.m_flScalar * 2.0f );
 						}
 
-						Vector vProjectVert;
 						float flProjectDist = DotProduct( vVert, m_SpatialData.m_vPaintAxis ) - flPaintDist;
 						flSmoothDist += ( flProjectDist * flFactor );
 						flWeight += flFactor;
@@ -644,7 +644,7 @@ bool CSculptTool::GetStartingSpot( CMapView3D *pView, const Vector2D &vPoint )
 //-----------------------------------------------------------------------------
 void CSculptTool::DrawDirection( CRender3D *pRender, Vector Direction, Color Towards, Color Away )
 {
-	Vector		ViewPoint, ViewDir;
+	Vector		ViewDir;
 	Vector2D	ViewVert;
 
 	VMatrix  Matrix;
@@ -765,7 +765,7 @@ bool CSculptTool::FindCollisionIntercept( CCamera *pCamera, const Vector2D &vPoi
 			if ( bUseOrigPosition )
 			{
 				CMapDisp	*OrigDisp = NULL;
-				int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+				auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 				if ( index != m_OrigMapDisp.InvalidIndex() )
 				{
@@ -1524,7 +1524,7 @@ void CSculptPushOptions::DoPaintOperation( CMapView3D *pView, const Vector2D &vP
 			if ( flLengthPercent > m_flFalloffSpot )
 			{
 				flLengthPercent = ( flLengthPercent - m_flFalloffSpot ) / ( 1.0f - m_flFalloffSpot );
-				flLengthPercent = 1.0 - flLengthPercent;
+				flLengthPercent = 1.0f - flLengthPercent;
 				flDistance = ( ( 1.0f - m_flFalloffEndingValue ) * flLengthPercent * flMaxDistance ) + ( m_flFalloffEndingValue * flMaxDistance );
 			}
 			else
@@ -2136,7 +2136,8 @@ void CSculptPushOptions::OnEnChangeSculptPushOptionOffsetDistance()
 	char	temp[ 1024 ];
 
 	m_OffsetDistanceControl.GetWindowText( temp, sizeof( temp ) );
-	m_OffsetDistance = atof( temp );
+	// dimhotepus: atof -> strtof.
+	m_OffsetDistance = strtof( temp, nullptr );
 }
 
 
@@ -3185,7 +3186,8 @@ void CSculptCarveOptions::OnEnChangeSculptPushOptionOffsetDistance()
 	char	temp[ 1024 ];
 
 	m_OffsetDistanceControl.GetWindowText( temp, sizeof( temp ) );
-	m_OffsetDistance = atof( temp );
+	// dimhotepus: atof -> strtof
+	m_OffsetDistance = strtof( temp, nullptr );
 }
 
 
@@ -3518,6 +3520,7 @@ CSculptProjectOptions::CSculptProjectOptions(CWnd* pParent /*=NULL*/) :
 	CSculptTool()
 {
 	m_FileDialog = new CFileDialog(TRUE, NULL, NULL, OFN_LONGNAMES | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST, "Image Files (*.tga)|*.tga||");
+	m_FileDialog.m_ofn.lpstrTitle = "Open Image File";
 	m_FileDialog->m_ofn.lpstrInitialDir = "";
 
 	m_ImagePixels = NULL;
