@@ -5,8 +5,9 @@
 //=============================================================================
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "ScenePreviewDlg.h"
+
+#include "hammer.h"
 #include "choreoscene.h"
 #include "soundsystem.h"
 
@@ -33,6 +34,7 @@ CScenePreviewDlg::CScenePreviewDlg( CChoreoScene *pScene, const char *pFilename,
 	m_hExitThreadEvent = NULL;
 	m_hIdleEventHandledEvent = NULL;
 	m_hIdleThread = NULL;
+	m_flStartTime = 0;
 	V_strncpy( m_SceneFilename, pFilename, sizeof( m_SceneFilename ) );
 }
 

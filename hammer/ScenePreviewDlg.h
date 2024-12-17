@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "resource.h"
 
 class CChoreoScene;
 
