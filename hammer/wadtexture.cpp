@@ -26,7 +26,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 
 #define _GraphicCacheAllocate(n)	malloc(n)
@@ -109,9 +108,6 @@ CWADTexture::CWADTexture(void)
 	memset(m_szName, 0, sizeof(m_szName));
 	memset(m_szFileName, 0, sizeof(m_szFileName));
 
-	m_datawidth = 0;
-	m_dataheight = 0;
-
 	m_WALsurface = 0;
 	m_WALvalue = 0;
 	m_WALcontents = 0;
@@ -123,6 +119,11 @@ CWADTexture::CWADTexture(void)
 
 	m_pPalette = NULL;
 	m_bLocalPalette = false;
+
+	m_nTextureID = -1;
+
+	m_datawidth = 0;
+	m_dataheight = 0;
 
 	m_nWidth = 0;
 	m_nHeight = 0;
@@ -363,7 +364,7 @@ BOOL CWADTexture::AdjustTexture(char *pLoadBuf)
 	{
 		CString errmsg;
 		errmsg.Format(IDS_ERRLOADGRAPHIC, m_szName);
-		AfxMessageBox(errmsg);
+		AfxMessageBox(errmsg, MB_ICONERROR);
 		return FALSE;
 	}
 
@@ -417,7 +418,7 @@ BOOL CWADTexture::Load(int fd, HANDLE hFile)
 	// dvs: if fd != -1, using FileInfo without initializing it!!
 	if (!AllocateLoadBuffer(m_nWidth * m_nHeight))
 	{
-		AfxMessageBox("Couldn't allocate a texture loading buffer.");
+		AfxMessageBox("Couldn't allocate a texture loading buffer.", MB_ICONERROR);
 		return FALSE;
 	}
 
@@ -454,7 +455,8 @@ BOOL CWADTexture::Load(int fd, HANDLE hFile)
 				m_pPalette->palPalEntry[i].peRed = PalBuf[i*3];
 				m_pPalette->palPalEntry[i].peGreen = PalBuf[i*3+1];
 				m_pPalette->palPalEntry[i].peBlue = PalBuf[i*3+2];
-				m_pPalette->palPalEntry[i].peFlags = D3DRMPALETTE_READONLY | PC_NOCOLLAPSE;
+				// dimhotepus: Comment unused D3DRMPALETTE_READONLY.
+				m_pPalette->palPalEntry[i].peFlags = /*D3DRMPALETTE_READONLY |*/ PC_NOCOLLAPSE;
 			}
 
 			m_pPalette->palVersion = 0x300;
