@@ -5,14 +5,16 @@
 //=============================================================================
 
 #include "stdafx.h"
-#include <afxtempl.h>
-#include "GameConfig.h"
 #include "RunCommands.h"
-#include "Options.h"
-#include <process.h>
-#include "ProcessWnd.h"
+
 #include <io.h>
 #include <direct.h>
+#include <process.h>
+#include <afxtempl.h>
+
+#include "GameConfig.h"
+#include "Options.h"
+#include "ProcessWnd.h"
 #include "GlobalFunctions.h"
 #include "hammer.h"
 
@@ -24,8 +26,6 @@ static bool s_bRunsCommands = false;
 bool IsRunningCommands() { return s_bRunsCommands; }
 
 static char *pszDocPath, *pszDocName, *pszDocExt;
-
-CProcessWnd procWnd;
 
 void FixGameVars(char *pszSrc, char *pszDst, BOOL bUseQuotes)
 {
@@ -148,20 +148,27 @@ static void RemoveQuotes(char *pBuf)
 
 LPCTSTR GetErrorString()
 {
-	static char szBuf[200];
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0, 
-		szBuf, 200, NULL);
+	static thread_local char szBuf[200];
+	// dimhotepus: Add error string using system_category API.
+	V_strcpy_safe(szBuf, std::system_category().message(::GetLastError()).c_str());
 	char *p = strchr(szBuf, '\r');	// get rid of \r\n
-	if(p) p[0] = 0;
+	if(p) p[0] = '\0';
 	return szBuf;
 }
+
+CProcessWnd procWnd;
 
 bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 {
 	s_bRunsCommands = true;
 
 	char szCurDir[MAX_PATH];
-	_getcwd(szCurDir, MAX_PATH);
+	if ( !_getcwd(szCurDir, MAX_PATH) )
+	{
+		// dimhotepus: Add warning when current directory unavailable.
+		Warning( "Unable to get current directory: %s\n",
+			std::generic_category().message(errno).c_str() );
+	}
 
 	procWnd.GetReady();
 
@@ -358,12 +365,11 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				if(bError)
 				{
 					CString str;
-					str.Format("The command failed. Windows reported the error:\r\n"
-						"  \"%s\"\r\n", pszError);
+					str.Format("The command failed:\r\n  \"%s\"\r\n", pszError);
 					procWnd.Append(str);
 					procWnd.SetForegroundWindow();
 					str += "\r\nDo you want to continue?";
-					if(AfxMessageBox(str, MB_YESNO) == IDNO)
+					if(AfxMessageBox(str, MB_YESNO | MB_ICONQUESTION) == IDNO)
 						break;
 				}
 			}
@@ -403,7 +409,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				str.Format("The file '%s' was not built.\n"
 					"Do you want to continue?", szFile);
 				procWnd.SetForegroundWindow();
-				if(AfxMessageBox(str, MB_YESNO) == IDNO)
+				if(AfxMessageBox(str, MB_YESNO | MB_ICONQUESTION) == IDNO)
 					break;	// outta here
 			}
 		}
