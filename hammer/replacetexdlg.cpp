@@ -12,8 +12,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "ReplaceTexDlg.h"
+#include "hammer.h"
 #include "MainFrm.h"
 #include "GlobalFunctions.h"
 #include "TextureBrowser.h"
