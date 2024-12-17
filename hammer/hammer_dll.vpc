@@ -698,7 +698,8 @@ $Project "hammer_dll"
 		$Lib mathlib
 		$Lib matsys_controls
 		$Lib raytrace
-		$ImpLib steam_api
+		// dimhotepus: No Steam.
+		$ImpLib steam_api [!$NO_STEAM]
 		$Lib tier2
 		$Lib tier3
 		$Lib vgui_controls
