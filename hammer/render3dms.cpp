@@ -6,8 +6,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include <math.h>
-#include <mmsystem.h>
+#include "Render3DMS.h"
+
 #include "Camera.h"
 #include "CullTreeNode.h"
 #include "MapDefs.h"
@@ -15,7 +15,6 @@
 #include "MapEntity.h"
 #include "MapInstance.h"
 #include "MapWorld.h"
-#include "Render3DMS.h"
 #include "SSolid.h"
 #include "MapStudioModel.h"
 #include "Material.h"
@@ -36,7 +35,6 @@
 #include "map_utils.h"
 #include "bitmap/float_bm.h"
 #include "lpreview_thread.h"
-#include "hammer.h"
 #include "mainfrm.h"
 #include "mathlib/halton.h"
 #include "Manifest.h"
@@ -119,7 +117,7 @@ static bool TranslucentObjectsLessFunc( TranslucentObjects_t const&a, Translucen
 }
 
 
-bool GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
+static bool GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
 {
 	pMaterial = NULL;
 	IEditorTexture *pTex = g_Textures.FindActiveTexture( pName );
@@ -133,8 +131,8 @@ bool GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
 	else
 	{
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "Missing material '%s'. Go to Tools | Options | Game Configurations and verify that your game directory is correct.", pName );
-		MessageBox( NULL, str, "FATAL ERROR", MB_OK );
+		V_sprintf_safe( str, "Missing material '%s'. Go to Tools | Options | Game Configurations and verify that your game directory is correct.", pName );
+		MessageBox( NULL, str, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
 		return false;
 	}
 }
@@ -213,10 +211,7 @@ CRender3D::CRender3D(void) :
 //-----------------------------------------------------------------------------
 CRender3D::~CRender3D(void)
 {
-	if (m_pDropCamera != NULL)
-	{
-		delete m_pDropCamera;
-	}
+	delete m_pDropCamera;
 }
 
 //-----------------------------------------------------------------------------
@@ -375,7 +370,8 @@ void CRender3D::ComputeFrustumRenderGeometry(CCamera *pCamera)
 void CRender3D::RenderFrustum( )
 {
 #ifdef _DEBUG
-	static int indices[] = 
+	// dimhotepus: int -> unsigned short.
+	static unsigned short indices[] = 
 		{
 			0, 1, 1, 2, 2, 3, 3, 0,	// near square
 			4, 5, 5, 6, 6, 7, 7, 4,	// far square
@@ -386,7 +382,7 @@ void CRender3D::RenderFrustum( )
 	CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 	IMesh* pMesh = pRenderContext->GetDynamicMesh();
 
-	int numIndices = sizeof(indices) / sizeof(int);
+	constexpr int numIndices = ssize(indices);
 	CMeshBuilder meshBuilder3D;
 	meshBuilder3D.Begin( pMesh, MATERIAL_LINES, 8, numIndices );
 
@@ -457,7 +453,7 @@ bool CRender3D::SetView( CMapView *pView )
 	if ((m_WinData.hDC = GetDCEx(m_WinData.hWnd, NULL, DCX_CACHE | DCX_CLIPSIBLINGS)) == NULL)
 	{
 		ChangeDisplaySettings(NULL, 0);
-		MessageBox(NULL, "GetDC on main window failed", "FATAL ERROR", MB_OK);
+		MessageBox(NULL, "GetDC on main window failed", "Hammer - Fatal Error", MB_OK | MB_ICONERROR);
 		return(false);
 	}
 
@@ -540,10 +536,10 @@ Visibility_t CRender3D::IsBoxVisible(Vector const &BoxMins, Vector const &BoxMax
 
 	if (nInPlanes == 6)
 	{
-		return(VIS_TOTAL);
+		return VIS_TOTAL;
 	}
 	
-	return(VIS_PARTIAL);
+	return VIS_PARTIAL;
 }
 
 
@@ -810,18 +806,19 @@ bool CompareLightPreview_Lights(CLightPreview_Light const &a, CLightPreview_Ligh
 void CRender3D::SendShadowTriangles( void )
 {
 	static int LastSendTimeStamp=-1;
-	if ( GetUpdateCounter( EVTYPE_FACE_CHANGED ) != LastSendTimeStamp )
+
+	const int sendTimeStamp = GetUpdateCounter( EVTYPE_FACE_CHANGED );
+	if ( sendTimeStamp != LastSendTimeStamp )
 	{
-		LastSendTimeStamp = GetUpdateCounter( EVTYPE_FACE_CHANGED );
+		LastSendTimeStamp = sendTimeStamp;
 		CUtlVector<Vector> *tri_list=new CUtlVector<Vector>;
 		CMapDoc *pDoc = m_pView->GetMapDoc();
 		CMapWorld *pWorld = pDoc->GetMapWorld();
 		
 		if ( !pWorld )
 			return;
-		
-		if (g_pLPreviewOutputBitmap)
-			delete g_pLPreviewOutputBitmap;
+
+		delete g_pLPreviewOutputBitmap;
 		g_pLPreviewOutputBitmap = NULL;
 		EnumChildrenPos_t pos;
 		CMapClass *pChild = pWorld->GetFirstDescendent( pos );
@@ -902,7 +899,7 @@ static bool LightForString( char const *pLight, Vector& intensity )
 			break;
 
 		default:
-			printf("unknown light specifier type - %s\n",pLight);
+			Warning("Unknown light specifier type - %s\n",pLight);
 			return false;
 	}
 	// change light to 0..1
@@ -924,7 +921,8 @@ static void GetVectorForKey( CMapEntity *e, char const *kname, Vector *out )
 	char const *pk = e->GetKeyValue( kname );
 	if ( pk )
 	{
-		sscanf( pk, "%f %f %f", &(ret.x), &(ret.y), &(ret.z) );
+		[[maybe_unused]] const int scanned = sscanf( pk, "%f %f %f", &(ret.x), &(ret.y), &(ret.z) );
+		Assert( scanned == 3 );
 	}
 	*out=ret;
 }
@@ -932,7 +930,8 @@ static float GetFloatForKey( CMapEntity *e, char const *kname)
 {
 	char const *pk = e->GetKeyValue( kname );
 	if ( pk )
-		return atof( pk );
+		// dimhotepus: atof -> strtof.
+		return strtof( pk,  nullptr );
 	else
 		return 0.0;
 }
@@ -1135,9 +1134,10 @@ void CRender3D::SendLightList( void )
 	if ( GetUpdateCounter( EVTYPE_LIGHTING_CHANGED ) != LastSendTimeStamp )
 	{
 		LastSendTimeStamp = GetUpdateCounter( EVTYPE_LIGHTING_CHANGED );
-		if (g_pLPreviewOutputBitmap)
-			delete g_pLPreviewOutputBitmap;
+
+		delete g_pLPreviewOutputBitmap;
 		g_pLPreviewOutputBitmap = NULL;
+
 		// now, get list of lights
 		CUtlVector<CLightingPreviewLightDescription> *pList=new CUtlVector<CLightingPreviewLightDescription>;
 		BuildLightList( pList );
@@ -1229,6 +1229,7 @@ void CRender3D::EndRenderFrame(void)
 				 ( new_vp != m_LastLPreviewCameraPos ) ||
 				 (pCamera->GetZoom() != m_fLastLPreviewZoom ) )
 				view_changed = true;
+
 			if (m_pView->m_bUpdateView && (m_eCurrentRenderMode == RENDER_MODE_LIGHT_PREVIEW_RAYTRACED))
 			{
 
@@ -1240,6 +1241,7 @@ void CRender3D::EndRenderFrame(void)
 				{
 					SendShadowTriangles();
 					SendLightList();							// send light list to render thread
+
 					if ( view_changed )
 					{
 						m_fLastLPreviewAngles[0] = pCamera->GetYaw();
@@ -1252,9 +1254,10 @@ void CRender3D::EndRenderFrame(void)
 
 
 						g_nBitmapGenerationCounter++;
-						Last_SendTime=newtime;
-						if (g_pLPreviewOutputBitmap)
-							delete g_pLPreviewOutputBitmap;
+
+						Last_SendTime = newtime;
+
+						delete g_pLPreviewOutputBitmap;
 						g_pLPreviewOutputBitmap = NULL;
 						static char const *rts_to_transmit[]={"_rt_albedo","_rt_normal","_rt_position",
 															  "_rt_flags" };
@@ -1312,7 +1315,7 @@ void CRender3D::EndRenderFrame(void)
 				CUtlVector<CLightingPreviewLightDescription> lightList;
 				BuildLightList( &lightList );
 
-				CUtlPriorityQueue<CLightPreview_Light> light_queue( 0, 0, CompareLightPreview_Lights);
+				CUtlPriorityQueue<CLightPreview_Light> light_queue( (intp)0, 0, CompareLightPreview_Lights);
 
 				Vector eye_pnt;
 				pCamera->GetViewPoint(eye_pnt);
@@ -1409,10 +1412,12 @@ void CRender3D::EndRenderFrame(void)
 						nTargetWidth - 1, nTargetHeight -1,
 						dest_rt->GetActualWidth(),
 						dest_rt->GetActualHeight());
+
 					V_swap(dest_rt_current,dest_rt_other);
 					V_swap(sample_last,sample_other);
 					V_swap(add_0_to_1,add_1_to_0);
 				}
+
 				pRenderContext->SetRenderTarget(NULL);
 				pRenderContext->DrawScreenSpaceRectangle(
 					sample_last, xl, yl, dest_width, dest_height,
@@ -1493,7 +1498,7 @@ void CRender3D::EndRenderFrame(void)
 }
 
 
-void CRender3D::PushInstanceData( CMapInstance *pInstanceClass, Vector &InstanceOrigin, QAngle &InstanceAngles )
+void CRender3D::PushInstanceData( CMapInstance *pInstanceClass, const Vector &InstanceOrigin, const QAngle &InstanceAngles )
 {
 	__super::PushInstanceData( pInstanceClass, InstanceOrigin, InstanceAngles );
 
@@ -1807,13 +1812,13 @@ void CRender3D::RenderArrow( Vector const &vStartPt, Vector const &vEndPt,
 	//
 	Vector coneAxis = vEndPt - vStartPt;
 	float length = VectorNormalize( coneAxis );
-	float length8 = length * 0.125;
+	float length8 = length * 0.125f;
 	length -= length8;
 	
 	Vector vBasePt;
 	vBasePt = vStartPt + coneAxis * length;
 
-	RenderCone( vBasePt, vEndPt, ( length8 * 0.333 ), 6, chRed, chGreen, chBlue );
+	RenderCone( vBasePt, vEndPt, ( length8 * 0.333f ), 6, chRed, chGreen, chBlue );
 }
 
 
@@ -1969,7 +1974,7 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 		                      unsigned char chRed, unsigned char chGreen, unsigned char chBlue )
 {
 	// get the angle between slices (in radians)
-	float sliceAngle = ( 2 * M_PI ) / ( float )nSlices;
+	float sliceAngle = ( 2 * M_PI_F ) / ( float )nSlices;
 
 	//
 	// allocate ALIGNED!!!!!!! vectors for cone base
@@ -1977,7 +1982,7 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	int size = nSlices * sizeof( Vector );
 	size += 16 + sizeof( Vector* );
 	byte *ptr = ( byte* )_alloca( size );
-	long data = ( long )ptr;
+	ptrdiff_t data = ( ptrdiff_t )ptr;
 	
 	data += 16 + sizeof( Vector* ) - 1;
 	data &= -16;
@@ -2127,8 +2132,8 @@ void CRender3D::RenderSphere(Vector const &vCenter, float flRadius, int nTheta, 
 		{
 			float u = j / ( float )( nTheta - 1 );
 			float v = i / ( float )( nPhi - 1 );
-			float theta = 2.0f * M_PI * u;
-			float phi = M_PI * v;
+			float theta = 2.0f * M_PI_F * u;
+			float phi = M_PI_F * v;
 
 			Vector vecPos;
 			vecPos.x = flRadius * sin(phi) * cos(theta);
@@ -2216,8 +2221,8 @@ void CRender3D::RenderWireframeSphere(Vector const &vCenter, float flRadius, int
 		{
 			float u = j / ( float )( nTheta - 1 );
 			float v = i / ( float )( nPhi - 1 );
-			float theta = 2.0f * M_PI * u;
-			float phi = M_PI * v;
+			float theta = 2.0f * M_PI_F * u;
+			float phi = M_PI_F * v;
 			meshBuilder3D.Position3f( vCenter.x + ( flRadius * sin(phi) * cos(theta) ),
 				                    vCenter.y + ( flRadius * sin(phi) * sin(theta) ), 
 									vCenter.z + ( flRadius * cos(phi) ) );
