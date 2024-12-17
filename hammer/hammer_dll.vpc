@@ -6,6 +6,9 @@
 
 $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro LIBJPEGSRCDIR	"$SRCDIR\thirdparty\libjpeg-turbo"
+$Macro LIBJPEGSRC2DIR	"$LIBJPEGSRCDIR\out"
+$Macro LIBJPEGOUTDIR	"$LIBJPEGSRCDIR\out\Release"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,7 +16,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\common\shaderdll,$SRCDIR\common\iostream;$SRCDIR\dx9sdk\include;$SRCDIR\engine;$SRCDIR\game\shared;$SRCDIR\utils\common;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\common\shaderdll,$SRCDIR\common\iostream;$SRCDIR\dx9sdk\include;$SRCDIR\engine;$SRCDIR\game\shared;$SRCDIR\utils\common;$LIBJPEGSRCDIR;LIBJPEGSRC2DIR"
 		$PreprocessorDefinitions			"$BASE;VALVE;PROTECTED_THINGS_DISABLE;VERSION_SAFE_STEAM_API_INTERFACES;NO_WARN_MBCS_MFC_DEPRECATION"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
 		$AdditionalOptions					"$BASE /EHa"
@@ -698,7 +701,7 @@ $Project "hammer_dll"
 		$Lib tier2
 		$Lib tier3
 		$Lib vgui_controls
-		$Lib "$LIBCOMMON/jpeg-static"
+		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static"
 	}
 
 	$File	"whatsnew.txt"
