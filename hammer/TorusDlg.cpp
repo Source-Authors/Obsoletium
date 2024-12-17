@@ -43,16 +43,20 @@ CTorusDlg::CTorusDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
 	CString str;
 	m_iWallWidth = AfxGetApp()->GetProfileInt(pszSection, "Wall Width", 32);
 	str = AfxGetApp()->GetProfileString(pszSection, "Arc_", "360");
-	m_fArc = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fArc = strtof(str, nullptr);
 	m_iSides = AfxGetApp()->GetProfileInt(pszSection, "Sides", 16);
 	str = AfxGetApp()->GetProfileString(pszSection, "Start Angle_", "0");
-	m_fAngle = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fAngle = strtof(str, nullptr);
 
 	str = AfxGetApp()->GetProfileString(pszSection, "Rotation Arc_", "360");
-	m_fRotationArc = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fRotationArc = strtof(str, nullptr);
 	m_iRotationSides = AfxGetApp()->GetProfileInt(pszSection, "Rotation Sides", 16);
 	str = AfxGetApp()->GetProfileString(pszSection, "Rotation Start Angle_", "0");
-	m_fRotationAngle = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fRotationAngle = strtof(str, nullptr);
 	
 	m_iAddHeight = AfxGetApp()->GetProfileInt(pszSection, "Add Height", 0);
 
@@ -376,7 +380,7 @@ void CTorusDlg::DrawTorusCrossSection(CDC* pDC )
 	//  set the inner poinst to the center point of the box
 	//  and turn off the CreateSouthFace flag
 		
-	Vector points[4];	
+	Vector points[4] = {};	
 	for (i = 0; i < iSides; i++)
 	{
 		int iNextPoint = i+1;
@@ -492,7 +496,7 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 	Vector vecCenter;
 	VectorLerp( bmins, bmaxs, 0.5f, vecCenter );
 	
-	Vector points[4];	
+	Vector points[4] = {};
 	for (i = 0; i < iSides; i++)
 	{
 		int iNextPoint = i+1;
