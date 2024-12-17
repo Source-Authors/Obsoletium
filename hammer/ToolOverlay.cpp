@@ -6,10 +6,11 @@
 //=============================================================================//
 
 #include <stdafx.h>
+#include "ToolOverlay.h"
+
 #include "MapWorld.h"
 #include "GlobalFunctions.h"
 #include "MainFrm.h"
-#include "ToolOverlay.h"
 #include "MapDoc.h"
 #include "History.h"
 #include "CollisionUtils.h"
@@ -32,7 +33,9 @@
 CToolOverlay::CToolOverlay()
 {
 	m_bDragging = false;
-	m_pActiveOverlay = NULL;
+	// dimhotepus: Add nullptr init.
+	m_pShoreline = nullptr;
+	m_pActiveOverlay = nullptr;
 }
 
 //-----------------------------------------------------------------------------
