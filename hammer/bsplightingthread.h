@@ -12,26 +12,23 @@
 #endif
 
 
-#include "stdafx.h"
 #include "ibsplightingthread.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
+#include <atomic>
 
 class CBSPLightingThread : public IBSPLightingThread
 {
 public:
-
-						CBSPLightingThread();
-
+	CBSPLightingThread();
+	virtual		~CBSPLightingThread();
 
 // IBSPLightingThread functions.
-public:
-	virtual				~CBSPLightingThread();
-	virtual void		Release();
-	virtual void		StartLighting( char const *pVMFFileWithEntities );
-	virtual int			GetCurrentState();
-	virtual void		Interrupt();
-	virtual float		GetPercentComplete();
+	void		Release() override;
+	void		StartLighting( char const *pVMFFileWithEntities ) override;
+	int			GetCurrentState() const override;
+	void		Interrupt() override;
+	float		GetPercentComplete() override;
 
 
 // Other functions.
@@ -57,7 +54,7 @@ public:
 	void				SetThreadCmd( int cmd );
 
 	// Returns an IBSPLightingThread::STATE_ define.
-	int					GetThreadState();
+	int					GetThreadState() const;
 	void				SetThreadState( int state );
 	
 
@@ -69,8 +66,8 @@ public:
 
 public:
 
-	int					m_ThreadCmd;		// Next command for the thread to run.
-	int					m_ThreadState;		// Current state of the thread.
+	std::atomic_int				m_ThreadCmd;		// Next command for the thread to run.
+	std::atomic_int				m_ThreadState;		// Current state of the thread.
 
 	CUtlVector<char>	m_VMFFileWithEntities;
 
@@ -80,7 +77,6 @@ public:
 
 	HANDLE				m_hThread;
 	DWORD				m_ThreadID;
-	CRITICAL_SECTION	m_CS;
 };
 
 

@@ -39,7 +39,7 @@ public:
 	virtual void		StartLighting( char const *pVMFFileWithEntities ) = 0;
 
 	// Returns one of the STATE_ defines.
-	virtual int			GetCurrentState() = 0;
+	virtual int			GetCurrentState() const = 0;
 
 	// If lighting is in progress, make it stop.
 	virtual void		Interrupt() = 0;
