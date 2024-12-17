@@ -1517,21 +1517,16 @@ void CNetworkStringTableContainer::WriteUpdateMessage( CBaseClient *client, int 
 	char buffer[NET_MAX_PAYLOAD];
 
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		if ( !table )
-			continue;
-
-		if ( !table->ChangedSinceTick( tick_ack ) )
+		if ( !t->ChangedSinceTick( tick_ack ) )
 			continue;
 
 		SVC_UpdateStringTable msg;
 
 		msg.m_DataOut.StartWriting( buffer, NET_MAX_PAYLOAD );
-		msg.m_nTableID = table->GetTableId();
-		msg.m_nChangedEntries = table->WriteUpdate( client, msg.m_DataOut, tick_ack );
+		msg.m_nTableID = t->GetTableId();
+		msg.m_nChangedEntries = t->WriteUpdate( client, msg.m_DataOut, tick_ack );
 
 		Assert( msg.m_nChangedEntries > 0 ); // don't send unnecessary empty updates
 
@@ -1540,7 +1535,7 @@ void CNetworkStringTableContainer::WriteUpdateMessage( CBaseClient *client, int 
 		if ( client &&
 			 client->IsTracing() )
 		{
-			client->TraceNetworkData( buf, "StringTable %s", table->GetTableName() );
+			client->TraceNetworkData( buf, "StringTable %s", t->GetTableName() );
 		}
 	}
 }
@@ -1555,16 +1550,12 @@ void CNetworkStringTableContainer::DirectUpdate( int tick_ack )
 	VPROF_BUDGET( "CNetworkStringTableContainer::DirectUpdate", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-		
-		if ( !table->ChangedSinceTick( tick_ack ) )
+		if ( !t->ChangedSinceTick( tick_ack ) )
 			continue;
 
-		table->UpdateMirrorTable( tick_ack );
+		t->UpdateMirrorTable( tick_ack );
 	}
 }
 
@@ -1579,13 +1570,9 @@ void CNetworkStringTableContainer::EnableRollback( bool bState )
 
 void CNetworkStringTableContainer::RestoreTick( int tick )
 {
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-
-		table->RestoreTick( tick );
+		t->RestoreTick( tick );
 	}
 }
 
@@ -1594,16 +1581,12 @@ void CNetworkStringTableContainer::RestoreTick( int tick )
 void CNetworkStringTableContainer::TriggerCallbacks( int tick_ack )
 {
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-
-		if ( !table->ChangedSinceTick( tick_ack ) )
+		if ( !t->ChangedSinceTick( tick_ack ) )
 			continue;
 
-		table->TriggerCallbacks( tick_ack );
+		t->TriggerCallbacks( tick_ack );
 	}
 }
 
@@ -1614,13 +1597,9 @@ void CNetworkStringTableContainer::SetTick( int tick_count)
 	m_nTickCount = tick_count;
 
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-
-		table->SetTick( tick_count );
+		t->SetTick( tick_count );
 	}
 }
 
@@ -1642,8 +1621,8 @@ void CNetworkStringTableContainer::RemoveAllTables( void )
 //-----------------------------------------------------------------------------
 void CNetworkStringTableContainer::Dump( void )
 {
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		m_Tables[ i ]->Dump();
+		t->Dump();
 	}
 }
