@@ -34,23 +34,28 @@ bool CFileChangeWatcher::AddDirectory( const char *pSearchPathBase, const char *
 	HANDLE hDir = CreateFile( fullDirName, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OVERLAPPED, NULL );
 	if ( hDir == INVALID_HANDLE_VALUE )
 	{
-		Warning( "CFileChangeWatcher::AddDirectory - can't get a handle to directory %s.\n", pDirName );
+		Warning( "Unable to watch changes in the directory '%s': %s\n",
+			fullDirName, std::system_category().message(::GetLastError()).c_str() );
 		return false;
 	}
 
 	// Call this once to start the ball rolling.. Next time we call it, it'll tell us the changes that
 	// have happened since this call.
 	CDirWatch *pDirWatch = new CDirWatch;
-	V_strncpy( pDirWatch->m_SearchPathBase, pSearchPathBase, sizeof( pDirWatch->m_SearchPathBase ) );
-	V_strncpy( pDirWatch->m_DirName, pDirName, sizeof( pDirWatch->m_DirName ) );
-	V_strncpy( pDirWatch->m_FullDirName, fullDirName, sizeof( pDirWatch->m_FullDirName ) );
+	V_strcpy_safe( pDirWatch->m_SearchPathBase, pSearchPathBase );
+	V_strcpy_safe( pDirWatch->m_DirName, pDirName );
+	V_strcpy_safe( pDirWatch->m_FullDirName, fullDirName );
 	pDirWatch->m_hDir = hDir;
 	pDirWatch->m_hEvent = CreateEvent( NULL, false, false, NULL );
 	memset( &pDirWatch->m_Overlapped, 0, sizeof( pDirWatch->m_Overlapped ) );
 	pDirWatch->m_Overlapped.hEvent = pDirWatch->m_hEvent;
 	if ( !CallReadDirectoryChanges( pDirWatch ) )
 	{
-		CloseHandle( pDirWatch->m_hEvent );
+		if (pDirWatch->m_hEvent)
+		{
+			CloseHandle(pDirWatch->m_hEvent);
+		}
+
 		CloseHandle( pDirWatch->m_hDir );
 		delete pDirWatch;
 		return false;
@@ -62,10 +67,13 @@ bool CFileChangeWatcher::AddDirectory( const char *pSearchPathBase, const char *
 
 void CFileChangeWatcher::Term()
 {
-	for ( int i=0; i < m_DirWatches.Count(); i++ )
+	for ( auto *w : m_DirWatches )
 	{
-		CloseHandle( m_DirWatches[i]->m_hDir );
-		CloseHandle( m_DirWatches[i]->m_hEvent );
+		if (w->m_hEvent)
+		{
+			CloseHandle( w->m_hEvent );
+		}
+		CloseHandle( w->m_hDir );
 	}
 	m_DirWatches.PurgeAndDeleteElements();
 	m_pCallbacks = NULL;
@@ -86,19 +94,20 @@ int CFileChangeWatcher::Update()
 		if ( GetOverlappedResult( pDirWatch->m_hDir, &pDirWatch->m_Overlapped, &dwBytes, FALSE ) )
 		{
 			// Read through the notifications.
-			int nBytesLeft = (int)dwBytes;
+			DWORD nBytesLeft = dwBytes;
 			char *pCurPos = pDirWatch->m_Buffer;
 			while ( nBytesLeft >= sizeof( FILE_NOTIFY_INFORMATION ) )
 			{
-				FILE_NOTIFY_INFORMATION *pNotify = (FILE_NOTIFY_INFORMATION*)pCurPos;
+				auto *pNotify = (FILE_NOTIFY_INFORMATION*)pCurPos;
 			
 				if ( m_pCallbacks )
 				{
 					// Figure out what happened to this file.
 					WCHAR nullTerminated[2048];
-					int nBytesToCopy = min( (int)pNotify->FileNameLength, 2047 );
+					DWORD nBytesToCopy = min( pNotify->FileNameLength, 2047UL );
 					memcpy( nullTerminated, pNotify->FileName, nBytesToCopy );
 					nullTerminated[nBytesToCopy/2] = 0;
+
 					char ansiFilename[1024];
 					V_UnicodeToUTF8( nullTerminated, ansiFilename, sizeof( ansiFilename ) );
 					
@@ -110,13 +119,13 @@ int CFileChangeWatcher::Update()
 						iExisting = queuedChanges.Insert( ansiFilename, 0 );
 						++nTotalChanges;
 					}
-				}		
+				}
 			
 				if ( pNotify->NextEntryOffset == 0 )
 					break;
-					
+
 				pCurPos += pNotify->NextEntryOffset;
-				nBytesLeft -= (int)pNotify->NextEntryOffset;
+				nBytesLeft -= pNotify->NextEntryOffset;
 			}
 			
 			CallReadDirectoryChanges( pDirWatch );
@@ -124,10 +133,13 @@ int CFileChangeWatcher::Update()
 		}
 
 		// Process all the entries in the queue.
-		for ( int iQueuedChange=queuedChanges.First(); iQueuedChange != queuedChanges.InvalidIndex(); iQueuedChange=queuedChanges.Next( iQueuedChange ) )
+		for ( auto iQueuedChange=queuedChanges.First();
+			iQueuedChange != queuedChanges.InvalidIndex();
+			iQueuedChange=queuedChanges.Next( iQueuedChange ) )
 		{
 			SendNotification( pDirWatch, queuedChanges.GetElementName( iQueuedChange ) );
 		}
+
 		queuedChanges.Purge();
 		++i;
 	}
@@ -137,7 +149,7 @@ int CFileChangeWatcher::Update()
 
 void CFileChangeWatcher::SendNotification( CFileChangeWatcher::CDirWatch *pDirWatch, const char *pRelativeFilename )
 {
-	// Use this for full filenames although you don't strictly need it.. 
+	// Use this for full filenames although you don't strictly need it..
 	char fullFilename[MAX_PATH];
 	V_ComposeFileName( pDirWatch->m_FullDirName, pRelativeFilename, fullFilename, sizeof( fullFilename ) );
 
