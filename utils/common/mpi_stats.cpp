@@ -466,6 +466,9 @@ void PerfThread_AddGraphEntry( ULONGLONG startTicks, DWORD &lastSent, DWORD &las
 // This function adds a graph_entry into the database periodically.
 DWORD WINAPI PerfThreadFn( LPVOID pParameter )
 {
+	// dimhotepus: Add thread name to aid debugging.	
+	ThreadSetDebugName("VmpiPerfStats");
+
 	DWORD lastSent = 0;
 	DWORD lastReceived = 0;
 	ULONGLONG startTicks = GetTickCount64();

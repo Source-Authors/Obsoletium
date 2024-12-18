@@ -121,6 +121,9 @@ void PlayMIDISong(LPTSTR szMIDIFileName, BOOL bRestart)
 
 void CantTouchThisThread( void * )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("HammerTime!");
+
 	int file = _open( "hamrtime.mid", _O_BINARY| _O_CREAT | _O_RDWR, _S_IREAD | _S_IWRITE );
 	if ( file != -1 )
 	{

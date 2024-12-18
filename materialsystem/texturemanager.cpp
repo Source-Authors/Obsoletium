@@ -1093,6 +1093,7 @@ private:
 
 	static unsigned LoaderMain( void* _this )
 	{
+		// dimhotepus: Add thread name to aid debugging.
 		ThreadSetDebugName( "TextureLoader" );
 
 		s_TextureManager.m_nAsyncLoadThread = ThreadGetCurrentId();
@@ -1393,6 +1394,7 @@ private:
 	}
 	static unsigned ReaderMain( void* _this )
 	{
+		// dimhotepus: Add thread name to aid debugging.
 		ThreadSetDebugName( "TextureReader" );
 
 		s_TextureManager.m_nAsyncReadThread = ThreadGetCurrentId();

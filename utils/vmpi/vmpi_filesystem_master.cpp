@@ -809,6 +809,9 @@ void CMasterMulticastThread::CreateVirtualFile(const char *pFilename,
 }
 
 DWORD WINAPI CMasterMulticastThread::StaticMulticastThread(LPVOID pParameter) {
+  // dimhotepus: Add thread name to aid debugging.
+  ThreadSetDebugName("VmpiMstMulticast");
+
   return ((CMasterMulticastThread *)pParameter)->MulticastThread();
 }
 

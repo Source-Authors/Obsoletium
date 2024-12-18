@@ -112,6 +112,9 @@ void VoiceRecord_AudioQueue::Release()
 
 uintp StartAudio( void *pRecorder )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("AqVoiceRecorder");
+
 	VoiceRecord_AudioQueue *vr = (VoiceRecord_AudioQueue *)pRecorder;
 	if ( vr )
 	{

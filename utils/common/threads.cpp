@@ -149,6 +149,9 @@ void ThreadSetDefault() {
 
 // This runs in the thread and dispatches a RunThreadsFn call.
 static DWORD WINAPI InternalRunThreadsFn(void *arg) {
+  // dimhotepus: Add thread name to aid debugging.
+  ThreadSetDebugName("RunWorker");
+
   auto *args = static_cast<RunThreadArgs *>(arg);
 
   args->run_func(args->thread_no, args->user_data);

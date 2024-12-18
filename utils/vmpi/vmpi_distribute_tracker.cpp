@@ -218,6 +218,9 @@ static void CheckFlashTimers()
 
 static DWORD WINAPI ThreadProc( LPVOID lpParameter )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("VmpiDistrTracker");
+
 	// Create the window.
 	const char *pClassName = "VMPI_Tracker";
 

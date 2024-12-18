@@ -354,6 +354,9 @@ void ReceivePortalFlow( uint64 iWorkUnit, MessageBuffer *pBuf, int iWorker )
 
 DWORD WINAPI PortalMCThreadFn( LPVOID p )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("VmpiVvis");
+
 	CUtlVector<char> data;
 	data.SetSize( portalbytes + 128 );
 

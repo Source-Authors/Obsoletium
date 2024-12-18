@@ -17,6 +17,7 @@
 #include "shaderapidx8_global.h"
 #include "recording.h"
 #include "tier0/vprof.h"
+#include "tier0/threadtools.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "shaderapidx8.h"
@@ -24,7 +25,6 @@
 #include "utllinkedlist.h"
 #include "IShaderSystem.h"
 #include "tier0/fasttimer.h"
-#include <stdlib.h>
 #include "convar.h"
 #include "materialsystem/shader_vcs_version.h"
 #include "datacache/idatacache.h"
@@ -114,6 +114,9 @@ void __cdecl OurThreadInit( void * ourthis )
 unsigned int OurThreadInit( void * ourthis )
 #endif
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("D3DAsync");
+
 	(( D3DDeviceWrapper *) ourthis )->RunThread();
 #ifndef WIN32
 	return 0;

@@ -82,6 +82,9 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 
 static DWORD STDCALL ThreadProcX86SetDataBreakpoints( LPVOID pvParam )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("SetX86DataBreaks");
+
 	if ( pvParam )
 	{
 		X86ApplyBreakpointsToThread( *(unsigned long*)pvParam );

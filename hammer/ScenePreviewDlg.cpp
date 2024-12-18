@@ -98,6 +98,9 @@ BOOL CScenePreviewDlg::OnInitDialog()
 
 DWORD CScenePreviewDlg::StaticIdleThread( LPVOID pParameter )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("ScenePreview");
+
 	return ((CScenePreviewDlg*)pParameter)->IdleThread();
 }
 

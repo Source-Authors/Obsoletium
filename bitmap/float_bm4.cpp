@@ -46,6 +46,9 @@ struct SSBumpCalculationContext								// what each thread needs to see
 
 static unsigned SSBumpCalculationThreadFN( void * ctx1 )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("SelfShadowBump");
+
 	auto *ctx = static_cast<SSBumpCalculationContext *>(ctx1);
 
 	RayStream ray_trace_stream_ctx;
@@ -307,7 +310,7 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 			ctxs[t].max_y = min( Height - 1, starty + ystep - 1 );
 		else
 			ctxs[t].max_y = Height - 1;
-		waithandles[t]= CreateSimpleThread( SSBumpCalculationThreadFN, ( SSBumpCalculationContext * ) & ctxs[t] );
+		waithandles[t]= CreateSimpleThread( SSBumpCalculationThreadFN, &ctxs[t] );
 		starty += ystep;
 	}
 	for(int t=0;t<nthreads;t++)

@@ -117,7 +117,8 @@ int64 s_frequencies[ nMaxCPUs ];
 // Measurement thread, designed to be one per core.
 DWORD WINAPI MeasureThread( LPVOID vThreadNum )
 {
-	ThreadSetDebugName( "CPUMonitoringMeasureThread" );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName( "CPUBurnMonitor" );
 
 	ptrdiff_t threadNum = reinterpret_cast<ptrdiff_t>(vThreadNum);
 
@@ -154,7 +155,8 @@ typedef struct _PROCESSOR_POWER_INFORMATION {
 // Master control thread to periodically wake the measurement threads.
 DWORD WINAPI HeartbeatThread( LPVOID )
 {
-	ThreadSetDebugName( "CPUMonitoringHeartbeatThread" );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName( "CPUBurnHeartbeat" );
 	// Arbitrary/hacky time to wait for results to become available.
 	ThreadSleep( kFirstIntervalMs );
 

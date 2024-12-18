@@ -2127,6 +2127,7 @@ int g_bTotalDumps = 0;
 
 void LongTickWatcherThread()
 {
+	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("LongTickWatcher");
 
 	int nLastTick = 0;

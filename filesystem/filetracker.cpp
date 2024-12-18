@@ -25,7 +25,8 @@ unsigned ThreadStubProcessMD5Requests( void *pParam )
 //-----------------------------------------------------------------------------
 unsigned CFileTracker2::ThreadedProcessMD5Requests()
 {
-	ThreadSetDebugName( "ProcessMD5Requests" );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName( "MD5Calculator" );
 
 	while ( m_bThreadShouldRun )
 	{

@@ -1099,7 +1099,13 @@ protected:
 	};
 
 public:
-	static unsigned CallbackThreadProc( void *pvParam ) { ((CAsyncUploaderThread*) pvParam)->ThreadProc(); return 0; }
+	static unsigned CallbackThreadProc( void *pvParam )
+	{
+		// dimhotepus: Add thread name to aid debugging.
+		ThreadSetDebugName("GameStatsUpload");
+		((CAsyncUploaderThread*) pvParam)->ThreadProc();
+		return 0;
+	}
 	void QueueData( char const *szMapName, uint uiBlobVersion, uint uiBlobSize, const void *pvBlob );
 	void TerminateAndSelfDelete();
 };

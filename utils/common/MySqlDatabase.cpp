@@ -50,6 +50,9 @@ CMySqlDatabase::~CMySqlDatabase()
 //-----------------------------------------------------------------------------
 static DWORD WINAPI staticThreadFunc(void *param)
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("MySQLQueryRunner");
+
 	((CMySqlDatabase *)param)->RunThread();
 	return 0;
 }

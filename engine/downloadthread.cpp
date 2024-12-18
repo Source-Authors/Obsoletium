@@ -322,6 +322,9 @@ void CleanUpDownload( RequestContext_t& rc, HTTPStatus_t status, HTTPError_t err
  */
 DWORD __stdcall DownloadThread( void *voidPtr )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("HttpDownload");
+
 	RequestContext_t& rc = *(RequestContext_t *)voidPtr;
 
 	URL_COMPONENTS url;
@@ -812,6 +815,9 @@ void SetProxiesForURL( CURL *hMasterCURL, const char *pszURL )
 
 void DownloadThread( void *voidPtr )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("HttpDownload");
+
 	static bool bDoneInit = false;
 	if ( !bDoneInit )
 	{

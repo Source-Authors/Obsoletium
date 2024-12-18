@@ -138,6 +138,7 @@ void ValidateBuckets() {
 
 template <typename T>
 unsigned PopThreadFunc(void *ctx) {
+  // dimhotepus: Add thread name to aid debugging.
   ThreadSetDebugName("PopTestWork");
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
@@ -172,6 +173,7 @@ unsigned PopThreadFunc(void *ctx) {
 
 template <typename T>
 unsigned PushThreadFunc(void *ctx) {
+  // dimhotepus: Add thread name to aid debugging.
   ThreadSetDebugName("PushTestWork");
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
@@ -314,6 +316,7 @@ void PushPopInterleavedTest(ITestContainer<T> &container) {
 
 template <typename T>
 unsigned PushPopInterleavedTestThreadFunc(void *ctx) {
+  // dimhotepus: Add thread name to aid debugging.
   ThreadSetDebugName("PushPopTestWork");
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);

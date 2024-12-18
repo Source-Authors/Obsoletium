@@ -787,7 +787,8 @@ void CLightingPreviewThread::SendVectorMatrixAsRendering( CSIMDVectorMatrix cons
 // master side of lighting preview
 unsigned LightingPreviewThreadFN( void *thread_start_arg )
 {
-	CLightingPreviewThread LPreviewObject;
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("LightingPreview");
 	ThreadSetPriority( -2 );								// low
 	LPreviewObject.Run();
 	return 0;

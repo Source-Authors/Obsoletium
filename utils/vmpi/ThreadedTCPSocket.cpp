@@ -199,9 +199,6 @@ private:
 			SetThreadPriority( m_hRecvThread, THREAD_PRIORITY_LOWEST );
 		}
 		
-		ThreadSetDebugName( (ThreadId_t)dwSendThreadID, "TCPSend" );
-		ThreadSetDebugName( (ThreadId_t)dwRecvThreadID, "TCPRecv" );
-
 		// Make sure to init the handler before the threads actually run, so it isn't handed data before initializing.
 		m_pHandler->Init( this );
 
@@ -463,6 +460,9 @@ private:
 
 	static DWORD WINAPI StaticSendThreadFn( LPVOID pParameter )
 	{
+		// dimhotepus: Add thread name to aid debugging.
+		ThreadSetDebugName("TcpSender");
+
 		return ((CThreadedTCPSocket*)pParameter)->SendThreadFn();
 	}
 
@@ -653,6 +653,9 @@ private:
 
 	static DWORD WINAPI StaticRecvThreadFn( LPVOID pParameter )
 	{
+		// dimhotepus: Add thread name to aid debugging.
+		ThreadSetDebugName("TcpReceiver");
+
 		return ((CThreadedTCPSocket*)pParameter)->RecvThreadFn();
 	}
 

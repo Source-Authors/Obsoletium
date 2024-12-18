@@ -176,6 +176,8 @@ static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 
 unsigned ThreadedLoadLibraryFunc( void *pParam )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("ModuleLoader");
 	ThreadedLoadLibaryContext_t *pContext = (ThreadedLoadLibaryContext_t*)pParam;
 	pContext->m_hLibrary = InternalLoadLibrary( pContext->m_pLibraryName, SYS_NOFLAGS );
 	return 0;

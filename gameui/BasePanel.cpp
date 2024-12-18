@@ -2140,7 +2140,8 @@ bool CBasePanel::IsPromptableCommand( const char *command )
 //-------------------------
 static unsigned PanelJobWrapperFn( void *pvContext )
 {
-	CBasePanel::CAsyncJobContext *pAsync = reinterpret_cast< CBasePanel::CAsyncJobContext * >( pvContext );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("VGuiPanelJob");
 
 	float const flTimeStart = Plat_FloatTime();
 	
