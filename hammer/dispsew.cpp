@@ -7,13 +7,13 @@
 //=============================================================================//
 
 #include <stdafx.h>
-#include <malloc.h>
+#include "dispsew.h"
 #include "FaceEditSheet.h"
 #include "MainFrm.h"
 #include "GlobalFunctions.h"
 #include "MapDisp.h"
 #include "MapFace.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "disp_tesselate.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -496,22 +496,19 @@ void PreFaceListSew( void )
 void PostFaceListSew( void )
 {
 	// Destroy all corners, midpoint, edges.
-	int count = s_CornerData.Size();
-	for( int i = 0; i < count; i++ )
+	for( auto *c : s_CornerData )
 	{
-		SewCorner_Destroy( s_CornerData.Element( i ) );
+		SewCorner_Destroy( c );
 	}
 
-	count = s_TJData.Size();
-	for( int i = 0; i < count; i++ )
+	for( auto *tj : s_TJData )
 	{
-		SewTJunc_Destroy( s_TJData.Element( i ) );
+		SewTJunc_Destroy( tj );
 	}
 	
-	count = s_EdgeData.Size();
-	for( int i = 0; i < count; i++ )
+	for( auto *e : s_EdgeData )
 	{
-		SewEdge_Destroy( s_EdgeData.Element( i ) );
+		SewEdge_Destroy( e );
 	}
 
 	// Flush all of the sewing data buffers.
@@ -593,7 +590,7 @@ void SewCorner_Add( SewCornerData_t *pCornerData, CMapFace *pFace, int ndx )
 {
 	if ( pCornerData->faceCount >= DISPSEW_FACES_AT_CORNER )
 	{
-		AfxMessageBox( "Warning: Too many displacement faces at corner!\n" );
+		AfxMessageBox( "Warning: Too many displacement faces at corner!\n", MB_ICONEXCLAMATION );
 		return;
 	}
 
@@ -614,14 +611,11 @@ void SewCorner_AddToList( SewCornerData_t *pCornerData )
 	//
 	// check to see if the corner point already exists in the corner data list
 	//
-	int cornerCount = s_CornerData.Size();
-
-	for( int i = 0; i < cornerCount; i++ )
+	for( auto *pCmpData : s_CornerData )
 	{
 		//
 		// get the compare corner point
 		//
-		SewCornerData_t *pCmpData = s_CornerData.Element( i );
 		if( !pCmpData )
 			continue;
 
@@ -904,13 +898,10 @@ void SewCorner_ResolveSolid( SewCornerData_t *pCornerData )
 void SewCorner_Resolve( void )
 {
 	// get the number of corners in the corner list
-	int cornerCount = s_CornerData.Size();
-
 	// resolve each corner
-	for( int i = 0; i < cornerCount; i++ )
+	for( auto *pCornerData : s_CornerData )
 	{
 		// get the current corner data struct
-		SewCornerData_t *pCornerData = s_CornerData.Element( i );
 		if( !pCornerData )
 			continue;
 
@@ -979,7 +970,7 @@ void SewTJunc_Add( SewTJuncData_t *pTJData, CMapFace *pFace, int ndxCorner, int 
 {
 	if ( pTJData->faceCount >= DISPSEW_FACES_AT_TJUNC )
 	{
-		AfxMessageBox( "Warning: Too many displacement faces at t-junction!\n" );
+		AfxMessageBox( "Warning: Too many displacement faces at t-junction!\n", MB_ICONEXCLAMATION );
 		return;
 	}
 
@@ -1001,11 +992,9 @@ void SewTJunc_AddToList( SewTJuncData_t *pTJData )
 	//
 	// check to see if the t-junction point already exists in the t-junction data list
 	//
-	int tjCount = s_TJData.Size();
-	for( int i = 0; i < tjCount; i++ )
+	for( auto *pCmpData : s_TJData )
 	{
 		// get the compare t-junction point
-		SewTJuncData_t *pCmpData = s_TJData.Element( i );
 		if( !pCmpData )
 			continue;
 
@@ -1274,14 +1263,10 @@ void SewTJunc_ResolveSolid( SewTJuncData_t *pTJData )
 //-----------------------------------------------------------------------------
 void SewTJunc_Resolve( void )
 {
-	// get the number of t-junctions in the t-junction list
-	int tjCount = s_TJData.Size();
-
 	// resolve each t-junction
-	for( int i = 0; i < tjCount; i++ )
+	for( auto *pTJData : s_TJData )
 	{
 		// get the current t-junction data struct
-		SewTJuncData_t *pTJData = s_TJData.Element( i );
 		if( !pTJData )
 			continue;
 
@@ -1451,11 +1436,9 @@ bool SewEdge_AddToListTJunc( SewEdgeData_t *pEdgeData )
 	//
 	// check to see if the edge already exists in the edge data list
 	//
-	int edgeCount = s_EdgeData.Size();
-	for( int i = 0; i < edgeCount; i++ )
+	for( auto *pCmpData : s_EdgeData )
 	{
 		// get the edge points to compare against
-		SewEdgeData_t *pCmpData = s_EdgeData.Element( i );
 		if( !pCmpData )
 			continue;
 
@@ -1502,11 +1485,9 @@ void SewEdge_AddToListNormal( SewEdgeData_t *pEdgeData )
 	//
 	// check to see if the edge already exists in the edge data list
 	//
-	int edgeCount = s_EdgeData.Size();
-	for( int i = 0; i < edgeCount; i++ )
+	for( auto *pCmpData : s_EdgeData )
 	{
 		// get the edge points to compare against
-		SewEdgeData_t *pCmpData = s_EdgeData.Element( i );
 		if( !pCmpData )
 			continue;
 
@@ -1654,7 +1635,7 @@ void SewEdge_Build( void )
 
 	if (bError)
 	{
-		AfxMessageBox("Not all selected faces could be sewn because too many selected faces share a single edge.\n\nLook for places where 3 or more selected faces (displacement or non-displacement) all share an edge.");
+		AfxMessageBox("Not all selected faces could be sewn because too many selected faces share a single edge.\n\nLook for places where 3 or more selected faces (displacement or non-displacement) all share an edge.", MB_ICONERROR );
 	}
 }
 
@@ -2032,14 +2013,10 @@ void SewEdge_ResolveSolidNormal( SewEdgeData_t *pEdgeData )
 //-----------------------------------------------------------------------------
 void SewEdge_Resolve( void )
 {
-	// get the number of edges in the edge list
-	int edgeCount = s_EdgeData.Size();
-
 	// resolve each edge
-	for( int i = 0; i < edgeCount; i++ )
+	for( auto *pEdgeData : s_EdgeData )
 	{
 		// get the current edge data struct
-		SewEdgeData_t *pEdgeData = s_EdgeData.Element( i );
 		if( !pEdgeData )
 			continue;
 
@@ -2135,9 +2112,9 @@ bool PrePlanarizeDependentVerts( void )
 	}
 
 	// Add the list to the displacements -- this is a bit hacky!!
-	for ( int iDisp = 0; iDisp < m_aCoreDispInfos.Count(); ++iDisp )
+	for ( auto *i : m_aCoreDispInfos )
 	{
-		m_aCoreDispInfos[iDisp]->SetDispUtilsHelperInfo( m_aCoreDispInfos.Base(), m_aCoreDispInfos.Count() );
+		i->SetDispUtilsHelperInfo( m_aCoreDispInfos.Base(), m_aCoreDispInfos.Count() );
 	}
 
 	// Build neighboring info.
@@ -2271,9 +2248,9 @@ void SnapDependentVertsToSurface( CCoreDispInfo *pCoreDisp )
 void PostPlanarizeDependentVerts( void )
 {
 	// Snap dependents verts to the displacement surface.
-	for ( int iDispCore = 0; iDispCore < m_aCoreDispInfos.Count(); ++iDispCore )
+	for ( auto *c : m_aCoreDispInfos )
 	{
-		SnapDependentVertsToSurface( m_aCoreDispInfos[iDispCore] );
+		SnapDependentVertsToSurface( c );
 	}
 		
 	// Clear out the displacement info list.
