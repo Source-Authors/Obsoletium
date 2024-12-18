@@ -331,8 +331,11 @@ void MakeArcCenterRadius(float xCenter, float yCenter, float xrad, float yrad, i
            angle -= 360;
 		}
 
-        points[point][0] = V_rint(xCenter + (float)cos(DEG2RAD(angle)) * xrad);
-        points[point][1] = V_rint(yCenter + (float)sin(DEG2RAD(angle)) * yrad);
+		float fSin, fCos;
+		DirectX::XMScalarSinCos(&fSin, &fCos, DEG2RAD(angle));
+
+        points[point][0] = V_rint(xCenter + fCos * xrad);
+        points[point][1] = V_rint(yCenter + fSin * yrad);
 
 		angle += angle_delta;
     }
@@ -575,12 +578,11 @@ CMapClass *CreateTorus(BoundBox *pBox, float fStartAngle, int iSides, float fArc
 			flRotationAngle = fRotationStartAngle;
 		}
 
-		float xCurrCenter, yCurrCenter;
+		float flSinAngle, flCosAngle;
+		DirectX::XMScalarSinCos(&flSinAngle, &flCosAngle, DEG2RAD(flRotationAngle));
 
-		float flCosAngle = cos( DEG2RAD(flRotationAngle) );
-		float flSinAngle = sin( DEG2RAD(flRotationAngle) );
-		xCurrCenter = xCenter + xRad * flCosAngle;
-		yCurrCenter = yCenter + yRad * flSinAngle;
+		float xCurrCenter = xCenter + xRad * flCosAngle;
+		float yCurrCenter = yCenter + yRad * flSinAngle;
 
 		// Update buffers
 		pStartInnerPoints = pEndInnerPoints;
