@@ -10,13 +10,15 @@
 #pragma once
 #endif
 
+#include <afxwin.h>
+
 enum DrawType_t;
 
 class CMySplitterWnd : public CSplitterWnd
 {
 public:
 
-	CMySplitterWnd(void) { pMaxPrev = NULL; }
+	CMySplitterWnd(void) { memset(sizePrev, 0xFF, sizeof(sizePrev)); pMaxPrev = NULL; }
 
 	int sizePrev[2][2];
 	CWnd *pMaxPrev;
