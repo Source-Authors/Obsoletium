@@ -1971,12 +1971,14 @@ void ClientDLL_Shutdown( void )
 //-----------------------------------------------------------------------------
 void ClientDLL_Unload()
 {
-	FileSystem_UnloadModule( g_ClientDLLModule );
-
-	g_ClientDLL = NULL;
-	g_ClientDLLModule = NULL;
+	// dimhotepus: In reverse order.
 	g_pClientRenderTargets = NULL;
+	g_pClientVR = NULL;
+	g_ClientDLL = NULL;
+	g_ClientFactory = NULL;
+	g_ClientDLLModule = NULL;
 
+	FileSystem_UnloadModule( g_ClientDLLModule );
 }
 
 //-----------------------------------------------------------------------------
