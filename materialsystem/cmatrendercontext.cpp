@@ -85,18 +85,6 @@ void SpinPresent()
 
 void ReportDirtyDisk()
 {
-#ifdef _X360
-	s_bDirtyDisk = true;
-	ThreadHandle_t h = CreateSimpleThread( ThreadedDirtyDiskErrorDisplay, NULL );
-	ThreadSetPriority( h, THREAD_PRIORITY_HIGHEST );
-
-	// If this is being called from the render thread, immediately swap
-	if ( ( ThreadGetCurrentId() == MaterialSystem()->GetRenderThreadId() ) ||
-		( ThreadInMainThread() && g_pMaterialSystem->GetThreadMode() != MATERIAL_QUEUED_THREADED ) )
-	{
-		SpinPresent();
-	}
-#endif
 }
 
 
