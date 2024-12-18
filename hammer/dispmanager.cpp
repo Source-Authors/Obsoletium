@@ -8,12 +8,12 @@
 //=============================================================================//
 
 #include <stdafx.h>
-#include "UtlLinkedList.h"
-//#include "DispManager.h"
+#include "DispManager.h"
 #include "MapFace.h"
 #include "MapDisp.h"
 #include "DispSubdiv.h"
 #include "History.h"
+#include "tier1/utllinkedlist.h"
 #include "tier0/minidump.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -100,9 +100,9 @@ void CEditDispMgr::Destroy( EditDispHandle_t handle )
 		if ( !bNoToAll )
 		{
 			int result = AfxMessageBox( 
-				"CEditDispMgr::Destroy - invalid handle.\n"
+				"Error! CEditDispMgr::Destroy - invalid handle.\n"
 				"Write minidump?\n",
-				MB_YESNO );
+				MB_YESNO | MB_ICONQUESTION );
 			
 			if ( result == IDYES )
 			{
@@ -263,7 +263,7 @@ CMapDisp *CWorldEditDispMgr::GetFromWorld( int iWorldList )
 //-----------------------------------------------------------------------------
 CMapDisp *CWorldEditDispMgr::GetFromWorld( EditDispHandle_t handle )
 {
-	int ndx = m_WorldList.Find( handle );
+	intp ndx = m_WorldList.Find( handle );
 	if( ndx != -1 )
 	{
 		return EditDispMgr()->GetDisp( handle );
@@ -278,7 +278,7 @@ CMapDisp *CWorldEditDispMgr::GetFromWorld( EditDispHandle_t handle )
 //-----------------------------------------------------------------------------
 void CWorldEditDispMgr::AddToWorld( EditDispHandle_t handle )
 {
-	int ndx = m_WorldList.Find( handle );
+	intp ndx = m_WorldList.Find( handle );
 	if( ndx == -1 )
 	{
 		ndx = m_WorldList.AddToTail();
@@ -299,7 +299,7 @@ void CWorldEditDispMgr::AddToWorld( EditDispHandle_t handle )
 //-----------------------------------------------------------------------------
 void CWorldEditDispMgr::RemoveFromWorld( EditDispHandle_t handle )
 {
-	int ndx = m_WorldList.Find( handle );
+	intp ndx = m_WorldList.Find( handle );
 	if( ndx != -1 )
 	{
 		m_WorldList.Remove( ndx );
@@ -500,7 +500,7 @@ CMapDisp *CWorldEditDispMgr::GetFromSelect( int iSelectList )
 //-----------------------------------------------------------------------------
 void CWorldEditDispMgr::AddToSelect( EditDispHandle_t handle )
 {
-	int ndx = m_SelectList.Find( handle );
+	intp ndx = m_SelectList.Find( handle );
 	if( ndx == -1 )
 	{
 		ndx = m_SelectList.AddToTail();
@@ -513,7 +513,7 @@ void CWorldEditDispMgr::AddToSelect( EditDispHandle_t handle )
 //-----------------------------------------------------------------------------
 void CWorldEditDispMgr::RemoveFromSelect( EditDispHandle_t handle )
 {
-	int ndx = m_SelectList.Find( handle );
+	intp ndx = m_SelectList.Find( handle );
 	if( ndx != -1 )
 	{
 		m_SelectList.Remove( handle );
@@ -526,7 +526,7 @@ void CWorldEditDispMgr::RemoveFromSelect( EditDispHandle_t handle )
 //-----------------------------------------------------------------------------
 bool CWorldEditDispMgr::IsInSelect( EditDispHandle_t handle )
 {
-	int ndx = m_SelectList.Find( handle );
+	intp ndx = m_SelectList.Find( handle );
 	return ( ndx != -1 );
 }
 
