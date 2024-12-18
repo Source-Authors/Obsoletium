@@ -391,8 +391,9 @@ DWORD __stdcall DownloadThread( void *voidPtr )
 		// In other words, this allows people with only access to https:// servers (?!?) to host files as transparently
 		// as possible.
 		flags |= INTERNET_FLAG_SECURE;						// Use SSL, etc.  Kinda need this for HTTPS URLs.
-		flags |= INTERNET_FLAG_IGNORE_CERT_CN_INVALID;		// Don't check hostname on the SSL cert.
-		flags |= INTERNET_FLAG_IGNORE_CERT_DATE_INVALID;	// Don't check for expired SSL certs.
+		// dimhotepus: Do not ingore certificate errors!
+		// flags |= INTERNET_FLAG_IGNORE_CERT_CN_INVALID;		// Don't check hostname on the SSL cert.
+		// flags |= INTERNET_FLAG_IGNORE_CERT_DATE_INVALID;	// Don't check for expired SSL certs.
 	}
 
 	// Request a partial if we have the data
