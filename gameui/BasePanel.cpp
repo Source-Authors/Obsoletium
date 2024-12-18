@@ -2143,7 +2143,9 @@ static unsigned PanelJobWrapperFn( void *pvContext )
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("VGuiPanelJob");
 
-	float const flTimeStart = Plat_FloatTime();
+	auto *pAsync = static_cast< CBasePanel::CAsyncJobContext * >( pvContext );
+
+	double const flTimeStart = Plat_FloatTime();
 	
 	pAsync->ExecuteAsync();
 
@@ -2154,7 +2156,7 @@ static unsigned PanelJobWrapperFn( void *pvContext )
 		ThreadSleep( ( pAsync->m_flLeastExecuteTime - flElapsedTime ) * 1000 );
 	}
 
-	ReleaseThreadHandle( ( ThreadHandle_t ) pAsync->m_hThreadHandle.operator void *() );
+	ReleaseThreadHandle( ( ThreadHandle_t ) static_cast<void *>( pAsync->m_hThreadHandle ) );
 	pAsync->m_hThreadHandle = NULL;
 
 	return 0;
@@ -2171,7 +2173,7 @@ void CBasePanel::ExecuteAsync( CAsyncJobContext *pAsync )
 	m_pAsyncJob = pAsync;
 
 #ifdef _WIN32
-	ThreadHandle_t hHandle = CreateSimpleThread( PanelJobWrapperFn, reinterpret_cast< void * >( pAsync ) );
+	ThreadHandle_t hHandle = CreateSimpleThread( PanelJobWrapperFn, pAsync );
 	pAsync->m_hThreadHandle = hHandle;
 
 #ifdef _X360
