@@ -30,16 +30,12 @@
 #include "tier1/strtools.h"
 #include "tier0/threadtools.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 //--------------------------------------------------------------------------------------------------------------
 
-void WriteFileFromRequestContext( const RequestContext_t &rc )
+static void WriteFileFromRequestContext( const RequestContext_t &rc )
 {
 	struct stat buf;
 	int rt = stat(rc.absLocalPath, &buf);
@@ -182,7 +178,7 @@ void ReadData( RequestContext_t& rc )
 		// main thread could request an abort while we're blocked here.  This is okay, because the main
 		// thread will not wait for this thread to finish, but will clean up the RequestContext_t at some
 		// later point when InternetReadFile() has returned and this thread has finished.
-		if ( !InternetReadFile( rc.hDataResource, (LPVOID)data, BufferSize, &dwSize ) )
+		if ( !InternetReadFile( rc.hDataResource, data, BufferSize, &dwSize ) )
 		{
 			// if InternetReadFile() returns 0, there was a socket error (connection closed, etc)
 			rc.status = HTTP_ERROR;
@@ -347,7 +343,7 @@ DWORD __stdcall DownloadThread( void *voidPtr )
 
 	char fullURL[BufferSize*2];
 	DWORD fullURLLength = BufferSize*2;
-	Q_snprintf( fullURL, fullURLLength, "%s%s", rc.baseURL, rc.urlPath );
+	V_sprintf_safe( fullURL, "%s%s", rc.baseURL, rc.urlPath );
 
 	if ( !InternetCrackUrl( fullURL, fullURLLength, 0, &url ) )
 	{
@@ -400,19 +396,19 @@ DWORD __stdcall DownloadThread( void *voidPtr )
 	}
 
 	// Request a partial if we have the data
-	char headers[BufferSize] = "";
+	char headers[BufferSize] = {};
 	DWORD headerLen = 0;
 	char *headerPtr = NULL;
 	if ( *rc.cachedTimestamp && rc.nBytesCached )
 	{
 		if ( *rc.serverURL )
 		{
-			Q_snprintf( headers, BufferSize, "If-Range: %s\nRange: bytes=%d-\nReferer: hl2://%s\n",
+			V_sprintf_safe( headers, "If-Range: %s\nRange: bytes=%d-\nReferer: hl2://%s\n",
 				rc.cachedTimestamp, rc.nBytesCached, rc.serverURL );
 		}
 		else
 		{
-			Q_snprintf( headers, BufferSize, "If-Range: %s\nRange: bytes=%d-\n",
+			V_sprintf_safe( headers, "If-Range: %s\nRange: bytes=%d-\n",
 				rc.cachedTimestamp, rc.nBytesCached );
 		}
 		headerPtr = headers;
@@ -421,7 +417,7 @@ DWORD __stdcall DownloadThread( void *voidPtr )
 	}
 	else if ( *rc.serverURL )
 	{
-		Q_snprintf( headers, BufferSize, "Referer: hl2://%s\n", rc.serverURL );
+		V_sprintf_safe( headers, "Referer: hl2://%s\n", rc.serverURL );
 		headerPtr = headers;
 		headerLen = (DWORD)-1L; // the DWORD cast is because we get a signed/unsigned mismatch even with an L on the -1.
 		//Thread_DPrintf( "Requesting full download\n%s", headers );
@@ -446,7 +442,7 @@ DWORD __stdcall DownloadThread( void *voidPtr )
 
 	// check the status (are we gonna get anything?)
 	DWORD size = sizeof(DWORD);
-	DWORD code;
+	DWORD code = 0;
 	if ( !HttpQueryInfo( rc.hDataResource, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &code, &size, NULL ) )
 	{
 		CleanUpDownload( rc, HTTP_ERROR, HTTP_ERROR_NO_HEADERS );
