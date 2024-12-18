@@ -19,6 +19,7 @@
 //
 
 #include <stdafx.h>
+#include "dispmapimagefilter.h"
 #include "MapDisp.h"
 #include "DispSew.h"
 #include "ChunkFile.h"
@@ -206,8 +207,16 @@ ChunkFileResult_t CDispMapImageFilter::LoadFilter( CChunkFile *pFile )
 //-----------------------------------------------------------------------------
 CDispMapImageFilterManager::CDispMapImageFilterManager()
 {
+	m_ActiveFilter = -1;
 	m_FilterCount = 0;
-	m_ActiveFilter = 0;
+
+	for (auto &f : m_pFilterList)
+	{
+		f = nullptr;
+	}
+
+	m_PaintType = -1;
+	m_PaintDir = vec3_invalid;
 }
 
 
@@ -1833,9 +1842,10 @@ bool CDispMapImageFilterManager::GetFilterVector( CDispMapImageFilter *pFilter,
 	if( !pNeighborDisp )
 		return false;
 
-	Vector normal;
-	normal = m_PaintDir;
+	Vector normal = m_PaintDir;
 
+	Assert(normal != vec3_invalid);
+	Assert(m_PaintType != -1);
 	if( m_PaintType == DISPPAINT_AXIS_SUBDIV )
 	{
 		switch( ndxImg )

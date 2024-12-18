@@ -15,6 +15,8 @@
 #define DISPMAPIMAGEFILTER_H
 #pragma once
 
+#include "mathlib/vector.h"
+
 class CChunkFile;
 class CMapDisp;
 enum ChunkFileResult_t;
@@ -289,6 +291,7 @@ inline void CDispMapImageFilterManager::SetActiveFilter( int ndx )
 //-----------------------------------------------------------------------------
 inline CDispMapImageFilter *CDispMapImageFilterManager::GetActiveFilter( void )
 {
+	Assert(m_ActiveFilter >= 0 && m_ActiveFilter < m_FilterCount);
 	return m_pFilterList[m_ActiveFilter];
 }
 
