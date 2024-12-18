@@ -36,6 +36,9 @@ static KeyMap_t ModifierKeyTable[] =
 //-----------------------------------------------------------------------------
 CKeyboard::CKeyboard(void)
 {
+	memset(g_uPhysicalKeyState, 0, sizeof(g_uPhysicalKeyState));
+	memset(g_uLogicalKeyState, 0, sizeof(g_uLogicalKeyState));
+	memset(g_uKeyMap, 0, sizeof(g_uKeyMap));
 	g_uKeyMaps = 0;	
 }
 
