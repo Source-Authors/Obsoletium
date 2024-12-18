@@ -12,31 +12,34 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-static int g_EventTimeCounters[100];
-static float g_EventTimes[100];
+static std::atomic_int g_EventTimeCounters[100];
+static double g_EventTimes[ssize(g_EventTimeCounters)];
 
 void SignalUpdate(int ev)
 {
+	Assert(ev >= 0 && ev < ssize(g_EventTimes));
 	g_EventTimes[ev]=Plat_FloatTime();
-	g_EventTimeCounters[ev]++;
+	g_EventTimeCounters[ev].fetch_add(1, std::memory_order::memory_order_relaxed);
 }
 
 int GetUpdateCounter(int ev)
 {
-	return g_EventTimeCounters[ev];
+	Assert(ev >= 0 && ev < ssize(g_EventTimes));
+	return g_EventTimeCounters[ev].load(std::memory_order::memory_order_relaxed);
 }
 
-float GetUpdateTime(int ev)
+double GetUpdateTime(int ev)
 {
+	Assert(ev >= 0 && ev < ssize(g_EventTimes));
 	return g_EventTimes[ev];
 }
 
-void SignalGlobalUpdate(void)
+void SignalGlobalUpdate()
 {
-	float stamp=Plat_FloatTime();
-	for(int i=0;i<NELEMS(g_EventTimes);i++)
+	double stamp=Plat_FloatTime();
+	for(intp i=0;i<ssize(g_EventTimes);i++)
 	{
 		g_EventTimes[i] = stamp;
-		g_EventTimeCounters[i]++;
+		g_EventTimeCounters[i].fetch_add(1, std::memory_order::memory_order_relaxed);
 	}
 }
