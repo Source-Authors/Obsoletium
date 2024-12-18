@@ -401,7 +401,6 @@ bool CDispPaintMgr::DoPaintSmoothOneOverExp( const SpatialPaintData_t &spatialDa
 							flFactor *= 1.0f / ( spatialData.m_flScalar * 2.0f );
 						}
 						
-						Vector vProjectVert;
 						float flProjectDist = DotProduct( vVert, spatialData.m_vPaintAxis ) - flPaintDist;
 						flSmoothDist += ( flProjectDist * flFactor );
 						flWeight += flFactor;
