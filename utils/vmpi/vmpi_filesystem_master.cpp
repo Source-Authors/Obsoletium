@@ -151,12 +151,12 @@ class CTransmitRateMgr {
 
  private:
   struct CMachineRecord {
-    unsigned long m_UniqueID;
+    uintp m_UniqueID;
     double m_flLastTime;
   };
   CUtlVector<CMachineRecord> m_MachineRecords;
 
-  unsigned long m_UniqueID;
+  uintp m_UniqueID;
   double m_flLastBroadcastTime;
   double m_nMicrosecondsPerByte;
   ISocket *m_pSocket;
@@ -192,11 +192,10 @@ void CTransmitRateMgr::ReadPackets() {
     int len = m_pSocket->RecvFrom(data, sizeof(data), &ipFrom);
     if (len == -1) break;
 
-    if (len == sizeof(s_cTransmitRateMgrPacket) + sizeof(unsigned long) &&
+    if (len == sizeof(s_cTransmitRateMgrPacket) + sizeof(uintp) &&
         memcmp(data, s_cTransmitRateMgrPacket,
                sizeof(s_cTransmitRateMgrPacket)) == 0) {
-      unsigned long id =
-          *((unsigned long *)&data[sizeof(s_cTransmitRateMgrPacket)]);
+      uintp id = *((uintp *)&data[sizeof(s_cTransmitRateMgrPacket)]);
       if (id == m_UniqueID) continue;
 
       intp i;
@@ -239,9 +238,9 @@ void CTransmitRateMgr::BroadcastPresence() {
 
   m_flLastBroadcastTime = flCurTime;
 
-  char cData[sizeof(s_cTransmitRateMgrPacket) + sizeof(unsigned long)];
+  char cData[sizeof(s_cTransmitRateMgrPacket) + sizeof(uintp)];
   memcpy(cData, s_cTransmitRateMgrPacket, sizeof(s_cTransmitRateMgrPacket));
-  *((unsigned long *)&cData[sizeof(s_cTransmitRateMgrPacket)]) = m_UniqueID;
+  *((uintp *)&cData[sizeof(s_cTransmitRateMgrPacket)]) = m_UniqueID;
 
   m_pSocket->Broadcast(cData, sizeof(cData),
                        VMPI_MASTER_FILESYSTEM_BROADCAST_PORT);
