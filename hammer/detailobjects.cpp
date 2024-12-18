@@ -7,14 +7,16 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "detailobjects.h"
 
 #include "collisionutils.h"
 #include "const.h"
-#include "interface.h"
 
-#include "KeyValues.h"
-#include "utlsymbol.h"
-#include "utlvector.h"
+#include "tier1/interface.h"
+#include "tier1/KeyValues.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/utlvector.h"
+
 #include "utilmatlib.h"
 #include "mathlib/VMatrix.h"
 #include "vstdlib/random.h"
@@ -150,7 +152,9 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 					pSpriteData = pIter->GetString( "spritesize", 0 );
 					if (pSpriteData)
 					{
-						sscanf( pSpriteData, "%f %f %f %f", &x, &y, &flWidth, &flHeight );
+						[[maybe_unused]] int scanned =
+							sscanf( pSpriteData, "%f %f %f %f", &x, &y, &flWidth, &flHeight );
+						Assert(scanned == 4);
 
 						float ox = flWidth * x;
 						float oy = flHeight * y;
@@ -190,8 +194,8 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 			// These are used to prevent emission on steep surfaces
 			float minAngle = pIter->GetFloat( "minAngle", 180 );
 			float maxAngle = pIter->GetFloat( "maxAngle", 180 );
-			model.m_MinCosAngle = cos(minAngle * M_PI / 180.f);
-			model.m_MaxCosAngle = cos(maxAngle * M_PI / 180.f);
+			model.m_MinCosAngle = cos(DEG2RAD(minAngle));
+			model.m_MaxCosAngle = cos(DEG2RAD(maxAngle));
 			model.m_Orientation = pIter->GetInt( "detailOrientation", 0 );
 
 			// Make sure minAngle < maxAngle
@@ -502,10 +506,10 @@ void DetailObjects::EmitDetailObjectsOnFace( CMapFace *pMapFace, DetailObject_t&
 		Vector	areaVec;
 		CrossProduct( e1, e2, areaVec );
 		float	normalLength = areaVec.Length();
-		float	area = 0.5 * normalLength;
+		float	area = 0.5f * normalLength;
 
 		// Calculate the detail prop density based on the expected density and the tesselated triangle area
-		int numSamples = clamp( area * detail.m_Density * 0.000001, 0, MAX_DETAIL_SPRITES_PER_FACE );
+		int numSamples = clamp( area * detail.m_Density * 0.000001f, 0, MAX_DETAIL_SPRITES_PER_FACE );
 		
 		// For each possible sample, attempt to randomly place a detail object there
 		for (int j = 0; j < numSamples; ++j )
@@ -587,7 +591,7 @@ void DetailObjects::EmitDetailObjectsOnDisplacementFace( CMapFace *pMapFace,
 	float area = ComputeDisplacementFaceArea( pMapFace );
 
 	// Compute the number of samples to take
-	int numSamples = area * detail.m_Density * 0.000001;
+	int numSamples = area * detail.m_Density * 0.000001f;
 
 	EditDispHandle_t	editdisphandle = pMapFace->GetDisp();
 	CMapDisp			*pMapDisp = EditDispMgr()->GetDisp(editdisphandle);
