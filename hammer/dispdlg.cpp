@@ -6,11 +6,11 @@
 //=============================================================================//
 
 #include <stdafx.h>
+#include "DispDlg.h"
 #include "hammer.h"
 #include "MainFrm.h"
 #include "FaceEditSheet.h"
 #include "GlobalFunctions.h"
-#include "DispDlg.h"
 #include "MapFace.h"
 #include "MapDisp.h"
 #include "ToolDisplace.h"
@@ -173,7 +173,8 @@ void CDispNoiseDlg::OnSpinUpDown( NMHDR *pNMHDR, LRESULT *pResult )
 			CEdit *pEdit = ( CEdit* )GetDlgItem( ID_DISP_NOISE_MIN );
 			CString strMin;
 			pEdit->GetWindowText( strMin );
-			m_Min = atof( strMin );
+			// dimhotepus: atof -> strtof.
+			m_Min = strtof( strMin, nullptr );
 			m_Min += 0.5f * ( -pNMUpDown->iDelta );
 			strMin.Format( "%4.2f", m_Min );
 			pEdit->SetWindowText( strMin );
@@ -186,7 +187,8 @@ void CDispNoiseDlg::OnSpinUpDown( NMHDR *pNMHDR, LRESULT *pResult )
 			CEdit *pEdit = ( CEdit* )GetDlgItem( ID_DISP_NOISE_MAX );
 			CString strMax;
 			pEdit->GetWindowText( strMax );
-			m_Max = atof( strMax );
+            // dimhotepus: atof -> strtof.
+			m_Max = strtof( strMax, nullptr );
 			m_Max += 0.5f * ( -pNMUpDown->iDelta );
 			strMax.Format( "%4.2f", m_Max );
 			pEdit->SetWindowText( strMax );
@@ -976,7 +978,8 @@ void CDispPaintDistDlg::OnEditDistance( void )
 	//
 	CString strDistance;
 	m_editDistance.GetWindowText( strDistance );
-	float flDistance = atof( strDistance );
+	// dimhotepus: atof -> strtof
+	float flDistance = strtof( strDistance, nullptr );
 
 	// get the displacement tool
 	CToolDisplace *pTool = GetDisplacementTool();
@@ -998,7 +1001,8 @@ void CDispPaintDistDlg::OnEditRadius( void )
 	//
 	CString strRadius;
 	m_editRadius.GetWindowText( strRadius );
-	float flRadius = atof( strRadius );
+	// dimhotepus: atof -> strtof
+	float flRadius = strtof( strRadius, nullptr );
 
 	// get the displacement tool
 	CToolDisplace *pTool = GetDisplacementTool();
@@ -1827,7 +1831,8 @@ void CDispPaintDataDlg::OnEditValue( void )
 	//
 	CString strValue;
 	m_editValue.GetWindowText( strValue );
-	float fValue = atof( strValue );
+	// dimhotepus: atof -> strtof
+	float fValue = strtof( strValue, nullptr );
 
 	// get the displacement tool
 	CToolDisplace *pDispTool = GetDisplacementTool();

@@ -11,7 +11,8 @@
 
 #include "resource.h"
 #include "IconComboBox.h"
-#include "afxwin.h"
+#include "mathlib/vector.h"
+#include <afxwin.h>
 
 //=============================================================================
 //
