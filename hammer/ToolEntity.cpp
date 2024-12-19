@@ -88,7 +88,7 @@ bool CToolEntityMessageWnd::Create(void)
 		return(false);
 	}
 
-	return(CWnd::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
+	return(__super::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
 }
 
 

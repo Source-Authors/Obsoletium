@@ -50,7 +50,7 @@ CEditGroups::CEditGroups(CWnd* pParent /*=NULL*/)
 //-----------------------------------------------------------------------------
 void CEditGroups::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditGroups)
 	DDX_Control(pDX, IDC_NAME, m_cName);
 	//}}AFX_DATA_MAP
@@ -199,7 +199,7 @@ void CEditGroups::UpdateControlsForVisGroup(CVisGroup *pVisGroup)
 //-----------------------------------------------------------------------------
 BOOL CEditGroups::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_cGroupList.SubclassDlgItem(IDC_GROUPS, this);
 	m_cColorBox.SubclassDlgItem(IDC_COLORBOX, this);
@@ -267,7 +267,7 @@ void CEditGroups::UpdateGroupList()
 void CEditGroups::OnClose(void)
 {
 	GetMainWnd()->GlobalNotify(WM_MAPDOC_CHANGED);
-	CDialog::OnClose();
+	__super::OnClose();
 }
 
 
@@ -278,7 +278,7 @@ void CEditGroups::OnClose(void)
 BOOL CEditGroups::DestroyWindow(void)
 {
 	GetMainWnd()->GlobalNotify(WM_MAPDOC_CHANGED);
-	return(CDialog::DestroyWindow());
+	return(__super::DestroyWindow());
 }
 
 

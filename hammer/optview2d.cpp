@@ -33,7 +33,7 @@ COPTView2D::~COPTView2D()
 
 void COPTView2D::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(COPTView2D)
 	DDX_Control(pDX, IDC_GRIDINTENSITY, m_cGridIntensity);
@@ -94,12 +94,12 @@ BOOL COPTView2D::OnInitDialog()
 		pwnd->ShowWindow(SW_HIDE);
 	}
 
-	CPropertyPage::OnInitDialog();
+	__super::OnInitDialog();
 	return TRUE;
 }
 
 BOOL COPTView2D::OnApply() 
 {
 	Options.PerformChanges(COptions::secView2D);	
-	return CPropertyPage::OnApply();
+	return __super::OnApply();
 }

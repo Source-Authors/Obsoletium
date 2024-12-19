@@ -332,7 +332,7 @@ void CSplashWnd::PostNcDestroy()
 //-----------------------------------------------------------------------------
 int CSplashWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CWnd::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	// Center the window.

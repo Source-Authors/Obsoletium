@@ -41,7 +41,7 @@ LRESULT CVGuiPanelWnd::WindowProc( UINT message, WPARAM wParam, LPARAM lParam )
 {
 	if ( !WindowProcVGui( message, wParam, lParam ) )
 	{
-		return CWnd::WindowProc( message, wParam, lParam ) ;
+		return __super::WindowProc( message, wParam, lParam ) ;
 	}
 
 	return 1;

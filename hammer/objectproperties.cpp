@@ -1175,7 +1175,7 @@ void CObjectProperties::ReloadData()
 
 BOOL CObjectProperties::OnInitDialog() 
 {
-	BOOL b = CPropertySheet::OnInitDialog();
+	BOOL b = __super::OnInitDialog();
 	SetWindowText("Object Properties");
 
 	CreateButtons();
@@ -1243,7 +1243,7 @@ void CObjectProperties::OnShowWindow(BOOL bShow, UINT nStatus)
 	SetActivePage(0);
 	m_pLastActivePage = NULL;
 
-	CPropertySheet::OnShowWindow(bShow, nStatus);
+	__super::OnShowWindow(bShow, nStatus);
 
 	for (int i = 0; i < m_nPages; i++)
 	{
@@ -1392,7 +1392,7 @@ int CObjectProperties::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	lpCreateStruct->dwExStyle |= WS_EX_TOOLWINDOW;
 
-	if (CPropertySheet::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 	{
 		return -1;
 	}

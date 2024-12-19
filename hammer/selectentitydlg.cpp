@@ -35,7 +35,7 @@ CSelectEntityDlg::CSelectEntityDlg(const CMapObjectList *pList,
 
 void CSelectEntityDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CSelectEntityDlg)
 	DDX_Control(pDX, IDC_ENTITIES, m_cEntities);
 	//}}AFX_DATA_MAP
@@ -65,7 +65,7 @@ void CSelectEntityDlg::OnSelchangeEntities()
 
 BOOL CSelectEntityDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// add entities from our list of entities to the listbox
 	FOR_EACH_OBJ( *m_pEntityList, pos )
@@ -91,5 +91,5 @@ void CSelectEntityDlg::OnOK()
 	int iSel = m_cEntities.GetCurSel();
 	m_pFinalEntity = (CMapEntity*) m_cEntities.GetItemData(iSel);
 	
-	CDialog::OnOK();
+	__super::OnOK();
 }

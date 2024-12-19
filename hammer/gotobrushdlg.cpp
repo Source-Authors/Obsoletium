@@ -38,7 +38,7 @@ CGotoBrushDlg::CGotoBrushDlg(CWnd *pParent)
 //-----------------------------------------------------------------------------
 void CGotoBrushDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CGotoBrushDlg)
 	DDX_Text(pDX, IDC_BRUSH_NUMBER, m_nBrushID);
 	//}}AFX_DATA_MAP
@@ -50,6 +50,6 @@ void CGotoBrushDlg::DoDataExchange(CDataExchange* pDX)
 //-----------------------------------------------------------------------------
 void CGotoBrushDlg::OnOK() 
 {
-	CDialog::OnOK();
+	__super::OnOK();
 }
 

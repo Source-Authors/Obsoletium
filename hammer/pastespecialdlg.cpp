@@ -90,12 +90,12 @@ BOOL CPasteSpecialDlg::OnInitDialog()
 	BOOL bEnable = m_bAddPrefix ? TRUE : FALSE;
 	GetDlgItem( IDC_PASTE_SPECIAL_PREFIX_TEXT )->EnableWindow( bEnable );
 	
-	return CDialog::OnInitDialog();
+	return __super::OnInitDialog();
 }
 
 void CPasteSpecialDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPasteSpecialDlg)
 	DDX_Text(pDX, IDC_COPIES, m_iCopies);
 	DDV_MinMaxInt(pDX, m_iCopies, 1, 256);

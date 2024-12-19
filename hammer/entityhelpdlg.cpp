@@ -80,7 +80,7 @@ CEntityHelpDlg::~CEntityHelpDlg(void)
 //-----------------------------------------------------------------------------
 void CEntityHelpDlg::DoDataExchange(CDataExchange *pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CEntityHelpDlg)
 	//}}AFX_DATA_MAP
@@ -172,7 +172,7 @@ void CEntityHelpDlg::OnDestroy(void)
 //-----------------------------------------------------------------------------
 BOOL CEntityHelpDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	m_pHelpText = new CRichEditCtrlEx;
 	m_pHelpText->SubclassDlgItem(IDC_HELP_TEXT, this);
 	m_pHelpText->enable();
@@ -361,7 +361,7 @@ void CEntityHelpDlg::UpdateHelp(void)
 //-----------------------------------------------------------------------------
 void CEntityHelpDlg::OnSize( UINT nType, int cx, int cy )
 {
-	CDialog::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 
 	if (m_pHelpText != NULL)
 	{

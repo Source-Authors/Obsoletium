@@ -192,7 +192,7 @@ CMapCheckDlg::CMapCheckDlg(CWnd *pParent)
 //-----------------------------------------------------------------------------
 void CMapCheckDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CMapCheckDlg)
 	DDX_Control(pDX, IDC_FIXALL, m_cFixAll);
@@ -1767,6 +1767,7 @@ void CMapCheckDlg::OnClose()
 //-----------------------------------------------------------------------------
 void CMapCheckDlg::OnDestroy()
 {
+	__super::OnDestroy();
 	delete this;
 	s_pDlg = NULL;
 }

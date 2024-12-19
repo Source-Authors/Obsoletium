@@ -33,7 +33,7 @@ CTransformDlg::CTransformDlg(CWnd* pParent /*=NULL*/)
 
 void CTransformDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CTransformDlg)
 	DDX_Radio(pDX, IDC_MODE, m_iMode);
 	DDX_Text(pDX, IDC_X, m_X);

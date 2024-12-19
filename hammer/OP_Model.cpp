@@ -236,7 +236,7 @@ void COP_Model::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 		}
 	}
 	
-	CPropertyPage::OnHScroll(nSBCode, nPos, pScrollBar);
+	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 

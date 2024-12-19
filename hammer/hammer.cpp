@@ -1467,7 +1467,7 @@ CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 //-----------------------------------------------------------------------------
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAboutDlg)
 	DDX_Control(pDX, IDC_REDHERRING, m_cRedHerring);
 	DDX_Control(pDX, IDC_ORDER, m_Order);
@@ -1540,7 +1540,7 @@ void Encode( char *pstring, char *pkey, int strLen )
 //-----------------------------------------------------------------------------
 BOOL CAboutDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_Order.SetRedraw(FALSE);
 

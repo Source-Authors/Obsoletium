@@ -1070,7 +1070,7 @@ BOOL CSculptPushOptions::OnInitDialog( void )
 {
 	char	temp[ 1024 ];
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_OffsetModeControl.InsertString( -1, "Adaptive" );
 	m_OffsetModeControl.InsertString( -1, "Absolute" );
@@ -1133,7 +1133,7 @@ void CSculptPushOptions::OnCancel()
 //-----------------------------------------------------------------------------
 void CSculptPushOptions::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, m_OffsetModeControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, m_OffsetDistanceControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_AMOUNT, m_OffsetAmountControl);
@@ -2303,7 +2303,7 @@ BOOL CSculptCarveOptions::OnInitDialog( )
 {
 	char	temp[ 1024 ];
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_OffsetModeControl.InsertString( -1, "Adaptive" );
 	m_OffsetModeControl.InsertString( -1, "Absolute" );
@@ -2360,7 +2360,7 @@ void CSculptCarveOptions::OnCancel( )
 //-----------------------------------------------------------------------------
 void CSculptCarveOptions::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, m_OffsetModeControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, m_OffsetDistanceControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_AMOUNT, m_OffsetAmountControl);
@@ -3565,7 +3565,7 @@ CSculptProjectOptions::~CSculptProjectOptions()
 //-----------------------------------------------------------------------------
 void CSculptProjectOptions::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_PROJECT_SIZE, m_ProjectSizeControl);
 	DDX_Control(pDX, IDC_PROJECT_SIZE_NUM, m_ProjectSizeNumControl);
 }

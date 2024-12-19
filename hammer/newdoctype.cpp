@@ -30,7 +30,7 @@ CNewDocType::CNewDocType(CWnd* pParent /*=NULL*/)
 
 void CNewDocType::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CNewDocType)
 	DDX_Radio(pDX, IDC_NEWTYPE, m_iNewType);
 	//}}AFX_DATA_MAP

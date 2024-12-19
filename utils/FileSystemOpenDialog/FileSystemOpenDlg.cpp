@@ -144,7 +144,7 @@ CFileSystemOpenDlg::CFileSystemOpenDlg(CreateInterfaceFn factory, CWnd* pParent 
 
 void CFileSystemOpenDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CBaseDlg::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CFileSystemOpenDlg)
 	DDX_Control(pDX, IDC_FILENAME_LABEL, m_FilenameLabel);
 	DDX_Control(pDX, IDC_FILENAME, m_FilenameControl);
@@ -230,56 +230,58 @@ CString CFileSystemOpenDlg::GetFilename() const
 
 BOOL CFileSystemOpenDlg::OnInitDialog() 
 {
-	CBaseDlg::OnInitDialog();
+	BOOL rc = __super::OnInitDialog();
+	if (rc)
+	{	
+		// Setup our anchor list.
+		AddAnchor( IDC_FILE_LIST, 2, 2 );
+		AddAnchor( IDC_FILE_LIST, 3, 3 );
 	
-	// Setup our anchor list.
-	AddAnchor( IDC_FILE_LIST, 2, 2 );
-	AddAnchor( IDC_FILE_LIST, 3, 3 );
+		AddAnchor( IDC_FILENAME, 1, 3 );
+		AddAnchor( IDC_FILENAME, 3, 3 );
+		AddAnchor( IDC_FILENAME, 2, 2 );
+
+		AddAnchor( IDC_FILENAME_LABEL, 0, 0 );
+		AddAnchor( IDC_FILENAME_LABEL, 2, 0 );
+		AddAnchor( IDC_FILENAME_LABEL, 1, 3 );
+		AddAnchor( IDC_FILENAME_LABEL, 3, 3 );
+
+		AddAnchor( IDOK, 0, 2 );
+		AddAnchor( IDOK, 2, 2 );
+		AddAnchor( IDOK, 1, 3 );
+		AddAnchor( IDOK, 3, 3 );
 	
-	AddAnchor( IDC_FILENAME, 1, 3 );
-	AddAnchor( IDC_FILENAME, 3, 3 );
-	AddAnchor( IDC_FILENAME, 2, 2 );
+		AddAnchor( IDCANCEL, 0, 2 );
+		AddAnchor( IDCANCEL, 2, 2 );
+		AddAnchor( IDCANCEL, 1, 3 );
+		AddAnchor( IDCANCEL, 3, 3 );
 
-	AddAnchor( IDC_FILENAME_LABEL, 0, 0 );
-	AddAnchor( IDC_FILENAME_LABEL, 2, 0 );
-	AddAnchor( IDC_FILENAME_LABEL, 1, 3 );
-	AddAnchor( IDC_FILENAME_LABEL, 3, 3 );
+		AddAnchor( IDC_LOOKIN, 2, 2 );
 
-	AddAnchor( IDOK, 0, 2 );
-	AddAnchor( IDOK, 2, 2 );
-	AddAnchor( IDOK, 1, 3 );
-	AddAnchor( IDOK, 3, 3 );
+		AddAnchor( IDC_UP_BUTTON, 0, 2 );
+		AddAnchor( IDC_UP_BUTTON, 2, 2 );
+
+
+		// Setup our image list.
+		m_ImageList.Create( PREVIEW_IMAGE_SIZE, PREVIEW_IMAGE_SIZE, ILC_COLOR32, 0, 512 );
 	
-	AddAnchor( IDCANCEL, 0, 2 );
-	AddAnchor( IDCANCEL, 2, 2 );
-	AddAnchor( IDCANCEL, 1, 3 );
-	AddAnchor( IDCANCEL, 3, 3 );
+		m_BitmapFolder.LoadBitmap( IDB_LABEL_FOLDER );
+		m_iLabel_Folder = m_ImageList.Add( &m_BitmapFolder, (CBitmap*)NULL );
 
-	AddAnchor( IDC_LOOKIN, 2, 2 );
+		m_BitmapMdl.LoadBitmap( IDB_LABEL_MDL );
+		m_iLabel_Mdl = m_ImageList.Add( &m_BitmapMdl, (CBitmap*)NULL );
 
-	AddAnchor( IDC_UP_BUTTON, 0, 2 );
-	AddAnchor( IDC_UP_BUTTON, 2, 2 );
+		m_BitmapFile.LoadBitmap( IDB_LABEL_FILE );
+		m_iLabel_File = m_ImageList.Add( &m_BitmapFile, (CBitmap*)NULL );
 
+		m_FileList.SetImageList( &m_ImageList, LVSIL_NORMAL );
 
-	// Setup our image list.
-	m_ImageList.Create( PREVIEW_IMAGE_SIZE, PREVIEW_IMAGE_SIZE, ILC_COLOR32, 0, 512 );
+		// Populate the list with the contents of our current directory.
+		PopulateListControl();
+	}
 	
-	m_BitmapFolder.LoadBitmap( IDB_LABEL_FOLDER );
-	m_iLabel_Folder = m_ImageList.Add( &m_BitmapFolder, (CBitmap*)NULL );
-
-	m_BitmapMdl.LoadBitmap( IDB_LABEL_MDL );
-	m_iLabel_Mdl = m_ImageList.Add( &m_BitmapMdl, (CBitmap*)NULL );
-
-	m_BitmapFile.LoadBitmap( IDB_LABEL_FILE );
-	m_iLabel_File = m_ImageList.Add( &m_BitmapFile, (CBitmap*)NULL );
-
-	m_FileList.SetImageList( &m_ImageList, LVSIL_NORMAL );
-
-	// Populate the list with the contents of our current directory.
-	PopulateListControl();
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return rc;  // return TRUE unless you set the focus to a control
+	            // EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CFileSystemOpenDlg::GetEntries( const char *pMask, CUtlVector<CString> &entries, GetEntriesMode_t mode )
@@ -682,12 +684,12 @@ void CFileSystemOpenDlg::AddFileMask( const char *pMask )
 
 BOOL CFileSystemOpenDlg::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
 {
-	return CBaseDlg::Create(IDD, pParentWnd);
+	return __super::Create(IDD, pParentWnd);
 }
 
 int CFileSystemOpenDlg::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-	if (CBaseDlg::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	return 0;
@@ -745,7 +747,7 @@ void CFileSystemOpenDlg::AddAnchor( int iDlgItem, int iSide, int iParentSide )
 
 void CFileSystemOpenDlg::OnSize(UINT nType, int cx, int cy) 
 {
-	CBaseDlg::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 	
 	for ( int i=0; i < m_Anchors.Count(); i++ )
 		ProcessAnchor( &m_Anchors[i] );	

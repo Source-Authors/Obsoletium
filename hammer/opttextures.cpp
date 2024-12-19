@@ -38,7 +38,7 @@ COPTTextures::~COPTTextures()
 
 void COPTTextures::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COPTTextures)
 	DDX_Control(pDX, IDC_TEXTUREFILES, m_TextureFiles);
 	DDX_Control(pDX, IDC_BRIGHTNESS, m_cBrightness);
@@ -66,7 +66,7 @@ END_MESSAGE_MAP()
 
 BOOL COPTTextures::OnInitDialog() 
 {
-	CPropertyPage::OnInitDialog();
+	__super::OnInitDialog();
 	
 	// load texture file list with options
 	int i;
@@ -161,7 +161,7 @@ void COPTTextures::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	if(pScrollBar == (CScrollBar*) &m_cBrightness)
 		SetModified();
 	
-	CPropertyPage::OnHScroll(nSBCode, nPos, pScrollBar);
+	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 BOOL COPTTextures::OnApply() 
@@ -190,7 +190,7 @@ BOOL COPTTextures::OnApply()
 
 	Options.PerformChanges(COptions::secTextures);
 
-	return CPropertyPage::OnApply();
+	return __super::OnApply();
 }
 
 void GetDirectory(char *pDest, const char *pLongName)
@@ -383,7 +383,7 @@ BOOL COPTTextures::OnSetActive( void )
 		m_pMaterialConfig = pConfig;
 	}
 
-	return CPropertyPage::OnSetActive();
+	return __super::OnSetActive();
 }
 
 

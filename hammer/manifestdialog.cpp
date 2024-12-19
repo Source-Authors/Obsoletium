@@ -40,7 +40,7 @@ CManifestMove::~CManifestMove()
 //-----------------------------------------------------------------------------
 void CManifestMove::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MANIFEST_FILENAME, m_FileNameControl);
 	DDX_Control(pDX, IDC_MANIFEST_CENTER_AROUND_BRUSH, m_CenterContentsControl);
 	DDX_Control(pDX, IDC_MANIFEST_NAME2, m_FriendlyNameControl);
@@ -59,7 +59,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 BOOL CManifestMove::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_FileNameControl.SetWindowText( "" );
 
@@ -79,7 +79,7 @@ void CManifestMove::OnOK()
 {
 	char		FullFileName[ MAX_PATH ];
 
-	CDialog::OnOK();
+	__super::OnOK();
 
 	m_FriendlyNameControl.GetWindowText( m_FriendlyName );
 	m_FileNameControl.GetWindowText( m_FileName );
@@ -930,7 +930,7 @@ CManifestMapDlg::~CManifestMapDlg()
 //-----------------------------------------------------------------------------
 void CManifestMapDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MANIFEST_FRIENDLY_NAME, m_FriendlyNameControl);
 	DDX_Control(pDX, IDC_MANIFEST_FULL_FILENAME, m_FullFileNameCtrl);
 }
@@ -945,7 +945,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 BOOL CManifestMapDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_FriendlyNameControl.SetWindowText( m_pManifestMap->m_FriendlyName );
 	m_FullFileNameCtrl.SetWindowText( m_pManifestMap->m_AbsoluteMapFileName );
@@ -961,7 +961,7 @@ void CManifestMapDlg::OnOK()
 {
 	m_FriendlyNameControl.GetWindowText( m_pManifestMap->m_FriendlyName );
 
-	CDialog::OnOK();
+	__super::OnOK();
 }
 
 
@@ -999,7 +999,7 @@ CManifestCheckin::~CManifestCheckin()
 //-----------------------------------------------------------------------------
 void CManifestCheckin::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CHECKIN_LIST, m_CheckinListCtrl);
 	DDX_Control(pDX, IDC_CHECKIN_DESCRIPTION, m_DescriptionCtrl);
 }
@@ -1019,7 +1019,7 @@ BOOL CManifestCheckin::OnInitDialog()
 {
 	P4File_t	FileInfo;
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_CheckinListCtrl.SetExtendedStyle( m_CheckinListCtrl.GetExtendedStyle() | LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT );
 

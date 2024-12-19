@@ -47,7 +47,7 @@ BOOL CObjectPage::OnSetActive(void)
 
 	if (CObjectPage::s_bRESTRUCTURING || !GetActiveWorld())
 	{
-		return CPropertyPage::OnSetActive();
+		return __super::OnSetActive();
 	}
 
 	CObjectProperties *pParent = (CObjectProperties *)GetParent();
@@ -60,7 +60,7 @@ BOOL CObjectPage::OnSetActive(void)
 		pParent->LoadDataForPages(pParent->GetPageIndex(this));
 	}
 
-	return CPropertyPage::OnSetActive();
+	return __super::OnSetActive();
 }
 
 

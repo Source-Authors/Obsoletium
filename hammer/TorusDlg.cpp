@@ -91,7 +91,7 @@ void CTorusDlg::SaveValues()
 
 void CTorusDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CTorusDlg)
 	DDX_Control(pDX, IDC_ANGLESPIN, m_cStartAngleSpin);
 	DDX_Control(pDX, IDC_WALLWIDTHSPIN, m_cWallWidthSpin);
@@ -182,7 +182,7 @@ void CTorusDlg::OnUpdateWallwidth()
 
 BOOL CTorusDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	m_cArcSpin.SetRange(8, 360);
 	m_cSidesSpin.SetRange(3, 100);
@@ -203,7 +203,7 @@ void CTorusDlg::OnPaint()
 	CBrush black(RGB(0,0,0));
 	CBrush grey(RGB(128,128,128));
 
-	// Do not call CDialog::OnPaint() for painting messages
+	// Do not call __super::OnPaint() for painting messages
 	CRect rcPreview;
 	m_cPreview.GetWindowRect(&rcPreview);
 	ScreenToClient(&rcPreview);

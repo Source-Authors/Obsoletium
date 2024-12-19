@@ -288,7 +288,7 @@ void COP_Groups::OnSetFocus(CWnd *pOld)
 {
 	// fixme:
 	//UpdateGrouplist();
-	CPropertyPage::OnSetFocus(pOld);
+	__super::OnSetFocus(pOld);
 }
 
 void COP_Groups::OnSize( UINT nType, int cx, int cy )

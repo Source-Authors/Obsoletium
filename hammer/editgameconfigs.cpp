@@ -35,7 +35,7 @@ CEditGameConfigs::CEditGameConfigs(BOOL bSelectOnly,
 
 void CEditGameConfigs::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditGameConfigs)
 	DDX_Control(pDX, IDC_CONFIGS, m_cConfigs);
 	//}}AFX_DATA_MAP
@@ -193,7 +193,7 @@ void CEditGameConfigs::OnSelchangeConfigs()
 
 BOOL CEditGameConfigs::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if(m_bSelectOnly)
 	{

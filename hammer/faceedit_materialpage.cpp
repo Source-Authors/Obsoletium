@@ -175,7 +175,7 @@ BOOL CFaceEditMaterialPage::PreTranslateMessage( MSG *pMsg )
 	HACCEL hAccel = GetMainWnd()->GetAccelTable();
 	if( !(hAccel && ::TranslateAccelerator( GetMainWnd()->m_hWnd, hAccel, pMsg ) ) )
 	{
-		return CPropertyPage::PreTranslateMessage( pMsg );
+		return __super::PreTranslateMessage( pMsg );
 	}
 	else
 	{
@@ -1705,7 +1705,7 @@ BOOL CFaceEditMaterialPage::OnSetActive( void )
 	// Set the initial face edit tool state.
 	SetMaterialPageTool( MATERIALPAGETOOL_MATERIAL );
 
-	return CPropertyPage::OnSetActive();
+	return __super::OnSetActive();
 }
 
 //-----------------------------------------------------------------------------

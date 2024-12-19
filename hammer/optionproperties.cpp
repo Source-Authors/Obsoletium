@@ -58,5 +58,5 @@ void COptionProperties::DoStandardInit()
 
 void COptionProperties::OnClose() 
 {
-	CPropertySheet::OnClose();
+	__super::OnClose();
 }

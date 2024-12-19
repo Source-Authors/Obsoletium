@@ -173,12 +173,12 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 
 void CProcessWnd::OnTimer(UINT_PTR nIDEvent) 
 {
-	CWnd::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 }
 
 int CProcessWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-	if (CWnd::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	// create big CEdit in window
@@ -205,7 +205,7 @@ int CProcessWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CProcessWnd::OnSize(UINT nType, int cx, int cy) 
 {
-	CWnd::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 
 	// create big CEdit in window
 	CRect rctClient;

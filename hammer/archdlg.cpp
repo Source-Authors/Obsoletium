@@ -62,7 +62,7 @@ void CArchDlg::SaveValues()
 
 void CArchDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CArchDlg)
 	DDX_Control(pDX, IDC_ANGLESPIN, m_cStartAngleSpin);
@@ -122,7 +122,7 @@ void CArchDlg::OnUpdateWallwidth()
 
 BOOL CArchDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	m_cArcSpin.SetRange(8, 360);
 	m_cSidesSpin.SetRange(3, 100);
@@ -139,7 +139,7 @@ void CArchDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 	
-	// Do not call CDialog::OnPaint() for painting messages
+	// Do not call __super::OnPaint() for painting messages
 	CBrush black(RGB(0,0,0));
 	CBrush grey(RGB(128,128,128));
 

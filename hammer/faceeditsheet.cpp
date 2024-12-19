@@ -68,7 +68,7 @@ void CFaceEditSheet::Setup( void )
 //-----------------------------------------------------------------------------
 BOOL CFaceEditSheet::Create( CWnd *pParentWnd )
 {
-	if( !CPropertySheet::Create( pParentWnd ) )
+	if( !__super::Create( pParentWnd ) )
 		return FALSE;
 
 	//

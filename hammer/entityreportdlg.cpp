@@ -84,7 +84,7 @@ void CEntityReportDlg::SaveToIni()
 
 void CEntityReportDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEntityReportDlg)
 	DDX_Control(pDX, IDC_EXACTVALUE, m_cExact);
 	DDX_Control(pDX, IDC_FILTERCLASS, m_cFilterClass);
@@ -295,7 +295,7 @@ void CEntityReportDlg::OnProperties()
 
 void CEntityReportDlg::OnTimer(UINT nIDEvent) 
 {
-	CDialog::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 
 	// check filters
 	if(!m_bFilterTextChanged)
@@ -569,5 +569,6 @@ void CEntityReportDlg::OnDestroy()
 {
 	SaveToIni();
 	s_pDlg = NULL;
+	__super::OnDestroy();
 	delete this;
 }

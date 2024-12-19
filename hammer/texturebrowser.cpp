@@ -84,7 +84,7 @@ void CTextureBrowser::OnSize(UINT nType, int cx, int cy)
 {
 	if (nType == SIZE_MINIMIZED || !IsWindow(m_cTextureWindow.m_hWnd))
 	{
-		CDialog::OnSize(nType, cx, cy);
+		__super::OnSize(nType, cx, cy);
 		return;
 	}
 	
@@ -175,7 +175,7 @@ void CTextureBrowser::OnSize(UINT nType, int cx, int cy)
 		}
 	}
 
-	CDialog::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 }
 
 
@@ -218,7 +218,7 @@ void CTextureBrowser::OnClose(void)
 {
 	WriteSettings();
 	SaveAndExit();
-	CDialog::OnCancel();
+	__super::OnCancel();
 }
 
 
@@ -229,7 +229,7 @@ void CTextureBrowser::OnCancel()
 {
 	WriteSettings();
 	SaveAndExit();
-	CDialog::OnCancel();
+	__super::OnCancel();
 }
 
 
@@ -283,7 +283,7 @@ void CTextureBrowser::OnSelendokTexturesize()
 //-----------------------------------------------------------------------------
 BOOL CTextureBrowser::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// Iterate all the active textures for debugging.
 	//int nCount = g_Textures.GetActiveTextureCount();
@@ -485,7 +485,7 @@ void CTextureBrowser::OnTimer(UINT_PTR nIDEvent)
 		SetTimer(nIDEvent, 500, NULL);
 	}
 
-	CDialog::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 }
 
 

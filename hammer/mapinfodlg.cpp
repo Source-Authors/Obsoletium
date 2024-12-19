@@ -173,7 +173,7 @@ void CMapInfoDlg::CountTexture(IEditorTexture *pTex)
 //-----------------------------------------------------------------------------
 void CMapInfoDlg::DoDataExchange(CDataExchange *pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMapInfoDlg)
 	DDX_Control(pDX, IDC_FACES, m_Faces);
 	DDX_Control(pDX, IDC_SOLIDS, m_Solids);
@@ -192,7 +192,7 @@ void CMapInfoDlg::DoDataExchange(CDataExchange *pDX)
 //-----------------------------------------------------------------------------
 BOOL CMapInfoDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	m_uSolidCount = 0;
 	m_uPointEntityCount = 0;
