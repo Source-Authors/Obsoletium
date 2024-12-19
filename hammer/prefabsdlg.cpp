@@ -33,7 +33,7 @@ CPrefabsDlg::CPrefabsDlg(CWnd* pParent /*=NULL*/)
 
 void CPrefabsDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPrefabsDlg)
 	DDX_Control(pDX, IDC_OBJECTS, m_Objects);
 	DDX_Control(pDX, IDC_OBJECTNOTES, m_ObjectNotes);
@@ -564,7 +564,7 @@ void CPrefabsDlg::OnRemovelibrary()
 
 BOOL CPrefabsDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	SetCurObject(-1);
 
@@ -619,5 +619,5 @@ void CPrefabsDlg::OnClose()
 		pLibrary->Save();
 	}
 	
-	CDialog::OnClose();
+	__super::OnClose();
 }

@@ -36,7 +36,7 @@ CMapDiffDlg::CMapDiffDlg(CWnd* pParent )
 
 void CMapDiffDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	DDX_Check(pDX, IDC_SIMILARCHECK, m_bCheckSimilar);
 	DDX_Control(pDX, IDC_MAPNAME, m_mapName);
@@ -159,6 +159,7 @@ void CMapDiffDlg::OnOK()
 //-----------------------------------------------------------------------------
 void CMapDiffDlg::OnDestroy()
 {
+	__super::OnDestroy();
 	delete this;
 	s_pDlg = NULL;
 	s_pCurrentMap = NULL;

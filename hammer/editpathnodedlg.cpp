@@ -34,7 +34,7 @@ CEditPathNodeDlg::CEditPathNodeDlg(CWnd* pParent /*=NULL*/)
 
 void CEditPathNodeDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditPathNodeDlg)
 	DDX_Check(pDX, IDC_RETRIGGER, m_bRetrigger);
 	DDX_Text(pDX, IDC_SPEED, m_iSpeed);

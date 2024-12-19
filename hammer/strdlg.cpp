@@ -38,7 +38,7 @@ CStrDlg::CStrDlg(DWORD dwFlags, LPCTSTR pszString, LPCTSTR pszPrompt,
 
 void CStrDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_PROMPT, m_strPrompt);
 	DDX_Text(pDX, IDC_EDIT, m_string);
 	DDX_Control(pDX, IDC_EDIT, m_cEdit);
@@ -64,7 +64,7 @@ void CStrDlg::SetRange(int iLow, int iHigh, int iIncrement_)
 
 BOOL CStrDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if(dwFlags & Spin)	// enable spin
 	{

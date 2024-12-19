@@ -49,7 +49,7 @@ COPTBuild::COPTBuild()
 
 void COPTBuild::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COPTBuild)
 	DDX_Control(pDX, IDC_BSPDIR, m_cBSPDir);
 	DDX_Control(pDX, IDC_VIS, m_cVIS);
@@ -176,7 +176,7 @@ void COPTBuild::UpdateConfigList()
 
 BOOL COPTBuild::OnInitDialog() 
 {
-	CPropertyPage::OnInitDialog();
+	__super::OnInitDialog();
 	
 	UpdateConfigList();
 	SetModified(TRUE);
@@ -188,7 +188,7 @@ BOOL COPTBuild::OnApply()
 {
 	SaveInfo(m_pConfig);
 	
-	return CPropertyPage::OnApply();
+	return __super::OnApply();
 }
 
 BOOL COPTBuild::HandleInsertParm(UINT nID)

@@ -73,7 +73,7 @@ void CAngleBox::OnMouseMove(UINT nFlags, CPoint point)
 		DrawAngleLine(&m_DragDC);
 	}
 
-	CWnd::OnMouseMove(nFlags, point);
+	__super::OnMouseMove(nFlags, point);
 }
 
 
@@ -100,7 +100,7 @@ void CAngleBox::OnLButtonUp(UINT nFlags, CPoint point)
 		GetParent()->PostMessage(ABN_CHANGED, GetDlgCtrlID(), 0);
 	}
 		
-	CWnd::OnLButtonUp(nFlags, point);
+	__super::OnLButtonUp(nFlags, point);
 }
 
 
@@ -118,7 +118,7 @@ void CAngleBox::OnLButtonDown(UINT nFlags, CPoint point)
 	m_bDragging = true;
 	SetCapture();
 
-	CWnd::OnLButtonDown(nFlags, point);
+	__super::OnLButtonDown(nFlags, point);
 
 	OnMouseMove(0, point);
 }

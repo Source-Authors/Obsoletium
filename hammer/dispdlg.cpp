@@ -54,7 +54,7 @@ CDispCreateDlg::CDispCreateDlg( CWnd *pParent ) :
 //-----------------------------------------------------------------------------
 BOOL CDispCreateDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// set the initial power "3"
 	SetDlgItemInt( ID_DISP_CREATE_POWER, 3 );
@@ -73,7 +73,7 @@ BOOL CDispCreateDlg::OnInitDialog(void)
 //-----------------------------------------------------------------------------
 void CDispCreateDlg::DoDataExchange( CDataExchange *pDX )
 {
-	CDialog::DoDataExchange( pDX );
+	__super::DoDataExchange( pDX );
 	//{{AFX_DATA_MAP(CDispCreateDlg)
 	DDX_Control( pDX, ID_DISP_CREATE_POWER_SPIN, m_spinPower );
 	DDX_Control( pDX, ID_DISP_CREATE_POWER, m_editPower );
@@ -121,7 +121,7 @@ CDispNoiseDlg::CDispNoiseDlg( CWnd *pParent ) :
 //-----------------------------------------------------------------------------
 BOOL CDispNoiseDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	//
 	// set min, max initially to zero!!
@@ -145,7 +145,7 @@ BOOL CDispNoiseDlg::OnInitDialog(void)
 //-----------------------------------------------------------------------------
 void CDispNoiseDlg::DoDataExchange( CDataExchange *pDX )
 {
-	CDialog::DoDataExchange( pDX );
+	__super::DoDataExchange( pDX );
 	//{{AFX_DATA_MAP(CDispNoiseDlg)
 	DDX_Control( pDX, ID_DISP_NOISE_MIN_SPIN, m_spinMin );
 	DDX_Control( pDX, ID_DISP_NOISE_MAX_SPIN, m_spinMax );
@@ -255,7 +255,7 @@ BOOL CDispPaintDistDlg::OnInitDialog( void )
 {
 	static bool bInit = false;
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	CToolDisplace *pTool = GetDisplacementTool();
 	if ( !pTool )
@@ -648,7 +648,7 @@ void CDispPaintDistDlg::DisableBrushTypeButtons( void )
 //-----------------------------------------------------------------------------
 void CDispPaintDistDlg::DoDataExchange( CDataExchange *pDX )
 {
-	CDialog::DoDataExchange( pDX );
+	__super::DoDataExchange( pDX );
 	//{{AFX_DATA_MAP(CDispPaintDistDlg)
 	DDX_Control( pDX, ID_DISP_PAINT_DIST_SLIDER_DISTANCE, m_sliderDistance );
 	DDX_Control( pDX, ID_DISP_PAINT_DIST_SLIDER_RADIUS, m_sliderRadius );
@@ -1118,7 +1118,7 @@ BOOL CPaintSculptDlg::OnInitDialog( )
 {
 	static bool bInit = false;
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	CToolDisplace *pTool = GetDisplacementTool();
 	if ( !pTool )
@@ -1193,7 +1193,7 @@ BOOL CPaintSculptDlg::OnInitDialog( )
 //-----------------------------------------------------------------------------
 void CPaintSculptDlg::DoDataExchange( CDataExchange *pDX )
 {
-	CDialog::DoDataExchange( pDX );
+	__super::DoDataExchange( pDX );
 	//{{AFX_DATA_MAP(CPaintSculptDlg)
 	//}}AFX_DATA_MAP
 	DDX_Control(pDX, IDC_SCULPT_OPTIONS_LOC, m_SculptOptionsLoc);
@@ -1459,7 +1459,7 @@ BOOL CDispPaintDataDlg::OnInitDialog(void)
 {
 	static bool bInit = false;
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if( !bInit )
 	{
@@ -1670,7 +1670,7 @@ bool CDispPaintDataDlg::InitComboBoxType( void )
 //-----------------------------------------------------------------------------
 void CDispPaintDataDlg::DoDataExchange( CDataExchange *pDX )
 {
-	CDialog::DoDataExchange( pDX );
+	__super::DoDataExchange( pDX );
 	//{{AFX_DATA_MAP(CDispPaintDistDlg)
 	DDX_Control( pDX, ID_DISP_PAINT_DATA_SLIDER_VALUE, m_sliderValue );
 	DDX_Control( pDX, ID_DISP_PAINT_DATA_EDIT_VALUE, m_editValue );

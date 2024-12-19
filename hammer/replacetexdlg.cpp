@@ -44,7 +44,7 @@ CReplaceTexDlg::CReplaceTexDlg(int nSelected, CWnd* pParent /*=NULL*/)
 
 void CReplaceTexDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CReplaceTexDlg)
 	DDX_Control(pDX, IDC_FIND, m_cFind);
 	DDX_Control(pDX, IDC_REPLACE, m_cReplace);
@@ -137,7 +137,7 @@ void CReplaceTexDlg::OnUpdateReplace()
 
 BOOL CReplaceTexDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if(!m_nSelected)
 	{

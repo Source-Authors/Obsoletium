@@ -323,7 +323,7 @@ void CMessageWnd::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		ScrollWindow(-iPos, 0);
 		UpdateWindow();
 	}
-	CMDIChildWnd::OnHScroll(nSBCode, nPos, pScrollBar);
+	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 
@@ -369,7 +369,7 @@ void CMessageWnd::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		UpdateWindow();
 	}
 
-	CMDIChildWnd::OnVScroll(nSBCode, nPos, pScrollBar);
+	__super::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 
@@ -377,7 +377,7 @@ void CMessageWnd::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 //-----------------------------------------------------------------------------
 void CMessageWnd::OnSize(UINT nType, int cx, int cy) 
 {
-	CMDIChildWnd::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 	CalculateScrollSize();	
 }
 
@@ -409,7 +409,7 @@ void CMessageWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		break;
 	}
 
-	CMDIChildWnd::OnKeyDown(nChar, nRepCnt, nFlags);
+	__super::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 

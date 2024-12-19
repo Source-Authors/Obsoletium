@@ -33,7 +33,7 @@ CRunMapCfgDlg::CRunMapCfgDlg(CWnd* pParent /*=NULL*/)
 
 void CRunMapCfgDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CRunMapCfgDlg)
 	DDX_Control(pDX, IDC_CONFIGURATIONS, m_cConfigurations);
 	//}}AFX_DATA_MAP
@@ -121,7 +121,7 @@ void CRunMapCfgDlg::OnRename()
 
 BOOL CRunMapCfgDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// add the configurations into the list
 	int iSize = m_pApp->m_CmdSequences.GetSize();

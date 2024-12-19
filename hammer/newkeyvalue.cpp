@@ -31,7 +31,7 @@ CNewKeyValue::CNewKeyValue(CWnd* pParent /*=NULL*/)
 
 void CNewKeyValue::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CNewKeyValue)
 	DDX_Text(pDX, IDC_KEY, m_Key);
 	DDV_MaxChars(pDX, m_Key, 31);

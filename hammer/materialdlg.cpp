@@ -78,7 +78,7 @@ BOOL CFaceSmoothingDlg::OnInitDialog( void )
 {
 	static bool bInit = false;
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if ( bInit )
 	{
@@ -369,7 +369,7 @@ CFaceSmoothingVisualDlg::~CFaceSmoothingVisualDlg()
 //-----------------------------------------------------------------------------
 BOOL CFaceSmoothingVisualDlg::OnInitDialog( void )
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 //	SetWindowPos( &wndTop, m_DialogPosRect.left, m_DialogPosRect.top,
 //		m_DialogPosRect.Width(), m_DialogPosRect.Height(), SWP_NOZORDER );

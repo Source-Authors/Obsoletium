@@ -1500,7 +1500,7 @@ BOOL CFaceEditDispPage::OnSetActive( void )
 	// set the selection as the tool to use!!!
 	OnButtonSelect();
 
-	return CPropertyPage::OnSetActive();
+	return __super::OnSetActive();
 }
 
 
@@ -1521,7 +1521,7 @@ BOOL CFaceEditDispPage::PreTranslateMessage( MSG *pMsg )
 	HACCEL hAccel = GetMainWnd()->GetAccelTable();
 	if( !(hAccel && ::TranslateAccelerator( GetMainWnd()->m_hWnd, hAccel, pMsg ) ) )
 	{
-		return CPropertyPage::PreTranslateMessage( pMsg );
+          return __super::PreTranslateMessage(pMsg);
 	}
 	else
 	{

@@ -31,7 +31,7 @@ CMapErrorsDlg::CMapErrorsDlg(CWnd* pParent /*=NULL*/)
 
 void CMapErrorsDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMapErrorsDlg)
 	DDX_Control(pDX, IDC_ERRORS, m_cErrors);
 	//}}AFX_DATA_MAP
@@ -63,7 +63,7 @@ void CMapErrorsDlg::OnView()
 
 BOOL CMapErrorsDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// fill list with errors
 	error3d * pError = Enum3dErrors(TRUE);

@@ -42,7 +42,7 @@ CProgressDlg::~CProgressDlg()
 BOOL CProgressDlg::DestroyWindow()
 {
     ReEnableParent();
-    return CDialog::DestroyWindow();
+    return __super::DestroyWindow();
 }
 
 void CProgressDlg::ReEnableParent()
@@ -67,7 +67,7 @@ BOOL CProgressDlg::Create(CWnd *pParent)
       m_bParentDisabled = TRUE;
     }
 
-    if(!CDialog::Create(CProgressDlg::IDD,pParent))
+    if(!__super::Create(CProgressDlg::IDD,pParent))
     {
       ReEnableParent();
       return FALSE;
@@ -78,7 +78,7 @@ BOOL CProgressDlg::Create(CWnd *pParent)
 
 void CProgressDlg::DoDataExchange(CDataExchange* pDX)
 {
-    CDialog::DoDataExchange(pDX);
+    __super::DoDataExchange(pDX);
     //{{AFX_DATA_MAP(CProgressDlg)
     DDX_Control(pDX, CG_IDC_PROGDLG_PROGRESS, m_Progress);
     //}}AFX_DATA_MAP
@@ -200,7 +200,7 @@ void CProgressDlg::UpdatePercent(int nNewPos)
 
 BOOL CProgressDlg::OnInitDialog() 
 {
-    CDialog::OnInitDialog();
+    __super::OnInitDialog();
     m_Progress.SetRange(m_nLower,m_nUpper);
     m_Progress.SetStep(m_nStep);
     m_Progress.SetPos(m_nLower);

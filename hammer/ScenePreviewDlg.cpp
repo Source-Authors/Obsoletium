@@ -62,7 +62,7 @@ void CScenePreviewDlg::EndThread()
 
 BOOL CScenePreviewDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// Setup the control showing the scene name.
 	CString str;
@@ -193,7 +193,7 @@ LRESULT CScenePreviewDlg::DefWindowProc( UINT message, WPARAM wParam, LPARAM lPa
 		return 0;
 	}
 	
-	return CDialog::DefWindowProc( message, wParam, lParam );
+	return __super::DefWindowProc( message, wParam, lParam );
 }
 
 

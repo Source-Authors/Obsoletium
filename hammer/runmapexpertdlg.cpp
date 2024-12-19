@@ -35,7 +35,7 @@ CRunMapExpertDlg::CRunMapExpertDlg(const CString& mapName, CWnd* pParent /*=NULL
 
 void CRunMapExpertDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CRunMapExpertDlg)
 	DDX_Control(pDX, IDC_USEPROCESSWND, m_cUseProcessWnd);
 	DDX_Control(pDX, IDC_CONFIGURATIONS, m_cCmdSequences);
@@ -556,7 +556,7 @@ void CRunMapExpertDlg::InitSequenceList()
 
 BOOL CRunMapExpertDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	CString title;
 	GetWindowText(title);
@@ -583,7 +583,7 @@ void CRunMapExpertDlg::OnOK()
 	
 	pApp->SaveSequences();
 
-	CDialog::OnOK();
+	__super::OnOK();
 }
 
 void CRunMapExpertDlg::SaveCommandsToSequence()
@@ -659,5 +659,5 @@ void CRunMapExpertDlg::OnCancel()
 	CHammer *pApp = (CHammer*) AfxGetApp();
 	pApp->SaveSequences();
 
-	CDialog::OnCancel();
+	__super::OnCancel();
 }

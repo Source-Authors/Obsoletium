@@ -181,7 +181,7 @@ COPTConfigs::~COPTConfigs(void)
 //-----------------------------------------------------------------------------
 void COPTConfigs::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COPTConfigs)
 	DDX_Control(pDX, IDC_MAPDIR, m_cMapDir);
 	DDX_Control(pDX, IDC_GAMEEXEDIR, m_cGameExeDir);
@@ -624,7 +624,7 @@ void COPTConfigs::UpdateConfigList()
 //-----------------------------------------------------------------------------
 BOOL COPTConfigs::OnInitDialog(void) 
 {
-	CPropertyPage::OnInitDialog();
+	__super::OnInitDialog();
 
 	int nIndex;
 
@@ -702,7 +702,7 @@ BOOL COPTConfigs::OnApply(void)
 
 	Options.PerformChanges(COptions::secConfigs);
 	
-	return CPropertyPage::OnApply();
+	return __super::OnApply();
 }
 
 

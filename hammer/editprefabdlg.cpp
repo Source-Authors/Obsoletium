@@ -36,7 +36,7 @@ CEditPrefabDlg::CEditPrefabDlg(CWnd* pParent /*=NULL*/)
 
 void CEditPrefabDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditPrefabDlg)
 	DDX_Control(pDX, IDC_CREATEIN, m_CreateIn);
 	DDX_Control(pDX, IDC_NAME, m_Name);
@@ -73,7 +73,7 @@ void CEditPrefabDlg::EnableLibrary(BOOL b)
 
 BOOL CEditPrefabDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	if(!m_bEnableLibrary)
 	{

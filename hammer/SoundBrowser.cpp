@@ -49,7 +49,7 @@ void CSoundBrowser::SaveValues()
 
 void CSoundBrowser::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CSoundBrowser)
 	DDX_Control(pDX, IDC_SOUND_LIST, m_SoundList);
 	DDX_Text(pDX, IDC_SOUNDNAME_SELECTED, m_SoundNameSelected);
@@ -83,7 +83,7 @@ END_MESSAGE_MAP()
 
 BOOL CSoundBrowser::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_cFilter.SubclassDlgItem(IDC_SOUND_FILTER, this);
 	for ( int i = 0; i < m_nFilterHistory; ++i )
@@ -116,7 +116,7 @@ BOOL CSoundBrowser::OnInitDialog()
 void CSoundBrowser::OnClose(void)
 {
 	Shutdown();
-	CDialog::OnClose();
+	__super::OnClose();
 }
 
 
@@ -268,7 +268,7 @@ void CSoundBrowser::OnTimer(UINT_PTR nIDEvent)
 		SetTimer(nIDEvent, 500, NULL);
 	}
 
-	CDialog::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 }
 
 //-----------------------------------------------------------------------------
@@ -361,7 +361,7 @@ void CSoundBrowser::OnRefreshSounds()
 
 INT_PTR CSoundBrowser::DoModal() 
 {	
-	INT_PTR nRet = CDialog::DoModal();
+	INT_PTR nRet = __super::DoModal();
 	Shutdown();
 	return nRet;
 }

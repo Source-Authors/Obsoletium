@@ -45,7 +45,7 @@ CRunMap::CRunMap(const CString& mapName, CWnd* pParent /*=NULL*/)
 
 void CRunMap::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CRunMap)
 	DDX_Check(pDX, IDC_NOQUAKE, m_bNoQuake);
 	DDX_Text(pDX, IDC_QUAKEPARMS, m_strQuakeParms);
@@ -86,7 +86,7 @@ void CRunMap::OnExpert()
 
 BOOL CRunMap::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	CString title;
 	GetWindowText(title);

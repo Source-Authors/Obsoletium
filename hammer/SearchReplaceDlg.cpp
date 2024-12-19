@@ -345,7 +345,7 @@ CSearchReplaceDlg::CSearchReplaceDlg(CWnd *pParent)
 //-----------------------------------------------------------------------------
 BOOL CSearchReplaceDlg::Create(CWnd *pwndParent)
 {
-	return CDialog::Create(CSearchReplaceDlg::IDD, pwndParent);
+	return __super::Create(CSearchReplaceDlg::IDD, pwndParent);
 }
 
 
@@ -355,7 +355,7 @@ BOOL CSearchReplaceDlg::Create(CWnd *pwndParent)
 //-----------------------------------------------------------------------------
 void CSearchReplaceDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CSearchReplaceDlg)
 	DDX_Check(pDX, IDC_VISIBLES_ONLY, m_bVisiblesOnly);
@@ -595,5 +595,5 @@ void CSearchReplaceDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 		UpdateData(FALSE);
 	}
 
-	CDialog::OnShowWindow(bShow, nStatus);
+	__super::OnShowWindow(bShow, nStatus);
 }
