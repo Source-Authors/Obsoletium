@@ -52,6 +52,7 @@ enum DirIndex_t
 class CCommandSequence
 {
 	public:
+		CCommandSequence(){ memset( m_szName, 0, sizeof(m_szName) ); }
 
 		CCommandArray m_Commands;
 		char m_szName[128];

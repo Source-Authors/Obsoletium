@@ -99,8 +99,8 @@ void EditorUtil_ConvertPath(CString &str, bool bSave);
 
 static bool bMakeLib = false;
 
-static float fSequenceVersion = 0.2f;
-static char *pszSequenceHdr = "Worldcraft Command Sequences\r\n\x1a";
+static constexpr inline float fSequenceVersion = 0.2f;
+static constexpr char pszSequenceHdr[] = "Worldcraft Command Sequences\r\n\x1a";
 
 
 CHammer theApp;
@@ -1816,26 +1816,28 @@ void CHammer::LoadSequences(void)
 	// skip past header & version
 	float fThisVersion;
 
-	file.seekg(strlen(pszSequenceHdr));
+	file.seekg(std::size(pszSequenceHdr) - 1);
 	file.read((char*)&fThisVersion, sizeof fThisVersion);
 
 	// read number of sequences
 	DWORD dwSize;
-	int nSeq;
-
 	file.read((char*)&dwSize, sizeof dwSize);
-	nSeq = dwSize;
 
-	for(int i = 0; i < nSeq; i++)
+	intp nSeq = dwSize;
+
+	for(intp i = 0; i < nSeq; i++)
 	{
 		CCommandSequence *pSeq = new CCommandSequence;
-		file.read(pSeq->m_szName, 128);
+		file.read(pSeq->m_szName, std::size(pSeq->m_szName));
 
 		// read commands in sequence
 		file.read((char*)&dwSize, sizeof dwSize);
-		int nCmd = dwSize;
+
+		intp nCmd = dwSize;
 		CCOMMAND cmd;
-		for(int iCmd = 0; iCmd < nCmd; iCmd++)
+		memset( &cmd, 0, sizeof(cmd) );
+
+		for(intp iCmd = 0; iCmd < nCmd; iCmd++)
 		{
 			if(fThisVersion < 0.2f)
 			{
@@ -1866,28 +1868,28 @@ void CHammer::SaveSequences(void)
 	std::ofstream file( szFullPath, std::ios::out | std::ios::binary );
 
 	// write header
-	file.write(pszSequenceHdr, Q_strlen(pszSequenceHdr));
+	file.write(pszSequenceHdr, std::size(pszSequenceHdr) - 1);
 	// write out version
 	file.write((char*)&fSequenceVersion, sizeof(float));
 
 	// write out each sequence..
-	int i, nSeq = m_CmdSequences.GetSize();
+	intp nSeq = m_CmdSequences.GetSize();
 	DWORD dwSize = nSeq;
 	file.write((char*)&dwSize, sizeof dwSize);
-	for(i = 0; i < nSeq; i++)
+	for(intp i = 0; i < nSeq; i++)
 	{
 		CCommandSequence *pSeq = m_CmdSequences[i];
 
 		// write name of sequence
-		file.write(pSeq->m_szName, 128);
+		file.write(pSeq->m_szName, std::size(pSeq->m_szName));
 		// write number of commands
-		int nCmd = pSeq->m_Commands.GetSize();
+		intp nCmd = pSeq->m_Commands.GetSize();
 		dwSize = nCmd;
 		file.write((char*)&dwSize, sizeof dwSize);
 		// write commands .. 
-		for(int iCmd = 0; iCmd < nCmd; iCmd++)
+		for(intp iCmd = 0; iCmd < nCmd; iCmd++)
 		{
-			CCOMMAND &cmd = pSeq->m_Commands[iCmd];
+			const CCOMMAND &cmd = pSeq->m_Commands[iCmd];
 			file.write((char*)&cmd, sizeof cmd);
 		}
 	}

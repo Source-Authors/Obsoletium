@@ -68,7 +68,7 @@ void CRunMapCfgDlg::OnNew()
 
 	// add it to the list in the app
 	CCommandSequence *pSeq = new CCommandSequence;
-	strcpy(pSeq->m_szName, dlg.m_string);
+	V_strcpy_safe(pSeq->m_szName, dlg.m_string);
 	m_pApp->m_CmdSequences.Add(pSeq);
 
 	AddSequenceToList(-1, pSeq);
@@ -86,7 +86,7 @@ void CRunMapCfgDlg::OnRemove()
 		m_cConfigurations.GetItemDataPtr(iSel);
 
 	// find it in the app's array
-	for(int i = 0; i < m_pApp->m_CmdSequences.GetSize(); i++)
+	for(intp i = 0; i < m_pApp->m_CmdSequences.GetSize(); i++)
 	{
 		if(pSeq == m_pApp->m_CmdSequences[i])
 		{
@@ -113,7 +113,7 @@ void CRunMapCfgDlg::OnRename()
 	if(dlg.DoModal() == IDCANCEL)
 		return;
 
-	strcpy(pSeq->m_szName, dlg.m_string);
+	V_strcpy_safe(pSeq->m_szName, dlg.m_string);
 
 	m_cConfigurations.DeleteString(iSel);
 	AddSequenceToList(iSel, pSeq);
@@ -124,12 +124,12 @@ BOOL CRunMapCfgDlg::OnInitDialog()
 	__super::OnInitDialog();
 
 	// add the configurations into the list
-	int iSize = m_pApp->m_CmdSequences.GetSize();
-	for(int i = 0; i < iSize; i++)
+	intp iSize = m_pApp->m_CmdSequences.GetSize();
+	for(intp i = 0; i < iSize; i++)
 	{
 		CCommandSequence *pSeq = m_pApp->m_CmdSequences[i];
 		int iIndex = m_cConfigurations.AddString(pSeq->m_szName);
-		m_cConfigurations.SetItemDataPtr(iIndex, PVOID(pSeq));
+		m_cConfigurations.SetItemDataPtr(iIndex, pSeq);
 	}
 
 	return TRUE;
@@ -148,7 +148,7 @@ void CRunMapCfgDlg::OnCopy()
 
 	// add it to the list in the app
 	CCommandSequence *pSeq = new CCommandSequence;
-	strcpy(pSeq->m_szName, dlg.m_string);
+	V_strcpy_safe(pSeq->m_szName, dlg.m_string);
 	m_pApp->m_CmdSequences.Add(pSeq);
 
 	CCommandSequence *pSrcSeq = (CCommandSequence*) 

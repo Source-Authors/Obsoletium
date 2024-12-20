@@ -531,22 +531,22 @@ void CRunMapExpertDlg::InitSequenceList()
 	m_cCmdSequences.ResetContent();
 
 	// add the configurations into the list ..
-	int iSize = pApp->m_CmdSequences.GetSize();
+	intp iSize = pApp->m_CmdSequences.GetSize();
 
 	if(iSize == 0)
 	{
 		// add a default configuration
 		CCommandSequence *pSeq = new CCommandSequence;
-		strcpy(pSeq->m_szName, "Default");
+		V_strcpy_safe(pSeq->m_szName, "Default");
 		((CHammer*)AfxGetApp())->m_CmdSequences.Add(pSeq);
 		iSize = 1;
 	}
 
-	for(int i = 0; i < iSize; i++)
+	for(intp i = 0; i < iSize; i++)
 	{
 		CCommandSequence *pSeq = pApp->m_CmdSequences[i];
 		int iIndex = m_cCmdSequences.AddString(pSeq->m_szName);
-		m_cCmdSequences.SetItemDataPtr(iIndex, PVOID(pSeq));
+		m_cCmdSequences.SetItemDataPtr(iIndex, pSeq);
 	}
 	
 	m_pActiveSequence = NULL;
