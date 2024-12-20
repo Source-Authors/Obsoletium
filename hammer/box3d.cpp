@@ -370,12 +370,14 @@ void Box3D::GetStatusString(char *pszBuf)
 	}
 
 	Vector size = maxs - mins;
-	Vector center = ( maxs + mins ) * 0.5f;
 
 	if ( !IsTranslating() || m_TranslateMode == modeScale || m_TranslateMode == modeMove )
 	{
 		if (!IsEmpty())
 		{
+			// dimhotepus: Moved near usage.
+			Vector center = ( maxs + mins ) * 0.5f;
+
 			if ( IsTranslating() && m_TranslateMode == modeMove )
 			{
 				center = m_vTranslationFixPoint;
@@ -765,7 +767,8 @@ void Box3D::UpdateTransformMatrix()
 	}
 	else if ( m_TranslateMode == modeRotate )
 	{
-		QAngle angle = *(QAngle*)&m_vTranslation; // buuuhhh
+		// Fix UB on cast Vector to QAngle.
+		const QAngle angle(m_vTranslation.x, m_vTranslation.y, m_vTranslation.z);
  		m_TransformMatrix.SetupMatrixOrgAngles( vec3_origin, angle );
 	}
 
