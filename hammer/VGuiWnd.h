@@ -1,6 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 #pragma once
-#include "afxwin.h"
+
+#include <afxwin.h>
 #include "color.h"
 
 namespace vgui
