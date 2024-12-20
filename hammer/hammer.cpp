@@ -748,7 +748,9 @@ void CHammer::OpenURL(const char *pszURL, HWND hwnd)
 {
 	if (HINSTANCE(32) > ::ShellExecute(hwnd, "open", pszURL, NULL, NULL, 0))
 	{
-		AfxMessageBox("The website couldn't be opened.");
+		CString format;
+		format.Format("The website '%s' couldn't be opened.", pszURL);
+		AfxMessageBox(format, MB_ICONEXCLAMATION);
 	}
 }
 
