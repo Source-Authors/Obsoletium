@@ -217,7 +217,7 @@ bool IsRunningInEngine();
 // event update system - lets you check for events such as gemoetry modification for updating stuff.
 void SignalUpdate(int ev);									// EVTYPE_xx
 int GetUpdateCounter(int ev);									// return timestamp
-float GetUpdateTime(int ev);									// return floating point time event was signalled
+double GetUpdateTime(int ev);									// return floating point time event was signalled
 void SignalGlobalUpdate(void);								// flag ALL events, such as on map load
 
 #define EVTYPE_FACE_CHANGED 0
