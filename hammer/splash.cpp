@@ -74,69 +74,60 @@ unsigned char g_CantTouchThis[] =
 
 #include <mmsystem.h> 
 
-int m_uiMIDIPlayerID = 0;
-
-void CloseMIDIPlayer()
+static void CloseMIDIPlayer(MCIDEVICEID deviceId)
 {
 	// Close the MIDI player, if possible
-	if (m_uiMIDIPlayerID != 0)
+	if (deviceId != 0)
 	{
-	  mciSendCommand(m_uiMIDIPlayerID, MCI_CLOSE, 0, NULL);
-	  m_uiMIDIPlayerID = 0;
+	  mciSendCommand(deviceId, MCI_CLOSE, 0, NULL);
 	}
 }
-void PlayMIDISong(LPTSTR szMIDIFileName, BOOL bRestart)
+static MCIDEVICEID PlayMIDISong(LPCTSTR szMIDIFileName, BOOL bRestart)
 {
-	// See if the MIDI player needs to be opened
-	if (m_uiMIDIPlayerID == 0)
-	{
-	  // Open the MIDI player by specifying the device and filename
-	  MCI_OPEN_PARMS mciOpenParms;
-	  mciOpenParms.lpstrDeviceType = "sequencer";
-	  mciOpenParms.lpstrElementName = szMIDIFileName;
-	  if (mciSendCommand(NULL, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
-		(DWORD)&mciOpenParms) == 0)
-		// Get the ID for the MIDI player
-		m_uiMIDIPlayerID = mciOpenParms.wDeviceID;
-	  else
-		// There was a problem, so just return
-		return;
-	}
+	MCIDEVICEID deviceId = 0;
 
-	// Restart the MIDI song, if necessary
-	if (bRestart)
-	{
-	  MCI_SEEK_PARMS mciSeekParms;
-	  if (mciSendCommand(m_uiMIDIPlayerID, MCI_SEEK, MCI_SEEK_TO_START,
-		(DWORD)&mciSeekParms) != 0)
-		// There was a problem, so close the MIDI player
-		CloseMIDIPlayer();
-	}
+	// See if the MIDI player needs to be opened
+	// Open the MIDI player by specifying the device and filename
+	MCI_OPEN_PARMS mciOpenParms = {};
+	mciOpenParms.lpstrDeviceType = "sequencer";
+	mciOpenParms.lpstrElementName = szMIDIFileName;
+	if (mciSendCommand(NULL, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
+		(DWORD_PTR)&mciOpenParms) == 0)
+		// Get the ID for the MIDI player
+		deviceId = mciOpenParms.wDeviceID;
+	else
+		// There was a problem, so just return
+		return deviceId;
 
 	// Play the MIDI song
-	MCI_PLAY_PARMS mciPlayParms;
-	if (mciSendCommand(m_uiMIDIPlayerID, MCI_PLAY, MCI_WAIT,
-	  (DWORD)&mciPlayParms) != 0)
-	  // There was a problem, so close the MIDI player
-	  CloseMIDIPlayer();
+	MCI_PLAY_PARMS mciPlayParms = {};
+	mciSendCommand(deviceId, MCI_PLAY, MCI_WAIT, (DWORD_PTR)&mciPlayParms);
+
+	return deviceId;
 }
 
-void CantTouchThisThread( void * )
+unsigned __stdcall CantTouchThisThread( void * )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("HammerTime!");
 
-	int file = _open( "hamrtime.mid", _O_BINARY| _O_CREAT | _O_RDWR, _S_IREAD | _S_IWRITE );
+	constexpr char songName[] = "hamrtime.mid";
+
+	int file = _open( songName, _O_BINARY| _O_CREAT | _O_RDWR, _S_IREAD | _S_IWRITE );
 	if ( file != -1 )
 	{
 		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer time!" );
 		// dimhotepus: Comment as threaded access to control is not allowed.
 		//SetStatusText(SBI_PROMPT, "Stop, Hammer time!");
-		bool fPlay = ( _write( file, g_CantTouchThis, sizeof( g_CantTouchThis ) ) == sizeof( g_CantTouchThis ) );
+
+		bool fPlay = _write( file, g_CantTouchThis, sizeof( g_CantTouchThis ) ) == sizeof( g_CantTouchThis );
 		_close( file );
-		PlayMIDISong("hamrtime.mid", false );
-		CloseMIDIPlayer();
-		_unlink( "hamrtime.mid" );
+		if (fPlay)
+		{
+			CloseMIDIPlayer( PlayMIDISong( songName, false ) );
+		}
+		_unlink( songName );
+
 		// dimhotepus: Comment as threaded access to control is not allowed.
 		//SetStatusText(SBI_PROMPT, "You can't touch this");
 		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer" );
@@ -144,6 +135,8 @@ void CantTouchThisThread( void * )
 		// Sleep(1500);
 		//SetStatusText(SBI_PROMPT, "For Help, press F1");
 	}
+
+	return 0;
 }
 
 void CantTouchThis()
@@ -151,7 +144,7 @@ void CantTouchThis()
 	if ( !AfxGetApp()->GetProfileInt("General", "Hammer time", 0))
 	{
 		AfxGetApp()->WriteProfileInt("General", "Hammer time", 1);
-		_beginthread( CantTouchThisThread, 0, NULL );
+		_beginthreadex( nullptr, 0, CantTouchThisThread, 0, 0, nullptr );
 	}
 }
 
