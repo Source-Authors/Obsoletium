@@ -17,7 +17,7 @@
 class CFilterControl : public CHammerBar
 {
 public:
-	CFilterControl() : CHammerBar() { bInitialized = FALSE; }
+	CFilterControl() : CHammerBar() { bInitialized = FALSE; m_bShowingAuto = FALSE; m_pDragImageList = nullptr; }
 	BOOL Create(CWnd *pParentWnd);
 
 	void UpdateGroupList(void);
