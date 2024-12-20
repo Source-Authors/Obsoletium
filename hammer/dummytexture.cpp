@@ -25,13 +25,15 @@ CDummyTexture::CDummyTexture(const char *pszName, TEXTUREFORMAT eFormat)
 {
 	if (pszName != NULL)
 	{
-		strcpy(m_szName, pszName);
+		V_strcpy_safe(m_szName, pszName);
 	}
 	else
 	{
-		strcpy(m_szName, "Missing texture");
+		V_strcpy_safe(m_szName, "Missing texture");
 	}
 
+	// dimhotepus: 0 termination.
+	m_szFileName[0] = '\0';
 	m_eTextureFormat = eFormat;
 }
 
