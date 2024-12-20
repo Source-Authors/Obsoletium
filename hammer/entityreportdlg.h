@@ -64,7 +64,7 @@ protected:
 	CString m_szFilterClass;
 
 	BOOL m_bFilterTextChanged;
-	DWORD m_dwFilterTime;
+	time_t m_dwFilterTime;
 
 	// Generated message map functions
 	//{{AFX_MSG(CEntityReportDlg)
@@ -76,7 +76,7 @@ protected:
 	afx_msg void OnChangeFiltervalue();
 	afx_msg void OnGoto();
 	afx_msg void OnProperties();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnEditchangeFilterclass();
 	afx_msg void OnFilterbyclass();
 	afx_msg void OnSelchangeFilterclass();
@@ -92,7 +92,7 @@ private:
 
 	CMapDoc *MarkSelectedEntities( void );
 
-	friend BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg);
+	friend BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx);
 };
 
 

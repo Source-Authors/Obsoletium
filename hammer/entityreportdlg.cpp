@@ -138,7 +138,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 void CEntityReportDlg::OnDelete(void)
 {
-	if (AfxMessageBox("Delete Objects?", MB_YESNO) == IDNO)
+	if (AfxMessageBox("Delete Objects?", MB_YESNO | MB_ICONQUESTION) == IDNO)
 	{
 		return;
 	}
@@ -293,7 +293,7 @@ void CEntityReportDlg::OnProperties()
 	}
 }
 
-void CEntityReportDlg::OnTimer(UINT nIDEvent) 
+void CEntityReportDlg::OnTimer(UINT_PTR nIDEvent) 
 {
 	__super::OnTimer(nIDEvent);
 
@@ -309,8 +309,11 @@ void CEntityReportDlg::OnTimer(UINT nIDEvent)
 	}
 }
 
-BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
+BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx)
 {
+	auto *pEntity = reinterpret_cast<CMapEntity *>(mp);
+	auto *pDlg = reinterpret_cast<CEntityReportDlg *>(ctx);
+
 	char szString[256];
 	
 	// nope.
@@ -337,10 +340,10 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 			return TRUE;
 		}
 	}
-		
+
 	const char* pszClassName = pEntity->GetClassName();
 
-	if ( pEntity && stricmp( pszClassName, "func_instance" ) == 0 )
+	if ( stricmp( pszClassName, "func_instance" ) == 0 )
 	{
 		CMapInstance	*pMapInstance = pEntity->GetChildOfType( ( CMapInstance * )NULL );
 		if ( pMapInstance )
@@ -350,7 +353,7 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 			{
 				CMapWorld	*pWorld = pMapDoc->GetMapWorld();
 
-				pWorld->EnumChildren(ENUMMAPCHILDRENPROC(AddEntityToList), DWORD(pDlg), MAPCLASS_TYPE(CMapEntity));
+				pWorld->EnumChildren(AddEntityToList, DWORD_PTR(pDlg), MAPCLASS_TYPE(CMapEntity));
 			}
 		}
 	}
@@ -383,7 +386,7 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 		bAdd = FALSE;
 
 	MDkeyvalue tmpkv;
-	for (int i = pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for (auto i = pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		// if filtering by keyvalue, check!
 		if (pDlg->m_bFilterByKeyvalue && !bAdd && !pDlg->m_szFilterValue.IsEmpty())
@@ -453,7 +456,7 @@ void CEntityReportDlg::UpdateEntityList(void)
 
 	// add items to list
 	CMapWorld *pWorld = m_pDoc->GetMapWorld();
-	pWorld->EnumChildren(ENUMMAPCHILDRENPROC(AddEntityToList), DWORD(this), MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(AddEntityToList, DWORD_PTR(this), MAPCLASS_TYPE(CMapEntity));
 
 	m_cEntities.SetRedraw(TRUE);
 	m_cEntities.Invalidate();
