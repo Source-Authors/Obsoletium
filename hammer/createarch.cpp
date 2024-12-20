@@ -407,10 +407,10 @@ CMapClass *CreateArch(BoundBox *pBox, float fStartAngle, int iSides, float fArc,
 	if((iWallWidth*2+8) >= (pBox->bmaxs[AXIS_X] - pBox->bmins[AXIS_X]) ||
 		(iWallWidth*2+8) >= (pBox->bmaxs[AXIS_Y] - pBox->bmins[AXIS_Y]))
 	{
-		for(int i = 0; i < ARC_MAX_POINTS; i++)
+		for(auto &p : fInnerPoints)
 		{
-			fInnerPoints[i][AXIS_X] = Center[AXIS_X];
-			fInnerPoints[i][AXIS_Y] = Center[AXIS_Y];
+			p[AXIS_X] = Center[AXIS_X];
+			p[AXIS_Y] = Center[AXIS_Y];
 		}
 		bCreateSouthFace = FALSE;
 	}
