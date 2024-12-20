@@ -144,9 +144,13 @@ void CEditGroups::OnRemove(void)
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 	if (pDoc != NULL)
 	{
+		// dimhotepus: Do not use pGroup after deletion. ASAN catch.
+		VisGroupState_t state = pGroup->GetVisible();
+
+		// pGroup is deleted here.
 		pDoc->VisGroups_RemoveGroup(pGroup);
 
-		if (pGroup->GetVisible() != VISGROUP_SHOWN)
+		if (state != VISGROUP_SHOWN)
 		{
 			pDoc->VisGroups_UpdateAll();
 			pDoc->UpdateVisibilityAll();
