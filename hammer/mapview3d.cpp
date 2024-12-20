@@ -579,12 +579,14 @@ void CMapView3D::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case '2':
 		{
 			float fBack = m_pCamera->GetFarClip();
-			if ((fBack <= 9000) && (fBack > 1000))
+			// dimhotepus: Bump 9000 -> 19000
+			if ((fBack <= 19000) && (fBack > 1000))
 			{
 				m_pCamera->SetFarClip(fBack + 1000);
 				Options.view3d.iBackPlane = fBack;
 			}
-			else if (fBack < 10000)
+			// dimhotepus: Bump 10000 -> 20000
+			else if (fBack < 20000)
 			{
 				m_pCamera->SetFarClip(fBack + 250);
 				Options.view3d.iBackPlane = fBack;
