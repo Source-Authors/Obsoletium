@@ -14,6 +14,10 @@
 // TorusDlg.h : header file
 //
 
+#include "mathlib/vector.h"
+
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CTorusDlg dialog
 

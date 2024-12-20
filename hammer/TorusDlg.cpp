@@ -8,15 +8,16 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "TorusDlg.h"
 #include "hammer.h"
 #include "hammer_mathlib.h"
-#include "TorusDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
+constexpr inline size_t ARC_MAX_POINTS{4096};
 
-static LPCTSTR pszSection = "Torus";
+constexpr inline TCHAR pszSection[]{TEXT("Torus")};
 
 void MakeArcCenterRadius(float xCenter, float yCenter, float xrad, float yrad, int npoints, float start_ang, float fArc, float points[][2]);
 void MakeArc(float x1, float y1, float x2, float y2, int npoints, float start_ang, float fArc, float points[][2]);
@@ -448,7 +449,7 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 	pt.x = rcItem.left + rcItem.Width()  / 2;
 	pt.y = rcItem.top  + rcItem.Height() / 2;
 
-	if (bmaxs[0] - bmins[0])
+	if (bmaxs[0] != bmins[0])
 	{
 		fScaleX = rcItem.Width() /(bmaxs[0] - bmins[0]);
 	}
@@ -457,7 +458,7 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 		fScaleX = 1.0f;
 	}
 	
-	if (bmaxs[1] - bmins[1])
+	if (bmaxs[1] != bmins[1])
 	{
 		fScaleY = rcItem.Height() /(bmaxs[1] - bmins[1]);
 	}
