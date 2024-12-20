@@ -76,7 +76,6 @@ public:
 	IVRadDLL			*m_pVRadDLL;
 
 	HANDLE				m_hThread;
-	DWORD				m_ThreadID;
 };
 
 

@@ -30,7 +30,7 @@ IBSPLightingThread* CreateBSPLightingThread( IVRadDLL *pDLL )
 	return 0;
 }
 
-static DWORD WINAPI ThreadMainLoop_Static( LPVOID lpParameter )
+static unsigned __stdcall ThreadMainLoop_Static( void* lpParameter )
 {
 	// dimhotepus: Add thread name to simplify debugging.
 	ThreadSetDebugName("BSPLighting");
@@ -47,7 +47,6 @@ CBSPLightingThread::CBSPLightingThread()
 {
 	m_pVRadDLL = nullptr;
 	m_hThread = 0;
-	m_ThreadID = 0;
 	
 	m_ThreadCmd = THREADCMD_NONE;
 	m_ThreadState = STATE_IDLE;
@@ -123,13 +122,13 @@ bool CBSPLightingThread::Init( IVRadDLL *pDLL )
 {
 	m_pVRadDLL = pDLL;
 
-	m_hThread = CreateThread(
-		NULL,
+	m_hThread = (HANDLE)_beginthreadex(
+		nullptr,
 		0,
 		ThreadMainLoop_Static,
 		this,
 		0,
-		&m_ThreadID );
+		nullptr );
 
 	if( !m_hThread )
 		return false;
