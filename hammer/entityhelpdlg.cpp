@@ -33,11 +33,12 @@ void CEntityHelpDlg::ShowEntityHelpDialog(void)
 	if (g_pHelpDlg == NULL)
 	{
 		g_pHelpDlg = new CEntityHelpDlg;
-		g_pHelpDlg->Create(IDD_ENTITY_HELP);
 	}
 
 	if (g_pHelpDlg != NULL)
 	{
+		// dimhotepus: No null dereference.
+		g_pHelpDlg->Create(IDD_ENTITY_HELP);
 		g_pHelpDlg->ShowWindow(SW_SHOW);
 	}
 }
@@ -62,6 +63,7 @@ CEntityHelpDlg::CEntityHelpDlg(CWnd *pwndParent)
 	: CDialog(CEntityHelpDlg::IDD, pwndParent)
 {
 	m_pHelpText = NULL;
+	m_pClass = NULL;
 }
 
 
@@ -70,6 +72,8 @@ CEntityHelpDlg::CEntityHelpDlg(CWnd *pwndParent)
 //-----------------------------------------------------------------------------
 CEntityHelpDlg::~CEntityHelpDlg(void)
 {
+	// dimhotepus: Delete text.
+	delete m_pHelpText;
 	g_pHelpDlg = NULL;
 }
 
@@ -105,7 +109,7 @@ int CEntityHelpDlg::GetTextWidth(const char *pszText, CDC *pDC)
 		}
 
 		CGdiObject *pOldFont = pDC->SelectStockObject(DEFAULT_GUI_FONT);
-		CSize Size = pDC->GetTabbedTextExtent(pszText, strlen(pszText), 0, NULL);
+		CSize Size = pDC->GetTabbedTextExtent(pszText, V_strlen(pszText), 0, NULL);
 		pDC->SelectObject(pOldFont);
 
 		if (bRelease)
