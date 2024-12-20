@@ -37,17 +37,17 @@ class CEditGameClass
 		CEditGameClass(void);
 		~CEditGameClass(void);
 
-		inline bool IsClass(const char *pszClass = NULL);
+		inline bool IsClass(const char *pszClass = NULL) const;
 		inline GDclass *GetClass(void) { return(m_pClass); }
 		inline void SetClass(GDclass *pClass) { m_pClass = pClass; }
-		inline const char* GetClassName(void) { return(m_szClass); }
-		inline bool IsKeyFrameClass(void) { return((m_pClass != NULL) && (m_pClass->IsKeyFrameClass())); }
-		inline bool IsMoveClass(void) { return((m_pClass != NULL) && (m_pClass->IsMoveClass())); }
-		inline bool IsPointClass(void) { return((m_pClass != NULL) && (m_pClass->IsPointClass())); }
-		inline bool IsNPCClass(void) { return((m_pClass != NULL) && (m_pClass->IsNPCClass())); }
-		inline bool IsFilterClass(void) { return((m_pClass != NULL) && (m_pClass->IsFilterClass())); }
-		inline bool IsSolidClass(void) { return((m_pClass != NULL) && (m_pClass->IsSolidClass())); }
-		inline bool IsNodeClass(void) { return((m_pClass != NULL) && (m_pClass->IsNodeClass())); }
+		inline const char* GetClassName(void) const { return(m_szClass); }
+		inline bool IsKeyFrameClass(void) const { return((m_pClass != NULL) && (m_pClass->IsKeyFrameClass())); }
+		inline bool IsMoveClass(void) const { return((m_pClass != NULL) && (m_pClass->IsMoveClass())); }
+		inline bool IsPointClass(void) const { return((m_pClass != NULL) && (m_pClass->IsPointClass())); }
+		inline bool IsNPCClass(void) const { return((m_pClass != NULL) && (m_pClass->IsNPCClass())); }
+		inline bool IsFilterClass(void) const { return((m_pClass != NULL) && (m_pClass->IsFilterClass())); }
+		inline bool IsSolidClass(void) const { return((m_pClass != NULL) && (m_pClass->IsSolidClass())); }
+		inline bool IsNodeClass(void) const { return((m_pClass != NULL) && (m_pClass->IsNodeClass())); }
 		static inline bool IsNodeClass(const char *pszClassName) { return GDclass::IsNodeClass(pszClassName); }
 
 		//
@@ -191,7 +191,7 @@ const char *CEditGameClass::GetComments(void)
 // Input  : NULL - 
 // Output : inline bool
 //-----------------------------------------------------------------------------
-inline bool CEditGameClass::IsClass(const char *pszClass)
+inline bool CEditGameClass::IsClass(const char *pszClass) const
 {
 	if (pszClass == NULL)
 	{
