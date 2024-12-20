@@ -99,7 +99,7 @@ CEntityConnection &CEntityConnection::operator =(const CEntityConnection &Other)
 void CEntityConnection::SetSourceName(const char *pszName) 
 {
 	// Save the name of the entity(ies)
-	lstrcpyn(m_szSourceEntity, pszName ? pszName : "<<null>>", sizeof(m_szSourceEntity));
+	V_strcpy_safe(m_szSourceEntity, pszName ? pszName : "<<null>>");
 	
 	// Update the source entity list
 	// LinkSourceEntities(); // Changing the entity connection source name shouldnt change the source entity linkage, right?
@@ -112,7 +112,7 @@ void CEntityConnection::SetSourceName(const char *pszName)
 void CEntityConnection::SetTargetName(const char *pszName) 
 {
 	// Save the name of the entity(ies)
-	lstrcpyn(m_szTargetEntity, pszName ? pszName : "<<null>>", sizeof(m_szTargetEntity));
+	V_strcpy_safe(m_szTargetEntity, pszName ? pszName : "<<null>>");
 
 	// Update the target entity list
 	LinkTargetEntities();
@@ -476,6 +476,9 @@ int CEntityConnection::ValidateInputConnections(CMapEntity *pEntity, bool bVisib
 			pAllWorldEntities = pWorld->EntityList_GetList();
 		}
 	}
+
+	// dimhotepus: Do not crash if no entities.
+	if (!pAllWorldEntities) return CONNECTION_NONE;
 
 	// Look at outputs from each entity in the world
 	

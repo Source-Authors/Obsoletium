@@ -57,10 +57,10 @@ public:
 	inline void SetDelay(float fDelay) { m_fDelay = fDelay; }
 
 	inline const char *GetInputName(void) { return(m_szInput); }
-	inline void SetInputName(const char *pszName) { lstrcpyn(m_szInput, pszName, sizeof(m_szInput)); }
+	inline void SetInputName(const char *pszName) { V_strcpy_safe(m_szInput, pszName); }
 
 	inline const char *GetOutputName(void) { return(m_szOutput); }
-	inline void SetOutputName(const char *pszName) { lstrcpyn(m_szOutput, pszName, sizeof(m_szOutput)); }
+	inline void SetOutputName(const char *pszName) { V_strcpy_safe(m_szOutput, pszName); }
 
 	inline const char *GetTargetName(void) { return(m_szTargetEntity); }
 	void SetTargetName(const char *pszName);
@@ -80,7 +80,7 @@ public:
 	inline void SetTimesToFire(int nTimesToFire) { m_nTimesToFire = nTimesToFire; }
 
 	inline const char *GetParam(void) { return(m_szParam); }
-	inline void SetParam(const char *pszParam) { lstrcpyn(m_szParam, pszParam, sizeof(m_szParam)); }
+	inline void SetParam(const char *pszParam) { V_strcpy_safe(m_szParam, pszParam); }
 
 	// Sorting functions
 	static int CALLBACK CompareDelaysSecondary(CEntityConnection *pConn1, CEntityConnection *pConn2, SortDirection_t eDirection);
