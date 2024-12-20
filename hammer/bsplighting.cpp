@@ -689,11 +689,11 @@ void CBSPLighting::BuildLMGroups(
 						}
 
 						// Generate the vert list.
-						for( int iVert=0; iVert < pDisp->m_Verts.Count(); iVert++ )
+						for( auto &vert : pDisp->m_Verts )
 						{
-							mb.Position3fv( (float*)&pDisp->m_Verts[iVert].m_vPos );
-							mb.TexCoord2fv( 0, (float*)&pDisp->m_Verts[iVert].m_vTexCoords );
-							mb.TexCoord2fv( 1, (float*)&pDisp->m_Verts[iVert].m_vLightCoords );
+							mb.Position3fv( (float*)&vert.m_vPos );
+							mb.TexCoord2fv( 0, (float*)&vert.m_vTexCoords );
+							mb.TexCoord2fv( 1, (float*)&vert.m_vLightCoords );
 							
 							if( bNeedsBumpmap )
 								mb.TexCoord2f ( 2, pStoredFace->m_BumpSTexCoordOffset, 0 );
