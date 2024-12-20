@@ -16,6 +16,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
+IEditDispSubdivMesh::~IEditDispSubdivMesh() = default;
+
 //=============================================================================
 //
 // Editable Displacement Subdivision Mesh Implementation
