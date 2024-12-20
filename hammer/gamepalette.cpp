@@ -13,16 +13,11 @@
 #include "GamePalette.h"
 #include "Hammer.h"
 #include "tier1/strtools.h"
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
+
 #include <fstream>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-#pragma warning(pop)
-
-#pragma warning(disable:4244)
 
 CGamePalette::CGamePalette()
 {
@@ -31,15 +26,13 @@ CGamePalette::CGamePalette()
 	uPaletteBytes = sizeof(LOGPALETTE) + sizeof(PALETTEENTRY) * 256;
 
 	// allocate memory
-	pPalette = (LOGPALETTE*) malloc(uPaletteBytes);
-	pOriginalPalette = (LOGPALETTE*) malloc(uPaletteBytes);
-
-	memset(pPalette, 0, uPaletteBytes);
-	memset(pOriginalPalette, 0, uPaletteBytes);
+	// dimhotepus: malloc + memset -> calloc
+	pPalette = (LOGPALETTE*) calloc(uPaletteBytes, sizeof(byte));
+	pOriginalPalette = (LOGPALETTE*) calloc(uPaletteBytes, sizeof(byte));
 
 	if(!pPalette || !pOriginalPalette)
 	{
-		AfxMessageBox("I couldn't allocate memory for the palette.");
+		AfxMessageBox("Couldn't allocate memory for the palette.", MB_ICONERROR);
 		PostQuitMessage(-1);
 		return;
 	}
@@ -72,7 +65,7 @@ BOOL CGamePalette::Create(LPCTSTR pszFile)
 
 	strFile = szFullPath;
 
-	if( GetFileAttributes(strFile) == 0xffffffff )
+	if (GetFileAttributes(strFile) == INVALID_FILE_ATTRIBUTES)
 		return FALSE;	// not exist
 
 	// open file & read palette
@@ -90,7 +83,8 @@ BOOL CGamePalette::Create(LPCTSTR pszFile)
 		pOriginalPalette->palPalEntry[i].peRed = file.get();
 		pOriginalPalette->palPalEntry[i].peGreen = file.get();
 		pOriginalPalette->palPalEntry[i].peBlue = file.get();
-		pOriginalPalette->palPalEntry[i].peFlags = D3DRMPALETTE_READONLY |
+		// dimhotepus: Comment unused D3DRMPALETTE_READONLY.
+		pOriginalPalette->palPalEntry[i].peFlags = /*D3DRMPALETTE_READONLY |*/
 			PC_NOCOLLAPSE;
 	}
 
