@@ -5,9 +5,10 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "VisGroup.h"
+
 #include "ChunkFile.h"
 #include "MapDoc.h"		// dvs: FIXME: I'd rather not have this class know about the doc
-#include "VisGroup.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -39,7 +40,7 @@ CVisGroup::CVisGroup(void)
 	m_rgbColor.b = 0;
 	m_rgbColor.a = 0;
 
-	m_pParent = NULL;
+	m_pParent = nullptr;
 	
 	m_eVisible = VISGROUP_HIDDEN;
 	m_szName[0] = '\0';
@@ -81,12 +82,10 @@ ChunkFileResult_t CVisGroup::LoadKeyCallback(const char *szKey, const char *szVa
 	}
 	else if (!stricmp(szKey, "color"))
 	{
-		unsigned char chRed;
-		unsigned char chGreen;
-		unsigned char chBlue;
+		unsigned char r, g, b;
 
-		CChunkFile::ReadKeyValueColor(szValue, chRed, chGreen, chBlue);
-		pGroup->SetColor(chRed, chGreen, chBlue);
+		CChunkFile::ReadKeyValueColor(szValue, r, g, b);
+		pGroup->SetColor(r, g, b);
 	}
 	else if (!stricmp(szKey, "visible"))
 	{
@@ -108,7 +107,7 @@ ChunkFileResult_t CVisGroup::LoadKeyCallback(const char *szKey, const char *szVa
 ChunkFileResult_t CVisGroup::LoadVMF(CChunkFile *pFile, CMapDoc *pDoc)
 {
 	// Fill out a little context blob for passing to the handler.
-	LoadVisGroupData_t LoadData;
+	LoadVisGroupData_t LoadData = {};
 	LoadData.pDoc = pDoc;
 	LoadData.pParent = this;
 
@@ -135,7 +134,7 @@ ChunkFileResult_t CVisGroup::LoadVisGroupCallback(CChunkFile *pFile, LoadVisGrou
 	ChunkFileResult_t eResult = pVisGroup->LoadVMF(pFile, pLoadData->pDoc);
 	if (eResult == ChunkFile_Ok)
 	{
-		if (pLoadData->pParent != NULL)
+		if (pLoadData->pParent != nullptr)
 		{
 			pLoadData->pParent->AddChild(pVisGroup);
 			pVisGroup->SetParent(pLoadData->pParent);
@@ -162,9 +161,9 @@ ChunkFileResult_t CVisGroup::LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *p
 	s_bIsConvertingOldVisGroups = false;
 
 	// Fill out a little context blob for passing to the handler.
-	LoadVisGroupData_t LoadData;
+	LoadVisGroupData_t LoadData = {};
 	LoadData.pDoc = pDoc;
-	LoadData.pParent = NULL;
+	LoadData.pParent = nullptr;
 
 	//
 	// Set up handlers for the subchunks that we are interested in.
@@ -186,7 +185,7 @@ ChunkFileResult_t CVisGroup::LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *p
 //-----------------------------------------------------------------------------
 void CVisGroup::MoveUp(CVisGroup *pChild)
 {
-	int nIndex = m_Children.Find(pChild);
+	auto nIndex = m_Children.Find(pChild);
 	if (nIndex > 0)
 	{
 		m_Children.Remove(nIndex);
@@ -201,7 +200,7 @@ void CVisGroup::MoveUp(CVisGroup *pChild)
 //-----------------------------------------------------------------------------
 void CVisGroup::MoveDown(CVisGroup *pChild)
 {
-	int nIndex = m_Children.Find(pChild);
+	auto nIndex = m_Children.Find(pChild);
 	if ((nIndex >= 0) && (nIndex < (m_Children.Count() - 1)))
 	{
 		m_Children.Remove(nIndex);
@@ -213,7 +212,7 @@ void CVisGroup::MoveDown(CVisGroup *pChild)
 //-----------------------------------------------------------------------------
 // Purpose: Returns whether or not this visgroup is currently visible.
 //-----------------------------------------------------------------------------
-VisGroupState_t CVisGroup::GetVisible(void)
+VisGroupState_t CVisGroup::GetVisible(void) const
 {
 	return m_eVisible;
 }
@@ -258,7 +257,7 @@ ChunkFileResult_t CVisGroup::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	// Recurse into children, writing them within this chunk.
 	//
-	for (int i = 0; i < GetChildCount(); i++)
+	for (intp i = 0; i < GetChildCount(); i++)
 	{
 		CVisGroup *pChild = GetChild(i);
 		eResult = pChild->SaveVMF(pFile, pSaveInfo);
@@ -290,7 +289,7 @@ void CVisGroup::ShowAllVisGroups(bool bShow)
 //-----------------------------------------------------------------------------
 void CVisGroup::AddChild(CVisGroup *pChild)
 {
-	int nIndex = m_Children.Find(pChild);
+	intp nIndex = m_Children.Find(pChild);
 	if (nIndex == -1)
 	{
 		m_Children.AddToTail(pChild);
@@ -302,7 +301,7 @@ void CVisGroup::AddChild(CVisGroup *pChild)
 // Purpose: 
 // Input  : pChild - 
 //-----------------------------------------------------------------------------
-bool CVisGroup::CanMoveUp(CVisGroup *pChild)
+bool CVisGroup::CanMoveUp(CVisGroup *pChild) const
 {
 	return (m_Children.Find(pChild) > 0);
 }
@@ -312,9 +311,9 @@ bool CVisGroup::CanMoveUp(CVisGroup *pChild)
 // Purpose: 
 // Input  : pChild - 
 //-----------------------------------------------------------------------------
-bool CVisGroup::CanMoveDown(CVisGroup *pChild)
+bool CVisGroup::CanMoveDown(CVisGroup *pChild) const
 {
-	int nIndex = m_Children.Find(pChild);
+	intp nIndex = m_Children.Find(pChild);
 	return (nIndex >= 0) && (nIndex < m_Children.Count() - 1);
 }
 
@@ -324,7 +323,7 @@ bool CVisGroup::CanMoveDown(CVisGroup *pChild)
 //-----------------------------------------------------------------------------
 void CVisGroup::RemoveChild(CVisGroup *pChild)
 {
-	int nIndex = m_Children.Find(pChild);
+	intp nIndex = m_Children.Find(pChild);
 	if (nIndex != -1)
 	{
 		m_Children.Remove(nIndex);
@@ -335,9 +334,9 @@ void CVisGroup::RemoveChild(CVisGroup *pChild)
 //-----------------------------------------------------------------------------
 // Purpose: Returns true if the group is one of our descendents, false if not.
 //-----------------------------------------------------------------------------
-bool CVisGroup::FindDescendent(CVisGroup *pGroup)
+bool CVisGroup::FindDescendent(CVisGroup *pGroup) const
 {
-	for (int i = 0; i < m_Children.Count(); i++)
+	for (intp i = 0; i < m_Children.Count(); i++)
 	{
 		CVisGroup *pChild = m_Children.Element(i);
 		if ((pChild == pGroup) || (pChild->FindDescendent(pGroup)))
@@ -349,9 +348,9 @@ bool CVisGroup::FindDescendent(CVisGroup *pGroup)
 	return false;
 }
 
-bool CVisGroup::IsAutoVisGroup()
+bool CVisGroup::IsAutoVisGroup() const
 {
-	return m_bIsAuto;	
+	return m_bIsAuto;
 }
 
 void CVisGroup::SetAuto( bool bAuto )
@@ -378,7 +377,7 @@ void CVisGroup::VisGroups_UpdateParent( VisGroupState_t state )
 		pParent->SetVisible( VISGROUP_PARTIAL );
 	}
 
-	if ( pParent->GetParent() != NULL )
+	if ( pParent->GetParent() != nullptr )
 	{
 		pParent->VisGroups_UpdateParent( pParent->GetVisible() );
 	}
