@@ -44,7 +44,7 @@ struct ShoreSegment_t
 
 struct Shoreline_t
 {
-	int							m_nShorelineId;
+	intp						m_nShorelineId;
 	CUtlVector<ShoreSegment_t>	m_aSegments;		// List of shore segments making up the shore line.
 	CUtlVector<int>				m_aSortedSegments;	// List of shore segments sorted (for connectivity).
 	CUtlVector<CMapOverlay>		m_aOverlays;
@@ -65,10 +65,10 @@ public:
 
 	// Shoreline management.
 	virtual int			GetShorelineCount( void ) = 0;
-	virtual Shoreline_t *GetShoreline( int nShorelineId ) = 0;
-	virtual void		AddShoreline( int nShorelineId ) = 0;
-	virtual void		RemoveShoreline( int nShorelineId ) = 0;
-	virtual void		BuildShoreline( int nShorelineId, CUtlVector<CMapFace*> &aFaces, CUtlVector<CMapFace*> &aWaterFaces ) = 0;
+	virtual Shoreline_t *GetShoreline( intp nShorelineId ) = 0;
+	virtual void		AddShoreline( intp nShorelineId ) = 0;
+	virtual void		RemoveShoreline( intp nShorelineId ) = 0;
+	virtual void		BuildShoreline( intp nShorelineId, CUtlVector<CMapFace*> &aFaces, CUtlVector<CMapFace*> &aWaterFaces ) = 0;
 
 	virtual void		Draw( CRender3D *pRender ) = 0;
 	virtual void		DebugDraw( CRender3D *pRender ) = 0;
