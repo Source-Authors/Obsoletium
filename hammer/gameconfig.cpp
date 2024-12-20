@@ -25,10 +25,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning(disable:4244)
 
 
-const int MAX_ERRORS = 5;
+constexpr inline int MAX_ERRORS = 5;
 
 
 GameData *pGD;
@@ -89,6 +88,7 @@ void CGameConfig::SetActiveGame(CGameConfig *pGame)
 CGameConfig::CGameConfig(void)
 {
 	nGDFiles = 0;
+	mapformat = mfQuake;
 	textureformat = tfNone;
 	m_fDefaultTextureScale = DEFAULT_TEXTURE_SCALE;
 	m_nDefaultLightmapScale = DEFAULT_LIGHTMAP_SCALE;
@@ -108,6 +108,7 @@ CGameConfig::CGameConfig(void)
 	strcpy(m_szCordonTexture, "BLACK");
 
 	m_szSteamDir[0] = '\0';
+	m_szSteamUserDir[0] = '\0';
 	m_szSteamAppID[0] = '\0';
 
 	static DWORD __dwID = 0;
@@ -414,8 +415,11 @@ void CGameConfig::CopyFrom(CGameConfig *pConfig)
 //			pGD - 
 // Output : Returns TRUE to keep enumerating.
 //-----------------------------------------------------------------------------
-static BOOL UpdateClassPointer(CMapEntity *pEntity, GameData *pGDIn)
+static BOOL UpdateClassPointer(CMapClass *mp, DWORD_PTR ctx)
 {
+	auto *pEntity = reinterpret_cast<CMapEntity *>(mp);
+	auto *pGDIn = reinterpret_cast<GameData *>(ctx);
+
 	GDclass *pClass = pGDIn->ClassForName(pEntity->GetClassName());
 	pEntity->SetClass(pClass);
 	return(TRUE);
@@ -431,12 +435,20 @@ void CGameConfig::LoadGDFiles(void)
 	
 	// Save the old working directory
 	char szOldDir[MAX_PATH];
-	_getcwd( szOldDir, sizeof(szOldDir) );
+	if ( !_getcwd( szOldDir, sizeof(szOldDir) ) )
+	{
+		Warning( "Can't get current dir for load GDF files: %s.\n",
+			std::generic_category().message(errno).c_str() );
+	}
 
 	// Set our working directory properly
 	char szAppDir[MAX_PATH];
 	APP()->GetDirectory( DIR_PROGRAM, szAppDir );
-	_chdir( szAppDir );
+	if ( _chdir( szAppDir ) )
+	{
+		Warning( "Can't change current dir to '%s' for load GDF files: %s.\n",
+			szAppDir, std::generic_category().message(errno).c_str() );
+	}
 
 	for (int i = 0; i < nGDFiles; i++)
 	{
@@ -444,7 +456,11 @@ void CGameConfig::LoadGDFiles(void)
 	}
 
 	// Reset our old working directory
-	_chdir( szOldDir );
+	if ( _chdir( szOldDir ) )
+	{
+		Warning( "Can't restore current dir to '%s' for load GDF files: %s.\n",
+			szOldDir, std::generic_category().message(errno).c_str() );
+	}
 
 	// All the class pointers have changed - now we have to
 	// reset all the class pointers in each map doc that 
@@ -457,7 +473,7 @@ void CGameConfig::LoadGDFiles(void)
 		{
 			CMapWorld *pWorld = pDoc->GetMapWorld();
 			pWorld->SetClass(GD.ClassForName(pWorld->GetClassName()));
-			pWorld->EnumChildren((ENUMMAPCHILDRENPROC)UpdateClassPointer, (DWORD)&GD, MAPCLASS_TYPE(CMapEntity));
+			pWorld->EnumChildren(UpdateClassPointer, (DWORD_PTR)&GD, MAPCLASS_TYPE(CMapEntity));
 		}
 	}
 }
@@ -549,10 +565,9 @@ bool FindSteamUserDir(const char *szAppDir, const char *szSteamDir, char *szStea
 //-----------------------------------------------------------------------------
 void CGameConfig::ParseGameInfo()
 {
-	KeyValues *pkv = new KeyValues("gameinfo.txt");
+	auto pkv = KeyValues::AutoDelete("gameinfo.txt");
 	if (!pkv->LoadFromFile(g_pFileSystem, "gameinfo.txt", "GAME"))
 	{
-		pkv->deleteThis();
 		return;
 	}
 
@@ -567,8 +582,6 @@ void CGameConfig::ParseGameInfo()
 	{
 		CMapInstance::SetInstancePath( InstancePath );
 	}
-
-	pkv->deleteThis();
 
 	char szAppDir[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szAppDir);
