@@ -807,7 +807,7 @@ void CHammer::Help(const char *pszTopic)
 	{
 		char szError[MAX_PATH];
 		sprintf(szError, "The help system could not be launched. The the following error was returned:\n%s (0x%X)", GetErrorString(), hResult);
-		AfxMessageBox(szError);
+		AfxMessageBox(szError, MB_ICONERROR);
 	}
 	*/
 }
@@ -822,7 +822,7 @@ static SpewRetval_t HammerDbgOutput( SpewType_t spewType, char const *pMsg )
 	switch( spewType )
 	{
 	case SPEW_ERROR:
-		MessageBox( NULL, (LPCTSTR)pMsg, "Fatal Error", MB_OK | MB_ICONINFORMATION );
+		MessageBox( NULL, pMsg, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
 #ifdef _DEBUG
 		return SPEW_DEBUGGER;
 #else
@@ -999,7 +999,7 @@ bool CHammer::Check16BitColor()
 		int bpp = GetDeviceCaps(hDC, BITSPIXEL);
 		if (bpp < 15)
 		{
-			AfxMessageBox("Your screen must be in 16-bit color or higher to run Hammer.");
+			AfxMessageBox("Your screen must be in 16-bit color or higher to run Hammer.", MB_ICONERROR);
 			return false;
 		}
 		::DeleteDC(hDC);
@@ -1057,7 +1057,7 @@ InitReturnVal_t CHammer::HammerInternalInit()
     // Register it, exit if it fails    
 	if(!AfxRegisterClass(&wndcls))
 	{
-		AfxMessageBox("Could not register Hammer's main window class");
+		AfxMessageBox("Could not register Hammer's main window class.", MB_ICONERROR);
 		return INIT_FAILED;
 	}
 
@@ -1211,8 +1211,8 @@ InitReturnVal_t CHammer::HammerInternalInit()
 		if ( strLastGoodSave.GetLength() != 0 )
 		{
 			char msg[1024];
-			V_snprintf( msg, sizeof( msg ), "Hammer did not shut down correctly the last time it was used.\nWould you like to load the last saved file?\n(%s)", (const char*)strLastGoodSave );
-			if ( AfxMessageBox( msg, MB_YESNO ) == IDYES )
+			V_sprintf_safe( msg, "Hammer did not shut down correctly the last time it was used.\n\nWould you like to load the last saved file?\n(%s)", strLastGoodSave.GetString() );
+			if ( AfxMessageBox( msg, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{
 				LoadLastGoodSave();
 			}
@@ -1707,7 +1707,7 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 		CString		Message;
 
 		Message = "The file " + CString( lpszFileName ) + " does not exist.";
-		AfxMessageBox( Message );
+		AfxMessageBox( Message, MB_ICONERROR );
 
 		return NULL;
 	}
@@ -1741,7 +1741,7 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 
 		sprintf( szRenameMessage, "This map was loaded from an autosave file.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
 
-		if ( AfxMessageBox( szRenameMessage, MB_YESNO ) == IDYES )
+		if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 		{			
 			((CMapDoc *)pDoc)->SetPathName( newMapPath );		
 		}			
@@ -2348,7 +2348,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 
 	if ( szRootDir[0] == 0 )
 	{
-		AfxMessageBox( "No autosave directory has been selected.\nThe autosave feature will be disabled until a directory is entered.", MB_OK );
+		AfxMessageBox( "No autosave directory has been selected.\nThe autosave feature will be disabled until a directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 		return false;
 	}
 	CString strAutosaveDirectory( szRootDir );	
@@ -2356,7 +2356,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		EditorUtil_ConvertPath(strAutosaveDirectory, true);
 		if ( ( strAutosaveDirectory[1] != ':' ) || ( strAutosaveDirectory[2] != '\\' ) )
 		{
-			AfxMessageBox( "The current autosave directory does not have an absolute path.\nThe autosave feature will be disabled until a new directory is entered.", MB_OK );
+			AfxMessageBox( "The current autosave directory does not have an absolute path.\nThe autosave feature will be disabled until a new directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 			return false;
 		}
 	}
@@ -2377,7 +2377,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		bool bDirResult = CreateDirectory( strAutosaveDirectory, NULL );
 		if ( !bDirResult )
 		{
-			AfxMessageBox( "The current autosave directory does not exist and could not be created.  \nThe autosave feature will be disabled until a new directory is entered.", MB_OK );
+			AfxMessageBox( "The current autosave directory does not exist and could not be created.\nThe autosave feature will be disabled until a new directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 			return false;
 		}
 	}    
@@ -2398,12 +2398,12 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		{
 			 if ( GetLastError() == ERROR_ACCESS_DENIED )
 			 {
-				 AfxMessageBox( "The autosave directory is marked as read only.  Please remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK );
+				 AfxMessageBox( "The autosave directory is marked as read only.\nPlease remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
 				 return false;
 			 }
 			 else
 			 {
-				 AfxMessageBox( "There is a problem with the autosave directory.  Please select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK );
+				 AfxMessageBox( "There is a problem with the autosave directory.\nPlease select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
 				 return false;
 			 }
 
@@ -2434,7 +2434,7 @@ void CHammer::LoadLastGoodSave( void )
 
 		if ( !pCurrentDoc )
 		{
-			AfxMessageBox( "There was an error loading the last saved file.", MB_OK );
+			AfxMessageBox( "There was an error loading the last saved file.", MB_OK | MB_ICONERROR );
 			return;
 		}
 		
@@ -2460,7 +2460,7 @@ void CHammer::LoadLastGoodSave( void )
 			newMapPath.Append( pszFileName );
 			sprintf( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
 
-			if ( AfxMessageBox( szRenameMessage, MB_YESNO ) == IDYES )
+			if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{			
 				pCurrentDoc->SetPathName( newMapPath );		
 			}		
