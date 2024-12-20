@@ -13,7 +13,7 @@
 #include <tier0/memdbgon.h>
 
 
-static LPCTSTR pszSection = "Arch";
+constexpr inline TCHAR pszSection[]{TEXT("Arch")};
 
 extern void MakeArc(float x1, float y1, float x2, float y2, int npoints, 
 					 float start_ang, float fArc, float points[][2]);
@@ -32,6 +32,8 @@ CArchDlg::CArchDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
 	m_fArc = 0.0f;
 	m_fAngle = 0.0f;
 	//}}AFX_DATA_INIT
+
+	m_iMaxWallWidth = 0;
 
 	// load up old defaults
 	CString str;
@@ -194,12 +196,12 @@ void CArchDlg::DrawArch(CDC* pDC)
 	pt.x = rcItem.left + rcItem.Width()  / 2;
 	pt.y = rcItem.top  + rcItem.Height() / 2;
 
-	if (bmaxs[0] - bmins[0])
+	if (bmaxs[0] != bmins[0])
 		fScaleX = rcItem.Width()/(bmaxs[0] - bmins[0]);
 	else
 		fScaleX = 1.0f;
 	
-	if (bmaxs[1] - bmins[1])
+	if (bmaxs[1] != bmins[1])
 		fScaleY = rcItem.Height()/(bmaxs[1] - bmins[1]);
 	else
 		fScaleY = 1.0f;
@@ -236,10 +238,10 @@ void CArchDlg::DrawArch(CDC* pDC)
 	if((iWallWidth*2+8)  >= (bmaxs[0] - bmins[0]) ||
 		(iWallWidth*2+8) >= (bmaxs[1] - bmins[1]))
 	{
-		for(int i = 0; i < ARC_MAX_POINTS; i++)
+		for(auto &p : fInnerPoints)
 		{
-			fInnerPoints[i][0] = fCenter[0];
-			fInnerPoints[i][1] = fCenter[1];
+			p[0] = fCenter[0];
+			p[1] = fCenter[1];
 		}
 		bCreateSouthFace = FALSE;
 	}
