@@ -183,7 +183,7 @@ static int WrapFunctionWithMinidumpHandler( int (*pfn)(void *pParam), void *pPar
 // Input  : fmt - format specifier.
 //			... - arguments to format.
 //-----------------------------------------------------------------------------
-void DBG(const char *fmt, ...)
+void DBG(PRINTF_FORMAT_STRING const char *fmt, ...)
 {
     char ach[128];
     va_list va;
@@ -195,7 +195,7 @@ void DBG(const char *fmt, ...)
 }
 
 
-void Msg(int type, const char *fmt, ...)
+void Msg(int type, PRINTF_FORMAT_STRING const char *fmt, ...)
 {
 	if ( !g_pwndMessage )
 		return;
