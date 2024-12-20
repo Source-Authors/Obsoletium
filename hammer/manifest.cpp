@@ -20,7 +20,8 @@
 #include "HelperFactory.h"
 #include "SaveInfo.h"
 #include "tier2/tier2.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No Perforce
+// #include "p4lib/ip4.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -1343,19 +1344,21 @@ bool CManifest::RemoveSubMap( CManifestMap *pManifestMap )
 //-----------------------------------------------------------------------------
 bool CManifest::CheckOut( )
 {
-	if ( !p4 )
-	{
-		return false;
-	}
-
-	if ( !p4->OpenFileForEdit( GetPathName() ) )
-	{
-		return false;
-	}
-
-	CheckFileStatus();
-
-	return true;
+	// dimhotepus: No Perforce.
+	return false;
+	// if ( !p4 )
+	// {
+	// 	return false;
+	// }
+	// 
+	// if ( !p4->OpenFileForEdit( GetPathName() ) )
+	// {
+	// 	return false;
+	// }
+	// 
+	// CheckFileStatus();
+	// 
+	// return true;
 }
 
 
@@ -1366,19 +1369,21 @@ bool CManifest::CheckOut( )
 //-----------------------------------------------------------------------------
 bool CManifest::AddToVersionControl( )
 {
-	if ( !p4 )
-	{
-		return false;
-	}
-
-	if ( !p4->OpenFileForAdd( GetPathName() ) )
-	{
-		return false;
-	}
-
-	CheckFileStatus();
-
-	return true;
+	// dimhotepus: No Perforce.
+	return false;
+	// if ( !p4 )
+	// {
+	// 	return false;
+	// }
+	// 
+	// if ( !p4->OpenFileForAdd( GetPathName() ) )
+	// {
+	// 	return false;
+	// }
+	// 
+	// CheckFileStatus();
+	// 
+	// return true;
 }
 
 
@@ -1389,37 +1394,38 @@ bool CManifest::AddToVersionControl( )
 //-----------------------------------------------------------------------------
 void CManifest::CheckFileStatus( void )
 {
-	P4File_t	FileInfo;
-
-	m_bReadOnly = !g_pFullFileSystem->IsFileWritable( GetPathName() );
-	m_bCheckedOut = false;
-	m_bIsVersionControlled = false;
-	if ( p4 != NULL && p4->GetFileInfo( GetPathName(), &FileInfo ) == true )
-	{
-		m_bIsVersionControlled = true;
-		if ( FileInfo.m_eOpenState == P4FILE_OPENED_FOR_ADD || FileInfo.m_eOpenState == P4FILE_OPENED_FOR_EDIT )
-		{
-			m_bCheckedOut = true;
-		}
-	}
-
-	for( int i = 0; i < GetNumMaps(); i++ )
-	{
-		CManifestMap	*pManifestMap = GetMap( i );
-
-		pManifestMap->m_bReadOnly = !g_pFullFileSystem->IsFileWritable( pManifestMap->m_AbsoluteMapFileName );
-		pManifestMap->m_bCheckedOut = false;
-		pManifestMap->m_bIsVersionControlled = false;
-
-		if ( p4 != NULL && p4->GetFileInfo( pManifestMap->m_AbsoluteMapFileName, &FileInfo ) == true )
-		{
-			pManifestMap->m_bIsVersionControlled = true;
-			if ( FileInfo.m_eOpenState == P4FILE_OPENED_FOR_ADD || FileInfo.m_eOpenState == P4FILE_OPENED_FOR_EDIT )
-			{
-				pManifestMap->m_bCheckedOut = true;
-			}
-		}
-	}
+	// dimhotepus: No Perforce.
+	// P4File_t	FileInfo;
+	// 
+	// m_bReadOnly = !g_pFullFileSystem->IsFileWritable( GetPathName() );
+	// m_bCheckedOut = false;
+	// m_bIsVersionControlled = false;
+	// if ( p4 != NULL && p4->GetFileInfo( GetPathName(), &FileInfo ) == true )
+	// {
+	// 	m_bIsVersionControlled = true;
+	// 	if ( FileInfo.m_eOpenState == P4FILE_OPENED_FOR_ADD || FileInfo.m_eOpenState == P4FILE_OPENED_FOR_EDIT )
+	// 	{
+	// 		m_bCheckedOut = true;
+	// 	}
+	// }
+	// 
+	// for( int i = 0; i < GetNumMaps(); i++ )
+	// {
+	// 	CManifestMap	*pManifestMap = GetMap( i );
+	// 
+	// 	pManifestMap->m_bReadOnly = !g_pFullFileSystem->IsFileWritable( pManifestMap->m_AbsoluteMapFileName );
+	// 	pManifestMap->m_bCheckedOut = false;
+	// 	pManifestMap->m_bIsVersionControlled = false;
+	// 
+	// 	if ( p4 != NULL && p4->GetFileInfo( pManifestMap->m_AbsoluteMapFileName, &FileInfo ) == true )
+	// 	{
+	// 		pManifestMap->m_bIsVersionControlled = true;
+	// 		if ( FileInfo.m_eOpenState == P4FILE_OPENED_FOR_ADD || FileInfo.m_eOpenState == P4FILE_OPENED_FOR_EDIT )
+	// 		{
+	// 			pManifestMap->m_bCheckedOut = true;
+	// 		}
+	// 	}
+	// }
 }
 
 

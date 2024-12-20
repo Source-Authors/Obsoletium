@@ -9,7 +9,8 @@
 #include "Manifest.h"
 #include "MapInstance.h"
 #include "ControlBarIDs.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No Perforce
+// #include "p4lib/ip4.h"
 
 // CManifestMove dialog
 
@@ -419,24 +420,25 @@ void CManifestListBox::OnRButtonUp(UINT nFlags, CPoint point)
 	pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKIN, nDisable );
 	pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_ADD, nDisable );
 
-	if ( p4 && m_pTrackerManifestMap )
-	{
-		if ( m_pTrackerManifestMap->m_bIsVersionControlled )
-		{
-			if ( m_pTrackerManifestMap->m_bCheckedOut )
-			{
-				pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKIN, nEnable );
-			}
-			else
-			{
-				pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKOUT, nEnable );
-			}
-		}
-		else
-		{
-			pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_ADD, nEnable );
-		}
-	}
+	// dimhotepus: No Perforce support
+	// if ( p4 && m_pTrackerManifestMap )
+	// {
+	// 	if ( m_pTrackerManifestMap->m_bIsVersionControlled )
+	// 	{
+	// 		if ( m_pTrackerManifestMap->m_bCheckedOut )
+	// 		{
+	// 			pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKIN, nEnable );
+	// 		}
+	// 		else
+	// 		{
+	// 			pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKOUT, nEnable );
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_ADD, nEnable );
+	// 	}
+	// }
 
 	Invalidate();
 	pWhichMenu->TrackPopupMenu( TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_LEFTALIGN, ptScreen.x, ptScreen.y, this );
@@ -505,25 +507,25 @@ void CManifestListBox::OnMoveSelectionToNewSubMap()
 //-----------------------------------------------------------------------------
 void CManifestListBox::OnVersionControlCheckOut()
 {
-	CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
-	if ( !activeDoc || !activeDoc->GetManifest() )
-	{
-		return;
-	}
-	CManifest	*pManifest = activeDoc->GetManifest();
-
-	if ( !p4->OpenFileForEdit( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
-	{
+	//CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
+	//if ( !activeDoc || !activeDoc->GetManifest() )
+	//{
+	//	return;
+	//}
+	//CManifest	*pManifest = activeDoc->GetManifest();
+	//
+	//if ( !p4->OpenFileForEdit( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
+	//{
 		char temp[ 2048 ];
 		
-		sprintf( temp, "Could not check out map: %s", p4->GetLastError() );
+		sprintf( temp, "Could not check out map: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
-	}
-	else
-	{
-		pManifest->CheckFileStatus();
-		Invalidate();
-	}
+	// }
+	// else
+	// {
+	// 	pManifest->CheckFileStatus();
+	// 	Invalidate();
+	// }
 }
 
 
@@ -569,25 +571,25 @@ void CManifestListBox::OnVersionControlCheckIn()
 //-----------------------------------------------------------------------------
 void CManifestListBox::OnVersionControlAdd()
 {
-	CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
-	if ( !activeDoc || !activeDoc->GetManifest() )
-	{
-		return;
-	}
-	CManifest	*pManifest = activeDoc->GetManifest();
-
-	if ( !p4->OpenFileForAdd( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
-	{
+	//CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
+	//if ( !activeDoc || !activeDoc->GetManifest() )
+	//{
+	//	return;
+	//}
+	//CManifest	*pManifest = activeDoc->GetManifest();
+	//
+	//if ( !p4->OpenFileForAdd( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
+	//{
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not add map: %s", p4->GetLastError() );
+		sprintf( temp, "Could not add map: %s",  /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
-	}
-	else
-	{
-		pManifest->CheckFileStatus();
-		Invalidate();
-	}
+	//}
+	//else
+	//{
+	//	pManifest->CheckFileStatus();
+	//	Invalidate();
+	//}
 }
 
 
@@ -1017,7 +1019,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 BOOL CManifestCheckin::OnInitDialog()
 {
-	P4File_t	FileInfo;
+	// P4File_t	FileInfo;
 
 	__super::OnInitDialog();
 
@@ -1033,7 +1035,7 @@ BOOL CManifestCheckin::OnInitDialog()
 		return TRUE;
 	}
 
-	int nCount = 0;
+	//int nCount = 0;
 
 	CMapDoc	*activeDoc = CMapDoc::GetActiveMapDoc();
 	if ( activeDoc && activeDoc->GetManifest() )
@@ -1042,29 +1044,29 @@ BOOL CManifestCheckin::OnInitDialog()
 
 		if ( pManifest->m_bCheckedOut )
 		{
-			if ( p4->GetFileInfo( pManifest->GetPathName(), &FileInfo ) == true )
-			{
-				int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
-				nCount++;
-				m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )NULL );
-				switch( FileInfo.m_eOpenState )
-				{	
-					case P4FILE_OPENED_FOR_ADD:
-						m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
-						break;
-
-					case P4FILE_OPENED_FOR_EDIT:
-						m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
-						break;
-				}
-				m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
-				m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
-
-				if ( pManifest->m_bDefaultCheckin )
-				{
-					ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
-				}
-			}
+			// if ( p4->GetFileInfo( pManifest->GetPathName(), &FileInfo ) == true )
+			// {
+			// 	int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
+			// 	nCount++;
+			// 	m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )NULL );
+			// 	switch( FileInfo.m_eOpenState )
+			// 	{	
+			// 		case P4FILE_OPENED_FOR_ADD:
+			// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
+			// 			break;
+			// 
+			// 		case P4FILE_OPENED_FOR_EDIT:
+			// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
+			// 			break;
+			// 	}
+			// 	m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
+			// 	m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
+			// 
+			// 	if ( pManifest->m_bDefaultCheckin )
+			// 	{
+			// 		ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
+			// 	}
+			// }
 		}
 
 		for( int i = 0; i < pManifest->GetNumMaps(); i++ )
@@ -1073,29 +1075,29 @@ BOOL CManifestCheckin::OnInitDialog()
 
 			if ( pManifestMap->m_bCheckedOut )
 			{
-				if ( p4->GetFileInfo( pManifestMap->m_AbsoluteMapFileName, &FileInfo ) == true )
-				{
-					int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
-					nCount++;
-					m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )pManifestMap );
-					switch( FileInfo.m_eOpenState )
-					{	
-						case P4FILE_OPENED_FOR_ADD:
-							m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
-							break;
-
-						case P4FILE_OPENED_FOR_EDIT:
-							m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
-							break;
-					}
-					m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
-					m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
-
-					if ( pManifestMap->m_bDefaultCheckin )
-					{
-						ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
-					}
-				}
+				// if ( p4->GetFileInfo( pManifestMap->m_AbsoluteMapFileName, &FileInfo ) == true )
+				// {
+				// 	int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
+				// 	nCount++;
+				// 	m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )pManifestMap );
+				// 	switch( FileInfo.m_eOpenState )
+				// 	{	
+				// 		case P4FILE_OPENED_FOR_ADD:
+				// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
+				// 			break;
+				// 
+				// 		case P4FILE_OPENED_FOR_EDIT:
+				// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
+				// 			break;
+				// 	}
+				// 	m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
+				// 	m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
+				// 
+				// 	if ( pManifestMap->m_bDefaultCheckin )
+				// 	{
+				// 		ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
+				// 	}
+				// }
 			}
 		}
 	}
@@ -1162,15 +1164,15 @@ void CManifestCheckin::OnBnClickedOk()
 			}
 		}
 
-		if ( p4->SubmitFiles( nFileCount, ppFileNames, Description ) == false )
-		{
+		// if ( p4->SubmitFiles( nFileCount, ppFileNames, Description ) == false )
+		// {
 			char temp[ 2048 ];
 
-			sprintf( temp, "Could not check in map(s): %s", p4->GetLastError() );
+			sprintf( temp, "Could not check in map(s): %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 			AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 
 			return;
-		}
+		// }
 	}
 
 	OnOK();

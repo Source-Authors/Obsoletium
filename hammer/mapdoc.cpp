@@ -69,7 +69,8 @@
 #include "StockSolids.h"
 #include "ToolMorph.h"
 #include "ToolBlock.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No Perforce
+// #include "p4lib/ip4.h"
 
 #include "mapdoc.h"
 
@@ -11727,15 +11728,15 @@ void CMapDoc::OnInstancingCheckOutManifest( )
 		return;
 	}
 
-	CManifest		*pManifest = activeDoc->GetManifest();
-
-	if ( pManifest->CheckOut() == false && p4 )
-	{
+	//CManifest		*pManifest = activeDoc->GetManifest();
+	//
+	//if ( pManifest->CheckOut() == false && p4 )
+	//{
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not check out manifest: %s", p4->GetLastError() );
+		sprintf( temp, "Could not check out manifest: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
-	}
+	//}
 }
 
 
@@ -11746,21 +11747,21 @@ void CMapDoc::OnInstancingCheckOutManifest( )
 //-----------------------------------------------------------------------------
 void CMapDoc::OnInstancingAddManifest( )
 {
-	CMapDoc	*activeDoc = CMapDoc::GetActiveMapDoc();
-	if ( !activeDoc || !activeDoc->GetManifest() )
-	{
-		return;
-	}
-
-	CManifest		*pManifest = activeDoc->GetManifest();
-
-	if ( pManifest->AddToVersionControl() == false && p4 )
-	{
+	// CMapDoc	*activeDoc = CMapDoc::GetActiveMapDoc();
+	// if ( !activeDoc || !activeDoc->GetManifest() )
+	// {
+	// 	return;
+	// }
+	// 
+	// CManifest		*pManifest = activeDoc->GetManifest();
+	// 
+	// if ( pManifest->AddToVersionControl() == false && p4 )
+	// {
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not check out manifest: %s", p4->GetLastError() );
+		sprintf( temp, "Could not check out manifest: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
-	}
+	//}
 }
 
 

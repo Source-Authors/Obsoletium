@@ -59,6 +59,7 @@
 #ifndef NO_STEAM
 #include "steam/steam_api.h"
 #endif
+// #include "p4lib/ip4.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -453,7 +454,8 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	g_pStudioRender = ( IStudioRender * )factory( STUDIO_RENDER_INTERFACE_VERSION, NULL );
 	g_pEngineAPI = ( IEngineAPI * )factory( VENGINE_LAUNCHER_API_VERSION, NULL );
 	g_pMDLCache = (IMDLCache*)factory( MDLCACHE_INTERFACE_VERSION, NULL );
-	p4 = ( IP4 * )factory( P4_INTERFACE_VERSION, NULL );
+	// dimhotepus: No Perforce.
+	// p4 = ( IP4 * )factory( P4_INTERFACE_VERSION, NULL );
     g_Factory = factory;
 
 	if ( !g_pMDLCache || !g_pFileSystem || !g_pFullFileSystem || !materials || !g_pMaterialSystemHardwareConfig || !g_pStudioRender )
