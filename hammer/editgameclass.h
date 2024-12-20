@@ -8,10 +8,8 @@
 #define EDITGAMECLASS_H
 #pragma once
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
+
 #include "BlockArray.h"
 #include "fgdlib/fgdlib.h"
 #include "fgdlib/WCKeyValues.h"
@@ -72,8 +70,8 @@ class CEditGameClass
 		//
 		// Interface to spawnflags.
 		//
-		bool GetSpawnFlag(unsigned long nFlag);
-		unsigned long GetSpawnFlags(void);
+		bool GetSpawnFlag(unsigned long nFlag) const;
+		unsigned long GetSpawnFlags(void) const;
 		void SetSpawnFlag(unsigned long nFlag, bool bSet);
 		void SetSpawnFlags(unsigned long nFlags);
 
