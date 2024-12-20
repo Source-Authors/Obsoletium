@@ -263,8 +263,7 @@ int CPrefabRMF::DoLoad(std::fstream& file, DWORD dwFlags)
 
 	AddMRU(this);
 
-	if(m_pWorld)
-		delete m_pWorld;
+	delete m_pWorld;
 	m_pWorld = new CMapWorld( NULL );
 
 	// read data
@@ -456,11 +455,7 @@ int CPrefabVMF::Load(DWORD dwFlags)
 	//
 	// Create a new world to hold the loaded objects.
 	//
-	if (m_pWorld != NULL)
-	{
-		delete m_pWorld;
-	}
-
+	delete m_pWorld;
 	m_pWorld = new CMapWorld( NULL );
 
 	//

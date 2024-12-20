@@ -133,20 +133,9 @@ CMapView2DBase::CMapView2DBase(void)
 //-----------------------------------------------------------------------------
 CMapView2DBase::~CMapView2DBase(void)
 {
-	if (m_pwndTitle != NULL)
-	{
-		delete m_pwndTitle;
-	}
-
-	if ( m_pCamera )
-	{
-		delete m_pCamera;
-	}
-
-	if ( m_pRender )
-	{
-		delete m_pRender;
-	}
+	delete m_pwndTitle;
+	delete m_pCamera;
+	delete m_pRender;
 }
 
 //-----------------------------------------------------------------------------

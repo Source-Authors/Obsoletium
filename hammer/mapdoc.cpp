@@ -1874,10 +1874,7 @@ void CMapDoc::SetManifest( CManifest *pManifest )
 	m_pManifest = pManifest; 
 	m_pManifestOwner = pManifest; 
 
-	if ( m_pSelection )
-	{
-		delete m_pSelection;
-	}
+	delete m_pSelection;
 
 	m_pSelection = pManifest->GetSelection();
 }

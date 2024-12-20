@@ -35,10 +35,7 @@ CTexture::CTexture( void )
 //-----------------------------------------------------------------------------
 CTexture::~CTexture( void )
 {
-	if ( m_pImageData != NULL )
-	{
-		delete [] m_pImageData;
-	}
+	delete [] m_pImageData;
 }
 
 

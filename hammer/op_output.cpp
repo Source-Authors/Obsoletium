@@ -671,10 +671,7 @@ void COP_Output::EmptyCopyBuffer(void)
 	for (int i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConnection = m_pConnectionBuffer->Element(i);
-		if (pConnection != NULL)
-		{
-			delete pConnection;
-		}
+		delete pConnection;
 	}
 	m_pConnectionBuffer->RemoveAll();
 	

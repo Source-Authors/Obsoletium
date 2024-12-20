@@ -154,10 +154,7 @@ CMaterialImageCache::CMaterialImageCache(int maxNumGraphicsLoaded)
 //-----------------------------------------------------------------------------
 CMaterialImageCache::~CMaterialImageCache(void)
 {
-	if (pool != NULL)
-	{
-		delete [] pool;
-	}
+	delete [] pool;
 }
 
 
@@ -209,10 +206,7 @@ CMaterialCache::CMaterialCache(void)
 //-----------------------------------------------------------------------------
 CMaterialCache::~CMaterialCache(void)
 {
-	if (m_pCache != NULL)
-	{
-		delete m_pCache;
-	}
+	delete m_pCache;
 }
 
 

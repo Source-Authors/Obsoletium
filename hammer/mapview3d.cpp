@@ -151,21 +151,14 @@ CMapView3D::CMapView3D(void)
 //-----------------------------------------------------------------------------
 CMapView3D::~CMapView3D(void)
 {
-	if (m_pCamera != NULL)
-	{
-		delete m_pCamera;
-	}
-
+	delete m_pCamera;
 	if (m_pRender != NULL)
 	{
 		m_pRender->ShutDown();
 		delete m_pRender;
 	}
 
-	if (m_pwndTitle != NULL)
-	{
-		delete m_pwndTitle;
-	}
+	delete m_pwndTitle;
 }
 
 //-----------------------------------------------------------------------------

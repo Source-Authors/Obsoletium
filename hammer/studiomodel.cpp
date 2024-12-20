@@ -421,10 +421,8 @@ StudioModel::StudioModel(void) : m_pModelName(0)
 StudioModel::~StudioModel(void)
 {
 	FreeModel();
-	if (m_pModelName)
-	{
-		delete[] m_pModelName;
-	}
+
+	delete []m_pModelName;
 	delete m_pStudioHdr;
 
 	delete []m_pPosePos;
@@ -762,10 +760,7 @@ bool StudioModel::LoadModel( const char *modelname )
 	if (m_pModelName != modelname)
 	{
 		// Copy over the model name; we'll need it later...
-		if (m_pModelName)
-		{
-			delete[] m_pModelName;
-		}
+		delete[] m_pModelName;
 
 		m_pModelName = new char[strlen(modelname) + 1];
 		strcpy( m_pModelName, modelname );

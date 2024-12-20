@@ -719,11 +719,7 @@ void Clipper3D::ResetClipResults( void )
     FOR_EACH_OBJ( m_ClipResults, pos )
     {
         CClipGroup *pClipGroup = m_ClipResults.Element(pos);
-
-        if( pClipGroup )
-        {
-            delete pClipGroup;
-        }
+        delete pClipGroup;
     }
 
 	m_ClipResults.RemoveAll();
