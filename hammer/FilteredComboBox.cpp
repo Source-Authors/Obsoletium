@@ -22,7 +22,7 @@ END_MESSAGE_MAP()
 
 
 static const char *s_pStringToMatch = NULL;
-static int s_iStringToMatchLen;
+static ptrdiff_t s_iStringToMatchLen;
 
 
 // This can help debug events in the combo box.
@@ -36,20 +36,25 @@ public:
 		m_iEvent = g_iFunctionMarkerEvent++;
 		
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "enter %d: %s\n", m_iEvent, p );
+		V_sprintf_safe( str, "enter %d: %s\n", m_iEvent, p );
 		OutputDebugString( str );
 		m_p = p;
+#else
+		m_p = nullptr;
+		m_iEvent = -1;
 #endif
 	}
 	
 	~CFunctionMarker()
-	{
 #if 0
+	{
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "exit %d: %s\n", m_iEvent, m_p );
+		V_sprintf_safe( str, "exit %d: %s\n", m_iEvent, m_p );
 		OutputDebugString( str );
-#endif
 	}
+#else
+		= default;
+#endif
 	const char *m_p;
 	int m_iEvent;
 };
@@ -63,6 +68,7 @@ CFilteredComboBox::CFilteredComboBox( CFilteredComboBox::ICallbacks *pCallbacks 
 	m_hQueuedFont = NULL;
 	m_bInSelChange = false;
 	m_bNotifyParent = true;
+	m_bWasEditing = false;
 	m_dwTextColor = RGB(0, 0, 0);
 	m_bOnlyProvideSuggestions = true;
 	m_hEditControlFont = NULL;
@@ -107,7 +113,7 @@ void CFilteredComboBox::SetSuggestions( CUtlVector<CString> &suggestions, int fl
 		}
 		else
 		{
-			m_LastTextChangedValue = "";
+			m_LastTextChangedValue.Empty();
 		}
 	}
 	else
@@ -523,7 +529,6 @@ BOOL CFilteredComboBox::OnSelChange()
 		{
 			HFONT hFont = m_hQueuedFont;
 			m_hQueuedFont = NULL;
-			m_bInSelChange = false;
 			InternalSetEditControlFont( hFont, strOriginalText, dwOriginalEditSel );
 		}
 	}
