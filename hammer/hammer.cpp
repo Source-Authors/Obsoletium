@@ -5,13 +5,13 @@
 //===========================================================================//
 
 #include "stdafx.h"
+
 #include <io.h>
-#include <stdlib.h>
 #include <direct.h>
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
+
+#include <cstdlib>
 #include <fstream>
-#pragma warning(pop)
+
 #include "BuildNum.h"
 #include "EditGameConfigs.h"
 #include "Splash.h"
@@ -31,7 +31,6 @@
 #include "GlobalFunctions.h"
 #include "Shell.h"
 #include "ShellMessageWnd.h"
-#include "Options.h"
 #include "TextureSystem.h"
 #include "ToolManager.h"
 #include "Hammer.h"
@@ -57,8 +56,9 @@
 #include "lpreview_thread.h"
 #include "inputsystem/iinputsystem.h"
 #include "datacache/idatacache.h"
+#ifndef NO_STEAM
 #include "steam/steam_api.h"
-#include "p4lib/ip4.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -113,8 +113,10 @@ CMessageWnd *g_pwndMessage = NULL;
 CMessageQueue<MessageToLPreview> g_HammerToLPreviewMsgQueue;
 CMessageQueue<MessageFromLPreview> g_LPreviewToHammerMsgQueue;
 ThreadHandle_t g_LPreviewThread;
+#ifndef NO_STEAM
 CSteamAPIContext g_SteamAPIContext;
 CSteamAPIContext *steamapicontext = &g_SteamAPIContext;
+#endif
 
 
 bool	CHammer::m_bIsNewDocumentVisible = true;
@@ -483,10 +485,12 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	CHammerCmdLine cmdInfo;
 	ParseCommandLine(cmdInfo);
 	
+#ifndef NO_STEAM
 	// Set up SteamApp() interface (for checking app ownership)
 	SteamAPI_InitSafe();
 	SteamAPI_SetTryCatchCallbacks( false ); // We don't use exceptions, so tell steam not to use try/catch in callback handlers
 	g_SteamAPIContext.Init();
+#endif
 
 	// Load the options
 	// NOTE: Have to do this now, because we need it before Inits() are called 
