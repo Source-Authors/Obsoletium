@@ -15,6 +15,7 @@
 #include "tier0/vprof.h"
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
+#include "unordered_map"
 
 #ifdef _X360
 #include "xbox/xbox_console.h"
@@ -113,6 +114,7 @@ private:
 	CUtlVector< IConsoleDisplayFunc* >	m_DisplayFuncs;
 	int									m_nNextDLLIdentifier;
 	ConCommandBase						*m_pConCommandList;
+	std::unordered_map<std::string_view, ConCommandBase*> m_pConCommandNames;
 
 	// temporary console area so we can store prints before console display funs are installed
 	mutable CUtlBuffer					m_TempConsoleBuffer;
@@ -403,6 +405,8 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 	// link the variable in
 	variable->m_pNext = m_pConCommandList;
 	m_pConCommandList = variable;
+
+	m_pConCommandNames[ variable->GetName() ] = variable;
 }
 
 void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
@@ -434,6 +438,10 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 		pCommand->m_pNext = NULL;
 		break;
 	}
+
+	auto it = m_pConCommandNames.find( pCommandToRemove->GetName() );
+	if ( it != m_pConCommandNames.end() )
+		m_pConCommandNames.erase(it);
 }
 
 void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
@@ -453,6 +461,10 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 			// Unlink
 			pCommand->m_bRegistered = false;
 			pCommand->m_pNext = NULL;
+
+			auto it = m_pConCommandNames.find( pCommand->GetName() );
+			if ( it != m_pConCommandNames.end() )
+				m_pConCommandNames.erase(it);
 		}
 
 		pCommand = pNext;
@@ -467,6 +479,10 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 //-----------------------------------------------------------------------------
 const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 {
+	auto it = m_pConCommandNames.find( name );
+	if (it != m_pConCommandNames.end())
+		return it->second;
+
 	const ConCommandBase *cmd = GetCommands();
 	for ( ; cmd; cmd = cmd->GetNext() )
 	{
@@ -478,6 +494,10 @@ const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 
 ConCommandBase *CCvar::FindCommandBase( const char *name )
 {
+	auto it = m_pConCommandNames.find( name );
+	if (it != m_pConCommandNames.end())
+		return it->second;
+
 	ConCommandBase *cmd = GetCommands();
 	for ( ; cmd; cmd = cmd->GetNext() )
 	{
