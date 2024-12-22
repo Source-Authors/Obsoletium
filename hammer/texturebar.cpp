@@ -143,7 +143,7 @@ void CTextureBar::NotifyGraphicsChanged()
 				const char *p = strstr(pGroup->GetName(), "textures\\");
 				if (p)
 				{
-					p += strlen("textures\\");
+					p += ssize("textures\\") - 1;
 				}
 				else
 				{
