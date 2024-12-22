@@ -621,7 +621,7 @@ bool COptions::Read(void)
 		{
 			str.Format("TextureFile%d", i);
 			str = APP()->GetProfileString(pszGeneral, str);
-			if(GetFileAttributes(str) == 0xffffffff)
+			if(GetFileAttributes(str) == INVALID_FILE_ATTRIBUTES)
 			{
 				// can't find
 				continue;

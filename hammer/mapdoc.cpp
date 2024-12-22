@@ -5834,7 +5834,7 @@ void CMapDoc::OnFileRunmap(void)
 	strBspFile.ReleaseBuffer();
 	
 	// if no bsp file, make sure it's checked
-	if (GetFileAttributes(strBspFile) == 0xFFFFFFFF)
+	if (GetFileAttributes(strBspFile) == INVALID_FILE_ATTRIBUTES)
 	{
 		dlg.m_iQBSP = 1;
 	}
@@ -5884,7 +5884,7 @@ void CMapDoc::OnFileRunmap(void)
 		}
 	}
 
-	if (GetFileAttributes(strBspFile) == 0xFFFFFFFF)
+	if (GetFileAttributes(strBspFile) == INVALID_FILE_ATTRIBUTES)
 	{
 		if (!dlg.m_iQBSP)
 		{
@@ -9066,7 +9066,7 @@ void CMapDoc::OnMapLoadportalfile(void)
 
 	CString str;
 	str.Format("Load default portal file?\n(%s)", m_pPortalFile->fileName.GetBuffer());
-	if(GetFileAttributes(m_pPortalFile->fileName) == 0xFFFFFFFF ||
+	if(GetFileAttributes(m_pPortalFile->fileName) == INVALID_FILE_ATTRIBUTES ||
 		AfxMessageBox(str, MB_ICONQUESTION | MB_YESNO) == IDNO)
 	{
 		CFileDialog dlg(TRUE, ".prt", m_pPortalFile->fileName, OFN_HIDEREADONLY | 
@@ -9079,7 +9079,7 @@ void CMapDoc::OnMapLoadportalfile(void)
 		m_pPortalFile->fileName = dlg.GetPathName();	
 	}
 // load the file
-	if(GetFileAttributes(m_pPortalFile->fileName) == 0xFFFFFFFF)
+	if(GetFileAttributes(m_pPortalFile->fileName) == INVALID_FILE_ATTRIBUTES)
 	{
 		AfxMessageBox("Couldn't find portal file.");
 		return;
@@ -9160,7 +9160,7 @@ void CMapDoc::OnMapLoadpointfile(void)
 
 	CString str;
 	str.Format("Load default pointfile?\n(%s)", m_strLastPointFile.GetBuffer());
-	if(GetFileAttributes(m_strLastPointFile) == 0xFFFFFFFF ||
+	if(GetFileAttributes(m_strLastPointFile) == INVALID_FILE_ATTRIBUTES ||
 		AfxMessageBox(str, MB_ICONQUESTION | MB_YESNO) == IDNO)
 	{
 		CFileDialog dlg(TRUE, ".pts", m_strLastPointFile, OFN_HIDEREADONLY | 
@@ -9174,7 +9174,7 @@ void CMapDoc::OnMapLoadpointfile(void)
 	}
 
 	// load the file
-	if(GetFileAttributes(m_strLastPointFile) == 0xFFFFFFFF)
+	if(GetFileAttributes(m_strLastPointFile) == INVALID_FILE_ATTRIBUTES)
 	{
 		AfxMessageBox("Couldn't load pointfile.");
 		return;

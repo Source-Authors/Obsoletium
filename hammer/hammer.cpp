@@ -1702,7 +1702,7 @@ void CHammer::OnFileOpen(void)
 //-----------------------------------------------------------------------------
 CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName) 
 {
-	if(GetFileAttributes(lpszFileName) == 0xFFFFFFFF)
+	if(GetFileAttributes(lpszFileName) == INVALID_FILE_ATTRIBUTES)
 	{
 		CString		Message;
 

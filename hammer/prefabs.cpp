@@ -857,7 +857,7 @@ int CPrefabLibraryRMF::SetName(LPCTSTR pszName)
 	else
 	{
 		// ensure destination name doesn't exist already - 
-		if(GetFileAttributes(szNewFilename) != 0xFFFFFFFF)
+		if(GetFileAttributes(szNewFilename) != INVALID_FILE_ATTRIBUTES)
 			return 0;	// exists.
 	}
 

@@ -94,7 +94,7 @@ Again:
 		strTextFile.ReleaseBuffer();
 		strTextFile += ".txt";
 
-		if(GetFileAttributes(strTextFile) != 0xFFFFFFFF)
+		if(GetFileAttributes(strTextFile) != INVALID_FILE_ATTRIBUTES)
 		{
 			std::ifstream tfile(strTextFile);
 			char szBuffer[1024], szBuffer2[1024];

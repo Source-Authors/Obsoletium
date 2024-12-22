@@ -1031,7 +1031,7 @@ DWORD CTextureSystem::LoadGraphicsFile(const char *pFilename)
 	// Is this a WAD file?
 	//
 	DWORD dwAttrib = GetFileAttributes(pFilename);
-	if (dwAttrib == 0xFFFFFFFF)
+	if (dwAttrib == INVALID_FILE_ATTRIBUTES)
 	{
 		return(0);
 	}

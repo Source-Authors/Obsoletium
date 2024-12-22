@@ -402,7 +402,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 		{
 			char szFile[MAX_PATH];
 			FixGameVars(cmd.szEnsureFn, szFile, FALSE);
-			if(GetFileAttributes(szFile) == 0xFFFFFFFF)
+			if(GetFileAttributes(szFile) == INVALID_FILE_ATTRIBUTES)
 			{
 				// not there!
 				CString str;
