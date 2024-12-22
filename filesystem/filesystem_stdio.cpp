@@ -66,7 +66,7 @@ public:
 
 protected:
 	// implementation of CBaseFileSystem virtual functions
-	virtual FILE *FS_fopen( const char *filename, const char *options, unsigned flags, int64 *size );
+	virtual FILE *FS_fopen( const char *filename, const char *options, unsigned flags, int64 *size, bool bNative );
 	virtual void FS_setbufsize( FILE *fp, unsigned nBytes );
 	virtual void FS_fclose( FILE *fp );
 	virtual void FS_fseek( FILE *fp, int64 pos, int seekType );
@@ -415,7 +415,7 @@ void CFileSystem_Stdio::FreeOptimalReadBuffer( void *p )
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
-FILE *CFileSystem_Stdio::FS_fopen( const char *filenameT, const char *options, unsigned flags, int64 *size )
+FILE *CFileSystem_Stdio::FS_fopen( const char *filenameT, const char *options, unsigned flags, int64 *size, bool bNative )
 {
 	CStdFilesystemFile *pFile = NULL;
 
@@ -424,14 +424,16 @@ FILE *CFileSystem_Stdio::FS_fopen( const char *filenameT, const char *options, u
 	CBaseFileSystem::FixUpPath ( filenameT, filename, sizeof( filename ) );
 
 #ifdef _WIN32
-	if ( CWin32ReadOnlyFile::CanOpen( filename, options ) )
+	if ( bNative && CWin32ReadOnlyFile::CanOpen( filename, options ) )
 	{
 		pFile = CWin32ReadOnlyFile::FS_fopen( filename, options, size );
-		if ( pFile )
-		{
-			return (FILE *)pFile;
-		}
+
+		// If you have filesystem_native 1 checking if a file exists can take twice as long. There are some cases where CWin32[...]::FS_fopen fails but CStdioFile::FS_fopen works
+		return (FILE *)pFile; // We do two passes, one with bNative and one without. This should improve performance since most of the time CWin32ReadOnlyFile::FS_fopen will work.
 	}
+#else
+	if ( bNative ) // The Native pass should fail for any other platform, as the second pass should use the normal CStdioFile.
+		return (FILE *)pFile;
 #endif
 
 	pFile = CStdioFile::FS_fopen( filename, options, size );
@@ -750,6 +752,7 @@ int CFileSystem_Stdio::HintResourceNeed( const char *hintlist, int forgetEveryth
 //-----------------------------------------------------------------------------
 CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, int64 *size )
 {
+	VPROF_BUDGET( "CStdioFile::FS_fopen", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	FILE *pFile = NULL;
 	char *p = NULL;
 	char filename[MAX_PATH];
