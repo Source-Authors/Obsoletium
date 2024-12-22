@@ -33,8 +33,7 @@
 
 
 
-
-#define IsSortChr(ch) ((ch == '-') || (ch == '+'))
+[[nodiscard]] constexpr inline bool IsSortChr(char ch) { return ch == '-' || ch == '+'; }
 
 
 //-----------------------------------------------------------------------------
