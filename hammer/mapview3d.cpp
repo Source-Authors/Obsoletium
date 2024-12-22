@@ -1212,7 +1212,7 @@ void CMapView3D::UpdateView(int nFlags)
 //			ulFace - Index of face in object that was hit.
 // Output : Returns a pointer to the CMapClass object at the coordinates, NULL if none.
 //-----------------------------------------------------------------------------
-CMapClass *CMapView3D::NearestObjectAt( const Vector2D &vPoint, ULONG &ulFace, unsigned int nFlags, VMatrix *pLocalMatrix )
+CMapClass *CMapView3D::NearestObjectAt( const Vector2D &vPoint, unsigned int &ulFace, unsigned int nFlags, VMatrix *pLocalMatrix )
 {
 	ulFace = 0;
 	if (m_pRender == NULL)

@@ -89,7 +89,7 @@ bool CToolPickEntity::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vecto
 {
 	bool bControl = ((nFlags & MK_CONTROL) != 0);
 
-	unsigned long uEntity;
+	unsigned uEntity;
 	CMapClass *pObject = pView->NearestObjectAt( vPoint, uEntity);
 	if (pObject != NULL)
 	{

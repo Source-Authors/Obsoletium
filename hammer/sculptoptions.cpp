@@ -1354,7 +1354,7 @@ bool CSculptPushOptions::OnRMouseDown3D( CMapView3D *pView, UINT nFlags, const V
 		//
 		// check for closest solid object
 		//
-		ULONG		ulFace;
+		unsigned	ulFace;
 		CMapClass	*pObject;
 
 		if( ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL ) )
@@ -2869,7 +2869,7 @@ bool CSculptCarveOptions::OnRMouseDown3D( CMapView3D *pView, UINT nFlags, const 
 		//
 		// check for closest solid object
 		//
-		ULONG		ulFace;
+		unsigned	ulFace;
 		CMapClass	*pObject;
 
 		if( ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL ) )

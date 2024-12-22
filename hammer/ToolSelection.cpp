@@ -1585,7 +1585,7 @@ void Selection3D::EyedropperPick3D(CMapView3D *pView, const Vector2D &vPoint)
 	//
 	// If they clicked on an entity, get the name of the entity they clicked on.
 	//
-	ULONG ulFace;
+	unsigned ulFace;
 	CMapClass *pClickObject = pView->NearestObjectAt( vPoint, ulFace);
 	if (pClickObject != NULL)
 	{

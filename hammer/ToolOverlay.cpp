@@ -87,7 +87,7 @@ bool CToolOverlay::OnLMouseDown3D( CMapView3D *pView, UINT nFlags, const Vector2
 	OverlaySelection( pView, nFlags, vPoint );
 
 	// Handle the overlay creation and placement (if we hit a solid).
-	ULONG ulFace;
+	unsigned ulFace;
 	CMapClass *pObject = NULL;
 	if ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL )
 	{

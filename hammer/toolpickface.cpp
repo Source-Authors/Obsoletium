@@ -99,7 +99,7 @@ bool CToolPickFace::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 		bShift = false;
 	}
 
-	unsigned long uFace;
+	unsigned uFace;
 	CMapClass *pObject = pView->NearestObjectAt( vPoint, uFace);
 	if (pObject != NULL)
 	{

@@ -500,7 +500,7 @@ void CToolEntity::OnEscape(void)
 //-----------------------------------------------------------------------------
 bool CToolEntity::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D &vPoint)
 {
-	ULONG ulFace;
+	unsigned ulFace;
 	VMatrix LocalMatrix, LocalMatrixNeg;
 	CMapClass *pObject = pView->NearestObjectAt( vPoint, ulFace, FLAG_OBJECTS_AT_RESOLVE_INSTANCES, &LocalMatrix );
 	Tool3D::OnLMouseDown3D(pView, nFlags, vPoint);
