@@ -51,6 +51,9 @@ CTextureWindow::CTextureWindow(void)
 {
 	total_x = -1;
 	total_y = -1;
+
+	iDisplaySizeX = -1;
+	iDisplaySizeY = -1;
 	iTexNameCharWidth = -1;
 
 	bFirstPaint = TRUE;
@@ -89,7 +92,7 @@ void CTextureWindow::Create(CWnd *pParentWnd, RECT& rect)
 {
 	static CString TextureWndClassName;
 
-	iDisplaySize = 64;
+	iDisplaySizeX = iDisplaySizeY = 64;
 
 	if(TextureWndClassName.IsEmpty())
 	{
@@ -300,8 +303,8 @@ BOOL CTextureWindow::EnumTexturePositions(TWENUMPOS *pTE, BOOL bStart)
 doresize:
 
 	SetRect( &texrect, pTE->cur_x, pTE->cur_y,
-		pTE->cur_x + iDisplaySize,
-		pTE->cur_y + iDisplaySize );
+		pTE->cur_x + iDisplaySizeX,
+		pTE->cur_y + iDisplaySizeY );
 
 	// if we've got one texture on this row already, and this one goes out of 
 	// the client area, jump to the next row. we want to have at least one texture on 
@@ -331,10 +334,12 @@ doresize:
 //					64 to display as 64 x 64 textures.
 //					128 to display as 128 x 128 textures.
 //					512 to display as 512 x 512 textures
+//					1024 to display as 1024 x 1024 textures
 //-----------------------------------------------------------------------------
-void CTextureWindow::SetDisplaySize(int iSize)
+void CTextureWindow::SetDisplaySize(int iSizeX, int iSizeY)
 {
-	iDisplaySize = iSize;
+	iDisplaySizeX = iSizeX;
+	iDisplaySizeY = iSizeY;
 	UpdateScrollSizes();
 	SelectTexture(szCurTexture, FALSE);
 	RedrawWindow();

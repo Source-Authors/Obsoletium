@@ -72,7 +72,7 @@ public:
 	void EnableUpdate(bool bEnable);
 	void UpdateScrollSizes();
 	BOOL EnumTexturePositions(TWENUMPOS *pTE, BOOL bStart = FALSE);
-	void SetDisplaySize(int iSize);
+	void SetDisplaySize(int iSizeX, int iSizeY);
 	void HighlightCurTexture(CDC *pDC = NULL);
 	void SetNameFilter(LPCTSTR pszFilter);
 	void SetKeywords(const char *pszKeywords);
@@ -94,7 +94,8 @@ protected:
 
 	int total_x;
 	int total_y;
-	int iDisplaySize;
+	int iDisplaySizeX;
+	int iDisplaySizeY;
 	int iTexNameCharWidth;
 	BOOL bFirstPaint;
 	CFont TexFont;

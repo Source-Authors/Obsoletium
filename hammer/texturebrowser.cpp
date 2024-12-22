@@ -266,13 +266,17 @@ void CTextureBrowser::OnSelendokTexturesize()
 	switch(iCurSel)
 	{
 	case 0:
-		m_cTextureWindow.SetDisplaySize(128);
+		m_cTextureWindow.SetDisplaySize(128, 128);
 		break;
 	case 1:
-		m_cTextureWindow.SetDisplaySize(256);
+		m_cTextureWindow.SetDisplaySize(256, 256);
 		break;
 	case 2:
-		m_cTextureWindow.SetDisplaySize(512);
+		m_cTextureWindow.SetDisplaySize(512, 512);
+		break;
+	// dimhotepus: Add 1024x1024 view for new textures.
+	case 3:
+		m_cTextureWindow.SetDisplaySize(1024, 1024);
 		break;
 	}
 }
