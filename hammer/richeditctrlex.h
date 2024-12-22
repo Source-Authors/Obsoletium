@@ -128,7 +128,7 @@ class CFontList : public list<CString>
 			s = "{\\fonttbl";
 
 			int nCount = 0;
-			for (const_iterator i = begin(); i!=end(); i++)
+			for (const_iterator i = begin(); i!=end(); ++i)
 			{
 				CString s2;
 				s2.Format("{\\f%d %s;}", nCount++, (const char*)(*i));
@@ -159,7 +159,7 @@ class CColorList : public list<COLORREF>
 		int find(COLORREF c)
 		{
 			int n = 0;
-			for (iterator i = begin(); i != end(); i++, n++)
+			for (iterator i = begin(); i != end(); ++i, ++n)
 			{
 				COLORREF cComp(*i);
 				if (cComp == c)
@@ -175,7 +175,7 @@ class CColorList : public list<COLORREF>
 		operator CString() const
 		{
 			CString s("{\\colortbl");
-			for (const_iterator i = begin(); i != end(); i++)
+			for (const_iterator i = begin(); i != end(); ++i)
 			{
 				COLORREF c(*i);
 				int r((c & 0x000000ff));
@@ -208,7 +208,7 @@ class RICHED_DECL CManip
 
 		CManip()
 		{ 
-			m_strVal = ""; 
+			m_strVal.Empty(); 
 			m_nVal = 0; 
 			m_pFunc =  NULL; 
 			m_bVal = false; 
@@ -224,7 +224,7 @@ class RICHED_DECL CManip
 
 		CManip(LPVOID p, int n)
 		{
-			m_strVal = ""; 
+			m_strVal.Empty(); 
 			m_nVal = n;
 			m_pFunc = p;
 			m_bVal = false; 
@@ -232,7 +232,7 @@ class RICHED_DECL CManip
 
 		CManip(LPVOID p, bool b)
 		{
-			m_strVal = ""; 
+			m_strVal.Empty(); 
 			m_nVal = 0;
 			m_pFunc = p;
 			m_bVal = b;
