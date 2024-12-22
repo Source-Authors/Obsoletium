@@ -275,9 +275,13 @@ void CStudioFileChangeWatcher::Init()
 		CUtlVector<char*> searchPathList;
 		V_SplitString( searchPaths, ";", searchPathList );
 
-		for ( int i=0; i < searchPathList.Count(); i++ )
+		for ( auto *searchPath : searchPathList )
 		{
-			m_Watcher.AddDirectory( searchPathList[i], "models", true );
+			// dimhotepus: Do not watch VPKs (from mods) as they are not directories.
+			if ( !V_strEndsWith( searchPath, ".vpk" ) )
+			{
+				m_Watcher.AddDirectory( searchPath, "models", true );
+			}
 		}
 		
 		searchPathList.PurgeAndDeleteElements();

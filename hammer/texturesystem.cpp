@@ -75,9 +75,13 @@ void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, intp context )
 		CUtlVector<char*> searchPathList;
 		V_SplitString( searchPaths, ";", searchPathList );
 
-		for ( int i=0; i < searchPathList.Count(); i++ )
+		for ( auto *searchPath : searchPathList )
 		{
-			m_Watcher.AddDirectory( searchPathList[i], "materials", true );
+			// dimhotepus: Do not watch VPKs (from mods) as they are not directories.
+			if ( !V_strEndsWith( searchPath, ".vpk" ) )
+			{
+				m_Watcher.AddDirectory( searchPath, "materials", true );
+			}
 		}
 		
 		searchPathList.PurgeAndDeleteElements();
