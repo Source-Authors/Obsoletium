@@ -8,10 +8,11 @@
 // ProcessWnd.h : header file
 //
 
+#include "windows/base_wnd.h"
 /////////////////////////////////////////////////////////////////////////////
 // CProcessWnd window
 
-class CProcessWnd : public CWnd
+class CProcessWnd : public CBaseWnd
 {
 // Construction
 public:

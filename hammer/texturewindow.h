@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 #include "IEditorTexture.h"
 #include "utlvector.h"
 
@@ -40,7 +41,7 @@ public:
 };
 
 
-class CTextureWindow : public CWnd
+class CTextureWindow : public CBaseWnd
 {
 public:
 	CTextureWindow();

@@ -20,7 +20,7 @@ CFont CTitleWnd::m_FontNormal;
 CFont CTitleWnd::m_FontActive;
 
 
-BEGIN_MESSAGE_MAP(CTitleWnd, CWnd)
+BEGIN_MESSAGE_MAP(CTitleWnd, CBaseWnd)
 	ON_WM_PAINT()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_LBUTTONDOWN()

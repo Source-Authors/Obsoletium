@@ -29,7 +29,7 @@ CProcessWnd::~CProcessWnd()
 }
 
 
-BEGIN_MESSAGE_MAP(CProcessWnd, CWnd)
+BEGIN_MESSAGE_MAP(CProcessWnd, CBaseWnd)
 	ON_BN_CLICKED(IDC_PROCESSWND_COPYALL, OnCopyAll)
 	//{{AFX_MSG_MAP(CProcessWnd)
 	ON_BN_CLICKED(IDC_PROCESSWND_COPYALL, OnCopyAll)

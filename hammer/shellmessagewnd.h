@@ -16,11 +16,12 @@
 #define SHELLMESSAGEWND_H
 #pragma once
 
+#include "windows/base_wnd.h"
 
 class CShell;
 
 
-class CShellMessageWnd : public CWnd
+class CShellMessageWnd : public CBaseWnd
 {
 	public:
 		// dimhotepus: Init members in ctor.

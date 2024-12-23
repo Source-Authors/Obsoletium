@@ -32,7 +32,7 @@ CDynamicDialogWnd::~CDynamicDialogWnd()
 }
 
 
-BEGIN_MESSAGE_MAP(CDynamicDialogWnd, CWnd)
+BEGIN_MESSAGE_MAP(CDynamicDialogWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CDynamicDialogWnd)
 		// NOTE - the ClassWizard will add and remove mapping macros here.
 	//}}AFX_MSG_MAP

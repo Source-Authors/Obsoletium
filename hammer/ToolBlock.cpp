@@ -19,9 +19,9 @@
 #include "ToolManager.h"
 #include "vgui/Cursor.h"
 #include "Selection.h"
+#include "windows/base_wnd.h"
 
-
-class CToolBlockMessageWnd : public CWnd
+class CToolBlockMessageWnd : public CBaseWnd
 {
 	public:
 		// dimhotepus: Init members in ctor.
@@ -49,7 +49,7 @@ static CToolBlockMessageWnd s_wndToolMessage;
 static const char *g_pszClassName = "ValveEditor_BlockToolWnd";
 
 
-BEGIN_MESSAGE_MAP(CToolBlockMessageWnd, CWnd)
+BEGIN_MESSAGE_MAP(CToolBlockMessageWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CToolMessageWnd)
 	ON_COMMAND(ID_CREATEOBJECT, OnCreateObject)
 	//}}AFX_MSG_MAP

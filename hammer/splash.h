@@ -10,8 +10,9 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 
-class CSplashWnd : public CWnd
+class CSplashWnd : public CBaseWnd
 {
 // Construction
 protected:

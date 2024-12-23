@@ -157,7 +157,7 @@ static CSplashWnd *s_pSplashWnd = NULL;
 static bool s_bShowSplashWnd = true;
 
 
-BEGIN_MESSAGE_MAP(CSplashWnd, CWnd)
+BEGIN_MESSAGE_MAP(CSplashWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CSplashWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()

@@ -10,13 +10,14 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 #include "mathlib/vector.h"
 
 
 class CAngleCombo;
 
 
-class CAngleBox : public CWnd
+class CAngleBox : public CBaseWnd
 {
 public:
 	CAngleBox();

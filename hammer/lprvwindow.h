@@ -10,10 +10,11 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 #include "utlvector.h"
 
 
-class CLightingPreviewResultsWindow : public CWnd
+class CLightingPreviewResultsWindow : public CBaseWnd
 {
 public:
 	CLightingPreviewResultsWindow();

@@ -15,8 +15,9 @@
 #define TITLEWND_H
 #pragma once
 
+#include "windows/base_wnd.h"
 
-class CTitleWnd : public CWnd
+class CTitleWnd : public CBaseWnd
 {
 	public:
 

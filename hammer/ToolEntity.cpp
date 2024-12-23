@@ -25,6 +25,7 @@
 #include "vgui/Cursor.h"
 #include "Selection.h"
 #include "vstdlib/random.h"
+#include "windows/base_wnd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -35,7 +36,7 @@
 static HCURSOR s_hcurEntity = NULL;
 
 
-class CToolEntityMessageWnd : public CWnd
+class CToolEntityMessageWnd : public CBaseWnd
 {
 	public:
 		// dimhotepus: Init members in ctor.
@@ -63,7 +64,7 @@ static CToolEntityMessageWnd s_wndToolMessage;
 static const char *g_pszClassName = "ValveEditor_EntityToolWnd";
 
 
-BEGIN_MESSAGE_MAP(CToolEntityMessageWnd, CWnd)
+BEGIN_MESSAGE_MAP(CToolEntityMessageWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CToolMessageWnd)
 	ON_COMMAND(ID_CREATEOBJECT, OnCreateObject)
 	//}}AFX_MSG_MAP

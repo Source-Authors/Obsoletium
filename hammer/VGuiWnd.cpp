@@ -20,7 +20,7 @@
 #include "hammer.h"
 
 
-IMPLEMENT_DYNCREATE(CVGuiPanelWnd, CWnd)
+IMPLEMENT_DYNCREATE(CVGuiPanelWnd, CBaseWnd)
 
 #define REPAINT_TIMER_ID	1042 //random value, hopefully no collisions
 
@@ -47,7 +47,7 @@ LRESULT CVGuiPanelWnd::WindowProc( UINT message, WPARAM wParam, LPARAM lParam )
 	return 1;
 }
 
-BEGIN_MESSAGE_MAP(CVGuiPanelWnd, CWnd)
+BEGIN_MESSAGE_MAP(CVGuiPanelWnd, CBaseWnd)
 END_MESSAGE_MAP()
 
 CVGuiWnd::CVGuiWnd(void)

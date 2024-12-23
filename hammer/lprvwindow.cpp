@@ -5,10 +5,8 @@
 //=============================================================================
 
 #include "stdafx.h"
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
+
 #include "hammer.h"
 #include "lprvwindow.h"
 #include "TextureBrowser.h"
@@ -27,7 +25,7 @@
 
 
 
-BEGIN_MESSAGE_MAP(CLightingPreviewResultsWindow, CWnd)
+BEGIN_MESSAGE_MAP(CLightingPreviewResultsWindow, CBaseWnd)
 	//{{AFX_MSG_MAP(CTextureWindow)
 	ON_WM_PAINT()
 	ON_WM_CLOSE()

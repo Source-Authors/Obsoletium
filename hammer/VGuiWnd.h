@@ -3,6 +3,7 @@
 
 #include <afxwin.h>
 #include "color.h"
+#include "windows/base_wnd.h"
 
 namespace vgui
 {
@@ -44,7 +45,7 @@ protected:
 	bool		m_bClearZBuffer;
 };
 
-class CVGuiPanelWnd: public CWnd, public CVGuiWnd
+class CVGuiPanelWnd: public CBaseWnd, public CVGuiWnd
 {
 protected:
 	DECLARE_DYNCREATE(CVGuiPanelWnd)

@@ -16,7 +16,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\common\shaderdll,$SRCDIR\common\iostream;$SRCDIR\dx9sdk\include;$SRCDIR\engine;$SRCDIR\game\shared;$SRCDIR\utils\common;$LIBJPEGSRCDIR;LIBJPEGSRC2DIR"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\dx9sdk\include;$SRCDIR\engine;$SRCDIR\game\shared;$SRCDIR\utils\common;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR"
 		$PreprocessorDefinitions			"$BASE;VALVE;PROTECTED_THINGS_DISABLE;VERSION_SAFE_STEAM_API_INTERFACES;NO_WARN_MBCS_MFC_DEPRECATION"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
 		$AdditionalOptions					"$BASE /EHa"
@@ -115,6 +115,8 @@ $Project "hammer_dll"
 		$File	"Axes2.h"
 		$File	"$SRCDIR\common\windows\base_dlg.h"
 		$File	"$SRCDIR\common\windows\base_dlg.cpp"
+		$File	"$SRCDIR\common\windows\base_wnd.h"
+		$File	"$SRCDIR\common\windows\base_wnd.cpp"
 		$File	"BlockArray.h"
 		$File	"BoundBox.cpp"
 		$File	"BoundBox.h"

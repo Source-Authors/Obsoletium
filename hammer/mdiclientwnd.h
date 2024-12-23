@@ -11,8 +11,9 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 
-class CMDIClientWnd : public CWnd
+class CMDIClientWnd : public CBaseWnd
 {
 public:
 

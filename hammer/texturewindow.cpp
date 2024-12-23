@@ -29,7 +29,7 @@ constexpr inline int iTexNameFontHeight = 7;
 constexpr inline int iTexIconHeight = 12;
 
 
-BEGIN_MESSAGE_MAP(CTextureWindow, CWnd)
+BEGIN_MESSAGE_MAP(CTextureWindow, CBaseWnd)
 	//{{AFX_MSG_MAP(CTextureWindow)
 	ON_WM_PAINT()
 	ON_WM_SIZE()

@@ -23,7 +23,7 @@
 static constexpr char g_pszClassName[] = "Worldcraft_ShellMessageWnd";
 
 
-BEGIN_MESSAGE_MAP(CShellMessageWnd, CWnd)
+BEGIN_MESSAGE_MAP(CShellMessageWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CShellMessageWnd)
 	ON_WM_COPYDATA()
 	//}}AFX_MSG_MAP

@@ -9,10 +9,12 @@
 //
 
 #include "windows/base_dlg.h"
+#include "windows/base_wnd.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CDynamicDialogWnd window
 
-class CDynamicDialogWnd : public CWnd
+class CDynamicDialogWnd : public CBaseWnd
 {
 // Construction
 public:

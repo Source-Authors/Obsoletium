@@ -17,12 +17,13 @@
 #include "StatusBarIDs.h"		// For SetStatusText
 #include "ToolManager.h"
 #include "Selection.h"
+#include "windows/base_wnd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 
-class CToolPointHandleMsgWnd : public CWnd
+class CToolPointHandleMsgWnd : public CBaseWnd
 {
 	public:
 		// dimhotepus: Add ctor to set members.
@@ -50,7 +51,7 @@ static CToolPointHandleMsgWnd s_wndToolMessage;
 static const char *g_pszClassName = "ValveEditor_PointHandleToolWnd";
 
 
-BEGIN_MESSAGE_MAP(CToolPointHandleMsgWnd, CWnd)
+BEGIN_MESSAGE_MAP(CToolPointHandleMsgWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CToolPointHandleMsgWnd)
 	ON_COMMAND(ID_CENTER_ON_ENTITY, OnCenter)
 	//}}AFX_MSG_MAP
