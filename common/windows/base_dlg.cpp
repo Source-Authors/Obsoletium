@@ -27,11 +27,14 @@ CBaseDlg::~CBaseDlg() = default;
 
 BOOL CBaseDlg::OnInitDialog() {
   const BOOL rc{__super::OnInitDialog()};
-
-  if (m_hWnd) {
-    m_dpi_behavior.OnCreateWindow(m_hWnd);
+  // dimhotepus: Try to add main icon for dialog.
+  HANDLE hExeIcon = LoadImageW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(101),
+                               IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+  if (hExeIcon) {
+    SendMessage(WM_SETICON, ICON_BIG, (LPARAM)hExeIcon);
   }
 
+  m_dpi_behavior.OnCreateWindow(m_hWnd);
   return rc;
 }
 

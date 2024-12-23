@@ -19,15 +19,15 @@ namespace {
 /**
  * @brief Update window child controls and DPI dependent things.
  * @param parentWnd Window.
- * @param parentOldDpiX Old X DPI value for window.
- * @param parentOldDpiY Old Y DPI value for window.
+ * @param previousDpiX Old X DPI value for window.
+ * @param previousDpiY Old Y DPI value for window.
  */
-void UpdateDpiDependentThings(HWND parent_window, unsigned parent_old_dpi_x,
-                              unsigned parent_old_dpi_y) {
-  const unsigned new_dpi_y{::GetDpiForWindow(parent_window)};
+void UpdateDpiDependentThings(HWND parentWnd, unsigned previousDpiX,
+                              unsigned previousDpiY) {
+  const unsigned new_dpi_y{::GetDpiForWindow(parentWnd)};
 
   // Send a new font to all child controls.
-  const HFONT old_font{GetWindowFont(parent_window)};
+  const HFONT old_font{GetWindowFont(parentWnd)};
   // "For uiAction values that contain strings within their associated
   // structures, only Unicode (LOGFONTW) strings are supported in this
   // function."
@@ -43,15 +43,15 @@ void UpdateDpiDependentThings(HWND parent_window, unsigned parent_old_dpi_x,
     ::DeleteObject(old_font);
 
     // Set a new font to our window.
-    ::SendMessage(parent_window, WM_SETFONT, reinterpret_cast<WPARAM>(new_font),
+    ::SendMessage(parentWnd, WM_SETFONT, reinterpret_cast<WPARAM>(new_font),
                   MAKELPARAM(TRUE, 0));
   }
 
   const auto change_dpi_request =
-      std::make_tuple(parent_old_dpi_x, parent_old_dpi_y, new_font);
+      std::make_tuple(previousDpiX, previousDpiY, new_font);
 
   ::EnumChildWindows(
-      parent_window,
+      parentWnd,
       [](HWND child_window, LPARAM lParam) {
         auto* parent_old_dpis =
             reinterpret_cast<std::tuple<unsigned, unsigned, HFONT>*>(lParam);
@@ -113,6 +113,8 @@ namespace se::windows::ui {
 
 CDpiWindowBehavior::CDpiWindowBehavior()
     : m_window_handle{nullptr},
+      m_previous_dpi_x{USER_DEFAULT_SCREEN_DPI},
+      m_previous_dpi_y{USER_DEFAULT_SCREEN_DPI},
       m_current_dpi_x{USER_DEFAULT_SCREEN_DPI},
       m_current_dpi_y{USER_DEFAULT_SCREEN_DPI} {}
 
@@ -121,7 +123,9 @@ BOOL CDpiWindowBehavior::OnCreateWindow(HWND window) {
 
   m_window_handle = window;
   // Windows docs say DPI is same for X and Y.
-  m_current_dpi_x = m_current_dpi_y = ::GetDpiForWindow(window);
+  m_previous_dpi_x = m_previous_dpi_y =
+      std::exchange(m_current_dpi_x, ::GetDpiForWindow(window));
+  m_current_dpi_y = m_current_dpi_x;
 
   RECT rc_window;
   ::GetClientRect(window, &rc_window);
@@ -149,11 +153,11 @@ void CDpiWindowBehavior::OnDestroyWindow() {
 }
 
 [[nodiscard]] int CDpiWindowBehavior::ScaleOnX(int value) const {
-  return ::MulDiv(value, m_current_dpi_x, USER_DEFAULT_SCREEN_DPI);
+  return ::MulDiv(value, m_current_dpi_x, m_previous_dpi_x);
 }
 
 [[nodiscard]] int CDpiWindowBehavior::ScaleOnY(int value) const {
-  return ::MulDiv(value, m_current_dpi_y, USER_DEFAULT_SCREEN_DPI);
+  return ::MulDiv(value, m_current_dpi_y, m_previous_dpi_y);
 }
 
 LRESULT CDpiWindowBehavior::OnWindowDpiChanged(WPARAM wParam, LPARAM lParam) {
@@ -169,10 +173,10 @@ LRESULT CDpiWindowBehavior::OnWindowDpiChanged(WPARAM wParam, LPARAM lParam) {
                  SWP_NOZORDER | SWP_NOACTIVATE);
 
   // Need to notify children and dependent controls.
-  UpdateDpiDependentThings(m_window_handle, m_current_dpi_x, m_current_dpi_y);
+  UpdateDpiDependentThings(m_window_handle, m_previous_dpi_x, m_previous_dpi_y);
 
-  m_current_dpi_x = LOWORD(wParam);
-  m_current_dpi_y = HIWORD(wParam);
+  m_previous_dpi_x = std::exchange(m_current_dpi_x, LOWORD(wParam));
+  m_previous_dpi_y = std::exchange(m_current_dpi_y, HIWORD(wParam));
 
   return 0;
 }
