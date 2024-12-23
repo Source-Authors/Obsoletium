@@ -693,7 +693,7 @@ void	DetailObjects::BuildAnyDetailObjects(CMapFace *pMapFace)
 
 		pDetails->SetOrigin( faceCenter );
 
-		int objectType = s_DetailObjectDict.Find(search);
+		intp objectType = s_DetailObjectDict.Find(search);
 		if (objectType < 0)
 		{
 			char	szTextureName[MAX_PATH];
