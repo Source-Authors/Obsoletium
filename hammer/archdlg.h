@@ -10,13 +10,14 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+#include "windows/base_dlg.h"
 
 #include "mathlib/vector.h"
 #include "resource.h"
 
 constexpr inline size_t ARC_MAX_POINTS{4096};
 
-class CArchDlg : public CDialog
+class CArchDlg : public CBaseDlg
 {
 // Construction
 public:

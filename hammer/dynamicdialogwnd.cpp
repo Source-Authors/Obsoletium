@@ -42,7 +42,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CDynamicDialogWnd message handlers
 
-void CDynamicDialogWnd::SetDialogClass(UINT nID, CDialog *pDialog)
+void CDynamicDialogWnd::SetDialogClass(UINT nID, CBaseDlg *pDialog)
 {
 	delete m_pDialog;
 

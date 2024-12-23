@@ -33,7 +33,7 @@ int CTextureBrowser::m_nFilterHistory;
 char CTextureBrowser::m_szLastKeywords[MAX_PATH];
 
 
-BEGIN_MESSAGE_MAP(CTextureBrowser, CDialog)
+BEGIN_MESSAGE_MAP(CTextureBrowser, CBaseDlg)
 	//{{AFX_MSG_MAP(CTextureBrowser)
 	ON_WM_SIZE()
 	ON_CBN_SELENDOK(IDC_TEXTURESIZE, OnSelendokTexturesize)
@@ -64,7 +64,7 @@ END_MESSAGE_MAP()
 // Input  : pParent - 
 //-----------------------------------------------------------------------------
 CTextureBrowser::CTextureBrowser(CWnd* pParent)
-	: CDialog(IDD, pParent)
+	: CBaseDlg(IDD, pParent)
 {
 	m_szNameFilter[0] = '\0';
 	szInitialTexture[0] = '\0';

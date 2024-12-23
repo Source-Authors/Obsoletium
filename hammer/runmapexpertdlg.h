@@ -15,6 +15,7 @@
 #define RUNMAPEXPERTDLG_H
 #pragma once
 
+#include "windows/base_dlg.h"
 #include "RunCommands.h"
 #include "MyCheckListBox.h"
 #include "resource.h"
@@ -23,7 +24,7 @@
 class CCommandSequence;
 
 
-class CRunMapExpertDlg : public CDialog
+class CRunMapExpertDlg : public CBaseDlg
 {
 // Construction
 public:

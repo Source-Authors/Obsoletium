@@ -12,7 +12,6 @@
 
 #include "AutoSelCombo.h"
 #include "ChunkFile.h"
-#include "ListBoxEx.h"
 #include "AngleBox.h"
 #include "fgdlib/WCKeyValues.h"
 #include "MapFace.h"

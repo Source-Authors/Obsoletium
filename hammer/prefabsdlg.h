@@ -11,9 +11,10 @@
 /////////////////////////////////////////////////////////////////////////////
 // CPrefabsDlg dialog
 
+#include "windows/base_dlg.h"
 #include "Prefabs.h"
 
-class CPrefabsDlg : public CDialog
+class CPrefabsDlg : public CBaseDlg
 {
 // Construction
 public:

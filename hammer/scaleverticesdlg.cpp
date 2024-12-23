@@ -22,7 +22,7 @@
 
 
 CScaleVerticesDlg::CScaleVerticesDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CScaleVerticesDlg::IDD, pParent)
+	: CBaseDlg(CScaleVerticesDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CScaleVerticesDlg)
 	//}}AFX_DATA_INIT
@@ -41,7 +41,7 @@ void CScaleVerticesDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CScaleVerticesDlg, CDialog)
+BEGIN_MESSAGE_MAP(CScaleVerticesDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CScaleVerticesDlg)
 	ON_EN_CHANGE(IDC_SCALE, OnChangeScale)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SCALESPIN, OnDeltaposScalespin)

@@ -8,7 +8,6 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "SelectEntityDlg.h"
 #include "hammer.h"
 #include "GlobalFunctions.h"
@@ -21,7 +20,7 @@
 
 CSelectEntityDlg::CSelectEntityDlg(const CMapObjectList *pList,
 								   CWnd* pParent /*=NULL*/)
-	: CDialog(CSelectEntityDlg::IDD, pParent)
+	: CBaseDlg(CSelectEntityDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CSelectEntityDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -42,7 +41,7 @@ void CSelectEntityDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSelectEntityDlg, CDialog)
+BEGIN_MESSAGE_MAP(CSelectEntityDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CSelectEntityDlg)
 	ON_LBN_SELCHANGE(IDC_ENTITIES, OnSelchangeEntities)
 	//}}AFX_MSG_MAP

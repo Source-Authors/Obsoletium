@@ -21,7 +21,7 @@
 
 
 CMapErrorsDlg::CMapErrorsDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CMapErrorsDlg::IDD, pParent)
+	: CBaseDlg(CMapErrorsDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CMapErrorsDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -38,7 +38,7 @@ void CMapErrorsDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CMapErrorsDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMapErrorsDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CMapErrorsDlg)
 	ON_BN_CLICKED(IDC_CLEAR, OnClear)
 	ON_LBN_DBLCLK(IDC_ERRORS, OnDblclkErrors)

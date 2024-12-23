@@ -16,7 +16,7 @@
 static CEntityHelpDlg *g_pHelpDlg = NULL;
 
 
-BEGIN_MESSAGE_MAP(CEntityHelpDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEntityHelpDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEntityHelpDlg)
 	ON_WM_DESTROY()
 	ON_WM_CLOSE()
@@ -60,7 +60,7 @@ void CEntityHelpDlg::SetEditGameClass(GDclass *pClass)
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
 CEntityHelpDlg::CEntityHelpDlg(CWnd *pwndParent)
-	: CDialog(CEntityHelpDlg::IDD, pwndParent)
+	: CBaseDlg(CEntityHelpDlg::IDD, pwndParent)
 {
 	m_pHelpText = NULL;
 	m_pClass = NULL;

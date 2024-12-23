@@ -20,7 +20,7 @@ extern void MakeArc(float x1, float y1, float x2, float y2, int npoints,
 
 
 CArchDlg::CArchDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
-	: CDialog(CArchDlg::IDD, pParent)
+	: CBaseDlg(CArchDlg::IDD, pParent)
 {
 	bmins = boxmins;
 	bmaxs = boxmaxs;
@@ -89,7 +89,7 @@ void CArchDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CArchDlg, CDialog)
+BEGIN_MESSAGE_MAP(CArchDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CArchDlg)
 	ON_EN_CHANGE(IDC_ARC, OnChangeArc)
 	ON_BN_CLICKED(IDC_CIRCLE, OnCircle)

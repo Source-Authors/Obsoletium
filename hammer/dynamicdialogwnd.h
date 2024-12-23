@@ -8,6 +8,7 @@
 // DynamicDialogWnd.h : header file
 //
 
+#include "windows/base_dlg.h"
 /////////////////////////////////////////////////////////////////////////////
 // CDynamicDialogWnd window
 
@@ -22,7 +23,7 @@ public:
 
 // Operations
 public:
-	void SetDialogClass(UINT nID, CDialog *pDialog);
+	void SetDialogClass(UINT nID, CBaseDlg *pDialog);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -40,7 +41,7 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
-	CDialog *m_pDialog;
+	CBaseDlg *m_pDialog;
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -56,6 +56,7 @@
 #include "lpreview_thread.h"
 #include "inputsystem/iinputsystem.h"
 #include "datacache/idatacache.h"
+#include "windows/base_dlg.h"
 #ifndef NO_STEAM
 #include "steam/steam_api.h"
 #endif
@@ -1431,7 +1432,7 @@ bool CHammer::IsNewDocumentVisible( void )
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 
-class CAboutDlg : public CDialog
+class CAboutDlg : public CBaseDlg
 {
 public:
 	CAboutDlg();
@@ -1462,7 +1463,7 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
+CAboutDlg::CAboutDlg() : CBaseDlg(CAboutDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CAboutDlg)
 	//}}AFX_DATA_INIT
@@ -1592,7 +1593,7 @@ BOOL CAboutDlg::OnInitDialog(void)
 }
 
 
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
+BEGIN_MESSAGE_MAP(CAboutDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CAboutDlg)
 	ON_BN_CLICKED(IDC_ORDER, OnOrder)
 	//}}AFX_MSG_MAP

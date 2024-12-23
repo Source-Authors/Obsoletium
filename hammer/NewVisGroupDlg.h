@@ -10,11 +10,12 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "GroupList.h"
 
 
-class CNewVisGroupDlg : public CDialog
+class CNewVisGroupDlg : public CBaseDlg
 {
 public:
 	CNewVisGroupDlg(CString &str, CWnd *pParent = NULL);

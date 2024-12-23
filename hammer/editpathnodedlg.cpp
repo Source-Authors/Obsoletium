@@ -20,7 +20,7 @@
 
 
 CEditPathNodeDlg::CEditPathNodeDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CEditPathNodeDlg::IDD, pParent)
+	: CBaseDlg(CEditPathNodeDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditPathNodeDlg)
 	m_bRetrigger = FALSE;
@@ -46,7 +46,7 @@ void CEditPathNodeDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEditPathNodeDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEditPathNodeDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditPathNodeDlg)
 		// NOTE: the ClassWizard will add message map macros here
 	//}}AFX_MSG_MAP

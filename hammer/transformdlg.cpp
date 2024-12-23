@@ -20,7 +20,7 @@
 
 
 CTransformDlg::CTransformDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CTransformDlg::IDD, pParent)
+	: CBaseDlg(CTransformDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CTransformDlg)
 	m_iMode = -1;
@@ -43,7 +43,7 @@ void CTransformDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CTransformDlg, CDialog)
+BEGIN_MESSAGE_MAP(CTransformDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CTransformDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()

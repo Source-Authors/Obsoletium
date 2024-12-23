@@ -23,7 +23,7 @@
 // CPrefabsDlg dialog
 
 CPrefabsDlg::CPrefabsDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CPrefabsDlg::IDD, pParent)
+	: CBaseDlg(CPrefabsDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPrefabsDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -43,7 +43,7 @@ void CPrefabsDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CPrefabsDlg, CDialog)
+BEGIN_MESSAGE_MAP(CPrefabsDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CPrefabsDlg)
 	ON_BN_CLICKED(IDC_ADDLIBRARY, OnAddlibrary)
 	ON_BN_CLICKED(IDC_ADDOBJECT, OnAddobject)

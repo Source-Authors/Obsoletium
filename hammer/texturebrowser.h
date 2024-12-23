@@ -9,13 +9,13 @@
 #define TEXTUREBROWSER_H
 #pragma once
 
-
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "AutoSelCombo.h"
 #include "texturewindow.h"
 
 
-class CTextureBrowser : public CDialog
+class CTextureBrowser : public CBaseDlg
 {
 public:
 

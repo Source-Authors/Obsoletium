@@ -17,7 +17,7 @@ static LPCTSTR pszSection = "Run Map";
 
 
 CRunMap::CRunMap(const CString& mapName, CWnd* pParent /*=NULL*/)
-	: CDialog(CRunMap::IDD, pParent)
+	: CBaseDlg(CRunMap::IDD, pParent)
 {
 	m_strMapName = mapName;
 	m_bSwitchMode = FALSE;
@@ -69,7 +69,7 @@ void CRunMap::SaveToIni(void)
 }
 
 
-BEGIN_MESSAGE_MAP(CRunMap, CDialog)
+BEGIN_MESSAGE_MAP(CRunMap, CBaseDlg)
 	//{{AFX_MSG_MAP(CRunMap)
 	ON_BN_CLICKED(IDC_EXPERT, OnExpert)
 	//}}AFX_MSG_MAP

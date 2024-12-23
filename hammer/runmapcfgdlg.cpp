@@ -21,7 +21,7 @@
 
 
 CRunMapCfgDlg::CRunMapCfgDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CRunMapCfgDlg::IDD, pParent)
+	: CBaseDlg(CRunMapCfgDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CRunMapCfgDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -40,7 +40,7 @@ void CRunMapCfgDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CRunMapCfgDlg, CDialog)
+BEGIN_MESSAGE_MAP(CRunMapCfgDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CRunMapCfgDlg)
 	ON_BN_CLICKED(IDC_NEW, OnNew)
 	ON_BN_CLICKED(IDC_REMOVE, OnRemove)

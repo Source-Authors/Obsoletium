@@ -10,9 +10,10 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 
-class CEditPrefabDlg : public CDialog
+class CEditPrefabDlg : public CBaseDlg
 {
 // Construction
 public:

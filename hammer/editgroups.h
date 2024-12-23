@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "GroupList.h"
 #include "mapdoc.h"
 
@@ -33,7 +34,7 @@ class CColorBox : public CStatic
 };
 
 
-class CEditGroups : public CDialog
+class CEditGroups : public CBaseDlg
 {
 	// Construction
 	public:

@@ -19,7 +19,7 @@
 static const unsigned int g_uSelChangeMsg = ::RegisterWindowMessage(GROUPLIST_MSG_SEL_CHANGE);
 
 
-BEGIN_MESSAGE_MAP(CEditGroups, CDialog)
+BEGIN_MESSAGE_MAP(CEditGroups, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditGroups)
 	ON_BN_CLICKED(IDC_COLOR, OnColor)
 	ON_EN_CHANGE(IDC_NAME, OnChangeName)
@@ -36,7 +36,7 @@ END_MESSAGE_MAP()
 // Input  : pParent - Parent window.
 //-----------------------------------------------------------------------------
 CEditGroups::CEditGroups(CWnd* pParent /*=NULL*/)
-	: CDialog(CEditGroups::IDD, pParent)
+	: CBaseDlg(CEditGroups::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditGroups)
 		// NOTE: the ClassWizard will add member initialization here

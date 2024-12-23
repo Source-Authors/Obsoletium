@@ -21,7 +21,7 @@
 
 
 CEditPrefabDlg::CEditPrefabDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CEditPrefabDlg::IDD, pParent)
+	: CBaseDlg(CEditPrefabDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditPrefabDlg)
 	m_strDescript = _T("");
@@ -49,7 +49,7 @@ void CEditPrefabDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEditPrefabDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEditPrefabDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditPrefabDlg)
 	ON_CBN_SELCHANGE(IDC_CREATEIN, OnSelchangeCreatein)
 	//}}AFX_MSG_MAP

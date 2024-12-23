@@ -9,7 +9,7 @@
 #include <math.h>
 
 #define OCTAVE_COUNT				4
-#define OCTAVE_COUNT_MINUS_ONE		OCTAVE_COUNT - 1
+#define OCTAVE_COUNT_MINUS_ONE		(OCTAVE_COUNT - 1)
 
 //-----------------------------------------------------------------------------
 // quick random number generator - returns a value -1.0f to 1.0

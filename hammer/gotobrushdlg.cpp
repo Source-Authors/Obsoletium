@@ -14,7 +14,7 @@
 #include <tier0/memdbgon.h>
 
 
-BEGIN_MESSAGE_MAP(CGotoBrushDlg, CDialog)
+BEGIN_MESSAGE_MAP(CGotoBrushDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CGotoBrushDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -24,7 +24,7 @@ END_MESSAGE_MAP()
 // Purpose: 
 //-----------------------------------------------------------------------------
 CGotoBrushDlg::CGotoBrushDlg(CWnd *pParent)
-	: CDialog(CGotoBrushDlg::IDD, pParent)
+	: CBaseDlg(CGotoBrushDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CGotoBrushDlg)
 	m_nBrushID = 0;

@@ -15,6 +15,7 @@
 #define __PROGDLG_H__
 
 #include "resource.h"
+#include "windows/base_dlg.h"
 
 class CProgressDlg : public CBaseDlg
 {

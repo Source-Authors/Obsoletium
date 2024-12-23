@@ -20,7 +20,7 @@
 // CRunMapExpertDlg dialog
 
 CRunMapExpertDlg::CRunMapExpertDlg(const CString& mapName, CWnd* pParent /*=NULL*/)
-	: CDialog(CRunMapExpertDlg::IDD, pParent)
+	: CBaseDlg(CRunMapExpertDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CRunMapExpertDlg)
 	//}}AFX_DATA_INIT
@@ -82,7 +82,7 @@ enum
 };
 
 
-BEGIN_MESSAGE_MAP(CRunMapExpertDlg, CDialog)
+BEGIN_MESSAGE_MAP(CRunMapExpertDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CRunMapExpertDlg)
 	ON_BN_CLICKED(IDC_BROWSECOMMAND, OnBrowsecommand)
 	ON_LBN_SELCHANGE(IDC_COMMANDLIST, OnSelchangeCommandlist)

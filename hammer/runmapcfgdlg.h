@@ -8,12 +8,13 @@
 // RunMapCfgDlg.h : header file
 //
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CRunMapCfgDlg dialog
 
-class CRunMapCfgDlg : public CDialog
+class CRunMapCfgDlg : public CBaseDlg
 {
 // Construction
 public:

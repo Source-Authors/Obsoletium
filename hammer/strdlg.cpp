@@ -20,7 +20,7 @@
 
 CStrDlg::CStrDlg(DWORD dwFlags, LPCTSTR pszString, LPCTSTR pszPrompt, 
 				 LPCTSTR pszTitle)
-	: CDialog(CStrDlg::IDD, NULL)
+	: CBaseDlg(CStrDlg::IDD, NULL)
 {
 	//{{AFX_DATA_INIT(CStrDlg)
 	m_string = _T("");
@@ -47,7 +47,7 @@ void CStrDlg::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CStrDlg, CDialog)
+BEGIN_MESSAGE_MAP(CStrDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CStrDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()

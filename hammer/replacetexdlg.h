@@ -11,13 +11,13 @@
 #pragma once
 #endif
 
-
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "IEditorTexture.h"
 #include "wndTex.h"
 
 
-class CReplaceTexDlg : public CDialog
+class CReplaceTexDlg : public CBaseDlg
 {
 // Construction
 public:

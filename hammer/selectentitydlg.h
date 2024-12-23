@@ -13,12 +13,12 @@
 
 #pragma once
 
-
+#include "windows/base_dlg.h"
 #include "MapClass.h"	// dvs: For CMapObjectList
 #include "resource.h"
 
 
-class CSelectEntityDlg : public CDialog
+class CSelectEntityDlg : public CBaseDlg
 {
 	// Construction
 	public:

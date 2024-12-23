@@ -18,7 +18,7 @@ static const unsigned int g_uSelChangeMsg = ::RegisterWindowMessage(GROUPLIST_MS
 static BOOL s_bLastHideObjects = TRUE;
 
 
-BEGIN_MESSAGE_MAP(CNewVisGroupDlg, CDialog)
+BEGIN_MESSAGE_MAP(CNewVisGroupDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CNewVisGroupDlg)
 	ON_REGISTERED_MESSAGE(g_uSelChangeMsg, OnSelChangeGroupList)
 	ON_COMMAND(IDC_PLACE_IN_EXISTING_VISGROUP, OnPlaceInExistingVisGroup)
@@ -32,7 +32,7 @@ END_MESSAGE_MAP()
 // Input  : pParent - 
 //-----------------------------------------------------------------------------
 CNewVisGroupDlg::CNewVisGroupDlg(CString &str, CWnd *pParent)
-	: CDialog(CNewVisGroupDlg::IDD, pParent)
+	: CBaseDlg(CNewVisGroupDlg::IDD, pParent)
 {
 	m_pPickedVisGroup = NULL;
 

@@ -311,7 +311,7 @@ int FindReplace(CMapEntity *pEntity, FindObject_t &FindObject, const char *pszRe
 }
 
 
-BEGIN_MESSAGE_MAP(CSearchReplaceDlg, CDialog)
+BEGIN_MESSAGE_MAP(CSearchReplaceDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CSearchReplaceDlg)
 	ON_WM_SHOWWINDOW()
 	ON_COMMAND_EX(IDC_FIND_NEXT, OnFindReplace)
@@ -326,7 +326,7 @@ END_MESSAGE_MAP()
 // Input  : pParent - 
 //-----------------------------------------------------------------------------
 CSearchReplaceDlg::CSearchReplaceDlg(CWnd *pParent)
-	: CDialog(CSearchReplaceDlg::IDD, pParent)
+	: CBaseDlg(CSearchReplaceDlg::IDD, pParent)
 {
 	m_bNewSearch = true;
 

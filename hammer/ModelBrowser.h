@@ -1,6 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 #pragma once
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "VGuiWnd.h"
 
@@ -17,7 +18,7 @@ class CModelBrowserPanel;
 class CMDLPicker;
 
 
-class CModelBrowser : public CDialog
+class CModelBrowser : public CBaseDlg
 {
 	DECLARE_DYNAMIC(CModelBrowser)
 

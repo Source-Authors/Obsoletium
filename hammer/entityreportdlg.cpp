@@ -45,7 +45,7 @@ void CEntityReportDlg::ShowEntityReport(CMapDoc *pDoc, CWnd *pwndParent)
 // Purpose: Private constructor.
 //-----------------------------------------------------------------------------
 CEntityReportDlg::CEntityReportDlg(CMapDoc *pDoc, CWnd* pParent /*=NULL*/)
-	: CDialog(CEntityReportDlg::IDD, pParent)
+	: CBaseDlg(CEntityReportDlg::IDD, pParent)
 {
 	m_pDoc = pDoc;
 
@@ -108,7 +108,7 @@ void CEntityReportDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEntityReportDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEntityReportDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEntityReportDlg)
 	ON_BN_CLICKED(IDC_DELETE, OnDelete)
 	ON_BN_CLICKED(IDC_FILTERBYHIDDEN, OnFilterbyhidden)

@@ -1030,14 +1030,14 @@ bool CSculptPainter::DoSizing( const Vector2D &vPoint )
 
 // CSculptPushOptions dialog
 
-IMPLEMENT_DYNAMIC(CSculptPushOptions, CDialog)
+IMPLEMENT_DYNAMIC(CSculptPushOptions, CBaseDlg)
 
 
 //-----------------------------------------------------------------------------
 // Purpose: constructor
 //-----------------------------------------------------------------------------
 CSculptPushOptions::CSculptPushOptions(CWnd* pParent /*=NULL*/) : 
-	CDialog(CSculptPushOptions::IDD, pParent),
+	CBaseDlg(CSculptPushOptions::IDD, pParent),
 	CSculptPainter()
 {
 	m_OffsetMode = OFFSET_MODE_ABSOLUTE;
@@ -1145,7 +1145,7 @@ void CSculptPushOptions::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSculptPushOptions, CDialog)
+BEGIN_MESSAGE_MAP(CSculptPushOptions, CBaseDlg)
 	ON_CBN_SELCHANGE(IDC_IDC_SCULPT_PUSH_OPTION_NORMAL_MODE, &CSculptPushOptions::OnCbnSelchangeIdcSculptPushOptionNormalMode)
 	ON_CBN_SELCHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, &CSculptPushOptions::OnCbnSelchangeSculptPushOptionOffsetMode)
 	ON_EN_CHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, &CSculptPushOptions::OnEnChangeSculptPushOptionOffsetDistance)
@@ -2258,14 +2258,14 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffFinal()
 
 // CSculptCarveOptions dialog
 
-IMPLEMENT_DYNAMIC(CSculptCarveOptions, CDialog)
+IMPLEMENT_DYNAMIC(CSculptCarveOptions, CBaseDlg)
 
 
 //-----------------------------------------------------------------------------
 // Purpose: constructor
 //-----------------------------------------------------------------------------
 CSculptCarveOptions::CSculptCarveOptions(CWnd* pParent /*=NULL*/) : 
-	CDialog(CSculptCarveOptions::IDD, pParent),
+	CBaseDlg(CSculptCarveOptions::IDD, pParent),
 	CSculptPainter()
 {
 	m_OffsetMode = OFFSET_MODE_ABSOLUTE;
@@ -2371,7 +2371,7 @@ void CSculptCarveOptions::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSculptCarveOptions, CDialog)
+BEGIN_MESSAGE_MAP(CSculptCarveOptions, CBaseDlg)
 	ON_CBN_SELCHANGE(IDC_IDC_SCULPT_PUSH_OPTION_NORMAL_MODE, &CSculptCarveOptions::OnCbnSelchangeIdcSculptPushOptionNormalMode)
 	ON_CBN_SELCHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, &CSculptCarveOptions::OnCbnSelchangeSculptPushOptionOffsetMode)
 	ON_EN_CHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, &CSculptCarveOptions::OnEnChangeSculptPushOptionOffsetDistance)
@@ -3513,10 +3513,10 @@ private:
 
 // CSculptProjectOptions dialog
 
-IMPLEMENT_DYNAMIC(CSculptProjectOptions, CDialog)
+IMPLEMENT_DYNAMIC(CSculptProjectOptions, CBaseDlg)
 
 CSculptProjectOptions::CSculptProjectOptions(CWnd* pParent /*=NULL*/) : 
-	CDialog(CSculptProjectOptions::IDD, pParent),
+	CBaseDlg(CSculptProjectOptions::IDD, pParent),
 	CSculptTool()
 {
 	m_FileDialog = new CFileDialog(TRUE, NULL, NULL, OFN_LONGNAMES | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST, "Image Files (*.tga)|*.tga||");
@@ -3571,7 +3571,7 @@ void CSculptProjectOptions::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSculptProjectOptions, CDialog)
+BEGIN_MESSAGE_MAP(CSculptProjectOptions, CBaseDlg)
 	ON_BN_CLICKED(IDC_LOAD_IMAGE, &CSculptProjectOptions::OnBnClickedLoadImage)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_PROJECT_SIZE, &CSculptProjectOptions::OnNMCustomdrawProjectSize)
 END_MESSAGE_MAP()

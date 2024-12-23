@@ -84,7 +84,7 @@ void CProgressDlg::DoDataExchange(CDataExchange* pDX)
     //}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CProgressDlg, CDialog)
+BEGIN_MESSAGE_MAP(CProgressDlg, CBaseDlg)
     //{{AFX_MSG_MAP(CProgressDlg)
     //}}AFX_MSG_MAP
 END_MESSAGE_MAP()

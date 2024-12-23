@@ -72,9 +72,9 @@ public:
 	CModelBrowser *m_pBrowser;
 };
 
-IMPLEMENT_DYNAMIC(CModelBrowser, CDialog)
+IMPLEMENT_DYNAMIC(CModelBrowser, CBaseDlg)
 CModelBrowser::CModelBrowser(CWnd* pParent /*=NULL*/)
-	: CDialog(CModelBrowser::IDD, pParent)
+	: CBaseDlg(CModelBrowser::IDD, pParent)
 {
 	m_pPicker = new CMDLPicker( NULL );
 	m_pStatusLine = new vgui::TextEntry( NULL, "StatusLine" );
@@ -214,7 +214,7 @@ void CModelBrowser::OnSize(UINT nType, int cx, int cy)
 }
 
 
-BEGIN_MESSAGE_MAP(CModelBrowser, CDialog)
+BEGIN_MESSAGE_MAP(CModelBrowser, CBaseDlg)
 	ON_WM_SIZE()
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()

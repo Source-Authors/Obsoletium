@@ -20,7 +20,7 @@
 static BOOL CountObject(CMapClass *pobj);
 
 
-BEGIN_MESSAGE_MAP(CMapInfoDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMapInfoDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CMapInfoDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()

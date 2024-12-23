@@ -5,7 +5,9 @@
 //=============================================================================//
 
 #include "resource.h"
+#include "windows/base_dlg.h"
 
+class CRunMap : public CBaseDlg
 {
 // Construction
 public:

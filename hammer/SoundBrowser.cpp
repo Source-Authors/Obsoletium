@@ -23,7 +23,7 @@ int CSoundBrowser::m_nFilterHistory;
 
 
 CSoundBrowser::CSoundBrowser( const char *pCurrentSoundName, CWnd* pParent /*=NULL*/ )
-	: CDialog(CSoundBrowser::IDD, pParent)
+	: CBaseDlg(CSoundBrowser::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CSoundBrowser)
 	m_Autoplay = FALSE;
@@ -61,7 +61,7 @@ void CSoundBrowser::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSoundBrowser, CDialog)
+BEGIN_MESSAGE_MAP(CSoundBrowser, CBaseDlg)
 	//{{AFX_MSG_MAP(CSoundBrowser)
 	ON_WM_CLOSE()
 	ON_CBN_EDITCHANGE(IDC_SOUND_FILTER, OnChangeFilter)

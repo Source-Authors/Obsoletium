@@ -18,7 +18,7 @@
 #define WM_SCENEPREVIEW_IDLE	(WM_USER+1)
 
 
-BEGIN_MESSAGE_MAP(CScenePreviewDlg, CDialog)
+BEGIN_MESSAGE_MAP(CScenePreviewDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CScenePreviewDlg)
 	ON_BN_CLICKED(IDCANCEL, OnCancel)
 	//}}AFX_MSG_MAP
@@ -26,7 +26,7 @@ END_MESSAGE_MAP()
 
 
 CScenePreviewDlg::CScenePreviewDlg( CChoreoScene *pScene, const char *pFilename, CWnd* pParent /*=NULL*/ )
-	: CDialog(CScenePreviewDlg::IDD, pParent)
+	: CBaseDlg(CScenePreviewDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CScenePreviewDlg)
 	m_pScene = pScene;

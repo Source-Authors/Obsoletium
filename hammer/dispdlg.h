@@ -9,6 +9,7 @@
 #define DISPDLG_H
 #pragma once
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "IconComboBox.h"
 #include "mathlib/vector.h"
@@ -18,7 +19,7 @@
 //
 // Displacement Create Dialog
 //
-class CDispCreateDlg : public CDialog
+class CDispCreateDlg : public CBaseDlg
 {
 public:
 
@@ -50,7 +51,7 @@ protected:
 //
 // Displacement Noise Dialog
 //
-class CDispNoiseDlg : public CDialog
+class CDispNoiseDlg : public CBaseDlg
 {
 public:
 
@@ -85,7 +86,7 @@ protected:
 //
 // Displacement Paint Dist Dialog
 //
-class CDispPaintDistDlg : public CDialog
+class CDispPaintDistDlg : public CBaseDlg
 {
 public:
 
@@ -180,7 +181,7 @@ class CSculptPushOptions;
 class CSculptCarveOptions;
 class CSculptProjectOptions;
 
-class CPaintSculptDlg : public CDialog
+class CPaintSculptDlg : public CBaseDlg
 {
 public:
 
@@ -248,7 +249,7 @@ protected:
 //
 // Displacement Paint Dist Dialog
 //
-class CDispPaintDataDlg : public CDialog
+class CDispPaintDataDlg : public CBaseDlg
 {
 public:
 

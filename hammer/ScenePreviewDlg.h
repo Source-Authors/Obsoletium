@@ -11,11 +11,12 @@
 #endif
 
 #include "resource.h"
+#include "windows/base_dlg.h"
 
 class CChoreoScene;
 
 
-class CScenePreviewDlg : public CDialog
+class CScenePreviewDlg : public CBaseDlg
 {
 // Construction
 public:

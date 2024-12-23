@@ -13,6 +13,7 @@
 #include "disppaint.h"
 #include "tier1/utlmap.h"
 #include "resource.h"
+#include "windows/base_dlg.h"
 
 #include <afxwin.h>
 
@@ -117,7 +118,7 @@ protected:
 	float						m_OrigBrushSize;
 };
 
-class CSculptPushOptions : public CDialog, public CSculptPainter
+class CSculptPushOptions : public CBaseDlg, public CSculptPainter
 {
 	DECLARE_DYNAMIC(CSculptPushOptions)
 
@@ -204,7 +205,7 @@ public:
 };
 
 
-class CSculptCarveOptions : public CDialog, public CSculptPainter
+class CSculptCarveOptions : public CBaseDlg, public CSculptPainter
 {
 	DECLARE_DYNAMIC(CSculptCarveOptions)
 
@@ -316,7 +317,7 @@ class ITextureInternal;
 
 // CSculptProjectOptions dialog
 
-class CSculptProjectOptions : public CDialog, public CSculptTool
+class CSculptProjectOptions : public CBaseDlg, public CSculptTool
 {
 	DECLARE_DYNAMIC(CSculptProjectOptions)
 

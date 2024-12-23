@@ -10,12 +10,13 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include <afxtempl.h>
 #include "resource.h"
 #include "MapDoc.h"
 
 
-class CEntityReportDlg : public CDialog
+class CEntityReportDlg : public CBaseDlg
 {
 public:
 

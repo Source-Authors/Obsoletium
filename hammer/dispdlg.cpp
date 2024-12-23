@@ -31,7 +31,7 @@
 //
 // Displacement Create Dialog Functions
 //
-BEGIN_MESSAGE_MAP(CDispCreateDlg, CDialog)
+BEGIN_MESSAGE_MAP(CDispCreateDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CDispCreateDlg)
 	ON_WM_VSCROLL()
 	//}}AFX_MSG_MAP
@@ -43,7 +43,7 @@ extern CToolDisplace* GetDisplacementTool();
 // Purpose:  constructor
 //-----------------------------------------------------------------------------
 CDispCreateDlg::CDispCreateDlg( CWnd *pParent ) :
-	CDialog( CDispCreateDlg::IDD, pParent )
+	CBaseDlg( CDispCreateDlg::IDD, pParent )
 {
 	m_Power = 0;
 }
@@ -99,7 +99,7 @@ void CDispCreateDlg::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar *pScrollBar 
 //
 // Displacement Noise Dialog Functions
 //
-BEGIN_MESSAGE_MAP(CDispNoiseDlg, CDialog)
+BEGIN_MESSAGE_MAP(CDispNoiseDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CDispNoiseDlg)
 	ON_NOTIFY( UDN_DELTAPOS, ID_DISP_NOISE_MIN_SPIN, OnSpinUpDown )
 	ON_NOTIFY( UDN_DELTAPOS, ID_DISP_NOISE_MAX_SPIN, OnSpinUpDown )
@@ -110,7 +110,7 @@ END_MESSAGE_MAP()
 // Purpose:  constructor
 //-----------------------------------------------------------------------------
 CDispNoiseDlg::CDispNoiseDlg( CWnd *pParent ) :
-	CDialog( CDispNoiseDlg::IDD, pParent )
+	CBaseDlg( CDispNoiseDlg::IDD, pParent )
 {
 	m_Min = m_Max = 0.0f;
 }
@@ -203,7 +203,7 @@ void CDispNoiseDlg::OnSpinUpDown( NMHDR *pNMHDR, LRESULT *pResult )
 //
 // Displacement Paint Distance Dialog Functions
 //
-BEGIN_MESSAGE_MAP(CDispPaintDistDlg, CDialog)
+BEGIN_MESSAGE_MAP(CDispPaintDistDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CDispPaintDistDlg)
 	ON_BN_CLICKED( ID_DISP_PAINT_DIST_RAISELOWER, OnEffectRaiseLowerGeo )
 	ON_BN_CLICKED( ID_DISP_PAINT_DIST_RAISETO, OnEffectRaiseToGeo )
@@ -231,7 +231,7 @@ END_MESSAGE_MAP()
 // Purpose:  constructor
 //-----------------------------------------------------------------------------
 CDispPaintDistDlg::CDispPaintDistDlg( CWnd *pParent ) :
-	CDialog( CDispPaintDistDlg::IDD, pParent )
+	CBaseDlg( CDispPaintDistDlg::IDD, pParent )
 {
 }
 
@@ -1069,7 +1069,7 @@ void CDispPaintDistDlg::OnDestroy( void )
 //
 // Paint Scult Dialog Functions
 //
-BEGIN_MESSAGE_MAP(CPaintSculptDlg, CDialog)
+BEGIN_MESSAGE_MAP(CPaintSculptDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CPaintSculptDlg)
 	ON_BN_CLICKED( ID_DISP_PAINT_DIST_AUTOSEW, OnCheckAutoSew )
 	ON_WM_CLOSE()
@@ -1088,7 +1088,7 @@ END_MESSAGE_MAP()
 // Purpose:  constructor
 //-----------------------------------------------------------------------------
 CPaintSculptDlg::CPaintSculptDlg( CWnd *pParent ) :
-CDialog( CPaintSculptDlg::IDD, pParent )
+CBaseDlg( CPaintSculptDlg::IDD, pParent )
 {
 	m_bAutoSew = true;
 	m_SculptMode = SCULPT_MODE_PUSH;
@@ -1414,7 +1414,7 @@ void CPaintSculptDlg::SetActiveMode( SculptMode NewMode )
 //
 // Set Paint Distance Dialog Functions
 //
-BEGIN_MESSAGE_MAP(CDispPaintDataDlg, CDialog)
+BEGIN_MESSAGE_MAP(CDispPaintDataDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CDispPaintDataDlg)
 	ON_BN_CLICKED( ID_DISP_PAINT_DATA_RAISELOWER, OnEffectRaiseLowerData )
 	ON_BN_CLICKED( ID_DISP_PAINT_DATA_RAISETO, OnEffectRaiseToData )
@@ -1435,7 +1435,7 @@ END_MESSAGE_MAP()
 // Purpose:  constructor
 //-----------------------------------------------------------------------------
 CDispPaintDataDlg::CDispPaintDataDlg( CWnd *pParent ) :
-	CDialog( CDispPaintDataDlg::IDD, pParent )
+	CBaseDlg( CDispPaintDataDlg::IDD, pParent )
 {
 }
 

@@ -15,7 +15,7 @@
 
 
 CEditPathDlg::CEditPathDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CEditPathDlg::IDD, pParent)
+	: CBaseDlg(CEditPathDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditPathDlg)
 	m_strClass = _T("");
@@ -37,7 +37,7 @@ void CEditPathDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEditPathDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEditPathDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditPathDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()

@@ -23,7 +23,7 @@
 
 CEditGameConfigs::CEditGameConfigs(BOOL bSelectOnly, 
 								   CWnd* pParent /*=NULL*/)
-	: CDialog(CEditGameConfigs::IDD, pParent)
+	: CBaseDlg(CEditGameConfigs::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditGameConfigs)
 		// NOTE: the ClassWizard will add member initialization here
@@ -43,7 +43,7 @@ void CEditGameConfigs::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEditGameConfigs, CDialog)
+BEGIN_MESSAGE_MAP(CEditGameConfigs, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditGameConfigs)
 	ON_BN_CLICKED(IDC_ADD, OnAdd)
 	ON_BN_CLICKED(IDC_COPY, OnCopy)

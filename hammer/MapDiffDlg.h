@@ -10,7 +10,7 @@
 
 // MapDiffDlg dialog
 
-class CMapDiffDlg : public CDialog
+class CMapDiffDlg : public CBaseDlg
 {
 public:
 	static void MapDiff(CWnd *pwndParent, CMapDoc *p_CurrentMap);

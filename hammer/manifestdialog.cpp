@@ -14,14 +14,14 @@
 
 // CManifestMove dialog
 
-IMPLEMENT_DYNAMIC(CManifestMove, CDialog)
+IMPLEMENT_DYNAMIC(CManifestMove, CBaseDlg)
 
 //-----------------------------------------------------------------------------
 // Purpose: contructor
 // Input  : pParent - the parent window of this dialog
 //-----------------------------------------------------------------------------
 CManifestMove::CManifestMove( bool bIsMove, CWnd* pParent /*=NULL*/ )
-	: CDialog(CManifestMove::IDD, pParent)
+	: CBaseDlg(CManifestMove::IDD, pParent)
 {
 	m_bIsMove = bIsMove;
 }
@@ -49,7 +49,7 @@ void CManifestMove::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CManifestMove, CDialog)
+BEGIN_MESSAGE_MAP(CManifestMove, CBaseDlg)
 	ON_EN_CHANGE(IDC_MANIFEST_FILENAME, &CManifestMove::OnEnChangeManifestFilename)
 END_MESSAGE_MAP()
 
@@ -904,7 +904,7 @@ void CManifestFilter::OnSize(UINT nType, int cx, int cy)
 }
 
 
-IMPLEMENT_DYNAMIC(CManifestMapDlg, CDialog)
+IMPLEMENT_DYNAMIC(CManifestMapDlg, CBaseDlg)
 
 
 //-----------------------------------------------------------------------------
@@ -913,7 +913,7 @@ IMPLEMENT_DYNAMIC(CManifestMapDlg, CDialog)
 //			pParent - the parent window
 //-----------------------------------------------------------------------------
 CManifestMapDlg::CManifestMapDlg( CManifestMap *pManifestMap, CWnd* pParent /*=NULL*/ )
-	: CDialog(CManifestMapDlg::IDD, pParent)
+	: CBaseDlg(CManifestMapDlg::IDD, pParent)
 {
 	m_pManifestMap = pManifestMap;
 }
@@ -938,7 +938,7 @@ void CManifestMapDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CManifestMapDlg, CDialog)
+BEGIN_MESSAGE_MAP(CManifestMapDlg, CBaseDlg)
 END_MESSAGE_MAP()
 
 
@@ -970,7 +970,7 @@ void CManifestMapDlg::OnOK()
 
 // CManifestCheckin dialog
 
-IMPLEMENT_DYNAMIC(CManifestCheckin, CDialog)
+IMPLEMENT_DYNAMIC(CManifestCheckin, CBaseDlg)
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -978,7 +978,7 @@ IMPLEMENT_DYNAMIC(CManifestCheckin, CDialog)
 // Output : 
 //-----------------------------------------------------------------------------
 CManifestCheckin::CManifestCheckin(CWnd* pParent /*=NULL*/)
-	: CDialog(CManifestCheckin::IDD, pParent)
+	: CBaseDlg(CManifestCheckin::IDD, pParent)
 {
 
 }
@@ -1007,7 +1007,7 @@ void CManifestCheckin::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CManifestCheckin, CDialog)
+BEGIN_MESSAGE_MAP(CManifestCheckin, CBaseDlg)
 	ON_BN_CLICKED(IDOK, &CManifestCheckin::OnBnClickedOk)
 END_MESSAGE_MAP()
 

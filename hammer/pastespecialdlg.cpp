@@ -8,7 +8,6 @@
 #include "hammer.h"
 #include "PasteSpecialDlg.h"
 
-#pragma warning(disable:4244)
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -18,7 +17,7 @@ static LPCTSTR pszIni = "Paste Special";
 
 
 CPasteSpecialDlg::CPasteSpecialDlg(CWnd* pParent /*=NULL*/, BoundBox* pBox)
-	: CDialog(CPasteSpecialDlg::IDD, pParent)
+	: CBaseDlg(CPasteSpecialDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPasteSpecialDlg)
 	m_iCopies = 1;
@@ -117,7 +116,7 @@ void CPasteSpecialDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CPasteSpecialDlg, CDialog)
+BEGIN_MESSAGE_MAP(CPasteSpecialDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CPasteSpecialDlg)
 	ON_BN_CLICKED(IDC_GETOFFSETX, OnGetoffsetx)
 	ON_BN_CLICKED(IDC_GETOFFSETY, OnGetoffsety)

@@ -29,7 +29,7 @@ CMapDoc *s_pCurrentMap = NULL;
 // MapDiffDlg dialog
 
 CMapDiffDlg::CMapDiffDlg(CWnd* pParent )
-	: CDialog(CMapDiffDlg::IDD, pParent)
+	: CBaseDlg(CMapDiffDlg::IDD, pParent)
 {
 	m_bCheckSimilar = true;
 }
@@ -43,7 +43,7 @@ void CMapDiffDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CMapDiffDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMapDiffDlg, CBaseDlg)
 	ON_BN_CLICKED(IDC_SIMILARCHECK, OnBnClickedSimilarcheck)
 	ON_BN_CLICKED(IDC_MAPBROWSE, OnBnClickedMapbrowse)
 	ON_BN_CLICKED(IDOK, OnBnClickedOk)

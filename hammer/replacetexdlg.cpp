@@ -26,7 +26,7 @@
 
 
 CReplaceTexDlg::CReplaceTexDlg(int nSelected, CWnd* pParent /*=NULL*/)
-	: CDialog(CReplaceTexDlg::IDD, pParent)
+	: CBaseDlg(CReplaceTexDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CReplaceTexDlg)
 	m_iSearchAll = nSelected ? FALSE : TRUE;
@@ -61,7 +61,7 @@ void CReplaceTexDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CReplaceTexDlg, CDialog)
+BEGIN_MESSAGE_MAP(CReplaceTexDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CReplaceTexDlg)
 	ON_BN_CLICKED(IDC_BROWSEREPLACE, OnBrowsereplace)
 	ON_BN_CLICKED(IDC_BROWSEFIND, OnBrowsefind)
