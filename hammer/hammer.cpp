@@ -1067,7 +1067,7 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	// HL Shell class name
     wndcls.lpszClassName = "VALVEWORLDCRAFT";
 
-    // Register it, exit if it fails    
+    // Register it, exit if it fails
 	if(!AfxRegisterClass(&wndcls))
 	{
 		AfxMessageBox("Could not register Hammer's main window class.", MB_ICONERROR);
@@ -1146,7 +1146,11 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	//
 	CMainFrame *pMainFrame = new CMainFrame;
 	if (!pMainFrame->LoadFrame(IDR_MAINFRAME))
+	{
+		// dimhotepus: Free on error.
+		delete pMainFrame;
 		return INIT_FAILED;
+	}
 
 	m_pMainWnd = pMainFrame;
 
