@@ -1224,7 +1224,6 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	if ( Options.general.bClosedCorrectly == FALSE )
 	{
 		CString strLastGoodSave = APP()->GetProfileString("General", "Last Good Save", "");
-        
 		if ( strLastGoodSave.GetLength() != 0 )
 		{
 			char msg[1024];
@@ -1309,8 +1308,6 @@ int CHammer::InternalMainLoop()
 			}
 		}
 	}
-
-	Assert(0);  // not reachable
 }
 
 //-----------------------------------------------------------------------------
