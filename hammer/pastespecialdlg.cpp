@@ -48,9 +48,10 @@ CPasteSpecialDlg::CPasteSpecialDlg(CWnd* pParent /*=NULL*/, BoundBox* pBox)
 
 	str = App->GetProfileString(pszIni, "Rotate", "0 0 0");
 	p = str.GetBuffer(0);
-	m_fRotateX = atof(p);
-	m_fRotateY = atof(strchr(p, ' ')+1);
-	m_fRotateZ = atof(strrchr(p, ' ')+1);
+	// dimhotepus: atof -> strtof.
+	m_fRotateX = strtof(p, nullptr);
+	m_fRotateY = strtof(strchr(p, ' ')+1, nullptr);
+	m_fRotateZ = strtof(strrchr(p, ' ')+1, nullptr);
 
 	m_bCenterOriginal = App->GetProfileInt(pszIni, "Center", TRUE);
 
