@@ -309,7 +309,7 @@ protected:
 #endif // STENCIL_AS_CALLS
 	int										m_nNumInstancesRendered;	// number of instances rendered that impacted the stencil buffer
 	CUtlVector< InstanceRenderingState_t >	m_InstanceRenderingState;	// the instance rendering state stack
-
+	bool									m_bRenderModeLightPreviewRaytracedMaterialsReferenced;
 };
 
 #endif // RENDER_H

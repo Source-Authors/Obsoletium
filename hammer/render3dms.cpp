@@ -1360,6 +1360,16 @@ void CRender3D::EndRenderFrame(void)
 				IMaterial *sample_other=materials->FindMaterial("editor/sample_result_1",
 																TEXTURE_GROUP_OTHER,true);
 
+				// dimhotepus: Ensure materials are alive.
+				if ( !m_bRenderModeLightPreviewRaytracedMaterialsReferenced )
+				{
+					m_bRenderModeLightPreviewRaytracedMaterialsReferenced = true;
+					add_0_to_1->IncrementReferenceCount();
+					add_1_to_0->IncrementReferenceCount();
+					sample_last->IncrementReferenceCount();
+					sample_other->IncrementReferenceCount();
+				}
+
 				ITexture *dest_rt_current=materials->FindTexture("_rt_accbuf_1", TEXTURE_GROUP_RENDER_TARGET );
 				ITexture *dest_rt_other=materials->FindTexture("_rt_accbuf_0", TEXTURE_GROUP_RENDER_TARGET );
 				pRenderContext->SetRenderTarget(dest_rt_other);

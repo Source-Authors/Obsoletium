@@ -91,6 +91,8 @@ CRender::CRender(void)
 	m_nInstanceCount = 0;
 	m_InstanceSelectionDepth = 0;
 
+	m_bRenderModeLightPreviewRaytracedMaterialsReferenced = false;
+
 	PushInstanceData( NULL, Vector( 0.0f, 0.0f, 0.0f ), QAngle( 0.0f, 0.0f, 0.0f ) ); // always add a default state
 
 	UpdateStudioRenderConfig( false, false );
