@@ -163,7 +163,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	s_bRunsCommands = true;
 
 	char szCurDir[MAX_PATH];
-	if ( !_getcwd(szCurDir, MAX_PATH) )
+	if ( !_getcwd(szCurDir, ssize(szCurDir)) )
 	{
 		// dimhotepus: Add warning when current directory unavailable.
 		Warning( "Unable to get current directory: %s\n",
@@ -221,9 +221,9 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 		strcpy(szDocShortName, p+1);
 		p[0] = 0;
 	}
-
-	int iSize = Commands.GetSize(), i = 0;
+	
 	char *ppParms[32];
+	INT_PTR iSize = Commands.GetSize(), i = 0;
 	while(iSize--)
 	{
 		CCOMMAND &cmd = Commands[i++];
@@ -318,7 +318,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 			if(cmd.iSpecialCmd)
 			{
 				BOOL bError = FALSE;
-				LPCTSTR pszError = "";
+				CString error = "";
 
 				if(cmd.iSpecialCmd == CCCopyFile && iArg == 3)
 				{
@@ -326,11 +326,11 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 					RemoveQuotes(ppParms[2]);
 					
 					// don't copy if we're already there
-					if (stricmp(ppParms[1], ppParms[2]) && 					
+					if (stricmp(ppParms[1], ppParms[2]) != 0 && 
 							(!CopyFile(ppParms[1], ppParms[2], FALSE)))
 					{
 						bError = TRUE;
-						pszError = GetErrorString();
+						error = std::system_category().message(::GetLastError()).c_str();
 					}
 				}
 				else if(cmd.iSpecialCmd == CCDelFile && iArg == 2)
@@ -339,7 +339,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 					if(!DeleteFile(ppParms[1]))
 					{
 						bError = TRUE;
-						pszError = GetErrorString();
+						error = std::system_category().message(::GetLastError()).c_str();
 					}
 				}
 				else if(cmd.iSpecialCmd == CCRenameFile && iArg == 3)
@@ -349,7 +349,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 					if(rename(ppParms[1], ppParms[2]))
 					{
 						bError = TRUE;
-						pszError = strerror(errno);
+						error = strerror(errno);
 					}
 				}
 				else if(cmd.iSpecialCmd == CCChangeDir && iArg == 2)
@@ -358,14 +358,14 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 					if(mychdir(ppParms[1]) == -1)
 					{
 						bError = TRUE;
-						pszError = strerror(errno);
+						error = strerror(errno);
 					}
 				}
 
 				if(bError)
 				{
 					CString str;
-					str.Format("The command failed:\r\n  \"%s\"\r\n", pszError);
+					str.Format("The command failed:\r\n  \"%s\"\r\n", error.GetString());
 					procWnd.Append(str);
 					procWnd.SetForegroundWindow();
 					str += "\r\nDo you want to continue?";
@@ -388,8 +388,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				//  exit???  Seems to work.
 				// spawnv doesn't like quotes
 				RemoveQuotes(szNewRun);
-				_spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, 
-					(const char *const *)ppParms);
+				_spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, ppParms);
 			}
 		}
 		else
@@ -406,8 +405,11 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 			{
 				// not there!
 				CString str;
-				str.Format("The file '%s' was not built.\n"
-					"Do you want to continue?", szFile);
+				// dimhotepus: Enchance error details.
+				str.Format("The file \"%s\" was not built by %s.\n\n"
+					"Do you want to continue?",
+					Q_isempty(szFile) ? pszOrigDocName : szFile,
+					szNewRun);
 				procWnd.SetForegroundWindow();
 				if(AfxMessageBox(str, MB_YESNO | MB_ICONQUESTION) == IDNO)
 					break;	// outta here
