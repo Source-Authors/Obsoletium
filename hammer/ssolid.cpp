@@ -359,6 +359,8 @@ Vector * CSSolid::CreatePointList(CSSFace & face)
 
 		if(!edgeCur || !edgeNext)
 		{
+			// dimhotepus: Free points on error.
+			delete[] pts;
 			CString str;
 			str.Format("Conversion error!\n"
 				"edgeCur = %p, edgeNext = %p", edgeCur, edgeNext);
@@ -370,6 +372,8 @@ Vector * CSSolid::CreatePointList(CSSFace & face)
 
 		if(!hVertex)
 		{
+			// dimhotepus: Free points on error.
+			delete[] pts;
 			CString str;
 			str.Format("Conversion error!\n"
 				"hVertex = %08X", hVertex);
@@ -1715,6 +1719,9 @@ void CSSolid::SerializeDXF(FILE *stream, int nObject)
 				v == (face.nEdges-3) ? pVerts[v+2] : -pVerts[v+2]
 				);
 		}
+
+		// dimhotepus: Fix vertices leak.
+		delete[] pVerts;
 	}
 
 	fprintf(stream, "0\nSEQEND\n8\n%s\n", szName);
