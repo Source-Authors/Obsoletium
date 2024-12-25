@@ -155,7 +155,9 @@ CSSolid::CSSolid()
 //-----------------------------------------------------------------------------
 CSSolid::~CSSolid()
 {
-	memset(this, 0, sizeof(this));
+	// dimhotepus: WTF?
+	constexpr size_t membersOffset = offsetof(CSSolid, m_nVertices);
+	memset(reinterpret_cast<byte*>(this) + membersOffset, 0, sizeof(*this) - membersOffset);
 }
 
 
@@ -1611,8 +1613,10 @@ CSSFace::~CSSFace(void)
 		EditDispMgr()->Destroy( m_hDisp );
 		m_hDisp = EDITDISPHANDLE_INVALID;
 	}
-
-	memset(this, 0, sizeof(this));
+	
+	// dimhotepus: WTF?
+	constexpr size_t membersOffset = offsetof(CSSFace, Edges);
+	memset(reinterpret_cast<byte*>(this) + membersOffset, 0, sizeof(*this) - membersOffset);
 }
 
 
@@ -1630,7 +1634,9 @@ CSSEdge::CSSEdge(void)
 //-----------------------------------------------------------------------------
 CSSEdge::~CSSEdge()
 {
-	memset(this, 0, sizeof(this));
+	// dimhotepus: WTF?
+	constexpr size_t membersOffset = offsetof(CSSEdge, hvStart);
+	memset(reinterpret_cast<byte*>(this) + membersOffset, 0, sizeof(*this) - membersOffset);
 }
 
 
