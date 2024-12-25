@@ -469,13 +469,12 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 		return false;
 
 	// ensure we're in the same directory as the .EXE
-	char *p;
 	GetModuleFileName(NULL, m_szAppDir, MAX_PATH);
-	p = strrchr(m_szAppDir, '\\');
+	char *p = strrchr(m_szAppDir, '\\');
 	if(p)
 	{
-		// chop off \wc.exe
-		p[0] = 0;
+		// chop off \hammer.exe
+		p[0] = '\0';
 	}
 
 	if ( IsRunningInEngine() )
@@ -868,7 +867,7 @@ void UpdatePrefabs_Init()
  
 		if (dwChangeHandle == INVALID_HANDLE_VALUE) 
 		{
-			ExitProcess(GetLastError()); 
+			::exit(::GetLastError()); 
 		}
 	}
 }	 
@@ -892,7 +891,7 @@ void UpdatePrefabs()
 
 		if (FindNextChangeNotification(dwChangeHandle) == FALSE)
 		{
-			ExitProcess(GetLastError()); 
+			exit(::GetLastError()); 
 		}
 	}
 }
