@@ -37,7 +37,7 @@ protected:
 
 
 private:
-	static DWORD WINAPI StaticIdleThread( LPVOID pParameter );
+	static unsigned __stdcall StaticIdleThread( void* pParameter );
 	DWORD IdleThread();
 	
 	void OnIdle();

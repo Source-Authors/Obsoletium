@@ -92,13 +92,13 @@ BOOL CScenePreviewDlg::OnInitDialog()
 	// Create our idle thread.
 	m_hExitThreadEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
 	m_hIdleEventHandledEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
-	m_hIdleThread = CreateThread( NULL, 0, &CScenePreviewDlg::StaticIdleThread, this, 0, NULL );
+	m_hIdleThread = (HANDLE)_beginthreadex( NULL, 0, &CScenePreviewDlg::StaticIdleThread, this, 0, NULL );
 	
 	return TRUE;
 }
 
 
-DWORD CScenePreviewDlg::StaticIdleThread( LPVOID pParameter )
+unsigned __stdcall CScenePreviewDlg::StaticIdleThread( void *pParameter )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("ScenePreview");
