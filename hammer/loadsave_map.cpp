@@ -25,9 +25,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#pragma optimize("g", off)
-
-#pragma warning(disable: 4748)		// buffer overrung with optimizations off	 - remove if we turn "g" back on
+// dimhotepus: Reenable optimizer.
+// #pragma optimize("g", off)
 
 #define TEXTURE_NAME_LEN 128
 
@@ -338,7 +337,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 
 		if (MapFormat == mfQuake2)
 		{
-			pszTexture = strstr(szTexture, ".");
+			pszTexture = strchr(szTexture, '.');
 			if (pszTexture)
 			{
 				*pszTexture = 0;
@@ -872,7 +871,7 @@ int CEditGameClass::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		//
 		// Consider all the keyvalues in this object for serialization.
 		//
-		for ( int z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
+		for ( auto z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
 		{
 			MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(z);
 
@@ -1073,7 +1072,9 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		pProgDlg->SetStep(1);
 		
 		CString caption;
-		caption.LoadString(IDS_LOADINGFILE);
+		[[maybe_unused]] const BOOL rc{caption.LoadString(IDS_LOADINGFILE)};
+		Assert(rc > 0);
+
 		pProgDlg->SetWindowText(caption);
 
 		m_Render2DBox.ResetBounds();
@@ -1143,10 +1144,10 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 				CString str;
 				str.Format("For your information, %d solids were not loaded\n"
 					"due to errors in the file.", nInvalidSolids); 
-				AfxMessageBox(str);
+				AfxMessageBox(str, MB_ICONEXCLAMATION);
 			}
 			else if (AfxMessageBox("There was a problem loading the MAP file. Do you\n"
-				"want to view the error report?", MB_YESNO) == IDYES)
+				"want to view the error report?", MB_YESNO | MB_ICONQUESTION) == IDYES)
 			{
 				CMapErrorsDlg dlg;
 				dlg.DoModal();
@@ -1186,7 +1187,7 @@ FatalError:
 	// OS error.
 	CString str;
 	str.Format("The OS reported an error %s the file: %s", fIsStoring ? "saving" : "loading", strerror(errno));
-	AfxMessageBox(str);
+	AfxMessageBox(str, MB_ICONERROR);
 
 	if (pProgDlg != NULL)
 	{
