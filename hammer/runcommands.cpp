@@ -170,7 +170,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 			std::generic_category().message(errno).c_str() );
 	}
 
-	procWnd.GetReady();
+	procWnd.GetReady(pszOrigDocName);
 
 	// cut up document name into file and extension components.
 	//  create two sets of buffers - one set with the long filename
