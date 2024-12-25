@@ -584,8 +584,6 @@ bool CGameConfigManager::IsAppSubscribed( int nAppID )
 //-----------------------------------------------------------------------------
 bool CGameConfigManager::CreateAllDefaultConfigs( void )
 {
-	bool bRetVal = true;
-
 	// Start our new block
 	KeyValues *configBlock = new KeyValues( "Configs" );
 	KeyValues *gameBlock = configBlock->CreateNewKey();
@@ -593,7 +591,7 @@ bool CGameConfigManager::CreateAllDefaultConfigs( void )
 
 	GetDefaultGameBlock( gameBlock );
 
-	bRetVal = !gameBlock->IsEmpty(); 
+	bool bRetVal = !gameBlock->IsEmpty(); 
 
 	// Make a full path name
 	char szPath[MAX_PATH];
