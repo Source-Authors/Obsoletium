@@ -1264,7 +1264,11 @@ int CHammer::InternalMainLoop()
 {	
 	MSG msg;
 
+#ifdef PLATFORM_64BITS
+	g_pDataCache->SetSize( 256 * 1024 * 1024 );
+#else
 	g_pDataCache->SetSize( 128 * 1024 * 1024 );
+#endif
 
 	// For tracking the idle time state
 	bool bIdle = true;
