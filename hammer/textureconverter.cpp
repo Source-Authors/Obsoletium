@@ -289,7 +289,7 @@ bool CTextureConverter::CountMapDecals( CMapEntity * pEnt, DWORD )
 //-----------------------------------------------------------------------------
 bool CTextureConverter::CheckDecalTextures( CMapEntity * pEnt, DWORD )
 {
-	if ( strcmp( pEnt->GetClassName(), "infodecal" ) )
+	if ( strcmp( pEnt->GetClassName(), "infodecal" ) != 0 )
 		return true;	// not a decal, return true to continue enumerating
 
 	m_nCurrentDecal++;
