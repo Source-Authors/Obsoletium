@@ -126,7 +126,3 @@ void CHammerVGui::Shutdown()
 	// stop the App running
 	vgui::ivgui()->Stop();
 }
-
-CHammerVGui::~CHammerVGui(void)
-{
-}
