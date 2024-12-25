@@ -153,7 +153,7 @@ struct MinidumpWrapperHelper_t
 
 static void MinidumpWrapperHelper( void *arg )
 {
-	MinidumpWrapperHelper_t *info = (MinidumpWrapperHelper_t *)arg;
+	auto *info = (MinidumpWrapperHelper_t *)arg;
 	info->m_iRetVal = info->m_pfn( info->m_pParam );
 }
 
@@ -456,7 +456,6 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	if ( !BaseClass::Connect( factory ) )
 		return false;
 
-//	bool bCVarOk = ConnectStudioRenderCVars( factory );
 	g_pFileSystem = ( IBaseFileSystem * )factory( BASEFILESYSTEM_INTERFACE_VERSION, NULL );
 	g_pStudioRender = ( IStudioRender * )factory( STUDIO_RENDER_INTERFACE_VERSION, NULL );
 	g_pEngineAPI = ( IEngineAPI * )factory( VENGINE_LAUNCHER_API_VERSION, NULL );
@@ -1320,7 +1319,7 @@ void CHammer::Shutdown()
 		MessageToLPreview StopMsg( LPREVIEW_MSG_EXIT );
 		g_HammerToLPreviewMsgQueue.QueueMessage( StopMsg );
 		ThreadJoin( g_LPreviewThread );
-		g_LPreviewThread = 0;
+		g_LPreviewThread = nullptr;
 	}
 
 #ifdef VPROF_HAMMER
@@ -2423,12 +2422,12 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		{
 			 if ( GetLastError() == ERROR_ACCESS_DENIED )
 			 {
-				 AfxMessageBox( "The autosave directory is marked as read only.\nPlease remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
+				 AfxMessageBox( "The autosave directory is marked as read only.\n\nPlease remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
 				 return false;
 			 }
 			 else
 			 {
-				 AfxMessageBox( "There is a problem with the autosave directory.\nPlease select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
+				 AfxMessageBox( "There is a problem with the autosave directory.\n\nPlease select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
 				 return false;
 			 }
 
