@@ -59,7 +59,7 @@ CMapClassManager::~CMapClassManager(void)
 //-----------------------------------------------------------------------------
 CMapClass *CMapClassManager::CreateObject(MAPCLASSTYPE Type)
 {
-	unsigned uLen = strlen(Type)+1;
+	size_t uLen = strlen(Type)+1;
 	for (int i = s_Classes.Count() - 1; i >= 0; i--)
 	{
 		MCMSTRUCT &mcms = s_Classes[i];
@@ -134,7 +134,7 @@ CMapClass::~CMapClass(void)
 									"Please tell a programmer.\n"
 									"Click Yes to write a minidump and continue.\n"
 									"Click No to ignore.", 
-						MB_YESNO );
+						MB_YESNO | MB_ICONINFORMATION );
 		
 		if ( ret == IDYES )
 		{
@@ -865,7 +865,7 @@ CMapClass *CMapClass::PrepareSelection(SelectMode_t eSelectMode)
 //			Type - Unless NULL, only objects of the given type will be enumerated.
 // Output : Returns FALSE if the enumeration was terminated early, TRUE if it completed.
 //-----------------------------------------------------------------------------
-BOOL CMapClass::EnumChildren(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPCLASSTYPE Type)
+BOOL CMapClass::EnumChildren(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type)
 {
 	FOR_EACH_OBJ( m_Children, pos )
 	{
@@ -897,7 +897,7 @@ BOOL CMapClass::EnumChildren(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPC
 //			Type - Unless NULL, only objects of the given type will be enumerated.
 // Output : Returns FALSE if the enumeration was terminated early, TRUE if it completed.
 //-----------------------------------------------------------------------------
-BOOL CMapClass::EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPCLASSTYPE Type)
+BOOL CMapClass::EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type)
 {
 	FOR_EACH_OBJ( m_Children, pos )
 	{
@@ -1495,7 +1495,7 @@ ChunkFileResult_t CMapClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	CEditGameClass *pEdit = dynamic_cast <CEditGameClass *> (this);
 	if (pEdit != NULL)
 	{
-		if ((eResult == ChunkFile_Ok) && (strlen(pEdit->GetComments()) > 0))
+		if ((eResult == ChunkFile_Ok) && (!Q_isempty(pEdit->GetComments())))
 		{
 			eResult = pFile->WriteKeyValue("comments", pEdit->GetComments());
 		}

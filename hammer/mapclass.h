@@ -18,10 +18,8 @@
 
 #include "tier0/basetypes.h"
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
+
 #include "BoundBox.h"
 #include "MapPoint.h"
 #include "utlvector.h"
@@ -90,9 +88,16 @@ enum VisGroupSelection
 	for( int iteratorName=0; iteratorName<(listName).Count(); iteratorName++)
 
 
+#if defined(_WIN64)
+typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
+#else
+typedef _W64 unsigned long ULONG_PTR, *PULONG_PTR;
+#endif
+
+typedef ULONG_PTR DWORD_PTR;
 
 typedef const char * MAPCLASSTYPE;
-typedef BOOL (*ENUMMAPCHILDRENPROC)(CMapClass *, unsigned int dwParam);
+typedef BOOL (*ENUMMAPCHILDRENPROC)(CMapClass *, DWORD_PTR dwParam);
 typedef CUtlVector<CMapClass*> CMapObjectList;
 
 
@@ -333,8 +338,8 @@ public:
     
 	virtual const char* GetDescription() { return ""; }
 
-	BOOL EnumChildren(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam = 0, MAPCLASSTYPE Type = NULL);
-	BOOL EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPCLASSTYPE Type = NULL);
+	BOOL EnumChildren(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam = 0, MAPCLASSTYPE Type = NULL);
+	BOOL EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type = NULL);
 	BOOL IsChildOf(CMapAtom *pObject);
 
 	virtual bool ShouldAppearInLightingPreview(void)
