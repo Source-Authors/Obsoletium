@@ -70,9 +70,6 @@ void CTextureBox::DeleteItem(LPDELETEITEMSTRUCT lpDeleteItemStruct)
 //-----------------------------------------------------------------------------
 void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) 
 {
-//	if(!pGD)
-//		return;
-
 	CDC dc;
 	dc.Attach(lpDrawItemStruct->hDC);
 	dc.SaveDC();

@@ -22,7 +22,7 @@ class CTextureBox : public CComboBox
 // Construction
 public:
 	CTextureBox();
-	virtual BOOL Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID);
+	BOOL Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID) override;
 
 // Attributes
 public:
@@ -38,11 +38,11 @@ public:
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CTextureBox)
-	public:
-	virtual int CompareItem(LPCOMPAREITEMSTRUCT lpCompareItemStruct);
-	virtual void DeleteItem(LPDELETEITEMSTRUCT lpDeleteItemStruct);
-	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
-	virtual void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+public:
+	int CompareItem(LPCOMPAREITEMSTRUCT lpCompareItemStruct) override;
+	void DeleteItem(LPDELETEITEMSTRUCT lpDeleteItemStruct) override;
+	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) override;
+	void MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct) override;
 	//}}AFX_VIRTUAL
 
 // Implementation
