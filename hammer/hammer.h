@@ -215,7 +215,7 @@ extern IEngineAPI	*g_pEngineAPI;
 extern CreateInterfaceFn g_Factory;
 bool IsRunningInEngine();
 
-// event update system - lets you check for events such as gemoetry modification for updating stuff.
+// event update system - lets you check for events such as geometry modification for updating stuff.
 void SignalUpdate(int ev);									// EVTYPE_xx
 int GetUpdateCounter(int ev);									// return timestamp
 double GetUpdateTime(int ev);									// return floating point time event was signalled

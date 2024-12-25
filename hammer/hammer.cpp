@@ -1513,9 +1513,12 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 void CAboutDlg::OnOrder() 
 {
 	char szBuf[MAX_PATH];
-	GetWindowsDirectory(szBuf, MAX_PATH);
-	strcat(szBuf, "\\notepad.exe");
-	_spawnl(_P_NOWAIT, szBuf, szBuf, "order.txt", NULL);
+	unsigned bufferSize = GetWindowsDirectory(szBuf, MAX_PATH);
+	if (bufferSize != 0 && bufferSize <= std::size(szBuf))
+	{
+		V_strcat_safe(szBuf, "\\notepad.exe");
+		_spawnl(_P_NOWAIT, szBuf, szBuf, "order.txt", NULL);
+	}
 }
 
 
@@ -1655,7 +1658,7 @@ void CHammer::OnFileNew(void)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CHammer::OnFileOpen(void)
+void CHammer::OnFileOpen()
 {
 	static char szInitialDir[MAX_PATH] = "";
 	if (szInitialDir[0] == '\0')
@@ -2484,7 +2487,7 @@ void CHammer::LoadLastGoodSave( void )
 
 			if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{			
-				pCurrentDoc->SetPathName( newMapPath );		
+				pCurrentDoc->SetPathName( newMapPath );
 			}		
 		}
 	}
