@@ -768,8 +768,12 @@ void CHammer::OpenURL(const char *pszURL, HWND hwnd)
 void CHammer::OpenURL(UINT nID, HWND hwnd)
 {
 	CString str;
-	str.LoadString(nID);
-	OpenURL(str, hwnd);
+	const BOOL rc{str.LoadString(nID)};
+	// dimhotepus: Open URL only if found.
+	if (rc)
+	{
+		OpenURL(str, hwnd);
+	}
 }
 
 
