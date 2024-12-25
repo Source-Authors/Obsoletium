@@ -20,7 +20,7 @@ public:
 	CLightingPreviewResultsWindow();
 	virtual ~CLightingPreviewResultsWindow();
 
-	void Create(CWnd *pParentWnd );
+	void Create( CWnd *pParentWnd, const char *pszTitle );
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CLightingPreviewResultsWindow)

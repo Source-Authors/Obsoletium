@@ -36,7 +36,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 // Purpose: Constructor. Initializes data members.
 //-----------------------------------------------------------------------------
-CLightingPreviewResultsWindow::CLightingPreviewResultsWindow(void)
+CLightingPreviewResultsWindow::CLightingPreviewResultsWindow()
 {
 }
 
@@ -44,9 +44,9 @@ CLightingPreviewResultsWindow::CLightingPreviewResultsWindow(void)
 //-----------------------------------------------------------------------------
 // Purpose: Destructor.
 //-----------------------------------------------------------------------------
-CLightingPreviewResultsWindow::~CLightingPreviewResultsWindow(void)
+CLightingPreviewResultsWindow::~CLightingPreviewResultsWindow()
 {
-} 
+}
 
 
 //-----------------------------------------------------------------------------
@@ -54,24 +54,25 @@ CLightingPreviewResultsWindow::~CLightingPreviewResultsWindow(void)
 // Input  : *pParentWnd - 
 //			rect - 
 //-----------------------------------------------------------------------------
-void CLightingPreviewResultsWindow::Create(CWnd *pParentWnd )
+void CLightingPreviewResultsWindow::Create( CWnd *pParentWnd, const char *pszTitle )
 {
-	static CString LPreviewWndClassName;
+	static CString wndClassName;
 
-	if(LPreviewWndClassName.IsEmpty())
+	if (wndClassName.IsEmpty())
 	{
 		// create class
-		LPreviewWndClassName = AfxRegisterWndClass(
+		wndClassName = AfxRegisterWndClass(
 			CS_DBLCLKS | CS_HREDRAW | 
-			CS_VREDRAW, LoadCursor(NULL, IDC_ARROW), 
+			CS_VREDRAW, LoadCursor(NULL, IDC_ARROW),
 			(HBRUSH) GetStockObject(BLACK_BRUSH), NULL);
 	}
 
-	RECT rect;
-	rect.left = 500; rect.right = 600;
-	rect.top = 500; rect.bottom = 600;
+	CString format;
+	format.Format("Lighting Preview - %s", pszTitle);
 
-	CWnd::CreateEx(0,LPreviewWndClassName, "LightingPreviewWindow",
+	RECT rect{500, 500, 600, 600};
+
+	CWnd::CreateEx(0, wndClassName, format.GetString(),
 				   WS_OVERLAPPEDWINDOW|WS_SIZEBOX,
 				   rect, NULL, NULL,NULL);
 
