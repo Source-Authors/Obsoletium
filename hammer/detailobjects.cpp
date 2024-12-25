@@ -689,7 +689,8 @@ void	DetailObjects::BuildAnyDetailObjects(CMapFace *pMapFace)
 			pMapFace->GetPoint(faceCorner,point);
 			faceCenter += faceCorner;
 		}
-		faceCenter /= nPoints;
+		// dimhotepus: Prevent crash when np points
+		faceCenter /= (nPoints != 0 ? nPoints : 1);
 
 		pDetails->SetOrigin( faceCenter );
 
