@@ -519,7 +519,7 @@ class CCheckFaceInfo
 {
 public:
 
-	CCheckFaceInfo() { iPoint = -1; }
+	CCheckFaceInfo() { szDescription[0] = '\0'; iPoint = -1; }
 	char szDescription[128];
 	int iPoint;
 };
