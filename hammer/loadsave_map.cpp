@@ -622,6 +622,9 @@ int MDkeyvalue::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			return fileDone;
 		}
 		char *p = strchr(szBuf, '\"');
+		// dimhotepus: Exit when no data.
+		if(!p)
+			return fileError;
 		p = strchr(p+1, '\"');
 		if(!p)
 			return fileError;
