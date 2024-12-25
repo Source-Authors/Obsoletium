@@ -635,7 +635,7 @@ void CTextureSystem::LoadMaterials(CGameConfig *pConfig)
 	m_pNoDrawTexture = NULL;
 	for ( int i=0; i < m_Textures.Count(); i++ )
 	{
-		if ( V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 || V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 )
+		if ( V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 )
 		{
 			m_pNoDrawTexture = m_Textures[i];
 			break;
