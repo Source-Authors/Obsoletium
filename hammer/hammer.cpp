@@ -1948,9 +1948,9 @@ void CHammer::UpdateLighting(CMapDoc *pDoc)
 	if ( pLighting )
 	{
 		// Update 5x / second.
-		static DWORD lastTime = 0;
+		static ULONGLONG lastTime = 0;
 
-		DWORD curTime = GetTickCount();
+		ULONGLONG curTime = GetTickCount64();
 		if ( curTime - lastTime < 200 )
 		{
 			curPercent = lastPercent; // no change
