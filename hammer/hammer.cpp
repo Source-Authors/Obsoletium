@@ -426,10 +426,16 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CHammer::CHammer(void)
 {
+	pMapDocTemplate = nullptr;
+	pManifestDocTemplate = nullptr;
+
+	m_bClosing = false;
 	m_bActiveApp = true;
 	m_SuppressVideoAllocation = false;
 	m_bForceRenderNextFrame = false;
-	m_bClosing = false;
+
+	m_szAppDir[0] = '\0';
+	m_szAutosaveDir[0] = '\0';
 }
 
 
