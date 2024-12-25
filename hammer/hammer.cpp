@@ -1333,8 +1333,8 @@ void CHammer::Shutdown()
 	UnloadFileSystemDialogModule();
 
 	// Delete the command sequences.
-	int nSequenceCount = m_CmdSequences.GetSize();
-	for (int i = 0; i < nSequenceCount; i++)
+	intp nSequenceCount = m_CmdSequences.GetSize();
+	for (intp i = 0; i < nSequenceCount; i++)
 	{
 		CCommandSequence *pSeq = m_CmdSequences[i];
 		if ( pSeq != NULL )
@@ -1669,6 +1669,7 @@ void CHammer::OnFileOpen()
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf;*.vmm)|*.vmf;*.vmm|Valve Map Files Autosave (*.vmf_autosave)|*.vmf_autosave|Worldcraft RMFs (*.rmf)|*.rmf|Worldcraft Maps (*.map)|*.map||");
 	dlg.m_ofn.lpstrInitialDir = szInitialDir;
 	int iRvl = dlg.DoModal();
+	INT_PTR iRvl = dlg.DoModal();
 
 	if (iRvl == IDCANCEL)
 	{
@@ -1730,7 +1731,7 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 	{
 		CString		Message;
 
-		Message = "The file " + CString( lpszFileName ) + " does not exist.";
+		Message = "The file '" + CString( lpszFileName ) + "' does not exist.";
 		AfxMessageBox( Message, MB_ICONERROR );
 
 		return NULL;
@@ -1742,9 +1743,9 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 	if ( pMapDoc )
 	{
 		CMapDoc::SetActiveMapDoc( pMapDoc );
-
 	}
-	if( pDoc && Options.general.bLoadwinpos && Options.general.bIndependentwin)
+
+	if ( pDoc && Options.general.bLoadwinpos && Options.general.bIndependentwin)
 	{
 		::GetMainWnd()->LoadWindowStates();
 	}
@@ -1758,16 +1759,16 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 		pMapDoc->ShowWindow( true );
 	}
 
-	if ( pDoc && ((CMapDoc *)pDoc)->IsAutosave() )
+	if ( pMapDoc->IsAutosave() )
 	{			
 		char szRenameMessage[MAX_PATH+MAX_PATH+256];
-		CString newMapPath = *((CMapDoc *)pDoc)->AutosavedFrom();
+		CString newMapPath = *pMapDoc->AutosavedFrom();
 
-		sprintf( szRenameMessage, "This map was loaded from an autosave file.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
+		V_sprintf_safe( szRenameMessage, "This map was loaded from an autosave file.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
 
 		if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 		{			
-			((CMapDoc *)pDoc)->SetPathName( newMapPath );		
+			pMapDoc->SetPathName( newMapPath );
 		}			
 	}
 
