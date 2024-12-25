@@ -501,7 +501,8 @@ bool CSoundSystem::Play( SoundType_t type, int nIndex )
 		g_SoundPlayData.SetSize( g_pFileSystem->Size( fp ) );
 		if ( g_pFileSystem->Read( g_SoundPlayData.Base(), g_SoundPlayData.Count(), fp ) == g_SoundPlayData.Count() )
 		{
-			return (PlaySound( g_SoundPlayData.Base(), NULL, SND_ASYNC | SND_MEMORY ) != FALSE);
+			// dimhotepus: Do not play default sound on error.
+			return (PlaySound( g_SoundPlayData.Base(), NULL, SND_ASYNC | SND_MEMORY | SND_NODEFAULT | SND_SENTRY ) != FALSE);
 		}
 		g_pFileSystem->Close( fp );
 	}
@@ -514,7 +515,8 @@ bool CSoundSystem::Play( SoundType_t type, int nIndex )
 //-----------------------------------------------------------------------------
 void CSoundSystem::StopSound()
 {
-	PlaySound( NULL, NULL, SND_ASYNC | SND_MEMORY );
+	// dimhotepus: Do not play default sound on error.
+	PlaySound( NULL, NULL, SND_ASYNC | SND_MEMORY | SND_NODEFAULT | SND_SENTRY );
 }
 
 
