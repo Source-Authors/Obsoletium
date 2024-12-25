@@ -2,10 +2,10 @@
 // MapDiffDlg.cpp : implementation file
 //
 #include "stdafx.h"
+#include "MapDiffDlg.h"
 #include "GlobalFunctions.h"
 #include "History.h"
 #include "MainFrm.h"
-#include "MapDiffDlg.h"
 #include "MapDoc.h"
 #include "MapEntity.h"
 #include "MapSolid.h"
@@ -21,7 +21,6 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
-#include ".\mapdiffdlg.h"
 
 CMapDiffDlg *s_pDlg = NULL;
 CMapDoc *s_pCurrentMap = NULL;
@@ -84,7 +83,8 @@ void CMapDiffDlg::OnBnClickedMapbrowse()
 	// TODO: need to prevent (or handle) opening VMF files when using old map file formats
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf)|*.vmf|Valve Map Files Autosaves (*.vmf_autosave)|*.vmf_autosave|Worldcraft RMFs (*.rmf)|*.rmf|Worldcraft Maps (*.map)|*.map||");
 	dlg.m_ofn.lpstrInitialDir = szInitialDir;
-	int iRvl = dlg.DoModal();
+	dlg.m_ofn.lpstrTitle = "Open Valve Map | Valve Map Autosave | Worldcraft RMF | Worldcraft Map File";
+	INT_PTR iRvl = dlg.DoModal();
 
 	if (iRvl == IDCANCEL)
 	{
@@ -148,7 +148,7 @@ void CMapDiffDlg::OnOK()
 	}
 	if ( nTotalSimilarities > 0 )
 	{
-		GetMainWnd()->MessageBox( "Similarities were found and placed into the \"Similar\" visgroup.", "Map Similarities Found", MB_OK | MB_ICONEXCLAMATION);
+		GetMainWnd()->MessageBox( "Similarities were found and placed into the \"Similar\" visgroup.", "Hammer - Map Similarities Found", MB_OK | MB_ICONEXCLAMATION);
 	}
 	s_pCurrentMap->VisGroups_UpdateAll();
 	DestroyWindow();

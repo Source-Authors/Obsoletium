@@ -6,7 +6,9 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "mapdoc.h"
+#include "resource.h"
 
 // MapDiffDlg dialog
 
