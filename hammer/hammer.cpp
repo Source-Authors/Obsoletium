@@ -1351,6 +1351,10 @@ void CHammer::Shutdown()
 	g_Sounds.ShutDown();
 
 	materials->ModShutdown();
+
+	// dimhotepus: Unlink spew debug output.
+	SpewOutputFunc(nullptr);
+
 	BaseClass::Shutdown();
 }
 
