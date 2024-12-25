@@ -375,7 +375,7 @@ LRESULT CFilteredComboBox::DefWindowProc(
 		}
 	}
 	
-	return BaseClass::DefWindowProc( message, wParam, lParam );
+	return __super::DefWindowProc( message, wParam, lParam );
 }
 
 
@@ -385,7 +385,7 @@ BOOL CFilteredComboBox::PreCreateWindow( CREATESTRUCT& cs )
 	// If we use CBS_OWNERDRAWVARIABLE, then we run into this bug: http://support.microsoft.com/kb/813791.
 	cs.style |= CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
 	cs.style &= ~CBS_SORT;
-	return BaseClass::PreCreateWindow( cs );
+	return __super::PreCreateWindow( cs );
 }
 
 void CFilteredComboBox::OnEnterKeyPressed( const char *pForceText )

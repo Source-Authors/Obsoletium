@@ -158,7 +158,7 @@ void CGroupList::SetRedraw(bool bRedraw)
 //-----------------------------------------------------------------------------
 bool CGroupList::SubclassDlgItem(int nCtrlID, CWnd *pwndParent)
 {
-	return (CTreeCtrl::SubclassDlgItem(nCtrlID, pwndParent) == TRUE);
+	return (__super::SubclassDlgItem(nCtrlID, pwndParent) == TRUE);
 }
 
 
