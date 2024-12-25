@@ -535,7 +535,13 @@ void CSoundSystem::OpenSource( SoundType_t type, int nIndex )
 		char pFullPath[MAX_PATH];
 		if ( g_pFullFileSystem->GetLocalPath( pRelativePath, pFullPath, MAX_PATH ) )
 		{
-			ShellExecute( NULL, "open", pFullPath, NULL, NULL, SW_SHOWNORMAL );
+			if (HINSTANCE(32) > ShellExecute( NULL, "open", pFullPath, NULL, NULL, SW_SHOWNORMAL ))
+			{
+				CString format;
+				format.Format("The sound '%s' couldn't be opened. Looks like it is inside VPK file.", pFullPath);
+
+				AfxMessageBox(format, MB_ICONEXCLAMATION);
+			}
 		}
 	}
 }
