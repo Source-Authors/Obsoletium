@@ -740,33 +740,26 @@ BOOL COPTConfigs::BrowseForFolder(char *pszTitle, char *pszDirectory)
 //-----------------------------------------------------------------------------
 void COPTConfigs::OnBrowseCordonTexture(void)
 {
-	CTextureBrowser *pBrowser = new CTextureBrowser(this);
-	if (pBrowser != NULL)
+	CTextureBrowser browser(this);
+	//
+	// Use the currently selected texture format for browsing.
+	//
+	int nIndex = m_cTextureFormat.GetCurSel();
+	TEXTUREFORMAT eTextureFormat = nIndex != LB_ERR
+		? (TEXTUREFORMAT)m_cTextureFormat.GetItemData(nIndex)
+		: tfVMT;
+	browser.SetTextureFormat(eTextureFormat);
+
+	//
+	// Select the current cordon texture in the texture browser.
+	//
+	CString strTex;
+	m_cCordonTexture.GetWindowText(strTex);
+	browser.SetInitialTexture(strTex);
+
+	if (browser.DoModal() == IDOK)
 	{
-		//
-		// Use the currently selected texture format for browsing.
-		//
-		TEXTUREFORMAT eTextureFormat = tfVMT;
-		int nIndex = m_cTextureFormat.GetCurSel();
-		if (nIndex != LB_ERR)
-		{
-			eTextureFormat = (TEXTUREFORMAT)m_cTextureFormat.GetItemData(nIndex);
-		}
-		pBrowser->SetTextureFormat(eTextureFormat);
-
-		//
-		// Select the current cordon texture in the texture browser.
-		//
-		CString strTex;
-		m_cCordonTexture.GetWindowText(strTex);
-		pBrowser->SetInitialTexture(strTex);
-
-		if (pBrowser->DoModal() == IDOK)
-		{
-			m_cCordonTexture.SetWindowText(pBrowser->m_cTextureWindow.szCurTexture);
-		}
-
-		delete pBrowser;
+		m_cCordonTexture.SetWindowText(browser.m_cTextureWindow.szCurTexture);
 	}
 }
 

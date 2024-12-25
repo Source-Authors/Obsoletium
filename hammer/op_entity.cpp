@@ -3147,19 +3147,19 @@ void COP_Entity::BrowseTextures( const char *szFilter, bool bSprite )
 	m_pSmartControl->GetWindowText(szInitialTexture, 128);
 	
 	// create a texture browser and set it to browse decals
-	CTextureBrowser *pBrowser = new CTextureBrowser(GetMainWnd());
+	CTextureBrowser browser(GetMainWnd());
 
 	// setup filter - if any
 	if( szFilter[0] != '\0' )
 	{
-		pBrowser->SetFilter( szFilter );
+		browser.SetFilter( szFilter );
 	}
 
-	pBrowser->SetInitialTexture(szInitialTexture);
+	browser.SetInitialTexture(szInitialTexture);
 	
-	if (pBrowser->DoModal() == IDOK)
+	if (browser.DoModal() == IDOK)
 	{
-		IEditorTexture *pTex = g_Textures.FindActiveTexture(pBrowser->m_cTextureWindow.szCurTexture);
+		IEditorTexture *pTex = g_Textures.FindActiveTexture(browser.m_cTextureWindow.szCurTexture);
 
 		char szName[MAX_PATH];
 		if (pTex)
@@ -3187,8 +3187,6 @@ void COP_Entity::BrowseTextures( const char *szFilter, bool bSprite )
 		m_kv.SetValue(pVar->GetName(), szName);
 		m_kvAdded.SetValue(pVar->GetName(), "1");
 	}
-
-	delete pBrowser;
 }
 
 

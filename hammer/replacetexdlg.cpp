@@ -77,17 +77,17 @@ END_MESSAGE_MAP()
 void CReplaceTexDlg::BrowseTex(int iEdit)
 {
 	CString strTex;
-	CWnd *pWnd = GetDlgItem(iEdit);
 
+	CWnd *pWnd = GetDlgItem(iEdit);
 	pWnd->GetWindowText(strTex);
 
-	CTextureBrowser *pBrowser = new CTextureBrowser(GetMainWnd());
-	pBrowser->SetUsed(iEdit == IDC_FIND);
-	pBrowser->SetInitialTexture(strTex);
+	CTextureBrowser browser(GetMainWnd());
+	browser.SetUsed(iEdit == IDC_FIND);
+	browser.SetInitialTexture(strTex);
 
-	if (pBrowser->DoModal() == IDOK)
+	if (browser.DoModal() == IDOK)
 	{
-		IEditorTexture *pTex = g_Textures.FindActiveTexture(pBrowser->m_cTextureWindow.szCurTexture);
+		IEditorTexture *pTex = g_Textures.FindActiveTexture(browser.m_cTextureWindow.szCurTexture);
 		char szName[MAX_PATH];
 		if (pTex != NULL)
 		{
@@ -99,8 +99,6 @@ void CReplaceTexDlg::BrowseTex(int iEdit)
 		}
 		pWnd->SetWindowText(szName);
 	}
-
-	delete pBrowser;
 }
 
 void CReplaceTexDlg::OnBrowsereplace() 
