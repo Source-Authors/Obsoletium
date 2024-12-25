@@ -9,14 +9,11 @@
 
 #include "resource.h"
 
-
-#define SPLASH_MIN_SHOW_TIME_MS	500
-
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-// Sorry Tom...   :(
+constexpr inline int SPLASH_MIN_SHOW_TIME_MS{500};
+
 // dimhotepus: Reenable Hammer Time playing for first time.
 #define HAMMER_TIME 1
 #ifdef HAMMER_TIME
@@ -25,7 +22,7 @@
 #include <sys/stat.h>
 #include "StatusBarIDs.h"
 
-unsigned char g_CantTouchThis[] = 
+static constexpr unsigned char g_CantTouchThis[] = 
 {
 	0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x01, 0x00, 0x0B, 0x00, 0xF0, 0x4D, 0x54,
 	0x72, 0x6B, 0x00, 0x00, 0x00, 0x13, 0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08, 0x00, 0xFF,
@@ -106,7 +103,7 @@ static MCIDEVICEID PlayMIDISong(LPCTSTR szMIDIFileName, BOOL bRestart)
 	return deviceId;
 }
 
-unsigned __stdcall CantTouchThisThread( void * )
+static unsigned __stdcall CantTouchThisThread( void * )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("HammerTime!");
@@ -139,7 +136,7 @@ unsigned __stdcall CantTouchThisThread( void * )
 	return 0;
 }
 
-void CantTouchThis()
+static void CantTouchThis()
 {
 	if ( !AfxGetApp()->GetProfileInt("General", "Hammer time", 0))
 	{
@@ -216,6 +213,7 @@ void CSplashWnd::ShowSplashScreen(CWnd* pParentWnd /*= NULL*/)
 	else
 	{
 		delete s_pSplashWnd;
+		s_pSplashWnd = nullptr;
 	}
 }
 
