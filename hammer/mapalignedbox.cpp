@@ -62,11 +62,13 @@ CMapClass *CMapAlignedBox::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 
 			if (nParam < 3)
 			{
-				Mins[nParam] = atof(pszParam);
+				// dimhoteous: atof -> strtof.
+				Mins[nParam] = strtof(pszParam, nullptr);
 			}
 			else if (nParam < 6)
 			{
-				Maxs[nParam % 3] = atof(pszParam);
+				// dimhoteous: atof -> strtof.
+				Maxs[nParam % 3] = strtof(pszParam, nullptr);
 			}
 			else
 			{
@@ -96,8 +98,11 @@ CMapClass *CMapAlignedBox::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 //-----------------------------------------------------------------------------
 CMapAlignedBox::CMapAlignedBox(void)
 {
-	m_bUseKeyName = false;
 	m_bWireframe = false;
+	m_bUseKeyName = false;
+
+	m_MinsKeyName[0] = '\0';
+	m_MaxsKeyName[0] = '\0';
 
 	m_Mins.Init();
 	m_Maxs.Init();
