@@ -148,7 +148,7 @@ class CTexture : public IEditorTexture
 
 		char m_szName[MAX_PATH];
 
-		void *m_pImageData;
+		unsigned char *m_pImageData;
 };
 
 

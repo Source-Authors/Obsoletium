@@ -207,7 +207,7 @@ BOOL CSSolid::GetHandleInfo(SSHANDLEINFO *pInfo, SSHANDLE id)
 	}
 
 	// try faces ..
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		if(m_Faces[i].id != id)
 			continue;	// not this one
@@ -463,7 +463,7 @@ CMapSolid *CSSolid::Detach()
 //-----------------------------------------------------------------------------
 bool CSSolid::HasDisps( void )
 {
-	for ( int iFace = 0; iFace < m_nFaces; ++iFace )
+	for ( short iFace = 0; iFace < m_nFaces; ++iFace )
 	{
 		CSSFace *pFace = &m_Faces[iFace];
 		if ( pFace->m_hDisp != EDITDISPHANDLE_INVALID )
@@ -482,7 +482,7 @@ bool CSSolid::IsValidWithDisps( void )
 	if ( !HasDisps() )
 		return true;
 
-	for ( int iFace = 0; iFace < m_nFaces; ++iFace )
+	for ( short iFace = 0; iFace < m_nFaces; ++iFace )
 	{
 		// Get the face(s) that have displacements.
 		CSSFace *pFace = &m_Faces[iFace];
@@ -510,7 +510,7 @@ bool CSSolid::IsValidWithDisps( void )
 //-----------------------------------------------------------------------------
 void CSSolid::DestroyDisps( void )
 {
-	for ( int iFace = 0; iFace < m_nFaces; ++iFace )
+	for ( short iFace = 0; iFace < m_nFaces; ++iFace )
 	{
 		CSSFace *pFace = &m_Faces[iFace];
 		if ( pFace->m_hDisp != EDITDISPHANDLE_INVALID )
@@ -548,7 +548,7 @@ void CSSolid::ToMapSolid(CMapSolid *p)
 	unsigned char r, g, b;
 	pSolid->GetRenderColor( r,g,b );
 
-	for (int i = 0; i < m_nFaces; i++)
+	for (short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &pFace = m_Faces[i];
 		CMapFace SolidFace;
@@ -606,6 +606,7 @@ void CSSolid::ToMapSolid(CMapSolid *p)
 
 CSSFace* CSSolid::AddFace(int* piNewIndex)
 {
+	Assert(m_nFaces < SHRT_MAX);
 	m_Faces.SetCount(++m_nFaces);
 	if(piNewIndex)
 		piNewIndex[0] = m_nFaces-1;
@@ -875,7 +876,7 @@ void CSSolid::MoveSelectedHandles(const Vector &Delta)
 // check faces for irregularities ->
 void CSSolid::CheckFaces()
 {
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &face = m_Faces[i];
 
@@ -1059,7 +1060,7 @@ DoNextFace:
 		goto DoNextFace;
 	}
 
-	delete phVertexList;
+	delete[] phVertexList;
 
 	return(TRUE);
 }
@@ -1203,7 +1204,7 @@ DoNextFace:
 	delete phVertexList;
 
 	// ** now regular faces **
-	for(int iFace = 0; iFace < m_nFaces; iFace++)
+	for(short iFace = 0; iFace < m_nFaces; iFace++)
 	{
 		CSSFace *pUpdFace = &m_Faces[iFace];
 
@@ -1270,7 +1271,7 @@ void CSSolid::DeleteEdge(int iEdge)
 	memset(&m_Edges[m_nEdges], 0, sizeof(CSSEdge));
 
 	// kill all references to this edge in faces
-	for(int f = 0; f < m_nFaces; f++)
+	for(short f = 0; f < m_nFaces; f++)
 	{
 		CSSFace& face = m_Faces[f];
 		for(int e = 0; e < face.nEdges; e++)
@@ -1299,7 +1300,7 @@ void CSSolid::DeleteVertex(int iVertex)
 }
 
 
-void CSSolid::DeleteFace(int iFace)
+void CSSolid::DeleteFace(short iFace)
 {
 	// Destroy the displacement if there is one.
 	CSSFace *pFace = &m_Faces[iFace];
@@ -1312,7 +1313,7 @@ void CSSolid::DeleteFace(int iFace)
 		}
 	}
 
-	for(int i2 = iFace; i2 < m_nFaces-1; i2++)
+	for(short i2 = iFace; i2 < m_nFaces-1; i2++)
 	{
 		memcpy(&m_Faces[i2], &m_Faces[i2+1], sizeof(CSSFace));
 	}
@@ -1517,7 +1518,7 @@ DoEdges:
 			SSHANDLE id2 = edge2.id;
 			SSHANDLE id1 = edge.id;
 
-			for(int f = 0; f < m_nFaces; f++)
+			for(short f = 0; f < m_nFaces; f++)
 			{
 				CSSFace& face = m_Faces[f];
 				for(int ef = 0; ef < face.nEdges; ef++)
@@ -1538,7 +1539,7 @@ DoEdges:
 	}
 
 	// delete concurrent edge references in face
-	for(int f = 0; f < m_nFaces; f++)
+	for(short f = 0; f < m_nFaces; f++)
 	{
 		CSSFace& face = m_Faces[f];
 
@@ -1675,7 +1676,7 @@ void CSSolid::SerializeDXF(FILE *stream, int nObject)
 
 	// count number of triangulated faces
 	int nTriFaces = 0;
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &face = m_Faces[i];
 		nTriFaces += face.nEdges-2;
@@ -1691,7 +1692,7 @@ void CSSolid::SerializeDXF(FILE *stream, int nObject)
 	}
 
 	// triangulate each face and write
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &face = m_Faces[i];
 		PINT pVerts = CreatePointIndexList(face);
