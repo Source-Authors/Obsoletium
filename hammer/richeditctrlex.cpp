@@ -341,7 +341,7 @@ void CRTFBuilder::size(int n)
 void CRTFBuilder::font(const CString &strFont)
 {
 	int nCount =  0;
-	for (list<CString>::iterator i = m_fontList.begin(); i != m_fontList.end(); i++, nCount++)
+	for (list<CString>::iterator i = m_fontList.begin(); i != m_fontList.end(); ++i, ++nCount)
 	{
 		if ((*i) == strFont)
 		{
