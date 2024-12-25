@@ -64,14 +64,6 @@ CShell::CShell(void)
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Destructor.
-//-----------------------------------------------------------------------------
-CShell::~CShell(void)
-{
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Initiates a shell editing session.
 // Input  : pszCommand - Should be "session_begin".
 //			pszArguments - Filename and file version in the engine.
