@@ -1007,7 +1007,8 @@ bool CHammer::Check16BitColor()
 	if (hDC)
 	{
 		int bpp = GetDeviceCaps(hDC, BITSPIXEL);
-		if (bpp < 15)
+		// dimhotepus: Correctly check BPP is 16+
+		if (bpp < 16)
 		{
 			AfxMessageBox("Your screen must be in 16-bit color or higher to run Hammer.", MB_ICONERROR);
 			return false;
@@ -1037,7 +1038,9 @@ int CHammer::StaticHammerInternalInit( void *pParam )
 InitReturnVal_t CHammer::HammerInternalInit()
 {
 	SpewOutputFunc( HammerDbgOutput );
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
+
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
+
 	InitReturnVal_t nRetVal = BaseClass::Init();
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
