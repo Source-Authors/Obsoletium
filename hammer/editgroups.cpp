@@ -64,9 +64,11 @@ void CEditGroups::DoDataExchange(CDataExchange* pDX)
 //			pGroup - Visgroup to check against.
 // Output : Returns TRUE to continue enumerating.
 //-----------------------------------------------------------------------------
-static BOOL UpdateObjectColor(CMapClass *pObject, CVisGroup *pGroup)
+static BOOL UpdateObjectColor(CMapClass *pObject, DWORD_PTR ctx)
 {
-	pObject->UpdateObjectColor();
+	auto *pGroup = reinterpret_cast<CVisGroup *>(ctx);
+	// dimhotepus: Color object by its vis group color.
+	pObject->SetColorVisGroup(pGroup);
 	return(TRUE);
 }
 
@@ -90,7 +92,7 @@ void CEditGroups::OnColor(void)
 			m_cColorBox.SetColor(dlg.m_cc.rgbResult, TRUE);
 
 			// change all object colors
-			GetActiveWorld()->EnumChildren(ENUMMAPCHILDRENPROC(UpdateObjectColor), DWORD(pGroup));
+			GetActiveWorld()->EnumChildren(UpdateObjectColor, DWORD_PTR(pGroup));
 
 			CMapDoc::GetActiveMapDoc()->UpdateAllViews( MAPVIEW_UPDATE_COLOR );
 		}
