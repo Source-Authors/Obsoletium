@@ -31,18 +31,18 @@ CPrefabList CPrefab::MRU;
 CPrefabLibraryList CPrefabLibrary::PrefabLibraryList;
 
 
-static char *pLibHeader = "Worldcraft Prefab Library\r\n\x1a";
-static float fLibVersion = 0.1f;
+constexpr inline char pLibHeader[]{ "Worldcraft Prefab Library\r\n\x1a" };
+constexpr inline float fLibVersion{ 0.1f };
 
 
-typedef struct
+struct PrefabHeader
 {
 	DWORD dwOffset;
 	DWORD dwSize;
 	char szName[31];
 	char szNotes[MAX_NOTES];
 	int iType;
-} PrefabHeader;
+};
 
 
 typedef struct
