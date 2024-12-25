@@ -104,17 +104,28 @@ CMapLightCone::CMapLightCone(void)
 	m_fQuadraticAttn = 1;
 	m_fLinearAttn = 0;
 	m_fConstantAttn = 0;
-	m_bPitchSet = false;
-	m_fPitch = 0;
-	m_fFocus = 1;
-	m_flPitchScale = 1;
 
+	m_fFiftyPercentDistance = -1;	// disabled - use attenuation
+	m_fZeroPercentDistance = -1;
+
+	m_LightColor.Init();
 	m_fBrightness = 100;
+
 	m_fInnerConeAngle = 0;
 	m_fOuterConeAngle = 45;
 
-	m_fFiftyPercentDistance = -1;							// disabled - use attenuation
 	m_Angles.Init();
+
+	m_bPitchSet = false;
+	m_fPitch = 0;
+
+	m_fFocus = 1;
+	m_flPitchScale = 1;
+
+	m_szColorKeyName[0] = '\0';
+	m_szInnerConeKeyName[0] = '\0';
+	m_szOuterConeKeyName[0] = '\0';
+
 	SignalUpdate( EVTYPE_LIGHTING_CHANGED );
 }
 
