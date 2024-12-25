@@ -72,9 +72,10 @@ void CPrefabsDlg::OnAddobject()
 
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT | OFN_FILEMUSTEXIST |
 		OFN_HIDEREADONLY | OFN_LONGNAMES | OFN_NOCHANGEDIR, 
-		"Prefab files (*.map;*.rmf;*.os)|*.map; *.rmf; *.os|"
-		"Game MAP files (*.map)|*.map|"
-		"Worldcraft RMF files (*.rmf)|*.rmf||", this);
+		"Prefab Files (*.map;*.rmf;*.os)|*.map; *.rmf; *.os|"
+		"Game Map Files (*.map)|*.map|"
+		"Worldcraft RMF Files (*.rmf)|*.rmf||", this);
+	dlg.m_ofn.lpstrTitle = "Open Prefab | Game Map | Wordlcraft RMF File";
 
 	if(dlg.DoModal() == IDCANCEL)
 		return;	// aborted
@@ -284,7 +285,7 @@ void CPrefabsDlg::OnRemoveobject()
 	CPrefabLibrary *pLibrary = GetCurrentLibrary();
 	while(iIndex != -1)
 	{
-		CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(iIndex));
+		CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iIndex)));
 		if(pPrefab)
 		{
 			// delete it
@@ -292,7 +293,7 @@ void CPrefabsDlg::OnRemoveobject()
 			{
 				// do confirmation.
 				if(AfxMessageBox("Are you sure you want to delete these "
-					"items?", MB_YESNO) == IDNO)
+					"items?", MB_YESNO | MB_ICONQUESTION) == IDNO)
 					return;	// nope!
 				m_Objects.SetRedraw(FALSE);	// no redraw while doing this
 			}
@@ -323,14 +324,18 @@ void CPrefabsDlg::OnExportobject()
 	int iIndex = m_Objects.GetNextItem(-1, LVNI_SELECTED);
 	while(iIndex != -1)
 	{
-		CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(iIndex));
+		CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iIndex)));
 		if(pPrefab)
 		{
 			// export it
 			CString strFilename;
 			strFilename = pPrefab->GetName();
 			CFileDialog dlg(FALSE, "map", strFilename, OFN_HIDEREADONLY | 
-				OFN_OVERWRITEPROMPT, "Map files|*.map;*.rmf|", this);
+				OFN_OVERWRITEPROMPT,
+				"Game Map Files (*.map)|*.map|"
+				"Worldcraft RMF Files (*.rmf)|*.rmf||",
+				this);
+			dlg.m_ofn.lpstrTitle = "Open Game Map | Worldcraft RMF File";
 			if(dlg.DoModal() == IDCANCEL)
 				return;	// nevermind
 			strFilename = dlg.GetPathName();
@@ -362,7 +367,7 @@ void CPrefabsDlg::SetCurObject(int iItem)
 	}
 
 	// update data..
-	CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(iCurObject));
+	CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iCurObject)));
 	Assert(pPrefab);
 
 	m_ObjectNotes.SetWindowText(pPrefab->GetNotes());
@@ -394,8 +399,8 @@ CPrefabLibrary *CPrefabsDlg::GetCurrentLibrary(int *piSel)
 	int iSel = m_Libraries.GetCurSel();
 	if(iSel == CB_ERR)
 		return NULL;
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(
-		m_Libraries.GetItemData(iSel));
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(static_cast<DWORD>(
+		m_Libraries.GetItemData(iSel)));
 
 	if(piSel)
 		piSel[0] = iSel;
@@ -410,7 +415,7 @@ CPrefab *CPrefabsDlg::GetCurrentObject(int *piSel)
 	int iSel = iCurObject;
 	if(iSel == -1)
 		return NULL;
-	CPrefab *pPrefab= CPrefab::FindID(m_Objects.GetItemData(iSel));
+	CPrefab *pPrefab= CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iSel)));
 
 	if(piSel)
 		piSel[0] = iSel;
@@ -422,7 +427,7 @@ void CPrefabsDlg::OnSelchangeLibraries()
 {
 	// get last library
 	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(
-		m_Libraries.GetItemData(iCurLibrary));
+		static_cast<DWORD>(m_Libraries.GetItemData(iCurLibrary)));
 
 	// save its index
 	if(bCurLibraryModified)
@@ -458,7 +463,7 @@ static int AskAboutInvalidFilename()
 {
 	return AfxMessageBox("That's not a valid name - some of the characters aren't\n"
 			"acceptable. Try using a name with only A-Z, 0-9, space,\n"
-			"and these characters: $%`-_@~'!(){}^#&", MB_OKCANCEL);
+			"and these characters: $%`-_@~'!(){}^#&", MB_OKCANCEL | MB_ICONERROR);
 }
 
 
@@ -548,7 +553,7 @@ void CPrefabsDlg::OnRemovelibrary()
 		return;
 	}
 
-	if (AfxMessageBox("Are you sure you want to delete this library from your hard drive?", MB_YESNO) == IDYES)
+	if (AfxMessageBox("Are you sure you want to delete this library from your storage?", MB_YESNO | MB_ICONQUESTION) == IDYES)
 	{
 		pLibrary->DeleteFile();
 		delete pLibrary;
@@ -602,7 +607,7 @@ void CPrefabsDlg::OnEndlabeleditObjects(NMHDR* pNMHDR, LRESULT* pResult)
 	if(item.pszText == NULL)
 		return;
 
-	CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(item.iItem));
+	CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(item.iItem)));
 	pPrefab->SetName(item.pszText);
 	m_Objects.SetItemText(item.iItem, 0, item.pszText);
 	bCurLibraryModified = TRUE;
