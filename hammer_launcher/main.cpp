@@ -187,7 +187,13 @@ bool HammerAppSystemGroup::Create() {
       {"", ""}  // Required to terminate the list
   };
 
-  if (!AddSystems(app_systems)) return false;
+  if (!AddSystems(app_systems)) {
+    Error(
+        "Please check Hammer installed correctly.\n\n"
+        "Unable to add launcher systems from *" DLL_EXT_STRING
+        "s. Looks like required components are missed or broken.");
+    return false;
+  }
 
   // dimhotepus: Drop Perforce support
   // Add Perforce separately since it's possible it isn't there. (SDK)
@@ -197,11 +203,11 @@ bool HammerAppSystemGroup::Create() {
   // 	AddSystem( p4Module, P4_INTERFACE_VERSION );
   // }
   // Connect to interfaces loaded in AddSystems that we need locally
+  data_cache_ = FindSystem<IDataCache>(DATACACHE_INTERFACE_VERSION);
+  input_system_ = FindSystem<IInputSystem>(INPUTSYSTEM_INTERFACE_VERSION);
   material_system_ =
       FindSystem<IMaterialSystem>(MATERIAL_SYSTEM_INTERFACE_VERSION);
   hammer_ = FindSystem<IHammer>(INTERFACEVERSION_HAMMER);
-  data_cache_ = FindSystem<IDataCache>(DATACACHE_INTERFACE_VERSION);
-  input_system_ = FindSystem<IInputSystem>(INPUTSYSTEM_INTERFACE_VERSION);
 
   // This has to be done before connection.
   material_system_->SetShaderAPI("shaderapidx9" DLL_EXT_STRING);
