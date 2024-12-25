@@ -1668,7 +1668,7 @@ void CHammer::OnFileOpen()
 	// TODO: need to prevent (or handle) opening VMF files when using old map file formats
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf;*.vmm)|*.vmf;*.vmm|Valve Map Files Autosave (*.vmf_autosave)|*.vmf_autosave|Worldcraft RMFs (*.rmf)|*.rmf|Worldcraft Maps (*.map)|*.map||");
 	dlg.m_ofn.lpstrInitialDir = szInitialDir;
-	int iRvl = dlg.DoModal();
+	dlg.m_ofn.lpstrTitle = "Open Valve Map | Valve Map Autosave | Worldcraft RMF | Worldcraft Map File";
 	INT_PTR iRvl = dlg.DoModal();
 
 	if (iRvl == IDCANCEL)
