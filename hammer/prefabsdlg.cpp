@@ -489,12 +489,16 @@ Again:
 
 	pLibrary->SetName(dlg.m_strName);
 	pLibrary->SetNotes(dlg.m_strDescript);
+	// dimhotepus: Save immediately to be able to work with.
+	pLibrary->Save();
 
 	// add to list
 	int iIndex = m_Libraries.AddString(pLibrary->GetName());
 	m_Libraries.SetItemData(iIndex, pLibrary->GetID());
 
 	m_Libraries.SetCurSel(iIndex);
+	// dimhotepus: Add to global list.
+	CPrefabLibrary::AddLibrary(pLibrary);
 	OnSelchangeLibraries();	// to redraw description window
 	bCurLibraryModified = TRUE;
 }
@@ -555,14 +559,21 @@ void CPrefabsDlg::OnRemovelibrary()
 
 	if (AfxMessageBox("Are you sure you want to delete this library from your storage?", MB_YESNO | MB_ICONQUESTION) == IDYES)
 	{
-		pLibrary->DeleteFile();
-		delete pLibrary;
+		// dimhotepus: Only if library file was deleted (ex. Prefabs can't be deleted).
+		if (pLibrary->DeleteFile())
+		{
+			// dimhotepus: Remove from global list.
+			CPrefabLibrary::RemoveLibrary(pLibrary);
 
-		bCurLibraryModified = FALSE;
+			delete pLibrary;
 
-		m_Libraries.DeleteString(iSel);
-		m_Libraries.SetCurSel(0);
-		OnSelchangeLibraries();	// to redraw description window
+			bCurLibraryModified = FALSE;
+
+			m_Libraries.DeleteString(iSel);
+			m_Libraries.SetCurSel(0);
+
+			OnSelchangeLibraries();	// to redraw description window
+		}
 	}
 }
 

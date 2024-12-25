@@ -16,8 +16,10 @@
 
 #include "stdafx.h"
 #include "Prefabs.h"
+
 #include "Prefab3D.h"
 #include "hammer.h"
+
 #include <io.h>
 #include <fcntl.h>
 
@@ -88,8 +90,13 @@ CPrefabLibrary *CreatePrefabLibrary(const char *szFile)
 CPrefab::CPrefab()
 {
 	static DWORD dwRunningID = 1;
+
 	// assign running ID
 	dwID = dwRunningID++;
+	dwLibID = 0;
+	dwFileOffset = 0;
+	dwFileSize = 0;
+
 	PrefabList.AddTail(this);
 
 	// assign blank name/notes
@@ -209,7 +216,8 @@ CPrefab::pfiletype_t CPrefab::CheckFileType(LPCTSTR pszFilename)
 	std::fstream file(pszFilename, std::ios::in | std::ios::binary);
 
 	// read first 16 bytes of file
-	char szBuf[255];
+	// dimhotepus: alignas(float)
+	alignas(float) char szBuf[255];
 	file.read(szBuf, 16);
 
 	// check 1: RMF
@@ -251,6 +259,7 @@ CPrefabLibrary::CPrefabLibrary()
 	static DWORD dwRunningID = 1;
 	// assign running ID
 	dwID = dwRunningID++;
+	m_eType = LibType_None;
 	m_szName[0] = '\0';
 	szNotes[0] = '\0';
 }
@@ -360,10 +369,7 @@ void CPrefabLibrary::FreeAllLibraries(void)
 	while (pos != NULL)
 	{
 		CPrefabLibrary *pPrefabLibrary = PrefabLibraryList.GetNext(pos);
-		if (pPrefabLibrary != NULL)
-		{
-			delete pPrefabLibrary;
-		}
+		delete pPrefabLibrary;
 	}
 
 	PrefabLibraryList.RemoveAll();
@@ -517,6 +523,32 @@ CPrefabLibrary *CPrefabLibrary::FindOpenLibrary(LPCTSTR pszFilename)
 
 
 //-----------------------------------------------------------------------------
+// Purpose:
+// Input  : pLibrary -
+// Output :
+//-----------------------------------------------------------------------------
+void CPrefabLibrary::AddLibrary(CPrefabLibrary *pLibrary)
+{
+	PrefabLibraryList.AddTail(pLibrary);
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Input  : pLibrary -
+// Output :
+//-----------------------------------------------------------------------------
+void CPrefabLibrary::RemoveLibrary(CPrefabLibrary *pLibrary)
+{
+	POSITION pos = PrefabLibraryList.Find(pLibrary);
+	if (pos)
+	{
+		PrefabLibraryList.RemoveAt(pos);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
 // Purpose: Enumerates the prefab libraries of a given type.
 // Input  : p - Iterator.
 //			eType - Type of library to return, LibType_None returns all
@@ -548,6 +580,7 @@ CPrefabLibrary *CPrefabLibrary::EnumLibraries(POSITION &p, LibraryType_t eType)
 //-----------------------------------------------------------------------------
 CPrefabLibraryRMF::CPrefabLibraryRMF()
 {
+	m_dwDirOffset = 0;
 }
 
 
@@ -590,8 +623,8 @@ int CPrefabLibraryRMF::Load(LPCTSTR pszFilename)
 	char szBuf[128];
 
 	// read string header
-	m_file.read(szBuf, strlen(pLibHeader));
-	if(strncmp(szBuf, pLibHeader, strlen(pLibHeader)))
+	m_file.read(szBuf, std::size(pLibHeader) - 1);
+	if(strncmp(szBuf, pLibHeader, std::size(pLibHeader) - 1))
 	{
 		// return
 		return -1;
@@ -645,6 +678,12 @@ int CPrefabLibraryRMF::Load(LPCTSTR pszFilename)
 //-----------------------------------------------------------------------------
 bool CPrefabLibraryRMF::DeleteFile(void)
 {
+	// dimhotepus: Close in case we opened it.
+	if ( m_file.is_open() )
+	{
+		m_file.close();
+	}
+
 	return(remove(m_strOpenFileName) == 0);
 }
 
@@ -748,7 +787,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 
 	// write binary header
 	// save current position so we can seek back and rewrite it
-	DWORD dwBinaryHeaderOffset = file.tellp();
+	std::streampos dwBinaryHeaderOffset = file.tellp();
 	PrefabLibraryHeader plh;
 	plh.dwNumEntries = Prefabs.GetCount();
 	plh.fVersion = fLibVersion;
@@ -875,6 +914,7 @@ int CPrefabLibraryRMF::SetName(LPCTSTR pszName)
 //-----------------------------------------------------------------------------
 CPrefabLibraryVMF::CPrefabLibraryVMF()
 {
+	m_szFolderName[0] = '\0';
 }
 
 

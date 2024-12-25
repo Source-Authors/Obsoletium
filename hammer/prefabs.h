@@ -159,6 +159,8 @@ public:
 	static void LoadAllLibraries(void);
 	static void FreeAllLibraries(void);
 	static CPrefabLibrary *FindOpenLibrary(LPCTSTR pszFilename);
+	static void AddLibrary(CPrefabLibrary *pLibrary);
+	static void RemoveLibrary(CPrefabLibrary *pLibrary);
 
 protected:
 
