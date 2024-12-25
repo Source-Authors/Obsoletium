@@ -82,86 +82,121 @@ void CProcessWnd::Append(CString str)
 int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 {
 	int rval = -1;
-    SECURITY_ATTRIBUTES saAttr; 
 	HANDLE hChildStdinRd_, hChildStdinWr, hChildStdoutRd_, hChildStdoutWr, hChildStderrWr; 
 
     // Set the bInheritHandle flag so pipe handles are inherited.
+    SECURITY_ATTRIBUTES saAttr = {}; 
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
     saAttr.bInheritHandle = TRUE; 
     saAttr.lpSecurityDescriptor = NULL; 
  
     // Create a pipe for the child's STDOUT. 
-    if(CreatePipe(&hChildStdoutRd_, &hChildStdoutWr, &saAttr, 0))
+    if (::CreatePipe(&hChildStdoutRd_, &hChildStdoutWr, &saAttr, 0))
 	{
-		if(CreatePipe(&hChildStdinRd_, &hChildStdinWr, &saAttr, 0))
+		if (::CreatePipe(&hChildStdinRd_, &hChildStdinWr, &saAttr, 0))
 		{
-			if (DuplicateHandle(GetCurrentProcess(),hChildStdoutWr, GetCurrentProcess(),&hChildStderrWr,0, TRUE,DUPLICATE_SAME_ACCESS))
+			if (::DuplicateHandle
+				(
+					::GetCurrentProcess(),
+					hChildStdoutWr,
+					::GetCurrentProcess(),
+					&hChildStderrWr,
+					0,
+					TRUE,
+					DUPLICATE_SAME_ACCESS
+				))
 			{
 				/* Now create the child process. */ 
 				STARTUPINFO si;
 				memset(&si, 0, sizeof si);
+
 				si.cb = sizeof(si);
 				si.dwFlags = STARTF_USESTDHANDLES;
 				si.hStdInput = hChildStdinRd_;
 				si.hStdError = hChildStderrWr;
 				si.hStdOutput = hChildStdoutWr;
+
 				PROCESS_INFORMATION pi;
 				CString str;
 				str.Format("%s %s", pszCmd, pszCmdLine);
-				if (CreateProcess(NULL, (char*) LPCTSTR(str), NULL, NULL, TRUE, 
+
+				if (::CreateProcess(NULL, str.GetBuffer(), NULL, NULL, TRUE, 
 					DETACHED_PROCESS, NULL, NULL, &si, &pi))
 				{
 					HANDLE hProcess = pi.hProcess;
 					
-#define BUFFER_SIZE 4096
+					constexpr DWORD BUFFER_SIZE{4096};
 					// read from pipe..
 					char buffer[BUFFER_SIZE];
 					BOOL bDone = FALSE;
 					
 					while(1)
 					{
-						DWORD dwCount = 0;
-						DWORD dwRead = 0;
+						DWORD dwCount = 0, dwRead = 0;
 						
 						// read from input handle
-						PeekNamedPipe( hChildStdoutRd_, NULL, NULL, NULL, &dwCount, NULL);
-						if (dwCount)
+						if (PeekNamedPipe( hChildStdoutRd_, NULL, NULL, NULL, &dwCount, NULL) && dwCount)
 						{
-							dwCount = min (dwCount, (DWORD)BUFFER_SIZE - 1);
+							dwCount = min(dwCount, BUFFER_SIZE - 1);
 							ReadFile( hChildStdoutRd_, buffer, dwCount, &dwRead, NULL);
 						}
-						if(dwRead)
+
+						if (dwRead)
 						{
 							buffer[dwRead] = 0;
 							Append(buffer);
 						}
-						// check process termination
-						else if(WaitForSingleObject(hProcess, 1000) != WAIT_TIMEOUT)
+						else if (WaitForSingleObject(hProcess, 1000) != WAIT_TIMEOUT)
 						{
+							// check process termination
 							if(bDone)
 								break;
+
 							bDone = TRUE;	// next time we get it
 						}
 					}
-					rval = 0;
+
+					// dimhotepus: Correctly process exit code for processes.
+					if ( DWORD rc; ::GetExitCodeProcess(pi.hProcess, &rc) && rc != STILL_ACTIVE )
+					{
+						rval = rc;
+					}
+					else
+					{
+						rval = STILL_ACTIVE;
+					}
+
+					::CloseHandle(pi.hThread);
+					::CloseHandle(pi.hProcess);
+
+					if (rval != 0)
+					{
+						SetForegroundWindow();
+
+						// dimhotepus: Dump process exit code on failure.
+						CString strTmp;
+						strTmp.Format("\r\n* Failure during command execution:\r\n   %s\r\n* Command returned nonsuccess error code:   \"%d\"\r\n", str.GetBuffer(), rval);
+						Append(strTmp);
+					}
 				}
 				else
 				{
+					const char *error{GetErrorString()};
+
 					SetForegroundWindow();
+
 					CString strTmp;
-					strTmp.Format("* Could not execute the command:\r\n   %s\r\n", str.GetBuffer());
-					Append(strTmp);
-					strTmp.Format("* Windows gave the error message:\r\n   \"%s\"\r\n", GetErrorString());
+					strTmp.Format("* Could not execute the command:\r\n   %s\r\n* Windows gave the error message:\r\n   \"%s\"\r\n", str.GetBuffer(), error);
 					Append(strTmp);
 				}
 				
-				CloseHandle(hChildStderrWr);
+				::CloseHandle(hChildStderrWr);
 			}
-			CloseHandle(hChildStdinRd_);
-			CloseHandle(hChildStdinWr);
+			::CloseHandle(hChildStdinRd_);
+			::CloseHandle(hChildStdinWr);
 		}
-		CloseHandle(hChildStdoutRd_);
-		CloseHandle(hChildStdoutWr);
+		::CloseHandle(hChildStdoutRd_);
+		::CloseHandle(hChildStdoutWr);
 	}
 
 	return rval;
