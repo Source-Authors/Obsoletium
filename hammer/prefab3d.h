@@ -109,7 +109,8 @@ class CPrefabVMF : public CPrefab3D
 		static ChunkFileResult_t LoadWorldCallback(CChunkFile *pFile, CPrefabVMF *pPrefab);
 
 		char m_szFilename[MAX_PATH];	// Full path of the prefab VMF.
-		int m_nFileTime;				// File modification time of the last loaded version of the prefab.
+		// dimhotepus: int -> time_t
+		time_t m_nFileTime;				// File modification time of the last loaded version of the prefab.
 }; 
 
 #endif // PREFAB3D_H
