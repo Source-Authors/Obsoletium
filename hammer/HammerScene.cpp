@@ -88,7 +88,7 @@ char *ExpandPath (char *path)
 // is $include in scriptlib, if this function returns 0, $include will
 // behave the way it did before this change
 //-----------------------------------------------------------------------------
-int CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
+intp CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
 {
 	return 0;
 }
@@ -103,7 +103,12 @@ int LoadFile( const char *filename, void **bufferptr )
 	if ( FILESYSTEM_INVALID_HANDLE != f )
 	{
 		int length = g_pFullFileSystem->Size( f );
-		void *buffer = malloc (length+1);
+		void *buffer = malloc(length+1);
+		if (!buffer)
+		{
+			*bufferptr = NULL;
+			return 0;
+		}
 		((char *)buffer)[length] = 0;
 		g_pFullFileSystem->Read( buffer, length, f );
 		g_pFullFileSystem->Close (f);
