@@ -24,7 +24,7 @@
 // FIXME: Put gamesounds parsing into shared code somewhere
 #define MANIFEST_FILE			"scripts/game_sounds_manifest.txt"
 #define SOUNDGENDER_MACRO		"$gender"
-#define SOUNDGENDER_MACRO_LENGTH ssize(SOUNDGENDER_MACRO) - 1		// Length of above including $
+constexpr inline int SOUNDGENDER_MACRO_LENGTH = ssize(SOUNDGENDER_MACRO) - 1;		// Length of above including $
 
 
 // Sounds we're playing are loaded into here for Windows to access while playing them.
