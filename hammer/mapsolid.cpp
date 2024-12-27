@@ -1570,23 +1570,24 @@ ChunkFileResult_t CMapSolid::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 		//
 		// Save the solid's ID.
 		//
+		eResult = pFile->WriteKeyValueInt("id", GetID());
+
+		// dimhotepus: Check result.
 		if (eResult == ChunkFile_Ok)
 		{
-			eResult = pFile->WriteKeyValueInt("id", GetID());
-		}
-
-		//
-		// Save all the brush faces.
-		//
-		int nFaceCount = GetFaceCount();
-		for (int nFace = 0; nFace < nFaceCount; nFace++)
-		{
-			CMapFace *pFace = GetFace(nFace);
-			eResult = pFace->SaveVMF(pFile, pSaveInfo);
-
-			if (eResult != ChunkFile_Ok)
+			//
+			// Save all the brush faces.
+			//
+			int nFaceCount = GetFaceCount();
+			for (int nFace = 0; nFace < nFaceCount; nFace++)
 			{
-				break;
+				CMapFace *pFace = GetFace(nFace);
+				eResult = pFace->SaveVMF(pFile, pSaveInfo);
+
+				if (eResult != ChunkFile_Ok)
+				{
+					break;
+				}
 			}
 		}
 

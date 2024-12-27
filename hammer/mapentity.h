@@ -111,12 +111,12 @@ public:
 	//
 	// Serialization.
 	//
-	ChunkFileResult_t LoadVMF(CChunkFile *pFile);
-	ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+	[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+	[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 	int SerializeRMF(std::fstream&, BOOL);
 	int SerializeMAP(std::fstream&, BOOL);
 	virtual void PostloadWorld(CMapWorld *pWorld);
-	virtual ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
+	[[nodiscard]] virtual ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
 
 	//
 	// Rendering.
@@ -243,11 +243,11 @@ private:
 	//
 	// Chunk and key value handlers for loading.
 	//
-	static ChunkFileResult_t LoadSolidCallback(CChunkFile *pFile, CMapEntity *pEntity);
-	static ChunkFileResult_t LoadEditorCallback(CChunkFile *pFile, CMapEntity *pEntity);
-	static ChunkFileResult_t LoadHiddenCallback(CChunkFile *pFile, CMapEntity *pEntity);
-	static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CMapEntity *pEntity);
-	static ChunkFileResult_t LoadEditorKeyCallback(const char *szKey, const char *szValue, CMapEntity *pEntity);
+	[[nodiscard]] static ChunkFileResult_t LoadSolidCallback(CChunkFile *pFile, CMapEntity *pEntity);
+	[[nodiscard]] static ChunkFileResult_t LoadEditorCallback(CChunkFile *pFile, CMapEntity *pEntity);
+	[[nodiscard]] static ChunkFileResult_t LoadHiddenCallback(CChunkFile *pFile, CMapEntity *pEntity);
+	[[nodiscard]] static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CMapEntity *pEntity);
+	[[nodiscard]] static ChunkFileResult_t LoadEditorKeyCallback(const char *szKey, const char *szValue, CMapEntity *pEntity);
 
 	static bool s_bShowEntityNames;			// Whether to render entity names in the 2D views.
 	static bool s_bShowEntityConnections;	// Whether to render lines indicating entity connections in the 2D views.

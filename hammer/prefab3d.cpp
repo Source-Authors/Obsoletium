@@ -509,7 +509,8 @@ int CPrefabVMF::Load(DWORD dwFlags)
 		m_pWorld->PostloadWorld();
 		m_pWorld->CalcBounds();
 
-		File.Close();
+		// dimhotepus: Check result.
+		eResult = File.Close();
 
 		//
 		// Store the file modification time to use as a cache check.

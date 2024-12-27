@@ -228,8 +228,8 @@ public:
 	//
 	// Serialization.
 	//
-	ChunkFileResult_t LoadVMF(CChunkFile *pFile);
-	ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+	[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+	[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 	int SerializeRMF(std::fstream&, BOOL);
 	int SerializeMAP(std::fstream&, BOOL);
 
@@ -377,8 +377,8 @@ protected:
 	//
 	// Serialization (chunk handlers).
 	//
-	static ChunkFileResult_t LoadDispInfoCallback(CChunkFile *pFile, CMapFace *pFace);
-	static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, LoadFace_t *pLoadFace);
+	[[nodiscard]] static ChunkFileResult_t LoadDispInfoCallback(CChunkFile *pFile, CMapFace *pFace);
+	[[nodiscard]] static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, LoadFace_t *pLoadFace);
 
 	unsigned char m_uchAlpha;			// HACK: should be in CMapAtom
 

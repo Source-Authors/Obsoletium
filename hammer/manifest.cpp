@@ -610,29 +610,61 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Write );
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest!" , MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest", MB_OK | MB_ICONEXCLAMATION );
 		bSaved = false;
 	}
 	else
 	{
 		eResult = File.BeginChunk( "Info" );
-		eResult = File.WriteKeyValueInt( "NextInternalID", m_NextInternalID );
-		eResult = File.EndChunk();
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.WriteKeyValueInt( "NextInternalID", m_NextInternalID );
+		}
 
-		eResult = File.BeginChunk( "Maps" );
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.EndChunk();
+		}
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.BeginChunk( "Maps" );
+		}
+		
+		// dimhotepus: Check result.
 		if (eResult == ChunkFile_Ok)
 		{
 			for( int i = 0; i < GetNumMaps(); i++ )
 			{
-				CManifestMap	*pManifestMap = GetMap( i );
-
-				eResult = File.BeginChunk("VMF");
+				// dimhotepus: Check result.
 				if (eResult == ChunkFile_Ok)
 				{
+					eResult = File.BeginChunk("VMF");
+				}
+
+				if (eResult == ChunkFile_Ok)
+				{
+					CManifestMap	*pManifestMap = GetMap( i );
+
 					eResult = File.WriteKeyValue( "Name", pManifestMap->m_FriendlyName );
-					eResult = File.WriteKeyValue( "File", pManifestMap->m_RelativeMapFileName );
-					eResult = File.WriteKeyValueInt( "InternalID", pManifestMap->m_InternalID );
-					if ( pManifestMap->m_bTopLevelMap == true )
+					
+					// dimhotepus: Check result.
+					if (eResult == ChunkFile_Ok)
+					{
+						eResult = File.WriteKeyValue( "File", pManifestMap->m_RelativeMapFileName );
+					}
+					
+					// dimhotepus: Check result.
+					if (eResult == ChunkFile_Ok)
+					{
+						eResult = File.WriteKeyValueInt( "InternalID", pManifestMap->m_InternalID );
+					}
+
+					if (eResult == ChunkFile_Ok && pManifestMap->m_bTopLevelMap == true )
 					{
 						eResult = File.WriteKeyValue( "TopLevel", "1" );
 					}
@@ -648,11 +680,12 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 		}
 		else
 		{
-			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest!", MB_OK | MB_ICONEXCLAMATION );
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest", MB_OK | MB_ICONEXCLAMATION );
 			bSaved = false;
 		}
 
-		File.Close();
+		// dimhotepus: Check result.
+		eResult = File.Close();
 	}
 
 	V_StripExtension( pszFileName, m_ManifestDir, sizeof( m_ManifestDir ) );
@@ -734,7 +767,7 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Write );
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest User Prefs!" , MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs" , MB_OK | MB_ICONEXCLAMATION );
 		bSaved = false;
 	}
 	else
@@ -744,21 +777,29 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 		{
 			for( int i = 0; i < GetNumMaps(); i++ )
 			{
-				CManifestMap	*pManifestMap = GetMap( i );
-
-				eResult = File.BeginChunk("VMF");
+				// dimhotepus: Check result.
 				if (eResult == ChunkFile_Ok)
 				{
+					eResult = File.BeginChunk("VMF");
+				}
+
+				if (eResult == ChunkFile_Ok)
+				{
+					CManifestMap	*pManifestMap = GetMap( i );
+
 					eResult = File.WriteKeyValueInt( "InternalID", pManifestMap->m_InternalID );
-					if ( pManifestMap->m_bPrimaryMap )
+					// dimhotepus: Check result.
+					if ( eResult == ChunkFile_Ok && pManifestMap->m_bPrimaryMap )
 					{
 						eResult = File.WriteKeyValue( "IsPrimary", "1" );
 					}
-					if ( pManifestMap->m_bProtected == true )
+					// dimhotepus: Check result.
+					if ( eResult == ChunkFile_Ok && pManifestMap->m_bProtected == true )
 					{
 						eResult = File.WriteKeyValue( "IsProtected", "1" );
 					}
-					if ( pManifestMap->m_bVisible == false )
+					// dimhotepus: Check result.
+					if ( eResult == ChunkFile_Ok && pManifestMap->m_bVisible == false )
 					{
 						eResult = File.WriteKeyValue( "IsVisible", "0" );
 					}
@@ -774,12 +815,16 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 		}
 		else
 		{
-			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest User Prefs!", MB_OK | MB_ICONEXCLAMATION );
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs", MB_OK | MB_ICONEXCLAMATION );
 			bSaved = false;
 		}
 
 		eResult = File.BeginChunk( "cordoning" );
-		eResult = CordonSaveVMF( &File, NULL );
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = CordonSaveVMF( &File, NULL );
+		}
 
 		if ( m_bIsCordoning )
 		{
@@ -789,10 +834,25 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 			CMapWorld *pCordonWorld = CordonCreateWorld();
 			eResult = pCordonWorld->SaveSolids( &File, &SaveInfo, 0 );
 		}
-
-		eResult = File.EndChunk();
-
-		File.Close();
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.EndChunk();
+		}
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.Close();
+		}
+		
+		// dimhotepus: Check result.
+		if (eResult != ChunkFile_Ok)
+		{
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs", MB_OK | MB_ICONEXCLAMATION );
+			bSaved = false;
+		}
 	}
 
 	if ( bSaved )

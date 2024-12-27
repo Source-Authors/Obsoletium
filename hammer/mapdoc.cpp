@@ -9877,22 +9877,21 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 		//
 		// Write the map file version.
 		//
-		if (eResult == ChunkFile_Ok)
-		{
-			bool bIsAutosave = false;
-			if ( SAVEFLAGS_AUTOSAVE & saveFlags )
 			{
-				bIsAutosave = true;
-			}
+			const bool bIsAutosave = ( SAVEFLAGS_AUTOSAVE & saveFlags );
 			eResult = SaveVersionInfoVMF(&File, bIsAutosave);
 		}
 
 		//
 		// Save VisGroups information. Save this first so that we can assign visgroups while loading objects.
 		//
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
 		if (!m_bPrefab && !(saveFlags & SAVEFLAGS_LIGHTSONLY))
 		{
 			eResult = VisGroups_SaveVMF(&File, &SaveInfo);
+		}
 		}
 
 		//
@@ -9946,7 +9945,8 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 			}
 		}
 
-		File.Close();
+		// dimhotepus: Check result.
+		eResult = File.Close();
 	}
 
 	// Restore the main window's title.
@@ -9954,7 +9954,7 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Error Saving File", MB_OK);
+		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Error Saving File", MB_OK | MB_ICONERROR);
 	}
 	else
 	{

@@ -43,8 +43,8 @@ class CMapGroup : public CMapClass
 		//
 		// Serialization.
 		//
-		ChunkFileResult_t LoadVMF(CChunkFile *pFile);
-		ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+		[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
  		Vector2D m_vecLogicalPosition;	// Position in logical space
 };

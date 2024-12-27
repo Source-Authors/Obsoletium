@@ -100,7 +100,7 @@ public:
 	void ResetOverlayType( unsigned short uiType )			{ m_uiFlags &= ~uiType; }
 	unsigned short GetOverlayType( void )					{ return m_uiFlags; }
 
-	ChunkFileResult_t SaveDataToVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
+	[[nodiscard]] ChunkFileResult_t SaveDataToVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
 
 private:
 

@@ -3281,7 +3281,7 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	}
 #endif
 
-	if( eResult == ChunkFile_Ok )
+	if ( eResult == ChunkFile_Ok )
 	{
 		eResult = pFile->WriteKeyValueFloat( "elevation", elevation );
 	}

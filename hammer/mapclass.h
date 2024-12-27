@@ -312,8 +312,8 @@ public:
 	//
 	// Can be serialized:
 	//
-	virtual ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
-	virtual ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
+	[[nodiscard]] virtual ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+	[[nodiscard]] virtual ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
 
 	virtual bool ShouldSerialize(void) { return true; }
 	virtual int SerializeRMF(std::fstream &File, BOOL bRMF);
@@ -418,8 +418,8 @@ protected:
 	//
 	// Serialization callbacks.
 	//
-	static ChunkFileResult_t LoadEditorCallback(CChunkFile *pFile, CMapClass *pObject);
-	static ChunkFileResult_t LoadEditorKeyCallback(const char *szKey, const char *szValue, CMapClass *pObject);
+	[[nodiscard]] static ChunkFileResult_t LoadEditorCallback(CChunkFile *pFile, CMapClass *pObject);
+	[[nodiscard]] static ChunkFileResult_t LoadEditorKeyCallback(const char *szKey, const char *szValue, CMapClass *pObject);
 
 	//
 	// Has a list of objects that must be notified if it changes size or position.

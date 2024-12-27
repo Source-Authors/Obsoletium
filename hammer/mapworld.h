@@ -104,13 +104,13 @@ class CMapWorld : public CMapClass, public CEditGameClass
 		//
 		// Serialization.
 		//
-		ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+		[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
 		void PostloadWorld(void);
 		void PostloadVisGroups(void);
 		
 		// saveFlags is a combination of SAVEFLAGS_ defines.
-		ChunkFileResult_t SaveSolids(CChunkFile *pFile, CSaveInfo *pSaveInfo, int saveFlags);
-		ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, int saveFlags);
+		[[nodiscard]] ChunkFileResult_t SaveSolids(CChunkFile *pFile, CSaveInfo *pSaveInfo, int saveFlags);
+		[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, int saveFlags);
 		
 		virtual int SerializeRMF(std::fstream &file, BOOL fIsStoring);
 		virtual int SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pIntersecting = NULL);
@@ -167,16 +167,16 @@ class CMapWorld : public CMapClass, public CEditGameClass
 		//
 		// Serialization.
 		//
-		static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CMapWorld *pWorld);
-		static ChunkFileResult_t LoadGroupCallback(CChunkFile *pFile, CMapWorld *pWorld);
-		static ChunkFileResult_t LoadHiddenCallback(CChunkFile *pFile, CMapWorld *pWorld);
-		static ChunkFileResult_t LoadHiddenSolidCallback(CChunkFile *pFile, CMapWorld *pWorld);
-		static ChunkFileResult_t LoadSolidCallback(CChunkFile *pFile, CMapWorld *pWorld);
+		[[nodiscard]] static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CMapWorld *pWorld);
+		[[nodiscard]] static ChunkFileResult_t LoadGroupCallback(CChunkFile *pFile, CMapWorld *pWorld);
+		[[nodiscard]] static ChunkFileResult_t LoadHiddenCallback(CChunkFile *pFile, CMapWorld *pWorld);
+		[[nodiscard]] static ChunkFileResult_t LoadHiddenSolidCallback(CChunkFile *pFile, CMapWorld *pWorld);
+		[[nodiscard]] static ChunkFileResult_t LoadSolidCallback(CChunkFile *pFile, CMapWorld *pWorld);
 
-		ChunkFileResult_t LoadSolid(CChunkFile *pFile, bool bVisible);
+		[[nodiscard]] ChunkFileResult_t LoadSolid(CChunkFile *pFile, bool bVisible);
 
-		static BOOL BuildSaveListsCallback(CMapClass *pObject, SaveLists_t *pSaveLists);
-		ChunkFileResult_t SaveObjectListVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, const CMapObjectList *pList, int saveFlags);
+		static BOOL BuildSaveListsCallback(CMapClass *pObject, DWORD_PTR ctx);
+		[[nodiscard]] ChunkFileResult_t SaveObjectListVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, const CMapObjectList *pList, int saveFlags);
 
 		//
 		// Culling tree operations.

@@ -261,11 +261,14 @@ void CToolManager::SetTool(ToolID_t eNewTool)
 
 ChunkFileResult_t CToolManager::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo) 
 {
-	for (int i=0;i<m_Tools.Count(); i++)
+	for (auto *t : m_Tools)
 	{
-		if ( m_Tools[i]->GetVMFChunkName() != NULL  )
+		if ( t->GetVMFChunkName() != NULL  )
 		{
-			m_Tools[i]->SaveVMF( pFile, pSaveInfo );
+            ChunkFileResult_t eResult = t->SaveVMF(pFile, pSaveInfo);
+			// dimhotepus: Check result.
+			if (eResult != ChunkFile_Ok)
+				return eResult;
 		}
 	}
 

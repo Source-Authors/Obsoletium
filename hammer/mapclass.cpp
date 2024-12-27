@@ -1459,20 +1459,17 @@ ChunkFileResult_t CMapClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	// Save the visgroup IDs, if any.
 	//
-	if (m_VisGroups.Count())
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok && m_VisGroups.Count())
 	{
-		if ((eResult == ChunkFile_Ok) && m_VisGroups.Count())
+		for (auto *pVisGroup : m_VisGroups)
 		{
-			for (int i = 0; i < m_VisGroups.Count(); i++)
+			if ( !pVisGroup->IsAutoVisGroup() )
 			{
-				CVisGroup *pVisGroup = m_VisGroups.Element(i);
-				if ( !pVisGroup->IsAutoVisGroup() )
+				eResult = pFile->WriteKeyValueInt("visgroupid", pVisGroup->GetID());
+				if (eResult != ChunkFile_Ok)
 				{
-					eResult = pFile->WriteKeyValueInt("visgroupid", pVisGroup->GetID());
-					if (eResult != ChunkFile_Ok)
-					{
-						break;
-					}
+					break;
 				}
 			}
 		}

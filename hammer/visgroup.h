@@ -86,11 +86,11 @@ class CVisGroup
 		//
 		// Serialization.
 		//
-		ChunkFileResult_t LoadVMF(CChunkFile *pFile, CMapDoc *pDoc);
-		ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
-		static ChunkFileResult_t LoadVisGroupCallback(CChunkFile *pFile, LoadVisGroupData_t *pLoadData);
-		static ChunkFileResult_t LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		static [[nodiscard]] ChunkFileResult_t LoadVisGroupCallback(CChunkFile *pFile, LoadVisGroupData_t *pLoadData);
+		static [[nodiscard]] ChunkFileResult_t LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *pDoc);
 
 		static bool IsConvertingOldVisGroups();
 
@@ -104,7 +104,7 @@ class CVisGroup
 
 		bool m_bIsAuto;
 
-		static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CVisGroup *pGroup);
+		static [[nodiscard]] ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CVisGroup *pGroup);
 
 		static bool s_bShowAll;
 		static bool s_bIsConvertingOldVisGroups;

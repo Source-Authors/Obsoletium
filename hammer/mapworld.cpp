@@ -1096,7 +1096,8 @@ ChunkFileResult_t CMapWorld::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, in
 		//
 		if (eResult == ChunkFile_Ok)
 		{
-			CEditGameClass::SaveVMF(pFile, pSaveInfo);
+			// dimhotepus: Check result.
+			eResult = CEditGameClass::SaveVMF(pFile, pSaveInfo);
 		}
 
 		//
@@ -1120,7 +1121,8 @@ ChunkFileResult_t CMapWorld::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, in
 		//
 		if (eResult == ChunkFile_Ok)
 		{
-			pFile->EndChunk();
+			// dimhotepus: Check result.
+			eResult = pFile->EndChunk();
 		}
 	}
 

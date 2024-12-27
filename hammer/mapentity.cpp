@@ -1710,7 +1710,11 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	// Begin this entity's scope.
 	//
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok)
+	{
 	eResult = pFile->BeginChunk("entity");
+	}
 
 	//
 	// Save the entity's ID.
@@ -1732,17 +1736,20 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	// If this is a point entity of an unknown type or a point entity that doesn't
 	// declare an origin key, save our origin.
 	//
-	if (IsPlaceholder() && (!IsClass() || GetClass()->VarForName("origin") == NULL))
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok && IsPlaceholder() && (!IsClass() || GetClass()->VarForName("origin") == NULL))
 	{
 		char szOrigin[80];
-		sprintf(szOrigin, "%g %g %g", (double)m_Origin[0], (double)m_Origin[1], (double)m_Origin[2]);
-		pFile->WriteKeyValue("origin", szOrigin);
+		V_sprintf_safe(szOrigin, "%g %g %g", (double)m_Origin[0], (double)m_Origin[1], (double)m_Origin[2]);
+		eResult = pFile->WriteKeyValue("origin", szOrigin);
 	}
 
 	//
 	// Save all our descendents.
 	//
-	eResult = ChunkFile_Ok;
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok)
+	{
 	EnumChildrenPos_t pos;
 	CMapClass *pChild = GetFirstDescendent(pos);
 	while ((pChild != NULL) && (eResult == ChunkFile_Ok))
@@ -1751,7 +1758,9 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 		{
 			eResult = pChild->SaveVMF(pFile, pSaveInfo);
 		}
+
 		pChild = GetNextDescendent(pos);
+	}
 	}
 
 	//
@@ -1767,13 +1776,15 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	if (eResult == ChunkFile_Ok)
 	{
-		pFile->EndChunk();
+		// dimhotepus: Check result.
+		eResult = pFile->EndChunk();
 	}
 
 	//
 	// End the hidden chunk if we began it.
 	//
-	if (!IsVisible())
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok && !IsVisible())
 	{
 		eResult = pFile->EndChunk();
 	}
