@@ -20,6 +20,7 @@ class BlockArray
 public:
 	BlockArray()
 	{
+		memset(Blocks, 0, sizeof(Blocks));
 		nCount = nBlocks = 0;
 	}
 	~BlockArray()
