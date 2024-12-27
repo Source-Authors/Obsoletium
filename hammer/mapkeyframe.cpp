@@ -224,7 +224,7 @@ void CMapKeyFrame::GetQuatAngles( Quaternion &outQuat )
 // Purpose: Recalulates timings based on the new position
 // Input  : *pfOrigin - 
 //-----------------------------------------------------------------------------
-void CMapKeyFrame::SetOrigin( Vector& pfOrigin )
+void CMapKeyFrame::SetOrigin( const Vector& pfOrigin )
 {
 	CMapClass::SetOrigin(pfOrigin);
 	m_bRebuildPath = true;

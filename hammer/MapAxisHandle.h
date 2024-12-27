@@ -64,7 +64,7 @@ public:
 	virtual int SerializeMAP(std::fstream &File, BOOL bRMF);
 
 	// Overridden to chain down to our endpoints, which are not children.
-	void SetOrigin(Vector &vecOrigin);
+	void SetOrigin(const Vector &vecOrigin) override;
 
 	// Overridden to chain down to our endpoints, which are not children.
 	virtual SelectionState_t SetSelectionState(SelectionState_t eSelectionState);

@@ -366,7 +366,7 @@ int CMapSweptPlayerHull::SerializeMAP(std::fstream &File, BOOL bRMF)
 //-----------------------------------------------------------------------------
 // Purpose: Overridden to chain down to our endpoints, which are not children.
 //-----------------------------------------------------------------------------
-void CMapSweptPlayerHull::SetOrigin(Vector &vecOrigin)
+void CMapSweptPlayerHull::SetOrigin(const Vector &vecOrigin)
 {
 	BaseClass::SetOrigin(vecOrigin);
 

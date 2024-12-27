@@ -1639,7 +1639,7 @@ void CMapClass::SetEditorKeyValue(const char *szKey, const char *szValue)
 //			FIXME: Should our children necessarily have the same origin as us?
 //				   Seems like we should translate our children by our origin delta
 //-----------------------------------------------------------------------------
-void CMapClass::SetOrigin( Vector &origin )
+void CMapClass::SetOrigin( const Vector &origin )
 {
 	CMapPoint::SetOrigin( origin );
  

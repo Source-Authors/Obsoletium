@@ -794,7 +794,7 @@ ChunkFileResult_t CMapEntity::LoadSolidCallback(CChunkFile *pFile, CMapEntity *p
 // Purpose: Sets this entity's origin and updates the bounding box.
 // Input  : o - Origin to set.
 //-----------------------------------------------------------------------------
-void CMapEntity::SetOrigin(Vector& o)
+void CMapEntity::SetOrigin(const Vector& o)
 {
 	Vector vecOrigin;
 	GetOrigin(vecOrigin);

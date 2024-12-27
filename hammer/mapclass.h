@@ -290,7 +290,7 @@ public:
 	void PostUpdate(Notify_Dependent_t eNotifyType);
 	static void UpdateAllDependencies(CMapClass *pObject);
 
-	void SetOrigin(Vector& origin);
+ 	void SetOrigin(const Vector& origin) override;
 
 	// hierarchy
 	virtual void UpdateAnimation( float animTime ) {}

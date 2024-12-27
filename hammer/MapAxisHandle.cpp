@@ -302,7 +302,7 @@ int CMapAxisHandle::SerializeMAP(std::fstream &File, BOOL bRMF)
 //-----------------------------------------------------------------------------
 // Purpose: Overridden to chain down to our endpoints, which are not children.
 //-----------------------------------------------------------------------------
-void CMapAxisHandle::SetOrigin(Vector &vecOrigin)
+void CMapAxisHandle::SetOrigin(const Vector &vecOrigin)
 {
 	BaseClass::SetOrigin(vecOrigin);
 
