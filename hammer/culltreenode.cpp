@@ -19,17 +19,13 @@ bool BoxesIntersect(Vector const &mins1, Vector const &maxs1, Vector const &mins
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CCullTreeNode::CCullTreeNode(void)
-{
-}
+CCullTreeNode::CCullTreeNode(void) = default;
 
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CCullTreeNode::~CCullTreeNode(void)
-{
-}
+CCullTreeNode::~CCullTreeNode(void) = default;
 
 
 //-----------------------------------------------------------------------------
