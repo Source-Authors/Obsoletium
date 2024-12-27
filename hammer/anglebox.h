@@ -32,7 +32,8 @@ public:
 	void SetDifferent(bool bDifferent, bool bRedraw = true);
 	inline void SetEditControl(CAngleCombo *pEdit);
 
-	char *GetAngleEditText(char *szBuf);
+	// dimhotepus: Add buffer size arg to prevent overflows.
+	char *GetAngleEditText(char *szBuf, ptrdiff_t len);
 
 	void Enable(bool bEnable);
 	void Show(bool bShow);
