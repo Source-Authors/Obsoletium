@@ -63,7 +63,7 @@ class CMapSphere : public CMapHelper
 		
 		virtual bool HitTest2D(CMapView2D *pView, const Vector2D &point, HitInfo_t &HitData);
 
-		virtual const char* GetDescription() { return "Sphere helper"; }
+		const char* GetDescription() const override { return "Sphere helper"; }
 
 	protected:
 

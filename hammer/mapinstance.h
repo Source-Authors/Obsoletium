@@ -77,7 +77,7 @@ class CMapInstance : public CMapHelper
 		virtual bool	IsEditable( void );
 				bool	IsInstanceVisible( void );
 		
-		const char		*GetDescription( void ) { return( "Instance" ); }
+		const char		*GetDescription( void ) const { return( "Instance" ); }
 		CMapDoc			*GetInstancedMap( void ) { return m_pInstancedMap; }
 		CManifestMap	*GetManifestMap( void ) { return m_pManifestMap; }
 		bool			IsInstance( void ) { return ( m_pManifestMap == NULL ); }

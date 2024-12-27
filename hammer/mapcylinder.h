@@ -59,7 +59,7 @@ class CMapCylinder : public CMapHelper
 
 		virtual CMapClass *PrepareSelection(SelectMode_t eSelectMode);
 		
-		const char* GetDescription() { return("Cylinder helper"); }
+		const char* GetDescription() const override { return("Cylinder helper"); }
 
 		void OnAddToWorld(CMapWorld *pWorld);
 		void OnNotifyDependent(CMapClass *pObject, Notify_Dependent_t eNotifyType);

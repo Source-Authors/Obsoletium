@@ -53,7 +53,7 @@ class CMapAlignedBox : public CMapHelper
 
 		bool IsVisualElement(void) { return !m_bWireframe; }
 		
-		const char* GetDescription() { return("Aligned box"); }
+		const char* GetDescription() const override { return("Aligned box"); }
 
 		virtual void OnParentKeyChanged( const char* key, const char* value );
 

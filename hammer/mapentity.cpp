@@ -596,7 +596,7 @@ void CMapEntity::Debug(void)
 //			in it. Otherwise returns a buffer with "<classname>" in it.
 // Output : String description of the entity.
 //-----------------------------------------------------------------------------
-const char* CMapEntity::GetDescription(void)
+const char* CMapEntity::GetDescription(void) const
 {
 	static char szBuf[128];
 	const char *pszName = GetKeyValue("targetname");

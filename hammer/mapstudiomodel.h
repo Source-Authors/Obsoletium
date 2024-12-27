@@ -66,7 +66,7 @@ class CMapStudioModel : public CMapHelper
 		
 		bool ShouldRenderLast();
 
-		const char* GetDescription() { return("Studio model"); }
+		const char* GetDescription() const override { return("Studio model"); }
 
 		int GetFrame(void);
 		void SetFrame(int nFrame);

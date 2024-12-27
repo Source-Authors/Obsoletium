@@ -21,7 +21,7 @@ class CMapGroup : public CMapClass
 		
 		CMapGroup() : m_vecLogicalPosition(COORD_NOTINIT, COORD_NOTINIT) {}
 
-		const char* GetDescription(void);
+		const char* GetDescription(void) const override;
 
 		virtual CMapClass *Copy(bool bUpdateDependencies);
 		virtual CMapClass *CopyFrom(CMapClass *pFrom, bool bUpdateDependencies);

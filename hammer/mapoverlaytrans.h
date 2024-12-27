@@ -69,7 +69,7 @@ public:
 
 	inline virtual bool IsVisualElement( void ) { return true; }
 	inline virtual bool ShouldRenderLast( void ) { return true; }
-	inline const char* GetDescription() { return ( "Overlay Transition" ); }
+	inline const char* GetDescription() const override { return ( "Overlay Transition" ); }
 
 	[[nodiscard]] ChunkFileResult_t LoadVMF( CChunkFile *pFile );
 	[[nodiscard]] ChunkFileResult_t SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );

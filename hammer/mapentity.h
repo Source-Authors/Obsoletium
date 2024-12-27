@@ -182,7 +182,7 @@ public:
 
 	void AssignNodeID(void);
 
-	const char* GetDescription();
+	const char* GetDescription() const override;
 	bool IsScaleable() { return !IsPlaceholder(); }
 
 	// animation

@@ -74,7 +74,7 @@ public:
 	virtual bool IsVisualElement(void) { return true; }
 	virtual bool IsClutter(void) { return false; }
 	
-	virtual const char* GetDescription() { return("Swept player hull helper"); }
+	const char* GetDescription() const override { return("Swept player hull helper"); }
 
 	virtual void OnAddToWorld(CMapWorld *pWorld);
 	virtual void OnParentKeyChanged(const char *key, const char *value);

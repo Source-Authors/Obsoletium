@@ -96,7 +96,7 @@ public:
 	// solid info
 	//
 	size_t GetSize();
-	const char* GetDescription();
+	const char* GetDescription() const override;
 	inline bool IsValid( void ) { return( m_bValid ); }
 	inline void SetValid( bool bValid ) { m_bValid = bValid; }
 	void SetTexture( LPCTSTR pszTex, int iFace = -1 );

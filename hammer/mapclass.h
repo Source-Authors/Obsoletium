@@ -336,7 +336,7 @@ public:
 	// HACK: get the world that this object is contained within.
 	static CMapWorld *GetWorldObject(CMapAtom *pStart);
     
-	virtual const char* GetDescription() { return ""; }
+	virtual const char* GetDescription() const { return ""; }
 
 	BOOL EnumChildren(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam = 0, MAPCLASSTYPE Type = NULL);
 	BOOL EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type = NULL);

@@ -80,7 +80,7 @@ public:
 	virtual bool IsClutter(void) { return true; }
 	virtual bool IsCulledByCordon(const Vector &vecMins, const Vector &vecMaxs) { return false; } // We don't hide unless our parent hides.
 	
-	virtual const char* GetDescription() { return("Axis helper"); }
+	const char* GetDescription() const override { return("Axis helper"); }
 
 	virtual void OnAddToWorld(CMapWorld *pWorld);
 	virtual void OnParentKeyChanged(const char *key, const char *value);
