@@ -1088,13 +1088,14 @@ END_MESSAGE_MAP()
 // Purpose:  constructor
 //-----------------------------------------------------------------------------
 CPaintSculptDlg::CPaintSculptDlg( CWnd *pParent ) :
-CBaseDlg( CPaintSculptDlg::IDD, pParent )
+	CBaseDlg( CPaintSculptDlg::IDD, pParent )
 {
 	m_bAutoSew = true;
 	m_SculptMode = SCULPT_MODE_PUSH;
 
 	m_PushOptions = new CSculptPushOptions();
 	m_CarveOptions = new CSculptCarveOptions();
+	m_ProjectOptions = nullptr;
 //	m_ProjectOptions = new CSculptProjectOptions();
 }
 
