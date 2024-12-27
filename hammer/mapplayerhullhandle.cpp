@@ -74,7 +74,7 @@ CMapPlayerHullHandle::CMapPlayerHullHandle(void)
 CMapPlayerHullHandle::CMapPlayerHullHandle(const char *pszKey, bool bDrawLineToParent)
 {
 	Initialize();
-	strcpy(m_szKeyName, pszKey);
+	V_strcpy_safe(m_szKeyName, pszKey);
 	m_bDrawLineToParent = bDrawLineToParent;
 }
 
@@ -159,7 +159,7 @@ CMapClass *CMapPlayerHullHandle::CopyFrom(CMapClass *pObject, bool bUpdateDepend
 
 	CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
-	strcpy(m_szKeyName, pFrom->m_szKeyName);
+	V_strcpy_safe(m_szKeyName, pFrom->m_szKeyName);
 
 	return(this);
 }

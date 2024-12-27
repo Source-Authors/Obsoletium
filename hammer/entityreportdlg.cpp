@@ -378,7 +378,7 @@ BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx)
 		}
 	}
 
-	strcpy(szString, pszClassName);
+	V_strcpy_safe(szString, pszClassName);
 
 	BOOL bAdd = TRUE;
 
@@ -398,7 +398,7 @@ BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx)
 				char szTmp1[128], szTmp2[128];
 				V_strcpy_safe( szTmp1, pEntity->GetKeyValue( i ) );
 				strupr(szTmp1);
-				strcpy(szTmp2, pDlg->m_szFilterValue);
+				V_strcpy_safe( szTmp2, pDlg->m_szFilterValue );
 				if ((!pDlg->m_bExact && strstr(szTmp1, szTmp2)) || !strcmpi(szTmp1, szTmp2))
 				{
 					bAdd = TRUE;

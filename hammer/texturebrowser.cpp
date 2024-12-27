@@ -251,7 +251,7 @@ void CTextureBrowser::OnUsed()
 //-----------------------------------------------------------------------------
 void CTextureBrowser::SetInitialTexture(LPCTSTR pszTexture)
 {
-	strcpy(szInitialTexture, pszTexture);
+	V_strcpy_safe(szInitialTexture, pszTexture);
 }
 
 
@@ -592,7 +592,7 @@ void CTextureBrowser::SetFilter(const char *pszFilter)
 {
 	if (pszFilter)
 	{
-		strcpy(m_szNameFilter, pszFilter);
+		V_strcpy_safe(m_szNameFilter, pszFilter);
 	}
 	else
 	{

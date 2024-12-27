@@ -303,9 +303,11 @@ CMapClass *CMapWorld::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 	//
 	const char *pszOldTargetName = CEditGameClass::GetKeyValue("targetname");
 	char szOldTargetName[MAX_IO_NAME_LEN];
+	szOldTargetName[0] = '\0';
+
 	if (pszOldTargetName != NULL)
 	{
-		strcpy(szOldTargetName, pszOldTargetName);
+		V_strcpy_safe(szOldTargetName, pszOldTargetName);
 	}
 
 	CEditGameClass::CopyFrom(pFrom);
@@ -1450,7 +1452,7 @@ void CMapWorld::FaceID_StringToFaceIDLists(CMapFaceIDList *pFullFaceList, CMapFa
 	if (pszValue != NULL)
 	{
 		char szVal[KEYVALUE_MAX_VALUE_LENGTH];
-		strcpy(szVal, pszValue);
+		V_strcpy_safe(szVal, pszValue);
 
 		int nParens = 0;
 		bool bInParens = false;

@@ -210,11 +210,11 @@ BOOL CWADTexture::Init(int fd, DWORD ulFileID, BOOL bLoad, LPCTSTR pszName)
 
 	m_ulFileID = ulFileID;
 
-	strcpy(m_szName, pszName);
+	V_strcpy_safe(m_szName, pszName);
 
 	if (bFound)
 	{
-		strcpy(m_szFileName, FileInfo.filename);
+		V_strcpy_safe(m_szFileName, FileInfo.filename);
 	}
 
 	if (m_nWidth * m_nHeight > MAX_TEXTURESIZE)

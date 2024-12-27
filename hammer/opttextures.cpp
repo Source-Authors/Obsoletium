@@ -138,7 +138,7 @@ void COPTTextures::OnAddtexfile(void)
 	int nBackslash = str.ReverseFind('\\');
 	if (nBackslash != -1)
 	{
-		lstrcpyn(szInitialDir, str, nBackslash + 1);
+		V_strncpy(szInitialDir, str, nBackslash + 1);
 	}
 }
 
@@ -236,8 +236,8 @@ void COPTTextures::OnAddtexfile2()
 		//if (!strcmpi("\\textures", &szPathName[strlen(szPathName) - strlen("\\textures")]))
 		{
 			char szNewPath[MAX_PATH];
-			strcpy(szNewPath, szPathName);
-			strcat(szNewPath, "\\*.*");
+			V_strcpy_safe(szNewPath, szPathName);
+			V_strcat_safe(szNewPath, "\\*.*");
 			WIN32_FIND_DATA FindData;
 			HANDLE hFile = FindFirstFile(szNewPath, &FindData);
 
@@ -246,7 +246,7 @@ void COPTTextures::OnAddtexfile2()
 				if ((FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 						&&(FindData.cFileName[0] != '.'))
 				{
-					sprintf(szNewPath, "%s\\%s", szPathName, FindData.cFileName);
+					V_sprintf_safe(szNewPath, "%s\\%s", szPathName, FindData.cFileName);
 					strlwr(szNewPath);
 					if (m_TextureFiles.FindStringExact(-1, szNewPath) == CB_ERR)
 						m_TextureFiles.AddString(szNewPath);
@@ -342,7 +342,7 @@ BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 	SHGetPathFromIDList( idl, pszDirectory );
 
 	// Start in this folder next time.	
-	Q_strncpy( s_szStartFolder, pszDirectory, sizeof( s_szStartFolder ) ); 
+		V_strcpy_safe( s_szStartFolder, pszDirectory );
 
 	CoTaskMemFree( pidlStartFolder );
 	CoTaskMemFree( idl );
@@ -409,8 +409,8 @@ void COPTTextures::MaterialExcludeUpdate( void )
 		for( int i = 0; i < pGD->m_FGDMaterialExclusions.Count(); i++ )
 		{
 			char szFolder[MAX_PATH];
-			strcpy( szFolder, pGD->m_FGDMaterialExclusions[i].szDirectory );
-			strcat( szFolder, " (default)" );
+			V_strcpy_safe( szFolder, pGD->m_FGDMaterialExclusions[i].szDirectory );
+			V_strcat_safe( szFolder, " (default)" );
 			int result = m_MaterialExcludeList.AddString( szFolder );
 			m_MaterialExcludeList.SetItemData( result, 0 );
 			if( ( result == LB_ERR ) || ( result == LB_ERRSPACE ) )

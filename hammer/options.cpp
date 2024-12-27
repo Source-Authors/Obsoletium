@@ -250,7 +250,7 @@ int COptionsConfigs::LoadGameConfigs()
 		Q_MakeAbsolutePath( szFullPath, MAX_PATH, "GameCfg.wc", szRootDir );
 		remove( szFullPath );
 		char szSaveName[MAX_PATH];
-		strcpy(szSaveName, m_strConfigDir);
+		V_strcpy_safe(szSaveName, m_strConfigDir);
 		Q_AppendSlash(szSaveName, sizeof(szSaveName));
 		Q_strcat(szSaveName, "GameCfg.ini", sizeof(szSaveName));
 		SaveGameConfigs();
@@ -660,10 +660,10 @@ bool COptions::Read(void)
 	char szDefaultAutosavePath[MAX_PATH];
 	V_strcpy_safe( szDefaultAutosavePath, APP()->GetProfileString( pszGeneral, "Directory", "C:" ) );
 	V_strcpy_safe( szDefaultAutosavePath, "\\HammerAutosave\\" );
-	strcpy( general.szAutosaveDir, APP()->GetProfileString("General", "Autosave Dir", szDefaultAutosavePath));
+	V_strcpy_safe( general.szAutosaveDir, APP()->GetProfileString("General", "Autosave Dir", szDefaultAutosavePath));
 	if ( Q_strlen( general.szAutosaveDir ) == 0 )
 	{
-		strcpy( general.szAutosaveDir, szDefaultAutosavePath );
+		V_strcpy_safe( general.szAutosaveDir, szDefaultAutosavePath );
 	}
 	APP()->SetDirectory( DIR_AUTOSAVE, general.szAutosaveDir );	
 

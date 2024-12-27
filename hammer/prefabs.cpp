@@ -402,7 +402,7 @@ void CPrefabLibrary::LoadAllLibraries()
 		pLibrary->Load(szDir);
 	}
 
-	strcat(szDir, "\\*.*");
+	V_strcat_safe(szDir, "\\*.*");
 
 	WIN32_FIND_DATA fd;
 	HANDLE hnd = FindFirstFile(szDir, &fd);
@@ -417,7 +417,7 @@ void CPrefabLibrary::LoadAllLibraries()
 	{
 		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (fd.cFileName[0] != '.'))
 		{
-			sprintf(szFile, "%s\\%s", szDir, fd.cFileName);
+			V_sprintf_safe(szFile, "%s\\%s", szDir, fd.cFileName);
 
 			pLibrary = FindOpenLibrary(szFile);
 			if (pLibrary == NULL)
@@ -633,7 +633,7 @@ int CPrefabLibraryRMF::Load(LPCTSTR pszFilename)
 	// read binary header
 	PrefabLibraryHeader plh;
 	m_file.read((char*)&plh, sizeof(plh));
-	strcpy(szNotes, plh.szNotes);
+	V_strcpy_safe(szNotes, plh.szNotes);
 
 	// set name from filename
 	SetNameFromFilename(pszFilename);
@@ -721,7 +721,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 		plh.dwNumEntries = Prefabs.GetCount();
 		plh.fVersion = fLibVersion;
 		plh.dwDirOffset = m_dwDirOffset;
-		strcpy(plh.szNotes, szNotes);
+		V_strcpy_safe(plh.szNotes, szNotes);
 		file.write((char*)&plh, sizeof plh);
 
 		// recreate a directory and write it
@@ -769,11 +769,11 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 			m_strOpenFileName = szNewFilename;
 		}
 
-		strcpy(szFile, m_strOpenFileName);
+		V_strcpy_safe(szFile, m_strOpenFileName);
 	}
 	else
 	{
-		strcpy(szFile, pszFilename);
+		V_strcpy_safe(szFile, pszFilename);
 		SetNameFromFilename(pszFilename);
 	}
 
@@ -791,7 +791,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 	PrefabLibraryHeader plh;
 	plh.dwNumEntries = Prefabs.GetCount();
 	plh.fVersion = fLibVersion;
-	strcpy(plh.szNotes, szNotes);
+	V_strcpy_safe(plh.szNotes, szNotes);
 	file.write((char*)&plh, sizeof plh);
 
 	// allocate memory for directory
@@ -880,7 +880,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 int CPrefabLibraryRMF::SetName(LPCTSTR pszName)
 {
 	// set szName
-	strcpy(m_szName, pszName);
+	V_strcpy_safe(m_szName, pszName);
 
 	char szNewFilename[MAX_PATH];
 	CHammer *pApp = (CHammer*) AfxGetApp();
@@ -946,7 +946,7 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 	FreePrefabs();
 
 	SetNameFromFilename(pszFilename);
-	strcpy(m_szFolderName, pszFilename);
+	V_strcpy_safe(m_szFolderName, pszFilename);
 
 	m_eType = LibType_HalfLife2;
 
@@ -956,8 +956,8 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 	// Read the prefabs - they are stored as individual VMF files.
 	//
 	char szDir[MAX_PATH];
-	strcpy(szDir, pszFilename);
-	strcat(szDir, "\\*.vmf");
+	V_strcpy_safe(szDir, pszFilename);
+	V_strcat_safe(szDir, "\\*.vmf");
 
 	WIN32_FIND_DATA fd;
 	HANDLE hnd = FindFirstFile(szDir, &fd);
@@ -977,8 +977,8 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 			// Build the full path to the prefab file.
 			//
 			char szFile[MAX_PATH];
-			strcpy(szFile, szDir);
-			strcat(szFile, fd.cFileName);
+			V_strcpy_safe(szFile, szDir);
+			V_strcat_safe(szFile, fd.cFileName);
 
 			CPrefabVMF *pPrefab = new CPrefabVMF;
 			pPrefab->SetFilename(szFile);
@@ -1024,7 +1024,7 @@ int CPrefabLibraryVMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 int CPrefabLibraryVMF::SetName(LPCTSTR pszName)
 {
 	// dvs: rename the folder - or maybe don't implement for VMF prefabs
-	strcpy(m_szName, pszName);
+	V_strcpy_safe(m_szName, pszName);
 	return 1;
 }
 

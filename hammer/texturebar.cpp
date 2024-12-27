@@ -52,7 +52,7 @@ void SetDefaultTextureName( const char *szTexName )
 	int length = strlen( szTexName );
 	Assert( length < 128 );
 
-	strcpy( szDefaultTexture, szTexName );
+	V_strcpy_safe( szDefaultTexture, szTexName );
 }
 
 

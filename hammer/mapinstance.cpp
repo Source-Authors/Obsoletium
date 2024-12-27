@@ -90,7 +90,7 @@ bool CMapInstance::DeterminePath( const char *pszBaseFileName, const char *pszIn
 	char		szInstanceFileNameFixed[ MAX_PATH ];
 	const char *pszMapPath = "\\maps\\";
 
-	strcpy( szInstanceFileNameFixed, pszInstanceFileName );
+	V_strcpy_safe( szInstanceFileNameFixed, pszInstanceFileName );
 	V_SetExtension( szInstanceFileNameFixed, ".vmf", sizeof( szInstanceFileNameFixed ) );
 	V_FixSlashes( szInstanceFileNameFixed );
 

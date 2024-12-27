@@ -270,9 +270,12 @@ void COPTConfigs::OnGdfileEdit(void)
 
 	// call editor (notepad!)
 	char szBuf[MAX_PATH];
-	GetWindowsDirectory(szBuf, MAX_PATH);
-	strcat(szBuf, "\\notepad.exe");
-	_spawnl(_P_WAIT, szBuf, szBuf, str, NULL);
+	unsigned bufferSize = GetWindowsDirectory(szBuf, MAX_PATH);
+	if (bufferSize != 0 && bufferSize <= std::size(szBuf))
+	{
+		V_strcat_safe(szBuf, "\\notepad.exe");
+		_spawnl(_P_WAIT, szBuf, szBuf, str.GetString(), NULL);
+	}
 
 	m_pLastSelConfig->LoadGDFiles();
 	UpdateEntityLists();

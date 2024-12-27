@@ -51,7 +51,7 @@ class CVisGroup
 		{
 			if (pszName != NULL)
 			{
-				strncpy(m_szName, pszName, sizeof(m_szName));
+				V_strcpy_safe(m_szName, pszName);
 			}
 		}
 

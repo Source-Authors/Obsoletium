@@ -111,7 +111,7 @@ CPickEntityTarget::CPickEntityTarget()
 //-----------------------------------------------------------------------------
 void CPickEntityTarget::SetKeyToRetrieve(const char *pszKey)
 {
-	strncpy(m_szKey, pszKey, sizeof(m_szKey) - 1);
+	V_strcpy_safe(m_szKey, pszKey);
 }
 
 

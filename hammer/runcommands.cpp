@@ -189,7 +189,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	if(p && strrchr(szDocLongPath, '\\') < p && strrchr(szDocLongPath, '/') < p)
 	{
 		// got the extension
-		strcpy(szDocLongExt, p+1);
+		V_strcpy_safe(szDocLongExt, p+1);
 		p[0] = 0;
 	}
 
@@ -199,7 +199,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	if(p)
 	{
 		// got the filepart
-		strcpy(szDocLongName, p+1);
+		V_strcpy_safe(szDocLongName, p+1);
 		p[0] = 0;
 	}
 
@@ -208,7 +208,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	if(p && strrchr(szDocShortPath, '\\') < p && strrchr(szDocShortPath, '/') < p)
 	{
 		// got the extension
-		strcpy(szDocShortExt, p+1);
+		V_strcpy_safe(szDocShortExt, p+1);
 		p[0] = 0;
 	}
 
@@ -218,7 +218,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	if(p)
 	{
 		// got the filepart
-		strcpy(szDocShortName, p+1);
+		V_strcpy_safe(szDocShortName, p+1);
 		p[0] = 0;
 	}
 	

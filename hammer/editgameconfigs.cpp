@@ -66,7 +66,7 @@ void CEditGameConfigs::OnAdd()
 
 	// add a new game config
 	CGameConfig *pConfig = Options.configs.AddConfig();
-	strcpy(pConfig->szName, dlg.m_string);
+	V_strcpy_safe(pConfig->szName, dlg.m_string);
 
 	FillConfigList(pConfig->dwID);
 }

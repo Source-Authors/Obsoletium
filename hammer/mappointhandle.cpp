@@ -76,7 +76,7 @@ CMapPointHandle::CMapPointHandle(void)
 CMapPointHandle::CMapPointHandle(const char *pszKey, bool bDrawLineToParent)
 {
 	Initialize();
-	strcpy(m_szKeyName, pszKey);
+	V_strcpy_safe(m_szKeyName, pszKey);
 	m_bDrawLineToParent = bDrawLineToParent;
 }
 
@@ -150,7 +150,7 @@ CMapClass *CMapPointHandle::CopyFrom(CMapClass *pObject, bool bUpdateDependencie
 
 	CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
-	strcpy(m_szKeyName, pFrom->m_szKeyName);
+	V_strcpy_safe(m_szKeyName, pFrom->m_szKeyName);
 
 	return(this);
 }

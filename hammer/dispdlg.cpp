@@ -535,7 +535,7 @@ void CDispPaintDistDlg::FilterComboBoxBrushGeo( unsigned int nEffect, bool bInit
 				APP()->GetDirectory( DIR_PROGRAM, appDir );
 				
 				// append the filters directory name
-				strcat( appDir, "filters\\" );
+				V_strcat_safe( appDir, "filters\\" );
 				
 				// append the directory prefix to the icon name
 				CString iconFilename = appDir + pFilter->m_Name;
@@ -1626,7 +1626,7 @@ void CDispPaintDataDlg::FilterComboBoxBrushData( unsigned int uiEffect, bool bIn
 				APP()->GetDirectory( DIR_PROGRAM, appDir );
 				
 				// append the filters directory name
-				strcat( appDir, "filters\\" );
+				V_strcat_safe( appDir, "filters\\" );
 				
 				// append the directory prefix to the icon name
 				CString iconFilename = appDir + pFilter->m_Name;

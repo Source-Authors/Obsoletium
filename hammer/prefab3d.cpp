@@ -341,7 +341,7 @@ int CPrefabRMF::Init(LPCTSTR pszFilename, BOOL bLoadNow, DWORD dwFlags)
 
 	// ensure we're named
 	memset(szName, 0, sizeof szName);
-	strncpy(szName, pszFilename, sizeof szName - 1);
+	V_strcpy_safe(szName, pszFilename);
 	return Init(file, bLoadNow, dwFlags);
 }
 
@@ -366,7 +366,7 @@ int CPrefabRMF::Init(std::fstream &file, BOOL bLoadNow, DWORD dwFlags)
 	if(!szName[0])
 	{
 		// ensure we're named
-		strcpy(szName, "Prefab");
+		V_strcpy_safe(szName, "Prefab");
 	}
 
 	return iRvl;
@@ -588,6 +588,6 @@ void CPrefabVMF::SetFilename(const char *szFilename)
 	//
 	_splitpath(szFilename, NULL, NULL, szName, NULL);
 
-	strcpy(m_szFilename, szFilename);
+	V_strcpy_safe(m_szFilename, szFilename);
 }
 

@@ -635,8 +635,8 @@ int MDkeyvalue::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		p = strchr(p+1, '\"');
 		if(!p)
 			return fileError;
-		// ocpy in value
-		strcpy(szValue, p+1);
+		// copy in value
+		V_strcpy_safe(szValue, p+1);
 		// kill trailing "
 		p = strchr(szValue, '\"');
 		if(!p)
@@ -773,7 +773,7 @@ int CMapEntity::SerializeMAP(std::fstream &file, BOOL fIsStoring)
 		if (IsPlaceholder() && (!IsClass() || !IsSolidClass()))
 		{
 			MDkeyvalue tmpkv;
-			strcpy(tmpkv.szKey, "origin");
+			V_strcpy_safe(tmpkv.szKey, "origin");
 
 			Vector Origin;
 			GetOrigin(Origin);
@@ -963,12 +963,12 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		{
 			MDkeyvalue tmpkv;
 
-			strcpy(tmpkv.szKey, "mapversion");
-			strcpy(tmpkv.szValue, "360");
+			V_strcpy_safe(tmpkv.szKey, "mapversion");
+			V_strcpy_safe(tmpkv.szValue, "360");
 			tmpkv.SerializeMAP(file, fIsStoring);
 
 			// Save wad file line
-			strcpy(tmpkv.szKey, "wad");
+			V_strcpy_safe(tmpkv.szKey, "wad");
 
 			// copy all texfiles into value
 			tmpkv.szValue[0] = 0;
@@ -995,7 +995,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 						//
 						// Append this WAD file to the WAD list.
 						//
-						strcpy(szFile, gf.filename);
+						V_strcpy_safe(szFile, gf.filename);
 
 						// dvs: Strip off the path. This crashes VIS and QRAD!!
 						/*
@@ -1026,10 +1026,10 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 						// WAD names are semicolon delimited.
 						if (!bFirst)
 						{
-							strcat(tmpkv.szValue, ";");
+							V_strcat_safe(tmpkv.szValue, ";");
 						}
 
-						strcat(tmpkv.szValue, pszSlash);
+						V_strcat_safe(tmpkv.szValue, pszSlash);
 						bFirst = FALSE;
 					}
 				}

@@ -621,7 +621,7 @@ void CMapSolid::DeleteFace(int iIndex)
 const char* CMapSolid::GetDescription(void) const
 {
 	static char szBuf[128];
-	sprintf(szBuf, "solid with %d faces", Faces.GetCount());
+	V_sprintf_safe(szBuf, "solid with %hd faces", Faces.GetCount());
 	return szBuf;
 }
 

@@ -1643,7 +1643,7 @@ ChunkFileResult_t CMapDoc::LoadAutosaveKeyCallback(const char *szKey, const char
 	{
 		pDoc->m_bIsAutosave = true;
 		char szTempName[MAX_PATH];
-		Q_strcpy( szTempName, szValue );
+		V_strcpy_safe( szTempName, szValue );
 		Q_FixSlashes( szTempName, '\\' );
 		pDoc->m_strAutosavedFrom = szTempName;
 		
@@ -1742,7 +1742,7 @@ void CMapDoc::Postload(const char *pszFileName)
 	{
 		char szError[ 1024 ];
 
-		V_sprintf_safe( szError, "For your information, %d solid(s) were not loaded due to errors in the file. Would you like to Re-Save your map with the invalid solids removed?", CMapSolid::GetBadSolidCount() );
+		V_sprintf_safe( szError, "For your information, %d solid(s) were not loaded due to errors in the file.\nWould you like to Re-Save your map with the invalid solids removed?", CMapSolid::GetBadSolidCount() );
 		if ( GetMainWnd()->MessageBox(szError, "Warning", MB_YESNO | MB_ICONQUESTION) == IDYES )
 		{
 			OnFileSave();
@@ -3221,18 +3221,18 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	// If a file with the same name exists, back it up before saving the new one.
 	//
 	char szFile[MAX_PATH];
-	strcpy(szFile, lpszPathName);
+	V_strcpy_safe(szFile, lpszPathName);
 	szFile[strlen(szFile) - 1] = 'x';
 
 	if (access(lpszPathName, 0) != -1)
 	{
 		if (!CopyFile(lpszPathName, szFile, FALSE))
 		{
-			DWORD dwError = GetLastError();
-
 			char szError[_MAX_PATH];
-			wsprintf(szError, "Hammer was unable to backup the existing file \"%s\" (Error: 0x%lX). Please verify that the there is space on the hard drive and that the path still exists.", lpszPathName, dwError);
-			AfxMessageBox(szError);
+			V_sprintf_safe(szError, "Hammer was unable to backup the existing file \"%s\".\nThe error is '%s'.\n\n"
+				"Please verify that the there is storage space and that the path still exists.",
+				std::system_category().message(::GetLastError()).c_str(), lpszPathName);
+			AfxMessageBox(szError, MB_ICONERROR);
 			return(FALSE);
 		}
 	}
@@ -3276,8 +3276,9 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	if (!file.is_open())
 	{
 		char szError[_MAX_PATH];
-		wsprintf(szError, "Hammer was unable to open the file \"%s\" for writing. Please verify that the file is writable and that the path exists.", lpszPathName);
-		AfxMessageBox(szError);
+		V_sprintf_safe(szError, "Hammer was unable to open the file \"%s\" for writing.\n\n"
+			"Please verify that the file is writable and that the path exists.", lpszPathName);
+		AfxMessageBox(szError, MB_ICONERROR);
 		return(FALSE);
 	}
 
@@ -5487,13 +5488,13 @@ void CMapDoc::OnFileSaveAs(void)
 			if (access(str, 2) == -1)
 			{
 				// The file is read-only
-				wsprintf(szConfirm, "The file %s is read-only. You must change the file's attributes to overwrite it.", (const char*)str);
+				V_sprintf_safe(szConfirm, "The file '%s' is read-only. You must change the file's attributes to overwrite it.", str.GetString());
 				AfxMessageBox(szConfirm, MB_OK | MB_ICONEXCLAMATION);
 				bSave = false;
 			}
 			else
 			{
-				wsprintf(szConfirm, "Overwrite existing file %s?", (const char*)str);
+				V_sprintf_safe(szConfirm, "Do you want to overwrite existing file '%s'?", str.GetString());
 				if (AfxMessageBox(szConfirm, MB_YESNO | MB_ICONQUESTION) != IDYES)
 				{
 					bSave = false;
@@ -6930,17 +6931,18 @@ void CMapDoc::OnUpdateUndoRedo(CCmdUI *pCmdUI)
 bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldTargetName, CMapWorld *pWorld)
 {
 	const char *pszKeyword = strstr(szOldTargetName, "&i");
-	if (pszKeyword != NULL)
-	{
-		char szPrefix[100];
-		char szSuffix[100];
+	if (pszKeyword == nullptr) return false;
 
-		strncpy(szPrefix, szOldTargetName, pszKeyword - szOldTargetName);
-		szPrefix[pszKeyword - szOldTargetName] = '\0';
+	char szPrefix[100], szSuffix[100];
 
-		strcpy(szSuffix, pszKeyword + 2);
+	V_strncpy(szPrefix, szOldTargetName, pszKeyword - szOldTargetName);
+	szPrefix[pszKeyword - szOldTargetName] = '\0';
+	const size_t nPrefixLen = strlen(szPrefix);
 
-		int nHighestIndex = 0;
+	strcpy(szSuffix, pszKeyword + 2);
+	const size_t nSuffixLen = strlen(szSuffix);
+
+	int nHighestIndex = 0;
 
 		const CMapEntityList *pEntityList = pWorld->EntityList_GetList();
 		
@@ -6954,22 +6956,19 @@ bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldT
 			// form <prefix><number><suffix>. If so, it must be counted as
 			// we search for the highest instance number. 
 			//
-			if (pszTargetName != NULL)
-			{
+		if (pszTargetName == nullptr) continue;
+
 				char szTemp[MAX_PATH];
-				strcpy(szTemp, pszTargetName);
+		V_strcpy_safe(szTemp, pszTargetName);
 
-				int nPrefixLen = strlen(szPrefix);
-				int nSuffixLen = strlen(szSuffix);
-
-				int nFullLen = strlen(szTemp);
+		size_t nFullLen = strlen(szTemp);
 
 				//
 				// It must be longer than the prefix and the suffix combined to be
 				// of the form <prefix><number><suffix>.
 				//
-				if (nFullLen > nPrefixLen + nSuffixLen)
-				{
+		if (nFullLen <= nPrefixLen + nSuffixLen) continue;
+
 					char *pszTempSuffix = szTemp + nFullLen - nSuffixLen;
 
 					//
@@ -6981,7 +6980,7 @@ bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldT
 						*pszTempSuffix = '\0';
 
 						bool bAllDigits = true;
-						for (int i = 0; i < (int)strlen(&szTemp[nPrefixLen]); i++)
+			for (size_t i = 0; i < strlen(&szTemp[nPrefixLen]); i++)
 						{
 							if (!V_isdigit(szTemp[nPrefixLen + i]))
 							{
@@ -7000,16 +6999,11 @@ bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldT
 						}
 					}
 				}
-			}
-		}
 
 		sprintf(szNewTargetName, "%s%d%s", szPrefix, nHighestIndex + 1, szSuffix);
 	
 		return(true);
 	}
-
-	return(false);
-}
 
 
 //-----------------------------------------------------------------------------
@@ -7044,7 +7038,8 @@ bool CMapDoc::DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld, char *szOl
 //-----------------------------------------------------------------------------
 // Gets this object's name if it has one. Returns false if it has none.
 //-----------------------------------------------------------------------------
-static bool GetName( CMapClass *pObject, char *szName )
+template<ptrdiff_t size>
+static bool GetName( CMapClass *pObject, char (&szName)[size] )
 {
 	CEditGameClass *pEditGameClass = dynamic_cast <CEditGameClass *>( pObject );
 	if ( pEditGameClass == NULL )
@@ -7054,7 +7049,7 @@ static bool GetName( CMapClass *pObject, char *szName )
 	if ( !pszName )
 		return false;
 
-	Q_strcpy( szName, pszName );
+	V_strcpy_safe( szName, pszName );
 
 	return true;
 }
@@ -7725,7 +7720,7 @@ bool GetSaveAsFilename(const char *pszBaseDir, char *pszFileName, int nSize)
 			str += ".vmf";
 		}
 
-		lstrcpyn(pszFileName, str, nSize);
+		V_strncpy(pszFileName, str, nSize);
 		return(true);
 	}
 
@@ -7765,7 +7760,7 @@ void CMapDoc::OnToolsCreateprefab(void)
 	//
 	// Save the default folder for next time.
 	//
-	strcpy(szBaseDir, szFilename);
+	V_strcpy_safe(szBaseDir, szFilename);
 	char *pch = strrchr(szBaseDir, '\\');
 	if (pch != NULL)
 	{
@@ -8031,9 +8026,9 @@ static BOOL ReplaceTexFunc(CMapSolid *pSolid, ReplaceTexInfo_t *pInfo)
 					}
 					// create a new string
 					char szNewTex[128];
-					strcpy(szNewTex, pszFaceTex);
+					V_strcpy_safe(szNewTex, pszFaceTex);
 					strcpy(szNewTex + int(p - pszFaceTex), pInfo->szReplace);
-					strcat(szNewTex, pszFaceTex + int(p - pszFaceTex) + pInfo->iFindLen);
+					V_strcat_safe(szNewTex, pszFaceTex + int(p - pszFaceTex) + pInfo->iFindLen);
 					pFace->SetTexture(szNewTex, pInfo->m_bRescaleTextureCoordinates);
 					++pInfo->nReplaced;
 				}
@@ -10011,8 +10006,8 @@ ChunkFileResult_t CMapDoc::SaveVersionInfoVMF(CChunkFile *pFile, bool bIsAutoSav
 			V_strcpy_safe( szOriginalName, GetPathName() );
 			if ( strlen( szOriginalName ) == 0 )
 			{
-				strcpy(szOriginalName, g_pGameConfig->szMapDir);
-				strcat(szOriginalName, "\\untitled.vmf");	
+				V_strcpy_safe(szOriginalName, g_pGameConfig->szMapDir);
+				V_strcat_safe(szOriginalName, "\\untitled.vmf");	
 				//put in the default map path + untitled.vmf
 			}
 			Q_FixSlashes( szOriginalName, '/' );

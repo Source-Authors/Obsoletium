@@ -1258,7 +1258,7 @@ void CTextureSystem::OpenSource( const char *pMaterialName )
 //-----------------------------------------------------------------------------
 CTextureGroup::CTextureGroup(const char *pszName)
 {
-	strcpy(m_szName, pszName);
+	V_strcpy_safe(m_szName, pszName);
 	m_eTextureFormat = tfNone;
 	m_nTextureToLoad = 0;
 }

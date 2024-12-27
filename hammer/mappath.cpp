@@ -382,7 +382,7 @@ ResolveNamesAgain:
 		//
 		CMapPathNode &LastNode = m_Nodes[iMax];
 		GetNodeName(iCurNode, 0, strTemp);
-		strcpy(LastNode.szTargets[LastNode.nTargets], strTemp);
+		V_strcpy_safe(LastNode.szTargets[LastNode.nTargets], strTemp);
 		LastNode.nTargets++;
 	}
 

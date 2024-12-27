@@ -66,14 +66,14 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 
 	if(!nPoints)
 	{
-		strcpy(pInfo->szDescription, "no points");
+		V_strcpy_safe(pInfo->szDescription, "no points");
 		pInfo->iPoint = -2;
 		return FALSE;
 	}
 
 	if(nPoints < 3)
 	{
-		strcpy(pInfo->szDescription, "fewer than three points");
+		V_strcpy_safe(pInfo->szDescription, "fewer than three points");
 		pInfo->iPoint = -2;
 		return FALSE;
 	}
@@ -88,7 +88,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 		{
 			if (p1[j] > MAX_COORD_INTEGER || p1[j] < MIN_COORD_INTEGER)
 			{
-				strcpy(pInfo->szDescription, "out of range");
+				V_strcpy_safe(pInfo->szDescription, "out of range");
 				return FALSE;
 			}
 		}
@@ -97,7 +97,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 		d = DotProduct (p1, *pNormal) - dist;
 		if (d < -ON_PLANE_EPSILON || d > ON_PLANE_EPSILON)
 		{
-			strcpy(pInfo->szDescription, "point off plane");
+			V_strcpy_safe(pInfo->szDescription, "point off plane");
 			return FALSE;
 		}
 
@@ -107,7 +107,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 
 		if (VectorLength (dir) < MIN_EDGE_LENGTH_EPSILON)
 		{
-			strcpy(pInfo->szDescription, "edge is too small");
+			V_strcpy_safe(pInfo->szDescription, "edge is too small");
 			return FALSE;
 		}
 
@@ -124,7 +124,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 			d = DotProduct (Points[j], edgenormal);
 			if (d > edgedist)
 			{
-				strcpy(pInfo->szDescription, "face is not convex");
+				V_strcpy_safe(pInfo->szDescription, "face is not convex");
 				return FALSE;
 			}
 		}

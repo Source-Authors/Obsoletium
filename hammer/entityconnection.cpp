@@ -77,11 +77,11 @@ CEntityConnection::~CEntityConnection()
 //-----------------------------------------------------------------------------
 CEntityConnection &CEntityConnection::operator =(const CEntityConnection &Other)
 {
-	strcpy(m_szSourceEntity, Other.m_szSourceEntity);
-	strcpy(m_szTargetEntity, Other.m_szTargetEntity);
-	strcpy(m_szOutput, Other.m_szOutput);
-	strcpy(m_szInput, Other.m_szInput);
-	strcpy(m_szParam, Other.m_szParam);
+	V_strcpy_safe(m_szSourceEntity, Other.m_szSourceEntity);
+	V_strcpy_safe(m_szTargetEntity, Other.m_szTargetEntity);
+	V_strcpy_safe(m_szOutput, Other.m_szOutput);
+	V_strcpy_safe(m_szInput, Other.m_szInput);
+	V_strcpy_safe(m_szParam, Other.m_szParam);
 	m_fDelay = Other.m_fDelay;
 	m_nTimesToFire = Other.m_nTimesToFire;
 

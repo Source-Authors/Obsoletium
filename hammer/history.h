@@ -98,7 +98,7 @@ public:
 
 	void Undo();
 
-	void SetName(LPCTSTR pszName) { if(pszName) strcpy(szName, pszName); }
+	void SetName(LPCTSTR pszName) { if(pszName) V_strcpy_safe(szName, pszName); }
 
 	void OnRemoveVisGroup(CVisGroup *pGroup);
 

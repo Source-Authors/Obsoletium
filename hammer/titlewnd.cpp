@@ -90,7 +90,7 @@ void CTitleWnd::SetTitle(LPCTSTR pszTitle)
 	Assert(pszTitle != NULL);
 	if (pszTitle != NULL)
 	{
-		strcpy(m_szTitle, pszTitle);
+		V_strcpy_safe(m_szTitle, pszTitle);
 		if (::IsWindow(m_hWnd))
 		{
 			CDC *pDC = GetDC();

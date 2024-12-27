@@ -798,7 +798,7 @@ void COP_Entity::UpdateData( int Mode, PVOID pData, bool bCanEdit )
 		#ifdef NAMES
 		if(pEdit->pClass)
 		{
-			sprintf(szBuf, "%s (%s)", pEdit->pClass->GetDescription(), pEdit->pClass->GetName());
+			V_sprintf_safe(szBuf, "%s (%s)", pEdit->pClass->GetDescription(), pEdit->pClass->GetName());
 		}
 		else
 		#endif
@@ -1334,7 +1334,7 @@ void COP_Entity::PresentProperties()
 							pVariable = pReplace = "";
 							if ( pInstanceValue )
 							{
-								strcpy( ValueData, pInstanceValue );
+								V_strcpy_safe( ValueData, pInstanceValue );
 								pVariable = ValueData;
 								char *pos = strchr( ValueData, ' ' );
 								if ( pos )
@@ -2349,7 +2349,7 @@ void COP_Entity::CreateSmartControls_InstanceVariable( GDinputvariable *pVar, CR
 	pVariable = pReplace = "";
 	if ( pValue )
 	{
-		strcpy( ValueData, pValue );
+		V_strcpy_safe( ValueData, pValue );
 		pVariable = ValueData;
 		char *pos = strchr( ValueData, ' ' );
 		if ( pos )
@@ -2469,7 +2469,7 @@ void COP_Entity::CreateSmartControls_InstanceParm( GDinputvariable *pVar, CRect 
 	pVariable = pType = "";
 	if ( pValue )
 	{
-		strcpy( ValueData, pValue );
+		V_strcpy_safe( ValueData, pValue );
 		pVariable = ValueData;
 		char *pos = strchr( ValueData, ' ' );
 		if ( pos )
@@ -3289,8 +3289,8 @@ void COP_Entity::OnChangeInstanceVariableControl( void )
 
 		if ( szValue[ 0 ] )
 		{
-			strcat( szVariable, " " );
-			strcat( szVariable, szValue );
+			V_strcat_safe( szVariable, " " );
+			V_strcat_safe( szVariable, szValue );
 		}
 
 		int iSel = GetCurVarListSelection();
@@ -3331,8 +3331,8 @@ void COP_Entity::OnChangeInstanceParmControl( void )
 
 		if ( szValue[ 0 ] )
 		{
-			strcat( szVariable, " " );
-			strcat( szVariable, szValue );
+			V_strcat_safe( szVariable, " " );
+			V_strcat_safe( szVariable, szValue );
 		}
 
 		int iSel = GetCurVarListSelection();
@@ -3399,7 +3399,7 @@ void COP_Entity::OnChangeSmartcontrolSel(void)
 		const char *pszValue = pVar->ItemValueForString(szBuf);
 		if (pszValue != NULL)
 		{
-			strcpy(szBuf, pszValue);
+			V_strcpy_safe(szBuf, pszValue);
 		}
 	}
 	
@@ -3597,8 +3597,7 @@ void COP_Entity::OnBrowse(void)
 	{
 		case ivStudioModel:
 		{
-			static char szInitialDir[MAX_PATH] = "models";
-			pszInitialDir = szInitialDir;
+			V_strcpy_safe( szInitialDir, "models" );
 
 			pDlg->AddFileMask( "*.jpg" );
 			pDlg->AddFileMask( "*.mdl" );
@@ -3721,7 +3720,7 @@ void COP_Entity::OnBrowseInstance(void)
 
 	if ( dlg.DoModal() == IDOK )
 	{
-		strcpy( FileName, dlg.GetPathName() );
+		V_strcpy_safe( FileName, dlg.GetPathName() );
 		V_RemoveDotSlashes( FileName );
 		V_FixDoubleSlashes( FileName );
 		V_strlower( FileName );

@@ -90,7 +90,7 @@ CModelBrowser::~CModelBrowser()
 void CModelBrowser::SetModelName( const char *pModelName )
 {
 	char pszTempModelName[255];
-	strcpy( pszTempModelName, pModelName );
+	V_strcpy_safe( pszTempModelName, pModelName );
 
 	char * pszSelectedModel = strchr( pszTempModelName, '/' );
 	if( pszSelectedModel)

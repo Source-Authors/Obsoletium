@@ -245,13 +245,13 @@ int CMapFace::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		{
 			char szBuf[MAX_PATH];
 			char *psz;
-			strcpy(szBuf, texture.texture);
+			V_strcpy_safe(szBuf, texture.texture);
 			psz = strstr(szBuf, "textures\\");
 			if (psz)
 			{
 				memset(texture.texture, 0, sizeof(texture.texture));
-				psz += strlen("textures\\");
-				strcpy(texture.texture, psz);
+				psz += ssize("textures\\") - 1;
+				V_strcpy_safe(texture.texture, psz);
 			}
 		}
 		

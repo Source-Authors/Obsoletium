@@ -210,7 +210,7 @@ ChunkFileResult_t CManifest::LoadManifestVMFCallback( CChunkFile *pFile, CManife
 {
 	char FileName[ MAX_PATH ];
 
-	strcpy( FileName, pDoc->m_ManifestDir );
+	V_strcpy_safe( FileName, pDoc->m_ManifestDir );
 
 	CManifestMap	*pManifestMap = pDoc->CreateNewMap( FileName, "", false );
 	SetActiveMapDoc( pManifestMap->m_Map );
@@ -371,7 +371,7 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 	}
 
 	V_StripExtension( pszFileName, m_ManifestDir, sizeof( m_ManifestDir ) );
-	strcat( m_ManifestDir, "\\" );
+	V_strcat_safe( m_ManifestDir, "\\" );
 
 	CChunkFile File;
 	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Read );
@@ -486,12 +486,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	UserNameSize = sizeof( UserName );
 	if ( GetUserName( UserName, &UserNameSize ) == 0 )
 	{
-		strcpy( UserPrefsFileName, "default" );
+		V_strcpy_safe( UserPrefsFileName, "default" );
 	}
 
-	strcpy( FileName, m_ManifestDir );
-	sprintf( UserPrefsFileName, "%s.vmm_prefs", UserName );
-	strcat( FileName, UserPrefsFileName );
+	V_strcpy_safe( FileName, m_ManifestDir );
+	V_sprintf_safe( UserPrefsFileName, "%s.vmm_prefs", UserName );
+	V_strcat_safe( FileName, UserPrefsFileName );
 
 	FILE *fp = fopen( FileName, "rb" );
 	if ( !fp )
@@ -690,7 +690,7 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 
 	V_StripExtension( pszFileName, m_ManifestDir, sizeof( m_ManifestDir ) );
 	CreateDirectory( m_ManifestDir, NULL );
-	strcat( m_ManifestDir, "\\" );
+	V_strcat_safe( m_ManifestDir, "\\" );
 
 	if ( bSaved )
 	{
@@ -719,8 +719,8 @@ bool CManifest::SaveVMFManifestMaps( const char *pszFileName )
 		{
 			char FileName[ MAX_PATH ];
 
-			strcpy( FileName, m_ManifestDir );
-			strcat( FileName, pManifestMap->m_RelativeMapFileName );
+			V_strcpy_safe( FileName, m_ManifestDir );
+			V_strcat_safe( FileName, pManifestMap->m_RelativeMapFileName );
 			pManifestMap->m_AbsoluteMapFileName = FileName;
 		}
 
@@ -757,12 +757,12 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 	UserNameSize = sizeof( UserName );
 	if ( GetUserName( UserName, &UserNameSize ) == 0 )
 	{
-		strcpy( UserPrefsFileName, "default" );
+		V_strcpy_safe( UserPrefsFileName, "default" );
 	}
 
-	strcpy( FileName, m_ManifestDir );
-	sprintf( UserPrefsFileName, "%s.vmm_prefs", UserName );
-	strcat( FileName, UserPrefsFileName );
+	V_strcpy_safe( FileName, m_ManifestDir );
+	V_sprintf_safe( UserPrefsFileName, "%s.vmm_prefs", UserName );
+	V_strcat_safe( FileName, UserPrefsFileName );
 
 	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Write );
 	if (eResult != ChunkFile_Ok)
@@ -1171,8 +1171,8 @@ CManifestMap *CManifest::MoveSelectionToNewSubmap( CString &FriendlyName, CStrin
 	
 	char AbsoluteFileName[ MAX_PATH ];
 
-	strcpy( AbsoluteFileName, m_ManifestDir );
-	strcat( AbsoluteFileName, FileName );
+	V_strcpy_safe( AbsoluteFileName, m_ManifestDir );
+	V_strcat_safe( AbsoluteFileName, FileName );
 
 	CManifestMap	*pManifestMap = CreateNewMap( AbsoluteFileName, FileName, true );
 	pManifestMap->m_FriendlyName = FriendlyName;
@@ -1212,8 +1212,8 @@ CManifestMap *CManifest::AddNewSubmap( CString &FriendlyName, CString &FileName 
 {
 	char AbsoluteFileName[ MAX_PATH ];
 
-	strcpy( AbsoluteFileName, m_ManifestDir );
-	strcat( AbsoluteFileName, FileName );
+	V_strcpy_safe( AbsoluteFileName, m_ManifestDir );
+	V_strcat_safe( AbsoluteFileName, FileName );
 
 	CManifestMap	*pManifestMap = CreateNewMap( AbsoluteFileName, FileName, true );
 
@@ -1254,10 +1254,10 @@ bool CManifest::AddExistingMap( const char *pszFileName, bool bFromInstance )
 	char FileExt[ MAX_PATH ];
 
 	_splitpath_s( pszFileName, NULL, 0, NULL, 0, RelativeFileName, sizeof( RelativeFileName ), FileExt, sizeof( FileExt ) );
-	strcat( RelativeFileName, FileExt );
+	V_strcat_safe( RelativeFileName, FileExt );
 
-	strcpy( AbsoluteFileName, m_ManifestDir );
-	strcat( AbsoluteFileName, RelativeFileName );
+	V_strcpy_safe( AbsoluteFileName, m_ManifestDir );
+	V_strcat_safe( AbsoluteFileName, RelativeFileName );
 	CManifestMap	*pManifestMap = CreateNewMap( AbsoluteFileName, RelativeFileName, true );
 
 	m_bLoading = true;
@@ -1297,7 +1297,7 @@ bool CManifest::AddExistingMap( const char *pszFileName, bool bFromInstance )
 	{
 		char	ManifestFile[ MAX_PATH ];
 
-		strcpy( ManifestFile, pszFileName );
+		V_strcpy_safe( ManifestFile, pszFileName );
 		V_SetExtension( ManifestFile, ".vmm", sizeof( ManifestFile ) );
 
 		m_bRelocateSave = true;
@@ -1321,7 +1321,7 @@ bool CManifest::AddExistingMap( void )
 	V_strcpy_safe( szInitialDir, GetPathName() );
 	if ( szInitialDir[ 0 ] == '\0' )
 	{
-		strcpy( szInitialDir, g_pGameConfig->szMapDir );
+		V_strcpy_safe( szInitialDir, g_pGameConfig->szMapDir );
 	}
 
 	CFileDialog dlg( TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf)|*.vmf||" );
@@ -1340,7 +1340,7 @@ bool CManifest::AddExistingMap( void )
 	int nSlash = str.ReverseFind( '\\' );
 	if ( nSlash != -1 )
 	{
-		strcpy( szInitialDir, str.Left( nSlash ) );
+		V_strcpy_safe( szInitialDir, str.Left( nSlash ) );
 	}
 
 	if ( str.Find('.') == -1 )

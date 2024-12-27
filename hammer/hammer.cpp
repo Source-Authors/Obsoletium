@@ -563,11 +563,11 @@ bool CHammer::HammerOnIdle(long count)
 // Purpose: Adds a backslash to the end of a string if there isn't one already.
 // Input  : psz - String to add the backslash to.
 //-----------------------------------------------------------------------------
-static void EnsureTrailingBackslash(char *psz)
+static void EnsureTrailingBackslash(char *psz, ptrdiff_t size)
 {
 	if ((psz[0] != '\0') && (psz[strlen(psz) - 1] != '\\'))
 	{
-		strcat(psz, "\\");
+		V_strncat(psz, "\\", size);
 	}
 }
 
@@ -612,22 +612,22 @@ void CHammer::EndImportSettings(void)
 // Input  : dir - Enumerated directory to retrieve.
 //			p - Pointer to buffer that receives the full path to the directory.
 //-----------------------------------------------------------------------------
-void CHammer::GetDirectory(DirIndex_t dir, char *p)
+void CHammer::GetDirectory(DirIndex_t dir, char *p, ptrdiff_t size)
 {
 	switch (dir)
 	{
 		case DIR_PROGRAM:
 		{
-			strcpy(p, m_szAppDir);
-			EnsureTrailingBackslash(p);
+			V_strncpy(p, m_szAppDir, size);
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 
 		case DIR_PREFABS:
 		{
-			strcpy(p, m_szAppDir);
-			EnsureTrailingBackslash(p);
-			strcat(p, "Prefabs");
+			V_strncpy(p, m_szAppDir, size);
+			EnsureTrailingBackslash(p, size);
+			V_strncat(p, "Prefabs", size);
 
 			//
 			// Make sure the prefabs directory exists.
@@ -645,8 +645,8 @@ void CHammer::GetDirectory(DirIndex_t dir, char *p)
 		//
 		case DIR_GAME_EXE:
 		{
-			strcpy(p, g_pGameConfig->m_szGameExeDir);
-			EnsureTrailingBackslash(p);
+			V_strncpy(p, g_pGameConfig->m_szGameExeDir, size);
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 
@@ -656,8 +656,8 @@ void CHammer::GetDirectory(DirIndex_t dir, char *p)
 		//
 		case DIR_MOD:
 		{
-			strcpy(p, g_pGameConfig->m_szModDir);
-			EnsureTrailingBackslash(p);
+			V_strncpy(p, g_pGameConfig->m_szModDir, size);
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 
@@ -667,16 +667,16 @@ void CHammer::GetDirectory(DirIndex_t dir, char *p)
 		//
 		case DIR_MATERIALS:
 		{
-			strcpy(p, g_pGameConfig->m_szModDir);
-			EnsureTrailingBackslash(p);
+			V_strncpy(p, g_pGameConfig->m_szModDir, size);
+			EnsureTrailingBackslash(p, size);
 			Q_strcat(p, "materials\\", MAX_PATH);
 			break;
 		}
 
 		case DIR_AUTOSAVE:
 		{			
-            strcpy( p, m_szAutosaveDir );
-			EnsureTrailingBackslash(p);			
+            V_strncpy( p, m_szAutosaveDir, size );
+			EnsureTrailingBackslash(p, size);			
 			break;
 		}
 	}
@@ -688,7 +688,7 @@ void CHammer::SetDirectory(DirIndex_t dir, const char *p)
 	{
 		case DIR_AUTOSAVE:
 		{
-			strcpy( m_szAutosaveDir, p );
+			V_strcpy_safe( m_szAutosaveDir, p );
 			break;
 		}
 	}
@@ -719,7 +719,7 @@ COLORREF CHammer::GetProfileColor(const char *pszSection, const char *pszKey, in
 	pStart = szBuff;
 	pCurrent = pStart;
 	
-	strcpy( szBuff, (char *)(LPCSTR)strReturn );
+	V_strcpy_safe(szBuff, (LPCSTR)strReturn);
 
 	while (*pCurrent && *pCurrent != ' ')
 		pCurrent++;
@@ -798,12 +798,12 @@ void CHammer::Help(const char *pszTopic)
 		// Build the full topic with which to launch the help application.
 		//
 		char szParam[2 * MAX_PATH];
-		strcpy(szParam, szHelpDir);
-		strcat(szParam, "wc.chm");
+		V_strcpy_safe(szParam, szHelpDir);
+		V_strcat_safe(szParam, "wc.chm");
 		if (pszTopic != NULL)
 		{
-			strcat(szParam, "::/");
-			strcat(szParam, pszTopic);
+			V_strcat_safe(szParam, "::/");
+			V_strcat_safe(szParam, pszTopic);
 		}
 
 		//
@@ -1608,7 +1608,7 @@ BOOL CAboutDlg::OnInitDialog(void)
 #ifdef SDK_BUILD
 	char szTemp[MAX_PATH];
 	GetWindowText(szTemp, sizeof(szTemp));
-	strcat(szTemp, " SDK");
+	V_strcat_safe(szTemp, " SDK");
 	SetWindowText(szTemp);
 #endif // SDK_BUILD
 
@@ -1662,7 +1662,7 @@ void CHammer::OnFileOpen()
 	static char szInitialDir[MAX_PATH] = "";
 	if (szInitialDir[0] == '\0')
 	{
-		strcpy(szInitialDir, g_pGameConfig->szMapDir);
+		V_strcpy_safe(szInitialDir, g_pGameConfig->szMapDir);
 	}
 
 	// TODO: need to prevent (or handle) opening VMF files when using old map file formats
@@ -1683,7 +1683,7 @@ void CHammer::OnFileOpen()
 	int nSlash = str.ReverseFind('\\');
 	if (nSlash != -1)
 	{
-		strcpy(szInitialDir, str.Left(nSlash));
+		V_strcpy_safe(szInitialDir, str.Left(nSlash));
 	}
 
 	if (str.Find('.') == -1)
@@ -2335,8 +2335,10 @@ void CHammer::Autosave( void )
 			WIN32_FIND_DATA fileData = autosaveFiles.Element( nFirstElementIndex );
 			DWORD dwOldestFileSize =  fileData.nFileSizeLow;
 			char filename[MAX_PATH];
-			strcpy( filename, fileData.cFileName );
+			V_strcpy_safe( filename, fileData.cFileName );
+
 			DeleteFile( strAutosaveDirectory + filename );
+
 			dwTotalAutosaveDirectorySize -= dwOldestFileSize;
 			autosaveFiles.RemoveAt( nFirstElementIndex );			
 		}
@@ -2363,8 +2365,8 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 	char szRootDir[MAX_PATH];
 	if ( szAutosaveDirectory )
 	{
-		strcpy( szRootDir, szAutosaveDirectory );
-		EnsureTrailingBackslash( szRootDir );
+		V_strcpy_safe( szRootDir, szAutosaveDirectory );
+		EnsureTrailingBackslash( szRootDir, std::size(szRootDir) );
 	}
 	else
 	{
@@ -2398,7 +2400,6 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 
 	if ( hDir == INVALID_HANDLE_VALUE )
 	{
-
 		bool bDirResult = CreateDirectory( strAutosaveDirectory, NULL );
 		if ( !bDirResult )
 		{
@@ -2450,7 +2451,7 @@ void CHammer::LoadLastGoodSave( void )
 {	
 	CString strLastGoodSave = APP()->GetProfileString("General", "Last Good Save", "");
 	char szMapDir[MAX_PATH];
-	strcpy(szMapDir, g_pGameConfig->szMapDir);
+	V_strcpy_safe(szMapDir, g_pGameConfig->szMapDir);
 	CDocument *pCurrentDoc;
 
 	if ( !strLastGoodSave.IsEmpty() )
@@ -2472,7 +2473,7 @@ void CHammer::LoadLastGoodSave( void )
 			//It assumes the file should go into the gameConfig map directory
 			char szRenameMessage[MAX_PATH+MAX_PATH+256];
 			char szLastSaveCopy[MAX_PATH];
-			Q_strcpy( szLastSaveCopy, strLastGoodSave );		
+			V_strcpy_safe( szLastSaveCopy, strLastGoodSave );		
 			char *pszFileName = Q_strrchr( strLastGoodSave, '\\') + 1;
 			char *pszFileNameEnd = Q_strrchr( strLastGoodSave, '_');
 			if ( !pszFileNameEnd )

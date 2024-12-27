@@ -83,7 +83,7 @@ void CPrefabsDlg::OnAddobject()
 	// add all these files .. 
 	char szDir[MAX_PATH], szFiles[2048];
 	memcpy(szFiles, dlg.m_ofn.lpstrFile, dlg.m_ofn.nMaxFile);
-	strcpy(szDir, dlg.m_ofn.lpstrFile);
+	V_strcpy_safe(szDir, dlg.m_ofn.lpstrFile);
 
 	BOOL bOneFile = FALSE;
 	char *p = szFiles + strlen(szDir) + 1;
@@ -102,7 +102,7 @@ void CPrefabsDlg::OnAddobject()
 	int iItem = m_Objects.GetItemCount();
 	while(1)
 	{
-		strcpy(szFile, p);
+		V_strcpy_safe(szFile, p);
 		if(!szFile[0])
 			break;
 		p += strlen(szFile) + 1;

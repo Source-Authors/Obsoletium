@@ -249,7 +249,7 @@ void CEditGameClass::Upstream_FixBad()
 void CEditGameClass::SetClass(LPCTSTR pszClass, bool bLoading)
 {
 	extern GameData *pGD;
-	strcpy(m_szClass, pszClass);
+	V_strcpy_safe(m_szClass, pszClass);
 
 	StripEdgeWhiteSpace(m_szClass);
 
@@ -268,7 +268,7 @@ void CEditGameClass::SetClass(LPCTSTR pszClass, bool bLoading)
 CEditGameClass *CEditGameClass::CopyFrom(CEditGameClass *pFrom)
 {
 	m_pClass = pFrom->m_pClass;
-	strcpy( m_szClass, pFrom->m_szClass );
+	V_strcpy_safe( m_szClass, pFrom->m_szClass );
 
 	//
 	// Copy all the keys.

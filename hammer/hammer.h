@@ -120,7 +120,12 @@ public:
 	virtual int Run(void);
 	//}}AFX_VIRTUAL
 
-	void GetDirectory(DirIndex_t dir, char *p);
+	void GetDirectory(DirIndex_t dir, char *p, ptrdiff_t size);
+	template<ptrdiff_t dirSize>
+	void GetDirectory(DirIndex_t dir, char (&p)[dirSize])
+	{
+		GetDirectory(dir, p, dirSize);
+	}
 	void SetDirectory(DirIndex_t dir, const char *p);
 
 	COLORREF GetProfileColor(const char *pszSection, const char *pszKey, int r, int g, int b);

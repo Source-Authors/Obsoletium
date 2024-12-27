@@ -12,6 +12,7 @@
 
 #include <afxtempl.h>
 #include <fstream>
+#include "tier1/strtools.h"
 
 
 class BoundBox;
@@ -63,9 +64,9 @@ public:
 
 	// set info:
 	void SetName(LPCTSTR pszName)
-	{ strcpy(szName, pszName); }
+	{ V_strcpy_safe(szName, pszName); }
 	void SetNotes(LPCTSTR pszNotes)
-	{ strcpy(szNotes, pszNotes); }
+	{ V_strcpy_safe(szNotes, pszNotes); }
 
 	// get info:
 	LPCTSTR GetName() { return szName; }
@@ -138,7 +139,7 @@ public:
 	virtual int SetName(const char *pszName) = 0;
 	void SetNotes(LPCTSTR pszNotes)
 	{
-		strcpy(szNotes, pszNotes);
+		V_strcpy_safe(szNotes, pszNotes);
 	}
 
 	// get info:
