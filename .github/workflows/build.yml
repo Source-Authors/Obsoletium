@@ -46,7 +46,7 @@ jobs:
 
     - name: Build app
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}} ${{env.HL2_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln
+      run: msbuild ${{env.HL2_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}}
 
   build_hl2_episodic:
     name: Build Half-Life 2 Episode 1 & 2
@@ -78,7 +78,7 @@ jobs:
 
     - name: Build app
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}} ${{env.HL2_EPISODIC_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln
+      run: msbuild  ${{env.HL2_EPISODIC_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}}
 
   build_hl2_mp:
     name: Build Half-Life 2 Deathmatch
@@ -110,7 +110,7 @@ jobs:
 
     - name: Build app
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}} ${{env.HL2_MP_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln
+      run: msbuild ${{env.HL2_MP_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}}
 
   build_portal:
     name: Build Portal
@@ -142,5 +142,5 @@ jobs:
 
     - name: Build app
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}} ${{env.PORTAL_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln
+      run: msbuild ${{env.PORTAL_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}}
 
