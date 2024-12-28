@@ -57,6 +57,12 @@ $Configuration
 		// schemalib.lib(schemaclassinfo.obj) : warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
 		// $AdditionalOptions					"$BASE /ignore:4221"
 	}
+
+	$ManifestTool
+	{
+		// Input And Output
+		$AdditionalManifestFiles			"$BASE;$SRCDIR\build\win\manifests\dpi-aware.manifest;$SRCDIR\build\win\manifests\ultra-high-scroll-resolution.manifest;$SRCDIR\build\win\manifests\utf-8-code-page.manifest;$SRCDIR\out\manifests\enable-visual-styles.manifest" [!$SOURCESDK]
+	}
 	
 	$PreBuildEvent
 	{

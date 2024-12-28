@@ -273,7 +273,7 @@ $Configuration "Release"
 		$UseFAT32WorkAround
 
 		// Input And Output
-		$AdditionalManifestFiles			"$SRCDIR\build\win\manifests\supported-os.manifest" [!$SOURCESDK]
+		$AdditionalManifestFiles			"$SRCDIR\build\win\manifests\supported-os.manifest;$SRCDIR\build\win\manifests\heap-type.manifest" [!$SOURCESDK]
 		$InputResourceManifests
 		$EmbedManifest
 		$OutputManifestFile
