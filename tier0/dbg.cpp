@@ -843,6 +843,9 @@ void SpewActivate( const tchar* pGroupName, int level )
 
 void SpewDeactivate()
 {
+	// dimhotepus: Ensure counter is 0 to be able to reinit.
+	s_GroupCount = 0;
+
 	PvFree( s_pSpewGroups );
 	s_pSpewGroups = nullptr;
 
