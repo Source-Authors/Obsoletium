@@ -62,8 +62,8 @@ void TokenReader::Close()
 const char *TokenReader::Error(char *error, ...)
 {
 	static char szErrorBuf[256];
-	Q_snprintf(szErrorBuf, sizeof( szErrorBuf ), "File %s, line %d: ", m_szFilename, m_nLine);
-	Q_strncat(szErrorBuf, error, sizeof( szErrorBuf ), COPY_ALL_CHARACTERS );
+	V_sprintf_safe(szErrorBuf, "File %s, line %d: ", m_szFilename, m_nLine);
+	V_strcat_safe(szErrorBuf, error );
 	m_nErrorCount++;
 	return(szErrorBuf);
 }
