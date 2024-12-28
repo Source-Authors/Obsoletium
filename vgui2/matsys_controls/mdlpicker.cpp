@@ -945,7 +945,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 
 	// Generale small TGA name, by removing the "large" part
 	char pSmallTGAName[ MAX_PATH ];
-	strcpy( pSmallTGAName, pLargeTGAName );
+	V_strcpy_safe( pSmallTGAName, pLargeTGAName );
 	char *_large = Q_stristr( pSmallTGAName, "_large");
 	Assert(_large);
 	strcpy(_large, _large+6);

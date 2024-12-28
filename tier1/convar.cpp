@@ -1194,7 +1194,7 @@ void ConVarRef::Init( const char *pName, bool bIgnoreMissing )
 		{
 			if ( !bIgnoreMissing )
 			{
-				Warning( "ConVarRef %s doesn't point to an existing ConVar\n", pName );
+				Warning( "ConVarRef %s doesn't point to an existing ConVar.\n", pName );
 			}
 			bFirst = false;
 		}
