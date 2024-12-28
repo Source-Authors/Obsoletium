@@ -269,7 +269,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					if ( GetConsoleLogFileData( buf ) )
 					{
 						HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
-						void *pMem;
+						void *pMem = nullptr;
 						unsigned long nLen;
 						ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
 						ZipGetMemory( hZip, &pMem, &nLen );
@@ -360,7 +360,7 @@ void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 	if ( g_pFullFileSystem->ReadFile( pFileName, "MOD", buf ) )
 	{
 		HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
-		void *pMem;
+		void *pMem = nullptr;
 		unsigned long nLen;
 		ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
 		ZipGetMemory( hZip, &pMem, &nLen );

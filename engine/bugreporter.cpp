@@ -2005,7 +2005,7 @@ void CBugUIPanel::OnSubmit()
 		if ( m_hZip && ( attachedSave || attachedScreenshot ) )
 		{
 			Assert( m_hZip );
-			void *mem;
+			void *mem = nullptr;
 			unsigned long len;
 
 			ZipGetMemory( m_hZip, &mem, &len );
