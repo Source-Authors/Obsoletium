@@ -417,6 +417,12 @@ devtools/bin/vpc.pdb
 *.idb
 *.lib
 
+# PVS-Studio intermediate artefacts
+*.PVS-Studio.cfg
+*.PVS-Studio.cmd
+*.PVS-Studio.i
+*.PVS-Studio.preprocess.cmd
+
 # Resource scripts intermediate
 RC[a-z0-9]*
 *.res
