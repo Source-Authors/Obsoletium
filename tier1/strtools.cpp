@@ -2066,9 +2066,10 @@ void V_ExtractFileExtension( const char *path, char *dest, ptrdiff_t destSize )
 //-----------------------------------------------------------------------------
 const char * V_GetFileExtension( const char * path )
 {
-	const char    *src;
+	// dimhotepus: ASAN catch. Fix one before range read.
+	if ( !path[0] ) return nullptr;
 
-	src = path + strlen(path) - 1;
+	const char   *src = path + strlen(path) - 1;
 
 //
 // back up until a . or the start
