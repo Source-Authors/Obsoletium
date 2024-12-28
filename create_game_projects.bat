@@ -179,8 +179,10 @@ if ERRORLEVEL 1 (
 
 REM Build SDL.
 MKDIR thirdparty\SDL\out
-PUSHD thirdparty\SDL\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DSDL_TEST=OFF ..
+PUSHD thirdparty\SDL\out 
+REM Use Ninja generator to overcome Github CI issues
+REM https://github.com/actions/runner-images/issues/10980
+cmake -G Ninja -DSDL_TEST=OFF ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\SDL failed.
   EXIT /B 1
@@ -258,7 +260,7 @@ if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
 
 
 REM Finally create solution.
-devtools\bin\vpc.exe /2022 %WIN_X64% /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo /%GAME_NAME% +game /mksln %SOLUTION_NAME%.sln
+devtools\bin\vpc.exe /2022 %WIN_X64% /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo /%GAME_NAME% +game /mksln %SOLUTION_NAME%.sln /slnitems .slnitems
 if ERRORLEVEL 1 (
   ECHO MSBuild for %SOLUTION_NAME%.sln failed.
   EXIT /B 1

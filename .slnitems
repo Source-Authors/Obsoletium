@@ -1,0 +1,8 @@
+.clang-format
+.editorconfig
+.gitignore
+.github\workflows\build.yml
+.slnitems
+LICENSE
+README.md
+CMakeLists.txt
