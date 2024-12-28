@@ -76,7 +76,7 @@ int Overlay_GetFromEntity( entity_t *pMapEnt )
 		Error( "Overlay Material Name (%s) too long! > OVERLAY_MAP_STRLEN (%d)", pMaterialName, OVERLAY_MAP_STRLEN );
 		return -1;
 	}
-	strcpy( pMapOverlay->szMaterialName, pMaterialName );	
+	V_strcpy_safe( pMapOverlay->szMaterialName, pMaterialName );	
 
 	// Convert the sidelist to side id(s).
 	const char *pSideList = ValueForKey( pMapEnt, "sides" );

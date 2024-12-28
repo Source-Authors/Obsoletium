@@ -72,7 +72,7 @@ void CTextBuffer::WriteIntKey( const char *pKeyName, int outputData )
 		Msg("Error writing collision data %s\n", pKeyName );
 		return;
 	}
-	sprintf( tmp, "\"%s\" \"%d\"\n", pKeyName, outputData );
+	V_sprintf_safe( tmp, "\"%s\" \"%d\"\n", pKeyName, outputData );
 	CopyData( tmp, strlen(tmp) );
 }
 
@@ -94,7 +94,7 @@ void CTextBuffer::WriteFloatKey( const char *pKeyName, float outputData )
 		Msg("Error writing collision data %s\n", pKeyName );
 		return;
 	}
-	sprintf( tmp, "\"%s\" \"%f\"\n", pKeyName, outputData );
+	V_sprintf_safe( tmp, "\"%s\" \"%f\"\n", pKeyName, outputData );
 	CopyData( tmp, strlen(tmp) );
 }
 
@@ -108,15 +108,15 @@ void CTextBuffer::WriteFloatArrayKey( const char *pKeyName, const float *outputD
 		Msg("Error writing collision data %s\n", pKeyName );
 		return;
 	}
-	sprintf( tmp, "\"%s\" \"", pKeyName );
+	V_sprintf_safe( tmp, "\"%s\" \"", pKeyName );
 	for ( int i = 0; i < count; i++ )
 	{
 		char buf[80];
 
-		sprintf( buf, "%f ", outputData[i] );
-		strcat( tmp, buf );
+		V_sprintf_safe( buf, "%f ", outputData[i] );
+		V_strcat_safe( tmp, buf );
 	}
-	strcat( tmp, "\"\n" );
+	V_strcat_safe( tmp, "\"\n" );
 
 	CopyData( tmp, strlen(tmp) );
 }

@@ -433,11 +433,11 @@ void CreateDefaultCubemaps( bool bHDR )
 	char dstVTFFileName[1024];
 	if( bHDR )
 	{
-		sprintf( dstVTFFileName, "materials/maps/%s/cubemapdefault.hdr.vtf", mapbase );
+		V_sprintf_safe( dstVTFFileName, "materials/maps/%s/cubemapdefault.hdr.vtf", mapbase );
 	}
 	else
 	{
-		sprintf( dstVTFFileName, "materials/maps/%s/cubemapdefault.vtf", mapbase );
+		V_sprintf_safe( dstVTFFileName, "materials/maps/%s/cubemapdefault.vtf", mapbase );
 	}
 
 	CUtlBuffer outputBuf;
@@ -645,8 +645,8 @@ static int Cubemap_CreateTexInfo( int originalTexInfo, int origin[3] )
 		
 		// Store off the name of the cubemap that we need to create since we successfully patched
 		char pFileName[1024];
-		int nLen = Q_snprintf( pFileName, 1024, "materials/%s.vtf", pTextureName );
-		int id = s_DefaultCubemapNames.AddToTail();
+		int nLen = V_sprintf_safe( pFileName, "materials/%s.vtf", pTextureName );
+		intp id = s_DefaultCubemapNames.AddToTail();
 		s_DefaultCubemapNames[id] = new char[ nLen + 1 ];
 		strcpy( s_DefaultCubemapNames[id], pFileName );
 

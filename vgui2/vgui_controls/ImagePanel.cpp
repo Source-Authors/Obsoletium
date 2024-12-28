@@ -376,7 +376,7 @@ void ImagePanel::ApplySchemeSettings( IScheme *pScheme )
 const char *ImagePanel::GetDescription()
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, string image, string border, string fillcolor, bool scaleImage", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, string image, string border, string fillcolor, bool scaleImage", BaseClass::GetDescription());
 	return buf;
 }
 

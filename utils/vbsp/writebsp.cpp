@@ -1017,7 +1017,7 @@ void SetLightStyles (void)
 		{
 			if (stylenum == MAX_SWITCHED_LIGHTS)
 				Error ("Too many switched lights (error at light %s), max = %d", t, MAX_SWITCHED_LIGHTS);
-			strcpy (lighttargets[j], t);
+			V_strcpy_safe(lighttargets[j], t);
 			stylenum++;
 		}
 		sprintf (value, "%i", 32 + j);

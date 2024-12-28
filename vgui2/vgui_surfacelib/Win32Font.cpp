@@ -126,7 +126,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	LOGFONT logfont;
 	logfont.lfCharSet = DEFAULT_CHARSET;
 	logfont.lfPitchAndFamily = 0;
-	strcpy(logfont.lfFaceName, m_szName.String());
+	V_strcpy_safe(logfont.lfFaceName, m_szName.String());
 	bool bFontFound = false;
 	// dimhotepus: Remove global state when using fonts search.
 	::EnumFontFamiliesEx(m_hDC, &logfont, &FontEnumProc, (LPARAM)&bFontFound, 0);

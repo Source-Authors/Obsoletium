@@ -515,7 +515,7 @@ bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuf
 
 	// construct filename
 	Q_StripExtension( pModelName, filename, sizeof( filename ) );
-	strcat( filename, ".dx80.vtx" );
+	V_strcat_safe( filename, ".dx80.vtx" );
 
 	if ( !LoadFile( filename, buf ) )
 	{
@@ -2147,10 +2147,10 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
 	char fileName[MAX_PATH];
-	strcpy( fileName, "models/" );	
-	strcat( fileName, pActiveStudioHdr->pszName() );
+	V_strcpy_safe( fileName, "models/" );	
+	V_strcat_safe( fileName, pActiveStudioHdr->pszName() );
 	Q_StripExtension( fileName, fileName, sizeof( fileName ) );
-	strcat( fileName, ".vvd" );
+	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model
 	FileHandle_t fileHandle = g_pFileSystem->Open( fileName, "rb" );

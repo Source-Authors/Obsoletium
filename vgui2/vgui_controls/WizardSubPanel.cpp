@@ -82,7 +82,7 @@ void WizardSubPanel::ApplySettings(KeyValues *inResourceData)
 const char *WizardSubPanel::GetDescription()
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, int WizardWide, int WizardTall", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, int WizardWide, int WizardTall", BaseClass::GetDescription());
 	return buf;
 }
 

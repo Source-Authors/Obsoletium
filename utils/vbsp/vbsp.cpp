@@ -1067,7 +1067,7 @@ int RunVBSP( int argc, char **argv )
 		else if (!Q_stricmp (argv[i],"-tmpout"))
 		{
 			Msg("--tmp-out: Write to /tmp\n" );
-			strcpy (outbase, "/tmp");
+			V_strcpy_safe (outbase, "/tmp");
 		}
 #if 0
 		else if( !Q_stricmp( argv[i], "-defaultluxelsize" ) )

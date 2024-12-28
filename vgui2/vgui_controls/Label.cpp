@@ -1136,7 +1136,7 @@ void Label::ApplySettings( KeyValues *inResourceData )
 			g_pVGuiLocalize->ConvertANSIToUnicode(labelText, unicodeVar, sizeof(unicodeVar));
 
 			char var[256];
-			_snprintf(var, sizeof(var), "#var_%s", labelText);
+			V_sprintf_safe(var, "#var_%s", labelText);
 			g_pVGuiLocalize->AddString(var + 1, unicodeVar, "");
 			SetText(var);
 		}

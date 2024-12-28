@@ -261,6 +261,6 @@ void ScalableImagePanel::PerformLayout( void )
 const char *ScalableImagePanel::GetDescription()
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s string image, int src_corner_height, int src_corner_width, int draw_corner_height, int draw_corner_width", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s string image, int src_corner_height, int src_corner_width, int draw_corner_height, int draw_corner_width", BaseClass::GetDescription());
 	return buf;
 }

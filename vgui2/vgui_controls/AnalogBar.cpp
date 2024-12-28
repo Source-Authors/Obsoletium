@@ -398,7 +398,7 @@ void AnalogBar::GetSettings(KeyValues *outResourceData)
 const char *AnalogBar::GetDescription( void )
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, string analogValue, string variable", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, string analogValue, string variable", BaseClass::GetDescription());
 	return buf;
 }
 

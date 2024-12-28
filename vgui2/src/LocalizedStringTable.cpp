@@ -461,7 +461,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 					// copy out our language setting
 					char value[MAX_LOCALIZED_CHARS];
 					V_UCS2ToUTF8(valuetoken, value, sizeof(value));
-					strncpy(m_szLanguage, value, sizeof(m_szLanguage) - 1);
+					V_strcpy_safe(m_szLanguage, value);
 				}
 				else if (!stricmp(key, "Tokens"))
 				{

@@ -675,7 +675,7 @@ void Splitter::ApplyUserConfigSettings(KeyValues *userConfig)
 	for ( int i = 0; i < c; i++ )
 	{
 		char name[128];
-		_snprintf(name, sizeof(name), "%d_splitter_pos", i);
+		V_sprintf_safe(name, "%d_splitter_pos", i);
 		pFractions[i] = userConfig->GetFloat( name, flTotalSize + SPLITTER_HANDLE_WIDTH + 1 );
 		flTotalSize = pFractions[i];
 	}
@@ -703,7 +703,7 @@ void Splitter::GetUserConfigSettings(KeyValues *userConfig)
 	for ( int i = 0 ; i < c; i++ )
 	{
 		char name[128];
-		_snprintf(name, sizeof(name), "%d_splitter_pos", i);
+		V_sprintf_safe(name, "%d_splitter_pos", i);
 		userConfig->SetFloat( name, m_Splitters[i].m_flPos );
 	}
 }

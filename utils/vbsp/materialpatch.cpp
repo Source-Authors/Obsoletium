@@ -96,8 +96,8 @@ void CreateMaterialPatch( const char *pOriginalMaterialName, const char *pNewMat
 
 	AddNewTranslation( pOriginalMaterialName, pNewMaterialName );
 	
-	Q_snprintf( pOldVMTFile, 512, "materials/%s.vmt", pOriginalMaterialName );
-	Q_snprintf( pNewVMTFile, 512, "materials/%s.vmt", pNewMaterialName );
+	V_sprintf_safe( pOldVMTFile, "materials/%s.vmt", pOriginalMaterialName );
+	V_sprintf_safe( pNewVMTFile, "materials/%s.vmt", pNewMaterialName );
 
 //	printf( "Creating material patch file %s which points at %s\n", newVMTFile, oldVMTFile );
 
@@ -115,7 +115,7 @@ void CreateMaterialPatch( const char *pOriginalMaterialName, const char *pNewMat
 	if( nPatchType == PATCH_REPLACE )
 	{
 		char name[512];
-		Q_snprintf( name, 512, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pOriginalMaterialName ) );
+		V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pOriginalMaterialName ) );
 		KeyValues *origkv = new KeyValues( "blah" );
 
 		if ( !origkv->LoadFromFile( g_pFileSystem, name ) )
@@ -205,7 +205,7 @@ static bool DoesMaterialHaveKeyValuePair( KeyValues *pKeyValues, const char *pKe
 bool DoesMaterialHaveKey( const char *pMaterialName, const char *pKeyName )
 {
 	char name[512];
-	Q_snprintf( name, 512, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
+	V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
 	KeyValues *kv = new KeyValues( "blah" );
 
 	if ( !kv->LoadFromFile( g_pFileSystem, name ) )
@@ -226,7 +226,7 @@ bool DoesMaterialHaveKey( const char *pMaterialName, const char *pKeyName )
 bool DoesMaterialHaveKeyValuePair( const char *pMaterialName, const char *pKeyName, const char *pSearchValue )
 {
 	char name[512];
-	Q_snprintf( name, 512, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
+	V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
 	KeyValues *kv = new KeyValues( "blah" );
 
 	if ( !kv->LoadFromFile( g_pFileSystem, name ) )
@@ -247,7 +247,7 @@ bool DoesMaterialHaveKeyValuePair( const char *pMaterialName, const char *pKeyNa
 bool GetValueFromMaterial( const char *pMaterialName, const char *pKey, char *pValue, int len )
 {
 	char name[512];
-	Q_snprintf( name, 512, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
+	V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
 	KeyValues *kv = new KeyValues( "blah" );
 
 	if ( !kv->LoadFromFile( g_pFileSystem, name ) )

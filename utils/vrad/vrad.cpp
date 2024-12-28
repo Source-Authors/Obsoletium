@@ -331,7 +331,7 @@ void LightForTexture( const char *name, Vector& result )
 
 				// now we've gotten rid of the 'maps/level_name/' part, so we're left with
 				// 'originalName_%d_%d_%d'.
-				strcpy( baseFilename, base );
+				V_strcpy_safe( baseFilename, base );
 				bool foundSeparators = true;
 				for ( int i=0; i<3; ++i )
 				{
@@ -2170,7 +2170,7 @@ void VRAD_LoadBSP( char const *pFilename )
 			    global_lights );
 		GetModuleFileName( NULL, global_lights, sizeof( global_lights ) );
 		Q_ExtractFilePath( global_lights, global_lights, sizeof( global_lights ) );
-		strcat( global_lights, "lights.rad" );
+		V_strcat_safe( global_lights, "lights.rad" );
 	}
 
 	// Set the optional level specific lights filename

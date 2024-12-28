@@ -287,9 +287,8 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 //-----------------------------------------------------------------------------
 void DirectorySelectDialog::SetStartDirectory(const char *path)
 {
-	strncpy(m_szCurrentDir, path, sizeof(m_szCurrentDir));
-	strncpy(m_szCurrentDrive, path, sizeof(m_szCurrentDrive));
-	m_szCurrentDrive[sizeof(m_szCurrentDrive) - 1] = 0;
+	V_strcpy_safe(m_szCurrentDir, path);
+	V_strcpy_safe(m_szCurrentDrive, path);
 	char *firstSlash = strchr(m_szCurrentDrive, '\\');
 	if (firstSlash)
 	{
@@ -316,8 +315,7 @@ void DirectorySelectDialog::SetStartDirectory(const char *path)
 //-----------------------------------------------------------------------------
 void DirectorySelectDialog::SetDefaultCreateDirectoryName(const char *defaultCreateDirName)
 {
-	strncpy(m_szDefaultCreateDirName, defaultCreateDirName, sizeof(m_szDefaultCreateDirName));
-	m_szDefaultCreateDirName[sizeof(m_szDefaultCreateDirName) - 1] = 0;
+	V_strcpy_safe(m_szDefaultCreateDirName, defaultCreateDirName);
 }
 
 //-----------------------------------------------------------------------------
@@ -504,7 +502,7 @@ void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 		GenerateFullPathForNode(selectedIndex, fullPath, sizeof(fullPath));
 
 		// create the new directory underneath
-		strcat(fullPath, dir);
+		V_strcat_safe(fullPath, dir);
 		if (_mkdir(fullPath) == 0)
 		{
 			// add new path to tree view

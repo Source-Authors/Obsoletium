@@ -860,13 +860,13 @@ void FileOpenDialog::OnOpenInExplorer()
 	GetCurrentDirectory( pCurrentDirectory, sizeof(pCurrentDirectory) );
 #if !defined( _X360 ) && defined( WIN32 )
 	ShellExecute( NULL, NULL, pCurrentDirectory, NULL, NULL, SW_SHOWNORMAL );
-#elif defined( OSX )
-	char szCmd[ MAX_PATH * 2];
-	Q_snprintf( szCmd, sizeof(szCmd), "/usr/bin/open \"%s\"", pCurrentDirectory );
-	::system( szCmd );
+#else
+	char szCmd[MAX_PATH * 2];
+#if defined( OSX )
+	V_sprintf_safe( szCmd, "/usr/bin/open \"%s\"", pCurrentDirectory );
 #elif defined( LINUX )
-	char szCmd[ MAX_PATH * 2 ];	
-	Q_snprintf( szCmd, sizeof(szCmd), "xdg-open \"%s\" &", pCurrentDirectory );
+	V_sprintf_safe( szCmd, "xdg-open \"%s\" &", pCurrentDirectory );
+#endif
 	::system( szCmd );
 #endif
 }
@@ -1461,7 +1461,7 @@ void FileOpenDialog::OnSelectFolder()
 	if ( !Q_IsAbsolutePath( pFileName ) )
 	{
 		GetCurrentDirectory(pFullPath, sizeof(pFullPath) - MAX_PATH);
-		strcat( pFullPath, pFileName );
+		V_strcat_safe( pFullPath, pFileName );
 		if ( !pFileName[0] )
 		{
 			Q_StripTrailingSlash( pFullPath );
@@ -1524,7 +1524,7 @@ void FileOpenDialog::OnOpen()
 	{
 		GetCurrentDirectory(pFullPath, sizeof(pFullPath) - MAX_PATH);
 		Q_AppendSlash( pFullPath, sizeof( pFullPath ) );
-		strcat(pFullPath, pFileName);
+		V_strcat_safe(pFullPath, pFileName);
 		if ( !pFileName[0] )
 		{
 			Q_StripTrailingSlash( pFullPath );

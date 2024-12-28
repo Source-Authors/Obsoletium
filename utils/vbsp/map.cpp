@@ -831,7 +831,7 @@ ChunkFileResult_t LoadDispDistancesKeyCallback(const char *szKey, const char *sz
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -979,7 +979,7 @@ ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szVa
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -1033,7 +1033,7 @@ ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szVa
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -1074,7 +1074,7 @@ ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -1129,7 +1129,7 @@ ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szVal
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -1163,7 +1163,7 @@ ChunkFileResult_t LoadDispTriangleTagsKeyCallback(const char *szKey, const char 
 	if ( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pMapDispInfo->power );
 		int nRow = atoi( &szKey[3] );
@@ -1265,7 +1265,7 @@ void ConvertSideList( entity_t *mapent, char *key )
 				{
 					if (!bFirst)
 					{
-						strcat( szNewValue, " " );
+						V_strcat_safe( szNewValue, " " );
 					}
 					else
 					{
@@ -1274,7 +1274,7 @@ void ConvertSideList( entity_t *mapent, char *key )
 
 					char szIndex[15];
 					itoa( nIndex, szIndex, 10 );
-					strcat( szNewValue, szIndex );
+					V_strcat_safe( szNewValue, szIndex );
 				}
 			}
 		} while ( ( pszScan = strtok( NULL, " " ) ) );
@@ -1332,7 +1332,7 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 			Error( "Overlay Material Name (%s) > OVERLAY_MAP_STRLEN (%d)", pMaterialName, OVERLAY_MAP_STRLEN );
 			return ChunkFile_Fail;
 		}
-		strcpy( pOverlay->szMaterialName, pMaterialName );	
+		V_strcpy_safe( pOverlay->szMaterialName, pMaterialName );	
 	}
 	else if ( !stricmp( szKey, "StartU") )
 	{
@@ -1894,7 +1894,7 @@ static KeyValues *ReadKeyValuesFile( const char *pFilename )
 //-----------------------------------------------------------------------------
 void CMapFile::SetInstancePath( const char *pszInstancePath )
 {
-	strcpy( m_InstancePath, pszInstancePath );
+	V_strcpy_safe( m_InstancePath, pszInstancePath );
 	V_strlower( m_InstancePath );
 	V_FixSlashes( m_InstancePath );
 }
@@ -1912,7 +1912,7 @@ bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstan
 	char		szInstanceFileNameFixed[ MAX_PATH ];
 	const char *pszMapPath = "\\maps\\";
 
-	strcpy( szInstanceFileNameFixed, pszInstanceFileName );
+	V_strcpy_safe( szInstanceFileNameFixed, pszInstanceFileName );
 	V_SetExtension( szInstanceFileNameFixed, ".vmf", sizeof( szInstanceFileNameFixed ) );
 	V_FixSlashes( szInstanceFileNameFixed );
 
@@ -2287,14 +2287,14 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 	char	Value[ MAX_KEYVALUE_LEN ], NewValue[ MAX_KEYVALUE_LEN ];
 	bool	Overwritten = false;
 
-	strcpy( NewValue, pPair->value );
+	V_strcpy_safe( NewValue, pPair->value );
 	for ( epair_t *epInstance = pInstanceEntity->epairs; epInstance != NULL; epInstance = epInstance->next )
 	{
 		if ( strnicmp( epInstance->key, INSTANCE_VARIABLE_KEY, strlen( INSTANCE_VARIABLE_KEY ) ) == 0 )
 		{
 			char InstanceVariable[ MAX_KEYVALUE_LEN ];
 
-			strcpy( InstanceVariable, epInstance->value );
+			V_strcpy_safe( InstanceVariable, epInstance->value );
 
 			char *ValuePos = strchr( InstanceVariable, ' ' );
 			if ( !ValuePos )
@@ -2304,7 +2304,7 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 			*ValuePos = 0;
 			ValuePos++;
 
-			strcpy( Value, NewValue );
+			V_strcpy_safe( Value, NewValue );
 			if ( !V_StrSubst( Value, InstanceVariable, ValuePos, NewValue, sizeof( NewValue ), false ) )
 			{
 				Overwritten = true;
@@ -2475,7 +2475,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 		int		extraLen = 0;
 
 		oldValue = Connection->m_Pair->value;
-		strcpy( origValue, oldValue );
+		V_strcpy_safe( origValue, oldValue );
 		char *pos = strchr( origValue, ',' );
 		if ( pos )
 		{	// null terminate the first field
@@ -2836,7 +2836,7 @@ ChunkFileResult_t LoadSideKeyCallback(const char *szKey, const char *szValue, Lo
 			szValue = ReplaceMaterialName( szValue );
 		}
 
-		strcpy(pSideInfo->td.name, szValue);
+		V_strcpy_safe(pSideInfo->td.name, szValue);
 		g_MapError.TextureState(szValue);
 
 		// Find default flags and values for this material.

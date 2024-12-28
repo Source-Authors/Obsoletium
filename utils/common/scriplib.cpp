@@ -132,7 +132,7 @@ void DefineMacro( char *macroname )
 	script_t	*pmacro = (script_t *)malloc( sizeof( script_t ) );
 	if (!pmacro) Error("Out of memory in DefineMacro for %s", macroname);
 
-	strcpy( pmacro->filename, macroname );
+	V_strcpy_safe(pmacro->filename, macroname);
 	pmacro->line = script->line;
 	pmacro->nummacroparams = 0;
 
@@ -151,7 +151,7 @@ void DefineMacro( char *macroname )
 
 		pmacro->macroparam[pmacro->nummacroparams++] = mp;
 
-		strcpy( mp, token );
+		V_strncpy( mp, token, ssize(pmacro->macrobuffer) );
 		mp += strlen( token ) + 1;
 
 		if (mp >= pmacro->macrobuffer + sizeof( pmacro->macrobuffer ))
@@ -263,7 +263,7 @@ bool AddMacroToStack( char *macroname )
 	}
 
 	script = pnext;
-	strcpy( script->filename, pmacro->filename );
+	V_strcpy_safe( script->filename, pmacro->filename );
 
 	ptrdiff_t size = pmacro->end_p - pmacro->buffer;
 	script->buffer = (char *)malloc( size + 1 );
@@ -401,7 +401,7 @@ void ParseFromMemory (char *buffer, int size)
 	script++;
 	if (script == &scriptstack[MAX_INCLUDES])
 		Error ("script file exceeded MAX_INCLUDES");
-	strcpy (script->filename, "memory buffer" );
+	V_strcpy_safe (script->filename, "memory buffer" );
 
 	script->buffer = buffer;
 	script->line = 1;
@@ -428,7 +428,7 @@ void PushMemoryScript( char *pszBuffer, const int nSize )
 	{
 		Error ( "script file exceeded MAX_INCLUDES" );
 	}
-	strcpy (script->filename, "memory buffer" );
+	V_strcpy_safe (script->filename, "memory buffer" );
 
 	script->buffer = pszBuffer;
 	script->line = 1;
@@ -1013,7 +1013,7 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 
 	// create path
 	// prime and skip to first seperator
-	strcpy( dirPath, pTargetName );
+	V_strcpy_safe( dirPath, pTargetName );
 	ptr = strchr( dirPath, '\\' );
 	while ( ptr )
 	{		
@@ -1114,9 +1114,9 @@ void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 	if ( pEnv )
 	{
 		char tempPath[MAX_PATH];
-		strcpy( tempPath, pEnv );
+		V_strcpy_safe( tempPath, pEnv );
 		V_AppendSlash( tempPath, sizeof( tempPath ) );
-		strcat( tempPath, pFileMask );
+		V_strcat_safe( tempPath, pFileMask );
 
 		CUtlVector<fileList_t> fileList;
 		FindFiles( tempPath, false, fileList );
@@ -1141,11 +1141,11 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 
 	fileList.Purge();
 
-	strcpy( sourcePath, pDirPath );
+	V_strcpy_safe( sourcePath, pDirPath );
 	intp len = V_strlen( sourcePath );
 	if ( !len )
 	{
-		strcpy( sourcePath, ".\\" );
+		V_strcpy_safe( sourcePath, ".\\" );
 	}
 	else if ( sourcePath[len-1] != '\\' )
 	{
@@ -1153,18 +1153,18 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 		sourcePath[len+1] = '\0';
 	}
 
-	strcpy( fullPath, sourcePath );
+	V_strcpy_safe( fullPath, sourcePath );
 	if ( pPattern[0] == '\\' && pPattern[1] == '\0' )
 	{
 		// find directories only
 		bFindDirs = true;
-		strcat( fullPath, "*" );
+		V_strcat_safe( fullPath, "*" );
 	}
 	else
 	{
 		// find files, use provided pattern
 		bFindDirs = false;
-		strcat( fullPath, pPattern );
+		V_strcat_safe( fullPath, pPattern );
 	}
 
 #ifdef WIN32
@@ -1198,8 +1198,8 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 			continue;
 
 		char fileName[MAX_PATH];
-		strcpy( fileName, sourcePath );
-		strcat( fileName, findData.name );
+		V_strcpy_safe( fileName, sourcePath );
+		V_strcat_safe( fileName, findData.name );
 
 		intp j = fileList.AddToTail();
 		fileList[j].fileName.Set( fileName );
@@ -1240,8 +1240,8 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 			continue;
 
 		char fileName[MAX_PATH];
-		strcpy( fileName, sourcePath );
-		strcat( fileName, findData.cFileName );
+		V_strcpy_safe( fileName, sourcePath );
+		V_strcat_safe( fileName, findData.cFileName );
 
 		intp j = fileList.AddToTail();
 		fileList[j].fileName.Set( fileName );
@@ -1303,7 +1303,7 @@ int CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t
 	char	extension[MAX_PATH];
 
 	// get path only
-	strcpy( dirPath, pFileMask );
+	V_strcpy_safe( dirPath, pFileMask );
 	V_StripFilename( dirPath );
 
 	// get pattern only
@@ -1311,8 +1311,8 @@ int CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t
 	V_ExtractFileExtension( pFileMask, extension, sizeof( extension ) );
 	if ( extension[0] )
 	{
-		strcat( pattern, "." );
-		strcat( pattern, extension );
+		V_strcat_safe( pattern, "." );
+		V_strcat_safe( pattern, extension );
 	}
 
 	if ( !bRecurse )

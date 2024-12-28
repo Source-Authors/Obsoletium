@@ -1809,7 +1809,7 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 {
 	// try load the tga
 	char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s.bmp", filename);
+	V_sprintf_safe(buf, "%s.bmp", filename);
 
 	FileHandle_t file = g_pFullFileSystem->Open(buf, "rb", NULL);
 	if (!file)
@@ -1898,7 +1898,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 
 	// try load the tga
 	char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s.tga", filename);
+	V_sprintf_safe(buf, "%s.tga", filename);
 
 	FileHandle_t file = g_pFullFileSystem->Open(buf, "rb", NULL);
 	if (!file)

@@ -131,7 +131,7 @@ isstaticprop_ret IsStaticProp( studiohdr_t* pHdr )
 static int AddStaticPropDictLump( char const* pModelName )
 {
 	StaticPropDictLump_t dictLump;
-	strncpy( dictLump.m_Name, pModelName, DETAIL_NAME_LENGTH );
+	V_strcpy_safe( dictLump.m_Name, pModelName );
 
 	for (int i = s_StaticPropDictLump.Count(); --i >= 0; )
 	{
@@ -715,10 +715,10 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
-	strcpy( fileName, "models/" );	
-	strcat( fileName, g_pActiveStudioHdr->pszName() );
+	V_strcpy_safe( fileName, "models/" );	
+	V_strcat_safe( fileName, g_pActiveStudioHdr->pszName() );
 	Q_StripExtension( fileName, fileName, sizeof( fileName ) );
-	strcat( fileName, ".vvd" );
+	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model
 	fileHandle = g_pFileSystem->Open( fileName, "rb" );

@@ -824,7 +824,7 @@ int CSystem::GetAvailableDrives(char *buf, int bufLen)
 double CSystem::GetFreeDiskSpace(const char *path)
 {
 	char buf[_MAX_PATH];
-	strcpy(buf, path);
+	V_strcpy_safe(buf, path);
 	// strip of to first slash (to make it look like 'x:\')
 	char *slash = strstr(buf, "\\");
 	if (slash)
@@ -870,8 +870,8 @@ void CSystem::SetUserConfigFile(const char *fileName, const char *pathName)
 		m_pUserConfigData = new KeyValues("UserConfigData");
 	}
 
-	strncpy(m_szFileName, fileName, sizeof(m_szFileName) - 1);
-	strncpy(m_szPathID, pathName, sizeof(m_szPathID) - 1);
+	V_strcpy_safe(m_szFileName, fileName);
+	V_strcpy_safe(m_szPathID, pathName);
 
 	// open
 	m_pUserConfigData->UsesEscapeSequences( true ); // VGUI may use this
@@ -980,7 +980,7 @@ bool CSystem::CreateShortcut(const char *linkFileName, const char *targetPath, c
 #ifndef _X360
 	bool bSuccess = false;
 	char temp[MAX_PATH];
-	strcpy(temp, linkFileName);
+	V_strcpy_safe(temp, linkFileName);
 
 	// make sure it doesn't already exist
 	struct _stat statBuf;
@@ -1034,7 +1034,7 @@ bool CSystem::GetShortcutTarget(const char *linkFileName, char *targetPath, char
 {
 #ifndef _X360
 	char temp[MAX_PATH];
-	strcpy(temp, linkFileName);
+	V_strcpy_safe(temp, linkFileName);
 	strlwr(temp);
 
 	targetPath[0] = 0;
@@ -1084,7 +1084,7 @@ bool CSystem::ModifyShortcutTarget(const char *linkFileName, const char *targetP
 #ifndef _X360
 	bool bSuccess = false;
 	char temp[MAX_PATH];
-	strcpy(temp, linkFileName);
+	V_strcpy_safe(temp, linkFileName);
 	strlwr(temp);
 
 	// Create the ShellLink object

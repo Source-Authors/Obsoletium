@@ -42,7 +42,7 @@ ChunkFileResult_t CManifest::LoadManifestMapKeyCallback( const char *szKey, cons
 	}
 	else if ( !stricmp( szKey, "File" ) )
 	{
-		strcpy( pManifestMap->m_RelativeMapFileName, szValue );
+		V_strcpy_safe( pManifestMap->m_RelativeMapFileName, szValue );
 	}
 	else if ( !stricmp( szKey, "IsPrimary" ) )
 	{
@@ -309,7 +309,7 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 		{
 			char		FileName[ MAX_PATH ];
 
-			sprintf( FileName, "%s%s", m_InstancePath, m_Maps[ i ]->m_RelativeMapFileName );
+			V_sprintf_safe( FileName, "%s%s", m_InstancePath, m_Maps[ i ]->m_RelativeMapFileName );
 
 			InstanceEntity = &pMapFile->entities[ pMapFile->num_entities ];
 			pMapFile->num_entities++;
@@ -368,12 +368,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	UserNameSize = sizeof( UserName );
 	if ( GetUserNameA( UserName, &UserNameSize ) == 0 )
 	{
-		strcpy( UserPrefsFileName, "default" );
+		V_strcpy_safe( UserPrefsFileName, "default" );
 	}
 
-	sprintf( UserPrefsFileName, "\\%s.vmm_prefs", UserName );
+	V_sprintf_safe( UserPrefsFileName, "\\%s.vmm_prefs", UserName );
 	V_StripExtension( pszFileName, FileName, sizeof( FileName ) );
-	strcat( FileName, UserPrefsFileName );
+	V_strcat_safe( FileName, UserPrefsFileName );
 
 	FILE *fp = fopen( FileName, "rb" );
 	if ( !fp )

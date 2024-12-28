@@ -677,11 +677,11 @@ CVGui::Tick_t* CVGui::CreateNewTick( VPANEL panel, int intervalMilliseconds )
 
 	if ( !Q_isempty( ((VPanel *)panel)->Client()->GetName() ) )
 	{
-		strncpy( t->panelname, ((VPanel *)panel)->Client()->GetName(), sizeof( t->panelname ) );
+		V_strcpy_safe( t->panelname, ((VPanel *)panel)->Client()->GetName() );
 	}
 	else
 	{
-		strncpy( t->panelname, ((VPanel *)panel)->Client()->GetClassName(), sizeof( t->panelname ) );
+		V_strcpy_safe( t->panelname, ((VPanel *)panel)->Client()->GetClassName() );
 	}
 
 	return t;

@@ -278,7 +278,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, IBaseFile
 
 	if ( pFileBasename )
 	{
-		V_strcpy( m_pszFileBaseName, pFileBasename );
+		V_strcpy_safe( m_pszFileBaseName, pFileBasename );
 		StripTrailingString( m_pszFileBaseName, ".vpk" );
 		StripTrailingString( m_pszFileBaseName, "_dir" );
 		sprintf( pszFName, "%s_dir.vpk", m_pszFileBaseName );

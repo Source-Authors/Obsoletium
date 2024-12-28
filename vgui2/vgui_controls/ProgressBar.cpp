@@ -366,7 +366,7 @@ void ProgressBar::GetSettings(KeyValues *outResourceData)
 const char *ProgressBar::GetDescription( void )
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, string progress, string variable", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, string progress, string variable", BaseClass::GetDescription());
 	return buf;
 }
 

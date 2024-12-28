@@ -65,7 +65,7 @@ int	FindMiptex (const char *name)
 	}
 	if (nummiptex == MAX_MAP_TEXTURES)
 		Error ("Too many unique textures, max %d", MAX_MAP_TEXTURES);
-	strcpy (textureref[i].name, name);
+	V_strcpy_safe (textureref[i].name, name);
 
 	textureref[i].lightmapWorldUnitsPerLuxel = 0.0f;
 	textureref[i].flags = 0;

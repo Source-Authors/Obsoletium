@@ -60,7 +60,7 @@ static bool SaveTgaAndAddToP4( unsigned char *pImage, ImageFormat imageFormat, i
 
 	// async write to disk (this will take ownership of the memory)
 	char szDirName[ _MAX_PATH ];
-	strcpy( szDirName, szDestFilename );
+	V_strcpy_safe( szDirName, szDestFilename );
 	V_StripFilename( szDirName );
 	g_pFullFileSystem->CreateDirHierarchy( szDirName, "" );
 	g_pFullFileSystem->AsyncWrite( szDestFilename, buffer.Base(), buffer.TellPut(), true );
@@ -1127,7 +1127,7 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 
 	if ( szFileName != NULL )
 	{
-		strcpy( temp, szFileName );
+		V_strcpy_safe( temp, szFileName );
 		V_SetExtension( temp, ".cfg", sizeof( temp ) );
 	}
 	else
@@ -1135,7 +1135,7 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 		Label	*m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
 		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
 
-		strcat( temp, "ScreenCaps.cfg" );
+		V_strcat_safe( temp, "ScreenCaps.cfg" );
 	}
 
 	CaptureData->SaveToFile( g_pFullFileSystem, temp );
@@ -1152,14 +1152,14 @@ bool CMDLPicker::RestoreCaps( const char *szFileName )
 
 	if ( szFileName != NULL )
 	{
-		strcpy( temp, szFileName );
+		V_strcpy_safe( temp, szFileName );
 		V_SetExtension( temp, ".cfg", sizeof( temp ) );
 	}
 	else
 	{
 		Label	*m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
 		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
-		strcat( temp, "ScreenCaps.cfg" );
+		V_strcat_safe( temp, "ScreenCaps.cfg" );
 	}
 
 	KeyValues *CaptureData = new KeyValues( "ScreenCaps" );

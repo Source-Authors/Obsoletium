@@ -1048,7 +1048,7 @@ void CConsolePanel::DumpConsoleTextToFile()
 	// we don't want to overwrite other condump.txt files
 	for ( int i = 0 ; i < CONDUMP_FILES_MAX_NUM ; ++i )
 	{
-		_snprintf( szfile, sizeof(szfile), "condump%03d.txt", i );
+		V_sprintf_safe( szfile, "condump%03d.txt", i );
 		if ( !g_pFullFileSystem->FileExists(szfile) )
 		{
 			found = true;
