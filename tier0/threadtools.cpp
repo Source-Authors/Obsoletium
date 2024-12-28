@@ -965,11 +965,6 @@ bool ThreadInterlockedAssignIf64(volatile int64 *pDest, int64 value, int64 compe
 
 #if defined( PLATFORM_64BITS )
 
-#if _MSC_VER < 1500
-// This intrinsic isn't supported on VS2005.
-extern "C" unsigned char _InterlockedCompareExchange128( int64 volatile * Destination, int64 ExchangeHigh, int64 ExchangeLow, int64 * ComparandResult );
-#endif
-
 bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
 {
 	Assert( ( (size_t)pDest % 16 ) == 0 );
