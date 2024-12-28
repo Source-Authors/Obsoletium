@@ -184,7 +184,7 @@ void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 
 		// days:hours:minutes:seconds
 		char timeText[64];
-		_snprintf(timeText, sizeof(timeText), "%i", (int)p.players);
+		V_sprintf_safe(timeText, "%i", (int)p.players);
 		SetControlString("TotalUsersLabel", timeText);
 
 		// mark the vert combo has changed to force it to update graph ranges

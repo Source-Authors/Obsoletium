@@ -260,7 +260,7 @@ void CBanPanel::ChangeBan()
 	{	
 		char timeText[20];
 		float time = kv->GetFloat("time");
-		_snprintf(timeText, sizeof(timeText), "%0.2f", time);
+		V_sprintf_safe(timeText, "%0.2f", time);
 
 		// open a dialog asking them what time to change the ban lenght to
 		CDialogCvarChange *box = new CDialogCvarChange(this);
@@ -281,7 +281,7 @@ void CBanPanel::RemoveBanByID(const char *id)
 
 	// send down the command
 	char cmd[512];
-	_snprintf(cmd, sizeof(cmd) -1, "%s %s\n", IsIPAddress(id) ? "removeip" : "removeid", id);
+	V_sprintf_safe(cmd, "%s %s\n", IsIPAddress(id) ? "removeip" : "removeid", id);
 	RemoteServer().SendCommand(cmd);
 
 	// force the file to be written

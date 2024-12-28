@@ -315,7 +315,7 @@ void CPlayerPanel::KickSelectedPlayers()
 
 		// kick 'em
 		char cmd[512];
-		_snprintf(cmd, sizeof(cmd), "kick \"%s\"", pl->GetString("name"));
+		V_sprintf_safe(cmd, "kick \"%s\"", pl->GetString("name"));
 		RemoteServer().SendCommand(cmd);
 	}
 

@@ -75,7 +75,7 @@ void CChatPanel::OnSendChat()
 {
 	// build a chat command and send it to the server
 	char chat_text[512];
-	strcpy(chat_text, "say ");
+	V_strcpy_safe(chat_text, "say ");
 	m_pEnterChatPanel->GetText(chat_text + 4, sizeof(chat_text) - 4);
 	if (strlen("say ") != strlen(chat_text))
 	{

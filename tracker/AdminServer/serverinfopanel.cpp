@@ -61,7 +61,7 @@ void CServerInfoPanel::OnThink()
 	{
 		m_iLastUptimeDisplayed = time;
 		char timeText[64];
-		_snprintf(timeText, sizeof(timeText), "%0.1i:%0.2i:%0.2i:%0.2i", (time / 3600) / 24, (time / 3600), (time / 60) % 60, time % 60);
+		V_sprintf_safe(timeText, "%0.1i:%0.2i:%0.2i:%0.2i", (time / 3600) / 24, (time / 3600), (time / 60) % 60, time % 60);
 		SetControlString("UpTimeText", timeText);
 	}
 }
@@ -216,9 +216,9 @@ void CServerInfoPanel::UpdateMapCycleValue()
 		{
 			if (needComma)
 			{
-				strcat(nextMaps, ", ");
+				V_strcat_safe(nextMaps, ", ");
 			}
-			strcat(nextMaps, m_MapCycle[point].String());
+			V_strcat_safe(nextMaps, m_MapCycle[point].String());
 			needComma = true;
 		}
 	}
@@ -226,9 +226,9 @@ void CServerInfoPanel::UpdateMapCycleValue()
 	// add some elipses to show there is more maps
 	if (needComma)
 	{
-		strcat(nextMaps, ", ");
+		V_strcat_safe(nextMaps, ", ");
 	}
-	strcat(nextMaps, "...");
+	V_strcat_safe(nextMaps, "...");
 
 	// show in varlist
 	SetVarString("mapcycle", nextMaps);

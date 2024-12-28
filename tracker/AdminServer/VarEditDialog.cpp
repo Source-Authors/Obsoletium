@@ -129,7 +129,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 
 	// set value
 	char title[256];
-	_snprintf(title, sizeof(title) - 1, "Change %s", m_pRules->GetString("name"));
+	V_sprintf_safe(title, "Change %s", m_pRules->GetString("name"));
 	SetTitle(title, false);
 
 	// bring to front	
