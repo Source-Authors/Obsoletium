@@ -782,7 +782,7 @@ CDbgMemAlloc::~CDbgMemAlloc()
 
 void CDbgMemAlloc::Initialize()
 {
-  if (!m_bInitialized)
+	if ( !m_bInitialized )
 	{
 		m_pFilenames = new Filenames_t;
 		// dimhotepus: Allocate reasonable amount.
@@ -845,16 +845,13 @@ void *CDbgMemAlloc::Alloc( size_t nSize )
 		int x = 3;
 	}
 */
-	char szModule[MAX_PATH];
-	if ( GetCallerModule( szModule ) )
+	
+	if ( char szModule[MAX_PATH]; GetCallerModule(szModule) )
 	{
 		return Alloc( nSize, szModule, 0 );
 	}
-	else
-	{
-		return Alloc( nSize, g_pszUnknown, 0 );
-	}
-//	return malloc( nSize );
+
+	return Alloc( nSize, g_pszUnknown, 0 );
 }
 
 void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize )
@@ -870,23 +867,18 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize )
 	}
 */
 	// FIXME: Should these gather stats?
-	char szModule[MAX_PATH];
-	if ( GetCallerModule( szModule ) )
+	if ( char szModule[MAX_PATH]; GetCallerModule( szModule ) )
 	{
 		return Realloc( pMem, nSize, szModule, 0 );
 	}
-	else
-	{
-		return Realloc( pMem, nSize, g_pszUnknown, 0 );
-	}
-//	return realloc( pMem, nSize );
+
+	return Realloc( pMem, nSize, g_pszUnknown, 0 );
 }
 
 void CDbgMemAlloc::Free( void *pMem )
 {
 	// FIXME: Should these gather stats?
 	Free( pMem, g_pszUnknown, 0 );
-//	free( pMem );
 }
 
 void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t )
@@ -897,7 +889,7 @@ void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t )
 void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
 {
 	stack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
-  stack_depth = -1;
+	stack_depth = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -921,7 +913,7 @@ void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 
 void CDbgMemAlloc::PopAllocDbgInfo()
 {
-  if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == NULL )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -955,7 +947,7 @@ void CDbgMemAlloc::RestoreDebugInfo( const void *pvDebugInfo )
 {
 	if ( g_DbgInfoStack == NULL )
 	{
-    SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
+		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
 
 	const int32 *pnStackDepth = (const int32*) pvDebugInfo;
@@ -1160,11 +1152,10 @@ const char *CDbgMemAlloc::GetAllocatonFileName( void *pMem )
 		return "";
 
 #ifndef __SANITIZE_ADDRESS__
-	CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem );
-	if ( pHeader->m_pFileName )
+	if ( CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem ); pHeader->m_pFileName )
 		return pHeader->m_pFileName;
-	else
-		return g_pszUnknown;
+
+	return g_pszUnknown;
 #else
 	return g_pszUnknown;
 #endif
@@ -1411,8 +1402,7 @@ int CDbgMemAlloc::heapchk()
 
 void CDbgMemAlloc::DumpBlockStats( void *p )
 {
-	DbgMemHeader_t *pBlock = (DbgMemHeader_t *)p - 1;
-	if ( !CrtIsValidHeapPointer( pBlock ) )
+	if ( auto *pBlock = (DbgMemHeader_t *)p - 1; !CrtIsValidHeapPointer( pBlock ) )
 	{
 		Msg( "0x%p is not valid heap pointer\n", p );
 		return;
@@ -1443,9 +1433,9 @@ void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const Mem
 		info.m_nTotalCount
 		);
 
-	for (int i = 0; i < NUM_BYTE_COUNT_BUCKETS; ++i)
+	for (const auto &b : info.m_pCount)
 	{
-		m_OutputFunc( "\t%d", info.m_pCount[i] );
+		m_OutputFunc( "\t%d", b );
 	}
 
 	m_OutputFunc("\n");
@@ -1490,9 +1480,9 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 
 	m_OutputFunc("Allocation type\tCurrent Size(k)\tPeak Size(k)\tTotal Allocations(k)\tOverhead Size(k)\tPeak Overhead Size(k)\tTime(ms)\tCurrent Count\tPeak Count\tTotal Count");
 
-	for (int i = 0; i < NUM_BYTE_COUNT_BUCKETS; ++i)
+	for (const auto &b : s_pCountHeader)
 	{
-		m_OutputFunc( "\t%s", s_pCountHeader[i] );
+		m_OutputFunc( "\t%s", b );
 	}
 
 	m_OutputFunc("\n");
