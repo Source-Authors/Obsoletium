@@ -31,7 +31,8 @@ enum trtoken_t
 };
 
 
-#define IsToken(s1, s2)	!strcmpi(s1, s2)
+[[nodiscard]]
+inline bool IsToken(const char* s1, const char* s2) { return !strcmpi(s1, s2); }
 
 #define MAX_TOKEN (128 + 1)
 #define MAX_IDENT (64 + 1)
