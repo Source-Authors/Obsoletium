@@ -14,6 +14,7 @@ CBaseBudgetPanel::CBaseBudgetPanel( vgui::Panel *pParent, const char *pElementNa
 	 :	vgui::Panel( pParent, pElementName )
 {
 	m_BudgetHistoryOffset = 0;
+	m_hFont = vgui::INVALID_FONT;
 
 	SetProportional( false );
 	SetKeyBoardInputEnabled( false );

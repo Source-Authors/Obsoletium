@@ -124,7 +124,6 @@ protected:
 		double m_Time[BUDGET_HISTORY_COUNT];
 	};
 	CUtlVector<BudgetGroupTimeData_t> m_BudgetGroupTimes; // [m_CachedNumBudgetGroups][BUDGET_HISTORY_COUNT]
-	int m_CachedNumTimeLabels;
 	vgui::HFont		m_hFont;
 
 	bool m_bDedicated;
