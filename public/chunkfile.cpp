@@ -33,6 +33,7 @@
 //=============================================================================//
 
 #include "chunkfile.h"
+
 #include "mathlib/vector.h"
 #include "mathlib/vector4d.h"
 #include "tier1/strtools.h"
@@ -57,10 +58,10 @@ CChunkHandlerMap::CChunkHandlerMap(void)
 //-----------------------------------------------------------------------------
 CChunkHandlerMap::~CChunkHandlerMap(void)
 {
-	ChunkHandlerInfoNode_t *pNode = m_pHandlers;
+	auto *pNode = m_pHandlers;
 	while (pNode != NULL)
 	{
-		ChunkHandlerInfoNode_t *pPrev = pNode;
+		auto *pPrev = pNode;
 		pNode = pNode->pNext;
 
 		delete pPrev;
@@ -76,7 +77,7 @@ CChunkHandlerMap::~CChunkHandlerMap(void)
 //-----------------------------------------------------------------------------
 void CChunkHandlerMap::AddHandler(const char *pszChunkName, ChunkHandler_t pfnHandler, void *pData)
 {
-	ChunkHandlerInfoNode_t *pNew = new ChunkHandlerInfoNode_t;
+	auto *pNew = new ChunkHandlerInfoNode_t;
 
 	V_strcpy_safe(pNew->Handler.szChunkName, pszChunkName);
 	pNew->Handler.pfnHandler = pfnHandler;
@@ -89,7 +90,7 @@ void CChunkHandlerMap::AddHandler(const char *pszChunkName, ChunkHandler_t pfnHa
 	}
 	else
 	{
-		ChunkHandlerInfoNode_t *pNode = m_pHandlers;
+		auto *pNode = m_pHandlers;
 		while (pNode->pNext != NULL)
 		{
 			pNode = pNode->pNext;
@@ -132,7 +133,7 @@ ChunkErrorHandler_t CChunkHandlerMap::GetErrorHandler(void **ppData)
 //-----------------------------------------------------------------------------
 ChunkHandler_t CChunkHandlerMap::GetHandler(const char *pszChunkName, void **ppData)
 {
-	ChunkHandlerInfoNode_t *pNode = m_pHandlers;
+	auto *pNode = m_pHandlers;
 	while (pNode != NULL)
 	{
 		if (!stricmp(pNode->Handler.szChunkName, pszChunkName))
