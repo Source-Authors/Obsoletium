@@ -1498,19 +1498,21 @@ static int g_nTrees;
 #endif
 CDispCollTree *DispCollTrees_Alloc( int count )
 {
-	CDispCollTree *pTrees = NULL;
 #ifdef ENGINE_DLL
-	pTrees = (CDispCollTree *)Hunk_Alloc( count * sizeof(CDispCollTree), false );
+	CDispCollTree *pTrees = Hunk_Alloc<CDispCollTree>( count, false );
+	if( !pTrees )
+		return NULL;
+
 	g_nTrees = count;
 	for ( int i = 0; i < g_nTrees; i++ )
 	{
 		Construct( pTrees + i );
 	}
 #else
-	pTrees = new CDispCollTree[count];
-#endif
+	CDispCollTree *pTrees = new CDispCollTree[count];
 	if( !pTrees )
 		return NULL;
+#endif
 
 	for ( int i = 0; i < count; i++ )
 	{
