@@ -257,9 +257,8 @@ ChunkFileResult_t CChunkFile::EndChunk(void)
 		BuildIndentString(m_szIndent, ssize(m_szIndent), m_nCurrentDepth);
 	}
 
-	WriteLine("}");
-
-	return(ChunkFile_Ok);
+	// dimhotepus: Check result.
+	return WriteLine("}");
 }
 
 
