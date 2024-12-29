@@ -141,7 +141,7 @@ public:
 	}
 	void UpdateSamples( char *, int ) override {}
 
-	int	GetLoopingInfo( int *, int *, int * ) override
+	int	GetLoopingInfo() override
 	{
 		return 0;
 	}

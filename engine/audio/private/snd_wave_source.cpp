@@ -104,13 +104,14 @@ CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx )
 		m_pDebugName = strdup( m_pSfx->getname() );
 #endif
 
-	m_bNoSentence = false;
 	m_pTempSentence = NULL;
 	m_nCachedDataSize = 0;
+	
+	m_numDecodedSamples = 0;
+
+	m_bNoSentence = false;
 	m_bIsPlayOnce = false;
 	m_bIsSentenceWord = false;
-
-	m_numDecodedSamples = 0;
 }
 
 CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx, CAudioSourceCachedInfo *info )
@@ -150,9 +151,10 @@ CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx, CAudioSourceCachedInfo *inf
 		m_numDecodedSamples = ADPCMSampleCount( (ADPCMWAVEFORMAT *)m_pHeader, m_sampleCount );
 	}
 
-	m_bNoSentence = false;
 	m_pTempSentence = NULL;
 	m_nCachedDataSize = 0;
+
+	m_bNoSentence = false;
 	m_bIsPlayOnce = false;
 	m_bIsSentenceWord = false;
 }
@@ -724,26 +726,8 @@ void *CAudioSourceWave::GetHeader( void )
 //-----------------------------------------------------------------------------
 // Gets the looping information. Some parameters are interpreted based on format
 //-----------------------------------------------------------------------------
-int CAudioSourceWave::GetLoopingInfo( int *pLoopBlock, int *pNumLeadingSamples, int *pNumTrailingSamples )
+int CAudioSourceWave::GetLoopingInfo()
 {
-	if ( pLoopBlock )
-	{
-		// for xma, the block that contains the loop point
-		*pLoopBlock = m_loopBlock;
-	}
-
-	if ( pNumLeadingSamples )
-	{
-		// for xma, the number of leading samples at the loop block to discard
-		*pNumLeadingSamples = m_numLeadingSamples;
-	}
-
-	if ( pNumTrailingSamples )
-	{
-		// for xma, the number of trailing samples at the final block to discard
-		*pNumTrailingSamples = m_numTrailingSamples;
-	}
-
 	// the loop point in samples
 	return m_loopStart;
 }
@@ -1393,9 +1377,9 @@ public:
 	{
 		ConvertSamples( pData, sampleCount );
 	}
-	virtual int GetLoopingInfo( int *pLoopBlock, int *pNumLeadingSamples, int *pNumTrailingSamples )
+	virtual int GetLoopingInfo()
 	{
-		return CAudioSourceWave::GetLoopingInfo( pLoopBlock, pNumLeadingSamples, pNumTrailingSamples );
+		return CAudioSourceWave::GetLoopingInfo();
 	}
 
 	virtual void Prefetch();
@@ -1445,25 +1429,7 @@ CAudioMixer *CAudioSourceStreamWave::CreateMixer( int initialStreamPosition )
 {
 	char fileName[MAX_PATH];
 	const char *pFileName = m_pSfx->GetFileName();
-	if ( IsX360() && ( m_format == WAVE_FORMAT_XMA || m_format == WAVE_FORMAT_PCM ) )
-	{
-		V_strcpy_safe( fileName, pFileName );
-		V_SetExtension( fileName, ".360.wav", sizeof( fileName ) );
-		pFileName = fileName;
-
-		// for safety, validate the initial stream position
-		// not trusting save/load
-		if ( m_format == WAVE_FORMAT_XMA )
-		{
-			if ( ( initialStreamPosition % XBOX_DVD_SECTORSIZE ) || 
-				( initialStreamPosition % XMA_BLOCK_SIZE ) ||
-				( initialStreamPosition >= m_dataSize ) )
-			{
-				initialStreamPosition = 0;
-			}
-		}
-	}
-
+	
 	// BUGBUG: Source constructs the IWaveData, mixer frees it, fix this?
 	IWaveData *pWaveData = CreateWaveDataStream( *this, static_cast<IWaveStreamSource *>(this), pFileName, m_dataStart, m_dataSize, m_pSfx, initialStreamPosition );
 	if ( pWaveData )
