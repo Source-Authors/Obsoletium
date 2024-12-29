@@ -98,6 +98,11 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 		MemDbgDllMain( hinstDLL, fdwReason, lpvReserved );
 #endif
 	}
+	else if (fdwReason == DLL_PROCESS_DETACH)
+	{
+		// dimhotepus: Cleanup instance.
+		g_hTier0Instance = nullptr;
+	}
 
 	return TRUE;
 }
