@@ -974,7 +974,8 @@ void DataCacheSize_f( IConVar *pConVar, [[maybe_unused]] const char *pOldString,
 		g_DataCache.SetSize( var.GetInt() * 1024 * 1024 );
 	}
 }
-ConVar datacachesize( "datacachesize", "64", FCVAR_INTERNAL_USE, "Size in MiB.", true, 32, true, 512, DataCacheSize_f );
+// dimhotepus: Bump 64 -> 96 as Hammer with many models needs this.
+ConVar datacachesize( "datacachesize", "96", FCVAR_INTERNAL_USE, "Size in MiB.", true, 32, true, 512, DataCacheSize_f );
 
 //-----------------------------------------------------------------------------
 // Connect, disconnect
