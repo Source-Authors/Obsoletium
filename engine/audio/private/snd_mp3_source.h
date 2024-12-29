@@ -174,9 +174,10 @@ protected:
 	memhandle_t				m_hCache;
 
 private:
-	CAudioSourceMP3Cache( const CAudioSourceMP3Cache & );
+	CAudioSourceMP3Cache( const CAudioSourceMP3Cache & ) = delete;
 
-	unsigned int	m_bNoSentence : 1;
+	// dimhotepus: uint -> bool
+	bool	m_bNoSentence : 1;
 };
 
 bool Audio_IsMP3( const char *pName );

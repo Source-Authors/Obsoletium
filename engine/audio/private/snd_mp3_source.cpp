@@ -311,6 +311,7 @@ CAudioSourceMP3Cache::CAudioSourceMP3Cache( CSfxTable *pSfx ) :
 	CAudioSourceMP3( pSfx )
 {
 	m_hCache = 0;
+	m_bNoSentence = false;
 }
 
 CAudioSourceMP3Cache::CAudioSourceMP3Cache( CSfxTable *pSfx, CAudioSourceCachedInfo *info ) :
