@@ -548,20 +548,20 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 		nPriority = 0;
 	}
 
-		m_async.pData = NULL;
-		if ( SndAlignReads() )
-		{
-			m_async.nOffset = 0;
-			m_async.nBytes = params.seekpos + params.datasize;
-		}
-		else
-		{
-			m_async.nOffset = params.seekpos;
-			m_async.nBytes = params.datasize;
-		}
+	m_async.pData = NULL;
+	if ( SndAlignReads() )
+	{
+		m_async.nOffset = 0;
+		m_async.nBytes = params.seekpos + params.datasize;
+	}
+	else
+	{
+		m_async.nOffset = params.seekpos;
+		m_async.nBytes = params.datasize;
+	}
 
 	m_async.pfnCallback	= AsyncCallback;	// optional completion callback
-	m_async.pContext = (void *)this;		// caller's unique context
+	m_async.pContext = this;		// caller's unique context
 	m_async.priority = nPriority;			// inter list priority, 0=lowest
 	m_async.flags = FSASYNC_FLAGS_ALLOCNOFREE;
 	m_async.pszPathID = "GAME";
