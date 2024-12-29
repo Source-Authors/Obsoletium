@@ -572,7 +572,7 @@ class DefaultAudioDeviceChangedNotificationClient
         device_role_{device_role} {
     Assert(!!mm_device_enumerator_);
 
-    AddRef();
+    ++ref_counter_;
 
     // May fail with out of memory.
     registration_hr_ =
