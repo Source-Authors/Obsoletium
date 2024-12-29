@@ -501,7 +501,7 @@ void XM_CALLCONV VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
 
 	// Above 255 would be right out.
 	AssertMsg( r <= 255.0f && g <= 255.0f && b <= 255.0f,
-		"(R = %.2f, G = %.2f, B = %.2f): component > 255.\n",
+		"(R = %.2f, G = %.2f, B = %.2f): component > 255.",
 		r, g, b );
 
 	c.r = static_cast<byte>( r );
