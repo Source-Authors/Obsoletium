@@ -124,12 +124,18 @@ int __cdecl _AfxAllocHookProxy(int nAllocType, void* pvData, size_t nSize,
                                const unsigned char* szFilename, int nLine) {
   if (nAllocType != _HOOK_ALLOC)
     return (pfnCrtAllocHook)(nAllocType, pvData, nSize, nBlockUse, lRequest,
-                             (const unsigned char*)szFilename, nLine);
+                             szFilename, nLine);
 
+  // dimhotepus: Fix checking of block use in debug mode.
+#ifdef _DEBUG
+  if ((pfnAllocHook)(nSize, nBlockUse == _AFX_CLIENT_BLOCK,
+                     lRequest))
+#else
   if ((pfnAllocHook)(nSize, _BLOCK_TYPE(nBlockUse) == _AFX_CLIENT_BLOCK,
                      lRequest))
+#endif
     return (pfnCrtAllocHook)(nAllocType, pvData, nSize, nBlockUse, lRequest,
-                             (const unsigned char*)szFilename, nLine);
+                             szFilename, nLine);
 
   return FALSE;
 }
