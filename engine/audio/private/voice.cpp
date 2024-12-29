@@ -571,13 +571,6 @@ bool Voice_InitWithDefault( const char *pCodecName )
 		return false;
 	}
 
-	int nRate = Voice_GetDefaultSampleRate( pCodecName );
-	if ( nRate < 0 )
-	{
-		Msg( "Voice_InitWithDefault: Unable to determine defaults for codec \"%s\"\n", pCodecName );
-		return false;
-	}
-
 	return Voice_Init( pCodecName, Voice_GetDefaultSampleRate( pCodecName ) );
 }
 
