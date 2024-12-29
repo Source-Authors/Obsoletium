@@ -532,7 +532,7 @@ void CAsyncWaveData::SetAsyncPriority( int priority )
 //-----------------------------------------------------------------------------
 void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 {
-	Assert( IsX360() || ( IsPC() && !m_bLoaded ) );
+	Assert( !m_bLoaded );
 
 	// expected to be relative to the sound\ dir
 	m_hFileNameHandle = params.hFilename;
@@ -548,8 +548,6 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 		nPriority = 0;
 	}
 
-	if ( !IsX360() )
-	{
 		m_async.pData = NULL;
 		if ( SndAlignReads() )
 		{
@@ -561,21 +559,11 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 			m_async.nOffset = params.seekpos;
 			m_async.nBytes = params.datasize;
 		}
-	}
-	else
-	{
-		Assert( params.datasize > 0 );
-
-		// using explicit allocated buffer on xbox
-		m_async.pData = m_pvData;
-		m_async.nOffset = params.seekpos;
-		m_async.nBytes = AlignValue( params.datasize, params.alignment ); 
-	}
 
 	m_async.pfnCallback	= AsyncCallback;	// optional completion callback
 	m_async.pContext = (void *)this;		// caller's unique context
 	m_async.priority = nPriority;			// inter list priority, 0=lowest
-	m_async.flags = IsX360() ? 0 : FSASYNC_FLAGS_ALLOCNOFREE;
+	m_async.flags = FSASYNC_FLAGS_ALLOCNOFREE;
 	m_async.pszPathID = "GAME";
 
 	m_bLoaded = false;
@@ -588,38 +576,6 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 
 	// The async layer creates a copy of this string, ok to send a local reference
 	m_async.pszFilename	= szFilename;
-
-	char szFullName[MAX_PATH];
-	if ( IsX360() && ( g_pFileSystem->GetDVDMode() == DVDMODE_STRICT ) )
-	{
-		// all audio is expected be in zips
-		// resolve to absolute name now, where path can be filtered to just the zips (fast find, no real i/o)
-		// otherwise the dvd will do a costly seek for each zip miss due to search path fall through
-		PathTypeQuery_t pathType;
-		if ( !g_pFileSystem->RelativePathToFullPath( m_async.pszFilename, m_async.pszPathID, szFullName, sizeof( szFullName ), FILTER_CULLNONPACK, &pathType ) )
-		{
-			// not found, do callback now to handle error
-			m_async.pfnCallback( m_async, 0, FSASYNC_ERR_FILEOPEN );
-			return;
-		}
-		m_async.pszFilename	= szFullName;
-	}
-
-	if ( IsX360() && params.bCanBeQueued )
-	{
-		// queued loader takes over
-		LoaderJob_t loaderJob;
-		loaderJob.m_pFilename = m_async.pszFilename;
-		loaderJob.m_pPathID = m_async.pszPathID;
-		loaderJob.m_pCallback = QueuedLoaderCallback;
-		loaderJob.m_pContext = (void *)this;
-		loaderJob.m_Priority = LOADERPRIORITY_DURINGPRELOAD;
-		loaderJob.m_pTargetData = m_async.pData;
-		loaderJob.m_nBytesToRead = m_async.nBytes;
-		loaderJob.m_nStartOffset = m_async.nOffset;
-		g_pQueuedLoader->AddJob( &loaderJob );
-		return;
-	}
 
 	MEM_ALLOC_CREDIT();
 	
