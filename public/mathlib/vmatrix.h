@@ -686,7 +686,9 @@ inline void VMatrix::PostTranslate(const Vector &vTrans)
 
 inline const matrix3x4_t& VMatrix::As3x4() const
 {
-	return *((const matrix3x4_t*)this);
+	static_assert(alignof(VMatrix) == alignof(matrix3x4_t));
+	static_assert(sizeof(VMatrix) >= sizeof(matrix3x4_t));
+	return *reinterpret_cast<const matrix3x4_t*>(this);
 }
 
 inline void VMatrix::CopyFrom3x4( const matrix3x4_t &m3x4 )
