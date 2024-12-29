@@ -120,6 +120,11 @@ struct ThreadPoolStartParams_t
 				iAffinityTable[i] = pAffinities[i];
 			}
 		}
+		else
+		{
+			// dimhotepus: Ensure all affinities are used if smb breaks pool affinities logic.
+			memset(iAffinityTable, 0xFF, sizeof(iAffinityTable));
+		}
 	}
 
 	int				nThreads;
