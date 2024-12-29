@@ -183,7 +183,7 @@ void CCommandLine::CreateCmdLine( int argc, char **argv )
 	cmdline[ 0 ] = 0;
 
 	char *dest = cmdline;
-	size_t size = sizeof( cmdline );
+	size_t size = std::size( cmdline );
 	const char *space = "";
 
 	for ( int i = 0; i < argc; ++i )
