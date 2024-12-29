@@ -222,7 +222,7 @@ template<size_t outSize>
 	bool ok = !!getcwd( out, outSize );
 	if (ok)
 	{
-		strcat( out, "/" );
+		V_strcat_safe( out, "/" );
 		Q_FixSlashes( out );
 	}
 	return ok;

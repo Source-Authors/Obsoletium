@@ -87,7 +87,7 @@ void CChunkHandlerMap::AddHandler(const char *pszChunkName, ChunkHandler_t pfnHa
 {
 	ChunkHandlerInfoNode_t *pNew = new ChunkHandlerInfoNode_t;
 
-	Q_strncpy(pNew->Handler.szChunkName, pszChunkName, sizeof( pNew->Handler.szChunkName ));
+	V_strcpy_safe(pNew->Handler.szChunkName, pszChunkName);
 	pNew->Handler.pfnHandler = pfnHandler;
 	pNew->Handler.pData = pData;
 	pNew->pNext = NULL;
@@ -201,7 +201,7 @@ ChunkFileResult_t CChunkFile::BeginChunk(const char *pszChunkName)
 	// Write the chunk name and open curly.
 	//
 	char szBuf[MAX_KEYVALUE_LEN];
-	Q_snprintf(szBuf, sizeof( szBuf ), "%s\r\n%s{", pszChunkName, m_szIndent);
+	V_sprintf_safe(szBuf, "%s\r\n%s{", pszChunkName, m_szIndent);
 	ChunkFileResult_t eResult = WriteLine(szBuf);
 
 	//
@@ -210,7 +210,7 @@ ChunkFileResult_t CChunkFile::BeginChunk(const char *pszChunkName)
 	if (eResult == ChunkFile_Ok)
 	{
 		m_nCurrentDepth++;
-		BuildIndentString(m_szIndent, m_nCurrentDepth);
+		BuildIndentString(m_szIndent, ssize(m_szIndent), m_nCurrentDepth);
 	}
 
 	return(eResult);
@@ -220,10 +220,13 @@ ChunkFileResult_t CChunkFile::BeginChunk(const char *pszChunkName)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CChunkFile::BuildIndentString(char *pszDest, int nDepth)
+void CChunkFile::BuildIndentString(char *pszDest, ptrdiff_t destLen, ptrdiff_t nDepth)
 {
 	if (nDepth >= 0)
 	{
+		// dimhotepus: Prevent overflow.
+		nDepth = min(destLen - 1, nDepth);
+
 		for (int i = 0; i < nDepth; i++)
 		{
 			pszDest[i] = '\t';
@@ -259,7 +262,7 @@ ChunkFileResult_t CChunkFile::EndChunk(void)
 	if (m_nCurrentDepth > 0)
 	{
 		m_nCurrentDepth--;
-		BuildIndentString(m_szIndent, m_nCurrentDepth);
+		BuildIndentString(m_szIndent, ssize(m_szIndent), m_nCurrentDepth);
 	}
 
 	WriteLine("}");

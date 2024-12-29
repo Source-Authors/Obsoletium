@@ -994,7 +994,7 @@ void CZipFile::AddBufferToZip( const char *relativename, void *data, int length,
 {
 	// Lower case only
 	char name[512];
-	Q_strcpy( name, relativename );
+	V_strcpy_safe( name, relativename );
 	Q_strlower( name );
 
 	int outLength = length;
