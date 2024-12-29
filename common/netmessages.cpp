@@ -1232,8 +1232,18 @@ const char *SVC_UpdateStringTable::ToString(void) const
 }
 
 SVC_CreateStringTable::SVC_CreateStringTable()
+    : m_pMessageHandler{nullptr},
+	m_szTableName{nullptr},
+	m_nMaxEntries{-1},
+	m_nNumEntries{-1},
+	m_bUserDataFixedSize{false},
+	m_nUserDataSize{-1},
+	m_nUserDataSizeBits{-1},
+	m_bIsFilenames{false},
+	m_nLength{-1},
+	m_bDataCompressed{false}
 {
-
+	m_szTableNameBuffer[0] = '\0';
 }
 
 bool SVC_CreateStringTable::WriteToBuffer( bf_write &buffer )
