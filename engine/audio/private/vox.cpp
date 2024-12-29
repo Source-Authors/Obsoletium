@@ -685,7 +685,7 @@ char * VOX_LookupNumber( char *pGroupName, int ipick )
 
 	char sznumbers[16] = "V_NUMBERS";
 	intp glen = Q_strlen(pGroupName);
-	intp slen = ssize("V_NUMBERS") - 1;
+	constexpr intp slen = ssize("V_NUMBERS") - 1;
 
 	// insert type character
 	sznumbers[slen] = pGroupName[glen-1];
@@ -1679,7 +1679,7 @@ void VOX_AddNumbers( char *pGroupName, CUtlVector< WordBuf >& list )
 	{
 		char sznumbers[16] = "V_NUMBERS";
 		intp glen = Q_strlen(pGroupName);
-		intp slen = ssize("V_NUMBERS") - 1;
+		constexpr intp slen = ssize("V_NUMBERS") - 1;
 
 		// insert type character
 		sznumbers[slen] = pGroupName[glen-1];
