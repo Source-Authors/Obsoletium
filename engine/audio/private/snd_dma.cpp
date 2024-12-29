@@ -3771,9 +3771,6 @@ void DAS_DisplayRoomDEBUG( das_room_t *proom, bool fnew, float preset )
 
 	if (preset >= 0.0)
 	{
-		if (proom == NULL)
-			return;
-
 		DevMsg( "DSP PRESET: %.0f size:(%.0f,%.0f) height:(%.0f) dif %.4f : refl %.4f : cobj: %.0f : sky %.0f \n", preset, dx, dy, dz, proom->diffusion, refl, count, fsky);
 		return;
 	}
