@@ -170,7 +170,8 @@ void _ExitOnFatalAssert( const tchar* pFile, int line )
 	if ( !Plat_IsInDebugSession() )
 	{
 		char rgchSuffix[512];
-		_snprintf( rgchSuffix, sizeof(rgchSuffix), "fatalassert_%s_%d", SkipToFname( pFile ), line );
+		_snprintf( rgchSuffix, std::size(rgchSuffix), "fatalassert_%s_%d", SkipToFname( pFile ), line );
+		rgchSuffix[ std::size(rgchSuffix) - 1 ] = '\0';
 		WriteMiniDump( rgchSuffix );
 	}
 
