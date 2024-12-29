@@ -12,12 +12,11 @@
 #pragma once
 #endif
 
-#include <stdio.h>
-#include "tokenreader.h"
+#include "tier1/tokenreader.h"
 
 
-#define MAX_INDENT_DEPTH		80
-#define MAX_KEYVALUE_LEN		1024
+constexpr inline int MAX_INDENT_DEPTH{80};
+constexpr inline int MAX_KEYVALUE_LEN{1024};
 
 
 class CChunkFile;
@@ -122,34 +121,34 @@ class CChunkFile
 		CChunkFile(void);
 		~CChunkFile(void);
 
-		ChunkFileResult_t Open(const char *pszFileName, ChunkFileOpenMode_t eMode);
-		ChunkFileResult_t Close(void);
-		const char *GetErrorText(ChunkFileResult_t eResult);
+		[[nodiscard]] ChunkFileResult_t Open(const char *pszFileName, ChunkFileOpenMode_t eMode);
+		[[nodiscard]] ChunkFileResult_t Close(void);
+		[[nodiscard]] const char *GetErrorText(ChunkFileResult_t eResult);
 
 		//
 		// Functions for writing chunk files.
 		//
-		ChunkFileResult_t BeginChunk(const char *pszChunkName);
-		ChunkFileResult_t EndChunk(void);
+		[[nodiscard]] ChunkFileResult_t BeginChunk(const char *pszChunkName);
+		[[nodiscard]] ChunkFileResult_t EndChunk(void);
 
-		ChunkFileResult_t WriteKeyValue(const char *pszKey, const char *pszValue);
-		ChunkFileResult_t WriteKeyValueBool(const char *pszKey, bool bValue);
-		ChunkFileResult_t WriteKeyValueColor(const char *pszKey, unsigned char r, unsigned char g, unsigned char b);
-		ChunkFileResult_t WriteKeyValueFloat(const char *pszKey, float fValue);
-		ChunkFileResult_t WriteKeyValueInt(const char *pszKey, int nValue);
-		ChunkFileResult_t WriteKeyValuePoint(const char *pszKey, const Vector &Point);
-		ChunkFileResult_t WriteKeyValueVector2(const char *pszKey, const Vector2D &vec);
-		ChunkFileResult_t WriteKeyValueVector3(const char *pszKey, const Vector &vec);
-		ChunkFileResult_t WriteKeyValueVector4( const char *pszKey, const Vector4D &vec);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValue(const char *pszKey, const char *pszValue);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValueBool(const char *pszKey, bool bValue);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValueColor(const char *pszKey, unsigned char r, unsigned char g, unsigned char b);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValueFloat(const char *pszKey, float fValue);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValueInt(const char *pszKey, int nValue);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValuePoint(const char *pszKey, const Vector &Point);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValueVector2(const char *pszKey, const Vector2D &vec);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValueVector3(const char *pszKey, const Vector &vec);
+		[[nodiscard]] ChunkFileResult_t WriteKeyValueVector4( const char *pszKey, const Vector4D &vec);
 
-		ChunkFileResult_t WriteLine(const char *pszLine);
+		[[nodiscard]] ChunkFileResult_t WriteLine(const char *pszLine);
 
 		//
 		// Functions for reading chunk files.
 		//
-		ChunkFileResult_t ReadChunk(KeyHandler_t pfnKeyHandler = NULL, void *pData = NULL);
-		ChunkFileResult_t ReadNext(char *szKey, char *szValue, int nValueSize, ChunkType_t &eChunkType);
-		ChunkFileResult_t HandleChunk(const char *szChunkName);
+		[[nodiscard]] ChunkFileResult_t ReadChunk(KeyHandler_t pfnKeyHandler = NULL, void *pData = NULL);
+		[[nodiscard]] ChunkFileResult_t ReadNext(char *szKey, char *szValue, int nValueSize, ChunkType_t &eChunkType);
+		[[nodiscard]] ChunkFileResult_t HandleChunk(const char *szChunkName);
 		void HandleError(const char *szChunkName, ChunkFileResult_t eError);
 
 		// These functions should more really be named Parsexxx and possibly moved elsewhere.
