@@ -100,9 +100,9 @@ class NET_SetConVar : public CNetMessage
 	NET_SetConVar() : m_pMessageHandler{nullptr} {}
 	NET_SetConVar(const char *name, const char *value) : NET_SetConVar{}
 	{
-		cvar_t localCvar;
-		Q_strncpy( localCvar.name, name, MAX_OSPATH );
-		Q_strncpy( localCvar.value, value, MAX_OSPATH );
+		cvar_t localCvar = {};
+		V_strcpy_safe( localCvar.name, name );
+		V_strcpy_safe( localCvar.value, value );
 		m_ConVars.AddToTail( localCvar );	
 	}
 
