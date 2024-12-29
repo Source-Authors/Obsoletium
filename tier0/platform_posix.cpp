@@ -138,7 +138,8 @@ static void InitTimeSystem( void )
 				if ( pEnv && ( ( pEnv[0] > '9' ) || ( pEnv[0] < '0' ) ) )
 					return;									// leave rdtsc disabled
 				// the variable holds the number of ticks per microsecond
-				s_flRDTSCToMicroSeconds = atof( pEnv );
+				// dimhotepus: atof -> strtof.
+				s_flRDTSCToMicroSeconds = strtof( pEnv, nullptr );
 				// sanity check
 				if ( s_flRDTSCToMicroSeconds > 1.0 )
 				{
