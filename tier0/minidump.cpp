@@ -626,11 +626,12 @@ void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 {
 	va_list marker;
 	char *pData = g_UserStreamInfo[ g_UserStreamInfoIndex ];
-	const int DataSize = ssize( g_UserStreamInfo[ g_UserStreamInfoIndex ] );
+	constexpr int DataSize = ARRAYSIZE( g_UserStreamInfo[ g_UserStreamInfoIndex ] );
 
 	// Add tick count just so we have a general idea of when this event happened.
-	_snprintf( pData, DataSize, "[%x]", Plat_MSTime() );
-	pData[ DataSize - 1 ] = 0;
+	// dimhotepus: Use float seconds as uint ms overflows.
+	_snprintf( pData, DataSize, "[%g]", Plat_FloatTime() );
+	pData[ DataSize - 1 ] = '\0';
 	size_t HeaderLen = strlen( pData );
 
 	va_start( marker, pFormat );
