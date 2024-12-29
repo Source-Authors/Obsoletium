@@ -6744,12 +6744,15 @@ CON_COMMAND( vx_soundlist, "Dump sounds to VXConsole" )
 }
 #endif
 
-extern unsigned g_snd_time_debug;
-extern unsigned g_snd_call_time_debug;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+extern double g_snd_time_debug;
+extern double g_snd_call_time_debug;
 extern unsigned g_snd_count_debug;
 extern unsigned g_snd_samplecount;
-extern unsigned g_snd_frametime;
-extern unsigned g_snd_frametime_total;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+extern double g_snd_frametime;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+extern double g_snd_frametime_total;
 extern int g_snd_profile_type;
 
 // start measuring sound perf, 100 reps
@@ -6764,7 +6767,7 @@ void DEBUG_StartSoundMeasure(int type, int samplecount )
 	if (samplecount)
 		g_snd_samplecount += samplecount;
 
-	g_snd_call_time_debug = Plat_MSTime();
+	g_snd_call_time_debug = Plat_FloatTime();
 }
 
 // show sound measurement after 25 reps - show as % of total frame
@@ -6783,33 +6786,33 @@ void DEBUG_StopSoundMeasure(int type, int samplecount )
 
 	// add total time since last frame
 
-	g_snd_frametime_total += Plat_MSTime() - g_snd_frametime;
+	g_snd_frametime_total += Plat_FloatTime() - g_snd_frametime;
 
 	// performance timing
 
-	g_snd_time_debug += Plat_MSTime() - g_snd_call_time_debug;
+	g_snd_time_debug += Plat_FloatTime() - g_snd_call_time_debug;
 
 	if (++g_snd_count_debug >= 100)
 	{
 		switch (g_snd_profile_type)
 		{
 		case 1: 
-			Msg("dsp: (%2.2f) millisec   ", ((float)g_snd_time_debug) / 100.0); 
-			Msg("(%2.2f) pct of frame \n", 100.0 * ((float)g_snd_time_debug) / ((float)g_snd_frametime_total)); 
+			Msg("dsp: (%2.2f) ms   ", g_snd_time_debug * 1000.0 / g_snd_count_debug); 
+			Msg("(%2.2f) pct of frame \n", 100.0 * (g_snd_time_debug / g_snd_frametime_total)); 
 			break;
 		case 2: 
-			Msg("mix+dsp:(%2.2f) millisec   ", ((float)g_snd_time_debug) / 100.0);
-			Msg("(%2.2f) pct of frame \n", 100.0 * ((float)g_snd_time_debug) / ((float)g_snd_frametime_total)); 
+			Msg("mix+dsp:(%2.2f) ms   ", g_snd_time_debug * 1000.0 / g_snd_count_debug);
+			Msg("(%2.2f) pct of frame \n", 100.0 * (g_snd_time_debug / g_snd_frametime_total)); 
 			break;
 		case 3: 
 			//if ( (((float)g_snd_time_debug) / 100.0) < 0.01 )
 			//	break;
-			Msg("snd load: (%2.2f) millisec   ", ((float)g_snd_time_debug) / 100.0); 
-			Msg("(%2.2f) pct of frame \n", 100.0 * ((float)g_snd_time_debug) / ((float)g_snd_frametime_total)); 
+			Msg("snd load: (%2.2f) ms   ", g_snd_time_debug * 1000.0 / g_snd_count_debug); 
+			Msg("(%2.2f) pct of frame \n", 100.0 * (g_snd_time_debug / g_snd_frametime_total)); 
 			break;
 		case 4: 
-			Msg("sound: (%2.2f) millisec   ", ((float)g_snd_time_debug) / 100.0); 
-			Msg("(%2.2f) pct of frame (%d samples) \n", 100.0 * ((float)g_snd_time_debug) / ((float)g_snd_frametime_total), g_snd_samplecount); 
+			Msg("sound: (%2.2f) ms   ", g_snd_time_debug * 1000.0 / g_snd_count_debug); 
+			Msg("(%2.2f) pct of frame (%d samples) \n", 100.0 * (g_snd_time_debug / g_snd_frametime_total), g_snd_samplecount); 
 			break;
 		}
 		
@@ -6819,7 +6822,7 @@ void DEBUG_StopSoundMeasure(int type, int samplecount )
 		g_snd_frametime_total = 0;
 	}
 
-	g_snd_frametime = Plat_MSTime();
+	g_snd_frametime = Plat_FloatTime();
 }
 
 // speak a sentence from console; works by passing in "!sentencename"

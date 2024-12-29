@@ -89,12 +89,16 @@ bool g_bDspOff;
 float g_dsp_volume;
 
 // dsp performance timing
-unsigned g_snd_call_time_debug = 0;
-unsigned g_snd_time_debug = 0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_call_time_debug = 0.0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_time_debug = 0.0;
 unsigned g_snd_count_debug = 0;
 unsigned g_snd_samplecount = 0;
-unsigned g_snd_frametime = 0;
-unsigned g_snd_frametime_total = 0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_frametime = 0.0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_frametime_total = 0.0;
 int	g_snd_profile_type = 0;		// type 1 dsp, type 2 mixer, type 3 load sound, type 4 all sound
 
 #define FILTERTYPE_NONE		0
