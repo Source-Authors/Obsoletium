@@ -677,7 +677,8 @@ bool CGameConfigManager::ConvertGameConfigsINI( void )
 			
 			// Default texture scale
 			GetPrivateProfileString( szSectionName, "DefaultTextureScale", "1", textBuffer, sizeof(textBuffer), iniFilePath );
-			float defaultTextureScale = (float) atof( textBuffer );
+			// dimhotepus: atof -> strtof.
+			float defaultTextureScale = strtof( textBuffer, nullptr );
 			if ( defaultTextureScale == 0 )
 			{
 				defaultTextureScale = 1.0f;
