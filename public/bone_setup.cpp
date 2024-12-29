@@ -3445,10 +3445,11 @@ void CIKContext::AddSequenceLocks( mstudioseqdesc_t &seqdesc, Vector pos[], Quat
 
 		MatrixAngles( boneToWorld[bone], ikrule.q, ikrule.pos );
 
+		mstudioiklink_t *link = pchain->pLink(0);
 		// save off current knee direction
-		if (pchain->pLink(0)->kneeDir.LengthSqr() > 0.0)
+		if (link->kneeDir.LengthSqr() > 0.0)
 		{
-			VectorRotate( pchain->pLink( 0 )->kneeDir, boneToWorld[ pchain->pLink( 0 )->bone ], ikrule.kneeDir );
+			VectorRotate( link->kneeDir, boneToWorld[ link->bone ], ikrule.kneeDir );
 		}
 		else
 		{
