@@ -56,10 +56,10 @@ static const char *SkipToFname( const tchar* pFile )
 //-----------------------------------------------------------------------------
 DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 {
-		_tprintf( _T("%s"), pMsg );
+	_tprintf( _T("%s"), pMsg );
 
 #ifdef _WIN32
-		Plat_DebugString( pMsg );
+	Plat_DebugString( pMsg );
 #endif
 
 	if ( type == SPEW_ASSERT )
@@ -96,22 +96,20 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFuncAbortOnAsserts( SpewType_t type, const
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
-static SpewOutputFunc_t   s_SpewOutputFunc = DefaultSpewFunc;
 
-static AssertFailedNotifyFunc_t	s_AssertFailedNotifyFunc = NULL;
+// dimhotepus: Make all this things thread-safe as may be used from different threads.
+static std::atomic<SpewOutputFunc_t>   s_SpewOutputFunc = DefaultSpewFunc;
+static std::atomic<AssertFailedNotifyFunc_t>	s_AssertFailedNotifyFunc = nullptr;
 
-static const tchar*	s_pFileName;
-static int			s_Line;
-static SpewType_t	s_SpewType;
+static thread_local const tchar*	s_pFileName;
+static thread_local int				s_Line;
+static thread_local SpewType_t		s_SpewType;
 
-static SpewGroup_t* s_pSpewGroups = 0;
-static size_t		s_GroupCount = 0;
-static int			s_DefaultLevel = 0;
-#if !defined( _X360 )
-static Color		s_DefaultOutputColor( 255, 255, 255, 255 );
-#else
-static Color		s_DefaultOutputColor( 0, 0, 0, 255 );
-#endif
+static CThreadMutex		s_SpewGroupsMutex;
+static SpewGroup_t*		s_pSpewGroups = nullptr;
+static size_t			s_GroupCount = 0;
+static std::atomic_int	s_DefaultLevel = 0;
+static const Color		s_DefaultOutputColor( 255, 255, 255, 255 );
 
 // Only useable from within a spew function
 struct SpewInfo_t
@@ -125,9 +123,9 @@ static thread_local SpewInfo_t *g_pSpewInfo;
 
 
 // Standard groups
-static const tchar* s_pDeveloper = _T("developer");
-static const tchar* s_pConsole = _T("console");
-static const tchar* s_pNetwork = _T("network");
+static const tchar s_pDeveloper[] = _T("developer");
+static const tchar s_pConsole[] = _T("console");
+static const tchar s_pNetwork[] = _T("network");
 
 enum StandardSpewGroup_t
 {
@@ -150,16 +148,15 @@ static const char *s_pGroupNames[GROUP_COUNT] = { s_pDeveloper, s_pConsole, s_pN
 //-----------------------------------------------------------------------------
 // Spew output management.
 //-----------------------------------------------------------------------------
-void SpewOutputFunc( SpewOutputFunc_t func )
+SpewOutputFunc_t SpewOutputFunc( SpewOutputFunc_t func )
 {
-	s_SpewOutputFunc = func ? func : DefaultSpewFunc;
+	return s_SpewOutputFunc.exchange( func ? func : DefaultSpewFunc, std::memory_order::memory_order_acq_rel );
 }
 
 SpewOutputFunc_t GetSpewOutputFunc( void )
 {
-	if( s_SpewOutputFunc )
-		return s_SpewOutputFunc;
-	return DefaultSpewFunc;
+	// dimhotepus: Should always be set now.
+	return s_SpewOutputFunc.load( std::memory_order::memory_order_relaxed );
 }
 
 void _ExitOnFatalAssert( const tchar* pFile, int line )
@@ -292,7 +289,7 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 	assert( g_pSpewInfo == nullptr );
 
 	g_pSpewInfo = &spewInfo;
-	SpewRetval_t ret = s_SpewOutputFunc( spewType, pTempBuffer );
+	SpewRetval_t ret = GetSpewOutputFunc()( spewType, pTempBuffer );
 	g_pSpewInfo = nullptr;
 
 	switch (ret)
@@ -331,7 +328,7 @@ FORCEINLINE SpewRetval_t _SpewMessage( SpewType_t spewType, const tchar* pMsgFor
 // index of the found group, or the index of the group right before where the
 // group should be inserted into the list to maintain sorted order.
 //-----------------------------------------------------------------------------
-bool FindSpewGroup( const tchar* pGroupName, size_t* pInd )
+static bool FindSpewGroup( const tchar* pGroupName, size_t* pInd )
 {
 	size_t s = 0;
 	if (s_GroupCount)
@@ -374,26 +371,30 @@ bool HushAsserts()
 //-----------------------------------------------------------------------------
 bool IsSpewActive( const tchar* pGroupName, int level )
 {
+	AUTO_LOCK(s_SpewGroupsMutex);
+
 	// If we don't find the spew group, use the default level.
 	size_t ind;
 	if ( FindSpewGroup( pGroupName, &ind ) )
 		return s_pSpewGroups[ind].m_Level >= level;
 	else
-		return s_DefaultLevel >= level;
+		return s_DefaultLevel.load(std::memory_order::memory_order_relaxed) >= level;
 }
 
 inline bool IsSpewActive( StandardSpewGroup_t group, int level )
 {
-	if ( static_cast<unsigned>(group) >= std::size(s_pGroupIndices) )
+	if ( static_cast<size_t>(group) >= std::size(s_pGroupIndices) )
 	{
-		AssertMsg( static_cast<unsigned>(group) >= sizeof(s_pGroupIndices), "Group index is out of range." );
+		AssertMsg( static_cast<size_t>(group) >= sizeof(s_pGroupIndices), "Group index is out of range." );
 		return false;
 	}
+
+	AUTO_LOCK(s_SpewGroupsMutex);
 
 	// If we don't find the spew group, use the default level.
 	if ( s_pGroupIndices[group] != std::numeric_limits<size_t>::max() )
 		return s_pSpewGroups[ s_pGroupIndices[group] ].m_Level >= level;
-	return s_DefaultLevel >= level;
+	return s_DefaultLevel.load(std::memory_order::memory_order_relaxed) >= level;
 }
 
 SpewRetval_t  _SpewMessage( PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... ) FMTFUNCTION( 1, 2 )
@@ -782,10 +783,12 @@ void SpewActivate( const tchar* pGroupName, int level )
 	// check for the default group first...
 	if ((pGroupName[0] == '*') && (pGroupName[1] == '\0'))
 	{
-		s_DefaultLevel = level;
+		s_DefaultLevel.store(level, std::memory_order::memory_order_relaxed);
 		return;
 	}
-	
+
+	AUTO_LOCK(s_SpewGroupsMutex);
+
 	// Normal case, search in group list using binary search.
 	// If not found, grow the list of groups and insert it into the
 	// right place to maintain sorted order. Then set the level.
@@ -836,6 +839,8 @@ void SpewActivate( const tchar* pGroupName, int level )
 
 void SpewDeactivate()
 {
+	AUTO_LOCK(s_SpewGroupsMutex);
+
 	// dimhotepus: Ensure counter is 0 to be able to reinit.
 	s_GroupCount = 0;
 
@@ -883,7 +888,11 @@ void ValidateSpew( CValidator &validator )
 {
 	validator.Push( _T("Spew globals"), NULL, _T("Global") );
 
-	validator.ClaimMemory( s_pSpewGroups );
+	{
+		AUTO_LOCK(s_SpewGroupsMutex);
+
+		validator.ClaimMemory( s_pSpewGroups );
+	}
 
 	validator.Pop( );
 }
@@ -963,9 +972,9 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 //-----------------------------------------------------------------------------
 // Sets an assert failed notify handler
 //-----------------------------------------------------------------------------
-void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func )
+AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func )
 {
-	s_AssertFailedNotifyFunc = func;
+	return s_AssertFailedNotifyFunc.exchange( func, std::memory_order::memory_order_relaxed );
 }
 
 
@@ -974,8 +983,8 @@ void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func )
 //-----------------------------------------------------------------------------
 void CallAssertFailedNotifyFunc( const char *pchFile, int nLine, const char *pchMessage )
 {
-	if ( s_AssertFailedNotifyFunc )
-		s_AssertFailedNotifyFunc( pchFile, nLine, pchMessage );
+	const auto assertFn = s_AssertFailedNotifyFunc.load( std::memory_order_relaxed );
+	if (assertFn) assertFn( pchFile, nLine, pchMessage );
 }
 
 
