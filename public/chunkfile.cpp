@@ -972,8 +972,8 @@ ChunkFileResult_t CChunkFile::WriteLine(const char *pszLine)
 		//
 		// Write the string.
 		//
-		int nLen = strlen(pszLine);
-		int nWritten = fwrite(pszLine, 1, nLen, m_hFile);
+		size_t nLen = strlen(pszLine);
+		size_t nWritten = fwrite(pszLine, 1, nLen, m_hFile);
 		if (nWritten != nLen)
 		{
 			return(ChunkFile_Fail);
