@@ -343,6 +343,8 @@ CSfxTable::CSfxTable()
 	m_bIsLateLoad = false;
 	m_bMixGroupsCached = false;
 	m_pDebugName = NULL;
+	m_mixGroupCount = 0;
+	memset(m_mixGroupList, 0, sizeof(m_mixGroupList));
 }
 
 
