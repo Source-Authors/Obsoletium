@@ -3231,6 +3231,9 @@ CIKContext::CIKContext()
 	m_iFramecounter = -1;
 	m_pStudioHdr = NULL;
 	m_flTime = -1.0f;
+	m_boneMask = 0;
+	// dimhotepus: Fill with NaNs to catch not initialized usage.
+	m_rootxform.Invalidate();
 	m_target.SetSize( 0 );
 }
 
