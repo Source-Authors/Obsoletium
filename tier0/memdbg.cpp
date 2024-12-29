@@ -137,7 +137,8 @@ int WalkStack( void **ppAddresses, int nMaxAddresses, int nSkip = 0 )
 	return nWalked;
 }
 
-bool GetModuleFromAddress( void *address, char *pResult )
+template<size_t size>
+bool GetModuleFromAddress( void *address, char (&pResult)[size] )
 {
 	IMAGEHLP_MODULE   moduleInfo;
 
@@ -145,14 +146,16 @@ bool GetModuleFromAddress( void *address, char *pResult )
 
 	if ( SymGetModuleInfo( GetCurrentProcess(), (DWORD)address, &moduleInfo ) )
 	{
-		strcpy( pResult, moduleInfo.ModuleName );
+		strncpy( pResult, moduleInfo.ModuleName, std::size(pResult) - 1 );
+		pResult[ std::size(pResult) - 1 ] = '\0';
 		return true;
 	}
 
 	return false;
 }
 
-bool GetCallerModule( char *pDest )
+template<size_t size>
+bool GetCallerModule( char (&pDest)[size] )
 {
 	static bool bInit;
 	if ( !bInit )
@@ -552,11 +555,11 @@ public:
 #if defined( _MEMTEST )
 	void SetStatsExtraInfo( const char *pMapName, const char *pComment )
 	{
-		strncpy( s_szStatsMapName, pMapName, sizeof( s_szStatsMapName ) );
-		s_szStatsMapName[sizeof( s_szStatsMapName ) - 1] = '\0';
+		strncpy( s_szStatsMapName, pMapName, std::size( s_szStatsMapName ) );
+		s_szStatsMapName[std::size( s_szStatsMapName ) - 1] = '\0';
 
-		strncpy( s_szStatsComment, pComment, sizeof( s_szStatsComment ) );
-		s_szStatsComment[sizeof( s_szStatsComment ) - 1] = '\0';
+		strncpy( s_szStatsComment, pComment, std::size( s_szStatsComment ) );
+		s_szStatsComment[std::size( s_szStatsComment ) - 1] = '\0';
 	}
 #endif
 
@@ -1483,30 +1486,8 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	static int s_FileCount = 0;
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
-		const char *pPath = "";
-		if ( IsX360() )
-		{
-			pPath = "D:\\";
-		}
-
-#if defined( _MEMTEST ) && defined( _X360 )
-		char szXboxName[32];
-		strcpy( szXboxName, "xbox" );
-		DWORD numChars = sizeof( szXboxName );
-		DmGetXboxName( szXboxName, &numChars ); 
-		char *pXboxName = strstr( szXboxName, "_360" );
-		if ( pXboxName )
-		{
-			*pXboxName = '\0';
-		}
-
-		SYSTEMTIME systemTime;
-		GetLocalTime( &systemTime );
-		_snprintf( szFileName, sizeof( szFileName ), "%s%s_%2.2d%2.2d_%2.2d%2.2d%2.2d_%d.txt", pPath, s_szStatsMapName, systemTime.wMonth, systemTime.wDay, systemTime.wHour, systemTime.wMinute, systemTime.wSecond, s_FileCount );
-#else
-		_snprintf( szFileName, sizeof( szFileName ), "%s%s%d.txt", pPath, pchFileBase, s_FileCount );
-#endif
-		szFileName[ std::size(szFileName) - 1 ] = 0;
+		_snprintf( szFileName, std::size( szFileName ), "%s%d.txt", pchFileBase, s_FileCount );
+		szFileName[ std::size(szFileName) - 1 ] = '\0';
 
 		++s_FileCount;
 

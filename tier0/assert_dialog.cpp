@@ -540,8 +540,8 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 			{ 0,										IDC_IGNORE_ALL,		"Ignore All Asserts"	},
 		};
 
-		_snprintf( text, sizeof( text ), "File: %s\nLine: %i\nExpr: %s\n", pFilename, line, pExpression );
-		text[ sizeof( text ) - 1 ] = 0;
+		_snprintf( text, std::size( text ), "File: %s\nLine: %i\nExpr: %s\n", pFilename, line, pExpression );
+		text[ std::size( text ) - 1 ] = '\0';
 
 		messageboxdata.window = g_SDLWindow;
 		messageboxdata.title = "Assertion Failed";

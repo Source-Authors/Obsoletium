@@ -468,6 +468,7 @@ public:
 		if( m_pSymFromAddr( m_hProcess, (DWORD64)pAddress, &dwDisplacement, (PSYMBOL_INFO)genericbuffer) )
 		{
 			strncpy( pSymbolNameOut, ((PSYMBOL_INFO)genericbuffer)->Name, iMaxSymbolNameLength );
+			pSymbolNameOut[iMaxSymbolNameLength - 1] = 0;
 			if( pDisplacementOut != NULL )
 				*pDisplacementOut = dwDisplacement;
 			return true;
@@ -494,6 +495,7 @@ public:
 		if( m_pSymGetLineFromAddr64( m_hProcess, (DWORD64)pAddress, &dwDisplacement, &imageHelpLine64 ) )
 		{
 			strncpy( pFileNameOut, imageHelpLine64.FileName, iMaxFileNameLength );
+			pFileNameOut[iMaxFileNameLength - 1] = 0;
 			iLineNumberOut = imageHelpLine64.LineNumber;
 			
 			if( pDisplacementOut != NULL )
@@ -515,6 +517,7 @@ public:
 		if ( m_pSymGetModuleInfo64( m_hProcess, (DWORD64)pAddress, &moduleInfo ) )
 		{
 			strncpy( pModuleNameOut, moduleInfo.ModuleName, iMaxModuleNameLength );
+			pModuleNameOut[iMaxModuleNameLength - 1] = 0;
 			return true;
 		}
 
@@ -543,7 +546,10 @@ public:
 		if( style & TSISTYLEFLAG_MODULENAME )
 		{
 			if( !this->GetModuleNameFromAddress( pAddress, pWrite, iTranslationBufferLength ) )
+			{
 				strncpy( pWrite, "unknown_module", iTranslationBufferLength );
+				pWrite[iTranslationBufferLength - 1] = 0;
+			}
 
 			iLength = (intp)strlen( pWrite );
 			pWrite += iLength;

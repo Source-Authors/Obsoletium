@@ -512,8 +512,8 @@ void Plat_DebugString( const char * psz )
 static char g_CmdLine[ 2048 ];
 PLATFORM_INTERFACE void Plat_SetCommandLine( const char *cmdLine )
 {
-	strncpy( g_CmdLine, cmdLine, sizeof(g_CmdLine) );
-	g_CmdLine[ sizeof(g_CmdLine) -1 ] = 0;
+	strncpy( g_CmdLine, cmdLine, std::size(g_CmdLine) );
+	g_CmdLine[ std::size(g_CmdLine) -1 ] = '\0';
 }
 
 PLATFORM_INTERFACE const tchar *Plat_GetCommandLine()

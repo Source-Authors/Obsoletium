@@ -392,7 +392,7 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 		if ( GetModuleFileNameA( exeHandle, appName, std::size( appName ) ) )
 		{
 			// Guarantee null-termination -- not guaranteed on Windows XP!
-			appName[ std::size( appName ) - 1 ] = 0;
+			appName[ std::size( appName ) - 1 ] = '\0';
 			// Find the file part of the name.
 			const char* pFilePart = strrchr( appName, '\\' );
 			if ( pFilePart )
@@ -410,7 +410,7 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 				_snprintf( regPathName, std::size( regPathName ),
 							"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%s",
 							pFilePart );
-				regPathName[ std::size( regPathName ) - 1 ] = 0;
+				regPathName[ std::size( regPathName ) - 1 ] = '\0';
 
 				HKEY key;
 				LONG regResult = RegOpenKeyA( HKEY_LOCAL_MACHINE,
@@ -510,8 +510,8 @@ public:
 		if ( pStr )
 		{
 			char tempStr[512];
-			strncpy( tempStr, pStr, sizeof( tempStr ) - 1 );
-			tempStr[ sizeof( tempStr ) - 1 ] = 0;
+			strncpy( tempStr, pStr, std::size( tempStr ) );
+			tempStr[ std::size( tempStr ) - 1 ] = '\0';
 			_strupr( tempStr );
 
 			CheckWindowsAllocSettings( tempStr );
@@ -1686,8 +1686,8 @@ void CStdMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 {
 #ifdef _WIN32
 	char filename[ 512 ];
-	_snprintf( filename, sizeof( filename ) - 1, ( IsX360() ) ? "D:\\%s.txt" : "%s.txt", pchFileBase );
-	filename[ sizeof( filename ) - 1 ] = 0;
+	_snprintf( filename, std::size( filename ) - 1, "%s.txt", pchFileBase );
+	filename[ std::size( filename ) - 1 ] = '\0';
 	FILE *pFile = fopen( filename, "wt" );
 #ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
 	fprintf( pFile, "X360 Large Page SBH:\n" );

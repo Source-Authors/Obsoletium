@@ -118,8 +118,8 @@ void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 		if ( pStr )
 		{
 			char tempStr[512];
-			strncpy( tempStr, pStr, sizeof( tempStr ) - 1 );
-			tempStr[ sizeof( tempStr ) - 1 ] = 0;
+			strncpy( tempStr, pStr, std::size( tempStr ) );
+			tempStr[ std::size( tempStr ) - 1 ] = '\0';
 			_strupr( tempStr );
 			
 			if ( strstr( tempStr, "-RANDOMIZEMEMORY" ) )

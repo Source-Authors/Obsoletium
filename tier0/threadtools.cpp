@@ -1661,11 +1661,11 @@ const char *CThread::GetName()
 	if ( !m_szName[0] )
 	{
 #ifdef _WIN32
-		_snprintf( m_szName, sizeof(m_szName) - 1, "Thread(%p/%p)", this, m_hThread );
+		_snprintf( m_szName, std::size(m_szName) - 1, "Thread(%p/%p)", this, m_hThread );
 #elif defined(POSIX)
-		_snprintf( m_szName, sizeof(m_szName) - 1, "Thread(%p/0x%x)", this, (uint)m_threadId );
+		_snprintf( m_szName, std::size(m_szName) - 1, "Thread(%p/0x%x)", this, (uint)m_threadId );
 #endif
-		m_szName[sizeof(m_szName) - 1] = 0;
+		m_szName[std::size(m_szName) - 1] = '\0';
 	}
 	return m_szName;
 }
@@ -1675,8 +1675,8 @@ const char *CThread::GetName()
 void CThread::SetName(const char *pszName)
 {
 	AUTO_LOCK( m_Lock );
-	strncpy( m_szName, pszName, sizeof(m_szName) - 1 );
-	m_szName[sizeof(m_szName) - 1] = 0;
+	strncpy( m_szName, pszName, std::size(m_szName) );
+	m_szName[std::size(m_szName) - 1] = '\0';
 }
 
 //---------------------------------------------------------

@@ -1024,7 +1024,7 @@ void TelemetryThreadSetDebugName( ThreadId_t id, const char *pszName )
 
 	pThreadNameInfo->ThreadID = id;
 	strncpy( pThreadNameInfo->szName, pszName, std::size( pThreadNameInfo->szName ) );
-	pThreadNameInfo->szName[ std::size( pThreadNameInfo->szName ) - 1 ] = 0;
+	pThreadNameInfo->szName[ std::size( pThreadNameInfo->szName ) - 1 ] = '\0';
 	g_ThreadNamesList.Push( pThreadNameInfo );
 
 	g_bThreadNameArrayChanged = true;
@@ -1133,7 +1133,7 @@ static bool TelemetryInitialize()
 
 	char szBuildInfo[ 2048 ];
 	_snprintf( szBuildInfo, std::size( szBuildInfo ), "%s: %s", __DATE__ __TIME__, Plat_GetCommandLineA() );
-	szBuildInfo[ std::size( szBuildInfo ) - 1 ] = 0;
+	szBuildInfo[ std::size( szBuildInfo ) - 1 ] = '\0';
 
 	TmU32 TmOpenFlags = TMOF_DEFAULT | TMOF_MINIMAL_CONTEXT_SWITCHES;
 	/* TmOpenFlags |= TMOF_DISABLE_CONTEXT_SWITCHES | TMOF_INIT_NETWORKING*/

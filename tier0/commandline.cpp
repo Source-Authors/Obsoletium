@@ -194,7 +194,7 @@ void CCommandLine::CreateCmdLine( int argc, char **argv )
 		if ( size )
 		{
 			_snprintf( dest, size, "%s\"%s\"", space, argv[ i ] );
-			dest[ size - 1 ] = 0;
+			dest[ size - 1 ] = '\0';
 		}
 
 		size_t len = strlen( dest );

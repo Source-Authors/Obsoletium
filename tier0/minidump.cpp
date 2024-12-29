@@ -261,9 +261,10 @@ void MinidumpSetUnhandledExceptionFunction( FnMiniDump pfn )
 void SetMinidumpFilenamePrefix( const char *pszPrefix )
 {
 	#ifdef TCHAR_IS_WCHAR
-		mbstowcs( g_rgchMinidumpFilenamePrefix, pszPrefix, sizeof(g_rgchMinidumpFilenamePrefix) / sizeof(g_rgchMinidumpFilenamePrefix[0]) - 1 );
+		mbstowcs( g_rgchMinidumpFilenamePrefix, pszPrefix, ssize(g_rgchMinidumpFilenamePrefix) );
 	#else
-		strncpy( g_rgchMinidumpFilenamePrefix, pszPrefix, sizeof(g_rgchMinidumpFilenamePrefix) / sizeof(g_rgchMinidumpFilenamePrefix[0]) - 1 );
+		strncpy( g_rgchMinidumpFilenamePrefix, pszPrefix, std::size(g_rgchMinidumpFilenamePrefix) );
+		g_rgchMinidumpFilenamePrefix[std::size(g_rgchMinidumpFilenamePrefix) - 1] = '\0';
 	#endif
 }
 
@@ -274,7 +275,8 @@ void SetMinidumpComment( const char *pszComment )
 {
 	if ( pszComment == nullptr )
 		pszComment = "";
-	strncpy( g_rgchMinidumpComment, pszComment, sizeof(g_rgchMinidumpComment) - 1 );
+	strncpy( g_rgchMinidumpComment, pszComment, std::size(g_rgchMinidumpComment) );
+	g_rgchMinidumpComment[std::size(g_rgchMinidumpComment) - 1] = '\0';
 }
 
 //-----------------------------------------------------------------------------
