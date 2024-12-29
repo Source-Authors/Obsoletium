@@ -32,15 +32,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <fcntl.h>
-#ifdef _WIN32
-#include <io.h>
-#endif
-#include <math.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "chunkfile.h"
 #include "mathlib/vector.h"
 #include "mathlib/vector4d.h"
