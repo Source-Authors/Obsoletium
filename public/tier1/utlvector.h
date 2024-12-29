@@ -1237,10 +1237,13 @@ inline intp CUtlVector<T, A>::InsertMultipleBefore( intp elem, intp num, const T
 template< typename T, class A >
 intp CUtlVector<T, A>::Find( const T& src ) const
 {
-	for ( intp i = 0; i < Count(); ++i )
+	intp i = 0;
+	for ( const auto &e : *this )
 	{
-		if (Element(i) == src)
+		if (e == src)
 			return i;
+
+		++i;
 	}
 	return -1;
 }
@@ -1269,9 +1272,9 @@ intp CUtlVector<T, A>::FindPredicate( F &&predicate ) const
 template< typename T, class A >
 void CUtlVector<T, A>::FillWithValue( const T& src )
 {
-	for ( intp i = 0; i < Count(); i++ )
+	for ( auto &e : *this )
 	{
-		Element(i) = src;
+		e = src;
 	}
 }
 
@@ -1401,9 +1404,9 @@ inline void CUtlVector<T, A>::Purge()
 template< typename T, class A >
 inline void CUtlVector<T, A>::PurgeAndDeleteElements()
 {
-	for( intp i=0; i < m_Size; i++ )
+	for( auto &e : *this )
 	{
-		delete Element(i);
+		delete e;
 	}
 	Purge();
 }
@@ -1412,9 +1415,9 @@ inline void CUtlVector<T, A>::PurgeAndDeleteElements()
 template< typename T, class A >
 inline void CUtlVector<T, A>::PurgeAndDeleteElementsArray()
 {
-	for( intp i=0; i < m_Size; i++ )
+	for( auto &e : *this )
 	{
-		delete[] Element(i);
+		delete[] e;
 	}
 	Purge();
 }
