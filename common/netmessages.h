@@ -7,22 +7,23 @@
 #ifndef NETMESSAGES_H
 #define NETMESSAGES_H
 
-#include <inetmessage.h>
-#include <checksum_crc.h>
-#include <checksum_md5.h>
-#include <const.h>
-#include <utlvector.h>
-#include "qlimits.h"
+#include "tier1/checksum_crc.h"
+#include "tier1/checksum_md5.h"
+#include "tier1/utlvector.h"
+#include "tier1/bitbuf.h"
 #include "mathlib/vector.h"
-#include <soundflags.h>
-#include <bitbuf.h>
-#include <inetchannel.h>
+
+#include "inetmessage.h"
+#include "const.h"
+#include "qlimits.h"
+#include "soundflags.h"
+#include "inetchannel.h"
 #include "protocol.h"
-#include <inetmsghandler.h>
-#include <igameevents.h>
-#include <bitvec.h>
-#include <engine/iserverplugin.h>
-#include <Color.h>
+#include "inetmsghandler.h"
+#include "igameevents.h"
+#include "bitvec.h"
+#include "engine/iserverplugin.h"
+#include "Color.h"
 #include "proto_version.h"
 
 #if !defined( _X360 )
