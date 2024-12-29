@@ -3015,13 +3015,13 @@ bool Studio_IKAnimationError( const CStudioHdr *pStudioHdr, mstudioikrule_t *pRu
 	// This shouldn't be necessary, but the Assert should help us catch whoever is screwing this up
 	flWeight = clamp( flWeight, 0.0f, 1.0f );
 
-	if (pRule->type != IK_GROUND && flWeight < 0.0001)
+	if (pRule->type != IK_GROUND && flWeight < 0.0001f)
 		return false;
 
 	mstudioikerror_t *pError = pRule->pError( iFrame );
 	if (pError != NULL)
 	{
-		if (fraq < 0.001)
+		if (fraq < 0.001f)
 		{
 			q = pError[0].q;
 			pos = pError[0].pos;
