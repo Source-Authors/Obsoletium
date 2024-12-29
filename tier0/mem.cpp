@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "tier0/mem.h"
 #include "tier0/dbg.h"
+#include "tier0/threadtools.h"
 #include "tier0/minidump.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -16,25 +17,21 @@
 #define PvExpand _expand
 #endif
 
-enum 
-{
-	MAX_STACK_DEPTH = 32
-};
-
+// dimhotepus: Memory allocation should be multithreaded.
+static CThreadMutex s_allocMutex;
 static uint8 *s_pBuf = NULL;
-static int s_pBufStackDepth[MAX_STACK_DEPTH];
+static size_t s_pBufStackDepth[32];
 static int s_nBufDepth = -1;
-static int s_nBufCurSize = 0;
-static int s_nBufAllocSize = 0;
-static bool s_oomerror_called = false;
+static size_t s_nBufCurSize = 0;
+static size_t s_nBufAllocSize = 0;
+static std::atomic_bool s_oomerror_called = false;
 
 void MemAllocOOMError( size_t nSize )
 {
-	if ( !s_oomerror_called )
+	bool expected = false;
+	if ( !s_oomerror_called.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed) )
 	{
-		s_oomerror_called = true;
-
-		MinidumpUserStreamInfoAppend( "MemAllocOOMError: %u bytes\n", (uint)nSize );
+		MinidumpUserStreamInfoAppend( "MemAllocOOMError: %zu bytes\n", nSize );
 
 		//$ TODO: Need a good error message here.
 		// A basic advice to try lowering texture settings is just most-likely to help users who are exhausting address
@@ -46,12 +43,16 @@ void MemAllocOOMError( size_t nSize )
 //-----------------------------------------------------------------------------
 // Other DLL-exported methods for particular kinds of memory
 //-----------------------------------------------------------------------------
-void *MemAllocScratch( int nMemSize )
+void *MemAllocScratch( size_t nMemSize )
 {	
+	// dimhotepus: Make thread-safe.
+	AUTO_LOCK(s_allocMutex);
+
+	const size_t newAllocSize = s_nBufCurSize + nMemSize;
 	// Minimally allocate 1M scratch
-	if (s_nBufAllocSize < s_nBufCurSize + nMemSize)
+	if (s_nBufAllocSize < newAllocSize)
 	{
-		s_nBufAllocSize = s_nBufCurSize + nMemSize;
+		s_nBufAllocSize = newAllocSize;
 		if (s_nBufAllocSize < 1024 * 1024)
 		{
 			s_nBufAllocSize = 1024 * 1024;
@@ -60,7 +61,7 @@ void *MemAllocScratch( int nMemSize )
 		if (s_pBuf)
 		{
 			s_pBuf = (uint8*)PvRealloc( s_pBuf, s_nBufAllocSize );
-			Assert( s_pBuf );	
+			Assert( s_pBuf );
 		}
 		else
 		{
@@ -68,10 +69,13 @@ void *MemAllocScratch( int nMemSize )
 		}
 	}
 
-	int nBase = s_nBufCurSize;
-	s_nBufCurSize += nMemSize;
+	size_t nBase = std::exchange(s_nBufCurSize, s_nBufCurSize + nMemSize);
+
 	++s_nBufDepth;
-	Assert( s_nBufDepth < MAX_STACK_DEPTH );
+	Assert( s_nBufDepth < ssize(s_pBufStackDepth) );
+	if ( s_nBufDepth >= ssize(s_pBufStackDepth) )
+		Error("Stack overflow during scratch memory allocation. Only %zd allocations allowed.", ssize(s_pBufStackDepth));
+
 	s_pBufStackDepth[s_nBufDepth] = nMemSize;
 
 	return &s_pBuf[nBase];
@@ -79,7 +83,13 @@ void *MemAllocScratch( int nMemSize )
 
 void MemFreeScratch()
 {
+	// dimhotepus: Make thread-safe.
+	AUTO_LOCK(s_allocMutex);
+
 	Assert( s_nBufDepth >= 0 );
+	if ( s_nBufDepth < 0 )
+		Error("Stack underflow during scratch memory free. Free called when no memory allocated.");
+
 	s_nBufCurSize -= s_pBufStackDepth[s_nBufDepth];
 	--s_nBufDepth;
 }
