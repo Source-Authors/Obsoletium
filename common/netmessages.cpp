@@ -988,7 +988,7 @@ bool SVC_VoiceInit::ReadFromBuffer( bf_read &buffer )
 
 const char *SVC_VoiceInit::ToString(void) const
 {
-	Q_snprintf( s_text, sizeof(s_text), "%s: codec \"%s\", sample rate %i", GetName(), m_szVoiceCodec, m_nSampleRate );
+	V_sprintf_safe( s_text, "%s: codec \"%s\", sample rate %i", GetName(), m_szVoiceCodec, m_nSampleRate );
 	return s_text;
 }
 
@@ -1226,7 +1226,7 @@ bool SVC_UpdateStringTable::ReadFromBuffer( bf_read &buffer )
 
 const char *SVC_UpdateStringTable::ToString(void) const
 {
-	Q_snprintf(s_text, sizeof(s_text), "%s: table %i, changed %i, bytes %i", GetName(), m_nTableID, m_nChangedEntries, Bits2Bytes(m_nLength) );
+	V_sprintf_safe(s_text, "%s: table %i, changed %i, bytes %i", GetName(), m_nTableID, m_nChangedEntries, Bits2Bytes(m_nLength) );
 	return s_text;
 }
 
