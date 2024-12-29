@@ -619,7 +619,8 @@ const char * Base_CmdKeyValues::ToString(void) const
 	return s_text;
 }
 
-CLC_CmdKeyValues::CLC_CmdKeyValues( KeyValues *pKeyValues /* = NULL */ ) : Base_CmdKeyValues( pKeyValues )
+CLC_CmdKeyValues::CLC_CmdKeyValues( KeyValues *pKeyValues /* = NULL */ )
+	: Base_CmdKeyValues( pKeyValues ), m_pMessageHandler{nullptr}
 {
 }
 
@@ -638,7 +639,8 @@ const char *CLC_CmdKeyValues::ToString(void) const
 	return Base_CmdKeyValues::ToString();
 }
 
-SVC_CmdKeyValues::SVC_CmdKeyValues( KeyValues *pKeyValues /* = NULL */ ) : Base_CmdKeyValues( pKeyValues )
+SVC_CmdKeyValues::SVC_CmdKeyValues( KeyValues *pKeyValues /* = NULL */ )
+	: Base_CmdKeyValues( pKeyValues ), m_pMessageHandler{nullptr}
 {
 }
 
