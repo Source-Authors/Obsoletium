@@ -170,8 +170,9 @@ enum SpewRetval_t
 typedef SpewRetval_t (*SpewOutputFunc_t)( SpewType_t spewType, const tchar *pMsg );
 
 /* Used to redirect spew output */
-// dimhotepus: Added return of old spew output function.
-DBG_INTERFACE SpewOutputFunc_t SpewOutputFunc(SpewOutputFunc_t func);
+DBG_INTERFACE void SpewOutputFunc(SpewOutputFunc_t func);
+// dimhotepus: Add ^ which returns old spew.
+DBG_INTERFACE SpewOutputFunc_t SpewOutputFunc2(SpewOutputFunc_t func);
 
 /* Used to get the current spew output function */
 DBG_INTERFACE SpewOutputFunc_t GetSpewOutputFunc( void );
@@ -212,8 +213,9 @@ DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsEnabled );
 
 // Provides a callback that is called on asserts regardless of spew levels
 typedef void (*AssertFailedNotifyFunc_t)( const char *pchFile, int nLine, const char *pchMessage );
-// dimhotepus: Return old assert failed notify function.
-DBG_INTERFACE AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func );
+DBG_INTERFACE void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func );
+// dimhotepus: Add ^ which returns old assert failed notify.
+DBG_INTERFACE AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc2( AssertFailedNotifyFunc_t func );
 DBG_INTERFACE void CallAssertFailedNotifyFunc( const char *pchFile, int nLine, const char *pchMessage );
 
 /* True if -hushasserts was passed on command line. */

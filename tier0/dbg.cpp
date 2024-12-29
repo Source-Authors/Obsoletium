@@ -148,7 +148,13 @@ static const char *s_pGroupNames[GROUP_COUNT] = { s_pDeveloper, s_pConsole, s_pN
 //-----------------------------------------------------------------------------
 // Spew output management.
 //-----------------------------------------------------------------------------
-SpewOutputFunc_t SpewOutputFunc( SpewOutputFunc_t func )
+void SpewOutputFunc( SpewOutputFunc_t func )
+{
+	SpewOutputFunc2( func );
+}
+
+// dimhotepus: Add ^ which returns old spew.
+SpewOutputFunc_t SpewOutputFunc2( SpewOutputFunc_t func )
 {
 	return s_SpewOutputFunc.exchange( func ? func : DefaultSpewFunc, std::memory_order::memory_order_acq_rel );
 }
@@ -972,7 +978,15 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 //-----------------------------------------------------------------------------
 // Sets an assert failed notify handler
 //-----------------------------------------------------------------------------
-AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func )
+void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func )
+{
+	SetAssertFailedNotifyFunc2( func );
+}
+
+//-----------------------------------------------------------------------------
+// Sets an assert failed notify handler
+//-----------------------------------------------------------------------------
+AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc2( AssertFailedNotifyFunc_t func )
 {
 	return s_AssertFailedNotifyFunc.exchange( func, std::memory_order::memory_order_relaxed );
 }
