@@ -29,13 +29,8 @@
 */
 
 #if !defined(_MINIMUM_BUILD_)
-#include <stdio.h>  // Needed for file access
-#if defined( _PS3 )
-#include <sys/memory.h>
-#else
+#include <cstdio>  // Needed for file access
 #include <memory.h>
-#endif
-#include <string.h> // Needed for strcat and strcpy
 #endif
 
 // If you're compiling big endian, just comment out the following line
@@ -93,7 +88,7 @@ public:
 	// Finalize hash and report
 	void Final();
 #if !defined(_MINIMUM_BUILD_) 
-	void ReportHash(char *szReport, unsigned char uReportType = REPORT_HEX);
+	void ReportHash(char *szReport, ptrdiff_t nReportSize, unsigned char uReportType = REPORT_HEX);
 #endif
 	void GetHash(unsigned char *uDest);
 
