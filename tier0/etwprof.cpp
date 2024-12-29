@@ -185,7 +185,7 @@ void ETWMark2S( const char *pMessage, const char* data1, const char* data2 )
 // if we start emitting marks on multiple threads. Using __declspec(thread)
 // has some problems on Windows XP, but since these ETW functions only work
 // on Vista+ that doesn't matter.
-static __declspec( thread ) int s_nDepth;
+static thread_local int s_nDepth;
 
 int64 ETWBegin( const char *pMessage )
 {
