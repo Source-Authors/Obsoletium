@@ -617,7 +617,8 @@ CThreadEvent::CThreadEvent( bool bManualReset )
 #ifdef _WIN32
     m_hSyncObject = CreateEvent( NULL, bManualReset, FALSE, NULL );
 	m_bCreatedHandle = true;
-    AssertMsg1(m_hSyncObject, "Failed to create event (error 0x%x)", GetLastError() );
+    AssertMsg1(m_hSyncObject, "Failed to create event: %s",
+		std::system_category().message(::GetLastError()).c_str() );
 #elif defined( POSIX )
     pthread_mutexattr_t Attr;
     pthread_mutexattr_init( &Attr );
@@ -717,7 +718,8 @@ CThreadSemaphore::CThreadSemaphore( long initialValue, long maxValue )
 
 		m_hSyncObject = CreateSemaphore( NULL, initialValue, maxValue, NULL );
 
-		AssertMsg1(m_hSyncObject, "Failed to create semaphore (error 0x%x)", GetLastError());
+		AssertMsg1(m_hSyncObject, "Failed to create semaphore: %s",
+			std::system_category().message(::GetLastError()).c_str() );
 	}
 	else
 	{
@@ -743,7 +745,8 @@ CThreadFullMutex::CThreadFullMutex( bool bEstablishInitialOwnership, const char 
 {
    m_hSyncObject = CreateMutex( NULL, bEstablishInitialOwnership, pszName );
 
-   AssertMsg1( m_hSyncObject, "Failed to create mutex (error 0x%x)", GetLastError() );
+   AssertMsg1( m_hSyncObject, "Failed to create mutex: %s",
+	   std::system_category().message(::GetLastError()).c_str() );
 }
 
 //---------------------------------------------------------
@@ -768,7 +771,7 @@ CThreadLocalBase::CThreadLocalBase()
 	m_index = TlsAlloc();
 	AssertMsg( m_index != TLS_OUT_OF_INDEXES, "Bad thread local" );
 	if ( m_index == TLS_OUT_OF_INDEXES )
-		Error( "Out of thread local storage: %s!\n",
+		Error( "Out of thread local storage: %s\n",
 			std::system_category().message(::GetLastError()).c_str() );
 #elif defined(POSIX)
 	if ( pthread_key_create( &m_index, NULL ) != 0 )
@@ -1705,7 +1708,8 @@ bool CThread::Start( unsigned nBytesStack )
 														&m_threadId );
 	if ( !hThread )
 	{
-		AssertMsg1( 0, "Failed to create thread (error 0x%x)", GetLastError() );
+		AssertMsg1( 0, "Failed to create thread: %s",
+			std::system_category().message(::GetLastError()).c_str() );
 		return false;
 	}
 	Plat_ApplyHardwareDataBreakpointsToNewThread( m_threadId );
@@ -1719,7 +1723,8 @@ bool CThread::Start( unsigned nBytesStack )
 	pthread_attr_setstacksize( &attr, MAX( nBytesStack, 1024u*1024 ) );
 	if ( pthread_create( &m_threadId, &attr, (void *(*)(void *))GetThreadProc(), new ThreadInit_t( init ) ) != 0 )
 	{
-		AssertMsg1( 0, "Failed to create thread (error 0x%x)", GetLastError() );
+		AssertMsg1( 0, "Failed to create thread: %s",
+			std::system_category().message(errno).c_str() );
 		return false;
 	}
 	Plat_ApplyHardwareDataBreakpointsToNewThread( (long unsigned int)m_threadId );
