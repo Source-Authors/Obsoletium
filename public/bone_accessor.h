@@ -58,17 +58,14 @@ private:
 };
 
 
-inline CBoneAccessor::CBoneAccessor()
-{
-	m_pAnimating = NULL;
-	m_pBones = NULL;
-	m_ReadableBones = m_WritableBones = 0;
+inline CBoneAccessor::CBoneAccessor() : CBoneAccessor{nullptr} {
 }
 
 inline CBoneAccessor::CBoneAccessor( matrix3x4_t *pBones )
 {
-	m_pAnimating = NULL;
+	m_pAnimating = nullptr;
 	m_pBones = pBones;
+	m_ReadableBones = m_WritableBones = 0;
 }
 
 #if defined( CLIENT_DLL )
