@@ -1003,25 +1003,25 @@ bool CGame::CreateGameWindow( void )
 	}
 
 #ifdef PLATFORM_64BITS
-	V_strcat( utf8_window_name, " - 64 bit", sizeof( utf8_window_name ) );
+	V_strcat_safe( utf8_window_name, " - 64 bit" );
 #endif
 
 	if ( IsOpenGL() )
 	{
-		V_strcat( utf8_window_name, " - OpenGL", sizeof( utf8_window_name ) );
+		V_strcat_safe( utf8_window_name, " - OpenGL" );
 	}
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
 	// PIX_ENABLE/PIX_INSTRUMENTATION is a big slowdown (that should never be
 	// checked in, but sometimes is by accident), so add this to the Window title too.
-	V_strcat( windowName, " - PIX_ENABLE", sizeof( windowName ) );
+	V_strcat_safe( windowName, " - PIX_ENABLE" );
 #endif
 
 	if ( const char *p = CommandLine()->ParmValue( "-window_name_suffix", "" );
 		 p && !Q_isempty( p ) )
 	{
-		V_strcat( utf8_window_name, " - ", sizeof( utf8_window_name ) );
-		V_strcat( utf8_window_name, p, sizeof( utf8_window_name ) );
+		V_strcat_safe( utf8_window_name, " - " );
+		V_strcat_safe( utf8_window_name, p );
 	}
 
 #if defined( WIN32 ) && !defined( USE_SDL )

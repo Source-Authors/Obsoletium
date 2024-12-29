@@ -847,8 +847,8 @@ void CVideoMode_Common::DrawStartupGraphic()
 	if(debugstartup)
 	{
 		// slam the startup graphic name for sanity - take your pick
-		strcpy( pStartupGraphicName, "materials/console/background01.vtf");
-		//strcpy( pStartupGraphicName, "materials/console/testramp.vtf");
+		V_strcpy_safe( pStartupGraphicName, "materials/console/background01.vtf");
+		//V_strcpy_safe( pStartupGraphicName, "materials/console/testramp.vtf");
 	}
 	
     // Allocate a white material

@@ -257,7 +257,7 @@ bool CReplayDemoPlayer::StartPlayback( const char *pFilename, bool bAsTimeDemo )
 		// Start recording the movie
 		char szIdealFilename[ MAX_OSPATH ];
 		V_FileBase( pFilename, szIdealFilename, sizeof( szIdealFilename ) );
-		V_strcat( szIdealFilename, va( "_%i", pReplay->m_nSpawnTick ), sizeof( szIdealFilename ) );
+		V_strcat_safe( szIdealFilename, va( "_%i", pReplay->m_nSpawnTick ) );
 		V_SetExtension( szIdealFilename, pExtension, sizeof( szIdealFilename ) );
 
 		char szRenderPath[ MAX_OSPATH ];

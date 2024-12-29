@@ -79,7 +79,7 @@ const char *CReplayDemoRecorder::GetDemoFilename()
 {
 	static char s_szDemoFilename[ MAX_OSPATH ];
 	const char *pFilename = replay->m_DemoRecorder.GetRecordingFilename();		Assert( pFilename && pFilename[0] );
-	V_strcpy( s_szDemoFilename, pFilename );
+	V_strcpy_safe( s_szDemoFilename, pFilename );
 	return s_szDemoFilename;
 }
 

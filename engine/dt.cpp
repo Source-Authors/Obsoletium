@@ -553,7 +553,7 @@ void DataTable_Warning( const char *pInMessage, ... )
 #endif
 
 	va_start(marker, pInMessage);
-	Q_vsnprintf( msg, sizeof( msg ), pInMessage, marker);
+	V_sprintf_safe( msg, pInMessage, marker);
 	va_end(marker);
 
 	Warning( "DataTable warning: %s", msg );

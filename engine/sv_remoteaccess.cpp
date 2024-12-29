@@ -772,7 +772,7 @@ void CServerRemoteAccess::GetStatsString(char *buf, int bufSize)
 	sv.GetNetStats( avgIn, avgOut );
 
 	// format: CPU percent, Bandwidth in, Bandwidth out, uptime, changelevels, framerate, total players
-	_snprintf(buf, bufSize - 1, "%-6.2f %-10.2f %-11.2f %-7i %-12i %-8.2f %-8i %-8i",
+	V_snprintf(buf, bufSize, "%-6.2f %-10.2f %-11.2f %-7i %-12i %-8.2f %-8i %-8i",
 				sv.GetCPUUsage() * 100, 
 				avgIn / 1024.0f,
 				avgOut / 1024.0f,
@@ -781,7 +781,6 @@ void CServerRemoteAccess::GetStatsString(char *buf, int bufSize)
 				1.0/host_frametime, // frame rate
 				sv.GetNumClients() - sv.GetNumProxies(),
 				sv.GetNumConnections());
-	buf[bufSize - 1] = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -839,15 +838,15 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	// search the directory structure.
 	char mapwild[MAX_QPATH];
 	char friendly_com_gamedir[ MAX_OSPATH ];
-	strcpy(mapwild, "maps/*.bsp");
-	Q_strncpy( friendly_com_gamedir, com_gamedir, sizeof(friendly_com_gamedir) );
+	V_strcpy_safe( mapwild, "maps/*.bsp" );
+	V_strcpy_safe( friendly_com_gamedir, com_gamedir );
 	Q_strlower( friendly_com_gamedir );
 	
 	char const *findfn = Sys_FindFirst( mapwild, NULL, 0 );
 	while ( findfn )
 	{
 		char curDir[MAX_PATH];
-		_snprintf(curDir, MAX_PATH, "maps/%s", findfn);
+		V_sprintf_safe(curDir, "maps/%s", findfn);
 		g_pFileSystem->GetLocalPath(curDir, curDir, MAX_PATH);
 		
 		// limit maps displayed to ones for the mod only
@@ -855,7 +854,7 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 		{
 			// clean up the map name
 			char mapName[MAX_PATH];
-			strcpy(mapName, findfn);
+			V_strcpy_safe(mapName, findfn);
 			char *extension = strstr(mapName, ".bsp");
 			if (extension)
 			{
