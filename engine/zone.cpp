@@ -47,7 +47,7 @@ static int GetTargetCacheSize()
 Hunk_AllocName
 ===================
 */
-void *Hunk_AllocName (unsigned size, const char *name, bool bClear)
+void *Hunk_AllocName (size_t size, const char *name, bool bClear)
 {
 	MEM_ALLOC_CREDIT();
 	void * p = g_HunkMemoryStack.Alloc( size, bClear );
@@ -64,7 +64,8 @@ void *Hunk_AllocName (unsigned size, const char *name, bool bClear)
 	if ( p )
 		return p;
 #endif
-	Error( "Engine hunk overflow!\n" );
+	Error( "Engine hunk overflow when allocating %zu bytes for '%s'. Max hunk size %zd bytes, used %zd bytes.\n",
+		size, name ? name : "(null)", g_HunkMemoryStack.GetMaxSize(), g_HunkMemoryStack.GetUsed() );
 	return NULL;
 }
 
@@ -73,7 +74,7 @@ void *Hunk_AllocName (unsigned size, const char *name, bool bClear)
 Hunk_Alloc
 ===================
 */
-void *Hunk_Alloc(unsigned size, bool bClear )
+void *Hunk_Alloc(size_t size, bool bClear )
 {
 	MEM_ALLOC_CREDIT();
 	return Hunk_AllocName( size, NULL, bClear );
@@ -131,7 +132,7 @@ void Memory_Init()
 {
     MEM_ALLOC_CREDIT();
 
-#if defined(_X360) || defined(HUNK_USE_16MB_PAGE)
+#if defined(HUNK_USE_16MB_PAGE)
     unsigned nMaxBytes = 48 * 1024 * 1024;
 #else
 	// dimhotepus: With r_hunkalloclightmaps 1 (default), the hunk is not large

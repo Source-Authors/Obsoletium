@@ -14,13 +14,24 @@
 void Memory_Init();
 void Memory_Shutdown();
 
-void* Hunk_Alloc(unsigned size, bool bClear = true);
-void *Hunk_AllocName(unsigned size, const char *name, bool bClear = true );
+void* Hunk_Alloc(size_t size, bool bClear = true);
+
+template<typename T>
+T* Hunk_Alloc(size_t count, bool bClear = true)
+{
+  return static_cast<T*>(Hunk_Alloc(count * sizeof(T), bClear));
+}
+
+void *Hunk_AllocName(size_t size, const char *name, bool bClear = true );
+
+template<typename T>
+T* Hunk_AllocName(size_t count, const char *name, bool bClear = true)
+{
+  return static_cast<T*>(Hunk_AllocName(count * sizeof(T), name, bClear));
+}
 
 int	Hunk_LowMark();
 void Hunk_FreeToLowMark (int mark);
-
-void Hunk_Check();
 
 int Hunk_MallocSize();
 int Hunk_Size();
@@ -39,8 +50,8 @@ public:
 	bool IsIdxValid( int i ) const							{ return (i >= 0) && (i < m_nAllocated); }
 
 	// Gets the base address
-	T* Base()												{ return (T*)m_pMemory; }
-	const T* Base() const									{ return (T*)m_pMemory; }
+	T* Base()												{ return m_pMemory; }
+	const T* Base() const									{ return m_pMemory; }
 
 	// element access
 	T& operator[]( int i )									{ Assert( IsIdxValid(i) ); return Base()[i];	}
@@ -56,7 +67,7 @@ public:
 	int Count() const										{ return m_nAllocated; }
 
 	// Grows the memory, so that at least allocated + num elements are allocated
-	void Grow( int num = 1 )								{ Assert( !m_nAllocated ); m_pMemory = (T *)Hunk_Alloc( num * sizeof(T), false ); m_nAllocated = num; }
+	void Grow( int num = 1 )								{ Assert( !m_nAllocated ); m_pMemory = Hunk_Alloc<T>( num, false ); m_nAllocated = num; }
 
 	// Makes sure we've got at least this much memory
 	void EnsureCapacity( int num )							{ Assert( num <= m_nAllocated ); }
