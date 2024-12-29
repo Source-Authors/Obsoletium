@@ -1208,7 +1208,8 @@ bool SVC_UpdateStringTable::ReadFromBuffer( bf_read &buffer )
 {
 	VPROF( "SVC_UpdateStringTable::ReadFromBuffer" );
 
-	m_nTableID = buffer.ReadUBitLong( Q_log2( MAX_TABLES ) );
+	constexpr int bits = Q_log2( MAX_TABLES );
+	m_nTableID = buffer.ReadUBitLong( bits );
 
 	if ( buffer.ReadOneBit() != 0 )
 	{
