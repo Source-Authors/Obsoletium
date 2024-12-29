@@ -546,9 +546,9 @@ template <size_t maxLenInChars> int Q_NormalizeUTF8ToASCII( OUT_Z_ARRAY char (&p
 			// dimhotepus: Makes sense only if char is unsigned.
 			if ( pchDest[i] > 127 )
 			{
-			pchDest[i] = '?';
+				pchDest[i] = '?';
+			}
 		}
-	}
 		else if ( pchDest[i] < 0 )
 		{
 			// dimhotepus: Makes sense only if char is signed.
@@ -1340,9 +1340,13 @@ V_to_chars(OUT_Z_CAP(size) char (&buffer)[size], TIntegral value, int base = 10)
 			return std::errc{};
 		}
 	}
-	AssertMsg(false, "Unable to convert integral to chars: %s.\n",
-		std::make_error_code(result.ec != std::errc{} ? result.ec : std::errc::value_too_large)
-			.message().c_str());
+#ifdef _DEBUG
+	const std::string message = std::make_error_code
+	(
+		result.ec != std::errc{} ? result.ec : std::errc::value_too_large
+	).message();
+	AssertMsg(false, "Unable to convert integral to chars: %s.\n", message.c_str());
+#endif
 	// Overflow.
 	*buffer = '\0';
 	return std::errc::value_too_large;
@@ -1364,9 +1368,13 @@ V_to_chars(OUT_Z_CAP(size) char (&buffer)[size], TFloat value)
 			return std::errc{};
 		}
 	}
-	AssertMsg(false, "Unable to convert floating point to chars: %s.\n",
-		std::make_error_code(result.ec != std::errc{} ? result.ec : std::errc::value_too_large)
-			.message().c_str());
+#ifdef _DEBUG
+	const std::string message = std::make_error_code
+	(
+		result.ec != std::errc{} ? result.ec : std::errc::value_too_large
+	).message();
+	AssertMsg(false, "Unable to convert floating point to chars: %s.\n", message.c_str());
+#endif
 	// Overflow.
 	*buffer = '\0';
 	return std::errc::value_too_large;
