@@ -56,7 +56,7 @@ inline bool ThreadInterlockedAssignIf64x128( volatile int64 *pDest, const int64 
 #define TSLIST_NODE_ALIGN_POST
 
 // Lock free stack node.
-struct TSLIST_NODE_ALIGN TSLNodeBase_t
+struct TSLIST_NODE_ALIGN TSLNodeBase_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
 {
 	TSLNodeBase_t *Next; // name to match Windows
 };
@@ -412,13 +412,19 @@ template <typename T, bool bTestOptimizer = false>
 class TSLIST_NODE_ALIGN CTSQueue : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
 {
 public:
-	struct TSLIST_NODE_ALIGN Node_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
+	struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t
 	{
 		Node_t() = default;
-		Node_t( const T &init ) : pNext{nullptr}, elem{init} {}
+		Node_t( const T &init ) : elem{init}
+		{
+			Next = nullptr;
+		}
 
-		Node_t *pNext;
 		T elem;
+
+		Node_t *GetNextNode() { return static_cast<Node_t*>(Next); }
+		Node_t **GetNextNodePtr() { return reinterpret_cast<Node_t**>(&Next); }
+		void SetNextNode(Node_t* next) { Next = next; }
 	};
 
 	union TSLIST_HEAD_ALIGN NodeLink_t
@@ -465,7 +471,7 @@ public:
 		
 		 // list always contains a dummy node
 		m_Head.value.pNode = m_Tail.value.pNode = new Node_t;
-		m_Head.value.pNode->pNext = End();
+		m_Head.value.pNode->SetNextNode(End());
 		m_Head.value.sequence = m_Tail.value.sequence = 0;
 	}
 
@@ -475,7 +481,7 @@ public:
 
 		Assert( m_Count.load( std::memory_order::memory_order_relaxed ) == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
-		Assert( m_Head.value.pNode->pNext == End() );
+		Assert( m_Head.value.pNode->GetNextNode() == End() );
 
 		delete m_Head.value.pNode;
 	}
@@ -493,14 +499,14 @@ public:
 			delete pNode;
 		}
 
-		while ( ( pNode = reinterpret_cast<Node_t *>(m_FreeNodes.Pop()) ) != nullptr )
+		while ( ( pNode = static_cast<Node_t *>(m_FreeNodes.Pop()) ) != nullptr )
 		{
 			delete pNode;
 		}
 
 		Assert( m_Count.load() == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
-		Assert( m_Head.value.pNode->pNext == End() );
+		Assert( m_Head.value.pNode->GetNextNode() == End() );
 
 		m_Head.value.sequence = m_Tail.value.sequence = 0;
 	}
@@ -514,7 +520,7 @@ public:
 		Node_t *pNode;
 		while ( ( pNode = Pop() ) != nullptr )
 		{
-			m_FreeNodes.Push( (TSLNodeBase_t *)pNode );
+			m_FreeNodes.Push( pNode );
 		}
 	}
 
@@ -524,7 +530,7 @@ public:
 		{
 			bool bResult = true;
 			int nNodes = 0;
-			if ( m_Tail.value.pNode->pNext != End() )
+			if ( m_Tail.value.pNode->GetNextNode() != End() )
 			{
 				DebuggerBreakIfDebugging();
 				bResult = false;
@@ -543,7 +549,7 @@ public:
 			while ( pNode != End() )
 			{
 				nNodes++;
-				pNode = pNode->pNext;
+				pNode = pNode->GetNextNode();
 			}
 
 			nNodes--;// skip dummy node
@@ -589,20 +595,20 @@ public:
 
 		NodeLink_t oldTail;
 
-		pNode->pNext = End();
+		pNode->SetNextNode( End() );
 
 		for (;;)
 		{
 			oldTail.value.sequence = m_Tail.value.sequence;
 			oldTail.value.pNode = m_Tail.value.pNode;
-			if ( InterlockedCompareExchangeNode( &(oldTail.value.pNode->pNext), pNode, End() ) == End() ) //-V1051
+			if ( InterlockedCompareExchangeNode( oldTail.value.pNode->GetNextNodePtr(), pNode, End() ) ) //-V1051
 			{
 				break;
 			}
 			else
 			{
 				// Another thread is trying to push, help it along
-				FinishPush( oldTail.value.pNode->pNext, oldTail );
+				FinishPush( oldTail.value.pNode->GetNextNode(), oldTail );
 			}
 		}
 
@@ -640,7 +646,7 @@ public:
 			ThreadMemoryBarrier(); // need a barrier to prevent reordering of these assignments
 			head.value.pNode	= *pHeadNode;
 			tailSequence		= pTail->value.sequence;
-			pNext				= head.value.pNode->pNext;
+			pNext				= head.value.pNode->GetNextNode();
 
 			// Checking pNext only to force optimizer to not reorder the assignment
 			// to pNext and the compare of the sequence
@@ -678,7 +684,7 @@ public:
 					ThreadMemoryBarrier();
 					if ( bTestOptimizer )
 					{
-						head.value.pNode->pNext = TSQUEUE_BAD_NODE_LINK;
+						head.value.pNode->SetNextNode( TSQUEUE_BAD_NODE_LINK );
 					}
 					break;
 				}
@@ -692,12 +698,12 @@ public:
 
 	void FreeNode( Node_t *pNode )
 	{
-		m_FreeNodes.Push( reinterpret_cast<Node_t *>(pNode) );
+		m_FreeNodes.Push( pNode );
 	}
 
 	void PushItem( const T &init )
 	{
-		auto *pNode = reinterpret_cast<Node_t *>(m_FreeNodes.Pop());
+		auto *pNode = static_cast<Node_t *>(m_FreeNodes.Pop());
 		if ( pNode )
 		{
 			pNode->elem = init;
@@ -716,7 +722,7 @@ public:
 			return false;
 
 		*pResult = pNode->elem;
-		m_FreeNodes.Push( reinterpret_cast<TSLNodeBase_t *>(pNode) );
+		m_FreeNodes.Push( pNode );
 		return true;
 	}
 
@@ -729,9 +735,9 @@ private:
 	// just need a unique signifier
 	Node_t *End() { return &m_end; }
 
-	[[nodiscard]] static Node_t *InterlockedCompareExchangeNode( Node_t * volatile *ppNode, Node_t *value, Node_t *comperand )
+	[[nodiscard]] static bool InterlockedCompareExchangeNode( Node_t * volatile *ppNode, Node_t *value, Node_t *comperand )
 	{
-		return (Node_t *)::ThreadInterlockedCompareExchangePointer( (void * volatile *)ppNode, value, comperand );
+		return ThreadInterlockedCompareExchangePointer( (void * volatile *)ppNode, value, comperand ) == comperand;
 	}
 
 	bool InterlockedCompareExchangeNodeLink( NodeLink_t volatile *pLink, const NodeLink_t &value, const NodeLink_t &comperand )
