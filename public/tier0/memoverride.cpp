@@ -310,7 +310,7 @@ size_t msize( void *pMem ) //-V524
 	return _msize_base(pMem);
 }
 
-void *__cdecl _heap_alloc( size_t nSize )
+void *__cdecl _heap_alloc( size_t nSize ) //-V524
 {
 	return AllocUnattributed( nSize );
 }
