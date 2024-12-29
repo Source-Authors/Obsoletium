@@ -539,7 +539,7 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 
 	// build the real filename
 	char szFilename[MAX_PATH];
-	Q_snprintf( szFilename, sizeof( szFilename ), "sound\\%s", GetFileName() );
+	V_sprintf_safe( szFilename, "sound\\%s", GetFileName() );
 
 	int nPriority = 1;
 	if ( params.bPrefetch )

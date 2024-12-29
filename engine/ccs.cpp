@@ -725,7 +725,7 @@ private:
 						replyPacket.m_nID = cPacketHeaderID;
 						replyPacket.m_nTotalSize = sizeof( replyPacket ) + nPNGSize;
 						replyPacket.m_nType = cPacketTypeScreenshotReply;
-						V_strcpy( replyPacket.m_szFilename, requestPacket.m_szFilename );
+						V_strcpy_safe( replyPacket.m_szFilename, requestPacket.m_szFilename );
 						replyPacket.m_nScreenshotID = requestPacket.m_nScreenshotID;
 						
 						if ( !SendData( &replyPacket, sizeof( replyPacket ) ) ) 

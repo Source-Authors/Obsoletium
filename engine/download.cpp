@@ -166,7 +166,7 @@ void DownloadCache::GetCachedData( RequestContext_t *rc )
 	{
 		BuildKeyNames( rc->gamePath );
 		rc->nBytesCached = size;
-		strncpy( rc->cachedTimestamp, m_cache->GetString( m_timestampKey, "" ), BufferSize );
+		V_strcpy_safe( rc->cachedTimestamp, m_cache->GetString( m_timestampKey, "" ) );
 	}
 }
 
@@ -372,11 +372,10 @@ void DownloadCache::GetCacheFilename( const RequestContext_t *rc, char cachePath
 	const char *path = m_cache->GetString( m_cachefileKey, NULL );
 	if ( !path || strncmp( path, CacheDirectory, strlen(CacheDirectory) ) )
 	{
-		cachePath[0] = 0;
+		cachePath[0] = '\0';
 		return;
 	}
-	strncpy( cachePath, path, _MAX_PATH );
-	cachePath[_MAX_PATH-1] = 0;
+	V_strcpy_safe( cachePath, path );
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -399,7 +398,7 @@ void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char cach
 		}
 		for( int i=0; i<1000; ++i )
 		{
-			Q_snprintf( cachePath, _MAX_PATH, "%s/%s%4.4d", CacheDirectory, gameFilename, i );
+			V_sprintf_safe( cachePath, "%s/%s%4.4d", CacheDirectory, gameFilename, i );
 			if ( !g_pFileSystem->FileExists( cachePath ) )
 			{
 				m_cache->SetString( m_cachefileKey, cachePath );
@@ -408,8 +407,7 @@ void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char cach
 			}
 		}
 		// all 1000 were invalid?!?
-		Q_snprintf( cachePath, _MAX_PATH, "%s/overflow", CacheDirectory );
-		//ConDColorMsg( DownloadColor,"DownloadCache::GenerateCacheFilename() set %s = %s\n", m_cachefileKey, cachePath );
+		V_sprintf_safe( cachePath, "%s/overflow", CacheDirectory );
 		m_cache->SetString( m_cachefileKey, cachePath );
 	}
 }
@@ -504,12 +502,12 @@ RequestContext_t *CDownloadManager::NewRequestContext()
 //--------------------------------------------------------------------------------------------------------------
 void CDownloadManager::SetupURLPath( RequestContext_t *pRequestContext, const char *pURLPath )
 {
-	V_strcpy( pRequestContext->urlPath, pRequestContext->gamePath );
+	V_strcpy_safe( pRequestContext->urlPath, pRequestContext->gamePath );
 }
 //--------------------------------------------------------------------------------------------------------------
 void CDownloadManager::SetupServerURL( RequestContext_t *pRequestContext )
 {
-	Q_strncpy( pRequestContext->serverURL, cl.m_NetChannel->GetRemoteAddress().ToString(), BufferSize );
+	V_strcpy_safe( pRequestContext->serverURL, cl.m_NetChannel->GetRemoteAddress().ToString() );
 }
 //--------------------------------------------------------------------------------------------------------------
 bool CDownloadManager::HasMapBeenDownloadedFromServer( const char *serverMapName )

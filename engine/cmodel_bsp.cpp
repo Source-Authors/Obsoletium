@@ -240,7 +240,7 @@ bool CollisionBSPData_Load( const char *pName, CCollisionBSPData *pBSPData )
 	CUtlVector<unsigned short> 	map_texinfo;
 
 	// copy map name
-	Q_strncpy( pBSPData->map_name, pName, sizeof( pBSPData->map_name ) );
+	V_strcpy_safe( pBSPData->map_name, pName );
 
 	//
 	// load bsp file data
@@ -1007,7 +1007,7 @@ void CollisionBSPData_LoadEntityString( CCollisionBSPData *pBSPData )
 	pBSPData->numentitychars = lh.LumpSize();
 	MEM_ALLOC_CREDIT();
 	char szMapName[MAX_PATH] = { 0 };
-	V_strncpy( szMapName, lh.GetMapName(), sizeof( szMapName ) );
+	V_strcpy_safe( szMapName, lh.GetMapName() );
 	pBSPData->map_entitystring.Init( szMapName, lh.LumpOffset(), lh.LumpSize(), lh.LumpBase() );
 }
 

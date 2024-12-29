@@ -231,13 +231,13 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 					exposure*=0.75;
 					materials->SwapBuffers();
 				}
-				Q_snprintf( name, sizeof( name ), "%s%s%s", pFileNameBase, facingName[side],pExtension );
+				V_sprintf_safe( name, "%s%s%s", pFileNameBase, facingName[side],pExtension );
 //				hdr_map.WritePFM(name);
 			}
 			else
 			{
 				g_ClientDLL->RenderView( view, nFlags, 0 );
-				Q_snprintf( name, sizeof( name ), "%s%s%s", pFileNameBase, facingName[side],pExtension );
+				V_sprintf_safe( name, "%s%s%s", pFileNameBase, facingName[side],pExtension );
 				Assert( strlen( name ) < 1023 );
 				videomode->TakeSnapshotTGARect( name, 0, 0, screenBufSize, screenBufSize, tgaSize, tgaSize, bPFM, face_idx[side]);
 			}
@@ -268,7 +268,7 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 			
 			
 			g_ClientDLL->RenderView( view, nFlags, 0 );
-			Q_snprintf( name, sizeof( name ), "%s%s%s", pFileNameBase, facingName[side],pExtension );
+			V_sprintf_safe( name, "%s%s%s", pFileNameBase, facingName[side],pExtension );
 			Assert( strlen( name ) < 1023 );
 			videomode->TakeSnapshotTGARect( name, 0, 0, screenBufSize, screenBufSize, tgaSize, tgaSize, bPFM, face_idx[side]);
 		}
@@ -315,7 +315,7 @@ static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 	TakeCubemapSnapshot( vecOrigin, pVTFName, nScreenBufSize, nSize, bHDR );
 
 	char pTXTName[ MAX_PATH ];
-	Q_strncpy( pTXTName, pVTFName, sizeof(pTXTName) );
+	V_strcpy_safe( pTXTName, pVTFName );
 	Q_SetExtension( pTXTName, ".txt", sizeof(pTXTName) );
 
 	// HDRFIXME: Make this go to a buffer instead.
@@ -347,7 +347,7 @@ static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 	for( int i = 0; i < 6; i++ )
 	{
 		char pTempName[MAX_PATH];
-		Q_snprintf( pTempName, sizeof( pTempName ), "%s%s", pVTFName, facingName[i] );
+		V_sprintf_safe( pTempName, "%s%s", pVTFName, facingName[i] );
 		Q_SetExtension( pTempName, pSrcExtension, sizeof(pTempName) );
 		g_pFileSystem->RemoveFile( pTempName, NULL );
 	}
@@ -373,7 +373,7 @@ CON_COMMAND( envmap, "" )
 	}
 	else
 	{
-		Q_strncpy( base, "Env", sizeof( base ) );
+		V_strcpy_safe( base, "Env" );
 	}
 
 	intp strLen = V_strlen( base ) + ssize( "cubemap_screenshots/" );

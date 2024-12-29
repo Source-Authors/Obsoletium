@@ -91,7 +91,7 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 	{
 		char const *filename = entries.String( s );
 
-		Q_snprintf( commands[ i ], sizeof( commands[ i ] ), "%s %s", cmdname, filename );
+		V_sprintf_safe( commands[ i ], "%s %s", cmdname, filename );
 
 		const size_t commandLen{ strlen( commands[i] ) };
 		if ( commandLen >= 4 )
