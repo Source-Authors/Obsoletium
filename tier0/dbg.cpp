@@ -56,20 +56,12 @@ static const char *SkipToFname( const tchar* pFile )
 //-----------------------------------------------------------------------------
 DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 {
-#ifdef _X360
-	if ( XBX_IsConsoleConnected() )
-	{
-		// send to console
-		XBX_DebugString( XMAKECOLOR( 0,0,0 ), pMsg );
-	}
-	else
-#endif
-	{
 		_tprintf( _T("%s"), pMsg );
+
 #ifdef _WIN32
 		Plat_DebugString( pMsg );
 #endif
-	}
+
 	if ( type == SPEW_ASSERT )
 	{
 #ifndef WIN32

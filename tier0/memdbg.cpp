@@ -25,9 +25,6 @@
 #include <unordered_set>
 #include <climits>
 #include "tier0/threadtools.h"
-#ifdef _X360
-#include "xbox/xbox_console.h"
-#endif
 #if ( !defined(_DEBUG) && defined(USE_MEM_DEBUG) )
 #pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't check this in!")
 #endif
@@ -41,13 +38,8 @@
 
 //-----------------------------------------------------------------------------
 
-#ifndef _X360
 #define DebugAlloc	malloc
 #define DebugFree	free
-#else
-#define DebugAlloc	DmAllocatePool
-#define DebugFree	DmFreePool
-#endif
 
 #ifdef WIN32
 int g_DefaultHeapFlags = _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF );
@@ -776,7 +768,7 @@ CDbgMemAlloc::CDbgMemAlloc() : m_pStatMap{nullptr}, m_pFilenames{nullptr}, m_sMe
 	m_OutputFunc = DefaultHeapReportFunc;
 	m_bInitialized = false;
 
-	if ( !IsDebug() && !IsX360() )
+	if ( !IsDebug() )
 	{
 		Plat_DebugString( "USE_MEM_DEBUG is enabled in a release build. Don't check this in!\n" );
 	}
@@ -1507,28 +1499,11 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 
 	DumpMemInfo( "Totals", 0, m_GlobalInfo );
 
-#ifdef WIN32
-	if ( IsX360() )
-	{
-		// add a line that has free memory
-		size_t usedMemory, freeMemory;
-		GlobalMemoryStatus( &usedMemory, &freeMemory );
-		MemInfo_t info;
-		// OS takes 32 MiB, report our internal allocations only
-		info.m_nCurrentSize = usedMemory;
-		DumpMemInfo( "Used Memory", 0, info );
-	}
-#endif
-
 	DumpFileStats();
 
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
 		fclose(s_DbgFile);
-
-#if defined( _X360 ) && !defined( _RETAIL )
-		XBX_rMemDump( szFileName );
-#endif
 	}
 }
 
@@ -1537,23 +1512,9 @@ void CDbgMemAlloc::GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory 
 	if ( !pUsedMemory || !pFreeMemory )
 		return;
 
-#if defined ( _X360 )
-
-	// GlobalMemoryStatus tells us how much physical memory is free
-	MEMORYSTATUS stat;
-	::GlobalMemoryStatus( &stat );
-	*pFreeMemory = stat.dwAvailPhys;
-
-	// Used is total minus free (discount the 32MB system reservation)
-	*pUsedMemory = ( stat.dwTotalPhys - 32*1024*1024 ) - *pFreeMemory;
-
-#else
-
 	// no data
 	*pFreeMemory = 0;
 	*pUsedMemory = 0;
-
-#endif
 }
 
 //-----------------------------------------------------------------------------

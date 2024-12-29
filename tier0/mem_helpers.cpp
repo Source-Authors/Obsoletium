@@ -154,9 +154,6 @@ void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 
 size_t CalcHeapUsed()
 {
-#if defined( _X360 )
-	return 0;
-#else
 	_HEAPINFO	hinfo = {};
 	int			heapstatus;
 	size_t		nTotal{0};
@@ -179,7 +176,6 @@ size_t CalcHeapUsed()
 	}
 
 	return nTotal;
-#endif
 }
 #endif
 

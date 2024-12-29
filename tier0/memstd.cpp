@@ -6,7 +6,7 @@
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define VA_COMMIT_FLAGS MEM_COMMIT
 #define VA_RESERVE_FLAGS MEM_RESERVE
 #endif
