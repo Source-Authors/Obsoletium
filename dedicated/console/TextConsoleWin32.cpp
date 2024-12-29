@@ -323,11 +323,11 @@ void CTextConsoleWin32::ReceiveTab() {
 
     if (pszRest) {
       PrintRaw(pszRest);
-      strcat(m_szConsoleText, pszRest);
+      V_strcat_safe(m_szConsoleText, pszRest);
       m_nConsoleTextLen += strlen(pszRest);
 
       PrintRaw(" ");
-      strcat(m_szConsoleText, " ");
+      V_strcat_safe(m_szConsoleText, " ");
       m_nConsoleTextLen++;
     }
   } else {
