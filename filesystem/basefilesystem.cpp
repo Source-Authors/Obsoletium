@@ -872,7 +872,7 @@ bool CBaseFileSystem::AddPackFile( const char *pFileName, const char *pathID )
 bool CBaseFileSystem::AddPackFileFromPath( const char *pPath, const char *pakfile, bool bCheckForAppendedPack, const char *pathID )
 {
 	char fullpath[ MAX_PATH ];
-	_snprintf( fullpath, sizeof(fullpath), "%s%s", pPath, pakfile );
+	V_sprintf_safe( fullpath, "%s%s", pPath, pakfile );
 	Q_FixSlashes( fullpath );
 
 	struct	_stat buf;
@@ -2010,17 +2010,21 @@ void CBaseFileSystem::LogFileAccess( const char *pFullFileName )
 #else
 	char cwd[MAX_FILEPATH];
 	getcwd( cwd, MAX_FILEPATH-1 );
-	Q_strcat( cwd, "\\", sizeof( cwd ) );
-	if( Q_strnicmp( cwd, pFullFileName, strlen( cwd ) ) == 0 )
+	V_strcat_safe( cwd, "\\" );
+	const size_t cwdLen = strlen( cwd );
+	if( Q_strnicmp( cwd, pFullFileName, cwdLen ) == 0 )
 	{
-		const char *pFileNameWithoutExeDir = pFullFileName + strlen( cwd );
+		const char *pFileNameWithoutExeDir = pFullFileName + cwdLen;
+
 		char targetPath[ MAX_FILEPATH ];
-		strcpy( targetPath, "%fs_target%\\" );
-		strcat( targetPath, pFileNameWithoutExeDir );
-		Q_snprintf( buf, sizeof( buf ), "copy \"%s\" \"%s\"\n", pFullFileName, targetPath );
+		V_strcpy_safe( targetPath, "%fs_target%\\" );
+		V_strcat_safe( targetPath, pFileNameWithoutExeDir );
+		V_sprintf_safe( buf, "copy \"%s\" \"%s\"\n", pFullFileName, targetPath );
+
 		char tmp[ MAX_FILEPATH ];
-		Q_strncpy( tmp, targetPath, sizeof( tmp ) );
+		V_strcpy_safe( tmp, targetPath );
 		Q_StripFilename( tmp );
+
 		fprintf( m_pLogFile, "mkdir \"%s\"\n", tmp ); // STEAM OK
 		fprintf( m_pLogFile, "%s", buf ); // STEAM OK
 	}

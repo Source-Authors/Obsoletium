@@ -402,7 +402,7 @@ void CQueuedLoader::BuildMaterialResources( IResourcePreload *pLoader, ResourceL
 				// same cubemap material base already processed, skip it
 				continue;
 			}
-			V_strncpy( szLastFilename, pFilename, sizeof( szLastFilename ) );		
+			V_strcpy_safe( szLastFilename, pFilename );
 
 			strcat( pFilename, ".vmt" );
 			FileNameHandle_t hFilename = g_QueuedLoader.FindFilename( pFilename );
@@ -1243,7 +1243,7 @@ void CQueuedLoader::SpewInfo()
 			const char *pAnonymousStatus = "";
 			if ( !pFileJob->m_pCallback )
 			{
-				V_snprintf( szAnonymousString, sizeof( szAnonymousString ), "(%s) ", pFileJob->m_bClaimed ? "Claimed" : "Unclaimed" );
+				V_sprintf_safe( szAnonymousString, "(%s) ", pFileJob->m_bClaimed ? "Claimed" : "Unclaimed" );
 				pAnonymousStatus = szAnonymousString;
 			
 				if ( pFileJob->m_bClaimed )
