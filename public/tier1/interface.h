@@ -105,7 +105,10 @@ public:
 
 #if !defined(_STATIC_LINKED) || !defined(_SUBSYSTEM)
 #define EXPOSE_INTERFACE(className, interfaceName, versionName) \
-	static void* __Create##className##_interface() {return static_cast<interfaceName *>( new className );} \
+	static void* __Create##className##_interface() { \
+		interfaceName *name = new className; \
+		return name; \
+	} \
 	static InterfaceReg __g_Create##className##_reg(__Create##className##_interface, versionName );
 #else
 #define EXPOSE_INTERFACE(className, interfaceName, versionName) \
