@@ -8,6 +8,8 @@
 #include <sys/stat.h>
 #include <cstdio>
 
+#include "tier1/strtools.h"
+
 #include "winlite.h"
 
 #define STEAM_PARM "-steam"
@@ -119,7 +121,7 @@ void LaunchSelfViaSteam(const char *params)
 				{
 					// found it
 					fclose(f);
-					strcpy(steamExe, dir);
+					V_strcpy_safe(steamExe, dir);
 					break;
 				}
 
@@ -131,7 +133,7 @@ void LaunchSelfViaSteam(const char *params)
 				{
 					// found it
 					fclose(f);
-					strcpy(steamExe, dir);
+					V_strcpy_safe(steamExe, dir);
 					break;
 				}
 
@@ -173,7 +175,7 @@ void LaunchSelfViaSteam(const char *params)
 		}
 
 		// change to the steam directory
-		strcpy(dir, steamExe);
+		V_strcpy_safe(dir, steamExe);
 		char *delimiter = strrchr(dir, '\\');
 		if (delimiter)
 		{
