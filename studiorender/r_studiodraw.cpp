@@ -936,7 +936,6 @@ public:
 											 IMaterial* pMaterial)		
 	{
 		Vector4D *pStudioTangentS;
-		Vector4DAligned tangentS;
 		Vector *pSrcPos;
 		Vector *pSrcNorm;
 		Vector4D *pSrcTangentS = NULL;
