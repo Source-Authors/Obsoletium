@@ -446,6 +446,9 @@ void DirectorySelectDialog::GenerateChildrenOfDirectoryNode(int nodeIndex)
 //-----------------------------------------------------------------------------
 void DirectorySelectDialog::GenerateFullPathForNode(int nodeIndex, char *path, int pathBufferSize)
 {
+	// dimhotepus: Do not overflow 0 size buffer.
+	if (pathBufferSize <= 0) return;
+
 	// get all the nodes
 	CUtlLinkedList<int, int> nodes;
 	nodes.AddToTail(nodeIndex);
@@ -459,16 +462,16 @@ void DirectorySelectDialog::GenerateFullPathForNode(int nodeIndex, char *path, i
 	}
 
 	// walk the nodes, adding to the path
-	path[0] = 0;
+	path[0] = '\0';
 	bool bFirst = true;
 	FOR_EACH_LL( nodes, i )
 	{
 		KeyValues *kv = m_pDirTree->GetItemData( nodes[i] );
-		strcat(path, kv->GetString("Text"));
+		V_strncat(path, kv->GetString("Text"), pathBufferSize);
 
 		if (!bFirst)
 		{
-			strcat(path, "\\");
+			V_strncat(path, "\\", pathBufferSize);
 		}
 		bFirst = false;
 	}
