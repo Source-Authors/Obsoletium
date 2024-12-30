@@ -2306,7 +2306,8 @@ int CL_GetBackgroundLevelIndex( int nNumChapters )
 
 	if ( sv_unlockedchapters.GetInt() >= ( nNumChapters-1 ) )
 	{
-		RandomSeed( Plat_MSTime() );
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		RandomSeed( static_cast<int>(Plat_USTime() % std::numeric_limits<int>::max()) );
 		g_iRandomChapterIndex = iChapterIndex = RandomInt( 1, nNumChapters );
 	}
 
