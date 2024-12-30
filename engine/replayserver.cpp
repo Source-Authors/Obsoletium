@@ -398,7 +398,8 @@ void CReplayFrame::FreeBuffers( void )
 CReplayServer::CReplayServer()
 :	m_DemoRecorder( this )
 {
-	m_flTickInterval = 0.03;
+	m_nDebugID = 0;
+	m_flTickInterval = 0.03f;
 	m_MasterClient = NULL;
 	m_Server = NULL;
 	m_nFirstTick = -1;
@@ -543,6 +544,9 @@ void CReplayServer::FireGameEvent(IGameEvent *event)
 	if ( g_GameEventManager.SerializeEvent( event, &eventMsg.m_DataOut ) )
 	{
 		SendNetMsg( eventMsg );
+		
+		// dimhotepus: Increment events count.
+		++m_nDebugID;
 	}
 	else
 	{
