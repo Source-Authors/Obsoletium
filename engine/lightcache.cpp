@@ -133,10 +133,13 @@ struct LightingStateInfo_t
 {
 	float	m_pIllum[MAXLOCALLIGHTS];
 	bool 	m_LightingStateHasSkylight;
+
 	LightingStateInfo_t()
 	{
-		memset( this, 0, sizeof( *this ) );
+		m_LightingStateHasSkylight = false;
+		Clear();
 	}
+
 	void Clear()
 	{
 		memset( this, 0, sizeof( *this ) );
@@ -149,12 +152,16 @@ struct LightingStateInfo_t
 class CBaseLightCache : public LightingStateInfo_t
 {
 public:
-	CBaseLightCache()
+	CBaseLightCache() : m_LightingOrigin{vec3_invalid}
 	{
-		m_pEnvCubemapTexture = NULL;
-		memset( m_pLightstyles, 0, sizeof( m_pLightstyles ) );
-		m_LightingFlags = 0;
 		m_LastFrameUpdated_LightStyles = -1;
+		m_LastFrameUpdated_DynamicLighting = -1;
+
+		m_LightingFlags = 0;
+		leaf = -1;
+
+		memset( m_pLightstyles, 0, sizeof( m_pLightstyles ) );
+		m_pEnvCubemapTexture = nullptr;
 	}
 
 	bool HasLightStyle() 
@@ -204,7 +211,11 @@ class lightcache_t : public CBaseLightCache
 public:
 	lightcache_t()
 	{
-		m_LastFrameUpdated_DynamicLighting = -1;
+		memset(m_StaticPrecalc_LocalLight, 0, sizeof(m_StaticPrecalc_LocalLight));
+		m_StaticPrecalc_NumLocalLights = 0;
+		next = bucket = 0xFFFF;
+		lru_prev = lru_next = 0xFFFF;
+		x = y = z = INT_MIN;
 	}
 
 public:
@@ -246,10 +257,13 @@ public:
 	bool HasDlights() { return m_DLightActive ? true : false; }
 	PropLightcache_t()
 	{
+		m_pNextPropLightcache = nullptr;
 		m_Flags = 0;
-		m_SwitchableLightFrame = -1;
 		m_DLightActive = 0;
 		m_DLightMarkFrame = 0;
+		m_SwitchableLightFrame = -1;
+		mins = vec3_invalid;
+		maxs = vec3_invalid;
 	}
 };
 
