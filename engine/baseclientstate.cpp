@@ -184,8 +184,9 @@ ConVar  cl_show_connectionless_packet_warnings( "cl_show_connectionless_packet_w
 
 C_ServerClassInfo::C_ServerClassInfo()
 {
-	m_ClassName = NULL;
-	m_DatatableName = NULL;
+	m_pClientClass = nullptr;
+	m_ClassName = nullptr;
+	m_DatatableName = nullptr;
 	m_InstanceBaselineIndex = INVALID_STRING_INDEX;
 }
 
@@ -288,6 +289,7 @@ CBaseClientState::CBaseClientState()
 	m_Socket = NS_CLIENT;
 	m_pServerClasses = NULL;
 	m_StringTableContainer = NULL;
+	m_iEncryptionKeySize = std::numeric_limits<uint>::max();
 	m_NetChannel = NULL;
 	m_nSignonState = SIGNONSTATE_NONE;
 	m_nChallengeNr = 0;
@@ -299,6 +301,7 @@ CBaseClientState::CBaseClientState()
 	m_bRestrictServerCommands = true;
 	m_bRestrictClientCommands = true;
 	m_nServerCount = 0;
+	m_flNextCmdTime = -1.f;
 	m_nCurrentSequence = 0;
 	m_nDeltaTick = 0;
 	m_bPaused = 0;
