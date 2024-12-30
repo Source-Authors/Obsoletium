@@ -13,7 +13,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern void DataTable_Warning( const char *pInMessage, ... );
+extern void DataTable_Warning( PRINTF_FORMAT_STRING const char *pInMessage, ... );
 extern bool ShouldWatchThisProp( const SendTable *pTable, int objectID, const char *pPropName );
 
 // The engine implements this.
