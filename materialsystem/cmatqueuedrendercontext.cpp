@@ -1525,7 +1525,7 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 		uint64 status = 0x31415926;
 
 		// Print some information to the console so that it's picked up in the minidump comment.
-		Msg( "AllocVertices( %d, %d ) on %p failed. m_Vertices is based at %p with a size of 0x%x.\n", nVerts, nVertexSize, this, m_Vertices.GetBase(), m_Vertices.GetSize() );
+		Msg( "AllocVertices( %d, %d ) on %p failed. m_Vertices is based at %p with a size of 0x%zx.\n", nVerts, nVertexSize, this, m_Vertices.GetBase(), m_Vertices.GetSize() );
 		Msg( "%zd vertices used.\n", m_Vertices.GetUsed() );
 		if ( pNextAlloc > pCommitLimit )
 		{
@@ -1537,7 +1537,9 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 			if ( !pRet )
 				status = GetLastError();
 
-			Msg( "VirtualAlloc( %p, %d ) returned %p on repeat. VirtualAlloc %s with code %x.\n", pCommitLimit, commitSize, pRet, (pRet != NULL) ? "succeeded" : "failed", (uint32) status );
+			Msg( "VirtualAlloc(%p, %u) returned %p on repeat. VirtualAlloc %s with error %s.\n",
+				pCommitLimit, commitSize, pRet, (pRet != NULL) ? "succeeded" : "failed",
+				std::system_category().message(status).c_str() );
 		}
 		else
 		{
@@ -1568,7 +1570,7 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 		uint64 status = 0x31415926;
 
 		// Print some information to the console so that it's picked up in the minidump comment.
-		Msg( "AllocIndices( %d ) on %p failed. m_Indices is based at %p with a size of 0x%x.\n", nIndices, this, m_Indices.GetBase(), m_Indices.GetSize() );
+		Msg( "AllocIndices( %d ) on %p failed. m_Indices is based at %p with a size of 0x%zx.\n", nIndices, this, m_Indices.GetBase(), m_Indices.GetSize() );
 		Msg( "%zd indices used.\n", m_Indices.GetUsed() );
 		if ( pNextAlloc > pCommitLimit )
 		{
@@ -1580,7 +1582,9 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 			if ( !pRet )
 				status = GetLastError();
 
-			Msg( "VirtualAlloc( %p, %d ) returned %p on repeat. VirtualAlloc %s with code %x.\n", pCommitLimit, commitSize, pRet, (pRet != NULL) ? "succeeded" : "failed", (uint32) status );
+			Msg( "VirtualAlloc(%p, %u) returned %p on repeat. VirtualAlloc %s with code %x.\n",
+				pCommitLimit, commitSize, pRet, (pRet != NULL) ? "succeeded" : "failed",
+				std::system_category().message(status).c_str() );
 		}
 		else
 		{
