@@ -119,7 +119,7 @@ void S_ReloadFilesInList( IFileList *pFilesToReload );
 vec_t S_GetNominalClipDist();
 
 extern bool TestSoundChar(const char *pch, char c);
-extern char *PSkipSoundChars(const char *pch);
+extern const char *PSkipSoundChars(const char *pch);
 
 #include "soundchars.h"
 
