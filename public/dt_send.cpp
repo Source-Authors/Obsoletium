@@ -804,24 +804,35 @@ SendProp SendPropExclude(
 // ---------------------------------------------------------------------- //
 SendProp::SendProp()
 {
-	m_pVarName = NULL;
-	m_Offset = 0;
-	m_pDataTable = NULL;
-	m_ProxyFn = NULL;
-	m_pExcludeDTName = NULL;
-	m_pParentArrayPropName = NULL;
-
-	
+	m_pMatchingRecvProp = nullptr;
 	m_Type = DPT_Int;
-	m_Flags = 0;
 	m_nBits = 0;
 
 	m_fLowValue = 0.0f;
 	m_fHighValue = 0.0f;
-	m_pArrayProp = 0;
-	m_ArrayLengthProxy = 0;
+
+	m_pArrayProp = nullptr;
+	m_ArrayLengthProxy = nullptr;
+
 	m_nElements = 1;
 	m_ElementStride = -1;
+
+	m_pExcludeDTName = nullptr;
+	m_pParentArrayPropName = nullptr;
+
+	m_pVarName = nullptr;
+	m_fHighLowMul = 1.f;
+
+	m_Flags = 0;
+
+	m_ProxyFn = nullptr;
+	m_DataTableProxyFn = nullptr;
+
+	m_pDataTable = nullptr;
+
+	m_Offset = 0;
+
+	m_pExtraData = nullptr;
 }
 
 
