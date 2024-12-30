@@ -1422,19 +1422,6 @@ size_t CWin32ReadOnlyFile::FS_fread( void *dest, size_t destSize, size_t size )
 		{
 			DWORD dwError = GetLastError();
 
-			if ( IsX360() )
-			{
-				if ( dwError == ERROR_DISK_CORRUPT || dwError == ERROR_FILE_CORRUPT )
-				{
-					FSDirtyDiskReportFunc_t func = g_FileSystem_Stdio.GetDirtyDiskReportFunc();
-					if ( func )
-					{
-						func();
-						result = 0;
-					}
-				}
-			}
-
 			if ( dwError == ERROR_NO_SYSTEM_RESOURCES && MAX_READ > MIN_READ )
 			{
 				MAX_READ /= 2;
