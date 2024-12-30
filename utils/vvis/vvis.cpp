@@ -969,7 +969,7 @@ int ParseCommandLine( int argc, char **argv )
 		else if (!Q_stricmp (argv[i],"-tmpin"))
 		{
 			Msg ("--tmpin: Read from /tmp\n");
-			strcpy (inbase, "/tmp");
+			V_strcpy_safe (inbase, "/tmp");
 		}
 		else if( !Q_stricmp( argv[i], "-low" ) )
 		{
