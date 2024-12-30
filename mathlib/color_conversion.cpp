@@ -407,7 +407,7 @@ void XM_CALLCONV ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out )
 // for f' = f * 2^e,  f is on [128..255].
 // Uses IEEE 754 representation to directly extract this information
 // from the float.
-inline static int VectorToColorRGBExp32_CalcExponent( const float *pin )
+inline static int XM_CALLCONV VectorToColorRGBExp32_CalcExponent( float pin )
 {
 	static_assert(std::numeric_limits<float>::is_iec559);
 
@@ -417,15 +417,15 @@ inline static int VectorToColorRGBExp32_CalcExponent( const float *pin )
 	// input exponent and 7 to work out the normalizing exponent. Thus if you pass in 
 	// 32 (represented in IEEE 754 as 2^5), this function will return 2
 	// (because 32 * 2^2 = 128)
-	if (*pin == 0.0f)
+	if (pin == 0.0f)
 		return 0;
 
-	unsigned int fbits;
+	alignas(float) unsigned int fbits;
 
-	static_assert(sizeof(*pin) == sizeof(fbits));
+	static_assert(sizeof(pin) == sizeof(fbits));
 
 	// dimhotepus: Fix UB on reinterpret cast float* -> unsigned*
-	std::memcpy(&fbits, pin, sizeof(unsigned));
+	std::memcpy(&fbits, &pin, sizeof(unsigned));
 	
 	// the exponent component is bits 23..30, and biased by +127
 	constexpr unsigned int biasedSeven = 7 + 127;
@@ -452,38 +452,17 @@ void XM_CALLCONV VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
 	// work out which of the channels is the largest ( we will use that to map the exponent )
 	// this is a sluggish branch-based decision tree -- most architectures will offer a [max]
 	// assembly opcode to do this faster.
-	const float *pMax;
-	if (vin.x > vin.y)
-	{
-		if (vin.x > vin.z)
-		{
-			pMax = &vin.x;
-		}
-		else
-		{
-			pMax = &vin.z;
-		}
-	}
-	else
-	{
-		if (vin.y > vin.z)
-		{
-			pMax = &vin.y;
-		}
-		else
-		{
-			pMax = &vin.z;
-		}
-	}
+	const float fMax = VectorMaximum(vin);
 
 	// now work out the exponent for this luxel. 
-	signed int exponent = VectorToColorRGBExp32_CalcExponent( pMax );
+	const int exponent = VectorToColorRGBExp32_CalcExponent( fMax );
 
 	// make sure the exponent fits into a signed byte.
 	// (in single precision format this is assured because it was a signed byte to begin with)
-	Assert(exponent > -128 && exponent <= 127);
+	Assert(exponent > std::numeric_limits<signed char>::min() &&
+		   exponent <= std::numeric_limits<signed char>::max());
 
-	// promote the exponent back onto a scalar that we'll use to normalize all the numbers
+	// promote the exponent back onto a scalar that we'll use to normalize all the numbers.
 	float scalar;
 	{
 		static_assert(std::numeric_limits<float>::is_iec559);
@@ -495,18 +474,18 @@ void XM_CALLCONV VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
 		std::memcpy( &scalar, &fbits, sizeof(scalar) );
 	}
 
-	float r = vin.x * scalar;
-	float g = vin.y * scalar;
-	float b = vin.z * scalar;
+	const float r = vin.x * scalar;
+	const float g = vin.y * scalar;
+	const float b = vin.z * scalar;
 
 	// Above 255 would be right out.
 	AssertMsg( r <= 255.0f && g <= 255.0f && b <= 255.0f,
 		"(R = %.2f, G = %.2f, B = %.2f): component > 255.",
 		r, g, b );
 
-	c.r = static_cast<byte>( r );
-	c.g = static_cast<byte>( g );
-	c.b = static_cast<byte>( b );
+	c.r = static_cast<byte>( static_cast<int>(r) );
+	c.g = static_cast<byte>( static_cast<int>(g) );
+	c.b = static_cast<byte>( static_cast<int>(b) );
 
-	c.exponent = ( signed char )exponent;
+	c.exponent = static_cast<signed char>(exponent);
 }
