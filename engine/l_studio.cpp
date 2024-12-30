@@ -1897,8 +1897,7 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 			return;
 	}
 
-	Assert( info.m_pStudioHdr );
-	Assert( info.m_pStudioHdr->pszName() );
+	Assert( info.m_pStudioHdr && info.m_pStudioHdr->pszName() );
 	Assert( info.m_pHardwareData );
 	float duration = 0.0f;
 	int lineOffset = 0;
@@ -3701,7 +3700,7 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 	{
 		// any i/o error
 		goto cleanUp;
-			}
+	}
 
 	pVhvHdr = (HardwareVerts::FileHeader_t *)pData;
 
@@ -3766,10 +3765,7 @@ cleanUp:
 	CacheUnlock( pStaticPropContext->m_ColorMeshHandle );
 	delete pStaticPropContext;
 
-	if ( pOriginalData )
-	{
-		free( pOriginalData );
-	}
+	free( pOriginalData );
 }
 
 //-----------------------------------------------------------------------------
