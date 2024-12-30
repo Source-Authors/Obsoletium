@@ -18,6 +18,7 @@ struct DemoCommandQueue
 	DemoCommandQueue()
 	{
 		tick = 0;
+		filepos = -1;
 	}
 	int				tick;
 	democmdinfo_t	info;
