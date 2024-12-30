@@ -305,7 +305,8 @@ template <typename T>
 void PushPopInterleavedTest(ITestContainer<T> &container) {
   Msg("%s test: single thread push/pop, interleaved...\n", container.GetType());
 
-  srand(Plat_MSTime());
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  srand(static_cast<unsigned>(Plat_USTime() % std::numeric_limits<unsigned>::max()));
 
   g_nTested.store(0, std::memory_order::memory_order_relaxed);
 
@@ -414,7 +415,8 @@ void MTPushPopPopInterleaved(ITestContainer<T> &container, bool bDistribute) {
   Msg("%s test: multithread interleaved push/pop, %s\n", container.GetType(),
       bDistribute ? "distributed..." : "no affinity...");
 
-  srand(Plat_MSTime());
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  srand(static_cast<unsigned>(Plat_USTime() % std::numeric_limits<unsigned>::max()));
   TestStart();
 
   for (int i = 0; i < NUM_THREADS; i++) {
