@@ -82,8 +82,8 @@ public:
 private:
 	KeyValues *m_cache;
 
-	void GetCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] );
-	void GenerateCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] );
+	void GetCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] );
+	void GenerateCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] );
 
 	void BuildKeyNames( const char *gamePath );			///< Convenience function to build the keys to index into m_cache
 	char m_cachefileKey[BufferSize + 64];
@@ -366,7 +366,7 @@ void DownloadCache::PersistToCache( const RequestContext_t *rc )
 }
 
 //--------------------------------------------------------------------------------------------------------------
-void DownloadCache::GetCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] )
+void DownloadCache::GetCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] )
 {
 	BuildKeyNames( rc->gamePath );
 	const char *path = m_cache->GetString( m_cachefileKey, NULL );
@@ -379,13 +379,12 @@ void DownloadCache::GetCacheFilename( const RequestContext_t *rc, char cachePath
 }
 
 //--------------------------------------------------------------------------------------------------------------
-void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] )
+void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] )
 {
 	GetCacheFilename( rc, cachePath );
 	BuildKeyNames( rc->gamePath );
 
 	m_cache->SetString( m_timestampKey, rc->cachedTimestamp );
-	//ConDColorMsg( DownloadColor,"DownloadCache::GenerateCacheFilename() set %s = %s\n", m_timestampKey, rc->cachedTimestamp );
 
 	if ( !*cachePath )
 	{
@@ -402,7 +401,6 @@ void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char cach
 			if ( !g_pFileSystem->FileExists( cachePath ) )
 			{
 				m_cache->SetString( m_cachefileKey, cachePath );
-				//ConDColorMsg( DownloadColor,"DownloadCache::GenerateCacheFilename() set %s = %s\n", m_cachefileKey, cachePath );
 				return;
 			}
 		}
