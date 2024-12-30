@@ -3739,9 +3739,6 @@ void CModelLoader::ReloadFilesInList( IFileList *pFilesToReload )
 		if ( !IsLoaded( pModel ) )
 			continue;
 		
-		if ( pModel->type != mod_studio )
-			continue;
-		
 		if ( pFilesToReload->IsFileInList( pModel->strName ) )
 		{
 			#ifdef PURE_SERVER_DEBUG_SPEW
@@ -5147,8 +5144,6 @@ void *CModelLoader::GetExtraData( model_t *model )
 	case mod_sprite:
 		{
 			// sprites don't use the real cache yet
-			if ( model->type == mod_sprite )
-			{
 				// The sprite got unloaded.
 				if ( !( FMODELLOADER_LOADED & model->nLoadFlags ) )
 				{
@@ -5157,7 +5152,6 @@ void *CModelLoader::GetExtraData( model_t *model )
 
 				return model->sprite.sprite;
 			}
-		}
 		break;
 
 	case mod_studio:
