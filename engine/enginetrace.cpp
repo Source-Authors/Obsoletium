@@ -1770,13 +1770,15 @@ void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter 
 		IHandleEntity *pHandleEntity = enumerator.m_EntityHandles[i];
 		HandleEntityToCollideable( pHandleEntity, &pCollideable, &pDebugName );
 
+#ifdef _DEBUG
 		// Check for error condition
-		if ( IsPC() && IsDebug() && !IsSolid( pCollideable->GetSolid(), pCollideable->GetSolidFlags() ) )
+		if ( !IsSolid( pCollideable->GetSolid(), pCollideable->GetSolidFlags() ) )
 		{
 			Assert( 0 );
 			Msg( "%s in solid list (not solid)\n", pDebugName );
 			continue;
 		}
+#endif
 
 		if ( !StaticPropMgr()->IsStaticProp( pHandleEntity ) )
 		{
