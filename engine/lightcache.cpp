@@ -302,17 +302,17 @@ static Vector s_Grayscale( 0.299f, 0.587f, 0.114f );
 #define BIT_SET( a, b ) ((a)[(b)>>3] & (1<<((b)&7)))
 
 
-inline unsigned short GetLightCacheIndex( const lightcache_t *pCache )
+inline static unsigned short GetLightCacheIndex( const lightcache_t *pCache )
 {
 	return pCache - lightcache;
 }
 
-inline lightcache_t& GetLightLRUHead()
+inline static lightcache_t& GetLightLRUHead()
 {
 	return lightcache[LIGHT_LRU_HEAD_INDEX];
 }
 
-inline lightcache_t& GetLightLRUTail()
+inline static lightcache_t& GetLightLRUTail()
 {
 	return lightcache[LIGHT_LRU_TAIL_INDEX];
 }
