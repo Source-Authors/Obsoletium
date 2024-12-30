@@ -2721,6 +2721,7 @@ void CM_SetupAreaFloodNums( byte areaFloodNums[MAX_MAP_AREAS], int *pNumAreas )
 
 CFastPointLeafNum::CFastPointLeafNum()
 {
+	m_iCachedLeaf = -1;
 	m_flDistToExitLeafSqr = -1;
 	m_vCachedPos.Init();
 }
