@@ -1202,12 +1202,10 @@ void CShadowMgr::RemoveAllSurfacesFromShadow( ShadowHandle_t handle )
 	// Iterate over all the decals associated with a particular shadow
 	// Remove the decals from the surfaces they are associated with
 	ShadowSurfaceIndex_t i = m_Shadows[handle].m_FirstDecal;
-	ShadowSurfaceIndex_t next;
 	while ( i != m_ShadowSurfaces.InvalidIndex() )
 	{
 		ShadowDecalHandle_t decalHandle = m_ShadowSurfaces[i];
-
-		next = m_ShadowSurfaces.Next(i);
+		ShadowSurfaceIndex_t next = m_ShadowSurfaces.Next(i);
 
 		RemoveShadowDecalFromSurface( m_ShadowDecals[decalHandle].m_SurfID, decalHandle );
 
