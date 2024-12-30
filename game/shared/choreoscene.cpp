@@ -2836,7 +2836,7 @@ float CChoreoScene::LoopThink( float curtime )
 			entry.e		= e;
 			entry.pt	= disposition;
 
-			//float ret = (float)atof( e->GetParameters() );
+			//float ret = strtof( e->GetParameters(), nullptr );
 			float ret = e->GetStartTime();
 			ProcessActiveListEntry( &entry );
 
