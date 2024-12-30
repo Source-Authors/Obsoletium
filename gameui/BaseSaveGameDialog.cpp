@@ -14,7 +14,6 @@
 #include "vgui_controls/Button.h"
 #include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
-#include "filesystem.h"
 #include "qlimits.h"
 
 #include "MouseMessageForwardingPanel.h"
@@ -63,11 +62,11 @@ public:
 	{
 		// set the bitmap to display
 		char tga[_MAX_PATH];
-		Q_strncpy( tga, save.szFileName, sizeof(tga) );
+		V_strcpy_safe( tga, save.szFileName );
 		char *ext = strstr( tga, ".sav" );
 		if ( ext )
 		{
-			strcpy( ext, ".tga" );
+			V_strncpy( ext, ".tga", 5 );
 		}
 
 		// If a TGA file exists then it is a user created savegame
@@ -637,11 +636,11 @@ void CBaseSaveGameDialog::DeleteSaveGame( const char *fileName )
 
 	// delete the associated tga
 	char tga[_MAX_PATH];
-	Q_strncpy( tga, fileName, sizeof(tga) );
+	V_strcpy_safe( tga, fileName );
 	char *ext = strstr( tga, ".sav" );
 	if ( ext )
 	{
-		strcpy( ext, ".tga" );
+		V_strncpy( ext, ".tga", 5 );
 	}
 	g_pFullFileSystem->RemoveFile( tga, "MOD" );
 }

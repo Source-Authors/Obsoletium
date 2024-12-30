@@ -19,8 +19,6 @@
 #include "vgui_controls/Label.h"
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/Button.h"
-#include "vgui_controls/Button.h"
-#include "vgui_controls/PanelListPanel.h"
 #include "vgui_controls/QueryBox.h"
 
 #include <stdio.h>
@@ -94,11 +92,11 @@ public:
 	{
 		// set the bitmap to display
 		char tga[_MAX_PATH];
-		Q_strncpy( tga, item.szMapFileName, sizeof(tga) );
-		char *ext = strstr( tga, ".txt" );
+		V_strcpy_safe( tga, item.szMapFileName );
+		char *ext = strstr( tga, ".sav" );
 		if ( ext )
 		{
-			strcpy( ext, ".tga" );
+			V_strncpy( ext, ".tga", 5 );
 		}
 		m_pCommentaryScreenshot->SetTGA( tga );
 

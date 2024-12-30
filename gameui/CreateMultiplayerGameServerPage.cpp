@@ -177,7 +177,7 @@ void CCreateMultiplayerGameServerPage::LoadMaps( const char *pszPathID )
 
 		// FindFirst ignores the pszPathID, so check it here
 		// TODO: this doesn't find maps in fallback dirs
-		_snprintf( mapname, sizeof(mapname), "maps/%s", pszFilename );
+		V_sprintf_safe( mapname, "maps/%s", pszFilename );
 		if ( !g_pFullFileSystem->FileExists( mapname, pszPathID ) )
 		{
 			goto nextFile;
