@@ -654,7 +654,13 @@ void S_Startup( void )
 static ConCommand play("play", S_Play, "Play a sound.", FCVAR_SERVER_CAN_EXECUTE );
 static ConCommand playflush( "playflush", S_Play, "Play a sound, reloading from disk in case of changes." );
 static ConCommand playvol( "playvol", S_PlayVol, "Play a sound at a specified volume." );
-static ConCommand speak( "speak", S_Say, "Play a constructed sentence." );
+static ConCommand speak( "speak", S_Say, "Play a constructed sentence.\n"
+	"speak <sentence> where sentence:\n"
+	"dsp - Test DSP performance for room preset.\n"
+	"paint - Test mixing paint performance.\n"
+	"!sentence - Test speak sentence.\n"
+	"sound - Test speak custom sound.\n"
+);
 static ConCommand stopsound( "stopsound", S_StopAllSoundsC, 0, FCVAR_CHEAT);		// Marked cheat because it gives an advantage to players minimising ambient noise.
 static ConCommand soundlist( "soundlist", S_SoundList, "List all known sounds." );
 static ConCommand soundinfo( "soundinfo", S_SoundInfo_f, "Describe the current sound device." );
@@ -4936,7 +4942,7 @@ int S_StartDynamicSound( StartSoundParams_t& params )
 
 	// For debugging to see the actual name of the sound...
 	char sndname[ MAX_OSPATH ];
-	Q_strncpy( sndname, params.pSfx->getname(), sizeof( sndname ) );
+	V_strcpy_safe( sndname, params.pSfx->getname() );
 
 	// Msg("Start sound %s\n", pSfx->getname() );
 
@@ -6818,7 +6824,7 @@ void DEBUG_StopSoundMeasure(int type, int samplecount )
 		
 		g_snd_count_debug = 0;
 		g_snd_time_debug = 0;
-		g_snd_samplecount = 0;	
+		g_snd_samplecount = 0;
 		g_snd_frametime_total = 0;
 	}
 
@@ -6832,58 +6838,64 @@ extern ConVar dsp_room;
 
 static void S_Say( const CCommand &args )
 {
-	CSfxTable *pSfx;
+	if ( args.ArgC() != 2 )
+	{
+		Warning("speak: Need single argument.\n");
+		return;
+	}
 
 	if ( !g_AudioDevice->IsActive() )
+	{
+		Warning("speak: No active sound device.\n");
 		return;
+	}
 
 	char sound[256];
-	Q_strncpy( sound, args[1], sizeof( sound ) );		
+	V_strcpy_safe( sound, args[1] );
 	
 	// DEBUG - test performance of dsp code
 	if ( !Q_stricmp( sound, "dsp" ) )
 	{
-		unsigned time;
-		int i;
-		int count = 10000;
-		int idsp; 
+		constexpr intp count = 1000000;
 
-		for (i = 0; i < PAINTBUFFER_SIZE; i++)
+		for (intp i = 0; i < PAINTBUFFER_SIZE; i++)
 		{
-			g_paintbuffer[i].left = RandomInt(0,2999);
-			g_paintbuffer[i].right = RandomInt(0,2999);
+			g_paintbuffer[i].left = RandomInt(0, 2999);
+			g_paintbuffer[i].right = RandomInt(0, 2999);
 		}
-
-		Msg ("Start profiling 10,000 calls to DSP\n");
 		
-		idsp = dsp_room.GetInt();
+		const int idsp = dsp_room.GetInt();
+
+		Msg("speak: Start profiling %zd calls to DSP room preset #%d.\n", count, idsp);
 		
 		// get system time
-
-		time = Plat_MSTime();
+		const double startTime = Plat_FloatTime();
 		
-		for (i = 0; i < count; i++)
+		for (intp i = 0; i < count; i++)
 		{
 			// SX_RoomFX(PAINTBUFFER_SIZE, TRUE, TRUE);
 
 			DSP_Process(idsp, g_paintbuffer, NULL, NULL, PAINTBUFFER_SIZE);
-
 		}
+
 		// display system time delta 
-		Msg("%d milliseconds \n", Plat_MSTime() - time);
+		double totalMs = (Plat_FloatTime() - startTime) * 1000.0;
+		Msg("speak: #%d DSP room preset took %.3lf ms for %zd calls. Average call time %.2f ns.\n",
+			idsp, totalMs, count, totalMs / count * 1000000);
+
 		return;
-	} 
+	}
 	
-	if ( !Q_stricmp(sound, "paint") )
+	if ( !Q_stricmp( sound, "paint" ) )
 	{
-		unsigned time;
-		int count = 10000;
-		static int hash=543;
+		constexpr intp count = 100000;
+
+		static int hash = 543;
 		int psav = g_paintedtime;
 
-		Msg ("Start profiling MIX_PaintChannels\n");
+		Msg("speak: Start profiling MIX_PaintChannels\n");
 		
-		pSfx = S_PrecacheSound("ambience/labdrone1.wav");
+		CSfxTable *pSfx = S_PrecacheSound("ambience/labdrone1.wav");
 
 		StartSoundParams_t params;
 		params.staticsound = false;
@@ -6899,14 +6911,17 @@ static void S_Say( const CCommand &args )
 		S_StartDynamicSound( params );
 
 		// get system time
-		time = Plat_MSTime();
+		double startTime = Plat_FloatTime();
 
 		// paint a boatload of sound
 
-		MIX_PaintChannels( g_paintedtime + 512*count, s_bIsListenerUnderwater );		
+		MIX_PaintChannels( g_paintedtime + count, s_bIsListenerUnderwater );
 
 		// display system time delta 
-		Msg("%d milliseconds \n", Plat_MSTime() - time);
+		double totalMs = (Plat_FloatTime() - startTime) * 1000.0;
+		Msg("speak: %.2lf ms for painting %zd samples ahead. Average sample time %.2f ns.\n",
+			totalMs, count, totalMs / count * 1000000);
+
 		g_paintedtime = psav;
 		return;
 	}
@@ -6916,8 +6931,10 @@ static void S_Say( const CCommand &args )
 	{
 		// build a fake sentence name, then play the sentence text
 
-		Q_strncpy(sound, "xxtestxx ", sizeof( sound ) );
-		Q_strncat(sound, args[1], sizeof( sound ), COPY_ALL_CHARACTERS );
+		#define SRC_SPEAK_TEST_SOUND_NAME "xxtestxx"
+
+		V_strcpy_safe( sound, SRC_SPEAK_TEST_SOUND_NAME " " );
+		V_strcat_safe( sound, args[1] );
 
 		auto addIndex = g_Sentences.AddToTail();
 		sentence_t *pSentence = &g_Sentences[addIndex];
@@ -6925,12 +6942,12 @@ static void S_Say( const CCommand &args )
 		pSentence->length = 0;
 
 		// insert null terminator after sentence name
-		sound[8] = 0;
+		sound[std::size(SRC_SPEAK_TEST_SOUND_NAME) - 1] = '\0';
 
-		pSfx = S_PrecacheSound ("!xxtestxx");
+		CSfxTable *pSfx = S_PrecacheSound("!" SRC_SPEAK_TEST_SOUND_NAME);
 		if (!pSfx)
 		{
-			Msg ("S_Say: can't cache %s\n", sound);
+			Warning("speak: can't cache '%s'.\n", sound);
 			return;
 		}
 
@@ -6945,32 +6962,38 @@ static void S_Say( const CCommand &args )
 		params.flags = 0;
 		params.pitch = PITCH_NORM;
 
-		S_StartDynamicSound ( params );
+		if ( !S_StartDynamicSound( params ) )
+		{
+			Warning("speak: can't start sound '%s'.\n", sound);
+		}
 		
 		// remove last
 		g_Sentences.Remove( g_Sentences.Count() - 1 );
+
+		return;
 	}
-	else
+
+	CSfxTable *pSfx = S_FindName(sound, NULL);
+	if (!pSfx)
 	{
-		pSfx = S_FindName(sound, NULL);
-		if (!pSfx)
-		{
-			Msg ("S_Say: can't find sentence name %s\n", sound);
-			return;
-		}
+		Msg("speak: can't find sentence name '%s'.\n", sound);
+		return;
+	}
 
-		StartSoundParams_t params;
-		params.staticsound = false;
-		params.soundsource = g_pSoundServices->GetViewEntity();
-		params.entchannel = CHAN_REPLACE;
-		params.pSfx = pSfx;
-		params.origin = vec3_origin;
-		params.fvol = 1.0f;
-		params.soundlevel = SNDLVL_NONE;
-		params.flags = 0;
-		params.pitch = PITCH_NORM;
+	StartSoundParams_t params;
+	params.staticsound = false;
+	params.soundsource = g_pSoundServices->GetViewEntity();
+	params.entchannel = CHAN_REPLACE;
+	params.pSfx = pSfx;
+	params.origin = vec3_origin;
+	params.fvol = 1.0f;
+	params.soundlevel = SNDLVL_NONE;
+	params.flags = 0;
+	params.pitch = PITCH_NORM;
 
-		S_StartDynamicSound( params );
+	if ( !S_StartDynamicSound( params ) )
+	{
+		Warning("speak: can't start sound '%s'.\n", sound);
 	}
 }
 
