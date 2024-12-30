@@ -99,7 +99,6 @@ void CMaterialDict::RemoveMaterialFromMaterialList( IMaterialInternal *pMaterial
 //-----------------------------------------------------------------------------
 IMaterialInternal* CMaterialDict::AddMaterial( char const* pName, const char *pTextureGroupName )
 {
-	Assert( ThreadInMainThread() );
 	IMaterialInternal *pMaterial = IMaterialInternal::CreateMaterial( pName, pTextureGroupName );
 	Assert( pMaterial && pMaterial->IsRealTimeVersion() );
 	AddMaterialToMaterialList( pMaterial );
@@ -108,7 +107,6 @@ IMaterialInternal* CMaterialDict::AddMaterial( char const* pName, const char *pT
 
 void CMaterialDict::RemoveMaterial( IMaterialInternal* pMaterial )
 {
-	Assert( ThreadInMainThread() );
 	Assert( (pMaterial == NULL) || pMaterial->IsRealTimeVersion() );
 	RemoveMaterialFromMaterialList( pMaterial );
 }
