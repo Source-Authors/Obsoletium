@@ -3660,16 +3660,20 @@ void HLTV_Shutdown()
 // Check with steam to see if the requested file (requires full path) is a valid, signed binary
 bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown )
 {
-#if defined( SWDS ) || defined(_X360)
+#if defined( SWDS )
 	return true;
 #else
-	if ( sv.IsDedicated() || IsOSX() || IsLinux() )
+	if ( sv.IsDedicated() )
 	{
-		// dedicated servers and Mac and Linux  binaries don't check signatures
+		// dedicated servers don't check signatures
 		return true;
 	}
-	else
-	{
+
+#if defined(POSIX)
+	// Mac and Linux binaries don't check signatures
+	return true;
+#else
+
     // dimhotepus: NO_STEAM
 #ifndef NO_STEAM
 		if ( Steam3Client().SteamUtils() )
@@ -3705,7 +3709,8 @@ bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown 
 			}
 		}
 #endif
-	}
+
+#endif
 
 	return false;
 #endif // SWDS
