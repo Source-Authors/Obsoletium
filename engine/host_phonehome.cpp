@@ -30,10 +30,6 @@
 #include "tier0/vcrmode.h"
 #include "blockingudpsocket.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -52,6 +48,7 @@ class CPhoneHome : public IPhoneHome
 public:
 	CPhoneHome() :
 		m_bPhoneHome( false ),
+		m_bLevelStarted( false ),
 		m_uSessionID( 0 ),
 		m_pSocket( 0 )
 	{

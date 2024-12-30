@@ -61,9 +61,11 @@ static	ConVar tv_timeout( "tv_timeout", "30", 0, "SourceTV connection timeout in
 
 CHLTVClientState::CHLTVClientState()
 {
-	m_pNewClientFrame = NULL;
-	m_pCurrentClientFrame = NULL;
+	m_pNewClientFrame = nullptr;
+	m_pCurrentClientFrame = nullptr;
 	m_bSaveMemory = false;
+	m_fNextSendUpdateTime = -1;
+	m_pHLTV = nullptr;
 }
 
 CHLTVClientState::~CHLTVClientState()

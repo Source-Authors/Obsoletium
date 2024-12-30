@@ -843,6 +843,9 @@ void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
 //-----------------------------------------------------------------------------
 CConPanel::CConPanel( vgui::Panel *parent ) : CBasePanel( parent, "CConPanel" )
 {
+	m_hFont = vgui::INVALID_FONT;
+	m_hFontFixed = vgui::INVALID_FONT;
+
 	// Full screen assumed
 	SetSize( videomode->GetModeStereoWidth(), videomode->GetModeStereoHeight() );
 	SetPos( 0, 0 );
