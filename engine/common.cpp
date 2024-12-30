@@ -624,7 +624,7 @@ byte *COM_LoadFile (const char *path, int usehunk, int *pLength)
 	switch ( usehunk )
 	{
 	case 1:
-		buf = (byte *)Hunk_AllocName (bufSize, base);
+		buf = Hunk_AllocName<byte>(bufSize, base);
 		break;
 	case 2:
 		AssertMsg( 0, "Temp alloc no longer supported\n" );

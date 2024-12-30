@@ -1477,6 +1477,8 @@ CColorHistogramPanel::CColorHistogramPanel( vgui::Panel *pParent, const char *pN
 	m_Type = RGB;
 
 	m_pOp = pOp;
+
+	m_flMax = -1;
 }
 
 CColorHistogramPanel::~CColorHistogramPanel()
@@ -2249,6 +2251,8 @@ private:
 //-----------------------------------------------------------------------------
 CSelectedHSVOperation::CSelectedHSVOperation()
 {
+	m_pOpList = nullptr;
+
 	m_SelectionMethod = SELECT_NEARBY_RGB;
 	m_DeltaHSV.Init( 0, 0, 0 );
 
@@ -2680,6 +2684,7 @@ protected:
 //-----------------------------------------------------------------------------
 CUncorrectedImagePanel::CUncorrectedImagePanel( vgui::Panel *pParent, const char *pName ) : BaseClass( pParent, pName )
 {
+	m_pHSVOp = nullptr;
 	m_bMouseDown = false;
 	SetMouseInputEnabled( true );
 	MaintainProportions( true );
@@ -3248,12 +3253,14 @@ private:
 //-----------------------------------------------------------------------------
 CColorLookupOperation::CColorLookupOperation( )
 {
+	m_pFilename[0] = '\0';
+
 	m_Resolution = 0;
 	m_LookupTable = 0;
 	m_flBlendFactor = 1.0f;
+	m_bEnable = false;
 
 	V_strcpy_safe( m_pName, "Lookup" );
-	V_strcpy_safe( m_pFilename, "" );
 }
 
 
