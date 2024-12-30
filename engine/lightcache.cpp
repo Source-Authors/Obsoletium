@@ -72,14 +72,13 @@ static byte g_FrameMissCount = 0;
 static int g_FrameIndex = 0;
 ConVar lightcache_maxmiss("lightcache_maxmiss","2", FCVAR_CHEAT);
 
-#define NUMRANDOMNORMALS	162
-static Vector	s_raddir[NUMRANDOMNORMALS] = {
+static const Vector	s_raddir[] = {
 #include "randomnormals.h"
 };
 
 static ConVar r_lightcache_numambientsamples( "r_lightcache_numambientsamples", "162", FCVAR_CHEAT, 
 											 "number of random directions to fire rays when computing ambient lighting",
-											 true, 1.0f, true, ( float )NUMRANDOMNORMALS );
+											 true, 1.0f, true, static_cast<float>(ssize(s_raddir)) );
 
 ConVar r_ambientlightingonly( 
 	"r_ambientlightingonly", 
@@ -631,7 +630,7 @@ static void ComputeAmbientFromSphericalSamples( const Vector& start,
 	// find any ambient lights
 	dworldlight_t *pSkylight = FindAmbientLight();
 
-	Vector radcolor[NUMRANDOMNORMALS];
+	Vector radcolor[std::size(s_raddir)];
 	Assert( cached_r_lightcache_numambientsamples <= ssize( radcolor ) );
 
 	// sample world by casting N rays distributed across a sphere
