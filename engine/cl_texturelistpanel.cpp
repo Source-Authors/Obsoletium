@@ -1521,7 +1521,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		// 1. look for TGA - if found, get the txt file (if txt file missing, create one)
 		// 2. otherwise look for PSD - affecting psdinfo
 		// 3. else error
-		char *pExtPut = szFileName + strlen( szFileName ) - strlen( ".vtf" ); // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
+		char *pExtPut = szFileName + strlen( szFileName ) - (ssize( ".vtf" ) - 1); // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
 
 		// 1.tga
 		sprintf( pExtPut, ".tga" );
