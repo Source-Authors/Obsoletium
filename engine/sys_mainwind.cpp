@@ -1592,6 +1592,8 @@ CGame::CGame()
 	}
 #endif
 
+	m_bExternallySuppliedWindow = false;
+
 #if defined( USE_SDL )
 	m_pSDLWindow = 0;
 #endif
