@@ -79,11 +79,6 @@ CPlugin::~CPlugin()
 //---------------------------------------------------------------------------------
 bool CPlugin::Load( const char *fileName )
 {
-	if ( IsX360() )
-	{
-		return false;
-	}
-
 	char fixedFileName[ MAX_PATH ];
 	Q_strncpy( fixedFileName, fileName, sizeof(fixedFileName) );
 	Q_FixSlashes( fixedFileName );
