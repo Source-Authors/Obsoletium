@@ -1296,18 +1296,8 @@ void Sys_SetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
 
-	// First time, just set to Valve default
-	if (dwDisposition == REG_CREATED_NEW_KEY)
-	{
-		// Just Set the Values according to the defaults
-		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, static_cast<unsigned long>(strlen(pszValue)) + 1 ); 
-	}
-	else
-	{
-		// Didn't find it, so write out new value
-		// Just Set the Values according to the defaults
-		lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, static_cast<unsigned long>(strlen(pszValue)) + 1 ); 
-	}
+	// Just Set the Values according to the defaults
+	lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, static_cast<unsigned long>(strlen(pszValue)) + 1 ); 
 
 	// Always close this key before exiting.
 	VCRHook_RegCloseKey(hKey);
