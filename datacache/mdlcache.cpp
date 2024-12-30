@@ -122,7 +122,7 @@ struct studiodata_t
 	// array of cache handles to demand loaded virtual model data
 	int					m_nAnimBlockCount;
 	DataCacheHandle_t	*m_pAnimBlock;
-	unsigned long	 	*m_iFakeAnimBlockStall;
+	unsigned long long 	*m_iFakeAnimBlockStall;
 
 	// vertex data is usually compressed to save memory (model decal code only needs some data)
 	DataCacheHandle_t	m_VertexCache;
@@ -1153,12 +1153,12 @@ void CMDLCache::AllocateAnimBlocks( studiodata_t *pStudioData, int nCount )
 	Assert( pStudioData->m_pAnimBlock == NULL );
 
 	pStudioData->m_nAnimBlockCount = nCount;
-	pStudioData->m_pAnimBlock = new DataCacheHandle_t[pStudioData->m_nAnimBlockCount];
 
+	pStudioData->m_pAnimBlock = new DataCacheHandle_t[pStudioData->m_nAnimBlockCount];
 	memset( pStudioData->m_pAnimBlock, 0, sizeof(DataCacheHandle_t) * pStudioData->m_nAnimBlockCount );
 
-	pStudioData->m_iFakeAnimBlockStall = new unsigned long [pStudioData->m_nAnimBlockCount];
-	memset( pStudioData->m_iFakeAnimBlockStall, 0, sizeof( unsigned long ) * pStudioData->m_nAnimBlockCount );
+	pStudioData->m_iFakeAnimBlockStall = new unsigned long long [pStudioData->m_nAnimBlockCount];
+	memset( pStudioData->m_iFakeAnimBlockStall, 0, sizeof( unsigned long long ) * pStudioData->m_nAnimBlockCount );
 }
 
 void CMDLCache::FreeAnimBlocks( MDLHandle_t handle )
@@ -1294,13 +1294,14 @@ unsigned char *CMDLCache::GetAnimBlock( MDLHandle_t handle, int nBlock )
 
 	if (mod_load_fakestall.GetInt())
 	{
-		unsigned int t = Plat_MSTime();
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		unsigned long long t = Plat_USTime();
 		if (pStudioData->m_iFakeAnimBlockStall[nBlock] == 0 || pStudioData->m_iFakeAnimBlockStall[nBlock] > t)
 		{
 			pStudioData->m_iFakeAnimBlockStall[nBlock] = t;
 		}
 
-		if ((int)(t - pStudioData->m_iFakeAnimBlockStall[nBlock]) < mod_load_fakestall.GetInt())
+		if (static_cast<long long>(t - pStudioData->m_iFakeAnimBlockStall[nBlock]) < mod_load_fakestall.GetInt() * 1000LL)
 		{
 			return NULL;
 		}
