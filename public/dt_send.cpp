@@ -691,7 +691,7 @@ SendProp SendPropArray3(
 	int offset,
 	int sizeofVar,
 	int elements,
-	SendProp pArrayProp,
+	const SendProp &pArrayProp,
 	SendTableProxyFn varProxy
 	)
 {
@@ -836,9 +836,7 @@ SendProp::SendProp()
 }
 
 
-SendProp::~SendProp()
-{
-}
+SendProp::~SendProp() = default;
 
 
 int SendProp::GetNumArrayLengthBits() const
