@@ -102,8 +102,9 @@ struct FogVolumeInfo_t : public FogState_t
 //-----------------------------------------------------------------------------
 struct CachedConvars_t
 {
-	bool	m_bDrawWorld;
+	// dimhotepus: Reorder to reduce memory footprint.
 	int		m_nDrawLeaf;
+	bool	m_bDrawWorld;
 	bool	m_bDrawFuncDetail;
 };
 
@@ -1721,8 +1722,8 @@ void ResetWorldRenderList( CWorldRenderList *pRenderList )
 void Shader_WorldBegin( CWorldRenderList *pRenderList )
 {
 	// Cache the convars so we don't keep accessing them...
-	s_ShaderConvars.m_bDrawWorld = r_drawworld.GetBool();
 	s_ShaderConvars.m_nDrawLeaf = r_drawleaf.GetInt();
+	s_ShaderConvars.m_bDrawWorld = r_drawworld.GetBool();
 	s_ShaderConvars.m_bDrawFuncDetail = r_drawfuncdetail.GetBool();
 
 	ResetWorldRenderList( pRenderList );
