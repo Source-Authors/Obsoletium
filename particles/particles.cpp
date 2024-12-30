@@ -1023,7 +1023,8 @@ void CParticleCollection::Init( CParticleSystemDefinition *pDef, float flDelay, 
 	{
 		m_nRandomSeed = (intp)this;
 #ifndef _DEBUG
-		m_nRandomSeed += Plat_MSTime();
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		m_nRandomSeed += static_cast<int>((Plat_USTime() / 1000) % std::numeric_limits<int>::max());
 #endif
 	}
 

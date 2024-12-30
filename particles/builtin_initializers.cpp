@@ -2275,7 +2275,8 @@ void C_INIT_CreationNoise::InitNewParticlesScalar(
 	float Offset = m_flOffset;
 	CoordBase = Vector ( (*pCreationTime + Offset), (*pCreationTime + Offset), (*pCreationTime + Offset) );
 	CoordBase *= CoordScale;
-	CoordWorldTime = Vector( (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale) );
+	// dimhotepus: ms -> mcs to prevent overflow in 49.7 days.
+	CoordWorldTime = Vector( (Plat_USTime() / 1000 * m_flWorldTimeScale), (Plat_USTime() / 1000 * m_flWorldTimeScale), (Plat_USTime() / 1000 * m_flWorldTimeScale) );
 	CoordBase += CoordWorldTime;
 
 	for( ; nParticleCount--; start_p++ )
