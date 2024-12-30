@@ -2,6 +2,9 @@
 //
 // Purpose: Utility class to help in socket creation. Works for clients + servers
 
+#include "socketcreator.h"
+#include "tier0/dbg.h"
+#include "server.h"
 
 #if defined(_WIN32)
 #include <winsock.h>
@@ -24,10 +27,6 @@
 #define MSG_NOSIGNAL 0
 #endif
 #endif
-
-#include "tier0/dbg.h"
-#include "socketcreator.h"
-#include "server.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

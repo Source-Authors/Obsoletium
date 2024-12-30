@@ -13,7 +13,7 @@
 class IUploadGameStats;
 extern IUploadGameStats *g_pUploadGameStats;
 
-void AsyncUpload_QueueData( char const *szMapName, uint uiBlobVersion, uint uiBlobSize, const void *pvBlob );
+void AsyncUpload_QueueData( char const *szMapName, unsigned uiBlobVersion, unsigned uiBlobSize, const void *pvBlob );
 void AsyncUpload_Shutdown();
 
 #endif // SV_UPLOADGAMESTATS_H

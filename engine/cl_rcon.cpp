@@ -4,35 +4,27 @@
 //
 //===========================================================================//
 
-// If we are going to include winsock.h then we need to disable protected_things.h
-// or else we get many warnings.
-#undef PROTECTED_THINGS_ENABLE
+#include "cl_rcon.h"
+
 #include "tier0/platform.h"
-#ifdef POSIX
-#include "net_ws_headers.h"
-#define WSAGetLastError() errno
-#else
-#if !defined( _X360 )
-#include <winsock.h>
-#else
-#include "winsockx.h"
-#endif
-#undef SetPort // winsock screws with the SetPort string... *sigh*8
-#endif
 
 #include <tier0/dbg.h>
 #include "utlbuffer.h"
-#include "cl_rcon.h"
 #include "vprof_engine.h"
 #include "proto_oob.h" // PORT_RCON define
 #include "cmd.h"
 #include "tier2/fileutils.h"
-#include "zip/XUnzip.h"
 
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
+#ifdef POSIX
+#include "net_ws_headers.h"
+#define WSAGetLastError() errno
+#else
+#include <winsock.h>
 #endif
+
+#undef SetPort  // winsock screws with the SetPort string... *sigh*8
+
+#include "zip/XUnzip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

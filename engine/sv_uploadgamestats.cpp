@@ -6,35 +6,9 @@
 //
 //=============================================================================//
 
-#ifdef _WIN32
-
-#if !defined( _X360 )
-#include <winsock.h>
-#else
-#include "winsockx.h"
-#endif
-
-#elif POSIX
-#define INVALID_SOCKET -1
-#define SOCKET_ERROR -1
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-//$ #include <uuid/uuid.h>
-typedef unsigned char uuid_t[16];
-#ifdef OSX
-#include <uuid/uuid.h>
-#else
-typedef unsigned char uuid_t[16];
-#endif
-#include <pwd.h>
-#define closesocket close
-#include "quakedef.h" // build_number()
-#endif
-
+#include "sv_uploadgamestats.h"
 #include "net.h"
 #include "quakedef.h"
-#include "sv_uploadgamestats.h"
 #include "host.h"
 #include "host_phonehome.h"
 #include "mathlib/IceKey.H"
@@ -58,9 +32,28 @@ typedef unsigned char uuid_t[16];
 #include "sv_steamauth.h"
 #include "host_state.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
+#ifdef _WIN32
+#include <winsock.h>
+
+#elif POSIX
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+//$ #include <uuid/uuid.h>
+typedef unsigned char uuid_t[16];
+#ifdef OSX
+#include <uuid/uuid.h>
+#else
+typedef unsigned char uuid_t[16];
 #endif
+#include <pwd.h>
+#define closesocket close
+#include "quakedef.h" // build_number()
+#endif
+
+#undef SetPort
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1239,7 +1232,7 @@ void CAsyncUploaderThread::ThreadProc()
 	delete this;
 }
 
-void AsyncUpload_QueueData( char const *szMapName, uint uiBlobVersion, uint uiBlobSize, const void *pvBlob )
+void AsyncUpload_QueueData( char const *szMapName, unsigned uiBlobVersion, unsigned uiBlobSize, const void *pvBlob )
 {
 	if ( !g_pAsyncUploader )
 	{

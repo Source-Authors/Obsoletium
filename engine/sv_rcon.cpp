@@ -4,12 +4,20 @@
 //
 //===========================================================================//
 
+#include "sv_rcon.h"
+#include <tier0/dbg.h>
+#include "utlbuffer.h"
+#include "server.h"
+#include "proto_oob.h" // PORT_RCON define
+#include "sv_remoteaccess.h"
+#include "cl_rcon.h"
+#include "sv_filter.h"
 
 #if defined(_WIN32)
 #if !defined(_X360)
 #include <winsock.h>
 #endif
-#undef SetPort // winsock screws with the SetPort string... *sigh*
+#undef SetPort  // winsock screws with the SetPort string... *sigh*
 #define socklen_t int
 #define MSG_NOSIGNAL 0
 #elif POSIX
@@ -25,18 +33,6 @@
 #ifdef OSX
 #define MSG_NOSIGNAL 0
 #endif
-#endif
-#include <tier0/dbg.h>
-#include "utlbuffer.h"
-#include "server.h"
-#include "sv_rcon.h"
-#include "proto_oob.h" // PORT_RCON define
-#include "sv_remoteaccess.h"
-#include "cl_rcon.h"
-#include "sv_filter.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
