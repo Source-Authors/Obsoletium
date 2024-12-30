@@ -891,12 +891,11 @@ bool IsSpaceOrQuote( char val )
 	return (isspace(val) || val == '\"');
 }
 
-static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char const *szNewValue )
+static bool SetBufferValue( char *chTxtFileBuffer, size_t nTxtFileBufferLen, char const *szLookupKey, char const *szNewValue )
 {
 	bool bResult = false;
 
 	size_t lenTmp = strlen( szNewValue );
-	size_t nTxtFileBufferLen = strlen( chTxtFileBuffer );
 
 	for ( char *pch = chTxtFileBuffer;
 		( NULL != ( pch = strstr( pch, szLookupKey ) ) );
@@ -1536,7 +1535,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 			for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
 			// Now fix maxwidth/maxheight settings
-			SetBufferValue( bufTxtFileBuffer.Base<char>(), "nomip", bNewNoMip ? "1" : "0" );
+			SetBufferValue( bufTxtFileBuffer.Base<char>(), strlen( bufTxtFileBuffer.Base<const char>() ), "nomip", bNewNoMip ? "1" : "0" );
 			bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 			// Check out or add the file
@@ -1573,7 +1572,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 				for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "nomip", bNewNoMip ? "1" : "0" );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), strlen( bufTxtFileBuffer.Base<const char>() ), "nomip", bNewNoMip ? "1" : "0" );
 				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
