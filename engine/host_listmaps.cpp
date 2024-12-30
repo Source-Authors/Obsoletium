@@ -173,11 +173,11 @@ private:
 	void			BuildList( void );
 
 private:
-	// Dictionary of items
-	CUtlDict< CMapListItem, int > m_Items;
-
 	// Time of last update
 	double			m_flLastRefreshTime;
+
+	// Dictionary of items
+	CUtlDict< CMapListItem, int > m_Items;
 
 	bool			m_bDirty;
 };
