@@ -8,9 +8,9 @@
 
 #include "IOcclusionSystem.h"
 #include "mathlib/vector.h"
-#include "UtlSortVector.h"
-#include "utllinkedlist.h"
-#include "utlvector.h"
+#include "tier1/UtlSortVector.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/utlvector.h"
 #include "collisionutils.h"
 #include "filesystem.h"
 #include "gl_model_private.h"
@@ -208,6 +208,9 @@ CWingedEdgeList::CWingedEdgeList() : m_WingedEdges( (intp)0, 64 )
 
 	m_BackSurface.m_Plane.normal.Init( 0, 0, 1 );
 	m_BackSurface.m_Plane.dist = FLT_MAX;
+
+	m_flNextDiscontinuity =	FLT_MAX;
+	m_nCurrentEdgeIndex = -1;
 }
 
 
