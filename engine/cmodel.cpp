@@ -2888,7 +2888,8 @@ CON_COMMAND( opt_test_rotation, "Quick timing test of vector rotation my m3x4" )
 
 	// construct an array of 1024 random vectors
 	FourVectors testData[1024];
-	SeedRandSIMD(Plat_MSTime());
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	SeedRandSIMD(static_cast<uint>(Plat_USTime() % std::numeric_limits<uint>::max()));
 	for (int i = 0 ; i < 1024 ; ++i)
 	{
 		testData[i].x = RandSIMD();
