@@ -30,10 +30,10 @@ class CClientSendProp
 public:
 
 	CClientSendProp() : m_pTableName{nullptr} {}
-				~CClientSendProp();
+	~CClientSendProp();
 
-	const char*	GetTableName()				{ return m_pTableName; }
-	void		SetTableName( char *pName )	{ m_pTableName = pName; }
+	const char*	GetTableName() const		{ return m_pTableName; }
+	void		SetTableName( const char *pName );
 		
 
 private:

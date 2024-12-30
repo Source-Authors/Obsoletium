@@ -6,6 +6,8 @@
 
 #include "dt_recv_decoder.h"
 
+#include "common.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -20,14 +22,17 @@ CRecvDecoder::CRecvDecoder()
 	m_pDTITable = nullptr;
 }
 
-CClientSendProp::CClientSendProp()
-{
-	m_pTableName = 0;
-}
-
 CClientSendProp::~CClientSendProp()
 {
-	delete [] m_pTableName;
+	// dimhotepus: Own table name.
+	COM_StringFree(m_pTableName);
+}
+
+void CClientSendProp::SetTableName( const char* name) 
+{
+	// dimhotepus: Own table name.
+	COM_StringFree(m_pTableName);
+	m_pTableName = COM_StringCopy(name);
 }
 
 
