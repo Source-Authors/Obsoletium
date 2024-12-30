@@ -467,8 +467,8 @@ void CVGui::RunFrame()
 
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Ticks", __FUNCTION__ );
 		// directly invoke tick all who asked to be ticked
-		int count = m_TickSignalVec.Count();
-		for (int i = count - 1; i >= 0; i-- )
+		intp count = m_TickSignalVec.Count();
+		for (intp i = count - 1; i >= 0; i-- )
 		{
 			Tick_t *t = m_TickSignalVec[i];
 			if ( t->bMarkDeleted )
@@ -492,7 +492,7 @@ void CVGui::RunFrame()
 		count = m_TickSignalVec.Count();
 
 		// Remove all panels that tried to remove tick in OnTick
-		for (int i = count - 1; i >= 0; i-- )
+		for (intp i = count - 1; i >= 0; i-- )
 		{
 			Tick_t *t = m_TickSignalVec[i];
 			if ( t->bMarkDeleted )
@@ -651,10 +651,8 @@ void CVGui::PanelDeleted(VPanel *focus)
 CVGui::Tick_t* CVGui::CreateNewTick( VPANEL panel, int intervalMilliseconds )
 {
 	// See if it's already in list
-	int count = m_TickSignalVec.Count();
-	for (int i = 0; i < count; i++ )
+	for ( auto *t : m_TickSignalVec )
 	{
-		Tick_t *t = m_TickSignalVec[i];
 		if ( t->panel == (VPanel *)panel )
 		{
 			// Go ahead and update intervals
@@ -726,9 +724,9 @@ void CVGui::RemoveTickSignal( VPANEL panel )
 	VPanel *search = (VPanel *)panel;
 
 	// remove from tick signal dar
-	int count = m_TickSignalVec.Count();
+	intp count = m_TickSignalVec.Count();
 
-	for (int i = 0; i < count; i++ )
+	for (intp i = 0; i < count; i++ )
 	{
 		Tick_t *tick = m_TickSignalVec[i];
 		if ( tick->panel == search )
