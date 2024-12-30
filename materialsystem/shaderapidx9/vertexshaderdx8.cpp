@@ -1817,7 +1817,7 @@ retry_compile:
 		{
 			Warning( "send(%s) failed: %s\n",
 				pSendbuf,
-				std::system_category().message(WSAGetLastError()).c_str() );
+				std::system_category().message(::WSAGetLastError()).c_str() );
 			DeinitRemoteShaderCompile();
 		}
 
@@ -1835,7 +1835,7 @@ retry_compile:
 			else if ( rc < 0 )
 			{
 				Warning( "recv failed: %s\n",
-					std::system_category().message(WSAGetLastError()).c_str() );
+					std::system_category().message(::WSAGetLastError()).c_str() );
 				DeinitRemoteShaderCompile();
 			}
 

@@ -8932,35 +8932,35 @@ static const char *TextureArgToString( int arg )
 	switch( arg & D3DTA_SELECTMASK )
 	{
 	case D3DTA_DIFFUSE:
-		strcpy( buf, "D3DTA_DIFFUSE" );
+		V_strcpy_safe( buf, "D3DTA_DIFFUSE" );
 		break;
 	case D3DTA_CURRENT:
-		strcpy( buf, "D3DTA_CURRENT" );
+		V_strcpy_safe( buf, "D3DTA_CURRENT" );
 		break;
 	case D3DTA_TEXTURE:
-		strcpy( buf, "D3DTA_TEXTURE" );
+		V_strcpy_safe( buf, "D3DTA_TEXTURE" );
 		break;
 	case D3DTA_TFACTOR:
-		strcpy( buf, "D3DTA_TFACTOR" );
+		V_strcpy_safe( buf, "D3DTA_TFACTOR" );
 		break;
 	case D3DTA_SPECULAR:
-		strcpy( buf, "D3DTA_SPECULAR" );
+		V_strcpy_safe( buf, "D3DTA_SPECULAR" );
 		break;
 	case D3DTA_TEMP:
-		strcpy( buf, "D3DTA_TEMP" );
+		V_strcpy_safe( buf, "D3DTA_TEMP" );
 		break;
 	default:
-		strcpy( buf, "<ERROR>" );
+		V_strcpy_safe( buf, "<ERROR>" );
 		break;
 	}
 
 	if( arg & D3DTA_COMPLEMENT )
 	{
-		strcat( buf, "|D3DTA_COMPLEMENT" );
+		V_strcat_safe( buf, "|D3DTA_COMPLEMENT" );
 	}
 	if( arg & D3DTA_ALPHAREPLICATE )
 	{
-		strcat( buf, "|D3DTA_ALPHAREPLICATE" );
+		V_strcat_safe( buf, "|D3DTA_ALPHAREPLICATE" );
 	}
 	return buf;
 }
