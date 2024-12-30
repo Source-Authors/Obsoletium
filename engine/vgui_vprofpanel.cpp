@@ -245,7 +245,8 @@ void CProfileHierarchyPanel::ColumnPanels_t::Refresh( KeyValues *kv )
 
 CProfileHierarchyPanel::CProfileHierarchyPanel(vgui::Panel *parent, const char *panelName)
  : BaseClass(parent,panelName),
-	m_Panels( 0, 0, PanelsLessFunc )
+	m_Panels( 0, 0, PanelsLessFunc ),
+	m_itemFont{vgui::INVALID_FONT}
 {
 }
 

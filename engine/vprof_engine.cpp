@@ -20,7 +20,6 @@
 #include "vgui_baseui_interface.h"
 #include "vgui_vprofpanel.h"
 #endif
-#include "utlvector.h"
 #include "sv_remoteaccess.h"
 #include "ivprofexport.h"
 #include "vprof_record.h"
@@ -1047,7 +1046,7 @@ struct VProfListenInfo_t
 	float m_flLastSentVProfDataTime;
 	CUtlVector< CUtlString > m_SentGroups;
 
-	VProfListenInfo_t() : m_flLastSentVProfDataTime( 0.0f ) {}
+	VProfListenInfo_t() : m_nListenerId{std::numeric_limits<ra_listener_id>::max()}, m_flLastSentVProfDataTime( 0.0f ) {}
 	VProfListenInfo_t( ra_listener_id nListenerId ) : m_nListenerId( nListenerId ), m_flLastSentVProfDataTime( 0.0f ) {}
 	bool operator==( const VProfListenInfo_t& src ) const { return src.m_nListenerId == m_nListenerId; }
 
