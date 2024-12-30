@@ -2274,7 +2274,7 @@ bool SV_ActivateServer()
 
 static void SV_AllocateEdicts()
 {
-	sv.edicts = (edict_t *)Hunk_AllocName( sv.max_edicts*sizeof(edict_t), "edicts" );
+	sv.edicts = Hunk_AllocName<edict_t>( sv.max_edicts, "edicts" );
 
 	COMPILE_TIME_ASSERT( MAX_EDICT_BITS+1 <= 8*sizeof(sv.edicts[0].m_EdictIndex) );
 
@@ -2287,7 +2287,7 @@ static void SV_AllocateEdicts()
 	}
 	ED_ClearFreeEdictList();
 
-	sv.edictchangeinfo = (IChangeInfoAccessor *)Hunk_AllocName( sv.max_edicts * sizeof( IChangeInfoAccessor ), "edictchangeinfo" );
+	sv.edictchangeinfo = Hunk_AllocName<IChangeInfoAccessor>( sv.max_edicts, "edictchangeinfo" );
 }
 
 #include "tier0/memdbgon.h"

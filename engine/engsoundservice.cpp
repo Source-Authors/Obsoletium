@@ -48,7 +48,7 @@ public:
 
 	virtual void *LevelAlloc( unsigned nBytes, const char *pszTag )
 	{
-		return Hunk_AllocName(nBytes, pszTag);
+		return Hunk_AllocName<byte>(nBytes, pszTag);
 	}
 
 	virtual void OnExtraUpdate()

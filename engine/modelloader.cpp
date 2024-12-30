@@ -1106,14 +1106,15 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 		lh.GetMap()->worldlights = NULL;
 		return;
 	}
-	lh.GetMap()->numworldlights = lh.LumpSize() / sizeof( dworldlight_t );
-	lh.GetMap()->worldlights = (dworldlight_t *)Hunk_AllocName( lh.LumpSize(), va( "%s [%s]", lh.GetLoadName(), "worldlights" ) );
+	int numworldlights = lh.LumpSize() / sizeof( dworldlight_t );
+	lh.GetMap()->numworldlights = numworldlights;
+	lh.GetMap()->worldlights = Hunk_AllocName<dworldlight_t>( numworldlights, va( "%s [%s]", lh.GetLoadName(), "worldlights" ) );
 	memcpy (lh.GetMap()->worldlights, lh.LumpBase(), lh.LumpSize());
 #if !defined( SWDS )
 	if ( r_lightcache_zbuffercache.GetInt() )
 	{
 		size_t zbufSize = lh.GetMap()->numworldlights * sizeof( lightzbuffer_t );
-		lh.GetMap()->shadowzbuffers = ( lightzbuffer_t *) Hunk_AllocName( zbufSize, va( "%s [%s]", lh.GetLoadName(), "shadowzbuffers" ) );
+		lh.GetMap()->shadowzbuffers = Hunk_AllocName<lightzbuffer_t>( numworldlights, va( "%s [%s]", lh.GetLoadName(), "shadowzbuffers" ) );
 		memset( lh.GetMap()->shadowzbuffers, 0, zbufSize );		// mark empty
 	}
 #endif
@@ -1172,7 +1173,7 @@ void Mod_LoadVertices( void )
 		Host_Error( "Mod_LoadVertices: funny lump size in %s", lh.GetMapName() );
 	}
 	count = lh.LumpSize() / sizeof(*in);
-	out = (mvertex_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "vertexes" ) );
+	out = Hunk_AllocName<mvertex_t>( count, va( "%s [%s]", lh.GetLoadName(), "vertexes" ) );
 
 	lh.GetMap()->vertexes = out;
 	lh.GetMap()->numvertexes = count;
@@ -1298,7 +1299,7 @@ void Mod_LoadOcclusion( void )
 			if (b->numoccluders)
 			{
 				int nSize = b->numoccluders * sizeof(doccluderdata_t);
-				b->occluders = (doccluderdata_t*)Hunk_AllocName( nSize, "occluder data" );
+				b->occluders = Hunk_AllocName<doccluderdata_t>( b->numoccluders, "occluder data" );
 				buf.Get( b->occluders, nSize );
 			}
 
