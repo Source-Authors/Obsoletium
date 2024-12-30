@@ -432,7 +432,7 @@ void CRConServer::SetRequestID( ra_listener_id listener, int iRequestID )
 bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool fromQueue )
 {
 	SocketHandle_t hSocket = m_Socket.GetAcceptedSocketHandle( nIndex );
-	if ( hSocket < 0 )
+	if ( hSocket == kInvalidSocketHandle )
 		return false;
 
 	ConnectedRConSocket_t *pSocketData = GetSocketData( nIndex );
