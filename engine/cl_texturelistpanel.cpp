@@ -1470,7 +1470,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		vgui::system()->SetClipboardImage( pMainWnd, x, y, x + GetWide(), y + GetTall() );
 	}
 
-	if ( !stricmp( command, "SaveImg" ) )
+	if ( !stricmp( command, "SaveImg" ) && m_pInfo )
 	{
 		SaveTextureImage( m_pInfo->GetString( KEYNAME_NAME ) );
 	}
@@ -1495,7 +1495,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		InvalidateLayout();
 	}
 
-	if ( !stricmp( command, "ToggleNoMip" ) )
+	if ( !stricmp( command, "ToggleNoMip" ) && m_pInfo )
 	{
 #ifdef IS_WINDOWS_PC
 		CP4Requirement p4req;
@@ -1610,7 +1610,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 #endif // #ifdef IS_WINDOWS_PC
 	}
 	
-	if ( !stricmp( command, "RebuildVTF" ) )
+	if ( !stricmp( command, "RebuildVTF" ) && m_pInfo )
 	{
 #ifdef IS_WINDOWS_PC
 		CP4Requirement p4req;
