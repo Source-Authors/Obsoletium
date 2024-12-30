@@ -2008,7 +2008,7 @@ CON_COMMAND( crash, "[ sys_error | hang | purecall | segfault | minidump ]: Caus
 		Msg( "Hanging... Watchdog time: %d.\n ", Plat_GetWatchdogTime() );
 		for ( ;; )
 		{
-			Msg( "%d ", Plat_MSTime() );
+			Msg( "%llu ", Plat_USTime() / 1000 );
 			ThreadSleep( 5000 );
 		}
 	}
