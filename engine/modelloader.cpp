@@ -752,6 +752,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 		Sys_Error( "Can't load lump %d, range is [0...%d]", lumpToLoad, HEADER_LUMPS - 1 );
 	}
 
+	m_szLumpFilename[0] = '\0';
 	m_nLumpID = lumpToLoad;
 	m_nLumpSize = 0;
 	m_nLumpOffset = -1;
