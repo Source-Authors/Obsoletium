@@ -914,8 +914,7 @@ bool CSystem::GetCommandLineParamValue(const char *paramName, char *value, int v
 	char token[512];
 	ParseFile(loc, token, NULL);
 
-	strncpy(value, token, valueBufferSize - 1);
-	value[valueBufferSize - 1] = 0;
+	V_strncpy(value, token, valueBufferSize);
 	
 	return true;
 }
