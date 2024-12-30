@@ -29,8 +29,8 @@ void EncodeFloat( const SendProp *pProp, float fVal, bf_write *pOut, int objectI
 	}
 	else if ( flags & ( SPROP_COORD_MP | SPROP_COORD_MP_LOWPRECISION | SPROP_COORD_MP_INTEGRAL ) )
 	{
-		static_assert( SPROP_COORD_MP_INTEGRAL == (1<<15) );
-		static_assert( SPROP_COORD_MP_LOWPRECISION == (1<<14) );
+		static_assert( SPROP_COORD_MP_INTEGRAL == (1<<15) ); //-V501
+		static_assert( SPROP_COORD_MP_LOWPRECISION == (1<<14) ); //-V501
 		pOut->WriteBitCoordMP( fVal, ((flags >> 15) & 1), ((flags >> 14) & 1) );
 	}
 	else if ( flags & SPROP_NORMAL )
