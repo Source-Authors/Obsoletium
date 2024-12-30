@@ -76,8 +76,6 @@ void SetNameToSteamIDName( IConVar *pConVar )
 
 void CL_NameCvarChanged( IConVar *pConVar, const char *pOldString, float flOldValue )
 {
-	ConVarRef var( pConVar );
-
 	static bool bPreventRent = false;
 	if ( !bPreventRent )
 	{
@@ -85,6 +83,8 @@ void CL_NameCvarChanged( IConVar *pConVar, const char *pOldString, float flOldVa
 #if !defined( NO_STEAM )
 		SetNameToSteamIDName( pConVar );
 #endif
+		const ConVarRef var( pConVar );
+
 		// Remove any evil characters (ex: zero width no-break space)
 		char pchName[MAX_PLAYER_NAME_LENGTH];
 		V_strcpy_safe( pchName, var.GetString() );
