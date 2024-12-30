@@ -124,7 +124,12 @@ class NET_StringCmd : public CNetMessage
 	int	GetGroup() const override { return INetChannelInfo::STRINGCMD; }
 
 	NET_StringCmd() : NET_StringCmd{nullptr} {};
-	NET_StringCmd(const char *cmd) : m_pMessageHandler{nullptr} { m_szCommand = cmd; m_szCommandBuffer[0] = '\0'; };
+	explicit NET_StringCmd(const char *cmd)
+		: m_pMessageHandler{nullptr},
+		m_szCommand{cmd}
+	{
+		m_szCommandBuffer[0] = '\0';
+	};
 
 public:	
 	const char	*m_szCommand;	// execute this command
@@ -169,8 +174,13 @@ class NET_SignonState : public CNetMessage
 
 	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
-	NET_SignonState() : NET_SignonState{ -1, -1 } {};
-	NET_SignonState( int state, int spawncount ) : m_pMessageHandler{nullptr} { m_nSignonState = state; m_nSpawnCount = spawncount; };
+	NET_SignonState() : NET_SignonState{ -1, -1 } {}
+	NET_SignonState( int state, int spawncount )
+		: m_pMessageHandler{nullptr},
+		m_nSignonState{state},
+		m_nSpawnCount{spawncount}
+	{
+	}
 
 public:
 	int			m_nSignonState;			// See SIGNONSTATE_ defines
@@ -206,7 +216,14 @@ class CLC_Move : public CNetMessage
 
 	int	GetGroup() const override { return INetChannelInfo::MOVE; }
 
-	CLC_Move() : m_pMessageHandler{nullptr} { m_bReliable = false; }
+	CLC_Move()
+		: m_pMessageHandler{nullptr},
+		m_nBackupCommands{-1},
+		m_nNewCommands{-1},
+		m_nLength{-1}
+	{
+		m_bReliable = false;
+	}
 
 public:
 	int				m_nBackupCommands;
@@ -222,7 +239,13 @@ class CLC_VoiceData : public CNetMessage
 
 	int	GetGroup() const override { return INetChannelInfo::VOICE; }
 
-	CLC_VoiceData() : m_pMessageHandler{nullptr} { m_bReliable = false; };
+	CLC_VoiceData()
+		: m_pMessageHandler{nullptr},
+		m_nLength{-1},
+		m_xuid{std::numeric_limits<uint64>::max()}
+	{
+		m_bReliable = false;
+	}
 
 public:
 	int				m_nLength;
@@ -235,8 +258,12 @@ class CLC_BaselineAck : public CNetMessage
 {
 	DECLARE_CLC_MESSAGE( BaselineAck );
 
-	CLC_BaselineAck() : CLC_BaselineAck{ -1, -1, } {};
-	CLC_BaselineAck(int tick, int baseline ) : m_pMessageHandler{nullptr} { m_nBaselineTick = tick; m_nBaselineNr = baseline; }
+	CLC_BaselineAck() : CLC_BaselineAck{ -1, -1, } {}
+	CLC_BaselineAck( int tick, int baseline )
+		: m_pMessageHandler{nullptr},
+		m_nBaselineTick{tick},
+		m_nBaselineNr{baseline}
+	{}
 
 	int	GetGroup() const override { return INetChannelInfo::ENTITIES; }
 
@@ -260,7 +287,13 @@ class CLC_SaveReplay : public CNetMessage
 {
 	DECLARE_CLC_MESSAGE( SaveReplay );
 
-	CLC_SaveReplay() : m_pMessageHandler{nullptr} {}
+	CLC_SaveReplay()
+		: m_pMessageHandler{nullptr},
+		m_nStartSendByte{-1},
+		m_flPostDeathRecordTime{-1}
+	{
+		m_szFilename[0] = '\0';
+	}
 
 	int		m_nStartSendByte;
 	char	m_szFilename[ MAX_OSPATH ];
@@ -356,9 +389,15 @@ class SVC_Print : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( Print );
 
-	SVC_Print() { m_bReliable = false; m_szText = NULL; };
+	SVC_Print() : SVC_Print{nullptr} {}
 
-	SVC_Print(const char * text) { m_bReliable = false; m_szText = text; };
+	explicit SVC_Print(const char * text)
+		: m_pMessageHandler{nullptr},
+		m_szText{text}
+	{
+		m_bReliable = false;
+		m_szTextBuffer[0] = '\0';
+	}
 
 public:	
 	const char	*m_szText;	// show this text
@@ -419,10 +458,11 @@ class SVC_ClassInfo : public CNetMessage
 
 	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
-	SVC_ClassInfo() {};
+	SVC_ClassInfo() : SVC_ClassInfo{false, -1} {};
 	SVC_ClassInfo( bool createFromSendTables, int numClasses ) 
-		{ m_bCreateOnClient = createFromSendTables; 
-		  m_nNumServerClasses = numClasses; };
+		: m_pMessageHandler{nullptr},
+		  m_bCreateOnClient{createFromSendTables},
+		  m_nNumServerClasses{numClasses} {}
 
 public:
 		
@@ -443,8 +483,10 @@ class SVC_SetPause : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( SetPause );
 	
-	SVC_SetPause() {}
-	SVC_SetPause( bool state, [[maybe_unused]] float end = -1.f ) { m_bPaused = state; }
+	SVC_SetPause() : SVC_SetPause{false} {}
+	SVC_SetPause( bool state, [[maybe_unused]] float end = -1.f )
+		: m_pMessageHandler{nullptr}, m_bPaused{state}
+	{}
 	
 public:
 	bool		m_bPaused;		// true or false, what else
@@ -454,8 +496,12 @@ class SVC_SetPauseTimed : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( SetPauseTimed );
 
-	SVC_SetPauseTimed() {}
-	SVC_SetPauseTimed( bool bState, float flExpireTime = -1.f ) { m_bPaused = bState; m_flExpireTime = flExpireTime; }
+	SVC_SetPauseTimed() : SVC_SetPauseTimed{false} {}
+	SVC_SetPauseTimed( bool bState, float flExpireTime = -1.f )
+		: m_pMessageHandler{nullptr},
+		m_bPaused{bState},
+		m_flExpireTime{flExpireTime}
+	{}
 
 public:
 	bool		m_bPaused;
@@ -524,15 +570,17 @@ class SVC_VoiceInit : public CNetMessage
 	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 	SVC_VoiceInit()
-		: m_nSampleRate( 0 )
+		: m_pMessageHandler{nullptr},
+		  m_nSampleRate( 0 )
 	{
-		V_memset( m_szVoiceCodec, 0, sizeof( m_szVoiceCodec ) );
+		m_szVoiceCodec[0] = '\0';
 	}
 
 	SVC_VoiceInit( const char * codec, int nSampleRate )
-		: m_nSampleRate( nSampleRate )
+		: m_pMessageHandler{nullptr},
+		  m_nSampleRate( nSampleRate )
 	{
-		V_strncpy( m_szVoiceCodec, codec ? codec : "", sizeof( m_szVoiceCodec ) );
+		V_strcpy_safe( m_szVoiceCodec, codec ? codec : "" );
 	}
 
 
@@ -563,7 +611,16 @@ class SVC_VoiceData : public CNetMessage
 
 	int	GetGroup() const override { return INetChannelInfo::VOICE; }
 
-	SVC_VoiceData() { m_bReliable = false; }
+	SVC_VoiceData()
+		: m_pMessageHandler{nullptr},
+		m_nFromClient{-1},
+		m_bProximity{false},
+		m_nLength{-1},
+		m_xuid{std::numeric_limits<uint64>::max()},
+		m_DataOut{nullptr}
+	{
+		m_bReliable = false;
+	}
 
 public:	
 	int				m_nFromClient;	// client who has spoken
@@ -611,8 +668,11 @@ class SVC_SetView : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( SetView );
 
-	SVC_SetView() {}
-	SVC_SetView( int entity ) { m_nEntityIndex = entity; }
+	SVC_SetView() : SVC_SetView{-1} {}
+	explicit SVC_SetView( int entity )
+		: m_pMessageHandler{nullptr},
+		m_nEntityIndex{entity}
+	{}
 
 public:	
 	int				m_nEntityIndex;
@@ -623,9 +683,14 @@ class SVC_FixAngle: public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( FixAngle );
 
-	SVC_FixAngle() { m_bReliable = false; };
-	SVC_FixAngle( bool bRelative, QAngle angle ) 
-		{ m_bReliable = false; m_bRelative = bRelative; m_Angle = angle; }
+	SVC_FixAngle() : SVC_FixAngle{false, QAngle{-1, -1, -1}} {}
+	SVC_FixAngle( bool bRelative, QAngle angle )
+		: m_pMessageHandler{nullptr},
+		m_bRelative{bRelative},
+		m_Angle{angle}
+	{
+		m_bReliable = false;
+	}
 
 public:	
 	bool			m_bRelative; 
@@ -636,8 +701,12 @@ class SVC_CrosshairAngle : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( CrosshairAngle );
 
-	SVC_CrosshairAngle() {}
-	SVC_CrosshairAngle( QAngle angle ) { m_Angle = angle; }
+	SVC_CrosshairAngle() : SVC_CrosshairAngle{QAngle{-1, -1, -1}} {}
+	explicit SVC_CrosshairAngle(QAngle angle)
+		: m_pMessageHandler{nullptr},
+		m_Angle{angle}
+	{
+	}
 	
 public:
 	QAngle			m_Angle;
@@ -671,7 +740,13 @@ class SVC_UserMessage: public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( UserMessage );
 
-	SVC_UserMessage() { m_bReliable = false; }
+	SVC_UserMessage()
+		: m_pMessageHandler{nullptr},
+		m_nMsgType{-1},
+		m_nLength{-1}
+	{
+		m_bReliable = false;
+	}
 
 	int	GetGroup() const override { return INetChannelInfo::USERMESSAGES; }
 	
@@ -686,7 +761,14 @@ class SVC_EntityMessage : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( EntityMessage );
 
-	SVC_EntityMessage() : m_pMessageHandler{nullptr} { m_bReliable = false; }
+	SVC_EntityMessage()
+		: m_pMessageHandler{nullptr},
+		m_nEntityIndex{-1},
+		m_nClassID{-1},
+		m_nLength{-1}
+	{
+		m_bReliable = false;
+	}
 
 	int	GetGroup() const override { return INetChannelInfo::ENTMESSAGES	; }
 
@@ -736,7 +818,13 @@ class SVC_TempEntities: public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( TempEntities );
 
-	SVC_TempEntities() : m_pMessageHandler{nullptr} { m_bReliable = false; }
+	SVC_TempEntities()
+		: m_pMessageHandler{nullptr},
+		m_nNumEntries{-1},
+		m_nLength{-1}
+	{
+		m_bReliable = false;
+	}
 
 	int	GetGroup() const override { return INetChannelInfo::EVENTS; }
 
@@ -751,7 +839,13 @@ class SVC_Menu : public CNetMessage
 public:
 	DECLARE_SVC_MESSAGE( Menu );
 
-	SVC_Menu() : m_pMessageHandler{nullptr} { m_bReliable = true; m_Type = DIALOG_MENU; m_MenuKeyValues = NULL; m_iLength = 0; };
+	SVC_Menu() : m_pMessageHandler{nullptr}
+	{
+		m_bReliable = true;
+		m_Type = DIALOG_MENU;
+		m_MenuKeyValues = NULL;
+		m_iLength = 0;
+	}
 	SVC_Menu( DIALOG_TYPE type, KeyValues *data ); 
 	~SVC_Menu();
 
@@ -846,6 +940,13 @@ public:
 
 	MM_JoinResponse() : m_pMessageHandler{nullptr}
 	{
+		m_ResponseType = std::numeric_limits<uint>::max();
+		m_id = std::numeric_limits<uint64>::max();
+		m_Nonce = std::numeric_limits<uint64>::max();
+		m_SessionFlags = 0;
+		m_nOwnerId = std::numeric_limits<uint>::max();
+		m_iTeam = std::numeric_limits<int>::max();
+		m_nTotalTeams = std::numeric_limits<int>::max();
 		m_ContextCount = 0;
 		m_PropertyCount = 0;
 	}
