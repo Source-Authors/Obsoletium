@@ -634,9 +634,7 @@ void CDemoRecorder::StartupDemoFile( void )
 	g_ClientDLL->OnDemoRecordStart( m_szDemoBaseName );
 }
 
-CDemoRecorder::CDemoRecorder()
-{
-}
+CDemoRecorder::CDemoRecorder() = default;
 
 CDemoRecorder::~CDemoRecorder()
 {
@@ -1610,23 +1608,29 @@ bool CDemoPlayer::IsPlayingBack( void )
 
 CDemoPlayer::CDemoPlayer()
 {
+	m_nStartTick = -1;
+	m_nPreviousTick = 0;
+	V_memset(&m_DemoPacket, 0x00, sizeof(m_DemoPacket));
+	m_bPlayingBack = false;
+	m_bPlaybackPaused = false;
 	m_flAutoResumeTime = 0.0f;
 	m_flPlaybackRateModifier = 1.0f;
-	m_bTimeDemo = false;	
-	m_nTimeDemoStartFrame = -1;	
-	m_flTimeDemoStartTime = 0.0f;	
-	m_flTotalFPSVariability = 0.0f;
-	m_nTimeDemoCurrentFrame = -1; 
-	m_bPlayingBack = false;
-	m_bLoading = false;
-	m_bPlaybackPaused = false;
 	m_nSkipToTick = -1;
-	m_nSkipPacketsPlayed = 0;
-	m_nSnapshotTick = 0;
-	m_SnapshotFilename[0] = 0;
-	m_bResetInterpolation = false;
-	m_nPreviousTick = 0;
 	m_nEndTick = 0;
+	m_bLoading = false;
+	
+	m_nSkipPacketsPlayed = 0;
+	m_bInterpolateView = false;
+	m_bResetInterpolation = false;
+
+	m_bTimeDemo = false;
+	m_nTimeDemoStartFrame = -1;
+	m_flTimeDemoStartTime = 0.0f;
+	m_flTotalFPSVariability = 0.0f;
+	m_nTimeDemoCurrentFrame = -1;
+
+	m_nSnapshotTick = 0;
+	m_SnapshotFilename[0] = '\0';
 }
 
 CDemoPlayer::~CDemoPlayer()
