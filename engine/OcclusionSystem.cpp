@@ -1637,7 +1637,7 @@ float CEdgeList::LocateEdgeCrossingDiscontinuity( float flNextY, float flPrevY, 
 	float flNextX = -FLT_MAX;
 	float flCurrY = flNextY;
 
-	Vector2D vecDelta, vecIntersection;
+	Vector2D vecDelta;
 	
 	Edge_t *pCurEdge;
 	for ( pCurEdge = FirstActiveEdge(); !AtListEnd(pCurEdge); flCurrX = flNextX, pCurEdge = pCurEdge->m_pNextActiveEdge )
