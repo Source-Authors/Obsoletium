@@ -529,8 +529,7 @@ $Project "engine"
 			}
 		}
 		
-		$File	"audio\private\snd_dev_xaudio.cpp"	 \
-				"audio\private\snd_wave_mixer_xma.cpp"	[$X360]
+		$File	"audio\private\snd_dev_xaudio.cpp"
 		{
 			$Configuration
 			{
@@ -580,7 +579,6 @@ $Project "engine"
 			$File	"audio\private\snd_sfx.h"
 			$File	"audio\private\snd_wave_mixer.h"
 			$File	"audio\private\snd_wave_mixer_adpcm.h"
-			$File	"audio\private\snd_wave_mixer_xma.h"
 			$File	"audio\private\snd_wave_mixer_private.h"
 			$File	"audio\private\snd_wave_source.h"
 			$File	"audio\private\snd_wave_temp.h"
