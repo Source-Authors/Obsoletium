@@ -537,7 +537,7 @@ CON_COMMAND( lightprobe,
 static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pSkyboxBaseName )
 {
 	static_assert(ARRAYSIZE(pSrcVTFTextures) == ssize(facingName));
-
+	
 	char src0VTFFileName[MAX_PATH], srcVTFFileName[MAX_PATH];
 
 	intp i = -1;
@@ -569,6 +569,10 @@ static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pS
 			return false;
 		}
 
+		// dimhotepus: Ignore alpha as in vbsp cubemaps
+		CompiledVtfFlags flagsNoAlpha = static_cast<CompiledVtfFlags>(texture->Flags() & ~( TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA ));
+		CompiledVtfFlags flagsFirstNoAlpha = static_cast<CompiledVtfFlags>(pSrcVTFTextures[0]->Flags() & ~( TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA ));
+		
 		bool isIncorrectWidth = texture->Width() != pSrcVTFTextures[0]->Width() && texture->Width() != 4;
 
 		// NOTE: texture[0] is a side texture that could be 1/2 height, so allow this and also allow 4x4 faces
@@ -595,9 +599,14 @@ static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pS
 			DestroyVTFTexture(texture);
 			return false;
 		}
-
+		
+		// dimhotepus: Ignore alpha as in vbsp cubemaps
+		if ( flagsNoAlpha != flagsFirstNoAlpha )
 		{
-			Warning("*** Error: Skybox vtf files for %s weren't compiled with the same size texture and/or same flags!\n", pSkyboxBaseName );
+			Warning("*** Error: Skybox vtf for '%s' have different flags! Expected 0x%x from '%s', got 0x%x from '%s'.\n",
+				srcVTFFileName,
+				flagsFirstNoAlpha, src0VTFFileName, flagsNoAlpha, srcVTFFileName);
+			DestroyVTFTexture(texture);
 			return false;
 		}
 	}
