@@ -218,9 +218,7 @@ CServerPlugin::CServerPlugin()
 	m_PluginHelperCheck = NULL;
 }
 
-CServerPlugin::~CServerPlugin()
-{
-}
+CServerPlugin::~CServerPlugin() = default;
 
 //---------------------------------------------------------------------------------
 // Purpose: loads all plugins

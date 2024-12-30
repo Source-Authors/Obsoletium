@@ -275,9 +275,7 @@ static void WatchDogHandler()
 // Class implementation
 //-----------------------------------------------------------------------------
 
-CHostState::CHostState()
-{
-}
+CHostState::CHostState() = default;
 
 void CHostState::Init()
 {

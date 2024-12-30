@@ -445,9 +445,7 @@ inline CVoxelTree *CSpatialPartition::VoxelTreeForHandle( SpatialPartitionHandle
 //-----------------------------------------------------------------------------
 // Constructor, destructor
 //-----------------------------------------------------------------------------
-CVoxelHash::CVoxelHash( )
-{
-}
+CVoxelHash::CVoxelHash() = default;
 
 CVoxelHash::~CVoxelHash()
 {

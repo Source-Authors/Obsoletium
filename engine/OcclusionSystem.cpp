@@ -2146,9 +2146,7 @@ COcclusionSystem::COcclusionSystem() : m_ClippedVerts( (intp)0, 64 )
 	m_flMaxOccludeeArea = DEFAULT_MAX_OCCLUDEE_AREA;
 }
 
-COcclusionSystem::~COcclusionSystem()
-{
-}
+COcclusionSystem::~COcclusionSystem() = default;
 
 
 //-----------------------------------------------------------------------------

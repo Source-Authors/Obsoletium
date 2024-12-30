@@ -31,9 +31,7 @@ CClientSendProp::~CClientSendProp()
 }
 
 
-CClientSendTable::CClientSendTable()
-{
-}
+CClientSendTable::CClientSendTable() = default;
 
 
 CClientSendTable::~CClientSendTable()

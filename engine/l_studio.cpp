@@ -1869,7 +1869,7 @@ struct ModelDebugOverlayData_t
 	DrawModelResults_t m_ModelResults;
 	Vector m_Origin;
 
-	ModelDebugOverlayData_t() {}
+	ModelDebugOverlayData_t() = default;
 
 private:
 	ModelDebugOverlayData_t( const ModelDebugOverlayData_t &vOther );

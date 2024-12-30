@@ -287,10 +287,7 @@ CBaseServer::CBaseServer()
 	m_flPausedTimeEnd = -1.f;
 }
 
-CBaseServer::~CBaseServer()
-{
-
-}
+CBaseServer::~CBaseServer() = default;
 
 /*
 ================
