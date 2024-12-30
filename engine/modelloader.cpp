@@ -771,7 +771,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 	FileHandle_t fileToUse = s_MapFileHandle;
 
 	// If we have a lump file for this lump, use it instead
-	if ( IsPC() && s_MapLumpFiles[lumpToLoad].file != FILESYSTEM_INVALID_HANDLE )
+	if ( s_MapLumpFiles[lumpToLoad].file != FILESYSTEM_INVALID_HANDLE )
 	{
 		fileToUse = s_MapLumpFiles[lumpToLoad].file;
 		m_nLumpSize = s_MapLumpFiles[lumpToLoad].header.lumpLength;
@@ -1048,6 +1048,8 @@ static void AllocateLightingData( worldbrushdata_t *pBrushData, int nSize )
 	g_bHunkAllocLightmaps = ( !r_unloadlightmaps.GetBool() && r_hunkalloclightmaps.GetBool() );
 	if ( g_bHunkAllocLightmaps )
 	{
+		// dimhotepus: Check at least we try to load colors.
+		Assert(nSize % sizeof(ColorRGBExp32) == 0);
 		pBrushData->lightdata = (ColorRGBExp32 *)Hunk_Alloc( nSize, false );
 	}
 	else
