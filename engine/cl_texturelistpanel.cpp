@@ -930,11 +930,11 @@ static bool SetBufferValue( char *chTxtFileBuffer, size_t nTxtFileBufferLen, cha
 	if ( !bResult )
 	{
 		char *pchAdd = chTxtFileBuffer + nTxtFileBufferLen;
-		strcpy( pchAdd + strlen( pchAdd ), "\n" );
-		strcpy( pchAdd + strlen( pchAdd ), szLookupKey );
-		strcpy( pchAdd + strlen( pchAdd ), " " );
-		strcpy( pchAdd + strlen( pchAdd ), szNewValue );
-		strcpy( pchAdd + strlen( pchAdd ), "\n" );
+		strcat( pchAdd, "\n" );
+		strcat( pchAdd, szLookupKey );
+		strcat( pchAdd, " " );
+		strcat( pchAdd, szNewValue );
+		strcat( pchAdd, "\n" );
 		bResult = true;
 	}
 
