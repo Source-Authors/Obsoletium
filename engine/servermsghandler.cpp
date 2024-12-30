@@ -962,6 +962,7 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 		else
 		{
 			Assert( ei );
+			Assert( pClientClass );
 
 			unsigned int buffer_size = PAD_NUMBER( Bits2Bytes( ei->bits ), 4 );
 			bf_read fromBuf( ei->pData, buffer_size );
