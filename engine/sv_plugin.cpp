@@ -52,10 +52,11 @@ QueryCvarCookie_t SendCvarValueQueryToClient( IClient *client, const char *pCvar
 //---------------------------------------------------------------------------------
 CPlugin::CPlugin()
 {
-	m_pPlugin = NULL;
-	m_pPluginModule = NULL;
+	m_szName[0] = '\0';
 	m_bDisable = false;
-	m_szName[0] = 0;
+	m_pPlugin = nullptr;
+	m_iPluginInterfaceVersion = -1;
+	m_pPluginModule = nullptr;
 }
 
 CPlugin::~CPlugin()

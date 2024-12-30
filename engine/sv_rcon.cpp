@@ -97,7 +97,7 @@ ConVar sv_rcon_maxpacketbans( "sv_rcon_maxpacketbans", "1", 0, "Ban IPs for send
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CRConServer::CRConServer() : m_Socket( this )
+CRConServer::CRConServer() : m_Socket( this ), m_bSocketDeleted( false )
 {
 }
 
