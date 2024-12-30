@@ -464,8 +464,6 @@ protected:
 	int m_lastPercent;					///< last percent value the progress bar was updated with (to avoid spamming it)
 	int m_totalRequests;				///< Total number of requests (used to set the top progress bar)
 
-	int m_RequestIDCounter;				///< global increasing request ID counter
-
 	typedef CUtlVector< char * > StrVector;
 	StrVector m_downloadedMaps;			///< List of maps for which we have already tried to download assets.
 };
