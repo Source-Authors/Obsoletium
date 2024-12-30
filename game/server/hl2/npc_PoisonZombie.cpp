@@ -776,13 +776,13 @@ void CNPC_PoisonZombie::EvacuateNest( bool bExplosion, float flDamage, CBaseEnti
 			switch( i )
 			{
 			case 0:
-				strcpy( szAttachment, "headcrab2" );
+				V_strcpy_safe( szAttachment, "headcrab2" );
 				break;
 			case 1:
-				strcpy( szAttachment, "headcrab3" );
+				V_strcpy_safe( szAttachment, "headcrab3" );
 				break;
 			case 2:
-				strcpy( szAttachment, "headcrab4" );
+				V_strcpy_safe( szAttachment, "headcrab4" );
 				break;
 			}
 
