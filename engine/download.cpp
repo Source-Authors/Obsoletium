@@ -95,6 +95,8 @@ static DownloadCache *TheDownloadCache = NULL;
 DownloadCache::DownloadCache()
 {
 	m_cache = NULL;
+	memset(m_cachefileKey, 0, sizeof(m_cachefileKey));
+	memset(m_timestampKey, 0, sizeof(m_timestampKey));
 }
 
 //--------------------------------------------------------------------------------------------------------------
