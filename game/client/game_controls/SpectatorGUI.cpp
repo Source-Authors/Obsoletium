@@ -23,8 +23,6 @@
 #include <vgui_controls/MenuItem.h>
 #include <vgui_controls/TextImage.h>
 
-#include <stdio.h> // _snprintf define
-
 #include <game/client/iviewport.h>
 #include "commandmenu.h"
 #include "hltvcamera.h"
