@@ -749,7 +749,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 {
 	if ( lumpToLoad < 0 || lumpToLoad >= HEADER_LUMPS )
 	{
-		Sys_Error( "Can't load lump %i, range is 0 to %i!!!", lumpToLoad, HEADER_LUMPS - 1 );
+		Sys_Error( "Can't load lump %d, range is [0...%d]", lumpToLoad, HEADER_LUMPS - 1 );
 	}
 
 	m_nLumpID = lumpToLoad;
@@ -796,7 +796,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 	{
 		if ( s_MapFileHandle == FILESYSTEM_INVALID_HANDLE )
 		{
-			Sys_Error( "Can't load map from invalid handle!!!" );
+			Sys_Error( "Can't load map '%s' from invalid file handle", s_szMapName );
 		}
 
 		unsigned nOffsetAlign, nSizeAlign, nBufferAlign;
@@ -815,7 +815,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 		m_pRawData = (byte *)g_pFileSystem->AllocOptimalReadBuffer( fileToUse, alignedBytesToRead, alignedOffset );
 		if ( !m_pRawData && m_nLumpSize )
 		{
-			Sys_Error( "Can't load lump %i, allocation of %i bytes failed!!!", lumpToLoad, m_nLumpSize + 1 );
+			Sys_Error( "Can't load map's '%s' lump %d, out of memory when allocating %d bytes", s_szMapName, lumpToLoad, m_nLumpSize + 1 );
 		}
 
 		if ( m_nLumpSize )
@@ -830,11 +830,11 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 	{
 		// Handle compressed lump -- users of the class see the uncompressed data
 		AssertMsg( CLZMA::IsCompressed( m_pData ),
-		           "Lump claims to be compressed but is not recognized as LZMA" );
+		           "Map's '%s' lump %d claims to be compressed but is not recognized as LZMA", s_szMapName, lumpToLoad );
 
 		m_nLumpSize = CLZMA::GetActualSize( m_pData );
 		AssertMsg( lump->uncompressedSize == m_nLumpSize,
-		           "Lump header disagrees with lzma header for compressed lump" );
+		           "Map's '%s' lump %d header has size %d != LZMA header size %d for compressed lump", s_szMapName, lumpToLoad, lump->uncompressedSize, m_nLumpSize );
 
 		m_pUncompressedData = (unsigned char *)malloc( m_nLumpSize );
 		CLZMA::Uncompress( m_pData, m_pUncompressedData );
