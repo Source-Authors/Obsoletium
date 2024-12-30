@@ -5116,7 +5116,7 @@ IMaterialProxy *CMaterialSystem::DetermineProxyReplacements( IMaterial *pMateria
 			break;
 		}
 
-		strcpy( szLastPath, szCheckPath );
+		V_strcpy_safe( szLastPath, szCheckPath );
 	}
 
 	return pReplacementProxy;
