@@ -3024,7 +3024,7 @@ FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 
 		// dimhotepus: Detect cases when name matching is different. Inspect them.
 		AssertMsg( !(good ^ badmatch(cName, cQuery)),
-			"Behavior change. %s and %s names matching diffs from original.\n",
+			"Behavior change. %s and %s names matching diffs from original.",
 			pszQuery, pszNameToMatch );
 		if ( !good )
 		{
