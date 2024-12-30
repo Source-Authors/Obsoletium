@@ -9,7 +9,7 @@
 #endif
 
 
-#include <utlvector.h>
+#include "tier1/utlvector.h"
 #include "fgdlib/EntityDefs.h"
 
 
@@ -38,10 +38,10 @@ class CClassInputOutputBase
 		CClassInputOutputBase(const char *pszName, InputOutputType_t eType);
 		virtual ~CClassInputOutputBase(void);
 
-		inline const char *GetName(void) { return(m_szName); }
-		InputOutputType_t GetType(void) { return(m_eType);  }
-		const char *GetTypeText(void);
-		inline const char *GetDescription(void);
+		inline const char *GetName(void) const { return(m_szName); }
+		InputOutputType_t GetType(void) const { return(m_eType);  }
+		const char *GetTypeText(void) const;
+		inline const char *GetDescription(void) const;
 
 		inline void SetName(const char *szName) { V_strcpy_safe(m_szName, szName); }
 		inline void SetType(InputOutputType_t eType) { m_eType = eType; }
@@ -63,7 +63,7 @@ class CClassInputOutputBase
 //-----------------------------------------------------------------------------
 // Purpose: Returns this I/O's long description.
 //-----------------------------------------------------------------------------
-const char *CClassInputOutputBase::GetDescription(void)
+const char *CClassInputOutputBase::GetDescription(void) const
 {
 	if (m_pszDescription != NULL)
 	{

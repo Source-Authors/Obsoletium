@@ -11,11 +11,11 @@
 #endif
 
 #include <fstream>
-#include "TokenReader.h"
 #include "GDClass.h"
 #include "InputOutput.h"
-#include "UtlString.h"
-#include "utlvector.h"
+#include "tier1/tokenreader.h"
+#include "tier1/utlstring.h"
+#include "tier1/utlvector.h"
 
 
 class MDkeyvalue;
@@ -24,8 +24,10 @@ class KeyValues;
 
 enum TEXTUREFORMAT;
 
-
-typedef void (*GameDataMessageFunc_t)(int level, PRINTF_FORMAT_STRING const char *fmt, ...);
+// dimhotepus: Moved from Hammer to be type-safe.
+enum MWMSGTYPE { mwStatus, mwError, mwWarning };
+// dimhotepus: Return old function.
+using GameDataMessageFunc_t = void (*)(MWMSGTYPE level, PRINTF_FORMAT_STRING const char *fmt, ...);
 
 // FGD-based AutoMaterialExclusion data
 
@@ -58,12 +60,12 @@ struct FGDAutoVisGroups_s
 class GameData
 {
 	public:
-		typedef enum
+		enum TNameFixup
 		{
 			NAME_FIXUP_PREFIX = 0,
 			NAME_FIXUP_POSTFIX,
 			NAME_FIXUP_NONE
-		} TNameFixup;
+		};
 
 		GameData();
 		~GameData();
@@ -74,15 +76,15 @@ class GameData
 
 		void ClearData();
 
-		inline int GetMaxMapCoord(void);
-		inline int GetMinMapCoord(void);
+		inline int GetMaxMapCoord() const;
+		inline int GetMinMapCoord() const;
 
-		inline int GetClassCount();
-		inline GDclass *GetClass(int nIndex);
+		inline intp GetClassCount() const;
+		inline GDclass *GetClass(intp nIndex) const;
 
 		GDclass *BeginInstanceRemap( const char *pszClassName, const char *pszInstancePrefix, Vector &Origin, QAngle &Angle );
-		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, TNameFixup NameFixup );
-		bool	RemapNameField( const char *pszInValue, char *pszOutValue, TNameFixup NameFixup );
+		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
+		bool	RemapNameField( const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
 		bool	LoadFGDMaterialExclusions( TokenReader &tr );
 		bool	LoadFGDAutoVisGroups( TokenReader &tr );
 		
@@ -111,7 +113,7 @@ class GameData
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline int GameData::GetClassCount()
+inline intp GameData::GetClassCount() const
 {
 	return m_Classes.Count();
 }
@@ -119,10 +121,10 @@ inline int GameData::GetClassCount()
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline GDclass *GameData::GetClass(int nIndex)
+inline GDclass *GameData::GetClass(intp nIndex) const
 {
 	if (nIndex >= m_Classes.Count())
-		return NULL;
+		return nullptr;
 		
 	return m_Classes.Element(nIndex);
 }
@@ -131,7 +133,7 @@ inline GDclass *GameData::GetClass(int nIndex)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int GameData::GetMinMapCoord(void)
+int GameData::GetMinMapCoord() const
 {
 	return m_nMinMapCoord;
 }
@@ -140,13 +142,13 @@ int GameData::GetMinMapCoord(void)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int GameData::GetMaxMapCoord(void)
+int GameData::GetMaxMapCoord() const
 {
 	return m_nMaxMapCoord;
 }
 
-
-void GDSetMessageFunc(GameDataMessageFunc_t pFunc);
+// dimhotepus: Return old func.
+GameDataMessageFunc_t GDSetMessageFunc(GameDataMessageFunc_t pFunc);
 bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...);
 bool GDSkipToken(TokenReader &tr, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);
 bool GDGetToken(TokenReader &tr, char *pszStore, int nSize, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);

@@ -4,8 +4,9 @@
 //
 //=============================================================================
 
-#include "fgdlib/GameData.h" // FGDLIB: eliminate dependency
 #include "fgdlib/GDClass.h"
+
+#include "fgdlib/GameData.h" // FGDLIB: eliminate dependency
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -17,7 +18,6 @@
 GDclass::GDclass(void)
 {
 	Parent = nullptr;
-	m_bBase = false;
 	m_bBase = false;
 	m_bSolid = false;
 	m_bModel = false;
@@ -350,7 +350,7 @@ CClassOutput *GDclass::FindOutput(const char *szName)
 //			pfMaxs - Receives maximum X, Y, and Z coordinates for the class.
 // Output : Returns TRUE if this class has a specified bounding box, FALSE if not.
 //-----------------------------------------------------------------------------
-BOOL GDclass::GetBoundBox(Vector& pfMins, Vector& pfMaxs)
+BOOL GDclass::GetBoundBox(Vector& pfMins, Vector& pfMaxs) const
 {
 	if (m_bGotSize)
 	{
@@ -665,7 +665,8 @@ bool GDclass::ParseSize(TokenReader &tr)
 			return(false);
 		}
 
-		m_bmins[i] = (float)atof(szToken);
+		// dimhotepus: atof -> strtof.
+		m_bmins[i] = strtof(szToken, nullptr);
 	}
 
 	if (tr.PeekTokenType(szToken,sizeof(szToken)) == OPERATOR && IsToken(szToken, ","))
@@ -684,7 +685,8 @@ bool GDclass::ParseSize(TokenReader &tr)
 			{
 				return(false);
 			}
-			m_bmaxs[i] = (float)atof(szToken);
+			// dimhotepus: atof -> strtof.
+			m_bmaxs[i] = strtof(szToken, nullptr);
 		}
 	}
 	else
@@ -946,7 +948,11 @@ bool GDclass::ParseVariables(TokenReader &tr)
 
 		if (!stricmp(szToken, "key"))
 		{
-			GDGetToken(tr, szToken, sizeof(szToken));
+			// dimhotepus: Make error when no key token.
+			if (!GDGetToken(tr, szToken, sizeof(szToken)))
+			{
+				return(false);
+			}
 		}
 
 		GDinputvariable * var = new GDinputvariable;
@@ -967,7 +973,7 @@ bool GDclass::ParseVariables(TokenReader &tr)
 			{
 				char szError[_MAX_PATH];
 
-				sprintf(szError, "%s: Variable '%s' is multiply defined with different types.", GetName(), var->GetName());
+				V_sprintf_safe(szError, "%s: Variable '%s' is multiply defined with different types.", GetName(), var->GetName());
 				GDError(tr, szError);
 			}
 		}
@@ -1001,7 +1007,8 @@ GDinputvariable *GDclass::GetVariableAt(int iIndex)
 	GDclass *pVarClass = Parent->GetClass(m_VariableMap[iIndex][0]);
 
 	// find var in pVarClass
-	return pVarClass->GetVariableAt(m_VariableMap[iIndex][1]);
+	// dimhotepus: Do not dereference pVarClass if it is null. 
+	return pVarClass ? pVarClass->GetVariableAt(m_VariableMap[iIndex][1]) : nullptr;
 }
 
 

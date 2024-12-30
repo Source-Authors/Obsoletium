@@ -11,14 +11,6 @@
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Destructor.
-//-----------------------------------------------------------------------------
-MDkeyvalue::~MDkeyvalue(void)
-{
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Assignment operator.
 //-----------------------------------------------------------------------------
 MDkeyvalue &MDkeyvalue::operator =(const MDkeyvalue &other)
@@ -110,15 +102,6 @@ void WCKVBase_Dict::InsertKeyValue( const MDkeyvalue &kv )
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Constructor. Sets the initial size of the keyvalue array.
-//-----------------------------------------------------------------------------
-template<class Base>
-WCKeyValuesT<Base>::WCKeyValuesT(void)
-{
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Destructor. Deletes the contents of this keyvalue array.
 //-----------------------------------------------------------------------------
 template<class Base>
@@ -197,7 +180,7 @@ void StripEdgeWhiteSpace(char *psz)
 	{
 		while (V_isspace(psz[iLen]))
 		{
-			psz[iLen--] = 0;
+			psz[iLen--] = '\0';
 		}
 	}
 
@@ -242,8 +225,8 @@ void WCKeyValuesT<Base>::SetValue(const char *pszKey, const char *pszValue)
 			// Add the keyvalue to our list.
 			//
 			MDkeyvalue newkv;
-			Q_strncpy( newkv.szKey, szTmpKey, sizeof( newkv.szKey ) );
-			Q_strncpy( newkv.szValue, szTmpValue, sizeof( newkv.szValue ) );
+			V_strcpy_safe( newkv.szKey, szTmpKey );
+			V_strcpy_safe( newkv.szValue, szTmpValue );
 			InsertKeyValue( newkv );
 		}
 	}
@@ -251,7 +234,7 @@ void WCKeyValuesT<Base>::SetValue(const char *pszKey, const char *pszValue)
 	{
 		if (pszValue != NULL)
 		{
-			V_strncpy(m_KeyValues[i].szValue, szTmpValue, sizeof(m_KeyValues[i].szValue));
+			V_strcpy_safe(m_KeyValues[i].szValue, szTmpValue);
 		}
 		//
 		// If we are setting to a NULL value, delete the key.

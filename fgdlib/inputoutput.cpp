@@ -4,9 +4,9 @@
 //
 //=============================================================================
 
-
-#include <tier0/dbg.h>
 #include "fgdlib/InputOutput.h"
+
+#include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -25,7 +25,7 @@ char *CClassInputOutputBase::g_pszEmpty = "";
 //-----------------------------------------------------------------------------
 // Maps type names to type enums for inputs and outputs.
 //-----------------------------------------------------------------------------
-static TypeMap_t TypeMap[] =
+static constexpr TypeMap_t TypeMap[] =
 {
 	{ iotVoid,		"void" },
 	{ iotInt,		"integer" },
@@ -76,13 +76,13 @@ CClassInputOutputBase::~CClassInputOutputBase(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns a string representing the type of this I/O, eg. "integer".
 //-----------------------------------------------------------------------------
-const char *CClassInputOutputBase::GetTypeText(void)
+const char *CClassInputOutputBase::GetTypeText(void) const
 {
-	for (int i = 0; i < sizeof(TypeMap) / sizeof(TypeMap[0]); i++)
+	for (auto &tm : TypeMap)
 	{
-		if (TypeMap[i].eType == m_eType)
+		if (tm.eType == m_eType)
 		{
-			return(TypeMap[i].pszName);
+			return(tm.pszName);
 		}
 	}
 
@@ -97,11 +97,11 @@ const char *CClassInputOutputBase::GetTypeText(void)
 //-----------------------------------------------------------------------------
 InputOutputType_t CClassInputOutputBase::SetType(const char *szType)
 {
-	for (int i = 0; i < sizeof(TypeMap) / sizeof(TypeMap[0]); i++)
+	for (auto &tm : TypeMap)
 	{
-		if (!stricmp(TypeMap[i].pszName, szType))
+		if (!stricmp(tm.pszName, szType))
 		{
-			m_eType = TypeMap[i].eType;
+			m_eType = tm.eType;
 			return(m_eType);
 		}
 	}
@@ -115,7 +115,13 @@ InputOutputType_t CClassInputOutputBase::SetType(const char *szType)
 //-----------------------------------------------------------------------------
 CClassInputOutputBase &CClassInputOutputBase::operator =(CClassInputOutputBase &Other)
 {
-	strcpy(m_szName, Other.m_szName);
+	// dimhotepus: Protect from self-assignment.
+	if (this == &Other)
+	{
+		return *this;
+	}
+
+	V_strcpy_safe(m_szName, Other.m_szName);
 	m_eType = Other.m_eType;
 
 	//
@@ -124,8 +130,9 @@ CClassInputOutputBase &CClassInputOutputBase::operator =(CClassInputOutputBase &
 	delete m_pszDescription;
 	if (Other.m_pszDescription != NULL)
 	{
-		m_pszDescription = new char[strlen(Other.m_pszDescription) + 1];
-		strcpy(m_pszDescription, Other.m_pszDescription);
+		const ptrdiff_t len = strlen(Other.m_pszDescription) + 1;
+		m_pszDescription = new char[len];
+		V_strncpy(m_pszDescription, Other.m_pszDescription, len);
 	}
 	else
 	{

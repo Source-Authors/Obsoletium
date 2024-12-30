@@ -28,21 +28,21 @@ class CHelperInfo;
 class GameData;
 class GDinputvariable;
 
-const int GD_MAX_VARIABLES = 128;
+constexpr inline int GD_MAX_VARIABLES = 128;
 
 
 class GDclass
 {
 	public:
 
-		GDclass(void);
-		~GDclass(void);
+		GDclass();
+		~GDclass();
 
 		//
 		// Interface to class information:
 		//
-		inline const char *GetName(void) { return(m_szName); }
-		inline const char *GetDescription(void);
+		inline const char *GetName() const { return(m_szName); }
+		inline const char *GetDescription() const;
 
 		//
 		// Reading a class from the game data file:
@@ -52,7 +52,7 @@ class GDclass
 		//
 		// Interface to variable information (keys):
 		//
-		inline int GetVariableCount(void) { return(m_nVariables); }
+		inline int GetVariableCount() const { return(m_nVariables); }
 		GDinputvariable *GetVariableAt(int iIndex);
 		void GetHelperForGDVar( GDinputvariable *pVar, CUtlVector<const char *> *helperName );
 		GDinputvariable *VarForName(const char *pszName, int *piIndex = NULL);
@@ -64,7 +64,7 @@ class GDclass
 		//
 		inline void AddInput(CClassInput *pInput);
 		CClassInput *FindInput(const char *szName);
-		inline int GetInputCount(void) { return(m_Inputs.Count()); }
+		inline int GetInputCount() const { return(m_Inputs.Count()); }
 		CClassInput *GetInput(int nIndex);
 
 		//
@@ -72,7 +72,7 @@ class GDclass
 		//
 		inline void AddOutput(CClassOutput *pOutput);
 		CClassOutput *FindOutput(const char *szName);
-		inline int GetOutputCount(void) { return(m_Outputs.Count()); }
+		inline int GetOutputCount() const { return(m_Outputs.Count()); }
 		CClassOutput *GetOutput(int nIndex);
 
 		GameData *Parent;
@@ -80,7 +80,7 @@ class GDclass
 		//
 		// Interface to class attributes:
 		//
-		inline bool IsClass(const char *pszClass);
+		inline bool IsClass(const char *pszClass) const;
 		inline bool IsSolidClass(void) const { return(m_bSolid); }
 		inline bool IsBaseClass(void) const { return(m_bBase); }
 		inline bool IsMoveClass(void) const { return(m_bMove); }
@@ -91,7 +91,7 @@ class GDclass
 		inline bool IsNodeClass(void) const;
 		static inline bool IsNodeClass(const char *pszClassName);
 
-		inline bool ShouldSnapToHalfGrid() { return m_bHalfGridSnap; }
+		inline bool ShouldSnapToHalfGrid() const { return m_bHalfGridSnap; }
 
 		inline void SetNPCClass(bool bNPC) { m_bNPC = bNPC; }
 		inline void SetFilterClass(bool bFilter) { m_bFilter = bFilter; }
@@ -104,16 +104,16 @@ class GDclass
 		inline const Vector &GetMins(void) const { return(m_bmins); }
 		inline const Vector &GetMaxs(void) const { return(m_bmaxs); }
 		
-		BOOL GetBoundBox(Vector& pfMins, Vector& pfMaxs);
+		BOOL GetBoundBox(Vector& pfMins, Vector& pfMaxs) const;
 		bool HasBoundBox() const { return m_bGotSize; }
 
-		inline color32 GetColor(void) const;
+		inline color32 GetColor() const;
 
 		//
 		// Interface to helper information:
 		//
 		inline void AddHelper(CHelperInfo *pHelper);
-		inline int GetHelperCount(void) const { return(m_Helpers.Count()); }
+		inline int GetHelperCount() const { return(m_Helpers.Count()); }
 		CHelperInfo *GetHelper(int nIndex);
 
 	protected:
@@ -216,7 +216,7 @@ color32 GDclass::GetColor(void) const
 // Purpose: Returns a description of this entity class, or the entity class name
 //			if no description exists.
 //-----------------------------------------------------------------------------
-const char *GDclass::GetDescription(void)
+const char *GDclass::GetDescription(void) const
 {
 	if (m_pszDescription == NULL)
 	{
@@ -231,7 +231,7 @@ const char *GDclass::GetDescription(void)
 // Purpose: 
 // Input  : pszClass - 
 //-----------------------------------------------------------------------------
-bool GDclass::IsClass(const char *pszClass)
+bool GDclass::IsClass(const char *pszClass) const
 {
 	Assert(pszClass != NULL);
 	return(!stricmp(pszClass, m_szName));

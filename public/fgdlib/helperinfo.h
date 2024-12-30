@@ -6,8 +6,8 @@
 #define HELPERINFO_H
 #pragma once
 
-#include <tier0/dbg.h>
-#include <utlvector.h>
+#include "tier0/dbg.h"
+#include "tier1/utlvector.h"
 
 
 #define MAX_HELPER_NAME_LEN			256
@@ -56,18 +56,7 @@ inline CHelperInfo::CHelperInfo(void)
 //-----------------------------------------------------------------------------
 inline CHelperInfo::~CHelperInfo(void)
 {
-	intp nCount = m_Parameters.Count();
-	for (intp i = 0; i < nCount; i++)
-	{
-		char *pszParam = m_Parameters.Element(i);
-		Assert(pszParam != NULL);
-		if (pszParam != NULL)
-		{
-			delete [] pszParam;
-		}
-	}
-
-	m_Parameters.RemoveAll();
+	m_Parameters.PurgeAndDeleteElementsArray();
 }
 
 
@@ -85,7 +74,7 @@ inline bool CHelperInfo::AddParameter(const char *pszParameter)
 		if (nLen > 0)
 		{
 			char *pszNew = new char [nLen + 1];
-			if (pszNew != NULL)
+			if (pszNew != NULL) //-V668
 			{
 				strcpy(pszNew, pszParameter);
 				m_Parameters.AddToTail(pszNew);
@@ -117,7 +106,7 @@ inline void CHelperInfo::SetName(const char *pszName)
 {
 	if (pszName != NULL)
 	{	
-		strcpy(m_szName, pszName);
+		V_strcpy_safe(m_szName, pszName);
 	}
 }
 

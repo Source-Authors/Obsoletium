@@ -9,14 +9,14 @@
 #pragma once
 
 
-#include <tier0/dbg.h>
-#include <utlvector.h>
-#include <utldict.h>
+#include "tier0/dbg.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
 #include <fstream>
 
 
-#define KEYVALUE_MAX_KEY_LENGTH			80
-#define KEYVALUE_MAX_VALUE_LENGTH		512
+constexpr inline int KEYVALUE_MAX_KEY_LENGTH{80};
+constexpr inline int KEYVALUE_MAX_VALUE_LENGTH{512};
 
 
 class MDkeyvalue 
@@ -28,7 +28,7 @@ class MDkeyvalue
 		//
 		inline MDkeyvalue(void);
 		inline MDkeyvalue(const char *pszKey, const char *pszValue);
-		~MDkeyvalue(void);
+		inline ~MDkeyvalue();
 
 		MDkeyvalue &operator =(const MDkeyvalue &other);
 		
@@ -70,6 +70,12 @@ MDkeyvalue::MDkeyvalue(const char *pszKey, const char *pszValue)
 
 
 //-----------------------------------------------------------------------------
+// Purpose: Destructor.
+//-----------------------------------------------------------------------------
+MDkeyvalue::~MDkeyvalue() = default;
+
+
+//-----------------------------------------------------------------------------
 // Purpose: Assigns a key and value.
 //-----------------------------------------------------------------------------
 void MDkeyvalue::Set(const char *pszKey, const char *pszValue)
@@ -77,8 +83,8 @@ void MDkeyvalue::Set(const char *pszKey, const char *pszValue)
 	Assert(pszKey);
 	Assert(pszValue);
 
-	strcpy(szKey, pszKey);
-	strcpy(szValue, pszValue);
+	V_strcpy_safe(szKey, pszKey);
+	V_strcpy_safe(szValue, pszValue);
 }
 
 
@@ -156,7 +162,7 @@ class WCKeyValuesT : public Base
 {
 public:
 
-	WCKeyValuesT(void);
+	WCKeyValuesT(void) {}
 	~WCKeyValuesT(void);
 
 	void RemoveAll(void);

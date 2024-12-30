@@ -4,8 +4,6 @@
 
 #include "fgdlib/GameData.h"
 
-#include <io.h>
-
 #include "WorldSize.h"
 #include "fgdlib/HelperInfo.h"
 #include "filesystem_tools.h"
@@ -20,19 +18,18 @@
 #include "tier0/memdbgon.h"
 
 
+constexpr inline int MAX_ERRORS = 5;
 
-const int MAX_ERRORS = 5;
-
-
-static GameDataMessageFunc_t g_pMsgFunc = NULL;
+// dimhotepus: Make atomic to ensure global read/write is thread-safe.
+static std::atomic<GameDataMessageFunc_t> g_pMsgFunc = nullptr;
 
 
 //-----------------------------------------------------------------------------
 // Sets the function used for emitting error messages while loading gamedata files.
 //-----------------------------------------------------------------------------
-void GDSetMessageFunc(GameDataMessageFunc_t pFunc)
+GameDataMessageFunc_t GDSetMessageFunc(GameDataMessageFunc_t pFunc)
 {
-	g_pMsgFunc = pFunc;
+	return g_pMsgFunc.exchange( pFunc, std::memory_order::memory_order_relaxed );
 }
 
 
@@ -119,7 +116,7 @@ static bool DoGetToken(TokenReader &tr, char **ppszStore, int nSize, trtoken_t t
 			}
 		}
 		
-		GDError(tr, "expecting %s", pszTokenName);
+		GDError(tr, "expecting '%s'", pszTokenName);
 		return false;
 	}
 	else if (bBadTokenType || ((pszExpecting != NULL) && !IsToken(pszStore, pszExpecting)))
@@ -150,18 +147,17 @@ bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...)
 	vsprintf(szBuf, error, vl);
 	va_end(vl);
 
-	if (g_pMsgFunc)
+	const auto msgFunc = g_pMsgFunc.load(std::memory_order::memory_order_relaxed);
+	if (msgFunc)
 	{
-		// HACK: should use an enumeration for error level
-		g_pMsgFunc(1, tr.Error(szBuf));
+		msgFunc(MWMSGTYPE::mwError, tr.Error(szBuf));
 	}
 	
 	if (tr.GetErrorCount() >= MAX_ERRORS)
 	{
-		if (g_pMsgFunc)
+		if (msgFunc)
 		{
-			// HACK: should use an enumeration for error level
-			g_pMsgFunc(1, "   - too many errors; aborting.");
+			msgFunc(MWMSGTYPE::mwError, "   - too many errors; aborting.");
 		}
 		
 		return false;
@@ -267,13 +263,7 @@ GameData::~GameData(void)
 void GameData::ClearData(void)
 {
 	// delete classes.
-	int nCount = m_Classes.Count();
-	for (int i = 0; i < nCount; i++)
-	{
-		GDclass *pm = m_Classes.Element(i);
-		delete pm;
-	}
-	m_Classes.RemoveAll();
+	m_Classes.PurgeAndDeleteElements();
 }
 
 
@@ -545,7 +535,7 @@ GDclass *GameData::BeginInstanceRemap( const char *pszClassName, const char *psz
 	m_InstanceAngle = Angle;
 	AngleMatrix( m_InstanceAngle, m_InstanceOrigin, m_InstanceMat );
 
-	strcpy( m_InstancePrefix, pszInstancePrefix );
+	V_strcpy_safe( m_InstancePrefix, pszInstancePrefix );
 
 	if ( m_InstanceClass )
 	{
@@ -619,7 +609,7 @@ static bool CUtlType_LessThan( const GDIV_TYPE &type1, const GDIV_TYPE &type2 )
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, TNameFixup NameFixup )
+bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
 {
 	if ( RemapOperation.Count() == 0 )
 	{
@@ -650,14 +640,14 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 		return false;
 	}
 
-	strcpy( pszOutValue, pszInValue );
+	V_strncpy( pszOutValue, pszInValue, outLen );
 
 	switch( RemapOperation[ KVRemapIndex ] )
 	{
 		case REMAP_NAME:
 			if ( KVType != ivInstanceVariable )
 			{
-				RemapNameField( pszInValue, pszOutValue, NameFixup );
+				RemapNameField( pszInValue, pszOutValue, outLen, NameFixup );
 			}
 			break;
 
@@ -670,7 +660,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 					Warning( "'%s' is not a vector3.\n", pszInValue );
 				}
 				VectorTransform( inPoint, m_InstanceMat, outPoint );
-				sprintf( pszOutValue, "%g %g %g", outPoint.x, outPoint.y, outPoint.z );
+				V_snprintf( pszOutValue, outLen, "%g %g %g", outPoint.x, outPoint.y, outPoint.z );
 			}
 			break;
 			
@@ -689,7 +679,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 				MatrixMultiply( m_InstanceMat, angToWorld, localMatrix );
 				MatrixAngles( localMatrix, outAngles );
 
-				sprintf( pszOutValue, "%g %g %g", outAngles.x, outAngles.y, outAngles.z );
+				V_snprintf( pszOutValue, outLen, "%g %g %g", outAngles.x, outAngles.y, outAngles.z );
 			}
 			break;
 
@@ -709,7 +699,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 				MatrixMultiply( m_InstanceMat, angToWorld, localMatrix );
 				MatrixAngles( localMatrix, outAngles );
 
-				sprintf( pszOutValue, "%g", -outAngles.x );	// just the pitch
+				V_snprintf( pszOutValue, outLen, "%g", -outAngles.x );	// just the pitch
 			}
 			break;
 	}
@@ -726,20 +716,20 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapNameField( const char *pszInValue, char *pszOutValue, TNameFixup NameFixup )
+bool GameData::RemapNameField( const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
 {
-	strcpy( pszOutValue, pszInValue );
+	V_strncpy( pszOutValue, pszInValue, outLen );
 
 	if ( pszInValue[ 0 ] && pszInValue[ 0 ] != '@' )
 	{	// ! at the start of a value means it is global and should not be remaped
 		switch( NameFixup )
 		{
 			case NAME_FIXUP_PREFIX:
-				sprintf( pszOutValue, "%s-%s", m_InstancePrefix, pszInValue );
+				V_snprintf( pszOutValue, outLen, "%s-%s", m_InstancePrefix, pszInValue );
 				break;
 
 			case NAME_FIXUP_POSTFIX:
-				sprintf( pszOutValue, "%s-%s", pszInValue, m_InstancePrefix );
+				V_snprintf( pszOutValue, outLen, "%s-%s", pszInValue, m_InstancePrefix );
 				break;
 		}
 	}
@@ -783,8 +773,8 @@ bool GameData::LoadFGDMaterialExclusions( TokenReader &tr )
 			// Parse the string
 			if ( bMatchFound == false )
 			{
-				int index = m_FGDMaterialExclusions.AddToTail();
-				Q_strncpy( m_FGDMaterialExclusions[index].szDirectory, szToken, sizeof( m_FGDMaterialExclusions[index].szDirectory ) );
+				intp index = m_FGDMaterialExclusions.AddToTail();
+				V_strcpy_safe( m_FGDMaterialExclusions[index].szDirectory, szToken );
 				m_FGDMaterialExclusions[index].bUserGenerated = false;
 			}
 		}
@@ -808,8 +798,8 @@ bool GameData::LoadFGDMaterialExclusions( TokenReader &tr )
 //-----------------------------------------------------------------------------
 bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 {
-	int gindex = 0; // Index of AutoVisGroups
-	int cindex = 0;	// Index of Classes
+	intp gindex = 0; // Index of AutoVisGroups
+	intp cindex = 0;	// Index of Classes
 
 	char szToken[128];
 	
@@ -823,7 +813,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 		}
 		
 		gindex = m_FGDAutoVisGroups.AddToTail();
-		Q_strncpy( m_FGDAutoVisGroups[gindex].szParent, szToken, sizeof( m_FGDAutoVisGroups[gindex].szParent ) );
+		V_strcpy_safe( m_FGDAutoVisGroups[gindex].szParent, szToken );
 
 		// We expect a Class
 		if ( !GDSkipToken( tr, OPERATOR, "[" ) )
@@ -838,7 +828,9 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 		if ( GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
 		{
 			cindex = m_FGDAutoVisGroups[gindex].m_Classes.AddToTail();
-			Q_strncpy( m_FGDAutoVisGroups[gindex].m_Classes[cindex].szClass, szToken, sizeof( m_FGDAutoVisGroups[gindex].m_Classes[cindex].szClass ) );
+			auto &vgclass = m_FGDAutoVisGroups[gindex].m_Classes[cindex];
+
+			V_strcpy_safe( vgclass.szClass, szToken );
 
 			if ( !GDSkipToken( tr, OPERATOR, "[" ) )
 			{
@@ -858,7 +850,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 					return( FALSE );
 				}
 
-				m_FGDAutoVisGroups[gindex].m_Classes[cindex].szEntities.CopyAndAddToTail( szToken );
+				vgclass.szEntities.CopyAndAddToTail(szToken);
 
 			}
 

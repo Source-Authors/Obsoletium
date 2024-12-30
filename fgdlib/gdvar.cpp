@@ -2,27 +2,28 @@
 //
 //=============================================================================
 
+#include "fgdlib/gdvar.h"
+
 #include "fgdlib/fgdlib.h"
 #include "fgdlib/GameData.h"
 #include "fgdlib/WCKeyValues.h"
-#include "fgdlib/gdvar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 
-typedef struct
+struct TypeMap_t
 {
 	GDIV_TYPE eType;		// The enumeration of this type.
 	char *pszName;			// The name of this type.
 	trtoken_t eStoreAs;		// How this type is stored (STRING, INTEGER, etc).
-} TypeMap_t;
+};
 
 
 //-----------------------------------------------------------------------------
 // Maps type names to type enums and parsing logic for values.
 //-----------------------------------------------------------------------------
-static TypeMap_t TypeMap[] =
+static constexpr TypeMap_t TypeMap[] =
 {
 	{ ivAngle,				"angle",				STRING },
 	{ ivChoices,			"choices",				STRING },
@@ -85,15 +86,17 @@ GDinputvariable::GDinputvariable(void)
 //-----------------------------------------------------------------------------
 GDinputvariable::GDinputvariable( const char *szType, const char *szName )
 {
-	m_szDefault[0] = 0;
+	m_szLongName[0] = 0;
+	m_pszDescription = NULL;
 	m_nDefault = 0;
+	m_szDefault[0] = 0;
+	m_nValue = 0;
 	m_szValue[0] = 0;
 	m_bReportable = FALSE;
 	m_bReadOnly = false;
-	m_pszDescription = NULL;
 
 	m_eType = GetTypeFromToken( szType );
-	strcpy( m_szName, szName );
+	V_strcpy_safe( m_szName, szName );
 }
 
 
@@ -112,10 +115,16 @@ GDinputvariable::~GDinputvariable(void)
 //-----------------------------------------------------------------------------
 GDinputvariable &GDinputvariable::operator =(GDinputvariable &Other)
 {
+	// dimhotepus: Protect from self-assignment.
+	if (this == &Other)
+	{
+		return *this;
+	}
+
 	m_eType = Other.GetType();
-	strcpy(m_szName, Other.m_szName);
-	strcpy(m_szLongName, Other.m_szLongName);
-	strcpy(m_szDefault, Other.m_szDefault);
+	V_strcpy_safe(m_szName, Other.m_szName);
+	V_strcpy_safe(m_szLongName, Other.m_szLongName);
+	V_strcpy_safe(m_szDefault, Other.m_szDefault);
 
 	//
 	// Copy the description.
@@ -123,8 +132,9 @@ GDinputvariable &GDinputvariable::operator =(GDinputvariable &Other)
 	delete [] m_pszDescription;
 	if (Other.m_pszDescription != NULL)
 	{
-		m_pszDescription = new char[strlen(Other.m_pszDescription) + 1];
-		strcpy(m_pszDescription, Other.m_pszDescription);
+		const ptrdiff_t len = strlen(Other.m_pszDescription) + 1;
+		m_pszDescription = new char[len];
+		V_strncpy(m_pszDescription, Other.m_pszDescription, len);
 	}
 	else
 	{
@@ -137,10 +147,9 @@ GDinputvariable &GDinputvariable::operator =(GDinputvariable &Other)
 
 	m_Items.RemoveAll();
 	
-	int nCount = Other.m_Items.Count();
-	for (int i = 0; i < nCount; i++)
+	for (const auto &i : Other.m_Items)
 	{
-		m_Items.AddToTail(Other.m_Items.Element(i));
+		m_Items.AddToTail(i);
 	}
 
 	return(*this);
@@ -153,13 +162,13 @@ GDinputvariable &GDinputvariable::operator =(GDinputvariable &Other)
 // Output : GDIV_TYPE corresponding to the token in the string, ivBadType if the
 //			string does not correspond to a valid type.
 //-----------------------------------------------------------------------------
-trtoken_t GDinputvariable::GetStoreAsFromType(GDIV_TYPE eType)
+trtoken_t GDinputvariable::GetStoreAsFromType(GDIV_TYPE eType) const
 {
-	for (int i = 0; i < sizeof(TypeMap) / sizeof(TypeMap[0]); i++)
+	for (auto &tm : TypeMap)
 	{
-		if (TypeMap[i].eType == eType)
+		if (tm.eType == eType)
 		{
-			return(TypeMap[i].eStoreAs);
+			return(tm.eStoreAs);
 		}
 	}
 
@@ -174,13 +183,13 @@ trtoken_t GDinputvariable::GetStoreAsFromType(GDIV_TYPE eType)
 // Output : GDIV_TYPE corresponding to the token in the string, ivBadType if the
 //			string does not correspond to a valid type.
 //-----------------------------------------------------------------------------
-GDIV_TYPE GDinputvariable::GetTypeFromToken(const char *pszToken)
+GDIV_TYPE GDinputvariable::GetTypeFromToken(const char *pszToken) const
 {
-	for (int i = 0; i < sizeof(TypeMap) / sizeof(TypeMap[0]); i++)
+	for (auto &tm : TypeMap)
 	{
-		if (IsToken(pszToken, TypeMap[i].pszName))
+		if (IsToken(pszToken, tm.pszName))
 		{
-			return(TypeMap[i].eType);
+			return(tm.eType);
 		}
 	}
 
@@ -191,13 +200,13 @@ GDIV_TYPE GDinputvariable::GetTypeFromToken(const char *pszToken)
 //-----------------------------------------------------------------------------
 // Purpose: Returns a string representing the type of this variable, eg. "integer".
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::GetTypeText(void)
+const char *GDinputvariable::GetTypeText(void) const
 {
-	for (int i = 0; i < sizeof(TypeMap) / sizeof(TypeMap[0]); i++)
+	for (auto &tm : TypeMap)
 	{
-		if (TypeMap[i].eType == m_eType)
+		if (tm.eType == m_eType)
 		{
-			return(TypeMap[i].pszName);
+			return(tm.pszName);
 		}
 	}
 
@@ -396,7 +405,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		//
 		// Default long name is short name.
 		//
-		strcpy(m_szLongName, m_szName);
+		V_strcpy_safe(m_szLongName, m_szName);
 	}
 
 	//
@@ -464,7 +473,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			{
 				return FALSE;
 			}
-			strcpy(ivi.szCaption, szToken);
+			V_strcpy_safe(ivi.szCaption, szToken);
 
 			// colon..
 			if (!GDSkipToken(tr, OPERATOR, ":"))
@@ -485,13 +494,13 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		
 		// Set the default value.
 		unsigned long nDefault = 0;
-		for (int i = 0; i < m_Items.Count(); i++)
+		for (const auto &i : m_Items)
 		{
-			if (m_Items[i].bDefault)
-				nDefault |= m_Items[i].iValue;
+			if (i.bDefault)
+				nDefault |= i.iValue;
 		}
 		m_nDefault = (int)nDefault;
-		Q_snprintf( m_szDefault, sizeof( m_szDefault ), "%d", m_nDefault );
+		V_sprintf_safe( m_szDefault, "%d", m_nDefault );
 	}
 	else if (m_eType == ivChoices)
 	{
@@ -508,7 +517,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			// store choice value
 			GDGetToken(tr, szToken, sizeof(szToken), ttype);
 			ivi.iValue = 0;
-			strcpy(ivi.szValue, szToken);
+			V_strcpy_safe(ivi.szValue, szToken);
 
 			// colon
 			if (!GDSkipToken(tr, OPERATOR, ":"))
@@ -522,7 +531,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 				return FALSE;
 			}
 
-			strcpy(ivi.szCaption, szToken);
+			V_strcpy_safe(ivi.szCaption, szToken);
 
 			m_Items.AddToTail(ivi);
 		}
@@ -547,7 +556,7 @@ void GDinputvariable::FromKeyValue(MDkeyvalue *pkv)
 
 	if (eStoreAs == STRING)
 	{
-		strcpy(m_szValue, pkv->szValue);
+		V_strcpy_safe(m_szValue, pkv->szValue);
 	}
 	else if (eStoreAs == INTEGER)
 	{
@@ -561,7 +570,7 @@ void GDinputvariable::FromKeyValue(MDkeyvalue *pkv)
 // Input  : uCheck - Flag to check.
 // Output : Returns TRUE if flag is set, FALSE if not.
 //-----------------------------------------------------------------------------
-BOOL GDinputvariable::IsFlagSet(unsigned int uCheck)
+BOOL GDinputvariable::IsFlagSet(unsigned int uCheck) const
 {
 	Assert(m_eType == ivFlags);
 	return (((unsigned int)m_nValue & uCheck) == uCheck) ? TRUE : FALSE;
@@ -589,10 +598,9 @@ void GDinputvariable::Merge(GDinputvariable &Other)
 	//
 	bool bFound = false;
 	int nOurItems = m_Items.Count();
-	for (int i = 0; i < Other.m_Items.Count(); i++)
+	for (auto &TheirItem : Other.m_Items)
 	{
-		GDIVITEM &TheirItem = Other.m_Items[i];
-		for (int j = 0; j < nOurItems; j++)
+		for (intp j = 0; j < nOurItems; j++)
 		{
 			GDIVITEM &OurItem = m_Items[j];
 			if (TheirItem.iValue == OurItem.iValue)
@@ -656,7 +664,7 @@ void GDinputvariable::ResetDefaults(void)
 	else
 	{
 		m_nValue = m_nDefault;
-		strcpy(m_szValue, m_szDefault);
+		V_strcpy_safe(m_szValue, m_szDefault);
 	}
 }
 
@@ -667,13 +675,13 @@ void GDinputvariable::ResetDefaults(void)
 //-----------------------------------------------------------------------------
 void GDinputvariable::ToKeyValue(MDkeyvalue *pkv)
 {
-	strcpy(pkv->szKey, m_szName);
+	V_strcpy_safe(pkv->szKey, m_szName);
 
 	trtoken_t eStoreAs = GetStoreAsFromType(m_eType);
 
 	if (eStoreAs == STRING)
 	{
-		strcpy(pkv->szValue, m_szValue);
+		V_strcpy_safe(pkv->szValue, m_szValue);
 	}
 	else if (eStoreAs == INTEGER)
 	{
@@ -688,14 +696,13 @@ void GDinputvariable::ToKeyValue(MDkeyvalue *pkv)
 // Input  : pszString - The choices value string.
 // Output : Returns the description string.
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::ItemStringForValue(const char *szValue)
+const char *GDinputvariable::ItemStringForValue(const char *szValue) const
 {
-	int nCount = m_Items.Count();
-	for (int i = 0; i < nCount; i++)
+	for (const auto &i : m_Items)
 	{
-		if (!stricmp(m_Items[i].szValue, szValue))
+		if (!stricmp(i.szValue, szValue))
 		{
-			return(m_Items[i].szCaption);
+			return(i.szCaption);
 		}
 	}
 
@@ -709,14 +716,13 @@ const char *GDinputvariable::ItemStringForValue(const char *szValue)
 // Input  : pszString - The choices description string.
 // Output : Returns the value string.
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::ItemValueForString(const char *szString)
+const char *GDinputvariable::ItemValueForString(const char *szString) const
 {
-	int nCount = m_Items.Count();
-	for (int i = 0; i < nCount; i++)
+	for (const auto &i : m_Items)
 	{
-		if (!strcmpi(m_Items[i].szCaption, szString))
+		if (!strcmpi(i.szCaption, szString))
 		{
-			return(m_Items[i].szValue);
+			return(i.szValue);
 		}
 	}
 
