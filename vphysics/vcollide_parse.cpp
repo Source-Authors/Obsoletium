@@ -202,7 +202,7 @@ void CVPhysicsParse::ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKe
 		else if ( !Q_stricmp( key, "rollingdrag" ) )
 		{
 			AssertMsg( false, "Solid '%s' rolling drag is not implemented.", pSolid->name );
-			//pSolid->params.rollingDrag = atof(value);
+			//pSolid->params.rollingDrag = strtof(value, nullptr);
 		}
 		else
 		{
