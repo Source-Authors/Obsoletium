@@ -5144,14 +5144,14 @@ void *CModelLoader::GetExtraData( model_t *model )
 	case mod_sprite:
 		{
 			// sprites don't use the real cache yet
-				// The sprite got unloaded.
-				if ( !( FMODELLOADER_LOADED & model->nLoadFlags ) )
-				{
-					return NULL;
-				}
-
-				return model->sprite.sprite;
+			// The sprite got unloaded.
+			if ( !( FMODELLOADER_LOADED & model->nLoadFlags ) )
+			{
+				return NULL;
 			}
+
+			return model->sprite.sprite;
+		}
 		break;
 
 	case mod_studio:
@@ -5471,7 +5471,7 @@ model_t *CModelLoader::GetDynamicModel( const char *name, bool bClientOnly )
 		dyn.m_nLoadFlags = 0;
 		DynamicModelDebugMsg( "model %p [%s] registered\n", pModel, pModel->strName.String() );
 	}
-	dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
+	dyn.m_uLastTouchedMS_Div256 = (Plat_USTime() / 1000) >> 8;
 
 	return pModel;
 }
@@ -5516,7 +5516,7 @@ void CModelLoader::UpdateDynamicModelLoadQueue()
 				g_pMDLCache->LockStudioHdr( pModel->studio );
 				dyn.m_nLoadFlags |= CDynamicModelInfo::CLIENTREADY;
 
-				dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
+				dyn.m_uLastTouchedMS_Div256 = (Plat_USTime() / 1000) >> 8;
 
 				FinishDynamicModelLoadIfReady( &dyn, pModel );
 			}
@@ -5705,7 +5705,7 @@ void CModelLoader::ReleaseDynamicModel( model_t *pModel, bool bClientSideRef )
 			Assert( dyn.m_iClientRefCount >= 0 );
 			if ( dyn.m_iClientRefCount < 0 )
 				dyn.m_iClientRefCount = 0;
-			dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
+			dyn.m_uLastTouchedMS_Div256 = (Plat_USTime() / 1000) >> 8;
 		}
 	}
 }
@@ -5802,7 +5802,7 @@ bool CModelLoader::CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod 
 
 void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 {
-	const uint now = Plat_MSTime();
+	const unsigned long long now = Plat_USTime() / 1000;
 	const uint delay = bIgnoreTime ? 0 : (int)( clamp( mod_dynamicunloadtime.GetFloat(), 1.f, 600.f ) * 1000 );
 
 	UpdateDynamicModelLoadQueue();
@@ -5821,7 +5821,7 @@ void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 
 		// UNLOAD THIS MODEL if zero refcount and not currently loading, and either timed out or never loaded
 		if ( dyn.m_iRefCount <= 0 && !(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) &&
-			 ( ( now - (dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
+			 ( ( now - ((unsigned long long)dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
 		{
 			// Remove from load queue
 			if ( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED )
