@@ -163,8 +163,9 @@ InitReturnVal_t CMatRenderContextBase::Init( )
 	MEM_ALLOC_CREDIT();
 	if ( !sm_nInitializeCount )
 	{
-		int nSize = 2200 * 1024;
-		int nCommitSize = 32 * 1024;
+		// dimhotepus: Increase size 2200 -> 4400 as gmod do for rendering more models.
+		int nSize = 4400 * 1024;
+		constexpr int nCommitSize = 32 * 1024;
 
 #ifdef SWDS
 		nSize = nCommitSize = 1024;
