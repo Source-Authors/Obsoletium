@@ -1274,8 +1274,8 @@ void CWin32Surface::SetNotifyIcon(VPANEL context, HTexture iconID, VPANEL panelT
 
 	if (iconID && !success)
 	{
-		DWORD err = GetLastError();
-		Msg("error: SetNotifyIcon(%d) failed\n", err);
+		Msg("Shell_NotifyIcon(%ul) failed: %s.\n",
+			dwMessage, std::system_category().message(::GetLastError()).c_str());
 	}
 }
 
