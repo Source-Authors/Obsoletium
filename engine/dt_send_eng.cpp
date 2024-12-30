@@ -35,33 +35,33 @@ extern bool Sendprop_UsingDebugWatch();
 class CPropCullStack : public CDatatableStack
 {
 public:
-						CPropCullStack( 
-							CSendTablePrecalc *pPrecalc, 
-							int iClient, 
-							const CSendProxyRecipients *pOldStateProxies,
-							const int nOldStateProxies, 
-							const CSendProxyRecipients *pNewStateProxies,
-							const int nNewStateProxies
+	CPropCullStack( 
+		CSendTablePrecalc *pPrecalc, 
+		int iClient, 
+		const CSendProxyRecipients *pOldStateProxies,
+		const int nOldStateProxies, 
+		const CSendProxyRecipients *pNewStateProxies,
+		const int nNewStateProxies
 		) :	CDatatableStack( pPrecalc, (unsigned char*)1, -1 ),
 		m_pPrecalc(pPrecalc),
 		m_iClient(iClient),
-							m_pOldStateProxies( pOldStateProxies ),
-							m_nOldStateProxies( nOldStateProxies ),
-							m_pNewStateProxies( pNewStateProxies ),
+		m_pOldStateProxies( pOldStateProxies ),
+		m_nOldStateProxies( nOldStateProxies ),
+		m_pNewStateProxies( pNewStateProxies ),
 		m_nNewStateProxies( nNewStateProxies ),
 		m_pOutProps( nullptr ),
 		m_nMaxOutProps( -1 ),
 		m_nOutProps( 0 )
-						{
+	{
 		memset(m_NewProxyProps, 0, sizeof(m_NewProxyProps));
 		m_nNewProxyProps = 0;
-						}
+	}
 
 	inline unsigned char*	CallPropProxy( CSendNode *pNode, int iProp, unsigned char *pStructBase )
 	{
 		if ( pNode->GetDataTableProxyIndex() == DATATABLE_PROXY_INDEX_NOPROXY )
 		{
-			return (unsigned char*)1;
+			return (unsigned char*)(uintp)1;
 		}
 		else
 		{
@@ -103,7 +103,7 @@ public:
 				}
 			}
 
-			return (unsigned char*)bCur;
+			return (unsigned char*)(uintp)bCur;
 		}
 	}
 
