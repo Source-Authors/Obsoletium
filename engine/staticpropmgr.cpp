@@ -1513,15 +1513,13 @@ void CStaticPropMgr::LevelInitClient()
 
 	// Since the client will be ready at a later time than the server
 	// to set up its data, we need a separate call to handle that
-	int nCount = m_StaticProps.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( auto &prop : m_StaticProps )
 	{
-		CStaticProp &prop = m_StaticProps[i];
-		clientleafsystem->CreateRenderableHandle( &m_StaticProps[i], true );
+		clientleafsystem->CreateRenderableHandle( &prop, true );
 		if ( !prop.ShouldDraw() )
 			continue;
 
-		ClientRenderHandle_t handle = m_StaticProps[i].RenderHandle();
+		ClientRenderHandle_t handle = prop.RenderHandle();
 		if ( prop.LeafCount() > 0 )
 		{
 			// Add the prop to all the leaves it lies in
