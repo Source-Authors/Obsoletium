@@ -274,7 +274,7 @@ void CSystem::RunFrame()
 		// allow a little slack for jittery mice, don't reset until it's moved more than fifty pixels
 		if (abs((x + y) - (m_iStaticMouseOldX + m_iStaticMouseOldY)) > 50)
 		{
-			m_StaticLastComputerUseTime = GetTimeMillis() / 1000.0;
+			m_StaticLastComputerUseTime = GetCurrentTime();
 			m_iStaticMouseOldX = x;
 			m_iStaticMouseOldY = y;
 		}
@@ -800,7 +800,7 @@ double CSystem::GetTimeSinceLastUse()
 {
 	if (m_bStaticWatchForComputerUse)
 	{
-		return (GetTimeMillis() / 1000.0) - m_StaticLastComputerUseTime;
+		return GetCurrentTime() - m_StaticLastComputerUseTime;
 	}
 
 	return 0.0f;

@@ -226,7 +226,7 @@ void CSystem::RunFrame()
 		// allow a little slack for jittery mice, don't reset until it's moved more than fifty pixels
 		if (abs((x + y) - (m_iStaticMouseOldX + m_iStaticMouseOldY)) > 50)
 		{
-			m_StaticLastComputerUseTime = Plat_MSTime();
+			m_StaticLastComputerUseTime = Plat_FloatTime();
 			m_iStaticMouseOldX = x;
 			m_iStaticMouseOldY = y;
 		}
@@ -262,7 +262,8 @@ double CSystem::GetCurrentTime()
 //-----------------------------------------------------------------------------
 long CSystem::GetTimeMillis()
 {
-	return (long)(Plat_MSTime() );
+	// dimhotepus: Overflows in x86 (~49,7 days)!
+	return (long)(Plat_USTime() / 1000);
 }
 
 //-----------------------------------------------------------------------------
@@ -562,7 +563,7 @@ double CSystem::GetTimeSinceLastUse()
 {
 	if (m_bStaticWatchForComputerUse)
 	{
-		return ( Plat_MSTime() - m_StaticLastComputerUseTime ) / 1000.0f;
+		return Plat_FloatTime() - m_StaticLastComputerUseTime;
 	}
 
 	return 0.0f;
