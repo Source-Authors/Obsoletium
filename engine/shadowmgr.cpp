@@ -964,7 +964,7 @@ const CShadowMgr::SurfaceBounds_t* CShadowMgr::GetSurfaceBounds( SurfaceHandle_t
 	if ( m_pSurfaceBounds[nSurfaceIndex] != m_SurfaceBoundsCache.InvalidIndex() )
 		return &m_SurfaceBoundsCache[ m_pSurfaceBounds[nSurfaceIndex] ];
 
-	int nIndex;
+	unsigned short nIndex;
 	if ( m_SurfaceBoundsCache.Count() >= SURFACE_BOUNDS_CACHE_COUNT )
 	{
 		// Retire existing cache entry if we're out of space,
