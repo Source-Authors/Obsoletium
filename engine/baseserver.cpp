@@ -249,39 +249,48 @@ static void ServerNotifyVarChangeCallback( IConVar *pConVar, const char *pOldVal
 
 CBaseServer::CBaseServer() 
 {
-	// Just get a unique ID to talk to the steam master server updater.
-	m_bRestartOnLevelChange = false;
-	
-	m_StringTables = NULL;
-	m_pInstanceBaselineTable = NULL;
-	m_pLightStyleTable = NULL;
-	m_pUserInfoTable = NULL;
-	m_pServerStartupTable = NULL;
-	m_pDownloadableFileTable = NULL;
-
-	m_fLastCPUCheckTime = 0;
-	m_fStartTime = 0;
-	m_fCPUPercent = 0;
+	m_State = ss_dead;
 	m_Socket = NS_SERVER;
 	m_nTickCount = 0;
-	
-	m_szMapname[0] = 0;
-	m_szSkyname[0] = 0;
-	m_Password[0] = 0;
-	V_memset( worldmapMD5.bits, 0, MD5_DIGEST_LENGTH );
+	m_bSimulatingTicks = false;
+	m_szMapname[0] = '\0';
+	m_szMapFilename[0] = '\0';
+	m_szSkyname[0] = '\0';
+	m_Password[0] = '\0';
 
-	serverclasses = serverclassbits = 0;
-	m_nMaxclients = m_nSpawnCount = 0;
-	m_flTickInterval = 0.03;
-	m_nUserid = 0;
-	m_nNumConnections = 0;
-	m_bIsDedicated = false;
+	V_memset( worldmapMD5.bits, 0, sizeof(worldmapMD5.bits) );
 	
-	m_bMasterServerRulesDirty = true;
-	m_flLastMasterServerUpdateTime = 0;
+	m_StringTables = nullptr;
+
+	m_pInstanceBaselineTable = nullptr;
+	m_pLightStyleTable = nullptr;
+	m_pUserInfoTable = nullptr;
+	m_pServerStartupTable = nullptr;
+	m_pDownloadableFileTable = nullptr;
+	
+	serverclasses = serverclassbits = 0;
+	
+	m_nUserid = 0;
+
+	m_nMaxclients = m_nSpawnCount = 0;
+	m_flTickInterval = 0.03f;
+	
+	m_bIsDedicated = false;
+
 	m_CurrentRandomNonce = 0;
 	m_LastRandomNonce = 0;
 	m_flLastRandomNumberGenerationTime = -3.0f; // force it to calc first frame
+	m_fCPUPercent = 0;
+	m_fStartTime = 0;
+	m_fLastCPUCheckTime = 0;
+
+	// Just get a unique ID to talk to the steam master server updater.
+	m_bRestartOnLevelChange = false;
+	
+	m_bMasterServerRulesDirty = true;
+	m_flLastMasterServerUpdateTime = 0;
+
+	m_nNumConnections = 0;
 
 	m_bReportNewFakeClients = true;
 	m_flPausedTimeEnd = -1.f;
