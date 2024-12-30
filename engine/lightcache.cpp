@@ -164,17 +164,17 @@ public:
 		m_pEnvCubemapTexture = nullptr;
 	}
 
-	bool HasLightStyle() 
+	bool HasLightStyle() const
 	{
 		return ( m_LightingFlags & ( HACKLIGHTCACHEFLAGS_HASSWITCHABLELIGHTSTYLE | HACKLIGHTCACHEFLAGS_HASNONSWITCHABLELIGHTSTYLE ) ) ? true : false;
 	}
 
-	bool HasSwitchableLightStyle() 
+	bool HasSwitchableLightStyle() const
 	{
 		return ( m_LightingFlags & HACKLIGHTCACHEFLAGS_HASSWITCHABLELIGHTSTYLE ) ? true : false;
 	}
 
-	bool HasNonSwitchableLightStyle() 
+	bool HasNonSwitchableLightStyle() const
 	{
 		return ( m_LightingFlags & HACKLIGHTCACHEFLAGS_HASNONSWITCHABLELIGHTSTYLE ) ? true : false;
 	}
@@ -254,7 +254,7 @@ public:
 	Vector			mins; // fixme: make these smaller
 	Vector			maxs; // fixme: make these smaller
 
-	bool HasDlights() { return m_DLightActive ? true : false; }
+	bool HasDlights() const { return m_DLightActive ? true : false; }
 	PropLightcache_t()
 	{
 		m_pNextPropLightcache = nullptr;
