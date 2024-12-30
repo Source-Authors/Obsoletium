@@ -42,16 +42,19 @@ public:
 							const int nOldStateProxies, 
 							const CSendProxyRecipients *pNewStateProxies,
 							const int nNewStateProxies
-							) :
-							
-							CDatatableStack( pPrecalc, (unsigned char*)1, -1 ),
+		) :	CDatatableStack( pPrecalc, (unsigned char*)1, -1 ),
+		m_pPrecalc(pPrecalc),
+		m_iClient(iClient),
 							m_pOldStateProxies( pOldStateProxies ),
 							m_nOldStateProxies( nOldStateProxies ),
 							m_pNewStateProxies( pNewStateProxies ),
-							m_nNewStateProxies( nNewStateProxies )
+		m_nNewStateProxies( nNewStateProxies ),
+		m_pOutProps( nullptr ),
+		m_nMaxOutProps( -1 ),
+		m_nOutProps( 0 )
 						{
-							m_pPrecalc = pPrecalc;
-							m_iClient = iClient;
+		memset(m_NewProxyProps, 0, sizeof(m_NewProxyProps));
+		m_nNewProxyProps = 0;
 						}
 
 	inline unsigned char*	CallPropProxy( CSendNode *pNode, int iProp, unsigned char *pStructBase )

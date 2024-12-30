@@ -29,7 +29,7 @@ class CClientSendProp
 {
 public:
 
-				CClientSendProp();
+	CClientSendProp() : m_pTableName{nullptr} {}
 				~CClientSendProp();
 
 	const char*	GetTableName()				{ return m_pTableName; }

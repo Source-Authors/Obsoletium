@@ -62,11 +62,12 @@ public:
 CSendNode::CSendNode()
 {
 	m_iDatatableProp = -1;
-	m_pTable = NULL;
+	m_pTable = nullptr;
 	
 	m_iFirstRecursiveProp = m_nRecursiveProps = 0;
 
 	m_DataTableProxyIndex = DATATABLE_PROXY_INDEX_INVALID; // set it to a questionable value.
+	m_RecursiveProxyIndex = DATATABLE_PROXY_INDEX_INVALID;
 }
 
 CSendNode::~CSendNode()

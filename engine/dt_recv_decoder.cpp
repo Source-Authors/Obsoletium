@@ -15,8 +15,9 @@
 
 CRecvDecoder::CRecvDecoder()
 {
-	m_pTable = 0;
-	m_pClientSendTable = 0;
+	m_pTable = nullptr;
+	m_pClientSendTable = nullptr;
+	m_pDTITable = nullptr;
 }
 
 CClientSendProp::CClientSendProp()
