@@ -121,7 +121,8 @@ InitReturnVal_t CInputSystem::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	m_StartupTimeTick = Plat_MSTime();
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	m_StartupTimeTick = Plat_USTime();
 
 
 #if !defined( POSIX )
@@ -873,18 +874,18 @@ void CInputSystem::PollInputState()
 //-----------------------------------------------------------------------------
 int CInputSystem::ComputeSampleTick()
 {
-	// This logic will only fail if the app has been running for 49.7 days
+	// This logic will only fail if the app has been running for 49.7 / 2 days
 	int nSampleTick;
 
-	DWORD nCurrentTick = Plat_MSTime();
+	unsigned long long nCurrentTick = Plat_USTime();
 	if ( nCurrentTick >= m_StartupTimeTick )
 	{
-		nSampleTick = (int)( nCurrentTick - m_StartupTimeTick );
+		nSampleTick = (int)(( nCurrentTick - m_StartupTimeTick ) / 1000);
 	}
 	else
 	{
-		DWORD nDelta = (DWORD)0xFFFFFFFF - m_StartupTimeTick;
-		nSampleTick = (int)( nCurrentTick + nDelta ) + 1;
+		unsigned long long nDelta = std::numeric_limits<unsigned long long>::max() - m_StartupTimeTick;
+		nSampleTick = (int)( ( nCurrentTick + nDelta ) / 1000 ) + 1;
 	}
 	return nSampleTick;
 }
