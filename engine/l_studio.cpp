@@ -3701,29 +3701,7 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 	{
 		// any i/o error
 		goto cleanUp;
-	}
-
-	if ( IsX360() )
-	{
-		// only the 360 has compressed VHV data
-		// the compressed data is after the header
-		byte *pCompressedData = (byte *)pData + sizeof( HardwareVerts::FileHeader_t );
-		if ( CLZMA::IsCompressed( pCompressedData ) )
-		{
-			// create a buffer that matches the original
-			int actualSize = CLZMA::GetActualSize( pCompressedData );
-			pOriginalData = (byte *)malloc( sizeof( HardwareVerts::FileHeader_t ) + actualSize );
-
-			// place the header, then uncompress directly after it
-			V_memcpy( pOriginalData, pData, sizeof( HardwareVerts::FileHeader_t ) );
-			int outputLength = CLZMA::Uncompress( pCompressedData, pOriginalData + sizeof( HardwareVerts::FileHeader_t ) );
-			if ( outputLength != actualSize )
-			{
-				goto cleanUp;
 			}
-			pData = pOriginalData;
-		}
-	}
 
 	pVhvHdr = (HardwareVerts::FileHeader_t *)pData;
 
@@ -3782,15 +3760,6 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 		meshBuilder.End();
 	}
 cleanUp:
-	if ( IsX360() )
-	{
-		AUTO_LOCK( m_CachedStaticPropMutex );
-		// track the color mesh's datacache handle so that we can find it long after the model instance's are gone
-		// the static prop filenames are guaranteed uniquely decorated
-		m_CachedStaticPropColorData.Insert( pStaticPropContext->m_szFilenameVertex, pStaticPropContext->m_ColorMeshHandle );
-
-		// No support for lightmap textures on X360. 
-	}
 
 	// mark as completed in single atomic operation
 	pStaticPropContext->m_pColorMeshData->m_bColorMeshValid = true;
