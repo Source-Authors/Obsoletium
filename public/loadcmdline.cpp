@@ -89,11 +89,11 @@ void LoadCmdLineFromFile( int &argc, char **&argv, const char *keyname, const ch
 	if ( kv->LoadFromFile( g_pFileSystem, filename ) )
 	{
 		// Load the commandline arguments for this app
-		KeyValues  *appKey	= kv->FindKey( keyname );
-		if( appKey )
+		KeyValues *appKey = kv->FindKey( keyname );
+		if ( appKey )
 		{
 			const char *str	= appKey->GetString( appname );
-			Msg( "Command Line found: %s\n", str );
+			Msg( "Command Line for app %s found: %s\n", appname, str );
 
 			AddArguments( argc, argv, str );
 		}

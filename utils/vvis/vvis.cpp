@@ -1108,7 +1108,7 @@ int RunVVis( int argc, char **argv )
 
 	verbose = false;
 
-	CmdLib_InitFileSystem( argv[ argc - 1 ] );
+	const ScopedFileSystem scopedFileSystem(argv[argc - 1]);
 
 	// The ExpandPath is just for VMPI. VMPI's file system needs the basedir in front of all filenames,
 	// so we prepend qdir here.
@@ -1126,13 +1126,12 @@ int RunVVis( int argc, char **argv )
 	V_StripExtension( source, source, sizeof( source ) );
 
 	// dimhotepus: Reorder to apply command line from file, too.
-	LoadCmdLineFromFile( argc, argv, source, "vvis" );
+	ScopedCmdLine scopedCmdLine( argc, argv, source, "vvis" );
 
 	int i = ParseCommandLine( argc, argv );
 	if (i != argc - 1)
 	{
 		PrintUsage( argc, argv );
-		DeleteCmdLine( argc, argv );
 		CmdLib_Exit( 1 );
 	}
 
@@ -1236,7 +1235,6 @@ int RunVVis( int argc, char **argv )
 	Msg( "%s elapsed\n", str );
 
 	ReleasePakFileLumps();
-	DeleteCmdLine( argc, argv );
 	CmdLib_Cleanup();
 	// dimhotepus: Explicitly close spew and free memory.
 	SpewDeactivate();

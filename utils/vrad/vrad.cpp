@@ -2369,7 +2369,7 @@ void VRAD_Init()
 }
 
 
-int ParseCommandLine( int argc, char **argv, bool *onlydetail )
+static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 {
 	*onlydetail = false;
 
@@ -2962,19 +2962,15 @@ int RunVRAD( int argc, char **argv )
 	verbose = false;  // Originally FALSE
 
 	// dimhotepus: Need file system first.
-	CmdLib_InitFileSystem( argv[ argc - 1 ] );
-	if ( g_bUseMPI && !g_bMPIMaster )
-	{
-		// Don't do this if we're a VMPI worker..
-		LoadCmdLineFromFile( argc, argv, source, "vrad" );
-	}
+	const ScopedFileSystem scopedFileSystem( argv[ argc - 1 ] );
 
 	bool onlydetail;
+
+	const ScopedCmdLine scopedCmdLine( argc, argv, source, "vrad" );
 	int i = ParseCommandLine( argc, argv, &onlydetail );
 	if (i == -1)
 	{
 		PrintUsage( argc, argv );
-		DeleteCmdLine( argc, argv );
 		CmdLib_Exit( 1 );
 	}
 
@@ -2995,7 +2991,6 @@ int RunVRAD( int argc, char **argv )
 
 	VMPI_SetCurrentStage( "master done" );
 
-	DeleteCmdLine( argc, argv );
 	CmdLib_Cleanup();
 	SpewDeactivate();
 	return 0;

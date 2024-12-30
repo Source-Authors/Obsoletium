@@ -24,4 +24,21 @@ void LoadCmdLineFromFile( int &argc, char **&argv, const char *keyname, const ch
 //-----------------------------------------------------------------------------
 void DeleteCmdLine( int argc, char **argv );
 
+class ScopedCmdLine {
+ public:
+  ScopedCmdLine( int &argc, char **&argv, const char *keyname, const char *appname ) noexcept {
+    LoadCmdLineFromFile(argc, argv, keyname, appname);
+    m_argc = argc;
+    m_argv = argv;
+  }
+  ~ScopedCmdLine() noexcept { DeleteCmdLine(m_argc, m_argv); }
+
+  int argc() const noexcept { return m_argc; }
+  char **argv() const noexcept { return m_argv; }
+
+ private:
+  int m_argc;
+  char **m_argv;
+};
+
 #endif // LOADCMDLINE_H

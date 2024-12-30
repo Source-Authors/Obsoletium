@@ -37,6 +37,14 @@ extern IBaseFileSystem *g_pFileSystem;
 void CmdLib_InitFileSystem(const char *pFilename, int maxMemoryUsage = 0);
 void CmdLib_TermFileSystem();  // GracefulExit calls this.
 
+class ScopedFileSystem {
+ public:
+  explicit ScopedFileSystem(const char *fileName, int maxMemoryUsage = 0) noexcept {
+    CmdLib_InitFileSystem(fileName, maxMemoryUsage);
+  }
+  ~ScopedFileSystem() noexcept { CmdLib_TermFileSystem(); }
+};
+
 CreateInterfaceFn CmdLib_GetFileSystemFactory();
 
 // the dec offsetof macro doesnt work very well...

@@ -884,14 +884,14 @@ void PrintCommandLine( int argc, char **argv )
 int RunVBSP( int argc, char **argv )
 {
 	CommandLine()->CreateCmdLine( argc, argv );
-	CmdLib_InitFileSystem( argv[ argc - 1 ] );
+	const ScopedFileSystem scopedFileSystem( argv[ argc - 1 ] );
 
 	Q_StripExtension( ExpandArg( argv[ argc - 1 ] ), source, sizeof( source ) );
 	Q_FileBase( source, mapbase, sizeof( mapbase ) );
 	strlwr( mapbase );
 
-	// Depends on CmdLib_InitFileSystem.
-	LoadCmdLineFromFile( argc, argv, mapbase, "vbsp" );
+	// Depends on ScopedFileSystem.
+	ScopedCmdLine scopedCmdLine( argc, argv, mapbase, "vbsp" );
 	// Recreate with loaded args.
 	CommandLine()->CreateCmdLine( argc, argv );
 
@@ -1267,7 +1267,6 @@ int RunVBSP( int argc, char **argv )
 				);
 			}
 
-		DeleteCmdLine( argc, argv );
 		CmdLib_Cleanup();
 		CmdLib_Exit( 1 );
 	}
@@ -1278,7 +1277,7 @@ int RunVBSP( int argc, char **argv )
 		Warning( "-embed only makes sense alongside full BSP compiles.\n"
 		         "\n"
 		         "Use the bspzip utility to update embedded files.\n" );
-		DeleteCmdLine( argc, argv );
+
 		CmdLib_Cleanup();
 		CmdLib_Exit( 1 );
 	}
@@ -1448,7 +1447,6 @@ int RunVBSP( int argc, char **argv )
 	GetHourMinuteSecondsString( (int)( end - start ), str, sizeof( str ) );
 	Msg( "%s elapsed\n", str );
 
-	DeleteCmdLine( argc, argv );
 	ReleasePakFileLumps();
 	DeleteMaterialReplacementKeys();
 	ShutdownMaterialSystem();
