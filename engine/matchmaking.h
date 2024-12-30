@@ -172,7 +172,6 @@ public:
 	PROCESS_MM_MESSAGE( JoinResponse );
 	PROCESS_MM_MESSAGE( ClientInfo );
 	PROCESS_MM_MESSAGE( RegisterResponse );
-	PROCESS_MM_MESSAGE(	Migrate );
 	PROCESS_MM_MESSAGE( Mutelist );
 	PROCESS_MM_MESSAGE( Checkpoint );
 	PROCESS_MM_MESSAGE( Heartbeat ) { return true; }

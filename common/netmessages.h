@@ -873,25 +873,6 @@ public:
 	CUtlVector< XUSER_CONTEXT >m_SessionContexts;
 };
 
-class MM_Migrate : public CNetMessage
-{
-public:
-	DECLARE_MM_MESSAGE( Migrate );
-
-	enum eMsgType
-	{
-		MESSAGE_HOSTING,
-		MESSAGE_MIGRATED,
-		MESSAGE_STANDBY,
-	};
-
-	byte	m_MsgType;
-	uint64	m_Id;
-	XNKID	m_sessionId; 
-	XNADDR	m_xnaddr;  
-	XNKEY	m_key;
-};
-
 class SVC_GetCvarValue : public CNetMessage
 {
 public:

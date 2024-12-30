@@ -2019,40 +2019,6 @@ const char *MM_JoinResponse::ToString( void ) const
 	return s_text;
 }
 
-// NOTE: This message is not network-endian compliant, due to the
-// transmission of structures instead of their component parts
-bool MM_Migrate::WriteToBuffer( bf_write &buffer )
-{
-	Assert( IsX360() );
-
-	buffer.WriteUBitLong( GetType(), NETMSG_TYPE_BITS );
-	buffer.WriteByte( m_MsgType );
-	buffer.WriteLongLong( m_Id );
-	buffer.WriteBytes( &m_sessionId, sizeof( m_sessionId ) );
-	buffer.WriteBytes( &m_xnaddr, sizeof( m_xnaddr ) );
-	buffer.WriteBytes( &m_key, sizeof( m_key ) );
-	return !buffer.IsOverflowed();
-}
-
-bool MM_Migrate::ReadFromBuffer( bf_read &buffer )
-{
-	Assert( IsX360() );
-
-	m_MsgType = buffer.ReadByte();
-	m_Id = buffer.ReadLongLong();
-	buffer.ReadBytes( &m_sessionId, sizeof( m_sessionId ) );
-	buffer.ReadBytes( &m_xnaddr, sizeof( m_xnaddr ) );
-	buffer.ReadBytes( &m_key, sizeof( m_key ) );
-	return !buffer.IsOverflowed();
-}
-
-const char *MM_Migrate::ToString( void ) const
-{
-	Q_snprintf( s_text, sizeof( s_text ), "Migrate Message" );
-	return s_text;
-}
-
-
 bool SVC_GetCvarValue::WriteToBuffer( bf_write &buffer )
 {
 	buffer.WriteUBitLong( GetType(), NETMSG_TYPE_BITS );

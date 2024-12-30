@@ -302,7 +302,6 @@ void CMatchmaking::ConnectionStart( INetChannel *chan )
 	REGISTER_MM_MSG( JoinResponse );
 	REGISTER_MM_MSG( ClientInfo );
 	REGISTER_MM_MSG( RegisterResponse );
-	REGISTER_MM_MSG( Migrate );
 	REGISTER_MM_MSG( Mutelist );
 	REGISTER_MM_MSG( Checkpoint );
 	REGISTER_MM_MSG( Heartbeat );
