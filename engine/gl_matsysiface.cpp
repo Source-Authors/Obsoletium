@@ -718,7 +718,6 @@ void BuildBrushModelVertexArray(worldbrushdata_t *pBrushData, SurfaceHandle_t su
 		// output to mesh
 		VectorCopy( vec, pVerts[i].m_Pos );
 
-		Vector2D uv;
 		SurfComputeTextureCoordinate( ctx, surfID, vec, pVerts[i].m_TexCoord );
 
 		// garymct: normalized (within space of surface) lightmap texture coordinates
