@@ -1250,7 +1250,6 @@ int main (int argc, char **argv)
 
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
 
-	InstallAllocationFunctions();
 	InstallSpewFunction();
 	SpewActivate( "developer", 1 );
 
