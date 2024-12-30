@@ -534,33 +534,68 @@ CON_COMMAND( lightprobe,
 }
 
 
-static bool LoadSrcVTFFiles( IVTFTexture *pSrcVTFTextures[6], const char *pSkyboxBaseName )
+static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pSkyboxBaseName )
 {
-	if ( IsX360() )
-		return false;
+	static_assert(ARRAYSIZE(pSrcVTFTextures) == ssize(facingName));
 
-	int i;
-	for( i = 0; i < 6; i++ )
+	char src0VTFFileName[MAX_PATH], srcVTFFileName[MAX_PATH];
+
+	intp i = -1;
+	for( auto &texture : pSrcVTFTextures )
 	{
-		// !!! FIXME: This needs to open the vmt (or some other method) to find the correct LDR or HDR set of skybox textures! Look in vbsp\cubemap.cpp!
-		char srcVTFFileName[1024];
-		Q_snprintf( srcVTFFileName, sizeof( srcVTFFileName ), "materials/skybox/%s%s.vtf", pSkyboxBaseName, facingName[i] );
+		++i;
+
+		// !!! FIXME: This needs to open the vmt (or some other method) to find
+		// the correct LDR or HDR set of skybox textures!
+		// 
+		// Look in vbsp\cubemap.cpp!
+		V_sprintf_safe( srcVTFFileName, "materials/skybox/%s%s.vtf", pSkyboxBaseName, facingName[i] );
+
+		if (i == 0)
+		{
+			V_strcpy_safe( src0VTFFileName, srcVTFFileName );
+		}
 
 		CUtlBuffer buf;
 		if ( !g_pFileSystem->ReadFile( srcVTFFileName, NULL, buf ) )
 			return false;
 
-		pSrcVTFTextures[i] = CreateVTFTexture();
-		if (!pSrcVTFTextures[i]->Unserialize(buf))
+		texture = CreateVTFTexture();
+		if (!texture->Unserialize(buf))
 		{
-			Warning("*** Error unserializing skybox texture: %s\n", pSkyboxBaseName );
+			Warning("*** Error unserializing skybox texture: '%s'.\n", srcVTFFileName );
+			// dimhotepus: Do not leak VTF texture.
+			DestroyVTFTexture(texture);
 			return false;
 		}
 
+		bool isIncorrectWidth = texture->Width() != pSrcVTFTextures[0]->Width() && texture->Width() != 4;
+
 		// NOTE: texture[0] is a side texture that could be 1/2 height, so allow this and also allow 4x4 faces
-		if ( ( ( pSrcVTFTextures[i]->Width() != pSrcVTFTextures[0]->Width() ) && ( pSrcVTFTextures[i]->Width() != 4 ) ) ||
-			 ( ( pSrcVTFTextures[i]->Height() != pSrcVTFTextures[0]->Height() ) && ( pSrcVTFTextures[i]->Height() != pSrcVTFTextures[0]->Height()*2 )  && ( pSrcVTFTextures[i]->Height() != 4 ) ) ||
-			 ( pSrcVTFTextures[i]->Flags() != pSrcVTFTextures[0]->Flags() ) )
+		if ( isIncorrectWidth )
+		{
+			Warning("*** Error: Skybox vtf for '%s' have different width! Expected %d or 4 from '%s', got %d from '%s'.\n",
+				srcVTFFileName,
+				pSrcVTFTextures[0]->Width(), src0VTFFileName,
+				texture->Width(), srcVTFFileName);
+			DestroyVTFTexture(texture);
+			return false;
+		}
+
+		bool isIncorrectHeight = texture->Height() != pSrcVTFTextures[0]->Height() &&
+			texture->Height() != pSrcVTFTextures[0]->Height() * 2 &&
+			texture->Height() != 4;
+
+		if ( isIncorrectHeight )
+		{
+			Warning("*** Error: Skybox vtf for '%s' have different height! Expected %d or 4 from '%s', got %d from '%s'.\n",
+				srcVTFFileName,
+				pSrcVTFTextures[0]->Height(), src0VTFFileName,
+				texture->Height(), srcVTFFileName);
+			DestroyVTFTexture(texture);
+			return false;
+		}
+
 		{
 			Warning("*** Error: Skybox vtf files for %s weren't compiled with the same size texture and/or same flags!\n", pSkyboxBaseName );
 			return false;
