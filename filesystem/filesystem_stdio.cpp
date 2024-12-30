@@ -1430,7 +1430,7 @@ size_t CWin32ReadOnlyFile::FS_fread( void *dest, size_t destSize, size_t size )
 			}
 			else
 			{
-				DevMsg( "Unknown read error %d\n", dwError );
+				DevMsg( "Unknown read error '%s'.\n", std::system_category().message(dwError).c_str() );
 			}
 		}
 	}
