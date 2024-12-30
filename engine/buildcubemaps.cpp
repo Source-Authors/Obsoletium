@@ -56,7 +56,7 @@ ConVar r_DrawBeams( "r_DrawBeams", "1", FCVAR_CHEAT, "0=Off, 1=Normal, 2=Wirefra
 
 static ConVar mat_force_tonemap_scale( "mat_force_tonemap_scale", "0.0", FCVAR_CHEAT );
 
-static const char *facingName[6] = { "rt", "lf", "bk", "ft", "up", "dn" };
+static constexpr char facingName[6][3] = { "rt", "lf", "bk", "ft", "up", "dn" };
 
 //-----------------------------------------------------------------------------
 // Load, unload vtex 
@@ -95,9 +95,6 @@ void VTex_Unload( CSysModule *pModule )
 static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase, int screenBufSize,
 						 int tgaSize, bool bPFM )
 {
-	if ( IsX360() )
-		return;
-
 	if ( g_LostVideoMemory )
 		return;
 
@@ -216,7 +213,7 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 					delete[] pImage;
 					delete[] pImage1;
 					ldr_map.RaiseToPower(2.2);				// gamma to linear
-					float scale=1.0/exposure;
+					float scale=1.0f/exposure;
 					bOverExposedTexels=false;
 					for(int x=0;x<hdr_map.Width;x++)
 						for(int y=0;y<hdr_map.Height;y++)
@@ -292,9 +289,6 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 //-----------------------------------------------------------------------------
 void* CubemapsFSFactory( const char *pName, int *pReturnCode )
 {
-	if ( IsX360() )
-		return NULL;
-
 	if ( Q_stricmp( pName, FILESYSTEM_INTERFACE_VERSION ) == 0 )
 		return g_pFileSystem;
 
@@ -308,10 +302,7 @@ void* CubemapsFSFactory( const char *pName, int *pReturnCode )
 static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 	int nSize, bool bHDR, const char *pGameDir, IVTex *ivt )
 {
-	if ( IsX360() )
-		return;
-
-	int nScreenBufSize = 4 * nSize;
+	const int nScreenBufSize = 4 * nSize;
 	TakeCubemapSnapshot( vecOrigin, pVTFName, nScreenBufSize, nSize, bHDR );
 
 	char pTXTName[ MAX_PATH ];
@@ -361,9 +352,6 @@ static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 //-----------------------------------------------------------------------------
 CON_COMMAND( envmap, "" )
 {
-	if ( IsX360() )
-		return;
-
 	char	base[ 256 ];
 	IClientEntity *world = entitylist->GetClientEntity( 0 );
 
@@ -586,9 +574,6 @@ static bool LoadSrcVTFFiles( IVTFTexture *pSrcVTFTextures[6], const char *pSkybo
 
 void Cubemap_CreateDefaultCubemap( const char *pMapName, IBSPPack *iBSPPack )
 {
-	if ( IsX360() )
-		return;
-
 	// NOTE: This implementation depends on the fact that all VTF files contain
 	// all mipmap levels
 	ConVarRef skyboxBaseNameConVar( "sv_skyname" );
