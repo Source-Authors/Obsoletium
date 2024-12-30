@@ -95,9 +95,7 @@ static ConVar	rcon_address( "rcon_address", "", FCVAR_SERVER_CANNOT_QUERY|FCVAR_
 //-----------------------------------------------------------------------------
 // Implementation of remote vprof
 //-----------------------------------------------------------------------------
-CRConVProfExport::CRConVProfExport()
-{
-}
+CRConVProfExport::CRConVProfExport() = default;
 
 void CRConVProfExport::AddListener()
 {
@@ -246,9 +244,7 @@ CRConClient::CRConClient() : m_Socket( this )
 //-----------------------------------------------------------------------------
 // Purpose: Destructor
 //-----------------------------------------------------------------------------
-CRConClient::~CRConClient()
-{
-}
+CRConClient::~CRConClient() = default;
 
 
 //-----------------------------------------------------------------------------
@@ -557,7 +553,8 @@ void CRConClient::RunFrame()
 	// we have a command to process
 	// Read data into a utlbuffer
 	m_RecvBuffer.EnsureCapacity( m_RecvBuffer.TellPut() + readLen + 1 );
-	char *recvbuffer = (char *)_alloca( min( 1024ul, readLen + 1 ) );
+	const size_t recvbufferLen = min( 1024ul, readLen + 1 );
+	char *recvbuffer = (char *)_alloca( recvbufferLen );
 	unsigned int len = 0;
 	while ( len < readLen )
 	{
