@@ -29,7 +29,7 @@ class CMySqlDatabase
 public:
 	// constructor
 	CMySqlDatabase();
-	~CMySqlDatabase();
+	virtual ~CMySqlDatabase();
 
 	// initialization - must be called before this object can be used
 	bool Initialize();
