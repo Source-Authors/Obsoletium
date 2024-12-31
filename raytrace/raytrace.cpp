@@ -608,21 +608,31 @@ int RayTracingEnvironment::MakeLeafNode(int first_tri, int last_tri)
 }
 
 
-void RayTracingEnvironment::CalculateTriangleListBounds(int32 const *tris,int ntris,
+void RayTracingEnvironment::CalculateTriangleListBounds(int32 const *tris,intp ntris,
 														Vector &minout, Vector &maxout)
 {
-	minout = Vector( 1.0e23f, 1.0e23f, 1.0e23f);
-	maxout = Vector( -1.0e23f, -1.0e23f, -1.0e23f);
-	for(int i=0; i<ntris; i++)
+	Vector minIn( FLT_MAX, FLT_MAX, FLT_MAX );
+	Vector maxIn( -FLT_MAX, -FLT_MAX, -FLT_MAX );
+
+	for (intp i = 0; i < ntris; i++)
 	{
-		CacheOptimizedTriangle const &tri=OptimizedTriangleList[tris[i]];
-		for(int v=0; v<3; v++)
-			for(int c=0; c<3; c++)
+		CacheOptimizedTriangle const &tri = OptimizedTriangleList[tris[i]];
+
+		for (int v=0; v<3; v++)
+			for (int c=0; c<3; c++)
 			{
-				minout[c]=min(minout[c],tri.Vertex(v)[c]);
-							  maxout[c]=max(maxout[c],tri.Vertex(v)[c]);
+				vec_t vx = tri.Vertex(v)[c];
+
+				if (vx < minIn[c])
+					minIn[c] = vx;
+
+				if (vx > maxIn[c])
+					maxIn[c] = vx;
 			}
 	}
+
+	minout = minIn;
+	maxout = maxIn;
 }
 
 

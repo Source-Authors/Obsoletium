@@ -357,7 +357,7 @@ public:
 	void RefineNode(int node_number,int32 const *tri_list,int ntris,
 						 Vector MinBound,Vector MaxBound, int depth);
 	
-	void CalculateTriangleListBounds(int32 const *tris,int ntris,
+	void CalculateTriangleListBounds(int32 const *tris,intp ntris,
 									 Vector &minout, Vector &maxout);
 
 	void AddInfinitePointLight(Vector position,				// light center
