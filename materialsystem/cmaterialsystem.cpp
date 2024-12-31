@@ -1571,9 +1571,7 @@ static ConVar mat_forcehardwaresync( "mat_forcehardwaresync", IsPC() ? "1" : "0"
 
 // Texture-related
 static ConVar mat_trilinear(		"mat_trilinear", "0", FCVAR_ALLOWED_IN_COMPETITIVE );
-#ifdef _X360 // The code that reads this out of moddefaults.txt is #if'd out for the 360, so force aniso to 2 here.
-	static ConVar mat_forceaniso( "mat_forceaniso", "2", FCVAR_ARCHIVE ); // 0 = Bilinear, 1 = Trilinear, 2+ = Aniso
-#elif defined ( OSX )
+#if defined ( OSX )
 	static ConVar mat_forceaniso( "mat_forceaniso", "1", FCVAR_ARCHIVE, "Filtering level", true, 0, true, 8 ); // 0 = Bilinear, 1 = Trilinear, 2+ = Aniso
 #else
 	static ConVar mat_forceaniso( "mat_forceaniso", "1", FCVAR_ARCHIVE ); // 0 = Bilinear, 1 = Trilinear, 2+ = Aniso
