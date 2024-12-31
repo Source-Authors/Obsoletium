@@ -280,8 +280,7 @@ void CGamePanelInfo::AddToConsole(const char *msg)
 
 void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 {
-#if !defined(_DEBUG)
-
+	// dimhotepus: Show even in debug as need same behavior.
 	// open a dialog informing user that they need to restart the server
 	if (!m_hOutOfDateQueryBox.Get())
 	{
@@ -298,8 +297,6 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 		// reshow the existing window
 		m_hOutOfDateQueryBox->Activate();
 	}
-
-#endif // !defined(_DEBUG)
 }
 
 //-----------------------------------------------------------------------------
@@ -307,8 +304,7 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 //-----------------------------------------------------------------------------
 void CGamePanelInfo::OnMasterRequestRestart()
 {
-#if !defined(_DEBUG)
-
+	// dimhotepus: Show even in debug as need same behavior.
 	// open a dialog informing user that they need to restart the server
 	if (!m_hRestartQueryBox.Get())
 	{
@@ -322,8 +318,6 @@ void CGamePanelInfo::OnMasterRequestRestart()
 		// reshow the existing window
 		m_hRestartQueryBox->Activate();
 	}
-
-#endif // !defined(_DEBUG)
 }
 
 //-----------------------------------------------------------------------------
