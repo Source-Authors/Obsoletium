@@ -88,13 +88,7 @@ char *CmdLib_FGets(char *pOut, int outSize, FileHandle_t hFile) {
 
     pOut[it] = c;
     if (c == '\n') break;
-
-    if (c == EOF) {
-      if (it == 0) return nullptr;
-
-      break;
     }
-  }
 
   pOut[it] = '\0';
   return pOut;
