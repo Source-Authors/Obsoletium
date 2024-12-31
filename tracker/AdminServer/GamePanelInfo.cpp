@@ -258,16 +258,16 @@ void CGamePanelInfo::AddToConsole(const char *msg)
 	if (m_pServerLogPanel)
 	{
 		// hack, look for restart message
-		if (*msg == 3 && !strncmp(msg + 1, "MasterRequestRestart", strlen("MasterRequestRestart")))
+		if (*msg == 3 && !strncmp(msg + 1, "MasterRequestRestart", ssize("MasterRequestRestart") - 1))
 		{
 			OnMasterRequestRestart();
 		}
-		else if (*msg == 3 && !strncmp(msg + 1, "MasterOutOfDate", strlen("MasterOutOfDate")))
+		else if (*msg == 3 && !strncmp(msg + 1, "MasterOutOfDate", ssize("MasterOutOfDate") - 1))
 		{
 			const char *details = strstr( msg, "MasterOutOfDate" );
 			if ( details )
 			{
-				OnMasterOutOfDate(details + strlen("MasterOutOfDate"));
+				OnMasterOutOfDate(details + ssize("MasterOutOfDate") - 1);
 			}
 		}
 		else
