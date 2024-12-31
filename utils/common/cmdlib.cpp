@@ -312,7 +312,10 @@ void CmdLib_Cleanup() {
 #endif
 }
 
-void CmdLib_Exit(int exitCode) { ExitProcess(exitCode); }
+void CmdLib_Exit(int exitCode) {
+    // dimhotepus: ExitProcess -> exit.
+  exit(exitCode);
+}
 
 #endif
 
