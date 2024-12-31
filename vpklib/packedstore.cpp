@@ -480,10 +480,10 @@ CPackedStore::~CPackedStore( void )
 	}
 }
 
-void SplitFileComponents( char const *pFileName, char *pDirOut, char *pBaseOut, char *pExtOut )
+void SplitFileComponents( char const *pFileName, char (&pDirOut)[MAX_PATH], char (&pBaseOut)[MAX_PATH], char (&pExtOut)[MAX_PATH] )
 {
 	char pTmpDirOut[MAX_PATH];
-	V_ExtractFilePath( pFileName, pTmpDirOut, MAX_PATH );
+	V_ExtractFilePath( pFileName, pTmpDirOut, ssize(pTmpDirOut) );
 	// now, pTmpDirOut to pDirOut, except when we find more then one '\' in a row, only output one
 	char *pOutDirPtr = pDirOut;
 	for( char *pDirInPtr = pTmpDirOut; *pDirInPtr; pDirInPtr++ )
@@ -499,8 +499,8 @@ void SplitFileComponents( char const *pFileName, char *pDirOut, char *pBaseOut, 
 	*( pOutDirPtr ) = 0;									// null terminate
 
 	if ( !pDirOut[0] )
-		strcpy( pDirOut, " " );								// blank dir name
-	V_strcpy( pBaseOut, V_UnqualifiedFileName( pFileName ) );
+		V_strcpy_safe( pDirOut, " " );								// blank dir name
+	V_strcpy_safe( pBaseOut, V_UnqualifiedFileName( pFileName ) );
 	char *pDot = strrchr( pBaseOut, '.' );
 	if ( pDot )
 	{
