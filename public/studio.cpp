@@ -349,18 +349,18 @@ const mstudioposeparamdesc_t &studiohdr_t::pPoseParameter( int i )
 		return *pLocalPoseParameter( i );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	const virtualmodel_t *pVModel = GetVirtualModel();
 	Assert( pVModel );
 
-	if ( pVModel->m_pose[i].group == 0)
-		return *pLocalPoseParameter( pVModel->m_pose[i].index );
+	const virtualgeneric_t &pose = pVModel->m_pose[i];
+	if ( pose.group == 0)
+		return *pLocalPoseParameter( pose.index );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_pose[i].group ];
-
-	const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+	const virtualgroup_t &pGroup = pVModel->m_group[ pose.group ];
+	const studiohdr_t *pStudioHdr = pGroup.GetStudioHdr();
 	Assert( pStudioHdr );
 
-	return *pStudioHdr->pLocalPoseParameter( pVModel->m_pose[i].index );
+	return *pStudioHdr->pLocalPoseParameter( pose.index );
 }
 
 
@@ -1020,12 +1020,12 @@ const mstudioposeparamdesc_t &CStudioHdr::pPoseParameter( int i )
 		return *m_pStudioHdr->pLocalPoseParameter( i );
 	}
 
-	if ( m_pVModel->m_pose[i].group == 0)
-		return *m_pStudioHdr->pLocalPoseParameter( m_pVModel->m_pose[i].index );
+	const virtualgeneric_t &pose = m_pVModel->m_pose[i];
+	if ( pose.group == 0)
+		return *m_pStudioHdr->pLocalPoseParameter( pose.index );
 
-	const studiohdr_t *pStudioHdr = GroupStudioHdr( m_pVModel->m_pose[i].group );
-
-	return *pStudioHdr->pLocalPoseParameter( m_pVModel->m_pose[i].index );
+	const studiohdr_t *pStudioHdr = GroupStudioHdr( pose.group );
+	return *pStudioHdr->pLocalPoseParameter( pose.index );
 }
 
 
@@ -1036,19 +1036,22 @@ const mstudioposeparamdesc_t &CStudioHdr::pPoseParameter( int i )
 int CStudioHdr::GetSharedPoseParameter( int iSequence, int iLocalPose ) const
 {
 	if (m_pVModel == NULL)
-	{
 		return iLocalPose;
-	}
 
 	if (iLocalPose == -1)
 		return iLocalPose;
 
 	Assert( m_pVModel );
 
-	int group = m_pVModel->m_seq[iSequence].group;
-	virtualgroup_t *pGroup = m_pVModel->m_group.IsValidIndex( group ) ? &m_pVModel->m_group[ group ] : NULL;
+	const int group = m_pVModel->m_seq[iSequence].group;
 
-	return pGroup ? pGroup->masterPose[iLocalPose] : iLocalPose;
+	if (m_pVModel->m_group.IsValidIndex( group ))
+	{
+		const virtualgroup_t &pGroup = m_pVModel->m_group[ group ];
+		return pGroup.masterPose[iLocalPose];
+	}
+
+	return iLocalPose;
 }
 
 
