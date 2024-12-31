@@ -273,11 +273,6 @@ void InstallSpewFunction() {
 
 void InstallExtraSpewHook(SpewHookFn pFn) { g_ExtraSpewHooks.AddToTail(pFn); }
 
-void InstallAllocationFunctions() {
-  //	_set_new_mode( 1 ); // so if malloc() fails, we exit.
-  //	_set_new_handler( CmdLib_NewHandler );
-}
-
 void SetSpewFunctionLogFile(char const *pFilename) {
   Assert((!g_pLogFile));
   g_pLogFile = g_pFileSystem->Open(pFilename, "a");

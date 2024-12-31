@@ -98,7 +98,7 @@ typedef void (*SpewHookFn)(const char *);
 void InstallExtraSpewHook(SpewHookFn pFn);
 
 // Install allocation hooks so we error out if an allocation can't happen.
-void InstallAllocationFunctions();
+inline void InstallAllocationFunctions() {}
 
 // This shuts down mgrs that use threads gracefully.  If you just call exit(),
 // the threads can get in a state where you can't tell if they are shutdown or
