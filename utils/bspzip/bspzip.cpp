@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
 
   if ((stricmp(pAction, "-extract") == 0) && nActionArgs == 2) {
     // bspzip -extract <bspfile> <blah.zip>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
     Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
     ExtractZipFileFromBSP(bspName, zipName);
   } else if ((stricmp(pAction, "-extractfiles") == 0) && nActionArgs == 2) {
     // bsipzip -extractfiles <bspfile> <targetpath>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     // necessary for xbox process
     // only the .vtf are extracted as necessary for streaming and not the .vmt
@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
     printf("%zi files extracted.\n", numFilesExtracted);
   } else if ((stricmp(pAction, "-extractcubemaps") == 0) && nActionArgs == 2) {
     // bspzip -extractcubemaps <bspfile> <targetPath>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     // necessary for xbox process
     // only the .vtf are extracted as necessary for streaming and not the .vmt
@@ -263,7 +263,7 @@ int main(int argc, char **argv) {
     printf("%zi cubemaps extracted.\n", numFilesExtracted);
   } else if ((stricmp(pAction, "-deletecubemaps") == 0) && nActionArgs == 1) {
     // bspzip -deletecubemaps <bspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     // necessary for xbox process
     // the cubemaps are deleted as they cannot yet be streamed out of the bsp
@@ -302,7 +302,7 @@ int main(int argc, char **argv) {
     }
   } else if ((stricmp(pAction, "-addfiles") == 0) && nActionArgs == 4) {
     // bspzip -addfiles <bspfile> <relativePathPrefix> <listfile> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
     Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
@@ -354,7 +354,7 @@ int main(int argc, char **argv) {
     }
   } else if ((stricmp(pAction, "-dir") == 0) && nActionArgs == 1) {
     // bspzip -dir <bspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
     Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
@@ -364,7 +364,7 @@ int main(int argc, char **argv) {
     PrintBSPPackDirectory();
   } else if ((stricmp(pAction, "-addfile") == 0) && nActionArgs == 4) {
     // bspzip -addfile <bspfile> <relativepathname> <fullpathname> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
     Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
@@ -386,7 +386,7 @@ int main(int argc, char **argv) {
     WriteBSPFile(newbspName);
   } else if ((stricmp(pAction, "-addlist") == 0) && nActionArgs == 3) {
     // bspzip -addlist <bspfile> <listfile> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
     Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
@@ -442,7 +442,7 @@ int main(int argc, char **argv) {
     }
   } else if ((stricmp(pAction, "-addorupdatelist") == 0) && nActionArgs == 3) {
     // bspzip -addorupdatelist <bspfile> <listfile> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
     Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
@@ -515,7 +515,7 @@ int main(int argc, char **argv) {
       return Usage();
     }
 
-    CmdLib_InitFileSystem(pFile);
+    const ScopedFileSystem scopedFileSystem(pFile);
 
     char szAbsBSPPath[MAX_PATH] = {0};
     Q_MakeAbsolutePath(szAbsBSPPath, sizeof(szAbsBSPPath), pFile);
