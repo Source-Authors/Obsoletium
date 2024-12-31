@@ -65,8 +65,7 @@ bool SharedDispatch(MessageBuffer *pBuf, int iSource, int iPacketID) {
           pInPos += sizeof(iFileSize);
 
           // Temp folder
-          char const *szFolder = NULL;
-          if (!szFolder) szFolder = getenv("TEMP");
+          char const *szFolder = getenv("TEMP");
           if (!szFolder) szFolder = getenv("TMP");
           if (!szFolder) szFolder = "c:";
 
