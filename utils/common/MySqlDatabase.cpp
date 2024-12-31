@@ -48,7 +48,7 @@ CMySqlDatabase::~CMySqlDatabase()
 //-----------------------------------------------------------------------------
 // Purpose: Thread access function
 //-----------------------------------------------------------------------------
-static DWORD WINAPI staticThreadFunc(void *param)
+static unsigned WINAPI staticThreadFunc(void *param)
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("MySQLQueryRunner");
@@ -76,8 +76,7 @@ bool CMySqlDatabase::Initialize()
 	// start the DB-access thread
 	m_bRunThread = true;
 
-	unsigned long threadID;
-	::CreateThread(NULL, 0, staticThreadFunc, this, 0, &threadID);
+	::_beginthreadex(NULL, 0, staticThreadFunc, this, 0, nullptr);
 
 	return true;
 }
