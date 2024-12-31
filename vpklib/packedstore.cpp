@@ -935,7 +935,8 @@ int CPackedStoreReadCache::FindBufferToUse()
 {
 	int idxLRU = 0;
 	auto idxToRemove = m_treeCachedVPKRead.InvalidIndex();
-	uint32 uTimeLowest = (uint32)~0; // MAXINT
+	// dimhotepus: uint -> ullong as former overflows in 49.7 days.
+	auto uTimeLowest = std::numeric_limits<unsigned long long>::max();
 	// find the oldest item, reuse its buffer
 	for ( int i = 0; i < m_cItemsInCache; i++ )
 	{
@@ -1071,7 +1072,8 @@ bool CPackedStoreReadCache::BCanSatisfyFromReadCacheInternal( uint8 *pOutData, C
 		m_cubReadFromCache += nRead;
 		m_cReadFromCache ++;
 		bSuccess = true;
-		m_rgLastUsedTime[m_treeCachedVPKRead[idxTrackedVPKFile].m_idxLRU] = Plat_MSTime();
+		// dimhotepus: ms -> mcs as former overflow in 49.7 days.
+		m_rgLastUsedTime[m_treeCachedVPKRead[idxTrackedVPKFile].m_idxLRU] = Plat_USTime();
 	}
 	if ( bLockedForWrite )
 		m_rwlock.UnlockWrite();

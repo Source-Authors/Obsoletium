@@ -262,7 +262,8 @@ public:
 	// current items in the cache
 	int m_cItemsInCache;
 	unsigned short m_rgCurrentCacheIndex[k_nCacheBuffersToKeep];
-	CInterlockedUInt m_rgLastUsedTime[k_nCacheBuffersToKeep];
+	// dimhotepus: atomic_uint -> atomic_ullong as former overflows in 49.7 days.
+	std::atomic_ullong m_rgLastUsedTime[k_nCacheBuffersToKeep];
 
 	CPackedStore *m_pPackedStore;
 	IBaseFileSystem *m_pFileSystem;
