@@ -284,9 +284,12 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 	// open a dialog informing user that they need to restart the server
 	if (!m_hOutOfDateQueryBox.Get())
 	{
-		char *fullmsg = (char *) _alloca( strlen(msg) + strlen( "\n\nDo you wish to shutdown now?\n") + 1 );
+		const size_t msgLen = strlen(msg) + ssize("\n\nDo you wish to shutdown now?\n");
+		char *fullmsg = (char *) _alloca( msgLen );
 
-		_snprintf( fullmsg, strlen(msg) + strlen( "\n\nDo you wish to shutdown now?\n") + 1 , "%s\n\nDo you wish to shutdown now?\n", msg );
+		// _snprintf -> strcpy + strcat
+		V_strncpy( fullmsg, msg, msgLen );
+		V_strncat( fullmsg, "\n\nDo you wish to shutdown now?\n", msgLen );
 		m_hOutOfDateQueryBox = new QueryBox("Server restart pending", fullmsg);
 		m_hOutOfDateQueryBox->AddActionSignalTarget(this);
 		m_hOutOfDateQueryBox->SetOKCommand(new KeyValues("RestartServer"));
