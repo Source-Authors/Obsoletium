@@ -107,17 +107,19 @@ static void GetInitialColors() {
   g_InitialColor = g_LastColor =
       oldInfo.wAttributes & (FOREGROUND_RED | FOREGROUND_GREEN |
                              FOREGROUND_BLUE | FOREGROUND_INTENSITY);
-  g_BackgroundFlags =
+
+  const WORD backgroundFlags =
       oldInfo.wAttributes & (BACKGROUND_RED | BACKGROUND_GREEN |
                              BACKGROUND_BLUE | BACKGROUND_INTENSITY);
+  unsigned short badColor = 0;
 
-  g_BadColor = 0;
+  if (backgroundFlags & BACKGROUND_RED) badColor |= FOREGROUND_RED;
+  if (backgroundFlags & BACKGROUND_GREEN) badColor |= FOREGROUND_GREEN;
+  if (backgroundFlags & BACKGROUND_BLUE) badColor |= FOREGROUND_BLUE;
+  if (backgroundFlags & BACKGROUND_INTENSITY) badColor |= FOREGROUND_INTENSITY;
 
-  if (g_BackgroundFlags & BACKGROUND_RED) g_BadColor |= FOREGROUND_RED;
-  if (g_BackgroundFlags & BACKGROUND_GREEN) g_BadColor |= FOREGROUND_GREEN;
-  if (g_BackgroundFlags & BACKGROUND_BLUE) g_BadColor |= FOREGROUND_BLUE;
-  if (g_BackgroundFlags & BACKGROUND_INTENSITY)
-    g_BadColor |= FOREGROUND_INTENSITY;
+  g_BackgroundFlags = backgroundFlags;
+  g_BadColor = badColor;
 }
 
 WORD SetConsoleTextColor(int red, int green, int blue, int intensity) {
