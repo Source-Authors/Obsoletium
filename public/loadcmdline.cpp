@@ -80,12 +80,13 @@ void LoadCmdLineFromFile( int &argc, char **&argv, const char *keyname, const ch
 	if( !g_pFileSystem )
 		return;
 
+	char filename[MAX_PATH];
+	// dimhotepus: Game dir already ends with /, no need to add 2 one.
+	V_sprintf_safe( filename, "%scfg" CORRECT_PATH_SEPARATOR_S "commandline.cfg", gamedir );
+	V_FixSlashes(filename);
+	
 	// Load the cfg file, and find the keyname
 	auto kv = KeyValues::AutoDelete( "CommandLine" );
-
-	char filename[512];
-	Q_snprintf( filename, sizeof( filename ), "%s/cfg/commandline.cfg", gamedir );
-
 	if ( kv->LoadFromFile( g_pFileSystem, filename ) )
 	{
 		// Load the commandline arguments for this app
