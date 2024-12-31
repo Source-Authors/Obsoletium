@@ -730,26 +730,29 @@ float RayTracingEnvironment::CalculateCostsOfSplit(
 
 #define NEVER_SPLIT 0
 
-void RayTracingEnvironment::RefineNode(int node_number,int32 const *tri_list,int ntris,
+void RayTracingEnvironment::RefineNode(intp node_number,int32 const *tri_list,intp ntris,
 									   Vector MinBound,Vector MaxBound, int depth)
 {
+	auto &kdnode = OptimizedKDTree[node_number];
+
 	if (ntris<3)											// never split empty lists
 	{
 		// no point in continuing
-		OptimizedKDTree[node_number].Children=KDNODE_STATE_LEAF+(TriangleIndexList.Count()<<2);
-		OptimizedKDTree[node_number].SetNumberOfTrianglesInLeafNode(ntris);
+		kdnode.Children=KDNODE_STATE_LEAF+(TriangleIndexList.Count()<<2);
+		kdnode.SetNumberOfTrianglesInLeafNode(ntris);
 
 #ifdef DEBUG_RAYTRACE
-		OptimizedKDTree[node_number].vecMins = MinBound;
-		OptimizedKDTree[node_number].vecMaxs = MaxBound;
+		kdnode.vecMins = MinBound;
+		kdnode.vecMaxs = MaxBound;
 #endif
 
-		for(int t=0;t<ntris;t++)
+		for(intp t=0;t<ntris;t++)
 			TriangleIndexList.AddToTail(tri_list[t]);
+
 		return;
 	}
 
-	float best_cost=1.0e23f;
+	float best_cost=FLT_MAX;
 	int best_nleft=0,best_nright=0,best_nboth=0;
 	float best_splitvalue=0;
 	int split_plane=0;
@@ -790,7 +793,7 @@ void RayTracingEnvironment::RefineNode(int node_number,int32 const *tri_list,int
 					best_nboth=trial_nboth;
 					best_splitvalue=trial_splitvalue;
 					// save away the axis classification of each triangle
-					for(int t=0 ; t < ntris; t++)
+					for(intp t=0 ; t < ntris; t++)
 					{
 						CacheOptimizedTriangle &tri=OptimizedTriangleList[tri_list[t]];
 						tri.m_Data.m_GeometryData.m_nTmpData1 = tri.m_Data.m_GeometryData.m_nTmpData0;
@@ -800,19 +803,20 @@ void RayTracingEnvironment::RefineNode(int node_number,int32 const *tri_list,int
 					break;
 			}
 		}
-
 	}
+
 	float cost_of_no_split=COST_OF_INTERSECTION*ntris;
 	if ( (cost_of_no_split<=best_cost) || NEVER_SPLIT || (depth>MAX_TREE_DEPTH))
 	{
 		// no benefit to splitting. just make this a leaf node
-		OptimizedKDTree[node_number].Children=KDNODE_STATE_LEAF+(TriangleIndexList.Count()<<2);
-		OptimizedKDTree[node_number].SetNumberOfTrianglesInLeafNode(ntris);
+		kdnode.Children=KDNODE_STATE_LEAF+(TriangleIndexList.Count()<<2);
+		kdnode.SetNumberOfTrianglesInLeafNode(ntris);
+
 #ifdef DEBUG_RAYTRACE
-		OptimizedKDTree[node_number].vecMins = MinBound;
-		OptimizedKDTree[node_number].vecMaxs = MaxBound;
+		kdnode.vecMins = MinBound;
+		kdnode.vecMaxs = MaxBound;
 #endif
-		for(int t=0;t<ntris;t++)
+		for(intp t=0;t<ntris;t++)
 			TriangleIndexList.AddToTail(tri_list[t]);
 	}
 	else
@@ -821,8 +825,7 @@ void RayTracingEnvironment::RefineNode(int node_number,int32 const *tri_list,int
 // 			   0.5*(MinBound[split_plane]+MaxBound[split_plane]),ntris,tri_skip);
 		// its worth splitting!
 		// we will achieve the splitting without sorting by using a selection algorithm.
-		int32 *new_triangle_list;
-		new_triangle_list=new int32[ntris];
+		int32 *new_triangle_list=new int32[ntris];
 
 		// now, perform surface area/cost check to determine whether this split was worth it
 		Vector LeftMins=MinBound;
@@ -835,51 +838,56 @@ void RayTracingEnvironment::RefineNode(int node_number,int32 const *tri_list,int
 		int n_left_output=0;
 		int n_both_output=0;
 		int n_right_output=0;
-		for(int t=0;t<ntris;t++)
+		for(intp t=0;t<ntris;t++)
 		{
-			CacheOptimizedTriangle &tri=OptimizedTriangleList[tri_list[t]];
+			const int optIndex = tri_list[t];
+			CacheOptimizedTriangle &tri=OptimizedTriangleList[optIndex];
 			switch( tri.m_Data.m_GeometryData.m_nTmpData1 )
 			{
 				case PLANECHECK_NEGATIVE:
 //					printf("%d goes left\n",t);
-					new_triangle_list[n_left_output++]=tri_list[t];
+					new_triangle_list[n_left_output++]=optIndex;
 					break;
 				case PLANECHECK_POSITIVE:
 					n_right_output++;
 //					printf("%d goes right\n",t);
-					new_triangle_list[ntris-n_right_output]=tri_list[t];
+					new_triangle_list[ntris-n_right_output]=optIndex;
 					break;
 				case PLANECHECK_STRADDLING:
 //					printf("%d goes both\n",t);
-					new_triangle_list[best_nleft+n_both_output]=tri_list[t];
+					new_triangle_list[best_nleft+n_both_output]=optIndex;
 					n_both_output++;
 					break;
-
-					
 			}
 		}
-		int left_child=OptimizedKDTree.Count();
-		int right_child=left_child+1;
-// 		printf("node %d split on axis %d at %f, nl=%d nr=%d nb=%d lc=%d rc=%d\n",node_number,
+
+		intp left_child=OptimizedKDTree.Count();
+		intp right_child=left_child+1;
+// 		printf("node %zd split on axis %d at %f, nl=%d nr=%d nb=%d lc=%d rc=%d\n",node_number,
 // 			   split_plane,best_splitvalue,best_nleft,best_nright,best_nboth,
 // 			   left_child,right_child);
-		OptimizedKDTree[node_number].Children=split_plane+(left_child<<2);
-		OptimizedKDTree[node_number].SplittingPlaneValue=best_splitvalue;
+		kdnode.Children=split_plane+(left_child<<2);
+		kdnode.SplittingPlaneValue=best_splitvalue;
+
 #ifdef DEBUG_RAYTRACE
-		OptimizedKDTree[node_number].vecMins = MinBound;
-		OptimizedKDTree[node_number].vecMaxs = MaxBound;
+		kdnode.vecMins = MinBound;
+		kdnode.vecMaxs = MaxBound;
 #endif
+
 		CacheOptimizedKDNode newnode;
 		OptimizedKDTree.AddToTail(newnode);
 		OptimizedKDTree.AddToTail(newnode);
+
 		// now, recurse!
 		if ( (ntris<20) && ((best_nleft==0) || (best_nright==0)) )
 			depth+=100;
+
 		RefineNode(left_child,new_triangle_list,best_nleft+best_nboth,LeftMins,LeftMaxes,depth+1);
 		RefineNode(right_child,new_triangle_list+best_nleft,best_nright+best_nboth,
 				   RightMins,RightMaxes,depth+1);
+
 		delete[] new_triangle_list;
-	}	
+	}
 }
 
 
@@ -888,17 +896,20 @@ void RayTracingEnvironment::SetupAccelerationStructure(void)
 	CacheOptimizedKDNode root;
 	OptimizedKDTree.AddToTail(root);
 
-	int32 *root_triangle_list = new int32[OptimizedTriangleList.Count()];
-	for(intp t = 0; t < OptimizedTriangleList.Count(); t++)
+	const intp trianglesCount = OptimizedTriangleList.Count();
+
+	int32 *root_triangle_list = new int32[trianglesCount];
+	for(intp t = 0; t < trianglesCount; t++)
 		root_triangle_list[t] = t;
 
-	CalculateTriangleListBounds(root_triangle_list,OptimizedTriangleList.Count(),m_MinBound,
+	CalculateTriangleListBounds(root_triangle_list,trianglesCount,m_MinBound,
 								m_MaxBound);
-	RefineNode(0,root_triangle_list,OptimizedTriangleList.Count(),m_MinBound,m_MaxBound,0);
+	RefineNode(0,root_triangle_list,trianglesCount,m_MinBound,m_MaxBound,0);
+
 	delete[] root_triangle_list;
 
 	// now, convert all triangles to "intersection format"
-	for(intp i=0;i<OptimizedTriangleList.Count();i++)
+	for(intp i = 0; i < OptimizedTriangleList.Count(); i++)
 		OptimizedTriangleList[i].ChangeIntoIntersectionFormat();
 }
 

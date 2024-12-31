@@ -354,7 +354,7 @@ public:
 		Vector MinBound,Vector MaxBound, float &split_value,
 		int &nleft, int &nright, int &nboth);
 		
-	void RefineNode(int node_number,int32 const *tri_list,int ntris,
+	void RefineNode(intp node_number,int32 const *tri_list,intp ntris,
 						 Vector MinBound,Vector MaxBound, int depth);
 	
 	void CalculateTriangleListBounds(int32 const *tris,intp ntris,
