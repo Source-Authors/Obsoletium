@@ -4610,11 +4610,12 @@ static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char
 	if ( !bResult )
 	{
 		char *pchAdd = chTxtFileBuffer + nTxtFileBufferLen;
-		strcpy( pchAdd + strlen( pchAdd ), "\n" );
-		strcpy( pchAdd + strlen( pchAdd ), szLookupKey );
-		strcpy( pchAdd + strlen( pchAdd ), " " );
-		strcpy( pchAdd + strlen( pchAdd ), szNewValue );
-		strcpy( pchAdd + strlen( pchAdd ), "\n" );
+		// dimhotepus: strcpy + strlen -> strcat
+		strcat( pchAdd, "\n" );
+		strcat( pchAdd, szLookupKey );
+		strcat( pchAdd, " " );
+		strcat( pchAdd, szNewValue );
+		strcat( pchAdd, "\n" );
 		bResult = true;
 	}
 

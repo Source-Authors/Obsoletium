@@ -930,6 +930,7 @@ static bool SetBufferValue( char *chTxtFileBuffer, size_t nTxtFileBufferLen, cha
 	if ( !bResult )
 	{
 		char *pchAdd = chTxtFileBuffer + nTxtFileBufferLen;
+		// dimhotepus: strcpy + strlen -> strcat.
 		strcat( pchAdd, "\n" );
 		strcat( pchAdd, szLookupKey );
 		strcat( pchAdd, " " );
