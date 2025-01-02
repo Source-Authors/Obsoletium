@@ -772,7 +772,9 @@ void String_Decode(DecodeInfo *pInfo)
 
 	if ( len >= DT_MAX_STRING_BUFFERSIZE )
 	{
-		Warning( "String_Decode( %s ) invalid length (%d)\n", pInfo->m_pRecvProp->GetName(), len );
+		Warning( "String_Decode( %s ) invalid length (%d)\n",
+			pInfo->m_pRecvProp ? pInfo->m_pRecvProp->GetName() : "N/A",
+			len);
 		len = DT_MAX_STRING_BUFFERSIZE - 1;
 	}
 
