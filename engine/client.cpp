@@ -145,7 +145,7 @@ const char *CClientState::GetCDKeyHash( void )
 		if ( nKeyLength == 0 )
 		{
 			nKeyLength = 13;
-			Q_strncpy( szKeyBuffer, "1234567890123", sizeof( szKeyBuffer ) );
+		V_strcpy_safe( szKeyBuffer, "1234567890123" );
 			Assert( Q_strlen( szKeyBuffer ) == nKeyLength );
 
 			DevMsg( "Missing CD Key from registry, inserting blank key\n" );
@@ -167,7 +167,7 @@ const char *CClientState::GetCDKeyHash( void )
 		MD5Init(&ctx);
 		MD5Update(&ctx, (unsigned char*)szKeyBuffer, nKeyLength);
 		MD5Final(digest, &ctx);
-		Q_strncpy ( szHashedKeyBuffer, MD5_Print ( digest, sizeof( digest ) ), sizeof( szHashedKeyBuffer ) );
+	V_strcpy_safe( szHashedKeyBuffer, MD5_Print ( digest, sizeof( digest ) ) );
 		return szHashedKeyBuffer;
 	}
 

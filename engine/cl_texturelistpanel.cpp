@@ -1564,7 +1564,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 				char chCommand[MAX_PATH];
 				char szTxtFileName[MAX_PATH] = {0};
 				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName, sizeof( szTxtFileName ) );
-				sprintf( chCommand, "/C psdinfo \"%s\" > \"%s\"", szFileName, szTxtFileName);
+				V_sprintf_safe( chCommand, "/C psdinfo \"%s\" > \"%s\"", szFileName, szTxtFileName);
 				vgui::system()->ShellExecuteEx( "open", "cmd.exe", chCommand );
 				Sys_Sleep( 200 );
 
@@ -1583,7 +1583,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 					g_p4factory->SetOpenFileChangeList( "Texture LOD Autocheckout" );
 					CP4AutoEditFile autop4_edit( szFileName );
 
-					sprintf( chCommand, "/C psdinfo -write \"%s\" < \"%s\"", szFileName, szTxtFileName );
+					V_sprintf_safe( chCommand, "/C psdinfo -write \"%s\" < \"%s\"", szFileName, szTxtFileName );
 					Sys_Sleep( 200 );
 					vgui::system()->ShellExecuteEx( "open", "cmd.exe", chCommand );
 					Sys_Sleep( 200 );
