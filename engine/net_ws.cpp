@@ -2037,7 +2037,7 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 	const char *sendbuf = buf;
 	int sendlen = len;
 
-	char			packet[ MAX_ROUTABLE_PAYLOAD ];
+	alignas(SPLITPACKET) char			packet[ MAX_ROUTABLE_PAYLOAD ];
 	SPLITPACKET		*pPacket = (SPLITPACKET *)packet;
 
 	// Make pPacket data network endian correct
