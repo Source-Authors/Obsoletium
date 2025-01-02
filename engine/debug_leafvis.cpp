@@ -15,14 +15,13 @@ struct leafvis_t
 {
 	leafvis_t()
 	{
-		leafIndex = 0;
+		color = vec3_invalid;
+
 		CCollisionBSPData *pBSP = GetCollisionBSPData();
-		if ( pBSP )
-		{
 			numbrushes = pBSP->numbrushes;
 			numentitychars = pBSP->numentitychars;
+		leafIndex = 0;
 		}
-	}
 
 	bool IsValid()
 	{
