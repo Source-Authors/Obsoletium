@@ -165,9 +165,10 @@ MSVC_DISABLE_WARNING(4996)
 	BOOL bOsVersionInfoEx = GetVersionEx( (OSVERSIONINFO *)&osvi );
 
 MSVC_END_WARNING_OVERRIDE_SCOPE()
-	if( !bOsVersionInfoEx )
+	if ( !bOsVersionInfoEx )
 	{
-		Q_strncpy( osversion, "Unable to get OS Version", maxlen );
+		// dimhotepus: Well, some too old or new OS version.
+		Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows N/A" : "Windows Server N/A", maxlen, COPY_ALL_CHARACTERS );
 		return;
 	}
 	
@@ -211,12 +212,6 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 			bOsVersionInfoEx = TRUE;
 		}
 
-		if ( !bOsVersionInfoEx )
-		{
-			// dimhotepus: Well, some too old or new OS version.
-			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows N/A" : "Windows Server N/A", maxlen, COPY_ALL_CHARACTERS );
-		}
-		
 		// Display version, service pack (if any), and build number.
 		
 		char build[256];
