@@ -698,7 +698,7 @@ void CL_DispatchSounds( void )
 	while ( i != g_SoundMessages.InvalidIndex() )
 	{
 		SoundInfo_t const &msg = g_SoundMessages[ i ];
-			// Play the sound
+		// Play the sound
 		CL_DispatchSound( msg );
 		i = g_SoundMessages.NextInorder( i );
 	}

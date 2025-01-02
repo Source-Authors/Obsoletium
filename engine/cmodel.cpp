@@ -328,6 +328,12 @@ cmodel_t *CM_LoadMap( const char *name, bool allowReusePrevious, unsigned *check
 	CCollisionBSPData *pBSPData = GetCollisionBSPData();
 
 	Assert( physcollision );
+	// dimhotepus: Check name earlier.
+	if ( !name || !name[0] )
+	{
+		*checksum = 0;
+		return &pBSPData->map_cmodels[0];			// cinematic servers won't have anything at all
+	}
 
 	if( !strcmp( pBSPData->map_name, name ) && allowReusePrevious )
 	{
@@ -337,12 +343,6 @@ cmodel_t *CM_LoadMap( const char *name, bool allowReusePrevious, unsigned *check
 
 	// only pre-load if the map doesn't already exist
 	CollisionBSPData_PreLoad( pBSPData );
-
-	if ( !name || !name[0] )
-	{
-		*checksum = 0;
-		return &pBSPData->map_cmodels[0];			// cinematic servers won't have anything at all
-	}
 
 	// read in the collision model data
 	// dimhotepus: Speedup loading as we already initialized helper.
