@@ -44,12 +44,17 @@ static ConVar *replay_record_voice = NULL;
 
 CReplayDemoRecorder::CReplayDemoRecorder( CReplayServer* pServer )
 {
+	m_szDumpFilename[0] = '\0';
 	m_bIsRecording = false;
+	m_bWrittenFirstFullUpdate = false;
+	m_nFrameCount = -1;
+	m_nStartTick = -1;
+	m_SequenceInfo = -1;
+	m_nDeltaTick = -1;
+	m_nSignonTick = -1;
 
 	Assert( pServer );
 	m_pReplayServer = pServer;
-
-	m_nStartTick = -1;
 }
 
 CReplayDemoRecorder::~CReplayDemoRecorder()
