@@ -1614,6 +1614,8 @@ CGame::CGame()
 	m_iDesktopWidth = 0;
 	m_iDesktopHeight = 0;
 	m_iDesktopRefreshRate = 0;
+	m_rcLastRestoredClientRect.left = m_rcLastRestoredClientRect.right =
+	m_rcLastRestoredClientRect.top = m_rcLastRestoredClientRect.bottom = 0;
 }
 
 //-----------------------------------------------------------------------------
