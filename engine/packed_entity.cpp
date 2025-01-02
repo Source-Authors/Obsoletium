@@ -24,8 +24,16 @@
 
 PackedEntity::PackedEntity()
 {
-	m_pData = NULL;
-	m_pChangeFrameList = NULL;
+	m_pServerClass = nullptr;
+	m_pClientClass = nullptr;
+
+	m_nEntityIndex = -1;
+	m_ReferenceCount = -1;
+
+	m_pData = nullptr;
+	m_nBits = -1;
+	m_pChangeFrameList = nullptr;
+
 	m_nSnapshotCreationTick = 0;
 	m_nShouldCheckCreationTick = 0;
 }
