@@ -1086,7 +1086,6 @@ void COverlayMgr::ReSortMaterials( void )
 		{
 			int iFrag = m_OverlayFragments[hFrag];
 			moverlayfragment_t *pFrag = &m_aFragments[iFrag];
-			if ( pFrag )
 			{
 				const MaterialSystem_SortInfo_t &sortInfo = materialSortInfoArray[MSurf_MaterialSortID( pFrag->m_SurfId )];
 				pFrag->m_nMaterialSortID = GetMaterialSortID( pTexInfo->material, sortInfo.lightmapPageID );

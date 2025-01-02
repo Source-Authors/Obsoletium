@@ -590,7 +590,7 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 		// StartSteamValidation() above initialized the clients networkid
 	}
 
-	if ( netchan && !netchan->IsLoopback() )
+	if ( !netchan->IsLoopback() )
 		ConMsg("Client \"%s\" connected (%s).\n", client->GetClientName(), netchan->GetAddress() );
 
 	return client;
@@ -1860,9 +1860,6 @@ void CBaseServer::UpdateMasterServerRules()
 			continue;
 
 		ConVar *pConVar = static_cast< ConVar* >( var );
-		if ( !pConVar )
-			continue;
-
 		SetMasterServerKeyValue( pUpdater, pConVar );
 	}
 

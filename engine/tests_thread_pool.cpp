@@ -34,7 +34,7 @@ class CountJob : public CJob {
 
     ThreadPause();
 
-    if (sleep_ms_ >= 0) ThreadSleep(sleep_ms_);
+    ThreadSleep(sleep_ms_);
 
     if (should_do_work_) {
       byte memory[1024];

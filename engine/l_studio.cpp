@@ -1434,11 +1434,8 @@ void CModelRender::StudioSetupLighting( const DrawModelState_t &state, const Vec
 	if ( pInfo.instance != m_ModelInstances.InvalidIndex() )
 	{
 		pModelInst = &m_ModelInstances[pInfo.instance];
-		if ( pModelInst )
-		{
 			bHasDecals = ( pModelInst->m_DecalHandle != STUDIORENDER_DECAL_INVALID );
 		}
-	}
 
 	if ( pLightcache )
 	{

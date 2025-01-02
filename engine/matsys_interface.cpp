@@ -746,10 +746,6 @@ void InitMaterialSystemConfig( bool bInEditMode )
 {
 	// get the default config for the current card as a starting point.
 	g_pMaterialSystemConfig = &materials->GetCurrentConfigForVideoCard();
-	if ( !g_pMaterialSystemConfig )
-	{
-		Sys_Error( "Could not get the material system config record!" );
-	}
 	if ( bInEditMode )
 		return;
 

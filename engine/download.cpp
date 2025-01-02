@@ -744,11 +744,8 @@ void CDownloadManager::Reset()
 	}
 	m_queuedRequests.RemoveAll();
 
-	if ( TheDownloadCache )
-	{
 		delete TheDownloadCache;
 		TheDownloadCache = NULL;
-	}
 
 	m_lastPercent = 0;
 	m_totalRequests = 0;

@@ -2974,7 +2974,7 @@ int CBugUIPanel::GetArea()
 		Q_memmove( szDirectory, pszAreaDir, iDirLength );
 		szDirectory[iDirLength] = 0;
 
-		if ( pszAreaDir && pszAreaPrefix )
+		if ( pszAreaPrefix )
 		{
 			if ( !Q_strcmp( szDirectory, gamedir) 
 				&& Q_strstr( mapname, pszAreaPrefix ) )
@@ -2982,7 +2982,7 @@ int CBugUIPanel::GetArea()
 				return i+1;
 			}
 		}
-		else if ( pszAreaDir && !pszAreaPrefix )
+		else if ( !pszAreaPrefix )
 		{
 			if ( !Q_strcmp( szDirectory, gamedir ) )
 			{

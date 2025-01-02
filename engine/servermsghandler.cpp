@@ -429,7 +429,7 @@ bool CClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 #ifdef DEDICATED
 	bool bAllowMismatches = false;
 #else
-	bool bAllowMismatches = ( demoplayer && demoplayer->IsPlayingBack() );
+	bool bAllowMismatches = ( demoplayer->IsPlayingBack() );
 #endif // DEDICATED
 
 	if ( !RecvTable_CreateDecoders( serverGameDLL->GetStandardSendProxies(), bAllowMismatches ) ) // create receive table decoders

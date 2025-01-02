@@ -141,7 +141,7 @@ CDecalVert* R_DoDecalSHClip( CDecalVert *pInVerts, CDecalVert *pOutVerts, decal_
 	{
 		VectorMA( pOutVerts[i].m_vPos, OVERLAY_AVOID_FLICKER_NORMAL_OFFSET, vecNormal, pOutVerts[i].m_vPos );
 	}
-	if ( outCount && pDecal->material->InMaterialPage() )
+	if ( pDecal->material->InMaterialPage() )
 	{
 		float offset[2], scale[2];
 		pDecal->material->GetMaterialOffset( offset );

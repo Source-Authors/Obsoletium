@@ -693,18 +693,13 @@ void CL_DispatchSound( const SoundInfo_t &sound )
 //-----------------------------------------------------------------------------
 void CL_DispatchSounds( void )
 {
-	int i;
 	// Walk list in sequence order
-	i = g_SoundMessages.FirstInorder();
+	auto i = g_SoundMessages.FirstInorder();
 	while ( i != g_SoundMessages.InvalidIndex() )
 	{
-		SoundInfo_t const *msg = &g_SoundMessages[ i ];
-		Assert( msg );
-		if ( msg )
-		{
+		SoundInfo_t const &msg = g_SoundMessages[ i ];
 			// Play the sound
-			CL_DispatchSound( *msg );
-		}
+		CL_DispatchSound( msg );
 		i = g_SoundMessages.NextInorder( i );
 	}
 

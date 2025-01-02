@@ -63,16 +63,8 @@ IMaterial *Draw_DecalMaterial( int index )
 	if ( slot < 0 || slot >= (int)g_DecalDictionary.MaxElement() )
 		return NULL;
 
-	DecalEntry * entry = &g_DecalDictionary[slot];
-	
-	if ( entry )
-	{
-		return entry->material;
-	}
-	else
-	{
-		return NULL;
-	}
+	DecalEntry &entry = g_DecalDictionary[slot];
+	return entry.material;
 }
 
 #ifndef SWDS

@@ -899,7 +899,7 @@ void CDemoSmootherPanel::DrawDebuggingInfo(  int frame, float elapsed )
 	for ( i = start; i < end; i++ )
 	{
 		p = &m_Smoothing.smooth[ i ];
-		if ( prev && p )
+		if ( prev )
 		{
 			DrawSmoothingSample( draworiginal, drawprocessed, i, prev, p );
 		}

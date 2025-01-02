@@ -2018,14 +2018,6 @@ void CL_ListDemo_f( const CCommand &args )
 	demofile.ReadDemoHeader();
 
 	demoheader_t *header = &demofile.m_DemoHeader;
-
-	if ( !header )
-	{
-		ConMsg( "Failed reading demo header.\n" );
-		demofile.Close();
-		return;
-	}
-	
 	if ( Q_strcmp ( header->demofilestamp, DEMO_HEADER_ID ) )
 	{
 		ConMsg( "%s is not a valid demo file\n", name);

@@ -597,8 +597,7 @@ bool CBaseClientState::PrepareSteamConnectResponse( uint64 unGSSteamID, bool bGS
 	}
 
 	msg.WriteShort( steam3CookieLen );
-	if ( steam3CookieLen > 0 )
-		msg.WriteBytes( steam3Cookie, steam3CookieLen );
+	msg.WriteBytes( steam3Cookie, steam3CookieLen );
 #endif
 
 	return true;

@@ -651,11 +651,8 @@ public:
 		memset( pEntity, 0xDD, size );
 #endif		
 		
-		if ( pEntity )
-		{
 			free( pEntity );
 		}
-	}
 	
 	void *SaveAllocMemory(size_t num, size_t size) override
 	{
@@ -1577,7 +1574,7 @@ public:
 	int GetClusterCount() override
 	{
 		CCollisionBSPData *pBSPData = GetCollisionBSPData();
-		if ( pBSPData && pBSPData->map_vis )
+		if ( pBSPData->map_vis )
 			return pBSPData->map_vis->numclusters;
 		return 0;
 	}
@@ -1585,7 +1582,7 @@ public:
 	int GetAllClusterBounds( bbox_t *pBBoxList, int maxBBox ) override
 	{
 		CCollisionBSPData *pBSPData = GetCollisionBSPData();
-		if ( pBSPData && pBSPData->map_vis && host_state.worldbrush )
+		if ( pBSPData->map_vis && host_state.worldbrush )
 		{
 			// clamp to max clusters in the map
 			if ( maxBBox > pBSPData->map_vis->numclusters )
