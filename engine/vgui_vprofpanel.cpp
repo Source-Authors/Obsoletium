@@ -691,6 +691,7 @@ void CVProfPanel::OnTextChanged( KeyValues *data )
 {
 	Panel *pPanel = reinterpret_cast<vgui::Panel *>( data->GetPtr("panel") );
 	vgui::ComboBox *pBox = dynamic_cast<vgui::ComboBox *>( pPanel );
+	Assert( pBox );
 
 	if( pBox == m_pVProfCategory ) 
 	{

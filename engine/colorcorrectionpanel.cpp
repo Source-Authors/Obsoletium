@@ -3131,6 +3131,7 @@ void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		CPrecisionSlider *pSlider = dynamic_cast<CPrecisionSlider *>( pPanel );
+		Assert( pSlider );
 
 		if ( pSlider != m_pBlendFactorSlider )
 		{
@@ -3147,6 +3148,7 @@ void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		vgui::CheckButton *pButton = dynamic_cast<vgui::CheckButton *>( pPanel );
+		Assert( pButton );
 
 		if( pButton == m_pColorizeButton )
 		{

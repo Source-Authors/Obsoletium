@@ -1225,7 +1225,7 @@ void CHLTVServer::EntityPVSCheck( CClientFrame *pFrame )
 
 	CFrameSnapshot * pSnapshot = pFrame->GetSnapshot();	
 
-	Assert ( pSnapshot->m_pHLTVEntityData != NULL );
+	Assert ( pSnapshot && pSnapshot->m_pHLTVEntityData != NULL );
 
 	int nDirectorEntity = m_Director->GetPVSEntity();
     	
