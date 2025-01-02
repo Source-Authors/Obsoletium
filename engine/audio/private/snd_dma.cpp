@@ -3852,7 +3852,8 @@ bool DAS_CheckNewRoom( das_room_t *proom )
 	ds = fabsf( proom->sky_pct - proom_prev->sky_pct);					// sky hits delta
 
 	if (dw > 1.0F) dw = 1.0F / dw;
-	if (dw2 > 1.0F) dw = 1.0F / dw2;
+	// dimhotepus: Changing room length should be reflected in 
+	if (dw2 > 1.0F) dw2 = 1.0F / dw2;
 	if (dh > 1.0F) dh = 1.0F / dh;
 	if (dr > 1.0F) dr = 1.0F / dr;
 
@@ -6787,7 +6788,7 @@ void DEBUG_StopSoundMeasure(int type, int samplecount )
 
 	g_snd_time_debug += Plat_FloatTime() - g_snd_call_time_debug;
 
-	if (++g_snd_count_debug >= 100)
+	if (++g_snd_count_debug >= 100) //-V1051
 	{
 		switch (g_snd_profile_type)
 		{
