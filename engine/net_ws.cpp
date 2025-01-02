@@ -1364,8 +1364,6 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 		MEM_ALLOC_CREDIT();
 		CUtlMemoryFixedGrowable< byte, NET_COMPRESSION_STACKBUF_SIZE > bufVoice( NET_COMPRESSION_STACKBUF_SIZE );
 
-		unsigned int nVoiceBits = 0u;
-
 		if ( ret < NET_MAX_MESSAGE )
 		{
 			// Check for split message
@@ -1406,29 +1404,6 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 				Q_memcpy( packet->data, memDecompressed.Base(), uDecompressedSize );
 
 				packet->size = uDecompressedSize;
-			}
-
-			if ( nVoiceBits > 0 )
-			{
-				// 9th byte is flag byte
-				byte flagByte = *( (byte *)packet->data + sizeof( unsigned int ) + sizeof( unsigned int ) );
-				unsigned int unPacketBits = packet->size << 3;
-				int nPadBits = DECODE_PAD_BITS( flagByte );
-				unPacketBits -= nPadBits;
-
-				bf_write fixup;
-				fixup.SetDebugName( "X360 Fixup" );
-				fixup.StartWriting( packet->data, NET_MAX_MESSAGE, unPacketBits );
-				fixup.WriteBits( bufVoice.Base(), nVoiceBits );
-
-				// Make sure we have enough bits to read a final net_NOP opcode before compressing 
-				int nRemainingBits = fixup.GetNumBitsWritten() % 8;
-				if ( nRemainingBits > 0 &&  nRemainingBits <= (8-NETMSG_TYPE_BITS) )
-				{
-					fixup.WriteUBitLong( net_NOP, NETMSG_TYPE_BITS );
-				}
-
-				packet->size = fixup.GetNumBytesWritten();
 			}
 
 			return NET_LagPacket( true, packet );
