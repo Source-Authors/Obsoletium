@@ -18,10 +18,10 @@ struct leafvis_t
 		color = vec3_invalid;
 
 		CCollisionBSPData *pBSP = GetCollisionBSPData();
-			numbrushes = pBSP->numbrushes;
-			numentitychars = pBSP->numentitychars;
+		numbrushes = pBSP->numbrushes;
+		numentitychars = pBSP->numentitychars;
 		leafIndex = 0;
-		}
+	}
 
 	bool IsValid() const
 	{
@@ -72,7 +72,8 @@ static void AddPlaneToList( CUtlVector<cplane_t> &list, const Vector& normal, fl
 
 static void PlaneList( int leafIndex, model_t *model, CUtlVector<cplane_t> &planeList )
 {
-	if (!model || !model->brush.pShared || !model->brush.pShared->nodes)
+	// dimhotepus: Check leafs is not nullptr as it is dereferenced below.
+	if (!model || !model->brush.pShared || !model->brush.pShared->leafs)
 		Sys_Error ("PlaneList: bad model");
 
 	mleaf_t *pLeaf = &model->brush.pShared->leafs[leafIndex];
