@@ -1318,12 +1318,6 @@ void CL_TakeSnapshotAndSwap()
 			if ( world && world->GetModel() )
 			{
 				Q_FileBase( modelloader->GetName( ( model_t *)world->GetModel() ), base, sizeof( base ) );
-
-				if ( IsX360() )
-				{
-					// map name has an additional extension
-					V_StripExtension( base, base, sizeof( base ) );
-				}
 			}
 			else
 			{

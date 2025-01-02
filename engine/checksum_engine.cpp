@@ -82,9 +82,7 @@ bool CRC_File(CRC32_t *crcvalue, const char *pszFileName)
 	byte chunk[1024];
 	int nBytesRead;
 	
-	int nSize;
-
-	nSize = COM_OpenFile(pszFileName, &fp);
+	int nSize = COM_OpenFile(pszFileName, &fp);
 	if ( !fp || ( nSize == -1 ) )
 		return FALSE;
 
@@ -106,8 +104,6 @@ bool CRC_File(CRC32_t *crcvalue, const char *pszFileName)
 		// We we are end of file, break loop and return
 		if ( g_pFileSystem->EndOfFile( fp ) )
 		{
-			g_pFileSystem->Close( fp );
-			fp = 0;
 			break;
 		}
 		// If there was a disk error, indicate failure.
