@@ -2155,11 +2155,11 @@ bool SV_ActivateServer()
 
 	if ( skyname )
 	{
-		Q_strncpy( sv.m_szSkyname, skyname->GetString(), sizeof( sv.m_szSkyname ) );
+		V_strcpy_safe( sv.m_szSkyname, skyname->GetString() );
 	}
 	else
 	{
-		Q_strncpy( sv.m_szSkyname, "unknown", sizeof( sv.m_szSkyname ) );
+		V_strcpy_safe( sv.m_szSkyname, "unknown" );
 	}
 
 	COM_TimestampedLog( "Send Reconnects" );
@@ -2406,10 +2406,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 		deathmatch.SetValue( 0 );
 	}
 
-	current_skill = (int)(skill.GetFloat() + 0.5);
-	current_skill = max( current_skill, 0 );
-	current_skill = min( current_skill, 3 );
-
+	current_skill = clamp( (int)(skill.GetFloat() + 0.5), 0, 3 );
 	skill.SetValue( (float)current_skill );
 
 	COM_TimestampedLog( "StaticPropMgr()->LevelShutdown()" );
@@ -2446,29 +2443,26 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	framesnapshotmanager->LevelChanged();
 
 	// set map name
-	Q_strncpy( m_szMapname, szMapName, sizeof( m_szMapname ) );
-	Q_strncpy( m_szMapFilename, szMapFile, sizeof( m_szMapFilename ) );
+	V_strcpy_safe( m_szMapname, szMapName );
+	V_strcpy_safe( m_szMapFilename, szMapFile );
 
 	// set startspot
 	if (startspot)
 	{
-		Q_strncpy(m_szStartspot, startspot, sizeof( m_szStartspot ) );
+		V_strcpy_safe(m_szStartspot, startspot );
 	}
 	else
 	{
-		m_szStartspot[0] = 0;
+		m_szStartspot[0] = '\0';
 	}
 
 	if ( g_FlushMemoryOnNextServer )
 	{
 		g_FlushMemoryOnNextServer = false;
-		if ( IsX360() )
-		{
-			g_pQueuedLoader->PurgeAll();
-		}
 		g_pDataCache->Flush();
 		g_pMaterialSystem->CompactMemory();
 		g_pFileSystem->AsyncFinishAll();
+
 #if !defined( SWDS )
 		extern CThreadMutex g_SndMutex;
 		g_SndMutex.Lock();
