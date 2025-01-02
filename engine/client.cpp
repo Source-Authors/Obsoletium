@@ -124,54 +124,45 @@ A LAN server will know not to allows more then xxx users with the same CD Key
 */
 const char *CClientState::GetCDKeyHash( void )
 {
-	if ( IsPC() )
+	char szKeyBuffer[256]; // Keys are about 13 chars long.	
+	static char szHashedKeyBuffer[64];
+
+	bool bDedicated = false;
+	if (bDedicated)
 	{
-		char szKeyBuffer[256]; // Keys are about 13 chars long.	
-		static char szHashedKeyBuffer[64];
-		int nKeyLength;
-		bool bDedicated = false;
-
-		MD5Context_t ctx;
-		unsigned char digest[16]; // The MD5 Hash
-
-		nKeyLength = Q_snprintf( szKeyBuffer, sizeof( szKeyBuffer ), "%s", registry->ReadString( "key", "" ) );
-
-		if (bDedicated)
-		{
-			ConMsg("Key has no meaning on dedicated server...\n");
-			return "";
-		}
-
-		if ( nKeyLength == 0 )
-		{
-			nKeyLength = 13;
-		V_strcpy_safe( szKeyBuffer, "1234567890123" );
-			Assert( Q_strlen( szKeyBuffer ) == nKeyLength );
-
-			DevMsg( "Missing CD Key from registry, inserting blank key\n" );
-
-			registry->WriteString( "key", szKeyBuffer );
-		}
-
-		if (nKeyLength <= 0 ||
-			nKeyLength >= 256 )
-		{
-			ConMsg("Bogus key length on CD Key...\n");
-			return "";
-		}
-
-		// Now get the md5 hash of the key
-		memset( &ctx, 0, sizeof( ctx ) );
-		memset( digest, 0, sizeof( digest ) );
-		
-		MD5Init(&ctx);
-		MD5Update(&ctx, (unsigned char*)szKeyBuffer, nKeyLength);
-		MD5Final(digest, &ctx);
-	V_strcpy_safe( szHashedKeyBuffer, MD5_Print ( digest, sizeof( digest ) ) );
-		return szHashedKeyBuffer;
+		ConMsg("Key has no meaning on dedicated server...\n");
+		return "";
 	}
 
-	return "12345678901234567890123456789012";
+	int nKeyLength = V_sprintf_safe( szKeyBuffer, "%s", registry->ReadString( "key", "" ) );
+	if ( nKeyLength == 0 )
+	{
+		nKeyLength = 13;
+		V_strcpy_safe( szKeyBuffer, "1234567890123" );
+		Assert( Q_strlen( szKeyBuffer ) == nKeyLength );
+
+		DevMsg( "Missing CD Key from registry, inserting blank key\n" );
+
+		registry->WriteString( "key", szKeyBuffer );
+	}
+
+	if (nKeyLength <= 0 || nKeyLength >= 256 )
+	{
+		ConMsg("Bogus key length on CD Key...\n");
+		return "";
+	}
+	
+	MD5Context_t ctx;
+	unsigned char digest[16]; // The MD5 Hash
+	// Now get the md5 hash of the key
+	memset( &ctx, 0, sizeof( ctx ) );
+	memset( digest, 0, sizeof( digest ) );
+
+	MD5Init(&ctx);
+	MD5Update(&ctx, (unsigned char*)szKeyBuffer, nKeyLength);
+	MD5Final(digest, &ctx);
+	V_strcpy_safe( szHashedKeyBuffer, MD5_Print ( digest, sizeof( digest ) ) );
+	return szHashedKeyBuffer;
 }
 
 void CClientState::SendClientInfo( void )
@@ -644,7 +635,7 @@ float CClientState::GetClientInterpAmount()
 	float flInterp = s_cl_interp->GetFloat();
 
 	const ConVar_ServerBounded *pBounded = static_cast<const ConVar_ServerBounded*>( s_cl_interp_ratio );
-		flInterpRatio = pBounded->GetFloat();
+	flInterpRatio = pBounded->GetFloat();
 
 	//#define FIXME_INTERP_RATIO
 	return max( flInterpRatio / cl_updaterate->GetFloat(), flInterp );
