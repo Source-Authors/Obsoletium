@@ -52,9 +52,15 @@ public:
 	{
 		m_Mode = Mode_None;
 		m_hFile = NULL;
+		m_iLastUniqueNodeID = -1;
+		m_iPlaybackTick = -1;
+		m_iSkipPastHeaderPos = -1;
+		m_iLastTick = -1;
+		m_FileLen = -1;
+		m_bNodesChanged = false;
 		m_nQueuedStarts = 0;
 		m_nQueuedStops = 0;
-		m_iPlaybackTick = -1;
+		m_bPlaybackPaused = false;
 	}
 
 	~CVProfRecorder()
