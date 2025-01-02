@@ -4104,10 +4104,13 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	sv.InactivateClients();
 
 	// The qualified name of the map, excluding path/extension
-	char szMapName[MAX_PATH] = { 0 };
+	char szMapName[MAX_PATH];
+	V_strcpy_safe( szMapName, mapname );
+
 	// The file to load the map from.
-	char szMapFile[MAX_PATH] = { 0 };
-	Q_strncpy( szMapName, mapname, sizeof( szMapName ) );
+	char szMapFile[MAX_PATH];
+	szMapFile[0] = '\0';
+	
 	Host_DefaultMapFileName( szMapName, szMapFile, sizeof( szMapFile ) );
 
 	// Ask serverDLL to prepare this load
@@ -4153,7 +4156,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 		startspot = NULL;
 	else
 	{
-		Q_strncpy (_startspot, start, sizeof( _startspot ) );
+		V_strcpy_safe (_startspot, start );
 		startspot = _startspot;
 	}
 
@@ -4192,7 +4195,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	}
 #endif
 
-	Q_strncpy( oldlevel, sv.GetMapName(), sizeof( oldlevel ) );
+	V_strcpy_safe( oldlevel, sv.GetMapName() );
 
 #if !defined(SWDS)
 	if ( loadfromsavedgame )
@@ -4298,18 +4301,20 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	VPROF( "Host_NewGame" );
 	COM_TimestampedLog( "Host_NewGame" );
 
-	char previousMapName[MAX_PATH] = { 0 };
-	Q_strncpy( previousMapName, host_map.GetString(), sizeof( previousMapName ) );
+	char previousMapName[MAX_PATH];
+	V_strcpy_safe( previousMapName, host_map.GetString() );
 
 #ifndef SWDS
 	SCR_BeginLoadingPlaque();
 #endif
 
 	// The qualified name of the map, excluding path/extension
-	char szMapName[MAX_PATH] = { 0 };
+	char szMapName[MAX_PATH];
+	V_strcpy_safe( szMapName, mapName );
+
 	// The file to load the map from.
-	char szMapFile[MAX_PATH] = { 0 };
-	Q_strncpy( szMapName, mapName, sizeof( szMapName ) );
+	char szMapFile[MAX_PATH];
+	szMapFile[0] = '\0';
 	Host_DefaultMapFileName( szMapName, szMapFile, sizeof( szMapFile ) );
 
 	// Steam may not have been started yet, ensure it is available to the game DLL before we ask it to prepare level
@@ -4360,7 +4365,7 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	NET_ListenSocket( sv.m_Socket, true );	// activated server TCP socket
 
 	// let's not have any servers with no name
-	if ( host_name.GetString()[0] == 0 )
+	if ( Q_isempty( host_name.GetString() ) )
 	{
 		host_name.SetValue( serverGameDLL->GetGameDescription() );
 	}
@@ -4405,7 +4410,7 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 		COM_TimestampedLog( "Stuff 'connect localhost' to console" );
 
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "connect localhost:%d listenserver", sv.GetUDPPort() );
+		V_sprintf_safe( str, "connect localhost:%d listenserver", sv.GetUDPPort() );
 		Cbuf_AddText( str );
 	}
 	else
