@@ -800,11 +800,10 @@ int CEngineTrace::GetLeafContainingPoint( const Vector &vPos )
 class CBrushConvexInfo : public IConvexInfo
 {
 public:
-	CBrushConvexInfo()
+	CBrushConvexInfo() : m_pBSPData{GetCollisionBSPData()}
 	{
-		m_pBSPData = GetCollisionBSPData();
 	}
-	virtual unsigned int GetContents( int convexGameData )
+	unsigned int GetContents( int convexGameData ) override
 	{
 		return m_pBSPData->map_brushes[convexGameData].contents;
 	}
