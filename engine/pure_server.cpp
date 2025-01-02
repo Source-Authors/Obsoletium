@@ -101,27 +101,26 @@ void CPureServerWhitelist::Load( int iPureMode )
 	// Now load user customizations
 	if ( iPureMode == 1 )
 	{
-
-		// Load custom whitelist
-		KeyValues *kv = new KeyValues( "" );
-		bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/pure_server_whitelist.txt", "game" );
-		if ( !bLoaded )
-			// Check the old location
-			bLoaded = kv->LoadFromFile( g_pFileSystem, "pure_server_whitelist.txt", "game" );
-		if ( bLoaded )
-			bLoaded = LoadCommandsFromKeyValues( kv );
-		else
-			Msg( "pure_server_whitelist.txt not present; pure server using only base file rules\n" );
-		kv->deleteThis();
+		{
+			// Load custom whitelist
+			auto kv = KeyValues::AutoDelete( "" );
+			bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/pure_server_whitelist.txt", "game" );
+			if ( !bLoaded )
+				// Check the old location
+				bLoaded = kv->LoadFromFile( g_pFileSystem, "pure_server_whitelist.txt", "game" );
+			if ( bLoaded )
+				bLoaded = LoadCommandsFromKeyValues( kv );
+			else
+				Msg( "pure_server_whitelist.txt not present; pure server using only base file rules\n" );
+		}
 
 		// Load custom trusted keys
-		kv = new KeyValues( "" );
-		bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/trusted_keys.txt", "game" );
+		auto kv = KeyValues::AutoDelete( "" );
+		bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/trusted_keys.txt", "game" );
 		if ( bLoaded )
 			bLoaded = LoadTrustedKeysFromKeyValues( kv );
 		else
 			Msg( "trusted_keys.txt not present; pure server using only base trusted key list\n" );
-		kv->deleteThis();
 	}
 
 	// Hardcoded rules last
