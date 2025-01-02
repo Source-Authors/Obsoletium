@@ -494,30 +494,40 @@ static CLoaderProgress s_LoaderProgress;
 //-----------------------------------------------------------------------------
 CEngineVGui::CEngineVGui()
 {
-	staticPanel = NULL;
-	staticClientDLLToolsPanel = NULL;
-	staticClientDLLPanel = NULL;
-	staticGameDLLPanel = NULL;
-	staticGameUIPanel = NULL;
-	staticEngineToolsPanel = NULL;
-	staticDebugSystemPanel = NULL;
-	staticFocusOverlayPanel = NULL;
+	memset(m_FactoryList, 0, sizeof(m_FactoryList));
+	m_iNumFactories = 0;
 
-	m_hStaticGameUIModule = NULL;
-	m_GameUIFactory = NULL;
+	m_hStaticGameUIModule = nullptr;
+	m_GameUIFactory = nullptr;
+
+	staticPanel = nullptr;
+	staticClientDLLToolsPanel = nullptr;
+	staticClientDLLPanel = nullptr;
+	staticGameUIPanel = nullptr;
+	staticGameDLLPanel = nullptr;
+
+	staticEngineToolsPanel = nullptr;
+	staticDebugSystemPanel = nullptr;
+	staticFocusOverlayPanel = nullptr;
 
 #ifdef VPROF_ENABLED
-	m_pVProfPanel = NULL;
-	m_pBudgetPanel = NULL;
-	m_pTextureBudgetPanel = NULL;
+	m_pVProfPanel = nullptr;
+	m_pBudgetPanel = nullptr;
+	m_pTextureBudgetPanel = nullptr;
 #endif
 
 	m_bShowProgressDialog = false;
+	m_eLastProgressPoint = PROGRESS_NONE;
+
+	m_nLastProgressPointRepeatCount = -1;
+	m_flLoadingStartTime = -1.f;
+
 	m_bSaveProgress = false;
 	m_bNoShaderAPI = false;
 	m_bNotAllowedToHideGameUI = false;
 	m_bNotAllowedToShowGameUI = false;
-	m_pInputInternal = NULL;
+
+	m_pInputInternal = nullptr;
 	m_ProgressBias = 0;
 }
 
