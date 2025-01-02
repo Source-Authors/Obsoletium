@@ -1683,8 +1683,7 @@ int CNetChan::SendDatagram(bf_write *datagram)
 	m_StreamUnreliable.Reset();	// clear unreliable data buffer
 
 	// On the PC the voice data is in the main packet
-	if ( !IsX360() && 
-		m_StreamVoice.GetNumBitsWritten() > 0 && m_StreamVoice.GetNumBitsWritten() < send.GetNumBitsLeft() )
+	if ( m_StreamVoice.GetNumBitsWritten() > 0 && m_StreamVoice.GetNumBitsWritten() < send.GetNumBitsLeft() )
 	{
 		send.WriteBits(m_StreamVoice.GetData(), m_StreamVoice.GetNumBitsWritten() );
 		m_StreamVoice.Reset();
@@ -1707,8 +1706,8 @@ int CNetChan::SendDatagram(bf_write *datagram)
 	}
 
 	// Make sure we have enough bits to read a final net_NOP opcode before compressing 
-	int nRemainingBits = send.GetNumBitsWritten() % 8;
-	if ( nRemainingBits > 0 &&  nRemainingBits <= (8-NETMSG_TYPE_BITS) )
+	int nRemainingBits = send.GetNumBitsWritten() % CHAR_BIT;
+	if ( nRemainingBits > 0 && nRemainingBits <= (CHAR_BIT-NETMSG_TYPE_BITS) )
 	{
 		send.WriteUBitLong( net_NOP, NETMSG_TYPE_BITS );
 	}
@@ -1716,26 +1715,19 @@ int CNetChan::SendDatagram(bf_write *datagram)
 	// if ( IsX360() )
 	{
 		// Now round up to byte boundary
-		nRemainingBits = send.GetNumBitsWritten() % 8;
+		nRemainingBits = send.GetNumBitsWritten() % CHAR_BIT;
 		if ( nRemainingBits > 0 )
 		{
-			int nPadBits = 8 - nRemainingBits;
+			int nPadBits = CHAR_BIT - nRemainingBits;
 
 			flags |= ENCODE_PAD_BITS( nPadBits );
 	
 			// Pad with ones
-			if ( nPadBits > 0 )
-			{
-				unsigned int unOnes = GetBitForBitnum( nPadBits ) - 1;
-				send.WriteUBitLong( unOnes, nPadBits );
-			}
+			unsigned int unOnes = GetBitForBitnum( nPadBits ) - 1;
+			send.WriteUBitLong( unOnes, nPadBits );
 		}
 	}
 
-
-	// FIXME:  This isn't actually correct since compression might make the main payload usage a bit smaller
-	bool bSendVoice = IsX360() && ( m_StreamVoice.GetNumBitsWritten() > 0 &&  m_StreamVoice.GetNumBitsWritten() < send.GetNumBitsLeft() );
-		
 	bool bCompress = false;
 	if ( net_compresspackets.GetBool() )
 	{
@@ -1759,12 +1751,9 @@ int CNetChan::SendDatagram(bf_write *datagram)
 	}
 
 	// Send the datagram
-	int	bytesSent = NET_SendPacket ( this, m_Socket, remote_address, send.GetData(), send.GetNumBytesWritten(), bSendVoice ? &m_StreamVoice : 0, bCompress );
+	int	bytesSent = NET_SendPacket ( this, m_Socket, remote_address, send.GetData(), send.GetNumBytesWritten(), 0, bCompress );
 
-	if ( bSendVoice || !IsX360() )
-	{
-		m_StreamVoice.Reset();
-	}
+	m_StreamVoice.Reset();
 
 	if ( net_showudp.GetInt() && net_showudp.GetInt() != 2 )
 	{
