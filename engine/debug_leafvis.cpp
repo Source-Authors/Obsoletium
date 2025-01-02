@@ -23,7 +23,7 @@ struct leafvis_t
 		leafIndex = 0;
 		}
 
-	bool IsValid()
+	bool IsValid() const
 	{
 		CCollisionBSPData *pBSP = GetCollisionBSPData();
 		if ( numbrushes != pBSP->numbrushes || numentitychars != pBSP->numentitychars )
