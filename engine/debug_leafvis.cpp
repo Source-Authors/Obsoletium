@@ -26,7 +26,7 @@ struct leafvis_t
 	bool IsValid()
 	{
 		CCollisionBSPData *pBSP = GetCollisionBSPData();
-		if ( !pBSP || numbrushes != pBSP->numbrushes || numentitychars != pBSP->numentitychars )
+		if ( numbrushes != pBSP->numbrushes || numentitychars != pBSP->numentitychars )
 			return false;
 
 		return true;
