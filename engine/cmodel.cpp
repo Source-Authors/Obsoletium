@@ -2276,11 +2276,6 @@ void CM_DecompressVis( CCollisionBSPData *pBSPData, int cluster, int visType, by
 	byte	*out_p;
 	int		numClusterBytes;
 
-	if ( !pBSPData )
-	{
-		Assert( false ); // Shouldn't ever happen.
-	}
-
 	if ( cluster > pBSPData->numclusters || cluster < 0 )
 	{
 		// This can happen if this is called while the level is loading. See Map_VisCurrentCluster.
