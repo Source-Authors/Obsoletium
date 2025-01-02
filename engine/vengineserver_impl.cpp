@@ -649,10 +649,10 @@ public:
 		// set the memory to a known value
 		int size = _msize( pEntity );
 		memset( pEntity, 0xDD, size );
-#endif		
+#endif
 		
-			free( pEntity );
-		}
+		free( pEntity );
+	}
 	
 	void *SaveAllocMemory(size_t num, size_t size) override
 	{

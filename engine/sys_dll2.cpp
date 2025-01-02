@@ -331,7 +331,7 @@ template< int _SIZE >
 class CErrorText
 {
 public:
-	CErrorText() : m_bIsDedicatedServer( false ) {}
+	CErrorText() : m_bIsDedicatedServer(false) { m_errorText[0] = '\0'; }
 	~CErrorText() = default;
 
 	void Steam_SetMiniDumpComment()
