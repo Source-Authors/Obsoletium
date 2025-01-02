@@ -1358,10 +1358,6 @@ void CEngineClient::GetUILanguage( char *dest, int destlen )
 	{
 		V_strncpy( dest, pStr, destlen );
 	}
-	else if ( IsX360() )
-	{
-		dest[0] = 0;
-	}
 }
 
 //-----------------------------------------------------------------------------
