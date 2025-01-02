@@ -973,7 +973,6 @@ void S_InternalReloadSound( CSfxTable *sfx )
 	char pExt[10];
 	Q_ExtractFileExtension( sfx->getname(), pExt, sizeof(pExt) );
 	int nSource = !Q_stricmp( pExt, "mp3" ) ? CAudioSource::AUDIO_SOURCE_MP3 : CAudioSource::AUDIO_SOURCE_WAV;
-//	audiosourcecache->RebuildCacheEntry( nSource, sfx->IsPrecachedSound(), sfx );
 	audiosourcecache->GetInfo( nSource, sfx->IsPrecachedSound(), sfx ); // Do a size/date check and rebuild the cache entry if necessary.
 }
 
@@ -983,13 +982,6 @@ void S_InternalReloadSound( CSfxTable *sfx )
 //-----------------------------------------------------------------------------
 void S_ReloadSound( const char *name )
 {
-	if ( IsX360() )
-	{
-		// not supporting
-		Assert( 0 );
-		return;
-	}
-
 	if ( !g_AudioDevice )
 		return;
 
@@ -1011,9 +1003,6 @@ void S_ReloadSound( const char *name )
 // See comments on CL_HandlePureServerWhitelist for details of what we're doing here.
 void S_ReloadFilesInList( IFileList *pFilesToReload )
 {
-	if ( !IsPC() )
-		return;
-
 	S_StopAllSounds( true );
 	wavedatacache->Flush();
 	audiosourcecache->ForceRecheckDiskInfo();	// Force all cached audio data to recheck size/date info next time it's accessed.
