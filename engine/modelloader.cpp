@@ -5262,13 +5262,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 	}
 
 	char szMapFile[MAX_PATH] = { 0 };
-	V_strncpy( szMapFile, pMapFile, sizeof( szMapFile ) );
-
-	if ( IsX360() && !V_stricmp( szMapFile, s_szLastMapFile ) )
-	{
-		// already been checked, no reason to do multiple i/o validations
-		return true;
-	}
+	V_strcpy_safe( szMapFile, pMapFile );
 
 	// Blacklist some characters
 	// - Don't allow characters not allowed on all supported platforms for consistency
@@ -5287,10 +5281,14 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 			case '<': case '>': case ':': case '"': case '/': case '\\':
 			case '|': case '?': case '*':
 				bIllegalChar = true;
+				// dimhotepus: Add missed break.
+				break;
 			// Additional special characters in source engine commands, defense-in-depth against things that might be
 			// composing commands with map names (though they really shouldn't be)
 			case ';': case '\'':
 				bIllegalChar = true;
+				// dimhotepus: Add missed break.
+				break;
 			default: break;
 		}
 	}
