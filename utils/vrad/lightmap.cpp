@@ -1306,8 +1306,8 @@ static void ParseLightSpot( entity_t* e, directlight_t* dl )
 			dl->light.stopdot2 = 90;
 		}
 
-		dl->light.stopdot2 = (float)cos(dl->light.stopdot2/180*M_PI);
-		dl->light.stopdot = (float)cos(dl->light.stopdot/180*M_PI);
+		dl->light.stopdot2 = cos(DEG2RAD(dl->light.stopdot2));
+		dl->light.stopdot = cos(DEG2RAD(dl->light.stopdot));
 		dl->light.exponent = FloatForKey (e, "_exponent");
 	}
 
