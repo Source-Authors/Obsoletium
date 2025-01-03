@@ -133,7 +133,7 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 		char id[64] = { 0 };
 		while (3 == sscanf(response, "%i %s : %f min\n", &item, id, &banTime))
 		{
-			KeyValues *ban = new KeyValues("ban");
+			auto ban = KeyValues::AutoDelete("ban");
 
 			// determine type
 			if (IsIPAddress(id))

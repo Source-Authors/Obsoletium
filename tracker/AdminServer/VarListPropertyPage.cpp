@@ -51,7 +51,7 @@ bool CVarListPropertyPage::LoadVarList(const char *varfile)
 	m_pRulesList->DeleteAllItems();
 
 	// load list from file
-	KeyValues *dat = new KeyValues("VarList");
+	auto dat = KeyValues::AutoDelete("VarList");
 	if (dat->LoadFromFile( g_pFullFileSystem, varfile, NULL))
 	{
 		// enter into list
@@ -62,7 +62,6 @@ bool CVarListPropertyPage::LoadVarList(const char *varfile)
 		bSuccess = true;
 	}
 
-	dat->deleteThis();
 	return bSuccess;
 }
 
