@@ -53,7 +53,6 @@
 #include <vgui_controls/TextEntry.h>
 #include "enginebugreporter.h"
 #include "vgui_baseui_interface.h"
-#include <vgui_controls/FileOpenDialog.h>
 #include "ivideomode.h"
 #include "cl_main.h"
 #include "gl_model_private.h"
@@ -87,10 +86,6 @@
 #endif
 
 #include "XZip.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1674,7 +1669,10 @@ void CBugUIPanel::OnSubmit()
 	m_pOrientation->GetText( orientation, sizeof( orientation ) );
 	m_pBuildNumber->GetText( build, sizeof( build ) );
 
+	// dimhotepus: Append steam in steam mode only
+#ifndef NO_STEAM
 	Q_strncat( build, " (Steam)", sizeof(build), COPY_ALL_CHARACTERS );
+#endif
 
 	MaterialAdapterInfo_t info;
 	materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), info );
