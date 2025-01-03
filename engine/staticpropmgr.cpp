@@ -1238,6 +1238,8 @@ CStaticPropMgr::CStaticPropMgr()
 {
 	m_bLevelInitialized = false;
 	m_bClientInitialized = false;
+	m_vecLastViewOrigin = vec3_invalid;
+	m_flLastViewFactor = false;
 }
 
 CStaticPropMgr::~CStaticPropMgr()
