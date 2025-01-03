@@ -171,7 +171,7 @@ void PairEdges (void)
 	for (i = 0; i < numvertexes; i++)
 	{
 		// use the count from above to allocate a big enough array
-		vertexface[i] = ( int* )calloc( vertexref[i], sizeof( vertexface[0] ) );
+		vertexface[i] = ( int* )calloc( vertexref[i], sizeof( vertexface[0] ) ); //-V641
 		// clear the temporary data
 		vertexref[i] = 0;
 	}
@@ -1487,7 +1487,8 @@ static void ParseLightEnvironment( entity_t* e, directlight_t* dl )
 	char *angle_str=ValueForKeyWithDefault( e, "SunSpreadAngle" );
 	if (angle_str)
 	{
-		g_SunAngularExtent=atof(angle_str);
+		// dimhotepus: atof -> strtof.
+		g_SunAngularExtent=strtof(angle_str, nullptr);
 		g_SunAngularExtent=sin((M_PI/180.0)*g_SunAngularExtent);
 		qprintf("sun extent from map=%f\n",g_SunAngularExtent);
 	}
