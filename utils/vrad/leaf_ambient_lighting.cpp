@@ -672,36 +672,37 @@ void ComputePerLeafAmbientLighting()
 		{
 			g_pLeafAmbientIndex->Element(leafID).firstAmbientSample = g_pLeafAmbientLighting->Count();
 			// compute the samples in disk format.  Encode the positions in 8-bits using leaf bounds fractions
-			for ( int i = 0; i < list.Count(); i++ )
+			for ( auto &as : list )
 			{
 				intp outIndex = g_pLeafAmbientLighting->AddToTail();
 				dleafambientlighting_t &light = g_pLeafAmbientLighting->Element(outIndex);
 
-				light.x = Fixed8Fraction( list[i].pos.x, dleafs[leafID].mins[0], dleafs[leafID].maxs[0] );
-				light.y = Fixed8Fraction( list[i].pos.y, dleafs[leafID].mins[1], dleafs[leafID].maxs[1] );
-				light.z = Fixed8Fraction( list[i].pos.z, dleafs[leafID].mins[2], dleafs[leafID].maxs[2] );
+				light.x = Fixed8Fraction( as.pos.x, dleafs[leafID].mins[0], dleafs[leafID].maxs[0] );
+				light.y = Fixed8Fraction( as.pos.y, dleafs[leafID].mins[1], dleafs[leafID].maxs[1] );
+				light.z = Fixed8Fraction( as.pos.z, dleafs[leafID].mins[2], dleafs[leafID].maxs[2] );
 				light.pad = 0;
 				for ( int side = 0; side < 6; side++ )
 				{
-					VectorToColorRGBExp32( list[i].cube[side], light.cube.m_Color[side] );
+					VectorToColorRGBExp32( as.cube[side], light.cube.m_Color[side] );
 				}
 			}
 		}
 	}
 	for ( int i = 0; i < numleafs; i++ )
 	{
+		auto &index = g_pLeafAmbientIndex->Element(i);
 		// UNDONE: Do this dynamically in the engine instead.  This will allow us to sample across leaf
 		// boundaries always which should improve the quality of lighting in general
-		if ( g_pLeafAmbientIndex->Element(i).ambientSampleCount == 0 )
+		if ( index.ambientSampleCount == 0 )
 		{
 			if ( !(dleafs[i].contents & CONTENTS_SOLID) )
 			{
 				Msg("Bad leaf ambient for leaf %d\n", i );
 			}
 
-			int refLeaf = NearestNeighborWithLight(i);
-			g_pLeafAmbientIndex->Element(i).ambientSampleCount = 0;
-			g_pLeafAmbientIndex->Element(i).firstAmbientSample = refLeaf;
+			const int refLeaf = NearestNeighborWithLight(i);
+			index.ambientSampleCount = 0;
+			index.firstAmbientSample = refLeaf;
 		}
 	}
 	Msg("done\n");
