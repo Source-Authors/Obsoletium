@@ -197,7 +197,7 @@ void ClusterMerge (int clusternum)
 {
 	leaf_t		*leaf;
 //	byte		portalvector[MAX_PORTALS/8];
-	byte		portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
+	alignas(long) byte		portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
 	byte		uncompressed[MAX_MAP_LEAFS/8];
 	int			i, j;
 	int			numvis;
@@ -565,7 +565,7 @@ by ORing together all the PVS visible from a leaf
 */
 void CalcPAS (void)
 {
-	byte	uncompressed[MAX_MAP_LEAFS/8];
+	alignas(long) byte	uncompressed[MAX_MAP_LEAFS/8];
 	byte	compressed[MAX_MAP_LEAFS/8];
 	
 	long *dest, *src;

@@ -815,7 +815,7 @@ void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 	int			i, j;
 	long		more;
 	int			pnum;
-	byte		newmight[MAX_PORTALS/8];
+	alignas(long) byte		newmight[MAX_PORTALS/8];
 
 	leaf = &leafs[leafnum];
 	
