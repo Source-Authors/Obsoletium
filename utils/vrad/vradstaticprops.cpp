@@ -668,7 +668,7 @@ public:
 		}
 		else
 		{
-			KeyValues *pVMT = new KeyValues("vmt");
+			auto pVMT = KeyValues::AutoDelete("vmt");
 			CUtlBuffer buf((intp)0,0,CUtlBuffer::TEXT_BUFFER);
 			LoadFileIntoBuffer( buf, pMaterialName );
 			if ( pVMT->LoadFromBuffer( pMaterialName, buf ) )
@@ -705,7 +705,6 @@ public:
 				}
 
 			}
-			pVMT->deleteThis();
 		}
 
 		return bFound;
