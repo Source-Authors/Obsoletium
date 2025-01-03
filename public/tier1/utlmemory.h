@@ -157,7 +157,7 @@ class CUtlMemoryFixedGrowable : public CUtlMemory< T, I >
 	typedef CUtlMemory< T, I > BaseClass;
 
 public:
-	CUtlMemoryFixedGrowable( intp nGrowSize = 0, intp nInitSize = SIZE ) : BaseClass( m_pFixedMemory, SIZE ) 
+	CUtlMemoryFixedGrowable( intp nGrowSize = 0, intp nInitSize = SIZE ) : BaseClass( m_pFixedMemory, SIZE )  //-V730 Buffer passed as pointer and not used in base ctor.
 	{
 		Assert( nInitSize == 0 || nInitSize == SIZE );
 		m_nMallocGrowSize = nGrowSize;
