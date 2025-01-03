@@ -30,7 +30,7 @@ public:
 	bool Create( CCoreDispInfo *pDisp );
 
 	// Patches.
-	bool InitPatch( int iPatch, int iParentPatch, int iChild, Vector *pPoints, int *pIndices, float &flArea );
+	bool InitPatch( intp iPatch, int iParentPatch, int iChild, Vector *pPoints, int *pIndices, float &flArea );
 	bool InitParentPatch( int iPatch, Vector *pPoints, float &flArea );
 	float CreateParentPatches( void );
 	void CreateChildPatches( int iParentPatch, int nLevel );

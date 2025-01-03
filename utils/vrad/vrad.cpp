@@ -779,9 +779,9 @@ bool PreventSubdivision( CPatch *patch )
 //-----------------------------------------------------------------------------
 // Purpose: subdivide the "parent" patch
 //-----------------------------------------------------------------------------
-int CreateChildPatch( int nParentIndex, winding_t *pWinding, float flArea, const Vector &vecCenter )
+intp CreateChildPatch( int nParentIndex, winding_t *pWinding, float flArea, const Vector &vecCenter )
 {
-	int nChildIndex = g_Patches.AddToTail();
+	intp nChildIndex = g_Patches.AddToTail();
 
 	CPatch *child = &g_Patches[nChildIndex];
 	CPatch *parent = &g_Patches[nParentIndex];
@@ -846,7 +846,7 @@ int CreateChildPatch( int nParentIndex, winding_t *pWinding, float flArea, const
 //-----------------------------------------------------------------------------
 // Purpose: subdivide the "parent" patch
 //-----------------------------------------------------------------------------
-void SubdividePatch( int ndxPatch )
+void SubdividePatch( intp ndxPatch )
 {
 	winding_t *w, *o1, *o2;
 	Vector	total;
@@ -919,8 +919,8 @@ void SubdividePatch( int ndxPatch )
 	}
 
 	// create new child patches
-	int ndxChild1Patch = CreateChildPatch( ndxPatch, o1, area1, center1 );
-	int ndxChild2Patch = CreateChildPatch( ndxPatch, o2, area2, center2 );
+	intp ndxChild1Patch = CreateChildPatch( ndxPatch, o1, area1, center1 );
+	intp ndxChild2Patch = CreateChildPatch( ndxPatch, o2, area2, center2 );
 
 	// FIXME: This could go into CreateChildPatch if child1, child2 were stored in the patch as child[0], child[1]
 	patch = &g_Patches.Element( ndxPatch );
@@ -1331,14 +1331,18 @@ void WriteRTEnv (char *name)
 
 	for( int i = 0; i < g_RtEnv.OptimizedTriangleList.Count(); i++ )
 	{
-		triw->p[0] = g_RtEnv.OptimizedTriangleList[i].Vertex( 0);
-		triw->p[1] = g_RtEnv.OptimizedTriangleList[i].Vertex( 1);
-		triw->p[2] = g_RtEnv.OptimizedTriangleList[i].Vertex( 2);
-		int id = g_RtEnv.OptimizedTriangleList[i].m_Data.m_GeometryData.m_nTriangleID;
+		const auto &v = g_RtEnv.OptimizedTriangleList[i];
+		triw->p[0] = v.Vertex( 0);
+		triw->p[1] = v.Vertex( 1);
+		triw->p[2] = v.Vertex( 2);
+
+		int id = v.m_Data.m_GeometryData.m_nTriangleID;
+
 		Vector color(0, 0, 0);
 		if (id & TRACE_ID_OPAQUE) color.Init(0, 255, 0);
 		if (id & TRACE_ID_SKY) color.Init(0, 0, 255);
 		if (id & TRACE_ID_STATICPROP) color.Init(255, 0, 0);
+
 		WriteWinding(out, triw, color);
 	}
 	FreeWinding(triw);
@@ -1692,7 +1696,7 @@ void BounceLight (void)
 		Vector total;
 
 		VectorSubtract (g_Patches[i].maxs, g_Patches[i].mins, total);
-		Msg("%4d %4d %4d %4d (%d) %.0f", i, g_Patches[i].parent, g_Patches[i].child1, g_Patches[i].child2, g_Patches[i].samples, g_Patches[i].area );
+		Msg("%4d %4zd %4zd %4d (%d) %.0f", i, g_Patches[i].parent, g_Patches[i].child1, g_Patches[i].child2, g_Patches[i].samples, g_Patches[i].area );
 		Msg(" [%.0f %.0f %.0f]", total[0], total[1], total[2] );
 		if (g_Patches[i].child1 != g_Patches.InvalidIndex() )
 		{

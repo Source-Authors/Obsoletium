@@ -902,7 +902,7 @@ bool CVRADDispColl::InitParentPatch( int iPatch, Vector *pPoints, float &flArea 
 //			&vecNormal - 
 //			flArea - 
 //-----------------------------------------------------------------------------
-bool CVRADDispColl::InitPatch( int iPatch, int iParentPatch, int iChild, Vector *pPoints, int *pIndices, float &flArea )
+bool CVRADDispColl::InitPatch( intp iPatch, int iParentPatch, int iChild, Vector *pPoints, int *pIndices, float &flArea )
 {
 	// Get the current patch.
 	CPatch *pPatch = &g_Patches[iPatch];

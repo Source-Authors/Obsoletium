@@ -218,8 +218,8 @@ struct CPatch
 	int			clusterNumber;
 
 	int			parent;			// patch index of parent
-	int			child1;			// patch index for children
-	int			child2;
+	intp		child1;			// patch index for children
+	intp		child2;
 
 	int			ndxNext;					// next patch index in face
 	int			ndxNextParent;				// next parent patch index in face

@@ -915,7 +915,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 	CUtlBuffer bufvtx;
 	CUtlBuffer bufphy;
 
-	int i = m_StaticPropDict.AddToTail();
+	intp i = m_StaticPropDict.AddToTail();
 	m_StaticPropDict[i].m_pModel = NULL;
 	m_StaticPropDict[i].m_pStudioHdr = NULL;
 
@@ -1506,9 +1506,9 @@ void CVradStaticPropMgr::SerializeLighting()
 		}
 
 		int totalVertexes = 0;
-		for ( int j=0; j<m_StaticProps[i].m_MeshData.Count(); j++ )
+		for ( auto &md : m_StaticProps[i].m_MeshData )
 		{
-			totalVertexes += m_StaticProps[i].m_MeshData[j].m_VertexColors.Count();
+			totalVertexes += md.m_VertexColors.Count();
 		}
 
 		// allocate a buffer with enough padding for alignment
@@ -1609,12 +1609,15 @@ void CVradStaticPropMgr::SerializeLighting()
 			HardwareTexels::MeshHeader_t *pMesh = pVhtHdr->pMesh(n);
 			pMesh->m_nLod = m_StaticProps[i].m_MeshData[n].m_nLod;
 			pMesh->m_nOffset = (unsigned int)pTexelData - (unsigned int)pVhtHdr;
-			pMesh->m_nBytes = m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count();
+
+			const auto &texels = m_StaticProps[i].m_MeshData[n].m_TexelsEncoded;
+
+			pMesh->m_nBytes = texels.Count();
 			pMesh->m_nWidth = m_StaticProps[i].m_LightmapImageWidth;
 			pMesh->m_nHeight = m_StaticProps[i].m_LightmapImageHeight;
 
-			Q_memcpy(pTexelData, m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Base(), m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count());
-			pTexelData += m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count();
+			V_memcpy(pTexelData, texels.Base(), texels.Count());
+			pTexelData += texels.Count();
 		}
 
 		pTexelData = (unsigned char *)((unsigned int)pTexelData - (unsigned int)pVhtHdr);

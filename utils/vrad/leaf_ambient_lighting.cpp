@@ -293,7 +293,7 @@ void GetLeafBoundaryPlanes( CUtlVector<dplane_t> &list, int leafIndex )
 		else
 		{
 			// back side
-			int plane = list.AddToTail();
+			intp plane = list.AddToTail();
 			list[plane].dist = -pNodePlane->dist;
 			list[plane].normal = -pNodePlane->normal;
 			list[plane].type = pNodePlane->type;
@@ -316,7 +316,7 @@ void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &samplePos
 {
 	const int MAX_SAMPLES = 16;
 
-	int index = list.AddToTail();
+	intp index = list.AddToTail();
 	list[index].pos = samplePosition;
 	for ( int i = 0; i < 6; i++ )
 	{
@@ -674,7 +674,7 @@ void ComputePerLeafAmbientLighting()
 			// compute the samples in disk format.  Encode the positions in 8-bits using leaf bounds fractions
 			for ( int i = 0; i < list.Count(); i++ )
 			{
-				int outIndex = g_pLeafAmbientLighting->AddToTail();
+				intp outIndex = g_pLeafAmbientLighting->AddToTail();
 				dleafambientlighting_t &light = g_pLeafAmbientLighting->Element(outIndex);
 
 				light.x = Fixed8Fraction( list[i].pos.x, dleafs[leafID].mins[0], dleafs[leafID].maxs[0] );
