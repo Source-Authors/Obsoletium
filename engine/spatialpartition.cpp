@@ -1709,7 +1709,9 @@ CVoxelTree::CVoxelTree() : m_pVoxelHash( NULL ), m_pOwner( NULL ), m_nNextVisitB
 	// Various optimizations I've made require 4 levels
 	Assert( m_nLevelCount == 4 );
 
-	m_pVoxelHash = new CVoxelHash[m_nLevelCount]; 
+	m_pVoxelHash = new CVoxelHash[m_nLevelCount];
+
+	m_TreeId = -1;
 
 	m_AvailableVisitBits.EnsureCapacity( 2048 );
 }
@@ -2405,7 +2407,10 @@ ISpatialPartitionInternal *SpatialPartition()
 //-----------------------------------------------------------------------------
 CSpatialPartition::CSpatialPartition()
 {
+	memset(m_pQueryCallback, 0, sizeof(m_pQueryCallback));
+	memset(m_bUseOldQueryCallback, 0, sizeof(m_bUseOldQueryCallback));
 	m_nQueryCallbackCount = 0;
+	m_nSuppressedListMask = 0;
 }
 
 
