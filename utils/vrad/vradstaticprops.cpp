@@ -926,7 +926,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 		return;
 	}
 
-	studiohdr_t* pHdr = (studiohdr_t*)buf.Base();
+	studiohdr_t* pHdr = buf.Base<studiohdr_t>();
 
 	VectorCopy( pHdr->hull_min, m_StaticPropDict[i].m_Mins );
 	VectorCopy( pHdr->hull_max, m_StaticPropDict[i].m_Maxs );
@@ -1568,7 +1568,7 @@ void CVradStaticPropMgr::SerializeLighting()
 
 	for (int i = 0; i < count; ++i)
 	{
-		const int kAlignment = 512;
+		constexpr int kAlignment = 512;
 		// no need to write this file if we didn't compute the data
 		// props marked this way will not load the info anyway 
 		if (m_StaticProps[i].m_Flags & STATIC_PROP_NO_PER_TEXEL_LIGHTING)
