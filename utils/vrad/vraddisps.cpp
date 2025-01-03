@@ -1558,7 +1558,8 @@ void CVRadDispMgr::EndTimer( void )
 	CCycleCount duration = m_Timer.GetDuration();
 	double seconds = duration.GetSeconds();
 
-	Msg( "Done<%1.4lfs>\n", seconds );
+	Msg( "done (%1.4lfs)", seconds );
+	Msg( "\n" );
 }
 
 

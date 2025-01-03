@@ -2277,10 +2277,11 @@ void VRAD_LoadBSP( char const *pFilename )
 		WriteRTEnv("trace.txt");
 
 	// Build acceleration structure
-	qprintf ( "Setting up ray-trace acceleration structure... ");
+	Msg ( "Setting up ray-trace acceleration structure...");
 	double start = Plat_FloatTime();
 	g_RtEnv.SetupAccelerationStructure();
-	qprintf ( "Done (%.2fs)\n", Plat_FloatTime()-start );
+	Msg ( "Done (%.2fs)", Plat_FloatTime()-start );
+	Msg ( "\n" );
 
 #if 0  // To test only k-d build
 	exit(0);
