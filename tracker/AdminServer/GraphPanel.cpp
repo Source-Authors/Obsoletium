@@ -416,7 +416,10 @@ void CGraphPanel::CGraphsImage::Paint()
 //-----------------------------------------------------------------------------
 CGraphPanel::CGraphsImage::CGraphsImage(): vgui::Image(), points()
 {
+	x = y = -1;
 	maxIn=maxOut=minIn=minOut=minFPS=maxFPS=minPing=maxPing=0;
+	maxPlayers = minPlayers = 0;
+	timeBetween = SECONDS;
 	net_i=net_o=fps=cpu=ping=players=false;
 	numAvgs=0;
 	memset(&avgPoint,0x0,sizeof(Points_t));
