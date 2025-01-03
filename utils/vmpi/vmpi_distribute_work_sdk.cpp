@@ -385,8 +385,7 @@ public:
 
 		if ( m_bUsingMasterLocalThreads )
 			RunThreads_Start( Master_WorkerThread_Static, this, ERunThreadsPriority::k_eRunThreadsPriority_Idle );
-
-		uint64 lastShuffleTime = Plat_MSTime();
+		
 		while ( m_WorkUnitWalker.Thread_NumWorkUnitsRemaining() > 0 )
 		{
 			VMPI_DispatchNextMessage( 200 );
@@ -399,8 +398,7 @@ public:
 			// Reshuffle the work units optimally every certain interval.
 			if ( m_bForceShuffle || CheckShuffleRequest() )
 			{
-				Shuffle();				
-				lastShuffleTime = Plat_MSTime();
+				Shuffle();
 				m_bForceShuffle = false;
 			}
 		}
