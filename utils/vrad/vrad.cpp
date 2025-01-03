@@ -2537,7 +2537,8 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 		{
 			if ( ++i < argc && *argv[i] )
 			{
-				g_flSkySampleScale = atof( argv[i] );
+				// dimhotepus: atof -> strtof.
+				g_flSkySampleScale = strtof( argv[i], nullptr );
 				Msg( "--extra-sky-scale: %f\n", g_flSkySampleScale );
 			}
 			else

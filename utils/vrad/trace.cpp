@@ -20,7 +20,7 @@
 class CToolTrace : public CBaseTrace
 {
 public:
-	CToolTrace() {}
+	CToolTrace() = default;
 
 	Vector		mins;
 	Vector		maxs;
