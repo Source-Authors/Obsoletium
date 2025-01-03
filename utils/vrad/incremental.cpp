@@ -716,6 +716,7 @@ void CIncremental::LinkLightsToFaces( CUtlVector<CFaceLightList> &faceLights )
 
 CIncLight::CIncLight()
 {
+	memset( &m_Light, 0, sizeof(m_Light) );
 	memset( m_pCachedFaces, 0, sizeof(m_pCachedFaces) );
 	m_pCS = new CRITICAL_SECTION;
 	(void)::InitializeCriticalSectionAndSpinCount(m_pCS, 4000);
