@@ -20,6 +20,8 @@ $Macro SNAPPYOUTDIRRELEASE		"$SNAPPYSRCDIR\out\Release"
 $Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
 $Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
 $Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
+$Macro ZIPUTILSSRCDIR		"$SRCDIR\thirdparty\zip-utils"
+$Macro ZIPUTILSOUTDIR		"$ZIPUTILSSRCDIR\out"
 
 $Macro MPAHEADERINFOOUTDIRDEBUG	"$SRCDIR\thirdparty\mpaheaderinfo\out\Debug"
 $Macro MPAHEADERINFOOUTDIRRELEASE	"$SRCDIR\thirdparty\mpaheaderinfo\out\Release"
@@ -38,6 +40,7 @@ $Configuration	"Debug"
 		$AdditionalIncludeDirectories	"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
 		$AdditionalIncludeDirectories	"$BASE;$SNAPPYSRCDIR;$SNAPPYSRC2DIR"
+		$AdditionalIncludeDirectories	"$BASE;$ZIPUTILSSRCDIR"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;SUPPORTS_INT64" [$WIN64]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
@@ -428,8 +431,6 @@ $Project "engine"
 		$File	"world.cpp"
 		// dimhotepus: Disable Win key.
 		$File	"windows_shortcut_keys_toggler.cpp"	[$WINDOWS]
-		$File	"$SRCDIR\public\XZip.cpp"
-		$File	"$SRCDIR\public\XUnzip.cpp"
 		$File	"zone.cpp"
 		$File	"bugreporter.cpp" [!$DEDICATED]
 		$File	"cheatcodes.cpp"
@@ -1153,7 +1154,8 @@ $Project "engine"
 		$File	"$SRCDIR\public\vstdlib\vstdlib.h"
 		$File	"$SRCDIR\public\vtf\vtf.h"
 		$File	"$SRCDIR\public\worldsize.h"
-		$File	"$SRCDIR\public\zip\XZip.h"
+		$File	"$SRCDIR\thirdparty\zip-utils\XZip.h"
+		$File	"$SRCDIR\thirdparty\zip-utils\XUnzip.h"
 		$File	"$SRCDIR\public\zip_uncompressed.h"
 	}
 
@@ -1181,6 +1183,7 @@ $Project "engine"
 		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
 		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]
 		$Libexternal	"$SNAPPYOUTDIRRELEASE/snappy" [!$WINDOWS]
+		$Libexternal	"$ZIPUTILSOUTDIR/zip-utils"
 		$Libexternal	"$MPAHEADERINFOOUTDIRRELEASE/mpaheaderinfo" [!$WINDOWS&&!$DEDICATED]
 		$Libexternal	"$ZLIBOUTDIR/zlibstatic"
 		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL&&!$DEDICATED]

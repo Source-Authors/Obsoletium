@@ -50,3 +50,6 @@
 [submodule "thirdparty/speex"]
 	path = thirdparty/speex
 	url = git@github.com:Source-Authors/speex.git
+[submodule "thirdparty/zip-utils"]
+	path = thirdparty/zip-utils
+	url = git@github.com:Source-Authors/zip-utils.git

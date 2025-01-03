@@ -86,7 +86,7 @@
 #include "cl_steamauth.h"
 #endif
 
-#include "zip/XZip.h"
+#include "XZip.h"
 
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
@@ -1557,7 +1557,7 @@ bool CBugUIPanel::AddBugTextToZip( char const *textfilename, char const *text, i
 	if ( !m_hZip )
 	{
 		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( 0, MAX_ZIP_SIZE, ZIP_MEMORY );
+		m_hZip = CreateZipZ( nullptr, MAX_ZIP_SIZE, ZIP_MEMORY );
 		Assert( m_hZip );
 		if ( !m_hZip )
 		{
@@ -1565,9 +1565,7 @@ bool CBugUIPanel::AddBugTextToZip( char const *textfilename, char const *text, i
 		}
 	}
 
-	ZipAdd( m_hZip, textfilename, (void *)text, textlen, ZIP_MEMORY );
-
-	return true;
+	return ZipAdd( m_hZip, textfilename, (void *)text, textlen, ZIP_MEMORY ) == ZR_OK;
 }
 
 
@@ -1576,7 +1574,7 @@ bool CBugUIPanel::AddFileToZip( char const *relative )
 	if ( !m_hZip )
 	{
 		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( 0, MAX_ZIP_SIZE, ZIP_MEMORY );
+		m_hZip = CreateZipZ( nullptr, MAX_ZIP_SIZE, ZIP_MEMORY );
 		Assert( m_hZip );
 		if ( !m_hZip )
 		{
@@ -1592,11 +1590,9 @@ bool CBugUIPanel::AddFileToZip( char const *relative )
 		char basename[ 256 ];
 		Q_FileBase( relative, basename, sizeof( basename ) );
 		char outname[ 512 ];
-		Q_snprintf( outname, sizeof( outname ), "%s.%s", basename, extension );
+		V_sprintf_safe( outname, "%s.%s", basename, extension );
 
-		ZipAdd( m_hZip, outname, fullpath, 0, ZIP_FILENAME );
-
-		return true;
+		return ZipAdd( m_hZip, outname, fullpath, 0, ZIP_FILENAME ) == ZR_OK;
 	}
 
 	return false;
@@ -1999,13 +1995,10 @@ void CBugUIPanel::OnSubmit()
 		// Don't bother uploading any attachment if it's just the info.txt file, either...
 		if ( m_hZip && ( attachedSave || attachedScreenshot ) )
 		{
-			Assert( m_hZip );
 			void *mem = nullptr;
 			unsigned long len;
 
-			ZipGetMemory( m_hZip, &mem, &len );
-			if ( mem != NULL 
-				 && len > 0 )
+			if ( ZipGetMemory( m_hZip, &mem, &len ) == ZR_OK && mem != NULL && len > 0 )
 			{
 				// Store .zip file
 				FileHandle_t fh = g_pFileSystem->Open( "bug.zip", "wb" );
@@ -2021,7 +2014,8 @@ void CBugUIPanel::OnSubmit()
 
 		if ( m_hZip )
 		{
-			CloseZip( m_hZip );
+			[[maybe_unused]] ZRESULT rc = CloseZip( m_hZip );
+			Assert(rc == ZR_OK);
 			m_hZip = (HZIP)0;
 		}
 

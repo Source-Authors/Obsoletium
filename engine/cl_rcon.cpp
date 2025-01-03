@@ -24,7 +24,7 @@
 
 #undef SetPort  // winsock screws with the SetPort string... *sigh*8
 
-#include "zip/XUnzip.h"
+#include "XUnzip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -770,21 +770,25 @@ void CRConClient::SaveRemoteScreenshot( const void* pBuffer, int nBufLen )
 	char pScreenshotPath[MAX_PATH];
 	do 
 	{
-		Q_snprintf( pScreenshotPath, sizeof( pScreenshotPath ), "%s/screenshot%04d.jpg", m_RemoteFileDir.Get(), m_nScreenShotIndex++ );	
+		V_sprintf_safe( pScreenshotPath, "%s/screenshot%04d.jpg", m_RemoteFileDir.Get(), m_nScreenShotIndex++ );
 	} while ( g_pFullFileSystem->FileExists( pScreenshotPath, "MOD" ) );
 
 	char pFullPath[MAX_PATH];
 	GetModSubdirectory( pScreenshotPath, pFullPath, sizeof(pFullPath) );
 	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
+	Assert(hZip);
+	if (!hZip) return;
 
 	int nIndex;
 	ZIPENTRY zipInfo;
-	FindZipItem( hZip, "screenshot.jpg", true, &nIndex, &zipInfo );
-	if ( nIndex >= 0 )
+	ZRESULT rc = FindZipItem( hZip, "screenshot.jpg", true, &nIndex, &zipInfo );
+	if ( rc == ZR_OK && nIndex >= 0 )
 	{
-		UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		rc = UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		Assert(rc == ZR_OK);
 	}
-	CloseZip( hZip );
+	rc = CloseZip( hZip );
+	Assert(rc == ZR_OK);
 }
 
 void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
@@ -795,19 +799,23 @@ void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
 	char pLogPath[MAX_PATH];
 	do 
 	{
-		Q_snprintf( pLogPath, sizeof( pLogPath ), "%s/console%04d.log", m_RemoteFileDir.Get(), m_nConsoleLogIndex++ );	
+		V_sprintf_safe( pLogPath, "%s/console%04d.log", m_RemoteFileDir.Get(), m_nConsoleLogIndex++ );	
 	} while ( g_pFullFileSystem->FileExists( pLogPath, "MOD" ) );
 
 	char pFullPath[MAX_PATH];
 	GetModSubdirectory( pLogPath, pFullPath, sizeof(pFullPath) );
 	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
+	Assert(hZip);
+	if (!hZip) return;
 
 	int nIndex;
 	ZIPENTRY zipInfo;
-	FindZipItem( hZip, "console.log", true, &nIndex, &zipInfo );
-	if ( nIndex >= 0 )
+	ZRESULT rc = FindZipItem( hZip, "console.log", true, &nIndex, &zipInfo );
+	if ( rc == ZR_OK && nIndex >= 0 )
 	{
-		UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		rc = UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		Assert(rc == ZR_OK);
 	}
-	CloseZip( hZip );
+	rc = CloseZip( hZip );
+	Assert(rc == ZR_OK);
 }

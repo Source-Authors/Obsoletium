@@ -18,7 +18,7 @@
 #include "PlayerState.h"
 #include "sv_log.h"
 #ifndef SWDS
-#include "zip/XZip.h"
+#include "XZip.h"
 #endif
 #include "cl_main.h"
 
@@ -269,12 +269,43 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					if ( GetConsoleLogFileData( buf ) )
 					{
 						HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
+						Assert(hZip);
+						if (!hZip)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
+
 						void *pMem = nullptr;
 						unsigned long nLen;
-						ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
-						ZipGetMemory( hZip, &pMem, &nLen );
+						ZRESULT rc = ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
+						Assert(rc == ZR_OK);
+						if (rc != ZR_OK)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
+
+						rc = ZipGetMemory( hZip, &pMem, &nLen );
+						Assert(rc == ZR_OK);
+						if (rc != ZR_OK)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
+
 						SendResponseToClient( listener, SERVERDATA_CONSOLE_LOG_RESPONSE, pMem, nLen );
-						CloseZip( hZip );
+						rc = CloseZip( hZip );
+						Assert(rc == ZR_OK);
+						if (rc != ZR_OK)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
 					}
 					else
 					{
@@ -359,13 +390,48 @@ void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 	CUtlBuffer buf( 128 * 1024, 0 );
 	if ( g_pFullFileSystem->ReadFile( pFileName, "MOD", buf ) )
 	{
-		HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
-		void *pMem = nullptr;
-		unsigned long nLen;
-		ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
-		ZipGetMemory( hZip, &pMem, &nLen );
-		SendResponseToClient( m_nScreenshotListener, SERVERDATA_SCREENSHOT_RESPONSE, pMem, nLen );
-		CloseZip( hZip );
+		// dimhotepus: Wrap into cycle to break.
+		do
+		{
+			HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
+			Assert(hZip);
+			if (!hZip)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+				break;
+			}
+
+			void *pMem = nullptr;
+			unsigned long nLen;
+			ZRESULT rc = ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
+			Assert(rc == ZR_OK);
+			if (rc != ZR_OK)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+				break;
+			}
+
+			rc = ZipGetMemory( hZip, &pMem, &nLen );
+			Assert(rc == ZR_OK);
+			if (rc != ZR_OK)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+				break;
+			}
+
+			SendResponseToClient( m_nScreenshotListener, SERVERDATA_SCREENSHOT_RESPONSE, pMem, nLen );
+
+			rc = CloseZip( hZip );
+			Assert(rc == ZR_OK);
+			if (rc != ZR_OK)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+			}
+		} while (false);
 	}
 	else
 	{

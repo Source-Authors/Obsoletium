@@ -6,33 +6,11 @@
 
 $Include "$SRCDIR\vpc_scripts\fbx.vpc"
 
+$Macro ZIPUTILSSRCDIR		"$SRCDIR\thirdparty\zip-utils"
+$Macro ZIPUTILSOUTDIR		"$ZIPUTILSSRCDIR\out"
+
 $Project
 {
-	$Folder	"ZIP Support"
-	{
-		$File	"$SRCDIR\public\XZip.cpp"
-		{
-			$Configuration
-			{
-				$Compiler
-				{
-					$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-				}
-			}
-		}
-		$File	"$SRCDIR\public\XUnzip.cpp"
-		{
-			$Configuration
-			{
-				$Compiler
-				{
-					$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
-					$EnableC++Exceptions	"Yes With SEH Exceptions (/EHa)"
-				}
-			}
-		}
-	}
-
 	$Folder	"Link Libraries" 
 	{
 		$Lib datamodel
@@ -40,5 +18,6 @@ $Project
 		$Lib fbxutils
 		$Lib movieobjects
 		$Lib itemtest_lib
+		$Libexternal "$ZIPUTILSOUTDIR/zip-utils"
 	}
 }

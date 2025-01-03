@@ -2460,10 +2460,6 @@ SOURCE=.\World.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\public\XZip.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\Zone.cpp
 # End Source File
 # End Group
