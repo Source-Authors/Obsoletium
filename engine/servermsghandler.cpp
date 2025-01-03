@@ -916,7 +916,7 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 	void *from = NULL;
 	C_ServerClassInfo *pServerClass = NULL;
 	ClientClass *pClientClass = NULL;
-	ALIGN4 unsigned char data[CEventInfo::MAX_EVENT_DATA] ALIGN4_POST;
+	alignas(4) unsigned char data[CEventInfo::MAX_EVENT_DATA];
 	bf_write toBuf( data, sizeof(data) );
 	CEventInfo *ei = NULL;
 	
