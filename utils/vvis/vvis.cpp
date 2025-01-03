@@ -1211,8 +1211,7 @@ int RunVVis( int argc, char **argv )
 	}
 	else
 	{
-		if ( g_TraceClusterStart < 0 ||
-			g_TraceClusterStart >= portalclusters ||
+		if ( g_TraceClusterStart >= portalclusters ||
 			g_TraceClusterStop < 0 ||
 			g_TraceClusterStop >= portalclusters )
 		{
