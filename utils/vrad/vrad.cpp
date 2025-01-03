@@ -2368,7 +2368,6 @@ void VRAD_Finish()
 void VRAD_Init()
 {
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
-	InstallAllocationFunctions();
 	InstallSpewFunction();
 	SpewActivate( "developer", 1 );
 }
