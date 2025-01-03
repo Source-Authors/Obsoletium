@@ -2438,9 +2438,6 @@ static int FindOrAllocateLightstyleSamples( dface_t* f, facelight_t	*fl, int lig
 //-----------------------------------------------------------------------------
 static void ComputeIlluminationPointAndNormalsSSE( lightinfo_t const& l, FourVectors const &pos, FourVectors const &norm, SSE_SampleInfo_t* pInfo, int numSamples )
 {
-
-	Vector v[4];
-
 	pInfo->m_Points = pos;
 	bool computeNormals = ( pInfo->m_NormalCount > 1 && ( pInfo->m_IsDispFace || !l.isflat ) );
 

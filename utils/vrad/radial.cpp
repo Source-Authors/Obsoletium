@@ -273,8 +273,7 @@ radial_t *AllocateRadial( int facenum )
 
 void FreeRadial( radial_t *rad )
 {
-	if (rad)
-		free( rad );
+	free( rad );
 }
 
 
