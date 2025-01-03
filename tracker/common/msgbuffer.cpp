@@ -20,6 +20,7 @@ CMsgBuffer::CMsgBuffer( const char *buffername, void (*ef)( const char *fmt, ...
 	m_pszBufferName		= buffername;
 	m_pfnErrorFunc		= ef;
 	m_bAllowOverflow	= false;	// if false, Error
+	m_fRecvTime			= -1.f;
 	m_bOverFlowed		= false;	// set to true if the buffer size failed
 	m_nMaxSize			= NET_MAXMESSAGE;
 	m_nPushedCount		= 0;
