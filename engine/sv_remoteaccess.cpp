@@ -5,22 +5,25 @@
 //===========================================================================//
 
 #include "server_pch.h"
+#include "sv_remoteaccess.h"
+
 #include "iclient.h"
 #include "net.h"
-#include "utlbuffer.h"
-#include "utllinkedlist.h"
 #include "igameserverdata.h"
-#include "sv_remoteaccess.h"
 #include "sv_rcon.h"
 #include "sv_filter.h"
 #include "sys.h"
 #include "vprof_engine.h"
 #include "PlayerState.h"
 #include "sv_log.h"
+#include "cl_main.h"
+
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
+
 #ifndef SWDS
 #include "XZip.h"
 #endif
-#include "cl_main.h"
 
 extern IServerGameDLL	*serverGameDLL;
 
@@ -268,7 +271,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 					if ( GetConsoleLogFileData( buf ) )
 					{
-						HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
+						HZIP hZip = CreateZip( 0, 1024 * 1024, nullptr );
 						Assert(hZip);
 						if (!hZip)
 						{
@@ -279,7 +282,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 
 						void *pMem = nullptr;
 						unsigned long nLen;
-						ZRESULT rc = ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
+						ZRESULT rc = ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut() );
 						Assert(rc == ZR_OK);
 						if (rc != ZR_OK)
 						{
@@ -393,7 +396,7 @@ void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 		// dimhotepus: Wrap into cycle to break.
 		do
 		{
-			HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
+			HZIP hZip = CreateZip( 0, 1024 * 1024, nullptr );
 			Assert(hZip);
 			if (!hZip)
 			{
@@ -404,7 +407,7 @@ void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 
 			void *pMem = nullptr;
 			unsigned long nLen;
-			ZRESULT rc = ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
+			ZRESULT rc = ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut() );
 			Assert(rc == ZR_OK);
 			if (rc != ZR_OK)
 			{

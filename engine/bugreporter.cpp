@@ -1552,7 +1552,7 @@ bool CBugUIPanel::AddBugTextToZip( char const *textfilename, char const *text, i
 	if ( !m_hZip )
 	{
 		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( nullptr, MAX_ZIP_SIZE, ZIP_MEMORY );
+		m_hZip = CreateZip( nullptr, MAX_ZIP_SIZE, nullptr );
 		Assert( m_hZip );
 		if ( !m_hZip )
 		{
@@ -1560,7 +1560,7 @@ bool CBugUIPanel::AddBugTextToZip( char const *textfilename, char const *text, i
 		}
 	}
 
-	return ZipAdd( m_hZip, textfilename, (void *)text, textlen, ZIP_MEMORY ) == ZR_OK;
+	return ZipAdd( m_hZip, textfilename, (void *)text, textlen ) == ZR_OK;
 }
 
 
@@ -1569,7 +1569,7 @@ bool CBugUIPanel::AddFileToZip( char const *relative )
 	if ( !m_hZip )
 	{
 		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( nullptr, MAX_ZIP_SIZE, ZIP_MEMORY );
+		m_hZip = CreateZip( nullptr, MAX_ZIP_SIZE, nullptr );
 		Assert( m_hZip );
 		if ( !m_hZip )
 		{
@@ -1587,7 +1587,7 @@ bool CBugUIPanel::AddFileToZip( char const *relative )
 		char outname[ 512 ];
 		V_sprintf_safe( outname, "%s.%s", basename, extension );
 
-		return ZipAdd( m_hZip, outname, fullpath, 0, ZIP_FILENAME ) == ZR_OK;
+		return ZipAdd( m_hZip, outname, fullpath, 0 ) == ZR_OK;
 	}
 
 	return false;

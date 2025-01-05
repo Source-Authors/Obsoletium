@@ -233,6 +233,23 @@ if ERRORLEVEL 1 (
 )
 
 
+REM Build zip-utils.
+MKDIR thirdparty\zip-utils\out
+PUSHD thirdparty\zip-utils\out
+cmake -G Ninja ..
+if ERRORLEVEL 1 (
+  ECHO cmake generation for thirdparty\zip-utils failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Release
+if ERRORLEVEL 1 (
+  ECHO cmake --build for thirdparty\zip-utils failed.
+  EXIT /B 1
+)
+POPD
+
+
 REM Generate version info, etc.
 MKDIR out
 PUSHD out

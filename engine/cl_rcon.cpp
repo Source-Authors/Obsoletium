@@ -6,14 +6,16 @@
 
 #include "cl_rcon.h"
 
-#include "tier0/platform.h"
+#include "XUnzip.h"
 
-#include <tier0/dbg.h>
-#include "utlbuffer.h"
+#include "tier0/dbg.h"
+#include "tier0/platform.h"
+#include "tier1/utlbuffer.h"
+#include "tier2/fileutils.h"
+
 #include "vprof_engine.h"
 #include "proto_oob.h" // PORT_RCON define
 #include "cmd.h"
-#include "tier2/fileutils.h"
 
 #ifdef POSIX
 #include "net_ws_headers.h"
@@ -24,7 +26,6 @@
 
 #undef SetPort  // winsock screws with the SetPort string... *sigh*8
 
-#include "XUnzip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -775,7 +776,7 @@ void CRConClient::SaveRemoteScreenshot( const void* pBuffer, int nBufLen )
 
 	char pFullPath[MAX_PATH];
 	GetModSubdirectory( pScreenshotPath, pFullPath, sizeof(pFullPath) );
-	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
+	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, nullptr );
 	Assert(hZip);
 	if (!hZip) return;
 
@@ -784,7 +785,7 @@ void CRConClient::SaveRemoteScreenshot( const void* pBuffer, int nBufLen )
 	ZRESULT rc = FindZipItem( hZip, "screenshot.jpg", true, &nIndex, &zipInfo );
 	if ( rc == ZR_OK && nIndex >= 0 )
 	{
-		rc = UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		rc = UnzipItem( hZip, nIndex, pFullPath, 0 );
 		Assert(rc == ZR_OK);
 	}
 	rc = CloseZip( hZip );
@@ -804,7 +805,7 @@ void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
 
 	char pFullPath[MAX_PATH];
 	GetModSubdirectory( pLogPath, pFullPath, sizeof(pFullPath) );
-	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
+	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, nullptr );
 	Assert(hZip);
 	if (!hZip) return;
 
@@ -813,7 +814,7 @@ void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
 	ZRESULT rc = FindZipItem( hZip, "console.log", true, &nIndex, &zipInfo );
 	if ( rc == ZR_OK && nIndex >= 0 )
 	{
-		rc = UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		rc = UnzipItem( hZip, nIndex, pFullPath, 0 );
 		Assert(rc == ZR_OK);
 	}
 	rc = CloseZip( hZip );
