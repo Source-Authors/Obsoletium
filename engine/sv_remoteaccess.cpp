@@ -35,7 +35,7 @@ ConVar sv_rcon_log( "sv_rcon_log", "1", 0, "Enable/disable rcon logging." );
 //-----------------------------------------------------------------------------
 // Host_Stats_f - prints out interesting stats about the server...
 //-----------------------------------------------------------------------------
-void Host_Stats_f (void)
+static void Host_Stats_f (void)
 {
 	char stats[512];
 	g_ServerRemoteAccess.GetStatsString(stats, sizeof(stats));
@@ -51,9 +51,8 @@ CServerRemoteAccess::CServerRemoteAccess()
 {
 	m_iBytesSent = 0;
 	m_iBytesReceived = 0;
-	m_NextListenerID = 0;
+	m_nScreenshotListener = INVALID_LISTENER_ID;
 	m_AdminUIID = INVALID_LISTENER_ID;
-	m_nScreenshotListener = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -387,7 +386,7 @@ void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, const void 
 void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 {
 #ifndef SWDS
-	if ( m_nScreenshotListener < 0 )
+	if ( m_nScreenshotListener == INVALID_LISTENER_ID )
 		return;
 
 	CUtlBuffer buf( 128 * 1024, 0 );
@@ -442,7 +441,7 @@ void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 		RespondString( m_nScreenshotListener, 0, "Failed to read screenshot!\n" );
 	}
 
-	m_nScreenshotListener = -1;
+	m_nScreenshotListener = INVALID_LISTENER_ID;
 #endif
 }
 
@@ -542,7 +541,7 @@ void CServerRemoteAccess::BadPassword( CRConServer *pNetworkListener, ra_listene
 //-----------------------------------------------------------------------------
 int CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
 {
-	for( int i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
+	for( auto i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
 	{
 		// copy response into buffer
 		if ( m_ResponsePackets[i].responderID != listener ) // not for us, skip to the next entry
@@ -556,14 +555,14 @@ int CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
 
 int CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, void *buffer, int bufferSize )
 {
-	for( int i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
+	for( auto i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
 	{
 		// copy response into buffer
 		if ( m_ResponsePackets[i].responderID != listener ) // not for us, skip to the next entry
 			continue;
 
 		CUtlBuffer &response = m_ResponsePackets[i].packet;
-		int bytesToCopy = response.TellPut();
+		intp bytesToCopy = response.TellPut();
 		Assert(bufferSize >= bytesToCopy);
 		if (bytesToCopy <= bufferSize)
 		{
@@ -995,8 +994,9 @@ void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupD
 //-----------------------------------------------------------------------------
 extern "C" void NotifyDedicatedServerUI(const char *message)
 {
-	if ( g_ServerRemoteAccess.GetAdminUIID() != INVALID_LISTENER_ID ) // if we have an admin UI actually registered
+	auto &remote = g_ServerRemoteAccess;
+	if ( remote.GetAdminUIID() != INVALID_LISTENER_ID ) // if we have an admin UI actually registered
 	{
-		g_ServerRemoteAccess.SendMessageToAdminUI( g_ServerRemoteAccess.GetAdminUIID(), message);
+		remote.SendMessageToAdminUI( remote.GetAdminUIID(), message);
 	}
 }

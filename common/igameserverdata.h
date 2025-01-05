@@ -14,8 +14,8 @@
 #include "interface.h"
 #include "netadr.h"
 
-typedef unsigned int ra_listener_id;
-const ra_listener_id INVALID_LISTENER_ID = 0xffffffff;
+using ra_listener_id = unsigned int;
+constexpr inline ra_listener_id INVALID_LISTENER_ID = 0xffffffff;
 
 
 //-----------------------------------------------------------------------------

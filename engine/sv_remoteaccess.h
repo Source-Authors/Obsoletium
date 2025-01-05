@@ -11,8 +11,8 @@
 #endif
 
 #include "igameserverdata.h"
-#include "utlbuffer.h"
-#include "utllinkedlist.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
 
 class CRConServer;
 
@@ -79,11 +79,11 @@ private:
 	};
 	
 	CUtlLinkedList<ListenerStore_t, int>	m_ListenerIDs;
-	ra_listener_id				m_NextListenerID;
+	
+	intp m_iBytesSent;
+	intp m_iBytesReceived;
 
-	int m_nScreenshotListener;
-	int m_iBytesSent;
-	int m_iBytesReceived;
+	ra_listener_id				m_nScreenshotListener;
 	ra_listener_id				m_AdminUIID;
 };
 
