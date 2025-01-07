@@ -16,6 +16,7 @@
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
 #include "unordered_map"
+#include "string"
 
 #ifdef _X360
 #include "xbox/xbox_console.h"
@@ -114,7 +115,7 @@ private:
 	CUtlVector< IConsoleDisplayFunc* >	m_DisplayFuncs;
 	int									m_nNextDLLIdentifier;
 	ConCommandBase						*m_pConCommandList;
-	std::unordered_map<std::string_view, ConCommandBase*> m_pConCommandNames;
+	std::unordered_map<std::string, ConCommandBase*> m_pConCommandNames;
 
 	// temporary console area so we can store prints before console display funs are installed
 	mutable CUtlBuffer					m_TempConsoleBuffer;
@@ -164,6 +165,39 @@ protected:
 private:
 	// Standard console commands -- DO NOT PLACE ANY HIGHER THAN HERE BECAUSE THESE MUST BE THE FIRST TO DESTRUCT
 	CON_COMMAND_MEMBER_F( CCvar, "find", Find, "Find concommands with the specified string in their name/help text.", 0 )
+
+	/*
+	 * BUG: The Source engine uses Q_stricmp -> V_stricmp which is case insensitive, so we need to account for that.
+	 */
+	inline void AddConVarName( ConCommandBase* variable )
+	{
+		std::string strName = variable->GetName();
+		std::transform( strName.begin(), strName.end(), strName.begin(), ::tolower );
+
+		m_pConCommandNames.try_emplace( strName, variable );
+	}
+
+	inline void RemoveConVarName( const ConCommandBase* variable )
+	{
+		std::string strName = variable->GetName();
+		std::transform( strName.begin(), strName.end(), strName.begin(), ::tolower );
+
+		auto it = m_pConCommandNames.find( strName );
+		if ( it != m_pConCommandNames.end() )
+			m_pConCommandNames.erase( it );
+	}
+
+	inline ConCommandBase* FindConVarName( const char* name ) const
+	{
+		std::string strName = name;
+		std::transform( strName.begin(), strName.end(), strName.begin(), ::tolower );
+
+		auto it = m_pConCommandNames.find( strName );
+		if ( it != m_pConCommandNames.end() )
+			return it->second;
+
+		return NULL;
+	}
 };
 
 void CCvar::CCVarIteratorInternal::SetFirst( void ) RESTRICT
@@ -407,7 +441,7 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 	variable->m_pNext = m_pConCommandList;
 	m_pConCommandList = variable;
 
-	m_pConCommandNames[ variable->GetName() ] = variable;
+	AddConVarName( variable );
 }
 
 void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
@@ -437,12 +471,9 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 			pPrev->m_pNext = pCommand->m_pNext;
 		}
 		pCommand->m_pNext = NULL;
+		RemoveConVarName( pCommandToRemove );
 		break;
 	}
-
-	auto it = m_pConCommandNames.find( pCommandToRemove->GetName() );
-	if ( it != m_pConCommandNames.end() )
-		m_pConCommandNames.erase(it);
 }
 
 void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
@@ -463,9 +494,7 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 			pCommand->m_bRegistered = false;
 			pCommand->m_pNext = NULL;
 
-			auto it = m_pConCommandNames.find( pCommand->GetName() );
-			if ( it != m_pConCommandNames.end() )
-				m_pConCommandNames.erase(it);
+			RemoveConVarName( pCommand );
 		}
 
 		pCommand = pNext;
@@ -480,32 +509,12 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 //-----------------------------------------------------------------------------
 const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 {
-	auto it = m_pConCommandNames.find( name );
-	if (it != m_pConCommandNames.end())
-		return it->second;
-
-	const ConCommandBase *cmd = GetCommands();
-	for ( ; cmd; cmd = cmd->GetNext() )
-	{
-		if ( !Q_stricmp( name, cmd->GetName() ) )
-			return cmd;
-	}
-	return NULL;
+	return FindConVarName( name );
 }
 
 ConCommandBase *CCvar::FindCommandBase( const char *name )
 {
-	auto it = m_pConCommandNames.find( name );
-	if (it != m_pConCommandNames.end())
-		return it->second;
-
-	ConCommandBase *cmd = GetCommands();
-	for ( ; cmd; cmd = cmd->GetNext() )
-	{
-		if ( !Q_stricmp( name, cmd->GetName() ) )
-			return cmd;
-	}
-	return NULL;
+	return FindConVarName( name );
 }
 
 
