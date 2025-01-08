@@ -14,7 +14,8 @@
 ******************************************************************************/
 
 #include "TokenLine.h"
-#include <cstring>
+
+#include "tier1/strtools.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -36,11 +37,8 @@ bool TokenLine::SetLine(const char * newLine)
 		return false;
 	}
 
-	strncpy( m_fullLine, newLine, MAX_LINE_CHARS-1 );
-	m_fullLine[ MAX_LINE_CHARS-1 ] = '\0';
-
-	strncpy( m_tokenBuffer, newLine, MAX_LINE_CHARS-1 );
-	m_tokenBuffer[ MAX_LINE_CHARS-1 ] = '\0';
+	V_strcpy_safe( m_fullLine, newLine );
+	V_strcpy_safe( m_tokenBuffer, newLine );
 
 	// parse tokens 
 	char * charPointer = m_tokenBuffer;
