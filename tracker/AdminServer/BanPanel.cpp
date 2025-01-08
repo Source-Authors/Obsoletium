@@ -131,8 +131,11 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 		int item = 0;
 		float banTime = 0.0f;
 		char id[64] = { 0 };
-		while (3 == sscanf(response, "%i %s : %f min\n", &item, id, &banTime))
+		// dimhotepus: Ensure id does not overflow.
+		while (3 == sscanf(response, "%i %63s : %f min\n", &item, id, &banTime))
 		{
+			id[std::size(id) - 1] = '\0';
+
 			auto ban = KeyValues::AutoDelete("ban");
 
 			// determine type

@@ -196,8 +196,12 @@ void CPlayerPanel::OnServerDataResponse(const char *value, const char *response)
 			name[pos] = 0;
 			parse++;	// move past end quote
 
-			if (6 != sscanf(parse, " %s %s %d %d %d %d\n", authID, netAdr, &ping, &packetLoss, &frags, &connectTime))
+			// dimhotepus: Ensure auth id and net address do not overlfow.
+			if (6 != sscanf(parse, " %63s %31s %d %d %d %d\n", authID, netAdr, &ping, &packetLoss, &frags, &connectTime))
 				break;
+
+			authID[std::size(authID) - 1] = '\0';
+			netAdr[std::size(netAdr) - 1] = '\0';
 
 			const char *timeStr = FormatSeconds(connectTime);
 
