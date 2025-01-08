@@ -141,7 +141,6 @@ void CDialogAddBan::OnCommand(const char *command)
 
 	if (!stricmp(command, "Okay"))
 	{
-		KeyValues *msg = new KeyValues("AddBanValue");
 		char buf[64],idbuf[64];
 		float time;
 		m_pIDTextEntry->GetText(idbuf, sizeof(idbuf));
@@ -187,6 +186,7 @@ void CDialogAddBan::OnCommand(const char *command)
 
 			if(time>=0)
 			{
+				KeyValues *msg = new KeyValues("AddBanValue");
 				msg->SetFloat("time", time);
 				msg->SetString("id", idbuf);
 				msg->SetString("type",m_cType);
