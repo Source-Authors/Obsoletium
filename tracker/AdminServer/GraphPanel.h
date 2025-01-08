@@ -69,7 +69,7 @@ private:
 		CGraphsImage();
 		using Image::DrawLine;
 		using Image::SetPos;
-		bool AddPoint(Points_t p);
+		bool AddPoint(const Points_t &p);
 		void RemovePoints() { points.RemoveAll(); }
 		void SaveSize(int x1,int y1) { x=x1;y=y1; SetSize(x1,y1);}
 
@@ -97,8 +97,8 @@ private:
 
 	private:
 
-		void AvgPoint(Points_t p);
-		void CheckBounds(Points_t p);
+		void AvgPoint(const Points_t &p);
+		void CheckBounds(const Points_t &p);
 
 		CUtlVector<Points_t> points;
 		

@@ -441,7 +441,7 @@ void CGraphPanel::CGraphsImage::SetDraw(bool cpu_in,bool fps_in,bool net_in,bool
 //-----------------------------------------------------------------------------
 // Purpose: used to average points over a period of time
 //-----------------------------------------------------------------------------
-void CGraphPanel::CGraphsImage::AvgPoint(Points_t p)
+void CGraphPanel::CGraphsImage::AvgPoint(const Points_t &p)
 {
 	avgPoint.cpu += p.cpu;
 	avgPoint.fps += p.fps;
@@ -456,7 +456,7 @@ void CGraphPanel::CGraphsImage::AvgPoint(Points_t p)
 //-----------------------------------------------------------------------------
 // Purpose: updates the current bounds of the points based on this new point
 //-----------------------------------------------------------------------------
-void CGraphPanel::CGraphsImage::CheckBounds(Points_t p)
+void CGraphPanel::CGraphsImage::CheckBounds(const Points_t &p)
 {
 	if(p.in>maxIn)
 	{
@@ -508,7 +508,7 @@ void CGraphPanel::CGraphsImage::CheckBounds(Points_t p)
 //-----------------------------------------------------------------------------
 // Purpose: adds a point to the graph image. 
 //-----------------------------------------------------------------------------
-bool CGraphPanel::CGraphsImage::AddPoint(Points_t p)
+bool CGraphPanel::CGraphsImage::AddPoint(const Points_t &p)
 {
 	int xSize,ySize;
 	bool recalcBounds=false;
