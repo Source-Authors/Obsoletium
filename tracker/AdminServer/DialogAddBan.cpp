@@ -111,7 +111,8 @@ bool CDialogAddBan::IsIPCheck()
 	int dotCount=0;
 	m_pIDTextEntry->GetText(buf, sizeof(buf)-1);
 
-	for(unsigned int i=0;i<strlen(buf);i++)
+	const size_t len = strlen(buf);
+	for(size_t i=0;i<len;i++)
 	{
 		if(buf[i]=='.')
 		{
