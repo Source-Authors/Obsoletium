@@ -24,6 +24,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CDialogAddBan::CDialogAddBan(vgui::Panel *parent) : Frame(parent, "DialogAddBan")
 {
+	m_cType = nullptr;
+
 	SetSize(320, 200);
 	SetTitle("#Game_Ban_Add_Title", false);
 
