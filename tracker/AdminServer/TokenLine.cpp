@@ -118,7 +118,7 @@ char* TokenLine::CheckToken(char * parm)
 	return NULL;
 }
 
-int TokenLine::CountToken()
+int TokenLine::CountToken() const
 {
 	int c = 0;
 	for (int i = 0 ; i < m_tokenNumber; i ++)
