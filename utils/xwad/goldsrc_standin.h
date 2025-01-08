@@ -1,15 +1,11 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: This file provides some of the goldsrc functionality for xwad.
-//
-//=============================================================================//
+// This file provides some of the goldsrc functionality for xwad.
 
-#ifndef GOLDSRC_STANDIN_H
-#define GOLDSRC_STANDIN_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_UTILS_XWAD_GOLDSRC_STANDIN_H_
+#define SE_UTILS_XWAD_GOLDSRC_STANDIN_H_
 
+#include <cstdio>
 
 typedef float vec_t;
 typedef float vec3_t[3];
@@ -17,26 +13,24 @@ typedef float vec3_t[3];
 typedef unsigned char byte;
 typedef int qboolean;
 
+void Msg(const char *pMsg, ...);
+void Warning(const char *pMsg, ...);
+[[noreturn]] void Error(const char *pMsg, ...);
 
-void Msg( PRINTF_FORMAT_STRING const char *pMsg, ... );
-void Warning( PRINTF_FORMAT_STRING const char *pMsg, ... );
-void Error( PRINTF_FORMAT_STRING const char *pMsg, ... );
+long LoadFile(char *filename, void **bufferptr);
+void SaveFile(char *filename, void *buffer, ptrdiff_t count);
 
-int		LoadFile (char *filename, void **bufferptr);
-void	SaveFile (char *filename, void *buffer, int count);
+short BigShort(short l);
+short LittleShort(short l);
+int BigLong(int l);
+int LittleLong(int l);
+unsigned LittleULong(unsigned l);
+float BigFloat(float l);
+float LittleFloat(float l);
 
-short	BigShort (short l);
-short	LittleShort (short l);
-int		BigLong (int l);
-int		LittleLong (int l);
-float	BigFloat (float l);
-float	LittleFloat (float l);
+FILE *SafeOpenWrite(char *filename);
+FILE *SafeOpenRead(char *filename);
+void SafeRead(FILE *f, void *buffer, ptrdiff_t count);
+void SafeWrite(FILE *f, void *buffer, ptrdiff_t count);
 
-
-FILE	*SafeOpenWrite (char *filename);
-FILE	*SafeOpenRead (char *filename);
-void	SafeRead (FILE *f, void *buffer, int count);
-void	SafeWrite (FILE *f, void *buffer, int count);
-
-
-#endif // GOLDSRC_STANDIN_H
+#endif  // !SE_UTILS_XWAD_GOLDSRC_STANDIN_H_
