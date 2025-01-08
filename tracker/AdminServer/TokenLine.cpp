@@ -22,10 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 
 
-TokenLine::~TokenLine()
-{
-
-}
+TokenLine::~TokenLine() = default;
 
 
 bool TokenLine::SetLine(const char * newLine)
