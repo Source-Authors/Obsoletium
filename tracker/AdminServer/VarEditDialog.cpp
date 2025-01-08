@@ -91,7 +91,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 			}
 
 			// pull out the map name
-			const char *end = strstr(parse, "\n");
+			const char *end = strchr(parse, '\n');
 			if (!end)
 				break;
 

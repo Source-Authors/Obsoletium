@@ -253,8 +253,8 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 		}
 
 		// pull out the map name
-		const char *end = strstr(parse, "\n");
-		const char *end2 = strstr(parse, "\r");
+		const char *end = strchr(parse, '\n');
+		const char *end2 = strchr(parse, '\r');
 		if (end && end2 && end2 < end)
 		{
 			end = end2;
