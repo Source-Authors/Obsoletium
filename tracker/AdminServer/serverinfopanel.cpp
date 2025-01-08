@@ -264,14 +264,14 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 
 		char customString[64];
 		intp nameSize = end - parse;
-		if (nameSize >= sizeof(customString))
+		if (nameSize >= ssize(customString))
 		{
-			nameSize = sizeof(customString) - 1;
+			nameSize = ssize(customString) - 1;
 		}
 
 		// copy in the name
-		strncpy(customString, parse, nameSize);
-		customString[nameSize] = 0;
+		// dimhotepus: Use V_strncpy
+		V_strncpy(customString, parse, nameSize);
 		parse = end;
 
 		// add to the list string that aren't comments
