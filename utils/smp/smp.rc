@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -49,49 +47,10 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904B0"
-        BEGIN
-            VALUE "CompanyName", "Valve"
-            VALUE "FileDescription", "Steam Media Player"
-            VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "Steam Media Player"
-            VALUE "LegalCopyright", "Copyright 2005"
-            VALUE "OriginalFilename", "smp.exe"
-            VALUE "ProductName", "Steam Media Player"
-            VALUE "ProductVersion", "1, 0, 0, 1"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menu
 //
 
-IDR_MENU1 MENU 
+IDR_MENU1 MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -110,7 +69,6 @@ BEGIN
         MENUITEM "    currentMedia",            ID_WMPCORE_CURRENTMEDIA
         MENUITEM "    mediaCollection",         ID_WMPCORE_MEDIACOLLECTION
         MENUITEM "    playlistCollection",      ID_WMPCORE_PLAYLISTCOLLECTION
-
         MENUITEM "    versionInfo",             ID_WMPCORE_VERSIONINFO
         MENUITEM "    launchURL",               ID_WMPCORE_LAUNCHURL
         MENUITEM "    network",                 ID_WMPCORE_NETWORK
@@ -126,7 +84,6 @@ BEGIN
         MENUITEM "    enabled",                 ID_WMPPLAYER_ENABLED
         MENUITEM "    fullScreen",              ID_WMPPLAYER_FULLSCREEN
         MENUITEM "    enableContextMenu",       ID_WMPPLAYER_ENABLECONTEXTMENU
-
         MENUITEM "    uiMode",                  ID_WMPPLAYER_UIMODE
         MENUITEM "IWMPlayer2",                  ID_WMPPLAYER2, INACTIVE
         MENUITEM "    stretchToFit",            ID_WMPPLAYER2_STRETCHTOFIT
@@ -145,14 +102,13 @@ CAPTION "Open URL"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_FILEOPEN_EDIT,7,25,235,14,ES_AUTOHSCROLL | WS_GROUP
-    PUSHBUTTON      "...",IDC_FILEOPEN_BROWSE,246,26,21,14,0,
-                    WS_EX_CLIENTEDGE
+    PUSHBUTTON      "...",IDC_FILEOPEN_BROWSE,246,26,21,14,0,WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "OK",IDOK,160,53,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,217,53,50,14
     LTEXT           "Enter URL to play:",IDC_STATIC,7,7,59,8
 END
 
-IDD_STRING_DIALOG DIALOG  0, 0, 244, 50
+IDD_STRING_DIALOG DIALOG 0, 0, 244, 50
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Property"
 FONT 8, "MS Shell Dlg"
@@ -162,17 +118,15 @@ BEGIN
     EDITTEXT        IDC_STRING_EDIT,7,7,226,13,ES_AUTOHSCROLL
 END
 
-IDD_BOOLEAN_DIALOG DIALOG  0, 0, 125, 58
+IDD_BOOLEAN_DIALOG DIALOG 0, 0, 125, 58
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Boolean"
 FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,7,37,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,68,37,50,14
-    CONTROL         "VARIANT_TRUE",IDC_BOOLEAN_TRUE,"Button",
-                    BS_AUTORADIOBUTTON,7,7,85,10
-    CONTROL         "VARIANT_FALSE",IDC_BOOLEAN_FALSE,"Button",
-                    BS_AUTORADIOBUTTON,7,21,85,10
+    CONTROL         "VARIANT_TRUE",IDC_BOOLEAN_TRUE,"Button",BS_AUTORADIOBUTTON,7,7,85,10
+    CONTROL         "VARIANT_FALSE",IDC_BOOLEAN_FALSE,"Button",BS_AUTORADIOBUTTON,7,21,85,10
 END
 
 
@@ -182,8 +136,12 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
+    IDD_FILEOPEN_DIALOG, DIALOG
+    BEGIN
+    END
+
     IDD_STRING_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -202,16 +160,7 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON                ICON                    "smp.ico"
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
