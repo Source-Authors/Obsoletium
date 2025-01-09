@@ -7,7 +7,6 @@
 #include <comdef.h>
 #include <commctrl.h>
 #include <initguid.h>
-#include <psapi.h>
 
 #include <vector>
 #include <string>
@@ -555,69 +554,6 @@ bool CreateDesktopBitmaps() {
   return rc;
 }
 
-void KillOtherSMPs() {
-  DWORD process_bytes{0}, process_ids[1024];
-  if (!EnumProcesses(process_ids, sizeof(process_ids), &process_bytes)) {
-    FailedUI(HRESULT_FROM_WIN32(GetLastError()), "EnumProcesses w/e: ");
-    return;
-  }
-
-  const DWORD process_id{GetCurrentProcessId()};
-  const DWORD processIds{process_bytes / sizeof(DWORD)};
-
-  for (DWORD i = 0; i < processIds; ++i) {
-    if (process_ids[i] == process_id) continue;
-
-    if (process_ids[i] == 0)  // system idle process
-      continue;
-
-    HANDLE process = OpenProcess(
-        PROCESS_TERMINATE | PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE,
-        process_ids[i]);
-    if (!process) {
-      if (GetLastError() != ERROR_ACCESS_DENIED) {
-        FailedUI(HRESULT_FROM_WIN32(GetLastError()), "OpenProcess w/e: ");
-      }
-
-      continue;
-    }
-
-    HMODULE hMod[1];
-    DWORD cbNeeded;
-    if (!EnumProcessModules(process, hMod, sizeof(hMod), &cbNeeded)) {
-      if (GetLastError() != ERROR_ACCESS_DENIED &&
-          GetLastError() != ERROR_PARTIAL_COPY) {
-        FailedUI(HRESULT_FROM_WIN32(GetLastError()),
-                 "EnumProcessModules w/e: ");
-      }
-
-      continue;
-    }
-
-    char processName[1024];
-    DWORD nChars = GetModuleBaseName(process, hMod[0], processName,
-                                     ARRAYSIZE(processName));
-    if (nChars >= sizeof(processName)) {
-      if (GetLastError() != ERROR_ACCESS_DENIED)
-        FailedUI(HRESULT_FROM_WIN32(GetLastError()), "GetModuleBaseName w/e: ");
-
-      continue;
-    }
-
-    if (strcmp(processName, "smp.exe") == 0) {
-      OutputDebugString("[log] >>> KILLING SMP.EXE.\n");
-
-      TerminateProcess(process, 0);
-    }
-
-    if (!CloseHandle(process)) {
-      FailedUI(HRESULT_FROM_WIN32(GetLastError()), "CloseHandle w/e: ");
-
-      continue;
-    }
-  }
-}
-
 std::vector<std::string> ParseCommandLine(const char *cmdline) {
   std::vector<std::string> params{""};
 
@@ -637,15 +573,15 @@ std::vector<std::string> ParseCommandLine(const char *cmdline) {
   return params;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-int WINAPI _tWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE,
-                     _In_ LPTSTR cmd_line, _In_ int) {
-  if (!cmd_line || *cmd_line == '\0') return 0;
+int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE,
+                   _In_ LPSTR cmd_line, _In_ int) {
+  if (*cmd_line == '\0') {
+    FailedUI(HRESULT_FROM_WIN32(ERROR_INVALID_COMMAND_LINE),
+             "Sorry, you need to pass media file to play.\n");
+    return ERROR_INVALID_COMMAND_LINE;
+  }
 
   g_hInstance = instance;
-
-  KillOtherSMPs();
 
   std::vector<std::string> params = ParseCommandLine(cmd_line);
   for (auto &p : params) {
