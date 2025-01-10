@@ -3,6 +3,7 @@
 #include "stdafx.h"
 
 #include "steam_wmp_host.h"
+#include "steam_wmp_event.h"
 
 #include <comdef.h>
 #include <commctrl.h>
@@ -13,25 +14,13 @@
 #include <strstream>
 #include <fstream>
 
-#include "IceKey.h"
-
-CComModule atl_com;
-
 BEGIN_OBJECT_MAP(ObjectMap)
 END_OBJECT_MAP()
 
-#define ID_SKIP_FADE_TIMER 1
-#define ID_DRAW_TIMER 2
+namespace {
 
-constexpr inline double FADE_TIME{1.0};
-constexpr inline int MAX_BLUR_STEPS{100};
-
-HINSTANCE g_hInstance;
-HWND g_hBlackFadingWindow = nullptr;
 bool g_bFadeIn = true;
-bool g_bFrameCreated = false;
-SteamWmpHost g_frame;
-SteamWmpHost *g_pFrame = nullptr;
+
 HDC g_hdcCapture = nullptr;
 HDC g_hdcBlend = nullptr;
 HBITMAP g_hbmCapture = nullptr;
@@ -46,178 +35,80 @@ std::string g_URL;
 double g_timeAtFadeStart = 0.0;
 int g_nBlurSteps = 0;
 
-void LogPlayerEvent(EventType_t e);
+constexpr inline DWORD ID_SKIP_FADE_TIMER = 1;
+constexpr inline DWORD ID_DRAW_TIMER = 2;
 
-DWORD g_dwUseVMROverlayOldValue = 0;
-bool g_bUseVMROverlayValueExists = false;
+constexpr inline double FADE_TIME{1.0};
+constexpr inline int MAX_BLUR_STEPS{100};
 
-void SetRegistryValue(const char *pKeyName, const char *value_name, DWORD value,
-                      DWORD &old_value, bool &value_exists) {
-  HKEY key{nullptr};
-  LONG rc{RegCreateKeyEx(HKEY_CURRENT_USER, pKeyName, 0, nullptr,
-                         REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &key,
-                         nullptr)};
-  if (rc != ERROR_SUCCESS) {
-    FailedUI(HRESULT_FROM_WIN32(GetLastError()),
-             "Unable to open registry key: ");
-    OutputDebugString(pKeyName);
-    OutputDebugString("\n");
-    return;
-  }
+CComModule atl_com;
 
-  DWORD type{0};
-  DWORD size{sizeof(old_value)};
+size_t g_nTimingIndex = 0;
+double g_timings[65536];
 
-  // amusingly enough, if pValueName doesn't exist, RegQueryValueEx returns
-  // ERROR_FILE_NOT_FOUND
-  rc = RegQueryValueEx(key, value_name, nullptr, &type, (LPBYTE)&old_value,
-                       &size);
+const char *GetEventName(se::smp::SmpPlayerEvent event) {
+  using namespace se::smp;
 
-  value_exists = rc == ERROR_SUCCESS;
-
-  rc = RegSetValueEx(key, value_name, 0, REG_DWORD, (CONST BYTE *)&value,
-                     sizeof(value));
-  if (rc != ERROR_SUCCESS) {
-    FailedUI(HRESULT_FROM_WIN32(GetLastError()),
-             "Unable to write registry value ");
-    OutputDebugString(value_name);
-    OutputDebugString(" in key ");
-    OutputDebugString(pKeyName);
-    OutputDebugString("\n");
-  }
-
-  RegCloseKey(key);
-}
-
-void RestoreRegistryValue(const char *pKeyName, const char *pValueName,
-                          DWORD dwOldValue, bool bValueExisted) {
-  HKEY key{nullptr};
-  LONG rc{RegCreateKeyEx(HKEY_CURRENT_USER, pKeyName, 0, nullptr,
-                         REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &key,
-                         nullptr)};
-  if (rc != ERROR_SUCCESS) {
-    FailedUI(HRESULT_FROM_WIN32(GetLastError()),
-             "Unable to open registry key: ");
-    OutputDebugString(pKeyName);
-    OutputDebugString("\n");
-    return;
-  }
-
-  if (bValueExisted) {
-    rc = RegSetValueEx(key, pValueName, 0, REG_DWORD, (CONST BYTE *)&dwOldValue,
-                       sizeof(dwOldValue));
-  } else {
-    rc = RegDeleteValue(key, pValueName);
-  }
-
-  if (rc != ERROR_SUCCESS) {
-    FailedUI(HRESULT_FROM_WIN32(GetLastError()), "SetRegistryValue w/e: ");
-  }
-
-  RegCloseKey(key);
-}
-
-bool GetRegistryString(const char *pKeyName, const char *pValueName,
-                       const char *pValueString, int nValueLen) {
-  HKEY key{nullptr};
-  LONG rc{RegCreateKeyEx(HKEY_CURRENT_USER, pKeyName, 0, nullptr,
-                         REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &key,
-                         nullptr)};
-  if (rc != ERROR_SUCCESS) {
-    FailedUI(HRESULT_FROM_WIN32(GetLastError()),
-             "Unable to open registry key: ");
-    OutputDebugString(pKeyName);
-    OutputDebugString("\n");
-    return false;
-  }
-
-  DWORD dwType = 0;
-  rc = RegQueryValueEx(key, pValueName, nullptr, &dwType, (LPBYTE)pValueString,
-                       (DWORD *)&nValueLen);
-
-  RegCloseKey(key);
-
-  if (rc != ERROR_SUCCESS || dwType != REG_SZ) {
-    FailedUI(HRESULT_FROM_WIN32(GetLastError()),
-             "Unable to read registry string: ");
-    OutputDebugString(pValueName);
-    OutputDebugString("\n");
-    return false;
-  }
-
-  return true;
-}
-
-struct EventData_t {
-  EventData_t(ULONGLONG t, double pos, EventType_t e)
-      : time(t), position(pos), event(e) {}
-
-  ULONGLONG time;     // real time
-  double position;    // movie position
-  EventType_t event;  // event type
-};
-
-const char *GetEventName(EventType_t event) {
   switch (event) {
-    case EventType_t::ET_APPLAUNCH:
+    case SmpPlayerEvent::AppLaunch:
       return "App Launch";
-    case EventType_t::ET_APPEXIT:
+    case SmpPlayerEvent::AppExit:
       return "App Exit";
-    case EventType_t::ET_CLOSE:
+    case SmpPlayerEvent::AppClose:
       return "Close";
-    case EventType_t::ET_FADEOUT:
+    case SmpPlayerEvent::FadeOut:
       return "Fade Out";
 
-    case EventType_t::ET_MEDIABEGIN:
+    case SmpPlayerEvent::BeginMedia:
       return "Media Begin";
-    case EventType_t::ET_MEDIAEND:
+    case SmpPlayerEvent::EndMedia:
       return "Media End";
 
-    case EventType_t::ET_JUMPHOME:
+    case SmpPlayerEvent::Jump2Home:
       return "Jump Home";
-    case EventType_t::ET_JUMPEND:
+    case SmpPlayerEvent::Jump2End:
       return "Jump End";
 
-    case EventType_t::ET_BUFFERING:
+    case SmpPlayerEvent::Buffering:
       return "Buffering";
-    case EventType_t::ET_WAITING:
+    case SmpPlayerEvent::Waiting:
       return "Waiting";
-    case EventType_t::ET_TRANSITIONING:
+    case SmpPlayerEvent::Transitioning:
       return "Transitioning";
-    case EventType_t::ET_READY:
+    case SmpPlayerEvent::Ready:
       return "Ready";
-    case EventType_t::ET_RECONNECTING:
+    case SmpPlayerEvent::Reconnecting:
       return "Reconnecting";
 
-    case EventType_t::ET_PLAY:
+    case SmpPlayerEvent::Play:
       return "Play";
-    case EventType_t::ET_PAUSE:
+    case SmpPlayerEvent::Pause:
       return "Pause";
-    case EventType_t::ET_STOP:
+    case SmpPlayerEvent::Stop:
       return "Stop";
-    case EventType_t::ET_SCRUBFROM:
+    case SmpPlayerEvent::ScrubFrom:
       return "Scrub From";
-    case EventType_t::ET_SCRUBTO:
+    case SmpPlayerEvent::ScrubTo:
       return "Scrub To";
-    case EventType_t::ET_STEPFWD:
+    case SmpPlayerEvent::StepForward:
       return "Step Forward";
-    case EventType_t::ET_STEPBCK:
+    case SmpPlayerEvent::StepBack:
       return "Step Back";
-    case EventType_t::ET_JUMPFWD:
+    case SmpPlayerEvent::JumpFroward:
       return "Jump Forward";
-    case EventType_t::ET_JUMPBCK:
+    case SmpPlayerEvent::JumpBack:
       return "Jump Back";
-    case EventType_t::ET_REPEAT:
+    case SmpPlayerEvent::Repeat:
       return "Repeat";
 
-    case EventType_t::ET_MAXIMIZE:
+    case SmpPlayerEvent::Maximize:
       return "Maximize Window";
-    case EventType_t::ET_MINIMIZE:
+    case SmpPlayerEvent::Minimize:
       return "Minimize Window";
-    case EventType_t::ET_RESTORE:
+    case SmpPlayerEvent::Restore:
       return "Restore Window";
 
-    case EventType_t::ET_ERROR:
+    case SmpPlayerEvent::Error:
       return "Dispatcher Error";
 
     default:
@@ -225,78 +116,56 @@ const char *GetEventName(EventType_t event) {
   }
 }
 
-std::vector<EventData_t> g_events;
+}  // namespace
 
-void LogPlayerEvent(EventType_t e, double pos) {
+namespace se::smp {
+
+HWND g_hBlackFadingWindow = nullptr;
+bool g_bFrameCreated = false;
+SteamWmpHost g_frame;
+SteamWmpHost *g_pFrame = nullptr;
+
+void LogPlayerEvent(SmpPlayerEvent e);
+
+void LogPlayerEvent(SmpPlayerEvent e, double pos) {
   static ULONGLONG first_tick_ms{GetTickCount64()};
   ULONGLONG time_ms{GetTickCount64() - first_tick_ms};
 
   char msg[256];
-  sprintf_s(msg, "[log] Event '%s' at time %.3fs and pos %d.\n",
-            GetEventName(e), time_ms / 1000.f, int(1000 * pos));
+  sprintf_s(msg, "[log] Event '%s' at time %.3fs and pos %f.\n",
+            GetEventName(e), time_ms / 1000.f, 1000 * pos);
   OutputDebugString(msg);
+}
 
-  bool should_drop_event = false;
+bool ShowFadeWindow(bool bShow) {
+  if (bShow) {
+    g_timeAtFadeStart = 0.0;
+    g_bFadeIn = false;
 
-  const size_t events_count = g_events.size();
-  if ((e == EventType_t::ET_STEPFWD || e == EventType_t::ET_STEPBCK) &&
-      events_count >= 2) {
-    const EventData_t &e1 = g_events[events_count - 1];
-    const EventData_t &e2 = g_events[events_count - 2];
+    ::SetTimer(g_hBlackFadingWindow, ID_DRAW_TIMER, 10, nullptr);
 
-    if ((e1.event == e || e1.event == EventType_t::ET_REPEAT) &&
-        e2.event == e) {
-      // only store starting and ending stepfwd or stepbck events, since there
-      // can be so many also keep events that are more than a second apart
-      if (e1.event == EventType_t::ET_REPEAT) {
-        // keep dropping events while e1 isn't before a gap
-        should_drop_event = time_ms - e1.time < 1000;
-      } else {
-        // e2 was kept last time, so keep e1 if e2 was kept because it was
-        // before a gap
-        should_drop_event = e1.time - e2.time < 1000;
-      }
-    }
-  }
+    if (se::smp::g_pFrame) se::smp::g_pFrame->ShowWindow(SW_HIDE);
 
-  if (should_drop_event) {
-    g_events[events_count - 1] =
-        EventData_t{time_ms, pos, EventType_t::ET_REPEAT};
+    ::SetWindowPos(g_hBlackFadingWindow, HWND_TOPMOST, 0, 0, 0, 0,
+                   SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+    ::InvalidateRect(g_hBlackFadingWindow, nullptr, TRUE);
   } else {
-    g_events.emplace_back(time_ms, pos, e);
+    ::SetWindowPos(g_hBlackFadingWindow, HWND_BOTTOM, 0, 0, 0, 0,
+                   SWP_NOREDRAW | SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW |
+                       SWP_NOACTIVATE | SWP_DEFERERASE);
   }
+
+  return true;
 }
 
-void PrintStats(const char *file_path, const std::string &url) {
-  std::ofstream os(file_path, std::ios_base::out | std::ios_base::binary);
+}  // namespace se::smp
 
-  size_t offset = url.find_last_of("/\\");
-  if (offset == url.npos) offset = 0;
-
-  // filename
-  os << url.substr(offset + 1) << '\n';
-
-  // number of events
-  os << g_events.size() << "\n";
-
-  // event data (tab-delimited)
-  for (auto &e : g_events) {
-    os << GetEventName(e.event) << "\t" << e.time << "\t"
-       << int(1000 * e.position) << "\n";
-  }
-}
-
-void RestoreRegistry() {
-  RestoreRegistryValue(
-      "Software\\Microsoft\\MediaPlayer\\Preferences\\VideoSettings",
-      "UseVMROverlay", g_dwUseVMROverlayOldValue, g_bUseVMROverlayValueExists);
-}
-
-int g_nTimingIndex = 0;
-double g_timings[65536];
+namespace {
 
 LRESULT CALLBACK SnmpWindowProc(HWND hWnd, UINT msg, WPARAM wparam,
                                 LPARAM lparam) {
+  using namespace se::smp;
+
   switch (msg) {
     case WM_CREATE: {
       g_timeAtFadeStart = 0.0;
@@ -347,7 +216,7 @@ LRESULT CALLBACK SnmpWindowProc(HWND hWnd, UINT msg, WPARAM wparam,
         LARGE_INTEGER time;
         QueryPerformanceCounter(&time);
 
-        g_timings[g_nTimingIndex++] =
+        g_timings[g_nTimingIndex++ % ARRAYSIZE(g_timings)] =
             time.QuadPart / double(s_nPerformanceFrequency.QuadPart);
         double dt = time.QuadPart / double(s_nPerformanceFrequency.QuadPart -
                                            g_timeAtFadeStart);
@@ -399,10 +268,12 @@ LRESULT CALLBACK SnmpWindowProc(HWND hWnd, UINT msg, WPARAM wparam,
           g_pFrame->GetWndClassInfo().m_wc.hIcon = LoadIcon(
               atl_com.GetResourceInstance(), MAKEINTRESOURCE(SRC_IDI_APP_MAIN));
 
-          RECT rcPos = {CW_USEDEFAULT, 0, 0, 0};
+          RECT rect = {CW_USEDEFAULT, 0, 0, 0};
 
-          g_pFrame->Create(::GetDesktopWindow(), rcPos,
-                           _T( "Steam Media Player" ),
+          char title[MAX_PATH * 2];
+          sprintf_s(title, "Steam Media Player - %s", g_URL.c_str());
+
+          g_pFrame->Create(::GetDesktopWindow(), rect, title,
                            WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, (UINT)0);
           g_pFrame->ShowWindow(SW_SHOW);
         }
@@ -433,29 +304,9 @@ LRESULT CALLBACK SnmpWindowProc(HWND hWnd, UINT msg, WPARAM wparam,
   return DefWindowProc(hWnd, msg, wparam, lparam);
 }
 
-bool ShowFadeWindow(bool bShow) {
-  if (bShow) {
-    g_timeAtFadeStart = 0.0;
-    g_bFadeIn = false;
-
-    ::SetTimer(g_hBlackFadingWindow, ID_DRAW_TIMER, 10, nullptr);
-
-    if (g_pFrame) g_pFrame->ShowWindow(SW_HIDE);
-
-    ::SetWindowPos(g_hBlackFadingWindow, HWND_TOPMOST, 0, 0, 0, 0,
-                   SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-    ::InvalidateRect(g_hBlackFadingWindow, nullptr, TRUE);
-  } else {
-    ::SetWindowPos(g_hBlackFadingWindow, HWND_BOTTOM, 0, 0, 0, 0,
-                   SWP_NOREDRAW | SWP_NOMOVE | SWP_NOSIZE | SWP_HIDEWINDOW |
-                       SWP_NOACTIVATE | SWP_DEFERERASE);
-  }
-
-  return true;
-}
-
-HWND CreateFullscreenWindow(bool bFadeIn, const std::string &url) {
-  if (g_hBlackFadingWindow) return g_hBlackFadingWindow;
+HWND CreateFullscreenWindow(HINSTANCE instance, HMONITOR monitor, bool bFadeIn,
+                            const std::string &url) {
+  if (se::smp::g_hBlackFadingWindow) return se::smp::g_hBlackFadingWindow;
 
   static bool s_bRegistered = false;
 
@@ -467,7 +318,7 @@ HWND CreateFullscreenWindow(bool bFadeIn, const std::string &url) {
     wc.lpfnWndProc = SnmpWindowProc;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
-    wc.hInstance = g_hInstance;
+    wc.hInstance = instance;
     wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     wc.hCursor = nullptr;
     wc.hbrBackground = nullptr;
@@ -482,7 +333,7 @@ HWND CreateFullscreenWindow(bool bFadeIn, const std::string &url) {
 
   MONITORINFO mi = {};
   mi.cbSize = sizeof(mi);
-  if (!GetMonitorInfo(g_hMonitor, &mi)) {
+  if (!GetMonitorInfo(monitor, &mi)) {
     GetClientRect(::GetDesktopWindow(), &mi.rcMonitor);
   }
 
@@ -492,22 +343,22 @@ HWND CreateFullscreenWindow(bool bFadeIn, const std::string &url) {
   constexpr DWORD windowStyle =
       WS_POPUP | WS_MAXIMIZE | WS_EX_TOPMOST | WS_VISIBLE;
 
-  g_hBlackFadingWindow =
+  se::smp::g_hBlackFadingWindow =
       CreateWindow(wnd_class_name, title, windowStyle, mi.rcMonitor.left,
                    mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
                    mi.rcMonitor.bottom - mi.rcMonitor.top, nullptr, nullptr,
-                   g_hInstance, nullptr);
-  ShowWindow(g_hBlackFadingWindow, SW_SHOWMAXIMIZED);
+                   instance, nullptr);
+  ShowWindow(se::smp::g_hBlackFadingWindow, SW_SHOWMAXIMIZED);
 
   while (ShowCursor(FALSE) >= 0);
 
-  return g_hBlackFadingWindow;
+  return se::smp::g_hBlackFadingWindow;
 }
 
-bool CreateDesktopBitmaps() {
+bool CreateDesktopBitmaps(HMONITOR monitor) {
   MONITORINFOEX mi = {};
   mi.cbSize = sizeof(mi);
-  if (!GetMonitorInfo(g_hMonitor, &mi)) return false;
+  if (!GetMonitorInfo(monitor, &mi)) return false;
 
   g_screenWidth = mi.rcMonitor.right - mi.rcMonitor.left;
   g_screenHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
@@ -548,94 +399,243 @@ bool CreateDesktopBitmaps() {
   const bool rc = !!BitBlt(g_hdcCapture, 0, 0, g_screenWidth, g_screenHeight,
                            dc_screen, 0, 0, SRCCOPY);
 
-  SelectObject(g_hdcCapture, old_capture);
   SelectObject(g_hdcBlend, old_blend);
+  SelectObject(g_hdcCapture, old_capture);
 
   return rc;
 }
 
-std::vector<std::string> ParseCommandLine(const char *cmdline) {
-  std::vector<std::string> params{""};
+std::vector<std::string> ParseCommandLine(const char *cmd_line) {
+  std::vector<std::string> args{""};
 
-  bool quoted = false;
-  for (const char *cp = cmdline; *cp; ++cp) {
+  bool quoted{false};
+  for (const auto *cp = cmd_line; *cp; ++cp) {
     if (*cp == '\"') {
       quoted = !quoted;
     } else if (isspace(*cp) && !quoted) {
-      if (!params.back().empty()) params.emplace_back("");
+      if (!args.back().empty()) args.emplace_back("");
     } else {
-      params.back().push_back(*cp);
+      args.back().push_back(*cp);
     }
   }
 
-  if (params.back().empty()) params.pop_back();
+  if (args.back().empty()) args.pop_back();
 
-  return params;
+  return args;
 }
+
+class ScopedShowCursor {
+ public:
+  /**
+   * @brief Creates scoped cursor.
+   * @param should_show Show cursor or not?
+   */
+  explicit ScopedShowCursor(bool should_show) noexcept
+      : should_show_{should_show} {
+    ::ShowCursor(should_show ? TRUE : FALSE);
+  }
+
+  ScopedShowCursor(ScopedShowCursor &) = delete;
+  ScopedShowCursor(ScopedShowCursor &&) = delete;
+  ScopedShowCursor &operator=(ScopedShowCursor &) = delete;
+  ScopedShowCursor &operator=(ScopedShowCursor &&) = delete;
+
+  ~ScopedShowCursor() noexcept { ::ShowCursor(should_show_ ? FALSE : TRUE); }
+
+ private:
+  const bool should_show_;
+};
+
+class ScopedRegistryValue {
+ public:
+  ScopedRegistryValue(HKEY root, const char *key_name, const char *value_name,
+                      DWORD value) noexcept
+      : root_{root}, key_name_{key_name}, value_name_{value_name} {
+    rc_ = SetRegistryValue(root, key_name, value_name, value, old_value_,
+                           value_exists_);
+  }
+
+  ScopedRegistryValue(ScopedRegistryValue &) = delete;
+  ScopedRegistryValue(ScopedRegistryValue &&) = delete;
+  ScopedRegistryValue &operator=(ScopedRegistryValue &) = delete;
+  ScopedRegistryValue &operator=(ScopedRegistryValue &&) = delete;
+
+  ~ScopedRegistryValue() noexcept {
+    if (rc_ == ERROR_SUCCESS) {
+      RestoreRegistryValue(root_, key_name_, value_name_, old_value_,
+                           value_exists_);
+    }
+  }
+
+ private:
+  static LONG SetRegistryValue(HKEY root, const char *key_name,
+                               const char *value_name, DWORD value,
+                               DWORD &old_value, bool &value_exists) {
+    HKEY key{nullptr};
+    LONG rc{RegCreateKeyEx(root, key_name, 0, nullptr, REG_OPTION_NON_VOLATILE,
+                           KEY_ALL_ACCESS, nullptr, &key, nullptr)};
+    if (rc != ERROR_SUCCESS) {
+      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+                        "Unable to open registry key: ");
+      OutputDebugString(key_name);
+      OutputDebugString("\n");
+      return rc;
+    }
+
+    DWORD type{0};
+    DWORD size{sizeof(old_value)};
+
+    // amusingly enough, if value_name doesn't exist, RegQueryValueEx returns
+    // ERROR_FILE_NOT_FOUND
+    rc = RegQueryValueEx(key, value_name, nullptr, &type, (LPBYTE)&old_value,
+                         &size);
+
+    value_exists = rc == ERROR_SUCCESS;
+
+    rc = RegSetValueEx(key, value_name, 0, REG_DWORD, (CONST BYTE *)&value,
+                       sizeof(value));
+    if (rc != ERROR_SUCCESS) {
+      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+                        "Unable to write registry value: ");
+
+      OutputDebugString(value_name);
+      OutputDebugString(" in key ");
+      OutputDebugString(key_name);
+      OutputDebugString("\n");
+    }
+
+    if (RegCloseKey(key) != ERROR_SUCCESS) {
+      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+                        "Unable to close registry key: ");
+    }
+
+    return rc;
+  }
+
+  static LONG RestoreRegistryValue(HKEY root, const char *key_name,
+                                   const char *value_name, DWORD old_value,
+                                   bool value_exists) {
+    HKEY key{nullptr};
+    LONG rc{RegCreateKeyEx(root, key_name, 0, nullptr, REG_OPTION_NON_VOLATILE,
+                           KEY_ALL_ACCESS, nullptr, &key, nullptr)};
+    if (rc != ERROR_SUCCESS) {
+      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+                        "Unable to open registry key: ");
+
+      OutputDebugString(key_name);
+      OutputDebugString("\n");
+      return rc;
+    }
+
+    if (value_exists) {
+      rc = RegSetValueEx(key, value_name, 0, REG_DWORD,
+                         (CONST BYTE *)&old_value, sizeof(old_value));
+      if (rc != ERROR_SUCCESS) {
+        se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+                          "RegSetValueEx w/e: ");
+      }
+    } else {
+      rc = RegDeleteValue(key, value_name);
+      if (rc != ERROR_SUCCESS) {
+        se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+                          "RegDeleteValue w/e: ");
+      }
+    }
+
+    if (RegCloseKey(key) != ERROR_SUCCESS) {
+      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+                        "Unable to close registry key: ");
+    }
+
+    return rc;
+  }
+
+  HKEY root_;
+  const char *key_name_;
+  const char *value_name_;
+
+  DWORD old_value_;
+  bool value_exists_;
+
+  LONG rc_;
+};
+
+}  // namespace
 
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE,
                    _In_ LPSTR cmd_line, _In_ int) {
+  using namespace se::smp;
+
   if (*cmd_line == '\0') {
     FailedUI(HRESULT_FROM_WIN32(ERROR_INVALID_COMMAND_LINE),
-             "Sorry, you need to pass media file to play.\n");
+             "Sorry, there is no media to play.\n\nPlease pass "
+             "enclosed in double quotes media file path or URL.");
     return ERROR_INVALID_COMMAND_LINE;
   }
 
-  g_hInstance = instance;
-
-  std::vector<std::string> params = ParseCommandLine(cmd_line);
-  for (auto &p : params) {
-    if (p[0] != '-' && p[0] != '/') g_URL = p;
+  std::vector<std::string> args{ParseCommandLine(cmd_line)};
+  if (args.size() != 1) {
+    FailedUI(HRESULT_FROM_WIN32(ERROR_INVALID_COMMAND_LINE),
+             "Sorry, there is more than one media to play.\n\nPlease pass "
+             "enclosed in double quotes media file path or URL.");
+    return ERROR_INVALID_COMMAND_LINE;
   }
 
-  SetRegistryValue(
+  LogPlayerEvent(SmpPlayerEvent::AppLaunch, 0.0);
+
+  const ScopedRegistryValue scoped_registry_value{
+      HKEY_CURRENT_USER,
       "Software\\Microsoft\\MediaPlayer\\Preferences\\VideoSettings",
-      "UseVMROverlay", 0, g_dwUseVMROverlayOldValue,
-      g_bUseVMROverlayValueExists);
-  atexit(RestoreRegistry);
+      "UseVMROverlay", 0};
 
-  LogPlayerEvent(EventType_t::ET_APPLAUNCH, 0.0);
-
+  g_URL = args[0];
   cmd_line = GetCommandLine();  // this line necessary for _ATL_MIN_CRT
 
   if (FailedUI(
           CoInitializeEx(0, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
                                 COINIT_SPEED_OVER_MEMORY),
-          "Failed to initialize COM.")) {
+          "Sorry, Component Object Model library failed to "
+          "initialize.\n\nPlease, contact the publisher for further help.")) {
     return 1;
   }
 
-  if (FailedUI(atl_com.Init(ObjectMap, instance, &LIBID_ATLLib),
-               "Failed to initialize COM module.")) {
+  if (FailedUI(
+          atl_com.Init(ObjectMap, instance, &LIBID_ATLLib),
+          "Sorry, Component Object Model module failed to "
+          "initialize.\n\nPlease, contact the publisher for further help.")) {
     return 2;
   }
 
   POINT pt;
   GetCursorPos(&pt);
-  g_hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
 
-  if (!CreateDesktopBitmaps()) {
+  HMONITOR monitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+  assert(monitor);
+
+  if (!CreateDesktopBitmaps(monitor)) {
     OutputDebugString("[log] CreateDesktopBitmaps FAILED!\n");
   }
 
-  if (!CreateFullscreenWindow(true, g_URL)) {
+  g_hMonitor = monitor;
+
+  if (!CreateFullscreenWindow(instance, monitor, true, g_URL)) {
     MessageBox(nullptr, "Unable to create Steam Media Player window.\n",
                "Steam Media Player - Error", MB_OK | MB_ICONERROR);
     return 3;
   }
 
-  ShowCursor(FALSE);
-
   MSG msg = {};
-  while (GetMessage(&msg, 0, 0, 0)) {
-    TranslateMessage(&msg);
+  {
+    const ScopedShowCursor scoped_show_cursor{false};
 
-    DispatchMessage(&msg);
+    while (GetMessage(&msg, 0, 0, 0)) {
+      TranslateMessage(&msg);
+
+      DispatchMessage(&msg);
+    }
   }
 
-  ShowCursor(TRUE);
-
-  LogPlayerEvent(EventType_t::ET_APPEXIT);
+  LogPlayerEvent(SmpPlayerEvent::AppExit);
 
   atl_com.Term();
   CoUninitialize();

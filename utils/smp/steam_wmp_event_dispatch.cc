@@ -5,22 +5,23 @@
 #include <comdef.h>
 
 #include "steam_wmp_host.h"
+#include "steam_wmp_event.h"
 
-extern HWND g_hBlackFadingWindow;
+namespace se::smp {
+
 extern CComPtr<IWMPPlayer> g_spWMPPlayer;
 extern SteamWmpHost* g_pFrame;
-extern double g_timeAtFadeStart;
-extern bool g_bFadeIn;
+extern HWND g_hBlackFadingWindow;
 
 bool g_bFadeWindowTriggered = false;
 
+bool ShowFadeWindow(bool bShow);
+
 bool IsFullScreen();
 bool SetFullScreen(bool bWantToBeFullscreen);
-bool IsVideoPlaying();
-void PlayVideo(bool bPlay);
-bool ShowFadeWindow(bool bShow);
-void LogPlayerEvent(EventType_t e, double pos);
-void LogPlayerEvent(EventType_t e);
+
+void LogPlayerEvent(SmpPlayerEvent e);
+void LogPlayerEvent(SmpPlayerEvent e, double pos);
 
 HRESULT SteamWmpEventDispatch::Invoke(DISPID dispIdMember, REFIID, LCID, WORD,
                                       DISPPARAMS FAR* pDispParams, VARIANT FAR*,
@@ -265,23 +266,23 @@ void SteamWmpEventDispatch::PlayStateChange(long NewState) {
                 "Failed to get WMP play state.")) {
     switch (playstate) {
       case wmppsBuffering:
-        LogPlayerEvent(EventType_t::ET_BUFFERING);
+        LogPlayerEvent(SmpPlayerEvent::Buffering);
         break;
 
       case wmppsWaiting:
-        LogPlayerEvent(EventType_t::ET_WAITING);
+        LogPlayerEvent(SmpPlayerEvent::Waiting);
         break;
 
       case wmppsTransitioning:
-        LogPlayerEvent(EventType_t::ET_TRANSITIONING);
+        LogPlayerEvent(SmpPlayerEvent::Transitioning);
         break;
 
       case wmppsReady:
-        LogPlayerEvent(EventType_t::ET_READY);
+        LogPlayerEvent(SmpPlayerEvent::Ready);
         break;
 
       case wmppsReconnecting:
-        LogPlayerEvent(EventType_t::ET_RECONNECTING);
+        LogPlayerEvent(SmpPlayerEvent::Reconnecting);
         break;
 
       case wmppsPlaying: {
@@ -289,26 +290,26 @@ void SteamWmpEventDispatch::PlayStateChange(long NewState) {
         if (s_first) {
           s_first = false;
 
-          LogPlayerEvent(EventType_t::ET_MEDIABEGIN);
+          LogPlayerEvent(SmpPlayerEvent::BeginMedia);
 
           SetFullScreen(true);
           ShowFadeWindow(false);
         } else {
-          LogPlayerEvent(EventType_t::ET_PLAY);
+          LogPlayerEvent(SmpPlayerEvent::Play);
         }
         break;
       }
 
       case wmppsPaused:
-        LogPlayerEvent(EventType_t::ET_PAUSE);
+        LogPlayerEvent(SmpPlayerEvent::Pause);
         break;
 
       case wmppsStopped:
-        LogPlayerEvent(EventType_t::ET_STOP);
+        LogPlayerEvent(SmpPlayerEvent::Stop);
         break;
 
       case wmppsMediaEnded:
-        LogPlayerEvent(EventType_t::ET_MEDIAEND);
+        LogPlayerEvent(SmpPlayerEvent::EndMedia);
 
         if (IsFullScreen() && !g_bFadeWindowTriggered) {
           g_bFadeWindowTriggered = true;
@@ -339,7 +340,7 @@ void SteamWmpEventDispatch::Buffering(VARIANT_BOOL Start) {}
 
 // Sent when the control has an error condition
 void SteamWmpEventDispatch::Error() {
-  LogPlayerEvent(EventType_t::ET_ERROR, 0.0);
+  LogPlayerEvent(SmpPlayerEvent::Error, 0.0);
 }
 
 // Sent when the control has an warning condition (obsolete)
@@ -352,8 +353,8 @@ void SteamWmpEventDispatch::EndOfStream(long Result) {}
 // Indicates that the current position of the movie has changed
 void SteamWmpEventDispatch::PositionChange(double oldPosition,
                                            double newPosition) {
-  LogPlayerEvent(EventType_t::ET_SCRUBFROM, (float)oldPosition);
-  LogPlayerEvent(EventType_t::ET_SCRUBTO, (float)newPosition);
+  LogPlayerEvent(SmpPlayerEvent::ScrubFrom, (float)oldPosition);
+  LogPlayerEvent(SmpPlayerEvent::ScrubTo, (float)newPosition);
 }
 
 // Sent when a marker is reached
@@ -516,3 +517,5 @@ void SteamWmpEventDispatch::MouseMove(short nButton, short nShiftState, long fX,
 // Occurs when a mouse button is released
 void SteamWmpEventDispatch::MouseUp(short nButton, short nShiftState, long fX,
                                     long fY) {}
+
+}  // namespace se::smp

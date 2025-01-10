@@ -11,6 +11,8 @@
 #include "steam_wmp_event_dispatch.h"
 #include "resource.h"
 
+namespace se::smp {
+
 class SteamWmpHost
     : public CWindowImpl<
           SteamWmpHost, CWindow,
@@ -55,7 +57,7 @@ class SteamWmpHost
   LRESULT OnVideoScale(WORD wNotifyCode, WORD wID, HWND hWndCtl,
                        BOOL& bHandled);
 
-  void SetUrl(const std::string &url);
+  void SetUrl(const std::string& url);
 
   CAxWindow m_wndView;
   CComPtr<IConnectionPoint> m_spConnectionPoint;
@@ -64,43 +66,6 @@ class SteamWmpHost
   std::string m_url;
 };
 
-// event logging - this should really be in its own smp.h or something...
-enum class EventType_t {
-  ET_APPLAUNCH,
-  ET_APPEXIT,
-  ET_CLOSE,
-  ET_FADEOUT,
-
-  ET_MEDIABEGIN,
-  ET_MEDIAEND,
-
-  ET_JUMPHOME,
-  ET_JUMPEND,
-
-  ET_BUFFERING,
-  ET_WAITING,
-  ET_TRANSITIONING,
-  ET_READY,
-  ET_RECONNECTING,
-
-  ET_PLAY,
-  ET_PAUSE,
-  ET_STOP,
-  ET_SCRUBFROM,
-  ET_SCRUBTO,
-  ET_STEPFWD,
-  ET_STEPBCK,
-  ET_JUMPFWD,
-  ET_JUMPBCK,
-  ET_REPEAT,
-
-  ET_MAXIMIZE,
-  ET_MINIMIZE,
-  ET_RESTORE,
-
-  ET_ERROR
-};
-
-bool FailedUI(HRESULT hr, const char* description);
+}  // namespace se::smp
 
 #endif  // !SE_UTILS_SMP_STEAM_WMP_HOST_H_

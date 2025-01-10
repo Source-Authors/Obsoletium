@@ -27,9 +27,6 @@
 #define _ATL_APARTMENT_THREADED
 
 #include <atlbase.h>
-
-extern CComModule atl_com;
-
 #include <atlcom.h>
 #include <atlhost.h>
 #include <atlctl.h>

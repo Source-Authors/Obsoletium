@@ -24,17 +24,11 @@
     <ClCompile Include="steam_wmp_host.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ice_key.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IceKey.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -47,6 +41,9 @@
     <ClInclude Include="steam_wmp_event_dispatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="steam_wmp_event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="smp.ico">
@@ -54,9 +51,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="smp.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
     <ResourceCompile Include="..\..\build\win\resource_scripts\windows_app_base.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>

@@ -3,26 +3,26 @@
 #include "stdafx.h"
 
 #include "steam_wmp_host.h"
+#include "steam_wmp_event.h"
 
 #include <comdef.h>
 
 #include <cassert>
 #include <string>
 
+namespace se::smp {
+
 extern HWND g_hBlackFadingWindow;
-extern SteamWmpHost* g_pFrame;
 extern bool g_bFrameCreated;
-extern double g_timeAtFadeStart;
-extern bool g_bFadeIn;
+extern SteamWmpHost* g_pFrame;
+
 extern bool g_bFadeWindowTriggered;
 
-bool ShowFadeWindow(bool bShow);
-void LogPlayerEvent(EventType_t e, double pos);
-
 CComPtr<IWMPPlayer> g_spWMPPlayer;
-bool g_bWantToBeFullscreen = false;
-bool g_bPlayOnRestore = false;
-int g_desiredVideoScaleMode = ID_STRETCH_TO_FIT;
+
+bool ShowFadeWindow(bool bShow);
+
+void LogPlayerEvent(SmpPlayerEvent e, double pos);
 
 bool FailedUI(HRESULT hr, const char* description) {
   const bool is_failed{FAILED(hr)};
@@ -40,7 +40,19 @@ bool FailedUI(HRESULT hr, const char* description) {
   return is_failed;
 }
 
-void LogPlayerEvent(EventType_t e) {
+}  // namespace se::smp
+
+namespace {
+
+bool g_bWantToBeFullscreen = false;
+bool g_bPlayOnRestore = false;
+int g_desiredVideoScaleMode = ID_STRETCH_TO_FIT;
+
+}  // namespace
+
+namespace se::smp {
+
+void LogPlayerEvent(SmpPlayerEvent e) {
   double dpos = 0.0;
 
   if (g_spWMPPlayer) {
@@ -147,8 +159,8 @@ bool SetFullScreen(bool bWantToBeFullscreen) {
 
   if (!g_spWMPPlayer) return false;
 
-  LogPlayerEvent(bWantToBeFullscreen ? EventType_t::ET_MAXIMIZE
-                                     : EventType_t::ET_RESTORE);
+  LogPlayerEvent(bWantToBeFullscreen ? SmpPlayerEvent::Maximize
+                                     : SmpPlayerEvent::Restore);
 
   bool bIsFullscreen = IsFullScreen();
 
@@ -264,7 +276,7 @@ LRESULT SteamWmpHost::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
   CComPtr<IAxWinHostWindow> spHost;
   CComPtr<IConnectionPointContainer> spConnectionContainer;
-  CComWMPEventDispatch* pEventListener = nullptr;
+  se::smp::CComWMPEventDispatch* pEventListener = nullptr;
   CComPtr<IWMPEvents> spEventListener;
   CComPtr<IWMPSettings> spWMPSettings;
 
@@ -294,8 +306,9 @@ LRESULT SteamWmpHost::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
   // start listening to events
 
-  hr = CComWMPEventDispatch::CreateInstance(&pEventListener);
-  if (FailedUI(hr, "Failed to create WMP Event Dispatcher.")) goto FAILURE;
+  hr = se::smp::CComWMPEventDispatch::CreateInstance(&pEventListener);
+  if (FailedUI(hr, "Failed to create Steam Media Player Event Dispatcher."))
+    goto FAILURE;
 
   spEventListener = pEventListener;
 
@@ -342,7 +355,7 @@ FAILURE:
 
 LRESULT SteamWmpHost::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam,
                               BOOL& bHandled) {
-  LogPlayerEvent(EventType_t::ET_CLOSE);
+  LogPlayerEvent(SmpPlayerEvent::AppClose);
 
   if (m_hPopupMenu) {
     DestroyMenu(m_hPopupMenu);
@@ -396,14 +409,14 @@ LRESULT SteamWmpHost::OnSize(UINT /* uMsg */, WPARAM wParam, LPARAM lParam,
     SetFullScreen(true);
   } else {
     if (wParam == SIZE_MINIMIZED) {
-      LogPlayerEvent(EventType_t::ET_MINIMIZE);
+      LogPlayerEvent(SmpPlayerEvent::Minimize);
 
       if (IsVideoPlaying()) {
         g_bPlayOnRestore = true;
         PlayVideo(false);
       }
     } else if (wParam == SIZE_RESTORED) {
-      LogPlayerEvent(EventType_t::ET_RESTORE);
+      LogPlayerEvent(SmpPlayerEvent::Restore);
     }
 
     RECT rcClient;
@@ -489,8 +502,8 @@ LRESULT SteamWmpHost::OnKeyDown(UINT /* uMsg */, WPARAM wParam,
         break;
       }
 
-      LogPlayerEvent(wParam == VK_LEFT ? EventType_t::ET_STEPBCK
-                                       : EventType_t::ET_STEPFWD);
+      LogPlayerEvent(wParam == VK_LEFT ? SmpPlayerEvent::StepBack
+                                       : SmpPlayerEvent::StepForward);
     } break;
 
     case VK_UP:
@@ -524,8 +537,8 @@ LRESULT SteamWmpHost::OnKeyDown(UINT /* uMsg */, WPARAM wParam,
         }
       }
 
-      LogPlayerEvent(wParam == VK_UP ? EventType_t::ET_JUMPBCK
-                                     : EventType_t::ET_JUMPFWD);
+      LogPlayerEvent(wParam == VK_UP ? SmpPlayerEvent::JumpBack
+                                     : SmpPlayerEvent::JumpFroward);
     } break;
 
     case VK_HOME: {
@@ -550,7 +563,7 @@ LRESULT SteamWmpHost::OnKeyDown(UINT /* uMsg */, WPARAM wParam,
         }
       }
 
-      LogPlayerEvent(EventType_t::ET_JUMPHOME);
+      LogPlayerEvent(SmpPlayerEvent::Jump2Home);
     } break;
 
     case VK_END: {
@@ -586,7 +599,7 @@ LRESULT SteamWmpHost::OnKeyDown(UINT /* uMsg */, WPARAM wParam,
         break;
       }
 
-      LogPlayerEvent(EventType_t::ET_JUMPEND);
+      LogPlayerEvent(SmpPlayerEvent::Jump2End);
     } break;
 
     case VK_ESCAPE:
@@ -601,7 +614,7 @@ LRESULT SteamWmpHost::OnKeyDown(UINT /* uMsg */, WPARAM wParam,
           break;
         }
 
-        LogPlayerEvent(EventType_t::ET_FADEOUT);
+        LogPlayerEvent(SmpPlayerEvent::FadeOut);
 
         g_bFadeWindowTriggered = true;
         ShowFadeWindow(true);
@@ -634,3 +647,5 @@ LRESULT SteamWmpHost::OnVideoScale(WORD wNotifyCode, WORD wID, HWND hWndCtl,
 }
 
 void SteamWmpHost::SetUrl(const std::string& url) { m_url = url; }
+
+}  // namespace se::smp

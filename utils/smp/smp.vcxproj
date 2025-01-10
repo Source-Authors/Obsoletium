@@ -302,7 +302,6 @@ exit 1
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MinSpace</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MinSpace</Optimization>
     </ClCompile>
-    <ClCompile Include="ice_key.cc" />
     <ClCompile Include="main.cc">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
@@ -314,8 +313,8 @@ exit 1
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="steam_wmp_event_dispatch.h" />
+    <ClInclude Include="steam_wmp_event.h" />
     <ClInclude Include="steam_wmp_host.h" />
-    <ClInclude Include="IceKey.H" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
@@ -324,7 +323,6 @@ exit 1
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\build\win\resource_scripts\windows_app_base.rc" />
-    <ResourceCompile Include="smp.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
