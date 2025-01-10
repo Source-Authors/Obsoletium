@@ -599,6 +599,8 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE,
     return 1;
   }
 
+  atexit(CoUninitialize);
+
   if (FailedUI(
           atl_com.Init(ObjectMap, instance, &LIBID_ATLLib),
           "Sorry, Component Object Model module failed to "
@@ -638,7 +640,6 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE,
   LogPlayerEvent(SmpPlayerEvent::AppExit);
 
   atl_com.Term();
-  CoUninitialize();
 
   return static_cast<int>(msg.wParam);
 }
