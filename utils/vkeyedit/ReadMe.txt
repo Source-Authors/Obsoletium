@@ -36,11 +36,11 @@ vkeyedit.clw
     information needed to create and edit message maps and dialog data
     maps and to create prototype member functions.
 
-res\vkeyedit.ico
+resources\vkeyedit.ico
     This is an icon file, which is used as the application's icon.  This
     icon is included by the main resource file vkeyedit.rc.
 
-res\vkeyedit.rc2
+resources\vkeyedit.rc2
     This file contains resources that are not edited by Microsoft 
 	Visual C++.  You should place all resources not editable by
 	the resource editor in this file.
@@ -55,11 +55,11 @@ MainFrm.h, MainFrm.cpp
     These files contain the frame class CMainFrame, which is derived from
     CFrameWnd and controls all SDI frame features.
 
-res\Toolbar.bmp
+resources\Toolbar.bmp
     This bitmap file is used to create tiled images for the toolbar.
     The initial toolbar and status bar are constructed in the CMainFrame
     class. Edit this toolbar bitmap using the resource editor, and
-    update the IDR_MAINFRAME TOOLBAR array in vkeyedit.rc to add
+    update the SRC_IDI_APP_MAIN TOOLBAR array in vkeyedit.rc to add
     toolbar buttons.
 /////////////////////////////////////////////////////////////////////////////
 

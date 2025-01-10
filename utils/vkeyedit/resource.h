@@ -1,17 +1,14 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
+// 
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
 // Used by vkeyedit.rc
 //
 #define IDD_ABOUTBOX                    100
-#define IDR_MAINFRAME                   128
-#define IDR_VKEYEDTYPE                  129
+#define SRC_IDI_APP_MAIN                128
+#define ID_FILE_OPEN_TITLE              129
+
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Valve KeyValue Editor"
 
 // Next default values for new objects
 // 

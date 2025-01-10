@@ -1,15 +1,3 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-// stdafx.cpp : source file that includes just the standard includes
-//	vkeyedit.pch will be the pre-compiled header
-//	stdafx.obj will contain the pre-compiled type information
+// Copyright Valve Corporation, All rights reserved.
 
 #include "stdafx.h"
-
-
-

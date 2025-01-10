@@ -199,7 +199,7 @@ static CAssertDisable* IgnoreAssertsNearby( int nRange )
 }
 
 #if defined( _WIN32 )
-se::windows::ui::CDpiWindowBehavior g_dpi_window_behavior;
+se::windows::ui::CDpiWindowBehavior g_dpi_window_behavior{false};
 
 static INT_PTR CALLBACK AssertDialogProc(
   HWND hDlg,                      // handle to dialog box
