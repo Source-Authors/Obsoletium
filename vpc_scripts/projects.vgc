@@ -1131,11 +1131,6 @@ $Project "unusedcontent"
 	"utils\unusedcontent\unusedcontent.vpc" [$WINDOWS]
 }
 
-$Project "valvelib"
-{
-	"utils\valvelib\valvelib.vpc" [$WINDOWS]
-}
-
 $Project "video_services"
 {
 	"video\video_services.vpc" [$WINDOWS||$POSIX]
