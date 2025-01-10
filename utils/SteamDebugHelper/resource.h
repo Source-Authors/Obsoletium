@@ -1,21 +1,18 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
 // Used by SteamDebugHelper.rc
 //
 #define ID_UNSETUP_FOR_DEBUGGING        3
 #define IDD_STEAMDEBUGHELPER_DIALOG     102
-#define IDR_MAINFRAME                   128
+#define SRC_IDI_APP_MAIN                128
 #define ID_SETUP_FOR_DEBUGGING          1004
 #define ID_START_STEAM                  1005
 #define ID_EDIT_CONFIG_FILE             1006
 #define ID_EDIT_CHOOSE_CONFIG_FILE      1007
+
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Steam Debug Helper"
 
 // Next default values for new objects
 // 
