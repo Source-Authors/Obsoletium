@@ -53,3 +53,6 @@
 [submodule "thirdparty/zip-utils"]
 	path = thirdparty/zip-utils
 	url = git@github.com:Source-Authors/zip-utils.git
+[submodule "thirdparty/speedtree"]
+	path = thirdparty/speedtree
+	url = git@github.com:Source-Authors/SpeedTree.git

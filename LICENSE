@@ -831,6 +831,22 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+- speedtree located at thirdparty/speedtree is licensed as:
+"""
+  This software is supplied under the terms of a license agreement or
+  nondisclosure agreement with Interactive Data Visualization and may
+  not be copied or disclosed except in accordance with the terms of
+  that agreement.
+
+  Copyright (c) 2003-2005 IDV, Inc.
+  All Rights Reserved.
+
+  IDV, Inc.
+  http://www.idvinc.com
+
+  Release version 1.8.0
+"""
+
 - stb located at thirdparty/stb is licensed as:
 """
   This software is available under 2 licenses -- choose whichever you prefer.
