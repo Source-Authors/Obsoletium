@@ -105,7 +105,7 @@ public:
 	{
 		ElementType_t element;
 		element.handle = g_pFullFileSystem->FindOrAddFileName( filename );
-		int idx = m_Elements.Find( element );
+		auto idx = m_Elements.Find( element );
 		return idx != m_Elements.InvalidIndex() ? true : false;
 	}
 
@@ -166,7 +166,7 @@ public:
 	{
 		ElementType_t element;
 		element.handle = g_pFullFileSystem->FindOrAddFileName( filename );
-		int idx = m_Elements.Find( element );
+		auto idx = m_Elements.Find( element );
 		if ( idx == m_Elements.InvalidIndex() )
 		{
 			return 0L;
