@@ -801,7 +801,7 @@ private:
 
 	const char* PoolString( const char *pStr )
 	{
-		int i = m_PooledStrings.Find( pStr );
+		auto i = m_PooledStrings.Find( pStr );
 		if ( i == m_PooledStrings.InvalidIndex() )
 			i = m_PooledStrings.Insert( pStr, 0 );
 

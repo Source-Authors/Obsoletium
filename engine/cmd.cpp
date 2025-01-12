@@ -135,7 +135,7 @@ static int CreateExecutionMarker()
 	}
 
 	int nRandomNumber;
-	int nIndex = g_ExecutionMarkers.InvalidIndex();
+	intp nIndex = g_ExecutionMarkers.InvalidIndex();
 
 	// Pick a random number that doesn't already exist in the list
 	do

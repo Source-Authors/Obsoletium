@@ -2346,7 +2346,7 @@ int CSaveRestore::LoadGameState( char const *level, bool createPlayers )
 
 CSaveRestore::RestoreLookupTable *CSaveRestore::FindOrAddRestoreLookupTable( char const *mapname )
 {
-	int idx = m_RestoreLookup.Find( mapname );
+	auto idx = m_RestoreLookup.Find( mapname );
 	if ( idx == m_RestoreLookup.InvalidIndex() )
 	{
 		idx = m_RestoreLookup.Insert( mapname );

@@ -5361,7 +5361,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 model_t *CModelLoader::FindModelNoCreate( const char *pModelName )
 {
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pModelName );
-	int i = m_Models.Find( fnHandle );
+	auto i = m_Models.Find( fnHandle );
 	if ( i != m_Models.InvalidIndex() )
 	{
 		return m_Models[i].modelpointer;
@@ -5775,7 +5775,7 @@ void CModelLoader::QueueDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod )
 
 bool CModelLoader::CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod )
 {
-	int i = m_DynamicModelLoadQueue.Find( mod );
+	intp i = m_DynamicModelLoadQueue.Find( mod );
 	Assert( (i < 0) == !(dyn->m_nLoadFlags & CDynamicModelInfo::QUEUED) );
 	if ( i >= 0 )
 	{

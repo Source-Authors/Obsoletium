@@ -885,7 +885,7 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 					Q_strlower( com_token );
 	
 					CUtlSymbol sym = m_DeletionListWarningsSymbols.AddString( com_token );
-					int idx = m_DeletionListWarnings.Find( sym );
+					auto idx = m_DeletionListWarnings.Find( sym );
 					if ( idx == m_DeletionListWarnings.InvalidIndex() )
 					{
 						m_DeletionListWarnings.Insert( sym );
@@ -924,7 +924,7 @@ void CMapReslistGenerator::TrackDeletions( const char *fullPathFileName )
 	{
 		CUtlSymbol warningSymbol = m_DeletionListWarningsSymbols.AddString( test );
 
-		uint idx = m_DeletionListWarnings.Find( warningSymbol );
+		auto idx = m_DeletionListWarnings.Find( warningSymbol );
 		if ( idx == m_DeletionListWarnings.InvalidIndex() )
 		{
 			Msg( "--> Referenced file marked for deletion \"%s\"\n", test );

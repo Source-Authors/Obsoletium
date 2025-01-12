@@ -844,7 +844,7 @@ memhandle_t CAsyncWavDataCache::FindOrCreateBuffer( asyncwaveparams_t &params, b
 	if ( bFind )
 	{
 		// look for an existing buffer that matches exactly (same file, offset, and share)
-		int iBuffer = m_BufferList.Find( search );
+		BufferHandle_t iBuffer = m_BufferList.Find( search );
 		if ( iBuffer != m_BufferList.InvalidIndex() )
 		{
 			// found

@@ -1731,7 +1731,7 @@ static inline bool CheckMSurfaceBaseTexture2( worldbrushdata_t *pBrushData, Surf
 			if ( developer.GetInt() <= 1 )
 			{
 				static CUtlDict<int,int> nameDict;
-				if ( nameDict.Find( pMaterialName ) == -1 )
+				if ( nameDict.Find( pMaterialName ) == CUtlDict<int,int>::InvalidIndex() )
 				{
 					nameDict.Insert( pMaterialName, 0 );
 					bShowIt = true;

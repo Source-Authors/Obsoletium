@@ -70,7 +70,7 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 		{
 			CUtlSymbol sym = entries.AddString( findfn );
 
-			int idx = symbols.Find( sym );
+			intp idx = symbols.Find( sym );
 			if ( idx == symbols.InvalidIndex() )
 			{
 				symbols.AddToTail( sym );

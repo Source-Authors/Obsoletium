@@ -110,7 +110,7 @@ int Draw_DecalIndexFromName( char *name, bool *found )
 	Assert( found );
 
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( name );
-	int lookup = g_DecalDictionary.Find( fnHandle );
+	auto lookup = g_DecalDictionary.Find( fnHandle );
 	if ( lookup == g_DecalDictionary.InvalidIndex() )
 	{
 		if ( found )

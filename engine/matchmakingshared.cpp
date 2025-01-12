@@ -428,7 +428,7 @@ INetChannel *CMatchmaking::FindChannel( const unsigned int ip )
 {
 	INetChannel *pChannel = NULL;
 
-	int idx = m_Channels.Find( ip );
+	auto idx = m_Channels.Find( ip );
 	if ( idx != m_Channels.InvalidIndex() )
 	{
 		pChannel = m_Channels.Element( idx );

@@ -731,7 +731,7 @@ void DisplaySelectedTextures()
 	typedef unsigned short MapIdx;
 
 	// Now walk over all the materials in the req list and push them to the params
-	for ( int k = 0, kEnd = s_viewParamsReq.lstMaterials.Count(); k < kEnd; ++ k )
+	for ( intp k = 0, kEnd = s_viewParamsReq.lstMaterials.Count(); k < kEnd; ++ k )
 	{
 		UtlSymId_t idMat = s_viewParamsReq.lstMaterials[ k ];
 		MapIdx idx = s_viewParamsLast.lstMaterials.Find( idMat );
