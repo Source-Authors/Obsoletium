@@ -25,7 +25,7 @@ public:
 	struct RowDescriptor_t
 	{
 		int m_nNonZeroCount;								// number of non-zero elements in the row
-		int m_nDataIndex;									// index of NonZeroValueDescriptor_t for the first non-zero value
+		intp m_nDataIndex;									// index of NonZeroValueDescriptor_t for the first non-zero value
 	};
 
 	int m_nNumRows;
@@ -91,7 +91,7 @@ namespace MatrixMath
 			{
 				// compute inner product efficiently because of sparsity
 				int nCnt = matA.m_rowDescriptors[i].m_nNonZeroCount;
-				int nDataIdx = matA.m_rowDescriptors[i].m_nDataIndex;
+				intp nDataIdx = matA.m_rowDescriptors[i].m_nDataIndex;
 				float flDot = 0.0;
 				for( int nIdx = 0; nIdx < nCnt; nIdx++ )
 				{
