@@ -1878,7 +1878,7 @@ void CPackedStore::BuildFindFirstCache()
 			m_dirContents.Insert( m_directoryList.Count(), new CUtlStringList() ); // Freed in destructor
 		}
 		
-		unsigned short nIndex = m_dirContents.Find( m_directoryList.Count() );
+		auto nIndex = m_dirContents.Find( m_directoryList.Count() );
 		CUtlStringList *pList = m_dirContents.Element( nIndex );
 
 		pList->CopyAndAddToTail( V_UnqualifiedFileName( allVPKFiles[i] ) );
