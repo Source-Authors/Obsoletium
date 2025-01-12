@@ -165,13 +165,13 @@ const wchar_t *GetTypedKeyValuesString<wchar_t>( KeyValues *pKeyValues, const ch
 }
 
 template < typename T >
-void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, int unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables )
+void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables )
 {
 	T *outputPos = unicodeOutput;
 
 	//assumes we can't have %s10
 	//assume both are 0 terminated?
-	int unicodeBufferSize = unicodeBufferSizeInBytes / sizeof(T);
+	intp unicodeBufferSize = unicodeBufferSizeInBytes / sizeof(T);
 
 	while ( *formatString != '\0' && unicodeBufferSize > 1 )
 	{
@@ -214,7 +214,7 @@ void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, int unicodeBufferS
 					intp paramSize = StringFuncs<T>::Length( value );
 					if (paramSize >= unicodeBufferSize)
 					{
-						paramSize = MAX( 0, unicodeBufferSize - 1 );
+						paramSize = MAX( static_cast<intp>(0), unicodeBufferSize - 1 );
 					}
 
 					StringFuncs<T>::Copy( outputPos, value, paramSize );
@@ -242,12 +242,12 @@ void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, int unicodeBufferS
 	*outputPos = '\0';
 }
 
-void ILocalize::ConstructStringKeyValuesInternal(char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables)
+void ILocalize::ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables)
 {
 	ConstructStringKeyValuesInternal_Impl<char>( unicodeOutput, unicodeBufferSizeInBytes, formatString, localizationVariables );
 }
 
-void ILocalize::ConstructStringKeyValuesInternal(wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables)
+void ILocalize::ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables)
 {
 	ConstructStringKeyValuesInternal_Impl<wchar_t>( unicodeOutput, unicodeBufferSizeInBytes, formatString, localizationVariables );
 }
