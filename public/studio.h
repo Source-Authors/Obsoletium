@@ -709,7 +709,7 @@ struct mstudioanimdesc_t
 
 	int					sectionindex;
 	int					sectionframes; // number of frames used in each fast lookup section, zero if not used
-	inline const mstudioanimsections_t * pSection( int i ) const { return (mstudioanimsections_t *)(((byte *)this) + sectionindex) + i; }
+	inline mstudioanimsections_t * pSection( int i ) const { return (mstudioanimsections_t *)(((byte *)this) + sectionindex) + i; }
 
 	short				zeroframespan;	// frames per span
 	short				zeroframecount; // number of spans
