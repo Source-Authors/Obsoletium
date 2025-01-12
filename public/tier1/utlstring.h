@@ -16,7 +16,7 @@
 #include "tier1/strtools.h"
 
 // Matched with the memdbgoff at end of header
-#include "memdbgon.h"
+#include "tier0/memdbgon.h"
 
 #if defined( OSX )
 #ifndef wcsdup
@@ -471,6 +471,6 @@ template < typename T > struct UTLConstStringCaselessStringEqualFunctor { bool o
 inline bool UtlStringLessFunc( const CUtlString &lhs, const CUtlString &rhs ) { return V_strcmp( lhs.Get(), rhs.Get() ) < 0; } 
 inline bool UtlStringCaseInsensitiveLessFunc( const CUtlString &lhs, const CUtlString &rhs ) { return V_stricmp( lhs.Get(), rhs.Get() ) < 0; } 
 
-#include "memdbgoff.h"
+#include "tier0/memdbgoff.h"
 
 #endif // UTLSTRING_H
