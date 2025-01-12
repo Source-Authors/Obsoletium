@@ -6,6 +6,8 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro NVTRISTRIPSSRCDIR	"$SRCDIR\thirdparty\nvtristrip"
+$Macro NVTRISTRIPOUTDIR		"$ZIPUTILSSRCDIR\out"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
@@ -13,7 +15,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common,..\nvtristriplib,$SRCDIR\Game_Shared"
+		$AdditionalIncludeDirectories		"$BASE,..\common;$NVTRISTRIPSSRCDIR"
 		$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE"
 	}
 
@@ -81,7 +83,7 @@ $Project "Motionmapper"
 	$Folder	"Link Libraries"
 	{
 		$Lib mathlib
-		$Lib nvtristrip
+		$Libexternal	"$NVTRISTRIPOUTDIR\nvtristrip"
 		$Lib tier2
 	}
 }

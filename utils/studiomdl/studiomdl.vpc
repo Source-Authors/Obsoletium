@@ -6,6 +6,8 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro NVTRISTRIPSSRCDIR	"$SRCDIR\thirdparty\nvtristrip"
+$Macro NVTRISTRIPOUTDIR		"$ZIPUTILSSRCDIR\out"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
@@ -13,7 +15,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common,..\nvtristriplib,$SRCDIR\Game_Shared"
+		$AdditionalIncludeDirectories		"$BASE,..\common,$NVTRISTRIPSSRCDIR"
 		$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE"
 	}
 
@@ -23,7 +25,7 @@ $Configuration
 	}
 }
 
-$Project "Studiomdl"
+$Project "studiomdl"
 {
 	$Folder	"Source Files"
 	{
@@ -64,7 +66,7 @@ $Project "Studiomdl"
 		$File	"..\common\FileSystem_Tools.h"
 		$File	"HardwareMatrixState.h"
 		$File	"HardwareVertexCache.h"
-		$File	"..\NvTriStripLib\NvTriStrip.h"
+		$File	"$NVTRISTRIPSSRCDIR\NvTriStrip.h"
 		$File	"perfstats.h"
 		$File	"..\common\physdll.h"
 		$File	"..\common\scriplib.h"
@@ -143,7 +145,7 @@ $Project "Studiomdl"
 		$Lib mathlib
 		$Lib mdlobjects
 		$Lib movieobjects
-		$Lib nvtristrip
+		$Libexternal	"$NVTRISTRIPOUTDIR\nvtristrip"
 		$Lib tier2
 		$Lib tier3
 	}
