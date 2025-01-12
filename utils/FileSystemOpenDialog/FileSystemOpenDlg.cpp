@@ -834,7 +834,7 @@ public:
 		m_bLastModalWasWindowsDialog = false;
 	}
 
-	virtual void Release()
+	void Release() override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		delete m_pDialog;
@@ -842,7 +842,7 @@ public:
 	}
 
 	// You must call this first to set the hwnd.
-	virtual void Init( CreateInterfaceFn factory, void *parentHwnd )
+	void Init( CreateInterfaceFn factory, void *parentHwnd ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( !m_pDialog );
@@ -851,28 +851,28 @@ public:
 		m_pDialog = new CFileSystemOpenDlg( factory, CWnd::FromHandle( m_hParentWnd ) );
 	}
 
-	virtual void AddFileMask( const char *pMask )
+	void AddFileMask( const char *pMask ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
 		m_pDialog->AddFileMask( pMask );
 	}
 
-	virtual void SetInitialDir( const char *pDir, const char *pPathID )
+	void SetInitialDir( const char *pDir, const char *pPathID ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
 		m_pDialog->SetInitialDir( pDir, pPathID );
 	}
 
-	virtual void SetFilterMdlAndJpgFiles( bool bFilter )
+	void SetFilterMdlAndJpgFiles( bool bFilter ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
 		m_pDialog->SetFilterMdlAndJpgFiles( bFilter );
 	}
 
-	virtual void GetFilename( char *pOut, int outLen ) const
+	void GetFilename( char *pOut, intp outLen ) const override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
@@ -887,7 +887,7 @@ public:
 		}
 	}
 
-	virtual bool DoModal()
+	bool DoModal() override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
@@ -896,7 +896,7 @@ public:
 		return m_pDialog->DoModal() == IDOK;
 	}
 
-	virtual bool DoModal_WindowsDialog()
+	bool DoModal_WindowsDialog() override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -927,7 +927,7 @@ public:
 		else
 		{
 			filters[0] = 0;
-			for ( int i=0; i < m_pDialog->m_FileMasks.Count(); i++ )
+			for ( intp i=0; i < m_pDialog->m_FileMasks.Count(); i++ )
 			{
 				if ( i > 0 )
 					V_strcat_safe( filters, "|" );
