@@ -82,7 +82,7 @@ inline CTimingInfo< T > CalcSmoothAverage_Struct( const T &value, int nTimes, co
 	char fullStr[1024];
 	Q_snprintf( fullStr, sizeof( fullStr ), "%s_%i", pFilename, iLine );
 	
-	int index = s_SmoothAverages.Find( fullStr );
+	auto index = s_SmoothAverages.Find( fullStr );
 	CAveragesInfo<T> *pInfo;
 	if ( index == s_SmoothAverages.InvalidIndex() )
 	{
@@ -155,7 +155,7 @@ inline CTimingInfo< T > SumOverTimeInterval_Struct( const T &value, float nSecon
 	char fullStr[1024];
 	Q_snprintf( fullStr, sizeof( fullStr ), "%s_%i", pFilename, iLine );
 	
-	int index = s_SmoothAverages.Find( fullStr );
+	auto index = s_SmoothAverages.Find( fullStr );
 	CAveragesInfo_TimeBased<T> *pInfo;
 	if ( index == s_SmoothAverages.InvalidIndex() )
 	{
