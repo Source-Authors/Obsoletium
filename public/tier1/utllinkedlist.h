@@ -123,12 +123,12 @@ public:
 	void	LinkToTail( I elem );
 
 	// invalid index (M will never allocate an element at this index)
-	inline static S  InvalidIndex()  { return ( S )M::InvalidIndex(); }
+	inline static constexpr S  InvalidIndex()  { return ( S )M::InvalidIndex(); }
 
 	// Is a given index valid to use? (representible by S and not the invalid index)
 	static bool IndexInRange( I index );
 
-	inline static size_t ElementSize() { return sizeof( ListElem_t ); }
+	inline static constexpr size_t ElementSize() { return sizeof( ListElem_t ); }
 
 	// list statistics
 	intp	Count() const;
@@ -412,7 +412,7 @@ public:
 	}
 
 private:
-	intp	MaxElementIndex() const { Assert( 0 ); return BaseClass::InvalidIndex(); } // fixedmemory containers don't support iteration from 0..maxelements-1
+	constexpr intp MaxElementIndex() const { Assert( 0 ); return BaseClass::InvalidIndex(); } // fixedmemory containers don't support iteration from 0..maxelements-1
 	void ResetDbgInfo() {}
 };
 
@@ -630,9 +630,7 @@ void  CUtlLinkedList<T,S,ML,I,M>::Purge()
 	m_FirstFree = InvalidIndex();
 	m_NumAlloced = 0;
 
-	//Routing "m_LastAlloc = m_Memory.InvalidIterator();" through a local const to sidestep an internal compiler error on 360 builds
-	const typename M::Iterator_t scInvalidIterator = m_Memory.InvalidIterator();
-	m_LastAlloc = scInvalidIterator;
+	m_LastAlloc = m_Memory.InvalidIterator();
 	ResetDbgInfo();
 }
 
@@ -1226,7 +1224,7 @@ public:
 		return ( p && p->pNext && p->pPrev );
 	}
 
-	inline static IndexType_t  InvalidIndex()
+	inline static constexpr IndexType_t  InvalidIndex()
 	{ 
 		return NULL; 
 	}

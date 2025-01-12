@@ -197,7 +197,7 @@ public:
 	{
 		return CNonThreadsafeTreeType::Find( entry );
 	}
-	inline intp InvalidIndex() const
+	inline constexpr intp InvalidIndex() const
 	{
 		return CNonThreadsafeTreeType::InvalidIndex();
 	}
@@ -272,7 +272,7 @@ public:
 	{
 		return CThreadsafeTreeType::Find( entry );
 	}
-	inline intp InvalidIndex() const
+	inline constexpr intp InvalidIndex() const
 	{
 		return CThreadsafeTreeType::InvalidHandle();
 	}

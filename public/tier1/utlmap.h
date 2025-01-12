@@ -94,7 +94,7 @@ public:
 	bool  IsValid() const									{ return m_Tree.IsValid(); }
 	
 	// Invalid index
-	static IndexType_t InvalidIndex()						{ return CTree::InvalidIndex(); }
+	static constexpr IndexType_t InvalidIndex()				{ return CTree::InvalidIndex(); }
 	
 	// Sets the less func
 	void SetLessFunc( LessFunc_t func )

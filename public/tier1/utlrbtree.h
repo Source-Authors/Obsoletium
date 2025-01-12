@@ -191,7 +191,7 @@ public:
 	bool  IsValid() const;
 
 	// Invalid index
-	static I InvalidIndex();
+	static constexpr I InvalidIndex();
 
 	// returns the tree depth (not a very fast operation)
 	intp   Depth( I node ) const;
@@ -567,7 +567,7 @@ inline	bool CUtlRBTree<T, I, L, M>::IsValidIndex( I i ) const
 //-----------------------------------------------------------------------------
 
 template < class T, class I, typename L, class M >
-inline I CUtlRBTree<T, I, L, M>::InvalidIndex()         
+inline constexpr I CUtlRBTree<T, I, L, M>::InvalidIndex()         
 {
 	return ( I )M::InvalidIndex();
 }

@@ -55,18 +55,18 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( I i ) : index( i ) {}
+		constexpr Iterator_t( I i ) : index( i ) {}
 		I index;
 
-		bool operator==( const Iterator_t it ) const	{ return index == it.index; }
-		bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
+		constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
+		constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
 	};
 	Iterator_t First() const							{ return Iterator_t( IsIdxValid( 0 ) ? 0 : InvalidIndex() ); }
 	Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( IsIdxValid( it.index + 1 ) ? it.index + 1 : InvalidIndex() ); }
 	I GetIndex( const Iterator_t &it ) const			{ return it.index; }
 	bool IsIdxAfter( I i, const Iterator_t &it ) const	{ return i > it.index; }
 	bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ); }
-	Iterator_t InvalidIterator() const					{ return Iterator_t( InvalidIndex() ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 	// element access
 	T& operator[]( I i );
@@ -78,8 +78,8 @@ public:
 	bool IsIdxValid( I i ) const;
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static const I INVALID_INDEX = ( I )-1; // For use with COMPILE_TIME_ASSERT
-	static I InvalidIndex() { return INVALID_INDEX; }
+	static constexpr I INVALID_INDEX = ( I )-1; // For use with COMPILE_TIME_ASSERT
+	static constexpr I InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address (can change when adding elements!)
 	T* Base();
@@ -208,8 +208,8 @@ public:
 	bool IsIdxValid( intp i ) const							{ return (size_t)i < SIZE; }
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static const intp INVALID_INDEX = -1; // For use with COMPILE_TIME_ASSERT
-	static intp InvalidIndex() { return INVALID_INDEX; }
+	static constexpr intp INVALID_INDEX = -1; // For use with COMPILE_TIME_ASSERT
+	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address
 	T* Base()												{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); }
@@ -250,17 +250,17 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( intp i ) : index( i ) {}
+		constexpr Iterator_t( intp i ) : index( i ) {}
 		intp index;
-		bool operator==( const Iterator_t it ) const	{ return index == it.index; }
-		bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
+		constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
+		constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
 	};
 	Iterator_t First() const							{ return Iterator_t( IsIdxValid( 0 ) ? 0 : InvalidIndex() ); }
 	Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( IsIdxValid( it.index + 1 ) ? it.index + 1 : InvalidIndex() ); }
 	intp GetIndex( const Iterator_t &it ) const			{ return it.index; }
 	bool IsIdxAfter( intp i, const Iterator_t &it ) const { return i > it.index; }
 	bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ); }
-	Iterator_t InvalidIterator() const					{ return Iterator_t( InvalidIndex() ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 private:
 	char m_Memory[ SIZE*sizeof(T) + nAlignment ];
@@ -290,7 +290,6 @@ public:
 #ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		m_nCurAllocSize = 0;
 #endif
-
 	}
 	CUtlMemoryConservative( T* pMemory, intp numElements ) = delete;
 	~CUtlMemoryConservative()								{ free( m_pMemory ); }
@@ -377,18 +376,18 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( intp i, intp _limit ) : index( i ), limit( _limit ) {}
+		constexpr Iterator_t( intp i, intp _limit ) : index( i ), limit( _limit ) {}
 		intp index;
 		intp limit;
-		bool operator==( const Iterator_t it ) const	{ return index == it.index; }
-		bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
+		constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
+		constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
 	};
 	Iterator_t First() const							{ intp limit = NumAllocated(); return Iterator_t( limit ? 0 : InvalidIndex(), limit ); }
 	Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( ( it.index + 1 < it.limit ) ? it.index + 1 : InvalidIndex(), it.limit ); }
 	intp GetIndex( const Iterator_t &it ) const			{ return it.index; }
 	bool IsIdxAfter( intp i, const Iterator_t &it ) const { return i > it.index; }
 	bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ) && ( it.index < it.limit ); }
-	Iterator_t InvalidIterator() const					{ return Iterator_t( InvalidIndex(), 0 ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex(), 0 ); }
 
 private:
 	T *m_pMemory;

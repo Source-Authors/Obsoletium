@@ -103,7 +103,7 @@ public:
 
 	// Is element index valid?
 	bool IsValidIndex( intp i ) const;
-	static intp InvalidIndex();
+	static constexpr intp InvalidIndex();
 
 	// Adds an element, uses default constructor
 	intp AddToHead();
@@ -369,7 +369,7 @@ public:
 		return m_pData->m_Size;
 	}
 
-	static intp InvalidIndex()
+	static constexpr intp InvalidIndex()
 	{
 		return -1;
 	}
@@ -820,7 +820,7 @@ inline bool CUtlVector<T, A>::IsValidIndex( intp i ) const
 // Returns in invalid index
 //-----------------------------------------------------------------------------
 template< typename T, class A >
-inline intp CUtlVector<T, A>::InvalidIndex()
+inline constexpr intp CUtlVector<T, A>::InvalidIndex()
 {
 	return -1;
 }

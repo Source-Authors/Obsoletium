@@ -107,7 +107,7 @@ public:
 	// invalid index
 	static constexpr I	InvalidIndex()		{ return (I)~0; }
 	static bool	IndexInRange( intp index );
-	static size_t ElementSize()		{ return sizeof(ListElem_t); }
+	static constexpr size_t ElementSize()	{ return sizeof(ListElem_t); }
 
 	// list statistics
 	intp	Count( ListHandle_t list ) const;

@@ -94,7 +94,7 @@ public:
 	I NextBucket( I idx ) const;
 	CBucketHandle Bucket( I idx ) const;
 
-	static S InvalidIndex();
+	static constexpr S InvalidIndex();
 
 	// Ensure capacity
 	void	EnsureCapacity( int count );
@@ -341,7 +341,7 @@ int CBidirectionalSet<CBucketHandle,CElementHandle,S,I>::NumAllocated( void ) co
 // Invalid index for iteration..
 //-----------------------------------------------------------------------------
 template< class CBucketHandle, class CElementHandle, class S, class I >
-inline S CBidirectionalSet<CBucketHandle,CElementHandle,S,I>::InvalidIndex()
+inline constexpr S CBidirectionalSet<CBucketHandle,CElementHandle,S,I>::InvalidIndex()
 {
 	return CUtlLinkedList< CElementHandle, I >::InvalidIndex();
 }

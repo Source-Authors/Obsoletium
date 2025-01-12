@@ -148,24 +148,24 @@ public:
 	bool IsIdxValid( I i ) const							{ return (i >= 0) && (i < m_nAllocated); }
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static const I INVALID_INDEX = ( I )-1; // For use with COMPILE_TIME_ASSERT
-	static I InvalidIndex() { return INVALID_INDEX; }
+	static constexpr I INVALID_INDEX = ( I )-1; // For use with COMPILE_TIME_ASSERT
+	static constexpr I InvalidIndex() { return INVALID_INDEX; }
 
 	class Iterator_t
 	{
-		Iterator_t( I i ) : index( i ) {}
+		constexpr Iterator_t( I i ) : index( i ) {}
 		I index;
 		friend class CUtlMemoryStack<T,I,MAX_SIZE, COMMIT_SIZE, INITIAL_COMMIT>;
 	public:
-		bool operator==( const Iterator_t it ) const		{ return index == it.index; }
-		bool operator!=( const Iterator_t it ) const		{ return index != it.index; }
+		constexpr bool operator==( const Iterator_t it ) const		{ return index == it.index; }
+		constexpr bool operator!=( const Iterator_t it ) const		{ return index != it.index; }
 	};
 	Iterator_t First() const								{ return Iterator_t( m_nAllocated ? 0 : InvalidIndex() ); }
 	Iterator_t Next( const Iterator_t &it ) const			{ return Iterator_t( it.index < m_nAllocated ? it.index + 1 : InvalidIndex() ); }
 	I GetIndex( const Iterator_t &it ) const				{ return it.index; }
 	bool IsIdxAfter( I i, const Iterator_t &it ) const		{ return i > it.index; }
 	bool IsValidIterator( const Iterator_t &it ) const		{ return it.index >= 0 && it.index < m_nAllocated; }
-	Iterator_t InvalidIterator() const						{ return Iterator_t( InvalidIndex() ); }
+	constexpr Iterator_t InvalidIterator() const			{ return Iterator_t( InvalidIndex() ); }
 
 	// Gets the base address
 	T* Base()												{ return (T*)m_MemoryStack.GetBase(); }
