@@ -1,17 +1,9 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-// FileSystemOpenDlg.cpp : implementation file
-//
+// Copyright Valve Corporation, All rights reserved.
 
 #include "stdafx.h"
 #include "FileSystemOpenDlg.h"
 #include "libjpeg-turbo/src/jpeglib.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
 #include "resource.h"
 #include "ifilesystemopendialog.h"
 
@@ -29,11 +21,6 @@ CFileInfo::CFileInfo()
 }
 
 
-CFileInfo::~CFileInfo()
-{
-}
-
-
 /////////////////////////////////////////////////////////////////////////////
 // This caches the thumbnail bitmaps we generate to speed up browsing.
 /////////////////////////////////////////////////////////////////////////////
@@ -44,7 +31,12 @@ public:
 	CBitmapCache()
 	{
 		m_CurMemoryUsage = 0;
+		// dimhotepus: x86-64 uses x2 cache
+#ifdef PLATFORM_64BITS
+		m_MaxMemoryUsage = 1024 * 1024 * 6 * 2;
+#else
 		m_MaxMemoryUsage = 1024 * 1024 * 6;
+#endif
 	}
 
 	void AddToCache( CBitmap *pBitmap, const char *pName, int memoryUsage, bool bLock )
@@ -63,16 +55,13 @@ public:
 
 	CBitmap* Find( const char *pName )
 	{
-		int i = m_Bitmaps.Find( pName );
-		if ( i == -1 )
-			return NULL;
-		else
-			return m_Bitmaps[i].m_pBitmap;
+		const auto i = m_Bitmaps.Find( pName );
+		return i != -1 ? m_Bitmaps[i].m_pBitmap : NULL;
 	}
 
 	void UnlockAll()
 	{
-		for ( int i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
+		for ( auto i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
 		{
 			m_Bitmaps[i].m_bLocked = false;
 		}
@@ -85,8 +74,7 @@ private:
 		while ( m_CurMemoryUsage > m_MaxMemoryUsage )
 		{
 			// Free something.
-			bool bFreed = false;
-			for ( int i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
+			for ( auto i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
 			{
 				if ( !m_Bitmaps[i].m_bLocked )
 				{
@@ -96,18 +84,13 @@ private:
 					break;
 				}
 			}
-			
-			// Nothing left to free?			
-			if ( !bFreed )
-				return;
 		}
 	}
 
 private:
 
-	class CBitmapCacheEntry
+	struct CBitmapCacheEntry
 	{
-	public:
 		CBitmap *m_pBitmap;
 		int m_MemoryUsage;
 		bool m_bLocked;
@@ -219,7 +202,7 @@ void CFileSystemOpenDlg::SetInitialDir( const char *pDir, const char *pPathID )
 	if ( pPathID )
 		m_PathIDString = pPathID;
 	else
-		m_PathIDString = "";
+		m_PathIDString.Empty();
 }
 
 CString CFileSystemOpenDlg::GetFilename() const
@@ -314,6 +297,8 @@ class CJpegSourceMgr : public jpeg_source_mgr
 public:
 	CJpegSourceMgr()
 	{
+		memset(m_JmpBuf, 0, sizeof(m_JmpBuf));
+
 		this->init_source = &CJpegSourceMgr::imp_init_source;
 		this->fill_input_buffer = &CJpegSourceMgr::imp_fill_input_buffer;
 		this->skip_input_data = &CJpegSourceMgr::imp_skip_input_data;
@@ -792,11 +777,12 @@ void CFileSystemOpenDlg::OnUpButton()
 	V_strcpy_safe( str, m_CurrentDir );
 	Q_StripLastDir( str, sizeof( str ) );
 
-	if ( str[0] == 0 )
+	if ( Q_isempty( str ) )
 		V_strcpy_safe( str, "." );
 	
-	if ( str[strlen(str)-1] == '\\' || str[strlen(str)-1] == '/' )
-		str[strlen(str)-1] = 0;
+	size_t len = strlen(str);
+	if ( len > 0 && ( str[len-1] == '\\' || str[len-1] == '/' ) )
+		str[len-1] = 0;
 
 	m_CurrentDir = str;
 	PopulateListControl();
@@ -827,10 +813,7 @@ void CFileSystemOpenDlg::SetFilterMdlAndJpgFiles( bool bFilter )
 
 const char* CFileSystemOpenDlg::GetPathID()
 {
-	if ( m_PathIDString == "" )
-		return NULL;
-	else
-		return (const char*)m_PathIDString;
+	return m_PathIDString.IsEmpty() ? nullptr : m_PathIDString.GetString();
 }
 
 
