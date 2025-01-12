@@ -1345,7 +1345,7 @@ extern void ControlPhysicsPlayerControllerAttachment_Silent( IPhysicsPlayerContr
 
 bool CPhysicsEnvironment::TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment )
 {
-	int iIndex = m_objects.Find( pObject );
+	intp iIndex = m_objects.Find( pObject );
 	if( iIndex == -1 || (pObject->GetCallbackFlags() & CALLBACK_MARKED_FOR_DELETE ) )
 		return false;
 

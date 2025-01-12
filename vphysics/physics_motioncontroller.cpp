@@ -234,7 +234,7 @@ void CPhysicsMotionController::AttachObject( IPhysicsObject *pObject, bool check
 	// OPTIMIZE: Linear search here?
 	if ( checkIfAlreadyAttached )
 	{
-		int index = m_coreList.Find(pCore);
+		intp index = m_coreList.Find(pCore);
 		if ( m_coreList.IsValidIndex(index) )
 		{
 			DevMsg(1,"Attached core twice!!!\n");
@@ -251,7 +251,7 @@ void CPhysicsMotionController::AttachObject( IPhysicsObject *pObject, bool check
 
 void CPhysicsMotionController::RemoveCore( IVP_Core *pCore )
 {
-	int index = m_coreList.Find(pCore);
+	intp index = m_coreList.Find(pCore);
 	if ( !m_coreList.IsValidIndex(index) )
 	{
 #if DEBUG
