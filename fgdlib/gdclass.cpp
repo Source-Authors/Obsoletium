@@ -233,7 +233,7 @@ BOOL GDclass::AddVariable(GDinputvariable *pVar, GDclass *pBase, int iBaseIndex,
 			//
 			// "pThisVar" is a leaf variable - we can remove since it is overridden.
 			//
-			int nIndex = m_Variables.Find(pThisVar);
+			intp nIndex = m_Variables.Find(pThisVar);
 			Assert(nIndex != -1);
 			delete pThisVar;
 
