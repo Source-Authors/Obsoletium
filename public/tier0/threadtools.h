@@ -940,7 +940,7 @@ template <class MUTEX_TYPE = CThreadMutex>
 class CAutoLockT
 {
 public:
-	FORCEINLINE CAutoLockT( MUTEX_TYPE &lock, const char* pMutexName, const char* pFilename, int nLineNum, uint64 minReportDurationUs )
+	FORCEINLINE CAutoLockT( MUTEX_TYPE &lock, const char* pMutexName, const char* pFilename, int nLineNum, [[maybe_unused]] uint64 minReportDurationUs )
 	: m_lock( const_cast< typename V_remove_const< MUTEX_TYPE >::type & >( lock ) )
 	, m_pMutexName( pMutexName )
 	, m_pFilename( pFilename )
