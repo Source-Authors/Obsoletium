@@ -668,10 +668,7 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 		g_KernelFunc[type]( kernel, info, wratio, hratio, dratio, gammaToLinear, pAlphaResult );
 	}
 
-	if ( pAlphaResult )
-	{
-		free( pAlphaResult );
-	}
+	free( pAlphaResult );
 
 	return true;
 }
