@@ -26,24 +26,24 @@
 
 #if defined( LINUX )
 
-int GetCallStack( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
+intp GetCallStack( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	return backtrace( pReturnAddressesOut, iArrayCount );
 }
 
-int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
+intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	return backtrace( pReturnAddressesOut, iArrayCount );
 }
 
 #else
 
-int GetCallStack( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
+intp GetCallStack( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	return 0;
 }
 
-int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
+intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	return 0;
 }
@@ -59,7 +59,7 @@ void StackToolsNotify_LoadedLibrary( const char *szLibName )
 {
 }
 
-int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tchar *szOutput, int iOutBufferSize, const tchar *szEntrySeparator, TranslateStackInfo_StyleFlags_t style )
+intp TranslateStackInfo( const void * const *pCallStack, intp iCallStackCount, tchar *szOutput, intp iOutBufferSize, const tchar *szEntrySeparator, TranslateStackInfo_StyleFlags_t style )
 {
 	if( iOutBufferSize > 0 )
 		*szOutput = '\0';
@@ -67,11 +67,11 @@ int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tch
 	return 0;
 }
 
-void PreloadStackInformation( const void **pAddresses, int iAddressCount )
+void PreloadStackInformation( const void **pAddresses, intp iAddressCount )
 {
 }
 
-bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
+bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, intp iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
 {
 	if( iMaxFileNameLength > 0 )
 		*pFileNameOut = '\0';
@@ -79,7 +79,7 @@ bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int i
 	return false;
 }
 
-bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int iMaxSymbolNameLength, uint64 *pDisplacementOut )
+bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, intp iMaxSymbolNameLength, uint64 *pDisplacementOut )
 {
 	if( iMaxSymbolNameLength > 0 )
 		*pSymbolNameOut = '\0';
@@ -87,7 +87,7 @@ bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int 
 	return false;
 }
 
-bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int iMaxModuleNameLength )
+bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, intp iMaxModuleNameLength )
 {
 	if( iMaxModuleNameLength > 0 )
 		*pModuleNameOut = '\0';
@@ -106,19 +106,19 @@ CTHREADLOCALPTR( CStackTop_Base ) g_StackTop;
 class CStackTop_FriendFuncs : public CStackTop_Base
 {
 public:
-	friend int AppendParentStackTrace( void **pReturnAddressesOut, int iArrayCount, int iAlreadyFilled );
-	friend int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCount );
+	friend intp AppendParentStackTrace( void **pReturnAddressesOut, intp iArrayCount, intp iAlreadyFilled );
+	friend intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount );
 };
 
 
-inline int AppendParentStackTrace( void **pReturnAddressesOut, int iArrayCount, int iAlreadyFilled )
+inline intp AppendParentStackTrace( void **pReturnAddressesOut, intp iArrayCount, intp iAlreadyFilled )
 {
 	CStackTop_FriendFuncs *pTop = (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
 	if( pTop != NULL )
 	{
 		if( pTop->m_pReplaceAddress != NULL )
 		{
-			for( int i = iAlreadyFilled; --i >= 0; )
+			for( intp i = iAlreadyFilled; --i >= 0; )
 			{
 				if( pReturnAddressesOut[i] == pTop->m_pReplaceAddress )
 				{
@@ -130,7 +130,7 @@ inline int AppendParentStackTrace( void **pReturnAddressesOut, int iArrayCount, 
 
 		if( pTop->m_iParentStackTraceLength != 0 )
 		{
-			int iCopy = MIN( iArrayCount - iAlreadyFilled, pTop->m_iParentStackTraceLength );
+			intp iCopy = std::min( iArrayCount - iAlreadyFilled, pTop->m_iParentStackTraceLength );
 			memcpy( pReturnAddressesOut + iAlreadyFilled, pTop->m_pParentStackTrace, iCopy * sizeof( void * ) );
 			iAlreadyFilled += iCopy;
 		}
@@ -157,7 +157,7 @@ inline bool ValidStackAddress( void *pAddress, const void *pNoLessThan, const vo
 }
 
 #pragma auto_inline( off )
-int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
+intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	//Only tested in windows. This function won't work with frame pointer omission enabled. "vpc /nofpo" all projects
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
@@ -175,7 +175,7 @@ int GetCallStack_Fast( void **pReturnAddressesOut, int iArrayCount, int iSkipCou
 	*/
 
 	void *pNoLessThan = pStackCrawlEBP; //impossible for a valid stack to traverse before this address
-	int i;
+	intp i;
 
 	CStackTop_FriendFuncs *pTop = (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
 	if( pTop != NULL ) //we can do fewer error checks if we have a valid reference point for the top of the stack
@@ -452,7 +452,7 @@ public:
 		m_bShouldReloadSymbols = true;
 	}
 
-	bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int iMaxSymbolNameLength, uint64 *pDisplacementOut )
+	bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, intp iMaxSymbolNameLength, uint64 *pDisplacementOut )
 	{
 		if( pAddress == NULL )
 			return false;
@@ -477,7 +477,7 @@ public:
 		return false;
 	}
 
-	bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
+	bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, intp iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
 	{
 		if( pAddress == NULL )
 			return false;
@@ -507,7 +507,7 @@ public:
 		return false;
 	}
 
-	bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int iMaxModuleNameLength )
+	bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, intp iMaxModuleNameLength )
 	{
 		AUTO_LOCK( m_Mutex );
 		IMAGEHLP_MODULE64 moduleInfo;
@@ -525,7 +525,7 @@ public:
 	}
 
 	//only returns false if we ran out of buffer space.
-	bool TranslatePointer( const void * const pAddress, tchar *pTranslationOut, int iTranslationBufferLength, TranslateStackInfo_StyleFlags_t style )
+	bool TranslatePointer( const void * const pAddress, tchar *pTranslationOut, intp iTranslationBufferLength, TranslateStackInfo_StyleFlags_t style )
 	{
 		//AUTO_LOCK( m_Mutex );
 
@@ -832,7 +832,7 @@ static CHelperFunctionsLoader s_HelperFunctions;
 
 
 #if defined( USE_STACKWALK64 ) //most reliable method thanks to boatloads of windows helper functions. Also the slowest.
-int CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
+intp CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	s_HelperFunctions.EnsureReady();
 
@@ -853,7 +853,7 @@ int CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddressesO
 
 	HANDLE hThread = GetCurrentThread();
 
-	int i;
+	intp i;
 	for( i = 0; i != iSkipCount; ++i ) //skip entries that the requesting function thinks are uninformative
 	{
 		if(!s_HelperFunctions.m_pStackWalk64( STACKWALK64_MACHINETYPE, s_HelperFunctions.m_hProcess, hThread, &sfFrame, &currentContext, NULL, NULL, NULL, NULL ) ||
@@ -876,16 +876,16 @@ int CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddressesO
 	return i;
 }
 
-void GetCallStackReturnAddresses_Exception( void **CallStackReturnAddresses, int *pRetCount, int iSkipCount, _EXCEPTION_POINTERS * pExceptionInfo )
+void GetCallStackReturnAddresses_Exception( void **CallStackReturnAddresses, intp *pRetCount, intp iSkipCount, _EXCEPTION_POINTERS * pExceptionInfo )
 {
-	int iCount = CrawlStack_StackWalk64( pExceptionInfo->ContextRecord, CallStackReturnAddresses, *pRetCount, iSkipCount + 1 ); //skipping RaiseException()
+	intp iCount = CrawlStack_StackWalk64( pExceptionInfo->ContextRecord, CallStackReturnAddresses, *pRetCount, iSkipCount + 1 ); //skipping RaiseException()
 	*pRetCount = iCount;
 }
 #endif //#if defined( USE_STACKWALK64 )
 
 
 
-int GetCallStack( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
+intp GetCallStack( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	s_HelperFunctions.EnsureReady();
 
@@ -895,14 +895,14 @@ int GetCallStack( void **pReturnAddressesOut, int iArrayCount, int iSkipCount )
 	if( s_HelperFunctions.m_pCaptureStackBackTrace != CaptureStackBackTrace_DummyFn )
 	{
 		//docs state a total limit of 63 back traces between skipped and stored
-		int iRetVal = s_HelperFunctions.m_pCaptureStackBackTrace( iSkipCount, MIN( iArrayCount, 63 - iSkipCount ), pReturnAddressesOut, NULL );
+		intp iRetVal = s_HelperFunctions.m_pCaptureStackBackTrace( iSkipCount, MIN( iArrayCount, 63 - iSkipCount ), pReturnAddressesOut, NULL );
 		return AppendParentStackTrace( pReturnAddressesOut, iArrayCount, iRetVal );
 	}
 #endif
 #if defined( USE_STACKWALK64 )
 	if( s_HelperFunctions.m_pStackWalk64 != StackWalk64_DummyFn )
 	{
-		int iInOutArrayCount = iArrayCount; //array count becomes both input and output with exception handler version
+		intp iInOutArrayCount = iArrayCount; //array count becomes both input and output with exception handler version
 		__try
 		{
 			::RaiseException( 0, EXCEPTION_NONCONTINUABLE, 0, NULL );
@@ -927,7 +927,7 @@ void StackToolsNotify_LoadedLibrary( [[maybe_unused]] const char *szLibName )
 	s_HelperFunctions.m_bShouldReloadSymbols = true;
 }
 
-int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tchar *szOutput, int iOutBufferSize, const tchar *szEntrySeparator, TranslateStackInfo_StyleFlags_t style )
+intp TranslateStackInfo( const void * const *pCallStack, intp iCallStackCount, tchar *szOutput, intp iOutBufferSize, const tchar *szEntrySeparator, TranslateStackInfo_StyleFlags_t style )
 {
 	s_HelperFunctions.EnsureReady();
 	tchar *szStartOutput = szOutput;
@@ -937,7 +937,7 @@ int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tch
 
 	intp iSeparatorSize = (intp)strlen( szEntrySeparator );
 
-	for( int i = 0; i < iCallStackCount; ++i )
+	for( intp i = 0; i < iCallStackCount; ++i )
 	{
 		if( !s_HelperFunctions.TranslatePointer( pCallStack[i], szOutput, iOutBufferSize, style ) )
 		{
@@ -964,24 +964,24 @@ int TranslateStackInfo( const void * const *pCallStack, int iCallStackCount, tch
 	return iCallStackCount;
 }
 
-void PreloadStackInformation( [[maybe_unused]] void * const *pAddresses, [[maybe_unused]] int iAddressCount )
+void PreloadStackInformation( [[maybe_unused]] void * const *pAddresses, [[maybe_unused]] intp iAddressCount )
 {
 	//nop on anything but 360
 }
 
-bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, int iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
+bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, intp iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
 {
 	s_HelperFunctions.EnsureReady();
 	return s_HelperFunctions.GetFileAndLineFromAddress( pAddress, pFileNameOut, iMaxFileNameLength, iLineNumberOut, pDisplacementOut );
 }
 
-bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, int iMaxSymbolNameLength, uint64 *pDisplacementOut )
+bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, intp iMaxSymbolNameLength, uint64 *pDisplacementOut )
 {
 	s_HelperFunctions.EnsureReady();
 	return s_HelperFunctions.GetSymbolNameFromAddress( pAddress, pSymbolNameOut, iMaxSymbolNameLength, pDisplacementOut );
 }
 
-bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int iMaxModuleNameLength )
+bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, intp iMaxModuleNameLength )
 {
 	s_HelperFunctions.EnsureReady();
 	return s_HelperFunctions.GetModuleNameFromAddress( pAddress, pModuleNameOut, iMaxModuleNameLength );
@@ -994,14 +994,14 @@ bool GetModuleNameFromAddress( const void *pAddress, tchar *pModuleNameOut, int 
 
 
 
-CCallStackStorage::CCallStackStorage( FN_GetCallStack GetStackFunction, uint32 iSkipCalls )
+CCallStackStorage::CCallStackStorage( FN_GetCallStack GetStackFunction, intp iSkipCalls )
 {
-	iValidEntries = GetStackFunction( pStack, std::size( pStack ), iSkipCalls + 1 );
+	iValidEntries = GetStackFunction( pStack, ssize( pStack ), iSkipCalls + 1 );
 }
 
 
 
-CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStackTrace, int iParentStackTraceLength )
+CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStackTrace, intp iParentStackTraceLength )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
@@ -1056,7 +1056,7 @@ CStackTop_CopyParentStack::~CStackTop_CopyParentStack( void )
 
 
 
-CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pParentStackTrace, int iParentStackTraceLength )
+CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pParentStackTrace, intp iParentStackTraceLength )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
@@ -1118,9 +1118,9 @@ void CStackTop_ReferenceParentStack::ReleaseParentStackReferences( void )
 //This puts the encoded data in the 128-255 value range. Leaving all standard ascii characters for control.
 //Returns string length (not including the written null terminator as is standard). 
 //Or if the buffer is too small. Returns negative of necessary buffer size (including room needed for null terminator)
-int EncodeBinaryToString( const void *pToEncode, int iDataLength, char *pEncodeOut, int iEncodeBufferSize )
+intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncodeOut, intp iEncodeBufferSize )
 {
-	int iEncodedSize = iDataLength;
+	intp iEncodedSize = iDataLength;
 	iEncodedSize += (iEncodedSize + 6) / 7; //Have 1 control byte for every 7 actual bytes
 	iEncodedSize += sizeof( uint32 ) + 1; //data size at the beginning of the blob and null terminator at the end
 
@@ -1139,7 +1139,7 @@ int EncodeBinaryToString( const void *pToEncode, int iDataLength, char *pEncodeO
 	const uint8 *pEncodeRead = (const uint8 *)pToEncode;
 	const uint8 *pEncodeStop = pEncodeRead + iDataLength;
 	uint8 *pEncodeWriteLastControlByte = pEncodeWrite;
-	int iControl = 0;
+	intp iControl = 0;
 
 	//Encode the data
 	while( pEncodeRead < pEncodeStop )
@@ -1170,7 +1170,7 @@ int EncodeBinaryToString( const void *pToEncode, int iDataLength, char *pEncodeO
 //	>= 0 is the decoded data size
 //	INT_MIN (most negative value possible) indicates an improperly formatted string (not our data)
 //	all other negative values are the negative of how much dest buffer size is necessary.
-int DecodeBinaryFromString( const char *pString, void *pDestBuffer, int iDestBufferSize, char **ppParseFinishOut )
+intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, char **ppParseFinishOut )
 {
 	const uint8 *pDecodeRead = (const uint8 *)pString;
 
@@ -1182,18 +1182,18 @@ int DecodeBinaryFromString( const char *pString, void *pDestBuffer, int iDestBuf
 		return INT_MIN; //Don't know what the string is, but it's not our format
 	}
 
-	int iDecodedSize = 0;
+	intp iDecodedSize = 0;
 	iDecodedSize |= (pDecodeRead[0] & 0x7F) << 21;
 	iDecodedSize |= (pDecodeRead[1] & 0x7F) << 14;
 	iDecodedSize |= (pDecodeRead[2] & 0x7F) << 7;
 	iDecodedSize |= (pDecodeRead[3] & 0x7F) << 0;
 	pDecodeRead += 4;
 
-	int iTextLength = iDecodedSize;
+	intp iTextLength = iDecodedSize;
 	iTextLength += (iTextLength + 6) / 7; //Have 1 control byte for every 7 actual bytes
 
 	//make sure it's formatted properly
-	for( int i = 0; i != iTextLength; ++i )
+	for( intp i = 0; i != iTextLength; ++i )
 	{
 		if( pDecodeRead[i] < 0x80 ) //encoded data always has MSB set
 		{
@@ -1214,8 +1214,8 @@ int DecodeBinaryFromString( const char *pString, void *pDestBuffer, int iDestBuf
 
 	const uint8 *pStopDecoding = pDecodeRead + iTextLength;		
 	uint8 *pDecodeWrite = (uint8 *)pDestBuffer;
-	int iControl = 0;
-	int iLSBXOR = 0;
+	intp iControl = 0;
+	intp iLSBXOR = 0;
 
 	while( pDecodeRead < pStopDecoding )
 	{
