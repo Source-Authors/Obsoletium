@@ -801,10 +801,7 @@ namespace
 
 SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn )
 {
-	SuggestGameInfoDirFn_t &rfn = GetSuggestGameInfoDirFn();
-	SuggestGameInfoDirFn_t pfnOldFn = rfn;
-	rfn = pfnNewFn;
-	return pfnOldFn;
+	return std::exchange(GetSuggestGameInfoDirFn(), pfnNewFn);
 }
 
 template<int outDirLen>
