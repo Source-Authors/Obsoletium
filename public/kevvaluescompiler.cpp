@@ -36,7 +36,7 @@ bool CRunTimeKeyValuesStringTable::ReadStringTable( int numStrings, CUtlBuffer& 
 	return true;
 }
 
-void CCompiledKeyValuesWriter::BuildKVData_R( KeyValues *kv, int parent )
+void CCompiledKeyValuesWriter::BuildKVData_R( KeyValues *kv, intp parent )
 {
 	// Add self
 	KVInfo_t info;
@@ -96,14 +96,15 @@ void CCompiledKeyValuesWriter::AppendKeyValuesFile( char const *filename )
 	kvf.filename = m_StringTable.AddString( filename );
 	kvf.firstElement = m_Data.Count();
 
-	KeyValues *kv = new KeyValues( filename );
-	if ( kv->LoadFromFile( g_pFullFileSystem, filename ) )
 	{
-		// Add to dictionary
-		// do a depth first traversal of the keyvalues
-		BuildKVData_R( kv, -1 );
+		auto kv = KeyValues::AutoDelete( filename );
+		if ( kv->LoadFromFile( g_pFullFileSystem, filename ) )
+		{
+			// Add to dictionary
+			// do a depth first traversal of the keyvalues
+			BuildKVData_R( kv, -1 );
+		}
 	}
-	kv->deleteThis();
 
 	kvf.numElements = m_Data.Count() - kvf.firstElement;
 
@@ -114,9 +115,9 @@ void CCompiledKeyValuesWriter::AppendKeyValuesFile( char const *filename )
 
 void CCompiledKeyValuesWriter::WriteData( CUtlBuffer& buf )
 {
-	int c = m_Data.Count();
+	intp c = m_Data.Count();
 	buf.PutInt( c );
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		KVInfo_t &info = m_Data[ i ];
 		buf.PutShort( info.key );
@@ -128,9 +129,9 @@ void CCompiledKeyValuesWriter::WriteData( CUtlBuffer& buf )
 
 void CCompiledKeyValuesWriter::WriteFiles( CUtlBuffer &buf )
 {
-	int c = m_Files.Count();
+	intp c = m_Files.Count();
 	buf.PutInt( c );
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		KVFile_t &file = m_Files[ i ];
 		buf.PutShort( file.filename );
@@ -307,7 +308,7 @@ bool CCompiledKeyValuesReader::CreateInPlaceFromData( KeyValues& head, const Fil
 		{
 			CreateHelper_t search;
 			search.index = info.GetParent();
-			int idx = helper.Find( search );
+			auto idx = helper.Find( search );
 			if ( idx == helper.InvalidIndex() )
 			{
 				return NULL;
@@ -381,7 +382,7 @@ bool CCompiledKeyValuesReader::InstanceInPlace( KeyValues& head, char const *kvf
 	FileInfo_t search;
 	search.hFile = g_pFullFileSystem->FindOrAddFileName( sz );
 
-	int idx = m_Dict.Find( search );
+	auto idx = m_Dict.Find( search );
 	if ( idx == m_Dict.InvalidIndex() )
 	{
 		return false;
@@ -401,7 +402,7 @@ KeyValues *CCompiledKeyValuesReader::Instance( char const *kvfilename )
 	FileInfo_t search;
 	search.hFile = g_pFullFileSystem->FindOrAddFileName( sz );
 
-	int idx = m_Dict.Find( search );
+	auto idx = m_Dict.Find( search );
 	if ( idx == m_Dict.InvalidIndex() )
 	{
 		return NULL;
@@ -421,7 +422,7 @@ bool CCompiledKeyValuesReader::LookupKeyValuesRootKeyName( char const *kvfilenam
 	FileInfo_t search;
 	search.hFile = g_pFullFileSystem->FindOrAddFileName( sz );
 
-	int idx = m_Dict.Find( search );
+	auto idx = m_Dict.Find( search );
 	if ( idx == m_Dict.InvalidIndex() )
 	{
 		return false;
