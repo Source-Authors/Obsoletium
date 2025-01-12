@@ -939,7 +939,7 @@ void KeyValues::SaveKeyToFile( KeyValues *dat, IBaseFileSystem *filesystem, File
 				{
 					static char buf[KEYVALUES_TOKEN_SIZE];
 					// make sure we have enough space
-					int result = Q_UnicodeToUTF8( dat->m_wsValue, buf, KEYVALUES_TOKEN_SIZE);
+					intp result = Q_UnicodeToUTF8( dat->m_wsValue, buf, KEYVALUES_TOKEN_SIZE);
 					if (result)
 					{
 						WriteIndents(filesystem, f, pBuf, indentLevel + 1);
@@ -1489,7 +1489,7 @@ const char *KeyValues::GetString( const char *keyName, const char *defaultValue 
 		{
 			// convert the string to char *, set it for future use, and return it
 			char wideBuf[512];
-			int result = Q_UnicodeToUTF8(dat->m_wsValue, wideBuf, 512);
+			intp result = Q_UnicodeToUTF8(dat->m_wsValue, wideBuf, 512);
 			if ( result )
 			{
 				// note: this will copy wideBuf
@@ -1547,7 +1547,7 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 			intp bufSize = Q_strlen(dat->m_sValue) + 1;
 			// dimhotepus: Speedup by using stack alloc. String is copied in SetWString.
 			wchar_t *pWBuf = static_cast<wchar_t*>( _alloca( sizeof(wchar_t) * bufSize ));
-			int result = Q_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof( wchar_t ) );
+			intp result = Q_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof( wchar_t ) );
 			if ( result >= 0 ) // may be a zero length string
 			{
 				SetWString( keyName, pWBuf);
