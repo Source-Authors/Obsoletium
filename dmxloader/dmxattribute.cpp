@@ -378,7 +378,7 @@ bool CDmxAttribute::Serialize( CUtlBuffer &buf ) const
 		return ::Serialize( _buf, temp );											\
 	}
 
-bool CDmxAttribute::SerializeElement( int nIndex, CUtlBuffer &buf ) const
+bool CDmxAttribute::SerializeElement( intp nIndex, CUtlBuffer &buf ) const
 {
 	if ( !IsArrayType( m_Type ) )
 		return false;
@@ -537,7 +537,7 @@ void CDmxAttribute::SetValue( const void *pBuffer, size_t nLen )
 }
 
 // Untyped method for setting used by unpack
-void CDmxAttribute::SetValue( DmAttributeType_t type, const void *pSrc, int nLen )
+void CDmxAttribute::SetValue( DmAttributeType_t type, const void *pSrc, intp nLen )
 {
 	if ( m_Type != type )
 	{

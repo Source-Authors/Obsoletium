@@ -98,8 +98,8 @@ private:
 	CDmxElement* UnserializeElementIndex( CUtlBuffer &buf, CUtlVector<CDmxElement*> &elementList );
 	void UnserializeElementAttribute( CUtlBuffer &buf, CDmxAttribute *pAttribute, CUtlVector<CDmxElement*> &elementList );
 	void UnserializeElementArrayAttribute( CUtlBuffer &buf, CDmxAttribute *pAttribute, CUtlVector<CDmxElement*> &elementList );
-	bool UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, int *offsetTable, char *stringTable );
-	int GetStringOffsetTable( CUtlBuffer &buf, int *offsetTable, int nStrings );
+	bool UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, intp *offsetTable, char *stringTable );
+	intp GetStringOffsetTable( CUtlBuffer &buf, intp *offsetTable, int nStrings );
 };
 
 
@@ -165,11 +165,11 @@ void CDmxSerializer::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmxSerial
 //-----------------------------------------------------------------------------
 bool CDmxSerializer::SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary& list, CUtlRBTree< const char* > &stringTable, CDmxElement *pElement )
 {
-	int nAttributesToSave = 0;
+	intp nAttributesToSave = 0;
 
 	// Count the attributes...
-	int nCount = pElement->AttributeCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pElement->AttributeCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = pElement->GetAttribute( i );
 		const char *pName = pAttribute->GetName( );
@@ -181,7 +181,7 @@ bool CDmxSerializer::SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary& 
 
 	// Now write them all out.
 	buf.PutInt( nAttributesToSave );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = pElement->GetAttribute( i );
 		const char *pName = pAttribute->GetName();
@@ -246,8 +246,8 @@ bool CDmxSerializer::Serialize( CUtlBuffer &buf, CDmxElement *pRoot, [[maybe_unu
 		if ( !pElement )
 			return false;
 		stringTable.InsertIfNotFound( pElement->GetTypeString() );
-		int nAttributes = pElement->AttributeCount();
-		for ( int ai = 0; ai < nAttributes; ++ai )
+		intp nAttributes = pElement->AttributeCount();
+		for ( intp ai = 0; ai < nAttributes; ++ai )
 		{
 			CDmxAttribute *pAttr = pElement->GetAttribute( ai );
 			if ( !pAttr )
@@ -336,7 +336,7 @@ void CDmxSerializer::UnserializeElementArrayAttribute( CUtlBuffer &buf, CDmxAttr
 //-----------------------------------------------------------------------------
 // Reads a single element
 //-----------------------------------------------------------------------------
-bool CDmxSerializer::UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, int *offsetTable, char *stringTable )
+bool CDmxSerializer::UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, intp *offsetTable, char *stringTable )
 {
 	CDmxElementModifyScope modify( pElement );
 
@@ -383,9 +383,9 @@ bool CDmxSerializer::UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pEleme
 }
 
 
-int CDmxSerializer::GetStringOffsetTable( CUtlBuffer &buf, int *offsetTable, int nStrings )
+intp CDmxSerializer::GetStringOffsetTable( CUtlBuffer &buf, intp *offsetTable, int nStrings )
 {
-	int nBytes = buf.GetBytesRemaining();
+	intp nBytes = buf.GetBytesRemaining();
 	char *pBegin = ( char* )buf.PeekGet();
 	char *pBytes = pBegin;
 	for ( int i = 0; i < nStrings; ++i )
@@ -429,17 +429,17 @@ bool CDmxSerializer::Unserialize( CUtlBuffer &buf, int nEncodingVersion, CDmxEle
 
 	// Read string table
 	int nStrings = 0;
-	int *offsetTable = NULL;
+	intp *offsetTable = NULL;
 	char *stringTable = NULL;
 	if ( bReadStringTable )
 	{
 		nStrings = buf.GetShort();
 		if ( nStrings > 0 )
 		{
-			offsetTable = ( int* )stackalloc( nStrings * sizeof( int ) );
+			offsetTable = ( intp* )stackalloc( nStrings * sizeof( intp ) );
 
 			// this causes entire string table to be mapped in memory at once
-			int nStringMemoryUsage = GetStringOffsetTable( buf, offsetTable, nStrings );
+			intp nStringMemoryUsage = GetStringOffsetTable( buf, offsetTable, nStrings );
 			stringTable = ( char* )stackalloc( nStringMemoryUsage * sizeof( char ) );
 			buf.Get( stringTable, nStringMemoryUsage );
 		}

@@ -65,8 +65,8 @@ void CDmxSerializationDictionary::BuildElementList_R( CDmxElement *pElement, boo
 	info.m_pElement = pElement;
 	m_Dict.Insert( info );
 
-	int nCount = pElement->AttributeCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pElement->AttributeCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = pElement->GetAttribute(i);
 		switch( pAttribute->GetType() )

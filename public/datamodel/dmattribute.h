@@ -344,7 +344,7 @@ inline void CDmAttribute::SetValue( E* pValue )
 template<>
 inline void CDmAttribute::SetValue( const char *pValue )
 {
-	int nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
+	intp nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
 	CUtlString str( pValue, nLen );
 	return SetValue( str );
 }
@@ -586,7 +586,7 @@ inline CDmAttribute* CDmElement::SetValue( const char *pAttributeName, E* pEleme
 template<>
 inline CDmAttribute* CDmElement::SetValue( const char *pAttributeName, const char *pValue )
 {
-	int nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
+	intp nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
 	CUtlString str( pValue, nLen );
 	return SetValue( pAttributeName, str );
 }

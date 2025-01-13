@@ -583,12 +583,12 @@ void CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, 
 //-----------------------------------------------------------------------------
 void CDmxSerializerKeyValues2::SerializeArrayAttribute( CUtlBuffer& buf, CDmxAttribute *pAttribute )
 {
-	int nCount = pAttribute->GetArrayCount();
+	intp nCount = pAttribute->GetArrayCount();
 
 	buf.PutString( "\n[\n" );
 	buf.PushTab();
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pAttribute->GetType() != AT_STRING_ARRAY )
 		{
@@ -629,9 +629,9 @@ static int SortAttributeByName(const void *p1, const void *p2 )
 
 bool CDmxSerializerKeyValues2::SerializeAttributes( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxElement *pElement )
 {
-	int nCount = pElement->AttributeCount();
+	intp nCount = pElement->AttributeCount();
 	CDmxAttribute **ppAttributes = (CDmxAttribute**)stackalloc( nCount * sizeof(CDmxAttribute*) );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		ppAttributes[i] = pElement->GetAttribute( i );
 	}
@@ -639,7 +639,7 @@ bool CDmxSerializerKeyValues2::SerializeAttributes( CUtlBuffer& buf, CDmxSeriali
 	// Sort by name
 	qsort( ppAttributes, nCount, sizeof(CDmxAttribute*), SortAttributeByName );
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = ppAttributes[ i ];
 
@@ -753,8 +753,8 @@ bool CDmxSerializerKeyValues2::Serialize( CUtlBuffer &outBuf, CDmxElement *pRoot
 void CDmxSerializerKeyValues2::EatWhitespacesAndComments( CUtlBuffer &buf )
 {
 	// eating white spaces and remarks loop
-	int nMaxPut = buf.TellMaxPut() - buf.TellGet();
-	int nOffset = 0;
+	intp nMaxPut = buf.TellMaxPut() - buf.TellGet();
+	intp nOffset = 0;
 	while ( nOffset < nMaxPut )	
 	{
 		// Eat whitespaces, keep track of line count
@@ -809,7 +809,7 @@ CDmxSerializerKeyValues2::TokenType_t CDmxSerializerKeyValues2::ReadToken( CUtlB
 		return TOKEN_EOF;
 
 	// Compute token length and type
-	int nLength = 0;
+	intp nLength = 0;
 	TokenType_t t = TOKEN_INVALID;
 	char c = *((const char *)buf.PeekGet());
 	switch( c )
@@ -864,7 +864,7 @@ CDmxSerializerKeyValues2::TokenType_t CDmxSerializerKeyValues2::ReadToken( CUtlB
 
 	// Count the number of crs in the token + update the current line
 	const char *pMem = token.Base<const char>();
-	for ( int i = 0; i < nLength; ++i )
+	for ( intp i = 0; i < nLength; ++i )
 	{
 		if ( pMem[i] == '\n' )
 		{
@@ -983,7 +983,7 @@ bool CDmxSerializerKeyValues2::UnserializeElementArrayAttribute( CUtlBuffer &buf
 
 		// Get the element type out
 		pConv = GetCStringCharConversion();
-		int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+		intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 		char *pElementType = (char*)stackalloc( nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pElementType, nLength );
 
@@ -1041,7 +1041,7 @@ bool CDmxSerializerKeyValues2::UnserializeAttributeValueFromToken( CDmxAttribute
 	// which is not really friendly toward delimiters, so we must pass in
 	// non-delimited buffers. Sucky. There must be a better way of doing this
 	const char *pBuf = tokenBuf.Base<const char>();
-	int nLength = tokenBuf.TellMaxPut();
+	intp nLength = tokenBuf.TellMaxPut();
 	char *pTemp = (char*)stackalloc( nLength + 1 );
 
 	bool bIsString = ( type == AT_STRING ) || ( type == AT_STRING_ARRAY );
@@ -1173,7 +1173,7 @@ bool CDmxSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 	if ( ( nAttrType == AT_OBJECTID ) && !Q_strnicmp( pAttributeName, "id", 3 ) )
 	{
 		CUtlCharConversion *pConv = GetCStringCharConversion();
-		int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+		intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 		char *pElementId = (char*)stackalloc( nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pElementId, nLength );
 
@@ -1207,7 +1207,7 @@ bool CDmxSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 		{
 			// Get the attribute value out
 			CUtlCharConversion *pConv = GetCStringCharConversion();
-			int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+			intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 			char *pAttributeValue = (char*)stackalloc( nLength * sizeof(char) );
 			tokenBuf.GetDelimitedString( pConv, pAttributeValue, nLength );
 
@@ -1252,7 +1252,7 @@ bool CDmxSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, const char *
 	TokenType_t token;
 	CUtlBuffer tokenBuf;
 	CUtlCharConversion *pConv;
-	int nLength;
+	intp nLength;
 
 	// Then we expect a '{'
 	token = ReadToken( buf, tokenBuf );
@@ -1370,7 +1370,7 @@ bool CDmxSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, DmxElementDi
 	}
 
 	pConv = GetCStringCharConversion();
-	int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+	intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 	char *pTypeName = (char*)stackalloc( nLength * sizeof(char) );
 	tokenBuf.GetDelimitedString( pConv, pTypeName, nLength );
 
