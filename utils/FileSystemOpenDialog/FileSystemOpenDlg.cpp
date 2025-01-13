@@ -582,10 +582,10 @@ int CALLBACK FileListSortCallback( LPARAM lParam1, LPARAM lParam2, LPARAM lParam
 
 void RemoveDuplicates( CUtlVector<CString> &files )
 {
-	CUtlDict<int,int> uniqueFilenames;
-	for ( int i=0; i < files.Count(); i++ )
+	CUtlDict<int,intp> uniqueFilenames;
+	for ( intp i=0; i < files.Count(); i++ )
 	{
-		int iPreviousIndex = uniqueFilenames.Find( files[i] );
+		intp iPreviousIndex = uniqueFilenames.Find( files[i] );
 		if ( iPreviousIndex == -1 )
 		{
 			uniqueFilenames.Insert( files[i], i );
