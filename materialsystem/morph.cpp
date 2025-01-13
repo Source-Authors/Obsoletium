@@ -126,7 +126,7 @@ void CVertexMorphDict::AddMorph( const MorphVertexInfo_t &info )
 
 	MorphVertexList_t find;
 	find.m_nMorphTargetId = info.m_nMorphTargetId;
-	int nIndex = m_MorphLists.Find( find );
+	intp nIndex = m_MorphLists.Find( find );
 	if ( nIndex == m_MorphLists.InvalidIndex() )
 	{
 		m_MorphLists.Insert( find );
