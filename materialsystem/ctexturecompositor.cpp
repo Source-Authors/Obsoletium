@@ -2184,7 +2184,7 @@ KeyValues* ExtractVariableDefinitions( VariableDefs_t* pOutVarDefs, const char* 
 				return NULL;
 			}
 
-			int ndx = ( *pOutVarDefs ).Find( pChildName + 1 );
+			intp ndx = ( *pOutVarDefs ).Find( pChildName + 1 );
 			if ( pOutVarDefs->IsValidIndex( ndx ) )
 				( *pOutVarDefs )[ ndx ] = pChild->GetString();
 			else
@@ -2299,7 +2299,7 @@ int SubstituteVarsRecursive( char* pOutBuffer, int* pOutSubsts, CUtlVector< cons
 				pCurVariable[ srcC - pCurVariable ] = 0;
 
 				// Lookup our substitution value.
-				int ndx = varDefs.Find( pCurVariable );
+				intp ndx = varDefs.Find( pCurVariable );
 				const char* pSubstText = NULL;
 
 				if ( ndx != varDefs.InvalidIndex() )
