@@ -2561,26 +2561,6 @@ void CBasePanel::OnCommand( const char *command )
 {
 	if ( GameUI().IsConsoleUI() )
 	{
-#if defined( _X360 )
-
-		// See if this is a command we need to intercept
-		if ( IsPromptableCommand( command ) )
-		{
-			// Handle the sign in case
-			if ( HandleSignInRequest( command ) == false )
-				return;
-			
-			// Handle storage
-			if ( HandleStorageDeviceRequest( command ) == false )
-				return;
-
-			// If we fall through, we'll need to track this again
-			m_bStorageBladeShown = false;
-
-			// Fall through
-		}
-#endif // _X360
-
 		RunAnimationWithCallback( this, command, new KeyValues( "RunMenuCommand", "command", command ) );
 	
 		// Clear our pending command if we just executed it
