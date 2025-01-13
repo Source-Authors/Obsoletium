@@ -358,7 +358,7 @@ BOOL GameData::Load(const char *pszFilename)
 				}
 
 				// Check and see if this new class matches an existing one. If so we will override the previous definition.
-				int nExistingClassIndex = 0;
+				intp nExistingClassIndex = 0;
 				GDclass *pExistingClass = ClassForName(pNewClass->GetName(), &nExistingClassIndex);
 				if (NULL != pExistingClass)
 				{
@@ -495,10 +495,10 @@ bool GameData::ParseMapSize(TokenReader &tr)
 //			piIndex - 
 // Output : 
 //-----------------------------------------------------------------------------
-GDclass *GameData::ClassForName(const char *pszName, int *piIndex)
+GDclass *GameData::ClassForName(const char *pszName, intp *piIndex)
 {
-	int nCount = m_Classes.Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_Classes.Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDclass *mp = m_Classes.Element(i);
 		if(!strcmp(mp->GetName(), pszName))

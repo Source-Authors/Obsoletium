@@ -597,7 +597,7 @@ void GDinputvariable::Merge(GDinputvariable &Other)
 	// for a specific item.
 	//
 	bool bFound = false;
-	int nOurItems = m_Items.Count();
+	intp nOurItems = m_Items.Count();
 	for (auto &TheirItem : Other.m_Items)
 	{
 		for (intp j = 0; j < nOurItems; j++)
@@ -652,8 +652,8 @@ void GDinputvariable::ResetDefaults(void)
 		//
 		// Run thru flags and set any default flags.
 		//
-		int nCount = m_Items.Count();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = m_Items.Count();
+		for (intp i = 0; i < nCount; i++)
 		{
 			if (m_Items[i].bDefault)
 			{

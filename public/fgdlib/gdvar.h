@@ -83,12 +83,12 @@ class GDinputvariable
 		inline const char *GetLongName(void) const { return m_szLongName; }
 		inline const char *GetDescription(void) const;
 
-		inline int GetFlagCount() const { return m_Items.Count(); }
-		inline int GetFlagMask(int nFlag) const;
-		inline const char *GetFlagCaption(int nFlag) const;
+		inline intp GetFlagCount() const { return m_Items.Count(); }
+		inline int GetFlagMask(intp nFlag) const;
+		inline const char *GetFlagCaption(intp nFlag) const;
 		
-		inline int GetChoiceCount() const { return m_Items.Count(); } //-V524
-		inline const char *GetChoiceCaption(int nChoice) const;
+		inline intp GetChoiceCount() const { return m_Items.Count(); } //-V524
+		inline const char *GetChoiceCaption(intp nChoice) const;
 
 		inline GDIV_TYPE GetType() const { return m_eType; }
 		const char *GetTypeText(void) const;
@@ -191,7 +191,7 @@ bool GDinputvariable::IsReportable(void) const
 // Returns the flag mask (eg 4096) for the flag at the given index. The
 // array is packed, so it isn't just 1 >> nFlag.
 //-----------------------------------------------------------------------------
-int GDinputvariable::GetFlagMask(int nFlag) const
+int GDinputvariable::GetFlagMask(intp nFlag) const
 {
 	Assert(m_eType == ivFlags);
 	return m_Items.Element(nFlag).iValue;
@@ -201,7 +201,7 @@ int GDinputvariable::GetFlagMask(int nFlag) const
 //-----------------------------------------------------------------------------
 // Returns the caption text (eg "Only break on trigger") for the flag at the given index.
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::GetFlagCaption(int nFlag) const
+const char *GDinputvariable::GetFlagCaption(intp nFlag) const
 {
 	Assert(m_eType == ivFlags);
 	return m_Items.Element(nFlag).szCaption;
@@ -211,7 +211,7 @@ const char *GDinputvariable::GetFlagCaption(int nFlag) const
 //-----------------------------------------------------------------------------
 // Returns the caption text (eg "Yes") for the choice at the given index.
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::GetChoiceCaption(int nChoice) const
+const char *GDinputvariable::GetChoiceCaption(intp nChoice) const
 {
 	Assert(m_eType == ivChoices);
 	return m_Items.Element(nChoice).szCaption;

@@ -23,12 +23,12 @@ MDkeyvalue &MDkeyvalue::operator =(const MDkeyvalue &other)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void WCKVBase_Vector::RemoveKeyAt(int nIndex)
+void WCKVBase_Vector::RemoveKeyAt(intp nIndex)
 {
 	Assert(nIndex >= 0);
-	Assert(nIndex < (int)m_KeyValues.Count());
+	Assert(nIndex < m_KeyValues.Count());
 
-	if ((nIndex >= 0) && (nIndex < (int)m_KeyValues.Count()))
+	if ((nIndex >= 0) && (nIndex < m_KeyValues.Count()))
 	{
 		m_KeyValues.Remove(nIndex);
 	}
@@ -66,9 +66,9 @@ void WCKVBase_Vector::AddKeyValue(const char *pszKey, const char *pszValue)
 	m_KeyValues.AddToTail(newkv);
 }
 
-int WCKVBase_Vector::FindByKeyName( const char *pKeyName ) const
+intp WCKVBase_Vector::FindByKeyName( const char *pKeyName ) const
 {
-	for ( int i=0; i < m_KeyValues.Count(); i++ )
+	for ( intp i=0; i < m_KeyValues.Count(); i++ )
 	{
 		if ( V_stricmp( m_KeyValues[i].szKey, pKeyName ) == 0 )
 			return i;
@@ -120,7 +120,7 @@ WCKeyValuesT<Base>::~WCKeyValuesT(void)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 template<class Base>
-const char *WCKeyValuesT<Base>::GetValue(const char *pszKey, int *piIndex) const
+const char *WCKeyValuesT<Base>::GetValue(const char *pszKey, intp *piIndex) const
 {
 	auto i = FindByKeyName( pszKey );
 	if ( i == GetInvalidIndex() )

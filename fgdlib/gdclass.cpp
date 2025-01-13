@@ -59,8 +59,8 @@ GDclass::~GDclass(void)
 	//
 	// Free variables.
 	//
-	int nCount = m_Variables.Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_Variables.Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDinputvariable *pvi = m_Variables.Element(i);
 		delete pvi;
@@ -71,7 +71,7 @@ GDclass::~GDclass(void)
 	// Free helpers.
 	//
 	nCount = m_Helpers.Count();
-	for (int i = 0; i < nCount; i++)
+	for (intp i = 0; i < nCount; i++)
 	{
 		CHelperInfo *pHelper = m_Helpers.Element(i);
 		delete pHelper;
@@ -82,7 +82,7 @@ GDclass::~GDclass(void)
 	// Free inputs.
 	//
 	nCount = m_Inputs.Count();
-	for (int i = 0; i < nCount; i++)
+	for (intp i = 0; i < nCount; i++)
 	{
 		CClassInput *pInput = m_Inputs.Element(i);
 		delete pInput;
@@ -93,7 +93,7 @@ GDclass::~GDclass(void)
 	// Free outputs.
 	//
 	nCount = m_Outputs.Count();
-	for (int i = 0; i < nCount; i++)
+	for (intp i = 0; i < nCount; i++)
 	{
 		CClassOutput *pOutput = m_Outputs.Element(i);
 		delete pOutput;
@@ -111,13 +111,13 @@ GDclass::~GDclass(void)
 //-----------------------------------------------------------------------------
 void GDclass::AddBase(GDclass *pBase)
 {
-	int iBaseIndex;
+	intp iBaseIndex;
 	Parent->ClassForName(pBase->GetName(), &iBaseIndex);
 
 	//
 	// Add variables from base - update variable table
 	//
-	for (int i = 0; i < pBase->GetVariableCount(); i++)
+	for (intp i = 0; i < pBase->GetVariableCount(); i++)
 	{
 		GDinputvariable *pVar = pBase->GetVariableAt(i);
 		AddVariable(pVar, pBase, iBaseIndex, i);
@@ -127,8 +127,8 @@ void GDclass::AddBase(GDclass *pBase)
 	// Add inputs from the base.
 	// UNDONE: need to use references to inputs & outputs to conserve memory
 	//
-	int nCount = pBase->GetInputCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pBase->GetInputCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CClassInput *pInput = pBase->GetInput(i);
 
@@ -141,7 +141,7 @@ void GDclass::AddBase(GDclass *pBase)
 	// Add outputs from the base.
 	//
 	nCount = pBase->GetOutputCount();
-	for (int i = 0; i < nCount; i++)
+	for (intp i = 0; i < nCount; i++)
 	{
 		CClassOutput *pOutput = pBase->GetOutput(i);
 
@@ -182,9 +182,9 @@ void GDclass::AddBase(GDclass *pBase)
 //			FALSE if not. If this function returns TRUE, pVar should not be
 //			deleted by the caller.
 //-----------------------------------------------------------------------------
-BOOL GDclass::AddVariable(GDinputvariable *pVar, GDclass *pBase, int iBaseIndex, int iVarIndex)
+BOOL GDclass::AddVariable(GDinputvariable *pVar, GDclass *pBase, intp iBaseIndex, intp iVarIndex)
 {
-	int iThisIndex;
+	intp iThisIndex;
 	GDinputvariable *pThisVar = VarForName(pVar->GetName(), &iThisIndex);
 	
 	//
@@ -309,8 +309,8 @@ BOOL GDclass::AddVariable(GDinputvariable *pVar, GDclass *pBase, int iBaseIndex,
 //-----------------------------------------------------------------------------
 CClassInput *GDclass::FindInput(const char *szName)
 {
-	int nCount = GetInputCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = GetInputCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CClassInput *pInput = GetInput(i);
 		if (!stricmp(pInput->GetName(), szName))
@@ -328,8 +328,8 @@ CClassInput *GDclass::FindInput(const char *szName)
 //-----------------------------------------------------------------------------
 CClassOutput *GDclass::FindOutput(const char *szName)
 {
-	int nCount = GetOutputCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = GetOutputCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CClassOutput *pOutput = GetOutput(i);
 		if (!stricmp(pOutput->GetName(), szName))
@@ -369,7 +369,7 @@ BOOL GDclass::GetBoundBox(Vector& pfMins, Vector& pfMaxs) const
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-CHelperInfo *GDclass::GetHelper(int nIndex)
+CHelperInfo *GDclass::GetHelper(intp nIndex)
 {
 	return m_Helpers.Element(nIndex);
 }
@@ -377,7 +377,7 @@ CHelperInfo *GDclass::GetHelper(int nIndex)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-CClassInput *GDclass::GetInput(int nIndex)
+CClassInput *GDclass::GetInput(intp nIndex)
 {
 	return m_Inputs.Element(nIndex);
 }
@@ -385,7 +385,7 @@ CClassInput *GDclass::GetInput(int nIndex)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-CClassOutput *GDclass::GetOutput(int nIndex)
+CClassOutput *GDclass::GetOutput(intp nIndex)
 {
 	return m_Outputs.Element(nIndex);
 }
@@ -962,7 +962,7 @@ bool GDclass::ParseVariables(TokenReader &tr)
 			return(false);
 		}
 
-		int nDupIndex;
+		intp nDupIndex;
 		GDinputvariable *pDupVar = VarForName(var->GetName(), &nDupIndex);
 		
 		// check for duplicate variable definitions
@@ -993,7 +993,7 @@ bool GDclass::ParseVariables(TokenReader &tr)
 // Input  : iIndex - 
 // Output : GDinputvariable *
 //-----------------------------------------------------------------------------
-GDinputvariable *GDclass::GetVariableAt(int iIndex)
+GDinputvariable *GDclass::GetVariableAt(intp iIndex)
 {
 	if ( iIndex < 0 || iIndex >= m_nVariables )
 		return NULL;
@@ -1014,9 +1014,9 @@ GDinputvariable *GDclass::GetVariableAt(int iIndex)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-GDinputvariable *GDclass::VarForName(const char *pszName, int *piIndex)
+GDinputvariable *GDclass::VarForName(const char *pszName, intp *piIndex)
 {
-	for(int i = 0; i < GetVariableCount(); i++)
+	for(intp i = 0; i < GetVariableCount(); i++)
 	{
 		GDinputvariable *pVar = GetVariableAt(i);
 		if(!strcmpi(pVar->GetName(), pszName))
@@ -1033,11 +1033,11 @@ GDinputvariable *GDclass::VarForName(const char *pszName, int *piIndex)
 void GDclass::GetHelperForGDVar( GDinputvariable *pVar, CUtlVector<const char *> *pszHelperName )
 {
 	const char *pszName = pVar->GetName();
-	for( int i = 0; i < GetHelperCount(); i++ )
+	for( intp i = 0; i < GetHelperCount(); i++ )
 	{
 		CHelperInfo *pHelper = GetHelper( i );
-		int nParamCount = pHelper->GetParameterCount();
-		for ( int j = 0; j < nParamCount; j++ )
+		intp nParamCount = pHelper->GetParameterCount();
+		for ( intp j = 0; j < nParamCount; j++ )
 		{
 			if ( !strcmpi( pszName, pHelper->GetParameter( j ) ) )
 			{

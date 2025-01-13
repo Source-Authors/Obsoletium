@@ -31,8 +31,8 @@ class CHelperInfo
 
 		inline bool AddParameter(const char *pszParameter);
 
-		inline int GetParameterCount(void) const { return(m_Parameters.Count()); }
-		inline const char *GetParameter(int nIndex) const;
+		inline intp GetParameterCount(void) const { return(m_Parameters.Count()); }
+		inline const char *GetParameter(intp nIndex) const;
 
 	protected:
 
@@ -89,7 +89,7 @@ inline bool CHelperInfo::AddParameter(const char *pszParameter)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline const char *CHelperInfo::GetParameter(int nIndex) const
+inline const char *CHelperInfo::GetParameter(intp nIndex) const
 {
 	if (nIndex >= m_Parameters.Count())
 		return NULL;

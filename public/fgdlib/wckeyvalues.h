@@ -115,13 +115,13 @@ class WCKVBase_Vector
 public:
 	
 	// Iteration helpers.
-	inline int GetCount() const			{ return m_KeyValues.Count(); }
-	inline int GetFirst() const			{ return m_KeyValues.Count() - 1; }
-	inline int GetNext( int i ) const	{ return i - 1; }
-	static inline int GetInvalidIndex()	{ return -1; }
+	inline intp GetCount() const			{ return m_KeyValues.Count(); }
+	inline intp GetFirst() const			{ return m_KeyValues.Count() - 1; }
+	inline intp GetNext( intp i ) const		{ return i - 1; }
+	static constexpr inline intp GetInvalidIndex()	{ return -1; }
 
-	void RemoveKeyAt(int nIndex);
-	int FindByKeyName( const char *pKeyName ) const; // Returns the same value as GetInvalidIndex if not found.
+	void RemoveKeyAt(intp nIndex);
+	intp FindByKeyName( const char *pKeyName ) const; // Returns the same value as GetInvalidIndex if not found.
 
 	// Special function used for non-unique keyvalue lists.
 	void AddKeyValue(const char *pszKey, const char *pszValue);
@@ -175,7 +175,7 @@ public:
 	MDkeyvalue &GetKeyValue(unsigned short nIndex);
 	const MDkeyvalue& GetKeyValue(unsigned short nIndex) const;
 	const char *GetValue(unsigned short nIndex) const;
-	const char *GetValue(const char *pszKey, int *piIndex = NULL) const;
+	const char *GetValue(const char *pszKey, intp *piIndex = NULL) const;
 };
 
 

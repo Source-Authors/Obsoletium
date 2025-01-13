@@ -52,11 +52,11 @@ class GDclass
 		//
 		// Interface to variable information (keys):
 		//
-		inline int GetVariableCount() const { return(m_nVariables); }
-		GDinputvariable *GetVariableAt(int iIndex);
+		inline intp GetVariableCount() const { return(m_nVariables); }
+		GDinputvariable *GetVariableAt(intp iIndex);
 		void GetHelperForGDVar( GDinputvariable *pVar, CUtlVector<const char *> *helperName );
-		GDinputvariable *VarForName(const char *pszName, int *piIndex = NULL);
-		BOOL AddVariable(GDinputvariable *pVar, GDclass *pBase, int iBaseIndex, int iVarIndex);
+		GDinputvariable *VarForName(const char *pszName, intp *piIndex = NULL);
+		BOOL AddVariable(GDinputvariable *pVar, GDclass *pBase, intp iBaseIndex, intp iVarIndex);
 		void AddBase(GDclass *pBase);
 
 		//
@@ -64,16 +64,16 @@ class GDclass
 		//
 		inline void AddInput(CClassInput *pInput);
 		CClassInput *FindInput(const char *szName);
-		inline int GetInputCount() const { return(m_Inputs.Count()); }
-		CClassInput *GetInput(int nIndex);
+		inline intp GetInputCount() const { return(m_Inputs.Count()); }
+		CClassInput *GetInput(intp nIndex);
 
 		//
 		// Interface to output information:
 		//
 		inline void AddOutput(CClassOutput *pOutput);
 		CClassOutput *FindOutput(const char *szName);
-		inline int GetOutputCount() const { return(m_Outputs.Count()); }
-		CClassOutput *GetOutput(int nIndex);
+		inline intp GetOutputCount() const { return(m_Outputs.Count()); }
+		CClassOutput *GetOutput(intp nIndex);
 
 		GameData *Parent;
 
@@ -113,8 +113,8 @@ class GDclass
 		// Interface to helper information:
 		//
 		inline void AddHelper(CHelperInfo *pHelper);
-		inline int GetHelperCount() const { return(m_Helpers.Count()); }
-		CHelperInfo *GetHelper(int nIndex);
+		inline intp GetHelperCount() const { return(m_Helpers.Count()); }
+		CHelperInfo *GetHelper(intp nIndex);
 
 	protected:
 
@@ -154,7 +154,7 @@ class GDclass
 		char *m_pszDescription;				// Description of this class, dynamically allocated.
 
 		CUtlVector<GDinputvariable *> m_Variables;		// Variables for this class.
-		int m_nVariables;								// Count of base & local variables combined.
+		intp m_nVariables;								// Count of base & local variables combined.
 		CUtlVector<GDclass *> m_Bases;					// List of base classes this class inherits from.
 
 		CClassInputList m_Inputs;
@@ -166,7 +166,7 @@ class GDclass
 		//	[0] = base number from Bases, or -1 if not in a base.
 		//	[1] = index into base's variables
 		//
-		int m_VariableMap[GD_MAX_VARIABLES][2];
+		intp m_VariableMap[GD_MAX_VARIABLES][2];
 
 		Vector m_bmins;		// 3D minima of object (pointclass).
 		Vector m_bmaxs;		// 3D maxima of object (pointclass).
