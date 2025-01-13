@@ -652,7 +652,7 @@ void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 //	Index 1+: comment string
 //	Returns nullptr when you've reached the end of the comment string array
 //  Empty strings ("\0") can be returned if comment hasn't been set
-const char *MinidumpUserStreamInfoGet( int Index )
+const char *MinidumpUserStreamInfoGet( intp Index )
 {
 	if( ( Index < 0 ) || ( Index >= ssize( g_UserStreamInfo ) + 1) ) //+1 because we map 0 to the header
 		return nullptr;
