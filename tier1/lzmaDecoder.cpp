@@ -2,8 +2,8 @@
 //
 //  LZMA Codec interface for engine.
 //
-//  LZMA SDK 9.38 beta
-//  2015-01-03 : Igor Pavlov : Public domain
+//  LZMA SDK 24.09
+//  2024-11-29 : Igor Pavlov : Public domain
 //  https://www.7-zip.org/
 //
 //========================================================================//
@@ -14,9 +14,9 @@
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
 
-#include "../utils/lzma/C/7zTypes.h"
-#include "../utils/lzma/C/LzmaEnc.h"
-#include "../utils/lzma/C/LzmaDec.h"
+#include "../thirdparty/7zip/C/7zTypes.h"
+#include "../thirdparty/7zip/C/LzmaEnc.h"
+#include "../thirdparty/7zip/C/LzmaDec.h"
 
 // Ugly define to let us forward declare the anonymous-struct-typedef that is CLzmaDec in the header.
 #define CLzmaDec_t CLzmaDec
@@ -43,7 +43,7 @@ ConVar lzma_persistent_buffer( "lzma_persistent_buffer", LZMA_DEFAULT_PERSISTENT
 static void *g_pStaticLZMABuf = NULL;
 static size_t g_unStaticLZMABufSize = 0;
 static uint32 g_unStaticLZMABufRef = 0;
-static void *SzAlloc( [[maybe_unused]] void *p, size_t size) {
+static void *SzAlloc( [[maybe_unused]] ISzAllocPtr p, size_t size) {
 	// Don't touch static buffer on other threads.
 	if ( ThreadInMainThread() )
 	{
@@ -64,7 +64,7 @@ static void *SzAlloc( [[maybe_unused]] void *p, size_t size) {
 	// Not using the persistent buffer
 	return malloc(size);
 }
-static void SzFree( [[maybe_unused]] void *p, void *address) {
+static void SzFree( [[maybe_unused]] ISzAllocPtr p, void *address) {
 	// Don't touch static buffer on other threads.
 	if ( ThreadInMainThread() )
 	{
@@ -125,9 +125,9 @@ unsigned int CLZMA::GetActualSize( unsigned char *pInput )
 // adequate sized output buffer or memory corruption will occur.
 //-----------------------------------------------------------------------------
 /* static */
-unsigned int CLZMA::Uncompress( unsigned char *pInput, unsigned char *pOutput )
+size_t CLZMA::Uncompress( unsigned char *pInput, unsigned char *pOutput )
 {
-	lzma_header_t *pHeader = (lzma_header_t *)pInput;
+	auto *pHeader = (lzma_header_t *)pInput;
 	if ( pHeader->id != LZMA_ID )
 	{
 		// not ours
@@ -135,7 +135,6 @@ unsigned int CLZMA::Uncompress( unsigned char *pInput, unsigned char *pOutput )
 	}
 
 	CLzmaDec state;
-
 	LzmaDec_Construct(&state);
 
 	if ( LzmaDec_Allocate(&state, pHeader->properties, LZMA_PROPS_SIZE, &g_Alloc) != SZ_OK )

@@ -2,8 +2,8 @@
 //
 //  LZMA Codec interface for engine.
 //
-//  LZMA SDK 9.38 beta
-//  2015-01-03 : Igor Pavlov : Public domain
+//  LZMA SDK 24.09
+//  2024-11-29 : Igor Pavlov : Public domain
 //  https://www.7-zip.org/
 //
 //========================================================================//
@@ -13,7 +13,7 @@
 #pragma once
 
 // Thanks for the useful define namespacing, LZMA
-#include "../../utils/lzma/C/7zVersion.h"
+#include "../thirdparty/7zip/C/7zVersion.h"
 #define LZMA_SDK_VERSION_MAJOR MY_VER_MAJOR
 #define LZMA_SDK_VERSION_MINOR MY_VER_MINOR
 
@@ -39,7 +39,7 @@ class CLZMAStream;
 class CLZMA
 {
 public:
-	static unsigned int	Uncompress( unsigned char *pInput, unsigned char *pOutput );
+	static size_t		Uncompress( unsigned char *pInput, unsigned char *pOutput );
 	static bool			IsCompressed( unsigned char *pInput );
 	static unsigned int	GetActualSize( unsigned char *pInput );
 };
