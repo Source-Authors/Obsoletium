@@ -603,7 +603,8 @@ int CThreadPool::ResumeExecution()
 
 void CThreadPool::WaitForIdle( bool bAll )
 {
-	ThreadWaitForEvents( m_IdleEvents.Count(), m_IdleEvents.Base(), bAll, 60000 );
+	Assert(m_IdleEvents.Count() <= INT_MAX);
+	ThreadWaitForEvents( static_cast<int>(m_IdleEvents.Count()), m_IdleEvents.Base(), bAll, 60000 );
 }
 
 //---------------------------------------------------------
@@ -658,8 +659,9 @@ int CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsigned ti
 	{
 		handles.AddToTail( ppJobs[i]->AccessEvent() );
 	}
-
-	return YieldWait( handles.Base(), handles.Count(), bWaitAll, timeout);
+	
+	Assert(handles.Count() <= INT_MAX);
+	return YieldWait( handles.Base(), static_cast<int>(handles.Count()), bWaitAll, timeout);
 }
 
 //---------------------------------------------------------

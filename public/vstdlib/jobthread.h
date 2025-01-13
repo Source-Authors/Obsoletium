@@ -683,7 +683,8 @@ public:
 
 	void WaitForFinish( IThreadPool *pPool, bool bRelease = true )
 	{
-		pPool->YieldWait( m_jobs.Base(), m_jobs.Count() );
+		Assert(m_jobs.Count() <= INT_MAX);
+		pPool->YieldWait( m_jobs.Base(), static_cast<int>(m_jobs.Count()) );
 
 		if ( bRelease )
 		{
