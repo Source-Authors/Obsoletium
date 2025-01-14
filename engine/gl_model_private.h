@@ -523,9 +523,9 @@ inline unsigned short MSurf_AreDynamicShadowsEnabled( SurfaceHandle_t surfID )
 
 inline int MSurf_Index( SurfaceHandle_t surfID, worldbrushdata_t *pData = host_state.worldbrush )
 {
-	int surfaceIndex = surfID - pData->surfaces2;
+	intp surfaceIndex = surfID - pData->surfaces2;
 	Assert(surfaceIndex >= 0 && surfaceIndex < pData->numsurfaces);
-	return surfaceIndex;
+	return static_cast<int>(surfaceIndex);
 }
 
 inline SurfaceHandle_t SurfaceHandleFromIndex( int surfaceIndex, const worldbrushdata_t *pData )
