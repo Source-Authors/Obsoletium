@@ -97,10 +97,13 @@ unsigned char *CLZSS::CompressNoAlloc( const unsigned char *pInput, int inputLen
 	ETWMark1I("CompressNoAlloc", inputLength );
 
 	// create the compression work buffers, small enough (~64K) for stack
-	m_pHashTable = (lzss_list_t *)stackalloc( 256 * sizeof( lzss_list_t ) );
-	memset( m_pHashTable, 0, 256 * sizeof( lzss_list_t ) );
-	m_pHashTarget = (lzss_node_t *)stackalloc( m_nWindowSize * sizeof( lzss_node_t ) );
-	memset( m_pHashTarget, 0, m_nWindowSize * sizeof( lzss_node_t ) );
+	constexpr size_t tableSize = 256 * sizeof( lzss_list_t );
+	m_pHashTable = (lzss_list_t *)stackalloc( tableSize );
+	memset( m_pHashTable, 0, tableSize );
+
+	const ptrdiff_t targetSize = m_nWindowSize * sizeof( lzss_node_t );
+	m_pHashTarget = (lzss_node_t *)stackalloc( targetSize );
+	memset( m_pHashTarget, 0, targetSize );
 
 	// allocate the output buffer, compressed buffer is expected to be less, caller will free
 	unsigned char *pStart = pOutputBuf;
