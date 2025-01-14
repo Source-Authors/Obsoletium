@@ -204,32 +204,21 @@ public:
 	CTempEnvVar m_Path;
 };
 
+}  // namespace
 
 // ---------------------------------------------------------------------------------------------------- //
 // Helpers.
 // ---------------------------------------------------------------------------------------------------- //
-template<size_t outSize>
-[[nodiscard]] bool Q_getwd( char (&out)[outSize] ) {
-#if defined( _WIN32 ) || defined( WIN32 )
-	bool ok = !!_getcwd( out, outSize );
+[[nodiscard]] bool Q_getwd( char *out, int outSize )
+{
+	const bool ok{!!_getcwd( out, outSize )};
 	if (ok)
 	{
-		V_strcat_safe( out, "\\" );
+		V_strncat( out, CORRECT_PATH_SEPARATOR_S, outSize );
 		Q_FixSlashes( out );
 	}
 	return ok;
-#else
-	bool ok = !!getcwd( out, outSize );
-	if (ok)
-	{
-		V_strcat_safe( out, "/" );
-		Q_FixSlashes( out );
-	}
-	return ok;
-#endif
 }
-
-}  // namespace
 
 // ---------------------------------------------------------------------------------------------------- //
 // Module interface.

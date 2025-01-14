@@ -224,6 +224,13 @@ FSReturnCode_t GetSteamCfgPath( char *steamCfgPath, int steamCfgPathLen );
 // Returns the last error.
 const char *FileSystem_GetLastErrorString();
 
+template <int outSize>
+[[nodiscard]] bool Q_getwd(char (&out)[outSize])
+{
+	[[nodiscard]] bool Q_getwd(char *out, int outSize);
+	return Q_getwd( out, outSize );
+}
+
 // dimhotepus: Drop internal function.
 // void Q_getwd( char *out, int outSize );
 
