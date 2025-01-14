@@ -39,7 +39,7 @@ CBudgetBarGraphPanel::~CBudgetBarGraphPanel()
 {
 }
 
-void CBudgetBarGraphPanel::GetBudgetGroupTopAndBottom( int id, int &top, int &bottom )
+void CBudgetBarGraphPanel::GetBudgetGroupTopAndBottom( intp id, int &top, int &bottom )
 {
 	// Ask where the corresponding graph label is.
 	m_pBudgetPanel->GetGraphLabelScreenSpaceTopAndBottom( id, top, bottom );
@@ -51,7 +51,7 @@ void CBudgetBarGraphPanel::GetBudgetGroupTopAndBottom( int id, int &top, int &bo
 	bottom = top + tall;
 }
 
-void CBudgetBarGraphPanel::DrawBarAtIndex( int id, float percent )
+void CBudgetBarGraphPanel::DrawBarAtIndex( intp id, float percent )
 {
 	int panelWidth, panelHeight;
 	GetSize( panelWidth, panelHeight );
@@ -76,7 +76,7 @@ void CBudgetBarGraphPanel::DrawBarAtIndex( int id, float percent )
 	vgui::surface()->DrawFilledRect( left, top+2, right, bottom-2 );
 }
 
-void CBudgetBarGraphPanel::DrawTickAtIndex( int id, float percent, int red, int green, int blue, int alpha )
+void CBudgetBarGraphPanel::DrawTickAtIndex( intp id, float percent, int red, int green, int blue, int alpha )
 {
 	if( percent > 1.0f )
 	{

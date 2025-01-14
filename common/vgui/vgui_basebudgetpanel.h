@@ -86,7 +86,7 @@ public:
 
 	const double *GetBudgetGroupData( intp &nGroups, int &nSamplesPerGroup, int &nSampleOffset ) const;
 	
-	void GetGraphLabelScreenSpaceTopAndBottom( int id, int &top, int &bottom );
+	void GetGraphLabelScreenSpaceTopAndBottom( intp id, int &top, int &bottom );
 
 	// What percentage is the specified value of the (bargraph) range?
 	float GetBudgetGroupPercent( float value );

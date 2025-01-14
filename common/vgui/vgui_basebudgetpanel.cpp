@@ -432,7 +432,7 @@ void CBaseBudgetPanel::MarkForFullRepaint()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseBudgetPanel::GetGraphLabelScreenSpaceTopAndBottom( int id, int &top, int &bottom )
+void CBaseBudgetPanel::GetGraphLabelScreenSpaceTopAndBottom( intp id, int &top, int &bottom )
 {
 	int x = 0;
 	int y = 0;
