@@ -110,12 +110,12 @@ bool Serialize( CUtlBuffer &buf, const CUtlVector<T> &src )
 {
 	extern const char *s_pUtlBufferUtilArrayDelim;
 
-	int nCount = src.Count();
+	intp nCount = src.Count();
 
 	if ( !buf.IsText() )
 	{
 		buf.PutInt( nCount );
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			::Serialize( buf, src[i] );
 		}
@@ -125,7 +125,7 @@ bool Serialize( CUtlBuffer &buf, const CUtlVector<T> &src )
 	if ( !SerializesOnMultipleLines<T>() )
 	{
 		buf.PutChar('\n');
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			::Serialize( buf, src[i] );
 			if ( s_pUtlBufferUtilArrayDelim && (i != nCount-1) )
@@ -137,7 +137,7 @@ bool Serialize( CUtlBuffer &buf, const CUtlVector<T> &src )
 	}
 	else
 	{
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			::Serialize( buf, src[i] );
 			if ( s_pUtlBufferUtilArrayDelim && (i != nCount-1) )
