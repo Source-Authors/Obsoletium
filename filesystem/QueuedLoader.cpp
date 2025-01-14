@@ -94,8 +94,8 @@ struct FileJob_t
 	unsigned int			m_nStartOffset;
 	LoaderPriority_t		m_Priority;
 
-	unsigned int			m_SubmitTime;
-	unsigned int			m_FinishTime;
+	unsigned long long		m_SubmitTime;
+	unsigned long long		m_FinishTime;
 	int						m_SubmitTag;
 	int						m_nActualBytesRead;
 	LoaderError_t			m_LoaderError;
@@ -198,8 +198,8 @@ private:
 	bool								m_bDoProgress;
 	bool								m_bSameMap;
 	int									m_nSubmitCount;
-	unsigned int						m_StartTime;
-	unsigned int						m_EndTime;
+	unsigned long long					m_StartTime;
+	unsigned long long					m_EndTime;
 	char								m_szMapNameToCompareSame[MAX_PATH];
 
 	DynamicResourceCallback_t			m_pfnDynamicCallback;
@@ -521,7 +521,8 @@ void IOComputationJob( FileJob_t *pFileJob, void *pData, int nSize, LoaderError_
 
 	// mark as completed
 	pFileJob->m_bFinished = true;
-	pFileJob->m_FinishTime = Plat_MSTime();
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	pFileJob->m_FinishTime = Plat_USTime();
 	pFileJob->m_ThreadId = ThreadGetCurrentId();
 
 	if ( pFileJob->m_Priority == LOADERPRIORITY_DURINGPRELOAD )
@@ -819,7 +820,8 @@ void CQueuedLoader::SubmitPendingJobs()
 		FileJob_t *pFileJob = sortedFiles[i];
 		
 		pFileJob->m_SubmitTag = m_nSubmitCount;
-		pFileJob->m_SubmitTime = Plat_MSTime();
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		pFileJob->m_SubmitTime = Plat_USTime();
 
 		m_SubmittedJobs.AddToTail( pFileJob );
 
@@ -1198,7 +1200,7 @@ void CQueuedLoader::PurgeQueue()
 }
 
 //-----------------------------------------------------------------------------
-// Spew info abut queued load
+// Spew info about queued load
 //-----------------------------------------------------------------------------
 void CQueuedLoader::SpewInfo()
 {
@@ -1216,7 +1218,8 @@ void CQueuedLoader::SpewInfo()
 		{
 			FileJob_t *pFileJob = m_SubmittedJobs[iIndex];	
 
-			int asyncDuration = -1;
+			// dimhotepus: Use mcs as ms overflows in 49.7 days.
+			auto asyncDuration = std::numeric_limits<unsigned long long>::max();
 			if ( pFileJob->m_FinishTime )
 			{
 				asyncDuration = pFileJob->m_FinishTime - pFileJob->m_SubmitTime;
@@ -1257,9 +1260,9 @@ void CQueuedLoader::SpewInfo()
 			}
 
 			char szFilename[MAX_PATH];
-			Msg( "Submit:%5dms AsyncDuration:%5dms Tag:%d Thread:%8.8x Size:%7d %s%s\n", 
-					pFileJob->m_SubmitTime - m_StartTime, 
-					asyncDuration, 
+			Msg( "Submit:%5llums AsyncDuration:%5lldms Tag:%d Thread:%8.8x Size:%7d %s%s\n", 
+					(pFileJob->m_SubmitTime - m_StartTime) / 1000, 
+					static_cast<long long>(asyncDuration != std::numeric_limits<unsigned long long>::max() ? asyncDuration / 1000 : -1), 
 					pFileJob->m_SubmitTag,
 					pFileJob->m_ThreadId,
 					pFileJob->m_nActualBytesRead,
@@ -1280,7 +1283,7 @@ void CQueuedLoader::SpewInfo()
 	Msg( "  Total Anonymous Unclaimed: %d\n", totalUnclaimed );
 	if ( m_EndTime )
 	{
-		Msg( "Queuing Duration: %dms\n", m_EndTime - m_StartTime );
+		Msg( "Queuing Duration: %llums\n", (m_EndTime - m_StartTime) / 1000 );
 	}
 }
 
@@ -1606,7 +1609,8 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 
 	m_bActive = true;
 	m_nSubmitCount = 0;
-	m_StartTime = Plat_MSTime();
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	m_StartTime = Plat_USTime();
 	m_EndTime = 0;
 	m_bCanBatch = false;
 	m_bBatching = false;
@@ -1726,8 +1730,9 @@ void CQueuedLoader::EndMapLoading( bool bAbort )
 				g_pThreadPool->Yield( MAIN_THREAD_YIELD_TIME );
 			}
 		}
-
-		m_EndTime = Plat_MSTime();
+		
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		m_EndTime = Plat_USTime();
 		m_bActive = false;
 
 		// transmit the end map event
