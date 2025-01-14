@@ -316,10 +316,10 @@ void CompileCaptionsApp::CompileCaptionFile(char const *infile,
   CUtlBuffer out;
   out.Put(&header, sizeof(header));
   out.Put(directory.Base(), directory.Count() * sizeof(CaptionLookup_t));
-  int curOffset = out.TellPut();
+  intp curOffset = out.TellPut();
   // Round it up to the next 512 byte boundary
-  int nBytesDestBuffer = AlignValue(curOffset, 512);  // align to HD sector
-  int nPadding = nBytesDestBuffer - curOffset;
+  intp nBytesDestBuffer = AlignValue(curOffset, 512);  // align to HD sector
+  intp nPadding = nBytesDestBuffer - curOffset;
   while (--nPadding >= 0) {
     out.PutChar(0);
   }
