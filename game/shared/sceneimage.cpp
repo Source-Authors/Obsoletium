@@ -303,14 +303,14 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 	char *pPath = strtok( searchPaths, ";" );
 	while ( pPath )
 	{
-		int currentCount = vcdFileList.Count();
+		intp currentCount = vcdFileList.Count();
 
 		char szPath[MAX_PATH];
 		V_ComposeFileName( pPath, "scenes/*.vcd", szPath, sizeof( szPath ) );
 
 		scriptlib->FindFiles( szPath, true, vcdFileList );
 
-		Msg( "Scenes: Searching '%s' - Found %d scenes.\n", szPath, vcdFileList.Count() - currentCount );
+		Msg( "Scenes: Searching '%s' - Found %zd scenes.\n", szPath, vcdFileList.Count() - currentCount );
 
 		pPath = strtok( NULL, ";" );
 	}
