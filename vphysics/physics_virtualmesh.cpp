@@ -218,16 +218,16 @@ public:
 		}
 		const_cast<CPhysCollideVirtualMesh *>(this)->Release();
 	}
-	unsigned int GetSerializationSize() const override 
+	size_t GetSerializationSize() const override 
 	{ 
 		if ( !m_pHull )
 			return 0; 
 		return m_pHull->TotalSize();
 	}
 
-	unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const override 
+	size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const override 
 	{
-		unsigned int size = GetSerializationSize();
+		size_t size = GetSerializationSize();
 		if ( size )
 		{
 			memcpy( pDest, m_pHull, size );
@@ -360,7 +360,7 @@ private:
 	virtualmeshparams_t m_params;
 	virtualmeshhull_t *m_pHull;
 	memhandle_t		m_hMemory;
-	short			m_ledgeCount;
+	int			m_ledgeCount;
 };
 
 static void FlushFrameLocks()

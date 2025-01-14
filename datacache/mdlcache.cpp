@@ -424,7 +424,7 @@ public:
 	// Task switch
 	void ReleaseMaterialSystemObjects();
 	void RestoreMaterialSystemObjects( int nChangeFlags );
-	bool GetVCollideSize( MDLHandle_t handle, int *pVCollideSize ) override;
+	bool GetVCollideSize( MDLHandle_t handle, size_t *pVCollideSize ) override;
 
 	void BeginMapLoad() override;
 	void EndMapLoad() override;
@@ -1128,7 +1128,7 @@ vcollide_t *CMDLCache::GetVCollideEx( MDLHandle_t handle, bool synchronousLoad /
 }
 
 
-bool CMDLCache::GetVCollideSize( MDLHandle_t handle, int *pVCollideSize )
+bool CMDLCache::GetVCollideSize( MDLHandle_t handle, size_t *pVCollideSize )
 {
 	*pVCollideSize = 0;
 

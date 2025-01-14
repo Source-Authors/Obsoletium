@@ -222,9 +222,9 @@ public:
 	virtual void			DestroyCollide( CPhysCollide *pCollide ) = 0;
 
 	// Get the memory size in bytes of the collision model for serialization
-	virtual int				CollideSize( CPhysCollide *pCollide ) = 0;
+	virtual size_t			CollideSize( CPhysCollide *pCollide ) = 0;
 	// serialize the collide to a block of memory
-	virtual int				CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap = false ) = 0;
+	virtual size_t			CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap = false ) = 0;
 	// unserialize the collide from a block of memory
 	virtual CPhysCollide	*UnserializeCollide( char *pBuffer, int size, int index ) = 0;
 
@@ -295,7 +295,7 @@ public:
 	virtual bool			SupportsVirtualMesh() = 0;
 
 
-	virtual bool			GetBBoxCacheSize( unsigned *pCachedSize, intp *pCachedCount ) = 0;
+	virtual bool			GetBBoxCacheSize( size_t *pCachedSize, intp *pCachedCount ) = 0;
 
 	
 	// extracts a polyhedron that defines a CPhysConvex's shape

@@ -2742,8 +2742,8 @@ bool Mod_LoadGameLump( int lumpId, void *pOutBuffer, int size )
 	else
 	{
 		// uncompress directly into caller's buffer
-		int outputLength = CLZMA::Uncompress( pData, (unsigned char *)pOutBuffer );
-		bResult = ( outputLength > 0 && (unsigned int)outputLength == g_GameLumpDict[i].uncompressedSize );
+		size_t outputLength = CLZMA::Uncompress( pData, (unsigned char *)pOutBuffer );
+		bResult = ( outputLength > 0 && outputLength == g_GameLumpDict[i].uncompressedSize );
 	}
 
 	if ( !s_MapBuffer.Base() )
@@ -4850,7 +4850,7 @@ void CModelLoader::Studio_ReloadModels( CModelLoader::ReloadType_t reloadType )
 struct modelsize_t
 {
 	const char *pName;
-	int			size;
+	size_t		size;
 };
 
 class CModelsize_Less
@@ -4864,14 +4864,15 @@ public:
 
 void CModelLoader::DumpVCollideStats()
 {
-	int i;
 	CUtlSortVector< modelsize_t, CModelsize_Less > list;
-	for ( i = 0; (m_Models).IsUtlMap && i < (m_Models).MaxElement(); ++i ) if ( !(m_Models).IsValidIndex( i ) ) continue; else
+	for ( decltype(m_Models)::IndexType_t i = 0; (m_Models).IsUtlMap && i < (m_Models).MaxElement(); ++i )
+		if ( !(m_Models).IsValidIndex( i ) ) continue;
+		else
 	{
 		model_t *pModel = m_Models[ i ].modelpointer;
 		if ( pModel && pModel->type == mod_studio )
 		{
-			int size = 0;
+			size_t size = 0;
 			bool loaded = g_pMDLCache->GetVCollideSize( pModel->studio, &size );
 			if ( loaded && size )
 			{
@@ -4882,12 +4883,12 @@ void CModelLoader::DumpVCollideStats()
 			}
 		}
 	}
-	for ( i = m_InlineModels.Count(); --i >= 0; )
+	for ( intp i = m_InlineModels.Count(); --i >= 0; )
 	{
 		vcollide_t *pCollide = CM_VCollideForModel( i+1, &m_InlineModels[i] );
 		if ( pCollide )
 		{
-			int size = 0;
+			size_t size = 0;
 			for ( int j = 0; j < pCollide->solidCount; j++ )
 			{
 				size += physcollision->CollideSize( pCollide->solids[j] );
@@ -4903,19 +4904,19 @@ void CModelLoader::DumpVCollideStats()
 		}
 	}
 
-	Msg("VCollides loaded: %d\n", list.Count() );
-	intp totalVCollideMemory = 0;
-	for ( i = 0; i < list.Count(); i++ )
+	Msg("VCollides loaded: %zd\n", list.Count() );
+	size_t totalVCollideMemory = 0;
+	for ( intp i = 0; i < list.Count(); i++ )
 	{
-		Msg("%8d bytes:%s\n", list[i].size, list[i].pName);
+		Msg("%8zu bytes:%s\n", list[i].size, list[i].pName);
 		totalVCollideMemory += list[i].size;
 	}
-	unsigned bboxSize;
+	size_t bboxSize;
 	intp bboxCount;
 	physcollision->GetBBoxCacheSize( &bboxSize, &bboxCount );
-	Msg( "%8u bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
+	Msg( "%8zu bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
 	totalVCollideMemory += bboxSize;
-	Msg( "--------------\n%8zd bytes total VCollide Memory\n", totalVCollideMemory );
+	Msg( "--------------\n%8zu bytes total VCollide Memory\n", totalVCollideMemory );
 }
 
 

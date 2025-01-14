@@ -562,7 +562,7 @@ intp ByteswapPHY( void *pDestBase, const void *pSrcBase, intp fileSize )
 	{
 		// skip over the size
 		pDest += sizeof(int);
-		int offset = pCollision->CollideWrite( (char*)pDest, collide.solids[i], g_bNativeSrc );
+		size_t offset = pCollision->CollideWrite( (char*)pDest, collide.solids[i], g_bNativeSrc );
 		int destSize = g_bNativeSrc ? SwapLong( offset ) : offset;
 		Q_memcpy( pDest - sizeof(int), &destSize, sizeof(int) );
 		pDest += offset;

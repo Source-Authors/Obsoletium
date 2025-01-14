@@ -228,7 +228,7 @@ public:
 	virtual void FinishPendingLoads() = 0;
 
 	virtual vcollide_t *GetVCollideEx( MDLHandle_t handle, bool synchronousLoad = true ) = 0;
-	virtual bool GetVCollideSize( MDLHandle_t handle, int *pVCollideSize ) = 0;
+	virtual bool GetVCollideSize( MDLHandle_t handle, size_t *pVCollideSize ) = 0;
 
 	virtual bool GetAsyncLoad( MDLCacheDataType_t type ) = 0;
 	virtual bool SetAsyncLoad( MDLCacheDataType_t type, bool bAsync ) = 0;

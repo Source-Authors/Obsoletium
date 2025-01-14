@@ -165,7 +165,7 @@ static unsigned short GetPackedIndex( const IVP_Compact_Ledge *pLedge, const IVP
 			break;
 	}
 
-	int triIndex = pBestTri - pLedge->get_first_triangle();
+	intp triIndex = pBestTri - pLedge->get_first_triangle();
 	int edgeIndex = 0;
 	// just do a search for the edge containing this vert instead of storing it along the way
 	for ( i = 0; i < 3; i++ )

@@ -279,7 +279,7 @@ void CPhysicsMotionController::WriteToTemplate( vphysics_save_motioncontroller_t
 {
 	controllerTemplate.m_nPriority = m_priority;
 
-	int nObjectCount = CountObjects();
+	intp nObjectCount = CountObjects();
 	controllerTemplate.m_objectList.AddMultipleToTail( nObjectCount );
 	GetObjects( controllerTemplate.m_objectList.Base() );
 }

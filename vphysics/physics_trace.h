@@ -40,8 +40,8 @@ public:
 	// get a surface manager 
 	virtual IVP_SurfaceManager *CreateSurfaceManager( short & ) const = 0;
 	virtual void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const = 0;
-	virtual unsigned int GetSerializationSize() const = 0;
-	virtual unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const = 0;
+	virtual size_t GetSerializationSize() const = 0;
+	virtual size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const = 0;
 	virtual int GetVCollideIndex() const = 0;
 	virtual Vector GetMassCenter() const = 0;
 	virtual void SetMassCenter( const Vector &massCenter ) = 0;
