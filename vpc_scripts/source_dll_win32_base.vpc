@@ -77,7 +77,6 @@ $Configuration
 							"del /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
 							"exit 1" "\n" \
 							":BuildEventOK" "\n" 
-
 		$Description		"Publishing to $OUTBINDIR"
 		$ExcludedFromBuild	"No"
 	}

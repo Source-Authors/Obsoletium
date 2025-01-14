@@ -34,36 +34,36 @@ $Configuration
 
 	$PostBuildEvent	[$WIN32 && !$ANALYZE]
 	{
-		$CommandLine				"IF NOT EXIST $OUTBINDIR MKDIR $OUTBINDIR" "\n"				\
-									"COPY $(TargetPath) $OUTBINDIR\$OUTBINNAME.exe" "\n"					\
+		$CommandLine				"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"				\
+									"COPY $QUOTE$(TargetPath)$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.exe$QUOTE" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $(IntDir)\$OUTBINNAME.pdb $OUTBINDIR\$OUTBINNAME.pdb" "\n"					\
+									"COPY $QUOTE$(IntDir)\$OUTBINNAME.pdb$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.pdb$QUOTE" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIR\$OUTBINNAME.map" "\n" \
-									"$OUTBINDIR\bin\newdat $OUTBINDIR\$OUTBINNAME.exe" "\n"					\
-									"COPY $(SolutionDir)LICENSE $OUTBINDIR\LICENSE" "\n"					\
+									"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.map$QUOTE" "\n" \
+									"$QUOTE$OUTBINDIR\bin\newdat$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.exe$QUOTE" "\n"					\
+									"COPY $QUOTE$(SolutionDir)LICENSE$QUOTE $QUOTE$OUTBINDIR\LICENSE$QUOTE" "\n"					\
 									"GOTO BuildEventOK" "\n" \
 									":BuildEventFailed" "\n" \
 									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-									"DEL /Q $(TargetPath)" "\n" \
+									"DEL /Q $QUOTE$(TargetPath)$QUOTE" "\n" \
 									"EXIT 1" "\n" \
 									":BuildEventOK" "\n"
 	}
 
 	$PostBuildEvent	[$WIN64 && !$ANALYZE]
 	{
-		$CommandLine				"IF NOT EXIST $OUTBINDIRX64 MKDIR $OUTBINDIRX64" "\n"				\
-									"COPY $(TargetPath) $OUTBINDIRX64\$OUTBINNAME.exe" "\n"					\
+		$CommandLine				"IF NOT EXIST $QUOTE$OUTBINDIRX64$QUOTE MKDIR $QUOTE$OUTBINDIRX64$QUOTE" "\n"				\
+									"COPY $QUOTE$(TargetPath)$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.exe$QUOTE" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $(IntDir)\$OUTBINNAME.pdb $OUTBINDIRX64\$OUTBINNAME.pdb" "\n"					\
+									"COPY $QUOTE$(IntDir)\$OUTBINNAME.pdb$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.pdb$QUOTE" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIRX64\$OUTBINNAME.map" "\n" \
-									"$OUTBINDIRX64\bin\x64\newdat $OUTBINDIRX64\$OUTBINNAME.exe" "\n"					\
-									"COPY $(SolutionDir)LICENSE $OUTBINDIRX64\LICENSE" "\n"					\
+									"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.map$QUOTE" "\n" \
+									"$QUOTE$OUTBINDIRX64\bin\x64\newdat$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.exe$QUOTE" "\n"					\
+									"COPY $QUOTE$(SolutionDir)LICENSE$QUOTE $QUOTE$OUTBINDIRX64\LICENSE$QUOTE" "\n"					\
 									"GOTO BuildEventOK" "\n" \
 									":BuildEventFailed" "\n" \
 									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-									"DEL /Q $(TargetPath)" "\n" \
+									"DEL /Q $QUOTE$(TargetPath)$QUOTE" "\n" \
 									"EXIT 1" "\n" \
 									":BuildEventOK" "\n"
 	}
