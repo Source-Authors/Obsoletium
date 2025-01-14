@@ -183,7 +183,7 @@ private:
 
 	CTSQueue< StuffToMD5_t >				m_PendingJobs;
 	CTSQueue< StuffToMD5_t >				m_CompletedJobs;
-	CUtlLinkedList< SubmittedMd5Job_t >		m_SubmittedJobs;
+	CUtlLinkedList< SubmittedMd5Job_t, int >		m_SubmittedJobs;
 #endif // SUPPORT_PACKED_STORE
 
 	// Stats

@@ -210,7 +210,7 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 		if ( pPreloadEntry )
 		{
 			// convert the absolute pack file position to a local file position
-			int nLocalOffset = nOffset - m_PackFiles[nEntryIndex].m_nPosition;
+			intp nLocalOffset = nOffset - m_PackFiles[nEntryIndex].m_nPosition;
 			byte *pPreloadData = (byte*)m_pPreloadData + pPreloadEntry->DataOffset;
 
 			if ( CLZMA::IsCompressed( pPreloadData ) )
@@ -341,7 +341,7 @@ bool CZipPackFile::GetFileInfo( const char *pFileName, intp &nBaseIndex, int64 &
 	return false;
 }
 
-bool CZipPackFile::IndexToFilename( int nIndex, char *pBuffer, int nBufferSize )
+bool CZipPackFile::IndexToFilename( intp nIndex, char *pBuffer, intp nBufferSize )
 {
 	AssertMsg( nIndex >= 0 && nIndex < m_PackFiles.Count(), "Out of bounds vector access in IndexToFilename" );
 	if ( nIndex >= 0 )

@@ -1517,7 +1517,7 @@ void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{
-		int nTokenSize = resourceList.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+		intp nTokenSize = resourceList.ParseToken( &breakSet, szToken, sizeof( szToken ) );
 		if ( nTokenSize <= 0 )
 		{
 			break;

@@ -128,7 +128,7 @@ public:
 	virtual bool Prepare( int64 fileLen = -1, int64 nFileOfs = 0 ) = 0;
 
 	// Returns the filename for a given file in the pack. Returns true if a filename is found, otherwise buffer is filled with "unknown"
-	virtual bool IndexToFilename( int nIndex, char* buffer, int nBufferSize ) = 0;
+	virtual bool IndexToFilename( intp nIndex, char* buffer, intp nBufferSize ) = 0;
 
 	inline int GetSectorSize();
 
@@ -198,7 +198,7 @@ public:
 
 	virtual int64 GetPackFileBaseOffset() override { return m_nBaseOffset; }
 
-	virtual bool IndexToFilename( int nIndex, char *pBuffer, int nBufferSize ) override;
+	virtual bool IndexToFilename( intp nIndex, char *pBuffer, intp nBufferSize ) override;
 
 protected:
 	virtual int  ReadFromPack( int nIndex, void* buffer, int nDestBytes, int nBytes, int64 nOffset  ) override;

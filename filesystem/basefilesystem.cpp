@@ -1166,7 +1166,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 		// Get the .bsp file header
 		dheader_t header;
 		memset( &header, 0, sizeof(dheader_t) );
-		m_Stats.nBytesRead += FS_fread( &header, sizeof( header ), fp );
+		m_Stats.nBytesRead += FS_fread( &header, static_cast<unsigned>(sizeof( header )), fp );
 		++m_Stats.nReads;
 	
 		if ( header.ident != IDBSPHEADER || header.version < MINBSPVERSION || header.version > BSPVERSION )
@@ -1743,7 +1743,7 @@ bool CBaseFileSystem::ReadToBuffer( FileHandle_t fp, CUtlBuffer &buf, int nMaxBy
 		if ( nBytesDestBuffer != nBytesToRead )
 		{
 			// doing optimal read, align target pointer
-			int nAlignedBase = AlignValue( buf.Base<byte>(), nBufferAlign ) - buf.Base<byte>();
+			intp nAlignedBase = AlignValue( buf.Base<byte>(), nBufferAlign ) - buf.Base<byte>();
 			buf.SeekPut( CUtlBuffer::SEEK_HEAD, nAlignedBase );
 	
 			// the buffer read position is slid forward to ignore the addtional
