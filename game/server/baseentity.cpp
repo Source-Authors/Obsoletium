@@ -3015,17 +3015,24 @@ FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 	if ( pszNameToMatch == pszQuery )
 		return true;
 
+	const char *originalQuery = pszQuery, *originalNameToMatch = STRING(nameToMatch);
+
 	while ( *pszNameToMatch && *pszQuery )
 	{
 		unsigned char cName = *pszNameToMatch;
 		unsigned char cQuery = *pszQuery;
 
-		bool good = goodmatch( cName, cQuery );
+		const bool good = goodmatch( cName, cQuery );
+
+#ifdef _DEBUG
+		const bool bad = badmatch( cName, cQuery );
 
 		// dimhotepus: Detect cases when name matching is different. Inspect them.
-		AssertMsg( !(good ^ badmatch(cName, cQuery)),
+		AssertMsg( good == bad,
 			"Behavior change. %s and %s names matching diffs from original.",
-			pszQuery, pszNameToMatch );
+			originalQuery, originalNameToMatch );
+#endif
+
 		if ( !good )
 		{
 			break;
