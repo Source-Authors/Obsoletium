@@ -1,14 +1,7 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================
-#if !defined( MSGBUFFER_H )
+// Copyright Valve Corporation, All rights reserved.
+
+#ifndef MSGBUFFER_H
 #define MSGBUFFER_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "netadr.h"
 
@@ -24,27 +17,27 @@ public:
 	};
 
 	// Buffers must be named
-					CMsgBuffer( const char *buffername = "unnamed", void (*ef)( PRINTF_FORMAT_STRING const char *fmt, ... ) = 0 );
-	virtual			~CMsgBuffer( void );
+	explicit CMsgBuffer( const char *buffername = "unnamed", void (*ef)( PRINTF_FORMAT_STRING const char *fmt, ... ) = 0 );
+	virtual			~CMsgBuffer();
 
 	// Reset the buffer for writing
-	void			Clear( void );
+	void			Clear();
 	// Get current # of bytes 
-	int				GetCurSize( void );
+	intp			GetCurSize();
 	// Get max # of bytes
-	int				GetMaxSize( void );
+	intp			GetMaxSize();
 	// Get pointer to raw data
-	void			*GetData( void );
+	void			*GetData();
 	// Set/unset the allow overflow flag
 	void			SetOverflow( bool allowed );
 	// Start reading from buffer
-	void			BeginReading( void );
+	void			BeginReading();
 	// Get current read byte
-	int				GetReadCount( void );
+	intp			GetReadCount();
 
 	// Push read count ( to peek at data )
-	void			Push( void );
-	void			Pop( void );
+	void			Push();
+	void			Pop();
 
 	// Writing functions
 	void			WriteByte(unsigned char c);
@@ -52,15 +45,15 @@ public:
 	void			WriteLong(int c);
 	void			WriteFloat(float f);
 	void			WriteString(const char *s);
-	void			WriteBuf( int iSize, void *buf );
+	void			WriteBuf(intp iSize, void *buf);
 
 	// Reading functions
-	int				ReadByte( void );
-	int				ReadShort( void );
-	int				ReadLong( void );
-	float			ReadFloat( void );
-	char			*ReadString( void );
-	int				ReadBuf( int iSize, void *pbuf );
+	int				ReadByte();
+	int				ReadShort();
+	int				ReadLong();
+	float			ReadFloat();
+	char			*ReadString();
+	intp			ReadBuf( intp iSize, void *pbuf );
 
 	// setting and storing time received
 	void			SetTime(float time);
@@ -72,9 +65,9 @@ public:
 
 private:
 	// Ensures sufficient space to append an object of length
-	void			*GetSpace( int length );
+	void			*GetSpace( intp length );
 	// Copy buffer in at current writing point
-	void			Write( const void *data, int length );
+	void			Write( const void *data, intp length );
 
 private:
 	// Name of buffer in case of debugging/errors
@@ -83,16 +76,16 @@ private:
 	void			( *m_pfnErrorFunc )( PRINTF_FORMAT_STRING const char *fmt, ... );
 
 	// Current read pointer
-	int				m_nReadCount;
+	intp			m_nReadCount;
 	// Push/pop read state
-	int				m_nPushedCount;
+	intp			m_nPushedCount;
 	bool			m_bPushed;
 	// Did we hit the end of the read buffer?
 	bool			m_bBadRead;
 	// Max size of buffer
-	int				m_nMaxSize;
+	intp			m_nMaxSize;
 	// Current bytes written
-	int				m_nCurSize;
+	intp			m_nCurSize;
 	// if false, call m_pfnErrorFunc
 	bool			m_bAllowOverflow;
 	// set to true when buffer hits end

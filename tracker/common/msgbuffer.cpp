@@ -4,9 +4,11 @@
 //
 // $NoKeywords: $
 //=============================================================================
-#include <cstring>
 #include "msgbuffer.h"
+
 #include "tier0/dbg.h"
+#include "tier1/strtools.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
@@ -15,7 +17,7 @@
 // Input  : *buffername - 
 //			*ef - 
 //-----------------------------------------------------------------------------
-CMsgBuffer::CMsgBuffer( const char *buffername, void (*ef)( const char *fmt, ... ) /*= NULL*/ )
+CMsgBuffer::CMsgBuffer( const char *buffername, void (*ef)( PRINTF_FORMAT_STRING const char *fmt, ... ) /*= NULL*/ )
 {
 	m_pszBufferName		= buffername;
 	m_pfnErrorFunc		= ef;
@@ -72,9 +74,9 @@ void CMsgBuffer::SetOverflow( bool allowed )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Output : int
+// Output : intp
 //-----------------------------------------------------------------------------
-int CMsgBuffer::GetMaxSize( void )
+intp CMsgBuffer::GetMaxSize( void )
 {
 	return m_nMaxSize;
 }
@@ -90,18 +92,18 @@ void * CMsgBuffer::GetData( void )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Output : int
+// Output : intp
 //-----------------------------------------------------------------------------
-int CMsgBuffer::GetCurSize( void )
+intp CMsgBuffer::GetCurSize( void )
 {
 	return m_nCurSize;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Output : int
+// Output : intp
 //-----------------------------------------------------------------------------
-int CMsgBuffer::GetReadCount( void )
+intp CMsgBuffer::GetReadCount( void )
 {
 	return m_nReadCount;
 }
@@ -202,7 +204,7 @@ void CMsgBuffer::WriteString (const char *s)
 	}
 	else
 	{
-		Write ( s, strlen( s ) + 1 );
+		Write ( s, V_strlen( s ) + 1 );
 	}
 }
 
@@ -211,7 +213,7 @@ void CMsgBuffer::WriteString (const char *s)
 // Input  : iSize - 
 //			*buf - 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::WriteBuf( int iSize, void *buf )
+void CMsgBuffer::WriteBuf( intp iSize, void *buf )
 {
 	if ( !buf )
 	{
@@ -319,14 +321,14 @@ float CMsgBuffer::ReadFloat (void)
 //			*pbuf - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CMsgBuffer::ReadBuf( int iSize, void *pbuf )
+intp CMsgBuffer::ReadBuf( intp iSize, void *pbuf )
 {
 	if (m_nReadCount + iSize > m_nCurSize)
 	{
 		m_bBadRead = true;
 		return -1;
 	}
-		
+
 	memcpy( pbuf, &m_rgData[m_nReadCount], iSize );
 	m_nReadCount += iSize;
 	
@@ -372,10 +374,8 @@ void CMsgBuffer::Clear( void )
 // Purpose: 
 // Input  : length - 
 //-----------------------------------------------------------------------------
-void *CMsgBuffer::GetSpace( int length )
-{
-	void    *d;
-	
+void *CMsgBuffer::GetSpace( intp length )
+{	
 	if (m_nCurSize + length > m_nMaxSize)
 	{
 		if ( !m_bAllowOverflow )
@@ -402,7 +402,7 @@ void *CMsgBuffer::GetSpace( int length )
 		Clear(); 
 	}
 
-	d = m_rgData + m_nCurSize;
+	void *d = m_rgData + m_nCurSize;
 	m_nCurSize += length;
 	return d;
 }
@@ -412,7 +412,7 @@ void *CMsgBuffer::GetSpace( int length )
 // Input  : *m_rgData - 
 //			length - 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::Write(const void *data, int length)
+void CMsgBuffer::Write(const void *data, intp length)
 {
 	memcpy( GetSpace(length), data, length );
 }
