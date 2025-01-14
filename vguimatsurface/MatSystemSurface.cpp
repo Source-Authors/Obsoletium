@@ -960,7 +960,7 @@ void CMatSystemSurface::DrawTexturedLine( const Vertex_t &a, const Vertex_t &b )
 //-----------------------------------------------------------------------------
 // Draws a line!
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::DrawPolyLine( int *px, int *py ,int n )
+void CMatSystemSurface::DrawPolyLine( int *px, int *py ,intp n )
 {
 	MAT_FUNC;
 
@@ -975,9 +975,9 @@ void CMatSystemSurface::DrawPolyLine( int *px, int *py ,int n )
 	InternalSetMaterial( );
 	meshBuilder.Begin( m_pMesh, MATERIAL_LINES, n );
 
-	for ( int i = 0; i < n ; i++ )
+	for ( intp i = 0; i < n ; i++ )
 	{
-		int inext = ( i + 1 ) % n;
+		intp inext = ( i + 1 ) % n;
 
 		vgui::Vertex_t verts[2];
 		vgui::Vertex_t clippedVerts[2];
@@ -2033,13 +2033,12 @@ void CMatSystemSurface::SetBitmapFontName( const char *pName, const char *pFontF
 	Q_strlower( fontPath );
 
 	CUtlSymbol sym( fontPath );
-	intp i;
-	for (i = 0; i < m_BitmapFontFileNames.Count(); i++)
+	for (intp i = 0; i < m_BitmapFontFileNames.Count(); i++)
 	{
 		if ( m_BitmapFontFileNames[i] == sym )
 		{
 			// found it, update the mapping
-			int index = m_BitmapFontFileMapping.Find( pName );
+			auto index = m_BitmapFontFileMapping.Find( pName );
 			if ( !m_BitmapFontFileMapping.IsValidIndex( index ) )
 			{
 				index = m_BitmapFontFileMapping.Insert( pName );	
@@ -2056,7 +2055,7 @@ void CMatSystemSurface::SetBitmapFontName( const char *pName, const char *pFontF
 const char *CMatSystemSurface::GetBitmapFontName( const char *pName )
 {
 	// find it in the mapping symbol table
-	int index = m_BitmapFontFileMapping.Find( pName );
+	auto index = m_BitmapFontFileMapping.Find( pName );
 	if ( index == m_BitmapFontFileMapping.InvalidIndex() )
 	{
 		return "";
@@ -2932,7 +2931,7 @@ intp CMatSystemSurface::GetPopupCount(  )
 	return m_PopupList.Count();
 }
 
-VPANEL CMatSystemSurface::GetPopup(  int index )
+VPANEL CMatSystemSurface::GetPopup(  intp index )
 {
 	HPanel p = m_PopupList[ index ];
 	VPANEL panel = ivgui()->HandleToPanel( p );

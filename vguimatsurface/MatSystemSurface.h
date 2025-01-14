@@ -93,7 +93,7 @@ public:
 	
 	void DrawLine( int x0, int y0, int x1, int y1 ) override;
 	void DrawTexturedLine( const vgui::Vertex_t &a, const vgui::Vertex_t &b ) override;
-	void DrawPolyLine(int *px, int *py, int numPoints) override;
+	void DrawPolyLine(int *px, int *py, intp numPoints) override;
 	void DrawTexturedPolyLine( const vgui::Vertex_t *p, int n ) override;
 
 	void DrawFilledRect(int x0, int y0, int x1, int y1) override;
@@ -207,7 +207,7 @@ public:
 	//!! these functions Should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
 	intp GetPopupCount() override;
-	vgui::VPANEL GetPopup( int index ) override;
+	vgui::VPANEL GetPopup( intp index ) override;
 	bool ShouldPaintChildPanel(vgui::VPANEL childPanel) override;
 	bool RecreateContext(vgui::VPANEL panel) override;
 	void AddPanel(vgui::VPANEL panel) override;
@@ -529,7 +529,7 @@ private:
 	CUtlVector< TitleEntry >	m_Titles;
 	CUtlVector< CUtlSymbol >	m_CustomFontFileNames;
 	CUtlVector< CUtlSymbol >	m_BitmapFontFileNames;
-	CUtlDict< int, int >		m_BitmapFontFileMapping;
+	CUtlDict< intp, int >		m_BitmapFontFileMapping;
 
 	float	m_flZPos;
 	CUtlDict< vgui::IImage *, unsigned short >	m_FileTypeImages;

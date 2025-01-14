@@ -143,7 +143,7 @@ public:
 	virtual void DrawOutlinedRect(int x0, int y0, int x1, int y1) = 0;
 
 	virtual void DrawLine(int x0, int y0, int x1, int y1) = 0;
-	virtual void DrawPolyLine(int *px, int *py, int numPoints) = 0;
+	virtual void DrawPolyLine(int *px, int *py, intp numPoints) = 0;
 
 	virtual void DrawSetTextFont(HFont font) = 0;
 	virtual void DrawSetTextColor(int r, int g, int b, int a) = 0;
@@ -279,7 +279,7 @@ public:
 	//!! these functions should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
 	virtual ptrdiff_t GetPopupCount() = 0;
-	virtual VPANEL GetPopup(int index) = 0;
+	virtual VPANEL GetPopup(intp index) = 0;
 	virtual bool ShouldPaintChildPanel(VPANEL childPanel) = 0;
 	virtual bool RecreateContext(VPANEL panel) = 0;
 	virtual void AddPanel(VPANEL panel) = 0;

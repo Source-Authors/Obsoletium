@@ -134,10 +134,10 @@ void Image::DrawLine(int x0,int y0,int x1,int y1)
 //-----------------------------------------------------------------------------
 // Purpose: Draw a line between a list of 'numPoints' points
 //-----------------------------------------------------------------------------
-void Image::DrawPolyLine(int *px, int *py, int numPoints)
+void Image::DrawPolyLine(int *px, int *py, intp numPoints)
 {
 	// update the positions to be relative to this panel
-	for(int i=0;i<numPoints;i++)
+	for(intp i=0;i<numPoints;i++)
 	{
 		px[i] += _pos[0];
 		py[i] += _pos[1];

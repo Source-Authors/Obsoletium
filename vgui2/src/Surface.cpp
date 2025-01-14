@@ -139,7 +139,7 @@ public:
 	void DrawFilledRectArray( IntRect *pRects, int numRects ) override;
 	void DrawOutlinedRect(int x0, int y0, int x1, int y1) override;
 	void DrawLine(int x0, int y0, int x1, int y1) override;
-	void DrawPolyLine(int *px, int *py, int numPoints) override;
+	void DrawPolyLine(int *px, int *py, intp numPoints) override;
 	void DrawSetTextFont(HFont font) override;
 	void DrawSetTextColor(int r, int g, int b, int a) override;
 	void DrawSetTextColor(Color col) override;
@@ -187,7 +187,7 @@ public:
 	void SetTopLevelFocus(VPANEL panel) override;
 
 	intp GetPopupCount() override;
-	VPANEL GetPopup(int index) override;
+	VPANEL GetPopup(intp index) override;
 	void AddPanel(VPANEL panel) override;
 	void ReleasePanel(VPANEL panel) override;
 	void CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIcon, bool disabled, bool mouseInput, bool kbInput ) override;
@@ -1353,20 +1353,19 @@ void CWin32Surface::DrawLine(int x0,int y0,int x1,int y1)
 }
 
 
-void CWin32Surface::DrawPolyLine(int *px, int *py, int numPoints)
+void CWin32Surface::DrawPolyLine(int *px, int *py, intp numPoints)
 {
-	POINT *pt;
-	
-	pt = (POINT *)malloc(sizeof(POINT) * numPoints);
+	POINT *pt = (POINT *)malloc(sizeof(POINT) * numPoints);
 	if(pt) 
 	{
-		for(int i=0;i<numPoints;i++)
+		for(intp i=0;i<numPoints;i++)
 		{
 			pt[i].x= px[i];
 			pt[i].y= py[i];
 		}
 
-		Polyline(PLAT(_currentContextPanel)->hdc, pt , numPoints);
+		Assert(numPoints <= INT_MAX);
+		Polyline(PLAT(_currentContextPanel)->hdc, pt , static_cast<int>(numPoints));
 		free(pt);
 	}
 }
@@ -2376,7 +2375,7 @@ intp CWin32Surface::GetPopupCount()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-VPANEL CWin32Surface::GetPopup(int index)
+VPANEL CWin32Surface::GetPopup(intp index)
 {
 	return _popupList[index];
 }
