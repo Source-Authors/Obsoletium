@@ -97,7 +97,7 @@ int CFileTracker2::SubmitThreadedMD5Request( uint8 *pubBuffer, int cubBuffer, in
 		trackedVPKFileFind.m_PackFileID = PackFileID;
 		trackedVPKFileFind.m_nFileFraction = nPackFileFraction;
 
-		int idxTrackedVPKFile = m_treeTrackedVPKFiles.Find( trackedVPKFileFind );
+		auto idxTrackedVPKFile = m_treeTrackedVPKFiles.Find( trackedVPKFileFind );
 		if ( idxTrackedVPKFile != m_treeTrackedVPKFiles.InvalidIndex() )
 		{
 			// dont early out if we have already done the MD5, if the caller wants us
@@ -253,7 +253,7 @@ EFileCRCStatus CFileTracker2::CheckCachedFileHash( const char *pPathID, const ch
 	TrackedFile_t trackedfileFind;
 	trackedfileFind.RebuildFileName( m_stringPool, pRelativeFilename, pPathID, nFileFraction );
 
-	int idx = m_treeAllOpenedFiles.Find( trackedfileFind );
+	auto idx = m_treeAllOpenedFiles.Find( trackedfileFind );
 	if ( idx != m_treeAllOpenedFiles.InvalidIndex() )
 	{
 		TrackedFile_t &trackedfile = m_treeAllOpenedFiles[ idx ];
@@ -467,7 +467,7 @@ int CFileTracker2::IdxFileFromName( const char *pFilename, const char *pPathID, 
 	trackedfile.RebuildFileName( m_stringPool, pFilename, pPathID, nFileFraction );
 	trackedfile.m_bPackOrVPKFile = bPackOrVPKFile;
 
-	int idxFile = m_treeAllOpenedFiles.Find( trackedfile );
+	auto idxFile = m_treeAllOpenedFiles.Find( trackedfile );
 	if ( idxFile == m_treeAllOpenedFiles.InvalidIndex() )
 	{
 		idxFile = m_treeAllOpenedFiles.Insert( trackedfile );

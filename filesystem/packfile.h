@@ -254,7 +254,7 @@ protected:
 	// Entries to the individual files stored inside the pack file.
 	CUtlSortVector< CPackFileEntry, CPackFileLessFunc > m_PackFiles;
 
-	bool						GetFileInfo( const char *pFileName, int &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod );
+	bool						GetFileInfo( const char *pFileName, intp &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod );
 
 	// Preload Support
 	void						SetupPreloadData() override;

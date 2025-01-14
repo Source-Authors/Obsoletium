@@ -400,7 +400,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 				char szToken[MAX_PATH];
 				for ( ;; )
 				{
-					int nTokenSize = buf.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+					intp nTokenSize = buf.ParseToken( &breakSet, szToken, sizeof( szToken ) );
 					if ( nTokenSize <= 0 )
 					{
 						break;
@@ -610,7 +610,7 @@ void CBaseFileSystem::GetFileNameForHandle( FileHandle_t handle, char *buf, size
 	COpenedFile file;
 	file.m_pFile = fh->GetFileHandle();
 
-	int result = m_OpenedFiles.Find( file );
+	intp result = m_OpenedFiles.Find( file );
 	if ( result != -1 )
 	{
 		COpenedFile found = m_OpenedFiles[ result ];
@@ -636,7 +636,7 @@ void CBaseFileSystem::Trace_FClose( FILE *fp )
 		COpenedFile file;
 		file.m_pFile = fp;
 
-		int result = m_OpenedFiles.Find( file );
+		intp result = m_OpenedFiles.Find( file );
 		if ( result != -1 /*m_OpenedFiles.InvalidIdx()*/ )
 		{
 			COpenedFile found = m_OpenedFiles[ result ];
@@ -673,7 +673,7 @@ void CBaseFileSystem::Trace_FRead( int size, FILE* fp )
 	COpenedFile file;
 	file.m_pFile = fp;
 
-	int result = m_OpenedFiles.Find( file );
+	intp result = m_OpenedFiles.Find( file );
 
 	if( result != -1 )
 	{
@@ -698,7 +698,7 @@ void CBaseFileSystem::Trace_FWrite( int size, FILE* fp )
 
 	AUTO_LOCK( m_OpenedFilesMutex );
 
-	int result = m_OpenedFiles.Find( file );
+	intp result = m_OpenedFiles.Find( file );
 
 	if( result != -1 )
 	{
@@ -3857,7 +3857,7 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
  	Assert(pWildCardT);
  	Assert(pHandle);
 
-	FileFindHandle_t hTmpHandle = m_FindData.AddToTail();
+	auto hTmpHandle = m_FindData.AddToTail();
 	FindData_t *pFindData = &m_FindData[hTmpHandle];
 	Assert( pFindData );
 	if ( pPathID )

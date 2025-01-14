@@ -816,7 +816,7 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 				// Win32 has an undocumented feature that is serialized ALL writes to a file across threads (i.e only 1 thread can open a file at a time)
 				// so add a lock here to mimic that behavior
 
-				int iLockID = m_LockedFDMap.Find( buf.st_ino );
+				auto iLockID = m_LockedFDMap.Find( buf.st_ino );
 				if ( iLockID != m_LockedFDMap.InvalidIndex() )
 				{
 					pMutex = m_LockedFDMap[iLockID];
@@ -887,7 +887,7 @@ void CStdioFile::FS_fclose()
 		fstat( fd, &buf );
 
 		fflush( m_pFile );
-		int iLockID = m_LockedFDMap.Find( buf.st_ino );
+		auto iLockID = m_LockedFDMap.Find( buf.st_ino );
 		if ( iLockID != m_LockedFDMap.InvalidIndex() )
 		{
 			m_LockedFDMap[iLockID]->Unlock();

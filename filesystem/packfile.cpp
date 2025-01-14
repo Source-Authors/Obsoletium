@@ -114,7 +114,8 @@ int CZipPackFileHandle::Seek( int nOffset, int nWhence )
 //-----------------------------------------------------------------------------
 CFileHandle *CZipPackFile::OpenFile( const char *pFileName, const char *pOptions )
 {
-	int nIndex, nOriginalSize, nCompressedSize;
+	int nOriginalSize, nCompressedSize;
+	intp nIndex;
 	int64 nPosition;
 	unsigned short nCompressionMethod;
 
@@ -303,7 +304,7 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 //-----------------------------------------------------------------------------
 //	Gets size, position, and index for a file in the pack.
 //-----------------------------------------------------------------------------
-bool CZipPackFile::GetFileInfo( const char *pFileName, int &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod )
+bool CZipPackFile::GetFileInfo( const char *pFileName, intp &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod )
 {
 	char szCleanName[MAX_FILEPATH];
 	Q_strncpy( szCleanName, pFileName, sizeof( szCleanName ) );
@@ -326,7 +327,7 @@ bool CZipPackFile::GetFileInfo( const char *pFileName, int &nBaseIndex, int64 &n
 
 	lookup.m_HashName = HashStringCaselessConventional( szFixedName );
 
-	int idx = m_PackFiles.Find( lookup );
+	intp idx = m_PackFiles.Find( lookup );
 	if ( -1 != idx  )
 	{
 		nFileOffset = m_PackFiles[idx].m_nPosition;
@@ -359,7 +360,8 @@ bool CZipPackFile::IndexToFilename( int nIndex, char *pBuffer, int nBufferSize )
 //-----------------------------------------------------------------------------
 bool CZipPackFile::ContainsFile( const char *pFileName )
 {
-	int nIndex, nOriginalSize, nCompressedSize;
+	int nOriginalSize, nCompressedSize;
+	intp nIndex;
 	int64 nOffset;
 	unsigned short nCompressionMethod;
 	bool bFound = GetFileInfo( pFileName, nIndex, nOffset, nOriginalSize, nCompressedSize, nCompressionMethod );
