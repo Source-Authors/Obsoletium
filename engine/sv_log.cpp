@@ -729,7 +729,7 @@ static bool gzip_file_compress( const CUtlString &Filename )
 		for (;;)
 		{
 			char buf[ 16384 ];
-			size_t len = fread( buf, 1, sizeof( buf ), in );
+			unsigned len = static_cast<unsigned>(fread( buf, 1, sizeof( buf ), in ));
 			if ( ferror( in ) )
 			{
 				Msg( "%s: fread failed.\n", __FUNCTION__ );
@@ -741,7 +741,7 @@ static bool gzip_file_compress( const CUtlString &Filename )
 				break;
 			}
 
-			if ( (size_t)gzwrite( info.fh.gzfile, buf, len ) != len )
+			if ( (unsigned)gzwrite( info.fh.gzfile, buf, len ) != len )
 			{
 				Msg( "%s: gzwrite failed.\n", __FUNCTION__ );
 				break;

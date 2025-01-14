@@ -339,13 +339,13 @@ void CMapReslistGenerator::BuildEngineLogFromReslist()
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{
-		int nTokenSize = buffer.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+		intp nTokenSize = buffer.ParseToken( &breakSet, szToken, sizeof( szToken ) );
 		if ( nTokenSize <= 0 )
 		{
 			break;
 		}
 
-		int idx = m_EngineLog.Find( szToken );
+		auto idx = m_EngineLog.Find( szToken );
 		if ( idx == m_EngineLog.InvalidIndex() )
 		{
 			m_EngineLog.Insert( szToken );
