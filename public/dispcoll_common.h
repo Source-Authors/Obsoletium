@@ -200,8 +200,8 @@ public:
 	inline void SetSurfaceProps( int iProp, short nSurfProp )		{ Assert( ( iProp >= 0 ) && ( iProp < 2 ) ); m_nSurfaceProps[iProp] = nSurfProp; }
 	inline short GetSurfaceProps( int iProp )						{ return m_nSurfaceProps[iProp]; }
 
-	inline unsigned int GetMemorySize( void )						{ return m_nSize; }
-	inline unsigned int GetCacheMemorySize( void )					{ return ( m_aTrisCache.Count() * sizeof(CDispCollTriCache) + m_aEdgePlanes.Count() * sizeof(Vector) ); }
+	inline size_t GetMemorySize( void )								{ return m_nSize; }
+	inline size_t GetCacheMemorySize( void )						{ return ( m_aTrisCache.Count() * sizeof(CDispCollTriCache) + m_aEdgePlanes.Count() * sizeof(Vector) ); }
 
 	inline bool IsCached( void )									{ return m_aTrisCache.Count() == m_aTris.Count(); }
 

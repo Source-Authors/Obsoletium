@@ -507,7 +507,7 @@ inline void CDispCollTree::LockCache()
 			Cache();
 			m_hCache = g_DispCollTriCache.CreateResource( this );
 			g_DispCollTriCache.LockResource( m_hCache );
-			//Msg( "Adding 0x%x to cache (actual %d) [%d, %d --> %.2f] %d total, %d unique\n", this, GetCacheMemorySize(), GetTriSize(), m_aEdgePlanes.Count(), (float)m_aEdgePlanes.Count()/(float)GetTriSize(), totals, uniques );
+			//Msg( "Adding 0x%x to cache (actual %zu) [%d, %d --> %.2f] %d total, %d unique\n", this, GetCacheMemorySize(), GetTriSize(), m_aEdgePlanes.Count(), (float)m_aEdgePlanes.Count()/(float)GetTriSize(), totals, uniques );
 		}
 	}
 #else

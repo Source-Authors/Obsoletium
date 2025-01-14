@@ -1198,7 +1198,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
 	CDispVert tempVerts[MAX_DISPVERTS];
 	CDispTri  tempTris[MAX_DISPTRIS];
 
-	int nSize = 0;
+	size_t nSize = 0;
 	int nCacheSize = 0;
 	int nPowerCount[3] = { 0, 0, 0 };
 
