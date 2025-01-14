@@ -139,9 +139,10 @@ bool CRemoteServer::ProcessServerResponse()
 	while (1)
 	{
 		// get packet from networking
-		int bytesRead = g_pGameServerData->ReadDataResponse(m_ListenerID, charbuf, sizeof(charbuf));
+		intp bytesRead = g_pGameServerData->ReadDataResponse(m_ListenerID, charbuf, sizeof(charbuf));
 		if (bytesRead < 1)
 			break;
+
 		bProcessedAnyPackets = true;
 
 		// parse response

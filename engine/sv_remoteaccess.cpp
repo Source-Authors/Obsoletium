@@ -71,10 +71,10 @@ ra_listener_id CServerRemoteAccess::GetNextListenerID( bool authConnection, cons
 	return i;
 }
 
-
-bool GetStringHelper( CUtlBuffer & cmd, char *outBuf, int bufSize )
+template<size_t bufSize>
+bool GetStringHelper(CUtlBuffer &cmd, char (&outBuf)[bufSize])
 {
-	outBuf[0] = 0;
+	outBuf[0] = '\0';
 	cmd.GetStringManualCharCount( outBuf, bufSize );
 	if ( !cmd.IsValid() )
 	{
@@ -88,12 +88,12 @@ bool GetStringHelper( CUtlBuffer & cmd, char *outBuf, int bufSize )
 //-----------------------------------------------------------------------------
 // Purpose: handles a request
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, const void *buffer, int bufferSize)
+void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, const void *buffer, intp bufferSize)
 {
 	m_iBytesReceived += bufferSize;
 	// ConMsg("RemoteAccess: bytes received: %d\n", m_iBytesReceived);
 
-	if ( bufferSize < static_cast<int>(2*sizeof(int)) ) // check that the buffer contains at least the id and type
+	if ( bufferSize < static_cast<intp>(2*sizeof(int)) ) // check that the buffer contains at least the id and type
 	{
 		return;
 	}
@@ -101,7 +101,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 	CUtlBuffer cmd(buffer, bufferSize, CUtlBuffer::READ_ONLY);
 	bool invalidRequest = false;
 
-	while ( invalidRequest == false && (int)cmd.TellGet() < (int)(cmd.Size() - 2 * sizeof(int) ) ) // while there is commands to read
+	while ( invalidRequest == false && cmd.TellGet() < (cmd.Size() - 2 * static_cast<intp>(sizeof(int)) ) ) // while there is commands to read
 	{
 		// parse out the buffer
 		int requestID = cmd.GetInt();
@@ -115,13 +115,13 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					if ( IsAuthenticated(listener) )
 					{
 						char variable[256];
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
 						}
 						RequestValue( listener, requestID, variable);
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
@@ -130,12 +130,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					else
 					{
 						char variable[256];
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
@@ -150,12 +150,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					{
 						char variable[256];
 						char value[256];
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, value, sizeof(value) ) )
+						if ( !GetStringHelper( cmd, value ) )
 						{
 							invalidRequest = true;
 							break;
@@ -165,12 +165,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					else
 					{
 						char command[512];
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -184,7 +184,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					if ( IsAuthenticated(listener) )
 					{
 						char command[512];
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -196,7 +196,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 						{
 							LogCommand( listener, va( "command \"%s\"", command) );
 						}
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -205,12 +205,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					else
 					{
 						char command[512];
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -223,13 +223,13 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_AUTH:
 				{
 					char password[512];
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
 					}
 					CheckPassword( pNetworkListener, listener, requestID, password );
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
@@ -322,12 +322,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_VPROF:
 				{
 					char password[25];
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
 					}
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
@@ -344,12 +344,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_REMOVE_VPROF:
 				{
 					char password[25];
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
 					}
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
@@ -374,7 +374,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 }
 
 // NOTE: This version is used by the server DLL or server plugins
-void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, const void *buffer, int bufferSize )
+void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, const void *buffer, intp bufferSize )
 {
 	WriteDataRequest( &RCONServer(), listener, buffer, bufferSize );
 }
@@ -539,7 +539,7 @@ void CServerRemoteAccess::BadPassword( CRConServer *pNetworkListener, ra_listene
 //-----------------------------------------------------------------------------
 // Purpose: returns the number of bytes read
 //-----------------------------------------------------------------------------
-int CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
+intp CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
 {
 	for( auto i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
 	{
@@ -553,7 +553,7 @@ int CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
 	return 0;
 }
 
-int CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, void *buffer, int bufferSize )
+intp CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, void *buffer, intp bufferSize )
 {
 	for( auto i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
 	{
@@ -816,24 +816,23 @@ const char *CServerRemoteAccess::LookupStringValue(const char *variable)
 void CServerRemoteAccess::GetUserBanList(CUtlBuffer &value)
 {
 	// add user bans
-	int i;
-	for (i = 0; i < g_UserFilters.Count(); i++)
+	for (intp i = 0; i < g_UserFilters.Count(); i++)
 	{
-		value.Printf("%i %s : %.3f min\n", i + 1, GetUserIDString(g_UserFilters[i].userid), g_UserFilters[i].banTime);
+		value.Printf("%zi %s : %.3f min\n", i + 1, GetUserIDString(g_UserFilters[i].userid), g_UserFilters[i].banTime);
 	}
 	
 	unsigned char b[4];
 	// add ip filters
-	for (i = 0; i < g_IPFilters.Count() ; i++)
+	for (intp i = 0; i < g_IPFilters.Count() ; i++)
 	{
 		memcpy( b, &g_IPFilters[i].compare, sizeof(b) );
-		value.Printf("%i %i.%i.%i.%i : %.3f min\n", i + 1 + g_UserFilters.Count(), b[0], b[1], b[2], b[3], g_IPFilters[i].banTime);
+		value.Printf("%zi %hhu.%hhu.%hhu.%hhu : %.3f min\n", i + 1 + g_UserFilters.Count(), b[0], b[1], b[2], b[3], g_IPFilters[i].banTime);
 	}
 
 	value.PutChar(0);
 }
 
-void CServerRemoteAccess::GetStatsString(char *buf, int bufSize)
+void CServerRemoteAccess::GetStatsString(char *buf, intp bufSize)
 {
 	float avgIn=0,avgOut=0;
 
@@ -965,7 +964,7 @@ void CServerRemoteAccess::SendMessageToAdminUI( ra_listener_id listenerID, const
 //-----------------------------------------------------------------------------
 // Purpose: Sends a response to the client
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, void *pData, int nDataLen )
+void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, void *pData, intp nDataLen )
 {
 	// allocate a spot in the list for the response
 	auto i = m_ResponsePackets.AddToTail();
@@ -983,7 +982,7 @@ void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, Serve
 //-----------------------------------------------------------------------------
 // Purpose: sends an opaque blob of data from VProf to a remote rcon listener
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupData, void *data, int len )
+void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupData, void *data, intp len )
 {
 	Assert( listenerID != m_AdminUIID ); // only RCON clients support this right now
 	SendResponseToClient( listenerID, bGroupData ? SERVERDATA_VPROF_GROUPS : SERVERDATA_VPROF_DATA, data, len );
