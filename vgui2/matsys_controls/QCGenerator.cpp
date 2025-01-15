@@ -4,9 +4,8 @@
 //
 //=============================================================================
 
-#if defined(WIN32) && !defined( _X360 )
-#include "winlite.h"
-#endif
+#include "matsys_controls/QCGenerator.h"
+
 #include "filesystem.h"
 #include "filesystem_init.h"
 #include "appframework/IAppSystemGroup.h"
@@ -14,9 +13,13 @@
 #include "appframework/AppFramework.h"
 #include "filesystem_helpers.h"
 
-#include "matsys_controls/QCGenerator.h"
 #include "tier1/KeyValues.h"
 #include "tier2/vconfig.h"
+
+#if defined(WIN32)
+#include "winlite.h"
+#endif
+
 #include "vgui_controls/ListPanel.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/Button.h"
@@ -30,22 +33,15 @@
 #include "vgui/Cursor.h"
 #include "vgui_controls/KeyBoardEditorDialog.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 using namespace vgui;
-
-#define MAX_KEYVALUE	1024
-
 
 //-----------------------------------------------------------------------------
 // Purpose: returns a pointer to the 'count' occurence of a character from the end of a string
 //			returns 0 of there aren't 'count' number of the character in the string
 //-----------------------------------------------------------------------------
-char *strrchrcount(char *string, int character, int count )
+static char *strrchrcount(char *string, int character, intp count )
 {
-	int j = count;
+	intp j = count;
 	intp numChars = V_strlen( string );
 	for( intp i = numChars; i > 0; i-- )
 	{
@@ -58,7 +54,7 @@ char *strrchrcount(char *string, int character, int count )
 			return string + i-1;
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -154,7 +150,7 @@ void QCInfo::SyncFromControls()
 
 		V_strcpy_safe( newLOD.pszFilename, key->GetString( "SMD" ) );
 		newLOD.iLOD = key->GetInt( "LOD" );		
-        LODs.AddToTail( newLOD );
+		LODs.AddToTail( newLOD );
 	}
 }
 
@@ -208,7 +204,7 @@ void QCInfo::SyncToControls()
 			((ComboBox *)pTargetField)->SetText( tempText );
 			break;
 		}
-	}   
+	}
 }
 
 CBrowseButton::CBrowseButton( vgui::Panel *pParent ) : BaseClass( pParent, "Browse Button", "...", pParent, "browse" )
@@ -230,7 +226,7 @@ void CBrowseButton::SetCharVar( char **pVar, const char *pszNewText )
 		return;
 	}
 
-    if ( *pVar )
+	if ( *pVar )
 	{
 		delete [] *pVar;
 		*pVar = NULL;
@@ -262,16 +258,15 @@ void CBrowseButton::SetActionMessage()
 	SetCommand( newActionMessage );
 }
 
-const char *ParseKeyvalue( const char *pBuffer, char *key, char *value )
+template<intp size>
+static const char *ParseKeyvalue( const char *pBuffer, char (&key)[size], char (&value)[size] )
 {
 	char com_token[1024];
 
-	pBuffer = (const char *)ParseFile( pBuffer, com_token, NULL );
-	if ( Q_strlen( com_token ) < MAX_KEYVALUE )
-	{
-		Q_strncpy( key, com_token, MAX_KEYVALUE );
-		Q_strlower( key );
-	}
+	pBuffer = ParseFile( pBuffer, com_token, NULL );
+	V_strcpy_safe( key, com_token );
+	Q_strlower( key );
+
 	// no value on a close brace
 	if ( !Q_strcmp( key, "}" ) )
 	{
@@ -279,12 +274,9 @@ const char *ParseKeyvalue( const char *pBuffer, char *key, char *value )
 		return pBuffer;
 	}
 
-	pBuffer = (const char *)ParseFile( pBuffer, com_token, NULL );
-	if ( Q_strlen( com_token ) < MAX_KEYVALUE )
-	{
-		Q_strncpy( value, com_token, MAX_KEYVALUE );
-		Q_strlower( value );
-	}
+	pBuffer = ParseFile( pBuffer, com_token, NULL );
+	V_strcpy_safe( value, com_token );
+	Q_strlower( value );
 
 	return pBuffer;
 }
@@ -300,18 +292,18 @@ CQCGenerator::CQCGenerator( vgui::Panel *pParent, const char *pszPath, const cha
 
 	m_pLODPanel = new ListPanel(this, "LODList");
 	m_pLODPanel->SetSelectIndividualCells( true );
-	m_pLODPanel->AddColumnHeader(0, "SMD", "LOD SMD", 450, 0);	
-	m_pLODPanel->AddColumnHeader(1, "LOD", "LOD Distance", 50, 0);		
+	m_pLODPanel->AddColumnHeader(0, "SMD", "LOD SMD", 450, 0);
+	m_pLODPanel->AddColumnHeader(1, "LOD", "LOD Distance", 50, 0);
 	m_pLODPanel->AddActionSignalTarget( this );
 	m_pLODPanel->SetMouseInputEnabled( true );
 
-	LoadControlSettings( "QCGenerator.res" );	
+	LoadControlSettings( "QCGenerator.res" );
 
 	m_pCollisionBrowseButton = new CBrowseButton( this );
 	m_pCollisionBrowseButton->InitBrowseInfo( 808, 158, "collisionBrowseButton", pszPath, "*.smd", "collisionSMDField" );
 
 	char szTerminatedPath[1024] = "\0";
-	sprintf( szTerminatedPath, "%s\\", pszPath );
+	V_sprintf_safe( szTerminatedPath, "%s\\", pszPath );
 	
 	InitializeSMDPaths( szTerminatedPath, pszScene );
 
@@ -325,50 +317,69 @@ CQCGenerator::CQCGenerator( vgui::Panel *pParent, const char *pszPath, const cha
 	char szSearchPath[1024] = "\0";
 
 	// Get the currently set game configuration
-	GetVConfigRegistrySetting( GAMEDIR_TOKEN, szGamePath, sizeof( szGamePath ) );	
-	static const char *pSurfacePropFilename = "\\scripts\\surfaceproperties.txt";
-
-	sprintf( szSearchPath, "%s%s", szGamePath, pSurfacePropFilename );
-
-	FileHandle_t fp = g_pFullFileSystem->Open( szSearchPath, "rb" );	 
-
-	if ( !fp )
+	// dimhotepus: Check token is present.
+	if ( GetVConfigRegistrySetting( GAMEDIR_TOKEN, szGamePath ) )
 	{
-		//the set game configuration didn't have a surfaceproperties file; we are grabbing it from hl2
-		//TODO:  This only works if they are in a subdirectory that is a peer to an hl2 directory 
-		//		that contains the file.  It potentially needs to search the entire drive or prompt for the location
-		char *pszEndGamePath = Q_strrchr( szGamePath, '\\' );
-		pszEndGamePath[0] = 0;
-		V_strcat_safe( szGamePath, "\\hl2" );
-		sprintf( szSearchPath, "%s%s", szGamePath, pSurfacePropFilename );
-		fp = g_pFullFileSystem->Open( szSearchPath, "rb" );	
-	}
+		constexpr char pSurfacePropFilename[]{"\\scripts\\surfaceproperties.txt"};
+		V_sprintf_safe( szSearchPath, "%s%s", szGamePath, pSurfacePropFilename );
 
-	int len = g_pFullFileSystem->Size( fp );
-
-	const char *szSurfacePropContents = new char[len+1];
-	g_pFullFileSystem->Read( (void *)szSurfacePropContents, len, fp );
-
-	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
-
-	vgui::Panel *pSurfacePropDropDown = FindChildByName( "surfacePropertyDropDown" );		
-
-	//filling up the surface property dropdown
-	while ( szSurfacePropContents )
-	{
-		szSurfacePropContents = ParseKeyvalue( szSurfacePropContents, key, value );
-		((ComboBox *)pSurfacePropDropDown)->AddItem( key, NULL );							
-		while ( szSurfacePropContents )
+		FileHandle_t fp = g_pFullFileSystem->Open( szSearchPath, "rb" );
+		if ( !fp )
 		{
-			szSurfacePropContents = ParseKeyvalue( szSurfacePropContents, key, value );
-			if (!stricmp( key, "}" ) )
+			//the set game configuration didn't have a surfaceproperties file; we are grabbing it from hl2
+			//TODO:  This only works if they are in a subdirectory that is a peer to an hl2 directory 
+			//		that contains the file.  It potentially needs to search the entire drive or prompt for the location
+			char *pszEndGamePath = Q_strrchr( szGamePath, '\\' );
+			pszEndGamePath[0] = '\0';
+
+			V_strcat_safe( szGamePath, "\\hl2" );
+			V_sprintf_safe( szSearchPath, "%s%s", szGamePath, pSurfacePropFilename );
+
+			fp = g_pFullFileSystem->Open( szSearchPath, "rb" );
+		}
+
+		// dimhotepus: Check file is opened.
+		if ( fp )
+		{
+			int len = g_pFullFileSystem->Size( fp );
+
+			const char *szSurfacePropContents = new char[len+1];
+			g_pFullFileSystem->Read( (void *)szSurfacePropContents, len, fp );
+
+			char key[1024], value[1024];
+			vgui::Panel *pSurfacePropDropDown = FindChildByName( "surfacePropertyDropDown" );
+
+			//filling up the surface property dropdown
+			while ( szSurfacePropContents )
 			{
-				break;
+				szSurfacePropContents = ParseKeyvalue( szSurfacePropContents, key, value );
+
+				((ComboBox *)pSurfacePropDropDown)->AddItem( key, NULL );
+
+				while ( szSurfacePropContents )
+				{
+					szSurfacePropContents = ParseKeyvalue( szSurfacePropContents, key, value );
+
+					if (!stricmp( key, "}" ) )
+					{
+						break;
+					}
+				}
 			}
 		}
-	}	
-    m_QCInfo_t.SyncToControls();
+		else
+		{
+			Warning( "Unable to find surface properties config '%s'.\n", szSearchPath );
+			Warning( "Surface properties selection will not be available.\n" );
+		}
+	}
+	else
+	{
+		Warning( "Game path is not found under registry token '%s'.\n",	GAMEDIR_TOKEN );
+		Warning( "Surface properties selection will not be available.\n" );
+	}
 
+	m_QCInfo_t.SyncToControls();
 	m_pLODEdit = 0;
 }
 
@@ -422,7 +433,7 @@ void CQCGenerator::OnBrowse( KeyValues *data )
 	}
 	else
 	{
-		BrowseFile( data );	
+		BrowseFile( data );
 	}
 }
 
@@ -475,6 +486,7 @@ bool CQCGenerator::GenerateQCFile()
 
 	char szPath[MAX_PATH];
 	char szName[MAX_PATH];
+
 	Q_strncpy( szPath, m_QCInfo_t.pszSMDPath, nameBegin - m_QCInfo_t.pszSMDPath + 2 );
 	V_strcpy_safe( szName, szPath);
 	V_strcat_safe( szName, m_QCInfo_t.pszSceneName);
@@ -482,12 +494,12 @@ bool CQCGenerator::GenerateQCFile()
 	FileHandle_t pSaveFile = g_pFullFileSystem->Open( szName, "wt" );
 	if (!pSaveFile)
 	{
-		char szSaveError[1024] = "";
-		Q_snprintf( szSaveError, 1024, "Save failed: invalid file name '%s'\n\nDirectory '%s' must exist.", szName, szPath );	
+		char szSaveError[1024];
+		V_sprintf_safe( szSaveError, "Save failed: invalid file name '%s'\n\nDirectory '%s' must exist.", szName, szPath );	
 		VGUIMessageBox( this, "QC Generator error", szSaveError );
 		return 0;
-	}	
-		
+	}
+
 	//write qc header
 	g_pFullFileSystem->FPrintf( pSaveFile, "//\n// .qc file version 1.0\n\n");
 	//write out modelname info
@@ -525,10 +537,9 @@ bool CQCGenerator::GenerateQCFile()
 	}
 
 	//write out lod info
-	for( int i = 0; i < m_QCInfo_t.LODs.Count(); i++ )
+	for ( auto &thisLOD : m_QCInfo_t.LODs )
 	{
-		LODInfo thisLOD = m_QCInfo_t.LODs.Element( i );
-		g_pFullFileSystem->FPrintf( pSaveFile, "$lod %d\n{\n\treplacemodel \"%s\" \"%s\"\n}\n\n", thisLOD.iLOD, strrchr(m_QCInfo_t.pszSMDPath, '\\')+1, thisLOD.pszFilename );		
+		g_pFullFileSystem->FPrintf( pSaveFile, "$lod %d\n{\n\treplacemodel \"%s\" \"%s\"\n}\n\n", thisLOD.iLOD, strrchr(m_QCInfo_t.pszSMDPath, '\\')+1, thisLOD.pszFilename );
 	}
 
 	if ( m_QCInfo_t.bDisableCollision != true )
@@ -565,32 +576,47 @@ bool CQCGenerator::GenerateQCFile()
 		}
 		g_pFullFileSystem->FPrintf( pSaveFile, "}\n\n");
 	}
-	    	
+
 	g_pFullFileSystem->Close( pSaveFile );
 
-	char szCommand[MAX_PATH];
+	char szCommand[MAX_PATH * 3];
 	char szGamePath[MAX_PATH];
 	
 	char studiomdlPath[512];
 	g_pFullFileSystem->RelativePathToFullPath( "studiomdl.bat", NULL, studiomdlPath, sizeof( studiomdlPath ));
 
-	GetVConfigRegistrySetting( GAMEDIR_TOKEN, szGamePath, sizeof( szGamePath ) );	
+	// dimhotepus: Check token is present.
+	if ( !GetVConfigRegistrySetting( GAMEDIR_TOKEN, szGamePath ) )
+	{
+		Warning( "Unable to generate QC file '%s'. Game path is not found under registry token '%s'.\n",
+			szName, GAMEDIR_TOKEN );
+		return false;
+	}
 
 #ifdef WIN32
-	STARTUPINFO startup; 
-	PROCESS_INFORMATION process; 
+	V_sprintf_safe( szCommand, "\"%s\" -game \"%s\" %s", studiomdlPath, szGamePath, szName);
 
-
-	memset(&startup, 0, sizeof(startup)); 
-	startup.cb = sizeof(startup); 
-
+	STARTUPINFO startup = {};
+	startup.cb = sizeof(startup);
 	
-	sprintf( szCommand, "%s -game %s %s", studiomdlPath, szGamePath, szName);
-	bool bReturn = CreateProcess( NULL, szCommand, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &startup, &process);
+	PROCESS_INFORMATION process;
+	bool bReturn = !!CreateProcess( NULL, szCommand, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &startup, &process);
+	// dimhotepus: Check QC started to create.
+	if (!bReturn)
+	{
+		Warning( "Unable to generate QC file '%s'. Spawn process '%s' failed w/e '%s'.\n",
+			szName, szCommand, std::system_category().message(GetLastError()).c_str() );
+	}
+	else
+	{
+		CloseHandle( process.hThread );
+		CloseHandle( process.hProcess );
+	}
 #else
 	AssertMsg( false, "Implement me, why aren't we using a thread tool abstraction?" );
 	bool bReturn = false;
 #endif
+
 	return bReturn;
 }
 
@@ -598,18 +624,17 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 {
 	V_strcpy_safe( m_QCInfo_t.pszSceneName, pszScene );
 
-	FileFindHandle_t *pFileHandle = new FileFindHandle_t();
-
 	g_pFullFileSystem->AddSearchPath( pszPath, "SMD_DIR" );
-	
-	const char *filename = g_pFullFileSystem->FindFirst( "*.smd", pFileHandle );	
+
+	FileFindHandle_t pFileHandle = 0;	
+	const char *filename = g_pFullFileSystem->FindFirst( "*.smd", &pFileHandle );	
 
 	bool bFoundReference = false;
 	bool bFoundCollision = false;
 	bool bFoundLOD = false;
 
 	//iterate through .smd files
-  	const char *startName = pszScene;
+	const char *startName = pszScene;
 
 	intp nSearchLength = Q_strlen( pszScene );
 
@@ -627,6 +652,7 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 				V_strcpy_safe( m_QCInfo_t.pszSMDPath, pszPath );
 				V_strcat_safe( m_QCInfo_t.pszSMDPath, filename );
 			}
+
 			if ( !strncmp( filenameEnd, "_phy", 4) || !strncmp( filenameEnd, "_col", 4 ) )
 			{
 				bFoundCollision = true;
@@ -634,40 +660,50 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 				V_strcpy_safe( m_QCInfo_t.pszCollisionPath, pszPath );
 				V_strcat_safe( m_QCInfo_t.pszCollisionPath, filename );
 			}
+
 			if ( !strncmp( filenameEnd, "_lod", 4) )
 			{
 				bFoundLOD = true;
+
 				//we found an LOD smd.
 				char lodName[255];
-				Q_snprintf( lodName, Q_strlen( lodName ), "lod%d", currentLOD );
-				//we found an LOD
-				KeyValues *newKv = new KeyValues( lodName, "SMD", filename, "LOD", "10" );
+				V_sprintf_safe( lodName, "lod%d", currentLOD );
+
+				// we found an LOD
+				// dimhotepus: Do not leak KeyValues.
+				auto newKv = KeyValues::AutoDelete(new KeyValues( lodName, "SMD", filename, "LOD", "10" ));
 				m_pLODPanel->AddItem( newKv, currentLOD, false, false );
+
 				currentLOD++;
 			}
 		}
-		filename = g_pFullFileSystem->FindNext( *pFileHandle );
+		filename = g_pFullFileSystem->FindNext( pFileHandle );
 	}
+
 	char pszMessage[2048] = "";
 	char pszRefMessage[1024] = "";
 	char pszColMessage[1024] = "";
+
 	if (!bFoundReference )
 	{
 		V_strcat_safe( m_QCInfo_t.pszSMDPath, pszPath );
-		V_strcat_safe( m_QCInfo_t.pszSMDPath, pszScene );		
+		V_strcat_safe( m_QCInfo_t.pszSMDPath, pszScene );
 		V_strcat_safe( m_QCInfo_t.pszSMDPath, ".smd" );
-		Q_snprintf( pszRefMessage, 1024, "Reference SMD not found.\n\nValid default reference SMDs are %s%s_ref*.smd and %s%s.smd\nUsing default of %s. Model will not compile.\n\n", pszPath, pszScene, pszPath, pszScene, m_QCInfo_t.pszSMDPath );		
+		V_sprintf_safe( pszRefMessage, "Reference SMD not found.\n\nValid default reference SMDs are %s%s_ref*.smd and %s%s.smd\nUsing default of %s. Model will not compile.\n\n", pszPath, pszScene, pszPath, pszScene, m_QCInfo_t.pszSMDPath );		
 	}
+
 	if ( !bFoundCollision )
 	{
-		Q_snprintf( pszColMessage, 1024, "Collision SMD not found.\n\nThe valid default collision SMD is %s%s_phy*.smd.\nUsing reference SMD as default.\n", pszPath, pszScene );
+		V_sprintf_safe( pszColMessage, "Collision SMD not found.\n\nThe valid default collision SMD is %s%s_phy*.smd.\nUsing reference SMD as default.\n", pszPath, pszScene );
 		V_strcpy_safe( m_QCInfo_t.pszCollisionPath, m_QCInfo_t.pszSMDPath );
 		m_QCInfo_t.bReferenceAsPhys = true;
 	}
+
 	if ( !bFoundReference || !bFoundCollision)
 	{
 		V_strcpy_safe( pszMessage, pszRefMessage );
 		V_strcat_safe( pszMessage, pszColMessage );
+
 		VGUIMessageBox( this, "Error Initializing Paths", pszMessage );
 	}
 }
@@ -676,10 +712,9 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 void CQCGenerator::DeleteLOD()
 {
 	int numSelected = m_pLODPanel->GetSelectedItemsCount();
-	int selected;
 	for ( int i = numSelected-1; i >= 0; i-- )
 	{
-		selected = m_pLODPanel->GetSelectedItem( i );
+		int selected = m_pLODPanel->GetSelectedItem( i );
 		m_pLODPanel->RemoveItem( selected );
 	}
 }
@@ -694,19 +729,21 @@ void CQCGenerator::EditLOD()
 			m_pLODEdit->MarkForDeletion();
 			m_pLODEdit = NULL;
 		}
+
 		m_pLODEdit = new vgui::TextEntry( this, "Edit" );
 		m_pLODEdit->SendNewLine( true );
+
 		m_nSelectedSequence = m_pLODPanel->GetSelectedItem( 0 );
 		m_nSelectedColumn = m_pLODPanel->GetSelectedColumn();
+
 		m_pLODPanel->EnterEditMode( m_nSelectedSequence, m_nSelectedColumn, m_pLODEdit );
 	}
 }
 
 void CQCGenerator::OnNewLODText()
-{		
+{
 	KeyValues *pEditItem = m_pLODPanel->GetItem( m_nSelectedSequence );
 	KeyValues *pListItem = pEditItem;
-	wchar_t szEditText[MAX_PATH];
 
 	pEditItem = pEditItem->GetFirstValue();
 	const char *name = pEditItem->GetName();
@@ -715,11 +752,12 @@ void CQCGenerator::OnNewLODText()
 		pEditItem = pEditItem->GetNextValue();
 		name = pEditItem->GetName();
 	}
+	
+	wchar_t szEditText[MAX_PATH];
 	m_pLODEdit->GetText( szEditText, MAX_PATH );
 
 	pListItem->SetWString( name, szEditText );
 
 	m_pLODPanel->LeaveEditMode();
 	m_pLODPanel->InvalidateLayout();
-	return;
 }

@@ -16,9 +16,9 @@
 
 // If this option is on the command line, then filesystem_init won't bring up the vconfig
 // dialog even if FS_ERRORMODE_VCONFIG is used.
-#define CMDLINEOPTION_NOVCONFIG	"-NoVConfig"
+constexpr inline char CMDLINEOPTION_NOVCONFIG[]{"-NoVConfig"};
 
-#define	GAMEDIR_TOKEN		"VProject"
+constexpr inline char GAMEDIR_TOKEN[]{"VProject"};
 
 
 #if defined( _WIN32 ) || defined( WIN32 )

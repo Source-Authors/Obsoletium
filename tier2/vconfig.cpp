@@ -4,18 +4,15 @@
 //
 //===========================================================================//
 
+#include "vconfig.h"
+
 #ifdef _WIN32
-#if !defined( _X360 )
-#include "winlite.h"
-#endif
 #include <direct.h>
 #include <io.h> // _chmod
 #include <process.h>
+
+#include "winlite.h"
 #endif
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-#include "vconfig.h"
 
 
 #ifdef _WIN32
@@ -25,8 +22,12 @@
 //			*pReturn - string buffer to receive read string
 //			size - size of specified buffer
 //-----------------------------------------------------------------------------
-bool GetVConfigRegistrySetting( const char *pName, char *pReturn, int size )
+bool GetVConfigRegistrySetting( const char *pName, char *pReturn, unsigned long size )
 {
+	// dimhotepus: Null terminate.
+	if (size)
+		pReturn[0] = '\0';
+
 	// Open the key
 	HKEY hregkey; 
 	// Changed to HKEY_CURRENT_USER from HKEY_LOCAL_MACHINE
@@ -36,23 +37,27 @@ bool GetVConfigRegistrySetting( const char *pName, char *pReturn, int size )
 	// Get the value
 	DWORD dwSize = size;
 	if ( RegQueryValueEx( hregkey, pName, NULL, NULL,(LPBYTE) pReturn, &dwSize ) != ERROR_SUCCESS )
+	{
+		// dimhotepus: Do not leak the key. 
+		RegCloseKey( hregkey );
 		return false;
+	}
 	
 	// Close the key
 	RegCloseKey( hregkey );
-
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Sends a global system message to alert programs to a changed environment variable
 //-----------------------------------------------------------------------------
-void NotifyVConfigRegistrySettingChanged( void )
+static void NotifyVConfigRegistrySettingChanged( void )
 {
 	DWORD_PTR dwReturnValue = 0;
 	
 	// Propagate changes so that environment variables takes immediate effect!
-	SendMessageTimeout( HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM) "Environment", SMTO_ABORTIFHUNG, 5000, &dwReturnValue );
+	// dimhotepus: Use const instead of magic value.
+	SendMessageTimeout( HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM) VPROJECT_REG_KEY, SMTO_ABORTIFHUNG, 5000, &dwReturnValue );
 }
 
 //-----------------------------------------------------------------------------
@@ -82,11 +87,12 @@ void SetVConfigRegistrySetting( const char *pName, const char *pValue, bool bNot
 	}
 	
 	// Set the value to the string passed in
-	int nType = strchr( pValue, '%' ) ? REG_EXPAND_SZ : REG_SZ;
-	RegSetValueEx( hregkey, pName, 0, nType, (const unsigned char *)pValue, (ptrdiff_t) strlen(pValue) );
-
+	const DWORD nType = strchr( pValue, '%' ) ? REG_EXPAND_SZ : REG_SZ;
+	
 	// Notify other programs
-	if ( bNotify )
+	// dimhotepus: Notify oly when value is set.
+	if ( RegSetValueEx( hregkey, pName, 0, nType, (const unsigned char *)pValue, static_cast<DWORD>( strlen(pValue) ) ) == ERROR_SUCCESS &&
+		 bNotify )
 	{
 		NotifyVConfigRegistrySettingChanged();
 	}
@@ -100,11 +106,12 @@ void SetVConfigRegistrySetting( const char *pName, const char *pValue, bool bNot
 // Input  : *pName - name of the subKey to set
 //			*pValue - string value
 //-----------------------------------------------------------------------------
-bool RemoveObsoleteVConfigRegistrySetting( const char *pValueName, char *pOldValue, int size )
+bool RemoveObsoleteVConfigRegistrySetting( const char *pValueName, char *pOldValue, unsigned long size )
 {
 	// Open the key
 	HKEY hregkey; 
-	if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Environment", 0, (REGSAM)KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
+	// dimhotepus: Use const instead of magic value.
+	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
 		return false;
 
 	// Return the old state if they've requested it
@@ -113,13 +120,21 @@ bool RemoveObsoleteVConfigRegistrySetting( const char *pValueName, char *pOldVal
 		DWORD dwSize = size;
 
 		// Get the value
-		if ( RegQueryValueEx( hregkey, pValueName, NULL, NULL,(LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS )
+		if ( RegQueryValueEx( hregkey, pValueName, NULL, NULL, (LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS )
+		{
+			// dimhotepus: Do not leak the key. 
+			RegCloseKey( hregkey );
 			return false;
+		}
 	}
 	
 	// Remove the value
 	if ( RegDeleteValue( hregkey, pValueName ) != ERROR_SUCCESS )
+	{
+		// dimhotepus: Do not leak the key. 
+		RegCloseKey( hregkey );
 		return false;
+	}
 
 	// Close the key
 	RegCloseKey( hregkey );
@@ -133,11 +148,10 @@ bool RemoveObsoleteVConfigRegistrySetting( const char *pValueName, char *pOldVal
 //-----------------------------------------------------------------------------
 // Purpose: Take a user-defined environment variable and swap it out for the internally used one
 //-----------------------------------------------------------------------------
-
 bool ConvertObsoleteVConfigRegistrySetting( const char *pValueName )
 {
 	char szValue[MAX_PATH];
-	if ( RemoveObsoleteVConfigRegistrySetting( pValueName, szValue, sizeof( szValue ) ) )
+	if ( RemoveObsoleteVConfigRegistrySetting( pValueName, szValue ) )
 	{
 		// Set it up the correct way
 		SetVConfigRegistrySetting( pValueName, szValue );
