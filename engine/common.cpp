@@ -845,7 +845,6 @@ void COM_InitFilesystem( const char *pFullModPath )
 	CFSSearchPathsInit initInfo;
 
 #ifndef SWDS	
-	if ( IsPC() )
 	{
 		static char language[128];
 		language[0] = 0;
