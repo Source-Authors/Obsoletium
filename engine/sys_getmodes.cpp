@@ -2325,7 +2325,6 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
 
         m_bSetModeOnce = true;
 
-        InitStartupScreen();
         return true;
     }
 
