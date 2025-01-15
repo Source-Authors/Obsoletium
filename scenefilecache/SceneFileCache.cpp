@@ -173,7 +173,11 @@ short CSceneFileCache::GetSceneCachedSound( int iScene, int iSound )
 		return -1;
 	}
 
-	return pSummary->soundStrings[iSound];
+	// dimhotepus: Check string in range.
+	int string = pSummary->soundStrings[iSound];
+		Assert(string >= std::numeric_limits<short>::min() &&
+			   string <= std::numeric_limits<short>::max());
+	return static_cast<short>(string);
 }
 
 const char *CSceneFileCache::GetSceneString( short stringId )
