@@ -118,7 +118,7 @@ static ConVar mat_monitorgamma_tv_range_max( "mat_monitorgamma_tv_range_max", "2
 // TV's generally have a 2.5 gamma, so we need to convert our 2.2 frame buffer into a 2.5 frame buffer for display on a TV
 static ConVar mat_monitorgamma_tv_exp( "mat_monitorgamma_tv_exp", "2.5", 0, "", true, 1.0f, true, 4.0f );
 static ConVar mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled", "0", FCVAR_ARCHIVE, "" );
-				  
+
 ConVar r_drawbrushmodels( "r_drawbrushmodels", "1", FCVAR_CHEAT, "Render brush models. 0=Off, 1=Normal, 2=Wireframe" );
 
 ConVar r_shadowrendertotexture( "r_shadowrendertotexture", "0" );
@@ -1093,7 +1093,7 @@ static ITexture *CreateFullFrameFBTexture( int textureIndex, int iExtraFlags = 0
 
 static ITexture *CreateFullFrameDepthTexture( void )
 {
-		materials->AddTextureAlias( "_rt_FullFrameDepth", "_rt_PowerOfTwoFB" );
+	materials->AddTextureAlias( "_rt_FullFrameDepth", "_rt_PowerOfTwoFB" );
 	return NULL;
 }
 
@@ -1143,8 +1143,8 @@ void InitWellKnownRenderTargets( void )
 
 	// Create the render targets upon which mods may rely
 
-		// Create for all mods as vgui2 uses it for 3D painting
-		g_PowerOfTwoFBTexture.Init( CreatePowerOfTwoFBTexture() );
+	// Create for all mods as vgui2 uses it for 3D painting
+	g_PowerOfTwoFBTexture.Init( CreatePowerOfTwoFBTexture() );
 
 	// Create these for all mods because the engine references them
 	if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80 )
@@ -1158,12 +1158,12 @@ void InitWellKnownRenderTargets( void )
 
 		// Used in Bloom effects
 		g_QuarterSizedFBTexture0.Init( CreateQuarterSizedFBTexture( 0, 0 ) );
-			g_QuarterSizedFBTexture1.Init( CreateQuarterSizedFBTexture( 1, 0 ) );			
+		g_QuarterSizedFBTexture1.Init( CreateQuarterSizedFBTexture( 1, 0 ) );			
 	}
 
-		g_TeenyFBTexture0.Init( CreateTeenyFBTexture( 0 ) );
-		g_TeenyFBTexture1.Init( CreateTeenyFBTexture( 1 ) );
-		g_TeenyFBTexture2.Init( CreateTeenyFBTexture( 2 ) );
+	g_TeenyFBTexture0.Init( CreateTeenyFBTexture( 0 ) );
+	g_TeenyFBTexture1.Init( CreateTeenyFBTexture( 1 ) );
+	g_TeenyFBTexture2.Init( CreateTeenyFBTexture( 2 ) );
 
 	g_FullFrameFBTexture0.Init( CreateFullFrameFBTexture( 0 ) );
 	g_FullFrameFBTexture1.Init( CreateFullFrameFBTexture( 1 ) );
@@ -1215,7 +1215,7 @@ void ShutdownWellKnownRenderTargets( void )
 	g_BuildCubemaps16BitTexture.Shutdown();
 		
 	g_QuarterSizedFBTexture0.Shutdown();
-		g_QuarterSizedFBTexture1.Shutdown();
+	g_QuarterSizedFBTexture1.Shutdown();
 	
 	g_TeenyFBTexture0.Shutdown();
 	g_TeenyFBTexture1.Shutdown();
@@ -1230,7 +1230,7 @@ void ShutdownWellKnownRenderTargets( void )
 	g_ResolvedFullFrameDepth.Shutdown();
 	g_FullFrameDepth.Shutdown();
 
-		materials->RemoveTextureAlias( "_rt_FullFrameDepth" );
+	materials->RemoveTextureAlias( "_rt_FullFrameDepth" );
 
 	if( g_pSourceVR )
 		g_pSourceVR->ShutdownRenderTargets();
@@ -1854,7 +1854,7 @@ static VertexFormat_t GetUncompressedFormat( const IMaterial * pMaterial )
 	return ( pMaterial->GetVertexFormat() & ~VERTEX_FORMAT_COMPRESSED );
 }
 
-int FindOrAddMesh( IMaterial *pMaterial, int vertexCount )
+static intp FindOrAddMesh( IMaterial *pMaterial, int vertexCount )
 {
 	VertexFormat_t format = GetUncompressedFormat( pMaterial );
 
@@ -1868,7 +1868,7 @@ int FindOrAddMesh( IMaterial *pMaterial, int vertexCount )
 		nMaxVertices = mat_max_worldmesh_vertices.GetInt();
 	}
 
-	for ( int i = 0; i < g_Meshes.Count(); i++ )
+	for ( intp i = 0; i < g_Meshes.Count(); i++ )
 	{
 		if ( g_Meshes[i].vertexFormat != format )
 			continue;
@@ -1964,11 +1964,10 @@ void WorldStaticMeshCreate( void )
 
 	CMSurfaceSortList matSortArray;
 	matSortArray.Init( nSortIDs, 512 );
-	int *sortIndex = (int *)_alloca( sizeof(int) * g_WorldStaticMeshes.Count() );
+	intp *sortIndex = (intp *)_alloca( sizeof(intp) * g_WorldStaticMeshes.Count() );
 
 	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
 
-	int i;
 	// sort the surfaces into the sort arrays
 	for( int surfaceIndex = 0; surfaceIndex < host_state.worldbrush->numsurfaces; surfaceIndex++ )
 	{
@@ -1996,7 +1995,7 @@ void WorldStaticMeshCreate( void )
 	}
 
 	// iterate the arrays and create buffers
-	for ( i = 0; i < g_WorldStaticMeshes.Count(); i++ )
+	for ( intp i = 0; i < g_WorldStaticMeshes.Count(); i++ )
 	{
 		const surfacesortgroup_t &group = matSortArray.GetGroupForSortID(0,i);
 		int vertexCount = VertexCountForSurfaceList( matSortArray, group );
@@ -2010,7 +2009,7 @@ void WorldStaticMeshCreate( void )
 
 	PIXEVENT( pRenderContext, "WorldStaticMeshCreate" );
 #ifdef NEWMESH
-	for ( i = 0; i < g_Meshes.Count(); i++ )
+	for ( intp i = 0; i < g_Meshes.Count(); i++ )
 	{
 		Assert( g_Meshes[i].vertCount > 0 );
 		Assert( g_Meshes[i].pMaterial );
@@ -2019,9 +2018,9 @@ void WorldStaticMeshCreate( void )
 		// NOTE: Index count is zero because this will be a static vertex buffer!!!
 		CVertexBufferBuilder vertexBufferBuilder;
 		vertexBufferBuilder.Begin( g_Meshes[i].pVertexBuffer, g_Meshes[i].vertCount );
-		for ( int j = 0; j < g_WorldStaticMeshes.Count(); j++ )
+		for ( intp j = 0; j < g_WorldStaticMeshes.Count(); j++ )
 		{
-			int meshId = sortIndex[j];
+			intp meshId = sortIndex[j];
 			if ( meshId == i )
 			{
 				g_WorldStaticMeshes[j] = g_Meshes[i].pVertexBuffer;
@@ -2039,7 +2038,7 @@ void WorldStaticMeshCreate( void )
 		Assert(vertBufferIndex == g_Meshes[i].vertCount);
 	}
 #else
-	for ( i = 0; i < g_Meshes.Count(); i++ )
+	for ( intp i = 0; i < g_Meshes.Count(); i++ )
 	{
 		Assert( g_Meshes[i].vertCount > 0 );
 		if ( g_VBAllocTracker )
@@ -2051,9 +2050,9 @@ void WorldStaticMeshCreate( void )
 		CMeshBuilder meshBuilder;
 		meshBuilder.Begin( g_Meshes[i].pMesh, MATERIAL_TRIANGLES, g_Meshes[i].vertCount, 0 );
 
-		for ( int j = 0; j < g_WorldStaticMeshes.Count(); j++ )
+		for ( intp j = 0; j < g_WorldStaticMeshes.Count(); j++ )
 		{
-			int meshId = sortIndex[j];
+			intp meshId = sortIndex[j];
 			if ( meshId == i )
 			{
 				g_WorldStaticMeshes[j] = g_Meshes[i].pMesh;
