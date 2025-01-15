@@ -18,7 +18,7 @@
 
 //-------------------------------------
 
-template <class UTLVECTOR, int FIELD_TYPE>
+template <class UTLVECTOR, fieldtype_t FIELD_TYPE>
 class CUtlVectorDataOps : public CDefSaveRestoreOps
 {
 public:
@@ -27,12 +27,12 @@ public:
 		UTLCLASS_SAVERESTORE_VALIDATE_TYPE( FIELD_TYPE );
 	}
 
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
-	{		
-		datamap_t *pArrayTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLVECTOR *)NULL );
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
+	{
+		datamap_t *pArrayTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLVECTOR *)nullptr );
 		typedescription_t dataDesc = 
 		{
-			(fieldtype_t)FIELD_TYPE, 
+			FIELD_TYPE, 
 			"elems", 
 			{ 0, 0 },
 			1, 
@@ -61,8 +61,9 @@ public:
 #endif
 		};
 		
-		UTLVECTOR *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
-		int nElems = pUtlVector->Count();
+		auto *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
+		Assert(pUtlVector->Count() <= std::numeric_limits<int>::max());
+		int nElems = static_cast<int>(pUtlVector->Count());
 		
 		pSave->WriteInt( &nElems, 1 );
 		if ( pArrayTypeDatamap == NULL )
@@ -88,12 +89,12 @@ public:
 		}
 	}
 	
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
-		datamap_t *pArrayTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLVECTOR *)NULL );
+		datamap_t *pArrayTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLVECTOR *)nullptr );
 		typedescription_t dataDesc = 
 		{
-			(fieldtype_t)FIELD_TYPE, 
+			FIELD_TYPE, 
 			"elems", 
 			{ 0, 0 },
 			1, 
@@ -122,7 +123,7 @@ public:
 #endif
 		};
 		
-		UTLVECTOR *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
+		auto *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
 
 		int nElems = pRestore->ReadInt();
 		
@@ -150,23 +151,23 @@ public:
 		}
 	}
 	
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		UTLVECTOR *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
+		auto *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
 		pUtlVector->SetCount( 0 );
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		UTLVECTOR *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
-		return ( pUtlVector->Count() == 0 );
+		auto *pUtlVector = (UTLVECTOR *)fieldInfo.pField;
+		return pUtlVector->Count() == 0;
 	}
 	
 };
 
 //-------------------------------------
 
-template <int FIELD_TYPE>
+template <fieldtype_t FIELD_TYPE>
 class CUtlVectorDataopsInstantiator
 {
 public:
@@ -192,7 +193,7 @@ public:
 	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL, nullptr, 0, nullptr, 0, 0.0f }
 
 #define DEFINE_GLOBAL_UTLVECTOR(name,fieldtype) \
-{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE|FTYPEDESC_GLOBAL, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL, nullptr, 0, nullptr, 0, 0.0f }
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE|FTYPEDESC_GLOBAL, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL, nullptr, 0, nullptr, 0, 0.0f }
 
 
 #endif // SAVERESTORE_UTLVECTOR_H

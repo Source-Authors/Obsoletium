@@ -10,38 +10,38 @@
 #pragma once
 #endif
 
-#include "utlsymbol.h"
+#include "tier1/utlsymbol.h"
 
 class CUtlSymbolDataOps : public CDefSaveRestoreOps
 {
 public:
 	CUtlSymbolDataOps( CUtlSymbolTable &masterTable ) : m_symbolTable(masterTable) {}
 
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
 	{
-		CUtlSymbol *sym = ((CUtlSymbol *)fieldInfo.pField);
+		auto *sym = ((CUtlSymbol *)fieldInfo.pField);
 		
 		pSave->WriteString( m_symbolTable.String( *sym ) );
 	}
 	
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
-		CUtlSymbol *sym = ((CUtlSymbol *)fieldInfo.pField);
+		auto *sym = ((CUtlSymbol *)fieldInfo.pField);
 
 		char tmp[1024];
 		pRestore->ReadString( tmp, sizeof(tmp), 0 );
 		*sym = m_symbolTable.AddString( tmp );
 	}
 	
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		CUtlSymbol *sym = ((CUtlSymbol *)fieldInfo.pField);
+		auto *sym = ((CUtlSymbol *)fieldInfo.pField);
 		*sym = UTL_INVAL_SYMBOL;
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		CUtlSymbol *sym = ((CUtlSymbol *)fieldInfo.pField);
+		auto *sym = ((CUtlSymbol *)fieldInfo.pField);
 		return (*sym).IsValid() ? false : true;
 	}
 
