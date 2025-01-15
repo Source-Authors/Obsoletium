@@ -467,6 +467,7 @@ void CMaterialSystem::SetShaderAPI( char const *pShaderAPIDLL )
 	m_ShaderAPIFactory = CreateShaderAPI( pShaderAPIDLL );
 	if ( !m_ShaderAPIFactory )
 	{
+		Warning( "Unable to set shader API '%s'.\n", pShaderAPIDLL );
 		DestroyShaderAPI();
 	}
 }
