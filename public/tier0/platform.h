@@ -28,8 +28,8 @@
 #include <malloc.h>
 #include <new>
 
-// need this for memset
-#include <cstring>
+#include <cstring>  // std::memset
+#include <cstddef>  // std::ptrdiff_t, std::size
 
 #include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
@@ -116,10 +116,10 @@ using uint64 = uint64_t;
 
 // intp is an integer that can accomodate a pointer
 // (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
-using intp = ptrdiff_t;
+using intp = std::ptrdiff_t;
 // uintp is an unsigned integer that can accomodate a pointer
 // (ie, sizeof(uintp) >= sizeof(unsigned int) && sizeof(uintp) >= sizeof(void *)
-using uintp = size_t;
+using uintp = std::size_t;
 
 #if !defined( _WIN32 )
 using HWND = void *;
