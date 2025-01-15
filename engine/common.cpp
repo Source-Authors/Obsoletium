@@ -862,14 +862,14 @@ void COM_InitFilesystem( const char *pFullModPath )
 		if ( Steam3Client().SteamApps() )
 		{
 			// use -audiolanguage command line to override audio language, otherwise take language from steam
-			Q_strncpy(language, CommandLine()->ParmValue("-audiolanguage", Steam3Client().SteamApps()->GetCurrentGameLanguage()), sizeof( language ) - 1);
+			V_strcpy_safe(language, CommandLine()->ParmValue("-audiolanguage", Steam3Client().SteamApps()->GetCurrentGameLanguage()));
 		}
 		else
 		{
 			// still allow command line override even when not running steam
 			if (CommandLine()->CheckParm("-audiolanguage"))
 			{
-				Q_strncpy(language, CommandLine()->ParmValue("-audiolanguage", "english"), sizeof( language ) - 1);
+				V_strcpy_safe(language, CommandLine()->ParmValue("-audiolanguage", "english"));
 			}
 		}
 
@@ -902,7 +902,7 @@ void COM_InitFilesystem( const char *pFullModPath )
 	Q_MakeAbsolutePath( com_gamedir, sizeof( com_gamedir ), initInfo.m_ModPath );
 							  	
 	// Set com_basedir.
-	Q_strncpy ( com_basedir, GetBaseDirectory(), sizeof( com_basedir ) ); // the "root" directory where hl2.exe is
+	V_strcpy_safe ( com_basedir, GetBaseDirectory() ); // the "root" directory where hl2.exe is
 	Q_strlower( com_basedir );
 	Q_FixSlashes( com_basedir );
 	
@@ -1031,11 +1031,11 @@ const char *COM_FormatSeconds( int seconds )
 	
 	if ( hours > 0 )
 	{
-		Q_snprintf( string, sizeof(string), "%2i:%02i:%02i", hours, minutes, seconds );
+		V_sprintf_safe( string, "%2i:%02i:%02i", hours, minutes, seconds );
 	}
 	else
 	{
-		Q_snprintf( string, sizeof(string), "%02i:%02i", minutes, seconds );
+		V_sprintf_safe( string, "%02i:%02i", minutes, seconds );
 	}
 
 	return string;
