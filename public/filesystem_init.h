@@ -220,9 +220,6 @@ bool FileSystem_GetExecutableDir( char (&exedir)[max_size] )
 // in the environment.
 void FileSystem_ClearSteamEnvVars();
 
-// Find the steam.cfg above you for optional stuff
-FSReturnCode_t GetSteamCfgPath( char *steamCfgPath, int steamCfgPathLen );
-
 // Returns the last error.
 const char *FileSystem_GetLastErrorString();
 
