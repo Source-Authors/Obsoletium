@@ -510,7 +510,7 @@ private:
 	const char *GetVTXExtension();
 
 	bool HandleCacheNotification( const DataCacheNotification_t &notification ) override;
-	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  ) override;
+	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, size_t nMaxLen  ) override;
 
 	bool GetAsyncLoad( MDLCacheDataType_t type ) override;
 	bool SetAsyncLoad( MDLCacheDataType_t type, bool bAsync ) override;
@@ -2289,7 +2289,7 @@ bool CMDLCache::HandleCacheNotification( const DataCacheNotification_t &notifica
 	return CDefaultDataCacheClient::HandleCacheNotification( notification );
 }
 
-bool CMDLCache::GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  )
+bool CMDLCache::GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, size_t nMaxLen  )
 {
 	if ( (DataCacheClientID_t)pItem == clientId )
 	{

@@ -236,47 +236,47 @@ public:
 	//--------------------------------------------------------
 	// IAppSystem methods
 	//--------------------------------------------------------
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	//--------------------------------------------------------
 	// IDataCache methods
 	//--------------------------------------------------------
 
-	virtual void SetSize( int nMaxBytes );
-	virtual void SetOptions( unsigned options );
-	virtual void SetSectionLimits( const char *pszSectionName, const DataCacheLimits_t &limits );
-	virtual void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL );
+	void SetSize( size_t nMaxBytes ) override;
+	void SetOptions( unsigned options )override;
+	void SetSectionLimits( const char *pszSectionName, const DataCacheLimits_t &limits ) override;
+	void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL ) override;
 
 	//--------------------------------------------------------
 
-	virtual IDataCacheSection *AddSection( IDataCacheClient *pClient, const char *pszSectionName, const DataCacheLimits_t &limits = DataCacheLimits_t(), bool bSupportFastFind = false );
-	virtual void RemoveSection( const char *pszClientName, bool bCallFlush = true );
-	virtual IDataCacheSection *FindSection( const char *pszClientName );
+	IDataCacheSection *AddSection( IDataCacheClient *pClient, const char *pszSectionName, const DataCacheLimits_t &limits = DataCacheLimits_t(), bool bSupportFastFind = false ) override;
+	void RemoveSection( const char *pszClientName, bool bCallFlush = true ) override;
+	IDataCacheSection *FindSection( const char *pszClientName ) override;
 
 	//--------------------------------------------------------
 
-	void EnsureCapacity( unsigned nBytes );
-	virtual unsigned Purge( unsigned nBytes );
-	virtual unsigned Flush( bool bUnlockedOnly = true, bool bNotify = true );
+	void EnsureCapacity( size_t nBytes );
+	size_t Purge( size_t nBytes ) override;
+	size_t Flush( bool bUnlockedOnly = true, bool bNotify = true ) override;
 
 	//--------------------------------------------------------
 
-	virtual void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT, const char *pszSection = NULL );
+	void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT, const char *pszSection = NULL ) override;
 
 	//--------------------------------------------------------
 
-	inline unsigned GetNumBytes()			{ return m_status.nBytes; }
-	inline unsigned GetNumItems()			{ return m_status.nItems; }
+	inline size_t GetNumBytes() const		{ return m_status.nBytes; }
+	inline size_t GetNumItems() const		{ return m_status.nItems; }
 
-	inline unsigned GetNumBytesLocked()		{ return m_status.nBytesLocked; }
-	inline unsigned GetNumItemsLocked()		{ return m_status.nItemsLocked; }
+	inline size_t GetNumBytesLocked() const		{ return m_status.nBytesLocked; }
+	inline size_t GetNumItemsLocked() const		{ return m_status.nItemsLocked; }
 
-	inline unsigned GetNumBytesUnlocked()	{ return m_status.nBytes - m_status.nBytesLocked; }
-	inline unsigned GetNumItemsUnlocked()	{ return m_status.nItems - m_status.nItemsLocked; }
+	inline size_t GetNumBytesUnlocked() const	{ return m_status.nBytes - m_status.nBytesLocked; }
+	inline size_t GetNumItemsUnlocked() const	{ return m_status.nItems - m_status.nItemsLocked; }
 
 private:
 	//-----------------------------------------------------
@@ -287,8 +287,8 @@ private:
 
 	DataCacheItem_t *AccessItem( memhandle_t hCurrent );
 
-	bool IsInFlush()						{ return m_bInFlush; }
-	int FindSectionIndex( const char *pszSection );
+	bool IsInFlush() const { return m_bInFlush; }
+	intp FindSectionIndex( const char *pszSection );
 
 	// Utilities used by the data cache report
 	void OutputItemReport( memhandle_t hItem );

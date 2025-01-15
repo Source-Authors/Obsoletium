@@ -708,7 +708,7 @@ size_t CDataCacheSection::PurgeItems( size_t nItems )
 {
 	AUTO_LOCK( m_mutex );
 
-	unsigned nPurged = 0;
+	size_t nPurged = 0;
 
 	memhandle_t hCurrent = GetFirstUnlockedItem();
 	memhandle_t hNext;
@@ -758,11 +758,10 @@ void CDataCacheSection::UpdateSize( DataCacheHandle_t handle, size_t nNewSize )
 		// Update the size
 		pItem->size = nNewSize;
 
-		ptrdiff_t bytesAdded = (ptrdiff_t)nNewSize - (ptrdiff_t)oldSize;
 		// If change would grow cache size, then purge items until we have room
-		if ( bytesAdded > 0 )
+		if ( nNewSize > oldSize )
 		{
-			m_pSharedCache->EnsureCapacity( bytesAdded );
+			m_pSharedCache->EnsureCapacity( nNewSize - oldSize );
 		}
 		
 		m_LRU.NotifySizeChanged( (memhandle_t)handle, oldSize, nNewSize );
@@ -971,11 +970,11 @@ void DataCacheSize_f( IConVar *pConVar, [[maybe_unused]] const char *pOldString,
 	int nOldValue = (int)flOldValue;
 	if ( var.GetInt() != nOldValue )
 	{
-		g_DataCache.SetSize( var.GetInt() * 1024 * 1024 );
+		g_DataCache.SetSize( var.GetInt() * static_cast<size_t>(1024) * 1024 );
 	}
 }
 // dimhotepus: Bump 64 -> 96 as Hammer with many models needs this.
-ConVar datacachesize( "datacachesize", "96", FCVAR_INTERNAL_USE, "Size in MiB.", true, 32, true, 512, DataCacheSize_f );
+ConVar datacachesize( "datacachesize", "96", FCVAR_INTERNAL_USE, "Data cache size in MiB.", true, 32, true, 512, DataCacheSize_f );
 
 //-----------------------------------------------------------------------------
 // Connect, disconnect
@@ -985,7 +984,7 @@ bool CDataCache::Connect( CreateInterfaceFn factory )
 	if ( !BaseClass::Connect( factory ) )
 		return false;
 
-	g_DataCache.SetSize( datacachesize.GetInt() * 1024 * 1024 );
+	g_DataCache.SetSize( datacachesize.GetInt() * static_cast<size_t>(1024) * 1024 );
 	g_pDataCache = this;
 
 	return true;
@@ -1037,7 +1036,7 @@ CDataCache::CDataCache()
 //-----------------------------------------------------------------------------
 // Purpose: Controls cache size.
 //-----------------------------------------------------------------------------
-void CDataCache::SetSize( int nMaxBytes )
+void CDataCache::SetSize( size_t nMaxBytes )
 {
 	m_LRU.SetTargetSize( nMaxBytes );
 	m_LRU.FlushToTargetSize();
@@ -1046,7 +1045,7 @@ void CDataCache::SetSize( int nMaxBytes )
 
 	if ( datacachesize.GetInt() != nMaxBytes )
 	{
-		datacachesize.SetValue( nMaxBytes );
+		datacachesize.SetValue( static_cast<int>(nMaxBytes) );
 	}
 }
 
@@ -1129,7 +1128,7 @@ IDataCacheSection *CDataCache::AddSection( IDataCacheClient *pClient, const char
 //-----------------------------------------------------------------------------
 void CDataCache::RemoveSection( const char *pszClientName, bool bCallFlush )
 {
-	int iSection = FindSectionIndex( pszClientName );
+	intp iSection = FindSectionIndex( pszClientName );
 
 	if ( iSection != m_Sections.InvalidIndex() )
 	{
@@ -1149,7 +1148,7 @@ void CDataCache::RemoveSection( const char *pszClientName, bool bCallFlush )
 //-----------------------------------------------------------------------------
 IDataCacheSection *CDataCache::FindSection( const char *pszClientName )
 {
-	int iSection = FindSectionIndex( pszClientName );
+	intp iSection = FindSectionIndex( pszClientName );
 
 	if ( iSection != m_Sections.InvalidIndex() )
 	{
@@ -1162,7 +1161,7 @@ IDataCacheSection *CDataCache::FindSection( const char *pszClientName )
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-void CDataCache::EnsureCapacity( unsigned nBytes )
+void CDataCache::EnsureCapacity( size_t nBytes )
 {
 	VPROF( "CDataCache::EnsureCapacity" );
 
@@ -1173,7 +1172,7 @@ void CDataCache::EnsureCapacity( unsigned nBytes )
 //-----------------------------------------------------------------------------
 // Purpose: Dump the oldest items to free the specified amount of memory. Returns amount actually freed
 //-----------------------------------------------------------------------------
-unsigned CDataCache::Purge( unsigned nBytes )
+size_t CDataCache::Purge( size_t nBytes )
 {
 	VPROF( "CDataCache::Purge" );
 
@@ -1184,11 +1183,9 @@ unsigned CDataCache::Purge( unsigned nBytes )
 //-----------------------------------------------------------------------------
 // Purpose: Empty the cache. Returns bytes released, will remove locked items if force specified
 //-----------------------------------------------------------------------------
-unsigned CDataCache::Flush( bool bUnlockedOnly, [[maybe_unused]] bool bNotify )
+size_t CDataCache::Flush( bool bUnlockedOnly, [[maybe_unused]] bool bNotify )
 {
 	VPROF( "CDataCache::Flush" );
-
-	unsigned result;
 
 	if ( m_bInFlush )
 	{
@@ -1197,14 +1194,7 @@ unsigned CDataCache::Flush( bool bUnlockedOnly, [[maybe_unused]] bool bNotify )
 
 	m_bInFlush = true;
 
-	if ( bUnlockedOnly )
-	{
-		result =  m_LRU.FlushAllUnlocked();
-	}
-	else
-	{
-		result = m_LRU.FlushAll();
-	}
+	size_t result = bUnlockedOnly ? m_LRU.FlushAllUnlocked() : m_LRU.FlushAll();
 
 	m_bInFlush = false;
 
@@ -1217,8 +1207,8 @@ unsigned CDataCache::Flush( bool bUnlockedOnly, [[maybe_unused]] bool bNotify )
 void CDataCache::OutputReport( DataCacheReportType_t reportType, const char *pszSection )
 {
 	AUTO_LOCK( m_mutex );
-	unsigned bytesUsed = m_LRU.UsedSize();
-	unsigned bytesTotal = m_LRU.TargetSize();
+	size_t bytesUsed = m_LRU.UsedSize();
+	size_t bytesTotal = m_LRU.TargetSize();
 
 	float percent = 100.0f * (float)bytesUsed / (float)bytesTotal;
 
@@ -1357,7 +1347,7 @@ void CDataCache::OutputItemReport( memhandle_t hItem )
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-int CDataCache::FindSectionIndex( const char *pszSection )
+intp CDataCache::FindSectionIndex( const char *pszSection )
 {
 	for ( intp i = 0; i < m_Sections.Count(); i++ )
 	{

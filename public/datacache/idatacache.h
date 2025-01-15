@@ -330,7 +330,7 @@ public:
 	//--------------------------------------------------------
 	// 
 	//--------------------------------------------------------
-	virtual bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  ) = 0;
+	virtual bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, size_t nMaxLen  ) = 0;
 };
 
 //-------------------------------------
@@ -351,7 +351,7 @@ public:
 		}
 	}
 
-	bool GetItemName( DataCacheClientID_t , const void *, char *, unsigned ) override
+	bool GetItemName( DataCacheClientID_t , const void *, char *, size_t ) override
 	{
 		return false;
 	}
@@ -370,7 +370,7 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Controls cache size.
 	//--------------------------------------------------------
-	virtual void SetSize( int nMaxBytes ) = 0;
+	virtual void SetSize( size_t nMaxBytes ) = 0;
 	virtual void SetOptions( unsigned options ) = 0;
 	virtual void SetSectionLimits( const char *pszSectionName, const DataCacheLimits_t &limits ) = 0;
 
@@ -403,13 +403,13 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Dump the oldest items to free the specified amount of memory. Returns amount actually freed
 	//--------------------------------------------------------
-	virtual unsigned Purge( unsigned nBytes ) = 0;
+	virtual size_t Purge( size_t nBytes ) = 0;
 
 
 	//--------------------------------------------------------
 	// Purpose: Empty the cache. Returns bytes released, will remove locked items if force specified
 	//--------------------------------------------------------
-	virtual unsigned Flush( bool bUnlockedOnly = true, bool bNotify = true ) = 0;
+	virtual size_t Flush( bool bUnlockedOnly = true, bool bNotify = true ) = 0;
 
 
 	//--------------------------------------------------------
