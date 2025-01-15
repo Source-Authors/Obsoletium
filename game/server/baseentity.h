@@ -1770,17 +1770,17 @@ public:
 
 
 	// For debugging shared code
-	static bool						IsServer( void )
+	static constexpr bool						IsServer( void )
 	{
 		return true;
 	}
 
-	static bool						IsClient( void )
+	static constexpr bool						IsClient( void )
 	{
 		return false;
 	}
 
-	static char const				*GetDLLType( void )
+	static constexpr char const				*GetDLLType( void )
 	{
 		return "server";
 	}
