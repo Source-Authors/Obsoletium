@@ -100,12 +100,12 @@ CRC32_t	CRC32_GetTableEntry( unsigned int slot )
 	return pulCRCTable[(unsigned char)slot];
 }
 
-void CRC32_ProcessBuffer(CRC32_t *pulCRC, const void *pBuffer, int nBuffer)
+void CRC32_ProcessBuffer(CRC32_t *pulCRC, const void *pBuffer, intp nBuffer)
 {
 	CRC32_t ulCrc = *pulCRC;
 	unsigned char *pb = (unsigned char *)pBuffer;
     unsigned int nFront;
-    int nMain;
+    intp nMain;
 
 JustAfew:
 
