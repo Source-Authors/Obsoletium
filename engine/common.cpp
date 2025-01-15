@@ -851,7 +851,7 @@ void COM_InitFilesystem( const char *pFullModPath )
 
 		// There are two language at play here.  The Audio language which is controled by the
 		// properties on the game itself in Steam (at least for now).  And the language Steam is set to.
-        // Under Windows the text in the game is controled by the language Steam is set in, but the audio
+		// Under Windows the text in the game is controled by the language Steam is set in, but the audio
 		// is controled by the language set in the game's properties which we can get from Steam3Client
 
 		// A command line override for audio language has also been added.
@@ -896,10 +896,10 @@ void COM_InitFilesystem( const char *pFullModPath )
 	{
 		Error( "Unable to load search paths from gameinfo.txt\n" );
 	}
-							  
+
 	// The mod path becomes com_gamedir.
 	Q_MakeAbsolutePath( com_gamedir, sizeof( com_gamedir ), initInfo.m_ModPath );
-							  	
+
 	// Set com_basedir.
 	V_strcpy_safe ( com_basedir, GetBaseDirectory() ); // the "root" directory where hl2.exe is
 	Q_strlower( com_basedir );
@@ -1070,7 +1070,7 @@ void COM_Log( const char *pszFile, PRINTF_FORMAT_STRING const char *fmt, ...) FM
 	char		string[8192];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+	Q_vsnprintf(string, sizeof( string ), fmt, argptr);
 	va_end (argptr);
 
 	COM_LogString( pszFile, string );
@@ -1282,10 +1282,8 @@ void *COM_CompressBuffer_LZSS( const void *source, unsigned int sourceLen, unsig
 		return pbOut;
 	}
 
-	if ( pbOut )
-	{
-		free( pbOut );
-	}
+	free( pbOut );
+
 	return NULL;
 }
 
