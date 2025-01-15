@@ -128,7 +128,7 @@ public:
 		return -1;
 	}
 
-	bool GetString( short stringId, char *buff, int buffSize );
+	bool GetString( short stringId, char *buff, intp buffSize ) override;
 };
 
 #endif // C_SCENEENTITY_H

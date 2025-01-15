@@ -114,7 +114,7 @@ public:
 		return stringId;
 	}
 
-	bool GetString( short stringId, char *buff, int buffSize ) override
+	bool GetString( short stringId, char *buff, intp buffSize ) override
 	{
 		if ( stringId < 0 || stringId >= m_StringMap.GetNumStrings() )
 		{
@@ -259,7 +259,7 @@ bool CreateTargetFile_VCD( const char *pSourceName, [[maybe_unused]] const char 
 	pChoreoScene->SaveToBinaryBuffer( sceneFile.compiledBuffer, crcSource, &g_ChoreoStringPool );
 
 	unsigned int compressedSize;
-	unsigned char *pCompressedBuffer = LZMA_OpportunisticCompress( (unsigned char *)sceneFile.compiledBuffer.Base(),
+	unsigned char *pCompressedBuffer = LZMA_OpportunisticCompress( sceneFile.compiledBuffer.Base<unsigned char>(),
 	                                                               sceneFile.compiledBuffer.TellMaxPut(),
 	                                                               &compressedSize );
 	if ( pCompressedBuffer )
@@ -323,7 +323,7 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 
 	// iterate and convert all the VCD files
 	bool bGameIsTF = V_stristr( pchModPath, "\\tf" ) != NULL;
-	for ( int i=0; i<vcdFileList.Count(); i++ )
+	for ( intp i=0; i<vcdFileList.Count(); i++ )
 	{
 		const char *pFilename = vcdFileList[i].fileName.String();
 		const char *pSceneName = V_stristr( pFilename, "scenes\\" );
@@ -350,8 +350,6 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 			{
 				Error( "CreateSceneImageFile: Failed on '%s' conversion!\n", pFilename );
 			}
-
-
 		}
 	}
 
@@ -371,16 +369,16 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 
 	if ( !bQuiet )
 	{
-		Msg( "Scenes: String Table: %llu bytes\n", ((uint64)stringOffsets.Count() * sizeof( int )) );
+		Msg( "Scenes: String Table: %zu bytes\n", stringOffsets.Count() * sizeof( int ) );
 		Msg( "Scenes: String Pool: %zd bytes\n", stringPool.TellMaxPut() );
 	}
 
 	// first header, then lookup table, then string pool blob
-	int stringPoolStart = sizeof( SceneImageHeader_t ) + stringOffsets.Count() * sizeof( int );
+	intp stringPoolStart = sizeof( SceneImageHeader_t ) + stringOffsets.Count() * sizeof( int );
 	// then directory
-	int sceneEntryStart = stringPoolStart + stringPool.TellMaxPut();
+	intp sceneEntryStart = stringPoolStart + stringPool.TellMaxPut();
 	// then variable sized summaries
-	int sceneSummaryStart = sceneEntryStart + g_SceneFiles.Count() * sizeof( SceneImageEntry_t );
+	intp sceneSummaryStart = sceneEntryStart + g_SceneFiles.Count() * sizeof( SceneImageEntry_t );
 	// then variable sized compiled binary scene data
 	intp sceneDataStart = 0;
 
@@ -420,7 +418,7 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 
 	// build directory
 	// directory is linear sorted by filename checksum for later binary search
-	for ( int i = 0; i < g_SceneFiles.Count(); i++ )
+	for ( intp i = 0; i < g_SceneFiles.Count(); i++ )
 	{
 		SceneImageEntry_t imageEntry = {};
 
@@ -462,7 +460,7 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 		writeOrder.AddToTail( iScene );
 
 		// march past each variable sized summary to determine start of scene data
-		int numSounds = g_SceneFiles[iScene].soundList.Count();
+		intp numSounds = g_SceneFiles[iScene].soundList.Count();
 		sceneDataStart += sizeof( SceneImageSummary_t ) + ( numSounds - 1 ) * sizeof( int );
 	}
 
@@ -486,7 +484,7 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 		}
 		targetBuffer.Put( &imageDirectory[i], sizeof( SceneImageEntry_t ) );
 
-		int numSounds = g_SceneFiles[iScene].soundList.Count();
+		intp numSounds = g_SceneFiles[iScene].soundList.Count();
 		nSummaryOffset += sizeof( SceneImageSummary_t ) + (numSounds - 1) * sizeof( int );
 
 		nDataOffset += g_SceneFiles[iScene].compiledBuffer.TellMaxPut();
@@ -498,7 +496,7 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 	{
 		int iScene = writeOrder[i];
 		int msecs = g_SceneFiles[iScene].msecs;
-		int soundCount = g_SceneFiles[iScene].soundList.Count();
+		intp soundCount = g_SceneFiles[iScene].soundList.Count();
 		if ( !bLittleEndian )
 		{
 			msecs = BigLong( msecs );

@@ -149,8 +149,8 @@ bool C_SceneEntity::GetHWMorphSceneFileName( const char *pFilename, char *pHWMFi
 //-----------------------------------------------------------------------------
 void C_SceneEntity::ResetActorFlexesForScene()
 {
-	int nActorCount = m_pScene->GetNumActors();
-	for( int iActor = 0; iActor < nActorCount; ++iActor )
+	intp nActorCount = m_pScene->GetNumActors();
+	for( intp iActor = 0; iActor < nActorCount; ++iActor )
 	{
 		CChoreoActor *pChoreoActor = m_pScene->GetActor( iActor );
 		if ( !pChoreoActor )
@@ -168,8 +168,7 @@ void C_SceneEntity::ResetActorFlexesForScene()
 			continue;
 
 		// Reset the flex weights to their starting position.
-		LocalFlexController_t iController;
-		for ( iController = LocalFlexController_t(0); iController < pStudioHdr->numflexcontrollers(); ++iController )
+		for ( auto iController = LocalFlexController_t(0); iController < pStudioHdr->numflexcontrollers(); ++iController )
 		{
 			pFlexActor->SetFlexWeight( iController, 0.0f );
 		}
@@ -793,7 +792,7 @@ void C_SceneEntity::EndEvent( float currenttime, CChoreoScene *scene, CChoreoEve
 	}
 }
 
-bool CChoreoStringPool::GetString( short stringId, char *buff, int buffSize )
+bool CChoreoStringPool::GetString( short stringId, char *buff, intp buffSize )
 {
 	// fetch from compiled pool
 	const char *pString = scenefilecache->GetSceneString( stringId );
@@ -815,12 +814,11 @@ CChoreoScene *C_SceneEntity::LoadScene( const char *filename )
 	Q_SetExtension( loadfile, ".vcd", sizeof( loadfile ) );
 	Q_FixSlashes( loadfile );
 
-	char *pBuffer = NULL;
 	size_t bufsize = scenefilecache->GetSceneBufferSize( loadfile );
 	if ( bufsize <= 0 )
 		return NULL;
 
-	pBuffer = new char[ bufsize ];
+	char *pBuffer = new char[ bufsize ];
 	if ( !scenefilecache->GetSceneData( filename, (byte *)pBuffer, bufsize ) )
 	{
 		delete[] pBuffer;
@@ -872,8 +870,7 @@ void C_SceneEntity::ClearSceneEvents( CChoreoScene *scene, bool canceled )
 
 	Scene_Printf( "%s : %8.2f:  clearing events\n", GetSceneFileName(), m_flCurrentTime );
 
-	int i;
-	for ( i = 0 ; i < m_pScene->GetNumActors(); i++ )
+	for ( intp i = 0 ; i < m_pScene->GetNumActors(); i++ )
 	{
 		C_BaseFlex *pActor = FindNamedActor( m_pScene->GetActor( i ) );
 		if ( !pActor )
@@ -896,7 +893,7 @@ void C_SceneEntity::UnloadScene( void )
 	if ( m_pScene )
 	{
 		ClearSceneEvents( m_pScene, false );
-		for ( int i = 0 ; i < m_pScene->GetNumActors(); i++ )
+		for ( intp i = 0 ; i < m_pScene->GetNumActors(); i++ )
 		{
 			C_BaseFlex *pTestActor = FindNamedActor( m_pScene->GetActor( i ) );
 
@@ -1062,8 +1059,8 @@ void C_SceneEntity::CheckQueuedEvents()
 	events = m_QueuedEvents;
 	m_QueuedEvents.RemoveAll();
 
-	int c = events.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = events.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		const QueuedEvents_t& check = events[ i ];
 		
@@ -1080,12 +1077,12 @@ void C_SceneEntity::WipeQueuedEvents()
 void C_SceneEntity::QueueStartEvent( float starttime, CChoreoScene *scene, CChoreoEvent *event )
 {
 	// Check for duplicates
-	int c = m_QueuedEvents.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_QueuedEvents.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		const QueuedEvents_t& check = m_QueuedEvents[ i ];
-		if ( check.scene == scene && 
-			 check.event == event )
+
+		if ( check.scene == scene && check.event == event )
 			return;
 	}
 
@@ -1145,7 +1142,7 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 				if ( pActor )
 				{
 					CBaseFlex *pFlex = NULL;
-					int idx = actorMap.Find( pActor );
+					auto idx = actorMap.Find( pActor );
 					if ( idx == actorMap.InvalidIndex() )
 					{
 						pFlex = FindNamedActor( pActor );

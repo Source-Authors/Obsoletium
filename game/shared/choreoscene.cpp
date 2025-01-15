@@ -50,7 +50,7 @@ CChoreoScene *ChoreoLoadScene(
 	return scene;
 }
 
-bool IsBufferBinaryVCD( char *pBuffer, int bufferSize )
+bool IsBufferBinaryVCD( char *pBuffer, size_t bufferSize )
 {	
 	if ( bufferSize > 4 && *(int *)pBuffer == SCENE_BINARY_TAG )
 	{

@@ -395,7 +395,7 @@ abstract_class IChoreoStringPool
 {
 public:
 	virtual short	FindOrAddString( const char *pString ) = 0;
-	virtual bool	GetString( short stringId, char *buff, int buffSize ) = 0; 	
+	virtual bool	GetString( short stringId, char *buff, intp buffSize ) = 0; 	
 };
 
 CChoreoScene *ChoreoLoadScene( 
@@ -404,6 +404,6 @@ CChoreoScene *ChoreoLoadScene(
 	ISceneTokenProcessor *tokenizer,
 	void ( *pfn ) ( PRINTF_FORMAT_STRING const char *fmt, ... ) );
 
-bool IsBufferBinaryVCD( char *pBuffer, int bufferSize );
+bool IsBufferBinaryVCD( char *pBuffer, size_t bufferSize );
 
 #endif // CHOREOSCENE_H
