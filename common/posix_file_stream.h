@@ -19,19 +19,28 @@ namespace se::posix {
 template <typename T>
 using io_result = std::tuple<T, std::error_code>;
 
+// Success error code.
+const inline std::error_code posix_error_ok{0, std::generic_category()};
+
+namespace internal {
+
+// std::error_code from errno.
 [[nodiscard]] inline std::error_code make_posix_error_from_errno(int errc) {
   return std::error_code{errc, std::generic_category()};
 }
 
+// Last errno as std::error_code.
 [[nodiscard]] inline std::error_code posix_error_last() {
   return make_posix_error_from_errno(errno);
 }
 
-const inline std::error_code posix_error_ok{0, std::generic_category()};
-
-[[nodiscard]] inline std::error_code make_posix_error_from_result(int result) {
-  return result ? posix_error_last() : posix_error_ok;
+// Make error from result and errc (errno).
+[[nodiscard]] inline std::error_code make_posix_error_from_result(int result,
+                                                                  int errc) {
+  return result ? make_posix_error_from_errno(errc) : posix_error_ok;
 }
+
+}  // namespace internal
 
 // stdio-based file stream.
 class posix_file_stream {
@@ -64,24 +73,29 @@ class posix_file_stream {
     int fields_assigned_count;
     va_list arg_list;
     va_start(arg_list, format);
-    fields_assigned_count = _vfscanf_s_l(fd_, format, nullptr, arg_list);
+#ifdef _WIN32
+    fields_assigned_count = vfscanf_s(fd_, format, arg_list);
+#else
+    fields_assigned_count = vfscanf(fd_, format, arg_list);
+#endif
     va_end(arg_list);
 
     return {fields_assigned_count != EOF ? fields_assigned_count : 0,
-            make_posix_error_from_result(ferror(fd_))};
+            internal::make_posix_error_from_result(ferror(fd_), EIO)};
   }
 
   // Like feof.
   [[nodiscard]] io_result<bool> eof() const noexcept {
     const int c{feof(fd_)};
-    return {c != 0, posix_error_last()};
+    return {c != 0, internal::posix_error_last()};
   }
 
   // Like fgetc, get char from file.
   [[nodiscard]] io_result<int> getc() const noexcept {
     const int c{fgetc(fd_)};
-    return {c, c != EOF ? posix_error_ok
-                        : make_posix_error_from_result(ferror(fd_))};
+    return {c, c != EOF
+                   ? posix_error_ok
+                   : internal::make_posix_error_from_result(ferror(fd_), EIO)};
   }
 
   // Like fgets, get C string from file.
@@ -91,7 +105,7 @@ class posix_file_stream {
     char* string{fgets(buffer, buffer_size, fd_)};
     return {string, string != nullptr
                         ? posix_error_ok
-                        : make_posix_error_from_result(ferror(fd_))};
+                        : make_posix_error_from_result(ferror(fd_), EIO)};
   }
 
   // Reads into |buffer| of size |buffer_size| |elements_count| elements.
@@ -115,7 +129,7 @@ class posix_file_stream {
     auto [read_size, error_info] =
         read(buffer, buffer_size * sizeof(char), sizeof(char), buffer_size - 1);
 
-    if (!error_info) {
+    if (!error_info || buffer_size != 0) {
       buffer[read_size] = '\0';
     }
 
@@ -138,7 +152,7 @@ class posix_file_stream {
     auto [read_size, error_info] = read(buffer, buffer_size * sizeof(wchar_t),
                                         sizeof(wchar_t), buffer_size - 1);
 
-    if (!error_info) {
+    if (!error_info || buffer_size != 0) {
       buffer[read_size] = L'\0';
     }
 
@@ -165,7 +179,7 @@ class posix_file_stream {
     va_end(arg_list);
 
     return {bytes_written_count >= 0 ? bytes_written_count : 0,
-            make_posix_error_from_result(ferror(fd_))};
+            internal::make_posix_error_from_result(ferror(fd_), EIO)};
   }
 
   // Writes |elements_count| elements from |buffer| to file.
@@ -192,9 +206,18 @@ class posix_file_stream {
       void* buffer, const size_t buffer_size_bytes,
       const size_t element_size_bytes,
       const size_t max_elements_count) const noexcept {
+#ifdef _WIN32
     return {fread_s(buffer, buffer_size_bytes, element_size_bytes,
                     max_elements_count, fd_),
-            make_posix_error_from_result(ferror(fd_))};
+            internal::make_posix_error_from_result(ferror(fd_), EIO)};
+#else
+    if (buffer_size_bytes < element_size_bytes * max_elements_count) {
+      return {0, internal::make_posix_error_from_errno(EINVAL)};
+    };
+
+    return {fread(buffer, element_size_bytes, max_elements_count, fd_),
+            internal::make_posix_error_from_result(ferror(fd_), EIO)};
+#endif
   }
 
   // Writes data from |buffer| of size |element_size_bytes| and count
@@ -207,20 +230,22 @@ class posix_file_stream {
       const void* buffer, const size_t element_size_bytes,
       const size_t max_elements_count) const noexcept {
     return {std::fwrite(buffer, element_size_bytes, max_elements_count, fd_),
-            make_posix_error_from_result(ferror(fd_))};
+            internal::make_posix_error_from_result(ferror(fd_), EIO)};
   }
 
   // Moves the file pointer to a specified location.
   [[nodiscard]] io_result<int> seek(const int64_t offset,
                                     const int origin) const noexcept {
     const int errno_code{_fseeki64(fd_, offset, origin)};
-    return {errno_code, errno_code == 0 ? posix_error_ok : posix_error_last()};
+    return {errno_code,
+            errno_code == 0 ? posix_error_ok : internal::posix_error_last()};
   }
 
   // Gets the current position of a file pointer.
   [[nodiscard]] io_result<int64_t> tell() const noexcept {
     const int64_t file_pos{_ftelli64(fd_)};
-    return {file_pos, file_pos != -1L ? posix_error_ok : posix_error_last()};
+    return {file_pos,
+            file_pos != -1L ? posix_error_ok : internal::posix_error_last()};
   }
 
   ~posix_file_stream() noexcept {
@@ -235,7 +260,8 @@ class posix_file_stream {
   // Closes file.
   [[nodiscard]] std::error_code close() noexcept {
     const std::error_code errno_code{
-        fd_ ? make_posix_error_from_result(fclose(fd_)) : posix_error_ok};
+        fd_ ? internal::make_posix_error_from_result(fclose(fd_), EIO)
+            : posix_error_ok};
     fd_ = nullptr;
     return errno_code;
   }
@@ -256,11 +282,17 @@ class posix_file_stream_factory {
   [[nodiscard]] static io_result<posix_file_stream> open(
       const char* file_path, const char* mode) noexcept {
     FILE* fd{nullptr};
+#ifdef _WIN32
     const int errno_code{fopen_s(&fd, file_path, mode)};
+#else
+    fd = fopen(file_path, mode);
+    const int errno_code{fd ? 0 : errno};
+#endif
     return errno_code == posix_error_ok.value()
                ? std::make_tuple(posix_file_stream{fd}, posix_error_ok)
-               : std::make_tuple(posix_file_stream::null(),
-                                 make_posix_error_from_errno(errno_code));
+               : std::make_tuple(
+                     posix_file_stream::null(),
+                     internal::make_posix_error_from_errno(errno_code));
   }
 
   posix_file_stream_factory() = delete;

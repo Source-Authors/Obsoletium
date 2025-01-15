@@ -93,15 +93,21 @@ public:
 	class AutoDelete
 	{
 	public:
-		explicit inline AutoDelete( KeyValues *pKeyValues ) : m_pKeyValues( pKeyValues ) {}
+		explicit inline AutoDelete( std::nullptr_t ) noexcept : m_pKeyValues{nullptr} {}
+		explicit inline AutoDelete( KeyValues *pKeyValues ) noexcept : m_pKeyValues( pKeyValues ) {}
 		explicit inline AutoDelete( const char *pchKVName ) : m_pKeyValues( new KeyValues( pchKVName ) ) {}
-		inline ~AutoDelete( void ) { if( m_pKeyValues ) m_pKeyValues->deleteThis(); }
-		inline void Assign( KeyValues *pKeyValues ) { m_pKeyValues = pKeyValues; }
-		KeyValues *operator->()	{ return m_pKeyValues; }
-		operator KeyValues *()	{ return m_pKeyValues; }
+
+		inline ~AutoDelete() { if ( m_pKeyValues ) m_pKeyValues->deleteThis(); }
+		inline void Assign( KeyValues *pKeyValues ) noexcept { m_pKeyValues = pKeyValues; }
+		KeyValues *operator->() noexcept { return m_pKeyValues; }
+		operator KeyValues *() noexcept	{ return m_pKeyValues; }
+
+		AutoDelete( AutoDelete const & ) = delete;
+		AutoDelete( AutoDelete &&x ) noexcept : m_pKeyValues{x.m_pKeyValues} { x.m_pKeyValues = nullptr; }
+		AutoDelete & operator= ( AutoDelete const & ) = delete;
+		AutoDelete & operator= ( AutoDelete &&x ) noexcept { std::swap(m_pKeyValues, x.m_pKeyValues); return *this; }
+
 	private:
-		AutoDelete( AutoDelete const &x ); // forbid
-		AutoDelete & operator= ( AutoDelete const &x ); // forbid
 		KeyValues *m_pKeyValues;
 	};
 

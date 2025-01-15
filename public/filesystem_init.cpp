@@ -29,6 +29,8 @@
 #include "tier1/utlbuffer.h"
 #include "tier1/KeyValues.h"
 #include "tier0/icommandline.h"
+#include "posix_file_stream.h"
+
 #include "appframework/IAppSystemGroup.h"
 
 #include <atomic>
@@ -36,7 +38,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-constexpr char GAMEINFO_FILENAME[]{"gameinfo.txt"};
+constexpr inline char GAMEINFO_FILENAME[]{"gameinfo.txt"};
 
 // dimhotepus: Thread-safe global state.
 static thread_local char g_FileSystemError[256];
@@ -272,26 +274,38 @@ const char *FileSystem_GetLastErrorString()
 }
 
 
-static KeyValues* ReadKeyValuesFile( const char *pFilename )
+static KeyValues::AutoDelete ReadKeyValuesFile( const char *pFilename )
 {
 	// Read in the gameinfo.txt file and null-terminate it.
-	FILE *fp = fopen( pFilename, "rb" );
-	if ( !fp )
-		return nullptr;
+	auto [fp, errc] = se::posix::posix_file_stream_factory::open(pFilename, "rb");
+	if ( errc )
+		return KeyValues::AutoDelete{ nullptr };
 	
-	fseek( fp, 0, SEEK_END );
-	CUtlVector<char> buf;
-	buf.SetSize( ftell( fp ) + 1 );
-	fseek( fp, 0, SEEK_SET );
-	fread( buf.Base(), 1, buf.Count()-1, fp );
-	fclose( fp );
-	buf[buf.Count()-1] = 0;
+	std::tie(std::ignore, errc) = fp.seek( 0, SEEK_END );
+	if ( errc )
+		return KeyValues::AutoDelete{ nullptr };
 
-	KeyValues *kv = new KeyValues( "" );
+	std::int64_t size;
+	std::tie(size, errc) = fp.tell();
+	if ( errc )
+		return KeyValues::AutoDelete{ nullptr };
+
+	CUtlVector<char> buf;
+	buf.SetSize( size + 1 );
+
+	std::tie(std::ignore, errc) = fp.seek( 0, SEEK_SET );
+	if ( errc )
+		return KeyValues::AutoDelete{ nullptr };
+
+	std::tie(std::ignore, errc) = fp.read( buf.Base(), size );
+	if ( errc )
+		return KeyValues::AutoDelete{ nullptr };
+
+	auto kv = KeyValues::AutoDelete( "" );
+	// File system is not ready yet so load from buffer.
 	if ( !kv->LoadFromBuffer( pFilename, buf.Base() ) )
 	{
-		kv->deleteThis();
-		return nullptr;
+		return KeyValues::AutoDelete{ nullptr };
 	}
 	
 	return kv;
@@ -320,7 +334,8 @@ static bool Sys_GetExecutableName( char *out, unsigned len )
 
 bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen )
 {
-	exedir[0] = '\0';
+	if ( exeDirLen )
+		exedir[0] = '\0';
 
 	if ( s_bUseVProjectBinDir.load(std::memory_order::memory_order_relaxed) )
 	{
@@ -375,7 +390,7 @@ static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 	if ( FileSystem_GetExecutableDir( baseDir ) )
 	{
 #ifdef PLATFORM_64BITS
-		// dimhteopus: Need to strip x64, too.
+		// dimhotepus: Need to strip x64, too.
 		Q_StripFilename( baseDir );
 #endif
 		Q_StripFilename( baseDir );
@@ -407,7 +422,7 @@ const char* GetVProjectCmdLineValue()
 	return CommandLine()->ParmValue( "-vproject", CommandLine()->ParmValue( "-game" ) );
 }
 
-FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, const char *pMsg, ... )
+static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, const char *pMsg, ... )
 {
 	va_list marker;
 	va_start( marker, pMsg );
@@ -418,7 +433,9 @@ FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, co
 
 	// Run vconfig?
 	// Don't do it if they specifically asked for it not to, or if they manually specified a vconfig with -game or -vproject.
-	if ( bRunVConfig && g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG && !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
+	if ( bRunVConfig &&
+		 g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG &&
+		 !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
 	{
 		if ( !LaunchVConfig() )
 		{
@@ -436,10 +453,9 @@ FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, co
 	return retVal;
 }
 
-FSReturnCode_t LoadGameInfoFile( 
+static FSReturnCode_t LoadGameInfoFile( 
 	const char *pDirectoryName, 
-	KeyValues *&pMainFile, 
-	KeyValues *&pFileSystemInfo, 
+	KeyValues::AutoDelete &pMainFile, 
 	KeyValues *&pSearchPaths )
 {
 	// If GameInfo.txt exists under pBaseDir, then this is their game directory.
@@ -449,16 +465,16 @@ FSReturnCode_t LoadGameInfoFile(
 	Q_AppendSlash( gameinfoFilename, sizeof( gameinfoFilename ) );
 	V_strcat_safe( gameinfoFilename, GAMEINFO_FILENAME );
 	Q_FixSlashes( gameinfoFilename );
+
 	pMainFile = ReadKeyValuesFile( gameinfoFilename );
 	if ( !pMainFile )
 	{
 		return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "%s is missing.", gameinfoFilename );
 	}
 
-	pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
+	auto *pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
 	if ( !pFileSystemInfo )
 	{
-		pMainFile->deleteThis();
 		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
 	}
 
@@ -466,9 +482,9 @@ FSReturnCode_t LoadGameInfoFile(
 	pSearchPaths = pFileSystemInfo->FindKey( "SearchPaths" );
 	if ( !pSearchPaths )
 	{
-		pMainFile->deleteThis();
 		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
 	}
+
 	return FS_OK;
 }
 
@@ -546,8 +562,9 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	if ( !initInfo.m_pFileSystem || !initInfo.m_pDirectoryName )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_LoadSearchPaths: Invalid parameters specified." );
 
-	KeyValues *pMainFile, *pFileSystemInfo, *pSearchPaths;
-	FSReturnCode_t retVal = LoadGameInfoFile( initInfo.m_pDirectoryName, pMainFile, pFileSystemInfo, pSearchPaths );
+	KeyValues::AutoDelete pMainFile{nullptr};
+	KeyValues *pSearchPaths;
+	FSReturnCode_t retVal = LoadGameInfoFile( initInfo.m_pDirectoryName, pMainFile, pSearchPaths );
 	if ( retVal != FS_OK )
 		return retVal;
 	
@@ -758,8 +775,6 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 			}
 		}
 	}
-
-	pMainFile->deleteThis();
 
 	// Also, mark specific path IDs as "by request only". That way, we won't waste time searching in them
 	// when people forget to specify a search path.
