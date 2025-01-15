@@ -65,7 +65,7 @@
 #include "materialsystem/imesh.h"
 #include "materialsystem/itexture.h"
 #include "bsptreedata.h"
-#include "utlmultilist.h"
+#include "tier1/utlmultilist.h"
 #include "collisionutils.h"
 #include "iviewrender.h"
 #include "ivrenderview.h"
