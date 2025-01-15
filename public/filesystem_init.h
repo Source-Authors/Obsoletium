@@ -166,7 +166,7 @@ public:
 };
 
 
-const char *GetVProjectCmdLineValue();
+[[nodiscard]] const char *GetVProjectCmdLineValue();
 
 
 // Call this to use a bin directory relative to VPROJECT
@@ -176,10 +176,10 @@ bool FileSystem_UseVProjectBinDir( bool bEnable );
 // This is used by all things that use the application framework:
 // Note that the application framework automatically takes care of step 1 if you use CSteamApplication.
 // Step 1: Ask filesystem_init for the name of the filesystem DLL to load
-FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, size_t nMaxLen, bool &bSteam );
+[[nodiscard]] FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, size_t nMaxLen, bool &bSteam );
 
 template<size_t max_size>
-FSReturnCode_t FileSystem_GetFileSystemDLLName( char (&dll_name)[max_size], bool &is_steam )
+[[nodiscard]] FSReturnCode_t FileSystem_GetFileSystemDLLName( char (&dll_name)[max_size], bool &is_steam )
 {
 	return FileSystem_GetFileSystemDLLName( dll_name, max_size, is_steam );
 }
@@ -187,18 +187,18 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( char (&dll_name)[max_size], bool
 // Step 2: Use filesystem framework to load/connect/init that filesystem DLL
 // -or- just set up the steam environment and get back the gameinfo.txt path
 // The second method is used by the application framework, which wants to connect/init the filesystem itself
-FSReturnCode_t FileSystem_LoadFileSystemModule( CFSLoadModuleInfo &info );
-FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &info );
+[[nodiscard]] FSReturnCode_t FileSystem_LoadFileSystemModule( CFSLoadModuleInfo &info );
+[[nodiscard]] FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &info );
 
 // Step 3: Ask filesystem_init to set up the executable search path, and mount the steam content based on the mod gameinfo.txt file
-FSReturnCode_t FileSystem_MountContent( CFSMountContentInfo &fsInfo );
+[[nodiscard]] FSReturnCode_t FileSystem_MountContent( CFSMountContentInfo &fsInfo );
 
 // Step 4: Load the search paths out of pGameDirectory\gameinfo.txt.
-FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo );
+[[nodiscard]] FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo );
 
 // This is automatically done during step 3, but if you want to redo all the search
 // paths (like Hammer does), you can call this to reset executable_path.
-FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem );
+[[nodiscard]] FSReturnCode_t FileSystem_SetBasePaths(IFileSystem *pFileSystem);
 
 // Utility function to add the PLATFORM search path.
 void FileSystem_AddSearchPath_Platform( IFileSystem *pFileSystem, const char *szGameInfoPath );
@@ -207,10 +207,10 @@ void FileSystem_AddSearchPath_Platform( IFileSystem *pFileSystem, const char *sz
 // dimhotepus: Return old file system error mode.
 FSErrorMode_t FileSystem_SetErrorMode( FSErrorMode_t errorMode = FS_ERRORMODE_VCONFIG );
 
-bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen );
+[[nodiscard]] bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen );
 
 template<size_t max_size>
-bool FileSystem_GetExecutableDir( char (&exedir)[max_size] )
+[[nodiscard]] bool FileSystem_GetExecutableDir( char (&exedir)[max_size] )
 {
 	return FileSystem_GetExecutableDir( exedir, max_size );
 }
@@ -221,7 +221,7 @@ bool FileSystem_GetExecutableDir( char (&exedir)[max_size] )
 void FileSystem_ClearSteamEnvVars();
 
 // Returns the last error.
-const char *FileSystem_GetLastErrorString();
+[[nodiscard]] const char *FileSystem_GetLastErrorString();
 
 template <int outSize>
 [[nodiscard]] bool Q_getwd(char (&out)[outSize])
@@ -229,8 +229,5 @@ template <int outSize>
 	[[nodiscard]] bool Q_getwd(char *out, int outSize);
 	return Q_getwd( out, outSize );
 }
-
-// dimhotepus: Drop internal function.
-// void Q_getwd( char *out, int outSize );
 
 #endif // FILESYSTEM_INIT_H

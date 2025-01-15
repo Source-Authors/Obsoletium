@@ -893,7 +893,10 @@ void COM_InitFilesystem( const char *pFullModPath )
 	initInfo.m_bMountHDContent = BLoadHDContent( initInfo.m_pDirectoryName, GetBaseDirectory() );
 
 	// Load gameinfo.txt and setup all the search paths, just like the tools do.
-	FileSystem_LoadSearchPaths( initInfo );
+	if ( FileSystem_LoadSearchPaths( initInfo ) != FS_OK )
+	{
+		Error( "Unable to load search paths from gameinfo.txt\n" );
+	}
 							  
 	// The mod path becomes com_gamedir.
 	Q_MakeAbsolutePath( com_gamedir, sizeof( com_gamedir ), initInfo.m_ModPath );

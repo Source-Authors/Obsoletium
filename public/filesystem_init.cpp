@@ -403,7 +403,9 @@ static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 static bool LaunchVConfig()
 {
 	char vconfigExe[MAX_PATH];
-	FileSystem_GetExecutableDir( vconfigExe );
+	if ( !FileSystem_GetExecutableDir( vconfigExe ) )
+		return false;
+
 	Q_AppendSlash( vconfigExe, sizeof( vconfigExe ) );
 	V_strcat_safe( vconfigExe, "vconfig.exe" );
 
