@@ -61,7 +61,7 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 	CSysModule *pSysModule = LoadModuleDLL( pDLLName );
 	if (!pSysModule)
 	{
-		Warning("AppFramework : Unable to load module %s!\n", pDLLName );
+		Warning("AppFramework: Unable to load module %s!\n", pDLLName );
 		return APP_MODULE_INVALID;
 	}
 
@@ -78,7 +78,7 @@ AppModule_t CAppSystemGroup::LoadModule( CreateInterfaceFn factory )
 {
 	if (!factory)
 	{
-		Warning("AppFramework : Unable to load module %p!\n", factory );
+		Warning("AppFramework: Unable to load module from factory 0x%p!\n", factory );
 		return APP_MODULE_INVALID;
 	}
 
@@ -139,7 +139,7 @@ IAppSystem *CAppSystemGroup::AddSystem( AppModule_t module, const char *pInterfa
 	void *pSystem = pFactory( pInterfaceName, &retval );
 	if ((retval != IFACE_OK) || (!pSystem))
 	{
-		Warning("AppFramework : Unable to create system %s!\n", pInterfaceName );
+		Warning("AppFramework: Unable to create system %s!\n", pInterfaceName );
 		return NULL;
 	}
 
@@ -182,7 +182,7 @@ void CAppSystemGroup::ReportStartupFailure( int nErrorStage, intp nSysIndex )
 		pszSystemName = m_SystemDict.GetElementName( i );
 		break;
 	}
-		 
+
 	// Walk the dictionary
 	Warning( "System (%s) failed during stage %s\n", pszSystemName, pszStageDesc );
 }
@@ -441,7 +441,7 @@ int CAppSystemGroup::OnStartup()
 	}
 
 	// Call Init on all App Systems
-	int nRetVal = InitSystems();
+	InitReturnVal_t nRetVal = InitSystems();
 	if ( nRetVal != INIT_OK )
 	{
 		m_nErrorStage = INITIALIZATION;

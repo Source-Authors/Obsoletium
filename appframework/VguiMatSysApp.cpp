@@ -47,25 +47,29 @@ bool CVguiMatSysApp::Create()
 	};
 
 	if ( !AddSystems( appSystems ) ) 
-		return false;
-
-	IMaterialSystem *pMaterialSystem = FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
-	if ( !pMaterialSystem )
 	{
-		Warning( "CVguiMatSysApp::Create: Unable to connect to necessary interface!\n" );
+		Warning( "CVguiMatSysApp::Create: Unable to load app systems!\n" );
 		return false;
 	}
 
-	char const* pDLLName = "shaderapidx9" DLL_EXT_STRING;
+	auto *pMaterialSystem = FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
+	if ( !pMaterialSystem )
+	{
+		Warning( "CVguiMatSysApp::Create: Unable to connect to '%s'!\n", MATERIAL_SYSTEM_INTERFACE_VERSION );
+		return false;
+	}
+
+	char const* shaderApiDllName = "shaderapidx9" DLL_EXT_STRING;
 	// dimhotepus: Allow to override shader API DLL.
 	const char *pArg = nullptr;
 	if ( CommandLine()->CheckParm( "-shaderapi", &pArg ))
 	{
-		pDLLName = pArg;
+		shaderApiDllName = pArg;
 	}
 
-	pMaterialSystem->SetShaderAPI( pDLLName );
-	return true;
+	pMaterialSystem->SetShaderAPI( shaderApiDllName );
+	// dimhotepus: Ensure shader API is set.
+	return pMaterialSystem->HasShaderAPI();
 }
 
 void CVguiMatSysApp::Destroy()
@@ -113,7 +117,7 @@ void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w
 
 	// Create the window
 	HWND hWnd{CreateWindowExA( 0, wc.lpszClassName, pTitle, style, 0, 0,
-		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, 
+		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
 		nullptr, nullptr, static_cast<HINSTANCE>(GetAppInstance()), nullptr )};
 	if (!hWnd)
 	{
@@ -124,7 +128,7 @@ void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w
 
 	const unsigned window_dpi{::GetDpiForWindow(hWnd)};
 	// Compute rect needed for DPI + that size client area based on window style
-    ::AdjustWindowRectExForDpi(&windowRect, style, FALSE, 0, window_dpi);
+	::AdjustWindowRectExForDpi(&windowRect, style, FALSE, 0, window_dpi);
 
 	const int CenterX{std::max(0, (GetSystemMetricsForDpi(SM_CXSCREEN, window_dpi) - w) / 2)};
 	const int CenterY{std::max(0, (GetSystemMetricsForDpi(SM_CYSCREEN, window_dpi) - h) / 2)};
@@ -171,7 +175,7 @@ bool CVguiMatSysApp::PreInit( )
 
 	if ( !g_pFullFileSystem || !g_pMaterialSystem || !g_pInputSystem || !g_pMatSystemSurface )
 	{
-		Warning( "CVguiMatSysApp::PreInit: Unable to connect to necessary interface!\n" );
+		Warning( "CVguiMatSysApp::PreInit: Unable to connect to necessary interfaces!\n" );
 		return false;
 	}
 
@@ -292,7 +296,10 @@ bool CVguiMatSysApp::SetVideoMode( )
 	bool modeSet = g_pMaterialSystem->SetMode( m_HWnd, config );
 	if (!modeSet)
 	{
-		Error( "Unable to set mode\n" );
+		Error( "Unable to set mode %d x %d, %d Hz, format BGRX88888.\n",
+			config.m_VideoMode.m_Width,
+			config.m_VideoMode.m_Height,
+			config.m_VideoMode.m_RefreshRate );
 	}
 
 	g_pMaterialSystem->OverrideConfig( config, false );
