@@ -1127,15 +1127,15 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 		MEM_ALLOC_CREDIT();
 		if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
 		{
-			Q_strncpy( gmodinfo.szInfo, modinfo->GetString("url_info"), sizeof( gmodinfo.szInfo ) );
-			Q_strncpy( gmodinfo.szDL, modinfo->GetString("url_dl"), sizeof( gmodinfo.szDL ) );
+			V_strcpy_safe( gmodinfo.szInfo, modinfo->GetString("url_info") );
+			V_strcpy_safe( gmodinfo.szDL, modinfo->GetString("url_dl") );
 
 			gmodinfo.version = modinfo->GetInt("version");
 			gmodinfo.size = modinfo->GetInt("size");
 			gmodinfo.svonly = modinfo->GetInt("svonly") ? true : false;
 			gmodinfo.cldll = modinfo->GetInt("cldll") ? true : false;
 
-			Q_strncpy( gmodinfo.szHLVersion, modinfo->GetString("hlversion"), sizeof( gmodinfo.szHLVersion ) );
+			V_strcpy_safe( gmodinfo.szHLVersion, modinfo->GetString("hlversion") );
 		}
 	}
 	
