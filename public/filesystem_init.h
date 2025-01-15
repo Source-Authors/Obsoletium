@@ -170,7 +170,8 @@ const char *GetVProjectCmdLineValue();
 
 
 // Call this to use a bin directory relative to VPROJECT
-void FileSystem_UseVProjectBinDir( bool bEnable );
+// dimhotepus: Return old use Vporject bin dir status.
+bool FileSystem_UseVProjectBinDir( bool bEnable );
 
 // This is used by all things that use the application framework:
 // Note that the application framework automatically takes care of step 1 if you use CSteamApplication.
@@ -203,7 +204,8 @@ FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem );
 void FileSystem_AddSearchPath_Platform( IFileSystem *pFileSystem, const char *szGameInfoPath );
 
 // See FSErrorMode_t. If you don't specify one here, then the default is FS_ERRORMODE_VCONFIG.
-void FileSystem_SetErrorMode( FSErrorMode_t errorMode = FS_ERRORMODE_VCONFIG );
+// dimhotepus: Return old file system error mode.
+FSErrorMode_t FileSystem_SetErrorMode( FSErrorMode_t errorMode = FS_ERRORMODE_VCONFIG );
 
 bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen );
 

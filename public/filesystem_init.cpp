@@ -31,19 +31,22 @@
 #include "tier0/icommandline.h"
 #include "appframework/IAppSystemGroup.h"
 
+#include <atomic>
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 constexpr char GAMEINFO_FILENAME[]{"gameinfo.txt"};
 
-static char g_FileSystemError[256];
-static bool s_bUseVProjectBinDir = false;
-static FSErrorMode_t g_FileSystemErrorMode = FS_ERRORMODE_VCONFIG;
+// dimhotepus: Thread-safe global state.
+static thread_local char g_FileSystemError[256];
+static std::atomic_bool s_bUseVProjectBinDir = false;
+static std::atomic<FSErrorMode_t> g_FileSystemErrorMode = FS_ERRORMODE_VCONFIG;
 
 // Call this to use a bin directory relative to VPROJECT
-void FileSystem_UseVProjectBinDir( bool bEnable )
+bool FileSystem_UseVProjectBinDir( bool bEnable )
 {
-	s_bUseVProjectBinDir = bEnable;
+	return s_bUseVProjectBinDir.exchange(bEnable, std::memory_order::memory_order_relaxed);
 }
 
 namespace {
@@ -269,7 +272,7 @@ const char *FileSystem_GetLastErrorString()
 }
 
 
-KeyValues* ReadKeyValuesFile( const char *pFilename )
+static KeyValues* ReadKeyValuesFile( const char *pFilename )
 {
 	// Read in the gameinfo.txt file and null-terminate it.
 	FILE *fp = fopen( pFilename, "rb" );
@@ -319,7 +322,7 @@ bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen )
 {
 	exedir[0] = '\0';
 
-	if ( s_bUseVProjectBinDir )
+	if ( s_bUseVProjectBinDir.load(std::memory_order::memory_order_relaxed) )
 	{
 		const char *pProject = GetVProjectCmdLineValue();
 		if ( !pProject )
@@ -337,8 +340,8 @@ bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen )
 
 	if ( !Sys_GetExecutableName( exedir, exeDirLen ) )
 		return false;
-	Q_StripFilename( exedir );
 
+	Q_StripFilename( exedir );
 	Q_FixSlashes( exedir );
 
 	// Return the bin directory as the executable dir if it's not in there
@@ -408,14 +411,14 @@ FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, co
 {
 	va_list marker;
 	va_start( marker, pMsg );
-	Q_vsnprintf( g_FileSystemError, sizeof( g_FileSystemError ), pMsg, marker );
+	V_sprintf_safe( g_FileSystemError, pMsg, marker );
 	va_end( marker );
 
 	Warning( "%s\n", g_FileSystemError );
 
 	// Run vconfig?
 	// Don't do it if they specifically asked for it not to, or if they manually specified a vconfig with -game or -vproject.
-	if ( bRunVConfig && g_FileSystemErrorMode == FS_ERRORMODE_VCONFIG && !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
+	if ( bRunVConfig && g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG && !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
 	{
 		if ( !LaunchVConfig() )
 		{
@@ -424,7 +427,8 @@ FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, co
 		}
 	}
 
-	if ( g_FileSystemErrorMode == FS_ERRORMODE_AUTO || g_FileSystemErrorMode == FS_ERRORMODE_VCONFIG )
+	const auto errorMode = g_FileSystemErrorMode.load(std::memory_order::memory_order_seq_cst);
+	if ( errorMode == FS_ERRORMODE_AUTO || errorMode == FS_ERRORMODE_VCONFIG )
 	{
 		Error( "%s\n", g_FileSystemError );
 	}
@@ -507,7 +511,8 @@ static void FileSystem_AddLoadedSearchPath(
 		if ( CommandLine()->FindParm( "-tempcontent" ) != 0 )
 		{
 			char szPath[MAX_PATH];
-			Q_snprintf( szPath, sizeof(szPath), "%s_tempcontent", fullLocationPath );
+			V_sprintf_safe( szPath, "%s_tempcontent", fullLocationPath );
+
 			initInfo.m_pFileSystem->AddSearchPath( szPath, pPathID, PATH_ADD_TO_TAIL );
 		}
 	}
@@ -522,8 +527,9 @@ static void FileSystem_AddLoadedSearchPath(
 		
 		// Need to add a language version of this path first
 
-		Q_snprintf( szLangString, sizeof(szLangString), "_%s", initInfo.m_pLanguage);
+		V_sprintf_safe( szLangString, "_%s", initInfo.m_pLanguage);
 		V_StrSubst( fullLocationPath, "_english", szLangString, szPath, sizeof( szPath ), true );
+
 		initInfo.m_pFileSystem->AddSearchPath( szPath, pPathID, PATH_ADD_TO_TAIL );
 	}
 
@@ -568,8 +574,10 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 			Q_StripPrecedingAndTrailingWhitespace( vecPaths[ idxExtraPath ] );
 			V_MakeAbsolutePath( szAbsSearchPath, sizeof( szAbsSearchPath ), vecPaths[ idxExtraPath ], baseDir );
 			V_FixSlashes( szAbsSearchPath );
+
 			if ( !V_RemoveDotSlashes( szAbsSearchPath ) )
 				Error( "Bad -insert_search_path - Can't resolve pathname for '%s'", szAbsSearchPath );
+
 			V_StripTrailingSlash( szAbsSearchPath );
 			FileSystem_AddLoadedSearchPath( initInfo, "GAME", szAbsSearchPath, false );
 			FileSystem_AddLoadedSearchPath( initInfo, "MOD", szAbsSearchPath, false );
@@ -578,7 +586,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 	bool bLowViolence = initInfo.m_bLowViolence;
 	bool bFirstGamePath = true;
-	for ( KeyValues *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
+	for ( auto *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
 	{
 		const char *pLocation = pCur->GetString();
 		const char *pszBaseDir = baseDir;
@@ -607,8 +615,10 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 		// Now resolve any ./'s.
 		V_FixSlashes( szAbsSearchPath );
+
 		if ( !V_RemoveDotSlashes( szAbsSearchPath ) )
 			Error( "FileSystem_AddLoadedSearchPath - Can't resolve pathname for '%s'", szAbsSearchPath );
+
 		V_StripTrailingSlash( szAbsSearchPath );
 
 		// Don't bother doing any wildcard expansion unless it has wildcards.  This avoids the weird
@@ -661,6 +671,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					}
 					pszFoundShortName = initInfo.m_pFileSystem->FindNext( findHandle );
 				} while ( pszFoundShortName );
+
 				initInfo.m_pFileSystem->FindClose( findHandle );
 			}
 
@@ -720,9 +731,9 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					{
 						char szGameBinPath[MAX_PATH];
 #ifdef PLATFORM_64BITS
-						Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s" CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64", pFullPath );
+						V_sprintf_safe( szGameBinPath, "%s" CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64", pFullPath );
 #else
-						Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s" CORRECT_PATH_SEPARATOR_S "bin", pFullPath );
+						V_sprintf_safe( szGameBinPath, "%s" CORRECT_PATH_SEPARATOR_S "bin", pFullPath );
 #endif
 
 						// 1. For each "Game" search path, it adds a "GameBin" path, in <dir>\bin[\x64]
@@ -914,7 +925,6 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 			return FS_OK;
 	}
 
-	if ( IsPC() )
 	{
 		Warning( "Warning: falling back to auto detection of vproject directory.\n" );
 		
@@ -1047,7 +1057,8 @@ FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &fsInfo )
 	// This is so that processes spawned by this application will have the same VPROJECT
 #ifdef WIN32
 	char pEnvBuf[MAX_PATH+32];
-	Q_snprintf( pEnvBuf, sizeof(pEnvBuf), "%s=%s", GAMEDIR_TOKEN, fsInfo.m_GameInfoPath );
+	V_sprintf_safe( pEnvBuf, "%s=%s", GAMEDIR_TOKEN, fsInfo.m_GameInfoPath );
+
 	return !_putenv( pEnvBuf )
 		? FS_OK
 		: SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Unable to set env variable %s: %s.", pEnvBuf, strerror(errno) );
@@ -1103,9 +1114,9 @@ FSReturnCode_t FileSystem_MountContent( CFSMountContentInfo &mountContentInfo )
 	return FileSystem_SetBasePaths( mountContentInfo.m_pFileSystem );
 }
 
-void FileSystem_SetErrorMode( FSErrorMode_t errorMode )
+FSErrorMode_t FileSystem_SetErrorMode( FSErrorMode_t errorMode )
 {
-	g_FileSystemErrorMode = errorMode;
+	return g_FileSystemErrorMode.exchange(errorMode, std::memory_order::memory_order_relaxed);
 }
 
 void FileSystem_ClearSteamEnvVars()
