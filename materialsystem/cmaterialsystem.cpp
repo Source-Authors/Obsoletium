@@ -1213,7 +1213,7 @@ void CMaterialSystem::AddReleaseFunc( MaterialBufferReleaseFunc_t func )
 
 void CMaterialSystem::RemoveReleaseFunc( MaterialBufferReleaseFunc_t func )
 {
-	int i = m_ReleaseFunc.Find( func );
+	intp i = m_ReleaseFunc.Find( func );
 	if( i != -1 )
 		m_ReleaseFunc.Remove(i);
 }
@@ -1231,7 +1231,7 @@ void CMaterialSystem::AddRestoreFunc( MaterialBufferRestoreFunc_t func )
 
 void CMaterialSystem::RemoveRestoreFunc( MaterialBufferRestoreFunc_t func )
 {
-	int i = m_RestoreFunc.Find( func );
+	intp i = m_RestoreFunc.Find( func );
 	Assert( i != -1 );
 	m_RestoreFunc.Remove(i);
 }
