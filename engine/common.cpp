@@ -1049,19 +1049,8 @@ void COM_LogString( char const *pchFile, char const *pchString )
 		return;
 	}
 
-	FileHandle_t fp;
-	const char *pfilename;
-
-	if ( !pchFile )
-	{
-		pfilename = "hllog.txt";
-	}
-	else
-	{
-		pfilename = pchFile;
-	}
-
-	fp = g_pFileSystem->Open( pfilename, "a+t");
+	const char *pfilename = pchFile ? pchFile : "hllog.txt";
+	FileHandle_t fp = g_pFileSystem->Open( pfilename, "a+t");
 	if (fp)
 	{
 		g_pFileSystem->Write( pchString, strlen( pchString), fp );
