@@ -166,9 +166,9 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 				index = m_FontPages.Insert( font );
 				pPage = &m_FontPages.Element( index );
 
-				for (int type = 0; type < FONT_DRAW_TYPE_COUNT; ++type )
+				for (auto &tid : pPage->textureID)
 				{
-					pPage->textureID[type] = g_MatSystemSurface.CreateNewTextureID( false );
+					tid = g_MatSystemSurface.CreateNewTextureID( false );
 				}
 				CreateFontMaterials( *pPage, pWinFont->GetTexturePage(), true );
 			}
