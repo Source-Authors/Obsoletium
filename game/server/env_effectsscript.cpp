@@ -526,15 +526,13 @@ void CEnvEffectsScript::ParseNewEffect( void )
 
 CEffectScriptElement *CEnvEffectsScript::GetScriptElementByName( const char *pName )
 {
-	for ( int i = 0; i < m_ScriptElements.Count(); i++ )
+	for ( auto &e : m_ScriptElements )
 	{
-		CEffectScriptElement *pCurrent = &m_ScriptElements.Element( i );
-
-		if ( pCurrent && !Q_stricmp( pCurrent->m_szEffectName, pName ) ) 
+		if ( !Q_stricmp( e.m_szEffectName, pName ) ) 
 		{
-			return pCurrent;
+			return &e;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
