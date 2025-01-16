@@ -292,11 +292,11 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 		pGroupName,
 		nLevel
 	};
-	assert( g_pSpewInfo == nullptr );
-
-	g_pSpewInfo = &spewInfo;
+	// dimhotepus: Allow recursive spew from spew by restoring old spew info.
+	auto pOldSpewInfo = std::exchange(g_pSpewInfo, &spewInfo);
 	SpewRetval_t ret = GetSpewOutputFunc()( spewType, pTempBuffer );
-	g_pSpewInfo = nullptr;
+	// dimhotepus: Allow recursive spew from spew by restoring old spew info.
+	std::exchange(g_pSpewInfo, pOldSpewInfo);
 
 	switch (ret)
 	{
