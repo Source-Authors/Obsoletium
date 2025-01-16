@@ -932,20 +932,7 @@ void CVGui::PostMessage(VPANEL target, KeyValues *params, VPANEL from, float del
 	}
 
 	MessageItem_t messageItem;
-	 
-#ifdef _X360
-	// Special coded target that will always send the message to the key focus
-	// this is needed since we might send two messages on a tice, and the first
-	// could change the focus.
-	if( target == (VPANEL) MESSAGE_CURRENT_KEYFOCUS )
-	{
-		messageItem._messageTo = 0xFFFFFFFE;
-	}
-	else
-#endif	
-	{
-		messageItem._messageTo = (target != (VPANEL) MESSAGE_CURSOR_POS ) ? g_pIVgui->PanelToHandle(target) : 0xFFFFFFFF;
-	}
+	messageItem._messageTo = (target != (VPANEL) MESSAGE_CURSOR_POS ) ? g_pIVgui->PanelToHandle(target) : 0xFFFFFFFF;
 	messageItem._params = params;
 	Assert(params->GetName());
 	messageItem._from = g_pIVgui->PanelToHandle(from);
