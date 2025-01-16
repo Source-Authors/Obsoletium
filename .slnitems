@@ -2,7 +2,9 @@
 .editorconfig
 .gitignore
 .github\workflows\build.yml
+.github\actions\build-shared\action.yml
 .slnitems
 LICENSE
 README.md
+SECURITY.md
 CMakeLists.txt

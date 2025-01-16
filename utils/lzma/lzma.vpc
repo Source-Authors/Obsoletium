@@ -13,7 +13,6 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;C"
 		$PreprocessorDefinitions			"$BASE;_NO_EXCEPTIONS;_LZMA_PROB32;_7ZIP_ST"
 	}
 }
