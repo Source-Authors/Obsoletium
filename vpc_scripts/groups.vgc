@@ -172,7 +172,6 @@ $Group "game"
 	"shaderapidx9"
 	"shaderapidx10"
 	"shaderlib"
-	"simdtest"
 // dimhotepus: Exclude missed projects.
 //	"socketlib"
 	"soundemittersystem"
