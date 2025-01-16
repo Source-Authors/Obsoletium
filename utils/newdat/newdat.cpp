@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: Makes .DAT files
+// Purpose: Makes .md5 files
 
 #include <iostream>
 #include <tuple>
@@ -95,11 +95,11 @@ namespace {
 
 }  // namespace
 
-// Purpose: newdat - makes the .DAT signature for file / virus checking.
+// Purpose: newdat - makes the .md5 signature for file / virus checking.
 // Output : int 0 == success, other == failure
 int main(int argc, char *argv[]) {
   if (argc < 2) {
-    std::cerr << "USAGE: newdat <filename>\n";
+    std::cerr << "Writes md5 signature for file to <filename>.md5\nUSAGE: newdat <filename>\n";
     return 1;
   }
 
@@ -107,8 +107,8 @@ int main(int argc, char *argv[]) {
   // Get the filename without the extension
   Q_StripExtension(argv[1], file_name, std::size(file_name));
 
-  char dat_file_name[MAX_PATH];
-  sprintf(dat_file_name, "%s.dat", file_name);
+  char md5_file_name[MAX_PATH];
+  V_sprintf_safe(md5_file_name, "%s.md5", file_name);
 
   byte digest[MD5_DIGEST_LENGTH];
   // Build the MD5 hash for the .EXE file
@@ -117,22 +117,31 @@ int main(int argc, char *argv[]) {
     return 2;
   }
 
-  // Write the first 4 bytes of the MD5 hash as the signature ".dat" file
+  // Write MD5 hash as the signature ".md5" file
   auto [f, errc] =
-      se::posix::posix_file_stream_factory::open(dat_file_name, "wb");
+      se::posix::posix_file_stream_factory::open(md5_file_name, "wb");
   if (!errc) {
-    std::tie(std::ignore, errc) = f.write(digest);
+    for (byte b : digest) {
+      std::tie(std::ignore, errc) = f.print("%hhx", b);
+      if (errc) {
+        std::cerr << "Can't write md5 " << sizeof(digest) << " bytes to "
+                  << md5_file_name << ": " << errc.message() << ".\n";
+        return 3;
+      }
+    }
+
+    std::tie(std::ignore, errc) = f.print(" *%s\r\n", V_GetFileName(argv[1]));
     if (errc) {
-      std::cerr << "Can't write md5 " << sizeof(digest) << " bytes to "
-                << dat_file_name << ": " << errc.message() << ".\n";
+      std::cerr << "Can't write md5 file name to " << md5_file_name << ": "
+                << errc.message() << ".\n";
       return 3;
     }
 
-    std::cout << "Wrote md5 of " << argv[1] << " to " << dat_file_name << ".\n";
+    std::cout << "Wrote md5 of " << argv[1] << " to " << md5_file_name << ".\n";
     return 0;
   }
 
-  std::cerr << "Can't open " << dat_file_name << " to write md5 of " << argv[1]
+  std::cerr << "Can't open " << md5_file_name << " to write md5 of " << argv[1]
             << " to: " << errc.message() << ".\n";
-  return 5;
+  return 4;
 }
