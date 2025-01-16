@@ -601,7 +601,9 @@ class MatSurfFuncLogger	// rip off of GLMFuncLogger - figure out a way to reunif
 			
 			char modifiedFmt[2000];
 			modifiedFmt[0] = '>';
-			strcpy( modifiedFmt+1, fmt );
+			// dimhotepus: strcpy -> V_stcat_safe
+			modifiedFmt[1] = '\0';
+			V_strcat_safe( modifiedFmt, fmt );
 			
 			va_list	vargs;
 			va_start(vargs, fmt);
