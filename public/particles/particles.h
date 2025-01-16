@@ -296,7 +296,7 @@ public:
 // separate particle system .libs
 //
 //-----------------------------------------------------------------------------
-typedef intp ParticleSystemHandle_t;
+typedef UtlSymId_t ParticleSystemHandle_t;
 
 class CParticleSystemMgr
 {
@@ -344,7 +344,7 @@ public:
 	const char *GetParticleSystemNameFromIndex( ParticleSystemHandle_t iIndex );
 
 	// Return the number of particle systems in our dictionary
-	intp GetParticleSystemCount( void );
+	UtlSymId_t GetParticleSystemCount( void );
 
 	// call to get available particle operator definitions
 	// NOTE: FUNCTION_CHILDREN will return a faked one, for ease of writing the editor
