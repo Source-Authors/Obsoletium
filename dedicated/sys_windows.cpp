@@ -14,7 +14,6 @@
 #include "tier0/minidump.h"
 #include "tier1/strtools.h"
 #include "inputsystem/iinputsystem.h"
-#include "SteamAppStartup.h"
 #include "vgui/vguihelpers.h"
 #include "appframework/AppFramework.h"
 #include "materialsystem/imaterialsystem.h"
