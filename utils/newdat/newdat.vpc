@@ -29,7 +29,6 @@ $Project "newdat"
 
 	$Folder	"Header Files"
 	{
-		$File	"scoped_file.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\tier1\checksum_md5.h"
 		$File	"$SRCDIR\public\tier0\commonmacros.h"

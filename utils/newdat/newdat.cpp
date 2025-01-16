@@ -5,11 +5,10 @@
 #include <iostream>
 #include <tuple>
 
-#include "scoped_file.h"
-
 #include "tier0/basetypes.h"
 #include "tier1/checksum_md5.h"
 #include "tier1/strtools.h"
+#include "posix_file_stream.h"
 
 #undef min
 
@@ -25,30 +24,31 @@ namespace {
 [[nodiscard]] bool MD5HashFile(byte (&digest)[MD5_DIGEST_LENGTH],
                                const char *file_name,
                                std::ostream &err) noexcept {
-  const nd::ScopedFile f{file_name, "rb"};
-  if (!f) {
-    err << "Can't open file " << file_name
-        << " to md5: " << strerror(f.open_error()) << ".\n";
-    return false;
-  }
-
-  if (f.seek(0, SEEK_END)) {
-    const auto rc = errno;
-    err << "Can't seek file " << file_name << " end: " << strerror(rc) << ".\n";
-    return false;
-  }
-
-  long long size{f.tell()};
-  if (size <= 0) {
-    const auto rc = errno;
-    err << "Can't read file " << file_name << " size to md5: " << strerror(rc)
+  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_name, "rb");
+  if (errc) {
+    err << "Can't open file " << file_name << " to md5: " << errc.message()
         << ".\n";
     return false;
   }
 
-  if (f.seek(0, SEEK_SET)) {
-    const auto rc = errno;
-    err << "Can't seek file " << file_name << " start: " << strerror(rc)
+  std::tie(std::ignore, errc) = f.seek(0, SEEK_END);
+  if (errc) {
+    err << "Can't seek file " << file_name << " end: " << errc.message()
+        << ".\n";
+    return false;
+  }
+
+  int64_t size;
+  std::tie(size, errc) = f.tell();
+  if (errc) {
+    err << "Can't read file " << file_name << " size to md5: " << errc.message()
+        << ".\n";
+    return false;
+  }
+
+  std::tie(std::ignore, errc) = f.seek(0, SEEK_SET);
+  if (errc) {
+    err << "Can't seek file " << file_name << " start: " << errc.message()
         << ".\n ";
     return false;
   }
@@ -59,8 +59,16 @@ namespace {
   byte chunk[1024];
   // Now read in chunks.
   while (size > 0) {
-    const size_t bytes_read{
-        f.read(chunk, std::min(std::size(chunk), static_cast<size_t>(size)))};
+    size_t bytes_read;
+
+    std::tie(bytes_read, errc) =
+        f.read(chunk, std::min(std::size(chunk), static_cast<size_t>(size)));
+    if (errc) {
+      err << "Can't read file " << file_name << " chunk: " << errc.message()
+          << ".\n ";
+      return false;
+    }
+
     // If any data was received, CRC it.
     if (bytes_read > 0) {
       size -= bytes_read;
@@ -69,14 +77,15 @@ namespace {
     }
 
     // We are at the end of file, break loop and return.
-    if (f.eof()) break;
-
-    if (f.last_error()) {
-      err << "Can't read file " << file_name
-          << " to md5: read error occured: " << strerror(f.last_error())
-          << ".\n";
+    bool eof;
+    std::tie(eof, errc) = f.eof();
+    if (errc) {
+      err << "Can't read file " << file_name << " chunk: " << errc.message()
+          << ".\n ";
       return false;
     }
+
+    if (eof) break;
   }
 
   MD5Final(digest, &ctx);
@@ -109,26 +118,21 @@ int main(int argc, char *argv[]) {
   }
 
   // Write the first 4 bytes of the MD5 hash as the signature ".dat" file
-  nd::ScopedFile f{dat_file_name, "wb"};
-  if (f) {
-    if (f.write(digest) != sizeof(digest)) {
+  auto [f, errc] =
+      se::posix::posix_file_stream_factory::open(dat_file_name, "wb");
+  if (!errc) {
+    std::tie(std::ignore, errc) = f.write(digest);
+    if (errc) {
       std::cerr << "Can't write md5 " << sizeof(digest) << " bytes to "
-                << dat_file_name << ": " << strerror(f.last_error()) << ".\n";
+                << dat_file_name << ": " << errc.message() << ".\n";
       return 3;
     }
 
-    if (f.close() != EOF) {
-      std::cout << "Wrote md5 of " << argv[1] << " to " << dat_file_name
-                << ".\n";
-      return 0;
-    }
-
-    std::cerr << "Can't close " << dat_file_name << " to write md5 of "
-              << argv[1] << " to: file may be not written.\n";
-    return 4;
+    std::cout << "Wrote md5 of " << argv[1] << " to " << dat_file_name << ".\n";
+    return 0;
   }
 
   std::cerr << "Can't open " << dat_file_name << " to write md5 of " << argv[1]
-            << " to: " << strerror(f.open_error()) << ".\n";
+            << " to: " << errc.message() << ".\n";
   return 5;
 }
