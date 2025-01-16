@@ -8,6 +8,7 @@ on:
 
 env:
   HL2_SOLUTION_NAME_BASE: hl2
+  HL2_LOASTCOAST_SOLUTION_NAME_BASE: loastcoast
   HL2_EPISODIC_SOLUTION_NAME_BASE: episodic
   HL2_MP_SOLUTION_NAME_BASE: hl2mp
   PORTAL_SOLUTION_NAME_BASE: portal
@@ -47,6 +48,38 @@ jobs:
     - name: Build app
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild ${{env.HL2_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}}
+
+  build_hl2_loastcoast:
+    name: Build Half-Life 2 Loast Coast
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [x86, x64]
+        configuration: [Debug, Release]
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+      with:
+        msbuild-architecture: ${{matrix.platform}}
+
+    - name: Add cmake / nmake to PATH
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{matrix.platform}}
+
+    - name: Build dependencies & generate solution
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: .\create_hl2_loastcoast_dev_${{matrix.platform}}.bat
+
+    - name: Build app
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild ${{env.HL2_LOASTCOAST_SOLUTION_NAME_BASE}}_${{matrix.platform}}.sln /m -verbosity:minimal /p:Configuration=${{matrix.configuration}} /p:Platform=${{matrix.platform}}
 
   build_hl2_episodic:
     name: Build Half-Life 2 Episode 1 & 2
