@@ -141,7 +141,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 			static float	sTexCoords[ 4*MAX_BITMAP_CHARS ];
 			CBitmapFont		*pWinFont;
 			float			left, top, right, bottom;
-			int				index;
+			unsigned short	index;
 			Page_t			*pPage;
 			
 			pWinFont = reinterpret_cast< CBitmapFont* >( FontManager().GetFontForChar( font, wch[i] ) );
