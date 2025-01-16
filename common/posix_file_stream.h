@@ -175,11 +175,16 @@ class posix_file_stream {
     int bytes_written_count;
     va_list arg_list;
     va_start(arg_list, format);
-    bytes_written_count = _vfprintf_s_l(fd_, format, nullptr, arg_list);
+#ifdef _WIN32
+    bytes_written_count = vfprintf_s(fd_, format, arg_list);
+#else
+    bytes_written_count = vfprintf(fd_, format, arg_list);
+#endif
     va_end(arg_list);
 
-    return {bytes_written_count >= 0 ? bytes_written_count : 0,
-            internal::make_posix_error_from_result(ferror(fd_), EIO)};
+    const bool ok{bytes_written_count >= 0};
+    return {ok ? bytes_written_count : 0,
+            ok ? posix_error_ok : internal::make_posix_error_from_errno(EIO)};
   }
 
   // Writes |elements_count| elements from |buffer| to file.
@@ -270,7 +275,7 @@ class posix_file_stream {
   posix_file_stream(_In_opt_ FILE* fd) noexcept : fd_{fd} {}
 
   // Empty file stream, invalid.
-  [[nodiscard]] static posix_file_stream null() noexcept {
+  [[nodiscard]] static posix_file_stream empty() noexcept {
     return posix_file_stream{nullptr};
   }
 };
@@ -291,7 +296,7 @@ class posix_file_stream_factory {
     return errno_code == posix_error_ok.value()
                ? std::make_tuple(posix_file_stream{fd}, posix_error_ok)
                : std::make_tuple(
-                     posix_file_stream::null(),
+                     posix_file_stream::empty(),
                      internal::make_posix_error_from_errno(errno_code));
   }
 

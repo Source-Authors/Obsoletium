@@ -22,13 +22,13 @@
 #include <WinInet.h>
 #endif
 #include <sys/stat.h>
-#include <stdio.h>
 
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "download_internal.h"
 #include "tier1/strtools.h"
 #include "tier0/threadtools.h"
+#include "posix_file_stream.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -41,14 +41,18 @@ static void WriteFileFromRequestContext( const RequestContext_t &rc )
 	int rt = stat(rc.absLocalPath, &buf);
 	if ( rt == -1 && !rc.bSuppressFileWrite )
 	{
-		FILE *fp = fopen( rc.absLocalPath, "wb" );
-		if ( fp )
+		auto [fp, errc] = se::posix::posix_file_stream_factory::open( rc.absLocalPath, "wb" );
+		if ( !errc )
 		{
 			if ( rc.data )
 			{
-				fwrite( rc.data, rc.nBytesTotal, 1, fp );
+				std::tie(std::ignore, errc) = fp.write( rc.data, 1, rc.nBytesTotal );
 			}
-			fclose( fp );
+		}
+
+		if ( errc )
+		{
+			Warning( "Failed to write downloaded '%s': %s.\n", rc.absLocalPath, errc.message().c_str() );
 		}
 	}
 }

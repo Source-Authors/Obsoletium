@@ -10,7 +10,7 @@
 #include "appframework/ilaunchermgr.h"
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "winlite.h"
 #include <Psapi.h>
 #endif
@@ -61,6 +61,7 @@
 #include "appframework/IAppSystemGroup.h"
 #include "tier0/systeminformation.h"
 #include "host_cmd.h"
+#include "posix_file_stream.h"
 #ifdef _WIN32
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #endif
@@ -91,8 +92,6 @@
 #if POSIX
 #include <dlfcn.h>
 #endif
-
-#include "xbox/xboxstubs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -715,8 +714,7 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 	bool bFoundInf = false;
 	if ( g_pFileSystem )
 	{
-		FileHandle_t fh;
-		fh = g_pFileSystem->Open( "steam.inf", "rb", "GAME" );
+		FileHandle_t fh = g_pFileSystem->Open( "steam.inf", "rb", "GAME" );
 		bFoundInf = fh && g_pFileSystem->ReadToBuffer( fh, infBuf );
 	}
 
@@ -729,22 +727,36 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		V_MakeAbsolutePath( szFullPath, sizeof( szFullPath ), szModSteamInfPath, pchBaseDir );
 
 		// Try opening steam.inf
-		FILE *fp = fopen( szFullPath, "rb" );
-		if ( fp )
+		auto [fp, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
+		if ( !errc )
 		{
+			size_t bufsize = 0;
 			// Read steam.inf data.
-			fseek( fp, 0, SEEK_END );
-			size_t bufsize = ftell( fp );
-			fseek( fp, 0, SEEK_SET );
+			std::tie(std::ignore, errc) = fp.seek( 0, SEEK_END );
+			if ( !errc )
+			{
+				std::tie(bufsize, errc) = fp.tell();
+			}
 
-			infBuf.EnsureCapacity( bufsize + 1 );
+			if ( !errc )
+			{
+				std::tie(std::ignore, errc) = fp.seek( 0, SEEK_SET );
+			}
 
-			size_t iBytesRead = fread( infBuf.Base(), 1, bufsize, fp );
-			(infBuf.Base<char>())[iBytesRead] = 0;
-			infBuf.SeekPut( CUtlBuffer::SEEK_CURRENT, iBytesRead + 1 );
-			fclose( fp );
+			size_t iBytesRead = 0;
+			if ( !errc )
+			{
+				infBuf.EnsureCapacity( bufsize + 1 );
 
-			bFoundInf = ( iBytesRead == bufsize );
+				std::tie(iBytesRead, errc) = fp.read( infBuf.Base<char>(), bufsize + 1 );
+			}
+
+			if ( !errc )
+			{
+				infBuf.SeekPut( CUtlBuffer::SEEK_CURRENT, iBytesRead + 1 );
+			}
+
+			bFoundInf = iBytesRead == bufsize;
 		}
 	}
 
@@ -824,17 +836,21 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 
 	if ( VerInfo.AppID )
 	{
+		constexpr char appidFile[]{"steam_appid.txt"};
 		// steamclient.dll doesn't know about steam.inf files in mod folder,
 		// it accepts a steam_appid.txt in the root directory if the game is
 		// not started through Steam. So we create one there containing the
 		// current AppID
-		FILE *fh = fopen( "steam_appid.txt", "wb" );
-		if ( fh  )
+		auto [fh, errc] = se::posix::posix_file_stream_factory::open( appidFile, "wb" );
+		if ( !errc )
 		{
-			CFmtStrN< 128 > strAppID( "%u\n", VerInfo.AppID );
-
-			fwrite( strAppID.Get(), strAppID.Length() + 1, 1, fh );
-			fclose( fh );
+			std::tie(std::ignore, errc) = fh.print("%u\n", VerInfo.AppID);
+		}
+		
+		if ( errc )
+		{
+			Warning( "Failed to write Steam app id %u to '%s': %s.\n",
+				VerInfo.AppID, appidFile, errc.message().c_str() );
 		}
 	}
 

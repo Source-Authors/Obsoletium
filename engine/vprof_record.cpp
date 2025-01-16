@@ -30,15 +30,6 @@
 #endif
 
 
-long GetFileSize( FILE *fp )
-{
-	int curPos = ftell( fp );
-	fseek( fp, 0, SEEK_END );
-	long ret = ftell( fp );
-	fseek( fp, curPos, SEEK_SET );
-	return ret;
-}
-
 
 // ------------------------------------------------------------------------------------------------------------------------------------ //
 // VProf record mode. Turn it on to record all the vprof data, then when you're playing back, the engine's budget and vprof panels 

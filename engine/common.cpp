@@ -6,8 +6,8 @@
 //
 //=============================================================================//
 
+#include "common.h"
 #include "host.h"
-#include <ctype.h>
 #include "draw.h"
 #include "zone.h"
 #include "sys.h"
@@ -15,8 +15,7 @@
 #include "coordsize.h"
 #include "characterset.h"
 #include "bitbuf.h"
-#include "common.h"
-#include <malloc.h>
+#include "posix_file_stream.h"
 #include "traceinit.h"
 #include "filesystem.h"
 #include "filesystem_engine.h"
@@ -820,16 +819,12 @@ bool BLoadHDContent( const char *pchModDir, const char *pchBaseDir )
 {
 	char szModSteamInfPath[ 1024 ];
 	V_ComposeFileName( pchModDir, "game_hd.txt", szModSteamInfPath, sizeof( szModSteamInfPath ) );
+
 	char szFullPath[ 1024 ];
 	V_MakeAbsolutePath( szFullPath, sizeof( szFullPath ), szModSteamInfPath, pchBaseDir );
 
-	FILE *fp = fopen( szFullPath, "rb" );
-	if ( fp )
-	{
-		fclose(fp);
-		return true;
-	}
-	return false;
+	auto [f, errc] = se::posix::posix_file_stream_factory::open(szFullPath, "rb");
+	return !errc;
 }
 
 
