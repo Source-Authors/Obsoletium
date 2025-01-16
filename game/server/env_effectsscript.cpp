@@ -9,7 +9,6 @@
 #include "baseanimating.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
-#include <ctype.h>
 #include "animation.h"
 #include "eventlist.h"
 #include "npcevent.h"
@@ -25,7 +24,6 @@ enum EffectType
 
 
 bool			g_bUnget = false;
-unsigned char	*buffer;
 char			name[ 256 ];
 const char		*currenttoken;
 int				tokencount;
