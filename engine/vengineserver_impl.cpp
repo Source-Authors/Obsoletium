@@ -342,7 +342,7 @@ public:
 
 	bool IsInternalBuild( void ) override
 	{
-		return !phonehome->IsExternalBuild();
+		return !IsExternalBuild();
 	}
 
 	//-----------------------------------------------------------------------------

@@ -31,7 +31,6 @@
 #include "MapReslistGenerator.h"
 #include "DownloadListGenerator.h"
 #include "GameEventManager.h"
-#include "host_phonehome.h"
 #include "vgui_baseui_interface.h"
 #include "clockdriftmgr.h"
 #include "snd_audio_source.h"
@@ -303,8 +302,6 @@ bool CClientState::SetSignonState ( int state, int count )
 				COM_TimestampedLog( "LevelInitPreEntity: start %d", state );
 				g_ClientDLL->LevelInitPreEntity(mapname);
 				COM_TimestampedLog( "LevelInitPreEntity: end %d", state );
-
-				phonehome->Message( IPhoneHome::PHONE_MSG_MAPSTART, mapname );
 
 				audiosourcecache->LevelInit( mapname );
 

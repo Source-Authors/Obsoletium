@@ -10,7 +10,6 @@
 #include "net.h"
 #include "quakedef.h"
 #include "host.h"
-#include "host_phonehome.h"
 #include "mathlib/IceKey.H"
 #include "bitbuf.h"
 #include "tier0/icommandline.h"

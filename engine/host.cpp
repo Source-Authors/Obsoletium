@@ -102,7 +102,6 @@
 #include "replay_internal.h"
 #endif
 #include "sys_mainwind.h"
-#include "host_phonehome.h"
 #ifndef SWDS
 #include "vgui_baseui_interface.h"
 #include "cl_steamauth.h"
@@ -4027,17 +4026,6 @@ void Host_Init( bool bDedicated )
 		DevShotGenerator().StartDevShotGeneration();
 	}
 
-	// if running outside of steam and NOT a dedicated server then phone home (or if "-phonehome" is passed on the command line)
-	if ( !sv.IsDedicated() || CommandLine()->FindParm( "-phonehome" ) )
-	{
-		// In debug, only run this check if -phonehome is on the command line (so a debug build will "just work").
-		if ( IsDebug() && CommandLine()->FindParm( "-phonehome" ) )
-		{
-			phonehome->Init();
-			phonehome->Message( IPhoneHome::PHONE_MSG_ENGINESTART, NULL );
-		}
-	}
-
 #ifndef SWDS
 	// Rebuild audio caches
 	if ( !sv.IsDedicated() && S_IsInitted() )
@@ -4531,9 +4519,6 @@ void Host_Shutdown(void)
 		return;
 	}
 	shutting_down = true;
-
-	phonehome->Message( IPhoneHome::PHONE_MSG_ENGINEEND, NULL );
-	phonehome->Shutdown();
 
 #ifndef SWDS
 	// Store active configuration settings
