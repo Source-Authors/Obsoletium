@@ -5,7 +5,7 @@
 #include "filesystem.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/fmtstr.h"
-#include "characterset.h"
+#include "tier1/characterset.h"
 #include "tier1/utlstring.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlbuffer.h"
