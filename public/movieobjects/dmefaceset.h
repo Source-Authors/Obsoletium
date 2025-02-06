@@ -35,7 +35,7 @@ public:
 	void SetMaterial( CDmeMaterial *pMaterial );
 
 	// Total number of indices in the face set including the -1 end of face designators
-	int NumIndices() const;
+	intp NumIndices() const;
 	const int *GetIndices() const;
 	int AddIndices( int nCount );
 	void SetIndex( int i, int nValue );
@@ -68,7 +68,7 @@ private:
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline int CDmeFaceSet::NumIndices() const
+inline intp CDmeFaceSet::NumIndices() const
 {
 	return m_indices.Count();
 }

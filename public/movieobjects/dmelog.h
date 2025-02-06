@@ -707,8 +707,8 @@ void CDmeTypedLog<T>::SetValueThreshold( float thresh )
 template< class T >
 bool CDmeTypedLog<T>::IsConstantValued() const
 {
-	int c = m_Layers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Layers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( !GetLayer( i )->IsConstantValued() )
 			return false;
@@ -791,8 +791,8 @@ inline void CDmeTypedLog< T >::BuildNormalizedLayer( CDmeTypedLogLayer< float > 
 	if ( !pBaseLayer )
 		return;
 
-	int kc = pBaseLayer->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = pBaseLayer->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t tKeyTime = pBaseLayer->GetKeyTime( i );
 		T keyValue = pBaseLayer->GetKeyValue( i );

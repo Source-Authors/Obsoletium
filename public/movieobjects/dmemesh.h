@@ -79,7 +79,7 @@ public:
 	void RemoveFaceSet( int nFaceSetIndex );
 
 	// Base states
-	int BaseStateCount() const;
+	intp BaseStateCount() const;
 
 	CDmeVertexData *GetBaseState( int nBaseIndex ) const;
 
@@ -475,7 +475,7 @@ private:
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline int CDmeMesh::BaseStateCount() const
+inline intp CDmeMesh::BaseStateCount() const
 {
 	return m_BaseStates.Count();
 }

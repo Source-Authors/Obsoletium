@@ -10,9 +10,9 @@
 #pragma once
 #endif
 
-#include <limits.h>
-#include <math.h>
-#include "platform.h"
+#include <climits>
+#include <cmath>
+#include "tier0/platform.h"
 #include "tier0/dbg.h"
 
 
