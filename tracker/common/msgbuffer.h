@@ -3,7 +3,7 @@
 #ifndef MSGBUFFER_H
 #define MSGBUFFER_H
 
-#include "netadr.h"
+#include "tier1/netadr.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Generic byte level message buffer with read/write support
