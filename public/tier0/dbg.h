@@ -570,8 +570,8 @@ public:
 // 3. You use assert_cast to verify it in the second DLL boundary (where it also could've been created).
 #ifdef _DEBUG
 template<typename DEST_POINTER_TYPE, typename SOURCE_POINTER_TYPE>
-inline DEST_POINTER_TYPE assert_cast(SOURCE_POINTER_TYPE* pSource)
-{
+inline std::enable_if_t<std::is_pointer_v<DEST_POINTER_TYPE>, DEST_POINTER_TYPE>
+assert_cast(SOURCE_POINTER_TYPE *pSource) {
     Assert( static_cast<DEST_POINTER_TYPE>(pSource) == dynamic_cast<DEST_POINTER_TYPE>(pSource) );
     return static_cast<DEST_POINTER_TYPE>(pSource);
 }
