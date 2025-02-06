@@ -21,7 +21,7 @@
 #include <vgui_controls/Label.h>
 #include <vgui_controls/ListPanel.h>
 
-#include <utlvector.h>
+#include <tier1/utlvector.h>
 
 namespace vgui
 {

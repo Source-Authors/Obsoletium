@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-#include "commonmacros.h"
+#include "tier0/commonmacros.h"
 #include "tier0/dbg.h"
 #include "bspfile.h"
 #include "mathlib/mathlib.h"

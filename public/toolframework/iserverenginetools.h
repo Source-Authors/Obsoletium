@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "interface.h"
+#include "tier1/interface.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: exposed from engine to game .dll

@@ -12,9 +12,9 @@
 #pragma once
 #endif
 
-#include <utllinkedlist.h>
-#include <utlvector.h>
-#include <utlrbtree.h>
+#include <tier1/utllinkedlist.h>
+#include <tier1/utlvector.h>
+#include <tier1/utlrbtree.h>
 #include <vgui/VGUI.h>
 #include <vgui_controls/Panel.h>
 

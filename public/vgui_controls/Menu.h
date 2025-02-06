@@ -14,8 +14,8 @@
 
 #include <vgui_controls/Panel.h>
 #include <vgui_controls/Label.h>
-#include <utllinkedlist.h>
-#include <utlvector.h>
+#include "tier1/utllinkedlist.h"
+#include <tier1/utlvector.h>
 
 namespace vgui
 {

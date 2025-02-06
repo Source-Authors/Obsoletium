@@ -13,7 +13,7 @@
 #endif
 
 #include <vgui_controls/Panel.h>
-#include <utlvector.h>
+#include <tier1/utlvector.h>
 
 namespace vgui
 {

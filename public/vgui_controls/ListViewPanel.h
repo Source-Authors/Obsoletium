@@ -12,8 +12,8 @@
 #pragma once
 #endif
 
-#include <utllinkedlist.h>
-#include <utlvector.h>
+#include "tier1/utllinkedlist.h"
+#include <tier1/utlvector.h>
 
 namespace vgui
 {

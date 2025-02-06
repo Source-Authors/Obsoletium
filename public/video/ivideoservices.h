@@ -14,7 +14,7 @@
     #pragma once
 #endif
 
-#include <math.h>
+#include <cmath>
 #include "appframework/IAppSystem.h"
 #include "tier0/platform.h"
 

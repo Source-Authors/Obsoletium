@@ -12,8 +12,8 @@
 #endif
 
 #include "Panel.h"
-#include "utlmap.h"
-#include "utlsymbol.h"
+#include "tier1/utlmap.h"
+#include "tier1/utlsymbol.h"
 
 class CControllerMap : public vgui::Panel
 {
