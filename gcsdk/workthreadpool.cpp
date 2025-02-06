@@ -7,7 +7,7 @@
 
 
 #include "stdafx.h"
-#include "tslist.h"
+#include "tier0/tslist.h"
 #include <workthreadpool.h>
 #include <gclogger.h>
 
