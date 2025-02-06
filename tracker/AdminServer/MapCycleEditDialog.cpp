@@ -8,7 +8,7 @@
 #include "MapCycleEditDialog.h"
 
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ListPanel.h>

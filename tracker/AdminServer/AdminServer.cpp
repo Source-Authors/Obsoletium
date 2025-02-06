@@ -15,7 +15,7 @@
 #include <vgui/IPanel.h>
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include "filesystem.h"
 
 // expose the server browser interfaces

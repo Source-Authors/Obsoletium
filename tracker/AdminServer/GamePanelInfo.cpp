@@ -21,7 +21,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/Cursor.h>
 #include <vgui/ILocalize.h>
 
@@ -37,7 +37,7 @@
 #include "tier0/icommandline.h"
 
 #include <proto_oob.h>
-#include <netadr.h>
+#include <tier1/netadr.h>
 
 using namespace vgui;
 

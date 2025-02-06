@@ -12,8 +12,8 @@
 #endif
 
 #include <vgui_controls/Frame.h>
-#include "utlvector.h"
-#include "utlsymbol.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlsymbol.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Dialog for editing the game server map cycle list

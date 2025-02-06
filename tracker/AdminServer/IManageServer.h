@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <interface.h>
+#include <tier1/interface.h>
 
 //-----------------------------------------------------------------------------
 // Purpose: basic callback interface for the manage server list, to update status text et al

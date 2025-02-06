@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "UtlLinkedList.h"
+#include "tier1/UtlLinkedList.h"
 #include "igameserverdata.h"
 
 class IServerDataResponse;

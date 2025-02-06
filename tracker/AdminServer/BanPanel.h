@@ -11,13 +11,13 @@
 #pragma once
 #endif
 
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
 #include <vgui_controls/ListPanel.h>
 #include <vgui_controls/PropertyPage.h>
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 #include "BanContextMenu.h"
 #include "RemoteServer.h"

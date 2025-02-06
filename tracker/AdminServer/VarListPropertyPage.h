@@ -11,10 +11,10 @@
 #pragma once
 #endif
 
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui_controls/PropertyPage.h>
 
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "RemoteServer.h"
 
 //-----------------------------------------------------------------------------
