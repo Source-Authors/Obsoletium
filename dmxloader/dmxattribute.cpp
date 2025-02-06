@@ -21,7 +21,8 @@ CUtlSymbolTableMT CDmxAttribute::s_AttributeNameSymbols;
 //-----------------------------------------------------------------------------
 // Attribute size
 //-----------------------------------------------------------------------------
-static size_t s_pAttributeSize[AT_TYPE_COUNT] = 
+// dimhotepus: size_t -> intp
+static intp s_pAttributeSize[AT_TYPE_COUNT] = 
 {
 	0,							// AT_UNKNOWN,
 	sizeof(CDmxElement*),		// AT_ELEMENT,
@@ -151,7 +152,8 @@ CDmxAttribute::~CDmxAttribute()
 //-----------------------------------------------------------------------------
 // Returns the size of the variables storing the various attribute types
 //-----------------------------------------------------------------------------
-int CDmxAttribute::AttributeDataSize( DmAttributeType_t type )
+// dimhotepus: int -> intp
+intp CDmxAttribute::AttributeDataSize( DmAttributeType_t type )
 {
 	return s_pAttributeSize[type];
 }
