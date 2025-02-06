@@ -10,7 +10,7 @@
 #include "appframework/AppFramework.h"
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "filesystem.h"
 #include "appframework/IAppSystemGroup.h"
 #include "filesystem_init.h"

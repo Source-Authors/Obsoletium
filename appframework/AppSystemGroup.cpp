@@ -9,7 +9,7 @@
 
 #include "appframework/IAppSystemGroup.h"
 #include "appframework/IAppSystem.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "filesystem.h"
 #include "filesystem_init.h"
 
