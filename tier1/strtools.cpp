@@ -55,7 +55,6 @@
 #include <iconv.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <stdlib.h>
 #define _getcwd getcwd
 #elif _WIN32
 #include <direct.h>
@@ -731,31 +730,28 @@ const char* V_strnchr( const char* pStr, char c, ptrdiff_t n )
 	return NULL;
 }
 
-void V_strncpy( OUT_Z_CAP(maxLen) char *pDest, char const *pSrc, ptrdiff_t maxLen )
+void V_strncpy( OUT_Z_CAP(maxLenInChars) char *pDest, char const *pSrc, ptrdiff_t maxLenInChars )
 {
-	Assert( maxLen >= static_cast<ptrdiff_t>(sizeof( *pDest )) );
-	AssertValidWritePtr( pDest, maxLen );
+	AssertValidWritePtr( pDest, maxLenInChars );
 	AssertValidStringPtr( pSrc );
 
-	strncpy( pDest, pSrc, maxLen );
-	if ( maxLen > 0 )
+	if ( maxLenInChars > 0 )
 	{
-		pDest[maxLen-1] = '\0';
+		strncpy( pDest, pSrc, maxLenInChars - 1 );
+		pDest[maxLenInChars - 1] = '\0';
 	}
 }
 
 void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const *pSrc, ptrdiff_t maxLenInBytes )
 {
-	Assert( maxLenInBytes >= static_cast<ptrdiff_t>(sizeof( *pDest )) );
 	AssertValidWritePtr( pDest, maxLenInBytes );
 	AssertValidReadPtr( pSrc );
 
-	size_t maxLen = maxLenInBytes / sizeof(wchar_t);
-
-	wcsncpy( pDest, pSrc, maxLen );
-	if( maxLen )
+	ptrdiff_t maxLen = maxLenInBytes / static_cast<ptrdiff_t>(sizeof(wchar_t));
+	if ( maxLen > 0 )
 	{
-		pDest[maxLen-1] = 0;
+		wcsncpy( pDest, pSrc, maxLen - 1 );
+		pDest[maxLen - 1] = L'\0';
 	}
 }
 
