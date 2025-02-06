@@ -930,14 +930,14 @@ qboolean GetTokenizerStatus( char **pFilename, int *pLine )
 }
 
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
 #include <sys/utime.h>
 #endif
-#include <time.h>
+#include <ctime>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>

@@ -15,7 +15,7 @@
 
 
 #include "mathlib/vector.h"
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 
 
 //-----------------------------------------------------------------------------
