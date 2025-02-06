@@ -25,7 +25,7 @@
 #include "tier0/vprof.h"
 //#include "constants.h"
 #include "vstdlib/vstdlib.h"
-#include "strtools.h"
+#include "tier1/strtools.h"
 //#include "version.h"
 //#include "globals.h"
 //#include "ivalidate.h"

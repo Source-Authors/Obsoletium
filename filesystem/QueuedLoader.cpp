@@ -46,15 +46,11 @@
 #include "tier1/utlstring.h"
 #include "tier1/UtlSortVector.h"
 #include "tier1/utldict.h"
-#include "basefilesystem.h"
 #include "tier0/icommandline.h"
 #include "vstdlib/jobthread.h"
 #include "filesystem/IQueuedLoader.h"
 #include "tier2/tier2.h"
-#include "characterset.h"
-#if !defined( _X360 )
-#include "xbox/xboxstubs.h"
-#endif
+#include "tier1/characterset.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -679,13 +675,6 @@ bool CQueuedLoader::CResourceNameLessFunc::Less( const FileNameHandle_t &hFilena
 int CQueuedLoader::CFileJobsLessFunc::GetLayoutOrderForFilename( const char *pFilename )
 {
 	bool bIsLocalizedZip = false;
-	if ( XBX_IsLocalized() )
-	{
-		if ( V_stristr( pFilename, "\\zip" ) && V_stristr( pFilename, XBX_GetLanguageString() ) )
-		{
-			bIsLocalizedZip = true;
-		}
-	}
 
 	int order;
 	if ( V_stristr( pFilename, "\\maps\\" ) )

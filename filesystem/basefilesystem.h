@@ -43,11 +43,11 @@
 	#define _S_IFDIR S_IFDIR
 #endif
 
-#include <time.h>
-#include "refcount.h"
-#include "filesystem.h"
-#include "tier1/utlvector.h"
+#include <ctime>
 #include <cstdarg>
+#include "filesystem.h"
+#include "tier1/refcount.h"
+#include "tier1/utlvector.h"
 #include "tier1/utlhashtable.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/utlsymbol.h"
@@ -55,7 +55,6 @@
 #include "tier1/utlstring.h"
 #include "tier1/UtlSortVector.h"
 #include "bspfile.h"
-#include "tier1/utldict.h"
 #include "tier1/tier1.h"
 #include "tier1/strtools.h"
 #include "tier1/byteswap.h"

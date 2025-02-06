@@ -16,7 +16,7 @@
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"
 #include "tier0/icommandline.h"
-#include "generichash.h"
+#include "tier1/generichash.h"
 #include "tier1/utllinkedlist.h"
 #include "filesystem/IQueuedLoader.h"
 #include "tier2/tier2.h"
