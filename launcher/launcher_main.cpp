@@ -450,8 +450,8 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     const bool allow_multirun{command_line->CheckParm("-multirun") != nullptr};
     if (!allow_multirun) {
       Error(
-          "Oops, the game is already launched\n\nSorry, but only "
-          "single game can run at the same time.");
+          "Oops, the game is already launched.\n\nSorry, but only single game "
+          "can run at the same time.");
 
 #ifdef WIN32
       return ERROR_SINGLE_INSTANCE_APP;
