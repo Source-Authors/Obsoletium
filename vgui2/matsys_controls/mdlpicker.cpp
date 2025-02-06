@@ -74,18 +74,6 @@ static bool SaveTgaAndAddToP4( unsigned char *pImage, ImageFormat imageFormat, i
 //
 //-----------------------------------------------------------------------------
 
-
-//-----------------------------------------------------------------------------
-// Sort by MDL name
-//-----------------------------------------------------------------------------
-static int __cdecl MDLBrowserSortFunc( vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
-{
-	const char *string1 = item1.kv->GetString("mdl");
-	const char *string2 = item2.kv->GetString("mdl");
-	return stricmp( string1, string2 );
-}
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
