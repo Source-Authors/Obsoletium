@@ -9,11 +9,16 @@
 //
 //===========================================================================//
 
-#include <memory.h>
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlmap.h"
+#include "tier1/utldict.h"
+#include "tier1/convar.h"
+#include "tier1/mempool.h"
+#include "tier1/functors.h"
+#include "tier1/lzmaDecoder.h"
+#include "tier2/fileutils.h"
 #include "datacache/imdlcache.h"
 #include "istudiorender.h"
 #include "filesystem.h"
@@ -23,17 +28,11 @@
 #include "datacache/idatacache.h"
 #include "studio.h"
 #include "vcollide.h"
-#include "utldict.h"
-#include "convar.h"
 #include "datacache_common.h"
-#include "mempool.h"
 #include "vphysics_interface.h"
 #include "phyfile.h"
 #include "studiobyteswap.h"
-#include "tier2/fileutils.h"
 #include "filesystem/IQueuedLoader.h"
-#include "tier1/lzmaDecoder.h"
-#include "functors.h"
 
 // XXX remove this later. (henryg)
 #if 0 && defined(_DEBUG) && defined(_WIN32) && !defined(_X360)

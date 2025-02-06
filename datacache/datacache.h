@@ -11,12 +11,12 @@
 #pragma once
 #endif
 
-#include "datamanager.h"
-#include "utlhash.h"
-#include "mempool.h"
 #include "tier0/tslist.h"
-#include "datacache_common.h"
+#include "tier1/datamanager.h"
+#include "tier1/utlhash.h"
+#include "tier1/mempool.h"
 #include "tier3/tier3.h"
+#include "datacache_common.h"
 
 
 //-----------------------------------------------------------------------------
@@ -189,7 +189,7 @@ private:
 	unsigned			m_options;
 	CDataCache *		m_pSharedCache;
 	char				szName[DC_MAX_CLIENT_NAME + 1];
-	CTSSimpleList<FrameLock_t> m_FreeFrameLocks;
+	CTSListWithFreeList<FrameLock_t*> m_FreeFrameLocks;
 
 protected:
 	CThreadFastMutex &	m_mutex;

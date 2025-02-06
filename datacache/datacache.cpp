@@ -11,18 +11,18 @@
 #endif
 
 #include "tier0/vprof.h"
-#include "basetypes.h"
-#include "convar.h"
-#include "interface.h"
-#include "datamanager.h"
-#include "utlrbtree.h"
-#include "utlhash.h"
-#include "utlmap.h"
-#include "generichash.h"
+#include "tier0/basetypes.h"
+#include "tier1/convar.h"
+#include "tier1/interface.h"
+#include "tier1/datamanager.h"
+#include "tier1/utlrbtree.h"
+#include "tier1/utlhash.h"
+#include "tier1/utlmap.h"
+#include "tier1/generichash.h"
+#include "tier1/utlvector.h"
+#include "tier1/fmtstr.h"
 #include "filesystem.h"
 #include "datacache.h"
-#include "utlvector.h"
-#include "fmtstr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
