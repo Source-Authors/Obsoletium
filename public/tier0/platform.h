@@ -22,7 +22,7 @@
 #include <alloca.h>
 #include <unistd.h>
 #include <signal.h>
-#include <time.h>
+#include <ctime>
 #endif
 
 #include <malloc.h>
@@ -851,7 +851,7 @@ PLATFORM_INTERFACE bool				Plat_IsInBenchmarkMode();
 
 
 PLATFORM_INTERFACE double			Plat_FloatTime();		// Returns time in seconds since the module was loaded.
-PLATFORM_INTERFACE uint32			Plat_MSTime();			// Time in milliseconds.
+PLATFORM_INTERFACE [[deprecated("Overlows in 49.7 days.")]] uint32			Plat_MSTime();			// Time in milliseconds.
 PLATFORM_INTERFACE uint64			Plat_USTime();			// Time in microseconds.
 PLATFORM_INTERFACE char *			Plat_ctime( const time_t *timep, char *buf, size_t bufsize );
 PLATFORM_INTERFACE void				Plat_GetModuleFilename( char *pOut, int nMaxBytes );
