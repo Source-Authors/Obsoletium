@@ -7,18 +7,18 @@
 #undef PROTECT_FILEIO_FUNCTIONS
 #undef fopen
 #include "winlite.h"
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 
-#include "utlvector.h"
-#include "utlsymbol.h"
-#include "utldict.h"
-#include "utlbuffer.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/utldict.h"
+#include "tier1/utlbuffer.h"
 #include "steamcommon.h"
 
 #include "bugreporter/bugreporter.h"
 #include "filesystem_tools.h"
-#include "KeyValues.h"
-#include "netadr.h"
+#include "tier1/KeyValues.h"
+#include "tier1/netadr.h"
 #include "steam/steamclientpublic.h"
 
 bool UploadBugReport(
