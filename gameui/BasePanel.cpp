@@ -82,7 +82,7 @@ using namespace vgui;
 #include "xbox/xboxstubs.h"
 #endif
 
-#include "../engine/imatchmaking.h"
+#include "engine/imatchmaking.h"
 #include "tier1/utlstring.h"
 #include "steam/steam_api.h"
 
