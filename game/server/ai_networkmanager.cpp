@@ -503,30 +503,13 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 
 	Q_strncat( szNrpFilename, "/", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 	Q_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
-	Q_strncat( szNrpFilename, IsX360() ? ".360.ain" : ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
+	Q_strncat( szNrpFilename, ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 
 	MEM_ALLOC_CREDIT();
 
 	// Read the file in one gulp
 	CUtlBuffer buf;
 	bool bHaveAIN = false;
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		// .ain was loaded anonymously by bsp, should be ready
-		void *pData;
-		int nDataSize;
-		if ( g_pQueuedLoader->ClaimAnonymousJob( szNrpFilename, &pData, &nDataSize ) )
-		{
-			if ( nDataSize != 0 )
-			{
-				buf.Put( pData, nDataSize );
-				bHaveAIN = true;
-			}
-			filesystem->FreeOptimalReadBuffer( pData );
-		}
-	}
-	
-
 
 	if ( !bHaveAIN && !filesystem->ReadFile( szNrpFilename, "game", buf ) )
 	{

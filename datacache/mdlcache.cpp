@@ -1195,12 +1195,6 @@ unsigned char *CMDLCache::UnserializeAnimBlock( MDLHandle_t handle, int nBlock )
 {
 	VPROF( "CMDLCache::UnserializeAnimBlock" );
 
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		// anim block i/o is not allowed at this stage
-		return NULL;
-	}
-
 	// Block 0 is never used!!!
 	Assert( nBlock > 0 );
 
@@ -1464,12 +1458,6 @@ void CMDLCache::UnserializeAllVirtualModelsAndAnimBlocks( MDLHandle_t handle )
 	// might be re-loading, discard old virtualmodel to force rebuild
 	// unfortunately, the virtualmodel does build data into the cacheable studiohdr
 	FreeVirtualModel( handle );
-
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		// queued loading has to do it
-		return;
-	}
 
 	// don't load the submodel data
 	if ( !mod_forcedata.GetBool() )
@@ -2633,11 +2621,6 @@ FSAsyncStatus_t CMDLCache::LoadData( const char *pszFilename, const char *pszPat
 {
 	if ( !*pControl )
 	{
-		if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-		{
-			DevWarning( "CMDLCache: Non-Optimal loading path for %s\n", pszFilename );
-		}
-
 		FileAsyncRequest_t asyncRequest;
 		asyncRequest.pszFilename = pszFilename;
 		asyncRequest.pszPathID = pszPathID;

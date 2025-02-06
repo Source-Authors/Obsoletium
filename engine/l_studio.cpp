@@ -1106,11 +1106,6 @@ bool CModelRender::Init()
 	// start a managed section in the cache
 	CCacheClientBaseClass::Init( g_pDataCache, "ColorMesh" );
 
-	if ( IsX360() )
-	{
-		g_pQueuedLoader->InstallLoader( RESOURCEPRELOAD_STATICPROPLIGHTING, &s_ResourcePreloadPropLighting );
-	}
-
 	return true;
 }
 
@@ -3918,23 +3913,6 @@ bool CModelRender::LoadStaticPropColorData( IHandleEntity *pProp, DataCacheHandl
 	pContextVertex->m_pColorMeshData = pColorMeshData;
 	V_strncpy( pContextVertex->m_szFilenameVertex, fileName, sizeof( pContextVertex->m_szFilenameVertex ) );
 
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		if ( !g_pQueuedLoader->ClaimAnonymousJob( fileName, QueuedLoaderCallback_PropLighting, (void *)pContextVertex ) )
-		{
-			// not there as expected
-			// as a less optimal fallback during loading, issue as a standard queued loader job
-			LoaderJob_t loaderJob;
-			loaderJob.m_pFilename = fileName;
-			loaderJob.m_pPathID = "GAME";
-			loaderJob.m_pCallback = QueuedLoaderCallback_PropLighting;
-			loaderJob.m_pContext = (void *)pContextVertex;
-			loaderJob.m_Priority = LOADERPRIORITY_BEFOREPLAY;
-			g_pQueuedLoader->AddJob( &loaderJob );
-		}
-		return true;
-	}
-
 	// async load the file
 	FileAsyncRequest_t fileRequest;
 	fileRequest.pContext = (void *)pContextVertex;
@@ -4498,45 +4476,6 @@ DataCacheHandle_t CModelRender::GetCachedStaticPropColorData( const char *pName 
 
 void CModelRender::SetupColorMeshes( int nTotalVerts )
 {
-	Assert( IsX360() );
-	if ( IsPC() )
-	{
-		return;
-	}
-
-	if ( !g_pQueuedLoader->IsMapLoading() )
-	{
-		// oops, the queued loader didn't run which does the pre-purge cleanup
-		// do the cleanup now
-		PurgeCachedStaticPropColorData();
-	}
-
-	// Set up the appropriate default value for color mesh pooling
-	if ( r_proplightingpooling.GetInt() == -1 )
-	{
-		// This is useful on X360 because VBs are 4-KiB aligned, so using a shared VB saves tons of memory
-		r_proplightingpooling.SetValue( true );
-	}
-
-	if ( r_proplightingpooling.GetInt() == 1 )
-	{
-		if ( m_colorMeshVBAllocator.GetNumVertsAllocated() == 0 )
-		{
-			if ( nTotalVerts )
-			{
-				// Allocate a mesh (vertex buffer) big enough to accommodate all static prop color meshes
-				// (which are allocated inside CModelRender::FindOrCreateStaticPropColorData() ):
-				m_colorMeshVBAllocator.Init( VERTEX_SPECULAR, nTotalVerts );
-			}
-		}
-		else
-		{
-			// already allocated
-			// 360 keeps the color meshes during same map loads
-			// vb allocator already allocated, needs to match
-			Assert( m_colorMeshVBAllocator.GetNumVertsAllocated() == nTotalVerts );
-		}
-	}
 }
 
 void CModelRender::DestroyInstance( ModelInstanceHandle_t handle )

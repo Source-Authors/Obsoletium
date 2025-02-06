@@ -932,11 +932,6 @@ void Host_Changelevel2_f( const CCommand &args )
 //-----------------------------------------------------------------------------
 void Host_Disconnect( bool bShowMainMenu, const char *pszReason )
 {
-	if ( IsX360() )
-	{
-		g_pQueuedLoader->EndMapLoading( false );
-	}
-
 #ifndef SWDS
 	if ( !sv.IsDedicated() )
 	{

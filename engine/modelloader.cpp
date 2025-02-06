@@ -3817,13 +3817,6 @@ void CModelLoader::UnloadAllModels( bool bCheckReference )
 			model->nLoadFlags &= ~FMODELLOADER_REFERENCEMASK;
 		}
 
-		if ( IsX360() && g_pQueuedLoader->IsMapLoading() && ( model->nLoadFlags & FMODELLOADER_LOADED_BY_PRELOAD ) )
-		{
-			// models preloaded by the queued loader are not initially claimed and MUST remain until the end of the load process
-			// unclaimed models get unloaded during the post load purge
-			continue;
-		}
-
 		if ( model->nLoadFlags & ( FMODELLOADER_LOADED | FMODELLOADER_LOADED_BY_PRELOAD ) )
 		{		
 			UnloadModel( model );
