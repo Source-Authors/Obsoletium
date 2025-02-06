@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdio.h>
 #include "physdll.h"
 #include "filesystem_tools.h"
 
@@ -14,7 +13,7 @@ CreateInterfaceFn GetPhysicsFactory( void )
 {
 	if ( !pPhysicsModule )
 	{
-		pPhysicsModule = g_pFullFileSystem->LoadModule( "VPHYSICS.DLL" );
+		pPhysicsModule = g_pFullFileSystem->LoadModule( "vphysics" DLL_EXT_STRING );
 		if ( !pPhysicsModule )
 			return NULL;
 	}
