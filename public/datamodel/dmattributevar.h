@@ -68,13 +68,13 @@ public:
 class CDmaBinaryBlock : public CDmaVar< CUtlBinaryBlock >
 {
 public:
-	void Get( void *pValue, int nMaxLen ) const;
-	void Set( const void *pValue, int nLen );
+	void Get( void *pValue, intp nMaxLen ) const;
+	void Set( const void *pValue, intp nLen );
 	const void *Get() const;
-	const unsigned char& operator[]( int i ) const;
+	const unsigned char& operator[]( intp i ) const;
 
 	// Returns buffer length
-	int	Length() const;
+	intp	Length() const;
 };
 
 
@@ -1064,7 +1064,7 @@ inline void CDmaString::Set( const char *pValue )
 }
 
 // Returns strlen
-inline int CDmaString::Length() const
+inline intp CDmaString::Length() const
 {
 	return Value().Length();
 }
@@ -1087,12 +1087,12 @@ inline const CDmaString& CDmaString::operator=( const CDmaString& src )
 // Inline methods for CDmaBinaryBlock
 //
 //-----------------------------------------------------------------------------
-inline void CDmaBinaryBlock::Get( void *pValue, int nMaxLen ) const
+inline void CDmaBinaryBlock::Get( void *pValue, intp nMaxLen ) const
 {
 	Value().Get( pValue, nMaxLen );
 }
 
-inline void CDmaBinaryBlock::Set( const void *pValue, int nLen )
+inline void CDmaBinaryBlock::Set( const void *pValue, intp nLen )
 {
 	CUtlBinaryBlock block( pValue, nLen );
 	m_pAttribute->SetValue( block );
@@ -1103,12 +1103,12 @@ inline const void *CDmaBinaryBlock::Get() const
 	return Value().Get();
 }
 
-inline const unsigned char& CDmaBinaryBlock::operator[]( int i ) const
+inline const unsigned char& CDmaBinaryBlock::operator[]( intp i ) const
 {
 	return Value()[i];
 }
 
-inline int CDmaBinaryBlock::Length() const
+inline intp CDmaBinaryBlock::Length() const
 {
 	return Value().Length();
 }
