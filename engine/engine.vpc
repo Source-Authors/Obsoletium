@@ -45,7 +45,7 @@ $Configuration	"Debug"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;SUPPORTS_INT64" [$WIN64]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
-		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
+		$PreprocessorDefinitions		"$BASE;SA_MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
 
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
@@ -92,7 +92,7 @@ $Configuration	"Release"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;SUPPORTS_INT64" [$WIN64]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
-		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
+		$PreprocessorDefinitions		"$BASE;SA_MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
 
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
