@@ -85,8 +85,8 @@ CUtlVector<char *> g_OriginalCommandLineParameters;
 // This queues up all the incoming VMPI messages.
 CCriticalSection g_VMPIMessagesCS;
 CUtlLinkedList<CTCPPacket *, int> g_VMPIMessages;
-CEvent
-    g_VMPIMessagesEvent;  // This is set when there are messages in the queue.
+// This is set when there are messages in the queue.
+CEvent g_VMPIMessagesEvent;
 
 // These are used to notify the main thread when some socket had OnError()
 // called on it.
@@ -113,14 +113,15 @@ VMPIFileSystemMode g_VMPIFileSystemMode =
 
 static char g_GroupedPacketHeader[] = {VMPI_INTERNAL_PACKET_ID,
                                        VMPI_INTERNAL_SUBPACKET_GROUPED_PACKET};
-static unsigned long g_LastFlushGroupedPacketsTime = 0;
+// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+static unsigned long long g_LastFlushGroupedPacketsTimeMcs = 0;
 
 // Set to true if we're running under the SDK (i.e. vmpi_transfer.exe is not
 // found).
 bool g_bVMPISDKMode = false;
-bool g_bVMPISDKModeSet =
-    false;  // If g_bVMPISDKMode has not been set, then VMPI_IsSDKMode just
-            // looks for VMPI_Transfer (and doesn't check the command line).
+// If g_bVMPISDKMode has not been set, then VMPI_IsSDKMode just
+// looks for VMPI_Transfer (and doesn't check the command line).
+bool g_bVMPISDKModeSet = false;
 
 int g_nBytesSent = 0;
 int g_nMessagesSent = 0;
@@ -756,11 +757,11 @@ class CMasterBroadcaster {
   ITCPConnectSocket *m_pDownloaderListenSocket;
   ISocket *m_pSocket;
 
-  DWORD m_LastSendTime;
+  unsigned long long m_LastSendTime;
   CMasterBroadcastInfo m_BroadcastInfo;
-  CUtlVector<IpV4>
-      m_PatchWorkerIPs;  // If in patch mode, these are the IPs we send the
-                         // job request to (instead of broadcasting).
+  // If in patch mode, these are the IPs we send the
+  // job request to (instead of broadcasting).
+  CUtlVector<IpV4> m_PatchWorkerIPs;
   bool m_bPatching;
 
   CVMPIConnectionCreator m_ConnectionCreator;
@@ -947,7 +948,8 @@ bool CMasterBroadcaster::Init(int argc, char **argv,
   m_ConnectionCreator.CreateNewHandler();
 
   // Initiate as many connections as we can for a few seconds.
-  m_LastSendTime = Plat_MSTime() - MASTER_BROADCAST_INTERVAL * 2;
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  m_LastSendTime = Plat_USTime() - MASTER_BROADCAST_INTERVAL * 2 * 1000ULL;
 
   m_hShutdownEvent.Init(false, false);
   m_hShutdownReply.Init(false, false);
@@ -1011,8 +1013,9 @@ bool CMasterBroadcaster::Update() {
 
   // Only broadcast our presence so often.
   if (m_pSocket) {
-    DWORD curTime = Plat_MSTime();
-    if (curTime - m_LastSendTime >= MASTER_BROADCAST_INTERVAL) {
+    // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+    unsigned long long curTime = Plat_USTime();
+    if (curTime - m_LastSendTime >= MASTER_BROADCAST_INTERVAL * 1000ULL) {
       char packetData[512] = {};
       bf_write packetBuf("packetBuf", packetData, sizeof(packetData));
       BuildBroadcastPacket(packetBuf);
@@ -1742,7 +1745,8 @@ bool VMPI_GetNextMessage(MessageBuffer *pBuf, int *pSource,
   HANDLE handles[2] = {g_ErrorSocketsEvent.GetEventHandle(),
                        g_VMPIMessagesEvent.GetEventHandle()};
 
-  DWORD startTime = Plat_MSTime();
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  const unsigned long long startTime = Plat_USTime();
   DWORD timeout = startTimeout;
 
   while (1) {
@@ -1757,10 +1761,11 @@ bool VMPI_GetNextMessage(MessageBuffer *pBuf, int *pSource,
       InternalHandleSocketErrors();
 
       // Update the timeout.
-      DWORD delta = Plat_MSTime() - startTime;
-      if (delta >= startTimeout) return false;
+      unsigned long long delta = Plat_USTime() - startTime;
+      if (delta >= startTimeout * 1000ULL) return false;
 
-      timeout = startTimeout - delta;
+      timeout = static_cast<unsigned long>((startTimeout * 1000ULL - delta) /
+                                           1000ULL);
       continue;
     }
 
@@ -1958,9 +1963,11 @@ void VMPI_GroupPackets(CVMPIConnection *pConn, void const *const *pChunks,
 
 void VMPI_FlushGroupedPackets(unsigned long msInterval) {
   if (msInterval != 0) {
-    unsigned long curTime = Plat_MSTime();
-    if (curTime - g_LastFlushGroupedPacketsTime < msInterval) return;
-    g_LastFlushGroupedPacketsTime = curTime;
+    // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+    unsigned long long curTime = Plat_USTime();
+    if (curTime - g_LastFlushGroupedPacketsTimeMcs < msInterval * 1000ULL)
+      return;
+    g_LastFlushGroupedPacketsTimeMcs = curTime;
   }
 
   CCriticalSectionLock connectionsLock(&g_ConnectionsCS);
