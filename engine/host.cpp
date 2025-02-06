@@ -263,7 +263,7 @@ static ConVar	violence_ablood( "violence_ablood","1", 0, "Draw alien blood" );
 static ConVar	violence_agibs( "violence_agibs","1", 0, "Show alien gib entities" );
 
 // Marked as FCVAR_USERINFO so that the server can cull CC messages before networking them down to us!!!
-ConVar closecaption( "closecaption", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX | FCVAR_USERINFO, "Enable close captioning." );
+ConVar closecaption( "closecaption", "0", FCVAR_ARCHIVE | FCVAR_USERINFO, "Enable close captioning." );
 extern ConVar sv_unlockedchapters;
 
 void Snd_Restart_f()
@@ -545,7 +545,7 @@ ConVar  developer( "developer", "0", FCVAR_CHEAT, "Set developer message level")
 ConVar  developer( "developer", "0", 0, "Set developer message level");
 #endif
 
-ConVar	skill( "skill","1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "Game skill level (1-3).", true, 1, true, 3 );			// 1 - 3
+ConVar	skill( "skill","1", FCVAR_ARCHIVE, "Game skill level (1-3).", true, 1, true, 3 );			// 1 - 3
 ConVar	deathmatch( "deathmatch","0", FCVAR_NOTIFY | FCVAR_INTERNAL_USE, "Running a deathmatch server." );	// 0, 1, or 2
 ConVar	coop( "coop","0", FCVAR_NOTIFY, "Cooperative play." );			// 0 or 1
 

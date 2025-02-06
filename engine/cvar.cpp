@@ -574,14 +574,12 @@ bool CCvarUtilities::IsValidToggleCommand( const char *cmd )
 //-----------------------------------------------------------------------------
 void CCvarUtilities::WriteVariables( CUtlBuffer &buff, bool bAllVars )
 {
-	const ConCommandBase	*var;
-
-	for (var = g_pCVar->GetCommands() ; var ; var = var->GetNext())
+	for (auto *var = g_pCVar->GetCommands() ; var ; var = var->GetNext())
 	{
 		if ( var->IsCommand() )
 			continue;
 
-		bool archive = var->IsFlagSet( IsX360() ? FCVAR_ARCHIVE_XBOX : FCVAR_ARCHIVE );
+		bool archive = var->IsFlagSet( FCVAR_ARCHIVE );
 		if ( archive )
 		{
 			const ConVar *pConvar = assert_cast<const ConVar *>( var );

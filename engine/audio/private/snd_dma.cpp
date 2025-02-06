@@ -462,9 +462,9 @@ ConVar snd_visualize ("snd_visualize", "0", FCVAR_CHEAT, "Show sounds location i
 ConVar snd_pitchquality( "snd_pitchquality", "1", FCVAR_ARCHIVE );		// 1) use high quality pitch shifters
 
 // master volume
-static ConVar volume( "volume", "1.0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "Sound volume", true, 0.0f, true, 1.0f );
+static ConVar volume( "volume", "1.0", FCVAR_ARCHIVE, "Sound volume", true, 0.0f, true, 1.0f );
 // user configurable music volume
-ConVar snd_musicvolume( "snd_musicvolume", "1.0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "Music volume", true, 0.0f, true, 1.0f );	
+ConVar snd_musicvolume( "snd_musicvolume", "1.0", FCVAR_ARCHIVE, "Music volume", true, 0.0f, true, 1.0f );	
 
 ConVar snd_mixahead( "snd_mixahead", "0.1", FCVAR_ARCHIVE );
 ConVar snd_mix_async( "snd_mix_async", "0", 0, "Perform sound mixing in dedicated thread", true, 0, true, 1 );
