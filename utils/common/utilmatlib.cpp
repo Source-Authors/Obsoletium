@@ -22,35 +22,35 @@
 
 void LoadMaterialSystemInterface( CreateInterfaceFn fileSystemFactory )
 {
-	if( g_pMaterialSystem )
+	if ( g_pMaterialSystem )
 		return;
 	
 	// materialsystem.dll should be in the path, it's in bin along with vbsp.
-	const char *pDllName = "materialsystem.dll";
-	CSysModule *materialSystemDLLHInst;
-	materialSystemDLLHInst = g_pFullFileSystem->LoadModule( pDllName );
+	constexpr char dllName[] = "materialsystem" DLL_EXT_STRING;
+	CSysModule *materialSystemDLLHInst = g_pFullFileSystem->LoadModule( dllName );
 	if( !materialSystemDLLHInst )
 	{
-		Error( "Can't load MaterialSystem.dll\n" );
+		Error( "Can't load material system %s.\n", dllName );
 	}
 
-	CreateInterfaceFn clientFactory = Sys_GetFactory( materialSystemDLLHInst );
+	const auto clientFactory = Sys_GetFactory<IMaterialSystem>( materialSystemDLLHInst );
 	if ( clientFactory )
 	{
-		g_pMaterialSystem = (IMaterialSystem *)clientFactory( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
+		g_pMaterialSystem = clientFactory( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
 		if ( !g_pMaterialSystem )
 		{
-			Error( "Could not get the material system interface from materialsystem.dll (" __FILE__ ")" );
+			Error( "Could not get the material system interface %s from %s (" __FILE__ ").\n",
+				MATERIAL_SYSTEM_INTERFACE_VERSION, dllName );
 		}
 	}
 	else
 	{
-		Error( "Could not find factory interface in library MaterialSystem.dll" );
+		Error( "Could not find factory interface in library %s.\n", dllName );
 	}
 
-	if (!g_pMaterialSystem->Init( "shaderapiempty.dll", 0, fileSystemFactory ))
+	if (!g_pMaterialSystem->Init( "shaderapiempty" DLL_EXT_STRING, 0, fileSystemFactory ))
 	{
-		Error( "Could not start the empty shader (shaderapiempty.dll)!" );
+		Error( "Could not start the empty shader (shaderapiempty" DLL_EXT_STRING ").\n" );
 	}
 }
 
@@ -87,11 +87,10 @@ MaterialSystemMaterial_t FindMaterial( const char *materialName, bool *pFound, b
 
 void GetMaterialDimensions( MaterialSystemMaterial_t materialHandle, int *width, int *height )
 {
-	PreviewImageRetVal_t retVal;
 	ImageFormat dummyImageFormat;
 	IMaterial *material = ( IMaterial * )materialHandle;
 	bool translucent;
-	retVal = material->GetPreviewImageProperties( width, height, &dummyImageFormat, &translucent );
+	PreviewImageRetVal_t retVal = material->GetPreviewImageProperties( width, height, &dummyImageFormat, &translucent );
 	if (retVal != MATERIAL_PREVIEW_IMAGE_OK ) 
 	{
 #if 0
@@ -110,10 +109,9 @@ void GetMaterialDimensions( MaterialSystemMaterial_t materialHandle, int *width,
 void GetMaterialReflectivity( MaterialSystemMaterial_t materialHandle, float *reflectivityVect )
 {
 	IMaterial *material = ( IMaterial * )materialHandle;
-	const IMaterialVar *reflectivityVar;
 
 	bool found;
-	reflectivityVar = material->FindVar( "$reflectivity", &found, false );
+	const IMaterialVar *reflectivityVar = material->FindVar( "$reflectivity", &found, false );
 	if( !found )
 	{
 		Vector tmp;
@@ -164,9 +162,8 @@ int GetMaterialShaderPropertyInt( MaterialSystemMaterial_t materialHandle, int p
 const char *GetMaterialVar( MaterialSystemMaterial_t materialHandle, const char *propertyName )
 {
 	IMaterial *material = ( IMaterial * )materialHandle;
-	IMaterialVar *var;
 	bool found;
-	var = material->FindVar( propertyName, &found, false );
+	IMaterialVar *var = material->FindVar( propertyName, &found, false );
 	if( found )
 	{
 		return var->GetStringValue();
