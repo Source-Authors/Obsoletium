@@ -9,8 +9,8 @@
 #ifndef FMTSTR_H
 #define FMTSTR_H
 
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"

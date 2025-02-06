@@ -13,7 +13,7 @@
 #endif
 
 #include "utlrbtree.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Allocates memory for strings, checking for duplicates first,

@@ -14,7 +14,7 @@
 #include "tier0/basetypes.h"
 
 #include <fstream>
-#include "valve_minmax_on.h"
+#include "tier0/valve_minmax_on.h"
 
 
 

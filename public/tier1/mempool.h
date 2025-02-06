@@ -137,7 +137,7 @@ template< class T >
 class CClassMemoryPool : public CUtlMemoryPool
 {
 public:
-	// dimhotepus: Alignment shold derive from class.
+	// dimhotepus: Alignment should derive from class.
 	CClassMemoryPool(intp numElements, int growMode = GROW_FAST, unsigned short nAlignment = alignof(T) ) :
 		CUtlMemoryPool( sizeof(T), numElements, growMode, MEM_ALLOC_CLASSNAME(T), nAlignment ) {
 			#ifdef PLATFORM_64BITS 

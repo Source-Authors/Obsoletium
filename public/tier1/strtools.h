@@ -24,7 +24,7 @@
 #pragma once
 #elif POSIX
 #include <wchar.h>
-#include <math.h>
+#include <cmath>
 #include <wctype.h>
 #endif
 
@@ -582,7 +582,7 @@ typedef char *  va_list;
 #endif   // _VA_LIST_DEFINED
 
 #elif POSIX
-#include <stdarg.h>
+#include <cstdarg>
 #endif
 
 #ifdef _WIN32

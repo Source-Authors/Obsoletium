@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 // T is the type stored in the queue, it must include the priority
 // The head of the list contains the element with GREATEST priority

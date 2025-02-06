@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-#include <string.h>
+#include <cstring>
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"

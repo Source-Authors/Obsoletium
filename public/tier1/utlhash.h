@@ -11,9 +11,9 @@
 #define UTLHASH_H
 #pragma once
 
-#include <limits.h>
+#include <climits>
 #include "utlmemory.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "utllinkedlist.h"
 #include "utllinkedlist.h"
 #include "tier0/commonmacros.h"

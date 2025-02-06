@@ -14,7 +14,7 @@
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 #include "mathlib/vector.h"
-#include <float.h>
+#include <cfloat>
 
 
 // Use this to disable range checks within a scope.
