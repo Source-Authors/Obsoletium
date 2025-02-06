@@ -13,7 +13,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "bitmap/imageformat.h"
 #include "mathlib/vmatrix.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 // GR
 #include "imaterialinternal.h"
 #include "materialsystem/materialsystem_config.h"

@@ -12,13 +12,13 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/IColorCorrection.h"
 #include "tier1/strtools.h"
-#include "utlvector.h"
-#include "utldict.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
 #include "itextureinternal.h"
 #include "vtf/vtf.h"
 #include "pixelwriter.h"
-#include "basetypes.h"
-#include "utlbuffer.h"
+#include "tier0/basetypes.h"
+#include "tier1/utlbuffer.h"
 #include "filesystem.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/ishaderapi.h"
@@ -26,12 +26,12 @@
 #include "imorphinternal.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/utlpair.h"
-#include "utlqueue.h"
+#include "tier1/utlqueue.h"
 #include "tier0/icommandline.h"
 #include "ctexturecompositor.h"
 #include "Color.h"
 
-#include "vprof_telemetry.h"
+#include "tier0/vprof_telemetry.h"
 
 // Need lightmaps access here
 #define MATSYS_INTERNAL

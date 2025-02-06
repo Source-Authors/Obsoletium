@@ -2497,7 +2497,7 @@ void CMatRenderContext::UpdateHeightClipUserClipPlane( void )
 	PlaneStackElement pse;
 	pse.bHack_IsHeightClipPlane = true;
 
-	int iExistingHeightClipPlaneIndex;
+	intp iExistingHeightClipPlaneIndex;
 	for( iExistingHeightClipPlaneIndex = m_CustomClipPlanes.Count(); --iExistingHeightClipPlaneIndex >= 0; )
 	{
 		if( m_CustomClipPlanes[iExistingHeightClipPlaneIndex].bHack_IsHeightClipPlane )

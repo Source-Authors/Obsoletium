@@ -9,28 +9,24 @@
 #include "colorspace.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
-#include <string.h>
 #include "materialsystem_global.h"
 #include "shaderapi/ishaderapi.h"
-#include "materialsystem/imaterialproxy.h"							   
+#include "materialsystem/imaterialproxy.h"
 #include "shadersystem.h"
 #include "materialsystem/imaterialproxyfactory.h"
 #include "IHardwareConfigInternal.h"
-#include "utlsymbol.h"
-#include <malloc.h>
+#include "tier1/utlsymbol.h"
 #include "filesystem.h"
-#include <KeyValues.h>
-#include "mempool.h"
+#include <tier1/KeyValues.h>
+#include "tier1/mempool.h"
 #include "shaderapi/ishaderutil.h"
 #include "vtf/vtf.h"
 #include "tier1/strtools.h"
-#include <ctype.h>
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 #include "mathlib/vmatrix.h"
 #include "texturemanager.h"
 #include "itextureinternal.h"
 #include "cmaterial_queuefriendly.h"
-#include "mempool.h"
 
 static IMaterialVar *CreateMaterialVarFromKeyValue( IMaterial* pMaterial, KeyValues* pKeyValue );
 

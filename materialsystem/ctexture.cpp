@@ -8,7 +8,7 @@
 	#undef PROTECTED_THINGS_ENABLE
 #endif
 
-#include "platform.h"
+#include "tier0/platform.h"
 
 // HACK: Need ShellExecute for PSD updates
 #ifdef IS_WINDOWS_PC
@@ -20,8 +20,8 @@
 #include "materialsystem_global.h"
 #include "shaderapi/ishaderapi.h"
 #include "itextureinternal.h"
-#include "utlsymbol.h"
-#include "time.h"
+#include "tier1/utlsymbol.h"
+#include <malloc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "bitmap/imageformat.h"
@@ -31,24 +31,20 @@
 #include "direct.h"
 #endif
 #include "colorspace.h"
-#include "string.h"
-#include <malloc.h>
-#include <stdlib.h>
-#include "utlmemory.h"
+#include "tier1/utlmemory.h"
 #include "IHardwareConfigInternal.h"
 #include "filesystem.h"
 #include "tier1/strtools.h"
 #include "vtf/vtf.h"
 #include "materialsystem/materialsystem_config.h"
-#include "mempool.h"
+#include "tier1/mempool.h"
 #include "texturemanager.h"
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 #include "pixelwriter.h"
 #include "tier1/callqueue.h"
 #include "tier1/UtlStringMap.h"
 #include "filesystem/IQueuedLoader.h"
 #include "tier2/fileutils.h"
-#include "filesystem.h"
 #include "tier2/p4helpers.h"
 #include "tier2/tier2.h"
 // dimhotepus: Exclude ip4.
