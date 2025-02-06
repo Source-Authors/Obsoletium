@@ -11,12 +11,12 @@
 #define DO_IME
 #endif
 
-#include <string.h>
+#include <cstring>
 
 #include "vgui_internal.h"
 #include "VPanel.h"
-#include "utlvector.h"
-#include <KeyValues.h>
+#include "tier1/utlvector.h"
+#include <tier1/KeyValues.h>
 #include "tier0/vcrmode.h"
 
 #include <vgui/VGUI.h>
@@ -31,7 +31,7 @@
 #include "vgui/Cursor.h"
 #include <vgui/keyrepeat.h>
 
-#include "utllinkedlist.h"
+#include "tier1/utllinkedlist.h"
 #include "tier0/icommandline.h"
 
 #if defined( _X360 )

@@ -6,12 +6,12 @@
 //=============================================================================//
 
 
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 
 #include <vgui/VGUI.h>
 #include <vgui/IScheme.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/ISurface.h>
 #include <vgui/IPanel.h>
 #include <vgui/ISystem.h>
