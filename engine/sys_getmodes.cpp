@@ -18,7 +18,7 @@ typedef void *HDC;
 
 #include "appframework/ilaunchermgr.h"
 
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "sysexternal.h"
 #include "cmd.h"
 #include "modelloader.h"
