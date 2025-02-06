@@ -86,17 +86,20 @@ extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, void* );
 
 extern void InitTime();
 
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 {
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
-		g_hTier0Instance = hinstDLL;
+		g_hTier0Instance = module;
 
 		InitTime();
 
 #ifdef DEBUG
-		MemDbgDllMain( hinstDLL, fdwReason, lpvReserved );
+		MemDbgDllMain( module, fdwReason, lpvReserved );
 #endif
+		
+		// dimhotepus: Do not notify on thread creation for performance.
+		DisableThreadLibraryCalls(module);
 	}
 	else if (fdwReason == DLL_PROCESS_DETACH)
 	{

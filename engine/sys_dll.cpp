@@ -557,6 +557,7 @@ BOOL WINAPI DllMain(HMODULE module, ULONG ulInit, LPVOID)
 {
 	if (ulInit == DLL_PROCESS_ATTACH)
 	{
+		// dimhotepus: Do not notify on thread creation for performance.
 		::DisableThreadLibraryCalls(module);
 		prevCRTMemDebugState = InitCRTMemDebug();
 	} 

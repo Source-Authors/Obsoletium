@@ -25,14 +25,16 @@
 HMODULE win32DLLHandle;
 
 // Required DLL entry point
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID )
+BOOL WINAPI DllMain( HMODULE module, DWORD fdwReason, LPVOID )
 {
 	// ensure data sizes are stable
 	static_assert( sizeof(inputfunc_t) == sizeof(void*) );
 
 	if ( fdwReason == DLL_PROCESS_ATTACH )
     {
-		win32DLLHandle = hinstDLL;
+		// dimhotepus: Do not notify on thread creation for performance.
+		::DisableThreadLibraryCalls(module);
+		win32DLLHandle = module;
     }
 	else if ( fdwReason == DLL_PROCESS_DETACH )
     {
