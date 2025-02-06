@@ -611,7 +611,7 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 			if ( Q_strnicmp( pszFileName, ".", 2 ) && Q_strnicmp( pszFileName, "..", 3 ) )
 			{
 				DirHandle_t hDirHandle = list.m_pFileTree->AddSubDirectory( hCurrentDir, pszFileName );
-				int i = list.m_DirectoriesToCheck.AddToTail();
+				auto i = list.m_DirectoriesToCheck.AddToTail();
 				list.m_DirectoriesToCheck[i].m_DirName = pRelativeChildPath;
 				list.m_DirectoriesToCheck[i].m_hDirHandle = hDirHandle;
 			}
@@ -733,7 +733,7 @@ bool CAssetCache::BeginAssetScan( AssetList_t hList, bool bForceRescan )
 	list.m_pFileTree->ClearDirectories();
 
 	// Add all files, determine which mod they are in.
-	int i = list.m_DirectoriesToCheck.AddToTail();
+	auto i = list.m_DirectoriesToCheck.AddToTail();
 	list.m_DirectoriesToCheck[i].m_DirName = list.m_pSubDir;
 	list.m_DirectoriesToCheck[i].m_hDirHandle = list.m_pFileTree->GetRootDirectory();
 	return true;
