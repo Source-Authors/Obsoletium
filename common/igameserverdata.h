@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include "interface.h"
-#include "netadr.h"
+#include "tier1/interface.h"
+#include "tier1/netadr.h"
 
 using ra_listener_id = unsigned int;
 constexpr inline ra_listener_id INVALID_LISTENER_ID = 0xffffffff;
