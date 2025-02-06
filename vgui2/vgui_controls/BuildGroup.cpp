@@ -899,7 +899,7 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 	// dimhotepus: Ensure passed keyvalues cached only once.
 	if ( rDat && bUsePrecaching )
 	{
-		int nIndex = m_dictCachedResFiles.Find( controlResourceName );
+		auto nIndex = m_dictCachedResFiles.Find( controlResourceName );
 		if ( nIndex != m_dictCachedResFiles.InvalidIndex() )
 		{
 			rDat = m_dictCachedResFiles[nIndex];
@@ -913,7 +913,7 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 	{
 		if ( bUsePrecaching )
 		{
-			int nIndex = m_dictCachedResFiles.Find( controlResourceName );
+			auto nIndex = m_dictCachedResFiles.Find( controlResourceName );
 			if ( nIndex != m_dictCachedResFiles.InvalidIndex() )
 			{
 				rDat = m_dictCachedResFiles[nIndex];

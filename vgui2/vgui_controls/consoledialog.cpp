@@ -410,8 +410,8 @@ void CConsolePanel::DPrint( const char *msg )
 
 void CConsolePanel::ClearCompletionList()
 {
-	int c = m_CompletionList.Count();
-	int i;
+	intp c = m_CompletionList.Count();
+	intp i;
 	for ( i = c - 1; i >= 0; i-- )
 	{
 		delete m_CompletionList[ i ];

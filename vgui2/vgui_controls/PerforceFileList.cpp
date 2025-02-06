@@ -137,7 +137,7 @@ PerforceFileList::PerforceFileList( Panel *pParent, const char *pPanelName ) :
 	m_bShowDeletedFiles = false;
 
 	// list panel
-	for ( intp i = 0; i < static_cast<intp>(std::size( g_ColInfo )); ++i )
+	for ( int i = 0; i < ssize( g_ColInfo ); ++i )
 	{
 		const ColumnInfo_t& info = g_ColInfo[ i ];
 

@@ -657,7 +657,7 @@ void TextEntry::PaintBackground()
 
 	m_nLangInset = 0;
 
-	int langlen = 0;
+	intp langlen = 0;
 	wchar_t shortcode[ 5 ];
 	shortcode[ 0 ] = L'\0';
 
@@ -670,7 +670,7 @@ void TextEntry::PaintBackground()
 		{
 			m_nLangInset = 0;
 			langlen = wcslen( shortcode );
-			for ( int i = 0; i < langlen; ++i )
+			for ( intp i = 0; i < langlen; ++i )
 			{
 				m_nLangInset += getCharWidth( _smallfont, shortcode[ i ] );
 			}
@@ -704,7 +704,7 @@ void TextEntry::PaintBackground()
 	int startIndex = GetStartDrawIndex(lineBreakIndexIndex);
 	int remembery = y;
 
-	int oldEnd = m_TextStream.Count();
+	intp oldEnd = m_TextStream.Count();
 	int oldCursorPos = _cursorPos;
 	int nCompStart = -1;
 	int nCompEnd = -1;
@@ -733,7 +733,7 @@ void TextEntry::PaintBackground()
 	// draw text with an elipsis
 	if ( (!_multiline) && (!_horizScrollingAllowed) )
 	{	
-		int endIndex = m_TextStream.Count();
+		intp endIndex = m_TextStream.Count();
 		// In editable windows only do the ellipsis if we don't have focus.
 		// In non editable windows do it all the time.
 		if ( (!HasFocus() && (IsEditable())) || (!IsEditable()) )
@@ -771,7 +771,7 @@ void TextEntry::PaintBackground()
 			}
 		}
 		// draw the text
-		int i;
+		intp i;
 		for (i = startIndex; i < endIndex; i++)
 		{
 			wchar_t ch = m_TextStream[i];
@@ -828,7 +828,7 @@ void TextEntry::PaintBackground()
 	else
 	{
 		// draw the text
-		for ( int i = startIndex; i < m_TextStream.Count(); i++)
+		for ( intp i = startIndex; i < m_TextStream.Count(); i++)
 		{
 			wchar_t ch = m_TextStream[i];
 			if (_hideText)
@@ -2405,7 +2405,7 @@ void TextEntry::MoveCursor(int line, int pixelsAcross)
 	int x = DRAW_OFFSET_X, y = yStart;
 	int lineBreakIndexIndex = 0;
 	_pixelsIndent = 0;
-	int i;
+	intp i;
 	for ( i = 0; i < m_TextStream.Count(); i++)
 	{
 		wchar_t ch = m_TextStream[i];
@@ -2517,7 +2517,7 @@ void TextEntry::ScrollLeftForResize()
     while (_currentStartIndex > 0)     // go until we hit leftmost
     {
         _currentStartIndex--;
-		int nVal = _currentStartIndex;
+		intp nVal = _currentStartIndex;
 
         // check if the cursor is now off the screen
         if (IsCursorOffRightSideOfWindow(_cursorPos))
@@ -2723,7 +2723,7 @@ int TextEntry::GetCurrentLineStart()
 	if (!_multiline)			// quick out for non multline buffers
 		return _currentStartIndex;
 	
-	int i;
+	intp i;
 	if (IsLineBreak(_cursorPos))
 	{
 		for (i = 0; i < m_LineBreaks.Count(); ++i )
@@ -2783,7 +2783,7 @@ void TextEntry::GotoEndOfLine()
 //-----------------------------------------------------------------------------
 int TextEntry::GetCurrentLineEnd()
 {
-	int i;
+	intp i;
 	if (IsLineBreak(_cursorPos)	)
 	{
 		for ( i = 0; i < m_LineBreaks.Count()-1; ++i )
@@ -4040,7 +4040,7 @@ void TextEntry::ShowIMECandidates()
 		_snwprintf( label, sizeof( label ) / sizeof( wchar_t ) - 1, L"%i %s", i - pageStart + startAtOne, unicode );
 		label[ sizeof( label ) / sizeof( wchar_t ) - 1 ] = L'\0';
 
-		int id = m_pIMECandidates->AddMenuItem( "Candidate", label, (KeyValues *)NULL, this );
+		intp id = m_pIMECandidates->AddMenuItem( "Candidate", label, (KeyValues *)NULL, this );
 		if ( isSelected )
 		{
 			m_pIMECandidates->SetCurrentlyHighlightedItem( id );

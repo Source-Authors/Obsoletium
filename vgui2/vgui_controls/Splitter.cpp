@@ -226,8 +226,8 @@ Splitter::~Splitter()
 
 void Splitter::RecreateSplitters( int nCount )
 {
-	int i;
-	int c = m_Splitters.Count();
+	intp i;
+	intp c = m_Splitters.Count();
 	for ( i = 0; i < c; ++i )
 	{
 		delete m_Splitters[ i ].m_pPanel;
@@ -238,7 +238,7 @@ void Splitter::RecreateSplitters( int nCount )
 	for ( i = 0; i < (nCount + 1); ++i )
 	{
 		char pBuffer[512];
-		Q_snprintf( pBuffer, sizeof(pBuffer), "child%d", i );
+		Q_snprintf( pBuffer, sizeof(pBuffer), "child%zd", i );
 
 		intp nIndex = m_Splitters.AddToTail( );
 		SplitterChildPanel *pEditablePanel = new SplitterChildPanel( this, pBuffer );
@@ -263,10 +263,10 @@ void Splitter::RecreateSplitters( int nCount )
 //-----------------------------------------------------------------------------
 void Splitter::SetSplitterColor( Color c )
 {
-	int nCount = m_Splitters.Count() - 1;
+	intp nCount = m_Splitters.Count() - 1;
 	if ( c.a() != 0 )
 	{
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			m_Splitters[i].m_pHandle->SetBgColor( c );
 			m_Splitters[i].m_pHandle->SetPaintBackgroundEnabled( true );
@@ -274,7 +274,7 @@ void Splitter::SetSplitterColor( Color c )
 	}
 	else
 	{
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			m_Splitters[i].m_pHandle->SetPaintBackgroundEnabled( false );
 		}
@@ -287,8 +287,8 @@ void Splitter::SetSplitterColor( Color c )
 //-----------------------------------------------------------------------------
 void Splitter::EnableBorders( bool bEnable )
 {
-	int nCount = m_Splitters.Count() - 1;
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Splitters.Count() - 1;
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		m_Splitters[i].m_pHandle->SetPaintBorderEnabled( bEnable );
 	}
@@ -361,8 +361,8 @@ void Splitter::LockChildSize( int nChildIndex, int nSize )
 		float flPrevPos = (nChildIndex > 0) ? m_Splitters[nChildIndex-1].m_flPos : 0.0f;
 		float flOldSize = info.m_flPos - flPrevPos;
 		float flDelta = nSize - flOldSize;
-		int nCount = m_Splitters.Count();
-		for ( int i = nChildIndex; i < nCount-1; ++i )
+		intp nCount = m_Splitters.Count();
+		for ( intp i = nChildIndex; i < nCount-1; ++i )
 		{
 			m_Splitters[i].m_flPos += flDelta;
 		}
@@ -386,9 +386,9 @@ void Splitter::UnlockChildSize( int nChildIndex )
 		float flBelowSize = GetPosRange() - flPrevPos;
 
 		int nLockedSize = ComputeLockedSize( nChildIndex + 1 );
-		int nUnlockedCount = 1;
-		int nCount = m_Splitters.Count();
-		for ( int i = nChildIndex + 1; i < nCount; ++i )
+		intp nUnlockedCount = 1;
+		intp nCount = m_Splitters.Count();
+		for ( intp i = nChildIndex + 1; i < nCount; ++i )
 		{
 			if ( !m_Splitters[i].m_bLocked )
 			{
@@ -398,7 +398,7 @@ void Splitter::UnlockChildSize( int nChildIndex )
 
 		float flUnlockedSize = ( flBelowSize - nLockedSize ) / nUnlockedCount;
 
-		for ( int i = nChildIndex; i < nCount; ++i )
+		for ( intp i = nChildIndex; i < nCount; ++i )
 		{
 			if ( !m_Splitters[i].m_bLocked )
 			{
@@ -428,10 +428,10 @@ void Splitter::OnSizeChanged( int newWide, int newTall )
 
 	int nLockedSize = 0;
 	float flUnlockedSize = 0.0f;
-	int nCount = m_Splitters.Count();
+	intp nCount = m_Splitters.Count();
 	float flLastPos = 0.0f;
-	int nUnlockedCount = 0;
-	for ( int i = 0; i < nCount; ++i )
+	intp nUnlockedCount = 0;
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		SplitterInfo_t &info = m_Splitters[i];
 		if ( info.m_bLocked )
@@ -456,7 +456,7 @@ void Splitter::OnSizeChanged( int newWide, int newTall )
 	float flRatio = nNewUnlockedSize / flUnlockedSize;
 	float flLastPrevPos = 0.0f;
 	flLastPos = 0.0f;
-	for ( int i = 0; i < nCount - 1; ++i )
+	for ( intp i = 0; i < nCount - 1; ++i )
 	{
 		SplitterInfo_t &info = m_Splitters[i];
 		if ( info.m_bLocked )
@@ -596,8 +596,8 @@ void Splitter::SetSplitterPosition( int nIndex, int nPos )
 int Splitter::ComputeLockedSize( int nStartingIndex )
 {
 	int nLockedSize = 0;
-	int nCount = m_Splitters.Count();
-	for ( int i = nStartingIndex; i < nCount; ++i )
+	intp nCount = m_Splitters.Count();
+	for ( intp i = nStartingIndex; i < nCount; ++i )
 	{
 		if ( m_Splitters[i].m_bLocked )
 		{
@@ -669,13 +669,13 @@ void Splitter::ApplyUserConfigSettings(KeyValues *userConfig)
 	BaseClass::ApplyUserConfigSettings( userConfig );
 
 	// read the splitter sizes
-	int c = m_Splitters.Count();
+	intp c = m_Splitters.Count();
 	float *pFractions = (float*)_alloca( c * sizeof(float) );
 	float flTotalSize = 0.0f;
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		char name[128];
-		V_sprintf_safe(name, "%d_splitter_pos", i);
+		V_sprintf_safe(name, "%zd_splitter_pos", i);
 		pFractions[i] = userConfig->GetFloat( name, flTotalSize + SPLITTER_HANDLE_WIDTH + 1 );
 		flTotalSize = pFractions[i];
 	}
@@ -683,7 +683,7 @@ void Splitter::ApplyUserConfigSettings(KeyValues *userConfig)
 	if ( flTotalSize != 0.0f )
 	{
 		int nPosRange = GetPosRange();
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
 			pFractions[i] /= flTotalSize;
 			m_Splitters[i].m_flPos = pFractions[i] * nPosRange;
@@ -699,11 +699,11 @@ void Splitter::GetUserConfigSettings(KeyValues *userConfig)
 	BaseClass::GetUserConfigSettings( userConfig );
 
 	// save which columns are hidden
-	int c = m_Splitters.Count();
-	for ( int i = 0 ; i < c; i++ )
+	intp c = m_Splitters.Count();
+	for ( intp i = 0 ; i < c; i++ )
 	{
 		char name[128];
-		V_sprintf_safe(name, "%d_splitter_pos", i);
+		V_sprintf_safe(name, "%zd_splitter_pos", i);
 		userConfig->SetFloat( name, m_Splitters[i].m_flPos );
 	}
 }

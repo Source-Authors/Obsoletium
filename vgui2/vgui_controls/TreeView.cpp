@@ -15,7 +15,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/MouseCode.h>
 
 #include <vgui_controls/TreeView.h>
@@ -2652,7 +2652,7 @@ void TreeView::RemoveSelectedItem( int itemIndex )
 
 	TreeNode *sel = m_NodeList[ itemIndex ];
 	Assert( sel );
-	int slot = m_SelectedItems.Find( sel );
+	intp slot = m_SelectedItems.Find( sel );
 	if ( slot != m_SelectedItems.InvalidIndex() )
 	{
 		m_SelectedItems.Remove( slot );
@@ -2684,7 +2684,7 @@ void TreeView::AddSelectedItem( int itemIndex, bool clearCurrentSelection, bool 
 	}
 
 	// Item 0 is most recently selected!!!
-	int slot = m_SelectedItems.Find( sel );
+	intp slot = m_SelectedItems.Find( sel );
 	if ( slot == m_SelectedItems.InvalidIndex() )
 	{
 		m_SelectedItems.AddToHead( sel );
