@@ -344,6 +344,7 @@ public:
 	const char *GetParticleSystemNameFromIndex( ParticleSystemHandle_t iIndex );
 
 	// Return the number of particle systems in our dictionary
+	// dimhotepus: intp -> UtlSymId_t
 	UtlSymId_t GetParticleSystemCount( void );
 
 	// call to get available particle operator definitions
