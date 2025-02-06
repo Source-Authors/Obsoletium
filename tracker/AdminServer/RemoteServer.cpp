@@ -53,7 +53,7 @@ void CRemoteServer::Initialize()
 //-----------------------------------------------------------------------------
 void CRemoteServer::ConnectRemoteGameServer(unsigned int ip, unsigned short port, const char *password)
 {
-	assert(!("CRemoteServer::ConnectRemoteGameServer() not yet implemented"));
+	Assert(!("CRemoteServer::ConnectRemoteGameServer() not yet implemented"));
 }
 
 //-----------------------------------------------------------------------------
