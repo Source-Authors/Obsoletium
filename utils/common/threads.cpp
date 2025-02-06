@@ -231,7 +231,8 @@ void RunThreadsOn(int workcnt, qboolean showpacifier, RunThreadsFn fn,
 
   if (pacifier) {
     EndPacifier(false);
-    printf(" (%.2f)\n", end - start);
+    // dimhotepus: Fix formatting.
+    Msg(" (%.2fs)", end - start);
     // dimhotepus: Add new line on end.
     Msg("\n");
   }
