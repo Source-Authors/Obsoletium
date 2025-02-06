@@ -10,7 +10,7 @@
 #include "vgui/ISurface.h"
 #include "vgui_controls/Label.h"
 #include "ivprofexport.h"
-#include "convar.h"
+#include "tier1/convar.h"
 #include "mathlib/mathlib.h"
 
 // NOTE: This has to be the last file included!

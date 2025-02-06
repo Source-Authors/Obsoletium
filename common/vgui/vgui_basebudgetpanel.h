@@ -16,7 +16,7 @@
 #include <vgui/IScheme.h>
 #include "vgui_budgethistorypanel.h"
 #include "vgui_budgetbargraphpanel.h"
-#include "utlsymbol.h"
+#include "tier1/utlsymbol.h"
 //#include "hudelement.h"
 
 
