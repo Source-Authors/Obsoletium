@@ -16,7 +16,7 @@
 #include "vtf/vtf.h"
 #include "pixelwriter.h"
 #include "tier3/tier3.h"
-#include "platform.h"
+#include "tier0/platform.h"
 
 #include "videoservices.h"
 #include "video_macros.h"

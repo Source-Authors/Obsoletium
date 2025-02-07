@@ -20,7 +20,7 @@
 #include "vtf/vtf.h"
 #include "pixelwriter.h"
 #include "tier2/tier2.h"
-#include "platform.h"
+#include "tier0/platform.h"
 #include "bink_material.h"
 
 #include "bink/include/bink.h"
