@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "interface.h"
+#include "tier1/interface.h"
 #include "milesbase.h"
 #include "vaudio/ivaudio.h"
-#include "dbg.h"
+#include "tier0/dbg.h"
 
 #ifndef SRC_USE_MILES_MP3
 // Strip MP1 / MP2 to reduce attack surface.
