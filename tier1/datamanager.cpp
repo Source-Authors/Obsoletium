@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "datamanager.h"
+#include "tier1/datamanager.h"
 
 #include "tier0/basetypes.h"
 

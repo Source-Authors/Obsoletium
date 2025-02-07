@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 
-#include "checksum_md5.h"
+#include "tier1/checksum_md5.h"
 
 #include "tier0/basetypes.h"
 #include "tier0/commonmacros.h"

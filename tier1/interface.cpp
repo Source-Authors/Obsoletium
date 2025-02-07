@@ -3,7 +3,7 @@
 // Purpose: 
 //
 //===========================================================================//
-#include "interface.h"
+#include "tier1/interface.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"

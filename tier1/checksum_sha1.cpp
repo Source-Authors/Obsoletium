@@ -22,7 +22,7 @@
 */
 
 #if !defined(_MINIMUM_BUILD_)
-#include "checksum_sha1.h"
+#include "tier1/checksum_sha1.h"
 #include <cstring>
 #else
 //

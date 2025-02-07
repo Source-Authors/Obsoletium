@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include "checksum_crc.h"
+#include "tier1/checksum_crc.h"
 
 #include "tier0/basetypes.h"
 #include "tier0/platform.h"

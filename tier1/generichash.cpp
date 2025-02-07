@@ -5,7 +5,7 @@
 //
 //=============================================================================
 
-#include "generichash.h"
+#include "tier1/generichash.h"
 
 #include <ctype.h>
 #include <cstdlib>

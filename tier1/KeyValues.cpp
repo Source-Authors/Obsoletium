@@ -13,7 +13,7 @@
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
 #endif
 
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 
 #include <cstdlib>
 
@@ -24,12 +24,12 @@
 #include "Color.h"
 #include "tier0/dbg.h"
 #include "tier0/mem.h"
-#include "utlbuffer.h"
-#include "utlhash.h"
-#include "utlvector.h"
-#include "utlqueue.h"
-#include "UtlSortVector.h"
-#include "convar.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlhash.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlqueue.h"
+#include "tier1/UtlSortVector.h"
+#include "tier1/convar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include "byteswap.h"
+#include "tier1/byteswap.h"
 
 #ifdef CByteswap
 #undef CByteswap

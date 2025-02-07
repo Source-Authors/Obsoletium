@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include "tokenreader.h"
+#include "tier1/tokenreader.h"
 
 #include <cctype>
 #include <cstdio>

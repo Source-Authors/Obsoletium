@@ -6,7 +6,7 @@
 
 #include "tier1/ilocalize.h"
 
-#include "utlstring.h"
+#include "tier1/utlstring.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: converts an english string to unicode

@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "bitbuf.h"
+#include "tier1/bitbuf.h"
 #include "coordsize.h"
 #include "mathlib/vector.h"
 #include "mathlib/mathlib.h"

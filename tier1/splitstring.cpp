@@ -4,8 +4,8 @@
 //
 //==================================================================================================
 
-#include "strtools.h"
-#include "utlvector.h"
+#include "tier1/strtools.h"
+#include "tier1/utlvector.h"
 
 CSplitString::CSplitString(const char *pString, const char **pSeparators, intp nSeparators)
 {
