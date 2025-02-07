@@ -4,6 +4,7 @@
 //
 //=============================================================================//
 
+#include "map_utils.h"
 #include "mathlib/vector.h"
 #include "bspfile.h"
 

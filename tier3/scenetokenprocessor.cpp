@@ -4,12 +4,12 @@
 //
 //=============================================================================
 
+#include "../game/shared/iscenetokenprocessor.h"
 #include "../game/shared/choreoscene.h"
 #include "../game/shared/choreoactor.h"
 #include "../game/shared/choreochannel.h"
 #include "../game/shared/choreoevent.h"
-#include "../game/shared/iscenetokenprocessor.h"
-#include "characterset.h"
+#include "tier1/characterset.h"
 
 
 //-----------------------------------------------------------------------------
