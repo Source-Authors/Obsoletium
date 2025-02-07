@@ -14,9 +14,9 @@
 
 
 #include "datamap.h"
-#include "utlmap.h"
+#include "tier1/utlmap.h"
 #include "isaverestore.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 
 //-------------------------------------

@@ -11,7 +11,7 @@
 
 #include "vphysics_interface.h"
 #include "ivu_types.hxx"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 class IVP_Environment;
 class CSleepObjects;

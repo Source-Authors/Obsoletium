@@ -9,11 +9,9 @@
 #include "physics_vehicle.h"
 
 #include "ivp_material.hxx"
-#include <ctype.h>
-#include "utlsymbol.h"
+#include "tier1/utlsymbol.h"
 #include "tier1/strtools.h" 
 #include "vcollide_parse_private.h"
-#include "ctype.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -13,7 +13,7 @@
 #include <ivp_compact_surface.hxx>
 #include <ivp_compact_ledge.hxx>
 
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 #include "ledgewriter.h"
 
 // gets the max vertex index referenced by a compact ledge
