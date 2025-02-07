@@ -15,7 +15,7 @@ using HFONT = struct HFONT__*;
 using HDC = struct HDC__*;
 using HBITMAP = struct HBITMAP__*;
 
-#include "utlrbtree.h"
+#include "tier1/utlrbtree.h"
 #include "tier1/utlsymbol.h"
 
 struct newChar_t;

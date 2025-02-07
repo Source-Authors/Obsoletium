@@ -26,8 +26,8 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "filesystem.h"
 #include <vgui/VGUI.h>
 #include <Color.h>
-#include "utlbuffer.h"
-#include "utlvector.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlvector.h"
 #include "Clip2D.h"
 #include <vgui_controls/Panel.h>
 #include <vgui/IInput.h>
