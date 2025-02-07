@@ -1391,8 +1391,8 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				// which returns KEY_ENTER from virtual keys, and KEY_PAD_ENTER from scan codes
 				// Since things like vgui care about virtual keys; we're going to
 				// put both scan codes in the input message
-				ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( wParam );
-				ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( lParam );
+				ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( static_cast<int>(wParam) );
+				ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( static_cast<int>(lParam) );
 				PostButtonPressedEvent( IE_ButtonPressed, m_nLastSampleTick, scanCode, virtualCode );
 
 				// Post ETW events describing key presses to help correlate input events to performance
@@ -1423,8 +1423,8 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_SYSKEYUP:
 		{
 			// Don't handle key ups if the key's already up. This can happen when we alt-tab back to the engine.
-			ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( wParam );
-			ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( lParam );
+			ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( static_cast<int>(wParam) );
+			ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( static_cast<int>(lParam) );
 			PostButtonReleasedEvent( IE_ButtonReleased, m_nLastSampleTick, scanCode, virtualCode );
 		}
 		break;
