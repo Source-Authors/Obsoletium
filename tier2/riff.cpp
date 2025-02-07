@@ -5,66 +5,11 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include "riff.h"
-#include <stdio.h>
-#include <string.h>
+#include "tier2/riff.h"
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: Test code that implements the interface on stdio
-//-----------------------------------------------------------------------------
-class StdIOReadBinary : public IFileReadBinary
-{
-public:
-	intp open( const char *pFileName )
-	{
-		return (intp)fopen( pFileName, "rb" );
-	}
-
-	int read( void *pOutput, int size, intp file )
-	{
-		FILE *fp = (FILE *)file;
-
-		return fread( pOutput, size, 1, fp );
-	}
-
-	void seek( intp file, int pos )
-	{
-		fseek( (FILE *)file, pos, SEEK_SET );
-	}
-
-	unsigned int tell( intp file )
-	{
-		return ftell( (FILE *)file );
-	}
-
-	unsigned int size( intp file )
-	{
-		FILE *fp = (FILE *)file;
-		if ( !fp )
-			return 0;
-
-		unsigned int pos = ftell( fp );
-		fseek( fp, 0, SEEK_END );
-		unsigned int size = ftell( fp );
-
-		fseek( fp, pos, SEEK_SET );
-		return size;
-	}
-
-	void close( intp file )
-	{
-		FILE *fp = (FILE *)file;
-
-		fclose( fp );
-	}
-};
-#endif
-
 
 #define RIFF_ID MAKEID('R','I','F','F')
 

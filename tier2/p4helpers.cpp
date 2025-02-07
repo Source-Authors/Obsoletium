@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "p4helpers.h"
+#include "tier2/p4helpers.h"
 #include "tier2/tier2.h"
 // dimhotepus: No perforce
 // #include "p4lib/ip4.h"

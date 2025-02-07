@@ -4,8 +4,8 @@
 //
 //===========================================================================//
 
-#include <tier0/platform.h>
 #include <tier2/tier2.h>
+#include <tier0/platform.h>
 #include <filesystem_init.h>
 
 

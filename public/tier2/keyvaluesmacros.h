@@ -2,6 +2,8 @@
 //
 //==================================================================================================
 
+#ifndef SE_TIER2_KEYVALUESMACROS_H_
+#define SE_TIER2_KEYVALUESMACROS_H_
 #pragma once
 
 
@@ -10,6 +12,8 @@
 // * matches any characters, ? matches any single character, otherwise case insensitive matching
 //--------------------------------------------------------------------------------------------------
 bool GlobMatch( const char *pszGlob, const char *pszString );
+
+class KeyValues;
 
 //--------------------------------------------------------------------------------------------------
 // Processes #insert and #update KeyValues macros
@@ -20,3 +24,5 @@ bool GlobMatch( const char *pszGlob, const char *pszString );
 // KeyValues as necessary
 //--------------------------------------------------------------------------------------------------
 KeyValues *HandleKeyValuesMacros( KeyValues *kv, KeyValues *pkvParent = nullptr );
+
+#endif  // SE_TIER2_KEYVALUESMACROS_H_

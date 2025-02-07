@@ -2,10 +2,9 @@
 //
 //==================================================================================================
 
-
+#include "tier2/keyvaluesmacros.h"
 #include "filesystem.h"
 #include "tier1/KeyValues.h"
-#include "tier2/keyvaluesmacros.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

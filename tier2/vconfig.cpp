@@ -4,13 +4,9 @@
 //
 //===========================================================================//
 
-#include "vconfig.h"
+#include "tier2/vconfig.h"
 
 #ifdef _WIN32
-#include <direct.h>
-#include <io.h> // _chmod
-#include <process.h>
-
 #include "winlite.h"
 #endif
 
