@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include <stdlib.h>
+#include "tier0/basetypes.h"
 
 // helper functions for parsing unicode file buffers
 ucs2 *AdvanceOverWhitespace(ucs2 *start);

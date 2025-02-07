@@ -5,6 +5,8 @@
 #ifndef SRC_FILESYSTEM_HELPERS_H_
 #define SRC_FILESYSTEM_HELPERS_H_
 
+#include "tier0/annotations.h"
+
 struct characterset_t;
 
 // Don't call this directly.  You should (as long as your destination is an array) be
