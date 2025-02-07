@@ -15,7 +15,7 @@
 #include "mathlib/vector.h"
 #include "mathlib/mathlib.h"
 #include "s3tc_decode.h"
-#include "vprof_telemetry.h"
+#include "tier0/vprof_telemetry.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
