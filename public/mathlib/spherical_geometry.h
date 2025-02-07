@@ -13,8 +13,7 @@
 #pragma once
 #endif
 
-#include <math.h>
-#include <float.h>
+#include "mathlib/vector.h"
 
 // see https://mathworld.wolfram.com/SphericalTrigonometry.html
 

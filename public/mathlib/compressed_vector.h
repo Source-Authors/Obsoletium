@@ -13,14 +13,14 @@
 #pragma once
 #endif
 
-#include <math.h>
-#include <float.h>
+#include <cmath>
+#include <cfloat>
 
 // For vec_t, put this somewhere else?
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 
 // For rand(). We really need a library!
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "tier0/dbg.h"
 #include "mathlib/vector.h"

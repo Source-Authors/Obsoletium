@@ -8,9 +8,7 @@
 #ifndef QUANTIZE_H
 #define QUANTIZE_H
 
-#ifndef STRING_H
-#include <string.h>
-#endif
+#include <cstring>
 
 #define MAXDIMS 768
 #define MAXQUANT 16000

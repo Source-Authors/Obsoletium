@@ -7,10 +7,9 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-#include <math.h>
-#include "basetypes.h"
-#include "mathlib/vector.h"
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
+#include "mathlib/vector.h"
 
 
 // The following code is the c-ification of Ken Perlin's new noise algorithm

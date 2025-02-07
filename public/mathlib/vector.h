@@ -15,7 +15,6 @@
 
 #include <DirectXMath.h>
 
-#include <cfloat>
 #include <cstdlib>  // rand
 
 #include "tier0/basetypes.h"  // vec_t

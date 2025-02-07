@@ -15,7 +15,6 @@
 
 #include <DirectXMath.h>
 
-#include <cfloat>
 #include <cmath>
 #include <cstdlib>  // rand
 

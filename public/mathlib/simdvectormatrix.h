@@ -15,7 +15,6 @@
 #endif
 
 
-#include <string.h>
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier1/utlsoacontainer.h"
