@@ -10,6 +10,8 @@
 #pragma once
 #endif
 
+#include "vgui/KeyCode.h"
+
 namespace vgui
 {
 
@@ -32,12 +34,15 @@ public:
 	void			KeyDown( vgui::KeyCode code );
 	void			KeyUp( vgui::KeyCode code );
 	vgui::KeyCode	KeyRepeated();
-	void			SetKeyRepeatTime( vgui::KeyCode code, float flRepeat );
+	// dimhotepus: float -> double.
+	void			SetKeyRepeatTime( vgui::KeyCode code, double flRepeat );
 
 private:
 	bool			m_bAliasDown[MAX_JOYSTICKS][FM_NUM_KEYREPEAT_ALIASES];
-	float			m_flRepeatTimes[FM_NUM_KEYREPEAT_ALIASES];
-	float			m_flNextKeyRepeat[MAX_JOYSTICKS];
+	// dimhotepus: float -> double.
+	double			m_flRepeatTimes[FM_NUM_KEYREPEAT_ALIASES];
+	// dimhotepus: float -> double.
+	double			m_flNextKeyRepeat[MAX_JOYSTICKS];
 	bool			m_bHaveKeyDown;
 };
 

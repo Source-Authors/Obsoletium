@@ -31,9 +31,9 @@ public:
 	CKeyRepeatHandler()
 	{
 		Reset();
-		for ( int i = 0; i < FM_NUM_KEYREPEAT_ALIASES; i++ )
+		for ( auto &t : m_flRepeatTimes )
 		{
-			m_flRepeatTimes[i] = 0.16;
+			t = 0.16;
 		}
 	}
 
@@ -41,7 +41,7 @@ public:
 	void		KeyDown( vgui::KeyCode code );
 	void		KeyUp( vgui::KeyCode code );
 	vgui::KeyCode	KeyRepeated( void );
-	void		SetKeyRepeatTime( vgui::KeyCode code, float flRepeat );
+	void		SetKeyRepeatTime( vgui::KeyCode code, double flRepeat );
 
 private:
 	int			GetIndexForCode( vgui::KeyCode code )

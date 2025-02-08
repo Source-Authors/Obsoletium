@@ -90,7 +90,7 @@ vgui::KeyCode CKeyRepeatHandler::KeyRepeated( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CKeyRepeatHandler::SetKeyRepeatTime( vgui::KeyCode code, float flRepeat )
+void CKeyRepeatHandler::SetKeyRepeatTime( vgui::KeyCode code, double flRepeat )
 {
 	int iIndex = GetIndexForCode(code);
 	Assert( iIndex != -1 );

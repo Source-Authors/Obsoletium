@@ -139,10 +139,10 @@ void CLeaderboardDialog::ApplySettings( KeyValues *pResourceData )
 {
 	BaseClass::ApplySettings( pResourceData );
 
-	m_KeyRepeat.SetKeyRepeatTime( KEY_XBUTTON_DOWN, 0.05f );
-	m_KeyRepeat.SetKeyRepeatTime( KEY_XSTICK1_DOWN, 0.05f );
-	m_KeyRepeat.SetKeyRepeatTime( KEY_XBUTTON_UP, 0.05f );
-	m_KeyRepeat.SetKeyRepeatTime( KEY_XSTICK1_UP, 0.05f );
+	m_KeyRepeat.SetKeyRepeatTime( KEY_XBUTTON_DOWN, 0.05 );
+	m_KeyRepeat.SetKeyRepeatTime( KEY_XSTICK1_DOWN, 0.05 );
+	m_KeyRepeat.SetKeyRepeatTime( KEY_XBUTTON_UP, 0.05 );
+	m_KeyRepeat.SetKeyRepeatTime( KEY_XSTICK1_UP, 0.05 );
 }
 
 //----------------------------------------------------------
