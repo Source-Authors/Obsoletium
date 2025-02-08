@@ -2388,7 +2388,7 @@ void CVTFTexture::GenerateHemisphereMap( unsigned char *pSphereMapBitsRGBA, int 
 //-----------------------------------------------------------------------------
 static void FixCubeMapFacing( unsigned char* pImage, int cubeFaceID, int size, ImageFormat fmt )
 {
-	int retVal;	
+	[[maybe_unused]] int retVal;
 	switch( cubeFaceID )
 	{
 	case CUBEMAP_FACE_RIGHT:	// +x
