@@ -39,7 +39,7 @@ inline void RangeCheck( const T &value, int, int )
 #endif
 }
 
-inline void RangeCheck( const Vector &value, int minValue, int maxValue )
+inline void RangeCheck( [[maybe_unused]] const Vector &value, [[maybe_unused]] int minValue, [[maybe_unused]] int maxValue )
 {
 #ifdef _DEBUG
 	RangeCheck( value.x, minValue, maxValue );

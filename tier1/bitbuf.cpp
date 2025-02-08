@@ -24,14 +24,14 @@
 #pragma intrinsic(_BitScanReverse)
 #pragma intrinsic(_BitScanForward)
 
-[[nodiscard]] static inline unsigned CountLeadingZeros(unsigned x)
+[[nodiscard]] [[maybe_unused]] static inline unsigned CountLeadingZeros(unsigned x)
 {
 	unsigned long firstBit;
 	if ( _BitScanReverse(&firstBit,x) )
 		return 31 - firstBit;
 	return CHAR_BIT * sizeof(unsigned);
 }
-[[nodiscard]] static inline unsigned CountTrailingZeros(unsigned elem)
+[[nodiscard]] [[maybe_unused]] static inline unsigned CountTrailingZeros(unsigned elem)
 {
 	unsigned long out;
 	if ( _BitScanForward(&out, elem) )

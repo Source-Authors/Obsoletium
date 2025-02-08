@@ -349,7 +349,7 @@ inline size_t MemAlloc_GetSizeAligned( void *pMemBlock )
 class CMemAllocAttributeAlloction
 {
 public:
-	CMemAllocAttributeAlloction( const char *pszFile, int line ) 
+	CMemAllocAttributeAlloction( [[maybe_unused]] const char *pszFile, [[maybe_unused]] int line ) 
 	{
 		MemAlloc_PushAllocDbgInfo( pszFile, line );
 	}

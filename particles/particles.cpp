@@ -2889,7 +2889,7 @@ public:
 	virtual void TraceLine( const Vector& vecAbsStart,
 							const Vector& vecAbsEnd, unsigned int mask, 
 							const class IHandleEntity *ignore,
-							int collisionGroup, CBaseTrace *ptr )
+							[[maybe_unused]] int collisionGroup, CBaseTrace *ptr )
 	{
 		ptr->fraction = 1.0;								// no hit
 	}
@@ -2898,7 +2898,7 @@ public:
 		CParticleCollection *pParticles,
 		int nControlPointNumber, 
 		int nNumPtsOut,
-		float flBBoxScale,
+		[[maybe_unused]] float flBBoxScale,
 		int nNumTrysToGetAPointInsideTheModel,
 		Vector *pPntsOut,
 		Vector vecDirectionBias,
@@ -3740,7 +3740,7 @@ void CParticleSystemMgr::DumpProfileInformation( void )
 #endif
 }
 
-void CParticleSystemMgr::CommitProfileInformation( bool bCommit )
+void CParticleSystemMgr::CommitProfileInformation( [[maybe_unused]] bool bCommit )
 {
 #if MEASURE_PARTICLE_PERF
 	if ( 1 )
@@ -3853,7 +3853,7 @@ void IParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 	CParticleCollection *pParticles,
 	int nControlPointNumber, 
 	int nNumPtsOut,
-	float flBBoxScale,
+	[[maybe_unused]] float flBBoxScale,
 	int nNumTrysToGetAPointInsideTheModel,
 	Vector *pPntsOut,
 	Vector vecDirectionalBias,

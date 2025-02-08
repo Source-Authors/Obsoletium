@@ -2893,7 +2893,7 @@ void *KeyValues::operator new( size_t iAllocSize )
 	return KeyValuesSystem()->AllocKeyValuesMemory( (int)iAllocSize );
 }
 
-void *KeyValues::operator new( size_t iAllocSize, int, const char *pFileName, int nLine )
+void *KeyValues::operator new( size_t iAllocSize, int, [[maybe_unused]] const char *pFileName, [[maybe_unused]] int nLine )
 {
 	MemAlloc_PushAllocDbgInfo( pFileName, nLine );
 	void *p = KeyValuesSystem()->AllocKeyValuesMemory( (int)iAllocSize );
@@ -2914,7 +2914,7 @@ void KeyValues::operator delete( void *pMem, int, const char *, int )
 	KeyValuesSystem()->FreeKeyValuesMemory(pMem);
 }
 
-void KeyValues::UnpackIntoStructure( KeyValuesUnpackStructure const *pUnpackTable, void *pDest, size_t DestSizeInBytes )
+void KeyValues::UnpackIntoStructure( KeyValuesUnpackStructure const *pUnpackTable, void *pDest, [[maybe_unused]] size_t DestSizeInBytes )
 {
 #ifdef DBGFLAG_ASSERT
 	void *pDestEnd = ( char * )pDest + DestSizeInBytes + 1;

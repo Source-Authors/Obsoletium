@@ -1103,7 +1103,7 @@ bool ConVar::GetCompMax( float& maxVal ) const
 // Input  : maxVal - 
 // Output : true if the value was successfully updated, otherwise false.
 //-----------------------------------------------------------------------------
-bool ConVar::SetCompetitiveMode( bool bCompetitive )
+bool ConVar::SetCompetitiveMode( [[maybe_unused]] bool bCompetitive )
 {
 	// Should only do this for competitive restricted things.
 	Assert( IsCompetitiveRestricted() );

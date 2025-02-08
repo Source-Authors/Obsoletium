@@ -45,7 +45,7 @@ template<class T,class V> static inline void AddToHead(T * & head, V * node)
    head=node;
 }  
 
-void Fail(char const *msg)
+void Fail([[maybe_unused]] char const *msg)
 {
 	AssertMsg(0, "%s", msg);
 }

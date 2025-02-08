@@ -55,7 +55,7 @@ static bool DoesSequenceLoop( CStudioHdr *pStudioHdr, int nSequence )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPoseParameters, bool bCheckOnly )
+bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPoseParameters, bool )
 {
 	int iSequence = LookupSequence( pStudioHdr, e->GetParameters() );
 	if ( iSequence < 0 )

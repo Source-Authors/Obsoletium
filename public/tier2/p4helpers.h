@@ -59,7 +59,7 @@ public:
 	virtual bool Edit( void ) { return true; }
 	virtual bool Add( void ) { return true; }
 	virtual bool IsFileInPerforce() { return false; }
-	virtual bool SetFileType(const CUtlString& desiredFileType) { return true; }
+	virtual bool SetFileType(const CUtlString&) { return true; }
 };
 
 

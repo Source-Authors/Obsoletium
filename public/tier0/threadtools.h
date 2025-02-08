@@ -1704,7 +1704,7 @@ inline bool CThreadMutex::AssertOwnedByCurrentThread() const
 
 //---------------------------------------------------------
 
-inline void CThreadMutex::SetTrace( bool bTrace )
+inline void CThreadMutex::SetTrace( [[maybe_unused]] bool bTrace )
 {
 #ifdef THREAD_MUTEX_TRACING_ENABLED
 	m_bTrace = bTrace;

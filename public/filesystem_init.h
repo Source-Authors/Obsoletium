@@ -226,7 +226,7 @@ void FileSystem_ClearSteamEnvVars();
 template <int outSize>
 [[nodiscard]] bool Q_getwd(char (&out)[outSize])
 {
-	[[nodiscard]] bool Q_getwd(char *out, int outSize);
+	[[nodiscard]] bool Q_getwd(char *out, int size);
 	return Q_getwd( out, outSize );
 }
 

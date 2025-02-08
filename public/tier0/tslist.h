@@ -91,7 +91,11 @@ union TSLIST_HEAD_ALIGN TSLHead_t
 // Basic lock free stack.
 class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT> {
  public:
-  CTSListBase() : head_{TSLHead_t{nullptr, 0}} {
+  CTSListBase() : head_{TSLHead_t{{nullptr, 0, 0
+#ifdef PLATFORM_64BITS
+	  , 0
+#endif
+  }}} {
     if (((size_t)&head_) % TSLIST_HEAD_ALIGNMENT != 0) {
       Error("CTSListBase: Misaligned list head.\n");
     }

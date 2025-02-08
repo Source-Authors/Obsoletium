@@ -161,7 +161,7 @@ char *RestoreFilename( const char *pSourceName, char *pTargetName, intp targetLe
 // pass the address of any data that the callback function may need to access. This function
 // is ONLY to be called by caller's who expect to have 360 versions of their file.
 //-----------------------------------------------------------------------------
-int UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, const char *pPathID, CreateCallback_t pfnCreate, bool bForce, void *pExtraData )
+int UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, [[maybe_unused]] const char *pPathID, [[maybe_unused]] CreateCallback_t pfnCreate, [[maybe_unused]] bool bForce, [[maybe_unused]] void *pExtraData )
 {
 	if ( pTargetName )
 	{

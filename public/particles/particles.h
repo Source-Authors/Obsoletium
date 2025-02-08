@@ -619,23 +619,23 @@ public:
 
 
 	// emitters over-ride this. Return a mask of what fields you initted
-	virtual uint32 Emit( CParticleCollection *pParticles, float flOpCurStrength,
-						 void *pContext ) const
+	virtual uint32 Emit( CParticleCollection *, float,
+						 void * ) const
 	{
 		return 0;
 	}
 
 	// emitters over-ride this. 
-	virtual void StopEmission( CParticleCollection *pParticles, void *pContext, bool bInfiniteOnly = false ) const
+	virtual void StopEmission( CParticleCollection *, void *, [[maybe_unused]] bool bInfiniteOnly = false ) const
 	{
 	}
-	virtual void StartEmission( CParticleCollection *pParticles, void *pContext, bool bInfiniteOnly = false ) const
+	virtual void StartEmission( CParticleCollection *, void *, [[maybe_unused]] bool bInfiniteOnly = false ) const
 	{
 	}
-	virtual void Restart( CParticleCollection *pParticles, void *pContext ) {}
+	virtual void Restart( CParticleCollection *, void * ) {}
 
 	// initters over-ride this
-	virtual void InitParticleSystem( CParticleCollection *pParticles, void *pContext ) const
+	virtual void InitParticleSystem( CParticleCollection *, void * ) const
 	{
 	}
 
@@ -688,7 +688,7 @@ public:
 	}
 
 	// particle-initters over-ride this
-	virtual void InitNewParticlesScalar( CParticleCollection *pParticles, int nFirstParticle, int n_particles, int attribute_write_mask, void *pContext ) const
+	virtual void InitNewParticlesScalar( CParticleCollection *pParticles, int nFirstParticle, int n_particles, [[maybe_unused]] int attribute_write_mask, void *pContext ) const
 	{
 	}
 

@@ -2671,10 +2671,10 @@ void XM_CALLCONV Kochanek_Bartels_Spline_NormalizeX(
 }
 
 void XM_CALLCONV Cubic_Spline(
-	const Vector &p1,
+	[[maybe_unused]] const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
-	const Vector &p4,
+	[[maybe_unused]] const Vector &p4,
 	float t, 
 	Vector& output )
 {
@@ -2809,7 +2809,7 @@ void XM_CALLCONV Parabolic_Spline(
 	const Vector &p1,
 	const Vector &p2,
 	const Vector &p3,
-	const Vector &p4,
+	[[maybe_unused]] const Vector &p4,
 	float t, 
 	Vector& output )
 {

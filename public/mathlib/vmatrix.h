@@ -362,8 +362,7 @@ inline void MatrixTranslate( VMatrix& dst, const Vector &translation )
 	dst = temp;
 }
 
-inline [[nodiscard]] DirectX::XMMATRIX MatrixBuildTranslation( float x, float y, float z )
-{
+[[nodiscard]] inline DirectX::XMMATRIX MatrixBuildTranslation(float x, float y, float z) {
 	DirectX::XMMATRIX dst = DirectX::XMMatrixIdentity();
 
 	dst.r[0] = DirectX::XMVectorSetW( dst.r[0], x );
@@ -377,7 +376,7 @@ inline [[nodiscard]] DirectX::XMMATRIX MatrixBuildTranslation( float x, float y,
 void MatrixBuildRotationAboutAxis( VMatrix& dst, const Vector& vAxisOfRot, float angleDegrees );
 void MatrixBuildRotateZ( VMatrix& dst, float angleDegrees );
 
-inline [[nodiscard]] DirectX::XMMATRIX MatrixBuildRotateZ( float angleDegrees )
+[[nodiscard]] inline DirectX::XMMATRIX MatrixBuildRotateZ( float angleDegrees )
 {
 	float fSin, fCos;
 	DirectX::XMScalarSinCos( &fSin, &fCos, DEG2RAD( angleDegrees ) );

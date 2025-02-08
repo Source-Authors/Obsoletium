@@ -31,7 +31,7 @@
 
 
 
-inline int InternalCheckDeclareClass( const char *pClassName, const char *pClassNameMatch, void *pTestPtr, void *pBasePtr )
+inline int InternalCheckDeclareClass( [[maybe_unused]] const char *pClassName, [[maybe_unused]] const char *pClassNameMatch, [[maybe_unused]] void *pTestPtr, [[maybe_unused]] void *pBasePtr )
 {
 	// This makes sure that casting from ThisClass to BaseClass works right. You'll get a compiler error if it doesn't
 	// work at all, and you'll get a runtime error if you use multiple inheritance.

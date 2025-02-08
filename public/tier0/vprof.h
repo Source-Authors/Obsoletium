@@ -897,7 +897,7 @@ inline void CVProfile::Stop()
 
 //-------------------------------------
 
-inline void CVProfile::EnterScope( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, bool bAssertAccounted, int budgetFlags )
+inline void CVProfile::EnterScope( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, [[maybe_unused]] bool bAssertAccounted, int budgetFlags )
 {
 	if ( ( m_enabled != 0 || !m_fAtRoot ) && InTargetThread() ) // if became disabled, need to unwind back to root before stopping
 	{

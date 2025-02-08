@@ -172,19 +172,19 @@ inline float GetComponent( const T &value, int i )
 	return 0.0f;
 }
 
-template <> inline float GetComponent( const bool &value, int i )
+template <> inline float GetComponent( const bool &value, [[maybe_unused]] int i )
 {
 	Assert( i == 0 );
 	return value ? 1.0f : 0.0f;
 }
 
-template <> inline float GetComponent( const int &value, int i )
+template <> inline float GetComponent( const int &value, [[maybe_unused]] int i )
 {
 	Assert( i == 0 );
 	return float( value );
 }
 
-template <> inline float GetComponent( const float &value, int i )
+template <> inline float GetComponent( const float &value, [[maybe_unused]] int i )
 {
 	Assert( i == 0 );
 	return value;

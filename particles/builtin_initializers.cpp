@@ -215,7 +215,7 @@ void C_INIT_CreateOnModel::InitNewParticlesScalar(
 }
 		
 
-static inline void RandomPointOnUnitSphere( int nRandContext, FourVectors &out )
+[[maybe_unused]] static inline void RandomPointOnUnitSphere( int nRandContext, FourVectors &out )
 {
 	// generate 4 random points on the unit sphere. uses Marsaglia (1972) method from
 	// https://mathworld.wolfram.com/SpherePointPicking.html
