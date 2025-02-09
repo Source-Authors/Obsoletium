@@ -354,6 +354,7 @@ void V_strncpy( OUT_Z_CAP(maxLenInChars) char *pDest, const char *pSrc, ptrdiff_
 // Ultimate safe strcpy function, for arrays only -- buffer size is inferred by the compiler
 template <ptrdiff_t maxLenInChars> void V_strcpy_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], const char *pSrc ) 
 { 
+	Assert(V_strlen(pSrc) < maxLenInChars);
 	V_strncpy( pDest, pSrc, maxLenInChars ); 
 }
 
@@ -367,28 +368,29 @@ inline char *V_strdup( const char *pSrc )
 }
 
 void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const *pSrc, ptrdiff_t maxLenInBytes );
-template <size_t maxLenInChars> void V_wcscpy_safe( OUT_Z_ARRAY wchar_t (&pDest)[maxLenInChars], wchar_t const *pSrc ) 
-{ 
-	V_wcsncpy( pDest, pSrc, maxLenInChars * sizeof(*pDest) ); 
+template <ptrdiff_t maxLenInChars> void V_wcscpy_safe( OUT_Z_ARRAY wchar_t (&pDest)[maxLenInChars], wchar_t const *pSrc ) 
+{
+	Assert(V_wcslen(pSrc) < maxLenInChars);
+	V_wcsncpy( pDest, pSrc, maxLenInChars * static_cast<std::ptrdiff_t>(sizeof(*pDest)) ); 
 }
 
 #define COPY_ALL_CHARACTERS -1
 char *V_strncat( INOUT_Z_CAP(cchDest) char *pDest, const char *pSrc, size_t cchDest, ptrdiff_t max_chars_to_copy=COPY_ALL_CHARACTERS );
-template <size_t cchDest> char *V_strcat_safe( INOUT_Z_ARRAY char (&pDest)[cchDest], const char *pSrc, ptrdiff_t nMaxCharsToCopy=COPY_ALL_CHARACTERS )
-{ 
+template <ptrdiff_t cchDest> char *V_strcat_safe( INOUT_Z_ARRAY char (&pDest)[cchDest], const char *pSrc, ptrdiff_t nMaxCharsToCopy=COPY_ALL_CHARACTERS )
+{
 	return V_strncat( pDest, pSrc, cchDest, nMaxCharsToCopy ); 
 }
 
 wchar_t *V_wcsncat( INOUT_Z_CAP(cchDest) wchar_t *pDest, const wchar_t *pSrc, size_t cchDest, ptrdiff_t nMaxCharsToCopy=COPY_ALL_CHARACTERS );
-template <size_t cchDest> wchar_t *V_wcscat_safe( INOUT_Z_ARRAY wchar_t (&pDest)[cchDest], const wchar_t *pSrc, ptrdiff_t nMaxCharsToCopy=COPY_ALL_CHARACTERS )
+template <ptrdiff_t cchDest> wchar_t *V_wcscat_safe( INOUT_Z_ARRAY wchar_t (&pDest)[cchDest], const wchar_t *pSrc, ptrdiff_t nMaxCharsToCopy=COPY_ALL_CHARACTERS )
 { 
 	return V_wcsncat( pDest, pSrc, cchDest, nMaxCharsToCopy ); 
 }
 
 char *V_strnlwr( INOUT_Z_CAP(cchBuf) char *pBuf, size_t cchBuf);
-template <size_t cchDest> char *V_strlwr_safe( INOUT_Z_ARRAY char (&pBuf)[cchDest] )
+template <ptrdiff_t cchDest> char *V_strlwr_safe( INOUT_Z_ARRAY char (&pBuf)[cchDest] )
 { 
-	return _V_strnlwr( pBuf, (ptrdiff_t)cchDest ); 
+	return _V_strnlwr( pBuf, cchDest ); 
 }
 
 // Unicode string conversion policies - what to do if an illegal sequence is encountered
