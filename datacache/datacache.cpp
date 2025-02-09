@@ -218,6 +218,8 @@ bool CDataCacheSection::AddEx( DataCacheClientID_t clientId, const void *pItemDa
 	}
 
 	NoteAdd( size );
+	// dimhotepus: resource created already locked (true).
+	NoteLock( size );
 
 	OnAdd( clientId, (DataCacheHandle_t)hMem );
 
@@ -232,7 +234,8 @@ bool CDataCacheSection::AddEx( DataCacheClientID_t clientId, const void *pItemDa
 
 	g_iDontForceFlush--;
 
-	m_LRU.UnlockResource( hMem );
+	// dimhotepus: unlock locked resource if needed and update status.
+	Unlock( hMem );
 
 	return true;
 }
@@ -523,6 +526,16 @@ void *CDataCacheSection::FrameLock( DataCacheHandle_t handle )
 			int iThread = pFrameLock->m_iThread;
 			if ( pItem->pNextFrameLocked[iThread] == DC_NO_NEXT_LOCKED )
 			{
+				// dimhotepus: Fix status by incrementing locked on first time lock.
+				// Lock below increments status stats on first lock (count = 1), but
+				// LockResource above already incremented lock counter and second
+				// LockResource inside Lock will increment it further (count = 2) 
+				// even for first time lock.
+				if ( m_LRU.LockCount( handle ) == 1 )
+				{
+					NoteLock( pItem->size );
+				}
+
 				pItem->pNextFrameLocked[iThread] = pFrameLock->m_pFirst;
 				pFrameLock->m_pFirst = pItem;
 				Lock( handle );

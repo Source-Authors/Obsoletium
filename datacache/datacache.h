@@ -189,7 +189,7 @@ private:
 	unsigned			m_options;
 	CDataCache *		m_pSharedCache;
 	char				szName[DC_MAX_CLIENT_NAME + 1];
-	CTSListWithFreeList<FrameLock_t*> m_FreeFrameLocks;
+	CTSSimpleList<FrameLock_t> m_FreeFrameLocks;
 
 protected:
 	CThreadFastMutex &	m_mutex;
@@ -330,18 +330,31 @@ inline DataCacheItem_t *CDataCacheSection::AccessItem( memhandle_t hCurrent )
 
 inline void CDataCacheSection::NoteSizeChanged( size_t oldSize, size_t newSize )
 {
-	intp nBytes = ( newSize - oldSize );
+	// dimhotepus: Correctly update status if size decreased.
+	if (newSize >= oldSize)
+	{
+		size_t nBytes = newSize - oldSize;
+		ThreadInterlockedExchangeAdd( &m_status.nBytes, nBytes );
+		ThreadInterlockedExchangeAdd( &m_status.nBytesLocked, nBytes );
 
-	m_status.nBytes += nBytes;
-	m_status.nBytesLocked += nBytes;
-	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytes, nBytes );
-	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, nBytes );
+		ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytes, nBytes );
+		ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, nBytes );
+	}
+	else
+	{
+		size_t nBytes = oldSize - newSize;
+		ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytes, -static_cast<intp>(nBytes) );
+		ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytesLocked, -static_cast<intp>(nBytes) );
+
+		ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytes, -static_cast<intp>(nBytes) );
+		ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytesLocked, -static_cast<intp>(nBytes) );
+	}
 }
 
 inline void CDataCacheSection::NoteAdd( size_t size )
 {
-	m_status.nBytes += size;
-	m_status.nItems++;
+	ThreadInterlockedExchangeAdd( &m_status.nBytes, size );
+	ThreadInterlockedIncrement( &m_status.nItems );
 
 	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytes, size );
 	ThreadInterlockedIncrement( &m_pSharedCache->m_status.nItems );
@@ -349,8 +362,8 @@ inline void CDataCacheSection::NoteAdd( size_t size )
 
 inline void CDataCacheSection::NoteRemove( size_t size )
 {
-	m_status.nBytes -= size;
-	m_status.nItems--;
+	ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytes, -static_cast<intp>(size) );
+	ThreadInterlockedDecrement( &m_status.nItems );
 
 	ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytes, -static_cast<intp>(size) );
 	ThreadInterlockedDecrement( &m_pSharedCache->m_status.nItems );
@@ -358,8 +371,8 @@ inline void CDataCacheSection::NoteRemove( size_t size )
 
 inline void CDataCacheSection::NoteLock( size_t size )
 {
-	m_status.nBytesLocked += size;
-	m_status.nItemsLocked++;
+	ThreadInterlockedExchangeAdd( &m_status.nBytesLocked, size );
+	ThreadInterlockedIncrement( &m_status.nItemsLocked );
 
 	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, size );
 	ThreadInterlockedIncrement( &m_pSharedCache->m_status.nItemsLocked );
@@ -367,8 +380,12 @@ inline void CDataCacheSection::NoteLock( size_t size )
 
 inline void CDataCacheSection::NoteUnlock( size_t size )
 {
-	m_status.nBytesLocked -= size;
-	m_status.nItemsLocked--;
+	// dimhotepus: Check sizes are consistent.
+	Assert(m_status.nBytesLocked >= size);
+	Assert(m_status.nItemsLocked > 0);
+
+	ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytesLocked, -static_cast<intp>(size) );
+	ThreadInterlockedDecrement( &m_status.nItemsLocked );
 
 	ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytesLocked, -static_cast<intp>(size) );
 	ThreadInterlockedDecrement( &m_pSharedCache->m_status.nItemsLocked );
