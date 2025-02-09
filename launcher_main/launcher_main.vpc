@@ -41,17 +41,17 @@ $Configuration
 
 	$PreBuildEvent [$WIN32]
 	{
-		$CommandLine		"if EXIST $OUTBINDIR\hl2.exe for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIR\hl2.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
+		$CommandLine		"if EXIST $QUOTE$OUTBINDIR\hl2.exe$QUOTE for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIR\hl2.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
 							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
-							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$QUOTE$(TargetFileName)" "\n" \
+							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
 							"$CRCCHECK"
 	}
 
 	$PreBuildEvent [$WIN64]
 	{
-		$CommandLine		"if EXIST $OUTBINDIRX64\hl2_win64.exe for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIRX64\hl2_win64.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
+		$CommandLine		"if EXIST $QUOTE$OUTBINDIRX64\hl2_win64.exe$QUOTE for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIRX64\hl2_win64.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
 							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
-							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$QUOTE$(TargetFileName)" "\n" \
+							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
 							"$CRCCHECK"
 	}
 

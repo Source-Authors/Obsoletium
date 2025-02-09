@@ -25,7 +25,7 @@ $Configuration "Debug"
 	{
 		// General
 		$OutputDirectory					"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME"
-		$IntermediateDirectory				"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\\$PROJECTNAME\i"
+		$IntermediateDirectory				"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i"
 		$ExtensionsToDeleteOnClean
 		$BuildLogFile
 		$InheritedProjectPropertySheets
