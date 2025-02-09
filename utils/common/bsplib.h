@@ -194,7 +194,6 @@ extern int			g_PhysDispSize;
 
 // Embedded pack/pak file
 IZip				*GetPakFile( void );
-IZip				*GetSwapPakFile( void );
 void				ClearPakFile( IZip *pak );
 void				AddFileToPak( IZip *pak, const char *pRelativeName, const char *fullpath, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
 void				AddBufferToPak( IZip *pak, const char *pRelativeName, void *data, int length, bool bTextMode, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
@@ -238,7 +237,7 @@ public:
 	GameLumpId_t		GetGameLumpId( GameLumpHandle_t handle );
 	unsigned short		GetGameLumpFlags( GameLumpHandle_t handle );
 	unsigned short		GetGameLumpVersion( GameLumpHandle_t handle );
-	void				ComputeGameLumpSizeAndCount( int& size, int& clumpCount );
+	void				ComputeGameLumpSizeAndCount( intp& size, intp& clumpCount );
 	void				ParseGameLump( dheader_t* pHeader );
 	void				SwapGameLump( GameLumpId_t id, unsigned short version, byte *dest, byte *src, int size );
 
@@ -247,7 +246,7 @@ public:
 	// Game lump accessor methods 
 	//-----------------------------------------------------------------------------
 	void*	GetGameLump( GameLumpHandle_t handle );
-	int		GameLumpSize( GameLumpHandle_t handle );
+	intp	GameLumpSize( GameLumpHandle_t handle );
 
 
 	//-----------------------------------------------------------------------------
@@ -275,7 +274,8 @@ extern CByteswap	g_Swap;
 //-----------------------------------------------------------------------------
 // Helper for the bspzip tool
 //-----------------------------------------------------------------------------
-void ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName );
+// dimhotepus: Signal errors.
+bool ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName );
 
 
 //-----------------------------------------------------------------------------
@@ -287,10 +287,14 @@ intp					TexDataStringTable_AddOrFindString( const char *pString );
 void	DecompressVis (byte *in, byte *decompressed);
 int		CompressVis (byte *vis, byte *dest);
 
-void	OpenBSPFile( const char *filename );
-void	CloseBSPFile(void);
-void	LoadBSPFile( const char *filename );
-void	LoadBSPFile_FileSystemOnly( const char *filename );
+// dimhotepus: Make stateless. Return header for open file. Call CloseBSPFile when done.
+[[nodiscard]] dheader_t* OpenBSPFile( const char *filename );
+// dimhotepus: Make stateless. Call when done.
+void CloseBSPFile(dheader_t *header);
+// dimhotepus: Signal errors.
+bool	LoadBSPFile( const char *filename );
+// dimhotepus: Signal errors.
+bool	LoadBSPFile_FileSystemOnly( const char *filename );
 bool	LoadBSPFileTexinfo( const char *filename );
 void	WriteBSPFile( const char *filename, char *pUnused = NULL );
 void	PrintBSPFileSizes(void);
