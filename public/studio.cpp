@@ -835,13 +835,12 @@ const studiohdr_t *CStudioHdr::GroupStudioHdr( int i )
 {
 	if ( m_nFrameUnlockCounter != *m_pFrameUnlockCounter )
 	{
-		m_FrameUnlockCounterMutex.Lock();
+		AUTO_LOCK(m_FrameUnlockCounterMutex);
 		if ( *m_pFrameUnlockCounter != m_nFrameUnlockCounter ) // i.e., this thread got the mutex
 		{
 			memset( m_pStudioHdrCache.Base(), 0, m_pStudioHdrCache.Count() * sizeof(studiohdr_t *) );
 			m_nFrameUnlockCounter = *m_pFrameUnlockCounter;
 		}
-		m_FrameUnlockCounterMutex.Unlock();
 	}
 
 	if ( !m_pStudioHdrCache.IsValidIndex( i ) )
