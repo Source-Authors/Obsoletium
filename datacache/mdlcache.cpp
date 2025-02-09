@@ -140,41 +140,6 @@ DEFINE_FIXEDSIZE_ALLOCATOR_MT( studiodata_t, 128, CUtlMemoryPool::GROW_SLOW );
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-class CTempAllocHelper
-{
-public:
-	CTempAllocHelper()
-	{
-		m_pData = NULL;
-	}
-
-	~CTempAllocHelper()
-	{
-		Free();
-	}
-
-	void *Get()
-	{
-		return m_pData;
-	}
-
-	void Alloc( int nSize )
-	{
-		m_pData = malloc( nSize );
-	}
-
-	void Free()
-	{
-		if ( m_pData )
-		{
-			free( m_pData );
-			m_pData = NULL;
-		}
-	}
-private:
-	void *m_pData;
-};
-
 //-----------------------------------------------------------------------------
 // ConVars
 //-----------------------------------------------------------------------------
@@ -1633,27 +1598,6 @@ bool CMDLCache::BuildHardwareData( MDLHandle_t handle, studiodata_t *pStudioData
 		return false;
 	}
 
-	CTempAllocHelper pOriginalData;
-	if ( IsX360() )
-	{
-		unsigned char *pInputData = (unsigned char *)pVtxHdr + sizeof( OptimizedModel::FileHeader_t );
-		if ( CLZMA::IsCompressed( pInputData ) )
-		{
-			// vtx arrives compressed, decode and cache the results
-			unsigned int nOriginalSize = CLZMA::GetActualSize( pInputData );
-			pOriginalData.Alloc( sizeof( OptimizedModel::FileHeader_t ) + nOriginalSize );
-			V_memcpy( pOriginalData.Get(), pVtxHdr, sizeof( OptimizedModel::FileHeader_t ) );
-			unsigned int nOutputSize = CLZMA::Uncompress( pInputData, sizeof( OptimizedModel::FileHeader_t ) + (unsigned char *)pOriginalData.Get() );
-			if ( nOutputSize != nOriginalSize )
-			{
-				// decoder failure
-				return false;
-			}
-
-			pVtxHdr = (OptimizedModel::FileHeader_t *)pOriginalData.Get();
-		}
-	}
-
 	MdlCacheMsg( "MDLCache: Load studiomdl %s\n", pStudioHdr->pszName() );
 
 	Assert( GetVertexData( handle ) );
@@ -1993,28 +1937,6 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 	{
 		DevWarning( "Failed to load %s!\n", pMDLFileName );
 		return false;
-	}
-
-	if ( IsX360() )
-	{
-		if ( CLZMA::IsCompressed( (unsigned char *)buf.PeekGet() ) )
-		{
-			// mdl arrives compressed, decode and cache the results
-			unsigned int nOriginalSize = CLZMA::GetActualSize( (unsigned char *)buf.PeekGet() );
-			void *pOriginalData = malloc( nOriginalSize );
-			unsigned int nOutputSize = CLZMA::Uncompress( (unsigned char *)buf.PeekGet(), (unsigned char *)pOriginalData );
-			if ( nOutputSize != nOriginalSize )
-			{
-				// decoder failure
-				free( pOriginalData );
-				return false;
-			}
-
-			// replace caller's buffer
-			buf.Purge();
-			buf.Put( pOriginalData, nOriginalSize );
-			free( pOriginalData );
-		}
 	}
 
 	studiohdr_t *pStudioHdr = (studiohdr_t*)buf.PeekGet();
@@ -3149,29 +3071,8 @@ vertexFileHeader_t *CMDLCache::BuildAndCacheVertexData( studiohdr_t *pStudioHdr,
 	Assert( pRawVvdHdr->numLODs );
 	if ( !pRawVvdHdr->numLODs )
 	{
-		return NULL;
-	}
-
-	CTempAllocHelper pOriginalData;
-	if ( IsX360() )
-	{
-		unsigned char *pInput = (unsigned char *)pRawVvdHdr + sizeof( vertexFileHeader_t );
-		if ( CLZMA::IsCompressed( pInput ) )
-		{
-			// vvd arrives compressed, decode and cache the results
-			unsigned int nOriginalSize = CLZMA::GetActualSize( pInput );
-			pOriginalData.Alloc( sizeof( vertexFileHeader_t ) + nOriginalSize );
-			V_memcpy( pOriginalData.Get(), pRawVvdHdr, sizeof( vertexFileHeader_t ) );
-			unsigned int nOutputSize = CLZMA::Uncompress( pInput, sizeof( vertexFileHeader_t ) + (unsigned char *)pOriginalData.Get() );
-			if ( nOutputSize != nOriginalSize )
-			{
-				// decoder failure
 				return NULL;
 			}
-
-			pRawVvdHdr = (vertexFileHeader_t *)pOriginalData.Get();
-		}
-	}
 
 	bool bNeedsTangentS = IsX360() || (g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80);
 	int rootLOD = min( (int)pStudioHdr->rootLOD, pRawVvdHdr->numLODs - 1 );
