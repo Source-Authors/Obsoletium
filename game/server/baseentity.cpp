@@ -2592,7 +2592,11 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 		{
 			// the only case where this is valid is if this entity is an attached ragdoll.
 			// So assert here to catch the non-ragdoll case.
-			Assert( 0 );
+			AssertMsg( child->GetOwnerEntity() == this,
+				"Our child '%s' has owner '%s' is not us '%s'.",
+				child->GetDebugName(),
+				child->GetOwnerEntity() ? child->GetOwnerEntity()->GetDebugName() : "<null>",
+				GetDebugName() );
 		}
 
 		if ( child->FirstMoveChild() )
