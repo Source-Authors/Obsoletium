@@ -383,13 +383,16 @@ int CDataCacheSection::Unlock( DataCacheHandle_t handle )
 	{
 		AssertMsg( AccessItem( (memhandle_t)handle ) != NULL, "Attempted to unlock nonexistent cache entry" );
 		size_t nBytesUnlocked = 0;
-		m_mutex.Lock();
-		iNewLockCount = m_LRU.UnlockResource( (memhandle_t)handle );
+
+		{
+			AUTO_LOCK(m_mutex);
+			iNewLockCount = m_LRU.UnlockResource( handle );
 		if ( iNewLockCount == 0 )
 		{
-			nBytesUnlocked = AccessItem( (memhandle_t)handle )->size;
+				nBytesUnlocked = AccessItem( handle )->size;
 		}
-		m_mutex.Unlock();
+		}
+
 		if ( nBytesUnlocked )
 		{
 			NoteUnlock( nBytesUnlocked );
