@@ -1057,7 +1057,8 @@ void Voice_UserDesiresStop()
 	}
 	else
 	{
-		VoiceRecord_Stop();
+		// dimhotepus: Need to stop recording AND write results, not just stop recording.
+		Voice_RecordStop();
 	}
 }
 
