@@ -169,9 +169,10 @@ void *CDataManagerBase::LockResource( memhandle_t handle )
 			m_memoryLists.Unlink( m_lruList, memoryIndex );
 			m_memoryLists.LinkToTail( m_lockList, memoryIndex );
 		}
-		Assert(m_memoryLists[memoryIndex].lockCount != (unsigned short)-1);
-		m_memoryLists[memoryIndex].lockCount++;
-		return m_memoryLists[memoryIndex].pStore;
+		auto &mem = m_memoryLists[memoryIndex];
+		Assert(mem.lockCount != (unsigned short)-1);
+		mem.lockCount++;
+		return mem.pStore;
 	}
 
 	return nullptr;
@@ -184,11 +185,12 @@ int CDataManagerBase::UnlockResource( memhandle_t handle )
 	unsigned short memoryIndex = FromHandle(handle);
 	if ( memoryIndex != m_memoryLists.InvalidIndex() )
 	{
-		Assert( m_memoryLists[memoryIndex].lockCount > 0 );
-		if ( m_memoryLists[memoryIndex].lockCount > 0 )
+		auto &mem = m_memoryLists[memoryIndex];
+		Assert( mem.lockCount > 0 );
+		if ( mem.lockCount > 0 )
 		{
-			m_memoryLists[memoryIndex].lockCount--;
-			if ( m_memoryLists[memoryIndex].lockCount == 0 )
+			--mem.lockCount;
+			if ( mem.lockCount == 0 )
 			{
 				m_memoryLists.Unlink( m_lockList, memoryIndex );
 				m_memoryLists.LinkToTail( m_lruList, memoryIndex );
