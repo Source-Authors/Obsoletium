@@ -1366,10 +1366,13 @@ void CDataCache::OutputItemReport( memhandle_t hItem )
 //-----------------------------------------------------------------------------
 intp CDataCache::FindSectionIndex( const char *pszSection )
 {
-	for ( intp i = 0; i < m_Sections.Count(); i++ )
+	intp i = 0;
+	for ( auto &s : m_Sections )
 	{
-		if ( stricmp( m_Sections[i]->GetName(), pszSection ) == 0 )
+		if ( stricmp( s->GetName(), pszSection ) == 0 )
 			return i;
+
+		++i;
 	}
 	return m_Sections.InvalidIndex();
 }
