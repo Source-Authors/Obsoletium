@@ -155,7 +155,7 @@ IServerGameTags *serverGameTags = NULL;
 //			ft2 - 
 // Output : int
 //-----------------------------------------------------------------------------
-int Sys_CompareFileTime( long ft1, long ft2 )
+int Sys_CompareFileTime( time_t ft1, time_t ft2 )
 {
 	if ( ft1 < ft2 )
 	{
