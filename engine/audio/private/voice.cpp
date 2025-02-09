@@ -1177,9 +1177,9 @@ int Voice_GetCompressedData(char *pchDest, int nCount, bool bFinal)
 		if(g_pMicInputFileData)
 		{
 			double curtime = Plat_FloatTime();
-			int nShouldGet = (curtime - g_MicStartTime) * Voice_SamplesPerSec();
-			gotten = min(sizeof(tempData)/BYTES_PER_SAMPLE,
-			             (size_t)min(nShouldGet, (g_nMicInputFileBytes - g_CurMicInputFileByte) / BYTES_PER_SAMPLE));
+			int nShouldGet = static_cast<int>((curtime - g_MicStartTime) * Voice_SamplesPerSec());
+			gotten = min(static_cast<int>(sizeof(tempData))/BYTES_PER_SAMPLE,
+			             min(nShouldGet, (g_nMicInputFileBytes - g_CurMicInputFileByte) / BYTES_PER_SAMPLE));
 			memcpy(tempData, &g_pMicInputFileData[g_CurMicInputFileByte], gotten*BYTES_PER_SAMPLE);
 			g_CurMicInputFileByte += gotten * BYTES_PER_SAMPLE;
 			g_MicStartTime = curtime;
