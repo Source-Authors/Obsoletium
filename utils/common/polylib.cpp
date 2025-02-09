@@ -174,7 +174,7 @@ vec_t WindingArea(winding_t *w)
 		CrossProduct (d1, d2, cross);
 		total += VectorLength ( cross );
 	}
-	return total * 0.5;
+	return total * 0.5f;
 }
 
 void WindingBounds (winding_t *w, Vector &mins, Vector &maxs)
@@ -212,7 +212,7 @@ void WindingCenter (winding_t *w, Vector &center)
 	for (i=0 ; i<w->numpoints ; i++)
 		VectorAdd (w->p[i], center, center);
 
-	scale = 1.0/w->numpoints;
+	scale = 1.0f/w->numpoints;
 	VectorScale (center, scale, center);
 }
 
@@ -243,15 +243,15 @@ vec_t WindingAreaAndBalancePoint( winding_t *w, Vector &center )
 		total += area;
 
 		// center of triangle, weighed by area
-		VectorMA( center, area / 3.0, w->p[i-1], center );
-		VectorMA( center, area / 3.0, w->p[i], center );
-		VectorMA( center, area / 3.0, w->p[0], center );
+		VectorMA( center, area / 3.0f, w->p[i-1], center );
+		VectorMA( center, area / 3.0f, w->p[i], center );
+		VectorMA( center, area / 3.0f, w->p[0], center );
 	}
 	if (total)
 	{
-		VectorScale( center, 1.0 / total, center );
+		VectorScale( center, 1.0f / total, center );
 	}
-	return total * 0.5;
+	return total * 0.5f;
 }
 
 /*
