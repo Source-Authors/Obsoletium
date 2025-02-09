@@ -54,7 +54,8 @@ CreateInterfaceFn CmdLib_GetFileSystemFactory();
 extern int myargc;
 extern char **myargv;
 
-int Q_filelength(FileHandle_t f);
+// dimhotepus: int -> unsigned for file length.
+unsigned Q_filelength(FileHandle_t f);
 time_t FileTime(char *path);
 
 void Q_mkdir(char *path);

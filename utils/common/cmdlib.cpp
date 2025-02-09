@@ -88,7 +88,7 @@ char *CmdLib_FGets(char *pOut, int outSize, FileHandle_t hFile) {
 
     pOut[it] = c;
     if (c == '\n') break;
-    }
+  }
 
   pOut[it] = '\0';
   return pOut;
@@ -313,7 +313,7 @@ void CmdLib_Cleanup() {
 }
 
 void CmdLib_Exit(int exitCode) {
-    // dimhotepus: ExitProcess -> exit.
+  // dimhotepus: ExitProcess -> exit.
   exit(exitCode);
 }
 
@@ -504,7 +504,8 @@ int CheckParm(char *check) {
   return 0;
 }
 
-int Q_filelength(FileHandle_t f) { return g_pFileSystem->Size(f); }
+// dimhotepus: int -> unsigned for file length.
+unsigned Q_filelength(FileHandle_t f) { return g_pFileSystem->Size(f); }
 
 FileHandle_t SafeOpenWrite(const char *filename) {
   FileHandle_t f = g_pFileSystem->Open(filename, "wb");
@@ -629,7 +630,8 @@ qboolean FileExists(const char *filename) {
 }
 
 int LoadFile(const char *filename, void **bufferptr) {
-  int length = 0;
+  // dimhotepus: int -> unsigned for file length.
+  unsigned length = 0;
 
   FileHandle_t f = SafeOpenRead(filename);
   if (f) {
