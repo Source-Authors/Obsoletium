@@ -1576,9 +1576,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 
 	m_PresentParameters.Windowed = info.m_bWindowed;
 	m_PresentParameters.SwapEffect = info.m_bUsingMultipleWindows ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
-
-	// for 360, we want to create it ourselves for hierarchical z support
-	m_PresentParameters.EnableAutoDepthStencil = IsX360() ? FALSE : TRUE; 
+	m_PresentParameters.EnableAutoDepthStencil = TRUE;
 
 	// What back-buffer format should we use?
 	ImageFormat backBufferFormat = FindNearestSupportedBackBufferFormat( nAdapter,
@@ -1591,11 +1589,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		// always stencil for dx9/hdr
 		m_bUsingStencil = true;
 	}
-#if defined( _X360 )
-	D3DFORMAT nDepthFormat = ReverseDepthOnX360() ? D3DFMT_D24FS8 : D3DFMT_D24S8;
-#else
 	D3DFORMAT nDepthFormat = m_bUsingStencil ? D3DFMT_D24S8 : D3DFMT_D24X8;
-#endif
 	m_PresentParameters.AutoDepthStencilFormat = FindNearestSupportedDepthFormat( 
 		nAdapter, m_AdapterFormat, backBufferFormat, nDepthFormat );
 	m_PresentParameters.hDeviceWindow = (VD3DHWND)hWnd;
@@ -1606,24 +1600,18 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	case D3DFMT_D24S8:
 		m_iStencilBufferBits = 8;
 		break;
-#if defined( _X360 )
-	case D3DFMT_D24FS8:
-		m_iStencilBufferBits = 8;
-		break;
-#else
 	case D3DFMT_D24X4S4:
 		m_iStencilBufferBits = 4;
 		break;
 	case D3DFMT_D15S1:
 		m_iStencilBufferBits = 1;
 		break;
-#endif
 	default:
 		m_iStencilBufferBits = 0;
 		m_bUsingStencil = false; //couldn't acquire a stencil buffer
 	};
 
-	if ( IsX360() || !info.m_bWindowed )
+	if ( !info.m_bWindowed )
 	{
 		bool useDefault = ( info.m_DisplayMode.m_nWidth == 0 ) || ( info.m_DisplayMode.m_nHeight == 0 );
 		m_PresentParameters.BackBufferCount = 1;
@@ -2172,9 +2160,6 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAd
 
 	if ( !FAILED( hr ) && pD3DDevice )
 		return pD3DDevice;
-
-	if ( !IsPC() )
-		return NULL;
 
 	// try again, other applications may be taking their time
 	ThreadSleep( 1000 );
