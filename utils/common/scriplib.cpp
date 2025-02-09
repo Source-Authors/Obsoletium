@@ -948,15 +948,15 @@ class CScriptLib final : public IScriptLib
 public:
 	bool ReadFileToBuffer( const char *pSourceName, CUtlBuffer &buffer, bool bText = false, bool bNoOpenFailureWarning = false ) override;
 	bool WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer, DiskWriteMode_t writeMode ) override;
-	int	FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList ) override;
-	char *MakeTemporaryFilename( char const *pchModPath, char *pPath, int pathSize ) override;
+	intp FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList ) override;
+	char *MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize ) override;
 	void DeleteTemporaryFiles( const char *pFileMask ) override;
 	int CompareFileTime( const char *pFilenameA, const char *pFilenameB ) override;
 	bool DoesFileExist( const char *pFilename ) override;
 
 private:
 
-	int GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList );
+	intp GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList );
 	void RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector< CUtlString > &dirList );
 };
 
@@ -1081,16 +1081,18 @@ int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB 
 //-----------------------------------------------------------------------------
 // Make a temporary filename
 //-----------------------------------------------------------------------------
-char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, int pathSize )
+char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize )
 {
 	char *pBuffer = _tempnam( pchModPath, "mgd_" );
 	if ( pBuffer[0] == '\\' )
 	{
 		pBuffer++;
 	}
-	if ( pBuffer[strlen( pBuffer )-1] == '.' )
+	auto len = V_strlen( pBuffer )-1;
+
+	if ( pBuffer[len] == '.' )
 	{
-		pBuffer[strlen( pBuffer )-1] = '\0';
+		pBuffer[len] = '\0';
 	}
 	V_snprintf( pPath, pathSize, "%s.tmp", pBuffer );
 
@@ -1133,7 +1135,7 @@ void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 //-----------------------------------------------------------------------------
 // Purpose: Get list of files from current path that match pattern
 //-----------------------------------------------------------------------------
-int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList )
+intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList )
 {
 	char	sourcePath[MAX_PATH];
 	char	fullPath[MAX_PATH];
@@ -1274,7 +1276,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 {
 	// recurse from source directory, get directories only
 	CUtlVector< fileList_t > fileList;
-	int dirCount = GetFileList( pDirPath, "\\", fileList );
+	intp dirCount = GetFileList( pDirPath, "\\", fileList );
 	if ( !dirCount )
 	{
 		// add directory name to search tree
@@ -1283,7 +1285,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 		return;
 	}
 
-	for ( int i=0; i<dirCount; i++ )
+	for ( intp i=0; i<dirCount; i++ )
 	{
 		// form new path name, recurse into
 		RecurseFileTree_r( fileList[i].fileName.String(), depth+1, dirList );
@@ -1296,7 +1298,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 //-----------------------------------------------------------------------------
 // Purpose: Generate a list of file matching mask
 //-----------------------------------------------------------------------------
-int CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList )
+intp CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList )
 {
 	char	dirPath[MAX_PATH];
 	char	pattern[MAX_PATH];
