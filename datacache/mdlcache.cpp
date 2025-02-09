@@ -2227,8 +2227,9 @@ void CMDLCache::BeginLock()
 //-----------------------------------------------------------------------------
 void CMDLCache::EndLock()
 {
-	m_pModelCacheSection->EndFrameLocking();
+	// dimhotepus: reorder in FIFO order to ensure no deadlocks.
 	m_pMeshCacheSection->EndFrameLocking();
+	m_pModelCacheSection->EndFrameLocking();
 }
 
 
@@ -2237,20 +2238,7 @@ void CMDLCache::EndLock()
 //-----------------------------------------------------------------------------
 void CMDLCache::BreakFrameLock( bool bModels, bool bMesh )
 {
-	if ( bModels )
-	{
-		if ( m_pModelCacheSection->IsFrameLocking() )
-		{
-			Assert( !m_nModelCacheFrameLocks );
-			m_nModelCacheFrameLocks = 0;
-			do
-			{
-				m_nModelCacheFrameLocks++;
-			} while ( m_pModelCacheSection->EndFrameLocking() );
-		}
-
-	}
-
+	// dimhotepus: reorder in FIFO order to ensure no deadlocks.
 	if ( bMesh )
 	{
 		if ( m_pMeshCacheSection->IsFrameLocking() )
@@ -2264,6 +2252,18 @@ void CMDLCache::BreakFrameLock( bool bModels, bool bMesh )
 		}
 	}
 
+	if ( bModels )
+	{
+		if ( m_pModelCacheSection->IsFrameLocking() )
+		{
+			Assert( !m_nModelCacheFrameLocks );
+			m_nModelCacheFrameLocks = 0;
+			do
+			{
+				m_nModelCacheFrameLocks++;
+			} while ( m_pModelCacheSection->EndFrameLocking() );
+		}
+	}
 }
 
 void CMDLCache::RestoreFrameLock()
@@ -3071,8 +3071,8 @@ vertexFileHeader_t *CMDLCache::BuildAndCacheVertexData( studiohdr_t *pStudioHdr,
 	Assert( pRawVvdHdr->numLODs );
 	if ( !pRawVvdHdr->numLODs )
 	{
-				return NULL;
-			}
+		return NULL;
+	}
 
 	bool bNeedsTangentS = IsX360() || (g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80);
 	int rootLOD = min( (int)pStudioHdr->rootLOD, pRawVvdHdr->numLODs - 1 );
