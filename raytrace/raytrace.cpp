@@ -4,7 +4,7 @@
 #include "raytrace.h"
 #include <filesystem_tools.h>
 #include <cmdlib.h>
-#include <stdio.h>
+#include <cstdio>
 
 static bool SameSign(float a, float b)
 {
@@ -596,7 +596,7 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 }
 
 
-int RayTracingEnvironment::MakeLeafNode(int first_tri, int last_tri)
+intp RayTracingEnvironment::MakeLeafNode(int first_tri, int last_tri)
 {
 	CacheOptimizedKDNode ret;
 	ret.Children=KDNODE_STATE_LEAF+(TriangleIndexList.Count()<<2);

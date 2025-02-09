@@ -346,7 +346,7 @@ public:
 	void FinishRayStream(RayStream &s);
 
 
-	int MakeLeafNode(int first_tri, int last_tri);
+	intp MakeLeafNode(int first_tri, int last_tri);
 
 
 	float CalculateCostsOfSplit(
