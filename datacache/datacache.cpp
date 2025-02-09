@@ -560,7 +560,7 @@ void *CDataCacheSection::FrameLock( DataCacheHandle_t handle )
 int CDataCacheSection::EndFrameLocking()
 {
 	FrameLock_t *pFrameLock = m_ThreadFrameLock.Get();
-	Assert( pFrameLock->m_iLock > 0 );
+	Assert( pFrameLock && pFrameLock->m_iLock > 0 );
 
 	if ( pFrameLock->m_iLock == 1 )
 	{
