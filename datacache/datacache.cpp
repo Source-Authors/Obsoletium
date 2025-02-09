@@ -79,7 +79,7 @@ CDataCacheSection::CDataCacheSection( CDataCache *pSharedCache, IDataCacheClient
 {
 	memset( &m_status, 0, sizeof(m_status) );
 	AssertMsg1( strlen(pszName) <= DC_MAX_CLIENT_NAME, "Cache client name too long \"%s\"", pszName );
-	Q_strncpy( szName, pszName, sizeof(szName) );
+	V_strcpy_safe( szName, pszName );
 
 	for ( int i = 0; i < DC_MAX_THREADS_FRAMELOCKED; i++ )
 	{
@@ -150,7 +150,8 @@ void CDataCacheSection::EnsureCapacity( size_t nBytes, size_t nItems )
 {
 	VPROF( "CDataCacheSection::EnsureCapacity" );
 
-	if ( m_limits.nMaxItems != (size_t)-1 || m_limits.nMaxBytes != (size_t)-1 )
+	if ( m_limits.nMaxItems != std::numeric_limits<size_t>::max() ||
+		 m_limits.nMaxBytes != std::numeric_limits<size_t>::max() )
 	{
 		size_t nNewSectionBytes = GetNumBytes() + nBytes;
 
@@ -192,7 +193,7 @@ bool CDataCacheSection::AddEx( DataCacheClientID_t clientId, const void *pItemDa
 
 	if ( ( m_options & DC_VALIDATE ) && Find( clientId ) )
 	{
-		Error( "Duplicate add to data cache\n" );
+		Error( "Duplicate add to data cache %zu\n", clientId );
 		return false;
 	}
 
