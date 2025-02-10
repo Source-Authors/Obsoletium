@@ -1085,9 +1085,13 @@ bool Voice_RecordStop()
 
 	if(g_pDecompressedFileData)
 	{
-		if (!WriteWaveFile(g_pDecompressedDataFilename, g_pDecompressedFileData, g_nDecompressedDataBytes, g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() ))
+		// dimhotepus: Write received voice data only if it is present.
+		if (g_nDecompressedDataBytes)
 		{
-			Warning("Unable to write decompressed voice file '%s'.\n", g_pUncompressedDataFilename);
+			if (!WriteWaveFile(g_pDecompressedDataFilename, g_pDecompressedFileData, g_nDecompressedDataBytes, g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() ))
+			{
+				Warning("Unable to write decompressed voice file '%s'.\n", g_pUncompressedDataFilename);
+			}
 		}
 
 		delete [] g_pDecompressedFileData;
