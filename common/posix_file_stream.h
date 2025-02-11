@@ -103,9 +103,9 @@ class posix_file_stream {
   [[nodiscard]] io_result<char*> gets(
       _Out_writes_z_(buffer_size) char (&buffer)[buffer_size]) const noexcept {
     char* string{fgets(buffer, buffer_size, fd_)};
-    return {string, string != nullptr
-                        ? posix_error_ok
-                        : make_posix_error_from_result(ferror(fd_), EIO)};
+    return {string, string != nullptr ? posix_error_ok
+                                      : internal::make_posix_error_from_result(
+                                            ferror(fd_), EIO)};
   }
 
   // Reads into |buffer| of size |buffer_size| |elements_count| elements.
