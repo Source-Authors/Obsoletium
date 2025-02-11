@@ -1167,7 +1167,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
   // Last argument is the file name
   const char *pFileName =
       CommandLine()->GetParm(CommandLine()->ParmCount() - 1);
-  CmdLib_InitFileSystem(pFileName);
+  const ScopedFileSystem scopedFileSystem(pFileName);
 
   if (CommandLine()->CheckParm("-portal")) {
     g_bReadPortals = 1;
