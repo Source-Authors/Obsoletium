@@ -383,7 +383,7 @@ void ReadPolyFileType(const char *name, int nList, BOOL drawLines) {
     c++;
   }
 
-  if (f) fclose(f);
+  fclose(f);
 
   glEndList();
 
@@ -621,7 +621,10 @@ void ReadPHYFile(const char *name, phyviewparams_t &params) {
 
   phyheader_t header;
   fread(&header, sizeof(header), 1, fp);
-  if (header.size != sizeof(header) || header.solidCount <= 0) return;
+  if (header.size != sizeof(header) || header.solidCount <= 0) {
+    fclose(fp);
+    return;
+  }
 
   int pos = ftell(fp);
   fseek(fp, 0, SEEK_END);
@@ -715,7 +718,7 @@ void ReadPortalFile(char *name) {
     c++;
   }
 
-  if (f) fclose(f);
+  fclose(f);
 
   glEndList();
 }
