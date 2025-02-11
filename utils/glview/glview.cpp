@@ -411,9 +411,9 @@ struct testlist_t {
 const float baselineTotal = 120.16f;
 const float baselineRay = 28.25f;
 const float baselineBox = 91.91f;
-#define IMPROVEMENT_FACTOR(x, baseline) (baseline / (x))
+#define IMPROVEMENT_FACTOR(x, baseline) ((baseline) / (x))
 #define IMPROVEMENT_PERCENT(x, baseline) \
-  (((baseline - (x)) / baseline) * 100.0f)
+  ((((baseline) - (x)) / (baseline)) * 100.0f)
 
 testlist_t g_Traces[NUM_COLLISION_TESTS];
 void Benchmark_PHY(const CPhysCollide *pCollide) {
