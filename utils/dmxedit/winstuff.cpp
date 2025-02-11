@@ -1,36 +1,28 @@
-//=============================================================================
+// Copyright Valve Corporation, All rights reserved.
 //
-//========= Copyright Valve Corporation, All rights reserved. ============//
-// The contents may be used and/or copied only with the written permission of
-// Valve, L.L.C., or in accordance with the terms and conditions stipulated in
-// the agreement/contract under which the contents have been supplied.
-//
-// $Header: $
-// $NoKeywords: $
-//
-// Some junk to isolate <windows.h> from polluting everything
-//
-//=============================================================================
+// Some junk to isolate <windows.h> from polluting everything.
 
 #ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "winlite.h"
 #endif // #ifdef WIN32
 
+namespace se::dmxedit {
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MyGetUserName( char *pszBuf, unsigned long *pBufSiz )
+bool MyGetUserName( char *pszBuf, unsigned long *pBufSiz )
 {
-	GetUserName( pszBuf, pBufSiz );
+	return !!GetUserName( pszBuf, pBufSiz );
 }
 
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MyGetComputerName( char *pszBuf, unsigned long *pBufSiz )
+bool MyGetComputerName( char *pszBuf, unsigned long *pBufSiz )
 {
-	GetComputerName( pszBuf, pBufSiz );
+	return !!GetComputerName( pszBuf, pBufSiz );
 }
+
+}  // namespace se::dmxedit
