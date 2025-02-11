@@ -691,6 +691,9 @@ void ReadPortalFile(char *name) {
 
   // Read in header
   fscanf(f, "%79s\n", szDummy);
+  // dimhotepus: Ensure zero-terminated read.
+  szDummy[ssize(szDummy) - 1] = '\0';
+
   fscanf(f, "%i\n", &nNumLeafs);
   fscanf(f, "%i\n", &nNumPortals);
 
