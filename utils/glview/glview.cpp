@@ -979,12 +979,12 @@ LRESULT WINAPI WCam_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
     } break;
 
     case WM_KEYDOWN:
-      KeyDown(wParam);
-      AppKeyDown(wParam);
+      KeyDown(static_cast<int>(wParam));
+      AppKeyDown(static_cast<int>(wParam));
       break;
 
     case WM_KEYUP:
-      AppKeyUp(wParam);
+      AppKeyUp(static_cast<int>(wParam));
       break;
 
     case WM_MBUTTONDOWN:
@@ -1212,5 +1212,5 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
   }
 
   /* return status of application */
-  return msg.wParam;
+  return static_cast<int>(msg.wParam);
 }
