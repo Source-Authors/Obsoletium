@@ -29,12 +29,12 @@ abstract_class CImportKeyValueBase : public IDmSerializer
 {
 public:
 	// Inherited from IDMSerializer
-	virtual bool StoresVersionInFile() const { return false; }
-	virtual bool IsBinaryFormat() const { return false; }
-	virtual bool Serialize( CUtlBuffer &buf, CDmElement *pRoot );
-	virtual bool Unserialize( CUtlBuffer &buf, const char *pEncodingName, int nEncodingVersion,
-							  const char *pSourceFormatName, int nSourceFormatVersion,
-							  DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot );
+	bool StoresVersionInFile() const override { return false; }
+	bool IsBinaryFormat() const override { return false; }
+	bool Serialize( CUtlBuffer &buf, CDmElement *pRoot ) override;
+	bool Unserialize( CUtlBuffer &buf, const char *pEncodingName, int nEncodingVersion,
+		const char *pSourceFormatName, int nSourceFormatVersion,
+		DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot ) override;
 
 protected:
 	// Main entry point for derived classes to implement unserialization

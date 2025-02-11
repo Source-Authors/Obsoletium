@@ -134,9 +134,9 @@ void CDmxSerializationDictionary::Clear()
 //-----------------------------------------------------------------------------
 // How many root elements do we have?
 //-----------------------------------------------------------------------------
-int CDmxSerializationDictionary::RootElementCount() const
+intp CDmxSerializationDictionary::RootElementCount() const
 {
-	int nCount = 0;
+	intp nCount = 0;
 	DmxSerializationHandle_t h = m_Dict.FirstInorder();
 	while( h != m_Dict.InvalidIndex() )
 	{
