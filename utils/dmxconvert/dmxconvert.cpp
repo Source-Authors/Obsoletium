@@ -1,47 +1,45 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// The copyright to the contents herein is the property of Valve, L.L.C.
-// The contents may be used and/or copied only with the written permission of
-// Valve, L.L.C., or in accordance with the terms and conditions stipulated in
-// the agreement/contract under which the contents have been supplied.
-//
-// $Header: $
-// $NoKeywords: $
-//
-// Converts from any one DMX file format to another
-// Can also output SMD or a QCI header from DMX input
-//
-//=============================================================================
+// Converts from any one DMX file format to another.
+// Can also output SMD or a QCI header from DMX input.
 
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
-#include "datamodel/idatamodel.h"
-#include "filesystem.h"
-#include "appframework/appframework.h"
 #include "tier1/utlbuffer.h"
-#include "dmserializers/idmserializers.h"
 #include "tier1/utlstring.h"
-#include "datamodel/dmattribute.h"
-#include "datamodel/dmelement.h"
 #include "tier2/tier2.h"
 
+#include "appframework/appframework.h"
+#include "dmserializers/idmserializers.h"
+#include "datamodel/dmattribute.h"
+#include "datamodel/dmelement.h"
+#include "datamodel/idatamodel.h"
+#include "filesystem.h"
 
 class CDmElement;
 
+namespace {
 
 //-----------------------------------------------------------------------------
 // Standard spew functions
 //-----------------------------------------------------------------------------
-static SpewRetval_t DMXConvertOutputFunc( SpewType_t spewType, char const *pMsg )
+SpewRetval_t DMXConvertOutputFunc( SpewType_t spewType, char const *pMsg )
 {
+	if (spewType == SPEW_WARNING || spewType == SPEW_ERROR)
+	{
+		fprintf(stderr, pMsg);
+		return SPEW_ABORT;
+	}
+	
 	printf( pMsg );
 	fflush( stdout );
 
-	if (spewType == SPEW_ERROR)
-		return SPEW_ABORT;
 	return (spewType == SPEW_ASSERT) ? SPEW_DEBUGGER : SPEW_CONTINUE; 
 }
 
+}  // namespace
+
+namespace se::dmxconvert {
 
 //-----------------------------------------------------------------------------
 // The application object
@@ -56,8 +54,13 @@ public:
 	virtual void PostShutdown();
 };
 
+}  // namespace se::dmxconvert
+
+using CDmxConvertApp = se::dmxconvert::CDmxConvertApp;
+
 DEFINE_CONSOLE_STEAM_APPLICATION_OBJECT( CDmxConvertApp );
 
+namespace se::dmxconvert {
 
 //-----------------------------------------------------------------------------
 // The application object
@@ -78,7 +81,7 @@ bool CDmxConvertApp::PreInit( )
 
 	if ( !g_pFullFileSystem || !g_pDataModel )
 	{
-		Warning( "DMXConvert is missing a required interface!\n" );
+		Warning( "DMXConvert is missing a required interfaces: file system and data model!\n" );
 		return false;
 	}
 	return true;
@@ -98,7 +101,7 @@ void CDmxConvertApp::PostShutdown()
 int CDmxConvertApp::Main()
 {
 	g_pDataModel->OnlyCreateUntypedElements( true );
-	g_pDataModel->SetDefaultElementFactory( NULL );
+	g_pDataModel->SetDefaultElementFactory( nullptr );
 
 	// This bit of hackery allows us to access files on the harddrive
 	g_pFullFileSystem->AddSearchPath( "", "LOCAL", PATH_ADD_TO_HEAD ); 
@@ -114,13 +117,13 @@ int CDmxConvertApp::Main()
 		Msg( "Usage: dmxconvert -i <in file> [-if <in format_hint>] [-o <out file>] [-oe <out encoding>] [-of <out format>]\n" );
 		Msg( "If no output file is specified, dmx to dmx conversion will overwrite the input\n" );
 		Msg( "Supported DMX file encodings:\n" );
-		for ( int i = 0; i < g_pDataModel->GetEncodingCount(); ++i )
+		for ( intp i = 0; i < g_pDataModel->GetEncodingCount(); ++i )
 		{
 			Msg( "   %s\n", g_pDataModel->GetEncodingName( i ) );
 		}
 
 		Msg( "Supported DMX file formats:\n" );
-		for ( int i = 0; i < g_pDataModel->GetFormatCount(); ++i )
+		for ( intp i = 0; i < g_pDataModel->GetFormatCount(); ++i )
 		{
 			Msg( "   %s\n", g_pDataModel->GetFormatName( i ) );
 		}
@@ -132,7 +135,7 @@ int CDmxConvertApp::Main()
 	// and also append a couple 0s to the end of the buffer.
 	DmxHeader_t header;
 	CDmElement *pRoot;
-	if ( g_pDataModel->RestoreFromFile( pInFileName, NULL, pInFormat, &pRoot, CR_DELETE_NEW, &header ) == DMFILEID_INVALID )
+	if ( g_pDataModel->RestoreFromFile( pInFileName, nullptr, pInFormat, &pRoot, CR_DELETE_NEW, &header ) == DMFILEID_INVALID )
 	{
 		Error( "Encountered an error reading file \"%s\"!\n", pInFileName );
 		return -1;
@@ -166,7 +169,7 @@ int CDmxConvertApp::Main()
 	// TODO - in theory, at some point, we may have converters from pInFormat to pOutFormat
 	//		  until then, treat it as a noop, and hope for the best
 
-	if ( !g_pDataModel->SaveToFile( pOutFileName, NULL, pOutEncoding, pOutFormat, pRoot ) )
+	if ( !g_pDataModel->SaveToFile( pOutFileName, nullptr, pOutEncoding, pOutFormat, pRoot ) )
 	{
 		Error( "Encountered an error writing file \"%s\"!\n", pOutFileName );
 		return -1;
@@ -177,5 +180,4 @@ int CDmxConvertApp::Main()
 	return 0;
 }
 
-
-
+}  // namespace se::dmxconvert
