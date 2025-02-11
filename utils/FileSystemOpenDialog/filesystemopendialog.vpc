@@ -18,7 +18,7 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories		"$BASE,..\common;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
-		$PrecompiledHeaderFile				"Debug/FileSystemOpenDialog.pch"
+		$PrecompiledHeaderFile				"Debug/filesystemopendialog.pch"
 		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 }

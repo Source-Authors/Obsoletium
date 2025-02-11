@@ -245,9 +245,9 @@ $Project "fgdlib"
 	"fgdlib\fgdlib.vpc" [$WINDOWS]
 }
 
-$Project "FileSystemOpenDialog"
+$Project "filesystemopendialog"
 {
-	"utils\FileSystemOpenDialog\FileSystemOpenDialog.vpc" [$WINDOWS]
+	"utils\FileSystemOpenDialog\filesystemopendialog.vpc" [$WINDOWS]
 }
 
 $Project "filesystem_stdio"
@@ -791,7 +791,7 @@ $Project "SDKLauncher"
 	"sdklauncher\SDKLauncher.vpc" [$WINDOWS]
 }
 
-$Project "ServerBrowser"
+$Project "serverbrowser"
 {
 	"serverbrowser\ServerBrowser.vpc" [$WINDOWS||$POSIX]
 }
