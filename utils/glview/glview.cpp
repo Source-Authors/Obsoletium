@@ -701,12 +701,12 @@ void ReadPortalFile(char *name) {
 
   while (1) {
     r = fscanf(f, "%i %i %i ", &numverts, &nLeafIndex[0], &nLeafIndex[1]);
-    if (!r || r == EOF) break;
+    if (r != 3) break;
 
     glBegin(GL_LINE_LOOP);
     for (i = 0; i < numverts; i++) {
       r = fscanf(f, "(%f %f %f )\n", &v[0], &v[1], &v[2]);
-      if (!r || (r != 3) || r == EOF) break;
+      if (r != 3) break;
 
       if (c == g_nPortalHighlight || nLeafIndex[0] == g_nLeafHighlight ||
           nLeafIndex[1] == g_nLeafHighlight) {
