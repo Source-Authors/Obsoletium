@@ -39,7 +39,7 @@ public:
 #endif
 	}
 
-	void AddToCache( CBitmap *pBitmap, const char *pName, int memoryUsage, bool bLock )
+	void AddToCache( CBitmap *pBitmap, const char *pName, intp memoryUsage, bool bLock )
 	{
 		Assert( m_Bitmaps.Find( pName ) == -1 );
 		m_CurMemoryUsage += memoryUsage;
@@ -92,13 +92,13 @@ private:
 	struct CBitmapCacheEntry
 	{
 		CBitmap *m_pBitmap;
-		int m_MemoryUsage;
+		intp m_MemoryUsage;
 		bool m_bLocked;
 	};
 	
 	CUtlDict<CBitmapCacheEntry,int> m_Bitmaps;
-	int m_CurMemoryUsage;
-	int m_MaxMemoryUsage;
+	intp m_CurMemoryUsage;
+	intp m_MaxMemoryUsage;
 };
 
 CBitmapCache g_BitmapCache;
@@ -582,7 +582,7 @@ int CALLBACK FileListSortCallback( LPARAM lParam1, LPARAM lParam2, LPARAM lParam
 
 void RemoveDuplicates( CUtlVector<CString> &files )
 {
-	CUtlDict<int,intp> uniqueFilenames;
+	CUtlDict<intp,intp> uniqueFilenames;
 	for ( intp i=0; i < files.Count(); i++ )
 	{
 		intp iPreviousIndex = uniqueFilenames.Find( files[i] );
@@ -597,7 +597,7 @@ void RemoveDuplicates( CUtlVector<CString> &files )
 		}
 	}
 }	
-		
+
 
 void CFileSystemOpenDlg::PopulateListControl()
 {
