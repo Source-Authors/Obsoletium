@@ -118,6 +118,29 @@ if ERRORLEVEL 1 (
 POPD
 
 
+REM Build lua.
+MKDIR thirdparty\lua\out
+PUSHD thirdparty\lua\out
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DLUA_ENABLE_TESTING=OFF -DLUA_BUILD_COMPILER=OFF -DLUA_BUILD_AS_CXX=ON ..
+if ERRORLEVEL 1 (
+  ECHO cmake generation for thirdparty\lua failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Debug
+if ERRORLEVEL 1 (
+  ECHO cmake --build Debug for thirdparty\lua failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Release
+if ERRORLEVEL 1 (
+  ECHO cmake --build Release for thirdparty\lua failed.
+  EXIT /B 1
+)
+POPD
+
+
 REM Build mpaheaderinfo.
 MKDIR thirdparty\mpaheaderinfo\out
 PUSHD thirdparty\mpaheaderinfo\out

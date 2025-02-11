@@ -62,3 +62,6 @@
 [submodule "thirdparty/7zip"]
 	path = thirdparty/7zip
 	url = git@github.com:Source-Authors/7zip.git
+[submodule "thirdparty/lua"]
+	path = thirdparty/lua
+	url = git@github.com:Source-Authors/Lua.git
