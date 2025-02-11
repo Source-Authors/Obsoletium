@@ -1196,7 +1196,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     V_strcpy_safe(szTempCmd, pFileName);
 
     char *pTmp = szTempCmd;
-    while (pTmp && *pTmp && *pTmp != '.') {
+    while (*pTmp && *pTmp != '.') {
       pTmp++;
     }
 
