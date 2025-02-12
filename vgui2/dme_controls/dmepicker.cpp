@@ -78,8 +78,8 @@ void CDmePicker::Activate( const CUtlVector< DmePickerInfo_t >&vec )
 {
 	m_pDmeBrowser->RemoveAll();	
 
-	int nCount = vec.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = vec.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pElement = GetElement<CDmElement>( vec[i].m_hElement );
 		const char *pElementName = pElement ? pElement->GetName() : "<null element>";

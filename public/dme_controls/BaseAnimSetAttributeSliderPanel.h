@@ -85,8 +85,8 @@ public:
 	void								SetControlSelected( CAttributeSlider *slider, bool state );
 	void								SetControlSelected( CDmElement *control, bool state );
 
-	virtual int							BuildVisibleControlList( CUtlVector< LogPreview_t >& list );
-	virtual int							BuildFullControlList( CUtlVector< LogPreview_t >& list );
+	virtual intp						BuildVisibleControlList( CUtlVector< LogPreview_t >& list );
+	virtual intp						BuildFullControlList( CUtlVector< LogPreview_t >& list );
 
 
 	virtual void						StampValueIntoLogs( CDmElement *control, AnimationControlType_t type, float flValue );
@@ -99,7 +99,8 @@ public:
 		}
 		CDmElement *element;
 		bool		selected;
-		int			index;
+		// dimhotepus: int -> intp
+		intp		index;
 	};
 
 	void									GetVisibleControls( CUtlVector< VisItem_t >& list );
@@ -169,11 +170,13 @@ protected:
 
 	// list of bones/root transforms which are in the control set
 	CUtlVector< LogPreview_t >			m_ActiveTransforms;
-	float								m_flRecomputePreviewTime;
+	// dimhotepus: float -> double.
+	double								m_flRecomputePreviewTime;
 
 	CUtlVector< LogPreview_t >			m_CurrentPreview;
-
-	float								m_flPrevTime;
+	
+	// dimhotepus: float -> double.
+	double								m_flPrevTime;
 
 };
 

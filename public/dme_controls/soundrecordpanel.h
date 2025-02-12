@@ -58,7 +58,8 @@ private:
 	CUtlString m_FileName;
 	CUtlString m_EngineFileName;
 	int m_nPlayingSound;
-	float m_flRecordStartTime;
+	// dimhotepus: float -> double.
+	double m_flRecordStartTime;
 	bool m_bIsRecording;
 };
 

@@ -46,7 +46,7 @@ void CAttributeShaderPickerPanel::ShowPickerDialog()
 	{
 		if ( ( ppShaderList[i]->GetFlags() & SHADER_NOT_EDITABLE ) == 0 )
 		{
-			int j = shaderList.AddToTail( );
+			intp j = shaderList.AddToTail( );
 			shaderList[j].m_pChoiceString = ppShaderList[i]->GetName();
 			shaderList[j].m_pChoiceValue = ppShaderList[i]->GetName();
 		}

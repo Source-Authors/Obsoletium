@@ -114,7 +114,8 @@ private:
 	CDmeHandle< CDmeChannelsClip > m_hCurrentAnimation;
 	CDmeHandle< CDmeChannelsClip > m_hCurrentVertexAnimation;
 	CUtlVector< IDmeOperator* > m_operators;
-	float m_flStartTime;
+	// dimhotepus: float -> double
+	double m_flStartTime;
 	CDmeHandle< CDmeDag > m_hDag;
 
 	CDmeDrawSettings *m_pDrawSettings;

@@ -135,7 +135,7 @@ bool CBaseAttributePanel::HasAttribute() const
 //-----------------------------------------------------------------------------
 // Returns the attribute array count
 //-----------------------------------------------------------------------------
-int CBaseAttributePanel::GetAttributeArrayCount() const
+intp CBaseAttributePanel::GetAttributeArrayCount() const
 {
 	CDmrGenericArrayConst array( GetPanelElement(), m_szAttributeName );
 	return array.IsValid() ? array.Count() : -1;
@@ -301,7 +301,7 @@ void CBaseAttributePanel::PerformLayout()
 		}
 	}
 	
-	int c = vispanels.Count();
+	intp c = vispanels.Count();
 
 	Assert( c >= 0 );
 	if ( c == 0 )
@@ -316,7 +316,7 @@ void CBaseAttributePanel::PerformLayout()
 	int y = 0;
 	w-= 2;
 
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		Panel *panel = vispanels[ i ];
 		int width = GetSizeForColumn( panel );

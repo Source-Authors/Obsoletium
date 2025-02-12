@@ -70,13 +70,13 @@ public:
 
 protected:
 	// Control points + values...
-	virtual int FindOrAddControlPoint( float flIn, float flTolerance, float flOut );
-	virtual int FindControlPoint( float flIn, float flTolerance );
-	virtual int ModifyControlPoint( int nPoint, float flIn, float flOut );
-	virtual void RemoveControlPoint( int nPoint );
+	virtual intp FindOrAddControlPoint( float flIn, float flTolerance, float flOut );
+	virtual intp FindControlPoint( float flIn, float flTolerance );
+	virtual intp ModifyControlPoint( intp nPoint, float flIn, float flOut );
+	virtual void RemoveControlPoint( intp nPoint );
 	virtual float GetValue( float flIn );
-	virtual int ControlPointCount();
-	virtual void GetControlPoint( int nPoint, float *pIn, float *pOut );
+	virtual intp ControlPointCount();
+	virtual void GetControlPoint( intp nPoint, float *pIn, float *pOut );
 
 private:
 	// Converts normalized values to int time

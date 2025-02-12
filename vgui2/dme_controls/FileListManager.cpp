@@ -20,7 +20,8 @@
 #include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
 #include "tier2/tier2.h"
-#include "p4lib/ip4.h"
+// dimhotepus: Drop Perforce support.
+// #include "p4lib/ip4.h"
 #include "filesystem.h"
 #include "dme_controls/INotifyUI.h"
 
@@ -199,9 +200,9 @@ void CFileListManager::OnMousePressed( vgui::MouseCode code )
 	BaseClass::OnMousePressed( code );
 }
 
-int AddMenuItemHelper( vgui::Menu *pMenu, const char *pItemName, const char *pKVName, vgui::Panel *pTarget, bool bEnabled )
+intp AddMenuItemHelper( vgui::Menu *pMenu, const char *pItemName, const char *pKVName, vgui::Panel *pTarget, bool bEnabled )
 {
-	int id = pMenu->AddMenuItem( pItemName, new KeyValues( pKVName ), pTarget );
+	intp id = pMenu->AddMenuItem( pItemName, new KeyValues( pKVName ), pTarget );
 	pMenu->SetItemEnabled( id, bEnabled );
 	return id;
 }
@@ -223,7 +224,8 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 	}
 	else
 	{
-		bool bP4Connected = p4->IsConnectedToServer();
+		// dimhotepus: Drop Perforce support.
+		bool bP4Connected = false; //  p4->IsConnectedToServer();
 
 		int nSelected = GetSelectedItemsCount();
 		int nLoaded = 0;
@@ -246,17 +248,18 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 				++nOnDisk;
 			}
 
-			if ( bP4Connected )
-			{
-				if ( p4->IsFileInPerforce( pFilename ) )
-				{
-					++nInPerforce;
-					if ( p4->GetFileState( pFilename ) != P4FILE_UNOPENED )
-					{
-						++nOpenForEdit;
-					}
-				}
-			}
+			// dimhotepus: Drop Perforce support.
+			// if ( bP4Connected )
+			// {
+			// 	if ( p4->IsFileInPerforce( pFilename ) )
+			// 	{
+			// 		++nInPerforce;
+			// 		if ( p4->GetFileState( pFilename ) != P4FILE_UNOPENED )
+			// 		{
+			// 			++nOpenForEdit;
+			// 		}
+			// 	}
+			// }
 		}
 
 		AddMenuItemHelper( m_hContextMenu, "Load", "load", this, nLoaded < nSelected && nOnDisk > 0 );
@@ -435,10 +438,11 @@ void CFileListManager::OnAddToPerforce( KeyValues *pParams )
 		ppFileNames[ i ] = pFilename;
 	}
 
-	bool bSuccess = p4->OpenFilesForAdd( nFileCount, ppFileNames );
+	bool bSuccess = false; // p4->OpenFilesForAdd( nFileCount, ppFileNames );
 	if ( !bSuccess )
 	{
-		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", p4->GetLastError(), GetParent() );
+		// dimhotepus: Drop Perforce support.
+		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", "No Perforce Support" /*p4->GetLastError()*/, GetParent() );
 		pError->SetSmallCaption( true );
 		pError->DoModal();
 	}
@@ -463,11 +467,13 @@ void CFileListManager::OnOpenForEdit( KeyValues *pParams )
 		++nFileCount;
 		ppFileNames[ i ] = pFilename;
 	}
-
-	bool bSuccess = p4->OpenFilesForEdit( nFileCount, ppFileNames );
+	
+	// dimhotepus: Drop Perforce support.
+	bool bSuccess = false; // p4->OpenFilesForEdit( nFileCount, ppFileNames );
 	if ( !bSuccess )
 	{
-		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", p4->GetLastError(), GetParent() );
+		// dimhotepus: Drop Perforce support.
+		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", "No Perforce Support" /*p4->GetLastError()*/, GetParent() );
 		pError->SetSmallCaption( true );
 		pError->DoModal();
 	}
@@ -533,7 +539,8 @@ void CFileListManager::Refresh()
 	m_bRefreshRequired = false;
 	RemoveAll();
 
-	const bool bP4Connected = p4 ? p4->IsConnectedToServer() : false;
+	// dimhotepus: Drop Perforce support.
+	const bool bP4Connected = /* p4 ? p4->IsConnectedToServer() :*/ false;
 
 	int nFiles = g_pDataModel->NumFileIds();
 	for ( int i = 0; i < nFiles; ++i )
@@ -546,8 +553,9 @@ void CFileListManager::Refresh()
 		bool bLoaded = g_pDataModel->IsFileLoaded( fileid );
 		int nElements = g_pDataModel->NumElementsInFile( fileid );
 		bool bChanged = false; // TODO - find out for real
-		bool bInPerforce = bP4Connected && p4->IsFileInPerforce( pFileName );
-		bool bOpenForEdit = bInPerforce && p4->GetFileState( pFileName ) != P4FILE_UNOPENED;
+		// dimhotepus: Drop Perforce support.
+		bool bInPerforce = bP4Connected && false; // p4->IsFileInPerforce( pFileName );
+		bool bOpenForEdit = bInPerforce && false; // p4->GetFileState( pFileName ) != P4FILE_UNOPENED;
 
 		char path[ 256 ];
 		V_ExtractFilePath( pFileName, path, sizeof( path ) );

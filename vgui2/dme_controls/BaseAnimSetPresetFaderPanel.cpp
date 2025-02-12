@@ -78,8 +78,8 @@ void CAddPresetDialog::DoModal( CDmeAnimationSet *pAnimationSet, KeyValues *pCon
 
 	// Populate the combo box with preset group names
 	CDmrElementArray< CDmePresetGroup > presetGroupList = pAnimationSet->GetPresetGroups();
-	int nCount = presetGroupList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = presetGroupList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroupList[i];
 		if ( pPresetGroup->m_bIsReadOnly )
@@ -404,8 +404,8 @@ void CPresetSlider::SetControlValues( )
 
 	CDmrElementArray< CDmElement > values = m_hSelf->GetControlValues();
 
-	int nControlValueCount = values.Count();
-	for ( int i = 0; i < nControlValueCount; ++i )
+	intp nControlValueCount = values.Count();
+	for ( intp i = 0; i < nControlValueCount; ++i )
 	{
 		CDmElement *v = values[ i ];
 
@@ -889,7 +889,7 @@ void CPresetSlider::PaintBackground()
 	int cw, ch;
 	m_pName->SetColor( hasFocus ? m_TextColorFocus : m_TextColor );
 	m_pName->GetContentSize( cw, ch );
-	m_pName->SetPos( ( w - cw ) * 0.5f, ( h - ch ) * 0.5f );
+	m_pName->SetPos( ( w - cw ) / 2, ( h - ch ) / 2 );
 	m_pName->Paint();
 }
 
@@ -1240,11 +1240,11 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 	CDmrElementArray< CDmePresetGroup > presetGroups = m_AnimSet->GetPresetGroups();
 	Assert( presetGroups.IsValid() );
 
-	int c = presetGroups.Count();
+	intp c = presetGroups.Count();
 
 	bool bNeedRebuild = false;
 	int slot = 0;
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroups[ i ];
 		Assert( pPresetGroup );
@@ -1253,8 +1253,8 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 
 		CDmrElementArray< CDmePreset > presets = pPresetGroup->GetPresets();
 
-		int cp = presets.Count();
-		for ( int j = 0; j < cp; ++j )
+		intp cp = presets.Count();
+		for ( intp j = 0; j < cp; ++j )
 		{
 			CDmePreset *pPreset = presets[ j ];
 			Assert( pPreset );
@@ -1301,8 +1301,8 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 
 			CDmrElementArray< CDmePreset > presets = pPresetGroup->GetPresets();
 
-			int cp = presets.Count();
-			for ( int j = 0; j < cp; ++j )
+			intp cp = presets.Count();
+			for ( intp j = 0; j < cp; ++j )
 			{
 				CDmePreset *pPreset = presets[ j ];
 				Assert( pPreset );
@@ -1379,8 +1379,8 @@ void CBaseAnimSetPresetFaderPanel::SetPresetFromSliders( CDmePreset *pPreset )
 	const CDmrElementArray< CDmElement > controlList = m_AnimSet->GetControls();
 
 	// Now set values for each known control
-	int numControls = controlList.Count();
-	for ( int i = 0; i < numControls; ++i )
+	intp numControls = controlList.Count();
+	for ( intp i = 0; i < numControls; ++i )
 	{
 		CDmElement *pControl = controlList[ i ];
 

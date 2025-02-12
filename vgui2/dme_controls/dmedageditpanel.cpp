@@ -127,8 +127,8 @@ void CDmeAnimationListPanel::RefreshAnimationList()
 	if ( !m_hAnimationList.Get() )
 		return;
 
-	int nCount = m_hAnimationList->GetAnimationCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_hAnimationList->GetAnimationCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeChannelsClip *pAnimation = m_hAnimationList->GetAnimation( i );
 		KeyValues *pItemKeys = new KeyValues( "node", "name", pAnimation->GetName() );
@@ -316,8 +316,8 @@ void CDmeCombinationOperatorPanel::GenerateProceduralPresetValues( CDmElement *p
 	CDmrElementArray<> values( pPreset, "controlValues" );
 	Assert( values.IsValid() );
 	values.RemoveAll();
-	int c = controls.Count();
-	for ( int i = 0; i < c ; ++i )
+	intp c = controls.Count();
+	for ( intp i = 0; i < c ; ++i )
 	{
 		CDmElement *pControl = controls[ i ];
 		CDmElement *pControlValue = CreateElement< CDmElement >( pControl->GetName(), pPreset->GetFileId() );
@@ -335,20 +335,20 @@ void CDmeCombinationOperatorPanel::RemoveAnimationControlFromPresets( const char
 	CDmeAnimationSet *pAnimationSet = m_AnimSet.Get();
 	CDmrElementArray< CDmePresetGroup > presetGroupList = pAnimationSet->GetPresetGroups();
 
-	int nPresetGroupCount = presetGroupList.Count();
-	for ( int i = 0; i < nPresetGroupCount; ++i )
+	intp nPresetGroupCount = presetGroupList.Count();
+	for ( intp i = 0; i < nPresetGroupCount; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroupList[ i ];
 
 		CDmrElementArray< CDmePreset > presetList = pPresetGroup->GetPresets();
-		int nPresetCount = presetList.Count();
-		for ( int j = 0; j < nPresetCount; ++j )
+		intp nPresetCount = presetList.Count();
+		for ( intp j = 0; j < nPresetCount; ++j )
 		{
 			CDmePreset *pPreset = presetList[ j ];
 			CDmrElementArray<> controlValues = pPreset->GetControlValues();
 
-			int nControlCount = controlValues.Count();
-			for ( int k = 0; k < nControlCount; ++k )
+			intp nControlCount = controlValues.Count();
+			for ( intp k = 0; k < nControlCount; ++k )
 			{
 				CDmElement *v = controlValues[ k ];
 				if ( !Q_stricmp( v->GetName(), pControlName ) )
@@ -370,13 +370,13 @@ void CDmeCombinationOperatorPanel::RemoveAnimationControlFromSelectionGroups( co
 	CDmeAnimationSet *pAnimationSet = m_AnimSet.Get();
 	CDmrElementArray< > selectionGroupList = pAnimationSet->GetSelectionGroups();
 
-	int nGroupCount = selectionGroupList.Count();
-	for ( int i = 0; i < nGroupCount; ++i )
+	intp nGroupCount = selectionGroupList.Count();
+	for ( intp i = 0; i < nGroupCount; ++i )
 	{
 		CDmElement *pSelectionGroup = selectionGroupList[ i ];
 		CDmrStringArray selectedControls( pSelectionGroup, "selectedControls" );
-		int nControlCount = selectedControls.Count();
-		for ( int j = 0; j < nControlCount; ++j )
+		intp nControlCount = selectedControls.Count();
+		for ( intp j = 0; j < nControlCount; ++j )
 		{
 			if ( !Q_stricmp( selectedControls[ j ], pControlName ) )
 			{
@@ -397,8 +397,8 @@ void CDmeCombinationOperatorPanel::RemoveUnusedAnimationSetControls()
 	CDmrElementArray< > controls = pAnimationSet->GetControls();
 
 	// Remove all controls in the animation set and in presets that don't exist in the combination system
-	int nAnimSetCount = controls.Count();
-	for ( int i = nAnimSetCount; --i >= 0; )
+	intp nAnimSetCount = controls.Count();
+	for ( intp i = nAnimSetCount; --i >= 0; )
 	{
 		CDmElement *pControlElement = controls[i];
 		if ( !pControlElement )
@@ -481,20 +481,20 @@ void CDmeCombinationOperatorPanel::ModifyExistingAnimationSetPresets( CDmElement
 	CDmeAnimationSet *pAnimationSet = m_AnimSet.Get();
 	const CDmrElementArray< CDmePresetGroup > &presetGroupList = pAnimationSet->GetPresetGroups();
 
-	int nPresetGroupCount = presetGroupList.Count();
-	for ( int g = 0; g < nPresetGroupCount; ++g )
+	intp nPresetGroupCount = presetGroupList.Count();
+	for ( intp g = 0; g < nPresetGroupCount; ++g )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroupList[ g ];
 		const CDmrElementArray< CDmePreset > &presetList = pPresetGroup->GetPresets();
 
-		int nPresetCount = presetList.Count();
-		for ( int i = 0; i < nPresetCount; ++i )
+		intp nPresetCount = presetList.Count();
+		for ( intp i = 0; i < nPresetCount; ++i )
 		{
 			CDmePreset *pPreset = presetList[ i ];
 			const CDmrElementArray< CDmElement > &controlValues = pPreset->GetControlValues( );
 
-			int nControlCount = controlValues.Count();
-			for ( int j = 0; j < nControlCount; ++j )
+			intp nControlCount = controlValues.Count();
+			for ( intp j = 0; j < nControlCount; ++j )
 			{
 				CDmElement *v = controlValues[ j ];
 				if ( Q_stricmp( v->GetName(), pControlName ) )
@@ -540,8 +540,8 @@ void CDmeCombinationOperatorPanel::ModifyExistingAnimationSetControls()
 	const CDmrElementArray< CDmElement > &controls = pAnimationSet->GetControls();
 
 	// Update the main controls; update defaults and add or remove combo + multi data
-	int nAnimSetCount = controls.Count();
-	for ( int i = nAnimSetCount; --i >= 0; )
+	intp nAnimSetCount = controls.Count();
+	for ( intp i = nAnimSetCount; --i >= 0; )
 	{
 		CDmElement *pControlElement = controls[i];
 		if ( !pControlElement )
@@ -569,7 +569,7 @@ void CDmeCombinationOperatorPanel::AddNewAnimationSetControls()
 	CDmaElementArray< > &controls = pAnimationSet->GetControls();
 
 	// Remove all controls in the animation set and in presets that don't exist in the combination system
-	int nFirstControl = controls.Count();
+	intp nFirstControl = controls.Count();
 	int nCombinationControlCount = m_hCombinationOperator->GetControlCount();
 	for ( int i = 0; i < nCombinationControlCount; ++i )
 	{
@@ -611,7 +611,7 @@ void CDmeCombinationOperatorPanel::AddNewAnimationSetControls()
 		pControl->SetValue( "defaultMultilevel", 0.5f );
 	}
 
-	int nLastControl = controls.Count();
+	intp nLastControl = controls.Count();
 	if ( nLastControl == nFirstControl )
 		return;
 
@@ -620,7 +620,7 @@ void CDmeCombinationOperatorPanel::AddNewAnimationSetControls()
 
 	// Fill in members
 	CDmrStringArray groups( pGroup, "selectedControls" );
-	for ( int i = nFirstControl; i < nLastControl; ++i )
+	for ( intp i = nFirstControl; i < nLastControl; ++i )
 	{
 		groups.AddToTail( controls[ i ]->GetName() );
 	}
@@ -663,7 +663,7 @@ void CDmeCombinationOperatorPanel::ComputeProceduralPresets()
 void CDmeCombinationOperatorPanel::SortAnimationSetControls()
 {
 	CDmaElementArray<> &controls = m_AnimSet->GetControls();
-	int nControlCount = controls.Count();
+	intp nControlCount = controls.Count();
 	if ( nControlCount == 0 )
 		return;
 

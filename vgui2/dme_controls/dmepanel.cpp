@@ -374,11 +374,11 @@ void CDmePanel::OnViewedElementChanged( KeyValues *kv )
 //-----------------------------------------------------------------------------
 void CDmePanel::DeleteCachedPanels()
 {
-	int nCount = m_EditorPanelCache.GetNumStrings();
-	for ( int i = 0; i < nCount; ++i )
+	unsigned short nCount = m_EditorPanelCache.GetNumStrings();
+	for ( unsigned short i = 0; i < nCount; ++i )
 	{
-		int nEditorCount = m_EditorPanelCache[ i ].Count();
-		for ( int j = 0; j < nEditorCount; ++j )
+		intp nEditorCount = m_EditorPanelCache[ i ].Count();
+		for ( intp j = 0; j < nEditorCount; ++j )
 		{
 			m_EditorPanelCache[ i ][ j ].m_pEditorPanel->MarkForDeletion();
 		}
@@ -431,8 +431,8 @@ void CDmePanel::SetEditor( const char *pEditorName )
 	if ( m_EditorPanelCache.Defined( pEditorName ) )
 	{
 		CUtlVector< EditorPanelMap_t > &entries = m_EditorPanelCache[ pEditorName ];
-		int nCount = entries.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = entries.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			EditorPanelMap_t &entry = entries[i];
 			if ( !m_hElement->IsA( entry.m_pFactory->m_pElementType ) )

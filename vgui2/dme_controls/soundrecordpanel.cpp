@@ -133,7 +133,7 @@ void CSoundRecordPanel::PlaySoundPreview( )
 //-----------------------------------------------------------------------------
 void CSoundRecordPanel::UpdateTimeRecorded()
 { 
-	float flTime = Plat_FloatTime() - m_flRecordStartTime;
+	double flTime = Plat_FloatTime() - m_flRecordStartTime;
 	char pTimeBuf[64];
 	Q_snprintf( pTimeBuf, sizeof(pTimeBuf), "%.3f", flTime );
 	m_pRecordTime->SetText( pTimeBuf );

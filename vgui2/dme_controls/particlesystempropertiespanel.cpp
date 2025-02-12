@@ -105,7 +105,7 @@ void CParticleFunctionPickerFrame::RefreshParticleFunctions( CDmeParticleSystemD
 		return;
 
 	CUtlVector< IParticleOperatorDefinition *> &list = g_pParticleSystemMgr->GetAvailableParticleOperatorList( type );
-	int nCount = list.Count();
+	intp nCount = list.Count();
 
 	// Build a list of used operator IDs
 	bool pUsedIDs[OPERATOR_ID_COUNT];
@@ -306,11 +306,11 @@ void CParticleChildrenPickerFrame::RefreshChildrenList( CDmeParticleSystemDefini
 	{
 		m_pQuery->GetKnownParticleDefinitions( definitions );
 	}
-	int nCount = definitions.Count();
+	intp nCount = definitions.Count();
 	if ( nCount == 0 )
 		return;
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleSystemDefinition *pParticleSystem = definitions[i];
 		if ( pParticleSystem == pCurrentParticleSystem )
@@ -574,9 +574,9 @@ void CParticleFunctionBrowser::RefreshParticleFunctionList()
 
 	m_pFunctionList->RemoveAll();	
 
-	int nSelectedCount = selectedItems.Count();
+	intp nSelectedCount = selectedItems.Count();
 	nCount = m_hParticleSystem->GetParticleFunctionCount( m_FuncType );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleFunction *pFunction = m_hParticleSystem->GetParticleFunction( m_FuncType, i );
 		KeyValues *kv = new KeyValues( "node", "name", pFunction->GetName() );
@@ -585,7 +585,7 @@ void CParticleFunctionBrowser::RefreshParticleFunctionList()
 		SetElementKeyValue( kv, "particleFunction", pFunction );
 		int nItemID = m_pFunctionList->AddItem( kv, 0, false, false );
 
-		for ( int j = 0; j < nSelectedCount; ++j )
+		for ( intp j = 0; j < nSelectedCount; ++j )
 		{
 			if ( selectedItems[j] == pFunction )
 			{
@@ -740,8 +740,8 @@ void CParticleFunctionBrowser::OnRemove( )
 		// Build a list of objects to delete.
 		//
 		CUtlVector< CDmeParticleFunction* > itemsToDelete;
-		int nCount = m_pFunctionList->GetSelectedItemsCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = m_pFunctionList->GetSelectedItemsCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CDmeParticleFunction *pParticleFunction = GetSelectedFunction( i );
 			if ( pParticleFunction )
@@ -751,7 +751,7 @@ void CParticleFunctionBrowser::OnRemove( )
 		}
 
 		nCount = itemsToDelete.Count();
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			m_hParticleSystem->RemoveFunction( m_FuncType, itemsToDelete[i] );
 		}

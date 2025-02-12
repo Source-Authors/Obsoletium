@@ -95,7 +95,7 @@ private:
 		ColumnPanels_t( const ColumnPanels_t& src )
 		{
 			treeViewItem = src.treeViewItem;
-			int i, c;
+			intp i, c;
 			c = src.m_Columns.Count();
 			for ( i = 0; i < c; ++i )
 			{
@@ -106,8 +106,8 @@ private:
 		void SetList( CUtlVector< vgui::Panel * >& list )
 		{
 			m_Columns.RemoveAll();
-			int c = list.Count();
-			for ( int i = 0; i < c; ++i )
+			intp c = list.Count();
+			for ( intp i = 0; i < c; ++i )
 			{
 				m_Columns.AddToTail( list[ i ] );
 			}
@@ -182,7 +182,7 @@ public:
 	};
 
 	virtual void	PopulateHistoryMenu( int whichMenu, vgui::Menu *menu );
-	virtual int		GetHistoryMenuItemCount( int whichMenu );
+	virtual intp	GetHistoryMenuItemCount( int whichMenu );
 	void			AddToSearchHistory( char const *str );
 	void			SetTypeDictionary( CDmeEditorTypeDictionary *pDict );
 
@@ -257,7 +257,7 @@ protected:
 		}
 	};
 
-	bool BuildExpansionListToFindElement_R( CUtlRBTree< CDmElement *, int >& visited, int depth, SearchResult_t& sr, CDmElement *owner, CDmElement *element, char const *attributeName, int arrayIndex, CUtlVector< int >& expandIndices );
+	bool BuildExpansionListToFindElement_R( CUtlRBTree< CDmElement *, int >& visited, int depth, SearchResult_t& sr, CDmElement *owner, CDmElement *element, char const *attributeName, int arrayIndex, CUtlVector< intp >& expandIndices );
 	void FindMatchingElements_R( CUtlRBTree< CDmElement *, int >& visited, char const *searchstr, CDmElement *root, CUtlVector< SearchResult_t >& list );
 	void NavigateToSearchResult();
 
@@ -329,8 +329,14 @@ protected:
 	MESSAGE_FUNC( OnDeleteSelected, "OnDelete" );
 
 	MESSAGE_FUNC_INT( OnElementChangedExternally, "ElementChangedExternally", valuesOnly );
+	// dimhotepus: x86-64 support.
+#ifndef PLATFORM_64BITS
 	MESSAGE_FUNC_INT( OnNavBack, "OnNavigateBack", item );
 	MESSAGE_FUNC_INT( OnNavForward, "OnNavigateForward", item );
+#else
+	MESSAGE_FUNC_UINT64( OnNavBack, "OnNavigateBack", item );
+	MESSAGE_FUNC_UINT64( OnNavForward, "OnNavigateForward", item );
+#endif
 	MESSAGE_FUNC_INT( OnNavigateSearchAgain, "OnNavigateSearchAgain", direction );
 	MESSAGE_FUNC( OnShowSearchResults, "OnShowSearchResults" );
 
@@ -359,7 +365,7 @@ protected:
 	void						DropItemsIntoArray( CDmrElementArray<> &array,
 													CUtlVector< KeyValues* > &msglist,
 													CUtlVector< CDmElement* > &list,
-													int nArrayIndex, DropOperation_t op );
+													intp nArrayIndex, DropOperation_t op );
 
 	bool						OnRemoveFromData( CUtlVector< KeyValues * >& list );
 	bool						OnRemoveFromData( KeyValues *item );
@@ -399,12 +405,12 @@ protected:
 
 	// Most recent are at the head
 	CUtlVector< CDmeHandle< CDmElement > >	m_hHistory;
-	int										m_nCurrentHistoryPosition;
+	intp									m_nCurrentHistoryPosition;
 	bool									m_bSuppressHistoryUpdates;
 	char									m_szSearchStr[ 128 ];
 
 	CUtlVector< SearchResult_t >			m_SearchResults;
-	int										m_nCurrentSearchResult;
+	intp									m_nCurrentSearchResult;
 
 	CUtlVector< CUtlString >				m_SearchHistory;
 

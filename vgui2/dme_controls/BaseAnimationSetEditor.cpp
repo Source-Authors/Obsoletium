@@ -56,8 +56,8 @@ static AnimSetLayout_t g_AnimSetLayout[] =
 
 static const char *NameForLayout( CBaseAnimationSetEditor::EAnimSetLayout_t layout, bool menu )
 {
-	int c = ARRAYSIZE( g_AnimSetLayout );
-	for ( int i = 0; i < c; ++i )
+	intp c = ssize( g_AnimSetLayout );
+	for ( intp i = 0; i < c; ++i )
 	{
 		const AnimSetLayout_t& data = g_AnimSetLayout[ i ];
 		if ( data.type == layout )
@@ -71,8 +71,8 @@ static const char *NameForLayout( CBaseAnimationSetEditor::EAnimSetLayout_t layo
 
 static CBaseAnimationSetEditor::EAnimSetLayout_t LayoutForName( const char *name )
 {
-	int c = ARRAYSIZE( g_AnimSetLayout );
-	for ( int i = 0; i < c; ++i )
+	intp c = ssize( g_AnimSetLayout );
+	for ( intp i = 0; i < c; ++i )
 	{
 		const AnimSetLayout_t& data = g_AnimSetLayout[ i ];
 		if ( !Q_stricmp( data.shortname, name ) )
@@ -374,8 +374,8 @@ CDmeChannel* CBaseAnimationSetEditor::FindImportChannel( CDmeChannel *pChannel, 
 	const char *pTargetName = pTargetElement->GetName();
 	CDmeLog *pTargetLog = pChannel->GetLog();
 
-	int nCount = pChannelsClip->m_Channels.Count();
-	for ( int j = 0; j < nCount; ++j )
+	intp nCount = pChannelsClip->m_Channels.Count();
+	for ( intp j = 0; j < nCount; ++j )
 	{
 		CDmeChannel *pImportChannel = pChannelsClip->m_Channels[j];
 		if ( !pImportChannel )
@@ -549,8 +549,8 @@ void CBaseAnimationSetEditor::FixupChannelsClipTime( CDmeChannel *pChannel, CDme
 {
 	CUtlVector< CDmeChannelsClip* > clips;
 	FindAncestorsReferencingElement( pChannel, clips );
-	int nCount = clips.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = clips.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		FixupChannelsClipTime( clips[i], pLog );
 	}
@@ -622,7 +622,7 @@ void CBaseAnimationSetEditor::ImportAnimation( CDmeChannelsClip *pChannelsClip, 
 	pStatusFrame->SetCloseButtonVisible( false );
 	pStatusFrame->SetOperationColumnHeaderText( "Source Channel" );
 
-	int nSrcCount = pChannelsClip->m_Channels.Count();
+	intp nSrcCount = pChannelsClip->m_Channels.Count();
 	CDmeChannel** ppFoundChannels = (CDmeChannel**)_alloca( nSrcCount * sizeof(CDmeChannel*) );
 	int nFoundCount = 0;
 
@@ -654,7 +654,7 @@ void CBaseAnimationSetEditor::ImportAnimation( CDmeChannelsClip *pChannelsClip, 
 		}
 	}
 
-	for ( int i = 0; i < nSrcCount; ++i )
+	for ( intp i = 0; i < nSrcCount; ++i )
 	{
 		CDmeChannel *pMissingChannel  = pChannelsClip->m_Channels[i];
 
@@ -726,15 +726,15 @@ void CBaseAnimationSetEditor::SelectImportAnimation( CDmeAnimationList *pAnimati
 	SetElementKeyValue( pContextKeyValues, "animationList", pAnimationList );
 	pContextKeyValues->SetInt( "visibleOnly", bVisibleOnly );
 
-	int nCount = pAnimationList->GetAnimationCount();
-	CUtlVector< DmePickerInfo_t > choices( 0, nCount );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pAnimationList->GetAnimationCount();
+	CUtlVector< DmePickerInfo_t > choices( (intp)0, nCount );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeChannelsClip *pAnimation = pAnimationList->GetAnimation( i );
 		if ( !pAnimation )
 			continue;
 
-		int j = choices.AddToTail();
+		intp j = choices.AddToTail();
 		DmePickerInfo_t& info = choices[j];
 		info.m_hElement = pAnimation->GetHandle();
 		info.m_pChoiceString = pAnimation->GetName();

@@ -49,7 +49,7 @@ void CAttributeSurfacePropertyPickerPanel::AddSurfacePropertiesToList( PickerLis
 			{
 				for ( KeyValues *pTrav = file; pTrav; pTrav = pTrav->GetNextKey() )
 				{
-					int i = list.AddToTail();
+					intp i = list.AddToTail();
 					list[i].m_pChoiceString = pTrav->GetName();
 					list[i].m_pChoiceValue = pTrav->GetName();
 				}

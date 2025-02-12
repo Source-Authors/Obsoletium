@@ -107,11 +107,11 @@ void CAttributeElementPickerPanel::ShowPickerDialog()
 	CUtlVector< DmePickerInfo_t > vec;
 	if ( ElementPropertiesChoices()->GetElementChoiceList( pInfo->GetChoiceType(), GetPanelElement(), GetAttributeName(), IsArrayEntry(), choices ) )
 	{
-		int c = choices.Count();
+		intp c = choices.Count();
 		vec.EnsureCapacity( c );
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
-			int j = vec.AddToTail( );
+			intp j = vec.AddToTail( );
 			vec[j].m_hElement = choices[i].m_pValue->GetHandle();
 			vec[j].m_pChoiceString = choices[i].m_pChoiceString;
 		}

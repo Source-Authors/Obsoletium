@@ -70,11 +70,11 @@ void CPresetPickerFrame::RefreshPresetList( CDmElement *pPresetGroup, bool bSele
 	if ( !presets.IsValid() )
 		return;
 
-	int nCount = presets.Count();
+	intp nCount = presets.Count();
 	if ( nCount == 0 )
 		return;
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePreset *pPreset = presets[i];
 

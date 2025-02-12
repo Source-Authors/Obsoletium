@@ -41,7 +41,7 @@ void CAttributeDetailTypePickerPanel::AddDetailTypesToList( PickerList_t &list )
 	{
 		for ( KeyValues *sub = pDetailTypes->GetFirstTrueSubKey(); sub != NULL; sub = sub->GetNextTrueSubKey() )
 		{
-			int i = list.AddToTail( );
+			intp i = list.AddToTail( );
 			list[i].m_pChoiceString = sub->GetName();
 			list[i].m_pChoiceValue = sub->GetName();
 		}

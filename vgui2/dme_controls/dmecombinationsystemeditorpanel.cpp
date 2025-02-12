@@ -913,8 +913,8 @@ void CDmeCombinationControlsPanel::BuildSelectedControlLists(
 //-----------------------------------------------------------------------------
 bool CDmeCombinationControlsPanel::HasDuplicateControlName( const char *pControlName, CUtlVector< CUtlString >& retiredControlNames )
 {
-	int i;
-	int nRetiredControlNameCount = retiredControlNames.Count();
+	intp i;
+	intp nRetiredControlNameCount = retiredControlNames.Count();
 	for ( i = 0; i < nRetiredControlNameCount; ++i )
 	{
 		if ( !Q_stricmp( retiredControlNames[i], pControlName ) )
@@ -956,8 +956,8 @@ void CDmeCombinationControlsPanel::PerformGroupControls( const char *pGroupedCon
 		return;
 
 	// Delete old controls
-	int nRetiredControlNameCount = controlNames.Count();
-	for ( int i = 0; i < nRetiredControlNameCount; ++i )
+	intp nRetiredControlNameCount = controlNames.Count();
+	for ( intp i = 0; i < nRetiredControlNameCount; ++i )
 	{
 		m_hCombinationOperator->RemoveControl( controlNames[i] );
 	}
@@ -965,8 +965,8 @@ void CDmeCombinationControlsPanel::PerformGroupControls( const char *pGroupedCon
 	// Create new control
 	ControlIndex_t nNewControl = m_hCombinationOperator->FindOrCreateControl( pGroupedControlName, bIsStereo );
 	m_hCombinationOperator->SetEyelidControl( nNewControl, bIsEyelid );
-	int nGroupedControlCount = rawControlNames.Count();
-	for ( int i = 0; i < nGroupedControlCount; ++i )
+	intp nGroupedControlCount = rawControlNames.Count();
+	for ( intp i = 0; i < nGroupedControlCount; ++i )
 	{
 		m_hCombinationOperator->AddRawControl( nNewControl, rawControlNames[i] );
 	}
@@ -1053,23 +1053,23 @@ void CDmeCombinationControlsPanel::OnUngroupControls( )
 
 	// NOTE: It's illegal to use a grouped control name which already exists
 	// assuming it's not in the list of grouped control names we're going to group together
-	int nRawControlCount = rawControlNames.Count();
-	for ( int i = 0; i < nRawControlCount; ++i )
+	intp nRawControlCount = rawControlNames.Count();
+	for ( intp i = 0; i < nRawControlCount; ++i )
 	{
 		if ( HasDuplicateControlName( rawControlNames[i], controlNames ) )
 			return;
 	}
 
 	// Delete old controls
-	int nRetiredControlNameCount = controlNames.Count();
-	for ( int i = 0; i < nRetiredControlNameCount; ++i )
+	intp nRetiredControlNameCount = controlNames.Count();
+	for ( intp i = 0; i < nRetiredControlNameCount; ++i )
 	{
 		m_hCombinationOperator->RemoveControl( controlNames[i] );
 	}
 
 	// Create new control (this will also create raw controls with the same name)
-	int nGroupedControlCount = rawControlNames.Count();
-	for ( int i = 0; i < nGroupedControlCount; ++i )
+	intp nGroupedControlCount = rawControlNames.Count();
+	for ( intp i = 0; i < nGroupedControlCount; ++i )
 	{
 		const int nControlIndex = m_hCombinationOperator->FindOrCreateControl( rawControlNames[i], bIsStereo, true );
 		m_hCombinationOperator->SetEyelidControl( nControlIndex, bIsEyelid );
@@ -1093,8 +1093,8 @@ void CDmeCombinationControlsPanel::OnToggleStereoControl( )
 	bool bIsStereo = false;
 	BuildSelectedControlLists( false, controlNames, rawControlNames, &bIsStereo );
 
-	int nControlCount = controlNames.Count();
-	for ( int i = 0; i < nControlCount; ++i )
+	intp nControlCount = controlNames.Count();
+	for ( intp i = 0; i < nControlCount; ++i )
 	{
 		ControlIndex_t nControlIndex = m_hCombinationOperator->FindControlIndex( controlNames[i] );
 		m_hCombinationOperator->SetStereoControl( nControlIndex, !bIsStereo );
@@ -1118,8 +1118,8 @@ void CDmeCombinationControlsPanel::OnToggleEyelidControl()
 	bool bIsEyelid = false;
 	BuildSelectedControlLists( false, controlNames, rawControlNames, NULL, &bIsEyelid );
 
-	int nControlCount = controlNames.Count();
-	for ( int i = 0; i < nControlCount; ++i )
+	intp nControlCount = controlNames.Count();
+	for ( intp i = 0; i < nControlCount; ++i )
 	{
 		ControlIndex_t nControlIndex = m_hCombinationOperator->FindControlIndex( controlNames[i] );
 		m_hCombinationOperator->SetEyelidControl( nControlIndex, !bIsEyelid );
@@ -1369,7 +1369,8 @@ void CDmeRawControlListPanel::OnNewWrinkleText()
 	m_pWrinkleEdit->GetText( szEditText, MAX_PATH );
 	m_pWrinkleEdit->SetVisible( false );
 
-	float flWrinkleScale = atof( szEditText );
+	// dimhotepus: atof -> strtof.
+	float flWrinkleScale = strtof( szEditText, nullptr );
 	if ( m_bIsWrinkle )
 	{
 		flWrinkleScale = -flWrinkleScale;

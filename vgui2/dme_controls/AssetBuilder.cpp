@@ -180,7 +180,7 @@ void BuildAssetTypeList( )
 		CDmeMakefile *pMakeFile = CastElement<CDmeMakefile>( pElement );
 		if ( pMakeFile && pMakeFile->GetMakefileType() )
 		{
-			int i = s_AssetTypes.AddToTail();
+			intp i = s_AssetTypes.AddToTail();
 			s_AssetTypes[i].m_pChoiceString = pMakeFile->GetMakefileType()->m_pHumanReadableName;
 			s_AssetTypes[i].m_pChoiceValue = pFactoryName;
 		}
@@ -203,8 +203,8 @@ static PickerList_t &BuildAssetSubTypeList( const char **ppSubTypes, PickerList_
 
 	CDisableUndoScopeGuard guard;
 
-	int nCount = s_AssetTypes.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = s_AssetTypes.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// Add all DmeElements that inherit from DmeMakefile 
 		CDmElement *pElement = GetElement< CDmElement >( g_pDataModel->CreateElement( s_AssetTypes[i].m_pChoiceValue, "temp" ) );
@@ -215,7 +215,7 @@ static PickerList_t &BuildAssetSubTypeList( const char **ppSubTypes, PickerList_
 			if ( !pElement->IsA( ppSubTypes[j] ) )
 				continue;
 
-			int k = pickerList.AddToTail();
+			intp k = pickerList.AddToTail();
 			pickerList[k].m_pChoiceString = pMakeFile->GetMakefileType()->m_pHumanReadableName;
 			pickerList[k].m_pChoiceValue = s_AssetTypes[i].m_pChoiceValue;
 			break;
@@ -446,8 +446,8 @@ void CAssetBuilder::BuildFileIDList( CDmeMakefile *pMakeFile, CUtlVector<DmFileI
 	// NOTE: Not hugely efficient. If the CDmeDependencyMakefile starts
 	// getting large, we can optimize this
 	DmFileId_t id = pMakeFile->GetFileId();
-	int nCount = fileIds.Count();
-	int i;
+	intp nCount = fileIds.Count();
+	intp i;
 	for ( i = 0; i < nCount; ++i )
 	{
 		if ( fileIds[i] == id )
@@ -488,8 +488,8 @@ void CAssetBuilder::CleanupMakefile()
 
 	m_hRootMakefile = NULL;
 
-	int nCount = fileIds.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = fileIds.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( fileIds[i] != DMFILEID_INVALID && g_pDataModel->GetFileName( fileIds[i] )[0] )
 		{
@@ -587,8 +587,8 @@ void CAssetBuilder::RefreshSourceList( )
 	{
 		CUtlVector< CDmeHandle< CDmeSource > > sources;
 		m_hMakefile->GetSources( pSourceTypes[i].m_pTypeName, sources );
-		int nCount = sources.Count();
-		for ( int j = 0; j < nCount; ++j )
+		intp nCount = sources.Count();
+		for ( intp j = 0; j < nCount; ++j )
 		{
 			char pFullPath[MAX_PATH];
 			m_hMakefile->GetSourceFullPath( sources[j], pFullPath, sizeof(pFullPath) );
@@ -619,8 +619,8 @@ void CAssetBuilder::RefreshOutputList()
 
 	CUtlVector<CUtlString> outputs;
 	m_hMakefile->GetOutputs( outputs );
-	int nCount = outputs.Count();
-	for ( int j = 0; j < nCount; ++j )
+	intp nCount = outputs.Count();
+	for ( intp j = 0; j < nCount; ++j )
 	{
 		KeyValues *pItemKeys = new KeyValues( "node", "type", "Output" );
 		pItemKeys->SetString( "file", outputs[j] );
@@ -733,7 +733,7 @@ void CAssetBuilder::OnAddSource( )
 				continue;
 		}
 
-		int j = sourceType.AddToTail( );
+		intp j = sourceType.AddToTail( );
 		sourceType[j].m_pChoiceString = pSourceTypes[i].m_pHumanReadableName;
 		sourceType[j].m_pChoiceValue = pSourceTypes[i].m_pTypeName;
 	}
@@ -1301,7 +1301,7 @@ void CAssetBuilder::OnTick()
 
 	if ( m_bIsCompiling )
 	{
-		int nLen = g_pDmeMakefileUtils->GetCompileOutputSize( );
+		intp nLen = g_pDmeMakefileUtils->GetCompileOutputSize( );
 		char *pBuf = (char*)_alloca( nLen+1 );
 		CompilationState_t state = g_pDmeMakefileUtils->UpdateCompilation( pBuf, nLen );
 		if ( nLen > 0 )

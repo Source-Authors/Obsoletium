@@ -99,8 +99,8 @@ inline DmAttributeType_t ElementTree_GetAttributeType( KeyValues *itemData )
 
 inline bool ElementTree_GetDroppableItems( CUtlVector< KeyValues * >& msglist, const char *elementType, CUtlVector< CDmElement * >& list )
 {
-	int c = msglist.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = msglist.Count();
+	for ( intp i = 0; i < c; ++i )
 	{	
 		KeyValues *data = msglist[ i ];
 
@@ -124,8 +124,8 @@ inline bool ElementTree_GetDroppableItems( CUtlVector< KeyValues * >& msglist, c
 inline void ElementTree_RemoveListFromArray( CDmAttribute *pArrayAttribute, CUtlVector< CDmElement * >& list )
 {
 	CDmrElementArray<> array( pArrayAttribute );
-	int c = array.Count();
-	for ( int i = c - 1 ; i >= 0 ; --i )
+	intp c = array.Count();
+	for ( intp i = c - 1 ; i >= 0 ; --i )
 	{
 		CDmElement *element = array[ i ];
 		if ( list.Find( element ) != list.InvalidIndex() )

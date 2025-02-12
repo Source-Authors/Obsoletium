@@ -167,14 +167,14 @@ void CDmePresetRemapPanel::RefreshPresetList( )
 	if ( !pPresetList )
 		return;
 
-	int nCount = pPresetList->Count();
+	intp nCount = pPresetList->Count();
 	if ( nCount == 0 )
 		return;
 
 	CDmePresetRemap *pRemap = m_hDestGroup->GetPresetRemap();
 	bool bUseRemap = ( pRemap && m_hSourceGroup.Get() && !Q_stricmp( pRemap->m_SourcePresetGroup, m_hSourceGroup->GetName() ) );
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePreset *pPreset = pPresetList->Get(i);
 
@@ -315,8 +315,8 @@ void CDmePresetRemapPanel::DoModal( CDmeAnimationSet *pAnimationSet, CDmePresetG
 
 	// Populate the combo box with preset group names
 	const CDmaElementArray< CDmePresetGroup > &presetGroupList = pAnimationSet->GetPresetGroups();
-	int nCount = presetGroupList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = presetGroupList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroupList[i];
 		if ( pPresetGroup == m_hDestGroup.Get() )
@@ -550,7 +550,7 @@ void CDmePresetGroupEditorPanel::RefreshAnimationSet()
 		return;
 	
 	const CDmaElementArray< CDmePresetGroup > &presetGroupList = m_hAnimationSet->GetPresetGroups();
-	int nCount = presetGroupList.Count();
+	intp nCount = presetGroupList.Count();
 	for ( int i = 0; i < nCount; ++i )
 	{ 
 		CDmePresetGroup *pPresetGroup = presetGroupList[i];
@@ -605,8 +605,8 @@ void CDmePresetGroupEditorPanel::RefreshPresetNames()
 		return;
 
 	const CDmaElementArray< CDmePreset > &presetList = pPresetGroup->GetPresets();
-	int nCount = presetList.Count( );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = presetList.Count( );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePreset *pPreset = presetList[i];
 		KeyValues *kv = new KeyValues( "node", "name", pPreset->GetName() );
@@ -931,10 +931,10 @@ struct ExportedControl_t
 	int m_nFirstIndex;
 };
 
-static int FindExportedControlIndex( const char *pControlName, CUtlVector< ExportedControl_t > &uniqueControls )
+static intp FindExportedControlIndex( const char *pControlName, CUtlVector< ExportedControl_t > &uniqueControls )
 {
-	int nCount = uniqueControls.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = uniqueControls.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pControlName, uniqueControls[i].m_Name ) )
 			return i;
@@ -950,17 +950,17 @@ static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, CDmePreset
 {
 	int nGlobalIndex = 0;
 	const CDmrElementArray< CDmePreset > &presets = pPresetGroup->GetPresets();
-	int nPresetCount = presets.Count();
-	for ( int iPreset = 0; iPreset < nPresetCount; ++iPreset )
+	intp nPresetCount = presets.Count();
+	for ( intp iPreset = 0; iPreset < nPresetCount; ++iPreset )
 	{
 		CDmePreset *pPreset = presets[iPreset];
 		const CDmrElementArray< CDmElement > &controls = pPreset->GetControlValues();
 
-		int nControlCount = controls.Count();
-		for ( int i = 0; i < nControlCount; ++i )
+		intp nControlCount = controls.Count();
+		for ( intp i = 0; i < nControlCount; ++i )
 		{
 			const char *pControlName = controls[i]->GetName();
-			int nIndex = FindExportedControlIndex( pControlName, uniqueControls );
+			intp nIndex = FindExportedControlIndex( pControlName, uniqueControls );
 			if ( nIndex >= 0 )
 				continue;
 			CDmAttribute *pValueAttribute = controls[i]->GetAttribute( "value" );
@@ -971,7 +971,7 @@ static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, CDmePreset
 			if ( !pControl )
 				continue;
 
-			int j = uniqueControls.AddToTail();
+			intp j = uniqueControls.AddToTail();
 			ExportedControl_t &control = uniqueControls[j];
 			control.m_Name = pControlName;
 			control.m_bIsStereo = pControl->GetValue<bool>( "combo" );
@@ -1162,16 +1162,16 @@ void CDmePresetGroupEditorPanel::ImportPresets( const CUtlVector< CDmePreset * >
 
 	CPresetGroupUndoScopeGuard sg( NOTIFY_SETDIRTYFLAG, "Import Presets" );
 
-	int nPresetCount = presets.Count();
-	for ( int i = 0; i < nPresetCount; ++i )
+	intp nPresetCount = presets.Count();
+	for ( intp i = 0; i < nPresetCount; ++i )
 	{
 		CDmePreset *pPreset = pPresetGroup->FindOrAddPreset( presets[i]->GetName() );
 		const CDmaElementArray< CDmElement > &srcValues = presets[i]->GetControlValues( );
 		CDmaElementArray< CDmElement > &values = pPreset->GetControlValues( );
 		values.RemoveAll();
 
-		int nValueCount = srcValues.Count();
-		for ( int j = 0; j < nValueCount; ++j )
+		intp nValueCount = srcValues.Count();
+		for ( intp j = 0; j < nValueCount; ++j )
 		{
 			CDmElement *pSrcControlValue = srcValues[j];
 			CDmElement *pControlValue = pSrcControlValue->Copy( );
@@ -1326,13 +1326,13 @@ void CDmePresetGroupEditorPanel::OnRemoveDefaultControls()
 
 	CPresetGroupUndoScopeGuard sg( NOTIFY_SETDIRTYFLAG, "Remove Default Controls" );
 	CDmrElementArray< CDmePreset > presets = pPresetGroup->GetPresets();
-	int nPresetCount = presets.Count();
-	for ( int i = 0; i < nPresetCount; ++i )
+	intp nPresetCount = presets.Count();
+	for ( intp i = 0; i < nPresetCount; ++i )
 	{
 		CDmePreset *pPreset = presets[i];
 		CDmrElementArray< CDmElement > controls = pPreset->GetControlValues();	
-		int nControlCount = controls.Count();
-		for ( int j = nControlCount; --j >= 0; )
+		intp nControlCount = controls.Count();
+		for ( intp j = nControlCount; --j >= 0; )
 		{
 			CDmElement *pControlValue = controls[j];
 			CDmElement *pControl = m_hAnimationSet->FindControl( pControlValue->GetName() );
