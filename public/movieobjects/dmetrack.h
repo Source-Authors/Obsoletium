@@ -54,8 +54,8 @@ public:
 	void			SetSynched( bool bState );
 	bool			IsSynched() const;
 
-	int				GetClipCount() const;
-	CDmeClip		*GetClip( int i ) const;
+	intp			GetClipCount() const;
+	CDmeClip		*GetClip( intp i ) const;
 	const CUtlVector< DmElementHandle_t > &GetClips( ) const;
 
 	void			AddClip( CDmeClip *clip );

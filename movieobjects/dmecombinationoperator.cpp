@@ -1236,10 +1236,10 @@ CDmeCombinationDominationRule *CDmeCombinationOperator::AddDominationRule( CDmeC
 //-----------------------------------------------------------------------------
 // Adds a dominator. Dominators are specified using raw control names
 //-----------------------------------------------------------------------------
-CDmeCombinationDominationRule *CDmeCombinationOperator::AddDominationRule( int nDominatorCount, const char **ppDominatorControlNames, int nSuppressedCount, const char **ppSuppressedControlNames )
+CDmeCombinationDominationRule *CDmeCombinationOperator::AddDominationRule( intp nDominatorCount, const char **ppDominatorControlNames, int nSuppressedCount, const char **ppSuppressedControlNames )
 {
 	CDmeCombinationDominationRule *pDominationRule = AddDominationRule();
-	for ( int i = 0; i < nDominatorCount; ++i )
+	for ( intp i = 0; i < nDominatorCount; ++i )
 	{
 		pDominationRule->AddDominator( ppDominatorControlNames[i] );
 	}

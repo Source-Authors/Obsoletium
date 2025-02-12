@@ -246,7 +246,7 @@ public:
 
 	// Adds a domination rule. Domination rules are specified using raw control names
 	CDmeCombinationDominationRule *AddDominationRule( );
-	CDmeCombinationDominationRule *AddDominationRule( int nDominatorCount, const char **ppDominatorOutputControlNames, int nSuppressedCount, const char **ppSuppressedOutputControlNames );
+	CDmeCombinationDominationRule *AddDominationRule( intp nDominatorCount, const char **ppDominatorOutputControlNames, int nSuppressedCount, const char **ppSuppressedOutputControlNames );
 	CDmeCombinationDominationRule *AddDominationRule( const CUtlVector< const char * > dominators, const CUtlVector< const char * > suppressed );
 	CDmeCombinationDominationRule *AddDominationRule( CDmeCombinationDominationRule *pSrcRule );
 

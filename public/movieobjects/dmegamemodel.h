@@ -20,8 +20,8 @@ struct studiohdr_t;
 class IGlobalFlexController
 {
 public:
-	virtual int				FindGlobalFlexController( char const *name ) = 0;
-	virtual char const		*GetGlobalFlexControllerName( int idx ) = 0;
+	virtual UtlSymId_t		FindGlobalFlexController( char const *name ) = 0;
+	virtual char const		*GetGlobalFlexControllerName( UtlSymId_t idx ) = 0;
 };
 
 class CDmeGameModel;

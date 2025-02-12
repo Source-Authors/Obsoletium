@@ -145,12 +145,12 @@ bool CDmeTrack::IsMute( bool bCheckSoloing ) const
 	return m_Mute.Get() || ( pSoloTrack != this && pSoloTrack != NULL );
 }
 
-int CDmeTrack::GetClipCount() const
+intp CDmeTrack::GetClipCount() const
 {
 	return m_Clips.Count();
 }
 
-CDmeClip *CDmeTrack::GetClip( int i ) const
+CDmeClip *CDmeTrack::GetClip( intp i ) const
 {
 	return m_Clips[ i ];
 }

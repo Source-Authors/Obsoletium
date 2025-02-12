@@ -972,7 +972,7 @@ intp CDmeLogLayer::GetKeyCount() const
 // Input  : nKeyIndex - 
 //			keyTime - 
 //-----------------------------------------------------------------------------
-void CDmeLogLayer::SetKeyTime( int nKeyIndex, DmeTime_t keyTime )
+void CDmeLogLayer::SetKeyTime( intp nKeyIndex, DmeTime_t keyTime )
 {
 	m_times.Set( nKeyIndex, keyTime.GetTenthsOfMS() );
 }
@@ -980,7 +980,7 @@ void CDmeLogLayer::SetKeyTime( int nKeyIndex, DmeTime_t keyTime )
 //-----------------------------------------------------------------------------
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
-DmeTime_t CDmeLogLayer::GetKeyTime( int nKeyIndex ) const
+DmeTime_t CDmeLogLayer::GetKeyTime( intp nKeyIndex ) const
 {
 	return DmeTime_t( m_times[ nKeyIndex ] );
 }
@@ -1371,7 +1371,7 @@ void CDmeTypedLogLayer< T >::ClearKeys()
 }
 
 template< class T >
-void CDmeTypedLogLayer< T >::RemoveKey( int nKeyIndex, int nNumKeysToRemove /*= 1*/ )
+void CDmeTypedLogLayer< T >::RemoveKey( intp nKeyIndex, intp nNumKeysToRemove /*= 1*/ )
 {
 	m_times.RemoveMultiple( nKeyIndex, nNumKeysToRemove );
 	m_values.RemoveMultiple( nKeyIndex, nNumKeysToRemove );
@@ -1610,7 +1610,7 @@ bool CDmeTypedLogLayer< T >::SetDuplicateKeyAtTime( DmeTime_t time )
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
 template< class T >
-const T& CDmeTypedLogLayer< T >::GetKeyValue( int nKeyIndex ) const
+const T& CDmeTypedLogLayer< T >::GetKeyValue( intp nKeyIndex ) const
 {
 	Assert( m_values.Count() == m_times.Count() );
 	Assert( !IsUsingCurveTypes() || ( m_CurveTypes.Count() == m_times.Count() ) );
@@ -2841,12 +2841,12 @@ int	CDmeLog::GetNumLayers() const
 	return m_Layers.Count();
 }
 
-CDmeLogLayer *CDmeLog::GetLayer( int index )
+CDmeLogLayer *CDmeLog::GetLayer( intp index )
 {
 	return m_Layers[ index ];
 }
 
-const CDmeLogLayer *CDmeLog::GetLayer( int index ) const
+const CDmeLogLayer *CDmeLog::GetLayer( intp index ) const
 {
 	return m_Layers[ index ];
 }
@@ -4441,7 +4441,7 @@ void CDmeTypedLog< T >::RemoveKeys( DmeTime_t starttime )
 }
 
 template< class T >
-void CDmeTypedLog< T >::RemoveKey( int nKeyIndex, int nNumKeysToRemove /*= 1*/ )
+void CDmeTypedLog< T >::RemoveKey( intp nKeyIndex, intp nNumKeysToRemove /*= 1*/ )
 {
 	int bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
@@ -4464,7 +4464,7 @@ void CDmeTypedLog< T >::ClearKeys()
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
 template< class T >
-DmeTime_t CDmeTypedLog< T >::GetKeyTime( int nKeyIndex ) const
+DmeTime_t CDmeTypedLog< T >::GetKeyTime( intp nKeyIndex ) const
 {
 	int bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
@@ -4473,7 +4473,7 @@ DmeTime_t CDmeTypedLog< T >::GetKeyTime( int nKeyIndex ) const
 }
 
 template< class T >
-void CDmeTypedLog< T >::SetKeyTime( int nKeyIndex, DmeTime_t keyTime )
+void CDmeTypedLog< T >::SetKeyTime( intp nKeyIndex, DmeTime_t keyTime )
 {
 	int bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
@@ -4541,7 +4541,7 @@ void CDmeTypedLog< T >::SetKey( DmeTime_t time, const T& value, int curveType /*
 }
 
 template< class T >
-CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( int index )
+CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( intp index )
 {
 	if ( index < 0 )
 		return NULL;
@@ -4550,7 +4550,7 @@ CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( int index )
 }
 
 template< class T >
-const CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( int index ) const
+const CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( intp index ) const
 {
 	if ( index < 0 )
 		return NULL;
@@ -4644,7 +4644,7 @@ bool CDmeTypedLog< T >::SetDuplicateKeyAtTime( DmeTime_t time )
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
 template< class T >
-const T& CDmeTypedLog< T >::GetKeyValue( int nKeyIndex ) const
+const T& CDmeTypedLog< T >::GetKeyValue( intp nKeyIndex ) const
 {
 	int bestLayer = GetTopmostLayer();
 	if ( bestLayer == -1 )

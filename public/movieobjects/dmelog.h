@@ -179,14 +179,14 @@ public:
 	virtual float GetComponent( DmeTime_t time, int componentIndex ) const = 0;
 
 	// Returns the time at which a particular key occurs
-	DmeTime_t GetKeyTime( int nKeyIndex ) const;
-	void	SetKeyTime( int nKeyIndex, DmeTime_t keyTime );
+	DmeTime_t GetKeyTime( intp nKeyIndex ) const;
+	void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime );
 
 	// Scale + bias key times
 	void ScaleBiasKeyTimes( double flScale, DmeTime_t nBias );
 
 	// Removes a single key	by index
-	virtual void RemoveKey( int nKeyIndex, int nNumKeysToRemove = 1 ) = 0;
+	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 ) = 0;
 
 	// Removes all keys
 	virtual void ClearKeys() = 0;
@@ -287,8 +287,8 @@ public:
 
 	int GetTopmostLayer() const;
 	int	GetNumLayers() const;
-	CDmeLogLayer *GetLayer( int index );
-	const CDmeLogLayer *GetLayer( int index ) const;
+	CDmeLogLayer *GetLayer( intp index );
+	const CDmeLogLayer *GetLayer( intp index ) const;
 
 	DmeTime_t GetBeginTime() const;
 	DmeTime_t GetEndTime() const;
@@ -315,15 +315,15 @@ public:
 	virtual float GetComponent( DmeTime_t time, int componentIndex ) const = 0;
 
 	// Returns the time at which a particular key occurs
-	virtual DmeTime_t GetKeyTime( int nKeyIndex ) const = 0;
-	virtual void	SetKeyTime( int nKeyIndex, DmeTime_t keyTime ) = 0;
+	virtual DmeTime_t GetKeyTime( intp nKeyIndex ) const = 0;
+	virtual void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime ) = 0;
 
 	// Override curvetype for specific key
 	void			SetKeyCurveType( int nKeyIndex, int curveType );
 	int				GetKeyCurveType( int nKeyIndex ) const;
 
 	// Removes a single key	by index
-	virtual void RemoveKey( int nKeyIndex, int nNumKeysToRemove = 1 ) = 0;
+	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 ) = 0;
 
 	// Removes all keys within the time range, returns true if keys were removed
 	bool RemoveKeys( DmeTime_t tStartTime, DmeTime_t tEndTime );
@@ -467,7 +467,7 @@ public:
 
 	const T& GetValue( DmeTime_t time ) const;
 
-	const T& GetKeyValue( int nKeyIndex ) const;
+	const T& GetKeyValue( intp nKeyIndex ) const;
 	const T& GetValueSkippingKey( int nKeyToSkip ) const;
 
 	// This inserts a key. Unlike SetKey, this will *not* delete keys after the specified time
@@ -484,7 +484,7 @@ public:
 	virtual void RemoveRedundantKeys();
 	virtual void RemoveRedundantKeys( float threshold );
 
-	virtual void RemoveKey( int nKeyIndex, int nNumKeysToRemove = 1 );
+	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 );
 	virtual void Resample( DmeFramerate_t samplerate );
 	virtual void Filter( int nSampleRadius );
 	virtual void Filter2( DmeTime_t sampleRadius );
@@ -535,8 +535,8 @@ public:
 
 	virtual void OnAttributeArrayElementAdded( CDmAttribute *pAttribute, int nFirstElem, int nLastElem );
 
-	CDmeTypedLogLayer< T > *GetLayer( int index );
-	const CDmeTypedLogLayer< T > *GetLayer( int index ) const;
+	CDmeTypedLogLayer< T > *GetLayer( intp index );
+	const CDmeTypedLogLayer< T > *GetLayer( intp index ) const;
 
 	void		StampKeyAtHead( DmeTime_t tHeadPosition, DmeTime_t tPreviousHeadPosition, const DmeLog_TimeSelection_t& params, const T& value );
 	void		StampKeyAtHead( DmeTime_t tHeadPosition, DmeTime_t tPreviousHeadPosition, const DmeLog_TimeSelection_t& params, const CDmAttribute *pAttr, uint index = 0 );
@@ -565,7 +565,7 @@ public:
 	const T& GetValue( DmeTime_t time ) const;
 	const T& GetValueSkippingTopmostLayer( DmeTime_t time ) const;
 
-	const T& GetKeyValue( int nKeyIndex ) const;
+	const T& GetKeyValue( intp nKeyIndex ) const;
 
 	// This inserts a key. Unlike SetKey, this will *not* delete keys after the specified time
 	int InsertKey( DmeTime_t nTime, const T& value, int curveType = CURVE_DEFAULT );
@@ -583,14 +583,14 @@ public:
 	virtual bool IsConstantValued() const;
 	virtual void RemoveRedundantKeys();
 	virtual void RemoveRedundantKeys( float threshold );
-	virtual void RemoveKey( int nKeyIndex, int nNumKeysToRemove = 1 );
+	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 );
 	virtual void Resample( DmeFramerate_t samplerate );
 	virtual void Filter( int nSampleRadius );
 	virtual void Filter2( DmeTime_t sampleRadius );
 
 	virtual int FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance );
-	virtual DmeTime_t GetKeyTime( int nKeyIndex ) const;
-	virtual void	SetKeyTime( int nKeyIndex, DmeTime_t keyTime );
+	virtual DmeTime_t GetKeyTime( intp nKeyIndex ) const;
+	virtual void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime );
 
 	virtual CDmeLogLayer *AddNewLayer();
 	virtual void		FlattenLayers( float threshhold, int flags );

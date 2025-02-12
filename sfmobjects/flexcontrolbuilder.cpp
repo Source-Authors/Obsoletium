@@ -32,12 +32,12 @@ class CDefaultGlobalFlexController : public IGlobalFlexController
 public:
 	CDefaultGlobalFlexController() : m_SymbolTable( 0, 32, true ) {}
 
-	virtual int	FindGlobalFlexController( const char *name )
+	UtlSymId_t	FindGlobalFlexController( const char *name ) override
 	{
 		return m_SymbolTable.AddString( name );
 	}
 
-	virtual const char *GetGlobalFlexControllerName( int idx )
+	const char *GetGlobalFlexControllerName( UtlSymId_t idx ) override
 	{
 		return m_SymbolTable.String( (CUtlSymbol)idx );
 	}

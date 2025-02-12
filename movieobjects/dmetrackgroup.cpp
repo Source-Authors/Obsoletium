@@ -171,7 +171,7 @@ CDmeTrack* CDmeTrackGroup::FindOrAddTrack( const char *pTrackName, DmeClipType_t
 	return pTrack;
 }
 
-void CDmeTrackGroup::RemoveTrack( int nIndex )
+void CDmeTrackGroup::RemoveTrack( intp nIndex )
 {
 	m_Tracks.Remove( nIndex );
 }
@@ -192,8 +192,8 @@ void CDmeTrackGroup::RemoveTrack( const char *pTrackName )
 		pTrackName = DMETRACK_DEFAULT_NAME;
 	}
 
-	int c = m_Tracks.Count();
-	for ( int i = c; --i >= 0; )
+	intp c = m_Tracks.Count();
+	for ( intp i = c; --i >= 0; )
 	{
 		if ( !Q_strcmp( m_Tracks[i]->GetName(), pTrackName ) )
 		{
@@ -214,8 +214,8 @@ CDmeTrack *CDmeTrackGroup::FindTrack( const char *pTrackName ) const
 		pTrackName = DMETRACK_DEFAULT_NAME;
 	}
 
-	int c = m_Tracks.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_Tracks.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmeTrack *pTrack = m_Tracks[i];
 		if ( !pTrack )
@@ -229,8 +229,8 @@ CDmeTrack *CDmeTrackGroup::FindTrack( const char *pTrackName ) const
 
 int CDmeTrackGroup::GetTrackIndex( CDmeTrack *pTrack ) const
 {
-	int nTracks = m_Tracks.Count();
-	for ( int i = 0 ; i < nTracks; ++i )
+	intp nTracks = m_Tracks.Count();
+	for ( intp i = 0 ; i < nTracks; ++i )
 	{
 		if ( pTrack == m_Tracks[i] )
 			return i;
@@ -328,8 +328,8 @@ CDmeTrack *CDmeTrackGroup::FindTrackForClip( CDmeClip *pClip ) const
 bool CDmeTrackGroup::FindTrackForClip( CDmeClip *pClip, int *pTrackIndex, int *pClipIndex ) const
 {
 	DmeClipType_t type = pClip->GetClipType();
-	int c = GetTrackCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetTrackCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeTrack *pTrack = GetTrack( i );
 		if ( !pTrack )
@@ -369,8 +369,8 @@ void CDmeTrackGroup::FindClipsAtTime( DmeClipType_t clipType, DmeTime_t time, Dm
 	if ( ( flags & DMESKIP_MUTED ) && IsMute() )
 		return;
 
-	int c = GetTrackCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetTrackCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeTrack *pTrack = GetTrack( i );
 		if ( !pTrack )
@@ -392,8 +392,8 @@ void CDmeTrackGroup::FindClipsIntersectingTime( DmeClipType_t clipType, DmeTime_
 	if ( ( flags & DMESKIP_MUTED ) && IsMute() )
 		return;
 
-	int c = GetTrackCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetTrackCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeTrack *pTrack = GetTrack( i );
 		if ( !pTrack )
@@ -415,8 +415,8 @@ void CDmeTrackGroup::FindClipsWithinTime( DmeClipType_t clipType, DmeTime_t star
 	if ( ( flags & DMESKIP_MUTED ) && IsMute() )
 		return;
 
-	int c = GetTrackCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetTrackCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeTrack *pTrack = GetTrack( i );
 		if ( !pTrack )
@@ -435,8 +435,8 @@ void CDmeTrackGroup::FindClipsWithinTime( DmeClipType_t clipType, DmeTime_t star
 //-----------------------------------------------------------------------------
 void CDmeTrackGroup::RemoveEmptyTracks()
 {
-	int tc = GetTrackCount();
-	for ( int i = tc; --i >= 0; )
+	intp tc = GetTrackCount();
+	for ( intp i = tc; --i >= 0; )
 	{
 		CDmeTrack *pTrack = GetTrack( i );
 		if ( pTrack->GetClipCount() == 0 )
@@ -463,12 +463,12 @@ static int TrackLessFunc( const void * lhs, const void * rhs )
 
 void CDmeTrackGroup::SortTracksByType()
 {
-	int tc = GetTrackCount();
+	intp tc = GetTrackCount();
 	if ( tc == 0 )
 		return;
 
 	CDmeTrack **ppTrack = (CDmeTrack**)_alloca( tc * sizeof(CDmeTrack*) );
-	for ( int i = 0; i < tc; ++i )
+	for ( intp i = 0; i < tc; ++i )
 	{
 		ppTrack[i] = GetTrack(i);
 	}
@@ -477,7 +477,7 @@ void CDmeTrackGroup::SortTracksByType()
 
 	m_Tracks.RemoveAll();
 
-	for ( int i = 0; i < tc; ++i )
+	for ( intp i = 0; i < tc; ++i )
 	{
 		m_Tracks.AddToTail( ppTrack[i] );
 	}

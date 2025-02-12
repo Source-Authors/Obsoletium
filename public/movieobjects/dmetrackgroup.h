@@ -55,10 +55,10 @@ public:
 	CDmeTrack* FindOrAddTrack( const char *pTrackName, DmeClipType_t trackType );
 	void RemoveTrack( CDmeTrack *track );
 	void RemoveTrack( const char *pTrackName );
-	void RemoveTrack( int nIndex );
+	void RemoveTrack( intp nIndex );
 	const CUtlVector< DmElementHandle_t > &GetTracks( ) const;
-	int GetTrackCount( ) const;
-	CDmeTrack *GetTrack( int nIndex ) const;
+	intp GetTrackCount( ) const;
+	CDmeTrack *GetTrack( intp nIndex ) const;
 	CDmeTrack *FindTrack( const char *pTrackName ) const;
 	int GetTrackIndex( CDmeTrack *pTrack ) const;
 
@@ -135,12 +135,12 @@ private:
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline int CDmeTrackGroup::GetTrackCount( ) const
+inline intp CDmeTrackGroup::GetTrackCount( ) const
 {
 	return m_Tracks.Count();
 }
 
-inline CDmeTrack *CDmeTrackGroup::GetTrack( int nIndex ) const
+inline CDmeTrack *CDmeTrackGroup::GetTrack( intp nIndex ) const
 {
 	return m_Tracks[nIndex];
 }
@@ -198,15 +198,15 @@ inline int CDmeTrackGroup::GetDisplaySize() const
 //-----------------------------------------------------------------------------
 #define DMETRACKGROUP_FOREACH_CLIP_START( _dmeTrackGroup, _dmeTrack, _dmeClip )	\
 	{																	\
-		int _tc = (_dmeTrackGroup)->GetTrackCount();					\
-		for ( int _i = 0; _i < _tc; ++_i )								\
+		intp _tc = (_dmeTrackGroup)->GetTrackCount();					\
+		for ( intp _i = 0; _i < _tc; ++_i )								\
 		{																\
 			CDmeTrack *_dmeTrack = (_dmeTrackGroup)->GetTrack( _i );	\
 			if ( !_dmeTrack )											\
 				continue;												\
 																		\
-			int _cc = _dmeTrack->GetClipCount();						\
-			for ( int _j = 0; _j < _cc; ++_j )							\
+			intp _cc = _dmeTrack->GetClipCount();						\
+			for ( intp _j = 0; _j < _cc; ++_j )							\
 			{															\
 				CDmeClip *_dmeClip = _dmeTrack->GetClip( _j );			\
 				if ( !_dmeClip )										\
@@ -219,8 +219,8 @@ inline int CDmeTrackGroup::GetDisplaySize() const
 
 #define DMETRACKGROUP_FOREACH_CLIP_TYPE_START( _clipType, _dmeTrackGroup, _dmeTrack, _dmeClip )	\
 	{																	\
-		int _tc = (_dmeTrackGroup)->GetTrackCount();					\
-		for ( int _i = 0; _i < _tc; ++_i )								\
+		intp _tc = (_dmeTrackGroup)->GetTrackCount();					\
+		for ( intp _i = 0; _i < _tc; ++_i )								\
 		{																\
 			CDmeTrack *_dmeTrack = (_dmeTrackGroup)->GetTrack( _i );	\
 			if ( !_dmeTrack )											\
@@ -229,8 +229,8 @@ inline int CDmeTrackGroup::GetDisplaySize() const
 			if ( _dmeTrack->GetClipType() != CDmeClipInfo< _clipType >::ClipType() )	\
 				continue;												\
 																		\
-			int _cc = _dmeTrack->GetClipCount();						\
-			for ( int _j = 0; _j < _cc; ++_j )							\
+			intp _cc = _dmeTrack->GetClipCount();						\
+			for ( intp _j = 0; _j < _cc; ++_j )							\
 			{															\
 				_clipType *_dmeClip = static_cast< _clipType* >( _dmeTrack->GetClip( _j ) );	\
 				if ( !_dmeClip )										\
