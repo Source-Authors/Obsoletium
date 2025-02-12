@@ -116,6 +116,7 @@ public:
 	KeyValues( const char *setName, const char *firstKey, const wchar_t *firstValue );
 	KeyValues( const char *setName, const char *firstKey, int firstValue );
 	KeyValues( const char *setName, const char *firstKey, unsigned firstValue );
+	KeyValues( const char *setName, const char *firstKey, float firstValue );
 	KeyValues( const char *setName, const char *firstKey, int64 firstValue );
 	KeyValues( const char *setName, const char *firstKey, uint64 firstValue );
 	KeyValues( const char *setName, const char *firstKey, void *firstValue );
