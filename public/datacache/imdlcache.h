@@ -164,7 +164,7 @@ public:
 //-----------------------------------------------------------------------------
 // The main MDL cacher 
 //-----------------------------------------------------------------------------
-#define MDLCACHE_INTERFACE_VERSION "MDLCache004"
+constexpr inline char MDLCACHE_INTERFACE_VERSION[]{"MDLCache004"};
  
 abstract_class IMDLCache : public IAppSystem
 {

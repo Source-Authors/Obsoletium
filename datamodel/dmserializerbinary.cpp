@@ -158,7 +158,7 @@ bool CDmSerializerBinary::SerializeAttributes( CUtlBuffer& buf, CDmElementSerial
 {
 	// Collect the attributes to be written
 	CDmAttribute **ppAttributes = ( CDmAttribute** )_alloca( pElement->AttributeCount() * sizeof( CDmAttribute* ) );
-	int nAttributes = 0;
+	intp nAttributes = 0;
 	for ( CDmAttribute *pAttribute = pElement->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 	{
 		if ( pAttribute->IsFlagSet( FATTRIB_DONTSAVE | FATTRIB_STANDARD ) )
@@ -169,7 +169,7 @@ bool CDmSerializerBinary::SerializeAttributes( CUtlBuffer& buf, CDmElementSerial
 
 	// Now write them all out in reverse order, since FirstAttribute is actually the *last* attribute for perf reasons
 	buf.PutInt( nAttributes );
-	for ( int i = nAttributes - 1; i >= 0; --i )
+	for ( intp i = nAttributes - 1; i >= 0; --i )
 	{
 		CDmAttribute *pAttribute = ppAttributes[ i ];
 		Assert( pAttribute );
@@ -254,7 +254,7 @@ bool CDmSerializerBinary::Serialize( CUtlBuffer &outBuf, CDmElement *pRoot )
 
 	// write out the symbol table for this file (may be significantly smaller than datamodel's full symbol table)
 	outBuf.PutShort( nUsedSymbols );
-	for ( int si = 0; si < nUsedSymbols; ++si )
+	for ( unsigned short si = 0; si < nUsedSymbols; ++si )
 	{
 		UtlSymId_t sym = indexToSymbolMap[ si ];
 		const char *pStr = g_pDataModel->GetString( sym );
@@ -468,7 +468,7 @@ bool CDmSerializerBinary::Unserialize( CUtlBuffer &buf, const char *pEncodingNam
 
 		nStrings = buf.GetShort();
 		symbolTable = ( UtlSymId_t* )stackalloc( nStrings * sizeof( UtlSymId_t ) );
-		for ( int i = 0; i < nStrings; ++i )
+		for ( unsigned short i = 0; i < nStrings; ++i )
 		{
 			buf.GetString( stringBuf );
 			symbolTable[ i ] = g_pDataModel->GetSymbol( stringBuf );
@@ -487,18 +487,18 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 	*ppRoot = NULL;
 
 	// Read in the element count.
-	int nElementCount = buf.GetInt();
+	intp nElementCount = buf.GetInt();
 	if ( !nElementCount )
 		return true;
 
-	int nMaxIdConflicts = min( nElementCount, g_pDataModel->GetAllocatedElementCount() );
-	int nExpectedIdCopyConflicts = ( idConflictResolution == CR_FORCE_COPY || idConflictResolution == CR_COPY_NEW ) ? nMaxIdConflicts : 0;
-	int nBuckets = min( 0x10000, max( 16, nExpectedIdCopyConflicts / 16 ) ); // CUtlHash can only address up to 65k buckets
+	intp nMaxIdConflicts = min( nElementCount, g_pDataModel->GetAllocatedElementCount() );
+	intp nExpectedIdCopyConflicts = ( idConflictResolution == CR_FORCE_COPY || idConflictResolution == CR_COPY_NEW ) ? nMaxIdConflicts : 0;
+	intp nBuckets = min( (intp)0x10000, max( (intp)16, nExpectedIdCopyConflicts / 16 ) ); // CUtlHash can only address up to 65k buckets
 	CUtlHash< DmIdPair_t > idmap( nBuckets, 0, 0, DmIdPair_t::Compare, DmIdPair_t::HashKey );
 
 	// Read + create all elements
 	CUtlVector<CDmElement*> elementList( (intp)0, nElementCount );
-	for ( int i = 0; i < nElementCount; ++i )
+	for ( intp i = 0; i < nElementCount; ++i )
 	{
 		char pName[2048];
 		DmObjectId_t id;
@@ -574,13 +574,13 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 	*ppRoot = elementList[ 0 ];
 
 	// Now read all attributes
-	for ( int i = 0; i < nElementCount; ++i )
+	for ( intp i = 0; i < nElementCount; ++i )
 	{
 		CDmElement *pInternal = elementList[ i ];
 		UnserializeAttributes( buf, pInternal->GetFileId() == fileid ? pInternal : NULL, elementList, symbolTable );
 	}
 
-	for ( int i = 0; i < nElementCount; ++i )
+	for ( intp i = 0; i < nElementCount; ++i )
 	{
 		CDmElement *pElement = elementList[ i ];
 		if ( pElement->GetFileId() == fileid )

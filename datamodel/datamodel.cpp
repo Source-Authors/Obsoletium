@@ -95,7 +95,7 @@ CDataModel::~CDataModel()
 
 	if ( GetAllocatedElementCount() > 0 )
 	{
-		Warning( "Leaking %i elements\n", GetAllocatedElementCount() );
+		Warning( "Leaking %zi elements\n", GetAllocatedElementCount() );
 	}
 }
 
@@ -160,7 +160,7 @@ CUtlMap< UtlSymId_t, int > g_typeHistogram( 0, 100, DefLessFunc( UtlSymId_t ) );
 void CDataModel::Shutdown()
 {
 #ifdef _ELEMENT_HISTOGRAM_
-	Msg( "element type histogram for %d elements allocated so far:\n", GetElementsAllocatedSoFar() );
+	Msg( "element type histogram for %zd elements allocated so far:\n", GetElementsAllocatedSoFar() );
 	for ( auto i = g_typeHistogram.FirstInorder(); g_typeHistogram.IsValidIndex( i ); i = g_typeHistogram.NextInorder( i ) )
 	{
 		Msg( "%d\t%s\n", g_typeHistogram.Element( i ), GetString( g_typeHistogram.Key( i ) ) );
@@ -168,10 +168,10 @@ void CDataModel::Shutdown()
 	Msg( "\n" );
 #endif  // _ELEMENT_HISTOGRAM_
 
-	int c = GetAllocatedElementCount();
+	intp c = GetAllocatedElementCount();
 	if ( c > 0 )
 	{
-		Warning( "CDataModel:  %i elements left in memory!!!\n", c );
+		Warning( "CDataModel:  %zi elements left in memory!!!\n", c );
 	}
 
 	m_Factories.Purge();
@@ -184,7 +184,7 @@ void CDataModel::Shutdown()
 //-----------------------------------------------------------------------------
 // Sets the undo context size
 //-----------------------------------------------------------------------------
-void CDataModel::SetUndoDepth( int nSize )
+void CDataModel::SetUndoDepth( intp nSize )
 {
 	m_UndoMgr.SetUndoDepth( nSize );
 }
@@ -204,17 +204,17 @@ void CDataModel::OnlyCreateUntypedElements( bool bEnable )
 	m_bOnlyCreateUntypedElements = bEnable;
 }
 
-int CDataModel::GetElementsAllocatedSoFar()
+intp CDataModel::GetElementsAllocatedSoFar() const
 {
 	return m_nElementsAllocatedSoFar;
 }
 
-int CDataModel::GetMaxNumberOfElements()
+intp CDataModel::GetMaxNumberOfElements() const
 {
 	return m_nMaxNumberOfElements;
 }
 
-int CDataModel::GetAllocatedAttributeCount()
+intp CDataModel::GetAllocatedAttributeCount() const
 {
 	return ::GetAllocatedAttributeCount();
 }
@@ -223,14 +223,14 @@ int CDataModel::GetAllocatedAttributeCount()
 //-----------------------------------------------------------------------------
 // Returns the total number of elements allocated at the moment
 //-----------------------------------------------------------------------------
-int CDataModel::GetAllocatedElementCount()
+intp CDataModel::GetAllocatedElementCount() const
 {
-	return ( int )m_Handles.GetValidHandleCount();
+	return m_Handles.GetValidHandleCount();
 }
 
 DmElementHandle_t CDataModel::FirstAllocatedElement()
 {
-	int nHandles = ( int )m_Handles.GetHandleCount();
+	int nHandles = m_Handles.GetHandleCount();
 	for ( int i = 0; i < nHandles; ++i )
 	{
 		DmElementHandle_t hElement = ( DmElementHandle_t )m_Handles.GetHandleFromIndex( i );
@@ -242,7 +242,7 @@ DmElementHandle_t CDataModel::FirstAllocatedElement()
 
 DmElementHandle_t CDataModel::NextAllocatedElement( DmElementHandle_t hElement )
 {
-	int nHandles = ( int )m_Handles.GetHandleCount();
+	int nHandles = m_Handles.GetHandleCount();
 	for ( int i = m_Handles.GetIndexFromHandle( hElement ) + 1; i < nHandles; ++i )
 	{
 		DmElementHandle_t hElementCur = ( DmElementHandle_t )m_Handles.GetHandleFromIndex( i );
@@ -263,7 +263,7 @@ static uintp HandleHash( const DmElementHandle_t &h )
 	return (uintp)h;
 }
 
-int CDataModel::EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth )
+intp CDataModel::EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth )
 {
 	CUtlHash< DmElementHandle_t > visited( 1024, 0, 0, HandleCompare, HandleHash );
 	CDmElement *pElement = m_Handles.GetHandle( hElement );
@@ -279,22 +279,30 @@ int CDataModel::EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_
 //-----------------------------------------------------------------------------
 struct DmMemoryInfo_t
 {
-	int m_nCount;
-	int m_nSize;
-	int m_pCategories[ MEMORY_CATEGORY_COUNT ];
+	// dimhotepus: int -> intp.
+	intp m_nCount;
+	// dimhotepus: int -> intp.
+	intp m_nSize;
+	// dimhotepus: int -> intp.
+	intp m_pCategories[ MEMORY_CATEGORY_COUNT ];
 };
 
 struct DmMemorySortInfo_t
 {
 	unsigned short m_nIndex;
-	int m_nTotalSize;
+	// dimhotepus: int -> intp.
+	intp m_nTotalSize;
 };
 
 int DmMemorySortFunc( const void * lhs, const void * rhs )
 {
 	DmMemorySortInfo_t &info1 = *(DmMemorySortInfo_t*)lhs;
 	DmMemorySortInfo_t &info2 = *(DmMemorySortInfo_t*)rhs;
-	return info1.m_nTotalSize - info2.m_nTotalSize;
+	return info1.m_nTotalSize > info2.m_nTotalSize
+		? 1
+		: info1.m_nTotalSize == info2.m_nTotalSize
+			? 0
+			: -1;
 }
 
 void CDataModel::DisplayMemoryStats( )
@@ -302,7 +310,7 @@ void CDataModel::DisplayMemoryStats( )
 	CUtlMap< UtlSymId_t, DmMemoryInfo_t > typeHistogram( 0, 100, DefLessFunc( UtlSymId_t ) );
 	CUtlHash< DmElementHandle_t > visited( 1024, 0, 0, HandleCompare, HandleHash );
 
-	int c = (int)m_Handles.GetHandleCount();
+	int c = m_Handles.GetHandleCount();
 	for ( int i = 0; i < c; ++i )
 	{
 		DmElementHandle_t h = (DmElementHandle_t)m_Handles.GetHandleFromIndex( i );
@@ -322,7 +330,7 @@ void CDataModel::DisplayMemoryStats( )
 			memset( typeHistogram[j].m_pCategories, 0, sizeof(typeHistogram[j].m_pCategories) );
 		}
 
-		int nMemory = CDmeElementAccessor::EstimateMemoryUsage( pElement, visited, TD_NONE, typeHistogram[j].m_pCategories );
+		intp nMemory = CDmeElementAccessor::EstimateMemoryUsage( pElement, visited, TD_NONE, typeHistogram[j].m_pCategories );
 
 		++typeHistogram[j].m_nCount;
 		typeHistogram[j].m_nSize += nMemory;
@@ -339,10 +347,10 @@ void CDataModel::DisplayMemoryStats( )
 	}
 	qsort( pSortInfo, nCount, sizeof(DmMemorySortInfo_t), DmMemorySortFunc );
 	     
-	int pTotals[ MEMORY_CATEGORY_COUNT ];
-	int nTotalSize = 0;
-	int nTotalCount = 0;
-	int nTotalData = 0;
+	intp pTotals[ MEMORY_CATEGORY_COUNT ];
+	intp nTotalSize = 0;
+	intp nTotalCount = 0;
+	intp nTotalData = 0;
 	memset( pTotals, 0, sizeof(pTotals) );
 	ConMsg( "Dm Memory usage: type\t\t\t\tcount\ttotalsize\twastage %%\touter\t\tinner\t\tdatamodel\trefs\t\ttree\t\tatts\t\tdata\t(att count)\n" );
 	for ( decltype(nCount) i = 0; i < nCount; ++i )
@@ -353,10 +361,10 @@ void CDataModel::DisplayMemoryStats( )
 		 
 		ConMsg( "%-40s\t%6d\t%9d\t\t%5.2f", GetString( typeHistogram.Key( pSortInfo[i].m_nIndex ) ), 
 			info.m_nCount, info.m_nSize, flPercentOverhead );
-		int nTotal = 0;
+		intp nTotal = 0;
 		for ( int j = 0; j < MEMORY_CATEGORY_COUNT; ++j )
 		{
-			ConColorMsg( Color( 255, 192, 0, 255 ), "\t%8d", info.m_pCategories[j] );
+			ConColorMsg( Color( 255, 192, 0, 255 ), "\t%8zd", info.m_pCategories[j] );
 			if ( j != MEMORY_CATEGORY_ATTRIBUTE_COUNT )
 			{
 				nTotal += info.m_pCategories[j];
@@ -369,12 +377,12 @@ void CDataModel::DisplayMemoryStats( )
 		nTotalCount += info.m_nCount;
 		nTotalData += info.m_pCategories[MEMORY_CATEGORY_ATTRIBUTE_DATA];
 	}
-	  
+
 	ConMsg( "\n" );
-	ConMsg( "%-40s\t%6d\t%9d\t\t%5.2f", "Totals", nTotalCount, nTotalSize, 100.0f * ( 1.0f - (float)nTotalData / (float)nTotalSize ) );
+	ConMsg( "%-40s\t%6zd\t%9zd\t\t%5.2f", "Totals", nTotalCount, nTotalSize, 100.0f * ( 1.0f - (float)nTotalData / (float)nTotalSize ) );
 	for ( int j = 0; j < MEMORY_CATEGORY_COUNT; ++j )
 	{
-		ConColorMsg( Color( 255, 192, 0, 255 ), "\t%8d", pTotals[j] );
+		ConColorMsg( Color( 255, 192, 0, 255 ), "\t%8zd", pTotals[j] );
 	}
 
 	ConMsg( "\n" );
@@ -428,7 +436,7 @@ intp CDataModel::GetFormatCount() const
 	return m_FormatUpdaters.Count();
 }
 
-const char* CDataModel::GetFormatName( int i ) const
+const char* CDataModel::GetFormatName( intp i ) const
 {
 	IDmFormatUpdater *pUpdater = m_FormatUpdaters[ i ];
 	if ( !pUpdater )
@@ -496,7 +504,7 @@ intp CDataModel::GetEncodingCount() const
 	return m_Serializers.Count();
 }
 
-const char *CDataModel::GetEncodingName( int i ) const
+const char *CDataModel::GetEncodingName( intp i ) const
 {
 	return m_Serializers[ i ]->GetName();
 }
@@ -1032,15 +1040,15 @@ bool CDataModel::UpdateUnserializedElements( const char *pSourceFormatName, int 
 // file id reference methods
 //-----------------------------------------------------------------------------
 
-int CDataModel::NumFileIds()
+int CDataModel::NumFileIds() const
 {
 	return m_openFiles.GetHandleCount();
 }
 
-DmFileId_t CDataModel::GetFileId( int i )
+DmFileId_t CDataModel::GetFileId( int i ) const
 {
-	Assert( i >= 0 && i < ( int )m_openFiles.GetHandleCount() );
-	if ( i < 0 || i >= ( int )m_openFiles.GetHandleCount() )
+	Assert( i >= 0 && i < m_openFiles.GetHandleCount() );
+	if ( i < 0 || i >= m_openFiles.GetHandleCount() )
 		return DMFILEID_INVALID;
 
 	return ( DmFileId_t )m_openFiles.GetHandleFromIndex( i );
@@ -1152,7 +1160,7 @@ void CDataModel::SetFileRoot( DmFileId_t fileid, DmElementHandle_t hRoot )
 	fes->m_hRoot = hRoot;
 }
 
-bool CDataModel::IsFileLoaded( DmFileId_t fileid )
+bool CDataModel::IsFileLoaded( DmFileId_t fileid ) const
 {
 	FileElementSet_t *fes = m_openFiles.GetHandle( fileid );
 	Assert( fes || fileid == DMFILEID_INVALID );
@@ -1164,7 +1172,7 @@ void CDataModel::UnloadFile( DmFileId_t fileid, bool bDeleteElements )
 	ClearUndo();
 	CDisableUndoScopeGuard sg;
 
-	int nHandles = ( int )m_Handles.GetHandleCount();
+	int nHandles = m_Handles.GetHandleCount();
 	for ( int i = 0; i < nHandles; ++i )
 	{
 		DmElementHandle_t hElement = ( DmElementHandle_t )m_Handles.GetHandleFromIndex( i );
@@ -1200,7 +1208,7 @@ void CDataModel::MarkFileLoaded( DmFileId_t fileid )
 	fes->m_bLoaded = true;
 }
 
-int CDataModel::NumElementsInFile( DmFileId_t fileid )
+intp CDataModel::NumElementsInFile( DmFileId_t fileid ) const
 {
 	FileElementSet_t *fes = m_openFiles.GetHandle( fileid );
 	Assert( fes );
@@ -1702,7 +1710,7 @@ void CDataModel::SetDefaultElementFactory( IDmElementFactory *pFactory )
 void CDataModel::AddElementFactory( const char *pClassName, IDmElementFactory *pFactory )
 {
 	Assert( pClassName && pFactory );
-	int idx = m_Factories.Find( pClassName );
+	auto idx = m_Factories.Find( pClassName );
 	if ( idx == m_Factories.InvalidIndex() )
 	{
 		m_Factories.Insert( pClassName, pFactory );
@@ -1717,7 +1725,7 @@ void CDataModel::AddElementFactory( const char *pClassName, IDmElementFactory *p
 
 bool CDataModel::HasElementFactory( const char *pElementType ) const
 {
-	int idx = m_Factories.Find( pElementType );
+	auto idx = m_Factories.Find( pElementType );
 	return ( idx != m_Factories.InvalidIndex() );
 }
 
@@ -1860,7 +1868,7 @@ CDmElement* CDataModel::CreateElement( const DmElementReference_t &ref, const ch
 	}
 	else
 	{
-		int idx = m_Factories.Find( pElementType );
+		auto idx = m_Factories.Find( pElementType );
 		if ( idx == m_Factories.InvalidIndex() )
 		{
 			Warning( "Unable to create unknown element %s!\n", pElementType );
@@ -2035,7 +2043,7 @@ void CDataModel::DeleteElement( DmElementHandle_t hElement, DmHandleReleasePolic
 	}
 	else
 	{
-		int idx = m_Factories.Find( pElementType );
+		auto idx = m_Factories.Find( pElementType );
 		pFactory = idx == m_Factories.InvalidIndex() ? m_pDefaultFactory : m_Factories[ idx ];
 	}
 
@@ -2087,8 +2095,8 @@ void CDataModel::MarkHandleValid( DmElementHandle_t hElement )
 
 void CDataModel::GetInvalidHandles( CUtlVector< DmElementHandle_t > &handles )
 {
-	unsigned int nHandles = m_Handles.GetHandleCount();
-	for ( unsigned int i = 0; i < nHandles; ++i )
+	int nHandles = m_Handles.GetHandleCount();
+	for ( int i = 0; i < nHandles; ++i )
 	{
 		DmElementHandle_t h = ( DmElementHandle_t )m_Handles.GetHandleFromIndex( i );
 		if ( !m_Handles.IsHandleValid( h ) )

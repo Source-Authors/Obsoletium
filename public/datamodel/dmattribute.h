@@ -133,9 +133,9 @@ public:
 	// Serialization of a single element. 
 	// First version of UnserializeElement adds to tail if it worked
 	// Second version overwrites, but does not add, the element at the specified index 
-	bool	SerializeElement( int nElement, CUtlBuffer &buf ) const;
+	bool	SerializeElement( intp nElement, CUtlBuffer &buf ) const;
 	bool	UnserializeElement( CUtlBuffer &buf );
-	bool	UnserializeElement( int nElement, CUtlBuffer &buf );
+	bool	UnserializeElement( intp nElement, CUtlBuffer &buf );
 
 	// Does this attribute serialize on multiple lines?
 	bool	SerializesOnMultipleLines() const;
@@ -148,7 +148,7 @@ public:
 	void	NotifyWhenChanged( DmElementHandle_t h, bool bNotify );
 
 	// estimate memory overhead
-	int		EstimateMemoryUsage( TraversalDepth_t depth ) const;
+	intp	EstimateMemoryUsage( TraversalDepth_t depth ) const;
 
 private:
 	// Class factory
@@ -199,7 +199,7 @@ private:
 	CDmAttribute **GetNextAttributeRef();
 
 	// Implementational function used for memory consumption estimation computation
-	int EstimateMemoryUsageInternal( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, int *pCategories ) const;
+	intp EstimateMemoryUsageInternal( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, intp *pCategories ) const;
 
 	// Called by elements after unserialization of their attributes is complete
 	void OnUnserializationFinished();

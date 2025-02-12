@@ -29,7 +29,7 @@ struct ElementPathItem_t
 {
 	ElementPathItem_t( DmElementHandle_t hElem = DMELEMENT_HANDLE_INVALID,
 						DmAttributeHandle_t hAttr = DMATTRIBUTE_HANDLE_INVALID,
-						int idx = -1 )
+						intp idx = -1 )
 		: hElement( hElem ), hAttribute( hAttr ), nIndex( idx )
 	{
 	}
@@ -42,7 +42,7 @@ struct ElementPathItem_t
 
 	DmElementHandle_t hElement;
 	DmAttributeHandle_t hAttribute;
-	int nIndex;
+	intp nIndex;
 };
 
 
@@ -94,19 +94,19 @@ struct DmElementReference_t
 	void AddAttribute( CDmAttribute *pAttribute );
 	void RemoveAttribute( CDmAttribute *pAttribute );
 
-	bool IsStronglyReferenced() // should this element be kept around (even if it's DmElementHandle_t is invalidated)
+	bool IsStronglyReferenced() const // should this element be kept around (even if it's DmElementHandle_t is invalidated)
 	{
 		return m_attributes.m_hAttribute != DMATTRIBUTE_HANDLE_INVALID || m_nStrongHandleCount > 0;
 	}
 
-	bool IsWeaklyReferenced() // should we keep this element's DmElementHandle_t mapped to it's id (even if the element is deleted)
+	bool IsWeaklyReferenced() const // should we keep this element's DmElementHandle_t mapped to it's id (even if the element is deleted)
 	{
 		return IsStronglyReferenced() || m_nWeakHandleCount > 0;
 	}
 
-	int EstimateMemoryOverhead()
+	intp EstimateMemoryOverhead() const
 	{
-		int nBytes = 0;
+		intp nBytes = 0;
 		for ( DmAttributeList_t *pLink = m_attributes.m_pNext; pLink; pLink = pLink->m_pNext )
 		{
 			nBytes += sizeof( DmAttributeList_t );
@@ -130,8 +130,8 @@ public:
 	// Can be overridden by derived classes
 	virtual	void		OnAttributeChanged( CDmAttribute * ) {}
 	virtual void		PreAttributeChanged( CDmAttribute * ) {}
-	virtual void		OnAttributeArrayElementAdded( CDmAttribute *, int, int ) {}
-	virtual void		OnAttributeArrayElementRemoved( CDmAttribute *, int, int ) {}
+	virtual void		OnAttributeArrayElementAdded( CDmAttribute *, intp, intp ) {}
+	virtual void		OnAttributeArrayElementRemoved( CDmAttribute *, intp, intp ) {}
 	virtual void		Resolve() {}
 	virtual	bool		IsA( UtlSymId_t typeSymbol ) const;
 	virtual int			GetInheritanceDepth( UtlSymId_t typeSymbol ) const;
@@ -146,7 +146,7 @@ public:
 	bool				HasAttribute( const char *pAttributeName, DmAttributeType_t type = AT_UNKNOWN ) const;
 	CDmAttribute		*GetAttribute( const char *pAttributeName, DmAttributeType_t type = AT_UNKNOWN );
 	const CDmAttribute	*GetAttribute( const char *pAttributeName, DmAttributeType_t type = AT_UNKNOWN ) const;
-	int					AttributeCount() const;
+	intp				AttributeCount() const;
 	CDmAttribute*		FirstAttribute();
 	const CDmAttribute*	FirstAttribute() const;
 
@@ -222,7 +222,7 @@ public:
 	bool				IsStronglyReferenced() { return m_ref.IsStronglyReferenced(); }
 
 	// Estimates the memory usage of the element, its attributes, and child elements
-	int					EstimateMemoryUsage( TraversalDepth_t depth = TD_DEEP );
+	intp				EstimateMemoryUsage( TraversalDepth_t depth = TD_DEEP );
 
 protected:
 	// NOTE: These are protected to ensure that the factory is the only thing that can create these
@@ -287,7 +287,7 @@ private:
 	void				SetReference( const DmElementReference_t &ref );
 
 	// Estimates memory usage
-	int					EstimateMemoryUsage( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, int *pCategories );
+	intp				EstimateMemoryUsage( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, intp *pCategories );
 
 protected:
 	CDmaString			m_Name;
@@ -465,7 +465,7 @@ void RemoveElementFromRefereringAttributes( CDmElement *pElement, bool bPreserve
 //-----------------------------------------------------------------------------
 
 // returns startindex if none found, 2 if only "prefix" found, and n+1 if "prefixn" found
-int GenerateUniqueNameIndex( const char *prefix, const CUtlVector< DmElementHandle_t > &array, int startindex = -1 );
+intp GenerateUniqueNameIndex( const char *prefix, const CUtlVector< DmElementHandle_t > &array, intp startindex = -1 );
 
 bool GenerateUniqueName( char *name, int memsize, const char *prefix, const CUtlVector< DmElementHandle_t > &array );
 
@@ -478,8 +478,8 @@ void MakeElementNameUnique( CDmElement *pElement, const char *prefix, const CUtl
 template< class T >
 inline void CDmElement::DeleteAttributeVarElementArray( T &array )
 {
-	int nElements = array.Count();
-	for ( int i = 0; i < nElements; ++i )
+	intp nElements = array.Count();
+	for ( intp i = 0; i < nElements; ++i )
 	{
 		g_pDataModel->DestroyElement( array.GetHandle( i ) );
 	}

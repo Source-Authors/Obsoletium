@@ -85,7 +85,7 @@ void CUndoManager::Trace( const char *fmt, ... )
 	Msg( "%s%s", spaces, str );
 }
 
-void CUndoManager::SetUndoDepth( int nMaxUndoDepth )
+void CUndoManager::SetUndoDepth( intp nMaxUndoDepth )
 {
 	Assert( !HasUndoData() );
 	m_nMaxUndoDepth = nMaxUndoDepth;
@@ -184,7 +184,7 @@ void CUndoManager::PushRedo()
 				m_PreviousChainingID == m_nChainingID )
 			{
 				// Walk undo list backward looking for previous end of stream and unmark that indicator
-				int i = m_UndoList.Tail();
+				auto i = m_UndoList.Tail();
 				while ( i != m_UndoList.InvalidIndex() )
 				{
 					IUndoElement *e = m_UndoList[ i ];
@@ -357,7 +357,7 @@ const char *CUndoManager::UndoDesc() const
 	if ( m_UndoList.Count() <= 0 )
 		return "";
 
-	int i = m_UndoList.Tail();
+	auto i = m_UndoList.Tail();
 	IUndoElement *action = m_UndoList[ i ];
 	return action->UndoDesc();
 }
@@ -406,7 +406,7 @@ void CUndoManager::GetUndoInfo( CUtlVector< UndoInfo_t >& list )
 	static CUtlSymbolTable table;
 
 	int ops = 0;
-	for ( int i = m_UndoList.Tail(); i != m_UndoList.InvalidIndex(); i = m_UndoList.Previous( i ) )
+	for ( auto i = m_UndoList.Tail(); i != m_UndoList.InvalidIndex(); i = m_UndoList.Previous( i ) )
 	{
 		++ops;
 		IUndoElement *action = m_UndoList[ i ];

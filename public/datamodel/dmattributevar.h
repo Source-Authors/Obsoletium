@@ -206,8 +206,8 @@ public:
 	const T& operator[]( intp i ) const;
 	const T& Element( intp i ) const;
 	const T& Get( intp i ) const;
-	const void*	GetUntyped( int i ) const;
-	bool	IsValidIndex( intp i ) const;
+	const void*	GetUntyped( intp i ) const;
+	bool		IsValidIndex( intp i ) const;
 	intp		InvalidIndex( void ) const;
 
 	// Search
@@ -235,7 +235,7 @@ public:
 	intp		InsertBefore( intp elem, const T& src );
 	intp		AddMultipleToTail( intp num );
 	intp		InsertMultipleBefore( intp elem, intp num );
-	void	EnsureCount( intp num );
+	void		EnsureCount( intp num );
 
 	// Element Modification
 	void	Set( intp i, const T& value );
@@ -276,13 +276,13 @@ template< class BaseClass >
 class CDmaStringArrayConstBase : public BaseClass
 {
 public:
-	const char *operator[]( int i ) const;
-	const char *Element( int i ) const;
-	const char *Get( int i ) const;
+	const char *operator[]( intp i ) const;
+	const char *Element( intp i ) const;
+	const char *Get( intp i ) const;
 	const CUtlVector< CUtlString > &Get() const;
 
 	// Returns strlen of element i
-	int	Length( int i ) const;
+	intp	Length( intp i ) const;
 };
 
 template< class B >
@@ -1225,7 +1225,7 @@ inline const T& CDmaArrayConstBase<T,B>::Get( intp i ) const //-V524
 }
 
 template< class T, class B >
-const void* CDmaArrayConstBase<T,B>::GetUntyped( int i ) const
+const void* CDmaArrayConstBase<T,B>::GetUntyped( intp i ) const
 {
 	return &( this->Value()[ i ] );
 }
@@ -1289,19 +1289,19 @@ inline const CDmAttribute *CDmaArrayBase<T,B>::GetAttribute() const
 //
 //-----------------------------------------------------------------------------
 template< class B >
-inline const char *CDmaStringArrayConstBase<B>::operator[]( int i ) const
+inline const char *CDmaStringArrayConstBase<B>::operator[]( intp i ) const
 {
 	return this->Value()[ i ].Get();
 }
 
 template< class B >
-inline const char *CDmaStringArrayConstBase<B>::Element( int i ) const
+inline const char *CDmaStringArrayConstBase<B>::Element( intp i ) const
 {
 	return this->Value()[ i ].Get();
 }
 
 template< class B >
-inline const char *CDmaStringArrayConstBase<B>::Get( int i ) const //-V524
+inline const char *CDmaStringArrayConstBase<B>::Get( intp i ) const //-V524
 {
 	return this->Value()[ i ].Get();
 }
@@ -1314,7 +1314,7 @@ inline const CUtlVector< CUtlString > &CDmaStringArrayConstBase<B>::Get() const
 
 // Returns strlen of element i
 template< class B >
-inline int CDmaStringArrayConstBase<B>::Length( int i ) const
+inline intp CDmaStringArrayConstBase<B>::Length( intp i ) const
 {
 	return this->Value()[i].Length();
 }

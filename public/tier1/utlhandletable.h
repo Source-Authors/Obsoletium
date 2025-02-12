@@ -48,8 +48,8 @@ public:
 	bool IsHandleValid( UtlHandle_t h ) const;
 
 	// Iterate over handles; they may not be valid
-	unsigned int GetValidHandleCount() const;
-	unsigned int GetHandleCount() const;
+	int GetValidHandleCount() const;
+	int GetHandleCount() const;
 	UtlHandle_t GetHandleFromIndex( int i ) const;
 	int GetIndexFromHandle( UtlHandle_t h ) const;
 
@@ -57,7 +57,7 @@ public:
 	void MarkHandleValid( UtlHandle_t h );
 
 private:
-	struct HandleType_t
+	struct alignas(UtlHandle_t) HandleType_t
 	{
 		HandleType_t( unsigned int i, unsigned int s ) : nIndex( i ), nSerial( s )
 		{
@@ -77,11 +77,11 @@ private:
 	};
 
 	static unsigned int GetSerialNumber( UtlHandle_t handle );
-	static unsigned int GetListIndex( UtlHandle_t handle );
+	static int GetListIndex( UtlHandle_t handle );
 	static UtlHandle_t CreateHandle( unsigned int nSerial, unsigned int nIndex );
 	const EntryType_t *GetEntry( UtlHandle_t handle, bool checkValidity ) const;
 
-	unsigned int m_nValidHandles;
+	int m_nValidHandles;
 	CUtlVector< EntryType_t > m_list;
 	CUtlQueue< int > m_unused;
 };
@@ -102,23 +102,30 @@ CUtlHandleTable<T, HandleBits>::CUtlHandleTable() : m_nValidHandles( 0 )
 template< class T, int HandleBits >
 UtlHandle_t CUtlHandleTable<T, HandleBits>::AddHandle()
 {
-	unsigned int nIndex = ( m_unused.Count() > 0 ) ? m_unused.RemoveAtHead() : m_list.AddToTail();
+	intp nIndex;
+	
+	if ( m_unused.Count() > 0 )
+		nIndex = m_unused.RemoveAtHead();
+	else
+		nIndex = m_list.AddToTail();
 
 	EntryType_t &entry = m_list[ nIndex ];
 	entry.nInvalid = 0;
 	entry.m_pData = NULL;
 
+	Assert(m_nValidHandles < std::numeric_limits<int>::max());
 	++m_nValidHandles;
 
-	return CreateHandle( entry.m_nSerial, nIndex );
+	Assert(nIndex >= 0 && nIndex <= std::numeric_limits<unsigned>::max());
+	return CreateHandle( entry.m_nSerial, static_cast<unsigned>(nIndex) );
 }
 
 template< class T, int HandleBits >
 void CUtlHandleTable<T, HandleBits>::RemoveHandle( UtlHandle_t handle )
 {
-	unsigned int nIndex = GetListIndex( handle );
-	Assert( nIndex < ( unsigned int )m_list.Count() );
-	if ( nIndex >= ( unsigned int )m_list.Count() )
+	int nIndex = GetListIndex( handle );
+	Assert( nIndex < m_list.Count() );
+	if ( nIndex >= m_list.Count() )
 		return;
 
 	EntryType_t &entry = m_list[ nIndex ];
@@ -126,6 +133,7 @@ void CUtlHandleTable<T, HandleBits>::RemoveHandle( UtlHandle_t handle )
 	if ( !entry.nInvalid )
 	{
 		entry.nInvalid = 1;
+		Assert(m_nValidHandles > 0);
 		--m_nValidHandles;
 	}
 	entry.m_pData = NULL;
@@ -155,6 +163,7 @@ void CUtlHandleTable<T, HandleBits>::SetHandle( UtlHandle_t handle, T *pData )
 	// Validate the handle
 	if ( entry->nInvalid )
 	{
+		Assert(m_nValidHandles < std::numeric_limits<int>::max());
 		++m_nValidHandles;
 		entry->nInvalid = 0;
 	}
@@ -185,9 +194,9 @@ bool CUtlHandleTable<T, HandleBits>::IsHandleValid( UtlHandle_t handle ) const
 	if ( handle == UTLHANDLE_INVALID )
 		return false;
 
-	unsigned int nIndex = GetListIndex( handle );
-	AssertOnce( nIndex < ( unsigned int )m_list.Count() );
-	if ( nIndex >= ( unsigned int )m_list.Count() )
+	int nIndex = GetListIndex( handle );
+	AssertOnce( nIndex < m_list.Count() );
+	if ( nIndex >= m_list.Count() )
 		return false;
 
 	const EntryType_t &entry = m_list[ nIndex ];
@@ -205,22 +214,24 @@ bool CUtlHandleTable<T, HandleBits>::IsHandleValid( UtlHandle_t handle ) const
 // Current max handle
 //-----------------------------------------------------------------------------
 template< class T, int HandleBits >
-unsigned int CUtlHandleTable<T, HandleBits>::GetValidHandleCount() const
+int CUtlHandleTable<T, HandleBits>::GetValidHandleCount() const
 {
 	return m_nValidHandles;
 }
 
 template< class T, int HandleBits >
-unsigned int CUtlHandleTable<T, HandleBits>::GetHandleCount() const
+int CUtlHandleTable<T, HandleBits>::GetHandleCount() const
 {
-	return m_list.Count();
+	intp count = m_list.Count();
+	Assert(count <= std::numeric_limits<int>::max());
+	return static_cast<int>(count);
 }
 
 template< class T, int HandleBits >
 UtlHandle_t CUtlHandleTable<T, HandleBits>::GetHandleFromIndex( int i ) const
 {
 	if ( m_list[i].m_pData )
-		return CreateHandle( m_list[i].m_nSerial, i );
+		return CreateHandle( m_list[i].m_nSerial, static_cast<unsigned>(i) );
 	return UTLHANDLE_INVALID;
 }
 
@@ -245,9 +256,13 @@ unsigned int CUtlHandleTable<T, HandleBits>::GetSerialNumber( UtlHandle_t handle
 }
 
 template< class T, int HandleBits >
-unsigned int CUtlHandleTable<T, HandleBits>::GetListIndex( UtlHandle_t handle )
+int CUtlHandleTable<T, HandleBits>::GetListIndex( UtlHandle_t handle )
 {
-	return ( ( HandleType_t* )&handle )->nIndex;
+	unsigned index = ( ( HandleType_t* )&handle )->nIndex;
+
+	Assert(index <= static_cast<unsigned>(std::numeric_limits<int>::max()));
+
+	return static_cast<int>(index);
 }
 
 template< class T, int HandleBits >
@@ -267,9 +282,9 @@ const typename CUtlHandleTable<T, HandleBits>::EntryType_t *CUtlHandleTable<T, H
 	if ( handle == UTLHANDLE_INVALID )
 		return NULL;
 
-	unsigned int nIndex = GetListIndex( handle );
-	Assert( nIndex < ( unsigned int )m_list.Count() );
-	if ( nIndex >= ( unsigned int )m_list.Count() )
+	int nIndex = GetListIndex( handle );
+	Assert( nIndex < m_list.Count() );
+	if ( nIndex >= m_list.Count() )
 		return NULL;
 
 	const EntryType_t &entry = m_list[ nIndex ];
@@ -289,9 +304,9 @@ void CUtlHandleTable<T, HandleBits>::MarkHandleInvalid( UtlHandle_t handle )
 	if ( handle == UTLHANDLE_INVALID )
 		return;
 
-	unsigned int nIndex = GetListIndex( handle );
-	Assert( nIndex < ( unsigned int )m_list.Count() );
-	if ( nIndex >= ( unsigned int )m_list.Count() )
+	int nIndex = GetListIndex( handle );
+	Assert( nIndex < m_list.Count() );
+	if ( nIndex >= m_list.Count() )
 		return;
 
 	EntryType_t &entry = m_list[ nIndex ];
@@ -300,6 +315,7 @@ void CUtlHandleTable<T, HandleBits>::MarkHandleInvalid( UtlHandle_t handle )
 
 	if ( !entry.nInvalid )
 	{
+		Assert(m_nValidHandles > 0);
 		--m_nValidHandles;
 		entry.nInvalid = 1;
 	}
@@ -311,9 +327,9 @@ void CUtlHandleTable<T, HandleBits>::MarkHandleValid( UtlHandle_t handle )
 	if ( handle == UTLHANDLE_INVALID )
 		return;
 
-	unsigned int nIndex = GetListIndex( handle );
-	Assert( nIndex < ( unsigned int )m_list.Count() );
-	if ( nIndex >= ( unsigned int )m_list.Count() )
+	int nIndex = GetListIndex( handle );
+	Assert( nIndex < m_list.Count() );
+	if ( nIndex >= m_list.Count() )
 		return;
 
 	EntryType_t &entry = m_list[ nIndex ];
@@ -322,6 +338,7 @@ void CUtlHandleTable<T, HandleBits>::MarkHandleValid( UtlHandle_t handle )
 
 	if ( entry.nInvalid )
 	{
+		Assert(m_nValidHandles < std::numeric_limits<int>::max());
 		++m_nValidHandles;
 		entry.nInvalid = 0;
 	}

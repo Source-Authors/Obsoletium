@@ -18,7 +18,6 @@
 #include "tier1/mempool.h"
 #include "mathlib/vmatrix.h"
 #include "datamodel/dmattributevar.h"
-#include <ctype.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -106,14 +105,14 @@ public:
 	virtual const char *AttributeTypeName() = 0;
 
 	virtual void SetValue( CDmAttribute *pAttribute, DmAttributeType_t valueType, const void *pValue ) = 0;
-	virtual void SetMultiple( CDmAttribute *pAttribute, int i, int nCount, DmAttributeType_t valueType, const void *pValue ) = 0;
-	virtual void Set( CDmAttribute *pAttribute, int i, DmAttributeType_t valueType, const void *pValue ) = 0;
+	virtual void SetMultiple( CDmAttribute *pAttribute, intp i, intp nCount, DmAttributeType_t valueType, const void *pValue ) = 0;
+	virtual void Set( CDmAttribute *pAttribute, intp i, DmAttributeType_t valueType, const void *pValue ) = 0;
 	virtual void SetToDefaultValue( CDmAttribute *pAttribute ) = 0;
 	virtual bool Serialize( const CDmAttribute *pAttribute, CUtlBuffer &buf ) = 0;
 	virtual bool Unserialize( CDmAttribute *pAttribute, CUtlBuffer &buf ) = 0;
-	virtual bool SerializeElement( const CDmAttribute *pAttribute, int nElement, CUtlBuffer &buf ) = 0;
+	virtual bool SerializeElement( const CDmAttribute *pAttribute, intp nElement, CUtlBuffer &buf ) = 0;
 	virtual bool UnserializeElement( CDmAttribute *pAttribute, CUtlBuffer &buf ) = 0;
-	virtual bool UnserializeElement( CDmAttribute *pAttribute, int nElement, CUtlBuffer &buf ) = 0;
+	virtual bool UnserializeElement( CDmAttribute *pAttribute, intp nElement, CUtlBuffer &buf ) = 0;
 	virtual void OnUnserializationFinished( CDmAttribute *pAttribute ) = 0;
 };
 
@@ -133,25 +132,25 @@ template< class T >
 class CDmAttributeOp : public IDmAttributeOp
 {
 public:
-	virtual void* CreateAttributeData();
-	virtual void DestroyAttributeData( void *pData );
-	virtual void SetDefaultValue( void *pData );
-	virtual int DataSize();
-	virtual int ValueSize();
-	virtual bool SerializesOnMultipleLines();
-	virtual bool SkipUnserialize( CUtlBuffer& buf );
-	virtual const char *AttributeTypeName();
+	void* CreateAttributeData() override;
+	void DestroyAttributeData( void *pData ) override;
+	void SetDefaultValue( void *pData ) override;
+	int DataSize() override;
+	int ValueSize() override;
+	bool SerializesOnMultipleLines() override;
+	bool SkipUnserialize( CUtlBuffer& buf ) override;
+	const char *AttributeTypeName() override;
 
-	virtual void SetValue( CDmAttribute *pAttribute, DmAttributeType_t valueType, const void *pValue );
-	virtual void SetMultiple( CDmAttribute *pAttribute, int i, int nCount, DmAttributeType_t valueType, const void *pValue );
-	virtual void Set( CDmAttribute *pAttribute, int i, DmAttributeType_t valueType, const void *pValue );
-	virtual void SetToDefaultValue( CDmAttribute *pAttribute );
-	virtual bool Serialize( const CDmAttribute *pData, CUtlBuffer &buf );
-	virtual bool Unserialize( CDmAttribute *pAttribute, CUtlBuffer &buf );
-	virtual bool SerializeElement( const CDmAttribute *pAttribute, int nElement, CUtlBuffer &buf );
-	virtual bool UnserializeElement( CDmAttribute *pAttribute, CUtlBuffer &buf );
-	virtual bool UnserializeElement( CDmAttribute *pAttribute, int nElement, CUtlBuffer &buf );
-	virtual void OnUnserializationFinished( CDmAttribute *pAttribute );
+	void SetValue( CDmAttribute *pAttribute, DmAttributeType_t valueType, const void *pValue ) override;
+	void SetMultiple( CDmAttribute *pAttribute, intp i, intp nCount, DmAttributeType_t valueType, const void *pValue ) override;
+	void Set( CDmAttribute *pAttribute, intp i, DmAttributeType_t valueType, const void *pValue ) override;
+	void SetToDefaultValue( CDmAttribute *pAttribute ) override;
+	bool Serialize( const CDmAttribute *pData, CUtlBuffer &buf ) override;
+	bool Unserialize( CDmAttribute *pAttribute, CUtlBuffer &buf ) override;
+	bool SerializeElement( const CDmAttribute *pAttribute, intp nElement, CUtlBuffer &buf ) override;
+	bool UnserializeElement( CDmAttribute *pAttribute, CUtlBuffer &buf ) override;
+	bool UnserializeElement( CDmAttribute *pAttribute, intp nElement, CUtlBuffer &buf ) override;
+	void OnUnserializationFinished( CDmAttribute *pAttribute ) override;
 };
 
 
@@ -283,13 +282,13 @@ void CDmAttributeOp<T>::SetToDefaultValue( CDmAttribute *pAttribute )
 }
 
 template< class T >
-void CDmAttributeOp<T>::SetMultiple( CDmAttribute *pAttribute, int i, int nCount, DmAttributeType_t valueType, const void *pValue )
+void CDmAttributeOp<T>::SetMultiple( CDmAttribute *pAttribute, intp i, intp nCount, DmAttributeType_t valueType, const void *pValue )
 {
 	Assert(0);
 }
 
 template< class T >
-void CDmAttributeOp<T>::Set( CDmAttribute *pAttribute, int i, DmAttributeType_t valueType, const void *pValue )
+void CDmAttributeOp<T>::Set( CDmAttribute *pAttribute, intp i, DmAttributeType_t valueType, const void *pValue )
 {
 	Assert(0);
 }
@@ -425,7 +424,7 @@ bool CDmAttributeOp<T>::Unserialize( CDmAttribute *pAttribute, CUtlBuffer &buf )
 }
 
 template< class T >
-bool CDmAttributeOp<T>::SerializeElement( const CDmAttribute *pData, int nElement, CUtlBuffer &buf )
+bool CDmAttributeOp<T>::SerializeElement( const CDmAttribute *pData, intp nElement, CUtlBuffer &buf )
 {
 	Assert( 0 );
 	return false;
@@ -439,7 +438,7 @@ bool CDmAttributeOp<T>::UnserializeElement( CDmAttribute *pData, CUtlBuffer &buf
 }
 
 template< class T >
-bool CDmAttributeOp<T>::UnserializeElement( CDmAttribute *pData, int nElement, CUtlBuffer &buf )
+bool CDmAttributeOp<T>::UnserializeElement( CDmAttribute *pData, intp nElement, CUtlBuffer &buf )
 {
 	Assert( 0 );
 	return false;
@@ -465,14 +464,14 @@ class CDmArrayAttributeOp : public CDmAttributeOp< CUtlVector< T > >
 
 public:
 	// Inherited from IDmAttributeOp
-	virtual void SetValue( CDmAttribute *pAttribute, DmAttributeType_t valueType, const void *pValue );
-	virtual void SetMultiple( CDmAttribute *pAttribute, int i, int nCount, DmAttributeType_t valueType, const void *pValue );
-	virtual void Set( CDmAttribute *pAttribute, int i, DmAttributeType_t valueType, const void *pValue );
-	virtual bool Unserialize( CDmAttribute *pAttribute, CUtlBuffer &buf );
-	virtual bool SerializeElement( const CDmAttribute *pData, int nElement, CUtlBuffer &buf );
-	virtual bool UnserializeElement( CDmAttribute *pData, CUtlBuffer &buf );
-	virtual bool UnserializeElement( CDmAttribute *pData, int nElement, CUtlBuffer &buf );
-	virtual void OnUnserializationFinished( CDmAttribute *pAttribute );
+	void SetValue( CDmAttribute *pAttribute, DmAttributeType_t valueType, const void *pValue ) override;
+	void SetMultiple( CDmAttribute *pAttribute, intp i, intp nCount, DmAttributeType_t valueType, const void *pValue ) override;
+	void Set( CDmAttribute *pAttribute, intp i, DmAttributeType_t valueType, const void *pValue ) override;
+	bool Unserialize( CDmAttribute *pAttribute, CUtlBuffer &buf ) override;
+	bool SerializeElement( const CDmAttribute *pData, intp nElement, CUtlBuffer &buf ) override;
+	bool UnserializeElement( CDmAttribute *pData, CUtlBuffer &buf ) override;
+	bool UnserializeElement( CDmAttribute *pData, intp nElement, CUtlBuffer &buf ) override;
+	void OnUnserializationFinished( CDmAttribute *pAttribute ) override;
 
 	// Other methods used by CDmaArrayBase
 	CDmArrayAttributeOp() : m_pAttribute( NULL ), m_pData( NULL ) {}
@@ -721,7 +720,7 @@ class CUndoArrayAttributeSetValueElement : public CUndoAttributeArrayBase<T>
 	typedef CUndoAttributeArrayBase<T> BaseClass;
 
 public:
-	CUndoArrayAttributeSetValueElement( CDmAttribute *pAttribute, int slot, const T &newValue ) : 
+	CUndoArrayAttributeSetValueElement( CDmAttribute *pAttribute, intp slot, const T &newValue ) : 
 		BaseClass( pAttribute, "CUndoArrayAttributeSetValueElement" ),
 		m_nSlot( slot )
 	{
@@ -751,7 +750,7 @@ public:
 	}
 
 private:
-	int				m_nSlot;
+	intp			m_nSlot;
 	typename CUndoAttributeArrayBase<T>::StorageType_t	m_OldValue;
 	typename CUndoAttributeArrayBase<T>::StorageType_t	m_Value;
 };
@@ -766,7 +765,7 @@ class CUndoArrayAttributeSetMultipleValueElement : public CUndoAttributeArrayBas
 	typedef CUndoAttributeArrayBase<T> BaseClass;
 
 public:
-	CUndoArrayAttributeSetMultipleValueElement( CDmAttribute *pAttribute, int nSlot, int nCount, const T *pNewValue ) : 
+	CUndoArrayAttributeSetMultipleValueElement( CDmAttribute *pAttribute, intp nSlot, intp nCount, const T *pNewValue ) : 
 		BaseClass( pAttribute, "CUndoArrayAttributeSetMultipleValueElement" ), 
 		m_nSlot( nSlot ), m_nCount( nCount )
 	{
@@ -775,7 +774,7 @@ public:
 		m_pValue    = new typename CUndoAttributeArrayBase<T>::StorageType_t[nCount];
 
 		CDmrArray<T> array( pAttribute );
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			m_pOldValue[i] = array[ nSlot+i ];
 			m_pValue[i] = pNewValue[ i ];
@@ -790,7 +789,7 @@ public:
 		if ( CDmAttributeInfo< T >::AttributeType() == AT_ELEMENT )
 		{
 			DmElementHandle_t value = DMELEMENT_HANDLE_INVALID;
-			for ( int i = 0; i < m_nCount; ++i )
+			for ( intp i = 0; i < m_nCount; ++i )
 			{
 				m_pOldValue[ i ] = m_pValue[ i ] = *( T* )&value;
 			}
@@ -805,7 +804,7 @@ public:
 		CDmrArray<T> array( this->GetAttribute() );
 		if ( array.IsValid() )
 		{
-			for ( int i = 0; i < m_nCount; ++i )
+			for ( intp i = 0; i < m_nCount; ++i )
 			{
 				array.Set( m_nSlot+i, m_pOldValue[i] );
 			}
@@ -817,7 +816,7 @@ public:
 		CDmrArray<T> array( this->GetAttribute() );
 		if ( array.IsValid() )
 		{
-			for ( int i = 0; i < m_nCount; ++i )
+			for ( intp i = 0; i < m_nCount; ++i )
 			{
 				array.Set( m_nSlot+i, m_pValue[i] );
 			}
@@ -825,8 +824,8 @@ public:
 	}
 
 private:
-	int				m_nSlot;
-	int				m_nCount;
+	intp				m_nSlot;
+	intp				m_nCount;
 	typename CUndoAttributeArrayBase<T>::StorageType_t	*m_pOldValue;
 	typename CUndoAttributeArrayBase<T>::StorageType_t	*m_pValue;
 };
@@ -842,7 +841,7 @@ class CUndoAttributeArrayInsertBefore : public CUndoAttributeArrayBase<T>
 {
 	typedef CUndoAttributeArrayBase<T> BaseClass;
 public:
-	CUndoAttributeArrayInsertBefore( CDmAttribute *pAttribute, int slot, int count = 1 ) : 
+	CUndoAttributeArrayInsertBefore( CDmAttribute *pAttribute, intp slot, intp count = 1 ) : 
 		BaseClass( pAttribute, "CUndoAttributeArrayInsertBefore" ),
 		m_nIndex( slot ), m_nCount( count )
 	{
@@ -867,7 +866,7 @@ public:
 			CDmAttributeInfo<T>::SetDefaultValue( defaultVal );
 
 			array.InsertMultipleBefore( m_nIndex, m_nCount );
-			for( int i = 0; i < m_nCount; ++i )
+			for( intp i = 0; i < m_nCount; ++i )
 			{
 				array.Set( m_nIndex + i, defaultVal );
 			}
@@ -875,8 +874,8 @@ public:
 	}
 
 private:
-	int	m_nIndex;
-	int m_nCount;
+	intp m_nIndex;
+	intp m_nCount;
 };
 
 
@@ -891,7 +890,7 @@ class CUndoAttributeArrayInsertCopyBefore : public CUndoAttributeArrayBase<T>
 	typedef CUndoAttributeArrayBase<T> BaseClass;
 
 public:
-	CUndoAttributeArrayInsertCopyBefore( CDmAttribute *pAttribute, int slot, const T& newValue ) : 
+	CUndoAttributeArrayInsertCopyBefore( CDmAttribute *pAttribute, intp slot, const T& newValue ) : 
 		BaseClass( pAttribute, "CUndoAttributeArrayInsertCopyBefore" ),
 		m_nIndex( slot ),
 		m_newValue( newValue )
@@ -918,7 +917,7 @@ public:
 	}
 
 private:
-	int				m_nIndex;
+	intp				m_nIndex;
 	typename CUndoAttributeArrayBase<T>::StorageType_t	m_newValue;
 };
 
@@ -1238,7 +1237,7 @@ template<> inline bool CDmArrayAttributeOp<DmElementHandle_t>::ShouldInsertEleme
 	if ( m_pAttribute->IsFlagSet( FATTRIB_NODUPLICATES ) )
 	{
 		// See if value exists
-		int idx = Data().Find( src );
+		intp idx = Data().Find( src );
 		if ( idx != Data().InvalidIndex() )
 			return false;
 	}
@@ -1428,7 +1427,7 @@ void CDmArrayAttributeOp<T>::PerformCopyArray( const T *pArray, intp nCount )
 template<> void CDmArrayAttributeOp<DmElementHandle_t>::PerformCopyArray( const DmElementHandle_t *pArray, intp nCount )
 {
 	Data().RemoveAll();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( ShouldInsertElement( pArray[ i ] ) )
 		{
@@ -1540,7 +1539,7 @@ void CDmArrayAttributeOp<T>::Set( intp i, const T& value )
 }
 
 template< class T >
-void CDmArrayAttributeOp<T>::Set( CDmAttribute *pAttribute, int i, DmAttributeType_t valueType, const void *pValue )
+void CDmArrayAttributeOp<T>::Set( CDmAttribute *pAttribute, intp i, DmAttributeType_t valueType, const void *pValue )
 {
 	if ( valueType == ArrayTypeToValueType( pAttribute->GetType() ) )
 	{
@@ -1599,7 +1598,7 @@ void CDmArrayAttributeOp<T>::SetMultiple( intp i, intp nCount, const T* pValue )
 }
 
 template< class T >
-void CDmArrayAttributeOp<T>::SetMultiple( CDmAttribute *pAttribute, int i, int nCount, DmAttributeType_t valueType, const void *pValue )
+void CDmArrayAttributeOp<T>::SetMultiple( CDmAttribute *pAttribute, intp i, intp nCount, DmAttributeType_t valueType, const void *pValue )
 {
 	if ( valueType == ArrayTypeToValueType( pAttribute->GetType() ) )
 	{
@@ -1708,7 +1707,7 @@ template<> bool CDmArrayAttributeOp<DmElementHandle_t>::Unserialize( CDmAttribut
 
 // Serialization of a single element
 template< class T >
-bool CDmArrayAttributeOp<T>::SerializeElement( const CDmAttribute *pAttribute, int nElement, CUtlBuffer &buf )
+bool CDmArrayAttributeOp<T>::SerializeElement( const CDmAttribute *pAttribute, intp nElement, CUtlBuffer &buf )
 {
 	CDmrArrayConst<T> array( pAttribute );
 	return ::Serialize( buf, array[ nElement ] );
@@ -1737,7 +1736,7 @@ bool CDmArrayAttributeOp<T>::UnserializeElement( CDmAttribute *pAttribute, CUtlB
 }
 
 template< class T >
-bool CDmArrayAttributeOp<T>::UnserializeElement( CDmAttribute *pAttribute, int nElement, CUtlBuffer &buf )
+bool CDmArrayAttributeOp<T>::UnserializeElement( CDmAttribute *pAttribute, intp nElement, CUtlBuffer &buf )
 {
 	if ( !CDmAttributeAccessor::MarkDirty( pAttribute ) )
 		return false;
@@ -2511,7 +2510,7 @@ bool CDmAttribute::Unserialize( CUtlBuffer &buf )
 	return s_pAttrInfo[ GetType() ]->Unserialize( this, buf );
 }
 
-bool CDmAttribute::SerializeElement( int nElement, CUtlBuffer &buf ) const
+bool CDmAttribute::SerializeElement( intp nElement, CUtlBuffer &buf ) const
 {
 	return s_pAttrInfo[ GetType() ]->SerializeElement( this, nElement, buf );
 }
@@ -2521,7 +2520,7 @@ bool CDmAttribute::UnserializeElement( CUtlBuffer &buf )
 	return s_pAttrInfo[ GetType() ]->UnserializeElement( this, buf );
 }
 
-bool CDmAttribute::UnserializeElement( int nElement, CUtlBuffer &buf )
+bool CDmAttribute::UnserializeElement( intp nElement, CUtlBuffer &buf )
 {
 	return s_pAttrInfo[ GetType() ]->UnserializeElement( this, nElement, buf );
 }
@@ -2602,25 +2601,25 @@ uintp HandleHash( const DmElementHandle_t &h )
 	return (uintp)h;
 }
 
-int CDmAttribute::EstimateMemoryUsage( TraversalDepth_t depth ) const
+intp CDmAttribute::EstimateMemoryUsage( TraversalDepth_t depth ) const
 {
 	CUtlHash< DmElementHandle_t > visited( 1024, 0, 0, HandleCompare, HandleHash );
 	return EstimateMemoryUsageInternal( visited, depth, 0 ) ;
 }
 
-int CDmAttribute::EstimateMemoryUsageInternal( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, int *pCategories ) const
+intp CDmAttribute::EstimateMemoryUsageInternal( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, intp *pCategories ) const
 {
-	int nOverhead = sizeof( *this );
-	int nAttributeDataSize = s_pAttrInfo[ GetType() ]->DataSize();
-	int nTotalMemory = nOverhead + nAttributeDataSize;
-	int nAttributeExtraDataSize = 0;
+	intp nOverhead = sizeof( *this );
+	intp nAttributeDataSize = s_pAttrInfo[ GetType() ]->DataSize();
+	intp nTotalMemory = nOverhead + nAttributeDataSize;
+	intp nAttributeExtraDataSize = 0;
 
 	if ( IsArrayType( GetType() ) )
 	{
 		CDmrGenericArrayConst array( this );
 		intp nCount = array.Count();
 		nAttributeExtraDataSize = nCount * s_pAttrInfo[ GetType() ]->ValueSize();	// Data in the UtlVector
-		int nMallocOverhead = ( array.Count() == 0 ) ? 0 : 8;	// malloc overhead inside the vector
+		intp nMallocOverhead = ( array.Count() == 0 ) ? 0 : 8;	// malloc overhead inside the vector
 		nOverhead += nMallocOverhead;
 		nTotalMemory += nAttributeExtraDataSize + nMallocOverhead;
 	}

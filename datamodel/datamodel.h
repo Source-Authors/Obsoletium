@@ -201,7 +201,8 @@ struct FileElementSet_t
 	UtlSymId_t m_format;
 	CDmeCountedHandle m_hRoot;
 	bool m_bLoaded;
-	int m_nElements;
+	// dimhotepus: int -> intp.
+	intp m_nElements;
 };
 
 
@@ -248,10 +249,10 @@ public:
 	const char*			GetFormatExtension( const char *pFormatName ) override;
 	const char*			GetFormatDescription( const char *pFormatName ) override;
 	intp				GetFormatCount() const override;
-	const char *		GetFormatName( int i ) const override;
+	const char *		GetFormatName( intp i ) const override;
 	const char *		GetDefaultEncoding( const char *pFormatName ) override;
 	intp				GetEncodingCount() const override;
-	const char *		GetEncodingName( int i ) const override;
+	const char *		GetEncodingName( intp i ) const override;
 	bool				IsEncodingBinary( const char *pEncodingName ) const override;
 	bool				DoesEncodingStoreVersionInFile( const char *pEncodingName ) const override;
 
@@ -273,13 +274,13 @@ public:
 	const char *		GetKeyValuesElementName( const char *pszKeyName, int iNestingLevel ) override;
 	UtlSymId_t			GetSymbol( const char *pString ) override;
 	const char *		GetString( UtlSymId_t sym ) const override;
-	int					GetElementsAllocatedSoFar() override;
-	int					GetMaxNumberOfElements() override;
-	int					GetAllocatedAttributeCount() override;
-	int					GetAllocatedElementCount() override;
+	intp				GetElementsAllocatedSoFar() const override;
+	intp				GetMaxNumberOfElements() const override;
+	intp				GetAllocatedAttributeCount() const override;
+	intp				GetAllocatedElementCount() const override;
 	DmElementHandle_t	FirstAllocatedElement() override;
 	DmElementHandle_t	NextAllocatedElement( DmElementHandle_t hElement ) override;
-	int					EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth = TD_DEEP ) override;
+	intp				EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth = TD_DEEP ) override;
 	void				SetUndoEnabled( bool enable ) override;
 	bool				IsUndoEnabled() const override;
 	bool				UndoEnabledForElement( const CDmElement *pElement ) const override;
@@ -310,8 +311,8 @@ public:
  	CDmAttribute *		GetAttribute( DmAttributeHandle_t h ) override;
 	bool				IsAttributeHandleValid( DmAttributeHandle_t h ) const override;
 	void				OnlyCreateUntypedElements( bool bEnable ) override;
-	int					NumFileIds() override;
-	DmFileId_t			GetFileId( int i ) override;
+	int					NumFileIds() const override;
+	DmFileId_t			GetFileId( int i ) const override;
 	DmFileId_t			FindOrCreateFileId( const char *pFilename ) override;
 	void				RemoveFileId( DmFileId_t fileid ) override;
 	DmFileId_t			GetFileId( const char *pFilename ) override;
@@ -321,10 +322,10 @@ public:
 	void				SetFileFormat( DmFileId_t fileid, const char *pFormat ) override;
 	DmElementHandle_t	GetFileRoot( DmFileId_t fileid ) override;
 	void				SetFileRoot( DmFileId_t fileid, DmElementHandle_t hRoot ) override;
-	bool				IsFileLoaded( DmFileId_t fileid ) override;
+	bool				IsFileLoaded( DmFileId_t fileid ) const override;
 	void				MarkFileLoaded( DmFileId_t fileid ) override;
 	void				UnloadFile( DmFileId_t fileid ) override;
-	int					NumElementsInFile( DmFileId_t fileid ) override;
+	intp				NumElementsInFile( DmFileId_t fileid ) const override;
 	void				DontAutoDelete( DmElementHandle_t hElement ) override;
 	void				MarkHandleInvalid( DmElementHandle_t hElement ) override;
 	void				MarkHandleValid( DmElementHandle_t hElement ) override;
@@ -338,7 +339,7 @@ public:
 	void				SetSuppressingNotify( bool bSuppress ) override;
 	void				PushNotificationScope( const char *pReason, int nNotifySource, int nNotifyFlags ) override;
 	void				PopNotificationScope( bool bAbort ) override;
-	void				SetUndoDepth( int nSize ) override;
+	void				SetUndoDepth( intp nSize ) override;
 	void				DisplayMemoryStats() override;
 
 public:
@@ -391,10 +392,10 @@ public:
 	void NotifyState( int nNotifyFlags );
 
 	// estimate memory overhead
-	constexpr int EstimateMemoryOverhead() const
+	constexpr intp EstimateMemoryOverhead() const
 	{
-		int nHandlesOverhead = sizeof( int ) + sizeof( CDmElement* ); // m_Handles
-		int nElementIdsOverhead = sizeof( DmElementHandle_t ); // this also has a 80k static overhead, since hash tables can't grow
+		intp nHandlesOverhead = sizeof( int ) + sizeof( CDmElement* ); // m_Handles
+		intp nElementIdsOverhead = sizeof( DmElementHandle_t ); // this also has a 80k static overhead, since hash tables can't grow
 		return nHandlesOverhead + nElementIdsOverhead;
 	}
 
@@ -498,8 +499,8 @@ private:
 	CClipboardManager m_ClipboardMgr;
 	IElementForKeyValueCallback *m_pKeyvaluesCallbackInterface;
 
-	int m_nElementsAllocatedSoFar;
-	int m_nMaxNumberOfElements;
+	intp m_nElementsAllocatedSoFar;
+	intp m_nMaxNumberOfElements;
 };
 
 //-----------------------------------------------------------------------------
@@ -547,16 +548,16 @@ public:
 	static void SetId( CDmElement *pElement, const DmObjectId_t &id )							{ pElement->SetId( id ); }
 	static bool IsDirty( const CDmElement *pElement )											{ return pElement->IsDirty(); }
 	static void MarkDirty( CDmElement *pElement, bool dirty = true )							{ pElement->MarkDirty( dirty ); }
-	static void MarkAttributesClean( CDmElement *pElement )									{ pElement->MarkAttributesClean(); }
+	static void MarkAttributesClean( CDmElement *pElement )										{ pElement->MarkAttributesClean(); }
 	static void MarkBeingUnserialized( CDmElement *pElement, bool beingUnserialized = true )	{ pElement->MarkBeingUnserialized( beingUnserialized ); }
 	static bool IsBeingUnserialized( const CDmElement *pElement ) 								{ return pElement->IsBeingUnserialized(); }
 	static void AddAttributeByPtr( CDmElement *pElement, CDmAttribute *ptr )					{ pElement->AddAttributeByPtr( ptr ); }
-	static void RemoveAttributeByPtrNoDelete( CDmElement *pElement, CDmAttribute *ptr )		{ pElement->RemoveAttributeByPtrNoDelete( ptr); }
+	static void RemoveAttributeByPtrNoDelete( CDmElement *pElement, CDmAttribute *ptr )			{ pElement->RemoveAttributeByPtrNoDelete( ptr); }
 	static void ChangeHandle( CDmElement *pElement, DmElementHandle_t handle )					{ pElement->ChangeHandle( handle ); }
 	static DmElementReference_t	*GetReference( CDmElement *pElement )							{ return pElement->GetReference(); }
 	static void SetReference( CDmElement *pElement, const DmElementReference_t &ref )			{ pElement->SetReference( ref ); }
-	static int EstimateMemoryUsage( CDmElement *pElement, CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, int *pCategories ) { return pElement->EstimateMemoryUsage( visited, depth, pCategories ); }
-	static void PerformConstruction( CDmElement *pElement )									{ pElement->PerformConstruction(); }
+	static intp EstimateMemoryUsage( CDmElement *pElement, CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, intp *pCategories ) { return pElement->EstimateMemoryUsage( visited, depth, pCategories ); }
+	static void PerformConstruction( CDmElement *pElement )										{ pElement->PerformConstruction(); }
 	static void PerformDestruction( CDmElement *pElement )										{ pElement->PerformDestruction(); }
 };
 
