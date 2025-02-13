@@ -105,8 +105,8 @@ public:
 	virtual bool Init() = 0;
 	virtual void Shutdown() = 0;
 
-	virtual int GetAPICount() = 0;
-	virtual void GetAPIInfo( int nIndex, CUtlString* pPrintName, PE_APITYPE *pAPIType ) = 0;
+	virtual intp GetAPICount() = 0;
+	virtual void GetAPIInfo( intp nIndex, CUtlString* pPrintName, PE_APITYPE *pAPIType ) = 0;
 
 	virtual void Extract( const PE_APITYPE& apiType, ExtractDesc_t& info, bool bWritePhonemesToWavFiles = false ) = 0;
 	virtual void ReApply( ExtractDesc_t& info ) = 0;

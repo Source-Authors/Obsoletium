@@ -90,8 +90,8 @@ static void ExportAnimations( ExportInfo_t &info, CDmElement *pRoot )
 
 	// Build a list of all controls
 	const CDmaElementArray< CDmElement > &controls = info.m_pAnimationSet->GetControls();
-	int nControlCount = controls.Count();
-	for ( int i = 0; i < nControlCount; ++i )
+	intp nControlCount = controls.Count();
+	for ( intp i = 0; i < nControlCount; ++i )
 	{
 		CDmElement *pControl = controls[i];
 		if ( !pControl || pControl->GetValue<bool>( "transform" ) )

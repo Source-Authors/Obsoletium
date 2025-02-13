@@ -166,7 +166,7 @@ const char *NameForPhonemeByIndex( int index )
 //-----------------------------------------------------------------------------
 int TextToPhonemeIndex( const char *text )
 {
-	for ( size_t i = 0; i < std::size( g_Phonemes ); ++i )
+	for ( int i = 0; i < static_cast<int>(std::size( g_Phonemes )); ++i )
 	{
 		PhonemeMap_t *test = &g_Phonemes[ i ];
 		if ( !stricmp( test->string, text ) )

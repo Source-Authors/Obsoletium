@@ -62,7 +62,7 @@ void CFlexControlBuilder::BuildDesiredFlexControlList( CDmeGameModel *pGameModel
 	m_FlexControllerInfo.EnsureCapacity( nCount );
 	for ( LocalFlexController_t i = LocalFlexController_t(0); i < nCount; ++i )
 	{
-		int j = m_FlexControllerInfo.AddToTail();
+		intp j = m_FlexControllerInfo.AddToTail();
 
 		FlexControllerInfo_t& info = m_FlexControllerInfo[j];
 		mstudioflexcontroller_t *pFlex = cHdr.pFlexcontroller( i );
@@ -84,10 +84,10 @@ void CFlexControlBuilder::BuildDesiredFlexControlList( CDmeGameModel *pGameModel
 //-----------------------------------------------------------------------------
 void CFlexControlBuilder::BuildDesiredControlList( CDmeGameModel *pGameModel )
 {
-	int nCount = m_FlexControllerInfo.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_FlexControllerInfo.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int j = m_ControlInfo.AddToTail();
+		intp j = m_ControlInfo.AddToTail();
 		ControlInfo_t &controlInfo = m_ControlInfo[j];
 		memset( &controlInfo, 0, sizeof(ControlInfo_t) );
 
@@ -147,10 +147,10 @@ void CFlexControlBuilder::BuildDesiredControlList( CDmeGameModel *pGameModel )
 //-----------------------------------------------------------------------------
 // Finds a desired flex controller index in the m_FlexControllerInfo array
 //-----------------------------------------------------------------------------
-int CFlexControlBuilder::FindDesiredFlexController( const char *pFlexControllerName ) const
+intp CFlexControlBuilder::FindDesiredFlexController( const char *pFlexControllerName ) const
 {
-	int nCount = m_FlexControllerInfo.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_FlexControllerInfo.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pFlexControllerName, m_FlexControllerInfo[i].m_pFlexControlName ) )
 			return i;
@@ -167,14 +167,14 @@ void CFlexControlBuilder::RemoveChannelFromClips( CDmeChannel *pChannel )
 	// First, try to grab the channels referring to this op
 	CUtlVector< CDmeChannelsClip* > channelsClips;
 	FindAncestorsReferencingElement( pChannel, channelsClips );
-	int nChannelsClips = channelsClips.Count();
-	for ( int i = 0; i < nChannelsClips; ++i )
+	intp nChannelsClips = channelsClips.Count();
+	for ( intp i = 0; i < nChannelsClips; ++i )
 	{
 		channelsClips[ i ]->RemoveChannel( pChannel );
 	}
 
 	// Next, remove the channel from values controls it may be attached to
-	for ( int i = 0; i < CONTROL_CHANNEL_ATTRIBUTE_COUNT; ++i ) 
+	for ( intp i = 0; i < CONTROL_CHANNEL_ATTRIBUTE_COUNT; ++i ) 
 	{
 		UtlSymId_t symChannelControl = g_pDataModel->GetSymbol( s_pChannelControls[i] );
 		CDmElement *pControl = FindReferringElement< CDmElement >( pChannel, symChannelControl );
@@ -262,8 +262,8 @@ bool RemoveChannelIfUnused( CDmeChannel *pChannel, CDmeChannelsClip *pChannelsCl
 void CFlexControlBuilder::RemoveUnusedControlsAndChannels( CDmeAnimationSet *pAnimationSet, CDmeChannelsClip *pChannelsClip )
 {
 	CDmrElementArray<> controls = pAnimationSet->GetControls();
-	int nControls = controls.Count();
-	for ( int i = nControls - 1; i >= 0 ; --i )
+	intp nControls = controls.Count();
+	for ( intp i = nControls - 1; i >= 0 ; --i )
 	{
 		CDmElement *pControl = controls[ i ];
 		if ( pControl )
@@ -341,8 +341,8 @@ CDmeChannelsClip* CFlexControlBuilder::FindChannelsClipContainingChannel( CDmeFi
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeChannelsClip, pTrackGroup, pTrack, pChannelsClip )
 
-			int nChannels = pChannelsClip->m_Channels.Count();
-		for ( int j = 0; j < nChannels; ++j )
+			intp nChannels = pChannelsClip->m_Channels.Count();
+		for ( intp j = 0; j < nChannels; ++j )
 		{
 			CDmeChannel *pChannel = pChannelsClip->m_Channels[ j ];
 			if ( pChannel == pSearch )
@@ -441,10 +441,10 @@ static void AddKeyToLogs( CDmeTypedLog< float > *valueLog, CDmeTypedLog< float >
 
 static void ConvertLRToVBLog( CDmeFloatLog *pValueLog, CDmeFloatLog *pBalanceLog, CDmeFloatLog *pLeftLog, CDmeFloatLog *pRightLog, DmeTime_t rightOffset, double flRightScale )
 {
-	int lc = pLeftLog->GetKeyCount();
-	int rc = pRightLog->GetKeyCount();
+	intp lc = pLeftLog->GetKeyCount();
+	intp rc = pRightLog->GetKeyCount();
 
-	int nLeft = 0, nRight = 0;
+	intp nLeft = 0, nRight = 0;
 	while ( nLeft < lc || nRight < rc )
 	{
 		bool bUseLeft = ( nLeft < lc );
@@ -569,8 +569,8 @@ void CFlexControlBuilder::FixupExistingFlexControlLogList( CDmeFilmClip *pCurren
 			continue;
 
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeChannelsClip, pTrackGroup, pTrack, pChannelsClip )
-			int nChannels = pChannelsClip->m_Channels.Count();
-			for ( int ci = 0; ci < nChannels; ++ci )
+			intp nChannels = pChannelsClip->m_Channels.Count();
+			for ( intp ci = 0; ci < nChannels; ++ci )
 			{
 				CDmeChannel *pChannel = pChannelsClip->m_Channels[ ci ];
 				if ( !pChannel )
@@ -613,15 +613,15 @@ void CFlexControlBuilder::BuildExistingFlexControlLogList( CDmeFilmClip *pCurren
 {
 	// These are the current flex controllers that also exist in the desired list
 	// NOTE: Name of these controllers should match the names of the flex controllers
-	int nCount = m_ControlInfo.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ControlInfo.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		ControlInfo_t &info = m_ControlInfo[i];
 
 		if ( info.m_bIsStereo )
 		{
-			int nRightFlex = info.m_pControllerIndex[ OUTPUT_RIGHT ];
-			int nLeftFlex = info.m_pControllerIndex[ OUTPUT_LEFT ];
+			intp nRightFlex = info.m_pControllerIndex[ OUTPUT_RIGHT ];
+			intp nLeftFlex = info.m_pControllerIndex[ OUTPUT_LEFT ];
 			FlexControllerInfo_t *pRightInfo = &m_FlexControllerInfo[nRightFlex];
 			FlexControllerInfo_t *pLeftInfo = &m_FlexControllerInfo[nLeftFlex];
 
@@ -638,7 +638,7 @@ void CFlexControlBuilder::BuildExistingFlexControlLogList( CDmeFilmClip *pCurren
 		}
 		else
 		{
-			int nFlex = info.m_pControllerIndex[ OUTPUT_MONO ];
+			intp nFlex = info.m_pControllerIndex[ OUTPUT_MONO ];
 			FlexControllerInfo_t *pInfo = &m_FlexControllerInfo[nFlex];
 
 			CDmeGlobalFlexControllerOperator *pMonoOp = pGameModel->FindGlobalFlexController( pInfo->m_nGlobalIndex );
@@ -653,7 +653,7 @@ void CFlexControlBuilder::BuildExistingFlexControlLogList( CDmeFilmClip *pCurren
 
 		if ( info.m_bIsMulti )
 		{
-			int nFlex = info.m_pControllerIndex[ OUTPUT_MULTILEVEL ];
+			intp nFlex = info.m_pControllerIndex[ OUTPUT_MULTILEVEL ];
 			FlexControllerInfo_t *pMultiInfo = &m_FlexControllerInfo[ nFlex ];
 			CDmeGlobalFlexControllerOperator *pMultiOp = pGameModel->FindGlobalFlexController( pMultiInfo->m_nGlobalIndex );
 			if ( pMultiOp )
@@ -776,8 +776,8 @@ void CFlexControlBuilder::AttachControlsToGameModel( CDmeAnimationSet *pAnimatio
 													CDmeGameModel *pGameModel, CDmeChannelsClip *pChannelsClip )
 {
 	// Build the infrastructure of the ops that connect that control to the dmegamemodel
-	int c = m_ControlInfo.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_ControlInfo.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		ControlInfo_t &info = m_ControlInfo[i];
 		if ( info.m_bIsStereo )
@@ -805,7 +805,7 @@ void CFlexControlBuilder::InitializeFlexControl( ControlInfo_t &info )
 	CDmElement *pControl = info.m_pControl;
 
 	// Remove these, if they exist...
-	for ( int i = 0; i < CONTROL_CHANNEL_ATTRIBUTE_COUNT; ++i )
+	for ( intp i = 0; i < CONTROL_CHANNEL_ATTRIBUTE_COUNT; ++i )
 	{
 		pControl->RemoveAttribute( s_pChannelControls[i] );
 	}
@@ -844,8 +844,8 @@ void CFlexControlBuilder::InitializeFlexControl( ControlInfo_t &info )
 void CFlexControlBuilder::CreateFlexControls( CDmeAnimationSet *pAnimationSet )
 {
 	// Create a facial control for all input controls
-	int c = m_ControlInfo.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_ControlInfo.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		ControlInfo_t &info = m_ControlInfo[i];
 
@@ -869,8 +869,8 @@ void CFlexControlBuilder::SetupLogs( CDmeChannelsClip *pChannelsClip, bool bUseE
 	double flOOTargetScale = ( flTargetScale != 0.0 ) ? 1.0 / flTargetScale : 1.0;
 
 	// Build the infrastructure of the ops that connect that control to the dmegamemodel
-	int c = m_ControlInfo.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_ControlInfo.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		ControlInfo_t &info = m_ControlInfo[i];
 		for ( int j = 0; j < CONTROL_FIELD_COUNT; ++j )

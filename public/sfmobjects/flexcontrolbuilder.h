@@ -65,7 +65,8 @@ private:
 	{
 		char m_pFlexControlName[256];
 		float m_flDefaultValue;
-		int m_nGlobalIndex;
+		// dimhotepus: int -> UtlSymId_t
+		UtlSymId_t m_nGlobalIndex;
 	};
 
 	struct ExistingLogInfo_t
@@ -82,7 +83,7 @@ private:
 		bool m_bIsMulti : 1;
 		CDmElement *m_pControl;
 
-		int m_pControllerIndex[OUTPUT_FIELD_COUNT];
+		intp m_pControllerIndex[OUTPUT_FIELD_COUNT];
 
 		CDmeChannel *m_ppControlChannel[CONTROL_FIELD_COUNT];
 		float m_pDefaultValue[CONTROL_FIELD_COUNT];
@@ -117,7 +118,7 @@ private:
 	void BuildExistingFlexControlLogList( CDmeFilmClip *pCurrentClip, CDmeGameModel *pGameModel );
 
 	// Finds a desired flex controller index in the m_FlexControllerInfo array
-	int FindDesiredFlexController( const char *pFlexControllerName ) const;
+	intp FindDesiredFlexController( const char *pFlexControllerName ) const;
 
 	// Blows away the various elements trying to control a flex controller op
 	void CleanupExistingFlexController( CDmeGameModel *pGameModel, CDmeGlobalFlexControllerOperator *pOp );
