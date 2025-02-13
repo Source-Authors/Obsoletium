@@ -17,11 +17,17 @@ $Configuration
 	}
 }
 
-$Project "Normal2ssbump"
+$Project "normal2ssbump"
 {
+	$Folder "Header Files"
+	{
+		$File	"..\common\tools_minidump.h"
+	}
+
 	$Folder "Source Files"
 	{
 		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
+		$File	"..\common\tools_minidump.cpp"
 		$File	"normal2ssbump.cpp"
 	}
 	
