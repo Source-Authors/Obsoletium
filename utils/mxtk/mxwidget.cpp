@@ -12,6 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxWidget.h"
+#include "tier0/dbg.h"
 #include <windows.h>
 #include <commctrl.h>
 #include <string.h>
@@ -42,10 +43,11 @@ mxWidget::mxWidget (mxWindow *parent, int x, int y, int w, int h, const char *la
 	setHandle (0);
 	setType (-1);
 	setParent (parent);
-	setBounds (x, y, w, h);
-	setVisible (true);
-	setEnabled (true);
-	setId (0);
+	// dimhotepus: Do not set window props as there is no window yet.
+	// setBounds (x, y, w, h);
+	// setVisible (true);
+	// setEnabled (true);
+	// setId (0);
 	setUserData (0);
 	setLabel (label);
 
@@ -106,6 +108,8 @@ mxWidget::setParent (mxWindow *parentWindow)
 void
 mxWidget::setBounds (int x, int y, int w, int h)
 {
+	AssertMsg (d_this->d_hwnd, "Window must be present to set bounds. Widget 0x%p.", this);
+
 	char str[128];
 	GetClassName (d_this->d_hwnd, str, 128);
 
@@ -121,7 +125,7 @@ mxWidget::setBounds (int x, int y, int w, int h)
 
 
 void
-mxWidget::setLabel (const char *format, ... )
+mxWidget::setLabel (PRINTF_FORMAT_STRING const char *format, ... )
 {
 	if (format == NULL)
 	{
@@ -149,6 +153,8 @@ mxWidget::setLabel (const char *format, ... )
 void
 mxWidget::setVisible (bool b)
 {
+	AssertMsg (d_this->d_hwnd, "Window must be present to set visibility. Widget 0x%p.", this);
+
 	if (b)
 		SetWindowPos (d_this->d_hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 	else
@@ -160,6 +166,8 @@ mxWidget::setVisible (bool b)
 void
 mxWidget::setEnabled (bool b)
 {
+	AssertMsg (d_this->d_hwnd, "Window must be present to toggle. Widget 0x%p.", this);
+
 	EnableWindow (d_this->d_hwnd, b);
 }
 
@@ -168,7 +176,9 @@ mxWidget::setEnabled (bool b)
 void
 mxWidget::setId (int id)
 {
-	SetWindowLong (d_this->d_hwnd, GWL_ID, (LONG) id);
+	AssertMsg (d_this->d_hwnd, "Window must be present to set id. Widget 0x%p.", this);
+
+	SetWindowLongPtr (d_this->d_hwnd, GWLP_ID, (LONG_PTR) id);
 }
 
 
@@ -294,7 +304,9 @@ mxWidget::isEnabled () const
 int
 mxWidget::getId () const
 {
-	return (int) GetWindowLong (d_this->d_hwnd, GWL_ID);
+	AssertMsg (d_this->d_hwnd, "Window must be present to get id. Widget 0x%p.", this);
+
+	return (int) GetWindowLongPtr (d_this->d_hwnd, GWLP_ID);
 }
 
 

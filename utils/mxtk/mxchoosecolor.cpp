@@ -19,7 +19,7 @@
 
 
 bool
-mxChooseColor (mxWindow *parent, int *r, int *g, int *b)
+mxChooseColor (mxWindow *parent, unsigned char *r, unsigned char *g, unsigned char *b)
 {
 	CHOOSECOLOR cc;
 	static COLORREF custColors[16];

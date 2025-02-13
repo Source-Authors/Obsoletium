@@ -32,16 +32,17 @@ static WndProc_t s_OldWndProc = 0;
 
 static LRESULT CALLBACK EditWndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
-	int iret = 0;
+	LRESULT iret = 0;
 
 	// This lovely bit of hackery ensures we get return key events
 	if ( uMessage == WM_CHAR)
 	{
-		iret = s_OldWndProc( hwnd, uMessage, wParam, lParam );
+		// dimhotepus: Can't call old wnd proc directly!
+		iret = CallWindowProc( s_OldWndProc, hwnd, uMessage, wParam, lParam );
 
 		// Post the message directly to all windows in the hierarchy until
 		// someone responds
-		mxLineEdit *lineEdit = (mxLineEdit *) GetWindowLong (hwnd, GWL_USERDATA);
+		mxLineEdit *lineEdit = (mxLineEdit *) GetWindowLongPtr (hwnd, GWLP_USERDATA);
 		mxEvent event;
 		event.event = mxEvent::KeyDown;
 		event.action = lineEdit->getId();
@@ -62,7 +63,8 @@ static LRESULT CALLBACK EditWndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LP
 		{
 			SetFocus( hwnd );
 		}
-		iret = s_OldWndProc( hwnd, uMessage, wParam, lParam );
+		// dimhotepus: Can't call old wnd proc directly!
+		iret = CallWindowProc( s_OldWndProc, hwnd, uMessage, wParam, lParam );
 	}
 	return iret;
 }
@@ -83,7 +85,7 @@ mxLineEdit::mxLineEdit (mxWindow *parent, int x, int y, int w, int h, const char
 
 	if (!s_OldWndProc)
 	{
-		WNDCLASSEX editClass;
+		WNDCLASSEX editClass = {};
 		GetClassInfoEx( (HINSTANCE) GetModuleHandle (NULL), "EDIT", &editClass );
 		s_OldWndProc = editClass.lpfnWndProc;
 
@@ -96,11 +98,11 @@ mxLineEdit::mxLineEdit (mxWindow *parent, int x, int y, int w, int h, const char
 
 	void *handle = (void *) CreateWindowEx (WS_EX_CLIENTEDGE, "mx_edit", label, dwStyle, //WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL,
 				x, y, w, h, hwndParent,
-				(HMENU) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	
 	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
 	SendMessage ((HWND) getHandle (), EM_LIMITTEXT, (WPARAM) 256, 0L);
-	SetWindowLong ((HWND) handle, GWL_USERDATA, (LONG) this);
+	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this);
 
 	setHandle (handle);
 	setType (MX_LINEEDIT);

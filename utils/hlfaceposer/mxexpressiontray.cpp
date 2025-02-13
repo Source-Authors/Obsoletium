@@ -4,12 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+#include "mxexpressiontray.h"
 #include "hlfaceposer.h"
-#include <windows.h>
-#include <stdio.h>
 #include <mxtk/mxWindow.h>
 #include <mxtk/mxScrollBar.h>
-#include "mxexpressiontray.h"
 #include "expressions.h"
 #include "expclass.h"
 #include "ControlPanel.h"
@@ -132,9 +130,9 @@ void mxExpressionTray::Deselect( void )
 // Purpose: 
 // Input  : exp - 
 //-----------------------------------------------------------------------------
-void mxExpressionTray::Select( int exp, bool deselect /*=true*/ )
+void mxExpressionTray::Select( intp exp, bool deselect /*=true*/ )
 {
-	int oldcell = m_nCurCell;
+	intp oldcell = m_nCurCell;
 
 	if ( deselect )
 	{
@@ -149,10 +147,10 @@ void mxExpressionTray::Select( int exp, bool deselect /*=true*/ )
 		CExpClass *active = expressions->GetActiveClass();
 		if ( active )
 		{
-			CExpression *exp = active->GetExpression( m_nCurCell );
-			if ( exp )
+			CExpression *expr = active->GetExpression( m_nCurCell );
+			if ( expr )
 			{
-				exp->SetSelected( true );
+				expr->SetSelected( true );
 			}
 		}
 	}
@@ -767,7 +765,7 @@ int mxExpressionTray::handleEvent (mxEvent *event)
 				break;
 			case IDC_EXPRESSIONCLASS:
 				{
-					int index = g_pExpressionClass->getSelectedIndex();
+					intp index = g_pExpressionClass->getSelectedIndex();
 					if ( index >= 0 )
 					{
 						CExpClass *current = expressions->GetClass( index );
@@ -1149,9 +1147,9 @@ void mxExpressionTray::RestoreThumbnailSize( void )
 void mxExpressionTray::ReloadBitmaps( void )
 {
 	CExpClass *cl;
-	int c = expressions->GetNumClasses();
+	intp c = expressions->GetNumClasses();
 	EnableStickySnapshotMode();
-	for ( int i = 0 ; i < c; i++ )
+	for ( intp i = 0 ; i < c; i++ )
 	{
 		cl = expressions->GetClass( i );
 		if ( !cl )

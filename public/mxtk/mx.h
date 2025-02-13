@@ -17,7 +17,7 @@
 #include "tier0/platform.h"
 
 #ifdef WIN32
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 

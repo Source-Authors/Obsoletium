@@ -24,7 +24,7 @@ public:
 
 
 mxMatSysWindow::mxMatSysWindow (mxWindow *parent, int x, int y, int w, int h, const char *label, int style)
-: mxWindow (parent, x, y, w, h, label, style)
+: mxWindow (parent, x, y, w, h, label, style), d_drawFunc (NULL)
 {
 	d_this = new mxMatSysWindow_i;
 

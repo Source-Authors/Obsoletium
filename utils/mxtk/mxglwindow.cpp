@@ -18,8 +18,8 @@
 
 
 static int g_formatMode = mxGlWindow::FormatDouble;
-static int g_formatColorBits = 24;
-static int g_formatDepthBits = 16;
+static unsigned char g_formatColorBits = 24;
+static unsigned char g_formatDepthBits = 16;
 
 
 
@@ -33,7 +33,7 @@ public:
 
 
 mxGlWindow::mxGlWindow (mxWindow *parent, int x, int y, int w, int h, const char *label, int style)
-: mxWindow (parent, x, y, w, h, label, style)
+: mxWindow (parent, x, y, w, h, label, style), d_drawFunc( NULL)
 {
 	PIXELFORMATDESCRIPTOR pfd =
 	{
@@ -182,7 +182,7 @@ mxGlWindow::setDrawFunc (void (*func) (void))
 
 
 void
-mxGlWindow::setFormat (int mode, int colorBits, int depthBits)
+mxGlWindow::setFormat (int mode, unsigned char  colorBits, unsigned char  depthBits)
 {
 	g_formatMode = mode;
 	g_formatColorBits = colorBits;

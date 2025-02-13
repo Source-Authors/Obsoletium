@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <mxtk/mx.h>
 #include "mxStatusWindow.h"
+#include <mxtk/mx.h>
 #include "hlfaceposer.h"
 #include "choreowidgetdrawhelper.h"
 #include "MDLViewer.h"
@@ -91,7 +91,7 @@ void mxStatusWindow::redraw()
 		rcTime.right = rcTime.left + 50;
 
 		char sz[ 32 ];
-		sprintf( sz, "%.3f",  m_rgTextLines[ line ].curtime );
+		V_sprintf_safe( sz, "%.3f",  m_rgTextLines[ line ].curtime );
 
 		int len = helper.CalcTextWidth( "Arial", STATUS_FONT_SIZE, FW_NORMAL, sz );
 
@@ -122,13 +122,13 @@ bool mxStatusWindow::PaintBackground( void )
 
 void mxStatusWindow::StatusPrint( COLORREF clr, bool overwrite, const char *text )
 {
-	float curtime = (float)Plat_FloatTime();
+	double curtime = Plat_FloatTime();
 
 	char sz[32];
-	sprintf( sz, "%.3f  ", curtime );
+	V_sprintf_safe( sz, "%.3f  ", curtime );
 
-	OutputDebugString( sz );
-	OutputDebugString( text );
+	Plat_DebugString( sz );
+	Plat_DebugString( text );
 
 	char fixedtext[ 512 ];
 	char *in, *out;
@@ -157,7 +157,7 @@ void mxStatusWindow::StatusPrint( COLORREF clr, bool overwrite, const char *text
 
 	int i =  m_nCurrentLine & TEXT_LINE_MASK;
 
-	strncpy( m_rgTextLines[ i ].m_szText, fixedtext, 511 );
+	V_strcpy_safe( m_rgTextLines[ i ].m_szText, fixedtext );
 	m_rgTextLines[ i ].m_szText[ 511 ] = 0;
 
 	m_rgTextLines[ i ].rgb = clr;
@@ -272,9 +272,9 @@ void mxStatusWindow::DrawActiveTool()
 
 	IFacePoserToolWindow *activeTool = IFacePoserToolWindow::GetActiveTool();
 
-	static float lastrealtime = 0.0f;
+	static double lastrealtime = 0.0;
 
-	float dt = (float)realtime - lastrealtime;
+	float dt = static_cast<float>(realtime - lastrealtime);
 	dt = clamp( dt, 0.0f, 1.0f );
 
 	float fps = 0.0f;
@@ -283,7 +283,7 @@ void mxStatusWindow::DrawActiveTool()
 		fps = 1.0f / dt;
 	}
 
-	sprintf( sz, "%s (%i) at %.3f (%.2f fps) (soundcount %i)", 
+	V_sprintf_safe( sz, "%s (%i) at %.3f (%.2f fps) (soundcount %zi)", 
 		activeTool ? activeTool->GetToolName() : "None", 
 		g_MDLViewer->GetCurrentFrame(), 
 		(float)realtime, 

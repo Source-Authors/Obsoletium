@@ -51,7 +51,7 @@ mxMenuBar::~mxMenuBar ()
 void
 mxMenuBar::addMenu (const char *item, mxMenu *menu)
 {
-	AppendMenu ((HMENU) getHandle (), MF_POPUP, (UINT) ((mxWidget *) menu)->getHandle (), item);
+	AppendMenu ((HMENU) getHandle (), MF_POPUP, (UINT_PTR) ((mxWidget *) menu)->getHandle (), item);
 }
 
 

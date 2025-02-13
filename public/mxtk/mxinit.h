@@ -17,7 +17,7 @@
 
 
 #ifdef WIN32
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 
@@ -46,7 +46,7 @@ public:
 	static int getDisplayHeight ();
 	static mxWindow *getMainWindow ();
 	static const char *getApplicationPath ();
-	static int getTickCount ();
+	static long long int getTickCount ();
 
 	enum
 	{

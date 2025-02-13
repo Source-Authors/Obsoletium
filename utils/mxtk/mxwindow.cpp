@@ -23,7 +23,7 @@ extern mxWindow *g_mainWindow;
 class mxWindow_i
 {
 public:
-	UINT d_uTimer;
+	UINT_PTR d_uTimer;
 };
 
 
@@ -53,7 +53,7 @@ mxWindow::mxWindow (mxWindow *parent, int x, int y, int w, int h, const char *la
 					x, y, w, h, (HWND) parentHandle,
 					(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
 
-	SetWindowLong ((HWND) handle, GWL_USERDATA, reinterpret_cast< LONG >( this ) );
+	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this );
 
 	setHandle (handle);
 	setType (MX_WINDOW);
@@ -69,7 +69,7 @@ mxWindow::mxWindow (mxWindow *parent, int x, int y, int w, int h, const char *la
 
 mxWindow::~mxWindow ()
 {
-	SetWindowLong ((HWND) (HWND) getHandle(), GWL_USERDATA, (LONG) 0 );
+	SetWindowLongPtr ((HWND) (HWND) getHandle(), GWLP_USERDATA, (LONG_PTR) 0 );
 	delete d_this;
 }
 
@@ -100,7 +100,7 @@ mxWindow::setTimer (int milliSeconds)
 	if (milliSeconds > 0)
 	{
 		d_this->d_uTimer = 21001;
-		d_this->d_uTimer = (UINT)SetTimer ((HWND) getHandle (), d_this->d_uTimer, milliSeconds, NULL);
+		d_this->d_uTimer = SetTimer ((HWND) getHandle (), d_this->d_uTimer, milliSeconds, NULL);
 	}
 }
 

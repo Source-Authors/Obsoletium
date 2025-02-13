@@ -38,10 +38,10 @@ mxRadioButton::mxRadioButton (mxWindow *parent, int x, int y, int w, int h, cons
 
 	void *handle = (void *) CreateWindowEx (0, "BUTTON", label, dwStyle,
 				x, y, w, h, hwndParent,
-				(HMENU) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	
 	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
-	SetWindowLong ((HWND) handle, GWL_USERDATA, (LONG) this);
+	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this);
 
 	setHandle (handle);
 	setType (MX_RADIOBUTTON);

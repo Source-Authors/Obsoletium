@@ -67,7 +67,7 @@ mxBmpRead (const char *filename)
 	if (bmih.biClrUsed == 0)
 	{
 		bmih.biClrUsed = 256;
-		cbPalBytes = (1 << bmih.biBitCount) * sizeof (mxBitmapRGBQuad);
+		cbPalBytes = (static_cast<size_t>(1) << bmih.biBitCount) * sizeof (mxBitmapRGBQuad);
 	}
 	else 
 	{

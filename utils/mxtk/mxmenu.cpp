@@ -46,7 +46,7 @@ mxMenu::~mxMenu ()
 void
 mxMenu::add (const char *item, int id)
 {
-	AppendMenu ((HMENU) getHandle (), MF_STRING, (UINT) id, item);
+	AppendMenu ((HMENU) getHandle (), MF_STRING, (UINT_PTR) id, item);
 }
 
 
@@ -54,7 +54,7 @@ mxMenu::add (const char *item, int id)
 void
 mxMenu::addMenu (const char *item, mxMenu *menu)
 {
-	AppendMenu ((HMENU) getHandle (), MF_POPUP, (UINT) menu->getHandle (), item);
+	AppendMenu ((HMENU) getHandle (), MF_POPUP, (UINT_PTR) menu->getHandle (), item);
 }
 
 
