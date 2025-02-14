@@ -1716,7 +1716,8 @@ bool CShaderSystem::DrawEnvmapMask( IShader *pShader, IMaterialVar **ppParams,
 								   ShaderRenderState_t* pRenderState, VertexCompressionType_t vertexCompression )
 {
 	// FIXME!  Make this work with fixed function.
-	int vertexFormat = pRenderState->m_VertexFormat;
+	// dimhotepus: int -> VertexFormat_t
+	VertexFormat_t vertexFormat = pRenderState->m_VertexFormat;
 	bool bUsesVertexShader = (VertexFlags(vertexFormat) & VERTEX_FORMAT_VERTEX_SHADER) != 0;
 	if( !bUsesVertexShader )
 	{
