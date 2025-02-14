@@ -905,7 +905,7 @@ void CShaderSystem::PrintBufferedSpew( void )
 			char *pMsg = (char*)_alloca( nMsgLen );
 			m_StoredSpew.GetStringManualCharCount( pMsg, nMsgLen );
 
-			if ( nGroupLen && pGroup )
+			if ( nGroupLen && !Q_isempty(pGroup) )
 			{
 				DColorSpewMessage( spewType, pGroup, &c, "%s", pMsg );
 			}
