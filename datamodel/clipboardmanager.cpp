@@ -138,19 +138,22 @@ void CClipboardManager::GetClipboardData( CUtlVector< KeyValues * >& data )
 			HANDLE hmem = ::GetClipboardData( CF_TEXT );
 			if ( hmem )
 			{
-				int len = GlobalSize( hmem );
+				size_t len = ::GlobalSize( hmem );
 				if ( len > 0 )
 				{
-					void *ptr = GlobalLock(hmem);
+					void *ptr = ::GlobalLock( hmem );
 					if ( ptr )
 					{
-						char buf[ 8192 ];
-						len = min( len, 8191 );
-						Q_memcpy( buf, ( char * )ptr, len );
-						buf[ 8191 ] = 0;
-						GlobalUnlock(hmem);
+						// dimhotepus: Do not truncate copied text.
+						char *buf = new char[len + 1];
+						memcpy( buf, ptr, len );
+						buf[ len ] = '\0';
+
+						::GlobalUnlock( hmem );
 
 						KeyValues *newData = new KeyValues( "ClipBoard", "text", buf );
+						delete[] buf;
+
 						data.AddToTail( newData );
 					}
 				}
