@@ -22,16 +22,15 @@
 InFileRIFF::InFileRIFF( const char *pFileName, IFileReadBinary &io ) : m_io(io)
 {
 	m_file = m_io.open( pFileName );
-	
-	int riff = 0;
-	if ( !m_file )
+	// dimhotepus: Different io's report different failure values.
+	if ( !m_file || m_file == -1 )
 	{
 		m_riffSize = 0;
 		m_riffName = 0;
 		return;
 	}
 
-	riff = ReadInt();
+	int riff = ReadInt();
 	if ( riff != RIFF_ID )
 	{
 		fprintf( stderr, "Not a RIFF File [%s]\n", pFileName );

@@ -94,7 +94,8 @@ CAudioSourceMP3::CAudioSourceMP3( CSfxTable *pSfx )
 	m_dataStart = 0;
 
 	intp file = g_pSndIO->open( pSfx->GetFileName() );
-	if ( file != -1 )
+	// dimhotepus: Diffrent imple signal errors in different ways
+	if ( file && file != -1 )
 	{
 		m_dataSize = g_pSndIO->size( file );
 		g_pSndIO->close( file );
@@ -240,7 +241,8 @@ void CAudioSourceMP3::GetCacheData( CAudioSourceCachedInfo *info )
 	info->SetDataStart( 0 );
 
 	intp file = g_pSndIO->open( m_pSfx->GetFileName() );
-	if ( !file )
+	// dimhotepus: Diffrent imple signal errors in different ways
+	if ( !file || file == -1 )
 	{
 		Warning( "Failed to find file for building soundcache [ %s ]\n", m_pSfx->GetFileName() );
 		// Don't re-use old cached value

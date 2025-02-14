@@ -604,8 +604,9 @@ bool CAudioSourceWave::GetStartupData( void *dest, int destsize, int& bytesCopie
 	// requesting precache snippet as leader for streaming startup latency
 	if ( destsize )
 	{
-		intp file = g_pSndIO->open( m_pSfx->GetFileName() );
-		if ( !file )
+		intp file = g_pSndIO->open(m_pSfx->GetFileName());
+		// dimhotepus: Diffrent imple signal errors in different ways
+		if ( !file || file == -1 )
 		{
 			return false;
 		}
