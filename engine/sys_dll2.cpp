@@ -89,6 +89,8 @@
 #include <thread>
 #endif
 
+#include <chrono>
+
 #if POSIX
 #include <dlfcn.h>
 #endif
