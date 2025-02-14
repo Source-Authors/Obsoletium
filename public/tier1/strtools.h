@@ -543,7 +543,9 @@ template <size_t maxLenInChars> int Q_NormalizeUTF8ToASCII( OUT_Z_ARRAY char (&p
 	// replace non ASCII characters with ?
 	for ( ptrdiff_t i = 0; i < nResult; i++ )
 	{
-		if (constexpr std::is_unsigned_v<std::decay_t<decltype(pchDest[0])>>)
+		constexpr bool isCharUnsigned =
+			std::is_unsigned_v<std::decay_t<decltype(pchDest[0])>>;
+		if constexpr (isCharUnsigned)
 		{
 			// dimhotepus: Makes sense only if char is unsigned.
 			if ( pchDest[i] > 127 )
