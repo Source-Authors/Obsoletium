@@ -26,7 +26,7 @@ class IDataCache;
 //
 //-----------------------------------------------------------------------------
 
-#define DATACACHE_INTERFACE_VERSION		"VDataCache003"
+constexpr inline char DATACACHE_INTERFACE_VERSION[]{"VDataCache003"};
 
 //-----------------------------------------------------------------------------
 // Support types and enums
@@ -35,15 +35,15 @@ class IDataCache;
 //---------------------------------------------------------
 // Unique (per section) identifier for a cache item defined by client
 //---------------------------------------------------------
-typedef uintp DataCacheClientID_t;
+using DataCacheClientID_t = uintp;
 
 
 //---------------------------------------------------------
 // Cache-defined handle for a cache item
 //---------------------------------------------------------
 FORWARD_DECLARE_HANDLE( memhandle_t );
-typedef memhandle_t DataCacheHandle_t;
-#define DC_INVALID_HANDLE ((DataCacheHandle_t)0)
+using DataCacheHandle_t = memhandle_t;
+constexpr inline DataCacheHandle_t DC_INVALID_HANDLE{(DataCacheHandle_t)0};
 
 //---------------------------------------------------------
 // Cache Limits
@@ -144,8 +144,8 @@ struct DataCacheNotification_t
 
 //---------------------------------------------------------
 
-const int DC_MAX_CLIENT_NAME = 15;
-const int DC_MAX_ITEM_NAME = 511;
+constexpr inline int DC_MAX_CLIENT_NAME = 15;
+constexpr inline int DC_MAX_ITEM_NAME = 511;
 
 //---------------------------------------------------------
 // Result codes

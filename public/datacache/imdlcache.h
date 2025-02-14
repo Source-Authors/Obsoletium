@@ -39,7 +39,7 @@ namespace OptimizedModel
 //-----------------------------------------------------------------------------
 // Reference to a loaded studiomdl 
 //-----------------------------------------------------------------------------
-typedef unsigned short MDLHandle_t;
+using MDLHandle_t = unsigned short;
 
 enum
 {

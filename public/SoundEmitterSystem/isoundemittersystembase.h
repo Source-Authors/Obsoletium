@@ -223,7 +223,7 @@ public:
 	virtual bool			IsValidIndex( int index ) = 0;
 	virtual int				GetSoundCount( void ) = 0;
 
-	virtual const char		*GetSoundName( int index ) = 0;
+	virtual const char		*GetSoundName( intp index ) = 0;
 	virtual bool			GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false ) = 0;
 
 	virtual const char		*GetWaveName( CUtlSymbol& sym ) = 0;

@@ -83,7 +83,7 @@ public:
 	virtual bool IsValidIndex( int index );
 	virtual int GetSoundCount( void );
 
-	virtual const char *GetSoundName( int index );
+	virtual const char *GetSoundName( intp index );
 	virtual bool GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false );
 	virtual const char *GetWaveName( CUtlSymbol& sym );
 

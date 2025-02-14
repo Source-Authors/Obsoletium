@@ -330,7 +330,7 @@ bool CSoundEmitterSystemBase::IsValidIndex( int index )
 // Input  : index - 
 // Output : char const
 //-----------------------------------------------------------------------------
-const char *CSoundEmitterSystemBase::GetSoundName( int index )
+const char *CSoundEmitterSystemBase::GetSoundName( intp index )
 {
 	if ( !IsValidIndex( index ) )
 		return "";
