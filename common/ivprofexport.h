@@ -10,12 +10,10 @@
 #pragma once
 #endif
 
-
 #include "tier0/vprof.h"
+#include "Color.h"
 
-
-#define VPROF_EXPORT_INTERFACE_VERSION "VProfExport001"
-#include <Color.h>
+constexpr inline char VPROF_EXPORT_INTERFACE_VERSION[]{"VProfExport001"};
 
 abstract_class IVProfExport
 {

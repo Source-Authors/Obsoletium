@@ -81,7 +81,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: callback interface
 //-----------------------------------------------------------------------------
-class IServerDataResponse
+abstract_class IServerDataResponse
 {
 public:
 	// called when the server has returned a requested value

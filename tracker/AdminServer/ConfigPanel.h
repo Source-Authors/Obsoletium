@@ -21,7 +21,7 @@ class CConfigPanel : public vgui::Frame
 	DECLARE_CLASS_SIMPLE( CConfigPanel, vgui::Frame ); 
 public:
 	CConfigPanel(vgui::Panel *parent, bool autorefresh,bool savercon,int refreshtime,bool graphs, int graphsrefreshtime,bool getlogs);
-	~CConfigPanel();
+	virtual ~CConfigPanel();
 
 	void Run();
 	
@@ -34,8 +34,8 @@ protected:
 	}
 
 	// vgui overrides
-	virtual void OnClose();
-	virtual void OnCommand(const char *command);
+	void OnClose() override;
+	void OnCommand(const char *command) override;
 
 private:
 

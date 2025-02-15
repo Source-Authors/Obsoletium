@@ -22,8 +22,9 @@ class CBudgetBarGraphPanel : public vgui::Panel
 
 public:
 	CBudgetBarGraphPanel( CBaseBudgetPanel *pParent, const char *pPanelName );
-	~CBudgetBarGraphPanel();
-	virtual void Paint( void );
+	virtual ~CBudgetBarGraphPanel();
+
+	void Paint( void ) override;
 
 private:
 

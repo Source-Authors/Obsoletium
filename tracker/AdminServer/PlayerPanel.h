@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
@@ -29,23 +29,23 @@ class CPlayerPanel : public vgui::PropertyPage, public IServerDataResponse
 	DECLARE_CLASS_SIMPLE( CPlayerPanel, vgui::PropertyPage );
 public:
 	CPlayerPanel(vgui::Panel *parent, const char *name);
-	~CPlayerPanel();
+	virtual ~CPlayerPanel();
 
 	// returns the keyvalues for the currently selected row
 	KeyValues *GetSelected(); 
 
 protected:
 	// property page handlers
-	virtual void OnResetData();
-	virtual void OnThink();
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
+	void OnResetData() override;
+	void OnThink() override;
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
 
 	// called when the server has returned a requested value
-	virtual void OnServerDataResponse(const char *value, const char *response);
+	void OnServerDataResponse(const char *value, const char *response) override;
 
 private:
 	// vgui overrides
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 	// msg handlers
 	MESSAGE_FUNC_INT( OnOpenContextMenu, "OpenContextMenu", itemID );

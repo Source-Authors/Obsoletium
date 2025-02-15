@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/ListPanel.h>	
+#include <vgui_controls/ListPanel.h>
 
 // these functions are common to most server lists in sorts
 int __cdecl PlayerNameCompare(const void *elem1, const void *elem2 );

@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
@@ -32,23 +32,23 @@ class CGraphPanel : public vgui::PropertyPage, public IServerDataResponse
 	DECLARE_CLASS_SIMPLE( CGraphPanel, vgui::PropertyPage );
 public:
 	CGraphPanel(vgui::Panel *parent, const char *name);
-	~CGraphPanel();
+	virtual ~CGraphPanel();
 
 	// property page handlers
-	virtual void OnPageShow();
-	virtual void OnPageHide();
+	void OnPageShow() override;
+	void OnPageHide() override;
 
 	void PerformLayout();
 
 protected:
 	// callback for receiving server data
-	virtual void OnServerDataResponse(const char *value, const char *response);
+	void OnServerDataResponse(const char *value, const char *response) override;
 
 	// called every frame to update stats page
-	virtual void OnTick();
+	void OnTick() override;
 
 private:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	typedef enum { SECONDS, MINUTES, HOURS } intervals;
 	struct Points_t

@@ -412,7 +412,7 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 //-----------------------------------------------------------------------------
 // Purpose: returns true if the id string is an IP address, false if it's a WON or STEAM ID
 //-----------------------------------------------------------------------------
-bool CBanPanel::IsIPAddress(const char *id)
+[[nodiscard]] bool CBanPanel::IsIPAddress(const char *id)
 {
 	int s1, s2, s3, s4;
 	return (4 == sscanf(id, "%d.%d.%d.%d", &s1, &s2, &s3, &s4));

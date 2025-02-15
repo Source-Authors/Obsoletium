@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
@@ -26,11 +26,12 @@ class CChatPanel : public vgui::PropertyPage
 	DECLARE_CLASS_SIMPLE( CChatPanel, vgui::PropertyPage );
 public:
 	CChatPanel(vgui::Panel *parent, const char *name);
-	~CChatPanel();
+	virtual ~CChatPanel();
 
 	// property page handlers
-	virtual void OnPageShow();
-	virtual void OnPageHide();
+	void OnPageShow() override;
+	void OnPageHide() override;
+
 	void DoInsertString(const char *str);
 
 private:

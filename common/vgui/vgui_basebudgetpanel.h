@@ -17,7 +17,6 @@
 #include "vgui_budgethistorypanel.h"
 #include "vgui_budgetbargraphpanel.h"
 #include "tier1/utlsymbol.h"
-//#include "hudelement.h"
 
 
 #define BUDGET_HISTORY_COUNT 1024
@@ -65,7 +64,7 @@ class CBaseBudgetPanel : public vgui::Panel
 
 public:
 	CBaseBudgetPanel( vgui::Panel *pParent, const char *pElementName );
-	~CBaseBudgetPanel();
+	virtual ~CBaseBudgetPanel();
 
 	// This should be called when starting up and whenever this data changes.
 	void OnConfigDataChanged( const CBudgetPanelConfigData &data );
@@ -77,10 +76,10 @@ public:
 	virtual void SetTimeLabelText() {}
 	virtual void SetHistoryLabelText() {}
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void PerformLayout();
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void Paint() override;
+	void PaintBackground() override;
+	void PerformLayout() override;
 	void MarkAsDedicatedServer() { m_bDedicated = true; } // plays nicer as part of a vgui window setup
 	bool IsDedicated() const { return m_bDedicated; }
 

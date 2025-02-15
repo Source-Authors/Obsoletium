@@ -222,7 +222,7 @@ void CBaseBudgetPanel::Rebuild( const CBudgetPanelConfigData &data )
 		for( i = oldNumTimeLabels; i < m_TimeLabels.Count(); i++ )
 		{
 			char name[1024];
-			Q_snprintf( name, sizeof( name ), "time_label_%zd", i );
+			V_sprintf_safe( name, "time_label_%zd", i );
 			m_TimeLabels[i] = new vgui::Label( this, name, "TEXT NOT SET YET" );
 		}
 	}

@@ -14,7 +14,7 @@
 #include "IAdminServer.h"
 #include "IVGuiModule.h"
 
-#include <tier1/utlvector.h>
+#include "tier1/utlvector.h"
 
 class CServerPage;
 
@@ -25,31 +25,31 @@ class CAdminServer : public IAdminServer, public IVGuiModule
 {
 public:
 	CAdminServer();
-	~CAdminServer();
+	virtual ~CAdminServer();
 
 	// IVGui module implementation
-	virtual bool Initialize(CreateInterfaceFn *factorylist, int numFactories);
-	virtual bool PostInitialize(CreateInterfaceFn *modules, int factoryCount);
-	virtual vgui::VPANEL GetPanel();
-	virtual bool Activate();
-	virtual bool IsValid();
-	virtual void Shutdown();
-	virtual void Deactivate();
-	virtual void Reactivate();
-	virtual void SetParent(vgui::VPANEL parent);
+	bool Initialize(CreateInterfaceFn *factorylist, int numFactories) override;
+	bool PostInitialize(CreateInterfaceFn *modules, int factoryCount) override;
+	vgui::VPANEL GetPanel() override;
+	bool Activate() override;
+	bool IsValid() override;
+	void Shutdown() override;
+	void Deactivate() override;
+	void Reactivate() override;
+	void SetParent(vgui::VPANEL parent) override;
 
 	// IAdminServer implementation
 	// opens a manage server dialog for a local server
-	virtual ManageServerUIHandle_t OpenManageServerDialog(const char *serverName, const char *gameDir);
+	ManageServerUIHandle_t OpenManageServerDialog(const char *serverName, const char *gameDir) override;
 
 	// opens a manage server dialog to a remote server
-	virtual ManageServerUIHandle_t OpenManageServerDialog(unsigned int gameIP, unsigned int gamePort, const char *password);
+	ManageServerUIHandle_t OpenManageServerDialog(unsigned int gameIP, unsigned int gamePort, const char *password) override;
 
 	// forces the game info dialog closed
-	virtual void CloseManageServerDialog(ManageServerUIHandle_t gameDialog);
+	void CloseManageServerDialog(ManageServerUIHandle_t gameDialog) override;
 
 	// Gets a handle to the interface
-	virtual IManageServer *GetManageServerInterface(ManageServerUIHandle_t handle);
+	IManageServer *GetManageServerInterface(ManageServerUIHandle_t handle) override;
 
 private:
 	struct OpenedManageDialog_t

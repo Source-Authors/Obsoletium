@@ -80,7 +80,7 @@ RESPONSE:
 
 */
 
-#define GAMESERVERDATA_INTERFACE_VERSION "GameServerData001"
+constexpr inline char GAMESERVERDATA_INTERFACE_VERSION[]{"GameServerData001"};
 
 
 #endif // IGAMESERVERDATA_H

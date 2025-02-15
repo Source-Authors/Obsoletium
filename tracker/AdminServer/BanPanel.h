@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
@@ -30,19 +30,19 @@ class CBanPanel : public vgui::PropertyPage, public IServerDataResponse
 	DECLARE_CLASS_SIMPLE( CBanPanel, vgui::PropertyPage );
 public:
 	CBanPanel(vgui::Panel *parent, const char *name);
-	~CBanPanel();
+	virtual ~CBanPanel();
 
-	virtual void OnResetData();
+	void OnResetData() override;
 
 protected:
 	// property page handlers
-	virtual void OnPageShow();
+	void OnPageShow() override;
 
-	virtual void OnThink();
+	void OnThink() override;
 
 	// server response on user data
-	virtual void OnServerDataResponse(const char *value, const char *response);
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
+	void OnServerDataResponse(const char *value, const char *response) override;
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
 
 private:
 	MESSAGE_FUNC( AddBan, "addban" );
@@ -54,7 +54,7 @@ private:
 	MESSAGE_FUNC_PARAMS( OnCvarChangeValue, "CvarChangeValue", kv );
 
 	// returns true if the id string is an IP address, false if it's a WON or STEAM ID
-	bool IsIPAddress(const char *id);
+	[[nodiscard]] static bool IsIPAddress(const char *id);
 
 	// msg handlers
 	MESSAGE_FUNC_INT( OnOpenContextMenu, "OpenContextMenu", itemID );

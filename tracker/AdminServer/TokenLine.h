@@ -6,12 +6,10 @@
 #ifndef TOKENLINE_H
 #define TOKENLINE_H
 
-#pragma once
+constexpr inline int MAX_LINE_TOKENS{128};
+constexpr inline int MAX_LINE_CHARS{2048};
 
-#define MAX_LINE_TOKENS		128
-#define MAX_LINE_CHARS		2048
-
-class TokenLine  
+class TokenLine
 {
 
 public:
