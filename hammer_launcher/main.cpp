@@ -189,7 +189,7 @@ bool HammerAppSystemGroup::Create() {
       AddSystem<IFileSystem>(file_system_module, FILESYSTEM_INTERFACE_VERSION);
   if (!file_system_) return false;
 
-  FileSystem_SetBasePaths(file_system_);
+  if (FileSystem_SetBasePaths(file_system_) != FS_OK) return false;
 
   AppSystemInfo_t app_systems[] = {
       {"materialsystem" DLL_EXT_STRING, MATERIAL_SYSTEM_INTERFACE_VERSION},
