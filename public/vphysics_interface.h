@@ -461,7 +461,7 @@ class CPhysicsSimObject;
 class IPhysicsMotionController;
 
 // Callback for simulation
-class IMotionEvent
+abstract_class IMotionEvent
 {
 public:
 	// These constants instruct the simulator as to how to apply the values copied to linear & angular
@@ -969,7 +969,7 @@ struct surfacedata_t
 	surfacesoundhandles_t		soundhandles;
 };
 
-#define VPHYSICS_SURFACEPROPS_INTERFACE_VERSION	"VPhysicsSurfaceProps001"
+constexpr inline char VPHYSICS_SURFACEPROPS_INTERFACE_VERSION[]{"VPhysicsSurfaceProps001"};
 abstract_class IPhysicsSurfaceProps
 {
 public:

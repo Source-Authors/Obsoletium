@@ -10,12 +10,14 @@
 #pragma once
 #endif
 
+#include "tier0/platform.h"
+
 // NOTE: This is an iterator for the contact points on an object
 // NOTE: This should only be used temporarily.  Holding one of these
 // NOTE: across collision callbacks or calls into simulation will cause errors!
 // NOTE: VPHYSICS may choose to make the data contained within this object invalid 
 // NOTE: any time simulation is run.
-class IPhysicsFrictionSnapshot
+abstract_class IPhysicsFrictionSnapshot
 {
 public:
 	virtual ~IPhysicsFrictionSnapshot() {}

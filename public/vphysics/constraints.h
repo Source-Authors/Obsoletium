@@ -13,6 +13,7 @@
 
 #include "vphysics_interface.h"
 #include "mathlib/mathlib.h"
+#include "tier0/platform.h"
 
 // constraint groups
 struct constraint_groupparams_t
@@ -297,7 +298,7 @@ struct constraint_lengthparams_t
 	}
 };
 
-class IPhysicsConstraint
+abstract_class IPhysicsConstraint
 {
 public:
 	virtual ~IPhysicsConstraint( void ) {}
@@ -329,7 +330,7 @@ public:
 };
 
 
-class IPhysicsConstraintGroup
+abstract_class IPhysicsConstraintGroup
 {
 public:
 	virtual ~IPhysicsConstraintGroup( void ) {}

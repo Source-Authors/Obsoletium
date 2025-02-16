@@ -48,7 +48,7 @@ struct fluid_t
 // Purpose: Pass this into the parser to handle the keys that vphysics does not
 // parse.
 //-----------------------------------------------------------------------------
-class IVPhysicsKeyHandler
+abstract_class IVPhysicsKeyHandler
 {
 public:
 	virtual void ParseKeyValue( void *pData, const char *pKey, const char *pValue ) = 0;
@@ -56,7 +56,7 @@ public:
 };
 
 
-class IVPhysicsKeyParser
+abstract_class IVPhysicsKeyParser
 {
 public:
 	virtual ~IVPhysicsKeyParser() {}

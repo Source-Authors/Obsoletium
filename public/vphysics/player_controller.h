@@ -10,13 +10,15 @@
 #pragma once
 #endif
 
-class IPhysicsPlayerControllerEvent
+#include "tier0/platform.h"
+
+abstract_class IPhysicsPlayerControllerEvent
 {
 public:
 	virtual int	ShouldMoveTo( IPhysicsObject *pObject, const Vector &position ) = 0;
 };
 
-class IPhysicsPlayerController
+abstract_class IPhysicsPlayerController
 {
 public:
 	virtual ~IPhysicsPlayerController( void ) {}

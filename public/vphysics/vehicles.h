@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "tier0/platform.h"
 #include "datamap.h"
 
 
@@ -73,7 +74,7 @@ struct vehicle_debugcarsystem_t
 
 struct vehicleparams_t;
 
-class IPhysicsVehicleController
+abstract_class IPhysicsVehicleController
 {
 public:
 	virtual ~IPhysicsVehicleController() {}

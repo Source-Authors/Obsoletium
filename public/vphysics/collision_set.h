@@ -9,9 +9,11 @@
 #ifndef SE_VPHYSICS_COLLISION_SET_H_
 #define SE_VPHYSICS_COLLISION_SET_H_
 
+#include "tier0/platform.h"
+
 // A set of collision rules
 // NOTE: Defaults to all indices disabled
-class IPhysicsCollisionSet
+abstract_class IPhysicsCollisionSet
 {
 public:
 	virtual ~IPhysicsCollisionSet() {}

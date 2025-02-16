@@ -10,7 +10,9 @@
 #pragma once
 #endif
 
-class IPhysicsObjectPairHash
+#include "tier0/platform.h"
+
+abstract_class IPhysicsObjectPairHash
 {
 public:
 	virtual ~IPhysicsObjectPairHash() {}
