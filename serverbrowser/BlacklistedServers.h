@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: Blacklisted servers list
 //-----------------------------------------------------------------------------
-class CBlacklistedServers : public vgui::PropertyPage
+class CBlacklistedServers final : public vgui::PropertyPage
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CBlacklistedServers, vgui::PropertyPage );
 
@@ -61,7 +61,7 @@ private:
 	vgui::DHANDLE< vgui::FileOpenDialog >	m_hImportDialog;
 
 	CBlacklistedServerManager m_blackList;
-	long m_blackListTimestamp;
+	time_t m_blackListTimestamp;
 };
 
 

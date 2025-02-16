@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: Spectator games list
 //-----------------------------------------------------------------------------
-class CQuickListPanel : public vgui::EditablePanel
+class CQuickListPanel final : public vgui::EditablePanel
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CQuickListPanel, vgui::EditablePanel );
 

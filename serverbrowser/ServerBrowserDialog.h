@@ -16,7 +16,7 @@ extern class IRunGameEngine *g_pRunGameEngine;
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CServerBrowserDialog : public vgui::Frame
+class CServerBrowserDialog final : public vgui::Frame
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CServerBrowserDialog, vgui::Frame ); 
 

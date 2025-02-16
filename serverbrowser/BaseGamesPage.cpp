@@ -7,10 +7,6 @@
 
 #include "pch_serverbrowser.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 using namespace vgui;
 
 #define FILTER_ALLSERVERS			0
@@ -838,15 +834,15 @@ void CBaseGamesPage::ServerResponded( HServerListRequest hReq, int iServer )
 //-----------------------------------------------------------------------------
 void CBaseGamesPage::ServerResponded( int iServer, gameserveritem_t *pServerItem )
 {
-	int iServerMap = m_mapServers.Find( iServer );
+	auto iServerMap = m_mapServers.Find( iServer );
 	if ( iServerMap == m_mapServers.InvalidIndex() )
 	{
 		netadr_t netAdr( pServerItem->m_NetAdr.GetIP(), pServerItem->m_NetAdr.GetConnectionPort() );
-		int iServerIP = m_mapServerIP.Find( netAdr );
+		auto iServerIP = m_mapServerIP.Find( netAdr );
 		if ( iServerIP != m_mapServerIP.InvalidIndex() )
 		{
 			// if we already had this entry under another index remove the old entry
-			int iServerMap = m_mapServers.Find( m_mapServerIP[ iServerIP ] );
+			auto iServerMap = m_mapServers.Find( m_mapServerIP[ iServerIP ] );
 			if ( iServerMap != m_mapServers.InvalidIndex() )
 			{
 				serverdisplay_t &server = m_mapServers[ iServerMap ];
@@ -1630,7 +1626,7 @@ bool CBaseGamesPage::CheckSecondaryFilters( gameserveritem_t &server )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-uint32 CBaseGamesPage::GetServerFilters( MatchMakingKeyValuePair_t **pFilters )
+intp CBaseGamesPage::GetServerFilters( MatchMakingKeyValuePair_t **pFilters )
 {
 	*pFilters = m_vecServerFilters.Base();
 	return m_vecServerFilters.Count();
@@ -1873,7 +1869,7 @@ void CBaseGamesPage::StartRefresh()
 
 	ClearServerList();
 	MatchMakingKeyValuePair_t *pFilters;
-	int nFilters = GetServerFilters( &pFilters );
+	intp nFilters = GetServerFilters( &pFilters );
 
 	if ( m_hRequest )
 	{

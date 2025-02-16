@@ -13,7 +13,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: History of all the servers joined
 //-----------------------------------------------------------------------------
-class CHistoryGames : public CBaseGamesPage
+class CHistoryGames final : public CBaseGamesPage
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CHistoryGames, CBaseGamesPage );
 
