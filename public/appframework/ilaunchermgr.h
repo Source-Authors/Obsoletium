@@ -27,7 +27,7 @@ class CStackCrawlParams;
 
 using SDL_Cursor = struct SDL_Cursor;
 
-class ILauncherMgr : public IAppSystem
+abstract_class ILauncherMgr : public IAppSystem
 {
 public:
 	virtual bool Connect( CreateInterfaceFn factory ) = 0;
