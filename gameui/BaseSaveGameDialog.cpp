@@ -290,8 +290,8 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	if ( !pszFileName || !pszShortName )
 		return false;
 
-	Q_strncpy( save.szShortName, pszShortName, sizeof(save.szShortName) );
-	Q_strncpy( save.szFileName, pszFileName, sizeof(save.szFileName) );
+	V_strcpy_safe( save.szShortName, pszShortName );
+	V_strcpy_safe( save.szFileName, pszFileName );
 
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFileName, "rb", "MOD" );
 	if (fh == FILESYSTEM_INVALID_HANDLE)
@@ -305,11 +305,11 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		return false;
 	}
 
-	Q_strncpy( save.szMapName, szMapName, sizeof(save.szMapName) );
+	V_strcpy_safe( save.szMapName, szMapName );
 
 	// Elapsed time is the last 6 characters in comment. (mmm:ss)
 	intp i = strlen( szComment );
-	Q_strncpy( szElapsedTime, "??", sizeof( szElapsedTime ) );
+	V_strcpy_safe( szElapsedTime, "??" );
 	if (i >= 6)
 	{
 		Q_strncpy( szElapsedTime, (char *)&szComment[i - 6], 7 );
@@ -322,11 +322,11 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		// reformat
 		if ( minutes )
 		{
-			Q_snprintf( szElapsedTime, sizeof(szElapsedTime), "%d %s %d seconds", minutes, minutes > 1 ? "minutes" : "minute", seconds );
+			V_sprintf_safe( szElapsedTime, "%d %s %d seconds", minutes, minutes > 1 ? "minutes" : "minute", seconds );
 		}
 		else
 		{
-			Q_snprintf( szElapsedTime, sizeof(szElapsedTime), "%d seconds", seconds );
+			V_sprintf_safe( szElapsedTime, "%d seconds", seconds );
 		}
 
 		// Chop elapsed out of comment.
@@ -355,9 +355,9 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		pszType = "#GameUI_AutoSave";
 	}
 
-	Q_strncpy( save.szType, pszType, sizeof(save.szType) );
-	Q_strncpy( save.szComment, szComment, sizeof(save.szComment) );
-	Q_strncpy( save.szElapsedTime, szElapsedTime, sizeof(save.szElapsedTime) );
+	V_strcpy_safe( save.szType, pszType );
+	V_strcpy_safe( save.szComment, szComment );
+	V_strcpy_safe( save.szElapsedTime, szElapsedTime );
 
 	// Now get file time stamp.
 	long fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
@@ -368,7 +368,7 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	{
 		*newline = '\0';
 	}
-	Q_strncpy( save.szFileTime, szFileTime, sizeof(save.szFileTime) );
+	V_strcpy_safe( save.szFileTime, szFileTime );
 	save.iTimestamp = fileTime;
 	return true;
 }

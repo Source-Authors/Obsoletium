@@ -1178,8 +1178,8 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 	if ( !pszFileName || !pszShortName )
 		return false;
 
-	Q_strncpy( save->szShortName, pszShortName, sizeof(save->szShortName) );
-	Q_strncpy( save->szFileName, pszFileName, sizeof(save->szFileName) );
+	V_strcpy_safe( save->szShortName, pszShortName );
+	V_strcpy_safe( save->szFileName, pszFileName );
 
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFileName, "rb", "MOD" );
 	if (fh == FILESYSTEM_INVALID_HANDLE)
@@ -1195,11 +1195,11 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		return false;
 	}
 
-	Q_strncpy( save->szMapName, szMapName, sizeof(save->szMapName) );
+	V_strcpy_safe( save->szMapName, szMapName );
 
 	// Elapsed time is the last 6 characters in comment. (mmm:ss)
 	intp i = V_strlen( szComment );
-	Q_strncpy( szElapsedTime, "??", sizeof( szElapsedTime ) );
+	V_strcpy_safe( szElapsedTime, "??" );
 	if (i >= 6)
 	{
 		Q_strncpy( szElapsedTime, (char *)&szComment[i - 6], 7 );
@@ -1256,9 +1256,9 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		pszType = "#GameUI_AutoSave";
 	}
 
-	Q_strncpy( save->szType, pszType, sizeof(save->szType) );
-	Q_strncpy( save->szComment, szComment, sizeof(save->szComment) );
-	Q_strncpy( save->szElapsedTime, szElapsedTime, sizeof(save->szElapsedTime) );
+	V_strcpy_safe( save->szType, pszType );
+	V_strcpy_safe( save->szComment, szComment );
+	V_strcpy_safe( save->szElapsedTime, szElapsedTime );
 
 	// Now get file time stamp.
 	long fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
@@ -1269,7 +1269,7 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 	{
 		*newline = '\0';
 	}
-	Q_strncpy( save->szFileTime, szFileTime, sizeof(save->szFileTime) );
+	V_strcpy_safe( save->szFileTime, szFileTime );
 	save->iTimestamp = fileTime;
 	return true;
 }
