@@ -355,20 +355,8 @@ private:
 	I  MaxElement() const;
 };
 
-// this is kind of ugly, but until C++ gets templatized typedefs in C++0x, it's our only choice
 template < class T, class I = unsigned short, typename L = bool (*)( const T &, const T & )  >
-class CUtlBlockRBTree : public CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >
-{
-public:
-	typedef L LessFunc_t;
-	CUtlBlockRBTree( intp growSize = 0, intp initSize = 0, const LessFunc_t &lessfunc = 0 )
-		: CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >( growSize, initSize, lessfunc ) {}
-	CUtlBlockRBTree( const LessFunc_t &lessfunc )
-		: CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >( lessfunc ) {}
-protected:
-	void ResetDbgInfo() {}
-};
-
+using CUtlBlockRBTree = CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >;
 
 //-----------------------------------------------------------------------------
 // constructor, destructor

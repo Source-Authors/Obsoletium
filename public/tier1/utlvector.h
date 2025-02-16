@@ -239,14 +239,8 @@ private:
 };
 
 
-// this is kind of ugly, but until C++ gets templatized typedefs in C++0x, it's our only choice
 template < class T >
-class CUtlBlockVector : public CUtlVector< T, CUtlBlockMemory< T, intp > >
-{
-public:
-	explicit CUtlBlockVector( intp growSize = 0, intp initSize = 0 )
-		: CUtlVector< T, CUtlBlockMemory< T, intp > >( growSize, initSize ) {}
-};
+using CUtlBlockVector = CUtlVector< T, CUtlBlockMemory< T, intp > >;
 
 //-----------------------------------------------------------------------------
 // The CUtlVectorMT class:
