@@ -442,7 +442,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // Can only run one windowed source app at a time.
-  const se::launcher::ScopedAppMultiRun scoped_app_multi_run;
+  const se::launcher::ScopedAppMultiRun scoped_app_multi_run{CommandLine()};
   if (!scoped_app_multi_run.is_single_run()) {
     // Allow the user to explicitly say they want to be able to run multiple
     // instances of the source mutex.  Useful for side-by-side comparisons of
