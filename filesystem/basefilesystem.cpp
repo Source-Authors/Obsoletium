@@ -2703,11 +2703,11 @@ long CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileNa
 		
 		if ( Q_IsAbsolutePath( pFileName ) )
 		{
-			Q_strncpy( pTmpFileName, pFileName, sizeof( pTmpFileName ) );
+			V_strcpy_safe( pTmpFileName, pFileName );
 		}
 		else
 		{
-			Q_snprintf( pTmpFileName, sizeof( pTmpFileName ), "%s%s", path->GetPathString(), pFileName );
+			V_sprintf_safe( pTmpFileName, "%s%s", path->GetPathString(), pFileName );
 		}
 
 		Q_FixSlashes( pTmpFileName );
@@ -3209,7 +3209,7 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 	CSearchPathsIterator iter( this, &pFileName, pPathID );
 
 	char tempFileName[MAX_PATH];
-	Q_strncpy( tempFileName, pFileName, sizeof(tempFileName) );
+	V_strcpy_safe( tempFileName, pFileName );
 	Q_FixSlashes( tempFileName );
 #ifdef _WIN32
 	Q_strlower( tempFileName );
@@ -3225,11 +3225,11 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 				char pTmpFileName[ MAX_FILEPATH ]; 
 				if ( strchr( tempFileName, ':' ) )
 				{
-					Q_strncpy( pTmpFileName, tempFileName, sizeof( pTmpFileName ) );
+					V_strcpy_safe( pTmpFileName, tempFileName );
 				}
 				else
 				{
-					Q_snprintf( pTmpFileName, sizeof( pTmpFileName ), "%s%s", pSearchPath->GetPathString(), tempFileName );
+					V_sprintf_safe( pTmpFileName, "%s%s", pSearchPath->GetPathString(), tempFileName );
 				}
 
 				Q_FixSlashes( tempFileName );
@@ -3245,12 +3245,12 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 
 long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 {
-	VPROF_BUDGET( "CBaseFileSystem::GetFileTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
+	VPROF_BUDGET( "CBaseFileSystem::GetPathTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
 	CSearchPathsIterator iter( this, &pFileName, pPathID );
 
 	char tempFileName[MAX_PATH];
-	Q_strncpy( tempFileName, pFileName, sizeof(tempFileName) );
+	V_strcpy_safe( tempFileName, pFileName );
 	Q_FixSlashes( tempFileName );
 #ifdef _WIN32
 	Q_strlower( tempFileName );
@@ -3269,11 +3269,11 @@ long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 				char pTmpFileName[ MAX_FILEPATH ]; 
 				if ( strchr( tempFileName, ':' ) )
 				{
-					Q_strncpy( pTmpFileName, tempFileName, sizeof( pTmpFileName ) );
+					V_strcpy_safe( pTmpFileName, tempFileName );
 				}
 				else
 				{
-					Q_snprintf( pTmpFileName, sizeof( pTmpFileName ), "%s%s", pSearchPath->GetPathString(), tempFileName );
+					V_sprintf_safe( pTmpFileName, "%s%s", pSearchPath->GetPathString(), tempFileName );
 				}
 
 				Q_FixSlashes( tempFileName );
@@ -3287,21 +3287,12 @@ long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 
 void CBaseFileSystem::MarkAllCRCsUnverified()
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	m_FileTracker2.MarkAllCRCsUnverified();
 }
 
 
 void CBaseFileSystem::CacheFileCRCs( const char *pPathname, ECacheCRCType eType, IFileList *pFilter )
 {
-	if ( IsX360() )
-	{
-		return;
-	}
 }
 
 EFileCRCStatus CBaseFileSystem::CheckCachedFileHash( const char *pPathID, const char *pRelativeFilename, int nFileFraction, FileHash_t *pFileHash )
@@ -3312,12 +3303,6 @@ EFileCRCStatus CBaseFileSystem::CheckCachedFileHash( const char *pPathID, const 
 
 void CBaseFileSystem::EnableWhitelistFileTracking( bool bEnable, bool bCacheAllVPKHashes, bool bRecalculateAndCheckHashes )
 {
-	if ( IsX360() )
-	{
-		m_WhitelistFileTrackingEnabled = false;
-		return;
-	}
-
 	if ( m_WhitelistFileTrackingEnabled != -1 )
 	{
 		Error( "CBaseFileSystem::EnableWhitelistFileTracking called more than once." );
@@ -3463,11 +3448,6 @@ void CBaseFileSystem::RegisterFileWhitelist( IPureServerWhitelist *pWhiteList, I
 	if ( pFilesToReload )
 		*pFilesToReload = NULL;
 
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	if ( m_pPureServerWhitelist )
 	{
 		m_pPureServerWhitelist->Release();
@@ -3583,21 +3563,6 @@ void CBaseFileSystem::SetWhitelistSpewFlags( int flags )
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::FileTimeToString( char *pString, int maxCharsIncludingTerminator, long fileTime )
 {
-	if ( IsX360() )
-	{
-		char szTemp[ 256 ];
-
-		time_t time = fileTime;
-		V_strncpy( szTemp, ctime( &time ), sizeof( szTemp ) );
-		char *pFinalColon = Q_strrchr( szTemp, ':' );
-		if ( pFinalColon )
-			*pFinalColon = '\0';
-
-		// Clip off the day of the week
-		V_strncpy( pString, szTemp + 4, maxCharsIncludingTerminator );
-	}
-	else
-	{
 		time_t time = fileTime;
 		V_strncpy( pString, ctime( &time ), maxCharsIncludingTerminator );
 
@@ -3610,7 +3575,6 @@ void CBaseFileSystem::FileTimeToString( char *pString, int maxCharsIncludingTerm
 
 		pString[maxCharsIncludingTerminator-1] = '\0';
 	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
