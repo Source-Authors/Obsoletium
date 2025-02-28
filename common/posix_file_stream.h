@@ -8,10 +8,10 @@
 #include <cstdio>
 #include <cstdint>
 
+// We should not depend on Valve libs here as header used in independent DLLs.
+#include <cassert>
 #include <system_error>
 #include <tuple>
-
-#include "tier0/dbg.h"
 
 namespace se::posix {
 
@@ -59,7 +59,7 @@ class posix_file_stream {
   // Move assignment operator.
   posix_file_stream& operator=(posix_file_stream&& f) noexcept {
     [[maybe_unused]] const std::error_code errno_code{close()};
-    Assert(errno_code == posix_error_ok);
+    assert(errno_code == posix_error_ok);
 
     std::swap(fd_, f.fd_);
 
@@ -239,11 +239,40 @@ class posix_file_stream {
   }
 
   // Moves the file pointer to a specified location.
-  [[nodiscard]] io_result<int> seek(const int64_t offset,
-                                    const int origin) const noexcept {
+  [[nodiscard]] io_result<bool> seek(const int64_t offset,
+                                     const int origin) const noexcept {
     const int errno_code{_fseeki64(fd_, offset, origin)};
-    return {errno_code,
+    return {errno_code == 0,
             errno_code == 0 ? posix_error_ok : internal::posix_error_last()};
+  }
+
+  // Gets file size.
+  [[nodiscard]] io_result<int64_t> size() const noexcept {
+    // Gets current position.
+    auto [pos, errc] = tell();
+    if (errc) return {-1, errc};
+
+    // Go to end.
+    std::tie(std::ignore, errc) = seek(0, SEEK_END);
+    if (errc) return {-1, errc};
+
+    int64_t size{-1};
+    // Get position.
+    std::tie(size, errc) = tell();
+    if (errc) {
+      // For debugging.
+      [[maybe_unused]] std::error_code errc2;
+      // Try to restore pointer.
+      std::tie(std::ignore, errc2) = seek(0, SEEK_END);
+      // Return original error.
+      return {-1, errc};
+    }
+
+    // Go to original position.
+    std::tie(std::ignore, errc) = seek(pos, SEEK_SET);
+    if (errc) return {-1, errc};
+
+    return {size, posix_error_ok};
   }
 
   // Gets the current position of a file pointer.
@@ -255,7 +284,7 @@ class posix_file_stream {
 
   ~posix_file_stream() noexcept {
     [[maybe_unused]] const std::error_code errno_code{close()};
-    Assert(errno_code == posix_error_ok);
+    assert(errno_code == posix_error_ok);
   }
 
  private:
