@@ -1,16 +1,12 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
+// Command-line tool used to convert targa (.tga), portable floatmap (.pfm), or
+// Photoshop (.psd) (Orange box SDK) image files into Valve Texture Files
+// (.vtf) for use in the  Source engine.
 //
-// $NoKeywords: $
-//=============================================================================//
+// See https://developer.valvesoftware.com/wiki/VTEX_(Valve_Texture_Tool)
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
 #include "tier1/strtools.h"
-#include <sys/stat.h>
 #include "bitmap/bitmap.h"
 #include "bitmap/tgaloader.h"
 #include "bitmap/psd.h"
@@ -35,7 +31,7 @@
 #include "cmdlib.h"
 #include "tier0/icommandline.h"
 #ifdef WIN32
-#include "windows.h"
+#include "winlite.h"
 #endif
 #include "ilaunchabledll.h"
 #include "ivtex.h"
@@ -43,9 +39,13 @@
 
 #include "tier2/tier2.h"
 #include "tier2/p4helpers.h"
-#include "p4lib/ip4.h"
+// dimhotepus: Drop Perforce support.
+// #include "p4lib/ip4.h"
+#include "tools_minidump.h"
+#include "posix_file_stream.h"
 
 #include "tier1/checksum_crc.h"
+#include <system_error>
 
 #define FF_TRYAGAIN 1
 #define FF_DONTPROCESS 2
@@ -90,32 +90,30 @@ public:
 	explicit SmartIVtfTexture( IVTFTexture *pVtf ) : m_p( pVtf ) {}
 	~SmartIVtfTexture() { if ( m_p ) DestroyVTFTexture( m_p ); }
 
-private:
-	SmartIVtfTexture( SmartIVtfTexture const &x );
-	SmartIVtfTexture & operator = ( SmartIVtfTexture const &x );
+	SmartIVtfTexture( SmartIVtfTexture const &x ) = delete;
+	SmartIVtfTexture & operator = ( SmartIVtfTexture const &x ) = delete;
 
-private:
-	SmartIVtfTexture & operator = ( IVTFTexture *pVtf ) { m_p = pVtf; return *this; }
-	operator IVTFTexture * () const { return m_p; }
-
-public:
 	IVTFTexture * Assign( IVTFTexture *pVtfNew ) { IVTFTexture *pOld = m_p; m_p = pVtfNew; return pOld; }
 	IVTFTexture * Get() const { return m_p; }
 	IVTFTexture * operator->() const { return m_p; }
 
-protected:
+private:
 	IVTFTexture *m_p;
+
+	SmartIVtfTexture & operator = ( IVTFTexture *pVtf ) { m_p = pVtf; return *this; }
+	operator IVTFTexture * () const { return m_p; }
 };
 
 static VTexVMTParam_t g_VMTParams[MAX_VMT_PARAMS];
 
 static int g_NumVMTParams = 0;
-static enum Mode { eModePSD, eModeTGA, eModePFM } g_eMode = eModePSD;
+// dimhotepus: Make scoped enum.
+static enum class Mode { eModePSD, eModeTGA, eModePFM } g_eMode = Mode::eModePSD;
 
 // NOTE: these must stay in the same order as CubeMapFaceIndex_t.
 static const char *g_CubemapFacingNames[7] = { "rt", "lf", "bk", "ft", "up", "dn", "sph" };
 
-static void Pause( void )
+static void Pause()
 {
 	if( !g_NoPause )
 	{
@@ -128,10 +126,9 @@ static void Pause( void )
 
 static bool VTexErrorAborts()
 {
-	if ( CommandLine()->FindParm( "-crcvalidate" ) )
-		return false;
 
-	return true;
+	// dimhotepus: Use simple HasParm API.
+	return !CommandLine()->HasParm( "-crcvalidate" );
 }
 
 
@@ -140,7 +137,7 @@ static void VTexError( const char *pFormat, ... )
 	char str[4096];
 	va_list marker;
 	va_start( marker, pFormat );
-	Q_vsnprintf( str, sizeof( str ), pFormat, marker );
+	V_vsprintf_safe( str, pFormat, marker );
 	va_end( marker );
 
 	if ( !VTexErrorAborts() )
@@ -167,7 +164,7 @@ static void VTexWarning( const char *pFormat, ... )
 	char str[4096];
 	va_list marker;
 	va_start( marker, pFormat );
-	Q_vsnprintf( str, sizeof( str ), pFormat, marker );
+	V_vsprintf_safe( str, pFormat, marker );
 	va_end( marker );
 
 	if ( g_bWarningsAsErrors )
@@ -272,8 +269,7 @@ struct VTexConfigInfo_t
 
 	bool IsSettings0Valid( void ) const
 	{
-		TextureSettingsEx_t exSettingsEmpty;
-		memset( &exSettingsEmpty, 0, sizeof( exSettingsEmpty ) );
+		TextureSettingsEx_t exSettingsEmpty = {};
 		Assert( sizeof( m_exSettings0 ) == sizeof( exSettingsEmpty ) );
 		return !!memcmp( &m_exSettings0, &exSettingsEmpty, sizeof( m_exSettings0 ) );
 	}
@@ -289,7 +285,7 @@ static inline T& SetFlagValueT( T &field, T const &flag, int bSetFlag )
 	if ( bSetFlag )
 		field |= flag;
 	else
-		field &=~flag;
+		field &= ~flag;
 
 	return field;
 }
@@ -309,6 +305,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 		// match their edges with the texture compression and mipmapping.
 		m_bSkyBox = iValue ? true : false;
 		m_bIsCubeMap = iValue ? true : false;
+
 		if ( !g_Quiet && iValue )
 			Msg( "'skybox' detected. Treating skybox like a cubemap for edge-matching purposes.\n" );
 	}
@@ -362,7 +359,8 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 	}
 	else if( !stricmp( pKeyName, "bumpscale" ) )
 	{
-		m_flBumpScale = atof( pKeyValue );
+		// dimhotepus: atof -> strtof.
+		m_flBumpScale = strtof( pKeyValue, nullptr );
 	}
 	else if( !stricmp( pKeyName, "pointsample" ) )
 	{
@@ -435,11 +433,13 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 	}
 	else if( !stricmp( pKeyName, "alphatest_threshhold" ) )
 	{
-		m_flAlphaThreshhold = atof( pKeyValue );
+		// dimhotepus: atof -> strtof.
+		m_flAlphaThreshhold = strtof( pKeyValue, nullptr );
 	}
 	else if( !stricmp( pKeyName, "alphatest_hifreq_threshhold" ) )
 	{
-		m_flAlphaHiFreqThreshhold = atof( pKeyValue );
+		// dimhotepus: atof -> strtof.
+		m_flAlphaHiFreqThreshhold = strtof( pKeyValue, nullptr );
 	}
 	else if( !stricmp( pKeyName, "rendertarget" ) )
 	{
@@ -521,17 +521,19 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 	}
 	else if( !stricmp( pKeyName, "distancespread" ) )
 	{
-		m_flDistanceSpread = atof(pKeyValue);
+		// dimhotepus: atof -> strtof.
+		m_flDistanceSpread = strtof(pKeyValue, nullptr);
 	}
 	else if( !stricmp( pKeyName, "pfmscale" ) )
 	{
-		m_pfmscale=atof(pKeyValue);
+		// dimhotepus: atof -> strtof.
+		m_pfmscale = strtof(pKeyValue, nullptr);
 		printf("******pfm scale=%f\n",m_pfmscale);
 	}
 	else if ( !stricmp( pKeyName, "pfm" ) )
 	{
 		if ( iValue )
-			g_eMode = eModePFM;
+			g_eMode = Mode::eModePFM;
 	}
 	else if ( !stricmp( pKeyName, "specvar" ) )
 	{
@@ -638,7 +640,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 				}
 				else
 				{
-					printf( "Warning: invalid mipblend setting \"%s\"\n", pKeyValue );
+					printf( "Warning: invalid mipblend setting '%s'.\n", pKeyValue );
 				}
 			}
 		}
@@ -660,11 +662,11 @@ static const char *GetSourceExtension( void )
 {
 	switch ( g_eMode )
 	{
-	case eModePSD:
+    case Mode::eModePSD:
 		return ".psd";
-	case eModeTGA:
+    case Mode::eModeTGA:
 		return ".tga";
-	case eModePFM:
+    case Mode::eModePFM:
 		return ".pfm";
 	default:
 		return ".tga";
@@ -771,7 +773,7 @@ static ImageFormat ComputeDesiredImageFormat( IVTFTexture *pTexture, VTexConfigI
 //-----------------------------------------------------------------------------
 // Computes the low res image size
 //-----------------------------------------------------------------------------
-void VTFGetLowResImageInfo( int cacheWidth, int cacheHeight, int *lowResImageWidth, int *lowResImageHeight,
+static void VTFGetLowResImageInfo( int cacheWidth, int cacheHeight, int *lowResImageWidth, int *lowResImageHeight,
 						   ImageFormat *imageFormat )
 {
 	if (cacheWidth > cacheHeight)
@@ -840,7 +842,8 @@ static void CreateLowResImage( IVTFTexture *pVTFTexture )
 //-----------------------------------------------------------------------------
 // Computes the source file name
 //-----------------------------------------------------------------------------
-void MakeSrcFileName( char *pSrcName, unsigned int flags, const char *pFullNameWithoutExtension, int frameID, 
+template<intp src_size>
+void MakeSrcFileName( char (&pSrcName)[src_size], unsigned int flags, const char *pFullNameWithoutExtension, int frameID, 
 					 int faceID, int z, bool isCubeMap, int startFrame, int endFrame, bool bNormalToDUDV )
 {
 	bool bAnimated = !( startFrame == -1 || endFrame == -1 );
@@ -848,17 +851,18 @@ void MakeSrcFileName( char *pSrcName, unsigned int flags, const char *pFullNameW
 	char tempBuf[512];
 	if( bNormalToDUDV )
 	{
-		char *pNormalString = Q_stristr( ( char * )pFullNameWithoutExtension, "_dudv" );
-		if( pNormalString )
+		if ( Q_stristr( pFullNameWithoutExtension, "_dudv" ) )
 		{
-			Q_strncpy( tempBuf, pFullNameWithoutExtension, sizeof(tempBuf) );
+			V_strcpy_safe( tempBuf, pFullNameWithoutExtension );
+
 			char *pNormalString = Q_stristr( tempBuf, "_dudv" );
 			Q_strcpy( pNormalString, "_normal" );
 			pFullNameWithoutExtension = tempBuf;
 		}
 		else
 		{
-			Assert( Q_stristr( ( char * )pFullNameWithoutExtension, "_dudv" ) );
+			// dimhotepus: Enchance Assert message.
+			AssertMsg( false, "Path '%s' missed _dudv", pFullNameWithoutExtension );
 		}
 	}
 
@@ -867,17 +871,17 @@ void MakeSrcFileName( char *pSrcName, unsigned int flags, const char *pFullNameW
 		if( isCubeMap )
 		{
 			Assert( z == -1 );
-			sprintf( pSrcName, "%s%s%03d%s", pFullNameWithoutExtension, g_CubemapFacingNames[faceID], frameID + startFrame, GetSourceExtension() );
+			V_sprintf_safe( pSrcName, "%s%s%03d%s", pFullNameWithoutExtension, g_CubemapFacingNames[faceID], frameID + startFrame, GetSourceExtension() );
 		}
 		else
 		{
 			if ( z == -1 )
 			{
-				sprintf( pSrcName, "%s%03d%s", pFullNameWithoutExtension, frameID + startFrame, GetSourceExtension() );
+				V_sprintf_safe( pSrcName, "%s%03d%s", pFullNameWithoutExtension, frameID + startFrame, GetSourceExtension() );
 			}
 			else
 			{
-				sprintf( pSrcName, "%s%03d_z%03d%s", pFullNameWithoutExtension, z, frameID + startFrame, GetSourceExtension() );
+				V_sprintf_safe( pSrcName, "%s%03d_z%03d%s", pFullNameWithoutExtension, z, frameID + startFrame, GetSourceExtension() );
 			}
 		}
 	}
@@ -886,17 +890,17 @@ void MakeSrcFileName( char *pSrcName, unsigned int flags, const char *pFullNameW
 		if( isCubeMap )
 		{
 			Assert( z == -1 );
-			sprintf( pSrcName, "%s%s%s", pFullNameWithoutExtension, g_CubemapFacingNames[faceID], GetSourceExtension() );
+			V_sprintf_safe( pSrcName, "%s%s%s", pFullNameWithoutExtension, g_CubemapFacingNames[faceID], GetSourceExtension() );
 		}
 		else
 		{
 			if ( z == -1 )
 			{
-				sprintf( pSrcName, "%s%s", pFullNameWithoutExtension, GetSourceExtension() );
+				V_sprintf_safe( pSrcName, "%s%s", pFullNameWithoutExtension, GetSourceExtension() );
 			}
 			else
 			{
-				sprintf( pSrcName, "%s_z%03d%s", pFullNameWithoutExtension, z, GetSourceExtension() );
+				V_sprintf_safe( pSrcName, "%s_z%03d%s", pFullNameWithoutExtension, z, GetSourceExtension() );
 			}
 		}
 	}
@@ -913,30 +917,45 @@ static void ComputeBufferHash( void const *pvBuffer, size_t numBytes, CRC32_t &u
 //-----------------------------------------------------------------------------
 static bool LoadFile( const char *pFileName, CUtlBuffer &buf, bool bFailOnError, CRC32_t *puiHash )
 {
-	FILE *fp = fopen( pFileName, "rb" );
-	if (!fp)
+	// dimhotepus: Use RAII FILE wrapper.
+	auto [f, errc] = se::posix::posix_file_stream_factory::open(pFileName, "rb");
+	if (errc)
 	{
 		if ( bFailOnError )
-			VTexError( "Can't open: \"%s\"\n", pFileName );
+			VTexError( "Unable to open '%s': %s.\n", pFileName, errc.message().c_str() );
 
 		return false;
 	}
 
-	fseek( fp, 0, SEEK_END );
-	int nFileLength = ftell( fp );
-	fseek( fp, 0, SEEK_SET );
+	int64_t size;
+	std::tie(size, errc) = f.size();
+	if (errc || size > std::numeric_limits<intp>::max())
+	{
+		// dimhotepus: Exit on size failure.
+		if ( bFailOnError )
+			VTexError( "Unable to get size of '%s': %s.\n", pFileName, errc.message().c_str() );
 
-	buf.EnsureCapacity( nFileLength );
-	int nBytesRead = fread( buf.Base(), 1, nFileLength, fp );
-	fclose( fp );
+		return false;
+	}
 
-	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
+	buf.EnsureCapacity( static_cast<intp>(size) );
+
+	size_t bytes_read;
+	std::tie(bytes_read, errc) = f.read( buf.Base(), static_cast<intp>(size), 1, static_cast<intp>(size) );
+	if (errc) {
+		if ( bFailOnError )
+			VTexError( "Unable to read '%s': %s.\n", pFileName, errc.message().c_str() );
+
+		return false;
+	}
+
+	buf.SeekPut( CUtlBuffer::SEEK_HEAD, bytes_read );
 
 	{ CP4AutoAddFile autop4( pFileName ); /* add loaded file to P4 */ }
 
 	// Auto-compute buffer hash if necessary
 	if ( puiHash )
-		ComputeBufferHash( buf.Base(), nBytesRead, *puiHash );
+		ComputeBufferHash( buf.Base(), bytes_read, *puiHash );
 
 	return true;
 }
@@ -997,10 +1016,9 @@ static void InitializeSrcTexture_TGA( IVTFTexture *pTexture, const char *pInputF
 static int ReadIntFromUtlBuffer( CUtlBuffer &buf )
 {
 	int val = 0;
-	int c;
 	while( buf.IsValid() )
 	{
-		c = buf.GetChar();
+		char c = buf.GetChar();
 		if( c >= '0' && c <= '9' )
 		{
 			val = val * 10 + ( c - '0' );
@@ -1023,7 +1041,7 @@ static void EatWhiteSpace( CUtlBuffer &buf )
 {
 	while( buf.IsValid() )
 	{
-		int	c = buf.GetChar();
+		char c = buf.GetChar();
 		if( !IsWhitespace( c ) )
 		{
 			buf.SeekGet( CUtlBuffer::SEEK_CURRENT, -1 );
@@ -1056,10 +1074,10 @@ static void InitializeSrcTexture_PFM( IVTFTexture *pTexture, const char *pInputF
 		Assert( 0 );
 		return;
 	}
-	int nWidth, nHeight;
-	nWidth = ReadIntFromUtlBuffer( fileBuffer );
+
+	int nWidth = ReadIntFromUtlBuffer( fileBuffer );
 	EatWhiteSpace( fileBuffer );
-	nHeight = ReadIntFromUtlBuffer( fileBuffer );
+	int nHeight = ReadIntFromUtlBuffer( fileBuffer );
 
 	//	// eat crap until the next newline
 	//	while( fileBuffer.GetChar() != 0xa )
@@ -1083,19 +1101,19 @@ static void InitializeSrcTexture( IVTFTexture *pTexture, const char *pInputFileN
 {
 	switch ( g_eMode )
 	{
-	case eModePSD:
+    case Mode::eModePSD:
 		InitializeSrcTexture_PSD( pTexture, pInputFileName, tgaBuffer, nDepth, nFrameCount, info );
 		break;
-	case eModeTGA:
+	case Mode::eModeTGA:
 		InitializeSrcTexture_TGA( pTexture, pInputFileName, tgaBuffer, nDepth, nFrameCount, info );
 		break;
-	case eModePFM:
+	case Mode::eModePFM:
 		InitializeSrcTexture_PFM( pTexture, pInputFileName, tgaBuffer, nDepth, nFrameCount, info );
 		break;
 	}
 }
 
-#define DISTANCE_CODE_ALPHA_INOUT_THRESHOLD 10
+constexpr inline uint8 DISTANCE_CODE_ALPHA_INOUT_THRESHOLD{10};
 
 
 //-----------------------------------------------------------------------------
@@ -1131,7 +1149,7 @@ static bool LoadFaceFromPSD( IVTFTexture *pTexture, CUtlBuffer &psdBuffer, int z
 		if ( !ok )
 			return false;
 
-		CUtlMemory<uint8> tmpDest( 0, pTexture->Width() * pTexture->Height() * 4 );
+		CUtlMemory<uint8> tmpDest( (intp)0, pTexture->Width() * pTexture->Height() * 4 );
 
 		ImageLoader::ResampleInfo_t resInfo;
 		resInfo.m_pSrc = bmPsdData.GetBits();
@@ -1151,7 +1169,7 @@ static bool LoadFaceFromPSD( IVTFTexture *pTexture, CUtlBuffer &psdBuffer, int z
 
 		if ( info.m_bAlphaToDistance )
 		{
-			float flMaxRad=info.m_flDistanceSpread*2.0*max(info.m_nReduceX,info.m_nReduceY);
+			float flMaxRad=info.m_flDistanceSpread*2.0f*max(info.m_nReduceX,info.m_nReduceY);
 			int nSearchRad=ceil(flMaxRad);
 			bool bWarnEdges = false;
 			// now, do alpha to distance coded stuff
@@ -1198,8 +1216,8 @@ static bool LoadFaceFromPSD( IVTFTexture *pTexture, CUtlBuffer &psdBuffer, int z
 							// negative distance
 							flOutDist = -flOutDist;
 						}
-						uint8 &nOutAlpha= tmpDest[3+4*(x+pTexture->Width()*y )];
-						nOutAlpha = min( 255.0, 255.0*( 0.5+flOutDist ) );
+						uint8 &nOutAlpha= tmpDest[static_cast<intp>(3)+4*(x+pTexture->Width()*static_cast<intp>(y) )];
+						nOutAlpha = static_cast<uint8>(min( 255.0f, 255.0f*( 0.5f+flOutDist ) ));
 						if ( ( nOutAlpha != 0 ) && 
 							(
 							( x == 0 ) ||
@@ -1238,7 +1256,7 @@ static bool LoadFaceFromPSD( IVTFTexture *pTexture, CUtlBuffer &psdBuffer, int z
 		ok = PSDReadFileRGBA8888( psdBuffer, bmPsdData );
 		if ( ok )
 		{
-			memcpy( pDestBits, bmPsdData.GetBits(), bmPsdData.Height() * bmPsdData.Stride() );
+			memcpy( pDestBits, bmPsdData.GetBits(), static_cast<intp>(bmPsdData.Height()) * bmPsdData.Stride() );
 		}
 		return ok;
 	}
@@ -1273,14 +1291,14 @@ static bool LoadFaceFromTGA( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z
 		 ( nHeight != pTexture->Height() ) )
 	{
 		// load into temp and resample
-		CUtlMemory<uint8> tmpImage( 0, nWidth*nHeight*4 );
+		CUtlMemory<uint8> tmpImage( (intp)0, nWidth*nHeight*4 );
 		if ( ! TGALoader::Load( tmpImage.Base(), tgaBuffer, nWidth, 
 								nHeight, IMAGE_FORMAT_RGBA8888, flGamma, false ) )
 		{
 			return false;
 		}
 
-		CUtlMemory<uint8> tmpDest( 0, pTexture->Width() * pTexture->Height() *4 );
+		CUtlMemory<uint8> tmpDest( (intp)0, pTexture->Width() * pTexture->Height() *4 );
 
 		ImageLoader::ResampleInfo_t resInfo;
 		resInfo.m_pSrc = tmpImage.Base();
@@ -1300,7 +1318,7 @@ static bool LoadFaceFromTGA( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z
 
 		if ( info.m_bAlphaToDistance )
 		{
-			float flMaxRad=info.m_flDistanceSpread*2.0*max(info.m_nReduceX,info.m_nReduceY);
+			float flMaxRad=info.m_flDistanceSpread*2.0f*max(info.m_nReduceX,info.m_nReduceY);
 			int nSearchRad=ceil(flMaxRad);
 			bool bWarnEdges = false;
 			// now, do alpha to distance coded stuff
@@ -1319,7 +1337,7 @@ static bool LoadFaceFromTGA( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z
 						int nOrig_x=FLerp(0,nWidth-1,0,pTexture->Width()-1,x);
 						int nOrig_y=FLerp(0,nHeight-1,0,pTexture->Height()-1,y);
 						
-						uint8 nOrigAlpha=tmpImage[3+4*(nOrig_x+nWidth*nOrig_y)];
+						uint8 nOrigAlpha=tmpImage[3+4*(nOrig_x+static_cast<intp>(nWidth)*nOrig_y)];
 						bool bInOrOut=nOrigAlpha > DISTANCE_CODE_ALPHA_INOUT_THRESHOLD;
 
 						float flClosest_Dist=1.0e23;
@@ -1348,8 +1366,8 @@ static bool LoadFaceFromTGA( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z
 							// negative distance
 							flOutDist = -flOutDist;
 						}
-						uint8 &nOutAlpha= tmpDest[3+4*(x+pTexture->Width()*y )];
-						nOutAlpha = min( 255.0, 255.0*( 0.5+flOutDist ) );
+						uint8 &nOutAlpha= tmpDest[3+4*(x+pTexture->Width()*static_cast<intp>(y) )];
+						nOutAlpha = static_cast<uint8>(min( 255.0f, 255.0f*( 0.5f+flOutDist ) ));
 						if ( ( nOutAlpha != 0 ) && 
 							 (
 								 ( x == 0 ) ||
@@ -1429,11 +1447,10 @@ static bool LoadFaceFromPFM( IVTFTexture *pTexture, CUtlBuffer &fileBuffer, int 
 	// Load the pfm and create all mipmap levels
 	float *pDestBits = ( float * )pTexture->ImageData( nFrame, nFace, 0, 0, 0, z );
 
-	int y;
-	for( y = nHeight-1; y >= 0; y-- )
+	for( int y = nHeight-1; y >= 0; y-- )
 	{
 		Assert( fileBuffer.IsValid() );
-		fileBuffer.Get( pDestBits + y * nWidth * 3, nWidth * 3 * sizeof( float ) );
+		fileBuffer.Get( pDestBits + y * nWidth * 3, nWidth * static_cast<intp>(3) * sizeof( float ) );
 		for(int x=0;x<nWidth*3;x++)
 			pDestBits[x+y*nWidth*3]*=info.m_pfmscale;
 	}
@@ -1445,15 +1462,12 @@ static bool LoadFaceFromX( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z, 
 {
 	switch ( g_eMode )
 	{
-	case eModePSD:
+    case Mode::eModePSD:
 		return LoadFaceFromPSD( pTexture, tgaBuffer, z, nFrame, nFace, flGamma, info );
-		break;
-	case eModeTGA:
+    case Mode::eModeTGA:
 		return LoadFaceFromTGA( pTexture, tgaBuffer, z, nFrame, nFace, flGamma, info );
-		break;
-	case eModePFM:
+    case Mode::eModePFM:
 		return LoadFaceFromPFM( pTexture, tgaBuffer, z, nFrame, nFace, flGamma, info );
-		break;
 	default:
 		return false;
 	}
@@ -1556,7 +1570,7 @@ static bool LoadSourceImages( IVTFTexture *pTexture, const char *pFullNameWithou
 				// Load the TGA from disk...
 				CUtlBuffer tgaBuffer;
 				if ( !LoadFile( pSrcName, tgaBuffer, bFailOnError,
-					( g_eMode != eModePSD ) ? &info.m_uiInputHash : NULL ) )
+					( g_eMode != Mode::eModePSD ) ? &info.m_uiInputHash : NULL ) )
 				{
 					// If we want to fail on error and VTexError didn't abort then
 					// simply notify the caller that we failed
@@ -1578,7 +1592,7 @@ static bool LoadSourceImages( IVTFTexture *pTexture, const char *pFullNameWithou
 					tgaBuffer.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 				}
 
-				strcpy( info.m_SrcName, pSrcName );
+				V_strcpy_safe( info.m_SrcName, pSrcName );
 				// NOTE: This here will generate all mip levels of the source image
 				if (!LoadFace( pTexture, tgaBuffer, z, iFrame, iFace, 2.2, info ))
 				{
@@ -1597,19 +1611,19 @@ static bool LoadSourceImages( IVTFTexture *pTexture, const char *pFullNameWithou
 }
 
 
-void PreprocessSkyBox( char *pFullNameWithoutExtension, int *iSkyboxFace )
+static void PreprocessSkyBox( char *pFullNameWithoutExtension, int *iSkyboxFace )
 {
 	// When we get here, it means that we're processing one face of a skybox, but we're going to 
 	// load all the faces and treat it as a cubemap so we can do the edge matching.
 
 	// Since they passed in only one face of the skybox, there's a 2 letter extension we want to get rid of.
-	int len = strlen( pFullNameWithoutExtension );
+	size_t len = strlen( pFullNameWithoutExtension );
 	if ( len >= 3 )
 	{
 		// Make sure there really is a 2 letter extension.
 		char *pEnd = &pFullNameWithoutExtension[ len - 2 ];
 		*iSkyboxFace = -1;
-		for ( int i=0; i < ARRAYSIZE( g_CubemapFacingNames ); i++ )
+		for ( int i=0; i < ssize( g_CubemapFacingNames ); i++ )
 		{
 			if ( stricmp( pEnd, g_CubemapFacingNames[i] ) == 0 )
 			{
@@ -1632,7 +1646,7 @@ void PreprocessSkyBox( char *pFullNameWithoutExtension, int *iSkyboxFace )
 
 // Right now, we've got a full cubemap, and we want to return the one face of the
 // skybox that we're supposed to be processing.
-IVTFTexture* PostProcessSkyBox( IVTFTexture *pTexture, int iSkyboxFace )
+static IVTFTexture* PostProcessSkyBox( IVTFTexture *pTexture, int iSkyboxFace )
 {
 	int nFlags = pTexture->Flags();
 	Assert( nFlags & TEXTUREFLAGS_ENVMAP );	// Should have been treated as an envmap till now.
@@ -1646,10 +1660,10 @@ IVTFTexture* PostProcessSkyBox( IVTFTexture *pTexture, int iSkyboxFace )
 	int nMips = min( pTexture->MipCount(), pRet->MipCount() );
 	for ( int iMip=0; iMip < nMips; iMip++ )
 	{
-		int mipSize = pTexture->ComputeMipSize( iMip );
+		intp mipSize = pTexture->ComputeMipSize( iMip );
 		if ( pRet->ComputeMipSize( iMip ) != mipSize )
 		{
-			Error( "PostProcessSkyBox: ComputeMipSize differs (src=%d, dest=%d)\n", mipSize, pRet->ComputeMipSize( iMip ) );
+			Error( "PostProcessSkyBox: ComputeMipSize differs (src=%zd, dest=%zd)\n", mipSize, pRet->ComputeMipSize( iMip ) );
 		}
 
 		for ( int iFrame=0; iFrame < pTexture->FrameCount(); iFrame++ )
@@ -1668,27 +1682,31 @@ IVTFTexture* PostProcessSkyBox( IVTFTexture *pTexture, int iSkyboxFace )
 	return pRet;
 }
 
-
-void MakeDirHier( const char *pPath )
+// dimhotepus: Report hierarchy creation errors.
+[[nodiscard]] static std::error_code MakeDirHier( const char *pPath )
 {
 #ifdef POSIX
 #define mkdir(s) mkdir(s, S_IRWXU | S_IRWXG | S_IRWXO )
 #endif
 	char temp[1024];
-	Q_strncpy( temp, pPath, 1024 );
-	int i;
-	for( i = 0; i < strlen( temp ); i++ )
+	V_strcpy_safe( temp, pPath );
+	for( size_t i = 0; i < strlen( temp ); i++ )
 	{
 		if( temp[i] == '/' || temp[i] == '\\' )
 		{
 			temp[i] = '\0';
-			//			DebugOut( "mkdir( %s )\n", temp );
-			mkdir( temp );
+
+			if ( mkdir( temp ) && errno != EEXIST )
+				return std::error_code{ errno, std::generic_category() };
+
 			temp[i] = CORRECT_PATH_SEPARATOR;
 		}
 	}
-	//	DebugOut( "mkdir( %s )\n", temp );
-	mkdir( temp );
+
+	if ( mkdir( temp ) && errno != EEXIST )
+		return std::error_code{ errno, std::generic_category() };
+
+	return std::error_code{ 0, std::generic_category() };
 }
 
 
@@ -1696,7 +1714,7 @@ static uint8 GetClampingValue( int nClampSize )
 {
 	if ( nClampSize <= 0 )
 		return 30;											// ~1 billion
-	int nRet = 0;
+	uint8 nRet = 0;
 	while ( nClampSize > 1 )
 	{
 		nClampSize >>= 1;
@@ -1749,7 +1767,7 @@ static void AttachShtFile( const char *pFullNameWithoutExtension, IVTFTexture *p
 //-----------------------------------------------------------------------------
 // Does the dirty deed and generates a VTF file
 //-----------------------------------------------------------------------------
-bool ProcessFiles( const char *pFullNameWithoutExtension, 
+static bool ProcessFiles( const char *pFullNameWithoutExtension, 
 				  const char *pOutputDir, const char *pBaseName, 
 				  bool isCubeMap, VTexConfigInfo_t &info )
 {
@@ -1779,7 +1797,7 @@ bool ProcessFiles( const char *pFullNameWithoutExtension,
 		pFullNameWithoutExtension, &bGenerateSpheremaps, info );
 	if ( !bLoadedSourceImages )
 	{
-		VTexError( "Can't load source images for \"%s\"\n", pFullNameWithoutExtension );
+		VTexError( "Can't load source images for '%s'.\n", pFullNameWithoutExtension );
 		return false;
 	}
 
@@ -1793,7 +1811,7 @@ bool ProcessFiles( const char *pFullNameWithoutExtension,
 
 	// Name of the destination file
 	char dstFileName[1024];
-	sprintf( dstFileName, "%s/%s%s.vtf", pOutputDir, pBaseName, ( ( eModePFM == g_eMode ) && isCubeMap ) ? ".hdr" : "" );
+	V_sprintf_safe( dstFileName, "%s/%s%s.vtf", pOutputDir, pBaseName, ( ( Mode::eModePFM == g_eMode ) && isCubeMap ) ? ".hdr" : "" );
 
 	// Now if we are only validating the CRC
 	if( CommandLine()->FindParm( "-crcvalidate" ) )
@@ -1906,7 +1924,11 @@ bool ProcessFiles( const char *pFullNameWithoutExtension,
 
 	// Write it!
 	if ( g_CreateDir == true )
-		MakeDirHier( pOutputDir ); //It'll create it if it doesn't exist.
+	{
+		const std::error_code rc = MakeDirHier( pOutputDir ); //It'll create it if it doesn't exist.
+		if ( rc )
+			VTexError( "Unable to create output directory '%s': %s.", pOutputDir, rc.message().c_str() );
+	}
 
 	// Make sure the CRC hasn't been modified since finalized
 	Assert( crcWritten == info.m_uiInputHash );
@@ -1914,25 +1936,32 @@ bool ProcessFiles( const char *pFullNameWithoutExtension,
 	CUtlBuffer outputBuf;
 	if (!pVTFTexture->Serialize( outputBuf ))
 	{
-		VTexError( "ERROR: \"%s\": Unable to serialize the VTF file!\n", dstFileName );
+		VTexError( "ERROR: '%s': Unable to serialize the VTF file!\n", dstFileName );
 	}
 
 	{
 		CP4AutoEditAddFile autop4( dstFileName );
-		FILE *fp = fopen( dstFileName, "wb" );
-		if( !fp )
+		// dimhotepus: Use RAII FILE wrapper.
+		auto [f, errc] = se::posix::posix_file_stream_factory::open( dstFileName, "wb" );
+		if ( errc )
 		{
-			VTexError( "Can't open: %s\n", dstFileName );
+			VTexError( "Unable to open '%s': %s.\n", dstFileName, errc.message().c_str() );
 		}
-		fwrite( outputBuf.Base(), 1, outputBuf.TellPut(), fp );
-		fclose( fp );
+
+		std::tie(std::ignore, errc) = f.write( outputBuf.Base(), 1, outputBuf.TellPut() );
+		if ( errc )
+		{
+			VTexError( "Unable to write '%s': %s.\n", dstFileName, errc.message().c_str() );
+		}
 	}
 
-	printf("SUCCESS: Vtf file created\n");
+	// dimhotepus: Dump created VTF name.
+	printf("SUCCESS: Vtf file '%s' created.\n", dstFileName);
 	return true;
 }
 
-const char *GetPossiblyQuotedWord( const char *pInBuf, char *pOutbuf )
+template<size_t out_size>
+const char *GetPossiblyQuotedWord( const char *pInBuf, char (&pOutbuf)[out_size] )
 {
 	pInBuf += strspn( pInBuf, " \t" );						// skip whitespace
 
@@ -1952,14 +1981,20 @@ const char *GetPossiblyQuotedWord( const char *pInBuf, char *pOutbuf )
 		if (! pWordEnd )
 			pWordEnd = pInBuf+strlen(pInBuf);
 	}
+
 	if ((! pWordEnd ) || (pWordEnd == pInBuf ) )
-		return NULL;										// no word found
-	memcpy( pOutbuf, pInBuf, pWordEnd-pInBuf );
-	pOutbuf[pWordEnd-pInBuf]=0;
+		return NULL;
+
+	// no word found
+	// dimhotepus: Prevent overflow of out buf.
+	const size_t word_size = min(out_size - 1, static_cast<size_t>(pWordEnd-pInBuf));
+	memcpy( pOutbuf, pInBuf, word_size );
+	pOutbuf[word_size]='\0';
 
 	pInBuf = pWordEnd;
 	if ( bQuote )
 		pInBuf++;
+
 	return pInBuf;
 }
 
@@ -1969,7 +2004,8 @@ const char *GetPossiblyQuotedWord( const char *pInBuf, char *pOutbuf )
 //			a) end-of-buffer is reached (then "val" is empty)
 //			b) error occurs (then "val" is the error message)
 //
-static bool GetKeyValueFromBuffer( CUtlBuffer &buffer, char *key, char *val )
+template<size_t key_size, size_t value_size>
+static bool GetKeyValueFromBuffer( CUtlBuffer &buffer, char (&key)[key_size], char (&val)[value_size] )
 {
 	char buf[2048];
 
@@ -1980,28 +2016,26 @@ static bool GetKeyValueFromBuffer( CUtlBuffer &buffer, char *key, char *val )
 		// Scanning algorithm
 		char *pComment = strpbrk( buf, "#\n\r" );
 		if ( pComment )
-			*pComment = 0;
+			*pComment = '\0';
 
 		pComment = strstr( buf, "//" );
 		if ( pComment)
-			*pComment = 0;
+			*pComment = '\0';
 
 		const char *scan = buf;
-		scan=GetPossiblyQuotedWord( scan, key );
+		scan = GetPossiblyQuotedWord( scan, key );
 		if ( scan )
 		{
-			scan=GetPossiblyQuotedWord( scan, val );
+			scan = GetPossiblyQuotedWord( scan, val );
 			if ( scan )
 				return true;
-			else
-			{
-				sprintf( val, "parameter %s has no value", key );
-				return false;
-			}
+
+			V_sprintf_safe( val, "parameter %s has no value", key );
+			return false;
 		}
 	}
 
-	val[0] = 0;
+	val[0] = '\0';
 	return false;
 }
 
@@ -2013,7 +2047,7 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 {
 	// Tries to load .txt, then .psd
 
-	int lenBaseName = strlen( pFileBaseName );
+	size_t lenBaseName = strlen( pFileBaseName );
 	char *pFileName = ( char * )stackalloc( lenBaseName + strlen( ".tga" ) + 1 );
 	strcpy( pFileName, pFileBaseName );
 	strcat( pFileName, ".tga" );
@@ -2027,10 +2061,10 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 	memcpy( pFileName + lenBaseName, ".tga", 4 );
 	if ( !bOK && !g_bNoTga && ( 00 == access( pFileName, 00 ) ) ) // TGA file exists
 	{
-		g_eMode = eModeTGA;
+		g_eMode = Mode::eModeTGA;
 
 		memcpy( pFileName + lenBaseName, ".txt", 4 );
-		CUtlBuffer bufFile( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer bufFile( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		bOK = LoadFile( pFileName, bufFile, false, &info.m_uiInputHash );
 		if ( bOK )
 		{
@@ -2061,14 +2095,14 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 	memcpy( pFileName + lenBaseName, ".tga", 4 );
 	if ( g_bNoTga && ( 00 == access( pFileName, 00 ) ) )
 	{
-		printf( "Warning: -notga disables \"%s\"\n", pFileName );
+		fprintf( stderr, "Warning: -notga disables '%s'.\n", pFileName );
 	}
 
 	// PSD file attempt
 	memcpy( pFileName + lenBaseName, ".psd", 4 );
 	if ( !bOK && !g_bNoPsd ) // If PSD mode was not disabled
 	{
-		g_eMode = eModePSD;
+		g_eMode = Mode::eModePSD;
 
 		CUtlBuffer bufFile;
 		bOK = LoadFile( pFileName, bufFile, false, &info.m_uiInputHash );
@@ -2087,7 +2121,7 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 			PSDResFileInfo::ResFileInfoElement descr = resFileInfo.FindElement( PSDResFileInfo::eDescription );
 			if ( descr.m_pvData )
 			{
-				CUtlBuffer bufDescr( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer bufDescr( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				bufDescr.EnsureCapacity( descr.m_numBytes );
 				bufDescr.Put( descr.m_pvData, descr.m_numBytes );
 
@@ -2111,18 +2145,18 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 	else if ( 00 == access( pFileName, 00 ) )
 	{
 		if ( !bOK )
-			printf( "Warning: -nopsd disables \"%s\"\n", pFileName );
+			fprintf( stderr, "Warning: -nopsd disables '%s'.\n", pFileName );
 		else
-			printf( "Warning: psd file \"%s\" exists, but not used, delete tga and txt files to use psd file directly\n", pFileName );
+			fprintf( stderr, "Warning: PSD file '%s' exists, but not used, delete TGA and TXT files to use PSD file directly.\n", pFileName );
 	}
 
 	// Try TXT file as config again for TGA cubemap / PFM
 	memcpy( pFileName + lenBaseName, ".txt", 4 );
 	if ( !bOK )
 	{
-		g_eMode = eModeTGA;
+		g_eMode = Mode::eModeTGA;
 
-		CUtlBuffer bufFile( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer bufFile( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		bOK = LoadFile( pFileName, bufFile, false, &info.m_uiInputHash );
 		if ( bOK )
 		{
@@ -2143,7 +2177,7 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 				}
 			}
 
-			if ( g_eMode == eModePFM )
+			if ( g_eMode == Mode::eModePFM )
 			{
 				if ( g_bUsedAsLaunchableDLL && !( info.m_vtfProcOptions.flags0 & VtfProcessingOptions::OPT_NOCOMPRESS ) )
 				{
@@ -2155,7 +2189,7 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 
 	if ( !bOK )
 	{
-		VTexError( "\"%s\" does not specify valid %s%sPFM+TXT files!\n",
+		VTexError( "'%s' does not specify valid %s%sPFM+TXT files!\n",
 			pFileBaseName,
 			g_bNoPsd ? "" : "PSD or ",
 			g_bNoTga ? "" : "TGA or "
@@ -2239,30 +2273,31 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 	return true;
 }
 
-void Usage( void )
+static void Usage()
 {
 	VTexError( 
-		"Usage: vtex [-outdir dir] [-quiet] [-nopause] [-mkdir] [-shader ShaderName] [-vmtparam Param Value] tex1.txt tex2.txt . . .\n"
+		"Usage: vtex [-outdir dir] [-quiet] [-nopause] [-mkdir] [-shader ShaderName] [-vmtparam Param Value] tex1.txt tex2.txt ...\n"
 		"-quiet            : don't print anything out, don't pause for input\n"
 		"-warningsaserrors : treat warnings as errors\n"
 		"-nopause          : don't pause for input\n"
 		"-nomkdir          : don't create destination folder if it doesn't exist\n"
 		"-vmtparam         : adds parameter and value to the .vmt file\n"
+		"                    eg: -vmtparam $ignorez 1 -vmtparam $translucent 1\n"
 		"-outdir <dir>     : write output to the specified dir regardless of source filename and vproject\n"
 		"-deducepath       : deduce path of sources by target file names\n"
 		"-quickconvert     : use with \"-nop4 -dontusegamedir -quickconvert\" to upgrade old .vmt files\n"
 		"-crcvalidate      : validate .vmt against the sources\n"
-		"-crcforce         : generate a new .vmt even if sources crc matches\n"
-		"\teg: -vmtparam $ignorez 1 -vmtparam $translucent 1\n"
+		"-crcforce         : generate a new .vmt even if sources crc matches\n\n"
 		"Note that you can use wildcards and that you can also chain them\n"
 		"e.g. materialsrc/monster1/*.tga materialsrc/monster2/*.tga\n" );
 }
 
-bool GetOutputDir( const char *inputName, char *outputDir )
+template<intp out_size>
+static bool GetOutputDir( const char *inputName, char (&outputDir)[out_size] )
 {
 	if ( g_ForcedOutputDir[0] )
 	{
-		strcpy( outputDir, g_ForcedOutputDir );
+		V_strcpy_safe( outputDir, g_ForcedOutputDir );
 	}
 	else
 	{
@@ -2279,9 +2314,9 @@ bool GetOutputDir( const char *inputName, char *outputDir )
 			return false;
 		}
 		pTmp += strlen( "materialsrc/" );
-		strcpy( outputDir, gamedir );
-		strcat( outputDir, "materials/" );
-		strcat( outputDir, pTmp );
+		V_strcpy_safe( outputDir, gamedir );
+		V_strcat_safe( outputDir, "materials/" );
+		V_strcat_safe( outputDir, pTmp );
 		Q_StripFilename( outputDir );
 	}
 	if( !g_Quiet )
@@ -2291,15 +2326,17 @@ bool GetOutputDir( const char *inputName, char *outputDir )
 	return true;
 }
 
-bool IsCube( const char *inputName )
+static bool IsCube( const char *inputName )
 {
 	char tgaName[MAX_PATH];
 	// Do Strcmp for ".hdr" to make sure we aren't ripping too much stuff off.
 	Q_StripExtension( inputName, tgaName, MAX_PATH );
-	const char *pInputExtension = inputName + Q_strlen( tgaName );
-	Q_strncat( tgaName, "rt", MAX_PATH, COPY_ALL_CHARACTERS );
-	Q_strncat( tgaName, pInputExtension, MAX_PATH, COPY_ALL_CHARACTERS );
-	Q_strncat( tgaName, GetSourceExtension(), MAX_PATH, COPY_ALL_CHARACTERS );
+
+	const char *pInputExtension = inputName + V_strlen( tgaName );
+	V_strcat_safe( tgaName, "rt", MAX_PATH );
+	V_strcat_safe( tgaName, pInputExtension, MAX_PATH );
+	V_strcat_safe( tgaName, GetSourceExtension(), MAX_PATH );
+
 	struct	_stat buf;
 	if( _stat( tgaName, &buf ) != -1 )
 	{
@@ -2312,7 +2349,7 @@ bool IsCube( const char *inputName )
 }
 
 #ifdef WIN32
-int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedir, const char *extension )
+static int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedir, const char *extension )
 {
 	char	filename[MAX_PATH] = {0};
 
@@ -2330,7 +2367,7 @@ int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedir, cons
 		if ( (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) )
 		{
 			char	subdir[MAX_PATH];
-			sprintf( subdir, "%s\\%s", basedir, wfd.cFileName );
+			V_sprintf_safe( subdir, "%s\\%s", basedir, wfd.cFileName );
 
 			// Recurse
 			Find_Files( wfd, hResult, basedir, extension );
@@ -2350,7 +2387,7 @@ int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedir, cons
 			return FF_DONTPROCESS;
 
 		// Check for .vmt
-		sprintf( filename, "%s\\%s.vmt", basedir, fname );
+		V_sprintf_safe( filename, "%s\\%s.vmt", basedir, fname );
 		// Exists, so don't overwrite it
 		if ( access( filename, 0 ) != -1 )
 			return FF_TRYAGAIN;
@@ -2362,7 +2399,7 @@ int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedir, cons
 		// p += strlen( wfd.cFileName ) + 1;
 
 		// Construct texture name
-		sprintf( texturename, "%s\\%s", p, fname );
+		V_sprintf_safe( texturename, "%s\\%s", p, fname );
 
 		// Convert all to lower case
 		strlwr( texturename );
@@ -2373,7 +2410,8 @@ int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedir, cons
 }
 #endif
 
-bool Process_File( char *pInputBaseName, int maxlen )
+template<intp maxlen>
+static bool Process_File( char (&pInputBaseName)[maxlen] )
 {
 	char outputDir[1024];
 	Q_FixSlashes( pInputBaseName, '/' );
@@ -2381,17 +2419,23 @@ bool Process_File( char *pInputBaseName, int maxlen )
 
 	if ( CommandLine()->FindParm( "-deducepath" ) )
 	{
-		strcpy( outputDir, pInputBaseName );
+		V_strcpy_safe( outputDir, pInputBaseName );
 
 		// If it is not a full path, try making it a full path
 		if ( pInputBaseName[0] != '/' &&
 			 pInputBaseName[1] != ':' )
 		{
 			// Convert to full path
-			getcwd( outputDir, sizeof( outputDir ) );
+			if ( !getcwd( outputDir, sizeof( outputDir ) ) )
+			{
+				Warning("Unable to get current directory: %s.\n",
+					std::generic_category().message(errno).c_str());
+				return false;
+			}
+
 			Q_FixSlashes( outputDir, '/' );
-			Q_strncat( outputDir, "/", sizeof( outputDir ) );
-			Q_strncat( outputDir, pInputBaseName, sizeof( outputDir ) );
+			V_strcat_safe( outputDir, "/" );
+			V_strcat_safe( outputDir, pInputBaseName );
 		}
 
 		// If it is pointing inside "/materials/" make it go for "/materialsrc/"
@@ -2400,18 +2444,18 @@ bool Process_File( char *pInputBaseName, int maxlen )
 		if ( pGame && pMaterials && ( pGame < pMaterials ) )
 		{
 			// "u:/data/game/tf/materials/"  ->  "u:/data/content/tf/materialsrc/"
-			int numExtraBytes = strlen( "/content/.../materialsrc/" ) - strlen( "/game/.../materials/" );
-			int numConvertBytes = pMaterials + strlen( "/materials/" ) - outputDir;
+			constexpr size_t numExtraBytes = std::size( "/content/.../materialsrc/" ) - std::size( "/game/.../materials/" ) - 2;
+			intp numConvertBytes = pMaterials + std::size( "/materials/" ) - 1 - outputDir;
 			memmove( outputDir + numConvertBytes + numExtraBytes, outputDir + numConvertBytes, strlen( outputDir ) - numConvertBytes + 1 );
 			
-			int numMidBytes = pMaterials - pGame - strlen( "/game" );
-			memmove( pGame + strlen( "/content" ), pGame + strlen( "/game" ), numMidBytes );
+			intp numMidBytes = pMaterials - pGame - std::size( "/game" ) - 1;
+			memmove( pGame + std::size( "/content" ) - 1, pGame + std::size( "/game" ) - 1, numMidBytes );
 
-			memmove( pGame, "/content", strlen( "/content" ) );
-			memmove( pGame + strlen( "/content" ) + numMidBytes, "/materialsrc/", strlen( "/materialsrc/" ) );
+			memmove( pGame, "/content", std::size( "/content" ) - 1 );
+			memmove( pGame + std::size( "/content" ) - 1 + numMidBytes, "/materialsrc/", std::size( "/materialsrc/" ) - 1 );
 		}
 
-		Q_strncpy( pInputBaseName, outputDir, maxlen );
+		V_strcpy_safe( pInputBaseName, outputDir );
 	}
 
 	if( !g_Quiet )
@@ -2426,7 +2470,7 @@ bool Process_File( char *pInputBaseName, int maxlen )
 	}
 	else if (!g_UseGameDir)
 	{
-		strcpy(outputDir, pInputBaseName);
+		V_strcpy_safe(outputDir, pInputBaseName);
 		Q_StripFilename(outputDir);
 	}
 
@@ -2526,7 +2570,7 @@ bool Process_File( char *pInputBaseName, int maxlen )
 			if( fp )
 			{
 				if ( !g_Quiet )
-					fprintf( stderr, "vmt file \"%s\" already exists\n", buf );
+					fprintf( stderr, "vmt file '%s' already exists\n", buf );
 
 				fclose( fp );
 			}
@@ -2537,7 +2581,7 @@ bool Process_File( char *pInputBaseName, int maxlen )
 				{
 					if ( !g_Quiet )
 						fprintf( stderr, "Creating vmt file: %s/%s\n", tmp, pBaseName );
-					tmp += strlen( "materials/" );
+					tmp += ssize( "materials/" ) - 1;
 					fprintf( fp, "\"%s\"\n", g_ShaderName );
 					fprintf( fp, "{\n" );
 					fprintf( fp, "\t\"$baseTexture\" \"%s/%s\"\n", tmp, pBaseName );
@@ -2555,14 +2599,14 @@ bool Process_File( char *pInputBaseName, int maxlen )
 				}
 				else
 				{
-					VTexWarning( "Couldn't open \"%s\" for writing\n", buf );
+					VTexWarning( "Couldn't open '%s' for writing.\n", buf );
 				}
 			}
 
 		}
 		else
 		{
-			VTexWarning( "Couldn't find \"materials/\" in output path\n", buf );
+			VTexWarning( "Couldn't find 'materials/' in output path\n", buf );
 		}
 	}
 
@@ -2571,7 +2615,17 @@ bool Process_File( char *pInputBaseName, int maxlen )
 
 static SpewRetval_t VTexOutputFunc( SpewType_t spewType, char const *pMsg )
 {
-	printf( "%s", pMsg );
+	if (spewType == SPEW_ERROR || spewType == SPEW_WARNING)
+	{
+		fprintf(stderr, "%s", pMsg);
+	}
+	else
+	{
+		printf( "%s", pMsg );
+	}
+
+	Plat_DebugString(pMsg);
+
 	if (spewType == SPEW_ERROR)
 	{
 		Pause();
@@ -2584,46 +2638,52 @@ static SpewRetval_t VTexOutputFunc( SpewType_t spewType, char const *pMsg )
 class CVTex : public CTier2AppSystem< IVTex >, public ILaunchableDLL
 {
 public:
-	int VTex( int argc, char **argv );
+	int VTex( int argc, char **argv ) override;
 
-	// ILaunchableDLL, used by vtex.exe.
-	virtual int main( int argc, char **argv )
+	// ILaunchableDLL, used by vtex executable.
+	int main( int argc, char **argv ) override
 	{
+		// dimhotepus: Install an exception handler only when running as standalone executable.
+		const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+
+		// dimhotepus: Store old spew to restore later.
+		const ScopedSpewOutputFunc scoped_spew_output{VTexOutputFunc};
+
 		g_bUsedAsLaunchableDLL = true;
 
 		// Being used as a launchable DLL, we don't want to blow away the host app's command line
-		CUtlString strOrigCmdLine( CommandLine()->GetCmdLine() );
+		const CUtlString original_cmd_line( CommandLine()->GetCmdLine() );
 
 		// Run the vtex logic
-		int iResult = VTex( argc, argv );
+		const int rc = VTex( argc, argv );
 
 		// Restore command line
-		CommandLine()->CreateCmdLine( strOrigCmdLine.Get() );
+		CommandLine()->CreateCmdLine( original_cmd_line.Get() );
 
-		return iResult;
+		return rc;
 	}
 
-	virtual int VTex( CreateInterfaceFn fsFactory, const char *pGameDir, int argc, char **argv )
+	int VTex( CreateInterfaceFn fsFactory, const char *pGameDir, int argc, char **argv ) override
 	{
-		g_pFileSystem = g_pFullFileSystem = (IFileSystem*)fsFactory( FILESYSTEM_INTERFACE_VERSION, NULL );
+		g_pFileSystem = g_pFullFileSystem = (IFileSystem*)fsFactory( FILESYSTEM_INTERFACE_VERSION, nullptr );
 		if ( !g_pFileSystem )
 		{
 			Error( "IVTex3::VTex - fsFactory can't get '%s' interface.", FILESYSTEM_INTERFACE_VERSION );
 			return 0;
 		}
 
-		Q_strncpy( gamedir, pGameDir, sizeof( gamedir ) );
+		V_strcpy_safe( gamedir, pGameDir );
 		Q_AppendSlash( gamedir, sizeof( gamedir ) );
 
 		// When being used embedded in a host app, we don't want to blow away the host app's command line
-		CUtlString strOrigCmdLine( CommandLine()->GetCmdLine() );
+		CUtlString original_cmd_line( CommandLine()->GetCmdLine() );
 
-		int iResult = VTex( argc, argv );
+		int rc = VTex( argc, argv );
 
 		// Restore command line
-		CommandLine()->CreateCmdLine( strOrigCmdLine.Get() );
+		CommandLine()->CreateCmdLine( original_cmd_line.Get() );
 
-		return iResult;
+		return rc;
 	}
 };
 
@@ -2654,7 +2714,7 @@ bool CSuggestGameDirHelper::MySuggestFn( CFSSteamSetupInfo const *pFsSteamSetupI
 	if ( pbBubbleDirectories )
 		*pbBubbleDirectories = true;
 
-	for ( int k = 0; k < m_numInputFiles; ++ k )
+	for ( size_t k = 0; k < m_numInputFiles; ++ k )
 	{
 		Q_MakeAbsolutePath( pchPathBuffer, nBufferLength, m_pszInputFiles[ k ] );
 		return true;
@@ -2667,24 +2727,26 @@ int CVTex::VTex( int argc, char **argv )
 {
 	CommandLine()->CreateCmdLine( argc, argv );
 
-	if ( g_bUsedAsLaunchableDLL )
-	{
-		SpewOutputFunc( VTexOutputFunc );
-	}
-
-	MathLib_Init(  2.2f, 2.2f, 0.0f, 1.0f, false, false, false, false );
-	if( argc < 2 )
+	if ( argc < 2 )
 	{
 		Usage();
 		return -1;
 	}
 
+	// dimhotepus: Add header.
+#ifdef PLATFORM_64BITS
+	Msg("Valve Software - vtex [64 bit] (%s)\n", __DATE__);
+#else
+	Msg("Valve Software - vtex (%s)\n", __DATE__);
+#endif
+
+	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
+
 	g_UseGameDir = true; // make sure this is initialized to true.
 	const char *p4ChangelistLabel = "VTex Auto Checkout";
 	bool bCreatedFilesystem = false;
 
-	int i;
-	i = 1;
+	int i = 1;
 	while( i < argc )
 	{
 		if( stricmp( argv[i], "-quiet" ) == 0 )
@@ -2793,7 +2855,7 @@ int CVTex::VTex( int argc, char **argv )
 
 					if( !g_Quiet )
 					{
-						fprintf( stderr, "Adding .vmt parameter: \"%s\"\t\"%s\"\n", 
+						printf( "Adding .vmt parameter: \"%s\"\t\"%s\"\n", 
 							g_VMTParams[g_NumVMTParams].m_szParam,
 							g_VMTParams[g_NumVMTParams].m_szValue );
 					}
@@ -2803,7 +2865,7 @@ int CVTex::VTex( int argc, char **argv )
 			}
 			else
 			{
-				fprintf( stderr, "Exceeded max number of vmt parameters, extra ignored ( max %d )\n", MAX_VMT_PARAMS );
+				fprintf( stderr, "Exceeded max number of vmt parameters, extra ignored (max %d)\n", MAX_VMT_PARAMS );
 			}
 		}
 		else if( stricmp( argv[i], "-nop4" ) == 0 )
@@ -2845,7 +2907,7 @@ int CVTex::VTex( int argc, char **argv )
 	// Set the suggest game info directory helper
 	g_suggestGameDirHelper.m_pszInputFiles = argv + i;
 	g_suggestGameDirHelper.m_numInputFiles = argc - i;
-	SetSuggestGameInfoDirFn( CSuggestGameDirHelper::SuggestFn );
+	const ScopedSuggestGameInfoDir scoped_suggest_game_info_dir( CSuggestGameDirHelper::SuggestFn );
 
 	// g_pFileSystem may have been inherited with -inherit_filesystem.
 	if (g_UseGameDir && !g_pFileSystem)
@@ -2862,36 +2924,38 @@ int CVTex::VTex( int argc, char **argv )
 		bool bP4DLLExists = false;
 		if ( g_pFullFileSystem )
 		{
-			bP4DLLExists = g_pFullFileSystem->FileExists( "p4lib.dll", "EXECUTABLE_PATH" );
+			bP4DLLExists = g_pFullFileSystem->FileExists( "p4lib" DLL_EXT_STRING, "EXECUTABLE_PATH" );
 		}
 
 		if ( g_bUsedAsLaunchableDLL && !CommandLine()->FindParm( "-nop4" ) && bP4DLLExists )
 		{
-			const char *pModuleName = "p4lib.dll";
+			constexpr char pModuleName[] = "p4lib" DLL_EXT_STRING;
 			CSysModule *pModule = Sys_LoadModule( pModuleName );
 			if ( !pModule )
 			{
-				printf( "Can't load %s.\n", pModuleName );
+				fprintf( stderr, "Can't load %s.\n", pModuleName );
 				return -1;
 			}
-			CreateInterfaceFn fn = Sys_GetFactory( pModule );
+			CreateInterfaceFnT<IP4> fn = Sys_GetFactory<IP4>( pModule );
 			if ( !fn )
 			{
-				printf( "Can't get factory from %s.\n", pModuleName );
+				fprintf( stderr, "Can't get factory from %s.\n", pModuleName );
 				Sys_UnloadModule( pModule );
 				return -1;
 			}
-			p4 = (IP4 *)fn( P4_INTERFACE_VERSION, NULL );
-			if ( !p4 )
+			
+			// dimhotepus: No Perforce support.
+			// p4 = fn( P4_INTERFACE_VERSION, NULL );
+			// if ( !p4 )
 			{
-				printf( "Can't get IP4 interface from %s, proceeding with -nop4.\n", pModuleName );
+				fprintf( stderr, "Can't get IP4 interface from %s, proceeding with -nop4.\n", pModuleName );
 				g_p4factory->SetDummyMode( true );
 			}
-			else
-			{
-				p4->Connect( FileSystem_GetFactory() );
-				p4->Init();
-			}
+			// else
+			// {
+			// 	p4->Connect( FileSystem_GetFactory() );
+			// 	p4->Init();
+			// }
 		}
 		else
 		{
@@ -2899,7 +2963,7 @@ int CVTex::VTex( int argc, char **argv )
 		}
 
 		// Setup p4 factory
-		if ( p4ChangelistLabel && p4ChangelistLabel[0] != '\000' )
+		if ( p4ChangelistLabel && p4ChangelistLabel[0] != '\0' )
 		{
 			// Set the named changelist
 			g_p4factory->SetOpenFileChangeList( p4ChangelistLabel );
@@ -2913,12 +2977,11 @@ int CVTex::VTex( int argc, char **argv )
 			continue; // Assuming flags
 
 		char pInputBaseName[MAX_PATH];
-		Q_strncpy( pInputBaseName, argv[i], sizeof(pInputBaseName) );
-		// int maxlen = Q_strlen( pInputBaseName ) + 1;
+		V_strcpy_safe( pInputBaseName, argv[i] );
 
 		if ( !Q_strstr( pInputBaseName, "*." ) )
 		{
-			Process_File( pInputBaseName, sizeof(pInputBaseName) );
+			Process_File( pInputBaseName );
 			continue;
 		}
 
@@ -2931,31 +2994,28 @@ int CVTex::VTex( int argc, char **argv )
 		_splitpath( pInputBaseName, NULL, NULL, NULL, ext ); //find extension wanted
 
 		if ( !Q_ExtractFilePath ( pInputBaseName, basedir, sizeof( basedir ) ) )
-			strcpy( basedir, ".\\" );
+			V_strcpy_safe( basedir, ".\\" );
 
-		sprintf( search, "%s\\*.*", basedir );
+		V_sprintf_safe( search, "%s\\*.*", basedir );
 
-		WIN32_FIND_DATA wfd;
-		HANDLE hResult;
-		memset(&wfd, 0, sizeof(WIN32_FIND_DATA));
+		WIN32_FIND_DATA wfd = {};
 
-		hResult = FindFirstFile( search, &wfd );
-
+		HANDLE hResult = FindFirstFile( search, &wfd );
 		if ( hResult != INVALID_HANDLE_VALUE )
 		{
-			sprintf( filename, "%s%s", basedir, wfd.cFileName );
+			V_sprintf_safe( filename, "%s%s", basedir, wfd.cFileName );
 
 			if ( wfd.cFileName[0] != '.' ) 
-				Process_File( filename, sizeof( filename ) );
+				Process_File( filename );
 
 			int iFFType = Find_Files( wfd, hResult, basedir, ext );
 
 			while ( iFFType )
 			{
-				sprintf( filename, "%s%s", basedir, wfd.cFileName );
+				V_sprintf_safe( filename, "%s%s", basedir, wfd.cFileName );
 
 				if ( wfd.cFileName[0] != '.' && iFFType != FF_DONTPROCESS ) 
-					Process_File( filename, sizeof( filename ) );
+					Process_File( filename );
 
 				iFFType = Find_Files( wfd, hResult, basedir, ext );
 			}
@@ -2969,22 +3029,17 @@ int CVTex::VTex( int argc, char **argv )
 
 	}
 	
+	// dimhotepus: Disable Perforce support.
 	// Shutdown P4
-	if ( g_bUsedAsLaunchableDLL && p4 && !CommandLine()->FindParm( "-p4skip" ) )
-	{
-		p4->Shutdown();
-		p4->Disconnect();
-	}
+	// if ( g_bUsedAsLaunchableDLL && p4 && !CommandLine()->FindParm( "-p4skip" ) )
+	// {
+	// 	p4->Shutdown();
+	// 	p4->Disconnect();
+	// }
 
 	if ( bCreatedFilesystem )
 	{
 		FileSystem_Term();
-	}
-
-	if ( g_bUsedAsLaunchableDLL )
-	{
-		// Make sure any further spew doesn't call the function in this module (which will be unloaded shortly)
-		SpewOutputFunc( NULL );
 	}
 
 	Pause();

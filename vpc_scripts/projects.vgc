@@ -1569,7 +1569,7 @@ $Project "vtaexp"
 
 $Project "vtex_dll"
 {
-	"utils\vtex\vtex_dll.vpc" [ $WINDOWS || $POSIX ]
+	"utils\vtex_dll\vtex_dll.vpc" [$WINDOWS || $POSIX]
 }
 
 $Project "vtex_launcher"

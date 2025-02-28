@@ -183,6 +183,27 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 /* Same as the default spew func, but returns SPEW_ABORT for asserts */
 DBG_INTERFACE SpewRetval_t DefaultSpewFuncAbortOnAsserts( SpewType_t type, const tchar *pMsg );
 
+class ScopedSpewOutputFunc
+{
+public:
+  explicit ScopedSpewOutputFunc(SpewOutputFunc_t new_spew)
+	  : m_old_spew{SpewOutputFunc2(new_spew)}
+  {
+  }
+  ~ScopedSpewOutputFunc()
+  {
+	  SpewOutputFunc2(m_old_spew);
+  }
+
+  ScopedSpewOutputFunc(ScopedSpewOutputFunc &) = delete;
+  ScopedSpewOutputFunc& operator=(ScopedSpewOutputFunc &) = delete;
+  ScopedSpewOutputFunc(ScopedSpewOutputFunc &&) = delete;
+  ScopedSpewOutputFunc& operator=(ScopedSpewOutputFunc &&) = delete;
+
+private:
+  const SpewOutputFunc_t m_old_spew;
+};
+
 /* Should be called only inside a SpewOutputFunc_t, returns groupname, level, color */
 DBG_INTERFACE const tchar* GetSpewOutputGroup( void );
 DBG_INTERFACE int GetSpewOutputLevel( void );

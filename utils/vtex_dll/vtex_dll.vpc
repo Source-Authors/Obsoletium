@@ -21,40 +21,25 @@ $Configuration
 	{
 		$SystemLibraries				"iconv" [$OSXALL]
 	}
-
 }
 
-$Configuration	"Debug"
-{
-	$General
-	{
-		$OutputDirectory			".\Debug_dll" [$WINDOWS]
-		$IntermediateDirectory		".\Debug_dll" [$WINDOWS]
-	}
-}
-
-$Configuration	"Release"
-{
-	$General
-	{
-		$OutputDirectory			".\Release_dll" [$WINDOWS]
-		$IntermediateDirectory		".\Release_dll" [$WINDOWS]
-	}
-}
-
-$Project "Vtex_dll"
+$Project "vtex_dll"
 {
 	$Folder	"Source Files"
 	{
 		$File	"..\common\cmdlib.cpp"
+		$File	"..\common\filesystem_tools.cpp"
+		$File	"..\common\tools_minidump.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"..\common\filesystem_tools.cpp"
 		$File	"vtex.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
+		$File	"..\common\cmdlib.h"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\tools_minidump.h"
 		$File	"$SRCDIR\public\ivtex.h"
 	}
 
