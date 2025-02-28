@@ -1565,7 +1565,7 @@ int main (int argc, char *argv[])
 	// mx_setcwd (szName);
 
 	// Set game info directory suggestion callback
-	SetSuggestGameInfoDirFn( CHLModelViewerApp_SuggestGameInfoDirFn );
+	const ScopedSuggestGameInfoDir scoped_suggest_game_info_dir( CHLModelViewerApp_SuggestGameInfoDirFn );
 
 	CHLModelViewerApp hlmodelviewerApp;
 	CSteamApplication steamApplication( &hlmodelviewerApp );

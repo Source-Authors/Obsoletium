@@ -2740,7 +2740,7 @@ int main (int argc, char *argv[])
 	Q_getwd( workingdir, sizeof( workingdir ) );
 
 	// Set game info directory suggestion callback
-	SetSuggestGameInfoDirFn( CHLFacePoserApp_SuggestGameInfoDirFn );
+	const ScopedSuggestGameInfoDir scoped_suggest_game_info_dir( CHLFacePoserApp_SuggestGameInfoDirFn );
 
  	CHLFacePoserApp hlFacePoserApp;
 	CSteamApplication steamApplication( &hlFacePoserApp );

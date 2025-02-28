@@ -809,16 +809,20 @@ static bool DoesFileExistIn( const char *pDirectoryName, const char *pFilename )
 
 namespace
 {
-	SuggestGameInfoDirFn_t & GetSuggestGameInfoDirFn( void )
-	{
-		static SuggestGameInfoDirFn_t s_pfnSuggestGameInfoDir = nullptr;
-		return s_pfnSuggestGameInfoDir;
-	}
-}; // `anonymous` namespace
+
+// dimhotepus: Global state so thread-safe.
+static std::atomic<SuggestGameInfoDirFn_t> g_pfnSuggestGameInfoDir = nullptr;
+
+SuggestGameInfoDirFn_t GetSuggestGameInfoDirFn()
+{
+	return g_pfnSuggestGameInfoDir.load(std::memory_order::memory_order_relaxed);
+}
+
+};  // namespace
 
 SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn )
 {
-	return std::exchange(GetSuggestGameInfoDirFn(), pfnNewFn);
+	return g_pfnSuggestGameInfoDir.exchange(pfnNewFn, std::memory_order::memory_order_relaxed);
 }
 
 template<int outDirLen>

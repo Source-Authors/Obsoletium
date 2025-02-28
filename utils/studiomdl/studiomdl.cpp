@@ -9526,7 +9526,8 @@ static bool CStudioMDLApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsStea
 
 int main( int argc, char **argv )
 {
-	SetSuggestGameInfoDirFn( CStudioMDLApp_SuggestGameInfoDirFn );
+	CommandLine()->CreateCmdLine(argc, argv);
+	const ScopedSuggestGameInfoDir scoped_sugest_game_info_dir( CStudioMDLApp_SuggestGameInfoDirFn );
 
 	CStudioMDLApp s_ApplicationObject;
 	CSteamApplication s_SteamApplicationObject( &s_ApplicationObject );

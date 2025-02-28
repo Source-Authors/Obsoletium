@@ -272,6 +272,21 @@ using SuggestGameInfoDirFn_t = bool (*) ( CFSSteamSetupInfo const *pFsSteamSetup
 //
 SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn );
 
+class ScopedSuggestGameInfoDir
+{
+public:
+  explicit ScopedSuggestGameInfoDir(SuggestGameInfoDirFn_t new_suggest_fn)
+     : old_suggest_fn_{SetSuggestGameInfoDirFn(new_suggest_fn)} {}
+
+  ~ScopedSuggestGameInfoDir()
+  {
+	SetSuggestGameInfoDirFn(old_suggest_fn_);
+  }
+
+private:
+  const SuggestGameInfoDirFn_t old_suggest_fn_;
+};
+
 
 #endif // APPSYSTEMGROUP_H
 
