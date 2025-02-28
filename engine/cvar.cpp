@@ -188,13 +188,13 @@ public:
 
 		if ( parent->IsFlagSet( FCVAR_CLIENTDLL ) )
 		{
-			ConMsg( "Parent cvar in client.dll not allowed (%s)\n", child->GetName() );
+			ConMsg( "Parent cvar in client" DLL_EXT_STRING " not allowed (%s)\n", child->GetName() );
 			return false;
 		}
 
 		if ( parent->IsFlagSet( FCVAR_GAMEDLL ) )
 		{
-			ConMsg( "Parent cvar in server.dll not allowed (%s)\n", child->GetName() );
+			ConMsg( "Parent cvar in server" DLL_EXT_STRING " not allowed (%s)\n", child->GetName() );
 			return false;
 		}
 

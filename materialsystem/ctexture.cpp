@@ -4675,7 +4675,7 @@ CP4Requirement::CP4Requirement() :
 
 	if ( !p4 )
 	{
-		Warning( "Can't load p4lib.dll\n" );
+		Warning( "Can't load p4lib" DLL_EXT_STRING ".\n" );
 	}
 }
 

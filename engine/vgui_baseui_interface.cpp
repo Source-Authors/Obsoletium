@@ -554,7 +554,7 @@ bool CEngineVGui::SetVGUIDirectories()
 //-----------------------------------------------------------------------------
 void CEngineVGui::Init()
 {
-	COM_TimestampedLog( "Loading gameui.dll" );
+	COM_TimestampedLog( "Loading gameui" DLL_EXT_STRING );
 
 	// load the GameUI module
 	constexpr char szDllName[]{"gameui"};

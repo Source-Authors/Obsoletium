@@ -35,12 +35,12 @@ bool CVguiMatSysApp::Create()
 {
 	AppSystemInfo_t appSystems[] = 
 	{
-		{ "inputsystem.dll",		INPUTSYSTEM_INTERFACE_VERSION },
-		{ "materialsystem.dll",		MATERIAL_SYSTEM_INTERFACE_VERSION },
+		{ "inputsystem" DLL_EXT_STRING,			INPUTSYSTEM_INTERFACE_VERSION },
+		{ "materialsystem" DLL_EXT_STRING,		MATERIAL_SYSTEM_INTERFACE_VERSION },
 
-		// NOTE: This has to occur before vgui2.dll so it replaces vgui2's surface implementation
-		{ "vguimatsurface.dll",		VGUI_SURFACE_INTERFACE_VERSION },
-		{ "vgui2.dll",				VGUI_IVGUI_INTERFACE_VERSION },
+		// NOTE: This has to occur before vgui2 so it replaces vgui2's surface implementation
+		{ "vguimatsurface" DLL_EXT_STRING,		VGUI_SURFACE_INTERFACE_VERSION },
+		{ "vgui2" DLL_EXT_STRING,				VGUI_IVGUI_INTERFACE_VERSION },
 
 		// Required to terminate the list
 		{ "", "" }

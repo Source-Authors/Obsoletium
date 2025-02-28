@@ -345,7 +345,7 @@ void CHostState::State_NewGame()
 
 		if ( !serverGameClients )
 		{
-			Warning( "Can't start game, no valid server.dll loaded\n" );
+			Warning( "Can't start game, no valid server" DLL_EXT_STRING " loaded\n" );
 		}
 		else
 		{

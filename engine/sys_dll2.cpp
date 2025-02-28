@@ -1549,7 +1549,8 @@ bool CEngineAPI::InitVR()
 			// let this client connect to secure servers.
 			if ( !Host_AllowLoadModule( "sourcevr" DLL_EXT_STRING, "EXECUTABLE_PATH", false ) )
 			{
-				Warning( "Preventing connections to secure servers because sourcevr.dll is not signed.\n" );
+
+				Warning( "Preventing connections to secure servers because sourcevr" DLL_EXT_STRING " is not signed.\n" );
 				Host_DisallowSecureServers();
 			}
 		}

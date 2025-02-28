@@ -1438,7 +1438,7 @@ bool VMPI_CheckForNonSDKExecutables() {
 
   V_StripLastDir(baseExeFilename, sizeof(baseExeFilename));
   V_AppendSlash(baseExeFilename, sizeof(baseExeFilename));
-  V_strncat(baseExeFilename, "mysql_wrapper.dll", sizeof(baseExeFilename));
+  V_strncat(baseExeFilename, "mysql_wrapper" DLL_EXT_STRING, sizeof(baseExeFilename));
 
   // If mysql_wrapper.dll doesn't exist, then we assume we're in SDK mode.
   return (_access(baseExeFilename, 0) == 0);

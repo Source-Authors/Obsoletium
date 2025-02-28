@@ -145,8 +145,8 @@ bool CompileCaptionsApp::Create() {
   SpewActivate("kvc", 2);
 
   AppSystemInfo_t appSystems[] = {
-      {"vgui2.dll", VGUI_IVGUI_INTERFACE_VERSION},
-      {"", ""}  // Required to terminate the list
+      {"vgui2" DLL_EXT_STRING, VGUI_IVGUI_INTERFACE_VERSION}, {"", ""}
+      // Required to terminate the list
   };
 
   return AddSystems(appSystems);

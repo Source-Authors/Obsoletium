@@ -2776,7 +2776,7 @@ private:
 static CEngineBugReporter g_BugReporter;
 IEngineBugReporter *bugreporter = &g_BugReporter;
 
-CON_COMMAND( _bugreporter_restart, "Restarts bug reporter .dll" )
+CON_COMMAND( _bugreporter_restart, "Restarts bug reporter " DLL_EXT_STRING )
 {
 	if ( args.ArgC() <= 1 )
 	{

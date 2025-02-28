@@ -77,7 +77,7 @@ IVTex* VTex_Load( CSysModule** pModule )
 
 	if ( !pIVTex )
 	{
-		ConMsg( "Can't load vtex_dll.dll\n" );
+		ConMsg( "Can't load vtex_dll" DLL_EXT_STRING "\n" );
 	}
 
 	return pIVTex;
@@ -1040,7 +1040,7 @@ void R_BuildCubemapSamples( int numIterations )
 		}
 		if( !iBSPPack )
 		{
-			ConMsg( "Can't load bsppack.dll\n" );
+			ConMsg( "Can't load bsppack" DLL_EXT_STRING "\n" );
 			R_BuildCubemapSamples_PostBuild();
 			return;
 		}

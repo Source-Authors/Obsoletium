@@ -30,18 +30,26 @@ void InitDefaultFileSystem( void )
 		if ( !Sys_LoadInterface( "filesystem_steam", FILESYSTEM_INTERFACE_VERSION,
 			&g_pFullFileSystemModule, (void**)&g_pFullFileSystem ) )
 		{
-			exit(0);
+			Warning("Unable to find interface '%s' in both filesystem_stdio"
+				DLL_EXT_STRING " and filesystem_steam" DLL_EXT_STRING ".\n",
+				FILESYSTEM_INTERFACE_VERSION);
+			// dimhotepus: Signal error code.
+			exit(1);
 		}
 	}
 
 	if ( !g_pFullFileSystem->Connect( DefaultCreateInterfaceFn ) )
 	{
-		exit(0);
+		Warning("Unable to connect file system interfaces.\n");
+		// dimhotepus: Signal error code.
+		exit(2);
 	}
 
 	if ( g_pFullFileSystem->Init() != INIT_OK )
 	{
-		exit(0);
+		Warning("Unable to init file system interfaces.\n");
+		// dimhotepus: Signal error code.
+		exit(3);
 	}
 
 	g_pFullFileSystem->RemoveAllSearchPaths();

@@ -308,7 +308,7 @@ void LoadFileSystemDialogModule()
 	Assert( !g_pFSDialogModule );
 
 	// Load the module with the file system open dialog.
-	const char *pDLLName = "filesystemopendialog.dll";
+	constexpr char pDLLName[] = "filesystemopendialog" DLL_EXT_STRING;
 	g_pFSDialogModule = Sys_LoadModule( pDLLName );
 	if ( g_pFSDialogModule )
 	{
@@ -2479,28 +2479,29 @@ bool CHLFacePoserApp::Create()
 
 	AppSystemInfo_t appSystems[] = 
 	{
-		{ "inputsystem.dll",		INPUTSYSTEM_INTERFACE_VERSION },
-		{ "materialsystem.dll",		MATERIAL_SYSTEM_INTERFACE_VERSION },
-		{ "studiorender.dll",		STUDIO_RENDER_INTERFACE_VERSION },
-		{ "vphysics.dll",			VPHYSICS_INTERFACE_VERSION },
-		{ "datacache.dll",			DATACACHE_INTERFACE_VERSION },
-		{ "datacache.dll",			MDLCACHE_INTERFACE_VERSION },
-		{ "datacache.dll",			STUDIO_DATA_CACHE_INTERFACE_VERSION },
-		{ "vguimatsurface.dll",		VGUI_SURFACE_INTERFACE_VERSION },
-		{ "vgui2.dll",				VGUI_IVGUI_INTERFACE_VERSION },
-		{ "soundemittersystem.dll",	SOUNDEMITTERSYSTEM_INTERFACE_VERSION },
+		{ "inputsystem" DLL_EXT_STRING,			INPUTSYSTEM_INTERFACE_VERSION },
+		{ "materialsystem" DLL_EXT_STRING,		MATERIAL_SYSTEM_INTERFACE_VERSION },
+		{ "studiorender" DLL_EXT_STRING,		STUDIO_RENDER_INTERFACE_VERSION },
+		{ "vphysics" DLL_EXT_STRING,			VPHYSICS_INTERFACE_VERSION },
+		{ "datacache" DLL_EXT_STRING,			DATACACHE_INTERFACE_VERSION },
+		{ "datacache" DLL_EXT_STRING,			MDLCACHE_INTERFACE_VERSION },
+		{ "datacache" DLL_EXT_STRING,			STUDIO_DATA_CACHE_INTERFACE_VERSION },
+		{ "vguimatsurface" DLL_EXT_STRING,		VGUI_SURFACE_INTERFACE_VERSION },
+		{ "vgui2" DLL_EXT_STRING,				VGUI_IVGUI_INTERFACE_VERSION },
+		{ "soundemittersystem" DLL_EXT_STRING,	SOUNDEMITTERSYSTEM_INTERFACE_VERSION },
 		{ "", "" }	// Required to terminate the list
 	};
 
 	if ( !AddSystems( appSystems ) ) 
 		return false;
 
+	// dimhotepus: Drop Perforce Support.
 	// Add the P4 module separately so that if it is absent (say in the SDK) then the other system will initialize properly
-	AppModule_t p4Module = LoadModule( "p4lib.dll" );
-	if ( p4Module != APP_MODULE_INVALID )
-	{
-		AddSystem( p4Module, P4_INTERFACE_VERSION );
-	}
+	// AppModule_t p4Module = LoadModule( "p4lib" DLL_EXT_STRING );
+	// if ( p4Module != APP_MODULE_INVALID )
+	// {
+	// 	AddSystem( p4Module, P4_INTERFACE_VERSION );
+	// }
 
 	g_Factory = GetFactory();
 
@@ -2514,7 +2515,7 @@ bool CHLFacePoserApp::Create()
 	const char *pShaderDLL = CommandLine()->ParmValue("-shaderdll");
 	if(!pShaderDLL)
 	{
-		pShaderDLL = "shaderapidx9.dll";
+		pShaderDLL = "shaderapidx9" DLL_EXT_STRING;
 	}
 	pMaterialSystem->SetShaderAPI( pShaderDLL );
 

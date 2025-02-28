@@ -107,7 +107,7 @@ bool CSFMPhonemeExtractor::Init()
 {
 	// Enumerate modules under bin folder of exe
 	FileFindHandle_t findHandle;
-	const char *pFilename = g_pFullFileSystem->FindFirstEx( "phonemeextractors/*.dll", "EXECUTABLE_PATH", &findHandle );
+	const char *pFilename = g_pFullFileSystem->FindFirstEx( "phonemeextractors/*" DLL_EXT_STRING, "EXECUTABLE_PATH", &findHandle );
 	while( pFilename )
 	{	
 		char fullpath[ 512 ];

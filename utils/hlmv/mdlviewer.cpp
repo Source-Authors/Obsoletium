@@ -113,8 +113,7 @@ void LoadFileSystemDialogModule()
 	Assert( !g_pFSDialogModule );
 
 	// Load the module with the file system open dialog.
-	const char *pDLLName = "filesystemopendialog.dll";
-	g_pFSDialogModule = Sys_LoadModule( pDLLName );
+	g_pFSDialogModule = Sys_LoadModule( "filesystemopendialog" DLL_EXT_STRING );
 	if ( g_pFSDialogModule )
 	{
 		g_FSDialogFactory = Sys_GetFactory( g_pFSDialogModule );
@@ -1358,19 +1357,24 @@ bool CHLModelViewerApp::Create()
 
 	AppSystemInfo_t appSystems[] = 
 	{
-		{ "materialsystem.dll",		MATERIAL_SYSTEM_INTERFACE_VERSION },
-		{ "studiorender.dll",		STUDIO_RENDER_INTERFACE_VERSION },
-		{ "vphysics.dll",			VPHYSICS_INTERFACE_VERSION },
-		{ "datacache.dll",			DATACACHE_INTERFACE_VERSION },
-		{ "datacache.dll",			MDLCACHE_INTERFACE_VERSION },
-		{ "datacache.dll",			STUDIO_DATA_CACHE_INTERFACE_VERSION },
-		{ "soundemittersystem.dll",	SOUNDEMITTERSYSTEM_INTERFACE_VERSION },
-		{ "soundsystem.dll",		SOUNDSYSTEM_INTERFACE_VERSION },
+		{ "materialsystem" DLL_EXT_STRING,		MATERIAL_SYSTEM_INTERFACE_VERSION },
+		{ "studiorender" DLL_EXT_STRING,		STUDIO_RENDER_INTERFACE_VERSION },
+		{ "vphysics" DLL_EXT_STRING,			VPHYSICS_INTERFACE_VERSION },
+		{ "datacache" DLL_EXT_STRING,			DATACACHE_INTERFACE_VERSION },
+		{ "datacache" DLL_EXT_STRING,			MDLCACHE_INTERFACE_VERSION },
+		{ "datacache" DLL_EXT_STRING,			STUDIO_DATA_CACHE_INTERFACE_VERSION },
+		{ "soundemittersystem" DLL_EXT_STRING,	SOUNDEMITTERSYSTEM_INTERFACE_VERSION },
+		{ "soundsystem" DLL_EXT_STRING,			SOUNDSYSTEM_INTERFACE_VERSION },
 
 		{ "", "" }	// Required to terminate the list
 	};
 
-	if ( !AddSystems( appSystems ) ) 
+	if ( !AddSystems( appSystems ) )
+	{
+		Error(
+			"Please check Valve Model Viewer installed correctly.\n\n"
+			"Unable to add launcher systems from *" DLL_EXT_STRING
+			"s. Looks like required components are missed or broken.");
 		return false;
 
 	g_pFileSystem = (IFileSystem*)FindSystem( FILESYSTEM_INTERFACE_VERSION );
@@ -1399,7 +1403,7 @@ bool CHLModelViewerApp::Create()
 	
 	if(!pShaderDLL)
 	{
-		pShaderDLL = "shaderapidx9.dll";
+		pShaderDLL = "shaderapidx9" DLL_EXT_STRING;
 	}
 
 	g_pMaterialSystem->SetShaderAPI( pShaderDLL );

@@ -2248,7 +2248,7 @@ CON_COMMAND( vtune, "Controls VTune's sampling." )
 	{
 		if(!vtune(false))
 		{
-			ConMsg("Failed to find \"VTPause()\" in \"vtuneapi.dll\".\n");
+			ConMsg("Failed to find \"VTPause()\" in \"vtuneapi" DLL_EXT_STRING "\".\n");
 			return;
 		}
 
@@ -2259,7 +2259,7 @@ CON_COMMAND( vtune, "Controls VTune's sampling." )
 	{
 		if(!vtune(true))
 		{
-			ConMsg("Failed to find \"VTResume()\" in \"vtuneapi.dll\".\n");
+			ConMsg("Failed to find \"VTResume()\" in \"vtuneapi" DLL_EXT_STRING "\".\n");
 			return;
 		}
 		

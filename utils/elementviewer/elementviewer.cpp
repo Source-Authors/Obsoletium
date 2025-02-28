@@ -101,8 +101,9 @@ bool CElementViewerApp::Create()
 
 	AppSystemInfo_t appSystems[] = 
 	{
-		{ "vstdlib.dll",			PROCESS_UTILS_INTERFACE_VERSION },
-		{ "p4lib.dll",				P4_INTERFACE_VERSION },
+		{ "vstdlib" DLL_EXT_STRING ,			PROCESS_UTILS_INTERFACE_VERSION },
+		// dimhotepus: Disable Perforce.
+		// { "p4lib" DLL_EXT_STRING,				P4_INTERFACE_VERSION },
 		{ "", "" }	// Required to terminate the list
 	};
 

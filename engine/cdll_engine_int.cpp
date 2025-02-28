@@ -1813,7 +1813,7 @@ void ClientDLL_Init( void )
 
 		if ( !g_ClientDLL->Init(g_AppSystemFactory, g_AppSystemFactory, &g_ClientGlobalVariables ) )
 		{
-			Sys_Error("Client.dll Init() in library client failed.");
+			Sys_Error("Client" DLL_EXT_STRING " Init() in library client failed.");
 		}
 
 		if ( g_ClientFactory )
@@ -1864,7 +1864,7 @@ void ClientDLL_Init( void )
 				// Replay dll should be loaded by this point
 				if ( !g_pReplay )
 				{
-					Sys_Error( "Replay.dll was not loaded" );
+					Sys_Error( "Replay" DLL_EXT_STRING " was not loaded" );
 				}
 
 				// Get pointer to client-side replay interface implementation
