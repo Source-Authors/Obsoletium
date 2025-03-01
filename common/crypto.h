@@ -11,45 +11,44 @@
 #ifndef CRYPTO_H
 #define CRYPTO_H
 
-#include <tier0/dbg.h>		// for Assert & AssertMsg
+#include "tier0/dbg.h"		// for Assert & AssertMsg
 #include "tier1/passwordhash.h"
 #include "tier1/utlmemory.h"
+
 #include <steam/steamtypes.h> // for Salt_t
 
 extern void FreeListRNG();
 
-const unsigned int k_cubSHA256Hash = 32;
-typedef	unsigned char SHA256Digest_t[ k_cubSHA256Hash ];
+constexpr inline unsigned int k_cubSHA256Hash = 32;
+using SHA256Digest_t = unsigned char [ k_cubSHA256Hash ];
 
-const int k_nSymmetricBlockSize = 16;					// AES block size (128 bits)
-const int k_nSymmetricKeyLen = 32;						// length in bytes of keys used for symmetric encryption
+constexpr inline int k_nSymmetricBlockSize = 16;					// AES block size (128 bits)
+constexpr inline int k_nSymmetricKeyLen = 32;						// length in bytes of keys used for symmetric encryption
 
-const int k_nRSAKeyLenMax = 1024;						// max length in bytes of keys used for RSA encryption (includes DER encoding)
-const int k_nRSAKeyLenMaxEncoded = k_nRSAKeyLenMax*2;	// max length in bytes of hex-encoded key (hex encoding exactly doubles size)
-const int k_nRSAKeyBits = 1024;							// length in bits of keys used for RSA encryption
-const int k_cubRSAEncryptedBlockSize	= 128;
-const int k_cubRSAPlaintextBlockSize	= 86 + 1;		// assume plaintext is text, so add a byte for the trailing \0
-const uint32 k_cubRSASignature = k_cubRSAEncryptedBlockSize;
+constexpr inline int k_nRSAKeyLenMax = 1024;						// max length in bytes of keys used for RSA encryption (includes DER encoding)
+constexpr inline int k_nRSAKeyLenMaxEncoded = k_nRSAKeyLenMax*2;	// max length in bytes of hex-encoded key (hex encoding exactly doubles size)
+constexpr inline int k_nRSAKeyBits = 1024;							// length in bits of keys used for RSA encryption
+constexpr inline int k_cubRSAEncryptedBlockSize	= 128;
+constexpr inline int k_cubRSAPlaintextBlockSize	= 86 + 1;		// assume plaintext is text, so add a byte for the trailing \0
+constexpr inline uint32 k_cubRSASignature = k_cubRSAEncryptedBlockSize;
 
 // Simple buffer class to encapsulate output from crypto functions with unknown output size
 class CCryptoOutBuffer
 {
 public:
 
-	CCryptoOutBuffer()
+	CCryptoOutBuffer() : m_pubData{nullptr}, m_cubData{0}
 	{
-		m_pubData = NULL;
-		m_cubData = 0;
 	}
 
 	~CCryptoOutBuffer()
 	{
 		delete[] m_pubData;
-		m_pubData = NULL;
+		m_pubData = nullptr;
 		m_cubData = 0;
 	}
 
-	void Set( uint8 *pubData, uint32 cubData )
+	void Set( uint8 *pubData, size_t cubData )
 	{
 		if ( !pubData || !cubData )
 			return;
@@ -61,7 +60,7 @@ public:
 		m_cubData = cubData;
 	}
 
-	void Allocate( uint32 cubData )
+	void Allocate( size_t cubData )
 	{
 		delete[] m_pubData;
 
@@ -69,164 +68,118 @@ public:
 		m_cubData = cubData;
 	}
 
-	void Trim( uint32 cubTrim )
+	void Trim( size_t cubTrim )
 	{
 		Assert( cubTrim <= m_cubData );
 		m_cubData = cubTrim;
 	}
 
-	uint8 *PubData() { return m_pubData; }
-	uint32 CubData() { return m_cubData; }
+	[[nodiscard]] uint8 *PubData() { return m_pubData; }
+	[[nodiscard]] size_t CubData() const { return m_cubData; }
 
 private:
 	uint8 *m_pubData;
-	uint32 m_cubData;
+	size_t m_cubData;
 };
 
-#if !defined(_PS3)
 class CCrypto
 {
 public:
-	static uint32 GetSymmetricEncryptedSize( uint32 cubPlaintextData );
+	[[nodiscard]] static size_t GetSymmetricEncryptedSize( size_t cubPlaintextData );
 
 	// this method writes the encrypted IV, then the ciphertext
-	static bool SymmetricEncryptWithIV( const uint8 * pubPlaintextData, uint32 cubPlaintextData, 
-										const uint8 * pIV, uint32 cubIV,
-										uint8 * pubEncryptedData, uint32 * pcubEncryptedData,
-										const uint8 * pubKey, uint32 cubKey );
-	static bool SymmetricEncrypt( const uint8 * pubPlaintextData, uint32 cubPlaintextData, 
-								  uint8 * pubEncryptedData, uint32 * pcubEncryptedData,
-								  const uint8 * pubKey, uint32 cubKey );
+	[[nodiscard]] static bool SymmetricEncryptWithIV( const uint8 * pubPlaintextData, size_t cubPlaintextData, 
+										const uint8 *pIV, size_t cubIV,
+										uint8 * pubEncryptedData, size_t * pcubEncryptedData,
+										const uint8 * pubKey, size_t cubKey );
+	[[nodiscard]] static bool SymmetricEncrypt( const uint8 * pubPlaintextData, size_t cubPlaintextData, 
+								  uint8 * pubEncryptedData, size_t * pcubEncryptedData,
+								  const uint8 * pubKey, size_t cubKey );
 	// this method assumes there is no IV before the payload - dissimilar to SymmetricEncryptWithIV
-	static bool SymmetricDecryptWithIV( const uint8 * pubEncryptedData, uint32 cubEncryptedData, 
-										const uint8 * pIV, uint32 cubIV,
-										uint8 * pubPlaintextData, uint32 * pcubPlaintextData,
-										const uint8 * pubKey, uint32 cubKey );
-	static bool SymmetricDecrypt( const uint8 * pubEncryptedData, uint32 cubEncryptedData, 
-								  uint8 * pubPlaintextData, uint32 * pcubPlaintextData,
-								  const uint8 * pubKey, uint32 cubKey );
+	[[nodiscard]] static bool SymmetricDecryptWithIV( const uint8 * pubEncryptedData, size_t cubEncryptedData, 
+										const uint8 * pIV, size_t cubIV,
+										uint8 * pubPlaintextData, size_t * pcubPlaintextData,
+										const uint8 * pubKey, size_t cubKey );
+	[[nodiscard]] static bool SymmetricDecrypt( const uint8 * pubEncryptedData, size_t cubEncryptedData, 
+								  uint8 * pubPlaintextData, size_t * pcubPlaintextData,
+								  const uint8 * pubKey, size_t cubKey );
 
 	// symmetrically encrypt data with a text password. A SHA256 hash of the password
 	// is used as an AES encryption key (calls SymmetricEncrypt, above).
 	// An HMAC of the ciphertext is appended, for authentication.
-	static bool EncryptWithPasswordAndHMAC( const uint8 *pubPlaintextData, uint32 cubPlaintextData,
-									 uint8 * pubEncryptedData, uint32 * pcubEncryptedData,
+	[[nodiscard]] static bool EncryptWithPasswordAndHMAC( const uint8 *pubPlaintextData, size_t cubPlaintextData,
+									 uint8 * pubEncryptedData, size_t * pcubEncryptedData,
 									 const char *pchPassword );
 
 	// Same as above but uses an explicit IV. The format of the ciphertext is the same.
 	// Be sure you know what you're doing if you use this - a random IV is much more secure in general!
-	static bool EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, uint32 cubPlaintextData,
-											const uint8 * pIV, uint32 cubIV,
-											uint8 * pubEncryptedData, uint32 * pcubEncryptedData,
+	[[nodiscard]] static bool EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, size_t cubPlaintextData,
+											const uint8 * pIV, size_t cubIV,
+											uint8 * pubEncryptedData, size_t * pcubEncryptedData,
 											const char *pchPassword );
 
 	// Symmetrically decrypt data with the given password (see above).
 	// If the HMAC does not match what we expect, then we know that either the password is
 	// incorrect or the message is corrupted.
-	static bool DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData, uint32 cubEncryptedData, 
-									 uint8 * pubPlaintextData, uint32 * pcubPlaintextData,
+	[[nodiscard]] static bool DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData, size_t cubEncryptedData, 
+									 uint8 * pubPlaintextData, size_t * pcubPlaintextData,
 									 const char *pchPassword );
 
-	static bool RSAGenerateKeys( uint8 *pubPublicKey, uint32 *pcubPublicKey, uint8 *pubPrivateKey, uint32 *pcubPrivateKey );
+	[[nodiscard]] static bool RSAGenerateKeys( uint8 *pubPublicKey, size_t *pcubPublicKey, uint8 *pubPrivateKey, size_t *pcubPrivateKey );
 
-	static bool RSAEncrypt( const uint8 *pubPlaintextPlaintextData, const uint32 cubData, uint8 *pubEncryptedData, 
-							uint32 *pcubEncryptedData, const uint8 *pubPublicKey, const uint32 cubPublicKey );
-	static bool RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData, 
-							uint8 *pubPlaintextData, uint32 *pcubPlaintextData, const uint8 *pubPrivateKey, const uint32 cubPrivateKey );
+	[[nodiscard]] static bool RSAEncrypt( const uint8 *pubPlaintextPlaintextData, const size_t cubData, uint8 *pubEncryptedData, 
+							size_t *pcubEncryptedData, const uint8 *pubPublicKey, const size_t cubPublicKey );
+	[[nodiscard]] static bool RSADecrypt( const uint8 *pubEncryptedData, size_t cubEncryptedData, 
+							uint8 *pubPlaintextData, size_t *pcubPlaintextData, const uint8 *pubPrivateKey, const size_t cubPrivateKey );
 
 	// decrypt using a public key, and no padding
-	static bool RSAPublicDecrypt_NoPadding( const uint8 *pubEncryptedData, uint32 cubEncryptedData, 
-							uint8 *pubPlaintextData, uint32 *pcubPlaintextData, const uint8 *pubPublicKey, const uint32 cubPublicKey );
+	[[nodiscard]] static bool RSAPublicDecrypt_NoPadding( const uint8 *pubEncryptedData, size_t cubEncryptedData, 
+							uint8 *pubPlaintextData, size_t *pcubPlaintextData, const uint8 *pubPublicKey, const size_t cubPublicKey );
 
-	static bool RSASign( const uint8 *pubData, const uint32 cubData, 
-						 uint8 *pubSignature, uint32 *pcubSignature, 
-						const uint8 * pubPrivateKey, const uint32 cubPrivateKey );
-	static bool RSAVerifySignature( const uint8 *pubData, const uint32 cubData, 
-									const uint8 *pubSignature, const uint32 cubSignature, 
-									const uint8 *pubPublicKey, const uint32 cubPublicKey );
+	[[nodiscard]] static bool RSASign( const uint8 *pubData, const size_t cubData, 
+						 uint8 *pubSignature, size_t *pcubSignature, const uint8 * pubPrivateKey, const size_t cubPrivateKey );
+	[[nodiscard]] static bool RSAVerifySignature( const uint8 *pubData, const size_t cubData, 
+									const uint8 *pubSignature, const size_t cubSignature, 
+									const uint8 *pubPublicKey, const size_t cubPublicKey );
 
-	static bool RSASignSHA256( const uint8 *pubData, const uint32 cubData, 
-						 uint8 *pubSignature, uint32 *pcubSignature, 
-						const uint8 * pubPrivateKey, const uint32 cubPrivateKey );
-	static bool RSAVerifySignatureSHA256( const uint8 *pubData, const uint32 cubData, 
-									const uint8 *pubSignature, const uint32 cubSignature, 
-									const uint8 *pubPublicKey, const uint32 cubPublicKey );
+	[[nodiscard]] static bool RSASignSHA256( const uint8 *pubData, const size_t cubData, 
+						 uint8 *pubSignature, size_t *pcubSignature, const uint8 * pubPrivateKey, const size_t cubPrivateKey );
+	[[nodiscard]] static bool RSAVerifySignatureSHA256( const uint8 *pubData, const size_t cubData, 
+									const uint8 *pubSignature, const size_t cubSignature, 
+									const uint8 *pubPublicKey, const size_t cubPublicKey );
 
-	static bool HexEncode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData );
-	static bool HexDecode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData );
+	[[nodiscard]] static bool HexEncode( const uint8 *pubData, const size_t cubData, char *pchEncodedData, size_t cchEncodedData );
+	[[nodiscard]] static bool HexDecode( const char *pchData, uint8 *pubDecodedData, size_t *pcubDecodedData );
 
-	static uint32 Base64EncodeMaxOutput( uint32 cubData, const char *pszLineBreakOrNull );
-	static bool Base64Encode( const uint8 *pubData, uint32 cubData, char *pchEncodedData, uint32 cchEncodedData, bool bInsertLineBreaks = true ); // legacy, deprecated
-	static bool Base64Encode( const uint8 *pubData, uint32 cubData, char *pchEncodedData, uint32 *pcchEncodedData, const char *pszLineBreak = "\n" );
+	[[nodiscard]] static size_t Base64EncodeMaxOutput( size_t cubData, const char *pszLineBreakOrNull );
+	[[nodiscard]] static bool Base64Encode( const uint8 *pubData, size_t cubData, char *pchEncodedData, size_t cchEncodedData, bool bInsertLineBreaks = true ); // legacy, deprecated
+	[[nodiscard]] static bool Base64Encode( const uint8 *pubData, size_t cubData, char *pchEncodedData, size_t *pcchEncodedData, const char *pszLineBreak = "\n" );
 
-	static uint32 Base64DecodeMaxOutput( uint32 cubData ) { return ( (cubData + 3 ) / 4) * 3 + 1; }
-	static bool Base64Decode( const char *pchEncodedData, uint8 *pubDecodedData, uint32 *pcubDecodedData, bool bIgnoreInvalidCharacters = true ); // legacy, deprecated
-	static bool Base64Decode( const char *pchEncodedData, uint32 cchEncodedData, uint8 *pubDecodedData, uint32 *pcubDecodedData, bool bIgnoreInvalidCharacters = true );
+	[[nodiscard]] static constexpr size_t Base64DecodeMaxOutput( size_t cubData ) { return ( (cubData + 3 ) / 4) * 3 + 1; }
+	[[nodiscard]] static bool Base64Decode( const char *pchEncodedData, uint8 *pubDecodedData, size_t *pcubDecodedData, bool bIgnoreInvalidCharacters = true ); // legacy, deprecated
+	[[nodiscard]] static bool Base64Decode( const char *pchEncodedData, size_t cchEncodedData, uint8 *pubDecodedData, size_t *pcubDecodedData, bool bIgnoreInvalidCharacters = true );
 
-	static bool GenerateSalt( Salt_t *pSalt );
-	static bool GenerateSHA1Digest( const uint8 *pubInput, const int cubInput, SHADigest_t *pOutDigest );
-	static bool GenerateSaltedSHA1Digest( const char *pchInput, const Salt_t *pSalt, SHADigest_t *pOutDigest );
-	static bool GenerateRandomBlock( uint8 *pubDest, int cubDest );
+	[[nodiscard]] static bool GenerateSalt( Salt_t *pSalt );
+	[[nodiscard]] static bool GenerateSHA1Digest( const uint8 *pubInput, const size_t cubInput, SHADigest_t *pOutDigest );
+	[[nodiscard]] static bool GenerateSaltedSHA1Digest( const char *pchInput, const Salt_t *pSalt, SHADigest_t *pOutDigest );
+	[[nodiscard]] static bool GenerateRandomBlock( uint8 *pubDest, size_t cubDest );
 
-	static bool GenerateHMAC( const uint8 *pubData, uint32 cubData, const uint8 *pubKey, uint32 cubKey, SHADigest_t *pOutputDigest );
-	static bool GenerateHMAC256( const uint8 *pubData, uint32 cubData, const uint8 *pubKey, uint32 cubKey, SHA256Digest_t *pOutputDigest );
+	[[nodiscard]] static bool GenerateHMAC( const uint8 *pubData, size_t cubData, const uint8 *pubKey, size_t cubKey, SHADigest_t *pOutputDigest );
+	[[nodiscard]] static bool GenerateHMAC256( const uint8 *pubData, size_t cubData, const uint8 *pubKey, size_t cubKey, SHA256Digest_t *pOutputDigest );
 
-	static bool BGeneratePasswordHash( const char *pchInput, EPasswordHashAlg hashType, const Salt_t &Salt, PasswordHash_t &OutPasswordHash );
-	static bool BValidatePasswordHash( const char *pchInput, EPasswordHashAlg hashType, const PasswordHash_t &DigestStored, const Salt_t &Salt, PasswordHash_t *pDigestComputed );
-	static bool BGeneratePBKDF2Hash( const char *pchInput, const Salt_t &Salt, unsigned int rounds, PasswordHash_t &OutPasswordHash );
-	static bool BGenerateWrappedSHA1PasswordHash( const char *pchInput, const Salt_t &Salt, unsigned int rounds, PasswordHash_t &OutPasswordHash );
-	static bool BUpgradeOrWrapPasswordHash( PasswordHash_t &InPasswordHash, EPasswordHashAlg hashTypeIn, const Salt_t &Salt, PasswordHash_t &OutPasswordHash, EPasswordHashAlg &hashTypeOut );
+	[[nodiscard]] static bool BGeneratePasswordHash( const char *pchInput, EPasswordHashAlg hashType, const Salt_t &Salt, PasswordHash_t &OutPasswordHash );
+	[[nodiscard]] static bool BValidatePasswordHash( const char *pchInput, EPasswordHashAlg hashType, const PasswordHash_t &DigestStored, const Salt_t &Salt, PasswordHash_t *pDigestComputed );
+	[[nodiscard]] static bool BGeneratePBKDF2Hash( const char *pchInput, const Salt_t &Salt, unsigned rounds, PasswordHash_t &OutPasswordHash );
+	[[nodiscard]] static bool BGenerateWrappedSHA1PasswordHash( const char *pchInput, const Salt_t &Salt, unsigned rounds, PasswordHash_t &OutPasswordHash );
+	[[nodiscard]] static bool BUpgradeOrWrapPasswordHash( PasswordHash_t &InPasswordHash, EPasswordHashAlg hashTypeIn, const Salt_t &Salt, PasswordHash_t &OutPasswordHash, EPasswordHashAlg &hashTypeOut, unsigned rounds = 10000 );
 
-	static bool BGzipBuffer( const uint8 *pubData, uint32 cubData, CCryptoOutBuffer &bufOutput );
-	static bool BGunzipBuffer( const uint8 *pubData, uint32 cubData, CCryptoOutBuffer &bufOutput );
+	[[nodiscard]] static bool BGzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuffer &bufOutput );
+	[[nodiscard]] static bool BGunzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuffer &bufOutput );
 
 #ifdef DBGFLAG_VALIDATE
 	static void ValidateStatics( CValidator &validator, const char *pchName );
 #endif
 };
-
-#else
-
-// bugbug ps3 - stub until we implement from PS3 libs
-class CCrypto
-{
-public:
-	// ps3 only
-	static bool Init();
-	static void Shutdown();
-
-	//shared
-	static uint32 GetSymmetricEncryptedSize( uint32 cubPlaintextData );
-
-	static bool SymmetricEncrypt( const uint8 * pubPlaintextData, uint32 cubPlaintextData, uint8 * pubEncryptedData, uint32 * pcubEncryptedData, const uint8 * pubKey, uint32 cubKey );
-	static bool SymmetricDecrypt( const uint8 * pubEncryptedData, uint32 cubEncryptedData, uint8 * pubPlaintextData, uint32 * pcubPlaintextData, const uint8 * pubKey, uint32 cubKey );
-	static bool RSAGenerateKeys( uint8 *pubPublicKey, uint32 *pcubPublicKey, uint8 *pubPrivateKey, uint32 *pcubPrivateKey ) { AssertMsg( false, "RSAGenerateKeys not implemented on PS3" ); return false; }
-	static bool RSAEncrypt( const uint8 *pubPlaintextPlaintextData, const uint32 cubData, uint8 *pubEncryptedData, uint32 *pcubEncryptedData, const uint8 *pubPublicKey, const uint32 cubPublicKey );
-	static bool RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData, uint8 *pubPlaintextData, uint32 *pcubPlaintextData, const uint8 *pubPrivateKey, const uint32 cubPrivateKey );
-	static bool RSAPublicDecrypt_NoPadding( const uint8 *pubEncryptedData, uint32 cubEncryptedData, uint8 *pubPlaintextData, uint32 *pcubPlaintextData, const uint8 *pubPublicKey, const uint32 cubPublicKey ) { AssertMsg( false, "RSAPublicDecrypt_NoPadding not implemented on PS3" ); return false; }
-	static bool RSASign( const uint8 *pubData, const uint32 cubData, uint8 *pubSignature, uint32 *pcubSignature, const uint8 * pubPrivateKey, const uint32 cubPrivateKey );
-	static bool RSAVerifySignature( const uint8 *pubData, const uint32 cubData, const uint8 *pubSignature, const uint32 cubSignature, const uint8 *pubPublicKey, const uint32 cubPublicKey );
-	static bool HexEncode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData );
-	static bool HexDecode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData );
-	static bool Base64Encode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData, bool bInsertLineBreaks = true ) { AssertMsg( false, "Base64Encode not implemented on PS3" ); return false; } // cellHttpUtilBase64Encoder()
-	static bool Base64Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData, bool bIgnoreInvalidCharacters = true ) { AssertMsg( false, "Base64Decode not implemented on PS3" ); return false; } // cellHttpUtilBase64Decoder()
-	static bool GenerateSalt( Salt_t *pSalt );
-	static bool GenerateSHA1Digest( const uint8 *pubInput, const int cubInput, SHADigest_t *pOutDigest );
-	static bool GenerateSaltedSHA1Digest( const char *pchInput, const Salt_t *pSalt, SHADigest_t *pOutDigest ) { AssertMsg( false, "GenerateSaltedSHA1Digest not implemented on PS3" ); return false; }
-	static bool GenerateRandomBlock( uint8 *pubDest, int cubDest );
-	static bool GenerateHMAC( const uint8 *pubData, uint32 cubData, const uint8 *pubKey, uint32 cubKey, SHADigest_t *pOutputDigest ) { AssertMsg( false, "GenerateHMAC not implemented on PS3" ); return false; }
-	static bool GenerateHMAC256( const uint8 *pubData, uint32 cubData, const uint8 *pubKey, uint32 cubKey, SHA256Digest_t *pOutputDigest ) { AssertMsg( false, "GenerateHMAC256 not implemented on PS3" ); return false; }
-	static bool BGzipBuffer( const uint8 *pubData, uint32 cubData, CCryptoOutBuffer &bufOutput );
-	static bool BGunzipBuffer( const uint8 *pubData, uint32 cubData, CCryptoOutBuffer &bufOutput );
-
-#ifdef DBGFLAG_VALIDATE
-	static void ValidateStatics( CValidator &validator, const char *pchName );
-#endif
-};
-
-
-#endif //!_PS3
-
 
 class CSimpleBitString;
 

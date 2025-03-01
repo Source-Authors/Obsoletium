@@ -13,46 +13,34 @@ $include "$SRCDIR\vpc_scripts\source_cryptlib_include.vpc"
 
 $Configuration
 {
-	$Linker
-	{
-		$SystemLibraries                    "iconv" [$OSXALL]
-		$SystemFrameworks					"Carbon" [$OSXALL]
-		// I'm not sure why this is set in source_dll_win32_debug/release.vpc but not for
-		// the corresponding .exe VPC files. vpk now needs this for cryptlib.
-		$AdditionalLibraryDirectories		"$LIBCOMMON;$LIBPUBLIC"
-    }
-
-}
-
-$Configuration	"Debug"
-{
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common"
+		// dimhotepus: Enable exceptions as we use them in a single place
+		$EnableC++Exceptions					"Yes (/EHsc)"
+		$AdditionalIncludeDirectories			"$BASE,..\common"
 	}
 
 	$Linker
 	{
-		$DebuggableAssembly					"Runtime tracking and disable optimizations (/ASSEMBLYDEBUG)"
+		$SystemLibraries			"iconv" [$OSXALL]
+		$SystemFrameworks			"Carbon" [$OSXALL]
 	}
 }
 
-$Configuration	"Release"
+$Project "vpk"
 {
-	$Compiler
+	$Folder "Header Files"
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common"
+		$File	"..\common\tools_minidump.h"
 	}
-}
 
-$Project "Vpk"
-{
 	$Folder "Source Files"
 	{
+		$File	"..\common\tools_minidump.cpp"
 		$File	"packtest.cpp"
 	}
 
-	$Folder	"Link Libraries" [$WIN32 || $POSIX]
+	$Folder	"Link Libraries" [$WINDOWS || $POSIX]
 	{
 		$Lib	bitmap
 		$Lib	mathlib

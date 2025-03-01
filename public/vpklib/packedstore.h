@@ -352,7 +352,7 @@ public:
 	void GetPackFileLoadErrorSummary( CUtlString &sErrors );
 
 	void GetPackFileName( CPackedStoreFileHandle &handle, char *pchFileNameOut, int cchFileNameOut ) const;
-	void GetDataFileName( char *pchFileNameOut, int cchFileNameOut, int nFileNumber ) const;
+	void GetDataFileName( char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const;
 
 	char const *BaseName( void )
 	{
@@ -373,7 +373,7 @@ public:
 
 	int GetHighestChunkFileIndex() const { return m_nHighestChunkFileIndex; }
 
-	void DiscardChunkHashes( int iChunkFileIndex );
+	void DiscardChunkHashes( intp iChunkFileIndex );
 
 	const CUtlVector<uint8> &GetSignaturePublicKey() const { return m_SignaturePublicKey; }
 	const CUtlVector<uint8> &GetSignature() const { return m_Signature; }
@@ -387,9 +387,9 @@ public:
 		eSignatureCheckResult_InvalidSignature,
 		eSignatureCheckResult_ValidSignature,
 	};
-	ESignatureCheckResult CheckSignature( int nSignatureSize, const void *pSignature ) const;
+	ESignatureCheckResult CheckSignature( intp nSignatureSize, const void *pSignature ) const;
 
-	void SetKeysForSigning( int nPrivateKeySize, const void *pPrivateKeyData, int nPublicKeySize, const void *pPublicKeyData );
+	void SetKeysForSigning( intp nPrivateKeySize, const void *pPrivateKeyData, intp nPublicKeySize, const void *pPublicKeyData );
 #endif
 
 	void SetUseDirFile() { m_bUseDirFile = true; }
@@ -447,8 +447,6 @@ private:
 	void BuildHashTables( void );
 
 	FileHandleTracker_t &GetFileHandle( int nFileNumber );
-
-	void CloseWriteHandle( void );
 
 	// For cache-ing directory and contents data
 	CUtlStringList m_directoryList; // The index of this list of directories...

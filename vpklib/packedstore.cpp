@@ -430,7 +430,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, IBaseFile
 }
 
 
-void CPackedStore::GetDataFileName( char *pchFileNameOut, int cchFileNameOut, int nFileNumber ) const
+void CPackedStore::GetDataFileName( char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const
 {
 	if ( nFileNumber == VPKFILENUMBER_EMBEDDED_IN_DIR_FILE )
 	{
@@ -445,7 +445,7 @@ void CPackedStore::GetDataFileName( char *pchFileNameOut, int cchFileNameOut, in
 	}
 	else
 	{
-		V_snprintf( pchFileNameOut, cchFileNameOut, "%s_%03d.vpk", m_pszFileBaseName, nFileNumber );
+		V_snprintf( pchFileNameOut, cchFileNameOut, "%s_%03zd.vpk", m_pszFileBaseName, nFileNumber );
 	}
 
 }
@@ -637,7 +637,7 @@ void CPackedStore::Write( void )
 	{
 		#ifdef VPK_ENABLE_SIGNING
 			nExpectedSignatureSize = k_cubRSASignature;
-			headerOut.m_nSignatureSize = sizeof(uint32) + m_SignaturePublicKey.Count() + sizeof(uint32) + nExpectedSignatureSize;
+			headerOut.m_nSignatureSize = static_cast<int>(sizeof(uint32)) + m_SignaturePublicKey.Count() + static_cast<int>(sizeof(uint32)) + nExpectedSignatureSize;
 		#else
 			Error( "VPK signing not implemented" );
 		#endif
@@ -698,7 +698,7 @@ void CPackedStore::Write( void )
 			m_Signature.SetCount( nExpectedSignatureSize + 1024 );
 
 			// Calcuate the signature
-			uint32 cubSignature = m_Signature.Count();
+			size_t cubSignature = m_Signature.Count();
 			if ( !CCrypto::RSASignSHA256( bufDirFile.Base<const uint8>(), bufDirFile.TellPut(), 
 				m_Signature.Base(), &cubSignature, 
 				m_SignaturePrivateKey.Base(), m_SignaturePrivateKey.Count() ) )
@@ -709,7 +709,7 @@ void CPackedStore::Write( void )
 			// Confirm that the size was what we expected
 			if ( cubSignature != nExpectedSignatureSize )
 			{
-				Error( "VPK signing produced %d byte signature.  Expected size was %d bytes", cubSignature, nExpectedSignatureSize );
+				Error( "VPK signing produced %zu byte signature.  Expected size was %u bytes", cubSignature, nExpectedSignatureSize );
 			}
 
 			// Shrink signature to fit
@@ -762,7 +762,7 @@ void CPackedStore::Write( void )
 
 #ifdef VPK_ENABLE_SIGNING
 
-void CPackedStore::SetKeysForSigning( int nPrivateKeySize, const void *pPrivateKeyData, int nPublicKeySize, const void *pPublicKeyData )
+void CPackedStore::SetKeysForSigning( intp nPrivateKeySize, const void *pPrivateKeyData, intp nPublicKeySize, const void *pPublicKeyData )
 {
 	m_SignaturePrivateKey.SetSize( nPrivateKeySize );
 	V_memcpy( m_SignaturePrivateKey.Base(), pPrivateKeyData, nPrivateKeySize );
@@ -774,7 +774,7 @@ void CPackedStore::SetKeysForSigning( int nPrivateKeySize, const void *pPrivateK
 	m_Signature.Purge();
 }
 
-CPackedStore::ESignatureCheckResult CPackedStore::CheckSignature( int nSignatureSize, const void *pSignature ) const
+CPackedStore::ESignatureCheckResult CPackedStore::CheckSignature( intp nSignatureSize, const void *pSignature ) const
 {
 	if ( m_Signature.Count() == 0 )
 		return eSignatureCheckResult_NotSigned;
@@ -1292,7 +1292,7 @@ bool CPackedStore::HashEntirePackFile( CPackedStoreFileHandle &handle, int64 &nF
 	return true;
 }
 
-void CPackedStore::DiscardChunkHashes( int iChunkFileIndex )
+void CPackedStore::DiscardChunkHashes( intp iChunkFileIndex )
 {
 	// Wow, this could be a LOT faster because the list is
 	// sorted.  Probably not worth optimizing
