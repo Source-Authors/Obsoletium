@@ -71,6 +71,25 @@ void ShutdownDefaultFileSystem(void);
 // init a filesystem for you, init mathlib, and create the command line.
 //-----------------------------------------------------------------------------
 void InitCommandLineProgram( int argc, char **argv );
+void ShutdownCommandLineProgram();
+
+class ScopedCommandLineProgram
+{
+public:
+  ScopedCommandLineProgram( int argc, char **argv )
+  {
+	InitCommandLineProgram( argc, argv );
+  }
+  ~ScopedCommandLineProgram()
+  {
+	ShutdownCommandLineProgram();
+  }
+
+  ScopedCommandLineProgram(ScopedCommandLineProgram &) = delete;
+  ScopedCommandLineProgram(ScopedCommandLineProgram &&) = delete;
+  ScopedCommandLineProgram& operator=(ScopedCommandLineProgram &) = delete;
+  ScopedCommandLineProgram& operator=(ScopedCommandLineProgram &&) = delete;
+};
 
 
 //-----------------------------------------------------------------------------

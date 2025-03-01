@@ -12,8 +12,9 @@
 #include "tier0/progressbar.h"
 #include "tier1/strtools.h"
 
+namespace {
 
-static void PrintFReportHandler(char const *job_name, int total_units_to_do, int n_units_completed)
+void PrintFReportHandler(char const *job_name, int total_units_to_do, int n_units_completed)
 {
 	static bool work_in_progress=false;
 	static char LastJobName[1024];
@@ -21,7 +22,7 @@ static void PrintFReportHandler(char const *job_name, int total_units_to_do, int
 	{
 		if ( work_in_progress )
 			Msg("..done\n");
-		Q_strncpy( LastJobName, job_name, sizeof( LastJobName ) );
+		V_strcpy_safe( LastJobName, job_name );
 	}
  	if ( (total_units_to_do > 0 ) && (total_units_to_do >= n_units_completed) )
 	{
@@ -36,15 +37,37 @@ static void PrintFReportHandler(char const *job_name, int total_units_to_do, int
 	}
 }
 
+ProgressReportHandler_t g_progress_report = nullptr;
+SpewOutputFunc_t g_spew_output = nullptr;
+
+}
+
 void InitCommandLineProgram( int argc, char **argv )
 {
 	MathLib_Init( 1,1,1,0,false,true,true,true);
+
 	CommandLine()->CreateCmdLine( argc, argv );
+
 	InitDefaultFileSystem();
-	InstallProgressReportHandler( PrintFReportHandler );
+
+	g_progress_report = InstallProgressReportHandler( PrintFReportHandler );
 
 	// By default, command line programs should not use the new assert dialog,
 	// and any asserts should be fatal, unless we are being debugged
 	if ( !Plat_IsInDebugSession() )
-		SpewOutputFunc( DefaultSpewFuncAbortOnAsserts );
+		g_spew_output = SpewOutputFunc2( DefaultSpewFuncAbortOnAsserts );
+}
+
+void ShutdownCommandLineProgram()
+{
+	if ( !Plat_IsInDebugSession() )
+	{
+		g_spew_output = SpewOutputFunc2( g_spew_output );
+		Assert( g_spew_output == DefaultSpewFuncAbortOnAsserts );
+	}
+
+	g_progress_report = InstallProgressReportHandler( g_progress_report );
+	Assert( g_progress_report == PrintFReportHandler );
+
+	ShutdownDefaultFileSystem();
 }
