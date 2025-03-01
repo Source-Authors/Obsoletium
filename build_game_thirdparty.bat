@@ -246,7 +246,7 @@ if ERRORLEVEL 1 (
 REM Build zip-utils.
 MKDIR thirdparty\zip-utils\out
 PUSHD thirdparty\zip-utils\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% ..
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DZU_ENABLE_UNIT_TESTS=OFF ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\zip-utils failed.
   EXIT /B 1
