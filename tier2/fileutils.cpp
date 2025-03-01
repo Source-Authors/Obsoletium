@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------------
 // Builds a directory which is a subdirectory of the current mod
 //-----------------------------------------------------------------------------
-void GetModSubdirectory( const char *pSubDir, char *pBuf, int nBufLen )
+void GetModSubdirectory( const char *pSubDir, char *pBuf, intp nBufLen )
 {
 	// Compute starting directory
 	Assert( g_pFullFileSystem->GetSearchPath( "MOD_WRITE", false, NULL, 0 ) < nBufLen );
@@ -49,7 +49,7 @@ void GetModSubdirectory( const char *pSubDir, char *pBuf, int nBufLen )
 //-----------------------------------------------------------------------------
 // Builds a directory which is a subdirectory of the current mod's *content*
 //-----------------------------------------------------------------------------
-void GetModContentSubdirectory( const char *pSubDir, char *pBuf, int nBufLen )
+void GetModContentSubdirectory( const char *pSubDir, char *pBuf, intp nBufLen )
 {
 	char pTemp[ MAX_PATH ];
 	GetModSubdirectory( pSubDir, pTemp, sizeof(pTemp) );
@@ -200,7 +200,7 @@ void GetSearchPath( CUtlVector< CUtlString > &path, const char *pPathID )
 //-----------------------------------------------------------------------------
 // Given file name in the current dir generate a full path to it.
 //-----------------------------------------------------------------------------
-bool GenerateFullPath( const char *pFileName, char const *pPathID, char *pBuf, int nBufLen )
+bool GenerateFullPath( const char *pFileName, char const *pPathID, char *pBuf, intp nBufLen )
 {
 	if ( V_IsAbsolutePath( pFileName ) )
 	{
