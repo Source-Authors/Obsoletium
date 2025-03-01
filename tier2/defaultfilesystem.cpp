@@ -8,8 +8,9 @@
 #include <tier0/platform.h>
 #include <filesystem_init.h>
 
+namespace {
 
-static CSysModule *g_pFullFileSystemModule = NULL;
+static CSysModule *g_pFullFileSystemModule{nullptr};
 
 void* DefaultCreateInterfaceFn(const char *, int *pReturnCode)
 {
@@ -17,10 +18,13 @@ void* DefaultCreateInterfaceFn(const char *, int *pReturnCode)
 	{
 		*pReturnCode = 0;
 	}
-	return NULL;
+
+	return nullptr;
 }
 
-void InitDefaultFileSystem( void )
+}  // namespace
+
+void InitDefaultFileSystem()
 {
 	AssertMsg( !g_pFullFileSystem, "Already set up the file system" );
 
@@ -56,7 +60,7 @@ void InitDefaultFileSystem( void )
 	g_pFullFileSystem->AddSearchPath( "", "LOCAL", PATH_ADD_TO_HEAD );
 }
 
-void ShutdownDefaultFileSystem(void)
+void ShutdownDefaultFileSystem()
 {
 	AssertMsg( g_pFullFileSystem, "File system not set up" );
 	g_pFullFileSystem->Shutdown();

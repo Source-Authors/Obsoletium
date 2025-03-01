@@ -112,7 +112,7 @@ bool CP4File::SetFileType( [[maybe_unused]] const CUtlString& desiredFileType)
 //////////////////////////////////////////////////////////////////////////
 
 
-CP4Factory::CP4Factory()
+CP4Factory::CP4Factory() : m_bDummyMode{false}
 {
 }
 
