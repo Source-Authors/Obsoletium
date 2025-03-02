@@ -612,20 +612,6 @@ void S_SoundInfo_f(void)
     Msg( "  Bits/Sample:  %d\n", g_AudioDevice->DeviceSampleBits() );
     Msg( "  Rate:         %d\n", g_AudioDevice->DeviceDmaSpeed() );
 	Msg( "total_channels: %d\n", total_channels);
-
-	if ( IsX360() )
-	{
-		// dump a glimpse of the mixing state
-		CChannelList list;
-		g_ActiveChannels.GetActiveChannels( list );
-
-		Msg( "\nActive Channels: (%d)\n", list.Count() );
-		for ( int i = 0; i < list.Count(); i++ )
-		{
-			channel_t *pChannel = list.GetChannel(i);
-			Msg( "%s (Mixer: 0x%p)\n", pChannel->sfx->GetFileName(), pChannel->pMixer );
-		}
-	}
 }
 
 
