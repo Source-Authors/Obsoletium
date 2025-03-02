@@ -39,7 +39,7 @@ public:
 	virtual bool IsValid();
 
 	// gets the abc widths for a character
-	virtual void GetCharABCWidths(int ch, int &a, int &b, int &c);
+	virtual void GetCharABCWidths(wchar_t ch, int &a, int &b, int &c);
 
 	// set the font to be the one to currently draw with in the gdi
 	ATSUStyle *SetAsActiveFont( CGContextRef cgContext );

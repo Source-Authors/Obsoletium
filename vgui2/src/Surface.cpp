@@ -226,8 +226,8 @@ public:
 	int GetFontTall(HFont font) override;
 	int GetFontTallRequested(HFont font) override;
 	int GetFontAscent(HFont font, wchar_t wch) override;
-	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) override;
-	int GetCharacterWidth(HFont font, int ch) override;
+	void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c) override;
+	int GetCharacterWidth(HFont font, wchar_t ch) override;
 	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) override;
 	bool AddCustomFontFile(const char *fontName, const char *fontFileName) override;
 	bool AddBitmapFontFile(const char *fontFileName) override;
@@ -3198,7 +3198,7 @@ bool CWin32Surface::IsFontAdditive(HFont font)
 //-----------------------------------------------------------------------------
 // Purpose: returns the abc widths of a single character
 //-----------------------------------------------------------------------------
-void CWin32Surface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
+void CWin32Surface::GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c)
 {
 	FontManager().GetCharABCwide(font, ch, a, b, c);
 }
@@ -3206,7 +3206,7 @@ void CWin32Surface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
 //-----------------------------------------------------------------------------
 // Purpose: returns the pixel width of a single character
 //-----------------------------------------------------------------------------
-int CWin32Surface::GetCharacterWidth(HFont font, int ch)
+int CWin32Surface::GetCharacterWidth(HFont font, wchar_t ch)
 {
 	return FontManager().GetCharacterWidth(font, ch);
 }

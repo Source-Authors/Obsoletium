@@ -611,12 +611,12 @@ void CLinuxFont::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAft
 //-----------------------------------------------------------------------------
 // Purpose: gets the abc widths for a character
 //-----------------------------------------------------------------------------
-void CLinuxFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
+void CLinuxFont::GetCharABCWidths(wchar_t ch, int &a, int &b, int &c)
 {
 	Assert(IsValid());
 
 	// look for it in the cache
-	abc_cache_t finder = { (wchar_t)ch };
+	abc_cache_t finder = { ch };
 
 	unsigned short i = m_ExtendedABCWidthsCache.Find(finder);
 	if (m_ExtendedABCWidthsCache.IsValidIndex(i))

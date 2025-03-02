@@ -547,12 +547,12 @@ void COSXFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned cha
 //-----------------------------------------------------------------------------
 // Purpose: gets the abc widths for a character
 //-----------------------------------------------------------------------------
-void COSXFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
+void COSXFont::GetCharABCWidths( wchar_t ch, int &a, int &b, int &c )
 {
 	Assert( IsValid() );
 
 	// Look for it in the cache.
-	abc_cache_t finder = { (wchar_t)ch };
+	abc_cache_t finder = { ch };
 
 	unsigned short i = m_ExtendedABCWidthsCache.Find( finder );
 	if ( m_ExtendedABCWidthsCache.IsValidIndex( i ) )

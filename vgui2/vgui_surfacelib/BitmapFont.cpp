@@ -236,7 +236,7 @@ void CBitmapFont::SetScale( float sx, float sy )
 //-----------------------------------------------------------------------------
 // Purpose: gets the abc widths for a character
 //-----------------------------------------------------------------------------
-void CBitmapFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
+void CBitmapFont::GetCharABCWidths( wchar_t ch, int &a, int &b, int &c )
 {
 	Assert( IsValid() && ch >= 0 && ch <= 255 );
 
@@ -274,7 +274,7 @@ void CBitmapFont::GetKernedCharWidth( wchar_t ch, wchar_t, wchar_t, float &wide,
 //-----------------------------------------------------------------------------
 // Purpose: gets the texcoords for a character
 //-----------------------------------------------------------------------------
-void CBitmapFont::GetCharCoords( int ch, float *left, float *top, float *right, float *bottom )
+void CBitmapFont::GetCharCoords( wchar_t ch, float *left, float *top, float *right, float *bottom )
 {
 	Assert( IsValid() && ch >= 0 && ch <= 255 );
 

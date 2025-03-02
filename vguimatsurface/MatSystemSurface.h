@@ -180,9 +180,9 @@ public:
 	int GetFontTallRequested(HFont font) override;
 	int GetFontAscent(HFont font, wchar_t wch) override;
 	bool IsFontAdditive(HFont font)  override;
-	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) override;
+	void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c) override;
 	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) override;
-	int GetCharacterWidth(vgui::HFont font, int ch) override;
+	int GetCharacterWidth(vgui::HFont font, wchar_t ch) override;
 	bool AddCustomFontFile(const char *fontName, const char *fontFileName) override;
 	bool AddBitmapFontFile(const char *fontFileName) override;
 	void SetBitmapFontName( const char *pName, const char *pFontFilename ) override;

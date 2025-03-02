@@ -1782,7 +1782,7 @@ bool CMatSystemSurface::IsFontAdditive(HFont font)
 //-----------------------------------------------------------------------------
 // Purpose: returns the abc widths of a single character
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
+void CMatSystemSurface::GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c)
 {
 	FontManager().GetCharABCwide(font, ch, a, b, c);
 }
@@ -1790,7 +1790,7 @@ void CMatSystemSurface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &
 //-----------------------------------------------------------------------------
 // Purpose: returns the pixel width of a single character
 //-----------------------------------------------------------------------------
-int CMatSystemSurface::GetCharacterWidth(HFont font, int ch)
+int CMatSystemSurface::GetCharacterWidth(HFont font, wchar_t ch)
 {
 	return FontManager().GetCharacterWidth(font, ch);
 }
@@ -3857,12 +3857,12 @@ void CMatSystemSurface::MovePopupToFront(VPANEL panel)
 	{
 		if ( !g_pVGuiPanel->HasParent(panel, input()->GetAppModalSurface()) )
 		{
-			HPanel p = ivgui()->PanelToHandle( input()->GetAppModalSurface() );
-			index = m_PopupList.Find( p );
+			HPanel pn = ivgui()->PanelToHandle( input()->GetAppModalSurface() );
+			index = m_PopupList.Find( pn );
 			if ( index != m_PopupList.InvalidIndex() )
 			{
 				m_PopupList.Remove( index );
-				m_PopupList.AddToTail( p );
+				m_PopupList.AddToTail( pn );
 			}
 		}
 	}
