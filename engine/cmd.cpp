@@ -543,6 +543,14 @@ bool IsValidFileExtension( const char *pszFilename )
 		 Q_strstr( pszFilename, ".com" ) ||
 		 Q_strstr( pszFilename, ".bat" ) ||
 		 Q_strstr( pszFilename, ".dll" ) ||
+#if defined(OSX)
+		 Q_strstr( pszFilename, ".so" ) ||
+		 Q_strstr( pszFilename, ".dylib" ) ||
+		 Q_strstr( pszFilename, ".kext" ) ||
+#elif defined(_LINUX)
+		 Q_strstr(pszFilename, ".so") ||
+		 Q_strstr(pszFilename, ".ko") ||
+#endif
 		 Q_strstr( pszFilename, ".ini" ) ||
 		 Q_strstr( pszFilename, ".gcf" ) ||
 		 Q_strstr( pszFilename, ".sys" ) ||

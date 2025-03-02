@@ -3166,7 +3166,9 @@ bool CNetChan::IsValidFileForTransfer( const char *pszFilename )
 	     V_stristr( szTemp, ".cmd" ) ||
 	     V_stristr( szTemp, ".dll" ) ||
 	     V_stristr( szTemp, ".so" ) ||
+	     V_stristr( szTemp, ".ko" ) ||
 	     V_stristr( szTemp, ".dylib" ) ||
+	     V_stristr( szTemp, ".kext" ) ||
 	     V_stristr( szTemp, ".ini" ) ||
 	     V_stristr( szTemp, ".log" ) ||
 	     V_stristr( szTemp, ".lua" ) ||
