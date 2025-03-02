@@ -13,7 +13,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\utils\hlfaceposer,$SRCDIR\hlfaceposer,..\common,..\hlmv,$SRCDIR\game\shared,..\SAPI51\Include,.\lipsinc;..\common\shaderdll"
+		$AdditionalIncludeDirectories		"$BASE,$SRCDIR\utils\hlfaceposer,..\common,..\hlmv,$SRCDIR\game\shared"
 		$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE"
 	}
 
@@ -326,16 +326,10 @@ $Project "hlfaceposer"
 		$File	"$SRCDIR\public\tier0\platform.h"
 		$File	"$SRCDIR\public\tier0\protected_things.h"
 		$File	"$SRCDIR\public\vstdlib\random.h"
-		$File	"..\sapi51\Include\sapi.h"
-		$File	"..\sapi51\Include\sapiddk.h"
 		$File	"..\common\scriplib.h"
 		$File	"$SRCDIR\game\shared\sharedInterface.h"
 		$File	"$SRCDIR\public\soundchars.h"
 		$File	"$SRCDIR\public\soundflags.h"
-		$File	"..\sapi51\Include\Spddkhlp.h"
-		$File	"..\sapi51\Include\spdebug.h"
-		$File	"..\sapi51\Include\sperror.h"
-		$File	"..\sapi51\Include\sphelper.h"
 		$File	"$SRCDIR\public\string_t.h"
 		$File	"$SRCDIR\public\tier1\strtools.h"
 		$File	"$SRCDIR\public\studio.h"
