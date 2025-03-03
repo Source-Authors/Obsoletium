@@ -1872,7 +1872,7 @@ studiohdr_t *CMDLCache::UnserializeMDL( MDLHandle_t handle, void *pData, int nDa
 
 	// critical! store a back link to our data
 	// this is fetched when re-establishing dependent cached data (vtx/vvd)
-	pStudioHdrIn->virtualModel = (int)(uintp)handle;
+	pStudioHdrIn->SetVirtualModel( MDLHandleToVirtual( handle ) );
 
 	MdlCacheMsg( "MDLCache: Alloc studiohdr %s\n", GetModelName( handle ) );
 
@@ -1953,7 +1953,7 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 
 	// critical! store a back link to our data
 	// this is fetched when re-establishing dependent cached data (vtx/vvd)
-	pStudioHdr->virtualModel = (int)(uintp)handle;
+	pStudioHdr->SetVirtualModel( MDLHandleToVirtual( handle ) );
 
 	// Make sure all dependent files are valid
 	if ( !VerifyHeaders( pStudioHdr ) )
