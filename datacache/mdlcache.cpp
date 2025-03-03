@@ -1851,7 +1851,7 @@ studiohdr_t *CMDLCache::UnserializeMDL( MDLHandle_t handle, void *pData, int nDa
 
 	// critical! store a back link to our data
 	// this is fetched when re-establishing dependent cached data (vtx/vvd)
-	pStudioHdrIn->virtualModel = (int)(uintp)handle;
+	pStudioHdrIn->SetVirtualModel( MDLHandleToVirtual( handle ) );
 
 	MdlCacheMsg( "MDLCache: Alloc studiohdr %s\n", GetModelName( handle ) );
 
@@ -1939,7 +1939,7 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 
 	// critical! store a back link to our data
 	// this is fetched when re-establishing dependent cached data (vtx/vvd)
-	pStudioHdr->virtualModel = (int)(uintp)handle;
+	pStudioHdr->SetVirtualModel( MDLHandleToVirtual( handle ) );
 
 	// Make sure all dependent files are valid
 	if ( !VerifyHeaders( pStudioHdr ) )
@@ -2447,7 +2447,7 @@ bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 	}
 
 	char pFileName[ MAX_PATH ];
-	MDLHandle_t handle = (MDLHandle_t)(intp)pStudioHdr->virtualModel&0xffff;
+	MDLHandle_t handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
 
 	MakeFilename( handle, ".vvd", pFileName, sizeof(pFileName) );
 
@@ -2508,7 +2508,7 @@ vertexFileHeader_t *CMDLCache::CacheVertexData( studiohdr_t *pStudioHdr )
 
 	Assert( pStudioHdr );
 
-	handle = (MDLHandle_t)(intp)pStudioHdr->virtualModel&0xffff;
+	handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
 	Assert( handle != MDLHANDLE_INVALID );
 
 	pVvdHdr = (vertexFileHeader_t *)CheckData( m_MDLDict[handle]->m_VertexCache, MDLCACHE_VERTEXES );
@@ -3030,7 +3030,7 @@ bool CMDLCache::SetAsyncLoad( MDLCacheDataType_t type, bool bAsync )
 //-----------------------------------------------------------------------------
 vertexFileHeader_t *CMDLCache::BuildAndCacheVertexData( studiohdr_t *pStudioHdr, vertexFileHeader_t *pRawVvdHdr  )
 {
-	MDLHandle_t	handle = (MDLHandle_t)(intp)pStudioHdr->virtualModel&0xffff;
+	MDLHandle_t	handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
 	vertexFileHeader_t *pVvdHdr;
 
 	MdlCacheMsg( "MDLCache: Load VVD for %s\n", pStudioHdr->pszName() );
@@ -3097,7 +3097,7 @@ vertexFileHeader_t *CMDLCache::LoadVertexData( studiohdr_t *pStudioHdr )
 	MDLHandle_t			handle;
 
 	Assert( pStudioHdr );
-	handle = (MDLHandle_t)(intp)pStudioHdr->virtualModel&0xffff;
+	handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
 	Assert( !m_MDLDict[handle]->m_VertexCache );
 
 	studiodata_t *pStudioData = m_MDLDict[handle];
@@ -3661,17 +3661,17 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 	if (numincludemodels == 0)
 		return NULL;
 
-	return g_MDLCache.GetVirtualModelFast( this, (MDLHandle_t)(intp)virtualModel&0xffff );
+	return g_MDLCache.GetVirtualModelFast( this, VoidPtrToMDLHandle( VirtualModel() ) );
 }
 
 byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
-	return g_MDLCache.GetAnimBlock( (MDLHandle_t)(intp)virtualModel&0xffff, i );
+	return g_MDLCache.GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
 }
 
 intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
-	return g_MDLCache.GetAutoplayList( (MDLHandle_t)(intp)virtualModel&0xffff, pOut );
+	return g_MDLCache.GetAutoplayList( VoidPtrToMDLHandle( VirtualModel() ), pOut );
 }
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const

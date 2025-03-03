@@ -26,27 +26,27 @@ const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName 
 
 virtualmodel_t *studiohdr_t::GetVirtualModel( ) const
 {
-	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)((intp)virtualModel&0xffff) );
+	return g_pMDLCache->GetVirtualModel( VoidPtrToMDLHandle( VirtualModel() ) );
 }
 
 byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
-	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)((intp)virtualModel&0xffff), i );
+	return g_pMDLCache->GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
 }
 
 intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
-	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)((intp)virtualModel&0xffff), pOut );
+	return g_pMDLCache->GetAutoplayList( VoidPtrToMDLHandle( VirtualModel() ), pOut );
 }
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( ) const
 {
-	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)((intp)cache&0xffff) );
+	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
 
 // dimhotepus: Add const-correct API.
 studiohdr_t *virtualgroup_t::GetStudioHdr( )
 {
-	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)((intp)cache&0xffff) );
+	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
 
