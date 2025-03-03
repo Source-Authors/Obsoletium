@@ -1388,6 +1388,12 @@ void CServerGameDLL::LevelShutdown( void )
 	// In case we quit out during initial load
 	CBaseEntity::SetAllowPrecache( false );
 
+	// Josh: Uncache all the particle systems on level shutdown
+	// otherwise we leak them constantly on changelevel in the
+	// particle precache stringtable list.
+	g_pParticleSystemMgr->UncacheAllParticleSystems();
+	g_pParticleSystemMgr->RecreateDictionary();
+
 	g_nCurrentChapterIndex = -1;
 
 #ifndef _XBOX

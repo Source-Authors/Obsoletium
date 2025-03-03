@@ -204,11 +204,11 @@ void C_SceneEntity::SetupClientOnlyScene( const char *pszFilename, C_BaseFlex *p
 	m_hOwner = pOwner;
 	m_bClientOnly = true;
 
-	char szFilename[128];
-	Assert( V_strlen( pszFilename ) < 128 );
+	char szFilename[MAX_PATH];
+	Assert( V_strlen( pszFilename ) < MAX_PATH );
 	V_strcpy_safe( szFilename, pszFilename );
 
-	char szSceneHWM[128];
+	char szSceneHWM[ MAX_PATH ];
 	if ( GetHWMorphSceneFileName( szFilename, szSceneHWM ) )
 	{
 		V_strcpy_safe( szFilename, szSceneHWM );

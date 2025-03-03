@@ -1116,7 +1116,8 @@ void CBaseAnimating::DispatchAnimEvents ( CBaseAnimating *eventHandler )
 				(float)flCycleRate );
 		}
 		*/
-		eventHandler->HandleAnimEvent( &event );
+		if ( eventHandler )
+			eventHandler->HandleAnimEvent( &event );
 
 		// FAILSAFE:
 		// If HandleAnimEvent has somehow reset my internal pointer

@@ -155,11 +155,13 @@ void CBaseTrigger::InputDisable( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 void CBaseTrigger::InputDisableAndEndTouch( inputdata_t &inputdata )
 {
-	FOR_EACH_VEC_BACK( m_hTouchingEntities, i )
+	// EndTouch may delete an arbitrary number of entities from the touch list
+	for ( int i = m_hTouchingEntities.Count() - 1; i >= 0; i = m_hTouchingEntities.Count() - 1 )
 	{
 		if ( m_hTouchingEntities[i] )
 		{
 			EndTouch( m_hTouchingEntities[ i ] );
+			Assert( i > m_hTouchingEntities.Count() - 1 );
 		}
 		else
 		{
