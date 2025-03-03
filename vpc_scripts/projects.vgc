@@ -84,11 +84,6 @@ $Project "captioncompiler"
 	"utils\captioncompiler\captioncompiler.vpc" [$WINDOWS]
 }
 
-$Project "cardstats"
-{
-	"utils\videocardstats\cardstats.vpc" [$WINDOWS]
-}
-
 $Project "choreoobjects"
 {
 	"choreoobjects\choreoobjects.vpc"
