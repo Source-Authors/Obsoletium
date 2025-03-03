@@ -14,6 +14,8 @@
 #include "gamerules.h"
 #include "datacache/imdlcache.h"
 
+#include "tier1/fmtstr.h"
+
 #include "tier2/tier2.h"
 #include "tier2/p4helpers.h"
 #include "tier2/fileutils.h"
@@ -29,6 +31,8 @@
 #include "nav_pathfind.h"
 #include "cs_nav_area.h"
 #endif
+
+#include "util_shared.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -1199,7 +1203,17 @@ bool CNavMesh::Save( void ) const
 
 	if ( !filesystem->WriteFile( filename, "MOD", fileBuffer ) )
 	{
+		// XXX(JohnS): Nav bails out after analyze regardless of it failed to save work, meaning if your .nav is
+		//             read-only you're about to throw away everything.  This code is old and bad.  Just make a generous
+		//             effort to save a backup, since this is common with e.g. read-only p4 nav files.
+		CFmtStrN< MAX_PATH > sBackupFile( "%s.failedsave", filename ); // .bak voted too likely to conflict with user
+																	   // saved files
 		Warning( "Unable to save %d bytes to %s\n", fileBuffer.Size(), filename );
+
+		if ( filesystem->WriteFile( sBackupFile, "MOD", fileBuffer ) )
+		{
+			Warning( "NAV failed to save, saved backup copy to '%s'\n", sBackupFile.Get() );
+		}
 		return false;
 	}
 
@@ -1313,10 +1327,13 @@ static ConCommand nav_check_file_consistency( "nav_check_file_consistency", Comm
  */
 const CUtlVector< Place > *CNavMesh::GetPlacesFromNavFile( bool *hasUnnamedPlaces )
 {
+	char maptmp[256];
+	const char *pszMapName = GetCleanMapName( STRING( gpGlobals->mapname ), maptmp );
+
 	placeDirectory.Reset();
 	// nav filename is derived from map filename
 	char filename[256];
-	Q_snprintf( filename, sizeof( filename ), FORMAT_NAVFILE, STRING( gpGlobals->mapname ) );
+	Q_snprintf( filename, sizeof( filename ), FORMAT_NAVFILE, pszMapName );
 
 	CUtlBuffer fileBuffer( 4096, 1024*1024, CUtlBuffer::READ_ONLY );
 	if ( GetNavDataFromFile( fileBuffer ) != NAV_OK )

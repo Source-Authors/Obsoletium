@@ -880,6 +880,8 @@ public:
 
 	char					m_szAnimExtension[32];
 
+	bool					m_bPendingClientSettings; // User client settings changed, but we're not importing them
+
 	int						m_nUpdateRate;		// user snapshot rate cl_updaterate
 	float					m_fLerpTime;		// users cl_interp
 	bool					m_bLagCompensation;	// user wants lag compenstation

@@ -15,6 +15,7 @@
 #include "tier0/vprof.h"
 #include "checksum_crc.h"
 #include "tier0/icommandline.h"
+#include "util_shared.h"
 
 #if defined( TF_CLIENT_DLL ) || defined( TF_DLL )
 #include "tf_shareddefs.h"
@@ -49,7 +50,7 @@ static ConVar *g_pClosecaption = NULL;
 int LookupStringFromCloseCaptionToken( char const *token );
 const wchar_t *GetStringForIndex( int index );
 #endif
-static bool g_bPermitDirectSoundPrecache = false;
+bool g_bPermitDirectSoundPrecache = false;
 
 #if !defined( CLIENT_DLL )
 
@@ -264,11 +265,14 @@ public:
 		StartLog();
 		Q_snprintf( mapname, sizeof( mapname ), "maps/%s", STRING( gpGlobals->mapname ) );
 #else
-		Q_strncpy( mapname, engine->GetLevelName(), sizeof( mapname ) );
+		Q_snprintf( mapname, sizeof( mapname ), "maps/%s", V_GetFileName( engine->GetLevelName() ) );
 #endif
 
 		Q_FixSlashes( mapname );
 		Q_strlower( mapname );
+
+		char maptmp[256];
+		const char *pszCleanMapName = GetCleanMapName( mapname, maptmp );
 
 		// Load in any map specific overrides
 		char scriptfile[ 512 ];
@@ -296,7 +300,7 @@ public:
 		}
 		else
 		{
-			Q_StripExtension( mapname, scriptfile, sizeof( scriptfile ) );
+			Q_StripExtension( pszCleanMapName, scriptfile, sizeof( scriptfile ) );
 			Q_strncat( scriptfile, "_level_sounds.txt", sizeof( scriptfile ), COPY_ALL_CHARACTERS );
 			if ( filesystem->FileExists( scriptfile, "GAME" ) )
 			{
@@ -304,7 +308,7 @@ public:
 			}
 		}
 #else
-		Q_StripExtension( mapname, scriptfile, sizeof( scriptfile ) );
+		Q_StripExtension( pszCleanMapName, scriptfile, sizeof( scriptfile ) );
 		Q_strncat( scriptfile, "_level_sounds.txt", sizeof( scriptfile ), COPY_ALL_CHARACTERS );
 
 		if ( filesystem->FileExists( scriptfile, "GAME" ) )

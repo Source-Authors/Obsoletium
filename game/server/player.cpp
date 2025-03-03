@@ -593,6 +593,7 @@ CBasePlayer::CBasePlayer( )
 
 	m_hZoomOwner = NULL;
 
+	m_bPendingClientSettings = false;
 	m_nUpdateRate = 20;  // cl_updaterate defualt
 	m_fLerpTime = 0.1f; // cl_interp default
 	m_bPredictWeapons = true;
@@ -3441,6 +3442,169 @@ void CBasePlayer::ForceSimulation()
 	m_nSimulationTick = -1;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Callback from engine when this player's client settings (userinfo) change
+//-----------------------------------------------------------------------------
+void CBasePlayer::ClientSettingsChanged()
+{
+	if ( !g_pGameRules->IsConnectedUserInfoChangeAllowed( this ) )
+	{
+		m_bPendingClientSettings = true;
+		return;
+	}
+
+	#define QUICKGETCVARVALUE(v) (engine->GetClientConVarValue( this->entindex(), v ))
+
+	// get network setting for prediction & lag compensation
+
+	// Unfortunately, we have to duplicate the code in cdll_bounded_cvars.cpp here because the client
+	// doesn't send the virtualized value up (because it has no way to know when the virtualized value
+	// changes). Possible todo: put the responsibility on the bounded cvar to notify the engine when
+	// its virtualized value has changed.
+
+	this->m_nUpdateRate = Q_atoi( QUICKGETCVARVALUE("cl_updaterate") );
+	static const ConVar *pMinUpdateRate = g_pCVar->FindVar( "sv_minupdaterate" );
+	static const ConVar *pMaxUpdateRate = g_pCVar->FindVar( "sv_maxupdaterate" );
+	if ( pMinUpdateRate && pMaxUpdateRate )
+		this->m_nUpdateRate = clamp( this->m_nUpdateRate, (int) pMinUpdateRate->GetFloat(), (int) pMaxUpdateRate->GetFloat() );
+
+	bool useInterpolation = Q_atoi( QUICKGETCVARVALUE("cl_interpolate") ) != 0;
+	if ( useInterpolation )
+	{
+		float flLerpRatio = Q_atof( QUICKGETCVARVALUE("cl_interp_ratio") );
+		if ( flLerpRatio == 0 )
+			flLerpRatio = 1.0f;
+		float flLerpAmount = Q_atof( QUICKGETCVARVALUE("cl_interp") );
+
+		static const ConVar *pMin = g_pCVar->FindVar( "sv_client_min_interp_ratio" );
+		static const ConVar *pMax = g_pCVar->FindVar( "sv_client_max_interp_ratio" );
+		if ( pMin && pMax && pMin->GetFloat() != -1 )
+		{
+			flLerpRatio = clamp( flLerpRatio, pMin->GetFloat(), pMax->GetFloat() );
+		}
+		else
+		{
+			if ( flLerpRatio == 0 )
+				flLerpRatio = 1.0f;
+		}
+		// #define FIXME_INTERP_RATIO
+		this->m_fLerpTime = MAX( flLerpAmount, flLerpRatio / this->m_nUpdateRate );
+	}
+	else
+	{
+		this->m_fLerpTime = 0.0f;
+	}
+
+#if !defined( NO_ENTITY_PREDICTION )
+	bool usePrediction = Q_atoi( QUICKGETCVARVALUE("cl_predict")) != 0;
+
+	if ( usePrediction )
+	{
+		this->m_bRequestPredict  = true;
+		this->m_bPredictWeapons  = Q_atoi( QUICKGETCVARVALUE("cl_predictweapons")) != 0;
+		this->m_bLagCompensation = Q_atoi( QUICKGETCVARVALUE("cl_lagcompensation")) != 0;
+	}
+	else
+#endif
+	{
+		this->m_bRequestPredict  = false;
+		this->m_bPredictWeapons  = false;
+		this->m_bLagCompensation = false;
+	}
+
+	#undef QUICKGETCVARVALUE
+
+	m_bPendingClientSettings = false;
+}
+
+unsigned int CBasePlayer::PhysicsSolidMaskForEntity() const
+{
+	return MASK_PLAYERSOLID;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: This will force usercmd processing to actually consume commands even if the global tick counter isn't incrementing
+//-----------------------------------------------------------------------------
+void CBasePlayer::ForceSimulation()
+{
+	m_nSimulationTick = -1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Callback from engine when this player's client settings (userinfo) change
+//-----------------------------------------------------------------------------
+void CBasePlayer::ClientSettingsChanged()
+{
+	if ( !g_pGameRules->IsConnectedUserInfoChangeAllowed( this ) )
+	{
+		m_bPendingClientSettings = true;
+		return;
+	}
+
+	#define QUICKGETCVARVALUE(v) (engine->GetClientConVarValue( this->entindex(), v ))
+
+	// get network setting for prediction & lag compensation
+
+	// Unfortunately, we have to duplicate the code in cdll_bounded_cvars.cpp here because the client
+	// doesn't send the virtualized value up (because it has no way to know when the virtualized value
+	// changes). Possible todo: put the responsibility on the bounded cvar to notify the engine when
+	// its virtualized value has changed.
+
+	this->m_nUpdateRate = Q_atoi( QUICKGETCVARVALUE("cl_updaterate") );
+	static const ConVar *pMinUpdateRate = g_pCVar->FindVar( "sv_minupdaterate" );
+	static const ConVar *pMaxUpdateRate = g_pCVar->FindVar( "sv_maxupdaterate" );
+	if ( pMinUpdateRate && pMaxUpdateRate )
+		this->m_nUpdateRate = clamp( this->m_nUpdateRate, (int) pMinUpdateRate->GetFloat(), (int) pMaxUpdateRate->GetFloat() );
+
+	bool useInterpolation = Q_atoi( QUICKGETCVARVALUE("cl_interpolate") ) != 0;
+	if ( useInterpolation )
+	{
+		float flLerpRatio = Q_atof( QUICKGETCVARVALUE("cl_interp_ratio") );
+		if ( flLerpRatio == 0 )
+			flLerpRatio = 1.0f;
+		float flLerpAmount = Q_atof( QUICKGETCVARVALUE("cl_interp") );
+
+		static const ConVar *pMin = g_pCVar->FindVar( "sv_client_min_interp_ratio" );
+		static const ConVar *pMax = g_pCVar->FindVar( "sv_client_max_interp_ratio" );
+		if ( pMin && pMax && pMin->GetFloat() != -1 )
+		{
+			flLerpRatio = clamp( flLerpRatio, pMin->GetFloat(), pMax->GetFloat() );
+		}
+		else
+		{
+			if ( flLerpRatio == 0 )
+				flLerpRatio = 1.0f;
+		}
+		// #define FIXME_INTERP_RATIO
+		this->m_fLerpTime = MAX( flLerpAmount, flLerpRatio / this->m_nUpdateRate );
+	}
+	else
+	{
+		this->m_fLerpTime = 0.0f;
+	}
+
+#if !defined( NO_ENTITY_PREDICTION )
+	bool usePrediction = Q_atoi( QUICKGETCVARVALUE("cl_predict")) != 0;
+
+	if ( usePrediction )
+	{
+		this->m_bRequestPredict  = true;
+		this->m_bPredictWeapons  = Q_atoi( QUICKGETCVARVALUE("cl_predictweapons")) != 0;
+		this->m_bLagCompensation = Q_atoi( QUICKGETCVARVALUE("cl_lagcompensation")) != 0;
+	}
+	else
+#endif
+	{
+		this->m_bRequestPredict  = false;
+		this->m_bPredictWeapons  = false;
+		this->m_bLagCompensation = false;
+	}
+
+	#undef QUICKGETCVARVALUE
+
+	m_bPendingClientSettings = false;
+}
+
 ConVar sv_usercmd_custom_random_seed( "sv_usercmd_custom_random_seed", "1", FCVAR_CHEAT, "When enabled server will populate an additional random seed independent of the client" );
 
 //-----------------------------------------------------------------------------
@@ -4545,6 +4709,12 @@ void CBasePlayer::ForceOrigin( const Vector &vecOrigin )
 //-----------------------------------------------------------------------------
 void CBasePlayer::PostThink()
 {
+	// Attempt to apply pending client settings
+	if ( m_bPendingClientSettings )
+	{
+		ClientSettingsChanged();
+	}
+
 	m_vecSmoothedVelocity = m_vecSmoothedVelocity * SMOOTHING_FACTOR + GetAbsVelocity() * ( 1 - SMOOTHING_FACTOR );
 
 	if ( !g_fGameOver && !m_iPlayerLocked )
@@ -5729,7 +5899,21 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	if ( pent != NULL && !(pent->IsMarkedForDeletion()) ) 
 	{
-		pent->Touch( this );
+#ifdef HL2MP
+		// misyl: Fix player's spawned weapons being dropped
+		// if they can't pick them up at spawn or died too quickly, etc.
+		if ( pWeapon )
+		{
+			if ( !BumpWeapon( pWeapon ) )
+			{
+				UTIL_Remove( pWeapon );
+			}
+		}
+		else
+#endif
+		{
+			pent->Touch( this );
+		}
 	}
 
 	return pent;
