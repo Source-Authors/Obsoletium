@@ -135,6 +135,32 @@ char * CheckChatText( CBasePlayer *pPlayer, char *text )
 		p[length] = 0;
 	}
 
+	// Josh:
+	// Cheaters can send us whatever data they want through this channel
+	// Let's validate they aren't trying to clear the chat.
+	// If we detect any of these blacklisted characters (which players cannot type anyway.)
+	// Let's just end the string here.
+	static const char s_blacklist[] = {
+	//	CLRF   LF    ESC
+		'\r',  '\n', '\x1b'
+	};
+
+	int oldLength = length;
+	for (int i = 0; i < length && oldLength == length; i++) {
+		for (int j = 0; j < ARRAYSIZE(s_blacklist); j++) {
+			if (p[i] == s_blacklist[j]) {
+				p[i] = '\0';
+				length = i;
+			}
+		}
+	}
+
+	// Josh:
+	// If the whole string was garbage characters
+	// Let's just not print anything.
+	if ( !*p )
+		return NULL;
+
 	// cut off after 127 chars
 	if ( length > 127 )
 		text[127] = 0;
@@ -213,6 +239,12 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 		// See if the player wants to modify of check the text
 		pPlayer->CheckChatText( p, 127 );	// though the buffer szTemp that p points to is 256, 
 											// chat text is capped to 127 in CheckChatText above
+
+		// make sure the text has valid content
+		p = CheckChatText( pPlayer, p );
+
+		if ( !p )
+			return;
 
 		Assert( pPlayer->GetPlayerName()[0] != '\0' );
 

@@ -3283,6 +3283,12 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 			continue;
 		}
 
+		if ( ( pFixupTable[ i ].numVertexes < 0 ) || ( target + pFixupTable[ i ].numVertexes > numVertexes ) )
+		{
+			Assert( !"Malicious map attempting to write off the end of our fixup verts. Sad face." );
+			Error( "Unable to load corrupted map." );
+		}
+
 		// copy vertexes
 		memcpy(
 			(mstudiovertex_t *)((byte *)pNewVvdHdr+pNewVvdHdr->vertexDataStart) + target,
