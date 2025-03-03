@@ -229,9 +229,23 @@ enum CastVote
 //Since this is decided by the gamerules (and it can be whatever number as long as its less than MAX_PLAYERS).
 #if defined( CSTRIKE_DLL )
 	#define MAX_PLAYERS				65  // Absolute max players supported
+#elif defined( TF_DLL ) || defined ( TF_CLIENT_DLL ) || defined( HL2MP )
+	#define MAX_PLAYERS				101
 #else
 	#define MAX_PLAYERS				33  // Absolute max players supported
 #endif
+
+// Josh: Accounts for code that may index this array by an entindex
+// of player rather than the player index... :s
+#define MAX_PLAYERS_ARRAY_SAFE		( MAX_PLAYERS + 1 )
+
+inline bool IsIndexIntoPlayerArrayValid( int iIndex )
+{
+	if ( iIndex < 0 || iIndex >= MAX_PLAYERS_ARRAY_SAFE )
+		return false;
+		
+	return true;
+}
 
 #define MAX_PLACE_NAME_LENGTH		18
 
@@ -251,6 +265,8 @@ enum CastVote
 
 #define MAX_TEAMS				32	// Max number of teams in a game
 #define MAX_TEAM_NAME_LENGTH	32	// Max length of a team's name
+
+#define MAX_TEAMS_ARRAY_SAFE 	MAX_TEAMS
 
 // Weapon m_iState
 #define WEAPON_IS_ONTARGET				0x40

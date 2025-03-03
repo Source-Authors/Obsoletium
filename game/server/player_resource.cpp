@@ -29,15 +29,15 @@ END_SEND_TABLE()
 
 BEGIN_DATADESC( CPlayerResource )
 
-	// DEFINE_ARRAY( m_iPing, FIELD_INTEGER, MAX_PLAYERS+1 ),
-	// DEFINE_ARRAY( m_iPacketloss, FIELD_INTEGER, MAX_PLAYERS+1 ),
-	// DEFINE_ARRAY( m_iScore, FIELD_INTEGER, MAX_PLAYERS+1 ),
-	// DEFINE_ARRAY( m_iDeaths, FIELD_INTEGER, MAX_PLAYERS+1 ),
-	// DEFINE_ARRAY( m_bConnected, FIELD_INTEGER, MAX_PLAYERS+1 ),
+	// DEFINE_ARRAY( m_iPing, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
+	// DEFINE_ARRAY( m_iPacketloss, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
+	// DEFINE_ARRAY( m_iScore, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
+	// DEFINE_ARRAY( m_iDeaths, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
+	// DEFINE_ARRAY( m_bConnected, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
 	// DEFINE_FIELD( m_flNextPingUpdate, FIELD_FLOAT ),
-	// DEFINE_ARRAY( m_iTeam, FIELD_INTEGER, MAX_PLAYERS+1 ),
-	// DEFINE_ARRAY( m_bAlive, FIELD_INTEGER, MAX_PLAYERS+1 ),
-	// DEFINE_ARRAY( m_iHealth, FIELD_INTEGER, MAX_PLAYERS+1 ),
+	// DEFINE_ARRAY( m_iTeam, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
+	// DEFINE_ARRAY( m_bAlive, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
+	// DEFINE_ARRAY( m_iHealth, FIELD_INTEGER, MAX_PLAYERS_ARRAY_SAFE ),
 	// DEFINE_FIELD( m_nUpdateCounter, FIELD_INTEGER ),
 
 	// Function Pointers
@@ -54,7 +54,7 @@ CPlayerResource *g_pPlayerResource;
 //-----------------------------------------------------------------------------
 void CPlayerResource::Spawn( void )
 {
-	for ( int i=0; i < MAX_PLAYERS+1; i++ )
+	for ( int i=0; i < MAX_PLAYERS_ARRAY_SAFE; i++ )
 	{
 		Init( i );
 	}
