@@ -315,10 +315,8 @@ void CommentarySystem_PePlayerRunCommand( CBasePlayer *player, CUserCmd *ucmd );
 //-----------------------------------------------------------------------------
 void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *moveHelper )
 {
-	const float playerCurTime = player->m_nTickBase * TICK_INTERVAL; 
-	const float playerFrameTime = player->m_bGamePaused ? 0 : TICK_INTERVAL;
-	const float flTimeAllowedForProcessing = player->ConsumeMovementTimeForUserCmdProcessing( playerFrameTime );
-	if ( !player->IsBot() && ( flTimeAllowedForProcessing < playerFrameTime ) )
+	const int nTicksAllowedForProcessing = player->ConsumeMovementTicksForUserCmdProcessing( 1 );
+	if ( !player->IsBot() && !player->IsHLTV() && ( nTicksAllowedForProcessing < 1 ) )
 	{
 		// Make sure that the activity in command is erased because player cheated or dropped too many packets
 		double dblWarningFrequencyThrottle = sv_maxusrcmdprocessticks_warning.GetFloat();
@@ -329,11 +327,14 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 			if ( !s_dblLastWarningTime || ( dblTimeNow - s_dblLastWarningTime >= dblWarningFrequencyThrottle ) )
 			{
 				s_dblLastWarningTime = dblTimeNow;
-				Warning( "sv_maxusrcmdprocessticks_warning at server tick %u: Ignored client %s usrcmd (%.6f < %.6f)!\n", gpGlobals->tickcount, player->GetPlayerName(), flTimeAllowedForProcessing, playerFrameTime );
+				Warning( "sv_maxusrcmdprocessticks_warning at server tick %u: Ignored client %s usrcmd (more commands than available movement ticks)!\n", gpGlobals->tickcount, player->GetPlayerName() );
 			}
 		}
 		return; // Don't process this command
 	}
+
+	const float playerCurTime = player->m_nTickBase * TICK_INTERVAL;
+	const float playerFrameTime = TICK_INTERVAL;
 
 	StartCommand( player, ucmd );
 

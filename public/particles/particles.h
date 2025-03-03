@@ -390,6 +390,7 @@ public:
 	// Cache/uncache materials used by particle systems
 	void PrecacheParticleSystem( const char *pName );
 	void UncacheAllParticleSystems();
+	void RecreateDictionary() { Assert(0); }; // ToDo!
 
 	// Sets the last simulation time, used for particle system sleeping logic
 	void SetLastSimulationTime( float flTime );

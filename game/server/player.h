@@ -315,6 +315,9 @@ public:
 	// Forces processing of usercmds (e.g., even if game is paused, etc.)
 	void					ForceSimulation();
 
+	// Process new user settings from the engine
+	void					ClientSettingsChanged();
+
 	unsigned int	PhysicsSolidMaskForEntity( void ) const override;
 
 	virtual void			PreThink( void );
@@ -783,31 +786,31 @@ public:
 	uint64		GetSteamIDAsUInt64( void );
 #endif
 
-	float GetRemainingMovementTimeForUserCmdProcessing() const { return m_flMovementTimeForUserCmdProcessingRemaining; }
+	float GetRemainingMovementTimeForUserCmdProcessing() const { return m_nMovementTicksForUserCmdProcessingRemaining; }
 	float ConsumeMovementTimeForUserCmdProcessing( float flTimeNeeded )
 	{
-		if ( m_flMovementTimeForUserCmdProcessingRemaining <= 0.0f )
+		if ( m_nMovementTicksForUserCmdProcessingRemaining <= 0.0f )
 		{
 			return 0.0f;
 		}
-		else if ( flTimeNeeded > m_flMovementTimeForUserCmdProcessingRemaining + FLT_EPSILON )
+		else if ( flTimeNeeded > m_nMovementTicksForUserCmdProcessingRemaining + FLT_EPSILON )
 		{
-			float flResult = m_flMovementTimeForUserCmdProcessingRemaining;
-			m_flMovementTimeForUserCmdProcessingRemaining = 0.0f;
+			float flResult = m_nMovementTicksForUserCmdProcessingRemaining;
+			m_nMovementTicksForUserCmdProcessingRemaining = 0.0f;
 			return flResult;
 		}
 		else
 		{
-			m_flMovementTimeForUserCmdProcessingRemaining -= flTimeNeeded;
-			if ( m_flMovementTimeForUserCmdProcessingRemaining < 0.0f )
-				m_flMovementTimeForUserCmdProcessingRemaining = 0.0f;
+			m_nMovementTicksForUserCmdProcessingRemaining -= flTimeNeeded;
+			if ( m_nMovementTicksForUserCmdProcessingRemaining < 0.0f )
+				m_nMovementTicksForUserCmdProcessingRemaining = 0.0f;
 			return flTimeNeeded;
 		}
 	}
 
 private:
 	// How much of a movement time buffer can we process from this user?
-	float				m_flMovementTimeForUserCmdProcessingRemaining;
+	float				m_nMovementTicksForUserCmdProcessingRemaining;
 
 	// For queueing up CUserCmds and running them from PhysicsSimulate
 	int					GetCommandContextCount( void ) const;
@@ -881,6 +884,7 @@ public:
 	float					m_fLerpTime;		// users cl_interp
 	bool					m_bLagCompensation;	// user wants lag compenstation
 	bool					m_bPredictWeapons; //  user has client side predicted weapons
+	bool					m_bRequestPredict; //  user has client prediction enabled
 	
 	float		GetDeathTime( void ) { return m_flDeathTime; }
 

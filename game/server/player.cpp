@@ -596,6 +596,7 @@ CBasePlayer::CBasePlayer( )
 	m_nUpdateRate = 20;  // cl_updaterate defualt
 	m_fLerpTime = 0.1f; // cl_interp default
 	m_bPredictWeapons = true;
+	m_bRequestPredict = true;
 	m_bLagCompensation = false;
 	m_flLaggedMovementValue = 1.0f;
 	m_StuckLast = 0;
@@ -636,7 +637,7 @@ CBasePlayer::CBasePlayer( )
 	m_vecConstraintCenter = vec3_origin;
 
 	m_flLastUserCommandTime = 0.f;
-	m_flMovementTimeForUserCmdProcessingRemaining = 0.0f;
+	m_nMovementTicksForUserCmdProcessingRemaining = 0;
 
 	m_flLastObjectiveTime = -1.f;
 }
@@ -3072,6 +3073,16 @@ int CBasePlayer::DetermineSimulationTicks( void )
 		simulation_ticks += ctx->numcmds + ctx->dropped_packets;
 	}
 
+	// Only allow rewinding if we actually behind by at least that many ticks.
+	// This doesn't quite guarantee that m_nTickBase is monotonically increasing, but it gets close and prevents users
+	// from manipulating the game time by more than 0.25s.
+	//
+	// REI- Ideally I'd like to put more serious restrictions on user command timing here, to lockstep the clients
+	// a bit harder and prevent even this 0.25s manipulation, but my experiments so far led to unacceptable hitching
+	// even for legitimate users.
+	if ( simulation_ticks > m_nMovementTicksForUserCmdProcessingRemaining )
+		simulation_ticks = m_nMovementTicksForUserCmdProcessingRemaining;
+
 	return simulation_ticks;
 }
 
@@ -3208,6 +3219,9 @@ void CBasePlayer::PhysicsSimulate( void )
 	
 	m_nSimulationTick = gpGlobals->tickcount;
 
+	// Grant the client some time buffer to execute user commands
+	m_nMovementTicksForUserCmdProcessingRemaining++;
+
 	// See how many CUserCmds are queued up for running
 	int simulation_ticks = DetermineSimulationTicks();
 
@@ -3314,6 +3328,15 @@ void CBasePlayer::PhysicsSimulate( void )
 
 	float vphysicsArrivalTime = TICK_INTERVAL;
 
+	// Now run the commands
+	MoveHelperServer()->SetHost( this );
+
+	// Suppress predicted events, etc.
+	if ( IsPredictingWeapons() )
+	{
+		IPredictionSystem::SuppressHostEvents( this );
+	}
+
 #ifdef _DEBUG
 	if ( sv_player_net_suppress_usercommands.GetBool() )
 	{
@@ -3321,39 +3344,14 @@ void CBasePlayer::PhysicsSimulate( void )
 	}
 #endif // _DEBUG
 
-	int numUsrCmdProcessTicksMax = sv_maxusrcmdprocessticks.GetInt();
-	if ( gpGlobals->maxClients != 1 && numUsrCmdProcessTicksMax ) // don't apply this filter in SP games
-	{
-		// Grant the client some time buffer to execute user commands
-		m_flMovementTimeForUserCmdProcessingRemaining += TICK_INTERVAL;
-
-		// but never accumulate more than N ticks
-		if ( m_flMovementTimeForUserCmdProcessingRemaining > numUsrCmdProcessTicksMax * TICK_INTERVAL )
-			m_flMovementTimeForUserCmdProcessingRemaining = numUsrCmdProcessTicksMax * TICK_INTERVAL;
-	}
-	else
-	{
-		// Otherwise we don't care to track time
-		m_flMovementTimeForUserCmdProcessingRemaining = FLT_MAX;
-	}
-
-	// Now run the commands
+	// Process user commands
 	if ( commandsToRun > 0 )
 	{
-		m_flLastUserCommandTime = savetime;
-
-		MoveHelperServer()->SetHost( this );
-
-		// Suppress predicted events, etc.
-		if ( IsPredictingWeapons() )
-		{
-			IPredictionSystem::SuppressHostEvents( this );
-		}
-
 		for ( int i = 0; i < commandsToRun; ++i )
 		{
 			PlayerRunCommand( &vecAvailCommands[ i ], MoveHelperServer() );
-
+			m_flLastUserCommandTime = savetime;
+		
 			// Update our vphysics object.
 			if ( m_pPhysicsController )
 			{
@@ -3363,28 +3361,64 @@ void CBasePlayer::PhysicsSimulate( void )
 				vphysicsArrivalTime += TICK_INTERVAL;
 			}
 		}
-
-		// Always reset after running commands
-		IPredictionSystem::SuppressHostEvents( NULL );
-
-		MoveHelperServer()->SetHost( NULL );
-
-		// Copy in final origin from simulation
-		CPlayerSimInfo *pi = NULL;
-		if ( m_vecPlayerSimInfo.Count() > 0 )
-		{
-			pi = &m_vecPlayerSimInfo[ m_vecPlayerSimInfo.Tail() ];
-			pi->m_flTime = Plat_FloatTime();
-			pi->m_vecAbsOrigin = GetAbsOrigin();
-			pi->m_flGameSimulationTime = gpGlobals->curtime;
-			pi->m_nNumCmds = commandsToRun;
-		}
 	}
 	else if ( GetTimeSinceLastUserCommand() > sv_player_usercommand_timeout.GetFloat() )
 	{
 		// no usercommand from player after some threshold
 		// server should start RunNullCommand as if client sends an empty command so that Think and gamestate related things run properly
 		RunNullCommand();
+	}
+
+	int nMaxTicks = sv_maxusrcmdprocessticks.GetInt();
+	if ( nMaxTicks && gpGlobals->maxClients != 1 ) // Don't apply this filter in SP games
+	{
+		if ( m_nMovementTicksForUserCmdProcessingRemaining > nMaxTicks )
+		{
+			//DevMsg( "Client %s dropped too many packets, simulating last cmd\n", m_szNetname );
+			
+			// Run a copy of the user's last command
+			// but make sure it's valid
+			CUserCmd cmd = m_LastCmd;
+			cmd.tick_count = gpGlobals->tickcount;
+			cmd.viewangles = EyeAngles();
+			pl.fixangle = FIXANGLE_NONE; // this forces use of cmd.viewangles directly, not as a relative value
+			PlayerRunCommand( &cmd, MoveHelperServer() );
+
+			if ( m_nMovementTicksForUserCmdProcessingRemaining > nMaxTicks )
+			{
+				// If this happens the user managed to execute a 'null' command that didn't make it through simulation.
+				// This means we should adjust the code above to make sure it always generates a valid command.
+				//Assert( false ); // security failure, airstuck!
+
+				// still make sure to avoid speedhax
+				m_nMovementTicksForUserCmdProcessingRemaining = nMaxTicks;
+			}
+			
+			// Update our vphysics object.
+			if ( m_pPhysicsController )
+			{
+				VPROF( "CBasePlayer::PhysicsSimulate-UpdateVPhysicsPosition" );
+				// If simulating at 2 * TICK_INTERVAL, add an extra TICK_INTERVAL to position arrival computation
+				UpdateVPhysicsPosition( m_vNewVPhysicsPosition, m_vNewVPhysicsVelocity, vphysicsArrivalTime );
+				vphysicsArrivalTime += TICK_INTERVAL;
+			}
+		}
+	}
+
+	// Always reset after running commands
+	IPredictionSystem::SuppressHostEvents( NULL );
+
+	MoveHelperServer()->SetHost( NULL );
+
+	// Copy in final origin from simulation
+	CPlayerSimInfo *pi = NULL;
+	if ( m_vecPlayerSimInfo.Count() > 0 )
+	{
+		pi = &m_vecPlayerSimInfo[ m_vecPlayerSimInfo.Tail() ];
+		pi->m_flTime = Plat_FloatTime();
+		pi->m_vecAbsOrigin = GetAbsOrigin();
+		pi->m_flGameSimulationTime = gpGlobals->curtime;
+		pi->m_nNumCmds = commandsToRun;
 	}
 
 	// Restore the true server clock
@@ -6517,7 +6551,17 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			angle.y = strtof( args[5], nullptr );
 			angle.z = 0.0f;
 
-			JumptoPosition( origin, angle );
+			// If the player jumps outside world extents it will hangs the server
+			CWorld *world = GetWorldEntity();
+			if ( world )
+			{
+				Extent worldExtent;
+				world->GetWorldBounds( worldExtent.lo, worldExtent.hi );
+				VectorMax( origin, worldExtent.lo, origin );
+				VectorMin( origin, worldExtent.hi, origin );
+
+				JumptoPosition( origin, angle );
+			}
 		}
 		
 		return true;

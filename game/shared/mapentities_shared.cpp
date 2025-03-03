@@ -175,6 +175,11 @@ skipwhite:
 	{
 		newToken[len] = c;
 		len++;
+
+		if ( len >= MAPKEY_MAXLENGTH )
+		{
+			len--;
+		}
 		newToken[len] = 0;
 		return data+1;
 	}
@@ -185,9 +190,6 @@ skipwhite:
 		newToken[len] = c;
 		data++;
 		len++;
-		c = *data;
-		if ( s_BraceCharacters[c] /*c=='{' || c=='}'|| c==')'|| c=='(' || c=='\''*/ )
-			break;
 
 		if ( len >= MAPKEY_MAXLENGTH )
 		{
@@ -195,8 +197,16 @@ skipwhite:
 			newToken[len] = 0;
 		}
 
+		c = *data;
+		if ( s_BraceCharacters[c] /*c=='{' || c=='}'|| c==')'|| c=='(' || c=='\''*/ )
+			break;
+
 	} while (c>32);
 	
+	if ( len >= MAPKEY_MAXLENGTH )
+	{
+		len--;
+	}
 	newToken[len] = 0;
 	return data;
 }
