@@ -54,6 +54,7 @@ typedef void *HDC;
 #include "tier0/etwprof.h"
 #include "xbox/xboxstubs.h"
 #include "video/ivideoservices.h"
+#include "bitmap/float_bm.h"
 #if !defined(NO_STEAM)
 #include "cl_steamauth.h"
 #endif
@@ -69,22 +70,6 @@ void ClientDLL_HudVidInit( void );
 ConVar cl_savescreenshotstosteam( "cl_savescreenshotstosteam", "0", FCVAR_HIDDEN, "Saves screenshots to the Steam's screenshot library" );
 ConVar cl_screenshotusertag( "cl_screenshotusertag", "", FCVAR_HIDDEN, "User to tag in the screenshot" );
 ConVar cl_screenshotlocation( "cl_screenshotlocation", "", FCVAR_HIDDEN, "Location to tag the screenshot with" );
-
-//-----------------------------------------------------------------------------
-// HDRFIXME: move this somewhere else.
-//-----------------------------------------------------------------------------
-static void PFMWrite( float *pFloatImage, const char *pFilename, int width, int height )
-{
-    FileHandle_t fp = g_pFileSystem->Open( pFilename, "wb" );
-    g_pFileSystem->FPrintf( fp, "PF\n%d %d\n-1.000000\n", width, height );
-    int i;
-    for( i = height-1; i >= 0; i-- )
-    {
-        float *pRow = &pFloatImage[3 * width * i];
-        g_pFileSystem->Write( pRow, width * sizeof( float ) * 3, fp );
-    }
-    g_pFileSystem->Close( fp );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Functionality shared by all video modes
@@ -1778,7 +1763,10 @@ void CVideoMode_Common::TakeSnapshotPFMRect( const char *pFilename, int x, int y
         Sys_Error( "Can't resample\n" );
     }
 
-    PFMWrite( pFloatImage, pFilename, resampleWidth, resampleHeight );
+    if ( !PFMWrite( g_pFullFileSystem, pFloatImage, pFilename, resampleWidth, resampleHeight ) )
+    {
+        Warning( "Unable to write %dx%d PFM to '%s'.\n", resampleWidth, resampleHeight, pFilename );
+    }
 
     free( pImage1 );
     free( pImage );

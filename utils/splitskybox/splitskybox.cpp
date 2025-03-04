@@ -9,6 +9,8 @@
 #include "filesystem_tools.h"
 #include "cmdlib.h"
 
+#include "bitmap/float_bm.h"
+
 #include "tier1/utlbuffer.h"
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
@@ -50,27 +52,29 @@ bool LoadFile(const char *file_path, CUtlBuffer &buf) {
 
   int64_t size;
   std::tie(size, errc) = f.size();
-  if (errc) {
+  if (errc || size > std::numeric_limits<intp>::max()) {
     Warning("Unable to get size of '%s': %s.\n", file_path,
             errc.message().c_str());
     return false;
   }
 
-  buf.EnsureCapacity(size);
+  const intp correct_size{static_cast<intp>(size)};
+  buf.EnsureCapacity(correct_size);
 
-  std::tie(std::ignore, errc) = f.read(buf.Base(), size, 1, size);
+  std::tie(std::ignore, errc) =
+      f.read(buf.Base(), correct_size, 1, correct_size);
   if (errc) {
     Warning("Unable to read '%s': %s.\n", file_path, errc.message().c_str());
     return false;
   }
 
-  buf.SeekPut(CUtlBuffer::SEEK_HEAD, size);
+  buf.SeekPut(CUtlBuffer::SEEK_HEAD, correct_size);
 
   return true;
 }
 
-bool PFMRead(const char *file_path, CUtlBuffer &fileBuffer, int &nWidth,
-             int &nHeight, float **ppImage) {
+[[nodiscard]] bool PFMRead(const char *file_path, CUtlBuffer &fileBuffer,
+                           int &nWidth, int &nHeight, float **ppImage) {
   fileBuffer.SeekGet(CUtlBuffer::SEEK_HEAD, 0);
   if (fileBuffer.GetChar() != 'P' || fileBuffer.GetChar() != 'F' ||
       fileBuffer.GetChar() != 0xa) {
@@ -94,41 +98,12 @@ bool PFMRead(const char *file_path, CUtlBuffer &fileBuffer, int &nWidth,
   return true;
 }
 
-bool PFMWrite(float *img, const char *file_path, int width, int height) {
-  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "wb");
-  if (errc) {
-    Warning("Unable to open '%s' for writing: %s.\n", file_path,
-            errc.message().c_str());
-    return false;
-  }
-
-  std::tie(std::ignore, errc) =
-      f.print("PF\n%d %d\n-1.000000\n", width, height);
-  if (errc) {
-    Warning("Unable to write header to '%s': %s.\n", file_path,
-            errc.message().c_str());
-    return false;
-  }
-
-  for (int i = height - 1; i >= 0; i--) {
-    float *row = &img[3 * width * i];
-
-    std::tie(std::ignore, errc) = f.write(row, width * sizeof(float) * 3, 1);
-    if (errc) {
-      Warning("Unable to write row to '%s': %s.\n", file_path,
-              errc.message().c_str());
-      return false;
-    }
-  }
-
-  return true;
-}
-
-void WriteSubRect(int src_width, int src_height, const float *src_image,
-                  int src_offset_x, int src_offset_y, int dst_width,
-                  int dst_height, const char *src_file_name,
-                  const char *dst_file_extension,
-                  std::unique_ptr<float[]> &dst_image) {
+[[nodiscard]] bool WriteSubRect(int src_width, int src_height,
+                                const float *src_image, int src_offset_x,
+                                int src_offset_y, int dst_width, int dst_height,
+                                const char *src_file_name,
+                                const char *dst_file_extension,
+                                std::unique_ptr<float[]> &dst_image) {
   for (int y = 0; y < dst_height; y++) {
     for (int x = 0; x < dst_width; x++) {
       const intp src_offset =
@@ -145,11 +120,16 @@ void WriteSubRect(int src_width, int src_height, const float *src_image,
 
   char dstFileName[MAX_PATH];
   V_strcpy_safe(dstFileName, src_file_name);
-  V_StripExtension(src_file_name, dstFileName, ssize(dstFileName));
+  V_StripExtension(src_file_name, dstFileName);
   V_strcat_safe(dstFileName, dst_file_extension);
   V_strcat_safe(dstFileName, ".pfm");
 
-  PFMWrite(dst_image.get(), dstFileName, dst_width, dst_height);
+  if (!PFMWrite(dst_image.get(), dstFileName, dst_width, dst_height)) {
+    Warning("Unable to write PFM to '%s'.\n", dstFileName);
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace
@@ -176,12 +156,12 @@ int main(int argc, char **argv) {
   V_strcpy_safe(source, ExpandPath(argv[1]));
 
   CUtlBuffer src_data;
-  if (!LoadFile(argv[1], src_data)) return 2;
+  if (!LoadFile(argv[1], src_data)) return EIO;
 
   float *src_image = nullptr;
   int src_width, src_height;
   if (!PFMRead(argv[1], src_data, src_width, src_height, &src_image)) {
-    return 3;
+    return EIO;
   }
 
   const int dst_width = src_width / 4;
@@ -193,20 +173,36 @@ int main(int argc, char **argv) {
   std::unique_ptr<float[]> dst_image = std::make_unique<float[]>(
       static_cast<size_t>(dst_width) * dst_height * 3);
 
-  WriteSubRect(src_width, src_height, src_image, dst_width * 0, dst_height * 1,
-               dst_width, dst_height, argv[1], "ft", dst_image);
-  WriteSubRect(src_width, src_height, src_image, dst_width * 1, dst_height * 1,
-               dst_width, dst_height, argv[1], "lf", dst_image);
-  WriteSubRect(src_width, src_height, src_image, dst_width * 2, dst_height * 1,
-               dst_width, dst_height, argv[1], "bk", dst_image);
-  WriteSubRect(src_width, src_height, src_image, dst_width * 3, dst_height * 1,
-               dst_width, dst_height, argv[1], "rt", dst_image);
-  WriteSubRect(src_width, src_height, src_image, dst_width * 3, dst_height * 0,
-               dst_width, dst_height, argv[1], "up", dst_image);
-  WriteSubRect(src_width, src_height, src_image, dst_width * 3, dst_height * 2,
-               dst_width, dst_height, argv[1], "dn", dst_image);
-
-  CmdLib_Cleanup();
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 0,
+                    dst_height * 1, dst_width, dst_height, argv[1], "ft",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 1,
+                    dst_height * 1, dst_width, dst_height, argv[1], "lf",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 2,
+                    dst_height * 1, dst_width, dst_height, argv[1], "bk",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 3,
+                    dst_height * 1, dst_width, dst_height, argv[1], "rt",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 3,
+                    dst_height * 0, dst_width, dst_height, argv[1], "up",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 3,
+                    dst_height * 2, dst_width, dst_height, argv[1], "dn",
+                    dst_image)) {
+    return EIO;
+  }
 
   return 0;
 }

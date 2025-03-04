@@ -65,7 +65,14 @@ constexpr int SSBUMP_OPTION_NONDIRECTIONAL{1};
 // in.
 constexpr int SSBUMP_MOD2X_DETAIL_TEXTURE{2};
 
+abstract_class IFileSystem;
 
+// Writes PFM using filesystem.
+[[nodiscard]] bool PFMWrite(IFileSystem *file_system,
+                            float *img, const char *file_path, int width, int height);
+
+// Writes PFM using stdio.
+[[nodiscard]] bool PFMWrite(float *img, const char *file_path, int width, int height);
 
 class FloatBitMap_t 
 {

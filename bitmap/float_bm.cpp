@@ -22,6 +22,7 @@
 #include "filesystem.h"
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
+#include "posix_file_stream.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -44,6 +45,65 @@ constexpr static inline float BiLinInterp(float Xfrac, float Yfrac, float UL, fl
 	return( LinInterp(Yfrac, iu, il) );
 }
 
+[[nodiscard]] bool PFMWrite(IFileSystem* file_system, float* img,
+							const char* file_path, int width, int height) {
+  FileHandle_t f = file_system->Open(file_path, "wb");
+  if (!f) {
+    Warning("Unable to open PFM '%s' for writing.\n", file_path);
+    return false;
+  }
+
+  if (!file_system->FPrintf(f, "PF\n%d %d\n-1.000000\n", width, height)) {
+    file_system->Close(f);
+    Warning("Unable to write PFM header to '%s'.\n", file_path);
+    return false;
+  }
+
+  for (int i = height - 1; i >= 0; i--) {
+    const float *row = &img[3 * width * i];
+
+    if (!file_system->Write(row, width * sizeof(float) * 3, f)) {
+      file_system->Close(f);
+      Warning("Unable to write PFM row #%d to '%s'.\n", height - i,
+              file_path);
+      return false;
+    }
+  }
+
+  file_system->Close(f);
+  return true;
+}
+
+[[nodiscard]] bool PFMWrite(float *img, const char *file_path, int width, int height) {
+  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "wb");
+  if (errc) {
+    Warning("Unable to open PFM '%s' for writing: %s.\n", file_path,
+            errc.message().c_str());
+    return false;
+  }
+
+  std::tie(std::ignore, errc) =
+      f.print("PF\n%d %d\n-1.000000\n", width, height);
+  if (errc) {
+    Warning("Unable to write PFM header to '%s': %s.\n", file_path,
+            errc.message().c_str());
+    return false;
+  }
+
+  for (int i = height - 1; i >= 0; i--) {
+    const float *row = &img[3 * width * i];
+
+    std::tie(std::ignore, errc) = f.write(row, width * sizeof(float) * 3, 1);
+    if (errc) {
+      Warning("Unable to write PFM row #%d to '%s': %s.\n", height - i,
+			  file_path, errc.message().c_str());
+      return false;
+    }
+  }
+
+  return true;
+}
+
 FloatBitMap_t::FloatBitMap_t(int width, int height) : FloatBitMap_t{}
 {
 	RGBAData = AllocateRGB(width,height);
@@ -55,25 +115,26 @@ FloatBitMap_t::FloatBitMap_t(FloatBitMap_t const *orig) : FloatBitMap_t{}
 	if (RGBAData) memcpy(RGBAData, orig->RGBAData, orig->Width * orig->Height * sizeof(float) * 4);
 }
 
-static char GetChar(FileHandle_t &f)
+static char GetChar(IFileSystem *file_system, FileHandle_t &f)
 {
 	char a;
-	g_pFullFileSystem->Read(&a,1,f);
+	file_system->Read(&a,1,f);
 	return a;
 }
 
-static int GetInt(FileHandle_t &f)
+static int GetInt(IFileSystem *file_system, FileHandle_t &f)
 {
-	char buf[100];
+	char buf[16];
+	intp i = ssize(buf) - 1;
 	char *bout=buf;
-	for(;;)
+	while(i--)
 	{
-		char c=GetChar(f);
+		char c=GetChar(file_system, f);
 		if ((c<'0') || (c>'9'))
 			break;
 		*(bout++)=c;
 	}
-	*(bout++)=0;
+	*(bout++)='\0';
 	return atoi(buf);
 
 }
@@ -83,12 +144,12 @@ bool FloatBitMap_t::LoadFromPFM(char const *fname)
 	FileHandle_t f = g_pFullFileSystem->Open(fname, "rb");
 	if (f)
 	{
-		if( GetChar(f) == 'P' &&
-			GetChar(f) == 'F' &&
-			GetChar(f) == '\n' )
+		if( GetChar(g_pFullFileSystem, f) == 'P' &&
+			GetChar(g_pFullFileSystem, f) == 'F' &&
+			GetChar(g_pFullFileSystem, f) == '\n' )
 		{
-			Width = GetInt(f);
-			Height = GetInt(f);
+			Width = GetInt(g_pFullFileSystem, f);
+			Height = GetInt(g_pFullFileSystem, f);
 
 			// dimhotepus: Protect from overflow as input is untrusted.
 			constexpr int kMaxDimension = std::numeric_limits<int>::max() /
@@ -102,7 +163,7 @@ bool FloatBitMap_t::LoadFromPFM(char const *fname)
 			}
 
 			// eat crap until the next newline
-			while( GetChar(f) != '\n')
+			while( GetChar(g_pFullFileSystem, f) != '\n')
 			{
 			}
 			
@@ -142,47 +203,29 @@ bool FloatBitMap_t::LoadFromPFM(char const *fname)
 
 bool FloatBitMap_t::WritePFM(char const *fname) const
 {
-	FileHandle_t f = g_pFullFileSystem->Open(fname, "wb");
-	if ( f )
+	// dimhotepus: Handle OOM.
+	std::unique_ptr<float[]> data =
+		std::make_unique<float[]>( static_cast<size_t>(4) * Width * Height );
+	if ( !data )
 	{
-		// dimhotepus: Protect from overflow.
-		constexpr int kMaxDimension = std::numeric_limits<int>::max() /
-			( static_cast<int>( sizeof(float) ) * 3 );
-		if ( Width < 0 || Width > kMaxDimension ||
-			 Height < 0 || Height > kMaxDimension )
-		{
-			fprintf(stderr, "'%s': width (%d) and height (%d) should be in range [0...%d].\n",
-				fname, Width, Height, kMaxDimension );
-			return false;
-		}
-		
-		// dimhotepus: Handle OOM.
-		std::unique_ptr<float[]> linebuffer = std::make_unique<float[]>( Width * 3 );
-		if ( !linebuffer )
-		{
-			fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
-				fname, sizeof(float) * Width * 3 );
-			return false;
-		}
-
-		g_pFullFileSystem->FPrintf(f, "PF\n%d %d\n-1.000000\n", Width, Height);
-		for( int y = Height-1; y >= 0; y-- )
-		{
-			for (int x = 0; x < Width; x++)
-			{
-				for (int c = 0; c < 3; c++)
-				{
-					linebuffer[x*3 + c] = Pixel(x,y,c);
-				}
-			}
-			g_pFullFileSystem->Write(linebuffer.get(), 3*Width*sizeof(float), f);
-		}
-		g_pFullFileSystem->Close(f);
-
-		return true;
+		fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
+			fname, static_cast<size_t>(4) * Width * Height );
+		return false;
 	}
 
-	return false;
+	for( int y = 0; y < Height; y++ )
+	{
+		const intp base = static_cast<intp>(y) * Width * 3;
+		for ( int x = 0; x < Width; x++ )
+		{
+			for ( int c = 0; c < 3; c++ )
+			{
+				data[base + x * 3 + c] = Pixel(x, y, c);
+			}
+		}
+	}
+
+	return PFMWrite( g_pFullFileSystem, data.get(), fname, Width, Height );
 }
 
 

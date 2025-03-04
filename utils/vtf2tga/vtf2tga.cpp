@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "mathlib/mathlib.h"
+#include "bitmap/float_bm.h"
 #include "bitmap/tgawriter.h"
 #include "vtf/vtf.h"
 
@@ -26,39 +27,9 @@
 #include "../common/tools_minidump.h"
 #include "posix_file_stream.h"
 
+#include "tier0/memdbgon.h"
+
 namespace {
-
-// HDRFIXME: move this somewhere else.
-bool PFMWrite(float *img, const char *file_path, int width, int height) {
-  // dimhotepus: Use RAII FILE wrapper.
-  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "wb");
-  if (errc) {
-    Warning("Unable to open '%s' for writing: %s.\n", file_path,
-            errc.message().c_str());
-    return false;
-  }
-
-  std::tie(std::ignore, errc) =
-      f.print("PF\n%d %d\n-1.000000\n", width, height);
-  if (errc) {
-    Warning("Unable to write header to '%s': %s.\n", file_path,
-            errc.message().c_str());
-    return false;
-  }
-
-  for (int i = height - 1; i >= 0; i--) {
-    float *row = &img[3 * width * i];
-
-    std::tie(std::ignore, errc) = f.write(row, width * sizeof(float) * 3, 1);
-    if (errc) {
-      Warning("Unable to write row to '%s': %s.\n", file_path,
-              errc.message().c_str());
-      return false;
-    }
-  }
-
-  return true;
-}
 
 SpewRetval_t VTF2TGAOutputFunc(SpewType_t spewType, char const *pMsg) {
   if (spewType == SPEW_ERROR || spewType == SPEW_WARNING) {
@@ -117,7 +88,7 @@ int main(int argc, char **argv) {
   Q_FixSlashes(buffer);
 
   char out_file_base[MAX_PATH];
-  Q_StripExtension(buffer, out_file_base, MAX_PATH);
+  Q_StripExtension(buffer, out_file_base);
 
   char actual_vtf_file_name[MAX_PATH];
   V_strcpy_safe(actual_vtf_file_name, vtf_file_name);

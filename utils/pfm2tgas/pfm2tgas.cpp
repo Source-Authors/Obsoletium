@@ -10,6 +10,8 @@
 
 #include "tools_minidump.h"
 
+#include "tier0/memdbgon.h"
+
 namespace {
 
 [[nodiscard]] constexpr inline float Normalize2Byte(float f) {
@@ -33,14 +35,14 @@ int main(int argc, char **argv) {
   const ScopedCommandLineProgram scoped_command_line_program(argc, argv);
 
   if (argc != 3) {
-    fprintf(stderr, "Usage: pfm2tgas xxx.pfm scalefactor'\n");
+    fprintf(stderr, "Usage: pfm2tgas xxx.pfm scalefactor\n");
     return EINVAL;
   }
 
   char *end{nullptr};
   const float scale_factor{strtof(argv[2], &end)};
   if (*end != '\0') {
-    fprintf(stderr, "Usage: pfm2tgas xxx.pfm <float scalefactor>'\n");
+    fprintf(stderr, "Usage: pfm2tgas xxx.pfm <float scalefactor>\n");
     return EINVAL;
   }
 

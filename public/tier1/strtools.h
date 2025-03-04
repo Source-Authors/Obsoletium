@@ -720,6 +720,12 @@ void V_StripSurroundingQuotes( char *ppline );
 
 // Remove any extension from in and return resulting string in out
 void V_StripExtension( const char *in, char *out, ptrdiff_t outLen );
+template<ptrdiff_t outSize>
+void V_StripExtension( const char *in, char (&out)[outSize] )
+{
+	return V_StripExtension( in, out, outSize );
+}
+
 // Make path end with extension if it doesn't already have an extension
 void V_DefaultExtension( char *path, const char *extension, ptrdiff_t pathStringLength );
 // Strips any current extension from path and ensures that extension is the new extension
