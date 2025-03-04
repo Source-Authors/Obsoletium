@@ -202,6 +202,8 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 	float bump_scale, int nrays_to_trace_per_pixel, 
 	uint32 nOptionFlags ) const
 {
+	FloatBitMap_t * ret = new FloatBitMap_t( Width, Height );
+	if (!ret) return nullptr;
 
 	// first, add all the triangles from the height map to the "world".
 	// we will make multiple copies to handle wrapping
@@ -269,9 +271,6 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 
 	// note that there is no reason inter-bounced lighting could not be folded into this
 	// calculation.
-
-	FloatBitMap_t * ret = new FloatBitMap_t( Width, Height );
-
 
 	Vector *trace_directions=new Vector[nrays_to_trace_per_pixel];
 	DirectionalSampler_t my_sphere_sampler;
@@ -344,6 +343,8 @@ FloatBitMap_t *FloatBitMap_t::ComputeBumpmapFromHeightInAlphaChannel( float bump
 	Vector *normals;
 	ComputeVertexPositionsAndNormals( bump_scale, &verts, &normals );
 	FloatBitMap_t *ret=new FloatBitMap_t( Width, Height );
+	if (!ret) return nullptr;
+
 	for( int y = 0; y < Height; y++ )
 		for( int x = 0; x < Width; x++ )
 		{

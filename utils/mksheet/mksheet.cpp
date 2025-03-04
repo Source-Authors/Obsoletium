@@ -140,13 +140,13 @@ static Sequence *pCurSequence = NULL;
 static int s_nWidth;
 static int s_nHeight;
 
-static void ApplyMacros(char *in_buf) {
+static void ApplyMacros(char *in_buf, intp buffer_size) {
   CUtlVector<char *> Words;
   V_SplitString(in_buf, " ", Words);
   if ((Words.Count() == 4) && (!stricmp(Words[0], "ga_frame"))) {
     // ga_frame frm1 frm2 n -> frame frm1{r=a},frm1{g=a},frm1{b=a},frm2{a=a} n
-    sprintf(in_buf, "frame %s{r=0},%s{g=a},%s{b=0},%s{a=a} %s", Words[1],
-            Words[1], Words[1], Words[2], Words[3]);
+    V_snprintf(in_buf, buffer_size, "frame %s{r=0},%s{g=a},%s{b=0},%s{a=a} %s",
+               Words[1], Words[1], Words[1], Words[2], Words[3]);
   }
   Words.PurgeAndDeleteElements();
 }
@@ -169,7 +169,7 @@ static void ReadTextControlFile(char const *fname) {
 
     if (in_str[0]) {
       strlwr(in_str);
-      ApplyMacros(in_str);
+      ApplyMacros(in_str, ssize(linebuffer) + linebuffer - in_str);
       CUtlVector<char *> Words;
       V_SplitString(in_str, " ", Words);
       if ((Words.Count() == 1) && (!stricmp(Words[0], "loop"))) {
@@ -370,7 +370,7 @@ bool PackImages_Flat(char const *pFname, int nWidth) {
 
     bool bWritten = cropped_output.WriteTGAFile(pFname);
     if (!bWritten)
-      printf("Error: failed to save TGA \"%s\"!\n", pFname);
+      fprintf(stderr, "Error: failed to save TGA \"%s\"!\n", pFname);
     else
       printf("Ok: successfully saved TGA \"%s\"\n", pFname);
   }
@@ -496,7 +496,7 @@ bool PackImages_Rgb_A(char const *pFname, int nWidth) {
 
     bool bWritten = cropped_output.WriteTGAFile(pFname);
     if (!bWritten)
-      printf("Error: failed to save TGA \"%s\"!\n", pFname);
+      fprintf(stderr, "Error: failed to save TGA \"%s\"!\n", pFname);
     else
       printf("Ok: successfully saved TGA \"%s\"\n", pFname);
   }

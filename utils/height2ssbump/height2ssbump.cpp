@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 //
 // Convert heightmap texture into selfshadow bump map texture.
-// 
+//
 // See https://developer.valvesoftware.com/wiki/$ssbump#Creation
 
 #include "tier0/platform.h"
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   int nCurArg = 1;
 
   bool bNormalOnly = false;
-  float flFilterRadius = 10.0f;
+  int filterRadius = 10;
   bool bWriteFiltered = false;
 
   uint32 nSSBumpFlags = 0;
@@ -67,8 +67,8 @@ int main(int argc, char **argv) {
 
       case 'f':  // filter radius
       {
-        // dimhotepus: atof -> strtof.
-        flFilterRadius = strtof(argv[++nCurArg], nullptr);
+        // dimhotepus: atof -> atoi as radius expected to be int.
+        filterRadius = atoi(argv[++nCurArg]);
       } break;
 
       case 'd':  // detail texture
@@ -100,13 +100,25 @@ int main(int argc, char **argv) {
   argc -= (nCurArg - 1);
   argv += (nCurArg - 1);
 
-  if (argc != 3) {
-    PrintArgSummaryAndExit();
-  }
+  if (argc != 3) PrintArgSummaryAndExit();
+
   ReportProgress("reading src texture", 0, 0);
+
   FloatBitMap_t src_texture(argv[1]);
-  src_texture.TileableBilateralFilter(flFilterRadius, 2.0f / 255.0f);
-  if (bWriteFiltered) src_texture.WriteTGAFile("filtered.tga");
+  if (!src_texture.IsValid()) {
+    fprintf(stderr, "Unable to load '%s'.\n", argv[1]);
+    return EIO;
+  }
+
+  src_texture.TileableBilateralFilter(filterRadius, 2.0f / 255.0f);
+  if (bWriteFiltered) {
+    constexpr char filteredTgaName[]{"filtered.tga"};
+
+    if (!src_texture.WriteTGAFile(filteredTgaName)) {
+      fprintf(stderr, "Unable to write '%s' from '%s'.\n", filteredTgaName,
+              argv[1]);
+    }
+  }
 
   FloatBitMap_t *out;
 
@@ -119,19 +131,27 @@ int main(int argc, char **argv) {
     out = src_texture.ComputeSelfShadowedBumpmapFromHeightInAlphaChannel(
         strtof(argv[2], nullptr), nNumRays, nSSBumpFlags);
 
+  if (!out) {
+    fprintf(stderr, "Unable to compute %s from '%s'.\n",
+            bNormalOnly ? "bumpmap" : "ss bumpmap", argv[1]);
+    return ENOMEM;
+  }
+
   char oname[1024];
   V_strcpy_safe(oname, argv[1]);
 
   char *dot = strchr(oname, '.');
   if (!dot) dot = oname + strlen(oname);
 
-  if (bNormalOnly)
-    V_strncpy(dot, "-bump.tga", oname + ssize(oname) - dot);
-  else
-    V_strncpy(dot, "-ssbump.tga", oname + ssize(oname) - dot);
+  V_strncpy(dot, bNormalOnly ? "-bump.tga" : "-ssbump.tga",
+            oname + ssize(oname) - dot);
 
-  out->WriteTGAFile(oname);
+  int rc = 0;
+  if (!out->WriteTGAFile(oname)) {
+    fprintf(stderr, "Unable to write result '%s'.\n", oname);
+    rc = EIO;
+  }
+
   delete out;
-
-  return 0;
+  return rc;
 }

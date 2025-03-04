@@ -82,11 +82,14 @@ public:
 	FloatBitMap_t(int width, int height);                  // make one and allocate space
 	FloatBitMap_t(char const *filename);                   // read one from a file (tga or pfm)
 	FloatBitMap_t(FloatBitMap_t const *orig);
+
+	[[nodiscard]] bool IsValid() const { return RGBAData != nullptr; }
+
 	// quantize one to 8 bits
 	bool WriteTGAFile(char const *filename) const;
 
 	bool LoadFromPFM(char const *filename);					// load from floating point pixmap (.pfm) file
-	bool WritePFM(char const *filename) const;					// save to floating point pixmap (.pfm) file
+	bool WritePFM(char const *filename) const;				// save to floating point pixmap (.pfm) file
 
 
 	void InitializeWithRandomPixelsFromAnotherFloatBM(FloatBitMap_t const &other) const;

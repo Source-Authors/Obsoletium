@@ -254,8 +254,7 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 	{
 		return false;
 	}
-	FileHandle_t fp;
-	fp = g_pFullFileSystem->Open( fileName, "r+b" );
+	FileHandle_t fp = g_pFullFileSystem->Open( fileName, "r+b" );
 
 	//
 	// Read in the targa header

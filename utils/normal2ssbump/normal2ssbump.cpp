@@ -43,12 +43,16 @@ int main(int argc, char **argv) {
 
   if (argc != 2) {
     fprintf(stderr, "Usage: normal2ssbump filename.tga\n");
-    return 1;
+    return EINVAL;
   }
 
   ReportProgress("reading src texture", 0, 0);
 
   const FloatBitMap_t src_texture{argv[1]};
+  if (!src_texture.IsValid()) {
+    fprintf(stderr, "Unable to load '%s'.\n", argv[1]);
+    return EIO;
+  }
 
   for (int y = 0; y < src_texture.Height; y++) {
     ReportProgress("Converting to ssbump format", src_texture.Height, y);
@@ -79,9 +83,13 @@ int main(int argc, char **argv) {
   if (!dot) dot = strchr(oname, '.');
   if (!dot) dot = oname + strlen(oname);
 
-  strcpy(dot, "_ssbump.tga");
+  V_strncpy(dot, "_ssbump.tga", ssize(oname) - (dot - oname));
 
-  printf("\nWriting %s\n", oname);
+  if (src_texture.WriteTGAFile(oname)) {
+    printf("\nWriting TGA to '%s': success", oname);
+    return 0;
+  }
 
-  return src_texture.WriteTGAFile(oname) ? 0 : 2;
+  fprintf(stderr, "Unable to write TGA to '%s'.\n", oname);
+  return EIO;
 }

@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 #include <utility>
 
 #include "tier2/tier2.h"
@@ -45,13 +46,13 @@ constexpr static inline float BiLinInterp(float Xfrac, float Yfrac, float UL, fl
 
 FloatBitMap_t::FloatBitMap_t(int width, int height) : FloatBitMap_t{}
 {
-	RGBAData=AllocateRGB(width,height);
+	RGBAData = AllocateRGB(width,height);
 }
 
 FloatBitMap_t::FloatBitMap_t(FloatBitMap_t const *orig) : FloatBitMap_t{}
 {
-	RGBAData=AllocateRGB(orig->Width,orig->Height);
-	memcpy(RGBAData,orig->RGBAData,orig->Width*orig->Height*sizeof(float)*4);
+	RGBAData = AllocateRGB(orig->Width,orig->Height);
+	if (RGBAData) memcpy(RGBAData, orig->RGBAData, orig->Width * orig->Height * sizeof(float) * 4);
 }
 
 static char GetChar(FileHandle_t &f)
@@ -77,62 +78,104 @@ static int GetInt(FileHandle_t &f)
 
 }
 
-constexpr int PFM_MAX_XSIZE{2048};
-
 bool FloatBitMap_t::LoadFromPFM(char const *fname)
 {
 	FileHandle_t f = g_pFullFileSystem->Open(fname, "rb");
 	if (f)
 	{
-		if( ( GetChar(f) == 'P' ) && (GetChar(f) == 'F' ) && ( GetChar(f) == '\n' ))
+		if( GetChar(f) == 'P' &&
+			GetChar(f) == 'F' &&
+			GetChar(f) == '\n' )
 		{
-			Width=GetInt(f);
-			Height=GetInt(f);
+			Width = GetInt(f);
+			Height = GetInt(f);
+
+			// dimhotepus: Protect from overflow as input is untrusted.
+			constexpr int kMaxDimension = std::numeric_limits<int>::max() /
+				( static_cast<int>( sizeof(float) ) * 3 );
+			if ( Width < 0 || Width > kMaxDimension ||
+				 Height < 0 || Height > kMaxDimension )
+			{
+				fprintf(stderr, "'%s': width (%d) and height (%d) should be in range [0...%d].\n",
+					fname, Width, Height, kMaxDimension );
+				return false;
+			}
 
 			// eat crap until the next newline
 			while( GetChar(f) != '\n')
 			{
 			}
+			
+			// dimhotepus: Handle OOM.
+			std::unique_ptr<float[]> linebuffer = std::make_unique<float[]>( Width * 3 );
+			if ( !linebuffer )
+			{
+				fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
+					fname, sizeof(float) * Width * 3 );
+				return false;
+			}
 
-			//			printf("file %s w=%d h=%d\n",fname,Width,Height);
-			AllocateRGB(Width,Height);
+			// dimhotepus: Handle OOM.
+			if ( !AllocateRGB(Width, Height) )
+			{
+				fprintf(stderr, "'%s': unable to allocate %zu bytes result buffer.\n",
+					fname, sizeof(float) * Width * Height * 4 );
+				return false;
+			}
 
 			for( int y = Height-1; y >= 0; y-- )
 			{
-				float linebuffer[PFM_MAX_XSIZE*3];
-				g_pFullFileSystem->Read(linebuffer,3*Width*sizeof(float),f);
-				for(int x=0;x<Width;x++)
+				g_pFullFileSystem->Read(linebuffer.get(), 3*Width*sizeof(float), f);
+				for (int x=0;x<Width;x++)
 				{
-					for(int c=0;c<3;c++)
+					for (int c=0;c<3;c++)
 					{
-						Pixel(x,y,c)=linebuffer[x*3+c];
+						Pixel(x,y,c) = linebuffer[x*3+c];
 					}
 				}
 			}
 		}
 		g_pFullFileSystem->Close( f );	// close file after reading
 	}
-	return (RGBAData!=0);
+	return RGBAData != nullptr;
 }
 
 bool FloatBitMap_t::WritePFM(char const *fname) const
 {
 	FileHandle_t f = g_pFullFileSystem->Open(fname, "wb");
-
 	if ( f )
 	{
-		g_pFullFileSystem->FPrintf(f,"PF\n%d %d\n-1.000000\n",Width,Height);
+		// dimhotepus: Protect from overflow.
+		constexpr int kMaxDimension = std::numeric_limits<int>::max() /
+			( static_cast<int>( sizeof(float) ) * 3 );
+		if ( Width < 0 || Width > kMaxDimension ||
+			 Height < 0 || Height > kMaxDimension )
+		{
+			fprintf(stderr, "'%s': width (%d) and height (%d) should be in range [0...%d].\n",
+				fname, Width, Height, kMaxDimension );
+			return false;
+		}
+		
+		// dimhotepus: Handle OOM.
+		std::unique_ptr<float[]> linebuffer = std::make_unique<float[]>( Width * 3 );
+		if ( !linebuffer )
+		{
+			fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
+				fname, sizeof(float) * Width * 3 );
+			return false;
+		}
+
+		g_pFullFileSystem->FPrintf(f, "PF\n%d %d\n-1.000000\n", Width, Height);
 		for( int y = Height-1; y >= 0; y-- )
 		{
-			float linebuffer[PFM_MAX_XSIZE*3];
-			for(int x=0;x<Width;x++)
+			for (int x = 0; x < Width; x++)
 			{
-				for(int c=0;c<3;c++)
+				for (int c = 0; c < 3; c++)
 				{
-					linebuffer[x*3+c]=Pixel(x,y,c);
+					linebuffer[x*3 + c] = Pixel(x,y,c);
 				}
 			}
-			g_pFullFileSystem->Write(linebuffer,3*Width*sizeof(float),f);
+			g_pFullFileSystem->Write(linebuffer.get(), 3*Width*sizeof(float), f);
 		}
 		g_pFullFileSystem->Close(f);
 
@@ -220,8 +263,7 @@ bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 	FileHandle_t f = g_pFullFileSystem->Open(filename, "wb");
 	if (f)
 	{
-		TGAHeader_t myheader;
-		memset(&myheader,0,sizeof(myheader));
+		TGAHeader_t myheader = {};
 		myheader.image_type=2;
 		myheader.pixel_size=32;
 		myheader.width0= Width & 0xff;
@@ -238,10 +280,10 @@ bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 				PixRGBAF fpix = PixelRGBAF( x, y );
 				PixRGBA8 pix8 = PixRGBAF_to_8( fpix );
 
-				g_pFullFileSystem->Write(&pix8.Blue,1,f);
-				g_pFullFileSystem->Write(&pix8.Green,1,f);
-				g_pFullFileSystem->Write(&pix8.Red,1,f);
-				g_pFullFileSystem->Write(&pix8.Alpha,1,f);
+				// dimhotepus: 4x speedup - write 4 colors at once.
+				const unsigned char pixels[]{pix8.Blue, pix8.Green, pix8.Red, pix8.Alpha};
+
+				g_pFullFileSystem->Write(pixels, sizeof(pixels), f);
 			}
 		}
 		g_pFullFileSystem->Close( f );	// close file after reading
@@ -257,7 +299,10 @@ FloatBitMap_t::FloatBitMap_t(char const *tgafilename) : FloatBitMap_t{}
 	// load from a tga or pfm
 	if (Q_stristr(tgafilename, ".pfm"))
 	{
-		LoadFromPFM(tgafilename);
+		if (!LoadFromPFM(tgafilename))
+		{
+			fprintf(stderr, "Unable to load '%s'. Expected PFM.\n", tgafilename);
+		}
 		return;
 	}
 
@@ -267,23 +312,29 @@ FloatBitMap_t::FloatBitMap_t(char const *tgafilename) : FloatBitMap_t{}
 
 	if( !TGALoader::GetInfo( tgafilename, &width1, &height1, &imageFormat1, &gamma1 ) )
 	{
-		fprintf(stderr, "error loading %s\n", tgafilename);
-		exit( -1 );
+		fprintf(stderr, "Error loading '%s'. Expected TGA.\n", tgafilename);
+		return;
 	}
-	AllocateRGB(width1,height1);
 
-	uint8 *pImage1Tmp = 
-		new uint8 [ImageLoader::GetMemRequired( width1, height1, 1, imageFormat1, false )];
-
-	if( !TGALoader::Load( pImage1Tmp, tgafilename, width1, height1, imageFormat1, 2.2f, false ) )
+	if ( !AllocateRGB(width1,height1))
 	{
-		fprintf(stderr, "error loading %s\n", tgafilename);
-		exit( -1 );
+		fprintf(stderr, "Error allocating memory bytes for '%s'.\n", tgafilename);
+		return;
 	}
-	uint8 *pImage1 = 
-		new uint8 [ImageLoader::GetMemRequired( width1, height1, 1, IMAGE_FORMAT_ABGR8888, false )];
 
-	ImageLoader::ConvertImageFormat( pImage1Tmp, imageFormat1, pImage1, IMAGE_FORMAT_ABGR8888, width1, height1, 0, 0 );
+	std::unique_ptr<uint8[]> pImage1Tmp = 
+		std::make_unique<uint8[]>(ImageLoader::GetMemRequired( width1, height1, 1, imageFormat1, false ));
+
+	if( !TGALoader::Load( pImage1Tmp.get(), tgafilename, width1, height1, imageFormat1, 2.2f, false ) )
+	{
+		fprintf(stderr, "Error loading '%s'. Expected TGA.\n", tgafilename);
+		return;
+	}
+
+	std::unique_ptr<uint8[]> pImage1 = 
+		std::make_unique<uint8[]>(ImageLoader::GetMemRequired( width1, height1, 1, IMAGE_FORMAT_ABGR8888, false ));
+
+	ImageLoader::ConvertImageFormat( pImage1Tmp.get(), imageFormat1, pImage1.get(), IMAGE_FORMAT_ABGR8888, width1, height1, 0, 0 );
 
 	for(int y=0;y<height1;y++)
 	{
@@ -295,22 +346,20 @@ FloatBitMap_t::FloatBitMap_t(char const *tgafilename) : FloatBitMap_t{}
 			}
 		}
 	}
-
-	delete[] pImage1;
-	delete[] pImage1Tmp;
 }
 
-FloatBitMap_t::~FloatBitMap_t(void)
+FloatBitMap_t::~FloatBitMap_t()
 {
 	delete[] RGBAData;
 }
 
 
-FloatBitMap_t *FloatBitMap_t::QuarterSize(void) const
+FloatBitMap_t *FloatBitMap_t::QuarterSize() const
 {
 	// generate a new bitmap half on each axis
-
 	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
+	if (!newbm) return nullptr;
+
 	for(int y=0;y<Height/2;y++)
 		for(int x=0;x<Width/2;x++)
 		{
@@ -324,8 +373,9 @@ FloatBitMap_t *FloatBitMap_t::QuarterSize(void) const
 FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky(void) const
 {
 	// generate a new bitmap half on each axis
-
 	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
+	if (!newbm) return nullptr;
+
 	for(int y=0;y<Height/2;y++)
 		for(int x=0;x<Width/2;x++)
 		{
@@ -356,13 +406,6 @@ float FloatBitMap_t::BrightestColor(void) const
 			ret=max(ret,v.Length());
 		}
 	return ret;
-}
-
-template <class T> static inline void SWAP(T & a, T & b)
-{
-	T temp=a;
-	a=b;
-	b=temp;
 }
 
 void FloatBitMap_t::RaiseToPower(float power) const
@@ -590,7 +633,7 @@ void FloatBitMap_t::MakeTileable(void) const
 					curdst->Pixel(x,y,c)=FLerp(cursrc->Pixel(x,y,c),desired,0.5);
 					error+=Square(desired-cursrc->Pixel(x,y,c));
 				}
-		SWAP(cursrc,curdst);
+		std::swap(cursrc,curdst);
 	}
 	// paste result
 	for(int x=0;x<Width;x++)
@@ -672,9 +715,9 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 						}
 
 		char fname[80];
-		sprintf(fname,"sub%dx%d.tga",tmp->Width,tmp->Height);
+		V_sprintf_safe(fname,"sub%dx%d.tga",tmp->Width,tmp->Height);
 		tmp->WriteTGAFile(fname);
-		sprintf(fname,"submrg%dx%d.tga",tmp->Width,tmp->Height);
+		V_sprintf_safe(fname,"submrg%dx%d.tga",tmp->Width,tmp->Height);
 		WriteTGAFile(fname);
 		delete tmp;
 		for(int i=0;i<NDELTAS;i++)
@@ -705,7 +748,7 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 						error+=Square(desired-cursrc->Pixel(x,y,c));
 					}
 				}
-				SWAP(cursrc,curdst);
+				std::swap(cursrc,curdst);
 			}
 		}
 	}
