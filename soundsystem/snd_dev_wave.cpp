@@ -8,13 +8,6 @@
 
 #include "snd_dev_wave.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#pragma warning( disable: 4201 )
-#include <mmsystem.h>
-#pragma warning( default: 4201 )
-#include <stdio.h>
-#include <math.h>
 #include "soundsystem/snd_audio_source.h"
 #include "soundsystem.h"
 #include "soundsystem/snd_device.h"
@@ -22,6 +15,8 @@
 #include "filesystem.h"
 #include "sentence.h"
 
+#include "winlite.h"
+#include <mmsystem.h>
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -232,7 +227,7 @@ void CAudioDeviceWave::OpenWaveOut( void )
 
 		if ( nRetVal != IDRETRY )
 		{
-			DWarning( "soundsystem", 1, "waveOutOpen failure--hardware already in use\n" );
+			DWarning( "soundsystem", 1, "waveOutOpen failure: hardware already in use\n" );
 			m_waveOutHandle = 0;
 			return;
 		}
@@ -546,14 +541,14 @@ void CAudioDeviceWave::RemoveMixerChannelReferences( CAudioMixer *mixer )
 void CAudioDeviceWave::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
 	// Already in list
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 			return;
 	}
 
 	// Just remove it
-	int idx = buffer->m_Referenced.AddToTail();
+	intp idx = buffer->m_Referenced.AddToTail();
 
 	CAudioMixerState *state = &buffer->m_Referenced[ idx ];
 	state->mixer = mixer;
@@ -561,7 +556,7 @@ void CAudioDeviceWave::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *bu
 
 void CAudioDeviceWave::RemoveFromReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
@@ -573,7 +568,7 @@ void CAudioDeviceWave::RemoveFromReferencedList( CAudioMixer *mixer, CAudioBuffe
 
 bool CAudioDeviceWave::IsSoundInReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
