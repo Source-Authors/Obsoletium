@@ -2354,7 +2354,7 @@ static bool CopyToMaxChars( char *pOut, intp outSize, const char *pIn, intp nCha
 //-----------------------------------------------------------------------------
 // Fixes up a file name, removing dot slashes, fixing slashes, converting to lowercase, etc.
 //-----------------------------------------------------------------------------
-void V_FixupPathName( OUT_Z_CAP(nOutLen) char *pOut, size_t nOutLen, const char *pPath )
+void V_FixupPathName( OUT_Z_CAP(nOutLen) char *pOut, intp nOutLen, const char *pPath )
 {
 	V_strncpy( pOut, pPath, nOutLen );
 	V_RemoveDotSlashes( pOut, CORRECT_PATH_SEPARATOR, true );
@@ -2487,7 +2487,7 @@ bool V_GetCurrentDirectory( OUT_Z_CAP(maxLen) char *pOut, int maxLen )
 }
 
 
-bool V_SetCurrentDirectory( const char *pDirName )
+bool V_SetCurrentDirectory( IN_Z const char *pDirName )
 {
 	return _chdir( pDirName ) == 0;
 }
@@ -2962,11 +2962,11 @@ bool BGetLocalFormattedDateAndTime( time_t timeVal, char *pchDate, int cubDate, 
 			// append am/pm in lower case (since strftime doesn't have a lowercase formatting option)
 			if (tmToDisplay.tm_hour >= 12)
 			{
-				Q_strcat( pchTime, "p.m.", cubTime );
+				V_strcat( pchTime, "p.m.", cubTime );
 			}
 			else
 			{
-				Q_strcat( pchTime, "a.m.", cubTime );
+				V_strcat( pchTime, "a.m.", cubTime );
 			}
 		}
 #else // WINDOWS

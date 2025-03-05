@@ -28,11 +28,11 @@ void InitDefaultFileSystem()
 {
 	AssertMsg( !g_pFullFileSystem, "Already set up the file system" );
 
-	if ( !Sys_LoadInterface( "filesystem_stdio", FILESYSTEM_INTERFACE_VERSION,
-		&g_pFullFileSystemModule, (void**)&g_pFullFileSystem ) )
+	if ( !Sys_LoadInterfaceT( "filesystem_stdio", FILESYSTEM_INTERFACE_VERSION,
+		&g_pFullFileSystemModule, &g_pFullFileSystem ) )
 	{
-		if ( !Sys_LoadInterface( "filesystem_steam", FILESYSTEM_INTERFACE_VERSION,
-			&g_pFullFileSystemModule, (void**)&g_pFullFileSystem ) )
+		if ( !Sys_LoadInterfaceT( "filesystem_steam", FILESYSTEM_INTERFACE_VERSION,
+			&g_pFullFileSystemModule, &g_pFullFileSystem ) )
 		{
 			Warning("Unable to find interface '%s' in both filesystem_stdio"
 				DLL_EXT_STRING " and filesystem_steam" DLL_EXT_STRING ".\n",

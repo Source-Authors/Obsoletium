@@ -17,42 +17,44 @@
 //-----------------------------------------------------------------------------
 // Builds a directory which is a subdirectory of the current mod
 //-----------------------------------------------------------------------------
-void GetModSubdirectory( const char *pSubDir, char *pBuf, intp nBufLen )
+void GetModSubdirectory( const char *pSubDir, OUT_Z_CAP(nBufLen) char *pBuf, intp nBufLen )
 {
+	Assert( g_pFullFileSystem );
+
 	// Compute starting directory
-	Assert( g_pFullFileSystem->GetSearchPath( "MOD_WRITE", false, NULL, 0 ) < nBufLen );
+	Assert( g_pFullFileSystem->GetSearchPath( "MOD_WRITE", false, nullptr, 0 ) < nBufLen );
 	if ( g_pFullFileSystem->GetSearchPath( "MOD_WRITE", false, pBuf, nBufLen ) == 0 )
 	{
 		// if we didn't find MOD_WRITE, back to the old MOD
-		Assert( g_pFullFileSystem->GetSearchPath( "MOD", false, NULL, 0 ) < nBufLen );
+		Assert( g_pFullFileSystem->GetSearchPath( "MOD", false, nullptr, 0 ) < nBufLen );
 		g_pFullFileSystem->GetSearchPath( "MOD", false, pBuf, nBufLen );
 	}
 
 	char *pSemi = strchr( pBuf, ';' );
 	if ( pSemi )
 	{
-		*pSemi = 0;
+		*pSemi = '\0';
 	}
 
-	Q_StripTrailingSlash( pBuf );
+	V_StripTrailingSlash( pBuf );
 	if ( pSubDir )
 	{
-		intp nLen = Q_strlen( pSubDir );
-		Q_strncat( pBuf, "\\", nBufLen, 1 );
-		Q_strncat( pBuf, pSubDir, nBufLen, nLen );
+		const intp nLen = V_strlen( pSubDir );
+		V_strncat( pBuf, "\\", nBufLen, 1 );
+		V_strncat( pBuf, pSubDir, nBufLen, nLen );
 	}
 
-	Q_FixSlashes( pBuf );
+	V_FixSlashes( pBuf );
 }
 
 
 //-----------------------------------------------------------------------------
 // Builds a directory which is a subdirectory of the current mod's *content*
 //-----------------------------------------------------------------------------
-void GetModContentSubdirectory( const char *pSubDir, char *pBuf, intp nBufLen )
+void GetModContentSubdirectory( const char *pSubDir, OUT_Z_CAP(nBufLen) char *pBuf, intp nBufLen )
 {
 	char pTemp[ MAX_PATH ];
-	GetModSubdirectory( pSubDir, pTemp, sizeof(pTemp) );
+	GetModSubdirectory( pSubDir, pTemp );
 	ComputeModContentFilename( pTemp, pBuf, nBufLen );
 }
 
@@ -60,48 +62,48 @@ void GetModContentSubdirectory( const char *pSubDir, char *pBuf, intp nBufLen )
 //-----------------------------------------------------------------------------
 // Generates a filename under the 'game' subdirectory given a subdirectory of 'content'
 //-----------------------------------------------------------------------------
-void ComputeModFilename( const char *pContentFileName, char *pBuf, size_t nBufLen )
+void ComputeModFilename( const char *pContentFileName, OUT_Z_CAP(nBufLen) char *pBuf, intp nBufLen )
 {
 	char pRelativePath[ MAX_PATH ];
-	if ( !g_pFullFileSystem->FullPathToRelativePathEx( pContentFileName, "CONTENTROOT", pRelativePath, sizeof(pRelativePath) ) )
+	if ( !g_pFullFileSystem->FullPathToRelativePathEx_safe( pContentFileName, "CONTENTROOT", pRelativePath ) )
 	{
-		Q_strncpy( pBuf, pContentFileName, (int)nBufLen );
+		Q_strncpy( pBuf, pContentFileName, nBufLen );
 		return;
 	}
 
 	char pGameRoot[ MAX_PATH ];
-	g_pFullFileSystem->GetSearchPath( "GAMEROOT", false, pGameRoot, sizeof(pGameRoot) );
+	g_pFullFileSystem->GetSearchPath_safe( "GAMEROOT", false, pGameRoot );
 	char *pSemi = strchr( pGameRoot, ';' );
 	if ( pSemi )
 	{
 		*pSemi = 0;
 	}
 
-	Q_ComposeFileName( pGameRoot, pRelativePath, pBuf, (int)nBufLen );
+	Q_ComposeFileName( pGameRoot, pRelativePath, pBuf, nBufLen );
 }
 
 
 //-----------------------------------------------------------------------------
 // Generates a filename under the 'content' subdirectory given a subdirectory of 'game'
 //-----------------------------------------------------------------------------
-void ComputeModContentFilename( const char *pGameFileName, char *pBuf, size_t nBufLen )
+void ComputeModContentFilename( const char *pGameFileName, OUT_Z_CAP(nBufLen) char *pBuf, intp nBufLen )
 {
 	char pRelativePath[ MAX_PATH ];
-	if ( !g_pFullFileSystem->FullPathToRelativePathEx( pGameFileName, "GAMEROOT", pRelativePath, sizeof(pRelativePath) ) )
+	if ( !g_pFullFileSystem->FullPathToRelativePathEx_safe( pGameFileName, "GAMEROOT", pRelativePath ) )
 	{
-		Q_strncpy( pBuf, pGameFileName, (int)nBufLen );
+		V_strncpy( pBuf, pGameFileName, nBufLen );
 		return;
 	}
 
 	char pContentRoot[ MAX_PATH ];
-	g_pFullFileSystem->GetSearchPath( "CONTENTROOT", false, pContentRoot, sizeof(pContentRoot) );
+	g_pFullFileSystem->GetSearchPath_safe( "CONTENTROOT", false, pContentRoot );
 	char *pSemi = strchr( pContentRoot, ';' );
 	if ( pSemi )
 	{
 		*pSemi = 0;
 	}
 
-	Q_ComposeFileName( pContentRoot, pRelativePath, pBuf, (int)nBufLen );
+	V_ComposeFileName( pContentRoot, pRelativePath, pBuf, nBufLen );
 }
 
 
@@ -129,7 +131,8 @@ char *CreateX360Filename( const char *pSourceName, char *pTargetName, int target
 // Returns source if no change needs to occur, othwerwise generates and
 // returns target.
 //-----------------------------------------------------------------------------
-char *RestoreFilename( const char *pSourceName, char *pTargetName, intp targetLen )
+template<intp targetLen>
+static const char *RestoreFilename( const char *pSourceName, OUT_Z_ARRAY char (&pTargetName)[targetLen] )
 {
 	// find extension
 	// scan backward for '.', but not past a seperator
@@ -151,7 +154,7 @@ char *RestoreFilename( const char *pSourceName, char *pTargetName, intp targetLe
 	}
 	
 	// source filename is as expected
-	return (char *)pSourceName;
+	return pSourceName;
 }
 
 //-----------------------------------------------------------------------------
@@ -167,7 +170,7 @@ int UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, [
 	{
 		// caller could supply source as PC or 360 name, we want the PC filename
 		char szFixedSourceName[MAX_PATH];
-		pSourceName = RestoreFilename( pSourceName, szFixedSourceName, sizeof( szFixedSourceName ) );
+		pSourceName = RestoreFilename( pSourceName, szFixedSourceName );
 		// caller wants us to provide 360 named version of source
 		CreateX360Filename( pSourceName, pTargetName, targetLen );
 	}
@@ -188,7 +191,7 @@ void GetSearchPath( CUtlVector< CUtlString > &path, const char *pPathID )
 	g_pFullFileSystem->GetSearchPath( pPathID, false, pBuf, nMaxLen );
 
 	char *pSemi;
-	while ( NULL != ( pSemi = strchr( pBuf, ';' ) ) )
+	while ( nullptr != ( pSemi = strchr( pBuf, ';' ) ) )
 	{
 		*pSemi = 0;
 		path.AddToTail( pBuf );
@@ -200,7 +203,7 @@ void GetSearchPath( CUtlVector< CUtlString > &path, const char *pPathID )
 //-----------------------------------------------------------------------------
 // Given file name in the current dir generate a full path to it.
 //-----------------------------------------------------------------------------
-bool GenerateFullPath( const char *pFileName, char const *pPathID, char *pBuf, intp nBufLen )
+bool GenerateFullPath( const char *pFileName, char const *pPathID, OUT_Z_CAP(nBufLen) char *pBuf, intp nBufLen )
 {
 	if ( V_IsAbsolutePath( pFileName ) )
 	{
@@ -227,7 +230,7 @@ bool GenerateFullPath( const char *pFileName, char const *pPathID, char *pBuf, i
 void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, const char *pPathID, const char *pExtension )
 {
 	char pSearchString[MAX_PATH];
-	Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pDirectory );
+	V_sprintf_safe( pSearchString, "%s\\*", pDirectory );
 
 	bool bIsAbsolute = Q_IsAbsolutePath( pDirectory );
 
@@ -240,7 +243,7 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 	for ( ; pFoundFile; pFoundFile = g_pFullFileSystem->FindNext( hFind ) )
 	{
 		char pChildPath[MAX_PATH];
-		Q_snprintf( pChildPath, MAX_PATH, "%s\\%s", pDirectory, pFoundFile );
+		V_sprintf_safe( pChildPath, "%s\\%s", pDirectory, pFoundFile );
 
 		if ( g_pFullFileSystem->FindIsDirectory( hFind ) )
 		{
@@ -252,7 +255,7 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 		}
 
 		// Check the extension matches
-		const char *pExt = Q_GetFileExtension( pFoundFile );
+		const char *pExt = V_GetFileExtension( pFoundFile );
 		if ( !pExt || Q_stricmp( pExt, pExtension ) != 0 )
 			continue;
 
@@ -260,7 +263,7 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 		char *pFullPath = pFullPathBuf;
 		if ( !bIsAbsolute )
 		{
-			g_pFullFileSystem->RelativePathToFullPath( pChildPath, pPathID, pFullPathBuf, sizeof(pFullPathBuf) );
+			g_pFullFileSystem->RelativePathToFullPath_safe( pChildPath, pPathID, pFullPathBuf );
 		}
 		else
 		{
@@ -268,16 +271,15 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 		}
 
 		V_strlower( pFullPath );
-		Q_FixSlashes( pFullPath );
+		V_FixSlashes( pFullPath );
 		list.AddToTail( pFullPath );
 	}
 
 	g_pFullFileSystem->FindClose( hFind );
 
-	intp nCount = subDirs.Count();
-	for ( intp i = 0; i < nCount; ++i )
+	for ( const auto &subDir : subDirs )
 	{
-		AddFilesToList( list, subDirs[i], pPathID, pExtension );
+		AddFilesToList( list, subDir, pPathID, pExtension );
 	}
 }
 

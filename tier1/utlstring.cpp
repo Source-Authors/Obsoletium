@@ -657,7 +657,7 @@ CUtlString CUtlString::Replace( const char *pszFrom, const char *pszTo ) const
 CUtlString CUtlString::AbsPath( const char *pStartingDir ) const
 {
 	char szNew[MAX_PATH];
-	V_MakeAbsolutePath( szNew, sizeof( szNew ), this->String(), pStartingDir );
+	V_MakeAbsolutePath( szNew, this->String(), pStartingDir );
 	return CUtlString( szNew );
 }
 

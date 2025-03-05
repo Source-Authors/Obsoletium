@@ -831,9 +831,9 @@ public:
 	// Returns true on success, otherwise false if it can't be resolved
 	// Prefer using the FullPathToRelativePathEx_safe template wrapper to calling this directly
 	virtual bool		FullPathToRelativePathEx( const char *pFullpath, const char *pPathId, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
-	template <size_t maxLenInChars> bool FullPathToRelativePathEx_safe( const char *pFullpath, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
+	template <size_t maxLenInChars> bool FullPathToRelativePathEx_safe( const char *pFullpath, const char *pPathId, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return FullPathToRelativePathEx( pFullpath, pDest, (int)maxLenInChars );
+		return FullPathToRelativePathEx( pFullpath, pPathId, pDest, (int)maxLenInChars );
 	}
 
 	virtual int			GetPathIndex( const FileNameHandle_t &handle ) = 0;

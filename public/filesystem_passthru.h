@@ -172,7 +172,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 		FileFindHandle_t *pHandle
 		)																										override { return m_pFileSystemPassThru->FindFirstEx( pWildCard, pPathID, pHandle ); }
 	void			MarkPathIDByRequestOnly( const char *pPathID, bool bRequestOnly )					override { m_pFileSystemPassThru->MarkPathIDByRequestOnly( pPathID, bRequestOnly ); }
-	bool			AddPackFile( const char *fullpath, const char *pathID )								override { return m_pFileSystemPassThru->AddPackFile( fullpath, pathID ); }
+	bool			AddPackFile( const char *fullPath, const char *pathID )								override { return m_pFileSystemPassThru->AddPackFile( fullPath, pathID ); }
 	FSAsyncStatus_t	AsyncAppend(const char *pFileName, const void *pSrc, int nSrcBytes, bool bFreeMemory, FSAsyncControl_t *pControl ) override { return m_pFileSystemPassThru->AsyncAppend( pFileName, pSrc, nSrcBytes, bFreeMemory, pControl); }
 	FSAsyncStatus_t	AsyncWrite(const char *pFileName, const void *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend, FSAsyncControl_t *pControl ) override { return m_pFileSystemPassThru->AsyncWrite( pFileName, pSrc, nSrcBytes, bFreeMemory, bAppend, pControl); }
 	FSAsyncStatus_t	AsyncWriteFile(const char *pFileName, const CUtlBuffer *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend, FSAsyncControl_t *pControl ) override { return m_pFileSystemPassThru->AsyncWriteFile( pFileName, pSrc, nSrcBytes, bFreeMemory, bAppend, pControl); }

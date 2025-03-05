@@ -321,7 +321,7 @@ static bool Sys_GetExecutableName( char *out, unsigned len )
 #else
 	if ( CommandLine()->GetParm(0) )
 	{
-		Q_MakeAbsolutePath( out, len, CommandLine()->GetParm(0) );
+		V_MakeAbsolutePath( out, len, CommandLine()->GetParm(0) );
 	}
 	else
 	{
@@ -332,7 +332,7 @@ static bool Sys_GetExecutableName( char *out, unsigned len )
 	return true;
 }
 
-bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen )
+bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned exeDirLen )
 {
 	if ( exeDirLen )
 		exedir[0] = '\0';
@@ -362,7 +362,7 @@ bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen )
 	// Return the bin directory as the executable dir if it's not in there
 	// because that's really where we're running from...
 	char ext[MAX_PATH];
-	Q_StrRight( exedir, 4, ext, sizeof( ext ) );
+	V_StrRight( exedir, 4, ext );
 	if ( ext[0] != CORRECT_PATH_SEPARATOR ||
 #ifdef PLATFORM_64BITS
 		Q_stricmp( ext+1, "x64" ) != 0
@@ -406,7 +406,7 @@ static bool LaunchVConfig()
 	if ( !FileSystem_GetExecutableDir( vconfigExe ) )
 		return false;
 
-	Q_AppendSlash( vconfigExe, sizeof( vconfigExe ) );
+	V_AppendSlash( vconfigExe );
 	V_strcat_safe( vconfigExe, "vconfig.exe" );
 
 	const char *argv[] =
@@ -464,7 +464,7 @@ static FSReturnCode_t LoadGameInfoFile(
 	// All the filesystem mappings will be in this file.
 	char gameinfoFilename[MAX_PATH];
 	V_strcpy_safe( gameinfoFilename, pDirectoryName );
-	Q_AppendSlash( gameinfoFilename, sizeof( gameinfoFilename ) );
+	V_AppendSlash( gameinfoFilename );
 	V_strcat_safe( gameinfoFilename, GAMEINFO_FILENAME );
 	Q_FixSlashes( gameinfoFilename );
 
@@ -546,7 +546,7 @@ static void FileSystem_AddLoadedSearchPath(
 		// Need to add a language version of this path first
 
 		V_sprintf_safe( szLangString, "_%s", initInfo.m_pLanguage);
-		V_StrSubst( fullLocationPath, "_english", szLangString, szPath, sizeof( szPath ), true );
+		V_StrSubst( fullLocationPath, "_english", szLangString, szPath, true );
 
 		initInfo.m_pFileSystem->AddSearchPath( szPath, pPathID, PATH_ADD_TO_TAIL );
 	}
@@ -591,7 +591,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		{
 			char szAbsSearchPath[MAX_PATH];
 			Q_StripPrecedingAndTrailingWhitespace( vecPaths[ idxExtraPath ] );
-			V_MakeAbsolutePath( szAbsSearchPath, sizeof( szAbsSearchPath ), vecPaths[ idxExtraPath ], baseDir );
+			V_MakeAbsolutePath( szAbsSearchPath, vecPaths[ idxExtraPath ], baseDir );
 			V_FixSlashes( szAbsSearchPath );
 
 			if ( !V_RemoveDotSlashes( szAbsSearchPath ) )
@@ -630,7 +630,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 		CUtlStringList vecFullLocationPaths;
 		char szAbsSearchPath[MAX_PATH];
-		V_MakeAbsolutePath( szAbsSearchPath, sizeof( szAbsSearchPath ), pLocation, pszBaseDir );
+		V_MakeAbsolutePath( szAbsSearchPath, pLocation, pszBaseDir );
 
 		// Now resolve any ./'s.
 		V_FixSlashes( szAbsSearchPath );
@@ -659,8 +659,8 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					if ( pszFoundShortName[0] != '.' && ( initInfo.m_pFileSystem->FindIsDirectory( findHandle ) || V_stristr( pszFoundShortName, ".vpk" ) ) )
 					{
 						char szAbsName[MAX_PATH];
-						V_ExtractFilePath( szAbsSearchPath, szAbsName, sizeof( szAbsName ) );
-						V_AppendSlash( szAbsName, sizeof(szAbsName) );
+						V_ExtractFilePath( szAbsSearchPath, szAbsName );
+						V_AppendSlash( szAbsName );
 						V_strcat_safe( szAbsName, pszFoundShortName );
 
 						vecFullLocationPaths.CopyAndAddToTail( szAbsName );
@@ -676,8 +676,8 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 						{
 
 							char szReadme[MAX_PATH];
-							V_ExtractFilePath( szAbsSearchPath, szReadme, sizeof( szReadme ) );
-							V_AppendSlash( szReadme, sizeof(szReadme) );
+							V_ExtractFilePath( szAbsSearchPath, szReadme );
+							V_AppendSlash( szReadme );
 							V_strcat_safe( szReadme, "readme.txt" );
 
 							Error(
@@ -799,7 +799,7 @@ static bool DoesFileExistIn( const char *pDirectoryName, const char *pFilename )
 	char filename[MAX_PATH];
 
 	V_strcpy_safe( filename, pDirectoryName );
-	Q_AppendSlash( filename, sizeof( filename ) );
+	V_AppendSlash( filename );
 	V_strcat_safe( filename, pFilename );
 	Q_FixSlashes( filename );
 	bool bExist = ( _access( filename, 0 ) == 0 );
@@ -857,7 +857,7 @@ static FSReturnCode_t TryLocateGameInfoFile(char (&pOutDir)[outDirLen],
 	V_strcpy_safe( pOutDir, spchCopyNameBuffer );
 	if ( char *pchContentFix = Q_stristr( pOutDir, "/content/" ) )
 	{
-		sprintf( pchContentFix, "/game/" );
+		V_strncpy( pchContentFix, "/game/", ssize("/content/") );
 		memmove( pchContentFix + 6, pchContentFix + 9, pOutDir + outDirLen - (pchContentFix + 9) );
 
 		// Try in the mapped "game" directory
@@ -901,7 +901,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 	{
 		if ( DoesFileExistIn( pProject, GAMEINFO_FILENAME ) )
 		{
-			Q_MakeAbsolutePath( pOutDir, outDirLen, pProject );
+			V_MakeAbsolutePath( pOutDir, outDirLen, pProject );
 			return FS_OK;
 		}
 		
@@ -940,7 +940,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 	// Try to use the environment variable / registry
 	if ( ( pProject = getenv( GAMEDIR_TOKEN ) ) != nullptr )
 	{
-		Q_MakeAbsolutePath( pOutDir, outDirLen, pProject );
+		V_MakeAbsolutePath( pOutDir, outDirLen, pProject );
 
 		if ( FS_OK == TryLocateGameInfoFile( pOutDir, false ) )
 			return FS_OK;
@@ -951,9 +951,9 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 		
 		// Now look for it in the directory they passed in.
 		if ( fsInfo.m_pDirectoryName )
-			Q_MakeAbsolutePath( pOutDir, outDirLen, fsInfo.m_pDirectoryName );
+			V_MakeAbsolutePath( pOutDir, outDirLen, fsInfo.m_pDirectoryName );
 		else
-			Q_MakeAbsolutePath( pOutDir, outDirLen, "." );
+			V_MakeAbsolutePath( pOutDir, outDirLen, "." );
 
 		if ( FS_OK == TryLocateGameInfoFile( pOutDir, true ) )
 			return FS_OK;
@@ -1031,7 +1031,7 @@ FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem )
 //-----------------------------------------------------------------------------
 // Returns the name of the file system DLL to use
 //-----------------------------------------------------------------------------
-FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, size_t nMaxLen, bool &bSteam )
+FSReturnCode_t FileSystem_GetFileSystemDLLName( OUT_Z_CAP(nMaxLen) char *pFileSystemDLL, size_t nMaxLen, bool &bSteam )
 {
 	bSteam = false;
 
@@ -1102,11 +1102,11 @@ FSReturnCode_t FileSystem_LoadFileSystemModule( CFSLoadModuleInfo &fsInfo )
 		return ret;
 
 	// Now that the environment is setup, load the filesystem module.
-	if ( !Sys_LoadInterface(
+	if ( !Sys_LoadInterfaceT(
 		fsInfo.m_pFileSystemDLLName,
 		FILESYSTEM_INTERFACE_VERSION,
 		&fsInfo.m_pModule,
-		(void**)&fsInfo.m_pFileSystem ) )
+		&fsInfo.m_pFileSystem ) )
 	{
 		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Can't load %s.", fsInfo.m_pFileSystemDLLName );
 	}

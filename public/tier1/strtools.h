@@ -17,6 +17,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <charconv>
+#include <memory>
 #include <system_error>
 #include <type_traits>
 
@@ -378,6 +379,18 @@ inline wchar_t *V_wcsdup( IN_Z const wchar_t *pSrc )
 	return pResult;
 }
 
+// dimhotepus: V_strdup on stack.
+#define V_strdup_stack( src, name ) \
+  const intp V_strdup_stack_len_{V_strlen(src) + 1};  \
+  char *name{stackallocT(char, V_strdup_stack_len_)}; \
+  V_strncpy( name, src, V_strdup_stack_len_ )
+
+// dimhotepus: V_wcsdup on stack.
+#define V_wcsdup_stack( src, name ) \
+  const intp V_wcsdup_stack_len_{V_wcslen(src) + 1};     \
+  char *name{stackallocT(wchar_t, V_wcsdup_stack_len_)}; \
+  V_wcsncpy( name, src, V_wcsdup_stack_len_ )
+
 void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const *pSrc, intp maxLenInBytes );
 template <intp maxLenInChars> void V_wcscpy_safe( OUT_Z_ARRAY wchar_t (&pDest)[maxLenInChars], wchar_t const *pSrc ) 
 {
@@ -386,7 +399,7 @@ template <intp maxLenInChars> void V_wcscpy_safe( OUT_Z_ARRAY wchar_t (&pDest)[m
 }
 
 #define COPY_ALL_CHARACTERS -1
-char *V_strncat( INOUT_Z_CAP(cchDest) char *pDest, const char *pSrc, size_t cchDest, intp max_chars_to_copy=COPY_ALL_CHARACTERS );
+char *V_strncat( INOUT_Z_CAP(destBufferSize) char *pDest, const char *pSrc, size_t destBufferSize, intp max_chars_to_copy=COPY_ALL_CHARACTERS );
 template <intp cchDest> char *V_strcat_safe( INOUT_Z_ARRAY char (&pDest)[cchDest], const char *pSrc, intp nMaxCharsToCopy=COPY_ALL_CHARACTERS )
 {
 	return V_strncat( pDest, pSrc, cchDest, nMaxCharsToCopy ); 
@@ -398,7 +411,7 @@ template <intp cchDest> wchar_t *V_wcscat_safe( INOUT_Z_ARRAY wchar_t (&pDest)[c
 	return V_wcsncat( pDest, pSrc, cchDest, nMaxCharsToCopy ); 
 }
 
-char *V_strnlwr( INOUT_Z_CAP(cchBuf) char *pBuf, size_t cchBuf);
+char *V_strnlwr( INOUT_Z_CAP(count) char *pBuf, size_t count);
 template <intp cchDest> char *V_strlwr_safe( INOUT_Z_ARRAY char (&pBuf)[cchDest] )
 { 
 	return _V_strnlwr( pBuf, cchDest ); 
@@ -579,18 +592,18 @@ template <size_t maxLenInChars> int Q_NormalizeUTF8ToASCII( OUT_Z_ARRAY char (&p
 #endif
 
 #ifdef _WIN32
-#define CORRECT_PATH_SEPARATOR '\\'
+constexpr inline char CORRECT_PATH_SEPARATOR{'\\'};
 #define CORRECT_PATH_SEPARATOR_S "\\"
-#define INCORRECT_PATH_SEPARATOR '/'
-#define INCORRECT_PATH_SEPARATOR_S "/"
+constexpr inline char INCORRECT_PATH_SEPARATOR{'/'};
+#define INCORRECT_PATH_SEPARATOR_S "/";
 #elif POSIX
-#define CORRECT_PATH_SEPARATOR '/'
+constexpr inline char CORRECT_PATH_SEPARATOR{'/'};
 #define CORRECT_PATH_SEPARATOR_S "/"
-#define INCORRECT_PATH_SEPARATOR '\\'
+constexpr inline char INCORRECT_PATH_SEPARATOR{'\\'};
 #define INCORRECT_PATH_SEPARATOR_S "\\"
 #endif
 
-int V_vsnprintf( OUT_Z_CAP(maxLenInCharacters) char *pDest, intp maxLenInCharacters, PRINTF_FORMAT_STRING const char *pFormat, va_list params );
+int V_vsnprintf( OUT_Z_CAP(maxLen) char *pDest, intp maxLen, PRINTF_FORMAT_STRING const char *pFormat, va_list params );
 template <size_t maxLenInCharacters> int V_vsprintf_safe( OUT_Z_ARRAY char (&pDest)[maxLenInCharacters], PRINTF_FORMAT_STRING const char *pFormat, va_list params ) { return V_vsnprintf( pDest, maxLenInCharacters, pFormat, params ); }
 
 int V_snprintf( OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars, PRINTF_FORMAT_STRING const char *pFormat, ... ) FMTFUNCTION( 3, 4 );
@@ -815,6 +828,16 @@ bool V_RemoveDotSlashes( char *pFilename, char separator = CORRECT_PATH_SEPARATO
 // using the current working directory as the base, or pStartingDir if it's non-nullptr.
 // Returns false if it runs out of room in the string, or if pPath tries to ".." past the root directory.
 void V_MakeAbsolutePath( char *pOut, int outLen, const char *pPath, const char *pStartingDir = nullptr );
+
+// If pPath is a relative path, this function makes it into an absolute path
+// using the current working directory as the base, or pStartingDir if it's non-nullptr.
+// Returns false if it runs out of room in the string, or if pPath tries to ".." past the root directory.
+template<int outSize>
+void V_MakeAbsolutePath( char (&pOut)[outSize], const char *pPath, const char *pStartingDir = nullptr )
+{
+	V_MakeAbsolutePath( pOut, outSize, pPath, pStartingDir );
+}
+
 inline void V_MakeAbsolutePath( char *pOut, int outLen, const char *pPath, const char *pStartingDir, bool bLowercaseName )
 {
 	V_MakeAbsolutePath( pOut, outLen, pPath, pStartingDir );
@@ -822,6 +845,12 @@ inline void V_MakeAbsolutePath( char *pOut, int outLen, const char *pPath, const
 	{
 		V_strlower( pOut );
 	}
+}
+
+template<int outSize>
+inline void V_MakeAbsolutePath( char (&pOut)[outSize], const char *pPath, const char *pStartingDir, bool bLowercaseName )
+{
+	V_MakeAbsolutePath( pOut, outSize, pPath, pStartingDir, bLowercaseName );
 }
 
 
@@ -842,7 +871,7 @@ bool V_MakeRelativePath( const char *pFullPath, const char *pDirectory, char (&p
 }
 
 // Fixes up a file name, removing dot slashes, fixing slashes, converting to lowercase, etc.
-void V_FixupPathName( OUT_Z_CAP(nOutLen) char *pOut, size_t nOutLen, const char *pPath );
+void V_FixupPathName( OUT_Z_CAP(nOutLen) char *pOut, intp nOutLen, const char *pPath );
 
 // Fixes up a file name, removing dot slashes, fixing slashes, converting to lowercase, etc.
 template<intp outSize>
@@ -916,7 +945,7 @@ bool V_GetCurrentDirectory( OUT_Z_ARRAY char (&pOut)[outSize] )
 }
 
 // Set the working directory thus.
-bool V_SetCurrentDirectory( const char *pDirName );
+bool V_SetCurrentDirectory( IN_Z const char *pDirName );
 
 
 // This function takes a slice out of pStr and stores it in pOut.
@@ -972,7 +1001,22 @@ void V_FixDoubleSlashes( char *pStr );
 // Convert multibyte to wchar + back
 // Specify -1 for nInSize for null-terminated string
 void V_strtowcs( const char *pString, int nInSize, OUT_Z_BYTECAP(nOutSizeInBytes) wchar_t *pWString, int nOutSizeInBytes );
+
+// Convert multibyte to wchar + back
+// Specify -1 for nInSize for null-terminated string
+template<int destSize>
+void V_strtowcs( const char *pString, int nInSize, OUT_Z_ARRAY wchar_t (&pWString)[destSize] )
+{
+	V_strtowcs( pString, nInSize, pWString, destSize * static_cast<int>(sizeof(wchar_t)) );
+}
+
 void V_wcstostr( const wchar_t *pWString, int nInSize, OUT_Z_CAP(nOutSizeInBytes) char *pString, int nOutSizeInBytes );
+
+template <int destSize>
+void V_wcstostr( const wchar_t *pWString, int nInSize, OUT_Z_ARRAY char (&pString)[destSize] )
+{
+	V_wcstostr( pWString, nInSize, pString, destSize );
+}
 
 // buffer-safe strcat
 inline void V_strcat( INOUT_Z_CAP(cchDest) char *dest, const char *src, intp cchDest )
@@ -1238,20 +1282,11 @@ private:
 
 		// each Unicode code point can expand to as many as four bytes in UTF-8; we
 		// also need to leave room for the terminating NUL.
-		size_t cbMax = 4 * wcslen( m_pwch ) + 1; //-V112
-		char *pchTemp = new char[ cbMax ];
-		if ( Q_WStringToUTF8( m_pwch, pchTemp, cbMax ) )
+		intp cbMax = 4 * V_wcslen( m_pwch ) + 1; //-V112
+		std::unique_ptr<char[]> pchTemp = std::make_unique<char[]>(cbMax);
+		if ( Q_WStringToUTF8( m_pwch, pchTemp.get(), cbMax ) )
 		{
-			uint32 cchAlloc = static_cast<uint32>( V_strlen( pchTemp ) ) + 1;
-			char *pchHeap = new char[ cchAlloc ];
-			V_strncpy( pchHeap, pchTemp, cchAlloc );
-			delete [] pchTemp;
-			m_pch = pchHeap;
-		}
-		else
-		{
-			// do nothing, and leave the UTF-8 string nullptr
-			delete [] pchTemp;
+			m_pch = V_strdup( pchTemp.get() );
 		}
 	}
 
@@ -1270,14 +1305,12 @@ private:
 		if ( m_pwch != nullptr )
 			return;					// already been converted to UTF-16; no work to do
 
-		uint32 cchMax = static_cast<uint32>( V_strlen( m_pch ) ) + 1;
-		wchar_t *pwchTemp = new wchar_t[ cchMax ];
-		if ( V_UTF8ToUnicode( m_pch, pwchTemp, cchMax * sizeof( wchar_t ) ) )
+		intp cchMax = V_strlen( m_pch ) + 1;
+		std::unique_ptr<wchar_t[]> pwchTemp = std::make_unique<wchar_t[]>(cchMax);
+		if ( V_UTF8ToUnicode( m_pch, pwchTemp.get(), cchMax * sizeof( wchar_t ) ) )
 		{
-			m_pwch = V_wcsdup( pwchTemp );
+			m_pwch = V_wcsdup( pwchTemp.get() );
 		}
-		// do nothing, and leave the UTF-16 string nullptr
-		delete [] pwchTemp;
 	}
 
 #if !defined( WIN32 ) && !defined(_WIN32)
@@ -1296,11 +1329,11 @@ private:
 		if ( m_pucs2 != nullptr )
 			return;					// already been converted to UTF-16; no work to do
 
-		uint32 cchMax = static_cast<uint32>( V_strlen( m_pch ) ) + 1;
+		intp cchMax = V_strlen( m_pch ) + 1;
 		ucs2 *pwchTemp = new ucs2[ cchMax ];
 		if ( V_UTF8ToUCS2( m_pch, cchMax, pwchTemp, cchMax * sizeof( ucs2 ) ) )
 		{
-			uint32 cchAlloc = cchMax;
+			intp cchAlloc = cchMax;
 			ucs2 *pwchHeap = new ucs2[ cchAlloc ];
 			memcpy( pwchHeap, pwchTemp, cchAlloc * sizeof( ucs2 ) );
 			delete [] pwchTemp;
@@ -1308,9 +1341,9 @@ private:
 		}
 		else
 		{
-			// do nothing, and leave the UTF-16 string nullptr
-			delete [] pwchTemp;
-		}
+		// do nothing, and leave the UTF-16 string nullptr
+		delete [] pwchTemp;
+	}
 	}
 #endif
 
