@@ -30,7 +30,7 @@ class CUtlSymbolTableMT;
 //-----------------------------------------------------------------------------
 typedef unsigned short UtlSymId_t;
 
-#define UTL_INVAL_SYMBOL  ((UtlSymId_t)~0)
+constexpr inline UtlSymId_t UTL_INVAL_SYMBOL{(UtlSymId_t)~0};
 
 class CUtlSymbol
 {
@@ -115,15 +115,14 @@ protected:
 	class CStringPoolIndex
 	{
 	public:
-		inline CStringPoolIndex() = default;
+		constexpr inline CStringPoolIndex() : CStringPoolIndex{0, 0} {}
 
-		inline CStringPoolIndex( unsigned short iPool, unsigned short iOffset )
+		constexpr inline CStringPoolIndex( unsigned short iPool, unsigned short iOffset )
+			: m_iPool{iPool}, m_iOffset{iOffset}
 		{
-			m_iPool = iPool;
-			m_iOffset = iOffset;
 		}
 
-		inline bool operator==( const CStringPoolIndex &other )	const
+		constexpr inline bool operator==( const CStringPoolIndex &other ) const
 		{
 			return m_iPool == other.m_iPool && m_iOffset == other.m_iOffset;
 		}
