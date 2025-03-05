@@ -250,7 +250,7 @@ char *MD5_Print( unsigned char *hash, int hashlen )
 
 	Assert( hashlen <= 32 );
 
-	Q_binarytohex( hash, hashlen, szReturn, sizeof( szReturn ) );
+	Q_binarytohex( hash, hashlen, szReturn );
 	return szReturn;
 }
 

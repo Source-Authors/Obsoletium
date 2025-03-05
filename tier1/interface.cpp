@@ -24,10 +24,9 @@
 
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-#include "tier1/strtools.h"
 #include "tier0/icommandline.h"
-#include "tier0/dbg.h"
 #include "tier0/threadtools.h"
+#include "tier1/strtools.h"
 
 #ifdef _WIN32
 #include <direct.h> // getcwd
@@ -133,7 +132,7 @@ void *GetModuleHandle(const char *name)
 //-----------------------------------------------------------------------------
 static void *Sys_GetProcAddress( const char *pModuleName, const char *pName )
 {
-  HMODULE hModule = (HMODULE)GetModuleHandle(pModuleName);
+	HMODULE hModule = (HMODULE)GetModuleHandle(pModuleName);
 #ifdef WIN32
 	return hModule ? (void *)GetProcAddress( hModule, pName ) : nullptr;
 #else
@@ -193,21 +192,10 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 	const char *pDllStringExtension = V_GetFileExtension( DLL_EXT_STRING );
 	const char *pModuleExtension = pDllStringExtension ? ( pDllStringExtension - 1 ) : DLL_EXT_STRING;
 
-	Q_strncpy( str, pLibraryName, sizeof(str) );
+	V_strcpy_safe( str, pLibraryName );
 
-	if ( IsX360() )
-	{
-		// old, probably busted, behavior for xbox
-		if ( !Q_stristr( str, pModuleExtension ) )
-		{
-			V_SetExtension( str, pModuleExtension, sizeof(str) );
-		}
-	}
-	else
-	{
-		// always force the final extension to be .dll
-		V_SetExtension( str, pModuleExtension, sizeof(str) );
-	}
+	// always force the final extension to be .dll
+	V_SetExtension( str, pModuleExtension );
 
 	Q_FixSlashes( str );
 
@@ -395,7 +383,7 @@ void Sys_UnloadModule( CSysModule *pModule )
 CreateInterfaceFn Sys_GetFactory( CSysModule *pModule )
 {
 	if ( !pModule )
-		return NULL;
+		return nullptr;
 
 	HMODULE	hDLL = reinterpret_cast<HMODULE>(pModule);
 #ifdef _WIN32
@@ -458,7 +446,7 @@ bool Sys_LoadInterface(
 		return false;
 	}
 
-	*pOutInterface = fn( pInterfaceVersionName, NULL );
+	*pOutInterface = fn( pInterfaceVersionName, nullptr );
 	if ( !( *pOutInterface ) )
 	{
 		Sys_UnloadModule( pMod );

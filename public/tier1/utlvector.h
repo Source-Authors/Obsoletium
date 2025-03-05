@@ -1511,6 +1511,12 @@ public:
 	{
 		V_SplitString2( pString, pSeparators, nSeparators, *this );
 	}
+
+	template<intp separatorsSize>
+	void SplitString2( char const *pString, const char * (&pSeparators)[separatorsSize] )
+	{
+		SplitString2( pString, pSeparators, separatorsSize );
+	}
 private:
 	CUtlStringList( const CUtlStringList &other ); // copying directly will cause double-release of the same strings; maybe we need to do a deep copy, but unless and until such need arises, this will guard against double-release
 };

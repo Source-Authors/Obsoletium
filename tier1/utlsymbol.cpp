@@ -317,17 +317,17 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 
 	// Fix slashes+dotslashes and make lower case first..
 	char fn[ MAX_PATH ];
-	Q_strncpy( fn, pFileName, sizeof( fn ) );
-	Q_RemoveDotSlashes( fn );
+	V_strcpy_safe( fn, pFileName );
+	V_RemoveDotSlashes( fn );
 #ifdef _WIN32
-	Q_strlower( fn );
+	V_strlower( fn );
 #endif
 
 	// Split the filename into constituent parts
 	char basepath[ MAX_PATH ];
-	Q_ExtractFilePath( fn, basepath, sizeof( basepath ) );
+	V_ExtractFilePath( fn, basepath );
 	char filename[ MAX_PATH ];
-	Q_strncpy( filename, fn + Q_strlen( basepath ), sizeof( filename ) );
+	V_strcpy_safe( filename, fn + V_strlen( basepath ) );
 
 	// not found, lock and look again
 	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
@@ -348,17 +348,17 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 
 	// Fix slashes+dotslashes and make lower case first..
 	char fn[ MAX_PATH ];
-	Q_strncpy( fn, pFileName, sizeof( fn ) );
-	Q_RemoveDotSlashes( fn );
+	V_strcpy_safe( fn, pFileName );
+	V_RemoveDotSlashes( fn );
 #ifdef _WIN32
-	Q_strlower( fn );
+	V_strlower( fn );
 #endif
 
 	// Split the filename into constituent parts
 	char basepath[ MAX_PATH ];
-	Q_ExtractFilePath( fn, basepath, sizeof( basepath ) );
+	V_ExtractFilePath( fn, basepath );
 	char filename[ MAX_PATH ];
-	Q_strncpy( filename, fn + Q_strlen( basepath ), sizeof( filename ) );
+	V_strcpy_safe( filename, fn + V_strlen( basepath ) );
 
 	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
 

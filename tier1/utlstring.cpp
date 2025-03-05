@@ -678,7 +678,7 @@ CUtlString CUtlString::DirName() const
 CUtlString CUtlString::StripExtension() const
 {
 	char szTemp[MAX_PATH];
-	V_StripExtension( String(), szTemp, sizeof( szTemp ) );
+	V_StripExtension( String(), szTemp );
 	return CUtlString( szTemp );
 }
 
@@ -695,14 +695,14 @@ CUtlString CUtlString::StripFilename() const
 CUtlString CUtlString::GetBaseFilename() const
 {
 	char szTemp[MAX_PATH];
-	V_FileBase( String(), szTemp, sizeof( szTemp ) );
+	V_FileBase( String(), szTemp );
 	return CUtlString( szTemp );
 }
 
 CUtlString CUtlString::GetExtension() const
 {
 	char szTemp[MAX_PATH];
-	V_ExtractFileExtension( String(), szTemp, sizeof( szTemp ) );
+	V_ExtractFileExtension( String(), szTemp );
 	return CUtlString( szTemp );
 }
 
@@ -710,7 +710,7 @@ CUtlString CUtlString::GetExtension() const
 CUtlString CUtlString::PathJoin( const char *pStr1, const char *pStr2 )
 {
 	char szPath[MAX_PATH];
-	V_ComposeFileName( pStr1, pStr2, szPath, sizeof( szPath ) );
+	V_ComposeFileName( pStr1, pStr2, szPath );
 	return CUtlString( szPath );
 }
 
