@@ -131,8 +131,8 @@ protected:
 
 #ifdef VPROF_ENABLED
 	int m_nVProfFrame;
-	intp	*m_pFrameCounter;
-	intp	*m_pGlobalCounter;
+	uintp	*m_pFrameCounter;
+	uintp	*m_pGlobalCounter;
 #endif
 
 #ifdef _DEBUG

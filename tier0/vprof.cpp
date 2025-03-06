@@ -885,12 +885,12 @@ void CVProfile::HideBudgetGroup( int budgetGroupID, bool bHide )
 	}
 }
 
-intp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup )
+uintp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup )
 {	
 	Assert( m_NumCounters+1 < MAXCOUNTERS );
 	if ( m_NumCounters + 1 >= MAXCOUNTERS || !InTargetThread() )
 	{
-		static intp dummy;
+		static uintp dummy;
 		return &dummy;
 	}
 	int i;
@@ -915,8 +915,7 @@ intp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounte
 
 void CVProfile::ResetCounters( CounterGroup_t eCounterGroup )
 {
-	int i;
-	for( i = 0; i < m_NumCounters; i++ )
+	for( int i = 0; i < m_NumCounters; i++ )
 	{
 		if ( m_CounterGroups[i] == eCounterGroup )
 			m_Counters[i] = 0;
@@ -934,13 +933,13 @@ const tchar *CVProfile::GetCounterName( int index ) const
 	return m_CounterNames[index];
 }
 
-intp CVProfile::GetCounterValue( int index ) const
+uintp CVProfile::GetCounterValue( int index ) const
 {
 	Assert( index >= 0 && index < m_NumCounters );
 	return m_Counters[index];
 }
 
-const tchar *CVProfile::GetCounterNameAndValue( int index, intp &val ) const
+const tchar *CVProfile::GetCounterNameAndValue( int index, uintp &val ) const
 {
 	Assert( index >= 0 && index < m_NumCounters );
 	val = m_Counters[index];
@@ -1215,10 +1214,14 @@ static void TelemetryPlots()
 	{
 		if( g_VProfCurrentProfile.GetCounterGroup( i ) == COUNTER_GROUP_TELEMETRY )
 		{
-			int val;
+			uintp val;
 			const char *name = g_VProfCurrentProfile.GetCounterNameAndValue( i, val );
 
-			tmPlotI32( TELEMETRY_LEVEL1, TMPT_INTEGER, 0, val, name );
+#ifdef PLATFORM_64BITS
+			tmPlotU64( TELEMETRY_LEVEL1, TMPT_INTEGER, 0, val, name );
+#else
+			tmPlotU32( TELEMETRY_LEVEL1, TMPT_INTEGER, 0, val, name );
+#endif
 		}
 	}
 

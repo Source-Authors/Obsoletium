@@ -343,7 +343,7 @@ inline size_t MemAlloc_GetSizeAligned( void *pMemBlock )
 #define MemAlloc_SaveDebugInfo( pvDebugInfo ) g_pMemAlloc->SaveDebugInfo( pvDebugInfo )
 #define MemAlloc_RestoreDebugInfo( pvDebugInfo ) g_pMemAlloc->RestoreDebugInfo( pvDebugInfo )
 #define MemAlloc_InitDebugInfo( pvDebugInfo, pchRootFileName, nLine ) g_pMemAlloc->InitDebugInfo( pvDebugInfo, pchRootFileName, nLine )
-#define MemAlloc_GetSize( x ) g_pMemAlloc->GetSize( x );
+#define MemAlloc_GetSize( x ) g_pMemAlloc->GetSize( x )
 //-----------------------------------------------------------------------------
 
 class CMemAllocAttributeAlloction

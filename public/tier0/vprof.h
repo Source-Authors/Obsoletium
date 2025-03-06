@@ -469,14 +469,14 @@ public:
 	void HideBudgetGroup( int budgetGroupID, bool bHide = true );
 	void HideBudgetGroup( const char *pszName, bool bHide = true ) { HideBudgetGroup( BudgetGroupNameToBudgetGroupID( pszName), bHide ); }
 
-	intp *FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup=COUNTER_GROUP_DEFAULT  );
+	uintp *FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup=COUNTER_GROUP_DEFAULT  );
 	void ResetCounters( CounterGroup_t eCounterGroup );
 	
 	int GetNumCounters( void ) const;
 	
 	const tchar *GetCounterName( int index ) const;
-	intp GetCounterValue( int index ) const;
-	const tchar *GetCounterNameAndValue( int index, intp &val ) const;
+	uintp GetCounterValue( int index ) const;
+	const tchar *GetCounterNameAndValue( int index, uintp &val ) const;
 	CounterGroup_t GetCounterGroup( int index ) const;
 
 	// Performance monitoring events.
@@ -540,7 +540,7 @@ protected:
 	bool		m_bPMEInit;
 	bool		m_bPMEEnabled;
 
-	intp m_Counters[MAXCOUNTERS];
+	uintp m_Counters[MAXCOUNTERS];
 	char m_CounterGroups[MAXCOUNTERS]; // (These are CounterGroup_t's).
 	tchar *m_CounterNames[MAXCOUNTERS];
 	int m_NumCounters;
@@ -1069,18 +1069,45 @@ class CVProfCounter
 {
 public:
 	CVProfCounter( const tchar *pName, CounterGroup_t group=COUNTER_GROUP_DEFAULT )
+		: m_pName{ pName },
+		  m_pCounter{ g_VProfCurrentProfile.FindOrCreateCounter( pName, group ) }
 	{
-		m_pCounter = g_VProfCurrentProfile.FindOrCreateCounter( pName, group );
 		Assert( m_pCounter );
 	}
 	~CVProfCounter() = default;
 	void Increment( intp val ) 
 	{ 
 		Assert( m_pCounter );
-		*m_pCounter += val; 
+
+		if (val >= 0)
+		{
+			constexpr auto maxCounterValue = std::numeric_limits<
+				std::remove_pointer_t<decltype(m_pCounter)>
+			>::max();
+
+			AssertMsg( maxCounterValue - static_cast<uintp>(val) >=	*m_pCounter,
+				"%s counter overflow. %zu (total) + %zd (value) > %zu (max).",
+				m_pName,
+				*m_pCounter,
+				val,
+				maxCounterValue );
+
+			*m_pCounter += val;
+		}
+		else
+		{
+			AssertMsg( *m_pCounter >= static_cast<uintp>(-val),
+				"%s counter underflow. %zu (total) < %zd (value).",
+				m_pName,
+				*m_pCounter,
+				val );
+
+			*m_pCounter -= -val;
+		}
 	}
 private:
-	intp *m_pCounter;
+	const tchar *m_pName;
+	uintp *m_pCounter;
 };
 
 #endif

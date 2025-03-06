@@ -235,10 +235,9 @@ void PreUpdateProfile( float filteredtime )
 		{
 			if( g_VProfCurrentProfile.GetCounterGroup( i ) != ( nCounterType - 1 ) )
 				continue;
-			const char *pName;
-			intp val;
-			pName = g_VProfCurrentProfile.GetCounterNameAndValue( i, val );
-			Con_NPrintf( nprintIndex, "%s = %d\n", pName, val );
+			uintp val;
+			const char *pName = g_VProfCurrentProfile.GetCounterNameAndValue( i, val );
+			Con_NPrintf( nprintIndex, "%s = %zu\n", pName, val );
 			nprintIndex++;
 		}
 	}

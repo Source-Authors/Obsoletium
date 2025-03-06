@@ -151,7 +151,7 @@ public:
 			m_szLine[len+1] = '\0';
 		}
 
-		V_strncat( m_szLine, pszText, sizeof( m_szLine ) );
+		V_strcat_safe( m_szLine, pszText );
 		m_curPosition += columnWidth + 1;
 	}
 
@@ -1453,39 +1453,48 @@ DEBUGGING TOOLS
 CON_COMMAND( memory, "Print memory stats." )
 {
 #if !defined(NO_MALLOC_OVERRIDE)
-	ConMsg( "Heap Used:\n" );
-	int nTotal = MemAlloc_GetSize( 0 );
-	if (nTotal == -1)
+	ConMsg( "Heap Memory Used:\n" );
+
+	const size_t nTotal{MemAlloc_GetSize(0)};
+	if (nTotal == std::numeric_limits<size_t>::max())
 	{
 		ConMsg( "Corrupted!\n" );
 	}
 	else
 	{
-		ConMsg( "%5.2f MiB (%d bytes)\n", nTotal/(1024.0f*1024.0f), nTotal );
+		ConMsg( "%s (%zu bytes)\n", V_pretifymem( nTotal, 2, true ), nTotal );
 	}
 #endif
 
 #ifdef VPROF_ENABLED
-	ConMsg("\nVideo Memory Used:\n");
-	CVProfile *pProf = &g_VProfCurrentProfile;
-	intp prefixLen = ssize( "TexGroup_Global_" ) - 1;
-	float total = 0.0f;
-	for ( int i=0; i < pProf->GetNumCounters(); i++ )
+	ConMsg("\nGPU Memory Used:\n");
+
+	constexpr char kGroupNamePrefix[]{"TexGroup_Global_"};
+	constexpr intp kGroupNamePrefixLen{ssize( kGroupNamePrefix ) - 1};
+	constexpr float kMibsMultiplier{1.0f / (1024.0f*1024.0f)};
+
+	const CVProfile &profile{g_VProfCurrentProfile};
+	float totalMibs{0.0f};
+	
+	for ( int i = 0; i < profile.GetNumCounters(); i++ )
 	{
-		if ( pProf->GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
+		if ( profile.GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
 		{
-			float value = pProf->GetCounterValue( i ) * (1.0f/(1024.0f*1024.0f) );
-			total += value;
-			const char *pName = pProf->GetCounterName( i );
-			if ( !Q_strnicmp( pName, "TexGroup_Global_", prefixLen ) )
+			const float counterMibs = profile.GetCounterValue( i ) * kMibsMultiplier;
+
+			totalMibs += counterMibs;
+
+			const char *counterName = profile.GetCounterName( i );
+			if ( !Q_strnicmp( counterName, kGroupNamePrefix, kGroupNamePrefixLen ) )
 			{
-				pName += prefixLen;
+				counterName += kGroupNamePrefixLen;
 			}
-			ConMsg( "%5.2f MiB: %s\n", value, pName );
+
+			ConMsg( "%5.2f MiB: %s\n", counterMibs, counterName );
 		}
 	}
 	ConMsg("------------------\n");
-	ConMsg( "%5.2f MiB: total\n", total );
+	ConMsg( "%5.2f MiB: total\n", totalMibs );
 #endif
 
 	ConMsg( "\nHunk Memory Used:\n" );

@@ -452,8 +452,8 @@ struct Texture_t
 
 	CUtlSymbol				m_DebugName;
 	CUtlSymbol				m_TextureGroupName;
-	intp						*m_pTextureGroupCounterGlobal;	// Global counter for this texture's group.
-	intp						*m_pTextureGroupCounterFrame;	// Per-frame global counter for this texture's group.
+	uintp					*m_pTextureGroupCounterGlobal;	// Global counter for this texture's group.
+	uintp					*m_pTextureGroupCounterFrame;	// Per-frame global counter for this texture's group.
 
 	// stats stuff
 	intp					m_SizeBytes;
@@ -6466,23 +6466,7 @@ void CShaderAPIDx8::SetTextureState( Sampler_t sampler, ShaderAPITextureHandle_t
 
 	IDirect3DBaseTexture *pTexture = CShaderAPIDx8::GetD3DTexture( hTexture );
 
-#if defined( _X360 )
-	DWORD linearFormatBackup = pTexture->Format.dword[0]; 
-	if ( samplerState.m_SRGBReadEnable ) 
-	{
-		// convert to srgb format for the bind. This effectively emulates the old srgb read sampler state
-		pTexture->Format.SignX = 
-			pTexture->Format.SignY = 
-			pTexture->Format.SignZ = 3; 
-	}
-#endif
-
 	Dx9Device()->SetTexture( sampler, pTexture );
-
-#if defined( _X360 )
-	// put the format back in linear space
-	pTexture->Format.dword[0] = linearFormatBackup;
-#endif
 
 	Texture_t &tex = GetTexture( hTexture );
 	if ( tex.m_LastBoundFrame != m_CurrentFrame )
@@ -6492,6 +6476,19 @@ void CShaderAPIDx8::SetTextureState( Sampler_t sampler, ShaderAPITextureHandle_t
 
 		if ( tex.m_pTextureGroupCounterFrame )
 		{
+			constexpr auto maxCounterValue = std::numeric_limits<
+				std::remove_pointer_t<
+					decltype(tex.m_pTextureGroupCounterFrame)>
+			>::max();
+
+			AssertMsg( maxCounterValue - static_cast<uintp>(tex.GetMemUsage()) >=
+				*tex.m_pTextureGroupCounterGlobal,
+				"TexGroup_global_%s counter overflow. %s (total) + %s (texture) > %s (max).",
+				tex.m_TextureGroupName.String(),
+				V_pretifymem( *tex.m_pTextureGroupCounterGlobal, 2, true ),
+				V_pretifymem( tex.GetMemUsage(), 2, true ),
+				V_pretifymem( maxCounterValue, 2, true ) );
+
 			// Update the per-frame texture group counter.
 			*tex.m_pTextureGroupCounterFrame += tex.GetMemUsage();
 		}
@@ -7041,12 +7038,12 @@ void CShaderAPIDx8::SetupTextureGroup( ShaderAPITextureHandle_t hTexture, const 
 	}
 
 	// 360 cannot vprof due to multicore loading until vprof is reentrant and these counters are real.
-#if defined( VPROF_ENABLED ) && !defined( _X360 )
+#if defined( VPROF_ENABLED )
 	char counterName[256];
-	Q_snprintf( counterName, sizeof( counterName ), "TexGroup_global_%s", pTexture->m_TextureGroupName.String() );
+	V_sprintf_safe( counterName, "TexGroup_global_%s", pTexture->m_TextureGroupName.String() );
 	pTexture->m_pTextureGroupCounterGlobal = g_VProfCurrentProfile.FindOrCreateCounter( counterName, COUNTER_GROUP_TEXTURE_GLOBAL );
 
-	Q_snprintf( counterName, sizeof( counterName ), "TexGroup_frame_%s", pTexture->m_TextureGroupName.String() );
+	V_sprintf_safe( counterName, "TexGroup_frame_%s", pTexture->m_TextureGroupName.String() );
 	pTexture->m_pTextureGroupCounterFrame = g_VProfCurrentProfile.FindOrCreateCounter( counterName, COUNTER_GROUP_TEXTURE_PER_FRAME );
 #else
 	pTexture->m_pTextureGroupCounterGlobal = NULL;
@@ -7055,6 +7052,18 @@ void CShaderAPIDx8::SetupTextureGroup( ShaderAPITextureHandle_t hTexture, const 
 
 	if ( pTexture->m_pTextureGroupCounterGlobal )
 	{
+		constexpr auto maxCounterValue = std::numeric_limits<
+			std::remove_pointer_t<
+				decltype(pTexture->m_pTextureGroupCounterGlobal)>
+		>::max();
+
+		AssertMsg( maxCounterValue - static_cast<uintp>(pTexture->GetMemUsage()) >=
+			*pTexture->m_pTextureGroupCounterGlobal,
+			"TexGroup_global_%s counter overflow. %s (total) + %s (texture) > %s (max).",
+			pTexture->m_TextureGroupName.String(),
+			V_pretifymem( *pTexture->m_pTextureGroupCounterGlobal, 2, true ),
+			V_pretifymem( pTexture->GetMemUsage(), 2, true ),
+			V_pretifymem( maxCounterValue, 2, true ) );
 		*pTexture->m_pTextureGroupCounterGlobal += pTexture->GetMemUsage();
 	}
 }
@@ -7126,8 +7135,13 @@ void CShaderAPIDx8::DeleteD3DTexture( ShaderAPITextureHandle_t hTexture )
 	// Remove this texture from its global texture group counter.
 	if ( texture.m_pTextureGroupCounterGlobal )
 	{
+		AssertMsg( *texture.m_pTextureGroupCounterGlobal >= static_cast<uintp>(texture.GetMemUsage()),
+			"TexGroup_global_%s counter underflow. %s (total) < %s (texture).",
+			texture.m_TextureGroupName.String(),
+			V_pretifymem( *texture.m_pTextureGroupCounterGlobal, 2, true ),
+			V_pretifymem( texture.GetMemUsage(), 2, true ) );
+
 		*texture.m_pTextureGroupCounterGlobal -= texture.GetMemUsage();
-		Assert( *texture.m_pTextureGroupCounterGlobal >= 0 );
 		texture.m_pTextureGroupCounterGlobal = NULL;
 	}
 
