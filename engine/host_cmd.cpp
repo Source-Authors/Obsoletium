@@ -1462,12 +1462,12 @@ CON_COMMAND( memory, "Print memory stats." )
 	}
 	else
 	{
-		ConMsg( "%s (%zu bytes)\n", V_pretifymem( nTotal, 2, true ), nTotal );
+		ConMsg( "%11s (%zu bytes)\n", V_pretifymem( nTotal, 2, true ), nTotal );
 	}
 #endif
 
 #ifdef VPROF_ENABLED
-	ConMsg("\nGPU Memory Used:\n");
+	ConMsg("GPU Memory Used:\n");
 
 	constexpr char kGroupNamePrefix[]{"TexGroup_Global_"};
 	constexpr intp kGroupNamePrefixLen{ssize( kGroupNamePrefix ) - 1};
@@ -1490,14 +1490,14 @@ CON_COMMAND( memory, "Print memory stats." )
 				counterName += kGroupNamePrefixLen;
 			}
 
-			ConMsg( "%5.2f MiB: %s\n", counterMibs, counterName );
+			ConMsg( "%7.2f MiB: %s\n", counterMibs, counterName );
 		}
 	}
 	ConMsg("------------------\n");
-	ConMsg( "%5.2f MiB: total\n", totalMibs );
+	ConMsg( "%7.2f MiB: total\n", totalMibs );
 #endif
 
-	ConMsg( "\nHunk Memory Used:\n" );
+	ConMsg( "Hunk Memory Used:\n" );
 	Hunk_Print();
 }
 

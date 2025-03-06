@@ -32,9 +32,9 @@ CMemoryStack g_HunkOverflow;
 static bool g_bWarnedOverflow;
 #endif
 
-static int GetTargetCacheSize()
+static intp GetTargetCacheSize()
 {
-	int nMemLimit = host_parms.memsize - Hunk_Size();
+	intp nMemLimit = host_parms.memsize - Hunk_Size();
 	if ( nMemLimit < 0x100000 )
 	{
 		nMemLimit = 0x100000;
@@ -80,12 +80,12 @@ void *Hunk_Alloc(size_t size, bool bClear )
 	return Hunk_AllocName( size, NULL, bClear );
 }
 
-int	Hunk_LowMark()
+intp Hunk_LowMark()
 {
-	return (int)( g_HunkMemoryStack.GetCurrentAllocPoint() );
+	return (intp)( g_HunkMemoryStack.GetCurrentAllocPoint() );
 }
 
-void Hunk_FreeToLowMark(int mark)
+void Hunk_FreeToLowMark(intp mark)
 {
 	Assert( mark < g_HunkMemoryStack.GetSize() );
 #ifdef HUNK_USE_16MB_PAGE
@@ -95,7 +95,7 @@ void Hunk_FreeToLowMark(int mark)
 	g_HunkMemoryStack.FreeToAllocPoint( mark );
 }
 
-int Hunk_MallocSize()
+intp Hunk_MallocSize()
 {
 #ifdef HUNK_USE_16MB_PAGE
 	return g_HunkMemoryStack.GetSize() + g_HunkOverflow.GetSize();
@@ -104,7 +104,7 @@ int Hunk_MallocSize()
 #endif
 }
 
-int Hunk_Size()
+intp Hunk_Size()
 {
 #ifdef HUNK_USE_16MB_PAGE
 	return g_HunkMemoryStack.GetUsed() + g_HunkOverflow.GetUsed();
@@ -115,12 +115,20 @@ int Hunk_Size()
 
 void Hunk_Print()
 {
+	constexpr float kMibsMuliplier{1.f / (1024.f * 1024.f)};
+
 #ifdef HUNK_USE_16MB_PAGE
-	Msg( "Total used memory:      %d (%zd/%zd)\n", Hunk_Size(), g_HunkMemoryStack.GetUsed(), g_HunkOverflow.GetUsed() );
-	Msg( "Total committed memory: %d (%d/%d)\n", Hunk_MallocSize(), g_HunkMemoryStack.GetSize(), g_HunkOverflow.GetSize() );
+	ConMsg( "Total used memory:      %.2f MiB (%.2f MiB/%.2f MiB)\n",
+			Hunk_Size() * kMibsMuliplier,
+			g_HunkMemoryStack.GetUsed() * kMibsMuliplier,
+			g_HunkOverflow.GetUsed() * kMibsMuliplier );
+	ConMsg( "Total committed memory: %.2f MiB (%.2f MiB/%.2f MiB)\n",
+			Hunk_MallocSize() * kMibsMuliplier,
+			g_HunkMemoryStack.GetSize() * kMibsMuliplier,
+			g_HunkOverflow.GetSize() * kMibsMuliplier );
 #else
-	Msg( "Total used memory:      %d\n", Hunk_Size() );
-	Msg( "Total committed memory: %d\n", Hunk_MallocSize() );
+	ConMsg( "Total used memory:      %.2f MiB\n", Hunk_Size() * kMibsMuliplier );
+	ConMsg( "Total committed memory: %.2f MiB\n", Hunk_MallocSize() * kMibsMuliplier );
 #endif
 }
 

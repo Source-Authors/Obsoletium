@@ -744,10 +744,10 @@ void CHostState::OnClientConnected()
 					counterName += kGroupNamePrefixLen;
 				}
 
-				g_pFileSystem->FPrintf( fp, "%s: %0.3fMiB\n", counterName, valueMibs );
+				g_pFileSystem->FPrintf( fp, "%s: %0.3f MiB\n", counterName, valueMibs );
 			}
 		}
-		g_pFileSystem->FPrintf( fp, "GPU memory total: %0.3fMiB\n", totalMibs );
+		g_pFileSystem->FPrintf( fp, "GPU memory total: %0.3f MiB\n", totalMibs );
 #else
 		// dimhotepus: Notify user VProfiler is not supported.
 		g_pFileSystem->FPrintf( fp, "VProfiler is not supported.\n" );

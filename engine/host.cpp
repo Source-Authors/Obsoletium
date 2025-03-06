@@ -493,7 +493,7 @@ double		host_jitterhistory[128] = { 0 };
 unsigned int host_jitterhistorypos = 0;
 
 int			host_framecount;
-static int	host_hunklevel;
+static intp	host_hunklevel;
 
 CGameClient	*host_client;			// current client
 
@@ -2351,18 +2351,18 @@ void Host_CheckDumpMemoryStats( void )
 	Q_memset( &state, 0, sizeof( state ) );
 	_CrtMemCheckpoint( &state );
 
-	unsigned int size = 0;
-
-	for ( int use = 0; use < _MAX_BLOCKS; use++)
+	size_t size = 0;
+	for ( const auto &sz : state.lSizes )
 	{
-		size += state.lSizes[ use ];
+		size += sz;
 	}
+
 	Msg("MEMORY:  Run-time Heap\n------------------------------------\n");
 
 	Msg( "\tHigh water %s\n", Q_pretifymem( state.lHighWaterCount,4 ) );
 	Msg( "\tCurrent mem %s\n", Q_pretifymem( size,4 ) );
 	Msg("------------------------------------\n");
-	int hunk = Hunk_MallocSize();
+	intp hunk = Hunk_MallocSize();
 	Msg("\tAllocated outside hunk:  %s\n", Q_pretifymem( size - hunk ) );
 #endif
 }

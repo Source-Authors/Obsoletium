@@ -30,11 +30,11 @@ T* Hunk_AllocName(size_t count, const char *name, bool bClear = true)
   return static_cast<T*>(Hunk_AllocName(count * sizeof(T), name, bClear));
 }
 
-int	Hunk_LowMark();
-void Hunk_FreeToLowMark (int mark);
+intp Hunk_LowMark();
+void Hunk_FreeToLowMark (intp mark);
 
-int Hunk_MallocSize();
-int Hunk_Size();
+intp Hunk_MallocSize();
+intp Hunk_Size();
 
 void Hunk_Print();
 
