@@ -31,8 +31,8 @@ extern CSteamAPIContext *steamapicontext;
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#define	GAME_CONFIG_FILENAME	"GameConfig.txt"
-#define TOKEN_SDK_VERSION		"SDKVersion"
+constexpr inline char GAME_CONFIG_FILENAME[]{"GameConfig.txt"};
+constexpr inline char TOKEN_SDK_VERSION[]{"SDKVersion"};
 
 // Version history:
 //	0 - Initial release
@@ -149,8 +149,8 @@ defaultConfigInfo_t SourceTestInfo =
 CGameConfigManager::CGameConfigManager( void ) : m_pData( NULL ), m_LoadStatus( LOADSTATUS_NONE )
 {
 	// Start with default directory
-	GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), m_szBaseDirectory, sizeof( m_szBaseDirectory ) );
-	Q_StripLastDir( m_szBaseDirectory, sizeof( m_szBaseDirectory ) );	// Get rid of the filename.
+	GetModuleFileName( GetModuleHandle( NULL ), m_szBaseDirectory, sizeof( m_szBaseDirectory ) );
+	Q_StripLastDir( m_szBaseDirectory );	// Get rid of the filename.
 	Q_StripTrailingSlash( m_szBaseDirectory );
 	m_eSDKEpoch = (eSDKEpochs) SDK_LAUNCHER_VERSION;
 }
@@ -637,7 +637,7 @@ bool CGameConfigManager::ConvertGameConfigsINI( void )
 	{
 		// Each came configuration is stored in a different section, named "GameConfig0..GameConfigN".
 		// If the "Name" key exists in this section, try to load the configuration from this section.
-		sprintf(szSectionName, "GameConfig%d", nConfig);
+		V_sprintf_safe(szSectionName, "GameConfig%d", nConfig);
 
 		int nCount = GetPrivateProfileString(szSectionName, "Name", "", textBuffer, sizeof(textBuffer), iniFilePath);
 		if (nCount > 0)
@@ -662,7 +662,7 @@ bool CGameConfigManager::ConvertGameConfigsINI( void )
 			{
 				char szGameData[MAX_PATH];
 
-				sprintf( szGameData, "GameData%d", i );
+				V_sprintf_safe( szGameData, "GameData%d", i );
 				nStrlen = GetPrivateProfileString( szSectionName, szGameData, "", textBuffer, sizeof(textBuffer), iniFilePath );
 				
 				if ( nStrlen > 0 )
@@ -727,7 +727,7 @@ bool CGameConfigManager::ConvertGameConfigsINI( void )
 			// Write out all excluded directories
 			for( i = 0; i < materialExcludeCount; i++ )
 			{
-				sprintf( &excludeDir[0], "-MaterialExcludeDir%d", i );
+				V_sprintf_safe( excludeDir, "-MaterialExcludeDir%d", i );
 				GetPrivateProfileString( szSectionName, excludeDir, "", textBuffer, sizeof( textBuffer ), iniFilePath ); 
 				hammerBlock->SetString( excludeDir, textBuffer );
 			}
@@ -774,9 +774,9 @@ bool CGameConfigManager::SaveConfigs( const char *baseDir )
 
 	// Make a full path name
 	char szPath[MAX_PATH];
-	Q_strncpy( szPath, GetBaseDirectory(), sizeof(szPath) );
-	Q_AppendSlash( szPath, sizeof(szPath) );
-	Q_strncat( szPath, GAME_CONFIG_FILENAME, sizeof( szPath ), COPY_ALL_CHARACTERS );
+	V_strcpy_safe( szPath, GetBaseDirectory() );
+	V_AppendSlash( szPath );
+	V_strcat_safe( szPath, GAME_CONFIG_FILENAME );
 	
 	CUtlBuffer buffer;
 	m_pData->RecursiveSaveToFile( buffer, 0 );
@@ -800,8 +800,8 @@ const char *CGameConfigManager::GetRootDirectory( void )
 	static char path[MAX_PATH] = {0};
 	if ( path[0] == 0 )
 	{
-		Q_strncpy( path, GetBaseDirectory(), sizeof( path ) );
-		Q_StripLastDir( path, sizeof( path ) );	// Get rid of the 'bin' directory
+		V_strcpy_safe( path, GetBaseDirectory() );
+		Q_StripLastDir( path );	// Get rid of the 'bin' directory
 		Q_StripTrailingSlash( path );
 	}
 	return path;

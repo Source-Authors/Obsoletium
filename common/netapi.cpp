@@ -4,6 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+
+#include "netapi.h"
+
 #ifdef _WIN32
 #include "winsock.h"
 typedef int socklen_t;
@@ -14,12 +17,12 @@ typedef int socklen_t;
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-
 #else
 #error "Please define your platform"
 #endif
 
-#include "netapi.h"
+#include "tier1/strtools.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -128,7 +131,7 @@ static bool StringToSockaddr( const char *s, struct sockaddr *sadr )
 	p->sin_family = AF_INET;
 	p->sin_port = 0;
 
-	strcpy (copy, s);
+	V_strcpy_safe (copy, s);
 
 	// strip off a trailing :port if present
 	for ( colon = copy ; *colon ; colon++ )
