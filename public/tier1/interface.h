@@ -243,6 +243,11 @@ public:
 						CDllDemandLoader( char const *pchModuleName );
 	virtual				~CDllDemandLoader();
 	[[nodiscard]] CreateInterfaceFn	GetFactory();
+	template<typename T>
+	[[nodiscard]] CreateInterfaceFnT<T>	GetFactoryT()
+	{
+		return reinterpret_cast<CreateInterfaceFnT<T>>(GetFactory());
+	}
 	void				Unload();
 
 private:
