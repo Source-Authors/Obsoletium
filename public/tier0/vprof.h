@@ -469,13 +469,16 @@ public:
 	void HideBudgetGroup( int budgetGroupID, bool bHide = true );
 	void HideBudgetGroup( const char *pszName, bool bHide = true ) { HideBudgetGroup( BudgetGroupNameToBudgetGroupID( pszName), bHide ); }
 
+	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
 	uintp *FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup=COUNTER_GROUP_DEFAULT  );
 	void ResetCounters( CounterGroup_t eCounterGroup );
 	
 	int GetNumCounters( void ) const;
 	
 	const tchar *GetCounterName( int index ) const;
+	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
 	uintp GetCounterValue( int index ) const;
+	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
 	const tchar *GetCounterNameAndValue( int index, uintp &val ) const;
 	CounterGroup_t GetCounterGroup( int index ) const;
 
@@ -1079,6 +1082,7 @@ public:
 	{ 
 		Assert( m_pCounter );
 
+		// dimhotepus: Check overflows / underflows.
 		if (val >= 0)
 		{
 			constexpr auto maxCounterValue = std::numeric_limits<

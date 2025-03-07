@@ -65,6 +65,7 @@ void DisconnectTier2Libraries();
 void InitDefaultFileSystem(void);
 void ShutdownDefaultFileSystem(void);
 
+// dimhotepus: Add RAII wrapper over InitDefaultFileSystem.
 class ScopedDefaultFileSystem
 {
 public:
@@ -91,6 +92,7 @@ public:
 void InitCommandLineProgram( int argc, char **argv );
 void ShutdownCommandLineProgram();
 
+// dimhotepus: Add RAII wrapper over InitCommandLineProgram.
 class ScopedCommandLineProgram
 {
 public:

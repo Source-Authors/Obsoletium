@@ -60,7 +60,8 @@ public:
 
 constexpr inline char CREATEINTERFACE_PROCNAME[]{"CreateInterface"};
 
-using CreateInterfaceFn = void* (*)(const char *pName, int *pReturnCode);
+using CreateInterfaceFn = void *(*)(const char *pName, int *pReturnCode);
+// dimhotepus: Strongly-typed version.
 template<typename T>
 using CreateInterfaceFnT = T *(*)(const char *pName, int *pReturnCode);
 
@@ -215,6 +216,7 @@ extern void					Sys_UnloadModule( CSysModule *pModule );
 	CSysModule **pOutModule,
 	void **pOutInterface );
 
+// dimhotepus: Strongly-typed version.
 template<typename T>
 [[nodiscard]] inline bool Sys_LoadInterfaceT(
 	const char *pModuleName,
@@ -243,6 +245,8 @@ public:
 						CDllDemandLoader( char const *pchModuleName );
 	virtual				~CDllDemandLoader();
 	[[nodiscard]] CreateInterfaceFn	GetFactory();
+
+	// dimhotepus: Strongly-typed version.
 	template<typename T>
 	[[nodiscard]] CreateInterfaceFnT<T>	GetFactoryT()
 	{
