@@ -21,13 +21,12 @@ using FARPROC = ptrdiff_t(__stdcall *)();
 
 extern "C" {
 
-__declspec(dllimport) _Ret_maybenull_ HMODULE
-    __stdcall LoadLibraryExA(_In_ const char *lpLibFileName,
-                             _Reserved_ void *hFile,
-                             _In_ unsigned long dwFlags);
+__declspec(dllimport) _Ret_maybenull_ HMODULE __stdcall LoadLibraryExA(
+    _In_ const char *lpLibFileName, _Reserved_ void *hFile,
+    _In_ unsigned long dwFlags);
 __declspec(dllimport) int __stdcall FreeLibrary(_In_ HMODULE hLibModule);
-__declspec(dllimport) FARPROC
-    __stdcall GetProcAddress(_In_ HMODULE hModule, _In_ const char *lpProcName);
+__declspec(dllimport) FARPROC __stdcall GetProcAddress(
+    _In_ HMODULE hModule, _In_ const char *lpProcName);
 
 __declspec(dllimport) _Check_return_ unsigned long __stdcall GetLastError();
 
@@ -106,14 +105,16 @@ class ScopedDll {
   GetFunction(const char *name) const noexcept {
 #ifdef _WIN32
     F f = reinterpret_cast<F>(::GetProcAddress(dll_, name));
-#else
-    F f = reinterpret_cast<F>(::dlsym(dll_, name));
-#endif
-
     if (f == nullptr) {
       return {nullptr, std::error_code{static_cast<int>(::GetLastError()),
                                        std::system_category()}};
     }
+#else
+    F f = reinterpret_cast<F>(::dlsym(dll_, name));
+    if (f == nullptr) {
+      return {nullptr, std::error_code{EINVAL, std::generic_category()}};
+    }
+#endif
 
     return {f, std::error_code{}};
   }
