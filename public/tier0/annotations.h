@@ -26,6 +26,7 @@
 // CAP (elements) versus BYTECAP (bytes), and null termination or
 // not (_Z).
 #define IN_Z _In_z_
+#define IN_OPT_Z _In_opt_z_
 #define IN_CAP(x) _In_count_(x)
 #define IN_BYTECAP(x) _In_bytecount_(x)
 #define OUT_Z_CAP(x) _Out_z_cap_(x)
