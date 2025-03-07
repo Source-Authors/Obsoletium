@@ -65,6 +65,24 @@ void DisconnectTier2Libraries();
 void InitDefaultFileSystem(void);
 void ShutdownDefaultFileSystem(void);
 
+class ScopedDefaultFileSystem
+{
+public:
+  ScopedDefaultFileSystem()
+  {
+	InitDefaultFileSystem();
+  }
+  ~ScopedDefaultFileSystem()
+  {
+	ShutdownDefaultFileSystem();
+  }
+
+  ScopedDefaultFileSystem(ScopedDefaultFileSystem &) = delete;
+  ScopedDefaultFileSystem(ScopedDefaultFileSystem &&) = delete;
+  ScopedDefaultFileSystem& operator=(ScopedDefaultFileSystem &) = delete;
+  ScopedDefaultFileSystem& operator=(ScopedDefaultFileSystem &&) = delete;
+};
+
 
 //-----------------------------------------------------------------------------
 // for simple utilities using valve libraries, call the entry point below in main(). It will
