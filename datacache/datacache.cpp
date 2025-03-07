@@ -1046,7 +1046,8 @@ void CDataCache::SetSize( size_t nMaxBytes )
 
 	nMaxBytes /= static_cast<size_t>(1024) * 1024;
 
-	if ( datacachesize.GetInt() != nMaxBytes )
+	// dimhotepus: Fix warning about size_t <-> int mismatch.
+	if ( static_cast<size_t>(datacachesize.GetInt()) != nMaxBytes )
 	{
 		datacachesize.SetValue( static_cast<int>(nMaxBytes) );
 	}
