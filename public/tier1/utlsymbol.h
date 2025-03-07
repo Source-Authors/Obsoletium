@@ -47,6 +47,8 @@ public:
 	// operator==
 	bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
 	bool operator==( const char* pStr ) const;
+	// dimhotepus: Compare with nullptr.
+	bool operator==( std::nullptr_t ptr ) const { return m_Id == UTL_INVAL_SYMBOL; }
 	
 	// Is valid?
 	bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
