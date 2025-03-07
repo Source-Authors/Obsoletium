@@ -139,7 +139,7 @@ bool CLC_ClientInfo::ReadFromBuffer( bf_read &buffer )
 	m_nSendTableCRC = buffer.ReadLong();
 	m_bIsHLTV = buffer.ReadOneBit()!=0;
 	m_nFriendsID = buffer.ReadLong();
-	buffer.ReadString( m_FriendsName, sizeof(m_FriendsName) );
+	buffer.ReadString( m_FriendsName );
 	
 	for ( int i=0; i<MAX_CUSTOM_FILES; i++ )
 	{
@@ -245,11 +245,11 @@ bool CLC_RespondCvarValue::ReadFromBuffer( bf_read &buffer )
 	m_eStatusCode = (EQueryCvarValueStatus)buffer.ReadSBitLong( 4 );
 	
 	// Read the name.
-	buffer.ReadString( m_szCvarNameBuffer, sizeof( m_szCvarNameBuffer ) );
+	buffer.ReadString( m_szCvarNameBuffer );
 	m_szCvarName = m_szCvarNameBuffer;
 	
 	// Read the value.
-	buffer.ReadString( m_szCvarValueBuffer, sizeof( m_szCvarValueBuffer ) );
+	buffer.ReadString( m_szCvarValueBuffer );
 	m_szCvarValue = m_szCvarValueBuffer;
 	
 	return !buffer.IsOverflowed();
@@ -356,11 +356,11 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 	int iCode = buffer.ReadUBitLong( 2 );
 	if ( iCode == 0 )
 	{
-		buffer.ReadString( m_szPathID, sizeof( m_szPathID ) );
+		buffer.ReadString( m_szPathID );
 	}
 	else if ( (iCode-1) < ssize( g_MostCommonPathIDs ) )
 	{
-		V_strncpy( m_szPathID, g_MostCommonPathIDs[iCode-1], sizeof( m_szPathID ) );
+		V_strcpy_safe( m_szPathID, g_MostCommonPathIDs[iCode-1] );
 	}
 	else
 	{
@@ -378,7 +378,7 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 	if ( c == 1 )
 	{
 		bNewVersion = true;
-		buffer.ReadString( szTemp, sizeof( szTemp ) );
+		buffer.ReadString( szTemp );
 	}
 	else
 	{
@@ -471,11 +471,11 @@ bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 	int iCode = buffer.ReadUBitLong( 2 );
 	if ( iCode == 0 )
 	{
-		buffer.ReadString( m_szPathID, sizeof( m_szPathID ) );
+		buffer.ReadString( m_szPathID );
 	}
 	else if ( (iCode-1) < ssize( g_MostCommonPathIDs ) )
 	{
-		V_strncpy( m_szPathID, g_MostCommonPathIDs[iCode-1], sizeof( m_szPathID ) );
+		V_strcpy_safe( m_szPathID, g_MostCommonPathIDs[iCode-1] );
 	}
 	else
 	{
@@ -487,13 +487,13 @@ bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 	iCode = buffer.ReadUBitLong( 3 );
 	if ( iCode == 0 )
 	{
-		buffer.ReadString( m_szFilename, sizeof( m_szFilename ) );
+		buffer.ReadString( m_szFilename );
 	}
 	else if ( (iCode-1) < ssize( g_MostCommonPrefixes ) )
 	{
 		char szTemp[MAX_PATH];
-		buffer.ReadString( szTemp, sizeof( szTemp ) );
-		V_snprintf( m_szFilename, sizeof( m_szFilename ), "%s%c%s", g_MostCommonPrefixes[iCode-1], CORRECT_PATH_SEPARATOR, szTemp );
+		buffer.ReadString( szTemp );
+		V_sprintf_safe( m_szFilename, "%s%c%s", g_MostCommonPrefixes[iCode-1], CORRECT_PATH_SEPARATOR, szTemp );
 	}
 	else
 	{
@@ -501,7 +501,7 @@ bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 		return false;
 	}
 
-	buffer.ReadBytes( m_MD5.bits, MD5_DIGEST_LENGTH );
+	buffer.ReadBytes( m_MD5.bits );
 
 	return !buffer.IsOverflowed();
 }
@@ -524,7 +524,7 @@ bool CLC_SaveReplay::WriteToBuffer( bf_write &buffer )
 
 bool CLC_SaveReplay::ReadFromBuffer( bf_read &buffer )
 {
-	buffer.ReadString( m_szFilename, sizeof( m_szFilename ) );
+	buffer.ReadString( m_szFilename );
 	m_nStartSendByte = buffer.ReadUBitLong( sizeof( m_nStartSendByte ) );
 	m_flPostDeathRecordTime = buffer.ReadFloat();
 	return !buffer.IsOverflowed();
@@ -676,7 +676,7 @@ bool SVC_Print::ReadFromBuffer( bf_read &buffer )
 
 	m_szText = m_szTextBuffer;
 	
-	return buffer.ReadString(m_szTextBuffer, sizeof(m_szTextBuffer) );
+	return buffer.ReadString(m_szTextBuffer);
 }
 
 const char *SVC_Print::ToString(void) const
@@ -697,7 +697,7 @@ bool NET_StringCmd::ReadFromBuffer( bf_read &buffer )
 
 	m_szCommand = m_szCommandBuffer;
 	
-	return buffer.ReadString(m_szCommandBuffer, sizeof(m_szCommandBuffer) );
+	return buffer.ReadString(m_szCommandBuffer);
 }
 
 const char *NET_StringCmd::ToString(void) const
@@ -751,7 +751,7 @@ bool SVC_ServerInfo::ReadFromBuffer( bf_read &buffer )
 	// Prevent cheating with hacked maps
 	if ( m_nProtocol > PROTOCOL_VERSION_17 )
 	{
-		buffer.ReadBytes( m_nMapMD5.bits, MD5_DIGEST_LENGTH );
+		buffer.ReadBytes( m_nMapMD5.bits );
 	}
 	else
 	{
@@ -762,10 +762,10 @@ bool SVC_ServerInfo::ReadFromBuffer( bf_read &buffer )
 	m_nMaxClients	= buffer.ReadByte();
 	m_fTickInterval	= buffer.ReadFloat();
 	m_cOS			= buffer.ReadChar();
-	buffer.ReadString( m_szGameDirBuffer, sizeof(m_szGameDirBuffer) );
-	buffer.ReadString( m_szMapNameBuffer, sizeof(m_szMapNameBuffer) );
-	buffer.ReadString( m_szSkyNameBuffer, sizeof(m_szSkyNameBuffer) );
-	buffer.ReadString( m_szHostNameBuffer, sizeof(m_szHostNameBuffer) );
+	buffer.ReadString( m_szGameDirBuffer );
+	buffer.ReadString( m_szMapNameBuffer );
+	buffer.ReadString( m_szSkyNameBuffer );
+	buffer.ReadString( m_szHostNameBuffer );
 
 #if defined( REPLAY_ENABLED )
 	// Only attempt to read the 'replay' bit if the net channel's protocol
@@ -950,7 +950,7 @@ bool SVC_VoiceInit::ReadFromBuffer( bf_read &buffer )
 {
 	VPROF( "SVC_VoiceInit::ReadFromBuffer" );
 
-	buffer.ReadString( m_szVoiceCodec, sizeof(m_szVoiceCodec) );
+	buffer.ReadString( m_szVoiceCodec );
 	unsigned char nLegacyQuality = buffer.ReadByte();
 	if ( nLegacyQuality == 255 )
 	{
@@ -1165,8 +1165,8 @@ bool NET_SetConVar::ReadFromBuffer( bf_read &buffer )
 	for (int i=0; i< numvars; i++ )
 	{
 		cvar_t var;
-		buffer.ReadString( var.name, sizeof(var.name) );
-		buffer.ReadString( var.value, sizeof(var.value) );
+		buffer.ReadString( var.name );
+		buffer.ReadString( var.value );
 		m_ConVars.AddToTail( var );
 
 	}
@@ -1294,7 +1294,7 @@ bool SVC_CreateStringTable::ReadFromBuffer( bf_read &buffer )
 	}
 
 	m_szTableName = m_szTableNameBuffer;
-	buffer.ReadString( m_szTableNameBuffer, sizeof(m_szTableNameBuffer) );
+	buffer.ReadString( m_szTableNameBuffer );
 	m_nMaxEntries = buffer.ReadWord();
 	int encodeBits = Q_log2( m_nMaxEntries );
 	m_nNumEntries = buffer.ReadUBitLong( encodeBits+1 );
@@ -1509,8 +1509,8 @@ bool SVC_ClassInfo::ReadFromBuffer( bf_read &buffer )
 		class_t serverclass;
 
 		serverclass.classID = buffer.ReadUBitLong( nServerClassBits );
-		buffer.ReadString( serverclass.classname, sizeof(serverclass.classname) );
-		buffer.ReadString( serverclass.datatablename, sizeof(serverclass.datatablename) );
+		buffer.ReadString( serverclass.classname );
+		buffer.ReadString( serverclass.datatablename );
 
 		m_Classes.AddToTail( serverclass );
 	}
@@ -1858,17 +1858,17 @@ bool MM_ClientInfo::WriteToBuffer( bf_write &buffer )
 
 bool MM_ClientInfo::ReadFromBuffer( bf_read &buffer )
 {
-	buffer.ReadBytes( &m_xnaddr, sizeof( m_xnaddr ) );
+	buffer.ReadBytes( m_xnaddr );
 	m_id = buffer.ReadLongLong();			// 64 bit
 	m_cPlayers = buffer.ReadByte();
 	m_bInvited = (buffer.ReadByte() != 0);
 	for ( int i = 0; i < m_cPlayers; ++i )
 	{
 		m_xuids[i] = buffer.ReadLongLong();	// 64 bit
-		buffer.ReadBytes( &m_cVoiceState, sizeof( m_cVoiceState ) );
+		buffer.ReadBytes( m_cVoiceState );
 		m_iTeam[i] = buffer.ReadLong();
 		m_iControllers[i] = buffer.ReadByte();
-		buffer.ReadString( m_szGamertags[i], sizeof( m_szGamertags[i] ), true );
+		buffer.ReadString( m_szGamertags[i], true );
 	}
 
 	return !buffer.IsOverflowed();
@@ -1999,14 +1999,14 @@ bool MM_JoinResponse::ReadFromBuffer( bf_read &buffer )
 	m_SessionProperties.RemoveAll();
 	for ( int i = 0; i < m_PropertyCount; ++i )
 	{
-		buffer.ReadBytes( &prop, sizeof( XUSER_PROPERTY ) );
+		buffer.ReadBytes( prop );
 		m_SessionProperties.AddToTail( prop );
 	}
 	XUSER_CONTEXT ctx;
 	m_SessionContexts.RemoveAll();
 	for ( int i = 0; i < m_ContextCount; ++i )
 	{
-		buffer.ReadBytes( &ctx, sizeof( XUSER_CONTEXT ) );
+		buffer.ReadBytes( ctx );
 		m_SessionContexts.AddToTail( ctx );
 	}
 
@@ -2034,7 +2034,7 @@ bool SVC_GetCvarValue::ReadFromBuffer( bf_read &buffer )
 	VPROF( "SVC_GetCvarValue::ReadFromBuffer" );
 
 	m_iCookie = buffer.ReadSBitLong( 32 );
-	buffer.ReadString( m_szCvarNameBuffer, sizeof( m_szCvarNameBuffer ) );
+	buffer.ReadString( m_szCvarNameBuffer );
 	m_szCvarName = m_szCvarNameBuffer;
 	
 	return !buffer.IsOverflowed();
