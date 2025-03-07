@@ -545,7 +545,7 @@ public:
 	}
 
 	// Read a list of bits in.
-	void            ReadBits(void *pOut, int nBits);
+	void            ReadBits(void *pOut, intp nBits);
 	// Read a list of bits in, but don't overrun the destination buffer.
 	// Returns the number of bits read into the buffer. The remaining
 	// bits are skipped over.
@@ -603,7 +603,20 @@ public:
 	BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
 	int64			ReadLongLong();
 	float			ReadFloat();
-	bool			ReadBytes(void *pOut, int nBytes);
+
+	bool			ReadBytes( OUT_CAP(nBytes) void *pOut, intp nBytes);
+	// dimhotepus: Bounds-safe interface.
+	template<typename T, intp nBytes>
+	bool			ReadBytes( T (&pOut)[nBytes] )
+	{
+		return ReadBytes( pOut, nBytes );
+	}
+	// dimhotepus: Bounds-safe interface.
+	template<typename T, intp nBytes = sizeof(T)>
+	std::enable_if_t<!std::is_pointer_v<T>, bool>	ReadBytes( T &pOut )
+	{
+		return ReadBytes( &pOut, nBytes );
+	}
 
 	// Returns false if bufLen isn't large enough to hold the
 	// string in the buffer.
@@ -618,7 +631,14 @@ public:
 	// pOutNumChars is set to the number of characters left in pStr when the routine is 
 	// complete (this will never exceed bufLen-1).
 	//
-	bool			ReadString( char *pStr, int bufLen, bool bLine=false, int *pOutNumChars=NULL );
+	bool			ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine=false, intp *pOutNumChars=NULL );
+	
+	// dimhotepus: Bounds-safe interface.
+	template<intp bufLen>
+	bool			ReadString( OUT_Z_ARRAY char (&pStr)[bufLen], bool bLine=false, intp *pOutNumChars=NULL )
+	{
+		return ReadString( pStr, bufLen, bLine, pOutNumChars );
+	}
 
 	// Reads a string and allocates memory for it. If the string in the buffer
 	// is > 2048 bytes, then pOverflow is set to true (if it's not NULL).

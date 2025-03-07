@@ -855,7 +855,7 @@ unsigned int bf_read::CheckReadUBitLong(int numbits)
 	return r;
 }
 
-void bf_read::ReadBits(void *pOutData, int nBits)
+void bf_read::ReadBits(void *pOutData, intp nBits)
 {
 #if defined( BB_PROFILING )
 	VPROF( "bf_read::ReadBits" );
@@ -1336,18 +1336,18 @@ float bf_read::ReadFloat()
 	return ret;
 }
 
-bool bf_read::ReadBytes(void *pOut, int nBytes)
+bool bf_read::ReadBytes( OUT_CAP(nBytes) void *pOut, intp nBytes)
 {
 	ReadBits(pOut, nBytes << 3);
 	return !IsOverflowed();
 }
 
-bool bf_read::ReadString( char *pStr, int maxLen, bool bLine, int *pOutNumChars )
+bool bf_read::ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine, intp *pOutNumChars )
 {
 	Assert( maxLen != 0 );
 
 	bool bTooSmall = false;
-	int iChar = 0;
+	intp iChar = 0;
 	while(1)
 	{
 		char val = ReadChar();
@@ -1383,7 +1383,7 @@ char* bf_read::ReadAndAllocateString( bool *pOverflow )
 	char str[2048];
 	
 	int nChars;
-	bool bOverflow = !ReadString( str, sizeof( str ), false, &nChars );
+	bool bOverflow = !ReadString( str, false, &nChars );
 	if ( pOverflow )
 		*pOverflow = bOverflow;
 
