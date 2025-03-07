@@ -224,8 +224,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 	m_Elements[nCurrentBucket].nNextElement = m_HashTable[ nHashBucketIndex ];
 	m_HashTable[ nHashBucketIndex ] = nCurrentBucket;
 
-	m_Elements[nCurrentBucket].pString = new char[Q_strlen( pIntrinsic ) + 1];
-	Q_strcpy( m_Elements[nCurrentBucket].pString, pIntrinsic );
+	m_Elements[nCurrentBucket].pString = V_strdup( pIntrinsic );
 	
     return nCurrentBucket;
 }

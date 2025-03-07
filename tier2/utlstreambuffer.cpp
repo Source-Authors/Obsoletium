@@ -44,14 +44,12 @@ CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, un
 
 		if ( pPath )
 		{
-			intp nPathLen = Q_strlen( pPath );
-			m_pPath = new char[ nPathLen + 1 ];
-			Q_strcpy( m_pPath, pPath );
+			m_pPath = V_strdup( pPath );
 		}
 		else
 		{
 			m_pPath = new char[ 1 ];
-			m_pPath[0] = 0;
+			m_pPath[0] = '\0';
 		}
 
 		m_hFileHandle = FILESYSTEM_INVALID_HANDLE;
