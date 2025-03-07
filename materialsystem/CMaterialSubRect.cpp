@@ -954,7 +954,7 @@ static IMaterialVar* CreateVectorMaterialVarFromKeyValue( IMaterial* pMaterial, 
 		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
-			Warning( "Error in .VMT file: error parsing vector element \"%s\" in \"%s\"\n", pKeyValue->GetName(), pMaterial->GetName() );
+			Warning( "Error in .VMT file (%s): error parsing vector element \"%s\".\n", pMaterial->GetName(), pKeyValue->GetName() );
 			return 0;
 		}
 

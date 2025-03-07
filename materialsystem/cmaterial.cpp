@@ -872,7 +872,8 @@ static int FindMaterialVar( IShader* pShader, char const* pVarName )
 //-----------------------------------------------------------------------------
 // Creates a vector material var
 //-----------------------------------------------------------------------------
-int ParseVectorFromKeyValueString( KeyValues *pKeyValue, const char *pMaterialName, float vecVal[4] )
+static int ParseVectorFromKeyValueString( KeyValues *pKeyValue,
+	const char *pMaterialName, const char *pVarName, float vecVal[4] )
 {
 	char const* pScan = pKeyValue->GetString();
 	bool divideBy255 = false;
@@ -922,7 +923,8 @@ int ParseVectorFromKeyValueString( KeyValues *pKeyValue, const char *pMaterialNa
 		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
-			Warning( "Error in .VMT file: error parsing vector element \"%s\" in \"%s\"\n", pKeyValue->GetName(), pMaterialName );
+			Warning( "Error in .VMT file (%s): error parsing vector element \"%s\" in \"%s\"\n",
+				pMaterialName, pKeyValue->GetName(), pVarName );
 			return 0;
 		}
 
@@ -945,7 +947,7 @@ static IMaterialVar* CreateVectorMaterialVarFromKeyValue( IMaterial* pMaterial, 
 {
 	char const *pszName = GetVarName( pKeyValue );
 	float vecVal[4];
-	int nDim = ParseVectorFromKeyValueString( pKeyValue, pszName, vecVal );
+	int nDim = ParseVectorFromKeyValueString( pKeyValue, pMaterial->GetName(), pszName, vecVal );
 	if ( nDim == 0 )
 		return NULL;
 
