@@ -536,7 +536,7 @@ bool SerializeDMX( const char *pFileName, const char *pPathID, [[maybe_unused]] 
 		char pDir[MAX_PATH];
 		if ( g_pFullFileSystem->GetCurrentDirectory( pDir, sizeof(pDir) ) )
 		{
-			Q_ComposeFileName( pDir, pFileName, pBuf, sizeof(pBuf) );
+			Q_ComposeFileName( pDir, pFileName, pBuf );
 			Q_RemoveDotSlashes( pBuf );
 			pFullPath = pBuf;
 		}
@@ -663,7 +663,7 @@ bool UnserializeDMX( const char *pFileName, const char *pPathID, bool bTextMode,
 		char pDir[MAX_PATH];
 		if ( g_pFullFileSystem->GetCurrentDirectory( pDir, sizeof(pDir) ) )
 		{
-			Q_ComposeFileName( pDir, pFileName, pBuf, sizeof(pBuf) );
+			Q_ComposeFileName( pDir, pFileName, pBuf );
 			Q_RemoveDotSlashes( pBuf );
 			pFullPath = pBuf;
 		}
