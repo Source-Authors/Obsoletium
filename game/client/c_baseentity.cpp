@@ -1090,6 +1090,28 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 
 	index = entnum;
 
+	if ( this->IsPlayer() )
+	{
+		// Josh: If we ever have a player that could ever cause us
+		// an out of bounds access to any player sized arrays.
+		// Just get out now!
+		//
+		// All these issues should be bounds checked now anyway,
+		// but I'd much rather be safe than sorry here.
+		//
+		// Additionally, make sure we aren't 0 or negative,
+		// the player CANNOT be worldspawn.
+		// Someone is going to try that to get an extra player and frog something up!
+		// 
+		// Player index is entindex - 1.
+		// MAX_PLAYERS_ARRAY_SAFE is MAX_PLAYERS + 1.
+		if ( index <= 0 || index >= MAX_PLAYERS_ARRAY_SAFE )
+		{
+			Warning("Player with out of bounds entindex! Got: %d Expected to be in inclusive range: %d - %d\n", index, 1, MAX_PLAYERS );
+			return false;
+		}
+	}
+
 	cl_entitylist->AddNetworkableEntity( GetIClientUnknown(), entnum, iSerialNum );
 
 	CollisionProp()->CreatePartitionHandle();

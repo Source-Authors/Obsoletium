@@ -421,8 +421,10 @@ void CTeamTrainWatcher::FireGameEvent( IGameEvent *event )
 	const char *pszEventName = event->GetName();
 	if ( FStrEq( pszEventName, "path_track_passed" ) )
 	{
-		int iIndex = event->GetInt( "index" );
-		CPathTrack *pNode = dynamic_cast< CPathTrack* >( UTIL_EntityByIndex( iIndex ) );
+		// Josh: This comes straight through, server->server
+		// from a GetRefEHandle().ToInt() so this is safe.
+		CBaseHandle hNode = CBaseHandle::UnsafeFromIndex( event->GetInt( "index" ) );
+		CPathTrack *pNode = dynamic_cast< CPathTrack* >( CBaseEntity::Instance( hNode ) );
 
 		if ( pNode )
 		{
