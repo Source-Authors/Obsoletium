@@ -255,7 +255,7 @@ public:
 	int					Read( void *pOutput, int size, FileHandle_t file ) override;
 	int					ReadEx( void* pOutput, int sizeDest, int size, FileHandle_t file ) override;
 	int					Write( void const* pInput, int size, FileHandle_t file ) override;
-	char				*ReadLine( char *pOutput, int maxChars, FileHandle_t file ) override;
+	char				*ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars, FileHandle_t file ) override;
 	int					FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... ) override FMTFUNCTION( 3, 4 );
 
 	// Reads/writes files to utlbuffers
@@ -327,7 +327,7 @@ public:
 
 	FileNameHandle_t	FindOrAddFileName( char const *pFileName ) override;
 	FileNameHandle_t	FindFileName( char const *pFileName ) override;
-	bool				String( const FileNameHandle_t& handle, char *buf, int buflen ) override;
+	bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen ) override;
 	int					GetPathIndex( const FileNameHandle_t &handle ) override;
 	long				GetPathTime( const char *pFileName, const char *pPathID ) override;
 	
@@ -431,7 +431,7 @@ public:
 	// Otherwise, it'll just fall through to the regular KeyValues loading routines
 	KeyValues			*LoadKeyValues( KeyValuesPreloadType_t type, char const *filename, char const *pPathID = 0 ) override;
 	bool				LoadKeyValues( KeyValues& head, KeyValuesPreloadType_t type, char const *filename, char const *pPathID = 0 ) override;
-	bool				ExtractRootKeyName( KeyValuesPreloadType_t type, char *outbuf, size_t bufsize, char const *filename, char const *pPathID = 0 ) override;
+	bool				ExtractRootKeyName( KeyValuesPreloadType_t type, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize, char const *filename, char const *pPathID = 0 ) override;
 
 	DVDMode_t			GetDVDMode() override { return m_DVDMode; }
 
@@ -802,7 +802,7 @@ protected:
 
 	// Helper function for fs_log file logging
 	void LogFileAccess( const char *pFullFileName );
-	bool LookupKeyValuesRootKeyName( char const *filename, char const *pPathID, char *rootName, size_t bufsize );
+	bool LookupKeyValuesRootKeyName( char const *filename, char const *pPathID, OUT_Z_CAP(bufsize) char *rootName, size_t bufsize );
 	void UnloadCompiledKeyValues();
 
 	// If bByRequestOnly is -1, then it will default to false if it doesn't already exist, and it 

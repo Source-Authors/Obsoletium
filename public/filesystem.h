@@ -621,7 +621,13 @@ public:
 
 	virtual bool			EndOfFile( FileHandle_t file ) = 0;
 
-	virtual char			*ReadLine( char *pOutput, int maxChars, FileHandle_t file ) = 0;
+	virtual char			*ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars, FileHandle_t file ) = 0;
+	template<int maxChars>
+	char *ReadLine( OUT_Z_ARRAY char (&pOutput)[maxChars], FileHandle_t file )
+	{
+		return ReadLine( pOutput, maxChars, file );
+	}
+
 	virtual int				FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... ) = 0;
 
 	//--------------------------------------------------------
@@ -672,14 +678,25 @@ public:
 	}
 
 	// Gets the current working directory
-	virtual bool			GetCurrentDirectory( char* pDirectory, int maxlen ) = 0;
+	virtual bool			GetCurrentDirectory( OUT_Z_CAP(maxlen) char* pDirectory, int maxlen ) = 0;
+
+	template<int maxLen>
+	bool GetCurrentDirectory( OUT_Z_ARRAY char (&pDirectory)[maxLen] )
+	{
+		return GetCurrentDirectory( pDirectory, maxLen );
+	}
 
 	//--------------------------------------------------------
 	// Filename dictionary operations
 	//--------------------------------------------------------
 
 	virtual FileNameHandle_t	FindOrAddFileName( char const *pFileName ) = 0;
-	virtual bool				String( const FileNameHandle_t& handle, char *buf, int buflen ) = 0;
+	virtual bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen ) = 0;
+	template<intp bufferSize>
+	bool String( const FileNameHandle_t& handle, OUT_Z_ARRAY char (&buf)[bufferSize] )
+	{
+		return String( handle, buf, bufferSize );
+	}
 
 	//--------------------------------------------------------
 	// Asynchronous file operations
@@ -800,7 +817,7 @@ public:
 	// Otherwise, it'll just fall through to the regular KeyValues loading routines
 	virtual KeyValues	*LoadKeyValues( KeyValuesPreloadType_t type, char const *filename, char const *pPathID = nullptr ) = 0;
 	virtual bool		LoadKeyValues( KeyValues& head, KeyValuesPreloadType_t type, char const *filename, char const *pPathID = nullptr ) = 0;
-	virtual bool		ExtractRootKeyName( KeyValuesPreloadType_t type, char *outbuf, size_t bufsize, char const *filename, char const *pPathID = nullptr ) = 0;
+	virtual bool		ExtractRootKeyName( KeyValuesPreloadType_t type, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize, char const *filename, char const *pPathID = nullptr ) = 0;
 
 	virtual FSAsyncStatus_t	AsyncWrite(const char *pFileName, const void *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend = false, FSAsyncControl_t *pControl = nullptr ) = 0;
 	virtual FSAsyncStatus_t	AsyncWriteFile(const char *pFileName, const CUtlBuffer *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend = false, FSAsyncControl_t *pControl = nullptr ) = 0;

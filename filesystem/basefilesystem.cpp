@@ -2877,48 +2877,43 @@ KeyValues *CBaseFileSystem::LoadKeyValues( KeyValuesPreloadType_t type, char con
 //			bufsize - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CBaseFileSystem::LookupKeyValuesRootKeyName( char const *filename, char const *pPathID, char *rootName, size_t bufsize )
+bool CBaseFileSystem::LookupKeyValuesRootKeyName( char const *filename, char const *pPathID, OUT_Z_CAP(bufsize) char *rootName, size_t bufsize )
 {
-	if ( FileExists( filename, pPathID ) )
+	// open file and get shader name
+	FileHandle_t hFile = Open( filename, "r", pPathID );
+	if ( hFile == FILESYSTEM_INVALID_HANDLE )
 	{
-		// open file and get shader name
-		FileHandle_t hFile = Open( filename, "r", pPathID );
-		if ( hFile == FILESYSTEM_INVALID_HANDLE )
-		{
-			return false;
-		}
-
-		char buf[ 128 ];
-		ReadLine( buf, sizeof( buf ), hFile );
-		Close( hFile );
-
-		// The name will possibly come in as "foo"\n
-
-		// So we need to strip the starting " character
-		char *pStart = buf;
-		if ( *pStart == '\"' )
-		{
-			++pStart;
-		}
-		// Then copy the rest of the string
-		Q_strncpy( rootName, pStart, bufsize );
-
-		// And then strip off the \n and the " character at the end, in that order
-		intp len = Q_strlen( pStart );
-		while ( len > 0 && rootName[ len - 1 ] == '\n' )
-		{
-			rootName[ len - 1 ] = 0;
-			--len;
-		}
-		while ( len > 0 && rootName[ len - 1 ] == '\"' )
-		{
-			rootName[ len - 1 ] = 0;
-			--len;
-		}
-	}
-	else
-	{
+		// dimhotepus: Always zero-terminate.
+		if (bufsize) rootName[0] = '\0';
 		return false;
+	}
+
+	char buf[ 128 ];
+	static_cast<IFileSystem *>(this)->ReadLine( buf, hFile );
+	Close( hFile );
+
+	// The name will possibly come in as "foo"\n
+
+	// So we need to strip the starting " character
+	char *pStart = buf;
+	if ( *pStart == '\"' )
+	{
+		++pStart;
+	}
+	// Then copy the rest of the string
+	Q_strncpy( rootName, pStart, bufsize );
+
+	// And then strip off the \n and the " character at the end, in that order
+	intp len = Q_strlen( pStart );
+	while ( len > 0 && rootName[ len - 1 ] == '\n' )
+	{
+		rootName[ len - 1 ] = 0;
+		--len;
+	}
+	while ( len > 0 && rootName[ len - 1 ] == '\"' )
+	{
+		rootName[ len - 1 ] = 0;
+		--len;
 	}
 	return true;
 }
@@ -2932,7 +2927,7 @@ bool CBaseFileSystem::LookupKeyValuesRootKeyName( char const *filename, char con
 //			*pPathID - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CBaseFileSystem::ExtractRootKeyName( KeyValuesPreloadType_t type, char *outbuf, size_t bufsize, char const *filename, char const *pPathID /*= 0*/ )
+bool CBaseFileSystem::ExtractRootKeyName( KeyValuesPreloadType_t type, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize, char const *filename, char const *pPathID /*= 0*/ )
 {
 	char tempPathID[MAX_PATH];
 	ParsePathID( filename, pPathID, tempPathID );
@@ -3142,13 +3137,15 @@ bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-char *CBaseFileSystem::ReadLine( char *pOutput, int maxChars, FileHandle_t file )
+char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars, FileHandle_t file )
 {
 	VPROF_BUDGET( "CBaseFileSystem::ReadLine", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to ReadLine NULL file handle!\n" );
+		// dimhotepus: Always zero-terminate.
+		if (maxChars > 0) pOutput[0] = '\0';
 		return NULL;
 	}
 	++m_Stats.nReads;
@@ -3187,10 +3184,10 @@ char *CBaseFileSystem::ReadLine( char *pOutput, int maxChars, FileHandle_t file 
 		nRead++;
 	}
 
-	if( nRead < maxChars )
-		pOutput[nRead] = '\0';
+	// dimhotepus: Always zero-terminate.
+	Assert( nRead < maxChars );
+	pOutput[nRead] = '\0';
 
-	
 	m_Stats.nBytesRead += nRead;
 	return ( nRead ) ? pOutput : NULL;
 }
@@ -4972,7 +4969,7 @@ FileNameHandle_t CBaseFileSystem::FindFileName( char const *pFileName )
 // Input  : handle - 
 // Output : char const
 //-----------------------------------------------------------------------------
-bool CBaseFileSystem::String( const FileNameHandle_t& handle, char *buf, int buflen )
+bool CBaseFileSystem::String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen )
 {
 	return m_FileNames.String( handle, buf, buflen );
 }
