@@ -38,6 +38,8 @@
 #define INOUT_BYTECAP(x) _Inout_bytecap_(x)
 #define INOUT_Z_CAP(x) _Inout_z_cap_(x)
 #define INOUT_Z_BYTECAP(x) _Inout_z_bytecap_(x)
+// dimhotepus: Add return may be null annotation.
+#define RET_MAY_BE_NULL _Ret_maybenull_
 // These macros are use for annotating array reference parameters, typically used in functions
 // such as V_strcpy_safe. Because they are array references the capacity is already known.
 #if _MSC_VER >= 1700
