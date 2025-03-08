@@ -3406,7 +3406,7 @@ void CMDLCache::QueuedLoaderCallback_MDL( void *pContext, void *pContext2, const
 							{
 								const char *pCdTexture = pHdr->pCdtexture( cd );
 								pCdTexture += ( pCdTexture[0] == CORRECT_PATH_SEPARATOR || pCdTexture[0] == INCORRECT_PATH_SEPARATOR );
-								V_ComposeFileName( pCdTexture, pTexture, buf + prefixLen, MAX_PATH - prefixLen );
+								V_ComposeFileName( pCdTexture, pTexture, buf + prefixLen, ssize(buf) - prefixLen );
 								V_strcat_safe( buf, ".vmt" );
 								pModelParts->bMaterialsPending = true;
 								const char *pbuf = buf;
@@ -3470,7 +3470,7 @@ void CMDLCache::ProcessDynamicLoad( ModelParts_t *pModelParts )
 				{
 					const char *pCdTexture = pHdr->pCdtexture( cd );
 					pCdTexture += ( pCdTexture[0] == CORRECT_PATH_SEPARATOR || pCdTexture[0] == INCORRECT_PATH_SEPARATOR );
-					V_ComposeFileName( pCdTexture, pTexture, buf + prefixLen, MAX_PATH - prefixLen );
+					V_ComposeFileName( pCdTexture, pTexture, buf + prefixLen, ssize(buf) - prefixLen );
 					IMaterial* pMaterial = materials->FindMaterial( buf + prefixLen, TEXTURE_GROUP_MODEL, false );
 					if ( !IsErrorMaterial( pMaterial ) && !pMaterial->IsPrecached() )
 					{
