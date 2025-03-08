@@ -54,8 +54,7 @@ const char *GetLiblistFallbackDir(const char *pszGameDir) {
     while (!g_pFullFileSystem->EndOfFile(hFile)) {
       // get a single line
       szLine[0] = 0;
-      g_pFullFileSystem->ReadLine(szLine, sizeof(szLine) - 1, hFile);
-      szLine[sizeof(szLine) - 1] = 0;
+      g_pFullFileSystem->ReadLine(szLine, hFile);
 
       if (!strnicmp(szLine, "fallback_dir", 12)) {
         // we got the line, get the value between the quotes
