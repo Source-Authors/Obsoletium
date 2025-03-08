@@ -263,8 +263,14 @@ public:
 	~CUtlFilenameSymbolTable();
 	FileNameHandle_t	FindOrAddFileName( const char *pFileName );
 	FileNameHandle_t	FindFileName( const char *pFileName );
-	intp					PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
-	bool				String( const FileNameHandle_t& handle, char *buf, intp buflen );
+	intp				PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
+	bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen );
+	template<intp bufferSize>
+	bool				String( const FileNameHandle_t& handle, OUT_Z_ARRAY char (&buf)[bufferSize] )
+	{
+		return String( handle, buf, bufferSize );
+	}
+
 	void				RemoveAll();
 
 private:
