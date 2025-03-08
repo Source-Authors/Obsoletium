@@ -928,15 +928,15 @@ bool CDataModel::Unserialize( CUtlBuffer &inBuf, const char *pEncodingName, cons
 	if ( !m_bOnlyCreateUntypedElements && !bIsCurrentVersion )
 	{
 		char path[ 256 ];
-		V_ExtractFilePath( pFileName, path, sizeof( path ) );
+		V_ExtractFilePath( pFileName, path );
 
 		char tempFileName[ 256 ];
 		if ( !V_IsAbsolutePath( path ) )
 		{
-			g_pFullFileSystem->GetCurrentDirectory( path, sizeof( path ) );
+			g_pFullFileSystem->GetCurrentDirectory( path );
 		}
 
-		V_ComposeFileName( path, "_temp_conversion_file_.dmx", tempFileName, sizeof( tempFileName ) );
+		V_ComposeFileName( path, "_temp_conversion_file_.dmx", tempFileName );
 		V_RemoveDotSlashes( tempFileName );
 
 		const char *pDestEncodingName = "binary";
