@@ -377,6 +377,9 @@ typedef void * HINSTANCE;
 	#define mallocsize( _p )		( _msize( _p ) )
 #endif
 
+// dimhotepus: Add type-safe interface.
+#define stackallocT( type_, _size )		static_cast<type_*>( stackalloc( sizeof(type_) * (_size) ) )
+
 #define  stackfree( _p )			0
 
 // Linux had a few areas where it didn't construct objects in the same order that Windows does.
