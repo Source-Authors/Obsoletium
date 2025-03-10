@@ -386,9 +386,11 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 // Input  : handle - 
 // Output : const char
 //-----------------------------------------------------------------------------
-bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, char *buf, intp buflen )
+bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen )
 {
-	buf[0] = '\0';
+	// dimhotepus: Write only if have space.
+	if (buflen > 0)
+		buf[0] = '\0';
 
 	static_assert(alignof(FileNameHandle_t*) == alignof(FileNameHandleInternal_t*));
 
@@ -399,8 +401,6 @@ bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, char *buf,
 	}
 
 	m_lock.LockForRead();
-	//const char *path = m_StringPool.HandleToString(internal->path);
-	//const char *fn = m_StringPool.HandleToString(internal->file);
 	const char *path = (*m_Strings)[ internal->path - 1 ].Get();
 	const char *fn = (*m_Strings)[ internal->file - 1].Get();
 	m_lock.UnlockRead();

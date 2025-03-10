@@ -161,8 +161,6 @@ public:
 
 	FORCEINLINE void ActivateByteSwappingIfBigEndian()
 	{
-		if ( IsX360() )
-			ActivateByteSwapping( true );
 	}
 
 
@@ -203,8 +201,23 @@ public:
 		GetStringInternal( pString, maxLenInChars );
 	}
 
-	void			Get( void* pMem, intp size );
-	void			GetLine( char* pLine, intp nMaxChars = 0 );
+	bool Get( OUT_BYTECAP(size) void* pMem, intp size );
+	template<typename T>
+	std::enable_if_t<!std::is_pointer_v<T>, bool> Get( T &mem )
+	{
+		return Get( &mem, static_cast<intp>(sizeof(T)) );
+	}
+	template<typename T, intp size>
+	bool Get( T (&mem)[size] )
+	{
+		return Get( &mem, static_cast<intp>(sizeof(T)) * size );
+	}
+	void GetLine( char* pLine, intp nMaxChars = 0 );
+	template<intp maxSize>
+	void GetLine( char (&pLine)[maxSize] )
+	{
+		GetLine( pLine, maxSize );
+	}
 
 	// Used for getting objects that have a byteswap datadesc defined
 	template <typename T> void GetObjects( T *dest, intp count = 1 );
@@ -252,6 +265,18 @@ public:
 	// otherwise the index is not advanced and the function returns false.
 	bool			ParseToken( const char *pStartingDelim, const char *pEndingDelim, char* pString, intp nMaxLen );
 
+	// (For text buffers only)
+	// Parse a token from the buffer:
+	// Grab all text that lies between a starting delimiter + ending delimiter
+	// (skipping whitespace that leads + trails both delimiters).
+	// If successful, the get index is advanced and the function returns true,
+	// otherwise the index is not advanced and the function returns false.
+	template<intp size>
+	bool ParseToken( const char *pStartingDelim, const char *pEndingDelim, char (&pString)[size] )
+	{
+		return ParseToken( pStartingDelim, pEndingDelim, pString, size );
+	}
+
 	// Advance the get index until after the particular string is found
 	// Do not eat whitespace before starting. Return false if it failed
 	// String test is case-insensitive.
@@ -259,7 +284,15 @@ public:
 
 	// Parses the next token, given a set of character breaks to stop at
 	// Returns the length of the token parsed in bytes (-1 if none parsed)
-	intp				ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
+	intp			ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
+
+	// Parses the next token, given a set of character breaks to stop at
+	// Returns the length of the token parsed in bytes (-1 if none parsed)
+	template<intp size>
+	intp ParseToken( characterset_t *pBreaks, char (&pTokenBuf)[size], bool bParseComments = true )
+	{
+		return ParseToken( pBreaks, pTokenBuf, size, bParseComments );
+	}
 
 	// Write stuff in
 	// Binary mode: it'll just write the bits directly in, and strings will be
@@ -418,9 +451,6 @@ protected:
 	unsigned char m_Error;
 	unsigned char m_Flags;
 	unsigned char m_Reserved;  //-V730_NOINIT
-#if defined( _X360 )
-	unsigned char pad;
-#endif
 
 	intp m_nTab;
 	intp m_nMaxPut;
@@ -644,12 +674,12 @@ inline void CUtlBuffer::GetTypeBin( T &dest )
 		{
 			m_Byteswap.SwapBufferToTargetEndian<T>( &dest, (T*)PeekGet() );
 		}
-		m_Get += sizeof(T);	
-	}		
+		m_Get += sizeof(T);
+	}
 	else
 	{
 		dest = 0;
-	}					
+	}
 }
 
 template <>

@@ -91,11 +91,28 @@ public:
 	// returns the number of wchar_t in resulting string, including null terminator
 	static int ConvertANSIToUnicode(const char *ansi, OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicode, int unicodeBufferSizeInBytes);
 
+	// converts an english string to unicode
+	// returns the number of wchar_t in resulting string, including null terminator
+	template<int unicodeSize>
+	static int ConvertANSIToUnicode(const char *ansi, OUT_Z_ARRAY wchar_t (&unicode)[unicodeSize])
+	{
+		return ConvertANSIToUnicode(ansi, unicode, unicodeSize * static_cast<int>(sizeof(wchar_t)));
+	}
+
 	// converts an unicode string to an english string
 	// unrepresentable characters are converted to system default
 	// returns the number of characters in resulting string, including null terminator
 	static int ConvertUnicodeToANSI(const wchar_t *unicode, OUT_Z_BYTECAP(ansiBufferSize) char *ansi, int ansiBufferSize);
-
+	
+	// converts an unicode string to an english string
+	// unrepresentable characters are converted to system default
+	// returns the number of characters in resulting string, including null terminator
+	template<int ansiSize>
+	static int ConvertUnicodeToANSI(const wchar_t *unicode, OUT_Z_ARRAY char (&ansi)[ansiSize])
+	{
+		return ConvertUnicodeToANSI(unicode, ansi, ansiSize * static_cast<int>(sizeof(char)));
+	}
+	
 	// builds a localized formatted string
 	// uses the format strings first: %s1, %s2, ...  unicode strings (wchar_t *)
 	template < typename T >

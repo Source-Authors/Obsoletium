@@ -322,10 +322,10 @@ public:
 	inline void SetInt64( int64 n64 )		{ V_to_chars( m_szBuf, n64 ); }
 	inline void SetUint64( uint64 un64 )	{ V_to_chars( m_szBuf, un64 ); }
 
-	inline void SetDouble( double f )		{ Q_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); }
-	inline void SetFloat( float f )			{ Q_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); }
+	inline void SetDouble( double f )		{ V_sprintf_safe( m_szBuf, "%.18g", f ); }
+	inline void SetFloat( float f )			{ V_sprintf_safe( m_szBuf, "%.18g", f ); }
 
-	inline void SetHexUint64( uint64 un64 )	{ Q_binarytohex( (byte *)&un64, sizeof( un64 ), m_szBuf ); }
+	inline void SetHexUint64( uint64 un64 )	{ V_binarytohex( un64, m_szBuf ); }
 
 	operator const char *() const { return m_szBuf; }
 	const char* String() const { return m_szBuf; }
@@ -333,11 +333,21 @@ public:
 	void AddQuotes()
 	{
 		Assert( m_szBuf[0] != '"' );
-		const ptrdiff_t nLength = Q_strlen( m_szBuf );
-		Q_memmove( m_szBuf + 1, m_szBuf, nLength );
-		m_szBuf[0] = '"';
-		m_szBuf[nLength + 1] = '"';
-		m_szBuf[nLength + 2] = 0;
+		const ptrdiff_t nLength = V_strlen( m_szBuf );
+
+		// dimhotepus: Prevent overflow.
+		if (nLength < ssize(m_szBuf) - 2)
+		{
+			V_memmove( m_szBuf + 1, m_szBuf, nLength );
+			m_szBuf[0] = '"';
+			m_szBuf[nLength + 1] = '"';
+			m_szBuf[nLength + 2] = '\0';
+		}
+		else
+		{
+			AssertMsg( "Unable to add double quotes to '%s' (%zd length). Buffer size is %zd and not enough",
+				m_szBuf, nLength, ssize(m_szBuf) );
+		}
 	}
 
 protected:

@@ -355,7 +355,7 @@ bool Unserialize( CUtlBuffer &buf, VMatrix &dest )
 		return (nRetVal == 16);
 	}
 
-	buf.Get( &dest, sizeof(VMatrix) );
+	buf.Get( dest );
 	return true;
 }
 

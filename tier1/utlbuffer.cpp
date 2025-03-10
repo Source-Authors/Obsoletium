@@ -350,7 +350,7 @@ void CUtlBuffer::EnsureCapacity( intp num )
 //-----------------------------------------------------------------------------
 // Base get method from which all others derive
 //-----------------------------------------------------------------------------
-void CUtlBuffer::Get( void* pMem, intp size )
+bool CUtlBuffer::Get( OUT_BYTECAP(size) void* pMem, intp size )
 {
 	if ( size > 0 && CheckGet( size ) )
 	{
@@ -359,7 +359,11 @@ void CUtlBuffer::Get( void* pMem, intp size )
 
 		memcpy( pMem, &m_Memory[ Index ], size );
 		m_Get += size;
+
+		return true;
 	}
+
+	return false;
 }
 
 

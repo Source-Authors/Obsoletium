@@ -36,11 +36,11 @@
 // If you're compiling big endian, just comment out the following line
 #define SHA1_LITTLE_ENDIAN
 
-typedef union
+union SHA1_WORKSPACE_BLOCK
 {
 	unsigned char c[64];
 	unsigned long l[16];
-} SHA1_WORKSPACE_BLOCK;
+};
 
 // SHA1 hash
 const unsigned int k_cubHash = 20;

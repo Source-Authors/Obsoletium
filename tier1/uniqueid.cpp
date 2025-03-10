@@ -161,13 +161,13 @@ bool Unserialize( CUtlBuffer &buf, UniqueId_t &dest )
 	if ( buf.IsText() )
 	{
 		intp nTextLen = buf.PeekStringLength();
-		char *pBuf = (char*)stackalloc( nTextLen );
+		char *pBuf = stackallocT( char, nTextLen );
 		buf.GetStringManualCharCount( pBuf, nTextLen );
 		UniqueIdFromString( &dest, pBuf, nTextLen );
 	}
 	else
 	{
-		buf.Get( &dest, sizeof(UniqueId_t) );
+		buf.Get( dest );
 	}
 	return buf.IsValid();
 }
