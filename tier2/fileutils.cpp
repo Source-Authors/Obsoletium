@@ -79,7 +79,7 @@ void ComputeModFilename( const char *pContentFileName, OUT_Z_CAP(nBufLen) char *
 		*pSemi = 0;
 	}
 
-	Q_ComposeFileName( pGameRoot, pRelativePath, pBuf, nBufLen );
+	V_ComposeFileName( pGameRoot, pRelativePath, pBuf, nBufLen );
 }
 
 
@@ -216,7 +216,7 @@ bool GenerateFullPath( const char *pFileName, char const *pPathID, OUT_Z_CAP(nBu
 		return true;
 
 	char pDir[ MAX_PATH ];
-	if ( !g_pFullFileSystem->GetCurrentDirectory( pDir, sizeof( pDir ) ) )
+	if ( !g_pFullFileSystem->GetCurrentDirectory( pDir ) )
 		return false;
 
 	V_ComposeFileName( pDir, pFileName, pBuf, nBufLen );
@@ -285,7 +285,7 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 
 void CBaseFile::ReadLines( CUtlStringList &lineList, int nMaxLineLength )
 {
-	char *pLine = ( char * ) stackalloc( nMaxLineLength );
+	char *pLine = stackallocT( char, nMaxLineLength );
 	while( ReadLine( pLine, nMaxLineLength ) )
 	{
 		char *pEOL = strchr( pLine, '\n' );					// kill the \n

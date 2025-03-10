@@ -128,9 +128,15 @@ public:
 		m_FileHandle = g_pFullFileSystem->Open( fname, modes );
 	}
 
-	char *ReadLine( char *pOutput, int maxChars )
+	char *ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars )
 	{
 		return g_pFullFileSystem->ReadLine( pOutput, maxChars, m_FileHandle );
+	}
+
+	template<int maxChars>
+	char *ReadLine( OUT_Z_ARRAY char (&pOutput)[maxChars] )
+	{
+		return ReadLine( pOutput, maxChars );
 	}
 
 	// read every line of the file into a vector of strings
