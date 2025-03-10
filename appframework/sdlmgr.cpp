@@ -102,7 +102,7 @@ static void DebugPrintf( const char *pMsg, ... )
 	va_list args;
 	va_start( args, pMsg );
 	char buf[2048];
-	V_vsnprintf( buf, sizeof( buf ), pMsg, args );
+	V_vsprintf_safe( buf, pMsg, args );
 	va_end( args );
 
 	Plat_DebugString( buf );

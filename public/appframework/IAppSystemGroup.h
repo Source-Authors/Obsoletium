@@ -272,6 +272,7 @@ using SuggestGameInfoDirFn_t = bool (*) ( CFSSteamSetupInfo const *pFsSteamSetup
 //
 SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn );
 
+// dimhotepus: RAII wrapper for SetSuggestGameInfoDirFn.
 class ScopedSuggestGameInfoDir
 {
 public:
