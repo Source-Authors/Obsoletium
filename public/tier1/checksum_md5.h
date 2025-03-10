@@ -20,11 +20,10 @@ struct MD5Value_t
 	unsigned char bits[MD5_DIGEST_LENGTH];
 
 	void Zero();
-	bool IsZero() const;
+	[[nodiscard]] bool IsZero() const;
 
-	bool operator==( const MD5Value_t &src ) const;
-	bool operator!=( const MD5Value_t &src ) const;
-
+	[[nodiscard]] bool operator==( const MD5Value_t &src ) const;
+	[[nodiscard]] bool operator!=( const MD5Value_t &src ) const;
 };
 
 // MD5 Hash
@@ -45,17 +44,17 @@ char *MD5_Print(unsigned char *digest, int hashlen );
 /// bothering with the context object.
 void MD5_ProcessSingleBuffer( const void *p, int len, MD5Value_t &md5Result );
 
-unsigned int MD5_PseudoRandom(unsigned int nSeed);
+[[nodiscard]] unsigned int MD5_PseudoRandom( unsigned int nSeed );
 
 /// Returns true if the values match.
-bool MD5_Compare( const MD5Value_t &data, const MD5Value_t &compare );
+[[nodiscard]] bool MD5_Compare( const MD5Value_t &data, const MD5Value_t &compare );
 
-inline bool MD5Value_t::operator==( const MD5Value_t &src ) const
+[[nodiscard]] inline bool MD5Value_t::operator==( const MD5Value_t &src ) const
 {
 	return MD5_Compare( *this, src );
 }
 
-inline bool MD5Value_t::operator!=( const MD5Value_t &src ) const
+[[nodiscard]] inline bool MD5Value_t::operator!=( const MD5Value_t &src ) const
 {
 	return !MD5_Compare( *this, src );
 }

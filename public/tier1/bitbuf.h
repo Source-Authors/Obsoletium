@@ -71,7 +71,7 @@ BitBufErrorHandler SetBitBufErrorHandler( BitBufErrorHandler fn );
 // Helpers.
 //-----------------------------------------------------------------------------
 
-constexpr inline intp BitByte( intp bits )
+[[nodiscard]] constexpr inline intp BitByte( intp bits )
 {
 	// return PAD_NUMBER( bits, 8 ) >> 3;
 	return (bits + CHAR_BIT - 1) >> 3;
@@ -106,24 +106,24 @@ namespace bitbuf
 	//        >> encode >>
 	//        << decode <<
 
-	constexpr inline uint32 ZigZagEncode32(int32 n) 
+	[[nodiscard]] constexpr inline uint32 ZigZagEncode32(int32 n) 
 	{
 		// Note:  the right-shift must be arithmetic
 		return(n << 1) ^ (n >> 31);
 	}
 
-	constexpr inline int32 ZigZagDecode32(uint32 n) 
+	[[nodiscard]] constexpr inline int32 ZigZagDecode32(uint32 n) 
 	{
 		return(n >> 1) ^ -static_cast<int32>(n & 1);
 	}
 
-	constexpr inline uint64 ZigZagEncode64(int64 n) 
+	[[nodiscard]] constexpr inline uint64 ZigZagEncode64(int64 n) 
 	{
 		// Note:  the right-shift must be arithmetic
 		return(n << 1) ^ (n >> 63);
 	}
 
-	constexpr inline int64 ZigZagDecode64(uint64 n) 
+	[[nodiscard]] constexpr inline int64 ZigZagDecode64(uint64 n) 
 	{
 		return(n >> 1) ^ -static_cast<int64>(n & 1);
 	}
@@ -155,14 +155,14 @@ public:
 	void			Reset();
 
 	// Get the base pointer.
-	unsigned char*	GetBasePointer() { return (unsigned char*) m_pData; }
+	[[nodiscard]] unsigned char*	GetBasePointer() { return (unsigned char*) m_pData; }
 
 	// Enable or disable assertion on overflow. 99% of the time, it's a bug that we need to catch,
 	// but there may be the occasional buffer that is allowed to overflow gracefully.
 	void			SetAssertOnOverflow( bool bAssert );
 
 	// This can be set to assign a name that gets output if the buffer overflows.
-	const char*		GetDebugName() const;
+	[[nodiscard]] const char*		GetDebugName() const;
 	void			SetDebugName( const char *pDebugName );
 
 
@@ -237,17 +237,17 @@ public:
 public:
 
 	// How many bytes are filled in?
-	intp				GetNumBytesWritten() const;
-	intp				GetNumBitsWritten() const;
-	intp				GetMaxNumBits() const;
-	intp				GetNumBitsLeft() const;
-	intp				GetNumBytesLeft() const;
-	unsigned char*	GetData();
-	const unsigned char*	GetData() const;
+	[[nodiscard]] intp				GetNumBytesWritten() const;
+	[[nodiscard]] intp				GetNumBitsWritten() const;
+	[[nodiscard]] intp				GetMaxNumBits() const;
+	[[nodiscard]] intp				GetNumBitsLeft() const;
+	[[nodiscard]] intp				GetNumBytesLeft() const;
+	[[nodiscard]] unsigned char*	GetData();
+	[[nodiscard]] const unsigned char*	GetData() const;
 
 	// Has the buffer overflowed?
-	bool			CheckForOverflow(intp nBits);
-	inline bool		IsOverflowed() const {return m_bOverflow;}
+	[[nodiscard]] bool			CheckForOverflow(intp nBits);
+	[[nodiscard]] inline bool		IsOverflowed() const {return m_bOverflow;}
 
 	void			SetOverflowFlag();
 
@@ -514,7 +514,7 @@ public:
 	void			SetAssertOnOverflow( bool bAssert );
 
 	// This can be set to assign a name that gets output if the buffer overflows.
-	const char*		GetDebugName() const { return m_pDebugName; }
+	[[nodiscard]] const char*		GetDebugName() const { return m_pDebugName; }
 	void			SetDebugName( const char *pName );
 
 	void			ExciseBits( intp startbit, intp bitstoremove );
@@ -524,22 +524,22 @@ public:
 public:
 	
 	// Returns 0 or 1.
-	int				ReadOneBit();
+	[[nodiscard]] int				ReadOneBit();
 
 
 protected:
 
-	unsigned int	CheckReadUBitLong(int numbits);		// For debugging.
-	int				ReadOneBitNoCheck();				// Faster version, doesn't check bounds and is inlined.
-	bool			CheckForOverflow(intp nBits);
+	[[nodiscard]] unsigned int	CheckReadUBitLong(int numbits);		// For debugging.
+	[[nodiscard]] int			ReadOneBitNoCheck();				// Faster version, doesn't check bounds and is inlined.
+	[[nodiscard]] bool			CheckForOverflow(intp nBits);
 
 
 public:
 
 	// Get the base pointer.
-	const unsigned char*	GetBasePointer() const { return m_pData; }
+	[[nodiscard]] const unsigned char*	GetBasePointer() const { return m_pData; }
 
-	BITBUF_INLINE intp TotalBytesAvailable( void ) const
+	[[nodiscard]] BITBUF_INLINE intp TotalBytesAvailable( void ) const
 	{
 		return m_nDataBytes;
 	}
@@ -560,49 +560,49 @@ public:
 		return ReadBitsClamped_ptr( pOut, N * sizeof(T), nBits );
 	}
 	
-	float			ReadBitAngle( int numbits );
+	[[nodiscard]] float			ReadBitAngle( int numbits );
 
-	unsigned int	ReadUBitLong( int numbits );
-	unsigned int	ReadUBitLongNoInline( int numbits );
-	unsigned int	PeekUBitLong( int numbits );
-	int				ReadSBitLong( int numbits );
+	[[nodiscard]] unsigned int	ReadUBitLong( int numbits );
+	[[nodiscard]] unsigned int	ReadUBitLongNoInline( int numbits );
+	[[nodiscard]] unsigned int	PeekUBitLong( int numbits );
+	[[nodiscard]] int			ReadSBitLong( int numbits );
 
 	// reads an unsigned integer with variable bit length
-	unsigned int	ReadUBitVar();
-	unsigned int	ReadUBitVarInternal( int encodingType );
+	[[nodiscard]] unsigned int	ReadUBitVar();
+	[[nodiscard]] unsigned int	ReadUBitVarInternal( int encodingType );
 
 	// reads a varint encoded integer
-	uint32			ReadVarInt32();
-	uint64			ReadVarInt64();
-	int32			ReadSignedVarInt32();
-	int64			ReadSignedVarInt64();
+	[[nodiscard]] uint32		ReadVarInt32();
+	[[nodiscard]] uint64		ReadVarInt64();
+	[[nodiscard]] int32			ReadSignedVarInt32();
+	[[nodiscard]] int64			ReadSignedVarInt64();
 
 	// You can read signed or unsigned data with this, just cast to 
 	// a signed int if necessary.
-	unsigned int	ReadBitLong(int numbits, bool bSigned);
+	[[nodiscard]] unsigned int	ReadBitLong(int numbits, bool bSigned);
 
-	float			ReadBitCoord();
-	float			ReadBitCoordMP( bool bIntegral, bool bLowPrecision );
-	float			ReadBitFloat();
-	float			ReadBitNormal();
+	[[nodiscard]] float			ReadBitCoord();
+	[[nodiscard]] float			ReadBitCoordMP( bool bIntegral, bool bLowPrecision );
+	[[nodiscard]] float			ReadBitFloat();
+	[[nodiscard]] float			ReadBitNormal();
 	void			ReadBitVec3Coord( Vector& fa );
 	void			ReadBitVec3Normal( Vector& fa );
 	void			ReadBitAngles( QAngle& fa );
 
 	// Faster for comparisons but do not fully decode float values
-	unsigned int	ReadBitCoordBits();
-	unsigned int	ReadBitCoordMPBits( bool bIntegral, bool bLowPrecision );
+	[[nodiscard]] unsigned int	ReadBitCoordBits();
+	[[nodiscard]] unsigned int	ReadBitCoordMPBits( bool bIntegral, bool bLowPrecision );
 
 // Byte functions (these still read data in bit-by-bit).
 public:
 	
-	BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(8); }
-	BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
-	BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
-	BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }
-	BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
-	int64			ReadLongLong();
-	float			ReadFloat();
+	[[nodiscard]] BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(8); }
+	[[nodiscard]] BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
+	[[nodiscard]] BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
+	[[nodiscard]] BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }
+	[[nodiscard]] BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
+	[[nodiscard]] int64			ReadLongLong();
+	[[nodiscard]] float			ReadFloat();
 
 	bool			ReadBytes( OUT_CAP(nBytes) void *pOut, intp nBytes);
 	// dimhotepus: Bounds-safe interface.
@@ -642,23 +642,23 @@ public:
 
 	// Reads a string and allocates memory for it. If the string in the buffer
 	// is > 2048 bytes, then pOverflow is set to true (if it's not NULL).
-	char*			ReadAndAllocateString( bool *pOverflow = 0 );
+	[[nodiscard]] char*			ReadAndAllocateString( bool *pOverflow = 0 );
 
 	// Returns nonzero if any bits differ
-	int				CompareBits( bf_read * RESTRICT other, int bits );
-	int				CompareBitsAt( int offset, bf_read * RESTRICT other, int otherOffset, int bits ) RESTRICT;
+	[[nodiscard]] int			CompareBits( bf_read * RESTRICT other, int bits );
+	[[nodiscard]] int			CompareBitsAt( int offset, bf_read * RESTRICT other, int otherOffset, int bits ) RESTRICT;
 
 // Status.
 public:
-	intp				GetNumBytesLeft() const;
-	intp				GetNumBytesRead();
-	intp				GetNumBitsLeft() const;
-	intp				GetNumBitsRead() const;
+	[[nodiscard]] intp				GetNumBytesLeft() const;
+	[[nodiscard]] intp				GetNumBytesRead();
+	[[nodiscard]] intp				GetNumBitsLeft() const;
+	[[nodiscard]] intp				GetNumBitsRead() const;
 
 	// Has the buffer overflowed?
-	inline bool		IsOverflowed() const {return m_bOverflow;}
+	[[nodiscard]] inline bool		IsOverflowed() const {return m_bOverflow;}
 
-	inline bool		Seek(intp iBit);					// Seek to a specific bit.
+	inline bool		Seek(intp iBit);				// Seek to a specific bit.
 	inline bool		SeekRelative(intp iBitDelta);	// Seek to an offset from the current position.
 
 	// Called when the buffer is overflowed.

@@ -105,7 +105,7 @@ private:
 
 #if !defined(_MINIMUM_BUILD_)
 // hash comparison function, for use with CUtlMap/CUtlRBTree
-bool HashLessFunc( SHADigest_t const &lhs, SHADigest_t const &rhs );
+[[nodiscard]] bool HashLessFunc( SHADigest_t const &lhs, SHADigest_t const &rhs );
 
 // utility class for manipulating SHA1 hashes in their compact form
 struct CSHA
@@ -123,32 +123,32 @@ public:
 		memcpy( m_shaDigest, rhs, k_cubHash );
 	}
 
-	SHADigest_t &SHADigest()
+	[[nodiscard]] SHADigest_t &SHADigest()
 	{
 		return m_shaDigest;
 	}
 
-	bool operator<( const CSHA &rhs ) const
+	[[nodiscard]] bool operator<( const CSHA &rhs ) const
 	{
 		return memcmp( m_shaDigest, rhs.m_shaDigest, k_cubHash ) < 0;
 	}
 
-	bool operator==( const CSHA &rhs ) const
+	[[nodiscard]] bool operator==( const CSHA &rhs ) const
 	{
 		return memcmp( m_shaDigest, rhs.m_shaDigest, k_cubHash ) == 0;
 	}
 
-	bool operator!=( const CSHA &rhs ) const
+	[[nodiscard]] bool operator!=( const CSHA &rhs ) const
 	{
 		return !(*this == rhs);
 	}
 
-	bool operator==( const SHADigest_t &rhs ) const
+	[[nodiscard]] bool operator==( const SHADigest_t &rhs ) const
 	{
 		return memcmp( m_shaDigest, rhs, k_cubHash ) == 0;
 	}
 
-	bool operator!=( const SHADigest_t &rhs ) const
+	[[nodiscard]] bool operator!=( const SHADigest_t &rhs ) const
 	{
 		return !(*this == rhs);
 	}
