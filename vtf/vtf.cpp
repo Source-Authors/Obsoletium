@@ -865,7 +865,7 @@ bool CVTFTexture::ResourceMemorySection::LoadData( CUtlBuffer &buf, CByteswap &b
 {
 	// Read the size
 	int iDataSize = 0;
-	buf.Get( &iDataSize, sizeof( iDataSize ) );
+	buf.Get( iDataSize );
 	byteSwap.SwapBufferToTargetEndian( &iDataSize );
 
 	// Read the actual data
@@ -930,7 +930,7 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 		#if defined( _X360 ) || defined (POSIX)
 			// read 15 dummy bytes to be properly positioned with 7.2 PC data
 			byte dummy[15];
-			buf.Get( dummy, 15 );
+			buf.Get( dummy );
 		#endif
 	}
 	else if ( header.version[1] == 1 || header.version[1] == 0 )
@@ -941,7 +941,7 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 		#if defined( _X360 ) || defined (POSIX)
 			// read a dummy byte to be properly positioned with 7.0/1 PC data
 			byte dummy;
-			buf.Get( &dummy, 1 );
+			buf.Get( dummy );
 		#endif
 	}
 	else
@@ -1122,19 +1122,6 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		buf.Get( m_arrResourcesInfo.Base(), m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ) );
 		if ( !buf.IsValid() )
 			return false;
-
-		if ( IsX360() )
-		{
-			// Byte-swap the dictionary data offsets
-			for ( intp k = 0; k < m_arrResourcesInfo.Count(); ++ k )
-			{
-				ResourceEntryInfo &rei = m_arrResourcesInfo[k];
-				if ( ( rei.eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
-				{
-					m_Swap.SwapBufferToTargetEndian( &rei.resData );
-				}
-			}
-		}
 	}
 	else
 	{
