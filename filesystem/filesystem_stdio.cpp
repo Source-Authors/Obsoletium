@@ -11,26 +11,25 @@
 
 #include "basefilesystem.h"
 #include "packfile.h"
-#include "tier0/dbg.h"
-#include "tier0/threadtools.h"
+
 #ifdef _WIN32
 #include "tier0/tslist.h"
 #elif defined(POSIX)
 #include <fcntl.h>
+
 #ifdef LINUX
 #include <sys/file.h>
 #endif
 #endif
-#include "tier1/convar.h"
+
+#include "tier0/dbg.h"
+#include "tier0/threadtools.h"
 #include "tier0/vcrmode.h"
 #include "tier0/vprof.h"
+#include "tier1/convar.h"
 #include "tier1/fmtstr.h"
 #include "tier1/utlrbtree.h"
 #include "vstdlib/osversion.h"
-
-#ifdef _X360
-#undef WaitForSingleObject
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -232,10 +232,10 @@ public:
 	InitReturnVal_t		Init() override;
 	void				Shutdown() override;
 
-	void						InitAsync();
-	void						ShutdownAsync();
+	void				InitAsync();
+	void				ShutdownAsync();
 
-	void						ParsePathID( const char* &pFilename, const char* &pPathID, char tempPathID[MAX_PATH] );
+	void				ParsePathID( const char* &pFilename, const char* &pPathID, char tempPathID[MAX_PATH] );
 
 	// file handling
 	FileHandle_t		Open( const char *pFileName, const char *pOptions, const char *pathID ) override;
