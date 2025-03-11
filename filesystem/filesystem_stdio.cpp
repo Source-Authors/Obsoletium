@@ -1234,18 +1234,17 @@ size_t CWin32ReadOnlyFile::FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t 
 		return 0;
 	}
 
-	CThreadEvent *pEvent = NULL;
-
-	if ( destSize == (size_t)-1 )
+	if ( destSize == std::numeric_limits<size_t>::max() )
 	{
 		destSize = size;
 	}
 
 	byte tempBuffer[READ_TEMP_BUFFER];
+	int64 offset = m_ReadPos;
+	CThreadEvent *pEvent = nullptr;
 	HANDLE hReadFile = m_hFileBuffered;
 	int nBytesToRead = size;
-	byte *pDest = (byte *)dest;
-	int64 offset = m_ReadPos;
+	byte *pDest = static_cast<byte *>(dest);
 
 	if ( m_hFileUnbuffered != INVALID_HANDLE_VALUE )
 	{
