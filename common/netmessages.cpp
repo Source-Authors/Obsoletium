@@ -350,7 +350,7 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 	VPROF( "CLC_FileCRCCheck::ReadFromBuffer" );
 
 	// Reserved for future use.
-	buffer.ReadOneBit();
+	(void)buffer.ReadOneBit();
 	
 	// Read the path ID.
 	int iCode = buffer.ReadUBitLong( 2 );
@@ -411,7 +411,7 @@ bool CLC_FileCRCCheck::ReadFromBuffer( bf_read &buffer )
 	}
 	else
 	{
-		/* m_CRC */ buffer.ReadUBitLong( 32 );
+		/* m_CRC */ (void)buffer.ReadUBitLong( 32 );
 		m_CRCIOs = buffer.ReadUBitLong( 32 );
 		m_eFileHashType = buffer.ReadUBitLong( 32 );
 	}
@@ -465,7 +465,7 @@ bool CLC_FileMD5Check::ReadFromBuffer( bf_read &buffer )
 	VPROF( "CLC_FileMD5Check::ReadFromBuffer" );
 
 	// Reserved for future use.
-	buffer.ReadOneBit();
+	(void)buffer.ReadOneBit();
 
 	// Read the path ID.
 	int iCode = buffer.ReadUBitLong( 2 );
@@ -745,7 +745,7 @@ bool SVC_ServerInfo::ReadFromBuffer( bf_read &buffer )
 	m_nServerCount	= buffer.ReadLong();
 	m_bIsHLTV		= buffer.ReadOneBit()!=0;
 	m_bIsDedicated	= buffer.ReadOneBit()!=0;
-	buffer.ReadLong();  // Legacy client CRC.
+	(void)buffer.ReadLong();  // Legacy client CRC.
 	m_nMaxClasses	= buffer.ReadWord();
 
 	// Prevent cheating with hacked maps
