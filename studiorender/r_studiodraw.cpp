@@ -1930,7 +1930,7 @@ int CStudioRender::R_StudioDrawGroupHWSkin( IMatRenderContext *pRenderContext, s
 
 #if PIX_ENABLE
 	char szPIXEventName[128];
-	sprintf( szPIXEventName, "R_StudioDrawGroupHWSkin (%s)", m_pStudioHdr->name );	// PIX
+	V_sprintf_safe( szPIXEventName, "R_StudioDrawGroupHWSkin (%s)", m_pStudioHdr->name );	// PIX
 	PIXEVENT( pRenderContext, szPIXEventName );
 #endif
 

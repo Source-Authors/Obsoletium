@@ -16,12 +16,12 @@
 // wouldn't have to include these if it weren't for inlines.
 #include "materialsystem/imaterial.h"
 #include "mathlib/mathlib.h"
-#include "utllinkedlist.h"
-#include "utlvector.h"
 #include "tier1/utllinkedlist.h"
+#include "tier1/utlvector.h"
 #include "flexrenderdata.h"
 #include "mathlib/compressed_vector.h"
 #include "r_studiolight.h"
+
 #if defined( _WIN32 ) && !defined( _X360 )
 #include <xmmintrin.h>
 #endif

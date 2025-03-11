@@ -270,7 +270,7 @@ void CStudioRenderContext::LoadMaterials( studiohdr_t *phdr,
 			if ( pCdTexture[0] == CORRECT_PATH_SEPARATOR || pCdTexture[0] == INCORRECT_PATH_SEPARATOR )
 				++pCdTexture;
 
-			V_ComposeFileName( pCdTexture, textureName, szPath, sizeof( szPath ) );
+			V_ComposeFileName( pCdTexture, textureName, szPath );
 
 			if ( phdr->flags & STUDIOHDR_FLAGS_OBSOLETE )
 			{
@@ -1647,7 +1647,7 @@ int CStudioRenderContext::GetMaterialList( studiohdr_t *pStudioHdr, int count, I
 			if ( pCdTexture[0] == CORRECT_PATH_SEPARATOR || pCdTexture[0] == INCORRECT_PATH_SEPARATOR )
 				++pCdTexture;
 
-			V_ComposeFileName( pCdTexture, textureName, szPath, sizeof( szPath ) );
+			V_ComposeFileName( pCdTexture, textureName, szPath );
 
 			if ( pStudioHdr->flags & STUDIOHDR_FLAGS_OBSOLETE )
 			{
