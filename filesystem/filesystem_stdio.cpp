@@ -213,7 +213,7 @@ private:
 //-----------------------------------------------------------------------------
 CFileSystem_Stdio g_FileSystem_Stdio;
 #if defined(_WIN32) && defined(DEDICATED)
-CBaseFileSystem *BaseFileSystem_Stdio( void )
+CBaseFileSystem *BaseFileSystem_Stdio()
 {
 	return &g_FileSystem_Stdio;
 }
@@ -326,15 +326,8 @@ bool CFileSystem_Stdio::GetOptimalIOConstraints( FileHandle_t hFile, unsigned *p
 
 	if ( pBufferAlign )
 	{
-		if ( IsX360() )
-		{
-			*pBufferAlign = 4;
-		}
-		else
-		{
 			*pBufferAlign = sectorSize;
 		}
-	}
 
 	return ( sectorSize > 1 );
 }
@@ -376,16 +369,9 @@ void *CFileSystem_Stdio::AllocOptimalReadBuffer( FileHandle_t hFile, unsigned nS
 	bool bOffsetIsAligned = ( nOffset % sectorSize == 0 );
 	unsigned nAllocSize = ( bOffsetIsAligned ) ? AlignValue( nSize, sectorSize ) : nSize;
 
-	if ( IsX360() )
-	{
-		return malloc( nAllocSize );
-	}
-	else
-	{
 		unsigned nAllocAlignment = ( bOffsetIsAligned ) ? sectorSize : 4;
 		return _aligned_malloc( nAllocSize, nAllocAlignment );
 	}
-}
 
 
 //-----------------------------------------------------------------------------
@@ -398,18 +384,8 @@ void CFileSystem_Stdio::FreeOptimalReadBuffer( void *p )
 		return;
 	}
 
-	if ( p )
-	{
-		if ( IsX360() )
-		{
-			free( p );
-		}
-		else
-		{
 			 _aligned_free( p );
 		}
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
