@@ -117,8 +117,13 @@ public:
 		return *pCRC;
 	}
 
-	FORCEINLINE void GetPackFileName( char *pchFileNameOut, int cchFileNameOut );
+	FORCEINLINE void GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut );
 
+	template<int outSize>
+	FORCEINLINE void GetPackFileName( OUT_Z_ARRAY char (&pchFileNameOut)[outSize] )
+	{
+		GetPackFileName( pchFileNameOut, outSize );
+	}
 };
 
 #define MAX_ARCHIVE_FILES_TO_KEEP_OPEN_AT_ONCE 512
@@ -283,7 +288,7 @@ public:
 class CPackedStore : public CAlignedNewDelete<16>
 {
 public:
-	CPackedStore( char const *pFileBasename, char *pszFName, IBaseFileSystem *pFS, bool bOpenForWrite = false );
+	CPackedStore( char const *pFileBasename, char *pszFName, intp fnameSize, IBaseFileSystem *pFS, bool bOpenForWrite = false );
 
 	void RegisterFileTracker( IThreadedFileMD5Processor *pFileTracker ) { m_pFileTracker = pFileTracker; m_PackedStoreReadCache.m_pFileTracker = pFileTracker; }
 
@@ -351,9 +356,19 @@ public:
 	bool FindFileHashFraction( int nPackFileNumber, int nFileFraction, ChunkHashFraction_t &chunkFileHashFraction );
 	void GetPackFileLoadErrorSummary( CUtlString &sErrors );
 
-	void GetPackFileName( CPackedStoreFileHandle &handle, char *pchFileNameOut, int cchFileNameOut ) const;
-	void GetDataFileName( char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const;
-
+	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut ) const;
+	template<int outSize>
+	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_ARRAY char (&pchFileNameOut)[outSize] ) const
+	{
+		return GetPackFileName( handle, pchFileNameOut, outSize );
+	}
+	void GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const;
+	template<int outSize>
+	void GetDataFileName( OUT_Z_ARRAY char (&pchFileNameOut)[outSize], intp nFileNumber ) const
+	{
+		return GetDataFileName( pchFileNameOut, outSize, nFileNumber );
+	}
+	
 	char const *BaseName( void )
 	{
 		return m_pszFileBaseName;
@@ -463,7 +478,7 @@ FORCEINLINE int CPackedStoreFileHandle::Read( void *pOutData, int nNumBytes )
 	return m_pOwner->ReadData( *this, pOutData, nNumBytes );
 }
 
-FORCEINLINE void CPackedStoreFileHandle::GetPackFileName( char *pchFileNameOut, int cchFileNameOut )
+FORCEINLINE void CPackedStoreFileHandle::GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut )
 {
 	m_pOwner->GetPackFileName( *this, pchFileNameOut, cchFileNameOut );
 }

@@ -749,8 +749,8 @@ void CBaseFileSystem::PrintOpenedFiles( void )
 
 #if defined( SUPPORT_PACKED_STORE )
 
-CPackedStoreRefCount::CPackedStoreRefCount( char const *pFileBasename, char *pszFName, IBaseFileSystem *pFS )
-: CPackedStore( pFileBasename, pszFName, pFS, false )
+CPackedStoreRefCount::CPackedStoreRefCount( char const *pFileBasename, char *pszFName, intp fnameSize, IBaseFileSystem *pFS )
+: CPackedStore( pFileBasename, pszFName, fnameSize, pFS, false )
 {
 	// If the VPK is signed, check the signature
 	//
@@ -795,7 +795,7 @@ void CBaseFileSystem::AddVPKFile( char const *pPath, const char *pPathID, Search
 	if ( pVPK == NULL )
 	{
 		char pszFName[MAX_PATH];
-		pVPK = new CPackedStoreRefCount( nameBuf, pszFName, this ); 
+		pVPK = new CPackedStoreRefCount( nameBuf, pszFName, ssize(pszFName), this ); 
 		if ( pVPK->IsEmpty() )
 		{
 			delete pVPK;

@@ -198,7 +198,7 @@ private:
 class CPackedStoreRefCount : public CPackedStore, public CRefCounted<CRefCountServiceMT>
 {
 public:
-	CPackedStoreRefCount( char const *pFileBasename, char *pszFName, IBaseFileSystem *pFS );
+	CPackedStoreRefCount( char const *pFileBasename, char *pszFName, intp fnameSize, IBaseFileSystem *pFS );
 
 	bool m_bSignatureValid;
 };
