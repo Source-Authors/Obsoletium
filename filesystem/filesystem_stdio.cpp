@@ -910,7 +910,10 @@ size_t CStdioFile::FS_fwrite( IN_BYTECAP(size) const void *src, size_t size )
 
 	// return number of bytes written (because we have size = 1, count = bytes, so it return bytes)
 	// dimhotepus: Write entire file at once, not by chunks as original bug has been fixed.
-	return fwrite(src, 1, size, m_pFile);
+	const size_t written_bytes{fwrite(src, 1, size, m_pFile)};
+	Assert(size == written_bytes);
+
+	return written_bytes;
 }
 
 //-----------------------------------------------------------------------------
