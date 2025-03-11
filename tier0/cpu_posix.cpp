@@ -3,13 +3,19 @@
 // Determine CPU speed under linux
 
 #include <sys/types.h>
-#include <sys/sysctl.h>
 #include <sys/time.h>
 #include <unistd.h>
+
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+
 #include "tier0/platform.h"
+#include "posix_file_stream.h"
+
+#ifdef OSX
+#include <sys/sysctl.h>
+#endif
 
 #define rdtsc(x) \
 	__asm__ __volatile__ ("rdtsc" : "=A" (x))
@@ -45,14 +51,13 @@ constexpr inline uint64 diff(uint64 v1, uint64 v2)
 #ifdef OSX
 
 // Mac
-uint64 GetCPUFreqFromPROC()
+static uint64 GetCPUFreqFromPROC()
 {
 	uint64_t frequency = 0;
 	size_t len = sizeof(frequency);
 
 	// Only for Intel Macs. M1+ have multiple CPUs with different frequency.
-	if (sysctlbyname("hw.cpufrequency",
-		&frequency, &len, NULL, 0) == 0)
+	if (sysctlbyname("hw.cpufrequency", &frequency, &len, NULL, 0) == 0)
 	{
 		return frequency;
 	}
@@ -64,23 +69,27 @@ uint64 GetCPUFreqFromPROC()
 #else
 
 // Linux
-uint64 GetCPUFreqFromPROC()
+static uint64 GetCPUFreqFromPROC()
 {
 	double mhz = 0;
-	char line[1024], *s, search_str[] = "cpu MHz";
+	char line[1024], search_str[] = "cpu MHz";
 
+	// dimhotepus: Use RAII FILE wrapper.
 	/* open proc/cpuinfo */
-	FILE *fp = fopen( "/proc/cpuinfo", "r" );
-	if (fp == NULL)
+	auto [f, errc] =
+		se::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
+	if (errc)
 	{
 		return 0;
 	}
 
 	/* ignore all lines until we reach MHz information */
-	while (fgets(line, 1024, fp) != NULL) 
+	while (!std::get<std::error_code>(f.gets(line))) 
 	{ 
-		if (strstr(line, search_str) != NULL) 
+		if (strstr(line, search_str) != nullptr) 
 		{
+			char *s;
+
 			/* ignore all characters in line up to : */
 			for (s = line; *s && (*s != ':'); ++s)
 				;
@@ -89,11 +98,9 @@ uint64 GetCPUFreqFromPROC()
 			if ( *s && ( sscanf( s + 1, "%lf", &mhz) == 1 ) )
 				break;
 		}
-    }
+	}
 
-    fclose(fp);
-
-    return ( uint64 )( mhz * 1000000 );
+	return ( uint64 )( mhz * 1000000 );
 }
 
 #endif
@@ -109,21 +116,25 @@ uint64 CalculateCPUFreq()
 	}
 #endif
 
+	// dimhotepus: Use RAII FILE wrapper.
 	// Try to open cpuinfo_max_freq. If the kernel was built with cpu scaling support disabled, this will fail.
-	FILE *fp = fopen( "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r" );
-	if ( fp )
+	auto [f, errc] =
+		se::posix::posix_file_stream_factory::open(
+			"/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r");
+	if ( !errc )
 	{
 		char buf[ 256 ];
+		buf[ 0 ] = '\0';
+
 		uint64 retVal = 0;
 
-		buf[ 0 ] = 0;
-		if( fread( buf, 1, std::size( buf ), fp ) )
+		std::tie(std::ignore, errc) = f.read( buf );
+		if ( !errc )
 		{
 			retVal = ( uint64 )atoll( buf );
 		}
-		fclose(fp);
 
-		if( retVal )
+		if ( retVal )
 		{
 			return retVal * 1000;
 		}
