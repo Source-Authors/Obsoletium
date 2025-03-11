@@ -208,11 +208,11 @@ unsigned int CWordTag::ComputeDataCheckSum()
 	for ( auto *p : m_Phonemes )
 	{
 		unsigned int phonemeCheckSum = p->ComputeDataCheckSum();
-		CRC32_ProcessBuffer( &crc, &phonemeCheckSum, sizeof( unsigned int ) );
+		CRC32_ProcessBuffer( &crc, phonemeCheckSum );
 	}
 	// Checksum timestamps
-	CRC32_ProcessBuffer( &crc, &m_flStartTime, sizeof( float ) );
-	CRC32_ProcessBuffer( &crc, &m_flEndTime, sizeof( float ) );
+	CRC32_ProcessBuffer( &crc, m_flStartTime );
+	CRC32_ProcessBuffer( &crc, m_flEndTime );
 
 	CRC32_Final( &crc );
 
@@ -318,13 +318,13 @@ unsigned int CPhonemeTag::ComputeDataCheckSum()
 	// Checksum the text
 	CRC32_ProcessBuffer( &crc, m_szPhoneme, Q_strlen( m_szPhoneme ) );
 	int phonemeCode = GetPhonemeCode();
-	CRC32_ProcessBuffer( &crc, &phonemeCode, sizeof( int ) );
+	CRC32_ProcessBuffer( &crc, phonemeCode );
 
 	// Checksum timestamps
 	float startTime = GetStartTime();
 	float endTime = GetEndTime();
-	CRC32_ProcessBuffer( &crc, &startTime, sizeof( float ) );
-	CRC32_ProcessBuffer( &crc, &endTime, sizeof( float ) );
+	CRC32_ProcessBuffer( &crc, startTime );
+	CRC32_ProcessBuffer( &crc, endTime );
 
 	CRC32_Final( &crc );
 
@@ -1552,14 +1552,14 @@ unsigned int CSentence::ComputeDataCheckSum()
 	for ( auto *word : m_Words )
 	{
 		unsigned int wordCheckSum = word->ComputeDataCheckSum();
-		CRC32_ProcessBuffer( &crc, &wordCheckSum, sizeof( unsigned int ) );
+		CRC32_ProcessBuffer( &crc, wordCheckSum );
 	}
 
 	// Checksum emphasis data
 	for ( const auto &s : m_EmphasisSamples )
 	{
-		CRC32_ProcessBuffer( &crc, &s.time, sizeof( float ) );
-		CRC32_ProcessBuffer( &crc, &s.value, sizeof( float ) );
+		CRC32_ProcessBuffer( &crc, s.time );
+		CRC32_ProcessBuffer( &crc, s.value );
 	}
 
 	CRC32_Final( &crc );

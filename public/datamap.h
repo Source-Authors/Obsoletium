@@ -443,9 +443,10 @@ public:
 	
 	const char *GenerateName( const char *pszIdentifier )
 	{
-		char *pBuf = new char[m_nLenBase + strlen(pszIdentifier) + 1];
-		strcpy( pBuf, m_pszBase );
-		strcat( pBuf, pszIdentifier );
+		intp bufferSize = m_nLenBase + V_strlen(pszIdentifier) + 1;
+		char *pBuf = new char[bufferSize];
+		V_strncpy( pBuf, m_pszBase, bufferSize );
+		V_strncat( pBuf, pszIdentifier, bufferSize );
 		m_Names.AddToTail( pBuf );
 		return pBuf;
 	}

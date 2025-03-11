@@ -139,12 +139,12 @@ public:
 		char valueString[4096];
 		va_list marker;
 		va_start( marker, pValue );
-		Q_vsnprintf( valueString, sizeof( valueString ), pValue, marker );
+		V_vsprintf_safe( valueString, pValue, marker );
 		va_end( marker );
 
 #ifdef WIN32
 		char str[4096];
-		Q_snprintf( str, sizeof( str ), "%s=%s", m_pVarName, valueString );
+		V_sprintf_safe( str, "%s=%s", m_pVarName, valueString );
 		bool ok = !_putenv( str );
 #else
 		bool ok = !setenv( m_pVarName, valueString, 1 );
@@ -162,7 +162,7 @@ public:
 	{
 #ifdef WIN32
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "%s=", m_pVarName );
+		V_sprintf_safe( str, "%s=", m_pVarName );
 		bool ok = !_putenv( str );
 #else
 		bool ok = !setenv( m_pVarName, "", 1 );
@@ -281,23 +281,15 @@ static KeyValues::AutoDelete ReadKeyValuesFile( const char *pFilename )
 	if ( errc )
 		return KeyValues::AutoDelete{ nullptr };
 	
-	std::tie(std::ignore, errc) = fp.seek( 0, SEEK_END );
-	if ( errc )
-		return KeyValues::AutoDelete{ nullptr };
-
 	std::int64_t size;
-	std::tie(size, errc) = fp.tell();
-	if ( errc )
+	std::tie(size, errc) = fp.size();
+	if ( errc || size > std::numeric_limits<intp>::max() - 1 )
 		return KeyValues::AutoDelete{ nullptr };
 
 	CUtlVector<char> buf;
-	buf.SetSize( size + 1 );
+	buf.SetSize( static_cast<intp>(size) + 1 );
 
-	std::tie(std::ignore, errc) = fp.seek( 0, SEEK_SET );
-	if ( errc )
-		return KeyValues::AutoDelete{ nullptr };
-
-	std::tie(std::ignore, errc) = fp.read( buf.Base(), size );
+	std::tie(std::ignore, errc) = fp.read( buf.Base(), static_cast<intp>(size) );
 	if ( errc )
 		return KeyValues::AutoDelete{ nullptr };
 
@@ -356,8 +348,8 @@ bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned ex
 	if ( !Sys_GetExecutableName( exedir, exeDirLen ) )
 		return false;
 
-	Q_StripFilename( exedir );
-	Q_FixSlashes( exedir );
+	V_StripFilename( exedir );
+	V_FixSlashes( exedir );
 
 	// Return the bin directory as the executable dir if it's not in there
 	// because that's really where we're running from...
@@ -391,9 +383,9 @@ static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 	{
 #ifdef PLATFORM_64BITS
 		// dimhotepus: Need to strip x64, too.
-		Q_StripFilename( baseDir );
+		V_StripFilename( baseDir );
 #endif
-		Q_StripFilename( baseDir );
+		V_StripFilename( baseDir );
 		return true;
 	}
 	
@@ -851,7 +843,7 @@ static FSReturnCode_t TryLocateGameInfoFile(char (&pOutDir)[outDirLen],
 			return FS_OK;
 		}
 	} 
-	while ( bBubbleDir && Q_StripLastDir( pOutDir, outDirLen ) );
+	while ( bBubbleDir && V_StripLastDir( pOutDir, outDirLen ) );
 
 	// Make an attempt to resolve from "content -> game" directory
 	V_strcpy_safe( pOutDir, spchCopyNameBuffer );
@@ -868,7 +860,7 @@ static FSReturnCode_t TryLocateGameInfoFile(char (&pOutDir)[outDirLen],
 				return FS_OK;
 			}
 		} 
-		while ( bBubbleDir && Q_StripLastDir( pOutDir, outDirLen ) );
+		while ( bBubbleDir && V_StripLastDir( pOutDir, outDirLen ) );
 	}
 
 	// Could not find it here

@@ -107,7 +107,7 @@ bool CSoundCombiner::CreateWorkList( IFileSystem *pFilesystem, CUtlVector< Combi
 
 		char fullpath[ MAX_PATH ];
 		Q_strncpy( fullpath, info[ i ].wavefile, sizeof( fullpath ) );
-		pFilesystem->GetLocalPath( info[ i ].wavefile, fullpath, sizeof( fullpath ) );
+		pFilesystem->GetLocalPath_safe( info[ i ].wavefile, fullpath );
 
 		if ( !LoadSentenceFromWavFile( fullpath, workitem->sentence ) )
 		{
@@ -228,7 +228,7 @@ bool CSoundCombiner::IsCombinedFileChecksumValid( IFileSystem *pFilesystem, char
 
 	char fullpath[ MAX_PATH ];
 	Q_strncpy( fullpath, outfile, sizeof( fullpath ) );
-	pFilesystem->GetLocalPath( outfile, fullpath, sizeof( fullpath ) );
+	pFilesystem->GetLocalPath_safe( outfile, fullpath );
 
 	CSentence sentence;
 
@@ -435,8 +435,8 @@ bool CSoundCombiner::SaveSentenceToWavFile( char const *wavfile, CSentence& sent
 {
 	char tempfile[ 512 ];
 
-	Q_StripExtension( wavfile, tempfile, sizeof( tempfile ) );
-	Q_DefaultExtension( tempfile, ".tmp", sizeof( tempfile ) );
+	Q_StripExtension( wavfile, tempfile );
+	Q_DefaultExtension( tempfile, ".tmp" );
 
 	if ( filesystem->FileExists( tempfile, NULL ) )
 	{
@@ -533,7 +533,7 @@ bool CSoundCombiner::InitSplicer( IFileSystem *pFilesystem, int samplerate, int 
 
 	// Make sure the directory exists
 	char basepath[ 512 ];
-	Q_ExtractFilePath( m_szOutFile, basepath, sizeof( basepath ) );
+	V_ExtractFilePath( m_szOutFile, basepath );
 	pFilesystem->CreateDirHierarchy( basepath, "GAME" );
 
 	// Create out put file

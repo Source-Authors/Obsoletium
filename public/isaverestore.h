@@ -270,8 +270,18 @@ public:
 	virtual int		ReadBool( bool *pValue, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadFloat( float *pValue, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadData( char *pData, int size, int nBytesAvailable ) = 0;
-	virtual void	ReadString( char *pDest, int nSizeDest, int nBytesAvailable ) = 0;			// A null-terminated string
+	virtual void	ReadString( OUT_Z_CAP(nSizeDest) char *pDest, int nSizeDest, int nBytesAvailable ) = 0;			// A null-terminated string
+	template<int nSizeDest>
+	void ReadString( OUT_Z_ARRAY char (&pDest)[nSizeDest], int nBytesAvailable )
+	{
+		ReadString( pDest, nSizeDest, nBytesAvailable );
+	}
 	virtual int		ReadString( string_t *pString, int count = 1, int nBytesAvailable = 0 ) = 0;
+	template<int count>
+	void ReadString( OUT_Z_ARRAY string_t (&pString)[count], int nBytesAvailable = 0 )
+	{
+		ReadString( pString, count, nBytesAvailable );
+	}
 	virtual int		ReadVector( Vector *pValue ) = 0;
 	virtual int		ReadVector( Vector *pValue, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadQuaternion( Quaternion *pValue ) = 0;
