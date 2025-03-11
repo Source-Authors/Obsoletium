@@ -150,8 +150,8 @@ CGameConfigManager::CGameConfigManager( void ) : m_pData( NULL ), m_LoadStatus( 
 {
 	// Start with default directory
 	GetModuleFileName( GetModuleHandle( NULL ), m_szBaseDirectory, sizeof( m_szBaseDirectory ) );
-	Q_StripLastDir( m_szBaseDirectory );	// Get rid of the filename.
-	Q_StripTrailingSlash( m_szBaseDirectory );
+	V_StripLastDir( m_szBaseDirectory );	// Get rid of the filename.
+	V_StripTrailingSlash( m_szBaseDirectory );
 	m_eSDKEpoch = (eSDKEpochs) SDK_LAUNCHER_VERSION;
 }
 
@@ -801,8 +801,8 @@ const char *CGameConfigManager::GetRootDirectory( void )
 	if ( path[0] == 0 )
 	{
 		V_strcpy_safe( path, GetBaseDirectory() );
-		Q_StripLastDir( path );	// Get rid of the 'bin' directory
-		Q_StripTrailingSlash( path );
+		V_StripLastDir( path );	// Get rid of the 'bin' directory
+		V_StripTrailingSlash( path );
 	}
 	return path;
 }
