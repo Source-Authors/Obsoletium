@@ -531,8 +531,10 @@ void VPKBuilder::BuildSteamPipeFriendlyFromInputKeys() {
           if (V_strlen(pszMD5) != MD5_DIGEST_LENGTH * 2)
             Error("File '%s' has invalid MD5 '%s'", pszNameOnDisk, pszMD5);
 
-          V_hextobinary(pszMD5, MD5_DIGEST_LENGTH * 2, bf.m_md5Old.bits,
-                        MD5_DIGEST_LENGTH);
+          // dimhotepus: Verify MD5 hex is valid.
+          if (!V_hextobinary(pszMD5, MD5_DIGEST_LENGTH * 2, bf.m_md5Old.bits))
+            Error("File '%s' has invalid (non-hex) MD5 '%s'", pszNameOnDisk,
+                  pszMD5);
         } else {
           fprintf(
               stderr,
@@ -1079,9 +1081,10 @@ void VPKBuilder::SetInputKeys(KeyValues *pInputKeys,
     if (*pszMD5) {
       if (V_strlen(pszMD5) != MD5_DIGEST_LENGTH * 2)
         Error("File '%s' has invalid MD5 '%s'", pszNameOnDisk, pszMD5);
-
-      V_hextobinary(pszMD5, MD5_DIGEST_LENGTH * 2, bf.m_md5New.bits,
-                    MD5_DIGEST_LENGTH);
+      // dimhotepus: Verify MD5 hex is valid.
+      if (!V_hextobinary(pszMD5, MD5_DIGEST_LENGTH * 2, bf.m_md5New.bits))
+        Error("File '%s' has invalid (non-hex) MD5 '%s'", pszNameOnDisk,
+              pszMD5);
     }
 
     m_vecNewFiles.AddToTail(f);
@@ -1573,7 +1576,8 @@ void GenerateKeyPair(const char *pszBaseKeyName) {
 
 static void CheckSignature(const char *pszFilename) {
   char szActualFileName[MAX_PATH];
-  CPackedStore pack(pszFilename, szActualFileName, g_pFullFileSystem);
+  CPackedStore pack(pszFilename, szActualFileName, ssize(szActualFileName),
+                    g_pFullFileSystem);
 
   // Make sure they didn't make a mistake
   CUtlVector<uint8> bytesPublicKey;
@@ -1642,7 +1646,8 @@ static void CheckSignature(const char *pszFilename) {
 
 static void CheckHashes(const char *pszFilename) {
   char szActualFileName[MAX_PATH];
-  CPackedStore pack(pszFilename, szActualFileName, g_pFullFileSystem);
+  CPackedStore pack(pszFilename, szActualFileName, ssize(szActualFileName),
+                    g_pFullFileSystem);
 
   char szChunkFilename[256];
 
@@ -1697,10 +1702,8 @@ static void CheckHashes(const char *pszFilename) {
 
       char szCalculated[MD5_DIGEST_LENGTH * 2 + 4];
       char szExpected[MD5_DIGEST_LENGTH * 2 + 4];
-      V_binarytohex(filehash.m_md5contents.bits, MD5_DIGEST_LENGTH,
-                    szCalculated, sizeof(szCalculated));
-      V_binarytohex(frac.m_md5contents.bits, MD5_DIGEST_LENGTH, szExpected,
-                    sizeof(szExpected));
+      V_binarytohex(filehash.m_md5contents.bits, szCalculated);
+      V_binarytohex(frac.m_md5contents.bits, szExpected);
 
       fprintf(stderr, "    @%d: hash mismatch: Got %s, expected %s.\n",
               frac.m_nFileFraction, szCalculated, szExpected);
@@ -1739,7 +1742,8 @@ static void PrintBinaryBlob(const CUtlVector<uint8> &blob) {
 
 static void DumpSignatureInfo(const char *pszFilename) {
   char szActualFileName[MAX_PATH];
-  CPackedStore pack(pszFilename, szActualFileName, g_pFullFileSystem);
+  CPackedStore pack(pszFilename, szActualFileName, ssize(szActualFileName),
+                    g_pFullFileSystem);
   if (pack.GetSignature().Count() == 0) {
     printf("VPK is not signed\n");
     return;
@@ -1794,12 +1798,13 @@ void BuildRecursiveFileList(const char *pcDirName, CUtlStringList &fileList) {
 
 static void DroppedVpk(const char *pszVpkFilename) {
   char szActualFileName[MAX_PATH];
-  CPackedStore mypack(pszVpkFilename, szActualFileName, g_pFullFileSystem);
+  CPackedStore mypack(pszVpkFilename, szActualFileName, ssize(szActualFileName),
+                      g_pFullFileSystem);
   CUtlStringList fileNames;
   char szVPKParentDir[MAX_PATH];
 
   V_strcpy_safe(szVPKParentDir, pszVpkFilename);
-  V_SetExtension(szVPKParentDir, "", sizeof(szVPKParentDir));
+  V_SetExtension(szVPKParentDir, "");
   mypack.GetFileList(fileNames, false, true);
 
   for (auto *name : fileNames) {
@@ -1812,8 +1817,7 @@ static void DroppedVpk(const char *pszVpkFilename) {
     if (pData) {
       char szParentDirectory[MAX_PATH];
 
-      V_ExtractFilePath(szDestFilePath, szParentDirectory,
-                        sizeof(szParentDirectory));
+      V_ExtractFilePath(szDestFilePath, szParentDirectory);
       V_FixSlashes(szParentDirectory);
 
       if (!g_pFullFileSystem->IsDirectory(szParentDirectory)) {
@@ -1861,7 +1865,8 @@ static void DroppedDirectory(const char *pszDirectoryArg) {
 
   // Make the VPK
   char szActualFileName[MAX_PATH];
-  CPackedStore mypack(szVPKPath, szActualFileName, g_pFullFileSystem, true);
+  CPackedStore mypack(szVPKPath, szActualFileName, ssize(szActualFileName),
+                      g_pFullFileSystem, true);
   mypack.SetWriteChunkSize(s_iMultichunkSize * 1024 * 1024);
 
   // !KLUDGE! Create keyvalues object, since that's what the builder uses
@@ -1986,7 +1991,8 @@ int main(int argc, char **argv) {
 
     // list a file
     char szActualFileName[MAX_PATH];
-    CPackedStore mypack(argv[2], szActualFileName, g_pFullFileSystem);
+    CPackedStore mypack(argv[2], szActualFileName, ssize(szActualFileName),
+                        g_pFullFileSystem);
     CUtlStringList fileNames;
     mypack.GetFileList(fileNames, pszCommand[0] == 'L', true);
 
@@ -1998,7 +2004,8 @@ int main(int argc, char **argv) {
     }
 
     char szActualFileName[MAX_PATH];
-    CPackedStore mypack(argv[2], szActualFileName, g_pFullFileSystem, true);
+    CPackedStore mypack(argv[2], szActualFileName, ssize(szActualFileName),
+                        g_pFullFileSystem, true);
     CheckLoadKeyFilesForSigning(mypack);
     for (int i = 3; i < argc; i++) {
       if (argv[i][0] == '@') {
@@ -2023,7 +2030,8 @@ int main(int argc, char **argv) {
     }
 
     char szActualFileName[MAX_PATH];
-    CPackedStore mypack(argv[2], szActualFileName, g_pFullFileSystem, true);
+    CPackedStore mypack(argv[2], szActualFileName, ssize(szActualFileName),
+                        g_pFullFileSystem, true);
     mypack.SetWriteChunkSize(s_iMultichunkSize * 1024 * 1024);
 
     VPKBuilder builder(mypack);
@@ -2038,7 +2046,8 @@ int main(int argc, char **argv) {
 
     // extract a file
     char szActualFileName[MAX_PATH];
-    CPackedStore mypack(argv[2], szActualFileName, g_pFullFileSystem);
+    CPackedStore mypack(argv[2], szActualFileName, ssize(szActualFileName),
+                        g_pFullFileSystem);
     for (int i = 3; i < argc; i++) {
       CPackedStoreFileHandle pData = mypack.OpenFile(argv[i]);
       if (pData) {
@@ -2089,7 +2098,8 @@ int main(int argc, char **argv) {
     }
 
     char szActualFileName[MAX_PATH];
-    CPackedStore mypack(argv[2], szActualFileName, g_pFullFileSystem, true);
+    CPackedStore mypack(argv[2], szActualFileName, ssize(szActualFileName),
+                        g_pFullFileSystem, true);
     CheckLoadKeyFilesForSigning(mypack);
     mypack.HashEverything();
     mypack.Write();
