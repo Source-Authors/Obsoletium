@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
   CommandLine()->CreateCmdLine(argc, argv);
   MathLib_Init(2.2f, 2.2f, 0.0f, 1, false, false, false, false);
-  InitDefaultFileSystem();
+  const ScopedDefaultFileSystem scoped_default_file_system;
 
   const char *vtf_file_name{CommandLine()->ParmValue("-i")};
   const char *tga_file_name{CommandLine()->ParmValue("-o")};
@@ -337,8 +337,6 @@ int main(int argc, char **argv) {
       }
     }
   }
-
-  ShutdownDefaultFileSystem();
 
   return 0;
 }
