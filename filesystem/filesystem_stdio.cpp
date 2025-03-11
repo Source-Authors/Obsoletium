@@ -722,66 +722,58 @@ int CFileSystem_Stdio::HintResourceNeed( const char *hintlist, int forgetEveryth
 //-----------------------------------------------------------------------------
 CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, int64 *size )
 {
-	FILE *pFile = NULL;
-	char *p = NULL;
 	char filename[MAX_PATH];
-	struct _stat buf;
+	V_strcpy_safe( filename, filenameT );
 
-	V_strncpy( filename, filenameT, sizeof(filename) );
-	
+	{
 	// stop newline characters at end of filename
-	p = strchr( filename, '\n' );
+		char *p = strchr( filename, '\n' );
 	if ( p )
 		*p = '\0';
 	p = strchr( filename, '\r' );
 	if ( p )
 		*p = '\0';
-
-
-	pFile = fopen(filename, options);
-	if (pFile && size)
-	{
-		// todo: replace with filelength()? 
-		int rt = _stat( filename, &buf );
-		if (rt == 0)
-		{
-			*size = buf.st_size;
-		}
 	}
 
-#if defined(LINUX)
-	if(!pFile && !strchr(options,'w') && !strchr(options,'+') ) // try opening the lower cased version
+	FILE *pFile = fopen( filename, options );
+
+#ifdef LINUX
+	// Try opening the lower cased version.
+	if ( !pFile && !strchr(options, 'w') && !strchr(options,'+') )
 	{
 		char caseFixedName[ MAX_PATH ];
-		bool found = findFileInDirCaseInsensitive_safe( filename, caseFixedName );
+		const bool found = findFileInDirCaseInsensitive_safe( filename, caseFixedName );
 		if ( found )
 		{	
 			pFile = fopen( caseFixedName, options );
+			// dimhotepus: filename should contain valid file name.
+			if (pFile)
+			{
+				V_strcpy_safe( filename, caseFixedName );
+			}
+		}
+	}
+#endif  // LINUX
 
 			if (pFile && size)
 			{
 				// todo: replace with filelength()? 
 				struct _stat buf;
-				int rt = _stat( caseFixedName, &buf );
+		int rt = _stat( filename, &buf );
 				if (rt == 0)
 				{
 					*size = buf.st_size;
 				}
 			}
-		}
-	}
-#endif
 
 	if ( pFile )
 	{
-		bool bWriteable = false;
-		if ( strchr(options,'w') || strchr(options,'a') )
-			bWriteable = true;
+		const bool bWriteable = strchr(options,'w') || strchr(options,'a');
 		
-#if defined POSIX
+#ifdef POSIX
 		if ( bWriteable )
 		{
-			CThreadMutex *pMutex = NULL;
+			CThreadMutex *pMutex = nullptr;
 
 			{
 				AUTO_LOCK( m_MutexLockedFD );
@@ -795,17 +787,18 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 				}
 				else
 				{
-					CThreadMutex *newMutex = new CThreadMutex;
+					auto *newMutex = new CThreadMutex;
 					pMutex = m_LockedFDMap[m_LockedFDMap.Insert( buf.st_ino, newMutex )];
 				}
 			}
+
 			// grab the lock once we have UNLOCKED m_MutexLockedFD so we don't deadlock on a close
 			pMutex->Lock();
 
 			rewind( pFile );
 
 			// we need to get the file size again after the lock returns
-			if (pFile && size)
+			if ( size )
 			{
 				int rt = _stat( filename, &buf );
 				if (rt == 0)
@@ -813,13 +806,13 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 					*size = buf.st_size;
 				}
 			}
-
 		}
-#endif
+#endif  // POSIX
+
 		return new CStdioFile( pFile, bWriteable );
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
