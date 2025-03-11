@@ -901,12 +901,12 @@ const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 	return (studiohdr_t *)cache;
 }
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
+byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
-	return NULL;
+	return nullptr;
 }
 
-int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
+intp	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
 	return 0;
 }

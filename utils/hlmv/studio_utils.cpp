@@ -1208,17 +1208,17 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)virtualModel );
 }
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
+byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)virtualModel, i );
 }
 
-int studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
+intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
 	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)virtualModel, pOut );
 }
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
-	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)cache );
+	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
 }

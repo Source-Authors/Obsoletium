@@ -336,7 +336,7 @@ public:
 	studiohwdata_t *GetHardwareData( MDLHandle_t handle ) override;
 	vcollide_t *GetVCollide( MDLHandle_t handle ) override { return GetVCollideEx( handle, true); }
 	vcollide_t *GetVCollideEx( MDLHandle_t handle, bool synchronousLoad = true ) override;
-	unsigned char *GetAnimBlock( MDLHandle_t handle, int nBlock ) override;
+	unsigned char *GetAnimBlock( MDLHandle_t handle, intp nBlock ) override;
 	virtualmodel_t *GetVirtualModel( MDLHandle_t handle ) override;
 	virtualmodel_t *GetVirtualModelFast( const studiohdr_t *pStudioHdr, MDLHandle_t handle ) override;
 	intp GetAutoplayList( MDLHandle_t handle, unsigned short **pOut ) override;
@@ -975,7 +975,7 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 			virtualmodel_t *pVirtualModel = GetVirtualModel( handle );
 			if ( pVirtualModel )
 			{
-				for ( int i = 1; i < pVirtualModel->m_group.Count(); i++ )
+				for ( intp i = 1; i < pVirtualModel->m_group.Count(); i++ )
 				{
 					MDLHandle_t sharedHandle = (MDLHandle_t) (intp)pVirtualModel->m_group[i].cache & 0xffff;
 					studiodata_t *pData = m_MDLDict[sharedHandle];
@@ -1220,7 +1220,7 @@ unsigned char *CMDLCache::UnserializeAnimBlock( MDLHandle_t handle, int nBlock )
 //-----------------------------------------------------------------------------
 // Gets at an animation block associated with an MDL
 //-----------------------------------------------------------------------------
-unsigned char *CMDLCache::GetAnimBlock( MDLHandle_t handle, int nBlock )
+unsigned char *CMDLCache::GetAnimBlock( MDLHandle_t handle, intp nBlock )
 {
 	if ( mod_test_not_available.GetBool() )
 		return NULL;
@@ -3678,7 +3678,7 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 	return g_MDLCache.GetVirtualModelFast( this, (MDLHandle_t)(intp)virtualModel&0xffff );
 }
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
+byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
 	return g_MDLCache.GetAnimBlock( (MDLHandle_t)(intp)virtualModel&0xffff, i );
 }

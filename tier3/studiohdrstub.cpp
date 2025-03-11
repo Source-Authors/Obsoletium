@@ -29,7 +29,7 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)((intp)virtualModel&0xffff) );
 }
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
+byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)((intp)virtualModel&0xffff), i );
 }
