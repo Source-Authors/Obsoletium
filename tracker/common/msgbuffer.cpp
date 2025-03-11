@@ -321,7 +321,7 @@ float CMsgBuffer::ReadFloat (void)
 //			*pbuf - 
 // Output : int
 //-----------------------------------------------------------------------------
-intp CMsgBuffer::ReadBuf( intp iSize, void *pbuf )
+intp CMsgBuffer::ReadBuf( intp iSize, OUT_CAP(iSize) void *pbuf )
 {
 	if (m_nReadCount + iSize > m_nCurSize)
 	{
@@ -367,7 +367,7 @@ void CMsgBuffer::Clear( void )
 	m_bOverFlowed	= false;
 	m_nReadCount	= 0;
 	m_bBadRead		= false;
-	memset( m_rgData, 0, sizeof( m_rgData ) );
+	BitwiseClear( m_rgData );
 }
 
 //-----------------------------------------------------------------------------

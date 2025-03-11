@@ -53,7 +53,7 @@ public:
 	int				ReadLong();
 	float			ReadFloat();
 	char			*ReadString();
-	intp			ReadBuf( intp iSize, void *pbuf );
+	intp			ReadBuf( intp iSize, OUT_CAP(iSize) void *pbuf );
 
 	// setting and storing time received
 	void			SetTime(float time);
