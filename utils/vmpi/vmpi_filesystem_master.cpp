@@ -1107,9 +1107,7 @@ bool CMasterMulticastThread::FindWarningSuppression(const char *pFilename) {
 }
 
 void CMasterMulticastThread::AddWarningSuppression(const char *pFilename) {
-  char *pBlah = new char[strlen(pFilename) + 1];
-  strcpy(pBlah, pFilename);
-  m_WarningSuppressions.AddToTail(pBlah);
+  m_WarningSuppressions.AddToTail(V_strdup(pFilename));
 }
 
 int CMasterMulticastThread::FindOrAddFile(const char *pFilename,
@@ -1175,11 +1173,11 @@ int CMasterMulticastThread::FinishFileSetup(CMulticastFile *pFile,
 
   // Get this file in the queue.
   if (!bFileAlreadyExisted) {
-    pFile->m_Filename.SetSize(strlen(pFilename) + 1);
-    strcpy(pFile->m_Filename.Base(), pFilename);
+    pFile->m_Filename.SetSize(V_strlen(pFilename) + 1);
+    V_strncpy(pFile->m_Filename.Base(), pFilename, pFile->m_Filename.Count());
 
-    pFile->m_PathID.SetSize(strlen(pPathID) + 1);
-    strcpy(pFile->m_PathID.Base(), pPathID);
+    pFile->m_PathID.SetSize(V_strlen(pPathID) + 1);
+    V_strncpy(pFile->m_PathID.Base(), pPathID, pFile->m_PathID.Count());
 
     pFile->m_nCycles = 0;
 

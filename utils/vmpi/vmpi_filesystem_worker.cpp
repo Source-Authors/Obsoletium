@@ -184,10 +184,10 @@ class CWorkerMulticastListener {
     CWorkerFile *pTestFile = new CWorkerFile;
 
     pTestFile->m_Filename.SetSize(strlen(pFilename) + 1);
-    strcpy(pTestFile->m_Filename.Base(), pFilename);
+    V_strncpy(pTestFile->m_Filename.Base(), pFilename, pTestFile->m_Filename.Count());
 
     pTestFile->m_PathID.SetSize(strlen(pPathID) + 1);
-    strcpy(pTestFile->m_PathID.Base(), pPathID);
+    V_strncpy(pTestFile->m_PathID.Base(), pPathID, pTestFile->m_PathID.Count());
 
     pTestFile->m_FileID = fileID;
     pTestFile->m_nChunksToReceive = 9999;
@@ -300,14 +300,14 @@ class CWorkerMulticastListener {
 
     // Setup a filename to print some debug spew with.
     char printableFilename[58];
-    if (V_strlen(pFilename) > ARRAYSIZE(printableFilename) - 1) {
-      V_strncpy(printableFilename, "[...]", sizeof(printableFilename));
-      V_strncat(printableFilename,
-                &pFilename[V_strlen(pFilename) - ARRAYSIZE(printableFilename) +
-                           1 + V_strlen(printableFilename)],
-                sizeof(printableFilename));
+    if (V_strlen(pFilename) > ssize(printableFilename) - 1) {
+      V_strcpy_safe(printableFilename, "[...]");
+      V_strcat_safe(
+          printableFilename,
+          &pFilename[V_strlen(pFilename) - ARRAYSIZE(printableFilename) + 1 +
+                     V_strlen(printableFilename)]);
     } else {
-      V_strncpy(printableFilename, pFilename, sizeof(printableFilename));
+      V_strcpy_safe(printableFilename, pFilename);
     }
     ShowSDKWorkerMsg("\rRecv %s (0%%)  ", printableFilename);
     int iChunkPayloadSize = VMPI_GetChunkPayloadSize();
