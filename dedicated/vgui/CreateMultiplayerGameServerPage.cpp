@@ -326,7 +326,7 @@ const char *ToString(int val) {
 void CCreateMultiplayerGameServerPage::OnCommand(const char *cmd) {
   char cvars[1024];
   int secure = GetControlInt("SecureCheck", 1);
-  m_pNumPlayers->GetText(cvars, 1024);
+  m_pNumPlayers->GetText(cvars);
   m_iMaxPlayers = atoi(cvars);
   V_strcpy_safe(m_szHostName, GetControlString("ServerNameEdit", ""));
   V_strcpy_safe(m_szPassword, GetControlString("RCONPasswordEdit", ""));
@@ -730,7 +730,7 @@ void CCreateMultiplayerGameServerPage::LoadMapList() {
 // Purpose: returns the name of the map selected from the map combo
 //-----------------------------------------------------------------------------
 const char *CCreateMultiplayerGameServerPage::GetMapName() {
-  m_pMapList->GetText(m_szMapName, DATA_STR_LENGTH);
+  m_pMapList->GetText(m_szMapName);
   return m_szMapName;
 }
 
@@ -770,7 +770,7 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
     }
 
     // update the game name
-    m_pGameCombo->GetText(m_szGameName, sizeof(m_szGameName));
+    m_pGameCombo->GetText(m_szGameName);
 
     // Copy the gamedir into m_szMod.
     KeyValues *gameData = m_pGameCombo->GetActiveItemUserData();
