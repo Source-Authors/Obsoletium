@@ -14,6 +14,8 @@
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"
 
+#include "tier0/memdbgon.h"
+
 namespace {
 
 template <int size>
@@ -21,7 +23,7 @@ template <int size>
   if (in[0] == CORRECT_PATH_SEPARATOR || in[0] == INCORRECT_PATH_SEPARATOR ||
       in[1] == ':') {
     // It's already a full path.
-    V_strncpy(out, in, size);
+    V_strcpy_safe(out, in);
   } else {
     try {
       std::error_code rc;
@@ -34,8 +36,8 @@ template <int size>
       return std::error_code{ENOMEM, std::generic_category()};
     }
 
-    V_strncat(out, CORRECT_PATH_SEPARATOR_S, size, COPY_ALL_CHARACTERS);
-    V_strncat(out, in, size, COPY_ALL_CHARACTERS);
+    V_strcat_safe(out, CORRECT_PATH_SEPARATOR_S);
+    V_strcat_safe(out, in);
   }
 
   return std::error_code{};

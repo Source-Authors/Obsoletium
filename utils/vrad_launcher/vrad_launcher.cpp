@@ -15,6 +15,8 @@
 
 #include "ivraddll.h"
 
+#include "tier0/memdbgon.h"
+
 namespace {
 
 template <int size>
