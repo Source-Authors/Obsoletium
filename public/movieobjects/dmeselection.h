@@ -42,7 +42,7 @@ public:
 	Component_t Type() const;
 
 	// How many pieces are in this component
-	virtual int Count() const;
+	virtual intp Count() const;
 
 	// Are there no pieces in this component
 	bool IsEmpty() const;
@@ -79,7 +79,7 @@ inline CDmeComponent::Component_t CDmeComponent::Type() const
 //-----------------------------------------------------------------------------
 // Are there no pieces in this component
 //-----------------------------------------------------------------------------
-inline int CDmeComponent::Count() const
+inline intp CDmeComponent::Count() const
 {
 	Assert( 0 );
 	return 0;
@@ -136,7 +136,7 @@ public:
 	virtual void Resolve();
 
 	// From CDmeComponent
-	virtual int Count() const;
+	virtual intp Count() const;
 
 	bool SetType( Component_t type );
 
@@ -148,7 +148,7 @@ public:
 
 	void RemoveComponent( int component );
 
-	bool GetComponent( int index, int &component, float &weight ) const;
+	bool GetComponent( intp index, int &component, float &weight ) const;
 
 	bool GetWeight( int component, float &weight ) const;
 
@@ -189,7 +189,7 @@ public:
 	void Intersection( const CDmeSingleIndexedComponent *pRhs ) { Assert( pRhs ); Intersection( *pRhs ); }
 
 protected:
-	int BinarySearch( int component ) const;
+	intp BinarySearch( int component ) const;
 
 	CDmaVar< int > m_CompleteCount;
 	CDmaArray< int > m_Components;

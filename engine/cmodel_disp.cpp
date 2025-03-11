@@ -373,7 +373,8 @@ void CM_TestInDispTree( TraceInfo_t *pTraceInfo, cleaf_t *pLeaf, const Vector &t
 			if( !(pDispBounds->GetContents() & collisionMask) )
 				continue;
 
-			if ( !pTraceInfo->Visit( pDispBounds->GetCounter(), count, pCounters ) )
+			// TODO: Why pCounters is nullptr?
+			if ( !pCounters || !pTraceInfo->Visit( pDispBounds->GetCounter(), count, pCounters ) )
 				continue;
 
 			if ( IsBoxIntersectingBox( absMins, absMaxs, pDispBounds->mins, pDispBounds->maxs ) )

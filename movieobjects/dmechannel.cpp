@@ -129,8 +129,8 @@ void CDmeChannelRecordingMgr::AddChannelToRecordingLayer( CDmeChannel *pChannel,
 //-----------------------------------------------------------------------------
 void CDmeChannelRecordingMgr::RemoveAllChannelsFromRecordingLayer( )
 {
-	int c = m_LayerChannels.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_LayerChannels.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmeChannel *pChannel = m_LayerChannels[ i ].m_Channel.Get();
 		if ( !pChannel )
@@ -161,8 +161,8 @@ void CDmeChannelRecordingMgr::FlattenLayers( float flThreshhold )
 		nFlags |= CDmeLog::FLATTEN_NODISCONTINUITY_FIXUP;
 	}
 
-	int c = m_LayerChannels.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_LayerChannels.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmeChannel *pChannel = m_LayerChannels[ i ].m_Channel.Get();
 		if ( !pChannel )
@@ -181,12 +181,12 @@ void CDmeChannelRecordingMgr::FlattenLayers( float flThreshhold )
 //-----------------------------------------------------------------------------
 // Used to iterate over all channels currently being recorded
 //-----------------------------------------------------------------------------
-int CDmeChannelRecordingMgr::GetLayerRecordingChannelCount()
+intp CDmeChannelRecordingMgr::GetLayerRecordingChannelCount() const
 {
 	return m_LayerChannels.Count();
 }
 
-CDmeChannel* CDmeChannelRecordingMgr::GetLayerRecordingChannel( int nIndex )
+CDmeChannel* CDmeChannelRecordingMgr::GetLayerRecordingChannel( intp nIndex )
 {
 	return m_LayerChannels[nIndex].m_Channel.Get();
 }
@@ -195,7 +195,7 @@ CDmeChannel* CDmeChannelRecordingMgr::GetLayerRecordingChannel( int nIndex )
 //-----------------------------------------------------------------------------
 // Computes time selection info in log time for a particular recorded channel
 //-----------------------------------------------------------------------------
-void CDmeChannelRecordingMgr::GetLocalTimeSelection( DmeLog_TimeSelection_t& selection, int nIndex )
+void CDmeChannelRecordingMgr::GetLocalTimeSelection( DmeLog_TimeSelection_t& selection, intp nIndex )
 {
 	Assert( m_bUseTimeSelection );
 	LayerChannelInfo_t& info = m_LayerChannels[nIndex];
@@ -219,8 +219,8 @@ void CDmeChannelRecordingMgr::UpdateTimeAdvancing( bool bPaused, DmeTime_t tCurT
 		m_TimeSelection.StartTimeAdvancing();
 
 		// blow away logs after curtime
-		int nCount = m_LayerChannels.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = m_LayerChannels.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			LayerChannelInfo_t& info = m_LayerChannels[i];
 			DmeTime_t t = CDmeClip::ToChildMediaTime( info.m_ClipStack, tCurTime, false );
@@ -281,25 +281,25 @@ bool CDmeChannelRecordingMgr::ShouldRecordUsingTimeSelection() const
 	return m_bUseTimeSelection && m_bActive;
 }
 
-void CDmeChannelRecordingMgr::SetProceduralTarget( int nProceduralMode, const CDmAttribute *pTarget )
+void CDmeChannelRecordingMgr::SetProceduralTarget( DmeProceduralPresetType nProceduralMode, const CDmAttribute *pTarget )
 {
 	m_nRevealType = nProceduralMode;
 	m_pRevealTarget = pTarget;
 	m_PasteTarget.RemoveAll();
 }
 
-void CDmeChannelRecordingMgr::SetProceduralTarget( int nProceduralMode, const CUtlVector< KeyValues * >& list )
+void CDmeChannelRecordingMgr::SetProceduralTarget( DmeProceduralPresetType nProceduralMode, const CUtlVector< KeyValues * >& list )
 {
 	m_nRevealType = nProceduralMode;
 	m_pRevealTarget = NULL;
 	m_PasteTarget.RemoveAll();
-	for ( int i = 0; i < list.Count(); ++i )
+	for ( intp i = 0; i < list.Count(); ++i )
 	{
 		m_PasteTarget.AddToTail( list[ i ] );
 	}
 }
 
-int CDmeChannelRecordingMgr::GetProceduralType() const
+DmeProceduralPresetType CDmeChannelRecordingMgr::GetProceduralType() const
 {
 	return m_nRevealType;
 }
@@ -797,8 +797,8 @@ CDmeLogLayer *FindLayerInSnapshot( const CDmrElementArray<CDmElement>& snapshotA
 	if ( !snapshotArray.IsValid() )
 		return NULL;
 
-	int c = snapshotArray.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = snapshotArray.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeLogLayer *layer = CastElement< CDmeLogLayer >( snapshotArray[ i ] );
 		if ( !layer )
@@ -820,8 +820,8 @@ CDmeLogLayer *FindLayerInSnapshot( const CDmrElementArray<CDmElement>& snapshotA
 
 KeyValues *FindLayerInPasteData( const CUtlVector< KeyValues * > &list, CDmeLog *log )
 {
-	int c = list.Count();
-	for ( int i = 0; i  < c; ++i )
+	intp c = list.Count();
+	for ( intp i = 0; i  < c; ++i )
 	{
 		CDisableUndoScopeGuard noundo;
 
@@ -847,12 +847,12 @@ KeyValues *FindLayerInPasteData( const CUtlVector< KeyValues * > &list, CDmeLog 
 	return NULL;
 }
 
-static int FindSpanningLayerAndSetIntensity( DmeLog_TimeSelection_t &ts, LayerSelectionData_t *data )
+static intp FindSpanningLayerAndSetIntensity( DmeLog_TimeSelection_t &ts, LayerSelectionData_t *data )
 {
 	Assert( data->m_vecData.Count() >= 2 );
 
 	float frac = ts.m_flIntensity;
-	int i = 0;
+	intp i = 0;
 	for ( ; i < data->m_vecData.Count() - 1; ++i )
 	{
 		LayerSelectionData_t::DataLayer_t *current = &data->m_vecData[ i ];
@@ -892,7 +892,7 @@ void CDmeChannel::Record()
 		DmeLog_TimeSelection_t timeSelection;
 		g_pChannelRecordingMgr->GetLocalTimeSelection( timeSelection, m_nRecordLayerIndex );
 
-		int nType = g_pChannelRecordingMgr->GetProceduralType();
+		DmeProceduralPresetType nType = g_pChannelRecordingMgr->GetProceduralType();
 		switch ( nType )
 		{
 		default:
@@ -927,7 +927,7 @@ void CDmeChannel::Record()
 					LayerSelectionData_t *data = reinterpret_cast< LayerSelectionData_t * >( layer->GetPtr( "LayerData" ) );
 					Assert( data );
 
-					int iSourceLayer = FindSpanningLayerAndSetIntensity( timeSelection, data );
+					intp iSourceLayer = FindSpanningLayerAndSetIntensity( timeSelection, data );
 
 					CDmeLogLayer *sourceLayer = data->m_vecData[ iSourceLayer ].m_hData.Get();
 					CDmeLogLayer *targetLayer = data->m_vecData[ iSourceLayer + 1 ].m_hData.Get();

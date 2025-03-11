@@ -189,7 +189,7 @@ bool CToolPointHandle::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vecto
 	// Update the status bar and the views.
 	//
 	char szBuf[128];
-	sprintf(szBuf, " @%.0f, %.0f ", m_pPoint->m_Origin[pView->axHorz], m_pPoint->m_Origin[pView->axVert]);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", m_pPoint->m_Origin[pView->axHorz], m_pPoint->m_Origin[pView->axVert]);
 	SetStatusText(SBI_COORDS, szBuf);
 
 	m_pDocument->UpdateAllViews( MAPVIEW_UPDATE_TOOL );

@@ -80,44 +80,44 @@ void AppRegisterMessagePretranslateFn( void (*)( MSG * ) );
 void AppRegisterPreShutdownFn( void (*)() );
 
 
-class CHammer : public CWinApp, public CTier3AppSystem< IHammer >
+class CHammer final : public CWinApp, public CTier3AppSystem< IHammer >
 {
 	typedef CTier3AppSystem< IHammer > BaseClass;
 
 public:
-	CHammer(void);
-	virtual ~CHammer(void);
+	CHammer();
+	virtual ~CHammer();
 
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Methods of IHammer
-	virtual bool HammerPreTranslateMessage( MSG * pMsg );
-	virtual bool HammerIsIdleMessage( MSG * pMsg );
-	virtual bool HammerOnIdle( long count );
-	virtual void RunFrame();
-	virtual int MainLoop();
-	virtual const char *GetDefaultMod();
-	virtual const char *GetDefaultGame();
-	virtual RequestRetval_t RequestNewConfig();
-	virtual const char *GetDefaultModFullPath();
-	virtual bool InitSessionGameConfig(const char *szGame);
+	bool HammerPreTranslateMessage( MSG * pMsg ) override;
+	bool HammerIsIdleMessage( MSG * pMsg ) override;
+	bool HammerOnIdle( long count ) override;
+	void RunFrame() override;
+	int MainLoop() override;
+	const char *GetDefaultMod() override;
+	const char *GetDefaultGame() override;
+	RequestRetval_t RequestNewConfig() override;
+	const char *GetDefaultModFullPath() override;
+	bool InitSessionGameConfig(const char *szGame) override;
 
-	virtual BOOL PreTranslateMessage(MSG *pMsg);
+	BOOL PreTranslateMessage(MSG *pMsg) override;
 
 	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CHammer)
-	public:
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
-	virtual CDocument* OpenDocumentFile(LPCTSTR lpszFileName);
-	virtual BOOL OnIdle(LONG lCount);
-	virtual int Run(void);
+public:
+	BOOL InitInstance() override;
+	int ExitInstance() override;
+	CDocument* OpenDocumentFile(LPCTSTR lpszFileName) override;
+	BOOL OnIdle(LONG lCount) override;
+	int Run() override;
 	//}}AFX_VIRTUAL
 
 	void GetDirectory(DirIndex_t dir, char *p, ptrdiff_t size);
@@ -201,6 +201,8 @@ protected:
 	bool m_bClosing;					// The user has initiated app shutdown.
 	bool m_bActiveApp;
 	bool m_SuppressVideoAllocation;
+
+	ScopedSpewOutputFunc m_scopedSpewOutput;
 
 	bool m_bForceRenderNextFrame;
 

@@ -613,12 +613,8 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 
 		CAI_Node *new_node = m_pNetwork->AddNode( origin, yaw );
 
-		buf.Get( new_node->m_flVOffset, sizeof(new_node->m_flVOffset) );
+		buf.Get( new_node->m_flVOffset );
 		new_node->m_eNodeType = (NodeType_e)buf.GetChar();
-		if ( IsX360() )
-		{
-			buf.SeekGet( CUtlBuffer::SEEK_CURRENT, 3 );
-		}
 
 		new_node->m_eNodeInfo = buf.GetUnsignedShort();
 		new_node->m_zone = buf.GetShort();

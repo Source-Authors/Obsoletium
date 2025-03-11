@@ -925,7 +925,7 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 		else
 		{
 			// string wasn't found by g_pVGuiLocalize->Find()
-			g_pVGuiLocalize->ConvertANSIToUnicode(weaponInfo.szPrintName, text, sizeof(text));
+			g_pVGuiLocalize->ConvertANSIToUnicode(weaponInfo.szPrintName, text);
 		}
 
 		surface()->DrawSetTextColor( col );

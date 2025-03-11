@@ -1436,7 +1436,8 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 		cbrush_t * RESTRICT pBrush = &map_brushes[ndxBrush];
 
 		// make sure we only check this brush once per trace/stab
-		if ( !pTraceInfo->Visit( pBrush, ndxBrush, count, pCounters ) )
+		// TODO: Why pCounters is nullptr?
+		if ( !pCounters || !pTraceInfo->Visit( pBrush, ndxBrush, count, pCounters ) )
 			continue;
 
 		const int traceContents = pTraceInfo->m_contents;
@@ -1585,7 +1586,8 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 				if( pTraceInfo->m_isswept )
 				{
 					// make sure we only check this brush once per trace/stab
-					if ( !pTraceInfo->Visit( pDispBounds->GetCounter(), count, pCounters ) )
+					// TODO: Why pCounters is nullptr?
+					if ( !pCounters || !pTraceInfo->Visit( pDispBounds->GetCounter(), count, pCounters ) )
 						continue;
 				}
 		

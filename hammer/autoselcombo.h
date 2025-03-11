@@ -10,8 +10,9 @@
 #pragma once
 #endif
 
+#include "windows/base_combo_box.h"
 
-class CAutoSelComboBox : public CComboBox
+class CAutoSelComboBox : public CBaseComboBox
 {
 	typedef CComboBox BaseClass;
 

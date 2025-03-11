@@ -85,12 +85,12 @@ void CDmeClip::OnDestruction()
 //-----------------------------------------------------------------------------
 // Inherited from IDmElement
 //-----------------------------------------------------------------------------
-void CDmeClip::OnAttributeArrayElementAdded( CDmAttribute *pAttribute, int nFirstElem, int nLastElem )
+void CDmeClip::OnAttributeArrayElementAdded( CDmAttribute *pAttribute, intp nFirstElem, intp nLastElem )
 {
 	BaseClass::OnAttributeArrayElementAdded( pAttribute, nFirstElem, nLastElem );
 	if ( pAttribute == m_TrackGroups.GetAttribute() )
 	{
-		for ( int i = nFirstElem; i <= nLastElem; ++i )
+		for ( intp i = nFirstElem; i <= nLastElem; ++i )
 		{
 			CDmeTrackGroup *pTrackGroup = m_TrackGroups[ i ];
 			if ( pTrackGroup )
@@ -102,12 +102,12 @@ void CDmeClip::OnAttributeArrayElementAdded( CDmAttribute *pAttribute, int nFirs
 	}
 }
 
-void CDmeClip::OnAttributeArrayElementRemoved( CDmAttribute *pAttribute, int nFirstElem, int nLastElem )
+void CDmeClip::OnAttributeArrayElementRemoved( CDmAttribute *pAttribute, intp nFirstElem, intp nLastElem )
 {
 	BaseClass::OnAttributeArrayElementRemoved( pAttribute, nFirstElem, nLastElem );
 	if ( pAttribute == m_TrackGroups.GetAttribute() )
 	{
-		for ( int i = nFirstElem; i <= nLastElem; ++i )
+		for ( intp i = nFirstElem; i <= nLastElem; ++i )
 		{
 			CDmeTrackGroup *pTrackGroup = m_TrackGroups[ i ];
 			if ( pTrackGroup )
@@ -267,13 +267,13 @@ const CUtlVector< DmElementHandle_t > &CDmeClip::GetTrackGroups( ) const
 	return m_TrackGroups.Get();
 }
 
-int CDmeClip::GetTrackGroupCount( ) const
+intp CDmeClip::GetTrackGroupCount( ) const
 {
 	// Make sure no invalid clip types have snuck in
 	return m_TrackGroups.Count();
 }
 
-CDmeTrackGroup *CDmeClip::GetTrackGroup( int nIndex ) const
+CDmeTrackGroup *CDmeClip::GetTrackGroup( intp nIndex ) const
 {
 	if ( ( nIndex >= 0 ) && ( nIndex < m_TrackGroups.Count() ) )
 		return m_TrackGroups[ nIndex ];
@@ -319,7 +319,7 @@ void CDmeClip::AddTrackGroupBefore( CDmeTrackGroup *pTrackGroup, CDmeTrackGroup 
 	// FIXME:  Should check if track with same name already exists???
 	if ( GetTrackGroupIndex( pTrackGroup ) < 0 )
 	{
-		int nBeforeIndex = pBefore ? GetTrackGroupIndex( pBefore ) : GetTrackGroupCount();
+		intp nBeforeIndex = pBefore ? GetTrackGroupIndex( pBefore ) : GetTrackGroupCount();
 		if ( nBeforeIndex >= 0 )
 		{
 			m_TrackGroups.InsertBefore( nBeforeIndex, pTrackGroup );
@@ -336,7 +336,7 @@ CDmeTrackGroup *CDmeClip::AddTrackGroup( const char *pTrackGroupName )
 	return pTrackGroup;
 }
 
-void CDmeClip::RemoveTrackGroup( int nIndex )
+void CDmeClip::RemoveTrackGroup( intp nIndex )
 {
 	Assert( nIndex >= 0 && nIndex < m_TrackGroups.Count() );
 
@@ -345,7 +345,7 @@ void CDmeClip::RemoveTrackGroup( int nIndex )
 
 void CDmeClip::RemoveTrackGroup( CDmeTrackGroup *pTrackGroup )
 {
-	int i = GetTrackGroupIndex( pTrackGroup );
+	intp i = GetTrackGroupIndex( pTrackGroup );
 	if ( i < 0 )
 		return;
 
@@ -359,8 +359,8 @@ void CDmeClip::RemoveTrackGroup( const char *pTrackGroupName )
 		pTrackGroupName = DMETRACKGROUP_DEFAULT_NAME;
 	}
 
-	int c = m_TrackGroups.Count();
-	for ( int i = c; --i >= 0; )
+	intp c = m_TrackGroups.Count();
+	for ( intp i = c; --i >= 0; )
 	{
 		if ( !Q_strcmp( m_TrackGroups[i]->GetName(), pTrackGroupName ) )
 		{
@@ -381,9 +381,9 @@ void CDmeClip::SwapOrder( CDmeTrackGroup *pTrackGroup1, CDmeTrackGroup *pTrackGr
 	if ( pTrackGroup1->IsFilmTrackGroup() || pTrackGroup2->IsFilmTrackGroup() )
 		return;
 
-	int nIndex1 = -1, nIndex2 = -1;
-	int c = m_TrackGroups.Count();
-	for ( int i = c; --i >= 0; )
+	intp nIndex1 = -1, nIndex2 = -1;
+	intp c = m_TrackGroups.Count();
+	for ( intp i = c; --i >= 0; )
 	{
 		if ( m_TrackGroups[i] == pTrackGroup1 )
 		{
@@ -411,8 +411,8 @@ CDmeTrackGroup *CDmeClip::FindTrackGroup( const char *pTrackGroupName ) const
 		pTrackGroupName = DMETRACKGROUP_DEFAULT_NAME;
 	}
 
-	int c = m_TrackGroups.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_TrackGroups.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = m_TrackGroups[i];
 		if ( !pTrackGroup )
@@ -424,10 +424,10 @@ CDmeTrackGroup *CDmeClip::FindTrackGroup( const char *pTrackGroupName ) const
 	return NULL;
 }
 
-int CDmeClip::GetTrackGroupIndex( CDmeTrackGroup *pTrackGroup ) const
+intp CDmeClip::GetTrackGroupIndex( CDmeTrackGroup *pTrackGroup ) const
 {
-	int nTrackGroups = m_TrackGroups.Count();
-	for ( int i = 0 ; i < nTrackGroups; ++i )
+	intp nTrackGroups = m_TrackGroups.Count();
+	for ( intp i = 0 ; i < nTrackGroups; ++i )
 	{
 		if ( pTrackGroup == m_TrackGroups[i] )
 			return i;
@@ -456,8 +456,8 @@ CDmeTrackGroup *CDmeClip::FindOrAddTrackGroup( const char *pTrackGroupName )
 CDmeTrack *CDmeClip::FindTrackForClip( CDmeClip *pClip, CDmeTrackGroup **ppTrackGroup /*= NULL*/ ) const
 {
 //	DmeClipType_t type = pClip->GetClipType();
-	int c = m_TrackGroups.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_TrackGroups.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		// FIXME: If trackgroups have valid types, can early out here
 		CDmeTrack *pTrack = m_TrackGroups[i]->FindTrackForClip( pClip );
@@ -474,10 +474,10 @@ CDmeTrack *CDmeClip::FindTrackForClip( CDmeClip *pClip, CDmeTrackGroup **ppTrack
 	return NULL;
 }
 
-bool CDmeClip::FindMultiTrackGroupForClip( CDmeClip *pClip, int *pTrackGroupIndex, int *pTrackIndex, int *pClipIndex ) const
+bool CDmeClip::FindMultiTrackGroupForClip( CDmeClip *pClip, intp *pTrackGroupIndex, intp *pTrackIndex, intp *pClipIndex ) const
 {
-	int nTrackGroups = m_TrackGroups.Count();
-	for ( int gi = 0 ; gi < nTrackGroups; ++gi )
+	intp nTrackGroups = m_TrackGroups.Count();
+	for ( intp gi = 0 ; gi < nTrackGroups; ++gi )
 	{
 		CDmeTrackGroup *pTrackGroup = m_TrackGroups[ gi ];
 		if ( !pTrackGroup )
@@ -504,8 +504,8 @@ void CDmeClip::FindClipsAtTime( DmeClipType_t clipType, DmeTime_t time, DmeClipS
 	if ( clipType == DMECLIP_FILM )
 		return;
 
-	int gc = GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = GetTrackGroup( i );
 		if ( !pTrackGroup )
@@ -520,8 +520,8 @@ void CDmeClip::FindClipsWithinTime( DmeClipType_t clipType, DmeTime_t startTime,
 	if ( clipType == DMECLIP_FILM )
 		return;
 
-	int gc = GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = GetTrackGroup( i );
 		if ( !pTrackGroup )
@@ -535,9 +535,9 @@ void CDmeClip::FindClipsWithinTime( DmeClipType_t clipType, DmeTime_t startTime,
 //-----------------------------------------------------------------------------
 // Build a list of all referring clips
 //-----------------------------------------------------------------------------
-static int BuildReferringClipList( CDmeClip *pClip, CDmeClip** ppParents, int nMaxCount )
+static intp BuildReferringClipList( CDmeClip *pClip, CDmeClip** ppParents, intp nMaxCount )
 {
-	int nCount = 0;
+	intp nCount = 0;
 
 	DmAttributeReferenceIterator_t it, it2, it3;
 	for ( it = g_pDataModel->FirstAttributeReferencingElement( pClip->GetHandle() );
@@ -609,8 +609,8 @@ static bool BuildClipStack_R( DmeClipStack_t* pStack, CDmeClip *pMovie, CDmeClip
 		// NOTE: This algorithm assumes a clip can never appear twice under another clip
 		// at a single level of hierarchy.
 		CDmeClip* ppParents[1024];
-		int nCount = BuildReferringClipList( pCurrent, ppParents, 1024 );
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = BuildReferringClipList( pCurrent, ppParents, 1024 );
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			// Can we find a path to the root through the shot? We succeeded!
 			if ( BuildClipStack_R( pStack, pMovie, pShot, ppParents[i] ) )
@@ -634,8 +634,8 @@ DmeTime_t CDmeClip::ToChildMediaTime( const DmeClipStack_t& stack, DmeTime_t glo
 {
 	DmeTime_t time = globalTime;
 
-	int nClips = stack.Count();
-	for ( int i = 0; i < nClips; ++i )
+	intp nClips = stack.Count();
+	for ( intp i = 0; i < nClips; ++i )
 	{
 		time = stack[ i ]->ToChildMediaTime( time, bClamp );
 	}
@@ -647,8 +647,8 @@ DmeTime_t CDmeClip::FromChildMediaTime( const DmeClipStack_t& stack, DmeTime_t l
 {
 	DmeTime_t time = localTime;
 
-	int nClips = stack.Count();
-	for ( int i = nClips-1; i >= 0; --i )
+	intp nClips = stack.Count();
+	for ( intp i = nClips-1; i >= 0; --i )
 	{
 		time = stack[ i ]->FromChildMediaTime( time, bClamp );
 	}
@@ -660,8 +660,8 @@ DmeTime_t CDmeClip::ToChildMediaDuration( const DmeClipStack_t& stack, DmeTime_t
 {
 	DmeTime_t duration = globalDuration;
 
-	int nClips = stack.Count();
-	for ( int i = 0; i < nClips; ++i )
+	intp nClips = stack.Count();
+	for ( intp i = 0; i < nClips; ++i )
 	{
 		duration = stack[ i ]->ToChildMediaDuration( duration );
 	}
@@ -673,8 +673,8 @@ DmeTime_t CDmeClip::FromChildMediaDuration( const DmeClipStack_t& stack, DmeTime
 {
 	DmeTime_t duration = localDuration;
 
-	int nClips = stack.Count();
-	for ( int i = nClips-1; i >= 0; --i )
+	intp nClips = stack.Count();
+	for ( intp i = nClips-1; i >= 0; --i )
 	{
 		duration = stack[ i ]->FromChildMediaDuration( duration );
 	}
@@ -751,8 +751,8 @@ CDmeChannel *CDmeChannelsClip::CreatePassThruConnection( char const *passThruNam
 
 void CDmeChannelsClip::RemoveChannel( CDmeChannel *pChannel )
 {
-	int nCount = m_Channels.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Channels.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pChannel == m_Channels[i] )
 		{
@@ -1263,14 +1263,14 @@ void CDmeFilmClip::AddMonitorCamera( CDmeCamera *pCamera )
 	m_MonitorCameras.AddToTail( pCamera );
 }
 
-int CDmeFilmClip::FindMonitorCamera( CDmeCamera *pCamera )
+intp CDmeFilmClip::FindMonitorCamera( CDmeCamera *pCamera )
 {
 	return m_MonitorCameras.Find( pCamera->GetHandle() );
 }
 
 void CDmeFilmClip::RemoveMonitorCamera( CDmeCamera *pCamera )
 {
-	int i = m_MonitorCameras.Find( pCamera->GetHandle() );
+	intp i = m_MonitorCameras.Find( pCamera->GetHandle() );
 	if ( i >= 0 )
 	{
 		if ( m_nActiveMonitor == i )
@@ -1290,12 +1290,12 @@ void CDmeFilmClip::SelectMonitorCamera( CDmeCamera *pCamera )
 //-----------------------------------------------------------------------------
 // Light helper methods
 //-----------------------------------------------------------------------------
-int CDmeFilmClip::GetLightCount()
+intp CDmeFilmClip::GetLightCount()
 {
 	return m_Lights.Count();
 }
 
-CDmeLight *CDmeFilmClip::GetLight( int nIndex )
+CDmeLight *CDmeFilmClip::GetLight( intp nIndex )
 {
 	if ( ( nIndex < 0 ) || ( nIndex >= m_Lights.Count() ) )
 		return NULL;
@@ -1326,12 +1326,12 @@ void CDmeFilmClip::SetScene( CDmeDag *pDag )
 //-----------------------------------------------------------------------------
 // helper for inputs and operators
 //-----------------------------------------------------------------------------
-int CDmeFilmClip::GetInputCount()
+intp CDmeFilmClip::GetInputCount()
 {
 	return m_Inputs.Count();
 }
 
-CDmeInput *CDmeFilmClip::GetInput( int nIndex )
+CDmeInput *CDmeFilmClip::GetInput( intp nIndex )
 {
 	if ( nIndex < 0 || nIndex >= m_Inputs.Count() )
 		return NULL;
@@ -1356,29 +1356,29 @@ void CDmeFilmClip::AddOperator( CDmeOperator *pOperator )
 
 void CDmeFilmClip::CollectOperators( CUtlVector< DmElementHandle_t > &operators )
 {
-	int numInputs = m_Inputs.Count();
-	for ( int i = 0; i < numInputs; ++i )
+	intp numInputs = m_Inputs.Count();
+	for ( intp i = 0; i < numInputs; ++i )
 	{
 		operators.AddToTail( m_Inputs[ i ]->GetHandle() );
 	}
 
-	int numOperators = m_Operators.Count();
-	for ( int i = 0; i < numOperators; ++i )
+	intp numOperators = m_Operators.Count();
+	for ( intp i = 0; i < numOperators; ++i )
 	{
 		operators.AddToTail( m_Operators[ i ]->GetHandle() );
 	}
 }
 
-int	CDmeFilmClip::GetAnimationSetCount()
+intp	CDmeFilmClip::GetAnimationSetCount()
 {
 	// yes, this is nasty perf-wise, but since we only have a dozen or so animation sets,
 	// and we're about to rewrite the entire structure of animation sets vs. clips vs. scene
 	// it's not worth polluting the leaf code just to save a couple cycles short term
 
-	int nCount = 0;
+	intp nCount = 0;
 
-	int nElements = m_AnimationSets.Count();
-	for ( int i = 0; i < nElements; ++i )
+	intp nElements = m_AnimationSets.Count();
+	for ( intp i = 0; i < nElements; ++i )
 	{
 		CDmElement *pElement = m_AnimationSets.Get( i );
 		if ( !pElement )
@@ -1403,14 +1403,14 @@ int	CDmeFilmClip::GetAnimationSetCount()
 	return nCount;
 }
 
-CDmeAnimationSet *CDmeFilmClip::GetAnimationSet( int idx )
+CDmeAnimationSet *CDmeFilmClip::GetAnimationSet( intp idx )
 {
 	// yes, this is nasty perf-wise, but since we only have a dozen or so animation sets,
 	// and we're about to rewrite the entire structure of animation sets vs. clips vs. scene
 	// it's not worth polluting the leaf code just to save a couple cycles short term
 
-	int nElements = m_AnimationSets.Count();
-	for ( int i = 0; i < nElements; ++i )
+	intp nElements = m_AnimationSets.Count();
+	for ( intp i = 0; i < nElements; ++i )
 	{
 		CDmElement *pElement = m_AnimationSets.Get( i );
 		if ( !pElement )
@@ -1430,7 +1430,7 @@ CDmeAnimationSet *CDmeFilmClip::GetAnimationSet( int idx )
 				continue;
 
 			CDmrElementArrayConst< CDmElement > array( pChildren );
-			int nChildren = array.Count();
+			intp nChildren = array.Count();
 
 			if ( idx < nChildren )
 				return CastElement< CDmeAnimationSet >( array[ idx ] );
@@ -1486,8 +1486,8 @@ void CDmeFilmClip::BuildClipAssociations( CUtlVector< ClipAssociation_t > &assoc
 	if ( !pFilmTrack )
 		return;
 
-	int c = pFilmTrack->GetClipCount();
-	int gc = GetTrackGroupCount();
+	intp c = pFilmTrack->GetClipCount();
+	intp gc = GetTrackGroupCount();
 	if ( c == 0 || gc == 0 )
 		return;
 
@@ -1500,20 +1500,20 @@ void CDmeFilmClip::BuildClipAssociations( CUtlVector< ClipAssociation_t > &assoc
 		pFilmTrack->FillAllGapsWithSlugs( "__tempSlug__", clipStartTime, clipEndTime );
 	}
 
-	for ( int i = 0; i < gc; ++i )
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = GetTrackGroup( i );
-		int tc = pTrackGroup->GetTrackCount();
-		for ( int j = 0; j < tc; ++j )
+		intp tc = pTrackGroup->GetTrackCount();
+		for ( intp j = 0; j < tc; ++j )
 		{
 			CDmeTrack *pTrack = pTrackGroup->GetTrack( j );
 			if ( !pTrack->IsSynched() )
 				continue;
 
 			// Only have visible tracks now
-			int cc = pTrack->GetClipCount();
+			intp cc = pTrack->GetClipCount();
 			association.EnsureCapacity( association.Count() + cc );
-			for ( int k = 0; k < cc; ++k )
+			for ( intp k = 0; k < cc; ++k )
 			{
 				CDmeClip *pClip = pTrack->GetClip( k );
 				CDmeClip *pFilmClip = pFilmTrack->FindFilmClipAtTime( pClip->GetStartTime() );
@@ -1556,8 +1556,8 @@ void CDmeFilmClip::BuildClipAssociations( CUtlVector< ClipAssociation_t > &assoc
 //-----------------------------------------------------------------------------
 void CDmeFilmClip::RollAssociatedClips( CDmeClip *pClip, CUtlVector< ClipAssociation_t > &association, DmeTime_t dt )
 {
-	int c = association.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = association.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( association[i].m_nType != ClipAssociation_t::HAS_CLIP )
 			continue;
@@ -1575,8 +1575,8 @@ void CDmeFilmClip::RollAssociatedClips( CDmeClip *pClip, CUtlVector< ClipAssocia
 //-----------------------------------------------------------------------------
 void CDmeFilmClip::ScaleAssociatedClips( CDmeClip *pClip, CUtlVector< ClipAssociation_t > &association, float ratio, DmeTime_t oldOffset )
 {
-	int c = association.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = association.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( association[i].m_nType != ClipAssociation_t::HAS_CLIP )
 			continue;
@@ -1593,13 +1593,13 @@ void CDmeFilmClip::ScaleAssociatedClips( CDmeClip *pClip, CUtlVector< ClipAssoci
 
 void CDmeFilmClip::UpdateAssociatedClips( CUtlVector< ClipAssociation_t > &association )
 {
-	int i;
+	intp i;
 
 	CDmeTrack *pFilmTrack = GetFilmTrack();
 	if ( !pFilmTrack )
 		return;
 
-	int c = association.Count(); 
+	intp c = association.Count(); 
 	if ( c > 0 )
 	{
 		DmeTime_t clipStartTime = GetStartInChildMediaTime();
@@ -1684,8 +1684,8 @@ CDmeTrack *GetParentTrack( CDmeClip *pClip )
 //-----------------------------------------------------------------------------
 CDmeChannel *FindChannelTargetingElement( CDmeChannelsClip *pChannelsClip, CDmElement *pElement, const char *pAttributeName )
 {
-	int nChannels = pChannelsClip->m_Channels.Count();
-	for ( int i = 0; i < nChannels; ++i )
+	intp nChannels = pChannelsClip->m_Channels.Count();
+	for ( intp i = 0; i < nChannels; ++i )
 	{
 		CDmeChannel *pChannel = pChannelsClip->m_Channels[ i ];
 		CDmElement *toElement = pChannel->GetToElement();
@@ -1703,8 +1703,8 @@ CDmeChannel *FindChannelTargetingElement( CDmeChannelsClip *pChannelsClip, CDmEl
 
 CDmeChannel *FindChannelTargetingElement( CDmeFilmClip *pClip, CDmElement *pElement, const char *pAttributeName, CDmeChannelsClip **ppChannelsClip, CDmeTrack **ppTrack, CDmeTrackGroup **ppTrackGroup )
 {
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeChannelsClip, pTrackGroup, pTrack, pChannelsClip )

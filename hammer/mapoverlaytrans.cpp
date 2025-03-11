@@ -26,6 +26,7 @@ CMapOverlayTransition::CMapOverlayTransition()
 	m_bIsWater = true;
 	m_aFaceCache1.Purge();
 	m_aFaceCache2.Purge();
+	m_nShorelineId = -1;
 	m_bDebugDraw = false;
 }
 
@@ -64,7 +65,7 @@ void CMapOverlayTransition::CalcBounds( BOOL bFullUpdate )
 {
 	CMapClass::CalcBounds( bFullUpdate );
 
-	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( ( int )GetParent() );
+	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( ( intp )GetParent() );
 	if ( pShoreline )
 	{
 		Vector vecMins( 99999.0f, 99999.0f, 99999.0f );
@@ -76,26 +77,28 @@ void CMapOverlayTransition::CalcBounds( BOOL bFullUpdate )
 		int nSegmentCount = pShoreline->m_aSegments.Count();
 		for ( int iSegment = 0; iSegment < nSegmentCount; ++iSegment )
 		{
+			const auto &segment = pShoreline->m_aSegments[iSegment];
+
 			for ( int iAxis = 0; iAxis < 3; ++iAxis )
 			{
-				if ( pShoreline->m_aSegments[iSegment].m_vecPoints[0][iAxis] < vecMins[iAxis] )
+				if ( segment.m_vecPoints[0][iAxis] < vecMins[iAxis] )
 				{
-					vecMins[iAxis] = pShoreline->m_aSegments[iSegment].m_vecPoints[0][iAxis];
+					vecMins[iAxis] = segment.m_vecPoints[0][iAxis];
 				}
 
-				if ( pShoreline->m_aSegments[iSegment].m_vecPoints[1][iAxis] < vecMins[iAxis] )
+				if ( segment.m_vecPoints[1][iAxis] < vecMins[iAxis] )
 				{
-					vecMins[iAxis] = pShoreline->m_aSegments[iSegment].m_vecPoints[1][iAxis];
+					vecMins[iAxis] = segment.m_vecPoints[1][iAxis];
 				}
 
-				if ( pShoreline->m_aSegments[iSegment].m_vecPoints[0][iAxis] > vecMaxs[iAxis] )
+				if ( segment.m_vecPoints[0][iAxis] > vecMaxs[iAxis] )
 				{
-					vecMaxs[iAxis] = pShoreline->m_aSegments[iSegment].m_vecPoints[0][iAxis];
+					vecMaxs[iAxis] = segment.m_vecPoints[0][iAxis];
 				}
 
-				if ( pShoreline->m_aSegments[iSegment].m_vecPoints[1][iAxis] > vecMaxs[iAxis] )
+				if ( segment.m_vecPoints[1][iAxis] > vecMaxs[iAxis] )
 				{
-					vecMaxs[iAxis] = pShoreline->m_aSegments[iSegment].m_vecPoints[1][iAxis];
+					vecMaxs[iAxis] = segment.m_vecPoints[1][iAxis];
 				}
 			}
 		}
@@ -158,29 +161,29 @@ void CMapOverlayTransition::OnParentKeyChanged( const char* szKey, const char* s
 	// Texture data.
 	if ( !stricmp( szKey, "LengthTexcoordStart" ) )	
 	{ 
-		m_ShoreData.m_vecLengthTexcoord[0] = atof( szValue );
+		m_ShoreData.m_vecLengthTexcoord[0] = strtof(szValue, nullptr);
 	}
 	if ( !stricmp( szKey, "LengthTexcoordEnd" ) )	
 	{ 
-		m_ShoreData.m_vecLengthTexcoord[1] = atof( szValue );
+		m_ShoreData.m_vecLengthTexcoord[1] = strtof(szValue, nullptr);
 	}
 	if ( !stricmp( szKey, "WidthTexcoordStart" ) )	
 	{ 
-		m_ShoreData.m_vecWidthTexcoord[0] = atof( szValue );
+		m_ShoreData.m_vecWidthTexcoord[0] = strtof(szValue, nullptr);
 	}
 	if ( !stricmp( szKey, "WidthTexcoordEnd" ) )	
 	{ 
-		m_ShoreData.m_vecWidthTexcoord[1] = atof( szValue );
+		m_ShoreData.m_vecWidthTexcoord[1] = strtof(szValue, nullptr);
 	}
 
 	// Width data.
 	if ( !stricmp( szKey, "Width1" ) )	
 	{ 
-		m_ShoreData.m_flWidths[0] = atof( szValue );
+		m_ShoreData.m_flWidths[0] = strtof(szValue, nullptr);
 	}
 	if ( !stricmp( szKey, "Width2" ) )	
 	{ 
-		m_ShoreData.m_flWidths[1] = atof( szValue );
+		m_ShoreData.m_flWidths[1] = strtof(szValue, nullptr);
 	}
 
 	// Debug data.
@@ -214,7 +217,7 @@ void CMapOverlayTransition::OnAddToWorld( CMapWorld *pWorld )
 //-----------------------------------------------------------------------------
 void CMapOverlayTransition::OnRemoveFromWorld( CMapWorld *pWorld, bool bNotifyChildren )
 {
-	GetShoreManager()->RemoveShoreline( ( int )GetParent() );
+	GetShoreManager()->RemoveShoreline( (intp)GetParent() );
 }
 
 //-----------------------------------------------------------------------------
@@ -319,7 +322,7 @@ bool CMapOverlayTransition::OnApply( void )
 		{
 			if ( BuildFaceCaches() )
 			{
-				m_nShorelineId = ( int )GetParent();
+				m_nShorelineId = ( intp )GetParent();
 
 				GetShoreManager()->AddShoreline( m_nShorelineId );
 				Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( m_nShorelineId );
@@ -365,18 +368,16 @@ ChunkFileResult_t CMapOverlayTransition::SaveVMF( CChunkFile *pFile, CSaveInfo *
 {
 	ChunkFileResult_t eResult = pFile->BeginChunk("overlaytransition");
 
-	m_nShorelineId = ( int )GetParent();
+	m_nShorelineId = ( intp )GetParent();
 	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( m_nShorelineId );
 	if ( pShoreline )
 	{
-		int nOverlayCount = pShoreline->m_aOverlays.Count();
-		for ( int iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
+		intp nOverlayCount = pShoreline->m_aOverlays.Count();
+		for ( auto &o : pShoreline->m_aOverlays )
 		{
-			CMapOverlay *pOverlay = &pShoreline->m_aOverlays[iOverlay];
-			if ( pOverlay )
-			{
-				pOverlay->SaveDataToVMF( pFile, pSaveInfo );
-			}
+			eResult = o.SaveDataToVMF( pFile, pSaveInfo );
+			if (eResult != ChunkFile_Ok )
+				break;
 		}
 	} 
 

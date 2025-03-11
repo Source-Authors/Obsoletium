@@ -1588,7 +1588,7 @@ void CDetailObjectSystem::UnserializeModelDict( CUtlBuffer& buf )
 	while ( --count >= 0 )
 	{
 		DetailObjectDictLump_t lump;
-		buf.Get( &lump, sizeof(DetailObjectDictLump_t) );
+		buf.Get( lump );
 		
 		DetailModelDict_t dict;
 		dict.m_pModel = (model_t *)engine->LoadModel( lump.m_Name, true );
@@ -1612,7 +1612,7 @@ void CDetailObjectSystem::UnserializeDetailSprites( CUtlBuffer& buf )
 	while ( --count >= 0 )
 	{
 		intp i = m_DetailSpriteDict.AddToTail();
-		buf.Get( &m_DetailSpriteDict[i], sizeof(DetailSpriteDictLump_t) );
+		buf.Get( m_DetailSpriteDict[i] );
 		intp flipi = m_DetailSpriteDictFlipped.AddToTail();
 		m_DetailSpriteDictFlipped[flipi] = m_DetailSpriteDict[i];
 		::V_swap( m_DetailSpriteDictFlipped[flipi].m_TexUL.x, m_DetailSpriteDictFlipped[flipi].m_TexLR.x );
@@ -1627,7 +1627,7 @@ void CDetailObjectSystem::UnserializeModelLighting( CUtlBuffer& buf )
 	while ( --count >= 0 )
 	{
 		intp i = m_DetailLighting.AddToTail();
-		buf.Get( &m_DetailLighting[i], sizeof(DetailPropLightstylesLump_t) );
+		buf.Get( m_DetailLighting[i] );
 	}
 }
 
@@ -1672,7 +1672,7 @@ void CDetailObjectSystem::ScanForCounts( CUtlBuffer& buf,
 	while ( --count >= 0 )
 	{
 		DetailObjectLump_t lump;
-		buf.Get( &lump, sizeof(DetailObjectLump_t) );
+		buf.Get( lump );
 		
 		// We rely on the fact that details objects are sorted by leaf in the
 		// bsp file for this
@@ -1770,7 +1770,7 @@ void CDetailObjectSystem::UnserializeModels( CUtlBuffer& buf )
 	{
 		bFlipped = !bFlipped;
 		DetailObjectLump_t lump;
-		buf.Get( &lump, sizeof(DetailObjectLump_t) );
+		buf.Get( lump );
 		
 		// We rely on the fact that details objects are sorted by leaf in the
 		// bsp file for this

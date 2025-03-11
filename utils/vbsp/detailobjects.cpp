@@ -105,7 +105,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	// Sort the group by alpha
 	float alpha = pGroupKeyValues->GetFloat( "alpha", 1.0f );
 	
-	int i = s_DetailObjectDict[detailId].m_Groups.Count();
+	intp i = s_DetailObjectDict[detailId].m_Groups.Count();
 	while ( --i >= 0 )
 	{
 		if (alpha > s_DetailObjectDict[detailId].m_Groups[i].m_Alpha)
@@ -125,7 +125,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	{
 		if (pIter->GetFirstSubKey())
 		{
-			int i = group.m_Models.AddToTail();
+			intp i = group.m_Models.AddToTail();
 
 			DetailModel_t &model = group.m_Models[i];
 
@@ -225,8 +225,8 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 			// These are used to prevent emission on steep surfaces
 			float minAngle = pIter->GetFloat( "minAngle", 180 );
 			float maxAngle = pIter->GetFloat( "maxAngle", 180 );
-			model.m_MinCosAngle = cos(minAngle * M_PI / 180.f);
-			model.m_MaxCosAngle = cos(maxAngle * M_PI / 180.f);
+			model.m_MinCosAngle = cos(DEG2RAD(minAngle));
+			model.m_MaxCosAngle = cos(DEG2RAD(maxAngle));
 			model.m_Orientation = pIter->GetInt( "detailOrientation", 0 );
 
 			// Make sure minAngle < maxAngle
@@ -261,7 +261,7 @@ static void ParseDetailObjectFile( KeyValues& keyValues )
 		if (!pIter->GetFirstSubKey())
 			continue;
 
-		int i = s_DetailObjectDict.AddToTail( );
+		intp i = s_DetailObjectDict.AddToTail( );
 		s_DetailObjectDict[i].m_Name = pIter->GetName() ;
 		s_DetailObjectDict[i].m_Density = pIter->GetFloat( "density", 0.0f );
 
@@ -377,12 +377,12 @@ static int SelectDetail( DetailObjectGroup_t const& group )
 //-----------------------------------------------------------------------------
 // Adds a detail dictionary element (expected to oftentimes be shared)
 //-----------------------------------------------------------------------------
-static int AddDetailDictLump( const char* pModelName )
+static intp AddDetailDictLump( const char* pModelName )
 {
 	DetailObjectDictLump_t dictLump;
 	V_strcpy_safe( dictLump.m_Name, pModelName );
 
-	for (int i = s_DetailObjectDictLump.Count(); --i >= 0; )
+	for (intp i = s_DetailObjectDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_DetailObjectDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -391,7 +391,7 @@ static int AddDetailDictLump( const char* pModelName )
 	return s_DetailObjectDictLump.AddToTail( dictLump );
 }
 
-static int AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
+static intp AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
 {
 	DetailSpriteDictLump_t dictLump;
 	dictLump.m_UL = pPos[0];
@@ -399,7 +399,7 @@ static int AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
 	dictLump.m_TexUL = pTex[0];
 	dictLump.m_TexLR = pTex[1];
 
-	for (int i = s_DetailSpriteDictLump.Count(); --i >= 0; )
+	for (intp i = s_DetailSpriteDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_DetailSpriteDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -438,7 +438,7 @@ static bool IsModelValid( const char* pModelName )
 	StaticPropLookup_t lookup;
 	lookup.m_ModelName = pModelName;
 
-	int i = s_StaticPropLookup.Find( lookup );
+	unsigned short i = s_StaticPropLookup.Find( lookup );
 	if (i != s_StaticPropLookup.InvalidIndex() )
 		return s_StaticPropLookup[i].m_IsValid;
 
@@ -473,7 +473,7 @@ static void AddDetailToLump( const char* pModelName, const Vector& pt, const QAn
 	}
 
 	// Insert an element into the object dictionary if it aint there...
-	int i = s_DetailObjectLump.AddToTail( );
+	intp i = s_DetailObjectLump.AddToTail( );
 
 	DetailObjectLump_t& objectLump = s_DetailObjectLump[i];
 	objectLump.m_DetailModel = AddDetailDictLump( pModelName ); 
@@ -499,7 +499,7 @@ static void AddDetailSpriteToLump( const Vector &vecOrigin, const QAngle &vecAng
 									int iShapeAngle = 0, int iShapeSize = 0, int iSwayAmount = 0 )
 {
 	// Insert an element into the object dictionary if it aint there...
-	int i = s_DetailObjectLump.AddToTail( );
+	intp i = s_DetailObjectLump.AddToTail( );
 
 	if (i >= 65535)
 	{
@@ -661,7 +661,7 @@ static void EmitDetailObjectsOnFace( dface_t* pFace, DetailObject_t& detail )
 		float area = 0.5f * normalLength;
 
 		// Compute the number of samples to take
-		int numSamples = area * detail.m_Density * 0.000001;
+		int numSamples = area * detail.m_Density * 0.000001f;
 
 		// Now take a sample, and randomly place an object there
 		for (int i = 0; i < numSamples; ++i )
@@ -673,7 +673,7 @@ static void EmitDetailObjectsOnFace( dface_t* pFace, DetailObject_t& detail )
 			{
 				u = 1.0f - u;
 				v = 1.0f - v;
-				assert( u + v <= 1.0f );
+				Assert( u + v <= 1.0f );
 			}
 
 			// Compute alpha
@@ -738,7 +738,7 @@ static float ComputeDisplacementFaceArea( dface_t* pFace )
 static void EmitDetailObjectsOnDisplacementFace( dface_t* pFace, 
 						DetailObject_t& detail, CCoreDispInfo& coreDispInfo )
 {
-	assert(pFace->numedges == 4);
+	Assert(pFace->numedges == 4);
 
 	// We're going to pick a bunch of random points, and then probabilistically
 	// decide whether or not to plant a detail object there.
@@ -835,7 +835,7 @@ static void SetLumpData( )
 //-----------------------------------------------------------------------------
 void EmitDetailModels()
 {
-	StartPacifier("Placing detail props : ");
+	StartPacifier("Placing detail props: ");
 
 	// Place stuff on each face
 	dface_t* pFace = dfaces;
@@ -863,7 +863,7 @@ void EmitDetailModels()
 		// Get the detail type...
 		DetailObject_t search;
 		search.m_Name = pDetailType;
-		int objectType = s_DetailObjectDict.Find(search);
+		intp objectType = s_DetailObjectDict.Find(search);
 		if (objectType < 0)
 		{
 			Warning("Material %s uses unknown detail object type %s!\n",	

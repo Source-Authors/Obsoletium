@@ -403,7 +403,7 @@ void CClientScoreBoardDialog::AddSection(int teamType, int teamNumber)
 		
 		if (!teamName)
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode(gr->GetTeamName(teamNumber), name, sizeof(name));
+			g_pVGuiLocalize->ConvertANSIToUnicode(gr->GetTeamName(teamNumber), name);
 			teamName = name;
 		}
 

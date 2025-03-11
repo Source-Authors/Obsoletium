@@ -96,7 +96,7 @@ public:
 		}
 	}
 
-	inline BOOL IsPlaceholder(void)
+	inline BOOL IsPlaceholder(void) const
 	{
 		return((flags & flagPlaceholder) ? TRUE : FALSE);
 	}
@@ -183,11 +183,11 @@ public:
 	void AssignNodeID(void);
 
 	const char* GetDescription() const override;
-	bool IsScaleable() { return !IsPlaceholder(); }
+	bool IsScaleable() const override { return !IsPlaceholder(); }
 
 	// animation
 	bool GetTransformMatrix( VMatrix& matrix );
-	BOOL IsAnimationController( void ) { return IsMoveClass(); }
+	BOOL IsAnimationController( void ) const { return IsMoveClass(); }
 
 	//-----------------------------------------------------------------------------
 	// Purpose: If the first child of this entity is of type MapClass, this function
@@ -201,6 +201,27 @@ public:
 		FOR_EACH_OBJ( m_Children, pos )
 		{
 			MapClass *pChild = dynamic_cast<MapClass*>( m_Children.Element(pos) );
+			if ( pChild != NULL )
+			{
+				return pChild;
+			}
+		}
+
+		return NULL;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: If the first child of this entity is of type MapClass, this function
+	//			returns a pointer to that child.
+	// Output : Returns a pointer to the MapClass that is a child of this
+	//			entity, NULL if the first child of this entity is not MapClass.
+	//-----------------------------------------------------------------------------
+	template< class MapClass >
+	const MapClass *GetChildOfType( MapClass *null ) const
+	{
+		FOR_EACH_OBJ( m_Children, pos )
+		{
+			const MapClass *pChild = dynamic_cast<const MapClass*>( m_Children.Element(pos) );
 			if ( pChild != NULL )
 			{
 				return pChild;

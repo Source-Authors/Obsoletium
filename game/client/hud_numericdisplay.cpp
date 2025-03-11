@@ -131,7 +131,7 @@ void CHudNumericDisplay::PaintNumbers(HFont font, int xpos, int ypos, int value)
 	}
 
 	// adjust the position to take into account 3 characters
-	int charWidth = surface()->GetCharacterWidth(font, '0');
+	int charWidth = surface()->GetCharacterWidth(font, L'0');
 	if (value < 100 && m_bIndent)
 	{
 		xpos += charWidth;

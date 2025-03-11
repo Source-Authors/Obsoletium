@@ -111,7 +111,7 @@ public:
 	inline void SetHL1SolidType(HL1_SolidType_t eSolidType) { m_eSolidType = eSolidType; }
 	HL1_SolidType_t HL1SolidTypeFromTextureName(const char *pszTexture);
 
-	virtual bool IsScaleable(void) { return(true); }
+	virtual bool IsScaleable(void) const { return(true); }
 	virtual bool IsVisualElement(void) { return(true); }
 
 	// Overridden to set the render color of each of our faces.
@@ -121,9 +121,9 @@ public:
 	//
 	// face info
 	//
-	inline int GetFaceCount( void ) { return( Faces.GetCount() ); }
-	inline void SetFaceCount( int nFaceCount ) { Faces.SetCount( nFaceCount ); }
-	inline CMapFace *GetFace( int nFace ) { return( &Faces[nFace] ); }		
+	inline short GetFaceCount( void ) { return( Faces.GetCount() ); }
+	inline void SetFaceCount( short nFaceCount ) { Faces.SetCount( nFaceCount ); }
+	inline CMapFace *GetFace( short nFace ) { return( &Faces[nFace] ); }		
 	int GetFaceIndex( CMapFace *pFace );	// Returns the index (you could use it with GetFace) or -1 if the face doesn't exist in this solid.
 	void AddFace( CMapFace *pFace );
 	void DeleteFace( int iIndex );

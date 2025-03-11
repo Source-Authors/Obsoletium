@@ -9,6 +9,8 @@
 #include "ChoreoWidgetDrawHelper.h"
 #include "hlfaceposer.h"
 
+#include "winlite.h"
+
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 // Input  : *parent - 
@@ -84,7 +86,7 @@ void CTabWindow::SetRightJustify( bool rightjustify )
 //			tabRect - 
 //			tabNum - 
 //-----------------------------------------------------------------------------
-void CTabWindow::GetTabRect( const RECT& rcClient, RECT& tabRect, int tabNum )
+void CTabWindow::GetTabRect( const RECT& rcClient, RECT& tabRect, intp tabNum )
 {
 	tabRect = m_Items[ tabNum ].rect;
 }
@@ -96,11 +98,11 @@ void CTabWindow::GetTabRect( const RECT& rcClient, RECT& tabRect, int tabNum )
 //			tabnum - 
 //			selected - 
 //-----------------------------------------------------------------------------
-void CTabWindow::DrawTab( CChoreoWidgetDrawHelper& drawHelper, RECT& rcClient, int tabnum, bool selected )
+void CTabWindow::DrawTab( CChoreoWidgetDrawHelper& drawHelper, RECT& rcClient, intp tabnum, bool selected )
 {
 	RECT rcTab;
 
-	if ( tabnum < 0 || tabnum >= m_Items.Size() )
+	if ( tabnum < 0 || tabnum >= m_Items.Count() )
 		return;
 
 	GetTabRect( rcClient, rcTab, tabnum );
@@ -187,7 +189,7 @@ void CTabWindow::redraw( void )
 	drawHelper.GetClientRect( rc );
 
 	// Draw non-selected first
-	for ( int i = 0 ; i < m_Items.Size(); i++ )
+	for ( intp i = 0 ; i < m_Items.Count(); i++ )
 	{
 		if ( i == m_nSelected )
 			continue;
@@ -196,7 +198,7 @@ void CTabWindow::redraw( void )
 	}
 
 	// Draw selected last, so that it appears to pop to top of z order
-	if ( m_nSelected >= 0 && m_nSelected < m_Items.Size() )
+	if ( m_nSelected >= 0 && m_nSelected < m_Items.Count() )
 	{
 		DrawTab( drawHelper, rc, m_nSelected, true );
 	}
@@ -208,12 +210,12 @@ void CTabWindow::redraw( void )
 //			my - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CTabWindow::GetItemUnderMouse( int mx, int my )
+intp CTabWindow::GetItemUnderMouse( int mx, int my )
 {
 	RECT rcClient;
 	GetClientRect( (HWND)getHandle(), &rcClient );
 
-	for ( int i = 0; i < m_Items.Size() ; i++ )
+	for ( intp i = 0; i < m_Items.Count() ; i++ )
 	{
 		RECT rcTab;
 		GetTabRect( rcClient, rcTab, i );
@@ -244,7 +246,7 @@ int CTabWindow::handleEvent (mxEvent *event)
 	{
 	case mxEvent::MouseDown:
 		{
-			int item = GetItemUnderMouse( (short)event->x, (short)event->y );
+			intp item = GetItemUnderMouse( (short)event->x, (short)event->y );
 			if ( item != -1 )
 			{
 				m_nSelected = item;
@@ -258,9 +260,9 @@ int CTabWindow::handleEvent (mxEvent *event)
 					WPARAM wp;
 
 					wp = MAKEWPARAM( getId(), CBN_SELCHANGE );
-					lp = (long)getHandle();
+					lp = (LPARAM)getHandle();
 
-					PostMessage( parent, WM_COMMAND, wp, lp );
+					PostMessageA( parent, WM_COMMAND, wp, lp );
 				}
 				iret = 1;
 			}
@@ -288,15 +290,15 @@ int CTabWindow::handleEvent (mxEvent *event)
 void CTabWindow::add( const char *item )
 {
 	m_Items.AddToTail();
-	CETItem *p = &m_Items[ m_Items.Size() - 1 ];
+	CETItem *p = &m_Items[ m_Items.Count() - 1 ];
 	Assert( p );
 
 	Q_memset( &p->rect, 0, sizeof( p->rect) );
 
-	strcpy( p->m_szString, item );
+	V_strcpy_safe( p->m_szString, item );
 	p->m_szPrefix[ 0 ] = 0;
-	m_nSelected = min( m_nSelected, m_Items.Size() - 1 );
-	m_nSelected = max( m_nSelected, 0 );
+	m_nSelected = min( m_nSelected, m_Items.Count() - 1 );
+	m_nSelected = max( m_nSelected, (intp)0 );
 
 	RecomputeLayout( w2() );
 
@@ -305,7 +307,7 @@ void CTabWindow::add( const char *item )
 
 void CTabWindow::setPrefix( int item, char const *prefix )
 {
-	if ( item < 0 || item >= m_Items.Size() )
+	if ( item < 0 || item >= m_Items.Count() )
 		return;
 
 	Q_strncpy( m_Items[ item ].m_szPrefix, prefix, sizeof( m_Items[ item ].m_szPrefix ) );
@@ -316,9 +318,9 @@ void CTabWindow::setPrefix( int item, char const *prefix )
 // Purpose: Change selected item
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void CTabWindow::select( int index )
+void CTabWindow::select( intp index )
 {
-	if ( index < 0 || index >= m_Items.Size() )
+	if ( index < 0 || index >= m_Items.Count() )
 		return;
 
 	m_nSelected = index;
@@ -329,15 +331,15 @@ void CTabWindow::select( int index )
 // Purpose: Remove a string
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void CTabWindow::remove( int index )
+void CTabWindow::remove( intp index )
 {
-	if ( index < 0 || index >= m_Items.Size() )
+	if ( index < 0 || index >= m_Items.Count() )
 		return;
 	
 	m_Items.Remove( index );
 
-	m_nSelected = min( m_nSelected, m_Items.Size() - 1 );
-	m_nSelected = max( m_nSelected, 0 );
+	m_nSelected = min( m_nSelected, m_Items.Count() - 1 );
+	m_nSelected = max( m_nSelected, (intp)0 );
 
 	RecomputeLayout( w2() );
 
@@ -361,22 +363,22 @@ void CTabWindow::removeAll()
 // Purpose: 
 // Output : int 
 //-----------------------------------------------------------------------------
-int CTabWindow::getItemCount () const
+intp CTabWindow::getItemCount () const
 {
-	return m_Items.Size();
+	return m_Items.Count();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : int	
 //-----------------------------------------------------------------------------
-int	CTabWindow::getSelectedIndex () const
+intp CTabWindow::getSelectedIndex () const
 {
 	// Convert based on override index
 	return m_nSelected;
 }
 
-char const *CTabWindow::getLabel( int item )
+char const *CTabWindow::getLabel( intp item )
 {
 	if ( item < 0 || item >= m_Items.Count() )
 		return "";
@@ -384,7 +386,7 @@ char const *CTabWindow::getLabel( int item )
 	return m_Items[ item ].m_szString;
 }
 
-char const	*CTabWindow::getPrefix( int item )
+char const	*CTabWindow::getPrefix( intp item )
 {
 	if ( item < 0 || item >= m_Items.Count() )
 		return "";
@@ -420,7 +422,7 @@ int CTabWindow::RecomputeLayout( int windowWidth, bool dolayout /*=true*/ )
 
 	int currentrow = 0;
 
-	for ( int i = 0 ; i < m_Items.Size(); i++ )
+	for ( intp i = 0 ; i < m_Items.Count(); i++ )
 	{
 		CETItem *p = &m_Items[ i ];
 

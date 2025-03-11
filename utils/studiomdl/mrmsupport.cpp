@@ -5,30 +5,11 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-
-
-//
-// studiomdl.c: generates a studio .mdl file from a .qc script
-// models/<scriptname>.mdl.
-//
-
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
-
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
 #include "studio.h"
 #include "studiomdl.h"
-//#include "..\..\dlls\activity.h"
 
 bool IsEnd( char const* pLine )
 {
@@ -93,7 +74,7 @@ int SortAndBalanceBones( int iCount, int iMaxCount, int bones[], float weights[]
 	{
 		// missing weights?, go ahead and evenly share?
 		// FIXME: shouldn't this error out?
-		t = 1.0 / iCount;
+		t = 1.0f / iCount;
 
 		for (i = 0; i < iCount; i++)
 		{
@@ -103,7 +84,7 @@ int SortAndBalanceBones( int iCount, int iMaxCount, int bones[], float weights[]
 	else
 	{
 		// scale to sum to 1.0
-		t = 1.0 / t;
+		t = 1.0f / t;
 
 		for (i = 0; i < iCount; i++)
 		{
@@ -272,7 +253,7 @@ void Grab_Texcoordlist( s_source_t *psource )
 				&j, 
 				&t[0], &t[1]) == 3)
 			{
-				t[1] = 1.0 - t[1];
+				t[1] = 1.0f - t[1];
 				g_texcoord[j][0] = t[0];
 				g_texcoord[j][1] = t[1];
 			}
@@ -686,8 +667,8 @@ static void BuildFaceList( s_source_t *pSource, int *pVListToDesired, int *pDesi
 //-----------------------------------------------------------------------------
 static void RemapVertexAnimations( s_source_t *pSource, int *pVListToDesired )
 {
-	int nAnimationCount = pSource->m_Animations.Count();
-	for ( int i = 0; i < nAnimationCount; ++i )
+	intp nAnimationCount = pSource->m_Animations.Count();
+	for ( intp i = 0; i < nAnimationCount; ++i )
 	{
 		s_sourceanim_t &anim = pSource->m_Animations[i];
 		if ( !anim.newStyleVertexAnimations )

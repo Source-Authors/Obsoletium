@@ -4,11 +4,8 @@
 //
 // $NoKeywords: $
 //===========================================================================//
-#include <Assert.h>
-#include <stdio.h>
-#include <math.h>
-#include "hlfaceposer.h"
 #include "PhonemeEditor.h"
+#include "hlfaceposer.h"
 #include "PhonemeEditorColors.h"
 #include "snd_audio_source.h"
 #include "snd_wave_source.h"
@@ -29,7 +26,6 @@
 #include "filesystem.h"
 #include "UtlBuffer.h"
 #include "AudioWaveOutput.h"
-#include "StudioModel.h"
 #include "viewerSettings.h"
 #include "ControlPanel.h"
 #include "faceposer_models.h"
@@ -42,6 +38,8 @@
 #include "WaveBrowser.h"
 #include "tier2/p4helpers.h"
 #include "vstdlib/random.h"
+
+#include <mmreg.h>
 
 extern IUniformRandomStream *random;
 
@@ -142,12 +140,12 @@ bool DoesExtractorExistFor( PE_APITYPE type )
 class StdIOReadBinary : public IFileReadBinary
 {
 public:
-	int open( const char *pFileName )
+	intp open( const char *pFileName )
 	{
-		return (int)filesystem->Open( pFileName, "rb" );
+		return (intp)filesystem->Open( pFileName, "rb" );
 	}
 
-	int read( void *pOutput, int size, int file )
+	int read( void *pOutput, int size, intp file )
 	{
 		if ( !file )
 			return 0;
@@ -155,7 +153,7 @@ public:
 		return filesystem->Read( pOutput, size, (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		if ( !file )
 			return;
@@ -163,7 +161,7 @@ public:
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -171,7 +169,7 @@ public:
 		return filesystem->Tell( (FileHandle_t)file );
 	}
 
-	unsigned int size( int file )
+	unsigned int size( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -179,7 +177,7 @@ public:
 		return filesystem->Size( (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		if ( !file )
 			return;
@@ -191,28 +189,28 @@ public:
 class StdIOWriteBinary : public IFileWriteBinary
 {
 public:
-	int create( const char *pFileName )
+	intp create( const char *pFileName )
 	{
 		MakeFileWriteable( pFileName );
-		return (int)filesystem->Open( pFileName, "wb" );
+		return (intp)filesystem->Open( pFileName, "wb" );
 	}
 
-	int write( void *pData, int size, int file )
+	int write( void *pData, int size, intp file )
 	{
 		return filesystem->Write( pData, size, (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		filesystem->Close( (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		return filesystem->Tell( (FileHandle_t)file );
 	}
@@ -416,7 +414,7 @@ void PhonemeEditor::SetupPhonemeEditorColors( void )
 			int bgavg = ( bgr + bgg + bgb ) / 3;
 
 			// Bias toward bg color
-			avg += ( bgavg - avg ) / 2.5;
+			avg += ( bgavg - avg ) * 5 / 2;
 
 			p->gray_color = RGB( avg, avg, avg );
 		}
@@ -459,8 +457,8 @@ void PhonemeEditor::EditWord( CWordTag *pWord, bool positionDialog /*= false*/ )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Edit Word" );
-	strcpy( params.m_szPrompt, "Current Word:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Edit Word" );
+	V_strcpy_safe( params.m_szPrompt, "Current Word:" );
 	V_strcpy_safe( params.m_szInputText, pWord->GetWord() );
 
 	params.m_nLeft = -1;
@@ -483,7 +481,7 @@ void PhonemeEditor::EditWord( CWordTag *pWord, bool positionDialog /*= false*/ )
 		params.m_nTop	= pt.y;
 	}
 
-	int iret = InputProperties( &params );
+	intp iret = InputProperties( &params );
 	SetFocus( (HWND)getHandle() );
 	if ( !iret )
 	{
@@ -527,7 +525,7 @@ void PhonemeEditor::EditPhoneme( CPhonemeTag *pPhoneme, bool positionDialog /*= 
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
 	V_strcpy_safe( params.m_szName, ConvertPhoneme( pPhoneme->GetPhonemeCode() ) );
 
 	params.m_nLeft = -1;
@@ -550,7 +548,7 @@ void PhonemeEditor::EditPhoneme( CPhonemeTag *pPhoneme, bool positionDialog /*= 
 		params.m_nTop	= pt.y;
 	}
 
-	int iret = PhonemeProperties( &params );
+	intp iret = PhonemeProperties( &params );
 	SetFocus( (HWND)getHandle() );
 
 	if ( !iret )
@@ -909,7 +907,7 @@ int PhonemeEditor::handleEvent( mxEvent *event )
 				}
 				break;	
 			case IDC_REDO_PHONEMEEXTRACTION:
-				if ( m_Tags.m_Words.Size() <= 0 )
+				if ( m_Tags.m_Words.Count() <= 0 )
 				{
 					// This calls redo LISET if some words are actually entered
 					EditWordList();
@@ -1419,7 +1417,7 @@ int PhonemeEditor::handleEvent( mxEvent *event )
 							if ( m_nSelectedWordCount == 1 )
 							{
 								// Find the selected one
-								for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+								for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 								{
 									CWordTag *word = m_Tags.m_Words[ i ];
 									if ( !word || !word->m_bSelected )
@@ -1440,13 +1438,13 @@ int PhonemeEditor::handleEvent( mxEvent *event )
 							if ( m_nSelectedPhonemeCount == 1 )
 							{
 								// Find the selected one
-								for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+								for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 								{
 									CWordTag *word = m_Tags.m_Words[ i ];
 									if ( !word )
 										continue;
 
-									for ( int j = 0; j < word->m_Phonemes.Size(); j++ )
+									for ( intp j = 0; j < word->m_Phonemes.Count(); j++ )
 									{
 										CPhonemeTag *phoneme = word->m_Phonemes[ j ];
 										if ( !phoneme )
@@ -1689,7 +1687,7 @@ void PhonemeEditor::DrawWords( CChoreoWidgetDrawHelper& drawHelper, RECT& rcWork
 	{
 		drawselected = pass == 0 ? false : true;
 
-		for (int k = 0; k < sentence.m_Words.Size(); k++)
+		for (intp k = 0; k < sentence.m_Words.Count(); k++)
 		{
 			CWordTag *word = sentence.m_Words[ k ];
 			if ( !word )
@@ -1699,7 +1697,7 @@ void PhonemeEditor::DrawWords( CChoreoWidgetDrawHelper& drawHelper, RECT& rcWork
 				continue;
 
 			bool hasselectedphonemes = false;
-			for ( int p = 0; p < word->m_Phonemes.Size() && !hasselectedphonemes; p++ )
+			for ( intp p = 0; p < word->m_Phonemes.Count() && !hasselectedphonemes; p++ )
 			{
 				CPhonemeTag *t = word->m_Phonemes[ p ];
 				if ( t->m_bSelected )
@@ -1806,7 +1804,7 @@ void PhonemeEditor::DrawPhonemes( CChoreoWidgetDrawHelper& drawHelper, RECT& rcW
 	{
 		drawselected = pass == 0 ? false : true;
 
-		for ( int i = 0; i < sentence.m_Words.Size(); i++ )
+		for ( intp i = 0; i < sentence.m_Words.Count(); i++ )
 		{
 			CWordTag *w = sentence.m_Words[ i ];
 			if ( !w )
@@ -1815,7 +1813,7 @@ void PhonemeEditor::DrawPhonemes( CChoreoWidgetDrawHelper& drawHelper, RECT& rcW
 			if ( w->m_bSelected != drawselected )
 				continue;
 
-			for ( int k = 0; k < w->m_Phonemes.Size(); k++ )
+			for ( intp k = 0; k < w->m_Phonemes.Count(); k++ )
 			{
 				CPhonemeTag *pPhoneme = w->m_Phonemes[ k ];
 
@@ -2010,7 +2008,7 @@ void PhonemeEditor::redraw( void )
 			rcLabel.top = rcLabel.bottom - 10;
 
 			char sz[ 32 ];
-			sprintf( sz, "%.2f", f );
+			V_sprintf_safe( sz, "%.2f", f );
 			int textWidth = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, sz );
 			rcLabel.right = rcLabel.left + textWidth;
 			OffsetRect( &rcLabel, -textWidth / 2, 0 );
@@ -2088,7 +2086,7 @@ void PhonemeEditor::redraw( void )
 	OffsetRect( &rcText, 0, fontsize + 1 );
 
 	drawHelper.DrawColoredText( font, fontsize, fontweight, PEColor( COLOR_PHONEME_TEXT ), rcText,
-		"[ %i ] Words [ %i ] Phonemes / Zoom %i %%", m_Tags.m_Words.Size(), m_Tags.CountPhonemes(), m_nTimeZoom );
+		"[ %zi ] Words [ %zi ] Phonemes / Zoom %i %%", m_Tags.m_Words.Count(), m_Tags.CountPhonemes(), m_nTimeZoom );
 
 	if ( m_pEvent )
 	{
@@ -2105,14 +2103,14 @@ void PhonemeEditor::redraw( void )
 
 
 	char text[ 4096 ];
-	sprintf( text, "Sentence Text:  %s", m_Tags.GetText() );
+	V_sprintf_safe( text, "Sentence Text:  %s", m_Tags.GetText() );
 
 	int halfwidth = ( rc.right - rc.left ) / 2;
 
 	rcText = rc;
 	rcText.left = halfwidth;
 	rcText.top = rcText.bottom + 5;
-	rcText.right = rcText.left + halfwidth * 0.6;
+	rcText.right = rcText.left + halfwidth * 6 / 10;
 
 	drawHelper.CalcTextRect( font, fontsize, fontweight, halfwidth, rcText, text );
 
@@ -2123,9 +2121,9 @@ void PhonemeEditor::redraw( void )
 	if ( cw )
 	{
 		char wordInfo[ 512 ];
-		sprintf( wordInfo, "Word:  %s, start %.2f end %.2f, duration %.2f ms phonemes %i",
+		V_sprintf_safe( wordInfo, "Word:  %s, start %.2f end %.2f, duration %.2f ms phonemes %zi",
 			cw->GetWord(), cw->m_flStartTime, cw->m_flEndTime, 1000.0f * ( cw->m_flEndTime - cw->m_flStartTime ),
-			cw->m_Phonemes.Size() );
+			cw->m_Phonemes.Count() );
 
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, wordInfo );
 
@@ -2141,7 +2139,7 @@ void PhonemeEditor::redraw( void )
 	if ( cp )
 	{
 		char phonemeInfo[ 512 ];
-		sprintf( phonemeInfo, "Phoneme:  %s, start %.2f end %.2f, duration %.2f ms",
+		V_sprintf_safe( phonemeInfo, "Phoneme:  %s, start %.2f end %.2f, duration %.2f ms",
 			ConvertPhoneme( cp->GetPhonemeCode() ), cp->GetStartTime(), cp->GetEndTime(), 1000.0f * ( cp->GetEndTime() - cp->GetStartTime() ) );
 
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, phonemeInfo );
@@ -2157,7 +2155,7 @@ void PhonemeEditor::redraw( void )
 	// Draw playback rate
 	{
 		char sz[ 48 ];
-		sprintf( sz, "Speed: %.2fx", m_flPlaybackRate );
+		V_sprintf_safe( sz, "Speed: %.2fx", m_flPlaybackRate );
 
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, sz);
 		
@@ -2171,10 +2169,10 @@ void PhonemeEditor::redraw( void )
 			PEColor( COLOR_PHONEME_TEXT ), rcText, sz );
 	}
 
-	if ( m_UndoStack.Size() > 0 )
+	if ( m_UndoStack.Count() > 0 )
 	{
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, 
-			"Undo levels:  %i/%i", m_nUndoLevel, m_UndoStack.Size() );
+			"Undo levels:  %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
 
 		rcText = rc;
 		rcText.top = rc.bottom + 60;
@@ -2183,7 +2181,7 @@ void PhonemeEditor::redraw( void )
 		rcText.left = rcText.right - length - 10;
 
 		drawHelper.DrawColoredText( font, fontsize, fontweight, PEColor( COLOR_PHONEME_EXTRACTION_RESULT_SUCCESS ), rcText,
-			"Undo levels:  %i/%i", m_nUndoLevel, m_UndoStack.Size() );
+			"Undo levels:  %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
 	}
 
 	float endfrac = ( m_pWaveFile->GetRunningLength() - starttime ) / ( endtime - starttime );
@@ -2346,7 +2344,7 @@ void PhonemeEditor::SetCurrentWaveFile( const char *wavefile, bool force /*=fals
 	if ( m_pWaveFile )
 	{
 		char fn[ 512 ];
-		Q_snprintf( fn, sizeof( fn ), "%s%s", m_WorkFile.m_szBasePath, m_WorkFile.m_szWorkingFile );
+		V_sprintf_safe( fn, "%s%s", m_WorkFile.m_szBasePath, m_WorkFile.m_szWorkingFile );
 		filesystem->RemoveFile( fn, "GAME" );
 	}
 
@@ -2360,20 +2358,20 @@ void PhonemeEditor::SetCurrentWaveFile( const char *wavefile, bool force /*=fals
 
 	// Try an dload new sound
 	m_pWaveFile = sound->LoadSound( wavefile );
-	Q_strncpy( m_WorkFile.m_szWaveFile, wavefile, sizeof( m_WorkFile.m_szWaveFile ) );
+	V_strcpy_safe( m_WorkFile.m_szWaveFile, wavefile );
 
 	char fullpath[ 512 ];
-	filesystem->RelativePathToFullPath( wavefile, "GAME", fullpath, sizeof( fullpath ) );
-	int len = Q_strlen( fullpath );
-	int charstocopy = len - Q_strlen( wavefile ) + 1;
+	filesystem->RelativePathToFullPath_safe( wavefile, "GAME", fullpath );
+	intp len = Q_strlen( fullpath );
+	intp charstocopy = len - Q_strlen( wavefile ) + 1;
 	m_WorkFile.m_szBasePath[ 0 ] = 0;
 	if ( charstocopy >= 0 )
 	{
 		Q_strncpy( m_WorkFile.m_szBasePath, fullpath, charstocopy );
 		m_WorkFile.m_szBasePath[ charstocopy ] = 0;
 	}
-	Q_StripExtension( wavefile, m_WorkFile.m_szWorkingFile, sizeof( m_WorkFile.m_szWorkingFile ) );
-	Q_strncat( m_WorkFile.m_szWorkingFile, "_work.wav", sizeof( m_WorkFile.m_szWorkingFile ), COPY_ALL_CHARACTERS );
+	Q_StripExtension( wavefile, m_WorkFile.m_szWorkingFile );
+	V_strcat_safe( m_WorkFile.m_szWorkingFile, "_work.wav" );
 
 	Q_FixSlashes( m_WorkFile.m_szWaveFile );
 	Q_FixSlashes( m_WorkFile.m_szWorkingFile );
@@ -2538,11 +2536,11 @@ int PhonemeEditor::IsMouseOverBoundary( mxEvent *event )
 
 		int		mouse_tolerance = 3;
 
-		for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+		for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 		{
 			CWordTag *word = m_Tags.m_Words[ i ];
 
-			for ( int k = 0; k < word->m_Phonemes.Size(); k++ )
+			for ( intp k = 0; k < word->m_Phonemes.Count(); k++ )
 			{
 				CPhonemeTag *pPhoneme = word->m_Phonemes[ k ];
 
@@ -2571,7 +2569,7 @@ int PhonemeEditor::IsMouseOverBoundary( mxEvent *event )
 
 		int		mouse_tolerance = 3;
 
-		for ( int k = 0; k < m_Tags.m_Words.Size(); k++ )
+		for ( intp k = 0; k < m_Tags.m_Words.Count(); k++ )
 		{
 			CWordTag *word = m_Tags.m_Words[ k ];
 
@@ -2602,7 +2600,7 @@ void PhonemeEditor::DrawFocusRect( char *reason )
 {
 	HDC dc = GetDC( NULL );
 
-	for ( int i = 0; i < m_FocusRects.Size(); i++ )
+	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
 		RECT rc = m_FocusRects[ i ].m_rcFocus;
 
@@ -2648,7 +2646,7 @@ void PhonemeEditor::ShowWordMenu( CWordTag *word, int mx, int my )
 
 		if ( m_nSelectedWordCount == 1 )
 		{
-			int index = IndexOfWord( word );
+			intp index = IndexOfWord( word );
 			bool valid = false;
 			if ( index != -1 )
 			{
@@ -2677,7 +2675,7 @@ void PhonemeEditor::ShowWordMenu( CWordTag *word, int mx, int my )
 					}
 				}
 
-				if ( word->m_Phonemes.Size() == 0 )
+				if ( word->m_Phonemes.Count() == 0 )
 				{
 					pop->addSeparator();
 					pop->add( va( "Add phoneme to '%s'...", word->GetWord() ), IDC_EDIT_INSERTFIRSTPHONEMEOFWORD );
@@ -2708,13 +2706,13 @@ void PhonemeEditor::ShowWordMenu( CWordTag *word, int mx, int my )
 		pop->add( va( "Deselect all" ), IDC_DESELECT_PHONEMESANDWORDS );
 	}
 
-	if ( m_Tags.m_Words.Size() > 0 )
+	if ( m_Tags.m_Words.Count() > 0 )
 	{
 		pop->addSeparator();
 		pop->add( va( "Cleanup words/phonemes" ), IDC_CLEANUP );
 	}
 
-	if ( m_Tags.m_Words.Size() > 0 )
+	if ( m_Tags.m_Words.Count() > 0 )
 	{
 		pop->addSeparator();
 		pop->add( va( "Realign phonemes to words" ), IDC_REALIGNPHONEMES );
@@ -2749,8 +2747,8 @@ void PhonemeEditor::ShowPhonemeMenu( CPhonemeTag *pho, int mx, int my )
 	CWordTag *tag = m_Tags.GetWordForPhoneme( pho );
 	if ( tag )
 	{
-		int wordNum = IndexOfWord( tag );
-		int pi = tag->IndexOfPhoneme( pho );
+		intp wordNum = IndexOfWord( tag );
+		intp pi = tag->IndexOfPhoneme( pho );
 
 		SetClickedPhoneme( wordNum, pi );
 		valid = true;
@@ -2808,13 +2806,13 @@ void PhonemeEditor::ShowPhonemeMenu( CPhonemeTag *pho, int mx, int my )
 	}
 
 
-	if ( m_Tags.m_Words.Size() > 0 )
+	if ( m_Tags.m_Words.Count() > 0 )
 	{
 		pop->addSeparator();
 		pop->add( va( "Cleanup words/phonemes" ), IDC_CLEANUP );
 	}
 
-	if ( m_Tags.m_Words.Size() > 0 )
+	if ( m_Tags.m_Words.Count() > 0 )
 	{
 		pop->addSeparator();
 		pop->add( va( "Realign words to phonemes" ), IDC_REALIGNWORDS );
@@ -2854,18 +2852,18 @@ bool PhonemeEditor::FindSpanningPhonemes( float time, CPhonemeTag **pp1, CPhonem
 	*pp2 = NULL;
 
 	// Three pixels
-	double time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 3;
+	float time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 3;
 
 	CPhonemeTag *previous = NULL;
 
-	for ( int w = 0; w < m_Tags.m_Words.Size(); w++ )
+	for ( intp w = 0; w < m_Tags.m_Words.Count(); w++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ w ];
 
-		for ( int i = 0; i < word->m_Phonemes.Size(); i++ )
+		for ( intp i = 0; i < word->m_Phonemes.Count(); i++ )
 		{
 			CPhonemeTag *current = word->m_Phonemes[ i ];
-			double dt;
+			float dt;
 
 			if ( !previous )
 			{
@@ -2904,15 +2902,15 @@ bool PhonemeEditor::FindSpanningPhonemes( float time, CPhonemeTag **pp1, CPhonem
 		}
 	}
 
-	if ( m_Tags.m_Words.Size() > 0 )
+	if ( m_Tags.m_Words.Count() > 0 )
 	{
 		// Check last word, but only if it has some phonemes
-		CWordTag *lastWord = m_Tags.m_Words[ m_Tags.m_Words.Size() - 1 ];
+		CWordTag *lastWord = m_Tags.m_Words[ m_Tags.m_Words.Count() - 1 ];
 		if ( lastWord && 
-			( lastWord->m_Phonemes.Size() > 0 ) )
+			( lastWord->m_Phonemes.Count() > 0 ) )
 		{
 
-			CPhonemeTag *last = lastWord->m_Phonemes[ lastWord->m_Phonemes.Size() - 1 ];
+			CPhonemeTag *last = lastWord->m_Phonemes[ lastWord->m_Phonemes.Count() - 1 ];
 			float dt;
 			dt = fabs( last->GetEndTime() - time );
 			if ( dt < time_epsilon )
@@ -2941,13 +2939,13 @@ bool PhonemeEditor::FindSpanningWords( float time, CWordTag **pp1, CWordTag **pp
 	*pp2 = NULL;
 
 	// Three pixels
-	double time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 3;
+	float time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 3;
 
 	CWordTag *previous = NULL;
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *current = m_Tags.m_Words[ i ];
-		double dt;
+		float dt;
 
 		if ( !previous )
 		{
@@ -2985,9 +2983,9 @@ bool PhonemeEditor::FindSpanningWords( float time, CWordTag **pp1, CWordTag **pp
 		previous = current;
 	}
 
-	if ( m_Tags.m_Words.Size() > 0 )
+	if ( m_Tags.m_Words.Count() > 0 )
 	{
-		CWordTag *last = m_Tags.m_Words[ m_Tags.m_Words.Size() - 1 ];
+		CWordTag *last = m_Tags.m_Words[ m_Tags.m_Words.Count() - 1 ];
 		float dt;
 		dt = fabs( last->m_flEndTime - time );
 		if ( dt < time_epsilon )
@@ -3000,9 +2998,9 @@ bool PhonemeEditor::FindSpanningWords( float time, CWordTag **pp1, CWordTag **pp
 	return false;
 }
 
-int	PhonemeEditor::FindWordForTime( float time )
+intp	PhonemeEditor::FindWordForTime( float time )
 {
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *pCurrent = m_Tags.m_Words[ i ];
 
@@ -3086,12 +3084,12 @@ void PhonemeEditor::FinishWordMove( int startx, int endx )
 
 CPhonemeTag *PhonemeEditor::FindPhonemeForTime( float time )
 {
-	for ( int w = 0 ; w < m_Tags.m_Words.Size(); w++ )
+	for ( intp w = 0 ; w < m_Tags.m_Words.Count(); w++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ w ];
 
 
-		for ( int i = 0; i < word->m_Phonemes.Size(); i++ )
+		for ( intp i = 0; i < word->m_Phonemes.Count(); i++ )
 		{
 			CPhonemeTag *pCurrent = word->m_Phonemes[ i ];
 
@@ -3241,7 +3239,7 @@ void PhonemeEditor::EditInsertPhonemeBefore( void )
 		return;
 	}
 
-	int clicked = word->IndexOfPhoneme( cp );
+	intp clicked = word->IndexOfPhoneme( cp );
 	if ( clicked < 0 )
 	{
 		Con_Printf( "EditInsertPhonemeBefore:  phoneme not a member of any specified word!!!\n" );
@@ -3253,10 +3251,10 @@ void PhonemeEditor::EditInsertPhonemeBefore( void )
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szName, "" );
 
-	int iret = PhonemeProperties( &params );
+	intp iret = PhonemeProperties( &params );
 	SetFocus( (HWND)getHandle() );
 	if ( !iret )
 	{
@@ -3312,7 +3310,7 @@ void PhonemeEditor::EditInsertPhonemeAfter( void )
 		return;
 	}
 
-	int clicked = word->IndexOfPhoneme( cp );
+	intp clicked = word->IndexOfPhoneme( cp );
 	if ( clicked < 0 )
 	{
 		Con_Printf( "EditInsertPhonemeAfter:  phoneme not a member of any specified word!!!\n" );
@@ -3324,10 +3322,10 @@ void PhonemeEditor::EditInsertPhonemeAfter( void )
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szName, "" );
 
-	int iret = PhonemeProperties( &params );
+	intp iret = PhonemeProperties( &params );
 	SetFocus( (HWND)getHandle() );
 
 	if ( !iret )
@@ -3377,7 +3375,7 @@ void PhonemeEditor::EditInsertWordBefore( void )
 	// Don't have really long words
 	gap = min( gap, DEFAULT_WORD_LENGTH );
 
-	int clicked = IndexOfWord( cw );
+	intp clicked = IndexOfWord( cw );
 	if ( clicked < 0 )
 	{
 		Con_Printf( "EditInsertWordBefore:  word not in sentence!!!\n" );
@@ -3387,9 +3385,9 @@ void PhonemeEditor::EditInsertWordBefore( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Insert Word" );
-	strcpy( params.m_szPrompt, "Word:" );
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Insert Word" );
+	V_strcpy_safe( params.m_szPrompt, "Word:" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	params.m_nLeft = -1;
 	params.m_nTop = -1;
@@ -3411,7 +3409,7 @@ void PhonemeEditor::EditInsertWordBefore( void )
 		params.m_nTop	= pt.y;
 	}
 
-	int iret = InputProperties( &params );
+	intp iret = InputProperties( &params );
 	SetFocus( (HWND)getHandle() );
 	if ( !iret )
 	{
@@ -3477,7 +3475,7 @@ void PhonemeEditor::EditInsertWordAfter( void )
 	// Don't have really long words
 	gap = min( gap, DEFAULT_WORD_LENGTH );
 
-	int clicked = IndexOfWord( cw );
+	intp clicked = IndexOfWord( cw );
 	if ( clicked < 0 )
 	{
 		Con_Printf( "EditInsertWordBefore:  word not in sentence!!!\n" );
@@ -3487,9 +3485,9 @@ void PhonemeEditor::EditInsertWordAfter( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Insert Word" );
-	strcpy( params.m_szPrompt, "Word:" );
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Insert Word" );
+	V_strcpy_safe( params.m_szPrompt, "Word:" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	params.m_nLeft = -1;
 	params.m_nTop = -1;
@@ -3511,7 +3509,7 @@ void PhonemeEditor::EditInsertWordAfter( void )
 		params.m_nTop	= pt.y;
 	}
 
-	int iret = InputProperties( &params );
+	intp iret = InputProperties( &params );
 	SetFocus( (HWND)getHandle() );
 	if ( !iret )
 	{
@@ -3578,13 +3576,13 @@ void PhonemeEditor::EditDeletePhoneme( void )
 
 	PushUndo();
 
-	for ( int i = m_Tags.m_Words.Size() - 1; i >= 0; i-- )
+	for ( intp i = m_Tags.m_Words.Count() - 1; i >= 0; i-- )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
 			continue;
 
-		for ( int j = word->m_Phonemes.Size() - 1; j >= 0; j-- )
+		for ( intp j = word->m_Phonemes.Count() - 1; j >= 0; j-- )
 		{
 			CPhonemeTag *p = word->m_Phonemes[ j ];
 			if ( !p || !p->m_bSelected )
@@ -3619,7 +3617,7 @@ void PhonemeEditor::EditDeleteWord( void )
 
 	PushUndo();
 
-	for ( int i = m_Tags.m_Words.Size() - 1; i >= 0; i-- )
+	for ( intp i = m_Tags.m_Words.Count() - 1; i >= 0; i-- )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word || !word->m_bSelected )
@@ -3833,7 +3831,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		return;
 	}
 
-	int i;
+	intp i;
 	// Create input array of just selected words
 	CSentence m_InputWords;
 	CSentence m_Results;
@@ -3847,14 +3845,14 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		// Allow user to type in text
 		// Build word string
 		char wordstring[ 1024 ];
-		strcpy( wordstring, "" );
+		V_strcpy_safe( wordstring, "" );
 
 		CInputParams params;
 		memset( &params, 0, sizeof( params ) );
-		strcpy( params.m_szDialogTitle, "Phrase Word List" );
-		strcpy( params.m_szPrompt, "Phrase" );
+		V_strcpy_safe( params.m_szDialogTitle, "Phrase Word List" );
+		V_strcpy_safe( params.m_szPrompt, "Phrase" );
 
-		strcpy( params.m_szInputText, wordstring );
+		V_strcpy_safe( params.m_szInputText, wordstring );
 
 		if ( !InputProperties( &params ) )
 			return;
@@ -3867,7 +3865,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 
 		SentenceFromString( m_InputWords, params.m_szInputText );
 
-		if ( m_InputWords.m_Words.Size() == 0 )
+		if ( m_InputWords.m_Words.Count() == 0 )
 		{
 			Con_Printf( "You must either select words, or type in a set of words in order to extract phonemes!\n" );
 			return;
@@ -3888,7 +3886,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		Q_strncpy( temp, m_InputWords.GetText(), sizeof( temp ) );
 
 		// Iterate existing words, looking for contiguous selected words
-		for ( i = 0; i < m_Tags.m_Words.Size(); i++ )
+		for ( i = 0; i < m_Tags.m_Words.Count(); i++ )
 		{
 			CWordTag *word = m_Tags.m_Words[ i ];
 			if ( !word || !word->m_bSelected )
@@ -3903,7 +3901,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		}
 
 		// Kill terminal space character
-		int len = Q_strlen( temp );
+		intp len = Q_strlen( temp );
 		if ( killspace && ( len >= 1 ) )
 		{
 			Assert( temp[ len -1 ] == ' ' );
@@ -3917,8 +3915,8 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 
 	char szCroppedFile[ 512 ];
 	char szBaseFile[ 512 ];
-	Q_StripExtension( m_WorkFile.m_szWaveFile, szBaseFile, sizeof( szBaseFile ) );
-	Q_snprintf( szCroppedFile, sizeof( szCroppedFile ), "%s%s_work1.wav", m_WorkFile.m_szBasePath, szBaseFile );
+	Q_StripExtension( m_WorkFile.m_szWaveFile, szBaseFile );
+	V_sprintf_safe( szCroppedFile, "%s%s_work1.wav", m_WorkFile.m_szBasePath, szBaseFile );
 
 	filesystem->RemoveFile( szCroppedFile, "GAME" );
 
@@ -3948,7 +3946,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 	m_TagsExt = m_Tags;
 
 	char filename[ 512 ];
-	Q_snprintf( filename, sizeof( filename ), "%s%s", m_WorkFile.m_szBasePath, szCroppedFile );
+	V_sprintf_safe( filename, "%s%s", m_WorkFile.m_szBasePath, szCroppedFile );
 
 	m_nLastExtractionResult = m_pPhonemeExtractor->Extract( 
 		filename,
@@ -3957,10 +3955,10 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		m_InputWords,
 		m_Results );
 
-	if ( m_InputWords.m_Words.Size() != m_Results.m_Words.Size() )
+	if ( m_InputWords.m_Words.Count() != m_Results.m_Words.Count() )
 	{
-		Con_Printf( "Extraction returned %i words, source had %i, try adjusting selection\n",
-			m_Results.m_Words.Size(), m_InputWords.m_Words.Size() );
+		Con_Printf( "Extraction returned %zi words, source had %zi, try adjusting selection\n",
+			m_Results.m_Words.Count(), m_InputWords.m_Words.Count() );
 
 		filesystem->RemoveFile( filename, "GAME" );
 
@@ -3980,7 +3978,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 	}
 
 	// Now convert byte offsets to times
-	for ( i = 0; i < m_Results.m_Words.Size(); i++ )
+	for ( i = 0; i < m_Results.m_Words.Count(); i++ )
 	{
 		CWordTag *tag = m_Results.m_Words[ i ];
 		Assert( tag );
@@ -3990,7 +3988,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		tag->m_flStartTime = ( float )(tag->m_uiStartByte ) / bytespersecond;
 		tag->m_flEndTime = ( float )(tag->m_uiEndByte ) / bytespersecond;
 
-		for ( int j = 0; j < tag->m_Phonemes.Size(); j++ )
+		for ( intp j = 0; j < tag->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *ptag = tag->m_Phonemes[ j ];
 			Assert( ptag );
@@ -4008,16 +4006,16 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		CWordTag *from;
 		CWordTag *to;
 
-		int fromWord = 0;
+		intp fromWord = 0;
 
-		for ( i = 0; i < m_TagsExt.m_Words.Size() ; i++ )
+		for ( i = 0; i < m_TagsExt.m_Words.Count() ; i++ )
 		{
 			to = m_TagsExt.m_Words[ i ];
 			if ( !to || !to->m_bSelected )
 				continue;
 
 			// Found start of contiguous run
-			if ( fromWord >= m_Results.m_Words.Size() )
+			if ( fromWord >= m_Results.m_Words.Count() )
 				break;
 
 			from = m_Results.m_Words[ fromWord++ ];
@@ -4026,7 +4024,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 				continue;
 
 			// Remove all phonemes from destination
-			while ( to->m_Phonemes.Size() > 0 )
+			while ( to->m_Phonemes.Count() > 0 )
 			{
 				CPhonemeTag *p = to->m_Phonemes[ 0 ];
 				Assert( p );
@@ -4035,7 +4033,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 			}
 
 			// Now copy phonemes from source
-			for ( int j = 0; j < from->m_Phonemes.Size(); j++ )
+			for ( intp j = 0; j < from->m_Phonemes.Count(); j++ )
 			{
 				CPhonemeTag *fromPhoneme = from->m_Phonemes[ j ];
 				Assert( fromPhoneme );
@@ -4057,7 +4055,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 			}
 
 			// Done
-			if ( fromWord >= m_Results.m_Words.Size() )
+			if ( fromWord >= m_Results.m_Words.Count() )
 				break;
 		}
 
@@ -4067,12 +4065,12 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		// Find word just before starting point of selection and
 		//  place input words into list starting that that point
 
-		int startWord = 0;
+		intp startWord = 0;
 
 		CWordTag *firstWordOfPhrase = m_Results.m_Words[ 0 ];
 		Assert( firstWordOfPhrase );
 		
-		for ( ; startWord < m_TagsExt.m_Words.Size(); startWord++ )
+		for ( ; startWord < m_TagsExt.m_Words.Count(); startWord++ )
 		{
 			CWordTag *w = m_TagsExt.m_Words[ startWord ];
 			Assert( w );
@@ -4083,7 +4081,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 				break;
 		}
 
-		for ( i = 0; i < m_Results.m_Words.Size(); i++ )
+		for ( i = 0; i < m_Results.m_Words.Count(); i++ )
 		{
 			CWordTag *from = m_Results.m_Words[ i ];
 			Assert( from );
@@ -4097,7 +4095,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 			to->m_flEndTime		+= selectionstarttime;
 
 			// Now adjust phoneme times
-			for ( int j = 0; j < to->m_Phonemes.Size(); j++ )
+			for ( intp j = 0; j < to->m_Phonemes.Count(); j++ )
 			{
 				CPhonemeTag *toPhoneme = to->m_Phonemes[ j ];
 				Assert( toPhoneme );
@@ -4156,8 +4154,8 @@ void PhonemeEditor::RedoPhonemeExtraction( void )
 	float bytespersecond = m_pWaveFile->SampleRate() * m_pWaveFile->TrueSampleSize();
 
 	// Now convert byte offsets to times
-	int i;
-	for ( i = 0; i < m_TagsExt.m_Words.Size(); i++ )
+	intp i;
+	for ( i = 0; i < m_TagsExt.m_Words.Count(); i++ )
 	{
 		CWordTag *tag = m_TagsExt.m_Words[ i ];
 		Assert( tag );
@@ -4167,7 +4165,7 @@ void PhonemeEditor::RedoPhonemeExtraction( void )
 		tag->m_flStartTime = ( float )(tag->m_uiStartByte ) / bytespersecond;
 		tag->m_flEndTime = ( float )(tag->m_uiEndByte ) / bytespersecond;
 
-		for ( int j = 0; j < tag->m_Phonemes.Size(); j++ )
+		for ( intp j = 0; j < tag->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *ptag = tag->m_Phonemes[ j ];
 			Assert( ptag );
@@ -4604,7 +4602,7 @@ void PhonemeEditor::OnExport()
 		return;
 	}
 
-	Q_SetExtension( filename, WORD_DATA_EXTENSION, sizeof( filename ) );
+	Q_SetExtension( filename, WORD_DATA_EXTENSION );
 
 	ExportValveDataChunk( filename );
 }
@@ -4616,7 +4614,7 @@ void PhonemeEditor::OnExport()
 void PhonemeEditor::StoreValveDataChunk( IterateOutputRIFF& store )
 {
 	// Buffer and dump data
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	m_Tags.SaveToBuffer( buf );
 
@@ -4645,14 +4643,14 @@ void PhonemeEditor::ExportValveDataChunk( char const *tempfile )
 	else
 	{
 		// Buffer and dump data
-		CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 		m_Tags.SaveToBuffer( buf );
 
 		filesystem->Write( buf.Base(), buf.TellPut(), fh );
 		filesystem->Close(fh);
 
-		Con_Printf( "Exported %i words to %s\n", m_Tags.m_Words.Count(), tempfile );
+		Con_Printf( "Exported %zi words to %s\n", m_Tags.m_Words.Count(), tempfile );
 	}
 }
 
@@ -4687,7 +4685,7 @@ void PhonemeEditor::ImportValveDataChunk( char const *tempfile )
 
 	delete[] buf;
 
-	Con_Printf( "Imported %i words from %s\n", m_TagsExt.m_Words.Count(), tempfile );
+	Con_Printf( "Imported %zi words from %s\n", m_TagsExt.m_Words.Count(), tempfile );
 
 	redraw();
 }
@@ -4845,14 +4843,14 @@ CPhonemeTag *PhonemeEditor::GetPhonemeTagUnderMouse( int mx, int my )
 	if ( endtime - starttime <= 0.0f )
 		return NULL;
 
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		Assert( word );
 		if ( !word )
 			continue;
 
-		for ( int k = 0; k < word->m_Phonemes.Size(); k++ )
+		for ( intp k = 0; k < word->m_Phonemes.Count(); k++ )
 		{
 			CPhonemeTag *pPhoneme = word->m_Phonemes[ k ];
 			Assert( pPhoneme );
@@ -4911,7 +4909,7 @@ CWordTag *PhonemeEditor::GetWordTagUnderMouse( int mx, int my )
 	if ( endtime - starttime <= 0.0f )
 		return NULL;
 
-	for ( int k = 0; k < m_Tags.m_Words.Size(); k++ )
+	for ( intp k = 0; k < m_Tags.m_Words.Count(); k++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ k ];
 		Assert( word );
@@ -4949,7 +4947,7 @@ void PhonemeEditor::DeselectWords( void )
 	if ( GetMode() != MODE_PHONEMES )
 		return;
 
-	for ( int i = 0 ; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0 ; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *w = m_Tags.m_Words[ i ];
 		Assert( w );
@@ -4965,14 +4963,14 @@ void PhonemeEditor::DeselectPhonemes( void )
 	if ( GetMode() != MODE_PHONEMES )
 		return;
 
-	for ( int w = 0 ; w < m_Tags.m_Words.Size(); w++ )
+	for ( intp w = 0 ; w < m_Tags.m_Words.Count(); w++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ w ];
 		Assert( word );
 		if ( !word )
 			continue;
 
-		for ( int i = 0 ; i < word->m_Phonemes.Size(); i++ )
+		for ( intp i = 0 ; i < word->m_Phonemes.Count(); i++ )
 		{
 			CPhonemeTag *pt = word->m_Phonemes[ i ];
 			Assert( pt );
@@ -4988,7 +4986,7 @@ void PhonemeEditor::SnapWords( void )
 	if ( GetMode() != MODE_PHONEMES )
 		return;
 
-	if ( m_Tags.m_Words.Size() < 2 )
+	if ( m_Tags.m_Words.Count() < 2 )
 	{
 		Con_Printf( "Can't snap, need at least two contiguous selected words\n" );
 		return;
@@ -4998,7 +4996,7 @@ void PhonemeEditor::SnapWords( void )
 
 	PushUndo();
 
-	for ( int i = 0; i < m_Tags.m_Words.Size() - 1; i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count() - 1; i++ )
 	{
 		CWordTag *current = m_Tags.m_Words[ i ];
 		CWordTag *next = m_Tags.m_Words[ i + 1 ];
@@ -5025,20 +5023,20 @@ void PhonemeEditor::SeparateWords( void )
 	if ( GetPixelsPerSecond() <= 0.0f )
 		return;
 
-	if ( m_Tags.m_Words.Size() < 2 )
+	if ( m_Tags.m_Words.Count() < 2 )
 	{
 		Con_Printf( "Can't separate, need at least two contiguous selected words\n" );
 		return;
 	}
 
 	// Three pixels
-	double time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 6;
+	float time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 6;
 
 	SetDirty( true );
 
 	PushUndo();
 
-	for ( int i = 0; i < m_Tags.m_Words.Size() - 1; i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count() - 1; i++ )
 	{
 		CWordTag *current = m_Tags.m_Words[ i ];
 		CWordTag *next = m_Tags.m_Words[ i + 1 ];
@@ -5098,10 +5096,10 @@ void PhonemeEditor::EditWordList( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Word List" );
-	strcpy( params.m_szPrompt, "Sentence:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Word List" );
+	V_strcpy_safe( params.m_szPrompt, "Sentence:" );
 
-	strcpy( params.m_szInputText, wordstring );
+	V_strcpy_safe( params.m_szInputText, wordstring );
 
 	if ( !InputProperties( &params ) )
 		return;
@@ -5122,7 +5120,7 @@ void PhonemeEditor::EditWordList( void )
 	// Force text
 	m_Tags.SetText( params.m_szInputText );
 
-	if ( m_Tags.m_Words.Size() == 0 )
+	if ( m_Tags.m_Words.Count() == 0 )
 	{
 		// First text we've seen, just distribute words evenly
 		CreateEvenWordDistribution( params.m_szInputText );
@@ -5192,14 +5190,14 @@ void PhonemeEditor::SnapPhonemes( void )
 
 	CPhonemeTag *prev = NULL;
 
-	for ( int w = 0; w < m_Tags.m_Words.Size(); w++ )
+	for ( intp w = 0; w < m_Tags.m_Words.Count(); w++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ w ];
 		Assert( word );
 		if ( !word )
 			continue;
 
-		for ( int i = 0; i < word->m_Phonemes.Size(); i++ )
+		for ( intp i = 0; i < word->m_Phonemes.Count(); i++ )
 		{
 			CPhonemeTag *current = word->m_Phonemes[ i ];
 			
@@ -5236,18 +5234,18 @@ void PhonemeEditor::SeparatePhonemes( void )
 	PushUndo();
 
 	// Three pixels
-	double time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 6;
+	float time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 6;
 
 	CPhonemeTag *prev = NULL;
 
-	for ( int w = 0; w < m_Tags.m_Words.Size(); w++ )
+	for ( intp w = 0; w < m_Tags.m_Words.Count(); w++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ w ];
 		Assert( word );
 		if ( !word )
 			continue;
 
-		for ( int i = 0; i < word->m_Phonemes.Size(); i++ )
+		for ( intp i = 0; i < word->m_Phonemes.Count(); i++ )
 		{
 			CPhonemeTag *current = word->m_Phonemes[ i ];
 
@@ -5385,7 +5383,7 @@ void PhonemeEditor::CommitExtracted( void )
 
 	m_nLastExtractionResult		= SR_RESULT_NORESULT;
 
-	if ( !m_TagsExt.m_Words.Size() )
+	if ( !m_TagsExt.m_Words.Count() )
 		return;
 
 	SetDirty( true );
@@ -5637,9 +5635,9 @@ void PhonemeEditor::AddTag( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Event Tag Name" );
-	strcpy( params.m_szPrompt, "Name:" );
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Event Tag Name" );
+	V_strcpy_safe( params.m_szPrompt, "Name:" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	if ( !InputProperties( &params ) )
 		return;
@@ -5678,7 +5676,7 @@ void PhonemeEditor::ClearEvent( void )
 
 void PhonemeEditor::TraverseWords( PEWORDITERFUNC pfn, float fparam )
 {
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
@@ -5690,13 +5688,13 @@ void PhonemeEditor::TraverseWords( PEWORDITERFUNC pfn, float fparam )
 
 void PhonemeEditor::TraversePhonemes( PEPHONEMEITERFUNC pfn, float fparam )
 {
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
 			continue;
 
-		for ( int j = 0; j < word->m_Phonemes.Size(); j++ )
+		for ( intp j = 0; j < word->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *phoneme = word->m_Phonemes[ j ];
 			if ( !phoneme )
@@ -5827,7 +5825,7 @@ void PhonemeEditor::ITER_CountSelectedPhonemes( CPhonemeTag *phoneme, CWordTag *
 // Undo/Redo
 void PhonemeEditor::Undo( void )
 {
-	if ( m_UndoStack.Size() > 0 && m_nUndoLevel > 0 )
+	if ( m_UndoStack.Count() > 0 && m_nUndoLevel > 0 )
 	{
 		m_nUndoLevel--;
 		PEUndo *u = m_UndoStack[ m_nUndoLevel ];
@@ -5842,7 +5840,7 @@ void PhonemeEditor::Undo( void )
 
 void PhonemeEditor::Redo( void )
 {
-	if ( m_UndoStack.Size() > 0 && m_nUndoLevel <= m_UndoStack.Size() - 1 )
+	if ( m_UndoStack.Count() > 0 && m_nUndoLevel <= m_UndoStack.Count() - 1 )
 	{
 		PEUndo *u = m_UndoStack[ m_nUndoLevel ];
 		Assert( u->redo );
@@ -5885,7 +5883,7 @@ void PhonemeEditor::PushRedo( void )
 
 void PhonemeEditor::WipeUndo( void )
 {
-	while ( m_UndoStack.Size() > 0 )
+	while ( m_UndoStack.Count() > 0 )
 	{
 		PEUndo *u = m_UndoStack[ 0 ];
 		delete u->undo;
@@ -5899,7 +5897,7 @@ void PhonemeEditor::WipeUndo( void )
 void PhonemeEditor::WipeRedo( void )
 {
 	// Wipe everything above level
-	while ( m_UndoStack.Size() > m_nUndoLevel )
+	while ( m_UndoStack.Count() > m_nUndoLevel )
 	{
 		PEUndo *u = m_UndoStack[ m_nUndoLevel ];
 		delete u->undo;
@@ -5914,7 +5912,7 @@ void PhonemeEditor::WipeRedo( void )
 // Input  : word - 
 //			phoneme - 
 //-----------------------------------------------------------------------------
-void PhonemeEditor::SetClickedPhoneme( int word, int phoneme )
+void PhonemeEditor::SetClickedPhoneme( intp word, intp phoneme )
 {
 	m_nClickedPhoneme = phoneme;
 	m_nClickedWord = word;
@@ -5929,14 +5927,14 @@ CPhonemeTag *PhonemeEditor::GetClickedPhoneme( void )
 	if ( m_nClickedPhoneme < 0 || m_nClickedWord < 0 )
 		return NULL;
 
-	if ( m_nClickedWord >= m_Tags.m_Words.Size() )
+	if ( m_nClickedWord >= m_Tags.m_Words.Count() )
 		return NULL;
 
 	CWordTag *word = m_Tags.m_Words[ m_nClickedWord ];
 	if ( !word )
 		return NULL;
 
-	if ( m_nClickedPhoneme >= word->m_Phonemes.Size() )
+	if ( m_nClickedPhoneme >= word->m_Phonemes.Count() )
 		return NULL;
 
 	CPhonemeTag *phoneme = word->m_Phonemes[ m_nClickedPhoneme ];
@@ -5952,7 +5950,7 @@ CWordTag *PhonemeEditor::GetClickedWord( void )
 	if ( m_nClickedWord < 0 )
 		return NULL;
 
-	if ( m_nClickedWord >= m_Tags.m_Words.Size() )
+	if ( m_nClickedWord >= m_Tags.m_Words.Count() )
 		return NULL;
 
 	CWordTag *word = m_Tags.m_Words[ m_nClickedWord ];
@@ -6010,28 +6008,28 @@ void PhonemeEditor::ShowContextMenu_Phonemes( int mx, int my )
 		}
 	}
 
-	if ( m_pWaveFile && m_TagsExt.m_Words.Size() )
+	if ( m_pWaveFile && m_TagsExt.m_Words.Count() )
 	{
 		pop->addSeparator();
 		pop->add( va( "Commit extraction" ) , IDC_COMMITEXTRACTED );
 		pop->add( va( "Clear extraction" ), IDC_CLEAREXTRACTED );
 	}
 
-	if ( m_nUndoLevel != 0 || m_nUndoLevel != m_UndoStack.Size()  )
+	if ( m_nUndoLevel != 0 || m_nUndoLevel != m_UndoStack.Count()  )
 	{
 		pop->addSeparator();
 		if ( m_nUndoLevel != 0 )
 		{
 			pop->add( va( "Undo" ), IDC_UNDO );
 		}
-		if ( m_nUndoLevel != m_UndoStack.Size() )
+		if ( m_nUndoLevel != m_UndoStack.Count() )
 		{
 			pop->add( va( "Redo" ), IDC_REDO );
 		}
 		pop->add( va( "Clear Undo Info" ), IDC_CLEARUNDO );
 	}
 
-	if ( m_Tags.m_Words.Size() > 0 )
+	if ( m_Tags.m_Words.Count() > 0 )
 	{
 		pop->addSeparator();
 		pop->add( va( "Cleanup words/phonemes" ), IDC_CLEANUP );
@@ -6095,7 +6093,7 @@ void PhonemeEditor::ShowContextMenu_Emphasis( int mx, int my )
 		pop->add( va( "Deselect All" ), IDC_EMPHASIS_DESELECT );
 	}
 
-	if ( m_nUndoLevel != 0 || m_nUndoLevel != m_UndoStack.Size()  )
+	if ( m_nUndoLevel != 0 || m_nUndoLevel != m_UndoStack.Count()  )
 	{
 		pop->addSeparator();
 
@@ -6103,7 +6101,7 @@ void PhonemeEditor::ShowContextMenu_Emphasis( int mx, int my )
 		{
 			pop->add( va( "Undo" ), IDC_UNDO );
 		}
-		if ( m_nUndoLevel != m_UndoStack.Size() )
+		if ( m_nUndoLevel != m_UndoStack.Count() )
 		{
 			pop->add( va( "Redo" ), IDC_REDO );
 		}
@@ -6241,10 +6239,10 @@ void PhonemeEditor::SelectNextPhoneme( int direction )
 		if ( m_nSelectedWordCount == 1 )
 		{
 			CWordTag *word = GetSelectedWord();
-			if ( word && word->m_Phonemes.Size() > 0 )
+			if ( word && word->m_Phonemes.Count() > 0 )
 			{
 				m_nSelectedPhonemeCount = 1;
-				CPhonemeTag *p = word->m_Phonemes[ direction ? word->m_Phonemes.Size() - 1 : 0 ];
+				CPhonemeTag *p = word->m_Phonemes[ direction ? word->m_Phonemes.Count() - 1 : 0 ];
 				p->m_bSelected = true;
 			}
 			else
@@ -6260,13 +6258,13 @@ void PhonemeEditor::SelectNextPhoneme( int direction )
 
 	Con_Printf( "Move to next phoneme %s\n", direction == -1 ? "left" : "right" );
 
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
 			continue;
 
-		for ( int j = 0; j < word->m_Phonemes.Size(); j++ )
+		for ( intp j = 0; j < word->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *phoneme = word->m_Phonemes[ j ];
 			if ( !phoneme )
@@ -6276,12 +6274,12 @@ void PhonemeEditor::SelectNextPhoneme( int direction )
 				continue;
 
 			// Deselect this one and move 
-			int nextindex = j + direction;
+			intp nextindex = j + direction;
 			if ( nextindex < 0 )
 			{
-				nextindex = word->m_Phonemes.Size() - 1;
+				nextindex = word->m_Phonemes.Count() - 1;
 			}
-			else if ( nextindex >= word->m_Phonemes.Size() )
+			else if ( nextindex >= word->m_Phonemes.Count() )
 			{
 				nextindex = 0;
 			}
@@ -6302,7 +6300,7 @@ void PhonemeEditor::SelectNextPhoneme( int direction )
 
 bool PhonemeEditor::IsPhonemeSelected( CWordTag *word )
 {
-	for ( int i = 0 ; i < word->m_Phonemes.Size(); i++ )
+	for ( intp i = 0 ; i < word->m_Phonemes.Count(); i++ )
 	{
 		CPhonemeTag *p = word->m_Phonemes[ i ];
 		if ( !p || !p->m_bSelected )
@@ -6324,9 +6322,9 @@ void PhonemeEditor::SelectNextWord( int direction )
 		 m_nSelectedPhonemeCount != 1 )
 	{
 		// Selected first word then
-		if ( m_nSelectedWordCount == 0 && m_Tags.m_Words.Size() > 0 )
+		if ( m_nSelectedWordCount == 0 && m_Tags.m_Words.Count() > 0 )
 		{
-			CWordTag *word = m_Tags.m_Words[ direction ? m_Tags.m_Words.Size() - 1 : 0 ];
+			CWordTag *word = m_Tags.m_Words[ direction ? m_Tags.m_Words.Count() - 1 : 0 ];
 			word->m_bSelected = true;
 			m_nSelectedWordCount = 1;
 		}
@@ -6338,7 +6336,7 @@ void PhonemeEditor::SelectNextWord( int direction )
 
 	Con_Printf( "Move to next word %s\n", direction == -1 ? "left" : "right" );
 
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
@@ -6358,7 +6356,7 @@ void PhonemeEditor::SelectNextWord( int direction )
 		// Deselect word
 		word->m_bSelected = false;
 
-		for ( int j = 0; j < word->m_Phonemes.Size(); j++ )
+		for ( intp j = 0; j < word->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *phoneme = word->m_Phonemes[ j ];
 			if ( !phoneme )
@@ -6371,12 +6369,12 @@ void PhonemeEditor::SelectNextWord( int direction )
 		}
 
 		// Deselect this one and move 
-		int nextword = i + direction;
+		intp nextword = i + direction;
 		if ( nextword < 0 )
 		{
-			nextword = m_Tags.m_Words.Size() - 1;
+			nextword = m_Tags.m_Words.Count() - 1;
 		}
-		else if ( nextword >= m_Tags.m_Words.Size() )
+		else if ( nextword >= m_Tags.m_Words.Count() )
 		{
 			nextword = 0;
 		}
@@ -6384,7 +6382,7 @@ void PhonemeEditor::SelectNextWord( int direction )
 		word = m_Tags.m_Words[ nextword ];
 		word->m_bSelected = true;
 
-		if ( word->m_Phonemes.Size() > 0 )
+		if ( word->m_Phonemes.Count() > 0 )
 		{
 			CPhonemeTag *phoneme = NULL;
 
@@ -6394,7 +6392,7 @@ void PhonemeEditor::SelectNextWord( int direction )
 			}
 			else
 			{
-				phoneme = word->m_Phonemes[ word->m_Phonemes.Size() - 1 ];
+				phoneme = word->m_Phonemes[ word->m_Phonemes.Count() - 1 ];
 			}
 
 			phoneme->m_bSelected = true;
@@ -6515,9 +6513,9 @@ void PhonemeEditor::ExtendSelectedWordEndTime( int direction )
 // Input  : *word - 
 // Output : int
 //-----------------------------------------------------------------------------
-int PhonemeEditor::IndexOfWord( CWordTag *word )
+intp PhonemeEditor::IndexOfWord( CWordTag *word )
 {
-	for ( int i = 0 ; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0 ; i < m_Tags.m_Words.Count(); i++ )
 	{
 		if ( m_Tags.m_Words[ i ] == word )
 			return i;
@@ -6542,15 +6540,15 @@ float PhonemeEditor::GetTimeGapToNextWord( bool forward, CWordTag *currentWord, 
 	if ( !currentWord )
 		return 0.0f;
 
-	int wordnum = IndexOfWord( currentWord );
+	intp wordnum = IndexOfWord( currentWord );
 	if ( wordnum == -1 )
 		return 0.0f;
 
 	// Go in correct direction
-	int newwordnum = wordnum + ( forward ? 1 : -1 );
+	intp newwordnum = wordnum + ( forward ? 1 : -1 );
 
 	// There is no next word
-	if ( newwordnum >= m_Tags.m_Words.Size() )
+	if ( newwordnum >= m_Tags.m_Words.Count() )
 	{
 		return PLENTY_OF_TIME;
 	}
@@ -6581,10 +6579,6 @@ float PhonemeEditor::GetTimeGapToNextWord( bool forward, CWordTag *currentWord, 
 
 		return ( currentStart - previousEnd );
 	}
-
-	
-	Assert( 0 );
-	return 0.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -6614,16 +6608,16 @@ float PhonemeEditor::GetTimeGapToNextPhoneme( bool forward, CPhonemeTag *current
 	if ( !word )
 		return 0.0f;
 
-	int wordnum = IndexOfWord( word );
+	intp wordnum = IndexOfWord( word );
 	Assert( wordnum != -1 );
 
-	int phonemenum = word->IndexOfPhoneme( currentPhoneme );
+	intp phonemenum = word->IndexOfPhoneme( currentPhoneme );
 	if ( phonemenum < 0  )
 		return 0.0f;
 
 	CPhonemeTag *nextPhoneme = NULL;
 
-	int nextphoneme = phonemenum + ( forward ? 1 : -1 );
+	intp nextphoneme = phonemenum + ( forward ? 1 : -1 );
 
 	// Try last phoneme of previous word
 	if ( nextphoneme < 0 )
@@ -6635,11 +6629,11 @@ float PhonemeEditor::GetTimeGapToNextPhoneme( bool forward, CPhonemeTag *current
 			{
 				*ppword = m_Tags.m_Words[ wordnum ];
 			}
-			if ( m_Tags.m_Words.Size() > 0 )
+			if ( m_Tags.m_Words.Count() > 0 )
 			{
-				if ( m_Tags.m_Words[ wordnum ]->m_Phonemes.Size() > 0 )
+				if ( m_Tags.m_Words[ wordnum ]->m_Phonemes.Count() > 0 )
 				{
-					nextPhoneme = m_Tags.m_Words[ wordnum ]->m_Phonemes[ m_Tags.m_Words[ wordnum ]->m_Phonemes.Size() - 1 ];
+					nextPhoneme = m_Tags.m_Words[ wordnum ]->m_Phonemes[ m_Tags.m_Words[ wordnum ]->m_Phonemes.Count() - 1 ];
 					break;
 				}
 			}
@@ -6647,19 +6641,19 @@ float PhonemeEditor::GetTimeGapToNextPhoneme( bool forward, CPhonemeTag *current
 		}
 	}
 	// Try first phoneme of next word, if there is one
-	else if ( nextphoneme >= word->m_Phonemes.Size() )
+	else if ( nextphoneme >= word->m_Phonemes.Count() )
 	{
 		wordnum++;
-		while ( wordnum < m_Tags.m_Words.Size() )
+		while ( wordnum < m_Tags.m_Words.Count() )
 		{
 			if ( ppword )
 			{
 				*ppword = m_Tags.m_Words[ wordnum ];
 			}
 			// Really it can't be zero, but check anyway
-			if ( m_Tags.m_Words.Size() > 0 )
+			if ( m_Tags.m_Words.Count() > 0 )
 			{
-				if ( m_Tags.m_Words[ wordnum ]->m_Phonemes.Size() > 0 )
+				if ( m_Tags.m_Words[ wordnum ]->m_Phonemes.Count() > 0 )
 				{
 					nextPhoneme = m_Tags.m_Words[ wordnum ]->m_Phonemes[ 0 ];
 					break;
@@ -6702,13 +6696,13 @@ CPhonemeTag *PhonemeEditor::GetSelectedPhoneme( void )
 	if ( m_nSelectedPhonemeCount != 1 )
 		return NULL;
 
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *w = m_Tags.m_Words[ i ];
 		if ( !w )
 			continue;
 
-		for ( int j = 0; j < w->m_Phonemes.Size() ; j++ )
+		for ( intp j = 0; j < w->m_Phonemes.Count() ; j++ )
 		{
 			CPhonemeTag *p = w->m_Phonemes[ j ];
 			if ( !p || !p->m_bSelected )
@@ -6727,7 +6721,7 @@ CWordTag *PhonemeEditor::GetSelectedWord( void )
 	if ( m_nSelectedWordCount != 1 )
 		return NULL;
 
-	for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+	for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 	{
 		CWordTag *w = m_Tags.m_Words[ i ];
 		if ( !w || !w->m_bSelected )
@@ -6750,7 +6744,7 @@ void PhonemeEditor::OnMouseMove( mxEvent *event )
 	{
 		DrawFocusRect( "moving old" );
 
-		for ( int i = 0; i < m_FocusRects.Size(); i++ )
+		for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 		{
 			CFocusRect *f = &m_FocusRects[ i ];
 			f->m_rcFocus = f->m_rcOrig;
@@ -6914,7 +6908,7 @@ void PhonemeEditor::EditInsertFirstPhonemeOfWord( void )
 	if ( !cw )
 		return;
 
-	if ( cw->m_Phonemes.Size() != 0 )
+	if ( cw->m_Phonemes.Count() != 0 )
 	{
 		Con_Printf( "Can't insert first phoneme into %s, already has phonemes\n", cw->GetWord() );
 		return;
@@ -6922,8 +6916,8 @@ void PhonemeEditor::EditInsertFirstPhonemeOfWord( void )
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szName, "" );
 
 	params.m_nLeft = -1;
 	params.m_nTop = -1;
@@ -6947,7 +6941,7 @@ void PhonemeEditor::EditInsertFirstPhonemeOfWord( void )
 		params.m_nTop	= pt.y;
 	}
 
-	int iret = PhonemeProperties( &params );
+	intp iret = PhonemeProperties( &params );
 	SetFocus( (HWND)getHandle() );
 	if ( !iret )
 	{
@@ -7034,14 +7028,12 @@ void PhonemeEditor::SelectPhonemes( bool forward )
 	if ( !word )
 		return;
 
-	int wordNum = IndexOfWord( word );
+	intp wordNum = IndexOfWord( word );
 	if ( wordNum == -1 )
 		return;
 
 	// Select remaining phonemes in current word
-	int i;
-
-	i = word->IndexOfPhoneme( phoneme );
+	intp i = word->IndexOfPhoneme( phoneme );
 	if ( i == -1 )
 		return;
 
@@ -7050,7 +7042,7 @@ void PhonemeEditor::SelectPhonemes( bool forward )
 		// Start at next one
 		i++;
 
-		for ( ; i < word->m_Phonemes.Size(); i++ )
+		for ( ; i < word->m_Phonemes.Count(); i++ )
 		{
 			phoneme = word->m_Phonemes[ i ];
 			phoneme->m_bSelected = true;
@@ -7059,11 +7051,11 @@ void PhonemeEditor::SelectPhonemes( bool forward )
 		// Now start at next word
 		wordNum++;
 
-		for ( ; wordNum < m_Tags.m_Words.Size(); wordNum++ )
+		for ( ; wordNum < m_Tags.m_Words.Count(); wordNum++ )
 		{
 			word = m_Tags.m_Words[ wordNum ];
 
-			for ( int j = 0; j < word->m_Phonemes.Size(); j++ )
+			for ( intp j = 0; j < word->m_Phonemes.Count(); j++ )
 			{
 				phoneme = word->m_Phonemes[ j ];
 				phoneme->m_bSelected = true;
@@ -7088,7 +7080,7 @@ void PhonemeEditor::SelectPhonemes( bool forward )
 		{
 			word = m_Tags.m_Words[ wordNum ];
 
-			for ( int j = 0; j < word->m_Phonemes.Size(); j++ )
+			for ( intp j = 0; j < word->m_Phonemes.Count(); j++ )
 			{
 				phoneme = word->m_Phonemes[ j ];
 				phoneme->m_bSelected = true;
@@ -7114,7 +7106,7 @@ void PhonemeEditor::SelectWords( bool forward )
 	if ( !word )
 		return;
 
-	int wordNum = IndexOfWord( word );
+	intp wordNum = IndexOfWord( word );
 	if ( wordNum == -1 )
 		return;
 
@@ -7122,7 +7114,7 @@ void PhonemeEditor::SelectWords( bool forward )
 	{
 		wordNum++;
 
-		for ( ; wordNum < m_Tags.m_Words.Size(); wordNum++ )
+		for ( ; wordNum < m_Tags.m_Words.Count(); wordNum++ )
 		{
 			word = m_Tags.m_Words[ wordNum ];
 			word->m_bSelected = true;
@@ -7157,7 +7149,7 @@ bool PhonemeEditor::AreSelectedWordsContiguous( void )
 	int runcount = 0;
 	bool parity = false;
 
-	for ( int i = 0 ; i < m_Tags.m_Words.Size() ; i++ )
+	for ( intp i = 0 ; i < m_Tags.m_Words.Count() ; i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
@@ -7200,13 +7192,13 @@ bool PhonemeEditor::AreSelectedPhonemesContiguous( void )
 	int runcount = 0;
 	bool parity = false;
 
-	for ( int i = 0 ; i < m_Tags.m_Words.Size() ; i++ )
+	for ( intp i = 0 ; i < m_Tags.m_Words.Count() ; i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
 			continue;
 
-		for ( int j = 0 ; j < word->m_Phonemes.Size(); j++ )
+		for ( intp j = 0 ; j < word->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *phoneme = word->m_Phonemes[ j ];
 			if ( !phoneme )
@@ -7246,9 +7238,9 @@ void PhonemeEditor::SortWords( bool prepareundo )
 	}
 
 	// Just bubble sort by start time
-	int c = m_Tags.m_Words.Count();
+	intp c = m_Tags.m_Words.Count();
 
-	int i;
+	intp i;
 
 	// check for start > end
 	for ( i = 0; i < c; i++ )
@@ -7264,7 +7256,7 @@ void PhonemeEditor::SortWords( bool prepareundo )
 
 	for ( i = 0; i < c; i++ )
 	{
-		for ( int j = i + 1; j < c; j++ )
+		for ( intp j = i + 1; j < c; j++ )
 		{
 			CWordTag *p1 = m_Tags.m_Words[ i ];
 			CWordTag *p2 = m_Tags.m_Words[ j ];
@@ -7293,14 +7285,14 @@ void PhonemeEditor::SortPhonemes( bool prepareundo )
 	}
 
 	// Just bubble sort by start time
-	int wc = m_Tags.m_Words.Count();
-	for ( int w = 0; w < wc; w++ )
+	intp wc = m_Tags.m_Words.Count();
+	for ( intp w = 0; w < wc; w++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ w ];
 		Assert( word );
 
-		int c = word->m_Phonemes.Count();
-		int i;
+		intp c = word->m_Phonemes.Count();
+		intp i;
 
 		// check for start > end
 		for ( i = 0; i < c; i++ )
@@ -7317,7 +7309,7 @@ void PhonemeEditor::SortPhonemes( bool prepareundo )
 
 		for ( i = 0; i < c; i++ )
 		{
-			for ( int j = i + 1; j < c; j++ )
+			for ( intp j = i + 1; j < c; j++ )
 			{
 				CPhonemeTag *p1 = word->m_Phonemes[ i ];
 				CPhonemeTag *p2 = word->m_Phonemes[ j ];
@@ -7355,14 +7347,14 @@ void PhonemeEditor::CleanupWordsAndPhonemes( bool prepareundo )
 	SortWords( false );
 	SortPhonemes( false );
 
-	for ( int i = 0 ; i < m_Tags.m_Words.Size() ; i++ )
+	for ( intp i = 0 ; i < m_Tags.m_Words.Count() ; i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
 			continue;
 
 		CWordTag *next = NULL;
-		if ( i < m_Tags.m_Words.Size() - 1 )
+		if ( i < m_Tags.m_Words.Count() - 1 )
 		{
 			next = m_Tags.m_Words[ i + 1 ];
 		}
@@ -7373,20 +7365,20 @@ void PhonemeEditor::CleanupWordsAndPhonemes( bool prepareundo )
 			float eps = next->m_flStartTime - word->m_flEndTime;
 			if ( eps && eps <= snap_epsilon )
 			{
-				float t = (word->m_flEndTime + next->m_flStartTime) * 0.5;
+				float t = (word->m_flEndTime + next->m_flStartTime) * 0.5f;
 				word->m_flEndTime = t;
 				next->m_flStartTime = t;
 			}
 		}
 
-		for ( int j = 0 ; j < word->m_Phonemes.Size(); j++ )
+		for ( intp j = 0 ; j < word->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *phoneme = word->m_Phonemes[ j ];
 			if ( !phoneme )
 				continue;
 
 			CPhonemeTag *next = NULL;
-			if ( j < word->m_Phonemes.Size() - 1 )
+			if ( j < word->m_Phonemes.Count() - 1 )
 			{
 				next = word->m_Phonemes[ j + 1 ];
 			}
@@ -7396,7 +7388,7 @@ void PhonemeEditor::CleanupWordsAndPhonemes( bool prepareundo )
 				float eps = next->GetStartTime() - phoneme->GetEndTime();
 				if ( eps && eps <= snap_epsilon )
 				{
-					float t = (phoneme->GetEndTime() + next->GetStartTime() ) * 0.5;
+					float t = (phoneme->GetEndTime() + next->GetStartTime() ) * 0.5f;
 					phoneme->SetEndTime( t );
 					next->SetStartTime( t );
 				}
@@ -7428,14 +7420,14 @@ void PhonemeEditor::RealignPhonemesToWords( bool prepareundo )
 	SortWords( false );
 	SortPhonemes( false );
 
-	for ( int i = 0 ; i < m_Tags.m_Words.Size() ; i++ )
+	for ( intp i = 0 ; i < m_Tags.m_Words.Count() ; i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
 			continue;
 
 		CWordTag *next = NULL;
-		if ( i < m_Tags.m_Words.Size() - 1 )
+		if ( i < m_Tags.m_Words.Count() - 1 )
 		{
 			next = m_Tags.m_Words[ i + 1 ];
 		}
@@ -7446,7 +7438,7 @@ void PhonemeEditor::RealignPhonemesToWords( bool prepareundo )
 		if ( !FirstPhoneme )
 			continue;
 
-		CPhonemeTag *LastPhoneme = word->m_Phonemes[ word->m_Phonemes.Size() - 1 ];
+		CPhonemeTag *LastPhoneme = word->m_Phonemes[ word->m_Phonemes.Count() - 1 ];
 		if ( !LastPhoneme )
 			continue;
 
@@ -7454,14 +7446,14 @@ void PhonemeEditor::RealignPhonemesToWords( bool prepareundo )
 
 		float phoneme_shift = FirstPhoneme->GetStartTime();
 
-		for ( int j = 0 ; j < word->m_Phonemes.Size(); j++ )
+		for ( intp j = 0 ; j < word->m_Phonemes.Count(); j++ )
 		{
 			CPhonemeTag *phoneme = word->m_Phonemes[ j ];
 			if ( !phoneme )
 				continue;
 
 			CPhonemeTag *next = NULL;
-			if ( j < word->m_Phonemes.Size() - 1 )
+			if ( j < word->m_Phonemes.Count() - 1 )
 			{
 				next = word->m_Phonemes[ j + 1 ];
 			}
@@ -7504,7 +7496,7 @@ void PhonemeEditor::RealignWordsToPhonemes( bool prepareundo )
 	SortWords( false );
 	SortPhonemes( false );
 
-	for ( int i = 0 ; i < m_Tags.m_Words.Size() ; i++ )
+	for ( intp i = 0 ; i < m_Tags.m_Words.Count() ; i++ )
 	{
 		CWordTag *word = m_Tags.m_Words[ i ];
 		if ( !word )
@@ -7514,7 +7506,7 @@ void PhonemeEditor::RealignWordsToPhonemes( bool prepareundo )
 		if ( !FirstPhoneme )
 			continue;
 
-		CPhonemeTag *LastPhoneme = word->m_Phonemes[ word->m_Phonemes.Size() - 1 ];
+		CPhonemeTag *LastPhoneme = word->m_Phonemes[ word->m_Phonemes.Count() - 1 ];
 		if ( !LastPhoneme )
 			continue;
 
@@ -7541,14 +7533,14 @@ float PhonemeEditor::ComputeMaxWordShift( bool forward, bool allowcrop )
 
 	if ( forward )
 	{
-		for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+		for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 		{
 			CWordTag *w1 = m_Tags.m_Words[ i ];
 			if ( !w1 || !w1->m_bSelected )
 				continue;
 
 			CWordTag *w2 = NULL;
-			for ( int search = i + 1; search < m_Tags.m_Words.Size() ; search++ )
+			for ( intp search = i + 1; search < m_Tags.m_Words.Count() ; search++ )
 			{
 				CWordTag *check = m_Tags.m_Words[ search ];
 				if ( !check || check->m_bSelected )
@@ -7579,14 +7571,14 @@ float PhonemeEditor::ComputeMaxWordShift( bool forward, bool allowcrop )
 	}
 	else
 	{
-		for ( int i = m_Tags.m_Words.Size() -1; i >= 0; i-- )
+		for ( intp i = m_Tags.m_Words.Count() -1; i >= 0; i-- )
 		{
 			CWordTag *w1 = m_Tags.m_Words[ i ];
 			if ( !w1 || !w1->m_bSelected )
 				continue;
 
 			CWordTag *w2 = NULL;
-			for ( int search = i - 1; search >= 0 ; search-- )
+			for ( intp search = i - 1; search >= 0 ; search-- )
 			{
 				CWordTag *check = m_Tags.m_Words[ search ];
 				if ( !check || check->m_bSelected )
@@ -7628,13 +7620,13 @@ float PhonemeEditor::ComputeMaxPhonemeShift( bool forward, bool allowcrop )
 
 	if ( forward )
 	{
-		for ( int i = 0; i < m_Tags.m_Words.Size(); i++ )
+		for ( intp i = 0; i < m_Tags.m_Words.Count(); i++ )
 		{
 			CWordTag *word = m_Tags.m_Words[ i ];
 			if ( !word )
 				continue;
 
-			for ( int j = 0; j < word->m_Phonemes.Size(); j++ )
+			for ( intp j = 0; j < word->m_Phonemes.Count(); j++ )
 			{
 				CPhonemeTag *p1 = word->m_Phonemes[ j ];
 				if ( !p1 || !p1->m_bSelected )
@@ -7683,13 +7675,13 @@ float PhonemeEditor::ComputeMaxPhonemeShift( bool forward, bool allowcrop )
 	}
 	else
 	{
-		for ( int i = m_Tags.m_Words.Size() -1; i >= 0; i-- )
+		for ( intp i = m_Tags.m_Words.Count() -1; i >= 0; i-- )
 		{
 			CWordTag *word = m_Tags.m_Words[ i ];
 			if ( !word )
 				continue;
 
-			for ( int j = word->m_Phonemes.Size() - 1; j >= 0; j-- )
+			for ( intp j = word->m_Phonemes.Count() - 1; j >= 0; j-- )
 			{
 				CPhonemeTag *p1 = word->m_Phonemes[ j ];
 				if ( !p1 || !p1->m_bSelected )
@@ -7974,8 +7966,8 @@ void PhonemeEditor::ValidateSpeechAPIIndex()
 
 void PhonemeEditor::UnloadPhonemeConverters()
 {
-	int c = g_Extractors.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	intp c = g_Extractors.Count();
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		Extractor *e = &g_Extractors[ i ];
 		Sys_UnloadModule( e->module );
@@ -7995,8 +7987,8 @@ bool PhonemeEditor::CheckSpeechAPI( void )
 
 	if ( !m_pPhonemeExtractor )
 	{
-		int c = g_Extractors.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = g_Extractors.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			Extractor *e = &g_Extractors[ i ];
 			if ( e->apitype == (PE_APITYPE)g_viewerSettings.speechapiindex )
@@ -8567,7 +8559,7 @@ void PhonemeEditor::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper )
 
 	// 
 	char sz[ 32 ];
-	sprintf( sz, "%.3f", m_flScrub );
+	V_sprintf_safe( sz, "%.3f", m_flScrub );
 
 	int len = drawHelper.CalcTextWidth( "Arial", 9, 500, sz );
 

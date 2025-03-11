@@ -550,10 +550,10 @@ void CPixelVisibilitySystem::LevelInitPreEntity()
 
 void CPixelVisibilitySystem::LevelShutdownPostEntity()
 {
-	m_pProxyMaterial->DecrementReferenceCount();
-	m_pProxyMaterial = NULL;
 	m_pDrawMaterial->DecrementReferenceCount();
 	m_pDrawMaterial = NULL;
+	m_pProxyMaterial->DecrementReferenceCount();
+	m_pProxyMaterial = NULL;
 	DeleteUnusedSets(true);
 	m_setList.Purge();
 	m_queryList.Purge();

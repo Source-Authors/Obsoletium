@@ -60,9 +60,9 @@ public:
 
 	void			AddClip( CDmeClip *clip );
 	bool			RemoveClip( CDmeClip *clip );
-	void			RemoveClip( int i );
+	void			RemoveClip( intp i );
 	void			RemoveAllClips();
-	int				FindClip( CDmeClip *clip );
+	intp			FindClip( CDmeClip *clip ) const;
 	CDmeClip		*FindNamedClip( const char *name );
 
 	DmeClipType_t	GetClipType() const;

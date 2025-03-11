@@ -1011,7 +1011,7 @@ void ListViewPanel::OnKeyTyped(wchar_t unichar)
 		uniString[1] = 0;
 
 		char buf[2];
-		g_pVGuiLocalize->ConvertUnicodeToANSI(uniString, buf, sizeof(buf));
+		g_pVGuiLocalize->ConvertUnicodeToANSI(uniString, buf);
 
 		intp i; 
 		intp itemPos = m_SortedItems.Find(m_LastSelectedItemID);

@@ -579,7 +579,7 @@ void DumpDispLuxels( int iFace, Vector &color, int iLuxel, int nBump )
 	{
 		if ( pFileLuxels[iBump] == NULL )
 		{
-			sprintf( szFileName, "luxels_bump%d.txt", iBump );
+			V_sprintf_safe( szFileName, "luxels_bump%d.txt", iBump );
 			pFileLuxels[iBump] = g_pFileSystem->Open( szFileName, "w" );
 		}
 	}

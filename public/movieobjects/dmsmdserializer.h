@@ -53,14 +53,14 @@ public:
 	}
 
 	// Inherited from IDMSerializer
-	virtual const char *GetName() const { return "smd"; }
-	virtual const char *GetDescription() const { return "VALVe SMD"; }
-	virtual bool IsBinaryFormat() const { return false; }
-	virtual bool StoresVersionInFile() const { return true; }
-	virtual int GetCurrentVersion() const { return 1; }
-	virtual bool Serialize( CUtlBuffer &, CDmElement * ) { return false; }	// No DMX -> SMD support
+	const char *GetName() const override { return "smd"; }
+	const char *GetDescription() const override { return "VALVe SMD"; }
+	bool IsBinaryFormat() const override { return false; }
+	bool StoresVersionInFile() const override { return true; }
+	int GetCurrentVersion() const override { return 1; }
+	bool Serialize( CUtlBuffer &, CDmElement * ) override { return false; }	// No DMX -> SMD support
 
-	virtual bool Unserialize(
+	bool Unserialize(
 		CUtlBuffer &utlBuf,
 		const char *pszEncodingName,
 		int nEncodingVersion,
@@ -68,7 +68,7 @@ public:
 		int nSourceFormatVersion,
 		DmFileId_t nDmFileId,
 		DmConflictResolution_t nDmConflictResolution,
-		CDmElement **ppDmRoot );
+		CDmElement **ppDmRoot ) override;
 
 	// Methods used for importing (only should return non-NULL for serializers that return false from StoresVersionInFile)
 	virtual const char *GetImportedFormat() const { return NULL; }
@@ -92,7 +92,7 @@ public:
 	struct SmdJoint_t
 	{
 		int m_nId;				// The id parsed from the SMD file
-		int m_nActualId;		// The actual node id which is created after sorting and creating all joints in order with no gaps in numbering, corresponds to joitnIndex in DmeModel
+		intp m_nActualId;		// The actual node id which is created after sorting and creating all joints in order with no gaps in numbering, corresponds to joitnIndex in DmeModel
 		CUtlString m_sName;
 		int m_nParentId;
 		int m_nLineNumber;

@@ -251,7 +251,7 @@ void CMapPointHandle::Render2D(CRender2D *pRender)
 		pRender->SetTextColor(GetRValue(Options.colors.clrToolHandle), GetGValue(Options.colors.clrToolHandle), GetBValue(Options.colors.clrToolHandle) );
 		
 		char szText[100];
-		sprintf(szText, "(%0.f, %0.f, %0.f)", m_Origin.x, m_Origin.y, m_Origin.z);
+		V_sprintf_safe(szText, "(%0.f, %0.f, %0.f)", m_Origin.x, m_Origin.y, m_Origin.z);
 		pRender->DrawText(szText, ptText.x, ptText.y, CRender2D::TEXT_JUSTIFY_LEFT);
 	}
 
@@ -270,7 +270,7 @@ void CMapPointHandle::Render3D(CRender3D *pRender)
 		pRender->GetCamera()->GetViewPoint(vecViewPoint);
 		float flDist = (m_Origin - vecViewPoint).Length();
 
-		pRender->RenderSphere(m_Origin, 0.04 * flDist, 12, 12, 128, 128, 255);
+		pRender->RenderSphere(m_Origin, 0.04f * flDist, 12, 12, 128, 128, 255);
 
 		if ((m_pParent != NULL) && (m_bDrawLineToParent))
 		{
@@ -365,7 +365,7 @@ void CMapPointHandle::UpdateParentKey(void)
 		if (pEntity != NULL)
 		{
 			char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-			sprintf(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
+			V_sprintf_safe(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
 			pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 
 		}

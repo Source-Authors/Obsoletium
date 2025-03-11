@@ -11,11 +11,11 @@
 #pragma once
 #endif
 
-
+#include "windows/base_property_page.h"
 #include "MapClass.h"
 
 
-class CObjectPage : public CPropertyPage
+class CObjectPage : public CBasePropertyPage
 {
 	DECLARE_DYNCREATE(CObjectPage)
 
@@ -23,15 +23,22 @@ public:
 
 	CObjectPage(void)
 	{
-		m_bMultiEdit = false;
 		m_bFirstTimeActive = true;
 		m_bHasUpdatedData = false;
+		m_pObjectList = nullptr;
+		m_bMultiEdit = false;
+		m_bCanEdit = false;
+		m_pEditObjectRuntimeClass = nullptr;
 	}
 
-	CObjectPage(UINT nResourceID) : CPropertyPage(nResourceID) 
+	CObjectPage(UINT nResourceID) : CBasePropertyPage(nResourceID) 
 	{
-		m_bMultiEdit = false;
 		m_bFirstTimeActive = false;
+		m_bHasUpdatedData = false;
+		m_pObjectList = nullptr;
+		m_bMultiEdit = false;
+		m_bCanEdit = false;
+		m_pEditObjectRuntimeClass = nullptr;
 	}
 
 	~CObjectPage() {}

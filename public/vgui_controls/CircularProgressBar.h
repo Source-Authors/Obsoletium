@@ -68,7 +68,7 @@ private:
 
 	int m_nTextureId[NUM_PROGRESS_TEXTURES];
 	char *m_pszImageName[NUM_PROGRESS_TEXTURES];
-	int   m_lenImageName[NUM_PROGRESS_TEXTURES];
+	intp  m_lenImageName[NUM_PROGRESS_TEXTURES];
 };
 
 } // namespace vgui

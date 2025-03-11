@@ -29,7 +29,7 @@ public:
 		auto *sym = ((CUtlSymbol *)fieldInfo.pField);
 
 		char tmp[1024];
-		pRestore->ReadString( tmp, sizeof(tmp), 0 );
+		pRestore->ReadString( tmp, 0 );
 		*sym = m_symbolTable.AddString( tmp );
 	}
 	

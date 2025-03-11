@@ -33,17 +33,17 @@ public:
 	intp AddImage(vgui::IImage *image);
 
 	// returns the number of images
-	int GetImageCount();
+	intp GetImageCount();
 
 	// returns true if an index is valid
-	bool IsValidIndex(int imageIndex);
+	bool IsValidIndex(intp imageIndex);
 
 	// sets an image at a specified index, growing and adding NULL images if necessary
-	void SetImageAtIndex(int index, vgui::IImage *image);
+	void SetImageAtIndex(intp index, vgui::IImage *image);
 
 	// gets an image, imageIndex is of range [0, GetImageCount)
 	// image index 0 is always the blank image
-	vgui::IImage *GetImage(int imageIndex);
+	vgui::IImage *GetImage(intp imageIndex);
 
 private:
 	CUtlVector<vgui::IImage *> m_Images;

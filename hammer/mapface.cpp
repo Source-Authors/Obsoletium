@@ -57,8 +57,6 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector *normal, float dist, CCheckFa
 LPCTSTR GetDefaultTextureName();
 
 
-#pragma warning(disable:4244)
-
 
 //
 // Static member data initialization.
@@ -164,7 +162,7 @@ BOOL CMapFace::Fix(void)
 // Purpose: Returns the short texture name in 'pszName'. Places an empty string
 //			in 'pszName' if the face has no texture.
 //-----------------------------------------------------------------------------
-void CMapFace::GetTextureName(char *pszName) const
+void CMapFace::GetTextureName(char *pszName, intp nameSize) const
 {
 	Assert(pszName != NULL);
 
@@ -172,7 +170,7 @@ void CMapFace::GetTextureName(char *pszName) const
 	{
 		if (m_pTexture != NULL)
 		{
-			m_pTexture->GetShortName(pszName);
+			m_pTexture->GetShortName(pszName, nameSize);
 		}
 		else
 		{
@@ -181,7 +179,7 @@ void CMapFace::GetTextureName(char *pszName) const
 	}
 }
 
-static char *InvisToolTextures[]={
+static const char *InvisToolTextures[]={
 	"occluder",
 	"areaportal",
 	"invisible",
@@ -1161,7 +1159,7 @@ void CMapFace::DebugPoints(void)
 				Points[j][1] == Points[i][1] &&
 				Points[j][2] == Points[i][2])
 			{
-				AfxMessageBox("Dup Points in CMapFace::Create(winding_t*)");
+				AfxMessageBox("Dup Points in CMapFace::Create(winding_t*)", MB_ICONERROR);
 				break;
 			}
 		}
@@ -1326,11 +1324,14 @@ void CMapFace::SetTexture(IEditorTexture *pTexture, bool bRescaleTextureCoordina
 	}
 
 	m_pTexture = pTexture;
-
-	// Copy other things from m_pTexture.
-	m_pTexture->GetShortName(texture.texture);
-	texture.q2surface = m_pTexture->GetSurfaceAttributes();
-	texture.q2contents = m_pTexture->GetSurfaceContents();
+	
+	if (m_pTexture != NULL)
+	{
+		// Copy other things from m_pTexture.
+		m_pTexture->GetShortName(texture.texture);
+		texture.q2surface = m_pTexture->GetSurfaceAttributes();
+		texture.q2contents = m_pTexture->GetSurfaceContents();
+	}
 
 	BOOL bTexValid = FALSE;
 	if (m_pTexture != NULL)
@@ -1515,7 +1516,7 @@ BOOL CMapFace::CheckFace(CCheckFaceInfo *pInfo)
 				{
 					if (pInfo != NULL)
 					{
-						strcpy(pInfo->szDescription, "face has duplicate plane points");
+						V_strcpy_safe(pInfo->szDescription, "face has duplicate plane points");
 					}
 					return(FALSE);		
 				}
@@ -2607,7 +2608,8 @@ ChunkFileResult_t CMapFace::LoadKeyCallback(const char *szKey, const char *szVal
 	}
 	else if (!stricmp(szKey, "rotation"))
 	{
-		pFace->texture.rotate = atof(szValue);
+		// dimhotepus: atof -> strtof.
+		pFace->texture.rotate = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "plane"))
 	{
@@ -2624,7 +2626,7 @@ ChunkFileResult_t CMapFace::LoadKeyCallback(const char *szKey, const char *szVal
 	}
 	else if (!stricmp(szKey, "material"))
 	{
-		strcpy(pLoadFace->szTexName, szValue);
+		V_strcpy_safe(pLoadFace->szTexName, szValue);
 	}
 	else if (!stricmp(szKey, "uaxis"))
 	{
@@ -2779,7 +2781,7 @@ ChunkFileResult_t CMapFace::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	if (eResult == ChunkFile_Ok)
 	{
-		sprintf(szBuf, "(%g %g %g) (%g %g %g) (%g %g %g)",
+		V_sprintf_safe(szBuf, "(%g %g %g) (%g %g %g) (%g %g %g)",
 				(double)plane.planepts[0][0], (double)plane.planepts[0][1], (double)plane.planepts[0][2],
 				(double)plane.planepts[1][0], (double)plane.planepts[1][1], (double)plane.planepts[1][2],
 				(double)plane.planepts[2][0], (double)plane.planepts[2][1], (double)plane.planepts[2][2]);
@@ -2790,7 +2792,7 @@ ChunkFileResult_t CMapFace::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	if (eResult == ChunkFile_Ok)
 	{
 		char szTexture[MAX_PATH];
-		strcpy(szTexture, texture.texture);
+		V_strcpy_safe(szTexture, texture.texture);
 		strupr(szTexture);
 
 		eResult = pFile->WriteKeyValue("material", szTexture);
@@ -2798,13 +2800,13 @@ ChunkFileResult_t CMapFace::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 	if (eResult == ChunkFile_Ok)
 	{
-		sprintf(szBuf, "[%g %g %g %g] %g", (double)texture.UAxis[0], (double)texture.UAxis[1], (double)texture.UAxis[2], (double)texture.UAxis[3], (double)texture.scale[0]);
+		V_sprintf_safe(szBuf, "[%g %g %g %g] %g", (double)texture.UAxis[0], (double)texture.UAxis[1], (double)texture.UAxis[2], (double)texture.UAxis[3], (double)texture.scale[0]);
 		eResult = pFile->WriteKeyValue("uaxis", szBuf);
 	}
 
 	if (eResult == ChunkFile_Ok)
 	{
-		sprintf(szBuf, "[%g %g %g %g] %g", (double)texture.VAxis[0], (double)texture.VAxis[1], (double)texture.VAxis[2], (double)texture.VAxis[3], (double)texture.scale[1]);
+		V_sprintf_safe(szBuf, "[%g %g %g %g] %g", (double)texture.VAxis[0], (double)texture.VAxis[1], (double)texture.VAxis[2], (double)texture.VAxis[3], (double)texture.scale[1]);
 		eResult = pFile->WriteKeyValue("vaxis", szBuf);
 	}
 

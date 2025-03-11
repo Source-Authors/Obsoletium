@@ -30,15 +30,15 @@ class CDmObjSerializer : public IDmSerializer
 {
 public:
 	// Inherited from IDMSerializer
-	virtual const char *GetName() const { return "obj"; }
-	virtual const char *GetDescription() const { return "Wavefront OBJ"; }
-	virtual bool IsBinaryFormat() const { return false; }
-	virtual bool StoresVersionInFile() const { return false; }
-	virtual int GetCurrentVersion() const { return 0; } // doesn't store a version
-	virtual bool Serialize( CUtlBuffer &buf, CDmElement *pRoot );
-	virtual bool Unserialize( CUtlBuffer &buf, const char *pEncodingName, int nEncodingVersion,
-							  const char *pSourceFormatName, int nSourceFormatVersion,
-							  DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot );
+	const char *GetName() const override { return "obj"; }
+	const char *GetDescription() const override { return "Wavefront OBJ"; }
+	bool IsBinaryFormat() const override { return false; }
+	bool StoresVersionInFile() const override { return false; }
+	int GetCurrentVersion() const override { return 0; } // doesn't store a version
+	bool Serialize( CUtlBuffer &buf, CDmElement *pRoot ) override;
+	bool Unserialize( CUtlBuffer &buf, const char *pEncodingName, int nEncodingVersion,
+		const char *pSourceFormatName, int nSourceFormatVersion,
+		DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot ) override;
 	virtual const char *GetImportedFormat() const { return NULL; }
 	virtual int GetImportedVersion() const { return 1; }
 
@@ -60,9 +60,9 @@ private:
 		CDmeMesh **ppCreatedMesh = NULL,
 		bool bAbsolute = true );
 
-	static int OutputVectors( CUtlBuffer &b, const char *pPrefix, const CUtlVector< Vector > &vData, const matrix3x4_t &matrix );
+	static intp OutputVectors( CUtlBuffer &b, const char *pPrefix, const CUtlVector< Vector > &vData, const matrix3x4_t &matrix );
 
-	static int OutputVectors( CUtlBuffer &b, const char *pPrefix, const CUtlVector< Vector2D > &vData );
+	static intp OutputVectors( CUtlBuffer &b, const char *pPrefix, const CUtlVector< Vector2D > &vData );
 
 	static void DeltaToObj( CUtlBuffer &b, const matrix3x4_t &parentWorldMatrix, CDmeMesh *pMesh, const char *pDeltaName = NULL );
 

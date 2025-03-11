@@ -178,7 +178,7 @@ public:
 	float				GetIntensity( float time, int side = 0 );
 
 	CExpressionSample	*AddSample( float time, float value, int type = 0 );
-	void				RemoveSample( int index, int type = 0 );
+	void				RemoveSample( intp index, int type = 0 );
 	void				Clear( void );
 
 	void				Resort( int type = 0 );
@@ -397,9 +397,9 @@ public:
 	bool			GetPlayOverScript( void );
 
 	intp				GetRampCount( void ) const { return m_Ramp.GetCount(); }
-	CExpressionSample *GetRamp( int index ) { return m_Ramp.Get( index ); }
+	CExpressionSample *GetRamp( intp index ) { return m_Ramp.Get( index ); }
 	CExpressionSample *AddRamp( float time, float value, bool selected ) { return m_Ramp.Add( time, value, selected ); }
-	void			DeleteRamp( int index ) { m_Ramp.Delete( index ); }
+	void			DeleteRamp( intp index ) { m_Ramp.Delete( index ); }
 	void			ClearRamp( void ) { m_Ramp.Clear(); };
 	void			ResortRamp( void ) { m_Ramp.Resort( this ); };
 	CCurveData		*GetRamp( void ) { return &m_Ramp; };
@@ -491,7 +491,7 @@ public:
 	CFlexAnimationTrack		*GetFlexAnimationTrack( intp index );
 	CFlexAnimationTrack		*AddTrack( const char *controllername );
 	CFlexAnimationTrack		*FindTrack( const char *controllername );
-	void			RemoveTrack( int index );
+	void			RemoveTrack( intp index );
 	void			RemoveAllTracks( void );
 	void			OnEndTimeChanged( void );
 

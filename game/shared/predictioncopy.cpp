@@ -310,7 +310,7 @@ void CPredictionCopy::DescribeInt( difftype_t dt, int *outvalue, const int *inva
 			described = true;
 			char shortfile[ 512 ];
 			shortfile[ 0 ] = 0;
-			Q_FileBase( modelinfo->GetModelName( m ), shortfile, sizeof( shortfile ) );
+			V_FileBase( modelinfo->GetModelName( m ), shortfile );
 
 			DescribeFields( dt, "integer (%i->%s)\n", outvalue[0], shortfile );
 		}
@@ -341,7 +341,7 @@ void CPredictionCopy::WatchInt( difftype_t dt, int *outvalue, const int *invalue
 			described = true;
 			char shortfile[ 512 ];
 			shortfile[ 0 ] = 0;
-			Q_FileBase( modelinfo->GetModelName( m ), shortfile, sizeof( shortfile ) );
+			V_FileBase( modelinfo->GetModelName( m ), shortfile );
 
 			WatchMsg( "integer (%i->%s)", outvalue[0], shortfile );
 		}

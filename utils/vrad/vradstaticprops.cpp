@@ -492,8 +492,8 @@ bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 {
 	char tmp[1024];
-	Q_strncpy( tmp, pModelName, sizeof( tmp ) );
-	Q_SetExtension( tmp, ".phy", sizeof( tmp ) );
+	V_strcpy_safe( tmp, pModelName );
+	Q_SetExtension( tmp, ".phy" );
 	// No luck, gotta build it	
 	if (!LoadFile( tmp, buf ))
 	{
@@ -512,9 +512,10 @@ bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuffer& buf )
 {
 	char	filename[MAX_PATH];
+	filename[0] = '\0';
 
 	// construct filename
-	Q_StripExtension( pModelName, filename, sizeof( filename ) );
+	Q_StripExtension( pModelName, filename );
 	V_strcat_safe( filename, ".dx80.vtx" );
 
 	if ( !LoadFile( filename, buf ) )
@@ -659,7 +660,7 @@ public:
 	bool FindOrLoadIfValid( const char *pMaterialName, int *pIndex )
 	{
 		*pIndex = -1;
-		int index = m_Textures.Find(pMaterialName);
+		unsigned short index = m_Textures.Find(pMaterialName);
 		bool bFound = false;
 		if ( index != m_Textures.InvalidIndex() )
 		{
@@ -738,9 +739,9 @@ public:
 		}
 	}
 	
-	int AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
+	intp AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
 	{
-		int index = m_MaterialEntries.AddToTail();
+		intp index = m_MaterialEntries.AddToTail();
 		m_MaterialEntries[index].textureIndex = shadowTextureIndex;
 		m_MaterialEntries[index].uv[0] = t0;
 		m_MaterialEntries[index].uv[1] = t1;
@@ -943,7 +944,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 		/*
 		static int propNum = 0;
 		char tmp[128];
-		sprintf( tmp, "staticprop%03d.txt", propNum );
+		V_sprintf_safe( tmp, "staticprop%03d.txt", propNum );
 		DumpCollideToGlView( pCollide, tmp );
 		++propNum;
 		*/
@@ -1215,7 +1216,7 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 					for ( int nGroup = 0; nGroup < pVtxMesh->numStripGroups; ++nGroup )
 					{
 						OptimizedModel::StripGroupHeader_t* pStripGroup = pVtxMesh->pStripGroup( nGroup );
-						int nMeshIdx = prop.m_MeshData.AddToTail();
+						intp nMeshIdx = prop.m_MeshData.AddToTail();
 
 						if (colorVerts)
 						{
@@ -1486,7 +1487,7 @@ void CVradStaticPropMgr::SerializeLighting()
 	}
 
 	char mapName[MAX_PATH];
-	Q_FileBase( source, mapName, sizeof( mapName ) );
+	Q_FileBase( source, mapName );
 
 	int size;
 	for (int i = 0; i < count; ++i)
@@ -1498,11 +1499,11 @@ void CVradStaticPropMgr::SerializeLighting()
 
 		if (g_bHDR)
 		{
-			sprintf( filename, "sp_hdr_%d.vhv", i );
+			V_sprintf_safe( filename, "sp_hdr_%d.vhv", i );
 		}
 		else
 		{
-			sprintf( filename, "sp_%d.vhv", i );
+			V_sprintf_safe( filename, "sp_%d.vhv", i );
 		}
 
 		int totalVertexes = 0;
@@ -1574,7 +1575,7 @@ void CVradStaticPropMgr::SerializeLighting()
 		if (m_StaticProps[i].m_Flags & STATIC_PROP_NO_PER_TEXEL_LIGHTING)
 			continue;
 
-		sprintf(filename, "texelslighting_%d.ppl", i);
+		V_sprintf_safe(filename, "texelslighting_%d.ppl", i);
 
 		ImageFormat fmt = m_StaticProps[i].m_LightmapImageFormat;
 
@@ -2149,9 +2150,9 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
 	char fileName[MAX_PATH];
-	V_strcpy_safe( fileName, "models/" );	
+	V_strcpy_safe( fileName, "models/" );
 	V_strcat_safe( fileName, pActiveStudioHdr->pszName() );
-	Q_StripExtension( fileName, fileName, sizeof( fileName ) );
+	Q_StripExtension( fileName, fileName );
 	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model
@@ -2661,7 +2662,7 @@ static void DumpLightmapLinear( const char* _dstFilename, const CUtlVector<color
 	BuildFineMipmap( _width, _height, true, _srcTexels, NULL, &linearFloats );
 	linearBuffer.SetCount( linearFloats.Count() );
 
-	for ( int i = 0; i < linearFloats.Count(); ++i ) {
+	for ( intp i = 0; i < linearFloats.Count(); ++i ) {
 		linearBuffer[i].b = RoundFloatToByte(linearFloats[i].z * 255.0f);
 		linearBuffer[i].g = RoundFloatToByte(linearFloats[i].y * 255.0f);
 		linearBuffer[i].r = RoundFloatToByte(linearFloats[i].x * 255.0f);

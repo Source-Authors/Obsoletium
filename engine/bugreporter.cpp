@@ -1734,7 +1734,7 @@ void CBugUIPanel::OnSubmit()
 		extern CGlobalVars g_ServerGlobalVariables;
 		char misc2[ 256 ];
 
-		long mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
+		time_t mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
 		if ( !isPublic && mapfiletime != 0L )
 		{
 			char filetimebuf[ 64 ];

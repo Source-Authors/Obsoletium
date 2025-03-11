@@ -525,7 +525,7 @@ void CHudCommentary::StartCommentary( C_PointCommentaryNode *pNode, char *pszSpe
 	m_flStartTime = flStartTime;
 	m_flEndTime = flEndTime;
 	m_bHiding = false;
-	g_pVGuiLocalize->ConvertANSIToUnicode( pszSpeakers, m_szSpeakers, sizeof(m_szSpeakers) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( pszSpeakers, m_szSpeakers );
 
 	// Don't draw the element itself if closecaptions are on (and captions are always on in non-english mode)
 	ConVarRef pCVar( "closecaption" );
@@ -541,7 +541,7 @@ void CHudCommentary::StartCommentary( C_PointCommentaryNode *pNode, char *pszSpe
 
 	char sz[MAX_COUNT_STRING];
 	Q_snprintf( sz, sizeof(sz), "%d \\ %d", iNode, iNodeMax );
-	g_pVGuiLocalize->ConvertANSIToUnicode( sz, m_szCount, sizeof(m_szCount) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( sz, m_szCount );
 
 	// If the commentary just started, play the commentary fade in.
 	if ( fabs(flStartTime - gpGlobals->curtime) < 1.0 )

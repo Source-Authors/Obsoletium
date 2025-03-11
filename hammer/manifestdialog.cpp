@@ -24,6 +24,7 @@ CManifestMove::CManifestMove( bool bIsMove, CWnd* pParent /*=NULL*/ )
 	: CBaseDlg(CManifestMove::IDD, pParent)
 {
 	m_bIsMove = bIsMove;
+	m_CenterContents = false;
 }
 
 
@@ -84,8 +85,8 @@ void CManifestMove::OnOK()
 
 	m_FriendlyNameControl.GetWindowText( m_FriendlyName );
 	m_FileNameControl.GetWindowText( m_FileName );
-	strcpy( FullFileName, m_FileName );
-	V_SetExtension( FullFileName, ".vmf", sizeof( FullFileName ) );
+	V_strcpy_safe( FullFileName, m_FileName );
+	V_SetExtension( FullFileName, ".vmf" );
 	m_FileName = FullFileName;
 	m_CenterContents = ( m_CenterContentsControl.GetCheck() == BST_CHECKED );
 }
@@ -107,15 +108,34 @@ void CManifestMove::OnEnChangeManifestFilename()
 			char		FullFileName[ MAX_PATH ];
 
 			m_FileNameControl.GetWindowText( m_FileName );
-			strcpy( FullFileName, m_FileName );
+			V_strcpy_safe( FullFileName, m_FileName );
 			GetDlgItem( IDOK )->EnableWindow( FullFileName[ 0 ] != 0 );
-			V_SetExtension( FullFileName, ".vmf", sizeof( FullFileName ) );
+			V_SetExtension( FullFileName, ".vmf" );
 			m_FileName = FullFileName;
 			pManifest->GetFullMapPath( m_FileName, FullFileName );
 
 			m_FullPathNameControl.SetWindowText( FullFileName );
 		}
 	}
+}
+
+
+int CManifestListBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	const int rc{m_dpi_behavior.OnCreateWindow(m_hWnd)};
+	return rc;
+}
+
+
+void CManifestListBox::OnDestroy()
+{
+	m_dpi_behavior.OnDestroyWindow();
+}
+
+
+LRESULT CManifestListBox::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	return m_dpi_behavior.OnWindowDpiChanged(wParam, lParam);
 }
 
 
@@ -272,7 +292,7 @@ void CManifestListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 //-----------------------------------------------------------------------------
 void CManifestListBox::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
-	lpMeasureItemStruct->itemHeight = 36;
+	lpMeasureItemStruct->itemHeight = m_dpi_behavior.ScaleOnY( 36 );
 }
 
 
@@ -518,7 +538,7 @@ void CManifestListBox::OnVersionControlCheckOut()
 	//{
 		char temp[ 2048 ];
 		
-		sprintf( temp, "Could not check out map: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
+		V_sprintf_safe( temp, "Could not check out map: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 	// }
 	// else
@@ -582,7 +602,7 @@ void CManifestListBox::OnVersionControlAdd()
 	//{
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not add map: %s",  /*p4->GetLastError()*/ "Perforce support is disabled" );
+		V_sprintf_safe( temp, "Could not add map: %s",  /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 	//}
 	//else
@@ -749,6 +769,7 @@ BOOL CManifestFilter::Create(CWnd *pParentWnd)
 //-----------------------------------------------------------------------------
 CManifestFilter::~CManifestFilter()
 {
+	delete m_pBkBrush;
 }
 
 
@@ -879,6 +900,7 @@ void CManifestFilter::OnDestroy()
 	__super::OnDestroy();
 
 	delete m_pBkBrush;
+	m_pBkBrush = nullptr;
 }
 
 
@@ -1168,7 +1190,7 @@ void CManifestCheckin::OnBnClickedOk()
 		// {
 			char temp[ 2048 ];
 
-			sprintf( temp, "Could not check in map(s): %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
+			V_sprintf_safe( temp, "Could not check in map(s): %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 			AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 
 			return;

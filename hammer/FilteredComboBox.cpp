@@ -9,7 +9,7 @@
 #include "FilteredComboBox.h"
 
 
-BEGIN_MESSAGE_MAP(CFilteredComboBox, CComboBox)
+BEGIN_MESSAGE_MAP(CFilteredComboBox, CBaseComboBox)
 	//{{AFX_MSG_MAP(CFilteredComboBox)
 	ON_CONTROL_REFLECT_EX(CBN_SELCHANGE, OnSelChange)
 	ON_CONTROL_REFLECT_EX(CBN_EDITCHANGE, OnEditChange)
@@ -656,7 +656,7 @@ CString CFilteredComboBox::GetBestSuggestion( const char *pTest )
 }
 
 
-CFont& CFilteredComboBox::GetNormalFont()
+DpiAwareFont& CFilteredComboBox::GetNormalFont()
 {
 	CreateFonts();
 	return m_NormalFont;
@@ -805,11 +805,11 @@ void CFilteredComboBox::MeasureItem(LPMEASUREITEMSTRUCT pStruct)
 	{
 		LOGFONT logFont;
 		pActualFont->GetLogFont( &logFont );
-		pStruct->itemHeight = abs( logFont.lfHeight ) + 5;
+		pStruct->itemHeight = abs( logFont.lfHeight ) + m_dpi_behavior.ScaleOnY( 5 );
 	}
 	else
 	{
-		pStruct->itemHeight = 16;
+		pStruct->itemHeight = m_dpi_behavior.ScaleOnY( 16 );
 	}
 }
 
@@ -851,7 +851,7 @@ void CFilteredComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	// Draw the text.
 	RECT rcDraw = lpDrawItemStruct->rcItem;
-	rcDraw.left += 1;
+	rcDraw.left += m_dpi_behavior.ScaleOnX( 1 );
 	dc.DrawText( str, -1, &rcDraw, DT_LEFT|DT_SINGLELINE|DT_VCENTER );
 
 	// Restore stuff.

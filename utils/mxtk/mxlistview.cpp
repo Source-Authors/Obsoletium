@@ -15,6 +15,7 @@
 #include <windows.h>
 #include <commctrl.h>
 
+#include "tier1/strtools.h"
 
 
 class mxListView_i

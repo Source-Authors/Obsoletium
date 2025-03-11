@@ -120,8 +120,9 @@ bool CShell::DoVersionCheck(const char *pszArguments)
 
 		int nEngineMapVersion;
 
-		if (sscanf(pszArguments, "%s %d", szEngineMapPath, &nEngineMapVersion) == 2)
+		if (sscanf(pszArguments, "%259s %d", szEngineMapPath, &nEngineMapVersion) == 2)
 		{
+			szEngineMapPath[ssize(szEngineMapPath) - 1] = '\0';
 			char szEngineMapName[MAX_PATH];
 			szEngineMapName[0] = '\0';
 
@@ -181,8 +182,9 @@ bool CShell::EntityCreate(const char *pszCommand, const char *pszArguments)
 		float z;
 		char szClassName[MAX_PATH];
 
-		if (sscanf(pszArguments, "%s %f %f %f", szClassName, &x, &y, &z) == 4)
+		if (sscanf(pszArguments, "%259s %f %f %f", szClassName, &x, &y, &z) == 4)
 		{
+			szClassName[ssize(szClassName) - 1] = '\0';
 			bool bCreated = (m_pDoc->CreateEntity(szClassName, x, y, z) != NULL);
 			return(bCreated);
 		}
@@ -207,8 +209,9 @@ bool CShell::EntityDelete(const char *pszCommand, const char *pszArguments)
 		float z;
 		char szClassName[MAX_PATH];
 
-		if (sscanf(pszArguments, "%s %f %f %f", szClassName, &x, &y, &z) == 4)
+		if (sscanf(pszArguments, "%259s %f %f %f", szClassName, &x, &y, &z) == 4)
 		{
+			szClassName[ssize(szClassName) - 1] = '\0';
 			bool bDeleted = m_pDoc->DeleteEntity(szClassName, x, y, z);
 			return(bDeleted);
 		}
@@ -367,8 +370,9 @@ bool CShell::NodeCreate(const char *pszCommand, const char *pszArguments)
 		int nID;
 		char szClassName[MAX_PATH];
 
-		if (sscanf(pszArguments, "%s %d %f %f %f", szClassName, &nID, &x, &y, &z) == 5)
+		if (sscanf(pszArguments, "%259s %d %f %f %f", szClassName, &nID, &x, &y, &z) == 5)
 		{
+			szClassName[ssize(szClassName) - 1] = '\0';
 			m_pDoc->SetNextNodeID(nID);
 			m_pDoc->CreateEntity(szClassName, x, y, z);
 
@@ -393,12 +397,13 @@ bool CShell::NodeDelete(const char *pszCommand, const char *pszArguments)
 	if ((m_pDoc != NULL) && m_pDoc->IsShellSessionActive())
 	{
 		char szID[80];
-		if (sscanf(pszArguments, "%s", szID) == 1)
+		if (sscanf(pszArguments, "%79s", szID) == 1)
 		{
+			szID[ssize(szID) - 1] = '\0';
 			CMapEntityList Found;
 			if (m_pDoc->FindEntitiesByKeyValue(Found, "nodeid", szID, false))
 			{
-                FOR_EACH_OBJ( Found, pos )
+				FOR_EACH_OBJ( Found, pos )
 				{
 					CMapEntity *pEntity = Found.Element(pos);
 					m_pDoc->DeleteObject(pEntity);
@@ -425,8 +430,11 @@ bool CShell::NodeLinkCreate(const char *pszCommand, const char *pszArguments)
 		char szIDStart[80];
 		char szIDEnd[80];
 
-		if (sscanf(pszArguments, "%s %s", szIDStart, szIDEnd) == 2)
+		if (sscanf(pszArguments, "%79s %79s", szIDStart, szIDEnd) == 2)
 		{
+			szIDStart[ssize(szIDStart) - 1] = '\0';
+			szIDEnd[ssize(szIDEnd) - 1] = '\0';
+
 			//
 			// It doesn't matter where we place it because it will move to the midpoint of the
 			// start and end entities.
@@ -464,8 +472,11 @@ bool CShell::NodeLinkDelete(const char *pszCommand, const char *pszArguments)
 		char szIDEnd[80];
 		szIDEnd[0] = '\0';
 
-		if (sscanf(pszArguments, "%s %s", szIDStart, szIDEnd) == 2)
+		if (sscanf(pszArguments, "%79s %79s", szIDStart, szIDEnd) == 2)
 		{
+			szIDStart[ssize(szIDStart) - 1] = '\0';
+			szIDEnd[ssize(szIDEnd) - 1] = '\0';
+
 			//
 			// Look for info_node_link entities with the appropriate start/end keys.
 			//

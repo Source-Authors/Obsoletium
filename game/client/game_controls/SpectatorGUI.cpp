@@ -341,7 +341,7 @@ void CSpectatorMenu::Update( void )
 		wchar_t playerText[ 80 ], playerName[ 64 ], *team, teamText[ 64 ];
 		char localizeTeamName[64];
 		char szPlayerIndex[16];
-		g_pVGuiLocalize->ConvertANSIToUnicode( UTIL_SafeName( gr->GetPlayerName(iPlayerIndex) ), playerName, sizeof( playerName ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( UTIL_SafeName( gr->GetPlayerName(iPlayerIndex) ), playerName );
 		const char * teamname = gr->GetTeamName( gr->GetTeam(iPlayerIndex) );
 		if ( teamname )
 		{	
@@ -350,7 +350,7 @@ void CSpectatorMenu::Update( void )
 
 			if ( !team ) 
 			{
-				g_pVGuiLocalize->ConvertANSIToUnicode( teamname , teamText, sizeof( teamText ) );
+				g_pVGuiLocalize->ConvertANSIToUnicode( teamname , teamText );
 				team = teamText;
 			}
 
@@ -662,10 +662,10 @@ void CSpectatorGUI::Update()
 		m_pPlayerLabel->SetFgColor( c );
 		
 		wchar_t playerText[ 80 ], playerName[ 64 ], health[ 10 ];
-		V_wcsncpy( playerText, L"Unable to find #Spec_PlayerItem*", sizeof( playerText ) );
+		V_wcscpy_safe( playerText, L"Unable to find #Spec_PlayerItem*" );
 		memset( playerName, 0x0, sizeof( playerName ) );
 
-		g_pVGuiLocalize->ConvertANSIToUnicode( UTIL_SafeName(gr->GetPlayerName( playernum )), playerName, sizeof( playerName ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( UTIL_SafeName(gr->GetPlayerName( playernum )), playerName );
 		int iHealth = gr->GetHealth( playernum );
 		if ( iHealth > 0  && gr->IsAlive(playernum) )
 		{
@@ -692,22 +692,22 @@ void CSpectatorGUI::Update()
 	if ( engine->IsHLTV() )
 	{
 		// set spectator number and HLTV title
-		Q_snprintf(tempstr,sizeof(tempstr),"Spectators : %d", HLTVCamera()->GetNumSpectators() );
-		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,szEtxraInfo,sizeof(szEtxraInfo));
+		V_sprintf_safe( tempstr, "Spectators : %d", HLTVCamera()->GetNumSpectators() );
+		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,szEtxraInfo);
 		
-		Q_strncpy( tempstr, HLTVCamera()->GetTitleText(), sizeof(tempstr) );
-		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,szTitleLabel,sizeof(szTitleLabel));
+		V_strcpy_safe( tempstr, HLTVCamera()->GetTitleText() );
+		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,szTitleLabel);
 	}
 	else
 	{
 		// otherwise show map name
-		Q_FileBase( engine->GetLevelName(), tempstr, sizeof(tempstr) );
+		V_FileBase( engine->GetLevelName(), tempstr );
 
 		wchar_t wMapName[64];
-		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,wMapName,sizeof(wMapName));
+		g_pVGuiLocalize->ConvertANSIToUnicode(tempstr,wMapName);
 		g_pVGuiLocalize->ConstructString_safe( szEtxraInfo, g_pVGuiLocalize->Find("#Spec_Map" ),1, wMapName );
 
-		g_pVGuiLocalize->ConvertANSIToUnicode( "" ,szTitleLabel,sizeof(szTitleLabel));
+		g_pVGuiLocalize->ConvertANSIToUnicode( "" ,szTitleLabel);
 	}
 
 	SetLabelText("extrainfo", szEtxraInfo );

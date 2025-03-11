@@ -81,6 +81,8 @@ IDirect3DDevice *g_pD3DDevice = NULL;
 // so they do not try to specify D3DPOOL_MANAGED, which is unsupported in D3D9Ex
 bool g_ShaderDeviceUsingD3D9Ex = false;
 static ConVar mat_supports_d3d9ex( "mat_supports_d3d9ex", "0", FCVAR_HIDDEN );
+static ConVar mat_disable_d3d9ex( "mat_disable_d3d9ex", "0", FCVAR_ARCHIVE, "Disables Windows Aero DirectX extensions (may positively or negatively affect performance depending on video drivers)", false, 0, false, 0, true, 0, false, 1, nullptr );
+static ConVar mat_use_flipex_d3d9ex( "mat_use_flipex_d3d9ex", "0", FCVAR_ARCHIVE, "Use more performant flip model to present on screen. Supported on DirectX 9 Extensions+ hardware", true, 0, true, 1 );
 #endif
 
 // hook into mat_forcedynamic from the engine.
@@ -89,6 +91,40 @@ static ConVar mat_forcedynamic( "mat_forcedynamic", "0", FCVAR_CHEAT );
 // this is hooked into the engines convar
 ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
 
+static int GetBackBufferCount( bool isMultiWindow )
+{
+	if ( isMultiWindow )
+	{
+		return 1;
+	}
+
+#if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
+	if ( mat_use_flipex_d3d9ex.GetBool() )
+	{
+		// FLIPEX requires at least 2 back buffers.
+		return 2;
+	}
+#endif
+
+	return 1;
+}
+
+static D3DSWAPEFFECT GetSwapEffect( bool isMultiWindow )
+{
+	if ( isMultiWindow )
+	{
+		return D3DSWAPEFFECT_COPY;
+	}
+
+#if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
+	if ( mat_use_flipex_d3d9ex.GetBool() )
+	{
+		return D3DSWAPEFFECT_FLIPEX;
+	}
+#endif
+
+	return D3DSWAPEFFECT_DISCARD;
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -140,7 +176,8 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	m_pD3D = NULL;
 
 	// Attempt to create a D3D9Ex device (Windows Vista and later) if possible
-	bool bD3D9ExForceDisable = ( CommandLine()->FindParm( "-nod3d9ex" ) != 0 ) ||
+	bool bD3D9ExForceDisable = mat_disable_d3d9ex.GetInt() == 1 ||
+								( CommandLine()->FindParm( "-nod3d9ex" ) != 0 ) ||
 								( CommandLine()->ParmValue( "-dxlevel", 95 ) < 90 );
 
 	IDirect3D9Ex *pD3D9Ex = NULL;
@@ -1575,7 +1612,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	ZeroMemory( &m_PresentParameters, sizeof(m_PresentParameters) );
 
 	m_PresentParameters.Windowed = info.m_bWindowed;
-	m_PresentParameters.SwapEffect = info.m_bUsingMultipleWindows ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
+	m_PresentParameters.SwapEffect = GetSwapEffect( info.m_bUsingMultipleWindows );
 	m_PresentParameters.EnableAutoDepthStencil = TRUE;
 
 	// What back-buffer format should we use?
@@ -1614,7 +1651,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	if ( !info.m_bWindowed )
 	{
 		bool useDefault = ( info.m_DisplayMode.m_nWidth == 0 ) || ( info.m_DisplayMode.m_nHeight == 0 );
-		m_PresentParameters.BackBufferCount = 1;
+		m_PresentParameters.BackBufferCount = GetBackBufferCount( info.m_bUsingMultipleWindows );
 		m_PresentParameters.BackBufferWidth = useDefault ? mode.m_nWidth : info.m_DisplayMode.m_nWidth;
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
@@ -1697,7 +1734,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 			m_PresentParameters.BackBufferHeight = info.m_DisplayMode.m_nHeight;
 		}
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
-		m_PresentParameters.BackBufferCount = 1;
+		m_PresentParameters.BackBufferCount = GetBackBufferCount( info.m_bUsingMultipleWindows );
 	}
 
 	if ( info.m_nAASamples > 0 && ( m_PresentParameters.SwapEffect == D3DSWAPEFFECT_DISCARD ) )
@@ -2172,8 +2209,10 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAd
 	// This will cause us to use less buffers...
 	if ( m_PresentParameters.Windowed )
 	{
-		m_PresentParameters.SwapEffect = D3DSWAPEFFECT_COPY; 
-		m_PresentParameters.BackBufferCount = 0;
+		m_PresentParameters.SwapEffect = mat_use_flipex_d3d9ex.GetBool()
+			? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_COPY; 
+		m_PresentParameters.BackBufferCount =
+			mat_use_flipex_d3d9ex.GetBool() ? 2 : 0;
 		hr = D3D()->CreateDevice( nAdapter, devType,
 			(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, &pD3DDevice );
 	}

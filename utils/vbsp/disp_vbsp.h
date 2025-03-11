@@ -34,7 +34,7 @@ void EmitDispLMAlphaAndNeighbors();
 // Setup a CCoreDispInfo given a mapdispinfo_t.
 // If pFace is non-NULL, then lightmap texture coordinates will be generated.
 void DispMapToCoreDispInfo( mapdispinfo_t *pMapDisp,
-	CCoreDispInfo *pCoreDispInfo, dface_t *pFace, int *pSwappedTexInfos );
+	CCoreDispInfo *pCoreDispInfo, dface_t *pFace, intp *pSwappedTexInfos );
 
 
 void DispGetFaceInfo( mapbrush_t *pBrush );

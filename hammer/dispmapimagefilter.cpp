@@ -119,7 +119,8 @@ ChunkFileResult_t CDispMapImageFilter::LoadImageKeyCallback( const char *szKey, 
 		int ndx = row * pFilter->m_Height;
 		while( pszNext != NULL )
 		{
-			float imageValue = ( float )atof( pszNext );
+			// dimhotepus: atof -> strtof.
+			float imageValue = strtof( pszNext, nullptr );
 			pFilter->m_pImage[ndx] = imageValue;
 			pszNext = strtok( NULL, " " );
 			ndx++;

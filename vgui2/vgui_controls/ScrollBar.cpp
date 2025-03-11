@@ -10,7 +10,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/IInput.h>
 #include <vgui/IImage.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/ScrollBarSlider.h>
@@ -46,7 +46,7 @@ public:
 		SetContentAlignment(Label::a_center);
 	}
 
-	void OnMouseFocusTicked()
+	void OnMouseFocusTicked() override
 	{
 		// pass straight up to parent
 		CallParentFunction(new KeyValues("MouseFocusTicked"));
@@ -67,7 +67,7 @@ public:
 
 	// Don't request focus.
 	// This will keep cursor focus in main window in text entry windows.
-	virtual void OnMousePressed(MouseCode code)
+	void OnMousePressed(MouseCode code) override
 	{
 		if (!IsEnabled())
 			return;
@@ -86,7 +86,7 @@ public:
 			input()->SetMouseCapture(GetVPanel());
 		}
 	}
-    virtual void OnMouseReleased(MouseCode code)
+    void OnMouseReleased(MouseCode code) override
     {
 		if (!IsEnabled())
 			return;
@@ -399,6 +399,8 @@ void ScrollBar::SetButton(Button *button, int index)
 	if(_button[index]!=null)
 	{
 		_button[index]->SetParent((Panel *)NULL);
+		// dimhotepus: Try to not leak button.
+		_button[index]->MarkForDeletion();
 	}
 	_button[index]=button;
 	_button[index]->SetParent(this);
@@ -427,6 +429,8 @@ void ScrollBar::SetSlider(ScrollBarSlider *slider)
 	if(_slider!=null)
 	{
 		_slider->SetParent((Panel *)NULL);
+		// dimhotepus: Try not to leak slider.
+		_slider->MarkForDeletion();
 	}
 	_slider=slider;
 	_slider->AddActionSignalTarget(this);

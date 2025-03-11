@@ -107,15 +107,15 @@ public:
 	  // the menu.  For combo boxes, it's the edit/field, etc. etc.
 
 	// Add a simple text item to the menu
-	virtual int AddMenuItem( const char *itemName, const char *itemText, const char *command, Panel *target, const KeyValues *userData = NULL );
-	virtual int AddMenuItem( const char *itemName, const wchar_t *wszItemText, const char *command, Panel *target, const KeyValues *userData = NULL );
+	virtual intp AddMenuItem( const char *itemName, const char *itemText, const char *command, Panel *target, const KeyValues *userData = NULL );
+	virtual intp AddMenuItem( const char *itemName, const wchar_t *wszItemText, const char *command, Panel *target, const KeyValues *userData = NULL );
 
-	virtual int AddMenuItem( const char *itemName, const char *itemText, KeyValues *message, Panel *target , const KeyValues *userData = NULL);
-	virtual int AddMenuItem( const char *itemName, const wchar_t *wszItemText, KeyValues *message, Panel *target , const KeyValues *userData = NULL);
+	virtual intp AddMenuItem( const char *itemName, const char *itemText, KeyValues *message, Panel *target , const KeyValues *userData = NULL);
+	virtual intp AddMenuItem( const char *itemName, const wchar_t *wszItemText, KeyValues *message, Panel *target , const KeyValues *userData = NULL);
 	
-	virtual int AddMenuItem( const char *itemText, const char *command, Panel *target , const KeyValues *userData = NULL);
-	virtual int AddMenuItem( const char *itemText, KeyValues *message, Panel *target, const KeyValues *userData = NULL );
-	virtual int AddMenuItem( const char *itemText, Panel *target, const KeyValues *userData = NULL );
+	virtual intp AddMenuItem( const char *itemText, const char *command, Panel *target , const KeyValues *userData = NULL);
+	virtual intp AddMenuItem( const char *itemText, KeyValues *message, Panel *target, const KeyValues *userData = NULL );
+	virtual intp AddMenuItem( const char *itemText, Panel *target, const KeyValues *userData = NULL );
 
 	// Add a checkable item to the menu
 	virtual int AddCheckableMenuItem( const char *itemName, const char *itemText, const char *command, Panel *target, const KeyValues *userData = NULL );
@@ -143,7 +143,7 @@ public:
 	virtual intp AddMenuItem( MenuItem *panel );
 
 	virtual void AddSeparator();
-	virtual void AddSeparatorAfterItem( int itemID );
+	virtual void AddSeparatorAfterItem( intp itemID );
 
 	// Sets the values of a menu item at the specified index
 	virtual void UpdateMenuItem(int itemID, const char *itemText,KeyValues *message, const KeyValues *userData = NULL);
@@ -262,8 +262,8 @@ public:
 
 protected:
 	// helper functions	
-	int AddMenuItemCharCommand(MenuItem *item, const char *command, Panel *target, const KeyValues *userData);
-	int AddMenuItemKeyValuesCommand(MenuItem *item, KeyValues *message, Panel *target, const KeyValues *userData);
+	intp AddMenuItemCharCommand(MenuItem *item, const char *command, Panel *target, const KeyValues *userData);
+	intp AddMenuItemKeyValuesCommand(MenuItem *item, KeyValues *message, Panel *target, const KeyValues *userData);
 
 	// vgui result reporting
 	void OnCommand( const char *command ) override;
@@ -324,7 +324,7 @@ private:
 
 	CUtlVector<int>					m_VisibleSortedItems;
 	CUtlVector<int>					m_SortedItems;		// used for visual 
-	CUtlVector<int>					m_Separators;       // menu item ids after  which separators should be shown
+	CUtlVector<intp>				m_Separators;       // menu item ids after  which separators should be shown
 	CUtlVector<MenuSeparator *>		m_SeparatorPanels;
 
 	bool 			_sizedForScrollBar: 1 ;  // whether menu has been sized for a scrollbar

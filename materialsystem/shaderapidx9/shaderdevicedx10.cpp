@@ -607,7 +607,7 @@ bool CShaderDeviceDx10::InitDevice( void *hWnd, unsigned nAdapter, const ShaderD
 
 	// NOTE: Having more than 1 back buffer disables MSAA!
 	sd.SwapEffect = mode.m_nBackBufferCount > 1
-		? DXGI_SWAP_EFFECT_SEQUENTIAL : DXGI_SWAP_EFFECT_DISCARD;
+		? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL : DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	// FIXME: Chicken + egg problem with SampleDesc.
 	sd.SampleDesc.Count = mode.m_nAASamples ? mode.m_nAASamples : 1;

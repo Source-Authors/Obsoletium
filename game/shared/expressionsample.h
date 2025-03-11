@@ -85,7 +85,7 @@ public:
 	intp				GetCount( void ) const;
 	CExpressionSample *Get( intp index );
 	CExpressionSample *Add( float time, float value, bool selected );
-	void			Delete( int index );
+	void			Delete( intp index );
 	void			Clear( void );
 	void			Resort( ICurveDataAccessor *data );
 

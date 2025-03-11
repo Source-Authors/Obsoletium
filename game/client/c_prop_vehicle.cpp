@@ -270,11 +270,8 @@ void C_PropVehicleDriveable::DrawHudElements( )
 				int vx, vy, vw, vh;
 				vgui::surface()->GetFullscreenViewport( vx, vy, vw, vh );
 
-				float screenWidth = vw;
-				float screenHeight = vh;
-
-				x = 0.5f * ( 1.0f + screen[0] ) * screenWidth + 0.5f;
-				y = 0.5f * ( 1.0f - screen[1] ) * screenHeight + 0.5f;
+				x = 0.5f * ( 1.0f + screen[0] ) * vw + 0.5f;
+				y = 0.5f * ( 1.0f - screen[1] ) * vh + 0.5f;
 			}
 			else
 			{

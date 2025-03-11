@@ -72,16 +72,16 @@ public:
 	virtual void GetBoundingBox( Vector &min, Vector &max ) const { return GetBoundingBox( min, max, NULL, NULL ); }
 
 	// accessors
-	int FaceSetCount() const;
-	CDmeFaceSet *GetFaceSet( int nFaceSetIndex );
-	const CDmeFaceSet *GetFaceSet( int nFaceSetIndex ) const;
+	intp FaceSetCount() const;
+	CDmeFaceSet *GetFaceSet( intp nFaceSetIndex );
+	const CDmeFaceSet *GetFaceSet( intp nFaceSetIndex ) const;
 	void AddFaceSet( CDmeFaceSet *faceSet );
-	void RemoveFaceSet( int nFaceSetIndex );
+	void RemoveFaceSet( intp nFaceSetIndex );
 
 	// Base states
 	intp BaseStateCount() const;
 
-	CDmeVertexData *GetBaseState( int nBaseIndex ) const;
+	CDmeVertexData *GetBaseState( intp nBaseIndex ) const;
 
 	CDmeVertexData *FindBaseState( const char *pStateName ) const;
 
@@ -101,7 +101,7 @@ public:
 	void Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSettings = NULL );
 
 	// Compute triangulated indices
-	void ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDmeFaceSet *pFaceSet, int nFirstIndex, int *pIndices, int nOutCount );
+	void ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDmeFaceSet *pFaceSet, intp nFirstIndex, int *pIndices, intp nOutCount );
 
 	// Compute a default per-vertex tangent given normal data + uv data for all vertex data referenced by this mesh
 	void ComputeDefaultTangentData( bool bSmoothTangents = false );
@@ -110,15 +110,15 @@ public:
 	void ComputeDefaultTangentData( CDmeVertexData *pVertexData, bool bSmoothTangents = false );
 
 	// Delta states
-	int DeltaStateCount() const;
-	CDmeVertexDeltaData *GetDeltaState( int nDeltaIndex ) const;
+	intp DeltaStateCount() const;
+	CDmeVertexDeltaData *GetDeltaState( intp nDeltaIndex ) const;
 	CDmeVertexDeltaData *FindDeltaState( const char *pDeltaName ) const;
 	CDmeVertexDeltaData *FindOrCreateDeltaState( const char *pDeltaName );
 	bool DeleteDeltaState( const char *pDeltaName );
 	bool ResetDeltaState( const char *pDeltaName );
-	int FindDeltaStateIndex( const char *pDeltaName ) const;
-	void SetDeltaStateWeight( int nDeltaIndex, MeshDeltaWeightType_t type, float flMorphWeight );
-	void SetDeltaStateWeight( int nDeltaIndex, MeshDeltaWeightType_t type, float flLeftWeight, float flRightWeight );
+	intp FindDeltaStateIndex( const char *pDeltaName ) const;
+	void SetDeltaStateWeight( intp nDeltaIndex, MeshDeltaWeightType_t type, float flMorphWeight );
+	void SetDeltaStateWeight( intp nDeltaIndex, MeshDeltaWeightType_t type, float flLeftWeight, float flRightWeight );
 	CDmeVertexDeltaData *ModifyOrCreateDeltaStateFromBaseState( const char *pDeltaName, CDmeVertexData *pPassedBase = NULL, bool absolute = false );
 
 	// Sets all of the data in the current base state to be the bind state plus the corrected delta, if delta is NULL then it's set to the bind state
@@ -154,10 +154,10 @@ public:
 		const CDmeSingleIndexedComponent *pMask = NULL );
 
 	// Grows the selection by a specified amount
-	void GrowSelection( int nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp );
+	void GrowSelection( intp nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp );
 
 	// Shrinks the selection by a specified amount
-	void ShrinkSelection( int nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp );
+	void ShrinkSelection( intp nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp );
 
 	enum Falloff_t
 	{
@@ -283,7 +283,7 @@ private:
 	void BuildVertToTriMap( const CDmeVertexData *pVertexData, CUtlVector<Triangle_t> &triangles, CUtlVector< CUtlVector<int> > &vertToTriMap );
 
 	// Compute the dimensionality of the delta state (how many inputs affect it)
-	int ComputeDeltaStateDimensionality( int nDeltaIndex );
+	intp ComputeDeltaStateDimensionality( intp nDeltaIndex );
 
 	// Discovers the atomic controls used by the various delta states 
 	void BuildAtomicControlLists( int nCount, DeltaComputation_t *pInfo, CUtlVector< CUtlVector< int > > &deltaStateUsage );
@@ -481,7 +481,7 @@ inline intp CDmeMesh::BaseStateCount() const
 }
 
 
-inline CDmeVertexData *CDmeMesh::GetBaseState( int nBaseIndex ) const
+inline CDmeVertexData *CDmeMesh::GetBaseState( intp nBaseIndex ) const
 {
 	return m_BaseStates[ nBaseIndex ];
 }

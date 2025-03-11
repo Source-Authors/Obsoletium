@@ -1,16 +1,10 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef HARDWAREMATRIXSTATE_H
-#define HARDWAREMATRIXSTATE_H
-#pragma once
+#ifndef SE_UTILS_STUDIOMDL_HARDWARE_MATRIX_STATE_H_
+#define SE_UTILS_STUDIOMDL_HARDWARE_MATRIX_STATE_H_
 
-// This emulates the hardware matrix palette and keeps up with 
-// matrix usage, LRU's matrices, etc.
+// This emulates the hardware matrix palette and keeps up with matrix usage,
+// LRU's matrices, etc.
 class CHardwareMatrixState
 {
 public:
@@ -68,4 +62,4 @@ private:
 	MatrixState_t *m_savedMatrixState;
 };
 
-#endif // HARDWAREMATRIXSTATE_H
+#endif  // !SE_UTILS_STUDIOMDL_HARDWARE_MATRIX_STATE_H_

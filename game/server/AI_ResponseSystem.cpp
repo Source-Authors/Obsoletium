@@ -944,7 +944,8 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 				{
 					matcher.usemin = true;
 					matcher.minequals = eq;
-					matcher.minval = (float)atof( token );
+					// dimhotepus: atof -> strtof.
+					matcher.minval = strtof( token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -952,7 +953,8 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 				{
 					matcher.usemax = true;
 					matcher.maxequals = eq;
-					matcher.maxval = (float)atof( token );
+					// dimhotepus: atof -> strtof.
+					matcher.maxval = strtof( token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -1070,7 +1072,8 @@ bool CResponseSystem::CompareUsingMatcher( const char *setValue, Matcher& m, boo
 		if ( !setValue || !setValue[0] )
 			return false;
 
-		return v == (float)atof( m.GetToken() );
+		// dimhotepus: atof -> strtof.
+		return v == strtof( m.GetToken(), nullptr );
 	}
 
 	return !Q_stricmp( setValue, m.GetToken() ) ? true : false;
@@ -2042,7 +2045,8 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 		if ( !Q_stricmp( token, "weight" ) )
 		{
 			ParseToken();
-			newResponse.weight.SetFloat( (float)atof( token ) );
+			// dimhotepus: atof -> strtof
+			newResponse.weight.SetFloat( strtof( token, nullptr ) );
 			continue;
 		}
 
@@ -2371,7 +2375,7 @@ short CResponseSystem::ParseOneCriterion( const char *criterionName )
 		{
 			ParseToken();
 			// dimhotepus: atof -> strtof.
-			newCriterion.weight.SetFloat( (float)atof( token ) );
+			newCriterion.weight.SetFloat( strtof( token, nullptr ) );
 		}
 		else
 		{
@@ -3115,7 +3119,7 @@ public:
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
-				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
+				pRestore->ReadString( groupname, 0 );
 
 				// Try and find it
 				auto idx = rs.m_Responses.Find( groupname );
@@ -3135,7 +3139,7 @@ public:
 						pRestore->StartBlock( szResponseBlockName );
 						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
 						{
-							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
+							pRestore->ReadString( responsename, 0 );
 
 							// Find it by name
 							intp ri;
@@ -3236,7 +3240,7 @@ public:
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
-				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
+				pRestore->ReadString( groupname, 0 );
 
 				// Try and find it
 				auto idx = pRS->m_Responses.Find( groupname );
@@ -3256,7 +3260,7 @@ public:
 						pRestore->StartBlock( szResponseBlockName );
 						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
 						{
-							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
+							pRestore->ReadString( responsename, 0 );
 
 							// Find it by name
 							intp ri;

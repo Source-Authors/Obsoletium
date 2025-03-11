@@ -11,7 +11,9 @@
 /////////////////////////////////////////////////////////////////////////////
 // CPakFrame frame
 
-class CPakFrame : public CMDIChildWnd
+#include "windows/base_mdi_child_wnd.h"
+
+class CPakFrame : public CBaseMDIChildWnd
 {
 	DECLARE_DYNCREATE(CPakFrame)
 protected:

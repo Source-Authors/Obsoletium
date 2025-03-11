@@ -31,13 +31,13 @@ public:
 	intp AddJoint( CDmeDag *pJoint );
 
 	// Returns the number of joint transforms we know about
-	int GetJointTransformCount() const;
+	intp GetJointTransformCount() const;
 
 	// Determines joint transform index	given a joint name
 	intp GetJointTransformIndex( CDmeTransform *pTransform ) const;
 
 	// Determines joint transform index	given a joint
-	int GetJointTransformIndex( CDmeDag *pJoint ) const;
+	intp GetJointTransformIndex( CDmeDag *pJoint ) const;
 
 	// Determines joint transform index	given a joint name
 	CDmeTransform *GetJointTransform( int nIndex );

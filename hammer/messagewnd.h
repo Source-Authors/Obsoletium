@@ -9,6 +9,8 @@
 #pragma once
 
 #include <afxtempl.h>
+#include "windows/base_mdi_child_wnd.h"
+#include "windows/dpi_aware_font.h"
 #include "GlobalFunctions.h"
 
 const int MAX_MESSAGE_WND_LINES = 5000;
@@ -19,12 +21,12 @@ enum
 };
 
 
-class CMessageWnd : private CMDIChildWnd
+class CMessageWnd : private CBaseMDIChildWnd
 {
 public:
 
 	static CMessageWnd *CreateMessageWndObject();
-	void CreateMessageWindow( CMDIFrameWnd *pwndParent, CRect &rect );
+	void CreateMessageWindow( CMDIFrameWnd *pwndParent, const CRect &rect );
 
 	void ShowMessageWindow();
 	void ToggleMessageWindow();
@@ -63,9 +65,10 @@ protected:
 	virtual ~CMessageWnd();
 
 	void CalculateScrollSize();
+	DpiAwareFont *CreateFont();
 	CArray<MWMSGSTRUCT, MWMSGSTRUCT&> MsgArray;
 
-	CFont Font;
+	DpiAwareFont *pFont;
 	int iCharWidth;	// calculated in first paint
 	int iNumMsgs;
 
@@ -77,6 +80,7 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnClose();
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

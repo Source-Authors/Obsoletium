@@ -61,7 +61,7 @@ public:
 
 protected:
 	// Constructor, protected because these should never be instanced directly
-	CCompileFuncAdapterBase( ) {}
+	CCompileFuncAdapterBase( ) : m_pNext{nullptr} {}
 
 public:
 	CUtlSymbol m_ElementType;
@@ -83,7 +83,7 @@ public:
 		U::m_CompileFuncTree.m_pFirstAdapter = this;
 	}
 
-	virtual void InitializeAdapter( )
+	void InitializeAdapter( ) override
 	{
 		m_ElementType = T::GetStaticTypeSymbol();
 		if ( m_pNext )
@@ -92,7 +92,7 @@ public:
 		}
 	}
 
-	virtual bool PerformCompilationStep( CDmElement *pElement, CompilationStep_t step )
+	bool PerformCompilationStep( CDmElement *pElement, CompilationStep_t step ) override
 	{
 		T *pConverted = CastElement< T >( pElement );
 		if ( pConverted )
@@ -112,7 +112,7 @@ public:
 
 protected:
 	// Constructor, protected because these should never be instanced directly
-	COpenEditorFuncAdapterBase( ) {}
+	COpenEditorFuncAdapterBase() : m_pNext{nullptr} {}
 
 public:
 	CUtlSymbol m_ElementType;
@@ -133,7 +133,7 @@ public:
 		U::m_OpenEditorFuncTree.m_pFirstAdapter = this;
 	}
 
-	virtual void InitializeAdapter( )
+	void InitializeAdapter( ) override
 	{
 		m_ElementType = T::GetStaticTypeSymbol();
 		if ( m_pNext )
@@ -142,7 +142,7 @@ public:
 		}
 	}
 
-	virtual void OpenEditor( CDmElement *pElement )
+	void OpenEditor( CDmElement *pElement ) override
 	{
 		T *pConverted = CastElement< T >( pElement );
 		if ( pConverted )
@@ -239,17 +239,17 @@ public:
 	virtual ~CDmeMakefileUtils();
 
 	// Inherited from IAppSystem
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
 
 	// Inherited from IDmeMakefileUtils
-	virtual void PerformCompile( CDmElement *pElement, bool bBuildAllDependencies );
-	virtual bool IsCurrentlyCompiling( );
-	virtual intp GetCompileOutputSize();
-	virtual CompilationState_t UpdateCompilation( char *pOutputBuf, int nBufLen );
-	virtual void AbortCurrentCompilation();
-	virtual void PerformOpenEditor( CDmElement *pElement );
-	virtual int GetExitCode();
+	void PerformCompile( CDmElement *pElement, bool bBuildAllDependencies ) override;
+	bool IsCurrentlyCompiling() override;
+	intp GetCompileOutputSize() override;
+	CompilationState_t UpdateCompilation( char *pOutputBuf, intp nBufLen ) override;
+	void AbortCurrentCompilation() override;
+	void PerformOpenEditor( CDmElement *pElement ) override;
+	int GetExitCode() override;
 
 protected:
 	// Compile functions + editor functions
@@ -292,7 +292,7 @@ private:
 
 	CUtlVector< CompileInfo_t > m_CompileTasks;
 	ProcessHandle_t m_hCompileProcess;
-	int m_nCurrentCompileTask;
+	intp m_nCurrentCompileTask;
 	int m_nExitCode;
 	CompilationStep_t m_CompilationStep;
 };

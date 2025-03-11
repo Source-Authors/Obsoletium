@@ -10,15 +10,15 @@
 //
 // $NoKeywords: $
 //===========================================================================//
-#include <stdio.h>
-#include <windows.h>
-#include "snd_audio_source.h"
-#include "snd_wave_source.h"
 #include "snd_wave_mixer_private.h"
 #include "snd_wave_mixer_adpcm.h"
+#include "snd_audio_source.h"
+#include "snd_wave_source.h"
 #include "ifaceposersound.h"
 #include "AudioWaveOutput.h"
 #include "tier2/riff.h"
+
+#include "winlite.h"
 
 typedef struct channel_s
 {
@@ -264,12 +264,12 @@ void CAudioMixerWave::SetActive( bool active )
 	m_bActive = active;
 }
 
-void CAudioMixerWave::SetModelIndex( int index )
+void CAudioMixerWave::SetModelIndex( intp index )
 {
 	m_nModelIndex = index;
 }
 
-int CAudioMixerWave::GetModelIndex( void ) const
+intp CAudioMixerWave::GetModelIndex( void ) const
 {
 	return m_nModelIndex;
 }

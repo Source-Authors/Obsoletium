@@ -240,8 +240,8 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 		lpszSubDirName = MoveToNextSubDir( lpszSubDirName, &nPathIncr );
 
 		// Get the span between the last subdir and the new one
-		Q_StrLeft( lpszLastSubDirName, nPathIncr, subDirName, sizeof(subDirName) );
-		Q_StripTrailingSlash( subDirName );
+		V_StrLeft( lpszLastSubDirName, nPathIncr, subDirName );
+		V_StripTrailingSlash( subDirName );
 
 		// Increment where we are in the string for use later
 		nPathPos += nPathIncr;
@@ -260,8 +260,8 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 				nItemIndex = nChild;
 
 				// Get the full path (starting from the drive letter) up to our current subdir
-				Q_strncpy( subDirName, workPath, nPathPos );
-				Q_AppendSlash( subDirName, sizeof(subDirName) );
+				V_strncpy( subDirName, workPath, nPathPos );
+				V_AppendSlash( subDirName );
 
 				// Expand the tree node and populate its subdirs for our next iteration
 				ExpandTreeNode( subDirName, nItemIndex );
@@ -383,7 +383,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 
 	// get all the subfolders of the current drive
 	char searchString[512];
-	sprintf(searchString, "%s*.*", path);
+	V_sprintf_safe(searchString, "%s*.*", path);
 
 	FileFindHandle_t h;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );
@@ -409,7 +409,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 bool DirectorySelectDialog::DoesDirectoryHaveSubdirectories(const char *path, const char *dir)
 {
 	char searchString[512];
-	sprintf(searchString, "%s%s\\*.*", path, dir);
+	V_sprintf_safe(searchString, "%s%s\\*.*", path, dir);
 
 	FileFindHandle_t h;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );

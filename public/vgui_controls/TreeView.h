@@ -39,18 +39,18 @@ public:
 
     void SetSortFunc(TreeViewSortFunc_t pSortFunc);
 
-    virtual int AddItem(KeyValues *data, int parentItemIndex);
+    virtual intp AddItem(KeyValues *data, intp parentItemIndex);
 
-	virtual int GetRootItemIndex();
-	virtual int GetNumChildren( int itemIndex );
-	virtual int GetChild( int iParentItemIndex, int iChild ); // between 0 and GetNumChildren( iParentItemIndex ).
+	virtual intp GetRootItemIndex();
+	virtual intp GetNumChildren( intp itemIndex );
+	virtual intp GetChild( intp iParentItemIndex, intp iChild ); // between 0 and GetNumChildren( iParentItemIndex ).
 
-    virtual int GetItemCount(void);
-    virtual KeyValues *GetItemData(int itemIndex);
-     virtual void RemoveItem(int itemIndex, bool bPromoteChildren, bool bRecursivelyRemove = false );
+    virtual intp GetItemCount(void);
+    virtual KeyValues *GetItemData(intp itemIndex);
+    virtual void RemoveItem(intp itemIndex, bool bPromoteChildren, bool bRecursivelyRemove = false );
     virtual void RemoveAll();
-    virtual bool ModifyItem(int itemIndex, KeyValues *data);
-	virtual int GetItemParent(int itemIndex);
+    virtual bool ModifyItem(intp itemIndex, KeyValues *data);
+	virtual intp GetItemParent(intp itemIndex);
 
     virtual void SetFont(HFont font);
 
@@ -60,18 +60,18 @@ public:
 	bool IsMultipleSelectionAllowed() const;
 
 	virtual void ClearSelection();
-    virtual void AddSelectedItem( int itemIndex, bool clearCurrentSelection, bool requestFocus = true, bool bMakeItemVisible = true );
-	virtual void RemoveSelectedItem( int itemIndex );
+    virtual void AddSelectedItem( intp itemIndex, bool clearCurrentSelection, bool requestFocus = true, bool bMakeItemVisible = true );
+	virtual void RemoveSelectedItem( intp itemIndex );
 	virtual void SelectAll();
 
-	virtual bool IsItemSelected( int itemIndex );
-	virtual void RangeSelectItems( int clickedItem );
-	virtual void FindNodesInRange( int startItem, int endItem, CUtlVector< int >& itemIndices );
+	virtual bool IsItemSelected( intp itemIndex );
+	virtual void RangeSelectItems( intp clickedItem );
+	virtual void FindNodesInRange( intp startItem, intp endItem, CUtlVector< intp >& itemIndices );
 
 	// returns the id of the currently selected item, -1 if nothing is selected
-	virtual int GetSelectedItemCount() const;
-	virtual int GetFirstSelectedItem() const;
-	virtual void GetSelectedItems( CUtlVector< int >& list );
+	virtual intp GetSelectedItemCount() const;
+	virtual intp GetFirstSelectedItem() const;
+	virtual void GetSelectedItems( CUtlVector< intp >& list );
 	virtual void GetSelectedItemData( CUtlVector< KeyValues * >& list );
 
 	// set colors for individual elments
@@ -87,12 +87,12 @@ public:
 	// item iterators
 	// iterate from [0..GetHighestItemID()], 
 	// and check each with IsItemIDValid() before using
-	virtual int GetHighestItemID();
+	virtual intp GetHighestItemID();
 
     virtual void ExpandItem(int itemIndex, bool bExpand);
 	virtual bool IsItemExpanded( int itemIndex );
 
-    virtual void MakeItemVisible(int itemIndex);
+    virtual void MakeItemVisible(intp itemIndex);
 	
 	// This tells which of the visible items is the top one.
 	virtual void GetVBarInfo( int &top, int &nItemsVisible, bool& hbarVisible );
@@ -129,8 +129,8 @@ public:
 	virtual bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist );
 	virtual HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist );
 
-	virtual int		GetPrevChildItemIndex( int itemIndex );
-	virtual int		GetNextChildItemIndex( int itemIndex );
+	virtual intp		GetPrevChildItemIndex( intp itemIndex );
+	virtual intp		GetNextChildItemIndex( intp itemIndex );
 
 	void PerformLayout() override;
 
@@ -141,7 +141,7 @@ public:
 	void		SetMultipleItemDragEnabled( bool state ); // if this is set, then clicking on one row and dragging will select a run or items, etc.
 	bool		IsMultipleItemDragEnabled() const;
 
-	int			FindItemUnderMouse( int mx, int my );
+	intp		FindItemUnderMouse( int mx, int my );
 
 protected:
 	// functions to override
@@ -162,8 +162,8 @@ private:
     friend class TreeNode;
 	friend class TreeNodeText;
 
-	TreeNode* GetItem( int itemIndex );
-	virtual void RemoveChildrenOfNode( int itemIndex );
+	TreeNode* GetItem( intp itemIndex );
+	virtual void RemoveChildrenOfNode( intp itemIndex );
 	void SetLabelBeingEdited( bool state );
 
 	// Clean up the image list
@@ -182,7 +182,7 @@ private:
 	bool m_bAllowMultipleSelections : 1;
 
     // cross reference - no hierarchy ordering in this list
-    CUtlLinkedList<TreeNode *, int>   m_NodeList;
+    CUtlLinkedList<TreeNode *, intp>   m_NodeList;
    	ScrollBar					*m_pHorzScrollBar, *m_pVertScrollBar;
 	int							m_nRowHeight;
 
@@ -194,7 +194,7 @@ private:
     CUtlVector< TreeNode * >	m_SelectedItems;
     TreeViewSubPanel			*m_pSubPanel;
 
-	int							m_nMostRecentlySelectedItem;
+	intp						m_nMostRecentlySelectedItem;
 	bool						m_bScrollbarExternal[ 2 ]; // 0 = vert, 1 = horz
 };
 

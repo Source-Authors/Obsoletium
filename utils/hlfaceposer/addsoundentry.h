@@ -10,6 +10,10 @@
 #pragma once
 #endif
 
+#include "tier0/basetypes.h"
+
+FORWARD_DECLARE_HANDLE(HWND);
+
 #include "basedialogparams.h"
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -35,6 +39,6 @@ struct CAddSoundParams : public CBaseDialogParams
 };
 
 // Display/create dialog
-int AddSound( CAddSoundParams *params, HWND parent );
+intp AddSound( CAddSoundParams *params, HWND parent );
 
 #endif // ADDSOUNDENTRY_H

@@ -85,6 +85,10 @@ CModelBrowser::CModelBrowser(CWnd* pParent /*=NULL*/)
 
 CModelBrowser::~CModelBrowser()
 {
+	m_pButtonCancel->MarkForDeletion();
+	m_pButtonOK->MarkForDeletion();
+	m_pStatusLine->MarkForDeletion();
+	m_pPicker->MarkForDeletion();
 }
 
 void CModelBrowser::SetModelName( const char *pModelName )
@@ -156,18 +160,19 @@ void CModelBrowser::SaveLoadSettings( bool bSave )
 
 		if (!str.IsEmpty())
 		{
-			sscanf(str, "%d %d %d %d", &rect.left, &rect.top, &rect.right, &rect.bottom);
-
-			if (rect.left < 0)
+			if ( sscanf(str, "%d %d %d %d", &rect.left, &rect.top, &rect.right, &rect.bottom) == 4 )
 			{
-				ShowWindow(SW_SHOWMAXIMIZED);
-			}
-			else
-			{
-				MoveWindow(rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, FALSE);
-			}
+				if (rect.left < 0)
+				{
+					ShowWindow(SW_SHOWMAXIMIZED);
+				}
+				else
+				{
+					MoveWindow(rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, FALSE);
+				}
 
-			Resize();
+				Resize();
+			}
 		}
 
 		str = pApp->GetProfileString(pszIniSection, "Filter");

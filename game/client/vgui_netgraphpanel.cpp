@@ -305,8 +305,8 @@ void CNetGraphPanel::OnFontChanged()
 	// Estimate the width of our panel.
 	char str[512];
 	wchar_t ustr[512];
-	Q_snprintf( str, sizeof( str ), "fps:  435  ping: 533 ms lerp 112.3 ms   0/0" );
-	g_pVGuiLocalize->ConvertANSIToUnicode( str, ustr, sizeof( ustr ) );
+	V_sprintf_safe( str, "fps:  435  ping: 533 ms lerp 112.3 ms   0/0" );
+	g_pVGuiLocalize->ConvertANSIToUnicode( str, ustr );
 	int textTall;
 	if ( m_hFontProportional == vgui::INVALID_FONT )
 	{
@@ -1051,9 +1051,9 @@ void CNetGraphPanel::DrawHatches( int x, int y, int maxmsgbytes )
 void CNetGraphPanel::DrawUpdateRate( int xright, int y )
 {
 	char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%i/s", cl_updaterate->GetInt() );
+	V_sprintf_safe( sz, "%i/s", cl_updaterate->GetInt() );
 	wchar_t unicode[ 32 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( sz, unicode, sizeof( unicode  ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( sz, unicode );
 
 	// Last one
 	int textWide, textTall;
@@ -1071,9 +1071,9 @@ void CNetGraphPanel::DrawUpdateRate( int xright, int y )
 void CNetGraphPanel::DrawCmdRate( int xright, int y )
 {
 	char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%i/s", cl_cmdrate->GetInt() );
+	V_sprintf_safe( sz, "%i/s", cl_cmdrate->GetInt() );
 	wchar_t unicode[ 32 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( sz, unicode, sizeof( unicode  ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( sz, unicode );
 
 	// Last one
 	int textWide, textTall;

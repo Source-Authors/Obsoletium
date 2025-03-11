@@ -323,7 +323,7 @@ void CAttachmentsWindow::UpdateStrings( bool bUpdateQC, bool bUpdateTranslation,
 
 		if ( bUpdateQC )
 		{
-			sprintf( str, "$attachment \"%s\" \"%s\" %.2f %.2f %.2f rotate %.0f %.0f %.0f", 
+			V_sprintf_safe( str, "$attachment \"%s\" \"%s\" %.2f %.2f %.2f rotate %.0f %.0f %.0f", 
 				pAttachment.pszName(),
 				pHdr->pBone( iBone )->pszName(),
 				VectorExpand( vTranslation ),
@@ -334,13 +334,13 @@ void CAttachmentsWindow::UpdateStrings( bool bUpdateQC, bool bUpdateTranslation,
 
 		if ( bUpdateTranslation )
 		{
-			sprintf( str, "%.2f %.2f %.2f", VectorExpand( vTranslation ) );
+			V_sprintf_safe( str, "%.2f %.2f %.2f", VectorExpand( vTranslation ) );
 			m_cTranslation->setText( str );
 		}
 
 		if ( bUpdateRotation )
 		{
-			sprintf( str, "%.0f %.0f %.0f", VectorExpand( vRotation ) );
+			V_sprintf_safe( str, "%.0f %.0f %.0f", VectorExpand( vRotation ) );
 			m_cRotation->setText( str );
 		}
 	}

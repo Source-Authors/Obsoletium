@@ -445,9 +445,9 @@ void CPlayerLogoProxy::OnLogoBindInternal( int playerindex )
 	{
 		char crcfilename[ 512 ];
 		char logohex[ 16 ];
-		Q_binarytohex( (byte *)&info.customFiles[0], sizeof( info.customFiles[0] ), logohex, sizeof( logohex ) );
 
-		Q_snprintf( crcfilename, sizeof( crcfilename ), "temp/%s", logohex );
+		V_binarytohex( info.customFiles[0], logohex );
+		V_sprintf_safe( crcfilename, "temp/%s", logohex );
 
 		texture = materials->FindTexture( crcfilename, TEXTURE_GROUP_DECAL, false );
 		if ( texture )

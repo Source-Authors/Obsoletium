@@ -48,9 +48,9 @@ class CUsedTextureList : public CUtlVector<UsedTexture_t>
 {
 public:
 
-	inline int Find(IEditorTexture *pTex)
+	inline intp Find(IEditorTexture *pTex)
 	{
-		for (int i = 0; i < Count(); i++)
+		for (intp i = 0; i < Count(); i++)
 		{
 			if (Element(i).pTex == pTex)
 			{
@@ -162,7 +162,7 @@ class CMapWorld : public CMapClass, public CEditGameClass
 		void EntityList_Add(CMapClass *pObject);
 		void EntityList_Remove(CMapClass *pObject, bool bRemoveChildren);
 
-		int FindEntityBucket( CMapEntity *pEntity, int *pnIndex );
+		int FindEntityBucket( CMapEntity *pEntity, intp *pnIndex );
 
 		//
 		// Serialization.

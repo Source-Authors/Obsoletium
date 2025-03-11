@@ -6,13 +6,11 @@
 //
 //===========================================================================//
 #include "cbase.h"
-#include <stdio.h>
-#include <string.h>
+#include "hlfaceposer.h"
 #include <sys/stat.h>
 #include "filesystem.h"
 #include "mxtk/mx.h"
 #include "mxStatusWindow.h"
-#include "filesystem.h"
 #include "StudioModel.h"
 #include "ControlPanel.h"
 #include "MDLViewer.h"
@@ -60,7 +58,7 @@ bool FPFullpathFileExists( const char *filename )
 char *FacePoser_MakeWindowsSlashes( char *pname )
 {
 	static char returnString[ 4096 ];
-	strcpy( returnString, pname );
+	V_strcpy_safe( returnString, pname );
 	pname = returnString;
 
 	while ( *pname ) 
@@ -211,7 +209,7 @@ void MakeFileWriteable( const char *filename )
 	char *pFullPath;
 	if ( !Q_IsAbsolutePath( filename ) )
 	{
-		pFullPath = (char*)filesystem->RelativePathToFullPath( filename, NULL, pFullPathBuf, sizeof(pFullPathBuf) );
+		pFullPath = (char*)filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
 	}
 	else
 	{
@@ -238,7 +236,7 @@ bool IsFileWriteable( const char *filename )
 	char *pFullPath;
 	if ( !Q_IsAbsolutePath( filename ) )
 	{
-		pFullPath = (char*)filesystem->RelativePathToFullPath( filename, NULL, pFullPathBuf, sizeof(pFullPathBuf) );
+		pFullPath = (char*)filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
 	}
 	else
 	{
@@ -280,26 +278,26 @@ void FPCopyFile( const char *source, const char *dest, bool bCheckOut )
 	char fullpaths[ MAX_PATH ];
 	char fullpathd[ MAX_PATH ];
 
-	if ( !Q_IsAbsolutePath( source ) )
+	if ( !V_IsAbsolutePath( source ) )
 	{
-		filesystem->RelativePathToFullPath( source, NULL, fullpaths, sizeof(fullpaths) );
+		filesystem->RelativePathToFullPath_safe( source, NULL, fullpaths );
 	}
 	else
 	{
-		Q_strncpy( fullpaths, source, sizeof(fullpaths) );
+		V_strcpy_safe( fullpaths, source );
 	}
 
-	Q_strncpy( fullpathd, fullpaths, MAX_PATH );
+	V_strcpy_safe( fullpathd, fullpaths );
 	char *pSubdir = Q_stristr( fullpathd, source );
 	if ( pSubdir )
 	{
 		*pSubdir = 0;
 	}
-	Q_AppendSlash( fullpathd, MAX_PATH );
-	Q_strncat( fullpathd, dest, MAX_PATH, MAX_PATH );
+	V_AppendSlash( fullpathd );
+	V_strcat_safe( fullpathd, dest );
 
-	Q_FixSlashes( fullpaths );
-	Q_FixSlashes( fullpathd );
+	V_FixSlashes( fullpaths );
+	V_FixSlashes( fullpathd );
 
 	if ( bCheckOut )
 	{
@@ -312,57 +310,81 @@ void FPCopyFile( const char *source, const char *dest, bool bCheckOut )
 	}
 }
 
-bool FacePoser_HasWindowStyle( mxWindow *w, int bits )
+bool FacePoser_HasWindowStyle( mxWidget *w, int bits )
 {
 	HWND wnd = (HWND)w->getHandle();
 	DWORD style = GetWindowLong( wnd, GWL_STYLE );
 	return ( style & bits ) ? true : false;
 }
 
-bool FacePoser_HasWindowExStyle( mxWindow *w, int bits )
+bool FacePoser_HasWindowExStyle( mxWidget *w, int bits )
 {
 	HWND wnd = (HWND)w->getHandle();
 	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE );
 	return ( style & bits ) ? true : false;
 }
 
-void FacePoser_AddWindowStyle( mxWindow *w, int addbits )
+static bool FacePoser_SetWindowLong( HWND wnd, int index, LONG newLong )
+{
+	// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowlonga
+	// If the previous value of the specified 32-bit integer is zero, and the function succeeds,
+	// the return value is zero, but the function does not clear the last error information.
+	//
+	// This makes it difficult to determine success or failure.  To deal with this, you should
+	// clear the last error information by calling SetLastError with 0 before calling
+	// SetWindowLong.  Then, function failure will be indicated by a return value of zero and
+	// a GetLastError result that is nonzero.
+	SetLastError(ERROR_SUCCESS);
+
+	const LONG rc = SetWindowLong( wnd, index, newLong );
+	const bool ok = rc || GetLastError() == ERROR_SUCCESS;
+
+	char windowTitle[256];
+	AssertMsg(ok, "Failed to set 0x%p window (%s) index %d value to %ld.",
+		wnd,
+		wnd && GetWindowText(wnd, windowTitle, ARRAYSIZE(windowTitle)) ? windowTitle : "null",
+		index,
+		newLong );
+	return ok;
+}
+
+void FacePoser_AddWindowStyle( mxWidget *w, int addbits )
 {
 	HWND wnd = (HWND)w->getHandle();
 	DWORD style = GetWindowLong( wnd, GWL_STYLE );
 	style |= addbits;
-	SetWindowLong( wnd, GWL_STYLE, style );
+	FacePoser_SetWindowLong( wnd, GWL_STYLE, style );
 }
 
-void FacePoser_AddWindowExStyle( mxWindow *w, int addbits )
+void FacePoser_AddWindowExStyle( mxWidget *w, int addbits )
 {
 	HWND wnd = (HWND)w->getHandle();
 	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE );
 	style |= addbits;
-	SetWindowLong( wnd, GWL_EXSTYLE, style );
+	FacePoser_SetWindowLong( wnd, GWL_EXSTYLE, style );
 }
 
-void FacePoser_RemoveWindowStyle( mxWindow *w, int removebits )
+void FacePoser_RemoveWindowStyle( mxWidget *w, int removebits )
 {
 	HWND wnd = (HWND)w->getHandle();
 	DWORD style = GetWindowLong( wnd, GWL_STYLE );
 	style &= ~removebits;
-	SetWindowLong( wnd, GWL_STYLE, style );
+	FacePoser_SetWindowLong( wnd, GWL_STYLE, style );
 }
 
-void FacePoser_RemoveWindowExStyle( mxWindow *w, int removebits )
+void FacePoser_RemoveWindowExStyle( mxWidget *w, int removebits )
 {
 	HWND wnd = (HWND)w->getHandle();
 	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE );
 	style &= ~removebits;
-	SetWindowLong( wnd, GWL_EXSTYLE, style );
+	FacePoser_SetWindowLong( wnd, GWL_EXSTYLE, style );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *w - 
 //-----------------------------------------------------------------------------
-void FacePoser_MakeToolWindow( mxWindow *w, bool smallcaption )
+void FacePoser_MakeToolWindow( mxWidget *w, bool smallcaption )
 {
 	FacePoser_AddWindowStyle( w, WS_VISIBLE | WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS );
 	if ( smallcaption )
@@ -380,51 +402,51 @@ void FacePoser_LoadWindowPositions( char const *name, bool& visible, int& x, int
 	char subkey[ 512 ];
 	int v;
 
-	Q_snprintf( subkey, sizeof( subkey ), "%s - visible", name );
+	V_sprintf_safe( subkey, "%s - visible", name );
 	LoadViewerSettingsInt( subkey, &v );
 	visible = v ? true : false;
 	
-	Q_snprintf( subkey, sizeof( subkey ), "%s - locked", name );
+	V_sprintf_safe( subkey, "%s - locked", name );
 	LoadViewerSettingsInt( subkey, &v );
 	locked = v ? true : false;
 
-	Q_snprintf( subkey, sizeof( subkey ), "%s - zoomed", name );
+	V_sprintf_safe( subkey, "%s - zoomed", name );
 	LoadViewerSettingsInt( subkey, &v );
 	zoomed = v ? true : false;
 
-	Q_snprintf( subkey, sizeof( subkey ), "%s - x", name );
+	V_sprintf_safe( subkey, "%s - x", name );
 	LoadViewerSettingsInt( subkey, &x );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - y", name );
+	V_sprintf_safe( subkey, "%s - y", name );
 	LoadViewerSettingsInt( subkey, &y );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - width", name );
+	V_sprintf_safe( subkey, "%s - width", name );
 	LoadViewerSettingsInt( subkey, &w );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - height", name );
+	V_sprintf_safe( subkey, "%s - height", name );
 	LoadViewerSettingsInt( subkey, &h );
 }
 
 void FacePoser_SaveWindowPositions( char const *name, bool visible, int x, int y, int w, int h, bool locked, bool zoomed )
 {
 	char subkey[ 512 ];
-	Q_snprintf( subkey, sizeof( subkey ), "%s - visible", name );
+	V_sprintf_safe( subkey, "%s - visible", name );
 	SaveViewerSettingsInt( subkey, visible );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - locked", name );
+	V_sprintf_safe( subkey, "%s - locked", name );
 	SaveViewerSettingsInt( subkey, locked );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - x", name );
+	V_sprintf_safe( subkey, "%s - x", name );
 	SaveViewerSettingsInt( subkey, x );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - y", name );
+	V_sprintf_safe( subkey,  "%s - y", name );
 	SaveViewerSettingsInt( subkey, y );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - width", name );
+	V_sprintf_safe( subkey,  "%s - width", name );
 	SaveViewerSettingsInt( subkey, w );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - height", name );
+	V_sprintf_safe( subkey,  "%s - height", name );
 	SaveViewerSettingsInt( subkey, h );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - zoomed", name );
+	V_sprintf_safe( subkey,  "%s - zoomed", name );
 	SaveViewerSettingsInt( subkey, zoomed );
 }
 
 static char g_PhonemeRoot[ MAX_PATH ] = { 0 };
 void FacePoser_SetPhonemeRootDir( char const *pchRootDir )
 {
-	Q_strncpy( g_PhonemeRoot, pchRootDir, sizeof( g_PhonemeRoot ) );
+	V_strcpy_safe( g_PhonemeRoot, pchRootDir );
 }
 
 //-----------------------------------------------------------------------------
@@ -449,19 +471,19 @@ void FacePoser_EnsurePhonemesLoaded( void )
 	for ( int i = 0 ; i < ARRAYSIZE( ext ); ++i )
 	{
 		char clname[ 256 ];
-		Q_snprintf( clname, sizeof( clname ), "%sphonemes%s", g_PhonemeRoot, ext[ i ] );
-		Q_FixSlashes( clname );
-		Q_strlower( clname );
+		V_sprintf_safe( clname, "%sphonemes%s", g_PhonemeRoot, ext[ i ] );
+		V_FixSlashes( clname );
+		V_strlower( clname );
 
 		if ( !expressions->FindClass( clname, false ) )
 		{
 			char clfile[ MAX_PATH ];
-			Q_snprintf( clfile, sizeof( clfile ), "expressions/%sphonemes%s.txt", g_PhonemeRoot, ext[ i ] );
+			V_sprintf_safe( clfile, "expressions/%sphonemes%s.txt", g_PhonemeRoot, ext[ i ] );
 			Q_FixSlashes( clfile );
 			Q_strlower( clfile );
 
 			if ( g_pFileSystem->FileExists( clfile ) )
-				{
+			{
 				expressions->LoadClass( clfile );
 				CExpClass *cl = expressions->FindClass( clname, false );
 				if ( !cl )
@@ -481,7 +503,11 @@ bool FacePoser_ShowFileNameDialog( bool openFile, char *relative, size_t bufsize
 	Assert( wildcard );
 
 	char workingdir[ 256 ];
-	Q_getwd( workingdir, sizeof( workingdir ) );
+	if ( !Q_getwd( workingdir ) )
+	{
+		return false;
+	}
+
 	strlwr( workingdir );
 	Q_FixSlashes( workingdir, '/' );
 
@@ -524,22 +550,6 @@ bool FacePoser_ShowOpenFileNameDialog( char *relative, size_t bufsize, char cons
 bool FacePoser_ShowSaveFileNameDialog( char *relative, size_t bufsize, char const *subdir, char const *wildcard )
 {
 	return FacePoser_ShowFileNameDialog( false, relative, bufsize, subdir, wildcard );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: converts an english string to unicode
-//-----------------------------------------------------------------------------
-int ConvertANSIToUnicode(const char *ansi, wchar_t *unicode, int unicodeBufferSize)
-{
-	return ::MultiByteToWideChar(CP_ACP, 0, ansi, -1, unicode, unicodeBufferSize);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: converts an unicode string to an english string
-//-----------------------------------------------------------------------------
-int ConvertUnicodeToANSI(const wchar_t *unicode, char *ansi, int ansiBufferSize)
-{
-	return ::WideCharToMultiByte(CP_ACP, 0, unicode, -1, ansi, ansiBufferSize, NULL, NULL);
 }
 
 //-----------------------------------------------------------------------------

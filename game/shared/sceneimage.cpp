@@ -299,14 +299,14 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 
 	// get all the VCD files according to the seacrh paths
 	char searchPaths[512];
-	g_pFullFileSystem->GetSearchPath( "GAME", false, searchPaths, sizeof( searchPaths ) );
+	g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths );
 	char *pPath = strtok( searchPaths, ";" );
 	while ( pPath )
 	{
 		intp currentCount = vcdFileList.Count();
 
 		char szPath[MAX_PATH];
-		V_ComposeFileName( pPath, "scenes/*.vcd", szPath, sizeof( szPath ) );
+		V_ComposeFileName( pPath, "scenes/*.vcd", szPath );
 
 		scriptlib->FindFiles( szPath, true, vcdFileList );
 

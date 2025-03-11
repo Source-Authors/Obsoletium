@@ -21,21 +21,20 @@ LPCTSTR GetErrorString();
 
 CProcessWnd::CProcessWnd() : pEditBuf{nullptr}, uBufLen{0}, pFont{nullptr}
 {
-	Font.CreatePointFont(100, "Courier New");
 }
 
 CProcessWnd::~CProcessWnd()
 {
+	delete pFont;
 }
 
 
 BEGIN_MESSAGE_MAP(CProcessWnd, CBaseWnd)
-	ON_BN_CLICKED(IDC_PROCESSWND_COPYALL, OnCopyAll)
 	//{{AFX_MSG_MAP(CProcessWnd)
 	ON_BN_CLICKED(IDC_PROCESSWND_COPYALL, OnCopyAll)
-	ON_WM_TIMER()
 	ON_WM_CREATE()
 	ON_WM_SIZE()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -61,7 +60,7 @@ int CProcessWnd::Execute(PRINTF_FORMAT_STRING LPCTSTR pszCmd, ...)
 
 	va_end(vl);
 
-	return Execute(pszCmd, strBuf.GetString());
+	return Execute(pszCmd, strBuf);
 }
 
 void CProcessWnd::Clear()
@@ -73,6 +72,10 @@ void CProcessWnd::Clear()
 
 void CProcessWnd::Append(CString str)
 {
+	// dimhotepus: Normalize output as ASAN reports for example dumps \n only but edit needs \r\n.
+	str.Replace("\r\n", "\n");
+	str.Replace("\n", "\r\n");
+
     m_EditText += str;
 	Edit.SetWindowText(m_EditText);
     Edit.LineScroll(Edit.GetLineCount());
@@ -117,10 +120,10 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 				si.hStdOutput = hChildStdoutWr;
 
 				PROCESS_INFORMATION pi;
-				CString str;
-				str.Format("%s %s", pszCmd, pszCmdLine);
+				CString commandLine;
+				commandLine.Format("%s %s", pszCmd, pszCmdLine);
 
-				if (::CreateProcess(NULL, str.GetBuffer(), NULL, NULL, TRUE, 
+				if (::CreateProcess(NULL, commandLine.GetBuffer(), NULL, NULL, TRUE, 
 					DETACHED_PROCESS, NULL, NULL, &si, &pi))
 				{
 					HANDLE hProcess = pi.hProcess;
@@ -128,7 +131,8 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 					constexpr DWORD BUFFER_SIZE{4096};
 					// read from pipe..
 					char buffer[BUFFER_SIZE];
-					BOOL bDone = FALSE;
+
+					DWORD rc;
 					
 					while(1)
 					{
@@ -138,33 +142,27 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 						if (PeekNamedPipe( hChildStdoutRd_, NULL, NULL, NULL, &dwCount, NULL) && dwCount)
 						{
 							dwCount = min(dwCount, BUFFER_SIZE - 1);
-							ReadFile( hChildStdoutRd_, buffer, dwCount, &dwRead, NULL);
+							if (!ReadFile( hChildStdoutRd_, buffer, dwCount, &dwRead, NULL))
+							{
+								dwRead = 0;
+							}
 						}
 
 						if (dwRead)
 						{
-							buffer[dwRead] = 0;
+							buffer[dwRead] = '\0';
 							Append(buffer);
 						}
 						else if (WaitForSingleObject(hProcess, 1000) != WAIT_TIMEOUT)
 						{
 							// check process termination
-							if(bDone)
+							if ( ::GetExitCodeProcess(pi.hProcess, &rc) && rc != STILL_ACTIVE )
 								break;
-
-							bDone = TRUE;	// next time we get it
 						}
 					}
 
 					// dimhotepus: Correctly process exit code for processes.
-					if ( DWORD rc; ::GetExitCodeProcess(pi.hProcess, &rc) && rc != STILL_ACTIVE )
-					{
-						rval = rc;
-					}
-					else
-					{
-						rval = STILL_ACTIVE;
-					}
+					rval = rc;
 
 					::CloseHandle(pi.hThread);
 					::CloseHandle(pi.hProcess);
@@ -175,7 +173,7 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 
 						// dimhotepus: Dump process exit code on failure.
 						CString strTmp;
-						strTmp.Format("\r\n* Failure during command execution:\r\n   %s\r\n* Command returned nonsuccess error code:   \"%d\"\r\n", str.GetBuffer(), rval);
+						strTmp.Format("\r\n\r\n** Failure during command execution:\r\n   %s\r\n** Command returned nonsuccess error code:   \"%d\"\r\n", commandLine.GetBuffer(), rval);
 						Append(strTmp);
 					}
 				}
@@ -186,7 +184,7 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 					SetForegroundWindow();
 
 					CString strTmp;
-					strTmp.Format("* Could not execute the command:\r\n   %s\r\n* Windows gave the error message:\r\n   \"%s\"\r\n", str.GetBuffer(), error);
+					strTmp.Format("** Could not execute the command:\r\n   %s\r\n** Last error message:\r\n   \"%s\"\r\n", commandLine.GetBuffer(), error);
 					Append(strTmp);
 				}
 				
@@ -205,36 +203,30 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 /////////////////////////////////////////////////////////////////////////////
 // CProcessWnd message handlers
 
-
-void CProcessWnd::OnTimer(UINT_PTR nIDEvent) 
-{
-	__super::OnTimer(nIDEvent);
-}
-
 int CProcessWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
 	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+	pFont = CreateFont();
+
 	// create big CEdit in window
 	CRect rctClient;
 	GetClientRect(rctClient);
 
-	CRect rctEdit;
-	rctEdit = rctClient;
-	rctEdit.bottom = rctClient.bottom - 20;
+	CRect rctEdit = rctClient;
+	rctEdit.bottom = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 
 	Edit.Create(WS_CHILD | WS_BORDER | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN, rctClient, this, IDC_PROCESSWND_EDIT);
 	Edit.SetReadOnly(TRUE);
-	Edit.SetFont(&Font);
+	Edit.SetFont(pFont);
 
-	CRect rctButton;
-	rctButton = rctClient;
-	rctButton.top = rctClient.bottom - 20;
+	CRect rctButton = rctClient;
+	rctButton.top = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 
 	m_btnCopyAll.Create("Copy to Clipboard", WS_CHILD | WS_VISIBLE, rctButton, this, IDC_PROCESSWND_COPYALL);
 	m_btnCopyAll.SetButtonStyle(BS_PUSHBUTTON);
-	
+
 	return 0;
 }
 
@@ -246,17 +238,25 @@ void CProcessWnd::OnSize(UINT nType, int cx, int cy)
 	CRect rctClient;
 	GetClientRect(rctClient);
 
-	CRect rctEdit;
-	rctEdit = rctClient;
-	rctEdit.bottom = rctClient.bottom - 20;
+	CRect rctEdit = rctClient;
+	rctEdit.bottom = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 	Edit.MoveWindow(rctEdit);
 
-	CRect rctButton;
-	rctButton = rctClient;
-	rctButton.top = rctClient.bottom - 20;
+	CRect rctButton = rctClient;
+	rctButton.top = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 	m_btnCopyAll.MoveWindow(rctButton);
 }
 
+DpiAwareFont* CProcessWnd::CreateFont()
+{
+	delete pFont;
+	
+	pFont = new DpiAwareFont{m_dpi_behavior.GetCurrentDpiY()};
+	// load font
+	pFont->CreatePointFont(10 * 10, "Courier New");
+
+	return pFont;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Prepare the process window for display. If it has not been created
@@ -266,11 +266,20 @@ void CProcessWnd::GetReady(LPCTSTR pszDocName)
 {
 	if (!IsWindow(m_hWnd))
 	{
-		CString strClass = AfxRegisterWndClass(0, AfxGetApp()->LoadStandardCursor(IDC_ARROW), HBRUSH(GetStockObject(WHITE_BRUSH)));
-		CString title;
+		CString windowClass = AfxRegisterWndClass
+		(
+			0,
+			AfxGetApp()->LoadStandardCursor(IDC_ARROW),
+			HBRUSH(GetStockObject(WHITE_BRUSH))
+		);
+
+		CString windowTitle;
 		// dimhotepus: Add compiling map name to title.
-		title.Format("Compile - [%s]", pszDocName);
-		CreateEx(0, strClass, title.GetString(), WS_OVERLAPPEDWINDOW, 50, 50, 600, 400, AfxGetMainWnd()->GetSafeHwnd(), nullptr);
+		windowTitle.Format("Compile - [%s]", pszDocName);
+
+		CreateEx(0, windowClass, windowTitle, WS_OVERLAPPEDWINDOW,
+			50,	50,	600, 400,
+			AfxGetMainWnd()->GetSafeHwnd(), nullptr);
 	}
 
 	ShowWindow(SW_SHOW);
@@ -301,7 +310,7 @@ static void CopyToClipboard(const CString& text)
 				LPTSTR tstrCopy = static_cast<LPTSTR>(::GlobalLock(hglbCopy));
 				if (tstrCopy)
 				{
-					strcpy(tstrCopy, text.GetString());
+					V_strncpy(tstrCopy, text.GetString(), text.GetLength() + sizeof(TCHAR));
 				}
 
 				::GlobalUnlock(hglbCopy);
@@ -317,4 +326,13 @@ void CProcessWnd::OnCopyAll()
 	// Used to call m_Edit.SetSel(0,1); m_Edit.Copy(); m_Edit.Clear()
 	// but in win9x the clipboard will only receive at most 64k of text from the control
 	CopyToClipboard(m_EditText);
+}
+
+LRESULT CProcessWnd::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	const LRESULT rc{__super::OnDpiChanged(wParam, lParam)};
+
+	pFont = CreateFont();
+
+	return rc;
 }

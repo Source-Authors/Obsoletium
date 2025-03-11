@@ -18,6 +18,9 @@
 #include "SelectModeDlgBar.h"
 #include "materialdlg.h"
 #include "ManifestDialog.h"
+#include "windows/dpi_wnd_behavior.h"
+#include "windows/base_status_bar.h"
+#include "windows/base_tool_bar.h"
 
 class CChildFrame;
 class CObjectProperties;
@@ -55,7 +58,7 @@ public:
 	void LoadWindowStates(std::fstream *pFile = NULL);
 
 	inline CFaceEditSheet *GetFaceEditSheet( void ) { return m_pFaceEditSheet; }
-	inline CStatusBar *GetStatusBar() { return &m_wndStatusBar; }
+	inline CBaseStatusBar *GetStatusBar() { return &m_wndStatusBar; }
 
 	void ShowSearchReplaceDialog(void);
 	void ShowFaceEditSheetOrTextureBar( bool bShowFaceEditSheet );
@@ -112,7 +115,8 @@ protected:
 	afx_msg void OnClose();
 	afx_msg void OnDestroy();
 	afx_msg void OnPaint();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnToolsOptions();
 	afx_msg void OnViewShowconnections();
 	afx_msg void OnToolsPrefabfactory();
@@ -134,11 +138,7 @@ protected:
 	afx_msg void OnUpdateApplicatorUI(CCmdUI *pUI);
 	afx_msg BOOL OnHelpInfo(HELPINFO*);
 	afx_msg void OnEnterMenuLoop( BOOL bIsTrackPopupMenu );
-#if _MSC_VER < 1300
-	afx_msg void OnActivateApp(BOOL bActive, HTASK hTask);
-#else
 	afx_msg void OnActivateApp(BOOL bActive, DWORD hThread);
-#endif
 	afx_msg void OnUpdateEditFunction(CCmdUI *pCmdUI);
 	afx_msg BOOL OnApplicator(UINT nID);
 	afx_msg BOOL OnSoundBrowser(UINT nID);
@@ -164,19 +164,18 @@ private:
 
 	void EnableFaceEditMode(bool bEnable);
 	void Autosave( void );
-	void LoadOldestAutosave( void );
 
-	CMDIClientWnd			wndMDIClient;			// dvs: what in God's name is this for?
+	CMDIClientWnd			wndMDIClient;	// dvs: what in God's name is this for?
 
 	CSearchReplaceDlg		*m_pSearchReplaceDlg;
 
 	BOOL					m_bUndoActive;
 
-	CStatusBar				m_wndStatusBar;
-	CToolBar				m_wndMapToolBar;
-	CToolBar				m_wndUndoRedoToolBar;
-	CToolBar				m_wndMapEditToolBar;
-	CToolBar				m_wndMapOps;
+	CBaseStatusBar			m_wndStatusBar;
+	CBaseToolBar			m_wndMapToolBar;
+	CBaseToolBar			m_wndUndoRedoToolBar;
+	CBaseToolBar			m_wndMapEditToolBar;
+	CBaseToolBar			m_wndMapOps;
 
 	CSelectModeDlgBar		m_SelectModeDlg;
 
@@ -185,6 +184,8 @@ private:
 	bool					m_bMinimized;
 	bool					m_bShellSessionActive;		// Whether a client has initiated a remote shell editing session.
 	CBitmap					m_bmMapEditTools256;
+
+	se::windows::ui::CDpiWindowBehavior		m_dpi_behavior;
 
 	enum
 	{

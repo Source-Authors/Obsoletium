@@ -1,36 +1,25 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
+// Command-line tool used to compile models from intermediate formats exported
+// from modeling packages to the binary .mdl format that is read by the Source
+// engine.
 //
-// $NoKeywords: $
-//
-//===========================================================================//
-
-
+// See
+// https://developer.valvesoftware.com/wiki/StudioMDL_(Source)
+// https://developer.valvesoftware.com/wiki/QC
 //
 // studiomdl.c: generates a studio .mdl file from a .qc script
 // models/<scriptname>.mdl.
-//
 
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-#include <windows.h>
+#include "winlite.h"
 #undef GetCurrentDirectory
 
 #include <Shlwapi.h> // PathCanonicalize
 #pragma comment( lib, "shlwapi" )
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
 #include <direct.h>
 #include "istudiorender.h"
 #include "filesystem_tools.h"
-#include "tier2/fileutils.h"
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
@@ -41,18 +30,19 @@
 #include "optimize.h"
 #include "byteswap.h"
 #include "studiobyteswap.h"
-#include "tier1/strtools.h"
 #include "bspflags.h"
-#include "tier0/icommandline.h"
-#include "utldict.h"
-#include "tier1/utlsortvector.h"
 #include "bitvec.h"
 #include "appframework/appframework.h"
 #include "datamodel/idatamodel.h"
 #include "materialsystem/materialsystem_config.h"
 #include "vstdlib/cvar.h"
+#include "tier0/icommandline.h"
 #include "tier1/tier1.h"
+#include "tier1/utlsortvector.h"
+#include "tier1/utldict.h"
+#include "tier1/strtools.h"
 #include "tier2/tier2.h"
+#include "tier2/fileutils.h"
 #include "tier3/tier3.h"
 #include "datamodel/dmelementfactoryhelper.h"
 #include "mdlobjects/dmeboneflexdriver.h"
@@ -62,10 +52,13 @@
 #include "movieobjects/dmecombinationoperator.h"
 #include "dmserializers/idmserializers.h"
 #include "tier2/p4helpers.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No P4
+//#include "p4lib/ip4.h"
 #include "mdllib/mdllib.h"
 #include "perfstats.h"
 #include "worldsize.h"
+
+#include "tier0/memdbgon.h"
 
 bool g_collapse_bones = false;
 bool g_collapse_bones_aggressive = false;
@@ -85,11 +78,10 @@ bool g_bVerifyOnly = false;
 bool g_bUseBoneInBBox = true;
 bool g_bLockBoneLengths = false;
 bool g_bOverridePreDefinedBones = false;
-int g_minLod = 0;
-int g_numAllowedRootLODs = 0;
+intp g_minLod = 0;
+intp g_numAllowedRootLODs = 0;
 bool g_bNoWarnings = false;
 int g_maxWarnings = -1;
-bool g_bX360 = false;
 bool g_bBuildPreview = false;
 bool g_bCenterBonesOnVerts = false;
 bool g_bDumpMaterials = false;
@@ -178,8 +170,7 @@ void CreateMakefile_AddDependency( const char *pFileName )
 	}
 
 	CUtlSymbol sym( pFileName );
-	int i;
-	for( i = 0; i < m_CreateMakefileDependencies.Count(); i++ )
+	for( intp i = 0; i < m_CreateMakefileDependencies.Count(); i++ )
 	{
 		if( m_CreateMakefileDependencies[i] == sym )
 		{
@@ -196,7 +187,7 @@ void EnsureDependencyFileCheckedIn( const char *pFileName )
 		return;
 
 	char pFullPath[MAX_PATH];
-	if ( !GetGlobalFilePath( pFileName, pFullPath, sizeof(pFullPath) ) )
+	if ( !GetGlobalFilePath( pFileName, pFullPath ) )
 	{
 		MdlWarning( "Model dependency file '%s' is missing.\n", pFileName );
 		return;
@@ -232,22 +223,21 @@ void CreateMakefile_OutputMakefile( void )
 //		V_strcat_safe( mdlname, g_pPlatformName );
 //		V_strcat_safe( mdlname, "/" );	
 //	}
-	V_strcat_safe( mdlname, "models/" );	
+	V_strcat_safe( mdlname, "models/" );
 	V_strcat_safe( mdlname, outname );
-	Q_StripExtension( mdlname, mdlname, sizeof( mdlname ) );
+	Q_StripExtension( mdlname, mdlname );
 	V_strcat_safe( mdlname, ".mdl" );
 	Q_FixSlashes( mdlname );
 
 	fprintf( fp, "%s:", mdlname );
-	int i;
-	for( i = 0; i < m_CreateMakefileDependencies.Count(); i++ )
+	for( intp i = 0; i < m_CreateMakefileDependencies.Count(); i++ )
 	{
 		fprintf( fp, " %s", m_CreateMakefileDependencies[i].String() );
 	}
 	fprintf( fp, "\n" );
 	char mkdirpath[MAX_PATH];
 	V_strcpy_safe( mkdirpath, mdlname );
-	Q_StripFilename( mkdirpath );
+	V_StripFilename( mkdirpath );
 	fprintf( fp, "\tmkdir \"%s\"\n", mkdirpath );
 	fprintf( fp, "\t%s -quiet %s\n\n", CommandLine()->GetParm( 0 ), fullpath );
 	fclose( fp );
@@ -259,7 +249,7 @@ void CreateMakefile_OutputMakefile( void )
 
 static bool g_bFirstWarning = true;
 
-void TokenError( const char *fmt, ... )
+[[noreturn]] void TokenError( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	static char output[1024];
 	va_list		args;
@@ -282,7 +272,7 @@ void TokenError( const char *fmt, ... )
 	}
 }
 
-void MdlError( const char *fmt, ... )
+[[noreturn]] void MdlError( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	static char output[1024];
 	static char *knownExtensions[] = {".mdl", ".ani", ".phy", ".sw.vtx", ".dx80.vtx", ".dx90.vtx", ".vvd"};
@@ -295,15 +285,15 @@ void MdlError( const char *fmt, ... )
 	{
 		if (g_bFirstWarning)
 		{
-			printf("%s :\n", fullpath );
+			fprintf(stderr, "%s :\n", fullpath );
 			g_bFirstWarning = false;
 		}
-		printf("\t");
+		fprintf(stderr, "\t");
 	}
 
-	printf("ERROR: ");
+	fprintf(stderr, "ERROR: ");
 	va_start( args, fmt );
-	vprintf( fmt, args );
+	vfprintf( stderr, fmt, args );
 
 	// delete premature files
 	// unforunately, content is built without verification
@@ -311,18 +301,18 @@ void MdlError( const char *fmt, ... )
 	if (g_bHasModelName)
 	{
 		// undescriptive errors in batch processes could be anonymous
-		printf("ERROR: Aborted Processing on '%s'\n", outname);
+		fprintf(stderr, "ERROR: Aborted Processing on '%s'\n", outname);
 
 		V_strcpy_safe( fileName, gamedir );
-		V_strcat_safe( fileName, "models/" );	
+		V_strcat_safe( fileName, "models/" );
 		V_strcat_safe( fileName, outname );
-		Q_FixSlashes( fileName );
-		Q_StripExtension( fileName, baseName, sizeof( baseName ) );
+		V_FixSlashes( fileName );
+		V_StripExtension( fileName, baseName );
 
-		for (int i=0; i<ARRAYSIZE(knownExtensions); i++)
+		for (const auto *ext : knownExtensions)
 		{
-			V_strcpy_safe( fileName, baseName);
-			V_strcat_safe( fileName, knownExtensions[i] );
+			V_strcpy_safe( fileName, baseName );
+			V_strcat_safe( fileName, ext );
 
 			// really need filesystem concept here
 //			g_pFileSystem->RemoveFile( fileName );
@@ -334,7 +324,7 @@ void MdlError( const char *fmt, ... )
 }
 
 
-void MdlWarning( const char *fmt, ... )
+void MdlWarning( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
@@ -348,17 +338,17 @@ void MdlWarning( const char *fmt, ... )
 	{
 		if (g_bFirstWarning)
 		{
-			printf("%s :\n", fullpath );
+			fprintf(stderr, "%s :\n", fullpath );
 			g_bFirstWarning = false;
 		}
-		printf("\t");
+		fprintf(stderr, "\t");
 	}
 
 	Assert( 0 );
 
-	printf("WARNING: ");
+	fprintf(stderr, "WARNING: ");
 	va_start( args, fmt );
-	vprintf( fmt, args );
+	vfprintf( stderr, fmt, args );
 
 	if (g_maxWarnings > 0)
 		g_maxWarnings--;
@@ -367,9 +357,9 @@ void MdlWarning( const char *fmt, ... )
 	{
 		if (g_quiet)
 		{
-			printf("\t");
+			fprintf(stderr, "\t");
 		}
-		printf("suppressing further warnings...\n");
+		fprintf(stderr, "suppressing further warnings...\n");
 	}
 
 	RestoreConsoleTextColor( old );
@@ -478,19 +468,22 @@ void MdlExceptionFilter( unsigned long code )
 =================
 */
 
-int k_memtotal;
-void *kalloc( int num, int size )
+intp k_memtotal;
+void *kalloc( intp num, intp size )
 {
 	// printf( "calloc( %d, %d )\n", num, size );
 	// printf( "%d ", num * size );
-	int nMemSize = num * size;
+	intp nMemSize = num * size;
 	k_memtotal += nMemSize;
 
 	// ensure memory alignment on maximum of ALIGN
 	nMemSize += 511;
+
 	void *ptr = malloc( nMemSize );
+	if (!ptr) return nullptr;
+
 	memset( ptr, 0, nMemSize );
-	ptr = (byte *)((int)((byte *)ptr + 511) & ~511);
+	ptr = (byte *)((intp)((byte *)ptr + 511) & ~511);
 	return ptr;
 }
 
@@ -517,7 +510,7 @@ float verify_atof( const char *token )
 	{
 		TokenError( "expecting number, got \"%s\"\n", token );
 	}
-	return atof( token );
+	return strtof( token, nullptr );
 }
 
 float verify_atof_with_null( const char *token )
@@ -529,7 +522,7 @@ float verify_atof_with_null( const char *token )
 	{
 		TokenError( "expecting number, got \"%s\"\n", token );
 	}
-	return atof( token );
+	return strtof( token, nullptr );
 }
 
 //-----------------------------------------------------------------------------
@@ -537,12 +530,12 @@ float verify_atof_with_null( const char *token )
 //-----------------------------------------------------------------------------
 static void AppendKeyValueText( CUtlVector< char > *pKeyValue, const char *pString )
 {
-	int nLen = strlen(pString);
-	int nFirst = pKeyValue->AddMultipleToTail( nLen );
+	intp nLen = strlen(pString);
+	intp nFirst = pKeyValue->AddMultipleToTail( nLen );
 	memcpy( pKeyValue->Base() + nFirst, pString, nLen );
 }
 
-int	KeyValueTextSize( CUtlVector< char > *pKeyValue )
+intp	KeyValueTextSize( CUtlVector< char > *pKeyValue )
 {
 	return pKeyValue->Count();
 }
@@ -637,8 +630,8 @@ int LookupPoseParameter( char *name )
 //-----------------------------------------------------------------------------
 s_sourceanim_t *FindSourceAnim( s_source_t *pSource, const char *pAnimName )
 {
-	int nCount = pSource->m_Animations.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pSource->m_Animations.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		s_sourceanim_t *pAnim = &pSource->m_Animations[i];
 		if ( !Q_stricmp( pAnimName, pAnim->animationname ) )
@@ -652,8 +645,8 @@ const s_sourceanim_t *FindSourceAnim( const s_source_t *pSource, const char *pAn
 	if ( !pAnimName[0] )
 		return NULL;
 
-	int nCount = pSource->m_Animations.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pSource->m_Animations.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const s_sourceanim_t *pAnim = &pSource->m_Animations[i];
 		if ( !Q_stricmp( pAnimName, pAnim->animationname ) )
@@ -667,15 +660,15 @@ s_sourceanim_t *FindOrAddSourceAnim( s_source_t *pSource, const char *pAnimName 
 	if ( !pAnimName[0] )
 		return NULL;
 
-	int nCount = pSource->m_Animations.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pSource->m_Animations.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		s_sourceanim_t *pAnim = &pSource->m_Animations[i];
 		if ( !Q_stricmp( pAnimName, pAnim->animationname ) )
 			return pAnim;
 	}
 
-	int nIndex = pSource->m_Animations.AddToTail();
+	intp nIndex = pSource->m_Animations.AddToTail();
 	s_sourceanim_t *pAnim = &pSource->m_Animations[nIndex];
 	memset( pAnim, 0, sizeof(s_sourceanim_t) );
 	Q_strncpy( pAnim->animationname, pAnimName, sizeof(pAnim->animationname) );
@@ -890,8 +883,8 @@ int LookupTexture( const char *pTextureName, bool bRelativePath )
 	char pTextureNoExt[MAX_PATH];
 	char pTextureBase[MAX_PATH];
 	char pTextureBase2[MAX_PATH];
-	Q_StripExtension( pTextureName, pTextureNoExt, sizeof(pTextureNoExt) );
-	Q_FileBase( pTextureName, pTextureBase, sizeof(pTextureBase) );
+	Q_StripExtension( pTextureName, pTextureNoExt );
+	Q_FileBase( pTextureName, pTextureBase );
 
 	int nFlags = bRelativePath ? RELATIVE_TEXTURE_PATH_SPECIFIED : 0;
 	int i;
@@ -913,7 +906,7 @@ int LookupTexture( const char *pTextureName, bool bRelativePath )
 		}
 
 		// Comparing non-relative vs relative
-		Q_FileBase( g_texture[i].name, pTextureBase2, sizeof(pTextureBase2) );
+		Q_FileBase( g_texture[i].name, pTextureBase2 );
 		if ( !Q_stricmp( pTextureNoExt, pTextureBase2 ) )
 			return i;
 	}
@@ -1018,11 +1011,11 @@ void SetSkinValues( )
 		V_strcpy_safe( szName, fullpath );
 		while (szName[0] != '\0' && strnicmp( "models", szName, 6 ) != 0)
 		{
-			strcpy( &szName[0], &szName[1] );
+			V_strcpy_safe( szName, &szName[1] );
 		}
 		if (szName[0] != '\0')
 		{
-			Q_StripFilename( szName );
+			V_StripFilename( szName );
 			V_strcat_safe( szName, "/" );
 		}
 		else
@@ -1033,9 +1026,9 @@ void SetSkinValues( )
 //				V_strcat_safe( szName, g_pPlatformName );
 //				V_strcat_safe( szName, "/" );	
 //			}
-			V_strcpy_safe( szName, "models/" );	
+			V_strcpy_safe( szName, "models/" );
 			V_strcat_safe( szName, outname );
-			Q_StripExtension( szName, szName, sizeof( szName ) );
+			V_StripExtension( szName, szName );
 			V_strcat_safe( szName, "/" );
 		}
 		cdtextures[0] = strdup( szName );
@@ -1045,7 +1038,7 @@ void SetSkinValues( )
 	for (i = 0; i < g_numtextures; i++)
 	{
 		char szName[256];
-		Q_StripExtension( g_texture[i].name, szName, sizeof( szName ) );
+		Q_StripExtension( g_texture[i].name, szName );
 		Q_strncpy( g_texture[i].name, szName, sizeof( g_texture[i].name ) );
 	}
 
@@ -1119,7 +1112,6 @@ int		g_iLinecount;
 void Build_Reference( s_source_t *pSource, const char *pAnimName )
 {
 	int		i, parent;
-	Vector	angle;
 
 	s_sourceanim_t *pReferenceAnim = FindSourceAnim( pSource, pAnimName );
 	for (i = 0; i < pSource->numbones; i++)
@@ -1263,7 +1255,7 @@ void Cmd_Eyeposition (void)
 void Cmd_MaxEyeDeflection()
 {
 	GetToken( false );
-	g_flMaxEyeDeflection = cosf( verify_atof( token ) * M_PI / 180.0f );
+	g_flMaxEyeDeflection = cosf( DEG2RAD( verify_atof( token ) ) );
 }
 
 
@@ -1613,7 +1605,7 @@ void AddBodyFlexFetchRule(
 
 	case FLEXCONTROLLER_REMAP_NWAY:
 		{
-			int nRemapCount = remap.m_RawControls.Count();
+			intp nRemapCount = remap.m_RawControls.Count();
 			float flStep = ( nRemapCount > 2 ) ? 2.0f / ( nRemapCount - 1 ) : 0.0f;
 
 			if ( remapLocalIndex == 0 )
@@ -1712,10 +1704,10 @@ void AddBodyFlexRule(
 	pRule->flex = nFlexDesc;
 
 	// This will multiply the combination together
-	const int nCombinationCount = rule.m_Combination.Count();
+	const intp nCombinationCount = rule.m_Combination.Count();
 	if ( nCombinationCount )
 	{
-		for ( int j = 0; j < nCombinationCount; ++j )
+		for ( intp j = 0; j < nCombinationCount; ++j )
 		{
 			// Handle any controller remapping
 			AddBodyFlexFetchRule( pSource, pRule, rule.m_Combination[ j ],
@@ -1732,13 +1724,13 @@ void AddBodyFlexRule(
 	}
 
 	// This will multiply in the suppressors
-	int nDominators = rule.m_Dominators.Count();
-	for ( int j = 0; j < nDominators; ++j )
+	intp nDominators = rule.m_Dominators.Count();
+	for ( intp j = 0; j < nDominators; ++j )
 	{
-		const int nFactorCount = rule.m_Dominators[j].Count();
+		const intp nFactorCount = rule.m_Dominators[j].Count();
 		if ( nFactorCount )
 		{
-			for ( int k = 0; k < nFactorCount; ++k )
+			for ( intp k = 0; k < nFactorCount; ++k )
 			{
 				AddBodyFlexFetchRule( pSource, pRule, rule.m_Dominators[ j ][ k ],
 					pRawIndexToRemapSourceIndex, pRawIndexToRemapLocalIndex,
@@ -1765,32 +1757,32 @@ void AddFlexControllers(
 	CUtlVector< int > &r2i = pSource->m_rightRemapIndexToGlobalFlexControllIndex;
 
 	// Number of Raw controls in this source
-	const int nRawControlCount = pSource->m_CombinationControls.Count();
+	const intp nRawControlCount = pSource->m_CombinationControls.Count();
 	// Initialize rawToRemapIndices
 	r2s.SetSize( nRawControlCount );
 	r2l.SetSize( nRawControlCount );
-	for ( int i = 0; i < nRawControlCount; ++i )
+	for ( intp i = 0; i < nRawControlCount; ++i )
 	{
 		r2s[ i ] = -1;
 		r2l[ i ] = -1;
 	}
 
 	// Number of Remapped Controls in this source
-	const int nRemappedControlCount = pSource->m_FlexControllerRemaps.Count();
+	const intp nRemappedControlCount = pSource->m_FlexControllerRemaps.Count();
 	l2i.SetSize( nRemappedControlCount );
 	r2i.SetSize( nRemappedControlCount );
 
-	for ( int i = 0; i < nRemappedControlCount; ++i )
+	for ( intp i = 0; i < nRemappedControlCount; ++i )
 	{
 		s_flexcontrollerremap_t &remapControl = pSource->m_FlexControllerRemaps[ i ];
 
 		// Number of Raw Controls In This Remapped Control
-		const int nRemappedRawControlCount = remapControl.m_RawControls.Count();
+		const intp nRemappedRawControlCount = remapControl.m_RawControls.Count();
 
 		// Figure out the mapping from raw to remapped
-		for ( int j = 0; j < nRemappedRawControlCount; ++j )
+		for ( intp j = 0; j < nRemappedRawControlCount; ++j )
 		{
-			for ( int k = 0; k < nRawControlCount; ++k )
+			for ( intp k = 0; k < nRawControlCount; ++k )
 			{
 				if ( remapControl.m_RawControls[ j ] == pSource->m_CombinationControls[ k ].name )
 				{
@@ -1815,7 +1807,7 @@ void AddFlexControllers(
 
 			s_flexcontroller_t *pController;
 
-			int nLen = remapControl.m_Name.Length();
+			intp nLen = remapControl.m_Name.Length();
 			char *pTemp = (char*)_alloca( nLen + 7 );	// 'left_' && 'right_'
 
 			memcpy( pTemp + 6, remapControl.m_Name.Get(), nLen + 1 );
@@ -1894,8 +1886,8 @@ void AddFlexControllers(
 
 			remapControl.m_MultiIndex = g_numflexcontrollers;
 			s_flexcontroller_t *pController = &g_flexcontroller[g_numflexcontrollers++];	
-			const int nLen = remapControl.m_Name.Length();
-			char *pTemp = ( char * )_alloca( nLen + 6 + 1 ); // 'multi_' + 1 for the NULL
+			const intp nLen = remapControl.m_Name.Length();
+			char *pTemp = stackallocT( char, nLen + 6 + 1 ); // 'multi_' + 1 for the NULL
 
 			memcpy( pTemp, "multi_", 6 );
 			memcpy( pTemp + 6, remapControl.m_Name.Get(), nLen + 1 );
@@ -1941,14 +1933,14 @@ void AddFlexControllers(
 //-----------------------------------------------------------------------------
 void AddBodyFlexRemaps( s_source_t *pSource )
 {
-	int nCount = pSource->m_FlexControllerRemaps.Count();
-	for( int i = 0; i < nCount; ++i )
+	intp nCount = pSource->m_FlexControllerRemaps.Count();
+	for( intp i = 0; i < nCount; ++i )
 	{
-		int k = g_FlexControllerRemap.AddToTail();
+		intp k = g_FlexControllerRemap.AddToTail();
 		s_flexcontrollerremap_t &remap = g_FlexControllerRemap[k];
 		remap = pSource->m_FlexControllerRemaps[i];
 	}
-}					 
+}
 
 
 //-----------------------------------------------------------------------------
@@ -1956,8 +1948,8 @@ void AddBodyFlexRemaps( s_source_t *pSource )
 //-----------------------------------------------------------------------------
 void AddBodyFlexRules( s_source_t *pSource )
 {
-	const int nRemapCount = pSource->m_FlexControllerRemaps.Count();
-	for ( int i = 0; i < nRemapCount; ++i )
+	const intp nRemapCount = pSource->m_FlexControllerRemaps.Count();
+	for ( intp i = 0; i < nRemapCount; ++i )
 	{
 		s_flexcontrollerremap_t &remap = pSource->m_FlexControllerRemaps[ i ];
 		if ( remap.m_RemapType == FLEXCONTROLLER_REMAP_EYELID && !remap.m_EyesUpDownFlexName.IsEmpty() )
@@ -1974,8 +1966,8 @@ void AddBodyFlexRules( s_source_t *pSource )
 		}
 	}
 
-	const int nCount = pSource->m_CombinationRules.Count();
-	for ( int i = 0; i < nCount; ++i )
+	const intp nCount = pSource->m_CombinationRules.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		s_combinationrule_t &rule = pSource->m_CombinationRules[i];
 		s_flexkey_t &flexKey = g_flexkey[ pSource->m_nKeyStartIndex + rule.m_nFlex ];
@@ -1998,8 +1990,8 @@ void AddBodyFlexData( s_source_t *pSource, int imodel )
 	pSource->m_nKeyStartIndex = g_numflexkeys;
 
 	// Add flex keys
-	int nCount = pSource->m_FlexKeys.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pSource->m_FlexKeys.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		s_flexkey_t &key = pSource->m_FlexKeys[i];
 
@@ -2076,7 +2068,7 @@ bool s_attachment_t::operator==( const s_attachment_t &rhs ) const
 //-----------------------------------------------------------------------------
 void AddBodyAttachments( s_source_t *pSource )
 {
-	for ( int i = 0; i < pSource->m_Attachments.Count(); ++i )
+	for ( intp i = 0; i < pSource->m_Attachments.Count(); ++i )
 	{
 		const s_attachment_t &sourceAtt = pSource->m_Attachments[i];
 
@@ -2751,7 +2743,7 @@ static s_source_t *FindCachedSource( const char* name, const char* xext )
 				return g_source[i];
 		}
 		/*
-		sprintf (g_szFilename, "%s%s.vta", cddir[numdirs], name );
+		V_sprintf_safe (g_szFilename, "%s%s.vta", cddir[numdirs], name );
 		for (i = 0; i < g_numsources; i++)
 		{
 			if (stricmp( g_szFilename, g_source[i]->filename ) == 0)
@@ -2774,13 +2766,13 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 		TokenError( "Load_Source( %s ) - overflowed g_numsources.", name );
 
 	Assert(name);
-	int namelen = strlen(name) + 1;
+	intp namelen = V_strlen(name) + 1;
 	char* pTempName = (char*)_alloca( namelen );
 	char xext[32];
 	int result = false;
 
 	V_strncpy( pTempName, name, namelen );
-	Q_ExtractFileExtension( pTempName, xext, sizeof( xext ) );
+	V_ExtractFileExtension( pTempName, xext );
 
 	if (xext[0] == '\0')
 	{
@@ -2788,7 +2780,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 	}
 	else
 	{
-		Q_StripExtension( pTempName, pTempName, namelen );
+		V_StripExtension( pTempName, pTempName, namelen );
 	}
 
 	s_source_t* pSource = FindCachedSource( pTempName, xext );
@@ -2809,7 +2801,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 		g_source[g_numsources]->isActiveModel = true;
 	}
 
-	char const * load_extensions[] = { "vrm", "smd", "sma", "phys", "vta", "obj", "dmx", "xml" };
+	constexpr char const * load_extensions[] = { "vrm", "smd", "sma", "phys", "vta", "obj", "dmx", "xml" };
 	int ( *load_procs[] )( s_source_t * ) = { Load_VRM, Load_SMD, Load_SMD, Load_SMD, Load_VTA, Load_OBJ, Load_DMX, Load_DMX };
 
 	Assert( ARRAYSIZE(load_extensions) == ARRAYSIZE(load_procs) );
@@ -2817,7 +2809,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 	{
 		if ( ( !result && xext[0] == '\0' ) || Q_stricmp( xext, load_extensions[kk] ) == 0)
 		{
-			Q_snprintf( g_szFilename, sizeof(g_szFilename), "%s%s.%s", cddir[numdirs], pTempName, load_extensions[kk] );
+			V_sprintf_safe( g_szFilename, "%s%s.%s", cddir[numdirs], pTempName, load_extensions[kk] );
 			V_strcpy_safe( g_source[g_numsources]->filename, g_szFilename );
 			result = (load_procs[kk])( g_source[g_numsources] );
 			
@@ -2857,8 +2849,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 
 s_sequence_t *LookupSequence( const char *name )
 {
-	int i;
-	for ( i = 0; i < g_sequence.Count(); ++i )
+	for ( intp i = 0; i < g_sequence.Count(); ++i )
 	{
 		if ( !Q_stricmp( g_sequence[i].name, name ) )
 			return &g_sequence[i];
@@ -3635,7 +3626,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 	if ( !Q_stricmp( "motionrollback", token ) )
 	{
 		GetToken( false );
-		panim->motionrollback = atof( token );
+		panim->motionrollback = strtof( token, nullptr );
 		return true;
 	}
 
@@ -4809,7 +4800,7 @@ void Option_Eyeball( s_model_t *pmodel )
 
 	// diameter
 	GetToken (false);
-	eyeball->radius = verify_atof (token) / 2.0;
+	eyeball->radius = verify_atof (token) / 2.0f;
 
 	// Z angle offset
 	GetToken (false);
@@ -4820,7 +4811,7 @@ void Option_Eyeball( s_model_t *pmodel )
 
 	// pupil scale
 	GetToken (false);
-	eyeball->iris_scale = 1.0 / verify_atof( token );
+	eyeball->iris_scale = 1.0f / verify_atof( token );
 	
 	VectorCopy( tmp, eyeball->org );
 
@@ -4966,10 +4957,10 @@ void Option_Flex( char *name, char *vtafile, int imodel, float pairsplit )
 	if (pairsplit != 0)
 	{
 		char mod[256];
-		sprintf( mod, "%sR", name );
+		V_sprintf_safe( mod, "%sR", name );
 		flexdesc = Add_Flexdesc( mod );
 
-		sprintf( mod, "%sL", name );
+		V_sprintf_safe( mod, "%sL", name );
 		flexpair = Add_Flexdesc( mod );
 	}
 	else
@@ -5036,7 +5027,7 @@ void Option_Flex( char *name, char *vtafile, int imodel, float pairsplit )
 	g_flexkey[g_numflexkeys].source = pSource;
 	if ( pSource->m_Animations.Count() )
 	{
-		Q_strncpy( g_flexkey[g_numflexkeys].animationname, pSource->m_Animations[0].animationname, sizeof( g_flexkey[g_numflexkeys].animationname ) );
+		V_strcpy_safe( g_flexkey[g_numflexkeys].animationname, pSource->m_Animations[0].animationname );
 	}
 	else
 	{
@@ -5050,10 +5041,10 @@ void Option_Flex( char *name, char *vtafile, int imodel, float pairsplit )
 //-----------------------------------------------------------------------------
 // Adds combination data to the source
 //-----------------------------------------------------------------------------
-int FindSourceFlexKey( s_source_t *pSource, const char *pName )
+intp FindSourceFlexKey( s_source_t *pSource, const char *pName )
 {
-	int nCount = pSource->m_FlexKeys.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pSource->m_FlexKeys.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pSource->m_FlexKeys[i].animationname, pName ) )
 			return i;
@@ -5071,7 +5062,7 @@ void AddFlexKey( s_source_t *pSource, CDmeCombinationOperator *pComboOp, const c
 	if ( FindSourceFlexKey( pSource, pFlexKeyName ) >= 0 )
 		return;
 
-	int i = pSource->m_FlexKeys.AddToTail();
+	intp i = pSource->m_FlexKeys.AddToTail();
 
 	s_flexkey_t &key = pSource->m_FlexKeys[i];
 	memset( &key, 0, sizeof(key) );
@@ -5097,7 +5088,7 @@ void AddCombination( s_source_t *pSource, CDmeCombinationOperator *pCombination 
 	int nControlCount = pCombination->GetRawControlCount();
 	for ( int i = 0; i < nControlCount; ++i )
 	{
-		int m = pSource->m_CombinationControls.AddToTail();
+		intp m = pSource->m_CombinationControls.AddToTail();
 		s_combinationcontrol_t &control = pSource->m_CombinationControls[m];
 		Q_strncpy( control.name, pCombination->GetRawControlName( i ), sizeof(control.name) );
 	}
@@ -5113,18 +5104,18 @@ void AddCombination( s_source_t *pSource, CDmeCombinationOperator *pCombination 
 			if ( !pDeltaState )
 				continue;
 
-			int nFlex = FindSourceFlexKey( pSource, pDeltaState->GetName() );
+			intp nFlex = FindSourceFlexKey( pSource, pDeltaState->GetName() );
 			if ( nFlex < 0 )
 				continue;
 
-			int k = pSource->m_CombinationRules.AddToTail();
+			intp k = pSource->m_CombinationRules.AddToTail();
 			s_combinationrule_t &rule = pSource->m_CombinationRules[k];
 			rule.m_nFlex = nFlex;
 			rule.m_Combination = pCombination->GetOperationControls( i, j );
 			int nDominatorCount = pCombination->GetOperationDominatorCount( i, j );
 			for ( int l = 0; l < nDominatorCount; ++l )
 			{
-				int m = rule.m_Dominators.AddToTail();
+				intp m = rule.m_Dominators.AddToTail();
 				rule.m_Dominators[m] = pCombination->GetOperationDominator( i, j, l );
 			}
 		}
@@ -5134,7 +5125,7 @@ void AddCombination( s_source_t *pSource, CDmeCombinationOperator *pCombination 
 	nControlCount = pCombination->GetControlCount();
 	for ( int i = 0; i < nControlCount; ++i )
 	{
-		int k = pSource->m_FlexControllerRemaps.AddToTail();
+		intp k = pSource->m_FlexControllerRemaps.AddToTail();
 		s_flexcontrollerremap_t &remap = pSource->m_FlexControllerRemaps[k];
 		remap.m_Name = pCombination->GetControlName( i );
 		remap.m_bIsStereo = pCombination->IsStereoControl( i );
@@ -5278,7 +5269,7 @@ void Option_Eyelid( int imodel )
 	g_flexkey[g_numflexkeys+0].decay = 0.0;
 	if ( pSource->m_Animations.Count() > 0 )
 	{
-		Q_strncpy( g_flexkey[g_numflexkeys+0].animationname, pSource->m_Animations[0].animationname, sizeof(g_flexkey[g_numflexkeys+0].animationname) );
+		V_strcpy_safe( g_flexkey[g_numflexkeys+0].animationname, pSource->m_Animations[0].animationname );
 	}
 	else
 	{
@@ -5286,7 +5277,7 @@ void Option_Eyelid( int imodel )
 	}
 
 	g_flexkey[g_numflexkeys+1].source = g_flexkey[g_numflexkeys+0].source;
-	Q_strncpy( g_flexkey[g_numflexkeys+1].animationname, g_flexkey[g_numflexkeys+0].animationname, sizeof(g_flexkey[g_numflexkeys+1].animationname) );
+	V_strcpy_safe( g_flexkey[g_numflexkeys+1].animationname, g_flexkey[g_numflexkeys+0].animationname );
 	g_flexkey[g_numflexkeys+1].frame = neutralframe;
 	g_flexkey[g_numflexkeys+1].flexdesc = basedesc;
 	g_flexkey[g_numflexkeys+1].imodel = imodel;
@@ -5878,7 +5869,7 @@ void Cmd_Model( )
 			V_strcpy_safe( FAC, token );
 
 			GetToken( false );
-			float split = atof( token );
+			float split = strtof( token, nullptr );
 
 			if (depth == 0)
 			{
@@ -6077,7 +6068,7 @@ void Cmd_IKChain( )
 		else if (stricmp( "pad", token ) == 0)
 		{
 			GetToken(false);
-			g_ikchain[g_numikchains].radius = verify_atof( token ) / 2.0;
+			g_ikchain[g_numikchains].radius = verify_atof( token ) / 2.0f;
 		}
 		else if (stricmp( "floor", token ) == 0)
 		{
@@ -6182,21 +6173,6 @@ void Cmd_Controller (void)
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-// Debugging function that enumerate all a models bones to stdout.
-static void SpewBones()
-{
-	MdlWarning("g_numbones %i\n",g_numbones);
-
-	for ( int i = g_numbones; --i >= 0; )
-	{
-		printf("%s\n",g_bonetable[i].name);
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -6384,14 +6360,14 @@ void Cmd_Hitgroup( )
 void Cmd_Hitbox( )
 {
 	bool autogenerated = false;
-	if ( g_hitboxsets.Size() == 0 )
+	if ( g_hitboxsets.Count() == 0 )
 	{
 		g_hitboxsets.AddToTail();
 		autogenerated = true;
 	}
 
 	// Last one
-	s_hitboxset *set = &g_hitboxsets[ g_hitboxsets.Size() - 1 ];
+	s_hitboxset *set = &g_hitboxsets[ g_hitboxsets.Count() - 1 ];
 	if ( autogenerated )
 	{
 		memset( set, 0, sizeof( *set ) );
@@ -6482,7 +6458,7 @@ void Cmd_JointSurfaceProp ()
 	GetToken (false);
 
 	// Search for the name in our list
-	int i;
+	intp i;
 	for ( i = s_JointSurfaceProp.Count(); --i >= 0; )
 	{
 		if (!stricmp(s_JointSurfaceProp[i].m_pJointName, token))
@@ -6518,7 +6494,7 @@ char* GetDefaultSurfaceProp ( )
 //-----------------------------------------------------------------------------
 static char* FindSurfaceProp ( const char* pJointName )
 {
-	for ( int i = s_JointSurfaceProp.Count(); --i >= 0; )
+	for ( intp i = s_JointSurfaceProp.Count(); --i >= 0; )
 	{
 		if (!stricmp(s_JointSurfaceProp[i].m_pJointName, pJointName))
 		{
@@ -6568,7 +6544,7 @@ char* GetSurfaceProp ( const char* pJointName )
 //-----------------------------------------------------------------------------
 void ConsistencyCheckSurfaceProp ( )
 {
-	for ( int i = s_JointSurfaceProp.Count(); --i >= 0; )
+	for ( intp i = s_JointSurfaceProp.Count(); --i >= 0; )
 	{
 		int j = findGlobalBone( s_JointSurfaceProp[i].m_pJointName );
 
@@ -6651,7 +6627,7 @@ void Cmd_JointContents ()
 	GetToken (false);
 
 	// Search for the name in our list
-	int i;
+	intp i;
 	for ( i = s_JointContents.Count(); --i >= 0; )
 	{
 		if (!stricmp(s_JointContents[i].m_pJointName, token))
@@ -6689,7 +6665,7 @@ int GetDefaultContents( )
 //-----------------------------------------------------------------------------
 static int FindContents( const char* pJointName )
 {
-	for ( int i = s_JointContents.Count(); --i >= 0; )
+	for ( intp i = s_JointContents.Count(); --i >= 0; )
 	{
 		if (!stricmp(s_JointContents[i].m_pJointName, pJointName))
 		{
@@ -6739,7 +6715,7 @@ int GetContents( const char* pJointName )
 //-----------------------------------------------------------------------------
 void ConsistencyCheckContents( )
 {
-	for ( int i = s_JointContents.Count(); --i >= 0; )
+	for ( intp i = s_JointContents.Count(); --i >= 0; )
 	{
 		int j = findGlobalBone( s_JointContents[i].m_pJointName );
 
@@ -6760,7 +6736,7 @@ void Cmd_BoneMerge( )
 	if( g_bCreateMakefile )
 		return;
 
-	int nIndex = g_BoneMerge.AddToTail();
+	intp nIndex = g_BoneMerge.AddToTail();
 
 	// bone name
 	GetToken (false);
@@ -6860,7 +6836,8 @@ void Cmd_Attachment( )
 		}
 		else
 		{
-			TokenError("unknown attachment (%s) option: ", g_attachment[g_numattachments].name, token );
+			// dimhotepus: Add missed argument.
+			TokenError("unknown attachment (%s) option: %s", g_attachment[g_numattachments].name, token );
 		}
 	}
 
@@ -6948,7 +6925,7 @@ void Cmd_Skiptransition( )
 
 static void Cmd_ReplaceModel( LodScriptData_t& lodData )
 {
-	int i = lodData.modelReplacements.AddToTail();
+	intp i = lodData.modelReplacements.AddToTail();
 	CLodScriptReplacement_t& newReplacement = lodData.modelReplacements[i];
 
 	// from
@@ -7012,7 +6989,7 @@ static void Cmd_ReplaceModel( LodScriptData_t& lodData )
 
 static void Cmd_RemoveModel( LodScriptData_t& lodData )
 {
-	int i = lodData.modelReplacements.AddToTail();
+	intp i = lodData.modelReplacements.AddToTail();
 	CLodScriptReplacement_t& newReplacement = lodData.modelReplacements[i];
 
 	// from
@@ -7042,7 +7019,7 @@ static void Cmd_RemoveModel( LodScriptData_t& lodData )
 
 static void Cmd_ReplaceBone( LodScriptData_t& lodData )
 {
-	int i = lodData.boneReplacements.AddToTail();
+	intp i = lodData.boneReplacements.AddToTail();
 	CLodScriptReplacement_t& newReplacement = lodData.boneReplacements[i];
 
 	// from
@@ -7060,7 +7037,7 @@ static void Cmd_ReplaceBone( LodScriptData_t& lodData )
 
 static void Cmd_BoneTreeCollapse( LodScriptData_t& lodData )
 {
-	int i = lodData.boneTreeCollapses.AddToTail();
+	intp i = lodData.boneTreeCollapses.AddToTail();
 	CLodScriptReplacement_t& newCollapse = lodData.boneTreeCollapses[i];
 
 	// from
@@ -7074,7 +7051,7 @@ static void Cmd_BoneTreeCollapse( LodScriptData_t& lodData )
 
 static void Cmd_ReplaceMaterial( LodScriptData_t& lodData )
 {
-	int i = lodData.materialReplacements.AddToTail();
+	intp i = lodData.materialReplacements.AddToTail();
 	CLodScriptReplacement_t& newReplacement = lodData.materialReplacements[i];
 
 	// from
@@ -7098,7 +7075,7 @@ static void Cmd_ReplaceMaterial( LodScriptData_t& lodData )
 
 static void Cmd_RemoveMesh( LodScriptData_t& lodData )
 {
-	int i = lodData.meshRemovals.AddToTail();
+	intp i = lodData.meshRemovals.AddToTail();
 	CLodScriptReplacement_t& newReplacement = lodData.meshRemovals[i];
 
 	// from
@@ -7114,7 +7091,7 @@ void Cmd_LOD( const char *cmdname )
 		MdlError( "Model can only have one $shadowlod and it must be the last lod in the .qc (%d) : %s\n", g_iLinecount, g_szLine );
 	}
 
-	int i = g_ScriptLODs.AddToTail();
+	intp i = g_ScriptLODs.AddToTail();
 	LodScriptData_t& newLOD = g_ScriptLODs[i];
 
 	if( g_ScriptLODs.Count() > MAX_NUM_LODS )
@@ -7357,7 +7334,7 @@ void Cmd_CenterBonesOnVerts( )
 void Cmd_MotionExtractionRollBack( )
 {
 	GetToken( false );
-	g_flDefaultMotionRollback = atof( token );
+	g_flDefaultMotionRollback = strtof( token, nullptr );
 }
 
 //-----------------------------------------------------------------------------
@@ -7366,7 +7343,7 @@ void Cmd_MotionExtractionRollBack( )
 void Cmd_SectionFrames( )
 {
 	GetToken( false );
-	g_sectionFrames = atof( token );
+	g_sectionFrames = atoi( token );
 	GetToken( false );
 	g_minSectionFrameLimit = atoi( token );
 }
@@ -7656,7 +7633,7 @@ bool ParseJiggleAngleConstraint( s_jigglebone_t *jiggleInfo )
 		return false;
 	}
 	
-	jiggleInfo->data.angleLimit = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.angleLimit = DEG2RAD( verify_atof( token ) );
 	
 	return true;
 }
@@ -7673,7 +7650,7 @@ bool ParseJiggleYawConstraint( s_jigglebone_t *jiggleInfo )
 		return false;	
 	}
 
-	jiggleInfo->data.minYaw = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.minYaw = DEG2RAD( verify_atof(token) );
 
 	if ( !GetToken( false ) )
 	{
@@ -7681,7 +7658,7 @@ bool ParseJiggleYawConstraint( s_jigglebone_t *jiggleInfo )
 		return false;
 	}
 
-	jiggleInfo->data.maxYaw = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.maxYaw = DEG2RAD( verify_atof( token ) );
 	
 	return true;
 }
@@ -7698,7 +7675,7 @@ bool ParseJigglePitchConstraint( s_jigglebone_t *jiggleInfo )
 		return false;	
 	}
 
-	jiggleInfo->data.minPitch = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.minPitch = DEG2RAD( verify_atof( token ) );
 
 	if ( !GetToken( false ) )
 	{
@@ -7706,7 +7683,7 @@ bool ParseJigglePitchConstraint( s_jigglebone_t *jiggleInfo )
 		return false;
 	}
 
-	jiggleInfo->data.maxPitch = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.maxPitch = DEG2RAD( verify_atof( token ) );
 
 	return true;
 }
@@ -8346,19 +8323,19 @@ void Grab_Vertexanimation( s_source_t *psource, const char *pAnimName )
 	MdlError( "unexpected EOF: %s\n", psource->filename );
 }
 
-bool GetGlobalFilePath( const char *pSrc, char *pFullPath, int nMaxLen )
+bool GetGlobalFilePath( const char *pSrc, char *pFullPath, intp nMaxLen )
 {
 	char	pFileName[1024];
-	Q_strncpy( pFileName, ExpandPath( (char*)pSrc ), sizeof(pFileName) );
+	V_strcpy_safe( pFileName, ExpandPath( (char*)pSrc ) );
 
 	// This is kinda gross. . . doing the same work in cmdlib on SafeOpenRead.
-	int nPathLength;
+	intp nPathLength;
 	if( CmdLib_HasBasePath( pFileName, nPathLength ) )
 	{
 		char tmp[1024];
-		int i;
+		intp i;
 
-		int nNumBasePaths = CmdLib_GetNumBasePaths();
+		intp nNumBasePaths = CmdLib_GetNumBasePaths();
 		for( i = 0; i < nNumBasePaths; i++ )
 		{
 			V_strcpy_safe( tmp, CmdLib_GetBasePath( i ) );
@@ -8388,19 +8365,18 @@ bool GetGlobalFilePath( const char *pSrc, char *pFullPath, int nMaxLen )
 
 int OpenGlobalFile( char *src )
 {
-	int		time1;
+	time_t	time1;
 	char	filename[1024];
 
 	V_strcpy_safe( filename, ExpandPath( src ) );
 
-	int pathLength;
-	int numBasePaths = CmdLib_GetNumBasePaths();
+	intp pathLength;
+	intp numBasePaths = CmdLib_GetNumBasePaths();
 	// This is kinda gross. . . doing the same work in cmdlib on SafeOpenRead.
 	if( CmdLib_HasBasePath( filename, pathLength ) )
 	{
 		char tmp[1024];
-		int i;
-		for( i = 0; i < numBasePaths; i++ )
+		for( intp i = 0; i < numBasePaths; i++ )
 		{
 			V_strcpy_safe( tmp, CmdLib_GetBasePath( i ) );
 			V_strcat_safe( tmp, filename + pathLength );
@@ -8464,7 +8440,9 @@ int Load_VTA( s_source_t *psource )
 	while (GetLineInput()) 
 	{
 		g_iLinecount++;
-		sscanf( g_szLine, "%s %d", cmd, &option );
+		sscanf( g_szLine, "%1023s %d", cmd, &option );
+		cmd[ssize(cmd) - 1] = '\0';
+
 		if (stricmp( cmd, "version" ) == 0) 
 		{
 			if (option != 1) 
@@ -8634,7 +8612,17 @@ void Grab_QuatInterpBones( )
 			return;
 		}
 
-		int i = sscanf( g_szLine, "%s %s %s %s %s", cmd, pBone->bonename, pBone->parentname, pBone->controlparentname, pBone->controlname );
+		int i = sscanf( g_szLine, "%1023s %127s %127s %127s %127s",
+			cmd,
+			pBone->bonename,
+			pBone->parentname,
+			pBone->controlparentname,
+			pBone->controlname );
+		cmd[ssize(cmd) - 1] = '\0';
+		pBone->bonename[ssize(pBone->bonename) - 1] = '\0';
+		pBone->parentname[ssize(pBone->parentname) - 1] = '\0';
+		pBone->controlparentname[ssize(pBone->controlparentname) - 1] = '\0';
+		pBone->controlname[ssize(pBone->controlname) - 1] = '\0';
 
 		while ( i == 4 && stricmp( cmd, "<aimconstraint>" ) == 0 )
 		{
@@ -8648,7 +8636,17 @@ void Grab_QuatInterpBones( )
 			// it will exit leaving that line in g_szLine, so check for the end and scan the current buffer again and continue on with 
 			// the normal QuatInterpBones process
 
-			i = sscanf( g_szLine, "%s %s %s %s %s", cmd, pBone->bonename, pBone->parentname, pBone->controlparentname, pBone->controlname );
+			i = sscanf( g_szLine, "%1023s %127s %127s %127s %127s",
+				cmd,
+				pBone->bonename,
+				pBone->parentname,
+				pBone->controlparentname,
+				pBone->controlname );
+			cmd[ssize(cmd) - 1] = '\0';
+			pBone->bonename[ssize(pBone->bonename) - 1] = '\0';
+			pBone->parentname[ssize(pBone->parentname) - 1] = '\0';
+			pBone->controlparentname[ssize(pBone->controlparentname) - 1] = '\0';
+			pBone->controlname[ssize(pBone->controlname) - 1] = '\0';
 		}
 
 		if (i == 5 && stricmp( cmd, "<helper>") == 0)
@@ -8680,7 +8678,7 @@ void Grab_QuatInterpBones( )
 
 				if (i == 4)
 				{
-					pAxis->percentage = distance / 100.0;
+					pAxis->percentage = distance / 100.0f;
 					pAxis->size = size;
 				}
 				else
@@ -8714,9 +8712,7 @@ void Grab_QuatInterpBones( )
 				Vector pos;
 				RadianEuler ang;
 
-				QAngle rot;
-				int j;
-				i = sscanf( g_szLine, "<trigger> %f %f %f %f %f %f %f %f %f %f", 
+				int j = sscanf( g_szLine, "<trigger> %f %f %f %f %f %f %f %f %f %f", 
 					&tolerance,
 					&trigger.x, &trigger.y, &trigger.z,
 					&ang.x, &ang.y, &ang.z,
@@ -8805,7 +8801,7 @@ void Load_ProceduralBones( )
 	g_iLinecount = 0;
 
 	char ext[32];
-	Q_ExtractFileExtension( filename, ext, sizeof( ext ) );
+	V_ExtractFileExtension( filename, ext );
 
 	if (stricmp( ext, "vrd") == 0)
 	{
@@ -8816,17 +8812,21 @@ void Load_ProceduralBones( )
 		while (GetLineInput()) 
 		{
 			g_iLinecount++;
-			sscanf( g_szLine, "%s %d", cmd, &option );
-			if (stricmp( cmd, "version" ) == 0) 
+			if (sscanf( g_szLine, "%1023s %d", cmd, &option ) >= 1)
 			{
-				if (option != 1) 
+				cmd[std::size(cmd) - 1] = '\0';
+
+				if (stricmp( cmd, "version" ) == 0) 
 				{
-					MdlError("bad version\n");
+					if (option != 1) 
+					{
+						MdlError("bad version\n");
+					}
 				}
-			}
-			else if (stricmp( cmd, "proceduralbones" ) == 0) 
-			{
-				Grab_AxisInterpBones( );
+				else if (stricmp( cmd, "proceduralbones" ) == 0) 
+				{
+					Grab_AxisInterpBones( );
+				}
 			}
 		}
 	}
@@ -8855,7 +8855,7 @@ void Cmd_CDMaterials()
 		char szPath[512];
 		Q_strncpy( szPath, token, sizeof( szPath ) );
 
-		int len = strlen( szPath );
+		intp len = V_strlen( szPath );
 		if ( len > 0 && szPath[len-1] != '/' && szPath[len-1] != '\\' )
 		{
 			Q_strncat( szPath, "/", sizeof( szPath ), COPY_ALL_CHARACTERS );
@@ -8969,7 +8969,7 @@ void Cmd_MinLOD()
 	// "minlod" rules over "allowrootlods"
 	if ( g_numAllowedRootLODs > 0 && g_numAllowedRootLODs < g_minLod )
 	{
-		MdlWarning( "$minlod %d overrides $allowrootlods %d, proceeding with $allowrootlods %d.\n", g_minLod, g_numAllowedRootLODs, g_minLod );
+		MdlWarning( "$minlod %zd overrides $allowrootlods %zd, proceeding with $allowrootlods %zd.\n", g_minLod, g_numAllowedRootLODs, g_minLod );
 		g_numAllowedRootLODs = g_minLod;
 	}
 }
@@ -8982,7 +8982,7 @@ void Cmd_AllowRootLODs()
 	// Root LOD restriction has to obey "minlod" request
 	if ( g_numAllowedRootLODs > 0 && g_numAllowedRootLODs < g_minLod )
 	{
-		MdlWarning( "$allowrootlods %d is conflicting with $minlod %d, proceeding with $allowrootlods %d.\n", g_numAllowedRootLODs, g_minLod, g_minLod );
+		MdlWarning( "$allowrootlods %zd is conflicting with $minlod %zd, proceeding with $allowrootlods %zd.\n", g_numAllowedRootLODs, g_minLod, g_minLod );
 		g_numAllowedRootLODs = g_minLod;
 	}
 }
@@ -9170,13 +9170,13 @@ bool GenerateModelName( CDmeMDLMakefile *pMDLMakeFile )
 	// NOTE: Model name is relative to the 'models' directory
 	char pOutputFullPath[MAX_PATH];
 	pMDLMakeFile->GetOutputName( pOutputFullPath, sizeof(pOutputFullPath) );
-	Q_SetExtension( pOutputFullPath, ".mdl", sizeof( pOutputFullPath) );
+	V_SetExtension( pOutputFullPath, ".mdl" );
 
 	char pModelSubDir[MAX_PATH];
-	GetModSubdirectory( "models", pModelSubDir, sizeof(pModelSubDir) );
+	GetModSubdirectory( "models", pModelSubDir );
 
 	char pRelativePath[MAX_PATH];
-	if ( !Q_MakeRelativePath( pOutputFullPath, pModelSubDir, pRelativePath, sizeof(pRelativePath) ) )
+	if ( !V_MakeRelativePath( pOutputFullPath, pModelSubDir, pRelativePath ) )
 	{
 		MdlError( "Makefile \"%s\" doesn't lie under the correct vproject \"%s\"!\n",
 			pOutputFullPath, pModelSubDir );
@@ -9195,8 +9195,8 @@ bool GenerateSkin( CDmeMDLMakefile *pMDLMakeFile )
 {
 	CUtlVector< CDmeHandle< CDmeSourceSkin > > bodies;
 	pMDLMakeFile->GetSources< CDmeSourceSkin >( bodies );
-	int nCount = bodies.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = bodies.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !bodies[i] )
 			continue;
@@ -9222,8 +9222,8 @@ bool GenerateAnimations( CDmeMDLMakefile *pMDLMakeFile )
 	CUtlVector< CDmeHandle< CDmeSourceAnimation > > animationFiles;
 	pMDLMakeFile->GetSources< CDmeSourceAnimation >( animationFiles );
 
-	int nCount = animationFiles.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = animationFiles.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !animationFiles[i] )
 			continue;
@@ -9488,10 +9488,10 @@ class CStudioMDLApp : public CDefaultAppSystemGroup< CSteamAppSystemGroup >
 
 public:
 	// Methods of IApplication
-	virtual bool Create();
-	virtual bool PreInit( );
-	virtual int Main();
-	virtual void PostShutdown();
+	bool Create() override;
+	bool PreInit() override;
+	int Main() override;
+	void PostShutdown() override;
 
 private:
 	int Main_StripModel();
@@ -9513,7 +9513,7 @@ static bool CStudioMDLApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsStea
 
 	if ( pProcessFileName )
 	{
-		Q_MakeAbsolutePath( pchPathBuffer, nBufferLength, pProcessFileName );
+		V_MakeAbsolutePath( pchPathBuffer, nBufferLength, pProcessFileName );
 
 		if ( pbBubbleDirectories )
 			*pbBubbleDirectories = true;
@@ -9527,11 +9527,17 @@ static bool CStudioMDLApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsStea
 int main( int argc, char **argv )
 {
 	CommandLine()->CreateCmdLine(argc, argv);
+
 	const ScopedSuggestGameInfoDir scoped_sugest_game_info_dir( CStudioMDLApp_SuggestGameInfoDirFn );
 
-	CStudioMDLApp s_ApplicationObject;
-	CSteamApplication s_SteamApplicationObject( &s_ApplicationObject );
-	return AppMain( argc, argv, &s_SteamApplicationObject );
+	InstallSpewFunction();
+	
+	// override the default spew function
+	const ScopedSpewOutputFunc scoped_spew_output{ MdlSpewOutputFunc };
+
+	CStudioMDLApp app;
+	CSteamApplication steam_app( &app );
+	return AppMain( argc, argv, &steam_app );
 }
 
 
@@ -9540,11 +9546,7 @@ int main( int argc, char **argv )
 //-----------------------------------------------------------------------------
 bool CStudioMDLApp::Create()
 {
-	InstallSpewFunction();
-	// override the default spew function
-	SpewOutputFunc( MdlSpewOutputFunc );
-
- 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
+ 	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
 
 #ifndef _DEBUG
 	SetUnhandledExceptionFilter( VExceptionFilter );
@@ -9580,12 +9582,13 @@ bool CStudioMDLApp::Create()
 	AppModule_t	studioDataCacheModule = LoadModule( Sys_GetFactoryThis() );
 	AddSystem( studioDataCacheModule, STUDIO_DATA_CACHE_INTERFACE_VERSION );
 
+	// dimhotepus: No P4 support
 	// Add the P4 module separately so that if it is absent (say in the SDK) then the other system will initialize properly
-	if ( !CommandLine()->FindParm( "-nop4" ) )
-	{
-		AppModule_t p4Module = LoadModule( "p4lib.dll" );
-		AddSystem( p4Module, P4_INTERFACE_VERSION );
-	}
+	//if ( !CommandLine()->FindParm( "-nop4" ) )
+	//{
+	//	AppModule_t p4Module = LoadModule( "p4lib.dll" );
+	//	AddSystem( p4Module, P4_INTERFACE_VERSION );
+	//}
 
 	bool bOk = AddSystems( appSystems );
 	if ( !bOk )
@@ -9651,9 +9654,9 @@ bool CStudioMDLApp::ParseArguments()
 	tag_reversed = 0;
 	tag_normals = 0;
 
-	normal_blend = cos( DEG2RAD( 2.0 ));
+	normal_blend = cos( DEG2RAD( 2.0f ));
 
-	g_gamma = 2.2;
+	g_gamma = 2.2f;
 
 	g_staticprop = false;
 	g_centerstaticprop = false;
@@ -9799,19 +9802,6 @@ bool CStudioMDLApp::ParseArguments()
 			continue;
 		}
 
-		if (!Q_stricmp( pArgv, "-x360"))
-		{
-			StudioByteSwap::ActivateByteSwapping( true ); // Set target to big endian
-			g_bX360  = true;
-			continue;
-		}
-
-		if (!Q_stricmp( pArgv, "-nox360"))
-		{
-			g_bX360  = false;
-			continue;
-		}
-
 		if ( !Q_stricmp( pArgv, "-nowarnings" ) )
 		{
 			g_bNoWarnings = true;
@@ -9888,16 +9878,16 @@ bool CStudioMDLApp::ParseArguments()
 	}
 	
 	const char *pArgv = CommandLine()->GetParm( i );
-	Q_strncpy( g_path, pArgv, sizeof(g_path) );
+	V_strcpy_safe( g_path, pArgv );
 	if ( Q_IsAbsolutePath( g_path ) )
 	{
 		// Set the working directory to be the path of the qc file
 		// so the relative-file fopen code works
 		char pQCDir[MAX_PATH];
-		Q_ExtractFilePath( g_path, pQCDir, sizeof(pQCDir) );
+		V_ExtractFilePath( g_path, pQCDir );
 		_chdir( pQCDir );
 	}
-	Q_StripExtension( pArgv, outname, sizeof( outname ) );
+	Q_StripExtension( pArgv, outname );
 	return true;
 }
 
@@ -9927,7 +9917,7 @@ void AddContentPaths( )
 
 	// get a copy of the game search paths
 	char paths[1024];
-	g_pFullFileSystem->GetSearchPath( "GAME", false, paths, sizeof( paths ) );
+	g_pFullFileSystem->GetSearchPath_safe( "GAME", false, paths );
 	if (!g_quiet)
 		printf("all paths:%s\n", paths );
 
@@ -10049,8 +10039,8 @@ int CStudioMDLApp::Main()
 		}
 	};
 
-	Q_FileBase( g_path, g_path, sizeof( g_path ) );
-	Q_DefaultExtension( g_path, pMDLMakeFile ? ".dmx" : ".qc", sizeof( g_path ) );
+	Q_FileBase( g_path, g_path );
+	Q_DefaultExtension( g_path, pMDLMakeFile ? ".dmx" : ".qc");
 	if (!g_quiet)
 	{
 		printf( "Working on \"%s\"\n", g_path );
@@ -10230,7 +10220,7 @@ int CStudioMDLApp::Main_StripVhv()
 		return 1;
 	}
 
-	Q_StripExtension( g_path, g_path, sizeof( g_path ) );
+	Q_StripExtension( g_path, g_path );
 	char *pExt = g_path + strlen( g_path );
 	*pExt = 0;
 
@@ -10297,7 +10287,7 @@ int CStudioMDLApp::Main_MakeVsi()
 		return 1;
 	}
 
-	Q_StripExtension( g_path, g_path, sizeof( g_path ) );
+	Q_StripExtension( g_path, g_path );
 	char *pExt = g_path + strlen( g_path );
 	*pExt = 0;
 
@@ -10373,7 +10363,7 @@ int CStudioMDLApp::Main_StripModel()
 		return 1;
 	}
 
-	Q_FileBase( g_path, g_path, sizeof( g_path ) );
+	Q_FileBase( g_path, g_path );
 	char *pExt = g_path + strlen( g_path );
 	*pExt = 0;
 

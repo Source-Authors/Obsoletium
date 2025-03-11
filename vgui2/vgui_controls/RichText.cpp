@@ -694,7 +694,7 @@ void RichText::CalculateFade( TRenderState &renderState )
 			const auto &fade = m_FormatStream[renderState.formatStreamIndex].fade;
 			if ( fade.flFadeLength != -1.0f )
 			{
-				float frac = ( fade.flFadeStartTime -  system()->GetCurrentTime() ) / fade.flFadeLength;
+				float frac = ( fade.flFadeStartTime - system()->GetCurrentTime() ) / fade.flFadeLength;
 
 				int alpha = frac * fade.iOriginalAlpha;
 				alpha = clamp( alpha, 0, fade.iOriginalAlpha );
@@ -832,7 +832,7 @@ void RichText::Paint()
 
 		// 3.
 		// Calculate the range of text to draw all at once
-		int iLast = m_TextStream.Count() - 1;
+		intp iLast = m_TextStream.Count() - 1;
 		
 		// Stop at the next line break
 		if ( m_LineBreaks.IsValidIndex( lineBreakIndexIndex ) && m_LineBreaks[lineBreakIndexIndex] <= iLast )
@@ -868,7 +868,7 @@ void RichText::Paint()
 		{
 			if ( m_TextStream[i] == '\t' )
 			{
-				int dxTabWidth = 8 * surface()->GetCharacterWidth(hFontCurrent, ' ');
+				int dxTabWidth = 8 * surface()->GetCharacterWidth(hFontCurrent, L' ');
 				dxTabWidth = MAX( 1, dxTabWidth );
 
 				renderState.x = ( dxTabWidth * ( 1 + ( renderState.x / dxTabWidth ) ) );
@@ -1463,7 +1463,7 @@ void RichText::LayoutVerticalScrollBarSlider()
 	
 	// calculate how many lines we can fully display
 	int displayLines = tall / (GetLineHeight() + _drawOffsetY);
-	int numLines = m_LineBreaks.Count();
+	intp numLines = m_LineBreaks.Count();
 	
 	if (numLines <= displayLines)
 	{
@@ -2249,7 +2249,7 @@ int RichText::GetStartDrawIndex(int &lineBreakIndexIndex)
 // Input:	offset - index to Start reading from 
 //			bufLen - length of string
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, wchar_t *buf, int bufLenInBytes)
+void RichText::GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, int bufLenInBytes)
 {
 	if (!buf)
 		return;
@@ -2271,7 +2271,7 @@ void RichText::GetText(int offset, wchar_t *buf, int bufLenInBytes)
 //-----------------------------------------------------------------------------
 // Purpose: gets text from the buffer
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, char *pch, int bufLenInBytes)
+void RichText::GetText(int offset, OUT_Z_CAP(bufLenInBytes) char *pch, int bufLenInBytes)
 {
 	wchar_t rgwchT[4096];
 	GetText(offset, rgwchT, sizeof(rgwchT));

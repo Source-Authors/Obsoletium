@@ -85,13 +85,13 @@ char const	*CWaveFile::GetSentenceText()
 	return m_Sentence.GetText();
 }
 
-int	CWaveFile::GetPhonemeCount()
+intp	CWaveFile::GetPhonemeCount()
 {
 	EnsureSentence();
 	return m_Sentence.CountPhonemes();
 }
 
-int	CWaveFile::GetWordCount()
+intp	CWaveFile::GetWordCount()
 {
 	EnsureSentence();
 	return m_Sentence.m_Words.Count();

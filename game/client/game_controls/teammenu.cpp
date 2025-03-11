@@ -172,7 +172,7 @@ void CTeamMenu::Update()
 {
 	char mapname[MAX_MAP_NAME];
 
-	Q_FileBase( engine->GetLevelName(), mapname, sizeof(mapname) );
+	V_FileBase( engine->GetLevelName(), mapname );
 
 	SetLabelText( "mapname", mapname );
 
@@ -211,11 +211,11 @@ void CTeamMenu::LoadMapPage( const char *mapName )
 	{
 		// it's a local HTML file
 		char localURL[ _MAX_PATH + 7 ];
-		Q_strncpy( localURL, "file://", sizeof( localURL ) );
+		V_strcpy_safe( localURL, "file://" );
 
 		char pPathData[ _MAX_PATH ];
-		g_pFullFileSystem->GetLocalPath( mapRES, pPathData, sizeof(pPathData) );
-		Q_strncat( localURL, pPathData, sizeof( localURL ), COPY_ALL_CHARACTERS );
+		g_pFullFileSystem->GetLocalPath_safe( mapRES, pPathData );
+		V_strcat_safe( localURL, pPathData );
 
 		// force steam to dump a local copy
 		g_pFullFileSystem->GetLocalCopy( pPathData );

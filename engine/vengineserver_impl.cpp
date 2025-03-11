@@ -57,7 +57,7 @@
 
 void SV_DetermineMulticastRecipients( bool usepas, const Vector& origin, CBitVec< ABSOLUTE_PLAYER_LIMIT >& playerbits );
 
-int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, int maxcount, int maxitemlength, char maplist[][ 64 ] );
+intp MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, intp maxcount, intp maxitemlength, char maplist[][ 64 ] );
 
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
 

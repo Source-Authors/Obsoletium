@@ -9,10 +9,6 @@
 // 1-4-99	fixed file texture load and file read bug
 
 ////////////////////////////////////////////////////////////////////////
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <malloc.h>
 #include "StudioModel.h"
 #include "vphysics/constraints.h"
 #include "physmesh.h"
@@ -30,9 +26,6 @@
 
 extern char g_appTitle[];
 Vector *StudioModel::m_AmbientLightColors;
-
-#pragma warning( disable : 4244 ) // double to float
-
 
 static StudioModel g_studioModel;
 static StudioModel *g_pActiveModel;
@@ -129,7 +122,7 @@ void StudioModel::operator delete( void *pMem )
 {
 #ifdef _DEBUG
 	// set the memory to a known value
-	int size = _msize( pMem );
+	size_t size = _msize( pMem );
 	memset( pMem, 0xcd, size );
 #endif
 
@@ -148,7 +141,7 @@ void StudioModel::operator delete( void *pMem, int nBlockUse, const char *pFileN
 {
 #ifdef _DEBUG
 	// set the memory to a known value
-	int size = _msize( pMem );
+	size_t size = _msize( pMem );
 	memset( pMem, 0xcd, size );
 #endif
 	// get the engine to free the memory
@@ -166,12 +159,8 @@ bool StudioModel::LoadModel( const char *pModelName )
 	if (m_pModelName != pModelName)
 	{
 		// Copy over the model name; we'll need it later...
-		if (m_pModelName)
-		{
-			delete[] m_pModelName;
-		}
-		m_pModelName = new char[Q_strlen(pModelName) + 1];
-		strcpy( m_pModelName, pModelName );
+		delete[] m_pModelName;
+		m_pModelName = V_strdup( pModelName );
 	}
 
 	m_MDLHandle = g_pMDLCache->FindMDL( pModelName );
@@ -200,14 +189,14 @@ bool StudioModel::LoadModel( const char *pModelName )
 		if ( !pSrcSet )
 			continue;
 
-		int j = m_HitboxSets.AddToTail();
+		intp j = m_HitboxSets.AddToTail();
 		HitboxSet_t &set = m_HitboxSets[j];
 		set.m_Name = pSrcSet->pszName();
 
 		for ( i = 0; i < pSrcSet->numhitboxes; ++i )
 		{
 			mstudiobbox_t *pHit = pSrcSet->pHitbox(i);
-			int nIndex = set.m_Hitboxes.AddToTail( );
+			auto nIndex = set.m_Hitboxes.AddToTail( );
 			HitboxInfo_t &hitbox = set.m_Hitboxes[nIndex];
 
 			hitbox.m_Name = pHit->pszHitboxName();
@@ -275,7 +264,7 @@ bool StudioModel::PostLoadModel( const char *modelname )
 	if (pStudioHdr == NULL)
 		return false;
 
-	SetSequence (0);
+	SetSequence ((intp)0);
 	SetController (0, 0.0f);
 	SetController (1, 0.0f);
 	SetController (2, 0.0f);
@@ -325,12 +314,12 @@ bool StudioModel::HasModel()
 ////////////////////////////////////////////////////////////////////////
 
 
-int StudioModel::GetSequence( )
+intp StudioModel::GetSequence( ) const
 {
 	return m_sequence;
 }
 
-int StudioModel::SetSequence( int iSequence )
+intp StudioModel::SetSequence( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -350,7 +339,7 @@ int StudioModel::SetSequence( int iSequence )
 	return m_sequence;
 }
 
-const char* StudioModel::GetSequenceName( int iSequence )
+const char* StudioModel::GetSequenceName( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -393,7 +382,7 @@ int	StudioModel::GetNewAnimationLayer( int iPriority )
 	return m_iActiveLayers++;
 }
 
-int StudioModel::SetOverlaySequence( int iLayer, int iSequence, float flWeight )
+int StudioModel::SetOverlaySequence( int iLayer, intp iSequence, float flWeight )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -497,7 +486,7 @@ int StudioModel::LookupActivity( const char *szActivity )
 	return -1;
 }
 
-int StudioModel::SetSequence( const char *szSequence )
+intp StudioModel::SetSequence( const char *szSequence )
 {
 	return SetSequence( LookupSequence( szSequence ) );
 }
@@ -668,17 +657,17 @@ void StudioModel::ExtractBbox( Vector &mins, Vector &maxs )
 
 
 
-void StudioModel::GetSequenceInfo( int iSequence, float *pflFrameRate, float *pflGroundSpeed )
+void StudioModel::GetSequenceInfo( intp iSequence, float *pflFrameRate, float *pflGroundSpeed )
 {
 	float t = GetDuration( iSequence );
 
 	if (t > 0)
 	{
-		*pflFrameRate = 1.0 / t;
+		*pflFrameRate = 1.0f / t;
 	}
 	else
 	{
-		*pflFrameRate = 1.0;
+		*pflFrameRate = 1.0f;
 	}
 	*pflGroundSpeed = GetGroundSpeed( iSequence );
 }
@@ -688,7 +677,7 @@ void StudioModel::GetSequenceInfo( float *pflFrameRate, float *pflGroundSpeed )
 	GetSequenceInfo( m_sequence, pflFrameRate, pflGroundSpeed );
 }
 
-float StudioModel::GetFPS( int iSequence )
+float StudioModel::GetFPS( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -702,7 +691,7 @@ float StudioModel::GetFPS( void )
 	return GetFPS( m_sequence );
 }
 
-float StudioModel::GetDuration( int iSequence )
+float StudioModel::GetDuration( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -712,7 +701,7 @@ float StudioModel::GetDuration( int iSequence )
 }
 
 
-int StudioModel::GetNumFrames( int iSequence )
+int StudioModel::GetNumFrames( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr || iSequence < 0 || iSequence >= pStudioHdr->GetNumSeq() )
@@ -742,7 +731,7 @@ static int GetSequenceFlags( CStudioHdr *pstudiohdr, int sequence )
 // Input  : iSequence - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool StudioModel::GetSequenceLoops( int iSequence )
+bool StudioModel::GetSequenceLoops( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -769,9 +758,9 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 		return;
 
   	// assume that changes < -0.5 are loops....
-  	if (m_cycle - prevcycle[0] < -0.5)
+  	if (m_cycle - prevcycle[0] < -0.5f)
   	{
-  		prevcycle[0] = prevcycle[0] - 1.0;
+  		prevcycle[0] = prevcycle[0] - 1.0f;
   	}
 
 	Studio_SeqMovement( pStudioHdr, m_sequence, prevcycle[0], m_cycle, m_poseparameter, vecPos, vecAngles );
@@ -783,9 +772,9 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 		Vector vecTmp;
 		QAngle angTmp;
 
-  		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5)
+  		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5f)
   		{
-  			prevcycle[i+1] = prevcycle[i+1] - 1.0;
+  			prevcycle[i+1] = prevcycle[i+1] - 1.0f;
   		}
 
 		if (m_Layer[i].m_weight > 0.0)
@@ -794,7 +783,7 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 			angTmp.Init();
 			if (Studio_SeqMovement( pStudioHdr, m_Layer[i].m_sequence, prevcycle[i+1], m_Layer[i].m_cycle, m_poseparameter, vecTmp, angTmp ))
 			{
-				vecPos = vecPos * ( 1.0 - m_Layer[i].m_weight ) + vecTmp * m_Layer[i].m_weight;
+				vecPos = vecPos * ( 1.0f - m_Layer[i].m_weight ) + vecTmp * m_Layer[i].m_weight;
 			}
 		}
 		prevcycle[i+1] = m_Layer[i].m_cycle;
@@ -804,7 +793,7 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 }
 
 
-void StudioModel::GetMovement( int iSequence, float prevCycle, float nextCycle, Vector &vecPos, QAngle &vecAngles )
+void StudioModel::GetMovement( intp iSequence, float prevCycle, float nextCycle, Vector &vecPos, QAngle &vecAngles )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -881,7 +870,7 @@ bool StudioModel::IsHidden( int iSequence )
 
 
 
-void StudioModel::GetSeqAnims( int iSequence, mstudioanimdesc_t *panim[4], float *weight )
+void StudioModel::GetSeqAnims( intp iSequence, mstudioanimdesc_t *panim[4], float *weight )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if (!pStudioHdr)
@@ -1083,15 +1072,13 @@ void StudioModel::scaleMeshes (float scale)
 	for (i = 0; i < pStudioHdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( i );
-		Vector tmp;
+		Vector tmpmin = seqdesc.bbmin;
+		VectorScale( tmpmin, scale, tmpmin );
+		seqdesc.bbmin = tmpmin;
 
-		tmp = seqdesc.bbmin;
-		VectorScale( tmp, scale, tmp );
-		seqdesc.bbmin = tmp;
-
-		tmp = seqdesc.bbmax;
-		VectorScale( tmp, scale, tmp );
-		seqdesc.bbmax = tmp;
+		tmpmin = seqdesc.bbmax;
+		VectorScale( tmpmin, scale, tmpmin );
+		seqdesc.bbmax = tmpmin;
 
 	}
 

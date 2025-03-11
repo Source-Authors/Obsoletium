@@ -10,6 +10,7 @@
 #include "OPTBuild.h"
 #include "Options.h"
 #include "shlobj.h"
+#include "windows/base_dlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -34,15 +35,20 @@ enum
 
 
 void EditorUtil_ConvertPath(CString &str, bool bSave);
-void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bSave);
+void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, intp destSize, bool bSave);
 
-
-COPTBuild::COPTBuild()
-	: CPropertyPage(COPTBuild::IDD)
+template<intp destSize>
+inline void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char (&szDest)[destSize], bool bSave)
 {
+	EditorUtil_TransferPath( pDlg, nIDC, szDest, destSize, bSave );
+}
+
+
+COPTBuild::COPTBuild() : CBasePropertyPage(COPTBuild::IDD) {
 	//{{AFX_DATA_INIT(COPTBuild)
 	//}}AFX_DATA_INIT
 
+	m_pAddParmWnd = NULL;
 	m_pConfig = NULL;
 }
 
@@ -61,7 +67,7 @@ void COPTBuild::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(COPTBuild, CPropertyPage)
+BEGIN_MESSAGE_MAP(COPTBuild, CBasePropertyPage)
 	//{{AFX_MSG_MAP(COPTBuild)
 	ON_BN_CLICKED(IDC_BROWSE_BSP, OnBrowseBsp)
 	ON_BN_CLICKED(IDC_BROWSE_GAME, OnBrowseGame)
@@ -88,7 +94,8 @@ void COPTBuild::DoBrowse(CWnd *pWnd)
 	pWnd->GetWindowText(str);
 	EditorUtil_ConvertPath(str, true);
 
-	CFileDialog dlg(TRUE, ".exe", str, OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, "Programs (*.exe)|*.exe||", this);
+	CFileDialog dlg(TRUE, ".exe", str, OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, "Program Files (*.exe)|*.exe||", this);
+	dlg.m_ofn.lpstrTitle = "Open Program File";
 	if (dlg.DoModal() == IDCANCEL)
 		return;
 
@@ -137,7 +144,7 @@ void COPTBuild::OnSelchangeConfigs()
 		return;
 
 	// get pointer to the configuration
-	m_pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(iCurSel));
+	m_pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
 
 	// update dialog data
 	EditorUtil_TransferPath(this, IDC_BSP, m_pConfig->szBSP, false);

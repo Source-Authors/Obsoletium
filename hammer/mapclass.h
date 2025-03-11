@@ -323,7 +323,7 @@ public:
 	bool PostloadVisGroups( bool bIsLoading );
 
 	virtual bool IsGroup(void) { return false; }
-	virtual bool IsScaleable(void) { return false; }
+	virtual bool IsScaleable(void) const { return false; }
 	virtual bool IsClutter(void) { return false; }			// Whether this object should be hidden when the user hides helpers.
 	virtual bool IsCulledByCordon(const Vector &vecMins, const Vector &vecMaxs);	// Whether this object is hidden based on its own intersection with the cordon, independent of its parent's intersection.
 	virtual bool IsEditable( void );
@@ -335,7 +335,7 @@ public:
 
 	// HACK: get the world that this object is contained within.
 	static CMapWorld *GetWorldObject(CMapAtom *pStart);
-    
+
 	virtual const char* GetDescription() const { return ""; }
 
 	BOOL EnumChildren(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam = 0, MAPCLASSTYPE Type = NULL);

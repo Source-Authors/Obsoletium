@@ -30,9 +30,9 @@ CToolDisplace* GetDisplacementTool() { return dynamic_cast<CToolDisplace*>(ToolM
 
 //=============================================================================
 
-IMPLEMENT_DYNAMIC( CFaceEditDispPage, CPropertyPage )
+IMPLEMENT_DYNAMIC( CFaceEditDispPage, CBasePropertyPage )
 
-BEGIN_MESSAGE_MAP( CFaceEditDispPage, CPropertyPage )
+BEGIN_MESSAGE_MAP( CFaceEditDispPage, CBasePropertyPage )
 	//{{AFX_MSG_MAP( CFaceEditDispPage )
 	ON_BN_CLICKED( ID_DISP_MASK_SELECT, OnCheckMaskSelect )
 	ON_BN_CLICKED( ID_DISP_MASK_GRID, OnCheckMaskGrid )
@@ -65,12 +65,13 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CFaceEditDispPage::CFaceEditDispPage() : CPropertyPage( IDD )
+CFaceEditDispPage::CFaceEditDispPage() : CBasePropertyPage( IDD )
 {
 	m_uiTool = FACEEDITTOOL_SELECT;
 
 	m_bForceShowWalkable = false;
 	m_bForceShowBuildable = false;
+	m_bIsEditable = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1251,8 +1252,8 @@ void CFaceEditDispPage::OnSelectAdjacent()
 		//{
 		//	EditDispHandle_t hNeighbor = pDisp->GetEdgeNeighbor( iEdge );
 		
-		int totalDispCount = pDispMgr->WorldCount();
-		for ( int iTestDisp=0; iTestDisp < totalDispCount; iTestDisp++ )
+		intp totalDispCount = pDispMgr->WorldCount();
+		for ( intp iTestDisp=0; iTestDisp < totalDispCount; iTestDisp++ )
 		{
 			int edge1[4], edge2[4];
 			CMapDisp *pNeighbor = pDispMgr->GetFromWorld( iTestDisp );

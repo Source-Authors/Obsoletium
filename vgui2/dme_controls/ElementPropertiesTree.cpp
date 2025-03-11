@@ -1098,7 +1098,7 @@ void CElementPropertiesTreeInternal::OnRename()
 
 void CElementPropertiesTreeInternal::OnCopy()
 {
-	CUtlVector< int > selected;
+	CUtlVector< intp > selected;
 	m_pTree->GetTree()->GetSelectedItems( selected ) ;
 	intp c = selected.Count();
 	if ( c <= 0 )
@@ -1191,7 +1191,7 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 
 void CElementPropertiesTreeInternal::OnPaste_( bool reference )
 {
-	CUtlVector< int > selected;
+	CUtlVector< intp > selected;
 	m_pTree->GetTree()->GetSelectedItems( selected ) ;
 	intp c = selected.Count();
 	if ( !c )
@@ -1812,7 +1812,7 @@ bool CElementPropertiesTreeInternal::BuildExpansionListToFindElement_R(
 	CDmElement *owner, 
 	CDmElement *element, 
 	const char *attributeName, 
-	int arrayIndex, 
+	intp arrayIndex, 
 	CUtlVector< intp >& expandIndices
 	)
 {

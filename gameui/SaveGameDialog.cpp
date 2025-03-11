@@ -28,7 +28,11 @@ using namespace vgui;
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef PLATFORM_64BITS
+#define NEW_SAVE_GAME_TIMESTAMP 0xFFFFFFFFFFFFFFFF
+#else
 #define NEW_SAVE_GAME_TIMESTAMP	0xFFFFFFFF
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose:Constructor

@@ -4,10 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "tier0/dbg.h"
-#include <stdio.h>
-#include "choreoview.h"
 #include "choreowidgetdrawhelper.h"
+#include "tier0/dbg.h"
+#include "choreoview.h"
 #include "choreoviewcolors.h"
 
 //-----------------------------------------------------------------------------
@@ -133,7 +132,7 @@ CChoreoWidgetDrawHelper::~CChoreoWidgetDrawHelper( void )
 {
 	SelectClipRgn( m_dcMemory, NULL );
 
-	while ( m_ClipRects.Size() > 0 )
+	while ( m_ClipRects.Count() > 0 )
 	{
 		StopClipping();
 	}
@@ -224,7 +223,7 @@ void CChoreoWidgetDrawHelper::CalcTextRect( const char *font, int pointsize, int
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -266,7 +265,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -305,7 +304,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, in
 
 	va_start( args, fmt );
 	vwprintf( fmt, args );
-	vswprintf( output, fmt, args );
+	vswprintf( output, std::size(output), fmt, args );
 
 	HFONT fnt = CreateFont(
 		 -pointsize, 
@@ -319,7 +318,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, in
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -382,7 +381,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( HFONT fnt, const wchar_t *fmt, ... 
 
 	va_start( args, fmt );
 	vwprintf( fmt, args );
-	vswprintf( output, fmt, args );
+	vswprintf( output, std::size(output), fmt, args );
 
 	HDC screen = GetDC( NULL );
 
@@ -439,7 +438,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextW( const char *font, int pointsize,
 	static wchar_t output[1024];
 
 	va_start( args, fmt );
-	vswprintf( output, fmt, args );
+	vswprintf( output, std::size(output), fmt, args );
 	va_end( args  );
 	
 	DrawColoredTextCharsetW( font, pointsize, weight, ANSI_CHARSET, clr, rcText, output );
@@ -493,7 +492,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextW( HFONT font, COLORREF clr, RECT& 
 	static wchar_t output[1024];
 
 	va_start( args, fmt );
-	vswprintf( output, fmt, args );
+	vswprintf( output, std::size(output), fmt, args );
 	va_end( args  );
 	
 	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, font );
@@ -543,7 +542,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int poin
 		 charset,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -570,7 +569,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int poi
 	static wchar_t output[1024];
 
 	va_start( args, fmt );
-	vswprintf( output, fmt, args );
+	vswprintf( output,  std::size(output), fmt, args );
 	va_end( args  );
 	
 
@@ -586,7 +585,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int poi
 		 charset,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -638,7 +637,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextMultiline( const char *font, int po
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -690,7 +689,7 @@ void CChoreoWidgetDrawHelper::DrawColoredLine( COLORREF clr, int style, int widt
 //-----------------------------------------------------------------------------
 void CChoreoWidgetDrawHelper::DrawColoredPolyLine( COLORREF clr, int style, int width, CUtlVector< POINT >& points )
 {
-	int c = points.Count();
+	intp c = points.Count();
 	if ( c < 2 )
 		return;
 
@@ -699,7 +698,7 @@ void CChoreoWidgetDrawHelper::DrawColoredPolyLine( COLORREF clr, int style, int 
 
 	POINT *temp = (POINT *)_alloca( c * sizeof( POINT ) );
 	Assert( temp );
-	int i;
+	intp i;
 	for ( i = 0; i < c; i++ )
 	{
 		POINT *pt = &points[ i ];
@@ -708,7 +707,8 @@ void CChoreoWidgetDrawHelper::DrawColoredPolyLine( COLORREF clr, int style, int 
 		temp[ i ].y = pt->y - m_y;
 	}
 	
-	Polyline( m_dcMemory, temp, c );
+	Assert(c <= std::numeric_limits<int>::max());
+	Polyline( m_dcMemory, temp, static_cast<int>(c) );
 
 	SelectObject( m_dcMemory, oldPen );
 	DeleteObject( pen );
@@ -933,11 +933,11 @@ void CChoreoWidgetDrawHelper::StartClipping( RECT& clipRect )
 
 void CChoreoWidgetDrawHelper::StopClipping( void )
 {
-	Assert( m_ClipRects.Size() > 0 );
-	if ( m_ClipRects.Size() <= 0 )
+	Assert( m_ClipRects.Count() > 0 );
+	if ( m_ClipRects.Count() <= 0 )
 		return;
 
-	m_ClipRects.Remove( m_ClipRects.Size() - 1 );
+	m_ClipRects.Remove( m_ClipRects.Count() - 1 );
 
 	ClipToRects();
 }
@@ -951,11 +951,11 @@ void CChoreoWidgetDrawHelper::ClipToRects( void )
 		m_ClipRegion = HRGN( 0 );
 	}
 
-	if ( m_ClipRects.Size() > 0 )
+	if ( m_ClipRects.Count() > 0 )
 	{
 		RECT rc = m_ClipRects[ 0 ];
 		m_ClipRegion = CreateRectRgn( rc.left, rc.top, rc.right, rc.bottom );
-		for ( int i = 1; i < m_ClipRects.Size(); i++ )
+		for ( intp i = 1; i < m_ClipRects.Count(); i++ )
 		{
 			RECT add = m_ClipRects[ i ];
 

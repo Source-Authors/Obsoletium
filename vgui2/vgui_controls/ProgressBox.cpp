@@ -38,7 +38,7 @@ ProgressBox::ProgressBox(const char *title, const char *text, const char *pszUnk
 	}
 	else
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode(title, m_wszTitleString, sizeof(m_wszTitleString));
+		g_pVGuiLocalize->ConvertANSIToUnicode(title, m_wszTitleString);
 	}
 
 	m_pMessageLabel = new Label(this, NULL, pszUnknownTimeString);
@@ -241,7 +241,7 @@ void ProgressBox::UpdateTitle()
 	{
 		completion[0] = 0;
 	}
-	g_pVGuiLocalize->ConstructString(unicode, sizeof(unicode), m_wszTitleString, 1, completion);
+	g_pVGuiLocalize->ConstructString_safe(unicode, m_wszTitleString, 1, completion);
 	SetTitle(unicode, true);
 }
 
@@ -257,7 +257,7 @@ void ProgressBox::OnThink()
 		if (ProgressBar::ConstructTimeRemainingString(timeRemaining, sizeof(timeRemaining), m_flFirstProgressUpdate, (float)system()->GetFrameTime(), m_flCurrentProgress, m_flLastProgressUpdate, true))
 		{
 			wchar_t unicode[256];
-			g_pVGuiLocalize->ConstructString(unicode, sizeof(unicode), m_wcsInfoString, 1, timeRemaining);
+			g_pVGuiLocalize->ConstructString_safe(unicode, m_wcsInfoString, 1, timeRemaining);
 			m_pMessageLabel->SetText(unicode);
 		}
 		else

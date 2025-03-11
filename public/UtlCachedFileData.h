@@ -23,7 +23,13 @@
 // If you change to serialization protocols, this must be bumped...
 #define UTL_CACHE_SYSTEM_VERSION		2
 
-#define UTL_CACHED_FILE_DATA_UNDEFINED_DISKINFO	(long)-2
+#ifdef PLATFORM_64BITS
+using FileInfo_t = time_t;
+#else
+using FileInfo_t = long;
+#endif
+
+#define UTL_CACHED_FILE_DATA_UNDEFINED_DISKINFO	(FileInfo_t)-2
 
 // Cacheable types must derive from this and implement the appropriate methods...
 abstract_class IBaseCacheInfo
@@ -155,7 +161,7 @@ public:
 
 	void	ForceRecheckDiskInfo();
 	// Iterates all entries and gets filesystem info and optionally causes rebuild on any existing items which are out of date
-	void	CheckDiskInfo( bool force_rebuild, long cacheFileTime = 0L );
+	void	CheckDiskInfo( bool force_rebuild, time_t cacheFileTime = 0L );
 
 	void	SaveManifest();
 	bool	ManifestExists();
@@ -229,8 +235,8 @@ private:
 		}
 
 		FileNameHandle_t	handle;
-		long				fileinfo;
-		long				diskfileinfo;
+		FileInfo_t			fileinfo;
+		FileInfo_t			diskfileinfo;
 		int					dataIndex;
 	};
 
@@ -267,7 +273,7 @@ T* CUtlCachedFileData<T>::Get( char const *filename )
 	{
 		e.fileinfo = 0;
 	}
-	long cachefileinfo = e.fileinfo;
+	FileInfo_t cachefileinfo = e.fileinfo;
 	// Set the disk fileinfo the first time we encounter the filename
 	if ( e.diskfileinfo == UTL_CACHED_FILE_DATA_UNDEFINED_DISKINFO )
 	{
@@ -634,7 +640,7 @@ bool CUtlCachedFileData<T>::Init()
 		SetDirty( true );
 		return true;
 	}
-	long fileTime = g_pFullFileSystem->GetFileTime( m_sRepositoryFileName, "MOD" );
+	time_t fileTime = g_pFullFileSystem->GetFileTime( m_sRepositoryFileName, "MOD" );
 	int size = g_pFullFileSystem->Size( fh );
 
 	bool deletefile = false;
@@ -802,8 +808,7 @@ void CUtlCachedFileData<T>::SaveManifest()
 	}
 
 	// Now write to file
-	FileHandle_t fh;
-	fh = g_pFullFileSystem->Open( manifest_name, "wb" );
+	FileHandle_t fh = g_pFullFileSystem->Open( manifest_name, "wb" );
 	if ( FILESYSTEM_INVALID_HANDLE != fh )
 	{
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
@@ -825,7 +830,7 @@ T *CUtlCachedFileData<T>::RebuildItem( const char *filename )
 
 	ForceRecheckDiskInfo();
 
-	long cachefileinfo = e.fileinfo;
+	FileInfo_t cachefileinfo = e.fileinfo;
 	// Set the disk fileinfo the first time we encounter the filename
 	if ( e.diskfileinfo == UTL_CACHED_FILE_DATA_UNDEFINED_DISKINFO )
 	{
@@ -906,7 +911,7 @@ public:
 
 // Iterates all entries and causes rebuild on any existing items which are out of date
 template <class T>
-void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime )
+void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, time_t cacheFileTime )
 {
 	char fn[ 512 ];
 	if ( forcerebuild )
@@ -955,7 +960,7 @@ void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime
 		}
 		else 
 		{
-			long pathTime = g_pFullFileSystem->GetPathTime( fn, "GAME" );
+			time_t pathTime = g_pFullFileSystem->GetPathTime( fn, "GAME" );
 			bCheck = (pathTime > cacheFileTime) ? true : false;
 		}
 

@@ -341,11 +341,11 @@ void CHudCredits::DrawOutroCreditsName( void )
 		
 		if ( credit.szCreditName[0] == '#' )
 		{
-			g_pVGuiLocalize->ConstructString( unicode, sizeof(unicode), g_pVGuiLocalize->Find(credit.szCreditName), 0 );
+			g_pVGuiLocalize->ConstructString_safe( unicode, g_pVGuiLocalize->Find(credit.szCreditName), 0 );
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode( credit.szCreditName, unicode, sizeof( unicode ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( credit.szCreditName, unicode );
 		}
 
 		int iStringWidth = GetStringPixelWidth( unicode, m_hTFont ); 
@@ -434,7 +434,7 @@ void CHudCredits::DrawLogo( void )
 	surface()->DrawSetTextColor( cColor[0], cColor[1], cColor[2], cColor[3]  );
 	
 	wchar_t unicode[256];
-	g_pVGuiLocalize->ConvertANSIToUnicode( m_szLogo, unicode, sizeof( unicode ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( m_szLogo, unicode );
 
 	int iStringWidth = GetStringPixelWidth( unicode, m_hTFont ); 
 
@@ -443,7 +443,7 @@ void CHudCredits::DrawLogo( void )
 
 	if ( !Q_isempty( m_szLogo2 ) )
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode( m_szLogo2, unicode, sizeof( unicode ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( m_szLogo2, unicode );
 
 		iStringWidth = GetStringPixelWidth( unicode, m_hTFont ); 
 
@@ -511,7 +511,7 @@ void CHudCredits::DrawIntroCreditsName( void )
 		surface()->DrawSetTextColor( m_cColor[0], m_cColor[1], m_cColor[2], FadeBlend( m_flFadeInTime, m_flFadeOutTime, m_flFadeHoldTime + credit.flTimeAdd, localTime ) * m_cColor[3] );
 		
 		wchar_t unicode[256];
-		g_pVGuiLocalize->ConvertANSIToUnicode( credit.szCreditName, unicode, sizeof( unicode ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( credit.szCreditName, unicode );
 
 		surface()->DrawSetTextPos( XRES( credit.flXPos ), YRES( credit.flYPos ) );
 		surface()->DrawUnicodeString( unicode );
@@ -604,11 +604,11 @@ void CHudCredits::PrepareLine( vgui::HFont hFont, char const *pchLine )
 
 	if ( pchLine[0] == '#' )
 	{
-		g_pVGuiLocalize->ConstructString( unicode, sizeof(unicode), g_pVGuiLocalize->Find(pchLine), 0 );
+		g_pVGuiLocalize->ConstructString_safe( unicode, g_pVGuiLocalize->Find(pchLine), 0 );
 	}
 	else
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode( pchLine, unicode, sizeof( unicode ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pchLine, unicode );
 	}
 
 	surface()->PrecacheFontCharacters( hFont, unicode );

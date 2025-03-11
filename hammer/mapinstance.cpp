@@ -72,7 +72,7 @@ CMapClass *CMapInstance::Create( CHelperInfo *pHelperInfo, CMapEntity *pParent )
 //-----------------------------------------------------------------------------
 void CMapInstance::SetInstancePath( const char *pszInstancePath )
 {
-	strcpy( m_InstancePath, pszInstancePath );
+	V_strcpy_safe( m_InstancePath, pszInstancePath );
 	V_strlower( m_InstancePath );
 	V_FixSlashes( m_InstancePath );
 }
@@ -85,21 +85,21 @@ void CMapInstance::SetInstancePath( const char *pszInstancePath )
 // Output : Returns true if it was able to locate the file
 //			pszOutFileName - the full path to the file name if located
 //-----------------------------------------------------------------------------
-bool CMapInstance::DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, char *pszOutFileName )
+bool CMapInstance::DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, char *pszOutFileName, intp outFileNameSize )
 {
 	char		szInstanceFileNameFixed[ MAX_PATH ];
-	const char *pszMapPath = "\\maps\\";
+	constexpr char pszMapPath[] = "\\maps\\";
 
 	V_strcpy_safe( szInstanceFileNameFixed, pszInstanceFileName );
-	V_SetExtension( szInstanceFileNameFixed, ".vmf", sizeof( szInstanceFileNameFixed ) );
+	V_SetExtension( szInstanceFileNameFixed, ".vmf" );
 	V_FixSlashes( szInstanceFileNameFixed );
 
 	// first, try to find a relative location based upon the Base file name
-	strcpy( pszOutFileName, pszBaseFileName );
+	V_strncpy( pszOutFileName, pszBaseFileName, outFileNameSize );
 	V_StripFilename( pszOutFileName );
 
-	strcat( pszOutFileName, "\\" );
-	strcat( pszOutFileName, szInstanceFileNameFixed );
+	V_strcat( pszOutFileName, "\\", outFileNameSize );
+	V_strcat( pszOutFileName, szInstanceFileNameFixed, outFileNameSize );
 
 	if ( g_pFullFileSystem->FileExists( pszOutFileName ) )
 	{
@@ -107,19 +107,19 @@ bool CMapInstance::DeterminePath( const char *pszBaseFileName, const char *pszIn
 	}
 
 	// second, try to find the master 'maps' directory and make it relative from that
-	strcpy( pszOutFileName, pszBaseFileName );
+	V_strncpy( pszOutFileName, pszBaseFileName, outFileNameSize );
 	V_StripFilename( pszOutFileName );
 	V_RemoveDotSlashes( pszOutFileName );
 	V_FixDoubleSlashes( pszOutFileName );
 	V_strlower( pszOutFileName );
-	strcat( pszOutFileName, "\\" );
+	V_strcat( pszOutFileName, "\\", outFileNameSize );
 
 	char *pos = strstr( pszOutFileName, pszMapPath );
 	if ( pos )
 	{
-		pos += strlen( pszMapPath );
+		pos += std::size( pszMapPath ) - 1;
 		*pos = 0;
-		strcat( pszOutFileName, szInstanceFileNameFixed );
+		V_strcat( pszOutFileName, szInstanceFileNameFixed, outFileNameSize );
 
 		if ( g_pFullFileSystem->FileExists( pszOutFileName ) )
 		{
@@ -129,13 +129,13 @@ bool CMapInstance::DeterminePath( const char *pszBaseFileName, const char *pszIn
 
 	if ( m_InstancePath[ 0 ] != 0 )
 	{
-		sprintf( szInstanceFileNameFixed, "%s%s", m_InstancePath, pszInstanceFileName );
+		V_sprintf_safe( szInstanceFileNameFixed, "%s%s", m_InstancePath, pszInstanceFileName );
 
 		if ( g_pFullFileSystem->FileExists( szInstanceFileNameFixed, "GAME" ) )
 		{
 			char FullPath[ MAX_PATH ];
-			g_pFullFileSystem->RelativePathToFullPath( szInstanceFileNameFixed, "GAME", FullPath, sizeof( FullPath ) );
-			strcpy( pszOutFileName, FullPath );
+			g_pFullFileSystem->RelativePathToFullPath_safe( szInstanceFileNameFixed, "GAME", FullPath );
+			V_strncpy( pszOutFileName, FullPath, outFileNameSize );
 
 			return true;
 		}
@@ -216,14 +216,14 @@ GDIV_TYPE CMapInstance::GetFieldType( const char *pInstanceValue )
 	{
 		return ivBadType;
 	}
-	int		len = InstancePos - pInstanceValue;
+	ptrdiff_t		len = InstancePos - pInstanceValue;
 
-	for ( int i = pInstanceParmsEntity->GetFirstKeyValue(); i != pInstanceParmsEntity->GetInvalidKeyValue(); i = pInstanceParmsEntity->GetNextKeyValue( i ) )
+	for ( auto i = pInstanceParmsEntity->GetFirstKeyValue(); i != pInstanceParmsEntity->GetInvalidKeyValue(); i = pInstanceParmsEntity->GetNextKeyValue( i ) )
 	{
 		LPCTSTR	pKey = pInstanceParmsEntity->GetKey( i );
 		LPCTSTR	pValue = pInstanceParmsEntity->GetKeyValue( i );
 
-		if ( strnicmp( pKey, "parm", strlen( "parm" ) ) == 0 )
+		if ( strnicmp( pKey, "parm", ssize( "parm" ) - 1 ) == 0 )
 		{
 			const char *InstanceParmsPos = strchr( pValue, ' ' );
 			if ( InstanceParmsPos == NULL )
@@ -246,11 +246,11 @@ void CMapInstance::FindTargetNames( CUtlVector< const char * > &Names )
 {
 	CMapEntity *pEntity = dynamic_cast< CMapEntity * >( GetParent() );
 
-	for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+	for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 	{
 		LPCTSTR	pInstanceKey = pEntity->GetKey( j );
 		LPCTSTR	pInstanceValue = pEntity->GetKeyValue( j );
-		if ( strnicmp( pInstanceKey, "replace", strlen( "replace" ) ) == 0 )
+		if ( strnicmp( pInstanceKey, "replace", ssize( "replace" ) - 1 ) == 0 )
 		{
 			GDIV_TYPE	FieldType = GetFieldType( pInstanceValue );
 
@@ -264,10 +264,7 @@ void CMapInstance::FindTargetNames( CUtlVector< const char * > &Names )
 				{
 					pszInstancePos++;
 
-					char	*temp = new char[ strlen( pszInstancePos ) + 1 ];
-					strcpy( temp, pszInstancePos );
-
-					Names.AddToTail( temp );
+					Names.AddToTail( V_strdup( pszInstancePos ) );
 				}
 			}
 		}
@@ -281,12 +278,13 @@ void CMapInstance::ReplaceTargetname( const char *szOldName, const char *szNewNa
 	BaseClass::ReplaceTargetname( szOldName, szNewName );
 
 	CMapEntity *pEntity = dynamic_cast< CMapEntity * >( GetParent() );
+	const size_t szNewNameLen = strlen( szNewName );
 
-	for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+	for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 	{
 		LPCTSTR	pInstanceKey = pEntity->GetKey( j );
 		LPCTSTR	pInstanceValue = pEntity->GetKeyValue( j );
-		if ( strnicmp( pInstanceKey, "replace", strlen( "replace" ) ) == 0 )
+		if ( strnicmp( pInstanceKey, "replace", ssize( "replace" ) - 1 ) == 0 )
 		{
 			const char *InstancePos = strchr( pInstanceValue, ' ' );
 			if ( InstancePos == NULL )
@@ -294,13 +292,13 @@ void CMapInstance::ReplaceTargetname( const char *szOldName, const char *szNewNa
 				continue;
 			}
 
-			int	nLen = InstancePos - pInstanceValue;
+			ptrdiff_t	nLen = InstancePos - pInstanceValue;
 
 			if ( strcmp( szOldName, InstancePos + 1 ) == 0 )
 			{
 				nLen++;
 
-				char	*pszResult = ( char * )stackalloc( nLen + strlen( szNewName ) + 1 );
+				char	*pszResult = ( char * )stackalloc( nLen + szNewNameLen + 1 );
 
 				strncpy( pszResult, pInstanceValue, nLen );
 				strcpy( &pszResult[ nLen ], szNewName );
@@ -340,7 +338,7 @@ bool CMapInstance::OnApply( void )
 			bool	bSaveVisible = CHammer::IsNewDocumentVisible();
 
 			CHammer::SetIsNewDocumentVisible( false );
-			strcpy( m_FileName, FileName );
+			V_strcpy_safe( m_FileName, FileName );
 			m_pInstancedMap = ( CMapDoc * )APP()->OpenDocumentFile( m_FileName );
 
 			CHammer::SetIsNewDocumentVisible( bSaveVisible );
@@ -509,14 +507,14 @@ CMapClass *CMapInstance::Copy(bool bUpdateDependencies)
 CMapClass *CMapInstance::CopyFrom(CMapClass *pObject, bool bUpdateDependencies)
 {
 	CMapInstance *pFrom = dynamic_cast<CMapInstance *>(pObject);
-	Assert(pObject != NULL);
+	Assert(pFrom != NULL);
 
-	if (pObject != NULL)
+	if (pFrom != NULL)
 	{
 		CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
 		m_Angles = pFrom->m_Angles;
-		strcpy( m_FileName, pFrom->m_FileName );
+		V_strcpy_safe( m_FileName, pFrom->m_FileName );
 		m_pInstancedMap = pFrom->m_pInstancedMap;
 		if ( m_pInstancedMap )
 		{
@@ -561,7 +559,7 @@ void CMapInstance::SetManifest( CManifestMap *pManifestMap )
 
 	m_pManifestMap = pManifestMap;
 	m_pInstancedMap = m_pManifestMap->m_Map;
-	strcpy( m_FileName, m_pManifestMap->m_AbsoluteMapFileName );
+	V_strcpy_safe( m_FileName, m_pManifestMap->m_AbsoluteMapFileName );
 }
 
 
@@ -645,10 +643,11 @@ void CMapInstance::SwitchTo( void )
 			MatrixMultiply( InstanceMatrix, Camera3x4Matrix, ResultMatrix );
 			MatrixAngles( ResultMatrix, CameraAngles );
 
-			pViewNew3D->GetCamera()->SetViewPoint( CameraVector );
-			pViewNew3D->GetCamera()->SetPitch( CameraAngles.x );
-			pViewNew3D->GetCamera()->SetYaw( CameraAngles.y );
-//			pViewNew3D->GetCamera()->SetRoll( CameraAngles.z );			we probably don't want to set this!
+			auto *camera = pViewNew3D->GetCamera();
+			camera->SetViewPoint( CameraVector );
+			camera->SetPitch( CameraAngles.x );
+			camera->SetYaw( CameraAngles.y );
+//			camera->SetRoll( CameraAngles.z );			we probably don't want to set this!
 		}
 		pViewNew->UpdateView( MAPVIEW_OPTIONS_CHANGED );
 	}
@@ -699,7 +698,7 @@ void CMapInstance::DoTransform(const VMatrix &matrix)
 	if (pEntity != NULL)
 	{
 		char szValue[ 80 ];
-		sprintf( szValue, "%g %g %g", m_Angles[ 0 ], m_Angles[ 1 ], m_Angles[ 2 ] );
+		V_sprintf_safe( szValue, "%g %g %g", m_Angles[ 0 ], m_Angles[ 1 ], m_Angles[ 2 ] );
 		pEntity->NotifyChildKeyChanged( this, "angles", szValue );
 	}
 

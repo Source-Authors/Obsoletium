@@ -1002,14 +1002,12 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 
 	// save off the resource name
 	delete [] m_pResourceName;
-	m_pResourceName = new char[strlen(controlResourceName) + 1];
-	strcpy(m_pResourceName, controlResourceName);
+	m_pResourceName = V_strdup(controlResourceName);
 
 	if (pathID)
 	{
 		delete [] m_pResourcePathID;
-		m_pResourcePathID = new char[strlen(pathID) + 1];
-		strcpy(m_pResourcePathID, pathID);
+		m_pResourcePathID = V_strdup(pathID);
 	}
 
 	// delete any controls not in both files
@@ -1199,7 +1197,7 @@ bool BuildGroup::SaveControlSettings( void )
 		GetSettings( rDat );
 		
 		char fullpath[ 512 ];
-		g_pFullFileSystem->RelativePathToFullPath( m_pResourceName, m_pResourcePathID, fullpath, sizeof( fullpath ) );
+		g_pFullFileSystem->RelativePathToFullPath_safe( m_pResourceName, m_pResourcePathID, fullpath );
 
 		// save the data out to a file
 		bSuccess = rDat->SaveToFile( g_pFullFileSystem, fullpath, NULL );

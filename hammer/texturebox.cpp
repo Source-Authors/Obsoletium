@@ -18,7 +18,7 @@
 #include <tier0/memdbgon.h>
 
 
-BEGIN_MESSAGE_MAP(CTextureBox, CComboBox)
+BEGIN_MESSAGE_MAP(CTextureBox, CBaseComboBox)
 	//{{AFX_MSG_MAP(CTextureBox)
 	ON_WM_ERASEBKGND()
 	ON_MESSAGE(CB_SELECTSTRING, OnSelectString)
@@ -31,7 +31,6 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CTextureBox::CTextureBox(void)
 {
-	bFirstMeasure = TRUE;
 }
 
 
@@ -76,8 +75,6 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	RECT& r = lpDrawItemStruct->rcItem;
 
-	int iFontHeight = dc.GetTextExtent("J", 1).cy;
-
 	if (lpDrawItemStruct->itemID != -1)
 	{
 		IEditorTexture *pTex = (IEditorTexture *)GetItemDataPtr(lpDrawItemStruct->itemID);
@@ -110,36 +107,38 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		{
 			// separator
 			dc.SelectStockObject(BLACK_PEN);
-			dc.MoveTo(r.left, r.top+5);
-			dc.LineTo(r.right, r.top+5);
+			dc.MoveTo(r.left, r.top+m_dpi_behavior.ScaleOnY( 5 ));
+			dc.LineTo(r.right, r.top+m_dpi_behavior.ScaleOnY( 5 ));
 		}
 		else
 		{
 			char szName[MAX_PATH];
-			int iLen = pTex->GetShortName(szName);
+			intp iLen = pTex->GetShortName(szName);
 
 			// when we get here, we are drawing a regular graphic. we
 			//  check the size of the rectangle - if it's > 32 (just
 			//	a nice number), we're drawing an item in the drop list.
-			if ((r.bottom - r.top) > 32)
+			if ((r.bottom - r.top) > m_dpi_behavior.ScaleOnY( 32 ))
 			{
 				DrawTexData_t DrawTexData;
 				DrawTexData.nFlags = 0;
 
 				// draw graphic
 				CRect r2(r);
-				r2.InflateRect(-4, -4);
-				r2.right = r2.left + 64;
+				r2.InflateRect(m_dpi_behavior.ScaleOnX( -4 ), m_dpi_behavior.ScaleOnY( -4 ));
+				r2.right = r2.left + m_dpi_behavior.ScaleOnX( 64 );
 				pTex->Draw(&dc, r2, 0, 0, DrawTexData);
 
 				// draw name
 				dc.SetTextColor(dwForeColor);
 				dc.SetBkMode(TRANSPARENT);
-				dc.TextOut(r2.right + 4, r2.top + 4, szName, iLen);
+				dc.TextOut(r2.right + m_dpi_behavior.ScaleOnX( 4 ), r2.top + m_dpi_behavior.ScaleOnY( 4 ), szName, iLen);
 				
+				const int iFontHeight = m_dpi_behavior.ScaleOnY( dc.GetTextExtent("J", 1).cy );
+
 				// draw size
-				sprintf(szName, "%dx%d", pTex->GetWidth(), pTex->GetHeight());
-				dc.TextOut(r2.right + 4, r2.top + 4 + iFontHeight, szName, V_strlen(szName));
+				V_sprintf_safe(szName, "%dx%d", pTex->GetWidth(), pTex->GetHeight());
+				dc.TextOut(r2.right + m_dpi_behavior.ScaleOnX( 4 ), r2.top + m_dpi_behavior.ScaleOnY( 4 ) + iFontHeight, szName, V_strlen(szName));
 			}
 			// if it's < 32, we're drawing the item in the "closed"
 			//	combo box, so just draw the name of the texture
@@ -148,7 +147,7 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				// just draw name - 
 				dc.SetTextColor(dwForeColor);
 				dc.SetBkMode(TRANSPARENT);
-				dc.TextOut(r.left + 4, r.top + 2, szName, iLen);
+				dc.TextOut(r.left + m_dpi_behavior.ScaleOnX( 4 ), r.top + m_dpi_behavior.ScaleOnY( 2 ), szName, iLen);
 			}
 		}
 
@@ -288,7 +287,7 @@ void CTextureBox::NotifyNewMaterial( IEditorTexture *pTex )
 //-----------------------------------------------------------------------------
 void CTextureBox::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct) 
 {
-	lpMeasureItemStruct->itemWidth = 64;
+	lpMeasureItemStruct->itemWidth = m_dpi_behavior.ScaleOnX( 64 );
 
 	//
 	// If the item data is NULL or points to an empty string, it's the separator.
@@ -297,11 +296,11 @@ void CTextureBox::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 
 	if ((pszText == NULL) || (*pszText == '\0'))
 	{
-		lpMeasureItemStruct->itemHeight = 9;
+		lpMeasureItemStruct->itemHeight = m_dpi_behavior.ScaleOnY( 9 );
 	}
 	else
 	{
-		lpMeasureItemStruct->itemHeight = 64 + 8;
+		lpMeasureItemStruct->itemHeight = m_dpi_behavior.ScaleOnY( 64 + 8 );
 	}
 }
 

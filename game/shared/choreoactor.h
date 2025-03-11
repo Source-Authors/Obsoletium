@@ -42,7 +42,7 @@ public:
 	const char		*GetName() const;
 
 	// Iteration
-	intp				GetNumChannels() const;
+	intp			GetNumChannels() const;
 	CChoreoChannel	*GetChannel( intp channel );
 
 	CChoreoChannel	*FindChannel( const char *name );
@@ -50,8 +50,8 @@ public:
 	// Manipulate children
 	void			AddChannel( CChoreoChannel *channel );
 	void			RemoveChannel( CChoreoChannel *channel );
-	ptrdiff_t				FindChannelIndex( CChoreoChannel *channel );
-	void			SwapChannels( int c1, int c2 );
+	intp			FindChannelIndex( CChoreoChannel *channel );
+	void			SwapChannels( intp c1, intp c2 );
 	void			RemoveAllChannels();
 
 	void			SetFacePoserModelName( const char *name );

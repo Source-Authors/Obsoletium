@@ -110,15 +110,15 @@ public:
 	CDmeParticleFunction* AddOperator( ParticleFunctionType_t type, const char *pFunctionName );
 	CDmeParticleFunction* AddChild( CDmeParticleSystemDefinition *pChild );
 	void RemoveFunction( ParticleFunctionType_t type, CDmeParticleFunction *pParticleFunction );
-	void RemoveFunction( ParticleFunctionType_t type, int nIndex );
+	void RemoveFunction( ParticleFunctionType_t type, intp nIndex );
 
 	// Find
-	int FindFunction( ParticleFunctionType_t type, CDmeParticleFunction *pParticleFunction );
-	int FindFunction( ParticleFunctionType_t type, const char *pFunctionName );
+	intp FindFunction( ParticleFunctionType_t type, CDmeParticleFunction *pParticleFunction );
+	intp FindFunction( ParticleFunctionType_t type, const char *pFunctionName );
 
 	// Iteration
-	int GetParticleFunctionCount( ParticleFunctionType_t type ) const;
-	CDmeParticleFunction *GetParticleFunction( ParticleFunctionType_t type, int nIndex );
+	intp GetParticleFunctionCount( ParticleFunctionType_t type ) const;
+	CDmeParticleFunction *GetParticleFunction( ParticleFunctionType_t type, intp nIndex );
 
 	// Reordering
 	void MoveFunctionUp( ParticleFunctionType_t type, CDmeParticleFunction *pElement );

@@ -122,7 +122,7 @@ public:
 
 			pRestore->StartBlock();
 			{
-				pRestore->ReadString( conceptname, sizeof( conceptname ), 0 );
+				pRestore->ReadString( conceptname, 0 );
 
 				pRestore->ReadAll( &history );
 

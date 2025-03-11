@@ -397,6 +397,8 @@ FILE *CFileSystem_Stdio::FS_fopen( const char *filenameT, const char *options, u
 
 	alignas(FILE *) CStdFilesystemFile *pFile = nullptr;
 
+	alignas(FILE *) CStdFilesystemFile *pFile = nullptr;
+
 #ifdef _WIN32
 	if ( CWin32ReadOnlyFile::CanOpen( filename, options ) )
 	{

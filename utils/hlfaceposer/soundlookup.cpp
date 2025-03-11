@@ -5,9 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
+#include "SoundLookup.h"
 #include "mxtk/mx.h"
 #include "resource.h"
-#include "SoundLookup.h"
 #include "mdlviewer.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "addsoundentry.h"
@@ -23,8 +23,8 @@ static void PopulateSoundEntryList( HWND wnd, CSoundLookupParams *params )
 	SendMessage( control, LB_RESETCONTENT, 0, 0 ); 
 	SendMessage( control, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_FIXED_FONT), MAKELPARAM (TRUE, 0) );
 
-	int c = params->entryList->Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = params->entryList->Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		int soundindex = (*params->entryList)[ i ];
 		char text[ 128 ];
@@ -34,7 +34,7 @@ static void PopulateSoundEntryList( HWND wnd, CSoundLookupParams *params )
 		{
 			char const *script = soundemitter->GetSourceFileForSound( soundindex );
 
-			int idx = SendMessage( control, LB_ADDSTRING, 0, (LPARAM)va( "%20s:  '%s'", script, text ) ); 
+			LRESULT idx = SendMessage( control, LB_ADDSTRING, 0, (LPARAM)va( "%20s:  '%s'", script, text ) ); 
 			SendMessage( control, LB_SETITEMDATA, idx, (LPARAM)soundindex );
 		}
 	}
@@ -74,15 +74,14 @@ static BOOL CALLBACK SoundLookupDialogProc( HWND hwndDlg, UINT uMsg, WPARAM wPar
 		{
 		case IDOK:
 			{
-				int selindex = SendMessage( GetDlgItem( hwndDlg, IDC_SOUNDENTRYLIST ), LB_GETCURSEL, 0, 0 );
+				LRESULT selindex = SendMessage( GetDlgItem( hwndDlg, IDC_SOUNDENTRYLIST ), LB_GETCURSEL, 0, 0 );
 				if ( selindex == LB_ERR )
 				{
 					mxMessageBox( NULL, "You must select an entry from the list", g_appTitle, MB_OK );
 					return TRUE;
 				}
 
-				int soundindex = SendMessage( GetDlgItem( hwndDlg, IDC_SOUNDENTRYLIST ), LB_GETITEMDATA, selindex, 0 );
-
+				LRESULT soundindex = SendMessage( GetDlgItem( hwndDlg, IDC_SOUNDENTRYLIST ), LB_GETITEMDATA, selindex, 0 );
 				Assert( soundindex != LB_ERR );
 
 				Q_strncpy( g_Params.m_szSoundName, soundemitter->GetSoundName( soundindex ), sizeof ( g_Params.m_szSoundName ) );
@@ -125,11 +124,11 @@ static BOOL CALLBACK SoundLookupDialogProc( HWND hwndDlg, UINT uMsg, WPARAM wPar
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int SoundLookup( CSoundLookupParams *params, HWND parent )
+intp SoundLookup( CSoundLookupParams *params, HWND parent )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_WAVELOOKUP ),
 		parent,
 		(DLGPROC)SoundLookupDialogProc );

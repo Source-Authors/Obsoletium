@@ -10,7 +10,6 @@
 #include "Options.h"
 
 
-#pragma warning(disable:4244)
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -18,10 +17,10 @@
 
 void EditorUtil_ConvertPath(CString &str, bool bSave);
 
-IMPLEMENT_DYNCREATE(COPTGeneral, CPropertyPage)
+IMPLEMENT_DYNCREATE(COPTGeneral, CBasePropertyPage)
 
 
-BEGIN_MESSAGE_MAP(COPTGeneral, CPropertyPage)
+BEGIN_MESSAGE_MAP(COPTGeneral, CBasePropertyPage)
 	//{{AFX_MSG_MAP(COPTGeneral)
 	ON_BN_CLICKED(IDC_INDEPENDENTWINDOWS, OnIndependentwindows)
 	ON_BN_CLICKED(IDC_BROWSEAUTOSAVEDIR, OnBrowseAutosaveDir)
@@ -33,12 +32,14 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-COPTGeneral::COPTGeneral(void) : CPropertyPage(COPTGeneral::IDD)
+COPTGeneral::COPTGeneral(void) : CBasePropertyPage(COPTGeneral::IDD)
 {
 	//{{AFX_DATA_INIT(COPTGeneral)
 	m_iMaxAutosavesPerMap = 0;
 	m_iUndoLevels = 0;
 	m_nMaxCameras = 5;
+	m_iMaxAutosaveSpace = 0;
+	m_iTimeBetweenSaves = 0;
 	//}}AFX_DATA_INIT
 }
 
@@ -206,7 +207,7 @@ BOOL COPTGeneral::OnApply(void)
 	CString str;
 	m_cAutosaveDir.GetWindowText(str);
 	
-	if ( strcmp( Options.general.szAutosaveDir, str ) )
+	if ( strcmp( Options.general.szAutosaveDir, str ) != 0 )
 	{
 		V_strcpy_safe( Options.general.szAutosaveDir, str );
 		bResetTimer = TRUE;

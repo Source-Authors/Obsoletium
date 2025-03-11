@@ -48,8 +48,8 @@ public:
 
 	CActivityRemapCache( const CActivityRemapCache& src )
 	{
-		int c = src.m_cachedActivityRemaps.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = src.m_cachedActivityRemaps.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			m_cachedActivityRemaps.AddToTail( src.m_cachedActivityRemaps[ i ] );
 		}
@@ -60,8 +60,8 @@ public:
 		if ( this == &src )
 			return *this;
 
-		int c = src.m_cachedActivityRemaps.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = src.m_cachedActivityRemaps.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			m_cachedActivityRemaps.AddToTail( src.m_cachedActivityRemaps[ i ] );
 		}

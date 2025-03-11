@@ -35,7 +35,12 @@ struct SaveGameDescription_t
 	char szType[64];
 	char szElapsedTime[SAVEGAME_ELAPSED_LEN];
 	char szFileTime[32];
-	unsigned int iTimestamp;
+#ifdef PLATFORM_64BITS
+	// dimhotepus: unsigned -> time_t. x64 saves stored in a different dir and do not compatible with x86 anyway.
+	time_t iTimestamp;
+#else
+	unsigned iTimestamp;
+#endif
 	unsigned int iSize;
 };
 

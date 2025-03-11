@@ -791,8 +791,8 @@ static void WriteShaderFiles(const char *pShaderName) {
     Msg("\b%c", chProgress[(++iProgressSymbol) % 4]);
   } else {
     char chShaderName[33];
-    Q_snprintf(chShaderName, 29, "%s...", pShaderName);
-    sprintf(chShaderName + sizeof(chShaderName) - 5, "...");
+    V_strcpy_safe(chShaderName, pShaderName);
+    V_strncpy(chShaderName + sizeof(chShaderName) - 4, "...", 4);
 
     Msg("\r%s %s   \r", szShaderFileOperation, chShaderName);
   }
@@ -1455,7 +1455,15 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
     void *pvMemory = shrmem.Lock();
     Assert(pvMemory);
 
-    Combo_FormatCommand(hCombo, (char *)pvMemory);
+    byte const *pBytes = (byte const *)pvMemory;
+    pBytes += sizeof(DWORD);
+    DWORD dwResultBufferLength = *(DWORD const *)pBytes;
+    pBytes += sizeof(DWORD);
+    pBytes += dwResultBufferLength;
+    pBytes += *pBytes ? V_strlen((const char *)pBytes) : 0;
+
+    Combo_FormatCommand(hCombo, (char *)pvMemory,
+                        pBytes - (byte const *)pvMemory);
 
     shrmem.Unlock();
   }

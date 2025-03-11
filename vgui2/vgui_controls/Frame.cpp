@@ -144,7 +144,7 @@ namespace
 			_frame->Repaint();
 		}
 		
-		void OnCursorMoved(int x, int y)
+		void OnCursorMoved(int x, int y) override
 		{
 			if (!_dragging)
 				return;
@@ -162,7 +162,7 @@ namespace
 			_frame->Repaint();
 		}
 		
-		void OnMousePressed(MouseCode code)
+		void OnMousePressed(MouseCode code) override
 		{
 			if (code == MOUSE_LEFT)
 			{ 
@@ -189,7 +189,7 @@ namespace
 			}
 		}
 
-		void OnMouseDoublePressed(MouseCode code)
+		void OnMouseDoublePressed(MouseCode code) override
 		{
 			GetParent()->OnMouseDoublePressed(code);
 		}
@@ -1345,7 +1345,7 @@ void Frame::SetTitle(const char *title, bool surfaceTitle)
 	}
 	else
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode( newTitle, unicodeText, sizeof(unicodeText) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( newTitle, unicodeText );
 	}
 
 	if (surfaceTitle)
@@ -2280,7 +2280,7 @@ void Frame::OnDialogVariablesChanged( KeyValues *dialogVariables )
 	{
 		// reconstruct the string from the variables
 		wchar_t buf[1024];
-		g_pVGuiLocalize->ConstructString(buf, sizeof(buf), index, dialogVariables);
+		g_pVGuiLocalize->ConstructString_safe(buf, index, dialogVariables);
 		SetTitle(buf, true);
 	}
 }

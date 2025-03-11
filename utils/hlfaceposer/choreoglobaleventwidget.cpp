@@ -4,9 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
-#include "hlfaceposer.h"
 #include "choreoviewcolors.h"
+#include "hlfaceposer.h"
 #include "choreoglobaleventwidget.h"
 #include "choreowidgetdrawhelper.h"
 #include "ChoreoView.h"

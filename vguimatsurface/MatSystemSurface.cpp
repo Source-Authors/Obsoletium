@@ -2041,7 +2041,7 @@ void CMatSystemSurface::SetBitmapFontName( const char *pName, const char *pFontF
 			auto index = m_BitmapFontFileMapping.Find( pName );
 			if ( !m_BitmapFontFileMapping.IsValidIndex( index ) )
 			{
-				index = m_BitmapFontFileMapping.Insert( pName );	
+				index = m_BitmapFontFileMapping.Insert( pName );
 			}
 			m_BitmapFontFileMapping.Element( index ) = i;
 			break;
@@ -4575,4 +4575,9 @@ void CMatSystemSurface::DrawSetTextureFrame( int id, int nFrame, unsigned int *p
 	{
 		pFrameVar->SetIntValue( nFrame % nTotalFrames );
 	}
+}
+
+void CMatSystemSurface::SetDpiScalePercent( int xDpiScalePercent, int yDpiScalePercent )
+{
+	scheme()->SetDpiScalePercent(xDpiScalePercent, yDpiScalePercent);
 }

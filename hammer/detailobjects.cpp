@@ -96,7 +96,7 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	{
 		if (pIter->GetFirstSubKey())
 		{
-			int i = group.m_Models.AddToTail();
+			intp i = group.m_Models.AddToTail();
 
 			DetailModel_t &model = group.m_Models[i];
 
@@ -124,11 +124,11 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 						}
 						else
 							model.m_Type = DETAIL_PROP_TYPE_SPRITE;
-					}					
+					}
 					else
 					{
 						// card sprite
-                        model.m_Type = DETAIL_PROP_TYPE_SPRITE;
+						model.m_Type = DETAIL_PROP_TYPE_SPRITE;
 					}
 
 					model.m_Tex[0].Init();

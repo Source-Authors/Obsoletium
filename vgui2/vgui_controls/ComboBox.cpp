@@ -150,7 +150,7 @@ int ComboBox::AddItem(const wchar_t *itemText, const KeyValues *userData)
 	kv->SetWString("text", itemText);
 	// get an ansi version for the menuitem name
 	char ansi[128];
-	g_pVGuiLocalize->ConvertUnicodeToANSI(itemText, ansi, sizeof(ansi));
+	g_pVGuiLocalize->ConvertUnicodeToANSI(itemText, ansi);
 	return m_pDropDown->AddMenuItem(ansi, kv, this, userData);
 }
 
@@ -526,7 +526,7 @@ void ComboBox::OnSetText(const wchar_t *newtext)
 	if (*text == '#')
 	{
 		char cbuf[255];
-		g_pVGuiLocalize->ConvertUnicodeToANSI(text, cbuf, 255);
+		g_pVGuiLocalize->ConvertUnicodeToANSI(text, cbuf);
 
 		// try lookup in localization tables
 		StringIndex_t unlocalizedTextSymbol = g_pVGuiLocalize->FindIndex(cbuf + 1);

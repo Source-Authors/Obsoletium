@@ -420,6 +420,9 @@ private:
 	bool						m_bHasMax;
 	float						m_fMaxVal;
 
+	// Call this function when ConVar changes
+	FnChangeCallback_t			m_fnChangeCallback;
+
 	// Min/Max values for competitive.
 	bool						m_bHasCompMin;
 	float						m_fCompMinVal;
@@ -427,10 +430,6 @@ private:
 	float						m_fCompMaxVal;
 
 	bool						m_bCompetitiveRestrictions;
-
-	
-	// Call this function when ConVar changes
-	FnChangeCallback_t			m_fnChangeCallback;
 };
 
 

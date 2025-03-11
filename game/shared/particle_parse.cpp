@@ -149,7 +149,7 @@ void ReloadParticleEffectsInList( IFileList *pFilesToReload )
 	if ( pszMapName && pszMapName[0] )
 	{
 		char mapname[MAX_MAP_NAME];
-		Q_FileBase( pszMapName, mapname, sizeof( mapname ) );
+		V_FileBase( pszMapName, mapname );
 		Q_strlower( mapname );
 		ParseParticleEffectsMap( mapname, true, pFilesToReload );
 	}
@@ -586,7 +586,8 @@ void StopParticleEffects( CBaseEntity *pEntity )
 		float flSurfaceOffsetDistance = 0.f;
 		if ( args.ArgC() == 3 )
 		{
-			flSurfaceOffsetDistance = atof( args[2] );
+			// dimhotepus: atof -> strtof.
+			flSurfaceOffsetDistance = strtof( args[2], nullptr );
 		}
 
 		Vector vForward;

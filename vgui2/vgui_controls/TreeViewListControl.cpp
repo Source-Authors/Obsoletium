@@ -86,7 +86,7 @@ void CTreeViewListControl::SetNumColumns( int nColumns )
 	InvalidateLayout();
 }
 
-int CTreeViewListControl::GetNumColumns() const
+intp CTreeViewListControl::GetNumColumns() const
 {
 	return m_Columns.Count();
 }
@@ -285,7 +285,7 @@ void CTreeViewListControl::DrawTitleBars()
 		const char *pTitleString = m_Columns[i].m_Title.String();
 
 		wchar_t unicodeString[1024];
-		g_pVGuiLocalize->ConvertANSIToUnicode( pTitleString, unicodeString, sizeof(unicodeString) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pTitleString, unicodeString );
 	
 		int wide, tall;
 		surface()->GetTextSize( m_TitleBarFont, unicodeString, wide, tall );

@@ -32,7 +32,7 @@ class CDmeAnimationList : public CDmElement
 public:
 	intp GetAnimationCount() const;
 	CDmeChannelsClip *GetAnimation( intp nIndex );
-	int FindAnimation( const char *pAnimName );
+	intp FindAnimation( const char *pAnimName ) const;
 	void SetAnimation( intp nIndex, CDmeChannelsClip *pAnimation );
 	intp AddAnimation( CDmeChannelsClip *pAnimation );
 	void RemoveAnimation( intp nIndex );

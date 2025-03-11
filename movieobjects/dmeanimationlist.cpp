@@ -56,10 +56,10 @@ void CDmeAnimationList::SetAnimation( intp nIndex, CDmeChannelsClip *pAnimation 
 //-----------------------------------------------------------------------------
 // Finds an animation by name
 //-----------------------------------------------------------------------------
-int CDmeAnimationList::FindAnimation( const char *pAnimName )
+intp CDmeAnimationList::FindAnimation( const char *pAnimName ) const
 {
-	int nCount = m_Animations.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Animations.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( m_Animations[i]->GetName(), pAnimName ) )
 			return i;

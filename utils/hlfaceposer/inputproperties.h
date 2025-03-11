@@ -24,6 +24,6 @@ struct CInputParams : public CBaseDialogParams
 };
 
 // Display/create dialog
-int InputProperties( CInputParams *params );
+intp InputProperties( CInputParams *params );
 
 #endif // INPUTPROPERTIES_H

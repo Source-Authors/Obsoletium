@@ -80,7 +80,8 @@ bool MatchString(const char *pszString, FindObject_t &FindObject)
 //			pszOut - String to check.
 //			FindObject - Search criteria, including string to search for.
 //-----------------------------------------------------------------------------
-bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, const char *pszReplace)
+template<intp outSize>
+static bool ReplaceString(char (&pszOut)[outSize], const char *pszIn, FindObject_t &FindObject, const char *pszReplace)
 {
 	//
 	// Whole matches are simple, just strcpy the replacement string into the out buffer.
@@ -89,13 +90,13 @@ bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, co
 	{
 		if (FindObject.bCaseSensitive && (!strcmp(pszIn, FindObject.strFindText)))
 		{
-			strcpy(pszOut, pszReplace);
+			V_strcpy_safe(pszOut, pszReplace);
 			return true;
 		}
 
 		if (!stricmp(pszIn, FindObject.strFindText))
 		{
-			strcpy(pszOut, pszReplace);
+			V_strcpy_safe(pszOut, pszReplace);
 			return true;
 		}
 	}
@@ -116,15 +117,19 @@ bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, co
 	if (pszStart != NULL)
 	{
 		ptrdiff_t nOffset = pszStart - pszIn;
+		V_strncpy(pszOut, pszIn, std::min(nOffset, ssize(pszOut)));
 
-		strncpy(pszOut, pszIn, nOffset);
-		pszOut += nOffset;
-		pszIn += nOffset + strlen(FindObject.strFindText);
+		char *out = pszOut + nOffset;
+		pszIn += nOffset + V_strlen(FindObject.strFindText);
 
-		strcpy(pszOut, pszReplace);
-		pszOut += strlen(pszReplace);
+		V_strncpy(out, pszReplace, ssize(pszOut) - nOffset);
 
-		strcpy(pszOut, pszIn);
+		const ptrdiff_t szReplaceOffset = V_strlen(pszReplace);
+		out += szReplaceOffset;
+
+		nOffset += szReplaceOffset;
+
+		V_strncpy(out, pszIn, ssize(pszOut) - nOffset);
 
 		return true;
 	}

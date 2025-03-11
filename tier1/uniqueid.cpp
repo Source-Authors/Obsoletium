@@ -200,7 +200,7 @@ bool Serialize( CUtlBuffer &buf, const UniqueId_t &src )
 		return false;
 	}
 
-	buf.Put( src );
+	buf.Put( &src, sizeof(src) );
 	return buf.IsValid();
 }
 

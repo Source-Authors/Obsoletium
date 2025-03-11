@@ -5,23 +5,6 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-
-
-//
-// studiomdl.c: generates a studio .mdl file from a .qc script
-// models/<scriptname>.mdl.
-//
-
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
 #include "tier1/utlbuffer.h"
 #include "cmdlib.h"
 #include "scriplib.h"
@@ -51,16 +34,17 @@ static CUtlVector<MtlInfo_t> g_MtlLib;
 
 void ParseMtlLib( CUtlBuffer &buf )
 {
-	int nCurrentMtl = -1;
+	intp nCurrentMtl = -1;
 	while ( buf.IsValid() )
 	{
-		buf.GetLine( g_szLine, sizeof(g_szLine) );
+		buf.GetLine( g_szLine );
 
 		if ( !Q_strnicmp( g_szLine, "newmtl ", 7 ) )
 		{
 			char mtlName[1024];
-			if ( sscanf( g_szLine, "newmtl %s", mtlName ) == 1 )
+			if ( sscanf( g_szLine, "newmtl %1023s", mtlName ) == 1 )
 			{
+				mtlName[ssize(mtlName) - 1] = '\0';
 				nCurrentMtl = g_MtlLib.AddToTail( );
 				g_MtlLib[nCurrentMtl].m_MtlName = mtlName;
 				g_MtlLib[nCurrentMtl].m_TgaName = "debugempty";
@@ -75,9 +59,11 @@ void ParseMtlLib( CUtlBuffer &buf )
 
 			char tgaPath[MAX_PATH];
 			char tgaName[1024];
-			if ( sscanf( g_szLine, "map_Kd %s", tgaPath ) == 1 )
+			if ( sscanf( g_szLine, "map_Kd %259s", tgaPath ) == 1 )
 			{
-				Q_FileBase( tgaPath, tgaName, sizeof(tgaName) );
+				tgaPath[ssize(tgaPath) - 1] = '\0';
+
+				Q_FileBase( tgaPath, tgaName );
 				g_MtlLib[nCurrentMtl].m_TgaName = tgaName;
 			}
 			continue;
@@ -87,8 +73,8 @@ void ParseMtlLib( CUtlBuffer &buf )
 
 const char *FindMtlEntry( const char *pTgaName )
 {
-	int nCount = g_MtlLib.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = g_MtlLib.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( g_MtlLib[i].m_MtlName, pTgaName ) )
 			return g_MtlLib[i].m_TgaName;
@@ -99,7 +85,7 @@ const char *FindMtlEntry( const char *pTgaName )
 static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v, int &t, int &n )
 {
 	char	cmd[1024];
-	int nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
+	intp nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
 	if ( nLen <= 0 )
 		return false;
 
@@ -159,11 +145,11 @@ int Load_OBJ( s_source_t *psource )
 		return 0;
 
 	char pFullPath[MAX_PATH];
-	if ( !GetGlobalFilePath( psource->filename, pFullPath, sizeof(pFullPath) ) )
+	if ( !GetGlobalFilePath( psource->filename, pFullPath ) )
 		return 0;
 
 	char pFullDir[MAX_PATH];
-	Q_ExtractFilePath( pFullPath, pFullDir, sizeof(pFullDir) );
+	V_ExtractFilePath( pFullPath, pFullDir );
 
 	if( !g_quiet )
 	{
@@ -173,7 +159,7 @@ int Load_OBJ( s_source_t *psource )
 	g_iLinecount = 0;
 
 	psource->numbones = 1;
-	strcpy( psource->localBone[0].name, "default" );
+	V_strcpy_safe( psource->localBone[0].name, "default" );
 	psource->localBone[0].parent = -1;
 	Assert( psource->m_Animations.Count() == 0 );
     s_sourceanim_t *pSourceAnim = FindOrAddSourceAnim( psource, "BindPose" );
@@ -190,8 +176,6 @@ int Load_OBJ( s_source_t *psource )
 
 	while ( GetLineInput() ) 
 	{
-		Vector tmp;
-
 		if ( strncmp( g_szLine, "v ", 2 ) == 0 )
 		{
 			i = g_numverts++;
@@ -214,17 +198,19 @@ int Load_OBJ( s_source_t *psource )
 		{
 			i = g_numtexcoords++;
 			sscanf( g_szLine, "vt %f %f", &g_texcoord[i].x, &g_texcoord[i].y );
-			g_texcoord[i].y = 1.0 - g_texcoord[i].y;
+			g_texcoord[i].y = 1.0f - g_texcoord[i].y;
 			continue;
 		}
 		
 		if ( !Q_strncmp( g_szLine, "mtllib ", 7 ) )
 		{
-			sscanf( g_szLine, "mtllib %s", &cmd[0] );
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			sscanf( g_szLine, "mtllib %1023s", cmd );
+			cmd[ssize(cmd) - 1] = '\0';
+
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 			char pFullMtlLibPath[MAX_PATH];
-			Q_ComposeFileName( pFullDir, cmd, pFullMtlLibPath, sizeof(pFullMtlLibPath) );
+			V_ComposeFileName( pFullDir, cmd, pFullMtlLibPath );
 			if ( g_pFullFileSystem->ReadFile( pFullMtlLibPath, NULL, buf ) )
 			{
 				ParseMtlLib( buf );
@@ -234,7 +220,8 @@ int Load_OBJ( s_source_t *psource )
 
 		if (strncmp( g_szLine, "usemtl ", 7 ) == 0)
 		{
-			sscanf( g_szLine, "usemtl %s", &cmd[0] );
+			sscanf( g_szLine, "usemtl %1023s", cmd );
+			cmd[ssize(cmd) - 1] = '\0';
 
 			const char *pTexture = FindMtlEntry( cmd );
 			int texture = LookupTexture( pTexture );
@@ -260,7 +247,7 @@ int Load_OBJ( s_source_t *psource )
 
 			// Are we specifying p only, p and t only, p and n only, or p and n and t?
 			char *pData = g_szLine + 2;
-			int nLen = Q_strlen( pData );
+			intp nLen = Q_strlen( pData );
 
 			CUtlBuffer bufParse( pData, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY );
 
@@ -324,8 +311,6 @@ int AppendVTAtoOBJ( s_source_t *psource, char *filename, int frame )
 
 	while ( GetLineInput() ) 
 	{
-		Vector tmp;
-
 		if (strncmp( g_szLine, "v ", 2 ) == 0)
 		{
 			i = g_numverts++;
@@ -352,7 +337,8 @@ int AppendVTAtoOBJ( s_source_t *psource, char *filename, int frame )
 		}
 		else if (strncmp( g_szLine, "usemtl ", 7 ) == 0)
 		{
-			sscanf( g_szLine, "usemtl %s", &cmd[0] );
+			sscanf( g_szLine, "usemtl %1023s", cmd );
+			cmd[ssize(cmd) - 1] = '\0';
 
 			int texture = LookupTexture( cmd );
 			psource->texmap[texture] = texture;	// hack, make it 1:1
@@ -399,7 +385,7 @@ int AppendVTAtoOBJ( s_source_t *psource, char *filename, int frame )
 	if ( frame == 0 )
 	{
 		psource->numbones = 1;
-		strcpy( psource->localBone[0].name, "default" );
+		V_strcpy_safe( psource->localBone[0].name, "default" );
 		psource->localBone[0].parent = -1;
 		pSourceAnim->numframes = 1;
 		pSourceAnim->startframe = 0;

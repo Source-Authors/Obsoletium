@@ -5,9 +5,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <windows.h>
-#include "resource.h"
 #include "vcdbrowser.h"
+#include "resource.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "filesystem.h"
 #include "tabwindow.h"
@@ -16,6 +15,8 @@
 #include "UtlBuffer.h"
 #include "ChoreoEvent.h"
 #include "ChoreoView.h"
+
+#include "winlite.h"
 
 CVCDBrowser	*g_pVCDBrowser = NULL;
 
@@ -125,13 +126,13 @@ public:
 			cur = FindOrAddChildItem( cur, check );
 		}
 
-		setUserData( cur, (void *)pathId );
+		setUserData( cur, (void *)(intp)pathId );
 	}
 
 	char const *GetSelectedPath( void )
 	{
 		mxTreeViewItem *tvi = getSelectedItem();
-		unsigned int id = (unsigned int)getUserData( tvi );
+		int id = (int)(intp)getUserData( tvi );
 
 		if ( id < 0 || id >= m_Paths.Count() )
 		{
@@ -472,7 +473,7 @@ void CVCDBrowser::OpenVCD( const FileNameHandle_t& handle )
 	if ( filesystem->String( handle, fn, sizeof( fn ) ) )
 	{
 		char pFullPath[MAX_PATH];
-		const char *pFileName = filesystem->RelativePathToFullPath( fn, "GAME", pFullPath, sizeof(pFullPath) );
+		const char *pFileName = filesystem->RelativePathToFullPath_safe( fn, "GAME", pFullPath );
 		if ( !pFileName )
 		{
 			pFileName = fn;
@@ -485,10 +486,9 @@ void CVCDBrowser::OpenVCD( const FileNameHandle_t& handle )
 //-----------------------------------------------------------------------------
 // Finds all .vcd files in a particular directory
 //-----------------------------------------------------------------------------
-bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CNameLessFunc >& soundlist, char const* pDirectoryName, int nDirectoryNameLen )
+bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CNameLessFunc >& soundlist, char const* pDirectoryName, intp nDirectoryNameLen )
 {
-	char *pWildCard;
-	pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
+	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
 	Q_snprintf( pWildCard, nDirectoryNameLen + 7, "%s/*.vcd", pDirectoryName );
 
 	if ( !filesystem )
@@ -504,7 +504,7 @@ bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CN
 		{
 			// Strip off the 'sound/' part of the name.
 			char *pFileNameWithPath;
-			int nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
+			intp nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
 			pFileNameWithPath = (char *)stackalloc( nAllocSize );
 			Q_snprintf(	pFileNameWithPath, nAllocSize, "%s/%s", &pDirectoryName[ SCENES_PREFIX_LEN ], pFileName ); 
 			Q_strnlwr( pFileNameWithPath, nAllocSize );
@@ -525,15 +525,16 @@ bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CN
 bool CVCDBrowser::InitDirectoryRecursive( CUtlSortVector< FileNameHandle_t, CNameLessFunc >& soundlist, char const* pDirectoryName )
 {
 	// Compute directory name length
-	int nDirectoryNameLen = Q_strlen( pDirectoryName );
+	intp nDirectoryNameLen = Q_strlen( pDirectoryName );
 
 	if (!LoadVCDsFilesInDirectory( soundlist, pDirectoryName, nDirectoryNameLen ) )
 		return false;
 
-	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 4 );
-	strcpy(pWildCard, pDirectoryName);
-	strcat(pWildCard, "/*.");
-	int nPathStrLen = nDirectoryNameLen + 1;
+	intp sizeWildCard = nDirectoryNameLen + ssize("/*.");
+	char *pWildCard = stackallocT( char, sizeWildCard );
+	V_strncpy(pWildCard, pDirectoryName, sizeWildCard);
+	V_strncat(pWildCard, "/*.", sizeWildCard);
+	intp nPathStrLen = nDirectoryNameLen + 1;
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = filesystem->FindFirst( pWildCard, &findHandle );
@@ -543,11 +544,11 @@ bool CVCDBrowser::InitDirectoryRecursive( CUtlSortVector< FileNameHandle_t, CNam
 		{
 			if( filesystem->FindIsDirectory( findHandle ) )
 			{
-				int fileNameStrLen = Q_strlen( pFileName );
-				char *pFileNameWithPath = ( char * )stackalloc( nPathStrLen + fileNameStrLen + 1 );
+				intp sizePath = Q_strlen( pFileName ) + nPathStrLen + 1;
+				char *pFileNameWithPath = stackallocT( char, sizePath );
 				memcpy( pFileNameWithPath, pWildCard, nPathStrLen );
 				pFileNameWithPath[nPathStrLen] = '\0';
-				strcat( pFileNameWithPath, pFileName );
+				V_strncat( pFileNameWithPath, pFileName, sizePath );
 
 				if (!InitDirectoryRecursive( soundlist, pFileNameWithPath ))
 					return false;
@@ -588,9 +589,9 @@ void CVCDBrowser::PopulateTree( char const *subdirectory )
 	char subdir[ 512 ];
 	subdir[ 0 ] = 0;
 
-	int i;
+	intp i;
 
-	CUtlSortVector< FileNameHandle_t, CNameLessFunc >	sorted( 0, 0 );
+	CUtlSortVector< FileNameHandle_t, CNameLessFunc >	sorted( (intp)0, 0 );
 	
 	char const *texttofind = NULL;
 
@@ -600,7 +601,7 @@ void CVCDBrowser::PopulateTree( char const *subdirectory )
 		texttofind = GetSearchString();
 	}
 
-	int len = 0;
+	intp len = 0;
 	if ( subdirectory )
 	{
 		len = Q_strlen( subdirectory );
@@ -609,7 +610,7 @@ void CVCDBrowser::PopulateTree( char const *subdirectory )
 		Q_FixSlashes( subdir );
 	}
 
-	int c = m_AllVCDs.Count();
+	intp c = m_AllVCDs.Count();
 	for ( i = 0; i < c; i++ )
 	{
 		const FileNameHandle_t &vcd = m_AllVCDs[ i ];
@@ -800,14 +801,14 @@ void CVCDBrowser::JumpToItem( const FileNameHandle_t& vcd )
 	}
 }
 
-int	 CVCDBrowser::GetVCDCount() const
+intp	 CVCDBrowser::GetVCDCount() const
 {
 	return m_AllVCDs.Count();
 }
 
-FileNameHandle_t CVCDBrowser::GetVCD( int index )
+FileNameHandle_t CVCDBrowser::GetVCD( intp index )
 {
-	if ( index < 0 || index >= (int)m_AllVCDs.Count() )
+	if ( index < 0 || index >= m_AllVCDs.Count() )
 		return NULL;
 
 	return m_AllVCDs[ index ];

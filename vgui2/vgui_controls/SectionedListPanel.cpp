@@ -324,7 +324,7 @@ public:
 					}				
 				}
 
-				{for ( int i = GetImageCount(); i < colCount; i++ ) // make sure we have enough image slots
+				{for ( intp i = GetImageCount(); i < colCount; i++ ) // make sure we have enough image slots
 				{
 					AddImage( NULL, 0 );
 				}}
@@ -811,7 +811,7 @@ void SectionedListPanel::ReSortList()
 {
     m_SortedItems.RemoveAll();
 
-	int sectionStart = 0;
+	intp sectionStart = 0;
 	// layout the buttons
 	for (intp sectionIndex = 0; sectionIndex < m_Sections.Count(); sectionIndex++)
 	{
@@ -819,14 +819,14 @@ void SectionedListPanel::ReSortList()
 		sectionStart = m_SortedItems.Count();
 
 		// find all the items in this section
-		for( int i = m_Items.Head(); i != m_Items.InvalidIndex(); i = m_Items.Next( i ) )
+		for( auto i = m_Items.Head(); i != m_Items.InvalidIndex(); i = m_Items.Next( i ) )
 		{
 			if (m_Items[i]->GetSectionID() == m_Sections[sectionIndex].m_iID)
 			{
 				// insert the items sorted
 				if (section.m_pSortFunc)
 				{
-					int insertionPoint = sectionStart;
+					intp insertionPoint = sectionStart;
 					for (;insertionPoint < m_SortedItems.Count(); insertionPoint++)
 					{
 						if (section.m_pSortFunc(this, i, m_SortedItems[insertionPoint]->GetID()))
@@ -1219,7 +1219,7 @@ bool SectionedListPanel::AddColumnToSection(int sectionID, const char *columnNam
 	wchar_t *pwtext = g_pVGuiLocalize->Find(columnText);
 	if (!pwtext)
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode(columnText, wtext, sizeof(wtext));
+		g_pVGuiLocalize->ConvertANSIToUnicode(columnText, wtext);
 		pwtext = wtext;
 	}
 	return AddColumnToSection(sectionID, columnName, pwtext, columnFlags, width, fallbackFont );
@@ -1766,7 +1766,7 @@ void SectionedListPanel::OnKeyCodePressed( KeyCode code )
         int lastValidItem = itemID;
         int secID = m_Items[itemID]->GetSectionID();
         int i=0;
-		int row = m_SortedItems.Find(m_Items[itemID]);
+		intp row = m_SortedItems.Find(m_Items[itemID]);
 
 		while ( i < rowsperpage )
         {
@@ -1804,7 +1804,7 @@ void SectionedListPanel::OnKeyCodePressed( KeyCode code )
         int lastValidItem = itemID;
         int secID = m_Items[itemID]->GetSectionID();
         int i=0;
-		int row = m_SortedItems.Find(m_Items[itemID]);
+		intp row = m_SortedItems.Find(m_Items[itemID]);
         while ( i < rowsperpage )
         {
 			if ( m_SortedItems.IsValidIndex(--row) )

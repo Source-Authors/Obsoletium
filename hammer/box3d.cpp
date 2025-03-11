@@ -349,11 +349,11 @@ void Box3D::StartTranslation(
 // Purpose: 
 // Input  : pszBuf - 
 //-----------------------------------------------------------------------------
-void Box3D::GetStatusString(char *pszBuf)
+void Box3D::GetStatusString(char *pszBuf, intp bufSize)
 {
+	if (bufSize <= 0) return;
+
 	*pszBuf = '\0';
-
-
 
 	Vector mins(0,0,0);
 	Vector maxs(0,0,0);
@@ -388,7 +388,7 @@ void Box3D::GetStatusString(char *pszBuf)
 			{
 				case Units_None:
 				{
-					sprintf(pszBuf, " %dw %dl %dh @(%.0f %.0f %.0f)", 
+					V_snprintf(pszBuf, bufSize, " %dw %dl %dh @(%.0f %.0f %.0f)", 
 						(int)fabs(size.x), (int)fabs(size.y), (int)fabs(size.z),
 						center.x,center.y,center.z );
 					break;
@@ -396,7 +396,7 @@ void Box3D::GetStatusString(char *pszBuf)
 
 				case Units_Inches:
 				{
-					sprintf(pszBuf, " %d\"w %d\"l %d\"h", (int)fabs(size.x), (int)fabs(size.y), (int)fabs(size.z));
+					V_snprintf(pszBuf, bufSize, " %d\"w %d\"l %d\"h", (int)fabs(size.x), (int)fabs(size.y), (int)fabs(size.z));
 					break;
 				}
 
@@ -411,7 +411,7 @@ void Box3D::GetStatusString(char *pszBuf)
 					int nFeetHigh = (int)fabs(size.z) / 12;
 					int nInchesHigh = (int)fabs(size.z) % 12;
 
-					sprintf(pszBuf, " %d' %d\"w %d' %d\"l %d' %d\"h", nFeetWide, nInchesWide, nFeetLong, nInchesLong, nFeetHigh, nInchesHigh);
+					V_snprintf(pszBuf, bufSize, " %d' %d\"w %d' %d\"l %d' %d\"h", nFeetWide, nInchesWide, nFeetLong, nInchesLong, nFeetHigh, nInchesHigh);
 					break;
 				}
 			}
@@ -419,7 +419,7 @@ void Box3D::GetStatusString(char *pszBuf)
 	}
 	else if ( m_TranslateMode == modeShear )
 	{
-		sprintf(pszBuf, " shear: %d %d %d ", (int)m_vTranslation.x, (int)m_vTranslation.y, (int)m_vTranslation.z );
+		V_snprintf(pszBuf, bufSize, " shear: %d %d %d ", (int)m_vTranslation.x, (int)m_vTranslation.y, (int)m_vTranslation.z );
 	}
 	else if ( m_TranslateMode == modeRotate )
 	{
@@ -427,11 +427,11 @@ void Box3D::GetStatusString(char *pszBuf)
 
 		if ( rotAxis != -1  )
 		{
-			sprintf(pszBuf, " %.2f%c", m_vTranslation[abs(rotAxis+2)%3], 0xF8);
+			V_snprintf(pszBuf, bufSize, " %.2f%c", m_vTranslation[abs(rotAxis+2)%3], 0xF8);
 		}
 		else
 		{
-			sprintf(pszBuf, " %.2f %.2f %.2f%c", m_vTranslation.x, m_vTranslation.y, m_vTranslation.z, 0xF8);
+			V_snprintf(pszBuf, bufSize, " %.2f %.2f %.2f%c", m_vTranslation.x, m_vTranslation.y, m_vTranslation.z, 0xF8);
 		}
 	}
 	else

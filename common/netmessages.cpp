@@ -1286,7 +1286,7 @@ bool SVC_CreateStringTable::ReadFromBuffer( bf_read &buffer )
 	{
 		// table hosts filenames
 		m_bIsFilenames = true;
-		buffer.ReadByte();
+		(void)buffer.ReadByte();
 	}
 	else
 	{

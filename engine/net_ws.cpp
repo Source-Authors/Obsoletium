@@ -1524,7 +1524,8 @@ netpacket_t *NET_GetPacket (intp sock, byte *scratch )
 #ifdef _DEBUG
 	if ( fakenoise.GetInt() > 0 )
 	{
-		COM_AddNoise( inpacket.data, inpacket.size, fakenoise.GetInt() );
+		// dimhotepus: Restrict noise bound to packet size to prevent overflow.
+		COM_AddNoise( inpacket.data, inpacket.size, std::min(inpacket.size, fakenoise.GetInt()) );
 	}
 #endif
 	

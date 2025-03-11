@@ -2975,13 +2975,9 @@ intp CChoreoScene::FindActorIndex( CChoreoActor *actor )
 // Input  : a1 - 
 //			a2 - 
 //-----------------------------------------------------------------------------
-void CChoreoScene::SwapActors( int a1, int a2 )
+void CChoreoScene::SwapActors( intp a1, intp a2 )
 {
-	CChoreoActor *temp;
-
-	temp = m_Actors[ a1 ];
-	m_Actors[ a1 ] = m_Actors[ a2 ];
-	m_Actors[ a2 ] = temp;
+	std::swap( m_Actors[ a1 ], m_Actors[ a2 ] );
 }
 
 //-----------------------------------------------------------------------------

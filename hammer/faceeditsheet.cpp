@@ -19,9 +19,9 @@
 #include <tier0/memdbgon.h>
 
 
-IMPLEMENT_DYNAMIC( CFaceEditSheet, CPropertySheet )
+IMPLEMENT_DYNAMIC( CFaceEditSheet, CBasePropertySheet )
 
-BEGIN_MESSAGE_MAP( CFaceEditSheet, CPropertySheet )
+BEGIN_MESSAGE_MAP( CFaceEditSheet, CBasePropertySheet )
 	//{{AFX_MSG_MAP( CFaceEdtiSheet )
 	ON_WM_CLOSE()
 	//}}AFX_MSG_MAP
@@ -30,7 +30,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 CFaceEditSheet::CFaceEditSheet( LPCTSTR pszCaption, CWnd *pParentWnd, UINT iSelectPage ) : 
-                CPropertySheet( pszCaption, pParentWnd, iSelectPage )
+                CBasePropertySheet( pszCaption, pParentWnd, iSelectPage )
 {
 	m_ClickMode = -1;
 	m_bEnableUpdate = true;

@@ -25,7 +25,7 @@ public:
 	CDmaString m_GameSoundName;	// Only used if it's a gamesound
 
 	// Return false if it can't find the sound full path
-	bool ComputeSoundFullPath( char *pBuf, int nBufLen );
+	bool ComputeSoundFullPath( char *pBuf, intp nBufLen );
 };
 
 class CDmeGameSound : public CDmeSound

@@ -63,16 +63,21 @@ static CMapObjectList FoundEntities;
 //			pKV - 
 // Output : 
 //-----------------------------------------------------------------------------
-static BOOL FindKeyValue(CMapEntity *pEntity, MDkeyvalue *pKV)
+static BOOL FindKeyValue(CMapClass *mp, DWORD_PTR ctx)
 {
+	auto *pEntity = reinterpret_cast<CMapEntity *>(mp);
+	auto *pKV = reinterpret_cast<MDkeyvalue *>(ctx);
+
 	LPCTSTR pszValue = pEntity->GetKeyValue(pKV->szKey);
-	if (!pszValue || strcmpi(pszValue, pKV->szValue))
+	if (!pszValue || strcmpi(pszValue, pKV->szValue) != 0)
 	{
+		// Continue to search for.
 		return TRUE;
 	}
 
 	FoundEntities.AddToTail(pEntity);
-
+	
+	// Continue to search for.
 	return TRUE;
 }
 
@@ -91,7 +96,7 @@ static BOOL FindKeyValue(CMapEntity *pEntity, MDkeyvalue *pKV)
 //-----------------------------------------------------------------------------
 int CompareEntityNames(const char *szName1, const char *szName2)
 {
-	int nCompareLen = -1;
+	ptrdiff_t nCompareLen = -1;
 
 	const char *pszWildcard1 = strchr(szName1, '*');
 	if (pszWildcard1)
@@ -140,8 +145,8 @@ static void ReplaceNodeIDRecursive(CMapClass *pRoot, int nOldNodeID, int nNewNod
 		if (!pClass)
 			return;
 		
-		int nVarCount = pClass->GetVariableCount();
-		for (int i = 0; i < nVarCount; i++)
+		intp nVarCount = pClass->GetVariableCount();
+		for (intp i = 0; i < nVarCount; i++)
 		{
 			GDinputvariable *pVar = pClass->GetVariableAt(i);
 			if (pVar->GetType() == ivNodeDest)
@@ -272,11 +277,11 @@ void CMapEntity::AddChild(CMapClass *pChild)
 	//
 	if (dynamic_cast<CMapSolid*>(pChild) == NULL)
 	{
-		for ( int i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
+		for ( auto i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
 		{
 			MDkeyvalue KeyValue = m_KeyValues.GetKeyValue(i); 
 			pChild->OnParentKeyChanged( KeyValue.szKey, KeyValue.szValue );
-		}	
+		}
 	}
 }
 
@@ -383,8 +388,8 @@ void CMapEntity::AddHelpersForClass(GDclass *pClass, bool bLoading)
 		//
 		// For every helper in the class definition...
 		//
-		int nHelperCount = pClassLocal->GetHelperCount();
-		for (int i = 0; i < nHelperCount; i++)
+		intp nHelperCount = pClassLocal->GetHelperCount();
+		for (intp i = 0; i < nHelperCount; i++)
 		{
 			CHelperInfo *pHelperInfo = pClassLocal->GetHelper(i);
 
@@ -407,8 +412,8 @@ void CMapEntity::AddHelpersForClass(GDclass *pClass, bool bLoading)
 		//
 		// FIXME: make this totally data driven like the helper factory, or better
 		//		  yet, like the LINK_ENTITY_TO_CLASS stuff in the game DLL
-		int nVarCount = pClassLocal->GetVariableCount();
-		for (int i = 0; i < nVarCount; i++)
+		intp nVarCount = pClassLocal->GetVariableCount();
+		for (intp i = 0; i < nVarCount; i++)
 		{
 			GDinputvariable *pVar = pClassLocal->GetVariableAt(i);
 			GDIV_TYPE eType = pVar->GetType();
@@ -540,9 +545,11 @@ CMapClass *CMapEntity::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 	//
 	const char *pszOldTargetName = CEditGameClass::GetKeyValue("targetname");
 	char szOldTargetName[MAX_IO_NAME_LEN];
+	szOldTargetName[0] = '\0';
+
 	if (pszOldTargetName != NULL)
 	{
-		strcpy(szOldTargetName, pszOldTargetName);
+		V_strcpy_safe(szOldTargetName, pszOldTargetName);
 	}
 
 	CEditGameClass::CopyFrom(pFrom);
@@ -582,13 +589,11 @@ void CMapEntity::CalcBounds(BOOL bFullUpdate)
 //-----------------------------------------------------------------------------
 // Purpose: Debugging hook.
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4189)
 void CMapEntity::Debug(void)
 {
-	int i = m_KeyValues.GetFirst();
-	MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(i);
+	auto i = m_KeyValues.GetFirst();
+	[[maybe_unused]] MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(i);
 }
-#pragma warning (default:4189)
 
 
 //-----------------------------------------------------------------------------
@@ -603,7 +608,7 @@ const char* CMapEntity::GetDescription(void) const
 
 	if (pszName != NULL)
 	{
-		sprintf(szBuf, "%s - %s", pszName, GetClassName());
+		V_sprintf_safe(szBuf, "%s - %s", pszName, GetClassName());
 	}
 	else
 	{
@@ -842,9 +847,10 @@ void CMapEntity::RemoveHelpers(bool bRemoveSolids)
 //-----------------------------------------------------------------------------
 // Building targetnames which deal with *
 //-----------------------------------------------------------------------------
-static inline void BuildNewTargetName( const char *pOldName, const char *pNewName, char *pBuffer )
+template<intp bufferSize>
+static inline void BuildNewTargetName( const char *pOldName, const char *pNewName, char (&pBuffer)[bufferSize] )
 {
-	strcpy(pBuffer, pNewName);
+	V_strcpy_safe(pBuffer, pNewName);
 
 	// If we matched a key value that contains wildcards, preserve the
 	// wildcards when we replace the name.
@@ -875,7 +881,7 @@ void CMapEntity::ReplaceTargetname(const char *szOldName, const char *szNewName)
 	//
 	// Replace any keys whose value matches the old name.
 	//
-	for ( int i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
+	for ( auto i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
 	{
 		MDkeyvalue KeyValue = m_KeyValues.GetKeyValue(i);
 		if (!CompareEntityNames(KeyValue.szValue, szOldName))
@@ -1082,7 +1088,7 @@ void CMapEntity::EnsureUniqueNodeID(CMapWorld *pWorld)
 //-----------------------------------------------------------------------------
 void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 {
-	int nIndex;
+	intp nIndex;
 
 	//
 	// Set our origin from our "origin" key and discard the key.
@@ -1117,7 +1123,7 @@ void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 		// keyvalues and our pointer might become bad.
 		//
 		char szClassName[MAX_CLASS_NAME_LEN];
-		strcpy(szClassName, pszValue);
+		V_strcpy_safe(szClassName, pszValue);
 		SetClass(szClassName, true);
 
 		//
@@ -1254,16 +1260,18 @@ void CMapEntity::DeleteKeyValue(LPCSTR pszKey)
 	const char *pszOld = GetKeyValue(pszKey);
 	if (pszOld != NULL)
 	{
-		strcpy(szOldValue, pszOld);
+		V_strcpy_safe(szOldValue, pszOld);
 	}
 	else
 	{
-	  szOldValue[0] = '\0';
+		szOldValue[0] = '\0';
 	}
 
+	// dimhotepus: Ensure deleted key still has its naem in OnKeyValueChanged.
+	CString key = pszKey;
 	CEditGameClass::DeleteKeyValue(pszKey);
 
-	OnKeyValueChanged(pszKey, szOldValue, "");
+	OnKeyValueChanged(key.GetString(), szOldValue, "");
 	CalculateTypeFlags();
 	SignalChanged();
 }
@@ -1599,10 +1607,10 @@ CMapEntity *CMapEntity::FindChildByKeyValue( LPCSTR key, LPCSTR value, bool *bIs
 		return(NULL);
 	}
 
-	int index;
+	intp index;
 	LPCSTR val = CEditGameClass::GetKeyValue(key, &index);
 
-	if ( val && value && !stricmp(value, val) )
+	if ( val && !stricmp(value, val) )
 	{
 		return this;
 	}
@@ -1639,7 +1647,7 @@ bool CMapEntity::GetTransformMatrix( VMatrix& matrix )
 		if ( gotMatrix )
 		{
 			// return ParentMatrix * OurMatrix
-			VMatrix tmpMat, animatorMat;
+			VMatrix animatorMat;
 			bool gotAnimMatrix = m_pAnimatorChild->GetTransformMatrix( animatorMat );
 			if ( !gotAnimMatrix )
 			{
@@ -1713,7 +1721,7 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	// dimhotepus: Check result.
 	if (eResult == ChunkFile_Ok)
 	{
-	eResult = pFile->BeginChunk("entity");
+		eResult = pFile->BeginChunk("entity");
 	}
 
 	//
@@ -1750,17 +1758,17 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	// dimhotepus: Check result.
 	if (eResult == ChunkFile_Ok)
 	{
-	EnumChildrenPos_t pos;
-	CMapClass *pChild = GetFirstDescendent(pos);
-	while ((pChild != NULL) && (eResult == ChunkFile_Ok))
-	{
-		if ( pChild->ShouldSerialize() )
+		EnumChildrenPos_t pos;
+		CMapClass *pChild = GetFirstDescendent(pos);
+		while ((pChild != NULL) && (eResult == ChunkFile_Ok))
 		{
-			eResult = pChild->SaveVMF(pFile, pSaveInfo);
-		}
+			if ( pChild->ShouldSerialize() )
+			{
+				eResult = pChild->SaveVMF(pFile, pSaveInfo);
+			}
 
-		pChild = GetNextDescendent(pos);
-	}
+			pChild = GetNextDescendent(pos);
+		}
 	}
 
 	//
@@ -2015,7 +2023,7 @@ void CMapEntity::Render2D(CRender2D *pRender)
 
 			CMapObjectList FoundEntitiesTarget;
 			FoundEntitiesTarget.RemoveAll();
-			pWorld->EnumChildren((ENUMMAPCHILDRENPROC)FindKeyValue, (DWORD)&kv, MAPCLASS_TYPE(CMapEntity));
+			pWorld->EnumChildren(FindKeyValue, (DWORD_PTR)&kv, MAPCLASS_TYPE(CMapEntity));
 
 			Vector vCenter1,vCenter2;
 			GetBoundsCenter( vCenter1 );
@@ -2368,7 +2376,7 @@ bool CMapEntity::HitTestLogical( CMapViewLogical *pView, const Vector2D &vecPoin
 	{
 		hitData.pObject = this;
 		hitData.uData = 0;
-		hitData.nDepth = 0.0f;
+		hitData.nDepth = 0;
 		return true;
 	}
 

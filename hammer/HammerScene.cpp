@@ -76,7 +76,7 @@ static CSceneTokenProcessor g_TokenProcessor;
 char *ExpandPath (char *path)
 {
 	static char fullpath[ 512 ];
-	g_pFullFileSystem->RelativePathToFullPath( path, "GAME", fullpath, sizeof( fullpath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( path, "GAME", fullpath );
 	return fullpath;
 }
 

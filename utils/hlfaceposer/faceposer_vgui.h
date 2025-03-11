@@ -10,6 +10,10 @@
 #pragma once
 #endif
 
+#include "tier0/basetypes.h"
+
+FORWARD_DECLARE_HANDLE(HWND);
+
 class IMatSystemSurface;
 class CVGuiWnd;
 

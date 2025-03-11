@@ -2467,13 +2467,19 @@ int VOX_GroupPickSequential( intp isentenceg, OUT_Z_CAP(szfoundLen) char *szfoun
 	unsigned char count;
 	
 	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Count())
+	{
+		if (szfoundLen) szfound[0] = '\0';
 		return -1;
+	}
 
 	szgroupname = g_SentenceGroups[isentenceg].GroupName();
 	count = g_SentenceGroups[isentenceg].count;
 	
 	if (count == 0)
+	{
+		if (szfoundLen) szfound[0] = '\0';
 		return -1;
+	}
 
 	if (ipick >= count)
 		ipick = count-1;
@@ -2512,7 +2518,10 @@ int VOX_GroupPick( intp isentenceg, OUT_Z_CAP(strLen) char *szfound, intp strLen
 	int ffound = FALSE;
 	
 	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Count())
+	{
+		if (strLen) szfound[0] = '\0';
 		return -1;
+	}
 
 	szgroupname = g_SentenceGroups[isentenceg].GroupName();
 	count = g_SentenceGroups[isentenceg].count;

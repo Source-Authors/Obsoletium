@@ -2853,7 +2853,8 @@ void CC_AirDensity( const CCommand &args )
 	}
 	else
 	{
-		float density = atof( args[1] );
+		// dimhotepus: atof -> strtof.
+		float density = strtof( args[1], nullptr );
 		physenv->SetAirDensity( density );
 	}
 }

@@ -32,7 +32,6 @@ public:
 	void UpdateGroupList(void);
 
 	CAnchorMgr m_AnchorMgr;
-	CMapClass *pUpdateObject;
 
 	//{{AFX_DATA(COP_Groups)
 	enum { IDD = IDD_OBJPAGE_GROUPS };

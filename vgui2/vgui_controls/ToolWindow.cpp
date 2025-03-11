@@ -26,7 +26,7 @@ CUtlVector< ToolWindow * > ToolWindow::s_ToolWindows;
 // Input  :  - 
 // Output : int
 //-----------------------------------------------------------------------------
-int ToolWindow::GetToolWindowCount()
+intp ToolWindow::GetToolWindowCount()
 {
 	return s_ToolWindows.Count();
 }

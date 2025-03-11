@@ -9,8 +9,11 @@
 #include "GameConfig.h"
 #include "OptionProperties.h"
 #include "OPTTextures.h"
+#include "MainFrm.h"
+#include "mapdoc.h"
 #include "Options.h"
 #include "tier1/strtools.h"
+#include "com_ptr.h"
 #include <shlobj.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -18,9 +21,9 @@
 /////////////////////////////////////////////////////////////////////////////
 // COPTTextures property page
 
-IMPLEMENT_DYNCREATE(COPTTextures, CPropertyPage)
+IMPLEMENT_DYNCREATE(COPTTextures, CBasePropertyPage)
 
-COPTTextures::COPTTextures() : CPropertyPage(COPTTextures::IDD)
+COPTTextures::COPTTextures() : CBasePropertyPage(COPTTextures::IDD)
 {
 	//{{AFX_DATA_INIT(COPTTextures)
 		// NOTE: the ClassWizard will add member initialization here
@@ -42,11 +45,37 @@ void COPTTextures::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(COPTTextures)
 	DDX_Control(pDX, IDC_TEXTUREFILES, m_TextureFiles);
 	DDX_Control(pDX, IDC_BRIGHTNESS, m_cBrightness);
+	DDX_Control(pDX, IDC_BRIGHTNESSTEXT, m_cBrightnessText);
 	//}}AFX_DATA_MAP
+
+	m_cBrightness.SetRange(1, 50, TRUE);
+
+	//
+	// If going from controls to data.
+	//
+	if (pDX->m_bSaveAndValidate)
+	{
+		Options.textures.fBrightness = (float)m_cBrightness.GetPos() / 10.0f;
+	}
+	//
+	// Else going from data to controls.
+	//
+	else
+	{
+		CString str;
+
+		//
+		// Brightness.
+		//
+		m_cBrightness.SetPos(int(Options.textures.fBrightness * 10));
+		int iBrightness = m_cBrightness.GetPos();
+		str.Format("%d", iBrightness);
+		m_cBrightnessText.SetWindowText(str);
+	}
 }
 
 
-BEGIN_MESSAGE_MAP(COPTTextures, CPropertyPage)
+BEGIN_MESSAGE_MAP(COPTTextures, CBasePropertyPage)
 	//{{AFX_MSG_MAP(COPTTextures)
 	ON_BN_CLICKED(IDC_EXTRACT, OnExtract)
 	ON_BN_CLICKED(IDC_ADDTEXFILE, OnAddtexfile)
@@ -75,10 +104,6 @@ BOOL COPTTextures::OnInitDialog()
 		m_TextureFiles.AddString(Options.textures.TextureFiles[i]);
 	}
 
-	// set brightness control & values
-	m_cBrightness.SetRange(1, 50); // 10 is default
-	m_cBrightness.SetPos(int(Options.textures.fBrightness * 10));
-
 	// attach the material exclusion list box
 	m_MaterialExcludeList.Attach( GetDlgItem( ID_MATERIALEXCLUDE_LIST )->m_hWnd );
 
@@ -105,7 +130,8 @@ void COPTTextures::OnAddtexfile(void)
 {
 	static char szInitialDir[MAX_PATH] = "\0";
 
-	CFileDialog dlg(TRUE, "wad", NULL, OFN_ALLOWMULTISELECT | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST, "Texture files (*.wad;*.pak)|*.wad; *.pak||");
+	CFileDialog dlg(TRUE, "wad", NULL, OFN_ALLOWMULTISELECT | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST, "Texture Files (*.wad;*.pak)|*.wad; *.pak||");
+	dlg.m_ofn.lpstrTitle = "Open Texture File";
 
 	if (szInitialDir[0] == '\0')
 	{
@@ -158,16 +184,33 @@ void COPTTextures::OnRemovetexfile()
 
 void COPTTextures::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
 {
-	if(pScrollBar == (CScrollBar*) &m_cBrightness)
+	//
+	// If it is the brightness scroll bar, update the brightness text.
+	// Also, notify the 3D view so that it can update in realtime.
+	//
+	if (pScrollBar->m_hWnd == m_cBrightness.m_hWnd)
+	{
 		SetModified();
+
+		int iBrightness = m_cBrightness.GetPos();
+
+		CString str;
+		str.Format("%d", iBrightness);
+		m_cBrightnessText.SetWindowText(str);
+
+		CMainFrame *pMainWnd = GetMainWnd();
+		if (pMainWnd != NULL)
+		{
+			Options.textures.fBrightness = (float)m_cBrightness.GetPos() / 10.0f;
+			pMainWnd->UpdateAllDocViews( MAPVIEW_OPTIONS_CHANGED | MAPVIEW_RENDER_NOW );
+		}
+	}
 	
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 BOOL COPTTextures::OnApply() 
 {
-	Options.textures.fBrightness = (float)m_cBrightness.GetPos() / 10.0f;
-
 	int iSize = m_TextureFiles.GetCount();
 	CString str;
 	Options.textures.nTextureFiles = iSize;
@@ -182,30 +225,15 @@ BOOL COPTTextures::OnApply()
 	{
 		// inform them that deleted files will only be reapplied after
 		// they reload the editor
-		MessageBox("You have removed some texture files from the list. "
+		MessageBox("You have removed some texture files from the list.\n"
 			"These texture files will continue to be used during this "
 			"session, but will not be loaded the next time you run "
-			"Hammer.", "A Quick Note");
+			"Hammer.", "Hammer - Quick Note", MB_ICONINFORMATION);
 	}
 
 	Options.PerformChanges(COptions::secTextures);
 
 	return __super::OnApply();
-}
-
-void GetDirectory(char *pDest, const char *pLongName)
-{
-	strcpy(pDest, pLongName);
-	int i = strlen(pDest);
-	while (pLongName[i] != '\\' && pLongName[i] != '/' && i > 0)
-		i--;
-
-	if (i <= 0)
-		i = 0;
-	
-	pDest[i] = 0;
-
-	return;
 }
 
 
@@ -232,7 +260,7 @@ void COPTTextures::OnAddtexfile2()
 		SHGetPathFromIDList(pidlNew, szPathName);
 		
 		
-		if (AfxMessageBox("Add all subdirectories as separate Texture Groups?", MB_YESNO) == IDYES)
+		if (AfxMessageBox("Add all subdirectories as separate Texture Groups?", MB_YESNO | MB_ICONQUESTION) == IDYES)
 		//if (!strcmpi("\\textures", &szPathName[strlen(szPathName) - strlen("\\textures")]))
 		{
 			char szNewPath[MAX_PATH];
@@ -301,8 +329,6 @@ static int CALLBACK BrowseCallbackProc( HWND hwnd, UINT uMsg, LPARAM lParam, LPA
 //-----------------------------------------------------------------------------
 BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 {
-	USES_CONVERSION;
-
 	static bool s_bFirst = true;
 	if ( s_bFirst )
 	{
@@ -312,40 +338,43 @@ BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 
 	LPITEMIDLIST pidlStartFolder = NULL;
 
-	IShellFolder *pshDesktop = NULL;
-	SHGetDesktopFolder( &pshDesktop );
-	if ( pshDesktop )
+	se::win::com::com_ptr<IShellFolder> shDesktop;
+	if ( s_bFirst && SUCCEEDED( SHGetDesktopFolder( &shDesktop ) ) )
 	{
-		ULONG ulEaten;
-		ULONG ulAttributes;
-		pshDesktop->ParseDisplayName( NULL, NULL, A2OLE( s_szStartFolder ), &ulEaten, &pidlStartFolder, &ulAttributes );
-	}	
+		wchar_t wszStartFolder[std::size(s_szStartFolder)];
+		Q_UTF8ToUTF16(s_szStartFolder, wszStartFolder, sizeof(wszStartFolder));
+
+		shDesktop->ParseDisplayName( NULL, NULL, wszStartFolder, NULL, &pidlStartFolder, NULL );
+	}
 	
 	char szTmp[MAX_PATH];
 
-	BROWSEINFO bi;
-	memset( &bi, 0, sizeof( bi ) );
+	BROWSEINFO bi = {};
 	bi.hwndOwner = m_hWnd;
+	bi.pidlRoot = pidlStartFolder;
 	bi.pszDisplayName = szTmp;
 	bi.lpszTitle = pszTitle;
-	bi.ulFlags = BIF_RETURNONLYFSDIRS /*| BIF_NEWDIALOGSTYLE*/;
+	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_BROWSEFILEJUNCTIONS /*| BIF_NEWDIALOGSTYLE*/;
 	bi.lpfn = BrowseCallbackProc;
 	bi.lParam = TRUE;
 
 	LPITEMIDLIST idl = SHBrowseForFolder( &bi );
-
 	if ( idl == NULL )
 	{
 		return FALSE;
 	}
 
-	SHGetPathFromIDList( idl, pszDirectory );
-
-	// Start in this folder next time.	
+	if ( SHGetPathFromIDList( idl, pszDirectory ) )
+	{
+		// Start in this folder next time.
 		V_strcpy_safe( s_szStartFolder, pszDirectory );
+	}
 
-	CoTaskMemFree( pidlStartFolder );
 	CoTaskMemFree( idl );
+	if ( pidlStartFolder )
+	{
+		CoTaskMemFree( pidlStartFolder );
+	}
 
 	return TRUE;
 }
@@ -422,10 +451,12 @@ void COPTTextures::MaterialExcludeUpdate( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void StripOffMaterialDirectory( const char *pszDirectoryName, char *pszName )
+template<intp nameSize>
+void StripOffMaterialDirectory( const char *pszDirectoryName, char (&pszName)[nameSize] )
 {
 	// clear name
-	pszName[0] = '\0';
+	if (nameSize)
+		pszName[0] = '\0';
 
 	// create a lower case version of the string
 	char *pLowerCase = _strlwr( _strdup( pszDirectoryName ) );
@@ -437,7 +468,7 @@ void StripOffMaterialDirectory( const char *pszDirectoryName, char *pszName )
 	pAtMat += 10;
 
 	// copy the rest to the name string
-	strcpy( pszName, pAtMat );
+	V_strcpy_safe( pszName, pAtMat );
 
 	// free duplicated string's memory
 	free( pLowerCase );
@@ -452,12 +483,12 @@ void COPTTextures::OnMaterialExcludeAdd( void )
 	// get the directory path to exclude
 	//
 	char szTmp[MAX_PATH];
-	if( !BrowseForFolder( "Select Game Executable Directory", szTmp ) )
+	if( !BrowseForFolder( "Select Material Directory To Exclude", szTmp ) )
 		return;
 
 	// strip off the material directory
 	char szSubDirName[MAX_PATH];
-	StripOffMaterialDirectory( szTmp, &szSubDirName[0] );
+	StripOffMaterialDirectory( szTmp, szSubDirName );
 	if( szSubDirName[0] == '\0' )
 		return;
 
@@ -477,7 +508,7 @@ void COPTTextures::OnMaterialExcludeAdd( void )
 		return;
 	m_pMaterialConfig->m_MaterialExcludeCount++;
 
-	int index = m_pMaterialConfig->m_MaterialExclusions.AddToTail();
+	intp index = m_pMaterialConfig->m_MaterialExclusions.AddToTail();
 	Q_strncpy( m_pMaterialConfig->m_MaterialExclusions[index].szDirectory, szSubDirName, sizeof ( m_pMaterialConfig->m_MaterialExclusions[index].szDirectory ) );
 
 }
@@ -535,7 +566,7 @@ void COPTTextures::OnMaterialExcludeListSel( void )
 	m_MaterialExcludeList.GetText( ndxSel, &szTmp[0] );
 
 	// Item data of 0 = FGD exclusion, 1 = user-created exclusion
-	DWORD dwData = m_MaterialExcludeList.GetItemData( ndxSel );
+	DWORD dwData = static_cast<DWORD>(m_MaterialExcludeList.GetItemData( ndxSel ));
 	GetDlgItem( ID_MATERIALEXCLUDE_REM )->EnableWindow( dwData ? TRUE : FALSE );
 }
 

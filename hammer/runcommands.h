@@ -42,7 +42,12 @@ typedef CArray<CCOMMAND, CCOMMAND&> CCommandArray;
 
 // run a list of commands:
 bool RunCommands(CCommandArray& Commands, LPCTSTR pszDocName);
-void FixGameVars(char *pszSrc, char *pszDst, BOOL bUseQuotes = TRUE);
+void FixGameVars(char *pszSrc, char *pszDst, intp dstSize, BOOL bUseQuotes = TRUE);
+template<intp dstSize>
+void FixGameVars(char* pszSrc, char (&pszDst)[dstSize], BOOL bUseQuotes = TRUE)
+{
+	FixGameVars(pszSrc, pszDst, dstSize, bUseQuotes);
+}
 bool IsRunningCommands();
 
 #endif // _RUNCOMMANDS_H

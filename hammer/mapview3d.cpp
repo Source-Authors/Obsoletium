@@ -43,8 +43,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#pragma warning(disable:4244 4305)
-
 
 typedef struct
 {
@@ -123,11 +121,19 @@ CMapView3D::CMapView3D(void)
 	m_pRender = NULL;
 	m_pCamera = NULL;
 
-	m_dwTimeLastInputSample = 0;
+	m_flTimeLastInputSample = 0;
 
 	m_fForwardSpeed = 0;
 	m_fStrafeSpeed = 0;
 	m_fVerticalSpeed = 0;
+
+	m_fForwardSpeedMax = 0;
+	m_fStrafeSpeedMax = 0;
+	m_fVerticalSpeedMax = 0;
+
+	m_fForwardAcceleration = 0;
+	m_fStrafeAcceleration = 0;
+	m_fVerticalAcceleration = 0;
 
 	m_pwndTitle = NULL;
 	m_bLightingPreview = false;
@@ -291,16 +297,16 @@ void CMapView3D::SetDrawType(DrawType_t eDrawType)
 		//		if ( pMapDoc )
 		//		{
 		//			const char *pFullPathName = pMapDoc->GetPathName();
-		//			if ( pFullPathName && pFullPathName[0] )
+		//			if ( pFullPathName && !Q_isempty(pFullPathName) )
 		//			{
 		//				char buf[MAX_PATH];
-		//				Q_FileBase( pFullPathName, buf,	MAX_PATH );
+		//				Q_FileBase( pFullPathName, buf );
 		//	
 		//				// Don't do it if we're untitled
 		//				//if ( !Q_stristr( buf, "untitled" ) )
 		//				{
 		//					g_pEngineAPI->SetEngineWindow( m_hWnd );
-		//					//g_pEngineAPI->SetMap( buf );
+		//					g_pEngineAPI->SetMap( buf );
 		//					g_pEngineAPI->ActivateSimulation( true );
 		//				}
 		//			}
@@ -379,7 +385,7 @@ void CMapView3D::Dump(CDumpContext& dc) const
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapView3D::OnTimer(UINT nIDEvent) 
+void CMapView3D::OnTimer(UINT_PTR nIDEvent) 
 {
 	static bool s_bPicking = false; // picking mutex
 
@@ -498,17 +504,14 @@ void CMapView3D::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	//
 	if (((char)tolower(nChar) == 'z') && !(nFlags & 0x4000) && (Options.view3d.bUseMouseLook))
 	{
-		if (pDoc != NULL)
-		{
-			EnableMouseLook(!m_bMouseLook);
+		EnableMouseLook(!m_bMouseLook);
 
-			//
-			// If we just stopped mouse looking, update the camera variables.
-			//
-			if (!m_bMouseLook)
-			{
-				UpdateCameraVariables();
-			}
+		//
+		// If we just stopped mouse looking, update the camera variables.
+		//
+		if (!m_bMouseLook)
+		{
+			UpdateCameraVariables();
 		}
 		
 		return;
@@ -1063,7 +1066,7 @@ void CMapView3D::ActivateView(bool bActivate)
 		//
 		// Reset the last input sample time.
 		//
-		m_dwTimeLastInputSample = 0;
+		m_flTimeLastInputSample = 0;
 	}
 }
 
@@ -1089,7 +1092,7 @@ void CMapView3D::OnDraw(CDC *pDC)
 void CMapView3D::RenderView()
 {
 	Render();
-	m_bUpdateView = false;
+	//m_bUpdateView = false;
 }
 
 
@@ -1109,9 +1112,9 @@ bool CMapView3D::ShouldRender()
 		// don't animate ray traced displays
 		if ( Options.view3d.bAnimateModels )
 		{
-			DWORD dwTimeElapsed = timeGetTime() - m_dwTimeLastRender;
-			
-			if ( (dwTimeElapsed/1000.0f) > 1.0f/20.0f)
+			const double flTimeElapsed = Plat_FloatTime() - m_flTimeLastRender;
+			// 20 Hz.
+			if ( flTimeElapsed > 1.0f / 20.0f)
 			{
 				m_bUpdateView = true;
 			}
@@ -1190,7 +1193,7 @@ void CMapView3D::UpdateView(int nFlags)
 		m_pCamera->SetPerspective( Options.view3d.fFOV, CAMERA_FRONT_PLANE_DISTANCE, Options.view3d.iBackPlane);
 		
 		CMapDoc *pDoc = GetMapDoc();
-		if ((pDoc != NULL) && (m_pRender != NULL))
+		if (pDoc != NULL)
 		{
 			m_pRender->RenderEnable(RENDER_GRID, pDoc->Is3DGridEnabled());
 			m_pRender->RenderEnable(RENDER_FILTER_TEXTURES, (Options.view3d.bFilterTextures == TRUE));
@@ -1345,23 +1348,22 @@ void CMapView3D::OnMouseMove(UINT nFlags, CPoint point)
 //-----------------------------------------------------------------------------
 void CMapView3D::ProcessInput(void)
 {
-	if (m_dwTimeLastInputSample == 0)
+	if (m_flTimeLastInputSample == 0)
 	{
-		m_dwTimeLastInputSample = timeGetTime();
+		m_flTimeLastInputSample = Plat_FloatTime();
 	}
 
-	DWORD dwTimeNow = timeGetTime();
+	const double flTimeNow = Plat_FloatTime();
+	float fElapsedTime = flTimeNow - m_flTimeLastInputSample;
 
-	float fElapsedTime = (float)(dwTimeNow - m_dwTimeLastInputSample) / 1000.0f;
+	m_flTimeLastInputSample = flTimeNow;
 
-	m_dwTimeLastInputSample = dwTimeNow;
-
-	// Clamp (can get really big when we cache textures in )
+	// Clamp (can get really big when we cache textures in)
 	if (fElapsedTime > 0.3f)
 	{
 		fElapsedTime = 0.3f;
 	}
-	else if ( fElapsedTime <=0 )
+	else if (fElapsedTime <= 0)
 	{
 		return; // dont process input
 	}
@@ -1595,7 +1597,7 @@ bool CMapView3D::ControlCamera(const CPoint &point)
 		//
 		if (MouseLookDelta.cy)
 		{
-			float fTheta = MouseLookDelta.cy * 0.4;
+			float fTheta = MouseLookDelta.cy * 0.4f;
 			if (Options.view3d.bReverseY)
 			{
 				fTheta = -fTheta;
@@ -1609,7 +1611,7 @@ bool CMapView3D::ControlCamera(const CPoint &point)
 		//
 		if (MouseLookDelta.cx)
 		{
-			float fTheta = MouseLookDelta.cx * 0.4;
+			float fTheta = MouseLookDelta.cx * 0.4f;
 			Yaw(fTheta);
 		}
 	}

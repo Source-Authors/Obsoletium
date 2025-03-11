@@ -37,27 +37,27 @@ public:
 	// Total number of indices in the face set including the -1 end of face designators
 	intp NumIndices() const;
 	const int *GetIndices() const;
-	int AddIndices( int nCount );
-	void SetIndex( int i, int nValue );
-	void SetIndices( int nFirstIndex, int nCount, int *pIndices );
-	int GetIndex( int i ) const;
+	intp AddIndices( intp nCount );
+	void SetIndex( intp i, int nValue );
+	void SetIndices( intp nFirstIndex, intp nCount, int *pIndices );
+	int GetIndex( intp i ) const;
 
 	// Returns the number of vertices in the next polygon
-	int GetNextPolygonVertexCount( int nFirstIndex ) const;
+	intp GetNextPolygonVertexCount( intp nFirstIndex ) const;
 
 	// Returns the number of triangulated indices total
-	int GetTriangulatedIndexCount() const;
+	intp GetTriangulatedIndexCount() const;
 
 	// Total number of indices in the face set excluding the -1 end of face designators
-	int GetIndexCount() const;
+	intp GetIndexCount() const;
 
 	// Removes multiple faces from the face set
-	void RemoveMultiple( int elem, int num );
+	void RemoveMultiple( intp elem, intp num );
 
 	// Returns the number of faces in total... This should be the number of -1 indices in the face set
 	// Which should equal  NumIndices() - GetIndexCount() but this function accounts for
 	// empty faces (which aren't counted as faces) and a missing -1 terminator at the end
-	int GetFaceCount() const;
+	intp GetFaceCount() const;
 
 private:
 	CDmaArray< int > m_indices;
@@ -78,7 +78,7 @@ inline const int *CDmeFaceSet::GetIndices() const
 	return m_indices.Base();
 }
 
-inline int CDmeFaceSet::GetIndex( int i ) const
+inline int CDmeFaceSet::GetIndex( intp i ) const
 {
 	return m_indices[i];
 }

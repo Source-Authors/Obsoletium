@@ -773,7 +773,7 @@ void CLCD::ParseIconMappings( KeyValues *kv )
 		HICON hIcon = 0;
 		char const *name = icon->GetName();
 		char fullpath[ 512 ];
-		filesystem->RelativePathToFullPath( icon->GetString(), "GAME", fullpath, sizeof( fullpath ) );
+		filesystem->RelativePathToFullPath_safe( icon->GetString(), "GAME", fullpath );
 #ifdef WIN32
 		hIcon = (HICON)::LoadImageA( NULL, fullpath, IMAGE_ICON, 32, 32, LR_LOADFROMFILE );
 #else
@@ -1226,7 +1226,7 @@ void CLCD::DumpPlayer()
 			const wchar_t *pWString = g_pVGuiLocalize->Find( pReplace );
 			if ( pWString )
 			{
-				g_pVGuiLocalize->ConvertUnicodeToANSI( pWString, ansi, sizeof( ansi ) );
+				g_pVGuiLocalize->ConvertUnicodeToANSI( pWString, ansi );
 				pReplace = ansi;
 			}
 		}
@@ -1541,7 +1541,7 @@ void CLCD::DoGlobalReplacements( CUtlString& str )
 				const wchar_t *pWString = g_pVGuiLocalize->Find( pReplace );
 				if ( pWString )
 				{
-					g_pVGuiLocalize->ConvertUnicodeToANSI( pWString, ansi, sizeof( ansi ) );
+					g_pVGuiLocalize->ConvertUnicodeToANSI( pWString, ansi );
 					pReplace = ansi;
 				}
 			}

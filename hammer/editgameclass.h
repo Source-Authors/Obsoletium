@@ -56,16 +56,16 @@ class CEditGameClass
 		virtual void SetKeyValue(LPCTSTR pszKey, LPCTSTR pszValue) { m_KeyValues.SetValue(pszKey, pszValue); }
 		virtual void DeleteKeyValue(LPCTSTR pszKey) { m_KeyValues.RemoveKey(pszKey); }
 
-		inline void RemoveKey(int nIndex) { m_KeyValues.RemoveKeyAt(nIndex); }
+		inline void RemoveKey(unsigned short nIndex) { m_KeyValues.RemoveKeyAt(nIndex); }
 		inline void SetKeyValue(LPCTSTR pszKey, int iValue) { m_KeyValues.SetValue(pszKey, iValue); }
-		inline LPCTSTR GetKey(int nIndex) { return(m_KeyValues.GetKey(nIndex)); }
-		inline LPCTSTR GetKeyValue(int nIndex) { return(m_KeyValues.GetValue(nIndex)); }
-		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, int *piIndex = NULL) { return(m_KeyValues.GetValue(pszKey, piIndex)); }
+		inline LPCTSTR GetKey(unsigned short nIndex) const { return(m_KeyValues.GetKey(nIndex)); }
+		inline LPCTSTR GetKeyValue(unsigned short nIndex) const { return(m_KeyValues.GetValue(nIndex)); }
+		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, intp *piIndex = NULL) const { return(m_KeyValues.GetValue(pszKey, piIndex)); }
 		
 		// Iterate the list of keyvalues.
-		inline int GetFirstKeyValue() const			{ return m_KeyValues.GetFirst(); }
-		inline int GetNextKeyValue( int i ) const	{ return m_KeyValues.GetNext( i ); }
-		static inline int GetInvalidKeyValue()		{ return WCKeyValues::GetInvalidIndex(); }
+		inline auto GetFirstKeyValue() const			{ return m_KeyValues.GetFirst(); }
+		inline auto GetNextKeyValue( unsigned short i ) const	{ return m_KeyValues.GetNext( i ); }
+		static inline auto GetInvalidKeyValue()		{ return WCKeyValues::GetInvalidIndex(); }
 
 		//
 		// Interface to spawnflags.
@@ -211,7 +211,7 @@ void CEditGameClass::SetComments(const char *pszComments)
 
 	if (pszComments != NULL)
 	{
-		int nLen = strlen(pszComments);
+		ptrdiff_t nLen = strlen(pszComments);
 		if (nLen == 0)
 		{
 			m_pszComments = NULL;
@@ -219,7 +219,7 @@ void CEditGameClass::SetComments(const char *pszComments)
 		else
 		{
 			m_pszComments = new char [nLen + 1];
-			strcpy(m_pszComments, pszComments);
+			V_strncpy(m_pszComments, pszComments, nLen + 1);
 		}
 	}
 	else

@@ -71,7 +71,7 @@ private:
 
 	bool				m_bDirty;
 	char				m_szCurrentFile[ MAX_OSPATH ];
-	long				m_lFileTime;
+	time_t				m_lFileTime;
 };
 
 static CDemoActionManager g_DemoActionManager;
@@ -205,7 +205,7 @@ void CDemoActionManager::StartPlaying( char const *demfilename )
 	Q_StripExtension( demfilename, metafile );
 	Q_DefaultExtension( metafile, ".vdm" );
 
-	long filetime = g_pFileSystem->GetFileTime( metafile );
+	time_t filetime = g_pFileSystem->GetFileTime( metafile );
 
 	// If didn't change file and the timestamps are the same, don't transition to new .vdm
 	if ( !changedfile && ( m_lFileTime == filetime ) )

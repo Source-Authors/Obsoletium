@@ -27,7 +27,7 @@ public:
 	ComboBoxButton(ComboBox *parent, const char *panelName, const char *text);
 	void ApplySchemeSettings(IScheme *pScheme) override;
 	IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus) override;
-	virtual void OnCursorExited();
+	void OnCursorExited() override;
 
 	Color GetButtonBgColor() override
 	{

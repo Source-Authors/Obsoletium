@@ -1559,32 +1559,32 @@ void CreateDirectLights (void)
 	//
 	// surfaces
 	//
-	unsigned int uiPatchCount = g_Patches.Count();
-	for (i=0; i< uiPatchCount; i++)
-	{
-		p = &g_Patches.Element( i );
+	//unsigned int uiPatchCount = g_Patches.Count();
+	//for (i=0; i< uiPatchCount; i++)
+	//{
+	//	p = &g_Patches.Element( i );
 
-		// skip parent patches
-		if (p->child1 != g_Patches.InvalidIndex() )
-			continue;
+	//	// skip parent patches
+	//	if (p->child1 != g_Patches.InvalidIndex() )
+	//		continue;
 
-		if (p->basearea < 1e-6)
-			continue;
+	//	if (p->basearea < 1e-6)
+	//		continue;
 
-		if( VectorAvg( p->baselight ) >= dlight_threshold )
-		{
-			dl = AllocDLight( p->origin, true );
+	//	if( VectorAvg( p->baselight ) >= dlight_threshold )
+	//	{
+	//		dl = AllocDLight( p->origin, true );
 
-			dl->light.type = emit_surface;
-			VectorCopy (p->normal, dl->light.normal);
-			Assert( VectorLength( p->normal ) > 1.0e-20 );
-			// scale intensity by number of texture instances
-			VectorScale( p->baselight, lightscale * p->area * p->scale[0] * p->scale[1] / p->basearea, dl->light.intensity );
+	//		dl->light.type = emit_surface;
+	//		VectorCopy (p->normal, dl->light.normal);
+	//		Assert( VectorLength( p->normal ) > 1.0e-20 );
+	//		// scale intensity by number of texture instances
+	//		VectorScale( p->baselight, lightscale * p->area * p->scale[0] * p->scale[1] / p->basearea, dl->light.intensity );
 
-			// scale to a range that results in actual light
-			VectorScale( dl->light.intensity, DIRECT_SCALE, dl->light.intensity );
-		}
-	}
+	//		// scale to a range that results in actual light
+	//		VectorScale( dl->light.intensity, DIRECT_SCALE, dl->light.intensity );
+	//	}
+	//}
 	
 	//
 	// entities

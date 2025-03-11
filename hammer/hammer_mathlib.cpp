@@ -55,8 +55,13 @@ void polyMake( float x1, float  y1, float x2, float y2, int npoints, float start
         if( angle > 360 )
             angle -= 360;
 
-        pmPoints[point][0] = V_rint(xCenter + (sin(DEG2RAD(angle)) * (float)xrad));
-        pmPoints[point][1] = V_rint(yCenter + (cos(DEG2RAD(angle)) * (float)yrad));
+        const float angle_radian = DEG2RAD(angle);
+        float fSin, fCos;
+
+        DirectX::XMScalarSinCos(&fSin, &fCos, angle_radian);
+
+        pmPoints[point][0] = V_rint(xCenter + fSin * xrad);
+        pmPoints[point][1] = V_rint(yCenter + fCos * yrad);
     }
 
     pmPoints[point][0] = pmPoints[0][0];
@@ -103,21 +108,15 @@ float lineangle(float x1, float y1, float x2, float y2)
 //-----------------------------------------------------------------------------
 void AxisAngleMatrix(VMatrix& Matrix, const Vector& Axis, float fAngle)
 {
-	float fRadians;
-	float fAxisXSquared;
-	float fAxisYSquared;
-	float fAxisZSquared;
 	float fSin;
 	float fCos;
 
-	fRadians = fAngle * M_PI / 180.0;
+	float fRadians = DEG2RAD(fAngle);
+	DirectX::XMScalarSinCos(&fSin, &fCos, fRadians);
 
-	fSin = sin(fRadians);
-	fCos = cos(fRadians);
-
-	fAxisXSquared = Axis[0] * Axis[0];
-	fAxisYSquared = Axis[1] * Axis[1];
-	fAxisZSquared = Axis[2] * Axis[2];
+	float fAxisXSquared = Axis[0] * Axis[0];
+	float fAxisYSquared = Axis[1] * Axis[1];
+	float fAxisZSquared = Axis[2] * Axis[2];
 
 	// Column 0:
 	Matrix[0][0] = fAxisXSquared + (1 - fAxisXSquared) * fCos;
@@ -425,7 +424,7 @@ float IntersectionLineAABBox( const Vector& mins, const Vector& maxs, const Vect
 	
 	vz = -vz;
 	
-	float fDistance = 999999;
+	float fDistance = std::numeric_limits<float>::max();
 	
 	for ( int i=0; i<6; i++ )
 	{
@@ -490,7 +489,7 @@ void PointsRevertOrder( Vector *pPoints, int nPoints)
 	}
 }
 
-const Vector &GetNormalFromFace( int nFace )
+Vector GetNormalFromFace( int nFace )
 {
 	// ok, now check against all 6 faces
 	
@@ -503,9 +502,9 @@ const Vector &GetNormalFromFace( int nFace )
  	return GetNormalFromPoints( points[s_BoxFaces[nFace][0]], points[s_BoxFaces[nFace][1]],points[s_BoxFaces[nFace][2]] );
 }
 
-const Vector &GetNormalFromPoints( const Vector &p0, const Vector &p1, const Vector &p2 )
+Vector GetNormalFromPoints( const Vector &p0, const Vector &p1, const Vector &p2 )
 {
-	static Vector vNormal;
+	Vector vNormal;
 	Vector v1 = p0 - p1;
 	Vector v2 = p2 - p1;
 	CrossProduct(v1, v2, vNormal);
@@ -537,7 +536,7 @@ bool BuildAxesFromNormal( const Vector &vNormal, Vector &vHorz, Vector &vVert )
 	vVert.Init();
 
 	// find the major axis
-	float bestMin = 99999;
+	float bestMin = std::numeric_limits<float>::max();
 	int bestAxis = -1;
 	for (int i=0 ; i<3; i++)
 	{

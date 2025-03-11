@@ -14,6 +14,7 @@
 #include "utlvector.h"
 #include "mxBitmapTools.h"
 #include "hlfaceposer.h"
+#include "studio.h"
 
 #define GLOBAL_STUDIO_FLEX_CONTROL_COUNT ( MAXSTUDIOFLEXCTRL * 4 )
 
@@ -56,13 +57,13 @@ public:
 	bool				CanUndo( void );
 	bool				CanRedo( void );
 
-	int					UndoLevels( void );
-	int					UndoCurrent( void );
+	intp				UndoLevels( void );
+	intp				UndoCurrent( void );
 
-	const char 			*GetBitmapFilename( int modelindex );
+	const char 			*GetBitmapFilename( intp modelindex );
 	const char			*GetBitmapCheckSum();
 	CRC32_t				GetBitmapCRC();
-	void				CreateNewBitmap( int modelindex );
+	void				CreateNewBitmap( intp modelindex );
 
 	void				PushUndoInformation( void );
 	void				PushRedoInformation( void );
@@ -95,7 +96,7 @@ public:
 
 	// Undo information
 	CUtlVector< CExpUndoInfo * >		undo;
-	int								m_nUndoCurrent;
+	intp								m_nUndoCurrent;
 
 	bool				m_bSelected;
 

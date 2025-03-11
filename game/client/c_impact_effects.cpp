@@ -166,7 +166,7 @@ static void CreateFleckParticles( const Vector& origin, const Vector &color, tra
 
 	// Handle increased scale
 	float flMaxSpeed = FLECK_MAX_SPEED * iScale;
-	float flAngularSpray = MAX( 0.2, FLECK_ANGULAR_SPRAY - ( (float)iScale * 0.2f) ); // More power makes the spray more controlled
+	float flAngularSpray = MAX( 0.2f, FLECK_ANGULAR_SPRAY - ( (float)iScale * 0.2f) ); // More power makes the spray more controlled
 	// Setup our collision information
 	fleckEmitter->m_ParticleCollision.Setup( spawnOffset, &trace->plane.normal, flAngularSpray, FLECK_MIN_SPEED, flMaxSpeed, FLECK_GRAVITY, FLECK_DAMPEN );
 
@@ -512,7 +512,7 @@ void FX_GlassImpact( const Vector &pos, const Vector &normal )
 			pParticle->m_vecVelocity[1]		= ( normal[1] + random->RandomFloat( -0.8f, 0.8f ) ) * random->RandomFloat( GLASS_SHARD_MIN_SPEED, GLASS_SHARD_MAX_SPEED );
 			pParticle->m_vecVelocity[2]		= ( normal[2] + random->RandomFloat( -0.8f, 0.8f ) ) * random->RandomFloat( GLASS_SHARD_MIN_SPEED, GLASS_SHARD_MAX_SPEED );
 
-			pParticle->m_uchSize			= flShardSize + random->RandomFloat(-0.5*flShardSize,0.5*flShardSize);
+			pParticle->m_uchSize			= flShardSize + random->RandomFloat(-0.5f*flShardSize,0.5f*flShardSize);
 			pParticle->m_vAngles			= RandomAngle( 0, 360 );
 			pParticle->m_flAngSpeed			= random->RandomFloat(-800,800);
 

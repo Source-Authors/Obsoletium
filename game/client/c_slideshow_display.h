@@ -37,7 +37,12 @@ public:
 
 	bool IsEnabled( void ) { return m_bEnabled; }
 
-	void GetDisplayText( char *pchText ) { Q_strcpy( pchText, m_szDisplayText ); }
+	void GetDisplayText( OUT_Z_CAP(size) char *pchText, intp size ) const { Q_strncpy( pchText, m_szDisplayText, size ); }
+	template<intp size>
+	void GetDisplayText( OUT_Z_ARRAY char (&pchText)[size] ) const 
+	{
+		GetDisplayText( pchText, size );
+	}
 	int CurrentMaterialIndex( void ) { return m_iCurrentMaterialIndex; }
 	int GetMaterialIndex( int iSlideIndex );
 	int NumMaterials( void );

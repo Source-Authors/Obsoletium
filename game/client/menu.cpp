@@ -334,7 +334,7 @@ void CHudMenu::ProcessText( void )
 	}
 
 	// Now compute pixels needed
-	int c = m_Processed.Count();
+	intp c = m_Processed.Count();
 	for ( i = 0; i < c; i++ )
 	{
 		ProcessedLine *l = &m_Processed[ i ];
@@ -390,7 +390,7 @@ void CHudMenu::ShowMenu( const char * menuName, int validSlots )
 	// we have the whole string, so we can localise it now
 	char szMenuString[MAX_MENU_STRING];
 	Q_strncpy( szMenuString, ConvertCRtoNL( hudtextmessage->BufferedLocaliseTextString( g_szPrelocalisedMenuString ) ), sizeof( szMenuString ) );
-	g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString, sizeof( g_szMenuString ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString );
 	
 	ProcessText();
 
@@ -476,7 +476,7 @@ void CHudMenu::MsgFunc_ShowMenu( bf_read &msg)
 	if ( m_bitsValidSlots )
 	{
 		char szString[2048];
-		msg.ReadString( szString, sizeof(szString) );
+		msg.ReadString( szString );
 
 		if ( !m_fWaitingForMore ) // this is the start of a new menu
 		{
@@ -495,7 +495,7 @@ void CHudMenu::MsgFunc_ShowMenu( bf_read &msg)
 			// we have the whole string, so we can localise it now
 			char szMenuString[MAX_MENU_STRING];
 			Q_strncpy( szMenuString, ConvertCRtoNL( hudtextmessage->BufferedLocaliseTextString( g_szPrelocalisedMenuString ) ), sizeof( szMenuString ) );
-			g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString, sizeof( g_szMenuString ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString );
 			
 			ProcessText();
 		}

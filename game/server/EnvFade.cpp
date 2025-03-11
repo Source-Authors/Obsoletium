@@ -72,7 +72,7 @@ void CEnvFade::Spawn( void )
 //-----------------------------------------------------------------------------
 void CEnvFade::InputFade( inputdata_t &inputdata )
 {
-	int fadeFlags = 0;
+	short fadeFlags = 0;
 
 	if ( m_spawnflags & SF_FADE_IN )
 	{

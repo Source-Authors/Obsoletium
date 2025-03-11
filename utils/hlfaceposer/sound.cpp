@@ -5,12 +5,8 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#pragma warning( disable : 4201 )
-#include <mmsystem.h>
-#include <stdio.h>
-#include <math.h>
+#include "sound.h"
+
 #include "snd_audio_source.h"
 #include "AudioWaveOutput.h"
 #include "ifaceposersound.h"
@@ -19,7 +15,7 @@
 #include "expressions.h"
 #include "expclass.h"
 #include "PhonemeConverter.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "filesystem.h"
 #include "sentence.h"
 #include "faceposer_models.h"
@@ -28,7 +24,13 @@
 #include "wavebrowser.h"
 #include "choreoscene.h"
 #include "choreoview.h"
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
+
+#include "winlite.h"
+#include <mmsystem.h>
+#include <mmreg.h>
+
+#undef PlaySound
 
 extern ISoundEmitterSystemBase *soundemitter;
 
@@ -73,7 +75,7 @@ public:
 	// stop sampling
 	void Stop( void );
 
-	void WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD dwParam1, DWORD dwParam2 );
+	void WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD_PTR dwParam1, DWORD_PTR dwParam2 );
 
 private:
 	void	OpenDevice( void );
@@ -99,7 +101,7 @@ private:
 	WAVEHDR	*m_buffers[ INPUT_BUFFER_COUNT ];
 };
 
-extern "C" void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, CAudioWaveInput *pAudio, DWORD dwParam1, DWORD dwParam2 );
+extern "C" void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, DWORD_PTR instance, DWORD_PTR dwParam1, DWORD_PTR dwParam2 );
 
 CAudioWaveInput::CAudioWaveInput( void )
 {
@@ -176,15 +178,16 @@ CAudioWaveInput::~CAudioWaveInput( void )
 	}
 }
 
-void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, CAudioWaveInput *pAudio, DWORD dwParam1, DWORD dwParam2 )
+void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, DWORD_PTR instance, DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
+	auto *pAudio = reinterpret_cast<CAudioWaveInput *>(instance);
 	if ( pAudio )
 	{
 		pAudio->WaveMessage( hwi, uMsg, dwParam1, dwParam2 );
 	}
 }
 
-void CAudioWaveInput::WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD dwParam1, DWORD dwParam2 )
+void CAudioWaveInput::WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
 	if ( hdevice != m_deviceHandle )
 		return;
@@ -212,7 +215,7 @@ void CAudioWaveInput::OpenDevice( void )
 	format.wFormatTag = WAVE_FORMAT_PCM;
 	format.nBlockAlign = m_sampleSize;
 
-	MMRESULT errorCode = waveInOpen( &m_deviceHandle, m_deviceId, &format, (DWORD)WaveData, (DWORD)this, CALLBACK_FUNCTION );
+	MMRESULT errorCode = waveInOpen( &m_deviceHandle, m_deviceId, &format, (DWORD_PTR)WaveData, (DWORD_PTR)this, CALLBACK_FUNCTION );
 	if ( errorCode == MMSYSERR_NOERROR )
 	{
 		// valid device opened
@@ -543,7 +546,7 @@ void CAudioWaveOutput::RemoveMixerChannelReferences( CAudioMixer *mixer )
 void CAudioWaveOutput::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
 	// Already in list
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
@@ -552,7 +555,7 @@ void CAudioWaveOutput::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *bu
 	}
 
 	// Just remove it
-	int idx = buffer->m_Referenced.AddToTail();
+	intp idx = buffer->m_Referenced.AddToTail();
 
 	CAudioMixerState *state = &buffer->m_Referenced[ idx ];
 	state->mixer = mixer;
@@ -562,7 +565,7 @@ void CAudioWaveOutput::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *bu
 
 void CAudioWaveOutput::RemoveFromReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
@@ -574,7 +577,7 @@ void CAudioWaveOutput::RemoveFromReferencedList( CAudioMixer *mixer, CAudioBuffe
 
 bool CAudioWaveOutput::IsSoundInReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
@@ -725,7 +728,7 @@ void CAudioWaveOutput::Update( float time )
 
 				StudioModel *model = NULL;
 
-				int modelindex = pSource->GetModelIndex();
+				intp modelindex = pSource->GetModelIndex();
 				if ( modelindex >= 0 )
 				{
 					model = models->GetStudioModel( modelindex );
@@ -925,7 +928,7 @@ void CAudioWaveOutput::FreeChannel( int channelIndex )
 	if ( m_sourceList[channelIndex] )
 	{
 		StudioModel *model = NULL;
-		int modelindex = m_sourceList[channelIndex]->GetModelIndex();
+		intp modelindex = m_sourceList[channelIndex]->GetModelIndex();
 		if ( modelindex >= 0)
 		{
 			model = models->GetStudioModel( modelindex );
@@ -980,15 +983,16 @@ void CAudioWaveOutput::OpenDevice( void )
 		{
 			m_buffers[i].hdr = new WAVEHDR;
 			m_buffers[i].hdr->lpData = new char[ bufferSize ];
-			long align = (long)m_buffers[i].hdr->lpData;
+			intp align = (intp)m_buffers[i].hdr->lpData;
 			if ( align & 3 )
 			{
-				m_buffers[i].hdr->lpData = (char *) ( (align+3) &~3 );
+				m_buffers[i].hdr->lpData = AlignValue( m_buffers[i].hdr->lpData, 4 );
 			}
 			m_buffers[i].hdr->dwBufferLength = bufferSize - (align&3);
 			m_buffers[i].hdr->dwFlags = 0;
 
-			if ( waveOutPrepareHeader( m_deviceHandle, m_buffers[i].hdr, sizeof(*m_buffers[i].hdr) ) != MMSYSERR_NOERROR )
+			errorCode = waveOutPrepareHeader( m_deviceHandle, m_buffers[i].hdr, sizeof(*m_buffers[i].hdr) );
+			if ( errorCode != MMSYSERR_NOERROR || !(m_buffers[i].hdr->dwFlags & WHDR_PREPARED) )
 			{
 				ClearDevice();
 				return;
@@ -1019,7 +1023,7 @@ struct CSoundFile
 {
 	char				filename[ 512 ];
 	CAudioSource		*source;
-	long				filetime;
+	time_t				filetime;
 };
 
 //-----------------------------------------------------------------------------
@@ -1078,8 +1082,8 @@ IFacePoserSound *sound = ( IFacePoserSound * )&g_FacePoserSound;
 
 CFacePoserSound::~CFacePoserSound( void )
 {
-	OutputDebugString( va( "Removing %i sounds\n", m_ActiveSounds.Size() ) );
-	for ( int i = 0 ; i < m_ActiveSounds.Size(); i++ )
+	OutputDebugString( va( "Removing %zi sounds\n", m_ActiveSounds.Count() ) );
+	for ( intp i = 0 ; i < m_ActiveSounds.Count(); i++ )
 	{
 		CSoundFile *p = &m_ActiveSounds[ i ];
 		OutputDebugString( va( "Removing sound:  %s\n", p->filename ) );
@@ -1101,14 +1105,14 @@ CAudioSource *CFacePoserSound::FindOrAddSound( const char *filename )
 {
 	CSoundFile *s;
 
-	int i;
-	for ( i = 0; i < m_ActiveSounds.Size(); i++ )
+	intp i;
+	for ( i = 0; i < m_ActiveSounds.Count(); i++ )
 	{
 		s = &m_ActiveSounds[ i ];
 		Assert( s );
 		if ( !stricmp( s->filename, filename ) )
 		{
-			long filetime = filesystem->GetFileTime( filename );
+			time_t filetime = filesystem->GetFileTime( filename );
 			if ( filetime != s->filetime )
 			{
 				Con_Printf( "Reloading sound %s\n", filename );
@@ -1122,7 +1126,7 @@ CAudioSource *CFacePoserSound::FindOrAddSound( const char *filename )
 
 	i = m_ActiveSounds.AddToTail();
 	s = &m_ActiveSounds[ i ];
-	strcpy( s->filename, filename );
+	V_strcpy_safe( s->filename, filename );
 	s->source = LoadSound( filename );
 	s->filetime = filesystem->GetFileTime( filename );
 
@@ -1136,7 +1140,7 @@ void CFacePoserSound::Init( void )
 
 	// Load SoundOverrides for Faceposer
 
-	KeyValues *manifest = new KeyValues( "scripts/game_sounds_manifest.txt" );
+	auto manifest = KeyValues::AutoDelete( "scripts/game_sounds_manifest.txt" );
 	if ( filesystem->LoadKeyValues( *manifest, IFileSystem::TYPE_SOUNDEMITTER, "scripts/game_sounds_manifest.txt", "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -1148,7 +1152,6 @@ void CFacePoserSound::Init( void )
 			}
 		}
 	}
-	manifest->deleteThis();
 }
 
 void CFacePoserSound::Shutdown( void )
@@ -1330,15 +1333,13 @@ void ComputeBlendedSetting( Emphasized_Phoneme *classes, float emphasis_intensit
 
 void CFacePoserSound::AddViseme( float intensity, StudioModel *model, int phoneme, float scale )
 {
-	int i;
-
 	Assert( model );
 	CStudioHdr *hdr = model->GetStudioHdr();
 	Assert( hdr );
 	if ( !hdr )
 		return;
 
-	for ( i = 0; i < NUM_PHONEME_CLASSES; i++ )
+	for ( int i = 0; i < NUM_PHONEME_CLASSES; i++ )
 	{
 		Emphasized_Phoneme *info = &g_PhonemeClasses[ i ];
 		
@@ -1401,8 +1402,8 @@ void CFacePoserSound::AddViseme( float intensity, StudioModel *model, int phonem
 void CFacePoserSound::SetupWeights( void )
 {
 	StudioModel *model;
-	int c = models->Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = models->Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		model = models->GetStudioModel( i );
 		if ( !model )
@@ -1449,13 +1450,13 @@ void CFacePoserSound::SetupWeights( void )
 
 			if ( t > 0.0f )
 			{
-				for ( int w = 0 ; w < sentence->m_Words.Size(); w++ )
+				for ( intp w = 0 ; w < sentence->m_Words.Count(); w++ )
 				{
 					CWordTag *word = sentence->m_Words[ w ];
 					if ( !word )
 						continue;
 
-					for ( int k = 0; k < word->m_Phonemes.Size(); k++)
+					for ( intp k = 0; k < word->m_Phonemes.Count(); k++)
 					{
 						CPhonemeTag *phoneme = word->m_Phonemes[ k ];
 						if ( !phoneme )
@@ -1468,11 +1469,11 @@ void CFacePoserSound::SetupWeights( void )
 						{
 							CPhonemeTag *next = NULL;
 							// try next phoneme, or first phoneme of next word
-							if (k < word->m_Phonemes.Size()-1)
+							if (k < word->m_Phonemes.Count()-1)
 							{
 								next = word->m_Phonemes[ k+1 ];
 							}
-							else if ( w < sentence->m_Words.Size() - 1  && sentence->m_Words[ w+1 ]->m_Phonemes.Size() )
+							else if ( w < sentence->m_Words.Count() - 1  && sentence->m_Words[ w+1 ]->m_Phonemes.Count() )
 							{
 								next = sentence->m_Words[ w+1 ]->m_Phonemes[ 0 ];
 							}
@@ -1558,8 +1559,8 @@ void CFacePoserSound::Flush( void )
 
 void CFacePoserSound::StopAll( void )
 {
-	int c = models->Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = models->Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		StudioModel *model = models->GetStudioModel( i );
 		if ( model )
@@ -1788,8 +1789,8 @@ CAudioMixer *CFacePoserSound::FindMixer( CAudioSource *source )
 
 void CFacePoserSound::EnsureNoModelReferences( CAudioSource *source )
 {
-	int c = models->Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = models->Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		StudioModel *model = models->GetStudioModel( i );
 		if ( model->m_mouth.IsSourceReferenced( source ) )

@@ -389,7 +389,7 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 			}
 			g_pFullFileSystem->GetLocalCopy( baseDir ); // put this file on disk for IE to load
 
-			g_pFullFileSystem->GetLocalPath( baseDir, fileLocation, sizeof(fileLocation) );
+			g_pFullFileSystem->GetLocalPath_safe( baseDir, fileLocation );
 			Q_snprintf(htmlLocation, sizeof(htmlLocation), "file://%s", fileLocation);
 
 			if (m_SteamAPIContext.SteamHTMLSurface())
@@ -852,12 +852,12 @@ void HTML::OnMouseWheeled(int delta)
 	if (_vbar )
 	{
 		int val = _vbar->GetValue();
-		val -= (delta * 100.0f/3.0f ); // 100 for every 3 lines matches chromes code
+		val -= static_cast<int>(delta * 100.f / 3); // 100 for every 3 lines matches chromes code
 		_vbar->SetValue(val);
 	}
 
 	if (m_SteamAPIContext.SteamHTMLSurface())
-		m_SteamAPIContext.SteamHTMLSurface()->MouseWheel( m_unBrowserHandle, delta* 100.0f/3.0f );
+		m_SteamAPIContext.SteamHTMLSurface()->MouseWheel( m_unBrowserHandle, static_cast<int>(delta * 100.f / 3) );
 }
 
 

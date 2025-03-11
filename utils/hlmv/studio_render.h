@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "mathlib/vector.h"
+#include "istudiorender.h"
 
 extern Vector	g_viewtarget;
 

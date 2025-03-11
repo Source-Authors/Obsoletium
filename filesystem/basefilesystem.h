@@ -303,10 +303,10 @@ public:
 	void				MarkPathIDByRequestOnly( const char *pPathID, bool bRequestOnly ) override;
 
 	bool				FileExists( const char *pFileName, const char *pPathID = NULL ) override;
-	long				GetFileTime( const char *pFileName, const char *pPathID = NULL ) override;
+	time_t				GetFileTime( const char *pFileName, const char *pPathID = NULL ) override;
 	bool				IsFileWritable( char const *pFileName, const char *pPathID = NULL ) override;
 	bool				SetFileWritable( char const *pFileName, bool writable, const char *pPathID = 0 ) override;
-	void				FileTimeToString( char *pString, int maxChars, long fileTime ) override;
+	void				FileTimeToString( char *pString, int maxChars, time_t fileTime ) override;
 	
 	const char			*FindFirst( const char *pWildCard, FileFindHandle_t *pHandle ) override;
 	const char			*FindFirstEx( const char *pWildCard, const char *pPathID, FileFindHandle_t *pHandle ) override;
@@ -329,7 +329,7 @@ public:
 	FileNameHandle_t	FindFileName( char const *pFileName ) override;
 	bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen ) override;
 	int					GetPathIndex( const FileNameHandle_t &handle ) override;
-	long				GetPathTime( const char *pFileName, const char *pPathID ) override;
+	time_t				GetPathTime( const char *pFileName, const char *pPathID ) override;
 	
 	void				EnableWhitelistFileTracking( bool bEnable, bool bCacheAllVPKHashes, bool bRecalculateAndCheckHashes ) override;
 	void				RegisterFileWhitelist( IPureServerWhitelist *pWhiteList, IFileList **ppFilesToReload ) override;
@@ -786,7 +786,7 @@ protected:
 	void						HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath );
 
 	FileHandle_t				FindFileInSearchPath( CFileOpenInfo &openInfo );
-	long						FastFileTime( const CSearchPath *path, const char *pFileName );
+	time_t						FastFileTime( const CSearchPath *path, const char *pFileName );
 
 	const char					*GetWritePath( const char *pFilename, const char *pathID );
 

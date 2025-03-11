@@ -20,6 +20,7 @@
 #endif
 
 #include <afxtempl.h>
+#include "windows/dpi_aware_font.h"
 #include "FilteredComboBox.h"
 #include "tier1/utlvector.h"
 #include "tier1/utldict.h"
@@ -62,7 +63,7 @@ class CTargetNameComboBox : public CFilteredComboBox, protected CFilteredComboBo
 		
 		CFilteredComboBox::ICallbacks *m_pPassThru;
 
-		CFont m_BoldFont;						// Bold font used when there are multiple matches.
+		DpiAwareFont m_BoldFont;						// Bold font used when there are multiple matches.
 
 		DECLARE_MESSAGE_MAP()
 };

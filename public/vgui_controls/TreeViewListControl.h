@@ -46,7 +46,7 @@ public:
 	
 	// Initialize the column headers.. This info includes the tree view on the left, so this 
 	virtual void SetNumColumns( int nColumns );
-	virtual int GetNumColumns() const;
+	virtual intp GetNumColumns() const;
 	// ciFlags is a combination of CI_ flags.
 	virtual void SetColumnInfo( int iColumn, const char *pTitle, int width, int ciFlags=0 );
 

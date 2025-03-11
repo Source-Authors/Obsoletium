@@ -56,7 +56,7 @@ struct PanelKeyBindingMap;
 //  SETUP_PANEL - will make a panel ready for use right now (i.e setup its colors, borders, fonts, etc)
 //
 template< class T >
-inline T *SETUP_PANEL(T *panel)
+inline std::enable_if_t<std::is_base_of_v<Panel, T>, T> *SETUP_PANEL(T *panel)
 {
 	panel->MakeReadyForUse();
 	return panel;
@@ -389,6 +389,8 @@ public:
 	MESSAGE_FUNC( OnSetFocus, "SetFocus" );			// called after the panel receives the keyboard focus
 	MESSAGE_FUNC( OnKillFocus, "KillFocus" );		// called after the panel loses the keyboard focus
 	MESSAGE_FUNC( OnDelete, "Delete" );				// called to delete the panel; Panel::OnDelete() does simply { delete this; }
+	// called when DPI changed.
+	MESSAGE_FUNC_INT_INT( OnDpiScalePercentChanged, "SetDpiScalePercent", xDpiScalePercent, yDpiScalePercent );
 	virtual void OnThink();							// called every frame before painting, but only if panel is visible
 	void OnChildAdded(VPANEL child) override;		// called when a child has been added to this panel
 	void OnSizeChanged(int newWide, int newTall) override;	// called after the size of a panel has been changed
@@ -1022,7 +1024,7 @@ public:
 
 void VguiPanelGetSortedChildPanelList( Panel *pParentPanel, void *pSortedPanels );
 void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels, const char *pchFilter = NULL, int nFilterType = 0 );
-int VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir );
+intp VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir );
 int ComputeWide(Panel* pPanel, unsigned int& nBuildFlags, KeyValues *inResourceData, int nParentWide, int nParentTall, bool bComputingForTall);
 int ComputeTall(Panel* pPanel, unsigned int& nBuildFlags, KeyValues *inResourceData, int nParentWide, int nParentTall, bool bComputingForWide);
 

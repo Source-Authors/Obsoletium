@@ -180,11 +180,11 @@ bool CAngleBox::GetAngles(QAngle &vecAngles)
 // Input  : szAngles - Buffer to receive angles string.
 // Output : Returns 'szAngles'.
 //-----------------------------------------------------------------------------
-char *CAngleBox::GetAngles(char *szAngles)
+char *CAngleBox::GetAngles(char *szAngles, intp size)
 {
 	QAngle vecAngles;
 	GetAngles(vecAngles);
-	sprintf(szAngles, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
+	V_snprintf(szAngles, size, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
 	return(szAngles);
 }
 
@@ -478,7 +478,7 @@ void CAngleBox::UpdateAngleEditText(void)
 }
 
 
-BEGIN_MESSAGE_MAP(CAngleCombo, CWnd)
+BEGIN_MESSAGE_MAP(CAngleCombo, CBaseComboBox)
 	//{{AFX_MSG_MAP(CAngleBox)
 	ON_CONTROL_REFLECT(CBN_EDITCHANGE, OnChangeAngleEdit)
 	ON_CONTROL_REFLECT(CBN_SELENDOK, OnSelChangeAngleEdit)
@@ -490,7 +490,7 @@ END_MESSAGE_MAP()
 // Purpose: Construktor.
 //-----------------------------------------------------------------------------
 CAngleCombo::CAngleCombo()
-	: CComboBox()
+	: CBaseComboBox()
 {
 	m_pBox = NULL;
 	m_bEnableUpdate = true;

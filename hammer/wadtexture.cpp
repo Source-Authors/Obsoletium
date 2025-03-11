@@ -259,7 +259,7 @@ CPalette *CWADTexture::GetPalette(void) const
 // Input  : pszKeywords - Buffer to receive keywords, NULL to query string length.
 // Output : Returns the number of characters in the keyword string.
 //-----------------------------------------------------------------------------
-int CWADTexture::GetKeywords(char *pszKeywords) const
+intp CWADTexture::GetKeywords(char *pszKeywords, intp keywordsSize) const
 {
 	//
 	// Set the keywords to the WAD file name.
@@ -270,15 +270,15 @@ int CWADTexture::GetKeywords(char *pszKeywords) const
 		if (pszLastSlash != NULL)
 		{
 			pszLastSlash++;
-			strcpy(pszKeywords, pszLastSlash);
+			V_strncpy(pszKeywords, pszLastSlash, keywordsSize);
 		}
 		else
 		{
-			strcpy(pszKeywords, m_szFileName);
+			V_strncpy(pszKeywords, m_szFileName, keywordsSize);
 		}
 	}
 
-	return(strlen(m_szFileName));
+	return V_strlen(m_szFileName);
 }
 
 
@@ -287,7 +287,7 @@ int CWADTexture::GetKeywords(char *pszKeywords) const
 // Input  : *pszName - 
 // Output : Returns the length of the short name in characters.
 //-----------------------------------------------------------------------------
-int CWADTexture::GetShortName(char *pszName) const
+intp CWADTexture::GetShortName(char *pszName, intp nameSize) const
 {
 	char szBuf[MAX_PATH];
 	szBuf[0] = '\0';
@@ -306,24 +306,24 @@ int CWADTexture::GetShortName(char *pszName) const
 		}
 		else
 		{
-			pszCopy += strlen("textures\\");
+			pszCopy += ssize("textures\\") - 1;
 		}
 
-		strcpy(pszName, pszCopy);
+		V_strncpy(pszName, pszCopy, nameSize);
 
 		// remove extension
 		char *psz = strstr(szBuf, ".wal");
 		if (psz != NULL)
 		{
-			*psz = 0;
+			*psz = '\0';
 		}
 	}
 	else
 	{
-		strcpy(pszName, m_szName);
+		V_strncpy(pszName, m_szName, nameSize);
 	}
 
-	return(strlen(pszName));
+	return V_strlen(pszName);
 }
 
 
@@ -629,7 +629,7 @@ void CWADTexture::Draw(CDC *pDC, RECT& rect, int iFontHeight, int iIconHeight, D
 	if (!bInit)
 	{
 		bInit = TRUE;
-		for (int i = 0; i < 256; i++)
+		for (unsigned short i = 0; i < 256; i++)
 		{
 			bmi.colorindex[i] = i;
 		}
@@ -677,7 +677,7 @@ void CWADTexture::Draw(CDC *pDC, RECT& rect, int iFontHeight, int iIconHeight, D
 
 		// draw name
 		char szShortName[MAX_PATH];
-		int iLen = GetShortName(szShortName);
+		intp iLen = static_cast<IEditorTexture*>(this)->GetShortName(szShortName);
 		pDC->TextOut(rect.left, rect.bottom - (iFontHeight + 4), szShortName, iLen);
 	}
 }

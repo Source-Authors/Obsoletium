@@ -399,7 +399,7 @@ bool CTextureConverter::TextureNameMatchesMaterialName( const char * pszTextureN
 	}
 
 	// No '/' found in the VMT name, or the name ended in a '/'.  This shouldn't happen.
-	if ( ( pszPartialMaterialName == NULL ) || strlen( pszPartialMaterialName ) == 0 )
+	if ( ( pszPartialMaterialName == NULL ) || Q_isempty( pszPartialMaterialName ) )
 		return false;
 
 	if ( stricmp( pszTextureName, pszPartialMaterialName ) == 0 )

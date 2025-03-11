@@ -128,12 +128,12 @@ isstaticprop_ret IsStaticProp( studiohdr_t* pHdr )
 // Add static prop model to the list of models
 //-----------------------------------------------------------------------------
 
-static int AddStaticPropDictLump( char const* pModelName )
+static intp AddStaticPropDictLump( char const* pModelName )
 {
 	StaticPropDictLump_t dictLump;
 	V_strcpy_safe( dictLump.m_Name, pModelName );
 
-	for (int i = s_StaticPropDictLump.Count(); --i >= 0; )
+	for (intp i = s_StaticPropDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_StaticPropDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -245,8 +245,8 @@ CPhysCollide* ComputeConvexHull( studiohdr_t* pStudioHdr )
 static CPhysCollide* GetCollisionModel( char const* pModelName )
 {
 	// Convert to a common string
-	char* pTemp = (char*)_alloca(strlen(pModelName) + 1);
-	strcpy( pTemp, pModelName );
+	V_strdup_stack( pModelName, pTemp );
+
 	_strlwr( pTemp );
 
 	char* pSlash = strchr( pTemp, '\\' );
@@ -259,7 +259,7 @@ static CPhysCollide* GetCollisionModel( char const* pModelName )
 	// Find it in the cache
 	ModelCollisionLookup_t lookup;
 	lookup.m_Name = pTemp;
-	int i = s_ModelCollisionCache.Find( lookup );
+	unsigned short i = s_ModelCollisionCache.Find( lookup );
 	if (i != s_ModelCollisionCache.InvalidIndex())
 		return s_ModelCollisionCache[i].m_pCollide;
 
@@ -295,7 +295,7 @@ static CPhysCollide* GetCollisionModel( char const* pModelName )
 	{
 		static int propNum = 0;
 		char tmp[128];
-		sprintf( tmp, "staticprop%03d.txt", propNum );
+		V_sprintf_safe( tmp, "staticprop%03d.txt", propNum );
 		DumpCollideToGlView( lookup.m_pCollide, tmp );
 		++propNum;
 	}
@@ -490,7 +490,7 @@ static void AddStaticPropToLump( StaticPropBuild_t const& build )
 		return;
 	}
 	// Insert an element into the lump data...
-	int i = s_StaticPropLump.AddToTail( );
+	intp i = s_StaticPropLump.AddToTail( );
 	StaticPropLump_t& propLump = s_StaticPropLump[i];
 	propLump.m_PropType = AddStaticPropDictLump( build.m_pModelName ); 
 	VectorCopy( build.m_Origin, propLump.m_Origin );
@@ -717,7 +717,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 	// load and persist the vertex file
 	V_strcpy_safe( fileName, "models/" );	
 	V_strcat_safe( fileName, g_pActiveStudioHdr->pszName() );
-	Q_StripExtension( fileName, fileName, sizeof( fileName ) );
+	Q_StripExtension( fileName, fileName );
 	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model

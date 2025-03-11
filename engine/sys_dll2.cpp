@@ -683,6 +683,8 @@ static void PosixPreMinidumpCallback( void *context )
 //-----------------------------------------------------------------------------
 // steam.inf keys.
 #define VERSION_KEY				"PatchVersion="
+// dimhotepus: Read client version as it is present in modern engine.
+#define CLIENT_VERSION_KEY		"ClientVersion="
 #define PRODUCT_KEY				"ProductName="
 #define SERVER_VERSION_KEY		"ServerVersion="
 #define APPID_KEY				"AppID="
@@ -718,6 +720,7 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 	{
 		FileHandle_t fh = g_pFileSystem->Open( "steam.inf", "rb", "GAME" );
 		bFoundInf = fh && g_pFileSystem->ReadToBuffer( fh, infBuf );
+		if (fh) g_pFileSystem->Close(fh);
 	}
 
 	if ( !bFoundInf )
@@ -729,36 +732,28 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		V_MakeAbsolutePath( szFullPath, szModSteamInfPath, pchBaseDir );
 
 		// Try opening steam.inf
-		auto [fp, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
+		auto [f, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
 		if ( !errc )
 		{
-			size_t bufsize = 0;
-			// Read steam.inf data.
-			std::tie(std::ignore, errc) = fp.seek( 0, SEEK_END );
-			if ( !errc )
-			{
-				std::tie(bufsize, errc) = fp.tell();
-			}
+			int64_t bufsize = -1;
+			std::tie(bufsize, errc) = f.size();
 
-			if ( !errc )
-			{
-				std::tie(std::ignore, errc) = fp.seek( 0, SEEK_SET );
-			}
+			const intp correctedBufferSize = static_cast<intp>(bufsize);
 
 			size_t iBytesRead = 0;
-			if ( !errc )
+			if ( !errc && bufsize < std::numeric_limits<intp>::max() )
 			{
-				infBuf.EnsureCapacity( bufsize + 1 );
+				infBuf.EnsureCapacity( correctedBufferSize + 1 );
 
-				std::tie(iBytesRead, errc) = fp.read( infBuf.Base<char>(), bufsize + 1 );
+				std::tie(iBytesRead, errc) = f.read( infBuf.Base<char>(), correctedBufferSize + 1 );
 			}
 
-			if ( !errc )
+			if ( !errc && bufsize < std::numeric_limits<intp>::max() )
 			{
 				infBuf.SeekPut( CUtlBuffer::SEEK_CURRENT, iBytesRead + 1 );
 			}
 
-			bFoundInf = iBytesRead == bufsize;
+			bFoundInf = static_cast<intp>(iBytesRead) == correctedBufferSize;
 		}
 	}
 
@@ -774,15 +769,23 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 			if ( !Q_strnicmp( com_token, VERSION_KEY, ssize( VERSION_KEY ) - 1 ) )
 			{
 				V_strcpy_safe( VerInfo.szVersionString, com_token + ssize( VERSION_KEY ) - 1 );
+				// Use version as client version by default.
 				VerInfo.ClientVersion = atoi( VerInfo.szVersionString );
 			}
-			else if ( !Q_strnicmp( com_token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
+			// dimhotepus: Explicitly read client version if present.
+			else if ( !Q_strnicmp( com_token, CLIENT_VERSION_KEY, ssize( CLIENT_VERSION_KEY ) - 1 ) )
 			{
-				V_strcpy_safe( VerInfo.szProductString, com_token + ssize( PRODUCT_KEY ) - 1 );
+				char szClientVersion[32];
+				V_strcpy_safe( szClientVersion, com_token + ssize( CLIENT_VERSION_KEY ) - 1 );
+				VerInfo.ClientVersion = atoi( szClientVersion );
 			}
 			else if ( !Q_strnicmp( com_token, SERVER_VERSION_KEY, ssize( SERVER_VERSION_KEY ) - 1 ) )
 			{
 				VerInfo.ServerVersion = atoi( com_token + ssize( SERVER_VERSION_KEY ) - 1 );
+			}
+			else if ( !Q_strnicmp( com_token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
+			{
+				V_strcpy_safe( VerInfo.szProductString, com_token + ssize( PRODUCT_KEY ) - 1 );
 			}
 			else if ( !Q_strnicmp( com_token, APPID_KEY, ssize( APPID_KEY ) - 1 ) )
 			{
@@ -809,21 +812,26 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		V_MakeAbsolutePath( szFullPath, szModGameinfoPath, pchBaseDir );
 
 		// Try opening gameinfo.txt
-		FILE *fp = fopen( szFullPath, "rb" );
-		if( fp )
+		auto [f, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
+		if ( !errc )
 		{
-			fseek( fp, 0, SEEK_END );
-			size_t bufsize = ftell( fp );
-			fseek( fp, 0, SEEK_SET );
+			int64_t bufsize = -1;
+			std::tie(bufsize, errc) = f.size();
 
-			char *buffer = ( char * )_alloca( bufsize + 1 );
+			const intp correctedBufferSize = static_cast<intp>(bufsize);
 
-			size_t iBytesRead = fread( buffer, 1, bufsize, fp );
-			buffer[ iBytesRead ] = 0;
-			fclose( fp );
+			char *buffer = stackallocT(char, correctedBufferSize + 1);
+
+			size_t iBytesRead = 0;
+			if ( !errc && bufsize < std::numeric_limits<intp>::max() )
+			{
+				std::tie(iBytesRead, errc) = f.read( buffer, correctedBufferSize + 1 );
+			}
 
 			KeyValuesAD pkvGameInfo( "gameinfo" );
-			if ( pkvGameInfo->LoadFromBuffer( "gameinfo.txt", buffer ) )
+			if ( !errc &&
+				bufsize <= std::numeric_limits<intp>::max() &&
+				pkvGameInfo->LoadFromBuffer( "gameinfo.txt", buffer ) )
 			{
 				VerInfo.AppID = (AppId_t)pkvGameInfo->GetInt( "FileSystem/SteamAppId", k_uAppIdInvalid );
 			}

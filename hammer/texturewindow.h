@@ -11,6 +11,7 @@
 #endif
 
 #include "windows/base_wnd.h"
+#include "windows/dpi_aware_font.h"
 #include "IEditorTexture.h"
 #include "utlvector.h"
 
@@ -92,6 +93,7 @@ public:
 protected:
 
 	bool MatchKeywords(const char *pszSearch, char **pszKeyword, int nKeywords);
+	DpiAwareFont* CreateFont();
 
 	int total_x;
 	int total_y;
@@ -99,7 +101,7 @@ protected:
 	int iDisplaySizeY;
 	int iTexNameCharWidth;
 	BOOL bFirstPaint;
-	CFont TexFont;
+	DpiAwareFont *TexFont;
 	TextureWindowTexList *m_pSpecificList;
 	CRect rectHighlight;
 	int	m_nTypeFilter;
@@ -127,6 +129,7 @@ protected:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint point);
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

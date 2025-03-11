@@ -158,8 +158,8 @@ void CHudDeathNotice::Paint()
 		wchar_t victim[ 256 ];
 		wchar_t killer[ 256 ];
 
-		g_pVGuiLocalize->ConvertANSIToUnicode( rgDeathNoticeList[i].szVictim, victim, sizeof( victim ) );
-		g_pVGuiLocalize->ConvertANSIToUnicode( rgDeathNoticeList[i].szKiller, killer, sizeof( killer ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( rgDeathNoticeList[i].szVictim, victim );
+		g_pVGuiLocalize->ConvertANSIToUnicode( rgDeathNoticeList[i].szKiller, killer );
 
 		int len = UTIL_ComputeStringWidth( m_hTextFont, victim );
 

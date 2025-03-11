@@ -582,7 +582,7 @@ void CBaseViewport::UpdateSpectatorPanel()
 		Q_strncpy( bottomText, name, sizeof( bottomText ) );
 	}
 	char szMapName[64];
-	Q_FileBase( const_cast<char *>(m_pClientDllInterface->GetLevelName()), szMapName );
+	V_FileBase( const_cast<char *>(m_pClientDllInterface->GetLevelName()), szMapName );
 
 	m_pSpectatorGUI->Update(bottomText, player, m_pClientDllInterface->SpectatorMode(), m_pClientDllInterface->IsSpectateOnly(), m_pClientDllInterface->SpectatorNumber(), szMapName );
 	m_pSpectatorGUI->UpdateSpectatorPlayerList();

@@ -244,11 +244,11 @@ void CTextWindow::ShowFile( const char *filename )
 	{
 		// it's a local HTML file
 		char localURL[ _MAX_PATH + 7 ];
-		Q_strncpy( localURL, "file://", sizeof( localURL ) );
+		V_strcpy_safe( localURL, "file://" );
 		
 		char pPathData[ _MAX_PATH ];
-		g_pFullFileSystem->GetLocalPath( filename, pPathData, sizeof(pPathData) );
-		Q_strncat( localURL, pPathData, sizeof( localURL ), COPY_ALL_CHARACTERS );
+		g_pFullFileSystem->GetLocalPath_safe( filename, pPathData );
+		V_strcat_safe( localURL, pPathData );
 
 		ShowURL( localURL );
 	}

@@ -5,10 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <mxtk/mx.h>
-#include <stdio.h>
-#include "resource.h"
 #include "EventProperties.h"
+#include <mxtk/mx.h>
+#include "resource.h"
 #include "mdlviewer.h"
 #include "choreoevent.h"
 #include "choreoscene.h"
@@ -147,7 +146,7 @@ CMapEntities::~CMapEntities()
 int CMapEntities::FindNamedEntity( char const *name )
 {
 	char lowername[ 128 ];
-	strcpy( lowername, name );
+	V_strcpy_safe( lowername, name );
 	_strlwr( lowername );
 
 	int index = m_Entities.Find( lowername );
@@ -382,7 +381,7 @@ void CBaseEventPropertiesDialog::InitControlData( CEventParams *params )
 	PopulateTagList( params );
 }
 
-BOOL CBaseEventPropertiesDialog::InternalHandleMessage( CEventParams *params, HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam, bool& handled )
+BOOL CBaseEventPropertiesDialog::InternalHandleMessage( CEventParams *params, HWND hwndDlg, unsigned uMsg, WPARAM wParam, LPARAM lParam, bool& handled )
 {
 	handled = false;
 	switch(uMsg)
@@ -488,8 +487,8 @@ void CBaseEventPropertiesDialog::PopulateNamedActorList( HWND wnd, CEventParams 
 //-----------------------------------------------------------------------------
 void CBaseEventPropertiesDialog::ParseTags( CEventParams *params )
 {
-	strcpy( params->m_szTagName, "" );
-	strcpy( params->m_szTagWav, "" );
+	V_strcpy_safe( params->m_szTagName, "" );
+	V_strcpy_safe( params->m_szTagWav, "" );
 
 	if ( params->m_bUsesTag )
 	{
@@ -507,16 +506,16 @@ void CBaseEventPropertiesDialog::ParseTags( CEventParams *params )
 		{
 			GetToken( false );
 			char tagname[ 256 ];
-			strcpy( tagname, token );
+			V_strcpy_safe( tagname, token );
 			if ( TokenAvailable() )
 			{
 				GetToken( false );
 				char wavename[ 256 ];
-				strcpy( wavename, token );
+				V_strcpy_safe( wavename, token );
 
 				// Valid
-				strcpy( params->m_szTagName, tagname );
-				strcpy( params->m_szTagWav, wavename );
+				V_strcpy_safe( params->m_szTagName, tagname );
+				V_strcpy_safe( params->m_szTagWav, wavename );
 
 			}
 			else
@@ -618,9 +617,9 @@ void CBaseEventPropertiesDialog::DrawSpline( HDC hdc, HWND placeholder, CChoreoE
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int EventProperties( CEventParams *params )
+intp EventProperties( CEventParams *params )
 {
-	int iret = 1;
+	intp iret = 1;
 	switch ( params->m_nType )
 	{
 	default:

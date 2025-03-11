@@ -264,9 +264,9 @@ bool CommandMenu::LoadFromKeyValues( KeyValues * params )
 	if ( !params )
 		return false;
 
-	Q_snprintf( m_CurrentTeam, 4, "%i", GetLocalPlayerTeam() );
+	V_sprintf_safe( m_CurrentTeam, "%i", GetLocalPlayerTeam() );
 
-	Q_FileBase( engine->GetLevelName(), m_CurrentMap, sizeof(m_CurrentMap) );
+	V_FileBase( engine->GetLevelName(), m_CurrentMap );
 	
 	if ( params != m_MenuKeys )
 	{

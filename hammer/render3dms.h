@@ -80,15 +80,16 @@ enum RenderState_t
 //
 // Render state information set via RenderEnable:
 //
-typedef struct
+struct RenderStateInfo_t
 {
-	bool bCenterCrosshair;	// Whether to render the center crosshair.
-	bool bDrawGrid;			// Whether to render the grid.
+	// dimhotepus: Reordered struct members to reduce size 16 -> 12.
 	float fGridSpacing;		// Grid spacing in world units.
 	float fGridDistance;	// Maximum distance from camera to draw grid.
+	bool bCenterCrosshair;	// Whether to render the center crosshair.
+	bool bDrawGrid;			// Whether to render the grid.
 	bool bFilterTextures;	// Whether to filter textures.
 	bool bReverseSelection;	// Driver issue fix - whether to return the largest (rather than smallest) Z value when picking
-} RenderStateInfo_t;
+};
 
 static inline bool RenderingModeIsTextured(EditorRenderMode_t mode)
 {
@@ -245,12 +246,13 @@ protected:
 	void ComputeFrustumRenderGeometry(CCamera * pCamera);
 	void RenderFrustum();
 
-	float m_fFrameRate;					// Framerate in frames per second, calculated once per second.
+	// dimhotepus: Times and FPS float -> double to stabilize simulation.
+	double m_fFrameRate;				// Framerate in frames per second, calculated once per second.
 	int m_nFramesThisSample;			// Number of frames rendered in the current sample period.
-	DWORD m_dwTimeLastSample;			// Time when the framerate was last calculated.
+	double m_flTimeLastSample;			// Time when the framerate was last calculated.
 
-	DWORD m_dwTimeLastFrame;			// The time when the previous frame was rendered.
-	float m_fTimeElapsed;				// Milliseconds elapsed since the last frame was rendered.
+	double m_flTimeLastFrame;			// The time when the previous frame was rendered.
+	float m_flTimeElapsed;				// Seconds elapsed since the last frame was rendered.
 
 	// context for the last bitmap we sent to lighting preview for ray tracing. we do not send if
 	// nothing happens, even if we end up re-rendering

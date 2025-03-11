@@ -41,6 +41,9 @@ private:
     void        SetCurrentResolutionComboItem();
 	void		EnableOrDisableWindowedForVR();
 
+	void		MarkDefaultSettingsAsRecommended();
+	void		SetComboItemAsRecommended( vgui::ComboBox *combo, int iItem );
+
     MESSAGE_FUNC( OnDataChanged, "ControlModified" );
 	MESSAGE_FUNC_PTR_CHARPTR( OnTextChanged, "TextChanged", panel, text );
 	MESSAGE_FUNC( OpenAdvanced, "OpenAdvanced" );
@@ -63,6 +66,7 @@ private:
 	vgui::ComboBox		*m_pWindowed;
 	vgui::ComboBox		*m_pAspectRatio;
 	vgui::ComboBox		*m_pHUDAspectRatio;
+	vgui::ComboBox		*m_pHDR;
 	vgui::ComboBox		*m_pVRMode;
 	vgui::Button		*m_pGammaButton;
 	vgui::Button		*m_pAdvanced;

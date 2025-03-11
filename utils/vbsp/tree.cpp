@@ -9,7 +9,7 @@
 
 #include "bspflags.h"
 
-extern	int	c_nodes;
+extern	std::atomic_int	c_nodes;
 
 void RemovePortalFromNode (portal_t *portal, node_t *l);
 
@@ -92,8 +92,7 @@ void FreeTree_r (node_t *node)
 	if (node->volume)
 		FreeBrush (node->volume);
 
-	if (numthreads == 1)
-		c_nodes--;
+	c_nodes.fetch_sub(1, std::memory_order::memory_order_relaxed);
 	free (node);
 }
 

@@ -8,12 +8,13 @@
 
 #include "stdafx.h"
 #include "AutoSelCombo.h"
+#include "tier1/strtools.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 
-BEGIN_MESSAGE_MAP(CAutoSelComboBox, CComboBox)
+BEGIN_MESSAGE_MAP(CAutoSelComboBox, CBaseComboBox)
 	//{{AFX_MSG_MAP(CAutoSelComboBox)
 	ON_WM_CTLCOLOR()
 	ON_CONTROL_REFLECT_EX(CBN_EDITUPDATE, OnEditUpdate)
