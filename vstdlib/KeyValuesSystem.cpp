@@ -257,15 +257,16 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 
 			// build up the new item
 			item->next = NULL;
-			char *pString = (char *)m_Strings.Alloc( V_strlen(name) + 1 );
+			const intp stringSize = V_strlen(name) + 1;
+			char *pString = static_cast<char *>(m_Strings.Alloc( stringSize ));
 			if ( !pString )
 			{
 				Error( "Out of keyvalue string space" );
 				return -1;
 			}
-			item->stringIndex = pString - (char *)m_Strings.GetBase();
-			strcpy(pString, name);
-			return (HKeySymbol)item->stringIndex;
+			item->stringIndex = pString - static_cast<char *>(m_Strings.GetBase());
+			V_strncpy(pString, name, stringSize);
+			return item->stringIndex;
 		}
 
 		item = item->next;
