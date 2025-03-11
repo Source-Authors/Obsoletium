@@ -529,7 +529,7 @@ public:
 // Main file system interface
 //-----------------------------------------------------------------------------
 
-#define FILESYSTEM_INTERFACE_VERSION			"VFileSystem022"
+constexpr inline char FILESYSTEM_INTERFACE_VERSION[]{"VFileSystem022"};
 
 abstract_class IFileSystem : public IAppSystem, public IBaseFileSystem
 {

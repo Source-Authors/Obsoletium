@@ -185,9 +185,8 @@ public:
 	virtual VPANEL 	GetMouseCapture() = 0;
 };
 
-#define VGUI_INPUT_INTERFACE_VERSION "VGUI_Input005"
-
 } // namespace vgui
 
+constexpr inline char VGUI_INPUT_INTERFACE_VERSION[]{"VGUI_Input005"};
 
 #endif // VGUI_IINPUT_H

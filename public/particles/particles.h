@@ -214,7 +214,7 @@ public:
 // Interface to allow the particle system to call back into the client
 //-----------------------------------------------------------------------------
 
-#define PARTICLE_SYSTEM_QUERY_INTERFACE_VERSION "VParticleSystemQuery001"
+constexpr inline char PARTICLE_SYSTEM_QUERY_INTERFACE_VERSION[]{"VParticleSystemQuery001"};
 
 class IParticleSystemQuery : public IAppSystem
 {
@@ -514,7 +514,7 @@ enum ParticleOperatorId_t
 //-----------------------------------------------------------------------------
 // Class factory for particle operators
 //-----------------------------------------------------------------------------
-class IParticleOperatorDefinition
+abstract_class IParticleOperatorDefinition
 {
 public:
 	virtual const char *GetName() const = 0;

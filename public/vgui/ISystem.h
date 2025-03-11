@@ -128,7 +128,7 @@ public:
 
 }
 
-#define VGUI_SYSTEM_INTERFACE_VERSION "VGUI_System010"
+constexpr inline char VGUI_SYSTEM_INTERFACE_VERSION[]{"VGUI_System010"};
 
 
 #endif // ISYSTEM_H

@@ -18,7 +18,7 @@
 #include "appframework/IAppSystem.h"
 
 
-#define SOUNDEMITTERSYSTEM_INTERFACE_VERSION	"VSoundEmitter002"
+constexpr inline char SOUNDEMITTERSYSTEM_INTERFACE_VERSION[]{"VSoundEmitter002"};
 
 #define SOUNDGENDER_MACRO "$gender"
 #define SOUNDGENDER_MACRO_LENGTH 7		// Length of above including $

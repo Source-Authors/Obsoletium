@@ -104,9 +104,8 @@ public:
 	virtual void AddTickSignalToHead( VPANEL panel, int intervalMilliseconds = 0 ) = 0;
 };
 
-#define VGUI_IVGUI_INTERFACE_VERSION "VGUI_ivgui008"
-
 };
 
+constexpr inline char VGUI_IVGUI_INTERFACE_VERSION[]{"VGUI_ivgui008"};
 
 #endif // IVGUI_H

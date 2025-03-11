@@ -116,6 +116,6 @@ public:
 	virtual void SendMainMenuCommand( const char *pszCommand ) = 0;
 };
 
-#define GAMEUI_INTERFACE_VERSION "GameUI011"
+constexpr inline char GAMEUI_INTERFACE_VERSION[]{"GameUI011"};
 
 #endif // IGAMEUI_H

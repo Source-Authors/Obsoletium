@@ -120,7 +120,7 @@ class ISave;
 class IRestore;
 
 
-#define VPHYSICS_DEBUG_OVERLAY_INTERFACE_VERSION	"VPhysicsDebugOverlay001"
+constexpr inline char VPHYSICS_DEBUG_OVERLAY_INTERFACE_VERSION[]{"VPhysicsDebugOverlay001"};
 
 abstract_class IVPhysicsDebugOverlay
 {
@@ -136,7 +136,7 @@ public:
 	virtual void AddTextOverlayRGB(const Vector& origin, int line_offset, float duration, float r, float g, float b, float alpha, PRINTF_FORMAT_STRING const char *format, ...) = 0;
 };
 
-#define VPHYSICS_INTERFACE_VERSION	"VPhysics031"
+constexpr inline char VPHYSICS_INTERFACE_VERSION[]{"VPhysics031"};
 
 abstract_class IPhysics : public IAppSystem
 {
@@ -180,7 +180,7 @@ struct truncatedcone_t
 };
 
 
-#define VPHYSICS_COLLISION_INTERFACE_VERSION	"VPhysicsCollision007"
+constexpr inline char VPHYSICS_COLLISION_INTERFACE_VERSION[]{"VPhysicsCollision007"};
 
 abstract_class IPhysicsCollision
 {
