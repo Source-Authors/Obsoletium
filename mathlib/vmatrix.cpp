@@ -832,7 +832,8 @@ void Vector3DMultiplyTranspose( const VMatrix& src1, const Vector& src2, Vector&
 	// Make sure it works if src2 == dst
 	bool srcEqualsDst = (&src2 == &dst);
 
-	Vector tmp;
+	// dimhotepus: Initialize to invalid vector.
+	Vector tmp{vec3_invalid};
 	const Vector&v = srcEqualsDst ? static_cast<const Vector&>(tmp) : src2;
 
 	if (srcEqualsDst)
