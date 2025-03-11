@@ -243,15 +243,15 @@ struct matrix3x4_t
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			for (int j = 0; j < 4; j++)
+			for (int j = 0; j < 4; j++) //-V112
 			{
 				m_flMatVal[i][j] = VEC_T_NAN;
 			}
 		}
 	}
 
-	float * XM_CALLCONV operator[]( int i )				{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
-	const float * XM_CALLCONV operator[]( int i ) const	{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
+	float * XM_CALLCONV operator[]( int i )				{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; } //-V302
+	const float * XM_CALLCONV operator[]( int i ) const	{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; } //-V302
 	float * XM_CALLCONV Base()							{ return &m_flMatVal[0][0]; }
 	const float * XM_CALLCONV Base() const				{ return &m_flMatVal[0][0]; }
 
@@ -522,7 +522,7 @@ FORCEINLINE constexpr uint64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint6
 	x |= x >> 4;
 	x |= x >> 8;
 	x |= x >> 16;
-	x |= x >> 32;
+	x |= x >> 32; //-V112
 	return x + 1;
 }
 
@@ -538,15 +538,15 @@ FORCEINLINE constexpr int64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int64 
 	x |= x >> 4;
 	x |= x >> 8;
 	x |= x >> 16;
-	x |= x >> 32;
+	x |= x >> 32; //-V112
 	return x + 1;
 }
 
 // return the largest power of two <= x. Will return 0 if passed 0
 FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint x )
 {
-	if ( x >= 0x80000000 )
-		return 0x80000000;
+	if ( x >= 0x80000000 ) //-V112
+		return 0x80000000; //-V112
 
 	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
 }
@@ -554,8 +554,8 @@ FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint x 
 // return the largest power of two <= x. Will return 0 if passed 0
 FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int x )
 {
-	if ( (uint)x >= 0x80000000 )
-		return 0x80000000;
+	if ( (uint)x >= 0x80000000 ) //-V112
+		return 0x80000000; //-V112
 
 	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
 }
@@ -678,8 +678,8 @@ inline float XM_CALLCONV MatrixRowDotProduct( const matrix3x4_t &in1, int row, c
 
 inline float XM_CALLCONV MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vector& in2 )
 {
-	Assert( (col >= 0) && (col < 4) );
-	return in1[0][col] * in2[0] + in1[1][col] * in2[1] + in1[2][col] * in2[2]; 
+	Assert( (col >= 0) && (col < 4) ); //-V112
+	return in1[0][col] * in2[0] + in1[1][col] * in2[1] + in1[2][col] * in2[2];  //-V108
 }
 
 // dimhotepus: Too unsafe. Use safer overload.
@@ -986,7 +986,7 @@ inline void XM_CALLCONV VectorNegate(Vector& a)
 	a[2] = -a[2];
 }
 
-inline vec_t XM_CALLCONV VectorAvg(Vector& a)
+inline vec_t XM_CALLCONV VectorAvg(const Vector& a)
 {
 	return ( a[0] + a[1] + a[2] ) / 3;
 }

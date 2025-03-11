@@ -84,8 +84,8 @@ public:
 	void Invalidate();
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const;
-	vec_t& XM_CALLCONV operator[](int i);
+	vec_t XM_CALLCONV operator[](int i) const; //-V302
+	vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
 	vec_t* XM_CALLCONV Base();
@@ -258,8 +258,8 @@ public:
 	void XM_CALLCONV Set( const short ix, const short iy, const short iz, const short iw );
 
 	// array access...
-	short XM_CALLCONV operator[](int i) const;
-	short& XM_CALLCONV operator[](int i);
+	short XM_CALLCONV operator[](int i) const; //-V302
+	short& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
 	short* XM_CALLCONV Base();
@@ -318,8 +318,8 @@ public:
 	void XM_CALLCONV Set( const int ix, const int iy, const int iz, const int iw );
 
 	// array access...
-	int XM_CALLCONV operator[](int i) const;
-	int& XM_CALLCONV operator[](int i);
+	int XM_CALLCONV operator[](int i) const; //-V302
+	int& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
 	int* XM_CALLCONV Base();
@@ -403,14 +403,14 @@ public:
 	}
 
 	// array access...
-	inline vec_t& XM_CALLCONV operator[](int i)
+	inline vec_t& XM_CALLCONV operator[](int i) //-V302
 	{
 		Assert( (i >= 0) && (i < 3) );
 		static_assert(alignof(TableVector) == alignof(vec_t));
 		return reinterpret_cast<vec_t*>(this)[i];
 	}
 
-	inline vec_t XM_CALLCONV operator[](int i) const
+	inline vec_t XM_CALLCONV operator[](int i) const //-V302
 	{
 		Assert( (i >= 0) && (i < 3) );
 		static_assert(alignof(TableVector) == alignof(vec_t));
@@ -887,7 +887,7 @@ FORCEINLINE void ShortVector::Set( const short ix, const short iy, const short i
 //-----------------------------------------------------------------------------
 inline short ShortVector::operator[](int i) const
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(ShortVector) >= alignof(short) &&
 		alignof(ShortVector) % alignof(short) >= 0);
 	return reinterpret_cast<const short*>(this)[i];
@@ -895,7 +895,7 @@ inline short ShortVector::operator[](int i) const
 
 inline short& ShortVector::operator[](int i)
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(ShortVector) >= alignof(short) &&
 		alignof(ShortVector) % alignof(short) >= 0);
 	return reinterpret_cast<short*>(this)[i];
@@ -1045,14 +1045,14 @@ FORCEINLINE void IntVector4D::Set( const int ix, const int iy, const int iz, con
 //-----------------------------------------------------------------------------
 inline int IntVector4D::operator[](int i) const
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(IntVector4D) == alignof(int));
 	return reinterpret_cast<const int *>(this)[i];
 }
 
 inline int& IntVector4D::operator[](int i)
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(IntVector4D) == alignof(int));
 	return reinterpret_cast<int*>(this)[i];
 }
@@ -1817,8 +1817,8 @@ public:
 	}
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const;
-	vec_t& XM_CALLCONV operator[](int i);
+	vec_t XM_CALLCONV operator[](int i) const; //-V302
+	vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	vec_t x, y, z, w;
 };
@@ -1829,14 +1829,14 @@ public:
 //-----------------------------------------------------------------------------
 inline vec_t& Quaternion::operator[](int i)
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(Quaternion) == alignof(vec_t));
 	return reinterpret_cast<vec_t*>(this)[i];
 }
 
 inline vec_t Quaternion::operator[](int i) const
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(Quaternion) == alignof(vec_t));
 	return reinterpret_cast<const vec_t*>(this)[i];
 }
@@ -1949,8 +1949,8 @@ public:
 	void Invalidate();
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const;
-	vec_t& XM_CALLCONV operator[](int i);
+	vec_t XM_CALLCONV operator[](int i) const; //-V302
+	vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// dimhotepus: Better DirectX math integration.
 	DirectX::XMFLOAT3* XM_CALLCONV XmBase()
@@ -2098,8 +2098,8 @@ public:
 	void Invalidate();
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const;
-	vec_t& XM_CALLCONV operator[](int i);
+	vec_t XM_CALLCONV operator[](int i) const; //-V302
+	vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
 	vec_t* XM_CALLCONV Base();

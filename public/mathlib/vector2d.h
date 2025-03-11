@@ -54,8 +54,8 @@ public:
 	bool XM_CALLCONV IsValid() const;
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const;
-	vec_t& XM_CALLCONV operator[](int i);
+	vec_t XM_CALLCONV operator[](int i) const; //-V302
+	vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
 	vec_t* XM_CALLCONV Base();
@@ -295,14 +295,14 @@ inline vec_t& Vector2D::operator[](int i)
 {
 	Assert( (i >= 0) && (i < 2) );
 	static_assert(alignof(Vector2D) == alignof(vec_t));
-	return reinterpret_cast<vec_t*>(this)[i];
+	return reinterpret_cast<vec_t*>(this)[i]; //-V108
 }
 
 inline vec_t Vector2D::operator[](int i) const
 {
 	Assert( (i >= 0) && (i < 2) );
 	static_assert(alignof(Vector2D) == alignof(vec_t));
-	return reinterpret_cast<const vec_t*>(this)[i];
+	return reinterpret_cast<const vec_t*>(this)[i]; //-V108
 }
 
 //-----------------------------------------------------------------------------

@@ -74,12 +74,12 @@ public:
 	void		Init( const matrix3x4_t& matrix3x4 );
 
 	// array access
-	inline float* operator[](int i)
+	inline float* operator[](int i) //-V302
 	{ 
 		return m[i]; 
 	}
 
-	inline const float* operator[](int i) const
+	inline const float* operator[](int i) const //-V302
 	{ 
 		return m[i]; 
 	}
@@ -948,9 +948,9 @@ inline void MatrixGetColumn( const VMatrix &src, int nCol, Vector *pColumn )
 {
 	Assert( (nCol >= 0) && (nCol <= 3) );
 
-	pColumn->x = src[0][nCol];
-	pColumn->y = src[1][nCol];
-	pColumn->z = src[2][nCol];
+	pColumn->x = src[0][nCol]; //-V108
+	pColumn->y = src[1][nCol]; //-V108
+	pColumn->z = src[2][nCol]; //-V108
 }
 
 inline void MatrixSetColumn( VMatrix &src, int nCol, const Vector &column )

@@ -328,14 +328,14 @@ inline Vector4D& Vector4D::operator=(const Vector4D &vOther)
 
 inline vec_t& Vector4D::operator[](int i)
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(Vector4D) == alignof(vec_t));
 	return reinterpret_cast<vec_t*>(this)[i];
 }
 
 inline vec_t Vector4D::operator[](int i) const
 {
-	Assert( (i >= 0) && (i < 4) );
+	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(Vector4D) == alignof(vec_t));
 	return reinterpret_cast<const vec_t*>(this)[i];
 }

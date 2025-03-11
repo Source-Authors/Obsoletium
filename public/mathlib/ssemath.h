@@ -55,15 +55,15 @@ struct alignas(16) intx4 : public CAlignedNewDelete<16>
 {
 	int32 m_i32[4];
 
-	inline int & operator[](int which)
+	inline int & operator[](int which) //-V302
 	{
-		Assert( which >= 0 && which < 4 );
+		Assert( which >= 0 && which < 4 ); //-V112
 		return m_i32[which];
 	}
 
-	inline const int & operator[](int which) const
+	inline const int & operator[](int which) const //-V302
 	{
-		Assert( which >= 0 && which < 4 );
+		Assert( which >= 0 && which < 4 ); //-V112
 		return m_i32[which];
 	}
 
@@ -1037,7 +1037,7 @@ FORCEINLINE fltx4 XM_CALLCONV LoadUnalignedSIMD( const void *pSIMD )
 }
 
 [[nodiscard]]
-FORCEINLINE fltx4 XM_CALLCONV LoadUnaligned3SIMD( const void *pSIMD )
+FORCEINLINE fltx4 XM_CALLCONV LoadUnaligned3SIMD( const void *pSIMD ) //-V524
 {
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
 }
@@ -1067,7 +1067,7 @@ FORCEINLINE float XM_CALLCONV SubFloat( const fltx4& a, size_t idx )
 [[nodiscard]]
 FORCEINLINE float& XM_CALLCONV SubFloat( fltx4 & a, size_t idx )
 {
-	Assert( idx < 4 );
+	Assert( idx < 4 ); //-V112
 
 	return (reinterpret_cast<float *>(&a))[idx];
 }
@@ -1089,7 +1089,7 @@ FORCEINLINE uint32 XM_CALLCONV SubInt( const fltx4& a, size_t idx )
 [[nodiscard]]
 FORCEINLINE uint32& XM_CALLCONV SubInt( fltx4 & a, size_t idx )
 {
-	Assert( idx < 4 );
+	Assert( idx < 4 ); //-V112
 
 	return (reinterpret_cast<uint32 *>(&a))[idx];
 }
@@ -1215,7 +1215,7 @@ FORCEINLINE fltx4 XM_CALLCONV RotateRight( DirectX::FXMVECTOR a )
 
 // a b c d -> c d a b
 [[nodiscard]]
-FORCEINLINE fltx4 XM_CALLCONV RotateRight2( DirectX::FXMVECTOR a )
+FORCEINLINE fltx4 XM_CALLCONV RotateRight2( DirectX::FXMVECTOR a ) //-V524
 {
 	return DirectX::XMVectorSwizzle<
 		DirectX::XM_SWIZZLE_Z,
