@@ -27,7 +27,12 @@ void BeginDMXContext( )
 
 	if ( !s_bAllocatorInitialized )
 	{
-		s_DMXAllocator.Init( 2 * 1024 * 1024, 0, 0, 4 );
+		// dimhotepus: x2 size on x86-64.
+#ifdef PLATFORM_64BITS
+		s_DMXAllocator.Init( 4u * 1024 * 1024, 0, 0, 8 );
+#else
+		s_DMXAllocator.Init( 2u * 1024 * 1024, 0, 0, 4 );
+#endif
 		s_bAllocatorInitialized = true;
 	}
 
