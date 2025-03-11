@@ -159,11 +159,11 @@ void CBudgetPanelShared::DrawColoredText(
 	char msg[4096];
 	va_list marker;
 	va_start( marker, pText );
-	_vsnprintf( msg, sizeof( msg ), pText, marker );
+	V_vsprintf_safe( msg, pText, marker );
 	va_end( marker );
 
 	wchar_t unicodeStr[4096];
-	int nChars = g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicodeStr, sizeof( unicodeStr ) );
+	int nChars = g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicodeStr );
 
 	vgui::surface()->DrawSetTextFont( font );
 	vgui::surface()->DrawSetTextColor( r, g, b, a );
@@ -249,7 +249,7 @@ void CBudgetPanelShared::SetTimeLabelText()
 	for ( intp i=0; i < m_TimeLabels.Count(); i++ )
 	{
 		char text[512];
-		Q_snprintf( text, sizeof( text ), "%dms", (int)( i * GetConfigData().m_flTimeLabelInterval ) );
+		V_sprintf_safe( text, "%dms", (int)( i * GetConfigData().m_flTimeLabelInterval ) );
 		m_TimeLabels[i]->SetText( text );
 	}
 }
