@@ -2806,7 +2806,7 @@ bool CMDLCache::ProcessDataIntoCache( MDLHandle_t handle, MDLCacheDataType_t typ
 				buf.SeekPut( CUtlBuffer::SEEK_HEAD, nDataSize );
 
 				phyheader_t header;
-				buf.Get( &header, sizeof( phyheader_t ) );
+				buf.Get( header );
 				if ( ( header.size == sizeof( header ) ) && header.solidCount > 0 )
 				{
 					intp nBufSize = buf.TellMaxPut() - buf.TellGet();

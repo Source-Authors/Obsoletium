@@ -377,13 +377,13 @@ BOOL GameData::Load(const char *pszFilename)
 			{
 				// Let's assume it's in the same directory.
 				char justPath[MAX_PATH], loadFilename[MAX_PATH];
-				if ( Q_ExtractFilePath( pszFilename, justPath, sizeof( justPath ) ) )
+				if ( V_ExtractFilePath( pszFilename, justPath ) )
 				{
-					Q_snprintf( loadFilename, sizeof( loadFilename ), "%s%s", justPath, szToken );
+					V_sprintf_safe( loadFilename, "%s%s", justPath, szToken );
 				}
 				else
 				{
-					Q_strncpy( loadFilename, szToken, sizeof( loadFilename ) );
+					V_strcpy_safe( loadFilename, szToken );
 				}
 
 				// First try our fully specified directory

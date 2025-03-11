@@ -58,10 +58,8 @@ void LoadResourceListing(IFileSystem *file_system,
   // parse reslist
   char szToken[MAX_PATH];
   for (;;) {
-    intp nTokenSize = buffer.ParseToken(&breakSet, szToken, sizeof(szToken));
-    if (nTokenSize <= 0) {
-      break;
-    }
+    intp nTokenSize = buffer.ParseToken(&breakSet, szToken);
+    if (nTokenSize <= 0) break;
 
     Q_strlower(szToken);
     Q_FixSlashes(szToken);
@@ -87,8 +85,7 @@ void MergeResLists(IFileSystem *file_system, CUtlVector<CUtlString> &fileNames,
                    const char *pchOutputFile, const char *pchSearchPath) {
   CUtlRBTree<CUtlString, int> sorted(0, 0, ReslistLogLessFunc);
   for (auto &fn : fileNames) {
-    LoadResourceListing(file_system, sorted, fn.String(),
-                        pchSearchPath);
+    LoadResourceListing(file_system, sorted, fn.String(), pchSearchPath);
   }
 
   // Now write it back out
@@ -329,7 +326,7 @@ void ResourceListing::LoadMapList(const char *pchGameDir,
   if (file_system_->ReadFile(fullpath, "GAME", buf)) {
     char szMap[MAX_PATH];
     while (true) {
-      buf.GetLine(szMap, sizeof(szMap));
+      buf.GetLine(szMap);
       if (!szMap[0]) break;
 
       // Strip trailing CR/LF chars

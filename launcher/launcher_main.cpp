@@ -179,9 +179,7 @@ void TryToLoadSteamOverlayDLL() {
   // First, check if the module is already loaded, perhaps because we were run
   // from Steam directly
   HMODULE hMod = GetModuleHandle("GameOverlayRenderer" DLL_EXT_STRING);
-  if (hMod) {
-    return;
-  }
+  if (hMod) return;
 
   if (0 == GetEnvironmentVariableA("SteamGameId", NULL, 0)) {
     // Initializing the Steam client API has the side effect of setting up the
@@ -192,8 +190,8 @@ void TryToLoadSteamOverlayDLL() {
       if (pchSteamInstallPath) {
         char rgchSteamPath[MAX_PATH];
         V_ComposeFileName(pchSteamInstallPath,
-                          "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath,
-                          ssize(rgchSteamPath));
+                          "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath);
+
         // This could fail, but we can't fix it if it does so just ignore
         // failures
         LoadLibrary(rgchSteamPath);

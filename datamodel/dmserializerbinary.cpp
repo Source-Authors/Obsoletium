@@ -517,7 +517,7 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 		}
 
 		buf.GetString( pName );
-		buf.Get( &id, sizeof(DmObjectId_t) );
+		buf.Get( id );
 
 		if ( idConflictResolution == CR_FORCE_COPY )
 		{

@@ -481,7 +481,7 @@ bool CDmxSerializer::Unserialize( CUtlBuffer &buf, int nEncodingVersion, CDmxEle
 			pType = pTypeBuf;
 		}
 		buf.GetString( pName );
-		buf.Get( &id, sizeof(DmObjectId_t) );
+		buf.Get( id );
 
 		CDmxElement *pElement = new CDmxElement( pType );
 		{
@@ -531,13 +531,13 @@ bool SerializeDMX( const char *pFileName, const char *pPathID, [[maybe_unused]] 
 	// NOTE: This guarantees full path names for pathids
 	char pBuf[MAX_PATH];
 	const char *pFullPath = pFileName;
-	if ( !Q_IsAbsolutePath( pFullPath ) && !pPathID )
+	if ( !V_IsAbsolutePath( pFullPath ) && !pPathID )
 	{
 		char pDir[MAX_PATH];
-		if ( g_pFullFileSystem->GetCurrentDirectory( pDir, sizeof(pDir) ) )
+		if ( g_pFullFileSystem->GetCurrentDirectory( pDir ) )
 		{
-			Q_ComposeFileName( pDir, pFileName, pBuf );
-			Q_RemoveDotSlashes( pBuf );
+			V_ComposeFileName( pDir, pFileName, pBuf );
+			V_RemoveDotSlashes( pBuf );
 			pFullPath = pBuf;
 		}
 	}
@@ -566,7 +566,7 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 	buf.SetBufferType( true, !bBufIsText || bBufHasCRLF );
 
 	char header[ DMX_MAX_HEADER_LENGTH ] = { 0 };
-	bool bOk = buf.ParseToken( DMX_VERSION_STARTING_TOKEN, DMX_VERSION_ENDING_TOKEN, header, sizeof( header ) );
+	bool bOk = buf.ParseToken( DMX_VERSION_STARTING_TOKEN, DMX_VERSION_ENDING_TOKEN, header );
 	if ( bOk )
 	{
 #ifdef _WIN32
@@ -575,7 +575,9 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 		// sscanf considered harmful. We don't have POSIX 2008 support on OS X and "C11 Annex K" is optional... (optional specs considered useful)
 		char pTmpEncodingName[ sizeof( header ) ] = { 0 };
 		char pTmpFormatName  [ sizeof( header ) ] = { 0 };
-		int nAssigned = sscanf( header, "encoding %s %d format %s %d\n", pTmpEncodingName, &nEncodingVersion, pTmpFormatName, &nFormatVersion );
+		int nAssigned = sscanf( header, "encoding %167s %d format %167s %d\n", pTmpEncodingName, &nEncodingVersion, pTmpFormatName, &nFormatVersion );
+		pTmpEncodingName[sssize(header) - 1] = '\0';
+		pTmpFormatName[sssize(header) - 1] = '\0';
 		bOk = ( V_strlen( pTmpEncodingName ) < nEncodingNameLen ) && ( V_strlen( pTmpFormatName ) < nFormatNameLen );
 		V_strncpy( pEncodingName, pTmpEncodingName, nEncodingNameLen );
 		V_strncpy( pFormatName, pTmpFormatName, nFormatNameLen );
@@ -658,13 +660,13 @@ bool UnserializeDMX( const char *pFileName, const char *pPathID, bool bTextMode,
 	// NOTE: This guarantees full path names for pathids
 	char pBuf[MAX_PATH];
 	const char *pFullPath = pFileName;
-	if ( !Q_IsAbsolutePath( pFullPath ) && !pPathID )
+	if ( !V_IsAbsolutePath( pFullPath ) && !pPathID )
 	{
 		char pDir[MAX_PATH];
-		if ( g_pFullFileSystem->GetCurrentDirectory( pDir, sizeof(pDir) ) )
+		if ( g_pFullFileSystem->GetCurrentDirectory( pDir ) )
 		{
-			Q_ComposeFileName( pDir, pFileName, pBuf );
-			Q_RemoveDotSlashes( pBuf );
+			V_ComposeFileName( pDir, pFileName, pBuf );
+			V_RemoveDotSlashes( pBuf );
 			pFullPath = pBuf;
 		}
 	}
