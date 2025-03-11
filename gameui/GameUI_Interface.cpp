@@ -332,10 +332,19 @@ void CGameUI::BonusMapChallengeUpdate( const char *pchFileName, const char *pchM
 
 void CGameUI::BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName )
 {
+	BonusMapChallengeNames( pchFileName, ARRAYSIZE(BonusMapChallenge_t::szFileName),
+		pchMapName, ARRAYSIZE(BonusMapChallenge_t::szMapName),
+		pchChallengeName, ARRAYSIZE(BonusMapChallenge_t::szChallengeName) );
+}
+
+void CGameUI::BonusMapChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,
+		OUT_Z_CAP(mapSize) char *pchMapName, intp mapSize,
+		OUT_Z_CAP(challengeSize) char *pchChallengeName, intp challengeSize )
+{
 	if ( !pchFileName || !pchMapName || !pchChallengeName )
 		return;
 
-	BonusMapsDatabase()->GetCurrentChallengeNames( pchFileName, pchMapName, pchChallengeName );
+	BonusMapsDatabase()->GetCurrentChallengeNames( pchFileName, fileSize, pchMapName, mapSize, pchChallengeName, challengeSize );
 }
 
 void CGameUI::BonusMapChallengeObjectives( int &iBronze, int &iSilver, int &iGold )
