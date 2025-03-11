@@ -67,23 +67,13 @@ inline CHelperInfo::~CHelperInfo(void)
 //-----------------------------------------------------------------------------
 inline bool CHelperInfo::AddParameter(const char *pszParameter)
 {
-	if ((pszParameter != NULL) && (pszParameter[0] != '\0'))
+	if (pszParameter && !Q_isempty(pszParameter))
 	{
-		size_t nLen = strlen(pszParameter);
-		
-		if (nLen > 0)
-		{
-			char *pszNew = new char [nLen + 1];
-			if (pszNew != NULL) //-V668
-			{
-				strcpy(pszNew, pszParameter);
-				m_Parameters.AddToTail(pszNew);
-				return(true);
-			}
-		}
+		m_Parameters.AddToTail(V_strdup(pszParameter));
+		return true;
 	}
 
-	return(false);
+	return false;
 }
 
 
@@ -94,7 +84,7 @@ inline const char *CHelperInfo::GetParameter(intp nIndex) const
 	if (nIndex >= m_Parameters.Count())
 		return NULL;
 	
-	return m_Parameters.Element(nIndex); 
+	return m_Parameters.Element(nIndex);
 }
 
 
