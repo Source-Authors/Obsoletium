@@ -1214,12 +1214,8 @@ int CWin32ReadOnlyFile::FS_feof()
 }
 
 // ends up on a thread's stack, don't blindly increase without awareness of that implication
-// 360 threads have small stacks, using small buffer of the worst case quantum sector size
-#if !defined( _X360 )
-#define READ_TEMP_BUFFER	( 32*1024 )
-#else
-#define READ_TEMP_BUFFER	( 2*XBOX_DVD_SECTORSIZE )
-#endif
+// dimhotepus: Double read buffer size for performance.
+constexpr inline size_t READ_TEMP_BUFFER{64 * 1024};
 
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
