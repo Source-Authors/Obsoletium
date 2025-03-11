@@ -62,9 +62,9 @@ public:
 	short		physicsbone;			// physics bone hit by trace in studio
 
 #if defined( CLIENT_DLL )
-		C_BaseEntity *m_pEnt;
+	C_BaseEntity *m_pEnt;
 #else
-		CBaseEntity *m_pEnt;
+	CBaseEntity *m_pEnt;
 #endif
 
 	// NOTE: this member is overloaded.
@@ -80,8 +80,8 @@ public:
 	}
 
 	// No copy constructors allowed
-	CGameTrace(const CGameTrace& vOther) = delete;
-	CGameTrace& operator=(const CGameTrace& vOther) = default;
+	CGameTrace(const CGameTrace&) = delete;
+	CGameTrace& operator=(const CGameTrace&) = default;
 };
 
 
@@ -132,12 +132,12 @@ public:
 
 	bool	IsEmpty( void ) const			{ return ( m_nLeafCount == 0 && m_nEntityCount == 0 ); }
 
-	int		LeafCount( void ) const			{ return m_nLeafCount; }
-	intp		LeafCountMax( void ) const		{ return m_aLeafList.Count(); }
+	intp	LeafCount( void ) const			{ return m_nLeafCount; }
+	intp	LeafCountMax( void ) const		{ return m_aLeafList.Count(); }
 	void    LeafCountReset( void )			{ m_nLeafCount = 0; }
 
-	int		EntityCount( void ) const		{ return m_nEntityCount; }
-	intp		EntityCountMax( void ) const	{ return m_aEntityList.Count(); }
+	intp	EntityCount( void ) const		{ return m_nEntityCount; }
+	intp	EntityCountMax( void ) const	{ return m_aEntityList.Count(); }
 	void	EntityCountReset( void )		{ m_nEntityCount = 0; }
 
 	// For leaves...
@@ -170,10 +170,10 @@ public:
 	
 public:
 
-	int							m_nLeafCount;
+	intp						m_nLeafCount;
 	CUtlVector<int>				m_aLeafList;
 
-	int							m_nEntityCount;
+	intp						m_nEntityCount;
 	CUtlVector<IHandleEntity*>	m_aEntityList;
 };
 

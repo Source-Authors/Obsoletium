@@ -17,6 +17,9 @@
 #include "vstdlib/random.h"
 #include "checksum_crc.h"
 
+#include "winlite.h"
+#include <mmeapi.h>
+
 #define WAVEOUTPUT_BITSPERCHANNEL		16
 #define WAVEOUTPUT_FREQUENCY			44100
 
@@ -100,8 +103,8 @@ bool CSoundCombiner::CreateWorkList( IFileSystem *pFilesystem, CUtlVector< Combi
 {
 	m_Work.RemoveAll();
 
-	int c = info.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = info.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CombinerWork *workitem = new CombinerWork();
 
@@ -126,8 +129,8 @@ bool CSoundCombiner::CreateWorkList( IFileSystem *pFilesystem, CUtlVector< Combi
 
 void CSoundCombiner::CleanupWork()
 {
-	int c = m_Work.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Work.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CombinerWork *workitem = m_Work[ i ];
 		delete workitem->mixer;
@@ -180,8 +183,8 @@ unsigned int CSoundCombiner::ComputeChecksum()
 	CRC32_t crc;
 	CRC32_Init( &crc );
 	
-	int c = m_Work.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Work.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CombinerWork *curitem = m_Work[ i ];
 		unsigned int chk = curitem->sentence.ComputeDataCheckSum();
@@ -257,8 +260,8 @@ bool CSoundCombiner::IsCombinedFileChecksumValid( IFileSystem *pFilesystem, char
 
 bool CSoundCombiner::VerifyFilesExist( IFileSystem *pFilesystem, CUtlVector< CombinerEntry >& info )
 {
-	int c = info.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = info.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CombinerEntry& entry = info[ i ];
 		if ( !pFilesystem->FileExists( entry.wavefile ) )
@@ -276,12 +279,12 @@ bool CSoundCombiner::VerifyFilesExist( IFileSystem *pFilesystem, CUtlVector< Com
 class StdIOReadBinary : public IFileReadBinary
 {
 public:
-	int open( const char *pFileName )
+	intp open( const char *pFileName )
 	{
-		return (int)filesystem->Open( pFileName, "rb" );
+		return (intp)filesystem->Open( pFileName, "rb" );
 	}
 
-	int read( void *pOutput, int size, int file )
+	int read( void *pOutput, int size, intp file )
 	{
 		if ( !file )
 			return 0;
@@ -289,7 +292,7 @@ public:
 		return filesystem->Read( pOutput, size, (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		if ( !file )
 			return;
@@ -297,7 +300,7 @@ public:
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -305,7 +308,7 @@ public:
 		return filesystem->Tell( (FileHandle_t)file );
 	}
 
-	unsigned int size( int file )
+	unsigned int size( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -313,7 +316,7 @@ public:
 		return filesystem->Size( (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		if ( !file )
 			return;
@@ -325,27 +328,27 @@ public:
 class StdIOWriteBinary : public IFileWriteBinary
 {
 public:
-	int create( const char *pFileName )
+	intp create( const char *pFileName )
 	{
-		return (int)filesystem->Open( pFileName, "wb" );
+		return (intp)filesystem->Open( pFileName, "wb" );
 	}
 
-	int write( void *pData, int size, int file )
+	int write( void *pData, int size, intp file )
 	{
 		return filesystem->Write( pData, size, (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		filesystem->Close( (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		return filesystem->Tell( (FileHandle_t)file );
 	}
@@ -354,7 +357,6 @@ public:
 static StdIOReadBinary io_in;
 static StdIOWriteBinary io_out;
 
-#define RIFF_WAVE			MAKEID('W','A','V','E')
 #define WAVE_FMT			MAKEID('f','m','t',' ')
 #define WAVE_DATA			MAKEID('d','a','t','a')
 #define WAVE_FACT			MAKEID('f','a','c','t')
@@ -366,7 +368,7 @@ static StdIOWriteBinary io_out;
 //-----------------------------------------------------------------------------
 void CSoundCombiner::ParseSentence( CSentence& sentence, IterateRIFF &walk )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.EnsureCapacity( walk.ChunkSize() );
 	walk.ChunkRead( buf.Base() );
@@ -422,7 +424,7 @@ bool CSoundCombiner::LoadSentenceFromWavFile( char const *wavfile, CSentence& se
 void CSoundCombiner::StoreValveDataChunk( CSentence& sentence )
 {
 	// Buffer and dump data
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	sentence.SaveToBuffer( buf );
 
@@ -570,8 +572,8 @@ bool CSoundCombiner::InitSplicer( IFileSystem *pFilesystem, int samplerate, int 
 
 bool CSoundCombiner::LoadSpliceAudioSources()
 {
-	int c = m_Work.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Work.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CombinerWork *item = m_Work[ i ];
 
@@ -732,8 +734,8 @@ bool CSoundCombiner::AppendWaveData( int& currentsample, CAudioSource *wave, CAu
 int CSoundCombiner::ComputeBestNumChannels()
 {
 	// We prefer mono output unless one of the source wav files is stereo, then we'll do stereo output
-	int c = m_Work.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Work.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CombinerWork *curitem = m_Work[ i ];
 
@@ -768,8 +770,8 @@ bool CSoundCombiner::PerformSplicingOnWorkItems( IFileSystem *pFilesystem )
 	m_Combined.Reset();
 	m_Combined.SetText( "" );
 
-	int c = m_Work.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Work.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		int currentsample = 0;
 

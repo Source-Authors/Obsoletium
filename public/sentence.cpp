@@ -155,9 +155,9 @@ CWordTag::~CWordTag( void )
 // Input  : *tag - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CWordTag::IndexOfPhoneme( CPhonemeTag *tag )
+intp CWordTag::IndexOfPhoneme( CPhonemeTag *tag )
 {
-  int i{0};
+	intp i{0};
 	for ( auto *p : m_Phonemes )
 	{
 		if ( p == tag )
@@ -747,7 +747,7 @@ void CSentence::CacheSaveToBuffer( CUtlBuffer& buf, int version )
 	}
 
 	// emphasis samples and voice duck
-	int c = m_EmphasisSamples.Count();
+	intp c = m_EmphasisSamples.Count();
 	Assert( c <= 32767 );
 
 	if ( version == CACHED_SENTENCE_VERSION_ALIGNED )
@@ -876,12 +876,12 @@ void CSentence::CacheRestoreFromBuffer( CUtlBuffer& buf )
 	m_bIsValid = true;
 }
 
-int CSentence::GetRuntimePhonemeCount() const
+intp CSentence::GetRuntimePhonemeCount() const
 {
 	return m_RunTimePhonemes.Count();
 }
 
-const CBasePhonemeTag *CSentence::GetRuntimePhoneme( int i ) const
+const CBasePhonemeTag *CSentence::GetRuntimePhoneme( intp i ) const
 {
 	Assert( m_bIsCached );
 	return m_RunTimePhonemes[ i ];
@@ -997,7 +997,7 @@ void CSentence::SaveToBuffer( CUtlBuffer& buf )
 // Input  : *data - 
 //			size - 
 //-----------------------------------------------------------------------------
-void CSentence::InitFromDataChunk( void *data, int size )
+void CSentence::InitFromDataChunk( void *data, intp size )
 {
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	buf.EnsureCapacity( size );
@@ -1041,7 +1041,7 @@ void CSentence::InitFromBuffer( CUtlBuffer& buf )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CSentence::GetWordBase( void )
+intp CSentence::GetWordBase( void )
 {
 #if PHONEME_EDITOR
 	return m_nResetWordBase;
@@ -1229,8 +1229,8 @@ CSentence& CSentence::operator=( const CSentence& src )
 
 	m_bIsCached = src.m_bIsCached;
 
-	int c = src.GetRuntimePhonemeCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = src.GetRuntimePhonemeCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		Assert( m_bIsCached );
 
@@ -1386,7 +1386,7 @@ void CSentence::Resort( void )
 // Input  : number - 
 // Output : CEmphasisSample
 //-----------------------------------------------------------------------------
-CEmphasisSample *CSentence::GetBoundedSample( int number, float endtime )
+CEmphasisSample *CSentence::GetBoundedSample( intp number, float endtime )
 {
 	// Search for two samples which span time f
 	static CEmphasisSample nullstart;
@@ -1418,14 +1418,14 @@ float CSentence::GetIntensity( float time, float endtime )
 {
 	float zeroValue = 0.5f;
 	
-	int c = GetNumSamples();
+	intp c = GetNumSamples();
 	
 	if ( c <= 0 )
 	{
 		return zeroValue;
 	}
 	
-	int i;
+	intp i;
 	for ( i = -1 ; i < c; i++ )
 	{
 		CEmphasisSample *s = GetBoundedSample( i, endtime );
@@ -1439,13 +1439,13 @@ float CSentence::GetIntensity( float time, float endtime )
 		}
 	}
 
-	int prev = i - 1;
-	int start = i;
-	int end = i + 1;
-	int next = i + 2;
+	intp prev = i - 1;
+	intp start = i;
+	intp end = i + 1;
+	intp next = i + 2;
 
-	prev = max( -1, prev );
-	start = max( -1, start );
+	prev = max( (intp)-1, prev );
+	start = max( (intp)-1, start );
 	end = min( end, GetNumSamples() );
 	next = min( next, GetNumSamples() );
 
@@ -1478,12 +1478,12 @@ float CSentence::GetIntensity( float time, float endtime )
 	return retval;
 }
 
-int CSentence::GetNumSamples( void )
+intp CSentence::GetNumSamples( void )
 {
 	return m_EmphasisSamples.Count();
 }
 
-CEmphasisSample *CSentence::GetSample( int index )
+CEmphasisSample *CSentence::GetSample( intp index )
 {
 	if ( index < 0 || index >= GetNumSamples() )
 		return NULL;
@@ -1497,7 +1497,7 @@ void CSentence::GetEstimatedTimes( float& start, float &end )
 	float beststart = 100000.0f;
 	float bestend = -100000.0f;
 
-	int c = m_Words.Count();
+	intp c = m_Words.Count();
 	if ( !c )
 	{
 		start = end = 0.0f;

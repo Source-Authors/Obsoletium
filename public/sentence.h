@@ -114,7 +114,7 @@ public:
 	void			SetWord( const char *word );
 	const char		*GetWord() const;
 
-	int				IndexOfPhoneme( CPhonemeTag *tag );
+	intp			IndexOfPhoneme( CPhonemeTag *tag );
 
 	unsigned int	ComputeDataCheckSum();
 
@@ -201,7 +201,7 @@ public:
 	void			SetText( const char *text );
 	const char		*GetText( void ) const;
 
-	void			InitFromDataChunk( void *data, int size );
+	void			InitFromDataChunk( void *data, intp size );
 	void			InitFromBuffer( CUtlBuffer& buf );
 	void			SaveToBuffer( CUtlBuffer& buf );
 
@@ -223,9 +223,9 @@ public:
 
 	void			MarkNewPhraseBase( void );
 
-	int				GetWordBase( void );
+	intp			GetWordBase( void );
 
-	intp				CountPhonemes( void );
+	intp			CountPhonemes( void );
 
 	// For legacy loading, try to find a word that contains the time
 	CWordTag		*EstimateBestWord( float time );
@@ -236,9 +236,9 @@ public:
 
 	float			GetIntensity( float time, float endtime );
 	void			Resort( void );
-	CEmphasisSample *GetBoundedSample( int number, float endtime );
-	int				GetNumSamples( void );
-	CEmphasisSample	*GetSample( int index );
+	CEmphasisSample *GetBoundedSample( intp number, float endtime );
+	intp			GetNumSamples( void );
+	CEmphasisSample	*GetSample( intp index );
 
 	// Compute start and endtime based on all words
 	void			GetEstimatedTimes( float& start, float &end );
@@ -251,8 +251,8 @@ public:
 	void			SetDataCheckSum( unsigned int chk );
 	unsigned int	GetDataCheckSum() const;
 
-	int				GetRuntimePhonemeCount() const;
-	const CBasePhonemeTag *GetRuntimePhoneme( int i ) const;
+	intp			GetRuntimePhonemeCount() const;
+	const CBasePhonemeTag *GetRuntimePhoneme( intp i ) const;
 	void			ClearRuntimePhonemes();
 	void			AddRuntimePhoneme( const CPhonemeTag *src );
 
@@ -269,7 +269,7 @@ public:
 	CUtlVector	< CBasePhonemeTag *> m_RunTimePhonemes;
 
 #if PHONEME_EDITOR
-	int				m_nResetWordBase;
+	intp			m_nResetWordBase;
 #endif
 	// Phoneme emphasis data
 	CUtlVector< CEmphasisSample > m_EmphasisSamples;

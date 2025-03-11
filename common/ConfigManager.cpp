@@ -923,8 +923,8 @@ bool CGameConfigManager::GetDefaultGameBlock( KeyValues *pIn )
 	char szPath[MAX_PATH];
 
 	// Add all default configs
-	int nNumConfigs = defaultConfigs.Count();
-	for ( int i = 0; i < nNumConfigs; i++ )
+	intp nNumConfigs = defaultConfigs.Count();
+	for ( intp i = 0; i < nNumConfigs; i++ )
 	{
 		// If it's installed, add it
 		if ( IsAppSubscribed( defaultConfigs[i].steamAppID ) )

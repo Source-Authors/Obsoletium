@@ -75,8 +75,8 @@ public:
 	virtual ~CUtlCachedFileData()
 	{
 		m_Elements.RemoveAll();
-		int c = m_Data.Count();
-		for ( int i = 0; i < c ; ++i )
+		intp c = m_Data.Count();
+		for ( intp i = 0; i < c ; ++i )
 		{
 			delete m_Data[ i ];
 		}
