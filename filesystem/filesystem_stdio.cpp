@@ -326,8 +326,8 @@ bool CFileSystem_Stdio::GetOptimalIOConstraints( FileHandle_t hFile, unsigned *p
 
 	if ( pBufferAlign )
 	{
-			*pBufferAlign = sectorSize;
-		}
+		*pBufferAlign = sectorSize;
+	}
 
 	return ( sectorSize > 1 );
 }
@@ -369,9 +369,9 @@ void *CFileSystem_Stdio::AllocOptimalReadBuffer( FileHandle_t hFile, unsigned nS
 	bool bOffsetIsAligned = ( nOffset % sectorSize == 0 );
 	unsigned nAllocSize = ( bOffsetIsAligned ) ? AlignValue( nSize, sectorSize ) : nSize;
 
-		unsigned nAllocAlignment = ( bOffsetIsAligned ) ? sectorSize : 4;
-		return _aligned_malloc( nAllocSize, nAllocAlignment );
-	}
+	unsigned nAllocAlignment = ( bOffsetIsAligned ) ? sectorSize : 4;
+	return _aligned_malloc( nAllocSize, nAllocAlignment );
+}
 
 
 //-----------------------------------------------------------------------------
@@ -384,8 +384,8 @@ void CFileSystem_Stdio::FreeOptimalReadBuffer( void *p )
 		return;
 	}
 
-			 _aligned_free( p );
-		}
+	_aligned_free( p );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
@@ -724,15 +724,15 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 {
 	char filename[MAX_PATH];
 	V_strcpy_safe( filename, filenameT );
-
+	
 	{
-	// stop newline characters at end of filename
+		// stop newline characters at end of filename
 		char *p = strchr( filename, '\n' );
-	if ( p )
-		*p = '\0';
-	p = strchr( filename, '\r' );
-	if ( p )
-		*p = '\0';
+		if ( p )
+			*p = '\0';
+		p = strchr( filename, '\r' );
+		if ( p )
+			*p = '\0';
 	}
 
 	FILE *pFile = fopen( filename, options );
@@ -744,7 +744,7 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 		char caseFixedName[ MAX_PATH ];
 		const bool found = findFileInDirCaseInsensitive_safe( filename, caseFixedName );
 		if ( found )
-		{	
+		{
 			pFile = fopen( caseFixedName, options );
 			// dimhotepus: filename should contain valid file name.
 			if (pFile)
@@ -755,16 +755,16 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 	}
 #endif  // LINUX
 
-			if (pFile && size)
-			{
-				// todo: replace with filelength()? 
-				struct _stat buf;
+	if (pFile && size)
+	{
+		// todo: replace with filelength()? 
+		struct _stat buf;
 		int rt = _stat( filename, &buf );
-				if (rt == 0)
-				{
-					*size = buf.st_size;
-				}
-			}
+		if (rt == 0)
+		{
+			*size = buf.st_size;
+		}
+	}
 
 	if ( pFile )
 	{
@@ -1403,12 +1403,19 @@ char *CWin32ReadOnlyFile::FS_fgets( OUT_Z_CAP(destSize) char *dest, int destSize
 {  
 	if ( FS_feof() )
 	{
-		return NULL;
+		// dimhotepus: Zero-terminate on failure.
+		if (destSize > 0)
+			dest[0] = '\0';
+		return nullptr;
 	}
+
 	int64 nStartPos = m_ReadPos;
 	int nBytesRead = FS_fread( dest, destSize, destSize );
 	if ( !nBytesRead )
 	{
+		// dimhotepus: Zero-terminate on failure.
+		if (destSize > 0)
+			dest[0] = '\0';
 		return NULL;
 	}
 
@@ -1424,6 +1431,7 @@ char *CWin32ReadOnlyFile::FS_fgets( OUT_Z_CAP(destSize) char *dest, int destSize
 	{
 		pNewline = &dest[min( nBytesRead, destSize - 1)];
 	}
+
 	m_ReadPos = nStartPos + ( pNewline - dest ) + 1;
 
 	return dest; 
