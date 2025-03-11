@@ -3036,29 +3036,27 @@ int CBaseFileSystem::FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char
 	va_list args;
 	va_start( args, pFormat );
 	VPROF_BUDGET( "CBaseFileSystem::FPrintf", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
-	CFileHandle *fh = ( CFileHandle *)file;
-	if ( !fh )
+	if ( !file )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to FPrintf NULL file handle!\n" );
 		return 0;
 	}
-/*
-	if ( !fh->GetFileHandle() )
-	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to FPrintf NULL file pointer inside valid file handle!\n" );
-		return 0;
-	}
-	*/
-
 
 	char buffer[65535];
-	int len = vsnprintf( buffer, sizeof( buffer), pFormat, args );
-	len = fh->Write( buffer, len );
-	//int len = FS_vfprintf( fh->GetFileHandle() , pFormat, args );
+	// The vsnprintf function conforms to the C99 standard;
+	// If you run out of buffer, vsnprintf null-terminates the end of the buffer
+	// and returns the number of characters that would have been required.
+	const int chars_count{vsnprintf( buffer, std::size(buffer), pFormat, args )};
 	va_end( args );
+	AssertMsg(chars_count < std::size(buffer),
+		"FPrintf output is truncated from %d to %zd.", chars_count, ssize(buffer));
 
+	auto *fh = static_cast<CFileHandle *>(file);
+	const int bytes_written{ fh->Write( buffer, chars_count ) };
+	AssertMsg(chars_count == bytes_written,
+		"Should FPrintf %d characters, but written %d.", chars_count, bytes_written);
 	
-	return len;
+	return bytes_written;
 }
 
 //-----------------------------------------------------------------------------
