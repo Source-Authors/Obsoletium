@@ -295,7 +295,7 @@ intp CUtlStreamBuffer::ReadBytesFromFile( intp nBytesToRead, intp nReadOffset )
 		}
 	}
 
-	char *pReadPoint = (char*)Base() + nReadOffset;
+	char *pReadPoint = Base<char>() + nReadOffset;
 	intp nBytesRead = g_pFullFileSystem->Read( pReadPoint, nBytesToRead, m_hFileHandle );
 	if ( nBytesRead != nBytesToRead )
 	{
