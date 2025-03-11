@@ -34,9 +34,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ASSERT_INVARIANT( SEEK_CUR == FILESYSTEM_SEEK_CURRENT );
-ASSERT_INVARIANT( SEEK_SET == FILESYSTEM_SEEK_HEAD );
-ASSERT_INVARIANT( SEEK_END == FILESYSTEM_SEEK_TAIL );
+static_assert( SEEK_CUR == FILESYSTEM_SEEK_CURRENT );
+static_assert( SEEK_SET == FILESYSTEM_SEEK_HEAD );
+static_assert( SEEK_END == FILESYSTEM_SEEK_TAIL );
 
 //-----------------------------------------------------------------------------
 
