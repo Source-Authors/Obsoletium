@@ -82,8 +82,19 @@ public:
 
 	// need to replace the existing ConstructString with this
 	virtual void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const char *tokenName, KeyValues *localizationVariables) = 0;
+	// dimhotepus: Add bounds-safe interface
+	template<int outSize>
+	void ConstructString_safe(OUT_Z_ARRAY wchar_t (&unicodeOutput)[outSize], const char *tokenName, KeyValues *localizationVariables)
+	{
+		ConstructString( unicodeOutput, static_cast<int>(sizeof(wchar_t)) * outSize, tokenName, localizationVariables );
+	}
 	virtual void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, StringIndex_t unlocalizedTextSymbol, KeyValues *localizationVariables) = 0;
-
+	// dimhotepus: Add bounds-safe interface
+	template<int outSize>
+	void ConstructString_safe(OUT_Z_ARRAY wchar_t (&unicodeOutput)[outSize], StringIndex_t unlocalizedTextSymbol, KeyValues *localizationVariables)
+	{
+		ConstructString( unicodeOutput, static_cast<int>(sizeof(wchar_t)) * outSize, unlocalizedTextSymbol, localizationVariables );
+	}
 	///////////////////////////////////////////////////////////////////
 	// static interface
 
