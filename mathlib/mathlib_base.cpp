@@ -1447,14 +1447,24 @@ void XM_CALLCONV ClearBounds (Vector& mins, Vector& maxs)
 
 void XM_CALLCONV AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs)
 {
-	for (int i=0 ; i<3 ; i++)
-	{
-		vec_t val = v[i];
-		if (val < mins[i])
-			mins[i] = val;
-		if (val > maxs[i])
-			maxs[i] = val;
-	}
+	// dimhotepus: Unroll loop for speed.
+	vec_t val = v.x;
+	if (val < mins.x)
+		mins.x = val;
+	if (val > maxs.x)
+		maxs.x = val;
+
+	val = v.y;
+	if (val < mins.y)
+		mins.y = val;
+	if (val > maxs.y)
+		maxs.y = val;
+	
+	val = v.z;
+	if (val < mins.z)
+		mins.z = val;
+	if (val > maxs.z)
+		maxs.z = val;
 }
 
 // solve a x^2 + b x + c = 0
