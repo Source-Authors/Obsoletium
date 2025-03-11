@@ -23,7 +23,7 @@ class KeyValues;
 // Purpose: Interface to shared data repository for KeyValues (included in vgui_controls.lib)
 //			allows for central data storage point of KeyValues symbol table
 //-----------------------------------------------------------------------------
-class IKeyValuesSystem
+abstract_class IKeyValuesSystem
 {
 public:
 	// registers the size of the KeyValues in the specified instance
