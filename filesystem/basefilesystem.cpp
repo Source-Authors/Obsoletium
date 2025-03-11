@@ -5539,11 +5539,12 @@ void CBaseFileSystem::CFileCacheObject::AddFiles( const char **ppFileNames, int 
 	{
 		infos[i] = new Info_t;
 		Info_t &info = *infos[i];
-		info.pFileName = strdup( ppFileNames[i] );
-		V_FixSlashes( (char*) info.pFileName );
+		char *pFileName = strdup( ppFileNames[i] );
+		V_FixSlashes( pFileName );
 #ifdef _WIN32
-		Q_strlower( (char*) info.pFileName );
+		V_strlower( pFileName );
 #endif
+		info.pFileName = pFileName;
 		info.hIOAsync = NULL;
 		info.pBacking = NULL;
 		info.pOwner = NULL;
