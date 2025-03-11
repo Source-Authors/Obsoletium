@@ -8,7 +8,7 @@
 
 #include "bsplib.h"
 
-#include <inttypes.h>
+#include <cinttypes>
 
 #include "mathlib/mathlib.h"
 #include "tier0/icommandline.h"
@@ -22,6 +22,8 @@
 #include "cmdlib.h"
 
 #include "posix_file_stream.h"
+
+#include "tier0/memdbgon.h"
 
 extern int num_entities;
 extern entity_t entities[MAX_MAP_ENTITIES];
@@ -361,7 +363,7 @@ int main(int argc, char **argv) {
     }
 
     V_strcpy_safe(source, argv[i]);
-    Q_DefaultExtension(source, ".bsp", sizeof(source));
+    Q_DefaultExtension(source, ".bsp");
     V_strcpy_safe(source, ExpandPath(source));
 
     int64_t size = 0;
