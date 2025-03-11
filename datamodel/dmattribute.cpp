@@ -2337,8 +2337,8 @@ template<> bool CDmAttribute::ShouldModify( const DmElementHandle_t& value )
 //-----------------------------------------------------------------------------
 // Main entry point for single-valued SetValue
 //-----------------------------------------------------------------------------
-template< class T >
-void CDmAttribute::SetValue( const T &value )
+template <class T>
+std::enable_if_t<!std::is_enum_v<T>> CDmAttribute::SetValue( const T &value )
 {
 	if ( !ShouldModify( value ) )
 		return;

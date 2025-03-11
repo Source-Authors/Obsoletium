@@ -91,7 +91,8 @@ public:
 	const void					*GetValueUntyped() const; 
 
 	// Sets the attribute value
-	template< class T > void SetValue( const T &value );
+	template< class T > std::enable_if_t<!std::is_enum_v<T>> SetValue( const T &value );
+	template< class E > std::enable_if_t<std::is_enum_v<E>> SetValue( const E &value );
 	template< class E > void SetValue( E* pValue );
 	void	SetValue( const void *pValue, size_t nSize );
 
@@ -250,6 +251,12 @@ inline const char *CDmAttribute::GetName() const
 inline UtlSymId_t CDmAttribute::GetNameSymbol() const
 {
 	return m_Name;
+}
+
+template <class E>
+inline std::enable_if_t<std::is_enum_v<E>> CDmAttribute::SetValue(const E &value)
+{
+	SetValue(static_cast<std::underlying_type_t<E>>(value));
 }
 
 
