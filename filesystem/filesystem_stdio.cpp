@@ -932,14 +932,8 @@ size_t CStdioFile::FS_fread( void *dest, size_t destSize, size_t size )
 	return fread( dest, 1, size, m_pFile );
 }
 
-
-#define WRITE_CHUNK		(256 * 1024)
-
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
-//
-// This routine breaks data into chunks if the amount to be written is beyond WRITE_CHUNK (256kb)
-// Windows can fail on monolithic writes of ~12MB or more, so we work around that here
 //-----------------------------------------------------------------------------
 size_t CStdioFile::FS_fwrite( const void *src, size_t size )
 {
@@ -949,27 +943,9 @@ size_t CStdioFile::FS_fwrite( const void *src, size_t size )
 		tmPlotI32( TELEMETRY_LEVEL0, TMPT_MEMORY, 0, size, "FileBytesWrite" );
 	}
 
-	if ( size > WRITE_CHUNK )
-	{
-		size_t remaining = size;
-		const byte* current = (const byte *) src;
-		size_t total = 0;
-
-		while ( remaining > 0 )
-		{
-			size_t bytesToCopy = min(remaining, (size_t)WRITE_CHUNK);
-
-			total += fwrite(current, 1, bytesToCopy, m_pFile);
-
-			remaining -= bytesToCopy;
-			current += bytesToCopy;
-		}
-
-		Assert( total == size );
-		return total;
-	}
-
-	return fwrite(src, 1, size, m_pFile);// return number of bytes written (because we have size = 1, count = bytes, so it return bytes)
+	// return number of bytes written (because we have size = 1, count = bytes, so it return bytes)
+	// dimhotepus: Write entire file at once, not by chunks as original bug has been fixed.
+	return fwrite(src, 1, size, m_pFile);
 }
 
 //-----------------------------------------------------------------------------
