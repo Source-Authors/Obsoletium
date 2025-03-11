@@ -77,18 +77,18 @@ int main(int argc, char **argv) {
             std::generic_category().message(errno).c_str());
     return 1;
   }
-  Q_StripTrailingSlash(cwd);
+  V_StripTrailingSlash(cwd);
 
   char buffer[MAX_PATH];
-  if (!Q_IsAbsolutePath(tga_file_name)) {
+  if (!V_IsAbsolutePath(tga_file_name)) {
     V_sprintf_safe(buffer, "%s\\%s", cwd, tga_file_name);
   } else {
     V_strcpy_safe(buffer, tga_file_name);
   }
-  Q_FixSlashes(buffer);
+  V_FixSlashes(buffer);
 
   char out_file_base[MAX_PATH];
-  Q_StripExtension(buffer, out_file_base);
+  V_StripExtension(buffer, out_file_base);
 
   char actual_vtf_file_name[MAX_PATH];
   V_strcpy_safe(actual_vtf_file_name, vtf_file_name);
@@ -106,17 +106,20 @@ int main(int argc, char **argv) {
 
   int64 size;
   std::tie(size, errc) = f.size();
-  if (errc) {
+  if (errc || size > std::numeric_limits<intp>::max()) {
     Error("Unable to get size of '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
     exit(errc.value());
   }
 
+  intp correct_size = static_cast<intp>(size);
+
   CUtlBuffer vtf_buffer;
-  vtf_buffer.EnsureCapacity(size);
+  vtf_buffer.EnsureCapacity(correct_size);
 
   size_t bytes_read;
-  std::tie(bytes_read, errc) = f.read(vtf_buffer.Base(), size, 1, size);
+  std::tie(bytes_read, errc) =
+      f.read(vtf_buffer.Base(), correct_size, 1, correct_size);
   if (errc) {
     Error("Unable to read '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
@@ -206,7 +209,7 @@ int main(int argc, char **argv) {
           // Construct output filename
           std::unique_ptr<char[]> temp_name =
               std::make_unique<char[]>(tga_name_size + 13);
-          Q_strncpy(temp_name.get(), out_file_base, tga_name_size + 1);
+          V_strncpy(temp_name.get(), out_file_base, tga_name_size + 1);
 
           char *ext = Q_strrchr(temp_name.get(), '.');
           if (ext) ext = 0;
@@ -214,33 +217,31 @@ int main(int argc, char **argv) {
           if (src_is_cubemap) {
             Assert(pTex->Depth() == 1);  // shouldn't this be 1 instead of 0?
 
-            Q_strcat(temp_name.get(), cube_face_names[cube_face_no],
+            V_strcat(temp_name.get(), cube_face_names[cube_face_no],
                      tga_name_size + 13);
           }
 
           if (src_frame_count > 1) {
             char pTemp[4];
             V_sprintf_safe(pTemp, "%03d", frame_no);
-            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+            V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
 
           if (last_mip_level != 0) {
             char pTemp[8];
             V_sprintf_safe(pTemp, "_mip%d", mip_level_no);
-            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+            V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
 
           if (pTex->Depth() > 1) {
             char pTemp[6];
             V_sprintf_safe(pTemp, "_z%03d", z);
-            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+            V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
 
-          if (src_format == IMAGE_FORMAT_RGBA16161616F) {
-            Q_strcat(temp_name.get(), ".pfm", tga_name_size + 13);
-          } else {
-            Q_strcat(temp_name.get(), ".tga", tga_name_size + 13);
-          }
+          V_strcat(temp_name.get(),
+                   src_format == IMAGE_FORMAT_RGBA16161616F ? ".pfm" : ".tga",
+                   tga_name_size + 13);
 
           unsigned char *src_data =
               pTex->ImageData(frame_no, cube_face_no, mip_level_no, 0, 0, z);
@@ -319,18 +320,18 @@ int main(int argc, char **argv) {
                                           mip_height, dst_format, dst_format)) {
               Error("Unable to write TGA in format '%s'.\n",
                     ImageLoader::GetName(dst_format));
-              exit(-1);
+              return EIO;
             }
 
             if (!g_pFullFileSystem->WriteFile(temp_name.get(), nullptr,
                                               outBuffer)) {
               Error("Unable to write result '%s'.\n", temp_name.get());
-              exit(-1);
+              return EIO;
             }
           } else {
             if (!PFMWrite((float *)dst_data.get(), temp_name.get(), mip_width,
                           mip_height)) {
-              exit(-1);
+              return EIO;
             }
           }
         }
