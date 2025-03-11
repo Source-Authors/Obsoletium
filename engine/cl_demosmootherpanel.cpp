@@ -2617,8 +2617,8 @@ void CDemoSmootherPanel::ParseSmoothingInfo( CDemoFile &demoFile, CSmoothingCont
 void CDemoSmootherPanel::LoadSmoothingInfo( const char *filename, CSmoothingContext& smoothing )
 {
 	char name[ MAX_OSPATH ];
-	Q_strncpy (name, filename, sizeof(name) );
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	V_strcpy_safe (name, filename );
+	Q_DefaultExtension( name, ".dem" );
 
 	CDemoFile demoFile;
 
@@ -2639,7 +2639,7 @@ void CDemoSmootherPanel::LoadSmoothingInfo( const char *filename, CSmoothingCont
 	ConMsg ("Smoothing demo from %s ...", name );
 
 	smoothing.active = true;
-	Q_strncpy( smoothing.filename, name, sizeof(smoothing.filename) );
+	V_strcpy_safe( smoothing.filename, name );
 
 	smoothing.smooth.RemoveAll();
 
@@ -2690,9 +2690,9 @@ void CDemoSmootherPanel::SaveSmoothingInfo( char const *filename, CSmoothingCont
 	int filesize = fs->Size( infile );
 
 	char outfilename[ 512 ];
-	Q_StripExtension( filename, outfilename, sizeof( outfilename ) );
-	Q_strncat( outfilename, "_smooth", sizeof(outfilename), COPY_ALL_CHARACTERS );
-	Q_DefaultExtension( outfilename, ".dem", sizeof( outfilename ) );
+	Q_StripExtension( filename, outfilename );
+	V_strcat_safe( outfilename, "_smooth" );
+	Q_DefaultExtension( outfilename, ".dem" );
 	outfile = fs->Open( outfilename, "wb" );
 	if ( outfile == FILESYSTEM_INVALID_HANDLE )
 	{
@@ -2700,10 +2700,8 @@ void CDemoSmootherPanel::SaveSmoothingInfo( char const *filename, CSmoothingCont
 		return;
 	}
 
-	int i;
-
 	int lastwritepos = 0;
-	for ( i = 0; i < c; i++ )
+	for ( int i = 0; i < c; i++ )
 	{
 		demosmoothing_t	*p = &smoothing.smooth[ i ];
 

@@ -86,10 +86,10 @@ void CMatchmaking::HandleSystemLinkReply( netpacket_t *pPacket )
 	systemLinkInfo_s *pResultInfo = (systemLinkInfo_s*)pData;
 	XSESSION_SEARCHRESULT *pResult = &pResultInfo->Result;
 
-	msg.ReadBytes( &pResult->info, sizeof( pResult->info ) );
+	msg.ReadBytes( pResult->info );
 
 	// Don't accept multiple replies from the same host
-	for ( int i = 0; i < m_pSystemLinkResults.Count(); ++i )
+	for ( intp i = 0; i < m_pSystemLinkResults.Count(); ++i )
 	{
 		XSESSION_SEARCHRESULT *pCheck = &((systemLinkInfo_s*)m_pSystemLinkResults[i])->Result;
 		if ( Q_memcmp( &pCheck->info.sessionID, &pResult->info.sessionID, sizeof( pResult->info.sessionID ) ) == 0 )
@@ -108,8 +108,8 @@ void CMatchmaking::HandleSystemLinkReply( netpacket_t *pPacket )
 	m_nTotalTeams					= msg.ReadByte();
 	pResultInfo->gameState			= msg.ReadByte();
 	pResultInfo->gameTime			= msg.ReadByte();
-	msg.ReadBytes( &pResultInfo->szHostName, MAX_PLAYER_NAME_LENGTH );
-	msg.ReadBytes( &pResultInfo->szScenario, MAX_MAP_NAME );
+	msg.ReadBytes( pResultInfo->szHostName );
+	msg.ReadBytes( pResultInfo->szScenario );
 
 	pResult->cProperties			= msg.ReadByte();
 	pResult->cContexts				= msg.ReadByte();

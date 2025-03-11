@@ -725,8 +725,8 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		// We may try to load the steam.inf BEFORE we turn on the filesystem, so use raw filesystem API's here.
 		char szFullPath[ MAX_PATH ] = { 0 };
 		char szModSteamInfPath[ MAX_PATH ] = { 0 };
-		V_ComposeFileName( pchMod, "steam.inf", szModSteamInfPath, sizeof( szModSteamInfPath ) );
-		V_MakeAbsolutePath( szFullPath, sizeof( szFullPath ), szModSteamInfPath, pchBaseDir );
+		V_ComposeFileName( pchMod, "steam.inf", szModSteamInfPath );
+		V_MakeAbsolutePath( szFullPath, szModSteamInfPath, pchBaseDir );
 
 		// Try opening steam.inf
 		auto [fp, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
@@ -805,8 +805,8 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		// breakpad there when we hit this case)
 		char szModGameinfoPath[ MAX_PATH ] = { 0 };
 		char szFullPath[ MAX_PATH ] = { 0 };
-		V_ComposeFileName( pchMod, "gameinfo.txt", szModGameinfoPath, sizeof( szModGameinfoPath ) );
-		V_MakeAbsolutePath( szFullPath, sizeof( szFullPath ), szModGameinfoPath, pchBaseDir );
+		V_ComposeFileName( pchMod, "gameinfo.txt", szModGameinfoPath );
+		V_MakeAbsolutePath( szFullPath, szModGameinfoPath, pchBaseDir );
 
 		// Try opening gameinfo.txt
 		FILE *fp = fopen( szFullPath, "rb" );

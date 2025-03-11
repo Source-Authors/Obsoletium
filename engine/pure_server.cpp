@@ -273,9 +273,9 @@ void CPureServerWhitelist::AddFileCommand( const char *pszFilePath, EPureServerF
 	// If it's a directory command, get rid of the *.* or ...
 	char filePath[MAX_PATH];
 	if ( pList == &m_RecursiveDirCommands || pList == &m_NonRecursiveDirCommands )
-		V_ExtractFilePath( pszFilePath, filePath, sizeof( filePath ) );
+		V_ExtractFilePath( pszFilePath, filePath );
 	else
-		V_strncpy( filePath, pszFilePath, sizeof( filePath ) );
+		V_strcpy_safe( filePath, pszFilePath );
 
 	V_FixSlashes( filePath );
 
@@ -315,9 +315,9 @@ bool CPureServerWhitelist::LoadTrustedKeysFromKeyValues( KeyValues *kv )
 		PureServerPublicKey_t &key = m_vecTrustedKeys[ m_vecTrustedKeys.AddToTail() ];
 		intp nKeyDataLen = V_strlen( pszKeyData );
 		key.SetSize( nKeyDataLen / 2 );
-		// Aaaannnnnnnnddddd V_hextobinary has no return code.
 		// Because nobody could *ever* possible attempt to parse bad data.  It could never possibly happen.
-		V_hextobinary( pszKeyData, nKeyDataLen, key.Base(), key.Count() );
+		// dimhotepus: Added check key data is good in V_hextobinary!
+		return V_hextobinary( pszKeyData, nKeyDataLen, key.Base(), key.Count() );
 	}
 
 	return true;
@@ -575,16 +575,16 @@ CPureServerWhitelist::CCommand* CPureServerWhitelist::GetBestEntry( const char *
 	
 	// Make sure we have a relative pathname with fixed slashes..
 	char relativeFilename[MAX_PATH];
-	V_strncpy( relativeFilename, pFilename, sizeof( relativeFilename ) );
+	V_strcpy_safe( relativeFilename, pFilename );
 
 	// Convert the path to relative if necessary.
-	if ( !V_IsAbsolutePath( relativeFilename ) || m_pFileSystem->FullPathToRelativePath( pFilename, relativeFilename, sizeof( relativeFilename ) ) )
+	if ( !V_IsAbsolutePath( relativeFilename ) || m_pFileSystem->FullPathToRelativePath_safe( pFilename, relativeFilename ) )
 	{
 		V_FixSlashes( relativeFilename );
 		
 		// Get the directory this thing is in.
 		char relativeDir[MAX_PATH];
-		if ( !V_ExtractFilePath( relativeFilename, relativeDir, sizeof( relativeDir ) )	)
+		if ( !V_ExtractFilePath( relativeFilename, relativeDir ) )
 			relativeDir[0] = 0;
 		
 		
@@ -600,7 +600,7 @@ CPureServerWhitelist::CCommand* CPureServerWhitelist::GetBestEntry( const char *
 			{
 				// Check for this directory.
 				pBestEntry = CheckEntry( m_RecursiveDirCommands, relativeDir, pBestEntry );
-				if ( !V_StripLastDir( relativeDir, sizeof( relativeDir ) ) )
+				if ( !V_StripLastDir( relativeDir ) )
 					break;
 			}
 		}
@@ -740,12 +740,12 @@ void FileRenderHelper( USERID_t userID, const char *pchMessage, const char *pchP
 	char rgch[256];
 	char hex[ 34 ];
 	Q_memset( hex, 0, sizeof( hex ) );
-	Q_binarytohex( (const byte *)&pFileHash->m_md5contents.bits, sizeof( pFileHash->m_md5contents.bits ), hex, sizeof( hex ) );
+	V_binarytohex( pFileHash->m_md5contents.bits, hex );
 
 	char hex2[ 34 ];
 	Q_memset( hex2, 0, sizeof( hex2 ) );
 	if ( pFileHashLocal )
-		Q_binarytohex( (const byte *)&pFileHashLocal->m_md5contents.bits, sizeof( pFileHashLocal->m_md5contents.bits ), hex2, sizeof( hex2 ) );
+		V_binarytohex( pFileHashLocal->m_md5contents.bits, hex2 );
 
 	if ( pFileHash->m_PackFileID )
 	{

@@ -59,8 +59,20 @@ public:
 	// sets unicode text directly
 	virtual void SetText(const wchar_t *text, bool bClearUnlocalizedSymbol = false);
 	// get the full text in the image
-	virtual void GetText(char *buffer, int bufferSize);
-	virtual void GetText(wchar_t *buffer, int bufferLength);
+	virtual void GetText(OUT_Z_CAP(bufferSize) char *buffer, int bufferSize);
+	template<int bufferSize>
+	void GetText(OUT_Z_ARRAY char (&buf)[bufferSize]) 
+	{
+		GetText( buf, bufferSize );
+	}
+
+	virtual void GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buffer, int bufLenInBytes);
+	template<int bufferSize>
+	void GetText(OUT_Z_ARRAY wchar_t (&buf)[bufferSize]) 
+	{
+		GetText( buf, static_cast<int>(sizeof(wchar_t)) * bufferSize );
+	}
+
 	// get the text in it's unlocalized form
 	virtual void GetUnlocalizedText(char *buffer, int bufferSize);
 	virtual StringIndex_t GetUnlocalizedTextSymbol();
@@ -87,7 +99,7 @@ public:
 	void GetContentSize(int &wide, int &tall) override;
 
 	// draws the text
-	virtual void Paint();
+	void Paint() override;
 
 	void SetWrap( bool bWrap );
 	void RecalculateNewLinePositions();

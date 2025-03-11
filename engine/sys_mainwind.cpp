@@ -171,7 +171,8 @@ public:
 	void	DispatchInputEvent( const InputEvent_t &event );
 
 	// Dispatch all the queued up messages.
-	virtual void	DispatchAllStoredGameMessages();
+	void	DispatchAllStoredGameMessages() override;
+
 private:
 	void			AppActivate( bool fActive );
 	void			PlayVideoAndWait( const char *filename, bool bNeedHealthWarning = false); // plays a video file and waits till it's done to return. Can be interrupted by user.
@@ -1034,7 +1035,7 @@ bool CGame::CreateGameWindow( void )
 
 	// find the icon file in the filesystem
 	if ( char localPath[ MAX_PATH ];
-		 g_pFileSystem->GetLocalPath( "resource/game.ico", localPath, sizeof(localPath) ) )
+		 g_pFileSystem->GetLocalPath_safe( "resource/game.ico", localPath ) )
 	{
 		g_pFileSystem->GetLocalCopy( localPath );
 
@@ -1046,8 +1047,7 @@ bool CGame::CreateGameWindow( void )
 	}
 
 	wchar_t utf16_window_name[512];
-	V_strtowcs( utf8_window_name, std::size(utf8_window_name),
-		utf16_window_name, sizeof(utf16_window_name) );
+	V_strtowcs( utf8_window_name, std::size(utf8_window_name), utf16_window_name );
 
 	if ( WNDCLASSW ewc; GetClassInfoW( m_hInstance, CLASSNAME, &ewc ) )
 	{
@@ -1127,7 +1127,7 @@ bool CGame::CreateGameWindow( void )
 	}
 	
 	char localPath[ MAX_PATH ];
-	if ( g_pFileSystem->GetLocalPath( "resource/game-icon.bmp", localPath, sizeof(localPath) ) )
+	if ( g_pFileSystem->GetLocalPath_safe( "resource/game-icon.bmp", localPath ) )
 	{
 		g_pFileSystem->GetLocalCopy( localPath );
 		g_pLauncherMgr->SetApplicationIcon( localPath );
@@ -1485,8 +1485,7 @@ void CGame::PlayStartupVideos( void )
 
 		// get the path to the media file and play it.
 		char localPath[MAX_PATH];
-
- 		g_pFileSystem->GetLocalPath( com_token, localPath, sizeof(localPath) );
+ 		g_pFileSystem->GetLocalPath_safe( com_token, localPath );
  		
 		PlayVideoAndWait( localPath, bNeedHealthWarning );
 		localPath[0] = 0; // just to make sure we don't play the same avi file twice in the case that one movie is there but another isn't.
@@ -1670,6 +1669,7 @@ void *CGame::GetMainWindowPlatformSpecificHandle( void )
 #ifdef WIN32
 	return (void*)m_hWindow;
 #else
+#ifdef OSX
 	SDL_SysWMinfo pInfo;
 	SDL_VERSION( &pInfo.version );
 	if ( !SDL_GetWindowWMInfo( (SDL_Window*)m_pSDLWindow, &pInfo ) )
@@ -1678,7 +1678,6 @@ void *CGame::GetMainWindowPlatformSpecificHandle( void )
 		return NULL;
 	}
 
-#ifdef OSX
 	id nsWindow = (id)pInfo.info.cocoa.window;
 	SEL selector = sel_registerName("windowRef");
 	id windowRef = objc_msgSend( nsWindow, selector );

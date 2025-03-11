@@ -957,7 +957,7 @@ void S_InternalReloadSound( CSfxTable *sfx )
 	sfx->pSource = NULL;
 
 	char pExt[10];
-	Q_ExtractFileExtension( sfx->getname(), pExt, sizeof(pExt) );
+	V_ExtractFileExtension( sfx->getname(), pExt );
 	int nSource = !Q_stricmp( pExt, "mp3" ) ? CAudioSource::AUDIO_SOURCE_MP3 : CAudioSource::AUDIO_SOURCE_WAV;
 	audiosourcecache->GetInfo( nSource, sfx->IsPrecachedSound(), sfx ); // Do a size/date check and rebuild the cache entry if necessary.
 }
@@ -1001,7 +1001,7 @@ void S_ReloadFilesInList( IFileList *pFilesToReload )
 	{
 		FileNameHandle_t fnHandle = s_Sounds.Key( i );
 		char filename[MAX_PATH * 3];
-		if ( !g_pFileSystem->String( fnHandle, filename, sizeof( filename ) ) )
+		if ( !g_pFileSystem->String( fnHandle, filename ) )
 		{
 			AssertMsg( false, "S_HandlePureServerWhitelist - can't get a filename." );
 			continue;
@@ -6492,10 +6492,9 @@ void S_DspParms( const CCommand &args )
 	Q_memset( params, 0, sizeof(float) * 16 );
 
 	// get preset & proc
-	int idsp, iproc;
 	// dimhotepus: Q_atof -> Q_atoi
-	idsp = Q_atoi( args[1] );
-	iproc = Q_atoi( args[2] );
+	int idsp = Q_atoi( args[1] );
+	int iproc = Q_atoi( args[2] );
 
 	// get params
 	for (int i = 0; i < cparam; i++)

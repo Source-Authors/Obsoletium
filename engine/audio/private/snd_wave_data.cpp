@@ -209,7 +209,7 @@ char const *CAsyncWaveData::GetFileName()
 
 	if ( m_hFileNameHandle )	
 	{
-		if ( g_pFileSystem->String( m_hFileNameHandle, sz, sizeof( sz ) ) )
+		if ( g_pFileSystem->String( m_hFileNameHandle, sz ) )
 		{
 			return sz;
 		}
@@ -405,7 +405,7 @@ bool CAsyncWaveData::BlockingCopyData( void *destbuffer, int destbufsize, int st
 		m_bMissing = false;
 
 		char fn[MAX_PATH];
-		if ( g_pFileSystem->String( m_hFileNameHandle, fn, sizeof( fn ) ) )
+		if ( g_pFileSystem->String( m_hFileNameHandle, fn ) )
 		{
 			MaybeReportMissingWav( fn );
 		}
@@ -489,7 +489,7 @@ bool CAsyncWaveData::BlockingGetDataPointer( void **ppData )
 		m_bMissing = false;
 
 		char fn[MAX_PATH];
-		if ( g_pFileSystem->String( m_hFileNameHandle, fn, sizeof( fn ) ) )
+		if ( g_pFileSystem->String( m_hFileNameHandle, fn ) )
 		{
 			MaybeReportMissingWav( fn );
 		}
@@ -852,7 +852,7 @@ memhandle_t CAsyncWavDataCache::FindOrCreateBuffer( asyncwaveparams_t &params, b
 			if ( snd_async_stream_spew.GetInt() >= 2 )
 			{
 				char tempBuff[MAX_PATH];
-				g_pFileSystem->String( params.hFilename, tempBuff, sizeof( tempBuff ) );
+				g_pFileSystem->String( params.hFilename, tempBuff );
 				Msg( "Found Buffer: %s, offset: %d\n", tempBuff, params.seekpos );
 			}
 		}
@@ -1626,7 +1626,7 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 			i = m_CacheHandles.NextInorder(i) )
 		{
 			char name[MAX_PATH];
-			if ( !g_pFileSystem->String( m_CacheHandles[ i ].name, name, sizeof( name ) ) )
+			if ( !g_pFileSystem->String( m_CacheHandles[ i ].name, name ) )
 			{
 				Assert( 0 );
 				continue;
@@ -1856,7 +1856,7 @@ char const *CWaveDataStreamAsync::GetFileName()
 
 	if ( m_hFileName )
 	{
-		if ( g_pFileSystem->String( m_hFileName, fn, sizeof( fn ) ) )
+		if ( g_pFileSystem->String( m_hFileName, fn ) )
 		{
 			return fn;
 		}

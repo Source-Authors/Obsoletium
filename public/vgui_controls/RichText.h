@@ -35,7 +35,7 @@ public:
 	virtual void SetText(const char *text);
 	virtual void SetText(const wchar_t *text);
 	void GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, int bufLenInBytes);
-	void GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) char *pch, int bufLenInBytes);
+	void GetText(int offset, OUT_Z_CAP(bufLenInBytes) char *pch, int bufLenInBytes);
 
 	// configuration
 	void SetFont(HFont font);

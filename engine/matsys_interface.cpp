@@ -1043,7 +1043,7 @@ static ITexture *CreateBuildCubemaps16BitTexture( void )
 static ITexture *CreateQuarterSizedFBTexture( int n, unsigned int iRenderTargetFlags )
 {
 	char nbuf[20];
-	sprintf(nbuf,"_rt_SmallFB%d",n);
+	V_sprintf_safe(nbuf,"_rt_SmallFB%d",n);
 
 	ImageFormat fmt=materials->GetBackBufferFormat();
 	if ( g_pMaterialSystemHardwareConfig->GetHDRType() == HDR_TYPE_FLOAT )
@@ -1059,7 +1059,7 @@ static ITexture *CreateQuarterSizedFBTexture( int n, unsigned int iRenderTargetF
 static ITexture *CreateTeenyFBTexture( int n )
 {
 	char nbuf[20];
-	sprintf(nbuf,"_rt_TeenyFB%d",n);
+	V_sprintf_safe(nbuf,"_rt_TeenyFB%d",n);
 
 	ImageFormat fmt = materials->GetBackBufferFormat();
 	if ( g_pMaterialSystemHardwareConfig->GetHDRType() == HDR_TYPE_FLOAT )
@@ -1075,7 +1075,7 @@ static ITexture *CreateFullFrameFBTexture( int textureIndex, int iExtraFlags = 0
 	char textureName[256];
 	if ( textureIndex > 0 )
 	{
-		sprintf( textureName, "_rt_FullFrameFB%d", textureIndex );
+		V_sprintf_safe( textureName, "_rt_FullFrameFB%d", textureIndex );
 	}
 	else
 	{

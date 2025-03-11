@@ -651,12 +651,12 @@ void CNetworkStringTable::ParseUpdate( bf_read &buf, int entries )
 					            entryIndex, GetTableName() );
 				}
 				Q_strncpy( entry, history[ index ].string, Min( sizeof( entry ), (size_t)bytestocopy + 1 ) );
-				buf.ReadString( substr, sizeof(substr) );
+				buf.ReadString( substr );
 				Q_strncat( entry, substr, sizeof(entry), COPY_ALL_CHARACTERS );
 			}
 			else
 			{
-				buf.ReadString( entry, sizeof( entry ) );
+				buf.ReadString( entry );
 			}
 
 			pEntry = entry;
@@ -1093,7 +1093,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 	{
 		char stringname[4096];
 		
-		buf.ReadString( stringname, sizeof( stringname ) );
+		buf.ReadString( stringname );
 
 		if ( buf.ReadOneBit() == 1 )
 		{
@@ -1123,7 +1123,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 		{
 			char stringname[4096];
 
-			buf.ReadString( stringname, sizeof( stringname ) );
+			buf.ReadString( stringname );
 
 			if ( buf.ReadOneBit() == 1 )
 			{
@@ -1485,7 +1485,7 @@ bool CNetworkStringTableContainer::ReadStringTables( bf_read& buf )
 	for ( int i = 0 ; i < numTables; i++ )
 	{
 		char tablename[ 256 ];
-		buf.ReadString( tablename, sizeof( tablename ) );
+		buf.ReadString( tablename );
 
 		// Find this table by name
 		CNetworkStringTable *table = (CNetworkStringTable*)FindTable( tablename );

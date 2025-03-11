@@ -191,7 +191,7 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 
 	// open the file for writing
 	char fullSrcPath[MAX_PATH];
-	Q_MakeAbsolutePath( fullSrcPath, sizeof( fullSrcPath ), srcFilename, com_gamedir );
+	V_MakeAbsolutePath( fullSrcPath, srcFilename, com_gamedir );
 
 	if ( !g_pFileSystem->FileExists( fullSrcPath ) )
 	{
@@ -227,7 +227,7 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 
 	bool bMapFile = false;
 	char szOutFilenameBase[MAX_PATH];
-	Q_FileBase( outFilename, szOutFilenameBase, sizeof( szOutFilenameBase ) );
+	Q_FileBase( outFilename, szOutFilenameBase );
 	const char *pszMapName = cl.m_szLevelBaseName;
 	if ( pszMapName && pszMapName[0] )
 	{
@@ -290,11 +290,11 @@ void DownloadCache::PersistToDisk( const RequestContext_t *rc )
 		char absPath[MAX_PATH];
 		if ( rc->bIsBZ2 )
 		{
-			Q_StripExtension( rc->absLocalPath, absPath, sizeof( absPath ) );
+			Q_StripExtension( rc->absLocalPath, absPath );
 		}
 		else
 		{
-			Q_strncpy( absPath, rc->absLocalPath, sizeof( absPath ) );
+			V_strcpy_safe( absPath, rc->absLocalPath );
 		}
 
 		if ( !g_pFileSystem->FileExists( absPath ) )
@@ -613,7 +613,7 @@ void CDownloadManager::QueueInternal( const char *pBaseURL, const char *pURLPath
 
 	// Setup base path.  We put it in the "download" search path, if they have set one
 	char szBasePath[ MAX_PATH ];
-	if ( g_pFileSystem->GetSearchPath( k_szDownloadPathID, false, szBasePath, sizeof(szBasePath) ) > 0 )
+	if ( g_pFileSystem->GetSearchPath_safe( k_szDownloadPathID, false, szBasePath ) > 0 )
 	{
 		char *split = V_strstr( szBasePath, ";" );
 		if ( split != NULL )
@@ -644,7 +644,7 @@ void CDownloadManager::QueueInternal( const char *pBaseURL, const char *pURLPath
 	// Now set the full absolute path.  Why does the file system not provide a convenient method to
 	// do stuff like this?
 	V_strcpy_safe( rc->absLocalPath, szBasePath );
-	V_AppendSlash( rc->absLocalPath, sizeof(rc->absLocalPath) );
+	V_AppendSlash( rc->absLocalPath );
 	V_strcat_safe( rc->absLocalPath, szGamePathLower );
 	V_FixSlashes( rc->absLocalPath );
 

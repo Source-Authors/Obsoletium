@@ -153,7 +153,7 @@ void CAskConnectPanel::StartSlideAnimation( float flDuration )
 	if ( pKeyName )
 	{
 		wchar_t wcKeyName[64], wcMessage[512];
-		g_pVGuiLocalize->ConvertANSIToUnicode( pKeyName, wcKeyName, sizeof( wcKeyName ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pKeyName, wcKeyName );
 		g_pVGuiLocalize->ConstructString_safe( wcMessage, g_pVGuiLocalize->Find("#Valve_PressKeyToAccept"), 1, wcKeyName );
 		m_pAcceptLabel->SetText( wcMessage );
 	}

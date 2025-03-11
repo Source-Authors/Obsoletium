@@ -575,7 +575,7 @@ bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *
 
 			char filepath[ 512 ];
 			Q_strncpy( filepath, pszLocalFileName, sizeof( filepath ) );
-			Q_StripFilename( filepath );
+			V_StripFilename( filepath );
 			g_pFullFileSystem->CreateDirHierarchy( filepath, "MOD" );
 
 			FileHandle_t hFile = g_pFileSystem->Open( pszLocalFileName, "wb", "MOD" );
@@ -683,7 +683,7 @@ void CheckForFlushMemory( const char *pCurrentMapName, const char *pDestMapName 
 	char szDestMapName[MAX_PATH];
 	if ( pCurrentMapName )
 	{
-		V_FileBase( pCurrentMapName, szCurrentMapName, sizeof( szCurrentMapName ) );
+		V_FileBase( pCurrentMapName, szCurrentMapName );
 	}
 	else
 	{
@@ -693,7 +693,7 @@ void CheckForFlushMemory( const char *pCurrentMapName, const char *pDestMapName 
 
 	if ( pDestMapName )
 	{
-		V_FileBase( pDestMapName, szDestMapName, sizeof( szDestMapName ) );
+		V_FileBase( pDestMapName, szDestMapName );
 	}
 	else
 	{
@@ -1041,12 +1041,12 @@ void UseDefaultBindings( void )
 	const char *buf = startbuf;
 	while ( 1 )
 	{
-		buf = COM_ParseFile( buf, token, sizeof( token ) );
+		buf = COM_ParseFile( buf, token );
 		if ( Q_isempty( token ) )
 			break;
 		Q_strncpy ( szKeyName, token, sizeof( szKeyName ) );
 
-		buf = COM_ParseFile( buf, token, sizeof( token ) );
+		buf = COM_ParseFile( buf, token );
 		if ( Q_isempty( token ) )  // Error
 			break;
 
@@ -1176,7 +1176,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 								byte *pBuffer = (byte*) malloc( unSize );
 								if ( g_pFileSystem->Read( pBuffer, unSize, hFile ) == unSize )
 								{
-									Q_SetExtension( g_szDefaultLogoFileName, ".vtf", sizeof(g_szDefaultLogoFileName) );
+									Q_SetExtension( g_szDefaultLogoFileName, ".vtf" );
 									if ( pRemoteStorage->FileWrite( g_szDefaultLogoFileName, pBuffer, unSize ) )
 									{
 										DevMsg( "[Cloud]: SUCCEESS saving %s in remote storage\n", g_szDefaultLogoFileName );
@@ -1191,7 +1191,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 							}
 
 							// store logo .VMT file
-							Q_SetExtension( szLogoFileName, ".vmt", sizeof(szLogoFileName) );
+							Q_SetExtension( szLogoFileName, ".vmt" );
 							hFile = g_pFileSystem->Open( szLogoFileName, "rb", "MOD" );
 							if ( FILESYSTEM_INVALID_HANDLE != hFile )
 							{
@@ -1200,7 +1200,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 								byte *pBuffer = (byte*) malloc( unSize );
 								if ( g_pFileSystem->Read( pBuffer, unSize, hFile ) == unSize )
 								{
-									Q_SetExtension( g_szDefaultLogoFileName, ".vmt", sizeof(g_szDefaultLogoFileName) );
+									Q_SetExtension( g_szDefaultLogoFileName, ".vmt" );
 									if ( pRemoteStorage->FileWrite( g_szDefaultLogoFileName, pBuffer, unSize ) )
 									{
 										DevMsg( "[Cloud]: SUCCEESS saving %s in remote storage\n", g_szDefaultLogoFileName );
@@ -1432,13 +1432,13 @@ void Host_ReadConfiguration()
 		if ( cl_cloud_settings.GetInt() == STEAMREMOTESTORAGE_CLOUD_ON )
 		{
 			// get logo .VTF file
-			Q_SetExtension( g_szDefaultLogoFileName, ".vtf", sizeof(g_szDefaultLogoFileName) );
+			Q_SetExtension( g_szDefaultLogoFileName, ".vtf" );
 			GetFileFromRemoteStorage( pRemoteStorage, g_szDefaultLogoFileName, g_szDefaultLogoFileName );
 
 			cl_logofile.SetValue( g_szDefaultLogoFileName );
 
 			// get logo .VMT file
-			Q_SetExtension( g_szDefaultLogoFileName, ".vmt", sizeof(g_szDefaultLogoFileName) );
+			Q_SetExtension( g_szDefaultLogoFileName, ".vmt" );
 			GetFileFromRemoteStorage( pRemoteStorage, g_szDefaultLogoFileName, g_szDefaultLogoFileName );
 		}
 	}
@@ -1505,7 +1505,7 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 
 		char outfile[ MAX_QPATH ];
 		// Strip path and extension from filename
-		Q_FileBase( filename, outfile, sizeof( outfile ) );
+		Q_FileBase( filename, outfile );
 		Host_WriteConfiguration( va( "%s.cfg", outfile ), bWriteAll );
 		if  ( !bWriteAll )
 			ConMsg( "Wrote partial config file \"%s\" out, to write full file use host_writeconfig \"%s\" full\n", outfile, outfile );
@@ -1558,7 +1558,7 @@ void Host_ReadPreStartupConfiguration()
 			COM_Parse(search);
 
 			// apply the value
-			ConVar *var = (ConVar *)g_pCVar->FindVar( configVar );
+			ConVar *var = g_pCVar->FindVar( configVar );
 			if ( var )
 			{
 				var->SetValue( com_token );
@@ -2330,7 +2330,7 @@ void Host_CheckDumpMemoryStats( void )
 			}
 
 			char mapname[ 256 ];
-			Q_FileBase( pTest, mapname, sizeof( mapname ) );
+			Q_FileBase( pTest, mapname );
 #if defined( _MEMTEST )
 			MemAlloc_SetStatsExtraInfo( pTest, "" );
 #endif
@@ -3468,13 +3468,13 @@ bool IsLowViolence_Registry()
 	}
 
 	char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	Q_FileBase( com_gamedir, gamedir );
 
 	// also check mod specific directories for LV changes
-	Q_snprintf(szSubKey, sizeof( szSubKey ), "Software\\Valve\\%s\\%s\\Settings", appname, gamedir );
+	V_sprintf_safe(szSubKey, "Software\\Valve\\%s\\%s\\Settings", appname, gamedir );
 
 	nBufferLen = 127;
-	Q_strncpy( szBuffer, "", sizeof( szBuffer ) );
+	szBuffer[0] = '\0';
 
 	Sys_GetRegKeyValue( szSubKey, "User Token 2", szBuffer,	nBufferLen, szBuffer );
 	if ( !Q_isempty( szBuffer ) )
@@ -3743,12 +3743,12 @@ bool DLL_LOCAL Host_AllowLoadModule( const char *pFilename, const char *pPathID,
 			{
 				char szDllname[512];
 
-				V_strncpy( szDllname, pFilename, sizeof(szDllname) );
-				V_SetExtension( szDllname, g_pModuleExtension, sizeof(szDllname) );
+				V_strcpy_safe( szDllname, pFilename );
+				V_SetExtension( szDllname, g_pModuleExtension );
 				if ( pPathID )
 				{
 					char szFullPath[ 512 ];
-					const char *pFullPath = g_pFileSystem->RelativePathToFullPath( szDllname, pPathID, szFullPath, sizeof(szFullPath) );
+					const char *pFullPath = g_pFileSystem->RelativePathToFullPath_safe( szDllname, pPathID, szFullPath );
 					if ( !pFullPath )
 					{
 						Warning("Can't find %s on disk\n", szDllname );

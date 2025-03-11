@@ -5,17 +5,14 @@
 //=====================================================================================//
 
 #include "client_pch.h"
-#include <time.h>
 #include "console.h"
+#include <ctime>
 #include "ivideomode.h"
 #include "zone.h"
 #include "sv_main.h"
 #include "server.h"
 #include "MapReslistGenerator.h"
 #include "tier0/vcrmode.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -974,7 +971,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 	Assert( current );
 
 	wchar_t unicode[ 1024 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicode, sizeof( unicode ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicode );
 
 	wchar_t const *p = unicode;
 	while ( *p )
@@ -1280,7 +1277,7 @@ void CConPanel::PaintBackground()
 	char ver[ 100 ];
 	Q_snprintf(ver, sizeof( ver ), "Source Engine %i (build %d)", PROTOCOL_VERSION, build_number() );
 	wchar_t unicode[ 200 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( ver, unicode, sizeof( unicode ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( ver, unicode );
 
 	vgui::surface()->DrawSetTextColor( Color( 255, 255, 255, 255 ) );
 	int x = wide - DrawTextLen( m_hFont, unicode ) - 2;
@@ -1290,14 +1287,15 @@ void CConPanel::PaintBackground()
 	{
 		if ( cl.m_NetChannel->IsLoopback() )
 		{
-			Q_snprintf(ver, sizeof( ver ), "Map '%s'", cl.m_szLevelBaseName );
+			V_sprintf_safe(ver, "Map '%s'", cl.m_szLevelBaseName );
 		}
 		else
 		{
-			Q_snprintf(ver, sizeof( ver ), "Server '%s' Map '%s'", cl.m_NetChannel->GetRemoteAddress().ToString(), cl.m_szLevelBaseName );
+			V_sprintf_safe(ver, "Server '%s' Map '%s'", cl.m_NetChannel->GetRemoteAddress().ToString(), cl.m_szLevelBaseName );
 		}
+
 		wchar_t wUnicode[ 200 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( ver, wUnicode, sizeof( wUnicode ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( ver, wUnicode );
 
 		int tall = vgui::surface()->GetFontTall( m_hFont );
 

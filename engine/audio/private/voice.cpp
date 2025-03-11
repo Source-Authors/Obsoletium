@@ -1450,24 +1450,6 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 }
 
 
-#if DEAD
-//------------------ Copyright (c) 1999 Valve, LLC. ----------------------------
-// Purpose: Flushes a given receive channel.
-// Input  : nChannel - index of channel to flush.
-//------------------------------------------------------------------------------
-void Voice_FlushChannel(int nChannel)
-{
-	if ((nChannel < 0) || (nChannel >= VOICE_NUM_CHANNELS))
-	{
-		Assert(false);
-		return;
-	}
-
-	g_VoiceChannels[nChannel].m_Buffer.Flush();
-}
-#endif
-
-
 //------------------------------------------------------------------------------
 // IVoiceTweak implementation.
 //------------------------------------------------------------------------------

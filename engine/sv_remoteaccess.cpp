@@ -88,7 +88,7 @@ bool GetStringHelper(CUtlBuffer &cmd, char (&outBuf)[bufSize])
 //-----------------------------------------------------------------------------
 // Purpose: handles a request
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, const void *buffer, intp bufferSize)
+void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize)
 {
 	m_iBytesReceived += bufferSize;
 	// ConMsg("RemoteAccess: bytes received: %d\n", m_iBytesReceived);
@@ -374,7 +374,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 }
 
 // NOTE: This version is used by the server DLL or server plugins
-void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, const void *buffer, intp bufferSize )
+void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize )
 {
 	WriteDataRequest( &RCONServer(), listener, buffer, bufferSize );
 }
@@ -553,7 +553,7 @@ intp CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
 	return 0;
 }
 
-intp CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, void *buffer, intp bufferSize )
+intp CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, IN_BYTECAP(bufferSize) void *buffer, intp bufferSize )
 {
 	for( auto i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
 	{
@@ -832,7 +832,7 @@ void CServerRemoteAccess::GetUserBanList(CUtlBuffer &value)
 	value.PutChar(0);
 }
 
-void CServerRemoteAccess::GetStatsString(char *buf, intp bufSize)
+void CServerRemoteAccess::GetStatsString(OUT_Z_CAP(bufSize) char *buf, intp bufSize)
 {
 	float avgIn=0,avgOut=0;
 
@@ -914,7 +914,7 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	{
 		char curDir[MAX_PATH];
 		V_sprintf_safe(curDir, "maps/%s", findfn);
-		g_pFileSystem->GetLocalPath(curDir, curDir, MAX_PATH);
+		g_pFileSystem->GetLocalPath_safe(curDir, curDir);
 		
 		// limit maps displayed to ones for the mod only
 		if (strstr(curDir, friendly_com_gamedir))
@@ -964,7 +964,7 @@ void CServerRemoteAccess::SendMessageToAdminUI( ra_listener_id listenerID, const
 //-----------------------------------------------------------------------------
 // Purpose: Sends a response to the client
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, void *pData, intp nDataLen )
+void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, IN_BYTECAP(nDataLen) void *pData, intp nDataLen )
 {
 	// allocate a spot in the list for the response
 	auto i = m_ResponsePackets.AddToTail();
@@ -982,7 +982,7 @@ void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, Serve
 //-----------------------------------------------------------------------------
 // Purpose: sends an opaque blob of data from VProf to a remote rcon listener
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupData, void *data, intp len )
+void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupData, IN_BYTECAP(len) void *data, intp len )
 {
 	Assert( listenerID != m_AdminUIID ); // only RCON clients support this right now
 	SendResponseToClient( listenerID, bGroupData ? SERVERDATA_VPROF_GROUPS : SERVERDATA_VPROF_DATA, data, len );

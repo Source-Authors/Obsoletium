@@ -254,7 +254,7 @@ void CDownloadListGenerator::OnResourcePrecached(const char *relativePathFileNam
 	}
 
 	char fullPath[_MAX_PATH];
-	if (g_pFileSystem->GetLocalPath(relativePathFileName, fullPath, sizeof(fullPath)))
+	if (g_pFileSystem->GetLocalPath_safe(relativePathFileName, fullPath))
 	{
 		OnResourcePrecachedFullPath( fullPath, relativePathFileName);
 	}

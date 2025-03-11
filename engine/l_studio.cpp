@@ -877,7 +877,7 @@ public:
 	bool Init();
 	void Shutdown();
 
-	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen );
+	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, unsigned nMaxLen );
 
 	struct staticPropAsyncContext_t
 	{
@@ -1024,8 +1024,8 @@ class CResourcePreloadPropLighting : public CResourcePreload
 
 		char szBasename[MAX_PATH];
 		char szFilename[MAX_PATH];
-		V_FileBase( pName, szBasename, sizeof( szBasename ) );
-		V_snprintf( szFilename, sizeof( szFilename ), "%s%s.vhv", szBasename, GetPlatformExt() );
+		V_FileBase( pName, szBasename );
+		V_sprintf_safe( szFilename, "%s%s.vhv", szBasename, GetPlatformExt() );
 
 		// static props have the same name across maps
 		// can check if loading the same map and early out if data present
@@ -1131,7 +1131,7 @@ void CModelRender::SuppressEngineLighting( bool bSuppress )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen )
+bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, unsigned nMaxLen )
 {
 	CColorMeshData *pColorMeshData = (CColorMeshData *)pItem;
 	g_pFileSystem->String( pColorMeshData->m_fnHandle, pDest, nMaxLen );
@@ -3844,19 +3844,6 @@ static void StaticPropColorTexelCallback( const FileAsyncRequest_t &request, int
 	s_ModelRender.StaticPropColorTexelCallback( request.pContext, request.pData, numReadBytes, asyncStatus );
 }
 
-
-//-----------------------------------------------------------------------------
-// Queued loader callback
-// Called from async i/o thread - must spend minimal cycles in this context
-//-----------------------------------------------------------------------------
-static void QueuedLoaderCallback_PropLighting( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError )
-{
-	// translate error
-	FSAsyncStatus_t asyncStatus = ( loaderError == LOADERERROR_NONE ? FSASYNC_OK : FSASYNC_ERR_READING );
-
-	// mimic async i/o completion
-	s_ModelRender.StaticPropColorMeshCallback( pContext, pData, nSize, asyncStatus );
-}
 
 //-----------------------------------------------------------------------------
 // Loads the serialized static prop color data.

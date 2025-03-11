@@ -1608,7 +1608,7 @@ void CVideoMode_Common::TakeSnapshotTGA( const char *pFilename )
 		{
 			char szPath[MAX_PATH];
 			szPath[0] = 0;
-			if ( g_pFileSystem->GetLocalPath( pFilename, szPath, sizeof(szPath) ) )
+			if ( g_pFileSystem->GetLocalPath_safe( pFilename, szPath ) )
 			{
 				AddScreenshotToSteam( szPath, GetModeStereoWidth(), GetModeStereoHeight() );
 			}
@@ -2116,7 +2116,7 @@ void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
 	{
 		char szPath[MAX_PATH];
 		szPath[0] = 0;
-		if ( g_pFileSystem->GetLocalPath( pFilename, szPath, sizeof(szPath) ) )
+		if ( g_pFileSystem->GetLocalPath_safe( pFilename, szPath ) )
 		{
 			AddScreenshotToSteam( szPath, GetModeStereoWidth(), GetModeStereoHeight() );
 		}

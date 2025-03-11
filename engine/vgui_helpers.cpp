@@ -158,8 +158,8 @@ void CopyListPanelToClipboard( vgui::ListPanel *pListPanel )
 			wchar_t tempTextWC[512];
 			char tempText[512];
 
-			pListPanel->GetCellText( iCur, i, tempTextWC, sizeof( tempTextWC ) );
-			g_pVGuiLocalize->ConvertUnicodeToANSI( tempTextWC, tempText, sizeof( tempText ) );
+			pListPanel->GetCellText( iCur, i, tempTextWC );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( tempTextWC, tempText );
 
 			textBuf.AddMultipleToTail( strlen( tempText ), tempText );
 		}

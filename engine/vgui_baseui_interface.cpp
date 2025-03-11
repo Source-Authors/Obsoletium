@@ -1398,7 +1398,7 @@ void CEngineVGui::UpdateCustomProgressBar( float progress, const wchar_t *desc )
 		return;
 
 	char ansi[1024];
-	g_pVGuiLocalize->ConvertUnicodeToANSI( desc, ansi, sizeof( ansi ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( desc, ansi );
 
 	if ( staticGameUIFuncs->UpdateProgressBar( progress, ansi ) )
 	{

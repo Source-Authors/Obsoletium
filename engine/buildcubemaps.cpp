@@ -77,7 +77,7 @@ IVTex* VTex_Load( CSysModule** pModule )
 
 	if ( !pIVTex )
 	{
-		ConMsg( "Can't load vtex_dll" DLL_EXT_STRING "\n" );
+		ConMsg( "Can't load vtex interface '%s' from vtex_dll" DLL_EXT_STRING "\n", IVTEX_VERSION_STRING );
 	}
 
 	return pIVTex;
@@ -245,7 +245,7 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 // 			for(int f=0;f<6;f++)
 // 				OutEnvmap.face_maps[f].Clear(0,0,0,1);
 // 			Envmap.Resample(OutEnvmap,15.0);
- 			Q_snprintf( name, sizeof( name ), "%s", pFileNameBase);
+ 			V_strcpy_safe( name, pFileNameBase);
  			Envmap.WritePFMs( name );
 // 			Q_snprintf( name, sizeof( name ), "%s_filtered", pFileNameBase);
 // 			OutEnvmap.WritePFMs( name );
@@ -307,7 +307,7 @@ static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 
 	char pTXTName[ MAX_PATH ];
 	V_strcpy_safe( pTXTName, pVTFName );
-	Q_SetExtension( pTXTName, ".txt", sizeof(pTXTName) );
+	Q_SetExtension( pTXTName, ".txt" );
 
 	// HDRFIXME: Make this go to a buffer instead.
 	FileHandle_t fp = g_pFileSystem->Open( pTXTName, "w" );
@@ -339,7 +339,7 @@ static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 	{
 		char pTempName[MAX_PATH];
 		V_sprintf_safe( pTempName, "%s%s", pVTFName, facingName[i] );
-		Q_SetExtension( pTempName, pSrcExtension, sizeof(pTempName) );
+		Q_SetExtension( pTempName, pSrcExtension );
 		g_pFileSystem->RemoveFile( pTempName, NULL );
 	}
 }
@@ -357,7 +357,7 @@ CON_COMMAND( envmap, "" )
 
 	if( world && world->GetModel() )
 	{
-		Q_FileBase( modelloader->GetName( ( model_t *)world->GetModel() ), base, sizeof( base ) );
+		V_FileBase( modelloader->GetName( world->GetModel() ), base );
 	}
 	else
 	{
@@ -365,8 +365,8 @@ CON_COMMAND( envmap, "" )
 	}
 
 	intp strLen = V_strlen( base ) + ssize( "cubemap_screenshots/" );
-	char *str = ( char * )_alloca( strLen );
-	Q_snprintf( str, strLen, "cubemap_screenshots/%s", base );
+	char *str = stackallocT( char, strLen );
+	V_snprintf( str, strLen, "cubemap_screenshots/%s", base );
 	g_pFileSystem->CreateDirHierarchy( "cubemap_screenshots", "DEFAULT_WRITE_PATH" );
 
 	TakeCubemapSnapshot( MainViewOrigin(), str, mat_envmapsize.GetInt(), mat_envmaptgasize.GetInt(), 
@@ -380,8 +380,8 @@ CON_COMMAND( envmap, "" )
 static void WriteLightProbe( const char *pBasePath, const LightingState_t& state, bool bHDR )
 {
 	char pFullPath[MAX_PATH];
-	Q_strncpy( pFullPath, pBasePath, sizeof(pFullPath) );
-	Q_SetExtension( pFullPath, ".prb", sizeof(pFullPath) );
+	V_strcpy_safe( pFullPath, pBasePath );
+	Q_SetExtension( pFullPath, ".prb" );
 
 	DECLARE_DMX_CONTEXT();
 	CDmxElement *pLightProbe = CreateDmxElement( "DmeElement" );
@@ -394,7 +394,7 @@ static void WriteLightProbe( const char *pBasePath, const LightingState_t& state
 	if ( bHDR )
 	{
 		char pTemp[MAX_PATH];
-		Q_snprintf( pTemp, sizeof(pTemp), "%s_hdr", pCubemap );
+		V_sprintf_safe( pTemp, "%s_hdr", pCubemap );
 		pLightProbe->SetValue( "cubemapHdr", pTemp );
 	}
 
@@ -474,9 +474,6 @@ CON_COMMAND( lightprobe,
 	"Creates a cubemap and a file indicating the local lighting in a subdirectory called 'materials/lightprobes'\n."
 	"The lightprobe command requires you specify a base file name.\n" )
 {
-	if ( IsX360() )
-		return;
-
 	if ( args.ArgC() < 2 ) 
 	{
 		ConMsg( "sample_lighting usage: lightprobe <base file name> [cubemap dimension]\n" );
@@ -495,31 +492,31 @@ CON_COMMAND( lightprobe,
 		return;
 
 	char pBasePath[MAX_PATH];
-	Q_snprintf( pBasePath, sizeof(pBasePath), "materials/lightprobes/%s", args[1] );
-	Q_StripFilename( pBasePath );
+	V_sprintf_safe( pBasePath, "materials/lightprobes/%s", args[1] );
+	V_StripFilename( pBasePath );
 	g_pFileSystem->CreateDirHierarchy( pBasePath, "DEFAULT_WRITE_PATH" );
 
 	char pTemp[MAX_PATH];
 	char pMaterialSrcPath[MAX_PATH];
-	Q_snprintf( pTemp, sizeof(pTemp), "materialsrc/lightprobes/%s", args[1] );
-	GetModContentSubdirectory( pTemp, pMaterialSrcPath, sizeof(pMaterialSrcPath) );
-	Q_StripFilename( pMaterialSrcPath );
+	V_sprintf_safe( pTemp, "materialsrc/lightprobes/%s", args[1] );
+	GetModContentSubdirectory( pTemp, pMaterialSrcPath );
+	V_StripFilename( pMaterialSrcPath );
 	g_pFileSystem->CreateDirHierarchy( pMaterialSrcPath, NULL );
 
 	char pGameDir[MAX_OSPATH];
-	COM_GetGameDir( pGameDir, sizeof( pGameDir ) );
+	COM_GetGameDir( pGameDir );
 
 	bool bHDR = g_pMaterialSystemHardwareConfig->GetHDRType() != HDR_TYPE_NONE;
 	if ( bHDR )
 	{
 		char pTemp2[MAX_PATH];
-		Q_snprintf( pTemp2, sizeof(pTemp2), "materialsrc/lightprobes/%s_hdr", args[1] );
+		V_sprintf_safe( pTemp2, "materialsrc/lightprobes/%s_hdr", args[1] );
 
-		GetModContentSubdirectory( pTemp2, pMaterialSrcPath, sizeof(pMaterialSrcPath) );
+		GetModContentSubdirectory( pTemp2, pMaterialSrcPath );
 		BuildSingleCubemap( pMaterialSrcPath, MainViewOrigin(), nTGASize, true, pGameDir, pIVTex );
 	}
 
-	GetModContentSubdirectory( pTemp, pMaterialSrcPath, sizeof(pMaterialSrcPath) );
+	GetModContentSubdirectory( pTemp, pMaterialSrcPath );
 	BuildSingleCubemap( pMaterialSrcPath, MainViewOrigin(), nTGASize, false, pGameDir, pIVTex );
 
 	VTex_Unload( pModule );
@@ -529,7 +526,7 @@ CON_COMMAND( lightprobe,
 	LightcacheGetDynamic_Stats stats;
 	LightcacheGetDynamic( MainViewOrigin(), lightingState, stats );
 
-	Q_snprintf( pBasePath, sizeof(pBasePath), "materials/lightprobes/%s", args[1] );
+	V_sprintf_safe( pBasePath, "materials/lightprobes/%s", args[1] );
 	WriteLightProbe( pBasePath, lightingState, bHDR );
 }
 
@@ -712,7 +709,7 @@ void Cubemap_CreateDefaultCubemap( const char *pMapName, IBSPPack *iBSPPack )
 
 	// Write the puppy out!
 	char dstVTFFileName[1024];
-	Q_snprintf( dstVTFFileName, sizeof( dstVTFFileName ), "materials/maps/%s/cubemapdefault.vtf", pMapName );
+	V_sprintf_safe( dstVTFFileName, "materials/maps/%s/cubemapdefault.vtf", pMapName );
 
 	CUtlBuffer outputBuf;
 	if (!pDstCubemap->Serialize( outputBuf ))
@@ -734,16 +731,13 @@ void Cubemap_CreateDefaultCubemap( const char *pMapName, IBSPPack *iBSPPack )
 
 static void AddSampleToBSPFile( bool bHDR, mcubemapsample_t *pSample, const char *matDir, IBSPPack *iBSPPack )
 {
-	if ( IsX360() )
-		return;
-
 	char textureName[MAX_PATH] = { 0 };
 	const char *pHDRExtension = "";
 	if( bHDR )
 	{
 		pHDRExtension = ".hdr";
 	}
-	Q_snprintf( textureName, sizeof( textureName ), "%s/c%d_%d_%d%s.vtf", matDir, ( int )pSample->origin[0],
+	V_sprintf_safe( textureName, "%s/c%d_%d_%d%s.vtf", matDir, ( int )pSample->origin[0],
 	            ( int )pSample->origin[1], ( int )pSample->origin[2], pHDRExtension );
 	char localPath[MAX_PATH] = { 0 };
 	if ( !g_pFileSystem->RelativePathToFullPath_safe( textureName, "DEFAULT_WRITE_PATH", localPath ) || !*localPath )
@@ -752,7 +746,7 @@ static void AddSampleToBSPFile( bool bHDR, mcubemapsample_t *pSample, const char
 	}
 	else
 	{
-		Q_FixSlashes( localPath );
+		V_FixSlashes( localPath );
 		iBSPPack->AddFileToPack( textureName, localPath );
 	}
 	g_pFileSystem->RemoveFile( textureName, "DEFAULT_WRITE_PATH" );
@@ -976,19 +970,19 @@ void R_BuildCubemapSamples( int numIterations )
 			return;
 
 		char matDir[MAX_PATH];
-		Q_snprintf( matDir, sizeof(matDir), "materials/maps/%s", cl.m_szLevelBaseName );
+		V_sprintf_safe( matDir, "materials/maps/%s", cl.m_szLevelBaseName );
 		g_pFileSystem->CreateDirHierarchy( matDir, "DEFAULT_WRITE_PATH" );
 
 		char pTemp[MAX_PATH];
-		Q_snprintf( pTemp, sizeof(pTemp), "materialsrc/maps/%s", cl.m_szLevelBaseName );
+		V_sprintf_safe( pTemp, "materialsrc/maps/%s", cl.m_szLevelBaseName );
 
 		char pMaterialSrcDir[MAX_PATH];
-		GetModContentSubdirectory( pTemp, pMaterialSrcDir, sizeof(pMaterialSrcDir) );
+		GetModContentSubdirectory( pTemp, pMaterialSrcDir );
 
 		g_pFileSystem->CreateDirHierarchy( pMaterialSrcDir, NULL );
 
 		char gameDir[MAX_OSPATH];
-		COM_GetGameDir( gameDir, sizeof( gameDir ) );
+		COM_GetGameDir( gameDir );
 
 		model_t *pWorldModel = ( model_t *)world->GetModel();
 		int i;
@@ -1015,7 +1009,7 @@ void R_BuildCubemapSamples( int numIterations )
 			mcubemapsample_t  *pCubemapSample = &pWorldModel->brush.pShared->m_pCubemapSamples[i];
 
 			char pVTFName[ MAX_PATH ];
-			Q_snprintf( pVTFName, sizeof( pVTFName ), "%s/c%d_%d_%d", pMaterialSrcDir, 
+			V_sprintf_safe( pVTFName, "%s/c%d_%d_%d", pMaterialSrcDir, 
 				( int )pCubemapSample->origin[0], ( int )pCubemapSample->origin[1],	
 				( int )pCubemapSample->origin[2] );
 
@@ -1050,7 +1044,7 @@ void R_BuildCubemapSamples( int numIterations )
 		iBSPPack->LoadBSPFile( g_pFileSystem, cl.m_szLevelFileName );
 
 		// Cram the textures into the bsp.
-		Q_snprintf( matDir, sizeof(matDir), "materials/maps/%s", cl.m_szLevelBaseName );
+		V_sprintf_safe( matDir, "materials/maps/%s", cl.m_szLevelBaseName );
 		for ( i=0 ; i < pWorldModel->brush.pShared->m_nCubemapSamples ; i++ )
 		{
 			mcubemapsample_t *pSample = &pWorldModel->brush.pShared->m_pCubemapSamples[i];
@@ -1061,7 +1055,7 @@ void R_BuildCubemapSamples( int numIterations )
 		// Resolve levelfilename to absolute to ensure we are writing the exact file we loaded and not preferentially to
 		// DEFAULT_WRITE_PATH
 		char szAbsFile[MAX_PATH] = { 0 };
-		g_pFullFileSystem->RelativePathToFullPath( cl.m_szLevelFileName, NULL, szAbsFile, sizeof( szAbsFile ) );
+		g_pFullFileSystem->RelativePathToFullPath_safe( cl.m_szLevelFileName, NULL, szAbsFile );
 		if ( !*szAbsFile )
 		{
 			ConMsg( "Failed to resolve absolute path of map: %s\n", cl.m_szLevelFileName );

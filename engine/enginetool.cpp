@@ -989,7 +989,7 @@ void CEngineTool::StartRecordingVoiceToFile( const char *filename, const char *p
 		g_pFileSystem->Close( fh );
 	}
 
-	g_pFileSystem->RelativePathToFullPath( filename, pPathID, m_szVoiceoverFile, sizeof( m_szVoiceoverFile ) );
+	g_pFileSystem->RelativePathToFullPath_safe( filename, pPathID, m_szVoiceoverFile );
 
 	g_pFileSystem->RemoveFile( filename, pPathID );
 

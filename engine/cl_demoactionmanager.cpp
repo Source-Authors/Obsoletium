@@ -120,8 +120,8 @@ void CDemoActionManager::Shutdown( void )
 void CDemoActionManager::ReloadFromDisk( void )
 {
 	char metafile[ 512 ];
-	Q_StripExtension( m_szCurrentFile, metafile, sizeof( metafile ) );
-	Q_DefaultExtension( metafile, ".vdm", sizeof( metafile ) );
+	Q_StripExtension( m_szCurrentFile, metafile );
+	Q_DefaultExtension( metafile, ".vdm" );
 
 	ClearAll();
 
@@ -202,8 +202,8 @@ void CDemoActionManager::StartPlaying( char const *demfilename )
 	Q_strncpy( m_szCurrentFile, demfilename, sizeof( m_szCurrentFile ) );
 
 	char metafile[ 512 ];
-	Q_StripExtension( demfilename, metafile, sizeof( metafile ) );
-	Q_DefaultExtension( metafile, ".vdm", sizeof( metafile ) );
+	Q_StripExtension( demfilename, metafile );
+	Q_DefaultExtension( metafile, ".vdm" );
 
 	long filetime = g_pFileSystem->GetFileTime( metafile );
 
@@ -328,8 +328,8 @@ void CDemoActionManager::SaveToFile( void )
 		return;
 
 	char metafile[ 512 ];
-	Q_StripExtension( m_szCurrentFile, metafile, sizeof( metafile ) );
-	Q_DefaultExtension( metafile, ".vdm", sizeof( metafile ) );
+	Q_StripExtension( m_szCurrentFile, metafile );
+	Q_DefaultExtension( metafile, ".vdm" );
 
 	// Save data
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );

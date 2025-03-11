@@ -460,7 +460,7 @@ char const *CSaveRestore::GetSaveGameMapName( char const *level )
 	Assert( level );
 
 	static char mapname[ 256 ];
-	Q_FileBase( level, mapname, sizeof( mapname ) );
+	Q_FileBase( level, mapname );
 	return mapname;
 }
 
@@ -1749,7 +1749,7 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 	pSaveData->levelInfo.time = m_flClientSaveRestoreTime;
 
 	char name[256];
-	Q_FileBase( fileName, name, sizeof( name ) );
+	Q_FileBase( fileName, name );
 	Q_strlower( name );
 
 	RestoreLookupTable *table = FindOrAddRestoreLookupTable( name );
@@ -2362,7 +2362,7 @@ CSaveRestore::RestoreLookupTable *CSaveRestore::FindOrAddRestoreLookupTable( cha
 void CSaveRestore::BuildRestoredIndexTranslationTable( char const *mapname, CSaveRestoreData *pSaveData, bool verbose )
 {
 	char name[ 256 ];
-	Q_FileBase( mapname, name, sizeof( name ) );
+	Q_FileBase( mapname, name );
 	Q_strlower( name );
 
 	// Build Translation Lookup

@@ -339,7 +339,7 @@ public:
 		{
 			wchar_t constructed[ 1024 ];
 			wchar_t file[ 256 ];
-			g_pVGuiLocalize->ConvertANSIToUnicode( cachefile, file, sizeof( file ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( cachefile, file );
 
 			g_pVGuiLocalize->ConstructString_safe( 
 				constructed, 

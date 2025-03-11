@@ -43,7 +43,17 @@ public:
 
 	// Get the current text
 	virtual void GetText(OUT_Z_BYTECAP(bufferLen) char *textOut, int bufferLen);
+	template<int bufferSize>
+	void GetText(OUT_Z_ARRAY char (&buf)[bufferSize]) 
+	{
+		GetText( buf, bufferSize );
+	}
 	virtual void GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *textOut, int bufLenInBytes);
+	template<int bufferSize>
+	void GetText(OUT_Z_ARRAY wchar_t (&buf)[bufferSize]) 
+	{
+		GetText( buf, static_cast<int>(sizeof(wchar_t)) * bufferSize );
+	}
 
 	// Content alignment
 	// Get the size of the content within the label

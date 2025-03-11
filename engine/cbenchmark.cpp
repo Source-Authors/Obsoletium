@@ -115,8 +115,8 @@ void CBenchmarkResults::StopBenchmark()
 //-----------------------------------------------------------------------------
 void CBenchmarkResults::SetResultsFilename( const char *pFilename )
 {
-	Q_strncpy( m_szFilename, pFilename, sizeof( m_szFilename ) );
-	Q_DefaultExtension( m_szFilename, ".txt", sizeof( m_szFilename ) );
+	V_strcpy_safe( m_szFilename, pFilename );
+	Q_DefaultExtension( m_szFilename, ".txt" );
 }
 
 //-----------------------------------------------------------------------------

@@ -92,9 +92,20 @@ public:
 
 	virtual void SetText(const wchar_t *wszText);
 	virtual void SetText(const char *text);
-	virtual void GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInBytes);
-	virtual void GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, int bufLenInBytes);
-	virtual int GetTextLength() const;
+	virtual void GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, intp bufLenInBytes);
+	template<intp bufferSize>
+	void GetText(OUT_Z_ARRAY char (&buf)[bufferSize]) 
+	{
+		GetText( buf, bufferSize );
+	}
+
+	virtual void GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, intp bufLenInBytes);
+	template<intp bufferSize>
+	void GetText(OUT_Z_ARRAY wchar_t (&buf)[bufferSize]) 
+	{
+		GetText( buf, static_cast<intp>(sizeof(wchar_t)) * bufferSize );
+	}
+
 	virtual bool IsTextFullySelected() const;
 
 	// editing

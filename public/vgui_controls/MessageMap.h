@@ -411,7 +411,7 @@ private:
 	// Next factory in list
 	CBuildFactoryHelper	*m_pNext;
 
-	// dimhteopus: Comment unused field.
+	// dimhotepus: Comment unused field.
 	// int					m_Type;
 	PANELCREATEFUNC		m_CreateFunc;
 	char const			*m_pClassName;

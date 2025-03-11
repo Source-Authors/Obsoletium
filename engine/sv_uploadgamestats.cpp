@@ -395,7 +395,7 @@ public:
 #endif
 			char hex[ 17 ];
 			Q_memset( hex, 0, sizeof( hex ) );
-			Q_binarytohex( (const byte *)&newId, sizeof( newId ), hex, sizeof( hex ) );
+			V_binarytohex( newId, hex );
 
 			// If running at Valve, copy in the users name here
 			if ( Steam3Client().SteamUtils() && ( Steam3Client().SteamUser()->BLoggedOn() ) && 
@@ -487,8 +487,8 @@ public:
 
 		params.m_uEngineBuildNumber		= build_number();
 		Q_strncpy( params.m_sExecutableName, "hl2.exe", sizeof( params.m_sExecutableName ) );
-		Q_FileBase( com_gamedir, params.m_sGameDirectory, sizeof( params.m_sGameDirectory ) );
-		Q_FileBase( mapname, params.m_sMapName, sizeof( params.m_sMapName ) );
+		Q_FileBase( com_gamedir, params.m_sGameDirectory );
+		Q_FileBase( mapname, params.m_sMapName );
 		params.m_uStatsBlobVersion		= blobversion;
 		params.m_uStatsBlobSize			= blobsize;
 		params.m_pStatsBlobData			= ( void * )pvBlobData;

@@ -775,7 +775,7 @@ void CRConClient::SaveRemoteScreenshot( const void* pBuffer, int nBufLen )
 	} while ( g_pFullFileSystem->FileExists( pScreenshotPath, "MOD" ) );
 
 	char pFullPath[MAX_PATH];
-	GetModSubdirectory( pScreenshotPath, pFullPath, sizeof(pFullPath) );
+	GetModSubdirectory( pScreenshotPath, pFullPath );
 	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, nullptr );
 	Assert(hZip);
 	if (!hZip) return;
@@ -804,7 +804,7 @@ void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
 	} while ( g_pFullFileSystem->FileExists( pLogPath, "MOD" ) );
 
 	char pFullPath[MAX_PATH];
-	GetModSubdirectory( pLogPath, pFullPath, sizeof(pFullPath) );
+	GetModSubdirectory( pLogPath, pFullPath );
 	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, nullptr );
 	Assert(hZip);
 	if (!hZip) return;

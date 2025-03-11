@@ -215,7 +215,7 @@ void CDispInfo::TestAddDecalTri( int iIndexStart, unsigned short decalHandle, CD
 		//if( )
 		{
 			char buffer[256];
-			sprintf(buffer, "Verts: 3:%i 4+:%i (%i)\n",three, total, sizeof(CDecalVert));
+			V_sprintf_safe(buffer, "Verts: 3:%i 4+:%i (%i)\n",three, total, sizeof(CDecalVert));
 			Msg(buffer);
 		}
 		*/

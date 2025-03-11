@@ -242,7 +242,7 @@ bool CEngine::FilterTime( float dt )
 	// Dedicated's tic_rate regulates server frame rate.  Don't apply fps filter here.
 	// Only do this restriction on the client. Prevents clients from accomplishing certain
 	// hacks by pausing their client for a period of time.
-	if ( IsPC() && !sv.IsDedicated() && !CanCheat() && fps_max.GetFloat() < 30 )
+	if ( !sv.IsDedicated() && !CanCheat() && fps_max.GetFloat() < 30 )
 	{
 		// Don't do anything if fps_max=0 (which means it's unlimited).
 		if ( fps_max.GetFloat() != 0.0f )

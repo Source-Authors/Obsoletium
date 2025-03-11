@@ -119,7 +119,7 @@ void CReplayDemoRecorder::StartRecording( const char *pFilename, bool bContinuou
 
 	char szGameDir[MAX_OSPATH];
 	Q_strncpy(szGameDir, com_gamedir, sizeof( szGameDir ) );
-	Q_FileBase ( szGameDir, dh->gamedirectory, sizeof( dh->gamedirectory ) );
+	Q_FileBase ( szGameDir, dh->gamedirectory );
 
 	Q_strncpy( dh->servername, host_name.GetString(), sizeof( dh->servername ) );
 

@@ -1348,7 +1348,7 @@ bool CNetChan::ReadSubChannelData( bf_read &buf, int stream  )
 			if ( buf.ReadOneBit() ) // is it a file ?
 			{
 				data->transferID = buf.ReadUBitLong( 32 );
-				buf.ReadString( data->filename, MAX_OSPATH );
+				buf.ReadString( data->filename );
 			}
 
 			// data compressed ?
@@ -1823,7 +1823,7 @@ bool CNetChan::ProcessControlMessage( int cmd, bf_read &buf)
 	
 	if ( cmd == net_Disconnect )
 	{
-		buf.ReadString( string, sizeof(string) );
+		buf.ReadString( string );
 		m_MessageHandler->ConnectionClosing( string );
 		return false;
 	}
@@ -1832,7 +1832,7 @@ bool CNetChan::ProcessControlMessage( int cmd, bf_read &buf)
 	{
 		unsigned int transferID = buf.ReadUBitLong( 32 );
 
-		buf.ReadString( string, sizeof(string) );
+		buf.ReadString( string );
 		if ( buf.ReadOneBit() != 0 && IsValidFileForTransfer( string ) )
 		{
 			m_MessageHandler->FileRequested( string, transferID );
@@ -2121,7 +2121,7 @@ bool CNetChan::HandleUpload( dataFragments_t *data, INetChannelHandler *MessageH
 			{
 				// Make sure path exists
 				char szParentDir[ MAX_PATH ];
-				if ( !V_ExtractFilePath( data->filename, szParentDir, sizeof( szParentDir ) ) )
+				if ( !V_ExtractFilePath( data->filename, szParentDir ) )
 					szParentDir[0] = '\0';
 
 				g_pFileSystem->CreateDirHierarchy( szParentDir, pszPathID );
@@ -3166,8 +3166,10 @@ bool CNetChan::IsValidFileForTransfer( const char *pszFilename )
 	     V_stristr( szTemp, ".cmd" ) ||
 	     V_stristr( szTemp, ".dll" ) ||
 	     V_stristr( szTemp, ".so" ) ||
+	     // dimhotepus: Ban Linux kernel shared objects.
 	     V_stristr( szTemp, ".ko" ) ||
 	     V_stristr( szTemp, ".dylib" ) ||
+	     // dimhotepus: Ban MacOS kernel shared objects.
 	     V_stristr( szTemp, ".kext" ) ||
 	     V_stristr( szTemp, ".ini" ) ||
 	     V_stristr( szTemp, ".log" ) ||

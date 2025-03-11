@@ -339,10 +339,10 @@ void CDemoUIPanel::OnFileSelected( char const *fullpath )
 		return;
 
 	char relativepath[ 512 ];
-	g_pFileSystem->FullPathToRelativePath( fullpath, relativepath, sizeof( relativepath ) );
+	g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath );
 
 	char ext[ 10 ];
-	Q_ExtractFileExtension( relativepath, ext, sizeof( ext ) );
+	V_ExtractFileExtension( relativepath, ext );
 
 	if ( Q_strcasecmp( ext, "dem" ) )
 	{
@@ -869,10 +869,10 @@ void CDemoUIPanel2::OnFileSelected( char const *fullpath )
 		return;
 
 	char relativepath[ 512 ];
-	g_pFileSystem->FullPathToRelativePath( fullpath, relativepath, sizeof( relativepath ) );
+	g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath );
 
 	char ext[ 10 ];
-	Q_ExtractFileExtension( relativepath, ext, sizeof( ext ) );
+	V_ExtractFileExtension( relativepath, ext );
 
 	if ( Q_strcasecmp( ext, "dem" ) )
 	{

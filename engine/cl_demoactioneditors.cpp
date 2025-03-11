@@ -1056,7 +1056,7 @@ void CBaseActionPlaySoundStartDialog::OnFileSelected( char const *fullpath )
 		return;
 
 	char relativepath[ 512 ];
-	g_pFileSystem->FullPathToRelativePath( fullpath, relativepath, sizeof( relativepath ) );
+	g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath );
 
 	Q_FixSlashes( relativepath );
 

@@ -264,7 +264,7 @@ void CCvarUtilities::SetDirect( ConVar *var, const char *value )
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode( pszValue, unicode, sizeof( unicode ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( pszValue, unicode );
 		}
 #else
 		V_UTF8ToUnicode( pszValue, unicode, sizeof( unicode ) );
@@ -309,7 +309,7 @@ void CCvarUtilities::SetDirect( ConVar *var, const char *value )
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertUnicodeToANSI( newUnicode, szNew, sizeof( szNew ) );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( newUnicode, szNew );
 		}
 #else
 		V_UnicodeToUTF8( newUnicode, szNew, sizeof( szNew ) );

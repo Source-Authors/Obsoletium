@@ -1080,7 +1080,7 @@ void CBugUIPanel::OnSaveVMF()
 		return;
 
 	char level[ 256 ];
-	m_pLevelName->GetText( level, sizeof( level ) );
+	m_pLevelName->GetText( level );
 
 	// See if .vmf exists in assumed location
 	char localfile[ 512 ];
@@ -1181,11 +1181,11 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 		return;
 
 	char relativepath[ 512 ];
-	if ( !g_pFileSystem->FullPathToRelativePath( fullpath, relativepath, sizeof( relativepath ) ) )
+	if ( !g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath ) )
 	{
 		if ( Q_stristr( fullpath, com_basedir ) )
 		{
-			Q_snprintf( relativepath, sizeof( relativepath ), "..%s", fullpath + strlen(com_basedir) );	
+			V_sprintf_safe( relativepath, "..%s", fullpath + strlen(com_basedir) );	
 			baseDirFile = true;
 		}
 		else
@@ -1196,7 +1196,7 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 	}
 
 	char ext[ 10 ];
-	Q_ExtractFileExtension( relativepath, ext, sizeof( ext ) );
+	V_ExtractFileExtension( relativepath, ext );
 
 	if ( m_hFileOpenDialog != 0 )
 	{
@@ -1204,17 +1204,17 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 	}
 
 	includedfile inc;
-	Q_strncpy( inc.name, relativepath, sizeof( inc.name ) );
+	V_strcpy_safe( inc.name, relativepath );
 	
 	if ( baseDirFile )
 	{
-		Q_snprintf( inc.fixedname, sizeof( inc.fixedname ), "%s", inc.name+3 ); // strip the "..\"
+		V_sprintf_safe( inc.fixedname, "%s", inc.name+3 ); // strip the "..\"
 	}
 	else
 	{
-		Q_snprintf( inc.fixedname, sizeof( inc.fixedname ), "%s", inc.name );
+		V_sprintf_safe( inc.fixedname, "%s", inc.name );
 	}
-	Q_FixSlashes( inc.fixedname );
+	V_FixSlashes( inc.fixedname );
 
 	m_IncludedFiles.AddToTail( inc );
 
@@ -1222,8 +1222,8 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 	concat[ 0 ] = 0;
 	for ( int i = 0 ; i < m_IncludedFiles.Count(); ++i )
 	{
-		Q_strncat( concat, m_IncludedFiles[ i ].name, sizeof( concat), COPY_ALL_CHARACTERS );
-		Q_strncat( concat, "\n", sizeof( concat), COPY_ALL_CHARACTERS );
+		V_strcat_safe( concat, m_IncludedFiles[ i ].name );
+		V_strcat_safe( concat, "\n" );
 	}
 	m_pIncludedFiles->SetText( concat );
 }
@@ -1244,8 +1244,8 @@ void CBugUIPanel::OnIncludeFile()
 	if ( m_hFileOpenDialog )
 	{
 		char startPath[ MAX_PATH ];
-		Q_strncpy( startPath, com_gamedir, sizeof( startPath ) );
-		Q_FixSlashes( startPath );
+		V_strcpy_safe( startPath, com_gamedir );
+		V_FixSlashes( startPath );
 		m_hFileOpenDialog->SetStartDirectory( startPath );
 		m_hFileOpenDialog->DoModal( false );
 	}
@@ -1441,7 +1441,7 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	title[ 0 ] = 0;
 	desc[ 0 ] = 0;
 
-	m_pTitle->GetText( title, sizeof( title ) );
+	m_pTitle->GetText( title );
 	if ( !title[ 0 ] )
 	{
 		if ( verbose ) 
@@ -1455,7 +1455,7 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	// Only require description in public UI
 	if ( isPublic )
 	{
-		m_pDescription->GetText( desc, sizeof( desc ) );
+		m_pDescription->GetText( desc );
 		if ( !desc[ 0 ] )
 		{
 			if ( verbose ) 
@@ -1536,7 +1536,7 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	if ( isPublic )
 	{
 		char email[ 80 ];
-		m_pEmail->GetText( email, sizeof( email ) );
+		m_pEmail->GetText( email );
 		if ( email[ 0 ] != 0 &&
 			!IsValidEmailAddress( email ) )
 		{
@@ -1578,12 +1578,12 @@ bool CBugUIPanel::AddFileToZip( char const *relative )
 	}
 
 	char fullpath[ 512 ];
-	if ( g_pFileSystem->RelativePathToFullPath( relative, "GAME", fullpath, sizeof( fullpath ) ) )
+	if ( g_pFileSystem->RelativePathToFullPath_safe( relative, "GAME", fullpath ) )
 	{
 		char extension[ 32 ];
-		Q_ExtractFileExtension( relative, extension, sizeof( extension ) );
+		V_ExtractFileExtension( relative, extension );
 		char basename[ 256 ];
-		Q_FileBase( relative, basename, sizeof( basename ) );
+		V_FileBase( relative, basename );
 		char outname[ 512 ];
 		V_sprintf_safe( outname, "%s.%s", basename, extension );
 
@@ -1644,7 +1644,7 @@ void CBugUIPanel::OnSubmit()
 
 
 	char temp[ 80 ];
-	m_pTitle->GetText( temp, sizeof( temp ) );
+	m_pTitle->GetText( temp );
 
 	if ( host_state.worldmodel )
 	{
@@ -1660,14 +1660,14 @@ void CBugUIPanel::OnSubmit()
 
 	Msg( "title:  %s\n", title );
 
-	m_pDescription->GetText( desc, sizeof( desc ) );
+	m_pDescription->GetText( desc );
 
 	Msg( "description:  %s\n", desc );
 
-	m_pLevelName->GetText( level, sizeof( level ) );
-	m_pPosition->GetText( position, sizeof( position ) );
-	m_pOrientation->GetText( orientation, sizeof( orientation ) );
-	m_pBuildNumber->GetText( build, sizeof( build ) );
+	m_pLevelName->GetText( level );
+	m_pPosition->GetText( position );
+	m_pOrientation->GetText( orientation );
+	m_pBuildNumber->GetText( build );
 
 	// dimhotepus: Append steam in steam mode only
 #ifndef NO_STEAM
@@ -1931,7 +1931,7 @@ void CBugUIPanel::OnSubmit()
 		buginfo.Printf( "Misc:  %s\n", misc );
 		buginfo.Printf( "Exe:  %s\n", "hl2.exe" );
 		char gd[ 256 ];
-		Q_FileBase( com_gamedir, gd, sizeof( gd ) );
+		Q_FileBase( com_gamedir, gd );
 		buginfo.Printf( "GameDirectory:  %s\n", gd );
 		buginfo.Printf( "Ram:  %lu\n", GetRam() );
 		buginfo.Printf( "CPU:  %i\n", (int)fFrequency );
@@ -2606,7 +2606,7 @@ void CBugUIPanel::ParseDefaultParams( void )
 	g_pFileSystem->Close( hLocal );	// close file after reading
 
 	char token[64];
-	const char *pfile = COM_ParseFile(buffer, token, sizeof( token ) );
+	const char *pfile = COM_ParseFile(buffer, token);
 
 	while ( pfile )
 	{
@@ -2621,7 +2621,7 @@ void CBugUIPanel::ParseDefaultParams( void )
 			}
 		}
 
-		pfile = COM_ParseFile(pfile, token, sizeof( token ) );
+		pfile = COM_ParseFile(pfile, token);
 	}
 }
 

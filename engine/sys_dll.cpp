@@ -1352,8 +1352,8 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 	char quoted_appname_with_arg[ 512 ];
 	V_sprintf_safe(quoted_appname_with_arg, "\"%s\" \"%%1\"", appname );
 	char base_exe_name[ 256 ];
-	Q_FileBase( appname, base_exe_name, sizeof( base_exe_name) );
-	Q_DefaultExtension( base_exe_name, ".exe", sizeof( base_exe_name ) );
+	Q_FileBase( appname, base_exe_name );
+	Q_DefaultExtension( base_exe_name, ".exe" );
 
 	// HKEY_CLASSES_ROOT/Valve.Source/shell/open/command == "u:\tf2\hl2.exe" "%1" quoted
 	Sys_SetRegKeyValueUnderRoot( HKEY_CLASSES_ROOT, va( "%s\\shell\\open\\command", SOURCE_ENGINE_APP_CLASS ), "", quoted_appname_with_arg );

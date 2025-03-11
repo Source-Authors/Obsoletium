@@ -324,7 +324,7 @@ bool MD5_Hash_File(unsigned char digest[16], const char *pszFileName, bool bSeed
 	if (bSeed)
 	{
 		// Seed the hash with the seed value
-		MD5Update( &ctx, (const unsigned char *)&seed[0], 16 );
+		MD5Update( &ctx, seed, 16 );
 	}
 
 	// Now read in 1K chunks
@@ -382,7 +382,7 @@ bool MD5_Hash_Buffer( unsigned char pDigest[16], const unsigned char *pBuffer, i
 	if ( bSeed )
 	{
 		// Seed the hash with the seed value
-		MD5Update( &ctx, (const unsigned char *)&seed[0], 16 );
+		MD5Update( &ctx, &seed[0], 16 );
 	}
 
 	// Now read in 1024 chunks

@@ -158,9 +158,9 @@ const char *CClientState::GetCDKeyHash( void )
 	memset( digest, 0, sizeof( digest ) );
 
 	MD5Init(&ctx);
-	MD5Update(&ctx, (unsigned char*)szKeyBuffer, nKeyLength);
+	MD5Update(&ctx, szKeyBuffer, nKeyLength);
 	MD5Final(digest, &ctx);
-	V_strcpy_safe( szHashedKeyBuffer, MD5_Print ( digest, sizeof( digest ) ) );
+	V_strcpy_safe( szHashedKeyBuffer, MD5_Print ( digest ) );
 	return szHashedKeyBuffer;
 }
 
@@ -1157,7 +1157,7 @@ void CClientState::AddCustomFile( int slot, const char *resourceFile)
 	bool bCopy = true;
 	CCustomFilename filehex( crcValue );
 	char szAbsFilename[ MAX_PATH ];
-	if ( g_pFileSystem->RelativePathToFullPath( filehex.m_Filename, "game", szAbsFilename, sizeof(szAbsFilename), FILTER_CULLPACK ) )
+	if ( g_pFileSystem->RelativePathToFullPath_safe( filehex.m_Filename, "game", szAbsFilename, FILTER_CULLPACK ) )
 	{
 		// check if existing file already has same CRC, 
 		// then we don't need to copy it anymore
@@ -1181,7 +1181,7 @@ void CClientState::AddCustomFile( int slot, const char *resourceFile)
 
 		// Make sure dest directory exists
 		char szParentDir[ MAX_PATH ];
-		V_ExtractFilePath( filehex.m_Filename, szParentDir, sizeof(szParentDir) );
+		V_ExtractFilePath( filehex.m_Filename, szParentDir );
 		g_pFileSystem->CreateDirHierarchy( szParentDir, "download" );
 
 		// Save it
@@ -1504,7 +1504,7 @@ void CClientState::CheckUpdatingSteamResources()
 
 						if ( !allowSoundDownloads )
 						{
-							Q_ExtractFileExtension( fname, extension, sizeof( extension ) );
+							V_ExtractFileExtension( fname, extension );
 							if ( !Q_strcasecmp( extension, "wav" ) || !Q_strcasecmp( extension, "mp3" ) )
 							{
 								continue;
@@ -1514,7 +1514,7 @@ void CClientState::CheckUpdatingSteamResources()
 						if ( !allowNonMaps )
 						{
 							// The user wants maps only.
-							Q_ExtractFileExtension( fname, extension, sizeof( extension ) );
+							V_ExtractFileExtension( fname, extension );
 
 							// If the extension is not bsp, skip it.
 							if ( Q_strcasecmp( extension, "bsp" ) )

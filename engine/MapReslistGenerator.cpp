@@ -339,7 +339,7 @@ void CMapReslistGenerator::BuildEngineLogFromReslist()
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{
-		intp nTokenSize = buffer.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+		intp nTokenSize = buffer.ParseToken( &breakSet, szToken );
 		if ( nTokenSize <= 0 )
 		{
 			break;
@@ -687,7 +687,7 @@ void CMapReslistGenerator::OnResourcePrecached(const char *relativePathFileName)
 		return;
 
 	char fullPath[_MAX_PATH];
-	if (g_pFileSystem->GetLocalPath(relativePathFileName, fullPath, sizeof(fullPath)))
+	if (g_pFileSystem->GetLocalPath_safe(relativePathFileName, fullPath))
 	{
 		OnResourcePrecachedFullPath(fullPath);
 	}

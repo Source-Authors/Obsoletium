@@ -220,7 +220,7 @@ bool CGameEventManager::ParseEventList(SVC_GameEventList *msg)
 	{
 		int id = msg->m_DataIn.ReadUBitLong( MAX_EVENT_BITS );
 		char name[MAX_EVENT_NAME_LENGTH];
-		msg->m_DataIn.ReadString( name, sizeof(name) );
+		msg->m_DataIn.ReadString( name );
 
 		CGameEventDescriptor *descriptor = GetEventDescriptor( name );
 
@@ -228,7 +228,7 @@ bool CGameEventManager::ParseEventList(SVC_GameEventList *msg)
 		{
 			// event unknown to client, skip data
 			while ( msg->m_DataIn.ReadUBitLong( 3 ) )
-				msg->m_DataIn.ReadString( name, sizeof(name) );
+				msg->m_DataIn.ReadString( name );
 
 			continue;
 		}
@@ -243,7 +243,7 @@ bool CGameEventManager::ParseEventList(SVC_GameEventList *msg)
 
 		while ( datatype != TYPE_LOCAL )
 		{
-			msg->m_DataIn.ReadString( name, sizeof(name) );
+			msg->m_DataIn.ReadString( name );
 			descriptor->keys->SetInt( name, datatype );
 
 			datatype = msg->m_DataIn.ReadUBitLong( 3 );
@@ -551,7 +551,7 @@ IGameEvent *CGameEventManager::UnserializeEvent( bf_read *buf)
 		switch ( type )
 		{
 			case TYPE_LOCAL		: break; // ignore 
-			case TYPE_STRING	: if ( buf->ReadString( databuf, sizeof(databuf) ) )
+			case TYPE_STRING	: if ( buf->ReadString( databuf ) )
 									event->SetString( keyName, databuf );
 								  break;
 			case TYPE_FLOAT		: event->SetFloat( keyName, buf->ReadFloat() ); break;

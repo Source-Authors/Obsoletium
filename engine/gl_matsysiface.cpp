@@ -148,8 +148,8 @@ CON_COMMAND_F( mat_crosshair_edit, "open the material under the crosshair in the
 	else
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vmt", pMaterial->GetName() );
-		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+		V_sprintf_safe( chResolveNameArg, "materials/%s.vmt", pMaterial->GetName() );
+		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 		if ( p4 )
 		{
 			CP4AutoEditAddFile autop4( szResolvedName );
@@ -175,10 +175,10 @@ CON_COMMAND_F( mat_crosshair_explorer, "open the material under the crosshair in
 	else
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vmt", pMaterial->GetName() );
-		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+		V_sprintf_safe( chResolveNameArg, "materials/%s.vmt", pMaterial->GetName() );
+		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 		char params[256];
-		Q_snprintf( params, sizeof( params ) - 1, "/E,/SELECT,%s", szResolvedName );
+		V_sprintf_safe( params, "/E,/SELECT,%s", szResolvedName );
 		vgui::system()->ShellExecuteEx( "open", "explorer.exe", params );
 	}
 }

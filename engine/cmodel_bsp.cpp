@@ -998,7 +998,7 @@ void CollisionBSPData_LoadAreaPortals( CCollisionBSPData *pBSPData )
 	pBSPData->numareaportals = count;
 	pBSPData->map_areaportals.Attach( count, Hunk_Alloc<dareaportal_t>( count ) );
 
-	Assert( count * sizeof(dareaportal_t) >= lh.LumpSize() ); 
+	Assert( count * static_cast<intp>(sizeof(dareaportal_t)) >= lh.LumpSize() ); 
 	memcpy( pBSPData->map_areaportals.Base(), in, lh.LumpSize() );
 }
 

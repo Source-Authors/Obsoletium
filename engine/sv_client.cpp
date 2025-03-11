@@ -535,7 +535,7 @@ bool CGameClient::ProcessIncomingLogo( const char *filename )
 {
 	char crcfilename[ 512 ];
 	char logohex[ 16 ];
-	Q_binarytohex( (byte *)&logo, sizeof( logo ), logohex, sizeof( logohex ) );
+	V_binarytohex( logo, logohex );
 
 	Q_snprintf( crcfilename, sizeof( crcfilename ), "materials/decals/downloads/%s.vtf", logohex );
 

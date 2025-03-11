@@ -553,7 +553,7 @@ void CMapLoadHelper::InitFromMemory( model_t *pMapModel, const void *pData, int 
 	V_memset( &s_MapLumpFiles, 0, sizeof( s_MapLumpFiles ) );
 
 	V_strcpy_safe( s_szMapName, pMapModel->strName );
-	V_FileBase( s_szMapName, s_szLoadName, sizeof( s_szLoadName ) );
+	V_FileBase( s_szMapName, s_szLoadName );
 
 	s_MapBuffer.SetExternalBuffer( (void *)pData, nDataSize, nDataSize );
 
@@ -1335,7 +1335,7 @@ void Mod_LoadOcclusion( void )
 				doccluderdataV1_t temp;
 				for ( int i = 0; i < b->numoccluders; ++i )
 				{
-					buf.Get( &temp, sizeof(doccluderdataV1_t) );
+					buf.Get( temp );
 					memcpy( &b->occluders[i], &temp, sizeof(doccluderdataV1_t) );
 					b->occluders[i].area = 1;
 				}
@@ -3077,7 +3077,7 @@ class CResourcePreloadModel : public CResourcePreload
 				// 360 reads its specialized bsp into memory,
 				// up to the pack lump, which is guranateed last
 				char szLoadName[MAX_PATH];
-				V_FileBase( pMapModel->strName, szLoadName, sizeof( szLoadName ) );
+				V_FileBase( pMapModel->strName, szLoadName );
 				CMapLoadHelper::Init( pMapModel, szLoadName );
 				int nBytesToRead = CMapLoadHelper::LumpOffset( LUMP_PAKFILE );
 				CMapLoadHelper::Shutdown();
@@ -3111,7 +3111,7 @@ class CResourcePreloadModel : public CResourcePreload
 			MEM_ALLOC_CREDIT_( "CResourcePreloadModel(MDL)" );
 
 			char szFilename[MAX_PATH];
-			V_ComposeFileName( "models", pName, szFilename, sizeof( szFilename ) );			
+			V_ComposeFileName( "models", pName, szFilename );
 	
 			// find model or create empty entry
 			model_t *pModel = g_ModelLoader.FindModel( szFilename );
@@ -3508,7 +3508,7 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 	double st = Plat_FloatTime();
 
 	// Set the name of the current model we are loading
-	Q_FileBase( mod->strName, m_szLoadName, sizeof( m_szLoadName ) );
+	Q_FileBase( mod->strName, m_szLoadName );
 
 	// load the file
 	if ( developer.GetInt() > 1 )
@@ -3558,10 +3558,10 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 
 			// the map may have explicit texture exclusion
 			// the texture state needs to be established before any loading work
-			if ( IsX360() || mat_excludetextures.GetBool() )
+			if ( mat_excludetextures.GetBool() )
 			{
 				char szExcludePath[MAX_PATH];
-				sprintf( szExcludePath, "//MOD/maps/%s_exclude.lst", m_szLoadName );
+				V_sprintf_safe( szExcludePath, "//MOD/maps/%s_exclude.lst", m_szLoadName );
 				g_pMaterialSystem->SetExcludedTextures( szExcludePath );
 			}
 
@@ -3647,7 +3647,7 @@ static void BuildSpriteLoadName( const char *pName, char *pOut, int outLen, bool
 	else
 	{
 		char szBase[MAX_PATH];
-		Q_FileBase( pName, szBase, sizeof( szBase ) );
+		Q_FileBase( pName, szBase );
 		Q_snprintf( pOut, outLen, "sprites/%s", szBase );
 	}
 	
@@ -3671,8 +3671,8 @@ int CModelLoader::GetModelFileSize( char const *name )
 	if ( Q_stristr( model->strName, ".spr" ) || Q_stristr( model->strName, ".vmt" ) )
 	{
 		char spritename[ MAX_PATH ];
-		Q_StripExtension( va( "materials/%s", model->strName.String() ), spritename, MAX_PATH );
-		Q_DefaultExtension( spritename, ".vmt", sizeof( spritename ) );
+		Q_StripExtension( va( "materials/%s", model->strName.String() ), spritename );
+		Q_DefaultExtension( spritename, ".vmt" );
 
 		size = COM_FileSize( spritename );
 	}
@@ -5193,7 +5193,7 @@ void CModelLoader::Map_LoadDisplacements( model_t *pModel, bool bRestoring )
 		return;
 	}
 	
-	Q_FileBase( pModel->strName, m_szLoadName, sizeof( m_szLoadName ) );
+	Q_FileBase( pModel->strName, m_szLoadName );
 	CMapLoadHelper::Init( pModel, m_szLoadName );
 
     DispInfo_LoadDisplacements( pModel, bRestoring );

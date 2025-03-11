@@ -2130,7 +2130,7 @@ bool CEngineClient::StartDemoRecording( const char *pszFilename, const char *psz
 	}
 
 	// remove .dem extension if it exists
-	Q_StripExtension( szTemp, szFinal, sizeof( szFinal ) );
+	Q_StripExtension( szTemp, szFinal );
 
 	// record it
 	demorecorder->StartRecording( szFinal, false );
@@ -2197,7 +2197,7 @@ void CEngineClient::TakeScreenshot( const char *pszFilename, const char *pszFold
 		V_sprintf_safe( szFinal, "%s", pszFilename );
 	}
 
-	V_SetExtension( szFinal, ".tga", sizeof( szFinal ) ); 
+	V_SetExtension( szFinal, ".tga" ); 
 
 	videomode->TakeSnapshotTGA( szFinal );
 
