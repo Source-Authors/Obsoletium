@@ -90,6 +90,7 @@ public:
 	FloatBitMap_t(char const *filename);                   // read one from a file (tga or pfm)
 	FloatBitMap_t(FloatBitMap_t const *orig);
 
+	// dimhotepus: Add API to check validity.
 	[[nodiscard]] bool IsValid() const { return RGBAData != nullptr; }
 
 	// quantize one to 8 bits

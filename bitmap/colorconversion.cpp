@@ -500,7 +500,7 @@ static void ConvertFromDXT1( const uint8 *src, CDestPixel *dst, int width, int h
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -562,7 +562,7 @@ static void ConvertFromDXT5( const uint8 *src, CDestPixel *dst, int width, int h
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -642,7 +642,7 @@ static void ConvertFromDXT5IgnoreAlpha( const uint8 *src, CDestPixel *dst, int w
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -714,7 +714,7 @@ static void ConvertFromATIxN( const uint8 *src, CDestPixel *dst, int width, int 
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );

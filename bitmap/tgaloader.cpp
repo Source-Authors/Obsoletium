@@ -127,7 +127,7 @@ static bool ReadFile( char const* pFileName, CTempImage& image, int maxbytes = -
 //-----------------------------------------------------------------------------
 static void ReadHeader( CUtlBuffer& buf, TGAHeader_t& header )
 {
-	buf.Get( &header, sizeof(TGAHeader_t) );
+	buf.Get( header );
 }
 
 

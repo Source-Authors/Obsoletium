@@ -91,10 +91,10 @@ float & FloatImagePyramid_t::Pixel(int x, int y, int component, int level) const
 
 void FloatImagePyramid_t::WriteTGAs(char const *basename) const
 {
+	char bname_out[1024];
 	for(int l=0;l<m_nLevels;l++)
 	{
-		char bname_out[1024];
-		Q_snprintf(bname_out,sizeof(bname_out),"%s_%02d.tga",basename,l);
+		V_sprintf_safe(bname_out,"%s_%02d.tga",basename,l);
 		m_pLevels[l]->WriteTGAFile(bname_out);
 	}
 
