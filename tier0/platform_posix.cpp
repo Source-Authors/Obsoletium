@@ -1064,9 +1064,8 @@ void DumpMemoryLog( int nThresh )
 
 	std::sort( memList.begin(), memList.end(), SortLessFunc );
 	
-	for( size_t i = 0; i < memList.size(); i++ )
+	for( auto *p : memList )
 	{
-		CLinuxMallocContext *p = memList[i];
 		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
 		Msg( "Context cursize=%d nallocs=%d maxsize=%d total_allocs=%d\n", p->m_nCurrentAllocSize, p->m_nNumAllocsInUse, p->m_nMaximumSize, p->m_TotalNumAllocs );
 		Msg("  stack\n" );
@@ -1098,9 +1097,8 @@ void DumpChangedMemory( int nThresh )
 	}
 
 	std::sort( memList.begin(), memList.end(), SortLessFunc );
-	for( size_t i = 0; i < memList.size(); i++ )
+	for( auto *p : memList )
 	{
-		CLinuxMallocContext *p = memList[i];
 		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
 		Msg( "Context cursize=%d lastsize=%d nallocs=%d maxsize=%d total_allocs=%d\n", p->m_nCurrentAllocSize, p->m_nLastAllocSize, p->m_nNumAllocsInUse, p->m_nMaximumSize, p->m_TotalNumAllocs );
 		Msg("  stack\n" );
