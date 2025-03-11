@@ -18,9 +18,9 @@
 //-----------------------------------------------------------------------------
 // Find sequence by name 
 //-----------------------------------------------------------------------------
-static int LookupSequence( CStudioHdr *pStudioHdr, const char *pSequenceName )
+static intp LookupSequence( CStudioHdr *pStudioHdr, const char *pSequenceName )
 {
-	for ( int i = 0; i < pStudioHdr->GetNumSeq(); i++ )
+	for ( intp i = 0; i < pStudioHdr->GetNumSeq(); i++ )
 	{
 		if ( !Q_stricmp( pSequenceName, pStudioHdr->pSeqdesc( i ).pszLabel() ) )
 			return i;
@@ -32,7 +32,7 @@ static int LookupSequence( CStudioHdr *pStudioHdr, const char *pSequenceName )
 //-----------------------------------------------------------------------------
 // Returns sequence flags 
 //-----------------------------------------------------------------------------
-static int GetSequenceFlags( CStudioHdr *pStudioHdr, int nSequence )
+static int GetSequenceFlags( CStudioHdr *pStudioHdr, intp nSequence )
 {
 	if ( !pStudioHdr || nSequence < 0 || nSequence >= pStudioHdr->GetNumSeq() )
 		return 0;
@@ -44,7 +44,7 @@ static int GetSequenceFlags( CStudioHdr *pStudioHdr, int nSequence )
 //-----------------------------------------------------------------------------
 // Does a sequence loop? 
 //-----------------------------------------------------------------------------
-static bool DoesSequenceLoop( CStudioHdr *pStudioHdr, int nSequence )
+static bool DoesSequenceLoop( CStudioHdr *pStudioHdr, intp nSequence )
 {
 	int nFlags = GetSequenceFlags( pStudioHdr, nSequence );
 	bool bLooping = ( nFlags & STUDIO_LOOPING ) ? true : false;
@@ -57,11 +57,11 @@ static bool DoesSequenceLoop( CStudioHdr *pStudioHdr, int nSequence )
 //-----------------------------------------------------------------------------
 bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPoseParameters, bool )
 {
-	int iSequence = LookupSequence( pStudioHdr, e->GetParameters() );
+	intp iSequence = LookupSequence( pStudioHdr, e->GetParameters() );
 	if ( iSequence < 0 )
 		return false;
 
-	KeyValues::AutoDelete pSeqKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD pSeqKeyValues("");
 	if ( !pSeqKeyValues->LoadFromBuffer( pStudioHdr->pszName(), Studio_GetKeyValueText( pStudioHdr, iSequence ) ) )
 	{
 		return false;
@@ -84,31 +84,30 @@ bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPosePa
 
 	for ( KeyValues *pkvFaceposer = pKVAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
 	{
-		if ( !Q_stricmp( pkvFaceposer->GetName(), "startloop" ) )
+		// dimhotepus: Precache name.
+		const char *name = pkvFaceposer->GetName();
+
+		if ( !Q_stricmp( name, "startloop" ) )
 		{
-			Q_strncpy( szStartLoop, pkvFaceposer->GetString(), sizeof(szStartLoop) );
+			V_strcpy_safe( szStartLoop, pkvFaceposer->GetString() );
 			continue;
 		}
-		
-		if ( !Q_stricmp( pkvFaceposer->GetName(), "endloop" ) )
+		else if ( !Q_stricmp( name, "endloop" ) )
 		{
-			Q_strncpy( szEndLoop, pkvFaceposer->GetString(), sizeof(szEndLoop) );
+			V_strcpy_safe( szEndLoop, pkvFaceposer->GetString() );
 			continue;
 		}
-		
-		if ( !Q_stricmp( pkvFaceposer->GetName(), "entrytag" ) )
+		else if ( !Q_stricmp( name, "entrytag" ) )
 		{
-			Q_strncpy( szEntry, pkvFaceposer->GetString(), sizeof(szEntry) );
+			V_strcpy_safe( szEntry, pkvFaceposer->GetString() );
 			continue;
 		}
-		
-		if ( !Q_stricmp( pkvFaceposer->GetName(), "exittag" ) )
+		else if ( !Q_stricmp( name, "exittag" ) )
 		{
-			Q_strncpy( szExit, pkvFaceposer->GetString(), sizeof(szExit) );
+			V_strcpy_safe( szExit, pkvFaceposer->GetString() );
 			continue;
 		}
-		
-		if ( !Q_stricmp( pkvFaceposer->GetName(), "tags" ) )
+		else if ( !Q_stricmp( name, "tags" ) )
 		{
 			if ( nMaxFrame <= 0 )
 				continue;
@@ -141,8 +140,7 @@ bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPosePa
 
 	// FIXME: lookup linear tags in sequence data
 	{
-		CEventAbsoluteTag *ptag;
-		ptag = e->FindAbsoluteTag( CChoreoEvent::ORIGINAL, szStartLoop );
+		CEventAbsoluteTag *ptag = e->FindAbsoluteTag( CChoreoEvent::ORIGINAL, szStartLoop );
 		if (ptag)
 		{
 			ptag->SetLinear( true );
@@ -201,7 +199,7 @@ bool UpdateGestureLength( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPoseP
 	if ( e->GetType() != CChoreoEvent::GESTURE )
 		return false;
 
-	int iSequence = LookupSequence( pStudioHdr, e->GetParameters() );
+	intp iSequence = LookupSequence( pStudioHdr, e->GetParameters() );
 	if ( iSequence < 0 )
 		return false;
 
@@ -240,7 +238,7 @@ bool UpdateSequenceLength( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPose
 		return false;
 	}
 
-	int iSequence = LookupSequence( pStudioHdr, e->GetParameters() );
+	intp iSequence = LookupSequence( pStudioHdr, e->GetParameters() );
 	if ( iSequence < 0 )
 		return false;
 
