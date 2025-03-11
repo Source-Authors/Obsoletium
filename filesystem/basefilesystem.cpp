@@ -388,7 +388,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 		if ( pRemotePath && pBasePath )
 		{
 			// the optional exclude path file only exists at the remote path
-			V_ComposeFileName( pRemotePath, "xbox_exclude_paths.txt", szExcludeFile, sizeof( szExcludeFile ) );
+			V_ComposeFileName( pRemotePath, "xbox_exclude_paths.txt", szExcludeFile );
 
 			// populate the exclusion list
 			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
@@ -400,7 +400,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 				char szToken[MAX_PATH];
 				for ( ;; )
 				{
-					intp nTokenSize = buf.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+					intp nTokenSize = buf.ParseToken( &breakSet, szToken );
 					if ( nTokenSize <= 0 )
 					{
 						break;
@@ -413,8 +413,8 @@ InitReturnVal_t CBaseFileSystem::Init()
 						pToken++;
 					}
 
-					V_ComposeFileName( pBasePath, pToken, szPath, sizeof( szPath ) );
-					V_AppendSlash( szPath, sizeof( szPath ) );
+					V_ComposeFileName( pBasePath, pToken, szPath );
+					V_AppendSlash( szPath );
 					
 					FileNameHandle_t hFileName = FindOrAddFileName( szPath );
 					if ( m_ExcludePaths.Find( hFileName ) == -1 )
@@ -770,8 +770,8 @@ void CBaseFileSystem::AddVPKFile( char const *pPath, const char *pPathID, Search
 #if defined( SUPPORT_PACKED_STORE )
 	char nameBuf[MAX_PATH];
 
-	Q_MakeAbsolutePath( nameBuf, sizeof( nameBuf ), pPath );
-	Q_FixSlashes( nameBuf );
+	V_MakeAbsolutePath( nameBuf, pPath );
+	V_FixSlashes( nameBuf );
 
 	CUtlSymbol pathIDSym = g_PathIDTable.AddString( pPathID );
 
@@ -828,8 +828,8 @@ bool CBaseFileSystem::RemoveVPKFile( const char *pPath, const char *pPathID )
 #if defined( SUPPORT_PACKED_STORE )
 	char nameBuf[MAX_PATH];
 
-	Q_MakeAbsolutePath( nameBuf, sizeof( nameBuf ), pPath );
-	Q_FixSlashes( nameBuf );
+	V_MakeAbsolutePath( nameBuf, pPath );
+	V_FixSlashes( nameBuf );
 
 	CUtlSymbol pathIDSym = g_PathIDTable.AddString( pPathID );
 
@@ -941,7 +941,7 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 		char pakfile[MAX_PATH];
 		char fullpath[MAX_PATH];
 		V_snprintf( pakfile, sizeof( pakfile ), PACK_NAME_FORMAT, i );
-		V_ComposeFileName( pPath, pakfile, fullpath, sizeof( fullpath ) );
+		V_ComposeFileName( pPath, pakfile, fullpath );
 
 		struct _stat buf;
 		if ( FS_stat( fullpath, &buf ) == -1 )
@@ -967,7 +967,7 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 			char pakfile[MAX_PATH];
 			char fullpath[MAX_PATH];
 			V_snprintf( pakfile, sizeof( pakfile ), PACK_LOCALIZED_NAME_FORMAT, i, XBX_GetLanguageString() );
-			V_ComposeFileName( pPath, pakfile, fullpath, sizeof( fullpath ) );
+			V_ComposeFileName( pPath, pakfile, fullpath );
 
 			struct _stat buf;
 			if ( FS_stat( fullpath, &buf ) == -1 )
@@ -986,7 +986,7 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 	for ( intp i = pakcount-1; i >= 0; i-- )
 	{
 		char fullpath[MAX_PATH];
-		V_ComposeFileName( pPath, pakNames[i].Get(), fullpath, sizeof( fullpath ) );
+		V_ComposeFileName( pPath, pakNames[i].Get(), fullpath );
 
 		intp nIndex;
 		if ( addType == PATH_ADD_TO_TAIL )
@@ -1111,7 +1111,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	}
 	else
 	{
-		if ( !GetLocalPath( newPath, fullpath, sizeof(fullpath) ) )
+		if ( !GetLocalPath_safe( newPath, fullpath ) )
 		{
 			// Couldn't find that .bsp file!!!
 			return;
@@ -1365,11 +1365,11 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 	{
 		if ( IsX360() || Q_IsAbsolutePath( pPath ) )
 		{
-			Q_strncpy( newPath, pPath, sizeof( newPath ) );
+			V_strcpy_safe( newPath, pPath );
 		}
 		else
 		{
-			Q_MakeAbsolutePath( newPath, sizeof(newPath), pPath );
+			V_MakeAbsolutePath( newPath, pPath );
 		}
 #ifdef _WIN32
 		Q_strlower( newPath );
@@ -1967,7 +1967,7 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 				// Make sure the directory actually exists in case the ZIP doesn't list it (our zip utils create zips like this)
 				char szFilePath[ MAX_PATH ];
 				Q_strncpy( szFilePath, szFinalName, sizeof(szFilePath) );
-				Q_StripFilename( szFilePath );
+				V_StripFilename( szFilePath );
 				CreateDirHierarchy( szFilePath, pPath );
 
 				WriteFile( szFinalName, pPath, fileBuffer );
@@ -2023,7 +2023,7 @@ void CBaseFileSystem::LogFileAccess( const char *pFullFileName )
 
 		char tmp[ MAX_FILEPATH ];
 		V_strcpy_safe( tmp, targetPath );
-		Q_StripFilename( tmp );
+		V_StripFilename( tmp );
 
 		fprintf( m_pLogFile, "mkdir \"%s\"\n", tmp ); // STEAM OK
 		fprintf( m_pLogFile, "%s", buf ); // STEAM OK
@@ -3104,7 +3104,6 @@ void CBaseFileSystem::Flush( FileHandle_t file )
 	}
 
 	fh->Flush();
-
 }
 
 bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
@@ -3122,12 +3121,9 @@ bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
 	if ( !f )
 		return false;
 
-	// not for consoles, the read discard is a negative benefit, slow and clobbers small drive caches
-	if ( IsPC() )
-	{
-		char buffer[16384];
+	// dimhotepus: Double buffer size.
+	char buffer[65535];
 		while( sizeof(buffer) == Read(buffer,sizeof(buffer),f) );
-	}
 
 	Close( f );
 
@@ -3411,17 +3407,17 @@ bool CBaseFileSystem::CheckVPKFileHash( int PackFileID, int nPackFileNumber, int
 		{
 			CPackedStoreFileHandle fhandle = pVPK->GetHandleForHashingFiles();
 			fhandle.m_nFileNumber = nPackFileNumber;
-			char szFileName[MAX_PATH];
 
-			pVPK->GetPackFileName( fhandle, szFileName, sizeof(szFileName) );
+			char szFileName[MAX_PATH];
+			pVPK->GetPackFileName( fhandle, szFileName );
 
 			char hex[ 34 ];
 			Q_memset( hex, 0, sizeof( hex ) );
-			Q_binarytohex( (const byte *)md5Value.bits, sizeof( md5Value.bits ), hex, sizeof( hex ) );
+			V_binarytohex( md5Value.bits, hex );
 
 			char hex2[ 34 ];
 			Q_memset( hex2, 0, sizeof( hex2 ) );
-			Q_binarytohex( (const byte *)fileHashFraction.m_md5contents.bits, sizeof( fileHashFraction.m_md5contents.bits ), hex2, sizeof( hex2 ) );
+			V_binarytohex( fileHashFraction.m_md5contents.bits, hex2 );
 
 			if ( Q_memcmp( fileHashFraction.m_md5contents.bits, md5Value.bits, sizeof(md5Value.bits) ) != 0 )
 			{
@@ -4155,7 +4151,7 @@ bool CBaseFileSystem::FixUpPath( const char *pFileName, char *pFixedUpFileName, 
 
 		//  Need to get "BASE_PATH" from the filesystem paths, and then check this name against it.
 		//
-		iBaseLength = GetSearchPath( "BASE_PATH", true, pBaseDir, sizeof( pBaseDir ) );
+		iBaseLength = GetSearchPath_safe( "BASE_PATH", true, pBaseDir );
 		if ( iBaseLength )
 		{
 			//  If the first part of the pFixedUpFilename is pBaseDir
@@ -4408,7 +4404,7 @@ bool CBaseFileSystem::GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_C
 
 	char szCurrentDir[MAX_PATH];
 	V_strcpy_safe( szCurrentDir, pFullPath );
-	V_StripLastDir( szCurrentDir, sizeof( szCurrentDir ) );
+	V_StripLastDir( szCurrentDir );
 
 	CUtlString strSearchName = pFullPath;
 	strSearchName.StripTrailingSlash();
@@ -4524,7 +4520,7 @@ bool CBaseFileSystem::RenameFile( char const *pOldPath, char const *pNewPath, co
 	char szScratchFileName[MAX_PATH];
 
 	// The source file may be in a fallback directory, so just resolve the actual path, don't assume pathid...
-	RelativePathToFullPath( pOldPath, pOldPathId, szScratchFileName, sizeof( szScratchFileName ) );
+	RelativePathToFullPath_safe( pOldPath, pOldPathId, szScratchFileName );
 
 	// Figure out the dest path
 	if ( !Q_IsAbsolutePath( pNewPath ) )
@@ -4539,7 +4535,7 @@ bool CBaseFileSystem::RenameFile( char const *pOldPath, char const *pNewPath, co
 	// Make sure the directory exitsts, too
 	char pPathOnly[ MAX_PATH ];
 	Q_strncpy( pPathOnly, pNewFileName, sizeof( pPathOnly ) );
-	Q_StripFilename( pPathOnly );
+	V_StripFilename( pPathOnly );
 	CreateDirHierarchy( pPathOnly, pathID );
 
 	// Now copy the file over
@@ -4804,10 +4800,10 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::CSearchPathsIterator::GetNext()
 				bool bIgnorePath = false;
 				char szExcludePath[MAX_PATH];
 				char szFilename[MAX_PATH];
-				V_ComposeFileName( pSearchPath->GetPathString(), m_Filename, szFilename, sizeof( szFilename ) );
+				V_ComposeFileName( pSearchPath->GetPathString(), m_Filename, szFilename );
 				for ( auto &ep : m_ExcludePaths )
 				{
-					if ( g_pFullFileSystem->String( ep, szExcludePath, sizeof( szExcludePath ) ) )
+					if ( g_pFullFileSystem->String( ep, szExcludePath ) )
 					{
 						if ( !V_strnicmp( szFilename, szExcludePath, strlen( szExcludePath ) ) )
 						{
@@ -5084,7 +5080,7 @@ bool CBaseFileSystem::GetFileTypeForFullPath( char const *pFullPath, wchar_t *bu
 #endif
 	{
 		char ext[32];
-		Q_ExtractFileExtension( pFullPath, ext, sizeof( ext ) );
+		V_ExtractFileExtension( pFullPath, ext );
 #ifdef POSIX		
 		_snwprintf( buf, ( bufSizeInBytes / sizeof( wchar_t ) ) - 1, L"%s File", V_strupr( ext ) ); // Matches what Windows does
 #else
@@ -5382,7 +5378,7 @@ int CFileHandle::Write( const void* pBuffer, int nLength )
 		return 0;
 	}
 
-	size_t nBytesWritten = m_fs->FS_fwrite( (void*)pBuffer, nLength, m_pFile  );
+	size_t nBytesWritten = m_fs->FS_fwrite( pBuffer, nLength, m_pFile  );
 
 	m_fs->Trace_FWrite(nBytesWritten,m_pFile);
 

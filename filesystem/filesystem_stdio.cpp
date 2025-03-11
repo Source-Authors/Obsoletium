@@ -859,15 +859,11 @@ void CStdioFile::FS_setbufsize( unsigned nBytes )
 #ifdef _WIN32
 	if ( nBytes )
 	{
-		setvbuf( m_pFile, NULL, _IOFBF,  32768 );
+		setvbuf( m_pFile, NULL, _IOFBF, 32768 );
 	}
 	else
 	{
-		setvbuf( m_pFile, NULL, _IONBF,  0 );
-#if defined(_MSC_VER) && ( _MSC_VER < 1900 )
-		// hack to make microsoft stdio not always read one stray byte on odd sized files
-		m_pFile->_bufsiz = 1;
-#endif
+		setvbuf( m_pFile, NULL, _IONBF, 0 );
 	}
 #endif
 }
@@ -1047,7 +1043,7 @@ int GetSectorSize( const char *pszFilename )
 	char szAbsoluteFilename[MAX_FILEPATH];
 	if ( pszFilename[1] != ':' )
 	{
-		Q_MakeAbsolutePath( szAbsoluteFilename, sizeof(szAbsoluteFilename), pszFilename );
+		V_MakeAbsolutePath( szAbsoluteFilename, pszFilename );
 		pszFilename = szAbsoluteFilename;
 	}
 

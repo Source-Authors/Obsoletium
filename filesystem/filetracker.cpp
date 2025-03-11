@@ -424,7 +424,7 @@ void CFileTracker2::AddFileHashForVPKFile( int nPackFileNumber, int nFileFractio
 
 	char szDataFileName[MAX_PATH];
 	VPKHandle.m_nFileNumber = nPackFileNumber;
-	VPKHandle.GetPackFileName( szDataFileName, sizeof(szDataFileName) );
+	VPKHandle.GetPackFileName( szDataFileName );
 	const char *pszFileName = V_GetFileName( szDataFileName );
 
 	TrackedVPKFile_t trackedVPKFile;

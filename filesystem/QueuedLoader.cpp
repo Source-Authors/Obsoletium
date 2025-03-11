@@ -906,7 +906,7 @@ bool CQueuedLoader::AddJob( const LoaderJob_t *pLoaderJob )
 		PathTypeFilter_t pathFilter = FILTER_NONE;
 
 		PathTypeQuery_t pathType;
-		g_pFullFileSystem->RelativePathToFullPath( pLoaderJob->m_pFilename, pLoaderJob->m_pPathID, szFullPath, sizeof( szFullPath ), pathFilter, &pathType );
+		g_pFullFileSystem->RelativePathToFullPath_safe( pLoaderJob->m_pFilename, pLoaderJob->m_pPathID, szFullPath, pathFilter, &pathType );
 		bExists = V_IsAbsolutePath( szFullPath );
 		pFullPath = szFullPath;
 		bFileIsFromBSP = ( (pathType & PATH_IS_MAPPACKFILE) != 0 );
@@ -1480,7 +1480,7 @@ void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{
-		intp nTokenSize = resourceList.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+		intp nTokenSize = resourceList.ParseToken( &breakSet, szToken );
 		if ( nTokenSize <= 0 )
 		{
 			break;

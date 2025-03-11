@@ -388,7 +388,7 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 	//
 	// Parse the wildcard string into a base and extension used for string comparisons
 	//
-	V_strncpy( szWildCard, pRawWildCard, sizeof( szWildCard ) );
+	V_strcpy_safe( szWildCard, pRawWildCard );
 	V_FixSlashes( szWildCard, '/' );
 	V_RemoveDotSlashes( szWildCard, '/', /* bRemoveDoubleSlashes */ true );
 
@@ -396,16 +396,16 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 	size_t nLenWildCard = V_strlen( szWildCard );
 	if ( nLenWildCard && szWildCard[ nLenWildCard - 1 ] == '/' )
 	{
-		V_strncpy( szWildCardPath, szWildCard, sizeof( szWildCardPath ) );
+		V_strcpy_safe( szWildCardPath, szWildCard );
 	}
 	else
 	{
-		V_ExtractFilePath( szWildCard, szWildCardPath, sizeof( szWildCardPath ) );
+		V_ExtractFilePath( szWildCard, szWildCardPath );
 	}
 
-	V_FileBase( szWildCard, szWildCardBase, sizeof( szWildCardBase ) );
+	V_FileBase( szWildCard, szWildCardBase );
 	bool bWildcardHasExt = !!V_strrchr( szWildCard, '.' );
-	V_ExtractFileExtension( szWildCard, szWildCardExt, sizeof( szWildCardExt ) );
+	V_ExtractFileExtension( szWildCard, szWildCardExt );
 
 	// From the pattern, we now have the directory path up to the file pattern, the filename base, and the filename
 	// extension.
@@ -471,7 +471,7 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 			}
 			else
 			{
-				V_strncpy( szCandidateBaseName, szCandidateName + nLenWildcardPath, sizeof( szCandidateBaseName ) );
+				V_strcpy_safe( szCandidateBaseName, szCandidateName + nLenWildcardPath );
 			}
 
 			char *pExt = strchr( szCandidateBaseName, '.' );
@@ -543,25 +543,11 @@ void CZipPackFile::SetupPreloadData()
 	MEM_ALLOC_CREDIT_( "xZip" );
 
 	void *pPreload;
-#if defined ( _X360 )
-	if ( m_pSection )
-	{
-		pPreload = (byte*)m_pSection + m_nPreloadSectionOffset;
-	}
-	else
-#endif
 	{
 		pPreload = malloc( m_nPreloadSectionSize );
 		if ( !pPreload )
 		{
 			return;
-		}
-
-		if ( IsX360() )
-		{
-			// 360 XZips are always dvd aligned
-			Assert( ( m_nPreloadSectionSize % XBOX_DVD_SECTORSIZE ) == 0 );
-			Assert( ( m_nPreloadSectionOffset % XBOX_DVD_SECTORSIZE ) == 0 );
 		}
 
 		// preload data is loaded as a single unbuffered i/o operation
@@ -589,15 +575,7 @@ void CZipPackFile::DiscardPreloadData()
 		return;
 	}
 
-#if defined ( _X360 )
-	// a section is an alias, the header becomes an alias, not owned memory
-	if ( !m_pSection )
-	{
-		free( m_pPreloadHeader );
-	}
-#else
 	free( m_pPreloadHeader );
-#endif
 	m_pPreloadHeader = NULL;
 }
 
@@ -684,16 +662,6 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	}
 	else
 	{
-		if ( IsX360() )
-		{
-			// all 360 zip files are expected to have preload sections
-			// only during development, maps are allowed to lack them, due to auto-conversion
-			if ( !m_bIsMapPath || g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT )
-			{
-				Warning( "ZipFile '%s' missing preload section\n", m_ZipName.String() );
-			}
-		}
-
 		// No preload section, reset buffer pointer
 		zipDirBuff.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 	}
@@ -774,10 +742,6 @@ CZipPackFile::CZipPackFile( CBaseFileSystem* fs, [[maybe_unused]] void *pSection
 	m_pPreloadRemapTable = NULL;
 	m_nPreloadSectionOffset = 0;
 	m_nPreloadSectionSize = 0;
-
-#if defined( _X360 )
-	m_pSection = pSection;
-#endif
 }
 
 CZipPackFile::~CZipPackFile()
