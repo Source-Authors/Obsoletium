@@ -29,6 +29,7 @@
 #define IN_OPT _In_opt_
 #define IN_OPT_Z _In_opt_z_
 #define IN_CAP(x) _In_count_(x)
+#define IN_CAP_OPT(x) _In_opt_count_(x)
 #define IN_Z_CAP(x) _In_z_count_(x)
 #define IN_Z_CAP_C(x) _In_z_count_c_(x)
 #define IN_BYTECAP(x) _In_bytecount_(x)
