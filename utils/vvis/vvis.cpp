@@ -1080,9 +1080,9 @@ void PrintUsage( int argc, char **argv )
 int RunVVis( int argc, char **argv )
 {
 #ifdef PLATFORM_64BITS
-	Msg( "Valve Software - vvis.exe [64 bit] (%s)\n", __DATE__ );
+	Msg( "Valve Software - vvis [64 bit] (%s)\n", __DATE__ );
 #else
-	Msg( "Valve Software - vvis.exe (%s)\n", __DATE__ );
+	Msg( "Valve Software - vvis (%s)\n", __DATE__ );
 #endif
 
 	char	portalfile[MAX_FILEPATH];
