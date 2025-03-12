@@ -70,8 +70,8 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 
 	CUtlSymbol symbol;
 	char fontName[MAX_PATH];
-	Q_FileBase( pFontFilename, fontName, MAX_PATH );
-	Q_strlower( fontName );
+	V_FileBase( pFontFilename, fontName );
+	V_strlower( fontName );
 	symbol = fontName;
 
 	// find a match that can use same entries
@@ -207,7 +207,7 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 bool CBitmapFont::IsEqualTo( const char *windowsFontName, float scalex, float scaley, int flags )
 {
 	char fontname[MAX_PATH];
-	Q_FileBase( windowsFontName, fontname, MAX_PATH );
+	V_FileBase( windowsFontName, fontname );
 
 	if ( !Q_stricmp( fontname, m_szName.String() ) &&
 		m_scalex == scalex && 
