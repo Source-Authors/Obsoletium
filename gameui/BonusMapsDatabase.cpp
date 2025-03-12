@@ -551,11 +551,13 @@ void CBonusMapsDatabase::SetCurrentChallengeNames( const char *pchFileName, cons
 	V_strcpy_safe( m_CurrentChallengeNames.szChallengeName, pchChallengeName );
 }
 
-void CBonusMapsDatabase::GetCurrentChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName )
+void CBonusMapsDatabase::GetCurrentChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,
+		OUT_Z_CAP(mapSize) char *pchMapName, intp mapSize,
+		OUT_Z_CAP(challengeSize) char *pchChallengeName, intp challengeSize ) const
 {
-	Q_strcpy( pchFileName, m_CurrentChallengeNames.szFileName );
-	Q_strcpy( pchMapName, m_CurrentChallengeNames.szMapName );
-	Q_strcpy( pchChallengeName, m_CurrentChallengeNames.szChallengeName );
+	V_strncpy( pchFileName, m_CurrentChallengeNames.szFileName, fileSize );
+	V_strncpy( pchMapName, m_CurrentChallengeNames.szMapName, mapSize );
+	V_strncpy( pchChallengeName, m_CurrentChallengeNames.szChallengeName, challengeSize );
 }
 
 void CBonusMapsDatabase::SetCurrentChallengeObjectives( int iBronze, int iSilver, int iGold )
@@ -565,7 +567,7 @@ void CBonusMapsDatabase::SetCurrentChallengeObjectives( int iBronze, int iSilver
 	m_CurrentChallengeObjectives.iGold = iGold;
 }
 
-void CBonusMapsDatabase::GetCurrentChallengeObjectives( int &iBronze, int &iSilver, int &iGold )
+void CBonusMapsDatabase::GetCurrentChallengeObjectives( int &iBronze, int &iSilver, int &iGold ) const
 {
 	iBronze = m_CurrentChallengeObjectives.iBronze;
 	iSilver = m_CurrentChallengeObjectives.iSilver;

@@ -378,7 +378,7 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 			return;
 		
 		*ext = '\0';
-		Q_FileBase( mapname, item.szMapName, sizeof(item.szMapName) );
+		V_FileBase( mapname, item.szMapName );
 
 		Q_strncpy( item.szPrintName, "No trackinfo found.", sizeof(item.szPrintName) );
 		Q_strncpy( item.szDescription, "No trackinfo found.", sizeof(item.szDescription) );

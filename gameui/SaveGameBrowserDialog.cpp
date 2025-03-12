@@ -1235,7 +1235,7 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Sec" ), 1, wzSecs );
 		}
 
-		g_pVGuiLocalize->ConvertUnicodeToANSI( buf, szElapsedTime, sizeof(szElapsedTime) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( buf, szElapsedTime );
 
 		// Chop elapsed out of comment.
 		char *pChop = Q_stristr( szComment, " " );

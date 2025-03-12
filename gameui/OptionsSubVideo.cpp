@@ -1083,7 +1083,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 
 	{
 		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectNormal");
-		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName);
 		
 		char *digit = strchr(pszAspectName, '3');
 		if (digit) *digit = '2';
@@ -1110,7 +1110,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 
 	{
 		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x9");
-		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName);
 
 		char *digit = strchr(pszAspectName, '1');
 		if (digit) *digit = '2';
@@ -1125,7 +1125,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 
 	{
 		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_AspectWide16x9");
-		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName);
 
 		char *digit = strchr(pszAspectName, '1');
 		if (digit) *digit = '3';
@@ -1195,7 +1195,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 		m_pWindowed->AddItem( "#GameUI_Windowed", NULL );
 
 		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_Windowed");
-		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName);
 		V_strcat_safe(pszAspectName, " (No Border)");
 
 		m_pWindowed->AddItem( pszAspectName, NULL );
@@ -1219,7 +1219,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 		m_pWindowed->AddItem( "#GameUI_Windowed", NULL );
 
 		const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_Windowed");
-		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+		g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName);
 		V_strcat_safe(pszAspectName, " (No Border)");
 
 		m_pWindowed->AddItem( pszAspectName, NULL );
@@ -1232,7 +1232,7 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pWindowed->AddItem( "#GameUI_Windowed", NULL );
 
 	const wchar_t *unicodeText = g_pVGuiLocalize->Find("#GameUI_Windowed");
-	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName, ssize(pszAspectName));
+	g_pVGuiLocalize->ConvertUnicodeToANSI(unicodeText, pszAspectName);
 	V_strcat_safe(pszAspectName, " (No Border)");
 
 	m_pWindowed->AddItem( pszAspectName, NULL );
@@ -1532,7 +1532,7 @@ FILE *FOpenGameHDFile( const char *pchMode )
 {
 	const char *pGameDir = engine->GetGameDirectory();
 	char szModSteamInfPath[ 1024 ];
-	V_ComposeFileName( pGameDir, "game_hd.txt", szModSteamInfPath, sizeof( szModSteamInfPath ) );
+	V_ComposeFileName( pGameDir, "game_hd.txt", szModSteamInfPath );
 
 	FILE *fp = fopen( szModSteamInfPath, pchMode );
 	return fp;
@@ -1573,7 +1573,7 @@ void COptionsSubVideo::SetUseHDContent( bool bUse )
 	{
 		const char *pGameDir = engine->GetGameDirectory();
 		char szModSteamInfPath[ 1024 ];
-		V_ComposeFileName( pGameDir, "game_hd.txt", szModSteamInfPath, sizeof( szModSteamInfPath ) );
+		V_ComposeFileName( pGameDir, "game_hd.txt", szModSteamInfPath );
 		_unlink( szModSteamInfPath );
 	}
 }

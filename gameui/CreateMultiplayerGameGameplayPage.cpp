@@ -348,7 +348,7 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 				else
 				{
 					// Just convert what we have to Unicode
-					g_pVGuiLocalize->ConvertANSIToUnicode( pItem->szItemText, w_szStrTemp, sizeof( w_szStrTemp ) );
+					g_pVGuiLocalize->ConvertANSIToUnicode( pItem->szItemText, w_szStrTemp );
 				}
 
 				if ( _wcsicmp( w_szStrTemp, w_szStrValue ) == 0 )

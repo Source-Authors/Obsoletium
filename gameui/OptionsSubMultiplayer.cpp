@@ -1327,7 +1327,7 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 
 		// Get the filename
 		char szRootFilename[MAX_PATH];
-		V_FileBase( fullpath, szRootFilename, sizeof( szRootFilename ) );
+		V_FileBase( fullpath, szRootFilename );
 
 		// automatically select the logo that was just imported.
 		SelectLogo(szRootFilename);
@@ -1406,7 +1406,7 @@ void COptionsSubMultiplayer::SelectLogo(const char *logoName)
 	wchar_t itemToSelectText[MAX_PATH];
 
 	// convert the logo filename to unicode
-	g_pVGuiLocalize->ConvertANSIToUnicode(logoName, itemToSelectText, sizeof(itemToSelectText));
+	g_pVGuiLocalize->ConvertANSIToUnicode(logoName, itemToSelectText);
 
 	// find the index of the spray we want.
 	for (index = 0; index < numEntries; ++index)
@@ -1507,8 +1507,8 @@ void FindVMTFilesInFolder( const char *pFolder, const char *pFolderName, CLabele
 
 
 				char realname[ 512 ];
-				Q_FileBase( modelfile, realname, sizeof( realname ) );
-				Q_FileBase( filename, filename, sizeof( filename ) );
+				V_FileBase( modelfile, realname );
+				V_FileBase( filename, filename );
 				
 				if (!stricmp(filename, realname))
 				{

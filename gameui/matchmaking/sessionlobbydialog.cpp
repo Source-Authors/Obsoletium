@@ -418,7 +418,7 @@ void CSessionLobbyDialog::UpdatePlayerInfo( uint64 nPlayerId, const char *pName,
 		wchar_t wszString[MAX_PATH];
 		wchar_t wszHostname[MAX_PATH];
 		wchar_t *wzHostFmt = g_pVGuiLocalize->Find( "#TF_Lobby_Host" );
-		g_pVGuiLocalize->ConvertANSIToUnicode( pName, wszHostname, sizeof( wszHostname ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pName, wszHostname );
 
 		V_snwprintf( wszString, ssize(wszString), L"%s\n%s", wzHostFmt, wszHostname );
 

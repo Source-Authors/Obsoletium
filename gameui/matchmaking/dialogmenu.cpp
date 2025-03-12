@@ -438,8 +438,8 @@ void COptionsItem::AddOption( const char *pLabelText, const sessionProperty_t& o
 		wchar_t wszString[64];
 		wchar_t wzNumber[8];
 		wchar_t *wzFmt = g_pVGuiLocalize->Find( pLabelText );
-		g_pVGuiLocalize->ConvertANSIToUnicode( option.szValue, wzNumber, sizeof( wzNumber ) );
-		g_pVGuiLocalize->ConstructString( wszString, sizeof( wszString ), wzFmt, 1, wzNumber );
+		g_pVGuiLocalize->ConvertANSIToUnicode( option.szValue, wzNumber );
+		g_pVGuiLocalize->ConstructString_safe( wszString, wzFmt, 1, wzNumber );
 		pOption->SetText( wszString );
 	}
 

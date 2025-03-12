@@ -300,7 +300,7 @@ void CLoadingDialog::DisplayGenericError(const char *failureReason, const char *
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode(extendedReason, compositeReason, sizeof( compositeReason ));
+			g_pVGuiLocalize->ConvertANSIToUnicode(extendedReason, compositeReason);
 		}
 
 		if ( failureReason[0] == '#' )
@@ -309,10 +309,10 @@ void CLoadingDialog::DisplayGenericError(const char *failureReason, const char *
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode(failureReason, formatStr, sizeof( formatStr ));
+			g_pVGuiLocalize->ConvertANSIToUnicode(failureReason, formatStr);
 		}
 
-		g_pVGuiLocalize->ConstructString(finalMsg, sizeof( finalMsg ), formatStr, 1, compositeReason);
+		g_pVGuiLocalize->ConstructString_safe(finalMsg, formatStr, 1, compositeReason);
 		m_pInfoLabel->SetText(finalMsg);
 	}
 	else

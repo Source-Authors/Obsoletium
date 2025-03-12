@@ -1643,7 +1643,7 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 		// 360 uses hi-res game specific backgrounds
 		char gameName[MAX_PATH];
 		const char *pGameDir = engine->GetGameDirectory();
-		V_FileBase( pGameDir, gameName, sizeof( gameName ) );
+		V_FileBase( pGameDir, gameName );
 		V_snprintf( filename, sizeof( filename ), "vgui/appchooser/background_%s%s", gameName, ( bIsWidescreen ? "_widescreen" : "" ) );
 	}
 
