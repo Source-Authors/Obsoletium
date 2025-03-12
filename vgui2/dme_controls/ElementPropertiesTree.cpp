@@ -4473,12 +4473,10 @@ IMPLEMENT_DMEPANEL_FACTORY( CDmeElementPanel, DmElement, "DmeElementDefault", "D
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4355)
 CDmeElementPanel::CDmeElementPanel( vgui::Panel *pParent, const char *pPanelName ) :
 	BaseClass( pParent, this, NULL )
 {
 }
-#pragma warning (default:4355)
 
 
 //-----------------------------------------------------------------------------
