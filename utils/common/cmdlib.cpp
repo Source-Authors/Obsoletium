@@ -139,7 +139,7 @@ WORD SetConsoleTextColor(int red, int green, int blue, int intensity) {
   return ret;
 }
 
-void RestoreConsoleTextColor(WORD color) {
+void RestoreConsoleTextColor(unsigned short color) {
   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                           color | g_BackgroundFlags);
 
@@ -280,7 +280,7 @@ void SetSpewFunctionLogFile(char const *pFilename) {
   g_pLogFile = g_pFileSystem->Open(pFilename, "a");
 
   Assert(g_pLogFile);
-  if (!g_pLogFile) Error("Can't create LogFile:\"%s\"\n", pFilename);
+  if (!g_pLogFile) Error("Can't create log file '%s'.\n", pFilename);
 
   CmdLib_FPrintf(g_pLogFile, "\n\n\n");
 }
