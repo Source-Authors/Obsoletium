@@ -861,7 +861,7 @@ VideoResult_t CValveVideoServices::ResolveToPlayableVideoFile( const char *pFile
 			}
 			else 
 			{
-				fileFound = ( g_pFullFileSystem->RelativePathToFullPath( pFileName, pPathID, ActualFilePath, sizeof( ActualFilePath ) ) != nullptr );
+				fileFound = ( g_pFullFileSystem->RelativePathToFullPath_safe( pFileName, pPathID, ActualFilePath ) != nullptr );
 			}
 		}
 		else	// The specified video system does not support this (required) feature
@@ -925,7 +925,7 @@ search_for_video:
 						{
 							
 							// Start with any optional path we got...
-							V_ExtractFilePath( pFileName, ActualFilePath, sizeof( ActualFilePath ) );
+							V_ExtractFilePath( pFileName, ActualFilePath );
 							// Append the search match file							
 							V_strncat( ActualFilePath, pMatchingFile, sizeof( ActualFilePath ) );
 							
