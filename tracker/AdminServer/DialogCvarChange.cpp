@@ -111,10 +111,10 @@ void CDialogCvarChange::OnCommand(const char *command)
 	{
 		KeyValues *msg = new KeyValues("CvarChangeValue");
 		char buf[64];
-		m_pCvarLabel->GetText(buf,64);
+		m_pCvarLabel->GetText(buf);
 
 		msg->SetString("player", buf );
-		m_pCvarEntry->GetText(buf, sizeof(buf)-1);
+		m_pCvarEntry->GetText(buf);
 		msg->SetString("value", buf);
 		msg->SetString("type",m_cType);
 

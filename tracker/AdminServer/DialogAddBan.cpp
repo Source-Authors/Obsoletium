@@ -111,7 +111,7 @@ bool CDialogAddBan::IsIPCheck()
 {
 	char buf[64];
 	int dotCount=0;
-	m_pIDTextEntry->GetText(buf, sizeof(buf)-1);
+	m_pIDTextEntry->GetText(buf);
 
 	const size_t len = strlen(buf);
 	for(size_t i=0;i<len;i++)
@@ -141,19 +141,19 @@ void CDialogAddBan::OnCommand(const char *command)
 
 	if (!stricmp(command, "Okay"))
 	{
-		char buf[64],idbuf[64];
+		char buf[64], idbuf[64];
 		float time;
-		m_pIDTextEntry->GetText(idbuf, sizeof(idbuf));
-		m_pTimeTextEntry->GetText(buf, 64);
+		m_pIDTextEntry->GetText(idbuf);
+		m_pTimeTextEntry->GetText(buf);
 	
 
-		if(strlen(idbuf)<=0)
+		if(Q_isempty(idbuf))
 		{
 			MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_ID_Invalid");
 			dlg->DoModal();
 			bClose=false;
 		} 
-		else if(strlen(buf)<=0 && !m_pPermBanRadio->IsSelected())
+		else if(Q_isempty(buf) && !m_pPermBanRadio->IsSelected())
 		{
 			MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_Time_Empty");
 			dlg->DoModal();
@@ -167,7 +167,7 @@ void CDialogAddBan::OnCommand(const char *command)
 			}
 			else
 			{
-				m_pTimeCombo->GetText(buf,64);
+				m_pTimeCombo->GetText(buf);
 				if(strstr(buf,"hour"))
 				{
 					time*=60;

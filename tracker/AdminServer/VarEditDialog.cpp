@@ -177,14 +177,14 @@ void CVarEditDialog::ApplyChanges()
 	else if (!stricmp(type, "customlist"))
 	{
 		char value[512];
-		m_pComboEdit->GetText(value, sizeof(value));
+		m_pComboEdit->GetText(value);
 		RemoteServer().SetValue(m_pRules->GetName(), value);
 	}
 	else
 	{
 		// normal string
 		char value[512];
-		m_pStringEdit->GetText(value, sizeof(value));
+		m_pStringEdit->GetText(value);
 		RemoteServer().SetValue(m_pRules->GetName(), value);
 	}
 

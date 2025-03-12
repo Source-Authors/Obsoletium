@@ -188,7 +188,7 @@ void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 		SetControlString("TotalUsersLabel", timeText);
 
 		// mark the vert combo has changed to force it to update graph ranges
-		m_pVertCombo->GetText(timeText, 64);
+		m_pVertCombo->GetText(timeText);
 		OnTextChanged(m_pVertCombo, timeText);
 	}
 }
@@ -422,7 +422,7 @@ CGraphPanel::CGraphsImage::CGraphsImage(): vgui::Image(), points()
 	timeBetween = SECONDS;
 	net_i=net_o=fps=cpu=ping=players=false;
 	numAvgs=0;
-	memset(&avgPoint,0x0,sizeof(Points_t));
+	BitwiseClear(avgPoint);
 }
 
 //-----------------------------------------------------------------------------
@@ -580,7 +580,7 @@ bool CGraphPanel::CGraphsImage::AddPoint(const Points_t &p)
 
 	if(recalcBounds) 
 	{
-		for(int i=0;i<points.Count();i++)
+		for(intp i=0;i<points.Count();i++)
 		{
 			CheckBounds(points[i]);
 		}
@@ -591,7 +591,7 @@ bool CGraphPanel::CGraphsImage::AddPoint(const Points_t &p)
 
 	points.AddToTail(avgPoint);
 	
-	memset(&avgPoint,0x0,sizeof(Points_t));
+	BitwiseClear(avgPoint);
 
 	return true;
 }

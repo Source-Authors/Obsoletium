@@ -136,14 +136,14 @@ char* TokenLine::GetRestOfLine(int i)
 
 TokenLine::TokenLine(char * string)
 {
-	memset(m_token, 0, sizeof(m_token));
+	BitwiseClear(m_token);
 	SetLine(string);
 }
 
 TokenLine::TokenLine()
 {
-	memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
-	memset(m_fullLine, 0, sizeof(m_fullLine));
-	memset(m_token, 0, sizeof(m_token));
+	BitwiseClear(m_tokenBuffer);
+	BitwiseClear(m_fullLine);
+	BitwiseClear(m_token);
 	m_tokenNumber = 0;
 }

@@ -142,9 +142,9 @@ void CGamePanelInfo::SetNewTitle(bool connectionFailed, const char *additional_t
 	}
 
 	wchar_t serverName[256];
-	g_pVGuiLocalize->ConvertANSIToUnicode(additional_text, serverName, sizeof(serverName));
+	g_pVGuiLocalize->ConvertANSIToUnicode(additional_text, serverName);
 	wchar_t title[256];
-	g_pVGuiLocalize->ConstructString(title, sizeof(title), g_pVGuiLocalize->Find(localized_title), 1, serverName);
+	g_pVGuiLocalize->ConstructString_safe(title, g_pVGuiLocalize->Find(localized_title), 1, serverName);
 	
 	SetTitle(title, true);
 }

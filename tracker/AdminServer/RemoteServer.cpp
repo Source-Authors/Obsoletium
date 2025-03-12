@@ -139,7 +139,7 @@ bool CRemoteServer::ProcessServerResponse()
 	while (1)
 	{
 		// get packet from networking
-		intp bytesRead = g_pGameServerData->ReadDataResponse(m_ListenerID, charbuf, sizeof(charbuf));
+		intp bytesRead = g_pGameServerData->ReadDataResponse(m_ListenerID, charbuf);
 		if (bytesRead < 1)
 			break;
 
@@ -218,8 +218,7 @@ void CRemoteServer::AddServerMessageHandler(IServerDataResponse *handler, const 
 {
 	// add to the server message handling table
 	intp i = m_MessageHandlers.AddToTail();
-	strncpy(m_MessageHandlers[i].messageName, watch, sizeof(m_MessageHandlers[i].messageName) - 1);
-	m_MessageHandlers[i].messageName[sizeof(m_MessageHandlers[i].messageName) - 1] = 0;
+	V_strcpy_safe(m_MessageHandlers[i].messageName, watch);
 	m_MessageHandlers[i].handler = handler;
 }
 

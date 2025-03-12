@@ -142,11 +142,11 @@ static const char *FormatSeconds( int seconds )
 	
 	if ( hours > 0 )
 	{
-		Q_snprintf( string, sizeof(string), "%2i:%02i:%02i", hours, minutes, seconds );
+		V_sprintf_safe( string, "%2i:%02i:%02i", hours, minutes, seconds );
 	}
 	else
 	{
-		Q_snprintf( string, sizeof(string), "%02i:%02i", minutes, seconds );
+		V_sprintf_safe( string, "%02i:%02i", minutes, seconds );
 	}
 
 	return string;
@@ -259,10 +259,10 @@ void CPlayerPanel::OnKickButtonPressed()
 			return;
 
 		wchar_t playerName[64];
-		g_pVGuiLocalize->ConvertANSIToUnicode( kv->GetString("name"), playerName, sizeof(playerName) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( kv->GetString("name"), playerName );
 
 		wchar_t msg[512];
-		g_pVGuiLocalize->ConstructString( msg, sizeof(msg), g_pVGuiLocalize->Find("Kick_Single_Player_Question"), 1, playerName );
+		g_pVGuiLocalize->ConstructString_safe( msg, g_pVGuiLocalize->Find("Kick_Single_Player_Question"), 1, playerName );
 		box = new QueryBox(g_pVGuiLocalize->Find("#Kick_Single_Player_Title"), msg);
 	}
 	box->AddActionSignalTarget(this);
@@ -294,7 +294,7 @@ void CPlayerPanel::OnBanButtonPressed()
 		int s1, s2, s3, s4;
 		if (4 == sscanf(netAdr, "%d.%d.%d.%d", &s1, &s2, &s3, &s4))
 		{
-			Q_snprintf( buf, sizeof(buf), "%d.%d.%d.%d", s1, s2, s3, s4 );
+			V_sprintf_safe( buf, "%d.%d.%d.%d", s1, s2, s3, s4 );
 			authid = buf;
 		}
 	}
@@ -339,7 +339,8 @@ void CPlayerPanel::AddBanByID(const char *id, const char *newtime)
 		return;
 
 	// if the newtime string is not valid, then set it to 0 (permanent ban)
-	if (!newtime || atof(newtime) < 0.001)
+	// dimhotepus: atof -> strtof
+	if (!newtime || strtof(newtime, nullptr) < 0.001)
 	{
 		newtime = "0";
 	}

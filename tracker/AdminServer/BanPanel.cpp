@@ -237,9 +237,9 @@ void CBanPanel::RemoveBan()
 	{
 		// build the message
 		wchar_t id[256];
-		g_pVGuiLocalize->ConvertANSIToUnicode(kv->GetString("id"), id, sizeof(id));
+		g_pVGuiLocalize->ConvertANSIToUnicode(kv->GetString("id"), id);
 		wchar_t message[256];
-		g_pVGuiLocalize->ConstructString(message, sizeof(message), g_pVGuiLocalize->Find("#Ban_Remove_Msg"), 1, id);
+		g_pVGuiLocalize->ConstructString_safe(message, g_pVGuiLocalize->Find("#Ban_Remove_Msg"), 1, id);
 
 		// activate the confirmation dialog
 		QueryBox *box = new QueryBox(g_pVGuiLocalize->Find("#Ban_Title_Remove"), message);
@@ -311,7 +311,8 @@ void CBanPanel::ChangeBanTimeByID(const char *id, const char *newtime)
 		return;
 
 	// if the newtime string is not valid, then set it to 0 (permanent ban)
-	if (!newtime || atof(newtime) < 0.001)
+	// dimhotepus: atof -> strtof
+	if (!newtime || strtof(newtime, nullptr) < 0.001)
 	{
 		newtime = "0";
 	}
