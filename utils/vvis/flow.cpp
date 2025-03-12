@@ -31,11 +31,8 @@ int g_TraceClusterStop = -1;
 
 int CountBits (byte *bits, int numbits)
 {
-	int		i;
-	int		c;
-
-	c = 0;
-	for (i=0 ; i<numbits ; i++)
+	int c = 0;
+	for (int i=0 ; i<numbits ; i++)
 		if ( CheckBit( bits, i ) )
 			c++;
 
@@ -55,18 +52,14 @@ extern bool g_bVMPIEarlyExit;
 
 void CheckStack (leaf_t *leaf, threaddata_t *thread)
 {
-	pstack_t	*p, *p2;
-
-	for (p=thread->pstack_head.next ; p ; p=p->next)
+	for (pstack_t *p = thread->pstack_head.next; p; p = p->next)
 	{
-//		Msg ("=");
 		if (p->leaf == leaf)
-			Error ("CheckStack: leaf recursion");
-		for (p2=thread->pstack_head.next ; p2 != p ; p2=p2->next)
+			Error ("CheckStack: leaf 0x%p recursion detected!", leaf);
+		for (pstack_t *p2=thread->pstack_head.next ; p2 != p ; p2=p2->next)
 			if (p2->leaf == p->leaf)
-				Error ("CheckStack: late leaf recursion");
+				Error ("CheckStack: late leaf 0x%p recursion detected!", p->leaf);
 	}
-//	Msg ("\n");
 }
 
 
