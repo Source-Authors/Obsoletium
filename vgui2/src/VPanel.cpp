@@ -5,8 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
-
 #include <vgui/IPanel.h>
 #include <vgui/IClientPanel.h>
 #include <vgui/ISurface.h>

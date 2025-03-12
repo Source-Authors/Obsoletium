@@ -5,6 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include "vgui/ILocalize.h"
 
 #if defined( POSIX )
 #include <iconv.h>
@@ -15,7 +16,6 @@
 #include "filesystem.h"
 
 #include "vgui_internal.h"
-#include "vgui/ILocalize.h"
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
 
@@ -23,13 +23,9 @@
 #include "tier1/utlrbtree.h"
 #include "tier1/utlsymbol.h"
 #include "tier1/utlstring.h"
+#include "tier1/byteswap.h"
 #include "UnicodeFileHelpers.h"
 #include "tier0/icommandline.h"
-#include "byteswap.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

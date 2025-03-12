@@ -5,17 +5,12 @@
 // $NoKeywords: $
 //=============================================================================//
 
-
-#if !defined( _X360 )
 #define OEMRESOURCE
 #include "winlite.h"
 #include <shellapi.h>
 #include <Shlwapi.h>
 #include <ShlObj.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+
 #include <sys/stat.h>
 
 
@@ -33,7 +28,7 @@
 
 #include <vgui/VGUI.h>
 #include <vgui/ISystem.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include "tier0/vcrmode.h"
@@ -42,7 +37,6 @@
 #include "vgui_internal.h"
 #include "filesystem_helpers.h"
 #include "vgui_key_translation.h"
-#include "filesystem.h"
 
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"

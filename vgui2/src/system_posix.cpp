@@ -6,16 +6,16 @@
 //=============================================================================//
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 
 #include <vgui/VGUI.h>
 #include <vgui/ISystem.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include "tier0/vcrmode.h"
@@ -25,7 +25,6 @@
 #include "vgui_internal.h"
 #include "filesystem_helpers.h"
 #include "vgui_key_translation.h"
-#include "filesystem.h"
 
 #ifdef OSX
 #include <Carbon/Carbon.h>

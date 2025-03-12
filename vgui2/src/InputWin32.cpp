@@ -5,24 +5,23 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include <vgui/IInputInternal.h>
+
 #if defined( WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 #include <imm.h>
 #define DO_IME
 #endif
 
-#include <cstring>
-
 #include "vgui_internal.h"
 #include "VPanel.h"
 #include "tier1/utlvector.h"
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "tier0/vcrmode.h"
 
 #include <vgui/VGUI.h>
 #include <vgui/ISystem.h>
 #include <vgui/IClientPanel.h>
-#include <vgui/IInputInternal.h>
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
@@ -33,10 +32,6 @@
 
 #include "tier1/utllinkedlist.h"
 #include "tier0/icommandline.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 /* 
 > Subject: RE: l4d2 & motd 

@@ -5,12 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-
-#include <cstdio>
-#include <cmath>
+#include <vgui/IScheme.h>
 
 #include <vgui/VGUI.h>
-#include <vgui/IScheme.h>
 #include <tier1/KeyValues.h>
 #include <vgui/ISurface.h>
 #include <vgui/IPanel.h>

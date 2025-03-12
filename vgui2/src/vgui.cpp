@@ -5,6 +5,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include <vgui/IVGui.h>
+
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include <vgui/VGUI.h>
 #include <vgui/Dar.h>
@@ -12,29 +14,20 @@
 #include <vgui/IPanel.h>
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
 #include <vgui/IClientPanel.h>
 #include <vgui/IScheme.h>
-#include <KeyValues.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <malloc.h>
+#include <tier1/KeyValues.h>
 #include <tier0/dbg.h>
 #include <tier1/utlhandletable.h>
 #include "vgui_internal.h"
 #include "VPanel.h"
 #include "IMessageListener.h"
 #include "tier3/tier3.h"
-#include "utllinkedlist.h"
-#include "utlpriorityqueue.h"
-#include "utlvector.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/utlpriorityqueue.h"
+#include "tier1/utlvector.h"
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #undef GetCursorPos // protected_things.h defines this, and it makes it so we can't access g_pInput->GetCursorPos.
 
