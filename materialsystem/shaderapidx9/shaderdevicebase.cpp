@@ -518,7 +518,7 @@ KeyValues *CShaderDeviceMgrBase::ReadDXSupportKeyValues()
 	}
 
 	char pTempPath[1024];
-	if ( g_pFullFileSystem->GetSearchPath( "GAME", false, pTempPath, sizeof(pTempPath) ) > 1 )
+	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, pTempPath ) > 1 )
 	{
 		// Is there a mod-specific override file?
 		KeyValues *pOverride = new KeyValues( "dxsupport_override" );

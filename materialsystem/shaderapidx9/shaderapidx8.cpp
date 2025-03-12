@@ -7433,7 +7433,7 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 		}
 
 		char buf[256];
-		sprintf( buf, "SRT:%s %s", pRT ? pRT : "?", pDS ? pDS : "?" );
+		V_sprintf_safe( buf, "SRT:%s %s", pRT ? pRT : "?", pDS ? pDS : "?" );
 		BeginPIXEvent( 0xFFFFFFFF, buf );
 		EndPIXEvent();
 	}
@@ -8561,7 +8561,7 @@ void CShaderAPIDx8::CopyRenderTargetToTextureEx( ShaderAPITextureHandle_t textur
 		}
 
 		char buf[256];
-		sprintf( buf, "CopyRTToTexture:%s", pRT ? pRT : "?" );
+		V_sprintf_safe( buf, "CopyRTToTexture:%s", pRT ? pRT : "?" );
 		BeginPIXEvent( 0xFFFFFFFF, buf );
 		EndPIXEvent();
 	}
@@ -9086,26 +9086,26 @@ void CShaderAPIDx8::SpewBoardState()
 	return;
 #ifdef DEBUG_BOARD_STATE
 	char buf[256];
-	sprintf(buf, "\nSnapshot id %zd : \n", m_TransitionTable.CurrentSnapshot() );
+	V_sprintf_safe(buf, "\nSnapshot id %zd : \n", m_TransitionTable.CurrentSnapshot() );
 	Plat_DebugString(buf);
 
 	ShadowState_t &boardState = m_TransitionTable.BoardState();
 	ShadowShaderState_t &boardShaderState = m_TransitionTable.BoardShaderState();
 
-	sprintf(buf,"Depth States: ZFunc %d, ZWrite %d, ZEnable %d, ZBias %d\n",
+	V_sprintf_safe(buf,"Depth States: ZFunc %d, ZWrite %d, ZEnable %d, ZBias %d\n",
 		boardState.m_ZFunc, boardState.m_ZWriteEnable, 
 		boardState.m_ZEnable, boardState.m_ZBias );
 	Plat_DebugString(buf);
-	sprintf(buf,"Cull Enable %d Cull Mode %d Color Write %lu Fill %d Const Color Mod %d sRGBWriteEnable %d\n",
+	V_sprintf_safe(buf,"Cull Enable %d Cull Mode %d Color Write %lu Fill %d Const Color Mod %d sRGBWriteEnable %d\n",
 		boardState.m_CullEnable, m_DynamicState.m_CullMode, boardState.m_ColorWriteEnable, 
 		boardState.m_FillMode, boardShaderState.m_ModulateConstantColor, boardState.m_SRGBWriteEnable );
 	Plat_DebugString(buf);
-	sprintf(buf,"Blend States: Blend Enable %d Test Enable %d Func %d SrcBlend %d (%s) DstBlend %d (%s)\n",
+	V_sprintf_safe(buf,"Blend States: Blend Enable %d Test Enable %d Func %d SrcBlend %d (%s) DstBlend %d (%s)\n",
 		boardState.m_AlphaBlendEnable, boardState.m_AlphaTestEnable, 
 		boardState.m_AlphaFunc, boardState.m_SrcBlend, BlendModeToString( boardState.m_SrcBlend ),
 		boardState.m_DestBlend, BlendModeToString( boardState.m_DestBlend ) );
 	Plat_DebugString(buf);
-	int len = sprintf(buf,"Alpha Ref %d, Lighting: %d, Ambient Color %lx, LightsEnabled ",
+	int len = V_sprintf_safe(buf,"Alpha Ref %d, Lighting: %d, Ambient Color %lx, LightsEnabled ",
 		boardState.m_AlphaRef, boardState.m_Lighting, m_DynamicState.m_Ambient);
 
 	int i;
@@ -9115,11 +9115,11 @@ void CShaderAPIDx8::SpewBoardState()
 	}
 	sprintf(buf+len,"\n");
 	Plat_DebugString(buf);
-	sprintf(buf,"Fixed Function: %d, VertexBlend %d\n",
+	V_sprintf_safe(buf,"Fixed Function: %d, VertexBlend %d\n",
 		boardState.m_UsingFixedFunction, m_DynamicState.m_VertexBlend );
 	Plat_DebugString(buf);
 	
-	sprintf(buf,"Pass Vertex Usage: %llx Pixel Shader %p Vertex Shader %p\n",
+	V_sprintf_safe(buf,"Pass Vertex Usage: %llx Pixel Shader %p Vertex Shader %p\n",
 		boardShaderState.m_VertexUsage, ShaderManager()->GetCurrentPixelShader(), 
 		ShaderManager()->GetCurrentVertexShader() );
 	Plat_DebugString(buf);
@@ -9127,7 +9127,7 @@ void CShaderAPIDx8::SpewBoardState()
 	// REGRESSED!!!!
 	/*
 	auto* m = &GetTransform(MATERIAL_MODEL);
-	sprintf(buf,"WorldMat [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
+	V_sprintf_safe(buf,"WorldMat [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
 		m->m[0][0],	m->m[0][1],	m->m[0][2],	m->m[0][3],	
 		m->m[1][0],	m->m[1][1],	m->m[1][2],	m->m[1][3],	
 		m->m[2][0],	m->m[2][1],	m->m[2][2],	m->m[2][3],	
@@ -9135,7 +9135,7 @@ void CShaderAPIDx8::SpewBoardState()
 	Plat_DebugString(buf);
 
 	m = &GetTransform(MATERIAL_MODEL + 1);
-	sprintf(buf,"WorldMat2 [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
+	V_sprintf_safe(buf,"WorldMat2 [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
 		m->m[0][0],	m->m[0][1],	m->m[0][2],	m->m[0][3],	
 		m->m[1][0],	m->m[1][1],	m->m[1][2],	m->m[1][3],	
 		m->m[2][0],	m->m[2][1],	m->m[2][2],	m->m[2][3],	
@@ -9143,7 +9143,7 @@ void CShaderAPIDx8::SpewBoardState()
 	Plat_DebugString(buf);
 
 	m = &GetTransform(MATERIAL_VIEW);
-	sprintf(buf,"ViewMat [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
+	V_sprintf_safe(buf,"ViewMat [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
 		m->m[0][0],	m->m[0][1],	m->m[0][2],	
 		m->m[1][0],	m->m[1][1],	m->m[1][2],
 		m->m[2][0],	m->m[2][1],	m->m[2][2],
@@ -9151,7 +9151,7 @@ void CShaderAPIDx8::SpewBoardState()
 	Plat_DebugString(buf);
 
 	m = &GetTransform(MATERIAL_PROJECTION);
-	sprintf(buf,"ProjMat [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
+	V_sprintf_safe(buf,"ProjMat [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
 		m->m[0][0],	m->m[0][1],	m->m[0][2],	
 		m->m[1][0],	m->m[1][1],	m->m[1][2],
 		m->m[2][0],	m->m[2][1],	m->m[2][2],
@@ -9161,7 +9161,7 @@ void CShaderAPIDx8::SpewBoardState()
 	for (i = 0; i < GetTextureStageCount(); ++i)
 	{
 		m = &GetTransform(MATERIAL_TEXTURE0 + i);
-		sprintf(buf,"TexMat%d [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
+		V_sprintf_safe(buf,"TexMat%d [%4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f %4.3f]\n",
 			i, m->m[0][0],	m->m[0][1],	m->m[0][2],	
 			m->m[1][0],	m->m[1][1],	m->m[1][2],
 			m->m[2][0],	m->m[2][1],	m->m[2][2],
@@ -9170,7 +9170,7 @@ void CShaderAPIDx8::SpewBoardState()
 	}
 	*/
 
-	sprintf(buf,"Viewport (%lu %lu) [%lu %lu] %4.3f %4.3f\n",
+	V_sprintf_safe(buf,"Viewport (%lu %lu) [%lu %lu] %4.3f %4.3f\n",
 		m_DynamicState.m_Viewport.X, m_DynamicState.m_Viewport.Y, 
 		m_DynamicState.m_Viewport.Width, m_DynamicState.m_Viewport.Height,
 		m_DynamicState.m_Viewport.MinZ, m_DynamicState.m_Viewport.MaxZ);
@@ -9178,25 +9178,25 @@ void CShaderAPIDx8::SpewBoardState()
 
 	for (i = 0; i < MAX_TEXTURE_STAGES; ++i)
 	{
-		sprintf(buf,"Stage %d :\n", i);
+		V_sprintf_safe(buf,"Stage %d :\n", i);
 		Plat_DebugString(buf);
-		sprintf(buf,"   Color Op: %d (%s) Color Arg1: %d (%s)",
+		V_sprintf_safe(buf,"   Color Op: %d (%s) Color Arg1: %d (%s)",
 			boardState.m_TextureStage[i].m_ColorOp, 
 			TextureOpToString( boardState.m_TextureStage[i].m_ColorOp ),
 			boardState.m_TextureStage[i].m_ColorArg1, 
 			TextureArgToString( boardState.m_TextureStage[i].m_ColorArg1 ) );
 		Plat_DebugString(buf);
-		sprintf( buf, " Color Arg2: %d (%s)\n",
+		V_sprintf_safe( buf, " Color Arg2: %d (%s)\n",
 			boardState.m_TextureStage[i].m_ColorArg2,
 			TextureArgToString( boardState.m_TextureStage[i].m_ColorArg2 ) );
 		Plat_DebugString(buf);
-		sprintf(buf,"   Alpha Op: %d (%s) Alpha Arg1: %d (%s)",
+		V_sprintf_safe(buf,"   Alpha Op: %d (%s) Alpha Arg1: %d (%s)",
 			boardState.m_TextureStage[i].m_AlphaOp, 
 			TextureOpToString( boardState.m_TextureStage[i].m_AlphaOp ),
 			boardState.m_TextureStage[i].m_AlphaArg1, 
 			TextureArgToString( boardState.m_TextureStage[i].m_AlphaArg1 ) );
 		Plat_DebugString(buf);
-		sprintf(buf," Alpha Arg2: %d (%s)\n",
+		V_sprintf_safe(buf," Alpha Arg2: %d (%s)\n",
 			boardState.m_TextureStage[i].m_AlphaArg2,
 			TextureArgToString( boardState.m_TextureStage[i].m_AlphaArg2 ) );
 		Plat_DebugString(buf);
@@ -9204,14 +9204,14 @@ void CShaderAPIDx8::SpewBoardState()
 
 	for ( int ii = 0; ii < MAX_SAMPLERS; ++ii )
 	{
-		sprintf(buf,"	Texture Enabled: %d Bound Texture: %zi UWrap: %d VWrap: %d\n",
+		V_sprintf_safe(buf,"	Texture Enabled: %d Bound Texture: %zi UWrap: %d VWrap: %d\n",
 			SamplerState(ii).m_TextureEnable, GetBoundTextureBindId( (Sampler_t)ii ),
 			SamplerState(ii).m_UTexWrap, SamplerState(ii).m_VTexWrap );
 		Plat_DebugString(buf);
-		sprintf(buf,"	Mag Filter: %d Min Filter: %d Mip Filter: %d\n",
+		V_sprintf_safe(buf,"	Mag Filter: %d Min Filter: %d Mip Filter: %d\n",
 			SamplerState(ii).m_MagFilter, SamplerState(ii).m_MinFilter,
 			SamplerState(ii).m_MipFilter );
-		sprintf(buf,"   MaxMipLevel: %d\n", SamplerState(ii).m_FinestMipmapLevel );
+		V_sprintf_safe(buf,"   MaxMipLevel: %d\n", SamplerState(ii).m_FinestMipmapLevel );
 		Plat_DebugString(buf);
 	}
 #else
