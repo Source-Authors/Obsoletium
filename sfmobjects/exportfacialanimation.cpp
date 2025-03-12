@@ -166,8 +166,8 @@ static void ExportSounds( ExportInfo_t &info, CDmElement *pRoot, CDmeClip *pClip
 	CDmrElementArray<> sounds( pRoot, "sounds", true );
 
 	DmeClipStack_t soundToGlobal;
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeSoundClip, pTrackGroup, pTrack, pSoundClip )
@@ -206,8 +206,8 @@ static void ExportSounds_R( ExportInfo_t &info, CDmElement *pRoot, CDmeClip *pCl
 
 	// Recurse
 	DmeClipStack_t childToGlobal;
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_START( pTrackGroup, pTrack, pChild )

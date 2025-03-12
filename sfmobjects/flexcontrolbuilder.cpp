@@ -335,13 +335,13 @@ void CFlexControlBuilder::GetExistingMonoLog( ExistingLogInfo_t *pExistingLog,
 //-----------------------------------------------------------------------------
 CDmeChannelsClip* CFlexControlBuilder::FindChannelsClipContainingChannel( CDmeFilmClip *pClip, CDmeChannel *pSearch )
 {
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeChannelsClip, pTrackGroup, pTrack, pChannelsClip )
 
-			intp nChannels = pChannelsClip->m_Channels.Count();
+		intp nChannels = pChannelsClip->m_Channels.Count();
 		for ( intp j = 0; j < nChannels; ++j )
 		{
 			CDmeChannel *pChannel = pChannelsClip->m_Channels[ j ];
@@ -561,8 +561,8 @@ void CFlexControlBuilder::GetExistingStereoLog( ExistingLogInfo_t *pLogs, CDmeFi
 //-----------------------------------------------------------------------------
 void CFlexControlBuilder::FixupExistingFlexControlLogList( CDmeFilmClip *pCurrentClip, CDmeGameModel *pGameModel )
 {
-	int nTrackGroups = pCurrentClip->GetTrackGroupCount();
-	for ( int gi = 0; gi < nTrackGroups; ++gi )
+	intp nTrackGroups = pCurrentClip->GetTrackGroupCount();
+	for ( intp gi = 0; gi < nTrackGroups; ++gi )
 	{
 		CDmeTrackGroup *pTrackGroup = pCurrentClip->GetTrackGroup( gi );
 		if ( !pTrackGroup )

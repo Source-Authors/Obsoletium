@@ -203,8 +203,8 @@ static CDmeChannelsClip *FindChannelsClipTargetingDmeGameModel( CDmeFilmClip *pC
 	uint nBoneCount = pGameModel->NumBones();
 	CDmeTransform *pGameModelTransform = pGameModel->GetTransform();
 
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeChannelsClip, pTrackGroup, pTrack, pChannelsClip )
