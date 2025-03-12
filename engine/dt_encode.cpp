@@ -369,11 +369,13 @@ void Int_SkipProp( const SendProp *pProp, bf_read *pIn )
 	{
 		if ( pProp->GetFlags() & SPROP_UNSIGNED )
 		{
-			pIn->ReadVarInt32();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadVarInt32();
 		}
 		else
 		{
-			pIn->ReadSignedVarInt32();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadSignedVarInt32();
 		}
 	}
 	else
@@ -478,15 +480,18 @@ void Float_SkipProp( const SendProp *pProp, bf_read *pIn )
 	}
 	else if ( pProp->GetFlags() & SPROP_COORD_MP )
 	{
-		pIn->ReadBitCoordMP( false, false );
+		// dimhotepus: Result is not needed so skip it.
+		(void)pIn->ReadBitCoordMP( false, false );
 	}
 	else if ( pProp->GetFlags() & SPROP_COORD_MP_LOWPRECISION )
 	{
-		pIn->ReadBitCoordMP( false, true );
+		// dimhotepus: Result is not needed so skip it.
+		(void)pIn->ReadBitCoordMP( false, true );
 	}
 	else if ( pProp->GetFlags() & SPROP_COORD_MP_INTEGRAL )
 	{
-		pIn->ReadBitCoordMP( true, false );
+		// dimhotepus: Result is not needed so skip it.
+		(void)pIn->ReadBitCoordMP( true, false );
 	}
 	else if(pProp->GetFlags() & SPROP_NOSCALE)
 	{
@@ -1246,11 +1251,13 @@ void Int64_SkipProp( const SendProp *pProp, bf_read *pIn )
 	{
 		if ( pProp->GetFlags() & SPROP_UNSIGNED )
 		{
-			pIn->ReadVarInt64();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadVarInt64();
 		}
 		else
 		{
-			pIn->ReadSignedVarInt64();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadSignedVarInt64();
 		}
 	}
 	else
