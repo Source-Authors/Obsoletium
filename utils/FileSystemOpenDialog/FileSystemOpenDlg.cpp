@@ -775,7 +775,7 @@ void CFileSystemOpenDlg::OnUpButton()
 {
 	char str[MAX_PATH];
 	V_strcpy_safe( str, m_CurrentDir );
-	Q_StripLastDir( str, sizeof( str ) );
+	V_StripLastDir( str );
 
 	if ( Q_isempty( str ) )
 		V_strcpy_safe( str, "." );
@@ -915,7 +915,7 @@ public:
 		}
 
 		char pFileNameBuf[MAX_PATH];
-		const char *pFileName = m_pDialog->m_pFileSystem->RelativePathToFullPath( m_pDialog->m_CurrentDir, m_pDialog->m_PathIDString, pFileNameBuf, MAX_PATH );
+		const char *pFileName = m_pDialog->m_pFileSystem->RelativePathToFullPath_safe( m_pDialog->m_CurrentDir, m_pDialog->m_PathIDString, pFileNameBuf );
 		V_strcat_safe( pFileNameBuf, "\\" );
 	
 		// Build the list of file filters.
@@ -957,7 +957,7 @@ public:
 		while ( dlg.DoModal() == IDOK )
 		{
 			// Make sure we can make this into a relative path.
-			if ( m_pDialog->m_pFileSystem->FullPathToRelativePath( dlg.GetPathName(), m_RelativeFilename, sizeof( m_RelativeFilename ) ) )
+			if ( m_pDialog->m_pFileSystem->FullPathToRelativePath_safe( dlg.GetPathName(), m_RelativeFilename ) )
 			{
 				// Replace .jpg or .jpeg extension with .mdl?
 				char *pEnd = m_RelativeFilename;
