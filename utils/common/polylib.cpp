@@ -17,13 +17,6 @@
 // doesn't seem to need to be here? -- in threads.h
 //extern int numthreads;
 
-// counters are only bumped when running single threaded,
-// because they are an awefull coherence problem
-int	c_active_windings;
-int	c_peak_windings;
-int	c_winding_allocs;
-int	c_winding_points;
-
 void pw(winding_t *w)
 {
 	int		i;
@@ -40,15 +33,6 @@ AllocWinding
 */
 winding_t *AllocWinding (int points)
 {
-	if (numthreads == 1)
-	{
-		c_winding_allocs++;
-		c_winding_points += points;
-		c_active_windings++;
-		if (c_active_windings > c_peak_windings)
-			c_peak_windings = c_active_windings;
-	}
-	
 	winding_t	*w;
 	{
 		bool need_new = true;
@@ -94,8 +78,6 @@ void FreeWinding (winding_t *w)
 RemoveColinearPoints
 ============
 */
-int	c_removed;
-
 void RemoveColinearPoints (winding_t *w)
 {
 	int		i, j, k;
@@ -122,8 +104,6 @@ void RemoveColinearPoints (winding_t *w)
 	if (nump == w->numpoints)
 		return;
 
-	if (numthreads == 1)
-		c_removed += w->numpoints - nump;
 	w->numpoints = nump;
 	memcpy (w->p, p, nump*sizeof(p[0]));
 }
