@@ -29,7 +29,7 @@ static CRC32_t Texture_CRCName( const char *string )
 	CRC32_t crc;
 	
 	CRC32_Init( &crc );
-	CRC32_ProcessBuffer( &crc, (void *)string, Q_strlen( string ) );
+	CRC32_ProcessBuffer( &crc, string, V_strlen( string ) );
 	CRC32_Final( &crc );
 
 	return crc;

@@ -1822,7 +1822,7 @@ bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fon
 
 	char fullPath[MAX_PATH];
 	// windows needs an absolute path for ttf
-	bool bFound = g_pFullFileSystem->GetLocalPath( fontFileName, fullPath, sizeof( fullPath ) );
+	bool bFound = g_pFullFileSystem->GetLocalPath_safe( fontFileName, fullPath );
 	if ( !bFound )
 	{
 		char output[512];
@@ -3555,7 +3555,7 @@ int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, i
 	DrawSetTextFont( font );
 
 	wchar_t szconverted[ 1024 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted, 1024 );
+	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted );
 	DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 	int totalLength = DrawTextLen( font, data );
@@ -3738,7 +3738,7 @@ void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int
 		DrawSetTextPos( x, y );
 
 		wchar_t szconverted[ 1024 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted, 1024 );
+		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted );
 		DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 		// Leave room for space, too
@@ -4308,10 +4308,10 @@ vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath 
 		if ( info.szTypeName[ 0 ] != 0 )
 		{
 			char ext[ 32 ];
-			Q_ExtractFileExtension( pFullPath, ext, sizeof( ext ) );
+			V_ExtractFileExtension( pFullPath, ext );
 
 			char lookup[ 512 ];
-			Q_snprintf( lookup, sizeof( lookup ), "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
+			V_sprintf_safe( lookup, "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
 			
 			// Now check the dictionary
 			unsigned short idx = m_FileTypeImages.Find( lookup );
