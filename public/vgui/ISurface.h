@@ -265,8 +265,8 @@ public:
 	virtual int GetFontTallRequested(HFont font) = 0;
 	virtual int GetFontAscent(HFont font, wchar_t wch) = 0;
 	virtual bool IsFontAdditive(HFont font) = 0;
-	virtual void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) = 0;
-	virtual int GetCharacterWidth(HFont font, int ch) = 0;
+	virtual void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c) = 0;
+	virtual int GetCharacterWidth(HFont font, wchar_t ch) = 0;
 	virtual void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) = 0;
 
 	// notify icons?!?
