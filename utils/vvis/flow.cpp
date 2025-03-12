@@ -376,10 +376,9 @@ Vector ClusterCenter( int cluster )
 {
 	Vector mins, maxs;
 	ClearBounds(mins, maxs);
-	int count = leafs[cluster].portals.Count();
-	for ( int i = 0; i < count; i++ )
+	for ( auto *p : leafs[cluster].portals )
 	{
-		winding_t *w = leafs[cluster].portals[i]->winding;
+		winding_t *w = p->winding;
 		for ( int j = 0; j < w->numpoints; j++ )
 		{
 			AddPointToBounds( w->points[j], mins, maxs );
