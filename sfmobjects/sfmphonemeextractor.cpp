@@ -123,14 +123,14 @@ bool CSFMPhonemeExtractor::Init()
 			continue;
 		}
 
-		CreateInterfaceFn factory = Sys_GetFactory( e.module );
+		CreateInterfaceFnT<IPhonemeExtractor> factory = Sys_GetFactory<IPhonemeExtractor>( e.module );
 		if ( !factory )
 		{
 			pFilename = g_pFullFileSystem->FindNext( findHandle );
 			continue;
 		}
 
-		e.extractor = ( IPhonemeExtractor * )factory( VPHONEME_EXTRACTOR_INTERFACE, NULL );
+		e.extractor = factory( VPHONEME_EXTRACTOR_INTERFACE, NULL );
 		if ( !e.extractor )
 		{
 			Warning( "Unable to get IPhonemeExtractor interface version %s from %s\n", VPHONEME_EXTRACTOR_INTERFACE, fullpath );
