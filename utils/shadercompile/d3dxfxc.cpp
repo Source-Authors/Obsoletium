@@ -23,7 +23,8 @@ static constexpr size_t kFxcCommandSize{std::size(kFxcCommand) - 1};
 
 namespace {
 
-class HLSLCompilerResponse final : public se::shader_compile::command_sink::IResponse {
+class HLSLCompilerResponse final
+    : public se::shader_compile::command_sink::IResponse {
  public:
   HLSLCompilerResponse(se::win::com::com_ptr<ID3DBlob> shader,
                        se::win::com::com_ptr<ID3DBlob> errors, HRESULT hr);
@@ -65,10 +66,10 @@ HLSLCompilerResponse::HLSLCompilerResponse(
 // "debugdrawenvmapmask_vs20.fxc")
 // @param pMacros			null-terminated array of macro-defines
 // @param shader_model		shader model for compilation
-static void FastShaderCompile(const char *file_name,
-                              const D3D_SHADER_MACRO *macroses,
-                              const char *shader_model,
-                              se::shader_compile::command_sink::IResponse **response) {
+static void FastShaderCompile(
+    const char *file_name, const D3D_SHADER_MACRO *macroses,
+    const char *shader_model,
+    se::shader_compile::command_sink::IResponse **response) {
   if (!response) return;
 
   // DxProxyModule.
@@ -114,15 +115,15 @@ static void FastShaderCompile(const char *file_name,
 // /DNUMDYNAMICCOMBOS=4 /DFLAGS=0x0 /DNUM_BONES=1 /Dmain=main /Emain /Tvs_2_0
 // /DSHADER_MODEL_VS_2_0=1 /nologo /Foshader.o
 // debugdrawenvmapmask_vs20.fxc>output.txt 2>&1"
-void ExecuteCommand(const char *in_command, se::shader_compile::command_sink::IResponse **response) {
+void ExecuteCommand(const char *in_command,
+                    se::shader_compile::command_sink::IResponse **response) {
   // Expect that the command passed is exactly "fxc.exe"
   Assert(!strncmp(in_command, kFxcCommand, kFxcCommandSize));
 
   in_command += kFxcCommandSize;
 
   // A duplicate portion of memory for modifications
-  char *editable_command{
-      strcpy((char *)alloca(strlen(in_command) + 1), in_command)};
+  V_strdup_stack(in_command, editable_command);
 
   // Macros to be defined
   CUtlVector<D3D_SHADER_MACRO> macros{(intp)0, 4};
@@ -204,12 +205,14 @@ void ExecuteCommand(const char *in_command, se::shader_compile::command_sink::IR
   FastShaderCompile(file_name, macros.Base(), out_shader_model, response);
 }
 
-bool TryExecuteCommand(const char *command, se::shader_compile::command_sink::IResponse **response) {
+bool TryExecuteCommand(const char *command,
+                       se::shader_compile::command_sink::IResponse **response) {
   static int dummy{(Msg("[shadercompile] Using new faster Vitaliy's "
                         "implementation.\n"),
                     1)};
 
-  const bool ok{!strncmp(command, se::shader_compile::fxc_intercept::kFxcCommand,
+  const bool ok{!strncmp(command,
+                         se::shader_compile::fxc_intercept::kFxcCommand,
                          se::shader_compile::fxc_intercept::kFxcCommandSize)};
   if (ok) {
     // Trap "fxc.exe" so that we did not spawn extra process every time

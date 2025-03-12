@@ -469,10 +469,10 @@ void ErrMsgDispatchMsgLine(char const *szCommand, char *szMsgLine,
     static char chFitLongMsgLine[4096];
 
     if (*szMsgLine == '(') {
-      sprintf(chFitLongMsgLine, "%s%s", szShaderName, szMsgLine);
+      V_sprintf_safe(chFitLongMsgLine, "%s%s", szShaderName, szMsgLine);
       szMsgLine = chFitLongMsgLine;
     } else if (!strncmp(szMsgLine, "memory(", 7)) {
-      sprintf(chFitLongMsgLine, "%s%s", szShaderName, szMsgLine + 6);
+      V_sprintf_safe(chFitLongMsgLine, "%s%s", szShaderName, szMsgLine + 6);
       szMsgLine = chFitLongMsgLine;
     }
   }
@@ -719,8 +719,10 @@ static void OutputDynamicComboDup(size_t *pnTotalFlushedSize,
 }
 #endif
 
-void GetVCSFilenames(char *pszMainOutFileName, ShaderInfo_t const &si) {
-  sprintf(pszMainOutFileName, "%s\\shaders\\fxc", g_pShaderPath);
+template <intp outSize>
+void GetVCSFilenames(OUT_Z_ARRAY char (&pszMainOutFileName)[outSize],
+                     ShaderInfo_t const &si) {
+  V_snprintf(pszMainOutFileName, outSize, "%s\\shaders\\fxc", g_pShaderPath);
 
   struct _stat buf;
   if (_stat(pszMainOutFileName, &buf) == -1) {
@@ -729,10 +731,10 @@ void GetVCSFilenames(char *pszMainOutFileName, ShaderInfo_t const &si) {
     _mkdir(pszMainOutFileName);
   }
 
-  strcat(pszMainOutFileName, "\\");
-  strcat(pszMainOutFileName, si.m_pShaderName);
-  strcat(pszMainOutFileName,
-         ".vcs");  // Different extensions for main output file
+  V_strcat(pszMainOutFileName, "\\", outSize);
+  V_strcat(pszMainOutFileName, si.m_pShaderName, outSize);
+  V_strcat(pszMainOutFileName, ".vcs",
+           outSize);  // Different extensions for main output file
 
   // Check status of vcs file...
   if (_stat(pszMainOutFileName, &buf) != -1) {
@@ -1330,7 +1332,7 @@ void CWorkerAccumState<TMutexType>::RangeBegin(uint64_t iFirstCommand,
       SubProcessKernelObjects_Memory shrmem(pSp->pCommObjs);
 
       if (void *pvMemory = shrmem.Lock()) {
-        strcpy((char *)pvMemory, "keepalive");
+        strcpy(static_cast<char *>(pvMemory), "keepalive");
         shrmem.Unlock();
       }
     }
@@ -1359,7 +1361,7 @@ void CWorkerAccumState<TMutexType>::QuitSubs() {
     if (pSp) {
       SubProcessKernelObjects_Memory shrmem(pSp->pCommObjs);
       if (void *pvMemory = shrmem.Lock()) {
-        strcpy((char *)pvMemory, "quit");
+        strcpy(static_cast<char *>(pvMemory), "quit");
         shrmem.Unlock();
       }
 
@@ -1469,7 +1471,10 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
     // attempt to restart on another worker.
     if (!pvMemory)
       // ::RaiseException( GetLastError(), EXCEPTION_NONCONTINUABLE, 0, NULL );
+    {
+      Error("Unable to lock shared memory for combo 0x%p", hCombo);
       ExitProcess(1);
+    }
 
     se::shader_compile::command_sink::IResponse *pResponse;
     if (pvMemory)
@@ -1541,11 +1546,12 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
   char const *szListing = pResponse->GetListing();
   if ((!g_bSuppressWarnings && szListing) || !pResponse->Succeeded()) {
     char chCommandNumber[32];
-    sprintf(chCommandNumber, "%I64u", iCommandNumber);
+    V_sprintf_safe(chCommandNumber, "%I64u", iCommandNumber);
 
     char chUnreportedListing[0xFF];
     if (!szListing) {
-      sprintf(chUnreportedListing,
+      V_sprintf_safe(
+          chUnreportedListing,
               "(0): error 0000: Compiler failed without error description, "
               "latest version of fxc.exe might give a description.");
       szListing = chUnreportedListing;
@@ -1560,7 +1566,7 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
 
     char *msg = static_cast<char *>(errMsg.Get());
 
-    sprintf(msg, "%s\n%s\n", chCommandNumber, szListing);
+    V_snprintf(msg, errMsg.Length(), "%s\n%s\n", chCommandNumber, szListing);
 
     GLOBAL_DATA_MTX_LOCK();
     ErrMsgDispatchInt(msg, pEntryInfo->m_szShaderFileName);
@@ -1877,8 +1883,8 @@ void Worker_ProcessWorkUnitFn(int iThread, uint64_t iWorkUnit,
   //////////////////////////////////////////////////////////////////////////
 
   // Failed shaders
-  for (intp k = 0, kEnd = g_Master_ShaderHadError.GetNumStrings(); k < kEnd;
-       ++k) {
+  for (unsigned short k = 0, kEnd = g_Master_ShaderHadError.GetNumStrings();
+       k < kEnd; ++k) {
     char const *szShaderName = g_Master_ShaderHadError.String(k);
     if (!g_Master_ShaderHadError[int_as_symid(k)]) continue;
 
@@ -1893,8 +1899,8 @@ void Worker_ProcessWorkUnitFn(int iThread, uint64_t iWorkUnit,
   }
 
   // Compiler spew
-  for (intp k = 0, kEnd = g_Master_CompilerMsgInfo.GetNumStrings(); k < kEnd;
-       ++k) {
+  for (unsigned short k = 0, kEnd = g_Master_CompilerMsgInfo.GetNumStrings();
+       k < kEnd; ++k) {
     char const *const szMsg = g_Master_CompilerMsgInfo.String(k);
     CompilerMsgInfo const &cmi = g_Master_CompilerMsgInfo[int_as_symid(k)];
 
@@ -1902,7 +1908,7 @@ void Worker_ProcessWorkUnitFn(int iThread, uint64_t iWorkUnit,
     int const numReported = cmi.GetNumTimesReported();
 
     char chNumReported[0x40];
-    sprintf(chNumReported, "%d", numReported);
+    V_sprintf_safe(chNumReported, "%d", numReported);
 
     CUtlBinaryBlock bb;
     bb.SetLength(1 + strlen(szMsg) + 1 + strlen(szFirstCmd) + 1 +
@@ -1973,7 +1979,7 @@ void Worker_GetLocalCopyOfShaders() {
   // locally.
 
   char filename[1024];
-  sprintf(filename, "%s\\uniquefilestocopy.txt", g_pShaderPath);
+  V_sprintf_safe(filename, "%s\\uniquefilestocopy.txt", g_pShaderPath);
 
   CUtlInplaceBuffer bffr(0, 0, CUtlBuffer::TEXT_BUFFER);
   if (!g_pFileSystem->ReadFile(filename, NULL, bffr)) {
@@ -1982,8 +1988,7 @@ void Worker_GetLocalCopyOfShaders() {
   }
 
   while (char *pszLineToCopy = bffr.InplaceGetLinePtr()) {
-    V_MakeAbsolutePath(filename, sizeof(filename), pszLineToCopy,
-                       g_pShaderPath);
+    V_MakeAbsolutePath(filename, pszLineToCopy, g_pShaderPath);
 
     DebugOut("getting local copy of shader: \"%s\" (\"%s\")\n", pszLineToCopy,
              filename);
@@ -2003,7 +2008,7 @@ void Worker_GetLocalCopyOfShaders() {
     else
       Q_strncpy(justFilename, pszLineToCopy, sizeof(justFilename));
 
-    sprintf(filename, "%s%s", g_WorkerTempPath, justFilename);
+    V_sprintf_safe(filename, "%s%s", g_WorkerTempPath, justFilename);
     DebugOut("creating \"%s\"\n", filename);
 
     FILE *fp3 = fopen(filename, "wb");
@@ -2035,7 +2040,7 @@ void Worker_GetLocalCopyOfShaders() {
 void Worker_GetLocalCopyOfBinary(const char *pFilename) {
   CUtlBuffer fileBuf;
   char tmpFilename[MAX_PATH];
-  sprintf(tmpFilename, "%s\\%s", g_ExeDir, pFilename);
+  V_sprintf_safe(tmpFilename, "%s\\%s", g_ExeDir, pFilename);
   DebugOut("trying to open: %s\n", tmpFilename);
 
   FILE *fp = fopen(tmpFilename, "rb");
@@ -2053,7 +2058,7 @@ void Worker_GetLocalCopyOfBinary(const char *pFilename) {
   fileBuf.SeekPut(CUtlBuffer::SEEK_HEAD, nBytesRead);
 
   char newFilename[MAX_PATH];
-  sprintf(newFilename, "%s%s", g_WorkerTempPath, pFilename);
+  V_sprintf_safe(newFilename, "%s%s", g_WorkerTempPath, pFilename);
 
   FILE *fp2 = fopen(newFilename, "wb");
   if (!fp2) {
@@ -2109,10 +2114,10 @@ void Shared_ParseListOfCompileCommands() {
   char chCommands[32], chNumShaders[32], chStaticCombos[32],
       chDynamicCombos[32];
 
-  sprintf(chCommands, "%s", PrettyPrintNumber(g_numCompileCommands));
-  sprintf(chNumShaders, "%s", PrettyPrintNumber(g_numShaders));
-  sprintf(chStaticCombos, "%s", PrettyPrintNumber(g_numStaticCombos));
-  sprintf(chDynamicCombos, "%s", PrettyPrintNumber(g_numDynamicCombos));
+  V_sprintf_safe(chCommands, "%s", PrettyPrintNumber(g_numCompileCommands));
+  V_sprintf_safe(chNumShaders, "%s", PrettyPrintNumber(g_numShaders));
+  V_sprintf_safe(chStaticCombos, "%s", PrettyPrintNumber(g_numStaticCombos));
+  V_sprintf_safe(chDynamicCombos, "%s", PrettyPrintNumber(g_numDynamicCombos));
 
   Msg("\rGoing to compile %s commands from %s shaders. Static combos %s, "
       "dynamic combos %s.\n",
@@ -2121,13 +2126,13 @@ void Shared_ParseListOfCompileCommands() {
 
 void SetupExeDir(int argc, char **argv) {
   V_strcpy_safe(g_ExeDir, argv[0]);
-  Q_StripFilename(g_ExeDir);
+  V_StripFilename(g_ExeDir);
 
   if (g_ExeDir[0] == '\0') {
     Q_strncpy(g_ExeDir, ".\\", sizeof(g_ExeDir));
   }
 
-  Q_FixSlashes(g_ExeDir);
+  V_FixSlashes(g_ExeDir);
 }
 
 void SetupPaths(int argc, char **argv) {
@@ -2148,7 +2153,8 @@ void SetupDebugFile() {
 #ifdef DEBUGFP
   const char *pComputerName = getenv("COMPUTERNAME");
   char filename[MAX_PATH];
-  sprintf(filename, "\\\\fileserver\\user\\gary\\debug\\%s.txt", pComputerName);
+  V_sprintf_safe(filename, "\\\\fileserver\\user\\gary\\debug\\%s.txt",
+                 pComputerName);
   g_WorkerDebugFp = fopen(filename, "w");
   Assert(g_WorkerDebugFp);
   DebugOut("opened debug file\n");
@@ -2439,9 +2445,10 @@ int ShaderCompile_Main(int argc, char *argv[]) {
       {
         char chCommands[32], chNumWorkUnits[32], chNumShaders[32];
 
-        sprintf(chCommands, "%s", PrettyPrintNumber(g_numCompileCommands));
-        sprintf(chNumWorkUnits, "%s", PrettyPrintNumber(nWorkUnits));
-        sprintf(chNumShaders, "%s", PrettyPrintNumber(g_numShaders));
+        V_sprintf_safe(chCommands, "%s",
+                       PrettyPrintNumber(g_numCompileCommands));
+        V_sprintf_safe(chNumWorkUnits, "%s", PrettyPrintNumber(nWorkUnits));
+        V_sprintf_safe(chNumShaders, "%s", PrettyPrintNumber(g_numShaders));
 
         Msg("\rCompiling %s commands in %s work units from %s shaders.\n",
             chCommands, chNumWorkUnits, chNumShaders);
@@ -2494,9 +2501,11 @@ int ShaderCompile_Main(int argc, char *argv[]) {
     {
       char chCommands[32], chStaticCombos[32], chDynamicCombos[32];
 
-      sprintf(chCommands, "%s", PrettyPrintNumber(g_numCompileCommands));
-      sprintf(chStaticCombos, "%s", PrettyPrintNumber(g_numStaticCombos));
-      sprintf(chDynamicCombos, "%s", PrettyPrintNumber(g_numDynamicCombos));
+      V_sprintf_safe(chCommands, "%s", PrettyPrintNumber(g_numCompileCommands));
+      V_sprintf_safe(chStaticCombos, "%s",
+                     PrettyPrintNumber(g_numStaticCombos));
+      V_sprintf_safe(chDynamicCombos, "%s",
+                     PrettyPrintNumber(g_numDynamicCombos));
 
       Msg("\rCompiling %s commands in %s static, %s dynamic combos...\n",
           chCommands, chStaticCombos, chDynamicCombos);
@@ -2510,8 +2519,8 @@ int ShaderCompile_Main(int argc, char *argv[]) {
     char str[4096];
 
     // Write everything that succeeded
-    intp nStrings = g_ShaderByteCode.GetNumStrings();
-    for (intp i = 0; i < nStrings; i++) {
+    unsigned short nStrings = g_ShaderByteCode.GetNumStrings();
+    for (unsigned short i = 0; i < nStrings; i++) {
       WriteShaderFiles(g_ShaderByteCode.String(i));
     }
 
@@ -2529,8 +2538,8 @@ int ShaderCompile_Main(int argc, char *argv[]) {
             : false;
 
     // Compiler spew
-    for (intp k = 0, kEnd = g_Master_CompilerMsgInfo.GetNumStrings(); k < kEnd;
-         ++k) {
+    for (unsigned short k = 0, kEnd = g_Master_CompilerMsgInfo.GetNumStrings();
+         k < kEnd; ++k) {
       char const *const szMsg = g_Master_CompilerMsgInfo.String(k);
       CompilerMsgInfo const &cmi = g_Master_CompilerMsgInfo[int_as_symid(k)];
 
@@ -2590,16 +2599,17 @@ int ShaderCompile_Main(int argc, char *argv[]) {
 
           pBegin = pSpace;
 
-          Msg("                  %.*s %.*s\n", static_cast<unsigned>(pSpace - pEqSign - 1),
-              pEqSign + 1, static_cast<unsigned>(pEqSign - pDefine - 2), pDefine + 2);
+          Msg("                  %.*s %.*s\n",
+              static_cast<unsigned>(pSpace - pEqSign - 1), pEqSign + 1,
+              static_cast<unsigned>(pEqSign - pDefine - 2), pDefine + 2);
         }
       }
       Msg("    %s\n", str);
     }
 
     // Failed shaders summary
-    for (intp k = 0, kEnd = g_Master_ShaderHadError.GetNumStrings(); k < kEnd;
-         ++k) {
+    for (unsigned short k = 0, kEnd = g_Master_ShaderHadError.GetNumStrings();
+         k < kEnd; ++k) {
       const char *shader_name = g_Master_ShaderHadError.String(k);
       if (!g_Master_ShaderHadError[int_as_symid(k)]) continue;
 

@@ -23,7 +23,7 @@ SubProcessKernelObjects::~SubProcessKernelObjects() { Close(); }
 
 BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
   char chBufferName[0x100] = {0};
-  sprintf(chBufferName, "%s_msec", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_msec", szBaseName);
 
   // 4Mb for a piece
   m_hMemorySection =
@@ -38,11 +38,11 @@ BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
     }
   }
 
-  sprintf(chBufferName, "%s_mtx", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_mtx", szBaseName);
   m_hMutex = CreateMutex(nullptr, FALSE, chBufferName);
 
   for (int k = 0; k < 2; ++k) {
-    sprintf(chBufferName, "%s_evt%d", szBaseName, k);
+    V_sprintf_safe(chBufferName, "%s_evt%d", szBaseName, k);
 
     m_hEvent[k] = CreateEvent(nullptr, FALSE, (k ? TRUE /* = master */ : FALSE),
                               chBufferName);
@@ -54,14 +54,14 @@ BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
 BOOL SubProcessKernelObjects::Open(char const *szBaseName) {
   char chBufferName[0x100] = {0};
 
-  sprintf(chBufferName, "%s_msec", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_msec", szBaseName);
   m_hMemorySection = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, chBufferName);
 
-  sprintf(chBufferName, "%s_mtx", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_mtx", szBaseName);
   m_hMutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, chBufferName);
 
   for (int k = 0; k < 2; ++k) {
-    sprintf(chBufferName, "%s_evt%d", szBaseName, k);
+    V_sprintf_safe(chBufferName, "%s_evt%d", szBaseName, k);
     m_hEvent[k] = OpenEvent(EVENT_ALL_ACCESS, FALSE, chBufferName);
   }
 
@@ -118,8 +118,9 @@ void *SubProcessKernelObjects_Memory::Lock() {
 
       case WAIT_TIMEOUT: {
         char chMsg[0x100];
-        sprintf(chMsg, "th%08X> WAIT_TIMEOUT in Memory::Lock (attempt %d).\n",
-                GetCurrentThreadId(), iWaitAttempt);
+        V_sprintf_safe(chMsg,
+                       "th%08X> WAIT_TIMEOUT in Memory::Lock (attempt %d).\n",
+                       GetCurrentThreadId(), iWaitAttempt);
         OutputDebugString(chMsg);
       }
         continue;  // retry
