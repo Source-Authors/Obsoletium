@@ -246,7 +246,8 @@ int main(int argc, char **argv) {
   }
 
   MathLib_Init(2.2f, 2.2f, 0.0f, 2);
-  InitDefaultFileSystem();
+
+  const ScopedDefaultFileSystem scoped_default_file_system;
 
   int i = 1;
   while (i < argc) {
@@ -314,8 +315,6 @@ int main(int argc, char **argv) {
     ProcessFiles(normalFileNameWithoutExtension, startFrame, endFrame,
                  bumpScale);
   }
-
-  ShutdownDefaultFileSystem();
 
   return 0;
 }
