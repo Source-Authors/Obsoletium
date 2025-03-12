@@ -76,8 +76,6 @@ $Configuration
 	{
 		$CommandLine		"copy $QUOTE$(TargetDir)$(TargetFileName)$QUOTE $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE >nul" "\n" \
 							"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
-							"SignTool sign /f $QUOTE$(SolutionDir)devtools\certificates\dev\local-dev-app-sign.pfx$QUOTE /p $QUOTEK)(#JF*56U8$RJO_)P#6NJP762OKAE$QUOTE /fd SHA512 /td SHA512 /tr http://timestamp.sectigo.com $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE" "\n" \
-							"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
 							"if NOT $QUOTE$(TargetFileName)$QUOTE == $QUOTEnewdat.exe$QUOTE $QUOTE$OUTBINDIR\newdat$QUOTE $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE" "\n"					\
 							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 							"if exist $QUOTE$(TargetDir)$(TargetName).map$QUOTE copy $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTBINDIR\$(TargetName).map$QUOTE >nul" "\n"
