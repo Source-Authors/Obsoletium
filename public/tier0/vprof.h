@@ -1085,7 +1085,7 @@ public:
 		// dimhotepus: Check overflows / underflows.
 		if (val >= 0)
 		{
-			constexpr auto maxCounterValue = std::numeric_limits<
+			[[maybe_unused]] constexpr auto maxCounterValue = std::numeric_limits<
 				std::remove_pointer_t<decltype(m_pCounter)>
 			>::max();
 
