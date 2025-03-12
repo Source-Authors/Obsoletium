@@ -93,7 +93,7 @@ void CQC_EyesDlg::AddText(PRINTF_FORMAT_STRING const char *pFormat, ...) {
     m_Buf = newbuf;
   }
 
-  strcat(m_Buf, tempMsg);
+  V_strncat(m_Buf, tempMsg, m_BufSize);
 }
 
 void SendToEditControl(HWND hEditControl, const char *pText) {
