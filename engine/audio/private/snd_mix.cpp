@@ -870,7 +870,7 @@ void S_MixBufferUpsample2x( int count, portable_samplepair_t *pbuffer, portable_
 // Also sets the rear paintbuffer if paintbuffer has fsurround true.
 // (otherwise, rearpaintbuffer is NULL)
 
-void MIX_SetCurrentPaintbuffer(int ipaintbuffer)
+void MIX_SetCurrentPaintbuffer(intp ipaintbuffer)
 {
 	// set front and rear paintbuffer
 
@@ -900,9 +900,7 @@ void MIX_SetCurrentPaintbuffer(int ipaintbuffer)
 
 intp MIX_GetCurrentPaintbufferIndex( void )
 {
-	intp i;
-
-	for ( i = 0; i < g_paintBuffers.Count(); i++ )
+	for ( intp i = 0; i < g_paintBuffers.Count(); i++ )
 	{
 		if (g_curpaintbuffer == g_paintBuffers[i].pbuf)
 			return i;
@@ -916,7 +914,7 @@ intp MIX_GetCurrentPaintbufferIndex( void )
 
 paintbuffer_t *MIX_GetCurrentPaintbufferPtr( void )
 {
-	int ipaint = MIX_GetCurrentPaintbufferIndex();
+	intp ipaint = MIX_GetCurrentPaintbufferIndex();
 	
 	Assert( ipaint < g_paintBuffers.Count() );
 
@@ -931,7 +929,7 @@ inline portable_samplepair_t *MIX_GetPFrontFromIPaint(int ipaintbuffer)
 	return g_paintBuffers[ipaintbuffer].pbuf;
 }
 
-paintbuffer_t *MIX_GetPPaintFromIPaint( int ipaintbuffer )
+paintbuffer_t *MIX_GetPPaintFromIPaint( intp ipaintbuffer )
 {	
 	Assert( ipaintbuffer < g_paintBuffers.Count() );
 
@@ -1774,7 +1772,7 @@ void MIX_CompressPaintbuffer(int ipaint, int count)
 void MIX_MixUpsampleBuffer( CChannelList &list, int ipaintbuffer, int end, int count, int flags )
 {
 	VPROF("MixUpsampleBuffer");
-	int ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
+	intp ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
 
 	// reset paintbuffer upsampling filter index
 	MIX_ResetPaintbufferFilterCounter( ipaintbuffer );
