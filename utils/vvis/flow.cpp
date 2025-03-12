@@ -778,28 +778,22 @@ RecursiveLeafBitFlow
 */
 void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 {
-	portal_t	*p;
-	leaf_t 		*leaf;
-	int			i, j;
-	long		more;
-	int			pnum;
 	alignas(long) byte		newmight[MAX_PORTALS/8];
 
-	leaf = &leafs[leafnum];
+	leaf_t *leaf = &leafs[leafnum];
 	
 // check all portals for flowing into other leafs	
-	for (i=0 ; i<leaf->portals.Count(); i++)
+	for (auto *p : leaf->portals)
 	{
-		p = leaf->portals[i];
-		pnum = p - portals;
+		int pnum = p - portals;
 
 		// if some previous portal can't see it, skip
 		if ( !CheckBit( mightsee, pnum ) )
 			continue;
 
 		// if this portal can see some portals we mightsee, recurse
-		more = 0;
-		for (j=0 ; j<portallongs ; j++)
+		long more = 0;
+		for (int j=0 ; j<portallongs ; j++)
 		{
 			((long *)newmight)[j] = ((long *)mightsee)[j] 
 				& ((long *)p->portalflood)[j];
