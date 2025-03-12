@@ -118,7 +118,7 @@ int g_nGenericErrorCounter = 0;
 
 void CErrorSystem::OGS_ReportSessionBlockDownloadError( const CHttpDownloader *pDownloader, const CClientRecordingSessionBlock *pBlock,
 														int nLocalFileSize, int nMaxBlock, const bool *pSizesDiffer,
-														const bool *pHashFail, uint8 *pLocalHash )
+														const bool *pHashFail, IN_CAP(localHashSize) uint8 *pLocalHash, int localHashSize )
 														
 {
 	// Create a download error and queue for upload
@@ -148,8 +148,8 @@ void CErrorSystem::OGS_ReportSessionBlockDownloadError( const CHttpDownloader *p
 
 		// Include hashes
 		char szRemoteHash[64], szLocalHash[64];
-		V_binarytohex( pBlock->m_aHash, sizeof( pBlock->m_aHash ), szRemoteHash, sizeof( szRemoteHash ) );
-		V_binarytohex( pLocalHash, sizeof( pBlock->m_aHash ), szLocalHash, sizeof( szLocalHash ) );
+		V_binarytohex( pBlock->m_aHash, szRemoteHash );
+		V_binarytohex( pLocalHash, localHashSize, szLocalHash );
 		pBlockDownloadError->SetString( "RemoteHash", szRemoteHash );
 		pBlockDownloadError->SetString( "LocalHash", szLocalHash );
 	}
@@ -207,7 +207,7 @@ void CErrorSystem::Think()
 	if ( m_lstErrors.Count() == 0 )
 		return;
 
-	const int nMaxLen = 4096;
+	constexpr intp nMaxLen = 4096;
 	wchar_t wszErrorText[ nMaxLen ] = L"";
 	FOR_EACH_LL( m_lstErrors, i )
 	{
@@ -215,8 +215,8 @@ void CErrorSystem::Think()
 		if ( wcslen( wszErrorText ) + wcslen( pError ) + 1 >= nMaxLen )
 			break;
 
-		wcscat( wszErrorText, pError );
-		wcscat( wszErrorText, L"\n" );
+		V_wcscat_safe( wszErrorText, pError );
+		V_wcscat_safe( wszErrorText, L"\n" );
 	}
 
 	// Report now

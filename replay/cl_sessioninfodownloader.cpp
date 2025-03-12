@@ -233,7 +233,7 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 								for ( int i = iStartBlock; i < header.m_nNumBlocks; ++i )
 								{
 									// Attempt to read the current block from the buffer
-									buf.Get( &DummyBlock, sizeof( DummyBlock ) );
+									buf.Get( DummyBlock );
 									if ( !buf.IsValid() )
 									{
 										m_nError = ERROR_BLOCK_READ_FAILED;
@@ -289,7 +289,7 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 											pSession->m_strName.Get(), pNewBlock->m_iReconstruction,
 											BLOCK_FILE_EXTENSION
 										);
-										V_strcpy( pNewBlock->m_szFullFilename, pFullFilename );
+										V_strcpy_safe( pNewBlock->m_szFullFilename, pFullFilename );
 										pNewBlock->m_hSession = pSession->GetHandle();
 
 										// Add to session block manager

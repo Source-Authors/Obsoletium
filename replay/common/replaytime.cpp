@@ -112,8 +112,8 @@ void CReplayTime::Write( KeyValues *pOut )
 	char szDay[8];		// Convert day to wide
 	static wchar_t s_wDay[8];
 
-	V_snprintf( szDay, sizeof( szDay ), "%i", nDay );
-	pLocalize->ConvertANSIToUnicode( szDay, s_wDay, sizeof( s_wDay ) );
+	V_sprintf_safe( szDay, "%i", nDay );
+	pLocalize->ConvertANSIToUnicode( szDay, s_wDay );
 
 	return s_wDay;
 }
@@ -123,8 +123,8 @@ void CReplayTime::Write( KeyValues *pOut )
 	char szYear[8];		// Convert year to wide
 	static wchar_t s_wYear[8];
 
-	V_snprintf( szYear, sizeof( szYear ), "%i", nYear );
-	pLocalize->ConvertANSIToUnicode( szYear, s_wYear, sizeof( s_wYear ) );
+	V_sprintf_safe( szYear, "%i", nYear );
+	pLocalize->ConvertANSIToUnicode( szYear, s_wYear );
 
 	return s_wYear;
 }
@@ -133,8 +133,8 @@ void CReplayTime::Write( KeyValues *pOut )
 {
 	char szTime[16];	// Convert time to wide
 	static wchar_t s_wTime[16];
-	V_snprintf( szTime, sizeof( szTime ), "%i:%02i:%02i %s", nHour % 12, nMin, nSec, nHour < 12 ? "AM" : "PM" );
-	pLocalize->ConvertANSIToUnicode( szTime, s_wTime, sizeof( s_wTime ) );
+	V_sprintf_safe( szTime, "%i:%02i:%02i %s", nHour % 12, nMin, nSec, nHour < 12 ? "AM" : "PM" );
+	pLocalize->ConvertANSIToUnicode( szTime, s_wTime );
 
 	return s_wTime;
 }

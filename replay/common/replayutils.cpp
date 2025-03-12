@@ -19,12 +19,12 @@ static char gs_szGameDir[MAX_OSPATH];
 
 //----------------------------------------------------------------------------------------
 
-void Replay_GetFirstAvailableFilename( char *pDst, intp nDstLen, const char *pIdealFilename, const char *pExt,
+void Replay_GetFirstAvailableFilename( OUT_Z_CAP(nDstLen) char *pDst, intp nDstLen, const char *pIdealFilename, const char *pExt,
 									   const char *pFilePath, intp nStartIndex )
 {
 	// Strip extension from ideal filename
 	char szIdealFilename[ MAX_OSPATH ];
-	V_StripExtension( pIdealFilename, szIdealFilename, sizeof( szIdealFilename ) );
+	V_StripExtension( pIdealFilename, szIdealFilename );
 
 	intp i = nStartIndex;
 	while ( 1 )
@@ -85,7 +85,7 @@ char *Replay_va( const char *format, ... )
 
 void Replay_SetGameDir( const char *pGameDir )
 {
-	V_strcpy( gs_szGameDir, pGameDir );
+	V_strcpy_safe( gs_szGameDir, pGameDir );
 }
 
 //----------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ const char *Replay_GetBaseDir()
 
 //----------------------------------------------------------------------------------------
 
-void Replay_GetAutoName( wchar_t *pDest, int nDestSize, const char *pMapName )
+void Replay_GetAutoName( OUT_Z_BYTECAP(nDestSize) wchar_t *pDest, int nDestSize, const char *pMapName )
 {
 	// Get date/time
 	CReplayTime now;
@@ -118,7 +118,7 @@ void Replay_GetAutoName( wchar_t *pDest, int nDestSize, const char *pMapName )
 	// Convert map name to unicode
 	wchar_t wszMapName[256];
 	extern vgui::ILocalize *g_pVGuiLocalize;
-	g_pVGuiLocalize->ConvertANSIToUnicode( pMapName, wszMapName, sizeof( wszMapName ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( pMapName, wszMapName );
 
 	// Get localized date as string
 	const wchar_t *pLocalizedDate = CReplayTime::GetLocalizedDate( g_pVGuiLocalize, now, true );

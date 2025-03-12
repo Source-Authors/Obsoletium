@@ -417,7 +417,7 @@ void CReplayManager::InitReplay( CReplay *pReplay )
 	pReplay->m_flStartTime = g_pEngine->GetHostTime();
 
 	// Get map name (w/o the path)
-	V_FileBase( g_pEngineClient->GetLevelName(), m_pPendingReplay->m_szMapName, sizeof( m_pPendingReplay->m_szMapName ) );
+	V_FileBase( g_pEngineClient->GetLevelName(), m_pPendingReplay->m_szMapName );
 
 	// Give the replay a default name
 	pReplay->AutoNameTitleIfEmpty();

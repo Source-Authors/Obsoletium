@@ -49,7 +49,7 @@ void CBasePublishJob::SimulateDelay( int nDelay, const char *pThreadName )
 
 CLocalPublishJob::CLocalPublishJob( const char *pLocalFilename )
 {
-	V_strcpy( m_szLocalFilename, pLocalFilename );
+	V_strcpy_safe( m_szLocalFilename, pLocalFilename );
 }
 
 JobStatus_t	CLocalPublishJob::DoExecute()
@@ -387,7 +387,7 @@ public:
 
 	virtual void Publish( const PublishFileParams_t &params )
 	{
-		V_strcpy( m_szOutFilename, params.m_pOutFilename );
+		V_strcpy_safe( m_szOutFilename, params.m_pOutFilename );
 
 		m_pInData = params.m_pSrcData;
 		m_nInSize = params.m_nSrcSize;
