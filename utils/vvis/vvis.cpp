@@ -1117,13 +1117,13 @@ int RunVVis( int argc, char **argv )
 	//             or reason to this. We get just the base name we were passed, discarding any directory or extension
 	//             information. We then ExpandPath() it (see VMPI comment above), and tack on .bsp for the file access
 	//             parts.
-	V_FileBase( argv[ argc - 1 ], mapFile, sizeof( mapFile ) );
+	V_FileBase( argv[ argc - 1 ], mapFile );
 	V_strcpy_safe( mapFile, ExpandPath( mapFile ) );
 	V_strcat_safe( mapFile, ".bsp" );
 
 	// Source is just the mapfile without an extension at this point...
 	V_strcpy_safe( source, mapFile );
-	V_StripExtension( source, source, sizeof( source ) );
+	V_StripExtension( source, source );
 
 	// dimhotepus: Reorder to apply command line from file, too.
 	ScopedCmdLine scopedCmdLine( argc, argv, source, "vvis" );
@@ -1183,7 +1183,7 @@ int RunVVis( int argc, char **argv )
 	else
 	{
 		V_sprintf_safe ( portalfile, "%s%s", inbase, argv[i] );
-		Q_StripExtension( portalfile, portalfile, sizeof( portalfile ) );
+		Q_StripExtension( portalfile, portalfile );
 	}
 	V_strcat_safe (portalfile, ".prt");
 
