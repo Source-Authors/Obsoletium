@@ -3001,7 +3001,7 @@ void CMaterial::CallBindProxy( void *proxyData )
 	case 2:
 		// alpha mod all....
 		{
-			float value = ( sin( 2.0f * M_PI_F * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
+			float value = static_cast<float>( sin( 2.0 * M_PI * Plat_FloatTime() / 10.0 ) * 0.5f ) + 0.5f;
 			m_pShaderParams[ALPHA]->SetFloatValue( value );
 		}
 		break;
@@ -3009,7 +3009,7 @@ void CMaterial::CallBindProxy( void *proxyData )
 	case 3:
 		// color mod all...
 		{
-			float value = ( sin( 2.0f * M_PI_F * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
+			float value = static_cast<float>( sin( 2.0 * M_PI * Plat_FloatTime() / 10.0 ) * 0.5f ) + 0.5f;
 			m_pShaderParams[COLOR]->SetVecValue( value, 1.0f, 1.0f );
 		}
 		break;
