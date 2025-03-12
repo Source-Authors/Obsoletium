@@ -170,8 +170,8 @@ bool CompileCaptionsApp::SetupSearchPaths() {
   if (!BaseClass::SetupSearchPaths(NULL, false, true)) return false;
 
   // Set gamedir.
-  Q_MakeAbsolutePath(gamedir, sizeof(gamedir), GetGameInfoPath());
-  Q_AppendSlash(gamedir, sizeof(gamedir));
+  V_MakeAbsolutePath(gamedir, GetGameInfoPath());
+  V_AppendSlash(gamedir);
 
   return true;
 }
@@ -476,7 +476,7 @@ int CompileCaptionsApp::Main() {
   char infile[MAX_PATH];
   V_strcpy_safe(infile, outfile);
 
-  Q_SetExtension(outfile, ".dat", sizeof(outfile));
+  Q_SetExtension(outfile, ".dat");
 
   vprint(m_UseLogFile, 0, "gamedir[ %s ]\n", gamedir);
   vprint(m_UseLogFile, 0, "infile[ %s ]\n", infile);
