@@ -224,7 +224,7 @@ void CQuickListPanel::SetServerInfo ( KeyValues *pKV, int iListID, int iTotalSer
 	wchar_t playercount[16];
 	wchar_t *pwszPlayers = g_pVGuiLocalize->Find("#ServerBrowser_Players");
 
-	g_pVGuiLocalize->ConvertANSIToUnicode( pKV->GetString( "players", " " ), playercount,  sizeof( playercount ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( pKV->GetString( "players", " " ), playercount );
 
 	_snwprintf( players, std::size( players ), L"%ls %ls",  playercount, pwszPlayers );
 	

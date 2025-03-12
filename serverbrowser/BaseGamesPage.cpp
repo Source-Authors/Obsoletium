@@ -20,8 +20,6 @@ using namespace vgui;
 #define MAX_MAP_NAME	128
 const char *COM_GetModDirectory();
 
-#undef wcscat
-
 ConVar sb_mod_suggested_maxplayers( "sb_mod_suggested_maxplayers", "0", FCVAR_HIDDEN );
 ConVar sb_filter_incompatible_versions( "sb_filter_incompatible_versions",
 	#ifdef STAGING_ONLY
@@ -76,14 +74,14 @@ inline char *CloneString( const char *str )
 
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
+			V_StripLastDir( modDir );
 			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
@@ -1444,26 +1442,26 @@ void CBaseGamesPage::RecalculateFilterString()
 	if (m_szGameFilter[0])
 	{
 		Q_UTF8ToUnicode( ModList().GetModNameForModDir( m_iLimitToAppID ), tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_iSecureFilter == FILTER_SECURESERVERSONLY)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescSecureOnly" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescSecureOnly" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 	else if (m_iSecureFilter == FILTER_INSECURESERVERSONLY)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescInsecureOnly" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescInsecureOnly" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_pLocationFilter->GetActiveItem() > 0)
 	{
 		m_pLocationFilter->GetText(tempUnicode, sizeof(tempUnicode));
-		wcscat( unicode, tempUnicode );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_iPingFilter)
@@ -1471,12 +1469,12 @@ void CBaseGamesPage::RecalculateFilterString()
 		char tmpBuf[16];
 		V_to_chars( tmpBuf, m_iPingFilter );
 
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescLatency" ) );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescLatency" ) );
 		Q_UTF8ToUnicode( " < ", tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
 		Q_UTF8ToUnicode(tmpBuf, tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );	
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, tempUnicode );	
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if ( m_iMaxPlayerFilter )
@@ -1484,42 +1482,42 @@ void CBaseGamesPage::RecalculateFilterString()
 		char tmpBuf[16];
 		V_to_chars( tmpBuf, m_iMaxPlayerFilter );
 
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescMaxPlayers" ) );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescMaxPlayers" ) );
 		Q_UTF8ToUnicode( " <= ", tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
 		Q_UTF8ToUnicode(tmpBuf, tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );	
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, tempUnicode );	
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterNoFullServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotFull" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotFull" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterNoEmptyServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotEmpty" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotEmpty" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterNoPasswordedServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNoPassword" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNoPassword" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterReplayServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescReplays" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescReplays" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_szMapFilter[0])
 	{
 		Q_UTF8ToUnicode( m_szMapFilter, tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
 	}
 
 	m_pFilterString->SetText(unicode);

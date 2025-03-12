@@ -429,14 +429,14 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 	char tmptags[MAX_TAG_CHARACTERS];
 	tmptags[0] = '\0';
 
-	for ( int i = 0; i < TagList.Count(); i++ )
+	for ( intp i = 0; i < TagList.Count(); i++ )
 	{
 		if ( i > 0 )
 		{
-			Q_strncat( tmptags, ",", MAX_TAG_CHARACTERS );
+			V_strcat_safe( tmptags, "," );
 		}
 
-		Q_strncat( tmptags, TagList[i], MAX_TAG_CHARACTERS );
+		V_strcat_safe( tmptags, TagList[i] );
 	}
 
 	m_pTagFilter->SetText( tmptags );
