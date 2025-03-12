@@ -134,7 +134,12 @@ void DownloadCache::Init()
 	}
 
 	m_cache = new KeyValues( "DownloadCache" );
-	m_cache->LoadFromFile( g_pFileSystem, CacheFilename, NULL );
+	if ( !m_cache->LoadFromFile( g_pFileSystem, CacheFilename, NULL ) )
+	{
+		// dimhotepus: Note missed download cache.
+		Msg( "There is no or broken download cache '%s' yet.\n", CacheFilename );
+	}
+
 	g_pFileSystem->CreateDirHierarchy( CacheDirectory, "DEFAULT_WRITE_PATH" );
 }
 
