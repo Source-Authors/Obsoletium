@@ -20,6 +20,8 @@
 
 #include <memory>
 
+#include "tier0/memdbgon.h"
+
 namespace {
 
 [[noreturn]] void Usage() {
