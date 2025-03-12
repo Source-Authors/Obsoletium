@@ -676,13 +676,12 @@ void LoadDefaultGroupMappings( CUtlDict< CUtlString, int > &defaultGroupMapping,
 	defaultGroupMapping.RemoveAll();
 	defaultGroupOrdering.RemoveAll();
 
-	KeyValues *pGroupFile = new KeyValues( "groupFile" );
+	KeyValuesAD pGroupFile("groupFile");
 	if ( !pGroupFile )
 		return;
 
 	if ( !pGroupFile->LoadFromFile( g_pFullFileSystem, ANIMATION_SET_DEFAULT_GROUP_MAPPING_FILE, "GAME" ) )
 	{
-		pGroupFile->deleteThis();
 		return;
 	}
 
@@ -706,8 +705,6 @@ void LoadDefaultGroupMappings( CUtlDict< CUtlString, int > &defaultGroupMapping,
 			defaultGroupMapping.Insert( controlName, pGroupName );
 		}
 	}
-
-	pGroupFile->deleteThis();
 }
 
 CDmElement *FindOrAddDefaultGroupForControls( const char *pGroupName, CDmaElementArray< CDmElement > &groups, DmFileId_t fileid )
