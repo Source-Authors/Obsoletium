@@ -644,17 +644,12 @@ SimpleFlood
 */
 void SimpleFlood (portal_t *srcportal, int leafnum)
 {
-	int		i;
-	leaf_t	*leaf;
-	portal_t	*p;
-	int		pnum;
+	leaf_t *leaf = &leafs[leafnum];
 
-	leaf = &leafs[leafnum];
-	
-	for (i=0 ; i<leaf->portals.Count(); i++)
+	for (auto *p : leaf->portals)
 	{
-		p = leaf->portals[i];
-		pnum = p - portals;
+		int pnum = p - portals;
+
 		if ( !CheckBit( srcportal->portalfront, pnum ) )
 			continue;
 
