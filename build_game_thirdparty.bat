@@ -98,7 +98,7 @@ if ERRORLEVEL 1 (
 POPD
 
 
-SET ZLIB_SOURCE_DIR=%cd%\thirdparty\zlib
+SET ZLIB_SOURCE_DIR="%cd%\thirdparty\zlib"
 
 
 REM Build libpng.
