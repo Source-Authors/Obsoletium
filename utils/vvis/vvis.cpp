@@ -218,7 +218,7 @@ void ClusterMerge (int clusternum)
 	// save uncompressed for PHS calculation
 	memcpy (uncompressedvis + clusternum*leafbytes, uncompressed, leafbytes);
 
-	qprintf ("cluster %4i : %4i visible\n", clusternum, numvis);
+	qprintf ("cluster %4i: %4i visible\n", clusternum, numvis);
 	totalvis += numvis;
 }
 
@@ -481,7 +481,7 @@ void LoadPortals (char *name)
 		if (numpoints > MAX_POINTS_ON_WINDING)
 			Error ("LoadPortals: portal %i has too many points", i);
 
-		if ( (unsigned)leafnums[0] > portalclusters || (unsigned)leafnums[1] > portalclusters)
+		if ( leafnums[0] > portalclusters || leafnums[1] > portalclusters )
 			Error ("LoadPortals: reading portal %i", i);
 		
 		winding_t *w = p->winding = NewWinding (numpoints);
@@ -565,7 +565,7 @@ void CalcPAS (void)
 		memcpy (uncompressed, scan, leafbytes);
 
 		// dimhotepus: Add size check to catch usage issues.
-		Assert(leaflongs * sizeof(long) <= ssize(uncompressed));
+		Assert(leaflongs * static_cast<intp>(sizeof(long)) <= ssize(uncompressed));
 		for (int j=0 ; j<leafbytes ; j++)
 		{
 			int bitbyte = scan[j];
