@@ -685,6 +685,7 @@ private:
 			NetworkStateChanged(); \
 			return m_Value; \
 		} \
+		constexpr intp Size() const { return length; }; \
 	protected: \
 		inline void NetworkStateChanged() \
 		{ \
