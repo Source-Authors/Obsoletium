@@ -35,21 +35,26 @@ $Project "glview"
 	{
 		$File	"glview.cpp"
 
-		$Folder	"common files"
+		$Folder	"Common Files"
 		{
 			$File	"..\common\cmdlib.cpp"
-			$File	"$SRCDIR\public\filesystem_helpers.cpp"
-			$File	"$SRCDIR\public\filesystem_init.cpp"
 			$File	"..\common\filesystem_tools.cpp"
 			$File	"..\common\physdll.cpp"
+			$File	"..\common\tools_minidump.cpp"
+			$File	"$SRCDIR\public\filesystem_helpers.cpp"
+			$File	"$SRCDIR\public\filesystem_init.cpp"
 		}
 	}
 
 	$Folder	"Header Files"
 	{
 		$File	"..\common\cmdlib.h"
-		$File	"glos.h"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\tools_minidump.h"
+		$File	"$SRCDIR\public\filesystem_helpers.h"
+		$File	"$SRCDIR\public\filesystem_init.h"
 		$File	"$SRCDIR\public\mathlib\mathlib.h"
+		$File	"glos.h"
 	}
 
 	$Folder	"Link Libraries"

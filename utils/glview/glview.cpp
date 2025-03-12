@@ -1,5 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 //
+// Program that displays visleaves.  It has been deprecated in the Orange Box
+// (Source 2007) by Hammer's Map > Load Portal File feature.  Despite that,
+// glview is still available for games made after Orange Box.
+//
 // See https://developer.valvesoftware.com/wiki/Glview
 //
 // YWB:  3/13/98
@@ -22,6 +26,7 @@
 //
 // I sped up the KB movement and turn speed, too.
 
+#define NOMINMAX
 #include <gl/gl.h>
 #include <gl/glu.h>
 
@@ -35,6 +40,7 @@
 #include "physdll.h"
 #include "phyfile.h"
 #include "vphysics_interface.h"
+#include "tools_minidump.h"
 
 #include "glos.h"
 #include "resource.h"
@@ -147,8 +153,8 @@ void Cam_MouseMoved() {
     RECT rect;
     ::GetWindowRect(camerawindow, &rect);
 
-    rect.top = max(0, rect.top);
-    rect.left = max(0, rect.left);
+    rect.top = max(0L, rect.top);
+    rect.left = max(0L, rect.left);
 
     int centerx = (rect.left + rect.right) / 2;
     int centery = (rect.top + rect.bottom) / 2;
@@ -1154,6 +1160,10 @@ SpewRetval_t GlViewSpew(SpewType_t type, const char *pMsg) {
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
                    _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps;
+
   CommandLine()->CreateCmdLine(Plat_GetCommandLine());
 
   if (CommandLine()->ParmCount() == 0) Error("Please specify file to view.\n");
