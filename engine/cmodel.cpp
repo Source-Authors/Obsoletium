@@ -1699,7 +1699,7 @@ static inline void CM_ComputeTraceEndpoints( const Ray_t& ray, trace_t& tr )
 //-----------------------------------------------------------------------------
 void CM_RayLeafnums_r( const Ray_t &ray, CCollisionBSPData *pBSPData, int iNode, 
 					  float p1f, float p2f, const Vector &vecPoint1, const Vector &vecPoint2,
-					  int *pLeafList, int nMaxLeafCount, int &nLeafCount )
+					  int *pLeafList, intp nMaxLeafCount, intp &nLeafCount )
 {
 	cnode_t		*pNode = NULL;
 	cplane_t	*pPlane = NULL;
@@ -1846,7 +1846,7 @@ void CM_RayLeafnums_r( const Ray_t &ray, CCollisionBSPData *pBSPData, int iNode,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CM_RayLeafnums( const Ray_t &ray, int *pLeafList, int nMaxLeafCount, int &nLeafCount  )
+void CM_RayLeafnums( const Ray_t &ray, int *pLeafList, intp nMaxLeafCount, intp &nLeafCount  )
 {
 	CCollisionBSPData *pBSPData = GetCollisionBSPData();
 	if ( !pBSPData->numnodes )
@@ -2044,7 +2044,7 @@ static inline void CM_UnsweptBoxTrace( TraceInfo_t *pTraceInfo, const Ray_t& ray
 //-----------------------------------------------------------------------------
 // Purpose: Ray/Hull trace against the world without the RecursiveHullTrace
 //-----------------------------------------------------------------------------
-void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, int nLeafCount, int nBrushMask,
+void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, intp nLeafCount, int nBrushMask,
 							     bool bComputeEndpoint, trace_t &trace )
 {
 	// For multi-check avoidance.
@@ -2084,7 +2084,7 @@ void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, int nLeafCoun
 		Vector vecBoxMax( ( ray.m_Start.x + ray.m_Extents.x + 1 ), ( ray.m_Start.y + ray.m_Extents.y + 1 ), ( ray.m_Start.z + ray.m_Extents.z + 1 ) );
 
 		bool bFoundNonSolidLeaf = false;
-		for ( int iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
+		for ( intp iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
 		{
 			if ( ( pTraceInfo->m_pBSPData->map_leafs[pLeafList[iLeaf]].contents & CONTENTS_SOLID ) == 0 )
 			{
@@ -2105,7 +2105,7 @@ void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, int nLeafCoun
 	}
 	else
 	{
-		for ( int iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
+		for ( intp iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
 		{
 			// NOTE: startFrac and endFrac are not really used.
 			if ( pTraceInfo->m_ispoint )
