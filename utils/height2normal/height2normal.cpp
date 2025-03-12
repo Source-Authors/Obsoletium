@@ -44,7 +44,7 @@ bool ImageRGBA8888HasAlpha(unsigned char *pImage, int numTexels) {
 bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key, char **val) {
   char stringBuf[2048];
   while (buf.IsValid()) {
-    buf.GetLine(stringBuf, sizeof(stringBuf));
+    buf.GetLine(stringBuf);
     char *scan = stringBuf;
     // search for the first quote for the key.
     while (1) {
@@ -128,7 +128,7 @@ void LoadConfigFile(const char *pFileName, float *bumpScale, int *startFrame,
   }
 }
 
-void Usage() {
+[[noreturn]] void Usage() {
   fprintf(stderr,
           "Usage: height2normal [-nopause] [-quiet] tex1_normal.txt "
           "tex2_normal.txt . . .\n");
@@ -161,7 +161,7 @@ void ProcessFiles(const char *pNormalFileNameWithoutExtension, int startFrame,
       return;
     }
 
-    strcpy(buffer, pNormalFileNameWithoutExtension);
+    V_strcpy_safe(buffer, pNormalFileNameWithoutExtension);
 
     // Strip '_normal' off the end because we're looking for '_height'
     char *pcUnderscore = Q_stristr(buffer, "_normal");
@@ -241,9 +241,7 @@ int main(int argc, char **argv) {
   Msg("\nValve Software - height2normal (%s)\n", __DATE__);
 #endif
 
-  if (argc < 2) {
-    Usage();
-  }
+  if (argc < 2) Usage();
 
   MathLib_Init(2.2f, 2.2f, 0.0f, 2);
 
@@ -310,8 +308,7 @@ int main(int argc, char **argv) {
       printf("\tbumpscale: %f\n", bumpScale);
     }
 
-    Q_StripExtension(pFileName, normalFileNameWithoutExtension,
-                     sizeof(normalFileNameWithoutExtension));
+    Q_StripExtension(pFileName, normalFileNameWithoutExtension);
     ProcessFiles(normalFileNameWithoutExtension, startFrame, endFrame,
                  bumpScale);
   }
