@@ -92,7 +92,7 @@ public:
 
 	int Count() const;
 
-	void GetElementName( int i, char *buf, int buflen )
+	void GetElementName( int i, OUT_Z_CAP(buflen) char *buf, intp buflen )
 	{
 		buf[ 0 ] = 0;
 		if ( !m_Elements.IsValidIndex( i ) )
@@ -666,7 +666,7 @@ void CUtlCachedFileData<T>::Save()
 {
 	char path[ 512 ];
 	Q_strncpy( path, m_sRepositoryFileName, sizeof( path ) );
-	Q_StripFilename( path );
+	V_StripFilename( path );
 
 	g_pFullFileSystem->CreateDirHierarchy( path, "MOD" );
 
@@ -709,7 +709,7 @@ void CUtlCachedFileData<T>::Save()
 			ElementType_t& element = m_Elements[ i ];
 
 			char fn[ 512 ];
-			g_pFullFileSystem->String( element.handle, fn, sizeof( fn ) );
+			g_pFullFileSystem->String( element.handle, fn );
 
 			buf.PutString( fn );
 			buf.PutInt( element.fileinfo );
@@ -761,9 +761,9 @@ template <class T>
 bool CUtlCachedFileData<T>::ManifestExists()
 {
 	char manifest_name[ 512 ];
-	Q_strncpy( manifest_name, m_sRepositoryFileName, sizeof( manifest_name ) );
+	V_strcpy_safe( manifest_name, m_sRepositoryFileName );
 
-	Q_SetExtension( manifest_name, ".manifest", sizeof( manifest_name ) );
+	Q_SetExtension( manifest_name, ".manifest" );
 
 	return g_pFullFileSystem->FileExists( manifest_name, "MOD" );
 }
@@ -779,21 +779,21 @@ void CUtlCachedFileData<T>::SaveManifest()
 		ElementType_t& element = m_Elements[ i ];
 
 		char fn[ 512 ];
-		g_pFullFileSystem->String( element.handle, fn, sizeof( fn ) );
+		g_pFullFileSystem->String( element.handle, fn );
 
 		buf.Printf( "\"%s\"\r\n", fn );
 	}
 
 	char path[ 512 ];
-	Q_strncpy( path, m_sRepositoryFileName, sizeof( path ) );
-	Q_StripFilename( path );
+	V_strcpy_safe( path, m_sRepositoryFileName );
+	V_StripFilename( path );
 
 	g_pFullFileSystem->CreateDirHierarchy( path, "MOD" );
 
 	char manifest_name[ 512 ];
-	Q_strncpy( manifest_name, m_sRepositoryFileName, sizeof( manifest_name ) );
+	V_strcpy_safe( manifest_name, m_sRepositoryFileName );
 
-	Q_SetExtension( manifest_name, ".manifest", sizeof( manifest_name ) );
+	V_SetExtension( manifest_name, ".manifest" );
 
 	if ( g_pFullFileSystem->FileExists( manifest_name, "MOD" ) && 
 		!g_pFullFileSystem->IsFileWritable( manifest_name, "MOD" ) )
@@ -898,8 +898,8 @@ public:
 	{
 		char name0[ 512 ];
 		char name1[ 512 ];
-		g_pFullFileSystem->String( file0.handle, name0, sizeof( name0 ) );
-		g_pFullFileSystem->String( file1.handle, name1, sizeof( name1 ) );
+		g_pFullFileSystem->String( file0.handle, name0 );
+		g_pFullFileSystem->String( file1.handle, name1 );
 		return Q_stricmp( name0, name1 ) < 0 ? true : false;
 	}
 };
@@ -914,7 +914,7 @@ void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime
 		for ( auto i = m_Elements.FirstInorder(); i != m_Elements.InvalidIndex(); i = m_Elements.NextInorder( i ) )
 		{
 			ElementType_t& element = m_Elements[ i ];
-			g_pFullFileSystem->String( element.handle, fn, sizeof( fn ) );
+			g_pFullFileSystem->String( element.handle, fn );
 			Get( fn );
 		}
 		return;
@@ -945,8 +945,8 @@ void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime
 			if ( pathTest != pathIndex )
 				break;
 		}
-		g_pFullFileSystem->String( m_Elements[list[listStart].index].handle, fn, sizeof( fn ) );
-		Q_StripFilename( fn );
+		g_pFullFileSystem->String( m_Elements[list[listStart].index].handle, fn );
+		V_StripFilename( fn );
 		bool bCheck = true;
 		
 		if ( m_bNeverCheckDisk )
@@ -971,7 +971,7 @@ void	CUtlCachedFileData<T>::CheckDiskInfo( bool forcerebuild, long cacheFileTime
 				}
 				else
 				{
-					g_pFullFileSystem->String( element.handle, fn, sizeof( fn ) );
+					g_pFullFileSystem->String( element.handle, fn );
 					if ( m_fileCheckType == UTL_CACHED_FILE_USE_FILESIZE ) 
 					{
 						element.diskfileinfo = g_pFullFileSystem->Size( fn, "GAME" );
