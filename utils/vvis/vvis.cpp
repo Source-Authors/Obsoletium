@@ -93,8 +93,7 @@ winding_t *NewWinding (int points)
 
 void pw(winding_t *w)
 {
-	int		i;
-	for (i=0 ; i<w->numpoints ; i++)
+	for (int i=0 ; i<w->numpoints ; i++)
 		Msg ("(%5.1f, %5.1f, %5.1f)\n",w->points[i][0], w->points[i][1],w->points[i][2]);
 }
 
