@@ -934,12 +934,13 @@ static bool SetBufferValue( INOUT_Z_CAP(nTxtFileBufferSize) char *chTxtFileBuffe
 	if ( !bResult )
 	{
 		char *pchAdd = chTxtFileBuffer + nTxtFileBufferLen;
+		const intp bufferSize = nTxtFileBufferSize - strlen(pchAdd);
 		// dimhotepus: strcpy + strlen -> V_strcat.
-		V_strcat( pchAdd, "\n", nTxtFileBufferSize - strlen(pchAdd) );
-		V_strcat( pchAdd, szLookupKey, nTxtFileBufferSize - strlen(pchAdd) );
-		V_strcat( pchAdd, " ", nTxtFileBufferSize - strlen(pchAdd) );
-		V_strcat( pchAdd, szNewValue, nTxtFileBufferSize - strlen(pchAdd) );
-		V_strcat( pchAdd, "\n", nTxtFileBufferSize - strlen(pchAdd) );
+		V_strcat( pchAdd, "\n", bufferSize );
+		V_strcat( pchAdd, szLookupKey, bufferSize );
+		V_strcat( pchAdd, " ", bufferSize );
+		V_strcat( pchAdd, szNewValue, bufferSize );
+		V_strcat( pchAdd, "\n", bufferSize );
 		bResult = true;
 	}
 
