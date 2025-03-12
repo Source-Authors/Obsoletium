@@ -29,9 +29,17 @@ void BeginDMXContext( )
 	{
 		// dimhotepus: x2 size on x86-64.
 #ifdef PLATFORM_64BITS
-		s_DMXAllocator.Init( 4u * 1024 * 1024, 0, 0, 8 );
+		constexpr unsigned size = 4u * 1024 * 1024;
+		if ( !s_DMXAllocator.Init( size, 0, 0, 8 ) )
+		{
+			Error( "DMX allocator unable to allocate %u virtual bytes.\n", size );
+		}
 #else
-		s_DMXAllocator.Init( 2u * 1024 * 1024, 0, 0, 4 );
+		constexpr unsigned size = 2u * 1024 * 1024;
+		if ( !s_DMXAllocator.Init( size, 0, 0, 4 ) )
+		{
+			Error( "DMX allocator unable to allocate %u virtual bytes.\n", size );
+		}
 #endif
 		s_bAllocatorInitialized = true;
 	}
