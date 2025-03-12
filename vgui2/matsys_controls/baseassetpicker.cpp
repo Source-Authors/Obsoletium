@@ -532,7 +532,7 @@ void CAssetCache::BuildModList()
 		Q_FixSlashes( pPath );
 
 		char pModName[ MAX_PATH ];
-		Q_FileBase( pPath, pModName, sizeof( pModName ) );
+		V_FileBase( pPath, pModName );
 
 		// Always start in an asset-specific directory
 //		char pAssetPath[MAX_PATH];
@@ -566,7 +566,7 @@ void CAssetCache::AddAssetToList( CachedAssetList_t& list, const char *pAssetNam
 bool CAssetCache::DoesExtensionMatch( CachedAssetList_t& info, const char *pFileName )
 {
 	char pChildExt[MAX_PATH];
-	Q_ExtractFileExtension( pFileName, pChildExt, sizeof(pChildExt) );
+	V_ExtractFileExtension( pFileName, pChildExt );
 
 	// Check the extension matches
 	int nCount = info.m_Ext.Count();
@@ -597,7 +597,7 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 	while ( pszFileName )
 	{
 		char pRelativeChildPath[MAX_PATH];
-		Q_snprintf( pRelativeChildPath, MAX_PATH, "%s\\%s", pFilePath, pszFileName );
+		V_sprintf_safe( pRelativeChildPath, "%s\\%s", pFilePath, pszFileName );
 
 		if ( g_pFullFileSystem->FindIsDirectory( list.m_hFind ) )
 		{
@@ -622,7 +622,7 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 			if ( DoesExtensionMatch( list, pszFileName ) )
 			{
 				char pFullAssetPath[MAX_PATH];
-				g_pFullFileSystem->RelativePathToFullPath( pRelativeChildPath, "GAME", pFullAssetPath, sizeof(pFullAssetPath) );
+				g_pFullFileSystem->RelativePathToFullPath_safe( pRelativeChildPath, "GAME", pFullAssetPath );
 
 				int nModIndex = -1;
 				for ( int i = 0; i < nModCount; ++i )
@@ -683,7 +683,7 @@ bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 		if ( list.m_hFind == FILESYSTEM_INVALID_FIND_HANDLE )
 		{
 			char pSearchString[MAX_PATH];
-			Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pFilePath );
+			V_sprintf_safe( pSearchString, "%s\\*", pFilePath );
 
 			// get the list of files
 			pStartingFile = g_pFullFileSystem->FindFirstEx( pSearchString, "GAME", &list.m_hFind );

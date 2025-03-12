@@ -422,7 +422,7 @@ void CMDLSequencePicker::OnFileSelected()
 	const char *pFullPathName = pkv->GetString( "path" );
 
 	char pRelativePathName[MAX_PATH];
-	g_pFullFileSystem->FullPathToRelativePath( pFullPathName, pRelativePathName, sizeof(pRelativePathName) );
+	g_pFullFileSystem->FullPathToRelativePath_safe( pFullPathName, pRelativePathName );
 
 	// FIXME: Check that we're not actually opening the wrong file!!
 	SelectMDL( pRelativePathName );

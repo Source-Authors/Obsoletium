@@ -583,7 +583,7 @@ bool CQCGenerator::GenerateQCFile()
 	char szGamePath[MAX_PATH];
 	
 	char studiomdlPath[512];
-	g_pFullFileSystem->RelativePathToFullPath( "studiomdl.bat", NULL, studiomdlPath, sizeof( studiomdlPath ));
+	g_pFullFileSystem->RelativePathToFullPath_safe( "studiomdl.bat", NULL, studiomdlPath );
 
 	// dimhotepus: Check token is present.
 	if ( !GetVConfigRegistrySetting( GAMEDIR_TOKEN, szGamePath ) )
