@@ -652,7 +652,7 @@ void ReadPHYFile(const char *name, phyviewparams_t &params) {
 
 void ReadPolyFile(const char *name) {
   char ext[4];
-  Q_ExtractFileExtension(name, ext, 4);
+  V_ExtractFileExtension(name, ext);
 
   bool isPHY = !Q_stricmp(ext, "phy");
   if (isPHY) {
