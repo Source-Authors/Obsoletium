@@ -191,12 +191,12 @@ public:
 	uint64			GetUint64( );
 	float			GetFloat( );
 	double			GetDouble( );
-	template <size_t maxLenInChars> void GetString( char( &pString )[maxLenInChars] )
+	template <size_t maxLenInChars> void GetString( OUT_Z_ARRAY char( &pString )[maxLenInChars] )
 	{
 		GetStringInternal( pString, maxLenInChars );
 	}
 
-	void GetStringManualCharCount( char *pString, size_t maxLenInChars )
+	void GetStringManualCharCount( OUT_Z_CAP(maxLenInChars) char *pString, size_t maxLenInChars )
 	{
 		GetStringInternal( pString, maxLenInChars );
 	}
@@ -312,6 +312,11 @@ public:
 	void			PutDouble( double d );
 	void			PutString( const char* pString );
 	void			Put( const void* pMem, intp size );
+	template<typename T> 
+	std::enable_if_t<!std::is_pointer_v<T>> Put( const T &pMem )
+	{
+		Put( &pMem, static_cast<intp>( sizeof(pMem) ) );
+	}
 
 	// Used for putting objects that have a byteswap datadesc defined
 	template <typename T> void PutObjects( T *src, intp count = 1 );
