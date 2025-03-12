@@ -426,7 +426,7 @@ void WritePortalTrace( const char *source )
 		Warning("No trace generated from %d to %d\n", g_TraceClusterStart, g_TraceClusterStop );
 		return;
 	}
-
+	
 	char filename[1024];
 	V_sprintf_safe (filename, "%s.lin", source);
 	FILE *linefile = fopen (filename, "w");
@@ -455,7 +455,7 @@ void RecursiveLeafFlow (int leafnum, threaddata_t *thread, pstack_t *prevstack)
 	plane_t		backplane;
 	int			j;
 	long		*test, *might, *vis, more;
-
+	
 	// Early-out if we're a VMPI worker that's told to exit. If we don't do this here, then the
 	// worker might spin its wheels for a while on an expensive work unit and not be available to the pool.
 	// This is pretty common in vis.
@@ -598,9 +598,9 @@ void PortalFlow (int iThread, int portalnum)
 {
 	portal_t *p = sorted_portals[portalnum];
 	p->status = stat_working;
-				
-	const int c_might = CountBits (p->portalflood, g_numportals*2);
 
+	const int c_might = CountBits (p->portalflood, g_numportals*2);
+	
 	threaddata_t	data;
 	memset (&data, 0, sizeof(data));
 	data.base = p;
@@ -645,7 +645,7 @@ SimpleFlood
 void SimpleFlood (portal_t *srcportal, int leafnum)
 {
 	leaf_t *leaf = &leafs[leafnum];
-
+	
 	for (auto *p : leaf->portals)
 	{
 		int pnum = p - portals;
@@ -670,14 +670,14 @@ BasePortalVis
 void BasePortalVis (int iThread, int portalnum)
 {
 	int			j, k;
-	portal_t	*tp, *p;
+	portal_t	*tp;
 	float		d;
 	winding_t	*w;
 	Vector		segment;
 	double		dist2, minDist2;
 
 	// get the portal
-	p = portals+portalnum;
+	portal_t *p = portals+portalnum;
 
 	//
 	// allocate memory for bitwise vis solutions for this portal
@@ -782,7 +782,7 @@ void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 
 	leaf_t *leaf = &leafs[leafnum];
 	
-// check all portals for flowing into other leafs	
+	// check all portals for flowing into other leafs
 	for (auto *p : leaf->portals)
 	{
 		int pnum = p - portals;
@@ -806,7 +806,7 @@ void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 		SetBit( cansee, pnum );
 
 		RecursiveLeafBitFlow (p->leaf, newmight, cansee);
-	}	
+	}
 }
 
 /*
@@ -816,9 +816,7 @@ BetterPortalVis
 */
 void BetterPortalVis (int portalnum)
 {
-	portal_t	*p;
-
-	p = portals+portalnum;
+	portal_t *p = portals + portalnum;
 
 	RecursiveLeafBitFlow (p->leaf, p->portalflood, p->portalvis);
 
