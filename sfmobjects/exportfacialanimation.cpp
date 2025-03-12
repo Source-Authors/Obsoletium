@@ -132,11 +132,11 @@ static void ExportAnimations( ExportInfo_t &info, CDmElement *pRoot )
 				pBalanceLogLayer->RemoveKeysOutsideRange( info.m_tExportStart, info.m_tExportEnd );
 
 				char pControlName[512];
-				Q_snprintf( pControlName, sizeof(pControlName), "value_%s", pControl->GetName() );
+				V_sprintf_safe( pControlName, "value_%s", pControl->GetName() );
 				pValueLogLayer->SetName( pControlName );
 				animations.AddToTail( pValueLogLayer ); 
 
-				Q_snprintf( pControlName, sizeof(pControlName), "balance_%s", pControl->GetName() );
+				V_sprintf_safe( pControlName, "balance_%s", pControl->GetName() );
 				pBalanceLogLayer->SetName( pControlName );
 				animations.AddToTail( pBalanceLogLayer ); 
 			}
@@ -150,7 +150,7 @@ static void ExportAnimations( ExportInfo_t &info, CDmElement *pRoot )
 		if ( pControl->GetValue<bool>( "multi" ) )
 		{
 			char pControlName[512];
-			Q_snprintf( pControlName, sizeof(pControlName), "multi_%s", pControl->GetName() );
+			V_sprintf_safe( pControlName, "multi_%s", pControl->GetName() );
 			CDmeChannel *pMultiChannel = pControl->GetValueElement<CDmeChannel>( "multilevelchannel" );
 			AddLogLayerForExport( info, pRoot, pControlName, pMultiChannel );
 		}

@@ -260,14 +260,14 @@ CDmeDag *CSFMSession::FindOrCreateScene( CDmeFilmClip *pShot, const char *pScene
 CDmeGameModel *CSFMSession::CreateEditorGameModel( studiohdr_t *hdr, const Vector &vecOrigin, Quaternion &qOrientation )
 {
 	char pBaseName[ 256 ];
-	Q_FileBase( hdr->pszName(), pBaseName, sizeof( pBaseName ) );
+	Q_FileBase( hdr->pszName(), pBaseName );
 
 	char pGameModelName[ 256 ];
-	Q_snprintf( pGameModelName, sizeof( pGameModelName ), "%s_GameModel", pBaseName );
+	V_sprintf_safe( pGameModelName, "%s_GameModel", pBaseName );
 	CDmeGameModel *pGameModel = CreateElement< CDmeGameModel >( pGameModelName, m_hRoot->GetFileId() );
 
 	char pRelativeModelsFileName[MAX_PATH];
-	Q_ComposeFileName( "models", hdr->pszName(), pRelativeModelsFileName, sizeof(pRelativeModelsFileName) );
+	V_ComposeFileName( "models", hdr->pszName(), pRelativeModelsFileName );
 	pGameModel->SetValue( "modelName", pRelativeModelsFileName );
 
 	CDmeTransform *pTransform = pGameModel->GetTransform();

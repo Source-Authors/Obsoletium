@@ -111,7 +111,7 @@ bool CSFMPhonemeExtractor::Init()
 	while( pFilename )
 	{	
 		char fullpath[ 512 ];
-		Q_snprintf( fullpath, sizeof( fullpath ), "phonemeextractors/%s", pFilename );
+		V_sprintf_safe( fullpath, "phonemeextractors/%s", pFilename );
 
 		// Msg( "Loading extractor from %s\n", fullpath );
 
@@ -258,11 +258,11 @@ bool CSFMPhonemeExtractor::GetSentence( CDmeGameSound *gameSound, CSentence& sen
 
 	char soundname[ 512 ];
 	// Note, calling PSkipSoundChars to remove any decorator characters used by the engine!!!
-	Q_snprintf( soundname, sizeof( soundname ), "sound/%s", PSkipSoundChars( filename ) );
-	Q_FixSlashes( soundname );
+	V_sprintf_safe( soundname, "sound/%s", PSkipSoundChars( filename ) );
+	V_FixSlashes( soundname );
 
 	char fullpath[ 512 ];
-	g_pFullFileSystem->RelativePathToFullPath( soundname, "GAME", fullpath, sizeof( fullpath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( soundname, "GAME", fullpath );
 
 	// Get sound file metrics of interest
 	CUtlBuffer buf;
@@ -322,8 +322,8 @@ static bool SaveSentenceToWavFile( const char *pWavFile, CSentence& sentence )
 {
 	char pTempFile[ 512 ];
 
-	Q_StripExtension( pWavFile, pTempFile, sizeof( pTempFile ) );
-	Q_DefaultExtension( pTempFile, ".tmp", sizeof( pTempFile ) );
+	Q_StripExtension( pWavFile, pTempFile );
+	Q_DefaultExtension( pTempFile, ".tmp" );
 
 	if ( g_pFullFileSystem->FileExists( pTempFile, "GAME" ) )
 	{
@@ -427,11 +427,11 @@ void CSFMPhonemeExtractor::Extract( const PE_APITYPE& apiType, ExtractDesc_t& in
 
 		char pSoundName[ 512 ];
 		// Note, calling PSkipSoundChars to remove any decorator characters used by the engine!!!
-		Q_snprintf( pSoundName, sizeof( pSoundName ), "sound/%s", PSkipSoundChars( pFileName ) );
-		Q_FixSlashes( pSoundName );
+		V_sprintf_safe( pSoundName, "sound/%s", PSkipSoundChars( pFileName ) );
+		V_FixSlashes( pSoundName );
 
 		char pFullPath[ 512 ];
-		g_pFullFileSystem->RelativePathToFullPath( pSoundName, "GAME", pFullPath, sizeof( pFullPath ) );
+		g_pFullFileSystem->RelativePathToFullPath_safe( pSoundName, "GAME", pFullPath );
 
 		// Get sound file metrics of interest
 		CUtlBuffer buf;
@@ -575,16 +575,16 @@ void CSFMPhonemeExtractor::BuildPhonemeToPresetMapping( const CUtlVector< CBaseP
 		CBasePhonemeTag *tag = uniquePhonemes[ i ];
 		// Convert phoneme code to text
 		char ph[ 32 ];
-		Q_strncpy( ph, ConvertPhoneme( tag->GetPhonemeCode() ), sizeof( ph ) );
+		V_strcpy_safe( ph, ConvertPhoneme( tag->GetPhonemeCode() ) );
 
 		char remappedph[ 32 ];
 		// By default we search for a preset name p_xxx where xxx is the phoneme string
-		Q_snprintf( remappedph, sizeof( remappedph ), "p_%s", ph );
+		V_sprintf_safe( remappedph, "p_%s", ph );
 		// Now find the preset in the animation set converter
 		CDmePhonemeMapping *mapping = pSet->FindMapping( ph );
 		if ( mapping )
 		{
-			Q_strncpy( remappedph, mapping->GetValueString( "preset" ), sizeof( remappedph ) );
+			V_strcpy_safe( remappedph, mapping->GetValueString( "preset" ) );
 		}
 
 		// Now look up the preset, if it exists

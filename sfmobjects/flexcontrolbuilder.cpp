@@ -66,7 +66,7 @@ void CFlexControlBuilder::BuildDesiredFlexControlList( CDmeGameModel *pGameModel
 
 		FlexControllerInfo_t& info = m_FlexControllerInfo[j];
 		mstudioflexcontroller_t *pFlex = cHdr.pFlexcontroller( i );
-		Q_strncpy( info.m_pFlexControlName, pFlex->pszName(), sizeof( info.m_pFlexControlName ) );
+		V_strcpy_safe( info.m_pFlexControlName, pFlex->pszName() );
 		info.m_nGlobalIndex = g_pGlobalFlexController->FindGlobalFlexController( pFlex->pszName() );
 		info.m_flDefaultValue = 0.0f;
 		if ( pFlex->max != pFlex->min )
@@ -103,7 +103,7 @@ void CFlexControlBuilder::BuildDesiredControlList( CDmeGameModel *pGameModel )
 			controlInfo.m_bIsStereo = true;
 			controlInfo.m_pControllerIndex[ OUTPUT_RIGHT ] = i;
 			controlInfo.m_pControllerIndex[ OUTPUT_LEFT ] = i+1;
-			Q_strncpy( controlInfo.m_pControlName, pFlexName + 6, sizeof(controlInfo.m_pControlName) );
+			V_strcpy_safe( controlInfo.m_pControlName, pFlexName + 6 );
 
 			// Convert default values into value/balance
 			LeftRightToValueBalance( &controlInfo.m_pDefaultValue[ CONTROL_VALUE ], 
@@ -118,7 +118,7 @@ void CFlexControlBuilder::BuildDesiredControlList( CDmeGameModel *pGameModel )
 			controlInfo.m_bIsStereo = false;
 			controlInfo.m_pControllerIndex[ OUTPUT_MONO ] = i;
 			controlInfo.m_pControllerIndex[ OUTPUT_LEFT ] = -1;
-			Q_strncpy( controlInfo.m_pControlName, pFlexName, sizeof(controlInfo.m_pControlName) );
+			V_strcpy_safe( controlInfo.m_pControlName, pFlexName );
 			controlInfo.m_pDefaultValue[ CONTROL_VALUE ] = info.m_flDefaultValue;
 			controlInfo.m_pDefaultValue[ CONTROL_BALANCE ] = 0.5f;
 		}
@@ -696,12 +696,12 @@ void CFlexControlBuilder::BuildFlexControllerOps( CDmeGameModel *pGameModel, CDm
 
 	// Create a channel which passes from the control value to the global flex controller
 	char pName[ 256 ];
-	Q_snprintf( pName, sizeof( pName ), "%s_flex_channel", fcInfo.m_pFlexControlName );
+	V_sprintf_safe( pName, "%s_flex_channel", fcInfo.m_pFlexControlName );
 	info.m_ppControlChannel[field] = pChannelsClip->CreatePassThruConnection( pName, 
 		info.m_pControl, flexInfo.m_pControlAttributeName, pFlexControllerOp, "flexWeight" );
 
 	// NOTE: The animation set slider panel looks for these custom attributes
-	Q_snprintf( pName, sizeof(pName), "%schannel", flexInfo.m_pControlLinkAttributeName );
+	V_sprintf_safe( pName, "%schannel", flexInfo.m_pControlLinkAttributeName );
 	info.m_pControl->SetValue( pName, info.m_ppControlChannel[field] );
 
 	// Switch the channel into play mode by default
@@ -749,18 +749,18 @@ void CFlexControlBuilder::BuildStereoFlexControllerOps( CDmeAnimationSet *pAnima
 			fcInfo.m_pFlexControlName, fcInfo.m_nGlobalIndex );
 
 		// Now create a channel which connects the output of the stereo op to the flex controller op
-		Q_snprintf( pResultName, sizeof( pResultName ), "result_%s", s_pStereoOutputPrefix[ i ] );
-		Q_snprintf( pChannelName, sizeof( pChannelName ), "%s_flex_channel", fcInfo.m_pFlexControlName );
+		V_sprintf_safe( pResultName, "result_%s", s_pStereoOutputPrefix[ i ] );
+		V_sprintf_safe( pChannelName, "%s_flex_channel", fcInfo.m_pFlexControlName );
 		pChannelsClip->CreatePassThruConnection( pChannelName, pStereoCalcOp, 
 			pResultName, pFlexControllerOp, "flexWeight" );
 
 		// Create a channel which connects the control to the input of the stereo op
-		Q_snprintf( pChannelName, sizeof( pChannelName ), "%s_%s_channel", info.m_pControlName, s_pStereoInputPrefix[ i ] );
+		V_sprintf_safe( pChannelName, "%s_%s_channel", info.m_pControlName, s_pStereoInputPrefix[ i ] );
 		info.m_ppControlChannel[i] = pChannelsClip->CreatePassThruConnection( pChannelName, 
 			info.m_pControl, s_pStereoInputPrefix[ i ], pStereoCalcOp, s_pStereoInputPrefix[ i ] );
 
 		// NOTE: The animation set slider panel looks for these custom attributes
-		Q_snprintf( pChannelName, sizeof(pChannelName), "%schannel", s_pStereoInputPrefix[ i ] );
+		V_sprintf_safe( pChannelName, "%schannel", s_pStereoInputPrefix[ i ] );
 		info.m_pControl->SetValue( pChannelName, info.m_ppControlChannel[i] );
 
 		// Switch the channel into play mode by default

@@ -65,7 +65,7 @@ template < class T >
 CDmeChannel *CreateConstantValuedLog( CDmeChannelsClip *channelsClip, const char *basename, const char *pName, CDmElement *pToElement, const char *pToAttr, const T &value )
 {
 	char name[ 256 ];
-	Q_snprintf( name, sizeof( name ), "%s_%s channel", basename, pName );
+	V_sprintf_safe( name, "%s_%s channel", basename, pName );
 
 	CDmeChannel *pChannel = CreateElement< CDmeChannel >( name, channelsClip->GetFileId() );
 	pChannel->SetMode( CM_PLAY );
@@ -89,7 +89,7 @@ static void CreateTransformChannels( CDmeTransform *pTransform, const char *pBas
 	char name[ 256 ];
 
 	// create, connect and cache bonePos channel
-	Q_snprintf( name, sizeof( name ), "%s_bonePos channel %d", pBaseName, bi );
+	V_sprintf_safe( name, "%s_bonePos channel %d", pBaseName, bi );
 	CDmeChannel *pPosChannel = CreateElement< CDmeChannel >( name, pChannelsClip->GetFileId() );
 	pPosChannel->SetMode( CM_PLAY );
 	pPosChannel->CreateLog( AT_VECTOR3 );
@@ -98,7 +98,7 @@ static void CreateTransformChannels( CDmeTransform *pTransform, const char *pBas
 	pChannelsClip->m_Channels.AddToTail( pPosChannel );
 
 	// create, connect and cache boneRot channel
-	Q_snprintf( name, sizeof( name ), "%s_boneRot channel %d", pBaseName, bi );
+	V_sprintf_safe( name, "%s_boneRot channel %d", pBaseName, bi );
 	CDmeChannel *pRotChannel = CreateElement< CDmeChannel >( name, pChannelsClip->GetFileId() );
 	pRotChannel->SetMode( CM_PLAY );
 	pRotChannel->CreateLog( AT_QUATERNION );
@@ -327,7 +327,7 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 	for ( i = 0; i < 2 ; ++i )
 	{
 		char szName[ 512 ];
-		Q_snprintf( szName, sizeof( szName ), "%s_bone%s %d", basename, suffix[ i ], bonenum );
+		V_sprintf_safe( szName, "%s_bone%s %d", basename, suffix[ i ], bonenum );
 
 		CDmeChannel *pAttachChannel = NULL;
 		if ( srcChannelsClip )
@@ -483,7 +483,7 @@ static void SetupRootTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 	for ( i = 0; i < 2 ; ++i )
 	{
 		char szName[ 512 ];
-		Q_snprintf( szName, sizeof( szName ), "%s_root%s channel", basename, suffix[ i ] );
+		V_sprintf_safe( szName, "%s_root%s channel", basename, suffix[ i ] );
 
 		CDmeChannel *pAttachChannel = NULL;
 		if ( srcChannelsClip )
