@@ -533,7 +533,7 @@ bool LoadMySQLWrapper(
 	UnloadMySQLWrapper();
 
 	// Load the DLL and the interface.
-	if ( !Sys_LoadInterface( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &g_hMySQLDLL, (void**)&g_pSQL ) )
+	if ( !Sys_LoadInterfaceT( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &g_hMySQLDLL, &g_pSQL ) )
 		return false;
 
 	// Try to init the database.
