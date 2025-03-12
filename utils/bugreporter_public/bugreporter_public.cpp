@@ -698,7 +698,7 @@ void CBugReporter::SetGameDirectory( char const *pchGamedir )
 {
 	Assert( m_pBug );
 
-	Q_FileBase( pchGamedir, m_pBug->gamedir, sizeof( m_pBug->gamedir ) );
+	V_FileBase( pchGamedir, m_pBug->gamedir );
 }
 
 void CBugReporter::SetRAM( int ram )
