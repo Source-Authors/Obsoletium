@@ -34,6 +34,8 @@
 // dimhotepus: Drop Perforce support
 // #include "p4lib/ip4.h"
 
+#include "tier0/memdbgon.h"
+
 extern "C" {
 
 // Starting with the Release 302 drivers, application developers can direct the
@@ -56,33 +58,6 @@ __declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
 }  // extern "C"
 
 namespace {
-
-// The application object
-class HammerAppSystemGroup final : public CAppSystemGroup {
- public:
-  HammerAppSystemGroup()
-      : file_system_{nullptr},
-        data_cache_{nullptr},
-        input_system_{nullptr},
-        material_system_{nullptr},
-        hammer_{nullptr} {}
-
-  // Methods of IApplication
-  bool Create() override;
-  bool PreInit() override;
-  int Main() override;
-  void PostShutdown() override;
-  void Destroy() override;
-
- private:
-  int MainLoop();
-
-  IFileSystem *file_system_;
-  IDataCache *data_cache_;
-  IInputSystem *input_system_;
-  IMaterialSystem *material_system_;
-  IHammer *hammer_;
-};
 
 template <size_t out_size>
 const char *PrefixMessageGroup(
@@ -121,12 +96,38 @@ SpewRetval_t HammerSpewFunc(SpewType_t type, char const *raw) {
   return SPEW_CONTINUE;
 }
 
+// The application object
+class HammerAppSystemGroup final : public CAppSystemGroup {
+ public:
+  HammerAppSystemGroup()
+      : file_system_{nullptr},
+        data_cache_{nullptr},
+        input_system_{nullptr},
+        material_system_{nullptr},
+        hammer_{nullptr},
+        scoped_spew_output_{HammerSpewFunc} {}
+
+  // Methods of IApplication
+  bool Create() override;
+  bool PreInit() override;
+  int Main() override;
+  void PostShutdown() override;
+  void Destroy() override;
+
+ private:
+  IFileSystem *file_system_;
+  IDataCache *data_cache_;
+  IInputSystem *input_system_;
+  IMaterialSystem *material_system_;
+  IHammer *hammer_;
+
+  ScopedSpewOutputFunc scoped_spew_output_;
+};
+
 // Create all singleton systems
 bool HammerAppSystemGroup::Create() {
   // Save some memory so engine/hammer isn't so painful
   CommandLine()->AppendParm("-disallowhwmorph", nullptr);
-
-  SpewOutputFunc(HammerSpewFunc);
 
   // Game and hammer require theses.
   const CPUInformation *cpu_info{GetCPUInformation()};
@@ -240,9 +241,6 @@ void HammerAppSystemGroup::Destroy() {
   input_system_ = nullptr;
   data_cache_ = nullptr;
   file_system_ = nullptr;
-
-  // dimhotepus: Restore default spew.
-  SpewOutputFunc(DefaultSpewFunc);
 }
 
 // Init, shutdown
