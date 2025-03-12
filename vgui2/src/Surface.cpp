@@ -3225,7 +3225,7 @@ void CWin32Surface::GetTextSize(HFont font, const wchar_t *text, int &wide, int 
 bool CWin32Surface::AddCustomFontFile(const char *, const char *fontFileName)
 {
 	char fullPath[ MAX_PATH ];
-	g_pFullFileSystem->GetLocalPath(fontFileName, fullPath, sizeof( fullPath ));
+	g_pFullFileSystem->GetLocalPath_safe(fontFileName, fullPath);
 	m_CustomFontFileNames.AddToTail(fontFileName);
 	return (::AddFontResource(fullPath) > 0);
 }
@@ -3324,7 +3324,7 @@ void CWin32Surface::GetAbsoluteWindowBounds(int &x, int &y, int &wide, int &tall
 void CWin32Surface::PlaySound(const char *fileName)
 {
 	char localPath[MAX_PATH];
-	if (!g_pFullFileSystem->GetLocalPath(fileName, localPath, sizeof(localPath)))
+	if (!g_pFullFileSystem->GetLocalPath_safe(fileName, localPath))
 		return;
 
 	g_pFullFileSystem->GetLocalCopy(localPath);
@@ -3478,10 +3478,10 @@ IImage *CWin32Surface::GetIconImageForFullPath( char const *pFullPath )
 		if ( info.szTypeName[ 0 ] != 0 )
 		{
 			char ext[ 32 ];
-			Q_ExtractFileExtension( pFullPath, ext, sizeof( ext ) );
+			V_ExtractFileExtension( pFullPath, ext );
 
 			char lookup[ 512 ];
-			Q_snprintf( lookup, sizeof( lookup ), "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
+			V_sprintf_safe( lookup, "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
 
 			// Now check the dictionary
 			auto idx = m_FileTypeImages.Find( lookup );

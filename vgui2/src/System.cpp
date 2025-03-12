@@ -571,8 +571,8 @@ static bool staticSplitRegistryKey(const char *key, char *key0, char *key1)
 		return false;
 	}
 	
-	vgui_strcpy(key0,Start+1,key);
-	vgui_strcpy(key1,(len-Start)+1,key+Start);
+	V_strncpy(key0, key, Start + 1);
+	V_strncpy(key1, key+Start, (len-Start)+1);
 
 	return true;
 }
