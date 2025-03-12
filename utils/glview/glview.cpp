@@ -1192,7 +1192,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     g_bDisp = TRUE;
   }
 
-  SpewOutputFunc(GlViewSpew);
+  const ScopedSpewOutputFunc scoped_spew_output(GlViewSpew);
 
   // Any chunk of original left is the filename.
   if (pFileName && pFileName[0] && !g_bDisp) {
