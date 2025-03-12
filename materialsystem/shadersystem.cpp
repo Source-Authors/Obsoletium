@@ -951,8 +951,7 @@ void CShaderSystem::PrepForShaderDraw( IShader *pShader,
 	Assert( !m_pRenderState );
 	Assert( !m_SaveSpewOutput );
 
-	m_SaveSpewOutput = GetSpewOutputFunc();
-	SpewOutputFunc( MySpewOutputFunc );
+	m_SaveSpewOutput = SpewOutputFunc2( MySpewOutputFunc );
 
 	m_pRenderState = pRenderState;
 	m_nModulation = nModulation;
