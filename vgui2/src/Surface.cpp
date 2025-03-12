@@ -16,8 +16,6 @@
 #include <shellapi.h>
 #include <mmsystem.h>
 #include <oleidl.h>
-#include <stdio.h>
-#include <basetypes.h>
 
 #include <vgui/VGUI.h>
 #include <vgui/Dar.h>
@@ -33,16 +31,17 @@
 
 #include <vgui/Cursor.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 
 #include "vgui_internal.h"
 #include "bitmap.h"
 #include "VPanel.h"
 
-#include "utlvector.h"
-#include "utlsymbol.h"
+#include <tier1/KeyValues.h>
+#include "tier1/utlvector.h"
+#include "tier1/utlsymbol.h"
 #include "tier1/utldict.h"
+#include "tier0/basetypes.h"
 
 #include "filesystem.h"
 #include "qlimits.h"
@@ -1570,7 +1569,8 @@ void CWin32Surface::DrawSetTexture(int id)
 	m_pCurrentTexture = texture;
 }
 
-HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, int bpp, void **dib);
+// dimhotepus: bpp int -> unsigned short.
+HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, unsigned short bpp, void **dib);
 //-----------------------------------------------------------------------------
 // Purpose: maps a texture from memory to an id, and uploads it into the engine
 //-----------------------------------------------------------------------------
@@ -1781,7 +1781,7 @@ typedef struct
 } tga_header_t;
 #pragma pack()
 
-HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, int bpp, void **dib)
+HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, unsigned short bpp, void **dib)
 {
 	BITMAPINFOHEADER bitmapInfoHeader;
 	memset(&bitmapInfoHeader, 0, sizeof(bitmapInfoHeader));
@@ -2543,7 +2543,7 @@ void CWin32Surface::ReleasePanel(VPANEL panel)
 		SetPanelVisible(panel, false);
 
 		// free all the windows/bitmap/DC handles we are using
-		::SetWindowLongPtr(plat->hwnd, GWLP_USERDATA, (LONG_PTR)-1);
+		::SetWindowLongPtr(plat->hwnd, GWLP_USERDATA, (LONG_PTR)INVALID_PANEL);
 		::SetWindowPos(plat->hwnd, HWND_BOTTOM, 0, 0, 1, 1, SWP_NOREDRAW|SWP_HIDEWINDOW);
 
 		// free the window context
@@ -3694,7 +3694,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 
 	if (staticSurfaceAvailable)
 	{
-		panel = g_pIVgui->HandleToPanel(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
+		panel = g_pIVgui->HandleToPanel(static_cast<HPanel>(::GetWindowLongPtr(hwnd, GWLP_USERDATA)));
 
 		if (panel)
 		{
@@ -3905,7 +3905,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		{
-			int code = wparam;
+			int code = static_cast<int>(wparam);
 			g_iPreviousKeyCode = KeyCode_VirtualKeyToVGUI( code );
 			bool bRepeating = ( lparam & ( 1<<30 ) ) != 0;
 			if ( !bRepeating )
@@ -3948,14 +3948,14 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		case WM_SYSCHAR:
 		case WM_CHAR:
 		{
-			int unichar = wparam;
+			int unichar = static_cast<int>(wparam);
 			g_pInput->InternalKeyTyped(unichar);
 			break;
 		}
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
-			KeyCode code = KeyCode_VirtualKeyToVGUI( wparam );
+			KeyCode code = KeyCode_VirtualKeyToVGUI( static_cast<int>(wparam) );
 			g_pInput->SetKeyCodeState( code, BUTTON_RELEASED );
 			g_pInput->InternalKeyCodeReleased( code );
 			break;
