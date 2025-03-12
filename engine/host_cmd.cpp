@@ -398,7 +398,7 @@ void Host_Client_Printf(const char *fmt, ...)
 
 #define LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(seconds) \
 	{ \
-		static float g_flLastTime__Limit[ABSOLUTE_PLAYER_LIMIT] = { 0.0f }; /* we don't have access to any of the three MAX_PLAYERS #define's here unfortunately */ \
+		static double g_flLastTime__Limit[ABSOLUTE_PLAYER_LIMIT] = { 0.0 }; /* we don't have access to any of the three MAX_PLAYERS #define's here unfortunately */ \
 		int playerindex = cmd_clientslot; \
 		if ( playerindex >= 0 && playerindex < ssize(g_flLastTime__Limit) && realtime - g_flLastTime__Limit[playerindex] > (seconds) ) \
 		{ \
@@ -433,7 +433,7 @@ CON_COMMAND( status, "Display map and connection status." )
 		print = Host_Client_Printf;
 
 		// limit this to once per 5 seconds
-		LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0F);
+		LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0);
 	}
 
 	// ============================================================
@@ -616,7 +616,7 @@ CON_COMMAND( ping, "Display ping to server." )
 		return;
 	}
 	// limit this to once per 5 seconds
-	LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0F);
+	LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0);
 
 	host_client->ClientPrintf( "Client ping times:\n" );
 
@@ -1867,9 +1867,10 @@ CON_COMMAND_F( incrementvar, "Increment specified convar value.", FCVAR_DONTRECO
 	}
 
 	float currentValue = var->GetFloat();
-	float startValue = atof( args[ 2 ] );
-	float endValue = atof( args[ 3 ] );
-	float delta = atof( args[ 4 ] );
+	// dimhotepus: atof -> strtof.
+	float startValue = strtof( args[ 2 ], nullptr );
+	float endValue = strtof( args[ 3 ], nullptr );
+	float delta = strtof( args[ 4 ], nullptr );
 	float newValue = currentValue + delta;
 	if( newValue > endValue )
 	{
@@ -1913,9 +1914,10 @@ CON_COMMAND_F( multvar, "Multiply specified convar value.", FCVAR_DONTRECORD )
 	}
 
 	float currentValue = var->GetFloat();
-	float startValue = atof( args[ 2 ] );
-	float endValue = atof( args[ 3 ] );
-	float factor = atof( args[ 4 ] );
+	// dimhotepus: atof -> strtof.
+	float startValue = strtof( args[ 2 ], nullptr );
+	float endValue = strtof( args[ 3 ], nullptr );
+	float factor = strtof( args[ 4 ], nullptr );
 	float newValue = currentValue * factor;
 	if( newValue > endValue )
 	{
