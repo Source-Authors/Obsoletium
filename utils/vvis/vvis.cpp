@@ -178,28 +178,27 @@ Merges the portal visibility for a leaf
 */
 void ClusterMerge (int clusternum)
 {
-	leaf_t		*leaf;
-//	byte		portalvector[MAX_PORTALS/8];
-	alignas(long) byte		portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
+	alignas(long) byte portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
 	byte		uncompressed[MAX_MAP_LEAFS/8];
-	int			i, j;
 	int			numvis;
-	portal_t	*p;
 	int			pnum;
 
 	// OR together all the portalvis bits
 
 	memset (portalvector, 0, portalbytes);
-	leaf = &leafs[clusternum];
-	for (i=0 ; i < leaf->portals.Count(); i++)
+	leaf_t *leaf = &leafs[clusternum];
+
+	intp i = 0;
+	for (auto *p : leaf->portals)
 	{
-		p = leaf->portals[i];
 		if (p->status != stat_done)
-			Error ("portal not done %d %p %p\n", i, p, portals);
-		for (j=0 ; j<portallongs ; j++)
+			Error ("portal not done %zd 0x%p 0x%p\n", i, p, portals);
+		for (int j=0 ; j<portallongs ; j++)
 			((long *)portalvector)[j] |= ((long *)p->portalvis)[j];
 		pnum = p - portals;
 		SetBit( portalvector, pnum );
+
+		++i;
 	}
 
 	// convert portal bits to leaf bits
@@ -211,7 +210,7 @@ void ClusterMerge (int clusternum)
 	if ( CheckBit( uncompressed, clusternum ) )
 		Warning("WARNING: Cluster portals saw into cluster\n");
 #endif
-		
+
 	SetBit( uncompressed, clusternum );
 	numvis++;		// count the leaf itself
 
