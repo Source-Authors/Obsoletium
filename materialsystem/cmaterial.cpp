@@ -453,7 +453,7 @@ CMaterial::CMaterial( char const* materialName, const char *pTextureGroupName, K
 {
 	m_Reflectivity.Init( 0.2f, 0.2f, 0.2f );
 	intp len = Q_strlen(materialName);
-	char* pTemp = (char*)_alloca( len + 1 );
+	char* pTemp = stackallocT( char, len + 1 );
 
 	// Strip off the extension
 	Q_StripExtension( materialName, pTemp, len+1 );
@@ -2138,16 +2138,16 @@ void CMaterial::DecideShouldReloadFromWhitelist( IFileList *pFilesToReload )
 		return;
 
 	char vmtFilename[MAX_PATH];
-	V_ComposeFileName( "materials", GetName(), vmtFilename, sizeof( vmtFilename ) );
-	V_strncat( vmtFilename, ".vmt", sizeof( vmtFilename ) );
+	V_ComposeFileName( "materials", GetName(), vmtFilename );
+	V_strcat_safe( vmtFilename, ".vmt" );
 
 	// Check if either this file or any of the files it included need to be reloaded.
 	bool bShouldReload = pFilesToReload->IsFileInList( vmtFilename );
 	if ( !bShouldReload )
 	{
-		for ( int i=0; i < m_VMTIncludes.Count(); i++ )
+		for ( intp i=0; i < m_VMTIncludes.Count(); i++ )
 		{
-			g_pFullFileSystem->String( m_VMTIncludes[i], vmtFilename, sizeof( vmtFilename ) );
+			g_pFullFileSystem->String( m_VMTIncludes[i], vmtFilename );
 			if ( pFilesToReload->IsFileInList( vmtFilename ) )
 			{
 				bShouldReload = true;
@@ -2167,8 +2167,8 @@ void CMaterial::ReloadFromWhitelistIfMarked()
 	#ifdef PURE_SERVER_DEBUG_SPEW
 	{
 		char vmtFilename[MAX_PATH];
-		V_ComposeFileName( "materials", GetName(), vmtFilename, sizeof( vmtFilename ) );
-		V_strncat( vmtFilename, ".vmt", sizeof( vmtFilename ) );
+		V_ComposeFileName( "materials", GetName(), vmtFilename );
+		V_strcat_safe( vmtFilename, ".vmt" );
 		Msg( "Reloading %s due to pure server whitelist change\n", GetName() );
 	}
 	#endif

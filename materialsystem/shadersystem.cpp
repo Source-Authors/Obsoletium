@@ -359,14 +359,14 @@ void CShaderSystem::LoadAllShaderDLLs( )
 
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
+			V_StripLastDir( modDir );
 			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
@@ -377,9 +377,6 @@ const char *COM_GetModDirectory()
 
 void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 {
-	if ( IsX360() )
-		return;
-
 	// Don't do this for Valve mods. They don't need them, and attempting to load them is an opportunity for cheaters to get their code into the process
 	const char *pGameDir = COM_GetModDirectory();
 	if ( !Q_stricmp( pGameDir, "hl2" ) || !Q_stricmp( pGameDir, "cstrike" ) || !Q_stricmp( pGameDir, "cstrike_beta" ) ||
@@ -398,7 +395,7 @@ void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 	int dxStart = 6;
 	for ( int i = dxStart; i <= dxSupportLevel; ++i )
 	{
-		Q_snprintf( buf, sizeof( buf ), "game_shader_dx%d%s", i, DLL_EXT_STRING );
+		V_sprintf_safe( buf, "game_shader_dx%d%s", i, DLL_EXT_STRING );
 		LoadShaderDLL( buf, pModShaderPathID, true );
 	}
 
@@ -407,7 +404,7 @@ void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 	const char *pFilename = g_pFullFileSystem->FindFirstEx( "game_shader_generic*", pModShaderPathID, &findHandle );
 	while ( pFilename )
 	{
-		Q_snprintf( buf, sizeof( buf ), "%s%s", pFilename, DLL_EXT_STRING );
+		V_sprintf_safe( buf, "%s%s", pFilename, DLL_EXT_STRING );
 		LoadShaderDLL( buf, pModShaderPathID, true );
 
 		pFilename = g_pFullFileSystem->FindNext( findHandle );
@@ -966,8 +963,8 @@ void CShaderSystem::DoneWithShaderDraw()
 {
 	SpewOutputFunc( m_SaveSpewOutput );
 	PrintBufferedSpew();
-	m_SaveSpewOutput = NULL;
 
+	m_SaveSpewOutput = NULL;
 	m_pRenderState = NULL;
 }
 

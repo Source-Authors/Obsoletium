@@ -218,8 +218,12 @@ void CMatLightmaps::CleanupLightmaps()
          {
             char szPFMFileName[MAX_PATH];
 
-            sprintf(szPFMFileName, "Lightmap-Page-%d.pfm", lightmap);
-            m_pLightmapDataPtrArray[lightmap]->WritePFM(szPFMFileName);
+            V_sprintf_safe(szPFMFileName, "Lightmap-Page-%d.pfm", lightmap);
+            if (!m_pLightmapDataPtrArray[lightmap]->WritePFM(szPFMFileName))
+            {
+				// dimhotepus: Dump warning.
+                Warning("Failed to write #%d ligtmap to PFM '%s'.\n", lightmap, szPFMFileName);
+            }
          }
       }
    }

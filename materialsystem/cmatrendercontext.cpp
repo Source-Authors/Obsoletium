@@ -1004,9 +1004,7 @@ void CMatRenderContextBase::OnAsyncCreateTextureFromRenderTarget( ITexture* pSrc
 	pRecipient->AddRef();
 
 	// Also, need to allocate a copy of the string and use that one s.t. the caller doesn't have to worry about it.
-	char* pDstNameCopy = new char[ V_strlen( *ppDstName ) + 1 ];
-	V_strcpy( pDstNameCopy, *ppDstName );
-	( *ppDstName ) = pDstNameCopy;
+	*ppDstName = V_strdup( *ppDstName );
 }
 
 // Map and unmap a texture. The pRecipient->OnAsyncMapComplete is called when complete. 

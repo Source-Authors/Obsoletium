@@ -4570,12 +4570,15 @@ void FreeOptimalReadBuffer( int nMaxSize )
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef IS_WINDOWS_PC
-static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char const *szNewValue )
+static bool SetBufferValue( INOUT_Z_CAP(nTxtFileBufferSize) char *chTxtFileBuffer,
+	size_t nTxtFileBufferSize,
+	IN_Z char const *szLookupKey,
+	IN_Z char const *szNewValue )
 {
 	bool bResult = false;
 	
-	size_t lenTmp = strlen( szNewValue );
 	size_t nTxtFileBufferLen = strlen( chTxtFileBuffer );
+	size_t lenTmp = strlen( szNewValue );
 	
 	for ( char *pch = chTxtFileBuffer;
 		( NULL != ( pch = strstr( pch, szLookupKey ) ) );
@@ -4606,12 +4609,13 @@ static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char
 	if ( !bResult )
 	{
 		char *pchAdd = chTxtFileBuffer + nTxtFileBufferLen;
-		// dimhotepus: strcpy + strlen -> strcat
-		strcat( pchAdd, "\n" );
-		strcat( pchAdd, szLookupKey );
-		strcat( pchAdd, " " );
-		strcat( pchAdd, szNewValue );
-		strcat( pchAdd, "\n" );
+		const intp bufferSize = nTxtFileBufferSize - strlen(pchAdd);
+		// dimhotepus: strcpy + strlen -> V_strcat.
+		V_strcat( pchAdd, "\n", bufferSize );
+		V_strcat( pchAdd, szLookupKey, bufferSize );
+		V_strcat( pchAdd, " ", bufferSize );
+		V_strcat( pchAdd, szNewValue, bufferSize );
+		V_strcat( pchAdd, "\n", bufferSize );
 		bResult = true;
 	}
 
@@ -4621,7 +4625,8 @@ static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char
 // Replaces the first occurrence of "szFindData" with "szNewData"
 // Returns the remaining buffer past the replaced data or NULL if
 // no replacement occurred.
-static char * BufferReplace( char *buf, char const *szFindData, char const *szNewData )
+template<intp bufSize>
+static char * BufferReplace( char (&buf)[bufSize], char const *szFindData, char const *szNewData )
 {
 	size_t len = strlen( buf ), lFind = strlen( szFindData ), lNew = strlen( szNewData );
 	if ( char *pBegin = strstr( buf, szFindData ) )
@@ -4761,30 +4766,32 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 
 			// We have the texture and path to its content
 			char chResolveName[ MAX_PATH ] = {0}, chResolveNameArg[ MAX_PATH ] = {0};
-			Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s" TEXTURE_FNAME_EXTENSION, szTx );
+			V_sprintf_safe( chResolveNameArg, "materials/%s" TEXTURE_FNAME_EXTENSION, szTx );
 			char *szTextureContentPath;
 			if ( !mat_texture_list_content_path.GetString()[0] )
 			{
-				szTextureContentPath = const_cast< char * >( g_pFullFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 ) );
-
-				if ( !szTextureContentPath )
+				const char *contentPath = g_pFullFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
+				if ( !contentPath )
 				{
 					Warning( " mat_texture_list_txlod_sync save - texture '%s' is not loaded from file system.\n", szTx );
 					continue;
 				}
-				if ( !BufferReplace( szTextureContentPath, "\\game\\", "\\content\\" ) ||
-					 !BufferReplace( szTextureContentPath, "\\materials\\", "\\materialsrc\\" ) )
+
+				if ( !BufferReplace( chResolveName, "\\game\\", "\\content\\" ) ||
+					 !BufferReplace( chResolveName, "\\materials\\", "\\materialsrc\\" ) )
 				{
 					Warning( " mat_texture_list_txlod_sync save - texture '%s' cannot be mapped to content directory.\n", szTx );
 					continue;
 				}
+
+				szTextureContentPath = chResolveName;
 			}
 			else
 			{
-				V_strncpy( chResolveName, mat_texture_list_content_path.GetString(), MAX_PATH );
-				V_strncat( chResolveName, "/", MAX_PATH );
-				V_strncat( chResolveName, szTx, MAX_PATH );
-				V_strncat( chResolveName, TEXTURE_FNAME_EXTENSION, MAX_PATH );
+				V_strcpy_safe( chResolveName, mat_texture_list_content_path.GetString() );
+				V_strcat_safe( chResolveName, "/" );
+				V_strcat_safe( chResolveName, szTx );
+				V_strcat_safe( chResolveName, TEXTURE_FNAME_EXTENSION );
 
 				szTextureContentPath = chResolveName;
 			}
@@ -4793,22 +4800,22 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 			// 1. look for TGA - if found, get the txt file (if txt file missing, create one)
 			// 2. otherwise look for PSD - affecting psdinfo
 			// 3. else error
-			char *pExtPut = szTextureContentPath + strlen( szTextureContentPath ) - strlen( TEXTURE_FNAME_EXTENSION ); // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
+			char *pExtPut = szTextureContentPath + strlen( szTextureContentPath ) - ssize( TEXTURE_FNAME_EXTENSION ) + 1; // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
 			
 			// 1.tga
-			sprintf( pExtPut, ".tga" );
+			V_strcpy( pExtPut, ".tga" );
 			if ( g_pFullFileSystem->FileExists( szTextureContentPath ) )
 			{
 				// Have tga - pump in the txt file
-				sprintf( pExtPut, ".txt" );
+				V_strcpy( pExtPut, ".txt" );
 				
 				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTextureContentPath, 0, bufTxtFileBuffer );
 				for ( int kCh = 0; kCh < 1024; ++kCh ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxwidth", chMaxWidth );
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxheight", chMaxHeight );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "maxwidth", chMaxWidth );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "maxheight", chMaxHeight );
 				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
@@ -4831,13 +4838,13 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 			}
 
 			// 2.psd
-			sprintf( pExtPut, ".psd" );
+			V_strcpy( pExtPut, ".psd" );
 			if ( g_pFullFileSystem->FileExists( szTextureContentPath ) )
 			{
 				char chCommand[MAX_PATH];
 				char szTxtFileName[MAX_PATH] = {0};
-				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName, sizeof( szTxtFileName ) );
-				sprintf( chCommand, "/C psdinfo \"%s\" > \"%s\"", szTextureContentPath, szTxtFileName);
+				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName );
+				V_sprintf_safe( chCommand, "/C psdinfo \"%s\" > \"%s\"", szTextureContentPath, szTxtFileName);
 				ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
 				ThreadSleep( 200 );
 
@@ -4846,8 +4853,8 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 				for ( int kCh = 0; kCh < 1024; ++ kCh ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxwidth", chMaxWidth );
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxheight", chMaxHeight );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "maxwidth", chMaxWidth );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(),	"maxheight", chMaxHeight );
 				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
@@ -4857,7 +4864,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 					g_p4factory->SetOpenFileChangeList( "Texture LOD Autocheckout" );
 					CP4AutoEditFile autop4_edit( szTextureContentPath );
 
-					sprintf( chCommand, "/C psdinfo -write \"%s\" < \"%s\"", szTextureContentPath, szTxtFileName );
+					V_sprintf_safe( chCommand, "/C psdinfo -write \"%s\" < \"%s\"", szTextureContentPath, szTxtFileName );
 					ThreadSleep( 200 );
 					ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
 					ThreadSleep( 200 );
@@ -4875,7 +4882,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 			}
 
 			// 3. - error
-			sprintf( pExtPut, "" );
+			pExtPut[0] = '\0';
 			{
 				Warning( " '%s' : doesn't specify a valid TGA or PSD file!\n", szTextureContentPath );
 				continue;

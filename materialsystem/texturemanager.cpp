@@ -2134,7 +2134,7 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 					break;
 				}
 			}
-			excludeBuffer.GetLine( szToken, sizeof( szToken ) );
+			excludeBuffer.GetLine( szToken );
 			intp tokenLength = V_strlen( szToken );
 			if ( !tokenLength )
 			{
@@ -2834,7 +2834,7 @@ void CTextureManager::FindFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 		else
 		{
 			char filenameNoExtension[_MAX_PATH];
-			V_StripExtension( pFilename, filenameNoExtension, _MAX_PATH );
+			V_StripExtension( pFilename, filenameNoExtension );
 			// Add the file to the list, which we will later traverse in order to ensure we're hitting these in the expected order for the VPK. 
 			( *pOutFilesToLoad ).Insert( CUtlString( filenameNoExtension ), 0 );
 		}
@@ -2862,7 +2862,7 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 	char buffer[_MAX_PATH + 1];
 	while ( 1 ) 
 	{
-		fileContents.GetLine( buffer, _MAX_PATH );
+		fileContents.GetLine( buffer );
 		if ( buffer[ 0 ] == 0 )
 			break;
 

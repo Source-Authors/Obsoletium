@@ -663,7 +663,7 @@ InitReturnVal_t CMaterialSystem::Init()
     if ( ::GetModuleFileName( GetModuleHandle( NULL ), szExeName, sizeof( szExeName ) ) )
     {
 		char szRight[20];
-		Q_StrRight( szExeName, 11, szRight, sizeof( szRight ) );
+		V_StrRight( szExeName, 11, szRight );
 		if ( !Q_stricmp( szRight, "\\hammer.exe" ) )
 		{
 			m_bRequestedEditorMaterials = true;
@@ -2728,8 +2728,8 @@ ITexture *CMaterialSystem::FindTexture( char const *pTextureName, const char *pT
 		{
 			const char* pPathID = "GAME";
 			char buf[MAX_PATH];
-			V_snprintf( buf, MAX_PATH, "materials/%s", pTextureName );
-			V_SetExtension( buf, ".vtf", sizeof( buf ) );
+			V_sprintf_safe( buf, "materials/%s", pTextureName );
+			V_SetExtension( buf, ".vtf" );
 			
 			const char *pbuf = buf;
 			g_pFullFileSystem->AddFilesToFileCache( m_hAsyncLoadFileCache, &pbuf, 1, pPathID );
@@ -2996,7 +2996,7 @@ void CMaterialSystem::ReloadMaterials( const char *pSubString )
 		if ( strchr( pSubString, chMultiDelim ) )
 		{
 			arrSearchSubString.SetCount( strlen( pSubString ) + 1 );
-			strcpy( arrSearchSubString.Base(), pSubString );
+			V_strncpy( arrSearchSubString.Base(), pSubString, arrSearchSubString.Count() );
 			for ( char * pch = arrSearchSubString.Base(); pch; )
 			{
 				char *pchEnd = strchr( pch, chMultiDelim );
@@ -4991,7 +4991,7 @@ IMaterialProxy *CMaterialSystem::DetermineProxyReplacements( IMaterial *pMateria
 	while( 1 )
 	{
 		const char *pszRemoveSlashes;
-		V_ExtractFilePath( szLastPath, szCheckPath, sizeof( szCheckPath ) );
+		V_ExtractFilePath( szLastPath, szCheckPath );
 
 		pszRemoveSlashes = szCheckPath;
 		while ( ( *pszRemoveSlashes ) != 0 && ( ( *pszRemoveSlashes ) == '/' || ( *pszRemoveSlashes ) == '\\' ) )
@@ -5232,7 +5232,7 @@ static int ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const ch
 		return 0;
 
 	const char* seps[] = { "\r", "\r\n", "\n" };
-	V_SplitString2( fileContents.Base<char>(), seps, ssize(seps), *outReplacementMaterials );
+	V_SplitString2( fileContents.Base<char>(), seps, *outReplacementMaterials );
 
 
 	return outReplacementMaterials->Count();

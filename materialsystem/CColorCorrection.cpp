@@ -75,7 +75,7 @@ ColorCorrectionLookup_t::~ColorCorrectionLookup_t( )
 void ColorCorrectionLookup_t::AllocTexture()
 {
 	char name[64];
-	sprintf( name, "ColorCorrection - %zu", m_Handle );
+	V_sprintf_safe( name, "ColorCorrection - %zu", m_Handle );
 
 	m_pColorCorrectionTexture = ITextureInternal::CreateProceduralTexture( name, TEXTURE_GROUP_OTHER,
 		COLOR_CORRECTION_TEXTURE_SIZE, COLOR_CORRECTION_TEXTURE_SIZE, COLOR_CORRECTION_TEXTURE_SIZE, IMAGE_FORMAT_BGRX8888,
