@@ -446,7 +446,7 @@ extern "C"
 void CShaderSystem::VerifyBaseShaderDLL( CSysModule *pModule )
 {
 #if defined( _WIN32 ) && !defined( _X360 )
-	const char *pErrorStr = "Corrupt save data settings.";
+	const char *pErrorStr = "Corrupt shader DLL.";
 
 	unsigned char *testData1 = new unsigned char[SHADER_DLL_VERIFY_DATA_LEN1];
 
