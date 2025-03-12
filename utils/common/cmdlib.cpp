@@ -345,10 +345,10 @@ void ExpandWildcards(int *argc, char ***argv) {
     intptr_t handle = _findfirst(path, &fileinfo);
     if (handle == -1) return;
 
-    Q_ExtractFilePath(path, filebase, sizeof(filebase));
+    V_ExtractFilePath(path, filebase);
 
     do {
-      sprintf(filename, "%s%s", filebase, fileinfo.name);
+      V_sprintf_safe(filename, "%s%s", filebase, fileinfo.name);
 
       ex_argv[ex_argc++] = copystring(filename);
     } while (_findnext(handle, &fileinfo) != -1);
@@ -417,7 +417,7 @@ char *ExpandPath(char *path) {
     return path;
   }
 
-  sprintf(full, "%s%s", qdir, path);
+  V_sprintf_safe(full, "%s%s", qdir, path);
   return full;
 }
 
@@ -536,9 +536,9 @@ void CmdLib_AddBasePath(const char *pPath) {
 bool CmdLib_HasBasePath(const char *pFileName_, intp &pathLength) {
   pathLength = 0;
 
-  char *pFileName = (char *)_alloca(strlen(pFileName_) + 1);
-  strcpy(pFileName, pFileName_);
-  Q_FixSlashes(pFileName);
+  V_strdup_stack(pFileName_, pFileName);
+
+  V_FixSlashes(pFileName);
 
   for (intp i = 0; i < g_NumBasePaths; i++) {
     // see if we can rip the base off of the filename.

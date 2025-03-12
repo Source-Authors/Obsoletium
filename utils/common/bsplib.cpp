@@ -3143,7 +3143,7 @@ void UnparseEntities (void)
 			V_strcpy_safe (value, ep->value);
 			StripTrailing (value);
 				
-			sprintf(line, "\"%s\" \"%s\"\n", key, value);
+			V_sprintf_safe(line, "\"%s\" \"%s\"\n", key, value);
 			buffer.PutString( line );
 		}
 		buffer.PutString("}\n");
@@ -4108,7 +4108,7 @@ void ConvertPakFileContents( const char *pInFilename )
 		else
 		{
 			// converted filename
-			V_StripExtension( relativeName, relativeName, sizeof( relativeName ) );
+			V_StripExtension( relativeName, relativeName );
 			V_strcat_safe( relativeName, ".360" );
 			V_strcat_safe( relativeName, pExt );
 			AddBufferToPak( newPakFile, relativeName, targetBuf.Base(), targetBuf.TellMaxPut(), false, IZip::eCompressionType_None );
@@ -5242,8 +5242,8 @@ bool GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList
 	}
 
 	char szBspName[MAX_PATH];
-	V_FileBase( pBSPFilename, szBspName, sizeof( szBspName ) );
-	V_SetExtension( szBspName, ".bsp", sizeof( szBspName ) );
+	V_FileBase( pBSPFilename, szBspName );
+	V_SetExtension( szBspName, ".bsp" );
 
 	// get embedded pak files, and internals
 	char szFilename[MAX_PATH];
@@ -5264,8 +5264,8 @@ bool GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList
 	{
 		const char *pName = TexDataStringTable_GetString( dtexdata[i].nameStringTableID );
 
-		V_ComposeFileName( "materials", pName, szFilename, sizeof( szFilename ) );
-		V_SetExtension( szFilename, ".vmt", sizeof( szFilename ) );
+		V_ComposeFileName( "materials", pName, szFilename );
+		V_SetExtension( szFilename, ".vmt" );
 
 		pList->AddToTail( szFilename );
 	}

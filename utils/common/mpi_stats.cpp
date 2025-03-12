@@ -571,7 +571,7 @@ bool VMPI_Stats_Init_Master(
 	GetComputerName( g_MachineName, &size );
 
 	// Create the job_master_start row.
-	Q_FileBase( pBSPFilename, g_BSPFilename, sizeof( g_BSPFilename ) );
+	Q_FileBase( pBSPFilename, g_BSPFilename );
 
 	g_JobPrimaryID = 0;
 	CMySQLQuery query;
@@ -712,7 +712,7 @@ void GetDBInfo( const char *pDBInfoFilename, CDBInfo *pInfo )
 	// Look for the info file in the same directory as the exe.
 	char dbInfoFilename[512];
 	Q_strncpy( dbInfoFilename, baseExeFilename, sizeof( dbInfoFilename ) );
-	Q_StripFilename( dbInfoFilename );
+	V_StripFilename( dbInfoFilename );
 
 	if ( dbInfoFilename[0] == 0 )
 		Q_strncpy( dbInfoFilename, ".", sizeof( dbInfoFilename ) );

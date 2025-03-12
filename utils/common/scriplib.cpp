@@ -525,7 +525,7 @@ static void FindFileAbsoluteList( CUtlVector< CUtlString > &outAbsolutePathNames
 
 	for ( const char *pszFoundFile = g_pFullFileSystem->FindFirst( pszFindName, &hFile ); pszFoundFile && hFile != FILESYSTEM_INVALID_FIND_HANDLE; pszFoundFile = g_pFullFileSystem->FindNext( hFile ) )
 	{
-		V_ComposeFileName( szPath, pszFoundFile, szResult, sizeof( szResult ) );
+		V_ComposeFileName( szPath, pszFoundFile, szResult );
 		outAbsolutePathNames.AddToTail( szResult );
 	}
 
@@ -1117,7 +1117,7 @@ void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 	{
 		char tempPath[MAX_PATH];
 		V_strcpy_safe( tempPath, pEnv );
-		V_AppendSlash( tempPath, sizeof( tempPath ) );
+		V_AppendSlash( tempPath );
 		V_strcat_safe( tempPath, pFileMask );
 
 		CUtlVector<fileList_t> fileList;
@@ -1309,8 +1309,8 @@ intp CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_
 	V_StripFilename( dirPath );
 
 	// get pattern only
-	V_FileBase( pFileMask, pattern, sizeof( pattern ) );
-	V_ExtractFileExtension( pFileMask, extension, sizeof( extension ) );
+	V_FileBase( pFileMask, pattern );
+	V_ExtractFileExtension( pFileMask, extension );
 	if ( extension[0] )
 	{
 		V_strcat_safe( pattern, "." );

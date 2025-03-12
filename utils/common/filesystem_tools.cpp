@@ -60,17 +60,17 @@ void FileSystem_SetupStandardDirectories( const char *pFilename, const char *pGa
 		pFilename = ".";
 	}
 
-	Q_MakeAbsolutePath( qdir, sizeof( qdir ), pFilename, NULL );
-	Q_StripFilename( qdir );
-	Q_strlower( qdir );
+	V_MakeAbsolutePath( qdir, pFilename, nullptr );
+	V_StripFilename( qdir );
+	V_strlower( qdir );
 	if ( qdir[0] != 0 )
 	{
-		Q_AppendSlash( qdir, sizeof( qdir ) );
+		V_AppendSlash( qdir );
 	}
 
 	// Set gamedir.
-	Q_MakeAbsolutePath( gamedir, sizeof( gamedir ), pGameInfoPath );
-	Q_AppendSlash( gamedir, sizeof( gamedir ) );
+	V_MakeAbsolutePath( gamedir, pGameInfoPath );
+	V_AppendSlash( gamedir );
 }
 
 
