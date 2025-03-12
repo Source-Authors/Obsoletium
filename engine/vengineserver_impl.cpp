@@ -634,7 +634,7 @@ public:
 	//
 	// Request engine to allocate "cb" bytes on the entity's private data pointer.
 	//
-	void *PvAllocEntPrivateData(long cb) override
+	void *PvAllocEntPrivateData(size_t cb) override
 	{
 		return calloc( 1, cb );
 	}
@@ -1289,11 +1289,11 @@ public:
 	}
 	
 	// Get a keyvalue for s specified client
-	const char *GetClientConVarValue( int clientIndex, const char *name ) override
+	const char *GetClientConVarValue( intp clientIndex, const char *name ) override
 	{
 		if ( clientIndex < 1 || clientIndex > sv.GetClientCount() )
 		{
-			DevMsg( 1, "GetClientConVarValue: player invalid index %i\n", clientIndex );
+			DevMsg( 1, "GetClientConVarValue: player invalid index %zd\n", clientIndex );
 			return "";
 		}
 
