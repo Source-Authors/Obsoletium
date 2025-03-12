@@ -14,6 +14,8 @@
 #include "MapReslistGenerator.h"
 #include "tier0/vcrmode.h"
 
+#include "../out/build/app_version_config.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1274,8 +1276,10 @@ void CConPanel::PaintBackground()
 		return;
 
 	int wide = GetWide();
-	char ver[ 100 ];
-	Q_snprintf(ver, sizeof( ver ), "Source Engine %i (build %d)", PROTOCOL_VERSION, build_number() );
+	char ver[ 128 ];
+	// dimhotepus: Add SemVer version number.
+	V_sprintf_safe(ver, "Source Engine %i (build %d [v.%s])",
+		PROTOCOL_VERSION, build_number(), SRC_PRODUCT_VERSION_INFO_STRING );
 	wchar_t unicode[ 200 ];
 	g_pVGuiLocalize->ConvertANSIToUnicode( ver, unicode );
 
