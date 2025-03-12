@@ -53,6 +53,7 @@
 // Local includes
 #include "dmxedit.h"
 
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // Statics
@@ -2388,9 +2389,9 @@ bool CDmxEdit::CreateExpressionFilesFromCachedPresets() const
 
 			const char *pExpressionFilename = expressionFilename.Get();
 
-			Q_strncpy( buf, pExpressionFilename, sizeof( buf ) );
-			Q_SetExtension( buf, ".txt", sizeof( buf ) );
-			Q_ExtractFilePath( buf, buf1, sizeof( buf1 ) );
+			V_strcpy_safe( buf, pExpressionFilename );
+			Q_SetExtension( buf, ".txt" );
+			V_ExtractFilePath( buf, buf1 );
 			Q_FixSlashes( buf1 );
 			g_pFullFileSystem->CreateDirHierarchy( buf1 );
 
@@ -2401,8 +2402,8 @@ bool CDmxEdit::CreateExpressionFilesFromCachedPresets() const
 
 			pPresetGroup->ExportToTXT( buf, NULL, pComboOp );
 
-			Q_SetExtension( buf, ".vfe", sizeof( buf ) );
-			Q_ExtractFilePath( buf, buf1, sizeof( buf1 ) );
+			Q_SetExtension( buf, ".vfe" );
+			V_ExtractFilePath( buf, buf1 );
 			Q_FixSlashes( buf1 );
 			g_pFullFileSystem->CreateDirHierarchy( buf1 );
 
