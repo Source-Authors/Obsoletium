@@ -257,7 +257,7 @@ protected:
 		}
 	};
 
-	bool BuildExpansionListToFindElement_R( CUtlRBTree< CDmElement *, int >& visited, int depth, SearchResult_t& sr, CDmElement *owner, CDmElement *element, char const *attributeName, int arrayIndex, CUtlVector< intp >& expandIndices );
+	bool BuildExpansionListToFindElement_R( CUtlRBTree< CDmElement *, int >& visited, int depth, SearchResult_t& sr, CDmElement *owner, CDmElement *element, char const *attributeName, intp arrayIndex, CUtlVector< intp >& expandIndices );
 	void FindMatchingElements_R( CUtlRBTree< CDmElement *, int >& visited, char const *searchstr, CDmElement *root, CUtlVector< SearchResult_t >& list );
 	void NavigateToSearchResult();
 
@@ -281,7 +281,7 @@ protected:
 	void RemoveItem_R( int nItemIndex );
 
 	// Adds a single entry into the tree
-	void CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, int nArrayIndex, AttributeWidgets_t &entry );
+	void CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, intp nArrayIndex, AttributeWidgets_t &entry );
 
 	// Sets up the attribute widget init info for a particular attribute
 	void SetupWidgetInfo( AttributeWidgetInfo_t *pInfo, CDmElement *obj, CDmAttribute *pAttribute, int nArrayIndex = -1 );
@@ -294,7 +294,7 @@ protected:
 	void InsertAttributeArrayMembers( int parentNodeIndex, CDmElement *obj, CDmAttribute *array );
 
 	// Adds a single editable attribute of the element to the tree
-	void InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, int nArrayIndex = -1 );
+	void InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex = -1 );
 
 	// Refreshes the tree view
 	void RefreshTreeView( bool preservePrevSelectedItem = false );

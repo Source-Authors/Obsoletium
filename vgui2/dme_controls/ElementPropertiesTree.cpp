@@ -4102,7 +4102,7 @@ void CElementPropertiesTreeInternal::SetTreeEntryDimState(  )
 //-----------------------------------------------------------------------------
 // Adds a single entry into the tree
 //-----------------------------------------------------------------------------
-void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, int nArrayIndex, AttributeWidgets_t &widgets )
+void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, intp nArrayIndex, AttributeWidgets_t &widgets )
 {
 	char pText[ 512 ];
 	bool bEditableLabel = false;
@@ -4203,7 +4203,7 @@ void CElementPropertiesTreeInternal::SetupWidgetInfo( AttributeWidgetInfo_t *pIn
 //-----------------------------------------------------------------------------
 // Adds a single editable attributes of the element to the tree
 //-----------------------------------------------------------------------------
-void CElementPropertiesTreeInternal::InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, int nArrayIndex )
+void CElementPropertiesTreeInternal::InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex )
 {
 	const char *attributeName = pAttribute->GetName();
 	NOTE_UNUSED( attributeName );
