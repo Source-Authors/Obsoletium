@@ -282,8 +282,8 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 	search.symPathID = pPathID ? pPathID : "";
 	search.bIncludeFallbacks = bIncludeFallbackSearchPaths;
 
-	int lfc = m_LocalizationFiles.Count();
-	for ( int lf = 0; lf < lfc; ++lf )
+	intp lfc = m_LocalizationFiles.Count();
+	for ( intp lf = 0; lf < lfc; ++lf )
 	{
 		LocalizationFileInfo_t& entry = m_LocalizationFiles[ lf ];
 		if ( !Q_stricmp( entry.symName.String(), fileName ) )
@@ -1005,8 +1005,8 @@ const char *CLocalizedStringTable::GetLocalizationFileName(int index)
 //-----------------------------------------------------------------------------
 bool CLocalizedStringTable::LocalizationFileIsLoaded(const char *name)
 {
-	int c = m_LocalizationFiles.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_LocalizationFiles.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( !Q_stricmp( m_LocalizationFiles[ i ].symName.String(), name ) )
 			return true;

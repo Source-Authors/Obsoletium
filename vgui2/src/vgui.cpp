@@ -221,7 +221,8 @@ private:
 	int m_nReentrancyCount;
 
 	CUtlVector< Tick_t * > m_TickSignalVec;
-	CUtlLinkedList< Context_t >	m_Contexts;
+	// dimhotepus: unsigned short -> HContext
+	CUtlLinkedList< Context_t, HContext >	m_Contexts;
 
 	HContext m_hContext;
 	Context_t m_DefaultContext;

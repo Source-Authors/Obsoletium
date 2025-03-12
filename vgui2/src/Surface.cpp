@@ -3484,7 +3484,7 @@ IImage *CWin32Surface::GetIconImageForFullPath( char const *pFullPath )
 			Q_snprintf( lookup, sizeof( lookup ), "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
 
 			// Now check the dictionary
-			unsigned short idx = m_FileTypeImages.Find( lookup );
+			auto idx = m_FileTypeImages.Find( lookup );
 			if ( idx == m_FileTypeImages.InvalidIndex() )
 			{
 				newIcon = new CIconImage( info.hIcon );

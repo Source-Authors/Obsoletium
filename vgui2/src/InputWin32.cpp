@@ -703,7 +703,7 @@ VPanel *CInputSystem::CalculateNewKeyFocus()
 	if ( g_pSurface->GetPopupCount() > 0 )
 	{
 		// find the highest-level window that is both visible and a popup
-		int nIndex = g_pSurface->GetPopupCount();
+		intp nIndex = g_pSurface->GetPopupCount();
 
 		while ( nIndex )
 		{			
@@ -936,7 +936,7 @@ VPanel *CInputSystem::GetMouseFocusIgnoringModalSubtree()
 		{
 			// faster version of code below
 			// checks through each popup in order, top to bottom windows
-			for (int i = g_pSurface->GetPopupCount() - 1; i >= 0; i--)
+			for (intp i = g_pSurface->GetPopupCount() - 1; i >= 0; i--)
 			{
 				VPanel *popup = (VPanel *)g_pSurface->GetPopup(i);
 				VPanel *panel = popup;
@@ -997,8 +997,8 @@ void CInputSystem::UpdateMouseFocus(int x, int y)
 	{
 		// faster version of code below
 		// checks through each popup in order, top to bottom windows
-		int c = g_pSurface->GetPopupCount();
-		for (int i = c - 1; i >= 0; i--)
+		intp c = g_pSurface->GetPopupCount();
+		for (intp i = c - 1; i >= 0; i--)
 		{
 			VPanel *popup = (VPanel *)g_pSurface->GetPopup(i);
 			VPanel *panel = popup;
@@ -2117,7 +2117,7 @@ void CInputSystem::OnChangeIME( bool forward )
 
 		GetKeyboardLayoutList( numKBs, list );
 
-		int oldKb = 0;
+		intp oldKb = 0;
 		CUtlVector< HKL >	selections;
 
 		for ( int i = 0; i < numKBs; ++i )

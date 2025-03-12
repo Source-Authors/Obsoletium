@@ -157,11 +157,11 @@ public:
 
 	virtual void ShellExecute(const char *command, const char *file);
 
-	virtual int GetClipboardTextCount();
-	virtual void SetClipboardText(const char *text, int textLen);
-	virtual void SetClipboardText(const wchar_t *text, int textLen);
-	virtual int GetClipboardText(int offset, char *buf, int bufLen);
-	virtual int GetClipboardText(int offset, wchar_t *buf, int bufLen);
+	virtual intp GetClipboardTextCount();
+	virtual void SetClipboardText(const char *text, intp textLen);
+	virtual void SetClipboardText(const wchar_t *text, intp textLen);
+	virtual intp GetClipboardText(int offset, char *buf, intp bufLen);
+	virtual intp GetClipboardText(int offset, wchar_t *buf, intp bufLen);
 
 	virtual void SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 );
 
@@ -357,7 +357,7 @@ void CSystem::SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 )
 #endif
 }
 
-void CSystem::SetClipboardText(const char *text, int textLen)
+void CSystem::SetClipboardText(const char *text, intp textLen)
 {
 #ifndef _X360
 	if (!text)
@@ -392,7 +392,7 @@ void CSystem::SetClipboardText(const char *text, int textLen)
 //-----------------------------------------------------------------------------
 // Purpose: Puts unicode text into the clipboard
 //-----------------------------------------------------------------------------
-void CSystem::SetClipboardText(const wchar_t *text, int textLen)
+void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 {
 #ifndef _X360
 	if (!text)
@@ -425,10 +425,10 @@ void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 #endif
 }
 
-int CSystem::GetClipboardTextCount()
+intp CSystem::GetClipboardTextCount()
 {
 #ifndef _X360
-	int count = 0;
+	size_t count = 0;
 	
 	if ( VCRGetMode() != VCR_Playback )
 	{
@@ -451,10 +451,10 @@ int CSystem::GetClipboardTextCount()
 #endif
 }
 
-int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
+intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
 {
 #ifndef _X360
-	int count = 0;
+	size_t count = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
 		if (OpenClipboard(GetDesktopWindow()))
@@ -462,17 +462,17 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				int len = GlobalSize(hmem);
-				count = len - offset;
-				if (count <= 0)
+				size_t len = GlobalSize(hmem);
+				if (len <= offset)
 				{
 					count = 0;
 				}
 				else
 				{
-					if (bufLen < count)
+					count = len - offset;
+					if (static_cast<size_t>(bufLen) < count)
 					{
-						count = bufLen;
+						count = static_cast<size_t>(bufLen);
 					}
 					void *ptr = GlobalLock(hmem);
 					if (ptr)
@@ -498,10 +498,10 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 //-----------------------------------------------------------------------------
 // Purpose: Retrieves unicode text from the clipboard
 //-----------------------------------------------------------------------------
-int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
+intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
 {
 #ifndef _X360
-	int retVal = 0;
+	intp retVal = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
 		if (OpenClipboard( GetDesktopWindow() ) )
@@ -509,10 +509,10 @@ int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				int len = GlobalSize(hmem);
-				int count = len - offset;
-				if (count > 0)
+				size_t len = GlobalSize(hmem);
+				if (len > offset)
 				{
+					intp count = len - offset;
 					if (bufLen < count)
 					{
 						count = bufLen;
@@ -579,7 +579,6 @@ static bool staticSplitRegistryKey(const char *key, char *key0, char *key1)
 
 bool CSystem::SetRegistryString(const char *key, const char *value)
 {
-#ifndef _X360
 	HKEY hKey;
 
 	HKEY hSlot = HKEY_CURRENT_USER;
@@ -612,14 +611,12 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 
 	return false;
 }
 
 bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 {
-#ifndef _X360
 	if (!value)
 		return false;
 	value[0] = 0;
@@ -657,14 +654,12 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 
 	return false;
 }
 
 bool CSystem::SetRegistryInteger(const char *key, int value)
 {
-#ifndef _X360
 	HKEY hKey;
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
@@ -696,13 +691,11 @@ bool CSystem::SetRegistryInteger(const char *key, int value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 	return false;
 }
 
 bool CSystem::GetRegistryInteger(const char *key, int &value)
 {
-#ifndef _X360
 	HKEY hKey;
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
@@ -735,7 +728,6 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 	return false;
 }
 
@@ -744,7 +736,6 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 //-----------------------------------------------------------------------------
 bool CSystem::DeleteRegistryKey(const char *key)
 {
-#ifndef _X360
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
 	{
@@ -761,7 +752,6 @@ bool CSystem::DeleteRegistryKey(const char *key)
 	{
 		return true;
 	}
-#endif
 	return false;
 }
 
