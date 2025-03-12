@@ -1148,7 +1148,7 @@ void AppRender() {
 }
 
 SpewRetval_t GlViewSpew(SpewType_t type, const char *pMsg) {
-  OutputDebugString(pMsg);
+  Plat_DebugString(pMsg);
 
   if (type == SPEW_ASSERT) return SPEW_DEBUGGER;
   if (type == SPEW_ERROR) return SPEW_ABORT;
