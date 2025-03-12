@@ -98,22 +98,6 @@ void pw(winding_t *w)
 		Msg ("(%5.1f, %5.1f, %5.1f)\n",w->points[i][0], w->points[i][1],w->points[i][2]);
 }
 
-void prl(leaf_t *l)
-{
-	int			i;
-	portal_t	*p;
-	plane_t		pl;
-	
-	int count = l->portals.Count();
-	for (i=0 ; i<count ; i++)
-	{
-		p = l->portals[i];
-		pl = p->plane;
-		Msg ("portal %4i to leaf %4i : %7.1f : (%4.1f, %4.1f, %4.1f)\n",(int)(p-portals),p->leaf,pl.dist, pl.normal[0], pl.normal[1], pl.normal[2]);
-	}
-}
-
-
 //=============================================================================
 
 /*
