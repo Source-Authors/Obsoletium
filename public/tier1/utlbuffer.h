@@ -191,12 +191,12 @@ public:
 	uint64			GetUint64( );
 	float			GetFloat( );
 	double			GetDouble( );
-	template <size_t maxLenInChars> void GetString( char( &pString )[maxLenInChars] )
+	template <size_t maxLenInChars> void GetString( OUT_Z_ARRAY char( &pString )[maxLenInChars] )
 	{
 		GetStringInternal( pString, maxLenInChars );
 	}
 
-	void GetStringManualCharCount( char *pString, size_t maxLenInChars )
+	void GetStringManualCharCount( OUT_Z_CAP(maxLenInChars) char *pString, size_t maxLenInChars )
 	{
 		GetStringInternal( pString, maxLenInChars );
 	}

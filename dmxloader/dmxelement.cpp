@@ -37,7 +37,12 @@ CDmxElement::CDmxElement( const char *pType )
 	m_nLockCount = 0;
 	m_bResortNeeded = false;
 	m_bIsMarkedForDeletion = false;
-	CreateUniqueId( &m_Id );
+
+	// dimhotepus: m_Id will be zeros when unable to create unique id.
+	if ( !CreateUniqueId( &m_Id ) )
+	{
+		AssertMsg( "Unable to create unique id for DMX Element of type %s.", pType );
+	}
 }
 
 CDmxElement::~CDmxElement()

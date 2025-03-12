@@ -76,15 +76,21 @@ void CAttributeElementPickerPanel::Refresh()
 
 	if ( element )
 	{
+		// dimhotepus: Handle conversion failure (should not happen).
 		char idstr[ 37 ];
-		UniqueIdToString( element->GetId(), idstr, sizeof( idstr ) );
+		if ( !UniqueIdToString( element->GetId(), idstr ) )
+		{
+			AssertMsg( "Unable to convert ID to string for '%s' element.", element->GetName() );
+			V_strcpy_safe( idstr, "N/A" );
+		}
+
 		if ( m_bShowMemoryUsage )
 		{
-			Q_snprintf( elemText, sizeof( elemText ), "%s %s %.3fMB", element->GetTypeString(), idstr, element->EstimateMemoryUsage() / float( 1 << 20 ) );
+			V_sprintf_safe( elemText, "%s %s %.3fMB", element->GetTypeString(), idstr, element->EstimateMemoryUsage() / float( 1 << 20 ) );
 		}
 		else
 		{
-			Q_snprintf( elemText, sizeof( elemText ), "%s %s", element->GetTypeString(), idstr );
+			V_sprintf_safe( elemText, "%s %s", element->GetTypeString(), idstr );
 		}
 	}
 
