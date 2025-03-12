@@ -442,7 +442,7 @@ BOOL GDclass::InitFromTokens(TokenReader& tr, GameData *pGD)
 	if ((tr.PeekTokenType(szToken,sizeof(szToken)) == OPERATOR) && IsToken(szToken, ":"))
 	{
 		// Skip ":"
-		tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken, sizeof(szToken));
 
 		//
 		// Free any existing description and set the pointer to NULL so that GDGetToken
@@ -674,7 +674,7 @@ bool GDclass::ParseSize(TokenReader &tr)
 		//
 		// Skip ","
 		//
-		tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken, sizeof(szToken));
 
 		//
 		// Get maxes.
@@ -724,7 +724,8 @@ bool GDclass::ParseSpecifiers(TokenReader &tr)
 
 	while (tr.PeekTokenType() == IDENT)
 	{
-		tr.NextToken(szToken, sizeof(szToken));
+		// dimhotepus: Skip identation.
+		(void)tr.NextToken(szToken, sizeof(szToken));
 
 		//
 		// Handle specifiers that don't have any parens after them.
@@ -860,7 +861,7 @@ bool GDclass::ParseInputOutput(TokenReader &tr, CClassInputOutputBase *pInputOut
 		//
 		// Skip the ":".
 		//
-		tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken, sizeof(szToken));
 
 		//
 		// Read the description.

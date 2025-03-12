@@ -278,7 +278,8 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 	//
 	if ((ttype == IDENT) && IsToken(szToken, "readonly"))
 	{
-		tr.NextToken(szToken, sizeof(szToken));
+		// dimhotepus: Skip readonly token.
+		(void)tr.NextToken(szToken, sizeof(szToken));
 		m_bReadOnly = true;
 
 		//
@@ -295,7 +296,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		//
 		// Eat the ':'.
 		//
-		tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken, sizeof(szToken));
 
 		if (m_eType == ivFlags)
 		{
@@ -324,7 +325,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			//
 			// Eat the ':'.
 			//
-			tr.NextToken(szToken, sizeof(szToken));
+			(void)tr.NextToken(szToken, sizeof(szToken));
 
 			//
 			// Look ahead at the next token.
@@ -377,7 +378,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			//
 			// Eat the ':'.
 			//
-			tr.NextToken(szToken, sizeof(szToken));
+			(void)tr.NextToken(szToken, sizeof(szToken));
 
 			//
 			// Read the description.
