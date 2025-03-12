@@ -938,8 +938,10 @@ void COptionsDialogXbox::GetChoiceFromConvar( OptionData_t *pOption )
 				// We need to compare values in case we have "0" & "0.00000". 
 				if ( (pchValue[0] >= '0' && pchValue[0] <= '9') || pchValue[0] == '-' )
 				{
-					float flVal = atof(pchValue);
-					float flChoiceVal = atof(pOption->m_Choices[ iChoice ].szValue);
+					// dimhotepus: aotf -> strtof
+					float flVal = strtof(pchValue, nullptr);
+					// dimhotepus: aotf -> strtof
+					float flChoiceVal = strtof(pOption->m_Choices[ iChoice ].szValue, nullptr);
 					if ( flVal == flChoiceVal )
 					{
 						pOption->iCurrentChoice = iChoice;
