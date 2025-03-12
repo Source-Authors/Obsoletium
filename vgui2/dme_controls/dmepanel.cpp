@@ -345,8 +345,8 @@ void CDmePanel::OnViewedElementChanged( KeyValues *kv )
 	while ( --nCount >= 0 )
 	{
 		int nItemID = m_pEditorNames->GetItemIDFromRow( nCount );
-		KeyValues *kv = m_pEditorNames->GetItemUserData( nItemID );
-		if ( Q_stricmp( m_CurrentEditorName, kv->GetString( "editorName" ) ) )
+		KeyValues *kvs = m_pEditorNames->GetItemUserData( nItemID );
+		if ( Q_stricmp( m_CurrentEditorName, kvs->GetString( "editorName" ) ) )
 		{
 			m_pEditorNames->DeleteItem( nItemID );
 		}
