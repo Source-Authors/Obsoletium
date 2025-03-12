@@ -1164,7 +1164,7 @@ void CDmeCombinationControlsPanel::OnFileSelected( KeyValues *kv )
 void CDmeCombinationControlsPanel::OnImportCombination()
 {
 	char pStartingDir[MAX_PATH];
-	GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+	GetModContentSubdirectory( "models", pStartingDir );
 
 	vgui::FileOpenDialog *pDialog = new vgui::FileOpenDialog( this, "Select File to Import", true, new KeyValues( "ImportControls" ) );
 	pDialog->SetStartDirectoryContext( "combination_system_import", pStartingDir );
@@ -1780,7 +1780,7 @@ void CDmeCombinationDominationRulesPanel::OnFileSelected( KeyValues *kv )
 void CDmeCombinationDominationRulesPanel::OnImportDominationRules()
 {
 	char pStartingDir[MAX_PATH];
-	GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+	GetModContentSubdirectory( "models", pStartingDir );
 
 	vgui::FileOpenDialog *pDialog = new vgui::FileOpenDialog( this, "Select File to Import", true, new KeyValues( "ImportDominationRules" ) );
 	pDialog->SetStartDirectoryContext( "combination_system_import", pStartingDir );

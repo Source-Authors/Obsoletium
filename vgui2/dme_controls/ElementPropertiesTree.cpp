@@ -2699,7 +2699,7 @@ void CElementPropertiesTreeInternal::OnShowFileDialog( KeyValues *params )
 	FileOpenDialog *pDialog = new FileOpenDialog( this, pTitle, bOpenOnly, pContext->MakeCopy() );
 
 	char pStartingDir[ MAX_PATH ];
-	GetModSubdirectory( NULL, pStartingDir, sizeof( pStartingDir ) );
+	GetModSubdirectory( NULL, pStartingDir );
 	Q_StripTrailingSlash( pStartingDir );
 
 	pDialog->SetStartDirectoryContext( pTitle, pStartingDir );
@@ -3253,7 +3253,7 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, 
 		}
 
 		char filename[ MAX_PATH ];
-		V_GenerateUniqueName( filename, sizeof( filename ), "unnamed", DataModelFilenameArray() );
+		V_GenerateUniqueName( filename, "unnamed", DataModelFilenameArray() );
 
 		menu->AddMenuItem( "<new file>", new KeyValues( "OnChangeFile", "filename", filename ), this );
 	}

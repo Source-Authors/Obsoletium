@@ -1001,21 +1001,21 @@ void CDmePresetGroupEditorPanel::SetupFileOpenDialog( vgui::FileOpenDialog *pDia
 	char pPresetPath[MAX_PATH];
 	if ( !Q_stricmp( pFileFormat, PRESET_FILE_FORMAT ) )
 	{
-		GetModSubdirectory( "models", pPresetPath, sizeof(pPresetPath) );
+		GetModSubdirectory( "models", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_importexport", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.pre", "Preset File (*.pre)", true, PRESET_FILE_FORMAT );
 	}
 	else if ( !Q_stricmp( pFileFormat, "vfe" ) )
 	{
-		GetModSubdirectory( "expressions", pPresetPath, sizeof(pPresetPath) );
+		GetModSubdirectory( "expressions", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_exportvfe", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.vfe", "Expression File (*.vfe)", true, "vfe" );
 	}
 	else if ( !Q_stricmp( pFileFormat, "txt" ) )
 	{
-		GetModSubdirectory( "expressions", pPresetPath, sizeof(pPresetPath) );
+		GetModSubdirectory( "expressions", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_exportvfe", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.txt", "Faceposer Expression File (*.txt)", true, "txt" );

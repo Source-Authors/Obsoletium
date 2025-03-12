@@ -558,7 +558,7 @@ void CFileListManager::Refresh()
 		bool bOpenForEdit = bInPerforce && false; // p4->GetFileState( pFileName ) != P4FILE_UNOPENED;
 
 		char path[ 256 ];
-		V_ExtractFilePath( pFileName, path, sizeof( path ) );
+		V_ExtractFilePath( pFileName, path );
 
 		AddItem( fileid, V_UnqualifiedFileName( pFileName ), path, bLoaded, nElements, bChanged, bInPerforce, bOpenForEdit );
 	}

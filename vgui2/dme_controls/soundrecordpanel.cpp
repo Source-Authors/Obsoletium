@@ -62,15 +62,15 @@ void CSoundRecordPanel::DoModal( const char *pFileName )
 	Assert( EngineTool() );
 
 	char pRelativeWAVPath[MAX_PATH];
-	g_pFullFileSystem->FullPathToRelativePath( pFileName, pRelativeWAVPath, sizeof(pRelativeWAVPath) );
+	g_pFullFileSystem->FullPathToRelativePath_safe( pFileName, pRelativeWAVPath );
 
 	// Check to see if this file is not hidden owing to search paths
 	bool bBadDirectory = false;
 	char pRelativeDir[MAX_PATH];
-	Q_strncpy( pRelativeDir, pRelativeWAVPath, sizeof( pRelativeDir ) );
-	Q_StripFilename( pRelativeDir );
+	V_strcpy_safe( pRelativeDir, pRelativeWAVPath );
+	V_StripFilename( pRelativeDir );
 	char pFoundFullPath[MAX_PATH];
-	g_pFullFileSystem->RelativePathToFullPath( pRelativeDir, "MOD", pFoundFullPath, sizeof( pFoundFullPath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( pRelativeDir, "MOD", pFoundFullPath );
 	if ( StringHasPrefix( pFileName, pFoundFullPath ) )
 	{
 		// Strip 'sound/' prefix
@@ -91,7 +91,7 @@ void CSoundRecordPanel::DoModal( const char *pFileName )
 	if ( bBadDirectory )
 	{
 		char pBuf[1024];
-		Q_snprintf( pBuf, sizeof(pBuf), "File %s is in a bad directory!\nAudio must be recorded into your mod's sound/ directory.\n", pFileName ); 
+		V_sprintf_safe( pBuf, "File %s is in a bad directory!\nAudio must be recorded into your mod's sound/ directory.\n", pFileName ); 
 		vgui::MessageBox *pMessageBox = new vgui::MessageBox( "Bad Save Directory!\n", pBuf, GetParent() );
 		pMessageBox->DoModal( );
 		return;

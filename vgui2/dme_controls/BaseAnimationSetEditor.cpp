@@ -828,24 +828,24 @@ void CBaseAnimationSetEditor::OnImportAnimation( KeyValues *pParams )
 	char pStartingDir[ MAX_PATH ];
 	if ( !pGameModel )
 	{
-		GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+		GetModContentSubdirectory( "models", pStartingDir );
 	}
 	else
 	{
 		char pModelName[ MAX_PATH ];
 		studiohdr_t *pStudioHdr = pGameModel->GetStudioHdr();
-		Q_StripExtension( pStudioHdr->pszName(), pModelName, sizeof(pModelName) );
+		Q_StripExtension( pStudioHdr->pszName(), pModelName );
 
 		char pRelativePath[ MAX_PATH ];
-		Q_snprintf( pRelativePath, sizeof(pRelativePath), "models/%s/animations/dmx", pModelName );
-		GetModContentSubdirectory( pRelativePath, pStartingDir, sizeof(pStartingDir) );
+		V_sprintf_safe( pRelativePath, "models/%s/animations/dmx", pModelName );
+		GetModContentSubdirectory( pRelativePath, pStartingDir );
 		if ( !g_pFullFileSystem->IsDirectory( pStartingDir ) )
 		{
-			Q_snprintf( pRelativePath, sizeof(pRelativePath), "models/%s", pModelName );
-			GetModContentSubdirectory( pRelativePath, pStartingDir, sizeof(pStartingDir) );
+			V_sprintf_safe( pRelativePath, "models/%s", pModelName );
+			GetModContentSubdirectory( pRelativePath, pStartingDir );
 			if ( !g_pFullFileSystem->IsDirectory( pStartingDir ) )
 			{
-				GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+				GetModContentSubdirectory( "models", pStartingDir );
 			}
 		}
 	}
@@ -869,7 +869,7 @@ void CBaseAnimationSetEditor::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog
 {
 	// Compute starting directory
 	char pStartingDir[ MAX_PATH ];
-	GetModSubdirectory( "scenes", pStartingDir, sizeof(pStartingDir) );
+	GetModSubdirectory( "scenes", pStartingDir );
 
 	Assert( !bOpenFile );
 	pDialog->SetTitle( "Save Facial Animation As", true );

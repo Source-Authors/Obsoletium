@@ -1420,7 +1420,7 @@ void CAssetBuilderFrame::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, boo
 {
 	// Compute starting directory
 	char pStartingDir[ MAX_PATH ];
-	GetModContentSubdirectory( "", pStartingDir, sizeof(pStartingDir) );
+	GetModContentSubdirectory( "", pStartingDir );
 
 	if ( bOpenFile )
 	{
