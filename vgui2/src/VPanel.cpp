@@ -220,8 +220,8 @@ void VPanel::Solve()
 		absX += pabs[0] + pinset[0];
 		absY += pabs[1] + pinset[1];
 
-		_absPos[0] = clamp( absX, -32767, 32767 );
-		_absPos[1] = clamp( absY, -32767, 32767 );
+		_absPos[0] = static_cast<short>(clamp( absX, -32767, 32767 ));
+		_absPos[1] = static_cast<short>(clamp( absY, -32767, 32767 ));
 	}
 
 	// set initial bounds
@@ -230,8 +230,8 @@ void VPanel::Solve()
 
 	int absX2 = absX + baseSize[0];
 	int absY2 = absY + baseSize[1];
-	_clipRect[2] = clamp( absX2, -32767, 32767 );
-	_clipRect[3] = clamp( absY2, -32767, 32767 );
+	_clipRect[2] = static_cast<short>(clamp( absX2, -32767, 32767 ));
+	_clipRect[3] = static_cast<short>(clamp( absY2, -32767, 32767 ));
 
 	// clip to parent, if we're not a popup
 	if ( parent && !IsPopup() )
