@@ -126,7 +126,8 @@ void CErrorSystem::OGS_ReportSessionBlockDownloadError( const CHttpDownloader *p
 	g_pClient->UploadOgsData( pDownloadError, false );
 
 	// Create block download error
-	KeyValues *pBlockDownloadError = new KeyValues( "TF2ReplayBlockDownloadErrors" );
+	// dimhotepus: Do not leak KV.
+	KeyValuesAD pBlockDownloadError ( "TF2ReplayBlockDownloadErrors" );
 	pBlockDownloadError->SetInt( "ErrorCounter", g_nGenericErrorCounter );
 	pBlockDownloadError->SetInt( "NumCurrentDownloads", CSessionBlockDownloader::sm_nNumCurrentDownloads );
 	pBlockDownloadError->SetInt( "MaxBlock", nMaxBlock );
@@ -168,7 +169,8 @@ void CErrorSystem::OGS_ReportSessioInfoDownloadError( const CHttpDownloader *pDo
 	g_pClient->UploadOgsData( pDownloadError, false );
 	
 	// Create session info download error
-	KeyValues *pSessionInfoDownloadError = new KeyValues( "TF2ReplaySessionInfoDownloadErrors" );
+	// dimhotepus: Do not leak KV.
+	KeyValuesAD pSessionInfoDownloadError( "TF2ReplaySessionInfoDownloadErrors" );
 	pSessionInfoDownloadError->SetInt( "ErrorCounter", g_nGenericErrorCounter++ );
 	pSessionInfoDownloadError->SetString( "SessionInfoDownloadErrorID", pErrorToken );
 	g_pClient->UploadOgsData( pSessionInfoDownloadError, false );
@@ -182,7 +184,8 @@ void CErrorSystem::OGS_ReportSessioInfoDownloadError( const CHttpDownloader *pDo
 // to write out the base error and increment the counter.
 void CErrorSystem::OGS_ReportGenericError( const char *pGenericErrorToken )
 {
-	KeyValues *pGenericError = new KeyValues( "TF2ReplayErrors" );
+	// dimhotepus: Do not leak KV.
+	KeyValuesAD pGenericError( "TF2ReplayErrors" );
 	pGenericError->SetInt( "ErrorCounter", g_nGenericErrorCounter++ );
 	pGenericError->SetString( "ReplayErrorID", pGenericErrorToken );
 
