@@ -115,7 +115,7 @@ int64 GetSampledFrequency( unsigned iterations )
 int64 s_frequencies[ nMaxCPUs ];
 
 // Measurement thread, designed to be one per core.
-DWORD WINAPI MeasureThread( LPVOID vThreadNum )
+unsigned __stdcall MeasureThread( void* vThreadNum )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName( "CPUBurnMonitor" );
@@ -153,7 +153,7 @@ typedef struct _PROCESSOR_POWER_INFORMATION {
 } PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
 
 // Master control thread to periodically wake the measurement threads.
-DWORD WINAPI HeartbeatThread( LPVOID )
+unsigned __stdcall HeartbeatThread( void* )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName( "CPUBurnHeartbeat" );
@@ -286,7 +286,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		// ensure that they will run promptly on a specific CPU.
 		for ( int i = 0; i < g_numCPUs; ++i )
 		{
-			HANDLE thread = CreateThread( NULL, 0x10000, MeasureThread, (void*)static_cast<ptrdiff_t>(i), 0, NULL );
+			HANDLE thread = (HANDLE)_beginthreadex( NULL, 0x10000, MeasureThread, (void*)static_cast<ptrdiff_t>(i), 0, NULL );
 			if (thread)
 			{
 				SetThreadAffinityMask( thread, static_cast<size_t>(1u) << i );
@@ -295,7 +295,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		}
 
 		// Create the thread which tells the measurement threads to wake up periodically
-		CreateThread( NULL, 0x10000, HeartbeatThread, NULL, 0, NULL );
+		_beginthreadex( NULL, 0x10000, HeartbeatThread, NULL, 0, NULL );
 	}
 
 	AUTO_LOCK( s_lock );

@@ -80,7 +80,7 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 	}
 }
 
-static DWORD STDCALL ThreadProcX86SetDataBreakpoints( LPVOID pvParam )
+static unsigned STDCALL ThreadProcX86SetDataBreakpoints( void* pvParam )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("SetX86DataBreaks");
@@ -178,7 +178,7 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	}
 	
 
-	HANDLE hWorkThread = CreateThread( NULL, NULL, &ThreadProcX86SetDataBreakpoints, NULL, 0, NULL );
+	HANDLE hWorkThread = (HANDLE)_beginthreadex( NULL, 0, &ThreadProcX86SetDataBreakpoints, NULL, 0, NULL );
 	if ( hWorkThread )
 	{
 		WaitForSingleObject( hWorkThread, INFINITE );
@@ -197,7 +197,7 @@ void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 	}
 	else
 	{
-		HANDLE hWorkThread = CreateThread( NULL, NULL, &ThreadProcX86SetDataBreakpoints, &dwThreadID, 0, NULL );
+		HANDLE hWorkThread = (HANDLE)_beginthreadex( NULL, 0, &ThreadProcX86SetDataBreakpoints, &dwThreadID, 0, NULL );
 		if ( hWorkThread )
 		{
 			WaitForSingleObject( hWorkThread, INFINITE );
