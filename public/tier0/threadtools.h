@@ -505,8 +505,8 @@ template <typename T = intp>
 		bool        operator==( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() == nullptr); }
 		bool		operator==( const void *p ) const			{ return (Get() == p); }
 		bool		operator!=( const void *p ) const			{ return (Get() != p); }
-		bool		operator==( const T *p ) const				{ return operator==((void*)p); }
-		bool		operator!=( const T *p ) const				{ return operator!=((void*)p); }
+		bool		operator==( const T *p ) const				{ return operator==((const void*)p); }
+		bool		operator!=( const T *p ) const				{ return operator!=((const void*)p); }
 
 		T *  		operator->()								{ return (T *)Get(); }
 		T &  		operator *()								{ return *((T *)Get()); }
