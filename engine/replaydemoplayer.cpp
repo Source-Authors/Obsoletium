@@ -50,7 +50,7 @@ CReplayDemoPlayer::CReplayDemoPlayer()
 	m_nCurReplayIndex( 0 ),
 	m_bInStartPlayback( false ),
 	m_bStopCommandEncountered( false ),
-	m_flStartRenderTime( 0.0f ),
+	m_flStartRenderTime( 0.0 ),
 	m_bFullSignonStateReached( false )
 {
 }
@@ -267,7 +267,7 @@ bool CReplayDemoPlayer::StartPlayback( const char *pFilename, bool bAsTimeDemo )
 		);
 
 		char szActualFilename[ MAX_OSPATH ];
-		Replay_GetFirstAvailableFilename( szActualFilename, sizeof( szActualFilename ), szIdealFilename,
+		Replay_GetFirstAvailableFilename( szActualFilename, szIdealFilename,
 			pExtension, szRenderPath, 0 );
 
 		// Create an entry in the movie manager & save to disk
@@ -432,7 +432,7 @@ void CReplayDemoPlayer::StopPlayback()
 		m_pMovie->SetIsRendered( true );
 		
 		// Compute the time it took to render
-		m_pMovie->SetRenderTime( MAX( 0.0f, realtime - m_flStartRenderTime ) );
+		m_pMovie->SetRenderTime( static_cast<float>(MAX( 0.0, realtime - m_flStartRenderTime )) );
 
 		// Sets the recorded date & time of the movie
 		m_pMovie->CaptureRecordTime();
