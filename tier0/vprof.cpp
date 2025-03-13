@@ -660,23 +660,35 @@ void CVProfile::OutputReport( int type, const tchar *pszStartNode, int budgetGro
 //=============================================================================
 
 CVProfile::CVProfile() 
- :	m_enabled( 0 ),
+ :	
+#ifdef VPROF_VTUNE_GROUP
+	m_bVTuneGroupEnabled{ false },
+	m_nVTuneGroupID{ -1 },
+	m_GroupIDStackDepth{ 1 },
+#endif
+	m_enabled( 0 ),
 	m_fAtRoot( true ),
 	m_pCurNode( nullptr ),
 	m_Root( _T("Root"), 0, NULL, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, 0 ),
  	m_nFrames( 0 ),
+ 	m_ProfileDetailLevel( 0 ),
  	m_pausedEnabledDepth( 0 ),
+ 	m_pBudgetGroups( nullptr ),
+ 	m_nBudgetGroupNamesAllocated( 0 ),
+ 	m_nBudgetGroupNames( 0 ),
+	m_pNumBudgetGroupsChangedCallBack( nullptr ),
+	m_bPMEInit( false ),
+	m_bPMEEnabled( false ),
+	m_NumCounters( 0 ),
+	m_TargetThreadId( ThreadGetCurrentId() ),
 	m_pOutputStream( Msg )
 {
 	m_pCurNode = &m_Root;
 
 #ifdef VPROF_VTUNE_GROUP
-	m_GroupIDStackDepth = 1;
-	m_GroupIDStack[0] = 0; // VPROF_BUDGETGROUP_OTHER_UNACCOUNTED
+	memset(m_GroupIDStack, 0, sizeof(m_GroupIDStack));
 #endif
 
-	m_TargetThreadId = ThreadGetCurrentId();
-	
 	// Go ahead and allocate 32 slots for budget group names
 	MEM_ALLOC_CREDIT();
 	m_pBudgetGroups = new CVProfile::CBudgetGroup[32];
@@ -718,8 +730,9 @@ CVProfile::CVProfile()
 	BudgetGroupNameToBudgetGroupID( VPROF_BUDGETGROUP_REPLAY,					BUDGETFLAG_SERVER );
 //	BudgetGroupNameToBudgetGroupID( VPROF_BUDGETGROUP_DISP_HULLTRACES );
 
-	m_bPMEInit = false;
-	m_bPMEEnabled = false;
+	memset( m_Counters, 0, sizeof(m_Counters) );
+	memset( m_CounterGroups, 0, sizeof(m_CounterGroups) );
+	memset( m_CounterNames, 0, sizeof(m_CounterNames) );
 }
 
 
