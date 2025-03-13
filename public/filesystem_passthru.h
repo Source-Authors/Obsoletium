@@ -108,7 +108,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	bool			RenameFile( char const *pOldPath, char const *pNewPath, const char *pathID )		override { return m_pFileSystemPassThru->RenameFile( pOldPath, pNewPath, pathID ); }
 	void			CreateDirHierarchy( const char *path, const char *pathID )							override { m_pFileSystemPassThru->CreateDirHierarchy( path, pathID ); }
 	bool			IsDirectory( const char *pFileName, const char *pathID )							override { return m_pFileSystemPassThru->IsDirectory( pFileName, pathID ); }
-	void			FileTimeToString( char* pStrip, int maxCharsIncludingTerminator, long fileTime )	override { m_pFileSystemPassThru->FileTimeToString( pStrip, maxCharsIncludingTerminator, fileTime ); }
+	void			FileTimeToString( char* pStrip, int maxCharsIncludingTerminator, time_t fileTime )	override { m_pFileSystemPassThru->FileTimeToString( pStrip, maxCharsIncludingTerminator, fileTime ); }
 	void			SetBufferSize( FileHandle_t file, unsigned nBytes )									override { m_pFileSystemPassThru->SetBufferSize( file, nBytes  ); }
 	bool			IsOk( FileHandle_t file )															override { return m_pFileSystemPassThru->IsOk( file ); }
 	bool			EndOfFile( FileHandle_t file )														override { return m_pFileSystemPassThru->EndOfFile( file ); }
