@@ -27,7 +27,7 @@ extern "C"
 			{
 				if (!c2)
 				{
-					return c1 - c2;
+					return c1;
 				}
 
 				const int cc1 = TOLOWERC(c1), cc2 = TOLOWERC(c2);
@@ -48,7 +48,7 @@ extern "C"
 			{
 				if (!c2)
 				{
-					return c1 - c2;
+					return c1;
 				}
 
 				const int cc1 = TOLOWERC(c1), cc2 = TOLOWERC(c2);
