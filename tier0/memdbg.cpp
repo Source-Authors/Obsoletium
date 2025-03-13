@@ -488,7 +488,7 @@ class CDbgMemAlloc final : public IMemAlloc
 {
 public:
 	CDbgMemAlloc();
-	virtual ~CDbgMemAlloc();
+	~CDbgMemAlloc();
 
 	// Release versions
 	void *Alloc( size_t nSize ) override;
