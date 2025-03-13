@@ -122,7 +122,7 @@ public:
 	int		Read( void* pBuffer, int nLength );
 	int		Read( void* pBuffer, int nDestSize, int nLength );
 
-	int		Write( const void* pBuffer, int nLength );
+	int		Write( IN_BYTECAP(nLength) const void* pBuffer, int nLength );
 	int		Seek( int64 nOffset, int nWhence );
 	int		Tell();
 	int		Size();
@@ -252,9 +252,9 @@ public:
 	bool				Precache( const char *pFileName, const char *pPathID ) override;
 	bool				EndOfFile( FileHandle_t file ) override;
  
-	int					Read( void *pOutput, int size, FileHandle_t file ) override;
-	int					ReadEx( void* pOutput, int sizeDest, int size, FileHandle_t file ) override;
-	int					Write( void const* pInput, int size, FileHandle_t file ) override;
+	int					Read( OUT_BYTECAP(size) void *pOutput, int size, FileHandle_t file ) override;
+	int					ReadEx( OUT_BYTECAP(destSize) void* pOutput, int destSize, int size, FileHandle_t file ) override;
+	int					Write( IN_BYTECAP(size) void const* pInput, int size, FileHandle_t file ) override;
 	char				*ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars, FileHandle_t file ) override;
 	int					FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... ) override FMTFUNCTION( 3, 4 );
 
@@ -697,9 +697,9 @@ protected:
 	virtual void FS_fseek( FILE *fp, int64 pos, int seekType ) = 0;
 	virtual long FS_ftell( FILE *fp ) = 0;
 	virtual int FS_feof( FILE *fp ) = 0;
-	size_t FS_fread( void *dest, size_t size, FILE *fp ) { return FS_fread( dest, (size_t)-1, size, fp ); }
-	virtual size_t FS_fread( void *dest, size_t destSize, size_t size, FILE *fp ) = 0;
-    virtual size_t FS_fwrite( const void *src, size_t size, FILE *fp ) = 0;
+	size_t FS_fread( OUT_BYTECAP(size) void *dest, size_t size, FILE *fp ) { return FS_fread( dest, (size_t)-1, size, fp ); }
+	virtual size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size, FILE *fp ) = 0;
+    virtual size_t FS_fwrite( IN_BYTECAP(size) const void *src, size_t size, FILE *fp ) = 0;
 	virtual bool FS_setmode( FILE *, FileMode_t ) { return false; }
 	virtual size_t FS_vfprintf( FILE *fp, const char *fmt, va_list list ) = 0;
 	virtual int FS_ferror( FILE *fp ) = 0;

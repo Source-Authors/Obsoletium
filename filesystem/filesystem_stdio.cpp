@@ -71,7 +71,7 @@ protected:
 	void FS_fseek( FILE *fp, int64 pos, int seekType ) override;
 	long FS_ftell( FILE *fp ) override;
 	int FS_feof( FILE *fp ) override;
-	size_t FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size, FILE *fp ) override;
+	size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size, FILE *fp ) override;
 	size_t FS_fwrite( IN_BYTECAP(size) const void *src, size_t size, FILE *fp ) override;
 	bool FS_setmode( FILE *fp, FileMode_t mode ) override;
 	size_t FS_vfprintf( FILE *fp, const char *fmt, va_list list ) override;
@@ -108,7 +108,7 @@ public:
 	virtual void FS_fseek( int64 pos, int seekType ) = 0;
 	virtual long FS_ftell() = 0;
 	virtual int FS_feof() = 0;
-	virtual size_t FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size ) = 0;
+	virtual size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size ) = 0;
 	virtual size_t FS_fwrite( IN_BYTECAP(size) const void *src, size_t size ) = 0;
 	virtual bool FS_setmode( FileMode_t mode ) = 0;
 	virtual size_t FS_vfprintf( const char *fmt, va_list list ) = 0;
@@ -130,7 +130,7 @@ public:
 	void FS_fseek( int64 pos, int seekType ) override;
 	long FS_ftell() override;
 	int FS_feof() override;
-	size_t FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size) override;
+	size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size) override;
 	size_t FS_fwrite( IN_BYTECAP(size) const void *src, size_t size ) override;
 	bool FS_setmode( FileMode_t mode ) override;
 	size_t FS_vfprintf( const char *fmt, va_list list ) override;
@@ -177,7 +177,7 @@ public:
 	void FS_fseek( int64 pos, int seekType ) override;
 	long FS_ftell() override;
 	int FS_feof() override;
-	size_t FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size) override;
+	size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size) override;
 	size_t FS_fwrite( IN_BYTECAP(size) const void *src, size_t size ) override { return 0; }
 	bool FS_setmode( FileMode_t mode ) override { Error( "Can't set mode, open a second file in right mode\n" ); return false; }
 	size_t FS_vfprintf( const char *fmt, va_list list ) override { return 0; }
@@ -463,7 +463,7 @@ int CFileSystem_Stdio::FS_feof( FILE *fp )
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
-size_t CFileSystem_Stdio::FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size, FILE *fp )
+size_t CFileSystem_Stdio::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size, FILE *fp )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 	if( ThreadInMainThread() )
@@ -885,7 +885,7 @@ int CStdioFile::FS_feof()
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
-size_t CStdioFile::FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size )
+size_t CStdioFile::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %t", __FUNCTION__, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
 	if( ThreadInMainThread() )
@@ -1220,7 +1220,7 @@ constexpr inline size_t READ_TEMP_BUFFER{64 * 1024};
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
-size_t CWin32ReadOnlyFile::FS_fread( INOUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size )
+size_t CWin32ReadOnlyFile::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size )
 {
 	VPROF_BUDGET( "CWin32ReadOnlyFile::FS_fread", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %t", __FUNCTION__, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );

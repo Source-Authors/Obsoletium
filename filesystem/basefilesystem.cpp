@@ -2747,7 +2747,7 @@ bool CBaseFileSystem::EndOfFile( FileHandle_t file )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CBaseFileSystem::Read( void *pOutput, int size, FileHandle_t file )
+int CBaseFileSystem::Read( OUT_BYTECAP(size) void *pOutput, int size, FileHandle_t file )
 {
 	return ReadEx( pOutput, size, size, file );
 }
@@ -2755,7 +2755,7 @@ int CBaseFileSystem::Read( void *pOutput, int size, FileHandle_t file )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CBaseFileSystem::ReadEx( void *pOutput, int destSize, int size, FileHandle_t file )
+int CBaseFileSystem::ReadEx( OUT_BYTECAP(destSize) void *pOutput, int destSize, int size, FileHandle_t file )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s (%d bytes)", __FUNCTION__, size );
 
@@ -3012,7 +3012,7 @@ void CBaseFileSystem::DiscardPreloadData()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CBaseFileSystem::Write( void const* pInput, int size, FileHandle_t file )
+int CBaseFileSystem::Write( IN_BYTECAP(size) void const* pInput, int size, FileHandle_t file )
 {
 	VPROF_BUDGET( "CBaseFileSystem::Write", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
@@ -5357,7 +5357,7 @@ int CFileHandle::Read( void* pBuffer, int nDestSize, int nLength )
 	return 0;
 }
 
-int CFileHandle::Write( const void* pBuffer, int nLength )
+int CFileHandle::Write( IN_BYTECAP(nLength) const void* pBuffer, int nLength )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 	if( ThreadInMainThread() )
