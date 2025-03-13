@@ -1628,7 +1628,12 @@ CThread::~CThread()
 			Msg( "Illegal termination of worker thread! Threads must negotiate an end to the thread before the CThread object is destroyed.\n" ); 
 #ifdef _WIN32
 
-			DoNewAssertDialog( __FILE__, __LINE__, "Illegal termination of worker thread! Threads must negotiate an end to the thread before the CThread object is destroyed.\n" );
+			if ( DoNewAssertDialog( __FILE__, __LINE__,
+				"Illegal termination of worker thread! Threads must negotiate an end to the thread before the CThread object is destroyed.\n" ) )
+			{
+				// dimhotepus: If user want to break debugger then do it.
+				DebuggerBreakIfDebugging();
+			}
 #endif
 			if ( GetCurrentCThread() == this )
 			{
