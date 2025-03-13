@@ -41,12 +41,14 @@ CVProfile g_VProfCurrentProfile;
 int CVProfNode::s_iCurrentUniqueNodeID = 0;
 
 CVProfNode::~CVProfNode()
-{
 #if !defined( _WIN32 ) && !defined( POSIX )
+{
 	delete m_pChild;
 	delete m_pSibling;
-#endif
 }
+#else
+    = default;
+#endif
 
 CVProfNode *CVProfNode::GetSubNode( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, int budgetFlags )
 {
