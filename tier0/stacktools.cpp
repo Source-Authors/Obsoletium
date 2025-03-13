@@ -160,8 +160,7 @@ inline bool ValidStackAddress( void *pAddress, const void *pNoLessThan, const vo
 intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	//Only tested in windows. This function won't work with frame pointer omission enabled. "vpc /nofpo" all projects
-#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) && (defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -1008,8 +1007,7 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
-#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) && (defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -1065,8 +1063,7 @@ CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pP
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
-#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) && (defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
