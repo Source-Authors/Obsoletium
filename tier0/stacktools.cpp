@@ -464,7 +464,7 @@ public:
 		((PSYMBOL_INFO)genericbuffer)->MaxNameLen = MAX_SYM_NAME;
 
 		DWORD64 dwDisplacement;
-		if( m_pSymFromAddr( m_hProcess, (DWORD64)pAddress, &dwDisplacement, (PSYMBOL_INFO)genericbuffer) )
+		if( m_pSymFromAddr( m_hProcess, (DWORD64)(uintp)pAddress, &dwDisplacement, (PSYMBOL_INFO)genericbuffer) )
 		{
 			strncpy( pSymbolNameOut, ((PSYMBOL_INFO)genericbuffer)->Name, iMaxSymbolNameLength );
 			pSymbolNameOut[iMaxSymbolNameLength - 1] = 0;
@@ -491,7 +491,7 @@ public:
 		imageHelpLine64.FileName = szBuffer;
 
 		DWORD dwDisplacement;
-		if( m_pSymGetLineFromAddr64( m_hProcess, (DWORD64)pAddress, &dwDisplacement, &imageHelpLine64 ) )
+		if( m_pSymGetLineFromAddr64( m_hProcess, (DWORD64)(uintp)pAddress, &dwDisplacement, &imageHelpLine64 ) )
 		{
 			strncpy( pFileNameOut, imageHelpLine64.FileName, iMaxFileNameLength );
 			pFileNameOut[iMaxFileNameLength - 1] = 0;
@@ -513,7 +513,7 @@ public:
 
 		moduleInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
 
-		if ( m_pSymGetModuleInfo64( m_hProcess, (DWORD64)pAddress, &moduleInfo ) )
+		if ( m_pSymGetModuleInfo64( m_hProcess, (DWORD64)(uintp)pAddress, &moduleInfo ) )
 		{
 			strncpy( pModuleNameOut, moduleInfo.ModuleName, iMaxModuleNameLength );
 			pModuleNameOut[iMaxModuleNameLength - 1] = 0;
