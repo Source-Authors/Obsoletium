@@ -81,7 +81,7 @@ public:
 		SIZE = 0
 	};
 
-	static constexpr int FieldSize( )
+	[[nodiscard]] static constexpr int FieldSize( )
 	{
 		return 0;
 	}
@@ -441,7 +441,7 @@ public:
 		}
 	}
 	
-	const char *GenerateName( const char *pszIdentifier )
+	[[nodiscard]] const char *GenerateName( const char *pszIdentifier )
 	{
 		intp bufferSize = m_nLenBase + V_strlen(pszIdentifier) + 1;
 		char *pBuf = new char[bufferSize];
