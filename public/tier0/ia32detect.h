@@ -181,7 +181,7 @@ public:
         }
 	}
 
-	const tstring version_text () const
+	tstring version_text () const
 	{
 		tchar b[128];
 
@@ -206,7 +206,7 @@ protected:
 		return text[version.Type];
 	}
 
-	const tstring brand_text () const
+	tstring brand_text () const
 	{
 		static const tchar *text[] =
 		{
