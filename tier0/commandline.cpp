@@ -366,9 +366,13 @@ void CCommandLine::RemoveParm( const char *pszParm )
 		}
 		else
 		{
-			// Clear out rest of string.
-			n = pnextparam - found;
-			memset( found, 0, n );
+			// dimhotepus: Handle nullptr.
+			if ( pnextparam )
+			{
+				// Clear out rest of string.
+				n = pnextparam - found;
+				memset( found, 0, n );
+			}
 		}
 	}
 	
