@@ -683,6 +683,8 @@ static void PosixPreMinidumpCallback( void *context )
 //-----------------------------------------------------------------------------
 // steam.inf keys.
 #define VERSION_KEY				"PatchVersion="
+// dimhotepus: Read client version as it is present in modern engine.
+#define CLIENT_VERSION_KEY		"ClientVersion="
 #define PRODUCT_KEY				"ProductName="
 #define SERVER_VERSION_KEY		"ServerVersion="
 #define APPID_KEY				"AppID="
@@ -767,15 +769,23 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 			if ( !Q_strnicmp( com_token, VERSION_KEY, ssize( VERSION_KEY ) - 1 ) )
 			{
 				V_strcpy_safe( VerInfo.szVersionString, com_token + ssize( VERSION_KEY ) - 1 );
+				// Use version as client version by default.
 				VerInfo.ClientVersion = atoi( VerInfo.szVersionString );
 			}
-			else if ( !Q_strnicmp( com_token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
+			// dimhotepus: Explicitly read client version if present.
+			else if ( !Q_strnicmp( com_token, CLIENT_VERSION_KEY, ssize( CLIENT_VERSION_KEY ) - 1 ) )
 			{
-				V_strcpy_safe( VerInfo.szProductString, com_token + ssize( PRODUCT_KEY ) - 1 );
+				char szClientVersion[32];
+				V_strcpy_safe( szClientVersion, com_token + ssize( CLIENT_VERSION_KEY ) - 1 );
+				VerInfo.ClientVersion = atoi( szClientVersion );
 			}
 			else if ( !Q_strnicmp( com_token, SERVER_VERSION_KEY, ssize( SERVER_VERSION_KEY ) - 1 ) )
 			{
 				VerInfo.ServerVersion = atoi( com_token + ssize( SERVER_VERSION_KEY ) - 1 );
+			}
+			else if ( !Q_strnicmp( com_token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
+			{
+				V_strcpy_safe( VerInfo.szProductString, com_token + ssize( PRODUCT_KEY ) - 1 );
 			}
 			else if ( !Q_strnicmp( com_token, APPID_KEY, ssize( APPID_KEY ) - 1 ) )
 			{
