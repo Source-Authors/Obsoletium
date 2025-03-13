@@ -250,7 +250,7 @@ inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
 	// Figure out the actual allocation point
 	void *pAlloc = ptr;
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 
 	// See if we have enough space
 	size_t nOffset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(pAlloc);
@@ -279,7 +279,7 @@ inline void MemAlloc_FreeAligned( void *pMemBlock )
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
 
 	// pAlloc is the pointer to the start of memory block
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 	g_pMemAlloc->Free( pAlloc );
 }
 
@@ -294,7 +294,7 @@ inline void MemAlloc_FreeAligned( void *pMemBlock, const char *pFileName, int nL
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
 
 	// pAlloc is the pointer to the start of memory block
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 	g_pMemAlloc->Free( pAlloc, pFileName, nLine );
 }
 
@@ -309,7 +309,7 @@ inline size_t MemAlloc_GetSizeAligned( void *pMemBlock )
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
 
 	// pAlloc is the pointer to the start of memory block
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 	return g_pMemAlloc->GetSize( pAlloc ) - ( static_cast<byte *>(pMemBlock) - static_cast<byte *>(pAlloc) );
 }
 

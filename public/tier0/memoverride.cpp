@@ -782,13 +782,13 @@ ALLOC_CALL void *__cdecl _aligned_malloc_base( size_t size, size_t align )
 
 inline void *MemAlloc_Unalign( void *pMemBlock )
 {
-	alignas(unsigned **) unsigned *pAlloc = (unsigned *)pMemBlock;
+	alignas(unsigned **) unsigned *pAlloc = static_cast<unsigned *>(pMemBlock);
 
 	// pAlloc points to the pointer to starting of the memory block
-	pAlloc = (unsigned *)(((size_t)pAlloc & ~(sizeof( void * ) - 1)) - sizeof( void * ));
+	pAlloc = reinterpret_cast<unsigned *>(((uintp)pAlloc & ~(sizeof( void * ) - 1)) - sizeof( void * ));
 
 	// pAlloc is the pointer to the start of memory block
-	return *((unsigned **)pAlloc);
+	return *(reinterpret_cast<unsigned **>(pAlloc));
 }
 
 ALLOC_CALL void *__cdecl _aligned_realloc_base( void *ptr, size_t size, size_t align )
@@ -1042,7 +1042,7 @@ char *Wide2Multibyte( const wchar_t* wide )
 		}
 	}
 
-	return new char[4]{"NA"};
+	return new char[4]{"NA"}; //-V112
 }
 
 void VInvalidParameterHandler( const wchar_t* expression,
