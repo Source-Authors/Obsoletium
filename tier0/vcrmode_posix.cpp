@@ -541,8 +541,8 @@ const char * BuildCmdLine( int argc, char **argv, bool fAddSteam )
 	if ( len > MAX_LINUX_CMDLINE )
 	{
 		fprintf( stderr, "command line too long, %i max\n", MAX_LINUX_CMDLINE );
-		exit(-1);
-		return "";
+		// dimhotepus: 1 -> EINVAL.
+		exit( EINVAL );  //-V2014
 	}
 
 	linuxCmdline[0] = '\0';

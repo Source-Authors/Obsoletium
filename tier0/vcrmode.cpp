@@ -477,11 +477,11 @@ static void VCR_End()
 	{
 		// It's going to get screwy now, especially if we have threads, so just exit.
 		#ifdef _DEBUG
-			if ( IsDebuggerPresent() )
-				DebuggerBreak();
+		DebuggerBreakIfDebugging();
 		#endif
 
-		ExitProcess( 1 );
+		// dimhotepus: 1 -> EINVAL.
+		exit( EINVAL );  //-V2014
 	}
 
 	g_VCRMode = VCR_Disabled;
