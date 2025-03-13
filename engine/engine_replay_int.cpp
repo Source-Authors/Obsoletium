@@ -182,7 +182,7 @@ public:
 		sv.RecalculateTags();
 	}
 
-	virtual bool NET_GetHostnameAsIP( const char *pHostname, char *pOut, int nOutSize )
+	virtual bool NET_GetHostnameAsIP( const char *pHostname, char *pOut, intp nOutSize )
 	{
 		netadr_t adr;
 		if ( !NET_StringToAdr( pHostname, &adr ) )
