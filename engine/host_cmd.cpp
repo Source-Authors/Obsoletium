@@ -390,7 +390,7 @@ void Host_Client_Printf(const char *fmt, ...)
 	char		string[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe (string, fmt, argptr);
 	va_end (argptr);
 
 	host_client->ClientPrintf( "%s", string );

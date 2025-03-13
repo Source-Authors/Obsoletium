@@ -432,7 +432,7 @@ void Con_DebugLog( const char *fmt, ...)
 	char data[MAXPRINTMSG];
     
     va_start(argptr, fmt);
-    Q_vsnprintf(data, sizeof(data), fmt, argptr);
+    V_vsprintf_safe(data, fmt, argptr);
     va_end(argptr);
 
 	FileHandle_t fh = GetConsoleLogManager().GetConsoleLogFileHandleForAppend();
@@ -663,7 +663,7 @@ void Con_Printf( const char *fmt, ... )
 	static bool	inupdate;
 	
 	va_start( argptr, fmt );
-	Q_vsnprintf( msg, sizeof( msg ), fmt, argptr );
+	V_vsprintf_safe( msg, fmt, argptr );
 	va_end( argptr );
 
 #ifndef NO_VCR
@@ -712,7 +712,7 @@ void Con_ColorPrintf( const Color& clr, const char *fmt, ... )
 	char		msg[MAXPRINTMSG];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (msg,sizeof( msg ), fmt,argptr);
+	V_vsprintf_safe (msg, fmt, argptr);
 	va_end (argptr);
 
 	AUTO_LOCK( g_AsyncNotifyTextMutex );
@@ -740,7 +740,7 @@ void Con_DPrintf (const char *fmt, ...)
 	char		msg[MAXPRINTMSG];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf(msg,sizeof( msg ), fmt,argptr);
+	V_vsprintf_safe(msg, fmt,argptr);
 	va_end (argptr);
 	
 	g_fIsDebugPrint = true;
@@ -776,7 +776,7 @@ void Con_SafePrintf (const char *fmt, ...)
 	char		msg[MAXPRINTMSG];
 		
 	va_start (argptr,fmt);
-	Q_vsnprintf(msg,sizeof( msg ), fmt,argptr);
+	V_vsprintf_safe(msg, fmt,argptr);
 	va_end (argptr);
 
 #ifndef SWDS
@@ -804,7 +804,7 @@ void Con_NPrintf( int idx, const char *fmt, ... )
 	char outtext[MAXPRINTMSG];
 
 	va_start(argptr, fmt);
-    Q_vsnprintf( outtext, sizeof( outtext ), fmt, argptr);
+    V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
 	if ( IsPC() )
@@ -823,7 +823,7 @@ void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
 	char outtext[MAXPRINTMSG];
 
 	va_start(argptr, fmt);
-    Q_vsnprintf( outtext, sizeof( outtext ), fmt, argptr);
+    V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
 	if ( IsPC() )

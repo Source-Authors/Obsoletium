@@ -521,14 +521,14 @@ void UpdateProgress( const TGameStatsParameters & params, char const *fmt, ... )
 	char str[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( str, sizeof( str ) - 1, fmt, argptr );
+	V_vsprintf_safe( str, fmt, argptr );
 	va_end( argptr );
 
 	char outstr[ 2060 ];
-	Q_snprintf( outstr, sizeof( outstr ), "(%u): %s", params.m_uProgressContext, str );
+	V_sprintf_safe( outstr, "(%u): %s", params.m_uProgressContext, str );
 
 	TGameStatsProgress progress;
-	Q_strncpy( progress.m_sStatus, outstr, sizeof( progress.m_sStatus ) );
+	V_strcpy_safe( progress.m_sStatus, outstr );
 
 	// Invoke the callback
 	( *params.m_pOptionalProgressFunc )( params.m_uProgressContext, progress );

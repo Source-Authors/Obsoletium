@@ -2341,7 +2341,7 @@ void NET_OutOfBandPrintf(intp sock, const netadr_t &adr, PRINTF_FORMAT_STRING co
 	*(unsigned int*)string = CONNECTIONLESS_HEADER;
 
 	va_start (argptr, format);
-	Q_vsnprintf (string+4, sizeof( string ) - 4, format,argptr);
+	V_vsnprintf (string+4, sizeof( string ) - 4, format,argptr);
 	va_end (argptr);
 
 	intp length = Q_strlen(string+4) + 5;

@@ -102,7 +102,7 @@ void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt
 		char		string[1024];
 
 		va_start (argptr, fmt);
-		Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+		V_vsprintf_safe(string, fmt,argptr);
 		va_end (argptr);
 
 		Q_strncpy( gszDisconnectReason, string, 256 );
@@ -344,7 +344,7 @@ char *va( PRINTF_FORMAT_STRING const char *format, ... )
 	char* outbuf = tmpstr512();
 	va_list argptr;
 	va_start (argptr, format);
-	Q_vsnprintf( outbuf, 512, format, argptr );
+	V_vsnprintf( outbuf, 512, format, argptr );
 	va_end (argptr);
 	return outbuf;
 }
@@ -1050,7 +1050,7 @@ void COM_Log( const char *pszFile, PRINTF_FORMAT_STRING const char *fmt, ...) FM
 	char		string[8192];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf(string, sizeof( string ), fmt, argptr);
+	V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 
 	COM_LogString( pszFile, string );

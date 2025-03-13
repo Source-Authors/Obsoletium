@@ -913,7 +913,7 @@ public:
 		static char	szOut[1024];
 		
 		va_start(argptr, szFmt);
-		Q_vsnprintf(szOut, sizeof( szOut ), szFmt, argptr);
+		V_vsprintf_safe(szOut, szFmt, argptr);
 		va_end(argptr);
 
 		if ( szOut[0] == 0 )
@@ -1181,7 +1181,7 @@ public:
 		va_list		argptr;
 		char		text[4096];
 		va_start (argptr, fmt);
-		Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+		V_vsprintf_safe(text, fmt, argptr);
 		va_end (argptr);
 
 		::Con_NPrintf( pos, "%s", text );
@@ -1195,7 +1195,7 @@ public:
 		va_list		argptr;
 		char		text[4096];
 		va_start (argptr, fmt);
-		Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+		V_vsprintf_safe(text, fmt, argptr);
 		va_end (argptr);
 
 		::Con_NXPrintf( info, "%s", text );

@@ -2308,7 +2308,7 @@ void CMatchmaking::SetPreventFullServerStartup( bool bState, char const *fmt, ..
 	char desc[ 256 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( desc, sizeof( desc ), fmt, argptr );
+	V_vsprintf_safe( desc, fmt, argptr );
 	va_end( argptr );
 
 	DevMsg( 1, "Setting state from prevent %s to prevent %s:  %s",

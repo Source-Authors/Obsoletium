@@ -42,7 +42,7 @@ void Con_ColorPrintf( const Color& clr, const char *fmt, ... )
 		return;
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (msg,sizeof( msg ), fmt,argptr);
+	V_vsprintf_safe (msg, fmt, argptr);
 	va_end (argptr);
 
 	if ( !HandleRedirectAndDebugLog( msg ) )
@@ -58,7 +58,7 @@ void Con_NPrintf( int pos, const char *fmt, ... )
 	va_list		argptr;
 	char		text[4096];
 	va_start (argptr, fmt);
-	Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
 	return;

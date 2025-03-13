@@ -2137,7 +2137,7 @@ void CBaseServer::BroadcastPrintf (const char *fmt, ...)
 	char		string[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe (string, fmt, argptr);
 	va_end (argptr);
 
 	SVC_Print print( string );

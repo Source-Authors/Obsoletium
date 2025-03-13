@@ -693,7 +693,7 @@ void CGameClient::Disconnect( const char *fmt, ... )
 		return;	// no recursion
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (reason, sizeof( reason ), fmt,argptr);
+	V_vsprintf_safe (reason, fmt,argptr);
 	va_end (argptr);
 
 	// notify other clients of player leaving the game

@@ -469,7 +469,7 @@ void CLog::Printf( const char *fmt, ... )
 	}
 
 	va_start ( argptr, fmt );
-	Q_vsnprintf ( string, sizeof( string ), fmt, argptr );
+	V_vsprintf_safe ( string, fmt, argptr );
 	va_end   ( argptr );
 
 	Print( string );

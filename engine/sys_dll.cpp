@@ -320,7 +320,7 @@ void Sys_Printf(const char *fmt, ...)
 	char		text[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe (text, fmt, argptr);
 	va_end (argptr);
 		
 	if ( developer.GetInt() )
@@ -385,7 +385,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 	char		text[1024];
 	static      bool bReentry = false; // Don't meltdown
 
-	Q_vsnprintf( text, sizeof( text ), error, argsList );
+	V_vsprintf_safe( text, error, argsList );
 
 	if ( bReentry )
 	{

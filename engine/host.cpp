@@ -761,7 +761,7 @@ void Host_EndGame (bool bShowMainMenu, PRINTF_FORMAT_STRING const char *message,
 	char		string[1024];
 
 	va_start (argptr,message);
-	Q_vsnprintf (string,sizeof(string),message,argptr);
+	V_vsprintf_safe (string,message,argptr);
 	va_end (argptr);
 	ConMsg ("Host_EndGame: %s\n",string);
 
@@ -831,7 +831,7 @@ void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2
 #endif
 
 	va_start (argptr,error);
-	Q_vsnprintf(string,sizeof(string),error,argptr);
+	V_vsprintf_safe(string,error,argptr);
 	va_end (argptr);
 
 	if ( sv.IsDedicated() )

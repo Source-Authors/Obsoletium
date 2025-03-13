@@ -1174,10 +1174,10 @@ private:
 	va_list	m_argptr;
 
 public:
-	void AddEntityTextOverlay(int ent_index, int line_offset, float duration, int r, int g, int b, int a, const char *format, ...)
+	void AddEntityTextOverlay(int ent_index, int line_offset, float duration, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *format, ...)
 	{
 		va_start( m_argptr, format );
-		Q_vsnprintf( m_text, sizeof( m_text ), format, m_argptr );
+		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
 		CDebugOverlay::AddEntityTextOverlay(ent_index, line_offset, duration, r, g, b, a, m_text);
@@ -1203,37 +1203,37 @@ public:
 		CDebugOverlay::AddTriangleOverlay(p1, p2, p3, r, g, b, a, noDepthTest, duration);
 	}
 
-	void AddTextOverlay(const Vector& origin, float duration, const char *format, ...)
+	void AddTextOverlay(const Vector& origin, float duration, PRINTF_FORMAT_STRING const char *format, ...)
 	{
 		va_start( m_argptr, format );
-		Q_vsnprintf( m_text, sizeof( m_text ), format, m_argptr );
+		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
 		CDebugOverlay::AddTextOverlay(origin, duration, m_text);
 	}
 
-	void AddTextOverlay(const Vector& origin, int line_offset, float duration, const char *format, ...)
+	void AddTextOverlay(const Vector& origin, int line_offset, float duration, PRINTF_FORMAT_STRING const char *format, ...)
 	{
 		va_start( m_argptr, format );
-		Q_vsnprintf( m_text, sizeof( m_text ), format, m_argptr );
+		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
 		CDebugOverlay::AddTextOverlay(origin, line_offset, duration, m_text);
 	}
 
-	void AddTextOverlayRGB(const Vector& origin, int line_offset, float duration, float r, float g, float b, float alpha, const char *format, ...)
+	void AddTextOverlayRGB(const Vector& origin, int line_offset, float duration, float r, float g, float b, float alpha, PRINTF_FORMAT_STRING const char *format, ...)
 	{
 		va_start( m_argptr, format );
-		Q_vsnprintf( m_text, sizeof( m_text ), format, m_argptr );
+		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
 		CDebugOverlay::AddTextOverlay(origin, line_offset, duration, r, g, b, alpha, m_text);
 	}
 
-	void AddTextOverlayRGB(const Vector& origin, int line_offset, float flDuration, int r, int g, int b, int alpha, const char *format, ...)
+	void AddTextOverlayRGB(const Vector& origin, int line_offset, float flDuration, int r, int g, int b, int alpha, PRINTF_FORMAT_STRING const char *format, ...)
 	{
 		va_start( m_argptr, format );
-		Q_vsnprintf( m_text, sizeof( m_text ), format, m_argptr );
+		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
 		CDebugOverlay::AddTextOverlay( origin, line_offset, flDuration, r * 1.0f/255.0f, g * 1.0f/255.0f, b * 1.0f/255.0f, alpha * 1.0f/255.0f, m_text );

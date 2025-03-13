@@ -333,7 +333,7 @@ static void SpewToFile( const char* pFmt, ... )
 	va_list args;
 
 	va_start( args, pFmt );
-	int len = Q_vsnprintf( temp, sizeof( temp ), pFmt, args );
+	int len = V_vsnprintf( temp, sizeof( temp ), pFmt, args );
 	va_end( args );
 	Assert( len < 2048 );
 

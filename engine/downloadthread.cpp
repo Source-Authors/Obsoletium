@@ -75,7 +75,7 @@ void Thread_DPrintf (char *fmt, ...)
 	char		msg[4096];
 		
 	va_start( argptr, fmt );
-	Q_vsnprintf( msg, sizeof(msg), fmt, argptr );
+	V_vsprintf_safe( msg, fmt, argptr );
 	va_end( argptr );
 	Plat_DebugString( msg );
 #endif // _DEBUG

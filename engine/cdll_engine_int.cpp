@@ -903,7 +903,7 @@ void CEngineClient::Con_NPrintf( int pos, const char *fmt, ... )
 	va_list		argptr;
 	char		text[4096];
 	va_start (argptr, fmt);
-	Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
 	::Con_NPrintf( pos, "%s", text );
@@ -914,7 +914,7 @@ void CEngineClient::Con_NXPrintf( const struct con_nprint_s *info, const char *f
 	va_list		argptr;
 	char		text[4096];
 	va_start (argptr, fmt);
-	Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
 	::Con_NXPrintf( info, "%s", text );

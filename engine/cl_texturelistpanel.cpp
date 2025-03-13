@@ -1532,11 +1532,11 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		char *pExtPut = szFileName + strlen( szFileName ) - (ssize( ".vtf" ) - 1); // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
 
 		// 1.tga
-		sprintf( pExtPut, ".tga" );
+		V_strcpy( pExtPut, ".tga" );
 		if ( g_pFullFileSystem->FileExists( szFileName ) )
 		{
 			// Have tga - pump in the txt file
-			sprintf( pExtPut, ".txt" );
+			V_strcpy( pExtPut, ".txt" );
 
 			CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			g_pFullFileSystem->ReadFile( szFileName, 0, bufTxtFileBuffer );
@@ -1565,7 +1565,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		else
 		{
 			// 2.psd
-			sprintf( pExtPut, ".psd" );
+			V_strcpy( pExtPut, ".psd" );
 			if ( g_pFullFileSystem->FileExists( szFileName ) )
 			{
 				char chCommand[MAX_PATH];
@@ -1607,7 +1607,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 			else
 			{
 				// 3. - error
-				sprintf( pExtPut, "" );
+				V_strcpy( pExtPut, "" );
 				Warning( " '%s' : doesn't specify a valid TGA or PSD file!\n", szFileName );
 				return;
 			}
@@ -1778,7 +1778,7 @@ void CRenderTextureEditor::Paint()
 	y += TILE_BORDER;
 
 	char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-	Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vtf", szTextureFile );
+	V_sprintf_safe( chResolveNameArg, "materials/%s.vtf", szTextureFile );
 	char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 
 	char const *szPrintFilePrefix = szResolvedName ? "" : "[?]/";

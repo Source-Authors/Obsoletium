@@ -549,7 +549,7 @@ void CEngineTool::Con_NPrintf( int pos, const char *fmt, ... )
 	char buf[ 1024 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( buf, sizeof( buf ) - 1, fmt, argptr );
+	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
 	return ::Con_NPrintf( pos, "%s", buf );
@@ -560,7 +560,7 @@ void CEngineTool::Con_NXPrintf( const struct con_nprint_s *info, const char *fmt
 	char buf[ 1024 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( buf, sizeof( buf ) - 1, fmt, argptr );
+	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
 	::Con_NXPrintf( info, "%s", buf );

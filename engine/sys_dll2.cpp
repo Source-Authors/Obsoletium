@@ -353,8 +353,7 @@ public:
 		va_start( args, fmt );
 		
 		size_t len = strlen( m_errorText );
-		vsnprintf( m_errorText + len, sizeof( m_errorText ) - len - 1, fmt, args );
-		m_errorText[ sizeof( m_errorText ) - 1 ] = 0;
+		V_vsnprintf( m_errorText + len, sizeof( m_errorText ) - len, fmt, args );
 
 		va_end( args );
 	}
