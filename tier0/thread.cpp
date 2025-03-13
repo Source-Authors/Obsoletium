@@ -38,11 +38,11 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 	CONTEXT ctx;
 	ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 	X86HardwareBreakpointState_t *pState = &s_BreakpointState;
-	ctx.Dr0 = (DWORD) pState->pAddress[0];
-	ctx.Dr1 = (DWORD) pState->pAddress[1];
-	ctx.Dr2 = (DWORD) pState->pAddress[2];
-	ctx.Dr3 = (DWORD) pState->pAddress[3];
-	ctx.Dr7 = (DWORD) 0;
+	ctx.Dr0 = (DWORD) (DWORD_PTR) pState->pAddress[0];
+	ctx.Dr1 = (DWORD) (DWORD_PTR) pState->pAddress[1];
+	ctx.Dr2 = (DWORD) (DWORD_PTR) pState->pAddress[2];
+	ctx.Dr3 = (DWORD) (DWORD_PTR) pState->pAddress[3];
+	ctx.Dr7 = (DWORD) (DWORD_PTR) 0;
 	for ( int i = 0; i < 4; ++i )
 	{
 		if ( pState->pAddress[i] && pState->nWatchBytes[i] )
