@@ -1031,8 +1031,10 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 
 		if( iParentStackTraceLength > 0 )
 		{
-			m_pParentStackTrace = new void * [iParentStackTraceLength];
-			memcpy( (void **)m_pParentStackTrace, pParentStackTrace, sizeof( void * ) * iParentStackTraceLength );
+			void **stackTrace = new void * [iParentStackTraceLength];
+			memcpy( stackTrace, pParentStackTrace, sizeof( void * ) * iParentStackTraceLength );
+
+			m_pParentStackTrace = stackTrace;
 		}
 	}	
 
@@ -1170,14 +1172,14 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 //	>= 0 is the decoded data size
 //	INT_MIN (most negative value possible) indicates an improperly formatted string (not our data)
 //	all other negative values are the negative of how much dest buffer size is necessary.
-intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, char **ppParseFinishOut )
+intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, const char **ppParseFinishOut )
 {
 	const uint8 *pDecodeRead = (const uint8 *)pString;
 
 	if( (pDecodeRead[0] < 0x80) || (pDecodeRead[1] < 0x80) || (pDecodeRead[2] < 0x80) || (pDecodeRead[3] < 0x80) )
 	{
 		if( ppParseFinishOut != NULL )
-			*ppParseFinishOut = (char *)pString;
+			*ppParseFinishOut = pString;
 
 		return INT_MIN; //Don't know what the string is, but it's not our format
 	}
@@ -1198,7 +1200,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 		if( pDecodeRead[i] < 0x80 ) //encoded data always has MSB set
 		{
 			if( ppParseFinishOut != NULL )
-				*ppParseFinishOut = (char *)pString;
+				*ppParseFinishOut = pString;
 
 			return INT_MIN; //either not our data, or part of the string is missing
 		}
@@ -1207,7 +1209,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 	if( iDestBufferSize < iDecodedSize )
 	{
 		if( ppParseFinishOut != NULL )
-			*ppParseFinishOut = (char *)pDecodeRead;
+			*ppParseFinishOut = reinterpret_cast<const char*>(pDecodeRead);
 
 		return -iDecodedSize; //dest buffer not big enough to hold the data
 	}
@@ -1235,7 +1237,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 	}
 
 	if( ppParseFinishOut != NULL )
-		*ppParseFinishOut = (char *)pDecodeRead;
+		*ppParseFinishOut = reinterpret_cast<const char*>(pDecodeRead);
 
 	return iDecodedSize;	
 }

@@ -125,7 +125,8 @@ PLATFORM_INTERFACE intp EncodeBinaryToString( const void *pToEncode, intp iDataL
 //	>= 0 is the decoded data size
 //	INT_MIN (most negative value possible) indicates an improperly formatted string (not our data)
 //	all other negative values are the negative of how much dest buffer size is necessary.
-PLATFORM_INTERFACE intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, char **ppParseFinishOut = nullptr );
+// dimhotepus: char ** -> const char ** for const-correctness.
+PLATFORM_INTERFACE intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, const char **ppParseFinishOut = nullptr );
 
 
 
