@@ -7,7 +7,9 @@
 #include <winsock.h>
 #endif
 
+#include <atomic>
 #include <ctime>
+
 #include "tier0/threadtools.h"
 #include "tier0/vcrmode.h"
 #include "tier0/dbg.h"
@@ -17,23 +19,16 @@
 												
 #ifndef NO_VCR
 
-#define PvRealloc realloc
 #define PvAlloc malloc
 
-											
-												
 #define VCR_RuntimeAssert(x)	VCR_RuntimeAssertFn(x, #x)
 
-double g_flLastVCRFloatTimeValue;												
+static IVCRHelpers	*g_pHelpers = nullptr;
 
-bool		g_bExpectingWindowProcCalls = false;
-
-IVCRHelpers	*g_pHelpers = 0;
-
-FILE		*g_pVCRFile = NULL;
-VCRMode_t	g_VCRMode = VCR_Disabled;
-VCRMode_t	g_OldVCRMode = VCR_Invalid;		// Stored temporarily between SetEnabled(0)/SetEnabled(1) blocks.
-int			g_iCurEvent = 0;
+static FILE				*g_pVCRFile = nullptr;
+VCRMode_t				g_VCRMode = VCR_Disabled;
+static VCRMode_t		g_OldVCRMode = VCR_Invalid;		// Stored temporarily between SetEnabled(0)/SetEnabled(1) blocks.
+static std::atomic_int	g_iCurEvent = 0;
 
 size_t			g_CurFilePos = 0;				// So it knows when we're done playing back.
 size_t			g_FileLen = 0;					
@@ -343,7 +338,7 @@ static void VCR_WriteEvent( VCREvent event )
 
 static void VCR_IncrementEvent()
 {
-	++g_iCurEvent;
+	g_iCurEvent.fetch_add(1, std::memory_order::memory_order_relaxed);
 }
 
 static void VCR_Event(VCREvent type)
@@ -568,7 +563,6 @@ static double VCR_Hook_Sys_FloatTime(double time)
 	else if(g_VCRMode == VCR_Playback)
 	{
 		VCR_Read(&time, sizeof(time));
-		g_flLastVCRFloatTimeValue = time;
 	}
 
 	return time;

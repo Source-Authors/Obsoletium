@@ -1,11 +1,13 @@
 // Copyright Valve Corporation, All rights reserved.
 
+#include <atomic>
 #include <ctime>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
 #include <cerrno>
 #include <cstdlib>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "tier0/threadtools.h"
@@ -23,15 +25,12 @@
 #define VCR_RuntimeAssert(x)	VCR_RuntimeAssertFn(x, #x)
 #define PvAlloc malloc
 
-bool		g_bExpectingWindowProcCalls = false;
+static IVCRHelpers	*g_pHelpers = nullptr;
 
-IVCRHelpers	*g_pHelpers = 0;
-
-FILE		*g_pVCRFile = NULL;
-VCRMode_t		g_VCRMode = VCR_Disabled;
-
-VCRMode_t		g_OldVCRMode = (VCRMode_t)-1;		// Stored temporarily between SetEnabled(0)/SetEnabled(1) blocks.
-int			g_iCurEvent = 0;
+static FILE				*g_pVCRFile = nullptr;
+VCRMode_t				g_VCRMode = VCR_Disabled;
+static VCRMode_t		g_OldVCRMode = VCR_Invalid;		// Stored temporarily between SetEnabled(0)/SetEnabled(1) blocks.
+static std::atomic_int	g_iCurEvent = 0;
 
 int			g_CurFilePos = 0;				// So it knows when we're done playing back.
 int			g_FileLen = 0;					
@@ -163,7 +162,7 @@ static void VCR_WriteEvent(VCREvent event)
 
 static void VCR_IncrementEvent()
 {
-	++g_iCurEvent;
+	g_iCurEvent.fetch_add(1, std::memory_order::memory_order_relaxed);
 }
 
 static void VCR_Event(VCREvent type)
