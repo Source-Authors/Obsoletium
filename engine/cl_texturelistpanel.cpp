@@ -538,23 +538,29 @@ static bool ShallWarnTx( KeyValues *kv, ITexture *tx )
 	return false;
 }
 
-static void FmtCommaNumber( char *pchBuffer, unsigned int uiNumber )
+template<intp bufferSize>
+static void FmtCommaNumber( char (&pchBuffer)[bufferSize], unsigned int uiNumber )
 {
-	pchBuffer[0] = 0;
-	for ( unsigned int uiDivisor = 1024 * 1024 * 1024; uiDivisor > 0; uiDivisor /= 1024 )
+	pchBuffer[0] = '\0';
+	for ( unsigned int uiDivisor = 1024u * 1024 * 1024; uiDivisor > 0; uiDivisor /= 1024u )
 	{
 		if ( uiNumber > uiDivisor )
 		{
-			unsigned int uiPrint = ( uiNumber / uiDivisor ) % 1024;
-			sprintf( pchBuffer + strlen( pchBuffer ), ( uiNumber / uiDivisor < 1024 ) ? "%d," : "%03d,", uiPrint );
+			unsigned int uiPrint = ( uiNumber / uiDivisor ) % 1024u;
+
+			intp bufferLen = V_strlen(pchBuffer);
+
+			V_snprintf( pchBuffer + bufferLen,
+				bufferSize - bufferLen,
+				( uiNumber / uiDivisor < 1024u ) ? "%u," : "%03u,", uiPrint );
 		}
 	}
 
 	intp len = V_strlen( pchBuffer );
 	if ( !len )
-		sprintf( pchBuffer, "0" );
+		V_sprintf_safe( pchBuffer, "0" );
 	else if ( pchBuffer[ len - 1 ] == ',' )
-		pchBuffer[ len - 1 ] = 0;
+		pchBuffer[ len - 1 ] = '\0';
 }
 
 namespace
