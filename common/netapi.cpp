@@ -102,11 +102,11 @@ char *CNetAPI::AdrToString( netadr_t *a )
 	{
 		if ( a->type == NA_LOOPBACK )
 		{
-			sprintf (s, "loopback");
+			V_sprintf_safe (s, "loopback");
 		}
 		else if ( a->type == NA_IP )
 		{
-			sprintf(s, "%i.%i.%i.%i:%i", a->ip[0], a->ip[1], a->ip[2], a->ip[3], ntohs( a->port ) );
+			V_sprintf_safe(s, "%i.%i.%i.%i:%i", a->ip[0], a->ip[1], a->ip[2], a->ip[3], ntohs( a->port ) );
 		}
 	}
 	return s;
