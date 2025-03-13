@@ -40,7 +40,6 @@ HRESULT PME::Init( void )
     case AMD:
         break;
     default:
-        bDriverOpen = FALSE;		// not an Intel or Athlon processor so return false
         return E_UNKNOWN_CPU_VENDOR;
     }
 
