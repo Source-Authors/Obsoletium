@@ -1117,8 +1117,7 @@ void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, s
 	Assert( info.m_nCurrentCount != 0 );
 
 	// It is technically legal for code to request allocations of zero bytes, and there are a number of places in our code
-	// that do. So only assert that nLogicalSize >= 0. https://stackoverflow.com/questions/1087042/c-new-int0-will-it-allocate-memory
-	Assert( nLogicalSize >= 0 );
+	// that do.
 	Assert( info.m_nCurrentSize >= nLogicalSize );
 	--info.m_nCurrentCount;
 	info.m_nCurrentSize -= nLogicalSize;
