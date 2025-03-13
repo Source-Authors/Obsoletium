@@ -52,8 +52,7 @@ static void VCR_Error( const char *pFormat, ... )
 	char str[256];
 	va_list marker;
 	va_start( marker, pFormat );
-	_snprintf( str, std::size( str ), pFormat, marker );
-	str[ std::size(str) - 1 ] = '\0';
+	vsnprintf( str, std::size( str ), pFormat, marker );
 	va_end( marker );
 
 	g_pHelpers->ErrorMessage( str );
@@ -114,7 +113,7 @@ void OutputDebugStringFormat( const char *pMsg, ... )
 	char msg[4096];
 	va_list marker;
 	va_start( marker, pMsg );
-	_vsnprintf( msg, sizeof( msg )-1, pMsg, marker );
+	vsnprintf( msg, sizeof( msg ), pMsg, marker );
 	va_end( marker );
 	int len = strlen( msg );
 	

@@ -420,7 +420,7 @@ static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t ret
 {
 	va_list marker;
 	va_start( marker, pMsg );
-	V_sprintf_safe( g_FileSystemError, pMsg, marker );
+	V_vsprintf_safe( g_FileSystemError, pMsg, marker );
 	va_end( marker );
 
 	Warning( "%s\n", g_FileSystemError );
