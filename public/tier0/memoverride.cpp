@@ -1033,11 +1033,13 @@ char *Wide2Multibyte( const wchar_t* wide )
 	{
 		const size_t expected_count{ wcstombs( nullptr, wide, 0 ) };
 		char *mb{ new char[expected_count] };
-		const size_t actual_count{ wcstombs( mb, wide, expected_count ) };
+		[[maybe_unused]] const size_t actual_count{ wcstombs( mb, wide, expected_count ) };
 
 		Assert(expected_count == actual_count);
-
-		return mb;
+		if (expected_count == actual_count)
+		{
+			return mb;
+		}
 	}
 
 	return new char[4]{"NA"};
