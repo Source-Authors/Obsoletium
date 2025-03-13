@@ -75,7 +75,7 @@ CThreadMutex g_DebugFileMutex;
 void VCR_Debug( const char *pMsg, ... )
 {
 	va_list marker;
-	va_start( marker, pMsg );
+	va_start( marker, pMsg ); //-V2018 //-V2019
 
 	{
 		AUTO_LOCK(g_DebugFileMutex);
@@ -230,7 +230,7 @@ static void VCR_Error( const char *pFormat, ... )
 
 	char str[256];
 	va_list marker;
-	va_start( marker, pFormat );
+	va_start( marker, pFormat ); //-V2018 //-V2019
 	vsnprintf( str, sizeof( str ), pFormat, marker );
 	va_end( marker );
 

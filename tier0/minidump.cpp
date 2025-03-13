@@ -615,7 +615,7 @@ void MinidumpUserStreamInfoSetHeader( const char *pFormat, ... )
 {
 	va_list marker;
 
-	va_start( marker, pFormat );
+	va_start( marker, pFormat ); //-V2018 //-V2019
 	vsnprintf( g_UserStreamInfoHeader, std::size( g_UserStreamInfoHeader ), pFormat, marker );
 	va_end( marker );
 }
@@ -633,7 +633,7 @@ void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 	pData[ DataSize - 1 ] = '\0';
 	size_t HeaderLen = strlen( pData );
 
-	va_start( marker, pFormat );
+	va_start( marker, pFormat ); //-V2018 //-V2019
 	vsnprintf( pData + HeaderLen, DataSize - HeaderLen, pFormat, marker );
 	va_end( marker );
 

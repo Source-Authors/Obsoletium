@@ -672,7 +672,7 @@ public:
 	{ 
 		va_list arg_ptr;
 
-		va_start(arg_ptr, pszFormat);
+		va_start(arg_ptr, pszFormat); //-V2019 //-V2018
 		_vsntprintf(m_szBuf, sizeof(m_szBuf)-1, pszFormat, arg_ptr);
 		va_end(arg_ptr);
 

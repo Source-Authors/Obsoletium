@@ -752,7 +752,7 @@ static FILE* s_DbgFile;
 static void DefaultHeapReportFunc( char const *pFormat, ... )
 {
 	va_list args;
-	va_start( args, pFormat );
+	va_start( args, pFormat ); //-V2018 //-V2019
 	vfprintf( s_DbgFile, pFormat, args );
 	va_end( args );
 }

@@ -124,7 +124,7 @@ void ETWMarkPrintf( PRINTF_FORMAT_STRING const char *pMessage, ... ) FMTFUNCTION
 
 	char buffer[1000];
 	va_list args;
-	va_start( args, pMessage );
+	va_start( args, pMessage ); //-V2018 //-V2019
 	vsprintf_s( buffer, pMessage, args );
 	va_end( args );
 

@@ -1320,7 +1320,7 @@ int __cdecl _CrtDbgReport
 	va_list args;
 	if ( szFormat )
 	{
-		va_start( args, szFormat );
+		va_start( args, szFormat ); //-V2019 //-V2018
 		// The vsnprintf function always writes a null terminator, even if it truncates the output.
 		vsnprintf( output, sizeof( output ), szFormat, args );
 		va_end( args );

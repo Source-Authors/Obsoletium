@@ -406,7 +406,7 @@ inline bool IsSpewActive( StandardSpewGroup_t group, int level )
 SpewRetval_t  _SpewMessage( PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... ) FMTFUNCTION( 1, 2 )
 {
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	SpewRetval_t ret = _SpewMessage( s_SpewType, pMsgFormat, args );
 	va_end(args);
 	return ret;
@@ -418,7 +418,7 @@ SpewRetval_t _DSpewMessage( const tchar *pGroupName, int level, PRINTF_FORMAT_ST
 		return SPEW_CONTINUE;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	SpewRetval_t ret = _SpewMessage( s_SpewType, pGroupName, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 	return ret;
@@ -427,7 +427,7 @@ SpewRetval_t _DSpewMessage( const tchar *pGroupName, int level, PRINTF_FORMAT_ST
 DBG_INTERFACE SpewRetval_t ColorSpewMessage( SpewType_t type, const Color *pColor, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	SpewRetval_t ret = _SpewMessage( type, "", 0, pColor, pMsgFormat, args );
 	va_end(args);
 	return ret;
@@ -436,7 +436,7 @@ DBG_INTERFACE SpewRetval_t ColorSpewMessage( SpewType_t type, const Color *pColo
 DBG_INTERFACE SpewRetval_t DColorSpewMessage( SpewType_t type, const tchar *pGroupName, const Color *pColor, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	SpewRetval_t ret = _SpewMessage( type, pGroupName, 0, pColor, pMsgFormat, args );
 	va_end(args);
 	return ret;
@@ -445,7 +445,7 @@ DBG_INTERFACE SpewRetval_t DColorSpewMessage( SpewType_t type, const tchar *pGro
 void Msg( PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 {
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, pMsgFormat, args );
 	va_end(args);
 }
@@ -456,7 +456,7 @@ void DMsg( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tchar 
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, pGroupName, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -470,7 +470,7 @@ void MsgV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 void Warning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, pMsgFormat, args );
 	va_end(args);
 }
@@ -481,7 +481,7 @@ void DWarning( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tc
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, pGroupName, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -495,7 +495,7 @@ void WarningV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 void Log( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, pMsgFormat, args );
 	va_end(args);
 }
@@ -506,7 +506,7 @@ void DLog( const tchar *pGroupName, int level, PRINTF_FORMAT_STRING const tchar 
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, pGroupName, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -520,7 +520,7 @@ void LogV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 void Error( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 {
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_ERROR, pMsgFormat, args );
 	va_end(args);
 }
@@ -540,7 +540,7 @@ void DevMsg( int level, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pDeveloper, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -551,7 +551,7 @@ void DevWarning( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, s_pDeveloper, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -562,7 +562,7 @@ void DevLog( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, s_pDeveloper, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -573,7 +573,7 @@ void DevMsg( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pDeveloper, 1, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -584,7 +584,7 @@ void DevWarning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, s_pDeveloper, 1, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -595,7 +595,7 @@ void DevLog( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, s_pDeveloper, 1, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -611,7 +611,7 @@ void ConColorMsg( int level, const Color& clr, PRINTF_FORMAT_STRING const tchar*
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pConsole, level, &clr, pMsgFormat, args );
 	va_end(args);
 }
@@ -622,7 +622,7 @@ void ConMsg( int level, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pConsole, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -633,7 +633,7 @@ void ConWarning( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, s_pConsole, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -644,7 +644,7 @@ void ConLog( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, s_pConsole, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -655,7 +655,7 @@ void ConColorMsg( const Color& clr, PRINTF_FORMAT_STRING const tchar* pMsgFormat
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pConsole, 1, &clr, pMsgFormat, args );
 	va_end(args);
 }
@@ -666,7 +666,7 @@ void ConMsg( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pConsole, 1, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -677,7 +677,7 @@ void ConWarning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, s_pConsole, 1, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -688,7 +688,7 @@ void ConLog( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, s_pConsole, 1, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -700,7 +700,7 @@ void ConDColorMsg( const Color& clr, PRINTF_FORMAT_STRING const tchar* pMsgForma
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pConsole, 2, &clr, pMsgFormat, args );
 	va_end(args);
 }
@@ -711,7 +711,7 @@ void ConDMsg( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pConsole, 2, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -722,7 +722,7 @@ void ConDWarning( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, s_pConsole, 2, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -733,7 +733,7 @@ void ConDLog( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, s_pConsole, 2, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -749,7 +749,7 @@ void NetMsg( int level, PRINTF_FORMAT_STRING const tchar* pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_MESSAGE, s_pNetwork, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -760,7 +760,7 @@ void NetWarning( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_WARNING, s_pNetwork, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -771,7 +771,7 @@ void NetLog( int level, PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 		return;
 
 	va_list args;
-	va_start( args, pMsgFormat );
+	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_LOG, s_pNetwork, level, &s_DefaultOutputColor, pMsgFormat, args );
 	va_end(args);
 }
@@ -932,7 +932,7 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 
 	char message[1024];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2018 //-V2019
 	vsnprintf( message, sizeof( message ), fmt, argptr );
 	va_end( argptr );
 
