@@ -308,17 +308,11 @@ void CCountedStringPool::SpewStrings()
 CON_COMMAND( test_stringpool, "Tests the class CStringPool" )
 {
 	CStringPool pool;
-
 	Assert(pool.Count() == 0);
 
-	pool.Allocate("test");
-	Assert(pool.Count() == 1);
-
-	pool.Allocate("test");
-	Assert(pool.Count() == 1);
-
-	pool.Allocate("test2");
-	Assert(pool.Count() == 2);
+	Assert(pool.Allocate("test") && pool.Count() == 1);
+	Assert(pool.Allocate("test") && pool.Count() == 1);
+	Assert(pool.Allocate("test2") && pool.Count() == 2);
 
 	Assert( pool.Find("test2") != NULL );
 	Assert( pool.Find("TEST") != NULL );
