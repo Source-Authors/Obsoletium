@@ -1045,7 +1045,7 @@ CDbgMemAlloc::MemInfo_t &CDbgMemAlloc::FindOrCreateEntry( const char *pFileName,
 	// retval.first->second == the MemInfo_t that's part of the StatMapIter_t 
 	// dimhotepus: Insert if not found.
 	return m_pStatMap
-		->emplace( MemInfoKey_t( pFileName, line ), MemInfo_t() )
+		->try_emplace( MemInfoKey_t( pFileName, line ), MemInfo_t() )
 		.first->second;
 }
 
