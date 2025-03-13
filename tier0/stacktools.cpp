@@ -543,7 +543,7 @@ public:
 		*pWrite = '\0';
 		intp iLength;
 
-		if( style & TSISTYLEFLAG_MODULENAME )
+		if( style & to_underlying(TSISTYLEFLAG_MODULENAME) )
 		{
 			if( !this->GetModuleNameFromAddress( pAddress, pWrite, iTranslationBufferLength ) )
 			{
@@ -558,7 +558,7 @@ public:
 			if( iTranslationBufferLength < 2 )
 				return false; //need more buffer
 
-			if( style & TSISTYLEFLAG_SYMBOLNAME )
+			if( style & to_underlying(TSISTYLEFLAG_SYMBOLNAME) )
 			{
 				*pWrite = '!';
 				++pWrite;
@@ -578,7 +578,7 @@ public:
 			}
 			return true;
 		}
-		else if( style & TSISTYLEFLAG_SYMBOLNAME )
+		else if( style & to_underlying(TSISTYLEFLAG_SYMBOLNAME) )
 		{
 			iLength = (intp)strlen( pWrite );
 			pWrite += iLength;
@@ -589,7 +589,10 @@ public:
 			*pWrite = '\0'; //symbol name lookup worked, but unwanted, discard
 		}
 
-		if( style & (TSISTYLEFLAG_FULLPATH | TSISTYLEFLAG_SHORTPATH | TSISTYLEFLAG_LINE | TSISTYLEFLAG_LINEANDOFFSET) )
+		if( style & (to_underlying(TSISTYLEFLAG_FULLPATH) |
+			to_underlying(TSISTYLEFLAG_SHORTPATH) |
+			to_underlying(TSISTYLEFLAG_LINE) |
+			to_underlying(TSISTYLEFLAG_LINEANDOFFSET)) )
 		{
 			if( pWrite != pTranslationOut ) //if we've written anything yet, separate the printed data from the file name and line
 			{
@@ -609,7 +612,7 @@ public:
 			char szFileName[MAX_PATH];
 			if( this->GetFileAndLineFromAddress( pAddress, szFileName, MAX_PATH, iLine, &iDisplacement ) )
 			{
-				if( style & TSISTYLEFLAG_FULLPATH )
+				if( style & to_underlying(TSISTYLEFLAG_FULLPATH) )
 				{
 					iLength = (intp)strlen( szFileName );
 					if ( iTranslationBufferLength < iLength + 1 )
@@ -619,7 +622,7 @@ public:
 					pWrite += iLength;
 					iTranslationBufferLength -= iLength;
 				}
-				else if( style & TSISTYLEFLAG_SHORTPATH )
+				else if( style & to_underlying(TSISTYLEFLAG_SHORTPATH) )
 				{
 					//shorten the path and copy
 					iLength = (intp)strlen( szFileName );
@@ -652,9 +655,9 @@ public:
 					iTranslationBufferLength -= iLength;
 				}
 
-				if( style & (TSISTYLEFLAG_LINE | TSISTYLEFLAG_LINEANDOFFSET) )
+				if( style & (to_underlying(TSISTYLEFLAG_LINE) | to_underlying(TSISTYLEFLAG_LINEANDOFFSET)) )
 				{
-					int nBytesWritten = _snprintf( pWrite, iTranslationBufferLength, ((style & TSISTYLEFLAG_LINEANDOFFSET) && (iDisplacement != 0)) ? "(%d) + %d bytes" : "(%d)", iLine, iDisplacement );
+					int nBytesWritten = _snprintf( pWrite, iTranslationBufferLength, ((style & to_underlying(TSISTYLEFLAG_LINEANDOFFSET)) && (iDisplacement != 0)) ? "(%d) + %d bytes" : "(%d)", iLine, iDisplacement );
 					if ( nBytesWritten < 0 )
 					{
 						*pWrite = '\0'; // if we can't write all of the line/lineandoffset, don't write any at all

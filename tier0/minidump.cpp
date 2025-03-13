@@ -212,11 +212,11 @@ void InternalWriteMiniDumpUsingExceptionInfo( unsigned int uStructuredExceptionC
 
 	// First try to write it with all the indirectly referenced memory (ie: a large file).
 	// If that doesn't work, then write a smaller one.
-	int iType = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
-	if ( !WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, (MINIDUMP_TYPE)iType, pszFilenameSuffix ) )
+	constexpr int iType = static_cast<int>(MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory);
+	if ( !WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, iType, pszFilenameSuffix ) )
 	{
-		iType = MiniDumpWithDataSegs;
-		WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, (MINIDUMP_TYPE)iType, pszFilenameSuffix );
+		constexpr int iType2 = static_cast<int>(MiniDumpWithDataSegs);
+		WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, iType2, pszFilenameSuffix );
 	}
 }
 

@@ -908,7 +908,7 @@ uintp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCount
 	tchar *pNewName = new tchar[_tcslen( pName ) + 1];
 	_tcscpy( pNewName, pName );
 	m_Counters[m_NumCounters] = 0;
-	m_CounterGroups[m_NumCounters] = (char)eCounterGroup;
+	m_CounterGroups[m_NumCounters] = static_cast<char>(to_underlying(eCounterGroup));
 	m_CounterNames[m_NumCounters++] = pNewName;
 	return &m_Counters[m_NumCounters-1];
 }
@@ -917,7 +917,7 @@ void CVProfile::ResetCounters( CounterGroup_t eCounterGroup )
 {
 	for( int i = 0; i < m_NumCounters; i++ )
 	{
-		if ( m_CounterGroups[i] == eCounterGroup )
+		if ( m_CounterGroups[i] == to_underlying(eCounterGroup) )
 			m_Counters[i] = 0;
 	}
 }

@@ -423,8 +423,8 @@ inline bool IsSpewActive( StandardSpewGroup_t group, int level )
 	AUTO_LOCK(s_SpewGroupsMutex);
 
 	// If we don't find the spew group, use the default level.
-	if ( s_pGroupIndices[group] != std::numeric_limits<size_t>::max() )
-		return s_pSpewGroups[ s_pGroupIndices[group] ].m_Level >= level;
+	if ( s_pGroupIndices[to_underlying(group)] != std::numeric_limits<size_t>::max() )
+		return s_pSpewGroups[ s_pGroupIndices[to_underlying(group)] ].m_Level >= level;
 	return s_DefaultLevel.load(std::memory_order::memory_order_relaxed) >= level;
 }
 
