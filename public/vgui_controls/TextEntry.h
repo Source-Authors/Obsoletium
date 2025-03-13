@@ -106,6 +106,7 @@ public:
 		GetText( buf, static_cast<intp>(sizeof(wchar_t)) * bufferSize );
 	}
 
+	virtual intp GetTextLength() const;
 	virtual bool IsTextFullySelected() const;
 
 	// editing
@@ -196,7 +197,7 @@ public:
 	// used by tooltips
 	void SetToFullWidth();
 
-	int GetNumLines();
+	intp GetNumLines();
 
 	/* INFO HANDLING
 		"GetText"

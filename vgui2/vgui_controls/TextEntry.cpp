@@ -3767,7 +3767,7 @@ const char *TextEntry::GetDescription()
 //-----------------------------------------------------------------------------
 // Purpose: Get the number of lines in the window
 //-----------------------------------------------------------------------------
-int TextEntry::GetNumLines()
+intp TextEntry::GetNumLines()
 {
 	return m_LineBreaks.Count();
 }
@@ -4281,7 +4281,7 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 	}
 }
 
-int TextEntry::GetTextLength() const
+intp TextEntry::GetTextLength() const
 {
 	return m_TextStream.Count();
 }
