@@ -33,7 +33,7 @@ bool cpuid(unsigned int function,
 	unsigned int& out_ecx,
 	unsigned int& out_edx)
 {
-	int CPUInfo[4] = { -1 };
+	int CPUInfo[4] = { -1, -1, -1, -1 };
 #if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
 	__cpuid(function, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
@@ -55,7 +55,7 @@ bool cpuidex(unsigned int function,
 	unsigned int& out_ecx,
 	unsigned int& out_edx)
 {
-	int CPUInfo[4] = { -1 };
+	int CPUInfo[4] = { -1, -1, -1, -1 };
 #if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
 	__cpuid_count(function, subfunction, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else

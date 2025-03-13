@@ -15,7 +15,7 @@
 
 inline void cpuid(unsigned int regs[4], unsigned int function)
 {
-	int CPUInfo[4] = { -1 };
+	int CPUInfo[4] = { -1, -1, -1, -1 };
 #if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
 	__cpuid(function, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
