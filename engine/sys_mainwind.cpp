@@ -1003,19 +1003,24 @@ bool CGame::CreateGameWindow( void )
 		V_strncpy( utf8_window_name, "N/A", sizeof(utf8_window_name) );
 	}
 
-#ifdef PLATFORM_64BITS
-	V_strcat_safe( utf8_window_name, " - 64 bit" );
-#endif
-
 	if ( IsOpenGL() )
 	{
 		V_strcat_safe( utf8_window_name, " - OpenGL" );
+	}
+	else
+	{
+		// dimhotepus: Match steam_legacy branch behavior.
+		V_strcat_safe( utf8_window_name, " - Direct3D 9" );
 	}
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
 	// PIX_ENABLE/PIX_INSTRUMENTATION is a big slowdown (that should never be
 	// checked in, but sometimes is by accident), so add this to the Window title too.
 	V_strcat_safe( windowName, " - PIX_ENABLE" );
+#endif
+
+#ifdef PLATFORM_64BITS
+	V_strcat_safe( utf8_window_name, " - 64 bit" );
 #endif
 
 	if ( const char *p = CommandLine()->ParmValue( "-window_name_suffix", "" );
