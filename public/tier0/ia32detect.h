@@ -137,6 +137,9 @@ public:
 
 	ia32detect ()
 	{
+		memset(&version, 0, sizeof(version));
+		memset(&misc, 0, sizeof(misc));
+		memset(&feature, 0, sizeof(feature));
 
         cache = 0;
 		uint32 m = init0();
