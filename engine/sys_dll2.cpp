@@ -718,6 +718,7 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 	{
 		FileHandle_t fh = g_pFileSystem->Open( "steam.inf", "rb", "GAME" );
 		bFoundInf = fh && g_pFileSystem->ReadToBuffer( fh, infBuf );
+		if (fh) g_pFileSystem->Close(fh);
 	}
 
 	if ( !bFoundInf )
