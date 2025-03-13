@@ -818,13 +818,8 @@ int V_snprintf( OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars, PRINTF
 	va_list marker;
 
 	va_start( marker, pFormat );
-#ifdef _WIN32
-	int len = _vsnprintf( pDest, maxLenInChars, pFormat, marker );
-#elif POSIX
+	// dimhotepus: vsnprintf always null-terminate.
 	int len = vsnprintf( pDest, maxLenInChars, pFormat, marker );
-#else
-	#error "Please define vsnprintf type."
-#endif
 	va_end( marker );
 
 	// Len > maxLen represents an overflow on POSIX, < 0 is an overflow on windows
@@ -843,8 +838,9 @@ int V_vsnprintf( OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars, PRINT
 	Assert( maxLenInChars > 0 );
 	AssertValidWritePtr( pDest, maxLenInChars );
 	AssertValidStringPtr( pFormat );
-
-	int len = _vsnprintf( pDest, maxLenInChars, pFormat, params );
+	
+	// dimhotepus: vsnprintf always null-terminate.
+	int len = vsnprintf( pDest, maxLenInChars, pFormat, params );
 
 	// Len > maxLen represents an overflow on POSIX, < 0 is an overflow on windows
 	if( len < 0 || len >= maxLenInChars )
@@ -862,8 +858,9 @@ int V_vsnprintfRet( OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars, PR
 	Assert( maxLenInChars > 0 );
 	AssertValidWritePtr( pDest, maxLenInChars );
 	AssertValidStringPtr( pFormat );
-
-	int len = _vsnprintf( pDest, maxLenInChars, pFormat, params );
+	
+	// dimhotepus: vsnprintf always null-terminate.
+	int len = vsnprintf( pDest, maxLenInChars, pFormat, params );
 
 	if ( pbTruncated )
 	{
