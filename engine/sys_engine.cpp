@@ -51,8 +51,8 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory,
 // dimhotepus: Reduce default no focus sleep time from 50 to 25 milliseconds.
 ConVar engine_no_focus_sleep( "engine_no_focus_sleep", "25", FCVAR_ARCHIVE, "How much time in milliseconds to sleep", true, 0, true, 1000.f );
 
-#define DEFAULT_FPS_MAX	300
-#define DEFAULT_FPS_MAX_S "300"
+#define DEFAULT_FPS_MAX	400
+#define DEFAULT_FPS_MAX_S "400"
 static int s_nDesiredFPSMax = DEFAULT_FPS_MAX;
 static bool s_bFPSMaxDrivenByPowerSavings = false;
 
@@ -67,7 +67,8 @@ static void fps_max_callback( IConVar *var, const char *pOldValue, float flOldVa
 		s_nDesiredFPSMax = ( (ConVar *)var)->GetInt();
 	}
 }
-ConVar fps_max( "fps_max", DEFAULT_FPS_MAX_S, FCVAR_NOT_CONNECTED, "Frame rate limiter, cannot be set while connected to a server.", fps_max_callback );
+// dimhotepus: Restrict fps_max to 30...MAX_FPS range.
+ConVar fps_max( "fps_max", DEFAULT_FPS_MAX_S, FCVAR_NOT_CONNECTED, "Frame rate limiter, cannot be set while connected to a server.", true, 30.0f, true, MAX_FPS, fps_max_callback );
 
 // When set, this ConVar (typically driven from the advanced video settings) will drive fps_max (see above) to
 // half of the refresh rate, if the user hasn't otherwise set fps_max (via console, commandline etc)
