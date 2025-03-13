@@ -87,9 +87,9 @@ public:
 	void			CallGlobalChangeCallbacks( ConVar *var, const char *pOldString, float flOldValue ) override;
 	void			InstallConsoleDisplayFunc( IConsoleDisplayFunc* pDisplayFunc ) override;
 	void			RemoveConsoleDisplayFunc( IConsoleDisplayFunc* pDisplayFunc ) override;
-	void			ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) const override;
-	void			ConsolePrintf( const char *pFormat, ... ) const override;
-	void			ConsoleDPrintf( const char *pFormat, ... ) const override;
+	void			ConsoleColorPrintf( const Color& clr, PRINTF_FORMAT_STRING const char *pFormat, ... ) const override;
+	void			ConsolePrintf( PRINTF_FORMAT_STRING const char *pFormat, ... ) const override;
+	void			ConsoleDPrintf( PRINTF_FORMAT_STRING const char *pFormat, ... ) const override;
 	void			RevertFlaggedConVars( int nFlag ) override;
 	void			InstallCVarQuery( ICvarQuery *pQuery ) override;
 
@@ -744,14 +744,13 @@ void CCvar::RemoveConsoleDisplayFunc( IConsoleDisplayFunc* pDisplayFunc )
 	m_DisplayFuncs.FindAndRemove( pDisplayFunc );
 }
 
-void CCvar::ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) const
+void CCvar::ConsoleColorPrintf( const Color& clr, PRINTF_FORMAT_STRING const char *pFormat, ... ) const
 {
 	char temp[ 8192 ];
 	va_list argptr;
 	va_start( argptr, pFormat );
-	_vsnprintf( temp, sizeof( temp ) - 1, pFormat, argptr );
+	V_vsprintf_safe( temp, pFormat, argptr );
 	va_end( argptr );
-	temp[ sizeof( temp ) - 1 ] = 0;
 
 	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
@@ -768,14 +767,13 @@ void CCvar::ConsoleColorPrintf( const Color& clr, const char *pFormat, ... ) con
 	}
 }
 
-void CCvar::ConsolePrintf( const char *pFormat, ... ) const
+void CCvar::ConsolePrintf( PRINTF_FORMAT_STRING const char *pFormat, ... ) const
 {
 	char temp[ 8192 ];
 	va_list argptr;
 	va_start( argptr, pFormat );
-	_vsnprintf( temp, sizeof( temp ) - 1, pFormat, argptr );
+	V_sprintf_safe( temp, pFormat, argptr );
 	va_end( argptr );
-	temp[ sizeof( temp ) - 1 ] = 0;
 
 	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )
@@ -791,14 +789,13 @@ void CCvar::ConsolePrintf( const char *pFormat, ... ) const
 	}
 }
 
-void CCvar::ConsoleDPrintf( const char *pFormat, ... ) const
+void CCvar::ConsoleDPrintf( PRINTF_FORMAT_STRING const char *pFormat, ... ) const
 {
 	char temp[ 8192 ];
 	va_list argptr;
 	va_start( argptr, pFormat );
-	_vsnprintf( temp, sizeof( temp ) - 1, pFormat, argptr );
+	V_vsprintf_safe( temp, pFormat, argptr );
 	va_end( argptr );
-	temp[ sizeof( temp ) - 1 ] = 0;
 
 	intp c = m_DisplayFuncs.Count();
 	if ( c == 0 )

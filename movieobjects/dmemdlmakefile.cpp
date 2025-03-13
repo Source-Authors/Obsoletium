@@ -218,7 +218,7 @@ CDmElement *CDmeMDLMakefile::CreateOutputElement( )
 	// Should we have output type names? Not sure yet..
 	// Doing the simplest thing first.
 	char pOutputName[MAX_PATH];
-	Q_FileBase( GetFileName(), pOutputName, sizeof(pOutputName) );
+	V_FileBase( GetFileName(), pOutputName );
 	if ( !pOutputName[0] )
 		return m_hMDL.Get();
 
@@ -267,7 +267,7 @@ void CDmeMDLMakefile::GetOutputs( CUtlVector<CUtlString> &fullPaths )
 	// Should we have output type names? Not sure yet..
 	// Doing the simplest thing first.
 	char pOutputName[MAX_PATH];
-	Q_FileBase( GetFileName(), pOutputName, sizeof(pOutputName) );
+	V_FileBase( GetFileName(), pOutputName );
 	if ( !pOutputName[0] )
 		return;
 

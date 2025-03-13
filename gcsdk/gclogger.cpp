@@ -79,7 +79,7 @@ void EmitBaseMessageV( const CGCEmitGroup& Group, SpewType_t spewType, int iCons
 //------------------------------
 // AssertError
 
-void CGCEmitGroup::Internal_AssertError( const char *pchMsg, ... ) const
+void CGCEmitGroup::Internal_AssertError( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -95,7 +95,7 @@ void CGCEmitGroup::AssertErrorV( const char *pchMsg, va_list vaArgs ) const
 //------------------------------
 // Error
 
-void CGCEmitGroup::Internal_Error( const char *pchMsg, ... ) const
+void CGCEmitGroup::Internal_Error( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -111,7 +111,7 @@ void CGCEmitGroup::ErrorV( const char *pchMsg, va_list vaArgs ) const
 //------------------------------
 // Warning
 
-void CGCEmitGroup::Internal_Warning( const char *pchMsg, ... ) const
+void CGCEmitGroup::Internal_Warning( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -127,7 +127,7 @@ void CGCEmitGroup::WarningV( const char *pchMsg, va_list vaArgs ) const
 //------------------------------
 // Msg
 
-void CGCEmitGroup::Internal_Msg( const char *pchMsg, ... ) const
+void CGCEmitGroup::Internal_Msg( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -143,7 +143,7 @@ void CGCEmitGroup::MsgV( const char *pchMsg, va_list vaArgs ) const
 //------------------------------
 // Verbose
 
-void CGCEmitGroup::Internal_Verbose( const char *pchMsg, ... ) const
+void CGCEmitGroup::Internal_Verbose( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -160,7 +160,7 @@ void CGCEmitGroup::VerboseV( const char *pchMsg, va_list vaArgs ) const
 //------------------------------
 // Verbose
 
-void CGCEmitGroup::Internal_BoldMsg( const char *pchMsg, ... ) const
+void CGCEmitGroup::Internal_BoldMsg( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -208,7 +208,7 @@ void CGCEmitGroup::EmitV( EMsgLevel eLvl, PRINTF_FORMAT_STRING const char *pchMs
 // Legacy Interface
 //---------------------------------------------------------------------
 
-void EGInternal_EmitInfo( const CGCEmitGroup& Group, int iLevel, int iLevelLog, const char *pchMsg, ... )
+void EGInternal_EmitInfo( const CGCEmitGroup& Group, int iLevel, int iLevelLog, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -221,7 +221,7 @@ void EmitInfoV( const CGCEmitGroup& Group, int iLevel, int iLevelLog, const char
 	EmitBaseMessageV( Group, SPEW_MESSAGE, iLevel, iLevelLog, pchMsg, vaArgs );
 }
 
-void EmitWarning( const CGCEmitGroup& Group, int iLevel, const char *pchMsg, ... )
+void EmitWarning( const CGCEmitGroup& Group, int iLevel, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -229,7 +229,7 @@ void EmitWarning( const CGCEmitGroup& Group, int iLevel, const char *pchMsg, ...
 	va_end( args );
 }
 
-void EmitError( const CGCEmitGroup& Group, const char *pchMsg, ... )
+void EmitError( const CGCEmitGroup& Group, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
 	va_start( args, pchMsg );
@@ -238,7 +238,7 @@ void EmitError( const CGCEmitGroup& Group, const char *pchMsg, ... )
 }
 
 // Emit an assert-like error, generating a minidump
-void EmitAssertError( const CGCEmitGroup& Group, const char *pchMsg, ... )
+void EmitAssertError( const CGCEmitGroup& Group, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
 	va_start( args, pchMsg );

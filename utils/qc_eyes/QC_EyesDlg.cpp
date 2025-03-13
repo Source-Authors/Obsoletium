@@ -78,8 +78,7 @@ void CQC_EyesDlg::AddText(PRINTF_FORMAT_STRING const char *pFormat, ...) {
   char tempMsg[4096];
   va_list marker;
   va_start(marker, pFormat);
-  _vsnprintf(tempMsg, sizeof(tempMsg), pFormat, marker);
-  tempMsg[ssize(tempMsg) - 1] = 0;
+  V_vsprintf_safe(tempMsg, pFormat, marker);
   va_end(marker);
 
   size_t nCharsInBuf = strlen(m_Buf);
@@ -493,8 +492,7 @@ void CQC_EyesDlg::SetupBitmapLabel(UINT iBitmapResourceID, const char *pString,
   char msg[4096];
   va_list marker;
   va_start(marker, pString);
-  _vsnprintf(msg, sizeof(msg), pString, marker);
-  msg[ssize(msg) - 1] = 0;
+  V_vsprintf_safe(msg, pString, marker);
   va_end(marker);
 
   m_PictureControl.SetBitmap(GetCachedBitmap(iBitmapResourceID));

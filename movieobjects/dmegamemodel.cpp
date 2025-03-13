@@ -466,7 +466,7 @@ void CDmeGameModel::AddBones( studiohdr_t *pStudioHdr, const char *pBaseName, in
 
 		// build dag hierarchy to match bone hierarchy
 		CDmeDag *pParent = ( parentIndex < 0 ) ? this : pDags[ parentIndex ];
-		Q_snprintf( name, sizeof( name ), "%s_bone %d (%s)", pBaseName, bi, pBone->pszName() );
+		V_sprintf_safe( name, "%s_bone %zd (%s)", pBaseName, bi, pBone->pszName() );
 		CDmeDag *pDag = CreateElement< CDmeDag >( name, GetFileId() );
 		pDags[nDagCount++] = pDag;
 		pParent->AddChild( pDag );

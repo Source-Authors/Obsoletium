@@ -9,8 +9,6 @@
 // dimhotepus: ASAN doesn't support default alloc functions replacement.
 #if !defined(__SANITIZE_ADDRESS__) && !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-#undef PROTECTED_THINGS_ENABLE   // allow use of _vsnprintf
-
 #if defined( _WIN32 )
 #include "winlite.h"
 #endif
@@ -1321,7 +1319,8 @@ int __cdecl _CrtDbgReport
 	if ( szFormat )
 	{
 		va_start( args, szFormat );
-		_vsnprintf( output, sizeof( output )-1, szFormat, args );
+		// The vsnprintf function always writes a null terminator, even if it truncates the output.
+		vsnprintf( output, sizeof( output ), szFormat, args );
 		va_end( args );
 	}
 	else

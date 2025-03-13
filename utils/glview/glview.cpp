@@ -91,7 +91,7 @@ void DrawDisplacementData();
   char text[1024];
 
   va_start(argptr, error);
-  vsprintf(text, error, argptr);
+  V_vsprintf_safe(text, error, argptr);
   va_end(argptr);
 
   MessageBox(nullptr, text, "Visleaf Camera View - Error",

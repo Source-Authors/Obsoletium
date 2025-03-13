@@ -231,7 +231,7 @@ static void VCR_Error( const char *pFormat, ... )
 	char str[256];
 	va_list marker;
 	va_start( marker, pFormat );
-	_vsnprintf( str, sizeof( str ), pFormat, marker );
+	vsnprintf( str, sizeof( str ), pFormat, marker );
 	va_end( marker );
 
 	g_pHelpers->ErrorMessage( str );

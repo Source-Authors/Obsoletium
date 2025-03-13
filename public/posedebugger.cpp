@@ -513,8 +513,8 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 	int numLines = 0;
 	
 	txt.m_iActivity = seqdesc.activity;
-	sprintf( txt.m_chActivity, "%s", seqdesc.pszActivityName() );
-	sprintf( txt.m_chLabel, "%s", seqdesc.pszLabel() );
+	V_sprintf_safe( txt.m_chActivity, "%s", seqdesc.pszActivityName() );
+	V_sprintf_safe( txt.m_chLabel, "%s", seqdesc.pszLabel() );
 
 	if ( !txt.m_chActivity[0] )
 	{
@@ -525,7 +525,7 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 			if ( lastSeenTxt.m_uiFlags & ModelPoseDebugInfo::F_SEEN_THIS_FRAME &&
 				 lastSeenTxt.m_chActivity[0] )
 			{
-				sprintf( txt.m_chActivity, "%s", lastSeenTxt.m_chActivity );
+				V_sprintf_safe( txt.m_chActivity, "%s", lastSeenTxt.m_chActivity );
 				break;
 			}
 		}
@@ -533,7 +533,7 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 
 	// The layer information
 	ModelPoseDebugInfo::InfoText *pOldTxt = pMpiOld ? pMpiOld->LookupInfoText( &txt ) : NULL;
-	sprintf( txt.m_chTextLines[numLines],
+	V_sprintf_safe( txt.m_chTextLines[numLines],
 		"%-*s  %-*s  %*.2f  %*.1f/%-*d  %*.0f%% ",
 		widthActivity,
 		seqdesc.pszActivityName(),
@@ -552,7 +552,7 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 
 	if ( seqdesc.numiklocks )
 	{
-		sprintf( chBuffer,
+		V_sprintf_safe( chBuffer,
 			"iklocks : %-2d : ",
 			seqdesc.numiklocks );
 
@@ -561,12 +561,13 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 			mstudioiklock_t *plock = seqdesc.pIKLock( k );
 			mstudioikchain_t *pchain = pStudioHdr->pIKChain( plock->chain );
 
-			sprintf( chBuffer + strlen( chBuffer ), "%s ", pchain->pszName() );
+			const intp bufferLen = V_strlen( chBuffer );
+			V_snprintf( chBuffer + bufferLen, ssize(chBuffer) - bufferLen, "%s ", pchain->pszName() );
 			// plock->flPosWeight;
 			// plock->flLocalQWeight;
 		}
 
-		sprintf( txt.m_chTextLines[numLines],
+		V_sprintf_safe( txt.m_chTextLines[numLines],
 			"%-*s",
 			widthIks,
 			chBuffer
@@ -576,10 +577,10 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 
 	if ( seqdesc.numikrules )
 	{
-		sprintf( chBuffer, "ikrules : %-2d",
+		V_sprintf_safe( chBuffer, "ikrules : %-2d",
 			seqdesc.numikrules );
 
-		sprintf( txt.m_chTextLines[numLines],
+		V_sprintf_safe( txt.m_chTextLines[numLines],
 			"%-*s",
 			widthIks,
 			chBuffer

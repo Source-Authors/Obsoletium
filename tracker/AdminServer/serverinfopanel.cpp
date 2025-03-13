@@ -110,7 +110,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 		buf[0] = 0;
 		if (m_iMaxPlayers > 0)
 		{
-			sprintf(buf, "%d / %d", m_iPlayerCount, m_iMaxPlayers);
+			V_sprintf_safe(buf, "%d / %d", m_iPlayerCount, m_iMaxPlayers);
 		}
 		SetControlString("PlayersText", buf);
 	}

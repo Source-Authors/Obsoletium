@@ -46,7 +46,7 @@ public:
 	void Reset( int stackLevel, CUtlSymbol symName );
 
 	// Hit an error, report it and the parsing stack for context
-	void ReportError( const char *pError, ... );
+	void ReportError( PRINTF_FORMAT_STRING const char *pError, ... );
 
 	static CUtlSymbolTable& GetSymbolTable() { return m_ErrorSymbolTable; }
 
@@ -153,13 +153,13 @@ void CDmxKeyValues2ErrorStack::Reset( int stackLevel, CUtlSymbol symName )
 //-----------------------------------------------------------------------------
 // Hit an error, report it and the parsing stack for context
 //-----------------------------------------------------------------------------
-void CDmxKeyValues2ErrorStack::ReportError( const char *pFmt, ... )
+void CDmxKeyValues2ErrorStack::ReportError( PRINTF_FORMAT_STRING const char *pFmt, ... )
 {
 	char temp[2048];
 
 	va_list args;
 	va_start( args, pFmt );
-	Q_vsnprintf( temp, sizeof( temp ), pFmt, args );
+	V_vsprintf_safe( temp, pFmt, args );
 	va_end( args );
 
 	Warning( "%s(%d) : %s\n", m_pFilename, m_nFileLine, temp );

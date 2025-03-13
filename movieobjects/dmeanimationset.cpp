@@ -467,15 +467,15 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 		}
 		else
 		{
-			Q_snprintf( pTempBuf, sizeof(pTempBuf), "right_%s", control.m_Name.Get() );
+			V_sprintf_safe( pTempBuf, "right_%s", control.m_Name.Get() );
 			buf.Printf("%s ", pTempBuf );
-			Q_snprintf( pTempBuf, sizeof(pTempBuf), "left_%s", control.m_Name.Get() );
+			V_sprintf_safe( pTempBuf, "left_%s", control.m_Name.Get() );
 			buf.Printf("%s ", pTempBuf );
 		}
 
 		if ( control.m_bIsMulti )
 		{
-			Q_snprintf( pTempBuf, sizeof(pTempBuf), "multi_%s", control.m_Name.Get() );
+			V_sprintf_safe( pTempBuf, "multi_%s", control.m_Name.Get() );
 			buf.Printf("%s ", pTempBuf );
 		}
 	}
@@ -629,7 +629,7 @@ bool CDmePresetGroup::ExportToVFE( const char *pFileName, CDmeAnimationSet *pAni
 	fhdr->version = 0;
 	if ( !g_pFullFileSystem->FullPathToRelativePathEx( pFileName, "GAME", fhdr->name, sizeof(fhdr->name) ) )
 	{
-		Q_strncpy( fhdr->name, pFileName, sizeof(fhdr->name) );
+		V_strcpy_safe( fhdr->name, pFileName );
 	}
 
 	// allocate room for header
@@ -1128,7 +1128,7 @@ void CDmeAnimationSet::RestoreDefaultPhonemeMap()
 		const char *pName = NameForPhonemeByIndex( i );
 		CDmePhonemeMapping *mapping = CreateElement< CDmePhonemeMapping >( pName, GetFileId() );
 		char presetName[ 256 ];
-		Q_snprintf( presetName, sizeof( presetName ), "p_%s", pName );
+		V_sprintf_safe( presetName, "p_%s", pName );
 		mapping->m_Preset = presetName;
 		mapping->m_Weight = 1.0f;
 
@@ -1327,10 +1327,10 @@ void CModelPresetGroupManager::LoadModelPresets( const char *pModelName, PresetG
 	list.RemoveAll();
 
 	char pPresetPath[MAX_PATH];
-	Q_ExtractFilePath( pModelName, pPresetPath, sizeof(pPresetPath) );
+	V_ExtractFilePath( pModelName, pPresetPath );
 
 	char pPresetNameBuf[MAX_PATH];
-	Q_StripExtension( pModelName, pPresetNameBuf, sizeof(pPresetNameBuf) );
+	V_StripExtension( pModelName, pPresetNameBuf );
 	intp nLen = Q_strlen( pPresetNameBuf );
 	Q_snprintf( &pPresetNameBuf[nLen], MAX_PATH - nLen, "*.pre" );
 

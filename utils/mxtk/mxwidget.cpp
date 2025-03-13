@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "tier1/strtools.h"
 
 void mxTab_resizeChild (HWND hwnd);
 void mx_addWidget (mxWidget *widget);
@@ -140,7 +141,7 @@ mxWidget::setLabel (PRINTF_FORMAT_STRING const char *format, ... )
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	vsprintf (string, format,argptr);
+	V_vsprintf_safe (string, format, argptr);
 	va_end (argptr);
 
 	if (d_this->d_hwnd)

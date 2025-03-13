@@ -342,7 +342,7 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 		return NULL;
 
 	char baseFile[ MAX_PATH ];
-	Q_FileBase( filename, baseFile, sizeof( baseFile ) );
+	V_FileBase( filename, baseFile );
 
 	CDmeMesh *pMesh( NULL );
 
@@ -381,12 +381,12 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 		Q_strncpy( pSuffix + 3, Q_GetFileExtension( filename ), sizeof( findGlob ) - ( pSuffix - findGlob + 3 ) );
 
 		char path[ MAX_PATH ];
-		Q_ExtractFilePath( filename, path, sizeof( path ) );
+		V_ExtractFilePath( filename, path );
 
 		m_objDirectory = path;
 
 		char findPath[ MAX_PATH ];
-		Q_ComposeFileName( path, findGlob, findPath, sizeof( findPath ) );
+		V_ComposeFileName( path, findGlob, findPath );
 
 		FileFindHandle_t hFind;
 
@@ -395,11 +395,11 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 
 		for ( const char *pFindFile( g_pFullFileSystem->FindFirst( findPath, &hFind ) ); pFindFile && *pFindFile; pFindFile = g_pFullFileSystem->FindNext( hFind ) )
 		{
-			Q_FileBase( pFindFile, deltaFile, sizeof( deltaFile ) );
+			V_FileBase( pFindFile, deltaFile );
 
 			if ( Q_stricmp( baseFile, deltaFile ) )
 			{
-				Q_ComposeFileName( path, pFindFile, deltaPath, sizeof( deltaPath ) );
+				V_ComposeFileName( path, pFindFile, deltaPath );
 
 				if ( !g_pFullFileSystem->FileExists( deltaPath ) )
 					continue;
@@ -496,7 +496,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 
 	while ( buf.IsValid() )
 	{
-		buf.GetLine( tmpBuf0, sizeof( tmpBuf0 ) );
+		buf.GetLine( tmpBuf0 );
 
 		pBuf = SkipSpace( tmpBuf0 );
 
@@ -1060,10 +1060,10 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 	if ( deltaMeshes.Count() )
 	{
 		char base[ MAX_PATH ];
-		Q_FileBase( pFilename, base, sizeof( base ) );
+		V_FileBase( pFilename, base );
 
 		char path[ MAX_PATH ];
-		Q_ExtractFilePath( pFilename, path, sizeof( path ) );
+		V_ExtractFilePath( pFilename, path );
 
 		char *pSuffix = strchr( base, '='	 );
 		if ( !pSuffix )
@@ -1139,7 +1139,7 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 	int nCurrentMtl = -1;
 	while ( buf.IsValid() )
 	{
-		buf.GetLine( tmpBuf0, sizeof(tmpBuf0) );
+		buf.GetLine( tmpBuf0 );
 
 		if ( StringHasPrefix( tmpBuf0, "newmtl " ) )
 		{
@@ -1170,18 +1170,18 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 			if ( sscanf( tmpBuf0, "map_Kd %s", tgaPath ) == 1 )
 			{
 				// Try a cheesy hack - look for /materialsrc/ and set the material name off the entire path minus extension
-				Q_strncpy( tmpBuf0, tgaPath, sizeof( tmpBuf0 ) );
+				V_strcpy_safe( tmpBuf0, tgaPath );
 				Q_FixSlashes( tmpBuf0, '/' );
 				const char *pMaterialSrc = Q_strstr( tmpBuf0, "/materialsrc/" );
 				if ( pMaterialSrc )
 				{
 					pMaterialSrc += ssize( "/materialsrc/" ) - 1;
-					Q_StripExtension( pMaterialSrc, tgaName, sizeof( tgaName) );
+					V_StripExtension( pMaterialSrc, tgaName );
 					m_mtlLib[ nCurrentMtl ].m_TgaName = tgaName;
 				}
 				else
 				{
-					Q_FileBase( tgaPath, tgaName, sizeof(tgaName) );
+					V_FileBase( tgaPath, tgaName );
 					m_mtlLib[nCurrentMtl].m_TgaName = tgaName;
 				}
 			}
@@ -1212,7 +1212,7 @@ const char *CDmObjSerializer::FindMtlEntry( const char *pTgaName )
 bool CDmObjSerializer::ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v, int &t, int &n )
 {
 	char	cmd[1024];
-	int nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
+	intp nLen = bufParse.ParseToken( &breakSet, cmd, false );
 	if ( nLen <= 0 )
 		return false;
 
@@ -1226,13 +1226,13 @@ bool CDmObjSerializer::ParseVertex( CUtlBuffer& bufParse, characterset_t &breakS
 	if ( bHasTexCoord )
 	{
 		// Snag the '/'
-		nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
+		nLen = bufParse.ParseToken( &breakSet, cmd, false );
 		Assert( nLen == 1 );
 
 		c = *(char*)bufParse.PeekGet();
 		if ( !IN_CHARACTERSET( breakSet, c ) )
 		{
-			nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
+			nLen = bufParse.ParseToken( &breakSet, cmd, false );
 			Assert( nLen > 0 );
 			t = atoi( cmd );
 
@@ -1248,10 +1248,10 @@ bool CDmObjSerializer::ParseVertex( CUtlBuffer& bufParse, characterset_t &breakS
 		if ( bHasNormal )
 		{
 			// Snag the '/'
-			nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
+			nLen = bufParse.ParseToken( &breakSet, cmd, false );
 			Assert( nLen == 1 );
 
-			nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
+			nLen = bufParse.ParseToken( &breakSet, cmd, false );
 			Assert( nLen > 0 );
 			n = atoi( cmd );
 		}

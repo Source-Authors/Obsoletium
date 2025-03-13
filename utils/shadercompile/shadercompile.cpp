@@ -578,7 +578,7 @@ void DebugOut(const char *pMsg, ...) {
     char msg[2048];
     va_list marker;
     va_start(marker, pMsg);
-    _vsnprintf(msg, sizeof(msg), pMsg, marker);
+    V_vsprintf_safe(msg, pMsg, marker);
     va_end(marker);
 
     Msg("%s", msg);
@@ -1892,7 +1892,8 @@ void Worker_ProcessWorkUnitFn(int iThread, uint64_t iWorkUnit,
 
     CUtlBinaryBlock bb;
     bb.SetLength(1 + len + 1);
-    sprintf((char *)bb.Get(), "%c%s", SHADERHADERROR_PACKETID, szShaderName);
+    V_snprintf((char *)bb.Get(), bb.Length(), "%c%s", SHADERHADERROR_PACKETID,
+               szShaderName);
 
     VMPI_SendData(bb.Get(), bb.Length(), VMPI_MASTER_ID);
     VMPI_HandleSocketErrors();
@@ -1913,8 +1914,8 @@ void Worker_ProcessWorkUnitFn(int iThread, uint64_t iWorkUnit,
     CUtlBinaryBlock bb;
     bb.SetLength(1 + strlen(szMsg) + 1 + strlen(szFirstCmd) + 1 +
                  strlen(chNumReported) + 1 + 1);
-    sprintf((char *)bb.Get(), "%c%s\n%s\n%s\n", ERRMSG_PACKETID, szMsg,
-            szFirstCmd, chNumReported);
+    V_snprintf((char *)bb.Get(), bb.Length(), "%c%s\n%s\n%s\n", ERRMSG_PACKETID,
+               szMsg, szFirstCmd, chNumReported);
 
     VMPI_SendData(bb.Get(), bb.Length(), VMPI_MASTER_ID);
     VMPI_HandleSocketErrors();

@@ -153,7 +153,7 @@ void CKeyValues2ErrorStack::ReportError( const char *pFmt, ... )
 
 	va_list args;
 	va_start( args, pFmt );
-	Q_vsnprintf( temp, sizeof( temp ), pFmt, args );
+	V_vsprintf_safe( temp, pFmt, args );
 	va_end( args );
 
 	char temp2[2048];

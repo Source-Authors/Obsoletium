@@ -616,8 +616,7 @@ void MinidumpUserStreamInfoSetHeader( const char *pFormat, ... )
 	va_list marker;
 
 	va_start( marker, pFormat );
-	_vsnprintf( g_UserStreamInfoHeader, std::size( g_UserStreamInfoHeader ), pFormat, marker );
-	g_UserStreamInfoHeader[ std::size( g_UserStreamInfoHeader ) - 1 ] = 0;
+	vsnprintf( g_UserStreamInfoHeader, std::size( g_UserStreamInfoHeader ), pFormat, marker );
 	va_end( marker );
 }
 
@@ -635,8 +634,7 @@ void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 	size_t HeaderLen = strlen( pData );
 
 	va_start( marker, pFormat );
-	_vsnprintf( pData + HeaderLen, DataSize - HeaderLen, pFormat, marker );
-	pData[ DataSize - 1 ] = 0;
+	vsnprintf( pData + HeaderLen, DataSize - HeaderLen, pFormat, marker );
 	va_end( marker );
 
 	// Bump up index, and go back to 0 if we've hit the end.

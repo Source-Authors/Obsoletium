@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tier1/utlvector.h"
+#include "tier1/strtools.h"
 
 
 #define WM_MOUSEWHEEL                   0x020A
@@ -273,7 +274,7 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 				HTREEITEM hItem = TreeView_GetSelection (nmhdr->hwndFrom);
 
 				char sz[ 256 ];
-				sprintf( sz, "tree view receiving notify %i : %s action %i old %p new %p selection %p\n", nmhdr->code, translatecode( nmhdr->code ),
+				V_sprintf_safe( sz, "tree view receiving notify %i : %s action %i old %p new %p selection %p\n", nmhdr->code, translatecode( nmhdr->code ),
 					nmt->action, nmt->itemOld, nmt->itemNew, hItem );
 				
 				OutputDebugString( sz );

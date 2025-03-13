@@ -3,12 +3,12 @@
 //=======================================================================================//
 
 #include "replay/replayutils.h"
-#include "dbg.h"
-#include "strtools.h"
+#include "tier0/dbg.h"
+#include "tier1/strtools.h"
 #include "qlimits.h"
 #include "filesystem.h"
 #include "replay/replaytime.h"
-#include "fmtstr.h"
+#include "tier1/fmtstr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -66,7 +66,7 @@ void Replay_ConstructReplayFilenameString( CUtlString &strOut, const char *pRepl
 
 //----------------------------------------------------------------------------------------
 
-char *Replay_va( const char *format, ... )
+char *Replay_va( PRINTF_FORMAT_STRING const char *format, ... )
 {
 	va_list		argptr;
 	static char	string[8][512];
@@ -75,7 +75,7 @@ char *Replay_va( const char *format, ... )
 	curstring = ( curstring + 1 ) % 8;
 
 	va_start (argptr, format);
-	Q_vsnprintf( string[curstring], sizeof( string[curstring] ), format, argptr );
+	V_vsprintf_safe( string[curstring], format, argptr );
 	va_end (argptr);
 
 	return string[curstring];  

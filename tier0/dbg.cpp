@@ -933,7 +933,7 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 	char message[1024];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( message, sizeof( message ), fmt, argptr );
+	vsnprintf( message, sizeof( message ), fmt, argptr );
 	va_end( argptr );
 
 	const double now_stamp{Plat_FloatTime()};

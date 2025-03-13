@@ -372,7 +372,7 @@ void qprintf(PRINTF_FORMAT_STRING const char *format, ...) {
   va_start(argptr, format);
 
   char str[2048];
-  Q_vsnprintf(str, sizeof(str), format, argptr);
+  V_vsprintf_safe(str, format, argptr);
 
 #if defined(CMDLIB_NODBGLIB)
   printf("%s", str);

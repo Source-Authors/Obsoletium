@@ -1053,7 +1053,7 @@ void CVGui::DPrintf(const char* format,...)
 	va_list argList;
 
 	va_start(argList,format);
-	Q_vsnprintf(buf,sizeof( buf ), format,argList);
+	V_vsprintf_safe(buf, format, argList);
 	va_end(argList);
 
 	Plat_DebugString(buf);
@@ -1069,7 +1069,7 @@ void CVGui::DPrintf2(const char* format,...)
 	va_list argList;
 	static int ctr=0;
 
-	Q_snprintf(buf,sizeof( buf ), "%d:",ctr++ );
+	V_sprintf_safe(buf, "%d:", ctr++ );
 
 	va_start(argList,format);
 	Q_vsnprintf(buf+strlen(buf),sizeof( buf )-strlen(buf),format,argList);

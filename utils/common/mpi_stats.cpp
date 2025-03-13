@@ -155,7 +155,7 @@ friend class CMySQL;
 
 public:
 	// This is like a sprintf, but it will grow the string as necessary.
-	void Format( const char *pFormat, ... );
+	void Format( PRINTF_FORMAT_STRING const char *pFormat, ... );
 
 	int Execute( IMySQL *pDB );
 
@@ -164,18 +164,18 @@ private:
 };
 
 
-void CMySQLQuery::Format( const char *pFormat, ... )
+void CMySQLQuery::Format( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	#define QUERYTEXT_GROWSIZE	1024
 
-	// This keeps growing the buffer and calling _vsnprintf until the buffer is 
+	// This keeps growing the buffer and calling V_vsnprintf until the buffer is 
 	// large enough to hold all the data.
 	m_QueryText.SetSize( QUERYTEXT_GROWSIZE );
 	while ( 1 )
 	{
 		va_list marker;
 		va_start( marker, pFormat );
-		int ret = _vsnprintf( m_QueryText.Base(), m_QueryText.Count(), pFormat, marker );
+		int ret = V_vsnprintf( m_QueryText.Base(), m_QueryText.Count(), pFormat, marker );
 		va_end( marker );
 
 		if ( ret < 0 )

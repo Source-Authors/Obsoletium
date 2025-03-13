@@ -240,9 +240,10 @@ static void Chomp( char *pszBuf )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-static void GetLine( CUtlBuffer &utlBuf, char *pszBuf, int nMaxLen )
+template<intp maxSize>
+static void GetLine( CUtlBuffer &utlBuf, char (&pszBuf)[maxSize] )
 {
-	utlBuf.GetLine( pszBuf, nMaxLen );
+	utlBuf.GetLine( pszBuf );
 	Chomp( pszBuf );
 }
 
@@ -367,7 +368,7 @@ bool CDmSmdSerializer::ParserHandleSkeletonLine(
 static CUtlString PathJoin( const char *pszStr1, const char *pszStr2 )
 {
 	char szPath[MAX_PATH];
-	V_ComposeFileName( pszStr1, pszStr2, szPath, sizeof( szPath ) );
+	V_ComposeFileName( pszStr1, pszStr2, szPath );
 	return CUtlString( szPath );
 }
 
@@ -502,17 +503,17 @@ bool CQcData::GetQcData(
 		V_strncpy( szBuf0, smdPath.Get(), ssize( szBuf0 ) );
 		V_FixSlashes( szBuf0 );
 
-		V_FileBase( szBuf0, szBuf1, ssize( szBuf1 ) );
+		V_FileBase( szBuf0, szBuf1 );
 		CUtlString sFileBase0( "\"" );
 		sFileBase0 += szBuf1;
 		sFileBase0 += "\"";
 
-		V_SetExtension( szBuf1, ".smd", ssize( szBuf1 ) );
+		V_SetExtension( szBuf1, ".smd" );
 		CUtlString sFileBase1( "\"" );
 		sFileBase1 += szBuf1;
 		sFileBase1 += "\"";
 
-		V_ExtractFilePath( szBuf0, szBuf1, ssize( szBuf1 ) );
+		V_ExtractFilePath( szBuf0, szBuf1 );
 		CUtlString sFilePath = szBuf1;
 
 		if ( sFileBase0.Length() > 0 && sFilePath.Length() > 0 )
@@ -1137,7 +1138,7 @@ static CDmeMesh *CreateDmeMesh(
 
 	if ( pszFilename )
 	{
-		V_FileBase( pszFilename, szFileBase, ssize( szFileBase ) );
+		V_FileBase( pszFilename, szFileBase );
 
 		if ( !Q_isempty( szFileBase ) )
 		{
@@ -1204,7 +1205,7 @@ static CDmeFaceSet *FindOrCreateFaceSet(
 	}
 
 	char szFaceSetName[ MAX_PATH ];
-	V_FileBase( sMaterial.Get(), szFaceSetName, ssize( szFaceSetName ) );
+	V_FileBase( sMaterial.Get(), szFaceSetName );
 
 	CDmeFaceSet *pDmeFaceSet = CreateElement< CDmeFaceSet >( szFaceSetName, pDmeMesh->GetFileId() );
 	Assert( pDmeFaceSet );
@@ -1360,7 +1361,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 
 	if ( pszFilename )
 	{
-		V_FileBase( pszFilename, szAnimationName, ssize( szAnimationName ) );
+		V_FileBase( pszFilename, szAnimationName );
 	}
 	else
 	{
@@ -1412,7 +1413,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 
 	while ( utlBuf.IsValid() )
 	{
-		GetLine( utlBuf, szLine, ssize( szLine ) );
+		GetLine( utlBuf, szLine );
 		++nLineNumber;
 
 		const char *pszLine = ParserSkipSpace( szLine );
@@ -1651,7 +1652,7 @@ void CDmSmdSerializer::FixNodeName( CUtlString &sName ) const
 	if ( m_bOptAutoStripPrefix )
 	{
 		// Get the string before the '.'
-		V_FileBase( pszName, szTmpBuf1, ssize( szTmpBuf1 ) );
+		V_FileBase( pszName, szTmpBuf1 );
 		V_strncpy( szTmpBuf0, szTmpBuf1, ssize( szTmpBuf0 ) );
 		pszName = szTmpBuf0;
 	}

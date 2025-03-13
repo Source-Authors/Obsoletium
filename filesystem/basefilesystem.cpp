@@ -2069,7 +2069,7 @@ public:
 	{
 		va_list marker;
 		va_start( marker, pFormat );
-		V_vsnprintf( m_AbsolutePath, sizeof( m_AbsolutePath ), pFormat, marker );
+		V_vsprintf_safe( m_AbsolutePath, pFormat, marker );
 		va_end( marker );
 
 		V_FixSlashes( m_AbsolutePath );
@@ -3043,12 +3043,9 @@ int CBaseFileSystem::FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char
 	}
 
 	char buffer[65535];
-	// The vsnprintf function conforms to the C99 standard;
-	// If you run out of buffer, vsnprintf null-terminates the end of the buffer
-	// and returns the number of characters that would have been required.
-	const int chars_count{vsnprintf( buffer, std::size(buffer), pFormat, args )};
+	const int chars_count{V_vsprintf_safe( buffer, pFormat, args )};
 	va_end( args );
-	AssertMsg(chars_count < std::size(buffer),
+	AssertMsg(chars_count < ssize(buffer),
 		"FPrintf output is truncated from %d to %zd.", chars_count, ssize(buffer));
 
 	auto *fh = static_cast<CFileHandle *>(file);
@@ -4615,7 +4612,7 @@ void CBaseFileSystem::Warning( FileWarningLevel_t level, PRINTF_FORMAT_STRING co
     char warningtext[ 4096 ];
     
     va_start( argptr, fmt );
-    Q_vsnprintf( warningtext, sizeof( warningtext ), fmt, argptr );
+    V_vsprintf_safe( warningtext, fmt, argptr );
     va_end( argptr );
 
 	// Dump to stdio

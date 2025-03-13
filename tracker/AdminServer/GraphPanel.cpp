@@ -657,42 +657,42 @@ void CGraphPanel::OnTextChanged(Panel *panel, const char *text)
 		else if (strstr(text, "FPS"))
 		{
 			m_pGraphs->GetFPSLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 			SetAxisLabels(m_pGraphs->GetFPSColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "In"))
 		{
 			m_pGraphs->GetInLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 
 			SetAxisLabels(m_pGraphs->GetInColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "Out"))
 		{
 			m_pGraphs->GetOutLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 			SetAxisLabels(m_pGraphs->GetOutColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "Ping"))
 		{
 			m_pGraphs->GetPingLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 			SetAxisLabels(m_pGraphs->GetPingColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "Players"))
 		{
 			m_pGraphs->GetPlayerLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 
 			SetAxisLabels(m_pGraphs->GetPlayersColor(), maxText, midText, minText);
 		}

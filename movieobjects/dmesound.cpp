@@ -45,7 +45,7 @@ bool CDmeSound::ComputeSoundFullPath( char *pBuf, int nBufLen )
 
 	// Compute the full path of the sound
 	char pRelativePath[MAX_PATH];
-	Q_snprintf( pRelativePath, sizeof(pRelativePath), "sound\\%s", m_SoundName.Get() );
+	V_sprintf_safe( pRelativePath, "sound\\%s", m_SoundName.Get() );
 	return g_pFullFileSystem->RelativePathToFullPath( pRelativePath, "GAME", pBuf, nBufLen ) != NULL;
 }
 

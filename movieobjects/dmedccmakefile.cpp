@@ -120,19 +120,19 @@ void CDmeDCCMakefile::GetOutputs( CUtlVector<CUtlString> &fullPaths )
 	fullPaths.RemoveAll();
 
 	char pOutputName[MAX_PATH];
-	Q_FileBase( GetFileName(), pOutputName, sizeof(pOutputName) );
+	V_FileBase( GetFileName(), pOutputName );
 	if ( !pOutputName[0] )
 		return;
 
 	// FIXME: We need to come up with an appropriate directory structure for export
 	char pOutputDir[MAX_PATH];
-	GetMakefilePath( pOutputDir, sizeof(pOutputDir) );
+	GetMakefilePath( pOutputDir );
 	if ( !pOutputDir[0] )
 		return;
 
 	Q_StripTrailingSlash( pOutputDir );
 	char pFullPath[MAX_PATH];
-	Q_snprintf( pFullPath, sizeof(pFullPath), "%s\\%s.dmx", pOutputDir, pOutputName );
+	V_sprintf_safe( pFullPath, "%s\\%s.dmx", pOutputDir, pOutputName );
 	fullPaths.AddToTail( pFullPath );
 }
 

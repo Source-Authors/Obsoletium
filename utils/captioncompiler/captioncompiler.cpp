@@ -61,7 +61,7 @@ void vprint(bool uselogfile, int depth, const char *fmt, ...) {
   char string[8192];
   va_list va;
   va_start(va, fmt);
-  vsprintf(string, fmt, va);
+  V_vsprintf_safe(string, fmt, va);
   va_end(va);
 
   FILE *fp{nullptr};

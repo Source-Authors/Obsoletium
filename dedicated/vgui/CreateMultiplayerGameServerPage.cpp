@@ -625,7 +625,7 @@ int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
   // UNDONE: steam wants this done in a special way, need to support that
   FileFindHandle_t findHandle = NULL;
   char szSearch[256];
-  sprintf(szSearch, "%s/maps/*.bsp", pszMod);
+  V_sprintf_safe(szSearch, "%s/maps/*.bsp", pszMod);
 
   int iMapsFound = 0;
 

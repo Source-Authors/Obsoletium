@@ -54,7 +54,7 @@ class UnixSystem : public ISystem {
 
   void ConsoleOutput(char *string) override;
   char *ConsoleInput(int index, char *buf, size_t buflen) override;
-  void Printf(const char *fmt, ...) override;
+  void Printf(PRINTF_FORMAT_STRING const char *fmt, ...) override;
 };
 
 UnixSystem::~UnixSystem() {}
@@ -69,13 +69,13 @@ void UnixSystem::UpdateStatus(int force) {}
 
 void UnixSystem::ConsoleOutput(char *string) { console.Print(string); }
 
-void UnixSystem::Printf(const char *fmt, ...) {
+void UnixSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
   // Dump text to debugging console.
   va_list argptr;
   char message[1024];
 
   va_start(argptr, fmt);
-  Q_vsnprintf(message, sizeof(message), fmt, argptr);
+  V_vsprintf_safe(message, fmt, argptr);
   va_end(argptr);
 
   // Get Current text and append it.

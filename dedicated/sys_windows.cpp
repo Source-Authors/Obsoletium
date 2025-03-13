@@ -126,7 +126,7 @@ void WindowsSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
   char message[1024];
 
   va_start(argptr, fmt);
-  Q_vsnprintf(message, sizeof(message), fmt, argptr);
+  V_vsprintf_safe(message, fmt, argptr);
   va_end(argptr);
 
   // Get current text and append it.

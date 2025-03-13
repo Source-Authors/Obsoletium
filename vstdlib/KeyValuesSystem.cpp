@@ -180,7 +180,7 @@ static void KVLeak( char const *fmt, ... )
     char data[1024];
     
     va_start(argptr, fmt);
-    Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+    V_vsprintf_safe(data, fmt, argptr);
     va_end(argptr);
 
 	Msg( "%s", data );

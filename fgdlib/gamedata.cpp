@@ -144,7 +144,7 @@ bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...)
 	char szBuf[128];
 	va_list vl;
 	va_start(vl, error);
-	vsprintf(szBuf, error, vl);
+	V_vsprintf_safe(szBuf, error, vl);
 	va_end(vl);
 
 	const auto msgFunc = g_pMsgFunc.load(std::memory_order::memory_order_relaxed);

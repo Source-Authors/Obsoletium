@@ -83,7 +83,7 @@ void VGUIMessageBox( vgui::Panel *pParent, const char *pTitle, const char *pMsg,
 	char msg[4096];
 	va_list marker;
 	va_start( marker, pMsg );
-	Q_vsnprintf( msg, sizeof( msg ), pMsg, marker );
+	V_vsprintf_safe( msg, pMsg, marker );
 	va_end( marker );
 
 	vgui::MessageBox *dlg = new CModalPreserveMessageBox( pTitle, msg, pParent );
