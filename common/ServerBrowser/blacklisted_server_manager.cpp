@@ -159,7 +159,10 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 //-----------------------------------------------------------------------------
 blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverName, const char *netAddressString, uint32 timestamp )
 {
-	netadr_t netAdr( netAddressString );
+	netadr_t netAdr;
+	// dimhotepus: If not net address, return.
+	if ( !netAdr.SetFromString( netAddressString ) )
+		return NULL;
 
 	// Don't let them add reserved addresses to their blacklists
 	if ( netAdr.IsReservedAdr() )
