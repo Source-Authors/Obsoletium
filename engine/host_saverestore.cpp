@@ -173,7 +173,12 @@ struct CSaveMemory : public CMemoryStack
 	CSaveMemory()
 	{
 		MEM_ALLOC_CREDIT();
-		Init( 32*1024*1024, 64, 2*1024*1024 + 192*1024 );
+
+		constexpr unsigned size = 32u*1024*1024;
+		if ( !Init( size, 64, 2u*1024*1024 + 192u*1024 ) )
+		{
+			Error( "Game saves memory allocator unable to allocate %u virtual bytes.\n", size );
+		}
 	}
 
 	CInterlockedInt m_nSaveAllocs;

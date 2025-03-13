@@ -532,7 +532,7 @@ bool CHLTVClientState::ProcessGameEvent( SVC_GameEvent *msg )
 
 		if ( Q_strcmp( pszName, "hltv_status" ) == 0 )
 		{
-			m_pHLTV->m_nGlobalSlots = event->GetInt("slots");;
+			m_pHLTV->m_nGlobalSlots = event->GetInt("slots");
 			m_pHLTV->m_nGlobalProxies = event->GetInt("proxies");
 			m_pHLTV->m_nGlobalClients = event->GetInt("clients");
 			m_pHLTV->m_RootServer.SetFromString( event->GetString("master") );
