@@ -8,6 +8,10 @@
 #pragma comment(lib,"user32.lib")	// For MessageBox
 #endif
 
+#ifdef POSIX
+#include <csignal>
+#endif
+
 #include <cassert>
 #include "Color.h"
 #include "tier0/dbg.h"
@@ -165,7 +169,7 @@ SpewOutputFunc_t GetSpewOutputFunc( void )
 	return s_SpewOutputFunc.load( std::memory_order::memory_order_relaxed );
 }
 
-void _ExitOnFatalAssert( const tchar* pFile, int line )
+[[noreturn]] void _ExitOnFatalAssert( const tchar* pFile, int line )
 {
 	(void)_SpewMessage( _T("Fatal assert failed: %s, line %d.  Application exiting.\n"), pFile, line );
 
@@ -179,7 +183,20 @@ void _ExitOnFatalAssert( const tchar* pFile, int line )
 	}
 
 	DevMsg( 1, _T("_ExitOnFatalAssert\n") );
-	exit( EXIT_FAILURE );
+
+	// The C99 (unchanged in C11) standard states that assert calls abort and
+	// the abort stuff states this about the return code:
+	// See https://stackoverflow.com/questions/2862731/when-assert-fails-what-is-the-program-exit-code
+
+#ifdef _WIN32
+	// dimhotepus: EXIT_FAILURE -> Abort on windows exit with error code 3.
+	// See https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/abort
+	exit(3);  //-V2014
+#else
+	// dimhotepus: EXIT_FAILURE -> Abort on POSIX is 128 + signal abort code.
+	// See https://stackoverflow.com/questions/23098695/strange-return-value-134-to-call-gawk-in-a-bash-script
+	exit(128 + SIGABRT);  //-V2014
+#endif
 }
 
 
@@ -310,7 +327,15 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 		
 	case SPEW_ABORT:
 	{
-		exit(1);
+#ifdef _WIN32
+		// dimhotepus: 1 -> Abort on windows exit with error code 3.
+		// See https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/abort
+		exit(3);  //-V2014
+#else
+		// dimhotepus: 1 -> Abort on POSIX is 128 + signal abort code.
+		// See https://stackoverflow.com/questions/23098695/strange-return-value-134-to-call-gawk-in-a-bash-script
+		exit(128 + SIGABRT);  //-V2014
+#endif
 	}
 
 	// dimhotepus: Do nothing.
