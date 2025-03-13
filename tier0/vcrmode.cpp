@@ -16,7 +16,7 @@
 
 // FIXME: We totally have a bad tier dependency here
 #include "inputsystem/InputEnums.h"
-												
+
 #ifndef NO_VCR
 
 #define PvAlloc malloc
@@ -471,9 +471,9 @@ static void VCR_End()
 	if ( g_VCRMode == VCR_Playback )
 	{
 		// It's going to get screwy now, especially if we have threads, so just exit.
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		DebuggerBreakIfDebugging();
-		#endif
+#endif
 
 		// dimhotepus: 1 -> EINVAL.
 		exit( EINVAL );  //-V2014
@@ -919,7 +919,9 @@ static void VCR_Hook_Cmd_Exec(char **f)
 		else
 		{
 			*f = (char*)PvAlloc(len);
-			VCR_Read(*f, len);
+			// dimhotepus: Do not read if alloc fails.
+			if (*f)
+				VCR_Read(*f, len);
 		}
 	}
 	else if(g_VCRMode == VCR_Record)
