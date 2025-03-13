@@ -800,7 +800,7 @@ ALLOC_CALL void *__cdecl _aligned_realloc_base( void *ptr, size_t size, size_t a
 	}
 
 	void *pNew = MemAlloc_AllocAligned( size, align );
-	if ( ptr )
+	if ( pNew && ptr )
 	{
 		void *ptrUnaligned = MemAlloc_Unalign( ptr );
 		size_t oldSize = g_pMemAlloc->GetSize( ptrUnaligned );
