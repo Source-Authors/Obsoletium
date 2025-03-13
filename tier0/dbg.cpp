@@ -205,17 +205,17 @@ SpewOutputFunc_t GetSpewOutputFunc( void )
 //-----------------------------------------------------------------------------
 
 
-DBG_INTERFACE void _AssertValidReadPtr( void* ptr, intp count/* = 1*/ )
+DBG_INTERFACE void _AssertValidReadPtr( void* ptr, intp count/* = 1*/ ) //-V2009
 {
 	Assert( !count || ptr );
 }
 
-DBG_INTERFACE void _AssertValidWritePtr( void* ptr, intp count/* = 1*/ )
+DBG_INTERFACE void _AssertValidWritePtr( void* ptr, intp count/* = 1*/ ) //-V2009
 {
 	Assert( !count || ptr );
 }
 
-DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, intp count/* = 1*/ )
+DBG_INTERFACE void _AssertValidReadWritePtr( void* ptr, intp count/* = 1*/ ) //-V2009
 {
 	Assert( !count || ptr );
 }

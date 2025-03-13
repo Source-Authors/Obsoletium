@@ -1931,7 +1931,7 @@ unsigned int CThread::Suspend()
 #ifdef _WIN32
   // dimhotepus: x64 support.
 #ifndef PLATFORM_64BITS
-  return SuspendThread(m_hThread) != static_cast<DWORD>(-1);
+  return SuspendThread(m_hThread) != static_cast<DWORD>(-1); //-V720
 #else
   return Wow64SuspendThread(m_hThread) != static_cast<DWORD>(-1);
 #endif

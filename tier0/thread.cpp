@@ -54,7 +54,7 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 				ctx.Dr7 |= 1 << (16 + i*4);
 			switch ( pState->nWatchBytes[i] )
 			{
-			case 1: ctx.Dr7 |= 0<<(18 + i*4); break;
+			case 1: ctx.Dr7 |= 0<<(18 + i*4); break; //-V684
 			case 2: ctx.Dr7 |= 1<<(18 + i*4); break;
 			case 4: ctx.Dr7 |= 3<<(18 + i*4); break;
 			case 8: ctx.Dr7 |= 2<<(18 + i*4); break;
