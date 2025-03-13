@@ -160,7 +160,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	void			GetLocalCopy( const char *pFileName )												override { m_pFileSystemPassThru->GetLocalCopy( pFileName ); }
 	FileNameHandle_t	FindOrAddFileName( char const *pFileName )										override { return m_pFileSystemPassThru->FindOrAddFileName( pFileName ); }
 	FileNameHandle_t	FindFileName( char const *pFileName )											override { return m_pFileSystemPassThru->FindFileName( pFileName ); }
-	bool				String( const FileNameHandle_t& handle, char *buf, int buflen )					override { return m_pFileSystemPassThru->String( handle, buf, buflen ); }
+	bool				String( const FileNameHandle_t& handle, char *buf, intp buflen )				override { return m_pFileSystemPassThru->String( handle, buf, buflen ); }
 	virtual bool			IsOk2( FileHandle_t file )															{ return IsOk(file); }
 	void			RemoveSearchPaths( const char *szPathID )											override { m_pFileSystemPassThru->RemoveSearchPaths( szPathID ); }
 	bool			IsSteam() const																		override { return m_pFileSystemPassThru->IsSteam(); }
