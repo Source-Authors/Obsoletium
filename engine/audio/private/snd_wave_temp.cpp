@@ -64,27 +64,12 @@ void WaveAppendTmpFile( const char *filename, void *pBuffer, int sampleBits, int
 	V_StripExtension( filename, tmpfilename );
 	V_DefaultExtension( tmpfilename, ".WAV" );
 
-	FileHandle_t file;
-	file = g_pFileSystem->Open( tmpfilename, "r+b" );
+	FileHandle_t file = g_pFileSystem->Open( tmpfilename, "r+b" );
 	if ( file == FILESYSTEM_INVALID_HANDLE )
 		return;
 
 	g_pFileSystem->Seek( file, 0, FILESYSTEM_SEEK_TAIL );
-
-	if ( IsX360() && sampleBits == 16 )
-	{
-		short *pSwapped = (short * )_alloca( numSamples * sampleBits/8 );
-		for ( int i=0; i<numSamples; i++ )
-		{
-			pSwapped[i] = LittleShort( ((short*)pBuffer)[i] );
-		}
-		g_pFileSystem->Write( pSwapped, numSamples * sizeof( short ), file );
-	}
-	else
-	{
-		g_pFileSystem->Write( pBuffer, numSamples * sampleBits/8, file );
-	}
-
+	g_pFileSystem->Write( pBuffer, numSamples * sampleBits/8, file );
 	g_pFileSystem->Close( file );
 }
 
