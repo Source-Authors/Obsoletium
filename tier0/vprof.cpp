@@ -688,7 +688,7 @@ CVProfile::CVProfile()
 #ifdef VPROF_VTUNE_GROUP
 	memset(m_GroupIDStack, 0, sizeof(m_GroupIDStack));
 #endif
-
+	
 	// Go ahead and allocate 32 slots for budget group names
 	MEM_ALLOC_CREDIT();
 	m_pBudgetGroups = new CVProfile::CBudgetGroup[32];
@@ -764,28 +764,25 @@ void CVProfile::FreeNodes_R( CVProfNode *pNode )
 
 void CVProfile::Term()
 {
-	int i;
-	for( i = 0; i < m_nBudgetGroupNames; i++ )
+	for( int i = 0; i < m_nBudgetGroupNames; i++ )
 	{
 		delete [] m_pBudgetGroups[i].m_pName;
 	}
 	delete[] m_pBudgetGroups;
-	m_nBudgetGroupNames = m_nBudgetGroupNamesAllocated = 0;
-	m_pBudgetGroups = NULL;
 
-	int n;
-	for( n = 0; n < m_NumCounters; n++ )
+	m_nBudgetGroupNames = m_nBudgetGroupNamesAllocated = 0;
+	m_pBudgetGroups = nullptr;
+
+	for( int n = 0; n < m_NumCounters; n++ )
 	{
 		delete [] m_CounterNames[n];
-		m_CounterNames[n] = NULL;
+		m_CounterNames[n] = nullptr;
 	}
+
 	m_NumCounters = 0;
 
 	// Free the nodes.
-	if ( GetRoot() )
-	{
-		FreeNodes_R( GetRoot() );
-	}
+	FreeNodes_R( GetRoot() );
 }
 
 
