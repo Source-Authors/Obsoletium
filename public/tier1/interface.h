@@ -171,21 +171,21 @@ DLL_EXPORT [[nodiscard]] void* CreateInterface(const char *pName, int *pReturnCo
 //-----------------------------------------------------------------------------
 // UNDONE: This is obsolete, use the module load/unload/get instead!!!
 //-----------------------------------------------------------------------------
-extern CreateInterfaceFn	Sys_GetFactory( CSysModule *pModule );
+[[nodiscard]] CreateInterfaceFn	Sys_GetFactory( CSysModule *pModule );
 // dimhotepus: Strongly-typed version.
 template<typename TInterface>
 [[nodiscard]] CreateInterfaceFnT<TInterface> Sys_GetFactory( CSysModule* pModule )
 {
 	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactory(pModule));
 }
-extern CreateInterfaceFn	Sys_GetFactory( const char *pModuleName );
+[[nodiscard]] CreateInterfaceFn	Sys_GetFactory( const char *pModuleName );
 // dimhotepus: Strongly-typed version.
 template<typename TInterface>
 [[nodiscard]] CreateInterfaceFnT<TInterface> Sys_GetFactory( const char *pModuleName )
 {
 	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactory(pModuleName));
 }
-extern CreateInterfaceFn	Sys_GetFactoryThis();
+[[nodiscard]] CreateInterfaceFn Sys_GetFactoryThis();
 // dimhotepus: Strongly-typed version.
 template<typename TInterface>
 [[nodiscard]] CreateInterfaceFnT<TInterface> Sys_GetFactoryThis()
