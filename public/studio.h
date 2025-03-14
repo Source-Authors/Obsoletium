@@ -1810,37 +1810,37 @@ struct thinModelVertices_t
 		}
 	}
 
-	void GetMeshPosition( mstudiomesh_t *pMesh, int meshIndex, Vector *pPosition ) const
+	void GetMeshPosition( const mstudiomesh_t *pMesh, int meshIndex, Vector *pPosition ) const
 	{
 		Assert( pMesh );
 		GetPosition( pMesh->vertexdata.GetGlobalVertexIndex( meshIndex ), pPosition );
 	}
 
-	void GetMeshNormal( mstudiomesh_t *pMesh, int meshIndex, Vector *pNormal ) const
+	void GetMeshNormal( const mstudiomesh_t *pMesh, int meshIndex, Vector *pNormal ) const
 	{
 		Assert( pMesh );
 		GetNormal( pMesh->vertexdata.GetGlobalVertexIndex( meshIndex ), pNormal );
 	}
 
-	void GetMeshBoneWeights( mstudiomesh_t *pMesh, int meshIndex, mstudioboneweight_t *pBoneWeights ) const
+	void GetMeshBoneWeights( const mstudiomesh_t *pMesh, int meshIndex, mstudioboneweight_t *pBoneWeights ) const
 	{
 		Assert( pMesh );
 		GetBoneWeights( pMesh->vertexdata.GetGlobalVertexIndex( meshIndex ), pBoneWeights );
 	}
 
-	void GetModelPosition( mstudiomodel_t *pModel, int modelIndex, Vector *pPosition ) const
+	void GetModelPosition( const mstudiomodel_t *pModel, int modelIndex, Vector *pPosition ) const
 	{
 		Assert( pModel );
 		GetPosition( pModel->vertexdata.GetGlobalVertexIndex( modelIndex ), pPosition );
 	}
 
-	void GetModelNormal( mstudiomodel_t *pModel, int modelIndex, Vector *pNormal ) const
+	void GetModelNormal( const mstudiomodel_t *pModel, int modelIndex, Vector *pNormal ) const
 	{
 		Assert( pModel );
 		GetNormal( pModel->vertexdata.GetGlobalVertexIndex( modelIndex ), pNormal );
 	}
 
-	void GetModelBoneWeights( mstudiomodel_t *pModel, int modelIndex, mstudioboneweight_t *pBoneWeights ) const
+	void GetModelBoneWeights( const mstudiomodel_t *pModel, int modelIndex, mstudioboneweight_t *pBoneWeights ) const
 	{
 		Assert( pModel );
 		GetBoneWeights( pModel->vertexdata.GetGlobalVertexIndex( modelIndex ), pBoneWeights );
@@ -3228,12 +3228,12 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 	int					i;
 	int					target;
 	int					numVertexes;
-	vertexFileFixup_t	*pFixupTable;
+	const vertexFileFixup_t	*pFixupTable;
 
 	numVertexes = pTempVvdHdr->numLODVertexes[rootLOD];
 
 	// copy all data up to start of vertexes
-	memcpy((void*)pNewVvdHdr, (void*)pTempVvdHdr, pTempVvdHdr->vertexDataStart);
+	memcpy(pNewVvdHdr, pTempVvdHdr, pTempVvdHdr->vertexDataStart);
 
 	for ( i = 0; i < rootLOD; i++)
 	{
@@ -3258,7 +3258,7 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 		// transfer vertex data
 		memcpy(
 			(byte *)pNewVvdHdr+pNewVvdHdr->vertexDataStart, 
-			(byte *)pTempVvdHdr+pTempVvdHdr->vertexDataStart,
+			(const byte *)pTempVvdHdr+pTempVvdHdr->vertexDataStart,
 			numVertexes*sizeof(mstudiovertex_t) );
 
 		if (bNeedsTangentS)
@@ -3266,7 +3266,7 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 			// transfer tangent data to cache memory
 			memcpy(
 				(byte *)pNewVvdHdr+pNewVvdHdr->tangentDataStart, 
-				(byte *)pTempVvdHdr+pTempVvdHdr->tangentDataStart,
+				(const byte *)pTempVvdHdr+pTempVvdHdr->tangentDataStart,
 				numVertexes*sizeof(Vector4D) );
 		}
 
@@ -3276,7 +3276,7 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 	// fixups required
 	// re-establish mesh ordered vertexes into cache memory, according to table
 	target      = 0;
-	pFixupTable = (vertexFileFixup_t *)((byte *)pTempVvdHdr + pTempVvdHdr->fixupTableStart);
+	pFixupTable = (const vertexFileFixup_t *)((const byte *)pTempVvdHdr + pTempVvdHdr->fixupTableStart);
 	for (i=0; i<pTempVvdHdr->numFixups; i++)
 	{
 		if (pFixupTable[i].lod < rootLOD)
