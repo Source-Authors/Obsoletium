@@ -98,7 +98,7 @@ FORCEINLINE float XM_CALLCONV clamp( float val, float minVal, float maxVal )
 		DirectX::XMLoadFloat( &minVal ),
 		DirectX::XMLoadFloat( &maxVal )
 	);
-	return DirectX::XMVectorGetX( vres );
+	return DirectX::XMVectorGetX( vres ); //-V2002
 	//val = fpmax(minVal, val);
 	//val = fpmin(maxVal, val);
 }
@@ -422,7 +422,7 @@ FORCEINLINE void XM_CALLCONV VectorMAInline( const Vector& start, float scale, c
 		DirectX::XMVectorMultiplyAdd
 		(
 			DirectX::XMLoadFloat3( direction.XmBase() ),
-			DirectX::XMVectorReplicate( scale ),
+			DirectX::XMVectorReplicate( scale ), //-V2002
 			DirectX::XMLoadFloat3( start.XmBase() )
 		)
 	);
@@ -927,9 +927,9 @@ inline DirectX::XMVECTOR XM_CALLCONV VectorIRotate( DirectX::FXMVECTOR in1, cons
 {
 	return DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0F ) ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0F ) ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][2], in2[1][2], in2[2][2], 0.0F ) ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0F ) ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0F ) ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][2], in2[1][2], in2[2][2], 0.0F ) ) ) ), //-V2002
 		0.0F
 	);
 }

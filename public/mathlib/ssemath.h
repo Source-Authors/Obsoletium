@@ -1047,20 +1047,20 @@ FORCEINLINE fltx4 XM_CALLCONV LoadUnaligned3SIMD( const void *pSIMD ) //-V524
 /// replicate a single 32 bit integer value to all 4 components of an m128
 [[nodiscard]]
 FORCEINLINE fltx4 XM_CALLCONV ReplicateIX4(uint32_t i) {
-	return DirectX::XMVectorReplicateInt( i );
+	return DirectX::XMVectorReplicateInt( i ); //-V2002
 }
 
 
 [[nodiscard]]
 FORCEINLINE fltx4 XM_CALLCONV ReplicateX4(float flValue) {
-	return DirectX::XMVectorReplicate( flValue );
+	return DirectX::XMVectorReplicate( flValue ); //-V2002
 }
 
 // Performance loss. Use with care.
 [[nodiscard]]
 FORCEINLINE float XM_CALLCONV SubFloat( const fltx4& a, size_t idx )
 {
-	return DirectX::XMVectorGetByIndex( a, idx );
+	return DirectX::XMVectorGetByIndex( a, idx ); //-V2002
 }
 
 // Performance loss. Use with care.
@@ -1082,7 +1082,7 @@ FORCEINLINE uint32 XM_CALLCONV SubFloatConvertToInt( DirectX::FXMVECTOR a, size_
 [[nodiscard]]
 FORCEINLINE uint32 XM_CALLCONV SubInt( const fltx4& a, size_t idx )
 {
-	return DirectX::XMVectorGetIntByIndex( a, idx );
+	return DirectX::XMVectorGetIntByIndex( a, idx ); //-V2002
 }
 
 // Performance loss. Use with care.
@@ -2408,13 +2408,13 @@ FORCEINLINE fltx4 XM_CALLCONV InvRSquared( DirectX::FXMVECTOR v )
 [[nodiscard]]
 FORCEINLINE vec_t XM_CALLCONV InvRSquared( Vector v )
 {
-	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat3( v.XmBase() ) ) );
+	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat3( v.XmBase() ) ) ); //-V2002
 }
 
 [[nodiscard]]
 FORCEINLINE vec_t XM_CALLCONV InvRSquared( VectorAligned v )
 {
-	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat4A( v.XmBase() ) ) );
+	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat4A( v.XmBase() ) ) ); //-V2002
 }
 
 inline void XM_CALLCONV VectorNegate( DirectX::XMFLOAT4 *v )

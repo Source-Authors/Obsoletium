@@ -365,9 +365,9 @@ inline void MatrixTranslate( VMatrix& dst, const Vector &translation )
 [[nodiscard]] inline DirectX::XMMATRIX MatrixBuildTranslation(float x, float y, float z) {
 	DirectX::XMMATRIX dst = DirectX::XMMatrixIdentity();
 
-	dst.r[0] = DirectX::XMVectorSetW( dst.r[0], x );
-	dst.r[1] = DirectX::XMVectorSetW( dst.r[1], y );
-	dst.r[2] = DirectX::XMVectorSetW( dst.r[2], z );
+	dst.r[0] = DirectX::XMVectorSetW( dst.r[0], x ); //-V2002
+	dst.r[1] = DirectX::XMVectorSetW( dst.r[1], y ); //-V2002
+	dst.r[2] = DirectX::XMVectorSetW( dst.r[2], z ); //-V2002
 
 	return dst;
 }
@@ -815,7 +815,7 @@ inline Vector VMatrix::VMul3x3Transpose(const Vector &vVec) const
 
 inline void VMatrix::V3Mul(const Vector &vIn, Vector &vOut) const
 {
-	DirectX::XMVECTOR vvin = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( vIn.XmBase() ), 1.0f );
+	DirectX::XMVECTOR vvin = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( vIn.XmBase() ), 1.0f ); //-V2002
 	DirectX::XMVECTOR vden = DirectX::XMVectorSum
 	(
 		DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 3 ), vvin )
@@ -827,7 +827,7 @@ inline void VMatrix::V3Mul(const Vector &vIn, Vector &vOut) const
 		vOut.XmBase(),
 		DirectX::XMVectorSet
 		(
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorMultiply
 				(
@@ -835,7 +835,7 @@ inline void VMatrix::V3Mul(const Vector &vIn, Vector &vOut) const
 					vrw
 				)
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorMultiply
 				(
@@ -843,7 +843,7 @@ inline void VMatrix::V3Mul(const Vector &vIn, Vector &vOut) const
 					vrw
 				)
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorMultiply
 				(
@@ -865,28 +865,28 @@ inline void VMatrix::V4Mul(const Vector4D &vIn, Vector4D &vOut) const
 		vOut.XmBase(),
 		DirectX::XMVectorSet
 		(
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum
 				(
 					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() ), vvin )
 				)
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum
 				(
 					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 1 ), vvin )
 				)
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum
 				(
 					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 2 ), vvin )
 				)
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum
 				(

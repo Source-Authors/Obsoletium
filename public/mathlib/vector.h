@@ -137,7 +137,7 @@ public:
 	FORCEINLINE vec_t XM_CALLCONV LengthSqr() const
 	{ 
 		CHECK_VALID(*this);
-		return DirectX::XMVectorGetX( DirectX::XMVector3LengthSq( DirectX::XMLoadFloat3( XmBase() ) ) );
+		return DirectX::XMVectorGetX( DirectX::XMVector3LengthSq( DirectX::XMLoadFloat3( XmBase() ) ) ); //-V2002
 	}
 
 	// return true if this vector is (0,0,0) within tolerance
@@ -147,7 +147,7 @@ public:
 		(
 			DirectX::g_XMZero,
 			DirectX::XMLoadFloat3( XmBase() ),
-			DirectX::XMVectorReplicate( tolerance )
+			DirectX::XMVectorReplicate( tolerance ) //-V2002
 		);
 	}
 
@@ -168,7 +168,7 @@ public:
 		DirectX::XMVECTOR self = DirectX::XMLoadFloat3( XmBase() );
 		DirectX::XMVECTOR other = DirectX::XMLoadFloat3( vOther.XmBase() );
 
-		return DirectX::XMVectorGetX
+		return DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVector3LengthSq( DirectX::XMVectorSubtract( self, other ) )
 		);
@@ -623,7 +623,7 @@ inline void Vector::Random( vec_t minVal, vec_t maxVal )
 		(static_cast<float>(rand()) / VALVE_RAND_MAX),
 		0.0f
 	);
-	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal );
+	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal ); //-V2002
 
 	DirectX::XMStoreFloat3
 	(
@@ -631,7 +631,7 @@ inline void Vector::Random( vec_t minVal, vec_t maxVal )
 		DirectX::XMVectorMultiplyAdd
 		(
 			rn,
-			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ),
+			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ), //-V2002
 			mn
 		)
 	);
@@ -1245,7 +1245,7 @@ FORCEINLINE void XM_CALLCONV VectorDivide( const Vector& a, const Vector& b, Vec
 		(
 			DirectX::XMLoadFloat3( a.XmBase() ),
 			// Ensure no zero division on W.
-			DirectX::XMVectorSetW( DirectX::XMLoadFloat3( b.XmBase() ), 1.0f )
+			DirectX::XMVectorSetW( DirectX::XMLoadFloat3( b.XmBase() ), 1.0f ) //-V2002
 		)
 	);
 }
@@ -1263,7 +1263,7 @@ inline void	Vector::MulAdd(const Vector& a, const Vector& b, float scalar)
 		DirectX::XMVectorMultiplyAdd
 		(
 			DirectX::XMLoadFloat3( b.XmBase() ),
-			DirectX::XMVectorReplicate( scalar ),
+			DirectX::XMVectorReplicate( scalar ), //-V2002
 			DirectX::XMLoadFloat3( a.XmBase() )
 		)
 	);
@@ -1326,7 +1326,7 @@ FORCEINLINE vec_t XM_CALLCONV DotProduct(const Vector& a, const Vector& b)
 	CHECK_VALID(a);
 	CHECK_VALID(b);
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVector3Dot
 		(
@@ -1416,7 +1416,7 @@ inline vec_t XM_CALLCONV DotProductAbs( const Vector &v0, const DirectX::XMFLOAT
 	CHECK_VALID(v0);
 	Assert(v1);
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVectorSum
 		(
@@ -1437,7 +1437,7 @@ inline vec_t XM_CALLCONV DotProductAbs( const Vector &v0, const Vector &v1 )
 	CHECK_VALID(v0);
 	CHECK_VALID(v1);
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVectorSum
 		(
@@ -1464,7 +1464,7 @@ inline vec_t XM_CALLCONV VectorLength( const Vector& v )
 {
 	CHECK_VALID(v);
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVector3Length
 		(
@@ -1516,7 +1516,7 @@ inline bool XM_CALLCONV VectorsAreEqual( const Vector& src1, const Vector& src2,
 	(
 		DirectX::XMLoadFloat3( src1.XmBase() ),
 		DirectX::XMLoadFloat3( src2.XmBase() ),
-		DirectX::XMVectorReplicate( tolerance )
+		DirectX::XMVectorReplicate( tolerance ) //-V2002
 	);
 }
 
@@ -1869,7 +1869,7 @@ inline bool XM_CALLCONV QuaternionsAreEqual( const Quaternion& src1, const Quate
 	(
 		DirectX::XMLoadFloat4( src1.XmBase() ),
 		DirectX::XMLoadFloat4( src2.XmBase() ),
-		DirectX::XMVectorReplicate( tolerance )
+		DirectX::XMVectorReplicate( tolerance ) //-V2002
 	);
 }
 
@@ -2196,7 +2196,7 @@ inline void XM_CALLCONV VectorMA( const QAngle &start, float scale, const QAngle
 		DirectX::XMVectorMultiplyAdd
 		(
 			DirectX::XMLoadFloat3( direction.XmBase() ),
-			DirectX::XMVectorReplicate( scale ),
+			DirectX::XMVectorReplicate( scale ), //-V2002
 			DirectX::XMLoadFloat3( start.XmBase() )
 		)
 	);
@@ -2231,7 +2231,7 @@ inline void QAngle::Random( vec_t minVal, vec_t maxVal )
 		(static_cast<float>(rand()) / VALVE_RAND_MAX),
 		0.0f
 	);
-	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal );
+	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal ); //-V2002
 
 	DirectX::XMStoreFloat3
 	(
@@ -2239,7 +2239,7 @@ inline void QAngle::Random( vec_t minVal, vec_t maxVal )
 		DirectX::XMVectorMultiplyAdd
 		(
 			rn,
-			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ),
+			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ), //-V2002
 			mn
 		)
 	);
@@ -2264,7 +2264,7 @@ inline RadianEuler::RadianEuler(QAngle const &angles) //-V730
 	DirectX::XMVECTOR qa = DirectX::XMVectorMultiply
 	(
 		DirectX::XMLoadFloat3( angles.XmBase() ),
-		DirectX::XMVectorReplicate( M_PI_F / 180.0f )
+		DirectX::XMVectorReplicate( M_PI_F / 180.0f ) //-V2002
 	);
 
 	DirectX::XMStoreFloat3
@@ -2287,7 +2287,7 @@ inline QAngle RadianEuler::ToQAngle() const
 	DirectX::XMVECTOR re = DirectX::XMVectorMultiply
 	(
 		DirectX::XMLoadFloat3( XmBase() ),
-		DirectX::XMVectorReplicate( 180.0f / M_PI_F )
+		DirectX::XMVectorReplicate( 180.0f / M_PI_F ) //-V2002
 	);
 
 	QAngle qa;
@@ -2474,7 +2474,7 @@ inline vec_t QAngle::Length() const
 {
 	CHECK_VALID(*this);
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVector3Length( DirectX::XMLoadFloat3( XmBase() ) )
 	);
@@ -2485,7 +2485,7 @@ inline vec_t QAngle::LengthSqr() const
 {
 	CHECK_VALID(*this);
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVector3LengthSq( DirectX::XMLoadFloat3( XmBase() ) )
 	);
@@ -2501,7 +2501,7 @@ inline bool XM_CALLCONV QAnglesAreEqual( const QAngle& src1, const QAngle& src2,
 	(
 		DirectX::XMLoadFloat3( src1.XmBase() ),
 		DirectX::XMLoadFloat3( src2.XmBase() ),
-		DirectX::XMVectorReplicate( tolerance )
+		DirectX::XMVectorReplicate( tolerance ) //-V2002
 	);
 }
 
@@ -2641,9 +2641,9 @@ inline void _SSE_RSqrtInline( float a, float* out ) = delete;
 FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMVECTOR& val )
 {
 	DirectX::XMVECTOR len = DirectX::XMVector3Length( val );
-	float slen = DirectX::XMVectorGetX( len );
+	float slen = DirectX::XMVectorGetX( len ); //-V2002
 	// Prevent division on zero.
-	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) );
+	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) ); //-V2002
 
 	val = DirectX::XMVectorMultiply( val, den );
 	
@@ -2667,7 +2667,7 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMFLOAT4 *v )
 	Assert(v);
 	
 	// Looks like DirectX::XMVector3Normalize honors w component, which is not we want to.
-	DirectX::XMVECTOR val = DirectX::XMVectorSetW
+	DirectX::XMVECTOR val = DirectX::XMVectorSetW //-V2002
 	(
 		DirectX::XMLoadFloat4( v ),
 		0.0f
@@ -2691,7 +2691,7 @@ FORCEINLINE void XM_CALLCONV VectorNormalizeFast( Vector &vec )
 	DirectX::XMVECTOR val = DirectX::XMLoadFloat3( vec.XmBase() );
 	DirectX::XMVECTOR len = DirectX::XMVector3LengthEst( val );
 	// Prevent division on zero.
-	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( DirectX::XMVectorGetX( len ) + FLT_EPSILON ) );
+	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( DirectX::XMVectorGetX( len ) + FLT_EPSILON ) ); //-V2002
 
 	DirectX::XMStoreFloat3( vec.XmBase(), DirectX::XMVectorMultiply( val, den ) );
 }

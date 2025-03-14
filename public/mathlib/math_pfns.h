@@ -155,7 +155,7 @@ inline DirectX::XMVECTOR XM_CALLCONV SSE_RSqrt_SS( DirectX::XMVECTOR in )
 
 inline float SSE_Sqrt(float x)
 {
-	return DirectX::XMVectorGetX( SSE_Sqrt_SS( DirectX::XMLoadFloat( &x ) ) );
+	return DirectX::XMVectorGetX( SSE_Sqrt_SS( DirectX::XMLoadFloat( &x ) ) ); //-V2002
 }
 
 inline const DirectX::XMVECTOR  f3  = DirectX::XMVectorSet( 3.0f, 0.0f, 0.0f, 0.0f );  // 3 as SSE value
@@ -173,14 +173,14 @@ inline float SSE_RSqrtAccurate(float a)
 	xt = DirectX::XMVectorMultiply( xt, f05 );
 	xr = DirectX::XMVectorMultiply( xr, xt );
 
-	return DirectX::XMVectorGetX( xr );
+	return DirectX::XMVectorGetX( xr ); //-V2002
 }
 
 // Simple SSE rsqrt.  Usually accurate to around 6 (relative) decimal places 
 // or so, so ok for closed transforms.  (ie, computing lighting normals)
 inline float SSE_RSqrtFast(float x)
 {
-	return DirectX::XMVectorGetX( SSE_RSqrt_SS( DirectX::XMLoadFloat( &x ) ) );
+	return DirectX::XMVectorGetX( SSE_RSqrt_SS( DirectX::XMLoadFloat( &x ) ) ); //-V2002
 }
 
 }  // namespace details

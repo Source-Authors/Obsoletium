@@ -257,7 +257,7 @@ inline void Vector2D::Random( float minVal, float maxVal )
 		0.0f,
 		0.0f
 	);
-	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal );
+	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal ); //-V2002
 
 	DirectX::XMStoreFloat2
 	(
@@ -265,7 +265,7 @@ inline void Vector2D::Random( float minVal, float maxVal )
 		DirectX::XMVectorMultiplyAdd
 		(
 			rn,
-			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ),
+			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ), //-V2002
 			mn
 		)
 	);
@@ -478,9 +478,9 @@ inline void XM_CALLCONV Vector2DDivide( const Vector2D& a, const Vector2D& b, Ve
 		(
 			DirectX::XMLoadFloat2( a.XmBase() ),
 			// Ensure no zero division on W & Z.
-			DirectX::XMVectorSetW
+			DirectX::XMVectorSetW //-V2002
 			(
-				DirectX::XMVectorSetZ
+				DirectX::XMVectorSetZ //-V2002
 				(
 					DirectX::XMLoadFloat2( b.XmBase() ), 1.0f
 				),
@@ -500,7 +500,7 @@ inline void XM_CALLCONV Vector2DMA( const Vector2D& start, float s, const Vector
 		DirectX::XMVectorMultiplyAdd
 		(
 			DirectX::XMLoadFloat2( dir.XmBase() ),
-			DirectX::XMVectorReplicate( s ),
+			DirectX::XMVectorReplicate( s ), //-V2002
 			DirectX::XMLoadFloat2( start.XmBase() )
 		)
 	);
@@ -534,7 +534,7 @@ inline vec_t XM_CALLCONV DotProduct2D(const Vector2D& a, const Vector2D& b)
 { 
 	Assert( a.IsValid() && b.IsValid() );
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVector2Dot
 		(
@@ -610,9 +610,9 @@ inline vec_t XM_CALLCONV Vector2DNormalize( Vector2D& v )
 	
 	DirectX::XMVECTOR val = DirectX::XMLoadFloat2( v.XmBase() );
 	DirectX::XMVECTOR len = DirectX::XMVector2Length( val );
-	float slen = DirectX::XMVectorGetX( len );
+	float slen = DirectX::XMVectorGetX( len ); //-V2002
 	// Prevent division on zero.
-	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) );
+	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) ); //-V2002
 
 	DirectX::XMStoreFloat2( v.XmBase(), DirectX::XMVectorMultiply( val, den ) );
 	

@@ -126,7 +126,7 @@ public:
 		(
 			DirectX::g_XMZero,
 			DirectX::XMLoadFloat4( XmBase() ),
-			DirectX::XMVectorReplicate( tolerance )
+			DirectX::XMVectorReplicate( tolerance ) //-V2002
 		);
 	}
 
@@ -292,7 +292,7 @@ inline void Vector4D::Random( vec_t minVal, vec_t maxVal )
 		(static_cast<float>(rand()) / VALVE_RAND_MAX),
 		(static_cast<float>(rand()) / VALVE_RAND_MAX)
 	);
-	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal );
+	DirectX::XMVECTOR mn = DirectX::XMVectorReplicate( minVal ); //-V2002
 
 	DirectX::XMStoreFloat4
 	(
@@ -300,7 +300,7 @@ inline void Vector4D::Random( vec_t minVal, vec_t maxVal )
 		DirectX::XMVectorMultiplyAdd
 		(
 			rn,
-			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ),
+			DirectX::XMVectorSubtract( DirectX::XMVectorReplicate( maxVal ), mn ), //-V2002
 			mn
 		)
 	);
@@ -627,7 +627,7 @@ inline void XM_CALLCONV Vector4DMA( Vector4D const& start, float s, Vector4D con
 		DirectX::XMVectorMultiplyAdd
 		(
 			DirectX::XMLoadFloat4( dir.XmBase() ),
-			DirectX::XMVectorReplicate( s ),
+			DirectX::XMVectorReplicate( s ), //-V2002
 			DirectX::XMLoadFloat4( start.XmBase() )
 		)
 	);
@@ -665,7 +665,7 @@ inline vec_t XM_CALLCONV DotProduct4D(const Vector4D& a, const Vector4D& b)
 { 
 	Assert( a.IsValid() && b.IsValid() );
 
-	return DirectX::XMVectorGetX
+	return DirectX::XMVectorGetX //-V2002
 	(
 		DirectX::XMVector4Dot
 		(
@@ -689,13 +689,13 @@ inline vec_t Vector4D::Dot( Vector4D const& vOther ) const
 inline vec_t XM_CALLCONV Vector4DLength( Vector4D const& v )
 {
 	Assert( v.IsValid() );
-	return DirectX::XMVectorGetX( DirectX::XMVector4Length( DirectX::XMLoadFloat4( v.XmBase() ) ) );
+	return DirectX::XMVectorGetX( DirectX::XMVector4Length( DirectX::XMLoadFloat4( v.XmBase() ) ) ); //-V2002
 }
 
 inline vec_t Vector4D::LengthSqr() const
 { 
 	Assert( IsValid() );
-	return DirectX::XMVectorGetX( DirectX::XMVector4LengthSq( DirectX::XMLoadFloat4( XmBase() ) ) );
+	return DirectX::XMVectorGetX( DirectX::XMVector4LengthSq( DirectX::XMLoadFloat4( XmBase() ) ) ); //-V2002
 }
 
 inline vec_t Vector4D::Length() const
@@ -713,9 +713,9 @@ inline vec_t XM_CALLCONV Vector4DNormalize( Vector4D& v )
 	
 	DirectX::XMVECTOR val = DirectX::XMLoadFloat4( v.XmBase() );
 	DirectX::XMVECTOR len = DirectX::XMVector4Length( val );
-	float slen = DirectX::XMVectorGetX( len );
+	float slen = DirectX::XMVectorGetX( len ); //-V2002
 	// Prevent division on zero.
-	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) );
+	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) ); //-V2002
 
 	DirectX::XMStoreFloat4( v.XmBase(), DirectX::XMVectorMultiply( val, den ) );
 	
@@ -779,7 +779,7 @@ inline void XM_CALLCONV Vector4DWeightMAD( vec_t w, Vector4DAligned const& vInA,
 {
 	Assert( vInA.IsValid() && vInB.IsValid() && IsFinite(w) );
 
-	DirectX::XMVECTOR vw = DirectX::XMVectorReplicate( w );
+	DirectX::XMVECTOR vw = DirectX::XMVectorReplicate( w ); //-V2002
 
 	DirectX::XMStoreFloat4A
 	(
