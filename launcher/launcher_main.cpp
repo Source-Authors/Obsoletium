@@ -488,7 +488,8 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   const se::common::windows::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
   if (scoped_winsock.errc()) {
     Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
-            scoped_winsock.errc(), scoped_winsock.errc().message().c_str());
+            scoped_winsock.errc().value(),
+            scoped_winsock.errc().message().c_str());
   }
 
   if (!ApplyProcessPriorityClass(command_line)) {
