@@ -124,7 +124,7 @@ void GetBaseDirectory(ICommandLine *command_line,
                       __out_z char (&base_directory)[MAX_PATH]) {
   base_directory[0] = '\0';
 
-  if (!base_directory[0] && GetExecutableName(base_directory)) {
+  if (GetExecutableName(base_directory)) {
     char *buffer = strrchr(base_directory, '\\');
 
     if (buffer && *buffer) *(buffer + 1) = '\0';
