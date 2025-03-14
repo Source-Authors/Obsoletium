@@ -53,7 +53,7 @@ struct Sample {
 
 void FreeQuantization(QuantizedValue *t);
 
-[[nodiscard]] QuantizedValue *Quantize(Sample *s, int nsamples, int ndims,
+[[nodiscard]] ALLOC_CALL QuantizedValue *Quantize(Sample *s, int nsamples, int ndims,
 	int nvalues, uint8 *weights, int value0=0);
 
 int CompressSamples(Sample *s, int nsamples, int ndims);
@@ -62,7 +62,7 @@ int CompressSamples(Sample *s, int nsamples, int ndims);
 	 int ndims, uint8 *weights, QuantizedValue *QTable);
 void PrintSamples(Sample const *s, int nsamples, int ndims);
 
-[[nodiscard]] QuantizedValue *FindQNode(QuantizedValue const *q, int32 code);
+[[nodiscard]] const QuantizedValue *FindQNode(QuantizedValue const *q, int32 code);
 
 [[nodiscard]] inline Sample *NthSample(Sample *s, int i, int nd)
 {

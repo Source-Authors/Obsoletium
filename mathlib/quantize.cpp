@@ -83,6 +83,8 @@ static int sortlong(void const *a, void const *b)
 
   
 #define NEXTSAMPLE(s) ( (Sample *) (((uint8 *) s)+current_ssize))
+// dimhotepus: Const-correct macro.
+#define NEXTSAMPLE_CONST(s) ( (const Sample *) (((uint8 *) s)+current_ssize))
 #define SAMPLE(s,i) NthSample(s,i,current_ndims)
 
 static void SetNDims(int n)
@@ -130,7 +132,7 @@ void PrintSamples(Sample const *s, int nsamples, int ndims)
 		for(int d=0;d<ndims;d++)
 			printf("%02x,",s->Value[d]);
 		printf("}\n");
-		s=NEXTSAMPLE(s);
+		s=NEXTSAMPLE_CONST(s);
 	}
 }
 
@@ -353,7 +355,7 @@ static void SubdivideNode(QuantizedValue *n, int whichdim)
 		NAdded++;
 	}
 #endif
-	QuantizedValue *a=AllocQValue();
+	QuantizedValue * RESTRICT a=AllocQValue();
 	a->sortdim=n->sortdim;
 	a->Samples=n->Samples;
 	a->NSamples=NAdded;
@@ -402,14 +404,14 @@ static void Label(QuantizedValue *q, int updatecolor)
 	}
 }    
 
-QuantizedValue *FindQNode(QuantizedValue const *q, int32 code)
+const QuantizedValue *FindQNode(QuantizedValue const *q, int32 code)
 {
 	if (! (q->Children[0]))
-		if (code==q->value) return (QuantizedValue *) q;
+		if (code==q->value) return q;
 		else return 0;
 	else
 	{
-		QuantizedValue *found=FindQNode(q->Children[0],code);
+		const QuantizedValue *found=FindQNode(q->Children[0],code);
 		if (! found) found=FindQNode(q->Children[1],code);
 		return found;
 	}
@@ -436,7 +438,7 @@ void CheckInRange(QuantizedValue *q, uint8 *max, uint8 *min)
 	}
 }
 
-QuantizedValue *Quantize(Sample *s, int nsamples, int ndims,
+ALLOC_CALL QuantizedValue *Quantize(Sample *s, int nsamples, int ndims,
 								int nvalues, uint8 *weights, int firstvalue)
 {
 	SetNDims(ndims);
