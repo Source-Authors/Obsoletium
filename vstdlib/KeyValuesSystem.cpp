@@ -121,7 +121,13 @@ CKeyValuesSystem::CKeyValuesSystem()
 		t.next = NULL;
 	}
 
-	m_Strings.Init( 4*1024*1024, 64*1024, 0, 4 );
+	constexpr size_t size = 4u * 1024 * 1024;
+	if ( !m_Strings.Init( size, 64u*1024, 0, 4 ) )
+	{
+		// dimhotepus: Handle allocator failure.
+		Error( "KeyValues allocator unable to allocate %u virtual bytes.\n", size );
+	}
+
 	char *pszEmpty = ((char *)m_Strings.Alloc(1));
 	*pszEmpty = 0;
 
