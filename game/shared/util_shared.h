@@ -659,4 +659,5 @@ Color LerpColor( const Color &c0, const Color &c1, float t );
 // Global econ-level helper functionality.
 EUniverse GetUniverse();
 
+const char *GetCleanMapName( const char *pszUnCleanMapName, char (&pszTmp)[256] );
 #endif // UTIL_SHARED_H
