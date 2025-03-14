@@ -94,20 +94,20 @@ public:
 	//-----------------------------------------------------------------------------
 	// Write a single field.
 	//-----------------------------------------------------------------------------
-	void SwapFieldToTargetEndian( void* pOutputBuffer, void *pData, typedescription_t *pField );
+	void SwapFieldToTargetEndian( void* pOutputBuffer, const void *pData, typedescription_t *pField );
 
 	//-----------------------------------------------------------------------------
 	// Write a block of fields.  Works a bit like the saverestore code.  
 	//-----------------------------------------------------------------------------
-	void SwapFieldsToTargetEndian( void *pOutputBuffer, void *pBaseData, datamap_t *pDataMap );
+	void SwapFieldsToTargetEndian( void *pOutputBuffer, const void *pBaseData, datamap_t *pDataMap );
 
 	// Swaps fields for the templated type to the output buffer.
-	template<typename T> inline void SwapFieldsToTargetEndian( T* pOutputBuffer, void *pBaseData, unsigned int objectCount = 1 )
+	template<typename T> inline void SwapFieldsToTargetEndian( T* pOutputBuffer, const void *pBaseData, unsigned int objectCount = 1 )
 	{
 		for ( unsigned int i = 0; i < objectCount; ++i, ++pOutputBuffer )
 		{
 			SwapFieldsToTargetEndian( (void*)pOutputBuffer, pBaseData, &T::m_DataMap );
-			pBaseData = (byte*)pBaseData + sizeof(T);
+			pBaseData = (const byte*)pBaseData + sizeof(T);
 		}
 	}
 
@@ -234,7 +234,7 @@ public:
 	// If inputBuffer is omitted or nullptr, then it is assumed to be the same as
 	// outputBuffer - effectively swapping the contents of the buffer in place.
 	//-----------------------------------------------------------------------------
-	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, T* inputBuffer = nullptr, int count = 1 )
+	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, const T* inputBuffer = nullptr, int count = 1 )
 	{
 		Assert( count >= 0 );
 		Assert( outputBuffer );
@@ -270,7 +270,7 @@ private:
 	// swapped version of input.  ( Doesn't compare machine to target endianness )
 	//-----------------------------------------------------------------------------
 	template <typename T>
-	inline void LowLevelByteSwap( T &output, T &input )
+	inline void LowLevelByteSwap( T &output, const T &input )
 	{
 		if constexpr (sizeof(T) == 1U)
 		{
