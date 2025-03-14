@@ -138,7 +138,7 @@ public:
 	{
 		char valueString[4096];
 		va_list marker;
-		va_start( marker, pValue );
+		va_start( marker, pValue ); //-V2018 //-V2019
 		V_vsprintf_safe( valueString, pValue, marker );
 		va_end( marker );
 
@@ -419,7 +419,7 @@ const char* GetVProjectCmdLineValue()
 static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, const char *pMsg, ... )
 {
 	va_list marker;
-	va_start( marker, pMsg );
+	va_start( marker, pMsg ); //-V2018 //-V2019
 	V_vsprintf_safe( g_FileSystemError, pMsg, marker );
 	va_end( marker );
 

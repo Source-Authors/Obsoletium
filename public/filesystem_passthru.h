@@ -116,7 +116,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	int				FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... ) override { 
 		char str[8192];
 		va_list marker;
-		va_start( marker, pFormat );
+		va_start( marker, pFormat ); //-V2018 //-V2019
 		_vsnprintf( str, sizeof( str ), pFormat, marker );
 		va_end( marker );
 		return m_pFileSystemPassThru->FPrintf( file, "%s", str );
