@@ -124,8 +124,8 @@ struct VtfProcessingOptions
 	//
 	// Decay settings
 	//
-	uint8 clrDecayGoal[4];			// Goal colors for R G B A
-	uint8 numNotDecayMips[4];		// Number of first mips unaffected by decay (0 means all below mip0)
+	uint8 clrDecayGoal[4];			// Goal colors for R G B A //-V112
+	uint8 numNotDecayMips[4];		// Number of first mips unaffected by decay (0 means all below mip0) //-V112
 	float fDecayExponentBase[4];	// For exponential decay the base number (e.g. 0.75)
 };
 
@@ -422,7 +422,7 @@ typedef bool (*CompressFunc_t)( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffe
 
 // version number for the disk texture cache
 constexpr int VTF_MAJOR_VERSION{7};
-constexpr int VTF_MINOR_VERSION{4};
+constexpr int VTF_MINOR_VERSION{4}; //-V112
 
 //-----------------------------------------------------------------------------
 // !!!!CRITICAL!!!! BEFORE YOU CHANGE THE FORMAT
@@ -440,7 +440,7 @@ constexpr int VTF_MINOR_VERSION{4};
 struct VTFFileBaseHeader_t
 {
 	DECLARE_BYTESWAP_DATADESC();
-	char fileTypeString[4]; // "VTF" Valve texture file
+	char fileTypeString[4]; // "VTF" Valve texture file //-V112
 	int version[2]; 		// version[0].version[1]
 	unsigned headerSize;
 };
@@ -521,7 +521,7 @@ struct ResourceEntryInfo
 	union
 	{ 
 		unsigned int	eType;		// Use MK_VTF_??? macros to be endian compliant with the type
-		unsigned char	chTypeBytes[4];
+		unsigned char	chTypeBytes[4]; //-V112
 	};
 	unsigned		resData;	// Resource data or offset from the beginning of the file
 };
@@ -565,7 +565,7 @@ struct VTFFileHeaderX360_t : public VTFFileBaseHeader_t
 	Vector			reflectivity;			// Resides on 16 byte boundary!
 	float			bumpScale;
 	ImageFormat		imageFormat;
-	unsigned char	lowResImageSample[4];
+	unsigned char	lowResImageSample[4]; //-V112
 	unsigned int	compressedSize;
 
 	// *** followed by *** ResourceEntryInfo resources[0];
