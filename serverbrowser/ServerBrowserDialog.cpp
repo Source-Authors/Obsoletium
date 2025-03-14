@@ -266,7 +266,10 @@ void CServerBrowserDialog::LoadUserData()
 void CServerBrowserDialog::SaveUserData()
 {
 	m_pSavedData->Clear();
-	m_pSavedData->LoadFromFile( g_pFullFileSystem, "ServerBrowser.vdf", "CONFIG");
+	if ( !m_pSavedData->LoadFromFile( g_pFullFileSystem, "ServerBrowser.vdf", "CONFIG") )
+	{
+		Msg( "ServerBrowser.vdf is not present. Creating one.\n" );
+	}
 
 	// set the current tab
 	if (m_pGameList == m_pSpectateGames)
