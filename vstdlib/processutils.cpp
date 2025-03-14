@@ -278,7 +278,16 @@ void CProcessUtils::AbortProcess( ProcessHandle_t hProcess )
 		if ( !IsProcessComplete( hProcess ) )
 		{
 			ProcessInfo_t& info = m_Processes[hProcess];
-			TerminateProcess( info.m_hProcess, 1 );
+
+#ifdef _WIN32
+			// dimhotepus: 1 -> Abort on windows exit with error code 3.
+			// See https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/abort
+			TerminateProcess( info.m_hProcess, 3 );  //-V2014
+#else
+			// dimhotepus: 1 -> Abort on POSIX is 128 + signal abort code.
+			// See https://stackoverflow.com/questions/23098695/strange-return-value-134-to-call-gawk-in-a-bash-script
+			exit(128 + SIGABRT);  //-V2014
+#endif
 		}
 		ShutdownProcess( hProcess );
 	}

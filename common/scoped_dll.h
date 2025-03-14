@@ -93,7 +93,8 @@ class ScopedDll {
       if (::dlclose(dll_)) {
         fprintf(stderr, "Failed to close the %s: %s.\n", dll_path_,
                 ::dlerror());
-        exit(1);
+        // dimhotepus: 1 -> EOTHER.
+        exit(EOTHER);
       }
 #endif
     }

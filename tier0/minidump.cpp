@@ -434,7 +434,8 @@ int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 	}
 	__except ( g_pfnWriteMiniDump( GetExceptionCode(), GetExceptionInformation(), GetExceptionCodeName( GetExceptionCode() ) ), EXCEPTION_EXECUTE_HANDLER )
 	{
-		TerminateProcess( GetCurrentProcess(), EXIT_FAILURE ); // die, die RIGHT NOW! (don't call exit() so destructors will not get run)
+		// dimhotepus: EXIT_FAILURE -> EOTHER
+		TerminateProcess( GetCurrentProcess(), EOTHER ); // die, die RIGHT NOW! (don't call exit() so destructors will not get run)
 	}
 
 	// if we get here, we definitely are not in an exception handler

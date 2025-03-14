@@ -681,7 +681,8 @@ void usage()
     //puts("options:");
     //puts("\t");
 
-    exit(-1);
+	// dimhotepus: -1 -> EINVAL
+    exit(EINVAL);
 }
 
 void test( const char *pszFile, bool bAllowBasenameMismatch )

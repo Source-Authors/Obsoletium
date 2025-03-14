@@ -154,7 +154,8 @@ static void VTexError( const char *pFormat, ... )
 	{
 		fprintf( stderr, "ERROR: %s", str );
 		Pause();
-		exit( 1 );
+		// dimhotepus: 1 -> EOTHER
+		exit(EOTHER);
 	}	
 }
 

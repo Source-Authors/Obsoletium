@@ -1017,7 +1017,8 @@ void __cdecl WriteMiniDumpOrBreak( int , const char *pchName )
 	{
 		WriteMiniDump( pchName );
 		// Call Plat_ExitProcess so we don't continue in a bad state. 
-		TerminateProcess(GetCurrentProcess(), 1);
+		// dimhotepus: 1 -> EINVAL as it is EINVAL case.
+		TerminateProcess(GetCurrentProcess(), EINVAL);
 	}
 }
 

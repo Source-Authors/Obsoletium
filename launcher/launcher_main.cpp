@@ -101,7 +101,8 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
     default:
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Source Launcher - Error",
                                message, nullptr);
-      _exit(1);
+      // dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
+      exit(ENOTRECOVERABLE);
   }
 }
 
@@ -148,7 +149,8 @@ void GetBaseDirectory(ICommandLine *command_line,
 
 #ifdef WIN32
 BOOL WINAPI ConsoleCtrlHandler(DWORD ctrl_type) {
-  TerminateProcess(GetCurrentProcess(), 2);
+  // dimhotepus: 2 -> ERROR_CONTROL_C_EXIT
+  TerminateProcess(GetCurrentProcess(), ERROR_CONTROL_C_EXIT);
   return TRUE;
 }
 #endif

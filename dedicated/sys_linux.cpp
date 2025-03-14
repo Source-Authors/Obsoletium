@@ -61,8 +61,8 @@ UnixSystem::~UnixSystem() {}
 
 void UnixSystem::ErrorMessage(int level, const char *msg) {
   Error("%s\n", msg);
-
-  exit(-1);
+  // dimhotepus: 1 -> EOTHER.
+  exit(EOTHER);
 }
 
 void UnixSystem::UpdateStatus(int force) {}

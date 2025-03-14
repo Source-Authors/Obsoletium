@@ -411,8 +411,9 @@ void VCR_EnterPausedState()
 		if ( GetAsyncKeyState( 'R' ) & 0x8000 )
 			break;
 
+		// dimhotepus: Run destructors, 1 -> 0.
 		if ( GetAsyncKeyState( 'Q' ) & 0x8000 )
-			TerminateProcess( GetCurrentProcess(), 1 );
+			exit( 0 );
 
 		if ( GetAsyncKeyState( 'S' ) & 0x8000 )
 		{
@@ -461,7 +462,8 @@ void VCR_HandlePlaybackMessages(
 
 			if ( upper == 'Q' )
 			{
-				TerminateProcess( GetCurrentProcess(), 1 );
+				// dimhotepus: Run destructors, 1 -> 0
+				exit( 0 );
 			}
 			else if ( upper == 'P' )
 			{

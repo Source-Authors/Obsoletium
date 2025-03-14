@@ -155,7 +155,8 @@ void Error(char const *pMsg, ...) {
   vprintf(pMsg, marker);
   va_end(marker);
 
-  exit(-1);
+  // dimhotepus: -1 -> EOTHER
+  exit(EOTHER);
 }
 
 #else
@@ -260,7 +261,8 @@ SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
     RestoreConsoleTextColor(old);
   }
 
-  if (type == SPEW_ERROR) CmdLib_Exit(1);
+  // dimhotepus: 1 -> ENOTRECOVERABLE.
+  if (type == SPEW_ERROR) CmdLib_Exit(ENOTRECOVERABLE);
 
   return retVal;
 }

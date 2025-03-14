@@ -435,7 +435,8 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
   if (bCollate) {
     Collate();
     is_active_ = false;
-    exit(-1);
+    // dimhotepus: -1 -> 0
+    exit(0);
   }
 
   return is_active_;

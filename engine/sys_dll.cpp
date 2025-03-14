@@ -496,9 +496,11 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 #if defined(_WIN32)
 	// We don't want global destructors in our process OR in any DLL to get executed.
 	// _exit() avoids calling global destructors in our module, but not in other DLLs.
-	TerminateProcess( GetCurrentProcess(), 100 );
+	// dimhotepus: 100 -> ENOTRECOVERABLE
+	TerminateProcess( GetCurrentProcess(), ENOTRECOVERABLE );
 #else
-	_exit( 100 );
+	// dimhotepus: 100 -> ENOTRECOVERABLE
+	_exit( ENOTRECOVERABLE );
 #endif
 }
 

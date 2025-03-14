@@ -167,7 +167,7 @@ void Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 
 void Plat_ExitProcess( int nCode )
 {
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	// We don't want global destructors in our process OR in any DLL to get executed.
 	// _exit() avoids calling global destructors in our module, but not in other DLLs.
 	const char *pchCmdLineA = Plat_GetCommandLineA();
@@ -176,9 +176,6 @@ void Plat_ExitProcess( int nCode )
 		int *x = NULL; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
 	}
 	TerminateProcess( GetCurrentProcess(), nCode );
-#elif defined(_PS3)
-	// We do not use this path to exit on PS3 (naturally), rather we want a clear crash:
-	int *x = NULL; *x = 1;
 #else	
 	_exit( nCode );
 #endif
@@ -187,11 +184,9 @@ void Plat_ExitProcess( int nCode )
 void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
 {
 	//try to delegate out if they have registered a callback
-	if( g_pfnExitProcessWithErrorCB )
-	{
-		if( g_pfnExitProcessWithErrorCB( nCode ) )
-			return;
-	}
+	const auto cb = g_pfnExitProcessWithErrorCB;
+	if( cb && cb( nCode ) )
+		return;
 
 	//handle default behavior
 	if( bGenerateMinidump )
