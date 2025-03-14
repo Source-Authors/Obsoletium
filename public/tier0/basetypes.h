@@ -48,7 +48,14 @@
 template <typename T>
 [[nodiscard]] constexpr inline T AlignValue( T val, uintptr_t alignment )
 {
-	return (T)( ( (uintptr_t)val + alignment - 1 ) & ~( alignment - 1 ) );
+	if constexpr (std::is_pointer_v<T>)
+	{
+		return reinterpret_cast<T>( ( reinterpret_cast<uintptr_t>(val) + alignment - 1 ) & ~( alignment - 1 ) );
+	}
+	else
+	{
+		return static_cast<T>( ( static_cast<uintptr_t>(val) + alignment - 1 ) & ~( alignment - 1 ) );
+	}
 }
 
 
