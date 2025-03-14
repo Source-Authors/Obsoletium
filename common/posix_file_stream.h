@@ -72,7 +72,7 @@ class posix_file_stream {
     // fscanf_s analog.
     int fields_assigned_count;
     va_list arg_list;
-    va_start(arg_list, format);
+    va_start(arg_list, format); //-V2019 //-V2018
 #ifdef _WIN32
     fields_assigned_count = vfscanf_s(fd_, format, arg_list);
 #else
@@ -174,7 +174,7 @@ class posix_file_stream {
     // fprintf_s analog.
     int bytes_written_count;
     va_list arg_list;
-    va_start(arg_list, format);
+    va_start(arg_list, format); //-V2019 //-V2018
 #ifdef _WIN32
     bytes_written_count = vfprintf_s(fd_, format, arg_list);
 #else
