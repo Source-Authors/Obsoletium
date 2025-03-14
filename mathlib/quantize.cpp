@@ -84,7 +84,7 @@ static int sortlong(void const *a, void const *b)
   
 #define NEXTSAMPLE(s) ( (Sample *) (((uint8 *) s)+current_ssize))
 // dimhotepus: Const-correct macro.
-#define NEXTSAMPLE_CONST(s) ( (const Sample *) (((uint8 *) s)+current_ssize))
+#define NEXTSAMPLE_CONST(s) ( (const Sample *) (((const uint8 *) s)+current_ssize))
 #define SAMPLE(s,i) NthSample(s,i,current_ndims)
 
 static void SetNDims(int n)
