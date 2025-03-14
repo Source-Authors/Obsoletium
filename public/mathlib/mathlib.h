@@ -171,7 +171,7 @@ enum
 	FRUSTUM_NUMPLANES	= 6
 };
 
-extern byte SignbitsForPlane( cplane_t *out );
+extern byte SignbitsForPlane( const cplane_t *out );
 
 class Frustum_t
 {

@@ -804,7 +804,7 @@ bool XM_CALLCONV IsDenormal( float val )
 }
 
 // dimhotepus: use byte as expected type is byte.
-byte SignbitsForPlane (cplane_t *out)
+byte SignbitsForPlane (const cplane_t *out)
 {
 	// for fast box on planeside test
 	byte bits = 0;
