@@ -253,7 +253,7 @@ void RemoveParametersOverrides(ICommandLine *command_line) {
 }
 
 #ifdef WIN32
-bool ApplyProcessPriorityClass(ICommandLine *command_line) {
+bool ApplyProcessPriorityClass(const ICommandLine *command_line) {
   // Make low priority?
   if (command_line->CheckParm("-low")) {
     return !!SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
