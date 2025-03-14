@@ -138,6 +138,8 @@ public:
 	void		PostTranslate(const Vector &vTrans);
 
 	const matrix3x4_t& As3x4() const;
+	// dimhotepus: Add non-const version as it is used.
+	matrix3x4_t& As3x4();
 	void		CopyFrom3x4( const matrix3x4_t &m3x4 );
 	void		Set3x4( matrix3x4_t& matrix3x4 ) const;
 
@@ -688,6 +690,13 @@ inline const matrix3x4_t& VMatrix::As3x4() const
 	static_assert(alignof(VMatrix) == alignof(matrix3x4_t));
 	static_assert(sizeof(VMatrix) >= sizeof(matrix3x4_t));
 	return *reinterpret_cast<const matrix3x4_t*>(this);
+}
+
+inline matrix3x4_t& VMatrix::As3x4()
+{
+	static_assert(alignof(VMatrix) == alignof(matrix3x4_t));
+	static_assert(sizeof(VMatrix) >= sizeof(matrix3x4_t));
+	return *reinterpret_cast<matrix3x4_t*>(this);
 }
 
 inline void VMatrix::CopyFrom3x4( const matrix3x4_t &m3x4 )
