@@ -3550,7 +3550,7 @@ int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, i
 	DrawSetTextPos( x, y );
 	DrawSetTextColor( r, g, b, a );
 
-	Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	V_vsprintf_safe(data, fmt, argptr);
 
 	DrawSetTextFont( font );
 
