@@ -14,6 +14,7 @@
 
 #include "inputsystem/InputEnums.h"
 #include "mathlib/mathlib.h"
+#include "tier0/commonmacros.h"
 
 //-----------------------------------------------------------------------------
 // Button enum. "Buttons" are binary-state input devices (mouse buttons, keyboard keys)
@@ -25,9 +26,9 @@ enum
 	JOYSTICK_AXIS_BUTTON_COUNT = MAX_JOYSTICK_AXES * 2,
 };
 
-#define JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_BUTTON + ((_joystick) * JOYSTICK_MAX_BUTTON_COUNT) + (_button) )
-#define JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_POV_BUTTON + ((_joystick) * JOYSTICK_POV_BUTTON_COUNT) + (_button) )
-#define JOYSTICK_AXIS_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_AXIS_BUTTON + ((_joystick) * JOYSTICK_AXIS_BUTTON_COUNT) + (_button) )
+#define JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) ( to_underlying(JOYSTICK_FIRST_BUTTON) + ((_joystick) * to_underlying(JOYSTICK_MAX_BUTTON_COUNT)) + (_button) )
+#define JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_POV_BUTTON + ((_joystick) * to_underlying(JOYSTICK_POV_BUTTON_COUNT)) + (_button) )
+#define JOYSTICK_AXIS_BUTTON_INTERNAL(_joystick, _button) ( JOYSTICK_FIRST_AXIS_BUTTON + ((_joystick) * to_underlying(JOYSTICK_AXIS_BUTTON_COUNT)) + (_button) )
 
 #define JOYSTICK_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) )
 #define JOYSTICK_POV_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) )
@@ -386,31 +387,31 @@ inline ButtonCode_t GetBaseButtonCode( ButtonCode_t code )
 {
 	if ( IsJoystickButtonCode( code ) )
 	{
-		int offset = ( code - JOYSTICK_FIRST_BUTTON ) % JOYSTICK_MAX_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_BUTTON) ) % to_underlying(JOYSTICK_MAX_BUTTON_COUNT);
 		return (ButtonCode_t)( JOYSTICK_FIRST_BUTTON + offset );
 	}
 
 	if ( IsJoystickPOVCode( code ) )
 	{
-		int offset = ( code - JOYSTICK_FIRST_POV_BUTTON ) % JOYSTICK_POV_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_POV_BUTTON) ) % to_underlying(JOYSTICK_POV_BUTTON_COUNT);
 		return (ButtonCode_t)( JOYSTICK_FIRST_POV_BUTTON + offset );
 	}
 
 	if ( IsJoystickAxisCode( code ) )
 	{
-		int offset = ( code - JOYSTICK_FIRST_AXIS_BUTTON ) % JOYSTICK_AXIS_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_AXIS_BUTTON) ) % to_underlying(JOYSTICK_AXIS_BUTTON_COUNT);
 		return (ButtonCode_t)( JOYSTICK_FIRST_AXIS_BUTTON + offset );
 	}
 
 	if ( IsSteamControllerButtonCode( code ) )
 	{
-		int offset = ( code - STEAMCONTROLLER_FIRST_BUTTON ) % STEAMCONTROLLER_MAX_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_BUTTON) ) % to_underlying(STEAMCONTROLLER_MAX_BUTTON_COUNT);
 		return ( ButtonCode_t )( STEAMCONTROLLER_FIRST_BUTTON + offset );
 	}
 
 	if ( IsSteamControllerAxisCode( code ) )
 	{
-		int offset = ( code - STEAMCONTROLLER_FIRST_AXIS_BUTTON ) % STEAMCONTROLLER_AXIS_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_AXIS_BUTTON) ) % to_underlying(STEAMCONTROLLER_AXIS_BUTTON_COUNT);
 		return ( ButtonCode_t )( STEAMCONTROLLER_FIRST_AXIS_BUTTON + offset );
 	}
 
@@ -424,27 +425,27 @@ inline int GetJoystickForCode( ButtonCode_t code )
 
 	if ( IsJoystickButtonCode( code ) )
 	{
-		int offset = ( code - JOYSTICK_FIRST_BUTTON ) / JOYSTICK_MAX_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_BUTTON) ) / to_underlying(JOYSTICK_MAX_BUTTON_COUNT);
 		return offset;
 	}
 	if ( IsJoystickPOVCode( code ) )
 	{
-		int offset = ( code - JOYSTICK_FIRST_POV_BUTTON ) / JOYSTICK_POV_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_POV_BUTTON) ) / to_underlying(JOYSTICK_POV_BUTTON_COUNT);
 		return offset;
 	}
 	if ( IsJoystickAxisCode( code ) )
 	{
-		int offset = ( code - JOYSTICK_FIRST_AXIS_BUTTON ) / JOYSTICK_AXIS_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_AXIS_BUTTON) ) / to_underlying(JOYSTICK_AXIS_BUTTON_COUNT);
 		return offset;
 	}
 	if ( IsSteamControllerButtonCode( code ) )
 	{
-		int offset = ( code - STEAMCONTROLLER_FIRST_BUTTON ) / STEAMCONTROLLER_MAX_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_BUTTON) ) / to_underlying(STEAMCONTROLLER_MAX_BUTTON_COUNT);
 		return offset;
 	}
 	if ( IsSteamControllerAxisCode( code ) )
 	{
-		int offset = ( code - STEAMCONTROLLER_FIRST_AXIS_BUTTON ) / STEAMCONTROLLER_AXIS_BUTTON_COUNT;
+		auto offset = ( to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_AXIS_BUTTON) ) / to_underlying(STEAMCONTROLLER_AXIS_BUTTON_COUNT);
 		return offset;
 	}
 
@@ -457,7 +458,7 @@ inline ButtonCode_t ButtonCodeToJoystickButtonCode( ButtonCode_t code, int nDesi
 		return code;
 
 	if ( IsJoystickCode( code ) && !IsSteamControllerCode( code ) )
-		nDesiredJoystick = clamp( nDesiredJoystick, 0, MAX_JOYSTICKS - 1 );
+		nDesiredJoystick = clamp( nDesiredJoystick, 0, to_underlying(MAX_JOYSTICKS) - 1 );
 	else
 		nDesiredJoystick = clamp( nDesiredJoystick, 0, MAX_STEAM_CONTROLLERS - 1 );
 
@@ -466,31 +467,31 @@ inline ButtonCode_t ButtonCodeToJoystickButtonCode( ButtonCode_t code, int nDesi
 	// Now upsample it
 	if ( IsJoystickButtonCode( code ) )
 	{
-		int nOffset = code - JOYSTICK_FIRST_BUTTON;
+		auto nOffset = to_underlying(code) - to_underlying(JOYSTICK_FIRST_BUTTON);
 		return JOYSTICK_BUTTON( nDesiredJoystick, nOffset );
 	}
 
 	if ( IsJoystickPOVCode( code ) )
 	{
-		int nOffset = code - JOYSTICK_FIRST_POV_BUTTON;
+		auto nOffset = to_underlying(code) - to_underlying(JOYSTICK_FIRST_POV_BUTTON);
 		return JOYSTICK_POV_BUTTON( nDesiredJoystick, nOffset );
 	}
 
 	if ( IsJoystickAxisCode( code ) )
 	{
-		int nOffset = code - JOYSTICK_FIRST_AXIS_BUTTON;
+		auto nOffset = to_underlying(code) - to_underlying(JOYSTICK_FIRST_AXIS_BUTTON);
 		return JOYSTICK_AXIS_BUTTON( nDesiredJoystick, nOffset );
 	}
 
 	if ( IsSteamControllerButtonCode( code ) )
 	{
-		int nOffset = code - STEAMCONTROLLER_FIRST_BUTTON;
+		auto nOffset = to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_BUTTON);
 		return STEAMCONTROLLER_BUTTON( nDesiredJoystick, nOffset );
 	}
 
 	if ( IsJoystickAxisCode( code ) )
 	{
-		int nOffset = code - STEAMCONTROLLER_FIRST_AXIS_BUTTON;
+		auto nOffset = to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_AXIS_BUTTON);
 		return STEAMCONTROLLER_AXIS_BUTTON( nDesiredJoystick, nOffset );
 	}
 
