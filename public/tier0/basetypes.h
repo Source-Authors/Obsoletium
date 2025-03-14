@@ -404,11 +404,11 @@ protected:
 	inline Type  operator^  ( Type  a, Type b ) { return static_cast<Type>( to_underlying( a ) ^ to_underlying( b ) ); } \
 	inline Type  operator<< ( Type  a, int  b ) { return static_cast<Type>( to_underlying( a ) << b ); } \
 	inline Type  operator>> ( Type  a, int  b ) { return static_cast<Type>( to_underlying( a ) >> b ); } \
-	inline Type &operator|= ( Type &a, Type b ) { return a = a |  b; } \
-	inline Type &operator&= ( Type &a, Type b ) { return a = a &  b; } \
-	inline Type &operator^= ( Type &a, Type b ) { return a = a ^  b; } \
-	inline Type &operator<<=( Type &a, int  b ) { return a = a << b; } \
-	inline Type &operator>>=( Type &a, int  b ) { return a = a >> b; } \
+	inline Type &operator|= ( Type &a, Type b ) { return a = static_cast<Type>( to_underlying( a ) |  to_underlying( b ) ); } \
+	inline Type &operator&= ( Type &a, Type b ) { return a = static_cast<Type>( to_underlying( a ) &  to_underlying( b ) ); } \
+	inline Type &operator^= ( Type &a, Type b ) { return a = static_cast<Type>( to_underlying( a ) ^  to_underlying( b ) ); } \
+	inline Type &operator<<=( Type &a, int  b ) { return a = static_cast<Type>( to_underlying( a ) << b ); } \
+	inline Type &operator>>=( Type &a, int  b ) { return a = static_cast<Type>( to_underlying( a ) >> b ); } \
 	inline Type  operator~( Type a ) { return static_cast<Type>( ~to_underlying( a ) ); }
 
 // defines increment/decrement operators for enums for easy iteration
