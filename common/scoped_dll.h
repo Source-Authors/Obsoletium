@@ -87,14 +87,14 @@ class ScopedDll {
     if (dll_) {
 #ifdef _WIN32
       // Force exit when unload failure.
-      if (!::FreeLibrary(dll_)) exit(static_cast<int>(::GetLastError()));
+      if (!::FreeLibrary(dll_)) exit(static_cast<int>(::GetLastError())); //-V2014
 #else
       // Force exit when unload failure.
       if (::dlclose(dll_)) {
         fprintf(stderr, "Failed to close the %s: %s.\n", dll_path_,
                 ::dlerror());
         // dimhotepus: 1 -> EOTHER.
-        exit(EOTHER);
+        exit(EOTHER); //-V2014
       }
 #endif
     }
