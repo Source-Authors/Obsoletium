@@ -97,7 +97,7 @@ FORCEINLINE fltx4 QuaternionNormalizeSIMD( const fltx4 &q )
 //---------------------------------------------------------------------
 FORCEINLINE fltx4 QuaternionBlendNoAlignSIMD( const fltx4 &p, const fltx4 &q, float t )
 {
-	fltx4 sclq = DirectX::XMVectorReplicate( t );
+	fltx4 sclq = DirectX::XMVectorReplicate( t ); //-V2002
 	fltx4 sclp = DirectX::XMVectorSubtract( Four_Ones, sclq );
 	fltx4 result = DirectX::XMVectorMultiply( sclp, p );
 	result = DirectX::XMVectorMultiplyAdd( sclq, q, result );
@@ -270,7 +270,7 @@ FORCEINLINE fltx4 QuaternionSlerpNoAlignSIMD( const fltx4 &p, const fltx4 &q, fl
 
 	// 0.0 returns p, 1.0 return q.
 	fltx4 result = DirectX::XMVector4Dot( p, q );
-	float cosom = DirectX::XMVectorGetX( result );
+	float cosom = DirectX::XMVectorGetX( result ); //-V2002
 
 	if ( cosom > -0.099999f )
 	{

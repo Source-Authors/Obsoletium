@@ -471,12 +471,12 @@ static void SetupMatrixAnglesInternal( vec_t (&m)[4][4], const QAngle & vAngles 
 	DirectX::XMVECTOR radians = DirectX::XMVectorMultiply
 	(
 		DirectX::XMLoadFloat3( vAngles.XmBase() ),
-		DirectX::XMVectorReplicate( M_PI_F / 180.f )
+		DirectX::XMVectorReplicate( M_PI_F / 180.f ) //-V2002
 	);
 	DirectX::XMVectorSinCos( &sine, &cosine, radians );
 
-	float sp = DirectX::XMVectorGetX( sine ),   sy = DirectX::XMVectorGetY( sine ),   sr = DirectX::XMVectorGetZ( sine );
-	float cp = DirectX::XMVectorGetX( cosine ), cy = DirectX::XMVectorGetY( cosine ), cr = DirectX::XMVectorGetZ( cosine );
+	float sp = DirectX::XMVectorGetX( sine ),   sy = DirectX::XMVectorGetY( sine ),   sr = DirectX::XMVectorGetZ( sine ); //-V2002
+	float cp = DirectX::XMVectorGetX( cosine ), cy = DirectX::XMVectorGetY( cosine ), cr = DirectX::XMVectorGetZ( cosine ); //-V2002
 
 	// matrix = (YAW * PITCH) * ROLL
 	m[0][0] = cp*cy;
@@ -710,15 +710,15 @@ void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 		dst.XmBase(),
 		DirectX::XMVectorSet
 		(
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
 			),
@@ -734,7 +734,7 @@ void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 //-----------------------------------------------------------------------------
 void Vector3DMultiplyPositionProjective( const VMatrix& src1, const Vector &src2, Vector& dst )
 {
-	DirectX::XMVECTOR vsrc2 = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( src2.XmBase() ), 1.0f );
+	DirectX::XMVECTOR vsrc2 = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( src2.XmBase() ), 1.0f ); //-V2002
 	DirectX::XMVECTOR vwden = DirectX::XMVectorSum
 	(
 		DirectX::XMVectorMultiply
@@ -751,15 +751,15 @@ void Vector3DMultiplyPositionProjective( const VMatrix& src1, const Vector &src2
 
 	DirectX::XMVECTOR vdest = DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
 		),

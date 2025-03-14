@@ -189,9 +189,9 @@ static DirectX::XMVECTOR XM_CALLCONV VectorTransform( DirectX::FXMVECTOR vin1, c
 	DirectX::XMVECTOR vin2 = DirectX::XMVectorSet( in2[0][3], in2[1][3], in2[2][3], 0.0f );
 	DirectX::XMVECTOR vdot = DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ), //-V2002
 		0.0f
 	);
 
@@ -232,21 +232,21 @@ static DirectX::XMVECTOR XM_CALLCONV VectorITransform( DirectX::FXMVECTOR vin1, 
 
 	return DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
 				DirectX::XMVectorMultiply( vin1t, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0f ) )
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
 				DirectX::XMVectorMultiply( vin1t, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0f ) )
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
@@ -278,9 +278,9 @@ static DirectX::XMVECTOR XM_CALLCONV VectorRotate( DirectX::XMVECTOR vin1, const
 {
 	return DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ), //-V2002
 		0.0f
 	);
 }
@@ -372,7 +372,7 @@ void XM_CALLCONV MatrixCopy( const matrix3x4_t& in, matrix3x4_t& out )
 //-----------------------------------------------------------------------------
 bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance )
 {
-	DirectX::XMVECTOR vtol = DirectX::XMVectorReplicate( flTolerance );
+	DirectX::XMVECTOR vtol = DirectX::XMVectorReplicate( flTolerance ); //-V2002
 
 	for ( int i = 0; i < 3; ++i )
 	{
@@ -1053,7 +1053,7 @@ int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *p )
 		break;
 	}
 
-	DirectX::XMVECTOR planeDist = DirectX::XMVectorReplicate( p->dist );
+	DirectX::XMVECTOR planeDist = DirectX::XMVectorReplicate( p->dist ); //-V2002
 
 	int sides = 0;
 
@@ -1744,7 +1744,7 @@ void XM_CALLCONV QuaternionIdentityBlend( const Quaternion &p, float t, Quaterni
 		t = -t;
 	}
 
-	result = DirectX::XMVectorSetW( result, DirectX::XMVectorGetW( result ) + t );
+	result = DirectX::XMVectorSetW( result, DirectX::XMVectorGetW( result ) + t ); //-V2002
 
 	DirectX::XMStoreFloat4( qt.XmBase(), QuaternionNormalizeSIMD( result ) );
 }
@@ -1860,7 +1860,7 @@ float XM_CALLCONV QuaternionNormalize( Quaternion &q )
 
 	DirectX::XMStoreFloat4( q.XmBase(), normalized );
 
-	return DirectX::XMVectorGetX( DirectX::XMQuaternionLength( qsimd ) );
+	return DirectX::XMVectorGetX( DirectX::XMQuaternionLength( qsimd ) ); //-V2002
 }
 
 // dimhotepus: QuaternionNormalize without length.
@@ -1934,7 +1934,7 @@ float XM_CALLCONV QuaternionDotProduct( const Quaternion &p, const Quaternion &q
 	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
-	return DirectX::XMVectorGetX( DirectX::XMQuaternionDot( psimd, qsimd ) );
+	return DirectX::XMVectorGetX( DirectX::XMQuaternionDot( psimd, qsimd ) ); //-V2002
 }
 
 
@@ -3021,7 +3021,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Ve
 	DirectX::XMVECTOR newCenter  = VectorIRotate( oldCenter, transform );
 	DirectX::XMVECTOR newExtents = DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
@@ -3035,7 +3035,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Ve
 				)
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
@@ -3049,7 +3049,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Ve
 				)
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
