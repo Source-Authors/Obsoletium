@@ -395,6 +395,10 @@ typedef void * HINSTANCE;
 	#define RESTRICT __restrict
 	#define RESTRICT_FUNC __declspec(restrict)
 	#define FMTFUNCTION( a, b )
+
+	// dimhotepus: Allow compiler optimize allocated pointer access.
+	#define ALLOC_CALL RESTRICT_FUNC __declspec(allocator)
+	#define FREE_CALL
 #elif defined(GNUC)
 	#define SELECTANY __attribute__((weak))
 	#if defined(LINUX) && !defined(DEDICATED)
@@ -406,11 +410,19 @@ typedef void * HINSTANCE;
 	// squirrel.h does a #define printf DevMsg which leads to warnings when we try
 	// to use printf as the prototype format function. Using __printf__ instead.
 	#define FMTFUNCTION( fmtargnumber, firstvarargnumber ) __attribute__ (( format( __printf__, fmtargnumber, firstvarargnumber )))
+
+	// dimhotepus: Allow compiler optimize allocated pointer access.
+	#define ALLOC_CALL
+	#define FREE_CALL
 #else
 	#define SELECTANY static
 	#define RESTRICT
 	#define RESTRICT_FUNC
 	#define FMTFUNCTION( a, b )
+
+	// dimhotepus: Allow compiler optimize allocated pointer access.
+	#define ALLOC_CALL
+	#define FREE_CALL
 #endif
 
 #if defined( _WIN32 )
@@ -854,7 +866,7 @@ PLATFORM_INTERFACE bool				Plat_IsInBenchmarkMode();
 
 
 PLATFORM_INTERFACE double			Plat_FloatTime();		// Returns time in seconds since the module was loaded.
-PLATFORM_INTERFACE [[deprecated("Overlows in 49.7 days.")]] uint32			Plat_MSTime();			// Time in milliseconds.
+PLATFORM_INTERFACE uint32			Plat_MSTime();			// Time in milliseconds.
 PLATFORM_INTERFACE uint64			Plat_USTime();			// Time in microseconds.
 PLATFORM_INTERFACE char *			Plat_ctime( const time_t *timep, char *buf, size_t bufsize );
 PLATFORM_INTERFACE void				Plat_GetModuleFilename( char *pOut, int nMaxBytes );

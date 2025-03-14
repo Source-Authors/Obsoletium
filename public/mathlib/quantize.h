@@ -72,7 +72,7 @@ inline Sample *NthSample(Sample *s, int i, int nd)
 	return (Sample *) r;
 }
 
-inline Sample *AllocSamples(int ns, int nd)
+ALLOC_CALL inline Sample *AllocSamples(int ns, int nd)
 {
 	size_t size5=(sizeof(Sample)+(nd-1))*ns;
 	void *ret=new uint8[size5];
