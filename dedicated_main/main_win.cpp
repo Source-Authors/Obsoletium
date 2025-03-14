@@ -193,7 +193,6 @@ template <size_t buffer_size>
 #endif
 
   {
-    constexpr char kConsoleArgName[]{"-console"};
     // Console mode, no NTUser/GDI calls allowed.
     if (is_console_mode) {
       PROCESS_MITIGATION_SYSTEM_CALL_DISABLE_POLICY policy = {};
@@ -241,6 +240,8 @@ bool IsConsoleMode(const char *command_line) {
   constexpr char kConsoleArgName[]{"-console"};
 
   const char *console_arg{strstr(command_line, kConsoleArgName)};
+  if (!console_arg) return false;
+
   const char *next_arg{console_arg + std::size(kConsoleArgName) - 1};
 
   return isspace(*next_arg) != 0;
@@ -337,5 +338,5 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       dedicated_main(instance, old_instance, cmd_line, window_flags);
 
   // Prevent tail call optimization and incorrect stack traces.
-  exit(rc);
+  exit(rc); //-V2014
 }
