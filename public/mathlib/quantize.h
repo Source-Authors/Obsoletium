@@ -101,23 +101,7 @@ void OptimizeQuantizer(struct QuantizedValue *q, int ndims);
 
 void RecalculateValues(struct QuantizedValue *q, int ndims);
 
-extern double SquaredError;	// may be reset and examined. updated by
-															// FindMatch()
-
-
-
-
-// the routines below can be used for uniform quantization via dart-throwing.
-typedef void (*GENERATOR)(void *);    // generate a random sample
-typedef double (*COMPARER)(void const *a, void const *b);
-
-void *DartThrow(int NResults, int NTries, size_t itemsize, GENERATOR gen,
-				COMPARER cmp);
-void *FindClosestDart(void *items,int NResults, size_t itemsize,
-					  COMPARER cmp, void *lookfor, int *idx);
-
-
-
+extern double SquaredError;	// may be reset and examined. updated by FindMatch()
 
 // color quantization of 24 bit images
 #define QUANTFLAGS_NODITHER 1	// don't do Floyd-steinberg dither
@@ -131,9 +115,5 @@ int			nColors,			// # of colors to fill in in palette
 uint8		*pOutPixels,		// where to store resulting 8 bit pixels
 uint8		*pOutPalette,		// where to store resulting 768-byte palette
 int			nFirstColor);		// first color to use in mapping
-
-
-
-
 
 #endif
