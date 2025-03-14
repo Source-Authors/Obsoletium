@@ -213,7 +213,7 @@ void OutputRowRGBA8888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned cha
 {
 	for( int i = 0; i < header.width; ++i, pDst += 4 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[0] = pSrc[0];
 		pDst[1] = pSrc[1];
 		pDst[2] = pSrc[2];
@@ -226,7 +226,7 @@ void OutputRowABGR8888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned cha
 {
 	for( int i = 0; i < header.width; ++i, pDst += 4 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[3] = pSrc[0];
 		pDst[2] = pSrc[1];
 		pDst[1] = pSrc[2];
@@ -239,7 +239,7 @@ void OutputRowRGB888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char*
 {
 	for( int i = 0; i < header.width; ++i, pDst += 3 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[0] = pSrc[0];
 		pDst[1] = pSrc[1];
 		pDst[2] = pSrc[2];
@@ -251,7 +251,7 @@ void OutputRowBGR888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char*
 {
 	for( int i = 0; i < header.width; ++i, pDst += 3 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[2] = pSrc[0];
 		pDst[1] = pSrc[1];
 		pDst[0] = pSrc[2];
@@ -263,7 +263,7 @@ void OutputRowI8( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char* pDs
 {
 	for( int i = 0; i < header.width; ++i, ++pDst )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 
 		if( ( pSrc[0] == pSrc[1] ) && ( pSrc[1] == pSrc[2] ) )
 		{
@@ -282,7 +282,7 @@ void OutputRowIA88( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char* p
 {
 	for( int i = 0; i < header.width; ++i, pDst += 2 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 
 		if( ( pSrc[0] == pSrc[1] ) && ( pSrc[1] == pSrc[2] ) )
 		{
@@ -302,7 +302,7 @@ void OutputRowA8( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char* pDs
 {
 	for( int i = 0; i < header.width; ++i, ++pDst )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[0] = pSrc[3];
 		buf.SeekGet( CUtlBuffer::SEEK_CURRENT, 4 );
 	}
@@ -312,7 +312,7 @@ void OutputRowRGB888BlueScreen( CUtlBuffer& buf, TGAHeader_t const& header, unsi
 {
 	for( int i = 0; i < header.width; ++i, pDst += 3 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[0] = (unsigned char)(( ( int )pSrc[0] * ( int )pSrc[3] ) >> 8);
 		pDst[1] = (unsigned char)(( ( int )pSrc[1] * ( int )pSrc[3] ) >> 8);
 		pDst[2] = (( ( ( ( int )pSrc[2] * ( int )pSrc[3] ) ) >> 8 ) + ( 255 - pSrc[3] ));
@@ -324,7 +324,7 @@ void OutputRowBGR888BlueScreen( CUtlBuffer& buf, TGAHeader_t const& header, unsi
 {
 	for( int i = 0; i < header.width; ++i, pDst += 3 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[2] = (unsigned char)(( ( int )pSrc[0] * ( int )pSrc[3] ) >> 8);
 		pDst[1] = (unsigned char)(( ( int )pSrc[1] * ( int )pSrc[3] ) >> 8);
 		pDst[0] = (unsigned char)(( ( ( ( int )pSrc[2] * ( int )pSrc[3] ) ) >> 8 ) + ( 255 - pSrc[3] ));
@@ -336,7 +336,7 @@ void OutputRowARGB8888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned cha
 {
 	for( int i = 0; i < header.width; ++i, pDst += 4 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[0] = pSrc[3];
 		pDst[1] = pSrc[0];
 		pDst[2] = pSrc[1];
@@ -349,7 +349,7 @@ void OutputRowBGRA8888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned cha
 {
 	for( int i = 0; i < header.width; ++i, pDst += 4 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		pDst[0] = pSrc[2];
 		pDst[1] = pSrc[1];
 		pDst[2] = pSrc[0];
@@ -362,7 +362,7 @@ void OutputRowBGRX8888( CUtlBuffer& buf, TGAHeader_t const& header, unsigned cha
 {
 	for( int i = 0; i < header.width; ++i, pDst += 4 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (unsigned char*)buf.PeekGet();
 		pDst[0] = pSrc[2];
 		pDst[1] = pSrc[1];
 		pDst[2] = pSrc[0];
@@ -375,7 +375,7 @@ void OutputRowBGR565( CUtlBuffer& buf, TGAHeader_t const& header, unsigned char*
 {
 	for( int i = 0; i < header.width; ++i, pDst += 2 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		unsigned short rgba = (pSrc[2] & 0x1F) | ((pSrc[1] & 0x3F) << 5) | 
 			((pSrc[0] & 0x1F) << 11);
 
@@ -389,7 +389,7 @@ void OutputRowBGRX5551( CUtlBuffer& buf, TGAHeader_t const& header, unsigned cha
 {
 	for( int i = 0; i < header.width; ++i, pDst += 2 )
 	{
-		unsigned char* pSrc = (unsigned char*)buf.PeekGet();
+		const unsigned char* pSrc = (const unsigned char*)buf.PeekGet();
 		unsigned short rgba = (pSrc[2] & 0x1F) | ((pSrc[1] & 0x1F) << 5) | 
 			((pSrc[0] & 0x1F) << 10) | 0x8000;
 
