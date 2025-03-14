@@ -1675,21 +1675,21 @@ void XM_CALLCONV QuaternionAlign( const Quaternion &p, const Quaternion &q, Quat
 	// decide if one of the quaternions is backwards
 	float a = 0;
 	float b = 0;
-	for (i = 0; i < 4; i++) 
+	for (i = 0; i < 4; i++)  //-V112
 	{
 		a += (p[i]-q[i])*(p[i]-q[i]);
 		b += (p[i]+q[i])*(p[i]+q[i]);
 	}
 	if (a > b) 
 	{
-		for (i = 0; i < 4; i++) 
+		for (i = 0; i < 4; i++)  //-V112
 		{
 			qt[i] = -q[i];
 		}
 	}
 	else if (&qt != &q)
 	{
-		for (i = 0; i < 4; i++) 
+		for (i = 0; i < 4; i++)  //-V112
 		{
 			qt[i] = q[i];
 		}
@@ -3633,7 +3633,7 @@ int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dis
 	VectorSubtract (outVerts[3], vup, outVerts[3]);	// down
 
 	// The four corners form a planar quadrilateral normal to "normal"
-	return 4;
+	return 4; //-V112
 }
 
 //-----------------------------------------------------------------------------

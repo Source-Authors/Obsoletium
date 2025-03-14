@@ -407,14 +407,14 @@ public:
 	{
 		Assert( (i >= 0) && (i < 3) );
 		static_assert(alignof(TableVector) == alignof(vec_t));
-		return reinterpret_cast<vec_t*>(this)[i];
+		return reinterpret_cast<vec_t*>(this)[i]; //-V108
 	}
 
 	inline vec_t XM_CALLCONV operator[](int i) const //-V302
 	{
 		Assert( (i >= 0) && (i < 3) );
 		static_assert(alignof(TableVector) == alignof(vec_t));
-		return reinterpret_cast<const vec_t*>(this)[i];
+		return reinterpret_cast<const vec_t*>(this)[i]; //-V108
 	}
 
 	// dimhotepus: Better DirectX math integration.
@@ -657,14 +657,14 @@ inline vec_t& Vector::operator[](int i)
 {
 	Assert( (i >= 0) && (i < 3) );
 	static_assert(alignof(Vector) == alignof(vec_t));
-	return reinterpret_cast<vec_t*>(this)[i];
+	return reinterpret_cast<vec_t*>(this)[i]; //-V108
 }
 
 inline vec_t Vector::operator[](int i) const
 {
 	Assert( (i >= 0) && (i < 3) );
 	static_assert(alignof(Vector) == alignof(vec_t));
-	return reinterpret_cast<const vec_t*>(this)[i];
+	return reinterpret_cast<const vec_t*>(this)[i]; //-V108
 }
 
 
@@ -890,7 +890,7 @@ inline short ShortVector::operator[](int i) const
 	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(ShortVector) >= alignof(short) &&
 		alignof(ShortVector) % alignof(short) >= 0);
-	return reinterpret_cast<const short*>(this)[i];
+	return reinterpret_cast<const short*>(this)[i]; //-V108
 }
 
 inline short& ShortVector::operator[](int i)
@@ -898,7 +898,7 @@ inline short& ShortVector::operator[](int i)
 	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(ShortVector) >= alignof(short) &&
 		alignof(ShortVector) % alignof(short) >= 0);
-	return reinterpret_cast<short*>(this)[i];
+	return reinterpret_cast<short*>(this)[i]; //-V108
 }
 
 //-----------------------------------------------------------------------------
@@ -1047,14 +1047,14 @@ inline int IntVector4D::operator[](int i) const
 {
 	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(IntVector4D) == alignof(int));
-	return reinterpret_cast<const int *>(this)[i];
+	return reinterpret_cast<const int *>(this)[i]; //-V108
 }
 
 inline int& IntVector4D::operator[](int i)
 {
 	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(IntVector4D) == alignof(int));
-	return reinterpret_cast<int*>(this)[i];
+	return reinterpret_cast<int*>(this)[i]; //-V108
 }
 
 //-----------------------------------------------------------------------------
@@ -1831,14 +1831,14 @@ inline vec_t& Quaternion::operator[](int i)
 {
 	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(Quaternion) == alignof(vec_t));
-	return reinterpret_cast<vec_t*>(this)[i];
+	return reinterpret_cast<vec_t*>(this)[i]; //-V108
 }
 
 inline vec_t Quaternion::operator[](int i) const
 {
 	Assert( (i >= 0) && (i < 4) ); //-V112
 	static_assert(alignof(Quaternion) == alignof(vec_t));
-	return reinterpret_cast<const vec_t*>(this)[i];
+	return reinterpret_cast<const vec_t*>(this)[i]; //-V108
 }
 
 
@@ -2041,14 +2041,14 @@ inline vec_t& RadianEuler::operator[](int i)
 {
 	Assert( (i >= 0) && (i < 3) );
 	static_assert(alignof(RadianEuler) == alignof(vec_t));
-	return reinterpret_cast<vec_t*>(this)[i];
+	return reinterpret_cast<vec_t*>(this)[i]; //-V108
 }
 
 inline vec_t RadianEuler::operator[](int i) const
 {
 	Assert( (i >= 0) && (i < 3) );
 	static_assert(alignof(RadianEuler) == alignof(vec_t));
-	return reinterpret_cast<const vec_t*>(this)[i];
+	return reinterpret_cast<const vec_t*>(this)[i]; //-V108
 }
 
 
@@ -2315,14 +2315,14 @@ inline vec_t& QAngle::operator[](int i)
 {
 	Assert( (i >= 0) && (i < 3) );
 	static_assert(alignof(QAngle) == alignof(vec_t));
-	return reinterpret_cast<vec_t*>(this)[i];
+	return reinterpret_cast<vec_t*>(this)[i]; //-V108
 }
 
 inline vec_t QAngle::operator[](int i) const
 {
 	Assert( (i >= 0) && (i < 3) );
 	static_assert(alignof(QAngle) == alignof(vec_t));
-	return reinterpret_cast<const vec_t*>(this)[i];
+	return reinterpret_cast<const vec_t*>(this)[i]; //-V108
 }
 
 

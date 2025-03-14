@@ -1704,13 +1704,13 @@ public:
 	}
 
 	[[nodiscard]]
-	FORCEINLINE fltx4 const & XM_CALLCONV operator[](int idx) const
+	FORCEINLINE fltx4 const & XM_CALLCONV operator[](int idx) const //-V302
 	{
 		return *((&x)+idx);
 	}
 	
 	[[nodiscard]]
-	FORCEINLINE fltx4 & XM_CALLCONV operator[](int idx)
+	FORCEINLINE fltx4 & XM_CALLCONV operator[](int idx) //-V302
 	{
 		return *((&x)+idx);
 	}

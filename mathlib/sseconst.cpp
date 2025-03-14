@@ -28,24 +28,24 @@ const fltx4 Four_FLT_MAX={FLT_MAX,FLT_MAX,FLT_MAX,FLT_MAX};
 const fltx4 Four_Negative_FLT_MAX={-FLT_MAX,-FLT_MAX,-FLT_MAX,-FLT_MAX};
 const fltx4 g_SIMD_0123 = { 0., 1., 2., 3. };
 
-alignas(16) const uint32 g_SIMD_clear_signmask[4] = {0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff};
-alignas(16) const uint32 g_SIMD_signmask[4] = { 0x80000000, 0x80000000, 0x80000000, 0x80000000 };
+alignas(16) const uint32 g_SIMD_clear_signmask[4] = {0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff}; //-V112
+alignas(16) const uint32 g_SIMD_signmask[4] = { 0x80000000, 0x80000000, 0x80000000, 0x80000000 }; //-V112
 alignas(16) const uint32 g_SIMD_lsbmask[4] = { 0xfffffffe, 0xfffffffe, 0xfffffffe, 0xfffffffe };
-alignas(16) const uint32 g_SIMD_clear_wmask[4] = { 0xffffffff, 0xffffffff, 0xffffffff, 0 };
-alignas(16) const uint32 g_SIMD_AllOnesMask[4] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }; // ~0,~0,~0,~0
+alignas(16) const uint32 g_SIMD_clear_wmask[4] = { 0xffffffff, 0xffffffff, 0xffffffff, 0 }; //-V112
+alignas(16) const uint32 g_SIMD_AllOnesMask[4] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }; // ~0,~0,~0,~0 //-V112
 alignas(16) const uint32 g_SIMD_Low16BitsMask[4] = { 0xffff, 0xffff, 0xffff, 0xffff }; // 0xffff x 4
 
 alignas(16) const uint32 g_SIMD_ComponentMask[4][4] =
 {
-	{ 0xFFFFFFFF, 0, 0, 0 }, { 0, 0xFFFFFFFF, 0, 0 }, { 0, 0, 0xFFFFFFFF, 0 }, { 0, 0, 0, 0xFFFFFFFF }
+	{ 0xFFFFFFFF, 0, 0, 0 }, { 0, 0xFFFFFFFF, 0, 0 }, { 0, 0, 0xFFFFFFFF, 0 }, { 0, 0, 0, 0xFFFFFFFF } //-V112
 };
 
 alignas(16) const uint32 g_SIMD_SkipTailMask[4][4] =
 {
-	{ 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff },
-	{ 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },
-	{ 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },
-	{ 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },
+	{ 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff }, //-V112
+	{ 0xffffffff, 0x00000000, 0x00000000, 0x00000000 }, //-V112
+	{ 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 }, //-V112
+	{ 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 }, //-V112
 };
 
 

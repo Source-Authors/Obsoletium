@@ -235,12 +235,12 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 	// I = identity
 
 	// Setup AI
-	for(i=0; i < 4; i++)
+	for(i=0; i < 4; i++) //-V112
 	{
 		const vec_t *pIn = src[i];
 		pOut = mat[i];
 
-		for(j=0; j < 4; j++)
+		for(j=0; j < 4; j++) //-V112
 		{
 			pOut[j] = pIn[j];
 		}
@@ -259,12 +259,12 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 	// 2. Add a multiple of one row to another.
 	// 3. Interchange two rows.
 
-	for(iRow=0; iRow < 4; iRow++)
+	for(iRow=0; iRow < 4; iRow++) //-V112
 	{
 		// Find the row with the largest element in this column.
 		fLargest = 0.00001f;
 		iLargest = -1;
-		for(iTest=iRow; iTest < 4; iTest++)
+		for(iTest=iRow; iTest < 4; iTest++) //-V112
 		{
 			fTest = (vec_t)FloatMakePositive(mat[rowMap[iTest]][iRow]);
 			if(fTest > fLargest)
@@ -295,7 +295,7 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 		pRow[iRow] = 1.0f; // Preserve accuracy...
 		
 		// Eliminate this element from the other rows using operation 2.
-		for(i=0; i < 4; i++)
+		for(i=0; i < 4; i++) //-V112
 		{
 			if(i == iRow)
 				continue;
@@ -314,12 +314,12 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 	}
 
 	// The inverse is on the right side of AX now (the identity is on the left).
-	for(i=0; i < 4; i++)
+	for(i=0; i < 4; i++) //-V112
 	{
 		const vec_t *pIn = mat[rowMap[i]] + 4;
 		pOut = dst.m[i];
 
-		for(j=0; j < 4; j++)
+		for(j=0; j < 4; j++) //-V112
 		{
 			pOut[j] = pIn[j];
 		}
