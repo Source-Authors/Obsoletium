@@ -1267,14 +1267,14 @@ public:
 	{
 		m_pch = nullptr;
 		m_pwch = pwch;
-#if !defined( WIN32 ) && !defined(_WIN32)
+#if !defined(_WIN32)
 		m_pucs2 = nullptr;
 		m_bCreatedUCS2 = false;
 #endif
 		m_bCreatedUTF16 = true;
 	}
 
-#if !defined(WIN32) && !defined(_WINDOWS) && !defined(_WIN32)
+#if !defined(_WIN32)
 	explicit CStrAutoEncode( const ucs2 *pwch )
 	{
 		m_pch = nullptr;
@@ -1394,7 +1394,7 @@ private:
 		}
 	}
 
-#if !defined( WIN32 ) && !defined(_WIN32)
+#if !defined(_WIN32)
 	// ensure we have done any conversion work required to farm out a
 	// UTF-16 encoded string.
 	//
@@ -1433,7 +1433,7 @@ private:
 	// with is the pointer we've allocated and must free.
 	const char *m_pch;
 	const wchar_t *m_pwch;
-#if !defined( WIN32 ) && !defined(_WIN32)
+#if !defined(_WIN32)
 	const ucs2 *m_pucs2;
 	bool m_bCreatedUCS2;
 #endif
