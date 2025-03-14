@@ -353,7 +353,7 @@ void *AppSystemCreateInterfaceFn(const char *pName, int *pReturnCode)
 	void *pInterface = s_pCurrentAppSystem->FindSystem( pName );
 	if ( pReturnCode )
 	{
-		*pReturnCode = pInterface ? IFACE_OK : IFACE_FAILED;
+		*pReturnCode = pInterface ? to_underlying(IFACE_OK) : to_underlying(IFACE_FAILED);
 	}
 	return pInterface;
 }
@@ -448,7 +448,7 @@ int CAppSystemGroup::OnStartup()
 		return -1;
 	}
 
-	return nRetVal;
+	return to_underlying(nRetVal);
 }
 
 void CAppSystemGroup::OnShutdown()
