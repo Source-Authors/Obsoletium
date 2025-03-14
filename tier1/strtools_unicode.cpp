@@ -415,9 +415,39 @@ char *Q_UnicodeAdvance( IN_Z char *pUTF8, intp nChars )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Advance a UTF-8 string pointer by a certain number of Unicode code points, stopping at end of string
+//-----------------------------------------------------------------------------
+const char *Q_UnicodeAdvance( IN_Z const char *pUTF8, intp nChars )
+{
+	while ( nChars > 0 && *pUTF8 )
+	{
+		uchar32 uVal;
+		bool bError;
+		pUTF8 += Q_UTF8ToUChar32( pUTF8, uVal, bError );
+		--nChars;
+	}
+	return pUTF8;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Advance a UTF-16 string pointer by a certain number of Unicode code points, stopping at end of string
 //-----------------------------------------------------------------------------
 uchar16 *Q_UnicodeAdvance( IN_Z uchar16 *pUTF16, intp nChars )
+{
+	while ( nChars > 0 && *pUTF16 )
+	{
+		uchar32 uVal;
+		bool bError;
+		pUTF16 += Q_UTF16ToUChar32( pUTF16, uVal, bError );
+		--nChars;
+	}
+	return pUTF16;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Advance a UTF-16 string pointer by a certain number of Unicode code points, stopping at end of string
+//-----------------------------------------------------------------------------
+const uchar16 *Q_UnicodeAdvance( IN_Z const uchar16 *pUTF16, intp nChars )
 {
 	while ( nChars > 0 && *pUTF16 )
 	{
@@ -433,6 +463,19 @@ uchar16 *Q_UnicodeAdvance( IN_Z uchar16 *pUTF16, intp nChars )
 // Purpose: Advance a UTF-32 string pointer by a certain number of Unicode code points, stopping at end of string
 //-----------------------------------------------------------------------------
 uchar32 *Q_UnicodeAdvance( uchar32 *pUTF32, intp nChars )
+{
+	while ( nChars > 0 && *pUTF32 )
+	{
+		++pUTF32;
+		--nChars;
+	}
+	return pUTF32;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Advance a UTF-32 string pointer by a certain number of Unicode code points, stopping at end of string
+//-----------------------------------------------------------------------------
+const uchar32 *Q_UnicodeAdvance( const uchar32 *pUTF32, intp nChars )
 {
 	while ( nChars > 0 && *pUTF32 )
 	{

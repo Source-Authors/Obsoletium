@@ -369,7 +369,7 @@ void V_strcpy_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], IN_Z const char *p
 {
 	const intp nLen = V_strlen( pSrc );
 	char *pResult = new char [ nLen+1 ];
-	if (pResult)
+	if (pResult) //-V668
 		V_memcpy( pResult, pSrc, nLen+1 );
 	return pResult;
 }
@@ -379,7 +379,7 @@ void V_strcpy_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], IN_Z const char *p
 {
 	const intp nLen = V_wcslen( pSrc );
 	wchar_t *pResult = new wchar_t [ nLen+1 ];
-	if (pResult)
+	if (pResult) //-V668
 		V_memcpy( pResult, pSrc, (nLen+1) * static_cast<intp>(sizeof(wchar_t)) );
 	return pResult;
 }
@@ -476,9 +476,9 @@ intp Q_UnicodeRepair( uchar32 *pUTF32, EStringConvertErrorPolicy ePolicy = STRIN
 [[nodiscard]] char *Q_UnicodeAdvance( IN_Z char *pUTF8, intp nCharacters);
 [[nodiscard]] uchar16 *Q_UnicodeAdvance( IN_Z uchar16 *pUTF16, intp nCharactersnCharacters );
 [[nodiscard]] uchar32 *Q_UnicodeAdvance( uchar32 *pUTF32, intp nChars );
-inline [[nodiscard]] const char *Q_UnicodeAdvance( IN_Z const char *pUTF8, intp nCharacters ) { return Q_UnicodeAdvance( (char*) pUTF8, nCharacters ); }
-inline [[nodiscard]] const uchar16 *Q_UnicodeAdvance( IN_Z const uchar16 *pUTF16, intp nCharacters ) { return Q_UnicodeAdvance( (uchar16*) pUTF16, nCharacters ); }
-inline [[nodiscard]] const uchar32 *Q_UnicodeAdvance( const uchar32 *pUTF32, intp nCharacters ) { return Q_UnicodeAdvance( (uchar32*) pUTF32, nCharacters ); }
+[[nodiscard]] const char *Q_UnicodeAdvance( IN_Z const char *pUTF8, intp nCharacters );
+[[nodiscard]] const uchar16 *Q_UnicodeAdvance( IN_Z const uchar16 *pUTF16, intp nCharacters );
+[[nodiscard]] const uchar32 *Q_UnicodeAdvance( const uchar32 *pUTF32, intp nCharacters );
 
 // Truncate to maximum of N Unicode code points (printed glyphs or non-printing characters)
 inline void Q_UnicodeTruncate( INOUT_Z char *pUTF8, intp nCharacters ) { *Q_UnicodeAdvance( pUTF8, nCharacters ) = 0; }
@@ -619,7 +619,7 @@ int V_sprintf_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars],
 	... )
 {
 	va_list params;
-	va_start( params, pFormat );
+	va_start( params, pFormat ); //-V2019 //-V2018
 	int result = V_vsnprintf( pDest, maxLenInChars, pFormat, params );
 	va_end( params );
 	return result;
@@ -637,7 +637,7 @@ int V_sprintfcat_safe( INOUT_Z_ARRAY char (&pDest)[maxLenInChars],
 	... )
 {
 	va_list params;
-	va_start( params, pFormat );
+	va_start( params, pFormat ); //-V2019 //-V2018
 	size_t usedLength = V_strlen(pDest);
 	// This code is here to check against buffer overruns when uninitialized arrays are passed in.
 	// It should never be executed. Unfortunately we can't assert in this header file.
@@ -685,7 +685,7 @@ int V_swprintf_safe( OUT_Z_ARRAY wchar_t (&pDest)[maxLenInChars],
 	... )
 {
 	va_list params;
-	va_start( params, pFormat );
+	va_start( params, pFormat ); //-V2019 //-V2018
 	int result = V_vsnwprintf( pDest, maxLenInChars, pFormat, params );
 	va_end( params );
 	return result;
