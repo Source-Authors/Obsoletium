@@ -479,11 +479,12 @@ void CPureServerWhitelist::Decode( CUtlBuffer &buf )
 {
 	Term();
 
-	uint32 nVersionTag = *(uint32 *)buf.PeekGet();
+	uint32 nVersionTag = *(const uint32 *)buf.PeekGet();
 	uint32 nFormatVersion = 0;
 	if ( nVersionTag == 0xffff )
 	{
-		buf.GetUnsignedInt();
+		// dimhotepus: Skip version tag.
+		(void)buf.GetUnsignedInt();
 		nFormatVersion = 1;
 	}
 	else
