@@ -1036,7 +1036,12 @@ EGameStatsUploadStatus Win32UploadGameStatsBlocking
 #endif
 
 			netadr_t GameStatsHarvesterFSMIPAddress;
-			GameStatsHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr );
+			if ( !GameStatsHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr ) )
+			{
+				// dimhotepus: Handle invalid address.
+				UpdateProgress( rGameStatsParameters, "Request denied, server IP:port pair is not IPv4 address." );
+				return eGameStatsUploadFailed;
+			}
 
 			UpdateProgress( rGameStatsParameters, "Server requested game stats upload to %s.", GameStatsHarvesterFSMIPAddress.ToString() );
 
