@@ -83,7 +83,7 @@ int CWorkThread::Run()
 			pProfile->MarkFrame( GetName() );
 #endif
 #endif
-		pPool->m_cActiveThreads++;
+		++pPool->m_cActiveThreads;
 
 		nIterations = 0;
 		while ( (pPool->BNeverSetEventOnAdd() && nIterations < nMaxFastIterations) || nIterations == 0 )
@@ -167,7 +167,7 @@ int CWorkThread::Run()
 			}
 		}
 
-		pPool->m_cActiveThreads--;
+		--pPool->m_cActiveThreads;
 
 		// wait for a new work item to arrive in the queue, check the counts first just to be sure
 		{
