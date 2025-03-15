@@ -98,7 +98,7 @@ END_BYTESWAP_DATADESC()
 class CWin32File
 {
 public:
-	static HANDLE CreateTempFile( CUtlString &WritePath, CUtlString &FileName )
+	static HANDLE CreateTempFile( const CUtlString &WritePath, CUtlString &FileName )
 	{
 		char tempFileName[MAX_PATH];
 		if ( WritePath.IsEmpty() )
@@ -161,7 +161,7 @@ public:
 		return bSuccess && ( numBytesRead == size );
 	}
 
-	static bool FileWrite( HANDLE hFile, void *pBuffer, unsigned int size )
+	static bool FileWrite( HANDLE hFile, const void *pBuffer, unsigned int size )
 	{
 		DWORD numBytesWritten;
 		BOOL bSuccess = WriteFile( hFile, pBuffer, size, &numBytesWritten, NULL );
