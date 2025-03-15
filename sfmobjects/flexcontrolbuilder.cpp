@@ -358,7 +358,7 @@ CDmeChannelsClip* CFlexControlBuilder::FindChannelsClipContainingChannel( CDmeFi
 //-----------------------------------------------------------------------------
 // Computes a global offset and scale to convert from log time to global time
 //-----------------------------------------------------------------------------
-void CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, double *pScale, CDmeChannelsClip *pChannelsClip )
+void CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, float *pScale, CDmeChannelsClip *pChannelsClip )
 {
 	// Determine the global time of the start + end of the log
 	DmeClipStack_t srcStack;
@@ -370,7 +370,7 @@ void CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, doubl
 	*pScale = duration.GetSeconds();
 }
 
-bool CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, double *pScale, CDmeFilmClip* pClip, CDmeChannel* pChannel )
+bool CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, float *pScale, CDmeFilmClip* pClip, CDmeChannel* pChannel )
 {
 	CDmeChannelsClip *pChannelsClip = FindChannelsClipContainingChannel( pClip, pChannel );
 	if ( !pChannelsClip )
@@ -439,7 +439,7 @@ static void AddKeyToLogs( CDmeTypedLog< float > *valueLog, CDmeTypedLog< float >
 	balanceLog->SetKey( keyTime, balance );
 }
 
-static void ConvertLRToVBLog( CDmeFloatLog *pValueLog, CDmeFloatLog *pBalanceLog, CDmeFloatLog *pLeftLog, CDmeFloatLog *pRightLog, DmeTime_t rightOffset, double flRightScale )
+static void ConvertLRToVBLog( CDmeFloatLog *pValueLog, CDmeFloatLog *pBalanceLog, CDmeFloatLog *pLeftLog, CDmeFloatLog *pRightLog, DmeTime_t rightOffset, float flRightScale )
 {
 	intp lc = pLeftLog->GetKeyCount();
 	intp rc = pRightLog->GetKeyCount();
@@ -499,13 +499,13 @@ void CFlexControlBuilder::ConvertExistingLRLogs( ExistingLogInfo_t *pLogs,
 
 	// Compute a scale + offset to transform the right log to get it in the same space as the left log
 	DmeTime_t leftOffset, rightOffset;
-	double flLeftScale, flRightScale;
+	float flLeftScale, flRightScale;
 	if ( !ComputeChannelTimeTransform( &leftOffset, &flLeftScale, pClip, pLeftChannel ) )
 		return;
 	if ( !ComputeChannelTimeTransform( &rightOffset, &flRightScale, pClip, pRightChannel ) )
 		return;
 
-	flRightScale = ( flRightScale != 0.0f ) ? flLeftScale / flRightScale : 1.0;
+	flRightScale = ( flRightScale != 0.0f ) ? flLeftScale / flRightScale : 1.0f;
 	rightOffset = leftOffset - DmeTime_t( rightOffset.GetSeconds() * flRightScale );
 
 	pLogs[CONTROL_VALUE].m_pLog = CreateElement< CDmeFloatLog >( "value" );
@@ -864,9 +864,9 @@ void CFlexControlBuilder::CreateFlexControls( CDmeAnimationSet *pAnimationSet )
 void CFlexControlBuilder::SetupLogs( CDmeChannelsClip *pChannelsClip, bool bUseExistingLogs )
 {
 	DmeTime_t targetOffset;
-	double flTargetScale;
+	float flTargetScale;
 	ComputeChannelTimeTransform( &targetOffset, &flTargetScale, pChannelsClip );
-	double flOOTargetScale = ( flTargetScale != 0.0 ) ? 1.0 / flTargetScale : 1.0;
+	float flOOTargetScale = ( flTargetScale != 0.0 ) ? 1.0f / flTargetScale : 1.0f;
 
 	// Build the infrastructure of the ops that connect that control to the dmegamemodel
 	intp c = m_ControlInfo.Count();

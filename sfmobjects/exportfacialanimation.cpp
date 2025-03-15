@@ -31,7 +31,7 @@ struct ExportInfo_t
 //-----------------------------------------------------------------------------
 // Used to transform channel data into export time
 //-----------------------------------------------------------------------------
-static void ComputeExportChannelScaleBias( double *pScale, DmeTime_t *pBias, ExportInfo_t &info, CDmeChannel *pChannel )
+static void ComputeExportChannelScaleBias( float *pScale, DmeTime_t *pBias, ExportInfo_t &info, CDmeChannel *pChannel )
 {
 	DmeClipStack_t channelToGlobal;
 	if ( pChannel->BuildClipStack( &channelToGlobal, info.m_pMovie, info.m_pShot ) )
@@ -62,7 +62,7 @@ static void AddLogLayerForExport( ExportInfo_t &info, CDmElement *pRoot, const c
 	CDmrElementArray<> animations( pRoot, "animations" );
 
 	DmeTime_t tBias;
-	double flScale;
+	float flScale;
 	ComputeExportChannelScaleBias( &flScale, &tBias, info, pChannel );
 
 	// Only export the base layer
@@ -107,7 +107,7 @@ static void ExportAnimations( ExportInfo_t &info, CDmElement *pRoot )
 			if ( pValueLog && pBalanceLog && pValueLog->GetNumLayers() != 0 && pBalanceLog->GetNumLayers() != 0 ) 
 			{
 				DmeTime_t tValueBias, tBalanceBias;
-				double flValueScale, flBalanceScale;
+				float flValueScale, flBalanceScale;
 				ComputeExportChannelScaleBias( &flValueScale, &tValueBias, info, pValueChannel );
 				ComputeExportChannelScaleBias( &flBalanceScale, &tBalanceBias, info, pBalanceChannel );
 

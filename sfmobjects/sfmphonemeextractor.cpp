@@ -454,7 +454,7 @@ void CSFMPhonemeExtractor::Extract( const PE_APITYPE& apiType, ExtractDesc_t& in
 		int nChannels = format->nChannels;
 		int nSampleCount = nDataSize / ( nBitsPerSample >> 3 );
 
-		float flTrueSampleSize = ( nBitsPerSample * nChannels ) >> 3;
+		float flTrueSampleSize = static_cast<float>(( nBitsPerSample * nChannels ) >> 3);
 		if ( format->wFormatTag == WAVE_FORMAT_ADPCM )
 		{
 			nBitsPerSample = 16;
@@ -838,7 +838,7 @@ void CSFMPhonemeExtractor::ClearInterstitialSpaces( CDmeChannelsClip *pChannelsC
 		// Find a scale + offset which transforms data in media space of the sound [namely, the phonemes]
 		// into the media space of the channels [the logs that drive the facial animation]
 		DmeTime_t tEndDuration = tChannelMediaEndTime - tChannelMediaStartTime;
-		double flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
+		float flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
 		DmeTime_t tOffset = tChannelMediaStartTime;
 
 		DmeTime_t tChannelRelativeStartTime( tStartTime * flScale );
@@ -991,7 +991,7 @@ void CSFMPhonemeExtractor::LogPhonemes( intp nItemIndex,	ExtractDesc_t& info )
 	// Find a scale + offset which transforms data in media space of the sound [namely, the phonemes]
 	// into the media space of the channels [the logs that drive the facial animation]
 	DmeTime_t tEndDuration = tChannelMediaEndTime - tChannelMediaStartTime;
-	double flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
+	float flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
 	DmeTime_t tOffset = tChannelMediaStartTime;
 
 	CUtlVector< CDmeLog * > logs;
