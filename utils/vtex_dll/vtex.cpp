@@ -156,7 +156,7 @@ static void VTexError( const char *pFormat, ... )
 		Pause();
 		// dimhotepus: 1 -> EOTHER
 		exit(EOTHER);
-	}	
+	}
 }
 
 
