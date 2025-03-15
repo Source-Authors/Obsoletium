@@ -1740,13 +1740,13 @@ void CBugUIPanel::OnSubmit()
 			char filetimebuf[ 64 ];
 			g_pFileSystem->FileTimeToString( filetimebuf, sizeof( filetimebuf ), mapfiletime );
 
-			Q_snprintf( misc2, sizeof( misc2 ), "Map version:  %i\nFile timestamp:  %s", g_ServerGlobalVariables.mapversion, filetimebuf );
-			Q_strncat( misc, misc2, sizeof( misc ), COPY_ALL_CHARACTERS );
+			V_sprintf_safe( misc2, "Map version:  %i\nFile timestamp:  %s", g_ServerGlobalVariables.mapversion, filetimebuf );
+			V_strcat_safe( misc, misc2 );
 		}
 		else
 		{
-			Q_snprintf( misc2, sizeof( misc2 ), "Map version:  %i\n", g_ServerGlobalVariables.mapversion );
-			Q_strncat( misc, misc2, sizeof( misc ), COPY_ALL_CHARACTERS );
+			V_sprintf_safe( misc2, "Map version:  %i\n", g_ServerGlobalVariables.mapversion );
+			V_strcat_safe( misc, misc2 );
 		}
 	}
 
