@@ -325,7 +325,6 @@ void CGCClient::AddSOCacheListener( const CSteamID &ownerID, ISharedObjectListen
 //------------------------------------------------------------------------------
 bool CGCClient::RemoveSOCacheListener( const CSteamID &ownerID, ISharedObjectListener *pListener )
 {
-	Assert ( this != NULL );		// Damn people - check your pointers before calling!
 	Assert( ownerID.IsValid() );
 	CGCClientSharedObjectCache *pCache = FindSOCache( ownerID, false );
 	if ( pCache == NULL )
