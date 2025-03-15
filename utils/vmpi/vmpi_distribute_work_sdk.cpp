@@ -430,7 +430,8 @@ public:
 	void Shuffle()
 	{
 		// Build a list of who's working.
-		CUtlVector<unsigned short> whosWorking;
+		// dimhotepus: int -> unsigned short.
+		CUtlVector<int> whosWorking;
 		if ( m_bUsingMasterLocalThreads )
 		{
 			whosWorking.AddToTail( VMPI_MASTER_ID );
