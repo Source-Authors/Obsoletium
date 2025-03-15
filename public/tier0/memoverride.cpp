@@ -329,13 +329,6 @@ void *__cdecl _expand
 	return nullptr;
 }
 
-unsigned int _amblksiz = 16; //BYTES_PER_PARA;
-
-#if _MSC_VER >= 1400
-HANDLE _crtheap = (HANDLE)1;	// PatM Can't be 0 or CRT pukes
-int __active_heap = 1;
-#endif //  _MSC_VER >= 1400
-
 size_t __cdecl _get_sbh_threshold()
 {
 	return 0;
