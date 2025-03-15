@@ -371,7 +371,6 @@ CWebAPIResponse::CWebAPIResponse()
 //-----------------------------------------------------------------------------
 CWebAPIResponse::~CWebAPIResponse()
 {
-	if ( m_pValues)
 		delete m_pValues;
 	m_pValues = NULL;
 }
@@ -529,9 +528,7 @@ bool CWebAPIResponse::BEmitParameterEncoding( CUtlBuffer &outputBuffer )
 //-----------------------------------------------------------------------------
 void CWebAPIResponse::Clear()
 {
-	if ( m_pValues )
 		delete m_pValues;
-
 	m_pValues = NULL;
 }
 
