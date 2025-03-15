@@ -228,11 +228,9 @@ void CDemoActionManager::ClearAll()
 //-----------------------------------------------------------------------------
 void CDemoActionManager::StopPlaying()
 {
-	int count = m_ActionStack.Count();
-	for ( int i = 0; i < count; i++ )
+	for ( auto *action : m_ActionStack )
 	{
-		CBaseDemoAction *a = m_ActionStack[ i ];
-		a->Reset();
+		action->Reset();
 	}
 
 	// Reset counters
@@ -250,7 +248,7 @@ void CDemoActionManager::StopPlaying()
 void CDemoActionManager::Update(  bool newframe, int demotick, float demotime )
 {
 	// Nothing to do?
-	int count = m_ActionStack.Count();
+	intp count = m_ActionStack.Count();
 	if ( count <= 0 )
 		return;
 
@@ -261,10 +259,8 @@ void CDemoActionManager::Update(  bool newframe, int demotick, float demotime )
 	ctx.prevtime = m_flPrevTime;
 	ctx.curtime = demotime;
 
-	int i;
-	for ( i = 0; i < count; i++ )
+	for ( auto *action : m_ActionStack )
 	{
-		CBaseDemoAction *action = m_ActionStack[ i ];
 		Assert( action );
 		if ( !action )
 			continue;
@@ -285,16 +281,16 @@ void CDemoActionManager::SaveToBuffer( CUtlBuffer& buf )
 	buf.Printf( "demoactions\n" );
 	buf.Printf( "{\n" );
 
-	int count = m_ActionStack.Count();
-	int i;
-	for ( i = 0; i < count; i++ )
+	intp i = 0;
+	for ( auto *action : m_ActionStack )
 	{
-		CBaseDemoAction *action = m_ActionStack[ i ];
 		Assert( action );
 		if ( !action )
 			continue;
 
 		action->SaveToBuffer( 1, i + 1, buf );
+
+		++i;
 	}
 
 	buf.Printf( "}\n" );
@@ -447,11 +443,8 @@ void CDemoActionManager::InsertFireEvent( CBaseDemoAction *action )
 //-----------------------------------------------------------------------------
 void CDemoActionManager::DispatchEvents()
 {
-	int c = m_PendingFireActionStack.Count();
-	int i;
-	for ( i = 0; i < c; i++ )
+	for ( auto *action : m_PendingFireActionStack )
 	{
-		CBaseDemoAction *action = m_PendingFireActionStack[ i ];
 		Assert( action );
 		action->FireAction();
 		action->SetActionFired( true );
