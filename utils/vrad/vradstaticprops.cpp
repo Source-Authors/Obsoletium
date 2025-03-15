@@ -492,8 +492,8 @@ bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 {
 	char tmp[1024];
-	Q_strncpy( tmp, pModelName, sizeof( tmp ) );
-	Q_SetExtension( tmp, ".phy", sizeof( tmp ) );
+	V_strcpy_safe( tmp, pModelName );
+	Q_SetExtension( tmp, ".phy" );
 	// No luck, gotta build it	
 	if (!LoadFile( tmp, buf ))
 	{
@@ -514,7 +514,7 @@ bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuf
 	char	filename[MAX_PATH];
 
 	// construct filename
-	Q_StripExtension( pModelName, filename, sizeof( filename ) );
+	Q_StripExtension( pModelName, filename );
 	V_strcat_safe( filename, ".dx80.vtx" );
 
 	if ( !LoadFile( filename, buf ) )
@@ -943,7 +943,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 		/*
 		static int propNum = 0;
 		char tmp[128];
-		sprintf( tmp, "staticprop%03d.txt", propNum );
+		V_sprintf_safe( tmp, "staticprop%03d.txt", propNum );
 		DumpCollideToGlView( pCollide, tmp );
 		++propNum;
 		*/
@@ -1486,7 +1486,7 @@ void CVradStaticPropMgr::SerializeLighting()
 	}
 
 	char mapName[MAX_PATH];
-	Q_FileBase( source, mapName, sizeof( mapName ) );
+	Q_FileBase( source, mapName );
 
 	int size;
 	for (int i = 0; i < count; ++i)
@@ -1498,11 +1498,11 @@ void CVradStaticPropMgr::SerializeLighting()
 
 		if (g_bHDR)
 		{
-			sprintf( filename, "sp_hdr_%d.vhv", i );
+			V_sprintf_safe( filename, "sp_hdr_%d.vhv", i );
 		}
 		else
 		{
-			sprintf( filename, "sp_%d.vhv", i );
+			V_sprintf_safe( filename, "sp_%d.vhv", i );
 		}
 
 		int totalVertexes = 0;
@@ -1574,7 +1574,7 @@ void CVradStaticPropMgr::SerializeLighting()
 		if (m_StaticProps[i].m_Flags & STATIC_PROP_NO_PER_TEXEL_LIGHTING)
 			continue;
 
-		sprintf(filename, "texelslighting_%d.ppl", i);
+		V_sprintf_safe(filename, "texelslighting_%d.ppl", i);
 
 		ImageFormat fmt = m_StaticProps[i].m_LightmapImageFormat;
 
@@ -2151,7 +2151,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	char fileName[MAX_PATH];
 	V_strcpy_safe( fileName, "models/" );	
 	V_strcat_safe( fileName, pActiveStudioHdr->pszName() );
-	Q_StripExtension( fileName, fileName, sizeof( fileName ) );
+	Q_StripExtension( fileName, fileName );
 	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model

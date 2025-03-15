@@ -683,8 +683,8 @@ entity_t *EntityForModel (int modnum)
 	int		i;
 	const char	*s;
 	char	name[16];
+	V_sprintf_safe (name, "*%i", modnum);
 
-	sprintf (name, "*%i", modnum);
 	// search the entities for one using modnum
 	for (i=0 ; i<num_entities ; i++)
 	{
@@ -1733,7 +1733,8 @@ void BounceLight (void)
 		i++;
 		if ( g_bDumpPatches && !bouncing && i != 1)
 		{
-			sprintf (name, "bounce%i.txt", i);
+			// dimhotepus: %i -> %u
+			V_sprintf_safe (name, "bounce%u.txt", i);
 			WriteWorld (name, 0);
 		}
 	}
@@ -2064,7 +2065,7 @@ bool RadWorld_Go()
 			for( int iBump = 0; iBump < 4; ++iBump )
 			{
 				char szName[64];
-				sprintf ( szName, "bounce0_%d.txt", iBump );
+				V_sprintf_safe ( szName, "bounce0_%d.txt", iBump );
 				WriteWorld( szName, iBump );
 			}
 		}
@@ -2122,7 +2123,7 @@ void InitDumpPatchesFiles()
 		for ( int iBump = 0; iBump < 4; ++iBump )
 		{
 			char szFilename[MAX_PATH];
-			sprintf( szFilename, "samples_style%d_bump%d.txt", iStyle, iBump );
+			V_sprintf_safe( szFilename, "samples_style%d_bump%d.txt", iStyle, iBump );
 			pFileSamples[iStyle][iBump] = g_pFileSystem->Open( szFilename, "w" );
 			if( !pFileSamples[iStyle][iBump] )
 			{
@@ -2173,14 +2174,14 @@ void VRAD_LoadBSP( char const *pFilename )
 		Msg( "Could not find lights.rad in %s.\nTrying VRAD BIN directory instead...\n", 
 			    global_lights );
 		GetModuleFileName( NULL, global_lights, sizeof( global_lights ) );
-		Q_ExtractFilePath( global_lights, global_lights, sizeof( global_lights ) );
+		V_ExtractFilePath( global_lights, global_lights );
 		V_strcat_safe( global_lights, "lights.rad" );
 	}
 
 	// Set the optional level specific lights filename
 	V_strcpy_safe( level_lights, source );
 
-	Q_DefaultExtension( level_lights, ".rad", sizeof( level_lights ) );
+	Q_DefaultExtension( level_lights, ".rad");
 	if ( !g_pFileSystem->FileExists( level_lights ) ) 
 		*level_lights = 0;	
 
@@ -2189,8 +2190,8 @@ void VRAD_LoadBSP( char const *pFilename )
 	if ( !Q_isempty(level_lights) )	ReadLightFile(level_lights);	// Optional & implied
 
 	V_strcpy_safe(incrementfile, source);
-	Q_DefaultExtension(incrementfile, ".r0", sizeof(incrementfile));
-	Q_DefaultExtension(source, ".bsp", sizeof( source ));
+	Q_DefaultExtension(incrementfile, ".r0");
+	Q_DefaultExtension(source, ".bsp");
 
 	Msg( "Loading %s.\n", source );
 	VMPI_SetCurrentStage( "LoadBSPFile" );
@@ -2980,8 +2981,8 @@ int RunVRAD( int argc, char **argv )
 	}
 
 	// Initialize the filesystem, so additional commandline options can be loaded
-	Q_StripExtension( argv[ i ], source, sizeof( source ) );
-	Q_FileBase( source, source, sizeof( source ) );
+	Q_StripExtension( argv[ i ], source );
+	Q_FileBase( source, source );
 
 	VRAD_LoadBSP( argv[i] );
 

@@ -104,8 +104,8 @@ void InitMacroTexture( const char *pBSPFilename )
 
 	// Load the macro texture that is mapped onto everything.
 	char mapName[512], vtfFilename[512];
-	Q_FileBase( pBSPFilename, mapName, sizeof( mapName ) );
-	Q_snprintf( vtfFilename, sizeof( vtfFilename ), "materials/macro/%s/base.vtf", mapName );
+	Q_FileBase( pBSPFilename, mapName );
+	V_sprintf_safe( vtfFilename, "materials/macro/%s/base.vtf", mapName );
 	g_pGlobalMacroTextureData = LoadMacroTextureFile( vtfFilename );
 
 	
