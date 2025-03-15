@@ -472,7 +472,7 @@ static bool MapList_CheckPrintMap( const char *pakorfilesys, const char *mapname
 //			maxitemlength - 
 // Output : static int
 //-----------------------------------------------------------------------------
-static int MapList_CountMaps( const char *pszSubString, bool listobsolete, intp& maxitemlength )
+static intp MapList_CountMaps( const char *pszSubString, bool listobsolete, intp& maxitemlength )
 {
 	g_MapListMgr.RefreshList();
 
@@ -516,7 +516,7 @@ static int MapList_CountMaps( const char *pszSubString, bool listobsolete, intp&
 //  If the substring is empty, or "*", then lists all maps
 // Input  : *pszSubString - 
 //-----------------------------------------------------------------------------
-int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, int maxcount, int maxitemlength, char maplist[][ 64 ] )
+intp MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, intp maxcount, intp maxitemlength, char maplist[][ 64 ] )
 {
 	g_MapListMgr.RefreshList();
 	intp substringlength = 0;
@@ -534,7 +534,7 @@ int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose,
 		ConMsg( "-------------\n");
 	}
 
-	int count = 0;
+	intp count = 0;
 	int showOutdated;
 	for( showOutdated = listobsolete ? 1 : 0; showOutdated >= 0; showOutdated-- )
 	{
@@ -585,13 +585,13 @@ int _Host_Map_f_CompletionFunc( char const *cmdname, char const *partial, char c
 	}
 
 	intp longest = 0;
-	int count = min( MapList_CountMaps( substring, false, longest ), COMMAND_COMPLETION_MAXITEMS );
+	intp count = min( MapList_CountMaps( substring, false, longest ), static_cast<intp>(COMMAND_COMPLETION_MAXITEMS) );
 	if ( count > 0 )
 	{
 		MapList_ListMaps( substring, false, false, COMMAND_COMPLETION_MAXITEMS, longest, commands );
 
 		// Now prepend maps * in front of all of the options
-		int i;
+		intp i;
 		for ( i = 0; i < count ; i++ )
 		{
 			char old[ COMMAND_COMPLETION_ITEM_LENGTH ];
@@ -688,7 +688,7 @@ static void Host_Maps_f( const CCommand &args )
 		pszSubString = NULL;
 
 	intp longest = 0;
-	int count = MapList_CountMaps( pszSubString, true, longest );
+	intp count = MapList_CountMaps( pszSubString, true, longest );
 	if ( count > 0 )
 	{
 		MapList_ListMaps( pszSubString, true, true, count, 0, NULL );
