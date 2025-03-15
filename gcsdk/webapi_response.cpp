@@ -371,7 +371,7 @@ CWebAPIResponse::CWebAPIResponse()
 //-----------------------------------------------------------------------------
 CWebAPIResponse::~CWebAPIResponse()
 {
-		delete m_pValues;
+	delete m_pValues;
 	m_pValues = NULL;
 }
 
@@ -528,7 +528,7 @@ bool CWebAPIResponse::BEmitParameterEncoding( CUtlBuffer &outputBuffer )
 //-----------------------------------------------------------------------------
 void CWebAPIResponse::Clear()
 {
-		delete m_pValues;
+	delete m_pValues;
 	m_pValues = NULL;
 }
 
@@ -1114,9 +1114,9 @@ CWebAPIValues *CWebAPIValues::FindOrCreateChildObject( const char *pchName )
 //-----------------------------------------------------------------------------
 CWebAPIValues * CWebAPIValues::AddChildObjectToArray()
 {
+	AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 	if ( m_eValueType != k_EWebAPIValueType_NumericArray )
 	{
-		AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 		return NULL;
 	}
 
@@ -1130,9 +1130,9 @@ CWebAPIValues * CWebAPIValues::AddChildObjectToArray()
 //-----------------------------------------------------------------------------
 CWebAPIValues * CWebAPIValues::AddChildArrayToArray( const char * pchArrayElementNames )
 {
+	AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 	if ( m_eValueType != k_EWebAPIValueType_NumericArray )
 	{
-		AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 		return NULL;
 	}
 
