@@ -70,7 +70,7 @@ void CCvarTextEntry::ApplyChanges( bool immediate )
 	else
 	{
 		char szCommand[ 256 ];
-		sprintf( szCommand, "%s \"%s\"\n", m_pszCvarName, szText );
+		V_sprintf_safe( szCommand, "%s \"%s\"\n", m_pszCvarName, szText );
 		engine->ClientCmd_Unrestricted( szCommand );
 	}
 

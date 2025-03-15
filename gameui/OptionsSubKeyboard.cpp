@@ -174,7 +174,7 @@ char *UTIL_va(const char *format, ...)
 	curstring = ( curstring + 1 ) % 4;
 
 	va_start (argptr, format);
-	Q_vsnprintf( string[curstring], 1024, format, argptr );
+	V_vsprintf_safe( string[curstring], format, argptr );
 	va_end (argptr);
 
 	return string[curstring];  

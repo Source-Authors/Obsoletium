@@ -173,17 +173,17 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 		{
 		case O_BOOL:
 			pBox = (CheckButton *)pList->pControl;
-			sprintf( szValue, "%s", pBox->IsSelected() ? "1" : "0" );
+			V_sprintf_safe( szValue, "%s", pBox->IsSelected() ? "1" : "0" );
 			break;
 		case O_NUMBER:
 			pEdit = ( TextEntry * )pList->pControl;
 			pEdit->GetText( strValue, sizeof( strValue ) );
-			sprintf( szValue, "%s", strValue );
+			V_sprintf_safe( szValue, "%s", strValue );
 			break;
 		case O_STRING:
 			pEdit = ( TextEntry * )pList->pControl;
 			pEdit->GetText( strValue, sizeof( strValue ) );
-			sprintf( szValue, "%s", strValue );
+			V_sprintf_safe( szValue, "%s", strValue );
 			break;
 		case O_LIST:
 			{
@@ -204,18 +204,18 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 
 				if ( pItem )
 				{
-					sprintf( szValue, "%s", pItem->szValue );
+					V_sprintf_safe( szValue, "%s", pItem->szValue );
 				}
 				else  // Couln't find index
 				{
 					//Assert(!("Couldn't find string in list, using default value"));
-					sprintf( szValue, "%s", pObj->defValue );
+					V_sprintf_safe( szValue, "%s", pObj->defValue );
 				}
 				break;
 			}
 		case O_SLIDER:
 			pSlider = ( CCvarSlider * )pList->pControl;
-			sprintf( szValue, "%.2f", pSlider->GetSliderValue() );
+			V_sprintf_safe( szValue, "%.2f", pSlider->GetSliderValue() );
 			break;
 		}
 

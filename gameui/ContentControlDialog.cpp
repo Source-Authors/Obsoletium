@@ -140,7 +140,7 @@ void CContentControlDialog::Explain( char const *fmt, ... )
 	char		text[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (text, sizeof(text), fmt, argptr);
+	V_vsprintf_safe (text, fmt, argptr);
 	va_end (argptr);
 
 	m_pExplain->SetText( text );
