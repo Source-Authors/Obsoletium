@@ -127,7 +127,7 @@ void CDemoActionManager::ReloadFromDisk( void )
 
 		m_lFileTime = g_pFileSystem->GetFileTime( metafile );
 
-		KeyValues *kv = new KeyValues( metafile );
+	KeyValuesAD kv( metafile );
 		Assert( kv );
 		if ( kv )
 		{
