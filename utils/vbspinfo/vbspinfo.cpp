@@ -40,7 +40,8 @@ int g_TotalTreeDepth;
 float g_TotalVariance;
 
 float g_ySpacing = -1;  // (set by code)
-double g_xSpacing = 1.0;
+// dimhotepus: double -> float.
+constexpr inline float g_xSpacing = 1.0f;
 
 void CalculateTreeInfo_R(int iNode, int depth) {
   dnode_t *pNode = &dnodes[iNode];
@@ -108,7 +109,7 @@ void DrawTreeToScratchPad() {
 
   int maxDepth = 0;
   CalcTreeDepth_R(dmodels[0].headnode, 0, maxDepth);
-  double flXSpace = (1u << min(maxDepth, 14)) * g_xSpacing;
+  float flXSpace = (1u << min(maxDepth, 14)) * g_xSpacing;
   g_ySpacing = (flXSpace / maxDepth) / 4;
 
   DrawTreeToScratchPad_R(pPad, dmodels[0].headnode,
