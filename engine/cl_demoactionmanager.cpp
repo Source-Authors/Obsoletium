@@ -120,16 +120,11 @@ void CDemoActionManager::Shutdown( void )
 void CDemoActionManager::ReloadFromDisk( void )
 {
 	char metafile[ 512 ];
-	Q_StripExtension( m_szCurrentFile, metafile );
-	Q_DefaultExtension( metafile, ".vdm" );
+	V_StripExtension( m_szCurrentFile, metafile );
+	V_DefaultExtension( metafile, ".vdm" );
 
 	ClearAll();
 
-	//const char *buffer = NULL;
-	//int sz = 0;
-	//buffer = (const char *)COM_LoadFile( metafile, 5, &sz );
-//	if ( buffer )
-//	{
 		m_lFileTime = g_pFileSystem->GetFileTime( metafile );
 
 		KeyValues *kv = new KeyValues( metafile );
@@ -143,13 +138,12 @@ void CDemoActionManager::ReloadFromDisk( void )
 				while( pIter )
 				{
 					char factorytouse[ 512 ];
+				V_strcpy_safe( factorytouse, pIter->GetName() );
 					
-					Q_strncpy( factorytouse, pIter->GetName(), sizeof( factorytouse ) );
-
 					// New format is to put numbers in here
 					if ( atoi( factorytouse ) > 0 )
 					{
-						Q_strncpy( factorytouse, pIter->GetString( "factory", "" ), sizeof( factorytouse ) );
+					V_strcpy_safe( factorytouse, pIter->GetString( "factory", "" ) );
 					}
 
 					CBaseDemoAction *action = CBaseDemoAction::CreateDemoAction( CBaseDemoAction::TypeForName( factorytouse ) );
@@ -174,13 +168,6 @@ void CDemoActionManager::ReloadFromDisk( void )
 			}
 		}
 
-//	}
-//	else
-//	{
-		// This will save out an empty .vdm of the proper name
-//		SaveToFile();
-//	}
-
 	OnVDMLoaded( m_szCurrentFile );
 
 	m_bDirty = false;
@@ -199,11 +186,11 @@ void CDemoActionManager::StartPlaying( char const *demfilename )
 
 	bool changedfile = Q_strcasecmp( demfilename, m_szCurrentFile ) != 0;
 
-	Q_strncpy( m_szCurrentFile, demfilename, sizeof( m_szCurrentFile ) );
+	V_strcpy_safe( m_szCurrentFile, demfilename );
 
 	char metafile[ 512 ];
-	Q_StripExtension( demfilename, metafile );
-	Q_DefaultExtension( metafile, ".vdm" );
+	V_StripExtension( demfilename, metafile );
+	V_DefaultExtension( metafile, ".vdm" );
 
 	long filetime = g_pFileSystem->GetFileTime( metafile );
 
@@ -328,8 +315,8 @@ void CDemoActionManager::SaveToFile( void )
 		return;
 
 	char metafile[ 512 ];
-	Q_StripExtension( m_szCurrentFile, metafile );
-	Q_DefaultExtension( metafile, ".vdm" );
+	V_StripExtension( m_szCurrentFile, metafile );
+	V_DefaultExtension( metafile, ".vdm" );
 
 	// Save data
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
