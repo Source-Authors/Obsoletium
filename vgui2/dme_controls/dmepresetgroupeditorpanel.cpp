@@ -944,47 +944,6 @@ static intp FindExportedControlIndex( const char *pControlName, CUtlVector< Expo
 
 
 //-----------------------------------------------------------------------------
-// Builds a unique list of controls found in the presets
-//-----------------------------------------------------------------------------
-static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, CDmePresetGroup *pPresetGroup, CUtlVector< ExportedControl_t > &uniqueControls )
-{
-	int nGlobalIndex = 0;
-	const CDmrElementArray< CDmePreset > &presets = pPresetGroup->GetPresets();
-	intp nPresetCount = presets.Count();
-	for ( intp iPreset = 0; iPreset < nPresetCount; ++iPreset )
-	{
-		CDmePreset *pPreset = presets[iPreset];
-		const CDmrElementArray< CDmElement > &controls = pPreset->GetControlValues();
-
-		intp nControlCount = controls.Count();
-		for ( intp i = 0; i < nControlCount; ++i )
-		{
-			const char *pControlName = controls[i]->GetName();
-			intp nIndex = FindExportedControlIndex( pControlName, uniqueControls );
-			if ( nIndex >= 0 )
-				continue;
-			CDmAttribute *pValueAttribute = controls[i]->GetAttribute( "value" );
-			if ( !pValueAttribute || pValueAttribute->GetType() != AT_FLOAT )
-				continue;
-
-			CDmElement *pControl = pAnimationSet->FindControl( pControlName );
-			if ( !pControl )
-				continue;
-
-			intp j = uniqueControls.AddToTail();
-			ExportedControl_t &control = uniqueControls[j];
-			control.m_Name = pControlName;
-			control.m_bIsStereo = pControl->GetValue<bool>( "combo" );
-			control.m_bIsMulti = pControl->GetValue<bool>( "multi" );
-			control.m_nFirstIndex = nGlobalIndex;
-			nGlobalIndex += 1 + control.m_bIsStereo + control.m_bIsMulti;
-		}
-	}
-	return nGlobalIndex;
-}
-
-
-//-----------------------------------------------------------------------------
 // Fileopen state machine
 //-----------------------------------------------------------------------------
 void CDmePresetGroupEditorPanel::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues )
