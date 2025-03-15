@@ -372,7 +372,7 @@ DWORD WINAPI PortalMCThreadFn( LPVOID p )
 		else
 		{
 			// These lengths must match exactly what is sent in ReceivePortalFlow.
-			if ( len == 2 + sizeof( g_PortalMCThreadUniqueID ) + sizeof( int ) + portalbytes )
+			if ( len == 2 + static_cast<int>(sizeof( g_PortalMCThreadUniqueID )) + static_cast<int>(sizeof( int )) + portalbytes )
 			{
 				// Perform more validation...
 				if ( data[0] == VMPI_VVIS_PACKET_ID && data[1] == VMPI_PORTALFLOW_RESULTS )
@@ -540,7 +540,7 @@ void RunMPIPortalFlow()
 		CUniformRandomStream randomStream;
 		randomStream.SetSeed( cnt.GetMicroseconds() );
 
-		g_PortalMCAddr.port = randomStream.RandomInt( 22000, 25000 ); // Pulled out of something else.
+		g_PortalMCAddr.port = static_cast<uint16_t>(randomStream.RandomInt( 22000, 25000 )); // Pulled out of something else.
 		g_PortalMCAddr.ip[0] = (unsigned char)RandomInt( 225, 238 );
 		g_PortalMCAddr.ip[1] = (unsigned char)RandomInt( 0, 255 );
 		g_PortalMCAddr.ip[2] = (unsigned char)RandomInt( 0, 255 );
@@ -550,7 +550,7 @@ void RunMPIPortalFlow()
 		int i=0;
 		for ( i; i < 5; i++ )
 		{
-			if ( g_pPortalMCSocket->BindToAny( randomStream.RandomInt( 20000, 30000 ) ) )
+			if ( g_pPortalMCSocket->BindToAny( static_cast<unsigned short>( randomStream.RandomInt( 20000, 30000 ) ) ) )
 				break;
 		}
 		if ( i == 5 )
