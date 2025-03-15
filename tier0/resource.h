@@ -14,6 +14,7 @@
 #define IDC_IGNORE_ALWAYS                     1009
 #define IDC_IGNORE_NUMTIMES                   1010
 #define IDC_ASSERT_MSG_CTRL                   1011
+#define IDC_ESCAPE_DIALOG                     2
 #define IDC_NOID                              -1
 
 // Next default values for new objects

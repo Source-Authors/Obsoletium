@@ -313,6 +313,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 				// dimhotepus: Explicitly handle missed commands.
 				case IDC_IGNORE_NUMLINES:
 				case IDC_IGNORE_NUMTIMES:
+				case IDC_ESCAPE_DIALOG:
 					return TRUE;
 
 				default:
