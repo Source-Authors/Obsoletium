@@ -158,7 +158,7 @@ void CBudgetPanelShared::DrawColoredText(
 {
 	char msg[4096];
 	va_list marker;
-	va_start( marker, pText );
+	va_start( marker, pText ); //-V2018 //-V2019
 	V_vsprintf_safe( msg, pText, marker );
 	va_end( marker );
 
