@@ -1215,7 +1215,7 @@ bool CCrypto::HexDecode( const char *pchData, uint8 *pubDecodedData, size_t *pcu
 	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
 	HexDecoder hexDecoder( &pArraySinkOutput );
-	hexDecoder.Put( (byte *) pchData, strlen( pchData ) );
+	hexDecoder.Put( (const byte *) pchData, strlen( pchData ) );
 	hexDecoder.MessageEnd();
 
 	size_t len = pArraySinkOutput.TotalPutLength();
@@ -1681,7 +1681,7 @@ bool CCrypto::BGzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuffe
 		StringSink sink{gzip_output};
 		Gzip zip{&sink};
 		StringSource src( pubData, cubData, true, &zip );
-		bufOutput.Set( (uint8*)gzip_output.c_str(), gzip_output.length() );
+		bufOutput.Set( (const uint8*)gzip_output.c_str(), gzip_output.length() );
 	}
 	catch( ... )
 	{
@@ -1700,7 +1700,7 @@ bool CCrypto::BGunzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuf
 		StringSink sink{gunzip_output};
 		Gunzip unzip{&sink};
 		StringSource src( pubData, cubData, true, &unzip ); 
-		bufOutput.Set( (uint8*)gunzip_output.c_str(), gunzip_output.length() );
+		bufOutput.Set( (const uint8*)gunzip_output.c_str(), gunzip_output.length() );
 	}
 	catch( ... )
 	{
@@ -1818,7 +1818,7 @@ bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, size
 	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
 	HexDecoderTKS hexDecoder( &pArraySinkOutput, (const int *)m_rgnDecodingTable );
-	hexDecoder.Put( (byte *) pchData, strlen( pchData ) );
+	hexDecoder.Put( (const byte *) pchData, strlen( pchData ) );
 	hexDecoder.MessageEnd();
 
 	size_t len = pArraySinkOutput.TotalPutLength();
@@ -1920,7 +1920,7 @@ bool CCustomBase32Encoder::Decode( const char *pchData, uint8 *pubDecodedData, s
 	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: Base32Encoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
 	Base32DecoderTKS base32Decoder( &pArraySinkOutput, (const int *)m_rgnDecodingTable );
-	base32Decoder.Put( (byte *) pchData, strlen( pchData ) );
+	base32Decoder.Put( (const byte *) pchData, strlen( pchData ) );
 	base32Decoder.MessageEnd();
 
 	size_t len = pArraySinkOutput.TotalPutLength();
