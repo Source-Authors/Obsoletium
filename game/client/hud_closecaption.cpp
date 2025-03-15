@@ -93,7 +93,7 @@ public:
 	void Dump()
 	{
 		char buf[ 2048 ];
-		g_pVGuiLocalize->ConvertUnicodeToANSI( GetStream(), buf, sizeof( buf ) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( GetStream(), buf );
 
 		Msg( "x = %i, y = %i, w = %i h = %i text %s\n", m_nX, m_nY, m_nWidth, m_nHeight, buf );
 	}
@@ -2476,7 +2476,7 @@ void CHudCloseCaption::_ProcessCaption( const wchar_t *caption, const char *toke
 void CHudCloseCaption::MsgFunc_CloseCaption(bf_read &msg)
 {
 	char tokenname[ 512 ];
-	msg.ReadString( tokenname, sizeof( tokenname ) );
+	msg.ReadString( tokenname );
 	float duration = msg.ReadShort() * 0.1f;
 	byte flagbyte = msg.ReadByte();
 	bool warnonmissing = flagbyte & CLOSE_CAPTION_WARNIFMISSING ? true : false;

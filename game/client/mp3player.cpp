@@ -176,7 +176,7 @@ public:
 		KeyValues::AutoDelete kv = KeyValues::AutoDelete("LI");
 		kv->SetString( "File", songInfo->shortname.String() );
 		char fn[ 512 ];
-		if ( g_pFullFileSystem->String( songInfo->filename, fn, sizeof( fn ) ) )
+		if ( g_pFullFileSystem->String( songInfo->filename, fn ) )
 		{
 			char artist[ 256 ];
 			char album[ 256 ];
@@ -325,7 +325,7 @@ public:
 		KeyValues::AutoDelete kv = KeyValues::AutoDelete("LI");
 		kv->SetString( "File", songInfo->shortname.String() );
 		char fn[ 512 ];
-		if ( g_pFullFileSystem->String( songInfo->filename, fn, sizeof( fn ) ) )
+		if ( g_pFullFileSystem->String( songInfo->filename, fn ) )
 		{
 			char artist[ 256 ];
 			char album[ 256 ];
@@ -898,7 +898,7 @@ void CMP3Player::OnRefresh()
 	for ( intp i = 0; i < pcount; ++i )
 	{
 		char fn[ 512 ];
-		if ( g_pFullFileSystem->String( m_PlayListFiles[ i ], fn, sizeof( fn ) ) )
+		if ( g_pFullFileSystem->String( m_PlayListFiles[ i ], fn ) )
 		{
 			// Find index for song
 			intp songIndex = FindSong( fn );
@@ -1182,8 +1182,8 @@ intp CMP3Player::AddSong( char const *relative, intp dirnum )
 		f.filename = g_pFullFileSystem->FindOrAddFileName( relative );
 
 		char shortname[ 256 ];
-		Q_FileBase( relative, shortname, sizeof( shortname ) );
-		Q_SetExtension( shortname, ".mp3", sizeof( shortname ) );
+		V_FileBase( relative, shortname );
+		V_SetExtension( shortname, ".mp3" );
 		f.shortname = shortname;
 		f.flags = ( dirnum == 0 ) ? MP3File_t::FLAG_FROMGAME : MP3File_t::FLAG_FROMFS;
 		f.dirnum = dirnum;
@@ -1286,7 +1286,7 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 {
 	outsong[ 0 ] = 0;
 	char fn[ 512 ];
-	if ( !g_pFullFileSystem->String( f.filename, fn, sizeof( fn ) ) )
+	if ( !g_pFullFileSystem->String( f.filename, fn ) )
 	{
 		return;
 	}
@@ -1301,14 +1301,14 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 	// Get temp filename from crc
 	CRC32_t crc;
 	CRC32_Init( &crc );
-	CRC32_ProcessBuffer( &crc, fn, static_cast<int>(V_strlen( fn )) );
+	CRC32_ProcessBuffer( &crc, fn, V_strlen( fn ) );
 	CRC32_Final( &crc );
 
 	char hexname[ 16 ];
-	Q_binarytohex( (const byte *)&crc, sizeof( crc ), hexname, sizeof( hexname ) );
+	V_binarytohex( crc, hexname );
 
 	char hexfilename[ 512 ];
-	Q_snprintf( hexfilename, sizeof( hexfilename ), "sound/_mp3/%s.mp3", hexname );
+	V_sprintf_safe( hexfilename, "sound/_mp3/%s.mp3", hexname );
 
 	Q_FixSlashes( hexfilename );
 
@@ -1368,7 +1368,7 @@ void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ )
 	}
 	else
 	{
-		if ( !g_pFullFileSystem->String( song.playbackfilename, soundname, sizeof( soundname ) ) )
+		if ( !g_pFullFileSystem->String( song.playbackfilename, soundname ) )
 		{
 			return;
 		}
@@ -1846,7 +1846,7 @@ void CMP3Player::RestoreDirectory( KeyValues *dir, SoundDirectory_t *sd )
 					if ( songIndex >= 0 && songIndex < m_Files.Count() )
 					{
 						char fn[ 512 ];
-						if ( g_pFullFileSystem->String( m_Files[ songIndex ].filename, fn, sizeof( fn ) ) )
+						if ( g_pFullFileSystem->String( m_Files[ songIndex ].filename, fn ) )
 						{
 							AddFileToDirectoryTree( sd, fn );
 						}
@@ -1901,12 +1901,12 @@ bool CMP3Player::RestoreDb( char const *filename )
 	return true;
 }
 
-void bpr( int level, CUtlBuffer& buf, char const *fmt, ... )
+static void bpr( int level, CUtlBuffer& buf, PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	char txt[ 4096 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( txt, sizeof( txt ) - 1, fmt, argptr );
+	V_vsprintf_safe( txt, fmt, argptr );
 	va_end( argptr );
 
 	int indent = 2;
@@ -1937,7 +1937,7 @@ void CMP3Player::SaveDbFile( int level, CUtlBuffer& buf, MP3File_t *file, intp f
 
 	bpr( level + 1, buf, "short \"%s\"\n", file->shortname.String() );
 	char fn[ 512 ];
-	if ( g_pFullFileSystem->String( file->filename, fn, sizeof( fn ) ) )
+	if ( g_pFullFileSystem->String( file->filename, fn ) )
 	{
 		bpr( level + 1, buf, "filename \"%s\"\n", fn );
 	}
@@ -2163,7 +2163,7 @@ void CMP3Player::SavePlayList( char const *filename )
 		{
 			MP3File_t& song = m_Files[ m_PlayList[ i ] ];
 			char fn[ 512 ];
-			if ( g_pFullFileSystem->String( song.filename, fn, sizeof( fn ) ) )
+			if ( g_pFullFileSystem->String( song.filename, fn ) )
 			{
 				char dirname[ 512 ];
 				dirname[0]=0;

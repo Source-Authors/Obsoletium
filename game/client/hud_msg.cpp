@@ -51,7 +51,7 @@ void CHud::ResetHUD()
 void CHud::MsgFunc_SendAudio( bf_read &msg )
 {
 	char szString[2048];
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 	
 	CLocalPlayerFilter filter;
 	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, szString );

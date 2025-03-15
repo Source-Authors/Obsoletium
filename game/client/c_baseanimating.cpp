@@ -6280,7 +6280,7 @@ void DevMsgRT( char const* pMsg, ... )
 		// 
 		{
 			static char	string[1024];
-			Q_vsnprintf (string, sizeof( string ), pMsg, argptr);
+			V_vsprintf_safe (string, pMsg, argptr);
 			DevMsg( 1, "%s", string );
 		}
 		// DevMsg( pMsg, argptr );

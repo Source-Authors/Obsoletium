@@ -126,17 +126,17 @@ bool C_SceneEntity::GetHWMorphSceneFileName( const char *pFilename, char *pHWMFi
 	{
 		if ( !V_stricmp( pszToken, "low" ) )
 		{
-			V_strcat( szSceneHWM, "high", sizeof( szSceneHWM ) );
+			V_strcat_safe( szSceneHWM, "high" );
 		}
 		else
 		{
-			V_strcat( szSceneHWM, pszToken, sizeof( szSceneHWM ) );
+			V_strcat_safe( szSceneHWM, pszToken );
 		}
 
 		pszToken = strtok( NULL, "/\\" );
 		if ( pszToken != NULL )
 		{
-			V_strcat( szSceneHWM, "\\", sizeof( szSceneHWM ) );
+			V_strcat_safe( szSceneHWM, "\\" );
 		}
 	}
 

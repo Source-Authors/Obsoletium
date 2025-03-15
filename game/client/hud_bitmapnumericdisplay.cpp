@@ -108,7 +108,7 @@ void CHudBitmapNumericDisplay::PaintNumbers(int xpos, int ypos, int value, Color
 
 		for( i=0;i<10;i++ )
 		{
-			sprintf( a, "number_%d", i );
+			V_sprintf_safe( a, "number_%d", i );
 
 			m_pNumbers[i] = gHUD.GetIcon( a );
 		}

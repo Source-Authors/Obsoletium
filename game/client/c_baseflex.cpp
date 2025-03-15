@@ -70,10 +70,13 @@ BEGIN_PREDICTION_DATA( C_BaseFlex )
 
 END_PREDICTION_DATA()
 
+// dimhotepus: Needed for TF only.
+#if defined( TF_CLIENT_DLL )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
+template<intp fileNameSize>
+bool GetHWMExpressionFileName( const char *pFilename, char (&pHWMFilename)[fileNameSize] )
 {
 	// Are we even using hardware morph?
 	if ( !UseHWMorphVCDs() )
@@ -86,7 +89,7 @@ bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
 	// Check to see if we already have an player/hwm/* filename.
 	if ( ( V_strstr( pFilename, "player/hwm" ) != NULL ) || ( V_strstr( pFilename, "player\\hwm" ) != NULL ) )
 	{
-		V_strcpy( pHWMFilename, pFilename );
+		V_strcpy_safe( pHWMFilename, pFilename );
 		return true;
 	}
 
@@ -100,22 +103,23 @@ bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
 	char *pszToken = strtok( szExpression, "/\\" );
 	while ( pszToken != NULL )
 	{
-		V_strcat( szExpressionHWM, pszToken, sizeof( szExpressionHWM ) );
+		V_strcat_safe( szExpressionHWM, pszToken );
 		if ( !V_stricmp( pszToken, "player" ) )
 		{
-			V_strcat( szExpressionHWM, "\\hwm", sizeof( szExpressionHWM ) );
+			V_strcat_safe( szExpressionHWM, "\\hwm" );
 		}
 
 		pszToken = strtok( NULL, "/\\" );
 		if ( pszToken != NULL )
 		{
-			V_strcat( szExpressionHWM, "\\", sizeof( szExpressionHWM ) );
+			V_strcat_safe( szExpressionHWM, "\\" );
 		}
 	}
 
-	V_strcpy( pHWMFilename, szExpressionHWM );
+	V_strcpy_safe( pHWMFilename, szExpressionHWM );
 	return true;
 }
+#endif
 
 C_BaseFlex::C_BaseFlex() : 
 	m_iv_viewtarget( "C_BaseFlex::m_iv_viewtarget" ), 

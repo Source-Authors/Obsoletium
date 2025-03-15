@@ -57,7 +57,7 @@ char *VarArgs( const char *format, ... )
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	Q_vsnprintf (string, sizeof( string ), format,argptr);
+	V_vsprintf_safe (string, format, argptr);
 	va_end (argptr);
 
 	return string;	
@@ -899,7 +899,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BY
 
 				// lookup key names
 				char binding[64];
-				g_pVGuiLocalize->ConvertUnicodeToANSI( token, binding, sizeof(binding) );
+				g_pVGuiLocalize->ConvertUnicodeToANSI( token, binding );
 
 				// Find a Steam Controller mapping, if an action set was specified.
 				const wchar_t* sc_origin = nullptr;
@@ -916,29 +916,14 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BY
 				const char *key = engine->Key_LookupBinding( *binding == '+' ? binding + 1 : binding );
 				if ( !key )
 				{
-					key = IsX360() ? "" : "< not bound >";
+					key = "< not bound >";
 				}
 
 				//!! change some key names into better names
 				char friendlyName[64];
 				bool bAddBrackets = false;
-				if ( IsX360() )
-				{
-					if ( !key || !key[0] )
-					{
-						Q_snprintf( friendlyName, sizeof(friendlyName), "#GameUI_None" );
-						bAddBrackets = true;
-					}
-					else
-					{
-						Q_snprintf( friendlyName, sizeof(friendlyName), "#GameUI_KeyNames_%s", key );
-					}
-				}
-				else
-				{
-					Q_snprintf( friendlyName, sizeof(friendlyName), "%s", key );
-				}
-				Q_strupr( friendlyName );
+				V_sprintf_safe( friendlyName, "%s", key );
+				V_strupr( friendlyName );
 
 				const wchar_t* locName = nullptr;
 
@@ -954,10 +939,10 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BY
 
 				if ( !locName || wcslen(locName) <= 0)
 				{
-					g_pVGuiLocalize->ConvertANSIToUnicode( friendlyName, token, sizeof(token) );
+					g_pVGuiLocalize->ConvertANSIToUnicode( friendlyName, token );
 
 					outbuf[pos] = '\0';
-					wcscat( outbuf, token );
+					V_wcscat( outbuf, token, outbufsizebytes / static_cast<int>(sizeof(wchar_t)) );
 					pos += wcslen(token);
 				}
 				else
@@ -965,14 +950,14 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BY
 					outbuf[pos] = '\0';
 					if ( bAddBrackets )
 					{
-						wcscat( outbuf, L"[" );
+						V_wcscat( outbuf, L"[", outbufsizebytes / static_cast<int>(sizeof(wchar_t)) );
 						pos += 1;
 					}
-					wcscat( outbuf, locName );
+					V_wcscat( outbuf, locName, outbufsizebytes / static_cast<int>(sizeof(wchar_t)) );
 					pos += wcslen(locName);
 					if ( bAddBrackets )
 					{
-						wcscat( outbuf, L"]" );
+						V_wcscat( outbuf, L"]", outbufsizebytes / static_cast<int>(sizeof(wchar_t)) );
 						pos += 1;
 					}
 				}
@@ -1219,14 +1204,14 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 
 	int iCount = 1;
 
-	KeyValues *kvMapLoadFile = new KeyValues( MAP_KEY_FILE );
+	KeyValuesAD kvMapLoadFile( MAP_KEY_FILE );
 	if ( kvMapLoadFile )
 	{
 		kvMapLoadFile->LoadFromFile( g_pFullFileSystem, szFilename, "MOD" );
 
 		char mapname[MAX_MAP_NAME];
-		Q_FileBase( engine->GetLevelName(), mapname, sizeof( mapname) );
-		Q_strlower( mapname );
+		V_FileBase( engine->GetLevelName(), mapname );
+		V_strlower( mapname );
 
 		// Increment existing, or add a new one
 		KeyValues *pMapKey = kvMapLoadFile->FindKey( mapname );
@@ -1253,15 +1238,6 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		kvMapLoadFile->RecursiveSaveToFile( buf, 0 );
 		g_pFullFileSystem->WriteFile( szFilename, "MOD", buf );
-
-		kvMapLoadFile->deleteThis();
-	}
-
-	if ( IsX360() )
-	{
-#ifdef _X360
-		xboxsystem->FinishContainerWrites();
-#endif
 	}
 }
 
@@ -1292,8 +1268,8 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 		kvMapLoadFile->LoadFromFile( g_pFullFileSystem, szFilename, "MOD" );
 
 		char mapname[MAX_MAP_NAME];
-		Q_FileBase( engine->GetLevelName(), mapname, sizeof( mapname) );
-		Q_strlower( mapname );
+		V_FileBase( engine->GetLevelName(), mapname );
+		V_strlower( mapname );
 
 		KeyValues *pMapKey = kvMapLoadFile->FindKey( mapname );
 		if ( pMapKey )

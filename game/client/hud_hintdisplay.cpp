@@ -263,7 +263,7 @@ void CHudHintDisplay::MsgFunc_HintText( bf_read &msg )
 {
 	// Read the string(s)
 	char szString[255];
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 
 	char *tmpStr = hudtextmessage->LookupString( szString, NULL );
 	LocalizeAndDisplay( tmpStr, szString );
@@ -307,7 +307,7 @@ void CHudHintDisplay::LocalizeAndDisplay( const char *pszHudTxtMsg, const char *
 	if ( !pszBuf )
 	{
 		// use plain ASCII string 
-		g_pVGuiLocalize->ConvertANSIToUnicode( szRawString, szBuf, sizeof(szBuf) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( szRawString, szBuf );
 		pszBuf = szBuf;
 	}
 
@@ -468,7 +468,7 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 			return false;
 		}
 		// use plain ASCII string 
-		g_pVGuiLocalize->ConvertANSIToUnicode(text, wszBuf, sizeof(wszBuf));
+		g_pVGuiLocalize->ConvertANSIToUnicode(text, wszBuf);
 		ws = wszBuf;
 	}
 
@@ -517,7 +517,7 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 
 			// lookup key names
 			char binding[64];
-			g_pVGuiLocalize->ConvertUnicodeToANSI( token, binding, sizeof(binding) );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( token, binding );
 
 			//!! change some key names into better names
 			char friendlyName[64];
@@ -566,7 +566,7 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 					// Turn localized string into icon character
 					Q_snprintf( szBuff, sizeof( szBuff ), "#GameUI_Icons_%s", g_pInputSystem->ButtonCodeToString( static_cast<ButtonCode_t>( iCode ) ) );
 					g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( szBuff ), 0 );
-					g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff, sizeof( szBuff ) );
+					g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
 
 					// Add this icon to our list of keys to display
 					friendlyName[ iNumBinds ] = szBuff[ 0 ];
@@ -766,7 +766,7 @@ void CHudHintKeyDisplay::MsgFunc_KeyHintText( bf_read &msg )
 
 	// read the string
 	char szString[2048];
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 
 	// make it visible
 	if ( SetHintText( szString ) )

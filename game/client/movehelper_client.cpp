@@ -244,7 +244,7 @@ void CMoveHelperClient::Con_NPrintf( int idx, char const* pFormat, ...)
 	char msg[8192];
 
 	va_start(marker, pFormat);
-	Q_vsnprintf(msg, sizeof( msg ), pFormat, marker);
+	V_vsprintf_safe(msg, pFormat, marker);
 	va_end(marker);
 	
 #if defined( CSTRIKE_DLL ) || defined( DOD_DLL ) // reltodo

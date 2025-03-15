@@ -481,7 +481,7 @@ void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
 		pText = g_pVGuiLocalize->Find( localString );
 		if ( !pText ) 
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode( pMessage->pMessage, textBuf, sizeof( textBuf ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( pMessage->pMessage, textBuf );
 			pText = textBuf;
 		}
 	}
@@ -775,7 +775,7 @@ void CHudMessage::MessageAdd( const char *pName )
 void CHudMessage::MsgFunc_HudText( bf_read &msg )
 {
 	char szString[2048];
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 
 	MessageAdd( szString );
 }

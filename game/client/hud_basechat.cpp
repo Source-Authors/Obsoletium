@@ -131,7 +131,7 @@ wchar_t* ReadLocalizedString( bf_read &msg, OUT_Z_BYTECAP(outSizeInBytes) wchar_
 {
 	char szString[2048];
 	szString[0] = 0;
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 
 	if ( originalString )
 	{
@@ -161,7 +161,7 @@ wchar_t* ReadChatTextString( bf_read &msg, OUT_Z_BYTECAP(outSizeInBytes) wchar_t
 {
 	char szString[2048];
 	szString[0] = 0;
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 
 	g_pVGuiLocalize->ConvertANSIToUnicode( szString, pOut, outSizeInBytes );
 
@@ -766,7 +766,7 @@ void CBaseHudChat::MsgFunc_SayText( bf_read &msg )
 	char szString[256];
 
 	int client = msg.ReadByte();
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 	bool bWantsToChat = msg.ReadByte();
 
 	if ( bWantsToChat )
@@ -822,7 +822,7 @@ void CBaseHudChat::MsgFunc_SayText2( bf_read &msg )
 	g_pVGuiLocalize->ConstructString_safe( szBuf[5], msg_text, 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 
 	char ansiString[512];
-	g_pVGuiLocalize->ConvertUnicodeToANSI( ConvertCRtoNL( szBuf[5] ), ansiString, sizeof( ansiString ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( ConvertCRtoNL( szBuf[5] ), ansiString );
 
 	if ( bWantsToChat )
 	{
@@ -872,7 +872,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 
 	for ( int i=0; i<5; ++i )
 	{
-		msg.ReadString( szString, sizeof(szString) );
+		msg.ReadString( szString );
 		char *tmpStr = hudtextmessage->LookupString( szString, &msg_dest );
 		const wchar_t *pBuf = g_pVGuiLocalize->Find( tmpStr );
 		if ( pBuf )
@@ -888,7 +888,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 			{
 				StripEndNewlineFromString( tmpStr );  // these strings are meant for subsitution into the main strings, so cull the automatic end newlines
 			}
-			g_pVGuiLocalize->ConvertANSIToUnicode( tmpStr, szBuf[i], sizeof(szBuf[i]) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( tmpStr, szBuf[i] );
 		}
 	}
 
@@ -905,7 +905,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 
 	case HUD_PRINTNOTIFY:
 		g_pVGuiLocalize->ConstructString_safe( outputBuf, szBuf[0], 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
-		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString, sizeof(szString) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString );
 		len = V_strlen( szString );
 		if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 		{
@@ -916,7 +916,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 
 	case HUD_PRINTTALK:
 		g_pVGuiLocalize->ConstructString_safe( outputBuf, szBuf[0], 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
-		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString, sizeof(szString) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString );
 		len = V_strlen( szString );
 		if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 		{
@@ -928,7 +928,7 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 
 	case HUD_PRINTCONSOLE:
 		g_pVGuiLocalize->ConstructString_safe( outputBuf, szBuf[0], 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
-		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString, sizeof(szString) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( outputBuf, szString );
 		len = V_strlen( szString );
 		if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 		{
@@ -981,18 +981,18 @@ void CBaseHudChat::MsgFunc_VoiceSubtitle( bf_read &msg )
 	}
 	else
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode( pszSubtitle, szBuf, sizeof(szBuf) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pszSubtitle, szBuf );
 	}
 
-	g_pVGuiLocalize->ConvertUnicodeToANSI( szBuf, szString, sizeof(szString) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( szBuf, szString );
 	intp len = V_strlen( szString );
 	if ( len && szString[len-1] != '\n' && szString[len-1] != '\r' )
 	{
-		Q_strncat( szString, "\n", sizeof(szString), 1 );
+		V_strcat_safe( szString, "\n" );
 	}
 
 	const wchar_t *pVoicePrefix = g_pVGuiLocalize->Find( "#Voice" );
-	g_pVGuiLocalize->ConvertUnicodeToANSI( pVoicePrefix, szPrefix, sizeof(szPrefix) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( pVoicePrefix, szPrefix );
 	
 	ChatPrintf( client, CHAT_FILTER_NONE, "%c(%s) %s%c: %s", COLOR_PLAYERNAME, szPrefix, GetDisplayedSubtitlePlayerName( client ), COLOR_NORMAL, ConvertCRtoNL( szString ) );
 
@@ -1079,7 +1079,7 @@ int CBaseHudChat::ComputeBreakChar( int width, const char *text, int textlen )
 
 		wchar_t wch[2];
 
-		g_pVGuiLocalize->ConvertANSIToUnicode( &ch, wch, sizeof( wch ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( &ch, wch );
 
 		int a,b,c;
 
@@ -1114,13 +1114,13 @@ int CBaseHudChat::ComputeBreakChar( int width, const char *text, int textlen )
 // Input  : *fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CBaseHudChat::Printf( int iFilter, const char *fmt, ... )
+void CBaseHudChat::Printf( int iFilter, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list marker;
 	char msg[4096];
 
 	va_start(marker, fmt);
-	Q_vsnprintf(msg, sizeof( msg), fmt, marker);
+	V_vsprintf_safe(msg, fmt, marker);
 	va_end(marker);
 
 	ChatPrintf( 0, iFilter, "%s", msg );
@@ -1562,7 +1562,7 @@ void CBaseHudChat::Send( void )
 	m_pChatInput->GetMessageText( szTextbuf, sizeof( szTextbuf ) );
 	
 	char ansi[128];
-	g_pVGuiLocalize->ConvertUnicodeToANSI( szTextbuf, ansi, sizeof( ansi ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( szTextbuf, ansi );
 
 	intp len = Q_strlen(ansi);
 
@@ -1669,13 +1669,13 @@ void CBaseHudChat::LevelShutdown( void )
 // Input  : *fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, const char *fmt, ... )
+void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list marker;
 	char msg[4096];
 
 	va_start(marker, fmt);
-	Q_vsnprintf(msg, sizeof( msg), fmt, marker);
+	V_vsprintf_safe(msg, fmt, marker);
 	va_end(marker);
 
 	// Strip any trailing '\n'
@@ -1769,7 +1769,7 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, const char *fmt, .
 		if ( pName )
 		{
 			wchar_t wideName[MAX_PLAYER_NAME_LENGTH];
-			g_pVGuiLocalize->ConvertANSIToUnicode( pName, wideName, sizeof( wideName ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( pName, wideName );
 
 			const wchar_t *nameInString = wcsstr( wbuf, wideName );
 

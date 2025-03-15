@@ -106,7 +106,7 @@ void CHudAnimationInfo::PaintString( int& x, int &y, const char *sz, Color *pLeg
 
 	wchar_t szconverted[ 512 ];
 
-	g_pVGuiLocalize->ConvertANSIToUnicode( "O->", szconverted, sizeof(szconverted)  );
+	g_pVGuiLocalize->ConvertANSIToUnicode( "O->", szconverted );
 		
 	if ( pLegendColor )
 	{
@@ -119,7 +119,7 @@ void CHudAnimationInfo::PaintString( int& x, int &y, const char *sz, Color *pLeg
 
 	surface()->DrawPrintText( szconverted, wcslen( szconverted ) );
 
-	g_pVGuiLocalize->ConvertANSIToUnicode( sz, szconverted, sizeof(szconverted)  );
+	g_pVGuiLocalize->ConvertANSIToUnicode( sz, szconverted );
 
 	surface()->DrawSetTextColor( m_ItemColor );
 	surface()->DrawPrintText( szconverted, wcslen( szconverted ) );
