@@ -32,7 +32,7 @@ template <int size>
 
       if (rc) return rc;
 
-      Q_UTF16ToUTF8(cwd.c_str(), out, size * sizeof(out[0]));
+      Q_WStringToUTF8(cwd.c_str(), out, size * sizeof(out[0]));
     } catch (const std::bad_alloc &) {
       return std::error_code{ENOMEM, std::generic_category()};
     }
