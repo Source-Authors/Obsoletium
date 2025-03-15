@@ -16,7 +16,7 @@ bool CRunTimeKeyValuesStringTable::ReadStringTable( int numStrings, CUtlBuffer& 
 	CUtlVector< int > offsets;
 	offsets.EnsureCapacity( numStrings );
 
-	offsets.CopyArray( (int *)( buf.PeekGet() ), numStrings );
+	offsets.CopyArray( (const int *)( buf.PeekGet() ), numStrings );
 
 	// Skip over data
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, buf.TellGet() + numStrings * sizeof( int ) );
