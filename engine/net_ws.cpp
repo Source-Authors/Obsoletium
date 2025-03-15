@@ -1717,7 +1717,7 @@ void NET_ProcessSocket( intp sock, IConnectionlessPacketHandler *handler )
 		// check for connectionless packet (0xffffffff) first
 		if ( LittleLong( *(unsigned int *)packet->data ) == CONNECTIONLESS_HEADER )
 		{
-			packet->message.ReadLong();	// read the -1
+			(void)packet->message.ReadLong();	// read the -1
 
 			if ( net_showudp.GetInt() )
 			{
