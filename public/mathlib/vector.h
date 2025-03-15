@@ -953,10 +953,10 @@ FORCEINLINE  ShortVector& ShortVector::operator-=(const ShortVector& v)
 
 FORCEINLINE  ShortVector& ShortVector::operator*=(float fl)
 {
-	x = static_cast<short>(x * fl);
-	y = static_cast<short>(y * fl);
-	z = static_cast<short>(z * fl);
-	w = static_cast<short>(w * fl);
+	x = static_cast<short>(x * fl); //-V2003
+	y = static_cast<short>(y * fl); //-V2003
+	z = static_cast<short>(z * fl); //-V2003
+	w = static_cast<short>(w * fl); //-V2003
 	return *this;
 }
 
@@ -973,10 +973,10 @@ FORCEINLINE  ShortVector& ShortVector::operator/=(float fl)
 {
 	Assert( fl != 0.0f );
 	const float oofl = 1.0f / fl;
-	x = static_cast<short>(x * oofl);
-	y = static_cast<short>(y * oofl);
-	z = static_cast<short>(z * oofl);
-	w = static_cast<short>(w * oofl);
+	x = static_cast<short>(x * oofl); //-V2003
+	y = static_cast<short>(y * oofl); //-V2003
+	z = static_cast<short>(z * oofl); //-V2003
+	w = static_cast<short>(w * oofl); //-V2003
 	return *this;
 }
 
@@ -993,10 +993,10 @@ FORCEINLINE  ShortVector& ShortVector::operator/=(const ShortVector& v)
 FORCEINLINE void ShortVectorMultiply( const ShortVector& src, float fl, ShortVector& res )
 {
 	Assert( IsFinite(fl) );
-	res.x = static_cast<short>(src.x * fl);
-	res.y = static_cast<short>(src.y * fl);
-	res.z = static_cast<short>(src.z * fl);
-	res.w = static_cast<short>(src.w * fl);
+	res.x = static_cast<short>(src.x * fl); //-V2003
+	res.y = static_cast<short>(src.y * fl); //-V2003
+	res.z = static_cast<short>(src.z * fl); //-V2003
+	res.w = static_cast<short>(src.w * fl); //-V2003
 }
 
 FORCEINLINE ShortVector ShortVector::operator*(float fl) const
@@ -1107,10 +1107,10 @@ FORCEINLINE  IntVector4D& IntVector4D::operator-=(const IntVector4D& v)
 
 FORCEINLINE  IntVector4D& IntVector4D::operator*=(float fl)
 {
-  x = static_cast<int>(x * fl);
-  y = static_cast<int>(y * fl);
-  z = static_cast<int>(z * fl);
-  w = static_cast<int>(w * fl);
+  x = static_cast<int>(x * fl); //-V2003
+  y = static_cast<int>(y * fl); //-V2003
+  z = static_cast<int>(z * fl); //-V2003
+  w = static_cast<int>(w * fl); //-V2003
 	return *this;
 }
 
@@ -1127,10 +1127,10 @@ FORCEINLINE  IntVector4D& IntVector4D::operator/=(float fl)
 {
 	Assert( fl != 0.0f );
 	const float oofl = 1.0f / fl;
-	x = static_cast<int>(x * oofl);
-	y = static_cast<int>(y * oofl);
-	z = static_cast<int>(z * oofl);
-	w = static_cast<int>(w * oofl);
+	x = static_cast<int>(x * oofl); //-V2003
+	y = static_cast<int>(y * oofl); //-V2003
+	z = static_cast<int>(z * oofl); //-V2003
+	w = static_cast<int>(w * oofl); //-V2003
 	return *this;
 }
 
@@ -1147,10 +1147,10 @@ FORCEINLINE  IntVector4D& IntVector4D::operator/=(const IntVector4D& v)
 FORCEINLINE void IntVector4DMultiply( const IntVector4D& src, float fl, IntVector4D& res )
 {
 	Assert( IsFinite(fl) );
-	res.x = static_cast<const int>(src.x * fl);
-	res.y = static_cast<const int>(src.y * fl);
-	res.z = static_cast<const int>(src.z * fl);
-	res.w = static_cast<const int>(src.w * fl);
+	res.x = static_cast<const int>(src.x * fl); //-V2003
+	res.y = static_cast<const int>(src.y * fl); //-V2003
+	res.z = static_cast<const int>(src.z * fl); //-V2003
+	res.w = static_cast<const int>(src.w * fl); //-V2003
 }
 
 FORCEINLINE IntVector4D IntVector4D::operator*(float fl) const
