@@ -83,7 +83,7 @@ private:
 			}
 			else
 			{
-				g_pVGuiLocalize->ConvertANSIToUnicode( text, localizeText, sizeof( localizeText ) );
+				g_pVGuiLocalize->ConvertANSIToUnicode( text, localizeText );
 			}
 
 			if ( m_bAddShortCut )

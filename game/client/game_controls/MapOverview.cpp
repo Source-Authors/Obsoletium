@@ -669,7 +669,7 @@ bool CMapOverview::DrawIcon( MapObject_t *obj )
 	{
 		wchar_t iconText[ MAX_PLAYER_NAME_LENGTH*2 ];
 
-		g_pVGuiLocalize->ConvertANSIToUnicode( text, iconText, sizeof( iconText ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( text, iconText );
 
 		int wide, tall;
 		surface()->GetTextSize( m_hIconFont, iconText, wide, tall );
