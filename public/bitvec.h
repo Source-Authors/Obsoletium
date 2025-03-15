@@ -398,9 +398,7 @@ private:
 class CVarBitVec : public CBitVecT< CVarBitVecBase<unsigned short> >
 {
 public:
-	CVarBitVec()
-	{
-	}
+	CVarBitVec() = default;
 	
 	CVarBitVec(int numBits)
 	 : CBitVecT< CVarBitVecBase<unsigned short> >(static_cast<unsigned short>(numBits))
@@ -418,9 +416,7 @@ public:
 class CLargeVarBitVec : public CBitVecT< CVarBitVecBase<int> >
 {
 public:
-	CLargeVarBitVec()
-	{
-	}
+	CLargeVarBitVec() = default;
 
 	CLargeVarBitVec(int numBits)
 		: CBitVecT< CVarBitVecBase<int> >(numBits)
