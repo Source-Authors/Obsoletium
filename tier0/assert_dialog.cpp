@@ -313,29 +313,23 @@ static INT_PTR CALLBACK AssertDialogProc(
 				// dimhotepus: Explicitly handle missed commands.
 				case IDC_IGNORE_NUMLINES:
 				case IDC_IGNORE_NUMTIMES:
+					return TRUE;
+					
+				// dimhotepus: Explicitly handle ESC.
 				case IDC_ESCAPE_DIALOG:
-					return TRUE;
-
-				default:
-				{
-					// dimhotepus: Cant use Assert here as recursive assert causes crash.
-					DebuggerBreakIfDebugging();
-					return TRUE;
-				}
-			}
-
-			case WM_KEYDOWN:
-			{
-				// Escape?
-				if ( wParam == 2 )
 				{
 					// Ignore this assert.
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
-			}
 
-			return TRUE;
+				default:
+				{
+					// dimhotepus: Cant use Assert here as recursive assert causes crash.
+					DebuggerBreakIfDebugging();
+					return FALSE;
+				}
+			}
 		}
 
 		case WM_DPICHANGED:
