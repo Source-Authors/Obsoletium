@@ -377,6 +377,27 @@ void SetPortalSphere (portal_t *p)
 	p->radius = bestr;
 }
 
+// dimhotepus: Dispatch vec_t type.
+using vector_type_t = std::conditional_t<
+	std::is_same_v<float, vec_t>,
+	float,
+	std::conditional_t<
+		std::is_same_v<double, vec_t>,
+		double,
+		void
+	>
+>;
+
+static constexpr const char* GetVector3FormatSpecifier() {
+	if constexpr (std::is_same_v<float, vector_type_t>)
+		return "(%f %f %f ) ";
+
+	if constexpr (std::is_same_v<double, vector_type_t>)
+		return "(%lf %lf %lf ) ";
+
+	return "";
+};
+
 /*
 ============
 LoadPortals
@@ -489,14 +510,14 @@ void LoadPortals (char *name)
 		
 		for (int j=0 ; j<numpoints ; j++)
 		{
-			double	v[3];
-			int		k;
+			vector_type_t v[3] = {};
+			constexpr auto format = GetVector3FormatSpecifier();
 
 			// scanf into double, then assign to vec_t
 			// so we don't care what size vec_t is
-			if (fscanf (f, "(%lf %lf %lf ) ", &v[0], &v[1], &v[2]) != 3)
+			if (fscanf (f, format, &v[0], &v[1], &v[2]) != 3)
 				Error ("LoadPortals: reading portal %i", i);
-			for (k=0 ; k<3 ; k++)
+			for (int k=0 ; k<3 ; k++)
 				w->points[j][k] = v[k];
 		}
 		fscanf (f, "\n");
