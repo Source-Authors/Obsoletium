@@ -537,45 +537,6 @@ int Q_UTF16ToUChar32( IN_Z const uchar16 *pUTF16, uchar32 &uValueOut, bool &bErr
 #define V_UTF8ToUnicode Q_UTF8ToWString
 #define V_UnicodeToUTF8 Q_WStringToUTF8
 
-// replaces characters in a UTF8 string with their identical-looking equivalent (non-roundtrippable)
-//
-// API uses a larger homoglyph table
-intp Q_NormalizeUTF8( IN_Z const char *pchSrc, OUT_Z_CAP(cchDest) char *pchDest, int cchDest );
-
-//-----------------------------------------------------------------------------
-// Purpose: replaces characters in a UTF8 string with similar-looking equivalents.
-// Only replaces with ASCII characters.. non-recognized characters will be replaced with ?
-// This operation is destructive (i.e. you can't roundtrip through the normalized
-// form).
-//-----------------------------------------------------------------------------
-template <size_t maxLenInChars>
-int Q_NormalizeUTF8ToASCII( OUT_Z_ARRAY char (&pchDest)[maxLenInChars], IN_Z const char *pchSrc ) 
-{ 
-	intp nResult = Q_NormalizeUTF8( pchSrc, pchDest, maxLenInChars );
-
-	// replace non ASCII characters with ?
-	for ( intp i = 0; i < nResult; i++ )
-	{
-		constexpr bool isCharUnsigned =
-			std::is_unsigned_v<std::decay_t<decltype(pchDest[0])>>;
-		if constexpr (isCharUnsigned)
-		{
-			// dimhotepus: Makes sense only if char is unsigned.
-			if ( pchDest[i] > 127 ) //-V547
-			{
-				pchDest[i] = '?';
-			}
-		}
-		else if ( pchDest[i] < 0 )
-		{
-			// dimhotepus: Makes sense only if char is signed.
-			pchDest[i] = '?';
-		}
-	}
-
-	return nResult;
-}
-
 #ifdef POSIX
 #include <cstdarg>
 #endif
