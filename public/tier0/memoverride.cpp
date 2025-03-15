@@ -778,7 +778,7 @@ inline void *MemAlloc_Unalign( void *pMemBlock )
 	alignas(unsigned **) unsigned *pAlloc = static_cast<unsigned *>(pMemBlock);
 
 	// pAlloc points to the pointer to starting of the memory block
-	pAlloc = reinterpret_cast<unsigned *>(((uintp)pAlloc & ~(sizeof( void * ) - 1)) - sizeof( void * ));
+	pAlloc = reinterpret_cast<unsigned *>((reinterpret_cast<uintp>(pAlloc) & ~(sizeof( void * ) - 1)) - sizeof( void * ));
 
 	// pAlloc is the pointer to the start of memory block
 	return *(reinterpret_cast<unsigned **>(pAlloc)); //-V114
@@ -797,7 +797,7 @@ ALLOC_CALL void *__cdecl _aligned_realloc_base( void *ptr, size_t size, size_t a
 	{
 		void *ptrUnaligned = MemAlloc_Unalign( ptr );
 		size_t oldSize = g_pMemAlloc->GetSize( ptrUnaligned );
-		size_t oldOffset = (uintp)ptr - (uintp)ptrUnaligned;
+		size_t oldOffset = reinterpret_cast<uintp>(ptr) - reinterpret_cast<uintp>(ptrUnaligned);
 		size_t copySize = oldSize - oldOffset;
 		if ( copySize > size )
 			copySize = size;
