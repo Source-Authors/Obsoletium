@@ -537,11 +537,8 @@ GDclass *GameData::BeginInstanceRemap( const char *pszClassName, const char *psz
 
 	V_strcpy_safe( m_InstancePrefix, pszInstancePrefix );
 
-	if ( m_InstanceClass )
-	{
-		delete m_InstanceClass;
-		m_InstanceClass = NULL;
-	}
+	delete m_InstanceClass;
+	m_InstanceClass = NULL;
 
 	if ( strcmpi( pszClassName, "info_overlay_accessor" ) == 0 )
 	{	// yucky hack for a made up entity in the bsp process
@@ -609,7 +606,7 @@ static bool CUtlType_LessThan( const GDIV_TYPE &type1, const GDIV_TYPE &type2 )
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
+bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
 {
 	if ( RemapOperation.Count() == 0 )
 	{
@@ -624,19 +621,27 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 
 	if ( !m_InstanceClass )
 	{
+		// dimhotepus: Zero-terminate on failure.
+		if ( outLen > 0 )
+			pszOutValue[0] = '\0';
 		return false;
 	}
 
 	GDinputvariable *KVVar = m_InstanceClass->VarForName( pszKey );
 	if ( !KVVar )
 	{
+		if ( outLen > 0 )
+			pszOutValue[0] = '\0';
 		return false;
 	}
 
 	GDIV_TYPE	KVType = KVVar->GetType();
-	auto			KVRemapIndex = RemapOperation.Find( KVType );
+	auto		KVRemapIndex = RemapOperation.Find( KVType );
 	if ( KVRemapIndex == RemapOperation.InvalidIndex() )
 	{
+		// dimhotepus: Zero-terminate on failure.
+		if ( outLen > 0 )
+			pszOutValue[0] = '\0';
 		return false;
 	}
 
@@ -716,7 +721,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapNameField( const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
+bool GameData::RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
 {
 	V_strncpy( pszOutValue, pszInValue, outLen );
 

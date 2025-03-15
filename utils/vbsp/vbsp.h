@@ -275,7 +275,12 @@ public:
 	static char			m_InstancePath[ MAX_PATH ];
 	static void			SetInstancePath( const char *pszInstancePath );
 	static const char	*GetInstancePath( void ) { return m_InstancePath; }
-	static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, char *pszOutFileName );
+	static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_CAP(outFileNameSize) char *pszOutFileName, intp outFileNameSize );
+	template<intp outFileNameSize>
+	static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_ARRAY char (&pszOutFileName)[outFileNameSize] )
+	{
+		return DeterminePath( pszBaseFileName, pszInstanceFileName, pszOutFileName, outFileNameSize );
+	}
 
 	void				CheckForInstances( const char *pszFileName );
 	void				MergeInstance( entity_t *pInstanceEntity, CMapFile *Instance );

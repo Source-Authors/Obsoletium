@@ -962,12 +962,12 @@ void SetModelNumbers (void)
 
 		if ( !IsFuncOccluder(i) )
 		{
-			sprintf (value, "*%i", models);
+			V_sprintf_safe (value, "*%i", models);
 			models++;
 		}
 		else
 		{
-			sprintf (value, "");
+			value[0] = '\0';
 		}
 		SetKeyValue (&entities[i], "model", value);
 	}
@@ -1020,7 +1020,7 @@ void SetLightStyles (void)
 			V_strcpy_safe(lighttargets[j], t);
 			stylenum++;
 		}
-		sprintf (value, "%i", 32 + j);
+		V_sprintf_safe (value, "%i", 32 + j);
 		const char *pCurrentStyle = ValueForKey( e, "style" );
 		// the designer has set a default lightstyle as well as making the light switchable
 		if ( pCurrentStyle )
@@ -1288,8 +1288,8 @@ void EndBSPFile (void)
 	DiscoverMacroTextures();
 
 	char fileName[1024];
-	V_strncpy( fileName, source, sizeof( fileName ) );
-	V_DefaultExtension( fileName, ".bsp", sizeof( fileName ) );
+	V_strcpy_safe( fileName, source );
+	V_DefaultExtension( fileName, ".bsp" );
 	Msg ("Writing %s\n", fileName);
 	WriteBSPFile (fileName);
 }
@@ -1555,9 +1555,9 @@ void ComputeBoundsNoSkybox( )
 		if (!strcmp(pEntity, "worldspawn"))
 		{
 			char	string[32];
-			sprintf (string, "%i %i %i", (int)mins[0], (int)mins[1], (int)mins[2]);
+			V_sprintf_safe (string, "%i %i %i", (int)mins[0], (int)mins[1], (int)mins[2]);
 			SetKeyValue (&entities[i], "world_mins", string);
-			sprintf (string, "%i %i %i", (int)maxs[0], (int)maxs[1], (int)maxs[2]);
+			V_sprintf_safe (string, "%i %i %i", (int)maxs[0], (int)maxs[1], (int)maxs[2]);
 			SetKeyValue (&entities[i], "world_maxs", string);
 			break;
 		}

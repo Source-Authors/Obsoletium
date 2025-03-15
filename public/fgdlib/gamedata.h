@@ -83,8 +83,18 @@ class GameData
 		inline GDclass *GetClass(intp nIndex) const;
 
 		GDclass *BeginInstanceRemap( const char *pszClassName, const char *pszInstancePrefix, Vector &Origin, QAngle &Angle );
-		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
-		bool	RemapNameField( const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
+		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
+		template<intp outSize>
+		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_ARRAY char (&pszOutValue)[outSize], TNameFixup NameFixup )
+		{
+			return RemapKeyValue( pszKey, pszInValue, pszOutValue, outSize, NameFixup );
+		}
+		bool	RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
+		template<intp outSize>
+		bool	RemapNameField( const char *pszInValue, OUT_Z_ARRAY char (&pszOutValue)[outSize], TNameFixup NameFixup )
+		{
+			return RemapNameField ( pszInValue, pszOutValue, outSize, NameFixup );
+		}
 		bool	LoadFGDMaterialExclusions( TokenReader &tr );
 		bool	LoadFGDAutoVisGroups( TokenReader &tr );
 		

@@ -245,8 +245,8 @@ CPhysCollide* ComputeConvexHull( studiohdr_t* pStudioHdr )
 static CPhysCollide* GetCollisionModel( char const* pModelName )
 {
 	// Convert to a common string
-	char* pTemp = (char*)_alloca(strlen(pModelName) + 1);
-	strcpy( pTemp, pModelName );
+	V_strdup_stack( pModelName, pTemp );
+
 	_strlwr( pTemp );
 
 	char* pSlash = strchr( pTemp, '\\' );
@@ -295,7 +295,7 @@ static CPhysCollide* GetCollisionModel( char const* pModelName )
 	{
 		static int propNum = 0;
 		char tmp[128];
-		sprintf( tmp, "staticprop%03d.txt", propNum );
+		V_sprintf_safe( tmp, "staticprop%03d.txt", propNum );
 		DumpCollideToGlView( lookup.m_pCollide, tmp );
 		++propNum;
 	}
@@ -717,7 +717,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 	// load and persist the vertex file
 	V_strcpy_safe( fileName, "models/" );	
 	V_strcat_safe( fileName, g_pActiveStudioHdr->pszName() );
-	Q_StripExtension( fileName, fileName, sizeof( fileName ) );
+	Q_StripExtension( fileName, fileName );
 	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model

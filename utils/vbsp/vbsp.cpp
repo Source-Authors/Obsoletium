@@ -600,7 +600,7 @@ static void EmitOccluderBrushes()
 
 		// NOTE: If you change the algorithm by which occluder numbers are allocated,
 		// then you must also change FixupOnlyEntsOccluderEntities() below
-		sprintf (str, "%i", nOccluder);
+		V_sprintf_safe (str, "%i", nOccluder);
 		SetKeyValue (&entities[entity_num], "occludernumber", str);
 
 		int nIndex = g_OccluderInfo.AddToTail();
@@ -753,7 +753,7 @@ void FixupOnlyEntsOccluderEntities()
 
 		// NOTE: If you change the algorithm by which occluder numbers are allocated above,
 		// then you must also change this
-		sprintf (str, "%i", nOccluder);
+		V_sprintf_safe (str, "%i", nOccluder);
 		SetKeyValue (&entities[entity_num], "occludernumber", str);
 		++nOccluder;
 	}
@@ -886,8 +886,8 @@ int RunVBSP( int argc, char **argv )
 	CommandLine()->CreateCmdLine( argc, argv );
 	const ScopedFileSystem scopedFileSystem( argv[ argc - 1 ] );
 
-	Q_StripExtension( ExpandArg( argv[ argc - 1 ] ), source, sizeof( source ) );
-	Q_FileBase( source, mapbase, sizeof( mapbase ) );
+	Q_StripExtension( ExpandArg( argv[ argc - 1 ] ), source );
+	Q_FileBase( source, mapbase );
 	strlwr( mapbase );
 
 	// Depends on ScopedFileSystem.
@@ -1336,10 +1336,10 @@ int RunVBSP( int argc, char **argv )
 	const char *pszExtension = V_GetFileExtension( name );
 	if ( !pszExtension )
 	{
-		V_SetExtension( name, ".vmm", sizeof( name ) );
+		V_SetExtension( name, ".vmm" );
 		if ( !FileExists( name ) )
 		{
-			V_SetExtension( name, ".vmf", sizeof( name ) );
+			V_SetExtension( name, ".vmf" );
 		}
 	}
 

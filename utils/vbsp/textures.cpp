@@ -402,8 +402,8 @@ int GetSurfaceProperties2( MaterialSystemMaterial_t matID, const char *pMatName 
 //-----------------------------------------------------------------------------
 int FindAliasedTexData( const char *pName_, dtexdata_t *sourceTexture )
 {
-	char *pName = ( char * )_alloca( strlen( pName_ ) + 1 );
-	strcpy( pName, pName_ );
+	V_strdup_stack( pName_, pName );
+
 	strlwr( pName );
 	int i, output;
 	bool found;
@@ -471,8 +471,7 @@ int FindTexData( const char *pName )
 //-----------------------------------------------------------------------------
 int FindOrCreateTexData( const char *pName_ )
 {
-	char *pName = ( char * )_alloca( strlen( pName_ ) + 1 );
-	strcpy( pName, pName_ );
+	V_strdup_stack( pName_, pName );
 
 	int nOutput = FindTexData( pName );
 	if ( nOutput >= 0 )

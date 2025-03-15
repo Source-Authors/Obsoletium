@@ -213,9 +213,9 @@ unsigned int CPhysCollisionEntry::WriteCollisionBinary( char *pDest )
 void CPhysCollisionEntry::DumpCollideFileName( const char *pName, int modelIndex, CTextBuffer *pTextBuffer )
 {
 	char tmp[128];
-	sprintf( tmp, "%s%03d.phy", pName, modelIndex );
+	V_sprintf_safe( tmp, "%s%03d.phy", pName, modelIndex );
 	DumpCollideToPHY( m_pCollide, pTextBuffer, tmp );
-	sprintf( tmp, "%s%03d.txt", pName, modelIndex );
+	V_sprintf_safe( tmp, "%s%03d.txt", pName, modelIndex );
 	DumpCollideToGlView( m_pCollide, tmp );
 }
 
@@ -286,7 +286,7 @@ CPhysCollisionEntryStaticSolid ::CPhysCollisionEntryStaticSolid ( CPhysCollide *
 void CPhysCollisionEntryStaticSolid::DumpCollide( CTextBuffer *pTextBuffer, int modelIndex, int collideIndex )
 {
 	char tmp[128];
-	sprintf( tmp, "static%02d", modelIndex );
+	V_sprintf_safe( tmp, "static%02d", modelIndex );
 	DumpCollideFileName( tmp, collideIndex, pTextBuffer );
 }
 
@@ -307,7 +307,7 @@ CPhysCollisionEntryStaticMesh::CPhysCollisionEntryStaticMesh( CPhysCollide *pCol
 void CPhysCollisionEntryStaticMesh::DumpCollide( CTextBuffer *pTextBuffer, int modelIndex, int collideIndex )
 {
 	char tmp[128];
-	sprintf( tmp, "mesh%02d", modelIndex );
+	V_sprintf_safe( tmp, "mesh%02d", modelIndex );
 	DumpCollideFileName( tmp, collideIndex, pTextBuffer );
 }
 
@@ -341,8 +341,7 @@ CPhysCollisionEntryFluid::CPhysCollisionEntryFluid( CPhysCollide *pCollide, cons
 {
 	m_surfaceNormal = normal;
 	m_surfaceDist = dist;
-	m_pSurfaceProp = new char[strlen(pSurfaceProp)+1];
-	strcpy( m_pSurfaceProp, pSurfaceProp );
+	m_pSurfaceProp = V_strdup(pSurfaceProp);
 	m_damping = damping;
 	m_contentsMask = nContents;
 }
@@ -355,7 +354,7 @@ CPhysCollisionEntryFluid::~CPhysCollisionEntryFluid()
 void CPhysCollisionEntryFluid::DumpCollide( CTextBuffer *pTextBuffer, int modelIndex, int collideIndex )
 {
 	char tmp[128];
-	sprintf( tmp, "water%02d", modelIndex );
+	V_sprintf_safe( tmp, "water%02d", modelIndex );
 	DumpCollideFileName( tmp, collideIndex, pTextBuffer );
 }
 
@@ -790,17 +789,18 @@ float GetSubdivSizeForFogVolume( int fogVolumeID )
 //			waterdepth - 
 //			*fullname - 
 //-----------------------------------------------------------------------------
-void GetWaterTextureName( char const *mapname, char const *materialname, int waterdepth, char *fullname  )
+template<intp fullNameSize>
+void GetWaterTextureName( char const *mapname, char const *materialname, int waterdepth, char (&fullname)[fullNameSize]  )
 {
 	char temp[ 512 ];
 
 	// Construct the full name (prepend mapname to reduce name collisions)
-	sprintf( temp, "maps/%s/%s_depth_%i", mapname, materialname, (int)waterdepth );
+	V_sprintf_safe( temp, "maps/%s/%s_depth_%i", mapname, materialname, waterdepth );
 
 	// Make sure it's lower case
 	strlwr( temp );
 
-	strcpy( fullname, temp );
+	V_strcpy_safe( fullname, temp );
 }
 
 //-----------------------------------------------------------------------------
@@ -819,7 +819,7 @@ void EmitWaterMaterialFile( WaterTexInfo *wti )
 	
 	// Convert to string
 	char szDepth[ 32 ];
-	sprintf( szDepth, "%i", wti->m_nWaterDepth );
+	V_sprintf_safe( szDepth, "%i", wti->m_nWaterDepth );
 	CreateMaterialPatch( wti->m_MaterialName.String(), waterTextureName, "$waterdepth", szDepth, PATCH_INSERT );
 }
 
@@ -854,7 +854,7 @@ int FindOrCreateWaterTexInfo( texinfo_t *pBaseInfo, float depth )
 	// Otherwise, fill in the rest of the data
 	lookup.m_nWaterDepth = (int)depth;
 	// Remember the current material name
-	sprintf( materialname, "%s", name );
+	V_sprintf_safe( materialname, "%s", name );
 	strlwr( materialname );
 	lookup.m_MaterialName = materialname;
 

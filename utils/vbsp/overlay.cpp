@@ -80,8 +80,9 @@ int Overlay_GetFromEntity( entity_t *pMapEnt )
 
 	// Convert the sidelist to side id(s).
 	const char *pSideList = ValueForKey( pMapEnt, "sides" );
-	char *pTmpList = ( char* )_alloca( strlen( pSideList ) + 1 );
-	strcpy( pTmpList, pSideList );
+
+	V_strdup_stack( pSideList, pTmpList );
+
 	const char *pScan = strtok( pTmpList, " " );
 	if ( !pScan )
 		return iAccessorID;

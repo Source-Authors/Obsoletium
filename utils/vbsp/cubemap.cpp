@@ -262,9 +262,9 @@ static bool LoadSrcVTFFiles( IVTFTexture *pSrcVTFTextures[6], const char *pSkybo
 	return true;
 }
 
-void VTFNameToHDRVTFName( const char *pSrcName, char *pDest, int maxLen, bool bHDR )
+static void VTFNameToHDRVTFName( const char *pSrcName, char (&pDest)[MAX_PATH], bool bHDR )
 {
-	Q_strncpy( pDest, pSrcName, maxLen );
+	V_strcpy_safe( pDest, pSrcName );
 	if( !bHDR )
 	{
 		return;
@@ -274,7 +274,7 @@ void VTFNameToHDRVTFName( const char *pSrcName, char *pDest, int maxLen, bool bH
 	{
 		return;
 	}
-	Q_strncpy( pDot, ".hdr.vtf", maxLen - ( pDot - pDest ) );
+	V_strncpy( pDot, ".hdr.vtf", ssize(pDest) - ( pDot - pDest ) );
 }
 
 #define DEFAULT_CUBEMAP_SIZE 32
@@ -452,17 +452,18 @@ void CreateDefaultCubemaps( bool bHDR )
 	// spit out the default one.
 	AddBufferToPak( pak, dstVTFFileName, outputBuf.Base(), outputBuf.TellPut(), false );
 
+	char vtfName[MAX_PATH];
 	// spit out all of the ones that are attached to world geometry.
-	int i;
-	for( i = 0; i < s_DefaultCubemapNames.Count(); i++ )
+	for( auto *name : s_DefaultCubemapNames )
 	{
-		char vtfName[MAX_PATH];
-		VTFNameToHDRVTFName( s_DefaultCubemapNames[i], vtfName, MAX_PATH, bHDR );
+		VTFNameToHDRVTFName( name, vtfName, bHDR );
+
 		if( FileExistsInPak( pak, vtfName ) )
 		{
 			continue;
 		}
-		AddBufferToPak( pak, vtfName, outputBuf.Base(),outputBuf.TellPut(), false );
+
+		AddBufferToPak( pak, vtfName, outputBuf.Base(), outputBuf.TellPut(), false );
 	}
 
 	// Clean up the textures
@@ -484,8 +485,9 @@ void Cubemap_CreateDefaultCubemaps( void )
 void Cubemap_SaveBrushSides( const char *pSideListStr )
 {
 	IntVector_t &brushSidesVector = s_EnvCubemapToBrushSides[s_EnvCubemapToBrushSides.AddToTail()];
-	char *pTmp = ( char * )_alloca( strlen( pSideListStr ) + 1 );
-	strcpy( pTmp, pSideListStr );
+
+	V_strdup_stack( pSideListStr, pTmp );
+
 	const char *pScan = strtok( pTmp, " " );
 	if( !pScan )
 	{
@@ -645,10 +647,10 @@ static int Cubemap_CreateTexInfo( int originalTexInfo, int origin[3] )
 		
 		// Store off the name of the cubemap that we need to create since we successfully patched
 		char pFileName[1024];
-		int nLen = V_sprintf_safe( pFileName, "materials/%s.vtf", pTextureName );
+		V_sprintf_safe( pFileName, "materials/%s.vtf", pTextureName );
+
 		intp id = s_DefaultCubemapNames.AddToTail();
-		s_DefaultCubemapNames[id] = new char[ nLen + 1 ];
-		strcpy( s_DefaultCubemapNames[id], pFileName );
+		s_DefaultCubemapNames[id] = V_strdup( pFileName );
 
 		// Make a new texdata
 		nTexDataID = AddCloneTexData( pTexData, pGeneratedTexDataName );
@@ -974,6 +976,7 @@ void Cubemap_AddUnreferencedCubemaps()
 		info.m_pOrigin[2] = pSample->origin[2];
 		GeneratePatchedName( "c", info, false, pTextureName, 1024 );
 		
+		intp j;
 		// find or add
 		for ( j=0; j<s_DefaultCubemapNames.Count(); ++j )
 		{
@@ -985,11 +988,10 @@ void Cubemap_AddUnreferencedCubemaps()
 		}
 		if ( j == s_DefaultCubemapNames.Count() )
 		{
-			int nLen = Q_snprintf( pFileName, 1024, "materials/%s.vtf", pTextureName );
+			V_sprintf_safe( pFileName, "materials/%s.vtf", pTextureName );
 
-			int id = s_DefaultCubemapNames.AddToTail();
-			s_DefaultCubemapNames[id] = new char[nLen + 1];
-			strcpy( s_DefaultCubemapNames[id], pFileName );
+			intp id = s_DefaultCubemapNames.AddToTail();
+			s_DefaultCubemapNames[id] = V_strdup( pFileName );
 		}
 	}
 }

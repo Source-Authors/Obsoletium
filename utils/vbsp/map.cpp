@@ -1244,8 +1244,7 @@ void ConvertSideList( entity_t *mapent, char *key )
 
 	if (pszSideList)
 	{
-		char *pszTmpList = ( char* )_alloca( strlen( pszSideList ) + 1 );
-		strcpy( pszTmpList, pszSideList );
+		V_strdup_stack( pszSideList, pszTmpList );
 
 		bool bFirst = true;
 		char szNewValue[1024];
@@ -1290,7 +1289,7 @@ ChunkFileResult_t HandleNoDynamicShadowsEnt( entity_t *pMapEnt )
 	// Get the list of the sides.
 	const char *pSideList = ValueForKey( pMapEnt, "sides" );
 	// dimhotepus: Create a copy as strtok accepts non-const
-	char *sideList = copystring( pSideList );
+	char *sideList = V_strdup( pSideList );
 
 	// Parse the side list.
 	char *pScan = strtok( sideList, " " );
@@ -1307,7 +1306,7 @@ ChunkFileResult_t HandleNoDynamicShadowsEnt( entity_t *pMapEnt )
 		} while( ( pScan = strtok( NULL, " " ) ) );
 	}
 
-	free(sideList);
+	delete[] sideList;
 	
 	// Clear out this entity.
 	pMapEnt->epairs = NULL;
@@ -1385,8 +1384,9 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 	else if ( !stricmp( szKey, "sides" ) )
 	{
 		const char *pSideList = szValue;
-		char *pTmpList = ( char* )_alloca( strlen( pSideList ) + 1 );
-		strcpy( pTmpList, pSideList );
+
+		V_strdup_stack( pSideList, pTmpList );
+
 		const char *pScan = strtok( pTmpList, " " );
 		if ( !pScan )
 			return ChunkFile_Fail;
@@ -1699,7 +1699,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
 			mapent->areaportalnum = c_areaportals;
 
 			// set the portal number as "portalnumber"
-			sprintf (str, "%i", c_areaportals);
+			V_sprintf_safe (str, "%i", c_areaportals);
 			SetKeyValue (mapent, "portalnumber", str);
 
 			MoveBrushesToWorld (mapent);
@@ -1907,21 +1907,21 @@ void CMapFile::SetInstancePath( const char *pszInstancePath )
 // Output : Returns true if it was able to locate the file
 //			pszOutFileName - the full path to the file name if located
 //-----------------------------------------------------------------------------
-bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, char *pszOutFileName )
+bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_CAP(outFileNameSize) char *pszOutFileName, intp outFileNameSize )
 {
 	char		szInstanceFileNameFixed[ MAX_PATH ];
 	const char *pszMapPath = "\\maps\\";
 
 	V_strcpy_safe( szInstanceFileNameFixed, pszInstanceFileName );
-	V_SetExtension( szInstanceFileNameFixed, ".vmf", sizeof( szInstanceFileNameFixed ) );
+	V_SetExtension( szInstanceFileNameFixed, ".vmf" );
 	V_FixSlashes( szInstanceFileNameFixed );
 
 	// first, try to find a relative location based upon the Base file name
-	strcpy( pszOutFileName, pszBaseFileName );
+	V_strncpy( pszOutFileName, pszBaseFileName, outFileNameSize );
 	V_StripFilename( pszOutFileName );
 
-	strcat( pszOutFileName, "\\" );
-	strcat( pszOutFileName, szInstanceFileNameFixed );
+	V_strcat( pszOutFileName, "\\", outFileNameSize );
+	V_strcat( pszOutFileName, szInstanceFileNameFixed, outFileNameSize );
 
 	if ( g_pFullFileSystem->FileExists( pszOutFileName ) )
 	{
@@ -1929,19 +1929,19 @@ bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstan
 	}
 
 	// second, try to find the master 'maps' directory and make it relative from that
-	strcpy( pszOutFileName, pszBaseFileName );
+	V_strncpy( pszOutFileName, pszBaseFileName, outFileNameSize );
 	V_StripFilename( pszOutFileName );
 	V_RemoveDotSlashes( pszOutFileName );
 	V_FixDoubleSlashes( pszOutFileName );
 	V_strlower( pszOutFileName );
-	strcat( pszOutFileName, "\\" );
+	V_strcat( pszOutFileName, "\\", outFileNameSize );
 
 	char *pos = strstr( pszOutFileName, pszMapPath );
 	if ( pos )
 	{
 		pos += strlen( pszMapPath );
 		*pos = 0;
-		strcat( pszOutFileName, szInstanceFileNameFixed );
+		V_strcat( pszOutFileName, szInstanceFileNameFixed, outFileNameSize );
 
 		if ( g_pFullFileSystem->FileExists( pszOutFileName ) )
 		{
@@ -1951,13 +1951,13 @@ bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstan
 
 	if ( m_InstancePath[ 0 ] != 0 )
 	{
-		sprintf( szInstanceFileNameFixed, "%s%s", m_InstancePath, pszInstanceFileName );
+		V_sprintf_safe( szInstanceFileNameFixed, "%s%s", m_InstancePath, pszInstanceFileName );
 
 		if ( g_pFullFileSystem->FileExists( szInstanceFileNameFixed, "GAME" ) )
 		{
 			char FullPath[ MAX_PATH ];
-			g_pFullFileSystem->RelativePathToFullPath( szInstanceFileNameFixed, "GAME", FullPath, sizeof( FullPath ) );
-			strcpy( pszOutFileName, FullPath );
+			g_pFullFileSystem->RelativePathToFullPath_safe( szInstanceFileNameFixed, "GAME", FullPath );
+			V_strncpy( pszOutFileName, FullPath, outFileNameSize );
 
 			return true;
 		}
@@ -1985,7 +1985,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 
 	char	GameInfoPath[ MAX_PATH ];
 
-	g_pFullFileSystem->RelativePathToFullPath( "gameinfo.txt", "MOD", GameInfoPath, sizeof( GameInfoPath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( "gameinfo.txt", "MOD", GameInfoPath );
 	KeyValues *GameInfoKV = ReadKeyValuesFile( GameInfoPath );
 	if ( !GameInfoKV )
 	{
@@ -2007,9 +2007,9 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	}
 
 	char	FDGPath[ MAX_PATH ];
-	if ( !g_pFullFileSystem->RelativePathToFullPath( GameDataFile, "EXECUTABLE_PATH", FDGPath, sizeof( FDGPath ) ) )
+	if ( !g_pFullFileSystem->RelativePathToFullPath_safe( GameDataFile, "EXECUTABLE_PATH", FDGPath ) )
 	{
-		if ( !g_pFullFileSystem->RelativePathToFullPath( GameDataFile, NULL, FDGPath, sizeof( FDGPath ) ) )
+		if ( !g_pFullFileSystem->RelativePathToFullPath_safe( GameDataFile, NULL, FDGPath ) )
 		{
 			Msg( "Could not locate GameData file %s\n", GameDataFile );
 		}
@@ -2305,7 +2305,7 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 			ValuePos++;
 
 			V_strcpy_safe( Value, NewValue );
-			if ( !V_StrSubst( Value, InstanceVariable, ValuePos, NewValue, sizeof( NewValue ), false ) )
+			if ( !V_StrSubst( Value, InstanceVariable, ValuePos, NewValue, false ) )
 			{
 				Overwritten = true;
 				break;
@@ -2343,15 +2343,15 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 	const char *pName = ValueForKey( pInstanceEntity, "name" );
 	if ( pTargetName[ 0 ] )
 	{
-		sprintf( NameFixup, "%s", pTargetName );
+		V_sprintf_safe( NameFixup, "%s", pTargetName );
 	}
 	else if ( pName[ 0 ] )
 	{
-		sprintf( NameFixup, "%s", pName );
+		V_sprintf_safe( NameFixup, "%s", pName );
 	}
 	else
 	{
-		sprintf( NameFixup, "InstanceAuto%d", m_InstanceCount );
+		V_sprintf_safe( NameFixup, "InstanceAuto%d", m_InstanceCount );
 	}
 
 	for( int i = 0; i < num_entities; i++ )
@@ -2381,7 +2381,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 		{
 			int value = atoi( pID );
 			value += max_entity_id;
-			sprintf( temp, "%d", value );
+			V_sprintf_safe( temp, "%d", value );
 
 			SetKeyValue( entity, "hammerid", temp );
 		}
@@ -2485,12 +2485,13 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 
 		if ( GD.RemapNameField( origValue, temp, FixupStyle ) )
 		{
-			newValue = new char [ strlen( temp ) + extraLen + 1 ];
-			strcpy( newValue, temp );
+			intp sizeValue = strlen( temp ) + extraLen + 1;
+			newValue = new char [ sizeValue ];
+			V_strncpy( newValue, temp, sizeValue );
 			if ( pos )
 			{
-				strcat( newValue, "," );
-				strcat( newValue, pos + 1 );
+				V_strncat( newValue, ",", sizeValue );
+				V_strncat( newValue, pos + 1, sizeValue );
 			}
 
 			Connection->m_Pair->value = newValue;
@@ -2931,11 +2932,8 @@ ChunkFileResult_t CMapFile::LoadConnectionsKeyCallback(const char *szKey, const 
 	//
 	epair_t *pOutput = new epair_t;
 
-	pOutput->key = new char [strlen(szKey) + 1];
-	pOutput->value = new char [strlen(szValue) + 1];
-
-	strcpy(pOutput->key, szKey);
-	strcpy(pOutput->value, szValue);
+	pOutput->key = V_strdup(szKey);
+	pOutput->value = V_strdup(szValue);
 
 	m_ConnectionPairs = new CConnectionPairs( pOutput, m_ConnectionPairs );
 	
@@ -3067,7 +3065,7 @@ ChunkFileResult_t CMapFile::LoadSolidCallback(CChunkFile *pFile, LoadEntity_t *p
 			VectorAdd (b->mins, b->maxs, origin);
 			VectorScale (origin, 0.5, origin);
 
-			sprintf (string, "%i %i %i", (int)origin[0], (int)origin[1], (int)origin[2]);
+			V_sprintf_safe (string, "%i %i %i", (int)origin[0], (int)origin[1], (int)origin[2]);
 			SetKeyValue (&entities[b->entitynum], "origin", string);
 
 			VectorCopy (origin, entities[b->entitynum].origin);
