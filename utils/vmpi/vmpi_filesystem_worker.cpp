@@ -2,7 +2,7 @@
 //
 //
 
-#include <winsock2.h>
+#include "winlite.h"
 #include <system_error>
 
 #include "vmpi_filesystem_internal.h"
