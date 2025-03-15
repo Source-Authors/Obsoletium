@@ -687,7 +687,8 @@ void CWebAPIValues::SetName( const char * pchName )
 		while ( pchName[unLen] != 0 )
 		{
 			if ( pchName[unLen] == '\'' || pchName[unLen] == '"' || pchName[unLen] == '&'
-				|| pchName[unLen] == '>' || pchName[unLen] == '>' || pchName[unLen] == ':' )
+				// dimhotepus: Correclt handle <
+				|| pchName[unLen] == '<' || pchName[unLen] == '>' || pchName[unLen] == ':' )
 			{
 				AssertMsg( false, "Shouldn't use any of '\"&<>: in CWebAPIValues node names, you used %s", pchName );
 				break;
