@@ -219,7 +219,8 @@ CWorkThreadPool::CWorkThreadPool( const char *pszThreadName )
 	m_cMaxThreads( 0 ),
 	m_pWorkThreadConstructor( NULL ),
 	m_cSuccesses( 0 ),
-	m_cFailures( 0 )
+	m_cFailures( 0 ),
+	m_cRetries( 0 )
 {
 	Assert( pszThreadName != NULL );
 	Q_strncpy( m_szThreadNamePfx, pszThreadName, sizeof( m_szThreadNamePfx ) );
