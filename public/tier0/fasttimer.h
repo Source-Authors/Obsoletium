@@ -28,7 +28,7 @@ public:
 
 	void			Init();		// Set to zero.
 	void			Init( float initTimeMsec );
-	void			Init( double initTimeMsec )		{ Init( (float)initTimeMsec ); }
+	void			Init( double initTimeMsec )		{ Init( static_cast<float>( initTimeMsec ) ); }
 	void			Init( uint64 cycles );
 	bool			IsLessThan( CCycleCount const &other ) const;					// Compare two counts.
 
@@ -233,7 +233,7 @@ private:
 
 inline CCycleCount::CCycleCount()
 {
-	Init( (uint64)0 );
+	Init( static_cast<uint64>(0) );
 }
 
 inline CCycleCount::CCycleCount( uint64 cycles )
@@ -243,15 +243,15 @@ inline CCycleCount::CCycleCount( uint64 cycles )
 
 inline void CCycleCount::Init()
 {
-	Init( (uint64)0 );
+	Init( static_cast<uint64>(0) );
 }
 
 inline void CCycleCount::Init( float initTimeMsec )
 {
 	if ( g_ClockSpeedMillisecondsMultiplier > 0 )
-		Init( (uint64)(initTimeMsec / g_ClockSpeedMillisecondsMultiplier) );
+		Init( static_cast<uint64>(initTimeMsec / g_ClockSpeedMillisecondsMultiplier) );
 	else
-		Init( (uint64)0 );
+		Init( static_cast<uint64>(0) );
 }
 
 inline void CCycleCount::Init( uint64 cycles )
