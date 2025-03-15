@@ -2068,7 +2068,7 @@ public:
 	void SetAbsolutePath( const char *pFormat, ... )
 	{
 		va_list marker;
-		va_start( marker, pFormat );
+		va_start( marker, pFormat ); //-V2018 //-V2019
 		V_vsprintf_safe( m_AbsolutePath, pFormat, marker );
 		va_end( marker );
 
@@ -3034,7 +3034,7 @@ int CBaseFileSystem::Write( IN_BYTECAP(size) void const* pInput, int size, FileH
 int CBaseFileSystem::FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list args;
-	va_start( args, pFormat );
+	va_start( args, pFormat ); //-V2018 //-V2019
 	VPROF_BUDGET( "CBaseFileSystem::FPrintf", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	if ( !file )
 	{
@@ -4611,7 +4611,7 @@ void CBaseFileSystem::Warning( FileWarningLevel_t level, PRINTF_FORMAT_STRING co
 	va_list argptr; 
     char warningtext[ 4096 ];
     
-    va_start( argptr, fmt );
+    va_start( argptr, fmt ); //-V2018 //-V2019
     V_vsprintf_safe( warningtext, fmt, argptr );
     va_end( argptr );
 
