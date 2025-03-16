@@ -559,30 +559,6 @@ bool CPerforceFileListFrame::PerformOperation( )
 	//	pError->SetSmallCaption( true );
 	//	pError->DoModal();
 	//}
-#if 0
-	if ( *pErrorString )
-	{
-		if ( V_strstr( pErrorString, "opened for add" ) )
-			return bSuccess;
-		if ( V_strstr( pErrorString, "opened for edit" ) )
-			return bSuccess;
-		// TODO - figure out the rest of these...
-
-		const char *pPrefix =	"Perforce has generated the following message which may or may not be an error.\n"
-								"Please email joe with the text of the message, whether you think it was an error, and what perforce operation you where performing.\n"
-								"To copy the message, hit ~ to enter the console, where you will find the message reprinted.\n"
-								"Select the lines of text in the message, right click, select Copy, and then paste into an email message.\n\n";
-		static int nPrefixLen = V_strlen( pPrefix );
-		int nErrorStringLength = V_strlen( pErrorString );
-		char *pMsg = (char*)_alloca( nPrefixLen + nErrorStringLength + 1 );
-		V_strcpy( pMsg, pPrefix );
-		V_strcpy( pMsg + nPrefixLen, pErrorString );
-
-		vgui::MessageBox *pError = new vgui::MessageBox( "Dubious Perforce Message", pMsg, GetParent() );
-		pError->SetSmallCaption( true );
-		pError->DoModal();
-	}
-#endif
 	return bSuccess;
 }
 
