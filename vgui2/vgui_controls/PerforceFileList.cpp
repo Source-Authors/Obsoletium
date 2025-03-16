@@ -378,9 +378,9 @@ void PerforceFileList::RemoveAllFiles()
 //-----------------------------------------------------------------------------
 // Finds a file in the p4 list
 //-----------------------------------------------------------------------------
-static P4File_t *FindFileInPerforceList( const char *pFileName, CUtlVector<P4File_t> &fileList, bool *pFound )
-{
-  // dimhotepus: No perforce
+// dimhotepus: No perforce
+//static P4File_t *FindFileInPerforceList( const char *pFileName, CUtlVector<P4File_t> &fileList, bool *pFound )
+//{
 	//int nCount = fileList.Count();
 	/*for ( int i = 0; i < nCount; ++i )
 	{
@@ -394,8 +394,8 @@ static P4File_t *FindFileInPerforceList( const char *pFileName, CUtlVector<P4Fil
 			return &fileList[i];
 		}*/
 	//}
-	return NULL;
-}
+//	return NULL;
+//}
 
 
 //-----------------------------------------------------------------------------
