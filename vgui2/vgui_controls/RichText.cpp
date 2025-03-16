@@ -868,7 +868,7 @@ void RichText::Paint()
 		{
 			if ( m_TextStream[i] == '\t' )
 			{
-				int dxTabWidth = 8 * surface()->GetCharacterWidth(hFontCurrent, ' ');
+				int dxTabWidth = 8 * surface()->GetCharacterWidth(hFontCurrent, L' ');
 				dxTabWidth = MAX( 1, dxTabWidth );
 
 				renderState.x = ( dxTabWidth * ( 1 + ( renderState.x / dxTabWidth ) ) );

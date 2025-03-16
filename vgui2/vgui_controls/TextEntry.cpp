@@ -3604,14 +3604,14 @@ void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInByte
 	if (m_TextStream.Count())
 	{
 		// temporarily null terminate the text stream so we can use the conversion function
-		intp nullTerminatorIndex = m_TextStream.AddToTail((wchar_t)0);
+		intp nullTerminatorIndex = m_TextStream.AddToTail(L'\0');
 		g_pVGuiLocalize->ConvertUnicodeToANSI(m_TextStream.Base(), buf, bufLenInBytes);
 		m_TextStream.FastRemove(nullTerminatorIndex);
 	}
 	else
 	{
 		// no characters in the stream
-		buf[0] = 0;
+		buf[0] = '\0';
 	}
 }
 
@@ -3628,11 +3628,11 @@ void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *wbuf, int bufLenIn
 	{
 		int terminator = min(len, (bufLenInBytes / (int)sizeof(wchar_t)) - 1);
 		wcsncpy(wbuf, m_TextStream.Base(), terminator);
-		wbuf[terminator] = 0;
+		wbuf[terminator] = L'\0';
 	}
 	else
 	{
-		wbuf[0] = 0;
+		wbuf[0] = L'\0';
 	}
 }
 

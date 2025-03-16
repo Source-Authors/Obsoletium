@@ -420,7 +420,7 @@ void TextImage::Paint()
 			{
 				surface()->DrawSetTextPos(x + px, y + py);
 				surface()->DrawUnicodeChar('.');
-				x += surface()->GetCharacterWidth(font, '.');
+				x += surface()->GetCharacterWidth(font, L'.');
 			}
 			break;
 		}
@@ -746,7 +746,7 @@ void TextImage::RecalculateEllipsesPosition()
 			m_bRenderUsingFallbackFont = true;
 		}
 		
-		int ellipsesWidth = 3 * surface()->GetCharacterWidth(font, '.');
+		int ellipsesWidth = 3 * surface()->GetCharacterWidth(font, L'.');
 		int x = 0;
 
 		for (wchar_t *wsz = _utext; *wsz != 0; wsz++)
