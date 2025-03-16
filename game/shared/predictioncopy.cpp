@@ -117,7 +117,7 @@ void CPredictionCopy::ReportFieldsDiffer( const char *fmt, ... )
 	char data[ 4096 ];
 	int len;
 	va_start(argptr, fmt);
-	len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
 	if ( m_nErrorCount == 1 )
@@ -163,7 +163,7 @@ void CPredictionCopy::DescribeFields( difftype_t dt, const char *fmt, ... )
 	char data[ 4096 ];
 	int len;
 	va_start(argptr, fmt);
-	len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
 	bool isnetworked = ( flags & FTYPEDESC_INSENDTABLE ) ? true : false;
@@ -310,7 +310,7 @@ void CPredictionCopy::DescribeInt( difftype_t dt, int *outvalue, const int *inva
 			described = true;
 			char shortfile[ 512 ];
 			shortfile[ 0 ] = 0;
-			Q_FileBase( modelinfo->GetModelName( m ), shortfile, sizeof( shortfile ) );
+			V_FileBase( modelinfo->GetModelName( m ), shortfile );
 
 			DescribeFields( dt, "integer (%i->%s)\n", outvalue[0], shortfile );
 		}
@@ -341,7 +341,7 @@ void CPredictionCopy::WatchInt( difftype_t dt, int *outvalue, const int *invalue
 			described = true;
 			char shortfile[ 512 ];
 			shortfile[ 0 ] = 0;
-			Q_FileBase( modelinfo->GetModelName( m ), shortfile, sizeof( shortfile ) );
+			V_FileBase( modelinfo->GetModelName( m ), shortfile );
 
 			WatchMsg( "integer (%i->%s)", outvalue[0], shortfile );
 		}
@@ -1332,7 +1332,7 @@ static ConVar pwatchvar( "pwatchvar", "", FCVAR_CHEAT, "Entity variable to watch
 // Input  : *fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CPredictionCopy::WatchMsg( const char *fmt, ... )
+void CPredictionCopy::WatchMsg( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	Assert( m_pCurrentField && (m_pCurrentField == m_pWatchField) );
 	Assert( m_pOperation );
@@ -1341,7 +1341,7 @@ void CPredictionCopy::WatchMsg( const char *fmt, ... )
 	char data[ 4096 ];
 	int len;
 	va_start(argptr, fmt);
-	len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
 	Msg( "%i %s %s : %s\n", gpGlobals->tickcount, m_pOperation, m_pCurrentField->fieldName, data );
@@ -1468,7 +1468,7 @@ void CPredictionDescribeData::Describe( const char *fmt, ... )
 	char data[ 4096 ];
 	int len;
 	va_start(argptr, fmt);
-	len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
 	bool isprivate = ( flags & FTYPEDESC_PRIVATE ) ? true : false;

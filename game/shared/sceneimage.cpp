@@ -68,12 +68,12 @@ public:
 		return ::TokenAvailable() ? true : false;
 	}
 
-	void Error( const char *fmt, ... ) override
+	void Error( PRINTF_FORMAT_STRING const char *fmt, ... ) override
 	{
 		char string[2048];
 		va_list argptr;
 		va_start( argptr, fmt );
-		Q_vsnprintf( string, sizeof(string), fmt, argptr );
+		V_vsprintf_safe( string, fmt, argptr );
 		va_end( argptr );
 
 		Warning( "%s", string );
@@ -299,14 +299,14 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 
 	// get all the VCD files according to the seacrh paths
 	char searchPaths[512];
-	g_pFullFileSystem->GetSearchPath( "GAME", false, searchPaths, sizeof( searchPaths ) );
+	g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths );
 	char *pPath = strtok( searchPaths, ";" );
 	while ( pPath )
 	{
 		intp currentCount = vcdFileList.Count();
 
 		char szPath[MAX_PATH];
-		V_ComposeFileName( pPath, "scenes/*.vcd", szPath, sizeof( szPath ) );
+		V_ComposeFileName( pPath, "scenes/*.vcd", szPath );
 
 		scriptlib->FindFiles( szPath, true, vcdFileList );
 

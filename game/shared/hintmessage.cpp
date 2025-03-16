@@ -12,17 +12,6 @@
 	#include "util.h"
 #endif
 
-//--------------------------------------------------------------------------------------------------------
-/**
-* Simple utility function to allocate memory and duplicate a string
-*/
-inline char *CloneString( const char *str )
-{
-	char *cloneStr = new char [ strlen(str)+1 ];
-	strcpy( cloneStr, str );
-	return cloneStr;
-}
-
 extern int gmsgHudText;
 
 enum { HMQ_SIZE = 8 };	// Maximum number of messages queue can hold
@@ -37,9 +26,9 @@ CHintMessage::CHintMessage( const char * hintString, CUtlVector< const char * > 
 
 	if ( args )
 	{
-		for ( int i=0; i<args->Count(); ++i )
+		for ( auto *arg : *args )
 		{
-			m_args.AddToTail( CloneString( (*args)[i] ) );
+			m_args.AddToTail( V_strdup( arg ) );
 		}
 	}
 }
@@ -232,9 +221,9 @@ void CHintMessageTimers::AddTimer( int iHintID, float timer_duration, float mess
 	newTimer->flMessageDuration = message_duration;
 	if ( args )
 	{
-		for ( int i=0; i<args->Count(); ++i )
+		for ( auto *arg : *args )
 		{
-			newTimer->args.AddToTail( CloneString( (*args)[i] ) );
+			newTimer->args.AddToTail( V_strdup( arg ) );
 		}
 	}
 	m_Timers.AddToTail( newTimer );

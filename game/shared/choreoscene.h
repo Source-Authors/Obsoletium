@@ -395,7 +395,13 @@ abstract_class IChoreoStringPool
 {
 public:
 	virtual short	FindOrAddString( const char *pString ) = 0;
-	virtual bool	GetString( short stringId, char *buff, intp buffSize ) = 0; 	
+	virtual bool	GetString( short stringId, OUT_Z_CAP(buffSize) char *buff, intp buffSize ) = 0;
+
+	template<intp buffSize>
+	bool GetString( short stringId, OUT_Z_ARRAY char (&buff)[buffSize] )
+	{
+		return GetString( stringId, buff, buffSize );
+	}
 };
 
 CChoreoScene *ChoreoLoadScene( 

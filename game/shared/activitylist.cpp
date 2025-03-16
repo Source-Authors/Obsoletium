@@ -2409,7 +2409,7 @@ public:
 			return;
 		}
 		nameLen &= 0xFFFF;
-		pRestore->ReadString( nameBuf, sizeof(nameBuf), nameLen );
+		pRestore->ReadString( nameBuf, nameLen );
 		*pActivityIndex = ActivityList_IndexForName( nameBuf );
 		if ( *pActivityIndex < 0 )
 		{

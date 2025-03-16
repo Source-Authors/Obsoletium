@@ -143,9 +143,9 @@ static int SeedFileLineHash( int seedvalue, const char *sharedname, int addition
 
 	CRC32_Init( &retval );
 
-	CRC32_ProcessBuffer( &retval, (void *)&seedvalue, sizeof( int ) );
-	CRC32_ProcessBuffer( &retval, (void *)&additionalSeed, sizeof( int ) );
-	CRC32_ProcessBuffer( &retval, (void *)sharedname, Q_strlen( sharedname ) );
+	CRC32_ProcessBuffer( &retval, seedvalue );
+	CRC32_ProcessBuffer( &retval, additionalSeed );
+	CRC32_ProcessBuffer( &retval, sharedname, Q_strlen( sharedname ) );
 	
 	CRC32_Final( &retval );
 

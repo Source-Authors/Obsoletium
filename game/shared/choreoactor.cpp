@@ -278,7 +278,7 @@ void CChoreoActor::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 bool CChoreoActor::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoStringPool *pStringPool )
 {
 	char sz[ 256 ];
-	pStringPool->GetString( buf.GetShort(), sz, sizeof( sz ) );
+	pStringPool->GetString( buf.GetShort(), sz );
 
 	SetName( sz );
 

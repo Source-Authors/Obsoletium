@@ -180,13 +180,13 @@ static int ClassFileLineHash( const char *classname, const char *module, int lin
 	//  letters, etc.!!!
 	Q_strncpy( tempbuffer, classname, sizeof( tempbuffer ) );
 	Q_strlower( tempbuffer );
-	CRC32_ProcessBuffer( &retval, (void *)tempbuffer, Q_strlen( tempbuffer ) );
+	CRC32_ProcessBuffer( &retval, tempbuffer, Q_strlen( tempbuffer ) );
 	
 	Q_strncpy( tempbuffer, module, sizeof( tempbuffer ) );
 	Q_strlower( tempbuffer );
-	CRC32_ProcessBuffer( &retval, (void *)tempbuffer, Q_strlen( tempbuffer ) );
+	CRC32_ProcessBuffer( &retval, tempbuffer, Q_strlen( tempbuffer ) );
 	
-	CRC32_ProcessBuffer( &retval, (void *)&line, sizeof( int ) );
+	CRC32_ProcessBuffer( &retval, line );
 
 	CRC32_Final( &retval );
 

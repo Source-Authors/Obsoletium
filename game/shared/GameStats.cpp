@@ -178,7 +178,7 @@ void CBaseGameStats::StatsLog( char const *fmt, ... )
 	char buf[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( buf, sizeof( buf ), fmt, argptr );
+	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
 	// Prepend timestamp and spew it
@@ -428,7 +428,7 @@ bool CBaseGameStats::SaveToFileNOW( bool bForceSyncWrite /* = false */ )
 	char fullpath[ 512 ] = { 0 };
 	if ( filesystem->FileExists( GetStatSaveFileName(), GAMESTATS_PATHID ) )
 	{
-		filesystem->RelativePathToFullPath( GetStatSaveFileName(), GAMESTATS_PATHID, fullpath, sizeof( fullpath ) );
+		filesystem->RelativePathToFullPath_safe( GetStatSaveFileName(), GAMESTATS_PATHID, fullpath );
 	}
 	else
 	{
@@ -582,7 +582,7 @@ bool CBaseGameStats::LoadFromFile( void )
 	if ( filesystem->FileExists( gamestats->GetStatSaveFileName(), GAMESTATS_PATHID ) )
 	{
 		char fullpath[ 512 ];
-		filesystem->RelativePathToFullPath( gamestats->GetStatSaveFileName(), GAMESTATS_PATHID, fullpath, sizeof( fullpath ) );
+		filesystem->RelativePathToFullPath_safe( gamestats->GetStatSaveFileName(), GAMESTATS_PATHID, fullpath );
 		StatsLog( "Loading stats from '%s'\n", fullpath );
 	}
 	
@@ -999,7 +999,7 @@ void CBaseGameStats_Driver::CollectData( StatSendType_t sendType )
 			// make a map node in the KeyValues to use for this level
 			char szMap[MAX_PATH+1]="";
 #ifdef CLIENT_DLL	
-			Q_FileBase( MapName(), szMap, ARRAYSIZE( szMap ) );
+			V_FileBase( MapName(), szMap );
 #else
 			Q_strncpy( szMap, gpGlobals->mapname.ToCStr(), ARRAYSIZE( szMap ) );
 #endif // CLIENT_DLL

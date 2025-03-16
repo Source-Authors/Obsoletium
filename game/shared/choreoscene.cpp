@@ -71,7 +71,7 @@ void CChoreoScene::choreoprintf(int level, PRINTF_FORMAT_STRING const char *fmt,
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( string, sizeof(string), fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 
 	while ( level-- > 0 )
@@ -497,7 +497,7 @@ void CChoreoScene::SceneMsg( PRINTF_FORMAT_STRING const char *pFormat, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, pFormat );
-	Q_vsnprintf( string, sizeof(string), pFormat, argptr );
+	V_vsprintf_safe( string, pFormat, argptr );
 	va_end( argptr );
 
 	if ( m_pfnPrint )
@@ -2977,11 +2977,7 @@ intp CChoreoScene::FindActorIndex( CChoreoActor *actor )
 //-----------------------------------------------------------------------------
 void CChoreoScene::SwapActors( int a1, int a2 )
 {
-	CChoreoActor *temp;
-
-	temp = m_Actors[ a1 ];
-	m_Actors[ a1 ] = m_Actors[ a2 ];
-	m_Actors[ a2 ] = temp;
+	std::swap( m_Actors[ a1 ], m_Actors[ a2 ] );
 }
 
 //-----------------------------------------------------------------------------

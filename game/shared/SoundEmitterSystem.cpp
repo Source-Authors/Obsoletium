@@ -241,7 +241,7 @@ public:
 		soundemitterbase->ReloadSoundEntriesInList( pFilesToReload );
 	}
 
-	virtual void TraceEmitSound( char const *fmt, ... )
+	virtual void TraceEmitSound( PRINTF_FORMAT_STRING char const *fmt, ... )
 	{
 		if ( !sv_soundemitter_trace.GetBool() )
 			return;
@@ -249,7 +249,7 @@ public:
 		va_list	argptr;
 		char string[256];
 		va_start (argptr, fmt);
-		Q_vsnprintf( string, sizeof( string ), fmt, argptr );
+		V_vsprintf_safe( string, fmt, argptr );
 		va_end (argptr);
 
 		// Spew to console
