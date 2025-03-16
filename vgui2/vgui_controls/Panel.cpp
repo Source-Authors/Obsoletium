@@ -4966,7 +4966,7 @@ MessageMapItem_t Panel::m_MessageMap[] =
 };
 
 // IMPLEMENT_PANELMAP( Panel, NULL )
-PanelMap_t Panel::m_PanelMap = { Panel::m_MessageMap, ssize(Panel::m_MessageMap), "Panel", NULL, 0 };
+PanelMap_t Panel::m_PanelMap = { Panel::m_MessageMap, static_cast<int>(ssize(Panel::m_MessageMap)), "Panel", NULL, 0 };
 PanelMap_t *Panel::GetPanelMap( void ) { return &m_PanelMap; }
 
 //-----------------------------------------------------------------------------
@@ -6091,20 +6091,20 @@ class CStringProperty : public vgui::IPanelAnimationPropertyConverter
 public:
 	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
-		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		kv->SetString( entry->name(), (char *)data );
+		const void *data = (*entry->m_pfnLookup)( panel );
+		kv->SetString( entry->name(), static_cast<const char *>(data) );
 	}
 	
 	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
-		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		strcpy( (char *)data, kv->GetString( entry->name() ) );
+		void *data = (*entry->m_pfnLookup)( panel );
+		strcpy( static_cast<char *>(data), kv->GetString( entry->name() ) );
 	}
 
 	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
-		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		strcpy( ( char * )data, entry->defaultvalue() );
+		void *data = (*entry->m_pfnLookup)( panel );
+		strcpy( static_cast<char *>(data), entry->defaultvalue() );
 	}
 };
 
