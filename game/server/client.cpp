@@ -182,12 +182,12 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	{
 		if ( args.ArgC() >= 2 )
 		{
-			Q_snprintf( szTemp,sizeof(szTemp), "%s %s", ( char * )pcmd, (char *)args.ArgS() );
+			V_sprintf_safe( szTemp, "%s %s", pcmd, args.ArgS() );
 		}
 		else
 		{
 			// Just a one word command, use the first word...sigh
-			Q_snprintf( szTemp,sizeof(szTemp), "%s", ( char * )pcmd );
+			V_sprintf_safe( szTemp, "%s", pcmd );
 		}
 		p = szTemp;
 	}
@@ -239,24 +239,24 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	{
 		if ( pszLocation && pszLocation[0] != '\0' )
 		{
-			Q_snprintf( text, sizeof(text), "%s %s @ %s: ", pszPrefix, pszPlayerName, pszLocation );
+			V_sprintf_safe( text, "%s %s @ %s: ", pszPrefix, pszPlayerName, pszLocation );
 		}
 		else
 		{
-			Q_snprintf( text, sizeof(text), "%s %s: ", pszPrefix, pszPlayerName );
+			V_sprintf_safe( text, "%s %s: ", pszPrefix, pszPlayerName );
 		}
 	}
 	else
 	{
-		Q_snprintf( text, sizeof(text), "%s: ", pszPlayerName );
+		V_sprintf_safe( text, "%s: ", pszPlayerName );
 	}
 
 	j = sizeof(text) - 2 - V_strlen(text);  // -2 for /n and null terminator
 	if ( V_strlen(p) > j )
 		p[j] = 0;
 
-	Q_strncat( text, p, sizeof( text ), COPY_ALL_CHARACTERS );
-	Q_strncat( text, "\n", sizeof( text ), COPY_ALL_CHARACTERS );
+	V_strcat_safe( text, p );
+	V_strcat_safe( text, "\n" );
  
 	// loop through all players
 	// Start with the first player.
@@ -866,7 +866,7 @@ CON_COMMAND( give, "Give item to player.\n\tArguments: <item_name>" )
 		&& args.ArgC() >= 2 )
 	{
 		char item_to_give[ 256 ];
-		Q_strncpy( item_to_give, args[1], sizeof( item_to_give ) );
+		V_strcpy_safe( item_to_give, args[1] );
 		Q_strlower( item_to_give );
 
 		// Don't allow regular users to create point_servercommand entities for the same reason as blocking ent_fire
@@ -931,7 +931,7 @@ void CC_Player_SetModel( const CCommand &args )
 	if ( pPlayer && args.ArgC() == 2)
 	{
 		static char szName[256];
-		Q_snprintf( szName, sizeof( szName ), "models/%s.mdl", args[1] );
+		V_sprintf_safe( szName, "models/%s.mdl", args[1] );
 		pPlayer->SetModel( szName );
 		UTIL_SetSize(pPlayer, VEC_HULL_MIN, VEC_HULL_MAX);
 	}

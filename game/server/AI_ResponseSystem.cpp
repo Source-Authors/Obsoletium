@@ -704,7 +704,7 @@ public:
 	void		PushScript( const char *scriptfile, unsigned char *buffer );
 	void		PopScript(void);
 
-	void		ResponseWarning( const char *fmt, ... );
+	void		ResponseWarning( PRINTF_FORMAT_STRING const char *fmt, ... );
 
 	CUtlDict< ResponseGroup, short >	m_Responses;
 	CUtlDict< Criteria, short >	m_Criteria;
@@ -1288,7 +1288,7 @@ void CResponseSystem::DebugPrint( int depth, const char *fmt, ... )
 	char szText[1024];
 
 	va_start (argptr, fmt);
-	Q_vsnprintf (szText, sizeof( szText ), fmt, argptr);
+	V_vsprintf_safe (szText, fmt, argptr);
 	va_end (argptr);
 
 	DevMsg( "%s%s", indent, szText );
@@ -2616,7 +2616,7 @@ int	CResponseSystem::GetCurrentToken() const
 }
 
 
-void CResponseSystem::ResponseWarning( const char *fmt, ... )
+void CResponseSystem::ResponseWarning( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 #ifndef _XBOX
@@ -2626,7 +2626,7 @@ void CResponseSystem::ResponseWarning( const char *fmt, ... )
 #endif	
 
 	va_start (argptr, fmt);
-	Q_vsnprintf(string, sizeof(string), fmt,argptr);
+	V_vsprintf_safe(string, fmt,argptr);
 	va_end (argptr);
 
 	char cur[ 256 ];
@@ -3115,7 +3115,7 @@ public:
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
-				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
+				pRestore->ReadString( groupname, 0 );
 
 				// Try and find it
 				auto idx = rs.m_Responses.Find( groupname );
@@ -3135,7 +3135,7 @@ public:
 						pRestore->StartBlock( szResponseBlockName );
 						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
 						{
-							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
+							pRestore->ReadString( responsename, 0 );
 
 							// Find it by name
 							intp ri;
@@ -3236,7 +3236,7 @@ public:
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
-				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
+				pRestore->ReadString( groupname, 0 );
 
 				// Try and find it
 				auto idx = pRS->m_Responses.Find( groupname );
@@ -3256,7 +3256,7 @@ public:
 						pRestore->StartBlock( szResponseBlockName );
 						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
 						{
-							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
+							pRestore->ReadString( responsename, 0 );
 
 							// Find it by name
 							intp ri;

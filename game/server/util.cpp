@@ -1308,13 +1308,13 @@ void UTIL_SnapDirectionToAxis( Vector &direction, float epsilon )
 	}
 }
 
-const char *UTIL_VarArgs( const char *format, ... )
+const char *UTIL_VarArgs( PRINTF_FORMAT_STRING const char *format, ... )
 {
 	va_list		argptr;
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	Q_vsnprintf(string, sizeof(string), format,argptr);
+	V_vsprintf_safe(string, format,argptr);
 	va_end (argptr);
 
 	return string;	
@@ -1748,13 +1748,13 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 // UTIL_LogPrintf - Prints a logged message to console.
 // Preceded by LOG: ( timestamp ) < message >
 //=========================================================
-void UTIL_LogPrintf( const char *fmt, ... )
+void UTIL_LogPrintf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 	char		tempString[1024];
 	
 	va_start ( argptr, fmt );
-	Q_vsnprintf( tempString, sizeof(tempString), fmt, argptr );
+	V_vsprintf_safe( tempString, fmt, argptr );
 	va_end   ( argptr );
 
 	// Print to server console
@@ -1809,7 +1809,7 @@ extern "C" void Sys_Error( char *error, ... )
 	char	string[1024];
 	
 	va_start( argptr, error );
-	Q_vsnprintf( string, sizeof(string), error, argptr );
+	V_vsprintf_safe( string, error, argptr );
 	va_end( argptr );
 
 	Warning( "%s", string );

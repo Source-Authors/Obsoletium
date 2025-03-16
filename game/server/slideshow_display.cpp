@@ -228,7 +228,7 @@ void CSlideshowDisplay::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 
 void CSlideshowDisplay::Spawn( void )
 {
-	Q_strcpy( m_szSlideshowDirectory.GetForModify(), m_String_tSlideshowDirectory.ToCStr() );
+	V_strncpy( m_szSlideshowDirectory.GetForModify(), m_String_tSlideshowDirectory.ToCStr(), m_szSlideshowDirectory.Size() );
 	Precache();
 
 	BaseClass::Spawn();
@@ -313,7 +313,7 @@ void CSlideshowDisplay::InputEnable( inputdata_t &inputdata )
 
 void CSlideshowDisplay::InputSetDisplayText( inputdata_t &inputdata )
 {
-	Q_strcpy( m_szDisplayText.GetForModify(), inputdata.value.String() );
+	V_strncpy( m_szDisplayText.GetForModify(), inputdata.value.String(), m_szDisplayText.Size() );
 }
 
 void CSlideshowDisplay::InputRemoveAllSlides( inputdata_t &inputdata )

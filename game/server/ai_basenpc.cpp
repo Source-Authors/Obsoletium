@@ -10986,7 +10986,7 @@ int CAI_BaseNPC::Save( ISave &save )
 		Q_strncpy( saveHeader.szSchedule, pszSchedule, sizeof( saveHeader.szSchedule ) );
 
 		CRC32_Init( &saveHeader.scheduleCrc );
-		CRC32_ProcessBuffer( &saveHeader.scheduleCrc, (void *)m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
+		CRC32_ProcessBuffer( &saveHeader.scheduleCrc, m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
 		CRC32_Final( &saveHeader.scheduleCrc );
 	}
 	else
@@ -11179,7 +11179,7 @@ int CAI_BaseNPC::Restore( IRestore &restore )
 		{
 			CRC32_t scheduleCrc;
 			CRC32_Init( &scheduleCrc );
-			CRC32_ProcessBuffer( &scheduleCrc, (void *)m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
+			CRC32_ProcessBuffer( &scheduleCrc, m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
 			CRC32_Final( &scheduleCrc );
 
 			if ( scheduleCrc != saveHeader.scheduleCrc )
@@ -11228,7 +11228,7 @@ void CAI_BaseNPC::RestoreConditions( IRestore &restore, CAI_ScheduleBits *pCondi
 	char szCondition[256];
 	for (;;)
 	{
-		restore.ReadString( szCondition, sizeof(szCondition), 0 );
+		restore.ReadString( szCondition, 0 );
 		if ( !szCondition[0] )
 			break;
 		int iCondition = GetSchedulingSymbols()->ConditionSymbolToId( szCondition );

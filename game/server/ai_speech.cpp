@@ -122,7 +122,7 @@ public:
 
 			pRestore->StartBlock();
 			{
-				pRestore->ReadString( conceptname, sizeof( conceptname ), 0 );
+				pRestore->ReadString( conceptname, 0 );
 
 				pRestore->ReadAll( &history );
 
@@ -822,7 +822,7 @@ void CAI_Expresser::SpeechMsg( CBaseEntity *pFlex, PRINTF_FORMAT_STRING const ch
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, pszFormat );
-	Q_vsnprintf( string, sizeof(string), pszFormat, argptr );
+	V_vsprintf_safe( string, pszFormat, argptr );
 	va_end( argptr );
 
 	if ( pFlex->MyNPCPointer() )

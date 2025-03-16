@@ -5578,7 +5578,7 @@ private:
 			const char *name = symbols[ i ].String();
 
 			char buf[ 512 ];
-			Q_strncpy( buf, name, sizeof( buf ) );
+			V_strcpy_safe( buf, name );
 			Q_strlower( buf );
 
 			CUtlString command = CFmtStr( "%s %s %s", cmdname, targetEntity, buf );
