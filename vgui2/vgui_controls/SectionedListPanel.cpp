@@ -1219,7 +1219,7 @@ bool SectionedListPanel::AddColumnToSection(int sectionID, const char *columnNam
 	wchar_t *pwtext = g_pVGuiLocalize->Find(columnText);
 	if (!pwtext)
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode(columnText, wtext, sizeof(wtext));
+		g_pVGuiLocalize->ConvertANSIToUnicode(columnText, wtext);
 		pwtext = wtext;
 	}
 	return AddColumnToSection(sectionID, columnName, pwtext, columnFlags, width, fallbackFont );

@@ -165,7 +165,7 @@ void TextImage::SetText(const char *text)
 
 	// convert the ansi string to unicode and use that
 	wchar_t unicode[1024];
-	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode, sizeof(unicode));
+	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode);
 	SetText(unicode);
 }
 
@@ -224,14 +224,14 @@ void TextImage::SetText(const wchar_t *unicode, bool bClearUnlocalizedSymbol)
 //-----------------------------------------------------------------------------
 // Purpose: Gets the text in the textImage
 //-----------------------------------------------------------------------------
-void TextImage::GetText(char *buffer, int bufferSize)
+void TextImage::GetText(OUT_Z_CAP(bufferSize) char *buffer, int bufferSize)
 {
 	g_pVGuiLocalize->ConvertUnicodeToANSI(_utext, buffer, bufferSize);
 
 	if ( m_bAllCaps )
 	{
 		// Uppercase all the letters
-		for ( intp i = Q_strlen( buffer ); i >= 0; --i )
+		for ( intp i = V_strlen( buffer ); i >= 0; --i )
 		{
 			buffer[ i ] = toupper( buffer[ i ] );
 		}
@@ -241,14 +241,14 @@ void TextImage::GetText(char *buffer, int bufferSize)
 //-----------------------------------------------------------------------------
 // Purpose: Gets the text in the textImage
 //-----------------------------------------------------------------------------
-void TextImage::GetText(wchar_t *buffer, int bufLenInBytes)
+void TextImage::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buffer, int bufLenInBytes)
 {
-	wcsncpy(buffer, _utext, bufLenInBytes / sizeof(wchar_t));
+	V_wcsncpy(buffer, _utext, bufLenInBytes);
 
 	if ( m_bAllCaps )
 	{
 		// Uppercase all the letters
-		for ( int i = Q_wcslen( buffer ) - 1; i >= 0; --i )
+		for ( intp i = V_wcslen( buffer ) - 1; i >= 0; --i )
 		{
 			buffer[ i ] = towupper( buffer[ i ] );
 		}

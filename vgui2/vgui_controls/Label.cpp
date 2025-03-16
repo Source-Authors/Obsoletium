@@ -259,7 +259,7 @@ void Label::OnMousePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 // Purpose: Return the text in the label
 //-----------------------------------------------------------------------------
-void Label::GetText(char *textOut, int bufferLen)
+void Label::GetText(OUT_Z_BYTECAP(bufferLen) char *textOut, int bufferLen)
 {
 	_textImage->GetText(textOut, bufferLen);
 }
@@ -267,7 +267,7 @@ void Label::GetText(char *textOut, int bufferLen)
 //-----------------------------------------------------------------------------
 // Purpose: Return the text in the label
 //-----------------------------------------------------------------------------
-void Label::GetText(wchar_t *textOut, int bufLenInBytes)
+void Label::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *textOut, int bufLenInBytes)
 {
 	_textImage->GetText(textOut, bufLenInBytes);
 }
@@ -333,7 +333,7 @@ void Label::OnDialogVariablesChanged(KeyValues *dialogVariables )
 	{
 		// reconstruct the string from the variables
 		wchar_t buf[1024];
-		g_pVGuiLocalize->ConstructString(buf, sizeof(buf), index, dialogVariables);
+		g_pVGuiLocalize->ConstructString_safe(buf, index, dialogVariables);
 		SetText(buf);
 	}
 }
@@ -1133,7 +1133,7 @@ void Label::ApplySettings( KeyValues *inResourceData )
 		{
 			// it's a variable, set it to be a special variable localized string
 			wchar_t unicodeVar[256];
-			g_pVGuiLocalize->ConvertANSIToUnicode(labelText, unicodeVar, sizeof(unicodeVar));
+			g_pVGuiLocalize->ConvertANSIToUnicode(labelText, unicodeVar);
 
 			char var[256];
 			V_sprintf_safe(var, "#var_%s", labelText);

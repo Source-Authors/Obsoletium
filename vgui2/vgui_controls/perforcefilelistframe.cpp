@@ -440,7 +440,7 @@ void CPerforceFileListFrame::AddFile( const char *pRelativePath, const char *pPa
 		if ( g_pFullFileSystem->FileExists( pRelativePath, pPathId ) )
 		{
 			char pFullPath[MAX_PATH];
-			g_pFullFileSystem->RelativePathToFullPath( pRelativePath, pPathId, pFullPath, sizeof( pFullPath ) );
+			g_pFullFileSystem->RelativePathToFullPath_safe( pRelativePath, pPathId, pFullPath );
 			AddFileForOpen( pFullPath );
 		}
 		return;
@@ -452,7 +452,7 @@ void CPerforceFileListFrame::AddFile( const char *pRelativePath, const char *pPa
 	//char pFullPath[MAX_PATH];
 	if ( g_pFullFileSystem->FileExists( pRelativePath, pPathId ) )
 	{
-		/*g_pFullFileSystem->RelativePathToFullPath( pRelativePath, pPathId, pFullPath, sizeof( pFullPath ) );
+		/*g_pFullFileSystem->RelativePathToFullPath_safe( pRelativePath, pPathId, pFullPath );
 		P4FileState_t state = p4->GetFileState( pFullPath );
 		AddFileForSubmit( pFullPath, state );*/
 		return;
@@ -485,7 +485,7 @@ void CPerforceFileListFrame::AddFile( const char *pRelativePath, const char *pPa
 	//	const char *pLocalFile = p4->String( m_OpenedFiles[k].m_sLocalFile );
 
 	//	// This ensures the full path lies under the search path
-	//	if ( !g_pFullFileSystem->FullPathToRelativePathEx( pLocalFile, pPathId, pTemp, sizeof(pTemp) ) )
+	//	if ( !g_pFullFileSystem->FullPathToRelativePathEx_safe( pLocalFile, pPathId, pTemp ) )
 	//		continue;
 
 	//	// The relative paths had better be the same

@@ -868,7 +868,7 @@ void BuildModeDialog::UpdateEditControl(PanelItem_t &panelItem, const char *dats
 		default:
 			{
 				wchar_t unicode[512];
-				g_pVGuiLocalize->ConvertANSIToUnicode(datstring, unicode, sizeof(unicode));
+				g_pVGuiLocalize->ConvertANSIToUnicode(datstring, unicode);
 				panelItem.m_EditPanel->SetText(unicode);
 			}
 			break;

@@ -72,9 +72,13 @@ void URLLabel::SetURL(const char *pszURL)
 	if (iNewURLSize > m_iURLSize || !m_pszURL)
 	{
 		delete [] m_pszURL;
-		m_pszURL = new char [iNewURLSize + 1];
+		m_pszURL = V_strdup(pszURL);
 	}
-	strcpy(m_pszURL, pszURL);
+	else
+	{
+		V_strncpy(m_pszURL, pszURL, m_iURLSize);
+	}
+
 	m_iURLSize = iNewURLSize;
 }
 
@@ -109,7 +113,7 @@ void URLLabel::ApplySettings(KeyValues *inResourceData)
 			if (ws)
 			{
 				char localizedUrl[512];
-				g_pVGuiLocalize->ConvertUnicodeToANSI(ws, localizedUrl, sizeof(localizedUrl));
+				g_pVGuiLocalize->ConvertUnicodeToANSI(ws, localizedUrl);
 				SetURL(localizedUrl);
 			}
 		}

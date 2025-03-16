@@ -1127,7 +1127,7 @@ void PropertySheet::SetPageEnabled(const char *title, bool state)
 		if (_showTabs)
 		{
 			char tmp[50];
-			m_PageTabs[i]->GetText(tmp,50);
+			m_PageTabs[i]->GetText(tmp);
 			if (!strnicmp(title,tmp,strlen(tmp)))
 			{	
 				m_PageTabs[i]->SetEnabled(state);
@@ -1442,7 +1442,7 @@ void PropertySheet::OnTextChanged(Panel *panel,const wchar_t *wszText)
 		for(int i = 0 ; i < m_PageTabs.Count() ; i++ )
 		{
 			tabText[0] = 0;
-			m_PageTabs[i]->GetText(tabText,30);
+			m_PageTabs[i]->GetText(tabText);
 			if ( !wcsicmp(wszText,tabText) )
 			{
 				ChangeActiveTab(i);

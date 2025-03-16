@@ -1373,12 +1373,12 @@ void ListPanel::SetSelectedCell(int itemID, int col)
 //-----------------------------------------------------------------------------
 // Purpose: returns the data held by a specific cell
 //-----------------------------------------------------------------------------
-void ListPanel::GetCellText(int itemID, int col, wchar_t *wbuffer, int bufferSizeInBytes)
+void ListPanel::GetCellText(int itemID, int col, OUT_Z_BYTECAP(bufferSizeInBytes) wchar_t *wbuffer, int bufferSizeInBytes)
 {
 	if ( !wbuffer || !bufferSizeInBytes )
 		return;
 
-	wcscpy( wbuffer, L"" );
+	V_wcsncpy( wbuffer, L"", bufferSizeInBytes );
 
 	KeyValues *itemData = GetItem( itemID );
 	if ( !itemData )
@@ -1418,8 +1418,7 @@ void ListPanel::GetCellText(int itemID, int col, wchar_t *wbuffer, int bufferSiz
 		wval = itemData->GetWString( key, L"" );
 	}
 
-	wcsncpy( wbuffer, wval, bufferSizeInBytes/sizeof(wchar_t) );
-	wbuffer[ (bufferSizeInBytes/sizeof(wchar_t)) - 1 ] = 0;
+	V_wcsncpy( wbuffer, wval, bufferSizeInBytes );
 }
 
 //-----------------------------------------------------------------------------
@@ -1483,7 +1482,7 @@ Panel *ListPanel::GetCellRenderer(int itemID, int col)
 		wchar_t tempText[ 256 ];
 
 		// Grab cell text
-		GetCellText( itemID, col, tempText, 256 );
+		GetCellText( itemID, col, tempText );
 		KeyValues *item = GetItem( itemID );
 		m_pTextImage->SetText(tempText);
         int cw, tall;
@@ -2018,7 +2017,7 @@ void ListPanel::Paint()
 				// just paint it ourselves
 				char tempText[256];
 				// Grab cell text
-				GetCellText(i, j, tempText, sizeof(tempText));
+				GetCellText(i, j, tempText);
 				surface()->DrawSetTextPos(x + m_iTableStartX + 2, (drawcount * m_iRowHeight) + m_iTableStartY);
 
 				for (const char *pText = tempText; *pText != 0; pText++)

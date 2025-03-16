@@ -262,7 +262,7 @@ void TextEntry::SetText(const char *text)
 	if ( len < 1023 )
 	{
 		wchar_t unicode[ 1024 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, sizeof( unicode ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode );
 		SetText( unicode );
 	}
 	else
@@ -1253,7 +1253,7 @@ const wchar_t *UnlocalizeUnicode( wchar_t *unicode )
 	if ( *unicode == L'#' )
 	{
 		char lookup[ 512 ];
-		g_pVGuiLocalize->ConvertUnicodeToANSI( unicode + 1, lookup, sizeof( lookup ) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( unicode + 1, lookup );
 		return g_pVGuiLocalize->Find( lookup );
 	}
 	return unicode;
@@ -3033,7 +3033,7 @@ void TextEntry::InsertString(const char *text)
 
 	// straight convert the ansi to unicode and insert
 	wchar_t unicode[1024];
-	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode, sizeof(unicode));
+	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode);
 	InsertString(unicode);
 }
 

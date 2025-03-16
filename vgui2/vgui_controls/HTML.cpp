@@ -389,7 +389,7 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 			}
 			g_pFullFileSystem->GetLocalCopy( baseDir ); // put this file on disk for IE to load
 
-			g_pFullFileSystem->GetLocalPath( baseDir, fileLocation, sizeof(fileLocation) );
+			g_pFullFileSystem->GetLocalPath_safe( baseDir, fileLocation );
 			Q_snprintf(htmlLocation, sizeof(htmlLocation), "file://%s", fileLocation);
 
 			if (m_SteamAPIContext.SteamHTMLSurface())

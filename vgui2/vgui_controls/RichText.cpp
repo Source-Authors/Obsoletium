@@ -2249,7 +2249,7 @@ int RichText::GetStartDrawIndex(int &lineBreakIndexIndex)
 // Input:	offset - index to Start reading from 
 //			bufLen - length of string
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, wchar_t *buf, int bufLenInBytes)
+void RichText::GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, int bufLenInBytes)
 {
 	if (!buf)
 		return;
@@ -2271,7 +2271,7 @@ void RichText::GetText(int offset, wchar_t *buf, int bufLenInBytes)
 //-----------------------------------------------------------------------------
 // Purpose: gets text from the buffer
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, char *pch, int bufLenInBytes)
+void RichText::GetText(int offset, OUT_Z_CAP(bufLenInBytes) char *pch, int bufLenInBytes)
 {
 	wchar_t rgwchT[4096];
 	GetText(offset, rgwchT, sizeof(rgwchT));

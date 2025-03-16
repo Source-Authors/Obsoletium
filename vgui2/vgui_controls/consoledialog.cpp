@@ -1078,7 +1078,7 @@ void CConsolePanel::DumpConsoleTextToFile()
 
 			// convert to ansi
 			char ansi[512];
-			g_pVGuiLocalize->ConvertUnicodeToANSI(buf, ansi, sizeof(ansi));
+			g_pVGuiLocalize->ConvertUnicodeToANSI(buf, ansi);
 
 			// write to disk
 			intp len = strlen(ansi);

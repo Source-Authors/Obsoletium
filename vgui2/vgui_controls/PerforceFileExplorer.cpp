@@ -39,7 +39,7 @@ PerforceFileExplorer::PerforceFileExplorer( Panel *pParent, const char *pPanelNa
 	m_pFullPathCombo->GetTooltip()->SetTooltipFormatToSingleLine();
 
 	char pFullPath[MAX_PATH];
-	g_pFullFileSystem->GetCurrentDirectory( pFullPath, sizeof(pFullPath) );
+	g_pFullFileSystem->GetCurrentDirectory( pFullPath );
 	SetCurrentDirectory( pFullPath );
 
 	m_pFullPathCombo->AddActionSignalTarget( this );
@@ -109,11 +109,11 @@ void PerforceFileExplorer::SetCurrentDirectory( const char *pFullPath )
 	PopulateDriveList();
 
 	char pCurrentDirectory[ MAX_PATH ];
-	m_pFullPathCombo->GetText( pCurrentDirectory, sizeof(pCurrentDirectory) );
+	m_pFullPathCombo->GetText( pCurrentDirectory );
 	if ( Q_stricmp( m_CurrentDirectory.Get(), pCurrentDirectory ) )
 	{
 		char pNewDirectory[ MAX_PATH ];
-		Q_snprintf( pNewDirectory, sizeof(pNewDirectory), "%s\\", m_CurrentDirectory.Get() );
+		V_sprintf_safe( pNewDirectory, "%s\\", m_CurrentDirectory.Get() );
 		m_pFullPathCombo->SetText( pNewDirectory );
 		m_pFullPathCombo->GetTooltip()->SetText( pNewDirectory );
 	}
@@ -127,8 +127,8 @@ void PerforceFileExplorer::PopulateDriveList()
 {
 	char pFullPath[MAX_PATH * 4];
 	char pSubDirPath[MAX_PATH * 4];
-	Q_strncpy( pFullPath, m_CurrentDirectory.Get(), sizeof( pFullPath ) );
-	Q_strncpy( pSubDirPath, m_CurrentDirectory.Get(), sizeof( pSubDirPath ) );
+	V_strcpy_safe( pFullPath, m_CurrentDirectory.Get() );
+	V_strcpy_safe( pSubDirPath, m_CurrentDirectory.Get() );
 
 	m_pFullPathCombo->DeleteAllItems();
 
@@ -178,7 +178,7 @@ void PerforceFileExplorer::PopulateFileList()
 	// Create filter string
 	char pFullFoundPath[MAX_PATH];
 	char pFilter[MAX_PATH+3];
-	Q_snprintf( pFilter, sizeof(pFilter), "%s\\*.*", m_CurrentDirectory.Get() );
+	V_sprintf_safe( pFilter, "%s\\*.*", m_CurrentDirectory.Get() );
 
 	// Find all files on disk
 	FileFindHandle_t h;
@@ -236,7 +236,7 @@ void PerforceFileExplorer::OnTextChanged( KeyValues *kv )
 	if ( pPanel == m_pFullPathCombo )
 	{
 		char pCurrentDirectory[ MAX_PATH ];
-		m_pFullPathCombo->GetText( pCurrentDirectory, sizeof(pCurrentDirectory) );
+		m_pFullPathCombo->GetText( pCurrentDirectory );
 		SetCurrentDirectory( pCurrentDirectory );
 		return;
 	}
@@ -266,9 +266,9 @@ void PerforceFileExplorer::OnItemDoubleClicked()
 void PerforceFileExplorer::OnFolderUp()
 {
 	char pUpDirectory[MAX_PATH];
-	Q_strncpy( pUpDirectory, m_CurrentDirectory.Get(), sizeof(pUpDirectory) );
-	Q_StripLastDir( pUpDirectory, sizeof(pUpDirectory) );
-	Q_StripTrailingSlash( pUpDirectory );
+	V_strcpy_safe( pUpDirectory, m_CurrentDirectory.Get() );
+	V_StripLastDir( pUpDirectory );
+	V_StripTrailingSlash( pUpDirectory );
 
 	// This occurs at the root directory
 	if ( !Q_stricmp( pUpDirectory, "." ) )

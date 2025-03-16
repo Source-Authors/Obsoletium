@@ -67,17 +67,6 @@ COMPILE_TIME_ASSERT( Panel::PIN_LAST == ssize( g_PinCornerStrings ) );
 
 extern int GetBuildModeDialogCount();
 
-static char *CopyString( const char *in )
-{
-	if ( !in )
-		return NULL;
-
-	intp len = V_strlen( in );
-	char *n = new char[ len + 1 ];
-	Q_strncpy( n, in, len  + 1 );
-	return n;
-}
-
 #ifdef STAGING_ONLY
 ConVar tf_strict_mouse_up_events( "tf_strict_mouse_up_events", "0", FCVAR_ARCHIVE, "Only allow Mouse-Release events to happens on panels we also Mouse-Downed in" );
 #endif
@@ -175,7 +164,7 @@ BoundKey_t::BoundKey_t():
 BoundKey_t::BoundKey_t( const BoundKey_t& src )
 {
 	isbuiltin			= src.isbuiltin;
-	bindingname			= isbuiltin ? src.bindingname : CopyString( src.bindingname );
+	bindingname			= isbuiltin ? src.bindingname : V_strdup( src.bindingname );
 	keycode				= src.keycode;
 	modifiers			= src.modifiers;
 }
@@ -185,7 +174,7 @@ BoundKey_t& BoundKey_t::operator =( const BoundKey_t& src )
 	if ( this == &src )
 		return *this;
 	isbuiltin			= src.isbuiltin;
-	bindingname			= isbuiltin ? src.bindingname : CopyString( src.bindingname );
+	bindingname			= isbuiltin ? src.bindingname : V_strdup( src.bindingname );
 	keycode				= src.keycode;
 	modifiers			= src.modifiers;
 	return *this;
@@ -449,9 +438,8 @@ static void BufPrint( CUtlBuffer& buf, int level, char const *fmt, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( string, sizeof( string ) - 1, fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
-	string[ sizeof( string ) - 1 ] = 0;
 
 	while ( --level >= 0 )
 	{
@@ -2171,7 +2159,7 @@ void Panel::AddKeyBinding( char const *bindingName, int keycode, int modifiers )
 
 	BoundKey_t kb;																	
 	kb.isbuiltin = false;															
-	kb.bindingname = CopyString( bindingName );												
+	kb.bindingname = V_strdup( bindingName );												
 	kb.keycode = keycode;															
 	kb.modifiers = modifiers;														
 
@@ -2459,7 +2447,7 @@ wchar_t const *Panel::KeyCodeToDisplayString( KeyCode code )
 				return wstr;
 			}
 
-			g_pVGuiLocalize->ConvertANSIToUnicode( str, buf, sizeof( buf ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( str, buf );
 			return buf;
 		}
 	}
@@ -8644,7 +8632,7 @@ void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels
 		if ( pchFilter && pchFilter[ 0 ] != '\0' )
 		{
 			char szBuff[ 128 ];
-			pPanel->GetText( szBuff, sizeof( szBuff ) );
+			pPanel->GetText( szBuff );
 
 			// Prefix
 			if ( nFilterType == 0 )

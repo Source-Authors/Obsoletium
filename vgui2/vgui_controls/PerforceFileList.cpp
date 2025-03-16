@@ -201,7 +201,7 @@ void PerforceFileList::ShowDeletedFiles( bool bShowDeletedFiles )
 void PerforceFileList::AddItemToDirectoryList( const char *pFullPath, int nItemID, bool bIsDirectory )
 {
 	char pDirectoryBuf[MAX_PATH];
-	Q_ExtractFilePath( pFullPath, pDirectoryBuf, sizeof(pDirectoryBuf) );
+	V_ExtractFilePath( pFullPath, pDirectoryBuf );
 	Q_StripTrailingSlash( pDirectoryBuf ); 
 	pFullPath = pDirectoryBuf;
 
