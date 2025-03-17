@@ -10,7 +10,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/IInput.h>
 #include <vgui/IImage.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/ScrollBarSlider.h>
@@ -46,7 +46,7 @@ public:
 		SetContentAlignment(Label::a_center);
 	}
 
-	void OnMouseFocusTicked()
+	void OnMouseFocusTicked() override
 	{
 		// pass straight up to parent
 		CallParentFunction(new KeyValues("MouseFocusTicked"));
@@ -67,7 +67,7 @@ public:
 
 	// Don't request focus.
 	// This will keep cursor focus in main window in text entry windows.
-	virtual void OnMousePressed(MouseCode code)
+	void OnMousePressed(MouseCode code) override
 	{
 		if (!IsEnabled())
 			return;
@@ -86,7 +86,7 @@ public:
 			input()->SetMouseCapture(GetVPanel());
 		}
 	}
-    virtual void OnMouseReleased(MouseCode code)
+    void OnMouseReleased(MouseCode code) override
     {
 		if (!IsEnabled())
 			return;
