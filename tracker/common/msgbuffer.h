@@ -45,7 +45,7 @@ public:
 	void			WriteLong(int c);
 	void			WriteFloat(float f);
 	void			WriteString(const char *s);
-	void			WriteBuf(intp iSize, void *buf);
+	void			WriteBuf(intp iSize, IN_Z_CAP(iSize) const void *buf);
 
 	// Reading functions
 	int				ReadByte();
@@ -60,14 +60,14 @@ public:
 	float			GetTime();
 
 	// net address received from
-	void			SetNetAddress(netadr_t &adr);
+	void			SetNetAddress(const netadr_t &adr);
 	netadr_t		&GetNetAddress();
 
 private:
 	// Ensures sufficient space to append an object of length
 	void			*GetSpace( intp length );
 	// Copy buffer in at current writing point
-	void			Write( const void *data, intp length );
+	void			Write( IN_Z_CAP(length) const void *data, intp length );
 
 private:
 	// Name of buffer in case of debugging/errors

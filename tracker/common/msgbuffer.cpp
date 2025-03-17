@@ -127,7 +127,7 @@ float CMsgBuffer::GetTime()
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-void CMsgBuffer::SetNetAddress(netadr_t &adr)
+void CMsgBuffer::SetNetAddress(const netadr_t &adr)
 {
 	m_NetAddr = adr;
 }
@@ -213,7 +213,7 @@ void CMsgBuffer::WriteString (const char *s)
 // Input  : iSize - 
 //			*buf - 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::WriteBuf( intp iSize, void *buf )
+void CMsgBuffer::WriteBuf( intp iSize, IN_Z_CAP(iSize) const void *buf )
 {
 	if ( !buf )
 	{
@@ -412,7 +412,7 @@ void *CMsgBuffer::GetSpace( intp length )
 // Input  : *m_rgData - 
 //			length - 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::Write(const void *data, intp length)
+void CMsgBuffer::Write(IN_Z_CAP(length) const void *data, intp length)
 {
 	memcpy( GetSpace(length), data, length );
 }
