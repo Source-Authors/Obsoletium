@@ -1428,7 +1428,6 @@ CAudioSourceStreamWave::~CAudioSourceStreamWave( void )
 //-----------------------------------------------------------------------------
 CAudioMixer *CAudioSourceStreamWave::CreateMixer( int initialStreamPosition )
 {
-	char fileName[MAX_PATH];
 	const char *pFileName = m_pSfx->GetFileName();
 	
 	// BUGBUG: Source constructs the IWaveData, mixer frees it, fix this?
@@ -1436,10 +1435,7 @@ CAudioMixer *CAudioSourceStreamWave::CreateMixer( int initialStreamPosition )
 	if ( pWaveData )
 	{
 		CAudioMixer *pMixer = CreateWaveMixer( pWaveData, m_format, m_channels, m_bits, initialStreamPosition );
-		if ( pMixer )
-		{
-			return pMixer;
-		}
+		if ( pMixer ) return pMixer;
 
 		// no mixer, delete the stream buffer/instance
 		delete pWaveData;
