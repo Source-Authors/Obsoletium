@@ -130,13 +130,6 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 	view.width = ( float )screenBufSize;
 	view.height = ( float )screenBufSize;
 
-
-	const char *pExtension = ".tga";
-	if( bPFM )
-	{
-		pExtension = ".pfm";
-	}
-
 	Shader_BeginRendering();
 
 	if( bPFM )
@@ -161,8 +154,14 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 										CUBEMAP_FACE_UP,CUBEMAP_FACE_DOWN};
 	static int engine_cubemap_idx_to_fbm_idx[6]={4,3,0,2,5,1};
 
+	const char *pExtension = bPFM ? ".pfm" : ".tga";
+
 	if (bPFM)
 	{
+		// dimhotepus: Moved out of loops as it is invariant.
+		std::unique_ptr<uint8[]> pImage = std::make_unique<uint8[]>(screenBufSize * screenBufSize * 4);
+		std::unique_ptr<uint8[]> pImage1 = std::make_unique<uint8[]>(tgaSize * tgaSize * 4);
+
 		FloatCubeMap_t Envmap(tgaSize, tgaSize);
 		for(int side=0;side<6;side++)
 		{
@@ -172,28 +171,28 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 			view.fov = 90;
 			view.fovViewmodel = 90;
 			view.origin = origin;
+
 			if (g_pMaterialSystemHardwareConfig->GetHDRType() == HDR_TYPE_INTEGER)
 			{
 				FloatBitMap_t &hdr_map=Envmap.face_maps[engine_cubemap_idx_to_fbm_idx[side]];
 				hdr_map.Clear(0,0,0,1);
 				// we are going to need to render multiple exposures
-				float exposure=16.0;
+				float exposure = 16.0f;
 				bool bOverExposedTexels=true;
-				while( bOverExposedTexels && (exposure>0.05))
+
+				while( bOverExposedTexels && exposure > 0.05f)
 				{
 					mat_force_tonemap_scale.SetValue(0.0f);
 					pRenderContext->ResetToneMappingScale( exposure );
 					g_ClientDLL->RenderView( view, nFlags, 0 );
-					uint8 *pImage = new uint8[ screenBufSize * screenBufSize * 4 ];
-					uint8 *pImage1 = new uint8[ tgaSize * tgaSize * 4 ];
 					
 					// Get Bits from the material system
 					pRenderContext->ReadPixels( 0, 0, screenBufSize, screenBufSize,
-												 pImage, IMAGE_FORMAT_RGBA8888 );
+												 pImage.get(), IMAGE_FORMAT_RGBA8888 );
 
 					ImageLoader::ResampleInfo_t info;
-					info.m_pSrc = pImage;
-					info.m_pDest = pImage1;
+					info.m_pSrc = pImage.get();
+					info.m_pDest = pImage1.get();
 					info.m_nSrcWidth = screenBufSize;
 					info.m_nSrcHeight = screenBufSize;
 					info.m_nDestWidth = tgaSize;
@@ -203,18 +202,20 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 
 					if( !ImageLoader::ResampleRGBA8888( info ) )
 					{
-						Sys_Error( "Can't resample\n" );
+						Error( "Can't resample.\n" );
 					}
+
 					FloatBitMap_t ldr_map(tgaSize,tgaSize);
 					for(int x1=0;x1<tgaSize;x1++)
 						for(int y1=0;y1<tgaSize;y1++)
 							for(int c=0;c<3;c++)
 								ldr_map.Pixel(x1,y1,c)=pImage1[c+4*(x1+tgaSize*y1)]*(1/255.0F);
-					delete[] pImage;
-					delete[] pImage1;
-					ldr_map.RaiseToPower(2.2);				// gamma to linear
+
+					ldr_map.RaiseToPower(2.2f);				// gamma to linear
+
 					float scale=1.0f/exposure;
 					bOverExposedTexels=false;
+
 					for(int x=0;x<hdr_map.Width;x++)
 						for(int y=0;y<hdr_map.Height;y++)
 							for(int c=0;c<3;c++)
@@ -225,9 +226,11 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 								texel*=scale;
 								hdr_map.Pixel(x,y,c)=max(hdr_map.Pixel(x,y,c),texel);
 							}
-					exposure*=0.75;
+
+					exposure *= 0.75f;
 					materials->SwapBuffers();
 				}
+
 				V_sprintf_safe( name, "%s%s%s", pFileNameBase, facingName[side],pExtension );
 //				hdr_map.WritePFM(name);
 			}
@@ -239,18 +242,16 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 				videomode->TakeSnapshotTGARect( name, 0, 0, screenBufSize, screenBufSize, tgaSize, tgaSize, bPFM, face_idx[side]);
 			}
 		}
+
 		if (g_pMaterialSystemHardwareConfig->GetHDRType() == HDR_TYPE_INTEGER)
 		{
-// 			FloatCubeMap_t OutEnvmap(tgaSize, tgaSize);
-// 			for(int f=0;f<6;f++)
-// 				OutEnvmap.face_maps[f].Clear(0,0,0,1);
-// 			Envmap.Resample(OutEnvmap,15.0);
  			V_strcpy_safe( name, pFileNameBase);
- 			Envmap.WritePFMs( name );
-// 			Q_snprintf( name, sizeof( name ), "%s_filtered", pFileNameBase);
-// 			OutEnvmap.WritePFMs( name );
+ 			if ( !Envmap.WritePFMs( name ) )
+			{
+				// dimhotepus: Dump warning when PFM fails to write.
+				Warning( "Unable to write PFM %dx%d '%s'.\n", tgaSize, tgaSize, name );
+			}
 		}
-
 	}
 	else
 	{
@@ -267,6 +268,7 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 			g_ClientDLL->RenderView( view, nFlags, 0 );
 			V_sprintf_safe( name, "%s%s%s", pFileNameBase, facingName[side],pExtension );
 			Assert( strlen( name ) < 1023 );
+
 			videomode->TakeSnapshotTGARect( name, 0, 0, screenBufSize, screenBufSize, tgaSize, tgaSize, bPFM, face_idx[side]);
 		}
 	}
