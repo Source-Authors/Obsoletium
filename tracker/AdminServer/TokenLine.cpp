@@ -96,7 +96,7 @@ char * TokenLine::GetToken(int i)
 
 // if the given parm is not present return NULL
 // otherwise return the address of the following token, or an empty string
-char* TokenLine::CheckToken(char * parm)
+char* TokenLine::CheckToken(const char * parm)
 {
 	for (int i = 0 ; i < m_tokenNumber; i ++)
 	{
