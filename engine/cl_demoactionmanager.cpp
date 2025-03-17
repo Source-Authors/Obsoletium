@@ -319,8 +319,7 @@ void CDemoActionManager::SaveToFile( void )
 	SaveToBuffer( buf );
 
 	// Write to file
-	FileHandle_t fh;
-	fh = g_pFileSystem->Open( metafile, "w" );
+	FileHandle_t fh = g_pFileSystem->Open( metafile, "w" );
 	if ( fh != FILESYSTEM_INVALID_HANDLE )
 	{
 		g_pFileSystem->Write( buf.Base(), buf.TellPut(), fh );
