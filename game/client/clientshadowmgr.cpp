@@ -1284,7 +1284,8 @@ bool CClientShadowMgr::Init()
 	SetShadowBlobbyCutoffArea( 0.005 );
 
 	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
-	m_nMaxDepthTextureShadows = bTools ? 4 : 1;	// Just one shadow depth texture in games, more in tools
+	// dimhotepus: Increase shadow depth textures count in game 1 -> 4.
+	m_nMaxDepthTextureShadows = bTools ? 4 : 4;	// Just one shadow depth texture in games, more in tools
 
 	bool bLowEnd = ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 );
 
@@ -1822,7 +1823,7 @@ ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( ClientEntityHandl
 		pShadowProxyData = (void*)(uintp)h;
 	}
 
-	int createShadowFlags;
+	ShadowCreateFlags_t createShadowFlags;
 	if( flags & SHADOW_FLAGS_FLASHLIGHT )
 	{
 		// don't use SHADOW_CACHE_VERTS with projective lightsources since we expect that they will change every frame.

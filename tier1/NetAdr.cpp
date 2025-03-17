@@ -306,6 +306,7 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 			|| n5 < 0 || n5 > 65535
 		)
 			return false;
+
 		// dimhotepus: Safe to cast as checked above.
 		SetIP( static_cast<uint8>(n1), static_cast<uint8>(n2), static_cast<uint8>(n3), static_cast<uint8>(n4) );
 		SetPort( static_cast<uint16>(n5) );
@@ -359,12 +360,8 @@ bool netadr_t::operator<(const netadr_t &netadr) const
 }
 
 
-void netadr_t::SetFromSocket( socket_handle hSocket )
+bool netadr_t::SetFromSocket( socket_handle hSocket )
 {	
-	// dgoodenough - since this is skipped on X360, seems reasonable to skip as well on PS3
-	// PS3_BUILDFIX
-	// FIXME - Leap of faith, this works without asserting on X360, so I assume it will on PS3
-#if !defined( _X360 ) && !defined( _PS3 )
 	Clear();
 	type = NA_IP;
 
@@ -372,9 +369,8 @@ void netadr_t::SetFromSocket( socket_handle hSocket )
 	socklen_t namelen = sizeof(address);
 	if ( getsockname( hSocket, &address, &namelen) == 0 )
 	{
-		SetFromSockadr( &address );
+		return SetFromSockadr( &address );
 	}
-#else
-	Assert(0);
-#endif
+
+	return false;
 }

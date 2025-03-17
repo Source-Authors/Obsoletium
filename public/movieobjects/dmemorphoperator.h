@@ -39,8 +39,8 @@ public:
 	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
 
 	// accessors
-	uint NumDeltaStateWeights();
-	CDmElement *GetDeltaStateWeight( uint i );
+	intp NumDeltaStateWeights();
+	CDmElement *GetDeltaStateWeight( intp i );
 	CDmeMesh *GetMesh();
 
 protected:

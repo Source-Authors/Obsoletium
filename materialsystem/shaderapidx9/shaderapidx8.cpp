@@ -2628,7 +2628,7 @@ static void CommitSetScissorRect( IDirect3DDevice9 *pDevice, const DynamicState_
 // Routine for setting scissor rect
 // If pScissorRect is NULL, disable scissoring by setting the render state
 // If pScissorRect is non-NULL, set the RECT state in Direct3D AND set the renderstate
-inline void CShaderAPIDx8::SetScissorRect( const int nLeft, const int nTop, const int nRight, const int nBottom, const bool bEnableScissor )
+inline void CShaderAPIDx8::SetScissorRect( int nLeft, int nTop, int nRight, int nBottom, const bool bEnableScissor )
 {
 	Assert( (nLeft <= nRight) && (nTop <= nBottom) ); //360 craps itself if this isn't true
 	if ( !g_pHardwareConfig->Caps().m_bScissorSupported )
@@ -10656,7 +10656,7 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 		m_DynamicState.m_UserClipLastUpdatedUsingFixedFunction = bUsingFixedFunction;
 	}
 
-	DirectX::XMMATRIX worldToProjectionInvTrans;
+	DirectX::XMMATRIX worldToProjectionInvTrans = DirectX::XMMatrixIdentity();
 #ifndef _DEBUG
 	if( m_DynamicState.m_UserClipPlaneChanged & m_DynamicState.m_UserClipPlaneEnabled & ((1 << g_pHardwareConfig->MaxUserClipPlanes()) - 1) )
 #endif

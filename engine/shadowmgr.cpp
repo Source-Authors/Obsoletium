@@ -134,8 +134,8 @@ public:
 	CShadowMgr();
 
 	// Methods inherited from IShadowMgr
-	virtual ShadowHandle_t CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags );
-	virtual ShadowHandle_t CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags );
+	virtual ShadowHandle_t CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags );
+	virtual ShadowHandle_t CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags );
 	virtual void DestroyShadow( ShadowHandle_t handle );
 	virtual void SetShadowMaterial( ShadowHandle_t handle, IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy );
 	virtual void EnableShadow( ShadowHandle_t handle, bool bEnable );
@@ -201,7 +201,7 @@ public:
 	virtual bool ModelHasShadows( ModelInstanceHandle_t instance );
 
 private:
-	enum
+	enum : unsigned short
 	{
 		SHADOW_DISABLED = (SHADOW_LAST_FLAG << 1),
 	};
@@ -245,7 +245,7 @@ private:
 		IMaterial*		m_pMaterial;		// material for rendering surfaces
 		IMaterial*		m_pModelMaterial;	// material for rendering models
 		void*			m_pBindProxy;
-		unsigned short	m_Flags;
+		ShadowCreateFlags_t	m_Flags;
 		unsigned short	m_SortOrder;
 		float			m_flSphereRadius;	// Radius of sphere surrounding the shadow
 		Ray_t			m_Ray;				// NOTE: Ray needs to be on 16-byte boundaries.
@@ -302,7 +302,7 @@ private:
 		int		m_nMaxVertices;
 		int		m_nMaxIndices;
 		int		m_Count;
-		int*	m_pCache;
+		intp*	m_pCache;
 		int		m_DispCount;
 		const VMatrix* m_pModelToWorld;
 		VMatrix m_WorldToModel;
@@ -324,7 +324,7 @@ private:
 	struct FlashlightInfo_t
 	{
 		FlashlightState_t m_FlashlightState;
-		unsigned short m_Shadow;
+		ShadowHandle_t m_Shadow;
 		Frustum_t m_Frustum;
 		CMaterialsBuckets<SurfaceHandle_t> m_MaterialBuckets;
 		CMaterialsBuckets<SurfaceHandle_t> m_OccluderBuckets;
@@ -445,10 +445,10 @@ private:
 private:
 	// List of all shadows (one per cast shadow)
 	// Align it so the Ray in the Shadow_t is aligned
-	CUtlLinkedList< Shadow_t, ShadowHandle_t, false, int, CUtlMemoryAligned< UtlLinkedListElem_t< Shadow_t, ShadowHandle_t >, 16 > > m_Shadows;
+	CUtlLinkedList< Shadow_t, ShadowHandle_t, false, ShadowHandle_t, CUtlMemoryAligned< UtlLinkedListElem_t< Shadow_t, ShadowHandle_t >, 16 > > m_Shadows;
 	
 	// List of all shadow decals (one per surface hit by a shadow)
-	CUtlLinkedList< ShadowDecal_t, ShadowDecalHandle_t, true, int > m_ShadowDecals;
+	CUtlLinkedList< ShadowDecal_t, ShadowDecalHandle_t, true, ShadowDecalHandle_t > m_ShadowDecals;
 
 	// List of all shadow decals associated with a particular shadow
 	CUtlFixedLinkedList< ShadowDecalHandle_t > m_ShadowSurfaces;
@@ -473,7 +473,7 @@ private:
 	CBidirectionalSet< ModelInstanceHandle_t, ShadowHandle_t, unsigned short >	m_ShadowsOnModels;
 
 	// Cache of information for surface bounds
-	typedef CUtlLinkedList< SurfaceBounds_t, unsigned short, false, int, CUtlMemoryFixed< UtlLinkedListElem_t< SurfaceBounds_t, unsigned short >, SURFACE_BOUNDS_CACHE_COUNT, 16 > > SurfaceBoundsCache_t;
+	typedef CUtlLinkedList< SurfaceBounds_t, unsigned short, false, unsigned short, CUtlMemoryFixed< UtlLinkedListElem_t< SurfaceBounds_t, unsigned short >, SURFACE_BOUNDS_CACHE_COUNT, 16 > > SurfaceBoundsCache_t;
 	typedef SurfaceBoundsCache_t::IndexType_t SurfaceBoundsCacheIndex_t;
 	SurfaceBoundsCache_t m_SurfaceBoundsCache;
 	SurfaceBoundsCacheIndex_t *m_pSurfaceBounds;
@@ -489,7 +489,7 @@ private:
 	// HPE_BEGIN:
 	// [smessick] These used to be dynamically allocated on the stack.
 	//=============================================================================
-	CUtlMemory<int> m_ShadowDecalCache;
+	CUtlMemory<intp> m_ShadowDecalCache;
 	CUtlMemory<DispShadowHandle_t> m_DispShadowDecalCache;
 	//=============================================================================
 	// HPE_END
@@ -665,13 +665,13 @@ unsigned short CShadowMgr::InvalidShadowIndex( )
 //-----------------------------------------------------------------------------
 // Create, destroy shadows
 //-----------------------------------------------------------------------------
-ShadowHandle_t CShadowMgr::CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags )
+ShadowHandle_t CShadowMgr::CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags )
 {
 	return CreateShadowEx( pMaterial, pModelMaterial, pBindProxy, creationFlags );
 }
 
 
-ShadowHandle_t CShadowMgr::CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags )
+ShadowHandle_t CShadowMgr::CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags )
 {
 #ifndef SWDS
 	ShadowHandle_t h = m_Shadows.AddToTail();
@@ -1439,12 +1439,18 @@ void CShadowMgr::EnableShadow( ShadowHandle_t handle, bool bEnable )
 		RemoveAllSurfacesFromShadow( handle );
 		RemoveAllModelsFromShadow( handle );
 
-		m_Shadows[handle].m_Flags |= SHADOW_DISABLED;
+		m_Shadows[handle].m_Flags = static_cast<ShadowCreateFlags_t>
+		(
+			to_underlying(m_Shadows[handle].m_Flags) | SHADOW_DISABLED
+		);
 	}
 	else
 	{
 		// FIXME: Could make this recompute the cache...
-		m_Shadows[handle].m_Flags &= ~SHADOW_DISABLED;
+		m_Shadows[handle].m_Flags = static_cast<ShadowCreateFlags_t>
+		(
+			to_underlying(m_Shadows[handle].m_Flags) & ~SHADOW_DISABLED
+		);
 	}
 }
 
@@ -2558,7 +2564,8 @@ int CShadowMgr::AddNormalShadowsToMeshBuilder( CMeshBuilder& meshBuilder, Shadow
 		}
 		else
 		{
-			pVertexCache = &m_VertexCache[info.m_pCache[i]];
+			Assert(info.m_pCache[i] <= (intp)std::numeric_limits<unsigned short>::max());
+			pVertexCache = &m_VertexCache[static_cast<unsigned short>(info.m_pCache[i])];
 		}
 
 		ShadowVertex_t* pVerts = GetCachedVerts( *pVertexCache );
@@ -2656,7 +2663,8 @@ void CShadowMgr::RenderDebuggingInfo( const ShadowRenderInfo_t &info, ShadowDebu
 		}
 		else
 		{
-			pVertexCache = &m_VertexCache[info.m_pCache[i]];
+			Assert(info.m_pCache[i] <= (intp)std::numeric_limits<unsigned short>::max());
+			pVertexCache = &m_VertexCache[static_cast<unsigned short>(info.m_pCache[i])];
 		}
 
 		ShadowVertex_t* pVerts = GetCachedVerts( *pVertexCache );

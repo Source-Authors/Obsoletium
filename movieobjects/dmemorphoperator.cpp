@@ -37,12 +37,12 @@ void CDmeMorphOperator::OnDestruction()
 //-----------------------------------------------------------------------------
 // accessors
 //-----------------------------------------------------------------------------
-uint CDmeMorphOperator::NumDeltaStateWeights()
+intp CDmeMorphOperator::NumDeltaStateWeights()
 {
 	return m_deltaStateWeights.Count();
 }
 
-CDmElement *CDmeMorphOperator::GetDeltaStateWeight( uint i )
+CDmElement *CDmeMorphOperator::GetDeltaStateWeight( intp i )
 {
 	return m_deltaStateWeights[ i ];
 }
@@ -90,14 +90,14 @@ void CDmeMorphOperator::Operate()
 {
 	CDmeMesh *mesh = GetMesh();
 
-	uint mn = NumDeltaStateWeights();
-	for ( uint mi = 0; mi < mn; ++mi )
+	intp mn = NumDeltaStateWeights();
+	for ( intp mi = 0; mi < mn; ++mi )
 	{
 		CDmElement *pDeltaState = GetDeltaStateWeight( mi );
 		const char *deltaName = pDeltaState->GetName();
 		float deltaWeight = pDeltaState->GetValue< float >( "weight" );
 
-		int di = mesh->FindDeltaStateIndex( deltaName );
+		intp di = mesh->FindDeltaStateIndex( deltaName );
 		if ( di != -1 )
 		{
 			mesh->SetDeltaStateWeight( di, MESH_DELTA_WEIGHT_NORMAL, deltaWeight );
@@ -131,8 +131,8 @@ using namespace MorphOp;
 
 void CDmeMorphOperator::GetInputAttributes( CUtlVector< CDmAttribute * > &attrs )
 {
-	uint nWeights = NumDeltaStateWeights();
-	for ( uint wi = 0; wi < nWeights; ++wi )
+	intp nWeights = NumDeltaStateWeights();
+	for ( intp wi = 0; wi < nWeights; ++wi )
 	{
 		CDmElement *pDelta = GetDeltaStateWeight( wi );
 		AddAttr( attrs, pDelta->GetAttribute( "weight" ) );
@@ -142,8 +142,8 @@ void CDmeMorphOperator::GetInputAttributes( CUtlVector< CDmAttribute * > &attrs 
 	CDmeVertexData *pBaseState = pMesh->FindBaseState( m_baseStateName.Get() );
 	AddVertexAttributes( attrs, pBaseState );
 
-	uint nDeltas = pMesh->DeltaStateCount();
-	for ( uint di = 0; di < nDeltas; ++di )
+	intp nDeltas = pMesh->DeltaStateCount();
+	for ( intp di = 0; di < nDeltas; ++di )
 	{
 		CDmElement *pDeltaState = pMesh->GetDeltaState( di );
 		AddAttr( attrs, pDeltaState->GetAttribute( "indices" ) );

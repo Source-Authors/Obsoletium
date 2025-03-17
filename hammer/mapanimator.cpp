@@ -216,7 +216,7 @@ CMapEntity *CMapAnimator::CreateNewKeyFrame( float time )
 	pNewEntity->SetClass( "keyframe_track" );
 
 	char buf[128];
-	sprintf( buf, "%f %f %f", angles[0], angles[1], angles[2] );
+	V_sprintf_safe( buf, "%f %f %f", angles[0], angles[1], angles[2] );
 	pNewEntity->SetKeyValue( "angles", buf );
 
 	// link it into the keyframe list
@@ -308,7 +308,7 @@ void CMapAnimator::GetAnimationAtTime( CMapKeyFrame *currentKey, CMapKeyFrame *p
 {
 	// calculate the proportion of time to be spent on this keyframe
 	float animTime;
-	if ( currentKey->MoveTime() < 0.01 )
+	if ( currentKey->MoveTime() < 0.01f )
 	{
 		animTime = 1.0f;
 	}

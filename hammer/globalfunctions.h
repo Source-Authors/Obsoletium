@@ -12,6 +12,7 @@
 #endif
 
 #include "MapClass.h"	// For CMapObjectList
+#include "fgdlib/gamedata.h"
 
 
 class CMapSolid;
@@ -50,15 +51,9 @@ int mychdir(LPCTSTR pszDir);
 //
 class CMessageWnd;
 
-enum MWMSGTYPE
-{	mwStatus,
-	mwError,
-	mwWarning
-};
-
 extern CMessageWnd *g_pwndMessage;
 
-void Msg(int type, PRINTF_FORMAT_STRING const char *fmt, ...);
+void Msg(MWMSGTYPE type, PRINTF_FORMAT_STRING const char *fmt, ...);
 
 
 //

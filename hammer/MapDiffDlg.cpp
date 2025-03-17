@@ -77,7 +77,7 @@ void CMapDiffDlg::OnBnClickedMapbrowse()
 	static char szInitialDir[MAX_PATH] = "";
 	if (szInitialDir[0] == '\0')
 	{
-		strcpy(szInitialDir, g_pGameConfig->szMapDir);
+		V_strcpy_safe(szInitialDir, g_pGameConfig->szMapDir);
 	}
 
 	// TODO: need to prevent (or handle) opening VMF files when using old map file formats

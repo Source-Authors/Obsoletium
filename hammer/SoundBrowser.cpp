@@ -35,7 +35,17 @@ CSoundBrowser::CSoundBrowser( const char *pCurrentSoundName, CWnd* pParent /*=NU
 	m_SoundType = AfxGetApp()->GetProfileInt(s_pszSection, "Sound Type", 0);
 	m_Autoplay = AfxGetApp()->GetProfileInt(s_pszSection, "Sound Autoplay", 0);
 	Q_strncpy(m_szFilter, (LPCSTR)(AfxGetApp()->GetProfileString(s_pszSection, "Sound Filter", "")), 256 ); 
+
+	m_uLastFilterChange = -1;
+	m_bFilterChanged = FALSE;
+
+	m_bSoundPlayed = FALSE;
+	m_uSoundPlayTime = 0;
+
 	m_nSelectedSoundIndex = -1;
+	m_szFilter[0] = '\0';
+	m_nFilters = -1;
+	memset(m_Filters, 0, sizeof(m_Filters));
 
 //	m_bSoundPlayed = false;
 }
@@ -185,7 +195,8 @@ void CSoundBrowser::PopulateSoundList()
 		if ( ShowSoundInList( pSoundName ) )
 		{
 			CString str;
-			str.Format( _T(pSoundName) );
+			// dimhotepus: Fix missing string format spec vulnerability.
+			str.Format( "%s", pSoundName );
 			int nIndex = m_SoundList.AddString( str );
 			m_SoundList.SetItemDataPtr( nIndex, (PVOID)(ptrdiff_t)i );
 		}

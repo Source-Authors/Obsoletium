@@ -33,7 +33,7 @@ public:
 	void					TouchResource( memhandle_t handle );
 	void					MarkAsStale( memhandle_t handle );		// move to head of LRU
 
-	int						LockCount( memhandle_t handle );
+	[[nodiscard]] int						LockCount( memhandle_t handle );
 	int						BreakLock( memhandle_t handle );
 	int						BreakAllLocks();
 
@@ -41,9 +41,9 @@ public:
 	// type-safe implementation in derived class
 	//void					*GetResource_NoLock( memhandle_t handle );
 
-	size_t					TargetSize() const;
-	size_t					AvailableSize() const;
-	size_t					UsedSize() const;
+	[[nodiscard]] size_t					TargetSize() const;
+	[[nodiscard]] size_t					AvailableSize() const;
+	[[nodiscard]] size_t					UsedSize() const;
 
 	void					NotifySizeChanged( memhandle_t handle, size_t oldSize, size_t newSize );
 
@@ -58,7 +58,7 @@ public:
 
 	// Thread lock
 	virtual void			Lock() {}
-	virtual bool			TryLock() { return true; }
+	[[nodiscard]] virtual bool			TryLock() { return true; }
 	virtual void			Unlock() {}
 
 	// Iteration
@@ -187,7 +187,7 @@ public:
 	}
 
 	// Iteration. Must lock first
-	memhandle_t GetFirstUnlocked()
+	[[nodiscard]] memhandle_t GetFirstUnlocked()
 	{
 		auto node = m_memoryLists.Head(m_lruList);
 		if ( node == m_memoryLists.InvalidIndex() )
@@ -197,7 +197,7 @@ public:
 		return ToHandle( node );
 	}
 
-	memhandle_t GetFirstLocked()
+	[[nodiscard]] memhandle_t GetFirstLocked()
 	{
 		auto node = m_memoryLists.Head(m_lockList);
 		if ( node == m_memoryLists.InvalidIndex() )
@@ -207,7 +207,7 @@ public:
 		return ToHandle( node );
 	}
 
-	memhandle_t GetNext( memhandle_t hPrev )
+	[[nodiscard]] memhandle_t GetNext( memhandle_t hPrev )
 	{
 		if ( hPrev == INVALID_MEMHANDLE )
 		{
@@ -223,9 +223,9 @@ public:
 		return ToHandle( iNext );
 	}
 
-	MUTEX_TYPE &AccessMutex()	{ return m_mutex; }
+	[[nodiscard]] MUTEX_TYPE &AccessMutex()	{ return m_mutex; }
 	void Lock() override { m_mutex.Lock(); }
-	bool TryLock() override { return m_mutex.TryLock(); }
+	[[nodiscard]] bool TryLock() override { return m_mutex.TryLock(); }
 	void Unlock() override { m_mutex.Unlock(); }
 
 private:

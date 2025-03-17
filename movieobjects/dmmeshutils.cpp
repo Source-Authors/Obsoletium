@@ -2338,7 +2338,7 @@ DmFileId_t CreateUniqueFileId()
 	do 
 	{
 		CreateUniqueId( &uniqueId );
-		UniqueIdToString( uniqueId, fileIdBuf, sizeof( fileIdBuf ) );
+		UniqueIdToString( uniqueId, fileIdBuf );
 
 		fileId = g_pDataModel->GetFileId( fileIdBuf );
 	} while( fileId != DMFILEID_INVALID );

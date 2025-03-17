@@ -65,8 +65,8 @@ public:
 	template < typename KInit, typename VInit >
 	constexpr CUtlKeyValuePair( const KInit &k, const VInit &v ) : m_key( k ), m_value( v ) {}
 
-	constexpr V &GetValue() { return m_value; }
-	constexpr const V &GetValue() const { return m_value; }
+	[[nodiscard]] constexpr V &GetValue() { return m_value; }
+	[[nodiscard]] constexpr const V &GetValue() const { return m_value; }
 };
 
 template <typename K>
@@ -85,7 +85,7 @@ public:
 	constexpr CUtlKeyValuePair( const KInit &k, empty_t ) : m_key( k ) {}
 
 	constexpr CUtlKeyValuePair( const K &k, const empty_t& ) : m_key( k ) {}
-	constexpr const K &GetValue() const { return m_key; }
+	[[nodiscard]] constexpr const K &GetValue() const { return m_key; }
 };
 
 
@@ -121,17 +121,17 @@ struct StringEqualFunctor { bool operator()( const char *a, const char *b ) cons
 struct CaselessStringLessFunctor { bool operator()( const char *a, const char *b ) const { return Q_strcasecmp( a, b ) < 0; } };
 struct CaselessStringEqualFunctor { bool operator()( const char *a, const char *b ) const { return Q_strcasecmp( a, b ) == 0; } };
 
-struct Mix32HashFunctor { constexpr unsigned int operator()( uint32 s ) const; };
-struct Mix64HashFunctor { constexpr unsigned int operator()( uint64 s ) const; };
-struct StringHashFunctor { unsigned int operator()( const char* s ) const; };
-struct CaselessStringHashFunctor { unsigned int operator()( const char* s ) const; };
+struct Mix32HashFunctor { [[nodiscard]] constexpr unsigned int operator()( uint32 s ) const; };
+struct Mix64HashFunctor { [[nodiscard]] constexpr unsigned int operator()( uint64 s ) const; };
+struct StringHashFunctor { [[nodiscard]] unsigned int operator()( const char* s ) const; };
+struct CaselessStringHashFunctor { [[nodiscard]] unsigned int operator()( const char* s ) const; };
 
-struct PointerLessFunctor { bool operator()( const void *a, const void *b ) const { return a < b; } };
-struct PointerEqualFunctor { bool operator()( const void *a, const void *b ) const { return a == b; } };
+struct PointerLessFunctor { [[nodiscard]] bool operator()( const void *a, const void *b ) const { return a < b; } };
+struct PointerEqualFunctor { [[nodiscard]] bool operator()( const void *a, const void *b ) const { return a == b; } };
 #if defined( PLATFORM_64BITS )
-struct PointerHashFunctor { unsigned int operator()( const void* s ) const { return Mix64HashFunctor()( ( uintp ) s ); } };
+struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix64HashFunctor()( ( uintp ) s ); } };
 #else
-struct PointerHashFunctor { unsigned int operator()( const void* s ) const { return Mix32HashFunctor()( ( uintp ) s ); } };
+struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix32HashFunctor()( ( uintp ) s ); } };
 #endif
 
 
@@ -139,17 +139,17 @@ struct PointerHashFunctor { unsigned int operator()( const void* s ) const { ret
 template < typename T >
 struct DefaultLessFunctor
 {
-	bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a < b; }
-	bool operator()( typename ArgumentTypeInfo< T >::Alt_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a < b; }
-	bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Alt_t b ) const { return a < b; }
+	[[nodiscard]] bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a < b; }
+	[[nodiscard]] bool operator()( typename ArgumentTypeInfo< T >::Alt_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a < b; }
+	[[nodiscard]] bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Alt_t b ) const { return a < b; }
 };
 
 template < typename T >
 struct DefaultEqualFunctor
 {
-	bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a == b; }
-	bool operator()( typename ArgumentTypeInfo< T >::Alt_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a == b; }
-	bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Alt_t b ) const { return a == b; }
+	[[nodiscard]] bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a == b; }
+	[[nodiscard]] bool operator()( typename ArgumentTypeInfo< T >::Alt_t a, typename ArgumentTypeInfo< T >::Arg_t b ) const { return a == b; }
+	[[nodiscard]] bool operator()( typename ArgumentTypeInfo< T >::Arg_t a, typename ArgumentTypeInfo< T >::Alt_t b ) const { return a == b; }
 };
 
 // Hashes for basic types

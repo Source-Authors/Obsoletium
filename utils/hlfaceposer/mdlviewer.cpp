@@ -1,18 +1,13 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+ï»¿//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
 //===========================================================================//
 #include "cbase.h"
-#include <direct.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
+#include "mdlviewer.h"
 #include <mxtk/mx.h>
 #include <mxtk/mxTga.h>
 #include <mxtk/mxEvent.h>
-#include "mdlviewer.h"
 #include "ViewerSettings.h"
 #include "MatSysWin.h"
 #include "ControlPanel.h"
@@ -27,7 +22,6 @@
 #include "PhonemeEditor.h"
 #include "filesystem.h"
 #include "ExpressionTool.h"
-#include "ControlPanel.h"
 #include "choreowidgetdrawhelper.h"
 #include "choreoviewcolors.h"
 #include "tabwindow.h"
@@ -61,21 +55,40 @@
 #include "datacache/idatacache.h"
 #include "filesystem_init.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "tier1/strtools.h"
 #include "appframework/tier3app.h"
 #include "faceposer_vgui.h"
 #include "vguiwnd.h"
 #include "vgui_controls/Frame.h"
 #include "vgui/ISurface.h"
-#include "p4lib/ip4.h"
+// dimhotepus: Drop Perforce support.
+//#include "p4lib/ip4.h"
 #include "tier2/p4helpers.h"
 #include "ProgressDialog.h"
 #include "scriplib.h"
+#include "tools_minidump.h"
+
+#include "../out/build/app_version_config.h"
+
+#ifdef _WIN32
+#include <direct.h>
+
+#include "windows/scoped_com.h"
+#include "windows/scoped_timer_resolution.h"
+
+#undef null
+#include <comdef.h>  // _com_error
+#include <shellapi.h>
+#endif
 
 #define WINDOW_TAB_OFFSET 24
 
 MDLViewer *g_MDLViewer = 0;
-char g_appTitle[] = "Half-Life Face Poser";
+#ifdef PLATFORM_64BITS
+char g_appTitle[] = "Valve Face Poser v" SRC_PRODUCT_FILE_VERSION_INFO_STRING " - 64 bit";
+#else
+char g_appTitle[] = "Valve Face Poser v" SRC_PRODUCT_FILE_VERSION_INFO_STRING;
+#endif
+
 static char recentFiles[8][256] = { "", "", "", "", "", "", "", "" };
 
 using namespace vgui;
@@ -294,7 +307,7 @@ char *ExpandPath(char *path)
 // is $include in scriptlib, if this function returns 0, $include will
 // behave the way it did before this change
 //-----------------------------------------------------------------------------
-int CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
+intp CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
 {
 	return 0;
 }
@@ -359,8 +372,8 @@ void
 MDLViewer::loadRecentFiles ()
 {
 	char path[256];
-	strcpy (path, mx::getApplicationPath ());
-	strcat (path, RECENTFILESPATH);
+	V_strcpy_safe (path, mx::getApplicationPath ());
+	V_strcat_safe (path, RECENTFILESPATH);
 	FILE *file = fopen (path, "rb");
 	if (file)
 	{
@@ -376,8 +389,8 @@ MDLViewer::saveRecentFiles ()
 {
 	char path[256];
 
-	strcpy (path, mx::getApplicationPath ());
-	strcat (path, RECENTFILESPATH);
+	V_strcpy_safe (path, mx::getApplicationPath ());
+	V_strcat_safe (path, RECENTFILESPATH);
 
 	FILE *file = fopen (path, "wb");
 	if (file)
@@ -473,15 +486,11 @@ public:
 	CFlatButton( mxWindow *parent, int id )
 		: mxButton( parent, 0, 0, 0, 0, "", id )
 	{
-		HWND wnd = (HWND)getHandle();
-		DWORD exstyle = GetWindowLong( wnd, GWL_EXSTYLE );
-		exstyle |= WS_EX_CLIENTEDGE;
-		SetWindowLong( wnd, GWL_EXSTYLE, exstyle );
-
-		DWORD style = GetWindowLong( wnd, GWL_STYLE );
-		style &= ~WS_BORDER;
-		SetWindowLong( wnd, GWL_STYLE, style );
-
+		// dimhotepus: Use single API to set window styles.
+		FacePoser_AddWindowExStyle(this, WS_EX_CLIENTEDGE);
+		
+		// dimhotepus: Use single API to set window styles.
+		FacePoser_RemoveWindowStyle(this, WS_BORDER);
 	}
 };
 
@@ -532,7 +541,7 @@ public:
 			break;
 		case mxEvent::Size:
 			{
-				int leftedge = w2() * 0.45f;
+				int leftedge = w2() * 45 / 100;
 				m_btnFPS->setBounds( 0, 0, leftedge, h2() );
 				m_btnGridSnap->setBounds( leftedge, 0, w2() - leftedge, h2() );
 				iret = 1;
@@ -558,12 +567,12 @@ public:
 								CInputParams params;
 								memset( &params, 0, sizeof( params ) );
 								
-								strcpy( params.m_szDialogTitle, "Change FPS" );
+								V_strcpy_safe( params.m_szDialogTitle, "Change FPS" );
 								
 								Q_snprintf( params.m_szInputText, sizeof( params.m_szInputText ),
 									"%i", currentFPS );
 								
-								strcpy( params.m_szPrompt, "Current FPS:" );
+								V_strcpy_safe( params.m_szPrompt, "Current FPS:" );
 								
 								if ( InputProperties( &params ) )
 								{
@@ -660,7 +669,7 @@ public:
 
 		char const *current = "";
 		char const *filename = "";
-		int idx = getSelectedIndex();
+		intp idx = getSelectedIndex();
 		if ( idx >= 0 )
 		{
 			current = models->GetModelName( idx );
@@ -688,9 +697,9 @@ public:
 			if ( scene )
 			{
 				// See if there is already an actor with this model associated
-				int c = scene->GetNumActors();
+				intp c = scene->GetNumActors();
 				bool hasassoc = false;
-				for ( int i = 0; i < c; i++ )
+				for ( intp i = 0; i < c; i++ )
 				{
 					CChoreoActor *a = scene->GetActor( i );
 					Assert( a );
@@ -758,8 +767,8 @@ public:
 				case IDC_MODELTAB_HIDEALL:
 					{
 						bool show = ( event->action == IDC_MODELTAB_SHOWALL ) ? true : false;
-						int c = models->Count();
-						for ( int i = 0; i < c ; i++ )
+						intp c = models->Count();
+						for ( intp i = 0; i < c ; i++ )
 						{
 							models->ShowModelIn3DView( i, show );
 						}
@@ -783,7 +792,7 @@ public:
 					break;
 				case IDC_MODELTAB_CLOSE:
 					{
-						int idx = getSelectedIndex();
+						intp idx = getSelectedIndex();
 						if ( idx >= 0 )
 						{
 							models->FreeModel( idx );
@@ -802,7 +811,7 @@ public:
 					break;
 				case IDC_MODELTAB_TOGGLE3DVIEW:
 					{
-						int idx = getSelectedIndex();
+						intp idx = getSelectedIndex();
 						if ( idx >= 0 )
 						{
 							bool visible = models->IsModelShownIn3DView( idx );
@@ -812,7 +821,7 @@ public:
 					break;
 				case IDC_MODELTAB_ASSOCIATEACTOR:
 					{
-						int idx = getSelectedIndex();
+						intp idx = getSelectedIndex();
 						if ( idx >= 0 )
 						{
 							char const *modelname = models->GetModelFileName( idx );
@@ -821,27 +830,27 @@ public:
 							if ( scene )
 							{
 								CChoiceParams params;
-								strcpy( params.m_szDialogTitle, "Associate Actor" );
+								V_strcpy_safe( params.m_szDialogTitle, "Associate Actor" );
 
 								params.m_bPositionDialog = false;
 								params.m_nLeft = 0;
 								params.m_nTop = 0;
-								strcpy( params.m_szPrompt, "Choose actor:" );
+								V_strcpy_safe( params.m_szPrompt, "Choose actor:" );
 
 								params.m_Choices.RemoveAll();
 
 								params.m_nSelected = -1;
 								int oldsel = -1;
 
-								int c = scene->GetNumActors();
+								intp c = scene->GetNumActors();
 								ChoiceText text;
-								for ( int i = 0; i < c; i++ )
+								for ( intp i = 0; i < c; i++ )
 								{
 									CChoreoActor *a = scene->GetActor( i );
 									Assert( a );
 
 									
-									strcpy( text.choice, a->GetName() );
+									V_strcpy_safe( text.choice, a->GetName() );
 
 									if ( !stricmp( a->GetFacePoserModelName(), modelname ) )
 									{
@@ -877,7 +886,7 @@ public:
 
 	void HandleModelSelect( void )
 	{
-		int idx = getSelectedIndex();
+		intp idx = getSelectedIndex();
 		if ( idx < 0 )
 			return;
 
@@ -889,15 +898,15 @@ public:
 	{
 		removeAll();
 		
-		int c = models->Count();
-		int i;
+		intp c = models->Count();
+		intp i;
 		for ( i = 0; i < c ; i++ )
 		{
 			char const *name = models->GetModelName( i );
 
 			// Strip it down to the base name
 			char cleanname[ 256 ];
-			Q_FileBase( name, cleanname, sizeof( cleanname ) );
+			Q_FileBase( name, cleanname );
 
 			add( cleanname );
 		}
@@ -1005,8 +1014,8 @@ public:
 
 	void	Init( void )
 	{
-		int c = IFacePoserToolWindow::GetToolCount();
-		int i;
+		intp c = IFacePoserToolWindow::GetToolCount();
+		intp i;
 		for ( i = 0; i < c ; i++ )
 		{
 			IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
@@ -1026,7 +1035,7 @@ public:
 		bool doubleclicked = false;
 
 		double curtime = realtime;
-		int clickedItem = getSelectedIndex();
+		intp clickedItem = getSelectedIndex();
 
 		if ( clickedItem == m_nLastSelected )
 		{
@@ -1064,8 +1073,8 @@ private:
 
 	IFacePoserToolWindow *GetSelectedTool()
 	{
-		int idx = getSelectedIndex();
-		int c = IFacePoserToolWindow::GetToolCount();
+		intp idx = getSelectedIndex();
+		intp c = IFacePoserToolWindow::GetToolCount();
 	
 		if ( idx < 0 || idx >= c )
 			return NULL;
@@ -1075,7 +1084,7 @@ private:
 	}
 
 	// HACKY double click handler
-	int		m_nLastSelected;
+	intp	m_nLastSelected;
 	double	m_flLastSelectedTime;
 };
 
@@ -1170,10 +1179,10 @@ void MDLViewer::SavePosition( void )
 MDLViewer::MDLViewer () : 
 	mxWindow (0, 0, 0, 0, 0, g_appTitle, mxWindow::Normal),
 	menuCloseCaptionLanguages(0),
-	m_bOldSoundScriptsDirty( -1 ),
+	m_bOldSoundScriptsDirty( true ),
 	m_bVCDSaved( false )
 {
-	int i;
+	intp i;
 
 	g_MDLViewer = this;
 
@@ -1313,7 +1322,7 @@ MDLViewer::MDLViewer () :
 	Con_Printf( "Creating 3D View\n" );
 	g_pMatSysWindow = new MatSysWindow (workspace, 0, 0, 100, 100, "", mxWindow::Normal);
 
-	Con_Printf( "Creating Close Caption tool" );
+	Con_Printf( "Creating Close Caption tool\n" );
 	g_pCloseCaptionTool = new CloseCaptionTool( workspace );
 
 	Con_Printf( "Creating control panel\n" );
@@ -1377,11 +1386,11 @@ MDLViewer::MDLViewer () :
 
 	Con_Printf( "Add Tool Windows\n" );
 
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp c = IFacePoserToolWindow::GetToolCount();
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
-		menuWindow->add( tool->GetToolName(), IDC_WINDOW_FIRSTTOOL + i );
+		menuWindow->add( tool->GetToolName(), static_cast<int>(IDC_WINDOW_FIRSTTOOL + i) );
 	}
 
 	menuWindow->addSeparator();
@@ -1418,11 +1427,11 @@ MDLViewer::MDLViewer () :
 //-----------------------------------------------------------------------------
 void MDLViewer::UpdateWindowMenu( void )
 {
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c ; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
-		menuWindow->setChecked( IDC_WINDOW_FIRSTTOOL + i, tool->GetMxWindow()->isVisible() );
+		menuWindow->setChecked( static_cast<int>(IDC_WINDOW_FIRSTTOOL + i), tool->GetMxWindow()->isVisible() );
 	}
 }
 
@@ -1481,7 +1490,7 @@ void MDLViewer::InitGridSettings( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int MDLViewer::GetActiveModelTab( void )
+intp MDLViewer::GetActiveModelTab( void )
 {
 	return modeltab->getSelectedIndex();
 }
@@ -1490,7 +1499,7 @@ int MDLViewer::GetActiveModelTab( void )
 // Purpose: 
 // Input  : modelindex - 
 //-----------------------------------------------------------------------------
-void MDLViewer::SetActiveModelTab( int modelindex )
+void MDLViewer::SetActiveModelTab( intp modelindex )
 {
 	modeltab->select( modelindex );
 	modeltab->HandleModelSelect();
@@ -1578,18 +1587,18 @@ void MDLViewer::OnFileLoaded( char const *pszFile )
 	if (i < 8)
 	{
 		char tmp[256];
-		strcpy (tmp, recentFiles[0]);
-		strcpy (recentFiles[0], recentFiles[i]);
-		strcpy (recentFiles[i], tmp);
+		V_strcpy_safe (tmp, recentFiles[0]);
+		V_strcpy_safe (recentFiles[0], recentFiles[i]);
+		V_strcpy_safe (recentFiles[i], tmp);
 	}
 
 	// insert recent file
 	else
 	{
 		for (i = 7; i > 0; i--)
-			strcpy (recentFiles[i], recentFiles[i - 1]);
+			V_strcpy_safe (recentFiles[i], recentFiles[i - 1]);
 
-		strcpy( recentFiles[0], pszFile );
+		V_strcpy_safe( recentFiles[0], pszFile );
 	}
 
 	initRecentFiles ();
@@ -1612,38 +1621,6 @@ void MDLViewer::LoadModelFile( const char *pszFile )
 
 	g_pControlPanel->CenterOnFace();
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *wnd - 
-//			x - 
-//			y - 
-// Output : static bool
-//-----------------------------------------------------------------------------
-static bool WindowContainsPoint( mxWindow *wnd, int x, int y )
-{
-	POINT pt;
-	pt.x = (short)x;
-	pt.y = (short)y;
-
-	HWND window = (HWND)wnd->getHandle();
-	if ( !window )
-		return false;
-
-	ScreenToClient( window, &pt );
-
-	if ( pt.x < 0 )
-		return false;
-	if ( pt.y < 0 )
-		return false;
-	if ( pt.x > wnd->w() )
-		return false;
-	if ( pt.y > wnd->h() )
-		return false;
-
-	return true;
-}
-
 
 void MDLViewer::LoadModel_Steam()
 {
@@ -1802,7 +1779,7 @@ int MDLViewer::handleEvent (mxEvent *event)
 					if ( recentFiles[ i ] && recentFiles[ i ][ 0 ] )
 					{
 						char ext[ 4 ];
-						Q_ExtractFileExtension( recentFiles[ i ], ext, sizeof( ext ) );
+						V_ExtractFileExtension( recentFiles[ i ], ext );
 						bool valid = false;
 						if ( !Q_stricmp( ext, "mdl" ) )
 						{
@@ -1819,9 +1796,9 @@ int MDLViewer::handleEvent (mxEvent *event)
 						if ( valid )
 						{
 							char tmp[256];			
-							strcpy (tmp, recentFiles[0]);
-							strcpy (recentFiles[0], recentFiles[i]);
-							strcpy (recentFiles[i], tmp);
+							V_strcpy_safe (tmp, recentFiles[0]);
+							V_strcpy_safe (recentFiles[0], recentFiles[i]);
+							V_strcpy_safe (recentFiles[i], tmp);
 						
 							initRecentFiles ();
 						}
@@ -1844,9 +1821,9 @@ int MDLViewer::handleEvent (mxEvent *event)
 				{
 					float *cols[3] = { g_viewerSettings.bgColor, g_viewerSettings.gColor, g_viewerSettings.lColor };
 					float *col = cols[event->action - IDC_OPTIONS_COLORBACKGROUND];
-					int r = (int) (col[0] * 255.0f);
-					int g = (int) (col[1] * 255.0f);
-					int b = (int) (col[2] * 255.0f);
+					unsigned char r = (unsigned char) (col[0] * 255.0f);
+					unsigned char g = (unsigned char) (col[1] * 255.0f);
+					unsigned char b = (unsigned char) (col[2] * 255.0f);
 					if (mxChooseColor (this, &r, &g, &b))
 					{
 						col[0] = (float) r / 255.0f;
@@ -1877,8 +1854,8 @@ int MDLViewer::handleEvent (mxEvent *event)
 					if (ptr)
 					{
 						char fn[ 512 ];
-						Q_strncpy( fn, ptr, sizeof( fn ) );
-						Q_SetExtension( fn, ".tga", sizeof( fn ) );
+						V_strcpy_safe( fn, ptr );
+						Q_SetExtension( fn, ".tga" );
 						g_pMatSysWindow->TakeScreenShot( fn );
 					}
 				}
@@ -1890,13 +1867,13 @@ int MDLViewer::handleEvent (mxEvent *event)
 				
 #ifdef WIN32
 			case IDC_HELP_GOTOHOMEPAGE:
-				ShellExecute (0, "open", "http://developer.valvesoftware.com/wiki/Category:Choreography", 0, 0, SW_SHOW);
+				ShellExecute (0, "open", "https://developer.valvesoftware.com/wiki/Category:Choreography", 0, 0, SW_SHOW);
 				break;
 #endif
 				
 			case IDC_HELP_ABOUT:
 				mxMessageBox (this,
-					"v1.0  Copyright © 1996-2007, Valve Corporation. All rights reserved.\r\nBuild Date: " __DATE__ "",
+					"Valve Face Poser v" SRC_PRODUCT_FILE_VERSION_INFO_STRING " (c0 1996-2025, Valve Corp. All rights reserved.\r\nBuild Date: " __DATE__ "",
 					"Valve Face Poser", 
 					MX_MB_OK | MX_MB_INFORMATION);
 				break;
@@ -1943,7 +1920,7 @@ int MDLViewer::handleEvent (mxEvent *event)
 					char classfile[ 512 ];
 					if ( FacePoser_ShowSaveFileNameDialog( classfile, sizeof( classfile ), "expressions", "*.txt" ) )
 					{
-	                    Q_DefaultExtension( classfile, ".txt", sizeof( classfile ) );
+	                    Q_DefaultExtension( classfile, ".txt" );
 						expressions->CreateNewClass( classfile );
 					}
 				}
@@ -2115,8 +2092,8 @@ void MDLViewer::SaveWindowPositions( void )
 	// Save the model viewer position
 	SavePosition();
 
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *w = IFacePoserToolWindow::GetTool( i );
 		w->SavePosition();
@@ -2134,8 +2111,8 @@ void MDLViewer::LoadWindowPositions( void )
 	g_viewerSettings.width = w;
 	g_viewerSettings.height = h;
 
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *w = IFacePoserToolWindow::GetTool( i );
 		w->LoadPosition();
@@ -2173,8 +2150,8 @@ void MDLViewer::Think( float dt )
 
 static int CountVisibleTools( void )
 {
-	int i;
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp i;
+	intp c = IFacePoserToolWindow::GetToolCount();
 	int viscount = 0;
 
 	for ( i = 0; i < c; i++ )
@@ -2192,8 +2169,8 @@ static int CountVisibleTools( void )
 
 void MDLViewer::OnCascade()
 {
-	int i;
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp i;
+	intp c = IFacePoserToolWindow::GetToolCount();
 	int viscount = CountVisibleTools();
 
 	int x = 0, y = 0;
@@ -2248,8 +2225,8 @@ void MDLViewer::OnTileVertically()
 
 void MDLViewer::OnHideAll()
 {
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
 		mxWindow *w = tool->GetMxWindow();
@@ -2262,8 +2239,8 @@ void MDLViewer::OnHideAll()
 
 void MDLViewer::OnShowAll()
 {
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
 		mxWindow *w = tool->GetMxWindow();
@@ -2276,7 +2253,7 @@ void MDLViewer::OnShowAll()
 
 void MDLViewer::DoTile( int x, int y )
 {
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp c = IFacePoserToolWindow::GetToolCount();
 
 	if ( x < 1 )
 		x = 1;
@@ -2361,7 +2338,7 @@ void MDLViewer::OnRebuildScenesImage()
 	m_bVCDSaved = false;
 }
 
-void MDLViewer::UpdateStatus( char const *pchSceneName, bool bQuiet, int nIndex, int nCount )
+void MDLViewer::UpdateStatus( char const *pchSceneName, bool bQuiet, intp nIndex, intp nCount )
 {
 	g_pProgressDialog->UpdateText( pchSceneName );
 	g_pProgressDialog->Update( (float)nIndex / (float)nCount );
@@ -2374,12 +2351,14 @@ void MDLViewer::OnVCDSaved()
 
 SpewRetval_t HLFacePoserSpewFunc( SpewType_t spewType, char const *pMsg )
 {
+	Plat_DebugString(pMsg);
+
 	g_bInError = true;
 
 	switch (spewType)
 	{
 	case SPEW_ERROR:
-		::MessageBox(NULL, pMsg, "FATAL ERROR", MB_OK);
+		mxMessageBox(nullptr, pMsg, "Valve Face Poser - Fatal Error", MX_MB_OK | MX_MB_ERROR);
 		g_bInError = false;
 		return SPEW_ABORT;
 
@@ -2454,16 +2433,20 @@ class CHLFacePoserApp : public CTier3SteamApp
 	typedef CTier3SteamApp BaseClass;
 
 public:
+	CHLFacePoserApp() : scoped_spew_output_{HLFacePoserSpewFunc} {}
+
 	// Methods of IApplication
-	virtual bool Create();
-	virtual bool PreInit();
-	virtual int Main();
-	virtual void PostShutdown();
-	virtual void Destroy();
+	bool Create() override;
+	bool PreInit() override;
+	int Main() override;
+	void PostShutdown() override;
+	void Destroy() override;
 
 private:
 	// Sets up the search paths
 	bool SetupSearchPaths();
+
+	const ScopedSpewOutputFunc scoped_spew_output_;
 };
 
 
@@ -2474,8 +2457,6 @@ bool CHLFacePoserApp::Create()
 {
 	// Save some memory so engine/hammer isn't so painful
 	CommandLine()->AppendParm( "-disallowhwmorph", NULL );
-
-	SpewOutputFunc( HLFacePoserSpewFunc );
 
 	AppSystemInfo_t appSystems[] = 
 	{
@@ -2505,10 +2486,10 @@ bool CHLFacePoserApp::Create()
 
 	g_Factory = GetFactory();
 
-	IMaterialSystem* pMaterialSystem = (IMaterialSystem*)FindSystem( MATERIAL_SYSTEM_INTERFACE_VERSION );
+	IMaterialSystem* pMaterialSystem = FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
 	if ( !pMaterialSystem )
 	{
-		Warning( "Material System interface could not be found!\n" );
+		Warning( "Material System interface '%s' could not be found!\n", MATERIAL_SYSTEM_INTERFACE_VERSION );
 		return false;
 	}
 
@@ -2551,11 +2532,11 @@ bool CHLFacePoserApp::SetupSearchPaths()
 		return false;
 
 	// Set gamedir.
-	Q_MakeAbsolutePath( gamedir, sizeof( gamedir ), GetGameInfoPath() );
+	V_MakeAbsolutePath( gamedir, GetGameInfoPath() );
 
-	Q_FileBase( gamedir, gamedirsimple, sizeof( gamedirsimple ) );
+	V_FileBase( gamedir, gamedirsimple );
 
-	Q_AppendSlash( gamedir, sizeof( gamedir ) );
+	V_AppendSlash( gamedir );
 
 	workspacefiles->Init( GetGameDirectorySimple() );
 
@@ -2572,11 +2553,11 @@ bool CHLFacePoserApp::PreInit( )
 		return false;
 
 	g_pFileSystem = filesystem = g_pFullFileSystem;
-	g_pStudioDataCache = (IStudioDataCache*)FindSystem( STUDIO_DATA_CACHE_INTERFACE_VERSION ); 
-	physcollision = (IPhysicsCollision *)FindSystem( VPHYSICS_COLLISION_INTERFACE_VERSION );
-	physprop = (IPhysicsSurfaceProps *)FindSystem( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION );
-	g_pLocalize = (vgui::ILocalize *)FindSystem(VGUI_LOCALIZE_INTERFACE_VERSION );
-	soundemitter = (ISoundEmitterSystemBase*)FindSystem(SOUNDEMITTERSYSTEM_INTERFACE_VERSION);
+	g_pStudioDataCache = FindSystem<IStudioDataCache>( STUDIO_DATA_CACHE_INTERFACE_VERSION ); 
+	physcollision = FindSystem<IPhysicsCollision>( VPHYSICS_COLLISION_INTERFACE_VERSION );
+	physprop = FindSystem<IPhysicsSurfaceProps>( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION );
+	g_pLocalize = FindSystem<vgui::ILocalize>(VGUI_LOCALIZE_INTERFACE_VERSION );
+	soundemitter = FindSystem<ISoundEmitterSystemBase>(SOUNDEMITTERSYSTEM_INTERFACE_VERSION);
 
 	if ( !soundemitter || !g_pLocalize || !filesystem || !physprop || !physcollision || 
 		!g_pMaterialSystem || !g_pStudioRender || !g_pMDLCache || !g_pDataCache )
@@ -2584,7 +2565,7 @@ bool CHLFacePoserApp::PreInit( )
 		Error("Unable to load required library interface!\n");
 	}
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
 	filesystem->SetWarningFunc( Warning );
 
 	// Add paths...
@@ -2593,10 +2574,10 @@ bool CHLFacePoserApp::PreInit( )
 
 	// Get the adapter from the command line....
 	const char *pAdapterString;
-	int nAdapter = 0;
+	unsigned nAdapter = 0;
 	if (CommandLine()->CheckParm( "-adapter", &pAdapterString ))
 	{
-		nAdapter = atoi( pAdapterString );
+		nAdapter = static_cast<unsigned>(strtoul( pAdapterString, nullptr, 10 ));
 	}
 
 	int adapterFlags = MATERIAL_INIT_ALLOCATE_FULLSCREEN_TEXTURE;
@@ -2643,7 +2624,12 @@ int CHLFacePoserApp::Main()
 	soundemitter->ModInit();
 	g_pMaterialSystem->ModInit();
 
+	// dimhotepus: Double cache size on x86-64.
+#ifdef PLATFORM_64BITS
+	g_pDataCache->SetSize( 2 * 64 * 1024 * 1024 );
+#else
 	g_pDataCache->SetSize( 64 * 1024 * 1024 );
+#endif
 
 	// Always start with english
 	g_pLocalize->AddFile( "resource/closecaption_english.txt", "GAME", true );
@@ -2717,7 +2703,7 @@ static bool CHLFacePoserApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsSt
 	{
 		if ( Q_stristr( CommandLine()->GetParm( i ), ".mdl" ) )
 		{
-			Q_MakeAbsolutePath( pchPathBuffer, nBufferLength, CommandLine()->GetParm( i ) );
+			V_MakeAbsolutePath( pchPathBuffer, nBufferLength, CommandLine()->GetParm( i ) );
 			return true;
 		}
 	}
@@ -2727,27 +2713,65 @@ static bool CHLFacePoserApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsSt
 
 int main (int argc, char *argv[])
 {
+	// Install an exception handler.
+	const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+
 	CommandLine()->CreateCmdLine( argc, argv );
-	CoInitialize(NULL);
+
+#ifdef _WIN32
+	constexpr COINIT comFlags{
+		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
+	se::common::windows::ScopedCom scopedCom{comFlags};
+	if (FAILED(scopedCom.errc())) {
+		const _com_error com_error{scopedCom.errc()};
+		mxMessageBox(nullptr, va( "Unable to initialize COM (0x%x): %s.",
+			scopedCom.errc(), com_error.ErrorMessage() ),
+			g_appTitle, MX_MB_OK | MX_MB_ERROR );
+		return 1;
+	}
+
+	using namespace std::chrono_literals;
+	constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
+
+	// System timer precision affects Sleep & friends performance.
+	const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
+		kSystemTimerResolution};
+	if (!scoped_timer_resolution) {
+		Warning(
+			"Unable to set Windows timer resolution to %lld ms. Will use default "
+			"one.",
+			static_cast<long long>(kSystemTimerResolution.count()));
+	}
+#endif
 
 	// make sure, we start in the right directory
 	char szName[256];
-	strcpy (szName, mx::getApplicationPath() );
-	mx::init (argc, argv);
+	V_strcpy_safe(szName, mx::getApplicationPath() );
+	if (!mx::init( argc, argv ))
+	{
+		mxMessageBox( nullptr,
+			"Sorry, unable to initialize UI toolkit.",
+			"Valve Model Viewer - Error",
+			MX_MB_OK | MX_MB_ERROR );
+		return 1;
+	}
 
 	char workingdir[ 256 ];
-	workingdir[0] = 0;
-	Q_getwd( workingdir, sizeof( workingdir ) );
+	workingdir[0] = '\0';
+	if (!Q_getwd( workingdir ))
+	{
+		mxMessageBox(nullptr, va( "Unable to get current directory: '%s'.",	
+			std::system_category().message(errno).c_str() ), g_appTitle, MX_MB_OK );
+		return 2;
+	}
 
 	// Set game info directory suggestion callback
 	const ScopedSuggestGameInfoDir scoped_suggest_game_info_dir( CHLFacePoserApp_SuggestGameInfoDirFn );
 
  	CHLFacePoserApp hlFacePoserApp;
 	CSteamApplication steamApplication( &hlFacePoserApp );
-	int nRetVal = steamApplication.Run();
+	int rc = steamApplication.Run();
 
-	CoUninitialize();
-
-	return nRetVal;
+	return rc;
 }
 

@@ -8,7 +8,7 @@
 #define CALLQUEUE_H
 
 #include "tier0/tslist.h"
-#include "functors.h"
+#include "tier1/functors.h"
 
 #if defined( _WIN32 )
 #pragma once
@@ -80,12 +80,12 @@ class CCallQueueT
 {
 public:
 	CCallQueueT()
-		: m_bNoQueue( false )
-	{
+		: m_bNoQueue{ false }
 #ifdef _DEBUG
-		m_nCurSerialNumber = 0;
-		m_nBreakSerialNumber = (unsigned)-1;
+		, m_nCurSerialNumber{ 0 }
+		, m_nBreakSerialNumber{ std::numeric_limits<unsigned>::max() }
 #endif
+	{
 	}
 
 	void DisableQueue( bool bDisable )
@@ -94,18 +94,19 @@ public:
 		{
 			return;
 		}
+
 		if ( !m_bNoQueue )
 			CallQueued();
 
 		m_bNoQueue = bDisable;
 	}
 
-	bool IsDisabled() const
+	[[nodiscard]] bool IsDisabled() const
 	{
 		return m_bNoQueue;
 	}
 
-	int Count()
+	[[nodiscard]] int Count()
 	{
 		return m_queue.Count();
 	}
@@ -121,12 +122,12 @@ public:
 
 		CFunctor *pFunctor;
 
-		while ( m_queue.PopItem( &pFunctor ) && pFunctor != NULL )
+		while ( m_queue.PopItem( &pFunctor ) && pFunctor != nullptr )
 		{
 #ifdef _DEBUG
 			if ( pFunctor->m_nUserID == m_nBreakSerialNumber)
 			{
-				m_nBreakSerialNumber = (unsigned)-1;
+				m_nBreakSerialNumber = std::numeric_limits<unsigned>::max();
 			}
 #endif
 			(*pFunctor)();

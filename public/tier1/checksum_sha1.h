@@ -153,7 +153,7 @@ public:
 		return !(*this == rhs);
 	}
 
-	CSHA &operator=( const SHADigest_t rhs )
+	CSHA &operator=( const SHADigest_t &rhs )
 	{
 		memcpy( m_shaDigest, rhs, k_cubHash );
 		return *this;

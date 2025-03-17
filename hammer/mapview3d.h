@@ -85,7 +85,7 @@ public:
 	void BeginPick(void);
 	void EndPick(void);
 
-	DrawType_t GetDrawType() { return m_eDrawType; }
+	DrawType_t GetDrawType() override { return m_eDrawType; }
 	void SetDrawType(DrawType_t eDrawType);
 
 	int			ObjectsAt( const Vector2D &point, HitInfo_t *pObjects, int nMaxObjects, unsigned int nFlags = 0 );
@@ -147,8 +147,7 @@ private:
 	bool m_bRotating;
 	CPoint m_ptLastMouseMovement;	// Last position used for tracking the mouse for camera control.
 
-	DWORD m_dwTimeLastSample;		// Used for calculating rendering framerate.
-	DWORD m_dwTimeLastInputSample;	// Used for framerate-independent input processing.
+	double m_flTimeLastInputSample;	// Used for framerate-independent input processing.
 
 	float m_fForwardSpeed;			// Current forward speed, in world units per second.
 	float m_fStrafeSpeed;			// Current side-to-side speed, in world units per second.
@@ -175,7 +174,7 @@ private:
 
 	//{{AFX_MSG(CMapView3D)
 protected:
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSize(UINT nType, int cx, int cy);

@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "hlfaceposer.h"
 #include "expressions.h"
+#include "hlfaceposer.h"
 #include <mxtk/mx.h>
 #include "ControlPanel.h"
 #include "StudioModel.h"
@@ -22,18 +22,18 @@ bool Sys_Error(const char *pMsg, ...);
 extern char g_appTitle[];
 
 static CUtlVector< CUtlSymbol > g_GlobalFlexControllers;
-static CUtlDict< int, int >		g_GlobalFlexControllerLookup; 
+static CUtlDict< intp, intp >	g_GlobalFlexControllerLookup; 
 
 void ChecksumFlexControllers( bool bSpew, char const *name, CRC32_t &crc, const float *settings, const float *weights )
 {
 	CRC32_Init( &crc );
 
 	// Walk them alphabetically so that load order doesn't matter
-	for ( int i = g_GlobalFlexControllerLookup.First() ; 
+	for ( auto i = g_GlobalFlexControllerLookup.First() ; 
 		i != g_GlobalFlexControllerLookup.InvalidIndex(); 
 		i = g_GlobalFlexControllerLookup.Next( i ) )
 	{
-		int controllerIndex = g_GlobalFlexControllerLookup[ i ];
+		auto controllerIndex = g_GlobalFlexControllerLookup[ i ];
 		char const *pszName = g_GlobalFlexControllerLookup.GetElementName( i );
 		
 		// Only count active controllers in checksum
@@ -60,7 +60,7 @@ void ChecksumFlexControllers( bool bSpew, char const *name, CRC32_t &crc, const 
 	if ( bSpew )
 	{
 		char hex[ 17 ];
-		Q_binarytohex( (const byte *)&crc, sizeof( crc ), hex, sizeof( hex ) );
+		V_binarytohex( crc, hex );
 		Msg( "%s checksum = %sf\n", name, hex );
 	}
 }
@@ -70,7 +70,7 @@ void ChecksumFlexControllers( bool bSpew, char const *name, CRC32_t &crc, const 
 // Input  : index - 
 // Output : char const
 //-----------------------------------------------------------------------------
-char const *GetGlobalFlexControllerName( int index )
+char const *GetGlobalFlexControllerName( intp index )
 {
 	return g_GlobalFlexControllers[ index ].String();
 }
@@ -79,7 +79,7 @@ char const *GetGlobalFlexControllerName( int index )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int GetGlobalFlexControllerCount( void )
+intp GetGlobalFlexControllerCount( void )
 {
 	return g_GlobalFlexControllers.Count();
 }
@@ -88,9 +88,9 @@ int GetGlobalFlexControllerCount( void )
 // Input  : *szName - 
 // Output : int
 //-----------------------------------------------------------------------------
-int AddGlobalFlexController( StudioModel *model, const char *szName )
+intp AddGlobalFlexController( StudioModel *model, const char *szName )
 {
-	int idx = g_GlobalFlexControllerLookup.Find( szName );
+	auto idx = g_GlobalFlexControllerLookup.Find( szName );
 	if ( idx != g_GlobalFlexControllerLookup.InvalidIndex() )
 	{
 		return g_GlobalFlexControllerLookup[ idx ];
@@ -126,7 +126,7 @@ void SetupModelFlexcontrollerLinks( StudioModel *model )
 
 	for (LocalFlexController_t i = LocalFlexController_t(0); i < hdr->numflexcontrollers(); i++)
 	{
-		int j = AddGlobalFlexController( model, hdr->pFlexcontroller( i )->pszName() );
+		auto j = AddGlobalFlexController( model, hdr->pFlexcontroller( i )->pszName() );
 		hdr->pFlexcontroller( i )->localToGlobal = j;
 		model->SetFlexController( i, 0.0f );
 	}
@@ -151,14 +151,14 @@ public:
 	bool					CloseClass( CExpClass *cl );
 
 	CExpClass				*AddCExpClass( const char *classname, const char *filename );
-	int						GetNumClasses( void );
+	intp					GetNumClasses( void );
 
 	CExpression				*GetCopyBuffer( void );
 
 	bool					CanClose( void );
 
 	CExpClass				*GetActiveClass( void );
-	CExpClass				*GetClass( int num );
+	CExpClass				*GetClass( intp num );
 	CExpClass				*FindClass( const char *classname, bool bMatchBaseNameOnly );
 
 private:
@@ -204,7 +204,7 @@ CExpressionManager::~CExpressionManager( void )
 //-----------------------------------------------------------------------------
 void CExpressionManager::Reset( void )
 {
-	while ( m_Classes.Size() > 0 )
+	while ( m_Classes.Count() > 0 )
 	{
 		CExpClass *p = m_Classes[ 0 ];
 		m_Classes.Remove( 0 );
@@ -229,7 +229,7 @@ CExpClass	*CExpressionManager::GetActiveClass( void )
 // Input  : num - 
 // Output : CExpClass
 //-----------------------------------------------------------------------------
-CExpClass *CExpressionManager::GetClass( int num )
+CExpClass *CExpressionManager::GetClass( intp num )
 {
 	return m_Classes[ num ];
 }
@@ -261,7 +261,7 @@ CExpClass * CExpressionManager::AddCExpClass( const char *classname, const char 
 //-----------------------------------------------------------------------------
 void CExpressionManager::RemoveCExpClass( CExpClass *cl )
 {
-	for ( int i = 0; i < m_Classes.Size(); i++ )
+	for ( intp i = 0; i < m_Classes.Count(); i++ )
 	{
 		CExpClass *p = m_Classes[ i ];
 		if ( p == cl )
@@ -272,7 +272,7 @@ void CExpressionManager::RemoveCExpClass( CExpClass *cl )
 		}
 	}
 
-	if ( m_Classes.Size() >= 1 )
+	if ( m_Classes.Count() >= 1 )
 	{
 		ActivateExpressionClass( m_Classes[ 0 ] );
 	}
@@ -307,9 +307,9 @@ void CExpressionManager::ActivateExpressionClass( CExpClass *cl )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CExpressionManager::GetNumClasses( void )
+intp CExpressionManager::GetNumClasses( void )
 {
-	return m_Classes.Size();
+	return m_Classes.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -322,17 +322,17 @@ CExpClass *CExpressionManager::FindClass( const char *classname, bool bMatchBase
 	char search[ 256 ];
 	if ( bMatchBaseNameOnly )
 	{
-		Q_FileBase( classname, search, sizeof( search ) );
+		Q_FileBase( classname, search );
 	}
 	else
 	{
-		Q_strncpy( search, classname, sizeof( search ) );
+		V_strcpy_safe( search, classname );
 	}
 
 	Q_FixSlashes( search );
 	Q_strlower( search );
 
-	for ( int i = 0; i < m_Classes.Size(); i++ )
+	for ( intp i = 0; i < m_Classes.Count(); i++ )
 	{
 		CExpClass *cl = m_Classes[ i ];
 
@@ -359,17 +359,17 @@ const char *CExpressionManager::GetClassnameFromFilename( const char *filename )
 	Assert( filename && filename[ 0 ] );
 
 	// Strip the .txt
-	Q_StripExtension( filename, cleanname, sizeof( cleanname ) );
+	Q_StripExtension( filename, cleanname );
 
 	char *p = Q_stristr( cleanname, "expressions" );
 	if ( p )
 	{
-		Q_strncpy( classname, p + Q_strlen( "expressions" ) + 1, sizeof( classname ) );
+		Q_strncpy( classname, p + std::size( "expressions" ), sizeof( classname ) );
 	}
 	else
 	{
 		Assert( 0 );
-		Q_strncpy( classname, cleanname, sizeof( classname ) );
+		V_strcpy_safe( classname, cleanname );
 	}
 
 	Q_FixSlashes( classname );
@@ -392,7 +392,7 @@ CExpression *CExpressionManager::GetCopyBuffer( void )
 //-----------------------------------------------------------------------------
 bool CExpressionManager::CanClose( void )
 {
-	for ( int i = 0; i < m_Classes.Size(); i++ )
+	for ( intp i = 0; i < m_Classes.Count(); i++ )
 	{
 		CExpClass *pclass = m_Classes[ i ];
 		if ( pclass->GetDirty() )
@@ -443,7 +443,7 @@ void CExpressionManager::LoadClass( const char *inpath )
 	ActivateExpressionClass( active );
 
 	int numflexmaps = 0;
-	int flexmap[128]; // maps file local controls into global controls
+	intp flexmap[128]; // maps file local controls into global controls
 	LocalFlexController_t localflexmap[128]; // maps file local controls into local controls
 	bool bHasWeighting = false;
 	bool bNormalized = false;
@@ -502,7 +502,7 @@ void CExpressionManager::LoadClass( const char *inpath )
 			memset( setting, 0, sizeof( setting ) );
 			memset( weight, 0, sizeof( weight ) );
 
-			strcpy( name, token );
+			V_strcpy_safe( name, token );
 
 			// phoneme index
 			GetToken( false );
@@ -521,11 +521,13 @@ void CExpressionManager::LoadClass( const char *inpath )
 				if (flexmap[i] > -1)
 				{
 					GetToken( false );
-					setting[flexmap[i]] = atof( token );
+					// dimhotepus: atof -> strtof.
+					setting[flexmap[i]] = strtof( token, nullptr );
 					if (bHasWeighting)
 					{
 						GetToken( false );
-						weight[flexmap[i]] = atof( token );
+						// dimhotepus: atof -> strtof.
+						weight[flexmap[i]] = strtof( token, nullptr );
 					}
 					else
 					{
@@ -553,7 +555,7 @@ void CExpressionManager::LoadClass( const char *inpath )
 
 			// description
 			GetToken( false );
-			strcpy( desc, token );
+			V_strcpy_safe( desc, token );
 
 			CExpression *exp = active->AddExpression( name, desc, setting, weight, false, false );
 			if ( active->IsPhonemeClass() && exp )

@@ -76,7 +76,7 @@ CMapAxisHandle::CMapAxisHandle(void)
 CMapAxisHandle::CMapAxisHandle(const char *pszKey)
 {
 	Initialize();
-	strcpy(m_szKeyName, pszKey);
+	V_strcpy_safe(m_szKeyName, pszKey);
 }
 
 
@@ -163,9 +163,9 @@ CMapClass *CMapAxisHandle::CopyFrom(CMapClass *pObject, bool bUpdateDependencies
 	m_Point[0].CopyFrom(&pFrom->m_Point[0], bUpdateDependencies);
 	m_Point[1].CopyFrom(&pFrom->m_Point[1], bUpdateDependencies);
 
-	strcpy(m_szKeyName, pFrom->m_szKeyName);
+	V_strcpy_safe(m_szKeyName, pFrom->m_szKeyName);
 
-	return(this);
+	return this;
 }
 
 
@@ -421,7 +421,7 @@ void CMapAxisHandle::UpdateParentKey(void)
 			CalcBounds();
 
 			char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-			sprintf(szValue, "%g %g %g, %g %g %g", (double)vecOrigin1.x, (double)vecOrigin1.y, (double)vecOrigin1.z, (double)vecOrigin2.x, (double)vecOrigin2.y, (double)vecOrigin2.z);
+			V_sprintf_safe(szValue, "%g %g %g, %g %g %g", (double)vecOrigin1.x, (double)vecOrigin1.y, (double)vecOrigin1.z, (double)vecOrigin2.x, (double)vecOrigin2.y, (double)vecOrigin2.z);
 			pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 		}
 	}

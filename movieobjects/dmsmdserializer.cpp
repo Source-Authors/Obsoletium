@@ -440,7 +440,7 @@ bool CQcData::ParseQc(
 		CUtlString sRelSmdPath;
 
 		bool bJoin = false;
-		for ( int i = 0; i < sPathArray.Count(); ++i )
+		for ( intp i = 0; i < sPathArray.Count(); ++i )
 		{
 			if ( !bJoin && !V_stricmp( sPathArray[i], "models" ) )
 			{
@@ -572,7 +572,7 @@ bool CQcData::GetQcData(
 class CVertexWeight
 {
 public:
-	int m_nBoneIndex;
+	intp m_nBoneIndex;
 	float m_flWeight;
 
 	CVertexWeight()
@@ -804,7 +804,7 @@ static bool ParserCreateJoint(
 			return false;
 		}
 
-		const int nParentIdIndex = smdJointMap.Find( nParentId );
+		const auto nParentIdIndex = smdJointMap.Find( nParentId );
 
 		if ( !smdJointMap.IsValidIndex( nParentIdIndex ) )
 		{
@@ -893,7 +893,7 @@ static void ParserCreateJoints(
 
 	std::stable_sort( smdJointList.Base(), smdJointList.Base() + smdJointList.Count(), SmdJointLessFunc );
 
-	for ( int i = 0; i < smdJointList.Count(); ++i )
+	for ( intp i = 0; i < smdJointList.Count(); ++i )
 	{
 		CDmSmdSerializer::SmdJoint_t *pSmdJoint = smdJointList[i];
 		pSmdJoint->m_nActualId = i;
@@ -964,7 +964,7 @@ void CDmSmdSerializer::ParserSetJoint(
 //-----------------------------------------------------------------------------
 // Returns -1 if invalid
 //-----------------------------------------------------------------------------
-static int GetActualId( const CDmSmdSerializer::SmdJointMap_t &smdJointMap, int nId )
+static intp GetActualId( const CDmSmdSerializer::SmdJointMap_t &smdJointMap, int nId )
 {
 	const CDmSmdSerializer::SmdJointMap_t::IndexType_t nIdIndex = smdJointMap.Find( nId );
 
@@ -1038,12 +1038,12 @@ static void HandleVertexWeights(
 
 	const float flEps = 1.0e-6;
 
-	uint nTokenEnd = tokens.Count();
+	intp nTokenEnd = tokens.Count();
 	if ( nTokenEnd > 10 )
 	{
 		int nId = -1;
 		float flWeight = 0.0f;
-		for ( uint i = 10; i < nTokenEnd; ++i )
+		for ( intp i = 10; i < nTokenEnd; ++i )
 		{
 			nId = strtol( tokens[ i ].Get(), NULL, 0 );
 			++i;
@@ -1052,11 +1052,11 @@ static void HandleVertexWeights(
 			if ( nId < 0 || flWeight < flEps )
 				continue;
 
-			const int nActualId = GetActualId( smdJointMap, nId );
+			const intp nActualId = GetActualId( smdJointMap, nId );
 
 			if ( nActualId < 0 )
 			{
-				Error( "%s(%d) : triangle error : ignoring unknown joint id(%d) with actual id(%d) for vertex weight\n",
+				Error( "%s(%d) : triangle error : ignoring unknown joint id(%d) with actual id(%zd) for vertex weight\n",
 					pszFilename, nLineNumber, nId, nActualId );
 				continue;
 			}
@@ -1075,7 +1075,7 @@ static void HandleVertexWeights(
 		float flTotalWeight = 0.0f;
 		vertex.m_nWeights = 0;
 
-		for ( size_t i = 0; static_cast<intp>(i) < tmpVertexWeights.Count() && i < std::size( vertex.m_vertexWeights ); ++i )
+		for ( intp i = 0; i < tmpVertexWeights.Count() && i < std::size( vertex.m_vertexWeights ); ++i )
 		{
 			CVertexWeight &vertexWeight( vertex.m_vertexWeights[ i ] );
 			vertexWeight = tmpVertexWeights[i];
@@ -1189,7 +1189,7 @@ static CDmeFaceSet *FindOrCreateFaceSet(
 	int nLineNumber )
 {
 	// Could cache in a hashed map or something...
-	for ( int i = 0; i < pDmeMesh->FaceSetCount(); ++i )
+	for ( intp i = 0; i < pDmeMesh->FaceSetCount(); ++i )
 	{
 		CDmeFaceSet *pDmeFaceSet = pDmeMesh->GetFaceSet( i );
 		if ( !pDmeFaceSet )
@@ -1282,7 +1282,7 @@ static void CreatePolygon(
 
 			pDmeVertexData->SetVertexIndices( nPositionField, nNewVertexIndex, 1, &nPositionIndex );
 
-			const int nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
+			const intp nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
 			pDmeFaceSet->SetIndices( nFaceSetIndex, 1, const_cast< int * >( &nNewVertexIndex ) );
 
 		}
@@ -1310,9 +1310,9 @@ static void CreatePolygon(
 
 	}
 
-	static const int nFaceDelimiter = -1;
-	const int nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
-	pDmeFaceSet->SetIndices( nFaceSetIndex, 1, const_cast< int * >( &nFaceDelimiter ) );
+	static int nFaceDelimiter = -1;
+	const intp nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
+	pDmeFaceSet->SetIndices( nFaceSetIndex, 1, &nFaceDelimiter );
 
 	triangle.Reset();
 }

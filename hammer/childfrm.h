@@ -12,6 +12,8 @@
 
 #include <afxwin.h>
 
+#include "windows/base_mdi_child_wnd.h"
+
 enum DrawType_t;
 
 class CMySplitterWnd : public CSplitterWnd
@@ -27,7 +29,7 @@ public:
 };
 
 
-class CChildFrame : public CMDIChildWnd
+class CChildFrame : public CBaseMDIChildWnd
 {
 	DECLARE_DYNCREATE(CChildFrame)
 		

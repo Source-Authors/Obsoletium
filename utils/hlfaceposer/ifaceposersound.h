@@ -10,10 +10,16 @@
 #pragma once
 #endif
 
+#include "tier0/basetypes.h"
+
 class StudioModel;
 class CAudioSource;
 class CAudioMixer;
 class CAudioOuput;
+
+FORWARD_DECLARE_HANDLE(HDC);
+using RECT = struct tagRECT;
+using COLORREF = unsigned long;
 
 class IFacePoserSound
 {

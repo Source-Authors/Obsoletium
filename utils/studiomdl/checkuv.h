@@ -1,14 +1,11 @@
-//============ Copyright (c) Valve Corporation, All rights reserved. ==========
-//
-//=============================================================================
+// Copyright (c) Valve Corporation, All rights reserved.
 
+#ifndef SE_UTILS_STUDIOMDL_CHECKUV_H_
+#define SE_UTILS_STUDIOMDL_CHECKUV_H_
 
-#pragma once
+#include "mathlib/vector.h"
+#include "mathlib/vector2d.h"
 
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 class CCheckUVCmd
 {
 public:
@@ -57,3 +54,5 @@ public:
 	static void PrintVertex( const struct s_vertexinfo_t &v, const struct s_texture_t &t, const char *pszPrefix = "       " );
 	static void PrintFace( const s_source_t *pSource, const int nMesh, const int nFace, const char *pszPrefix = "       " );
 };
+
+#endif  // !SE_UTILS_STUDIOMDL_CHECKUV_H_

@@ -15,7 +15,7 @@
 #endif
 
 #include "tier0/dbg.h"
-#include "utllinkedlist.h"
+#include "tier1/utllinkedlist.h"
 
 //-----------------------------------------------------------------------------
 // Templatized helper class to deal with the kinds of things that spatial
@@ -70,7 +70,7 @@ public:
 
 	// Test if an element is in a particular bucket.
 	// NOTE: EXPENSIVE!!!
-	bool IsElementInBucket( CBucketHandlePram bucket, CElementHandlePram element );
+	[[nodiscard]] bool IsElementInBucket( CBucketHandlePram bucket, CElementHandlePram element );
 	
 	// Remove an element from a particular bucket
 	void RemoveElementFromBucket( CBucketHandlePram bucket, CElementHandlePram element );
@@ -80,16 +80,16 @@ public:
 	void RemoveBucket( CBucketHandlePram element );
 
 	// Used to iterate elements in a bucket; I is the iterator
-	I FirstElement( CBucketHandlePram bucket ) const;
-	I NextElement( I idx ) const;
-	CElementHandle Element( I idx ) const;
+	[[nodiscard]] I FirstElement( CBucketHandlePram bucket ) const;
+	[[nodiscard]] I NextElement( I idx ) const;
+	[[nodiscard]] CElementHandle Element( I idx ) const;
 
 	// Used to iterate buckets associated with an element; I is the iterator
-	I FirstBucket( CElementHandlePram bucket ) const;
-	I NextBucket( I idx ) const;
-	CBucketHandle Bucket( I idx ) const;
+	[[nodiscard]] I FirstBucket( CElementHandlePram bucket ) const;
+	[[nodiscard]] I NextBucket( I idx ) const;
+	[[nodiscard]] CBucketHandle Bucket( I idx ) const;
 
-	static constexpr S InvalidIndex();
+	[[nodiscard]] static constexpr S InvalidIndex();
 
 	// Ensure capacity
 	void	EnsureCapacity( int count );
@@ -97,7 +97,7 @@ public:
 	// Deallocate....
 	void	Purge();
 
-	int		NumAllocated( void ) const;
+	[[nodiscard]] int		NumAllocated( void ) const;
 
 private:
 	struct BucketListInfo_t

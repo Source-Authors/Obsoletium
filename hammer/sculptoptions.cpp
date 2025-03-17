@@ -47,22 +47,27 @@ CUtlMap<EditDispHandle_t, CMapDisp *>		CSculptTool::m_OrigMapDisp( 3, 3, CSculpt
 //-----------------------------------------------------------------------------
 CSculptTool::CSculptTool()
 {
-	m_PaintOwner = NULL;
-
-	m_MousePoint.Init();
+	m_StartingCollisionPoint.Init();
 	m_StartingCollisionNormal.Init();
-
 	m_OriginalCollisionPoint.Init();
 
-	m_bAltDown = m_bCtrlDown = m_bShiftDown = false;
+	m_StartingCollisionIntercept = -1;
+	m_OriginalCollisionIntercept = -1;
+	m_CurrentCollisionIntercept = -1;
 
+	m_StartingProjectedRadius = m_OriginalProjectedRadius = m_CurrentProjectedRadius = 10.0f;
+	m_OriginalCollisionValid = m_CurrentCollisionValid = false;
+
+	m_MousePoint.Init();
+
+	m_bAltDown = m_bCtrlDown = m_bShiftDown = false;
 	m_bLMBDown = m_bRMBDown = false;
+
 	m_ValidPaintingSpot = false;
 	m_BrushSize = 50;
 
-	m_StartingProjectedRadius = m_OriginalProjectedRadius = 10.0f;
-
-	m_OriginalCollisionValid = m_CurrentCollisionValid = false;
+	m_PaintOwner = NULL;
+	memset(&m_SpatialData, 0xFF, sizeof(m_SpatialData));
 }
 
 
@@ -819,10 +824,7 @@ CSculptPainter::CSculptPainter() :
 //-----------------------------------------------------------------------------
 // Purpose: destructor
 //-----------------------------------------------------------------------------
-CSculptPainter::~CSculptPainter( )
-{
-
-}
+CSculptPainter::~CSculptPainter( ) = default;
 
 
 //-----------------------------------------------------------------------------
@@ -1079,19 +1081,19 @@ BOOL CSculptPushOptions::OnInitDialog( void )
 	m_OffsetDistanceControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ABSOLUTE ) );
 	m_OffsetAmountControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ADAPTIVE ) ); 
 
-	sprintf( temp, "%g", m_OffsetDistance );
+	V_sprintf_safe( temp, "%g", m_OffsetDistance );
 	m_OffsetDistanceControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_OffsetAmount * 100.0f );
 	m_OffsetAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_SmoothAmount * 100.0f );
 	m_SmoothAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_flFalloffSpot * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_flFalloffSpot * 100.0f );
 	m_FalloffPositionControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_flFalloffEndingValue * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_flFalloffEndingValue * 100.0f );
 	m_FalloffFinalControl.SetWindowText( temp );
 
 	m_NormalModeControl.InsertString( -1, "Brush Center" );
@@ -1291,7 +1293,7 @@ void CSculptPushOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -2166,7 +2168,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 		m_SmoothAmount = 0.2f;
 	}
 
-	sprintf( t2, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2191,7 +2193,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 		m_OffsetAmount = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2217,7 +2219,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffPosition()
 		m_flFalloffSpot = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_flFalloffSpot * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_flFalloffSpot * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2243,7 +2245,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffFinal()
 		m_flFalloffEndingValue = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_flFalloffEndingValue * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_flFalloffEndingValue * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2312,13 +2314,13 @@ BOOL CSculptCarveOptions::OnInitDialog( )
 	m_OffsetDistanceControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ABSOLUTE ) );
 	m_OffsetAmountControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ADAPTIVE ) ); 
 
-	sprintf( temp, "%g", m_OffsetDistance );
+	V_sprintf_safe( temp, "%g", m_OffsetDistance );
 	m_OffsetDistanceControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_OffsetAmount * 100.0f );
 	m_OffsetAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_SmoothAmount * 100.0f );
 	m_SmoothAmountControl.SetWindowText( temp );
 
 	m_NormalModeControl.InsertString( -1, "Brush Center" );
@@ -2770,7 +2772,7 @@ void CSculptCarveOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -3216,7 +3218,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 		m_SmoothAmount = 0.2f;
 	}
 
-	sprintf( t2, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -3241,7 +3243,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 		m_OffsetAmount = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -3903,7 +3905,7 @@ void CSculptProjectOptions::OnNMCustomdrawProjectSize(NMHDR *pNMHDR, LRESULT *pR
 //	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 
 	char	temp[ 128 ];
-	sprintf( temp, "%d", m_ProjectSizeControl.GetPos() * 16 );
+	V_sprintf_safe( temp, "%d", m_ProjectSizeControl.GetPos() * 16 );
 
 	m_ProjectSizeNumControl.SetWindowText( temp );
 

@@ -77,6 +77,9 @@ public:
 	virtual void SetKeyCodeState( KeyCode code, bool bPressed ) = 0;
 	virtual void SetMouseCodeState( MouseCode code, MouseCodeState_t state ) = 0;
 	virtual void UpdateButtonState( const InputEvent_t &event ) = 0;
+
+	// DPI value changed.
+	virtual bool InternalDpiScalePercentChanged( int xDpiScalePercent, int yDpiScalePercent ) = 0;
 };
 
 } // namespace vgui

@@ -98,6 +98,8 @@ public:
 	virtual void			ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format ) = 0;
 
 	virtual bool			IsBorderlessMode() const = 0;
+
+	virtual void			AdjustWindow() = 0;
 };
 
 //-----------------------------------------------------------------------------

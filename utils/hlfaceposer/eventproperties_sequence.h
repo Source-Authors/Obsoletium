@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_Sequence( CEventParams *params );
+intp EventProperties_Sequence( CEventParams *params );
 
 #endif // EVENTPROPERTIES_SEQUENCE_H

@@ -23,6 +23,7 @@ COP_Flags::COP_Flags() : CObjectPage(COP_Flags::IDD)
 	//{{AFX_DATA_INIT(COP_Flags)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
+	pObjClass = nullptr;
 	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCEditGameClass);
 	m_nNumSelectedObjects = 0;
 	m_pEntityPage = NULL;
@@ -105,11 +106,11 @@ bool COP_Flags::SaveData(void)
 		{
 			for ( int i = 0; i < m_CheckListItems.Count(); i++ )
 			{
-				CheckListItem currentItem = m_CheckListItems.Element( i );
 				// don't save tri-stated bit
-				if ( m_CheckList.GetCheck(i) != 2 )
+				if ( const int check = m_CheckList.GetCheck(i); check != 2 )
 				{
-					pEdit->SetSpawnFlag( currentItem.nItemBit, m_CheckList.GetCheck(i) ? TRUE : FALSE );
+					CheckListItem currentItem = m_CheckListItems.Element( i );
+					pEdit->SetSpawnFlag( currentItem.nItemBit, check ? TRUE : FALSE );
 				}
 			}
 		}
@@ -143,9 +144,9 @@ void COP_Flags::UpdateForClass(CEditGameClass* pObj)
 
 		if (pVar)
 		{
-			int nItems = pVar->GetFlagCount();		
+			intp nItems = pVar->GetFlagCount();
 
-			for ( int i = 0; i < nItems; i++ )
+			for ( intp i = 0; i < nItems; i++ )
 			{
 				CheckListItem newItem;
 				newItem.nItemBit = pVar->GetFlagMask( i );
@@ -203,13 +204,13 @@ void COP_Flags::MergeForClass(CEditGameClass* pObj)
 	{
 		GDinputvariable *pVar = pClass->VarForName("spawnflags");
 
-		for ( int i = m_CheckListItems.Count() - 1; i >= 0; i-- )
+		for ( intp i = m_CheckListItems.Count() - 1; i >= 0; i-- )
 		{	
 			bool bFound = false;
 			CheckListItem currentItem = m_CheckListItems.Element( i ); 
 			if ( pVar )
 			{
-				for ( int j = 0; j < pVar->GetFlagCount(); j++ )
+				for ( intp j = 0; j < pVar->GetFlagCount(); j++ )
 				{
 					CheckListItem newItem;
 					newItem.nItemBit = pVar->GetFlagMask(j);

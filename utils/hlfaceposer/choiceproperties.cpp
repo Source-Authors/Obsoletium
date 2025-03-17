@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "resource.h"
 #include "ChoiceProperties.h"
+#include "resource.h"
 #include <mxtk/mx.h>
 #include "mdlviewer.h"
 
@@ -20,7 +20,7 @@ static void PopulateChoiceList( HWND wnd, CChoiceParams *params )
 
 	SendMessage( control, CB_RESETCONTENT, 0, 0 ); 
 
-	int c = params->m_Choices.Count();
+	intp c = params->m_Choices.Count();
 
 	if ( params->m_nSelected == -1 )
 		params->m_nSelected = 0;
@@ -30,7 +30,7 @@ static void PopulateChoiceList( HWND wnd, CChoiceParams *params )
 		SendMessage( control, WM_SETTEXT , 0, (LPARAM)params->m_Choices[ params->m_nSelected ].choice );
 	}
 
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		char const *text = params->m_Choices[ i ].choice;
 		SendMessage( control, CB_ADDSTRING, 0, (LPARAM)text ); 
@@ -78,9 +78,9 @@ static BOOL CALLBACK ChoicePropertiesDialogProc( HWND hwndDlg, UINT uMsg, WPARAM
 				}
 
 				g_Params.m_nSelected = -1;
-				int c = g_Params.m_Choices.Count();
+				intp c = g_Params.m_Choices.Count();
 
-				for ( int i = 0; i < c; i++ )
+				for ( intp i = 0; i < c; i++ )
 				{
 					char const *text = g_Params.m_Choices[ i ].choice;
 					if ( stricmp( text, selected ) )
@@ -110,11 +110,11 @@ static BOOL CALLBACK ChoicePropertiesDialogProc( HWND hwndDlg, UINT uMsg, WPARAM
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int ChoiceProperties( CChoiceParams *params )
+intp ChoiceProperties( CChoiceParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_CHOICEDIALOG ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)ChoicePropertiesDialogProc );

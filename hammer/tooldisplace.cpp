@@ -918,7 +918,7 @@ void CToolDisplace::HandleTagging( CMapView3D *pView, const Vector2D &vPoint )
 			// Get the face and check for a displacement.
 			CMapSolid *pSolid = ( CMapSolid* )pObject;
 			CMapFace *pFace = pSolid->GetFace( ulFace );
-			if ( pFace && pFace->HasDisp() )
+			if ( pFace->HasDisp() )
 			{
 				EditDispHandle_t hDisp = pFace->GetDisp();
 				CMapDisp *pDisp = EditDispMgr()->GetDisp( hDisp );
@@ -1009,7 +1009,7 @@ void CToolDisplace::HandleTaggingReset( CMapView3D *pView, const Vector2D &vPoin
 			// Get the face and check for a displacement.
 			CMapSolid *pSolid = ( CMapSolid* )pObject;
 			CMapFace *pFace = pSolid->GetFace( ulFace );
-			if ( pFace && pFace->HasDisp() )
+			if ( pFace->HasDisp() )
 			{
 				EditDispHandle_t hDisp = pFace->GetDisp();
 				CMapDisp *pDisp = EditDispMgr()->GetDisp( hDisp );
@@ -1230,7 +1230,7 @@ bool CToolDisplace::RayPlaneTest( PLANE *pPlane, const Vector& rayStart, const V
 	if( ( distStart > 0.0f ) && ( distEnd > 0.0f ) )
 		return false;
 
-	if( ( distStart > 0.0f ) && ( distEnd > 0.0f ) )
+	if( ( distStart < 0.0f ) && ( distEnd < 0.0f ) )
 		return false;
 
 	// calculate the parameterized "t" component along the ray

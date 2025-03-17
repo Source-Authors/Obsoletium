@@ -118,6 +118,9 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	// begin and end skin composition painting
 	virtual void BeginSkinCompositionPainting() = 0;
 	virtual void EndSkinCompositionPainting() = 0;
+
+	// Stores DPI to take into account when computing scaling values.
+	virtual void SetDpiScalePercent( int xDpiScalePercent, int yDpiScalePercent ) = 0;
 };
 
 

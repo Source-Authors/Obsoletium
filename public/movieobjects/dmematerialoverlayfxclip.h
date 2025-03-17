@@ -24,7 +24,7 @@ class CDmeMaterialOverlayFXClip : public CDmeFXClip
 
 public:
 	// All effects must be able to apply their effect
-	virtual void ApplyEffect( DmeTime_t time, Rect_t &currentRect, Rect_t &totalRect, ITexture *pTextures[MAX_FX_INPUT_TEXTURES] );
+	void ApplyEffect( DmeTime_t time, Rect_t &currentRect, Rect_t &totalRect, ITexture *pTextures[MAX_FX_INPUT_TEXTURES] ) override;
 
 	// Resolves changes
 	virtual void Resolve();

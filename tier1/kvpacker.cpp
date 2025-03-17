@@ -91,7 +91,7 @@ bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 		{
 		case KeyValues::TYPE_NONE:
 			{
-				if( !WriteAsBinary( dat->GetFirstSubKey(), buffer ) )
+				if ( !WriteAsBinary( dat->GetFirstSubKey(), buffer ) )
 					return false;
 				break;
 			}

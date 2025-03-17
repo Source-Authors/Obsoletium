@@ -162,7 +162,7 @@ public:
 	// Returns the index of a key closest to this time, within tolerance
 	// NOTE: Insertion or removal may change this index!
 	// Returns -1 if the time isn't within tolerance.
-	int FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance );
+	intp FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance );
 	
 	// Returns the type of attribute being logged
 	virtual DmAttributeType_t GetDataType() const = 0;
@@ -197,7 +197,7 @@ public:
 
 	// resampling and filtering
 	virtual void Resample( DmeFramerate_t samplerate ) = 0;
-	virtual void Filter( int nSampleRadius ) = 0;
+	virtual void Filter( intp nSampleRadius ) = 0;
 	virtual void Filter2( DmeTime_t sampleRadius ) = 0;
 
 	virtual void SetOwnerLog( CDmeLog *owner ) = 0;
@@ -208,8 +208,8 @@ public:
 	int				GetDefaultCurveType() const;
 
 	// Override curvetype for specific key
-	void			SetKeyCurveType( int nKeyIndex, int curveType );
-	int				GetKeyCurveType( int nKeyIndex ) const;
+	void			SetKeyCurveType( intp nKeyIndex, int curveType );
+	int				GetKeyCurveType( intp nKeyIndex ) const;
 
 	// Validates that all keys are correctly sorted in time
 	bool			ValidateKeys() const;
@@ -218,13 +218,13 @@ public:
 	void			RemoveKeysOutsideRange( DmeTime_t tStart, DmeTime_t tEnd );
 
 protected:
-	int FindKey( DmeTime_t time ) const;
+	intp FindKey( DmeTime_t time ) const;
 
 	void OnUsingCurveTypesChanged();
 
 	CDmeLog *m_pOwnerLog;
 
-	mutable int m_lastKey;
+	mutable intp m_lastKey;
 	CDmaArray< int > m_times;
 	CDmaArray< int > m_CurveTypes;
 };
@@ -267,9 +267,9 @@ abstract_class CDmeLog : public CDmElement
 	DEFINE_ELEMENT( CDmeLog, CDmElement );
 
 public:
-	int FindLayerForTime( DmeTime_t time ) const;
-	int FindLayerForTimeSkippingTopmost( DmeTime_t time ) const;
-	void FindLayersForTime( DmeTime_t time, CUtlVector< int >& list ) const;
+	intp FindLayerForTime( DmeTime_t time ) const;
+	intp FindLayerForTimeSkippingTopmost( DmeTime_t time ) const;
+	void FindLayersForTime( DmeTime_t time, CUtlVector< intp >& list ) const;
 
 	virtual void		FinishTimeSelection( DmeTime_t tHeadPosition, DmeLog_TimeSelection_t& params ) = 0; // in attached, timeadvancing mode, we need to blend out of the final sample over the fadeout interval
 	virtual void		StampKeyAtHead( DmeTime_t tHeadPosition, DmeTime_t tPreviousHeadPosition, const DmeLog_TimeSelection_t& params, const CDmAttribute *pAttr, uint index = 0 ) = 0;
@@ -285,8 +285,8 @@ public:
 	virtual void		BuildNormalizedLayer( CDmeTypedLogLayer< float > *target ) = 0;
 	virtual void		BuildCorrespondingLayer( const CDmeLogLayer *pReferenceLayer, const CDmeLogLayer *pDataLayer, CDmeLogLayer *pOutputLayer ) = 0;
 
-	int GetTopmostLayer() const;
-	int	GetNumLayers() const;
+	intp GetTopmostLayer() const;
+	intp GetNumLayers() const;
 	CDmeLogLayer *GetLayer( intp index );
 	const CDmeLogLayer *GetLayer( intp index ) const;
 
@@ -299,7 +299,7 @@ public:
 	// Returns the index of a key closest to this time, within tolerance
 	// NOTE: Insertion or removal may change this index!
 	// Returns -1 if the time isn't within tolerance.
-	virtual int FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance ) = 0;
+	virtual intp FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance ) = 0;
 	
 	// Returns the type of attribute being logged
 	virtual DmAttributeType_t GetDataType() const = 0;
@@ -319,8 +319,8 @@ public:
 	virtual void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime ) = 0;
 
 	// Override curvetype for specific key
-	void			SetKeyCurveType( int nKeyIndex, int curveType );
-	int				GetKeyCurveType( int nKeyIndex ) const;
+	void			SetKeyCurveType( intp nKeyIndex, int curveType );
+	int				GetKeyCurveType( intp nKeyIndex ) const;
 
 	// Removes a single key	by index
 	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 ) = 0;
@@ -359,7 +359,7 @@ public:
 	// Only used by undo system!!!
 	virtual void		AddLayerToTail( CDmeLogLayer *layer ) = 0;
 	virtual CDmeLogLayer *RemoveLayerFromTail() = 0;
-	virtual CDmeLogLayer *RemoveLayer( int iLayer ) = 0;
+	virtual CDmeLogLayer *RemoveLayer( intp iLayer ) = 0;
 
 
 	// Resolve
@@ -463,12 +463,12 @@ public:
 	// This inserts a key using the current values to construct the proper value for the time
 	virtual intp InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT );
 
-	void SetKeyValue( int nKey, const T& value );
+	void SetKeyValue( intp nKey, const T& value );
 
 	const T& GetValue( DmeTime_t time ) const;
 
 	const T& GetKeyValue( intp nKeyIndex ) const;
-	const T& GetValueSkippingKey( int nKeyToSkip ) const;
+	const T& GetValueSkippingKey( intp nKeyToSkip ) const;
 
 	// This inserts a key. Unlike SetKey, this will *not* delete keys after the specified time
 	intp InsertKey( DmeTime_t nTime, const T& value, int curveType = CURVE_DEFAULT );
@@ -486,7 +486,7 @@ public:
 
 	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 );
 	virtual void Resample( DmeFramerate_t samplerate );
-	virtual void Filter( int nSampleRadius );
+	virtual void Filter( intp nSampleRadius );
 	virtual void Filter2( DmeTime_t sampleRadius );
 
 	void RemoveKeys( DmeTime_t starttime );
@@ -511,10 +511,10 @@ protected:
 	void GetZeroValue( int side, T& val ) const;
 
 	void GetValueUsingCurveInfo( DmeTime_t time, T& out ) const;
-	void GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, T& out ) const;
-	void GetBoundedSample( int keyindex, DmeTime_t& time, T& val, int& curveType ) const;
+	void GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, T& out ) const;
+	void GetBoundedSample( intp keyindex, DmeTime_t& time, T& val, int& curveType ) const;
 
-	void CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< T > *output );
+	void CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< T > *output );
 
 	friend CDmeTypedLog< T >;
 
@@ -533,7 +533,7 @@ class CDmeTypedLog : public CDmeLog
 
 public:
 
-	virtual void OnAttributeArrayElementAdded( CDmAttribute *pAttribute, int nFirstElem, int nLastElem );
+	void OnAttributeArrayElementAdded( CDmAttribute *pAttribute, intp nFirstElem, intp nLastElem ) override;
 
 	CDmeTypedLogLayer< T > *GetLayer( intp index );
 	const CDmeTypedLogLayer< T > *GetLayer( intp index ) const;
@@ -556,7 +556,7 @@ public:
 	virtual void		BuildNormalizedLayer( CDmeTypedLogLayer< float > *target );
 
 	// Finds a key within tolerance, or adds one. Unlike SetKey, this will *not* delete keys after the specified time
-	int FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType = CURVE_DEFAULT );
+	intp FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType = CURVE_DEFAULT );
 
 	// Sets a key, removes all keys after this time
 	void SetKey( DmeTime_t time, const T& value, int curveType = CURVE_DEFAULT );
@@ -588,7 +588,7 @@ public:
 	virtual void Filter( int nSampleRadius );
 	virtual void Filter2( DmeTime_t sampleRadius );
 
-	virtual int FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance );
+	virtual intp FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance );
 	virtual DmeTime_t GetKeyTime( intp nKeyIndex ) const;
 	virtual void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime );
 
@@ -598,7 +598,7 @@ public:
 	// Only used by undo system!!!
 	virtual void		AddLayerToTail( CDmeLogLayer *layer );
 	virtual CDmeLogLayer *RemoveLayerFromTail();
-	virtual CDmeLogLayer *RemoveLayer( int iLayer );
+	virtual CDmeLogLayer *RemoveLayer( intp iLayer );
 
 	// curve info helpers
 	const CDmeTypedCurveInfo< T > *GetTypedCurveInfo() const;
@@ -720,7 +720,7 @@ bool CDmeTypedLog<T>::IsConstantValued() const
 template< class T >
 void CDmeTypedLog<T>::RemoveRedundantKeys()
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 
@@ -826,15 +826,15 @@ template<> void CDmeTypedCurveInfo< Vector >::GetZeroValue( int side, Vector& va
 template<> void CDmeTypedCurveInfo< Quaternion >::GetZeroValue( int side, Quaternion& val ) const;
 
 template< class T > void CDmeTypedLogLayer< T >::GetValueUsingCurveInfo( DmeTime_t time, T& out ) const { Assert( 0 ); }
-template< class T > void CDmeTypedLogLayer< T >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, T& out ) const { Assert( 0 ); }
+template< class T > void CDmeTypedLogLayer< T >::GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, T& out ) const { Assert( 0 ); }
 template<> void CDmeTypedLogLayer< float >::GetValueUsingCurveInfo( DmeTime_t time, float& out ) const;
-template<> void CDmeTypedLogLayer< float >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, float& out ) const;
+template<> void CDmeTypedLogLayer< float >::GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, float& out ) const;
 
 template<> void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfo( DmeTime_t time, Vector& out ) const;
-template<> void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, Vector& out ) const;
+template<> void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, Vector& out ) const;
 
 template<> void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfo( DmeTime_t time, Quaternion& out ) const;
-template<> void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, Quaternion& out ) const;
+template<> void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, Quaternion& out ) const;
 
 template< class T >
 float LengthOf( const T& value );
@@ -872,17 +872,17 @@ Quaternion Subtract( const Quaternion& v1, const Quaternion& v2 );
 
 // Implementation of Douglas-Peucker curve simplification routine (hacked to only care about error against original curve (sort of 1D)
 template< class T >
-void CDmeTypedLogLayer< T >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< T > *output )
+void CDmeTypedLogLayer< T >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< T > *output )
 {
 	if ( endPoint <= startPoint + 1 )
 	{
 		return;
 	}
 
-	int maxPoint = startPoint;
+	intp maxPoint = startPoint;
 	float maxDistanceSqr = 0.0f;
 
-	for ( int i = startPoint + 1 ; i < endPoint; ++i )
+	for ( intp i = startPoint + 1 ; i < endPoint; ++i )
 	{
 		DmeTime_t keyTime = GetKeyTime( i );
         T check = GetKeyValue( i );
@@ -906,11 +906,11 @@ void CDmeTypedLogLayer< T >::CurveSimplify_R( float thresholdSqr, int startPoint
 }
 
 
-template<> void CDmeTypedLogLayer< bool >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< bool > *output );
-template<> void CDmeTypedLogLayer< int >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< int > *output );
-template<> void CDmeTypedLogLayer< Color >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< Color > *output );
-template<> void CDmeTypedLogLayer< Quaternion >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< Quaternion > *output );
-template<> void CDmeTypedLogLayer< VMatrix >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< VMatrix > *output );
+template<> void CDmeTypedLogLayer< bool >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< bool > *output );
+template<> void CDmeTypedLogLayer< int >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< int > *output );
+template<> void CDmeTypedLogLayer< Color >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< Color > *output );
+template<> void CDmeTypedLogLayer< Quaternion >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< Quaternion > *output );
+template<> void CDmeTypedLogLayer< VMatrix >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< VMatrix > *output );
 
 template<> void CDmeTypedLog< Vector >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *target );
 template<> void CDmeTypedLog< Vector2D >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *target );

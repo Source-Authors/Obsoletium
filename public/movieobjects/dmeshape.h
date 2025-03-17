@@ -37,7 +37,7 @@ public:
 	virtual void GetBoundingSphere( Vector &c, float &r ) const;
 
 	// Find out how many DmeDag's have this DmeShape as their shape, could be 0
-	int GetParentCount() const;
+	intp GetParentCount() const;
 
 	// Get the nth DmeDag that has this DmeShape as its shape.  The order is defined by g_pDataModel->FirstAttributeReferencingElement/NextAttr...
 	CDmeDag *GetParent( int nParentIndex = 0 ) const;

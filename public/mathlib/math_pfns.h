@@ -41,7 +41,7 @@ namespace details
 // square root by multiplying input in with its reciprocal square root before
 // using the Newton-Raphson method to approximate the results.
 // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sqrt_ps
-inline DirectX::XMVECTOR XM_CALLCONV SSE_Sqrt_PS( DirectX::XMVECTOR in )
+[[nodiscard]] inline DirectX::XMVECTOR XM_CALLCONV SSE_Sqrt_PS( DirectX::XMVECTOR in )
 {
 #if defined(_XM_ARM_NEON_INTRINSICS_)
 #if (defined(__aarch64__) || defined(_M_ARM64)) && !SSE2NEON_PRECISE_SQRT
@@ -83,7 +83,7 @@ inline DirectX::XMVECTOR XM_CALLCONV SSE_Sqrt_PS( DirectX::XMVECTOR in )
 // element in a, store the result in the lower element of dst, and copy the
 // upper 3 packed elements from a to the upper elements of dst.
 // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sqrt_ss
-inline DirectX::XMVECTOR XM_CALLCONV SSE_Sqrt_SS( DirectX::XMVECTOR in )
+[[nodiscard]] inline DirectX::XMVECTOR XM_CALLCONV SSE_Sqrt_SS( DirectX::XMVECTOR in )
 {
 #if defined(_XM_ARM_NEON_INTRINSICS_)
 	float32_t value = vgetq_lane_f32(vreinterpretq_f32_m128(SSE_Sqrt_PS(in)), 0);
@@ -106,7 +106,7 @@ inline DirectX::XMVECTOR XM_CALLCONV SSE_Sqrt_SS( DirectX::XMVECTOR in )
 // (32-bit) floating-point elements in a, and store the results in dst. The
 // maximum relative error for this approximation is less than 1.5*2^-12.
 // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_rsqrt_ps
-inline DirectX::XMVECTOR XM_CALLCONV SSE_RSqrt_PS( DirectX::XMVECTOR in )
+[[nodiscard]] inline DirectX::XMVECTOR XM_CALLCONV SSE_RSqrt_PS( DirectX::XMVECTOR in )
 {
 #if defined(_XM_ARM_NEON_INTRINSICS_)
 	float32x4_t out = vrsqrteq_f32(vreinterpretq_f32_m128(in));
@@ -136,7 +136,7 @@ inline DirectX::XMVECTOR XM_CALLCONV SSE_RSqrt_PS( DirectX::XMVECTOR in )
 // of dst, and copy the upper 3 packed elements from a to the upper elements of
 // dst.
 // https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_rsqrt_ss
-inline DirectX::XMVECTOR XM_CALLCONV SSE_RSqrt_SS( DirectX::XMVECTOR in )
+[[nodiscard]] inline DirectX::XMVECTOR XM_CALLCONV SSE_RSqrt_SS( DirectX::XMVECTOR in )
 {
 #if defined(_XM_ARM_NEON_INTRINSICS_)
 	return vsetq_lane_f32(vgetq_lane_f32(SSE_RSqrt_PS(in), 0), in, 0);
@@ -153,7 +153,7 @@ inline DirectX::XMVECTOR XM_CALLCONV SSE_RSqrt_SS( DirectX::XMVECTOR in )
 #endif
 }
 
-inline float SSE_Sqrt(float x)
+[[nodiscard]] inline float SSE_Sqrt(float x)
 {
 	return DirectX::XMVectorGetX( SSE_Sqrt_SS( DirectX::XMLoadFloat( &x ) ) ); //-V2002
 }
@@ -162,7 +162,7 @@ inline const DirectX::XMVECTOR  f3  = DirectX::XMVectorSet( 3.0f, 0.0f, 0.0f, 0.
 inline const DirectX::XMVECTOR  f05 = DirectX::XMVectorSet( 0.5f, 0.0f, 0.0f, 0.0f );  // 0.5 as SSE value
 
 // Intel / Kipps SSE RSqrt.  Significantly faster than above.
-inline float SSE_RSqrtAccurate(float a)
+[[nodiscard]] inline float SSE_RSqrtAccurate(float a)
 {
 	DirectX::XMVECTOR xx = DirectX::XMLoadFloat( &a );
 	DirectX::XMVECTOR xr = SSE_RSqrt_SS( xx );
@@ -178,7 +178,7 @@ inline float SSE_RSqrtAccurate(float a)
 
 // Simple SSE rsqrt.  Usually accurate to around 6 (relative) decimal places 
 // or so, so ok for closed transforms.  (ie, computing lighting normals)
-inline float SSE_RSqrtFast(float x)
+[[nodiscard]] inline float SSE_RSqrtFast(float x)
 {
 	return DirectX::XMVectorGetX( SSE_RSqrt_SS( DirectX::XMLoadFloat( &x ) ) ); //-V2002
 }

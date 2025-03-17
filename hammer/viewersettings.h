@@ -20,7 +20,7 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            https://www.chumba.ch/chumbalum-soft/hlmv/index.html
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #ifndef INCLUDED_VIEWERSETTINGS
 #define INCLUDED_VIEWERSETTINGS

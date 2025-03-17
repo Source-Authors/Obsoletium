@@ -11,7 +11,9 @@
 #endif
 
 
-#include "utlvector.h"
+#include "tier1/utlvector.h"
+#include "windows/dpi_aware_font.h"
+#include "windows/base_combo_box.h"
 
 
 
@@ -30,7 +32,7 @@
 // 3. Call SetOnlyProvideSuggestions to tell it how to behave.
 //
 // NOTE: Use CComboBox functions with caution! You could screw up the CFilteredComboBox's operation.
-class CFilteredComboBox : public CComboBox
+class CFilteredComboBox : public CBaseComboBox
 {
 	typedef CComboBox BaseClass;
 
@@ -127,7 +129,7 @@ public:
 protected:
 
 	// Get the base font it's using.
-	CFont& GetNormalFont();	
+	DpiAwareFont& GetNormalFont();	
 
 	// Get/set the text in the edit control.
 	void SetEditControlText( const char *pText );
@@ -145,7 +147,7 @@ protected:
 	void FillDropdownList( const char *pInitialSel, bool bEnableRedraw=true );
 
 	// CBN_ notification handlers.
-	virtual BOOL PreCreateWindow( CREATESTRUCT& cs );
+	BOOL PreCreateWindow( CREATESTRUCT& cs ) override;
 	BOOL OnDropDown();
 	BOOL OnSelEndOK();
 	BOOL OnCloseUp();
@@ -162,14 +164,14 @@ protected:
 	virtual void GetItemsMatchingString( const char *pStringToMatch, CUtlVector<CString> &matchingItems );
 	static int SortFn( const CString *pItem1, const CString *pItem2 );
 
-	virtual LRESULT DefWindowProc(
+	LRESULT DefWindowProc(
 		UINT message,
 		WPARAM wParam,
-		LPARAM lParam );
+		LPARAM lParam ) override;
 
 	// Overrides for owner draw.
-	virtual void MeasureItem(LPMEASUREITEMSTRUCT pStruct);
-	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
+	void MeasureItem(LPMEASUREITEMSTRUCT pStruct) override;
+	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) override;
 
 private:
 
@@ -183,7 +185,7 @@ private:
 	CUtlVector<CString> m_Suggestions;
 	HFONT m_hEditControlFont;
 
-	CFont m_NormalFont;
+	DpiAwareFont m_NormalFont;
 
 	CFilteredComboBox::ICallbacks *m_pCallbacks;
 	bool m_bWasEditing;

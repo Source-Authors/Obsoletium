@@ -50,11 +50,11 @@ public:
 	virtual long GetTimeMillis() = 0;
 
 	// clipboard access
-	virtual int GetClipboardTextCount() = 0;
-	virtual void SetClipboardText(const char *text, int textLen) = 0;
-	virtual void SetClipboardText(const wchar_t *text, int textLen) = 0;
-	virtual int GetClipboardText(int offset, char *buf, int bufLen) = 0;
-	virtual int GetClipboardText(int offset, wchar_t *buf, int bufLen) = 0;
+	virtual intp GetClipboardTextCount() = 0;
+	virtual void SetClipboardText(const char *text, intp textLen) = 0;
+	virtual void SetClipboardText(const wchar_t *text, intp textLen) = 0;
+	virtual intp GetClipboardText(int offset, char *buf, intp bufLen) = 0;
+	virtual intp GetClipboardText(int offset, wchar_t *buf, intp bufLen) = 0;
 
 	// windows registry
 	virtual bool SetRegistryString(const char *key, const char *value) = 0;

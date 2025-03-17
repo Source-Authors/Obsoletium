@@ -330,8 +330,8 @@ private:
 	void	FlipToLastIME();
 
 public:
-	virtual void GetTextRange( wchar_t *buf, int from, int numchars );	// copy a portion of the text to the buffer and add zero-termination
-	virtual void GetTextRange( char *buf, int from, int numchars );	// copy a portion of the text to the buffer and add zero-termination
+	virtual void GetTextRange( wchar_t *buf, intp from, intp numchars );	// copy a portion of the text to the buffer and add zero-termination
+	virtual void GetTextRange( char *buf, intp from, intp numchars );	// copy a portion of the text to the buffer and add zero-termination
 
 private:
 
@@ -339,10 +339,10 @@ private:
 	CUtlVector<wchar_t> m_UndoTextStream;	// a copy of the text buffer to revert changes
 	CUtlVector<int>		m_LineBreaks;		// an array that holds the index in the buffer to wrap lines at
 
-	int                _cursorPos;		// the position in the text buffer of the blinking cursor
+	intp               _cursorPos;		// the position in the text buffer of the blinking cursor
 	bool               _cursorIsAtEnd;
 	bool               _putCursorAtEnd;
-	int				   _undoCursorPos;	// a copy of the cursor position to revert changes
+	intp               _undoCursorPos;	// a copy of the cursor position to revert changes
 	bool               _cursorBlink;	// whether cursor is blinking or not
 	bool               _hideText;		// whether text is visible on screen or not
 	bool			   _editable;		// whether text is editable or not
@@ -350,7 +350,7 @@ private:
 	bool			   _mouseDragSelection; // tells weather mouse is outside window and button is down so we select text
 	long               _cursorNextBlinkTime;  // time of next cursor blink
 	int                _cursorBlinkRate;	  // speed of cursor blinking
-	int                _select[2];	// select[1] is the offset in the text to where the cursor is currently
+	intp               _select[2];	// select[1] is the offset in the text to where the cursor is currently
 									// select[0] is the offset to where the cursor was dragged to. or -1 if no drag.
 	int				   _pixelsIndent;
 	int				   _charCount;
@@ -368,7 +368,7 @@ private:
 	Color			   _selectionTextColor;	 // color of the highlighted text
 	Color			   _defaultSelectionBG2Color;
 	int				   _currentStartLine; // use for checking vertical text scrolling (multiline)
-	int				   _currentStartIndex; // use for horizontal text scrolling (!multiline)
+	intp			   _currentStartIndex; // use for horizontal text scrolling (!multiline)
 	bool			   _horizScrollingAllowed;	// use to disable horizontal text scrolling period.
 	Color			   _focusEdgeColor;
 	bool		       _catchEnterKey;

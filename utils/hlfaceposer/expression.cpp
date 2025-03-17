@@ -4,9 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+#include "expression.h"
 #include "hlfaceposer.h"
-#include <mxtk/mx.h>
 #include "expressions.h"
+#include <mxtk/mx.h>
 #include "StudioModel.h"
 #include "filesystem.h"
 #include "viewersettings.h"
@@ -50,11 +51,11 @@ CExpression::CExpression( void )
 //-----------------------------------------------------------------------------
 CExpression::CExpression( const CExpression& from )
 {
-	int i;
+	intp i;
 
-	strcpy( name, from.name );
+	V_strcpy_safe( name, from.name );
 	index = from.index;
-	strcpy( description, from.description );
+	V_strcpy_safe( description, from.description );
 	
 	for ( i = 0; i < MAX_FP_MODELS; i++ )
 	{
@@ -63,7 +64,7 @@ CExpression::CExpression( const CExpression& from )
 
 	m_bModified = from.m_bModified;
 
-	for ( i = 0 ; i < from.undo.Size(); i++ )
+	for ( i = 0 ; i < from.undo.Count(); i++ )
 	{
 		CExpUndoInfo *newUndo = new CExpUndoInfo();
 		*newUndo = *from.undo[ i ];
@@ -76,7 +77,7 @@ CExpression::CExpression( const CExpression& from )
 
 	m_bDirty = from.m_bDirty;
 
-	strcpy( expressionclass, from.expressionclass );
+	V_strcpy_safe( expressionclass, from.expressionclass );
 
 	memcpy( setting, from.setting, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
 	memcpy( weight, from.weight, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
@@ -168,7 +169,7 @@ bool CExpression::GetSelected( void )
 void CExpression::ResetUndo( void )
 {
 	CExpUndoInfo *u;
-	for ( int i = 0; i < undo.Size(); i++ )
+	for ( intp i = 0; i < undo.Count(); i++ )
 	{
 		u = undo[ i ];
 		delete u;
@@ -184,7 +185,7 @@ void CExpression::ResetUndo( void )
 //-----------------------------------------------------------------------------
 bool CExpression::CanRedo( void )
 {
-	if ( !undo.Size() )
+	if ( !undo.Count() )
 		return false;
 
 	if ( m_nUndoCurrent == 0 )
@@ -199,10 +200,10 @@ bool CExpression::CanRedo( void )
 //-----------------------------------------------------------------------------
 bool CExpression::CanUndo( void )
 {
-	if ( !undo.Size() )
+	if ( !undo.Count() )
 		return false;
 
-	if ( m_nUndoCurrent >= undo.Size() )
+	if ( m_nUndoCurrent >= undo.Count() )
 		return false;
 
 	return true;
@@ -211,16 +212,16 @@ bool CExpression::CanUndo( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CExpression::UndoLevels( void )
+intp	CExpression::UndoLevels( void )
 {
-	return undo.Size();
+	return undo.Count();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CExpression::UndoCurrent( void )
+intp CExpression::UndoCurrent( void )
 {
 	return m_nUndoCurrent;
 }
@@ -235,10 +236,10 @@ CRC32_t	CExpression::GetBitmapCRC()
 	float *w = weight;
 
 	// Note, we'll use the pristine values if this has changed
-	if ( undo.Size() >= 1 )
+	if ( undo.Count() >= 1 )
 	{
-		s = undo[ undo.Size() - 1 ]->setting;
-		w = undo[ undo.Size() - 1 ]->weight;
+		s = undo[ undo.Count() - 1 ]->setting;
+		w = undo[ undo.Count() - 1 ]->weight;
 	}
 
 	// This walks the global controllers sorted by name and only includes values with a setting or value which is != 0.0f
@@ -258,7 +259,7 @@ const char *CExpression::GetBitmapCheckSum()
 
 	// Create string name out of binary data
 	static char hex[ 9 ];
-	Q_binarytohex( (byte *)&crc, sizeof( crc ), hex, sizeof( hex ) );
+	V_binarytohex( crc, hex );
 	return hex;
 }
 
@@ -266,7 +267,7 @@ const char *CExpression::GetBitmapCheckSum()
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CExpression::GetBitmapFilename( int modelindex )
+const char *CExpression::GetBitmapFilename( intp modelindex )
 {
 	static char filename[ 256 ] = { 0 };
 	
@@ -299,7 +300,7 @@ const char *CExpression::GetBitmapFilename( int modelindex )
 	*out = 0;
 
 
-	sprintf( filename, "expressions/%s/%s/%s.bmp", modelName, classname, GetBitmapCheckSum() );
+	V_sprintf_safe( filename, "expressions/%s/%s/%s.bmp", modelName, classname, GetBitmapCheckSum() );
 
 	Q_FixSlashes( filename );
 	strlwr( filename );
@@ -309,7 +310,7 @@ const char *CExpression::GetBitmapFilename( int modelindex )
 	return filename;
 }
 
-void CExpression::CreateNewBitmap( int modelindex )
+void CExpression::CreateNewBitmap( intp modelindex )
 {
 	MatSysWindow *pWnd = g_pMatSysWindow;
 	if ( !pWnd ) 
@@ -362,7 +363,7 @@ void CExpression::PushUndoInformation( void )
 //-----------------------------------------------------------------------------
 void CExpression::PushRedoInformation( void )
 {
-	Assert( undo.Size() >= 1 );
+	Assert( undo.Count() >= 1 );
 
 	CExpUndoInfo *redo = undo[ 0 ];
 	memcpy( redo->redosetting, setting, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
@@ -378,7 +379,7 @@ void CExpression::Undo( void )
 	if ( !CanUndo() )
 		return;
 
-	Assert( m_nUndoCurrent < undo.Size() );
+	Assert( m_nUndoCurrent < undo.Count() );
 
 	CExpUndoInfo *u = undo[ m_nUndoCurrent++ ];
 	Assert( u );
@@ -397,7 +398,7 @@ void CExpression::Redo( void )
 		return;
 
 	Assert( m_nUndoCurrent >= 1 );
-	Assert( m_nUndoCurrent <= undo.Size() );
+	Assert( m_nUndoCurrent <= undo.Count() );
 
 	CExpUndoInfo *u = undo[ --m_nUndoCurrent ];
 	Assert( u );
@@ -434,11 +435,11 @@ void CExpression::Revert( void )
 {
 	SetDirty( false );
 
-	if ( undo.Size() <= 0 )
+	if ( undo.Count() <= 0 )
 		return;
 
 	// Go back to original data
-	CExpUndoInfo *u = undo[ undo.Size() - 1 ];
+	CExpUndoInfo *u = undo[ undo.Count() - 1 ];
 	Assert( u );
 
 	memcpy( setting, u->setting, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
@@ -467,6 +468,6 @@ CExpClass *CExpression::GetExpressionClass( void )
 //-----------------------------------------------------------------------------
 void CExpression::SetExpressionClass( char const *classname )
 {
-	strcpy( expressionclass, classname );
+	V_strcpy_safe( expressionclass, classname );
 }
 

@@ -197,6 +197,13 @@ public:
 	inline void FastRemove(intp nElement);
 	inline void RemoveAll(void);
 
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	CUtlVector<CVisGroup *>::iterator begin()						{ return m_List.Base(); }
+	CUtlVector<CVisGroup *>::const_iterator begin() const			{ return m_List.Base(); }
+	CUtlVector<CVisGroup *>::iterator end()							{ return m_List.Base() + m_List.Count(); }
+	CUtlVector<CVisGroup *>::const_iterator end() const				{ return m_List.Base() + m_List.Count(); }
+
 private:
 
 	CUtlVector<CVisGroup *> m_List;

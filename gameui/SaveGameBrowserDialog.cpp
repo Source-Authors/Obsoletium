@@ -1261,9 +1261,9 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 	V_strcpy_safe( save->szElapsedTime, szElapsedTime );
 
 	// Now get file time stamp.
-	long fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
+	time_t fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
 	char szFileTime[32];
-	g_pFullFileSystem->FileTimeToString(szFileTime, sizeof(szFileTime), fileTime);
+	g_pFullFileSystem->FileTimeToString(szFileTime, fileTime);
 	char *newline = strchr(szFileTime, '\n');
 	if (newline)
 	{

@@ -27,7 +27,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 CMapClass *CreateArch(BoundBox *pBox, float fStartAngle, int iSides, float fArc,
@@ -95,8 +94,8 @@ static int FindGameDataClass( const char *pName )
 	extern GameData *pGD;
 	if( pGD != NULL )
 	{
-		int nCount = pGD->GetClassCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pGD->GetClassCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			GDclass *pc = pGD->GetClass(i);
 			if ( Q_stricmp( pName, pc->GetName() ) == 0 )
@@ -113,12 +112,18 @@ static int FindGameDataClass( const char *pName )
 CObjectBar::CObjectBar()
 	: CHammerBar(), m_CreateList( this )
 {
-	for(int i = 0; i < MAX_PREV_SEL; i++)
+	ListType = listPrimitives;
+	
+	iEntitySel = -1;
+	iBlockSel = -1;
+	m_dwPrevGameID = (unsigned long)-1;
+
+	for (int i = 0; i < MAX_PREV_SEL; i++)
 	{
 		m_PrevSel[i].dwGameID = 0;
 	}
 
-	m_dwPrevGameID = (unsigned long)-1;
+	m_iLastTool = -1;
 }
 
 
@@ -190,7 +195,7 @@ BOOL CObjectBar::GetPrefabBounds(BoundBox *pBox)
 //-----------------------------------------------------------------------------
 CPrefab* CObjectBar::FindPrefabByName( const char *pName )
 {
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) );
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( static_cast<DWORD>(m_CategoryList.GetItemData(m_CategoryList.GetCurSel() )) );
 	if ( pLibrary )
 	{
 		POSITION p = ENUM_START;
@@ -251,7 +256,7 @@ CMapClass *CObjectBar::CreateInBox(BoundBox *pBox, CMapView *pView)
 			CString str;
 			str.Format("The face count for a %s must be in the range of %d to %d.",
 				SolidTypes[nSolidIndex].pszName, nFacesMin, nFacesMax);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONERROR);
 			return NULL;
 		}
 
@@ -628,8 +633,8 @@ void CObjectBar::LoadEntityItems( void )
 		extern GameData *pGD;
 		if( pGD != NULL )
 		{
-			int nCount = pGD->GetClassCount();
-			for (int i = 0; i < nCount; i++)
+			intp nCount = pGD->GetClassCount();
+			for (intp i = 0; i < nCount; i++)
 			{
 				GDclass *pc = pGD->GetClass(i);
 				if( !pc->IsBaseClass() && !pc->IsSolidClass() )
@@ -659,7 +664,7 @@ void CObjectBar::LoadPrefabItems( void )
 	CUtlVector<CString> suggestions;
 	
 	// get the active library and add the prefabs from it
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) );
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( static_cast<DWORD>( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) ) );
 	
 	POSITION p = ENUM_START;
 	CPrefab *pPrefab = pLibrary->EnumPrefabs( p );
@@ -766,7 +771,7 @@ BOOL CObjectBar::EnableFaceControl(CWnd *pWnd, BOOL bModifyWnd)
 		// Enable the control only if we are dealing with an object the
 		// that has adjustable faces.
 		//
-		if (ListType == listPrimitives)
+		if (iBlockSel != -1 && ListType == listPrimitives)
 		{
 			int nSolidIndex = iBlockSel;
 			if (SolidTypes[nSolidIndex].bEnableFaceControl)
@@ -962,8 +967,8 @@ void CObjectBar::UpdateListForTool( int iTool )
 		}
 		else
 		{
-			m_PrevSel[iPrevSel].block.strCategory = "";
-			m_PrevSel[iPrevSel].block.strItem = "";
+			m_PrevSel[iPrevSel].block.strCategory.Empty();
+			m_PrevSel[iPrevSel].block.strItem.Empty();
 		}
 	}
 	else if (m_iLastTool == TOOL_ENTITY)
@@ -976,8 +981,8 @@ void CObjectBar::UpdateListForTool( int iTool )
 		}
 		else
 		{
-			m_PrevSel[iPrevSel].entity.strCategory = "";
-			m_PrevSel[iPrevSel].entity.strItem = "";
+			m_PrevSel[iPrevSel].entity.strCategory.Empty();
+			m_PrevSel[iPrevSel].entity.strItem.Empty();
 		}
 	}
 

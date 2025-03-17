@@ -46,9 +46,9 @@ template< class T >
 CUtlFlags<T>::CUtlFlags( int nInitialFlags )
 {
 	// Makes sure we didn't truncate
-	Assert( nInitialFlags == (T)nInitialFlags );
+	Assert( nInitialFlags == static_cast<T>(nInitialFlags) );
 
-	m_nFlags = (T)nInitialFlags;
+	m_nFlags = static_cast<T>(nInitialFlags);
 }
 
 
@@ -59,24 +59,24 @@ template< class T >
 void CUtlFlags<T>::SetFlag( int nFlagMask )
 {
 	// Makes sure we didn't truncate
-	Assert( nFlagMask == (T)nFlagMask );
+	Assert( nFlagMask == static_cast<T>(nFlagMask) );
 
-	m_nFlags |= (T)nFlagMask;
+	m_nFlags |= static_cast<T>(nFlagMask);
 }
 
 template< class T >
 void CUtlFlags<T>::SetFlag( int nFlagMask, bool bEnable )
 {
 	// Makes sure we didn't truncate
-	Assert( nFlagMask == (T)nFlagMask );
+	Assert( nFlagMask == static_cast<T>(nFlagMask) );
 
 	if ( bEnable )
 	{
-		m_nFlags |= (T)nFlagMask;
+		m_nFlags |= static_cast<T>(nFlagMask);
 	}
 	else
 	{
-		m_nFlags &= ~((T)nFlagMask);
+		m_nFlags &= ~static_cast<T>(nFlagMask);
 	}
 }
 
@@ -88,8 +88,8 @@ template< class T >
 void CUtlFlags<T>::ClearFlag( int nFlagMask )
 {
 	// Makes sure we didn't truncate
-	Assert( nFlagMask == (T)nFlagMask );
-	m_nFlags &= ~((T)nFlagMask);
+	Assert( nFlagMask == static_cast<T>(nFlagMask) );
+	m_nFlags &= ~static_cast<T>(nFlagMask);
 }
 
 template< class T >
@@ -106,7 +106,7 @@ template< class T >
 bool CUtlFlags<T>::IsFlagSet( int nFlagMask ) const
 {
 	// Makes sure we didn't truncate
-	Assert( nFlagMask == (T)nFlagMask );
+	Assert( nFlagMask == static_cast<T>(nFlagMask) );
 	return ( m_nFlags & nFlagMask ) != 0;
 }
 

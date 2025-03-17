@@ -57,8 +57,8 @@ void PointsRevertOrder( Vector *pPoints, int nPoints);
 bool IsBoxInside( const Vector2D &min1, const Vector2D &max1, const Vector2D &min2, const Vector2D &max2 );
 bool IsBoxIntersecting( const Vector2D &min1, const Vector2D &max1, const Vector2D &min2, const Vector2D &max2 );
 
-const Vector &GetNormalFromPoints( const Vector &p1, const Vector &p2, const Vector &p3 );
-const Vector &GetNormalFromFace( int nFace );
+Vector GetNormalFromPoints( const Vector &p1, const Vector &p2, const Vector &p3 );
+Vector GetNormalFromFace( int nFace );
 
 inline void TransformPoint( const VMatrix& matrix, Vector &point )
 {

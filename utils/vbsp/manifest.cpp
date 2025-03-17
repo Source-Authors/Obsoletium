@@ -373,12 +373,6 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	V_StripExtension( pszFileName, FileName );
 	V_strcat_safe( FileName, UserPrefsFileName );
 
-	FILE *fp = fopen( FileName, "rb" );
-	if ( !fp )
-	{
-		return false;
-	}
-
 	CChunkFile File;
 	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Read );
 
@@ -409,14 +403,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 
 	if ( eResult == ChunkFile_Ok )
 	{
-	}
-	else
-	{
-		// no pref message for now
-		//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+		return true;
 	}
 
-	return true;
+	// no pref message for now
+	//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+	return false;
 }
 
 
@@ -456,7 +448,7 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 
 	if ( eResult == ChunkFile_Ok )
 	{
-		int index = g_Maps.AddToTail( new CMapFile() );
+		intp index = g_Maps.AddToTail( new CMapFile() );
 		g_LoadingMap = g_Maps[ index ];
 		if ( g_MainMap == NULL )
 		{

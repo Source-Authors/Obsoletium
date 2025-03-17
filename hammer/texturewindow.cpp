@@ -40,6 +40,7 @@ BEGIN_MESSAGE_MAP(CTextureWindow, CBaseWnd)
 	ON_WM_KEYDOWN()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_CHAR()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -57,6 +58,7 @@ CTextureWindow::CTextureWindow(void)
 	iTexNameCharWidth = -1;
 
 	bFirstPaint = TRUE;
+	TexFont = nullptr;
 
 	m_szFilter[0] = '\0';
 	m_nFilters = 0;
@@ -80,6 +82,8 @@ CTextureWindow::CTextureWindow(void)
 //-----------------------------------------------------------------------------
 CTextureWindow::~CTextureWindow(void)
 {
+	// dimhotepus: Delete font.
+	delete TexFont;
 } 
 
 
@@ -110,8 +114,7 @@ void CTextureWindow::Create(CWnd *pParentWnd, RECT& rect)
 	UpdateScrollSizes();
 
 	// create font
-	if(!TexFont.m_hObject)
-		TexFont.CreatePointFont(iTexNameFontHeight * 10, "Courier New");
+	TexFont = CreateFont();
 
 	CDC *pDC = GetDC();
 	CFont* old = pDC->SelectObject(TexFont);
@@ -188,12 +191,15 @@ void CTextureWindow::SetTypeFilter( int filter, bool enable )
 //-----------------------------------------------------------------------------
 BOOL CTextureWindow::EnumTexturePositions(TWENUMPOS *pTE, BOOL bStart)
 {
+	const int paddingX = m_dpi_behavior.ScaleOnX(iPadding);
+	const int paddingY = m_dpi_behavior.ScaleOnY(iPadding);
+
 	RECT &texrect = pTE->texrect;
 
 	if (bStart)
 	{
-		pTE->cur_x = iPadding;
-		pTE->cur_y = iPadding;
+		pTE->cur_x = paddingX;
+		pTE->cur_y = paddingY;
 		pTE->largest_y = 0;
 		pTE->iTexIndex = 0;
 
@@ -311,20 +317,20 @@ doresize:
 	// if we've got one texture on this row already, and this one goes out of 
 	// the client area, jump to the next row. we want to have at least one texture on 
 	// each row, or we will sit in an infinite loop.
-	if(pTE->cur_x > iPadding && texrect.right > pTE->clientrect.right)
+	if(pTE->cur_x > paddingX && texrect.right > pTE->clientrect.right)
 	{
-		pTE->cur_x = iPadding;
-		pTE->cur_y = pTE->largest_y + iPadding;
+		pTE->cur_x = paddingX;
+		pTE->cur_y = pTE->largest_y + paddingY;
 		goto doresize;
 	}
 
-	texrect.bottom += (8 + iTexNameFontHeight + iTexIconHeight);
+	texrect.bottom += (m_dpi_behavior.ScaleOnY(8 + iTexNameFontHeight + iTexIconHeight));
 
 	if(texrect.bottom > pTE->largest_y)
 		pTE->largest_y = texrect.bottom;
 
 	// update cur_x
-	pTE->cur_x = texrect.right + iPadding;
+	pTE->cur_x = texrect.right + paddingX;
 
 	return TRUE;
 }
@@ -361,7 +367,7 @@ void CTextureWindow::SetNameFilter(LPCTSTR pszFilter)
 	}
 
 	// set filter
-	strcpy(m_szFilter, pszFilter);
+	V_strcpy_safe(m_szFilter, pszFilter);
 	strupr(m_szFilter);
 
 	// delimit the filter
@@ -400,7 +406,7 @@ void CTextureWindow::SetKeywords(LPCTSTR pszKeywords)
 	}
 
 	// set keyword filter
-	strcpy(m_szKeywords, pszKeywords);
+	V_strcpy_safe(m_szKeywords, pszKeywords);
 	strupr(m_szKeywords);
 
 	// delimit the filter
@@ -443,9 +449,12 @@ void CTextureWindow::UpdateScrollSizes(void)
 				total_y = TE.texrect.bottom;
 		} while(EnumTexturePositions(&TE));
 
+	const int paddingX = m_dpi_behavior.ScaleOnX(iPadding);
+	const int paddingY = m_dpi_behavior.ScaleOnY(iPadding);
+
 	// update total_x and total_y
-	total_x += iPadding;
-	total_y += iPadding;
+	total_x += paddingX;
+	total_y += paddingY;
 
 	SCROLLINFO si;
 	si.cbSize = sizeof(SCROLLINFO);
@@ -461,7 +470,7 @@ void CTextureWindow::UpdateScrollSizes(void)
 	SetScrollInfo(SB_VERT, &si, TRUE);
 
 	char szbuf[100];
-	sprintf(szbuf, "Size = %d %d\n", total_y, TE.clientrect.bottom);
+	V_sprintf_safe(szbuf, "Size = %d %d\n", total_y, TE.clientrect.bottom);
 	TRACE0(szbuf);
 }
 
@@ -499,7 +508,7 @@ void CTextureWindow::OnPaint(void)
 		if (!strcmpi(szCurTexture, szDrawTexture))
 		{
 			rectHighlight = TE.texrect;
-			rectHighlight.InflateRect(2, 4);
+			rectHighlight.InflateRect(m_dpi_behavior.ScaleOnX(2), m_dpi_behavior.ScaleOnY(4));
 			bFoundHighlight = TRUE;
 		}
 
@@ -518,7 +527,7 @@ void CTextureWindow::OnPaint(void)
 			DrawTexData_t DrawTexData;
 			DrawTexData.nFlags = flags | (m_pSpecificList ? drawUsageCount : 0);
 			DrawTexData.nUsageCount = TE.nUsageCount;
-			TE.pTex->Draw(&dc, TE.texrect, iTexNameFontHeight, iTexIconHeight, DrawTexData);
+			TE.pTex->Draw(&dc, TE.texrect, m_dpi_behavior.ScaleOnY(iTexNameFontHeight), m_dpi_behavior.ScaleOnY(iTexIconHeight), DrawTexData);
 
 			dc.SelectPalette(pOld, FALSE);
 		}
@@ -750,7 +759,7 @@ void CTextureWindow::SelectTexture(LPCTSTR pszTexture, BOOL bAllowRedraw)
 			if (IsWindow(m_hWnd))
 			{
 				rectHighlight = CRect(&TE.texrect);
-				rectHighlight.InflateRect(2, 4);
+				rectHighlight.InflateRect(m_dpi_behavior.ScaleOnX(2), m_dpi_behavior.ScaleOnY(4));
 				HighlightCurTexture();
 			}
 
@@ -782,6 +791,7 @@ void CTextureWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	int iVertPos = GetScrollPos(SB_VERT);
 
 	char szNewTexture[128];
+	szNewTexture[0] = '\0';
 
 	point += CPoint(iHorzPos, iVertPos);
 
@@ -810,7 +820,7 @@ void CTextureWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	// highlight new texture
 	V_strcpy_safe(szCurTexture, szNewTexture);
 	rectHighlight = CRect(&TE.texrect);
-	rectHighlight.InflateRect(2, 4);
+	rectHighlight.InflateRect(m_dpi_behavior.ScaleOnX(2), m_dpi_behavior.ScaleOnY(4));
 	HighlightCurTexture();
 
 	// tell parent we changed selection
@@ -917,6 +927,30 @@ BOOL CTextureWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 void CTextureWindow::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
 	CWnd::OnChar(nChar, nRepCnt, nFlags);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+LRESULT CTextureWindow::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	const LRESULT rc{__super::OnDpiChanged(wParam, lParam)};
+
+	TexFont = CreateFont();
+
+	return rc;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+DpiAwareFont* CTextureWindow::CreateFont()
+{
+	delete TexFont;
+	
+	TexFont = new DpiAwareFont{m_dpi_behavior.GetCurrentDpiY()};
+	// load font
+	TexFont->CreatePointFont(iTexNameFontHeight * 10, "Courier New");
+
+	return TexFont;
 }
 
 

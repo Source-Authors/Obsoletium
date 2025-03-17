@@ -29,31 +29,31 @@ public:
 
 	void		Get( void *pValue, intp nMaxLen ) const;
 	void		Set( const void *pValue, intp nLen );
-	const void	*Get( ) const;
-	void		*Get( );
+	[[nodiscard]] const void	*Get( ) const;
+	[[nodiscard]] void		*Get( );
 
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
-	unsigned char* begin()						{ return static_cast<unsigned char*>(Get()); }
-	const unsigned char* begin() const			{ return static_cast<const unsigned char*>(Get()); }
-	unsigned char* end()						{ return static_cast<unsigned char*>(Get()) + Length(); }
-	const unsigned char* end() const			{ return static_cast<const unsigned char*>(Get()) + Length(); }
+	[[nodiscard]] unsigned char* begin()					{ return static_cast<unsigned char*>(Get()); }
+	[[nodiscard]] const unsigned char* begin() const		{ return static_cast<const unsigned char*>(Get()); }
+	[[nodiscard]] unsigned char* end()						{ return static_cast<unsigned char*>(Get()) + Length(); }
+	[[nodiscard]] const unsigned char* end() const			{ return static_cast<const unsigned char*>(Get()) + Length(); }
 
-	unsigned char& operator[]( intp i );
-	const unsigned char& operator[]( intp i ) const;
+	[[nodiscard]] unsigned char& operator[]( intp i );
+	[[nodiscard]] const unsigned char& operator[]( intp i ) const;
 
-	intp		Length() const;
+	[[nodiscard]] intp		Length() const;
 	void		SetLength( intp nLength );	// Undefined memory will result
-	bool		IsEmpty() const;
+	[[nodiscard]] bool		IsEmpty() const;
 	void		Clear();
 	void		Purge();
 
-	bool		IsReadOnly() const;
+	[[nodiscard]] bool		IsReadOnly() const;
 
 	CUtlBinaryBlock &operator=( const CUtlBinaryBlock &src );
 
 	// Test for equality
-	bool operator==( const CUtlBinaryBlock &src ) const;
+	[[nodiscard]] bool operator==( const CUtlBinaryBlock &src ) const;
 
 private:
 	CUtlMemory<unsigned char> m_Memory;

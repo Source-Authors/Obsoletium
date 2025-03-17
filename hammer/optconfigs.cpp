@@ -21,7 +21,7 @@
 #include <tier0/memdbgon.h>
 
 
-IMPLEMENT_DYNCREATE(COPTConfigs, CPropertyPage)
+IMPLEMENT_DYNCREATE(COPTConfigs, CBasePropertyPage)
 
 
 //-----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ bool GetPersistentEnvironmentVariable( const char *pName, char *pReturn, int siz
 void SetPersistentEnvironmentVariable( const char *pName, const char *pValue )
 {
 	HKEY hregkey; 
-	DWORD dwReturnValue = 0;
+	DWORD_PTR dwReturnValue = 0;
 
 	// Changed from HKEY_LOCAL_MACHINE to HKEY_CURRENT_USER
 	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
@@ -100,12 +100,12 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 	if (bExpand)
 	{
 		// Replace the tokens with the full strings
-		if (Q_StrSubst(str, szSteamUserDirToken, strSteamUserDir, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, szSteamUserDirToken, strSteamUserDir, szPathOut))
 		{
 			str = szPathOut;
 		}
 
-		if (Q_StrSubst(str, szSteamDirToken, strSteamDir, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, szSteamDirToken, strSteamDir, szPathOut))
 		{
 			str = szPathOut;
 		}
@@ -114,12 +114,12 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 	{
 		// Replace the full strings with the tokens
 		// Go from longest paths to shortest paths to insure the most brief expression.
-		if (Q_StrSubst(str, strSteamUserDir, szSteamUserDirToken, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, strSteamUserDir, szSteamUserDirToken, szPathOut))
 		{
 			str = szPathOut;
 		}
 
-		if (Q_StrSubst(str, strSteamDir, szSteamDirToken, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, strSteamDir, szSteamDirToken, szPathOut))
 		{
 			str = szPathOut;
 		}
@@ -131,7 +131,7 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 // Purpose: Exchanges path data between a CString and an edit control, converting
 //			the Steam path to %STEAM% and back.
 //-----------------------------------------------------------------------------
-void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand)
+void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, intp destSize, bool bExpand)
 {
 	CWnd *pwnd = pDlg->GetDlgItem(nIDC);
 	if (!pwnd)
@@ -143,7 +143,7 @@ void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand
 	{
 		pwnd->GetWindowText(str);
 		EditorUtil_ConvertPath(str, true);
-		strcpy(szDest, str);
+		V_strncpy(szDest, str, destSize);
 	}
 	else
 	{
@@ -154,10 +154,17 @@ void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand
 }
 
 
+template<intp destSize>
+inline void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char (&szDest)[destSize], bool bSave)
+{
+	EditorUtil_TransferPath( pDlg, nIDC, szDest, destSize, bSave );
+}
+
+
 //-----------------------------------------------------------------------------
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
-COPTConfigs::COPTConfigs(void) : CPropertyPage(COPTConfigs::IDD)
+COPTConfigs::COPTConfigs(void) : CBasePropertyPage(COPTConfigs::IDD)
 {
 	//{{AFX_DATA_INIT(COPTConfigs)
 	//}}AFX_DATA_INIT
@@ -198,7 +205,7 @@ void COPTConfigs::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(COPTConfigs, CPropertyPage)
+BEGIN_MESSAGE_MAP(COPTConfigs, CBasePropertyPage)
 	//{{AFX_MSG_MAP(COPTConfigs)
 	ON_BN_CLICKED(IDC_EDITCONFIGS, OnEditconfigs)
 	ON_BN_CLICKED(IDC_GDFILE_ADD, OnGdfileAdd)
@@ -237,6 +244,7 @@ void COPTConfigs::OnGdfileAdd(void)
 
 	// browse for .FGD files
 	CFileDialog dlg(TRUE, ".fgd", NULL, OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST, "Game Data Files (*.fgd)|*.fgd||");
+	dlg.m_ofn.lpstrTitle = "Open Game Data File";
 	dlg.m_ofn.lpstrInitialDir = szAppDir;
 	if (dlg.DoModal() != IDOK)
 		return;
@@ -370,7 +378,8 @@ void COPTConfigs::SaveInfo(CGameConfig *pConfig)
 	//
 	char szText[100];
 	m_cDefaultTextureScale.GetWindowText(szText, sizeof(szText));
-	float fScale = (float)atof(szText);
+	// dimhotepus: atof -> strtof.
+	float fScale = strtof(szText, nullptr);
 	if (fScale == 0)
 	{
 		fScale = 1;
@@ -397,7 +406,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 
 	// load info from newly selected config into controls
 	int iCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(iCurSel));
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
 
 	BOOL bKillFields = FALSE;
 	if (pConfig == NULL)
@@ -466,7 +475,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 	m_cCordonTexture.SetWindowText(pConfig->GetCordonTexture());
 	
 	char szText[100];
-	sprintf(szText, "%g", pConfig->GetDefaultTextureScale());
+	V_sprintf_safe(szText, "%g", pConfig->GetDefaultTextureScale());
 	m_cDefaultTextureScale.SetWindowText(szText);
 
 	SetDlgItemInt(IDC_DEFAULT_LIGHTMAP_SCALE, pConfig->GetDefaultLightmapScale(), FALSE);
@@ -489,8 +498,8 @@ void COPTConfigs::UpdateEntityLists(void)
 
 	CGameConfig *pConfig = m_pLastSelConfig;
 
-	int nCount = pConfig->GD.GetClassCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pConfig->GD.GetClassCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDclass *pClass = pConfig->GD.GetClass(i);
 		if (pClass->IsBaseClass())
@@ -539,7 +548,7 @@ void UpdateConfigList(CComboBox &combo)
 	DWORD dwSelID = 0xffffffff;
 	if (iCurSel != CB_ERR)
 	{
-		dwSelID = combo.GetItemData(iCurSel);
+		dwSelID = static_cast<DWORD>(combo.GetItemData(iCurSel));
 	}
 
 	combo.ResetContent();
@@ -562,7 +571,7 @@ void UpdateConfigList(CComboBox &combo)
 	int nSelIndex = -1;
 	for (int i = 0; i < Options.configs.nConfigs; i++)
 	{
-		DWORD dwData = combo.GetItemData(i);
+		DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
 		if (dwData == dwSelID)
 		{
 			nSelIndex = i;
@@ -589,7 +598,7 @@ void SelectActiveConfig(CComboBox &combo)
 			int nCount = combo.GetCount();
 			for (int i = 0; i < nCount; i++)
 			{
-				DWORD dwData = combo.GetItemData(i);
+				DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
 				if (pConfig->dwID == dwData)
 				{
 					nSelIndex = i;
@@ -652,7 +661,7 @@ BOOL COPTConfigs::OnInitDialog(void)
 	UpdateConfigList();
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	m_pInitialSelectedConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(nCurSel));
+	m_pInitialSelectedConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	m_strInitialGameDir.Empty();
 	if (m_pInitialSelectedConfig)
@@ -678,7 +687,7 @@ bool COPTConfigs::ConfigChanged(CGameConfig *pConfig)
 		if (m_pInitialSelectedConfig->dwID != pConfig->dwID)
 			return true;
 
-		if (m_strInitialGameDir.CompareNoCase(pConfig->m_szModDir))
+		if (m_strInitialGameDir.CompareNoCase(pConfig->m_szModDir) != 0)
 			return true;
 	}
 
@@ -695,12 +704,12 @@ BOOL COPTConfigs::OnApply(void)
 	SaveInfo(m_pLastSelConfig);
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(nCurSel));
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	if ( pConfig != NULL && ConfigChanged( pConfig ) )
 	{
 		SetPersistentEnvironmentVariable("vproject", pConfig->m_szModDir);
-		AfxMessageBox("Your changes to the active configuration will not take effect until the next time you run Hammer.");
+		AfxMessageBox("Your changes to the active configuration will not take effect until the next time you run Hammer.", MB_ICONINFORMATION);
 	}
 
 	Options.PerformChanges(COptions::secConfigs);
@@ -823,7 +832,8 @@ void COPTConfigs::OnBrowsemapdir(void)
 LRESULT COPTConfigs::OnSettingChange(WPARAM wParam, LPARAM lParam)
 {
     const char *changedSection = (const char *)lParam;
-    if ( Q_stricmp( changedSection, "Environment" ) == 0 )
+	// dimhotepus: WM_SETTINGCHANGE lParam can be 0. Do not crash then.
+    if ( changedSection && Q_stricmp( changedSection, "Environment" ) == 0 )
 	{
 		UpdateConfigList();		
 		//SelectActiveConfig();

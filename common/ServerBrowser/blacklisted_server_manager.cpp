@@ -67,9 +67,12 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 			auto iIdx = m_Blacklist.AddToTail();
 
 			m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
-			V_strncpy( m_Blacklist[iIdx].m_szServerName, pszName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
+			V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, pszName );
 			m_Blacklist[iIdx].m_ulTimeBlacklistedAt = ulDate;
-			m_Blacklist[iIdx].m_NetAdr.SetFromString( pszNetAddr );
+			if ( !m_Blacklist[iIdx].m_NetAdr.SetFromString( pszNetAddr ) )
+			{
+				Warning( "%s: %s is not a IPv4 address.\n", pszFilename, pszNetAddr );
+			}
 
 			++count;
 		}

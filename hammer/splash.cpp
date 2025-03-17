@@ -7,6 +7,8 @@
 #include "stdafx.h"
 #include "Splash.h"
 
+#include "windows/bitmap_scale.h"
+
 #include "resource.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -159,6 +161,7 @@ BEGIN_MESSAGE_MAP(CSplashWnd, CBaseWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
 	ON_WM_TIMER()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -256,11 +259,50 @@ void CSplashWnd::OnTimer(UINT_PTR nIDEvent)
 
 
 //-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+LRESULT CSplashWnd::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	const LRESULT rc{__super::OnDpiChanged(wParam, lParam)};
+	if (!rc)
+	{
+		CreateDpiDependentResources
+		(
+			m_dpi_behavior.GetCurrentDpiX(),
+			m_dpi_behavior.GetCurrentDpiY()
+		);
+	}
+	return rc;
+}
+
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CSplashWnd::DoHide()
 {
 	DestroyWindow();
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CSplashWnd::CreateDpiDependentResources(unsigned newDpiX, unsigned newDpiY)
+{
+	if (m_bitmap.GetSafeHandle())
+	{
+		newDpiX = newDpiX == 0 ? m_dpi_behavior.GetCurrentDpiX() : newDpiX;
+		newDpiY = newDpiY == 0 ? m_dpi_behavior.GetCurrentDpiY() : newDpiY;
+
+		HBITMAP scaledBmp = se::windows::ui::ScaleBitmapForDpi(m_bitmap,
+			m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),
+			newDpiX, newDpiY);
+
+		// Scale as needed.
+		m_bitmap.DeleteObject();
+		m_bitmap.Attach(scaledBmp);
+	}
 }
 
 
@@ -300,12 +342,18 @@ BOOL CSplashWnd::Create(CWnd* pParentWnd /*= NULL*/)
 	if (!m_bitmap.LoadBitmap(IDB_SPLASH))
 		return FALSE;
 
+	const UINT processDpi{::GetSystemDpiForProcess(::GetCurrentProcess())};
+	CreateDpiDependentResources(processDpi, processDpi);
+
 	BITMAP bm;
 	m_bitmap.GetBitmap(&bm);
 
 	return CreateEx(0,
 		AfxRegisterWndClass(0, AfxGetApp()->LoadStandardCursor(IDC_ARROW)),
-		NULL, WS_POPUP | WS_VISIBLE, 0, 0, bm.bmWidth, bm.bmHeight, pParentWnd->GetSafeHwnd(), NULL);
+		NULL, WS_POPUP | WS_VISIBLE,
+		0, 0, bm.bmWidth, bm.bmHeight,
+		pParentWnd->GetSafeHwnd(),
+		NULL);
 }
 
 

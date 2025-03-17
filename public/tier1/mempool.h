@@ -53,10 +53,10 @@ public:
 				CUtlMemoryPool( intp blockSize, intp numElements, int growMode = UTLMEMORYPOOL_GROW_FAST, const char *pszAllocOwner = nullptr, unsigned short nAlignment = 0 );
 				~CUtlMemoryPool();
 
-	void*		Alloc();	// Allocate the element size you specified in the constructor.
-	void*		Alloc( size_t amount );
-	void*		AllocZero();	// Allocate the element size you specified in the constructor, zero the memory before construction
-	void*		AllocZero( size_t amount );
+	[[nodiscard]] void*		Alloc();	// Allocate the element size you specified in the constructor.
+	[[nodiscard]] void*		Alloc( size_t amount );
+	[[nodiscard]] void*		AllocZero();	// Allocate the element size you specified in the constructor, zero the memory before construction
+	[[nodiscard]] void*		AllocZero( size_t amount );
 	void		Free(void *pMem);
 	
 	// Frees everything
@@ -66,8 +66,8 @@ public:
 	static void SetErrorReportFunc( MemoryPoolReportFunc_t func );
 
 	// returns number of allocated blocks
-	intp Count() const { return m_BlocksAllocated; }
-	intp PeakCount() const { return m_PeakAlloc; }
+	[[nodiscard]] intp Count() const { return m_BlocksAllocated; }
+	[[nodiscard]] intp PeakCount() const { return m_PeakAlloc; }
 
 protected:
 	class CBlob
@@ -116,10 +116,10 @@ public:
 		: CUtlMemoryPool( blockSize, numElements, growMode, pszAllocOwner, nAlignment) {}
 
 
-	void*		Alloc()	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::Alloc(); }
-	void*		Alloc( size_t amount )	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::Alloc( amount ); }
-	void*		AllocZero()	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::AllocZero(); }	
-	void*		AllocZero( size_t amount )	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::AllocZero( amount ); }
+	[[nodiscard]] void*		Alloc()	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::Alloc(); }
+	[[nodiscard]] void*		Alloc( size_t amount )	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::Alloc( amount ); }
+	[[nodiscard]] void*		AllocZero()	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::AllocZero(); }	
+	[[nodiscard]] void*		AllocZero( size_t amount )	{ AUTO_LOCK( m_mutex ); return CUtlMemoryPool::AllocZero( amount ); }
 	void		Free(void *pMem) { AUTO_LOCK( m_mutex ); CUtlMemoryPool::Free( pMem ); }
 
 	// Frees everything
@@ -147,8 +147,8 @@ public:
 			#endif
 		}
 
-	T*		Alloc();
-	T*		AllocZero();
+	[[nodiscard]] T*		Alloc();
+	[[nodiscard]] T*		AllocZero();
 	void	Free( T *pMem );
 
 	void	Clear();
@@ -169,23 +169,23 @@ class CAlignedMemPool
 public:
 	CAlignedMemPool();
 
-	void *Alloc();
+	[[nodiscard]] void *Alloc();
 	void Free( void *p );
 
 	static int __cdecl CompareChunk( void * const *ppLeft, void * const *ppRight );
 	void Compact();
 
-	intp NumTotal()			{ return m_Chunks.Count() * ( CHUNK_SIZE / BLOCK_SIZE ); }
-	intp NumAllocated()		{ return NumTotal() - m_nFree; }
-	intp NumFree()			{ return m_nFree; }
+	[[nodiscard]] intp NumTotal()			{ return m_Chunks.Count() * ( CHUNK_SIZE / BLOCK_SIZE ); }
+	[[nodiscard]] intp NumAllocated()		{ return NumTotal() - m_nFree; }
+	[[nodiscard]] intp NumFree()			{ return m_nFree; }
 
-	intp BytesTotal()		{ return NumTotal() * BLOCK_SIZE; }
-	intp BytesAllocated()	{ return NumAllocated() * BLOCK_SIZE; }
-	intp BytesFree()		{ return NumFree() * BLOCK_SIZE; }
+	[[nodiscard]] intp BytesTotal()		{ return NumTotal() * BLOCK_SIZE; }
+	[[nodiscard]] intp BytesAllocated()	{ return NumAllocated() * BLOCK_SIZE; }
+	[[nodiscard]] intp BytesFree()		{ return NumFree() * BLOCK_SIZE; }
 
-	intp ItemSize()			{ return ITEM_SIZE; }
-	intp BlockSize()		{ return BLOCK_SIZE; }
-	intp ChunkSize()		{ return CHUNK_SIZE; }
+	[[nodiscard]] intp ItemSize()			{ return ITEM_SIZE; }
+	[[nodiscard]] intp BlockSize()		{ return BLOCK_SIZE; }
+	[[nodiscard]] intp ChunkSize()		{ return CHUNK_SIZE; }
 
 private:
 	struct FreeBlock_t
@@ -222,7 +222,7 @@ public:
 		Purge();
 	}
 
-	intp NumAvailable() const
+	[[nodiscard]] intp NumAvailable() const
 	{
 		return m_AvailableObjects.Count();
 	}
@@ -236,7 +236,7 @@ public:
 		}
 	}
 
-	T *GetObject( bool bCreateNewIfEmpty = bDefCreateNewIfEmpty )
+	[[nodiscard]] T *GetObject( bool bCreateNewIfEmpty = bDefCreateNewIfEmpty )
 	{
 		T *p;
 		if ( !m_AvailableObjects.PopItem( &p )  )

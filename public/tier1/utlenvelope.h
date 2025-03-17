@@ -26,8 +26,8 @@ public:
 
 	CUtlDataEnvelope &operator=( const CUtlDataEnvelope &from );
 
-	operator void *();
-	operator void *() const;
+	[[nodiscard]] operator void *();
+	[[nodiscard]] operator void *() const;
 
 private:
 	void Assign( const void *pData, intp nBytes );
@@ -55,11 +55,11 @@ public:
 
 	CUtlEnvelope<T> &operator=( const CUtlEnvelope<T> &from );
 
-	operator T *();
-	operator T *() const;
+	[[nodiscard]] operator T *();
+	[[nodiscard]] operator T *() const;
 
-	operator void *();
-	operator void *() const;
+	[[nodiscard]] operator void *();
+	[[nodiscard]] operator void *() const;
 };
 
 //-----------------------------------------------------------------------------
@@ -84,24 +84,24 @@ public:
 		return *this;
 	}
 
-	operator char *()
+	[[nodiscard]] operator char *()
 	{
 		return (char *) m_string.Get();
 	}
 
-	operator char *() const
+	[[nodiscard]] operator char *() const
 	{
 		return (char *) m_string.Get();
 	}
 
-	operator void *()
+	[[nodiscard]] operator void *()
 	{
 		return (void *) m_string.Get();
 	}
 
-	operator void *() const
+	[[nodiscard]] operator void *() const
 	{
-		return (void *) m_string.Get();
+		return (void *)m_string.Get();
 	}
 
 private:

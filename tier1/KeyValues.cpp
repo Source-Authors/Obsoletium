@@ -2709,7 +2709,9 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 		{
 		case TYPE_NONE:
 			{
-				dat->m_pSub->WriteAsBinary( buffer );
+				// dimhotepus: Early return on write failure.
+				if ( !dat->m_pSub->WriteAsBinary( buffer ) )
+					return false;
 				break;
 			}
 		case TYPE_STRING:
@@ -2817,7 +2819,9 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 		case TYPE_NONE:
 			{
 				dat->m_pSub = new KeyValues("");
-				dat->m_pSub->ReadAsBinary( buffer, nStackDepth + 1 );
+				// dimhotepus: Early return on write failure.
+				if ( !dat->m_pSub->ReadAsBinary( buffer, nStackDepth + 1 ) )
+					return false;
 				break;
 			}
 		case TYPE_STRING:

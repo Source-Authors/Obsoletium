@@ -28,7 +28,7 @@ class AnalogBar : public Panel
 
 public:
 	AnalogBar(Panel *parent, const char *panelName);
-	~AnalogBar();
+	virtual ~AnalogBar();
 
 	// 'analogValue' is in the range [0.0f, 1.0f]
 	MESSAGE_FUNC_FLOAT( SetAnalogValue, "SetAnalogValue", analogValue );
@@ -39,7 +39,7 @@ public:
 	static bool ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output, intp outputBufferSizeInBytes, float startTime, float currentTime, float currentAnalogValue, float lastAnalogValueUpdateTime, bool addRemainingSuffix);
 
 	void SetBarInset( int pixels );
-	int GetBarInset( void );
+	int GetBarInset( void ) const;
 	
 	void ApplySettings(KeyValues *inResourceData) override;
 	void GetSettings(KeyValues *outResourceData) override;

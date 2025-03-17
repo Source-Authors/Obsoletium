@@ -37,9 +37,9 @@ class CWADTexture : public IEditorTexture
 		{
 			return(m_szName);
 		}
-		int GetShortName(char *pszName) const;
+		intp GetShortName(char *pszName, intp nameSize) const override;
 
-		int GetKeywords(char *pszKeywords) const;
+		intp GetKeywords(char *pszKeywords, intp keywordsSize) const override;
 
 		void Draw(CDC *pDC, RECT &rect, int iFontHeight, int iIconHeight, DrawTexData_t &DrawTexData);//, DWORD dwFlags = (drawCaption|drawIcons));
 		void GetSize(SIZE &size);

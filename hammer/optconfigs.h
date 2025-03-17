@@ -8,11 +8,11 @@
 #define OPTCONFIGS_H
 #pragma once
 
-
+#include "windows/base_property_page.h"
 #include "AutoSelCombo.h"
 
 
-class COPTConfigs : public CPropertyPage
+class COPTConfigs : public CBasePropertyPage
 {
 	DECLARE_DYNCREATE(COPTConfigs)
 

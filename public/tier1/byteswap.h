@@ -122,7 +122,7 @@ public:
 	// (Endienness is effectively detected at compile time when optimizations are
 	// enabled)
 	//-----------------------------------------------------------------------------
-	constexpr bool IsMachineBigEndian()
+	[[nodiscard]] constexpr bool IsMachineBigEndian()
 	{
 		return endian::native == endian::big;
 	}
@@ -158,12 +158,12 @@ public:
 	//
 	// Used to determine when a byteswap needs to take place.
 	//-----------------------------------------------------------------------------
-	constexpr inline bool IsSwappingBytes() const	// Are bytes being swapped?
+	[[nodiscard]] constexpr inline bool IsSwappingBytes() const	// Are bytes being swapped?
 	{
 		return m_bSwapBytes;
 	}
 
-	constexpr inline bool IsTargetBigEndian() const	// What is the current target endian?
+	[[nodiscard]] constexpr inline bool IsTargetBigEndian() const	// What is the current target endian?
 	{
 		return m_bBigEndian;
 	}
@@ -183,7 +183,7 @@ public:
 	// ( This is useful for detecting byteswapping in magic numbers in structure 
 	// headers for example. )
 	//-----------------------------------------------------------------------------
-	template<typename T> inline int SourceIsNativeEndian( T input, T nativeConstant )
+	template<typename T> [[nodiscard]] inline int SourceIsNativeEndian( T input, T nativeConstant )
 	{
 		// If it's the same, it isn't byteswapped:
 		if( input == nativeConstant )

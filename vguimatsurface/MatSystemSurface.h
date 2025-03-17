@@ -358,6 +358,8 @@ public:
 	int GetTextureNumFrames( int id ) override;
 	void DrawSetTextureFrame( int id, int nFrame, unsigned int *pFrameCache ) override;
 
+	void SetDpiScalePercent(int xDpiScalePercent, int yDpiScalePercent) override;
+
 private:
 	//void DrawRenderCharInternal( const FontCharRenderInfo& info );
 	void DrawRenderCharInternal( const CharRenderInfo& info );

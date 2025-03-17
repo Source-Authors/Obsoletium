@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 #include <ctype.h>
 
 #include <vgui/IInput.h>
@@ -851,7 +851,7 @@ void Label::ResetToSimpleTextImage()
 //			By default there is a TextImage in position 0
 //			Set the contents of an IImage in the IImage array.
 //-----------------------------------------------------------------------------
-void Label::SetImageAtIndex(int index, IImage *image, int offset)
+void Label::SetImageAtIndex(intp index, IImage *image, int offset)
 {
 	EnsureImageCapacity(index);
 //	Assert( image );
@@ -867,7 +867,7 @@ void Label::SetImageAtIndex(int index, IImage *image, int offset)
 //-----------------------------------------------------------------------------
 // Purpose: Get an IImage in the IImage array.
 //-----------------------------------------------------------------------------
-IImage *Label::GetImageAtIndex(int index)
+IImage *Label::GetImageAtIndex(intp index)
 {
 	if ( _imageDar.IsValidIndex( index ) )
 		return _imageDar[index].image;
@@ -877,7 +877,7 @@ IImage *Label::GetImageAtIndex(int index)
 //-----------------------------------------------------------------------------
 // Purpose: Get the number of images in the array.
 //-----------------------------------------------------------------------------
-int Label::GetImageCount()
+intp Label::GetImageCount()
 {
 	return _imageDar.Count();
 }
@@ -888,14 +888,14 @@ int Label::GetImageCount()
 // Input  : newIndex - 
 // Output : int - the index the default text image was previously in
 //-----------------------------------------------------------------------------
-int Label::SetTextImageIndex(int newIndex)
+intp Label::SetTextImageIndex(intp newIndex)
 {
 	if (newIndex == _textImageIndex)
 		return _textImageIndex;
 
 	EnsureImageCapacity(newIndex);
 
-	int oldIndex = _textImageIndex;
+	intp oldIndex = _textImageIndex;
 	if ( _textImageIndex >= 0 )
 	{
 		_imageDar[_textImageIndex].image = NULL;
@@ -911,7 +911,7 @@ int Label::SetTextImageIndex(int newIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Ensure that the maxIndex will be a valid index
 //-----------------------------------------------------------------------------
-void Label::EnsureImageCapacity(int maxIndex)
+void Label::EnsureImageCapacity(intp maxIndex)
 {
 	while (_imageDar.Count() <= maxIndex)
 	{
@@ -922,7 +922,7 @@ void Label::EnsureImageCapacity(int maxIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Set the offset in pixels before the image
 //-----------------------------------------------------------------------------
-void Label::SetImagePreOffset(int index, int preOffset)
+void Label::SetImagePreOffset(intp index, int preOffset)
 {
 	if (_imageDar.IsValidIndex(index) && _imageDar[index].offset != preOffset)
 	{

@@ -33,6 +33,8 @@ $Configuration
 		$CommandLine				"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"				\
 									"COPY $QUOTE$(TargetPath)$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.exe$QUOTE" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"SignTool sign /f $QUOTE$(SolutionDir)devtools\certificates\dev\local-dev-app-sign.pfx$QUOTE /p $QUOTEK)(#JF*56U8$RJO_)P#6NJP762OKAE$QUOTE /fd SHA512 /td SHA512 /tr http://timestamp.sectigo.com $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE" "\n" \
+									"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
 									"COPY $QUOTE$(IntDir)\$OUTBINNAME.pdb$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.pdb$QUOTE" "\n"					\
 									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 									"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.map$QUOTE" "\n" \

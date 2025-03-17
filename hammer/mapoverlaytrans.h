@@ -90,7 +90,7 @@ private:
 	CUtlVector<CMapFace*>	m_aFaceCache1;
 	CUtlVector<CMapFace*>	m_aFaceCache2;
 
-	int						m_nShorelineId;
+	intp					m_nShorelineId;
 	CUtlVector<CMapEntity*>	m_aOverlayChildren;
 
 	bool					m_bDebugDraw;

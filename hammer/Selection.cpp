@@ -24,6 +24,8 @@ CSelection::CSelection(void)
 	m_pDocument = NULL;
 	// dimhotepus: Init selection mode.
 	m_eSelectMode = selectGroups;
+	m_bBoundsDirty = false;
+	m_iCurHit = -1;
 }
 
 CSelection::~CSelection(void)
@@ -520,7 +522,7 @@ bool CSelection::SelectObject(CMapClass *pObj, int cmd)
 	}
 	else // object oriented operation
 	{
-		int iIndex = m_SelectionList.Find(pObj);
+		intp iIndex = m_SelectionList.Find(pObj);
 		bool bAlreadySelected = iIndex != -1;
 	
 		if ( cmd & scToggle )

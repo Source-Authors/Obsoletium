@@ -294,7 +294,7 @@ private:
 
 	bool				FindSpanningPhonemes( float time, CPhonemeTag **pp1, CPhonemeTag **pp2 );
 	bool				FindSpanningWords( float time, CWordTag **pp1, CWordTag **pp2 );
-	int					FindWordForTime( float time );
+	intp				FindWordForTime( float time );
 	CPhonemeTag			*FindPhonemeForTime( float time );
 	void				DeselectWords( void );
 	void				SnapWords( void );
@@ -408,7 +408,7 @@ private:
 
 	CPhonemeTag			*GetClickedPhoneme( void );
 	CWordTag			*GetClickedWord( void );
-	void				SetClickedPhoneme( int word, int phoneme );
+	void				SetClickedPhoneme( intp word, intp phoneme );
 
 	void				ShiftSelectedPhoneme( int direction );
 	void				ExtendSelectedPhonemeEndTime( int direction );
@@ -420,7 +420,7 @@ private:
 
 	float				GetTimeGapToNextWord( bool forward, CWordTag *currentWord, CWordTag **ppNextWord = NULL );
 	float				GetTimeGapToNextPhoneme( bool forward, CPhonemeTag *currentPhoneme, CWordTag **ppword = NULL, CPhonemeTag **phoneme = NULL );
-	int					IndexOfWord( CWordTag *word );
+	intp				IndexOfWord( CWordTag *word );
 	CPhonemeTag			*GetSelectedPhoneme( void );
 	CWordTag			*GetSelectedWord( void );
 
@@ -550,8 +550,8 @@ private:
 	};
 	CUtlVector < CFocusRect >	m_FocusRects;
 
-	int					m_nClickedPhoneme;
-	int					m_nClickedWord;
+	intp				m_nClickedPhoneme;
+	intp				m_nClickedWord;
 
 	// Current set of tags
 	CSentence			m_Tags;

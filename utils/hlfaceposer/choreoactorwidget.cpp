@@ -4,9 +4,8 @@
 //
 // $NoKeywords: $
 //===========================================================================//
-#include <stdio.h>
-#include "hlfaceposer.h"
 #include "choreoactorwidget.h"
+#include "hlfaceposer.h"
 #include "choreochannelwidget.h"
 #include "choreoactor.h"
 #include "choreoview.h"
@@ -83,7 +82,7 @@ CChoreoActorWidget::CChoreoActorWidget( CChoreoWidget *parent )
 //-----------------------------------------------------------------------------
 CChoreoActorWidget::~CChoreoActorWidget( void )
 {
-	for ( int i = 0 ; i < m_Channels.Size(); i++ )
+	for ( intp i = 0 ; i < m_Channels.Count(); i++ )
 	{
 		CChoreoChannelWidget *c = m_Channels[ i ];
 		delete c;
@@ -176,7 +175,7 @@ void CChoreoActorWidget::Layout( RECT& rc )
 	rcChannels.top += ACTOR_NAME_HEIGHT;
 
 	// Create objects for children
-	for ( int i = 0; i < m_Channels.Size(); i++ )
+	for ( intp i = 0; i < m_Channels.Count(); i++ )
 	{
 		CChoreoChannelWidget *channel = m_Channels[ i ];
 		Assert( channel );
@@ -203,7 +202,7 @@ int	CChoreoActorWidget::GetItemHeight( void )
 	int itemHeight = ACTOR_NAME_HEIGHT + 2;
 	if ( m_bShowChannels )
 	{
-		for ( int i = 0; i < m_Channels.Size(); i++ )
+		for ( intp i = 0; i < m_Channels.Count(); i++ )
 		{
 			CChoreoChannelWidget *channel = m_Channels[ i ];
 			itemHeight += channel->GetItemHeight();
@@ -267,7 +266,7 @@ void CChoreoActorWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 
 	if ( !actor->GetActive() )
 	{
-		strcpy( n, "(inactive)" );
+		V_strcpy_safe( n, "(inactive)" );
 
 		RECT rcInactive = rcName;
 		int len = drawHelper.CalcTextWidth( "Arial", m_pView->GetFontSize() - 2, 500, n );
@@ -291,8 +290,8 @@ void CChoreoActorWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 		int fontsize = m_pView->GetFontSize() - 2;
 
 		char shortname[ 512 ];
-		Q_FileBase (actor->GetFacePoserModelName(), shortname, sizeof( shortname ) );
-		strcat( shortname, ".mdl" );
+		Q_FileBase (actor->GetFacePoserModelName(), shortname );
+		V_strcat_safe( shortname, ".mdl" );
 
 		int len = drawHelper.CalcTextWidth( "Arial", fontsize, FW_NORMAL, shortname );
 
@@ -329,8 +328,8 @@ void CChoreoActorWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 
 	char sz[ 256 ];
 	// count channels and events
-	int ev = 0;
-	for ( int i = 0; i < actor->GetNumChannels(); i++ )
+	intp ev = 0;
+	for ( intp i = 0; i < actor->GetNumChannels(); i++ )
 	{
 		CChoreoChannel *ch = actor->GetChannel( i );
 		if ( ch )
@@ -338,7 +337,7 @@ void CChoreoActorWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 			ev += ch->GetNumEvents();
 		}
 	}
-	sprintf( sz, "%i channels with %i events hidden", actor->GetNumChannels(), ev );
+	V_sprintf_safe( sz, "%zd channels with %zd events hidden", actor->GetNumChannels(), ev );
 	drawHelper.DrawColoredText( "Arial", m_pView->GetFontSize(), FW_NORMAL, COLOR_CHOREO_ACTORNAME, rcName, sz );
 }
 
@@ -383,7 +382,7 @@ void CChoreoActorWidget::RemoveChannel( CChoreoChannelWidget *channel )
 // Input  : num - 
 // Output : CChoreoChannelWidget
 //-----------------------------------------------------------------------------
-CChoreoChannelWidget *CChoreoActorWidget::GetChannel( int num )
+CChoreoChannelWidget *CChoreoActorWidget::GetChannel( intp num )
 {
 	return m_Channels[ num ];
 }
@@ -392,9 +391,9 @@ CChoreoChannelWidget *CChoreoActorWidget::GetChannel( int num )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoActorWidget::GetNumChannels( void )
+intp CChoreoActorWidget::GetNumChannels( void )
 {
-	return m_Channels.Size();
+	return m_Channels.Count();
 }
 
 //-----------------------------------------------------------------------------

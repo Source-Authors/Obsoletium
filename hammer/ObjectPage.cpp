@@ -23,7 +23,7 @@ char *CObjectPage::VALUE_DIFFERENT_STRING = "(different)";
 BOOL CObjectPage::s_bRESTRUCTURING = FALSE;
 
 
-IMPLEMENT_DYNCREATE(CObjectPage, CPropertyPage)
+IMPLEMENT_DYNCREATE(CObjectPage, CBasePropertyPage)
 
 
 //-----------------------------------------------------------------------------

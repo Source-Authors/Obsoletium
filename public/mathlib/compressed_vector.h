@@ -43,7 +43,7 @@ public:
 
 	// assignment
 	Vector32& operator=(const Vector &vOther);
-	operator Vector ();
+	[[nodiscard]] operator Vector ();
 
 private:
 	unsigned short x:10;
@@ -103,7 +103,7 @@ public:
 
 	// assignment
 	Normal32& operator=(const Vector &vOther);
-	operator Vector ();
+	[[nodiscard]] operator Vector ();
 
 private:
 	unsigned short x:15;
@@ -153,7 +153,7 @@ public:
 	// assignment
 	// Quaternion& operator=(const Quaternion64 &vOther);
 	Quaternion64& operator=(const Quaternion &vOther);
-	operator Quaternion ();
+	[[nodiscard]] operator Quaternion ();
 private:
 	uint64 x:21;
 	uint64 y:21;
@@ -201,7 +201,7 @@ public:
 	// assignment
 	// Quaternion& operator=(const Quaternion48 &vOther);
 	Quaternion48& operator=(const Quaternion &vOther);
-	operator Quaternion ();
+	[[nodiscard]] operator Quaternion ();
 private:
 	unsigned short x:16;
 	unsigned short y:16;
@@ -248,7 +248,7 @@ public:
 	// assignment
 	// Quaternion& operator=(const Quaternion48 &vOther);
 	Quaternion32& operator=(const Quaternion &vOther);
-	operator Quaternion ();
+	[[nodiscard]] operator Quaternion ();
 private:
 	unsigned int x:11;
 	unsigned int y:10;
@@ -302,11 +302,11 @@ public:
 //	float16& operator=(const float &other) { m_storage.rawWord = ConvertFloatTo16bits(other); return *this; }
 //	operator unsigned short () { return m_storage.rawWord; }
 //	operator float () { return Convert16bitFloatTo32bits( m_storage.rawWord ); }
-	unsigned short GetBits() const 
+	[[nodiscard]] unsigned short GetBits() const 
 	{ 
 		return m_storage.rawWord; 
 	}
-	float GetFloat() const 
+	[[nodiscard]] float GetFloat() const 
 	{ 
 		return Convert16bitFloatTo32bits( m_storage.rawWord ); 
 	}
@@ -315,17 +315,17 @@ public:
 		m_storage.rawWord = ConvertFloatTo16bits( in ); 
 	}
 
-	bool IsInfinity() const
+	[[nodiscard]] bool IsInfinity() const
 	{
 		return m_storage.bits.biased_exponent == 31 && m_storage.bits.mantissa == 0;
 	}
-	bool IsNaN() const
+	[[nodiscard]] bool IsNaN() const
 	{
 		return m_storage.bits.biased_exponent == 31 && m_storage.bits.mantissa != 0;
 	}
 
-	bool operator==(const float16 other) const { return m_storage.rawWord == other.m_storage.rawWord; }
-	bool operator!=(const float16 other) const { return m_storage.rawWord != other.m_storage.rawWord; }
+	[[nodiscard]] bool operator==(const float16 other) const { return m_storage.rawWord == other.m_storage.rawWord; }
+	[[nodiscard]] bool operator!=(const float16 other) const { return m_storage.rawWord != other.m_storage.rawWord; }
 	
 //	bool operator< (const float other) const	   { return GetFloat() < other; }
 //	bool operator> (const float other) const	   { return GetFloat() > other; }
@@ -353,17 +353,17 @@ protected:
 		} bits;
 	};
 
-	static bool IsNaN( float16bits in )
+	[[nodiscard]] static bool IsNaN(float16bits in)
 	{
 		return in.bits.biased_exponent == 31 && in.bits.mantissa != 0;
 	}
-	static bool IsInfinity( float16bits in )
+	[[nodiscard]] static bool IsInfinity( float16bits in )
 	{
 		return in.bits.biased_exponent == 31 && in.bits.mantissa == 0;
 	}
 
 	// 0x0001 - 0x03ff
-	static unsigned short ConvertFloatTo16bits( float input )
+	[[nodiscard]] static unsigned short ConvertFloatTo16bits( float input )
 	{
 		if ( input > maxfloat16bits )
 			input = maxfloat16bits;
@@ -456,7 +456,7 @@ protected:
 		return output.rawWord;
 	}
 
-	static float Convert16bitFloatTo32bits( unsigned short input )
+	[[nodiscard]] static float Convert16bitFloatTo32bits( unsigned short input )
 	{
 		float32bits output;
 		const float16bits &inFloat = *((float16bits *)&input);
@@ -499,13 +499,13 @@ protected:
 class float16_with_assign : public float16
 {
 public:
-  float16_with_assign() = default;
+	float16_with_assign() = default;
 	float16_with_assign( float f ) { m_storage.rawWord = ConvertFloatTo16bits(f); }
 
 	float16& operator=(const float16 &other) { m_storage.rawWord = ((const float16_with_assign &)other).m_storage.rawWord; return *this; }
 	float16& operator=(const float &other) { m_storage.rawWord = ConvertFloatTo16bits(other); return *this; }
 //	operator unsigned short () const { return m_storage.rawWord; }
-	operator float () const { return Convert16bitFloatTo32bits( m_storage.rawWord ); }
+	[[nodiscard]] operator float () const { return Convert16bitFloatTo32bits( m_storage.rawWord ); }
 };
 
 //=========================================================
@@ -521,9 +521,9 @@ public:
 
 	// assignment
 	Vector48& operator=(const Vector &vOther);
-	operator Vector ();
+	[[nodiscard]] operator Vector ();
 
-	float operator[]( int i ) const { return (((const float16 *)this)[i]).GetFloat(); }
+	[[nodiscard]] float operator[]( int i ) const { return (((const float16 *)this)[i]).GetFloat(); }
 
 	float16 x;
 	float16 y;
@@ -567,7 +567,7 @@ public:
 	Vector2d32& operator=(const Vector &vOther);
 	Vector2d32& operator=(const Vector2D &vOther);
 
-	operator Vector2D ();
+	[[nodiscard]] operator Vector2D ();
 
 	void Init( vec_t ix = 0.f, vec_t iy = 0.f);
 

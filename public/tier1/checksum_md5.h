@@ -83,7 +83,7 @@ void MD5_ProcessSingleBuffer( IN_BYTECAP(len) const void *p, unsigned int len, M
 
 [[nodiscard]] inline bool MD5Value_t::operator!=( const MD5Value_t &src ) const
 {
-	return !MD5_Compare( *this, src );
+	return !(*this == src);
 }
 
 #endif // CHECKSUM_MD5_H

@@ -244,16 +244,16 @@ void CMapOverlay::Basis_UpdateParentKey( void )
 	CMapEntity *pEntity = ( CMapEntity* )GetParent();
 	if ( pEntity )
 	{
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecOrigin.x, m_Basis.m_vecOrigin.y, m_Basis.m_vecOrigin.z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecOrigin.x, m_Basis.m_vecOrigin.y, m_Basis.m_vecOrigin.z );
 		pEntity->NotifyChildKeyChanged( this, "BasisOrigin", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_U].x, m_Basis.m_vecAxes[OVERLAY_BASIS_U].y, m_Basis.m_vecAxes[OVERLAY_BASIS_U].z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_U].x, m_Basis.m_vecAxes[OVERLAY_BASIS_U].y, m_Basis.m_vecAxes[OVERLAY_BASIS_U].z );
 		pEntity->NotifyChildKeyChanged( this, "BasisU", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_V].x, m_Basis.m_vecAxes[OVERLAY_BASIS_V].y, m_Basis.m_vecAxes[OVERLAY_BASIS_V].z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_V].x, m_Basis.m_vecAxes[OVERLAY_BASIS_V].y, m_Basis.m_vecAxes[OVERLAY_BASIS_V].z );
 		pEntity->NotifyChildKeyChanged( this, "BasisV", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].x, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].y, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].x, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].y, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].z );
 		pEntity->NotifyChildKeyChanged( this, "BasisNormal", szValue );
 	}
 }
@@ -452,16 +452,16 @@ void CMapOverlay::Handles_UpdateParentKey( void )
 	CMapEntity *pEntity = ( CMapEntity* )GetParent();
 	if ( pEntity )
 	{
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[0].x, m_Handles.m_vecBasisCoords[0].y, ( float )m_Basis.m_nAxesFlip[0] );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[0].x, m_Handles.m_vecBasisCoords[0].y, ( float )m_Basis.m_nAxesFlip[0] );
 		pEntity->NotifyChildKeyChanged( this, "uv0", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[1].x, m_Handles.m_vecBasisCoords[1].y, ( float )m_Basis.m_nAxesFlip[1] );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[1].x, m_Handles.m_vecBasisCoords[1].y, ( float )m_Basis.m_nAxesFlip[1] );
 		pEntity->NotifyChildKeyChanged( this, "uv1", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[2].x, m_Handles.m_vecBasisCoords[2].y, ( float )m_Basis.m_nAxesFlip[2] );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[2].x, m_Handles.m_vecBasisCoords[2].y, ( float )m_Basis.m_nAxesFlip[2] );
 		pEntity->NotifyChildKeyChanged( this, "uv2", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[3].x, m_Handles.m_vecBasisCoords[3].y, 0.0f );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[3].x, m_Handles.m_vecBasisCoords[3].y, 0.0f );
 		pEntity->NotifyChildKeyChanged( this, "uv3", szValue );
 	}
 }
@@ -537,11 +537,14 @@ CMapOverlay::ClipFace_t *CMapOverlay::ClipFace_Copy( ClipFace_t *pSrc )
 				pDst->m_aTexCoords[iTexCoord][iPoint] = pSrc->m_aTexCoords[iTexCoord][iPoint];
 			}
 
-			pDst->m_aBlends[iPoint].m_nType = pSrc->m_aBlends[iPoint].m_nType;
+			const auto &srcBlend = pSrc->m_aBlends[iPoint];
+			auto &dstBlend = pDst->m_aBlends[iPoint];
+
+			dstBlend.m_nType = srcBlend.m_nType;
 			for ( int iBlend = 0; iBlend < 3; iBlend++ )
 			{
-				pDst->m_aBlends[iPoint].m_iPoints[iBlend] = pSrc->m_aBlends[iPoint].m_iPoints[iBlend];
-				pDst->m_aBlends[iPoint].m_flBlends[iBlend] = pSrc->m_aBlends[iPoint].m_flBlends[iBlend];
+				dstBlend.m_iPoints[iBlend] = srcBlend.m_iPoints[iBlend];
+				dstBlend.m_flBlends[iBlend] = srcBlend.m_flBlends[iBlend];
 			}
 		}
 	}
@@ -585,6 +588,9 @@ void CMapOverlay::ClipFace_Clip( ClipFace_t *pClipFace, cplane_t *pClipPlane, fl
 	float flDists[128];
 	int	nSides[128];
 	int nSideCounts[3];
+
+	flDists[0] = 0;
+	nSides[0] = SIDE_ON;
 
 	// Initialize
 	*ppFront = *ppBack = NULL;
@@ -722,6 +728,9 @@ void CMapOverlay::ClipFace_ClipBarycentric( ClipFace_t *pClipFace, cplane_t *pCl
 	float flDists[128];
 	int nSides[128];
 	int	nSideCounts[3];
+	
+	flDists[0] = 0;
+	nSides[0] = SIDE_ON;
 
 	// Determine "sidedness" of all the polygon points.
 	nSideCounts[0] = nSideCounts[1] = nSideCounts[2] = 0;
@@ -748,7 +757,7 @@ void CMapOverlay::ClipFace_ClipBarycentric( ClipFace_t *pClipFace, cplane_t *pCl
 
 	// Wrap around (close the polygon).
 	nSides[iPoint] = nSides[0];
-	flDists[iPoint] =  flDists[0];
+	flDists[iPoint] = flDists[0];
 
 	// All points in back - no split (copy face to back).
 	if( !nSideCounts[SIDE_FRONT] )
@@ -1161,11 +1170,12 @@ void CMapOverlay::ClipFace_BuildBlend( ClipFace_t *pClipFace, CMapDisp *pDisp,
 //-----------------------------------------------------------------------------
 void CMapOverlay::ClipFace_CopyBlendFrom( ClipFace_t *pClipFace, BlendData_t *pBlendFrom )
 {
-	pClipFace->m_aBlends[pClipFace->m_nPointCount].m_nType = pBlendFrom->m_nType;
+	auto &blend = pClipFace->m_aBlends[pClipFace->m_nPointCount];
+	blend.m_nType = pBlendFrom->m_nType;
 	for ( int iPoint = 0; iPoint < 3; iPoint++ )
 	{
-		pClipFace->m_aBlends[pClipFace->m_nPointCount].m_iPoints[iPoint] = pBlendFrom->m_iPoints[iPoint];
-		pClipFace->m_aBlends[pClipFace->m_nPointCount].m_flBlends[iPoint] = pBlendFrom->m_flBlends[iPoint];
+		blend.m_iPoints[iPoint] = pBlendFrom->m_iPoints[iPoint];
+		blend.m_flBlends[iPoint] = pBlendFrom->m_flBlends[iPoint];
 	}
 }
 
@@ -1250,7 +1260,7 @@ void CMapOverlay::Material_TexCoordInit( void )
 	m_Material.m_vecTextureU.Init( 0.0f, 1.0f );
 	m_Material.m_vecTextureV.Init( 1.0f, 0.0f );
 
-	if ( ( bUPos && !bVPos ) || ( !bUPos && bVPos ) )
+	if ( bUPos != bVPos )
 	{
 		m_Material.m_vecTextureU.Init( 1.0f, 0.0f );
 		m_Material.m_vecTextureV.Init( 0.0f, 1.0f );
@@ -1278,16 +1288,16 @@ void CMapOverlay::Material_UpdateParentKey( void )
 	CMapEntity *pEntity = ( CMapEntity* )GetParent();
 	if ( pEntity )
 	{
-		sprintf( szValue, "%g", m_Material.m_vecTextureU.x );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureU.x );
 		pEntity->NotifyChildKeyChanged( this, "StartU", szValue );
 
-		sprintf( szValue, "%g", m_Material.m_vecTextureU.y );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureU.y );
 		pEntity->NotifyChildKeyChanged( this, "EndU", szValue );
 
-		sprintf( szValue, "%g", m_Material.m_vecTextureV.x );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureV.x );
 		pEntity->NotifyChildKeyChanged( this, "StartV", szValue );
 
-		sprintf( szValue, "%g", m_Material.m_vecTextureV.y );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureV.y );
 		pEntity->NotifyChildKeyChanged( this, "EndV", szValue );
 	}
 }
@@ -1503,19 +1513,23 @@ void CMapOverlay::OnParentKeyChanged( const char* szKey, const char* szValue )
 
 	if ( !stricmp( szKey, "StartU" ) )	
 	{ 
-		m_Material.m_vecTextureU.x = atof( szValue ); 
+		// dimhotepus: atof -> strtof.
+		m_Material.m_vecTextureU.x = strtof( szValue, nullptr ); 
 	}
 	if ( !stricmp( szKey, "EndU" ) )	
 	{ 
-		m_Material.m_vecTextureU.y = atof( szValue ); 
+		// dimhotepus: atof -> strtof.
+		m_Material.m_vecTextureU.y = strtof( szValue, nullptr );
 	}
 	if ( !stricmp( szKey, "StartV" ) )	
 	{ 
-		m_Material.m_vecTextureV.x = atof( szValue ); 
+		// dimhotepus: atof -> strtof.
+		m_Material.m_vecTextureV.x = strtof( szValue, nullptr );
 	}
 	if ( !stricmp( szKey, "EndV" ) )	
 	{ 
-		m_Material.m_vecTextureV.y = atof( szValue ); 
+		// dimhotepus: atof -> strtof.
+		m_Material.m_vecTextureV.y = strtof( szValue, nullptr );
 	}
 
 	if ( m_bLoaded )
@@ -1715,7 +1729,8 @@ void CMapOverlay::OnClone( CMapClass *pClone, CMapWorld *pWorld,
 	CMapOverlay *pOverlay = dynamic_cast<CMapOverlay*>( pClone );
 	if ( pOverlay )
 	{
-		if ( ( GetOverlayType() && OVERLAY_TYPE_SHORE ) == 0 )
+		// dimhotepus: Correct check for flag presense.
+		if ( ( GetOverlayType() & OVERLAY_TYPE_SHORE ) == 0 )
 		{
 			// Update the clone's solid dependencies (this doesn't happen on clone generally).
 			int nFaceCount = pOverlay->GetFaceCount();
@@ -1826,7 +1841,9 @@ void CMapOverlay::Render3D( CRender3D *pRender )
 						meshBuilder.TexCoord2f( 2, pRenderFace->m_aTexCoords[1][iPoint].x, pRenderFace->m_aTexCoords[1][iPoint].y );
 						meshBuilder.Color4ub( 255, 255, 255, 255 );
 					}
-					meshBuilder.Position3f( pRenderFace->m_aPoints[iPoint].x, pRenderFace->m_aPoints[iPoint].y, pRenderFace->m_aPoints[iPoint].z );
+
+					const Vector &point = pRenderFace->m_aPoints[iPoint];
+					meshBuilder.Position3f( point.x, point.y, point.z );
 					meshBuilder.AdvanceVertex();
 				}
 				meshBuilder.End();
@@ -1938,18 +1955,24 @@ void CMapOverlay::PreClip( void )
 				{
 					Vector2D vecTmp;
 					pDisp->BaseFacePlaneToDispUV( m_pOverlayFace->m_aPoints[iPoint], vecTmp );
-					m_pOverlayFace->m_aDispPointUVs[iPoint].x = vecTmp.x;
-					m_pOverlayFace->m_aDispPointUVs[iPoint].y = vecTmp.y;
-					m_pOverlayFace->m_aDispPointUVs[iPoint].z = 0.0f;
+
+					Vector &vecUV = m_pOverlayFace->m_aDispPointUVs[iPoint];
+					vecUV.x = vecTmp.x;
+					vecUV.y = vecTmp.y;
+					vecUV.z = 0.0f;
 				}
 			}
 		}
+
 		// The second set of texcoords on the overlay is used for alpha by certain shaders,
 		// and they want to stretch the texture across the whole overlay.
-		m_pOverlayFace->m_aTexCoords[1][0].Init( 0, 0 );
-		m_pOverlayFace->m_aTexCoords[1][1].Init( 0, 1 );
-		m_pOverlayFace->m_aTexCoords[1][2].Init( 1, 1 );
-		m_pOverlayFace->m_aTexCoords[1][3].Init( 1, 0 );
+
+		auto &vecTexCoord = m_pOverlayFace->m_aTexCoords[1];
+
+		vecTexCoord[0].Init( 0, 0 );
+		vecTexCoord[1].Init( 0, 1 );
+		vecTexCoord[2].Init( 1, 1 );
+		vecTexCoord[3].Init( 1, 0 );
 	}
 }
 
@@ -2107,7 +2130,7 @@ bool CMapOverlay::BuildEdgePlanes( Vector const *pPoints, int nPointCount,
 //-----------------------------------------------------------------------------
 void CMapOverlay::Disp_ClipFragments( CMapDisp *pDisp, ClipFaces_t &aDispFragments )
 {
-	cplane_t clipPlane;
+	cplane_t clipPlane = {};
 
 	// Cache the displacement interval.
 	int nInterval = pDisp->GetWidth() - 1;
@@ -2396,8 +2419,9 @@ void CMapOverlay::SideList_Init( CMapFace *pFace )
 	// Purge side list as this should be the initial face!
 	m_Faces.Purge();
 	m_Faces.AddToTail( pFace );
-
-	if ( ( GetOverlayType() && OVERLAY_TYPE_SHORE ) == 0 )
+	
+	// dimhotepus: Correct check for flag presense.
+	if ( ( GetOverlayType() & OVERLAY_TYPE_SHORE ) == 0 )
 	{
 		// Update dependencies.
 		UpdateDependency( NULL, ( CMapSolid* )pFace->GetParent() );
@@ -2420,8 +2444,9 @@ void CMapOverlay::SideList_AddFace( CMapFace *pFace )
 
 	// Purge side list as this should be the initial face!
 	m_Faces.AddToTail( pFace );
-
-	if ( ( GetOverlayType() && OVERLAY_TYPE_SHORE ) == 0 )
+	
+	// dimhotepus: Correct check for flag presense.
+	if ( ( GetOverlayType() & OVERLAY_TYPE_SHORE ) == 0 )
 	{
 		// Update dependencies.
 		UpdateDependency( NULL, ( CMapSolid* )pFace->GetParent() );

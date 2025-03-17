@@ -116,6 +116,10 @@ public:
 
 	// Returns true if image evicted, false otherwise
 	virtual bool DeleteImage( const char *pImageName ) = 0;
+
+	// Accesses DPI to take into account when computing scaling values.
+	virtual void GetDpiScalePercent( int &xDpiScalePercent, int &yDpiScalePercent ) = 0;
+	virtual void SetDpiScalePercent( int xDpiScalePercent, int yDpiScalePercent ) = 0;
 };
 
 } // namespace vgui

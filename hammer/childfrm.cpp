@@ -20,16 +20,17 @@
 #include "MapView3D.h"
 #include "GlobalFunctions.h"
 #include "materialdlg.h"
+#include "windows/base_mdi_child_wnd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #define WM_INITIALUPDATE 0x0364  // (params unused) - sent to children
 
-IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWnd)
+IMPLEMENT_DYNCREATE(CChildFrame, CBaseMDIChildWnd)
 
 
-BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWnd)
+BEGIN_MESSAGE_MAP(CChildFrame, CBaseMDIChildWnd)
 	//{{AFX_MSG_MAP(CChildFrame)
 	ON_WM_SETFOCUS()
 	ON_WM_SIZE()
@@ -367,7 +368,7 @@ void CChildFrame::SaveOptions(void)
 				if (pView != NULL)
 				{
 					char szKey[30];
-					sprintf(szKey, "DrawType%d,%d", nRow, nCol);
+					V_sprintf_safe(szKey, "DrawType%d,%d", nRow, nCol);
 					APP()->WriteProfileInt("Splitter", szKey, pView->GetDrawType());
 				}
 			}
@@ -388,7 +389,7 @@ void CChildFrame::SaveOptions(void)
 		GetWindowPlacement(&wp);
 
 		char szPlacement[100];
-		sprintf(szPlacement, "(%d %d) (%d %d) (%d %d %d %d) %d", wp.ptMaxPosition.x, wp.ptMaxPosition.y, wp.ptMinPosition.x, wp.ptMinPosition.y, wp.rcNormalPosition.bottom, wp.rcNormalPosition.left, wp.rcNormalPosition.right, wp.rcNormalPosition.top, wp.showCmd);
+		V_sprintf_safe(szPlacement, "(%d %d) (%d %d) (%d %d %d %d) %d", wp.ptMaxPosition.x, wp.ptMaxPosition.y, wp.ptMinPosition.x, wp.ptMinPosition.y, wp.rcNormalPosition.bottom, wp.rcNormalPosition.left, wp.rcNormalPosition.right, wp.rcNormalPosition.top, wp.showCmd);
 		APP()->WriteProfileString("Splitter", "WindowPlacement", szPlacement);
 	}
 }

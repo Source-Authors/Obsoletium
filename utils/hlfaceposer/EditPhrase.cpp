@@ -6,8 +6,8 @@
 //=============================================================================//
 #define UNICODE
 
-#include "resource.h"
 #include "EditPhrase.h"
+#include "resource.h"
 #include "mxtk/mx.h"
 #include "mdlviewer.h"
 
@@ -67,11 +67,11 @@ static BOOL CALLBACK EditPhraseDialogProc( HWND hwndDlg, UINT uMsg, WPARAM wPara
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int EditPhrase( CEditPhraseParams *params )
+intp EditPhrase( CEditPhraseParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_EDITPHRASE ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)EditPhraseDialogProc );

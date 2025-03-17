@@ -512,6 +512,7 @@ bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuffer& buf )
 {
 	char	filename[MAX_PATH];
+	filename[0] = '\0';
 
 	// construct filename
 	Q_StripExtension( pModelName, filename );
@@ -659,7 +660,7 @@ public:
 	bool FindOrLoadIfValid( const char *pMaterialName, int *pIndex )
 	{
 		*pIndex = -1;
-		int index = m_Textures.Find(pMaterialName);
+		unsigned short index = m_Textures.Find(pMaterialName);
 		bool bFound = false;
 		if ( index != m_Textures.InvalidIndex() )
 		{
@@ -738,9 +739,9 @@ public:
 		}
 	}
 	
-	int AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
+	intp AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
 	{
-		int index = m_MaterialEntries.AddToTail();
+		intp index = m_MaterialEntries.AddToTail();
 		m_MaterialEntries[index].textureIndex = shadowTextureIndex;
 		m_MaterialEntries[index].uv[0] = t0;
 		m_MaterialEntries[index].uv[1] = t1;
@@ -1215,7 +1216,7 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 					for ( int nGroup = 0; nGroup < pVtxMesh->numStripGroups; ++nGroup )
 					{
 						OptimizedModel::StripGroupHeader_t* pStripGroup = pVtxMesh->pStripGroup( nGroup );
-						int nMeshIdx = prop.m_MeshData.AddToTail();
+						intp nMeshIdx = prop.m_MeshData.AddToTail();
 
 						if (colorVerts)
 						{
@@ -1541,7 +1542,7 @@ void CVradStaticPropMgr::SerializeLighting()
 			pMesh->m_nOffset   = (unsigned int)pVertexData - (unsigned int)pVhvHdr; 
 
 			// construct vertexes
-			for (int k=0; k<pMesh->m_nVertexes; k++)
+			for (unsigned k=0; k<pMesh->m_nVertexes; k++)
 			{
 				Vector &vertexColor = m_StaticProps[i].m_MeshData[n].m_VertexColors[k];
 
@@ -2149,7 +2150,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
 	char fileName[MAX_PATH];
-	V_strcpy_safe( fileName, "models/" );	
+	V_strcpy_safe( fileName, "models/" );
 	V_strcat_safe( fileName, pActiveStudioHdr->pszName() );
 	Q_StripExtension( fileName, fileName );
 	V_strcat_safe( fileName, ".vvd" );
@@ -2661,11 +2662,14 @@ static void DumpLightmapLinear( const char* _dstFilename, const CUtlVector<color
 	BuildFineMipmap( _width, _height, true, _srcTexels, NULL, &linearFloats );
 	linearBuffer.SetCount( linearFloats.Count() );
 
-	for ( int i = 0; i < linearFloats.Count(); ++i ) {
+	for ( intp i = 0; i < linearFloats.Count(); ++i ) {
 		linearBuffer[i].b = RoundFloatToByte(linearFloats[i].z * 255.0f);
 		linearBuffer[i].g = RoundFloatToByte(linearFloats[i].y * 255.0f);
 		linearBuffer[i].r = RoundFloatToByte(linearFloats[i].x * 255.0f);
 	}
 	
-	TGAWriter::WriteTGAFile( _dstFilename, _width, _height, IMAGE_FORMAT_BGR888, (uint8*)(linearBuffer.Base()), _width * ImageLoader::SizeInBytes(IMAGE_FORMAT_BGR888) );
+	if (!TGAWriter::WriteTGAFile(_dstFilename, _width, _height, IMAGE_FORMAT_BGR888, (uint8*)(linearBuffer.Base()), _width * ImageLoader::SizeInBytes(IMAGE_FORMAT_BGR888)))
+	{
+		Warning( "Unable to write lightmap TGA to '%s'.\n", _dstFilename );
+	}
 }

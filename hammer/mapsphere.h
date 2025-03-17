@@ -55,7 +55,7 @@ class CMapSphere : public CMapHelper
 		virtual int SerializeMAP(std::fstream &File, BOOL bRMF) { return(0); }
 
 		virtual bool IsVisualElement(void) { return false; } // Only visible when the parent entity is selected.
-		virtual bool IsScaleable(void) { return false; } // TODO: allow for scaling the sphere by itself
+		virtual bool IsScaleable(void) const { return false; } // TODO: allow for scaling the sphere by itself
 		virtual bool IsClutter(void) { return true; }
 		virtual bool IsCulledByCordon(const Vector &vecMins, const Vector &vecMaxs) { return false; } // We don't hide unless our parent hides.
 

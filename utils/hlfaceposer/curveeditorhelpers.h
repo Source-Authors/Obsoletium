@@ -63,20 +63,20 @@ int CCurveEditorHelper<T>::GetBestCurveTypeForSelectedSamples( bool reflect )
 	CUtlVector< T * > workList;
 	GetOuter()->GetWorkList( reflect, workList );
 
-	for ( int w = 0; w < workList.Count(); ++w )
+	for ( intp w = 0; w < workList.Count(); ++w )
 	{
-		int numSamples = workList[ w ]->NumSamples();
+		intp numSamples = workList[ w ]->NumSamples();
 		if ( !numSamples )
 			continue;
 
-		for ( int i = numSamples - 1; i >= 0 ; i-- )
+		for ( intp i = numSamples - 1; i >= 0 ; i-- )
 		{
 			CExpressionSample *sample = workList[ w ]->GetSample( i );
 			if ( !sample->selected )
 				continue;
 
 			int curveType = sample->GetCurveType();
-			int idx = counts.Find( curveType );
+			unsigned short idx = counts.Find( curveType );
 			if ( idx == counts.InvalidIndex() )
 			{
 				idx = counts.Insert( curveType, 0 );
@@ -89,7 +89,7 @@ int CCurveEditorHelper<T>::GetBestCurveTypeForSelectedSamples( bool reflect )
 	int maxType = CURVE_DEFAULT;
 	int maxCount = -1;
 
-	for ( int i = counts.FirstInorder(); i != counts.InvalidIndex(); i = counts.NextInorder( i ) )
+	for ( auto i = counts.FirstInorder(); i != counts.InvalidIndex(); i = counts.NextInorder( i ) )
 	{
 		if ( counts[ i ] > maxType )
 		{
@@ -109,13 +109,13 @@ int CCurveEditorHelper<T>::CountSelected( bool reflect )
 	CUtlVector< T * > workList;
 	GetOuter()->GetWorkList( reflect, workList );
 
-	for ( int w = 0; w < workList.Count(); ++w )
+	for ( intp w = 0; w < workList.Count(); ++w )
 	{
-		int numSamples = workList[ w ]->NumSamples();
+		intp numSamples = workList[ w ]->NumSamples();
 		if ( !numSamples )
 			continue;
 
-		for ( int i = 0 ; i < numSamples; ++i )
+		for ( intp i = 0 ; i < numSamples; ++i )
 		{
 			CExpressionSample *sample = workList[ w ]->GetSample( i );
 			if ( !sample || !sample->selected )
@@ -182,11 +182,11 @@ void CCurveEditorHelper<T>::SetCurveTypeForSelectedSamples( bool reflect, int cu
 	CUtlVector< T * > workList;
 	GetOuter()->GetWorkList( reflect, workList );
 
-	for ( int w = 0; w < workList.Count(); ++w )
+	for ( intp w = 0; w < workList.Count(); ++w )
 	{
-		int numSamples = workList[ w ]->NumSamples();
+		intp numSamples = workList[ w ]->NumSamples();
 
-		for ( int i = 0 ; i < numSamples; ++i )
+		for ( intp i = 0 ; i < numSamples; ++i )
 		{
 			CExpressionSample *sample = workList[ w ]->GetSample( i );
 			if ( !sample->selected )
@@ -221,13 +221,13 @@ void CCurveEditorHelper<T>::ToggleHoldTypeForSelectedSamples( bool reflect )
 	CUtlVector< T * > workList;
 	GetOuter()->GetWorkList( reflect, workList );
 
-	for ( int w = 0; w < workList.Count(); ++w )
+	for ( intp w = 0; w < workList.Count(); ++w )
 	{
-		int numSamples = workList[ w ]->NumSamples();
+		intp numSamples = workList[ w ]->NumSamples();
 
 		int newValue = -1;
 
-		for ( int i = 0 ; i < numSamples; ++i )
+		for ( intp i = 0 ; i < numSamples; ++i )
 		{
 			CExpressionSample *sample = workList[ w ]->GetSample( i );
 			if ( !sample->selected )

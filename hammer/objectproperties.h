@@ -14,6 +14,7 @@
 #include "ObjectPage.h"
 #include "OP_Groups.h"
 #include "AnchorMgr.h"
+#include "windows/base_property_sheet.h"
 
 
 class COP_Entity;
@@ -46,7 +47,7 @@ class editCEditGameClass : public CObject, public CEditGameClass
 };
 
 
-class CObjectProperties : public CPropertySheet
+class CObjectProperties : public CBasePropertySheet
 {
 	DECLARE_DYNAMIC(CObjectProperties)
 
@@ -132,7 +133,7 @@ protected:
 	HICON m_hIconInputGood;
 	HICON m_hIconInputBad;
 
-	CPropertyPage *m_pDummy;		// 
+	CBasePropertyPage *m_pDummy;  // 
 	bool m_bDummy;					// 
 
 	CMapObjectList			m_DstObjects;	// list of objects we work on

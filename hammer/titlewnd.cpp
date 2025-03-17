@@ -21,6 +21,8 @@ CFont CTitleWnd::m_FontActive;
 
 
 BEGIN_MESSAGE_MAP(CTitleWnd, CBaseWnd)
+	ON_WM_CREATE()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	ON_WM_PAINT()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_LBUTTONDOWN()
@@ -61,19 +63,10 @@ CTitleWnd *CTitleWnd::CreateTitleWnd(CWnd *pwndParent, UINT uID)
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Constructor. Creates fonts the first time it is called.
+// Purpose: Constructor.
 //-----------------------------------------------------------------------------
 CTitleWnd::CTitleWnd(void)
 {
-	if (!m_FontNormal.m_hObject)
-	{
-		//
-		// Create two fonts, a normal one and a bold one for when we are active.
-		//
-		m_FontNormal.CreateFont(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "MS Sans Serif");
-		m_FontActive.CreateFont(16, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "MS Sans Serif");
-	}
-
 	m_bMenuOpen = false;
 	m_bMouseOver = false;
 	m_szTitle[0] = '\0';
@@ -133,7 +126,8 @@ void CTitleWnd::OnMouseMove(UINT nFlags, CPoint point)
 		Track.cbSize = sizeof(Track);
 		Track.dwFlags = TME_HOVER | TME_LEAVE;
 		Track.hwndTrack = m_hWnd;
-		Track.dwHoverTime = 0.1;
+		// dimhotepus: Use default system hover timeout instead of 0.
+		Track.dwHoverTime = HOVER_DEFAULT;
 
 		_TrackMouseEvent(&Track);
 
@@ -144,6 +138,45 @@ void CTitleWnd::OnMouseMove(UINT nFlags, CPoint point)
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Recreates DPI dependent resources.
+//-----------------------------------------------------------------------------
+void CTitleWnd::CreateDpiDependentResources()
+{
+	const int height = m_dpi_behavior.ScaleOnY(16);
+
+	//
+	// Create two fonts, a normal one and a bold one for when we are active.
+	//
+	m_FontNormal.CreateFont(height, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+	m_FontActive.CreateFont(height, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Creates the title window. Creates fonts the first time it is called.
+//-----------------------------------------------------------------------------
+int CTitleWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	const int rc{__super::OnCreate(lpCreateStruct)};
+	if (!rc && !m_FontNormal.m_hObject)
+	{
+		CreateDpiDependentResources();
+	}
+	return rc;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: On DPI changed handling.
+//-----------------------------------------------------------------------------
+LRESULT CTitleWnd::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	const LRESULT rc{__super::OnDpiChanged(wParam, lParam)};
+	if (!rc)
+	{
+		CreateDpiDependentResources();
+	}
+	return rc;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Renders the title window. A special font is used if the mouse is

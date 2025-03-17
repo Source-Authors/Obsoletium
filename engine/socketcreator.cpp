@@ -172,8 +172,8 @@ void CSocketCreator::ProcessAccept()
 	}
 
 	netadr_t adr;
-	adr.SetFromSockadr( &sa );
-	if ( m_pListener && !m_pListener->ShouldAcceptSocket( newSocket, adr ) )
+	if ( m_pListener &&
+		 ( !adr.SetFromSockadr( &sa ) || !m_pListener->ShouldAcceptSocket( newSocket, adr ) ) )
 	{
 		closesocket( newSocket );
 		return;

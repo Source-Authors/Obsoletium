@@ -1,24 +1,13 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef STUDIOMDL_H
-#define STUDIOMDL_H
+#ifndef SE_UTILS_STUDIOMDL_STUDIOMDL_H_
+#define SE_UTILS_STUDIOMDL_STUDIOMDL_H_
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
-#include <stdio.h>
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlsymbol.h"
 #include "tier1/utlstring.h"
+
 #include "mathlib/vector.h"
 #include "studio.h"
 #include "datamodel/dmelementhandle.h"
@@ -33,10 +22,8 @@ struct s_combinationcontrol_t;
 class CDmeVertexDeltaData;
 class CDmeCombinationOperator;
 
-#define IDSTUDIOHEADER			(('T'<<24)+('S'<<16)+('D'<<8)+'I')
-														// little-endian "IDST"
-#define IDSTUDIOANIMGROUPHEADER	(('G'<<24)+('A'<<16)+('D'<<8)+'I')
-														// little-endian "IDAG"
+constexpr inline int IDSTUDIOHEADER = MAKEID('I', 'D', 'S', 'T');  // little-endian "IDST"
+constexpr inline int IDSTUDIOANIMGROUPHEADER = MAKEID('I', 'D', 'A', 'G');  // little-endian "IDAG"
 
 
 #define STUDIO_QUADRATIC_MOTION 0x00002000
@@ -62,7 +49,6 @@ class CDmeCombinationOperator;
 #endif
 
 EXTERN	char		outname[MAX_PATH];
-//EXTERN	char		g_pPlatformName[1024];
 EXTERN  qboolean	cdset;
 EXTERN  int			numdirs;
 EXTERN	char		cddir[32][MAX_PATH];
@@ -109,13 +95,11 @@ EXTERN  byte		g_constdirectionalightdot;
 
 // Methods associated with the key value text block
 extern CUtlVector< char >	g_KeyValueText;
-int		KeyValueTextSize( CUtlVector< char > *pKeyValue );
+intp		KeyValueTextSize( CUtlVector< char > *pKeyValue );
 const char *KeyValueText( CUtlVector< char > *pKeyValue );
 
-extern vec_t Q_rint (vec_t in);
-
 extern void WriteModelFiles(void);
-void *kalloc( int num, int size );
+void *kalloc( intp num, intp size );
 
 // --------------------------------------------------------------------
 
@@ -124,11 +108,11 @@ class CUtlVectorAuto : public CUtlVector< T >
 {
 	// typedef CUtlVectorAuto< T, CUtlVector<T > > BaseClass;
 public:
-	T& operator[]( int i );
+	T& operator[]( intp i );
 };
 
 template< typename T >
-inline T& CUtlVectorAuto<T>::operator[]( int i )
+inline T& CUtlVectorAuto<T>::operator[]( intp i )
 {
 	EnsureCount( i + 1 );
 	Assert( IsValidIndex(i) );
@@ -694,6 +678,10 @@ struct s_autolayer_t
 	float			end;
 };
 
+struct s_activitymodifier_t
+{
+	char			name[MAXSTUDIONAME];
+};
 
 class s_sequence_t
 {
@@ -754,6 +742,9 @@ public:
 	int				numiklocks;
 
 	int				cycleposeindex;
+
+	s_activitymodifier_t activitymodifier[64];
+	int				numactivitymodifiers;
 
 	CUtlVector< char > KeyValue;
 };
@@ -1126,8 +1117,8 @@ struct s_combinationcontrol_t
 struct s_combinationrule_t
 {
 	// The 'ints' here are indices into the m_Controls array
-	CUtlVector< int > m_Combination;
-	CUtlVector< CUtlVector< int > > m_Dominators;
+	CUtlVector< UtlHashFastHandle_t > m_Combination;
+	CUtlVector< CUtlVector< UtlHashFastHandle_t > > m_Dominators;
 
 	// The index into the flexkeys to put the result in
 	// (should affect both left + right if the key is sided)
@@ -1308,7 +1299,13 @@ struct s_bonesaveframe_t
 EXTERN CUtlVector< s_bonesaveframe_t > g_bonesaveframe;
 
 int OpenGlobalFile( char *src );
-bool GetGlobalFilePath( const char *pSrc, char *pFullPath, int nMaxLen );
+bool GetGlobalFilePath( const char *pSrc, char *pFullPath, intp nMaxLen );
+template<intp fullPathSize>
+bool GetGlobalFilePath( const char *pSrc, char (&pFullPath)[fullPathSize] )
+{
+	return GetGlobalFilePath( pSrc, pFullPath, fullPathSize );
+}
+
 s_source_t *Load_Source( char const *filename, const char *ext, bool reverse = false, bool isActiveModel = false );
 int Load_VRM( s_source_t *psource );
 int Load_SMD( s_source_t *psource );
@@ -1355,7 +1352,7 @@ void scale_vertex( Vector &org );
 void clip_rotations( RadianEuler& rot );
 void clip_rotations( Vector& rot );
 
-void *kalloc( int num, int size );
+void *kalloc( intp num, intp size );
 void kmemset( void *ptr, int value, int size );
 char *stristr( const char *string, const char *string2 );
 
@@ -1454,21 +1451,13 @@ class CLodScriptReplacement_t
 public:
 	void SetSrcName( const char *pSrcName )
 	{
-		if( m_pSrcName )
-		{
-			delete [] m_pSrcName;
-		}
-		m_pSrcName = new char[strlen( pSrcName ) + 1];
-		strcpy( m_pSrcName, pSrcName );
+		delete [] m_pSrcName;
+		m_pSrcName = V_strdup( pSrcName );
 	}
 	void SetDstName( const char *pDstName )
 	{
-		if( m_pDstName )
-		{
-			delete [] m_pDstName;
-		}
-		m_pDstName = new char[strlen( pDstName ) + 1];
-		strcpy( m_pDstName, pDstName );
+		delete [] m_pDstName;
+		m_pDstName = V_strdup( pDstName );
 	}
 
 	const char *GetSrcName( void ) const 
@@ -1558,9 +1547,8 @@ extern bool g_bVerifyOnly;
 extern bool g_bUseBoneInBBox;
 extern bool g_bLockBoneLengths;
 extern bool g_bOverridePreDefinedBones;
-extern bool g_bX360;
-extern int g_minLod;
-extern int g_numAllowedRootLODs;
+extern intp g_minLod;
+extern intp g_numAllowedRootLODs;
 extern bool g_bBuildPreview;
 extern bool g_bCenterBonesOnVerts;
 extern float g_flDefaultMotionRollback;
@@ -1580,7 +1568,7 @@ extern DmElementHandle_t g_hDmeBoneFlexDriverList;
 
 // the first time these are called, the name of the model/QC file is printed so that when 
 // running in batch mode, no echo, when dumping to a file, it can be determined which file is broke.
-void MdlError( PRINTF_FORMAT_STRING char const *pMsg, ... );
+[[noreturn]] void MdlError( PRINTF_FORMAT_STRING char const *pMsg, ... );
 void MdlWarning( PRINTF_FORMAT_STRING char const *pMsg, ... );
 
 void CreateMakefile_AddDependency( const char *pFileName );
@@ -1588,15 +1576,15 @@ void EnsureDependencyFileCheckedIn( const char *pFileName );
 
 bool ComparePath( const char *a, const char *b );
 
-byte IsByte( int val );
-char IsChar( int val );
-int IsInt24( int val );
-short IsShort( int val );
-unsigned short IsUShort( int val );
+[[nodiscard]] byte IsByte( int val );
+[[nodiscard]] char IsChar( intp val );
+[[nodiscard]] int IsInt24( int val );
+[[nodiscard]] short IsShort( int val );
+[[nodiscard]] unsigned short IsUShort( int val );
 
 
 extern CCheckUVCmd g_StudioMdlCheckUVCmd;
 
 
-#endif // STUDIOMDL_H
+#endif  // !SE_UTILS_STUDIOMDL_STUDIOMDL_H_
 

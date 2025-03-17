@@ -146,6 +146,7 @@ private:
     virtual void        ReleaseFullScreen( void );
     virtual void        ChangeDisplaySettingsToFullscreen( int nWidth, int nHeight, int nBPP );
     void        ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format ) override;
+    void        AdjustWindow() override;
 
     // PFM screenshot methods
     ITexture *GetBuildCubemaps16BitTexture( void );
@@ -1582,6 +1583,11 @@ void CVideoMode_Common::ReadScreenPixels( int x, int y, int w, int h, void *pBuf
 {
     intp nBytes = ImageLoader::GetMemRequired( w, h, 1, format, false );
     memset( pBuffer, 0, nBytes );
+}
+
+void CVideoMode_Common::AdjustWindow()
+{
+    AdjustWindow( GetModeWidth(), GetModeHeight(), GetModeBPP(), IsWindowedMode(), IsBorderlessMode() );
 }
 
 //-----------------------------------------------------------------------------

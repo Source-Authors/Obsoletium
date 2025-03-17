@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "Options.h"
+
 #include "hammer.h"
 #include "MainFrm.h"
 #include "mapdoc.h"
@@ -14,7 +15,6 @@
 #include "GlobalFunctions.h"
 #include "CustomMessages.h"
 #include "OptionProperties.h"
-#include <process.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -122,7 +122,7 @@ int COptionsConfigs::ImportOldGameConfigs(const char *pszFileName)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, pszFileName, szRootDir );
+	V_MakeAbsolutePath( szFullPath, pszFileName, szRootDir );
 	std::fstream file( szFullPath, std::ios::in | std::ios::binary );
 	if (file.is_open())
 	{
@@ -247,12 +247,12 @@ int COptionsConfigs::LoadGameConfigs()
 		char szRootDir[MAX_PATH];
 		char szFullPath[MAX_PATH];
 		APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-		Q_MakeAbsolutePath( szFullPath, MAX_PATH, "GameCfg.wc", szRootDir );
+		V_MakeAbsolutePath( szFullPath, "GameCfg.wc", szRootDir );
 		remove( szFullPath );
 		char szSaveName[MAX_PATH];
 		V_strcpy_safe(szSaveName, m_strConfigDir);
-		Q_AppendSlash(szSaveName, sizeof(szSaveName));
-		Q_strcat(szSaveName, "GameCfg.ini", sizeof(szSaveName));
+		V_AppendSlash(szSaveName);
+		V_strcat_safe(szSaveName, "GameCfg.ini");
 		SaveGameConfigs();
 		return(nConfigsRead);
 	}
@@ -297,7 +297,8 @@ void COptionsConfigs::SaveGameConfigs()
 	// For each Hammer known configuation, update the values in the global configs
 	for ( int i = 0; i < nConfigs; i++ )
 	{
-		KeyValues *pConfig = pGame->FindKey(Configs.GetAt(i)->szName);
+		CGameConfig *config = Configs.GetAt(i);
+		KeyValues *pConfig = pGame->FindKey(config->szName);
 		
 		// Add the configuration if it wasn't found
 		if ( pConfig == NULL )
@@ -311,7 +312,7 @@ void COptionsConfigs::SaveGameConfigs()
 		}
 
 		// Update the changes
-		Configs.GetAt(i)->Save(pConfig);
+		config->Save(pConfig);
 	}
 
 	// For each global configuration, remove any configs Hammer has deleted
@@ -352,9 +353,7 @@ void COptionsConfigs::SaveGameConfigs()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-COptions::COptions(void)
-{
-}
+COptions::COptions(void) = default;
 
 
 //-----------------------------------------------------------------------------
@@ -601,9 +600,18 @@ bool COptions::Read(void)
 		return false;
 	}
 
-	DWORD dwTime = APP()->GetProfileInt("Configured", "Installed", time(NULL));
-	CTimeSpan ts(time(NULL) - dwTime);
-	uDaysSinceInstalled = ts.GetDays();
+	{
+		time_t *installed_time = nullptr;
+		if ( UINT installed_size = 0; APP()->GetProfileBinary("Configured", "Installed",
+				reinterpret_cast<BYTE**>(&installed_time), &installed_size) &&
+			installed_size == sizeof(*installed_time) )
+		{
+			const CTimeSpan ts(time(nullptr) - *installed_time);
+			uDaysSinceInstalled = ts.GetDays();
+		}
+		
+		delete [] (BYTE*)installed_time;
+	}
 
 	int i, iSize;
 	CString str;
@@ -634,7 +642,7 @@ bool COptions::Read(void)
 	{
 		// SetDefaults() added 'textures.wad' to the list
 	}
-	textures.fBrightness = float(APP()->GetProfileInt(pszGeneral, "Brightness", 10)) / 10.0;
+	textures.fBrightness = float(APP()->GetProfileInt(pszGeneral, "Brightness", 10)) / 10.0f;
 
 	// load general info
 	general.nMaxCameras = APP()->GetProfileInt(pszGeneral, "Max Cameras", 100);
@@ -703,7 +711,8 @@ bool COptions::Read(void)
 	view3d.nTimeToMaxSpeed = APP()->GetProfileInt(pszView3D, "TimeToMaxSpeed", 500);
 	view3d.bFilterTextures = APP()->GetProfileInt(pszView3D, "FilterTextures", TRUE);
 	view3d.bReverseSelection = APP()->GetProfileInt(pszView3D, "ReverseSelection", FALSE);
-	view3d.fFOV = 90;
+	// dimhotepus: 90 -> 105
+	view3d.fFOV = 105;
 	view3d.fLightConeLength = 10;
 		
 	ReadColorSettings();
@@ -737,7 +746,7 @@ bool COptions::RunConfigurationDialog()
 {
 	CString strText;
 	strText.LoadString(IDS_NO_CONFIGS_AVAILABLE);
-	if (MessageBox(NULL, strText, "First Time Setup", MB_ICONQUESTION | MB_YESNO) == IDYES)
+	if (MessageBox(NULL, strText, "Hammer - First Time Setup", MB_ICONQUESTION | MB_YESNO) == IDYES)
 	{
 		APP()->OpenURL(ID_HELP_FIRST_TIME_SETUP, GetMainWnd()->GetSafeHwnd());
 	}
@@ -753,7 +762,7 @@ bool COptions::RunConfigurationDialog()
 
 		if (configs.nConfigs == 0)
 		{
-			MessageBox(NULL, "You must create at least one game configuration before using Hammer.", "First Time Setup", MB_ICONEXCLAMATION | MB_OK);
+			MessageBox(NULL, "You must create at least one game configuration before using Hammer.", "Hammer - First Time Setup", MB_ICONEXCLAMATION | MB_OK);
 		}
 
 	} while (configs.nConfigs == 0);
@@ -958,9 +967,21 @@ void COptions::SetDefaults(void)
 		bWrite = TRUE;
 	}
 
-	if (APP()->GetProfileInt("Configured", "Installed", 42151) == 42151)
 	{
-		APP()->WriteProfileInt("Configured", "Installed", time(NULL));
+		time_t *installed_time = nullptr;
+		if ( UINT installed_size = 0; !APP()->GetProfileBinary("Configured", "Installed",
+				reinterpret_cast<BYTE**>(&installed_time), &installed_size) ||
+			installed_size != sizeof(*installed_time))
+		{
+			time_t new_installed_time = time(nullptr);
+			APP()->WriteProfileBinary("Configured", "Installed",
+				reinterpret_cast<BYTE *>(&new_installed_time), sizeof(new_installed_time));
+		}
+		else
+		{
+			delete[] (BYTE*)installed_time;
+			installed_time = nullptr;
+		}
 	}
 
 	uDaysSinceInstalled = 0;

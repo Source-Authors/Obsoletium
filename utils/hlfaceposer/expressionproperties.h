@@ -22,6 +22,6 @@ struct CExpressionParams : public CBaseDialogParams
 	char			m_szDescription[ 256 ];
 };
 
-int ExpressionProperties( CExpressionParams *params );
+intp ExpressionProperties( CExpressionParams *params );
 
 #endif // EXPRESSIONPROPERTIES_H

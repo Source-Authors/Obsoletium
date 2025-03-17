@@ -621,20 +621,20 @@ void Morph3D::SelectHandle(MORPHHANDLE *pInfo, UINT cmd)
 
 		return;	// nothing else to do here
 	}
+
+	// dimhotepus: If no info, can't continue.
+	if (!pInfo) return;
 	
 	SSHANDLEINFO hi;
 	// dimhotepus: Check info is present.
-	if (pInfo && !pInfo->pStrucSolid->GetHandleInfo(&hi, pInfo->ssh))
+	if (!pInfo->pStrucSolid->GetHandleInfo(&hi, pInfo->ssh))
 	{
 		// Can't find the handle info, bail.
 		DeselectHandle(pInfo);
 		return;
 	}
 
-	// dimhotepus: If no info, can't continue.
-	if (!pInfo) return;
-
-	if(hi.Type != m_SelectedType)
+	if (hi.Type != m_SelectedType)
 		SelectHandle(NULL, scClear);	// clear selection first
 
 	m_SelectedType = hi.Type;
@@ -1715,7 +1715,7 @@ bool Morph3D::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &vPoi
 	//
 	char szBuf[128];
 	m_pDocument->Snap(vecWorld,uConstraints);
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert] );
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert] );
 	SetStatusText(SBI_COORDS, szBuf);
 
 	if ( m_bMouseDown[MOUSE_LEFT] )

@@ -208,7 +208,8 @@ public:
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
 	//-----------------------------------------------------
-	virtual void AddFunctor( CFunctor *pFunctor, CJob **ppJob = NULL, const char *pszDescription = NULL, unsigned flags = 0 ) { AddFunctorInternal( RetAddRef( pFunctor ), ppJob, pszDescription, flags ); }
+	// dimhotepus: flags unsigned -> unsigned char
+	virtual void AddFunctor( CFunctor *pFunctor, CJob **ppJob = NULL, const char *pszDescription = NULL, unsigned char flags = 0 ) { AddFunctorInternal( RetAddRef( pFunctor ), ppJob, pszDescription, flags ); }
 
 	//-----------------------------------------------------
 	// Change the priority of an active job
@@ -414,7 +415,8 @@ public:
 	#undef DEFINE_REF_COUNTING_CONST_MEMBER_QUEUE_CALL
 
 private:
-	virtual void AddFunctorInternal( CFunctor *, CJob ** = NULL, const char *pszDescription = NULL, unsigned flags = 0 ) = 0;
+	// dimhotepus: flags unsigned -> unsigned char
+	virtual void AddFunctorInternal( CFunctor *, CJob ** = NULL, const char *pszDescription = NULL, unsigned char flags = 0 ) = 0;
 
 	//-----------------------------------------------------
 	// Services for internal use by job instances

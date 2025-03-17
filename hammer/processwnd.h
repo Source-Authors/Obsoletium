@@ -9,6 +9,8 @@
 //
 
 #include "windows/base_wnd.h"
+#include "windows/dpi_aware_font.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CProcessWnd window
 
@@ -25,7 +27,7 @@ public:
 	UINT uBufLen;
 
 	CEdit Edit;
-	CFont Font;
+	DpiAwareFont *pFont;
 
 // Operations
 public:
@@ -34,7 +36,7 @@ public:
 
 	void Clear();
 	void Append(CString str);
-	void GetReady();
+	DpiAwareFont* CreateFont();
 	void GetReady(LPCTSTR pszDocName);
 
 // Overrides
@@ -55,10 +57,10 @@ protected:
 	CButton m_btnCopyAll;
 
 	//{{AFX_MSG(CProcessWnd)
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnCopyAll();
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

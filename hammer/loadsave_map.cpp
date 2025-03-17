@@ -69,18 +69,12 @@ static void StuffLine(char * buf)
 	bStuffed = TRUE;
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : file - 
-//			buf - 
-//-----------------------------------------------------------------------------
-static void GetLine(std::fstream& file, char *buf)
+static void GetLine(std::fstream& file, char *buf, intp bufferSize)
 {
 	if(bStuffed)
 	{
 		if(buf)
-			strcpy(buf, szStuffed);
+			V_strncpy(buf, szStuffed, bufferSize);
 		bStuffed = FALSE;
 		return;
 	}
@@ -90,7 +84,7 @@ static void GetLine(std::fstream& file, char *buf)
 	while(1)
 	{
 		file >> std::ws;
-		file.getline(szBuf, 512);
+		file.getline(szBuf, std::size(szBuf));
 		if(file.eof())
 			return;
 		if(!strncmp(szBuf, "//", 2))
@@ -102,10 +96,22 @@ static void GetLine(std::fstream& file, char *buf)
 //			if(p) p[0] = 0;
 //			p = strchr(szBuf, '\r');
 //			if(p) p[0] = 0;
-			strcpy(buf, szBuf);
+			V_strncpy(buf, szBuf, bufferSize);
 		}
 		return;
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : file - 
+//			buf - 
+//-----------------------------------------------------------------------------
+template<intp bufferSize>
+static void GetLine(std::fstream& file, char (&buf)[bufferSize])
+{
+	GetLine( file, buf, bufferSize );
 }
 
 
@@ -388,7 +394,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			Fix();
 		}
 
-		sprintf(szBuf,
+		V_sprintf_safe(szBuf,
 			"( %.0f %.0f %.0f ) ( %.0f %.0f %.0f ) ( %.0f %.0f %.0f ) "
 			"%s "
 			"[ %g %g %g %g ] "
@@ -606,7 +612,7 @@ int MDkeyvalue::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 	if(fIsStoring)
 	{
 		// save a keyvalue
-		sprintf( szBuf,
+		V_sprintf_safe( szBuf,
 			"\"%s\" \"%s\"",
 
 			Key(), Value() );
@@ -665,8 +671,8 @@ int CMapSolid::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		file << "{" << ENDLINE;
 
 		// serialize the Faces
-		int nFaces = Faces.GetCount();
-		for(int i = 0; i < nFaces; i++)
+		short nFaces = Faces.GetCount();
+		for(short i = 0; i < nFaces; i++)
 		{
 			if(!Faces[i].Points)
 				continue;
@@ -695,7 +701,7 @@ int CMapSolid::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			Faces[i].CalcPlane();
 		}
 
-		GetLine(file, NULL);	// ignore line
+		GetLine(file, nullptr, 0);	// ignore line
 
 		if (!file.fail())
 		{
@@ -777,7 +783,7 @@ int CMapEntity::SerializeMAP(std::fstream &file, BOOL fIsStoring)
 
 			Vector Origin;
 			GetOrigin(Origin);
-			sprintf(tmpkv.szValue, "%.0f %.0f %.0f", Origin[0], Origin[1], Origin[2]);
+			V_sprintf_safe(tmpkv.szValue, "%.0f %.0f %.0f", Origin[0], Origin[1], Origin[2]);
 			tmpkv.SerializeMAP(file, fIsStoring);
 		}
 
@@ -800,7 +806,7 @@ int CMapEntity::SerializeMAP(std::fstream &file, BOOL fIsStoring)
 		}
 
 		// skip delimiter
-		GetLine(file, NULL);
+		GetLine(file, nullptr, 0);
 	}
 
 	return file.fail() ? fileOsError : fileOk;
@@ -894,15 +900,15 @@ int CEditGameClass::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			//
 			// For each variable from the base class...
 			//
-			int nVariableCount = pGameDataClass->GetVariableCount();
-			for (int i = 0; i < nVariableCount; i++)
+			intp nVariableCount = pGameDataClass->GetVariableCount();
+			for (intp i = 0; i < nVariableCount; i++)
 			{
 				GDinputvariable *pVar = pGameDataClass->GetVariableAt(i);
 				Assert(pVar != NULL);
 
 				if (pVar != NULL)
 				{
-					int iIndex;
+					intp iIndex;
 					MDkeyvalue *pKey;
 					LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 
@@ -1083,7 +1089,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		m_Render2DBox.ResetBounds();
 
 		// load world
-		GetLine(file, NULL);	// ignore delimiter
+		GetLine(file, nullptr, 0);	// ignore delimiter
 		CEditGameClass::SerializeMAP(file, fIsStoring);
 
 		const char* pszMapVersion;
@@ -1105,7 +1111,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		}
 
 		// skip end-of-entity marker
-		GetLine(file, NULL);
+		GetLine(file, nullptr, 0);
 
 		char szBuf[128];
 

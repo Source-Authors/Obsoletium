@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "hlfaceposer.h"
 #include "faceposertoolwindow.h"
+#include "hlfaceposer.h"
 #include "utlvector.h"
 #include "tier1/strtools.h"
 #include "MDLViewer.h"
@@ -222,7 +222,7 @@ void IFacePoserToolWindow::LoadPosition( void )
 
 	if ( w == 0 || h == 0 )
 	{
-		int idx = g_Tools.Find( this );
+		intp idx = g_Tools.Find( this );
 		Assert( idx != g_Tools.InvalidIndex() );
 		if ( idx == 0 )
 		{
@@ -234,10 +234,10 @@ void IFacePoserToolWindow::LoadPosition( void )
 		visible = true;
 
 		// Just do a simple tiling
-		w = g_MDLViewer->w2() * 0.5;
-		h = g_MDLViewer->h2() * 0.5;
+		w = g_MDLViewer->w2() / 2;
+		h = g_MDLViewer->h2() / 2;
 
-		x = g_MDLViewer->w2() * 0.25f + s_nToolCount * 20;
+		x = g_MDLViewer->w2() / 4 + s_nToolCount * 20;
 		y = s_nToolCount * 20;
 
 		bool translated = TranslateToolPos
@@ -294,12 +294,12 @@ void IFacePoserToolWindow::SavePosition( void )
 	FacePoser_SaveWindowPositions( GetToolName(), visible, xpos, ypos, width, height, IsLocked(), false );
 }
 	
-int IFacePoserToolWindow::GetToolCount( void )
+intp IFacePoserToolWindow::GetToolCount( void )
 {
 	return g_Tools.Count();
 }
 
-IFacePoserToolWindow *IFacePoserToolWindow::GetTool( int index )
+IFacePoserToolWindow *IFacePoserToolWindow::GetTool( intp index )
 {
 	return g_Tools[ index ];
 }
@@ -309,8 +309,8 @@ IFacePoserToolWindow *IFacePoserToolWindow::GetTool( int index )
 //-----------------------------------------------------------------------------
 void IFacePoserToolWindow::InitTools( void )
 {
-	int c = GetToolCount();
-	int i;
+	intp c = GetToolCount();
+	intp i;
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = GetTool( i );
@@ -322,8 +322,8 @@ void IFacePoserToolWindow::InitTools( void )
 
 void IFacePoserToolWindow::ShutdownTools( void )
 {
-	int c = GetToolCount();
-	int i;
+	intp c = GetToolCount();
+	intp i;
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = GetTool( i );
@@ -337,8 +337,8 @@ void IFacePoserToolWindow::ShutdownTools( void )
 //-----------------------------------------------------------------------------
 void IFacePoserToolWindow::ToolThink( float dt )
 {
-	int c = GetToolCount();
-	int i;
+	intp c = GetToolCount();
+	intp i;
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = GetTool( i );
@@ -650,8 +650,8 @@ bool IFacePoserToolWindow::IsActiveTool( void )
 //-----------------------------------------------------------------------------
 bool IFacePoserToolWindow::IsAnyToolScrubbing( void )
 {
-	int c = GetToolCount();
-	int i;
+	intp c = GetToolCount();
+	intp i;
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = GetTool( i );
@@ -668,8 +668,8 @@ bool IFacePoserToolWindow::IsAnyToolScrubbing( void )
 //-----------------------------------------------------------------------------
 bool IFacePoserToolWindow::IsAnyToolProcessing( void )
 {
-	int c = GetToolCount();
-	int i;
+	intp c = GetToolCount();
+	intp i;
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = GetTool( i );
@@ -701,8 +701,8 @@ void IFacePoserToolWindow::EnableToolRedraw( bool enabled )
 
 	if ( s_bToolsCanDraw )
 	{
-		int c = s_NeedRedraw.Count();
-		int i;
+		intp c = s_NeedRedraw.Count();
+		intp i;
 		for ( i = 0; i < c; i++ )
 		{
 			IFacePoserToolWindow *tool = s_NeedRedraw[ i ];
@@ -734,8 +734,8 @@ void IFacePoserToolWindow::OnModelChanged()
 
 void IFacePoserToolWindow::ModelChanged()
 {
-	int c = GetToolCount();
-	int i;
+	intp c = GetToolCount();
+	intp i;
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = GetTool( i );

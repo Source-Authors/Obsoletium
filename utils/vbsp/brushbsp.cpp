@@ -10,9 +10,9 @@
 #include "bspflags.h"
 
 
-int		c_nodes;
-int		c_nonvis;
-int		c_active_brushes;
+std::atomic_int	c_nodes;
+static std::atomic_int	c_nonvis;
+static std::atomic_int	c_active_brushes;
 
 // if a brush just barely pokes onto the other side,
 // let it slide by without chopping
@@ -339,8 +339,9 @@ bspbrush_t *AllocBrush (int numsides)
 	if (!bb) Error("BSP brush allocation failure.\n");
 
 	bb->id = s_BrushId++;
-	if (numthreads == 1)
-		c_active_brushes++;
+
+	c_active_brushes.fetch_add(1, std::memory_order::memory_order_relaxed);
+
 	return bb;
 }
 
@@ -351,14 +352,12 @@ FreeBrush
 */
 void FreeBrush (bspbrush_t *brushes)
 {
-	int			i;
-
-	for (i=0 ; i<brushes->numsides ; i++)
+	for (int i=0 ; i<brushes->numsides ; i++)
 		if (brushes->sides[i].winding)
 			FreeWinding(brushes->sides[i].winding);
 	free (brushes);
-	if (numthreads == 1)
-		c_active_brushes--;
+	
+	c_active_brushes.fetch_sub(1, std::memory_order::memory_order_relaxed);
 }
 
 
@@ -973,8 +972,7 @@ side_t *SelectSplitSide (bspbrush_t *brushes, node_t *node)
 		{
 			if (pass > 0)
 			{
-				if (numthreads == 1)
-					c_nonvis++;
+				c_nonvis.fetch_add(1, std::memory_order::memory_order_relaxed);
 			}
 			break;
 		}
@@ -1235,13 +1233,13 @@ void SplitBrush( bspbrush_t *brush, int planenum, bspbrush_t **front, bspbrush_t
 {
 	vec_t	v1;
 
-	for (int i=0 ; i<2 ; i++)
+	for (int k=0 ; k<2 ; k++)
 	{
-		v1 = BrushVolume (b[i]);
+		v1 = BrushVolume (b[k]);
 		if (v1 < 1.0)
 		{
-			FreeBrush (b[i]);
-			b[i] = NULL;
+			FreeBrush (b[k]);
+			b[k] = NULL;
 //			qprintf ("tiny volume after clip\n");
 		}
 	}
@@ -1333,8 +1331,7 @@ node_t *BuildTree_r (node_t *node, bspbrush_t *brushes)
 	int			i;
 	bspbrush_t	*children[2];
 
-	if (numthreads == 1)
-		c_nodes++;
+	c_nodes.fetch_add(1, std::memory_order::memory_order_relaxed);
 
 	// find the best plane to use as a splitter
 	bestside = SelectSplitSide (brushes, node);
@@ -1434,8 +1431,8 @@ tree_t *BrushBSP (bspbrush_t *brushlist, Vector& mins, Vector& maxs)
 	qprintf ("%5i visible faces\n", c_faces);
 	qprintf ("%5i nonvisible faces\n", c_nonvisfaces);
 
-	c_nodes = 0;
-	c_nonvis = 0;
+	c_nodes.store(0, std::memory_order::memory_order_release);
+	c_nonvis.store(0, std::memory_order::memory_order_release);
 	node = AllocNode ();
 
 	node->volume = BrushFromBounds (mins, maxs);
@@ -1443,9 +1440,13 @@ tree_t *BrushBSP (bspbrush_t *brushlist, Vector& mins, Vector& maxs)
 	tree->headnode = node;
 
 	node = BuildTree_r (node, brushlist);
-	qprintf ("%5i visible nodes\n", c_nodes/2 - c_nonvis);
-	qprintf ("%5i nonvis nodes\n", c_nonvis);
-	qprintf ("%5i leafs\n", (c_nodes+1)/2);
+
+	int nodes = c_nodes.load(std::memory_order::memory_order_relaxed);
+	int nonvis = c_nonvis.load(std::memory_order::memory_order_relaxed);
+
+	qprintf ("%5i visible nodes\n", nodes/2 - nonvis);
+	qprintf ("%5i nonvis nodes\n", nonvis);
+	qprintf ("%5i leafs\n", (nodes+1)/2);
 #if 0
 {	// debug code
 static node_t	*tnode;

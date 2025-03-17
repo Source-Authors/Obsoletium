@@ -40,7 +40,7 @@ void OutputWinding (winding_t *w, FileHandle_t glview)
 
 	CmdLib_FPrintf( glview, "%i\n", w->numpoints);
 	level+=28;
-	light = (level&255)/255.0;
+	light = (level&255)/255.0f;
 	for (i=0 ; i<w->numpoints ; i++)
 	{
 		CmdLib_FPrintf(glview, "%6.3f %6.3f %6.3f %6.3f %6.3f %6.3f\n",

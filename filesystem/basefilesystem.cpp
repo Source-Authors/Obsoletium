@@ -2677,7 +2677,7 @@ unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 //			*pFileName - 
 // Output : long
 //-----------------------------------------------------------------------------
-long CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileName )
+time_t CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileName )
 {
 	struct	_stat buf;
 
@@ -2686,7 +2686,7 @@ long CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileNa
 		// If we found the file:
 		if ( path->GetPackFile()->ContainsFile( pFileName ) )
 		{
-			return (path->GetPackFile()->m_lPackFileTime);
+			return path->GetPackFile()->m_lPackFileTime;
 		}
 	}
 #ifdef SUPPORT_PACKED_STORE
@@ -2848,7 +2848,12 @@ KeyValues *CBaseFileSystem::LoadKeyValues( KeyValuesPreloadType_t type, char con
 		kv = new KeyValues( filename );
 		if ( kv )
 		{
-			kv->LoadFromFile( this, filename, pPathID );
+			if ( !kv->LoadFromFile( this, filename, pPathID ) )
+			{
+				// dimhotepus: Do not return anything if load failed.
+				kv->deleteThis();
+				return nullptr;
+			}
 		}
 	}
 	else
@@ -2861,7 +2866,12 @@ KeyValues *CBaseFileSystem::LoadKeyValues( KeyValuesPreloadType_t type, char con
 			kv = new KeyValues( filename );
 			if ( kv )
 			{
-				kv->LoadFromFile( this, filename, pPathID );
+				if ( !kv->LoadFromFile( this, filename, pPathID ) )
+				{
+					// dimhotepus: Do not return anything if load failed.
+					kv->deleteThis();
+					return nullptr;
+				}
 			}
 		}
 #endif
@@ -3118,7 +3128,7 @@ bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
 
 	// dimhotepus: Double buffer size.
 	char buffer[65535];
-		while( sizeof(buffer) == Read(buffer,sizeof(buffer),f) );
+	while( sizeof(buffer) == Read(buffer,sizeof(buffer),f) );
 
 	Close( f );
 
@@ -3188,7 +3198,7 @@ char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars
 // Input  : *pFileName - 
 // Output : long
 //-----------------------------------------------------------------------------
-long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
+time_t CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 {
 	VPROF_BUDGET( "CBaseFileSystem::GetFileTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
@@ -3205,7 +3215,7 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 
 	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
 	{
-		long ft = FastFileTime( pSearchPath, tempFileName );
+		time_t ft = FastFileTime( pSearchPath, tempFileName );
 		if ( ft != 0L )
 		{
 			if ( !pSearchPath->GetPackFile() && m_LogFuncs.Count() )
@@ -3231,7 +3241,7 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 	return 0L;
 }
 
-long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
+time_t CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 {
 	VPROF_BUDGET( "CBaseFileSystem::GetPathTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
@@ -3244,10 +3254,10 @@ long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 	Q_strlower( tempFileName );
 #endif
 
-	long pathTime = 0L;
+	time_t pathTime = 0L;
 	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
 	{
-		long ft = FastFileTime( pSearchPath, tempFileName );
+		time_t ft = FastFileTime( pSearchPath, tempFileName );
 		if ( ft > pathTime )
 			pathTime = ft;
 		if ( ft != 0L )
@@ -3549,20 +3559,20 @@ void CBaseFileSystem::SetWhitelistSpewFlags( int flags )
 //			maxCharsIncludingTerminator - 
 //			fileTime - 
 //-----------------------------------------------------------------------------
-void CBaseFileSystem::FileTimeToString( char *pString, int maxCharsIncludingTerminator, long fileTime )
+void CBaseFileSystem::FileTimeToString( OUT_Z_CAP(maxCharsIncludingTerminator) char *pString, intp maxCharsIncludingTerminator, time_t fileTime )
 {
-		time_t time = fileTime;
-		V_strncpy( pString, ctime( &time ), maxCharsIncludingTerminator );
+	time_t time = fileTime;
+	V_strncpy( pString, ctime( &time ), maxCharsIncludingTerminator );
 
-		// We see a linefeed at the end of these strings...if there is one, gobble it up
-		intp len = V_strlen( pString );
-		if ( pString[ len - 1 ] == '\n' )
-		{
-			pString[ len - 1 ] = '\0';
-		}
-
-		pString[maxCharsIncludingTerminator-1] = '\0';
+	// We see a linefeed at the end of these strings...if there is one, gobble it up
+	intp len = V_strlen( pString );
+	if ( pString[ len - 1 ] == '\n' )
+	{
+		pString[ len - 1 ] = '\0';
 	}
+
+	pString[maxCharsIncludingTerminator-1] = '\0';
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

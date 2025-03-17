@@ -45,11 +45,13 @@ public:
 protected:
 
 	void DoHide();
+	void CreateDpiDependentResources(unsigned newDpiX, unsigned newDpiY);
 
 	//{{AFX_MSG(CSplashWnd)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnPaint();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()

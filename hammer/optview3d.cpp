@@ -19,10 +19,10 @@
 #include <tier0/memdbgon.h>
 
 
-IMPLEMENT_DYNCREATE(COPTView3D, CPropertyPage)
+IMPLEMENT_DYNCREATE(COPTView3D, CBasePropertyPage)
 
 
-BEGIN_MESSAGE_MAP(COPTView3D, CPropertyPage)
+BEGIN_MESSAGE_MAP(COPTView3D, CBasePropertyPage)
 	//{{AFX_MSG_MAP(COPTView3D)
 	ON_WM_HSCROLL()
 	//}}AFX_MSG_MAP
@@ -30,10 +30,11 @@ END_MESSAGE_MAP()
 
 
 COPTView3D::COPTView3D(void)
-	: CPropertyPage(COPTView3D::IDD)
+	: CBasePropertyPage(COPTView3D::IDD)
 {
 	//{{AFX_DATA_INIT(COPTView3D)
 	//}}AFX_DATA_INIT
+	m_bOldFilterTextures = FALSE;
 }
 
 
@@ -43,9 +44,10 @@ COPTView3D::~COPTView3D(void)
 
 void PASCAL DDV_FOVRange(CDataExchange *pDX, int value)
 {
-	if ( ( value > 100 ) | ( value < 30 ) )
+	// dimhotepus: Increase max FOV 100 -> 110.
+	if ( ( value > 110 ) || ( value < 30 ) )
 	{
-		AfxMessageBox("FOV must be 30-100.", MB_ICONEXCLAMATION | MB_OK);
+		AfxMessageBox("Sorry, Camera FOV must be in range 30-110.", MB_ICONEXCLAMATION | MB_OK);
 		pDX->Fail();
 	}
 }
@@ -142,7 +144,8 @@ void COPTView3D::DoDataExchange(CDataExchange* pDX)
 		//
 		m_TimeToMaxSpeed.SetPos(Options.view3d.nTimeToMaxSpeed);
 		int nTime = m_TimeToMaxSpeed.GetPos();
-		str.Format("%.2f sec", (float)nTime / 1000.0f);
+		// dimhotepus: sec -> s.
+		str.Format("%.2f s", (float)nTime / 1000.0f);
 		m_TimeToMaxSpeedText.SetWindowText(str);	
 	}
 }
@@ -169,7 +172,7 @@ BOOL COPTView3D::OnApply(void)
 {
 	if (Options.view3d.bFilterTextures != m_bOldFilterTextures)
 	{
-		AfxMessageBox("The changes to the 'Filter textures' setting will not take effect for any currently visible textures. Close all 3D views and reopen them for the new setting to completely take effect.");
+		AfxMessageBox("The changes to the 'Filter textures' setting will not take effect for any currently visible textures. Close all 3D views and reopen them for the new setting to completely take effect.", MB_ICONINFORMATION);
 	}
 
 	Options.PerformChanges(COptions::secView3D);
@@ -260,7 +263,8 @@ void COPTView3D::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 		float fTimeSeconds = (float)m_TimeToMaxSpeed.GetPos() / 1000.0f;
 
 		CString str;
-		str.Format("%.2f sec", fTimeSeconds);
+		// dimhotepus: sec -> s.
+		str.Format("%.2f s", fTimeSeconds);
 		m_TimeToMaxSpeedText.SetWindowText(str);
 	}
 

@@ -35,7 +35,7 @@
 //     va_list va;
 // 
 //     va_start(va, fmt);
-//     vsprintf(ach, fmt, va);
+//     V_vsprintf_safe(ach, fmt, va);
 //     va_end(va);
 //     OutputDebugString(ach);
 // }

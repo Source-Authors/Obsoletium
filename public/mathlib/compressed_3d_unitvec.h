@@ -47,7 +47,7 @@ public:
    cUnitVector& operator=( const Vector& vec )
    { packVector( vec ); return *this; }
 
-   operator Vector()
+   [[nodiscard]] operator Vector()
    {
       unpackVector( mTmpVec );
       return mTmpVec;

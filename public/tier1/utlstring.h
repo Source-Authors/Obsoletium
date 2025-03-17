@@ -429,7 +429,8 @@ public:
 	typedef const T *AltArgumentType_t;
 
 protected:
-	const T *m_pString;
+	// dimhotepus: const T* -> T* as it is not a const! See Set API
+	T *m_pString;
 };
 
 template < typename T >
@@ -437,7 +438,7 @@ void CUtlConstStringBase<T>::Set( const T *pValue )
 {
 	if ( pValue != m_pString )
 	{
-		free( ( void* ) m_pString );
+		free( m_pString );
 		m_pString = pValue && pValue[0] ? StringFuncs<T>::Duplicate( pValue ) : NULL;
 	}
 }

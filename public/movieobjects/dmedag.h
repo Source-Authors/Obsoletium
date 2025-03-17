@@ -46,14 +46,14 @@ public:
 
 	// child helpers
 	const CUtlVector< DmElementHandle_t > &GetChildren() const;
-	int GetChildCount() const;
-	CDmeDag *GetChild( int i ) const;
+	intp GetChildCount() const;
+	CDmeDag *GetChild( intp i ) const;
 	void AddChild( CDmeDag* pDag );
-	void RemoveChild( int i );
+	void RemoveChild( intp i );
 	void RemoveChild( const CDmeDag *pChild, bool bRecurse = false );
-	int FindChild( const CDmeDag *pChild ) const;
-	int FindChild( CDmeDag *&pParent, const CDmeDag *pChild );
-	int FindChild( const char *name ) const;
+	intp FindChild( const CDmeDag *pChild ) const;
+	intp FindChild( CDmeDag *&pParent, const CDmeDag *pChild );
+	intp FindChild( const char *name ) const;
 	CDmeDag *FindOrAddChild( const char *name );
 
 	// Recursively render the Dag hierarchy

@@ -71,7 +71,7 @@ public:
 	void HandleMoveTo( int iHandle, Vector &vecPoint, CMapFace *pFace );
 	void SetTexCoords( Vector2D vecTexCoords[4] );
 	void GetHandlePos( int iHandle, Vector &vecPos );
-	bool IsSelected( void )									{ return ( GetSelectionState() == SELECT_NORMAL ); }
+	bool IsSelected( void ) const { return ( GetSelectionState() == SELECT_NORMAL ); }
 
 	void DoClip( void );
 	void CenterEntity( void );

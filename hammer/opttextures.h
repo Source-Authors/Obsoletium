@@ -8,8 +8,9 @@
 #define OPTTEXTURES_H
 #pragma once
 
+#include "windows/base_property_page.h"
 
-class COPTTextures : public CPropertyPage
+class COPTTextures : public CBasePropertyPage
 {
 	DECLARE_DYNCREATE( COPTTextures )
 
@@ -30,6 +31,7 @@ public:
 	enum { IDD = IDD_OPTIONS_TEXTURES };
 	CListBox	m_TextureFiles;
 	CSliderCtrl	m_cBrightness;
+	CStatic		m_cBrightnessText;
 	CListBox    m_MaterialExcludeList;
 	//}}AFX_DATA
 

@@ -20,7 +20,7 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include "FileAssociation.h"
 #include <stdio.h>
@@ -28,6 +28,7 @@
 #include <string.h>
 #include <mxtk/mx.h>
 
+#include "tier1/strtools.h"
 
 
 FileAssociation *g_FileAssociation = 0;
@@ -104,7 +105,7 @@ FileAssociation::handleEvent (mxEvent *event)
 	{
 		int index = cExtension->getSelectedIndex ();
 		if (index >= 0)
-			strcpy (d_associations[index].program, leProgram->getLabel ());
+			V_strcpy_safe (d_associations[index].program, leProgram->getLabel ());
 	}
 	break;
 
@@ -117,7 +118,7 @@ FileAssociation::handleEvent (mxEvent *event)
 
 			int index = cExtension->getSelectedIndex ();
 			if (index >= 0)
-				strcpy (d_associations[index].program, leProgram->getLabel ());
+				V_strcpy_safe (d_associations[index].program, leProgram->getLabel ());
 		}
 	}
 	break;
@@ -146,8 +147,8 @@ FileAssociation::initAssociations ()
 		d_associations[i].association = -1;
 
 	char path[256];
-	strcpy (path, mx::getApplicationPath ());
-	strcat (path, "/hlmv.fa");
+	V_strcpy_safe (path, mx::getApplicationPath ());
+	V_strcat_safe (path, "/hlmv.fa");
 	FILE *file = fopen (path, "rt");
 	if (!file)
 		return;
@@ -159,13 +160,13 @@ FileAssociation::initAssociations ()
 		int j = 0;
 		while (line[++j] != '\"');
 		line[j] = '\0';
-		strcpy (d_associations[i].extension, &line[1]);
+		V_strcpy_safe (d_associations[i].extension, &line[1]);
 
 		while (line[++j] != '\"');
 		int k = j + 1;
 		while (line[++j] != '\"');
 		line[j] = '\0';
-		strcpy (d_associations[i].program, &line[k]);
+		V_strcpy_safe (d_associations[i].program, &line[k]);
 
 		d_associations[i].association = atoi (&line[++j]);
 
@@ -196,9 +197,9 @@ FileAssociation::setAssociation (int index)
 #ifdef WIN32__
 	char path[256];
 
-	strcpy (path, mx_gettemppath ());
-	strcat (path, "/hlmvtemp.");
-	strcat (path, d_associations[index].extension);
+	V_strcpy_safe (path, mx_gettemppath ());
+	V_strcat_safe (path, "/hlmvtemp.");
+	V_strcat_safe (path, d_associations[index].extension);
 
 	FILE *file = fopen (path, "wb");
 	if (file)
@@ -206,7 +207,7 @@ FileAssociation::setAssociation (int index)
 
 	int val = (int) ShellExecute ((HWND) getHandle (), "open", path, 0, 0, SW_HIDE);
 	char str[32];
-	sprintf (str, "%d", val);
+	V_sprintf_safe (str, "%d", val);
 	setLabel (str);
 	rbAction[1]->setEnabled (val != 31);
 /*
@@ -214,7 +215,7 @@ FileAssociation::setAssociation (int index)
 	HICON hIcon = ExtractAssociatedIcon ((HINSTANCE) GetWindowLong ((HWND) getHandle (), GWL_HINSTANCE), path, &dw);
 	SendMessage ((HWND) getHandle (), WM_SETICON, (WPARAM) ICON_SMALL, (LPARAM) hIcon);
 	char str[32];
-	sprintf (str, "%d", (int) hIcon);
+	V_sprintf_safe (str, "%d", (int) hIcon);
 	setLabel (str);
 */
 	DeleteFile (path);
@@ -236,8 +237,8 @@ FileAssociation::saveAssociations ()
 {
 	char path[256];
 
-	strcpy (path, mx::getApplicationPath ());
-	strcat (path, "/hlmv.fa");
+	V_strcpy_safe (path, mx::getApplicationPath ());
+	V_strcat_safe (path, "/hlmv.fa");
 
 	FILE *file = fopen (path, "wt");
 	if (!file)

@@ -28,9 +28,9 @@ std::enable_if_t<!std::is_pointer_v<T>> CRC32_ProcessBuffer( CRC32_t *pulCRC, co
 }
 
 void CRC32_Final( CRC32_t *pulCRC );
-CRC32_t	CRC32_GetTableEntry( unsigned int slot );
+[[nodiscard]] CRC32_t CRC32_GetTableEntry(unsigned int slot);
 
-inline CRC32_t CRC32_ProcessSingleBuffer( IN_BYTECAP(len) const void *p, intp len )
+[[nodiscard]] inline CRC32_t CRC32_ProcessSingleBuffer( IN_BYTECAP(len) const void *p, intp len )
 {
 	CRC32_t crc;
 

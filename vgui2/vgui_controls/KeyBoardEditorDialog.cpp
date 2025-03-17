@@ -290,8 +290,8 @@ CKeyBoardEditorPage::CKeyBoardEditorPage( Panel *parent, Panel *panelToEdit, Key
 //-----------------------------------------------------------------------------
 CKeyBoardEditorPage::~CKeyBoardEditorPage()
 {
-	int c = m_Save.Count();
-	for ( int i = 0 ; i  < c; ++i )
+	intp c = m_Save.Count();
+	for ( intp i = 0 ; i  < c; ++i )
 	{
 		delete m_Save[ i ];
 	}
@@ -316,8 +316,8 @@ void CKeyBoardEditorPage::SaveMappings()
 	GetMappingList( m_pPanel, maps );
 
 	// add header item
-	int c = maps.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = maps.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		PanelKeyBindingMap *m = maps[ i ];
 		SaveMapping_t	*sm = new SaveMapping_t;
@@ -334,8 +334,8 @@ void CKeyBoardEditorPage::SaveMappings()
 //-----------------------------------------------------------------------------
 void CKeyBoardEditorPage::UpdateCurrentMappings()
 {
-	int c = m_Save.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_Save.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		PanelKeyBindingMap *m = m_Save[ i ]->map;
 		Assert( m );
@@ -349,8 +349,8 @@ void CKeyBoardEditorPage::UpdateCurrentMappings()
 //-----------------------------------------------------------------------------
 void CKeyBoardEditorPage::RestoreMappings()
 {
-	int c = m_Save.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Save.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		SaveMapping_t *sm = m_Save[ i ];
 		sm->current = sm->original;
@@ -359,8 +359,8 @@ void CKeyBoardEditorPage::RestoreMappings()
 
 void CKeyBoardEditorPage::ApplyMappings()
 {
-	int c = m_Save.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Save.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		SaveMapping_t *sm = m_Save[ i ];
 		sm->map->boundkeys = sm->current;
@@ -567,12 +567,12 @@ void CKeyBoardEditorPage::PopulateList()
 {
 	m_pList->DeleteAllItems();
 
-	int i, j;
+	intp i;
 
 	CUtlRBTree< KeyValues *, int >	sorted( 0, 0, BindingLessFunc );
 
 	// add header item
-	int c = m_Save.Count();
+	intp c = m_Save.Count();
 	for ( i = 0; i < c; ++i )
 	{
 		SaveMapping_t* sm = m_Save[ i ];
@@ -580,8 +580,8 @@ void CKeyBoardEditorPage::PopulateList()
 		PanelKeyBindingMap *m = sm->map;
 		Assert( m );
 
-		int bindings = sm->current.Count();
-		for ( j = 0; j < bindings; ++j )
+		intp bindings = sm->current.Count();
+		for ( intp j = 0; j < bindings; ++j )
 		{
 			BoundKey_t *kbMap = &sm->current[ j ];
 			Assert( kbMap );
@@ -614,8 +614,8 @@ void CKeyBoardEditorPage::PopulateList()
 		}
 
 		// Now try and find any "unbound" keys...
-		int mappings = m->entries.Count();
-		for ( j = 0; j < mappings; ++j )
+		intp mappings = m->entries.Count();
+		for ( intp j = 0; j < mappings; ++j )
 		{
 			KeyBindingMap_t *kbMap = &m->entries[ j ];
 
@@ -650,7 +650,7 @@ void CKeyBoardEditorPage::PopulateList()
 		}
 	}
 
-	for ( j = sorted.FirstInorder() ; j != sorted.InvalidIndex(); j = sorted.NextInorder( j ) )
+	for ( auto j = sorted.FirstInorder() ; j != sorted.InvalidIndex(); j = sorted.NextInorder( j ) )
 	{
 		KeyValues *item = sorted[ j ];
 

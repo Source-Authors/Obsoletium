@@ -39,7 +39,7 @@ protected:
 		m_nPaddedWidth = 0;
 	}
 
-	int NVectors( void ) const
+	[[nodiscard]] int NVectors( void ) const
 	{
 		return m_nHeight * m_nPaddedWidth;
 	}
@@ -100,7 +100,7 @@ public:
 
 	// Element access. If you are calling this a lot, you don't want to use this class, because
 	// you're not getting the sse advantage
-	Vector Element(int x, int y) const
+	[[nodiscard]] Vector Element(int x, int y) const
 	{
 		Assert( m_pData );
 		Assert( x < m_nWidth );
@@ -116,7 +116,7 @@ public:
 	}
 
 	//addressing the individual fourvectors elements
-	FourVectors &CompoundElement(int x, int y)
+	[[nodiscard]] FourVectors &CompoundElement(int x, int y)
 	{
 		Assert( m_pData );
 		Assert( y < m_nHeight );

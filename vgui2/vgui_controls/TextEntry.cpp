@@ -269,8 +269,8 @@ void TextEntry::SetText(const char *text)
 	{
 		size_t lenUnicode = ( len * sizeof( wchar_t ) + 4 );
 		wchar_t *unicode = ( wchar_t * ) malloc( lenUnicode );
-			g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, lenUnicode );
-			SetText( unicode );
+		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, lenUnicode );
+		SetText( unicode );
 		free( unicode );
 	}
 }
@@ -1118,7 +1118,7 @@ void TextEntry::LayoutVerticalScrollBarSlider()
 		
 		// calculate how many lines we can fully display
 		int displayLines = tall / (surface()->GetFontTall(_font) + DRAW_OFFSET_Y);
-		int numLines = m_LineBreaks.Count();
+		intp numLines = m_LineBreaks.Count();
 		
 		if (numLines <= displayLines)
 		{
@@ -3456,10 +3456,10 @@ void TextEntry::SaveUndoState()
 //-----------------------------------------------------------------------------
 int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 {
-	int startIndex = 0;
+	intp startIndex = 0;
 	
-	int numLines = m_LineBreaks.Count();
-	int startLine = 0;
+	intp numLines = m_LineBreaks.Count();
+	intp startLine = 0;
 	
 	// determine the Start point from the scroll bar
 	// do this only if we are not selecting text in the window with the mouse
@@ -3515,7 +3515,7 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 			{
 				done = true;
 				int x = DRAW_OFFSET_X;
-				for (int i = _currentStartIndex; i < m_TextStream.Count(); i++)
+				for (intp i = _currentStartIndex; i < m_TextStream.Count(); i++)
 				{
 					done = false;
 					wchar_t ch = m_TextStream[i];			
@@ -3577,7 +3577,7 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 // helper accessors for common gets
 float TextEntry::GetValueAsFloat()
 {
-	int nTextLength = GetTextLength() + 1;
+	intp nTextLength = GetTextLength() + 1;
 	char* txt = ( char* )_alloca( nTextLength * sizeof( char ) );
 	GetText( txt, nTextLength );
 
@@ -3586,7 +3586,7 @@ float TextEntry::GetValueAsFloat()
 
 int TextEntry::GetValueAsInt()
 {
-	int nTextLength = GetTextLength() + 1;
+	intp nTextLength = GetTextLength() + 1;
 	char* txt = ( char* )_alloca( nTextLength * sizeof( char ) );
 	GetText( txt, nTextLength );
 
@@ -3598,9 +3598,9 @@ int TextEntry::GetValueAsInt()
 // Input:	offset - index to Start reading from 
 //			bufLenInBytes - length of string
 //-----------------------------------------------------------------------------
-void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInBytes)
+void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, intp bufLenInBytes)
 {
-	Assert(bufLenInBytes >= static_cast<int>(sizeof(buf[0])));
+	Assert(bufLenInBytes >= static_cast<intp>(sizeof(buf[0])));
 	if (m_TextStream.Count())
 	{
 		// temporarily null terminate the text stream so we can use the conversion function
@@ -3620,13 +3620,13 @@ void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInByte
 // Input:	offset - index to Start reading from 
 //			bufLen - length of string
 //-----------------------------------------------------------------------------
-void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *wbuf, int bufLenInBytes)
+void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *wbuf, intp bufLenInBytes)
 {
-	Assert(bufLenInBytes >= static_cast<int>(sizeof(wbuf[0])));
-	int len = m_TextStream.Count();
+	Assert(bufLenInBytes >= static_cast<intp>(sizeof(wbuf[0])));
+	intp len = m_TextStream.Count();
 	if (m_TextStream.Count())
 	{
-		int terminator = min(len, (bufLenInBytes / (int)sizeof(wchar_t)) - 1);
+		intp terminator = min(len, (bufLenInBytes / (intp)sizeof(wchar_t)) - 1);
 		wcsncpy(wbuf, m_TextStream.Base(), terminator);
 		wbuf[terminator] = L'\0';
 	}
@@ -3636,21 +3636,21 @@ void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *wbuf, int bufLenIn
 	}
 }
 
-void TextEntry::GetTextRange( wchar_t *buf, int from, int numchars )
+void TextEntry::GetTextRange( wchar_t *buf, intp from, intp numchars )
 {
-	int len = m_TextStream.Count();
-	int cpChars = max( 0, min( numchars, len - from ) );
+	intp len = m_TextStream.Count();
+	intp cpChars = max( (intp)0, min( numchars, len - from ) );
 	
-	wcsncpy( buf, m_TextStream.Base() + max( 0, min( len, from ) ), cpChars );
+	wcsncpy( buf, m_TextStream.Base() + max( (intp)0, min( len, from ) ), cpChars );
 	buf[ cpChars ] = 0;
 }
 
-void TextEntry::GetTextRange( char *buf, int from, int numchars )
+void TextEntry::GetTextRange( char *buf, intp from, intp numchars )
 {
-	int len = m_TextStream.Count();
-	int cpChars = max( 0, min( numchars, len - from ) );
+	intp len = m_TextStream.Count();
+	intp cpChars = max( (intp)0, min( numchars, len - from ) );
 
-	g_pVGuiLocalize->ConvertUnicodeToANSI( m_TextStream.Base() + max( 0, min( len, from ) ), buf, cpChars + 1 );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( m_TextStream.Base() + max( (intp)0, min( len, from ) ), buf, cpChars + 1 );
 	buf[ cpChars ] = 0;
 }
 
@@ -3833,7 +3833,7 @@ void TextEntry::SetToFullWidth()
 	int wide = 2*DRAW_OFFSET_X; // buffer on left and right end of text.
 	
 	// loop through all the characters and sum their widths	
-	for (int i = 0; i < m_TextStream.Count(); ++i)
+	for (intp i = 0; i < m_TextStream.Count(); ++i)
 	{
 		wide += getCharWidth(_font, m_TextStream[i]);	
 	}

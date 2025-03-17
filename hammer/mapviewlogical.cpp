@@ -281,15 +281,15 @@ void CMapViewLogical::PopulateConnectionList( )
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapViewLogical::OnTimer(UINT nIDEvent) 
+void CMapViewLogical::OnTimer(UINT_PTR nIDEvent) 
 {
 	if ( nIDEvent == TIMER_CONNECTIONUPDATE )
 	{
 		// Make sure we don't blink too fast
-		static unsigned int	nLastUpdate = 0;
-		if ( GetTickCount() >= (nLastUpdate+TIMER_BLINK_INTERVAL/2) )
+		static ULONGLONG nLastUpdate = 0;
+		if ( GetTickCount64() >= (nLastUpdate+TIMER_BLINK_INTERVAL/2) )
 		{
-			nLastUpdate = GetTickCount();
+			nLastUpdate = GetTickCount64();
             UpdateView( 0 ); // Force the view to redraw for blinking errors
 		}
 	}
@@ -324,7 +324,7 @@ const color32 & CMapViewLogical::GetWireColor(const char *pszName, const bool bS
 	else
 	{
 		// Only blink errors if nothing is selected, or this is selected
-		bool	bBlinkingState =  bSelected || !bAnySelected ? (GetTickCount() / TIMER_BLINK_INTERVAL) & 1 : bSelected;
+		bool	bBlinkingState =  bSelected || !bAnySelected ? (GetTickCount64() / TIMER_BLINK_INTERVAL) & 1 : bSelected;
 		return s_pBrokenWireColor[bBlinkingState];
 	}
 }
@@ -418,9 +418,7 @@ void CMapViewLogical::RenderConnections(const bool bDrawSelected, const bool bAn
 		if ( !pMapClass )
 			continue;
 
-		CEditGameClass *pEditClass = dynamic_cast<CEditGameClass*>( pMapClass );
-		if ( !pEditClass )
-			continue;
+		CEditGameClass *pEditClass = pMapClass;
 
 		int nConnectionCount = pEditClass->Connections_GetCount();
 		if ( nConnectionCount == 0 )
@@ -455,11 +453,13 @@ void CMapViewLogical::RenderConnections(const bool bDrawSelected, const bool bAn
 
 			for ( int k = 0; k < nInputCount; ++k )
 			{
-				if ( pEntityList->Element( k )->GetSelectionState() != SELECT_NONE )
+				auto *e = pEntityList->Element( k );
+
+				if ( e->GetSelectionState() != SELECT_NONE )
 					bInputSelected = true;
 
 				// Make sure all the connected entities are all visible
-				if ( pEntityList->Element( k )->IsVisibleLogical() == false )
+				if ( e->IsVisibleLogical() == false )
 					bBadConnection = true;
 			}
 

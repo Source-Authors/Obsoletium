@@ -694,7 +694,7 @@ void RichText::CalculateFade( TRenderState &renderState )
 			const auto &fade = m_FormatStream[renderState.formatStreamIndex].fade;
 			if ( fade.flFadeLength != -1.0f )
 			{
-				float frac = ( fade.flFadeStartTime -  system()->GetCurrentTime() ) / fade.flFadeLength;
+				float frac = ( fade.flFadeStartTime - system()->GetCurrentTime() ) / fade.flFadeLength;
 
 				int alpha = frac * fade.iOriginalAlpha;
 				alpha = clamp( alpha, 0, fade.iOriginalAlpha );
@@ -832,7 +832,7 @@ void RichText::Paint()
 
 		// 3.
 		// Calculate the range of text to draw all at once
-		int iLast = m_TextStream.Count() - 1;
+		intp iLast = m_TextStream.Count() - 1;
 		
 		// Stop at the next line break
 		if ( m_LineBreaks.IsValidIndex( lineBreakIndexIndex ) && m_LineBreaks[lineBreakIndexIndex] <= iLast )
@@ -1463,7 +1463,7 @@ void RichText::LayoutVerticalScrollBarSlider()
 	
 	// calculate how many lines we can fully display
 	int displayLines = tall / (GetLineHeight() + _drawOffsetY);
-	int numLines = m_LineBreaks.Count();
+	intp numLines = m_LineBreaks.Count();
 	
 	if (numLines <= displayLines)
 	{

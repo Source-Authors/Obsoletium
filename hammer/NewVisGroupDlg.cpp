@@ -35,6 +35,8 @@ CNewVisGroupDlg::CNewVisGroupDlg(CString &str, CWnd *pParent)
 	: CBaseDlg(CNewVisGroupDlg::IDD, pParent)
 {
 	m_pPickedVisGroup = NULL;
+	m_bRemoveFromOtherGroups = FALSE;
+	m_bHideObjects = FALSE;
 
 	//{{AFX_DATA_INIT(CNewVisGroupDlg)
 	m_strName = str;

@@ -145,31 +145,31 @@ public: // functions
 	virtual ~CWorldEditDispMgr();
 
 	// world list functionals
-	int WorldCount( void );
-	CMapDisp *GetFromWorld( int iWorldList );
-	CMapDisp *GetFromWorld( EditDispHandle_t handle );
+	intp WorldCount( void ) override;
+	CMapDisp *GetFromWorld( intp iWorldList ) override;
+	CMapDisp *GetFromWorld( EditDispHandle_t handle ) override;
 
-	void AddToWorld( EditDispHandle_t handle );	
-	void RemoveFromWorld( EditDispHandle_t handle );
+	void AddToWorld( EditDispHandle_t handle ) override;
+	void RemoveFromWorld( EditDispHandle_t handle ) override;
 	
-	void FindWorldNeighbors( EditDispHandle_t handle );
+	void FindWorldNeighbors( EditDispHandle_t handle ) override;
 
 	// selection list functions
-	int SelectCount( void );
-	void SelectClear( void );
-	CMapDisp *GetFromSelect( int iSelectList );
+	int SelectCount( void ) override;
+	void SelectClear( void ) override;
+	CMapDisp *GetFromSelect( int iSelectList ) override;
 
-	void AddToSelect( EditDispHandle_t handle );
-	void RemoveFromSelect( EditDispHandle_t handle );
-	bool IsInSelect( EditDispHandle_t handle );
+	void AddToSelect( EditDispHandle_t handle ) override;
+	void RemoveFromSelect( EditDispHandle_t handle ) override;
+	bool IsInSelect( EditDispHandle_t handle ) override;
 
-	void CatmullClarkSubdivide( void );
+	void CatmullClarkSubdivide( void ) override;
 
-	void PreUndo( const char *pszMarkName );
-	void Undo( EditDispHandle_t handle, bool bAddNeighbors );
-	void PostUndo( void );
+	void PreUndo( const char *pszMarkName ) override;
+	void Undo( EditDispHandle_t handle, bool bAddNeighbors ) override;
+	void PostUndo( void ) override;
 
-	virtual int NumSharedPoints( CMapDisp *pDisp, CMapDisp *pNeighborDisp, int *edge1, int *edge2 );
+	int NumSharedPoints( CMapDisp *pDisp, CMapDisp *pNeighborDisp, int *edge1, int *edge2 ) override;
 
 private: // functions
 
@@ -241,7 +241,7 @@ CWorldEditDispMgr::~CWorldEditDispMgr()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-int CWorldEditDispMgr::WorldCount( void )
+intp CWorldEditDispMgr::WorldCount( void )
 {
 	return m_WorldList.Count();
 }
@@ -250,7 +250,7 @@ int CWorldEditDispMgr::WorldCount( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CMapDisp *CWorldEditDispMgr::GetFromWorld( int iWorldList )
+CMapDisp *CWorldEditDispMgr::GetFromWorld( intp iWorldList )
 {
 	// no assert because the .Element( ) takes care of that!
 	EditDispHandle_t handle = m_WorldList.Element( iWorldList );
@@ -321,8 +321,8 @@ void CWorldEditDispMgr::FindWorldNeighbors( EditDispHandle_t handle )
 	//
 	// compare against all of the displacements in the world
 	//
-	int count = WorldCount();
-	for( int ndx = 0; ndx < count; ndx++ )
+	intp count = WorldCount();
+	for( intp ndx = 0; ndx < count; ndx++ )
 	{
 		// get the potential neighbor surface
 		CMapDisp *pNeighborDisp = GetFromWorld( ndx );

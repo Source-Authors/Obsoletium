@@ -129,7 +129,7 @@ CDmElement *CDmeMakefile::GetOutputElement( bool bCreateIfNecessary )
 //-----------------------------------------------------------------------------
 // Gets the path of the makefile
 //-----------------------------------------------------------------------------
-void CDmeMakefile::GetMakefilePath( char *pFullPath, int nBufLen )
+void CDmeMakefile::GetMakefilePath( OUT_Z_CAP(nBufLen) char *pFullPath, intp nBufLen )
 {
 	DmFileId_t fileId = GetFileId();
 	const char *pFileName = ( fileId != DMFILEID_INVALID ) ? g_pDataModel->GetFileName( fileId ) : "";
@@ -142,7 +142,7 @@ void CDmeMakefile::GetMakefilePath( char *pFullPath, int nBufLen )
 //-----------------------------------------------------------------------------
 // Returns the output directory we expect to compile files into
 //-----------------------------------------------------------------------------
-bool CDmeMakefile::GetOutputDirectory( char *pFullPath, int nBufLen )
+bool CDmeMakefile::GetOutputDirectory( char *pFullPath, intp nBufLen )
 {
 	return GetDefaultDirectory( GetOutputDirectoryID(), pFullPath, nBufLen );
 }
@@ -151,7 +151,7 @@ bool CDmeMakefile::GetOutputDirectory( char *pFullPath, int nBufLen )
 //-----------------------------------------------------------------------------
 // Returns the output name (output directory + filename, no extension)
 //-----------------------------------------------------------------------------
-bool CDmeMakefile::GetOutputName( char *pFullPath, int nBufLen )
+bool CDmeMakefile::GetOutputName( char *pFullPath, intp nBufLen )
 {
 	pFullPath[0] = 0;
 
@@ -173,7 +173,7 @@ bool CDmeMakefile::GetOutputName( char *pFullPath, int nBufLen )
 //-----------------------------------------------------------------------------
 // Converts the m_pDefaultDirectoryID field of the DmeMakefileType_t to a full path
 //-----------------------------------------------------------------------------
-bool CDmeMakefile::GetDefaultDirectory( const char *pDefaultDirectoryID, char *pFullPath, int nBufLen )
+bool CDmeMakefile::GetDefaultDirectory( const char *pDefaultDirectoryID, char *pFullPath, intp nBufLen )
 {
 	if ( StringHasPrefix( pDefaultDirectoryID, "contentdir:" ) )
 	{
@@ -238,7 +238,7 @@ bool CDmeMakefile::GetDefaultDirectory( const char *pDefaultDirectoryID, char *p
 //-----------------------------------------------------------------------------
 // Relative path to full path
 //-----------------------------------------------------------------------------
-void CDmeMakefile::RelativePathToFullPath( const char *pRelativePath, char *pFullPath, int nBufLen )
+void CDmeMakefile::RelativePathToFullPath( const char *pRelativePath, OUT_Z_CAP(nBufLen) char *pFullPath, intp nBufLen )
 {
 	if ( !pRelativePath[0] )
 	{
@@ -255,7 +255,7 @@ void CDmeMakefile::RelativePathToFullPath( const char *pRelativePath, char *pFul
 //-----------------------------------------------------------------------------
 // Fullpath to relative path
 //-----------------------------------------------------------------------------
-void CDmeMakefile::FullPathToRelativePath( const char *pFullPath, char *pRelativePath, int nBufLen )
+void CDmeMakefile::FullPathToRelativePath( const char *pFullPath, OUT_Z_CAP(nBufLen) char *pRelativePath, intp nBufLen )
 {
 	if ( !pFullPath[0] )
 	{
@@ -360,7 +360,7 @@ void CDmeMakefile::SetSourceFullPath( CDmeSource *pSource, const char *pFullPath
 //-----------------------------------------------------------------------------
 // Returns the full path of a source
 //-----------------------------------------------------------------------------
-void CDmeMakefile::GetSourceFullPath( CDmeSource *pSource, char *pFullPath, int nBufLen )
+void CDmeMakefile::GetSourceFullPath( CDmeSource *pSource, char *pFullPath, intp nBufLen )
 {
 	const char *pRelativePath = pSource->GetRelativeFileName( );
 	RelativePathToFullPath( pRelativePath, pFullPath, nBufLen );
@@ -388,12 +388,12 @@ void CDmeMakefile::GetSources( const char *pSourceType, CUtlVector< CDmeHandle< 
 //-----------------------------------------------------------------------------
 // Gets a list of all sources, regardless of type
 //-----------------------------------------------------------------------------
-int CDmeMakefile::GetSourceCount()
+intp CDmeMakefile::GetSourceCount()
 {
 	return m_Sources.Count();
 }
 
-CDmeSource *CDmeMakefile::GetSource( int nIndex )
+CDmeSource *CDmeMakefile::GetSource( intp nIndex )
 {
 	return m_Sources[nIndex];
 }
@@ -404,8 +404,8 @@ CDmeSource *CDmeMakefile::GetSource( int nIndex )
 //-----------------------------------------------------------------------------
 void CDmeMakefile::RemoveSource( CDmeSource *pSource )
 {
-	int nCount = m_Sources.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Sources.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Sources[i] == pSource )
 		{
@@ -439,8 +439,8 @@ void CDmeMakefile::RemoveSource( const char *pSourceType, const char *pFullPath 
 //-----------------------------------------------------------------------------
 void CDmeMakefile::RemoveAllSources( const char *pSourceType )
 {
-	int nCount = m_Sources.Count();
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = m_Sources.Count();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		if ( !Q_stricmp( pSourceType, m_Sources[i]->GetTypeString() ) )
 		{
@@ -456,8 +456,8 @@ void CDmeMakefile::RemoveAllSources( const char *pSourceType )
 //-----------------------------------------------------------------------------
 bool CDmeMakefile::HasSourceOfType( const char *pSourceType )
 {
-	int nCount = m_Sources.Count();
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = m_Sources.Count();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		if ( !Q_stricmp( pSourceType, m_Sources[i]->GetTypeString() ) )
 			return true;
@@ -474,8 +474,8 @@ bool CDmeMakefile::UpdateSourceNames( const char *pOldRootDir, const char *pNewR
 	char pOldSourcePath[ MAX_PATH ];
 	char pNewSourcePath[ MAX_PATH ];
 
-	int nCount = m_Sources.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Sources.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pOldRelativePath = m_Sources[i]->GetRelativeFileName();
 		if ( pOldRelativePath[0] )
@@ -555,8 +555,8 @@ void CDmeMakefile::MakeOutputsWriteable( )
 	// When we publish, we'll check them out.
 	CUtlVector<CUtlString> outputs;
 	GetOutputs( outputs );
-	int nCount = outputs.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = outputs.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		g_pFullFileSystem->SetFileWritable( outputs[i], true );
 	}
@@ -572,8 +572,8 @@ void CDmeMakefile::SetAssociation( CDmeSource *pSource, CDmeMakefile *pSourceMak
 	if ( !pSource )
 		return;
 
-	int nCount = m_Sources.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Sources.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Sources[i] != pSource )
 			continue;
@@ -597,8 +597,8 @@ CDmeMakefile *CDmeMakefile::FindDependentMakefile( CDmeSource *pSource )
 	if ( !pSource )
 		return NULL;
 
-	int nCount = m_Sources.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Sources.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Sources[i] == pSource )
 			return m_Sources[i]->GetDependentMakefile();
@@ -616,8 +616,8 @@ CDmeSource *CDmeMakefile::FindAssociatedSource( CDmeMakefile *pChildMakefile )
 	if ( !pChildMakefile )
 		return NULL;
 
-	int nCount = m_Sources.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Sources.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Sources[i]->GetDependentMakefile() == pChildMakefile )
 			return m_Sources[i];

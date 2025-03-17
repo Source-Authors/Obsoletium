@@ -23,7 +23,7 @@ class CManifestMap
 public:
  	CManifestMap( void );
 
-	bool IsEditable( void );
+	bool IsEditable( void ) const;
 
 	CMapDoc				*m_Map;
 	CString				m_RelativeMapFileName, m_AbsoluteMapFileName;
@@ -89,7 +89,13 @@ public:
 	virtual void	SetModifiedFlag( BOOL bModified = TRUE );
 	virtual bool	IsManifest( void ) { return true; }
 
-	void			GetFullMapPath( const char *pManifestMapFileName, char *pOutputPath );
+	void			GetFullMapPath( const char *pManifestMapFileName, char *pOutputPath, intp outSize );
+
+	template<intp outSize>
+	inline void GetFullMapPath( const char *pManifestMapFileName, char (&pOutputPath)[outSize] )
+	{
+		GetFullMapPath( pManifestMapFileName, pOutputPath, outSize );
+	}
 
 	void			SetManifestPrefsModifiedFlag( bool bModified = true );
 	int				GetNumMaps( void ) { return m_Maps.Count(); }

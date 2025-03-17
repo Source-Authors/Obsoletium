@@ -514,7 +514,8 @@ public:
 	virtual bool			IsFileWritable( char const *pFileName, const char *pPathID = nullptr ) = 0;
 	virtual bool			SetFileWritable( char const *pFileName, bool writable, const char *pPathID = nullptr ) = 0;
 
-	virtual long			GetFileTime( const char *pFileName, const char *pPathID = nullptr ) = 0;
+	// dimhotepus: long -> time_t
+	virtual time_t			GetFileTime( const char *pFileName, const char *pPathID = nullptr ) = 0;
 
 	//--------------------------------------------------------
 	// Reads/writes files to utlbuffers. Use this for optimal read performance when doing open/read/close
@@ -609,7 +610,14 @@ public:
 	// File I/O and info
 	virtual bool			IsDirectory( const char *pFileName, const char *pathID = nullptr ) = 0;
 
-	virtual void			FileTimeToString( char* pStrip, int maxCharsIncludingTerminator, long fileTime ) = 0;
+	// dimhotepus: long -> time_t
+	virtual void			FileTimeToString( OUT_Z_CAP(maxCharsIncludingTerminator) char* pStrip, intp maxCharsIncludingTerminator, time_t fileTime ) = 0;
+
+	template<intp bufferSize>
+	void FileTimeToString( OUT_Z_ARRAY char (&buffer)[bufferSize], time_t fileTime )
+	{
+		FileTimeToString( buffer, bufferSize, fileTime );
+	}
 
 	//--------------------------------------------------------
 	// Open file operations
@@ -835,7 +843,7 @@ public:
 	// Optimal IO operations
 	//--------------------------------------------------------
 	virtual bool		GetOptimalIOConstraints( FileHandle_t hFile, unsigned *pOffsetAlign, unsigned *pSizeAlign, unsigned *pBufferAlign ) = 0;
-	inline unsigned		GetOptimalReadSize( FileHandle_t hFile, unsigned nLogicalSize );
+	unsigned			GetOptimalReadSize( FileHandle_t hFile, unsigned nLogicalSize );
 	virtual void		*AllocOptimalReadBuffer( FileHandle_t hFile, unsigned nSize = 0, unsigned nOffset = 0 ) = 0;
 	virtual void		FreeOptimalReadBuffer( void * ) = 0;
 
@@ -854,7 +862,9 @@ public:
 	}
 
 	virtual int			GetPathIndex( const FileNameHandle_t &handle ) = 0;
-	virtual long		GetPathTime( const char *pPath, const char *pPathID ) = 0;
+
+	// dimhotepus: long -> time_t
+	virtual time_t		GetPathTime( const char *pPath, const char *pPathID ) = 0;
 
 	virtual DVDMode_t	GetDVDMode() = 0;
 
@@ -959,8 +969,8 @@ public:
 	int m_nLength;
 
 private:
-	CMemoryFileBacking( const CMemoryFileBacking& ); // not defined
-	CMemoryFileBacking& operator=( const CMemoryFileBacking& ); // not defined
+	CMemoryFileBacking( const CMemoryFileBacking& ) = delete;
+	CMemoryFileBacking& operator=( const CMemoryFileBacking& ) = delete;
 };
 
 //-----------------------------------------------------------------------------

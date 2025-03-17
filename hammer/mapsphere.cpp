@@ -183,7 +183,7 @@ void CMapSphere::SetRadius(float flRadius)
 	if (pEntity != NULL)
 	{
 		char szValue[80];
-		sprintf(szValue, "%g", m_flRadius);
+		V_sprintf_safe(szValue, "%g", m_flRadius);
 		pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 	}
 }
@@ -290,7 +290,7 @@ void CMapSphere::OnParentKeyChanged(const char *szKey, const char *szValue)
 {
 	if (!stricmp(szKey, m_szKeyName))
 	{
-		m_flRadius = atof(szValue);
+		m_flRadius = strtof(szValue, nullptr);
 		PostUpdate(Notify_Changed);
 	}
 }

@@ -35,7 +35,7 @@ public:
 	// functions designed to be overriden
 	virtual void OnShowMenu(Menu *) {}
 	virtual void OnHideMenu(Menu *) {}
-	virtual int	 OnCheckMenuItemCount() { return 0; }
+	virtual intp OnCheckMenuItemCount() { return 0; }
 
 	virtual void SetMenu(Menu *menu);
 	virtual void HideMenu(void);

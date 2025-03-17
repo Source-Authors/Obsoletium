@@ -4,10 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <mxtk/mx.h>
-#include <stdio.h>
-#include "resource.h"
 #include "EdgeProperties.h"
+#include <mxtk/mx.h>
+#include "resource.h"
 #include "mdlviewer.h"
 #include "hlfaceposer.h"
 #include "choreoevent.h"
@@ -26,7 +25,7 @@ void CEdgePropertiesParams::SetFromFlexTrack( CFlexAnimationTrack *track )
 	{
 		m_bActive[ i ] = track->IsEdgeActive( i == 0 ? true : false );
 
-		int curveType = 0;
+		short curveType = 0;
 		track->GetEdgeInfo( i == 0 ? true : false, curveType, m_flValue[ i ] );
 
 		if ( i == 0 )
@@ -66,7 +65,7 @@ void CEdgePropertiesParams::SetFromCurve( CCurveData *ramp )
 	{
 		m_bActive[ i ] = ramp->IsEdgeActive( i == 0 ? true : false );
 
-		int curveType = 0;
+		short curveType = 0;
 		ramp->GetEdgeInfo( i == 0 ? true : false, curveType, m_flValue[ i ] );
 
 		if ( i == 0 )
@@ -105,7 +104,7 @@ static void PopulateCurveType( HWND control, CEdgePropertiesParams *params, bool
 {
 	SendMessage( control, CB_RESETCONTENT, 0, 0 ); 
 
-	for ( int i = 0; i < NUM_INTERPOLATE_TYPES; ++i )
+	for ( unsigned char i = 0; i < NUM_INTERPOLATE_TYPES; ++i )
 	{
 		SendMessage( control, CB_ADDSTRING, 0, (LPARAM)Interpolator_NameForInterpolator( i, true ) ); 
 	}
@@ -226,16 +225,15 @@ static BOOL CALLBACK EdgePropertiesDialogProc( HWND hwndDlg, UINT uMsg, WPARAM w
 				g_Params.m_bActive[ 0 ] = SendMessage( GetDlgItem( hwndDlg, IDC_LEFT_ACTIVE ), BM_GETCHECK, 0, 0 ) == BST_CHECKED ? true : false;
 				g_Params.m_bActive[ 1 ] = SendMessage( GetDlgItem( hwndDlg, IDC_RIGHT_ACTIVE ), BM_GETCHECK, 0, 0 ) == BST_CHECKED ? true : false;
 
-				int interpolatorType;
-				interpolatorType = SendMessage(  GetDlgItem( hwndDlg, IDC_LEFT_CURVETYPE ), CB_GETCURSEL, 0, 0 );
+				LRESULT interpolatorType = SendMessage(  GetDlgItem( hwndDlg, IDC_LEFT_CURVETYPE ), CB_GETCURSEL, 0, 0 );
 				if ( interpolatorType != CB_ERR )
 				{
-					g_Params.m_InterpolatorType[ 0 ] = interpolatorType;
+					g_Params.m_InterpolatorType[ 0 ] = static_cast<int>(interpolatorType);
 				}
 				interpolatorType = SendMessage(  GetDlgItem( hwndDlg, IDC_RIGHT_CURVETYPE ), CB_GETCURSEL, 0, 0 );
 				if ( interpolatorType != CB_ERR )
 				{
-					g_Params.m_InterpolatorType[ 1 ] = interpolatorType;
+					g_Params.m_InterpolatorType[ 1 ] = static_cast<int>(interpolatorType);
 				}
 
 				EndDialog( hwndDlg, 1 );
@@ -256,11 +254,11 @@ static BOOL CALLBACK EdgePropertiesDialogProc( HWND hwndDlg, UINT uMsg, WPARAM w
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int EdgeProperties( CEdgePropertiesParams *params )
+intp EdgeProperties( CEdgePropertiesParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_EDGEPROPERTIES ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)EdgePropertiesDialogProc );

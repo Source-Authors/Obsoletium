@@ -33,8 +33,9 @@ CIconComboBox::~CIconComboBox()
 void CIconComboBox::Init( void )
 {
 	// initialize the icon size
-	m_IconSize.cx = GetSystemMetrics( SM_CXICON );
-	m_IconSize.cy = GetSystemMetrics( SM_CYICON );
+	const UINT dpi = GetDpiForWindow( m_hWnd );
+	m_IconSize.cx = GetSystemMetricsForDpi( SM_CXICON, dpi );
+	m_IconSize.cy = GetSystemMetricsForDpi( SM_CYICON, dpi );
 }
 
 //-----------------------------------------------------------------------------
@@ -67,7 +68,7 @@ int CIconComboBox::AddIcon( LPCTSTR pIconName )
 	//
 	// CB_ERR - general error
 	//
-	int result = SetItemData( ndx, ( DWORD )hIcon );
+	int result = SetItemData( ndx, ( DWORD_PTR )hIcon );
 	if( result == CB_ERR )
 		return result;
 
@@ -106,7 +107,7 @@ int CIconComboBox::InsertIcon( LPCTSTR pIconName, int ndx )
 	//
 	// CB_ERR - general error
 	//
-	result = SetItemData( ndx, ( DWORD )hIcon );
+	result = SetItemData( ndx, ( DWORD_PTR )hIcon );
 	if( result == CB_ERR )
 		return result;
 	
@@ -209,7 +210,7 @@ int CIconComboBox::DeleteString( int nIndex )
 void CIconComboBox::MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct )
 { 
 	lpMeasureItemStruct->itemWidth = m_IconSize.cx;
-	lpMeasureItemStruct->itemHeight = m_IconSize.cy + 1;
+	lpMeasureItemStruct->itemHeight = m_IconSize.cy + m_dpi_behavior.ScaleOnY( 1 );
 }
 
 

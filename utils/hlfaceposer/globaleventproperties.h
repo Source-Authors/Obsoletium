@@ -43,6 +43,6 @@ struct CGlobalEventParams : public CBaseDialogParams
 	float			m_flLoopTime;
 };
 
-int GlobalEventProperties( CGlobalEventParams *params );
+intp GlobalEventProperties( CGlobalEventParams *params );
 
 #endif // GLOBALEVENTPROPERTIES_H

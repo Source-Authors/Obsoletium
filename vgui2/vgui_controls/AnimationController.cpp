@@ -1751,7 +1751,7 @@ PanelAnimationMap *CPanelAnimationDictionary::FindOrAddPanelAnimationMap( char c
 	Panel::InitPropertyConverters();
 
 	PanelAnimationMapDictionaryEntry entry;
-	entry.map = (PanelAnimationMap *)m_PanelAnimationMapPool.Alloc();
+	entry.map = m_PanelAnimationMapPool.Alloc();
 	m_AnimationMaps.Insert( StripNamespace( className ), entry );
 	return entry.map;
 }
@@ -1807,8 +1807,9 @@ void CPanelAnimationDictionary::PanelAnimationDumpVars( char const *className )
 //-----------------------------------------------------------------------------
 CPanelAnimationDictionary& GetPanelAnimationDictionary()
 {
-	static CPanelAnimationDictionary dictionary;
-	return dictionary;
+	// dimhotepus: Intentional leak.
+	static CPanelAnimationDictionary *dictionary = new CPanelAnimationDictionary();
+	return *dictionary;
 }
 
 //-----------------------------------------------------------------------------

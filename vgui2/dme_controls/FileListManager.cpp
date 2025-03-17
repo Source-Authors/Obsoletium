@@ -225,7 +225,7 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 	else
 	{
 		// dimhotepus: Drop Perforce support.
-		bool bP4Connected = false; //  p4->IsConnectedToServer();
+		// bool bP4Connected = p4->IsConnectedToServer();
 
 		int nSelected = GetSelectedItemsCount();
 		int nLoaded = 0;

@@ -346,11 +346,11 @@ void CMapKeyFrame::OnParentKeyChanged( const char* key, const char* value )
 	}
 	else if ( !stricmp(key, "NextTime") )
 	{
-		m_flMoveTime = atof( value );
+		m_flMoveTime = strtof(value, nullptr);
 	}
 	else if ( !stricmp(key, "MoveSpeed") )
 	{
-		m_flSpeed = atof( value );
+		m_flSpeed = strtof(value, nullptr);
 		m_bRebuildPath = true;
 	}
 	else if (!stricmp(key, "angles"))
@@ -425,7 +425,7 @@ void CMapKeyFrame::RecalculateTimeFromSpeed( void )
 	if ( ent )
 	{
 		char buf[16];
-		sprintf( buf, "%.2f", newTime );
+		V_sprintf_safe( buf, "%.2f", newTime );
 		ent->SetKeyValue( "NextTime", buf );
 		ent->OnParentKeyChanged( "NextTime", buf );
 	}
@@ -560,7 +560,7 @@ IPositionInterpolator* CMapKeyFrame::SetupPositionInterpolator( int iInterpolato
 		CMapEntity *pEnt = GetParentEntity();
 		if( pEnt )
 		{
-			for ( int i=pEnt->GetFirstKeyValue(); i != pEnt->GetInvalidKeyValue(); i=pEnt->GetNextKeyValue( i ) )
+			for ( auto i=pEnt->GetFirstKeyValue(); i != pEnt->GetInvalidKeyValue(); i=pEnt->GetNextKeyValue( i ) )
 			{
 				m_pPositionInterpolator->ProcessKey( 
 					pEnt->GetKey( i ),

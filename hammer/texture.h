@@ -43,9 +43,9 @@ class CTexture : public IEditorTexture
 		{
 			return(m_szName);
 		}
-		int GetShortName(char *pszName) const;
+		intp GetShortName(char *pszName, intp nameSize) const override;
 
-		int GetKeywords(char *pszKeywords) const;
+		intp GetKeywords(char *pszKeywords, intp keywordsSize) const override;
 		
 		int GetImageDataRGB( void *pData = NULL );
 		int GetImageDataRGBA( void *pData = NULL );

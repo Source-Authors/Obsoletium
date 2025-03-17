@@ -150,8 +150,8 @@ protected:
 		intp m_nBlockSize;
 	};
 
-	const T *HeaderToBlock( const BlockHeader_t *pHeader ) const { return ( T* )( pHeader + 1 ); }
-	const BlockHeader_t *BlockToHeader( const T *pBlock ) const { return ( BlockHeader_t* )( pBlock ) - 1; }
+	const T *HeaderToBlock( const BlockHeader_t *pHeader ) const { return ( const T* )( pHeader + 1 ); }
+	const BlockHeader_t *BlockToHeader( const T *pBlock ) const { return ( const BlockHeader_t* )( pBlock ) - 1; }
 
 	BlockHeader_t* m_pBlocks;
 	intp m_nAllocationCount;

@@ -218,7 +218,7 @@ private:
 		TFade fade;
 
 		// position in TextStream that these changes take effect
-		int textStreamIndex;
+		intp textStreamIndex;
 	};
 
 	bool m_bResetFades;

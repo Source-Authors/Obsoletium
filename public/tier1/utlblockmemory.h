@@ -48,8 +48,8 @@ public:
 	void Init( intp nGrowSize = 0, intp nInitSize = 0 );
 
 	// here to match CUtlMemory, but only used by ResetDbgInfo, so it can just return NULL
-	T* Base() { return nullptr; }
-	const T* Base() const { return nullptr; }
+	[[nodiscard]] T* Base() { return nullptr; }
+	[[nodiscard]] const T* Base() const { return nullptr; }
 
 	class Iterator_t
 	{
@@ -57,31 +57,31 @@ public:
 		constexpr Iterator_t( I i ) : index( i ) {}
 		I index;
 
-		constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
-		constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
+		[[nodiscard]] constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
+		[[nodiscard]] constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
 	};
-	Iterator_t First() const							{ return Iterator_t( IsIdxValid( 0 ) ? 0 : InvalidIndex() ); }
-	Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( IsIdxValid( it.index + 1 ) ? it.index + 1 : InvalidIndex() ); }
-	I GetIndex( const Iterator_t &it ) const			{ return it.index; }
-	bool IsIdxAfter( I i, const Iterator_t &it ) const	{ return i > it.index; }
-	bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ); }
-	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
+	[[nodiscard]] Iterator_t First() const							{ return Iterator_t( IsIdxValid( 0 ) ? 0 : InvalidIndex() ); }
+	[[nodiscard]] Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( IsIdxValid( it.index + 1 ) ? it.index + 1 : InvalidIndex() ); }
+	[[nodiscard]] I GetIndex( const Iterator_t &it ) const			{ return it.index; }
+	[[nodiscard]] bool IsIdxAfter( I i, const Iterator_t &it ) const	{ return i > it.index; }
+	[[nodiscard]] bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ); }
+	[[nodiscard]] constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 	// element access
-	T& operator[]( I i );
-	const T& operator[]( I i ) const;
-	T& Element( I i );
-	const T& Element( I i ) const;
+	[[nodiscard]] T& operator[]( I i );
+	[[nodiscard]] const T& operator[]( I i ) const;
+	[[nodiscard]] T& Element( I i );
+	[[nodiscard]] const T& Element( I i ) const;
 
 	// Can we use this index?
-	bool IsIdxValid( I i ) const;
-	static constexpr I InvalidIndex() { return static_cast<I>(-1); }
+	[[nodiscard]] bool IsIdxValid( I i ) const;
+	[[nodiscard]] static constexpr I InvalidIndex() { return static_cast<I>(-1); }
 
 	void Swap( CUtlBlockMemory< T, I > &mem );
 
 	// Size
-	intp NumAllocated() const;
-	intp Count() const { return NumAllocated(); }
+	[[nodiscard]] intp NumAllocated() const;
+	[[nodiscard]] intp Count() const { return NumAllocated(); }
 
 	// Grows memory by max(num,growsize) rounded up to the next power of 2, and returns the allocation index/ptr
 	void Grow( intp num = 1 );
@@ -96,11 +96,11 @@ public:
 	void Purge( intp numElements );
 
 protected:
-	intp Index( intp major, intp minor ) const { return ( major << m_nIndexShift ) | minor; }
-	intp MajorIndex( intp i ) const { return i >> m_nIndexShift; }
-	intp MinorIndex( intp i ) const { return i & m_nIndexMask; }
+	[[nodiscard]] intp Index( intp major, intp minor ) const { return ( major << m_nIndexShift ) | minor; }
+	[[nodiscard]] intp MajorIndex( intp i ) const { return i >> m_nIndexShift; }
+	[[nodiscard]] intp MinorIndex( intp i ) const { return i & m_nIndexMask; }
 	void ChangeSize( intp nBlocks );
-	intp NumElementsInBlock() const { return m_nIndexMask + 1; }
+	[[nodiscard]] intp NumElementsInBlock() const { return m_nIndexMask + 1; }
 
 	T** m_pMemory;
 	intp m_nBlocks;
