@@ -7235,9 +7235,6 @@ void CShaderAPIDx8::WriteTextureToFile( ShaderAPITextureHandle_t hTexture, const
 	{
 		//render targets can't be locked, luckily we can copy the surface to system memory and lock that.
 		IDirect3DSurface *pSystemSurface;
-
-		Assert( !IsX360() );
-
 		hr = Dx9Device()->CreateOffscreenPlainSurface( surfaceDesc.Width, surfaceDesc.Height, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &pSystemSurface, NULL );
 		Assert( SUCCEEDED( hr ) );
 
@@ -7260,7 +7257,15 @@ void CShaderAPIDx8::WriteTextureToFile( ShaderAPITextureHandle_t hTexture, const
 		return;
 	}
 
-	TGAWriter::WriteTGAFile( szFileName, surfaceDesc.Width, surfaceDesc.Height, pTexInt->GetImageFormat(), (const uint8 *)lockedRect.pBits, lockedRect.Pitch );
+	if ( !TGAWriter::WriteTGAFile( szFileName,
+		surfaceDesc.Width, surfaceDesc.Height,
+		pTexInt->GetImageFormat(),
+		(const uint8 *)lockedRect.pBits,
+		lockedRect.Pitch ) )
+	{
+		Warning( "Unable to write TGA '%s'.\n", szFileName );
+		Assert( 0 );
+	}
 
 	if ( FAILED( pTextureLevel->UnlockRect() ) ) 
 	{
