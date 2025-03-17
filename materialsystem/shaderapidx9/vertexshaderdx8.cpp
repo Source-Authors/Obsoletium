@@ -2201,7 +2201,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 	ShaderFileCache_t *pFileCache = &m_ShaderFileCache[pLookup->m_hShaderFileCache];
 	uint8 *pCompressedShaders = pComboBuffer + pLookup->m_nDataOffset;
 
-	uint8 *pUnpackBuffer = new uint8[MAX_SHADER_UNPACKED_BLOCK_SIZE];
+	std::unique_ptr<uint8[]> pUnpackBuffer = std::make_unique<uint8[]>(MAX_SHADER_UNPACKED_BLOCK_SIZE);
 
 	char *debugLabelPtr = debugLabel;	// can be moved to point at something else if need be
 	
@@ -2210,20 +2210,20 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 	while ( bOK )
 	{
 		uint32 nBlockSize = NextULONG( pCompressedShaders );
-		if ( nBlockSize == 0xffffffff )	
+		if ( nBlockSize == std::numeric_limits<uint32>::max() )	
 		{
 			// any more blocks?
 			break;
 		}
 
-		switch( nBlockSize  & 0xc0000000 )
+		switch( nBlockSize & 0xc0000000U )
 		{
 			case 0:											// bzip2
 			{
 				// uncompress
 				uint32 nOutsize = MAX_SHADER_UNPACKED_BLOCK_SIZE;
 				int nRslt = BZ2_bzBuffToBuffDecompress( 
-					reinterpret_cast<char *>( pUnpackBuffer ),
+					reinterpret_cast<char *>( pUnpackBuffer.get() ),
 					&nOutsize,
 					reinterpret_cast<char *>( pCompressedShaders ),
 					nBlockSize, 1, 0 );
@@ -2244,7 +2244,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			{
 				// not compressed, as is
 				nBlockSize &= 0x3fffffff;
-				memcpy( pUnpackBuffer, pCompressedShaders, nBlockSize );
+				memcpy( pUnpackBuffer.get(), pCompressedShaders, nBlockSize );
 				pCompressedShaders += nBlockSize;
 			}
 			break;
@@ -2256,7 +2256,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 				// dimhotepus: Add out size to prevent overflows.
 				size_t nOutsize = CLZMA::Uncompress(
 					pCompressedShaders,
-					pUnpackBuffer,
+					pUnpackBuffer.get(),
 					MAX_SHADER_UNPACKED_BLOCK_SIZE );
 				pCompressedShaders += nBlockSize;
 				nBlockSize = nOutsize;		// how much data there is
@@ -2271,8 +2271,8 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			}
 		}
 		
-		uint8 *pReadPtr = pUnpackBuffer;
-		while ( pReadPtr < pUnpackBuffer+nBlockSize )
+		uint8 *pReadPtr = pUnpackBuffer.get();
+		while ( pReadPtr < pUnpackBuffer.get()+nBlockSize )
 		{
 			uint32 nCombo_ID = NextULONG( pReadPtr );
 			uint32 nShaderSize = NextULONG( pReadPtr );
@@ -2285,7 +2285,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			int iIndex = nCombo_ID;
 			if ( iIndex >= pLookup->m_nStaticIndex )
 				iIndex -= pLookup->m_nStaticIndex;			// ver5 stores combos as full combo, ver6 as dynamic combo # only
-			if ( IsPC() && m_bCreateShadersOnDemand )
+			if ( m_bCreateShadersOnDemand )
 			{
 				// cache the code off for later
 				pLookup->m_ShaderStaticCombos.m_pCreationData[iIndex].ByteCode.SetSize( nShaderSize );
@@ -2298,39 +2298,6 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 
 				if ( pFileCache->m_bVertexShader )
 				{
-#if 0
-					// this is all test code
-					CUtlBuffer bufGLCode( 1000, 50000, CUtlBuffer::TEXT_BUFFER );
-					CUtlBuffer bufNewGLCode( 1000, 50000, CUtlBuffer::TEXT_BUFFER );
-					CUtlBuffer bufGLSLCode( 1000, 50000, CUtlBuffer::TEXT_BUFFER );
-					bool bVertexShader;
-
-					uint32 nOptions = 0;
-					nOptions |= D3DToGL_OptionUseEnvParams;
-					nOptions |= D3DToGL_OptionDoFixupZ;
-					nOptions |= D3DToGL_OptionDoFixupY;					
-					//options |= D3DToGL_OptionSpew;
-					
-					// GLSL options
-					nOptions |= D3DToGL_OptionGLSL; // | D3DToGL_AddHexComments | D3DToGL_PutHexCommentsAfterLines;
-					if ( !IsOSX() )
-					{
-						nOptions |= D3DToGL_OptionAllowStaticControlFlow;
-					}
-					sg_NewD3DToOpenGLTranslator.TranslateShader( (uint32 *) pReadPtr, &bufGLSLCode, &bVertexShader, nOptions, -1, 0, debugLabel );
-					Assert( bVertexShader );
-
-					// Test to make sure these are identical
-//					if ( bDumpGLSL )//V_strcmp( (char *)bufGLCode.Base(), (char *)bufNewGLCode.Base() ) )
-//					{
-						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLSLCode.Base(), "glsl_v" );	// GLSL
-//					}
-
-					#if defined( WRITE_ASSEMBLY )
-						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLCode.Base(), "avp" );
-					#endif
-#endif // 0
-
 #ifdef DX_TO_GL_ABSTRACTION
 					// munge the debug label a bit to aid in decoding... catenate the iIndex on the end
 					char temp[1024];
@@ -2342,37 +2309,6 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 				}
 				else
 				{
-#if 0
-					// this is all test code
-//					CUtlBuffer bufGLCode( 1000, 50000, CUtlBuffer::TEXT_BUFFER );
-//					CUtlBuffer bufNewGLCode( 1000, 50000, CUtlBuffer::TEXT_BUFFER );
-					CUtlBuffer bufGLSLCode( 1000, 50000, CUtlBuffer::TEXT_BUFFER );
-					bool bVertexShader;
-
-
-					uint32 nOptions = D3DToGL_OptionUseEnvParams;
-
-					// GLSL options
-					nOptions |= D3DToGL_OptionGLSL;// | D3DToGL_OptionSRGBWriteSuffix | D3DToGL_AddHexComments | D3DToGL_PutHexCommentsAfterLines;
-					if ( !IsOSX() )
-					{
-						nOptions |= D3DToGL_OptionAllowStaticControlFlow;
-					}
-					sg_NewD3DToOpenGLTranslator.TranslateShader( (uint32 *) pReadPtr, &bufGLSLCode, &bVertexShader, nOptions, -1, 0, debugLabel );
-
-					Assert( !bVertexShader );
-
-					// Test to make sure these are identical
-//					if ( V_strcmp( (char *)bufGLCode.Base(), (char *)bufNewGLCode.Base() ) )
-//					{
-						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLSLCode.Base(), "glsl_p" );	// GLSL
-//					}
-
-					#if defined( WRITE_ASSEMBLY )
-						WriteTranslatedFile( pLookup, iIndex, (char *)bufGLCode.Base(), "afp" );
-					#endif
-#endif // 0
-
 #ifdef DX_TO_GL_ABSTRACTION
 					// munge the debug label a bit to aid in decoding... catenate the iIndex on the end
 					char temp[1024];
@@ -2395,8 +2331,6 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			pReadPtr += nShaderSize;
 		}
 	}
-
-	delete[] pUnpackBuffer;
 
 	return bOK;
 }

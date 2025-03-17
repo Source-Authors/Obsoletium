@@ -284,8 +284,9 @@ bool CSceneFileCache::GetSceneDataFromImage( const char *pFileName, int iScene, 
 			}
 			else
 			{
-				auto *pOutputData = (unsigned char *)malloc( originalSize );
-				CLZMA::Uncompress( pData, pOutputData );
+				void *pOutputData = malloc( originalSize );
+				// dimhotepus: Add out size to prevent overflows.
+				CLZMA::Uncompress( pData, pOutputData, originalSize );
 				V_memcpy( pSceneData, pOutputData, nMaxLen );
 				free( pOutputData );
 			}
