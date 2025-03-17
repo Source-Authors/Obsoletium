@@ -356,7 +356,7 @@ void bf_write::WriteVarInt64( uint64 data )
 			}
 		}
 
-		AssertFatalMsg( false, "Can't get here." );
+		UNREACHABLE();
 
 		size10: target[9] = static_cast<uint8>((part2 >>  7) | 0x80);
 		size9 : target[8] = static_cast<uint8>((part2      ) | 0x80);
