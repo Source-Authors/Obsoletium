@@ -2641,7 +2641,7 @@ void LoadAndSpawnEntities_ParseEntKVBlockHelper( CBaseEntity *pNode, KeyValues *
 //-----------------------------------------------------------------------------
 bool UTIL_LoadAndSpawnEntitiesFromScript( CUtlVector <CBaseEntity*> &entities, const char *pScriptFile, const char *pBlock, bool bActivate )
 {
-	KeyValues *pkvFile = new KeyValues( pBlock );
+	KeyValuesAD pkvFile( pBlock );
 
 	if ( pkvFile->LoadFromFile( filesystem, pScriptFile, "MOD" ) )
 	{	
