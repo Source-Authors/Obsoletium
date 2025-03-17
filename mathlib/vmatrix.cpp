@@ -359,7 +359,8 @@ void VMatrix::InverseTR( VMatrix &ret ) const
 
 void MatrixInverseTranspose( const VMatrix& src, VMatrix& dst )
 {
-	src.InverseGeneral( dst );
+	[[maybe_unused]] bool ok = src.InverseGeneral( dst );
+	AssertMsg( ok, "Matrix inverse failed.\n" );
 	MatrixTranspose( dst, dst );
 }
 
