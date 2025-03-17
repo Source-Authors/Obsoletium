@@ -3008,7 +3008,7 @@ static auto goodmatch = []( unsigned char cName, unsigned char cQuery )
 	return false;
 };
 
-FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
+static FORCEINLINE bool NamesMatchGood( const char *pszQuery, string_t nameToMatch )
 {
 	if ( nameToMatch == NULL_STRING )
 		return (!pszQuery || *pszQuery == 0 || *pszQuery == '*');
@@ -3019,24 +3019,12 @@ FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 	if ( pszNameToMatch == pszQuery )
 		return true;
 
-	const char *originalQuery = pszQuery, *originalNameToMatch = STRING(nameToMatch);
-
 	while ( *pszNameToMatch && *pszQuery )
 	{
 		unsigned char cName = *pszNameToMatch;
 		unsigned char cQuery = *pszQuery;
 
 		const bool good = goodmatch( cName, cQuery );
-
-#ifdef _DEBUG
-		const bool bad = badmatch( cName, cQuery );
-
-		// dimhotepus: Detect cases when name matching is different. Inspect them.
-		AssertMsg( good == bad,
-			"Behavior change. %s and %s names matching diffs from original.",
-			originalQuery, originalNameToMatch );
-#endif
-
 		if ( !good )
 		{
 			break;
@@ -3054,6 +3042,61 @@ FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 		return true;
 
 	return false;
+}
+
+static bool NamesMatchBad( const char *pszQuery, string_t nameToMatch )
+{
+	if ( nameToMatch == NULL_STRING )
+		return (!pszQuery || *pszQuery == 0 || *pszQuery == '*');
+
+	const char *pszNameToMatch = STRING(nameToMatch);
+
+	// If the pointers are identical, we're identical
+	if ( pszNameToMatch == pszQuery )
+		return true;
+
+	while ( *pszNameToMatch && *pszQuery )
+	{
+		unsigned char cName = *pszNameToMatch;
+		unsigned char cQuery = *pszQuery;
+
+		const bool bad = badmatch( cName, cQuery );
+		if ( !bad )
+		{
+			break;
+		}
+
+		++pszNameToMatch;
+		++pszQuery;
+	}
+
+	if ( *pszQuery == 0 && *pszNameToMatch == 0 )
+		return true;
+
+	// @TODO (toml 03-18-03): Perhaps support real wildcards. Right now, only thing supported is trailing *
+	if ( *pszQuery == '*' )
+		return true;
+
+	return false;
+}
+
+static FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
+{
+	const bool good = NamesMatchGood( pszQuery, nameToMatch );
+
+#ifdef _DEBUG
+	const bool bad = NamesMatchBad( pszQuery, nameToMatch );
+
+	// dimhotepus: Detect cases when name matching is different. Inspect them.
+	AssertMsg( good == bad,
+		"Behavior change! New %s and %s match (%s) diffs from old (%s).",
+		pszQuery,
+		nameToMatch.ToCStr(),
+		good ? "true" : "false",
+		bad ? "true" : "false" );
+#endif
+
+	return good;
 }
 
 bool CBaseEntity::NameMatchesComplex( const char *pszNameOrWildcard )
