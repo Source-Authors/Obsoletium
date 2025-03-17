@@ -14,16 +14,10 @@
 #include "tier1/utlvector.h"
 #include "tier1/strtools.h"
 
-// This automatically calls WSAStartup for the app at startup.
-class CIPStarter {
- public:
-  CIPStarter() {
-    WSADATA wsaData;
-    WSAStartup(WINSOCK_VERSION, &wsaData);
-  }
-};
+#include "windows/scoped_winsock.h"
 
-static CIPStarter g_Starter;
+// This automatically calls WSAStartup for the app at startup.
+static se::common::windows::ScopedWinsock g_scoped_winsock{WINSOCK_VERSION};
 
 unsigned long SampleMilliseconds() {
   CCycleCount cnt;
