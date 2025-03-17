@@ -2220,7 +2220,7 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		if ( fmt & VERTEX_BONE_INDEX )
 		{
 			unsigned char *pIndex = BoneIndex( desc, i );
-			temp += sprintf( temp, "BI %d %d %d %d ", ( int )pIndex[0], ( int )pIndex[1], ( int )pIndex[2], ( int )pIndex[3] );
+			temp += sprintf( temp, "BI %hhu %hhu %hhu %hhu ", pIndex[0], pIndex[1], pIndex[2], pIndex[3] );
 			Assert( pIndex[0] < 16 );
 			Assert( pIndex[1] < 16 );
 			Assert( pIndex[2] < 16 );
@@ -2273,7 +2273,7 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 	Plat_DebugString(tempbuf);
 	for ( i = 0; i < nIndexCount; ++i )
 	{
-		temp += sprintf( temp, "%d ", ( int )desc.m_pIndices[i] );
+		temp += sprintf( temp, "%hu ", desc.m_pIndices[i] );
 		if ((i & 0x0F) == 0x0F)
 		{
 			sprintf( temp, "\n" );
