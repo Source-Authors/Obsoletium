@@ -32,7 +32,7 @@ CPlayerPanel::CPlayerPanel(vgui::Panel *parent, const char *name) : vgui::Proper
 {
 	m_pPlayerListPanel = new vgui::ListPanel(this, "Players list");
 
-	m_pPlayerListPanel->AddColumnHeader(0, "name", "#Player_Panel_Name", 200, ListPanel::COLUMN_RESIZEWITHWINDOW );
+	m_pPlayerListPanel->AddColumnHeader(0, "name", "#Player_Panel_Name", 200, ListPanel::COLUMN_RESIZEWITHWINDOW ); //-V2017
 	m_pPlayerListPanel->AddColumnHeader(1, "authid", "#Player_Panel_ID", 100);
 	m_pPlayerListPanel->AddColumnHeader(2, "ping", "#Player_Panel_Ping", 50);
 	m_pPlayerListPanel->AddColumnHeader(3, "loss", "#Player_Panel_Loss", 50);

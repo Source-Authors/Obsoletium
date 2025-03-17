@@ -25,7 +25,7 @@ using namespace vgui;
 CVarListPropertyPage::CVarListPropertyPage(vgui::Panel *parent, const char *name) : vgui::PropertyPage(parent, name)
 {
 	m_pRulesList = new ListPanel(this, "RulesList");
-	m_pRulesList->AddColumnHeader(0, "name", "Variable", 256);
+	m_pRulesList->AddColumnHeader(0, "name", "Variable", 256); //-V2017
 	m_pRulesList->AddColumnHeader(1, "value", "Value", 256);
 
 	m_pEditButton = new Button(this, "EditButton", "Edit...");
@@ -135,7 +135,7 @@ void CVarListPropertyPage::SetVarString(const char *varName, const char *value)
 		// look up the value in the enumeration
 		int iValue = atoi(value);
 		const char *result = rule->FindKey("list", true)->GetString(value, "");
-		rule->SetString("value", result);
+		rule->SetString("value", result); //-V2017
 		rule->SetInt("enum", iValue);
 	}
 	else 

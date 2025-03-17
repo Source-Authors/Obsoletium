@@ -243,7 +243,7 @@ void CBanPanel::RemoveBan()
 
 		// activate the confirmation dialog
 		QueryBox *box = new QueryBox(g_pVGuiLocalize->Find("#Ban_Title_Remove"), message);
-		box->SetOKCommand(new KeyValues("removebanbyid", "id", kv->GetString("id")));
+		box->SetOKCommand(new KeyValues("removebanbyid", "id", kv->GetString("id"))); //-V2017
 		box->AddActionSignalTarget(this);
 		box->DoModal();
 	}
