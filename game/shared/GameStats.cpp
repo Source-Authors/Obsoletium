@@ -635,7 +635,7 @@ bool CBaseGameStats::LoadFromFile( void )
 				else
 				{
 					// skip over the flag
-					buf.GetInt();
+					(void)buf.GetInt();
 				}
 
 				if( !bValid )
