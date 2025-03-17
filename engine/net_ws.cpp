@@ -376,10 +376,10 @@ bool NET_StringToAdr ( const char *s, netadr_t *a)
 	
 	if ( !NET_StringToSockaddr (address, &saddr) )
 		return false;
-		
-	a->SetFromSockadr( &saddr );
 
-	return true;
+	
+	// dimhotepus: Should check address assigned.
+	return a->SetFromSockadr( &saddr );
 }
 
 CNetChan *NET_FindNetChannel(intp socket, netadr_t &adr)
