@@ -84,6 +84,8 @@
 #include "cl_steamauth.h"
 #endif // SWDS
 
+#include "scoped_app_locale.h"
+
 #if defined(_WIN32)
 #include <eh.h>
 #include <thread>
@@ -2043,6 +2045,15 @@ bool CModAppSystemGroup::PreInit()
 void SV_ShutdownGameDLL();
 int CModAppSystemGroup::Main()
 {
+	// dimhotepus: Always set locale to utf8 one.
+	const char kEnUsUtf8Locale[] = "en_US.UTF-8";
+	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(),
+					kEnUsUtf8Locale)) {
+		Warning("setlocale('%s') failed, current locale is '%s'.\n",
+				kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+	}
+
 	int nRunResult = RUN_OK;
 
 	if ( IsServerOnly() )

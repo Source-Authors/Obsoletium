@@ -1,19 +1,19 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_SCOPED_APP_LOCALE_H
-#define SRC_LAUNCHER_SCOPED_APP_LOCALE_H
+#ifndef SRC_COMMON_SCOPED_APP_LOCALE_H_
+#define SRC_COMMON_SCOPED_APP_LOCALE_H_
 
 #include <clocale>
 #include <string>
 
 #include "tier1/strtools.h"
 
-namespace se::launcher {
+namespace se {
 
 // Scoped app locale.
 class ScopedAppLocale {
  public:
-  ScopedAppLocale(const char *new_locale) noexcept
+  explicit ScopedAppLocale(const char *new_locale) noexcept
       : old_locale_{GetCurrentLocale()}, new_locale_{new_locale} {
 #ifdef LINUX
     setenv("LC_ALL", new_locale, 1);
@@ -26,8 +26,8 @@ class ScopedAppLocale {
 
   ScopedAppLocale(const ScopedAppLocale &) = delete;
   ScopedAppLocale(ScopedAppLocale &&) = delete;
-  ScopedAppLocale& operator=(const ScopedAppLocale &) = delete;
-  ScopedAppLocale& operator=(ScopedAppLocale &&) = delete;
+  ScopedAppLocale &operator=(const ScopedAppLocale &) = delete;
+  ScopedAppLocale &operator=(ScopedAppLocale &&) = delete;
 
   ~ScopedAppLocale() noexcept {
     const char *locale{GetCurrentLocale()};
@@ -47,6 +47,6 @@ class ScopedAppLocale {
   static constexpr char kEmptyLocale[1]{""};
 };
 
-}  // namespace se::launcher
+}  // namespace se
 
-#endif  // SRC_LAUNCHER_SCOPED_APP_LOCALE_H
+#endif  // SRC_COMMON_SCOPED_APP_LOCALE_H_

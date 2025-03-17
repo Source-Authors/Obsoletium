@@ -385,11 +385,10 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // slam things to en_US.UTF-8.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::launcher::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (Q_stricmp(se::launcher::ScopedAppLocale::GetCurrentLocale(),
-                kEnUsUtf8Locale)) {
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::launcher::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
   }
 
 #ifdef POSIX

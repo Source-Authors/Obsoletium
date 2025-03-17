@@ -109,7 +109,6 @@
 #include "sv_remoteaccess.h" // NotifyDedicatedServerUI()
 #include "snd_audio_source.h"
 #include "sv_steamauth.h"
-#include "MapReslistGenerator.h"
 #include "DevShotGenerator.h"
 #include "sv_plugin.h"
 #include "toolframework/itoolframework.h"
@@ -122,10 +121,6 @@
 #include "soundservice.h"
 #include "profile.h"
 #include "steam/isteamremotestorage.h"
-#if defined( LINUX )
-#include <locale.h>
-#include "include/SDL3/SDL.h"
-#endif
 // dimhotepus: Fix warnings about unpaired voice controls shutdown.
 #include "audio/private/voice_mixer_controls.h"
 
@@ -3613,24 +3608,6 @@ void Host_PostInit()
 		// vgui needs other systems to finalize
 		EngineVGui()->PostInit();
 	}
-
-#if defined( LINUX )
-	const char en_US[] = "en_US.UTF-8";
-	const char *CurrentLocale = setlocale( LC_ALL, NULL );
-	if ( !CurrentLocale )
-		CurrentLocale = "c";
-	if ( Q_stricmp( CurrentLocale, en_US ) )
-	{
-		char MessageText[ 512 ];
-
-		V_sprintf_safe( MessageText, "SetLocale('%s') failed. Using '%s'.\n"
-									 "You may have limited glyph support.\n"
-									 "Please install '%s' locale.",
-						en_US, CurrentLocale, en_US );
-		SDL_ShowSimpleMessageBox( 0, "Warning", MessageText, GetAssertDialogParent() );
-	}
-#endif // LINUX
-
 #endif
 }
 

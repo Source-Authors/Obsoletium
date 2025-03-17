@@ -31,6 +31,8 @@
 #include "filesystem_init.h"
 #include "vphysics_interface.h"
 
+#include "scoped_app_locale.h"
+
 // dimhotepus: Drop Perforce support
 // #include "p4lib/ip4.h"
 
@@ -105,7 +107,8 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
         input_system_{nullptr},
         material_system_{nullptr},
         hammer_{nullptr},
-        scoped_spew_output_{HammerSpewFunc} {}
+        scoped_spew_output_{HammerSpewFunc},
+        scoped_app_locale_{kEnUsUtf8Locale} {}
 
   // Methods of IApplication
   bool Create() override;
@@ -115,6 +118,8 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
   void Destroy() override;
 
  private:
+  static constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
   IFileSystem *file_system_;
   IDataCache *data_cache_;
   IInputSystem *input_system_;
@@ -122,10 +127,16 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
   IHammer *hammer_;
 
   ScopedSpewOutputFunc scoped_spew_output_;
+  const se::ScopedAppLocale scoped_app_locale_;
 };
 
 // Create all singleton systems
 bool HammerAppSystemGroup::Create() {
+  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    Warning("setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
+
   // Save some memory so engine/hammer isn't so painful
   CommandLine()->AppendParm("-disallowhwmorph", nullptr);
 
