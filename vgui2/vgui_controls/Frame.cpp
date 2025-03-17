@@ -144,7 +144,7 @@ namespace
 			_frame->Repaint();
 		}
 		
-		void OnCursorMoved(int x, int y)
+		void OnCursorMoved(int x, int y) override
 		{
 			if (!_dragging)
 				return;
@@ -162,7 +162,7 @@ namespace
 			_frame->Repaint();
 		}
 		
-		void OnMousePressed(MouseCode code)
+		void OnMousePressed(MouseCode code) override
 		{
 			if (code == MOUSE_LEFT)
 			{ 
@@ -189,7 +189,7 @@ namespace
 			}
 		}
 
-		void OnMouseDoublePressed(MouseCode code)
+		void OnMouseDoublePressed(MouseCode code) override
 		{
 			GetParent()->OnMouseDoublePressed(code);
 		}
