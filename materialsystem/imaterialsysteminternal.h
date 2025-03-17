@@ -31,9 +31,17 @@ public:
 	{
 		MEM_ALLOC_CREDIT_( "CMatCallQueue.m_Allocator" );
 #ifdef SWDS
-		m_Allocator.Init( 2*1024, 0, 0, 4 );
+		constexpr size_t size = 2u*1024;
+		if ( !m_Allocator.Init( size, 0, 0, 4 ) )
+		{
+			Error( "Material call queue allocator unable to allocate %u virtual bytes.\n", size );
+		}
 #else
-		m_Allocator.Init( IsX360() ? 2*1024*1024 : 8*1024*1024, 64*1024, 256*1024, 4 );
+		constexpr size_t size = 8u*1024*1024;
+		if ( !m_Allocator.Init( size, 64u*1024, 256u*1024, 4u ) )
+		{
+			Error( "Material call queue allocator unable to allocate %u virtual bytes.\n", size );
+		}
 #endif
 		m_FunctorFactory.SetAllocator( &m_Allocator );
 		m_pHead = m_pTail = NULL;
