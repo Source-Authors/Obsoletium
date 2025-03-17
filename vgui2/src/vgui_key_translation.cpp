@@ -7,6 +7,7 @@
 #include "vgui_key_translation.h"
 
 #if defined( WIN32 )
+#define NOMINMAX
 #include <wtypes.h>
 #include <WinUser.h>
 #endif
