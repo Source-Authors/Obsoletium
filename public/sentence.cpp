@@ -602,12 +602,12 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 			cc_length = atoi( token );
 			Assert( cc_length >= 0 && cc_length < ssize( cc_stream ) );
 			// Skip space
-			buf.GetChar();
+			(void)buf.GetChar();
 			buf.Get( cc_stream, cc_length );
 			cc_stream[ cc_length ] = 0;
 			
 			// Skip space
-			buf.GetChar();
+			(void)buf.GetChar();
 			buf.GetString( token );
 			buf.GetString( token );
 
@@ -797,9 +797,10 @@ void CSentence::CacheRestoreFromBuffer( CUtlBuffer& buf )
 	unsigned short pcount;
 	if ( version == CACHED_SENTENCE_VERSION_ALIGNED )
 	{
-		buf.GetChar();
-		buf.GetChar();
-		buf.GetChar();
+		// dimhotepus: Skip 3 alingment chars, see CacheSaveToBuffer.
+		(void)buf.GetChar();
+		(void)buf.GetChar();
+		(void)buf.GetChar();
 		pcount = buf.GetInt();
 	}
 	else
