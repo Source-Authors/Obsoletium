@@ -438,13 +438,19 @@ bool VMPITracker_WriteDebugFile( const char *pFilename )
 	auto [fp, errc] = se::posix::posix_file_stream_factory::open( pFilename, "wt" );
 	if ( !errc )
 	{
-		fp.print( "# work units: %zd\n", g_WorkUnits.Count() );
-		fp.print( "# active work units: %d\n", CountActiveWorkUnits() );
+		std::tie(std::ignore, errc) = fp.print( "# work units: %zd\n", g_WorkUnits.Count() );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "# active work units: %d\n", CountActiveWorkUnits() );
+		if (errc) return false;
 		
-		fp.print( "\n" );
-		fp.print( "--- Events ---" );
-		fp.print( "\n" );
-		fp.print( "\n" );
+		std::tie(std::ignore, errc) = fp.print( "\n" );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "--- Events ---" );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "\n" );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "\n" );
+		if (errc) return false;
 		
 		ptrdiff_t i{0};
 		for ( auto &wu : g_WorkUnits )
@@ -452,12 +458,15 @@ bool VMPITracker_WriteDebugFile( const char *pFilename )
 			if ( wu.m_iWorkerCompleted != -1 )
 				continue;
 
-			fp.print( "  work unit %d\n", i++ );
-			fp.print( "\n" );
+			std::tie(std::ignore, errc) = fp.print( "  work unit %d\n", i++ );
+			if (errc) return false;
+			std::tie(std::ignore, errc) = fp.print( "\n" );
+			if (errc) return false;
 						
 			if ( wu.m_Events.Count() == 0 )
 			{
-				fp.print( "    *no events*\n" );
+				std::tie(std::ignore, errc) = fp.print( "    *no events*\n" );
+				if (errc) return false;
 			}
 			else
 			{
@@ -465,25 +474,30 @@ bool VMPITracker_WriteDebugFile( const char *pFilename )
 				{
 					if ( event.m_iEventType == EVENT_TYPE_WU_STARTED )
 					{
-						fp.print( "   started (by worker %s) %.1f seconds ago\n", 
+						std::tie(std::ignore, errc) = fp.print( "   started (by worker %s) %.1f seconds ago\n", 
 							VMPI_GetMachineName( event.m_iWorker ),
 							Plat_FloatTime() - event.m_flTime );
+						if (errc) return false;
 					}
 					else if ( event.m_iEventType == EVENT_TYPE_SEND_WORK_UNIT )
 					{
-						fp.print( "      sent (to worker %s) %.1f seconds ago\n", 
+						std::tie(std::ignore, errc) = fp.print( "      sent (to worker %s) %.1f seconds ago\n", 
 							VMPI_GetMachineName( event.m_iWorker ),
 							Plat_FloatTime() - event.m_flTime );
+						if (errc) return false;
 					}
 					else if ( event.m_iEventType == EVENT_TYPE_WU_COMPLETED )
 					{
-						fp.print( " completed (by worker %s) %.1f seconds ago\n", 
+						std::tie(std::ignore, errc) = fp.print( " completed (by worker %s) %.1f seconds ago\n", 
 							VMPI_GetMachineName( event.m_iWorker ),
 							Plat_FloatTime() - event.m_flTime );
+						if (errc) return false;
 					}
 				}
 			}
-			fp.print( "\n" );
+
+			std::tie(std::ignore, errc) = fp.print( "\n" );
+			if (errc) return false;
 		}
 		
 		return true;
@@ -534,13 +548,13 @@ void VMPITracker_HandleDebugKeypresses()
 			int iFile = 1;
 			for ( iFile; iFile < nMaxTries; iFile++ )
 			{
-				Q_snprintf( filename, sizeof( filename ), "c:\\vmpi_tracker_%d.txt", iFile );
+				V_sprintf_safe( filename, "vmpi_tracker_%d.txt", iFile );
 				if ( _access( filename, 0 ) != 0 )
 					break;
 			}
 			if ( iFile == nMaxTries )
 			{
-				Warning( "** Please delete c:\\vmpi_tracker_*.txt and try again.\n" );
+				Warning( "** Please delete vmpi_tracker_*.txt and try again.\n" );
 			}
 			else
 			{
