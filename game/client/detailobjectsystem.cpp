@@ -275,6 +275,10 @@ struct DetailPropSpriteDict_t
 	Vector2D	m_TexLR;	// Texcoords of lower left
 };
 
+// dimhotepus: Verify local and BSP definitions match.
+static_assert(sizeof(DetailSpriteDictLump_t) == sizeof(DetailPropSpriteDict_t));
+static_assert(alignof(DetailSpriteDictLump_t) == alignof(DetailPropSpriteDict_t));
+
 struct FastSpriteX4_t
 {
 	// mess with this structure without care and you'll be in a world of trouble. layout matters.
@@ -1614,7 +1618,7 @@ void CDetailObjectSystem::UnserializeDetailSprites( CUtlBuffer& buf )
 	while ( --count >= 0 )
 	{
 		intp i = m_DetailSpriteDict.AddToTail();
-		buf.Get( &m_DetailSpriteDict[i], sizeof(DetailSpriteDictLump_t) );
+		buf.Get( m_DetailSpriteDict[i] );
 		intp flipi = m_DetailSpriteDictFlipped.AddToTail();
 		m_DetailSpriteDictFlipped[flipi] = m_DetailSpriteDict[i];
 		::V_swap( m_DetailSpriteDictFlipped[flipi].m_TexUL.x, m_DetailSpriteDictFlipped[flipi].m_TexLR.x );
