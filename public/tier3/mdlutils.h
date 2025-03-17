@@ -41,7 +41,7 @@ public:
 	~CMDL();
 
 	void SetMDL( MDLHandle_t h );
-	MDLHandle_t GetMDL() const;
+	[[nodiscard]] MDLHandle_t GetMDL() const;
 
 	// Simple version of drawing; sets up bones for you
 	void Draw( const matrix3x4_t& rootToWorld );
@@ -56,7 +56,7 @@ public:
 	void SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pMergeBoneToWorld, 
 		const CStudioHdr *pFollow, const matrix3x4_t *pFollowBoneToWorld, const matrix3x4_t &matModelToWorld );
 	
-	studiohdr_t *GetStudioHdr();
+	[[nodiscard]] studiohdr_t *GetStudioHdr();
 
 private:
 	void UnreferenceMDL();
@@ -85,7 +85,7 @@ void GetMDLBoundingBox( Vector *pMins, Vector *pMaxs, MDLHandle_t h, int nSequen
 //-----------------------------------------------------------------------------
 // Returns the radius of the model as measured from the origin
 //-----------------------------------------------------------------------------
-float GetMDLRadius( MDLHandle_t h, int nSequence );
+[[nodiscard]] float GetMDLRadius( MDLHandle_t h, int nSequence );
 
 //-----------------------------------------------------------------------------
 // Returns a more accurate bounding sphere
