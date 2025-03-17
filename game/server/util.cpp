@@ -719,15 +719,9 @@ void UTIL_GetPlayerConnectionInfo( int playerIndex, int& ping, int &packetloss )
 
 static unsigned short FixedUnsigned16( float value, float scale )
 {
-	int output;
-
-	output = value * scale;
-	if ( output < 0 )
-		output = 0;
-	if ( output > 0xFFFF )
-		output = 0xFFFF;
-
-	return (unsigned short)output;
+	float scaled = value * scale;
+	int output = static_cast<int>(scaled);
+	return static_cast<unsigned short>(Clamp(output, 0, 0xFFFF));
 }
 
 
@@ -928,7 +922,7 @@ void UTIL_ViewPunch( const Vector &center, QAngle angPunch, float radius, bool b
 }
 
 
-void UTIL_ScreenFadeBuild( ScreenFade_t &fade, const color32 &color, float fadeTime, float fadeHold, int flags )
+static void UTIL_ScreenFadeBuild( ScreenFade_t &fade, const color32 &color, float fadeTime, float fadeHold, short flags )
 {
 	fade.duration = FixedUnsigned16( fadeTime, 1<<SCREENFADE_FRACBITS );		// 7.9 fixed
 	fade.holdTime = FixedUnsigned16( fadeHold, 1<<SCREENFADE_FRACBITS );		// 7.9 fixed
@@ -960,7 +954,7 @@ void UTIL_ScreenFadeWrite( const ScreenFade_t &fade, CBaseEntity *pEntity )
 }
 
 
-void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, int flags )
+void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, short flags )
 {
 	int			i;
 	ScreenFade_t	fade;
@@ -977,7 +971,7 @@ void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, i
 }
 
 
-void UTIL_ScreenFade( CBaseEntity *pEntity, const color32 &color, float fadeTime, float fadeHold, int flags )
+void UTIL_ScreenFade( CBaseEntity *pEntity, const color32 &color, float fadeTime, float fadeHold, short flags )
 {
 	ScreenFade_t	fade;
 
