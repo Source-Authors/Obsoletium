@@ -180,14 +180,14 @@ void C_MovieExplosion::RenderParticles( CParticleRenderIterator *pIterator )
 
 		float lifetimePercent = pParticle->m_Lifetime / EMITTED_PARTICLE_LIFETIME;
 		Vector color;
-		color.x = sin(lifetimePercent * 3.14159f);
+		color.x = sin(M_PI_F * lifetimePercent);
 		color.y = color.x * 0.5f;
 		color.z = 0;
 		RenderParticle_ColorSize(
 			pIterator->GetParticleDraw(),
 			tPos,
 			color,
-			m_EmitterAlpha * sin(3.14159 * lifetimePercent),
+			m_EmitterAlpha * color.x,
 			10);
 
 		pParticle = (const StandardParticle_t*)pIterator->GetNext( sortKey );

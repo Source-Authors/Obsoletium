@@ -501,7 +501,7 @@ inline void CClient_Precipitation::RenderParticle( CPrecipitationParticle* pPart
 
 		if ( pParticle->m_Mass > 1.0f )
 		{
-			SinCos( gpGlobals->curtime * M_PI * (1+pParticle->m_Mass * 0.1f) + 
+			SinCos( gpGlobals->curtime * M_PI_F * (1+pParticle->m_Mass * 0.1f) + 
 					pParticle->m_Mass * 5.0f, &s , &c );
 
 			// only spiral particles with a mass > 1, so some fall straight down
@@ -824,7 +824,7 @@ float AshDebrisEffect::UpdateRoll( SimpleParticle *pParticle, float timeDelta )
 	if ( pParticle->m_iFlags & ASH_PARTICLE_NOISE )
 	{
 		Vector vTempEntVel = pParticle->m_vecVelocity;
-		float fastFreq = gpGlobals->curtime * 1.5;
+		float fastFreq = gpGlobals->curtime * 1.5f;
 
 		float s, c;
 		SinCos( fastFreq, &s, &c );
@@ -997,7 +997,7 @@ void CClient_Precipitation::CreateAshParticle( void )
 
 			pParticle->m_uchStartAlpha	= 255;
 
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -0.15f, 0.15f );
 
 			pParticle->m_iFlags			= SIMPLE_PARTICLE_FLAG_WINDBLOWN;
@@ -1019,8 +1019,8 @@ void CClient_Precipitation::CreateRainOrSnowParticle( Vector vSpawnPosition, Vec
 	VectorCopy( vVelocity, p->m_Velocity );
 	p->m_Pos = vSpawnPosition;
 
-	p->m_Velocity[ 0 ] += random->RandomFloat(-r_RainSideVel.GetInt(), r_RainSideVel.GetInt());
-	p->m_Velocity[ 1 ] += random->RandomFloat(-r_RainSideVel.GetInt(), r_RainSideVel.GetInt());
+	p->m_Velocity[ 0 ] += random->RandomFloat(-r_RainSideVel.GetFloat(), r_RainSideVel.GetFloat());
+	p->m_Velocity[ 1 ] += random->RandomFloat(-r_RainSideVel.GetFloat(), r_RainSideVel.GetFloat());
 
 	p->m_Mass = random->RandomFloat( 0.5, 1.5 );
 }
@@ -1106,7 +1106,7 @@ void CClient_Precipitation::ComputeWindVector( )
 
 	// Randomize the wind angle and speed slightly to get us a little variation
 	windangle[1] = windangle[1] + random->RandomFloat( -10, 10 );
-	float windspeed = cl_windspeed.GetFloat() * (1.0 + random->RandomFloat( -0.2, 0.2 ));
+	float windspeed = cl_windspeed.GetFloat() * (1.0f + random->RandomFloat( -0.2f, 0.2f ));
 
 	AngleVectors( windangle, &s_WindVector );
 	VectorScale( s_WindVector, windspeed, s_WindVector );
@@ -1504,7 +1504,8 @@ END_RECV_TABLE()
 
 Vector Color32ToVector( const color32 &color )
 {
-	return Vector( color.r * (1.0/255.0f), color.g * (1.0/255.0f), color.b * (1.0/255.0f) );
+	constexpr float factor = 1.0f/255.0f;
+	return Vector( color.r * factor, color.g * factor, color.b * factor );
 }
 
 int	C_QuadraticBeam::DrawModel( int )
