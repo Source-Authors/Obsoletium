@@ -187,11 +187,11 @@ static int ListFileModifiedSortFunc(ListPanel *pPanel, const ListPanelItem &item
 	// NOTE: Backward order to get most recent files first
 	return ListBaseInteger64SortFunc( pPanel, item2, item1, "modifiedint_low", "modifiedint_high" );
 }
-static int ListFileCreatedSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
-{
-	// NOTE: Backward order to get most recent files first
-	return ListBaseInteger64SortFunc( pPanel, item2, item1, "createdint_low", "createdint_high" );
-}
+//static int ListFileCreatedSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
+//{
+//	// NOTE: Backward order to get most recent files first
+//	return ListBaseInteger64SortFunc( pPanel, item2, item1, "createdint_low", "createdint_high" );
+//}
 static int ListFileAttributesSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
 {
 	return ListBaseStringSortFunc( pPanel, item1, item2, "attributes" );
