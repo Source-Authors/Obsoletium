@@ -78,7 +78,6 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 		m_pStringEdit->SetVisible(false);
 
 		// fill in the combo box
-		int index = 0;
 		const char *currentValue = m_pRules->GetString("value");
 		const char *parse = m_pRules->GetString("stringlist");
 		while (*parse)
@@ -109,7 +108,6 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 
 			// add to dropdown
 			int itemID = m_pComboEdit->AddItem(customString, NULL);
-			index++;
 
 			// activate the current item
 			if (!stricmp(customString, currentValue))
