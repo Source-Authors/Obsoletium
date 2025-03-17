@@ -519,7 +519,6 @@ bool CQcData::GetQcData(
 		if ( sFileBase0.Length() > 0 && sFilePath.Length() > 0 )
 		{
 			struct _finddata_t qcFile;
-			long hFile;
 
 			CUtlVector< CUtlString > tokens;
 
@@ -528,7 +527,7 @@ bool CQcData::GetQcData(
 			CUtlString sQcGlob = sFilePath;
 			sQcGlob += "*.qc";
 
-			if ( ( hFile = _findfirst( sQcGlob.Get(), &qcFile ) ) != -1L )
+			if ( intptr_t hFile = _findfirst( sQcGlob.Get(), &qcFile ); hFile != -1L )
 			{
 				/* Find the rest of the .qc files */
 				do {
