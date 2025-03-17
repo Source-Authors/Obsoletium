@@ -1002,7 +1002,10 @@ inline void CDmaColor::SetRawColor( int color )
 inline void CDmaObjectId::CreateObjectId( )
 { 
 	DmObjectId_t id;
-	CreateUniqueId( &id );
+	if ( !CreateUniqueId( &id ) )
+	{
+		Warning( "Unable to create ID for DMA object 0x%p.", this );
+	}
 	m_pAttribute->SetValue( id );
 }
 
