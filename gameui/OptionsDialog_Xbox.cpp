@@ -1516,8 +1516,9 @@ bool COptionsDialogXbox::ShouldSkipOption( KeyValues *pKey )
 
 void COptionsDialogXbox::ReadOptionsFromFile( const char *pchFileName )
 {
-	KeyValues *pOptionKeys = new KeyValues( "options_x360" );
-	pOptionKeys->LoadFromFile( g_pFullFileSystem, pchFileName, NULL );
+	KeyValuesAD pOptionKeys( "options_x360" );
+	if ( !pOptionKeys->LoadFromFile( g_pFullFileSystem, pchFileName, NULL ) )
+		return;
 
 	KeyValues *pKey = NULL;
 	for ( pKey = pOptionKeys->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
