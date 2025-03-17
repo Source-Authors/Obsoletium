@@ -959,7 +959,8 @@ void CC_Player_TestDispatchEffect( const CCommand &args )
 	float flDistance = 1024;
 	if ( args.ArgC() >= 3 )
 	{
-		flDistance = atoi( args[ 2 ] );
+		// dimhotepus: Expects float so atoi -> strtof
+		flDistance = strtof( args[ 2 ], nullptr );
 	}
 
 	// Optional flags
