@@ -1208,8 +1208,9 @@ void CMultiSource::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	}
 
 	// CONSIDER: a Use input to the multisource always toggles.  Could check useType for ON/OFF/TOGGLE
-
-	m_rgTriggered[i-1] ^= 1;
+	// dimhotepus: Ensure no buffer underflow.
+	if (i > 0)
+		m_rgTriggered[i-1] ^= 1;
 
 	// 
 	if ( IsTriggered( pActivator ) )
