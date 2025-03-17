@@ -2166,7 +2166,16 @@ void UTIL_SetClientVisibilityPVS( edict_t *pClient, const unsigned char *pvs, in
 		int remainder = pvssize % 4;
 		for ( i = 0; i < remainder; i++ )
 		{
-			((unsigned char *)&pTo[limit])[i] = ((unsigned char *)&pFrom[limit])[i] & !((unsigned char *)&pMask[limit])[i];
+			// Original Valve PVS.
+			const unsigned char oldValue = ((unsigned char *)&pFrom[limit])[i] & !((unsigned char *)&pMask[limit])[i];
+			// dimhotepus: Correct PVS.
+			const unsigned char newValue = ((unsigned char *)&pFrom[limit])[i] & ~((unsigned char *)&pMask[limit])[i];
+
+			if ( oldValue != newValue )
+				DevWarning( "%s: PVS change - old value (%hhu) is not same as new one (%hhu).",
+					pClient->GetClassName(), oldValue, newValue );
+
+			((unsigned char *)&pTo[limit])[i] = newValue;
 
 			if ( ((unsigned char *)&pFrom[limit])[i] != 0)
 			{
