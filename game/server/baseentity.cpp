@@ -2044,7 +2044,7 @@ void CBaseEntity::UpdateOnRemove( void )
 	if ( childrenList.Count() )
 	{
 		DevMsg( 2, "Warning: Deleting orphaned children of %s\n", GetClassname() );
-		for ( int i = childrenList.Count()-1; i >= 0; --i )
+		for ( intp i = childrenList.Count()-1; i >= 0; --i )
 		{
 			UTIL_Remove( childrenList[i] );
 		}
@@ -5516,7 +5516,7 @@ private:
 
 		char targetEntity[ 256 ];
 		targetEntity[0] = 0;
-		int nEntityNameLength = (space-substring);
+		intp nEntityNameLength = (space-substring);
 		Q_strncat( targetEntity, substring, sizeof( targetEntity ), nEntityNameLength );
 
 		// Find the target entity by name
@@ -5527,7 +5527,7 @@ private:
 		CUtlRBTree< CUtlString > symbols( 0, 0, UtlStringLessFunc );
 
 		// Find the next portion of the text chain, if any (removing space)
-		int nInputNameLength = (checklen-nEntityNameLength-1);
+		intp nInputNameLength = (checklen-nEntityNameLength-1);
 
 		// Starting past the last space, this is the remainder of the string
 		char *inputPartial = ( checklen > nEntityNameLength ) ? (space+1) : NULL;
@@ -6507,8 +6507,8 @@ bool CBaseEntity::ContextExpired( int index ) const
 //-----------------------------------------------------------------------------
 int CBaseEntity::FindContextByName( const char *name ) const
 {
-	int c = m_ResponseContexts.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = m_ResponseContexts.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( FStrEq( name, GetContextName( i ) ) )
 			return i;
@@ -7034,7 +7034,7 @@ void CBaseEntity::RemoveRecipientsIfNotCloseCaptioning( CRecipientFilter& filter
 	intp c = filter.GetRecipientCount();
 	for ( intp i = c - 1; i >= 0; --i )
 	{
-		int playerIndex = filter.GetRecipientIndex( i );
+		intp playerIndex = filter.GetRecipientIndex( i );
 
 		CBasePlayer *player = static_cast< CBasePlayer * >( CBaseEntity::Instance( playerIndex ) );
 		if ( !player )
