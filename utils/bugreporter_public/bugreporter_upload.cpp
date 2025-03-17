@@ -8,6 +8,7 @@
 #include "tier0/basetypes.h"
 
 #ifdef WIN32
+#define NOMINMAX
 #include <winsock.h>
 #elif defined(POSIX)
 #define INVALID_SOCKET -1
@@ -947,10 +948,15 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 #ifdef WIN32
 			adr.sin_addr.S_un.S_addr = harvester_ip;
 #else
-			adr.sin_addr.s_addr = harvester_ip;			
+			adr.sin_addr.s_addr = harvester_ip;
 #endif
 			netadr_t BugReportHarvesterFSMIPAddress;
-			BugReportHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr );
+			if ( !BugReportHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr ) )
+			{
+				// dimhotepus: Handle invalid address.
+				UpdateProgress( rBugReportParameters, "Request denied, server IP:port pair is not IPv4 address." );
+				return eBugReportSendingBugReportHeaderFailed;
+			}
 
 			UpdateProgress( rBugReportParameters, "Server requested bug report upload." );
 
