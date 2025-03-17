@@ -93,24 +93,39 @@ bool UseHWMorphVCDs()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-bool C_SceneEntity::GetHWMorphSceneFileName( const char *pFilename, char *pHWMFilename )
+bool C_SceneEntity::GetHWMorphSceneFileName( IN_Z const char *pFilename, OUT_Z_CAP(fileNameSize) char *pHWMFilename, intp fileNameSize ) const
 {
 	// Are we even using hardware morph?
 	if ( !UseHWMorphVCDs() )
+	{
+		// dimhotepus: Zero-terminate on failure.
+		if (fileNameSize)
+			pHWMFilename[0] = '\0';
 		return false;
+	}
 
 	// Multi-player only!
 	if ( !m_bMultiplayer )
+	{
+		// dimhotepus: Zero-terminate on failure.
+		if (fileNameSize)
+			pHWMFilename[0] = '\0';
 		return false;
+	}
 
 	// Do we have a valid filename?
 	if ( !( pFilename && pFilename[0] ) )
+	{
+		// dimhotepus: Zero-terminate on failure.
+		if (fileNameSize)
+			pHWMFilename[0] = '\0';
 		return false;
+	}
 
 	// Check to see if we already have an player/hwm/* filename.
 	if ( ( V_strstr( pFilename, "/high" ) != NULL ) || ( V_strstr( pFilename, "\\high" ) != NULL ) )
 	{
-		V_strcpy( pHWMFilename, pFilename );
+		V_strncpy( pHWMFilename, pFilename, fileNameSize );
 		return true;
 	}
 
@@ -140,7 +155,7 @@ bool C_SceneEntity::GetHWMorphSceneFileName( const char *pFilename, char *pHWMFi
 		}
 	}
 
-	V_strcpy( pHWMFilename, szSceneHWM );
+	V_strncpy( pHWMFilename, szSceneHWM, fileNameSize );
 	return true;
 }
 
