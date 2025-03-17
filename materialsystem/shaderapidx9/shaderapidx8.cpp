@@ -7220,7 +7220,7 @@ void CShaderAPIDx8::WriteTextureToFile( ShaderAPITextureHandle_t hTexture, const
 
 	// Get the level of the texture we want to read from
 	IDirect3DSurface* pTextureLevel;
-	HRESULT hr = pD3DTexture ->GetSurfaceLevel( 0, &pTextureLevel );
+	HRESULT hr = pD3DTexture->GetSurfaceLevel( 0, &pTextureLevel );
 	if ( FAILED( hr ) )
 		return;
 
