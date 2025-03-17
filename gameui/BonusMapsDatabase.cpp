@@ -298,7 +298,12 @@ CBonusMapsDatabase::CBonusMapsDatabase( void )
 	RootPath();
 
 	m_pBonusMapsManifest = new KeyValues( "bonus_maps_manifest" );
-	m_pBonusMapsManifest->LoadFromFile( g_pFullFileSystem, "scripts/bonus_maps_manifest.txt", NULL );
+
+	constexpr char bonusMapsManifest[]{"scripts/bonus_maps_manifest.txt"};
+	if ( !m_pBonusMapsManifest->LoadFromFile( g_pFullFileSystem, bonusMapsManifest, NULL ) )
+	{
+		Warning( "Unable to load bonus maps db manifest '%s'.\n", bonusMapsManifest );
+	}
 
 	m_iX360BonusesUnlocked = -1;	// Only used on X360
 	m_bHasLoadedSaveData = false;
@@ -328,10 +333,13 @@ bool CBonusMapsDatabase::ReadBonusMapSaveData( void )
 	}
 
 	char	szFilename[_MAX_PATH];
-	Q_snprintf( szFilename, sizeof( szFilename ), "%s/bonus_maps_data.bmd", SAVE_DIR );
+	V_sprintf_safe( szFilename, "%s/bonus_maps_data.bmd", SAVE_DIR );
 
 	// dimhotepus: Support bonus maps in mods.
-	m_pBonusMapSavedData->LoadFromFile( g_pFullFileSystem, szFilename, MOD_DIR );
+	if ( !m_pBonusMapSavedData->LoadFromFile( g_pFullFileSystem, szFilename, MOD_DIR ) )
+	{
+		Warning( "Unable to load bonus maps data from '%s'.\n", szFilename );
+	}
 
 	m_bSavedDataChanged = false;
 	m_bHasLoadedSaveData = true;
