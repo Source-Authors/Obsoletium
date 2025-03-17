@@ -2620,11 +2620,6 @@ static void CommitSetScissorRect( IDirect3DDevice9 *pDevice, const DynamicState_
 		Assert( (desiredState.m_ScissorRect.left <= nWidth) && (desiredState.m_ScissorRect.bottom <= nHeight) &&
 			    ( desiredState.m_ScissorRect.top >= 0 ) && (desiredState.m_ScissorRect.left >= 0) );
 
-		clamp( desiredState.m_ScissorRect.right,  0, nWidth );
-		clamp( desiredState.m_ScissorRect.left,   0, nWidth );
-		clamp( desiredState.m_ScissorRect.top,    0, nHeight );
-		clamp( desiredState.m_ScissorRect.bottom, 0, nHeight );
-
 		Dx9Device()->SetScissorRect( &desiredState.m_ScissorRect );
 		currentState.m_ScissorRect = desiredState.m_ScissorRect;
 	}
