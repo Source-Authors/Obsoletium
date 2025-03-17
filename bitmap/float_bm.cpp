@@ -256,7 +256,10 @@ void FloatBitMap_t::ReSize(int NewWidth, int NewHeight)
 	float SourceX, SourceY, Xfrac, Yfrac;
 	int Top, Bot, Left, Right;
 
-	float *newrgba=new float[NewWidth * NewHeight * 4];
+	float * RESTRICT newrgba=new float[NewWidth * NewHeight * 4];
+	if (!newrgba)
+		Error( "Unable to allocate new bitmap %dx%d for resize from %dx%d.\n",
+			NewWidth, NewHeight, Width, Height );
 
 	SourceY= 0;
 	for(int y=0;y<NewHeight;y++)
@@ -304,36 +307,34 @@ struct TGAHeader_t
 bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 {
 	FileHandle_t f = g_pFullFileSystem->Open(filename, "wb");
-	if (f)
+	if (!f) return false;
+
+	TGAHeader_t myheader = {};
+	myheader.image_type=2;
+	myheader.pixel_size=32;
+	myheader.width0= Width & 0xff;
+	myheader.width1= static_cast<unsigned char>(Width>>8);
+	myheader.height0= Height & 0xff;
+	myheader.height1= static_cast<unsigned char>(Height>>8);
+	myheader.attributes=0x20;
+	g_pFullFileSystem->Write(&myheader,sizeof(myheader),f);
+	// now, write the pixels
+	for(int y=0;y<Height;y++)
 	{
-		TGAHeader_t myheader = {};
-		myheader.image_type=2;
-		myheader.pixel_size=32;
-		myheader.width0= Width & 0xff;
-		myheader.width1= static_cast<unsigned char>(Width>>8);
-		myheader.height0= Height & 0xff;
-		myheader.height1= static_cast<unsigned char>(Height>>8);
-		myheader.attributes=0x20;
-		g_pFullFileSystem->Write(&myheader,sizeof(myheader),f);
-		// now, write the pixels
-		for(int y=0;y<Height;y++)
+		for(int x=0;x<Width;x++)
 		{
-			for(int x=0;x<Width;x++)
-			{
-				PixRGBAF fpix = PixelRGBAF( x, y );
-				PixRGBA8 pix8 = PixRGBAF_to_8( fpix );
+			PixRGBAF fpix = PixelRGBAF( x, y );
+			PixRGBA8 pix8 = PixRGBAF_to_8( fpix );
 
-				// dimhotepus: 4x speedup - write 4 colors at once.
-				const unsigned char pixels[]{pix8.Blue, pix8.Green, pix8.Red, pix8.Alpha};
+			// dimhotepus: 4x speedup - write 4 colors at once.
+			const unsigned char pixels[]{pix8.Blue, pix8.Green, pix8.Red, pix8.Alpha};
 
-				g_pFullFileSystem->Write(pixels, sizeof(pixels), f);
-			}
+			g_pFullFileSystem->Write(pixels, sizeof(pixels), f);
 		}
-		g_pFullFileSystem->Close( f );	// close file after reading
-		
-		return true;
 	}
-	return false;
+	g_pFullFileSystem->Close( f );	// close file after reading
+		
+	return true;
 }
 
 
@@ -397,11 +398,12 @@ FloatBitMap_t::~FloatBitMap_t()
 }
 
 
-FloatBitMap_t *FloatBitMap_t::QuarterSize() const
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSize() const
 {
 	// generate a new bitmap half on each axis
-	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
-	if (!newbm) return nullptr;
+	FloatBitMap_t * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
+	if (!newbm)
+		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 
 	for(int y=0;y<Height/2;y++)
 		for(int x=0;x<Width/2;x++)
@@ -413,11 +415,12 @@ FloatBitMap_t *FloatBitMap_t::QuarterSize() const
 	return newbm;
 }
 
-FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky(void) const
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky(void) const
 {
 	// generate a new bitmap half on each axis
-	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
-	if (!newbm) return nullptr;
+	FloatBitMap_t * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
+	if (!newbm)
+		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 
 	for(int y=0;y<Height/2;y++)
 		for(int x=0;x<Width/2;x++)
@@ -759,9 +762,13 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 
 		char fname[80];
 		V_sprintf_safe(fname,"sub%dx%d.tga",tmp->Width,tmp->Height);
-		tmp->WriteTGAFile(fname);
+		if ( !tmp->WriteTGAFile(fname) )
+			Warning("Unable to write sub TGA '%s'.\n", fname);
+
 		V_sprintf_safe(fname,"submrg%dx%d.tga",tmp->Width,tmp->Height);
-		WriteTGAFile(fname);
+		if ( !WriteTGAFile(fname) )
+			Warning("Unable to write submerged TGA '%s'.\n", fname);
+
 		delete tmp;
 		for(int i=0;i<NDELTAS;i++)
 			delete lowdeltas[i];

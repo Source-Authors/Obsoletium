@@ -79,8 +79,8 @@ protected:
 //-----------------------------------------------------------------------------
 // Is a file a PSD file?
 //-----------------------------------------------------------------------------
-bool IsPSDFile( const char *pFileName, const char *pPathID );
-bool IsPSDFile( CUtlBuffer &buf );
+[[nodiscard]] bool IsPSDFile( const char *pFileName, const char *pPathID );
+[[nodiscard]] bool IsPSDFile( CUtlBuffer &buf );
 
 
 //-----------------------------------------------------------------------------

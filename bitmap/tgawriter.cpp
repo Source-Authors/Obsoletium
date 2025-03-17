@@ -225,14 +225,13 @@ bool WriteTGAFile( const char *fileName, int width, int height, enum ImageFormat
 	// Write out image data
 	if ( bMustConvert )
 	{
-		uint8 *pLineBuf = new uint8[ nBytesPerPixel * width ];
+		auto pLineBuf = std::make_unique<uint8[]>( nBytesPerPixel * width );
 		while( height-- )
 		{
-			ImageLoader::ConvertImageFormat( srcData, srcFormat, pLineBuf, dstFormat, width, 1 );
-			fp.Write( pLineBuf, nBytesPerPixel * width );
+			ImageLoader::ConvertImageFormat( srcData, srcFormat, pLineBuf.get(), dstFormat, width, 1 );
+			fp.Write( pLineBuf.get(), nBytesPerPixel * width );
 			srcData += nStride;
 		}
-		delete[] pLineBuf;
 	}
 	else
 	{
@@ -280,12 +279,16 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 		nPixelSize = 8;
 		break;
 	default:
+		// dimhotepus: Do not leak file.
+		g_pFullFileSystem->Close( fp );
 		return false;
 	}
 
 	// Verify src data matches the targa we're going to write into
 	if ( nPixelSize != tgaHeader.pixel_size )
 	{
+		// dimhotepus: Do not leak file.
+		g_pFullFileSystem->Close( fp );
 		Warning( "TGA doesn't match source data.\n" );
 		return false;
 	}

@@ -13,46 +13,19 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static float ScaleValue(float f, float overbright)
+static [[nodiscard]] constexpr float ScaleValue(float f, float overbright)
 {
 	// map a value between 0..255 to the scale factor
 	int ival=static_cast<int>(f);
 	return ival*(overbright/255.0f);
 }
 
-static float IScaleValue(float f, float overbright)
+static [[nodiscard]] constexpr float IScaleValue(float f, float overbright)
 {
 	f*=(1.0f/overbright);
 	float ival=min(255.0f,ceilf(f*255.0f));
 	return ival;
 }
-
-void MaybeSetScaleVaue(FloatBitMap_t const &orig, FloatBitMap_t &newbm, int x, int y, 
-					   float newscale, float overbright)
-{
-	// clamp the given scale value to the legal range for that pixel and regnerate the rgb
-	// components.
-	float maxc=max(max(orig.Pixel(x,y,0),orig.Pixel(x,y,1)),orig.Pixel(x,y,2));
-	if (maxc==0.0)
-	{
-		// pixel is black. any scale value is fine.
-		newbm.Pixel(x,y,3)=newscale;
-		for(int c=0;c<3;c++)
-			newbm.Pixel(x,y,c)=0;
-	}
-	else
-	{
-//		float desired_floatscale=maxc;
-		float scale_we_will_get=ScaleValue(newscale,overbright);
-//		if (scale_we_will_get >= desired_floatscale )
-		{
-			newbm.Pixel(x,y,3)=newscale;
-			for(int c=0;c<3;c++)
-				newbm.Pixel(x,y,c)=orig.Pixel(x,y,c)/(scale_we_will_get);
-		}
-	}
-}
-
 
 void FloatBitMap_t::Uncompress(float overbright) const
 {
@@ -69,10 +42,6 @@ void FloatBitMap_t::Uncompress(float overbright) const
 			}
 		}
 }
-
-#ifdef FILTER_TO_REDUCE_LERP_ARTIFACTS
-constexpr int GAUSSIAN_WIDTH{5};
-#endif
 
 void FloatBitMap_t::CompressTo8Bits(float overbright) const
 {
@@ -103,40 +72,6 @@ void FloatBitMap_t::CompressTo8Bits(float overbright) const
 					TmpFBM.Pixel(x,y,c)=Pixel(x,y,c)/scale_value_we_got;
 			}
 		}
-	// now, refine scale values
-#ifdef FILTER_TO_REDUCE_LERP_ARTIFACTS
-// I haven't been able to come up with a filter which eleiminates objectionable artifacts on all
-// source textures. So, I've gone to doing the lerping in the shader.
-	int pass=0;
-	while(pass<1)
-	{
-		FloatBitMap_t temp_filtered(&TmpFBM);
-		for(int y=0;y<Height;y++)
-		{
-			for(int x=0;x<Width;x++)
-			{
-				float sum_scales=0.0;
-				float sum_weights=0.0;
-				for(int yofs=-GAUSSIAN_WIDTH;yofs<=GAUSSIAN_WIDTH;yofs++)
-					for(int xofs=-GAUSSIAN_WIDTH;xofs<=GAUSSIAN_WIDTH;xofs++)
-					{
-						float r=0.456*GAUSSIAN_WIDTH;
-						r=0.26*GAUSSIAN_WIDTH;
-						float x1=xofs/r;
-						float y1=yofs/r;
-						float a=(Square(x1)+Square(y1))/(2.0*Square(r));
-						float w=exp(-a);
-						sum_scales+=w*TmpFBM.PixelClamped(x+xofs,y+yofs,3);
-						sum_weights+=w;
-					}
-				int new_trial_scale=sum_scales*(1.0/sum_weights);
-				MaybeSetScaleVaue(*this,temp_filtered,x,y,new_trial_scale,overbright);
-			}
-		}
-		pass++;
-		memcpy(TmpFBM.RGBAData,temp_filtered.RGBAData,Width*Height*4*sizeof(float));
-	}
-#endif
 
 	memcpy(RGBAData,TmpFBM.RGBAData,Width*Height*4*sizeof(float));
 	// now, map scale to real value

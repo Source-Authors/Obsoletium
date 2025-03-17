@@ -80,7 +80,7 @@ typedef CUtlMemory<unsigned char> CTempImage;
 // Reads in a file, sticks it into a UtlVector
 //-----------------------------------------------------------------------------
 
-static bool ReadFile( char const* pFileName, CTempImage& image, int maxbytes = -1 )
+static [[nodiscard]] bool ReadFile( char const* pFileName, CTempImage& image, int maxbytes = -1 )
 {
 	Assert( pFileName );
 	Assert( g_pFullFileSystem );
@@ -89,8 +89,7 @@ static bool ReadFile( char const* pFileName, CTempImage& image, int maxbytes = -
 		return false;
 	}
 
-	FileHandle_t fileHandle;
-	fileHandle = g_pFullFileSystem->Open( pFileName, "rb" );
+	FileHandle_t fileHandle = g_pFullFileSystem->Open( pFileName, "rb" );
 	if( !fileHandle )
 		return false;
 
