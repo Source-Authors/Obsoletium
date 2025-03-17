@@ -216,7 +216,7 @@ void TextImage::SetText(const wchar_t *unicode, bool bClearUnlocalizedSymbol)
 	m_LineXIndent.RemoveAll();
 
 	// store the text as unicode
-	wcscpy(_utext, unicode);
+	V_wcsncpy(_utext, unicode, _textBufferLen * static_cast<intp>(sizeof(wchar_t)));
 
 	m_bRecalculateTruncation = true;
 }
