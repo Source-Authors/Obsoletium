@@ -1164,8 +1164,9 @@ bool CVideoCommonServices::CalculateVideoDimensions( int videoWidth, int videoHe
 					
 					curWidth = (int)  ( curWidth * scale + 0.35f );
 					curHeight = (int) ( curHeight * scale + 0.35f );
-					clamp( curWidth, 0, displayWidth );
-					clamp( curHeight, 0, displayHeight );
+					// dimhotepus: Fix clamping.
+					curWidth = clamp( curWidth, 0, displayWidth );
+					curHeight = clamp( curHeight, 0, displayHeight );
 					goto finish;
 				}
 			
@@ -1197,8 +1198,9 @@ bool CVideoCommonServices::CalculateVideoDimensions( int videoWidth, int videoHe
 				
 				curWidth = (int)  ( curWidth * scale + 0.35f );
 				curHeight = (int) ( curHeight * scale + 0.35f );
-				clamp( curWidth, 0, displayWidth );
-				clamp( curHeight, 0, displayHeight );
+				// dimhotepus: Fix clamping.
+				curWidth = clamp( curWidth, 0, displayWidth );
+				curHeight = clamp( curHeight, 0, displayHeight );
 				goto finish;
 			}
 		}
@@ -1252,7 +1254,7 @@ float CVideoCommonServices::GetSystemVolume()
 {
 	ConVarRef volumeConVar( "volume" );
 	float sysVolume = volumeConVar.IsValid() ? volumeConVar.GetFloat() : 1.0f;
-	clamp( sysVolume, 0.0f, 1.0f);
+	sysVolume = clamp( sysVolume, 0.0f, 1.0f);
 
 	return sysVolume;
 }
