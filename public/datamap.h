@@ -11,10 +11,7 @@
 #pragma once
 #endif
 
-#ifndef VECTOR_H
 #include "mathlib/vector.h"
-#endif
-
 #include "tier1/utlvector.h"
 
 #include "tier0/memdbgon.h"
