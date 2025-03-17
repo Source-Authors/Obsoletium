@@ -286,7 +286,7 @@ public:
 	FloatCubeMap_t(char const *basename);
 
 	// save basenamebk,pfm, basenamedn.pfm, basenameft.pfm, ...
-	void WritePFMs(char const *basename) const;
+	[[nodiscard]] bool WritePFMs(char const *basename) const;
 
 	Vector AverageColor() const
 	{
@@ -375,7 +375,7 @@ public:
 
 	~FloatImagePyramid_t();
 
-	void WriteTGAs(char const *basename) const;				// outputs name_00.tga, name_01.tga,...
+	[[nodiscard]] bool WriteTGAs(char const *basename) const;				// outputs name_00.tga, name_01.tga,...
 };
 
 #endif

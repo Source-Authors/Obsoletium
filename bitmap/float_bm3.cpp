@@ -89,14 +89,22 @@ float & FloatImagePyramid_t::Pixel(int x, int y, int component, int level) const
 	return m_pLevels[level]->Pixel(x,y,component);
 }
 
-void FloatImagePyramid_t::WriteTGAs(char const *basename) const
+bool FloatImagePyramid_t::WriteTGAs(char const *basename) const
 {
 	char bname_out[1024];
+
+	bool ok = true;
 	for(int l=0;l<m_nLevels;l++)
 	{
 		V_sprintf_safe(bname_out,"%s_%02d.tga",basename,l);
-		m_pLevels[l]->WriteTGAFile(bname_out);
+		if ( !m_pLevels[l]->WriteTGAFile(bname_out) )
+		{
+			ok = false;
+			fprintf(stderr, "Unable to write #%d bitmap to TGA '%s'.\n", l, bname_out);
+		}
 	}
+
+	return ok;
 
 }
 

@@ -55,17 +55,24 @@ FloatCubeMap_t::FloatCubeMap_t(char const *basename)
 	}
 }
 
-void FloatCubeMap_t::WritePFMs(char const *basename) const
+bool FloatCubeMap_t::WritePFMs(char const *basename) const
 {
+	char fnamebuf[512];
+
+	bool ok = true;
 	for(int f=0;f<6;f++)
 	{
-		char fnamebuf[512];
 		V_sprintf_safe(fnamebuf,namepts[f],basename);
+
 		if (!face_maps[f].WritePFM(fnamebuf))
 		{
+			ok = false;
 			fprintf(stderr, "Unable to write #%d cubemap to PFM '%s'.\n", f, fnamebuf);
 		}
 	}
+
+	return ok;
+
 }
 
 Vector FloatCubeMap_t::PixelDirection(int face, int x, int y) const
@@ -124,5 +131,3 @@ void FloatCubeMap_t::Resample( FloatCubeMap_t &out, float flPhongExponent )
 			}
 	}
 }
-
-						
