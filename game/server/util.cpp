@@ -210,10 +210,23 @@ void CEntityFactoryDictionary::Destroy( const char *pClassName, IServerNetworkab
 //-----------------------------------------------------------------------------
 void CEntityFactoryDictionary::ReportEntitySizes()
 {
+	size_t totalCount = 0, totalSize = 0;
 	for ( auto i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next( i ) )
 	{
-		Msg( " %32s: %zu\n", m_Factories.GetElementName( i ), m_Factories[i]->GetEntitySize() );
+		const size_t entitySize = m_Factories[i]->GetEntitySize();
+
+		Msg( " %32s: %zu\n", m_Factories.GetElementName( i ), entitySize );
+
+		totalSize += entitySize;
+
+		++totalCount;
 	}
+
+	// dimhotepus: Dump total entities count.
+	char prefix[64];
+	V_vsprintf_safe( prefix, " %32s", "Total %zu entities size" );
+
+	Msg( "%s: %.2f MiB.\n", prefix, totalCount, totalSize / (1024.f * 1024.f) );
 }
 
 
