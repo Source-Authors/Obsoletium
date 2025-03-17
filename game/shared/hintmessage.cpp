@@ -36,9 +36,9 @@ CHintMessage::CHintMessage( const char * hintString, CUtlVector< const char * > 
 //--------------------------------------------------------------------------------------------------------------
 CHintMessage::~CHintMessage()
 {
-	for ( int i=0; i<m_args.Count(); ++i )
+	for ( auto *arg : m_args )
 	{
-		delete[] m_args[i];
+		delete[] arg;
 	}
 	m_args.RemoveAll();
 }
@@ -59,7 +59,7 @@ bool CHintMessage::IsEquivalent( const char *hintString, CUtlVector< const char 
 		if ( args->Count() != m_args.Count() )
 			return false;
 
-		for ( int i=0; i<args->Count(); ++i )
+		for ( intp i=0; i<args->Count(); ++i )
 		{
 			if ( !FStrEq( (*args)[i], m_args[i] ) )
 			{
@@ -92,6 +92,8 @@ void CHintMessage::Send( CBasePlayer * client )
 //--------------------------------------------------------------------------------------------------------------
 CHintMessageQueue::CHintMessageQueue( CBasePlayer *pPlayer )
 {
+	// dimhotepus: Initialize in ctor.
+	m_tmMessageEnd = -1.0f;
 	m_pPlayer = pPlayer;
 }
 
@@ -99,9 +101,9 @@ CHintMessageQueue::CHintMessageQueue( CBasePlayer *pPlayer )
 void CHintMessageQueue::Reset()
 {
 	m_tmMessageEnd = 0;
-	for ( int i=0; i<m_messages.Count(); ++i )
+	for ( auto *message : m_messages )
 	{
-		delete m_messages[i];
+		delete message;
 	}
 	m_messages.RemoveAll();
 }
@@ -133,18 +135,17 @@ bool CHintMessageQueue::AddMessage( const char* message, float duration, CUtlVec
 	if ( !m_pPlayer )
 		return false;
 
-	for ( int i=0; i<m_messages.Count(); ++i )
+	for ( auto *msg : m_messages )
 	{
 		// weed out duplicates
-		if ( m_messages[i]->IsEquivalent( message, args ) )
+		if ( msg->IsEquivalent( message, args ) )
 		{
 			return true;
 		}
 	}
 
 	// 'message' is not copied, so the pointer must remain valid forever
-	CHintMessage *msg = new CHintMessage( message, args, duration );
-	m_messages.AddToTail( msg );
+	m_messages.AddToTail( new CHintMessage( message, args, duration ) );
 	return true;
 }
 
@@ -165,9 +166,9 @@ CHintMessageTimers::CHintMessageTimers( CHintSystem *pSystem, CHintMessageQueue 
 //-----------------------------------------------------------------------------
 void CHintMessageTimers::Reset()
 {
-	for ( int i=0; i<m_Timers.Count(); ++i )
+	for ( auto *timer : m_Timers )
 	{
-		delete m_Timers[i];
+		delete timer;
 	}
 	m_Timers.RemoveAll();
 }
@@ -180,24 +181,24 @@ void CHintMessageTimers::Update()
 	if ( !m_pHintSystem )
 		return;
 
-	for ( int i = 0; i < m_Timers.Count(); i++ )
+	for ( auto *timer : m_Timers )
 	{
-		if ( m_Timers[i]->timer.Expired() )
+		if ( timer->timer.Expired() )
 		{
-			if ( m_pHintSystem->TimerShouldFire( m_Timers[i]->iHintID ) )
+			if ( m_pHintSystem->TimerShouldFire( timer->iHintID ) )
 			{
-				//Warning("TIMER FIRED: %s\n", m_pszHintMessages[m_Timers[i]->iHintID] );
+				//Warning("TIMER FIRED: %s\n", m_pszHintMessages[timer->iHintID] );
 
-				m_pHintSystem->HintMessage( m_Timers[i]->iHintID );
+				m_pHintSystem->HintMessage( timer->iHintID );
 
 				// Remove and return. No reason to bring up multiple hints.
-				RemoveTimer( m_Timers[i]->iHintID );
+				RemoveTimer( timer->iHintID );
 				return;
 			}
 			else
 			{
 				// Push the timer out again
-				m_Timers[i]->timer.Start();
+				timer->timer.Start();
 			}
 		}
 	}
@@ -236,7 +237,7 @@ void CHintMessageTimers::AddTimer( int iHintID, float timer_duration, float mess
 //-----------------------------------------------------------------------------
 void CHintMessageTimers::RemoveTimer( int iHintID )
 {
-	int iIndex = GetTimerIndex(iHintID);
+	intp iIndex = GetTimerIndex(iHintID);
 	if ( iIndex != m_Timers.InvalidIndex() )
 	{
 		//Warning("TIMER REMOVED: %s\n", m_pszHintMessages[iHintID] );
@@ -249,7 +250,7 @@ void CHintMessageTimers::RemoveTimer( int iHintID )
 //-----------------------------------------------------------------------------
 void CHintMessageTimers::StartTimer( int iHintID )
 {
-	int iIndex = GetTimerIndex(iHintID);
+	intp iIndex = GetTimerIndex(iHintID);
 	if ( iIndex != m_Timers.InvalidIndex() )
 	{
 		//Warning("TIMER STARTED: %s\n", m_pszHintMessages[iHintID] );
@@ -262,7 +263,7 @@ void CHintMessageTimers::StartTimer( int iHintID )
 //-----------------------------------------------------------------------------
 void CHintMessageTimers::StopTimer( int iHintID )
 {
-	int iIndex = GetTimerIndex(iHintID);
+	intp iIndex = GetTimerIndex(iHintID);
 	if ( iIndex != m_Timers.InvalidIndex() )
 	{
 		//Warning("TIMER STOPPED: %s\n", m_pszHintMessages[iHintID] );
@@ -273,12 +274,15 @@ void CHintMessageTimers::StopTimer( int iHintID )
 //-----------------------------------------------------------------------------
 // Purpose: Return the index of the hint message in the timer list, if any
 //-----------------------------------------------------------------------------
-int CHintMessageTimers::GetTimerIndex( int iHintID )
+intp CHintMessageTimers::GetTimerIndex( int iHintID ) const
 {
-	for ( int i = 0; i < m_Timers.Count(); i++ )
+	intp i = 0;
+	for ( auto *timer : m_Timers )
 	{
-		if ( m_Timers[i]->iHintID == iHintID )
+		if ( timer->iHintID == iHintID )
 			return i;
+
+		++i;
 	}
 
 	return m_Timers.InvalidIndex();
