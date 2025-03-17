@@ -435,10 +435,10 @@ void CClient_Precipitation::Simulate( float dt )
 	EmitParticles( dt );
 
 	// Simulate all the particles.
-	int iNext;
+	unsigned short iNext;
 	if ( m_nPrecipType == PRECIPITATION_TYPE_RAIN )
 	{
-		for ( int i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
+		for ( auto i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
 		{
 			iNext = m_Particles.Next( i );
 			if ( !SimulateRain( &m_Particles[i], dt ) )
@@ -447,7 +447,7 @@ void CClient_Precipitation::Simulate( float dt )
 	}
 	else if ( m_nPrecipType == PRECIPITATION_TYPE_SNOW )
 	{
-		for ( int i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
+		for ( auto i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
 		{
 			iNext = m_Particles.Next( i );
 			if ( !SimulateSnow( &m_Particles[i], dt ) )
@@ -458,7 +458,7 @@ void CClient_Precipitation::Simulate( float dt )
 	if ( r_RainProfile.GetInt() )
 	{
 		timer.End();
-		engine->Con_NPrintf( 15, "Rain simulation: %du (%d tracers)", timer.GetDuration().GetMicroseconds(), m_Particles.Count() );
+		engine->Con_NPrintf( 15, "Rain simulation: %lu (%zd tracers)", timer.GetDuration().GetMicroseconds(), m_Particles.Count() );
 	}
 }
 
@@ -602,7 +602,7 @@ void CClient_Precipitation::Render()
 		CMeshBuilder mb;
 		mb.Begin( pMesh, MATERIAL_QUADS, m_Particles.Count() );
 
-		for ( int i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=m_Particles.Next( i ) )
+		for ( auto i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=m_Particles.Next( i ) )
 		{
 			CPrecipitationParticle *p = &m_Particles[i];
 			RenderParticle( p, mb );
@@ -727,7 +727,7 @@ inline float CClient_Precipitation::GetRemainingLifetime( CPrecipitationParticle
 
 inline CPrecipitationParticle* CClient_Precipitation::CreateParticle()
 {
-	int i = m_Particles.AddToTail();
+	auto i = m_Particles.AddToTail();
 	CPrecipitationParticle* pParticle = &m_Particles[i];
 
 	pParticle->m_SpawnTime = gpGlobals->curtime;
