@@ -93,18 +93,25 @@ IEntityFactoryDictionary *EntityFactoryDictionary()
 	return &s_EntityFactory;
 }
 
-void DumpEntityFactories_f()
+static void DumpEntityFactories_f()
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CEntityFactoryDictionary *dict = ( CEntityFactoryDictionary * )EntityFactoryDictionary();
+	auto *dict = static_cast<CEntityFactoryDictionary *>(EntityFactoryDictionary());
 	if ( dict )
 	{
-		for ( auto i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
+		size_t total = 0;
+		const auto &factories = dict->m_Factories;
+		for ( auto i = factories.First(); i != factories.InvalidIndex(); i = factories.Next( i ) )
 		{
-			Warning( "%s\n", dict->m_Factories.GetElementName( i ) );
+			// dimhotepus: Warning -> Msg.
+			Msg( "%s\n", factories.GetElementName( i ) );
+			++total;
 		}
+
+		// dimhotepus: Print total entity factories count.
+		Msg( "Total entity factories: %zu.\n", total );
 	}
 }
 
