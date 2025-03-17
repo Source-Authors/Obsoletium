@@ -2015,8 +2015,8 @@ void CStudioRenderContext::SetLocalLights( int nLightCount, const LightDesc_t *p
 	{
 		int i;
 		int nMaxLightCount = g_pMaterialSystemHardwareConfig->MaxNumLights();
-		int nLightCount = min( m_RC.m_NumLocalLights, nMaxLightCount );
-		for( i = 0; i < nLightCount; i++ )
+		int nLocalLightCount = min( m_RC.m_NumLocalLights, nMaxLightCount );
+		for( i = 0; i < nLocalLightCount; i++ )
 		{
 			pRenderContext->SetLight( i, m_RC.m_LocalLights[i] );
 		}
