@@ -1023,7 +1023,10 @@ const char g_controlResourceName[] = "resource/ui/AchievementItem.res";
 void CAchievementDialogItemPanel::PreloadResourceFile( void )
 {
 	g_pPreloadedAchievementItemLayout = new KeyValues(g_controlResourceName);
-	g_pPreloadedAchievementItemLayout->LoadFromFile(g_pFullFileSystem, g_controlResourceName);
+	if ( !g_pPreloadedAchievementItemLayout->LoadFromFile(g_pFullFileSystem, g_controlResourceName) )
+	{
+		Warning( "Unable to preload achievements layout from '%s'.\n", g_controlResourceName );
+	}
 }
 
 //-----------------------------------------------------------------------------
