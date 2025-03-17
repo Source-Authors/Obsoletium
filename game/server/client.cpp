@@ -1013,7 +1013,7 @@ void CC_Player_TestDispatchEffect( const CCommand &args )
 	data.m_fFlags = flags;
 	data.m_flMagnitude = magnitude;
 	data.m_flScale = scale;
-	DispatchEffect( (char *)args[1], data );
+	DispatchEffect( args[1], data );
 }
 
 static ConCommand test_dispatcheffect("test_dispatcheffect", CC_Player_TestDispatchEffect, "Test a clientside dispatch effect.\n\tUsage: test_dispatcheffect <effect name> <distance away> <flags> <magnitude> <scale>\n\tDefaults are: <distance 1024> <flags 0> <magnitude 0> <scale 0>\n", FCVAR_CHEAT);
@@ -1114,8 +1114,7 @@ static bool TestEntityPosition ( CBasePlayer *pPlayer )
 //------------------------------------------------------------------------------
 static int FindPassableSpace( CBasePlayer *pPlayer, const Vector& direction, float step, Vector& oldorigin )
 {
-	int i;
-	for ( i = 0; i < 100; i++ )
+	for ( int i = 0; i < 100; i++ )
 	{
 		Vector origin = pPlayer->GetAbsOrigin();
 		VectorMA( origin, step, direction, origin );
