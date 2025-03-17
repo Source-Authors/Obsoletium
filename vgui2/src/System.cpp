@@ -859,7 +859,14 @@ void CSystem::SetUserConfigFile(const char *fileName, const char *pathName)
 
 	// open
 	m_pUserConfigData->UsesEscapeSequences( true ); // VGUI may use this
-	m_pUserConfigData->LoadFromFile(g_pFullFileSystem, m_szFileName, m_szPathID);
+	if ( !m_pUserConfigData->LoadFromFile(g_pFullFileSystem, m_szFileName, m_szPathID) )
+	{
+		// dimhotepus: Handle load failure and clean KVs.
+		Warning( "Unable to load user config from '%s'.\n", m_szFileName );
+
+		m_pUserConfigData->deleteThis();
+		m_pUserConfigData = nullptr;
+	}
 }
 
 //-----------------------------------------------------------------------------
