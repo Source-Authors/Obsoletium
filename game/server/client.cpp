@@ -170,13 +170,14 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	{
 		if ( args.ArgC() >= 2 )
 		{
-			p = (char *)args.ArgS();
+			V_strcpy_safe( szTemp, args.ArgS() );
 		}
 		else
 		{
 			// say with a blank message, nothing to do
 			return;
 		}
+		p = szTemp;
 	}
 	else  // Raw text, need to prepend argv[0]
 	{
