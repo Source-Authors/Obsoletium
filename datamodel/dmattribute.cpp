@@ -630,7 +630,7 @@ public:
 		{
 			::Serialize( serialized, m_Value );
 		}
-		Q_snprintf( buf, sizeof( buf ), "%s(%s) = %s", base, g_pDataModel->GetString( m_symAttribute ), serialized.Base() ? serialized.Base<const char>() : "\"\"" );
+		V_sprintf_safe( buf, "%s(%s) = %s", base, g_pDataModel->GetString( m_symAttribute ), serialized.Base() ? serialized.Base<const char>() : "\"\"" );
 		return buf;
 	}
 

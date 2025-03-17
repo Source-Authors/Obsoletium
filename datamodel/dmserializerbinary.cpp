@@ -101,7 +101,7 @@ void CDmSerializerBinary::SerializeElementIndex( CUtlBuffer& buf, CDmElementSeri
 			{
 				buf.PutInt( ELEMENT_INDEX_EXTERNAL );
 				char idstr[ 40 ];
-				UniqueIdToString( pElement->GetId(), idstr, sizeof( idstr ) );
+				UniqueIdToString( pElement->GetId(), idstr );
 				buf.PutString( idstr );
 			}
 		}
@@ -113,7 +113,7 @@ void CDmSerializerBinary::SerializeElementIndex( CUtlBuffer& buf, CDmElementSeri
 			{
 				buf.PutInt( ELEMENT_INDEX_EXTERNAL );
 				char idstr[ 40 ];
-				UniqueIdToString( *pId, idstr, sizeof( idstr ) );
+				UniqueIdToString( *pId, idstr );
 				buf.PutString( idstr );
 			}
 			else
