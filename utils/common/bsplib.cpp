@@ -4569,7 +4569,8 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 				{
 					unsigned int actualSize = CLZMA::GetActualSize( pCompressedLump );
 					inputBuffer.EnsureCapacity( actualSize );
-					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
+					// dimhotepus: Add out size to prevent overflows.
+					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>(), actualSize );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
 					if ( outSize != actualSize )
 					{
@@ -4709,8 +4710,10 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 				unsigned int headerSize = static_cast<unsigned>(pSortedLump->pLump->uncompressedSize);
 				if ( CLZMA::IsCompressed( pCompressedLump ) && headerSize == CLZMA::GetActualSize( pCompressedLump ) )
 				{
-					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
-					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
+					unsigned size = CLZMA::GetActualSize( pCompressedLump );
+					inputBuffer.EnsureCapacity( size );
+					// dimhotepus: Add out size to prevent overflows.
+					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>(), size );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
 					if ( outSize != headerSize )
 					{

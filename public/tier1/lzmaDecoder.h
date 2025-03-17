@@ -39,9 +39,9 @@ class CLZMAStream;
 class CLZMA
 {
 public:
-	static size_t		Uncompress( unsigned char *pInput, unsigned char *pOutput );
-	static bool			IsCompressed( unsigned char *pInput );
-	static unsigned int	GetActualSize( unsigned char *pInput );
+	static size_t		Uncompress( void *pInput, OUT_BYTECAP(outSize) void *pOutput, size_t outSize );
+	[[nodiscard]] static bool			IsCompressed( void *pInput );
+	[[nodiscard]] static unsigned int	GetActualSize( void *pInput );
 };
 
 // For files besides the implementation, we forward declare a dummy struct. We can't unconditionally forward declare

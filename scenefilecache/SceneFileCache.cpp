@@ -279,7 +279,8 @@ bool CSceneFileCache::GetSceneDataFromImage( const char *pFileName, int iScene, 
 			size_t nMaxLen = *pSceneLength;
 			if ( originalSize <= nMaxLen )
 			{
-				CLZMA::Uncompress( pData, pSceneData );
+				// dimhotepus: Add out size to prevent overflows.
+				CLZMA::Uncompress( pData, pSceneData, originalSize );
 			}
 			else
 			{

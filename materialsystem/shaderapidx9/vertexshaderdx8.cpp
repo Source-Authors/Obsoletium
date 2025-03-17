@@ -2253,9 +2253,11 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			{
 				nBlockSize &= 0x3fffffff;
 
+				// dimhotepus: Add out size to prevent overflows.
 				size_t nOutsize = CLZMA::Uncompress(
-					reinterpret_cast<uint8 *>( pCompressedShaders ),
-					pUnpackBuffer );
+					pCompressedShaders,
+					pUnpackBuffer,
+					MAX_SHADER_UNPACKED_BLOCK_SIZE );
 				pCompressedShaders += nBlockSize;
 				nBlockSize = nOutsize;		// how much data there is
 			}

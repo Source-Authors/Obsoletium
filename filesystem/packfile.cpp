@@ -229,14 +229,16 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 					if ( nLocalOffset == 0 && nDestBytes >= (int)actualSize && nBytes == (int)actualSize )
 					{
 						// uncompress directly into caller's buffer
-						CLZMA::Uncompress( (unsigned char *)pPreloadData, (unsigned char *)pBuffer );
+						// dimhotepus: Add out size to prevent overflows.
+						CLZMA::Uncompress( pPreloadData, pBuffer, nDestBytes );
 						return nBytes;
 					}
 
 					// uncompress into temporary memory
 					CUtlMemory< byte > tempMemory;
 					tempMemory.EnsureCapacity( actualSize );
-					CLZMA::Uncompress( pPreloadData, tempMemory.Base() );
+					// dimhotepus: Add out size to prevent overflows.
+					CLZMA::Uncompress( pPreloadData, tempMemory.Base(), actualSize );
 					// copy only what caller expects
 					V_memcpy( pBuffer, tempMemory.Base() + nLocalOffset, nBytes );
 					return nBytes;

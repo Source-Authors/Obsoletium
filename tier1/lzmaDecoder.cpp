@@ -91,9 +91,9 @@ static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 // Returns true if buffer is compressed.
 //-----------------------------------------------------------------------------
 /* static */
-bool CLZMA::IsCompressed( unsigned char *pInput )
+bool CLZMA::IsCompressed( void *pInput )
 {
-	lzma_header_t *pHeader = (lzma_header_t *)pInput;
+	auto *pHeader = static_cast<lzma_header_t *>(pInput);
 	if ( pHeader && pHeader->id == LZMA_ID )
 	{
 		return true;
@@ -108,9 +108,9 @@ bool CLZMA::IsCompressed( unsigned char *pInput )
 // buffer for decompression. Returns 0 if input buffer is not compressed.
 //-----------------------------------------------------------------------------
 /* static */
-unsigned int CLZMA::GetActualSize( unsigned char *pInput )
+unsigned int CLZMA::GetActualSize( void *pInput )
 {
-	lzma_header_t *pHeader = (lzma_header_t *)pInput;
+	auto *pHeader = static_cast<lzma_header_t *>(pInput);
 	if ( pHeader && pHeader->id == LZMA_ID )
 	{
 		return LittleLong( pHeader->actualSize );
@@ -125,13 +125,21 @@ unsigned int CLZMA::GetActualSize( unsigned char *pInput )
 // adequate sized output buffer or memory corruption will occur.
 //-----------------------------------------------------------------------------
 /* static */
-size_t CLZMA::Uncompress( unsigned char *pInput, unsigned char *pOutput )
+size_t CLZMA::Uncompress( void *pInput, OUT_BYTECAP(outSize) void *pOutput, size_t outSize )
 {
-	auto *pHeader = (lzma_header_t *)pInput;
+	auto *pHeader = static_cast<lzma_header_t *>(pInput);
 	if ( pHeader->id != LZMA_ID )
 	{
 		// not ours
-		return false;
+		return 0;
+	}
+
+	// These are in/out variables
+	SizeT outProcessed = pHeader->actualSize;
+	if ( outSize < outProcessed )
+	{
+		Warning( "LZMA Decompression buffer size %zu is lower than needed (%zu).\n", outSize, outProcessed );
+		return 0;
 	}
 
 	CLzmaDec state;
@@ -143,11 +151,9 @@ size_t CLZMA::Uncompress( unsigned char *pInput, unsigned char *pOutput )
 		return 0;
 	}
 
-	// These are in/out variables
-	SizeT outProcessed = pHeader->actualSize;
 	SizeT inProcessed = pHeader->lzmaSize;
 	ELzmaStatus status;
-	SRes result = LzmaDecode( pOutput, &outProcessed, pInput + sizeof( lzma_header_t ),
+	SRes result = LzmaDecode( static_cast<unsigned char*>(pOutput), &outProcessed, static_cast<unsigned char*>(pInput) + sizeof( lzma_header_t ),
 	                          &inProcessed, pHeader->properties, LZMA_PROPS_SIZE, LZMA_FINISH_END, &status, &g_Alloc );
 
 
@@ -155,7 +161,7 @@ size_t CLZMA::Uncompress( unsigned char *pInput, unsigned char *pOutput )
 
 	if ( result != SZ_OK || pHeader->actualSize != outProcessed )
 	{
-		Warning( "LZMA Decompression failed (%i)\n", result );
+		Warning( "LZMA Decompression failed (%i).\n", result );
 		return 0;
 	}
 
