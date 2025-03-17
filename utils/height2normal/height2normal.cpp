@@ -205,8 +205,10 @@ void ProcessFiles(const char *pNormalFileNameWithoutExtension, int startFrame,
     CUtlBuffer normalBuf;
     ImageLoader::NormalizeNormalMapRGBA8888(pImageRGBA8888, width * height);
     if (ImageRGBA8888HasAlpha(pImageRGBA8888, width * height)) {
-      TGAWriter::WriteToBuffer(pImageRGBA8888, normalBuf, width, height,
-                               IMAGE_FORMAT_RGBA8888, IMAGE_FORMAT_RGBA8888);
+      if (!TGAWriter::WriteToBuffer(pImageRGBA8888, normalBuf, width, height,
+                                    IMAGE_FORMAT_RGBA8888,
+                                    IMAGE_FORMAT_RGBA8888))
+        Error("Unable to convert alpha RGBA8888 image to RGBA8888.\n");
     } else {
       memRequired = ImageLoader::GetMemRequired(width, height, 1,
                                                 IMAGE_FORMAT_RGB888, false);
@@ -214,8 +216,10 @@ void ProcessFiles(const char *pNormalFileNameWithoutExtension, int startFrame,
       ImageLoader::ConvertImageFormat(pImageRGBA8888, IMAGE_FORMAT_RGBA8888,
                                       pImageRGB888, IMAGE_FORMAT_RGB888, width,
                                       height, 0, 0);
-      TGAWriter::WriteToBuffer(pImageRGB888, normalBuf, width, height,
-                               IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888);
+      if (!TGAWriter::WriteToBuffer(pImageRGB888, normalBuf, width, height,
+                                    IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888))
+        Error("Unable to convert alpha RGB888 image to RGB888.\n");
+
       delete[] pImageRGB888;
     }
     if (!g_pFullFileSystem->WriteFile(normalTGAFileName, NULL, normalBuf)) {
