@@ -550,10 +550,11 @@ void CPixelVisibilitySystem::LevelInitPreEntity()
 
 void CPixelVisibilitySystem::LevelShutdownPostEntity()
 {
-	m_pProxyMaterial->DecrementReferenceCount();
-	m_pProxyMaterial = NULL;
+	// dimhotepus: In reverse to creation order.
 	m_pDrawMaterial->DecrementReferenceCount();
 	m_pDrawMaterial = NULL;
+	m_pProxyMaterial->DecrementReferenceCount();
+	m_pProxyMaterial = NULL;
 	DeleteUnusedSets(true);
 	m_setList.Purge();
 	m_queryList.Purge();
