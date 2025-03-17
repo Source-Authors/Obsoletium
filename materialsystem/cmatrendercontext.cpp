@@ -177,8 +177,21 @@ InitReturnVal_t CMatRenderContextBase::Init( )
 			nSize = 4400 * 1024;
 		}
 
-		sm_RenderData[0].Init( nSize, nCommitSize, 0, 32 );
-		sm_RenderData[1].Init( nSize, nCommitSize, 0, 32 );
+		// dimhotepus: Check initialization succeeded.
+		if ( !sm_RenderData[0].Init( nSize, nCommitSize, 0, 32 ) )
+		{
+			Warning( "Render allocator #1 unable to allocate %d virtual bytes.\n", nSize );
+			return INIT_FAILED;
+		}
+		
+		// dimhotepus: Check initialization succeeded.
+		if ( !sm_RenderData[1].Init( nSize, nCommitSize, 0, 32 ) )
+		{
+			// * 2 to honor sm_RenderData[0].
+			Warning( "Render allocator #2 unable to allocate %d virtual bytes.\n", nSize * 2 );
+			return INIT_FAILED;
+		}
+
 		sm_nRenderStack = 0;
 		sm_nRenderLockCount = 0;
 	}
