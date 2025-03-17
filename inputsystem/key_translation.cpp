@@ -6,13 +6,10 @@
 
 
 #if defined( WIN32 ) 
-#if !defined( _X360 )
+#define NOMINMAX
 #include <wtypes.h>
 #include <winuser.h>
 #include "xbox/xboxstubs.h"
-#else
-#include "xbox/xbox_win32stubs.h"
-#endif
 #endif // WIN32
 
 #include "key_translation.h"
