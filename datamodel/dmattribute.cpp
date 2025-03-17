@@ -396,8 +396,8 @@ template< class T >
 bool CDmAttributeOp<T>::SkipUnserialize( CUtlBuffer& buf )
 {
 	T dummy;
-	::Unserialize( buf, dummy );
-	return buf.IsValid();
+	// dimhotepus: Honor serialize results.
+	return ::Unserialize( buf, dummy ) && buf.IsValid();
 }
 
 template< class T >

@@ -708,7 +708,8 @@ bool CDmxSerializerKeyValues2::SaveElement( CUtlBuffer& buf, CDmxSerializationDi
 	// explicitly serialize id, now that it's no longer an attribute
 	buf.Printf( "\"id\" \"%s\" ", g_pAttributeTypeName[ AT_OBJECTID ] );
 	buf.PutChar( '\"' );
-	::Serialize( buf, pElement->GetId() );
+	// dimhotepus: Honor serialize results.
+	bool ok = ::Serialize( buf, pElement->GetId() );
 	buf.PutString( "\"\n" );
 
 	SerializeAttributes( buf, dict, pElement );
@@ -718,7 +719,8 @@ bool CDmxSerializerKeyValues2::SaveElement( CUtlBuffer& buf, CDmxSerializationDi
 	{
 		buf.Printf( "}\n" );
 	}
-	return true;
+	// dimhotepus: Honor serialize results.
+	return ok;
 }
 
 bool CDmxSerializerKeyValues2::Serialize( CUtlBuffer &outBuf, CDmxElement *pRoot, const char *pFormatName )
