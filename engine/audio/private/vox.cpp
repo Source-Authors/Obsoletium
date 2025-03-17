@@ -2467,13 +2467,21 @@ int VOX_GroupPickSequential( intp isentenceg, OUT_Z_CAP(szfoundLen) char *szfoun
 	unsigned char count;
 	
 	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Count())
+	{
+		// dimhotepus: zero-terminate on error.
+		if (szfoundLen) szfound[0] = '\0';
 		return -1;
+	}
 
 	szgroupname = g_SentenceGroups[isentenceg].GroupName();
 	count = g_SentenceGroups[isentenceg].count;
 	
 	if (count == 0)
+	{
+		// dimhotepus: zero-terminate on error.
+		if (szfoundLen) szfound[0] = '\0';
 		return -1;
+	}
 
 	if (ipick >= count)
 		ipick = count-1;
@@ -2512,7 +2520,11 @@ int VOX_GroupPick( intp isentenceg, OUT_Z_CAP(strLen) char *szfound, intp strLen
 	int ffound = FALSE;
 	
 	if (isentenceg < 0 || isentenceg > g_SentenceGroups.Count())
+	{
+		// dimhotepus: zero-terminate on error.
+		if (strLen) szfound[0] = '\0';
 		return -1;
+	}
 
 	szgroupname = g_SentenceGroups[isentenceg].GroupName();
 	count = g_SentenceGroups[isentenceg].count;
@@ -2539,6 +2551,10 @@ int VOX_GroupPick( intp isentenceg, OUT_Z_CAP(strLen) char *szfound, intp strLen
 			return ipick;
 		}
 	}
+	
+	// dimhotepus: zero-terminate on error.
+	if (strLen) szfound[0] = '\0';
+
 	return -1;
 }
 
