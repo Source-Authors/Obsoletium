@@ -193,8 +193,11 @@ void ProcessFiles(const char *pNormalFileNameWithoutExtension, int startFrame,
     unsigned char *pImageIA88 = new unsigned char[memRequired];
 
     buf.SeekGet(CUtlBuffer::SEEK_HEAD, 0);
-    TGALoader::Load(pImageIA88, buf, width, height, IMAGE_FORMAT_IA88,
-                    sourceGamma, false);
+    if (!TGALoader::Load(pImageIA88, buf, width, height, IMAGE_FORMAT_IA88,
+                         sourceGamma, false)) {
+      fprintf(stderr, "error in %s.\n", heightTGAFileName);
+      return;
+    }
 
     memRequired = ImageLoader::GetMemRequired(width, height, 1,
                                               IMAGE_FORMAT_RGBA8888, false);
