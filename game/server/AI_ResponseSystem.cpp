@@ -944,7 +944,8 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 				{
 					matcher.usemin = true;
 					matcher.minequals = eq;
-					matcher.minval = (float)atof( token );
+					// dimhotepus: atof -> strtof.
+					matcher.minval = strtof( token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -952,7 +953,8 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 				{
 					matcher.usemax = true;
 					matcher.maxequals = eq;
-					matcher.maxval = (float)atof( token );
+					// dimhotepus: atof -> strtof.
+					matcher.maxval = strtof( token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -1070,7 +1072,8 @@ bool CResponseSystem::CompareUsingMatcher( const char *setValue, Matcher& m, boo
 		if ( !setValue || !setValue[0] )
 			return false;
 
-		return v == (float)atof( m.GetToken() );
+		// dimhotepus: atof -> strtof.
+		return v == strtof( m.GetToken(), nullptr );
 	}
 
 	return !Q_stricmp( setValue, m.GetToken() ) ? true : false;
