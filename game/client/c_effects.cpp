@@ -231,9 +231,9 @@ static ConVar r_SnowRayEnable( "r_SnowRayEnable", "1", FCVAR_CHEAT, "Snow." );
 
 void DrawPrecipitation()
 {
-	for ( int i=0; i < g_Precipitations.Count(); i++ )
+	for ( auto *p : g_Precipitations )
 	{
-		g_Precipitations[i]->Render();
+		p->Render();
 	}
 }
 
@@ -1624,9 +1624,9 @@ private:
 	void CreateInsideVolumeSnowParticles( float flCurrentTime, float flRadius, const Vector &vecEyePos, const Vector &vecForward, float flZoomScale );
 	void CreateSnowParticlesSphere( float flRadius );
 	void CreateSnowParticlesRay( float flRadius, const Vector &vecEyePos, const Vector &vecForward );
-	void CreateSnowFallParticle( const Vector &vecParticleSpawn, int iBBox );
+	void CreateSnowFallParticle( const Vector &vecParticleSpawn, intp iBBox );
 
-	int StandingInSnowVolume( Vector &vecPoint );
+	intp StandingInSnowVolume( Vector &vecPoint );
 	void FindSnowVolumes( Vector &vecCenter, float flRadius, Vector &vecEyePos, Vector &vecForward );
 
 	void UpdateBounds( const Vector &vecSnowMin, const Vector &vecSnowMax );
@@ -1647,8 +1647,8 @@ private:
 	Vector							m_vecMin;
 	Vector							m_vecMax;
 
-	int								m_nActiveSnowCount;
-	int								m_aActiveSnow[MAX_SNOW_LIST];
+	intp							m_nActiveSnowCount;
+	intp							m_aActiveSnow[MAX_SNOW_LIST];
 
 	bool							m_bRayParticles;
 
@@ -1798,12 +1798,12 @@ void CSnowFallManager::UpdateBounds( const Vector &vecSnowMin, const Vector &vec
 // Input  : &vecPoint - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CSnowFallManager::StandingInSnowVolume( Vector &vecPoint )
+intp CSnowFallManager::StandingInSnowVolume( Vector &vecPoint )
 {
 	trace_t traceSnow;
 
-	int nSnowCount = m_aSnow.Count();
-	int iSnow = 0;
+	intp nSnowCount = m_aSnow.Count();
+	intp iSnow = 0;
 	for ( iSnow = 0; iSnow < nSnowCount; ++iSnow )
 	{
 		UTIL_TraceModel( vecPoint, vecPoint, vec3_origin, vec3_origin, static_cast<C_BaseEntity*>( m_aSnow[iSnow].m_pEntity ), COLLISION_GROUP_NONE, &traceSnow );
@@ -1825,8 +1825,8 @@ void CSnowFallManager::FindSnowVolumes( Vector &vecCenter, float flRadius, Vecto
 	m_nActiveSnowCount = 0;
 	m_bRayParticles = false;
 
-	int nSnowCount = m_aSnow.Count();
-	int iSnow = 0;
+	intp nSnowCount = m_aSnow.Count();
+	intp iSnow = 0;
 	for ( iSnow = 0; iSnow < nSnowCount; ++iSnow )
 	{
 		// Check to see if the volume is in the PVS.
@@ -1933,7 +1933,7 @@ void CSnowFallManager::CreateSnowFall( void )
 		Vector vecTraceStart;
 		VectorCopy( pPlayer->EyePosition(), vecTraceStart );
 
-		int iSnowVolume = StandingInSnowVolume( vecTraceStart );
+		intp iSnowVolume = StandingInSnowVolume( vecTraceStart );
 		if ( iSnowVolume != -1 )
 		{
 			m_flSnowRadius = r_SnowInsideRadius.GetFloat() + ( flSpeed * 0.5f );
@@ -2159,7 +2159,7 @@ void CSnowFallManager::CreateSnowParticlesRay( float flRadius, const Vector &vec
 	CreateSnowFallParticle( vecParticleSpawn, m_aActiveSnow[iSnow] );
 }
 
-void CSnowFallManager::CreateSnowFallParticle( const Vector &vecParticleSpawn, int iSnow )
+void CSnowFallManager::CreateSnowFallParticle( const Vector &vecParticleSpawn, intp iSnow )
 {	
 	SimpleParticle *pParticle = ( SimpleParticle* )m_pSnowFallEmitter->AddParticle( sizeof( SimpleParticle ), m_aSnow[iSnow].m_hMaterial, vecParticleSpawn );
 	if ( pParticle == NULL )
