@@ -108,7 +108,12 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
         material_system_{nullptr},
         hammer_{nullptr},
         scoped_spew_output_{HammerSpewFunc},
-        scoped_app_locale_{kEnUsUtf8Locale} {}
+        scoped_app_locale_{kEnUsUtf8Locale},
+        scoped_com_{static_cast<COINIT>(COINIT_APARTMENTTHREADED |
+                                        COINIT_DISABLE_OLE1DDE |
+                                        COINIT_SPEED_OVER_MEMORY)},
+        scoped_timer_resolution_{kSystemTimerResolution},
+        scoped_winsock_{WINSOCK_VERSION} {}
 
   // Methods of IApplication
   bool Create() override;
@@ -119,6 +124,7 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
 
  private:
   static constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+  static constexpr auto kSystemTimerResolution{std::chrono::milliseconds{2}};
 
   IFileSystem *file_system_;
   IDataCache *data_cache_;
@@ -126,8 +132,11 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
   IMaterialSystem *material_system_;
   IHammer *hammer_;
 
-  ScopedSpewOutputFunc scoped_spew_output_;
+  const ScopedSpewOutputFunc scoped_spew_output_;
   const se::ScopedAppLocale scoped_app_locale_;
+  const se::common::windows::ScopedCom scoped_com_;
+  const se::common::windows::ScopedTimerResolution scoped_timer_resolution_;
+  const se::common::windows::ScopedWinsock scoped_winsock_;
 };
 
 // Create all singleton systems
@@ -151,32 +160,23 @@ bool HammerAppSystemGroup::Create() {
 
 #ifdef WIN32
   // COM is required.
-  const se::common::windows::ScopedCom scoped_com{
-      static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
-                          COINIT_SPEED_OVER_MEMORY)};
-  if (FAILED(scoped_com.errc())) {
-    const _com_error com_error{scoped_com.errc()};
-    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com.errc(),
+  if (FAILED(scoped_com_.errc())) {
+    const _com_error com_error{scoped_com_.errc()};
+    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com_.errc(),
           com_error.ErrorMessage());
   }
 
-  using namespace std::chrono_literals;
-  constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
-
   // System timer precision affects Sleep & friends performance.
-  const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
-      kSystemTimerResolution};
-  if (!scoped_timer_resolution) {
+  if (!scoped_timer_resolution_) {
     Warning(
         "Unable to set Windows timer resolution to %lld ms. Will use default "
         "one.",
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const se::common::windows::ScopedWinsock scoped_winsock{WINSOCK_VERSION};
-  if (scoped_winsock.errc()) {
+  if (scoped_winsock_.errc()) {
     Warning("Windows sockets 2.2 unavailable (%d): %s.\n",
-            scoped_winsock.errc(), scoped_winsock.errc().message().c_str());
+            scoped_winsock_.errc(), scoped_winsock_.errc().message().c_str());
   }
 #endif
 
