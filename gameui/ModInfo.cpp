@@ -212,8 +212,11 @@ int CModInfo::AdvCrosshairLevel()
 void CModInfo::LoadCurrentGameInfo()
 {
 	// Load up gameinfo for the current mod
-	char const *filename = "gameinfo.txt";
-	m_pModData->LoadFromFile( g_pFullFileSystem, filename );
+	constexpr char filename[]{"gameinfo.txt"};
+	if ( !m_pModData->LoadFromFile( g_pFullFileSystem, filename ) )
+	{
+		Warning( "Unable to load current game info from '%s'.\n", filename );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -222,7 +225,10 @@ void CModInfo::LoadCurrentGameInfo()
 void CModInfo::LoadGameInfoFromBuffer( const char *buffer )
 {
 	// Load up gameinfo.txt for the current mod
-	m_pModData->LoadFromBuffer( "", buffer );
+	if ( !m_pModData->LoadFromBuffer( "", buffer ) )
+	{
+		Warning( "Unable to load game info from '%s'.\n", buffer );
+	}
 }
 
 //-----------------------------------------------------------------------------
