@@ -2252,7 +2252,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			case 0x40000000:								// lzma compressed
 			{
 				nBlockSize &= 0x3fffffff;
-
+				
 				// dimhotepus: Add out size to prevent overflows.
 				size_t nOutsize = CLZMA::Uncompress(
 					pCompressedShaders,
