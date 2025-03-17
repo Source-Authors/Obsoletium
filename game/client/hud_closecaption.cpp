@@ -2039,13 +2039,13 @@ public:
 		}
 	}
 
-	bool GetStream( OUT_Z_BYTECAP(bufSizeInBytes) wchar_t *buf, int bufSizeInBytes )
+	bool GetStream( OUT_Z_BYTECAP(bufSizeInBytes) wchar_t *buf, intp bufSizeInBytes )
 	{
-		Assert( bufSizeInBytes >= static_cast<int>(sizeof(buf[0])) );
+		Assert( bufSizeInBytes >= static_cast<intp>(sizeof(buf[0])) );
 		buf[ 0 ] = L'\0';
 
-		int c = m_Tokens.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = m_Tokens.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			caption_t *caption = m_Tokens[ i ];
 			if ( caption->stream == NULL )
@@ -2054,21 +2054,21 @@ public:
 			}
 		}
 
-		unsigned int curlen = 0;
-		unsigned int maxlen = bufSizeInBytes / sizeof( wchar_t );
+		intp curlen = 0;
+		const intp maxlen = bufSizeInBytes / static_cast<intp>(sizeof(wchar_t));
 
 		// Compose full stream from tokens
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
 			caption_t *caption = m_Tokens[ i ];
-			int len = wcslen( caption->stream ) + 1;
+			intp len = wcslen( caption->stream ) + 1;
 			if ( curlen + len >= maxlen )
 				break;
 
-			wcscat( buf, caption->stream );
+			V_wcscat( buf, caption->stream, maxlen );
 			if ( i < c - 1 ) 
 			{
-				wcscat( buf, L" " );
+				V_wcscat( buf, L" ", maxlen );
 			}
 
 			curlen += len;
@@ -2077,19 +2077,25 @@ public:
 		return true;
 	}
 
-	bool					IsStream() const
+	template<intp bufferSize>
+	bool GetStream( OUT_Z_ARRAY wchar_t (&buf)[bufferSize] )
+	{
+		return GetStream( buf, bufferSize * static_cast<intp>(sizeof(wchar_t)) );
+	}
+
+	bool IsStream() const
 	{
 		return m_bIsStream;
 	}
 
-	void					SetIsStream( bool state )
+	void SetIsStream( bool state )
 	{
 		m_bIsStream = state;
 	}
 
-	void	AddRandomToken( CUtlVector< AsyncCaption_t >& directories )
+	void AddRandomToken( CUtlVector< AsyncCaption_t >& directories )
 	{
-		int dc = directories.Count();
+		intp dc = directories.Count();
 		int fileindex = RandomInt( 0, dc - 1 );
 
 		int c = directories[ fileindex ].m_CaptionDirectory.Count();
@@ -2253,7 +2259,7 @@ void CHudCloseCaption::ProcessAsyncWork()
 		wchar_t stream[ MAX_CAPTION_CHARACTERS ];
 
 		// If we get to the first item with pending async work, stop processing
-		if ( !item->GetStream( stream, sizeof( stream ) ) )
+		if ( !item->GetStream( stream ) )
 		{
 			break;
 		}
