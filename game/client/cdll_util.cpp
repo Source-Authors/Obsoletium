@@ -1205,10 +1205,9 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 	int iCount = 1;
 
 	KeyValuesAD kvMapLoadFile( MAP_KEY_FILE );
-	if ( kvMapLoadFile )
+	if ( kvMapLoadFile &&
+		 kvMapLoadFile->LoadFromFile( g_pFullFileSystem, szFilename, "MOD" ) )
 	{
-		kvMapLoadFile->LoadFromFile( g_pFullFileSystem, szFilename, "MOD" );
-
 		char mapname[MAX_MAP_NAME];
 		V_FileBase( engine->GetLevelName(), mapname );
 		V_strlower( mapname );
@@ -1252,7 +1251,7 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 
 	int iCount = 0;
 
-	KeyValues *kvMapLoadFile = new KeyValues( MAP_KEY_FILE );
+	KeyValuesAD kvMapLoadFile( MAP_KEY_FILE );
 	if ( kvMapLoadFile )
 	{
 		// create an empty file if none exists
@@ -1265,19 +1264,18 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 			g_pFullFileSystem->WriteFile( szFilename, "MOD", buf );
 		}
 
-		kvMapLoadFile->LoadFromFile( g_pFullFileSystem, szFilename, "MOD" );
-
-		char mapname[MAX_MAP_NAME];
-		V_FileBase( engine->GetLevelName(), mapname );
-		V_strlower( mapname );
-
-		KeyValues *pMapKey = kvMapLoadFile->FindKey( mapname );
-		if ( pMapKey )
+		if ( kvMapLoadFile->LoadFromFile( g_pFullFileSystem, szFilename, "MOD" ) )
 		{
-			iCount = pMapKey->GetInt( pszCustomKey );
-		}
+			char mapname[MAX_MAP_NAME];
+			V_FileBase( engine->GetLevelName(), mapname );
+			V_strlower( mapname );
 
-		kvMapLoadFile->deleteThis();
+			KeyValues *pMapKey = kvMapLoadFile->FindKey( mapname );
+			if ( pMapKey )
+			{
+				iCount = pMapKey->GetInt( pszCustomKey );
+			}
+		}
 	}
 
 	return iCount;
