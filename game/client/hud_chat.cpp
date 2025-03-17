@@ -85,7 +85,7 @@ void CHudChat::MsgFunc_SayText( bf_read &msg )
 {
 	char szString[256];
 
-	msg.ReadByte(); // client ID
+	(void)msg.ReadByte(); // client ID
 	msg.ReadString( szString );
 	Printf( CHAT_FILTER_NONE, "%s", szString );
 }

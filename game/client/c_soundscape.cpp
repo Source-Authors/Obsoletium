@@ -808,7 +808,8 @@ void C_SoundscapeSystem::ProcessPlayLooping( KeyValues *pAmbient, const subsound
 
 void C_SoundscapeSystem::TouchSoundFile( char const *wavefile )
 {
-	filesystem->GetFileTime( VarArgs( "sound/%s", PSkipSoundChars( wavefile ) ), "GAME" );
+	// dimhotepus: Touch here to load metadata.
+	(void)filesystem->GetFileTime( VarArgs( "sound/%s", PSkipSoundChars( wavefile ) ), "GAME" );
 }
 
 // start a new looping sound
