@@ -457,7 +457,7 @@ void CFlexAnimationTrack::Clear( void )
 // Purpose: 
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void CFlexAnimationTrack::RemoveSample( int index, int type /*=0*/ )
+void CFlexAnimationTrack::RemoveSample( intp index, int type /*=0*/ )
 {
 	Assert( type == 0 || type == 1 );
 
@@ -2613,7 +2613,7 @@ CFlexAnimationTrack *CChoreoEvent::AddTrack( const char *controllername )
 // Purpose: 
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void CChoreoEvent::RemoveTrack( int index )
+void CChoreoEvent::RemoveTrack( intp index )
 {	
 	CFlexAnimationTrack *track = GetFlexAnimationTrack( index );
 	if ( !track )
@@ -3451,7 +3451,7 @@ CExpressionSample *CCurveData::Add( float time, float value, bool selected )
 	return &m_Ramp[ idx ];
 }
 
-void CCurveData::Delete( int index )
+void CCurveData::Delete( intp index )
 {
 	if ( index < 0 || index >= GetCount() )
 		return;

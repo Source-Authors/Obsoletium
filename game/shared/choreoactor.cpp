@@ -162,7 +162,7 @@ void CChoreoActor::RemoveAllChannels()
 // Input  : c1 - 
 //			c2 - 
 //-----------------------------------------------------------------------------
-void CChoreoActor::SwapChannels( int c1, int c2 )
+void CChoreoActor::SwapChannels( intp c1, intp c2 )
 {
 	std::swap( m_Channels[ c1 ], m_Channels[ c2 ] );
 }
@@ -172,9 +172,9 @@ void CChoreoActor::SwapChannels( int c1, int c2 )
 // Input  : *channel - 
 // Output : int
 //-----------------------------------------------------------------------------
-ptrdiff_t CChoreoActor::FindChannelIndex( CChoreoChannel *channel )
+intp CChoreoActor::FindChannelIndex( CChoreoChannel *channel )
 {
-	ptrdiff_t i{ 0 };
+	intp i{ 0 };
 	for ( auto *ch : m_Channels )
 	{
 		if ( channel == ch )

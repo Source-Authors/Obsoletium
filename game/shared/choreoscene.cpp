@@ -2975,7 +2975,7 @@ intp CChoreoScene::FindActorIndex( CChoreoActor *actor )
 // Input  : a1 - 
 //			a2 - 
 //-----------------------------------------------------------------------------
-void CChoreoScene::SwapActors( int a1, int a2 )
+void CChoreoScene::SwapActors( intp a1, intp a2 )
 {
 	std::swap( m_Actors[ a1 ], m_Actors[ a2 ] );
 }
@@ -3880,11 +3880,10 @@ bool CChoreoScene::RestoreFromBinaryBuffer( CUtlBuffer& buf, char const *filenam
 		return false;
 
 	// Skip the CRC
-	buf.GetInt();
+	(void)buf.GetInt();
 
-	int i;
-	int eventCount = buf.GetUnsignedChar();
-	for ( i = 0; i < eventCount; ++i )
+	auto eventCount = buf.GetUnsignedChar();
+	for ( decltype(eventCount) i = 0; i < eventCount; ++i )
 	{
 		MEM_ALLOC_CREDIT();
 		CChoreoEvent *e = AllocEvent();
@@ -3898,8 +3897,8 @@ bool CChoreoScene::RestoreFromBinaryBuffer( CUtlBuffer& buf, char const *filenam
 		return false;
 	}
 
-	int actorCount = buf.GetUnsignedChar();
-	for ( i = 0; i < actorCount; ++i )
+	auto actorCount = buf.GetUnsignedChar();
+	for ( decltype(eventCount) i = 0; i < actorCount; ++i )
 	{
 		CChoreoActor *a = AllocActor();
 		Assert( a );
