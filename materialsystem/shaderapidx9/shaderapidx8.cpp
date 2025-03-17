@@ -2651,10 +2651,11 @@ inline void CShaderAPIDx8::SetScissorRect( const int nLeft, const int nTop, cons
 
 		Assert( (nRight <= nWidth) && (nBottom <= nHeight) && ( nTop >= 0 ) && (nLeft >= 0) );
 
-		clamp( nRight,  0, nWidth );
-		clamp( nLeft,   0, nWidth );
-		clamp( nTop,    0, nHeight );
-		clamp( nBottom, 0, nHeight );
+		// dimhotepus: Clamp rect if needed.
+		nRight  = clamp( nRight,  0, nWidth );
+		nLeft   = clamp( nLeft,   0, nWidth );
+		nTop    = clamp( nTop,    0, nHeight );
+		nBottom = clamp( nBottom, 0, nHeight );
 	}
 
 	DWORD dwEnableScissor = bEnableScissor ? TRUE : FALSE;
