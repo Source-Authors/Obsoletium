@@ -964,7 +964,7 @@ void CC_Player_TestDispatchEffect( const CCommand &args )
 	}
 
 	// Optional flags
-	float flags = 0;
+	int flags = 0;
 	if ( args.ArgC() >= 4 )
 	{
 		flags = atoi( args[ 3 ] );
