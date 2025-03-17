@@ -1019,13 +1019,13 @@ void UTIL_DecodeICE( unsigned char * buffer, int size, const unsigned char *key)
 #endif
 
 // work-around since client header doesn't like inlined gpGlobals->curtime
-float IntervalTimer::Now( void ) const
+double IntervalTimer::Now( void ) const
 {
 	return gpGlobals->curtime;
 }
 
 // work-around since client header doesn't like inlined gpGlobals->curtime
-float CountdownTimer::Now( void ) const
+double CountdownTimer::Now( void ) const
 {
 	return gpGlobals->curtime;
 }
