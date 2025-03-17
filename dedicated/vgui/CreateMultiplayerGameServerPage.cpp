@@ -788,7 +788,10 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
     char liblist[1024];
     V_sprintf_safe(liblist, "%s\\gameinfo.txt", m_szMod);
     m_pGameInfo = new KeyValues("GameInfo");
-    m_pGameInfo->LoadFromFile(g_pFullFileSystem, liblist);
+    if ( !m_pGameInfo->LoadFromFile(g_pFullFileSystem, liblist) )
+    {
+        Warning( "Unable to load game info from '%s'.\n", liblist );
+    }
 
     // redo the hostname with the new game name
     if (updateHostname) {
