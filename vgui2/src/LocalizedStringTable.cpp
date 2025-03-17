@@ -980,7 +980,7 @@ void CLocalizedStringTable::SetValueByIndex(StringIndex_t index, wchar_t *newVal
 	else
 	{
 		// copy the string into the old position
-		wcscpy(wstr, newValue);		
+		V_wcsncpy(wstr, newValue, (oldLen + 1) * static_cast<intp>(sizeof(wchar_t)));
 	}
 }
 
