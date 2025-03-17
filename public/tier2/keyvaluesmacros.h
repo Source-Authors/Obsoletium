@@ -11,7 +11,7 @@
 // Returns true if the passed string matches the filename style glob, false otherwise
 // * matches any characters, ? matches any single character, otherwise case insensitive matching
 //--------------------------------------------------------------------------------------------------
-bool GlobMatch( const char *pszGlob, const char *pszString );
+[[nodiscard]] bool GlobMatch( const char *pszGlob, const char *pszString );
 
 class KeyValues;
 
@@ -23,6 +23,6 @@ class KeyValues;
 // #update updates sibling KeyValues blocks subkeys with its subkeys, overwriting and adding
 // KeyValues as necessary
 //--------------------------------------------------------------------------------------------------
-KeyValues *HandleKeyValuesMacros( KeyValues *kv, KeyValues *pkvParent = nullptr );
+[[nodiscard]] KeyValues *HandleKeyValuesMacros( KeyValues *kv, KeyValues *pkvParent = nullptr );
 
 #endif  // SE_TIER2_KEYVALUESMACROS_H_
