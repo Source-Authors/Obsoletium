@@ -31,7 +31,7 @@ const studiohdr_t *virtualgroup_t::GetStudioHdr( ) const
 }
 
 
-byte *studiohdr_t::GetAnimBlock( int iBlock ) const
+byte *studiohdr_t::GetAnimBlock( intp iBlock ) const
 {
 	return modelinfo->GetAnimBlock( this, iBlock );
 }
