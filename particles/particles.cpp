@@ -3472,7 +3472,7 @@ CParticleCollection *CParticleSystemMgr::CreateParticleCollection( const DmObjec
 	if ( !pDef )
 	{
 		char pBuf[256];
-		UniqueIdToString( id, pBuf, sizeof(pBuf) );
+		UniqueIdToString( id, pBuf );
 		Warning( "Attempted to create unknown particle system id %s\n", pBuf );
 		return NULL;
 	}
