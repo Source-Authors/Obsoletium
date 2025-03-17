@@ -786,7 +786,7 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
       m_pGameInfo->deleteThis();
     }
     char liblist[1024];
-    Q_snprintf(liblist, sizeof(liblist) - 1, "%s\\gameinfo.txt", m_szMod);
+    V_sprintf_safe(liblist, "%s\\gameinfo.txt", m_szMod);
     m_pGameInfo = new KeyValues("GameInfo");
     m_pGameInfo->LoadFromFile(g_pFullFileSystem, liblist);
 
