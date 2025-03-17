@@ -1570,7 +1570,7 @@ private:
 
 	// debug logging
 	void PrintfVA( char *fmt, va_list vargs );
-	void Printf( const char *fmt, ... );	
+	void Printf( PRINTF_FORMAT_STRING const char *fmt, ... );	
 	float Knob( char *knobname, float *setvalue = NULL );
 
 	// "normal" back buffer and depth buffer.  Need to keep this around so that we
@@ -13274,7 +13274,7 @@ void CShaderAPIDx8::PrintfVA( char *fmt, va_list vargs )
 #endif
 }
 
-void CShaderAPIDx8::Printf( const char *fmt, ... )
+void CShaderAPIDx8::Printf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 #ifdef DX_TO_GL_ABSTRACTION
 	#if GLMDEBUG
