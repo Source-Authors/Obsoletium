@@ -186,7 +186,7 @@ void CAdminServer::CloseManageServerDialog(ManageServerUIHandle_t gameDialog)
 IManageServer *CAdminServer::GetManageServerInterface(ManageServerUIHandle_t handle)
 {
 	// make sure it's safe
-	if ((int)handle < 1 || (int)handle > m_OpenedManageDialog.Count())
+	if ((intp)handle < 1 || (intp)handle > m_OpenedManageDialog.Count())
 		return NULL;
 
 	vgui::VPANEL panel = vgui::ivgui()->HandleToPanel(m_OpenedManageDialog[handle].handle);
