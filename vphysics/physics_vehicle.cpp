@@ -1178,7 +1178,7 @@ float CVehicleController::CalcSteering( float dt, float speed, float steering, b
 	}
 	if ( m_vehicleData.steering.steeringExponent != 0 )
 	{
-		float sign = steering < 0 ? -1 : 1;
+		float sign = steering < 0 ? -1.f : 1.f;
 		float absSteering = fabs(steering);
 		if ( bAnalog )
 		{
