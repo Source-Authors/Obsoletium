@@ -1845,15 +1845,13 @@ void CPhysicsEnvironment::CleanupDeleteList()
 
 bool CPhysicsEnvironment::IsCollisionModelUsed( const CPhysCollide *pCollide ) const
 {
-	intp i;
-
-	for ( i = m_deadObjects.Count()-1; i >= 0; --i )
+	for ( intp i = m_deadObjects.Count()-1; i >= 0; --i )
 	{
 		if ( m_deadObjects[i]->GetCollide() == pCollide )
 			return true;
 	}
 	
-	for ( i = m_objects.Count()-1; i >= 0; --i )
+	for ( intp i = m_objects.Count()-1; i >= 0; --i )
 	{
 		if ( m_objects[i]->GetCollide() == pCollide )
 			return true;
@@ -2110,7 +2108,9 @@ public:
 		if ( !m_objectList.IsValidList( listIndex ) )
 			return;
 
-		for ( unsigned short item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); item = m_objectList.Next(item) )
+		for ( auto item = m_objectList.Head(listIndex);
+			item != m_objectList.InvalidIndex();
+			item = m_objectList.Next(item) )
 		{
 			if ( m_objectList[item] == pRemove )
 			{
@@ -2183,8 +2183,7 @@ public:
 			return 0;
 
 		int nCount = 0;
-		unsigned short item;
-		for ( item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
+		for ( auto item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
 				item = m_objectList.Next(item) )
 		{
 			++nCount;
@@ -2200,8 +2199,7 @@ public:
 			return 0;
 
 		int nCount = 0;
-		unsigned short item;
-		for ( item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
+		for ( auto item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
 				item = m_objectList.Next(item) )
 		{
 			ppObjectList[nCount] = m_objectList[item];
