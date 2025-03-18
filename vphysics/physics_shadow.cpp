@@ -1074,7 +1074,7 @@ void CShadowController::AttachObject( void )
 	}
 
 	m_savedFlags = m_pObject->CallbackFlags();
-	unsigned int flags = m_savedFlags | CALLBACK_SHADOW_COLLISION;
+	unsigned short flags = m_savedFlags | CALLBACK_SHADOW_COLLISION;
 	flags &= ~CALLBACK_GLOBAL_FRICTION;
 	flags &= ~CALLBACK_GLOBAL_COLLIDE_STATIC;
 	m_pObject->SetCallbackFlags( flags );
