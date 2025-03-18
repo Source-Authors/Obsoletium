@@ -177,12 +177,12 @@ public:
 	bool Tokenize( const char *pCommand, characterset_t *pBreakSet = nullptr );
 	void Reset();
 
-	int ArgC() const;
-	const char **ArgV() const;
-	const char *ArgS() const;					// All args that occur after the 0th arg, in string form
-	const char *GetCommandString() const;		// The entire command in string form, including the 0th arg
-	const char *operator[]( int nIndex ) const;	// Gets at arguments
-	const char *Arg( int nIndex ) const;		// Gets at arguments
+	[[nodiscard]] int ArgC() const;
+	[[nodiscard]] const char **ArgV() const;
+	[[nodiscard]] const char *ArgS() const;					// All args that occur after the 0th arg, in string form
+	[[nodiscard]] const char *GetCommandString() const;		// The entire command in string form, including the 0th arg
+	[[nodiscard]] const char *operator[]( int nIndex ) const;	// Gets at arguments //-V302
+	[[nodiscard]] const char *Arg( int nIndex ) const;		// Gets at arguments
 	
 	// Helper functions to parse arguments to commands.
 	const char* FindArg( const char *pName ) const;
