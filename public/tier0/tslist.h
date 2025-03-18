@@ -485,7 +485,7 @@ public:
 
 		Assert( m_Count.load( std::memory_order::memory_order_relaxed ) == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
-		Assert( m_Head.value.pNode->GetNextNode() == End() );
+		Assert( m_Head.value.pNode->GetNextNode() == End() ); //-V2002
 
 		delete m_Head.value.pNode;
 	}
@@ -510,7 +510,7 @@ public:
 
 		Assert( m_Count.load() == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
-		Assert( m_Head.value.pNode->GetNextNode() == End() );
+		Assert( m_Head.value.pNode->GetNextNode() == End() ); //-V2002
 
 		m_Head.value.sequence = m_Tail.value.sequence = 0;
 	}
@@ -534,7 +534,7 @@ public:
 		{
 			bool bResult = true;
 			int nNodes = 0;
-			if ( m_Tail.value.pNode->GetNextNode() != End() )
+			if ( m_Tail.value.pNode->GetNextNode() != End() ) //-V2002
 			{
 				DebuggerBreakIfDebugging();
 				bResult = false;
@@ -553,7 +553,7 @@ public:
 			while ( pNode != End() )
 			{
 				nNodes++;
-				pNode = pNode->GetNextNode();
+				pNode = pNode->GetNextNode(); //-V2002
 			}
 
 			nNodes--;// skip dummy node
@@ -612,7 +612,7 @@ public:
 			else
 			{
 				// Another thread is trying to push, help it along
-				FinishPush( oldTail.value.pNode->GetNextNode(), oldTail );
+				FinishPush( oldTail.value.pNode->GetNextNode(), oldTail ); //-V2002
 			}
 		}
 
@@ -650,7 +650,7 @@ public:
 			ThreadMemoryBarrier(); // need a barrier to prevent reordering of these assignments
 			head.value.pNode	= *pHeadNode;
 			tailSequence		= pTail->value.sequence;
-			pNext				= head.value.pNode->GetNextNode();
+			pNext				= head.value.pNode->GetNextNode(); //-V2002
 
 			// Checking pNext only to force optimizer to not reorder the assignment
 			// to pNext and the compare of the sequence
