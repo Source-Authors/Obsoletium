@@ -38,16 +38,16 @@ public:
 	//virtual void ReleaseReference() = 0;
 
 	// get a surface manager 
-	virtual IVP_SurfaceManager *CreateSurfaceManager( short & ) const = 0;
+	virtual [[nodiscard]] IVP_SurfaceManager *CreateSurfaceManager( short & ) const = 0;
 	virtual void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const = 0;
-	virtual size_t GetSerializationSize() const = 0;
-	virtual size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const = 0;
-	virtual int GetVCollideIndex() const = 0;
-	virtual Vector GetMassCenter() const = 0;
+	virtual [[nodiscard]] size_t GetSerializationSize() const = 0;
+	virtual [[nodiscard]] size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const = 0;
+	virtual [[nodiscard]] int GetVCollideIndex() const = 0;
+	virtual [[nodiscard]] Vector GetMassCenter() const = 0;
 	virtual void SetMassCenter( const Vector &massCenter ) = 0;
-	virtual Vector GetOrthographicAreas() const = 0;
+	virtual [[nodiscard]] Vector GetOrthographicAreas() const = 0;
 	virtual void SetOrthographicAreas( const Vector &areas ) = 0;
-	virtual float GetSphereRadius() const = 0;
+	virtual [[nodiscard]] float GetSphereRadius() const = 0;
 	virtual void OutputDebugInfo() const = 0;
 };
 
@@ -75,15 +75,15 @@ struct leafmap_t
 		vertCount = vertCountIn;
 	}
 
-	int MaxSpans()
+	[[nodiscard]] int MaxSpans()
 	{
 		return sizeof(startVert) - sizeof(startVert[0]);
 	}
-	const byte *GetSpans() const
+	[[nodiscard]] const byte *GetSpans() const
 	{
 		return reinterpret_cast<const byte *>(&startVert[1]);
 	}
-	byte *GetSpans()
+	[[nodiscard]] byte *GetSpans()
 	{
 		return reinterpret_cast<byte *>(&startVert[1]);
 	}
@@ -114,10 +114,10 @@ struct leafmap_t
 		}
 	}
 
-	inline bool HasSpans() const { return (flags & (LEAFMAP_HAS_SINGLE_VERTEX_SPAN|LEAFMAP_HAS_MULTIPLE_VERTEX_SPANS)) ? true : false; }
-	inline bool HasCubemap() const { return (flags & LEAFMAP_HAS_CUBEMAP) ? true : false; }
-	inline bool HasSingleVertexSpan() const { return (flags & LEAFMAP_HAS_SINGLE_VERTEX_SPAN) ? true : false; }
-	inline bool HasRLESpans() const { return (flags & LEAFMAP_HAS_MULTIPLE_VERTEX_SPANS) ? true : false; }
+	[[nodiscard]] inline bool HasSpans() const { return (flags & (LEAFMAP_HAS_SINGLE_VERTEX_SPAN|LEAFMAP_HAS_MULTIPLE_VERTEX_SPANS)) ? true : false; }
+	[[nodiscard]] inline bool HasCubemap() const { return (flags & LEAFMAP_HAS_CUBEMAP) ? true : false; }
+	[[nodiscard]] inline bool HasSingleVertexSpan() const { return (flags & LEAFMAP_HAS_SINGLE_VERTEX_SPAN) ? true : false; }
+	[[nodiscard]] inline bool HasRLESpans() const { return (flags & LEAFMAP_HAS_MULTIPLE_VERTEX_SPANS) ? true : false; }
 };
 
 struct collidemap_t
@@ -131,21 +131,21 @@ extern void InitLeafmap( IVP_Compact_Ledge *pLeaf, leafmap_t *pLeafmapOut );
 class CPhysCollide : public IPhysCollide
 {
 public:
-	static CPhysCollide *UnserializeFromBuffer( const char *pBuffer, unsigned int size, int index, bool swap = false );
-	virtual const IVP_Compact_Surface *GetCompactSurface() const { return nullptr; }
-	Vector GetOrthographicAreas() const override { return Vector(1,1,1); }
-	float GetSphereRadius() const override { return 0; }
+	[[nodiscard]] static CPhysCollide *UnserializeFromBuffer( const char *pBuffer, unsigned int size, int index, bool swap = false );
+	virtual [[nodiscard]] const IVP_Compact_Surface *GetCompactSurface() const { return nullptr; }
+	[[nodiscard]] Vector GetOrthographicAreas() const override { return Vector(1,1,1); }
+	[[nodiscard]] float GetSphereRadius() const override { return 0; }
 	virtual void ComputeOrthographicAreas( [[maybe_unused]] float epsilon ) {}
 	void SetOrthographicAreas( [[maybe_unused]] const Vector &areas ) override {}
-	virtual const collidemap_t *GetCollideMap() const { return nullptr; }
+	virtual [[nodiscard]] const collidemap_t *GetCollideMap() const { return nullptr; }
 };
 
 class ITraceObject
 {
 public:
-	virtual unsigned short SupportMap( const Vector &dir, Vector *pOut ) const = 0;
-	virtual Vector GetVertByIndex( int index ) const = 0;
-	virtual float Radius( void ) const = 0;
+	virtual [[nodiscard]] unsigned short SupportMap( const Vector &dir, Vector *pOut ) const = 0;
+	virtual [[nodiscard]] Vector GetVertByIndex( int index ) const = 0;
+	virtual [[nodiscard]] float Radius( void ) const = 0;
 };
 
 // This is the size of the vertex hash
@@ -171,9 +171,9 @@ public:
 	void GetAABB( Vector *pMins, Vector *pMaxs, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles );
 
 	// get the support map/extent for a collide along the axis given by "direction"
-	Vector GetExtent( const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, const Vector &direction );
+	[[nodiscard]] Vector GetExtent( const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, const Vector &direction );
 
-	bool IsBoxIntersectingCone( const Vector &boxAbsMins, const Vector &boxAbsMaxs, const truncatedcone_t &cone );
+	[[nodiscard]] bool IsBoxIntersectingCone( const Vector &boxAbsMins, const Vector &boxAbsMaxs, const truncatedcone_t &cone );
 };
 
 
@@ -181,9 +181,9 @@ class CVisitHash
 {
 public:
 	CVisitHash();
-	inline unsigned short VertIndexToID( int vertIndex );
+	[[nodiscard]] inline unsigned short VertIndexToID( int vertIndex );
 	inline void VisitVert( int vertIndex );
-	inline bool WasVisited( int vertIndex );
+	[[nodiscard]] inline bool WasVisited( int vertIndex );
 	inline void NewVisit( void );
 
 private:
@@ -238,7 +238,7 @@ inline void CVisitHash::NewVisit( void )
 
 
 
-extern IVP_SurfaceManager *CreateSurfaceManager( const CPhysCollide *pCollisionModel, short &collideType );
+extern [[nodiscard]] IVP_SurfaceManager *CreateSurfaceManager( const CPhysCollide *pCollisionModel, short &collideType );
 extern void OutputCollideDebugInfo( const CPhysCollide *pCollisionModel );
 
 #endif // PHYSICS_TRACE_H
