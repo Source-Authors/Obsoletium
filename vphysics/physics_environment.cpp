@@ -1186,9 +1186,7 @@ CPhysicsEnvironment::~CPhysicsEnvironment( void )
 
 	// delete/remove the listeners
 	m_pPhysEnv->remove_listener_collision_global( m_pCollisionListener );
-	delete m_pCollisionListener;
 	m_pPhysEnv->remove_listener_constraint_global( m_pConstraintListener );
-	delete m_pConstraintListener;
 
 	// Clean out the list of physics objects
 	for ( intp i = m_objects.Count()-1; i >= 0; --i )
@@ -1204,10 +1202,12 @@ CPhysicsEnvironment::~CPhysicsEnvironment( void )
 	// Clean out the list of fluids
 	m_fluids.PurgeAndDeleteElements();
 
-	delete m_pSleepEvents;
 	delete m_pDragController;
-	delete m_pPhysEnv;
+	delete m_pConstraintListener;
+	delete m_pCollisionListener;
 	delete m_pDeleteQueue;
+	delete m_pSleepEvents;
+	delete m_pPhysEnv;
 
 	// must be deleted after the environment (calls back in destructor)
 	delete m_pCollisionSolver;
@@ -1251,7 +1251,6 @@ void CPhysicsEnvironment::SetDebugOverlay( CreateInterfaceFn debugOverlayFactory
 	m_pCollisionSolver->pVisualizer = new CCollisionVisualizer( m_pDebugOverlay );
 	INSTALL_SHORTRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
 	INSTALL_LONGRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
-
 #endif
 }
 
