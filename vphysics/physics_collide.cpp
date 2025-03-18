@@ -317,7 +317,7 @@ CPhysCollide *CPhysCollide::UnserializeFromBuffer( const char *pBuffer, unsigned
 		switch( pHeader->modelType )
 		{
 		case COLLIDE_POLY:
-			return new CPhysCollideCompactSurface( (compactsurfaceheader_t *)pHeader, index, swap );
+			return new CPhysCollideCompactSurface( (const compactsurfaceheader_t *)pHeader, index, swap );
 		case COLLIDE_MOPP:
 #if ENABLE_IVP_MOPP
 			return new CPhysCollideMopp( (moppheader_t *)pHeader );
@@ -1682,7 +1682,7 @@ void CPhysicsCollision::VCollideUnload( vcollide_t *pVCollide )
 			if ( !pEnv )
 				break;
 
-			if ( pEnv->IsCollisionModelUsed( (CPhysCollide *)pVCollide->solids[i] ) )
+			if ( pEnv->IsCollisionModelUsed( (const CPhysCollide *)pVCollide->solids[i] ) )
 			{
  				AssertMsg(0, "Freed collision model while in use!!!\n");
 				return;

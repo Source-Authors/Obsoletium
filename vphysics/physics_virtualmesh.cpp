@@ -121,8 +121,8 @@ unsigned int CMeshInstance::ComputeRootLedgeSize( const byte *pData )
 {
 	if ( !pData )
 		return 0;
-	virtualmeshhull_t *pHeader = (virtualmeshhull_t *)pData;
-	packedhull_t *pHull = (packedhull_t *)(pHeader+1);
+	const virtualmeshhull_t *pHeader = (const virtualmeshhull_t *)pData;
+	const packedhull_t *pHull = (const packedhull_t *)(pHeader+1);
 	unsigned int size = pHeader->hullCount * sizeof(IVP_Compact_Ledge);
 	for ( int i = 0; i < pHeader->hullCount; i++ )
 	{
@@ -329,9 +329,9 @@ public:
 		return count;
 	}
 
-	IVP_Compact_Ledge *GetBoundingLedge()
+	const IVP_Compact_Ledge *GetBoundingLedge()
 	{
-		IVP_Compact_Ledge *pLedge = const_cast<IVP_Compact_Ledge *>(AddRef()->GetOuterHull());
+		const IVP_Compact_Ledge *pLedge = AddRef()->GetOuterHull();
 		FrameRelease();
 		return pLedge;
 	}
@@ -521,7 +521,7 @@ IVP_Compact_Surface *CPhysCollideVirtualMesh::CreateBoundingSurfaceFromRange( co
 
 #if _DEBUG
 	const IVP_Compact_Ledgetree_Node *node = pSurface->get_compact_ledge_tree_root();
-	IVP_Compact_Ledge *pLedge = const_cast<IVP_Compact_Ledge *>(node->get_compact_hull());	// we're going to write into client data on each vert before we throw this away
+	const IVP_Compact_Ledge *pLedge = node->get_compact_hull();	// we're going to write into client data on each vert before we throw this away
 	Assert(pLedge && !pLedge->is_terminal());
 #endif
 	return pSurface;

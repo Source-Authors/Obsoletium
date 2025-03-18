@@ -223,7 +223,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	const packedhull_t *pHull = pHullHeader->GetPackedHull(hullIndex);
 	const packedtriangle_t *pPackedTris = pHullHeader->GetPackedTriangles(hullIndex);
 	// write the ledge
-	pLedge->set_offset_ledge_points( (int)((char *)pPointList - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
+	pLedge->set_offset_ledge_points( (int)((const char *)pPointList - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
 	pLedge->set_is_compact( IVP_TRUE );
 	pLedge->set_size(sizeof(IVP_Compact_Ledge) + sizeof(IVP_Compact_Triangle)*pHull->triangleCount);	// <0 indicates a non compact compact ledge 
 	pLedge->n_triangles = pHull->triangleCount;
@@ -238,7 +238,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	{
 		forwardEdgeIndex[i] = -1;
 	}
-	packededge_t *pPackedEdges = (packededge_t *)(pPackedTris + pHull->triangleCount);
+	const packededge_t *pPackedEdges = (const packededge_t *)(pPackedTris + pHull->triangleCount);
 	IVP_Compact_Triangle *pOut = pLedge->get_first_triangle();
 	// now write the compact triangles and their edges
 	int baseVert = pHull->baseVert;
@@ -296,7 +296,7 @@ static void InitTriangle( IVP_Compact_Triangle *pTri, int index, int materialInd
 void CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( triangleledge_t *pOut, const IVP_Compact_Poly_Point *pPoints, int v0, int v1, int v2, int materialIndex )
 {
 	IVP_Compact_Ledge *pLedge = &pOut->ledge;
-	pLedge->set_offset_ledge_points( (int)((char *)pPoints - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
+	pLedge->set_offset_ledge_points( (int)((const char *)pPoints - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
 	pLedge->set_is_compact( IVP_TRUE );
 	pLedge->set_size(sizeof(triangleledge_t));	// <0 indicates a non compact compact ledge 
 	pLedge->n_triangles = 2;

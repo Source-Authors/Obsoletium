@@ -366,7 +366,7 @@ public:
 
 	inline void TransformPositionFromLocal( const IVP_U_Float_Point &local, Vector &out ) const
 	{
-		VectorTransform( *(Vector *)&local, *((const matrix3x4_t *)&m_ivpLocalToHLWorld), out );
+		VectorTransform( *(const Vector *)&local, *((const matrix3x4_t *)&m_ivpLocalToHLWorld), out );
 	}
 
 #if USE_VERT_CACHE
@@ -893,9 +893,9 @@ unsigned short CTraceAABB::SupportMap( const Vector &dir, Vector *pOut ) const
 		return 0;
 	}
 	// index is formed by the 3-bit bitfield SzSySx (negative is 1, positive is 0)
-	unsigned short x = ((*((unsigned int *)&dir.x)) & 0x80000000UL) >> 31;
-	unsigned short y = ((*((unsigned int *)&dir.y)) & 0x80000000UL) >> 31;
-	unsigned short z = ((*((unsigned int *)&dir.z)) & 0x80000000UL) >> 31;
+	unsigned short x = ((*((const unsigned int *)&dir.x)) & 0x80000000UL) >> 31;
+	unsigned short y = ((*((const unsigned int *)&dir.y)) & 0x80000000UL) >> 31;
+	unsigned short z = ((*((const unsigned int *)&dir.z)) & 0x80000000UL) >> 31;
 	pOut->x = m_x[x];
 	pOut->y = m_y[y];
 	pOut->z = m_z[z];

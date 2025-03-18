@@ -692,7 +692,7 @@ void CPhysicsConstraint::InitRagdoll( IVP_Environment *pEnvironment, CPhysicsCon
 
 	hk_Ragdoll_Constraint_BP_Builder r_builder;
 	r_builder.initialize_from_limited_ball_socket_bp( &ballsocketBP, ref, att );
-	hk_Ragdoll_Constraint_BP *bp = (hk_Ragdoll_Constraint_BP  *)r_builder.get_blueprint();  // get non const bp
+	hk_Ragdoll_Constraint_BP *bp = r_builder.get_blueprint();
 	
 	int revAxisMapHK[3];
 	revAxisMapHK[bp->m_axisMap[0]] = 0;

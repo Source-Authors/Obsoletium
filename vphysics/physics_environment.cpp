@@ -148,7 +148,7 @@ public:
 		else
 		{
 			IVP_U_Float_Point normal;
-			IVP_Contact_Point_API::get_surface_normal_ws(const_cast<IVP_Contact_Point *>(m_pPoint), &normal);
+			IVP_Contact_Point_API::get_surface_normal_ws(m_pPoint, &normal);
 			ConvertDirectionToHL( normal, out );
 			out *= m_sign;
 		}
@@ -1842,7 +1842,7 @@ void CPhysicsEnvironment::CleanupDeleteList()
 	ClearDeadObjects();
 }
 
-bool CPhysicsEnvironment::IsCollisionModelUsed( CPhysCollide *pCollide ) const
+bool CPhysicsEnvironment::IsCollisionModelUsed( const CPhysCollide *pCollide ) const
 {
 	intp i;
 
