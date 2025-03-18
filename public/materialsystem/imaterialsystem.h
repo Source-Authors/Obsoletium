@@ -1652,8 +1652,8 @@ public:
 	bool IsValid() const;
 	const E* Base() const;
 	E* Base();
-	const E& operator[]( int i ) const;
-	E& operator[]( int i );
+	const E& operator[]( int i ) const; //-V302
+	E& operator[]( int i ); //-V302
 
 private:
 	IMatRenderContext* m_pRenderContext;
