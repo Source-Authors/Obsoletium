@@ -742,6 +742,7 @@ CPhysicsListenerCollision::CPhysicsListenerCollision()
 	m_pCallback(&g_EmptyCollisionListener) 
 {
 	m_pairList.SetLessFunc( CorePairLessFunc );
+	memset(&m_event, 0, sizeof(m_event));
 }
 
 

@@ -1017,6 +1017,7 @@ class CTraceSolver
 {
 public:
 	CTraceSolver( trace_t *ptr, ITraceObject *sweepobject, CTraceRay *ray, ITraceObject *obstacle, const Vector &axis )
+		: m_pointClosestToIntersection{axis}
 	{
 		m_pTotalTrace = ptr;
 		m_sweepObject = sweepobject;
@@ -1025,7 +1026,6 @@ public:
 		m_ray = ray;
 		m_traceLength = 0;
 		m_totalTraceLength = max( ray->m_baseLength, 1e-8f );
-		m_pointClosestToIntersection = axis;
 		m_epsilon = g_PhysicsUnits.collisionSweepEpsilon;
 	}
 
