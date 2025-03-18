@@ -1124,21 +1124,18 @@ CPhysicsEnvironment::CPhysicsEnvironment( void )
 	m_enableConstraintNotify = false;
 
     // build a default environment
-    IVP_Environment_Manager *env_manager;
-    env_manager = IVP_Environment_Manager::get_environment_manager();
+	IVP_Environment_Manager *env_manager =
+		IVP_Environment_Manager::get_environment_manager();
 
-    IVP_Application_Environment appl_env;
+	BEGIN_IVP_ALLOCATION();
 	m_pCollisionSolver = new CCollisionSolver;
+	END_IVP_ALLOCATION();
+
+	IVP_Application_Environment appl_env;
     appl_env.collision_filter = m_pCollisionSolver;
 	appl_env.material_manager = physprops->GetIVPManager();
 	appl_env.anomaly_manager = m_pCollisionSolver;
-	// UNDONE: This would save another 45K of RAM on xbox, test perf
-	//	if ( IsXbox() )
-	//	{
-	//		appl_env.n_cache_object = 128;
-	//	}
 	
-
 	BEGIN_IVP_ALLOCATION();
     m_pPhysEnv = env_manager->create_environment( &appl_env, "JAY", 0xBEEF );
 	END_IVP_ALLOCATION();
@@ -2210,14 +2207,8 @@ public:
 
 	bool IsObjectInHash( void *pObject0 ) override
 	{
-		return m_pObjectHash->find_elem(pObject0) != NULL ? true : false;
+		return m_pObjectHash->find_elem(pObject0) != nullptr;
 	}
-#if 0
-	virtual int CountObjectsInHash()
-	{
-		return m_pObjectHash->n_elems();
-	}
-#endif
 
 private:
 	// this is a hash of object pairs
