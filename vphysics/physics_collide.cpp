@@ -985,8 +985,8 @@ int CPhysicsCollision::GetConvexesUsedInCollideable( const CPhysCollide *pCollid
 
 void CPhysicsCollision::ConvexesFromConvexPolygon( const Vector &vPolyNormal, const Vector *pPoints, int iPointCount, CPhysConvex **pOutput )
 {
-	IVP_U_Point *pIVP_Points = (IVP_U_Point *)stackalloc( sizeof( IVP_U_Point ) * iPointCount );
-	IVP_U_Point **pTriangulator = (IVP_U_Point **)stackalloc( sizeof( IVP_U_Point * ) * iPointCount );
+	IVP_U_Point *pIVP_Points = stackallocT( IVP_U_Point, iPointCount );
+	IVP_U_Point **pTriangulator = stackallocT( IVP_U_Point*, iPointCount );
 	IVP_U_Point **pRead = pTriangulator;
 	IVP_U_Point **pWrite = pTriangulator;
 
@@ -1646,7 +1646,7 @@ void CPhysicsCollision::VCollideLoad( vcollide_t *pOutput, int solidCount, const
 
 		if (size > currentSize || !tmpbuf)
 		{
-			delete[] tmpbuf;
+				delete[] tmpbuf;
 			tmpbuf = new char[size];
 			currentSize = size;
 		}
