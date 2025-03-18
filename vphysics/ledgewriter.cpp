@@ -227,7 +227,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	pLedge->set_is_compact( IVP_TRUE );
 	pLedge->set_size(sizeof(IVP_Compact_Ledge) + sizeof(IVP_Compact_Triangle)*pHull->triangleCount);	// <0 indicates a non compact compact ledge 
 	pLedge->n_triangles = pHull->triangleCount;
-	pLedge->has_chilren_flag = isVirtualLedge ? IVP_TRUE : IVP_FALSE;
+	pLedge->has_chilren_flag = static_cast<unsigned>(isVirtualLedge ? IVP_TRUE : IVP_FALSE);
 
 	// Make the offset -pLedge so the result is a NULL ledgetree node - we haven't needed to create one of these as of yet
 	//pLedge->ledgetree_node_offset = -((intp)pLedge);
@@ -246,7 +246,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	{
 		pOut[i].set_tri_index(i);
 		pOut[i].set_material_index(materialIndex);
-		pOut[i].set_is_virtual( i < pHull->vtriCount ? IVP_TRUE : IVP_FALSE );
+		pOut[i].set_is_virtual( static_cast<unsigned>(i < pHull->vtriCount ? IVP_TRUE : IVP_FALSE) );
 		pOut[i].set_pierce_index(pPackedTris[i].opposite);
 		Assert(pPackedTris[i].opposite<pHull->triangleCount);
 		int edges[3] = {pPackedTris[i].e0, pPackedTris[i].e1, pPackedTris[i].e2};
@@ -258,7 +258,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 				// this is the first triangle to use this edge, so it's forward (and the other triangle sharing (opposite edge pointer) is unknown)
 				int startVert = pPackedEdges[edges[j]].v0 + baseVert;
 				pOut[i].c_three_edges[j].set_start_point_index(startVert);
-				pOut[i].c_three_edges[j].set_is_virtual( edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE );
+				pOut[i].c_three_edges[j].set_is_virtual( static_cast<unsigned>(edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE) );
 				forwardEdgeIndex[edges[j]] = EdgeIndex(pLedge, &pOut[i].c_three_edges[j]);
 			}
 			else
@@ -268,7 +268,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 
 				int startVert = pPackedEdges[edges[j]].v1 + baseVert;
 				pOut[i].c_three_edges[j].set_start_point_index(startVert);
-				pOut[i].c_three_edges[j].set_is_virtual( edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE );
+				pOut[i].c_three_edges[j].set_is_virtual( static_cast<unsigned>(edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE) );
 				// now build the links between the triangles sharing this edge
 				int thisEdgeIndex = EdgeIndex( pLedge, &pOut[i].c_three_edges[j] );
 				pOut[i].c_three_edges[j].set_opposite_index( oppositeIndex - thisEdgeIndex );
