@@ -745,7 +745,7 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		TransformPositionFromLocal( pPoints[best], *pOut ); // transform point position to world space
 		return best;
 	}
-	else
+	
 	{
 		VPROF("SupportMap_Walk");
 		const IVP_U_Float_Point *pPoints = m_pLedge->get_point_array();
@@ -801,25 +801,6 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 				break;
 		}
 
-		// code to do the brute force method with no hill-climbing
-#if 0
-		for ( i = 0; i < triCount; i++ )
-		{
-			pTri = m_pLedge->get_first_triangle() + i;
-			for ( int j = 0; j < 3; j++ )
-			{
-				pEdge = pTri->get_edge( j );
-				int test = pEdge->get_start_point_index();
-				dot = pPoints[test].dot_product( &mapdir );
-				if ( dot > bestDot )
-				{
-					Assert(0);		// shouldn't hit this unless the hill-climb is broken
-					bestDot = dot;
-					best = test;
-				}
-			}
-		}
-#endif
 		TransformPositionFromLocal( pPoints[best], *pOut ); // transform point position to world space
 
 		return best;
