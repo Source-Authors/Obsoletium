@@ -364,7 +364,7 @@ CVehicleController::CVehicleController( const vehicleparams_t &params, CPhysicsE
 	m_pEnv = pEnv;
 	m_pGameTrace = pGameTrace;
 	m_nVehicleType = nVehicleType;
-	InitVehicleData( params );
+	CVehicleController::InitVehicleData( params );
 	ResetState();
 }
 

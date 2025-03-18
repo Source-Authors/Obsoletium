@@ -1167,8 +1167,8 @@ CPhysicsEnvironment::CPhysicsEnvironment( void )
 
 	physics_performanceparams_t perf;
 	perf.Defaults();
-	SetPerformanceSettings( &perf );
-	m_pPhysEnv->client_data = (void *)this;
+	CPhysicsEnvironment::SetPerformanceSettings( &perf );
+	m_pPhysEnv->client_data = this;
 	m_lastObjectThisTick = 0;
 }
 
