@@ -1123,21 +1123,21 @@ CPhysicsEnvironment::CPhysicsEnvironment( void )
 	m_fixedTimestep = true;	// try to simulate using fixed timesteps
 	m_enableConstraintNotify = false;
 
-    // build a default environment
+	// build a default environment
 	IVP_Environment_Manager *env_manager =
 		IVP_Environment_Manager::get_environment_manager();
-
+	
 	BEGIN_IVP_ALLOCATION();
 	m_pCollisionSolver = new CCollisionSolver;
 	END_IVP_ALLOCATION();
 
 	IVP_Application_Environment appl_env;
-    appl_env.collision_filter = m_pCollisionSolver;
+	appl_env.collision_filter = m_pCollisionSolver;
 	appl_env.material_manager = physprops->GetIVPManager();
 	appl_env.anomaly_manager = m_pCollisionSolver;
-	
+
 	BEGIN_IVP_ALLOCATION();
-    m_pPhysEnv = env_manager->create_environment( &appl_env, "JAY", 0xBEEF );
+	m_pPhysEnv = env_manager->create_environment( &appl_env, "JAY", 0xBEEF );
 	END_IVP_ALLOCATION();
 
 	// UNDONE: Revisit brush/terrain/object shrinking and tune this number to something larger
@@ -1198,7 +1198,7 @@ CPhysicsEnvironment::~CPhysicsEnvironment( void )
 
 	// Clean out the list of fluids
 	m_fluids.PurgeAndDeleteElements();
-
+	
 	delete m_pDragController;
 	delete m_pConstraintListener;
 	delete m_pCollisionListener;
@@ -1548,7 +1548,8 @@ void CPhysicsEnvironment::Simulate( float deltaTime )
 	}
 	//visualize_collisions();
 	VirtualMeshPSI();
-	GetNextFrameTime();
+	// dimhotepus: Comment pure API. 
+	// GetNextFrameTime();
 }
 
 void CPhysicsEnvironment::ResetSimulationClock()
