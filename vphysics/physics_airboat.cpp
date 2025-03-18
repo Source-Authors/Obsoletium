@@ -35,9 +35,9 @@
 #define AIRBOAT_WATER_DRAG_FORWARD_BACK		0.005f
 #define AIRBOAT_WATER_DRAG_UP_DOWN			0.0025f
 
-#define AIRBOAT_GROUND_DRAG_LEFT_RIGHT		2.0
-#define AIRBOAT_GROUND_DRAG_FORWARD_BACK	1.0
-#define AIRBOAT_GROUND_DRAG_UP_DOWN			0.8
+#define AIRBOAT_GROUND_DRAG_LEFT_RIGHT		2.0f
+#define AIRBOAT_GROUND_DRAG_FORWARD_BACK	1.0f
+#define AIRBOAT_GROUND_DRAG_UP_DOWN			0.8f
 
 #define AIRBOAT_DRY_FRICTION_SCALE		0.6f		// unitless, reduces our friction on all surfaces other than water
 
@@ -396,7 +396,7 @@ void CPhysics_Airboat::do_raycasts_gameside( int nRaycastCount, IVP_Ray_Solver_T
 
 			pImpacts[iRaycast].nSurfaceProps = trace.surface.surfaceProps;
 
-			if (pImpacts[iRaycast].vecImpactNormalWS.k[1] < -0.707)
+			if (pImpacts[iRaycast].vecImpactNormalWS.k[1] < -0.707)  // > 270 degrees
 			{
 				// dampening is 1/t, where t is how long it takes to come to a complete stop
 				pImpacts[iRaycast].flDampening = pSurfaceData->physics.dampening;
