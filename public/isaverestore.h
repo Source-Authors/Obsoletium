@@ -155,7 +155,7 @@ public:
 	
 	virtual void	WriteShort( const short *value, int count = 1 ) = 0;
 	virtual void	WriteInt( const int *value, int count = 1 ) = 0;		// Save an int
-	inline void		WriteInt( const unsigned *value, int count = 1 ) { WriteInt( (int *)value, count );	}
+	inline void		WriteInt( const unsigned *value, int count = 1 ) { WriteInt( (const int *)value, count );	}
 	virtual void	WriteBool( const bool *value, int count = 1 ) = 0;		// Save a bool
 	virtual void	WriteFloat( const float *value, int count = 1 ) = 0;	// Save a float
 	virtual void	WriteData( const char *pdata, int size ) = 0;		// Save a binary data block
