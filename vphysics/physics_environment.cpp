@@ -1707,12 +1707,10 @@ void CPhysicsEnvironment::SetCollisionSolver( IPhysicsCollisionSolver *pSolver )
 
 void CPhysicsEnvironment::ClearDeadObjects( void )
 {
-	for ( intp i = 0; i < m_deadObjects.Count(); i++ )
+	for ( auto *o : m_deadObjects )
 	{
-		CPhysicsObject *pObject = (CPhysicsObject *)m_deadObjects.Element(i);
-
-		m_pSleepEvents->DeleteObject( pObject );
-		delete pObject;
+		m_pSleepEvents->DeleteObject( (CPhysicsObject *)o );
+		delete o;
 	}
 	m_deadObjects.Purge();
 	m_pDeleteQueue->DeleteAll();
