@@ -35,7 +35,7 @@ public:
 	void		Init(const Vector &vNormal, vec_t dist);
 
 	// Return the distance from the point to the plane.
-	vec_t		DistTo(const Vector &vVec) const;
+	[[nodiscard]] vec_t		DistTo(const Vector &vVec) const;
 
 	// Copy.
 	VPlane&		operator=(const VPlane &thePlane);
@@ -43,24 +43,24 @@ public:
 
 	// Returns SIDE_ON, SIDE_FRONT, or SIDE_BACK.
 	// The epsilon for SIDE_ON can be passed in.
-	SideType	GetPointSide(const Vector &vPoint, vec_t sideEpsilon=VP_EPSILON) const;
+	[[nodiscard]] SideType	GetPointSide(const Vector &vPoint, vec_t sideEpsilon=VP_EPSILON) const;
 
 	// Returns SIDE_FRONT or SIDE_BACK.
-	SideType	GetPointSideExact(const Vector &vPoint) const;
+	[[nodiscard]] SideType	GetPointSideExact(const Vector &vPoint) const;
 
 	// Classify the box with respect to the plane.
 	// Returns SIDE_ON, SIDE_FRONT, or SIDE_BACK
-	SideType	BoxOnPlaneSide(const Vector &vMin, const Vector &vMax) const;
+	[[nodiscard]] SideType	BoxOnPlaneSide(const Vector &vMin, const Vector &vMax) const;
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 	// Flip the plane.
-	VPlane		Flip();
+	[[nodiscard]] VPlane		Flip();
 
 	// Get a point on the plane (normal*dist).
-	Vector		GetPointOnPlane() const;
+	[[nodiscard]] Vector		GetPointOnPlane() const;
 
 	// Snap the specified point to the plane (along the plane's normal).
-	Vector		SnapPointToPlane(const Vector &vPoint) const;
+	[[nodiscard]] Vector		SnapPointToPlane(const Vector &vPoint) const;
 #endif
 
 public:

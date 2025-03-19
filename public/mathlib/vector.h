@@ -80,25 +80,25 @@ public:
 	 // TODO (Ilya): Should there be an init that takes a single float for consistency?
 
 	// Got any nasty NAN's?
-	bool XM_CALLCONV IsValid() const;
+	[[nodiscard]] bool XM_CALLCONV IsValid() const;
 	void Invalidate();
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const; //-V302
-	vec_t& XM_CALLCONV operator[](int i); //-V302
+	[[nodiscard]] vec_t XM_CALLCONV operator[](int i) const; //-V302
+	[[nodiscard]] vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
-	vec_t* XM_CALLCONV Base();
-	vec_t const* XM_CALLCONV Base() const;
+	[[nodiscard]] vec_t* XM_CALLCONV Base();
+	[[nodiscard]] vec_t const* XM_CALLCONV Base() const;
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT3* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT3* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(Vector));
 		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
 	}
-	DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(Vector));
@@ -106,16 +106,16 @@ public:
 	}
 
 	// Cast to Vector2D...
-	Vector2D& XM_CALLCONV AsVector2D();
-	const Vector2D& XM_CALLCONV AsVector2D() const;
+	[[nodiscard]] Vector2D& XM_CALLCONV AsVector2D();
+	[[nodiscard]] const Vector2D& XM_CALLCONV AsVector2D() const;
 
 	// Initialization methods
 	void XM_CALLCONV Random( vec_t minVal, vec_t maxVal );
 	inline void Zero(); ///< zero out a vector
 
 	// equality
-	bool XM_CALLCONV operator==(const Vector& v) const;
-	bool XM_CALLCONV operator!=(const Vector& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator==(const Vector& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator!=(const Vector& v) const;
 
 	// arithmetic operations
 	FORCEINLINE Vector&	XM_CALLCONV operator+=(const Vector &v);
@@ -131,17 +131,17 @@ public:
 	void	Negate(); 
 
 	// Get the vector's magnitude.
-	inline vec_t XM_CALLCONV Length() const;
+	[[nodiscard]] inline vec_t XM_CALLCONV Length() const;
 
 	// Get the vector's magnitude squared.
-	FORCEINLINE vec_t XM_CALLCONV LengthSqr() const
+	[[nodiscard]] FORCEINLINE vec_t XM_CALLCONV LengthSqr() const
 	{ 
 		CHECK_VALID(*this);
 		return DirectX::XMVectorGetX( DirectX::XMVector3LengthSq( DirectX::XMLoadFloat3( XmBase() ) ) ); //-V2002
 	}
 
 	// return true if this vector is (0,0,0) within tolerance
-	bool XM_CALLCONV IsZero( float tolerance = 0.01f ) const
+	[[nodiscard]] bool XM_CALLCONV IsZero( float tolerance = 0.01f ) const
 	{
 		return DirectX::XMVector3NearEqual
 		(
@@ -152,18 +152,18 @@ public:
 	}
 
 	vec_t XM_CALLCONV NormalizeInPlace();
-	Vector XM_CALLCONV Normalized() const;
-	bool XM_CALLCONV IsLengthGreaterThan( float val ) const;
-	bool XM_CALLCONV IsLengthLessThan( float val ) const;
+	[[nodiscard]] Vector XM_CALLCONV Normalized() const;
+	[[nodiscard]] bool XM_CALLCONV IsLengthGreaterThan( float val ) const;
+	[[nodiscard]] bool XM_CALLCONV IsLengthLessThan( float val ) const;
 
 	// check if a vector is within the box defined by two other vectors
-	FORCEINLINE bool XM_CALLCONV WithinAABox( Vector const &boxmin, Vector const &boxmax) const;
+	[[nodiscard]] FORCEINLINE bool XM_CALLCONV WithinAABox( Vector const &boxmin, Vector const &boxmax) const;
  
 	// Get the distance from this vector to the other one.
-	vec_t XM_CALLCONV DistTo(const Vector &vOther) const;
+	[[nodiscard]] vec_t XM_CALLCONV DistTo(const Vector &vOther) const;
 
 	// Get the distance from this vector to the other one squared.
-	FORCEINLINE vec_t XM_CALLCONV DistToSqr(const Vector &vOther) const
+	[[nodiscard]] FORCEINLINE vec_t XM_CALLCONV DistToSqr(const Vector &vOther) const
 	{
 		DirectX::XMVECTOR self = DirectX::XMLoadFloat3( XmBase() );
 		DirectX::XMVECTOR other = DirectX::XMLoadFloat3( vOther.XmBase() );
@@ -183,18 +183,18 @@ public:
 	[[deprecated("Use VectorMA")]] void	MulAdd(const Vector& a, const Vector& b, float scalar);	
 
 	// Dot product.
-	vec_t XM_CALLCONV Dot(const Vector& vOther) const;
+	[[nodiscard]] vec_t XM_CALLCONV Dot(const Vector& vOther) const;
 
 	// 2d
-	vec_t XM_CALLCONV Length2D() const;
-	vec_t XM_CALLCONV Length2DSqr() const;
+	[[nodiscard]] vec_t XM_CALLCONV Length2D() const;
+	[[nodiscard]] vec_t XM_CALLCONV Length2DSqr() const;
 
-	XM_CALLCONV operator VectorByValue&()
+	[[nodiscard]] XM_CALLCONV operator VectorByValue&()
 	{
 		//static_assert(alignof(VectorByValue) == alignof(Vector));
 		return *reinterpret_cast<VectorByValue*>(this);
 	}
-	XM_CALLCONV operator const VectorByValue& () const
+	[[nodiscard]] XM_CALLCONV operator const VectorByValue& () const
 	{
 		//static_assert(alignof(VectorByValue) == alignof(Vector));
 		return *reinterpret_cast<const VectorByValue*>(this);
@@ -205,21 +205,21 @@ public:
 //	Vector(const Vector &vOther);
 
 	// arithmetic operations
-	Vector XM_CALLCONV operator-() const;
+	[[nodiscard]] Vector XM_CALLCONV operator-() const;
 
-	Vector XM_CALLCONV operator+(const Vector& v) const;
-	Vector XM_CALLCONV operator-(const Vector& v) const;
-	Vector XM_CALLCONV operator*(const Vector& v) const;
-	Vector XM_CALLCONV operator/(const Vector& v) const;
-	Vector XM_CALLCONV operator*(float fl) const;
-	Vector XM_CALLCONV operator/(float fl) const;
+	[[nodiscard]] Vector XM_CALLCONV operator+(const Vector& v) const;
+	[[nodiscard]] Vector XM_CALLCONV operator-(const Vector& v) const;
+	[[nodiscard]] Vector XM_CALLCONV operator*(const Vector& v) const;
+	[[nodiscard]] Vector XM_CALLCONV operator/(const Vector& v) const;
+	[[nodiscard]] Vector XM_CALLCONV operator*(float fl) const;
+	[[nodiscard]] Vector XM_CALLCONV operator/(float fl) const;
 	
 	// Cross product between two vectors.
-	Vector XM_CALLCONV Cross(const Vector &vOther) const;
+	[[nodiscard]] Vector XM_CALLCONV Cross(const Vector &vOther) const;
 
 	// Returns a vector with the min or max in X, Y, and Z.
-	Vector XM_CALLCONV Min(const Vector &vOther) const;
-	Vector XM_CALLCONV Max(const Vector &vOther) const;
+	[[nodiscard]] Vector XM_CALLCONV Min(const Vector &vOther) const;
+	[[nodiscard]] Vector XM_CALLCONV Max(const Vector &vOther) const;
 
 #else
 
@@ -249,8 +249,8 @@ public:
 
 
 #ifdef USE_M64S
-	__m64 &AsM64() { return *(__m64*)&x; }
-	const __m64 &AsM64() const { return *(const __m64*)&x; } 
+	[[nodiscard]] __m64 &AsM64() { return *(__m64*)&x; }
+	[[nodiscard]] const __m64 &AsM64() const { return *(const __m64*)&x; } 
 #endif
 
 	// Setter
@@ -258,16 +258,16 @@ public:
 	void XM_CALLCONV Set( const short ix, const short iy, const short iz, const short iw );
 
 	// array access...
-	short XM_CALLCONV operator[](int i) const; //-V302
-	short& XM_CALLCONV operator[](int i); //-V302
+	[[nodiscard]] short XM_CALLCONV operator[](int i) const; //-V302
+	[[nodiscard]] short& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
-	short* XM_CALLCONV Base();
-	short const* XM_CALLCONV Base() const;
+	[[nodiscard]] short* XM_CALLCONV Base();
+	[[nodiscard]] short const* XM_CALLCONV Base() const;
 
 	// equality
-	bool XM_CALLCONV operator==(const ShortVector& v) const;
-	bool XM_CALLCONV operator!=(const ShortVector& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator==(const ShortVector& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator!=(const ShortVector& v) const;
 
 	// Arithmetic operations
 	FORCEINLINE ShortVector& XM_CALLCONV operator+=(const ShortVector &v);
@@ -318,21 +318,21 @@ public:
 	void XM_CALLCONV Set( const int ix, const int iy, const int iz, const int iw );
 
 	// array access...
-	int XM_CALLCONV operator[](int i) const; //-V302
-	int& XM_CALLCONV operator[](int i); //-V302
+	[[nodiscard]] int XM_CALLCONV operator[](int i) const; //-V302
+	[[nodiscard]] int& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
-	int* XM_CALLCONV Base();
-	int const* XM_CALLCONV Base() const;
+	[[nodiscard]] int* XM_CALLCONV Base();
+	[[nodiscard]] int const* XM_CALLCONV Base() const;
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMINT4* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMINT4* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMINT4) == sizeof(*this));
 		static_assert(alignof(DirectX::XMINT4) == alignof(IntVector4D));
 		return reinterpret_cast<DirectX::XMINT4*>(this);
 	}
-	DirectX::XMINT4 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMINT4 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMINT4) == sizeof(*this));
 		static_assert(alignof(DirectX::XMINT4) == alignof(IntVector4D));
@@ -340,8 +340,8 @@ public:
 	}
 
 	// equality
-	bool XM_CALLCONV operator==(const IntVector4D& v) const;
-	bool XM_CALLCONV operator!=(const IntVector4D& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator==(const IntVector4D& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator!=(const IntVector4D& v) const;
 
 	// Arithmetic operations
 	FORCEINLINE IntVector4D& XM_CALLCONV operator+=(const IntVector4D &v);
@@ -391,26 +391,26 @@ class alignas(vec_t) TableVector
 public:
 	vec_t x, y, z;
 
-	XM_CALLCONV operator Vector &()
+	[[nodiscard]] XM_CALLCONV operator Vector &()
 	{
 		static_assert(alignof(TableVector) == alignof(Vector));
 		return *reinterpret_cast<Vector *>(this);
 	}
-	XM_CALLCONV operator const Vector &() const
+	[[nodiscard]] XM_CALLCONV operator const Vector &() const
 	{
 		static_assert(alignof(TableVector) == alignof(Vector));
 		return *reinterpret_cast<const Vector *>(this);
 	}
 
 	// array access...
-	inline vec_t& XM_CALLCONV operator[](int i) //-V302
+	[[nodiscard]] inline vec_t& XM_CALLCONV operator[](int i) //-V302
 	{
 		Assert( (i >= 0) && (i < 3) );
 		static_assert(alignof(TableVector) == alignof(vec_t));
 		return reinterpret_cast<vec_t*>(this)[i]; //-V108
 	}
 
-	inline vec_t XM_CALLCONV operator[](int i) const //-V302
+	[[nodiscard]] inline vec_t XM_CALLCONV operator[](int i) const //-V302
 	{
 		Assert( (i >= 0) && (i < 3) );
 		static_assert(alignof(TableVector) == alignof(vec_t));
@@ -418,13 +418,13 @@ public:
 	}
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT3* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT3* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(TableVector));
 		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
 	}
-	DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(TableVector));
@@ -469,13 +469,13 @@ public:
 	}
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT4A* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT4A* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(VectorAligned));
 		return reinterpret_cast<DirectX::XMFLOAT4A*>(this);
 	}
-	DirectX::XMFLOAT4A const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT4A const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(VectorAligned));
@@ -509,7 +509,7 @@ inline void XM_CALLCONV VectorScale ( const Vector& in, vec_t scale, Vector& res
 void XM_CALLCONV VectorMA( const Vector& start, float scale, const Vector& direction, Vector& dest );
 
 // Vector equality with tolerance
-bool XM_CALLCONV VectorsAreEqual( const Vector& src1, const Vector& src2, float tolerance = 0.0f );
+[[nodiscard]] bool XM_CALLCONV VectorsAreEqual( const Vector& src1, const Vector& src2, float tolerance = 0.0f );
 
 #define VectorExpand(v) (v).x, (v).y, (v).z
 
@@ -519,10 +519,10 @@ bool XM_CALLCONV VectorsAreEqual( const Vector& src1, const Vector& src2, float 
 //vec_t VectorNormalize( Vector& v );
 
 // Length
-inline vec_t XM_CALLCONV VectorLength( const Vector& v );
+[[nodiscard]] inline vec_t XM_CALLCONV VectorLength( const Vector& v );
 
 // Dot Product
-FORCEINLINE vec_t XM_CALLCONV DotProduct(const Vector& a, const Vector& b);
+[[nodiscard]] FORCEINLINE vec_t XM_CALLCONV DotProduct(const Vector& a, const Vector& b);
 
 // Cross product
 void XM_CALLCONV CrossProduct(const Vector& a, const Vector& b, Vector& result );
@@ -536,15 +536,15 @@ void XM_CALLCONV VectorMax( const Vector &a, const Vector &b, Vector &result );
 
 // Linearly interpolate between two vectors
 void XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t t, Vector& dest );
-Vector XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t t );
+[[nodiscard]] Vector XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t t );
 
-FORCEINLINE Vector XM_CALLCONV ReplicateToVector( float x )
+[[nodiscard]] FORCEINLINE Vector XM_CALLCONV ReplicateToVector( float x )
 {
 	return Vector( x, x, x );
 }
 
 // check if a point is in the field of a view of an object. supports up to 180 degree fov.
-FORCEINLINE bool XM_CALLCONV PointWithinViewAngle( Vector const &vecSrcPosition, 
+[[nodiscard]] FORCEINLINE bool XM_CALLCONV PointWithinViewAngle( Vector const &vecSrcPosition, 
 												   Vector const &vecTargetPosition, 
 												   Vector const &vecLookDirection, float flCosHalfFOV )
 {
@@ -564,15 +564,15 @@ FORCEINLINE bool XM_CALLCONV PointWithinViewAngle( Vector const &vecSrcPosition,
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
 // Cross product
-Vector XM_CALLCONV CrossProduct( const Vector& a, const Vector& b );
+[[nodiscard]] Vector XM_CALLCONV CrossProduct( const Vector& a, const Vector& b );
 
 // Random vector creation
 Vector XM_CALLCONV RandomVector( vec_t minVal, vec_t maxVal );
 
 #endif
 
-float XM_CALLCONV RandomVectorInUnitSphere( Vector *pVector );
-float XM_CALLCONV RandomVectorInUnitCircle( Vector2D *pVector );
+[[nodiscard]] float XM_CALLCONV RandomVectorInUnitSphere( Vector *pVector );
+[[nodiscard]] float XM_CALLCONV RandomVectorInUnitCircle( Vector2D *pVector );
 
 
 //-----------------------------------------------------------------------------
@@ -1286,7 +1286,7 @@ inline void XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t
 	);
 }
 
-inline Vector XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t t )
+[[nodiscard]] inline Vector XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t t )
 {
 	Vector result;
 	VectorLerp( src1, src2, t, result );
@@ -1296,7 +1296,7 @@ inline Vector XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec
 //-----------------------------------------------------------------------------
 // Temporary storage for vector results so const Vector& results can be returned
 //-----------------------------------------------------------------------------
-inline Vector& XM_CALLCONV AllocTempVector()
+[[nodiscard]] inline Vector& XM_CALLCONV AllocTempVector()
 {
 	static Vector s_vecTemp[128];
 	static CInterlockedInt s_nIndex;
@@ -1321,7 +1321,7 @@ inline Vector& XM_CALLCONV AllocTempVector()
 //-----------------------------------------------------------------------------
 // dot, cross
 //-----------------------------------------------------------------------------
-FORCEINLINE vec_t XM_CALLCONV DotProduct(const Vector& a, const Vector& b) 
+[[nodiscard]] FORCEINLINE vec_t XM_CALLCONV DotProduct(const Vector& a, const Vector& b) 
 { 
 	CHECK_VALID(a);
 	CHECK_VALID(b);
@@ -1411,7 +1411,7 @@ inline void XM_CALLCONV CrossProduct(const DirectX::XMFLOAT4 *a, const Vector& b
 	);
 }
 
-inline vec_t XM_CALLCONV DotProductAbs( const Vector &v0, const DirectX::XMFLOAT4 *v1 )
+[[nodiscard]] inline vec_t XM_CALLCONV DotProductAbs( const Vector &v0, const DirectX::XMFLOAT4 *v1 )
 {
 	CHECK_VALID(v0);
 	Assert(v1);
@@ -1432,7 +1432,7 @@ inline vec_t XM_CALLCONV DotProductAbs( const Vector &v0, const DirectX::XMFLOAT
 	);
 }
 
-inline vec_t XM_CALLCONV DotProductAbs( const Vector &v0, const Vector &v1 )
+[[nodiscard]] inline vec_t XM_CALLCONV DotProductAbs( const Vector &v0, const Vector &v1 )
 {
 	CHECK_VALID(v0);
 	CHECK_VALID(v1);
@@ -1460,7 +1460,7 @@ inline vec_t DotProductAbs( const Vector &v0, const float *v1 ) = delete;
 // length
 //-----------------------------------------------------------------------------
 
-inline vec_t XM_CALLCONV VectorLength( const Vector& v )
+[[nodiscard]] inline vec_t XM_CALLCONV VectorLength( const Vector& v )
 {
 	CHECK_VALID(v);
 
@@ -1510,7 +1510,7 @@ inline vec_t Vector::DistTo(const Vector &vOther) const
 //-----------------------------------------------------------------------------
 // Vector equality with tolerance
 //-----------------------------------------------------------------------------
-inline bool XM_CALLCONV VectorsAreEqual( const Vector& src1, const Vector& src2, float tolerance )
+[[nodiscard]] inline bool XM_CALLCONV VectorsAreEqual( const Vector& src1, const Vector& src2, float tolerance )
 {
 	return DirectX::XMVector3NearEqual
 	(
@@ -1680,7 +1680,7 @@ inline vec_t Vector::Length2DSqr(void) const
 	return (x*x + y*y); 
 }
 
-inline Vector XM_CALLCONV CrossProduct(const Vector& a, const Vector& b) 
+[[nodiscard]] inline Vector XM_CALLCONV CrossProduct(const Vector& a, const Vector& b) 
 {
 	DirectX::XMVECTOR result = DirectX::XMVector3Cross
 	(
@@ -1715,7 +1715,7 @@ inline void XM_CALLCONV VectorMax( const Vector &a, const Vector &b, Vector &res
 	DirectX::XMStoreFloat3( result.XmBase(), r );
 }
 
-inline float XM_CALLCONV ComputeVolume( const Vector &vecMins, const Vector &vecMaxs )
+[[nodiscard]] inline float XM_CALLCONV ComputeVolume( const Vector &vecMins, const Vector &vecMaxs )
 {
 	Vector vecDelta;
 	VectorSubtract( vecMaxs, vecMins, vecDelta );
@@ -1723,7 +1723,7 @@ inline float XM_CALLCONV ComputeVolume( const Vector &vecMins, const Vector &vec
 }
 
 // Get a random vector.
-inline Vector XM_CALLCONV RandomVector( float minVal, float maxVal )
+[[nodiscard]] inline Vector XM_CALLCONV RandomVector( float minVal, float maxVal )
 {
 	Vector vRandom;
 	vRandom.Random( minVal, maxVal );
@@ -1749,7 +1749,7 @@ typedef Vector AngularImpulse;
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
-inline AngularImpulse XM_CALLCONV RandomAngularImpulse( float minVal, float maxVal )
+[[nodiscard]] inline AngularImpulse XM_CALLCONV RandomAngularImpulse( float minVal, float maxVal )
 {
 	AngularImpulse	angImp;
 	angImp.Random( minVal, maxVal );
@@ -1785,31 +1785,31 @@ public:
 
 	inline void XM_CALLCONV Init(vec_t ix=0.0f, vec_t iy=0.0f, vec_t iz=0.0f, vec_t iw=0.0f)	{ x = ix; y = iy; z = iz; w = iw; }
 
-	bool XM_CALLCONV  IsValid() const;
+	[[nodiscard]] bool XM_CALLCONV IsValid() const;
 	void Invalidate();
 
-	bool XM_CALLCONV operator==( const Quaternion &src ) const;
-	bool XM_CALLCONV operator!=( const Quaternion &src ) const;
+	[[nodiscard]] bool XM_CALLCONV operator==( const Quaternion &src ) const;
+	[[nodiscard]] bool XM_CALLCONV operator!=( const Quaternion &src ) const;
 
-	vec_t* XM_CALLCONV Base()
+	[[nodiscard]] vec_t* XM_CALLCONV Base()
 	{
 		static_assert(alignof(Quaternion) == alignof(vec_t));
 		return reinterpret_cast<vec_t*>(this);
 	}
-	const vec_t* XM_CALLCONV Base() const
+	[[nodiscard]] const vec_t* XM_CALLCONV Base() const
 	{
 		static_assert(alignof(Quaternion) == alignof(vec_t));
 		return reinterpret_cast<const vec_t*>(this);
 	}
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT4* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT4* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT4) == alignof(Quaternion));
 		return reinterpret_cast<DirectX::XMFLOAT4*>(this);
 	}
-	DirectX::XMFLOAT4 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT4 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT4) == alignof(Quaternion));
@@ -1817,8 +1817,8 @@ public:
 	}
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const; //-V302
-	vec_t& XM_CALLCONV operator[](int i); //-V302
+	[[nodiscard]] vec_t XM_CALLCONV operator[](int i) const; //-V302
+	[[nodiscard]] vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	vec_t x, y, z, w;
 };
@@ -1908,13 +1908,13 @@ public:
 	}
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT4A* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT4A* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(QuaternionAligned));
 		return reinterpret_cast<DirectX::XMFLOAT4A*>(this);
 	}
-	DirectX::XMFLOAT4A const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT4A const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4A) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(QuaternionAligned));
@@ -1944,22 +1944,22 @@ public:
 	inline void XM_CALLCONV Init(vec_t ix=0.0f, vec_t iy=0.0f, vec_t iz=0.0f)	{ x = ix; y = iy; z = iz; }
 
 	// Conversion to qangle
-	QAngle XM_CALLCONV ToQAngle() const;
+	[[nodiscard]] QAngle XM_CALLCONV ToQAngle() const;
 	bool XM_CALLCONV IsValid() const;
 	void Invalidate();
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const; //-V302
-	vec_t& XM_CALLCONV operator[](int i); //-V302
+	[[nodiscard]] vec_t XM_CALLCONV operator[](int i) const; //-V302
+	[[nodiscard]] vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT3* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT3* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(RadianEuler));
 		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
 	}
-	DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(RadianEuler));
@@ -2078,12 +2078,12 @@ public:
 //	QAngle(RadianEuler const &angles);	// evil auto type promotion!!!
 
 	// Allow pass-by-value
-	XM_CALLCONV operator QAngleByValue &()
+	[[nodiscard]] XM_CALLCONV operator QAngleByValue &()
 	{
 		//static_assert(alignof(QAngle) == alignof(QAngleByValue));
 		return *reinterpret_cast<QAngleByValue *>(this);
 	}
-	XM_CALLCONV operator const QAngleByValue &() const
+	[[nodiscard]] XM_CALLCONV operator const QAngleByValue &() const
 	{
 		//static_assert(alignof(QAngle) == alignof(QAngleByValue));
 		return *reinterpret_cast<const QAngleByValue *>(this);
@@ -2094,25 +2094,25 @@ public:
 	void XM_CALLCONV Random( vec_t minVal, vec_t maxVal );
 
 	// Got any nasty NAN's?
-	bool XM_CALLCONV IsValid() const;
+	[[nodiscard]] bool XM_CALLCONV IsValid() const;
 	void Invalidate();
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const; //-V302
-	vec_t& XM_CALLCONV operator[](int i); //-V302
+	[[nodiscard]] vec_t XM_CALLCONV operator[](int i) const; //-V302
+	[[nodiscard]] vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
-	vec_t* XM_CALLCONV Base();
-	vec_t const* XM_CALLCONV Base() const;
+	[[nodiscard]] vec_t* XM_CALLCONV Base();
+	[[nodiscard]] vec_t const* XM_CALLCONV Base() const;
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT3* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT3* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(QAngle));
 		return reinterpret_cast<DirectX::XMFLOAT3*>(this);
 	}
-	DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT3 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT3) == alignof(QAngle));
@@ -2120,8 +2120,8 @@ public:
 	}
 	
 	// equality
-	bool XM_CALLCONV operator==(const QAngle& v) const;
-	bool XM_CALLCONV operator!=(const QAngle& v) const;	
+	[[nodiscard]] bool XM_CALLCONV operator==(const QAngle& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator!=(const QAngle& v) const;	
 
 	// arithmetic operations
 	QAngle&	XM_CALLCONV operator+=(const QAngle &v);
@@ -2130,19 +2130,19 @@ public:
 	QAngle&	XM_CALLCONV operator/=(float s);
 
 	// Get the vector's magnitude.
-	vec_t XM_CALLCONV Length() const;
-	vec_t XM_CALLCONV LengthSqr() const;
+	[[nodiscard]] vec_t XM_CALLCONV Length() const;
+	[[nodiscard]] vec_t XM_CALLCONV LengthSqr() const;
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 	// copy constructors
 
 	// arithmetic operations
-	QAngle XM_CALLCONV operator-() const;
+	[[nodiscard]] QAngle XM_CALLCONV operator-() const;
 	
-	QAngle XM_CALLCONV operator+(const QAngle& v) const;
-	QAngle XM_CALLCONV operator-(const QAngle& v) const;
-	QAngle XM_CALLCONV operator*(float fl) const;
-	QAngle XM_CALLCONV operator/(float fl) const;
+	[[nodiscard]] QAngle XM_CALLCONV operator+(const QAngle& v) const;
+	[[nodiscard]] QAngle XM_CALLCONV operator-(const QAngle& v) const;
+	[[nodiscard]] QAngle XM_CALLCONV operator*(float fl) const;
+	[[nodiscard]] QAngle XM_CALLCONV operator/(float fl) const;
 #else
 
 private:
@@ -2249,7 +2249,7 @@ inline void QAngle::Random( vec_t minVal, vec_t maxVal )
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
-inline QAngle XM_CALLCONV RandomAngle( float minVal, float maxVal )
+[[nodiscard]] inline QAngle XM_CALLCONV RandomAngle( float minVal, float maxVal )
 {
 	QAngle ret;
 	ret.Random( minVal, maxVal );
@@ -2495,7 +2495,7 @@ inline vec_t QAngle::LengthSqr() const
 //-----------------------------------------------------------------------------
 // Vector equality with tolerance
 //-----------------------------------------------------------------------------
-inline bool XM_CALLCONV QAnglesAreEqual( const QAngle& src1, const QAngle& src2, float tolerance = 0.0f )
+[[nodiscard]] inline bool XM_CALLCONV QAnglesAreEqual( const QAngle& src1, const QAngle& src2, float tolerance = 0.0f )
 {
 	return DirectX::XMVector3NearEqual
 	(
@@ -2662,7 +2662,7 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
 	return slen;
 }
 
-FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMFLOAT4 *v )
+[[nodiscard]] FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMFLOAT4 *v )
 {
 	Assert(v);
 	

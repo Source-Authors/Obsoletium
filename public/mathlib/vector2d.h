@@ -51,24 +51,24 @@ public:
 	void XM_CALLCONV Init(vec_t ix=0.0f, vec_t iy=0.0f);
 
 	// Got any nasty NAN's?
-	bool XM_CALLCONV IsValid() const;
+	[[nodiscard]] bool XM_CALLCONV IsValid() const;
 
 	// array access...
-	vec_t XM_CALLCONV operator[](int i) const; //-V302
-	vec_t& XM_CALLCONV operator[](int i); //-V302
+	[[nodiscard]] vec_t XM_CALLCONV operator[](int i) const; //-V302
+	[[nodiscard]] vec_t& XM_CALLCONV operator[](int i); //-V302
 
 	// Base address...
-	vec_t* XM_CALLCONV Base();
-	vec_t const* XM_CALLCONV Base() const;
+	[[nodiscard]] vec_t* XM_CALLCONV Base();
+	[[nodiscard]] vec_t const* XM_CALLCONV Base() const;
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT2* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT2* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT2) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT2) == alignof(Vector2D));
 		return reinterpret_cast<DirectX::XMFLOAT2*>(this);
 	}
-	DirectX::XMFLOAT2 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT2 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT2) == sizeof(*this));
 		static_assert(alignof(DirectX::XMFLOAT2) == alignof(Vector2D));
@@ -79,8 +79,8 @@ public:
 	void XM_CALLCONV Random( float minVal, float maxVal );
 
 	// equality
-	bool XM_CALLCONV operator==(const Vector2D& v) const;
-	bool XM_CALLCONV operator!=(const Vector2D& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator==(const Vector2D& v) const;
+	[[nodiscard]] bool XM_CALLCONV operator!=(const Vector2D& v) const;
 
 	// arithmetic operations
 	Vector2D& XM_CALLCONV operator+=(const Vector2D &v);
@@ -94,13 +94,13 @@ public:
 	void	Negate();
 
 	// Get the Vector2D's magnitude.
-	vec_t XM_CALLCONV Length() const;
+	[[nodiscard]] vec_t XM_CALLCONV Length() const;
 
 	// Get the Vector2D's magnitude squared.
-	vec_t XM_CALLCONV LengthSqr() const;
+	[[nodiscard]] vec_t XM_CALLCONV LengthSqr() const;
 
 	// return true if this vector is (0,0) within tolerance
-	bool XM_CALLCONV IsZero( float tolerance = 0.01f ) const
+	[[nodiscard]] bool XM_CALLCONV IsZero( float tolerance = 0.01f ) const
 	{
 		return (x > -tolerance && x < tolerance &&
 				y > -tolerance && y < tolerance);
@@ -110,14 +110,14 @@ public:
 	vec_t XM_CALLCONV NormalizeInPlace();
 
 	// Compare length.
-	bool XM_CALLCONV IsLengthGreaterThan( float val ) const;
-	bool XM_CALLCONV IsLengthLessThan( float val ) const;
+	[[nodiscard]] bool XM_CALLCONV IsLengthGreaterThan( float val ) const;
+	[[nodiscard]] bool XM_CALLCONV IsLengthLessThan( float val ) const;
 
 	// Get the distance from this Vector2D to the other one.
-	vec_t XM_CALLCONV DistTo(const Vector2D &vOther) const;
+	[[nodiscard]] vec_t XM_CALLCONV DistTo(const Vector2D &vOther) const;
 
 	// Get the distance from this Vector2D to the other one squared.
-	vec_t XM_CALLCONV DistToSqr(const Vector2D &vOther) const;
+	[[nodiscard]] vec_t XM_CALLCONV DistToSqr(const Vector2D &vOther) const;
 
 	// Copy
 	void XM_CALLCONV CopyToArray(float* rgfl) const;
@@ -128,7 +128,7 @@ public:
 	[[deprecated("Use Vector2DMA")]] void XM_CALLCONV MulAdd(const Vector2D& a, const Vector2D& b, float scalar);
 
 	// Dot product.
-	vec_t XM_CALLCONV Dot(const Vector2D& vOther) const;
+	[[nodiscard]] vec_t XM_CALLCONV Dot(const Vector2D& vOther) const;
 
 	// assignment
 	Vector2D& XM_CALLCONV operator=(const Vector2D &vOther);
@@ -138,18 +138,18 @@ public:
 	Vector2D(const Vector2D &vOther);
 
 	// arithmetic operations
-	Vector2D XM_CALLCONV operator-() const;
+	[[nodiscard]] Vector2D XM_CALLCONV operator-() const;
 				
-	Vector2D XM_CALLCONV operator+(const Vector2D& v) const;
-	Vector2D XM_CALLCONV operator-(const Vector2D& v) const;
-	Vector2D XM_CALLCONV operator*(const Vector2D& v) const;
-	Vector2D XM_CALLCONV operator/(const Vector2D& v) const;
-	Vector2D XM_CALLCONV operator*(float fl) const;
-	Vector2D XM_CALLCONV operator/(float fl) const;
+	[[nodiscard]] Vector2D XM_CALLCONV operator+(const Vector2D& v) const;
+	[[nodiscard]] Vector2D XM_CALLCONV operator-(const Vector2D& v) const;
+	[[nodiscard]] Vector2D XM_CALLCONV operator*(const Vector2D& v) const;
+	[[nodiscard]] Vector2D XM_CALLCONV operator/(const Vector2D& v) const;
+	[[nodiscard]] Vector2D XM_CALLCONV operator*(float fl) const;
+	[[nodiscard]] Vector2D XM_CALLCONV operator/(float fl) const;
 
 	// Returns a Vector2D with the min or max in X, Y, and Z.
-	Vector2D XM_CALLCONV Min(const Vector2D &vOther) const;
-	Vector2D XM_CALLCONV Max(const Vector2D &vOther) const;
+	[[nodiscard]] Vector2D XM_CALLCONV Min(const Vector2D &vOther) const;
+	[[nodiscard]] Vector2D XM_CALLCONV Max(const Vector2D &vOther) const;
 
 #else
 
@@ -195,10 +195,10 @@ void XM_CALLCONV Vector2DMax( const Vector2D &a, const Vector2D &b, Vector2D &re
 vec_t XM_CALLCONV Vector2DNormalize( Vector2D& v );
 
 // Length
-vec_t XM_CALLCONV Vector2DLength( const Vector2D& v );
+[[nodiscard]] vec_t XM_CALLCONV Vector2DLength( const Vector2D& v );
 
 // Dot Product
-vec_t XM_CALLCONV DotProduct2D( const Vector2D& a, const Vector2D& b );
+[[nodiscard]] vec_t XM_CALLCONV DotProduct2D( const Vector2D& a, const Vector2D& b );
 
 // Linearly interpolate between two vectors
 void XM_CALLCONV Vector2DLerp(const Vector2D& src1, const Vector2D& src2, vec_t t, Vector2D& dest );
@@ -530,7 +530,7 @@ inline void XM_CALLCONV Vector2DLerp(const Vector2D& src1, const Vector2D& src2,
 //-----------------------------------------------------------------------------
 // dot, cross
 //-----------------------------------------------------------------------------
-inline vec_t XM_CALLCONV DotProduct2D(const Vector2D& a, const Vector2D& b) 
+[[nodiscard]] inline vec_t XM_CALLCONV DotProduct2D(const Vector2D& a, const Vector2D& b) 
 { 
 	Assert( a.IsValid() && b.IsValid() );
 
@@ -554,7 +554,7 @@ inline vec_t Vector2D::Dot( const Vector2D& vOther ) const
 //-----------------------------------------------------------------------------
 // length
 //-----------------------------------------------------------------------------
-inline vec_t XM_CALLCONV Vector2DLength( const Vector2D& v )
+[[nodiscard]] inline vec_t XM_CALLCONV Vector2DLength( const Vector2D& v )
 {
 	Assert( v.IsValid() );
 	return FastSqrt( DotProduct2D( v, v ) );
