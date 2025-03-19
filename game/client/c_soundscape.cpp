@@ -270,11 +270,7 @@ void Soundscape_Update( audioparams_t &audio )
 void C_SoundscapeSystem::AddSoundScapeFile( const char *filename )
 {
 	KeyValues *script = new KeyValues( filename );
-#ifndef _XBOX
 	if ( script->LoadFromFile( filesystem, filename ) )
-#else
-	if ( filesystem->LoadKeyValues( *script, IFileSystem::TYPE_SOUNDSCAPE, filename, "GAME" ) )
-#endif
 	{
 		// parse out all of the top level sections and save their names
 		KeyValues *pKeys = script;
@@ -310,7 +306,7 @@ bool C_SoundscapeSystem::Init()
 		mapSoundscapeFilename = VarArgs( "scripts/soundscapes_%s.txt", mapname );
 	}
 
-	KeyValues *manifest = new KeyValues( SOUNDSCAPE_MANIFEST_FILE );
+	KeyValuesAD manifest( SOUNDSCAPE_MANIFEST_FILE );
 	if ( filesystem->LoadKeyValues( *manifest, IFileSystem::TYPE_SOUNDSCAPE, SOUNDSCAPE_MANIFEST_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -339,8 +335,6 @@ bool C_SoundscapeSystem::Init()
 	{
 		Error( "Unable to load manifest file '%s'\n", SOUNDSCAPE_MANIFEST_FILE );
 	}
-
-	manifest->deleteThis();
 
 	return true;
 }

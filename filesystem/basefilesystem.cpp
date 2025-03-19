@@ -2848,8 +2848,13 @@ KeyValues *CBaseFileSystem::LoadKeyValues( KeyValuesPreloadType_t type, char con
 		kv = new KeyValues( filename );
 		if ( kv )
 		{
-			kv->LoadFromFile( this, filename, pPathID );
+			if ( !kv->LoadFromFile( this, filename, pPathID ) )
+			{
+				// dimhotepus: Do not return anything if load failed.
+				kv->deleteThis();
+				return nullptr;
 		}
+	}
 	}
 	else
 	{
@@ -2861,8 +2866,13 @@ KeyValues *CBaseFileSystem::LoadKeyValues( KeyValuesPreloadType_t type, char con
 			kv = new KeyValues( filename );
 			if ( kv )
 			{
-				kv->LoadFromFile( this, filename, pPathID );
+				if ( !kv->LoadFromFile( this, filename, pPathID ) )
+				{
+					// dimhotepus: Do not return anything if load failed.
+					kv->deleteThis();
+					return nullptr;
 			}
+		}
 		}
 #endif
 	}
