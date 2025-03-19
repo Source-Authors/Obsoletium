@@ -714,7 +714,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 	if ( bRet )
 	{
 		// invalid ciphertext or key
-		if ( memcmp( &hmacActual, pHMAC, sizeof( SHADigest_t ) ) )
+		if ( memcmp( &hmacActual, pHMAC, sizeof( SHADigest_t ) ) != 0 )
 			return false;
 		
 		bRet = SymmetricDecrypt( pubEncryptedData, cubCiphertext, pubPlaintextData, pcubPlaintextData, rgubKey, k_nSymmetricKeyLen );
@@ -1741,6 +1741,9 @@ public:
 CCustomHexEncoder::CCustomHexEncoder( const char *pchEncodingTable )
 {
 	m_bValidEncoding = false;
+
+	BitwiseClear(m_rgnDecodingTable);
+
 	if ( strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
 	{
 		memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
@@ -1750,6 +1753,7 @@ CCustomHexEncoder::CCustomHexEncoder( const char *pchEncodingTable )
 	}
 	else
 	{
+		BitwiseClear(m_rgubEncodingTable);
 		AssertMsg( false, "CCrypto::CustomHexEncoder: Improper encoding table\n" );
 	}
 }
@@ -1843,6 +1847,9 @@ bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, size
 CCustomBase32Encoder::CCustomBase32Encoder( const char *pchEncodingTable )
 {
 	m_bValidEncoding = false;
+	
+	BitwiseClear(m_rgnDecodingTable);
+
 	if ( strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
 	{
 		memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
@@ -1852,6 +1859,7 @@ CCustomBase32Encoder::CCustomBase32Encoder( const char *pchEncodingTable )
 	}
 	else
 	{
+		BitwiseClear(m_rgubEncodingTable);
 		AssertMsg( false, "CCrypto::CustomBase32Encoder: Improper encoding table\n" );
 	}
 }
