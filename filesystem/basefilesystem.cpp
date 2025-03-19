@@ -2686,7 +2686,7 @@ long CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileNa
 		// If we found the file:
 		if ( path->GetPackFile()->ContainsFile( pFileName ) )
 		{
-			return (path->GetPackFile()->m_lPackFileTime);
+			return path->GetPackFile()->m_lPackFileTime;
 		}
 	}
 #ifdef SUPPORT_PACKED_STORE

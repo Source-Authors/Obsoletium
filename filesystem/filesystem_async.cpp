@@ -1276,7 +1276,7 @@ FSAsyncStatus_t CBaseFileSystem::SyncRead( const FileAsyncRequest_t &request )
 	if ( !pHeldFile || pHeldFile->hFile == FILESYSTEM_INVALID_HANDLE )
 	{
 		hFile = OpenEx( request.pszFilename, "rb", 0, request.pszPathID );
-		if ( pHeldFile )
+		if ( pHeldFile ) //-V1051
 		{
 			pHeldFile->hFile = hFile;
 		}
