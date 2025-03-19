@@ -890,12 +890,12 @@ bool CQueuedLoader::AddJob( const LoaderJob_t *pLoaderJob )
 	bool bFileIsFromBSP;
 	bool bExists = false;
 
-	char *pFullPath;
+	const char *pFullPath;
 	char szFullPath[MAX_PATH];
 	if ( V_IsAbsolutePath( pLoaderJob->m_pFilename ) )
 	{
 		// an absolute path is trusted, take as is
-		pFullPath = (char *)pLoaderJob->m_pFilename;
+		pFullPath = pLoaderJob->m_pFilename;
 		bFileIsFromBSP = V_stristr( pFullPath, ".bsp" ) != NULL;
 		bExists = true;
 	}

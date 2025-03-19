@@ -1677,7 +1677,7 @@ const char *CBaseFileSystem::GetWritePath( const char *pFilename, const char *pa
 //-----------------------------------------------------------------------------
 // Reads/writes files to utlbuffers.  Attempts alignment fixups for optimal read
 //-----------------------------------------------------------------------------
-CThreadLocal<char *> g_pszReadFilename;
+CThreadLocal<const char *> g_pszReadFilename;
 bool CBaseFileSystem::ReadToBuffer( FileHandle_t fp, CUtlBuffer &buf, int nMaxBytes, FSAllocFunc_t pfnAlloc )
 {
 	SetBufferSize( fp, 0 );  // TODO: what if it's a pack file? restore buffer size?
@@ -1789,7 +1789,7 @@ bool CBaseFileSystem::ReadFile( const char *pFileName, const char *pPath, CUtlBu
 
 	if ( pfnAlloc )
 	{
-		g_pszReadFilename.Set( (char *)pFileName );
+		g_pszReadFilename.Set( pFileName );
 	}
 
 	bool bSuccess = ReadToBuffer( fp, buf, nMaxBytes, pfnAlloc );
@@ -2598,7 +2598,7 @@ void CBaseFileSystem::Seek( FileHandle_t file, int pos, FileSystemSeek_t whence 
 		return;
 	}
 	
-	fh->Seek( pos, whence );
+	fh->Seek( pos, to_underlying( whence ) );
 }
 
 //-----------------------------------------------------------------------------
