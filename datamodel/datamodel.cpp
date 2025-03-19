@@ -1848,9 +1848,8 @@ CDmElement* CDataModel::CreateElement( const DmElementReference_t &ref, const ch
 
 	// Create a new id if we weren't given one to use
 	DmObjectId_t newId;
-	if ( !pObjectID )
+	if ( !pObjectID && CreateUniqueId( &newId ) )
 	{
-		CreateUniqueId( &newId );
 		pObjectID = &newId;
 	}
 

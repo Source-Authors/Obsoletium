@@ -626,11 +626,14 @@ public:
 		const char *base = BaseClass::GetDesc();
 		const CDmAttribute *pAtt = GetAttribute();
 		CUtlBuffer serialized( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
-		if ( pAtt && pAtt->GetType() != AT_ELEMENT )
+		if ( pAtt && pAtt->GetType() != AT_ELEMENT && ::Serialize( serialized, m_Value ) )
 		{
-			::Serialize( serialized, m_Value );
+			V_sprintf_safe( buf, "%s(%s) = %s", base, g_pDataModel->GetString( m_symAttribute ), serialized.Base<const char>() );
 		}
-		V_sprintf_safe( buf, "%s(%s) = %s", base, g_pDataModel->GetString( m_symAttribute ), serialized.Base() ? serialized.Base<const char>() : "\"\"" );
+		else
+		{
+			V_sprintf_safe( buf, "%s(%s) = %s", base, g_pDataModel->GetString( m_symAttribute ), "\"\"" );
+		}
 		return buf;
 	}
 
