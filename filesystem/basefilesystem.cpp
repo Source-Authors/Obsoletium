@@ -2650,14 +2650,14 @@ unsigned int CBaseFileSystem::Size( FileHandle_t file )
 unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 {
 	VPROF_BUDGET( "CBaseFileSystem::Size", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
-	CHECK_DOUBLE_SLASHES( pFileName );
-	
 	// handle the case where no name passed...
 	if ( !pFileName || !pFileName[0] )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size NULL filename!\n" );
 		return 0;
 	}
+	
+	CHECK_DOUBLE_SLASHES( pFileName );
 	
 	// Ok, fall through to the fast path.
 	unsigned result = 0;
