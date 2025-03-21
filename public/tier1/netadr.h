@@ -70,7 +70,7 @@ public:
 	[[nodiscard]] bool	IsValid() const;	// ip & port != 0
 	[[nodiscard]] bool	IsBaseAdrValid() const;	// ip != 0
 
-	void    SetFromSocket( socket_handle hSocket );
+	[[nodiscard]] bool SetFromSocket(socket_handle hSocket);
 
 	[[nodiscard]] bool	Unserialize( bf_read &readBuf );
 	[[nodiscard]] bool	Serialize( bf_write &writeBuf );
