@@ -117,7 +117,7 @@ const char * netadr_t::ToString( bool onlyBase ) const
 	return s[useSlot];
 }
 
-void netadr_t::ToString( char *pchBuffer, uint32 unBufferSize, bool onlyBase ) const
+void netadr_t::ToString( char *pchBuffer, size_t unBufferSize, bool onlyBase ) const
 {
 
 	if (type == NA_LOOPBACK)

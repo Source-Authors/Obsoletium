@@ -47,7 +47,7 @@ public:
 	// DON'T CALL THIS
 	const char*		ToString( bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
 
-	void	ToString( char *pchBuffer, uint32 unBufferSize, bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
+	void	ToString( char *pchBuffer, size_t unBufferSize, bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
 	template< size_t maxLenInChars >
 	void	ToString_safe( char (&pDest)[maxLenInChars], bool onlyBase = false ) const
 	{
