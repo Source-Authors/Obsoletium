@@ -832,7 +832,7 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 	int duplicatedReplacements = 0;
 
 	// Open the soundscape data file, and abort if we can't
-	KeyValues *kv = new KeyValues( "" );
+	KeyValuesAD kv( "" );
 	if ( filesystem->LoadKeyValues( *kv, IFileSystem::TYPE_SOUNDEMITTER, filename, "GAME" ) )
 	{
 		// parse out all of the top level sections and save their names
@@ -893,12 +893,6 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 					{
 						InitSoundInternalParameters( pKeys->GetName(), pKeys, m_Sounds[ lookup ]->m_SoundParams );
 					}
-#if 0
-					else
-					{
-					 	DevMsg( "CSoundEmitterSystem::AddSoundsFromFile(%s):  Entry %s duplicated, skipping\n", filename, pKeys->GetName() );
-					}
-#endif
 				}
 				else
 				{
@@ -910,8 +904,6 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 			}
 			pKeys = pKeys->GetNextKey();
 		}
-
-		kv->deleteThis();
 	}
 	else
 	{
@@ -922,8 +914,6 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 
 		// Discard
 		m_SoundKeyValues.Remove( scriptindex );
-
-		kv->deleteThis();
 
 		return;
 	}
@@ -946,10 +936,9 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 //-----------------------------------------------------------------------------
 void CSoundEmitterSystemBase::ReloadSoundEntriesInList( IFileList *pFilesToReload )
 {
-	int i, c;
-	c = m_SoundKeyValues.Count();
+	intp c = m_SoundKeyValues.Count();
 	CUtlVector< const char * > processed;
-	for ( i = 0; i < c ; i++ )
+	for ( intp i = 0; i < c ; i++ )
 	{
 		const char *pszFileName = GetSoundScriptName( i );
 		if ( pszFileName && pszFileName[0] )
