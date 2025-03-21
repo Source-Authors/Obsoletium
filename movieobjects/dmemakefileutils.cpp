@@ -530,7 +530,10 @@ bool CDmeMakefileUtils::PerformCompilationStep( CDmeMayaMakefile *pMakeFile, Com
 	mayaCommand += " -selection";
 
 	char pObjectId[128];
-	UniqueIdToString( pMakeFile->GetId(), pObjectId, sizeof(pObjectId) );
+	// dimhotepus: Exit on uuid convert failure.
+	if ( !UniqueIdToString( pMakeFile->GetId(), pObjectId ) )
+		return false;
+
 	mayaCommand += " -makefileObjectId \\\"";
 	mayaCommand += pObjectId;
 	mayaCommand += "\\\"";
