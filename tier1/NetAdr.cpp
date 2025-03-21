@@ -7,17 +7,17 @@
 //===========================================================================//
 #include "tier1/netadr.h"
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_WIN32 )
 #include "winlite.h"
 #endif
 
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_WIN32)
 #include <winsock.h>
 typedef int socklen_t;
-#elif !defined( _X360 )
+#elif defined(POSIX)
 #include <netinet/in.h> // ntohs()
 #include <netdb.h>		// gethostbyname()
 #include <sys/socket.h>	// getsockname()
