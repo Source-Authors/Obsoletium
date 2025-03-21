@@ -14,7 +14,7 @@
 #endif
 
 #include "appframework/IAppSystem.h"
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 // unicode character type
 // for more unicode manipulation functions #include <wchar.h>
@@ -42,22 +42,22 @@ public:
 	virtual void RemoveAll() = 0;
 
 	// Finds the localized text for tokenName
-	virtual wchar_t *Find(char const *tokenName) = 0;
+	[[nodiscard]] virtual wchar_t *Find(char const *tokenName) = 0;
 
 	// finds the index of a token by token name, INVALID_STRING_INDEX if not found
-	virtual StringIndex_t FindIndex(const char *tokenName) = 0;
+	[[nodiscard]] virtual StringIndex_t FindIndex(const char *tokenName) = 0;
 
 	// gets the values by the string index
-	virtual const char *GetNameByIndex(StringIndex_t index) = 0;
-	virtual wchar_t *GetValueByIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual const char *GetNameByIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual wchar_t *GetValueByIndex(StringIndex_t index) = 0;
 
 	///////////////////////////////////////////////////////////////////
 	// the following functions should only be used by localization editors
 
 	// iteration functions
-	virtual StringIndex_t GetFirstStringIndex() = 0;
+	[[nodiscard]] virtual StringIndex_t GetFirstStringIndex() = 0;
 	// returns the next index, or INVALID_STRING_INDEX if no more strings available
-	virtual StringIndex_t GetNextStringIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual StringIndex_t GetNextStringIndex(StringIndex_t index) = 0;
 
 	// adds a single name/unicode string pair to the table
 	virtual void AddString( const char *tokenName, wchar_t *unicodeString, const char *fileName ) = 0;
@@ -69,16 +69,16 @@ public:
 	virtual bool SaveToFile( const char *fileName ) = 0;
 
 	// iterates the filenames
-	virtual int GetLocalizationFileCount() = 0;
-	virtual const char *GetLocalizationFileName(int index) = 0;
+	[[nodiscard]] virtual int GetLocalizationFileCount() = 0;
+	[[nodiscard]] virtual const char *GetLocalizationFileName(int index) = 0;
 
 	// returns the name of the file the specified localized string is stored in
-	virtual const char *GetFileNameByIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual const char *GetFileNameByIndex(StringIndex_t index) = 0;
 
 	// for development only, reloads localization files
 	virtual void ReloadLocalizationFiles( ) = 0;
 
-	virtual const char *FindAsUTF8( const char *pchTokenName ) = 0;
+	[[nodiscard]] virtual const char *FindAsUTF8( const char *pchTokenName ) = 0;
 
 	// need to replace the existing ConstructString with this
 	virtual void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const char *tokenName, KeyValues *localizationVariables) = 0;
@@ -130,7 +130,7 @@ public:
 	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, intp unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, ...)
 	{
 		va_list argList;
-		va_start( argList, numFormatParameters );
+		va_start( argList, numFormatParameters ); //-V2018 //-V2019
 
 		ConstructStringVArgsInternal( unicodeOuput, unicodeBufferSizeInBytes, formatString, numFormatParameters, argList );
 
@@ -155,7 +155,7 @@ public:
 	static void ConstructString_safe( OUT_Z_ARRAY T (&pDest)[maxLenInChars], const T *formatString, int numFormatParameters, ... )
 	{
 		va_list argList;
-		va_start( argList, numFormatParameters );
+		va_start( argList, numFormatParameters ); //-V2018 //-V2019
 
 		ConstructStringVArgsInternal( pDest, maxLenInChars * sizeof( *pDest ), formatString, numFormatParameters, argList );
 
@@ -220,7 +220,7 @@ template < typename T >
 class TypedKeyValuesStringHelper
 {
 public:
-	static const T *Read( KeyValues *pKeyValues, const char *pKeyName, const T *pDefaultValue );
+	[[nodiscard]] static const T *Read( KeyValues *pKeyValues, const char *pKeyName, const T *pDefaultValue );
 	static void	Write( KeyValues *pKeyValues, const char *pKeyName, const T *pValue );
 };
 
@@ -230,7 +230,7 @@ template < >
 class TypedKeyValuesStringHelper<char>
 {
 public:
-	static const char *Read( KeyValues *pKeyValues, const char *pKeyName, const char *pDefaultValue ) { return pKeyValues->GetString( pKeyName, pDefaultValue ); }
+	[[nodiscard]] static const char *Read( KeyValues *pKeyValues, const char *pKeyName, const char *pDefaultValue ) { return pKeyValues->GetString( pKeyName, pDefaultValue ); }
 	static void Write( KeyValues *pKeyValues, const char *pKeyName, const char *pValue ) { pKeyValues->SetString( pKeyName, pValue ); }
 };
 
@@ -240,7 +240,7 @@ template < >
 class TypedKeyValuesStringHelper<wchar_t>
 {
 public:
-	static const wchar_t *Read( KeyValues *pKeyValues, const char *pKeyName, const wchar_t *pDefaultValue ) { return pKeyValues->GetWString( pKeyName, pDefaultValue ); }
+	[[nodiscard]] static const wchar_t *Read( KeyValues *pKeyValues, const char *pKeyName, const wchar_t *pDefaultValue ) { return pKeyValues->GetWString( pKeyName, pDefaultValue ); }
 	static void Write( KeyValues *pKeyValues, const char *pKeyName, const wchar_t *pValue ) { pKeyValues->SetWString( pKeyName, pValue ); }
 };
 
@@ -276,7 +276,7 @@ public:
 
 	CLocalizedStringArgStringImpl( const locchar_t *pStr ) : m_pStr( pStr ) { }
 
-	const locchar_t *GetLocArg() const { Assert( m_pStr ); return m_pStr; }
+	[[nodiscard]] const locchar_t *GetLocArg() const { Assert( m_pStr ); return m_pStr; }
 
 private:
 	const locchar_t *m_pStr;
@@ -301,7 +301,7 @@ public:
 
 	CLocalizedStringArgPrintfImpl( T value, const locchar_t *loc_Format ) { loc_snprintf( m_cBuffer, kBufferSize, loc_Format, value ); }
 
-	const locchar_t *GetLocArg() const { return m_cBuffer; }
+	[[nodiscard]] const locchar_t *GetLocArg() const { return m_cBuffer; }
 
 private:
 	enum { kBufferSize = 128, };
@@ -519,7 +519,7 @@ public:
 		}
 	}
 
-	operator const locchar_t *() const
+	[[nodiscard]] operator const locchar_t *() const
 	{
 		return m_loc_Buffer;
 	}

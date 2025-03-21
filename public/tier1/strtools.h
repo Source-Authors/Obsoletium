@@ -1131,7 +1131,7 @@ template <typename NameArray>
 		const char *pIndexStr = StringAfterPrefix( pName, prefix );
 		if ( pIndexStr )
 		{
-			intp index = *pIndexStr ? atoi( pIndexStr ) : 1;
+			int index = *pIndexStr ? atoi( pIndexStr ) : 1;
 			if ( index >= freeindex )
 			{
 				// TODO - check that there isn't more junk after the index in pElementName
@@ -1172,7 +1172,7 @@ template <typename NameArray>
 		return true;
 	}
 
-	intp newlen = prefixLength + ( intp )log10( ( float )i ) + 1;
+	intp newlen = prefixLength + ( intp )log10( i ) + 1;
 	if ( newlen + 1 > memsize )
 	{
 		V_strncpy( name, prefix, memsize );

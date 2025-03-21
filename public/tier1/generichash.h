@@ -16,19 +16,19 @@
 
 //-----------------------------------------------------------------------------
 
-unsigned FASTCALL HashString( const char *pszKey );
-unsigned FASTCALL HashStringCaseless( const char *pszKey );
-unsigned FASTCALL HashStringCaselessConventional( const char *pszKey );
-unsigned FASTCALL Hash4( const void *pKey );
-unsigned FASTCALL Hash8( const void *pKey );
-unsigned FASTCALL Hash12( const void *pKey );
-unsigned FASTCALL Hash16( const void *pKey );
-unsigned FASTCALL HashBlock( const void *pKey, unsigned size );
+[[nodiscard]] unsigned FASTCALL HashString( const char *pszKey );
+[[nodiscard]] unsigned FASTCALL HashStringCaseless( const char *pszKey );
+[[nodiscard]] unsigned FASTCALL HashStringCaselessConventional( const char *pszKey );
+[[nodiscard]] unsigned FASTCALL Hash4( const void *pKey );
+[[nodiscard]] unsigned FASTCALL Hash8( const void *pKey );
+[[nodiscard]] unsigned FASTCALL Hash12( const void *pKey );
+[[nodiscard]] unsigned FASTCALL Hash16( const void *pKey );
+[[nodiscard]] unsigned FASTCALL HashBlock( const void *pKey, unsigned size );
 
-unsigned FASTCALL HashInt( const int key );
+[[nodiscard]] unsigned FASTCALL HashInt(const int key);
 
 // hash a uint32 into a uint32
-constexpr FORCEINLINE uint32 HashIntAlternate( uint32 n)
+[[nodiscard]] constexpr FORCEINLINE uint32 HashIntAlternate( uint32 n)
 {
 	n = ( n + 0x7ed55d16 ) + ( n << 12 );
 	n = ( n ^ 0xc761c23c ) ^ ( n >> 19 );
@@ -39,7 +39,7 @@ constexpr FORCEINLINE uint32 HashIntAlternate( uint32 n)
 	return n;
 }
 
-constexpr inline unsigned HashIntConventional( const int n ) // faster but less effective
+[[nodiscard]] constexpr inline unsigned HashIntConventional( const int n ) // faster but less effective
 {
 	// first byte
 	unsigned hash = 0xAAAAAAAA + (n & 0xFF);
@@ -53,7 +53,7 @@ constexpr inline unsigned HashIntConventional( const int n ) // faster but less 
 	return hash;
 }
 
-constexpr inline unsigned HashInt64Conventional( const int64 n ) // faster but less effective
+[[nodiscard]] constexpr inline unsigned HashInt64Conventional( const int64 n ) // faster but less effective
 {
 	// first byte
 	unsigned hash = 0xAAAAAAAA + static_cast<unsigned char>(n & 0xFF);
@@ -78,7 +78,7 @@ constexpr inline unsigned HashInt64Conventional( const int64 n ) // faster but l
 //-----------------------------------------------------------------------------
 
 template <typename T>
-inline unsigned HashItem( const T &item )
+[[nodiscard]] inline unsigned HashItem( const T &item )
 {
 	if constexpr ( sizeof(item) == 4 )
 		return Hash4( &item );
@@ -92,27 +92,27 @@ inline unsigned HashItem( const T &item )
 	return HashBlock( &item, sizeof(item) );
 }
 
-template <> inline unsigned HashItem<int>(const int &key )
+template <> [[nodiscard]] inline unsigned HashItem<int>(const int &key )
 {
 	return HashInt( key );
 }
 
-template <> inline unsigned HashItem<unsigned>(const unsigned &key )
+template <> [[nodiscard]] inline unsigned HashItem<unsigned>(const unsigned &key )
 {
 	return HashInt( (int)key );
 }
 
-template <> inline unsigned HashItem<uint64>(const uint64 &key )
+template <> [[nodiscard]] inline unsigned HashItem<uint64>(const uint64 &key )
 {
 	return Hash8( &key );
 }
 
-template<> inline unsigned HashItem<const char *>(const char * const &pszKey )
+template<> [[nodiscard]] inline unsigned HashItem<const char *>(const char * const &pszKey )
 {
 	return HashString( pszKey );
 }
 
-template<> inline unsigned HashItem<char *>(char * const &pszKey )
+template<> [[nodiscard]] inline unsigned HashItem<char *>(char * const &pszKey )
 {
 	return HashString( pszKey );
 }
@@ -123,12 +123,12 @@ template<> inline unsigned HashItem<char *>(char * const &pszKey )
 //-----------------------------------------------------------------------------
 // Murmur hash
 //-----------------------------------------------------------------------------
-uint32 MurmurHash2( const void * key, int len, uint32 seed );
+[[nodiscard]] uint32 MurmurHash2( const void * key, int len, uint32 seed );
 
 // return murmurhash2 of a downcased string
-uint32 MurmurHash2LowerCase( char const *pString, uint32 nSeed );
+[[nodiscard]] uint32 MurmurHash2LowerCase( char const *pString, uint32 nSeed );
 
-uint64 MurmurHash64( const void * key, int len, uint32 seed );
+[[nodiscard]] uint64 MurmurHash64( const void * key, int len, uint32 seed );
 
 
 #endif /* !GENERICHASH_H */

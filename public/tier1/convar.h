@@ -105,27 +105,27 @@ public:
 
 	virtual						~ConCommandBase( void );
 
-	virtual	bool				IsCommand( void ) const;
+	[[nodiscard]] virtual	bool				IsCommand( void ) const;
 
 	// Check flag
-	virtual bool				IsFlagSet( int flag ) const;
+	[[nodiscard]] virtual bool				IsFlagSet( int flag ) const;
 	// Set flag
 	virtual void				AddFlags( int flags );
 
 	// Return name of cvar
-	virtual const char			*GetName( void ) const;
+	[[nodiscard]] virtual const char			*GetName( void ) const;
 
 	// Return help text for cvar
-	virtual const char			*GetHelpText( void ) const;
+	[[nodiscard]] virtual const char			*GetHelpText( void ) const;
 
 	// Deal with next pointer
-	const ConCommandBase		*GetNext( void ) const;
-	ConCommandBase				*GetNext( void );
+	[[nodiscard]] const ConCommandBase		*GetNext( void ) const;
+	[[nodiscard]] ConCommandBase				*GetNext( void );
 	
-	virtual bool				IsRegistered( void ) const;
+	[[nodiscard]] virtual bool IsRegistered(void) const;
 
 	// Returns the DLL identifier
-	virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
+	[[nodiscard]] virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
 
 protected:
 	virtual void				CreateBase( const char *pName, const char *pHelpString = nullptr, 
@@ -185,11 +185,11 @@ public:
 	[[nodiscard]] const char *Arg( int nIndex ) const;		// Gets at arguments
 	
 	// Helper functions to parse arguments to commands.
-	const char* FindArg( const char *pName ) const;
-	int FindArgInt( const char *pName, int nDefaultVal ) const;
+	[[nodiscard]] const char* FindArg( const char *pName ) const;
+	[[nodiscard]] int FindArgInt( const char *pName, int nDefaultVal ) const;
 
-	static int MaxCommandLength();
-	static characterset_t* DefaultBreakSet();
+	[[nodiscard]] static int MaxCommandLength();
+	[[nodiscard]] static characterset_t* DefaultBreakSet();
 
 private:
 	enum
@@ -199,7 +199,7 @@ private:
 	};
 
 	int		m_nArgc;
-	ptrdiff_t		m_nArgv0Size;
+	std::ptrdiff_t		m_nArgv0Size;
 	char	m_pArgSBuffer[ COMMAND_MAX_LENGTH ];
 	char	m_pArgvBuffer[ COMMAND_MAX_LENGTH ];
 	const char*	m_ppArgv[ COMMAND_MAX_ARGC ];
@@ -265,11 +265,11 @@ public:
 
 	virtual ~ConCommand( void );
 
-	bool IsCommand( void ) const override;
+	[[nodiscard]] bool IsCommand( void ) const override;
 
 	virtual int AutoCompleteSuggest( const char *partial, CUtlVector< CUtlString > &commands );
 
-	virtual bool CanAutoComplete( void );
+	[[nodiscard]] virtual bool CanAutoComplete( void );
 
 	// Invoke the function
 	virtual void Dispatch( const CCommand &command );
@@ -334,21 +334,21 @@ public:
 
 	virtual						~ConVar( void );
 
-	bool				IsFlagSet( int flag ) const override;
-	const char*			GetHelpText( void ) const override;
-	bool				IsRegistered( void ) const override;
-	const char			*GetName( void ) const override;
+	[[nodiscard]] bool				IsFlagSet( int flag ) const override;
+	[[nodiscard]] const char*		GetHelpText( void ) const override;
+	[[nodiscard]] bool				IsRegistered( void ) const override;
+	[[nodiscard]] const char		*GetName( void ) const override;
 	void				AddFlags( int flags ) override;
-	bool				IsCommand( void ) const override;
+	[[nodiscard]] bool				IsCommand( void ) const override;
 
 	// Install a change callback (there shouldn't already be one....)
 	void InstallChangeCallback( FnChangeCallback_t callback );
 
 	// Retrieve value
-	FORCEINLINE_CVAR float			GetFloat( void ) const;
-	FORCEINLINE_CVAR int			GetInt( void ) const;
-	FORCEINLINE_CVAR bool			GetBool() const {  return !!GetInt(); }
-	FORCEINLINE_CVAR char const	   *GetString( void ) const;
+	[[nodiscard]] FORCEINLINE_CVAR float			GetFloat( void ) const;
+	[[nodiscard]] FORCEINLINE_CVAR int			GetInt( void ) const;
+	[[nodiscard]] FORCEINLINE_CVAR bool			GetBool() const {  return !!GetInt(); }
+	[[nodiscard]] FORCEINLINE_CVAR char const	   *GetString( void ) const;
 
 	// Any function that allocates/frees memory needs to be virtual or else you'll have crashes
 	//  from alloc/free across dll/exe boundaries.
@@ -362,17 +362,17 @@ public:
 	void						Revert( void );
 
 	// True if it has a min/max setting
-	bool						GetMin( float& minVal ) const;
-	bool						GetMax( float& maxVal ) const;
-	const char					*GetDefault( void ) const;
+	[[nodiscard]] bool						GetMin( float& minVal ) const;
+	[[nodiscard]] bool						GetMax( float& maxVal ) const;
+	[[nodiscard]] const char					*GetDefault( void ) const;
 	void						SetDefault( const char *pszDefault );
 
 	// True if it has a min/max competitive setting
-	bool						GetCompMin( float& minVal ) const;
-	bool						GetCompMax( float& maxVal ) const;
+	[[nodiscard]] bool						GetCompMin( float& minVal ) const;
+	[[nodiscard]] bool						GetCompMax( float& maxVal ) const;
 
-	FORCEINLINE_CVAR bool		IsCompetitiveRestricted() const;
-	bool						SetCompetitiveMode( bool bCompetitive );
+	[[nodiscard]] FORCEINLINE_CVAR bool		IsCompetitiveRestricted() const;
+	[[nodiscard]] bool						SetCompetitiveMode( bool bCompetitive );
 
 private:
 	// Called by CCvar when the value of a var is changing.
@@ -394,7 +394,7 @@ private:
 
 	// Used internally by OneTimeInit to initialize.
 	void Init() override;
-	int GetFlags() { return m_pParent->m_nFlags; }
+	[[nodiscard]] int GetFlags() const { return m_pParent->m_nFlags; }
 private:
 
 	// This either points to "this" or it points to the original declaration of a ConVar.
@@ -420,6 +420,9 @@ private:
 	bool						m_bHasMax;
 	float						m_fMaxVal;
 
+	// Call this function when ConVar changes
+	FnChangeCallback_t			m_fnChangeCallback;
+
 	// Min/Max values for competitive.
 	bool						m_bHasCompMin;
 	float						m_fCompMinVal;
@@ -427,10 +430,6 @@ private:
 	float						m_fCompMaxVal;
 
 	bool						m_bCompetitiveRestrictions;
-
-	
-	// Call this function when ConVar changes
-	FnChangeCallback_t			m_fnChangeCallback;
 };
 
 

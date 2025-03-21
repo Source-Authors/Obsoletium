@@ -31,18 +31,18 @@ public:
 
 	void	SetType( netadrtype_t type );
 	void	SetPort( unsigned short port );
-	bool	SetFromSockadr(const struct sockaddr *s);
+	[[nodiscard]] bool	SetFromSockadr(const struct sockaddr *s);
 	void	SetIP(uint8 b1, uint8 b2, uint8 b3, uint8 b4);
 	void	SetIP(uint unIP);									// Sets IP.  unIP is in host order (little-endian)
 	void    SetIPAndPort( uint unIP, unsigned short usPort ) { SetIP( unIP ); SetPort( usPort ); }
-	bool	SetFromString(const char *pch, bool bUseDNS = false ); // if bUseDNS is true then do a DNS lookup if needed
+	[[nodiscard]] bool	SetFromString(const char *pch, bool bUseDNS = false ); // if bUseDNS is true then do a DNS lookup if needed
 	
-	bool	CompareAdr (const netadr_s &a, bool onlyBase = false) const;
-	bool	CompareClassBAdr (const netadr_s &a) const;
-	bool	CompareClassCAdr (const netadr_s &a) const;
+	[[nodiscard]] bool	CompareAdr (const netadr_s &a, bool onlyBase = false) const;
+	[[nodiscard]] bool	CompareClassBAdr (const netadr_s &a) const;
+	[[nodiscard]] bool	CompareClassCAdr (const netadr_s &a) const;
 
-	netadrtype_t	GetType() const;
-	unsigned short	GetPort() const;
+	[[nodiscard]] netadrtype_t	GetType() const;
+	[[nodiscard]] unsigned short	GetPort() const;
 
 	// DON'T CALL THIS
 	const char*		ToString( bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
@@ -59,25 +59,25 @@ public:
 	// Returns 0xAABBCCDD for AA.BB.CC.DD on all platforms, which is the same format used by SetIP().
 	// (So why isn't it just named GetIP()?  Because previously there was a fucntion named GetIP(), and
 	// it did NOT return back what you put into SetIP().  So we nuked that guy.)
-	unsigned int	GetIPHostByteOrder() const;
+	[[nodiscard]] unsigned int	GetIPHostByteOrder() const;
 
 	// Returns a number that depends on the platform.  In most cases, this probably should not be used.
-	unsigned int	GetIPNetworkByteOrder() const;
+	[[nodiscard]] unsigned int	GetIPNetworkByteOrder() const;
 
-	bool	IsLocalhost() const; // true, if this is the localhost IP 
-	bool	IsLoopback() const;	// true if engine loopback buffers are used
-	bool	IsReservedAdr() const; // true, if this is a private LAN IP
-	bool	IsValid() const;	// ip & port != 0
-	bool	IsBaseAdrValid() const;	// ip != 0
+	[[nodiscard]] bool	IsLocalhost() const; // true, if this is the localhost IP 
+	[[nodiscard]] bool	IsLoopback() const;	// true if engine loopback buffers are used
+	[[nodiscard]] bool	IsReservedAdr() const; // true, if this is a private LAN IP
+	[[nodiscard]] bool	IsValid() const;	// ip & port != 0
+	[[nodiscard]] bool	IsBaseAdrValid() const;	// ip != 0
 
 	void    SetFromSocket( socket_handle hSocket );
 
-	bool	Unserialize( bf_read &readBuf );
-	bool	Serialize( bf_write &writeBuf );
+	[[nodiscard]] bool	Unserialize( bf_read &readBuf );
+	[[nodiscard]] bool	Serialize( bf_write &writeBuf );
 
-	bool operator==(const netadr_s &netadr) const {return ( CompareAdr( netadr ) );}
-	bool operator!=(const netadr_s &netadr) const {return !( CompareAdr( netadr ) );}
-	bool operator<(const netadr_s &netadr) const;
+	[[nodiscard]] bool operator==(const netadr_s &netadr) const {return ( CompareAdr( netadr ) );}
+	[[nodiscard]] bool operator!=(const netadr_s &netadr) const {return !( CompareAdr( netadr ) );}
+	[[nodiscard]] bool operator<(const netadr_s &netadr) const;
 
 public:	// members are public to avoid to much changes
 
@@ -118,7 +118,7 @@ public:
 			m_rgchString[0] = '\0';
 	}
 
-	const char * String() const
+	[[nodiscard]] const char * String() const
 	{ 
 		return m_rgchString;
 	}

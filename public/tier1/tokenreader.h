@@ -45,18 +45,18 @@ public:
 
 	TokenReader();
 
-	bool Open(const char *pszFilename);
-	trtoken_t NextToken(char *pszStore, ptrdiff_t nSize);
-	trtoken_t NextTokenDynamic(char **ppszStore);
+	[[nodiscard]] bool Open(const char *pszFilename);
+	[[nodiscard]] trtoken_t NextToken(char *pszStore, ptrdiff_t nSize);
+	[[nodiscard]] trtoken_t NextTokenDynamic(char **ppszStore);
 	void Close();
 
 	void IgnoreTill(trtoken_t ttype, const char *pszToken);
 	void Stuff(trtoken_t ttype, const char *pszToken);
-	bool Expecting(trtoken_t ttype, const char *pszToken);
-	const char *Error(char *error, ...);
-	trtoken_t PeekTokenType(char* = nullptr, ptrdiff_t maxlen = 0);
+	[[nodiscard]] bool Expecting(trtoken_t ttype, const char *pszToken);
+	[[nodiscard]] const char *Error(char *error, ...);
+	[[nodiscard]] trtoken_t PeekTokenType(char* = nullptr, ptrdiff_t maxlen = 0);
 
-	inline int GetErrorCount(void);
+	inline int GetErrorCount(void) const;
 
 private:
 	// compiler can't generate an assignment operator since descended from std::ifstream
@@ -79,7 +79,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Returns the total number of parsing errors since this file was opened.
 //-----------------------------------------------------------------------------
-int TokenReader::GetErrorCount(void)
+int TokenReader::GetErrorCount(void) const
 {
 	return(m_nErrorCount);
 }

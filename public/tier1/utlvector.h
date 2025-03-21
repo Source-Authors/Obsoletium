@@ -750,14 +750,16 @@ template< typename T, class A >
 inline T& CUtlVector<T, A>::Random()
 {
 	Assert( m_Size > 0 );
-	return m_Memory[ RandomInt( 0, m_Size - 1 ) ];
+	int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
+	return m_Memory[ RandomInt( 0, upperBound ) ];
 }
 
 template< typename T, class A >
 inline const T& CUtlVector<T, A>::Random() const
 {
 	Assert( m_Size > 0 );
-	return m_Memory[ RandomInt( 0, m_Size - 1 ) ];
+	int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
+	return m_Memory[ RandomInt( 0, upperBound ) ];
 }
 
 

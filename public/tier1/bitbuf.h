@@ -57,7 +57,10 @@ using BitBufErrorHandler = void (*)(BitBufErrorType errorType, const char *pDebu
 
 #if defined( _DEBUG )
 	extern void InternalBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugName );
-	#define CallErrorHandler( errorType, pDebugName ) InternalBitBufErrorHandler( errorType, pDebugName )
+	inline void CallErrorHandler( BitBufErrorType errorType, const char *pDebugName )
+	{
+		InternalBitBufErrorHandler( errorType, pDebugName );
+	}
 #else
 	#define CallErrorHandler( errorType, pDebugName )
 #endif

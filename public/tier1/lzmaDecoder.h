@@ -64,13 +64,13 @@ public:
 	// Attempt to read up to nMaxInputBytes from the compressed stream, writing up to nMaxOutputBytes to pOutput.
 	// Makes progress until blocked on input or output.
 	// Returns false if read stops due to an error or if called at EOF (GetExpectedBytesRemaining == 0)
-	bool Read( unsigned char *pInput, unsigned int nMaxInputBytes,
+	[[nodiscard]] bool Read( unsigned char *pInput, unsigned int nMaxInputBytes,
 	           unsigned char *pOutput, unsigned int nMaxOutputBytes,
 	           /* out */ unsigned int &nCompressedBytesRead, /* out */ unsigned int &nOutputBytesWritten );
 
 	// Get the expected uncompressed bytes yet to be read from this stream. Returns false if not yet known, such as
 	// before being fed the header.
-	bool GetExpectedBytesRemaining( /* out */ unsigned int &nBytesRemaining );
+	[[nodiscard]] bool GetExpectedBytesRemaining( /* out */ unsigned int &nBytesRemaining );
 
 private:
 	enum eHeaderParse
@@ -80,10 +80,10 @@ private:
 		eHeaderParse_NeedMoreBytes
 	};
 
-	eHeaderParse TryParseHeader( unsigned char *pInput, unsigned int nBytesAvailable, /* out */ unsigned int &nBytesConsumed );
+	[[nodiscard]] eHeaderParse TryParseHeader( unsigned char *pInput, unsigned int nBytesAvailable, /* out */ unsigned int &nBytesConsumed );
 
 	void FreeDecoderState();
-	bool CreateDecoderState( const unsigned char *pProperties );
+	[[nodiscard]] bool CreateDecoderState( const unsigned char *pProperties );
 
 	// Init from a zip-embedded LZMA stream. Requires the original size be passed from zip headers.
 	CLzmaDec_t *m_pDecoderState;

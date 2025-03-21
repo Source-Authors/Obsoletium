@@ -64,7 +64,7 @@ public:
 		*this = value;
 	}
 
-	T GetRaw() const
+	[[nodiscard]] T GetRaw() const
 	{
 		return m_Val;
 	}
@@ -78,7 +78,7 @@ public:
 			m_Val = maxValue;
 	}
 
-	inline operator const T&() const
+	[[nodiscard]] inline operator const T&() const
 	{
 		return m_Val;
 	}

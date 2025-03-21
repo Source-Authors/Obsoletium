@@ -123,7 +123,7 @@ public:
 	void	LinkToTail( I elem );
 
 	// invalid index (M will never allocate an element at this index)
-	inline static constexpr S  InvalidIndex()  { return ( S )M::InvalidIndex(); }
+	inline static constexpr S  InvalidIndex()  { return static_cast<S>(M::InvalidIndex()); }
 
 	// Is a given index valid to use? (representible by S and not the invalid index)
 	static bool IndexInRange( I index );
@@ -429,7 +429,7 @@ CUtlLinkedList<T,S,ML,I,M>::CUtlLinkedList( intp growSize, intp initSize ) :
 	m_Memory( growSize, initSize ), m_LastAlloc( m_Memory.InvalidIterator() )
 {
 	// Prevent signed non-int datatypes
-	COMPILE_TIME_ASSERT( sizeof(S) <= sizeof(ptrdiff_t) || ( ( (S)-1 ) > 0 ) );
+	COMPILE_TIME_ASSERT( sizeof(S) <= sizeof(ptrdiff_t) || static_cast<S>(-1) > 0 );
 	ConstructList();
 	ResetDbgInfo();
 }
@@ -468,13 +468,13 @@ inline T const& CUtlLinkedList<T,S,ML,I,M>::Element( I i ) const
 }
 
 template <class T, class S, bool ML, class I, class M>
-inline T& CUtlLinkedList<T,S,ML,I,M>::operator[]( I i )        
+inline T& CUtlLinkedList<T,S,ML,I,M>::operator[]( I i )         //-V524
 { 
 	return m_Memory[i].m_Element; 
 }
 
 template <class T, class S, bool ML, class I, class M>
-inline T const& CUtlLinkedList<T,S,ML,I,M>::operator[]( I i ) const 
+inline T const& CUtlLinkedList<T,S,ML,I,M>::operator[]( I i ) const  //-V524
 {
 	return m_Memory[i].m_Element; 
 }
@@ -552,11 +552,11 @@ inline bool CUtlLinkedList<T,S,ML,I,M>::IndexInRange( I index ) // Static method
 	//  'I' needs to be able to store 'S'
 	COMPILE_TIME_ASSERT( sizeof(I) >= sizeof(S) );
 	//  'S' should be unsigned (to avoid signed arithmetic errors for plausibly exhaustible ranges)
-	COMPILE_TIME_ASSERT( ( sizeof(S) > 2 ) || ( ( (S)-1 ) > 0 ) );
+	COMPILE_TIME_ASSERT( sizeof(S) > 2 || static_cast<S>(-1) > 0 );
 	//  M::INVALID_INDEX should be storable in S to avoid ambiguities (e.g. with 65536)
-	COMPILE_TIME_ASSERT( ( M::INVALID_INDEX == -1 ) || ( M::INVALID_INDEX == (S)M::INVALID_INDEX ) );
+	COMPILE_TIME_ASSERT( M::INVALID_INDEX == -1 || M::INVALID_INDEX == static_cast<S>(M::INVALID_INDEX) );
 
-	return ( ( (S)index == index ) && ( (S)index != InvalidIndex() ) );
+	return static_cast<S>(index) == index && static_cast<S>(index) != InvalidIndex();
 }
 
 template <class T, class S, bool ML, class I, class M>
