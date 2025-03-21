@@ -119,7 +119,6 @@ const char * netadr_t::ToString( bool onlyBase ) const
 
 void netadr_t::ToString( char *pchBuffer, size_t unBufferSize, bool onlyBase ) const
 {
-
 	if (type == NA_LOOPBACK)
 	{
 		V_strncpy( pchBuffer, "loopback", unBufferSize );
@@ -202,44 +201,42 @@ unsigned int netadr_t::GetIPHostByteOrder() const
 	return BigDWord( GetIPNetworkByteOrder() );
 }
 
-void netadr_t::ToSockadr (struct sockaddr * s) const
+void netadr_t::ToSockadr (sockaddr * s) const
 {
-	Q_memset ( s, 0, sizeof(struct sockaddr));
+	Q_memset ( s, 0, sizeof(sockaddr));
 
 	if (type == NA_BROADCAST)
 	{
-		((struct sockaddr_in*)s)->sin_family = AF_INET;
-		((struct sockaddr_in*)s)->sin_port = port;
-		((struct sockaddr_in*)s)->sin_addr.s_addr = INADDR_BROADCAST;
+		((sockaddr_in*)s)->sin_family = AF_INET;
+		((sockaddr_in*)s)->sin_port = port;
+		((sockaddr_in*)s)->sin_addr.s_addr = INADDR_BROADCAST;
 	}
 	else if (type == NA_IP)
 	{
-		((struct sockaddr_in*)s)->sin_family = AF_INET;
-		((struct sockaddr_in*)s)->sin_addr.s_addr = *(int *)&ip;
-		((struct sockaddr_in*)s)->sin_port = port;
+		((sockaddr_in*)s)->sin_family = AF_INET;
+		((sockaddr_in*)s)->sin_addr.s_addr = *(int *)&ip;
+		((sockaddr_in*)s)->sin_port = port;
 	}
 	else if (type == NA_LOOPBACK )
 	{
-		((struct sockaddr_in*)s)->sin_family = AF_INET;
-		((struct sockaddr_in*)s)->sin_port = port;
-		((struct sockaddr_in*)s)->sin_addr.s_addr = INADDR_LOOPBACK ;
+		((sockaddr_in*)s)->sin_family = AF_INET;
+		((sockaddr_in*)s)->sin_port = port;
+		((sockaddr_in*)s)->sin_addr.s_addr = INADDR_LOOPBACK;
 	}
 }
 
-bool netadr_t::SetFromSockadr(const struct sockaddr * s)
+bool netadr_t::SetFromSockadr(const sockaddr * s)
 {
 	if (s->sa_family == AF_INET)
 	{
 		type = NA_IP;
-		*(int *)&ip = ((struct sockaddr_in *)s)->sin_addr.s_addr;
-		port = ((struct sockaddr_in *)s)->sin_port;
+		*(int *)&ip = ((sockaddr_in *)s)->sin_addr.s_addr;
+		port = ((sockaddr_in *)s)->sin_port;
 		return true;
 	}
-	else
-	{
-		Clear();
-		return false;
-	}
+
+	Clear();
+	return false;
 }
 
 bool netadr_t::IsValid() const
@@ -306,6 +303,7 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 			|| n5 < 0 || n5 > 65535
 		)
 			return false;
+
 		// dimhotepus: Safe to cast as checked above.
 		SetIP( static_cast<uint8>(n1), static_cast<uint8>(n2), static_cast<uint8>(n3), static_cast<uint8>(n4) );
 		SetPort( static_cast<uint16>(n5) );
