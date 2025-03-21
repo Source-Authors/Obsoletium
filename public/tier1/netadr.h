@@ -26,7 +26,7 @@ typedef struct netadr_s
 public:
 	netadr_s() { SetIP( 0 ); SetPort( 0 ); SetType( NA_IP ); }
 	netadr_s( uint unIP, uint16 usPort ) { SetIP( unIP ); SetPort( usPort ); SetType( NA_IP ); }
-	netadr_s( const char *pch ) { SetFromString( pch ); }
+	[[deprecated("Use SetFromString and check return value.")]] netadr_s( const char *pch ) { (void)SetFromString( pch ); }
 	void	Clear();	// invalids Address
 
 	void	SetType( netadrtype_t type );
