@@ -34,25 +34,25 @@ CDmMeshComp::CDmMeshComp( CDmeMesh *pMesh, CDmeVertexData *pPassedBase )
 	const CUtlVector< Vector > &pPositionData( m_pBase->GetPositionData() );
 	const CUtlVector<int> &pPositionIndices( m_pBase->GetVertexIndexData( CDmeVertexData::FIELD_POSITION ) );
 
-	const int nVertices( pPositionData.Count() );
+	const intp nVertices( pPositionData.Count() );
 	if ( nVertices <= 0 )
 		return;
 
 	// Create vertices
 	// TODO: check for duplicates in pPositionData - that would break this algorithm
 	m_verts.EnsureCapacity( nVertices );
-	for ( int i = 0; i < nVertices; ++i )
+	for ( intp i = 0; i < nVertices; ++i )
 	{
 		const CUtlVector< int > &vertexIndices = m_pBase->FindVertexIndicesFromDataIndex( CDmeVertexData::FIELD_POSITION, i );
 		m_verts.AddToTail( new CVert( i, &vertexIndices, &pPositionData[ i ] ) );
 	}
 
 	// Create edges and faces
-	const int nFaceSets( pMesh->FaceSetCount() );
-	for ( int i = 0; i < nFaceSets; ++i )
+	const intp nFaceSets( pMesh->FaceSetCount() );
+	for ( intp i = 0; i < nFaceSets; ++i )
 	{
 		CDmeFaceSet *pFaceSet( pMesh->GetFaceSet( i ) );
-		const int nIndices( pFaceSet->NumIndices() );
+		const intp nIndices( pFaceSet->NumIndices() );
 		if ( nIndices < 4 )	// At least a triangle and a -1
 			continue;
 
@@ -292,7 +292,7 @@ CDmMeshComp::CEdge *CDmMeshComp::FindOrCreateEdge( int vIndex0, int vIndex1, boo
 CDmMeshComp::CEdge *CDmMeshComp::FindEdge( int vIndex0, int vIndex1, bool *pReverse /* = NULL */ )
 {
 	CUtlVector< CEdge * > &edges = m_verts[ vIndex0 ]->m_edges;
-	for ( int i = 0; i < edges.Count(); i++ )
+	for ( intp i = 0; i < edges.Count(); i++ )
 	{
 		CEdge *e = edges[ i ];
 
@@ -335,7 +335,7 @@ CDmMeshComp::CFace *CDmMeshComp::CreateFace( const CUtlVector< CVert * > &verts,
 	pFace->m_edgeReverseMap.RemoveAll();
 	pFace->m_edgeReverseMap.AddVectorToTail( edgeReverseMap );
 
-	for ( int nEdgeIndex = edges.Count() - 1; nEdgeIndex >= 0; --nEdgeIndex )
+	for ( intp nEdgeIndex = edges.Count() - 1; nEdgeIndex >= 0; --nEdgeIndex )
 	{
 		edges[ nEdgeIndex ]->m_faceCount += 1;
 	}
@@ -347,15 +347,15 @@ CDmMeshComp::CFace *CDmMeshComp::CreateFace( const CUtlVector< CVert * > &verts,
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmMeshComp::FindFacesWithVert( int vIndex, CUtlVector< CFace * > &faces )
+intp CDmMeshComp::FindFacesWithVert( int vIndex, CUtlVector< CFace * > &faces )
 {
 	// TODO: optimize this by adding a vector of face pointers to each vertex
 	faces.RemoveAll();
 
-	for ( int fi( m_faces.Head() ); fi != m_faces.InvalidIndex(); fi = m_faces.Next( fi ) )
+	for ( intp fi( m_faces.Head() ); fi != m_faces.InvalidIndex(); fi = m_faces.Next( fi ) )
 	{
 		CFace &face( m_faces[ fi ] );
-		for ( int i = 0; i < face.m_verts.Count(); ++i )
+		for ( intp i = 0; i < face.m_verts.Count(); ++i )
 		{
 			if ( face.m_verts[ i ]->PositionIndex() == vIndex )
 			{
@@ -372,13 +372,13 @@ int CDmMeshComp::FindFacesWithVert( int vIndex, CUtlVector< CFace * > &faces )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmMeshComp::FindNeighbouringVerts( int vIndex, CUtlVector< CVert * > &verts )
+intp CDmMeshComp::FindNeighbouringVerts( int vIndex, CUtlVector< CVert * > &verts )
 {
 	verts.RemoveAll();
 
 	const CUtlVector< CEdge * > & edges = m_verts[ vIndex ]->m_edges;
 
-	for ( int i = 0; i < edges.Count(); ++i )
+	for ( intp i = 0; i < edges.Count(); ++i )
 	{
 		CEdge *e = edges[ i ];
 		if ( e->GetVertPositionIndex( 0 ) == vIndex )
@@ -398,16 +398,16 @@ int CDmMeshComp::FindNeighbouringVerts( int vIndex, CUtlVector< CVert * > &verts
 //-----------------------------------------------------------------------------
 // Find all edges that are only used by 1 face
 //-----------------------------------------------------------------------------
-int CDmMeshComp::GetBorderEdges( CUtlVector< CUtlVector< CEdge * > > &borderEdgesList )
+intp CDmMeshComp::GetBorderEdges( CUtlVector< CUtlVector< CEdge * > > &borderEdgesList )
 {
 	// TODO: optimize this by stepping from edge to edge to build chains, using CVert::m_edges
-	int retVal = 0;
+	intp retVal = 0;
 
 	borderEdgesList.RemoveAll();
 
 	bool connected;
 
-	for ( int ei = 0; ei < m_edges.Count(); ei++ )
+	for ( intp ei = 0; ei < m_edges.Count(); ei++ )
 	{
 		CEdge *pEdge = m_edges[ ei ];
 		if ( pEdge->IsBorderEdge() )
@@ -415,10 +415,10 @@ int CDmMeshComp::GetBorderEdges( CUtlVector< CUtlVector< CEdge * > > &borderEdge
 			++retVal;
 			connected = false;
 
-			for ( int i = borderEdgesList.Count() - 1; !connected && i >= 0; --i )
+			for ( intp i = borderEdgesList.Count() - 1; !connected && i >= 0; --i )
 			{
 				CUtlVector< CEdge * > &borderEdges = borderEdgesList[ i ];
-				for ( int j = borderEdges.Count() - 1; j >= 0; --j )
+				for ( intp j = borderEdges.Count() - 1; j >= 0; --j )
 				{
 					if ( borderEdges[ j ]->ConnectedTo( pEdge ) )
 					{
@@ -444,18 +444,18 @@ int CDmMeshComp::GetBorderEdges( CUtlVector< CUtlVector< CEdge * > > &borderEdge
 	{
 		anyConnected = false;
 
-		for ( int i = borderEdgesList.Count() - 1; i >= 0; --i )
+		for ( intp i = borderEdgesList.Count() - 1; i >= 0; --i )
 		{
 			CUtlVector< CEdge * > &srcBorderEdges = borderEdgesList[ i ];
-			for ( int j = srcBorderEdges.Count() - 1; j >= 0; --j )
+			for ( intp j = srcBorderEdges.Count() - 1; j >= 0; --j )
 			{
 				CEdge *pSrcEdge = srcBorderEdges[ j ];
 				connected = false;
 
-				for ( int k = 0; !connected && k < i; ++k )
+				for ( intp k = 0; !connected && k < i; ++k )
 				{
 					CUtlVector< CEdge * > &dstBorderEdges = borderEdgesList[ k ];
-					for ( int l = dstBorderEdges.Count() - 1; l >= 0; --l )
+					for ( intp l = dstBorderEdges.Count() - 1; l >= 0; --l )
 					{
 						if ( dstBorderEdges[ l ]->ConnectedTo( pSrcEdge ) )
 						{

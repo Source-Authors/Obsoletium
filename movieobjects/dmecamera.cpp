@@ -238,10 +238,10 @@ void CDmeCamera::GetProjectionMatrix( VMatrix &proj, int width, int height )
 //	MatrixBuildPerspective( proj, flFOV, flFOV * flApsectRatio, flZNear, flZFar );
 
 #if 1
-	float halfWidth = tan( flFOV * M_PI / 360.0 );
+	float halfWidth = tan( flFOV * M_PI_F / 360.0f );
 	float halfHeight = halfWidth / flApsectRatio;
 #else
-	float halfHeight = tan( flFOV * M_PI / 360.0 );
+	float halfHeight = tan( flFOV * M_PI_F / 360.0f );
 	float halfWidth = flApsectRatio * halfHeight;
 #endif
 	memset( proj.Base(), 0, sizeof( proj ) );

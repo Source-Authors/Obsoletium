@@ -47,9 +47,9 @@ void CDmeShape::GetBoundingSphere( Vector &c, float &r ) const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmeShape::GetParentCount() const
+intp CDmeShape::GetParentCount() const
 {
-	int nReferringDags = 0;
+	intp nReferringDags = 0;
 
 	DmAttributeReferenceIterator_t i = g_pDataModel->FirstAttributeReferencingElement( GetHandle() );
 	while ( i != DMATTRIBUTE_REFERENCE_ITERATOR_INVALID )
@@ -74,7 +74,7 @@ int CDmeShape::GetParentCount() const
 //-----------------------------------------------------------------------------
 CDmeDag *CDmeShape::GetParent( int nParentIndex /*= 0 */ ) const
 {
-	int nReferringDags = 0;
+	intp nReferringDags = 0;
 
 	DmAttributeReferenceIterator_t i = g_pDataModel->FirstAttributeReferencingElement( GetHandle() );
 	while ( i != DMATTRIBUTE_REFERENCE_ITERATOR_INVALID )

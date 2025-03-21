@@ -66,7 +66,8 @@ private:
 	CDmaVar< int > m_hold[ 2 ];
 	CDmaVar< int > m_nFalloffInterpolatorType[ 2 ];
 	CDmaVar< float > m_threshold;
-	CDmaVar< int > m_nRecordingState;
+	// dimhotepus: int -> RecordingState_t
+	CDmaVar< RecordingState_t > m_nRecordingState;
 };
 
 #endif // DMETIMESELECTION_H

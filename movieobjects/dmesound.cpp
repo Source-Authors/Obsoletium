@@ -35,7 +35,7 @@ void CDmeSound::OnDestruction()
 //-----------------------------------------------------------------------------
 // For sounds that are relative paths (instead of GameSound names), get full path
 //-----------------------------------------------------------------------------
-bool CDmeSound::ComputeSoundFullPath( char *pBuf, int nBufLen )
+bool CDmeSound::ComputeSoundFullPath( char *pBuf, intp nBufLen )
 {
 	if ( !m_SoundName[0] )
 	{

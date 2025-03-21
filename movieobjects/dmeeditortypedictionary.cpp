@@ -126,7 +126,7 @@ bool CDmeEditorChoicesInfo::HasChoiceType() const
 //-----------------------------------------------------------------------------
 // Gets the choices
 //-----------------------------------------------------------------------------
-int CDmeEditorChoicesInfo::GetChoiceCount() const
+intp CDmeEditorChoicesInfo::GetChoiceCount() const
 {
 	return m_Choices.Count();
 }
@@ -139,7 +139,7 @@ CDmElement *CDmeEditorChoicesInfo::CreateChoice( const char *pChoiceString )
 	return pChoice;
 }
 
-const char *CDmeEditorChoicesInfo::GetChoiceString( int nIndex ) const
+const char *CDmeEditorChoicesInfo::GetChoiceString( intp nIndex ) const
 {
 	Assert( ( nIndex < GetChoiceCount() ) && ( nIndex >= 0 ) );
 	CDmElement *pChoice = m_Choices[nIndex];

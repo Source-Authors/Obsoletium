@@ -60,12 +60,12 @@ public:
 
 	// Used to iterate over all channels currently being recorded
 	// NOTE: Use CDmeChannel::AddToRecordingLayer to add a channel to the recording layer
-	int GetLayerRecordingChannelCount();
-	CDmeChannel* GetLayerRecordingChannel( int nIndex );
+	intp GetLayerRecordingChannelCount() const;
+	CDmeChannel* GetLayerRecordingChannel( intp nIndex );
 
 	// Computes time selection info in log time for a particular recorded channel
 	// NOTE: Only valid if IsUsingTimeSelection() returns true
-	void GetLocalTimeSelection( DmeLog_TimeSelection_t& selection, int nIndex );
+	void GetLocalTimeSelection( DmeLog_TimeSelection_t& selection, intp nIndex );
 
 	// Methods which control various aspects of recording
 	void UpdateTimeAdvancing( bool bPaused, DmeTime_t tCurTime );
@@ -74,9 +74,12 @@ public:
 	void SetRecordingMode( RecordingMode_t mode );
 	void SetPresetValue( CDmeChannel* pChannel, CDmAttribute *pPresetValue );
 
-	void SetProceduralTarget( int nProceduralMode, const CDmAttribute *pTarget );
-	void SetProceduralTarget( int nProceduralMode, const CUtlVector< KeyValues * >& list );
-	int GetProceduralType() const;
+	// dimhotepus: int -> DmeProceduralPresetType
+	void SetProceduralTarget( DmeProceduralPresetType nProceduralMode, const CDmAttribute *pTarget );
+	// dimhotepus: int -> DmeProceduralPresetType
+	void SetProceduralTarget( DmeProceduralPresetType nProceduralMode, const CUtlVector< KeyValues * >& list );
+	// dimhotepus: int -> DmeProceduralPresetType
+	DmeProceduralPresetType GetProceduralType() const;
 	const CDmAttribute *GetProceduralTarget() const;
 	const CUtlVector< KeyValues * > &GetPasteTarget() const;
 
@@ -107,7 +110,8 @@ private:
 	bool									m_bUseTimeSelection : 1;
 	CUtlVector< LayerChannelInfo_t >		m_LayerChannels;
 	DmeLog_TimeSelection_t					m_TimeSelection;
-	int										m_nRevealType;
+	// dimhotepus: int -> DmeProceduralPresetType
+	DmeProceduralPresetType					m_nRevealType;
 	const CDmAttribute						*m_pRevealTarget;
 	CUtlVector< KeyValues * >				m_PasteTarget;
 
@@ -126,11 +130,11 @@ class CDmeChannel : public CDmeOperator
 	DEFINE_ELEMENT( CDmeChannel, CDmeOperator );
 
 public:
-	virtual bool IsDirty(); // ie needs to operate
-	virtual void Operate();
+	bool IsDirty() override; // ie needs to operate
+	void Operate() override;
 
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs );
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) override;
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 	void SetInput ( CDmElement* pElement, const char* pAttribute, int index = 0 );
 	void SetOutput( CDmElement* pElement, const char* pAttribute, int index = 0 );
@@ -203,7 +207,7 @@ protected:
 	DmeTime_t m_tCurrentTime;
 	DmeTime_t m_tPreviousTime;
 
-	int m_nRecordLayerIndex;
+	intp m_nRecordLayerIndex;
 	int m_nNextCurveType;
 
 	friend class CDmeChannelRecordingMgr;

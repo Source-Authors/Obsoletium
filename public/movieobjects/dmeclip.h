@@ -123,8 +123,8 @@ class CDmeClip : public CDmElement
 
 public:
 	// Inherited from IDmElement
-	virtual void OnAttributeArrayElementAdded( CDmAttribute *pAttribute, int nFirstElem, int nLastElem );
-	virtual void OnAttributeArrayElementRemoved( CDmAttribute *pAttribute, int nFirstElem, int nLastElem );
+	void OnAttributeArrayElementAdded( CDmAttribute *pAttribute, intp nFirstElem, intp nLastElem ) override;
+	void OnAttributeArrayElementRemoved( CDmAttribute *pAttribute, intp nFirstElem, intp nLastElem ) override;
 
 	// Returns the time frame
 	CDmeTimeFrame *GetTimeFrame() const;
@@ -166,21 +166,21 @@ public:
 	virtual DmeClipType_t GetClipType() { return DMECLIP_UNKNOWN; }
 
 	// Track group iteration methods
-	int GetTrackGroupCount() const;
-	CDmeTrackGroup *GetTrackGroup( int nIndex ) const;
+	intp GetTrackGroupCount() const;
+	CDmeTrackGroup *GetTrackGroup( intp nIndex ) const;
 	const CUtlVector< DmElementHandle_t > &GetTrackGroups( ) const;
 
 	// Track group addition/removal
 	void AddTrackGroup( CDmeTrackGroup *pTrackGroup );
 	void AddTrackGroupBefore( CDmeTrackGroup *pTrackGroup, CDmeTrackGroup *pBefore );
 	CDmeTrackGroup *AddTrackGroup( const char *pTrackGroupName );
-	void RemoveTrackGroup( int nIndex );
+	void RemoveTrackGroup( intp nIndex );
 	void RemoveTrackGroup( CDmeTrackGroup *pTrackGroup );
 	void RemoveTrackGroup( const char *pTrackGroupName );
 
 	// Track group finding
 	CDmeTrackGroup *FindTrackGroup( const char *pTrackGroupName ) const;
-	int GetTrackGroupIndex( CDmeTrackGroup *pTrack ) const;
+	intp GetTrackGroupIndex( CDmeTrackGroup *pTrack ) const;
 	CDmeTrackGroup *FindOrAddTrackGroup( const char *pTrackGroupName );
 
 	// Swap track groups
@@ -188,7 +188,7 @@ public:
 
 	// Clip finding
 	virtual CDmeTrack *FindTrackForClip( CDmeClip *pClip, CDmeTrackGroup **ppTrackGroup = NULL ) const;
-	bool FindMultiTrackGroupForClip( CDmeClip *pClip, int *pTrackGroupIndex, int *pTrackIndex = NULL, int *pClipIndex = NULL ) const;
+	bool FindMultiTrackGroupForClip( CDmeClip *pClip, intp *pTrackGroupIndex, intp *pTrackIndex = NULL, intp *pClipIndex = NULL ) const;
 
 	// Finding clips in tracks by time
 	virtual void FindClipsAtTime( DmeClipType_t clipType, DmeTime_t time, DmeClipSkipFlag_t flags, CUtlVector< CDmeClip * >& clips ) const;
@@ -399,11 +399,11 @@ public:
 	void AddMonitorCamera( CDmeCamera *pCamera );
 	void RemoveMonitorCamera( CDmeCamera *pCamera );
 	void SelectMonitorCamera( CDmeCamera *pCamera );
-	int FindMonitorCamera( CDmeCamera *pCamera );
+	intp FindMonitorCamera( CDmeCamera *pCamera );
 
 	// Light helper methods
-	int GetLightCount();
-	CDmeLight *GetLight( int nIndex );
+	intp GetLightCount();
+	CDmeLight *GetLight( intp nIndex );
 	void AddLight( CDmeLight *pLight );
 
 	// Scene / Dag helper methods
@@ -411,8 +411,8 @@ public:
 	CDmeDag *GetScene();
 
 	// helper for inputs and operators
-	int GetInputCount();
-	CDmeInput *GetInput( int nIndex );
+	intp GetInputCount();
+	CDmeInput *GetInput( intp nIndex );
 	void AddInput( CDmeInput *pInput );
 	void RemoveAllInputs();
 	void AddOperator( CDmeOperator *pOperator );
@@ -433,8 +433,8 @@ public:
 	IVideoMaterial *GetCachedVideoMaterial();
 	void SetCachedAVI( const char *pAVIFile );
 
-	int	GetAnimationSetCount();
-	CDmeAnimationSet *GetAnimationSet( int idx );
+	intp	GetAnimationSetCount();
+	CDmeAnimationSet *GetAnimationSet( intp idx );
 	void	AddAnimationSet( CDmeAnimationSet *element );
 	void	RemoveAllAnimationSets();
 	CDmaElementArray< CDmElement > &GetAnimationSets(); // raw access to the array

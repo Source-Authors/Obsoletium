@@ -23,11 +23,11 @@ class CDmeOperator : public IDmeOperator, public CDmElement
 	DEFINE_ELEMENT( CDmeOperator, CDmElement );
 
 public:
-	virtual bool IsDirty(); // ie needs to operate
-	virtual void Operate() {}
+	bool IsDirty() override; // ie needs to operate
+	void Operate() override {}
 
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > & ) {}
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > & ) {}
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > & ) override {}
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > & ) override {}
 };
 
 

@@ -97,9 +97,9 @@ public:
 
 	inline void AddUV( const Vector2D &uv ) { AddUniqueValue( uv, m_uvs, m_uvIndexMap, FLT_EPSILON * 0.1f ); }
 
-	inline void AddUVIndex( int i ) { Assert( i < m_uvIndexMap.Count() ); m_uvIndices.AddToTail( m_uvIndexMap[ i ] ); }
+	inline void AddUVIndex( intp i ) { Assert( i < m_uvIndexMap.Count() ); m_uvIndices.AddToTail( m_uvIndexMap[ i ] ); }
 
-	inline int VertexCount() const { return m_pIndices.Count(); }
+	inline intp VertexCount() const { return m_pIndices.Count(); }
 
 	CDmeVertexDataBase *AddToMesh( CDmeMesh *pMesh, bool bAbsolute, const char *pName, bool bDelta );
 
@@ -107,11 +107,11 @@ protected:
 	template < class T_t > void AddUniqueValue(
 		const T_t &v,
 		CUtlVector< T_t > &vs,
-		CUtlVector< int > &map,
+		CUtlVector< intp > &map,
 		float flThresh = FLT_EPSILON )
 	{
-		const int nVs( vs.Count() );
-		for ( int i( 0 ); i < nVs; ++i )
+		const intp nVs( vs.Count() );
+		for ( intp i( 0 ); i < nVs; ++i )
 		{
 			if ( v.DistToSqr( vs[ i ] ) < flThresh )
 			{
@@ -135,7 +135,7 @@ protected:
 	CUtlVector< int > m_nIndices;
 
 	CUtlVector< Vector2D > m_uvs;
-	CUtlVector< int > m_uvIndexMap;
+	CUtlVector< intp > m_uvIndexMap;
 	CUtlVector< int > m_uvIndices;
 };
 
@@ -237,18 +237,18 @@ CDmeVertexDeltaData *CVertexData::AddDelta( CDmeMesh *pMesh, bool bAbsolute, con
 
 		CDmrArrayConst< Vector > pBindData( pBind->GetVertexData( pBindIndex ) );
 
-		const int pCount( m_positions.Count() );
+		const intp pCount( m_positions.Count() );
 		if ( pBindData.Count() != pCount )
 			return NULL;
 
-		for ( int i( 0 ); i < pCount; ++i )
+		for ( intp i( 0 ); i < pCount; ++i )
 		{
 			m_positions[ i ] -= pBindData[ i ];
 		}
 
 		int *pIndices = reinterpret_cast< int * >( alloca( pCount * sizeof( int ) ) );
-		int nNonZero( 0 );
-		for ( int i( 0 ); i < pCount; ++i )
+		intp nNonZero( 0 );
+		for ( intp i( 0 ); i < pCount; ++i )
 		{
 			const Vector &v( m_positions[ i ] );
 			// Kind of a magic number but it's because of 16 bit compression of the delta values
@@ -273,21 +273,22 @@ CDmeVertexDeltaData *CVertexData::AddDelta( CDmeMesh *pMesh, bool bAbsolute, con
 		if ( nBindNormalIndex >= 0 )
 		{
 			CDmrArrayConst< Vector > bindNormalData( pBind->GetVertexData( nBindNormalIndex ) );
-			const int nNormalCount = m_normals.Count();
+			const intp nNormalCount = m_normals.Count();
 			if ( bindNormalData.Count() == nNormalCount )
 			{
-				for ( int i = 0; i < nNormalCount; ++i )
+				for ( intp i = 0; i < nNormalCount; ++i )
 				{
 					m_normals[ i ] -= bindNormalData[ i ];
 				}
 
-				int *pNormalIndices = reinterpret_cast< int * >( stackalloc( nNormalCount * sizeof( int ) ) );
-				int nNormalDeltaCount = 0;
-				for ( int i = 0; i < nNormalCount; ++i )
+				intp *pNormalIndices = reinterpret_cast< intp * >( stackalloc( nNormalCount * sizeof( intp ) ) );
+				intp nNormalDeltaCount = 0;
+				constexpr float coeff = 1 / 4096.0f;
+				for ( intp i = 0; i < nNormalCount; ++i )
 				{
 					const Vector &n = m_normals[ i ];
 					// Kind of a magic number but it's because of 16 bit compression of the delta values
-					if ( fabs( n.x ) >= ( 1 / 4096.0f ) || fabs( n.y ) >= ( 1 / 4096.0f ) || fabs( n.z ) >= ( 1 / 4096.0f ) )
+					if ( fabs( n.x ) >= coeff || fabs( n.y ) >= coeff || fabs( n.z ) >= coeff )
 					{
 						m_normals[ nNormalDeltaCount ] = n;
 						pNormalIndices[ nNormalDeltaCount ] = i;
@@ -672,7 +673,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmObjSerializer::OutputVectors(
+intp CDmObjSerializer::OutputVectors(
 	CUtlBuffer &b,
 	const char *pPrefix,
 	const CUtlVector< Vector > &vData,
@@ -680,9 +681,9 @@ int CDmObjSerializer::OutputVectors(
 {
 	Vector v;
 
-	const int nv( vData.Count() );
+	const intp nv( vData.Count() );
 
-	for ( int i( 0 ); i < nv; ++i )
+	for ( intp i( 0 ); i < nv; ++i )
 	{
 		VectorTransform( vData[ i ], matrix, v );
 		b << pPrefix << v << "\n";
@@ -695,14 +696,14 @@ int CDmObjSerializer::OutputVectors(
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmObjSerializer::OutputVectors(
+intp CDmObjSerializer::OutputVectors(
 	CUtlBuffer &b,
 	const char *pPrefix,
 	const CUtlVector< Vector2D > &vData )
 {
-	const int nv( vData.Count() );
+	const intp nv( vData.Count() );
 
-	for ( int i( 0 ); i < nv; ++i )
+	for ( intp i( 0 ); i < nv; ++i )
 	{
 		b << pPrefix << vData[ i ] << "\n";
 	}
@@ -728,7 +729,7 @@ void CDmObjSerializer::MeshToObj(
 		pMesh->ComputeDependentDeltaStateList( compList );
 	}
 
-	const int nCompList( compList.Count() );
+	const intp nCompList( compList.Count() );
 
 	CDmeVertexData *pBase( pMesh->FindBaseState( "bind" ) );
 	if ( !pBase )
@@ -755,7 +756,7 @@ void CDmObjSerializer::MeshToObj(
 
 		if ( absolute )
 		{
-			for ( int i ( 0 ); i < nCompList; ++i )
+			for ( intp i ( 0 ); i < nCompList; ++i )
 			{
 				CDmeVertexDeltaData *pTmpDeltaState( pMesh->GetDeltaState( compList[ i ].m_nDeltaIndex ) );
 				if ( Q_strcmp( pTmpDeltaState->GetName(), pDeltaName ) )
@@ -765,8 +766,8 @@ void CDmObjSerializer::MeshToObj(
 				pMesh->AddDelta( pTmpDeltaState, pData.Base(), pData.Count(), CDmeVertexData::FIELD_POSITION, 1.0f );
 
 				const CUtlVector< int > &depDeltas( compList[ i ].m_DependentDeltas );
-				const int nDepDeltas( depDeltas.Count() );
-				for ( int j( 0 ); j < nDepDeltas; ++j )
+				const intp nDepDeltas( depDeltas.Count() );
+				for ( intp j( 0 ); j < nDepDeltas; ++j )
 				{
 					pTmpDeltaState = pMesh->GetDeltaState( depDeltas[ j ] );
 					b << "# Dependent Delta: " << pTmpDeltaState->GetName() << "\n";
@@ -776,7 +777,7 @@ void CDmObjSerializer::MeshToObj(
 		}
 		else
 		{
-			for ( int i ( 0 ); i < nCompList; ++i )
+			for ( intp i ( 0 ); i < nCompList; ++i )
 			{
 				CDmeVertexDeltaData *pTmpDeltaState( pMesh->GetDeltaState( compList[ i ].m_nDeltaIndex ) );
 				if ( Q_strcmp( pTmpDeltaState->GetName(), pDeltaName ) )
@@ -823,7 +824,7 @@ void CDmObjSerializer::MeshToObj(
 
 			if ( absolute )
 			{
-				for ( int i ( 0 ); i < nCompList; ++i )
+				for ( intp i ( 0 ); i < nCompList; ++i )
 				{
 					CDmeVertexDeltaData *pTmpDeltaState( pMesh->GetDeltaState( compList[ i ].m_nDeltaIndex ) );
 					if ( Q_strcmp( pTmpDeltaState->GetName(), pDeltaName ) )
@@ -833,8 +834,8 @@ void CDmObjSerializer::MeshToObj(
 					pMesh->AddDelta( pTmpDeltaState, nData.Base(), nData.Count(), CDmeVertexData::FIELD_NORMAL, 1.0f );
 
 					const CUtlVector< int > &depDeltas( compList[ i ].m_DependentDeltas );
-					const int nDepDeltas( depDeltas.Count() );
-					for ( int j( 0 ); j < nDepDeltas; ++j )
+					const intp nDepDeltas( depDeltas.Count() );
+					for ( intp j( 0 ); j < nDepDeltas; ++j )
 					{
 						pTmpDeltaState = pMesh->GetDeltaState( depDeltas[ j ] );
 						b << "# Dependent Delta: " << pTmpDeltaState->GetName() << "\n";
@@ -844,7 +845,7 @@ void CDmObjSerializer::MeshToObj(
 			}
 			else
 			{
-				for ( int i ( 0 ); i < nCompList; ++i )
+				for ( intp i ( 0 ); i < nCompList; ++i )
 				{
 					CDmeVertexDeltaData *pTmpDeltaState( pMesh->GetDeltaState( compList[ i ].m_nDeltaIndex ) );
 					if ( Q_strcmp( pTmpDeltaState->GetName(), pDeltaName ) )
@@ -863,12 +864,12 @@ void CDmObjSerializer::MeshToObj(
 		}
 	}
 
-	const int pCount( ppIndices->Count() );
-	const int uvCount( puvIndices ? puvIndices->Count() : 0 );
-	const int nCount( pnIndices ? pnIndices->Count() : 0 );
+	const intp pCount( ppIndices->Count() );
+	const intp uvCount( puvIndices ? puvIndices->Count() : 0 );
+	const intp nCount( pnIndices ? pnIndices->Count() : 0 );
 
-	const int nFaceSets( pMesh->FaceSetCount() );
-	for ( int i= 0 ; i < nFaceSets; ++i )
+	const intp nFaceSets( pMesh->FaceSetCount() );
+	for ( intp i= 0 ; i < nFaceSets; ++i )
 	{
 		CDmeFaceSet *pFaceSet( pMesh->GetFaceSet( i ) );
 		CDmeMaterial *pMaterial( pFaceSet->GetMaterial() );
@@ -877,7 +878,7 @@ void CDmObjSerializer::MeshToObj(
 			b << "usemtl " << pMaterial->GetMaterialName() << "\n";
 		}
 
-		const int nIndices( pFaceSet->NumIndices() );
+		const intp nIndices( pFaceSet->NumIndices() );
 		const int *pnFaceSetIndex( pFaceSet->GetIndices() );
 		const int *const pEnd( pnFaceSetIndex + nIndices );
 		int fIndex;
@@ -991,8 +992,8 @@ void CDmObjSerializer::DagToObj(
 		MeshToObj( b, inclusiveMatrix, pMesh, pDeltaName, absolute );
 	}
 
-	const int nChildren( pDag->GetChildCount() );
-	for ( int i( 0 ); i < nChildren; ++i )
+	const intp nChildren( pDag->GetChildCount() );
+	for ( intp i( 0 ); i < nChildren; ++i )
 	{
 		DagToObj( b, inclusiveMatrix, pDag->GetChild( i ), pDeltaName, absolute );
 	}
@@ -1010,8 +1011,8 @@ void CDmObjSerializer::FindDeltaMeshes( CDmeDag *pDag, CUtlVector< CDmeMesh * > 
 		meshes.AddToTail( pMesh );
 	}
 
-	const int nChildren( pDag->GetChildCount() );
-	for ( int i( 0 ); i < nChildren; ++i )
+	const intp nChildren( pDag->GetChildCount() );
+	for ( intp i( 0 ); i < nChildren; ++i )
 	{
 		FindDeltaMeshes( pDag->GetChild( i ), meshes );
 	}
@@ -1079,12 +1080,12 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 
 		char filename[ MAX_PATH ];
 
-		const int nDeltaMeshes( deltaMeshes.Count() );
-		for ( int i( 0 ); i < nDeltaMeshes; ++i )
+		const intp nDeltaMeshes( deltaMeshes.Count() );
+		for ( intp i( 0 ); i < nDeltaMeshes; ++i )
 		{
 			CDmeMesh *pDeltaMesh( deltaMeshes[ i ] );
-			const int nDeltas( pDeltaMesh->DeltaStateCount() );
-			for ( int j( 0 ); j < nDeltas; ++j )
+			const intp nDeltas( pDeltaMesh->DeltaStateCount() );
+			for ( intp j( 0 ); j < nDeltas; ++j )
 			{
 				CDmeVertexDeltaData *pDelta( pDeltaMesh->GetDeltaState( j ) );
 
@@ -1144,8 +1145,10 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 		if ( StringHasPrefix( tmpBuf0, "newmtl " ) )
 		{
 			char mtlName[1024];
-			if ( sscanf( tmpBuf0, "newmtl %s", mtlName ) == 1 )
+			if ( sscanf( tmpBuf0, "newmtl %1023s", mtlName ) == 1 )
 			{
+				mtlName[ssize(mtlName) - 1] = '\0';
+
 				// Remove any 'SG' suffix from the material
 				const size_t sLen = Q_strlen( mtlName );
 				if ( sLen > 2 && !Q_strcmp( mtlName + sLen - 2, "SG" ) )
@@ -1167,8 +1170,10 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 
 			char tgaPath[MAX_PATH];
 			char tgaName[1024];
-			if ( sscanf( tmpBuf0, "map_Kd %s", tgaPath ) == 1 )
+			if ( sscanf( tmpBuf0, "map_Kd %259s", tgaPath ) == 1 )
 			{
+				tgaPath[ssize(tgaPath) - 1] = '\0';
+
 				// Try a cheesy hack - look for /materialsrc/ and set the material name off the entire path minus extension
 				V_strcpy_safe( tmpBuf0, tgaPath );
 				Q_FixSlashes( tmpBuf0, '/' );
@@ -1196,14 +1201,14 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 //-----------------------------------------------------------------------------
 const char *CDmObjSerializer::FindMtlEntry( const char *pTgaName )
 {
-	int nCount = m_mtlLib.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_mtlLib.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( m_mtlLib[i].m_MtlName, pTgaName ) )
 			return m_mtlLib[i].m_TgaName;
 	}
 	return pTgaName;
-}									 
+}
 
 
 //-----------------------------------------------------------------------------
@@ -1317,146 +1322,3 @@ bool CDmObjSerializer::LoadDependentDeltas( const char *pDeltaName )
 	// TODO: Load Dependent Deltas
 	return true;
 }
-
-
-//-----------------------------------------------------------------------------
-// Counts the number of _'s in a string
-//-----------------------------------------------------------------------------
-int ComputeDimensionality( const char *pDeltaName )
-{
-	const char *pUnderBar = pDeltaName;
-	int nDimensions = 0;
-
-	while ( pUnderBar )
-	{
-		++nDimensions;
-		pUnderBar = strchr( pUnderBar, '_' );
-		if ( pUnderBar )
-		{
-			++pUnderBar;
-		}
-	}
-
-	return nDimensions;
-}
-
-/*
-//-----------------------------------------------------------------------------
-// Generates a sorted list in order of dimensionality of the delta states
-// NOTE: This assumes a naming scheme where delta state names have _ that separate control names
-//-----------------------------------------------------------------------------
-void CDmObjSerializer::ComputeDeltaStateComputationList( CUtlVector< CUtlVector< int > > &dependentDeltaList )
-{
-	// Do all combinations in order of dimensionality, lowest dimension first
-
-	for ( int i = 0; i < nDeltas; ++i )
-	{
-		compList[i].m_nDeltaIndex = i;
-		compList[i].m_nDimensionality = ComputeDeltaStateDimensionality( i );
-	}
-	qsort( compList.Base(), nCount, sizeof(DeltaComputation_t), DeltaStateLessFunc );
-}
-
-
-
-{
-	CUtlVector< CUtlString > atomicControls;
-	deltaStateUsage.SetCount( nCount );
-
-	// Build a list of atomic controls
-	int nCurrentDelta;
-	for ( nCurrentDelta = 0; nCurrentDelta < nCount; ++nCurrentDelta ) 
-	{
-		if ( pInfo[nCurrentDelta].m_nDimensionality != 1 )
-			break;
-		intp j = atomicControls.AddToTail( GetDeltaState( pInfo[nCurrentDelta].m_nDeltaIndex )->GetName() );
-		deltaStateUsage[ nCurrentDelta ].AddToTail( j );
-	}
-
-	for ( ; nCurrentDelta < nCount; ++nCurrentDelta )
-	{
-		CDmeVertexDeltaData *pDeltaState = GetDeltaState( pInfo[nCurrentDelta].m_nDeltaIndex );
-		intp nLen = Q_strlen( pDeltaState->GetName() );
-		char *pTempBuf = (char*)_alloca( nLen + 1 );
-		memcpy( pTempBuf, pDeltaState->GetName(), nLen+1 );
-		char *pNext;
-		for ( char *pUnderBar = pTempBuf; pUnderBar; pUnderBar = pNext )
-		{
-			pNext = strchr( pUnderBar, '_' );
-			if ( pNext )
-			{
-				*pNext = 0;
-				++pNext;
-			}
-
-			// Find this name in the list of strings
-			intp j;
-			intp nControlCount = atomicControls.Count();
-			for ( j = 0; j < nControlCount; ++j )
-			{
-				if ( !Q_stricmp( pUnderBar, atomicControls[j] ) )
-					break;
-			}
-			if ( j == nControlCount )
-			{
-				j = atomicControls.AddToTail( pUnderBar );
-			}
-			deltaStateUsage[ nCurrentDelta ].AddToTail( j );
-		}
-		deltaStateUsage[ nCurrentDelta ].Sort( DeltaStateUsageLessFunc );
-	}
-}
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-void CDmObjSerializer::ComputeDependentUsage( CUtlVector< CUtlVector< int > > &deltaUsage )
-{
-	const unsigned short nDeltas = m_deltas.GetNumStrings();
-	compList.EnsureCount( nDeltas );
-
-	CUtlVector< CUtlVector< int > > deltaStateUsage;
-	const int nCount( compList.Count() );
-	BuildAtomicControlLists( nCount, compList.Base(), deltaStateUsage );
-
-	// Now build up a list of dependent delta states based on usage
-	// NOTE: Usage is sorted in ascending order.
-	for ( int i = 1; i < nCount; ++i )
-	{
-		int nUsageCount1 = deltaStateUsage[i].Count();
-		for ( int j = 0; j < i; ++j )
-		{
-			// At the point they have the same dimensionality, no more need to check
-			if ( compList[j].m_nDimensionality == compList[i].m_nDimensionality )
-				break;
-
-			int ii = 0;
-			bool bSubsetFound = true;
-			int nUsageCount2 = deltaStateUsage[j].Count();
-			for ( int ji = 0; ji < nUsageCount2; ++ji )
-			{
-				for ( bSubsetFound = false; ii < nUsageCount1; ++ii )
-				{
-					if ( deltaStateUsage[j][ji] == deltaStateUsage[i][ii] )
-					{
-						++ii;
-						bSubsetFound = true;
-						break;
-					}
-
-					if ( deltaStateUsage[j][ji] < deltaStateUsage[i][ii] )
-						break;
-				}
-
-				if ( !bSubsetFound )
-					break;
-			}
-
-			if ( bSubsetFound )
-			{
-				compList[i].m_DependentDeltas.AddToTail( compList[j].m_nDeltaIndex );
-			}
-		}
-	}
-}
-*/

@@ -42,10 +42,10 @@ const CDmaElementArray< CDmElement > &CDmePreset::GetControlValues() const
 	return m_ControlValues;
 }
 
-int CDmePreset::FindControlValueIndex( const char *pControlName )
+intp CDmePreset::FindControlValueIndex( const char *pControlName )
 {
-	int c = m_ControlValues.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_ControlValues.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *e = m_ControlValues.Get( i );
 		if ( !Q_stricmp( e->GetName(), pControlName ) )
@@ -56,7 +56,7 @@ int CDmePreset::FindControlValueIndex( const char *pControlName )
 
 CDmElement *CDmePreset::FindControlValue( const char *pControlName )
 {
-	int i = FindControlValueIndex( pControlName );
+	intp i = FindControlValueIndex( pControlName );
 	if ( i >= 0 )
 		return m_ControlValues.Get(i);
 	return NULL;
@@ -76,7 +76,7 @@ CDmElement *CDmePreset::FindOrAddControlValue( const char *pControlName )
 
 void CDmePreset::RemoveControlValue( const char *pControlName )
 {
-	int i = FindControlValueIndex( pControlName );
+	intp i = FindControlValueIndex( pControlName );
 	if ( i >= 0 )
 	{
 		m_ControlValues.Remove( i );
@@ -87,7 +87,7 @@ void CDmePreset::RemoveControlValue( const char *pControlName )
 //-----------------------------------------------------------------------------
 // Is the preset read-only?
 //-----------------------------------------------------------------------------
-bool CDmePreset::IsReadOnly()
+bool CDmePreset::IsReadOnly() const
 {
 	DmAttributeReferenceIterator_t h = g_pDataModel->FirstAttributeReferencingElement( GetHandle() );
 	while ( h != DMATTRIBUTE_REFERENCE_ITERATOR_INVALID )
@@ -110,15 +110,15 @@ void CDmePreset::CopyControlValuesFrom( CDmePreset *pSource )
 	m_ControlValues.RemoveAll();
 
 	const CDmaElementArray< CDmElement > &sourceValues = pSource->GetControlValues();
-	int nCount = sourceValues.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = sourceValues.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pCopy = sourceValues[i]->Copy( );
 		m_ControlValues.AddToTail( pCopy );
 	}
 }
 
-void CDmePreset::SetProceduralPresetType( int nType )
+void CDmePreset::SetProceduralPresetType( DmeProceduralPresetType nType )
 {
 	Assert( nType >= 0 && nType < NUM_PROCEDURAL_PRESET_TYPES );
 	m_nProceduralType = nType;
@@ -129,7 +129,7 @@ bool CDmePreset::IsProcedural() const
 	return m_nProceduralType != PROCEDURAL_PRESET_NOT;
 }
 
-int CDmePreset::GetProceduralPresetType() const
+DmeProceduralPresetType CDmePreset::GetProceduralPresetType() const
 {
 	return m_nProceduralType;
 }
@@ -175,8 +175,8 @@ void CDmePresetRemap::OnDestruction()
 
 const char *CDmePresetRemap::FindSourcePreset( const char *pDestPresetName )
 {
-	int nCount = m_DestPresets.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_DestPresets.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pDestPresetName, m_DestPresets[i] ) )
 			return m_SrcPresets[i];
@@ -200,17 +200,17 @@ void CDmePresetRemap::RemoveAll()
 //-----------------------------------------------------------------------------
 // Iteration
 //-----------------------------------------------------------------------------
-int CDmePresetRemap::GetRemapCount()
+intp CDmePresetRemap::GetRemapCount()
 {
 	return m_SrcPresets.Count();
 }
 
-const char *CDmePresetRemap::GetRemapSource( int i )
+const char *CDmePresetRemap::GetRemapSource( intp i )
 {
 	return m_SrcPresets[i];
 }
 
-const char *CDmePresetRemap::GetRemapDest( int i )
+const char *CDmePresetRemap::GetRemapDest( intp i )
 {
 	return m_DestPresets[i];
 }
@@ -245,10 +245,10 @@ const CDmaElementArray< CDmePreset > &CDmePresetGroup::GetPresets() const
 //-----------------------------------------------------------------------------
 // Finds the index of a particular preset group
 //-----------------------------------------------------------------------------
-int CDmePresetGroup::FindPresetIndex( CDmePreset *pPreset )
+intp CDmePresetGroup::FindPresetIndex( CDmePreset *pPreset )
 {
-	int c = m_Presets.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Presets.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmePreset *e = m_Presets.Get( i );
 		if ( pPreset == e )
@@ -260,9 +260,8 @@ int CDmePresetGroup::FindPresetIndex( CDmePreset *pPreset )
 
 CDmePreset *CDmePresetGroup::FindPreset( const char *pPresetName )
 {
-	int i;
-	int c = m_Presets.Count();
-	for ( i = 0; i < c; ++i )
+	intp c = m_Presets.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmePreset *e = m_Presets.Get( i );
 		if ( !Q_stricmp( e->GetName(), pPresetName ) )
@@ -271,7 +270,7 @@ CDmePreset *CDmePresetGroup::FindPreset( const char *pPresetName )
 	return NULL;
 }
 
-CDmePreset *CDmePresetGroup::FindOrAddPreset( const char *pPresetName, int nType /*=PROCEDURAL_PRESET_NOT*/ )
+CDmePreset *CDmePresetGroup::FindOrAddPreset( const char *pPresetName, DmeProceduralPresetType nType /*=PROCEDURAL_PRESET_NOT*/ )
 {
 	CDmePreset *pPreset = FindPreset( pPresetName );
 	if ( !pPreset )
@@ -286,7 +285,7 @@ CDmePreset *CDmePresetGroup::FindOrAddPreset( const char *pPresetName, int nType
 
 bool CDmePresetGroup::RemovePreset( CDmePreset *pPreset )
 {
-	int i = FindPresetIndex( pPreset );
+	intp i = FindPresetIndex( pPreset );
 	if ( i >= 0 )
 	{
 		m_Presets.Remove( i );
@@ -297,7 +296,7 @@ bool CDmePresetGroup::RemovePreset( CDmePreset *pPreset )
 
 void CDmePresetGroup::MovePresetUp( CDmePreset *pPreset )
 {
-	int i = FindPresetIndex( pPreset );
+	intp i = FindPresetIndex( pPreset );
 	if ( i >= 1 )
 	{
 		m_Presets.Swap( i, i-1 );
@@ -306,7 +305,7 @@ void CDmePresetGroup::MovePresetUp( CDmePreset *pPreset )
 
 void CDmePresetGroup::MovePresetDown( CDmePreset *pPreset )
 {
-	int i = FindPresetIndex( pPreset );
+	intp i = FindPresetIndex( pPreset );
 	if ( i >= 0 && i < m_Presets.Count() - 1 )
 	{
 		m_Presets.Swap( i, i+1 );
@@ -322,7 +321,7 @@ void CDmePresetGroup::MovePresetInFrontOf( CDmePreset *pPreset, CDmePreset *pInF
 	if ( pPreset == pInFrontOf )
 		return;
 
-	int nEnd = pInFrontOf ? FindPresetIndex( pInFrontOf ) : m_Presets.Count();
+	intp nEnd = pInFrontOf ? FindPresetIndex( pInFrontOf ) : m_Presets.Count();
 	Assert( nEnd >= 0 );
 	 
 	RemovePreset( pPreset );
@@ -370,10 +369,10 @@ struct ExportedControl_t
 //-----------------------------------------------------------------------------
 // Builds a unique list of controls found in the presets
 //-----------------------------------------------------------------------------
-static int FindExportedControlIndex( const char *pControlName, CUtlVector< ExportedControl_t > &uniqueControls )
+static intp FindExportedControlIndex( const char *pControlName, CUtlVector< ExportedControl_t > &uniqueControls )
 {
-	int nCount = uniqueControls.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = uniqueControls.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pControlName, uniqueControls[i].m_Name ) )
 			return i;
@@ -389,17 +388,17 @@ static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, const CDme
 {
 	int nGlobalIndex = 0;
 	const CDmrElementArrayConst< CDmePreset > &presets = pPresetGroup->GetPresets();
-	int nPresetCount = presets.Count();
-	for ( int iPreset = 0; iPreset < nPresetCount; ++iPreset )
+	intp nPresetCount = presets.Count();
+	for ( intp iPreset = 0; iPreset < nPresetCount; ++iPreset )
 	{
 		CDmePreset *pPreset = presets[iPreset];
 		const CDmrElementArray< CDmElement > &controls = pPreset->GetControlValues();
 
-		int nControlCount = controls.Count();
-		for ( int i = 0; i < nControlCount; ++i )
+		intp nControlCount = controls.Count();
+		for ( intp i = 0; i < nControlCount; ++i )
 		{
 			const char *pControlName = controls[i]->GetName();
-			int nIndex = FindExportedControlIndex( pControlName, uniqueControls );
+			intp nIndex = FindExportedControlIndex( pControlName, uniqueControls );
 			if ( nIndex >= 0 )
 				continue;
 			CDmAttribute *pValueAttribute = controls[i]->GetAttribute( "value" );
@@ -455,8 +454,8 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 
 	// Output the unique keys
 	buf.Printf( "$keys " );
-	int nExportedControlCount = exportedControls.Count();
-	for ( int i = 0; i < nExportedControlCount; ++i )
+	intp nExportedControlCount = exportedControls.Count();
+	for ( intp i = 0; i < nExportedControlCount; ++i )
 	{
 		char pTempBuf[MAX_PATH];
 
@@ -485,8 +484,8 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 
 	// Output all presets
 	const CDmrElementArrayConst< CDmePreset > &presets = pPresetGroup->GetPresets();
-	int nPresetCount = presets.Count();
-	for ( int iPreset = 0; iPreset < nPresetCount; ++iPreset )
+	intp nPresetCount = presets.Count();
+	for ( intp iPreset = 0; iPreset < nPresetCount; ++iPreset )
 	{
 		CDmePreset *pPreset = presets[iPreset];
 		const char *pPresetName = pPreset->GetName();
@@ -514,7 +513,7 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 			buf.Printf( "\"0x%x\"\t", nCode );
 		}
 
-		for ( int i = 0; i < nExportedControlCount; ++i )
+		for ( intp i = 0; i < nExportedControlCount; ++i )
 		{
 			ExportedControl_t &control = exportedControls[i];
 			CDmElement *pControlValue = pPreset->FindControlValue( control.m_Name );
@@ -602,7 +601,7 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 #ifdef ALIGN4
 #undef ALIGN4
 #endif // #ifdef ALIGN4
-#define ALIGN4( a ) a = (byte *)((intp)((byte *)a + 3) & ~ 3)
+#define ALIGN4( a ) a = AlignValue(a, 4)
 
 
 //-----------------------------------------------------------------------------
@@ -618,7 +617,7 @@ bool CDmePresetGroup::ExportToVFE( const char *pFileName, CDmeAnimationSet *pAni
 	// find all used controls
 	CUtlVector< ExportedControl_t > exportedControls;
 	int nTotalControlCount = BuildExportedControlList( pAnimationSet, pPresetGroup, exportedControls );
-	const int nExportedControlCount = exportedControls.Count();
+	const intp nExportedControlCount = exportedControls.Count();
 
 	byte *pData = (byte *)calloc( 1024 * 1024, 1 );
 	byte *pDataStart = pData;
@@ -652,7 +651,7 @@ bool CDmePresetGroup::ExportToVFE( const char *pFileName, CDmeAnimationSet *pAni
 
 		flexweight_t *pFlexWeights = (flexweight_t *)pData;
 
-		for ( int j = 0; j < nExportedControlCount; j++ )
+		for ( intp j = 0; j < nExportedControlCount; j++ )
 		{
 			ExportedControl_t &control = exportedControls[ j ];
 			CDmElement *pControlValue = pPreset->FindControlValue( control.m_Name );
@@ -817,7 +816,7 @@ bool CDmePresetGroup::ExportToVFE( const char *pFileName, CDmeAnimationSet *pAni
 	fhdr->numkeys = nTotalControlCount;
 	fhdr->keynameindex = pData - pDataStart;
 	pData += sizeof(char *) * nTotalControlCount;
-	int j = 0;
+	intp j = 0;
 	for ( i = 0; i < nExportedControlCount; ++i )
 	{
 		char pTempBuf[MAX_PATH];
@@ -925,8 +924,8 @@ void CDmeAnimationSet::AddOperator( CDmeOperator *pOperator )
 
 void CDmeAnimationSet::RemoveOperator( CDmeOperator *pOperator )
 {
-	int nCount = m_Operators.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Operators.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Operators[i] == pOperator )
 		{
@@ -957,10 +956,10 @@ void CDmeAnimationSet::OnElementUnserialized()
 //-----------------------------------------------------------------------------
 // Finds the index of a particular preset group
 //-----------------------------------------------------------------------------
-int CDmeAnimationSet::FindPresetGroupIndex( CDmePresetGroup *pPresetGroup )
+intp CDmeAnimationSet::FindPresetGroupIndex( CDmePresetGroup *pPresetGroup )
 {
-	int c = m_PresetGroups.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_PresetGroups.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmePresetGroup *e = m_PresetGroups.Get( i );
 		if ( pPresetGroup == e )
@@ -969,10 +968,10 @@ int CDmeAnimationSet::FindPresetGroupIndex( CDmePresetGroup *pPresetGroup )
 	return -1; 
 }
 
-int CDmeAnimationSet::FindPresetGroupIndex( const char *pGroupName )
+intp CDmeAnimationSet::FindPresetGroupIndex( const char *pGroupName )
 {
-	int c = m_PresetGroups.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_PresetGroups.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmePresetGroup *e = m_PresetGroups.Get( i );
 		if ( e && !Q_stricmp( e->GetName(), pGroupName ) )
@@ -987,7 +986,7 @@ int CDmeAnimationSet::FindPresetGroupIndex( const char *pGroupName )
 //-----------------------------------------------------------------------------
 CDmePresetGroup *CDmeAnimationSet::FindPresetGroup( const char *pGroupName )
 {
-	int nIndex = FindPresetGroupIndex( pGroupName );
+	intp nIndex = FindPresetGroupIndex( pGroupName );
 	if ( nIndex >= 0 )
 		return m_PresetGroups[nIndex];
 	return NULL;
@@ -1015,7 +1014,7 @@ CDmePresetGroup *CDmeAnimationSet::FindOrAddPresetGroup( const char *pGroupName 
 //-----------------------------------------------------------------------------
 bool CDmeAnimationSet::RemovePresetGroup( CDmePresetGroup *pPresetGroup )
 {
-	int i = FindPresetGroupIndex( pPresetGroup );
+	intp i = FindPresetGroupIndex( pPresetGroup );
 	if ( i >= 0 )
 	{
 		m_PresetGroups.Remove( i );
@@ -1030,7 +1029,7 @@ bool CDmeAnimationSet::RemovePresetGroup( CDmePresetGroup *pPresetGroup )
 //-----------------------------------------------------------------------------
 void CDmeAnimationSet::MovePresetGroupUp( CDmePresetGroup *pPresetGroup )
 {
-	int i = FindPresetGroupIndex( pPresetGroup );
+	intp i = FindPresetGroupIndex( pPresetGroup );
 	if ( i >= 1 )
 	{
 		m_PresetGroups.Swap( i, i-1 );
@@ -1039,7 +1038,7 @@ void CDmeAnimationSet::MovePresetGroupUp( CDmePresetGroup *pPresetGroup )
 
 void CDmeAnimationSet::MovePresetGroupDown( CDmePresetGroup *pPresetGroup )
 {
-	int i = FindPresetGroupIndex( pPresetGroup );
+	intp i = FindPresetGroupIndex( pPresetGroup );
 	if ( i >= 0 && i < m_PresetGroups.Count() - 1 )
 	{
 		m_PresetGroups.Swap( i, i+1 );
@@ -1056,10 +1055,10 @@ void CDmeAnimationSet::MovePresetGroupInFrontOf( CDmePresetGroup *pPresetGroup, 
 		return;
 
 #ifdef DBGFLAG_ASSERT
-	int nStart = FindPresetGroupIndex( pPresetGroup );
+	intp nStart = FindPresetGroupIndex( pPresetGroup );
 #endif
 
-	int nEnd = pInFrontOf ? FindPresetGroupIndex( pInFrontOf ) : m_PresetGroups.Count();
+	intp nEnd = pInFrontOf ? FindPresetGroupIndex( pInFrontOf ) : m_PresetGroups.Count();
 	Assert( nStart >= 0 && nEnd >= 0 );
 
 	RemovePresetGroup( pPresetGroup );
@@ -1071,7 +1070,7 @@ void CDmeAnimationSet::MovePresetGroupInFrontOf( CDmePresetGroup *pPresetGroup, 
 }
 
 
-CDmePreset *CDmeAnimationSet::FindOrAddPreset( const char *pGroupName, const char *pPresetName, int nType /*=PROCEDURAL_PRESET_NOT*/ )
+CDmePreset *CDmeAnimationSet::FindOrAddPreset( const char *pGroupName, const char *pPresetName, DmeProceduralPresetType nType /*=PROCEDURAL_PRESET_NOT*/ )
 {
 	CDmePresetGroup *pPresetGroup = FindOrAddPresetGroup( pGroupName );
 	return pPresetGroup->FindOrAddPreset( pPresetName, nType );
@@ -1079,8 +1078,8 @@ CDmePreset *CDmeAnimationSet::FindOrAddPreset( const char *pGroupName, const cha
 
 bool CDmeAnimationSet::RemovePreset( CDmePreset *pPreset )
 {
-	int c = m_PresetGroups.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_PresetGroups.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( m_PresetGroups[i]->RemovePreset( pPreset ) )
 			return true;
@@ -1114,16 +1113,15 @@ void CDmeAnimationSet::RestoreDefaultPhonemeMap()
 {
 	CUndoScopeGuard guard( "RestoreDefaultPhonemeMap" );
 
-	int i;
-	int c = m_PhonemeMap.Count();
-	for ( i = 0; i < c; ++i )
+	intp c = m_PhonemeMap.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		g_pDataModel->DestroyElement( m_PhonemeMap[ i ]->GetHandle() );
 	}
 	m_PhonemeMap.Purge();
 
 	int phonemeCount = NumPhonemes();
-	for ( i = 0; i < phonemeCount; ++i )
+	for ( int i = 0; i < phonemeCount; ++i )
 	{
 		const char *pName = NameForPhonemeByIndex( i );
 		CDmePhonemeMapping *mapping = CreateElement< CDmePhonemeMapping >( pName, GetFileId() );
@@ -1138,8 +1136,8 @@ void CDmeAnimationSet::RestoreDefaultPhonemeMap()
 
 CDmePhonemeMapping *CDmeAnimationSet::FindMapping( const char *pRawPhoneme )
 {
-	int c = m_PhonemeMap.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_PhonemeMap.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmePhonemeMapping *e = m_PhonemeMap.Get( i );
 		Assert( e );
@@ -1158,8 +1156,8 @@ CDmePhonemeMapping *CDmeAnimationSet::FindMapping( const char *pRawPhoneme )
 //-----------------------------------------------------------------------------
 CDmElement *CDmeAnimationSet::FindControl( const char *pControlName )
 {
-	int c = m_Controls.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Controls.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *e = m_Controls.Get( i );
 		if ( !Q_stricmp( e->GetName(), pControlName ) )
@@ -1187,8 +1185,8 @@ CDmElement *CDmeAnimationSet::FindOrAddControl( const char *pControlName )
 
 CDmElement *CDmeAnimationSet::FindSelectionGroup( const char *pSelectionGroupName )
 {
-	int c = m_SelectionGroups.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_SelectionGroups.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *e = m_SelectionGroups.Get( i );
 		if ( !Q_stricmp( e->GetName(), pSelectionGroupName ) )
@@ -1212,8 +1210,8 @@ CDmElement *CDmeAnimationSet::FindOrAddSelectionGroup( const char *pSelectionGro
 
 void CDmeAnimationSet::CollectOperators( CUtlVector< DmElementHandle_t > &operators )
 {
-	int numOperators = m_Operators.Count();
-	for ( int i = 0; i < numOperators; ++i )
+	intp numOperators = m_Operators.Count();
+	for ( intp i = 0; i < numOperators; ++i )
 	{
 		DmElementHandle_t h = m_Operators.GetHandle( i );
 		if ( h != DMELEMENT_HANDLE_INVALID )
@@ -1225,7 +1223,8 @@ void CDmeAnimationSet::CollectOperators( CUtlVector< DmElementHandle_t > &operat
 
 struct PPType_t
 {
-	int type;
+	// dimhotepus: int -> DmeProceduralPresetType
+	DmeProceduralPresetType type;
 	char const *name;
 };
 
@@ -1305,8 +1304,8 @@ void CModelPresetGroupManager::AssociatePresetsWithFile( DmFileId_t fileId )
 	m_Lookup.Clear();
 	if ( m_FileId != DMFILEID_INVALID )
 	{
-		int nCount = m_QueuedPresetRequest.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = m_QueuedPresetRequest.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			QueuedPresetRequest_t &request = m_QueuedPresetRequest[i];
 			if ( request.m_hAnimationSet.Get() )
@@ -1390,11 +1389,11 @@ void CModelPresetGroupManager::ApplyModelPresets( const char *pModelName, CDmeAn
 	}
 
 	PresetGroupList_t &list = m_Lookup[pModelName];
-	int nCount = list.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = list.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = list[i];
-		int nIndex = pAnimationSet->FindPresetGroupIndex( pPresetGroup->GetName() );
+		intp nIndex = pAnimationSet->FindPresetGroupIndex( pPresetGroup->GetName() );
 		if ( nIndex >= 0 )
 		{
 			pAnimationSet->GetPresetGroups().Set( nIndex, pPresetGroup );

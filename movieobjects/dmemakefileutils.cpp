@@ -40,7 +40,6 @@ CDmeMakefileUtils::CDmeMakefileUtils() : BaseClass( false )
 
 CDmeMakefileUtils::~CDmeMakefileUtils()
 {
-
 }
 
 
@@ -318,8 +317,8 @@ bool CDmeMakefileUtils::PerformCompilationStep( CompilationStep_t step )
 {
 	// Iterate through all elements and run a compilation step
 	m_CompilationStep = step;
-	int nCount = m_CompileTasks.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_CompileTasks.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CompileInfo_t &info = m_CompileTasks[i];
 		if ( info.m_hElement.Get() )
@@ -423,7 +422,7 @@ intp CDmeMakefileUtils::GetCompileOutputSize()
 	return g_pProcessUtils->GetProcessOutputSize( m_hCompileProcess );
 }
 
-CompilationState_t CDmeMakefileUtils::UpdateCompilation( char *pOutputBuf, int nBufLen )
+CompilationState_t CDmeMakefileUtils::UpdateCompilation( char *pOutputBuf, intp nBufLen )
 {
 	switch( m_CompilationStep )
 	{
