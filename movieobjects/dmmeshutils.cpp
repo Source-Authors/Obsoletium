@@ -2335,12 +2335,18 @@ DmFileId_t CreateUniqueFileId()
 	UniqueId_t uniqueId;
 	char fileIdBuf[ MAX_PATH ];
 
+	int counter = 0;
+
 	do 
 	{
-		CreateUniqueId( &uniqueId );
-		UniqueIdToString( uniqueId, fileIdBuf, sizeof( fileIdBuf ) );
+		// dimhotepus: Try to create uuid up to 10 times to prevent infinite cycle.
+		if ( CreateUniqueId( &uniqueId ) && UniqueIdToString( uniqueId, fileIdBuf ) )
+			fileId = g_pDataModel->GetFileId( fileIdBuf );
+		else
+			++counter;
 
-		fileId = g_pDataModel->GetFileId( fileIdBuf );
+		if (counter == 10)
+			return DMFILEID_INVALID;
 	} while( fileId != DMFILEID_INVALID );
 
 	return g_pDataModel->FindOrCreateFileId( fileIdBuf );

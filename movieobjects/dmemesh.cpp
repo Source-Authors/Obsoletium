@@ -3261,12 +3261,18 @@ CDmeVertexDeltaData *CDmeMesh::ModifyOrCreateDeltaStateFromBaseState( const char
 		UniqueId_t id;
 		char idBuf[ MAX_PATH ];
 
+		int counter = 0;
 		CDmeVertexData *pTmpBaseState = NULL;
 		do 
 		{
-			CreateUniqueId( &id );
-			UniqueIdToString( id, idBuf, sizeof( idBuf ) );
-			pTmpBaseState = FindBaseState( idBuf );
+			// dimhotepus: Try to create uuid up to 10 times to prevent infinite cycle.
+			if ( CreateUniqueId( &id ) && UniqueIdToString( id, idBuf ) )
+				pTmpBaseState = FindBaseState( idBuf );
+			else
+				++counter;
+
+			if (counter == 10)
+				return NULL;
 		} while( pTmpBaseState != NULL );
 
 		pTmpBaseState = FindOrCreateBaseState( idBuf );
