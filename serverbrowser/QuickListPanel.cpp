@@ -242,7 +242,7 @@ void CQuickListPanel::SetServerInfo ( KeyValues *pKV, int iListID, int iTotalSer
 	{
 		wchar_t *pwszServers = g_pVGuiLocalize->Find("#ServerBrowser_QuickListOtherServers");
 		_snwprintf( playercount, std::size(playercount), L"%d", (iTotalServers-1) );
-		g_pVGuiLocalize->ConstructString( players, sizeof( players ), pwszServers, 1, playercount );
+		g_pVGuiLocalize->ConstructString_safe( players, pwszServers, 1, playercount );
 		m_pOtherServersLabel->SetText( players );
 		m_pOtherServersLabel->SetVisible( true );
 	}

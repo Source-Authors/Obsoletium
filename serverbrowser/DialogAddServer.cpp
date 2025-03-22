@@ -249,7 +249,7 @@ void CDialogAddServer::TestServers()
 	{
 		wchar_t waddress[512];
 		Q_UTF8ToUnicode( address, waddress, sizeof( waddress ) );
-		g_pVGuiLocalize->ConstructString( wstr, sizeof( wstr ), g_pVGuiLocalize->Find( "#ServerBrowser_ServersResponding"), 1, waddress );
+		g_pVGuiLocalize->ConstructString_safe( wstr, g_pVGuiLocalize->Find( "#ServerBrowser_ServersResponding"), 1, waddress );
 	}
 		
 	char str[512];

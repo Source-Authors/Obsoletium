@@ -1228,7 +1228,7 @@ void CBaseGamesPage::UpdateStatus()
 
 		_snwprintf( count, std::size(count), L"%d", m_pGameList->GetItemCount() );
 		_snwprintf( blacklistcount, std::size(blacklistcount), L"%d", m_iServersBlacklisted );
-		g_pVGuiLocalize->ConstructString( header, sizeof( header ), g_pVGuiLocalize->Find( "#ServerBrowser_ServersCountWithBlacklist"), 2, count, blacklistcount );
+		g_pVGuiLocalize->ConstructString_safe( header, g_pVGuiLocalize->Find( "#ServerBrowser_ServersCountWithBlacklist"), 2, count, blacklistcount );
 		m_pGameList->SetColumnHeaderText( k_nColumn_Name, header);
 	}
 	else
@@ -2169,7 +2169,7 @@ void CBaseGamesPage::OnBeginConnect()
 				_snwprintf( wszServerMaxPlayers, std::size(wszServerMaxPlayers), L"%d", iMaxCount );
 				_snwprintf( wszDesignedMaxPlayers, std::size(wszDesignedMaxPlayers), L"%d", iMaxP );
 				Q_UTF8ToUnicode( ModList().GetModNameForModDir( m_iLimitToAppID ), wszGameName, ssize(wszGameName) );
-				g_pVGuiLocalize->ConstructString( wszWarning, sizeof( wszWarning ), g_pVGuiLocalize->Find( "#ServerBrowser_ServerWarning_MaxPlayers"), 4, wszServerMaxPlayers, wszGameName, wszDesignedMaxPlayers, wszDesignedMaxPlayers );
+				g_pVGuiLocalize->ConstructString_safe( wszWarning, g_pVGuiLocalize->Find( "#ServerBrowser_ServerWarning_MaxPlayers"), 4, wszServerMaxPlayers, wszGameName, wszDesignedMaxPlayers, wszDesignedMaxPlayers );
 				dlg->SetDialogVariable( "warning", wszWarning );
 
 				return;
