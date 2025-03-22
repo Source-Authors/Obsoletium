@@ -1805,7 +1805,7 @@ void COptionsSubVideo::OnApplyChanges()
 	{
 		// set mode
 		char szCmd[ 256 ];
-		Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i %i\n", width, height, windowed ? 1 : 0, borderless ? 1 : 0 );
+		Q_snprintf( szCmd, sizeof( szCmd ), "mat_setvideomode %i %i %i %i\n", width, height, windowed || borderless ? 1 : 0, borderless ? 1 : 0 );
 		engine->ClientCmd_Unrestricted( szCmd );
 	}
 
