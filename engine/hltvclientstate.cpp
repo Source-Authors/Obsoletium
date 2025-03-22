@@ -535,7 +535,10 @@ bool CHLTVClientState::ProcessGameEvent( SVC_GameEvent *msg )
 			m_pHLTV->m_nGlobalSlots = event->GetInt("slots");
 			m_pHLTV->m_nGlobalProxies = event->GetInt("proxies");
 			m_pHLTV->m_nGlobalClients = event->GetInt("clients");
-			m_pHLTV->m_RootServer.SetFromString( event->GetString("master") );
+			if ( !m_pHLTV->m_RootServer.SetFromString( event->GetString("master") ) )
+			{
+				Warning("hltv_status event master server address %s is invalid.\n", event->GetString("master"));
+			}
 			bDontForward = true;
 		}
 		else if ( Q_strcmp( pszName, "hltv_title" ) == 0 )
