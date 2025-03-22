@@ -328,7 +328,7 @@ void	ClientModeShared::ComputeVguiResConditions( KeyValues *pkvConditions )
 {
 	if ( UseVR() )
 	{
-		pkvConditions->FindKey( "if_vr", true );
+		(void)pkvConditions->FindKey( "if_vr", true );
 	}
 }
 

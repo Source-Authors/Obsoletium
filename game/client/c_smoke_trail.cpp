@@ -473,17 +473,17 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
 
 		KeyValues *pUpdaters = pEmitter->FindKey( "updaters", true );
 	    
-		pUpdaters->FindKey( "DmePositionVelocityUpdater", true );
-		pUpdaters->FindKey( "DmeRollUpdater", true );
+		(void)pUpdaters->FindKey( "DmePositionVelocityUpdater", true );
+		(void)pUpdaters->FindKey( "DmeRollUpdater", true );
 
 		KeyValues *pRollSpeedUpdater = pUpdaters->FindKey( "DmeRollSpeedAttenuateUpdater", true );
 		pRollSpeedUpdater->SetFloat( "attenuation", 1.0f - 8.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "attenuationTme", 1.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "minRollSpeed", 0.5f );
 
-		pUpdaters->FindKey( "DmeAlphaSineUpdater", true );
-		pUpdaters->FindKey( "DmeColorUpdater", true );
-		pUpdaters->FindKey( "DmeSizeUpdater", true );
+		(void)pUpdaters->FindKey( "DmeAlphaSineUpdater", true );
+		(void)pUpdaters->FindKey( "DmeColorUpdater", true );
+		(void)pUpdaters->FindKey( "DmeSizeUpdater", true );
 
 		KeyValues *pEmitter2 = pEmitter->MakeCopy();
 		pEmitter2->SetString( "material", "particle/particle_noisesphere" );
@@ -1995,17 +1995,17 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 		pSize->SetFloat( "maxEndSize", m_EndSize );
 
 		KeyValues *pUpdaters = pEmitter->FindKey( "updaters", true );
-		pUpdaters->FindKey( "DmePositionVelocityDecayUpdater", true );
-		pUpdaters->FindKey( "DmeRollUpdater", true );
+		(void)pUpdaters->FindKey( "DmePositionVelocityDecayUpdater", true );
+		(void)pUpdaters->FindKey( "DmeRollUpdater", true );
 
 		KeyValues *pRollSpeedUpdater = pUpdaters->FindKey( "DmeRollSpeedAttenuateUpdater", true );
 		pRollSpeedUpdater->SetFloat( "attenuation", 1.0f - 8.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "attenuationTme", 1.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "minRollSpeed", 0.5f );
 
-		pUpdaters->FindKey( "DmeAlphaSineRampUpdater", true );
-		pUpdaters->FindKey( "DmeColorUpdater", true );
-		pUpdaters->FindKey( "DmeSizeUpdater", true );
+		(void)pUpdaters->FindKey( "DmeAlphaSineRampUpdater", true );
+		(void)pUpdaters->FindKey( "DmeColorUpdater", true );
+		(void)pUpdaters->FindKey( "DmeSizeUpdater", true );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, oldmsg );
 		oldmsg->deleteThis();
