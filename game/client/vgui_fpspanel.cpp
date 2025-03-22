@@ -19,10 +19,6 @@
 #include "steam/steam_api.h"
 #include "tier0/cpumonitoring.h"
 
-#ifdef _WIN32
-#include "winlite.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -33,6 +29,19 @@ static ConVar cl_showbattery( "cl_showbattery", "0", 0, "Draw current battery le
 
 extern bool g_bDisplayParticlePerformance;
 int GetParticlePerformance();
+
+#ifdef _WIN32
+typedef struct _SYSTEM_POWER_STATUS {
+    BYTE ACLineStatus;
+    BYTE BatteryFlag;
+    BYTE BatteryLifePercent;
+    BYTE SystemStatusFlag;
+    DWORD BatteryLifeTime;
+    DWORD BatteryFullLifeTime;
+}   SYSTEM_POWER_STATUS, *LPSYSTEM_POWER_STATUS;
+
+extern "C" __declspec(dllimport) BOOL __stdcall GetSystemPowerStatus(LPSYSTEM_POWER_STATUS lpSystemPowerStatus);
+#endif
 
 
 //-----------------------------------------------------------------------------
