@@ -1592,15 +1592,15 @@ void COptionsSubVideo::OnResetData()
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
 	int ItemIndex;
 
-	if ( config.Windowed() )
-	{
-		// Last before one item in the combobox is Windowed.
-		ItemIndex = ( m_pWindowed->GetItemCount() - 2 );
-	}
-	else if ( config.Borderless() )
+	if ( config.Borderless() )
 	{
 		// Last before one item in the combobox is window borderless.
 		ItemIndex = ( m_pWindowed->GetItemCount() - 1 );
+	}
+	else if ( config.Windowed() )
+	{
+		// Last before one item in the combobox is Windowed.
+		ItemIndex = ( m_pWindowed->GetItemCount() - 2 );
 	}
 	else
 	{
@@ -1616,13 +1616,13 @@ void COptionsSubVideo::OnResetData()
 
     m_pWindowed->ActivateItem( ItemIndex );
 #else
-	if (config.Windowed())
-	{
-		m_pWindowed->ActivateItem( 1 );
-	}
-	else if (config.Borderless())
+	if (config.Borderless())
 	{
 		m_pWindowed->ActivateItem( 2 );
+	}
+	else if (config.Windowed())
+	{
+		m_pWindowed->ActivateItem( 1 );
 	}
 	else
 	{
