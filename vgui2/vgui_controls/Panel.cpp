@@ -4667,11 +4667,14 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 			if ( pColorStr[0] == '.' || isdigit( pColorStr[0] ) )
 			{
 				float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
-				sscanf( pColorStr, "%f %f %f %f", &r, &g, &b, &a );
+				// dimhotepus: Check all 4 color components are present.
+				if ( sscanf( pColorStr, "%f %f %f %f", &r, &g, &b, &a ) == 4 ) 
+				{
 				clrDest[0] = (unsigned char)r;
 				clrDest[1] = (unsigned char)g;
 				clrDest[2] = (unsigned char)b;
 				clrDest[3] = (unsigned char)a;
+			}
 			}
 			else
 			{
