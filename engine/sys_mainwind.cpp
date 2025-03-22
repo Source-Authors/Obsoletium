@@ -1142,7 +1142,7 @@ bool CGame::CreateGameWindow( void )
 
 	const unsigned dpi{::GetDpiForWindow(hwnd)};
 	// Windows claims x,y DPIs are same.
-	m_xDpiScalePercent = m_yDpiScalePercent = 150; // dpi * 100 / USER_DEFAULT_SCREEN_DPI;
+	m_xDpiScalePercent = m_yDpiScalePercent = 100; // dpi * 100 / USER_DEFAULT_SCREEN_DPI;
 
 	SetMainWindow( hwnd );
 
