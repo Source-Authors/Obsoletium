@@ -96,6 +96,11 @@ IClientNetworkable* CClientEntityList::GetClientNetworkable( int entnum )
 {
 	Assert( entnum >= 0 );
 	Assert( entnum < MAX_EDICTS );
+	if ( entnum < 0 || entnum >= MAX_EDICTS )
+	{
+		return NULL;
+	}
+
 	return m_EntityCacheInfo[entnum].m_pNetworkable;
 }
 
