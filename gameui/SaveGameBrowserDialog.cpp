@@ -1224,15 +1224,15 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		// reformat
 		if ( hours )
 		{
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Hr_Min" ), 2, wzHours, wzMins );
+			g_pVGuiLocalize->ConstructString_safe( buf, g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Hr_Min" ), 2, wzHours, wzMins );
 		}
 		else if ( minutes )
 		{
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Min_Sec" ), 2, wzMins, wzSecs );
+			g_pVGuiLocalize->ConstructString_safe( buf, g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Min_Sec" ), 2, wzMins, wzSecs );
 		}
 		else
 		{
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Sec" ), 1, wzSecs );
+			g_pVGuiLocalize->ConstructString_safe( buf, g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Sec" ), 1, wzSecs );
 		}
 
 		g_pVGuiLocalize->ConvertUnicodeToANSI( buf, szElapsedTime );

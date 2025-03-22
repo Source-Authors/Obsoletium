@@ -232,7 +232,7 @@ void CAchievementsDialog_XBox::PerformLayout( void )
 		wchar_t wzTotal[8];
 		V_snwprintf( wzActiveItem, ssize( wzActiveItem ), L"%d", m_Menu.GetActiveItemIndex()+1 );
 		V_snwprintf( wzTotal, ssize( wzTotal ), L"%d", m_nTotalAchievements );
-		g_pVGuiLocalize->ConstructString( wszNumbering, sizeof( wszNumbering ), wzNumberingFmt, 2, wzActiveItem, wzTotal );
+		g_pVGuiLocalize->ConstructString_safe( wszNumbering, wzNumberingFmt, 2, wzActiveItem, wzTotal );
 		m_pNumbering->SetText( wszNumbering );
 		m_pNumbering->SetWide( GetWide() );
 	}
@@ -885,7 +885,7 @@ void CAchievementsDialog::CreateOrUpdateComboItems( bool bCreate )
 			wchar_t wzNumAchievements[8];
 			V_snwprintf( wzNumAchievements, ssize( wzNumAchievements ), L"%d", m_AchievementGroups[i].m_iNumAchievements );
 
-			g_pVGuiLocalize->ConstructString( wzGroupTitle, sizeof( wzGroupTitle ), wzGroupName, 2, wzNumUnlocked, wzNumAchievements );
+			g_pVGuiLocalize->ConstructString_safe( wzGroupTitle, wzGroupName, 2, wzNumUnlocked, wzNumAchievements );
 		}
 
 		KeyValues *pKV = new KeyValues( "grp" );
