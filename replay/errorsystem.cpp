@@ -97,7 +97,7 @@ void CErrorSystem::AddFormattedErrorFromTokenName( const char *pFormatToken/*=NU
 	wchar_t wszErrorStr[1024];
 	if ( g_pVGuiLocalize )
 	{
-		g_pVGuiLocalize->ConstructString( wszErrorStr, sizeof( wszErrorStr ), pFormatToken, pFormatArgs );
+		g_pVGuiLocalize->ConstructString_safe( wszErrorStr, pFormatToken, pFormatArgs );
 	}
 	else
 	{
