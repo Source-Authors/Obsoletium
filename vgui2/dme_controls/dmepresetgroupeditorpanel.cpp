@@ -931,17 +931,6 @@ struct ExportedControl_t
 	int m_nFirstIndex;
 };
 
-static intp FindExportedControlIndex( const char *pControlName, CUtlVector< ExportedControl_t > &uniqueControls )
-{
-	intp nCount = uniqueControls.Count();
-	for ( intp i = 0; i < nCount; ++i )
-	{
-		if ( !Q_stricmp( pControlName, uniqueControls[i].m_Name ) )
-			return i;
-	}
-	return -1;
-}
-
 
 //-----------------------------------------------------------------------------
 // Fileopen state machine
