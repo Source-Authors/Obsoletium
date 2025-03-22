@@ -267,7 +267,8 @@ void ImagePanel::GetSettings(KeyValues *outResourceData)
 		outResourceData->SetString("border", GetBorder()->GetName());
 	}
 
-	outResourceData->GetInt("positionImage", m_bPositionImage );
+	// dimhotepus: Set position image.
+	outResourceData->SetInt("positionImage", m_bPositionImage );
 	outResourceData->SetInt("scaleImage", m_bScaleImage);
 	outResourceData->SetFloat("scaleAmount", m_fScaleAmount);
 	outResourceData->SetInt("tileImage", m_bTileImage);
