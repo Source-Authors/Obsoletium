@@ -6,15 +6,18 @@
 //===========================================================================//
 
 #include <vgui_controls/PerforceFileList.h>
+
+#include "filesystem.h"
+#include "tier1/KeyValues.h"
+// dimhotepus: No perforce
+// #include "p4lib/ip4.h"
+#include "tier2/tier2.h"
+
 #include <vgui_controls/ListPanel.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/ImageList.h>
-#include "tier1/KeyValues.h"
+
 #include <vgui/ISurface.h>
-#include "filesystem.h"
-// dimhotepus: No perforce
-//#include "p4lib/ip4.h"
-#include "tier2/tier2.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

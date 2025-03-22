@@ -7,24 +7,23 @@
 
 #include "vgui_controls/consoledialog.h"
 
+#include "icvar.h"
+#include "filesystem.h"
+#include "tier1/convar.h"
+#include "tier1/convar_serverbounded.h"
+#include "tier1/KeyValues.h"
+
 #include "vgui/IInput.h"
 #include "vgui/IScheme.h"
 #include "vgui/IVGui.h"
 #include "vgui/ISurface.h"
 #include "vgui/ILocalize.h"
-#include "KeyValues.h"
+#include "vgui/KeyCode.h"
 
 #include "vgui_controls/Button.h"
-#include "vgui/KeyCode.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/RichText.h"
-#include "tier1/convar.h"
-#include "tier1/convar_serverbounded.h"
-#include "icvar.h"
-#include "filesystem.h"
-
-#include <cstdlib>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

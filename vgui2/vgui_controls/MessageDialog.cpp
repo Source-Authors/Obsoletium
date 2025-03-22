@@ -5,6 +5,7 @@
 //=============================================================================//
 
 #include "vgui_controls/MessageDialog.h"
+
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
 

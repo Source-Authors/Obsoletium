@@ -5,9 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include <vgui_controls/ListPanel.h>
 
-#define PROTECTED_THINGS_DISABLE
+#include <tier1/KeyValues.h>
 
 #include <vgui/Cursor.h>
 #include <vgui/IInput.h>
@@ -18,7 +18,6 @@
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 
 #include <vgui_controls/Button.h>
@@ -26,7 +25,6 @@
 #include <vgui_controls/ImageList.h>
 #include <vgui_controls/ImagePanel.h>
 #include <vgui_controls/Label.h>
-#include <vgui_controls/ListPanel.h>
 #include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/TextImage.h>
 #include <vgui_controls/Menu.h>
@@ -639,7 +637,7 @@ void ListPanel::ResortColumnRBTree(int col)
 	Assert(m_CurrentColumns.IsValidIndex(col));
 
 	unsigned char dataColumnIndex = m_CurrentColumns[col];
-	int columnHistoryIndex = m_ColumnsHistory.Find(dataColumnIndex);
+	intp columnHistoryIndex = m_ColumnsHistory.Find(dataColumnIndex);
 	column_t &column = m_ColumnsData[dataColumnIndex];
 
 	IndexRBTree_t &rbtree = column.m_SortedTree;
@@ -1080,8 +1078,8 @@ void ListPanel::IndexItem(int itemID)
 	FastSortListPanelItem *newitem = (FastSortListPanelItem*) m_DataItems[itemID];
 
 	// remove the item from the indexes and re-add
-	int maxCount = min(m_ColumnsHistory.Count(), newitem->m_SortedTreeIndexes.Count());
-	for (int i = 0; i < maxCount; i++)
+	intp maxCount = min(m_ColumnsHistory.Count(), newitem->m_SortedTreeIndexes.Count());
+	for (intp i = 0; i < maxCount; i++)
 	{
 		IndexRBTree_t &rbtree = m_ColumnsData[m_ColumnsHistory[i]].m_SortedTree;
 		rbtree.RemoveAt(newitem->m_SortedTreeIndexes[i]);
@@ -1097,7 +1095,7 @@ void ListPanel::IndexItem(int itemID)
 	s_pCurrentSortingListPanel = this;
 
 	// add the item into the RB tree for each column
-	for (int i = 0; i < m_ColumnsHistory.Count(); i++)
+	for (intp i = 0; i < m_ColumnsHistory.Count(); i++)
 	{
 		// skip over any removed columns
 		if ( m_ColumnsHistory[i] == m_ColumnsData.InvalidIndex() )
@@ -1618,7 +1616,7 @@ void ListPanel::PerformLayout()
 	int rowsperpage = (int) GetRowsPerPage();
 
 	// count the number of visible items
-	int visibleItemCount = m_VisibleItems.Count();
+	intp visibleItemCount = m_VisibleItems.Count();
 
 	//!! need to make it recalculate scroll positions
 	m_vbar->SetVisible(true);
@@ -1635,7 +1633,7 @@ void ListPanel::PerformLayout()
 
 	int buttonMaxXPos = wide - (m_vbar->GetWide()+WINDOW_BORDER_WIDTH);
 	
-	int nColumns = m_CurrentColumns.Count();
+	intp nColumns = m_CurrentColumns.Count();
 	// number of bars that can be resized
 	int numToResize=0;
 	if (m_iColumnDraggerMoved != -1) // we're resizing in response to a column dragger
@@ -1644,7 +1642,7 @@ void ListPanel::PerformLayout()
 	}
 	else	// we're resizing in response to a window resize
 	{
-		for (int i = 0; i < nColumns; i++)
+		for (intp i = 0; i < nColumns; i++)
 		{
 			if ( m_ColumnsData[m_CurrentColumns[i]].m_bResizesWithWindow // column is resizable in response to window
 				&& !m_ColumnsData[m_CurrentColumns[i]].m_bHidden) 
@@ -1659,7 +1657,7 @@ void ListPanel::PerformLayout()
 	// location of the last column resizer
 	int oldSizeX = 0, oldSizeY = 0;
 	int lastColumnIndex = nColumns-1;
-	for (int i = nColumns-1; i >= 0; --i)
+	for (intp i = nColumns-1; i >= 0; --i)
 	{
 		if (!m_ColumnsData[m_CurrentColumns[i]].m_bHidden)
 		{
@@ -1674,7 +1672,7 @@ void ListPanel::PerformLayout()
 	{
 		// make sure we've got enough to be within minwidth
 		int minWidth=0;
-		for (int i = 0; i < nColumns; i++)
+		for (intp i = 0; i < nColumns; i++)
 		{
 			if (!m_ColumnsData[m_CurrentColumns[i]].m_bHidden)
 			{
@@ -1707,7 +1705,7 @@ void ListPanel::PerformLayout()
 	else // this is the first time we've opened the window, make sure all our colums fit! resize if needed
 	{
 		int startingBarWidth=0;
-		for (int i = 0; i < nColumns; i++)
+		for (intp i = 0; i < nColumns; i++)
 		{
 			if (!m_ColumnsData[m_CurrentColumns[i]].m_bHidden)
 			{
@@ -1721,7 +1719,7 @@ void ListPanel::PerformLayout()
 	}
 
 	// Make sure nothing is smaller than minwidth to start with or else we'll get into trouble below.
-	for ( int i=0; i < nColumns; i++ )
+	for ( intp i=0; i < nColumns; i++ )
 	{
 		column_t &column = m_ColumnsData[m_CurrentColumns[i]];
 		Panel *header = column.m_pHeader;
@@ -1734,7 +1732,7 @@ void ListPanel::PerformLayout()
 	{
 		// try and place headers as is - before we have to force items to be minimum width
 		int x = -1;
-		int i;
+		intp i;
 		for ( i = 0; i < nColumns; i++)
 		{
 			column_t &column = m_ColumnsData[m_CurrentColumns[i]];
@@ -1860,7 +1858,7 @@ void ListPanel::PerformLayout()
 		m_iTableStartX = 0; 
 		m_iTableStartY = m_iHeaderHeight + 1;
 
-		int nTotalRows = m_VisibleItems.Count();
+		intp nTotalRows = m_VisibleItems.Count();
 		int nRowsPerPage = GetRowsPerPage();
 
 		// find the first visible item to display
@@ -1872,7 +1870,7 @@ void ListPanel::PerformLayout()
 
 		bool bDone = false;
 		int drawcount = 0;
-		for (int i = nStartItem; i < nTotalRows && !bDone; i++)
+		for (intp i = nStartItem; i < nTotalRows && !bDone; i++)
 		{
 			int x = 0;
 			if (!m_VisibleItems.IsValidIndex(i))
@@ -1881,7 +1879,7 @@ void ListPanel::PerformLayout()
 			int itemID = m_VisibleItems[i];
 			
 			// iterate the columns
-			for (int j = 0; j < m_CurrentColumns.Count(); j++)
+			for (intp j = 0; j < m_CurrentColumns.Count(); j++)
 			{
 				Panel *header = m_ColumnsData[m_CurrentColumns[j]].m_pHeader;
 
@@ -1940,7 +1938,7 @@ void ListPanel::Paint()
 	m_iTableStartX = 0; 
 	m_iTableStartY = m_iHeaderHeight + 1;
 
-	int nTotalRows = m_VisibleItems.Count();
+	intp nTotalRows = m_VisibleItems.Count();
 	int nRowsPerPage = GetRowsPerPage();
 
 	// find the first visible item to display
@@ -1960,7 +1958,7 @@ void ListPanel::Paint()
 	// iterate through and draw each cell
 	bool bDone = false;
 	int drawcount = 0;
-	for (int i = nStartItem; i < nTotalRows && !bDone; i++)
+	for (intp i = nStartItem; i < nTotalRows && !bDone; i++)
 	{
 		int x = 0;
 		if (!m_VisibleItems.IsValidIndex(i))
@@ -1969,7 +1967,7 @@ void ListPanel::Paint()
 		int itemID = m_VisibleItems[i];
 		
 		// iterate the columns
-		for (int j = 0; j < m_CurrentColumns.Count(); j++)
+		for (intp j = 0; j < m_CurrentColumns.Count(); j++)
 		{
 			Panel *header = m_ColumnsData[m_CurrentColumns[j]].m_pHeader;
 			Panel *render = GetCellRenderer(itemID, j);
@@ -2064,8 +2062,8 @@ void ListPanel::HandleMultiSelection( int itemID, int row, int column )
 	// deal with 'multiple' row selection
 
 	// convert the last item selected to a row so we can multiply select by rows NOT items
-	int lastSelectedRow = (m_LastItemSelected != -1) ? m_VisibleItems.Find( m_LastItemSelected ) : row;
-	int startRow, endRow;
+	intp lastSelectedRow = (m_LastItemSelected != -1) ? m_VisibleItems.Find( m_LastItemSelected ) : row;
+	intp startRow, endRow;
 	if ( row < lastSelectedRow )
 	{
 		startRow = row;
@@ -2085,7 +2083,7 @@ void ListPanel::HandleMultiSelection( int itemID, int row, int column )
 	}
 
 	// add any items that we haven't added
-	for (int i = startRow; i <= endRow; i++)
+	for (intp i = startRow; i <= endRow; i++)
 	{
 		// get the item indexes for these rows
 		int selectedItemID = m_VisibleItems[i];
@@ -2257,127 +2255,6 @@ void ListPanel::OnMouseDoublePressed(MouseCode code)
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-#ifdef _X360
-void ListPanel::OnKeyCodePressed(KeyCode code)
-{
-	int nTotalRows = m_VisibleItems.Count();
-	int nTotalColumns = m_CurrentColumns.Count();
-	if ( nTotalRows == 0 )
-		return;
-
-	// calculate info for adjusting scrolling
-	int nStartItem = GetStartItem();
-	int nRowsPerPage = (int)GetRowsPerPage();
-
-	int nSelectedRow = 0;
-	if ( m_DataItems.IsValidIndex( m_LastItemSelected ) )
-	{
-		nSelectedRow = m_VisibleItems.Find( m_LastItemSelected );
-	}
- 	int nSelectedColumn = m_iSelectedColumn;
-
-	switch(code)
-	{
-	case KEY_XBUTTON_UP:
-	case KEY_XSTICK1_UP:
-	case KEY_XSTICK2_UP:
-		if(GetItemCount() < 1 || nSelectedRow == nStartItem)
-		{
-			ClearSelectedItems();
-			BaseClass::OnKeyCodePressed(code);
-			return;
-		}
-		else
-		{
-			nSelectedRow -= 1;
-		}
-		break;
-	case KEY_XBUTTON_DOWN:
-	case KEY_XSTICK1_DOWN:
-	case KEY_XSTICK2_DOWN:
-		{
-			int itemId = GetSelectedItem(0);
-			if(itemId != -1 && GetItemCurrentRow(itemId) == (nTotalRows - 1))
-			{
-				ClearSelectedItems();
-				BaseClass::OnKeyCodePressed(code);
-				return;
-			}
-			else
-			{
-				nSelectedRow += 1;
-			}
-		}
-		break;
-	case KEY_XBUTTON_LEFT:
-	case KEY_XSTICK1_LEFT:
-	case KEY_XSTICK2_LEFT:
-		if (m_bCanSelectIndividualCells && (GetSelectedItemsCount() == 1) && (nSelectedColumn >= 0) )
-		{
-			nSelectedColumn--;
-			if (nSelectedColumn < 0)
-			{
-				nSelectedColumn = 0;
-			}
-			break;
-		}
-		break;
-	case KEY_XBUTTON_RIGHT:
-	case KEY_XSTICK1_RIGHT:
-	case KEY_XSTICK2_RIGHT:
-		if (m_bCanSelectIndividualCells && (GetSelectedItemsCount() == 1) && (nSelectedColumn >= 0) )
-		{
-			nSelectedColumn++;
-			if (nSelectedColumn >= nTotalColumns)
-			{
-				nSelectedColumn = nTotalColumns - 1;
-			}
-			break;
-		}
-		break;
-	case KEY_XBUTTON_A:
-		PostActionSignal( new KeyValues("ListPanelItemChosen", "itemID", m_SelectedItems[0] ));
-		break;
-	default:
-		BaseClass::OnKeyCodePressed(code);
-		break;
-	}
-
-	// make sure newly selected item is a valid range
-	nSelectedRow = clamp(nSelectedRow, 0, nTotalRows - 1);
-
-	int row = m_VisibleItems[ nSelectedRow ];
-
-	// This will select the cell if in single select mode, or the row in multiselect mode
-	if ( ( row != m_LastItemSelected ) || ( nSelectedColumn != m_iSelectedColumn ) || ( m_SelectedItems.Count() > 1 ) )
-	{
-		SetSelectedCell( row, nSelectedColumn );
-	}
-
-	// move the newly selected item to within the visible range
-	if ( nRowsPerPage < nTotalRows )
-	{
-		int nStartItem = m_vbar->GetValue();
-		if ( nSelectedRow < nStartItem )
-		{
-			// move the list back to match
-			m_vbar->SetValue( nSelectedRow );
-		}
-		else if ( nSelectedRow >= nStartItem + nRowsPerPage )
-		{
-			// move list forward to match
-			m_vbar->SetValue( nSelectedRow - nRowsPerPage + 1);
-		}
-	}
-
-	// redraw
-	InvalidateLayout();
-}
-
-#else
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2392,8 +2269,8 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 		return;
 	}
 
-	int nTotalRows = m_VisibleItems.Count();
-	int nTotalColumns = m_CurrentColumns.Count();
+	intp nTotalRows = m_VisibleItems.Count();
+	intp nTotalColumns = m_CurrentColumns.Count();
 	if ( nTotalRows == 0 )
 	{
 		BaseClass::OnKeyCodePressed(code);
@@ -2404,7 +2281,7 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 	int nStartItem = GetStartItem();
 	int nRowsPerPage = (int)GetRowsPerPage();
 
-	int nSelectedRow = 0;
+	intp nSelectedRow = 0;
 	if ( m_DataItems.IsValidIndex( m_LastItemSelected ) )
 	{
 		nSelectedRow = m_VisibleItems.Find( m_LastItemSelected );
@@ -2542,7 +2419,6 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 	InvalidateLayout();
 }
 
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2716,7 +2592,7 @@ void ListPanel::SortList( void )
 	int screenPosition = -1;
 	if ( m_LastItemSelected != -1 && m_SelectedItems.Count() > 0 )
 	{
-		int selectedItemRow = m_VisibleItems.Find(m_LastItemSelected);
+		intp selectedItemRow = m_VisibleItems.Find(m_LastItemSelected);
 		if ( selectedItemRow >= startItem && selectedItemRow <= ( startItem + rowsperpage ) )
 		{
 			screenPosition = selectedItemRow - startItem;
@@ -2796,7 +2672,7 @@ void ListPanel::SortList( void )
 
 	if ( screenPosition != -1 )
 	{
-		int selectedItemRow = m_VisibleItems.Find(m_LastItemSelected);
+		intp selectedItemRow = m_VisibleItems.Find(m_LastItemSelected);
 
 		// if we can put the last selected item in exactly the same spot, put it there, otherwise
 		// we need to be at the top of the list
@@ -3094,7 +2970,7 @@ void ListPanel::ResizeColumnToContents(int column)
 
 		// get the text
 		wchar_t tempText[ 256 ];
-		GetCellText( itemID, column, tempText, 256 );
+		GetCellText( itemID, column, tempText );
 		m_pTextImage->SetText(tempText);
 
 		m_pTextImage->GetContentSize(wide, tall);

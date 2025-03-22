@@ -5,20 +5,20 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/ProgressBox.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/ProgressBox.h>
-
-#include <stdio.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

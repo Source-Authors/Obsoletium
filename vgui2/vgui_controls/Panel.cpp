@@ -5,12 +5,20 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "vgui_controls/Panel.h"
 
-#include <cstdio>
-#include <cctype>	// isdigit()
+#include "filesystem.h"
+#include "tier0/vprof.h"
+#include "tier0/icommandline.h"
+#include "tier0/minidump.h"
+#include "tier1/KeyValues.h"
+#include "tier1/UtlSortVector.h"
+#include "tier1/utldict.h"
+#include "tier1/utlbuffer.h"
 #include "tier1/utlvector.h"
-#include "vstdlib/IKeyValuesSystem.h"
+#include "tier1/mempool.h"
 
+#include "vstdlib/IKeyValuesSystem.h"
 #include "materialsystem/imaterial.h"
 
 #include "vgui/IBorder.h"
@@ -21,27 +29,14 @@
 #include "vgui/ISystem.h"
 #include "vgui/ILocalize.h"
 #include "vgui/IVGui.h"
-#include "tier1/KeyValues.h"
 #include "vgui/MouseCode.h"
 
-#include "vgui_controls/Panel.h"
 #include "vgui_controls/BuildGroup.h"
 #include "vgui_controls/Tooltip.h"
 #include "vgui_controls/PHandle.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/MenuItem.h"
-
-#include "UtlSortVector.h"
-
-#include "tier1/utldict.h"
-#include "tier1/utlbuffer.h"
-#include "tier1/mempool.h"
-#include "filesystem.h"
-#include "tier0/icommandline.h"
-#include "tier0/minidump.h"
-
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -8656,7 +8651,7 @@ void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels
 	}
 }
 
-int VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir )
+intp VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir )
 {
 	CUtlSortVector< SortedPanel_t, CSortedPanelYLess > *pList = reinterpret_cast< CUtlSortVector< SortedPanel_t, CSortedPanelYLess >* >( pSortedPanels );
 

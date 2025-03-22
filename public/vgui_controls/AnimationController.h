@@ -40,7 +40,7 @@ public:
 	// runs a frame of animation (time is passed in so slow motion, etc. works)
 	void UpdateAnimations( float curtime );
 	
-	int	 GetNumActiveAnimations( void ) { return m_ActiveAnimations.Count(); }
+	intp GetNumActiveAnimations() const { return m_ActiveAnimations.Count(); }
 
 	// plays all animations to completion instantly
 	void RunAllAnimationsToCompletion();

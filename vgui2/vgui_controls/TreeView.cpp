@@ -5,7 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#define PROTECTED_THINGS_DISABLE
+#include <vgui_controls/TreeView.h>
+
+#include <tier1/KeyValues.h>
+#include "tier1/utlstring.h"
 
 #include <vgui/Cursor.h>
 #include <vgui/IScheme.h>
@@ -15,10 +18,8 @@
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 #include <vgui/KeyCode.h>
-#include <tier1/KeyValues.h>
 #include <vgui/MouseCode.h>
 
-#include <vgui_controls/TreeView.h>
 #include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/Label.h>
@@ -26,8 +27,6 @@
 #include <vgui_controls/TextImage.h>
 #include <vgui_controls/ImageList.h>
 #include <vgui_controls/ImagePanel.h>
-
-#include "tier1/utlstring.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -197,7 +196,7 @@ public:
 
 			// make sure there is only one item selected
 			// before "WaitingForRelease" which leads to label editing.
-			CUtlVector< int > list;
+			CUtlVector< intp > list;
 			m_pTree->GetSelectedItems( list );
 			bool bIsOnlyOneItemSelected = ( list.Count() == 1 );
 
@@ -422,14 +421,14 @@ public:
 	void PaintBackground() override;
     void PerformLayout() override;
 	TreeNode *GetParentNode();
-    int GetChildrenCount();
+    intp GetChildrenCount();
 	void ClearChildren();
-	int ComputeInsertionPosition( TreeNode *pChild );
-	int FindChild( TreeNode *pChild );
+	intp ComputeInsertionPosition( TreeNode *pChild );
+	intp FindChild( TreeNode *pChild );
     void AddChild(TreeNode *pChild);
     void SetNodeExpanded(bool bExpanded);
     bool IsExpanded();
-    int CountVisibleNodes();
+    intp CountVisibleNodes();
 	void CalculateVisibleMaxWidth();
 	void OnChildWidthChange();
 	int GetMaxChildrenWidth();
@@ -447,8 +446,8 @@ public:
     void SelectPrevChild(TreeNode *pCurrentChild);
     void SelectNextChild(TreeNode *pCurrentChild);
 
-	int GetPrevChildItemIndex( TreeNode *pCurrentChild );
-	int GetNextChildItemIndex( TreeNode *pCurrentChild );
+	intp GetPrevChildItemIndex( TreeNode *pCurrentChild );
+	intp GetNextChildItemIndex( TreeNode *pCurrentChild );
 
 	virtual void ClosePreviousParents( TreeNode *pPreviousParent );
 	virtual void StepInto( bool bClosePrevious=true );
@@ -480,7 +479,7 @@ public:
 	HCursor GetDropCursor( CUtlVector< KeyValues * >& msglist ) override;
 	bool GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
 
-	void				FindNodesInRange( CUtlVector< TreeNode * >& list, int startIndex, int endIndex );
+	void				FindNodesInRange( CUtlVector< TreeNode * >& list, intp startIndex, intp endIndex );
 
 	void				RemoveChildren();
 
@@ -488,15 +487,15 @@ public:
 	void SetSelectionBgColor( const Color& clr );
 	void SetSelectionUnfocusedBgColor( const Color& clr );
 public:
-	int                 m_ItemIndex;
-	int					m_ParentIndex;
+	intp                m_ItemIndex;
+	intp				m_ParentIndex;
 	KeyValues           *m_pData;
     CUtlVector<TreeNode *> m_Children;
     bool                m_bExpand;
 
 private:
 
-	void				FindNodesInRange_R( CUtlVector< TreeNode * >& list, bool& finished, bool& foundStart, int startIndex, int endIndex );
+	void				FindNodesInRange_R( CUtlVector< TreeNode * >& list, bool& finished, bool& foundStart, intp startIndex, intp endIndex );
 
 	int					m_iNodeWidth;
 	int					m_iMaxVisibleWidth;
@@ -508,7 +507,7 @@ private:
 	bool				m_bExpandableWithoutChildren;
 
     TreeView            *m_pTreeView;
-	int					m_nClickedItem;
+	intp				m_nClickedItem;
 	bool				m_bClickedSelected;
 };
 
@@ -599,14 +598,14 @@ void TreeNode::OnCreateDragData( KeyValues *msg )
 // For handling multiple selections...
 void TreeNode::OnGetAdditionalDragPanels( CUtlVector< Panel * >& dragabbles )
 {
-	CUtlVector< int > list;
+	CUtlVector< intp > list;
 	m_pTreeView->GetSelectedItems( list );
-	int c = list.Count();
+	intp c = list.Count();
 	// walk this in reverse order so that panels are in order of selection
 	// even though GetSelectedItems returns items in reverse selection order
-	for ( int i = c - 1; i >= 0; --i )
+	for ( intp i = c - 1; i >= 0; --i )
 	{
-		int itemIndex = list[ i ];
+		intp itemIndex = list[ i ];
 		// Skip self
 		if ( itemIndex == m_ItemIndex )
 			continue;
@@ -740,22 +739,22 @@ TreeNode *TreeNode::GetParentNode()
 	return NULL;
 }
 
-int TreeNode::GetChildrenCount()
+intp TreeNode::GetChildrenCount()
 {
     return m_Children.Count();
 }
 
-int TreeNode::ComputeInsertionPosition( TreeNode *pChild )
+intp TreeNode::ComputeInsertionPosition( TreeNode *pChild )
 {
 	if ( !m_pTreeView->m_pSortFunc )
 	{
 		return GetChildrenCount() - 1;
 	}
 
-	int start = 0, end = GetChildrenCount() - 1;
+	intp start = 0, end = GetChildrenCount() - 1;
 	while (start <= end)
 	{
-		int mid = (start + end) >> 1;
+		intp mid = (start + end) >> 1;
 		if ( m_pTreeView->m_pSortFunc( m_Children[mid]->m_pData, pChild->m_pData ) )
 		{
 			start = mid + 1;
@@ -772,12 +771,12 @@ int TreeNode::ComputeInsertionPosition( TreeNode *pChild )
 	return end;
 }
 
-int TreeNode::FindChild( TreeNode *pChild )
+intp TreeNode::FindChild( TreeNode *pChild )
 {
 	if ( !m_pTreeView->m_pSortFunc )
 	{
 		AssertMsg( 0, "This code has never been tested. Is it correct?" );
-		for ( int i = 0; i < GetChildrenCount(); ++i )
+		for ( intp i = 0; i < GetChildrenCount(); ++i )
 		{
 			if ( m_Children[i] == pChild )
 				return i;
@@ -786,10 +785,10 @@ int TreeNode::FindChild( TreeNode *pChild )
 	}
 
 	// Find the first entry <= to the child
-	int start = 0, end = GetChildrenCount() - 1;
+	intp start = 0, end = GetChildrenCount() - 1;
 	while (start <= end)
 	{
-		int mid = (start + end) >> 1;
+		intp mid = (start + end) >> 1;
 
 		if ( m_Children[mid] == pChild )
 			return mid;
@@ -804,7 +803,7 @@ int TreeNode::FindChild( TreeNode *pChild )
 		}
 	}
 
-	int nMax = GetChildrenCount();
+	intp nMax = GetChildrenCount();
 	while( end < nMax )
 	{
 		// Stop when we reach a child that has a different value
@@ -822,7 +821,7 @@ int TreeNode::FindChild( TreeNode *pChild )
 
 void TreeNode::AddChild(TreeNode *pChild)
 {
-	int i = ComputeInsertionPosition( pChild );
+	intp i = ComputeInsertionPosition( pChild );
 	m_Children.InsertAfter( i, pChild );
 }
 
@@ -860,7 +859,7 @@ void TreeNode::SetNodeExpanded(bool bExpanded)
 		}
 
         // check if we've closed down on one of our children, if so, we get the focus
-        int selectedItem = m_pTreeView->GetFirstSelectedItem();
+        intp selectedItem = m_pTreeView->GetFirstSelectedItem();
         if (selectedItem != -1 && m_pTreeView->m_NodeList[selectedItem]->HasParent(this))
         {
             m_pTreeView->AddSelectedItem( m_ItemIndex, true );
@@ -875,13 +874,12 @@ bool TreeNode::IsExpanded()
     return m_bExpand;
 }
 
-int TreeNode::CountVisibleNodes()
+intp TreeNode::CountVisibleNodes()
 {
-    int count = 1;  // count myself
+    intp count = 1;  // count myself
     if (m_bExpand)
     {
-        int i;
-        for (i=0;i<m_Children.Count();i++)
+        for (intp i=0;i<m_Children.Count();i++)
         {
             count += m_Children[i]->CountVisibleNodes();
         }
@@ -1081,9 +1079,9 @@ void TreeNode::OnSetFocus()
     m_pText->RequestFocus();
 }
 
-int TreeNode::GetPrevChildItemIndex( TreeNode *pCurrentChild )
+intp TreeNode::GetPrevChildItemIndex( TreeNode *pCurrentChild )
 {
-	int i;
+	intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         if ( m_Children[i] == pCurrentChild )
@@ -1098,9 +1096,9 @@ int TreeNode::GetPrevChildItemIndex( TreeNode *pCurrentChild )
 	return -1;
 }
 
-int TreeNode::GetNextChildItemIndex( TreeNode *pCurrentChild )
+intp TreeNode::GetNextChildItemIndex( TreeNode *pCurrentChild )
 {
-	int i;
+	intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         if ( m_Children[i] == pCurrentChild )
@@ -1117,7 +1115,7 @@ int TreeNode::GetNextChildItemIndex( TreeNode *pCurrentChild )
 
 void TreeNode::SelectPrevChild(TreeNode *pCurrentChild)
 {
-    int i;
+    intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         if (m_Children[i] == pCurrentChild)
@@ -1154,7 +1152,7 @@ void TreeNode::SelectPrevChild(TreeNode *pCurrentChild)
 
 void TreeNode::SelectNextChild(TreeNode *pCurrentChild)
 {
-    int i;
+    intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         if (m_Children[i] == pCurrentChild)
@@ -1186,7 +1184,7 @@ void TreeNode::SelectNextChild(TreeNode *pCurrentChild)
 void TreeNode::ClosePreviousParents( TreeNode *pPreviousParent )
 {
 	// close up all the open nodes we've just stepped out of.
-	CUtlVector< int > selected;
+	CUtlVector< intp > selected;
 	m_pTreeView->GetSelectedItems( selected );
 	if ( selected.Count() == 0 )
 	{
@@ -1443,18 +1441,18 @@ void TreeNode::OnCursorMoved( int x, int y )
 
 	LocalToScreen( x, y );
 	m_pTreeView->ScreenToLocal( x, y );
-	int newItem = m_pTreeView->FindItemUnderMouse( x, y );
+	intp newItem = m_pTreeView->FindItemUnderMouse( x, y );
 	if ( newItem == -1 )
 	{
 		// Fixme:  Figure out best item
 		return;
 	}
 
-	int startItem = m_nClickedItem;
-	int endItem = newItem;
+	intp startItem = m_nClickedItem;
+	intp endItem = newItem;
 	if ( startItem > endItem )
 	{
-		int temp = startItem;
+		intp temp = startItem;
 		startItem = endItem;
 		endItem = temp;
 	}
@@ -1462,8 +1460,8 @@ void TreeNode::OnCursorMoved( int x, int y )
 	CUtlVector< TreeNode * > list;
 	m_pTreeView->m_pRootNode->FindNodesInRange( list, startItem, endItem );
 
-	int c = list.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = list.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		TreeNode *item = list[ i ];
 		if ( m_bClickedSelected )
@@ -1550,15 +1548,15 @@ void TreeNode::OnMousePressed( MouseCode code)
 
 void TreeNode::RemoveChildren()
 {
-	int c = m_Children.Count();
-	for ( int i = c - 1 ; i >= 0 ; --i )
+	intp c = m_Children.Count();
+	for ( intp i = c - 1 ; i >= 0 ; --i )
 	{
 		m_pTreeView->RemoveItem( m_Children[ i ]->m_ItemIndex, false, true );
 	}
 	m_Children.RemoveAll();
 }
 
-void TreeNode::FindNodesInRange( CUtlVector< TreeNode * >& list, int startIndex, int endIndex )
+void TreeNode::FindNodesInRange( CUtlVector< TreeNode * >& list, intp startIndex, intp endIndex )
 {
 	list.RemoveAll();
 	bool finished = false;
@@ -1566,7 +1564,7 @@ void TreeNode::FindNodesInRange( CUtlVector< TreeNode * >& list, int startIndex,
 	FindNodesInRange_R( list, finished, foundstart, startIndex, endIndex );
 }
 
-void TreeNode::FindNodesInRange_R( CUtlVector< TreeNode * >& list, bool& finished, bool& foundStart, int startIndex, int endIndex )
+void TreeNode::FindNodesInRange_R( CUtlVector< TreeNode * >& list, bool& finished, bool& foundStart, intp startIndex, intp endIndex )
 {
 	if ( finished )
 		return;
@@ -1595,8 +1593,8 @@ void TreeNode::FindNodesInRange_R( CUtlVector< TreeNode * >& list, bool& finishe
 		return;
 
 
-	int i;
-	int c = GetChildrenCount();
+	intp i;
+	intp c = GetChildrenCount();
     for (i=0;i<c;i++)
     {
 		m_Children[i]->FindNodesInRange_R( list, finished, foundStart, startIndex, endIndex );
@@ -1814,7 +1812,7 @@ int TreeView::GetVisibleMaxWidth()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int TreeView::AddItem(KeyValues *data, int parentItemIndex)
+intp TreeView::AddItem(KeyValues *data, intp parentItemIndex)
 {
     Assert(parentItemIndex == -1 || m_NodeList.IsValidIndex(parentItemIndex));
 
@@ -1863,7 +1861,7 @@ int TreeView::AddItem(KeyValues *data, int parentItemIndex)
 }
 
 
-int TreeView::GetRootItemIndex()
+intp TreeView::GetRootItemIndex()
 {
 	if ( m_pRootNode )
 		return m_pRootNode->m_ItemIndex;
@@ -1872,7 +1870,7 @@ int TreeView::GetRootItemIndex()
 }
 
 
-int TreeView::GetNumChildren( int itemIndex )
+intp TreeView::GetNumChildren( intp itemIndex )
 {
 	if ( itemIndex == -1 )
 		return 0;
@@ -1881,7 +1879,7 @@ int TreeView::GetNumChildren( int itemIndex )
 }
 
 
-int TreeView::GetChild( int iParentItemIndex, int iChild )
+intp TreeView::GetChild( intp iParentItemIndex, intp iChild )
 {
 	return m_NodeList[iParentItemIndex]->m_Children[iChild]->m_ItemIndex;
 }
@@ -1891,7 +1889,7 @@ int TreeView::GetChild( int iParentItemIndex, int iChild )
 // Input  : itemIndex - 
 // Output : TreeNode
 //-----------------------------------------------------------------------------
-TreeNode *TreeView::GetItem( int itemIndex )
+TreeNode *TreeView::GetItem( intp itemIndex )
 {
 	if ( !m_NodeList.IsValidIndex( itemIndex ) )
 	{
@@ -1905,7 +1903,7 @@ TreeNode *TreeView::GetItem( int itemIndex )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int TreeView::GetItemCount(void)
+intp TreeView::GetItemCount(void)
 {
     return m_NodeList.Count();
 }
@@ -1913,7 +1911,7 @@ int TreeView::GetItemCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-KeyValues* TreeView::GetItemData(int itemIndex)
+KeyValues* TreeView::GetItemData(intp itemIndex)
 {
     if (!m_NodeList.IsValidIndex(itemIndex))
         return NULL;
@@ -1924,7 +1922,7 @@ KeyValues* TreeView::GetItemData(int itemIndex)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void TreeView::RemoveItem(int itemIndex, bool bPromoteChildren, bool bFullDelete )
+void TreeView::RemoveItem(intp itemIndex, bool bPromoteChildren, bool bFullDelete )
 {
 	// HACK: there's a bug with RemoveItem where panels are lingering. This gets around it temporarily.
 
@@ -1946,7 +1944,7 @@ void TreeView::RemoveItem(int itemIndex, bool bPromoteChildren, bool bFullDelete
     // are we promoting the children
     if (bPromoteChildren && pParent)
     {
-        int i;
+        intp i;
         for (i=0;i<pNode->GetChildrenCount();i++)
         {
             TreeNode *pChild = pNode->m_Children[i];
@@ -2013,7 +2011,7 @@ void TreeView::RemoveAll()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool TreeView::ModifyItem(int itemIndex, KeyValues *data)
+bool TreeView::ModifyItem(intp itemIndex, KeyValues *data)
 {
     if (!m_NodeList.IsValidIndex(itemIndex))
         return false;
@@ -2021,7 +2019,7 @@ bool TreeView::ModifyItem(int itemIndex, KeyValues *data)
     TreeNode *pNode = m_NodeList[itemIndex];
 	TreeNode *pParent = pNode->GetParentNode();
 	bool bReSort = ( m_pSortFunc && pParent );
-	int nChildIndex = -1;
+	intp nChildIndex = -1;
 	if ( bReSort )
 	{
 		nChildIndex = pParent->FindChild( pNode );
@@ -2032,7 +2030,7 @@ bool TreeView::ModifyItem(int itemIndex, KeyValues *data)
 	// Changing the data can cause it to re-sort
 	if ( bReSort )
 	{
-		int nChildren = pParent->GetChildrenCount();
+		intp nChildren = pParent->GetChildrenCount();
 		bool bLeftBad = (nChildIndex > 0) && m_pSortFunc( pNode->m_pData, pParent->m_Children[nChildIndex-1]->m_pData );
 		bool bRightBad = (nChildIndex < nChildren - 1) && m_pSortFunc( pParent->m_Children[nChildIndex+1]->m_pData, pNode->m_pData );
 		if ( bLeftBad || bRightBad )
@@ -2110,7 +2108,7 @@ void TreeView::SetItemBgColor(int itemIndex, const Color& color)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int TreeView::GetItemParent(int itemIndex)
+intp TreeView::GetItemParent(intp itemIndex)
 {
 	return m_NodeList[itemIndex]->m_ParentIndex;
 }
@@ -2139,12 +2137,12 @@ IImage *TreeView::GetImage(int index)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void TreeView::GetSelectedItems( CUtlVector< int >& list )
+void TreeView::GetSelectedItems( CUtlVector< intp >& list )
 {
 	list.RemoveAll();
 
-	int c = m_SelectedItems.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_SelectedItems.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		list.AddToTail( m_SelectedItems[ i ]->m_ItemIndex );
 	}
@@ -2157,8 +2155,8 @@ void TreeView::GetSelectedItemData( CUtlVector< KeyValues * >& list )
 {
 	list.RemoveAll();
 
-	int c = m_SelectedItems.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_SelectedItems.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		list.AddToTail( m_SelectedItems[ i ]->m_pData );
 	}
@@ -2175,7 +2173,7 @@ bool TreeView::IsItemIDValid(int itemIndex)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int TreeView::GetHighestItemID()
+intp TreeView::GetHighestItemID()
 {
     return m_NodeList.MaxElementIndex();
 }
@@ -2375,7 +2373,7 @@ void TreeView::PerformLayout()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void TreeView::MakeItemVisible(int itemIndex)
+void TreeView::MakeItemVisible(intp itemIndex)
 {
     // first make sure that all parents are expanded
     TreeNode *pNode = m_NodeList[itemIndex];
@@ -2500,7 +2498,7 @@ void TreeView::EnableExpandTreeOnLeftClick( bool bEnable )
 	m_bLeftClickExpandsTree = bEnable;
 }
 
-int TreeView::FindItemUnderMouse( int mx, int my )
+intp TreeView::FindItemUnderMouse( int mx, int my )
 {
 	mx = clamp( mx, 0, GetWide() - 1 );
 	my = clamp( my, 0, GetTall() - 1 );
@@ -2586,7 +2584,7 @@ bool TreeView::IsMultipleSelectionAllowed() const
 // Input  :  - 
 // Output : int
 //-----------------------------------------------------------------------------
-int TreeView::GetSelectedItemCount() const
+intp TreeView::GetSelectedItemCount() const
 {
 	return m_SelectedItems.Count();
 }
@@ -2602,9 +2600,9 @@ void TreeView::ClearSelection()
 	PostActionSignal( new KeyValues( "TreeViewItemSelectionCleared" ) );
 }
 
-void TreeView::RangeSelectItems( int endItem )
+void TreeView::RangeSelectItems( intp endItem )
 {
-	int startItem = m_nMostRecentlySelectedItem;
+	intp startItem = m_nMostRecentlySelectedItem;
 	ClearSelection();
 	m_nMostRecentlySelectedItem = startItem;
 
@@ -2624,28 +2622,28 @@ void TreeView::RangeSelectItems( int endItem )
 	CUtlVector< TreeNode * > list;
 	m_pRootNode->FindNodesInRange( list, startItem, endItem );
 
-	int c = list.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = list.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		TreeNode *item = list[ i ];
 		AddSelectedItem( item->m_ItemIndex, false );
 	}
 }
 
-void TreeView::FindNodesInRange( int startItem, int endItem, CUtlVector< int >& itemIndices )
+void TreeView::FindNodesInRange( intp startItem, intp endItem, CUtlVector< intp >& itemIndices )
 {
 	CUtlVector< TreeNode * > nodes;
 	m_pRootNode->FindNodesInRange( nodes, startItem, endItem );
 
-	int c = nodes.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = nodes.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		TreeNode *item = nodes[ i ];
 		itemIndices.AddToTail( item->m_ItemIndex );
 	}
 }
 
-void TreeView::RemoveSelectedItem( int itemIndex )
+void TreeView::RemoveSelectedItem( intp itemIndex )
 {
 	if ( !m_NodeList.IsValidIndex( itemIndex ) )
 		return;
@@ -2665,7 +2663,7 @@ void TreeView::RemoveSelectedItem( int itemIndex )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void TreeView::AddSelectedItem( int itemIndex, bool clearCurrentSelection, bool requestFocus /* = true */, bool bMakeItemVisible /*= true*/ )
+void TreeView::AddSelectedItem( intp itemIndex, bool clearCurrentSelection, bool requestFocus /* = true */, bool bMakeItemVisible /*= true*/ )
 {
 	if ( clearCurrentSelection )
 	{
@@ -2714,7 +2712,7 @@ void TreeView::AddSelectedItem( int itemIndex, bool clearCurrentSelection, bool 
 // Input  :  - 
 // Output : int
 //-----------------------------------------------------------------------------
-int TreeView::GetFirstSelectedItem() const
+intp TreeView::GetFirstSelectedItem() const
 {
 	if ( m_SelectedItems.Count() <= 0 )
 		return -1;
@@ -2726,7 +2724,7 @@ int TreeView::GetFirstSelectedItem() const
 // Input  : itemIndex - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool TreeView::IsItemSelected( int itemIndex )
+bool TreeView::IsItemSelected( intp itemIndex )
 {
 	// Assume it's bogus
     if ( !m_NodeList.IsValidIndex( itemIndex ) )
@@ -2760,7 +2758,7 @@ void  TreeView::StartEditingLabel( int itemIndex )
 	sel->EditLabel();
 }
 
-int TreeView::GetPrevChildItemIndex( int itemIndex )
+intp TreeView::GetPrevChildItemIndex( intp itemIndex )
 {
 	if ( !m_NodeList.IsValidIndex( itemIndex ) )
 		return -1;
@@ -2772,7 +2770,7 @@ int TreeView::GetPrevChildItemIndex( int itemIndex )
 	return parent->GetPrevChildItemIndex( sel );
 }
 
-int TreeView::GetNextChildItemIndex( int itemIndex )
+intp TreeView::GetNextChildItemIndex( intp itemIndex )
 {
 	if ( !m_NodeList.IsValidIndex( itemIndex ) )
 		return -1;
@@ -2804,7 +2802,7 @@ HCursor TreeView::GetItemDropCursor( int, CUtlVector< KeyValues * >& )
 	return dc_arrow;
 }
 
-void TreeView::RemoveChildrenOfNode( int itemIndex )
+void TreeView::RemoveChildrenOfNode( intp itemIndex )
 {
 	if ( !m_NodeList.IsValidIndex( itemIndex ) )
 		return;

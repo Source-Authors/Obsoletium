@@ -8,19 +8,21 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/HTML.h>
+
+#include "OfflineMode.h"
+#include "filesystem.h"
+#include "qlimits.h"
+
 #include "vgui_controls/pch_vgui_controls.h"
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/MessageBox.h>
 
-#include "filesystem.h"
-#include "qlimits.h"
 #include "../vgui2/src/vgui_key_translation.h"
 
 #undef PostMessage
 #undef MessageBox
-
-#include "OfflineMode.h"
 
 // memdbgon must be the last include file in a .cpp file
 #include "tier0/memdbgon.h"
@@ -822,7 +824,7 @@ void HTML::OnKeyCodeTyped(KeyCode code)
 			if ( input()->IsKeyDown(KEY_LCONTROL) || input()->IsKeyDown(KEY_RCONTROL) )
 			{
 				// pass control-tab to parent (through baseclass)
-				BaseClass::OnKeyTyped( code );
+				BaseClass::OnKeyTyped( static_cast<wchar_t>(code) );
 				return;
 			}
 			break;

@@ -5,14 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/ScrollBar.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IScheme.h>
 #include <vgui/ISystem.h>
 #include <vgui/IInput.h>
 #include <vgui/IImage.h>
-#include <tier1/KeyValues.h>
 
-#include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/ScrollBarSlider.h>
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Controls.h>

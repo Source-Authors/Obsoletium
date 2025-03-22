@@ -4,16 +4,15 @@
 //
 //=============================================================================//
 
-#include <math.h>
-#include <stdio.h>
-
 #include <vgui_controls/AnalogBar.h>
-#include <vgui_controls/Controls.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/ILocalize.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
-#include <KeyValues.h>
+
+#include <vgui_controls/Controls.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -245,17 +244,28 @@ void AnalogBar::ApplySchemeSettings(IScheme *pScheme)
 {
 	Panel::ApplySchemeSettings(pScheme);
 
-	SetBgColor( Color( 255 - GetFgColor().r(), 255 - GetFgColor().g(), 255 - GetFgColor().b(), GetFgColor().a() ) );
+	const Color fg = GetFgColor();
+
+	SetBgColor( Color( 255 - fg.r(), 255 - fg.g(), 255 - fg.b(), fg.a() ) );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: utility function for calculating a time remaining string
 //-----------------------------------------------------------------------------
-bool AnalogBar::ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output, intp outputBufferSizeInBytes, float startTime, float currentTime, float currentAnalogValue, float lastAnalogValueUpdateTime, bool addRemainingSuffix)
+bool AnalogBar::ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output,
+	intp outputBufferSizeInBytes,
+	float startTime,
+	float currentTime,
+	float currentAnalogValue,
+	float lastAnalogValueUpdateTime,
+	bool addRemainingSuffix)
 {
 	Assert( outputBufferSizeInBytes >= static_cast<intp>(sizeof(output[0])) );
 	Assert(lastAnalogValueUpdateTime <= currentTime);
-	output[0] = 0;
+
+	// dimhotepus: Ensure has space to write zero terminator.
+	if (outputBufferSizeInBytes >= static_cast<intp>(sizeof(output[0])))
+		output[0] = L'\0';
 
 	// calculate pre-extrapolation values
 	float timeElapsed = lastAnalogValueUpdateTime - startTime;
@@ -356,7 +366,7 @@ void AnalogBar::SetBarInset( int pixels )
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-int AnalogBar::GetBarInset( void )
+int AnalogBar::GetBarInset( void ) const
 {
 	return m_iBarInset;
 }

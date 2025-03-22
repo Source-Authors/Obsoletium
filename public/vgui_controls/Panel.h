@@ -55,8 +55,9 @@ struct PanelKeyBindingMap;
 //
 //  SETUP_PANEL - will make a panel ready for use right now (i.e setup its colors, borders, fonts, etc)
 //
+// dimhotepus: SFINAE to check it is Panel.
 template< class T >
-inline T *SETUP_PANEL(T *panel)
+inline std::enable_if_t<std::is_base_of_v<Panel, T>, T> *SETUP_PANEL(T *panel)
 {
 	panel->MakeReadyForUse();
 	return panel;
@@ -1022,7 +1023,7 @@ public:
 
 void VguiPanelGetSortedChildPanelList( Panel *pParentPanel, void *pSortedPanels );
 void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels, const char *pchFilter = NULL, int nFilterType = 0 );
-int VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir );
+intp VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir );
 int ComputeWide(Panel* pPanel, unsigned int& nBuildFlags, KeyValues *inResourceData, int nParentWide, int nParentTall, bool bComputingForTall);
 int ComputeTall(Panel* pPanel, unsigned int& nBuildFlags, KeyValues *inResourceData, int nParentWide, int nParentTall, bool bComputingForWide);
 

@@ -5,15 +5,18 @@
 //=============================================================================
 
 #include "vgui_controls/perforcefilelistframe.h"
+
+#include "filesystem.h"
 #include "tier1/KeyValues.h"
+#include "tier2/tier2.h"
+// #include "p4lib/ip4.h"
+
 #include "vgui_controls/Button.h"
 #include "vgui_controls/ListPanel.h"
 #include "vgui_controls/Splitter.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/MessageBox.h"
-#include "tier2/tier2.h"
-//#include "p4lib/ip4.h"
-#include "filesystem.h"
+
 #include "vgui/IVGui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -4,9 +4,8 @@
 //
 //=============================================================================//
 
-#include <math.h>
-
 #include <vgui_controls/GraphPanel.h>
+
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>

@@ -5,17 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
-#define PROTECTED_THINGS_DISABLE
+#include <vgui_controls/AnimatingImagePanel.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 #include <vgui/IImage.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
-
-#include <vgui_controls/AnimatingImagePanel.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -76,7 +74,7 @@ void AnimatingImagePanel::LoadAnimation(const char *baseName, int frameCount)
 	for (int i = 1; i <= frameCount; i++)
 	{
 		char imageName[512];
-		Q_snprintf(imageName, sizeof( imageName ), "%s%d", baseName, i);
+		V_sprintf_safe(imageName, "%s%d", baseName, i);
 		AddImage(scheme()->GetImage(imageName, m_bFiltered));
 	}
 }
@@ -160,9 +158,7 @@ void AnimatingImagePanel::ApplySettings(KeyValues *inResourceData)
 		m_bScaleImage = ( inResourceData->GetInt( "scaleImage", 0 ) == 1 );
 
 		delete [] m_pImageName;
-		intp len = Q_strlen(imageName) + 1;
-		m_pImageName = new char[len];
-		Q_strncpy(m_pImageName, imageName, len);
+		m_pImageName = V_strdup( imageName );
 
 		// add in the command
 		LoadAnimation(m_pImageName, inResourceData->GetInt("frames"));
@@ -177,7 +173,7 @@ void AnimatingImagePanel::ApplySettings(KeyValues *inResourceData)
 const char *AnimatingImagePanel::GetDescription()
 {
 	static char buf[1024];
-	Q_snprintf(buf, sizeof(buf), "%s, string image", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, string image", BaseClass::GetDescription());
 	return buf;
 }
 

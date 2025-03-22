@@ -40,7 +40,7 @@ protected:
 
 private:
     char    *m_pszURL;
-    int     m_iURLSize;
+    intp    m_iURLSize;
 	bool	m_bUnderline;
 };
 

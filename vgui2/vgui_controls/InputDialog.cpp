@@ -5,11 +5,14 @@
 //=============================================================================//
 
 #include <vgui_controls/InputDialog.h>
+
+#include "tier1/KeyValues.h"
+
+#include "vgui/IInput.h"
+
 #include <vgui_controls/Label.h>
 #include <vgui_controls/Button.h>
 #include <vgui_controls/TextEntry.h>
-#include "tier1/KeyValues.h"
-#include "vgui/IInput.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

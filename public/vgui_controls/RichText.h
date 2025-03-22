@@ -200,7 +200,8 @@ private:
 
 	struct TFade
 	{
-		float flFadeStartTime;
+		// dimhotepus: float -> double
+		double flFadeStartTime;
 		float flFadeLength;
 		float flFadeSustain;
 		byte  iOriginalAlpha;
@@ -218,7 +219,7 @@ private:
 		TFade fade;
 
 		// position in TextStream that these changes take effect
-		int textStreamIndex;
+		intp textStreamIndex;
 	};
 
 	bool m_bResetFades;

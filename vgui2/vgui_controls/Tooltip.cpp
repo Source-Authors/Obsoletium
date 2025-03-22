@@ -6,8 +6,7 @@
 // and implement another button here.
 //=============================================================================//
 
-#include <math.h>
-#define PROTECTED_THINGS_DISABLE
+#include <vgui_controls/Tooltip.h>
 
 #include <vgui/IInput.h>
 #include <vgui/ISystem.h>
@@ -16,7 +15,6 @@
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>
 
-#include <vgui_controls/Tooltip.h>
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/Controls.h>
 

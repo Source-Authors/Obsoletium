@@ -190,7 +190,7 @@ void CBaseAnimSetControlGroupPanel::OnTreeViewItemSelected( int itemIndex )
 		return;
 
 	// Build the list of selected groups, and notify the attribute slider panel
-	CUtlVector< int > selection;
+	CUtlVector< intp > selection;
 	m_hGroups->GetSelectedItems( selection );
 
 	const CDmaElementArray<> &groups = m_AnimSet->GetSelectionGroups();

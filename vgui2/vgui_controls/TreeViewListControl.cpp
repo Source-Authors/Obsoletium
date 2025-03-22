@@ -5,7 +5,10 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#define PROTECTED_THINGS_DISABLE
+
+#include <vgui_controls/TreeViewListControl.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/Cursor.h>
 #include <vgui/IScheme.h>
@@ -13,11 +16,9 @@
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 #include <vgui/IBorder.h>
 
-#include <vgui_controls/TreeViewListControl.h>
 #include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/TreeView.h>
@@ -86,7 +87,7 @@ void CTreeViewListControl::SetNumColumns( int nColumns )
 	InvalidateLayout();
 }
 
-int CTreeViewListControl::GetNumColumns() const
+intp CTreeViewListControl::GetNumColumns() const
 {
 	return m_Columns.Count();
 }

@@ -5,10 +5,11 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <math.h> // for ceil()
-#define PROTECTED_THINGS_DISABLE
+#include "vgui_controls/Frame.h"
 
 #include "tier1/utlstring.h"
+#include "tier1/KeyValues.h"
+
 #include "vgui/Cursor.h"
 #include "vgui/MouseCode.h"
 #include "vgui/IBorder.h"
@@ -21,15 +22,10 @@
 
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/Controls.h"
-#include "vgui_controls/Frame.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/MenuButton.h"
 #include "vgui_controls/TextImage.h"
-
-#include "KeyValues.h"
-
-#include <stdio.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

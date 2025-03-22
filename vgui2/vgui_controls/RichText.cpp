@@ -5,7 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "vgui_controls/RichText.h"
+
 #include "vgui_controls/pch_vgui_controls.h"
+
 #include "vgui/ILocalize.h"
 
 // memdbgon must be the last include file in a .cpp file
@@ -189,7 +192,7 @@ RichText::RichText(Panel *parent, const char *panelName) : BaseClass(parent, pan
 	// add a basic format string
 	TFormatStream stream;
 	stream.color = _defaultTextColor;
-	stream.fade.flFadeStartTime = 0.0f;
+	stream.fade.flFadeStartTime = 0.0;
 	stream.fade.flFadeLength = -1.0f;
 	stream.pixelsIndent = 0;
 	stream.textStreamIndex = 0;
@@ -430,8 +433,8 @@ void RichText::SetText(const wchar_t *text)
 	m_FormatStream.RemoveAll();
 	TFormatStream stream;
 	stream.color = GetFgColor();
+	stream.fade.flFadeStartTime = 0.0;
 	stream.fade.flFadeLength = -1.0f;
-	stream.fade.flFadeStartTime = 0.0f;
 	stream.pixelsIndent = 0;
 	stream.textStreamIndex = 0;
 	stream.textClickable = false;
@@ -694,10 +697,10 @@ void RichText::CalculateFade( TRenderState &renderState )
 			const auto &fade = m_FormatStream[renderState.formatStreamIndex].fade;
 			if ( fade.flFadeLength != -1.0f )
 			{
-				float frac = ( fade.flFadeStartTime -  system()->GetCurrentTime() ) / fade.flFadeLength;
+				double frac = ( fade.flFadeStartTime - system()->GetCurrentTime() ) / fade.flFadeLength;
 
-				int alpha = frac * fade.iOriginalAlpha;
-				alpha = clamp( alpha, 0, fade.iOriginalAlpha );
+				int alpha = static_cast<int>(frac * fade.iOriginalAlpha);
+				alpha = clamp( alpha, 0, static_cast<int>(fade.iOriginalAlpha) );
 
 				renderState.textColor.SetColor( renderState.textColor.r(), renderState.textColor.g(), renderState.textColor.b(), alpha );
 			}
@@ -832,7 +835,7 @@ void RichText::Paint()
 
 		// 3.
 		// Calculate the range of text to draw all at once
-		int iLast = m_TextStream.Count() - 1;
+		intp iLast = m_TextStream.Count() - 1;
 		
 		// Stop at the next line break
 		if ( m_LineBreaks.IsValidIndex( lineBreakIndexIndex ) && m_LineBreaks[lineBreakIndexIndex] <= iLast )
@@ -1463,7 +1466,7 @@ void RichText::LayoutVerticalScrollBarSlider()
 	
 	// calculate how many lines we can fully display
 	int displayLines = tall / (GetLineHeight() + _drawOffsetY);
-	int numLines = m_LineBreaks.Count();
+	intp numLines = m_LineBreaks.Count();
 	
 	if (numLines <= displayLines)
 	{

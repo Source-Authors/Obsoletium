@@ -5,9 +5,11 @@
 //=============================================================================//
 
 #include <vgui_controls/CheckButtonList.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui_controls/CheckButton.h>
 #include <vgui_controls/ScrollBar.h>
-#include <KeyValues.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

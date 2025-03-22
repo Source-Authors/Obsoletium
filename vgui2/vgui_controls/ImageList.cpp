@@ -5,10 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui/VGUI.h>
+#include <vgui_controls/ImageList.h>
+
 #include <Color.h>
 
-#include <vgui_controls/ImageList.h>
+#include <vgui/VGUI.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -69,7 +70,7 @@ intp ImageList::AddImage(vgui::IImage *image)
 //-----------------------------------------------------------------------------
 // Purpose: sets an image at a specified index, growing and adding NULL images if necessary
 //-----------------------------------------------------------------------------
-void ImageList::SetImageAtIndex(int index, vgui::IImage *image)
+void ImageList::SetImageAtIndex(intp index, vgui::IImage *image)
 {
 	// allocate more images if necessary
 	while (m_Images.Count() <= index)
@@ -83,7 +84,7 @@ void ImageList::SetImageAtIndex(int index, vgui::IImage *image)
 //-----------------------------------------------------------------------------
 // Purpose: returns the number of images
 //-----------------------------------------------------------------------------
-int ImageList::GetImageCount()
+intp ImageList::GetImageCount()
 {
 	return m_Images.Count();
 }
@@ -91,7 +92,7 @@ int ImageList::GetImageCount()
 //-----------------------------------------------------------------------------
 // Purpose: gets an image, imageIndex is of range [0, GetImageCount)
 //-----------------------------------------------------------------------------
-vgui::IImage *ImageList::GetImage(int imageIndex)
+vgui::IImage *ImageList::GetImage(intp imageIndex)
 {
 	return m_Images[imageIndex];
 }
@@ -99,7 +100,7 @@ vgui::IImage *ImageList::GetImage(int imageIndex)
 //-----------------------------------------------------------------------------
 // Purpose: returns true if an index is valid
 //-----------------------------------------------------------------------------
-bool ImageList::IsValidIndex(int imageIndex)
+bool ImageList::IsValidIndex(intp imageIndex)
 {
 	return m_Images.IsValidIndex(imageIndex);
 }

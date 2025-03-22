@@ -5,15 +5,14 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include <vgui_controls/ImagePanel.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IBorder.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
-#include <vgui/IBorder.h>
-#include <KeyValues.h>
 
-#include <vgui_controls/ImagePanel.h>
 #include <vgui_controls/Image.h>
 #include <vgui_controls/Controls.h>
 

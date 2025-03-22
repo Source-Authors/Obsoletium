@@ -259,7 +259,7 @@ public:
 		}
 		else
 		{
-			CUtlVector< int > list;
+			CUtlVector< intp > list;
 			m_pTree->GetSelectedItems( list );
 
 			Assert( list.Count() == 1 );

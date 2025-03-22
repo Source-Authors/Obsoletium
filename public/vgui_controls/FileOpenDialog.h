@@ -61,10 +61,20 @@ public:
 	void DoModal( bool bUnused = false );
 
 	// Get the directory this is currently in
-	void GetCurrentDirectory( char *buf, int bufSize );
+	void GetCurrentDirectory( char *buf, intp bufSize );
+	template<intp bufferSize>
+	void GetCurrentDirectory( char (&buffer)[bufferSize] )
+	{
+		GetCurrentDirectory( buffer, bufferSize );
+	}
 
 	// Get the last selected file name
-	void GetSelectedFileName( char *buf, int bufSize );
+	void GetSelectedFileName( char *buf, intp bufSize );
+	template<intp bufferSize>
+	void GetSelectedFileName( char (&buffer)[bufferSize] )
+	{
+		GetSelectedFileName( buffer, bufferSize );
+	}
 
 	/*
 		messages sent:

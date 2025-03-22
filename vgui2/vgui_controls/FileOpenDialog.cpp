@@ -5,17 +5,15 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include <vgui_controls/FileOpenDialog.h>
 
-#define PROTECTED_THINGS_DISABLE
-
-#if !defined( _X360 ) && defined( WIN32 )
+#if defined( WIN32 )
 #include "winlite.h"
 #include <shellapi.h>
 #elif defined( POSIX )
-#include <stdlib.h>
+#include <cstdlib>
 #define _stat stat
 #define _wcsnicmp wcsncmp
-#elif defined( _X360 )
 #else
 #error "Please define your platform"
 #endif
@@ -26,16 +24,14 @@
 
 #include "tier1/utldict.h"
 #include "tier1/utlstring.h"
+#include <tier1/KeyValues.h>
 
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-#include <KeyValues.h>
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IInput.h>
-
-#include <vgui_controls/FileOpenDialog.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ComboBox.h>
@@ -47,11 +43,6 @@
 #include <vgui_controls/ImageList.h>
 #include <vgui_controls/MenuItem.h>
 #include <vgui_controls/Tooltip.h>
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#undef GetCurrentDirectory
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -857,7 +848,7 @@ void FileOpenDialog::OnNewFolder()
 void FileOpenDialog::OnOpenInExplorer()
 {
 	char pCurrentDirectory[MAX_PATH];
-	GetCurrentDirectory( pCurrentDirectory, sizeof(pCurrentDirectory) );
+	GetCurrentDirectory( pCurrentDirectory );
 #if !defined( _X360 ) && defined( WIN32 )
 	ShellExecute( NULL, NULL, pCurrentDirectory, NULL, NULL, SW_SHOWNORMAL );
 #else
@@ -940,7 +931,7 @@ void FileOpenDialog::SetStartDirectory( const char *dir )
 	if ( m_nStartDirContext != s_StartDirContexts.InvalidIndex() )
 	{
 		char pDirBuf[MAX_PATH];
-		GetCurrentDirectory( pDirBuf, sizeof(pDirBuf) );
+		GetCurrentDirectory( pDirBuf );
 		s_StartDirContexts[ m_nStartDirContext ] = pDirBuf;
 	}
 
@@ -977,7 +968,7 @@ void FileOpenDialog::DoModal( bool bUnused )
 //-----------------------------------------------------------------------------
 // Purpose: Gets the directory this is currently in
 //-----------------------------------------------------------------------------
-void FileOpenDialog::GetCurrentDirectory(char *buf, int bufSize)
+void FileOpenDialog::GetCurrentDirectory(char *buf, intp bufSize)
 {
 	// get the text from the text entry
 	m_pFullPathEdit->GetText(buf, bufSize);
@@ -987,7 +978,7 @@ void FileOpenDialog::GetCurrentDirectory(char *buf, int bufSize)
 //-----------------------------------------------------------------------------
 // Purpose: Get the last selected file name
 //-----------------------------------------------------------------------------
-void FileOpenDialog::GetSelectedFileName(char *buf, int bufSize)
+void FileOpenDialog::GetSelectedFileName(char *buf, intp bufSize)
 {
 	m_pFileNameEdit->GetText(buf, bufSize);
 }
@@ -999,7 +990,7 @@ void FileOpenDialog::GetSelectedFileName(char *buf, int bufSize)
 void FileOpenDialog::NewFolder( char const *folderName )
 {
 	char pCurrentDirectory[MAX_PATH];
-	GetCurrentDirectory( pCurrentDirectory, sizeof(pCurrentDirectory) );
+	GetCurrentDirectory( pCurrentDirectory );
 
 	char pFullPath[MAX_PATH];
 	char pNewFolderName[MAX_PATH];
@@ -1162,7 +1153,7 @@ void FileOpenDialog::PopulateFileList()
 	char currentDir[MAX_PATH * 4];
 	char dir[MAX_PATH * 4];
 	char filterList[MAX_FILTER_LENGTH+1];
-	GetCurrentDirectory(currentDir, sizeof(dir));
+	GetCurrentDirectory(currentDir);
 
 	KeyValues *combokv = m_pFileTypeCombo->GetActiveItemUserData();
 	if (combokv)
@@ -1254,7 +1245,7 @@ void FileOpenDialog::PopulateFileList()
 	}
 
 	// find all the directories
-	GetCurrentDirectory( dir, sizeof(dir) );
+	GetCurrentDirectory( dir );
 	Q_strncat(dir, "*", sizeof( dir ), COPY_ALL_CHARACTERS);
 	
 	const char *pszFileName = g_pFullFileSystem->FindFirst( dir, &findHandle );
@@ -1438,7 +1429,7 @@ void FileOpenDialog::OnSelectFolder()
 
 	// construct a file path
 	char pFileName[MAX_PATH];
-	GetSelectedFileName( pFileName, sizeof( pFileName ) );
+	GetSelectedFileName( pFileName );
 
 	Q_StripTrailingSlash( pFileName );
 
@@ -1498,7 +1489,7 @@ void FileOpenDialog::OnOpen()
 
 	// construct a file path
 	char pFileName[MAX_PATH];
-	GetSelectedFileName( pFileName, sizeof( pFileName ) );
+	GetSelectedFileName( pFileName );
 
 	intp nLen = Q_strlen( pFileName );
 	bool bSpecifiedDirectory = ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) && (!IsOSX() || ( !Q_stristr( pFileName, ".app" ) ) );

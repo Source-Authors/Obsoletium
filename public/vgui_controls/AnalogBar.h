@@ -28,7 +28,7 @@ class AnalogBar : public Panel
 
 public:
 	AnalogBar(Panel *parent, const char *panelName);
-	~AnalogBar();
+	virtual ~AnalogBar();
 
 	// 'analogValue' is in the range [0.0f, 1.0f]
 	MESSAGE_FUNC_FLOAT( SetAnalogValue, "SetAnalogValue", analogValue );
@@ -36,10 +36,16 @@ public:
 	virtual void SetSegmentInfo( int gap, int width );
 
 	// utility function for calculating a time remaining string
-	static bool ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output, intp outputBufferSizeInBytes, float startTime, float currentTime, float currentAnalogValue, float lastAnalogValueUpdateTime, bool addRemainingSuffix);
+	static bool ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output,
+		intp outputBufferSizeInBytes,
+		float startTime,
+		float currentTime,
+		float currentAnalogValue,
+		float lastAnalogValueUpdateTime,
+		bool addRemainingSuffix);
 
 	void SetBarInset( int pixels );
-	int GetBarInset( void );
+	int GetBarInset( void ) const;
 	
 	void ApplySettings(KeyValues *inResourceData) override;
 	void GetSettings(KeyValues *outResourceData) override;
@@ -62,7 +68,7 @@ public:
 
 	void SetHomeValue( float val ) { m_fHomeValue = val; }
 
-	const Color& GetHomeColor( void ) { return m_HomeColor; }
+	const Color& GetHomeColor() const { return m_HomeColor; }
 	void SetHomeColor( const Color &color ) { m_HomeColor = color; }
 
 protected:

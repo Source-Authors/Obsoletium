@@ -13,7 +13,10 @@
 #endif
 
 #include "tier1/utllinkedlist.h"
-#include <tier1/utlvector.h>
+#include "tier1/utlvector.h"
+#include "tier1/KeyValues.h"
+
+#include "vgui_controls/Panel.h"
 
 namespace vgui
 {
