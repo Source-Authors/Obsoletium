@@ -5,67 +5,52 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		".."
-$Macro OUTBINDIR	"$SRCDIR\..\game"
-$Macro OUTBINDIRX64	"$SRCDIR\..\game"
-$Macro OUTBINNAME	"srcds" [$WIN32]
-$Macro OUTBINNAME	"srcds_win64" [$WIN64]
-$Macro OUTBINNAME	"srcds_osx" [$OSXALL]
-$Macro OUTBINNAME	"srcds_linux" [$LINUXALL]
+$Macro OUTAPPBINDIR	"$SRCDIR\..\game"
+$Macro OUTBINDIR	"$OUTAPPBINDIR"
+
+$Macro OUTBINNAME	"srcds"			[$WIN32]
+$Macro OUTBINNAME	"srcds_win64"	[$WIN64]
+$Macro OUTBINNAME	"srcds_osx"		[$OSXALL]
+$Macro OUTBINNAME	"srcds_linux"	[$LINUXALL]
 
 $Include "$SRCDIR\vpc_scripts\source_exe_base.vpc"
 $Include "$SRCDIR\tier0\tier0_exclude.vpc"
-$Include "$SRCDIR\tier1\tier1_exclude.vpc" [$WINDOWS]
-$Include "$SRCDIR\vstdlib\vstdlib_exclude.vpc" [$WINDOWS]
+$Include "$SRCDIR\tier1\tier1_exclude.vpc"		[$WINDOWS]
+$Include "$SRCDIR\vstdlib\vstdlib_exclude.vpc"	[$WINDOWS]
 
 $Configuration
 {
 	$Linker [$WINDOWS]
 	{
 		$AdditionalDependencies				"$BASE delayimp.lib User32.lib"
-		// dimhotepus: Delay load user32 only when needed.  Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
+		// dimhotepus: Delay load user32 only when needed.
+		// Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
 		$DelayLoadedDLL						"$BASE User32.dll"
 	}
 
-	$Resources
+	$PostBuildEvent [$WINDOWS && !$ANALYZE]
 	{
-		// General
-		$PreprocessorDefinitions				"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEsrcds\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEsrcds.exe\$QUOTE"
-	}
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTAPPBINDIR$QUOTE MKDIR $QUOTE$OUTAPPBINDIR$QUOTE" "\n" 
+		$CommandLine		"COPY $QUOTE$(TargetDir)$(TargetFileName)$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetFileName)$QUOTE >nul" "\n" \
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							// "SignTool sign /f $QUOTE$(SolutionDir)devtools\certificates\dev\local-dev-app-sign.pfx$QUOTE /p $QUOTEK)(#JF*56U8$RJO_)P#6NJP762OKAE$QUOTE /fd SHA512 /td SHA512 /tr http://timestamp.sectigo.com $QUOTE$OUTAPPBINDIR\$(TargetFileName)$QUOTE" "\n" \
+							// "IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF NOT $QUOTE$(TargetFileName)$QUOTE == $QUOTEnewdat.exe$QUOTE (" "\n" \
+							"    $QUOTE$OUTAPPBINDIR\bin$PLATSUBDIR\newdat$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetFileName)$QUOTE" "\n" \
+							"    IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							")" "\n" \
 
-	$PostBuildEvent	[$WIN32 && !$ANALYZE]
-	{
-		$CommandLine				"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"				\
-									"COPY $QUOTE$(TargetPath)$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.exe$QUOTE" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $QUOTE$(IntDir)\$OUTBINNAME.pdb$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.pdb$QUOTE" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.map$QUOTE" "\n" \
-									"$QUOTE$OUTBINDIR\bin\newdat$QUOTE $QUOTE$OUTBINDIR\$OUTBINNAME.exe$QUOTE" "\n"					\
-									"COPY $QUOTE$(SolutionDir)LICENSE$QUOTE $QUOTE$OUTBINDIR\LICENSE$QUOTE" "\n"					\
-									"GOTO BuildEventOK" "\n" \
-									":BuildEventFailed" "\n" \
-									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-									"DEL /Q $QUOTE$(TargetPath)$QUOTE" "\n" \
-									"EXIT 1" "\n" \
-									":BuildEventOK" "\n"
-	}
-
-	$PostBuildEvent	[$WIN64 && !$ANALYZE]
-	{
-		$CommandLine				"IF NOT EXIST $QUOTE$OUTBINDIRX64$QUOTE MKDIR $QUOTE$OUTBINDIRX64$QUOTE" "\n"				\
-									"COPY $QUOTE$(TargetPath)$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.exe$QUOTE" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $QUOTE$(IntDir)\$OUTBINNAME.pdb$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.pdb$QUOTE" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.map$QUOTE" "\n" \
-									"$QUOTE$OUTBINDIRX64\bin\x64\newdat$QUOTE $QUOTE$OUTBINDIRX64\$OUTBINNAME.exe$QUOTE" "\n"					\
-									"COPY $QUOTE$(SolutionDir)LICENSE$QUOTE $QUOTE$OUTBINDIRX64\LICENSE$QUOTE" "\n"					\
-									"GOTO BuildEventOK" "\n" \
-									":BuildEventFailed" "\n" \
-									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-									"DEL /Q $QUOTE$(TargetPath)$QUOTE" "\n" \
-									"EXIT 1" "\n" \
-									":BuildEventOK" "\n"
+							"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetName).map$QUOTE >nul" "\n"
+		$CommandLine		"$BASE"	"COPY $QUOTE$(IntDir)$(TargetName).pdb$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetName).pdb$QUOTE >nul" "\n" \
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"GOTO BuildEventOK" "\n" \
+							":BuildEventFailed" "\n" \
+							"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! $(TargetFileName) is probably running. ***" "\n" \
+							"DEL /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
+							"EXIT 1" "\n" \
+							":BuildEventOK" "\n"
+		$Description		"Publishing $(TargetFileName) to $OUTAPPBINDIR"
+		$ExcludedFromBuild	"No"
 	}
 }
 
@@ -77,10 +62,10 @@ $Project "dedicated_main"
 		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
 	}
 
-	$Folder "Header Files" [$WINDOWS]
+	$Folder "Header Files"
 	{
 		$File	"$SRCDIR\common\scoped_dll.h"
-		$File	"$SRCDIR\common\scoped_process_error_mode.h"
+		$File	"$SRCDIR\common\scoped_process_error_mode.h" [$WINDOWS]
 	}
 
 	$Folder	"Resources"

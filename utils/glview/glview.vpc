@@ -21,12 +21,6 @@ $Configuration
 	{
 		$AdditionalDependencies				"$BASE glu32.lib opengl32.lib user32.lib gdi32.lib"
 	}
-
-	$Resources
-	{
-		// General
-		$PreprocessorDefinitions			"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEhammer\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEhammer.exe\$QUOTE"
-	}
 }
 
 $Project "glview"

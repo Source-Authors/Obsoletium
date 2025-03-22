@@ -21,12 +21,6 @@ $Configuration
 	{
 		$EnableLargeAddresses				"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"
 	}
-
-	$Resources
-	{
-		// General
-		$PreprocessorDefinitions			"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEhammer\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEhammer.exe\$QUOTE"
-	}
 }
 
 $Project "bspzip"
