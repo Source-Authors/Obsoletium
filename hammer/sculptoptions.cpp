@@ -1079,19 +1079,19 @@ BOOL CSculptPushOptions::OnInitDialog( void )
 	m_OffsetDistanceControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ABSOLUTE ) );
 	m_OffsetAmountControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ADAPTIVE ) ); 
 
-	sprintf( temp, "%g", m_OffsetDistance );
+	V_sprintf_safe( temp, "%g", m_OffsetDistance );
 	m_OffsetDistanceControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_OffsetAmount * 100.0f );
 	m_OffsetAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_SmoothAmount * 100.0f );
 	m_SmoothAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_flFalloffSpot * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_flFalloffSpot * 100.0f );
 	m_FalloffPositionControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_flFalloffEndingValue * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_flFalloffEndingValue * 100.0f );
 	m_FalloffFinalControl.SetWindowText( temp );
 
 	m_NormalModeControl.InsertString( -1, "Brush Center" );
@@ -2166,7 +2166,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 		m_SmoothAmount = 0.2f;
 	}
 
-	sprintf( t2, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2191,7 +2191,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 		m_OffsetAmount = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2217,7 +2217,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffPosition()
 		m_flFalloffSpot = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_flFalloffSpot * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_flFalloffSpot * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2243,7 +2243,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffFinal()
 		m_flFalloffEndingValue = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_flFalloffEndingValue * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_flFalloffEndingValue * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2312,13 +2312,13 @@ BOOL CSculptCarveOptions::OnInitDialog( )
 	m_OffsetDistanceControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ABSOLUTE ) );
 	m_OffsetAmountControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ADAPTIVE ) ); 
 
-	sprintf( temp, "%g", m_OffsetDistance );
+	V_sprintf_safe( temp, "%g", m_OffsetDistance );
 	m_OffsetDistanceControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_OffsetAmount * 100.0f );
 	m_OffsetAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_SmoothAmount * 100.0f );
 	m_SmoothAmountControl.SetWindowText( temp );
 
 	m_NormalModeControl.InsertString( -1, "Brush Center" );
@@ -3216,7 +3216,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 		m_SmoothAmount = 0.2f;
 	}
 
-	sprintf( t2, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -3241,7 +3241,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 		m_OffsetAmount = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -3903,7 +3903,7 @@ void CSculptProjectOptions::OnNMCustomdrawProjectSize(NMHDR *pNMHDR, LRESULT *pR
 //	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 
 	char	temp[ 128 ];
-	sprintf( temp, "%d", m_ProjectSizeControl.GetPos() * 16 );
+	V_sprintf_safe( temp, "%d", m_ProjectSizeControl.GetPos() * 16 );
 
 	m_ProjectSizeNumControl.SetWindowText( temp );
 

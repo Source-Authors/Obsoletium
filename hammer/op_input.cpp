@@ -233,7 +233,7 @@ void COP_Input::AddEntityConnections(const char *pTargetName, CMapEntity *pTestE
 				// Build the string for the delay.
 				float fDelay = pConnection->GetDelay();
 				char szTemp[MAX_PATH];
-				sprintf(szTemp, "%.2f", fDelay);
+				V_sprintf_safe(szTemp, "%.2f", fDelay);
 				m_ListCtrl.SetItemText(nItemCount, DELAY_COLUMN, szTemp);
 				m_ListCtrl.SetItemText(nItemCount, ONLY_ONCE_COLUMN, (pConnection->GetTimesToFire() == EVENT_FIRE_ALWAYS) ? "No" : "Yes");
 				m_ListCtrl.SetItemText(nItemCount, PARAMETER_COLUMN, pConnection->GetParam());

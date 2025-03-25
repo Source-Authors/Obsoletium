@@ -456,7 +456,7 @@ void COP_Output::AddEntityConnections(CMapEntity *pEntity, bool bFirst)
 				// Build the string for the delay.
 				float fDelay = pConnection->GetDelay();
 				char szTemp[MAX_PATH];
-				sprintf(szTemp, "%.2f", fDelay);
+				V_sprintf_safe(szTemp, "%.2f", fDelay);
 				m_ListCtrl.SetItemText(nItemCount, DELAY_COLUMN, szTemp);
 
 				// Fire once
@@ -605,7 +605,7 @@ void COP_Output::UpdateEditControls(void)
 
 		CEdit *pDelayEdit = ( CEdit* )GetDlgItem( IDC_EDIT_CONN_DELAY );
 		char szTemp[MAX_PATH];
-		sprintf(szTemp, "%.2f", m_fDelay);
+		V_sprintf_safe(szTemp, "%.2f", m_fDelay);
 		pDelayEdit->SetWindowText(szTemp);
 		
 		CComboBox* pParamEdit = ( CComboBox* )GetDlgItem( IDC_EDIT_CONN_PARAM );

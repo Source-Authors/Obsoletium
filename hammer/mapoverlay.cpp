@@ -244,16 +244,16 @@ void CMapOverlay::Basis_UpdateParentKey( void )
 	CMapEntity *pEntity = ( CMapEntity* )GetParent();
 	if ( pEntity )
 	{
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecOrigin.x, m_Basis.m_vecOrigin.y, m_Basis.m_vecOrigin.z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecOrigin.x, m_Basis.m_vecOrigin.y, m_Basis.m_vecOrigin.z );
 		pEntity->NotifyChildKeyChanged( this, "BasisOrigin", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_U].x, m_Basis.m_vecAxes[OVERLAY_BASIS_U].y, m_Basis.m_vecAxes[OVERLAY_BASIS_U].z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_U].x, m_Basis.m_vecAxes[OVERLAY_BASIS_U].y, m_Basis.m_vecAxes[OVERLAY_BASIS_U].z );
 		pEntity->NotifyChildKeyChanged( this, "BasisU", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_V].x, m_Basis.m_vecAxes[OVERLAY_BASIS_V].y, m_Basis.m_vecAxes[OVERLAY_BASIS_V].z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_V].x, m_Basis.m_vecAxes[OVERLAY_BASIS_V].y, m_Basis.m_vecAxes[OVERLAY_BASIS_V].z );
 		pEntity->NotifyChildKeyChanged( this, "BasisV", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].x, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].y, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].z );
+		V_sprintf_safe( szValue, "%g %g %g", m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].x, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].y, m_Basis.m_vecAxes[OVERLAY_BASIS_NORMAL].z );
 		pEntity->NotifyChildKeyChanged( this, "BasisNormal", szValue );
 	}
 }
@@ -452,16 +452,16 @@ void CMapOverlay::Handles_UpdateParentKey( void )
 	CMapEntity *pEntity = ( CMapEntity* )GetParent();
 	if ( pEntity )
 	{
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[0].x, m_Handles.m_vecBasisCoords[0].y, ( float )m_Basis.m_nAxesFlip[0] );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[0].x, m_Handles.m_vecBasisCoords[0].y, ( float )m_Basis.m_nAxesFlip[0] );
 		pEntity->NotifyChildKeyChanged( this, "uv0", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[1].x, m_Handles.m_vecBasisCoords[1].y, ( float )m_Basis.m_nAxesFlip[1] );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[1].x, m_Handles.m_vecBasisCoords[1].y, ( float )m_Basis.m_nAxesFlip[1] );
 		pEntity->NotifyChildKeyChanged( this, "uv1", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[2].x, m_Handles.m_vecBasisCoords[2].y, ( float )m_Basis.m_nAxesFlip[2] );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[2].x, m_Handles.m_vecBasisCoords[2].y, ( float )m_Basis.m_nAxesFlip[2] );
 		pEntity->NotifyChildKeyChanged( this, "uv2", szValue );
 
-		sprintf( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[3].x, m_Handles.m_vecBasisCoords[3].y, 0.0f );
+		V_sprintf_safe( szValue, "%g %g %g", m_Handles.m_vecBasisCoords[3].x, m_Handles.m_vecBasisCoords[3].y, 0.0f );
 		pEntity->NotifyChildKeyChanged( this, "uv3", szValue );
 	}
 }
@@ -1278,16 +1278,16 @@ void CMapOverlay::Material_UpdateParentKey( void )
 	CMapEntity *pEntity = ( CMapEntity* )GetParent();
 	if ( pEntity )
 	{
-		sprintf( szValue, "%g", m_Material.m_vecTextureU.x );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureU.x );
 		pEntity->NotifyChildKeyChanged( this, "StartU", szValue );
 
-		sprintf( szValue, "%g", m_Material.m_vecTextureU.y );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureU.y );
 		pEntity->NotifyChildKeyChanged( this, "EndU", szValue );
 
-		sprintf( szValue, "%g", m_Material.m_vecTextureV.x );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureV.x );
 		pEntity->NotifyChildKeyChanged( this, "StartV", szValue );
 
-		sprintf( szValue, "%g", m_Material.m_vecTextureV.y );
+		V_sprintf_safe( szValue, "%g", m_Material.m_vecTextureV.y );
 		pEntity->NotifyChildKeyChanged( this, "EndV", szValue );
 	}
 }

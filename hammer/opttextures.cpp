@@ -422,9 +422,11 @@ void COPTTextures::MaterialExcludeUpdate( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void StripOffMaterialDirectory( const char *pszDirectoryName, char *pszName )
+template<intp nameSize>
+void StripOffMaterialDirectory( const char *pszDirectoryName, OUT_Z_ARRAY char (&pszName)[nameSize] )
 {
 	// clear name
+	if (nameSize)
 	pszName[0] = '\0';
 
 	// create a lower case version of the string
@@ -437,7 +439,7 @@ void StripOffMaterialDirectory( const char *pszDirectoryName, char *pszName )
 	pAtMat += 10;
 
 	// copy the rest to the name string
-	strcpy( pszName, pAtMat );
+	V_strcpy_safe( pszName, pAtMat );
 
 	// free duplicated string's memory
 	free( pLowerCase );
@@ -457,7 +459,7 @@ void COPTTextures::OnMaterialExcludeAdd( void )
 
 	// strip off the material directory
 	char szSubDirName[MAX_PATH];
-	StripOffMaterialDirectory( szTmp, &szSubDirName[0] );
+	StripOffMaterialDirectory( szTmp, szSubDirName );
 	if( szSubDirName[0] == '\0' )
 		return;
 

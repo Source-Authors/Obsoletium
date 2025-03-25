@@ -301,7 +301,7 @@ static void CopyToClipboard(const CString& text)
 				LPTSTR tstrCopy = static_cast<LPTSTR>(::GlobalLock(hglbCopy));
 				if (tstrCopy)
 				{
-					strcpy(tstrCopy, text.GetString());
+					V_strncpy(tstrCopy, text.GetString(), text.GetLength() + sizeof(TCHAR));
 				}
 
 				::GlobalUnlock(hglbCopy);

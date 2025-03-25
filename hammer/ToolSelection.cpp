@@ -986,7 +986,7 @@ bool Selection3D::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &
 	// Update status bar position display.
 	//
 	char szBuf[128];
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
 	SetStatusText(SBI_COORDS, szBuf);
 
 	//
@@ -1282,7 +1282,7 @@ bool Selection3D::OnMouseMoveLogical(CMapViewLogical *pView, UINT nFlags, const 
 
 	// Update status bar position display.
 	char szBuf[128];
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld.x, vecWorld.y);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld.x, vecWorld.y);
 	SetStatusText( SBI_COORDS, szBuf );
 		   
 	// If we are currently dragging the selection (moving)

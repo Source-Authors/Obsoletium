@@ -419,7 +419,8 @@ BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx)
 			pszName = pVar->GetLongName();
 		}
 
-		sprintf(szString + strlen(szString), "\t%s \"%s\"", pszName, pEntity->GetKeyValue(i));
+		const intp stringLen = V_strlen(szString); 
+		V_snprintf(szString + stringLen, ssize(szString) - stringLen, "\t%s \"%s\"", pszName, pEntity->GetKeyValue(i));
 
 		if (pClass == NULL)
 		{

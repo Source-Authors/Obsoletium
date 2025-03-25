@@ -367,7 +367,7 @@ void CChildFrame::SaveOptions(void)
 				if (pView != NULL)
 				{
 					char szKey[30];
-					sprintf(szKey, "DrawType%d,%d", nRow, nCol);
+					V_sprintf_safe(szKey, "DrawType%d,%d", nRow, nCol);
 					APP()->WriteProfileInt("Splitter", szKey, pView->GetDrawType());
 				}
 			}
@@ -388,7 +388,7 @@ void CChildFrame::SaveOptions(void)
 		GetWindowPlacement(&wp);
 
 		char szPlacement[100];
-		sprintf(szPlacement, "(%d %d) (%d %d) (%d %d %d %d) %d", wp.ptMaxPosition.x, wp.ptMaxPosition.y, wp.ptMinPosition.x, wp.ptMinPosition.y, wp.rcNormalPosition.bottom, wp.rcNormalPosition.left, wp.rcNormalPosition.right, wp.rcNormalPosition.top, wp.showCmd);
+		V_sprintf_safe(szPlacement, "(%d %d) (%d %d) (%d %d %d %d) %d", wp.ptMaxPosition.x, wp.ptMaxPosition.y, wp.ptMinPosition.x, wp.ptMinPosition.y, wp.rcNormalPosition.bottom, wp.rcNormalPosition.left, wp.rcNormalPosition.right, wp.rcNormalPosition.top, wp.showCmd);
 		APP()->WriteProfileString("Splitter", "WindowPlacement", szPlacement);
 	}
 }

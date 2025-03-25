@@ -354,7 +354,7 @@ ResolveNamesAgain:
 		if(iLastNodeIndex != -1)
 		{
 			CMapPathNode &prevNode = m_Nodes[iLastNodeIndex];
-			strcpy(prevNode.szTargets[prevNode.nTargets++], strTemp);
+			V_strcpy_safe(prevNode.szTargets[prevNode.nTargets++], strTemp);
 		}
 
 		++iName;
@@ -566,7 +566,7 @@ CChunkFileResult_t CMapPathNode::LoadKeyCallback(const char *szKey, const char *
 	}
 	else if (!stricmp(szKey, "name"))
 	{
-		strcpy(pNode->szName, szValue);
+		V_strcpy_safe(pNode->szName, szValue);
 	}
 }
 

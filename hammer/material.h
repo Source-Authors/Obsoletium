@@ -55,13 +55,13 @@ public:
 
 	void FreeData(void);
 
-	inline const char *GetName(void) const
+	inline const char *GetName() const
 	{
-		return(m_szName);
+		return m_szName;
 	}
-	int GetShortName(char *pszName) const;
+	intp GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const override;
 
-	int GetKeywords(char *pszKeywords) const;
+	intp GetKeywords(OUT_Z_CAP(keywordsSize) char *pszKeywords, intp keywordsSize) const override;
 
 	void GetSize(SIZE &size) const;
 

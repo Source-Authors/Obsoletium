@@ -80,8 +80,12 @@ bool MatchString(const char *pszString, FindObject_t &FindObject)
 //			pszOut - String to check.
 //			FindObject - Search criteria, including string to search for.
 //-----------------------------------------------------------------------------
-bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, const char *pszReplace)
+template<intp outSize>
+static bool ReplaceString(OUT_Z_ARRAY char (&pszOut)[outSize], const char *pszIn, FindObject_t &FindObject, const char *pszReplace)
 {
+	if (outSize > 0)
+		pszOut[0] = '\0';
+
 	//
 	// Whole matches are simple, just strcpy the replacement string into the out buffer.
 	//
@@ -89,13 +93,13 @@ bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, co
 	{
 		if (FindObject.bCaseSensitive && (!strcmp(pszIn, FindObject.strFindText)))
 		{
-			strcpy(pszOut, pszReplace);
+			V_strcpy_safe(pszOut, pszReplace);
 			return true;
 		}
 
 		if (!stricmp(pszIn, FindObject.strFindText))
 		{
-			strcpy(pszOut, pszReplace);
+			V_strcpy_safe(pszOut, pszReplace);
 			return true;
 		}
 	}

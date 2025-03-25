@@ -90,7 +90,12 @@ public:
 	int						SetSequence( int iSequence );
 	int						GetSequence( void );
 	int						GetSequenceCount( void );
-	void					GetSequenceName( int nIndex, char *szName );
+	void					GetSequenceName( int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize );
+	template<intp nameSize>
+	void GetSequenceName(int nIndex, OUT_Z_ARRAY char (&szName)[nameSize])
+	{
+		GetSequenceName(nIndex, szName, nameSize);
+	}
 	void					GetSequenceInfo( float *pflFrameRate, float *pflGroundSpeed );
 
 	int						SetBodygroup( int iGroup, int iValue );

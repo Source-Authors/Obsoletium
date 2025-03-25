@@ -70,7 +70,7 @@ void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, intp context )
 	m_Watcher.Init( this );
 	
 	char searchPaths[1024 * 16];
-	if ( g_pFullFileSystem->GetSearchPath( "GAME", false, searchPaths, sizeof( searchPaths ) ) > 0 )
+	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths ) > 0 )
 	{
 		CUtlVector<char*> searchPathList;
 		V_SplitString( searchPaths, ";", searchPathList );
@@ -287,7 +287,7 @@ IEditorTexture *CTextureSystem::FindActiveTexture(LPCSTR pszInputName, int *piIn
 	// The .vmf file format gets confused if there are backslashes in material names,
 	// so make sure they're all using forward slashes here.
 	char szName[MAX_PATH];
-	Q_StrSubst( pszInputName, "\\", "/", szName, sizeof( szName ) );
+	V_StrSubst( pszInputName, "\\", "/", szName );
 	const char *pszName = szName;
 	IEditorTexture *pTex = NULL;
 	//
@@ -329,9 +329,9 @@ IEditorTexture *CTextureSystem::FindActiveTexture(LPCSTR pszInputName, int *piIn
 		iIndex = 0;
 		char szBuf[512];
 
-		sprintf(szBuf, "textures\\%s", pszName);
+		V_sprintf_safe(szBuf, "textures\\%s", pszName);
 
-		for (int i = strlen(szBuf) -1; i >= 0; i--)
+		for (intp i = strlen(szBuf) -1; i >= 0; i--)
 		{
 			if (szBuf[i] == '/')
 				szBuf[i] = '\\';
@@ -481,7 +481,7 @@ void CTextureSystem::SetActiveGroup(const char *pcszName)
 		return;
 
 	char szBuf[MAX_PATH];
-	sprintf(szBuf, "textures\\%s", pcszName);
+	V_sprintf_safe(szBuf, "textures\\%s", pcszName);
 
 	int iCount = m_pActiveContext->Groups.Count();
 	for (int i = 0; i < iCount; i++)
@@ -508,7 +508,7 @@ void CTextureSystem::SetActiveGroup(const char *pcszName)
 void HammerFileSystem_ReportSearchPath( const char *szPathID )
 {
 	char szSearchPath[ 4096 ];
-	g_pFullFileSystem->GetSearchPath( szPathID, true, szSearchPath, sizeof( szSearchPath ) );
+	g_pFullFileSystem->GetSearchPath_safe( szPathID, true, szSearchPath );
 
 	Msg( mwStatus, "------------------------------------------------------------------" );
 
@@ -533,7 +533,7 @@ void HammerFileSystem_SetGame( const char *pExeDir, const char *pModDir )
 
 	char buf[MAX_PATH];
 
-	Q_snprintf( buf, MAX_PATH, "%s\\hl2", pExeDir );
+	V_sprintf_safe( buf, "%s\\hl2", pExeDir );
 	g_pFullFileSystem->AddSearchPath( buf, "GAME", PATH_ADD_TO_HEAD );
 
 	if ( pModDir && *pModDir != '\0' )
@@ -668,7 +668,7 @@ void CTextureSystem::OnFileChange( const char *pFilename, intp context, CTexture
 {
 	// It requires the forward slashes later...
 	char fixedSlashes[MAX_PATH];
-	V_StrSubst( pFilename, "\\", "/", fixedSlashes, sizeof( fixedSlashes ) );	
+	V_StrSubst( pFilename, "\\", "/", fixedSlashes );
 
 	// Get rid of the extension.
 	if ( V_strlen( fixedSlashes ) < 5 )
@@ -750,7 +750,7 @@ void CTextureSystem::ReloadMaterialsUsingTexture( ITexture *pTestTexture )
 bool CTextureSystem::GetFileTypeFromFilename( const char *pFilename, CTextureSystem::EFileType *pFileType )
 {
 	char strRight[16];
-	V_StrRight( pFilename, 4, strRight, sizeof( strRight ) );
+	V_StrRight( pFilename, 4, strRight );
 	if ( V_stricmp( strRight, ".vmt" ) == 0 )
 	{
 		*pFileType = CTextureSystem::k_eFileTypeVMT;
@@ -1189,9 +1189,7 @@ void CTextureSystem::RegisterTextureKeywords( IEditorTexture *pTexture )
 
 			if (!bFound)
 			{
-				char *pszKeyword = new char[strlen(pch) + 1];
-				strcpy(pszKeyword, pch);
-				m_Keywords.AddToTail(pszKeyword);
+				m_Keywords.AddToTail(V_strdup(pch));
 			}
 
 			pch = strtok(NULL, " ,;");
@@ -1239,7 +1237,7 @@ void CTextureSystem::OpenSource( const char *pMaterialName )
 	Q_snprintf( pRelativePath, MAX_PATH, "materials/%s.vmt", pMaterialName );
 
 	char pFullPath[MAX_PATH];
-	if ( g_pFullFileSystem->GetLocalPath( pRelativePath, pFullPath, MAX_PATH ) )
+	if ( g_pFullFileSystem->GetLocalPath_safe( pRelativePath, pFullPath ) )
 	{
 		if (HINSTANCE(32) > ShellExecute( NULL, "open", pFullPath, NULL, NULL, SW_SHOWNORMAL ))
 		{

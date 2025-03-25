@@ -351,7 +351,7 @@ void CPrefabLibrary::Sort(void)
 void CPrefabLibrary::SetNameFromFilename(LPCTSTR pszFilename)
 {
 	const char *cp = strrchr(pszFilename, '\\');
-	strcpy(m_szName, cp ? (cp + 1) : pszFilename);
+	V_strcpy_safe(m_szName, cp ? (cp + 1) : pszFilename);
 	char *p = strchr(m_szName, '.');
 	if (p != NULL)
 	{
@@ -763,8 +763,9 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 			CHammer *pApp = (CHammer*) AfxGetApp();
 			pApp->GetDirectory(DIR_PREFABS, szNewFilename);
 
-			sprintf(szNewFilename + strlen(szNewFilename), "\\%s.ol", m_szName);
+			const intp newFileNameLen = V_strlen(szNewFilename);
 
+			V_snprintf(szNewFilename + newFileNameLen, ssize(szNewFilename) - newFileNameLen, "\\%s.ol", m_szName);
 			// make a name
 			m_strOpenFileName = szNewFilename;
 		}
@@ -886,7 +887,9 @@ int CPrefabLibraryRMF::SetName(LPCTSTR pszName)
 	CHammer *pApp = (CHammer*) AfxGetApp();
 	pApp->GetDirectory(DIR_PREFABS, szNewFilename);
 
-	sprintf(szNewFilename + strlen(szNewFilename), "\\%s.ol", pszName);
+	const intp newFileNameLen = V_strlen(szNewFilename);
+
+	V_snprintf(szNewFilename + newFileNameLen, ssize(szNewFilename) - newFileNameLen, "\\%s.ol", pszName);
 
 	if(m_file.is_open())
 	{

@@ -14,7 +14,6 @@
 #include "hammer.h"
 #include "KeyValues.h"
 #include "MapDoc.h"
-#include "MapDoc.h"
 #include "MapEntity.h"
 #include "MapInstance.h"
 #include "MapWorld.h"
@@ -216,7 +215,7 @@ bool CGameConfig::Load(KeyValues *pkv)
 	bool bAdded = true;
 	do
 	{
-		sprintf(szKey, "GameData%d", nGDFiles);
+		V_sprintf_safe(szKey, "GameData%d", nGDFiles);
 		const char *pszGameData = pkvHammer->GetString(szKey);
 		if (pszGameData[0] != '\0')
 		{
@@ -258,8 +257,8 @@ bool CGameConfig::Load(KeyValues *pkv)
 	m_MaterialExcludeCount = pkvHammer->GetInt( "MaterialExcludeCount" );
 	for ( int i = 0; i < m_MaterialExcludeCount; i++ )
 	{
-		sprintf( szExcludeDir, "-MaterialExcludeDir%d", i );
-		int index = m_MaterialExclusions.AddToTail();
+		V_sprintf_safe( szExcludeDir, "-MaterialExcludeDir%d", i );
+		intp index = m_MaterialExclusions.AddToTail();
 		Q_strncpy( m_MaterialExclusions[index].szDirectory, pkvHammer->GetString( szExcludeDir ), sizeof( m_MaterialExclusions[index].szDirectory ) ); 
 		Q_StripTrailingSlash( m_MaterialExclusions[index].szDirectory );
 		m_MaterialExclusions[index].bUserGenerated = true;
@@ -301,7 +300,7 @@ bool CGameConfig::Save(KeyValues *pkv)
 	for (int i = 0; i < nGDFiles; i++)
 	{
 		char szKey[MAX_PATH];
-		sprintf(szKey, "GameData%d", i);
+		V_sprintf_safe(szKey, "GameData%d", i);
 		pkvHammer->SetString(szKey, GDFiles.GetAt(i));
 	}
 
@@ -327,7 +326,7 @@ bool CGameConfig::Save(KeyValues *pkv)
 	pkvHammer->SetInt("MaterialExcludeCount", m_MaterialExcludeCount);
 	for (int i = 0; i < m_MaterialExcludeCount; i++)
 	{
-		sprintf(szExcludeDir, "-MaterialExcludeDir%d", i );
+		V_sprintf_safe(szExcludeDir, "-MaterialExcludeDir%d", i );
 		pkvHammer->SetString(szExcludeDir, m_MaterialExclusions[i].szDirectory);
 	}
 
@@ -498,7 +497,7 @@ bool FindFileInTree(const char *szFile, const char *szStartDir, char (&szFoundPa
 
 	char szRoot[MAX_PATH];
 	V_strcpy_safe(szRoot, szStartDir);
-	Q_AppendSlash(szRoot, sizeof(szRoot));
+	V_AppendSlash(szRoot);
 
 	char szTemp[MAX_PATH];
 	do
@@ -509,11 +508,11 @@ bool FindFileInTree(const char *szFile, const char *szStartDir, char (&szFoundPa
 		if (!_access(szTemp, 0))
 		{
 			V_strcpy_safe(szFoundPath, szRoot);
-			Q_StripTrailingSlash(szFoundPath);
+			V_StripTrailingSlash(szFoundPath);
 			return true;
 		}
 
-	} while (Q_StripLastDir(szRoot, sizeof(szRoot)));
+	} while (V_StripLastDir(szRoot));
 
 	return false;
 }
@@ -615,7 +614,7 @@ const char *CGameConfig::GetMod()
 		V_strcpy_safe( szModPath, "hl2" );
 	}
 
-	Q_FileBase( szModPath, szMod, MAX_PATH );
+	Q_FileBase( szModPath, szMod );
 
 	return szMod;
 }
@@ -629,7 +628,7 @@ const char *CGameConfig::GetGame()
 //	static char szGame[MAX_PATH];
 //	Q_strncpy( szGamePath, m_szGameDir, MAX_PATH );
 //	Q_StripTrailingSlash( szGamePath );
-//	Q_FileBase( szGamePath, szGame, MAX_PATH );
+//	Q_FileBase( szGamePath, szGame );
 
 //	return szGame;
 }

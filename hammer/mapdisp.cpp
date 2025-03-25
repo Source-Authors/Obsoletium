@@ -2786,7 +2786,7 @@ ChunkFileResult_t CMapDisp::LoadDispDistancesKeyCallback(const char *szKey, cons
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pDisp->GetPower()) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -2833,7 +2833,7 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetsKeyCallback(const char *szKey, const 
 	if( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pDisp->GetPower() ) + 1;
 		int nRow = atoi( &szKey[3] );
@@ -2891,7 +2891,7 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetNormalsKeyCallback(const char *szKey, 
 	if( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pDisp->GetPower() ) + 1;
 		int nRow = atoi( &szKey[3] );
@@ -3031,7 +3031,7 @@ ChunkFileResult_t CMapDisp::LoadDispAlphasKeyCallback(const char *szKey, const c
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pDisp->GetPower()) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -3071,7 +3071,7 @@ ChunkFileResult_t CMapDisp::LoadDispTriangleTagsKeyCallback(const char *szKey, c
 	if ( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pDisp->GetPower() );
 		int nRow = atoi( &szKey[3] );
@@ -3107,7 +3107,7 @@ ChunkFileResult_t CMapDisp::LoadDispAllowedVertsKeyCallback( const char *szKey, 
 	if ( !strnicmp( szKey, "10", 2 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 		
 		int iValue = 0;
 
@@ -3150,7 +3150,7 @@ ChunkFileResult_t CMapDisp::LoadDispNormalsKeyCallback(const char *szKey, const 
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pDisp->GetPower()) + 1;
 		int nRow = atoi(&szKey[3]);

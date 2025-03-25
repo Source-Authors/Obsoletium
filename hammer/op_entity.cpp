@@ -261,14 +261,14 @@ void CPickAnglesTarget::OnNotifyPickAngles(const Vector &vecPos)
 
 			// Update the edit control with the calculated angles.
 			char szAngles[80];	
-			sprintf(szAngles, "%.0f %.0f %.0f", angFace[PITCH], angFace[YAW], angFace[ROLL]);
+			V_sprintf_safe(szAngles, "%.0f %.0f %.0f", angFace[PITCH], angFace[YAW], angFace[ROLL]);
 			pEntity->SetKeyValue("angles", szAngles);
 
 			// HACK: lights have a separate "pitch" key
 			if (pEntity->GetClassName() && (!strnicmp(pEntity->GetClassName(), "light_", 6)))
 			{
 				char szPitch[20];
-				sprintf(szPitch, "%.0f", angFace[PITCH]);
+				V_sprintf_safe(szPitch, "%.0f", angFace[PITCH]);
 				pEntity->SetKeyValue("pitch", szPitch);
 			}
 
@@ -521,7 +521,7 @@ BOOL COP_Entity::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			LPNMLISTVIEW pListView = (LPNMLISTVIEW)lParam;
 
 			// Now sort by this column.
-			m_iSortColumn = max( 0, min( pListView->iSubItem, ARRAYSIZE( g_ColumnSortFunctions ) - 1 ) );
+			m_iSortColumn = max( 0, min( pListView->iSubItem, static_cast<int>(ssize( g_ColumnSortFunctions )) - 1 ) );
 			ResortItems();
 		}
 	}
@@ -2810,7 +2810,7 @@ void COP_Entity::AssignClassDefaults(GDclass *pClass, GDclass *pOldClass)
 			{
 				// First, just use the defaults for the new class.
 				int defaultValue;
-				pVar->GetDefault( &defaultValue );
+				pVar->GetDefault( &defaultValue, 1 );
 				nCurrent = (unsigned long)defaultValue;
 
 				// But.. if the old class and the new class have any flags with the same name and value,
@@ -3174,10 +3174,10 @@ void COP_Entity::BrowseTextures( const char *szFilter, bool bSprite )
 		if (bSprite && g_pGameConfig->GetTextureFormat() == tfVMT)
 		{
 			char sprExt[4];
-			Q_snprintf(sprExt, 4, ".vmt");
-			Q_snprintf(szName, MAX_PATH, "%s.vmt", szName);
+			V_strcpy_safe(sprExt, ".vmt");
+			V_sprintf_safe(szName, "%s.vmt", szName);
 			//Strcat is being zee stupido. I prolly have to strip the other string or something.
-			//Q_strcat( szName, sprExt, MAX_PATH );
+			//V_strcat_safe( szName, sprExt );
 		}
 
 
@@ -3495,8 +3495,8 @@ void LoadFileSystemDialogModule()
 		}
 
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "Can't load %s.\n", pDLLName );
-		AfxMessageBox( str, MB_OK );
+		V_sprintf_safe( str, "Unable to load %s. File selection dialog will not be available.\n", pDLLName );
+		AfxMessageBox( str, MB_OK | MB_ICONERROR );
 	}
 }
 
@@ -3568,9 +3568,6 @@ void COP_Entity::OnBrowse(void)
 		return;
 	}
 
-	char *pszInitialDir = 0;
-
-	
 	// Instantiate a dialog.
 	if ( !g_FSDialogFactory )
 		return;
@@ -3586,7 +3583,7 @@ void COP_Entity::OnBrowse(void)
 	}
 	pDlg->Init( g_Factory, NULL );
 	
-	
+	static char szInitialDir[MAX_PATH] = "";
 	const char *pPathID = "GAME";
 
 	//
@@ -3601,7 +3598,7 @@ void COP_Entity::OnBrowse(void)
 
 			pDlg->AddFileMask( "*.jpg" );
 			pDlg->AddFileMask( "*.mdl" );
-			pDlg->SetInitialDir( pszInitialDir, pPathID );
+			pDlg->SetInitialDir( szInitialDir, pPathID );
 			pDlg->SetFilterMdlAndJpgFiles( true );
 			break;
 		}
@@ -3662,8 +3659,8 @@ void COP_Entity::OnBrowse(void)
 		//
 		// Save the default folder for next time.
 		//
-		pDlg->GetFilename( pszInitialDir, MAX_PATH );
-		char *pchSlash = strrchr(pszInitialDir, '\\');
+		pDlg->GetFilename( szInitialDir );
+		char *pchSlash = strrchr(szInitialDir, '\\');
 		if (pchSlash != NULL)
 		{
 			*pchSlash = '\0';
@@ -3675,7 +3672,7 @@ void COP_Entity::OnBrowse(void)
 			// Reverse the slashes, because the engine expects them that way.
 			//
 			char szTemp[MAX_PATH];
-			pDlg->GetFilename( szTemp, sizeof( szTemp ) );
+			pDlg->GetFilename( szTemp );
 			for (unsigned int i = 0; i < strlen(szTemp); i++)
 			{
 				if (szTemp[i] == '\\')
@@ -4285,7 +4282,7 @@ void COP_Entity::LoadCustomColors()
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "customcolors.dat", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "customcolors.dat", szRootDir ); 
 	std::ifstream file(szFullPath, std::ios::in | std::ios::binary);
 	
 	if(!file.is_open())
@@ -4306,7 +4303,7 @@ void COP_Entity::SaveCustomColors()
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "customcolors.dat", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "customcolors.dat", szRootDir ); 
 	std::ofstream file( szFullPath, std::ios::out | std::ios::binary );
 
 	file.write((char*)CustomColors, sizeof(CustomColors));
@@ -4410,16 +4407,16 @@ void COP_Entity::OnPickColor(void)
 	// set back in field
 	if(pVar->GetType() == ivColor255)
 	{
-		sprintf(szTmp, "%d %d %d", r, g, b);
+		V_sprintf_safe(szTmp, "%d %d %d", r, g, b);
 	}
 	else
 	{
-		sprintf(szTmp, "%.3f %.3f %.3f", float(r) / 255.f,
+		V_sprintf_safe(szTmp, "%.3f %.3f %.3f", float(r) / 255.f,
 			float(g) / 255.f, float(b) / 255.f);
 	}
 
 	if(brightness != 0xffffffff)
-		sprintf(szTmp + strlen(szTmp), " %d", brightness);
+		V_snprintf(szTmp + V_strlen(szTmp), ssize(szTmp) - V_strlen(szTmp), " %d", brightness);
 
 	m_pSmartControl->SetWindowText(szTmp);
 	RefreshKVListValues();

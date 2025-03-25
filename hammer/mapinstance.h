@@ -31,7 +31,13 @@ class CMapInstance : public CMapHelper
 		static CMapClass	*Create( CHelperInfo *pInfo, CMapEntity *pParent );
 		static void			SetInstancePath( const char *pszInstancePath );
 		static const char	*GetInstancePath( void ) { return m_InstancePath; }
-		static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, char *pszOutFileName );
+		static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_CAP(outFileName) char *pszOutFileName, intp outFileName );
+		template<intp outFileNameSize>
+		static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_ARRAY char (&pszOutFileName)[outFileNameSize] )
+		{
+			return DeterminePath( pszBaseFileName, pszInstanceFileName, pszOutFileName, outFileNameSize );
+		}
+
 
 		//
 		// Construction/destruction:
@@ -75,7 +81,7 @@ class CMapInstance : public CMapHelper
 		bool IsVisualElement(void) { return(true); }
 		
 		virtual bool	IsEditable( void );
-				bool	IsInstanceVisible( void );
+		bool	IsInstanceVisible( void );
 		
 		const char		*GetDescription( void ) const { return( "Instance" ); }
 		CMapDoc			*GetInstancedMap( void ) { return m_pInstancedMap; }

@@ -432,8 +432,7 @@ bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirec
 {
 	//Assert( Q_strnicmp( pDirectoryName, "materials", 9 ) == 0 );
 
-	char *pWildCard;
-	pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
+	char *pWildCard = stackallocT( char, nDirectoryNameLen + 7 );
 	Q_snprintf( pWildCard, nDirectoryNameLen + 7, "%s/*.vmt", pDirectoryName );
 
 	if ( !g_pFileSystem )
@@ -495,10 +494,11 @@ bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName,
 	if (!LoadMaterialsInDirectory( pDirectoryName, nDirectoryNameLen, pEnum, nContext, nFlags ))
 		return false;
 
-	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 5 );
-	strcpy(pWildCard, pDirectoryName);
-	strcat(pWildCard, "/*.*");
-	int nPathStrLen = nDirectoryNameLen + 1;
+	intp sizeWildCard = nDirectoryNameLen + ssize( "/*.*" );
+	char *pWildCard = stackallocT( char, sizeWildCard );
+	V_strncpy(pWildCard, pDirectoryName, sizeWildCard);
+	V_strncat(pWildCard, "/*.*", sizeWildCard);
+	intp nPathStrLen = nDirectoryNameLen + 1;
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( pWildCard, "GAME", &findHandle );
@@ -1003,7 +1003,7 @@ NoData:
 
 		// draw name
 		char szShortName[MAX_PATH];
-		int iLen = GetShortName(szShortName);
+		intp iLen = static_cast<IEditorTexture*>(this)->GetShortName(szShortName);
 		pDC->TextOut(rect.left, rect.bottom - (iFontHeight + 4), szShortName, iLen);
 
 		// draw usage count
@@ -1034,16 +1034,19 @@ void CMaterial::FreeData( void )
 // Input  : pszKeywords - Buffer to receive keywords, NULL to query string length.
 // Output : Returns the number of characters in the keyword string.
 //-----------------------------------------------------------------------------
-int CMaterial::GetKeywords(char *pszKeywords) const
+intp CMaterial::GetKeywords(OUT_Z_CAP(keywordsSize) char *pszKeywords, intp keywordsSize) const
 {
+	if (keywordsSize > 0)
+		pszKeywords[0] = '\0';
+
 	// To access keywords, we have to have the header loaded
 	const_cast<CMaterial*>(this)->Load();
 	if (pszKeywords != NULL)
 	{
-		strcpy(pszKeywords, m_szKeywords);
+		V_strncpy(pszKeywords, m_szKeywords, keywordsSize);
 	}
 
-	return(strlen(m_szKeywords));
+	return V_strlen(m_szKeywords);
 }
 
 
@@ -1052,14 +1055,17 @@ int CMaterial::GetKeywords(char *pszKeywords) const
 // Input  : *pszName - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CMaterial::GetShortName(char *pszName) const
+intp CMaterial::GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const
 {
+	if (nameSize > 0)
+		pszName[0] = '\0';
+
 	if (pszName != NULL)
 	{
-		strcpy(pszName, m_szName);
+		V_strncpy(pszName, m_szName, nameSize);
 	}
 
-	return(strlen(m_szName));
+	return V_strlen(m_szName);
 }
 
 

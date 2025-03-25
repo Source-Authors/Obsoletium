@@ -100,12 +100,12 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 	if (bExpand)
 	{
 		// Replace the tokens with the full strings
-		if (Q_StrSubst(str, szSteamUserDirToken, strSteamUserDir, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, szSteamUserDirToken, strSteamUserDir, szPathOut))
 		{
 			str = szPathOut;
 		}
 
-		if (Q_StrSubst(str, szSteamDirToken, strSteamDir, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, szSteamDirToken, strSteamDir, szPathOut))
 		{
 			str = szPathOut;
 		}
@@ -114,12 +114,12 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 	{
 		// Replace the full strings with the tokens
 		// Go from longest paths to shortest paths to insure the most brief expression.
-		if (Q_StrSubst(str, strSteamUserDir, szSteamUserDirToken, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, strSteamUserDir, szSteamUserDirToken, szPathOut))
 		{
 			str = szPathOut;
 		}
 
-		if (Q_StrSubst(str, strSteamDir, szSteamDirToken, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, strSteamDir, szSteamDirToken, szPathOut))
 		{
 			str = szPathOut;
 		}
@@ -131,8 +131,11 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 // Purpose: Exchanges path data between a CString and an edit control, converting
 //			the Steam path to %STEAM% and back.
 //-----------------------------------------------------------------------------
-void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand)
+void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_CAP(destSize) char *szDest, intp destSize, bool bExpand)
 {
+	if (destSize > 0)
+		szDest[0] = '\0';
+
 	CWnd *pwnd = pDlg->GetDlgItem(nIDC);
 	if (!pwnd)
 		return;
@@ -143,7 +146,7 @@ void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand
 	{
 		pwnd->GetWindowText(str);
 		EditorUtil_ConvertPath(str, true);
-		strcpy(szDest, str);
+		V_strncpy(szDest, str, destSize);
 	}
 	else
 	{
@@ -151,6 +154,13 @@ void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand
 		EditorUtil_ConvertPath(str, false);
 		pwnd->SetWindowText(str);
 	}
+}
+
+
+template<intp destSize>
+inline void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_ARRAY char (&szDest)[destSize], bool bSave)
+{
+	EditorUtil_TransferPath( pDlg, nIDC, szDest, destSize, bSave );
 }
 
 
@@ -466,7 +476,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 	m_cCordonTexture.SetWindowText(pConfig->GetCordonTexture());
 	
 	char szText[100];
-	sprintf(szText, "%g", pConfig->GetDefaultTextureScale());
+	V_sprintf_safe(szText, "%g", pConfig->GetDefaultTextureScale());
 	m_cDefaultTextureScale.SetWindowText(szText);
 
 	SetDlgItemInt(IDC_DEFAULT_LIGHTMAP_SCALE, pConfig->GetDefaultLightmapScale(), FALSE);

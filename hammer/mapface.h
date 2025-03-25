@@ -215,7 +215,12 @@ public:
 	// so that the texture is in the same apparent spot as the old texture (if they are different sizes).
 	void SetTexture(const char *pszNewTex, bool bRescaleTextureCoordinates = false);
 	void SetTexture(IEditorTexture *pTexture, bool bRescaleTextureCoordinates = false);
-	void GetTextureName(char *pszName) const;
+	void GetTextureName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const;
+	template<intp nameSize>
+	void GetTextureName(OUT_Z_ARRAY char (&pszName)[nameSize]) const
+	{
+		GetTextureName(pszName, nameSize);
+	}
 
 	inline IEditorTexture *GetTexture(void) const;
 		

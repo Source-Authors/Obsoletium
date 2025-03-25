@@ -189,7 +189,7 @@ void COP_Model::UpdateForClass(LPCTSTR pszClass)
 void COP_Model::UpdateFrameText(float flFrame)
 {
 	char szFrame[40];
-	sprintf(szFrame, "%0.2f", flFrame);
+	V_sprintf_safe(szFrame, "%0.2f", flFrame);
 	GetDlgItem(IDC_FRAME_TEXT)->SetWindowText(szFrame);
 }
 

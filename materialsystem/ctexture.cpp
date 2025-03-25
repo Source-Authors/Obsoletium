@@ -320,7 +320,7 @@ public:
 
 	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown );
 
-	void GetFilename( char *pOut, int maxLen ) const;
+	void GetFilename( OUT_Z_CAP(maxLen) char *pOut, intp maxLen ) const;
 	virtual void ReloadFilesInList( IFileList *pFilesToReload );
 
 	// Save texture to a file.
@@ -3149,19 +3149,18 @@ bool CTexture::ConvertToActualFormat( IVTFTexture *pVTFTexture )
 	return bConverted;
 }
 
-void CTexture::GetFilename( char *pOut, int maxLen ) const
+void CTexture::GetFilename( OUT_Z_CAP(maxLen) char *pOut, intp maxLen ) const
 {
 	const char *pName = m_Name.String();
 	bool bIsUNCName = ( pName[0] == '/' && pName[1] == '/' && pName[2] != '/' );
 
 	if ( !bIsUNCName )
 	{
-		Q_snprintf( pOut, maxLen, 
-			"materials/%s" TEXTURE_FNAME_EXTENSION, pName );
+		V_snprintf( pOut, maxLen, "materials/%s" TEXTURE_FNAME_EXTENSION, pName );
 	}
 	else
 	{
-		Q_snprintf( pOut, maxLen, "%s" TEXTURE_FNAME_EXTENSION, pName );
+		V_snprintf( pOut, maxLen, "%s" TEXTURE_FNAME_EXTENSION, pName );
 	}
 }
 

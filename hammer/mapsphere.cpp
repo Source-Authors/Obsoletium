@@ -183,7 +183,7 @@ void CMapSphere::SetRadius(float flRadius)
 	if (pEntity != NULL)
 	{
 		char szValue[80];
-		sprintf(szValue, "%g", m_flRadius);
+		V_sprintf_safe(szValue, "%g", m_flRadius);
 		pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 	}
 }

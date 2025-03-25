@@ -185,7 +185,8 @@ void CSoundBrowser::PopulateSoundList()
 		if ( ShowSoundInList( pSoundName ) )
 		{
 			CString str;
-			str.Format( _T(pSoundName) );
+			// dimhotepus: Fix missing string format spec vulnerability.
+			str.Format( "%s", pSoundName );
 			int nIndex = m_SoundList.AddString( str );
 			m_SoundList.SetItemDataPtr( nIndex, (PVOID)(ptrdiff_t)i );
 		}

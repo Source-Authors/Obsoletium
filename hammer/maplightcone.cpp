@@ -47,11 +47,11 @@ CMapClass *CMapLightCone::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		const char *pszKeyName = pHelperInfo->GetParameter(0);
 		if (pszKeyName != NULL)
 		{
-			strcpy(new1->m_szInnerConeKeyName, pszKeyName);
+			V_strcpy_safe(new1->m_szInnerConeKeyName, pszKeyName);
 		}
 		else
 		{
-			strcpy(new1->m_szInnerConeKeyName, "_inner_cone");
+			V_strcpy_safe(new1->m_szInnerConeKeyName, "_inner_cone");
 		}
 
 		//
@@ -61,11 +61,11 @@ CMapClass *CMapLightCone::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		pszKeyName = pHelperInfo->GetParameter(1);
 		if (pszKeyName != NULL)
 		{
-			strcpy(new1->m_szOuterConeKeyName, pszKeyName);
+			V_strcpy_safe(new1->m_szOuterConeKeyName, pszKeyName);
 		}
 		else
 		{
-			strcpy(new1->m_szOuterConeKeyName, "_cone");
+			V_strcpy_safe(new1->m_szOuterConeKeyName, "_cone");
 		}
 
 		//
@@ -75,11 +75,11 @@ CMapClass *CMapLightCone::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		pszKeyName = pHelperInfo->GetParameter(2);
 		if (pszKeyName != NULL)
 		{
-			strcpy(new1->m_szColorKeyName, pszKeyName);
+			V_strcpy_safe(new1->m_szColorKeyName, pszKeyName);
 		}
 		else
 		{
-			strcpy(new1->m_szColorKeyName, "_light");
+			V_strcpy_safe(new1->m_szColorKeyName, "_light");
 		}
 
 		pszKeyName = pHelperInfo->GetParameter(3);

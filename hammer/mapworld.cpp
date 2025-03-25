@@ -772,14 +772,14 @@ void CMapWorld::CullTree_DumpNode(CCullTreeNode *pNode, int nDepth)
 		for (int nObject = 0; nObject < nObjectCount; nObject++)
 		{
 			CMapClass *pMapClass = pNode->GetCullTreeObject(nObject);
-			sprintf(szText, "%*c %p %s\n", nDepth, ' ', pMapClass, pMapClass->GetType());
+			V_sprintf_safe(szText, "%*c %p %s\n", nDepth, ' ', pMapClass, pMapClass->GetType());
 			OutputDebugString(szText);
 		}
 	}
 	else
 	{
 		// Node
-		sprintf(szText, "%*s\n", nDepth, "+");
+		V_sprintf_safe(szText, "%*s\n", nDepth, "+");
 		OutputDebugString(szText);
 
 		for (int nChild = 0; nChild < nChildCount; nChild++)

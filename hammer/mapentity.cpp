@@ -540,9 +540,11 @@ CMapClass *CMapEntity::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 	//
 	const char *pszOldTargetName = CEditGameClass::GetKeyValue("targetname");
 	char szOldTargetName[MAX_IO_NAME_LEN];
+	szOldTargetName[0] = '\0';
+
 	if (pszOldTargetName != NULL)
 	{
-		strcpy(szOldTargetName, pszOldTargetName);
+		V_strcpy_safe(szOldTargetName, pszOldTargetName);
 	}
 
 	CEditGameClass::CopyFrom(pFrom);
@@ -603,7 +605,7 @@ const char* CMapEntity::GetDescription(void) const
 
 	if (pszName != NULL)
 	{
-		sprintf(szBuf, "%s - %s", pszName, GetClassName());
+		V_sprintf_safe(szBuf, "%s - %s", pszName, GetClassName());
 	}
 	else
 	{
@@ -842,9 +844,10 @@ void CMapEntity::RemoveHelpers(bool bRemoveSolids)
 //-----------------------------------------------------------------------------
 // Building targetnames which deal with *
 //-----------------------------------------------------------------------------
-static inline void BuildNewTargetName( const char *pOldName, const char *pNewName, char *pBuffer )
+template<intp bufferSize>
+static inline void BuildNewTargetName( const char *pOldName, const char *pNewName, OUT_Z_ARRAY char (&pBuffer)[bufferSize] )
 {
-	strcpy(pBuffer, pNewName);
+	V_strcpy_safe(pBuffer, pNewName);
 
 	// If we matched a key value that contains wildcards, preserve the
 	// wildcards when we replace the name.
@@ -1117,7 +1120,7 @@ void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 		// keyvalues and our pointer might become bad.
 		//
 		char szClassName[MAX_CLASS_NAME_LEN];
-		strcpy(szClassName, pszValue);
+		V_strcpy_safe(szClassName, pszValue);
 		SetClass(szClassName, true);
 
 		//
@@ -1254,7 +1257,7 @@ void CMapEntity::DeleteKeyValue(LPCSTR pszKey)
 	const char *pszOld = GetKeyValue(pszKey);
 	if (pszOld != NULL)
 	{
-		strcpy(szOldValue, pszOld);
+		V_strcpy_safe(szOldValue, pszOld);
 	}
 	else
 	{

@@ -267,9 +267,9 @@ void FloatToSpin(float fValue, CSpinButtonCtrl *pSpin, BOOL bMantissa)
 	else
 	{
 		if(bMantissa)
-			sprintf(szNew, "%.2f", fValue);
+			V_sprintf_safe(szNew, "%.2f", fValue);
 		else
-			sprintf(szNew, "%.0f", fValue);
+			V_sprintf_safe(szNew, "%.0f", fValue);
 	}
 
 	pSpin->SetPos(atoi(szNew));
@@ -301,7 +301,7 @@ void IntegerToSpin(int nValue, CSpinButtonCtrl *pSpin)
 	}
 	else
 	{
-		sprintf(szNew, "%d", abs(nValue));
+		V_sprintf_safe(szNew, "%d", abs(nValue));
 	}
 
 	pSpin->SetPos(atoi(szNew));
@@ -332,7 +332,7 @@ void FloatToWnd(float fValue, CWnd *pWnd)
 	}
 	else
 	{
-		sprintf(szNew, "%g", fValue);
+		V_sprintf_safe(szNew, "%g", fValue);
 	}
 
 	pWnd->GetWindowText(szCurrent, 128);
@@ -1501,7 +1501,7 @@ void CFaceEditMaterialPage::UpdateTexture( void )
 	if( m_pCurTex )
 	{
 		char szBuf[128];
-		sprintf( szBuf, "%dx%d", m_pCurTex->GetWidth(), m_pCurTex->GetHeight() );
+		V_sprintf_safe( szBuf, "%dx%d", m_pCurTex->GetWidth(), m_pCurTex->GetHeight() );
 		GetDlgItem( IDC_TEXTURESIZE )->SetWindowText( szBuf );
 
 		char szTexName[128];
