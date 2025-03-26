@@ -629,7 +629,8 @@ CON_COMMAND_F( r_screenoverlay, "Draw specified material as an overlay", FCVAR_C
 {
 	if( args.ArgC() == 2 )
 	{
-		if ( !Q_stricmp( "off", args[1] ) )
+		// This command is silly an undocumented, but, users are expecting r_screenoverlay 0 to function as 'off'.
+		if ( !Q_stricmp( "off", args[1] ) || !Q_stricmp( "0", args[1] ) )
 		{
 			view->SetScreenOverlayMaterial( NULL );
 		}
