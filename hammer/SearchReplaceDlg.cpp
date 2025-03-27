@@ -120,15 +120,19 @@ static bool ReplaceString(OUT_Z_ARRAY char (&pszOut)[outSize], const char *pszIn
 	if (pszStart != NULL)
 	{
 		ptrdiff_t nOffset = pszStart - pszIn;
+		V_strncpy(pszOut, pszIn, std::min(nOffset, ssize(pszOut)));
 
-		strncpy(pszOut, pszIn, nOffset);
-		pszOut += nOffset;
-		pszIn += nOffset + strlen(FindObject.strFindText);
+		char *out = pszOut + nOffset;
+		pszIn += nOffset + V_strlen(FindObject.strFindText);
 
-		strcpy(pszOut, pszReplace);
-		pszOut += strlen(pszReplace);
+		V_strncpy(out, pszReplace, ssize(pszOut) - nOffset);
 
-		strcpy(pszOut, pszIn);
+		const ptrdiff_t szReplaceOffset = V_strlen(pszReplace);
+		out += szReplaceOffset;
+
+		nOffset += szReplaceOffset;
+
+		V_strncpy(out, pszIn, ssize(pszOut) - nOffset);
 
 		return true;
 	}

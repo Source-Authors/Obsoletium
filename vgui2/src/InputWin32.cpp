@@ -219,6 +219,8 @@ public:
 
 	virtual VPANEL 	GetMouseCapture() override;
 
+	virtual bool	InternalDpiScalePercentChanged( int xDpiScalePercent, int yDpiScalePercent ) override;
+
 	virtual VPANEL	GetMouseFocus();
 private:
 
@@ -1725,6 +1727,30 @@ void CInputSystem::UpdateButtonState( const InputEvent_t &event )
 		}
 		break;
 	}
+}
+
+bool CInputSystem::InternalDpiScalePercentChanged( int xDpiScalePercent, int yDpiScalePercent )
+{
+	// broadcast DPI change to all the top level windows, and see if any take notice
+	VPANEL panel = g_pSurface->GetEmbeddedPanel();
+	for (int i = 0; i < ((VPanel *)panel)->GetChildCount(); i++)
+	{
+		g_pIVgui->PostMessage(
+			(VPANEL)((VPanel *)panel)->GetChild(i),
+			new KeyValues("SetDpiScalePercent",
+				"xdpiscalepercent", xDpiScalePercent,
+				"ydpiscalepercent", yDpiScalePercent),
+			NULL);
+	}
+	
+	// post to the top level window as well
+	g_pIVgui->PostMessage(
+		panel,
+		new KeyValues("SetDpiScalePercent",
+			"xdpiscalepercent", xDpiScalePercent,
+			"ydpiscalepercent", yDpiScalePercent),
+		NULL);
+	return true;
 }
 
 bool CInputSystem::InternalKeyCodePressed( KeyCode code )

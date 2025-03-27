@@ -1,37 +1,29 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: abstract system dependent functions
-//
-// $NoKeywords: $
-//=============================================================================//
+// Abstract system dependent functions.
+
 #include "sys.h"
-#include <windows.h>
 #include "tier1/strtools.h"
 
+#include "winlite.h"
 
-void Sys_CopyStringToClipboard( const char *pOut )
-{
-	if ( !pOut || !OpenClipboard( NULL ) )
-	{
-		return;
-	}
-	// Remove the current Clipboard contents
-	if( !EmptyClipboard() )
-	{
-		return;
-	}
-	HGLOBAL clipbuffer;
-	char *buffer;
-	EmptyClipboard();
-	
-	int len = Q_strlen(pOut)+1;
-	clipbuffer = GlobalAlloc(GMEM_DDESHARE, len );
-	buffer = (char*)GlobalLock( clipbuffer );
-	Q_strncpy( buffer, pOut, len );
-	GlobalUnlock( clipbuffer );
+void Sys_CopyStringToClipboard(const char *out) {
+  if (!out || !::OpenClipboard(nullptr)) return;
 
-	SetClipboardData( CF_TEXT,clipbuffer );
+  // Remove the current Clipboard contents
+  if (!EmptyClipboard()) return;
 
-	CloseClipboard();
+  ::EmptyClipboard();
+
+  intp len = Q_strlen(out) + 1;
+
+  HGLOBAL clipbuffer = GlobalAlloc(GMEM_DDESHARE, len);
+
+  char *buffer = (char *)GlobalLock(clipbuffer);
+  Q_strncpy(buffer, out, len);
+  GlobalUnlock(clipbuffer);
+
+  ::SetClipboardData(CF_TEXT, clipbuffer);
+
+  ::CloseClipboard();
 }
-

@@ -14,12 +14,12 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-IMPLEMENT_DYNCREATE(CMessageWnd, CMDIChildWnd)
+IMPLEMENT_DYNCREATE(CMessageWnd, CBaseMDIChildWnd)
 
-const int iMsgPtSize = 10;
+constexpr inline int iMsgPtSize = 10;
 
 
-BEGIN_MESSAGE_MAP(CMessageWnd, CMDIChildWnd)
+BEGIN_MESSAGE_MAP(CMessageWnd, CBaseMDIChildWnd)
 	//{{AFX_MSG_MAP(CMessageWnd)
 	ON_WM_PAINT()
 	ON_WM_HSCROLL()
@@ -27,6 +27,7 @@ BEGIN_MESSAGE_MAP(CMessageWnd, CMDIChildWnd)
 	ON_WM_SIZE()
 	ON_WM_KEYDOWN()
 	ON_WM_CLOSE()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -46,12 +47,10 @@ CMessageWnd *CMessageWnd::CreateMessageWndObject()
 //-----------------------------------------------------------------------------
 CMessageWnd::CMessageWnd()
 {
+	pFont = nullptr;
 	// set initial elements
 	iCharWidth = -1;
 	iNumMsgs = 0;
-
-	// load font
-	Font.CreatePointFont(iMsgPtSize * 10, "Courier New");
 }
 
 
@@ -59,14 +58,18 @@ CMessageWnd::CMessageWnd()
 //-----------------------------------------------------------------------------
 CMessageWnd::~CMessageWnd()
 {
+	delete pFont;
+	pFont = nullptr;
 }
 
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CMessageWnd::CreateMessageWindow( CMDIFrameWnd *pwndParent, CRect &rect )
+void CMessageWnd::CreateMessageWindow( CMDIFrameWnd *pwndParent, const CRect &rect )
 {
 	Create( NULL, "Messages", WS_OVERLAPPEDWINDOW | WS_CHILD, rect, pwndParent );
+
+	pFont = CreateFont();
 
 	bool bErrors = true;
 	MWMSGSTRUCT mws;
@@ -76,7 +79,7 @@ void CMessageWnd::CreateMessageWindow( CMDIFrameWnd *pwndParent, CRect &rect )
 		if ( ( mws.type == mwError ) || ( mws.type == mwWarning ) )
 		{
 			bErrors = true;
-		}		
+		}
 	}
 	
 	if ( bErrors )
@@ -107,10 +110,10 @@ void CMessageWnd::AddMsg(MWMSGTYPE type, TCHAR* msg)
 	}
 
 	// format message
-	MWMSGSTRUCT mws;	
-	mws.MsgLen = strlen(msg);
+	MWMSGSTRUCT mws;
+	mws.MsgLen = V_strlen(msg);
 	mws.type = type;
-	Assert(mws.MsgLen <= (sizeof(mws.szMsg) / sizeof(TCHAR)));
+	Assert(mws.MsgLen <= ssize(mws.szMsg));
 	_tcscpy(mws.szMsg, msg);
 
 	// Add the message, growing the array as necessary
@@ -182,6 +185,18 @@ void CMessageWnd::Resize( CRect &rect )
 	MoveWindow( rect );
 }
 
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+DpiAwareFont* CMessageWnd::CreateFont()
+{
+	delete pFont;
+	
+	pFont = new DpiAwareFont{m_dpi_behavior.GetCurrentDpiY()};
+	// load font
+	pFont->CreatePointFont(iMsgPtSize * 10, "Courier New");
+
+	return pFont;
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -190,11 +205,10 @@ void CMessageWnd::CalculateScrollSize()
 	if ( m_hWnd == NULL )
 		return;
 
-	int iHorz;
-	int iVert;
+	const int heightOffset = m_dpi_behavior.ScaleOnY(8);
 
-	iVert = iNumMsgs * (iMsgPtSize + 2);
-	iHorz = 0;
+	int iVert = iNumMsgs * (iMsgPtSize + heightOffset);
+	int iHorz = 0;
 	for(int i = 0; i < iNumMsgs; i++)
 	{
 		int iTmp = MsgArray[i].MsgLen * iCharWidth;
@@ -233,7 +247,7 @@ void CMessageWnd::OnPaint()
 	int			nScrollMax;
 
 	// select font
-	dc.SelectObject(&Font);
+	dc.SelectObject(pFont);
 	dc.SetBkMode(TRANSPARENT);
 
 	// first paint?
@@ -244,10 +258,12 @@ void CMessageWnd::OnPaint()
 	}
 
 	GetScrollRange( SB_VERT, &nScrollMin, &nScrollMax );
+	
+	const int heightOffset = m_dpi_behavior.ScaleOnY(8);
 
 	// paint messages
 	MWMSGSTRUCT mws;
-	CRect r(0, 0, 1, iMsgPtSize+2);
+	CRect r(0, 0, 1, iMsgPtSize + heightOffset);
 
 	dc.SetWindowOrg(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
 
@@ -268,6 +284,10 @@ void CMessageWnd::OnPaint()
 		case mwError:
 			dc.SetTextColor(RGB(255, 60, 60));
 			break;
+		// dimhotepus: Use warning color as in Console.
+		case mwWarning:
+			dc.SetTextColor(RGB(238, 127, 27));
+			break;
 		case mwStatus:
 			dc.SetTextColor(RGB(0, 0, 0));
 			break;
@@ -277,7 +297,7 @@ void CMessageWnd::OnPaint()
 		dc.TextOut(r.left, r.top, mws.szMsg, mws.MsgLen);
 
 		// move rect down
-		r.OffsetRect(0, iMsgPtSize + 2);
+		r.OffsetRect(0, iMsgPtSize + heightOffset);
 	}
 }
 
@@ -419,4 +439,15 @@ void CMessageWnd::OnClose()
 {
 	// just hide the window
 	ShowWindow(SW_HIDE);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+LRESULT CMessageWnd::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	const LRESULT rc{__super::OnDpiChanged(wParam, lParam)};
+
+	pFont = CreateFont();
+
+	return rc;
 }

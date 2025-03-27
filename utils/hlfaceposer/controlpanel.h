@@ -145,10 +145,10 @@ public:
 	void Undo( void );
 	void Redo( void );
 
-	void UndoExpression( int index );
-	void RedoExpression( int index );
+	void UndoExpression( intp index );
+	void RedoExpression( intp index );
 
-	void DeleteExpression( int index );
+	void DeleteExpression( intp index );
 
 	float GetModelGap( void );
 

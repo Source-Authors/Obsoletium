@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_Face( CEventParams *params );
+intp EventProperties_Face( CEventParams *params );
 
 #endif // EVENTPROPERTIES_FACE_H

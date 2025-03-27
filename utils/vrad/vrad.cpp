@@ -239,8 +239,9 @@ void ReadLightFile (char *filename)
 
 			g_NonShadowCastingMaterialStrings.AddToTail( strdup( NoShadName ));
 		}
-		else if ( sscanf( scan, "forcetextureshadow %s", NoShadName ) == 1 )
+		else if ( sscanf( scan, "forcetextureshadow %1023s", NoShadName ) == 1 )
 		{
+			NoShadName[std::size(NoShadName) - 1] = '\0';
 			// dimhotepus: Add verbose log.
 			qprintf( "Added '%s' as a force texture shadows model.\n",NoShadName);
 
@@ -377,7 +378,7 @@ MAKE FACES
 WindingFromFace
 =============
 */
-winding_t	*WindingFromFace (dface_t *f, Vector& origin )
+winding_t	*WindingFromFace (dface_t *f, const Vector& origin )
 {
 	int			i;
 	int			se;
@@ -546,7 +547,7 @@ void MakePatchForFace (int fn, winding_t *w)
 	totalarea += area;
 
 	// get a patch
-	int ndxPatch = g_Patches.AddToTail();
+	intp ndxPatch = g_Patches.AddToTail();
 	patch = &g_Patches[ndxPatch];
 	memset( patch, 0, sizeof( CPatch ) );
 	patch->ndxNext = g_Patches.InvalidIndex();
@@ -680,15 +681,13 @@ void MakePatchForFace (int fn, winding_t *w)
 
 entity_t *EntityForModel (int modnum)
 {
-	int		i;
-	const char	*s;
 	char	name[16];
 	V_sprintf_safe (name, "*%i", modnum);
 
 	// search the entities for one using modnum
-	for (i=0 ; i<num_entities ; i++)
+	for (int i=0 ; i<num_entities ; i++)
 	{
-		s = ValueForKey (&entities[i], "model");
+		const char *s = ValueForKey (&entities[i], "model");
 		if (!strcmp (s, name))
 			return &entities[i];
 	}
@@ -1126,9 +1125,7 @@ float FormFactorDiffToDiff ( CPatch *pDiff1, CPatch* pDiff2 )
 
 
 void MakeTransfer( int ndxPatch1, int ndxPatch2, transfer_t *all_transfers )
-//void MakeTransfer (CPatch *patch, CPatch *patch2, transfer_t *all_transfers )
 {
-	Vector	delta;
 	vec_t	scale;
 	float	trans;
 	transfer_t *transfer;
@@ -1171,7 +1168,7 @@ void MakeTransfer( int ndxPatch1, int ndxPatch2, transfer_t *all_transfers )
 	// Test 5 times rule
 	Vector vDelta;
 	VectorSubtract( pPatch1->origin, pPatch2->origin, vDelta );
-	float flThreshold = ( M_PI * 0.04 ) * DotProduct( vDelta, vDelta );
+	float flThreshold = ( M_PI_F * 0.04f ) * DotProduct( vDelta, vDelta );
 
 	if (flThreshold < pPatch2->area)
 	{
@@ -1767,13 +1764,11 @@ RadWorld
 */
 void RadWorld_Start()
 {
-	unsigned	i;
-
-	if (luxeldensity < 1.0)
+	if (luxeldensity < 1.0f)
 	{
 		// Remember the old lightmap vectors.
 		float oldLightmapVecs[MAX_MAP_TEXINFO][2][4];
-		for (i = 0; i < texinfo.Count(); i++)
+		for (intp i = 0; i < texinfo.Count(); i++)
 		{
 			for( int j=0; j < 2; j++ )
 			{
@@ -1785,7 +1780,7 @@ void RadWorld_Start()
 		}
 
 		// rescale luxels to be no denser than "luxeldensity"
-		for (i = 0; i < texinfo.Count(); i++)
+		for (intp i = 0; i < texinfo.Count(); i++)
 		{
 			texinfo_t	*tx = &texinfo[i];
 
@@ -1907,7 +1902,7 @@ void BuildFacesVisibleToLights( bool bAllVisible )
 						int index = dleafs[iLeaf].firstleafface + iFace;
 						index = dleaffaces[index];
 						
-						assert( index < numfaces );
+						Assert( index < numfaces );
 						g_FacesVisibleToLights[index >> 3] |= (1 << (index & 7));
 					}
 
@@ -2960,9 +2955,9 @@ void PrintUsage( int argc, char **argv )
 int RunVRAD( int argc, char **argv )
 {
 #ifdef PLATFORM_64BITS
-	Msg("Valve Software - vrad.exe SSE4.2+ [64 bit] (" __DATE__ ")\n" );
+	Msg("Valve Software - vrad SSE4.2+ [64 bit] (" __DATE__ ")\n" );
 #else
-	Msg("Valve Software - vrad.exe SSE4.2+ (" __DATE__ ")\n");
+	Msg("Valve Software - vrad SSE4.2+ (" __DATE__ ")\n");
 #endif
 
 	verbose = false;  // Originally FALSE

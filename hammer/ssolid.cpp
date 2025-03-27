@@ -1310,13 +1310,10 @@ void CSSolid::DeleteFace(short iFace)
 {
 	// Destroy the displacement if there is one.
 	CSSFace *pFace = &m_Faces[iFace];
-	if ( pFace )
+	if ( pFace->m_hDisp != EDITDISPHANDLE_INVALID )
 	{
-		if ( pFace->m_hDisp != EDITDISPHANDLE_INVALID )
-		{
-			EditDispMgr()->Destroy( pFace->m_hDisp );
-			pFace->m_hDisp = EDITDISPHANDLE_INVALID;
-		}
+		EditDispMgr()->Destroy( pFace->m_hDisp );
+		pFace->m_hDisp = EDITDISPHANDLE_INVALID;
 	}
 
 	for(short i2 = iFace; i2 < m_nFaces-1; i2++)
@@ -1654,9 +1651,7 @@ void CSSEdge::GetCenterPoint(Vector& Point)
 }
 
 
-CSSVertex::CSSVertex(void)
-{
-}
+CSSVertex::CSSVertex(void) = default;
 
 
 CSSVertex::~CSSVertex(void)

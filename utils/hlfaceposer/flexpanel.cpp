@@ -4,9 +4,8 @@
 //
 //===========================================================================//
 
-
-#include "hlfaceposer.h"
 #include "FlexPanel.h"
+#include "hlfaceposer.h"
 #include "ViewerSettings.h"
 #include "StudioModel.h"
 #include "MatSysWin.h"
@@ -32,7 +31,7 @@
 #include "faceposer_models.h"
 
 LocalFlexController_t FindFlexControllerIndexByName( StudioModel *model, char const *searchname );
-char const *GetGlobalFlexControllerName( int index );
+char const *GetGlobalFlexControllerName( intp index );
 
 extern char g_appTitle[];
 
@@ -281,7 +280,7 @@ int FlexPanel::handleEvent (mxEvent *event)
 				CExpClass *active = expressions->GetActiveClass();
 				if ( active )
 				{
-					int index = active->GetSelectedExpression();
+					intp index = active->GetSelectedExpression();
 					if ( pushundo && index != -1 )
 					{
 						CExpression *exp = active->GetExpression( index );
@@ -622,7 +621,7 @@ FlexPanel::LookupPairedFlex( int iFlexController )
 }
 
 void
-FlexPanel::setExpression( int index )
+FlexPanel::setExpression( intp index )
 {
 	if ( !models->GetActiveStudioModel() )
 		return;
@@ -664,7 +663,7 @@ FlexPanel::setExpression( int index )
 	}
 }
 
-void FlexPanel::DeleteExpression( int index )
+void FlexPanel::DeleteExpression( intp index )
 {
 	CStudioHdr *hdr = models->GetActiveStudioModel()->GetStudioHdr();
 	if ( !hdr )
@@ -684,7 +683,7 @@ void FlexPanel::DeleteExpression( int index )
 // Purpose: 
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void FlexPanel::RevertExpression( int index )
+void FlexPanel::RevertExpression( intp index )
 {
 	CStudioHdr *hdr = models->GetActiveStudioModel()->GetStudioHdr();
 	if ( !hdr )
@@ -703,7 +702,7 @@ void FlexPanel::RevertExpression( int index )
 	g_pExpressionTrayTool->redraw();
 }
 
-void FlexPanel::SaveExpression( int index )
+void FlexPanel::SaveExpression( intp index )
 {
 	CStudioHdr *hdr = models->GetActiveStudioModel()->GetStudioHdr();
 	if ( !hdr )
@@ -805,7 +804,7 @@ void FlexPanel::ResetSliders( bool preserveundo, bool bDirtyClass )
 	CExpression *exp = NULL;
 	if ( active )
 	{
-		int index = active->GetSelectedExpression();
+		intp index = active->GetSelectedExpression();
 		if ( index != -1 )
 		{
 			exp = active->GetExpression( index );
@@ -889,7 +888,7 @@ void FlexPanel::PasteControllerSettings( void )
 		return;
 
 	CExpression *exp = NULL;
-	int index = active->GetSelectedExpression();
+	intp index = active->GetSelectedExpression();
 	if ( index != -1 )
 	{
 		exp = active->GetExpression( index );
@@ -949,7 +948,7 @@ void FlexPanel::EditExpression( void )
 	if ( !active )
 		return;
 
-	int index = active->GetSelectedExpression();
+	intp index = active->GetSelectedExpression();
 	if ( index == -1 )
 	{
 		Con_ErrorPrintf( "Can't edit face pose, must select a face from list first!\n" );
@@ -966,9 +965,9 @@ void FlexPanel::EditExpression( void )
 	CExpressionParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Edit Expression" );
-	strcpy( params.m_szName, exp->name );
-	strcpy( params.m_szDescription, exp->description );
+	V_strcpy_safe( params.m_szDialogTitle, "Edit Expression" );
+	V_strcpy_safe( params.m_szName, exp->name );
+	V_strcpy_safe( params.m_szDescription, exp->description );
 
 	if ( !ExpressionProperties( &params ) )
 		return;
@@ -997,8 +996,8 @@ void FlexPanel::EditExpression( void )
 		_unlink( exp->GetBitmapFilename( models->GetActiveModelIndex() ) );
 	}
 
-	strcpy( exp->name, params.m_szName );
-	strcpy( exp->description, params.m_szDescription );
+	V_strcpy_safe( exp->name, params.m_szName );
+	V_strcpy_safe( exp->description, params.m_szDescription );
 
 	if ( namechanged )
 	{
@@ -1028,9 +1027,9 @@ void FlexPanel::NewExpression( void )
 	CExpressionParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Add Expression" );
-	strcpy( params.m_szName, "" );
-	strcpy( params.m_szDescription, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Add Expression" );
+	V_strcpy_safe( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDescription, "" );
 
 	if ( !ExpressionProperties( &params ) )
 		return;

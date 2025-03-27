@@ -64,6 +64,7 @@ private:
 class CPickAnglesTarget : public IPickAnglesTarget
 {
 	public:
+		CPickAnglesTarget() : m_pDlg{nullptr} {}
 
 		void AttachEntityDlg(COP_Entity *pDlg) { m_pDlg = pDlg; }
 		void OnNotifyPickAngles(const Vector &vecPos);
@@ -121,6 +122,7 @@ void CPickEntityTarget::SetKeyToRetrieve(const char *pszKey)
 class CPickFaceTarget : public IPickFaceTarget
 {
 	public:
+		CPickFaceTarget() : m_pDlg{nullptr} {}
 
 		void AttachEntityDlg(COP_Entity *pDlg) { m_pDlg = pDlg; }
 		void OnNotifyPickFace(CToolPickFace *pTool);

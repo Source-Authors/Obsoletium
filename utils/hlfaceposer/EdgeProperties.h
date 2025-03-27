@@ -37,6 +37,6 @@ struct CEdgePropertiesParams : public CBaseDialogParams
 	float			m_flValue[ 2 ];
 };
 
-int EdgeProperties( CEdgePropertiesParams *params );
+intp EdgeProperties( CEdgePropertiesParams *params );
 
 #endif // EDGEPROPERTIES_H

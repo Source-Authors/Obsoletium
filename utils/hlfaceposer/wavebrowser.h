@@ -11,9 +11,9 @@
 #endif
 
 #include "mxtk/mxListView.h"
-#include "commctrl.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
 #include "faceposertoolwindow.h"
+#include <commctrl.h>
 
 class CWaveFile;
 class CWaveList;
@@ -80,7 +80,7 @@ private:
 
 	char const	*GetSearchString();
 
-	bool		LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName, int nDirectoryNameLen );
+	bool		LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName, intp nDirectoryNameLen );
 	bool		InitDirectoryRecursive( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName );
 
 	void		OnWaveProperties();

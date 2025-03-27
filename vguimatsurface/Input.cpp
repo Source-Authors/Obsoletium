@@ -55,6 +55,7 @@ enum VguiInputEventType_t
 	IE_IMEChangeCandidates,
 	IE_IMECloseCandidates,
 	IE_IMERecomputeModes,
+	IE_DpiScalePercentChanged
 };
 
 void InitInput()
@@ -263,6 +264,19 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 		// We need to process this message so that the IME doesn't double convert the unicode IME characters into garbage characters and post
 		//  them to our window... (get ? marks after text entry ).
 		return 0;
+
+	case WM_DPICHANGED:
+		{
+			const int xDpiScalePercent = static_cast<int>(LOWORD(wParam)) * 100 / USER_DEFAULT_SCREEN_DPI;
+			const int yDpiScalePercent = static_cast<int>(HIWORD(wParam)) * 100 / USER_DEFAULT_SCREEN_DPI;
+
+			event.m_nType = IE_DpiScalePercentChanged;
+			event.m_nData = xDpiScalePercent;
+			event.m_nData2 = yDpiScalePercent;
+			g_pInputSystem->PostUserEvent( event );
+
+			break;
+		}
 	}
 
 chainWndProc:
@@ -510,6 +524,9 @@ bool InputHandleInputEvent( const InputEvent_t &event )
 	case IE_IMERecomputeModes:
 		g_pIInput->OnIMERecomputeModes();
 		return true;
+
+	case IE_DpiScalePercentChanged:
+		return g_pIInput->InternalDpiScalePercentChanged( event.m_nData, event.m_nData2 );
 	}
 
 	return false;

@@ -251,9 +251,9 @@ class CMapDoc : public CDocument
 		bool IsAnimating( void ) { return m_bIsAnimating; }
 
 		// other stuff
-		float m_flCurrentTime;
+		double m_flCurrentTime;
 		void UpdateCurrentTime( void );
-		float GetTime( void ) { return m_flCurrentTime; }
+		double GetTime( void ) { return m_flCurrentTime; }
 
 		void GotoPFPoint(int iDirection);
 
@@ -329,9 +329,6 @@ class CMapDoc : public CDocument
 		void SetUndoActive(bool bActive);
 		void UpdateTitle(CView*);
 
-		void CountSolids();
-		void CountSolids2();
-		
 		void ReplaceTextures(
 			LPCTSTR pszFind, 
 			LPCTSTR pszReplace, 
@@ -586,7 +583,7 @@ class CMapDoc : public CDocument
 
 		void InitUpdateVisibilityData( UpdateVisibilityData_t &data );
 		bool ShouldObjectBeVisible( CMapClass *pObject, UpdateVisibilityData_t *pData );
-		static BOOL UpdateVisibilityCallback( CMapClass *pObject, UpdateVisibilityData_t *pData );
+		static BOOL UpdateVisibilityCallback( CMapClass *pObject, DWORD_PTR pData );
 
 		bool GetChildrenToHide(CMapClass *pObject, bool bSelected, CMapObjectList &List);
 

@@ -188,7 +188,7 @@ void CMapLightCone::BuildCone(void)
 	float fZoneDist[NUM_LIGHTCONE_ZONES];
 	memset( fZoneDist, 0, sizeof( fZoneDist ) );
 	fZoneDist[0] = 0;
-	SolveQuadratic(fZoneDist[1], 0.25 * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
+	SolveQuadratic(fZoneDist[1], 0.25f * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
 	SolveQuadratic(fZoneDist[2], fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
 	SolveQuadratic(fZoneDist[3], 4 * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
 	SolveQuadratic(fZoneDist[4], Options.view3d.fLightConeLength * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
@@ -211,7 +211,7 @@ void CMapLightCone::BuildCone(void)
 		//
 		// Build the new face list using the new parameters.
 		//
-		float fStepSize = 360.0 / 15.0;
+		constexpr int fStepSize = 360 / 15;
 		for (int nZone = 0; nZone < NUM_LIGHTCONE_ZONES - 1; nZone++)
 		{
 			float fSin0 = 0;
@@ -223,10 +223,12 @@ void CMapLightCone::BuildCone(void)
 			float fTopRadius = fZoneRadius[nZone];
 			float fBottomRadius = fZoneRadius[nZone + 1];
 
+			const float fIllumination = 1 - nZone / (float)NUM_LIGHTCONE_ZONES;
+
 			for (int fAngle = fStepSize; fAngle <= 361; fAngle += fStepSize)
 			{
-				float fSin1 = sin(DEG2RAD(fAngle));
-				float fCos1 = cos(DEG2RAD(fAngle));
+				float fSin1, fCos1;
+				DirectX::XMScalarSinCos(&fSin1, &fCos1, DEG2RAD(fAngle * 1.0f));
 
 				Vector Points[4];
 
@@ -250,9 +252,9 @@ void CMapLightCone::BuildCone(void)
 					Points[3][0] = fTopDist;
 					nPoints = 4;
 				}
-
+				
 				CMapFace *pFace = new CMapFace;
-				pFace->SetRenderColor(r * (1 - nZone / (float)NUM_LIGHTCONE_ZONES), g * (1 - nZone / (float)NUM_LIGHTCONE_ZONES), b * (1 - nZone / (float)NUM_LIGHTCONE_ZONES));
+				pFace->SetRenderColor(r * fIllumination, g * fIllumination, b * fIllumination);
 				pFace->SetRenderAlpha(180);
 				pFace->CreateFace(Points, nPoints);
 				pFace->RenderUnlit(true);
@@ -273,7 +275,7 @@ void CMapLightCone::BuildCone(void)
 	//
 	// Build the a face list that shows light-angle falloff
 	//
-	float fStepSize = 360.0 / 15.0;
+	constexpr int fStepSize = 360 / 15;
 	float fPitchStepSize = 90.0 / 15.0;
 	float fFocusRadius0 = 0;
 	float fFocusDist0 = fZoneDist[1];
@@ -309,8 +311,11 @@ void CMapLightCone::BuildCone(void)
 		// cosine falloff ^ exponent
 
 		// draw as lobe
-		float fFocusDist1 = cos(DEG2RAD(fPitch)) * fIllumination * fZoneDist[1];
-		float fFocusRadius1 = sin(DEG2RAD(fPitch)) * fIllumination * fZoneDist[1];
+		float fSinPitch, fCosPitch;
+		DirectX::XMScalarSinCos(&fSinPitch, &fCosPitch, DEG2RAD(fPitch));
+
+		float fFocusDist1 = fCosPitch * fIllumination * fZoneDist[1];
+		float fFocusRadius1 = fSinPitch * fIllumination * fZoneDist[1];
 
 		// draw as disk
 		// float fFocusDist1 = fZoneDist[1];
@@ -318,8 +323,8 @@ void CMapLightCone::BuildCone(void)
 
 		for (int fAngle = fStepSize; fAngle <= 361; fAngle += fStepSize)
 		{
-			float fSin1 = sin(DEG2RAD(fAngle));
-			float fCos1 = cos(DEG2RAD(fAngle));
+			float fSin1, fCos1;
+			DirectX::XMScalarSinCos(&fSin1, &fCos1, DEG2RAD(fAngle * 1.f));
 
 			Vector Points[4];
 
@@ -494,37 +499,37 @@ void CMapLightCone::OnParentKeyChanged(const char *szKey, const char *szValue)
 	{
 		// Pitch
 		m_bPitchSet = true;
-		m_fPitch = atof(szValue);
+		m_fPitch = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "_constant_attn"))
 	{
 		// Constant attenuation
-		m_fConstantAttn = atof(szValue);
+		m_fConstantAttn = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "_linear_attn"))
 	{
 		// Linear attenuation
-		m_fLinearAttn = atof(szValue);
+		m_fLinearAttn = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "_quadratic_attn"))
 	{
 		// Quadratic attenuation
-		m_fQuadraticAttn = atof(szValue);
+		m_fQuadraticAttn = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "_exponent"))
 	{
 		// Focus
-		m_fFocus = atof(szValue);
+		m_fFocus = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "_fifty_percent_distance"))
 	{
 		// Focus
-		m_fFiftyPercentDistance = atof(szValue);
+		m_fFiftyPercentDistance = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "_zero_percent_distance"))
 	{
 		// Focus
-		m_fZeroPercentDistance = atof(szValue);
+		m_fZeroPercentDistance = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, m_szInnerConeKeyName) || !stricmp(szKey, m_szOuterConeKeyName))
 	{
@@ -532,12 +537,12 @@ void CMapLightCone::OnParentKeyChanged(const char *szKey, const char *szValue)
 		if( !stricmp(szKey, m_szInnerConeKeyName ))
 		{
 			// Inner Cone angle
-			m_fInnerConeAngle = atof(szValue);
+			m_fInnerConeAngle = strtof(szValue, nullptr);
 		}
 		if( !stricmp(szKey, m_szOuterConeKeyName ))
 		{
 			// Outer Cone angle
-			m_fOuterConeAngle = atof(szValue);
+			m_fOuterConeAngle = strtof(szValue, nullptr);
 		}
 	}
 	else

@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_FlexAnimation( CEventParams *params );
+intp EventProperties_FlexAnimation( CEventParams *params );
 
 #endif // EVENTPROPERTIES_FLEXANIMATION_H

@@ -478,7 +478,7 @@ void CAngleBox::UpdateAngleEditText(void)
 }
 
 
-BEGIN_MESSAGE_MAP(CAngleCombo, CWnd)
+BEGIN_MESSAGE_MAP(CAngleCombo, CBaseComboBox)
 	//{{AFX_MSG_MAP(CAngleBox)
 	ON_CONTROL_REFLECT(CBN_EDITCHANGE, OnChangeAngleEdit)
 	ON_CONTROL_REFLECT(CBN_SELENDOK, OnSelChangeAngleEdit)
@@ -490,7 +490,7 @@ END_MESSAGE_MAP()
 // Purpose: Construktor.
 //-----------------------------------------------------------------------------
 CAngleCombo::CAngleCombo()
-	: CComboBox()
+	: CBaseComboBox()
 {
 	m_pBox = NULL;
 	m_bEnableUpdate = true;

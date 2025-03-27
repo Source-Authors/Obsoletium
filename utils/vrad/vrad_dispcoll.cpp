@@ -398,7 +398,7 @@ float CVRADDispColl::CreateParentPatches( void )
 	vecPoints[3].Init( m_aVerts[(nInterval-1)].x, m_aVerts[(nInterval-1)].y, m_aVerts[(nInterval-1)].z );
 
 	// Create and initialize the patch.
-	int iPatch = g_Patches.AddToTail();
+	intp iPatch = g_Patches.AddToTail();
 	if ( iPatch == g_Patches.InvalidIndex() )
 		return flTotalArea;
 
@@ -612,7 +612,7 @@ void CVRADDispColl::CreateChildPatches( int iParentPatch, int nLevel )
 	}
 
 	// Create and initialize the children patches.
-	int iChildPatch[2] = { -1, -1 };
+	intp iChildPatch[2] = { -1, -1 };
 	for ( int iChild = 0; iChild < 2; ++iChild )
 	{
 		iChildPatch[iChild] = g_Patches.AddToTail();
@@ -734,7 +734,7 @@ void CVRADDispColl::CreateChildPatchesSub( int iParentPatch )
 
 
 	// Create and initialize the children patches.
-	int iChildPatch[2] = { 0, 0 };
+	intp iChildPatch[2] = { 0, 0 };
 	int nChildIndices[3] = { -1, -1, -1 };
 	for ( int iChild = 0; iChild < 2; ++iChild )
 	{

@@ -196,7 +196,7 @@ void DBG(PRINTF_FORMAT_STRING const char *fmt, ...)
 }
 
 
-void Msg(int type, PRINTF_FORMAT_STRING const char *fmt, ...)
+void Msg(MWMSGTYPE type, PRINTF_FORMAT_STRING const char *fmt, ...)
 {
 	if ( !g_pwndMessage )
 		return;
@@ -420,11 +420,35 @@ BEGIN_MESSAGE_MAP(CHammer, CWinApp)
 END_MESSAGE_MAP()
 
 
+static SpewRetval_t HammerDbgOutput( SpewType_t spewType, char const *pMsg )
+{
+	// FIXME: The messages we're getting from the material system
+	// are ones that we really don't care much about.
+	// I'm disabling this for now, we need to decide about what to do with this
+
+	Plat_DebugString(pMsg);
+
+	switch( spewType )
+	{
+	case SPEW_ERROR:
+		MessageBox( NULL, pMsg, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
+#ifdef _DEBUG
+		return SPEW_DEBUGGER;
+#else
+		TerminateProcess( GetCurrentProcess(), 1 );
+		return SPEW_ABORT;
+#endif
+
+	default:
+		return (spewType == SPEW_ASSERT) ? SPEW_DEBUGGER : SPEW_CONTINUE; 
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Constructor. Initializes member variables and creates a scratch
 //			buffer for use when loading WAD files.
 //-----------------------------------------------------------------------------
-CHammer::CHammer(void)
+CHammer::CHammer() : m_scopedSpewOutput{HammerDbgOutput}
 {
 	pMapDocTemplate = nullptr;
 	pManifestDocTemplate = nullptr;
@@ -443,7 +467,7 @@ CHammer::CHammer(void)
 // Purpose: Destructor. Frees scratch buffer used when loading WAD files.
 //			Deletes all command sequences used when compiling maps.
 //-----------------------------------------------------------------------------
-CHammer::~CHammer(void)
+CHammer::~CHammer()
 {
 }
 
@@ -474,11 +498,6 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	{
 		// chop off \hammer.exe
 		p[0] = '\0';
-	}
-
-	if ( IsRunningInEngine() )
-	{
-		strcat( m_szAppDir, "\\bin" );
 	}
 	
 	// Create the message window object for capturing errors and warnings.
@@ -825,30 +844,6 @@ void CHammer::Help(const char *pszTopic)
 	*/
 }
 
-
-static SpewRetval_t HammerDbgOutput( SpewType_t spewType, char const *pMsg )
-{
-	// FIXME: The messages we're getting from the material system
-	// are ones that we really don't care much about.
-	// I'm disabling this for now, we need to decide about what to do with this
-
-	switch( spewType )
-	{
-	case SPEW_ERROR:
-		MessageBox( NULL, pMsg, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
-#ifdef _DEBUG
-		return SPEW_DEBUGGER;
-#else
-		TerminateProcess( GetCurrentProcess(), 1 );
-		return SPEW_ABORT;
-#endif
-
-	default:
-		OutputDebugString( pMsg );
-		return (spewType == SPEW_ASSERT) ? SPEW_DEBUGGER : SPEW_CONTINUE; 
-	}
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1013,7 +1008,7 @@ bool CHammer::Check16BitColor()
 		// dimhotepus: Correctly check BPP is 16+
 		if (bpp < 16)
 		{
-			AfxMessageBox("Your screen must be in 16-bit color or higher to run Hammer.", MB_ICONERROR);
+			AfxMessageBox("Your screen must be in 16-bit+ color or higher to run Hammer.", MB_ICONERROR);
 			return false;
 		}
 		::DeleteDC(hDC);
@@ -1040,8 +1035,6 @@ int CHammer::StaticHammerInternalInit( void *pParam )
 
 InitReturnVal_t CHammer::HammerInternalInit()
 {
-	SpewOutputFunc( HammerDbgOutput );
-
 	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
 
 	InitReturnVal_t nRetVal = BaseClass::Init();
@@ -1104,14 +1097,6 @@ InitReturnVal_t CHammer::HammerInternalInit()
 
 	// other init:
 	randomize();
-
-	/*
-#ifdef _AFXDLL
-	Enable3dControls();			// Call this when using MFC in a shared DLL
-#else
-	Enable3dControlsStatic();	// Call this when linking to MFC statically
-#endif
-	*/
 
 	LoadStdProfileSettings();  // Load standard INI file options (including MRU)
 
@@ -1355,9 +1340,6 @@ void CHammer::Shutdown()
 
 	materials->ModShutdown();
 
-	// dimhotepus: Unlink spew debug output.
-	SpewOutputFunc(nullptr);
-
 	BaseClass::Shutdown();
 }
 
@@ -1420,11 +1402,6 @@ int CHammer::ExitInstance()
 	g_ShellMessageWnd.DestroyWindow();
 
 	UpdatePrefabs_Shutdown();
-
-	if ( GetSpewOutputFunc() == HammerDbgOutput )
-	{
-		SpewOutputFunc( NULL );
-	}
 
 	SaveStdProfileSettings();
 
@@ -2166,10 +2143,9 @@ int CHammer::GetNextAutosaveNumber( CUtlMap<FILETIME, WIN32_FIND_DATA, int> *pFi
 	int nMaxAutosavesPerMap = Options.general.iMaxAutosavesPerMap; 
 
 	WIN32_FIND_DATA fileData;
-	HANDLE hFile;
 	DWORD dwTotalAutosaveDirectorySize = 0;
 			
-	hFile = FindFirstFile( strAutosaveDirectory + "*.vmf_autosave", &fileData );
+	HANDLE hFile = FindFirstFile( strAutosaveDirectory + "*.vmf_autosave", &fileData );
 
     if ( hFile != INVALID_HANDLE_VALUE )
 	{
@@ -2329,7 +2305,7 @@ void CHammer::Autosave( void )
 		//if there is too much space used for autosaves, delete the oldest file until the size is acceptable
 		while( dwTotalAutosaveDirectorySize > dwMaxAutosaveSpace ) 
 		{	
-			int nFirstElementIndex = autosaveFiles.FirstInorder();
+			auto nFirstElementIndex = autosaveFiles.FirstInorder();
 			if ( !autosaveFiles.IsValidIndex( nFirstElementIndex ) )
 			{
 				Assert( false );
@@ -2348,8 +2324,6 @@ void CHammer::Autosave( void )
 		}
 		
 		autosaveFiles.RemoveAll();
-
-		
 	}
 }
 
@@ -2363,9 +2337,6 @@ void CHammer::Autosave( void )
 //-----------------------------------------------------------------------------
 bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 {	
-	HANDLE hDir;
-	HANDLE hTestFile;
-
 	char szRootDir[MAX_PATH];
 	if ( szAutosaveDirectory )
 	{
@@ -2382,6 +2353,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		AfxMessageBox( "No autosave directory has been selected.\nThe autosave feature will be disabled until a directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 		return false;
 	}
+
 	CString strAutosaveDirectory( szRootDir );	
 	{
 		EditorUtil_ConvertPath(strAutosaveDirectory, true);
@@ -2392,7 +2364,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		}
 	}
 
-	hDir = CreateFile (
+	HANDLE hDir = CreateFile (
 		strAutosaveDirectory,
 		GENERIC_READ,
 		FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
@@ -2415,7 +2387,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 	{
 		CloseHandle( hDir );
 
-		hTestFile = CreateFile( strAutosaveDirectory + "test.txt", 
+		HANDLE hTestFile = CreateFile( strAutosaveDirectory + "test.txt", 
 			GENERIC_READ,
 			FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 			NULL,
@@ -2459,7 +2431,7 @@ void CHammer::LoadLastGoodSave( void )
 	CDocument *pCurrentDoc;
 
 	if ( !strLastGoodSave.IsEmpty() )
-	{		
+	{
 		pCurrentDoc = APP()->OpenDocumentFile( strLastGoodSave );
 
 		if ( !pCurrentDoc )
@@ -2468,8 +2440,8 @@ void CHammer::LoadLastGoodSave( void )
 			return;
 		}
 		
-		char szAutoSaveDir[MAX_PATH];	
-		APP()->GetDirectory(DIR_AUTOSAVE, szAutoSaveDir);	
+		char szAutoSaveDir[MAX_PATH];
+		APP()->GetDirectory(DIR_AUTOSAVE, szAutoSaveDir);
 
 		if ( !((CMapDoc *)pCurrentDoc)->IsAutosave() && Q_stristr( pCurrentDoc->GetPathName(), szAutoSaveDir ) )
 		{
@@ -2492,9 +2464,9 @@ void CHammer::LoadLastGoodSave( void )
 			V_sprintf_safe( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
 
 			if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
-			{			
+			{
 				pCurrentDoc->SetPathName( newMapPath );
-			}		
+			}
 		}
 	}
 }

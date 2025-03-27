@@ -22,9 +22,30 @@
 
 
 BEGIN_MESSAGE_MAP(CHammerBar, CDialogBar)
-	ON_WM_SETCURSOR()
+	ON_WM_CREATE()
+	ON_WM_DESTROY()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 END_MESSAGE_MAP()
 
+int CHammerBar::OnCreate(LPCREATESTRUCT lpcs)
+{
+	const int rc{__super::OnCreate(lpcs)};
+
+	if (!rc && m_dpi_behavior.OnCreateWindow(m_hWnd)) return 0;
+
+	return rc;
+}
+
+void CHammerBar::OnDestroy()
+{
+	m_dpi_behavior.OnDestroyWindow();
+	__super::OnDestroy();
+}
+
+LRESULT CHammerBar::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	return m_dpi_behavior.OnWindowDpiChanged(wParam, lParam);
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Automagically bring this bar to the top when the mouse cursor passes
@@ -195,7 +216,7 @@ void CHammerBar::AdjustControls( void )
 	int nHammerBarHeight = HammerBarPos.Height();
 	int nHammerBarWidth  = HammerBarPos.Width();
 	
-	for( int iControl = 0; iControl < m_ControlList.Size(); iControl++ )
+	for( int iControl = 0; iControl < m_ControlList.Count(); iControl++ )
 	{
 		ControlInfo_t currentControl = m_ControlList[ iControl ];
 		int nDialogID = currentControl.m_nIDDialogItem;		

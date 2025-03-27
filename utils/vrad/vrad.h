@@ -217,13 +217,13 @@ struct CPatch
 	int			faceNumber;
 	int			clusterNumber;
 
-	int			parent;			// patch index of parent
+	intp		parent;			// patch index of parent
 	intp		child1;			// patch index for children
 	intp		child2;
 
-	int			ndxNext;					// next patch index in face
-	int			ndxNextParent;				// next parent patch index in face
-	int			ndxNextClusterChild;		// next terminal child index in cluster
+	intp		ndxNext;					// next patch index in face
+	intp		ndxNextParent;				// next parent patch index in face
+	intp		ndxNextClusterChild;		// next terminal child index in cluster
 //	struct		patch_s		*next;					// next in face
 //	struct		patch_s		*nextparent;		    // next in face
 //	struct		patch_s		*nextclusterchild;		// next terminal child in cluster
@@ -408,7 +408,7 @@ bool RadWorld_Go();
 
 dleaf_t		*PointInLeaf (Vector const& point);
 int			ClusterFromPoint( Vector const& point );
-winding_t	*WindingFromFace (dface_t *f, Vector& origin );
+winding_t	*WindingFromFace (dface_t *f, const Vector& origin );
 
 void WriteWinding (FileHandle_t out, winding_t *w, Vector& color );
 void WriteNormal( FileHandle_t out, Vector const &nPos, Vector const &nDir, 

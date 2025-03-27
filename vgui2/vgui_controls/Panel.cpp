@@ -3028,6 +3028,27 @@ void Panel::OnCursorMoved(int x, int y)
 	}
 }
 
+static int ScaleByDpiPercent(int value, int oldDpiPercent, int newDpiPercent) {
+	return Ceil2Int( value * 1.0f / oldDpiPercent * newDpiPercent / 100.0f );
+}
+
+void Panel::OnDpiScalePercentChanged(int xDpiScalePercent, int yDpiScalePercent)
+{
+	int xOldDpiScalePercent, yOldDpiScalePercent;
+
+	scheme()->GetDpiScalePercent( xOldDpiScalePercent, yOldDpiScalePercent );
+	scheme()->SetDpiScalePercent( xDpiScalePercent, yDpiScalePercent );
+
+	int x, y;
+	GetPos(x, y);
+	SetPos( ScaleByDpiPercent(x, xOldDpiScalePercent, xDpiScalePercent), ScaleByDpiPercent(y, yOldDpiScalePercent, yDpiScalePercent) );
+
+	GetSize(x, y);
+	SetSize( ScaleByDpiPercent(x, xOldDpiScalePercent, xDpiScalePercent), ScaleByDpiPercent(y, yOldDpiScalePercent, yDpiScalePercent) );
+
+	InvalidateLayout();
+}
+
 void Panel::OnCursorEntered()
 {
 }
@@ -4670,11 +4691,11 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 				// dimhotepus: Check all 4 color components are present.
 				if ( sscanf( pColorStr, "%f %f %f %f", &r, &g, &b, &a ) == 4 ) 
 				{
-				clrDest[0] = (unsigned char)r;
-				clrDest[1] = (unsigned char)g;
-				clrDest[2] = (unsigned char)b;
-				clrDest[3] = (unsigned char)a;
-			}
+					clrDest[0] = (unsigned char)r;
+					clrDest[1] = (unsigned char)g;
+					clrDest[2] = (unsigned char)b;
+					clrDest[3] = (unsigned char)a;
+				}
 			}
 			else
 			{

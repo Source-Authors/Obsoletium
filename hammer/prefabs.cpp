@@ -306,7 +306,7 @@ static int __cdecl SortPrefabs(CPrefab *a, CPrefab *b)
 //-----------------------------------------------------------------------------
 void CPrefabLibrary::Sort(void)
 {
-	int nPrefabs = Prefabs.GetCount();
+	intp nPrefabs = Prefabs.GetCount();
 	if (nPrefabs < 2)
 	{
 		return;
@@ -319,7 +319,7 @@ void CPrefabLibrary::Sort(void)
 	//
 	POSITION p = ENUM_START;
 	CPrefab *pPrefab = EnumPrefabs(p);
-	int iPrefab = 0;
+	intp iPrefab = 0;
 	while (pPrefab != NULL)
 	{
 		TmpPrefabArray[iPrefab++] = pPrefab;
@@ -335,7 +335,7 @@ void CPrefabLibrary::Sort(void)
 	// Store back in list in sorted order.
 	//
 	Prefabs.RemoveAll();
-	for (int i = 0; i < nPrefabs; i++)
+	for (intp i = 0; i < nPrefabs; i++)
 	{
 		Prefabs.AddTail(TmpPrefabArray[i]);
 	}
@@ -708,8 +708,11 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 		{
 			// change size of file first
 			int iHandle = _open(m_strOpenFileName, _O_BINARY | _O_WRONLY);
-			_chsize(iHandle, m_dwDirOffset);
-			_close(iHandle);
+			if (iHandle != -1)
+			{
+				_chsize(iHandle, m_dwDirOffset);
+				_close(iHandle);
+			}
 		}
 
 		std::fstream file(m_strOpenFileName, std::ios::binary | std::ios::out);

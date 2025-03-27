@@ -24,6 +24,7 @@ CManifestMove::CManifestMove( bool bIsMove, CWnd* pParent /*=NULL*/ )
 	: CBaseDlg(CManifestMove::IDD, pParent)
 {
 	m_bIsMove = bIsMove;
+	m_CenterContents = false;
 }
 
 
@@ -116,6 +117,25 @@ void CManifestMove::OnEnChangeManifestFilename()
 			m_FullPathNameControl.SetWindowText( FullFileName );
 		}
 	}
+}
+
+
+int CManifestListBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	const int rc{m_dpi_behavior.OnCreateWindow(m_hWnd)};
+	return rc;
+}
+
+
+void CManifestListBox::OnDestroy()
+{
+	m_dpi_behavior.OnDestroyWindow();
+}
+
+
+LRESULT CManifestListBox::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	return m_dpi_behavior.OnWindowDpiChanged(wParam, lParam);
 }
 
 
@@ -272,7 +292,7 @@ void CManifestListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 //-----------------------------------------------------------------------------
 void CManifestListBox::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
-	lpMeasureItemStruct->itemHeight = 36;
+	lpMeasureItemStruct->itemHeight = m_dpi_behavior.ScaleOnY( 36 );
 }
 
 
@@ -749,6 +769,7 @@ BOOL CManifestFilter::Create(CWnd *pParentWnd)
 //-----------------------------------------------------------------------------
 CManifestFilter::~CManifestFilter()
 {
+	delete m_pBkBrush;
 }
 
 
@@ -879,6 +900,7 @@ void CManifestFilter::OnDestroy()
 	__super::OnDestroy();
 
 	delete m_pBkBrush;
+	m_pBkBrush = nullptr;
 }
 
 

@@ -47,22 +47,27 @@ CUtlMap<EditDispHandle_t, CMapDisp *>		CSculptTool::m_OrigMapDisp( 3, 3, CSculpt
 //-----------------------------------------------------------------------------
 CSculptTool::CSculptTool()
 {
-	m_PaintOwner = NULL;
-
-	m_MousePoint.Init();
+	m_StartingCollisionPoint.Init();
 	m_StartingCollisionNormal.Init();
-
 	m_OriginalCollisionPoint.Init();
 
-	m_bAltDown = m_bCtrlDown = m_bShiftDown = false;
+	m_StartingCollisionIntercept = -1;
+	m_OriginalCollisionIntercept = -1;
+	m_CurrentCollisionIntercept = -1;
 
+	m_StartingProjectedRadius = m_OriginalProjectedRadius = m_CurrentProjectedRadius = 10.0f;
+	m_OriginalCollisionValid = m_CurrentCollisionValid = false;
+
+	m_MousePoint.Init();
+
+	m_bAltDown = m_bCtrlDown = m_bShiftDown = false;
 	m_bLMBDown = m_bRMBDown = false;
+
 	m_ValidPaintingSpot = false;
 	m_BrushSize = 50;
 
-	m_StartingProjectedRadius = m_OriginalProjectedRadius = 10.0f;
-
-	m_OriginalCollisionValid = m_CurrentCollisionValid = false;
+	m_PaintOwner = NULL;
+	memset(&m_SpatialData, 0xFF, sizeof(m_SpatialData));
 }
 
 
@@ -819,10 +824,7 @@ CSculptPainter::CSculptPainter() :
 //-----------------------------------------------------------------------------
 // Purpose: destructor
 //-----------------------------------------------------------------------------
-CSculptPainter::~CSculptPainter( )
-{
-
-}
+CSculptPainter::~CSculptPainter( ) = default;
 
 
 //-----------------------------------------------------------------------------
@@ -1291,7 +1293,7 @@ void CSculptPushOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -2770,7 +2772,7 @@ void CSculptCarveOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{

@@ -982,12 +982,11 @@ float CMapDisp::CollideWithTriangles( const Vector& RayStart, const Vector& RayE
 									  Vector& surfNormal )
 {
 	// create a ray
-	Ray_t ray;
+	Ray_t ray = {};
 	ray.m_Start = RayStart;
 	ray.m_Delta = RayEnd - RayStart;
 	ray.m_IsRay = true;
 
-	Vector vNormal;
 	float minFraction = 1.0f;
 	for( int ndxTri = 0; ndxTri < triCount; ndxTri++ )
 	{
@@ -1218,7 +1217,7 @@ bool CMapDisp::TraceLineSnapTo( Vector &HitPos, Vector &HitNormal,
 	int height = GetHeight();
 
 	// build the ray
-	Ray_t ray;
+	Ray_t ray = {};
 	ray.m_Start = RayStart;
 	ray.m_Delta = RayEnd - RayStart;
 	ray.m_IsRay = true;
@@ -2522,8 +2521,8 @@ void CMapDisp::UpdateNeighborsOfDispsIntersectingBox( const Vector &bbMin, const
 	Vector bbPaddedMin = bbMin - Vector( flPadding, flPadding, flPadding );
 	Vector bbPaddedMax = bbMax + Vector( flPadding, flPadding, flPadding );
 
-	int count = pDispMgr->WorldCount();
-	for ( int i=0; i < count; i++ )
+	intp count = pDispMgr->WorldCount();
+	for ( intp i=0; i < count; i++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromWorld( i );
 		
@@ -2796,7 +2795,8 @@ ChunkFileResult_t CMapDisp::LoadDispDistancesKeyCallback(const char *szKey, cons
 
 		while (pszNext != NULL)
 		{
-			dispDistance = (float)atof(pszNext);
+			// dimhotepus: atof -> strtof.
+			dispDistance = strtof(pszNext, nullptr);
 			pDisp->m_CoreDispInfo.SetFieldDistance( nIndex, dispDistance );
 			pszNext = strtok(NULL, " ");
 			nIndex++;
@@ -2846,9 +2846,10 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetsKeyCallback(const char *szKey, const 
 
 		while( ( pszNext0 != NULL ) && ( pszNext1 != NULL ) && ( pszNext2 != NULL ) )
 		{
-			subdivVector[0] = ( float )atof( pszNext0 );
-			subdivVector[1] = ( float )atof( pszNext1 );
-			subdivVector[2] = ( float )atof( pszNext2 );
+			// dimhotepus: atof -> strtof.
+			subdivVector[0] = strtof( pszNext0, nullptr );
+			subdivVector[1] = strtof( pszNext1, nullptr );
+			subdivVector[2] = strtof( pszNext2, nullptr );
 
 			pDisp->m_CoreDispInfo.SetSubdivPosition( nIndex, subdivVector );
 
@@ -2904,9 +2905,10 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetNormalsKeyCallback(const char *szKey, 
 
 		while( ( pszNext0 != NULL ) && ( pszNext1 != NULL ) && ( pszNext2 != NULL ) )
 		{
-			normalVector[0] = ( float )atof( pszNext0 );
-			normalVector[1] = ( float )atof( pszNext1 );
-			normalVector[2] = ( float )atof( pszNext2 );
+			// dimhotepus: atof -> strtof.
+			normalVector[0] = strtof( pszNext0, nullptr );
+			normalVector[1] = strtof( pszNext1, nullptr );
+			normalVector[2] = strtof( pszNext2, nullptr );
 
 			pDisp->m_CoreDispInfo.SetSubdivNormal( nIndex, normalVector );
 
@@ -3042,7 +3044,8 @@ ChunkFileResult_t CMapDisp::LoadDispAlphasKeyCallback(const char *szKey, const c
 
 		while (pszNext != NULL) 
 		{
-			alpha = (float)atof(pszNext);
+			// dimhotepus: atof -> strtof.
+			alpha = strtof(pszNext, nullptr);
 
 			pDisp->m_CoreDispInfo.SetAlpha( nIndex, alpha );
 
@@ -3163,9 +3166,10 @@ ChunkFileResult_t CMapDisp::LoadDispNormalsKeyCallback(const char *szKey, const 
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			vectorFieldVector[0] = (float)atof(pszNext0);
-			vectorFieldVector[1] = (float)atof(pszNext1);
-			vectorFieldVector[2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			vectorFieldVector[0] = strtof(pszNext0, nullptr);
+			vectorFieldVector[1] = strtof(pszNext1, nullptr);
+			vectorFieldVector[2] = strtof(pszNext2, nullptr);
 
 			pDisp->m_CoreDispInfo.SetFieldVector( nIndex, vectorFieldVector );
 
@@ -3933,7 +3937,7 @@ bool CMapDisp::PointSurfIntersection( Vector const &ptCenter, float radius, floa
 					{
 						Vector vTmp;
 						vTmp = ptCenter - v[k];
-						float distPt = ( float )sqrt( vTmp.Dot( vTmp ) );
+						float distPt = sqrt( vTmp.Dot( vTmp ) );
 						if( distPt < distMin )
 						{
 							distMin = distPt;

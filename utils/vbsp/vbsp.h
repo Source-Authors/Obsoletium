@@ -392,7 +392,7 @@ extern	textureref_t	textureref[MAX_MAP_TEXTURES];
 
 int	FindMiptex (const char *name);
 
-int TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& origin);
+intp TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& origin);
 int GetSurfaceProperties2( MaterialSystemMaterial_t matID, const char *pMatName );
 
 extern int g_SurfaceProperties[MAX_MAP_TEXDATA];
@@ -598,9 +598,9 @@ int FindTexData( const char *pName );
 int FindOrCreateTexData( const char *pName );
 // Add a clone of an existing texdata with a new name
 int AddCloneTexData( dtexdata_t *pExistingTexData, char const *cloneTexDataName );
-int FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
+intp FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
 int FindAliasedTexData( const char *pName, dtexdata_t *sourceTexture );
-int FindTexInfo( const texinfo_t &searchTexInfo );
+intp FindTexInfo( const texinfo_t &searchTexInfo );
 
 //=============================================================================
 // normals.c
@@ -608,7 +608,7 @@ void SaveVertexNormals( void );
 
 //=============================================================================
 // cubemap.cpp
-void Cubemap_InsertSample( const Vector& origin, int size );
+void Cubemap_InsertSample( const Vector& origin, byte size );
 void Cubemap_CreateDefaultCubemaps( void );
 void Cubemap_SaveBrushSides( const char *pSideListStr );
 void Cubemap_FixupBrushSidesMaterials( void );

@@ -10,11 +10,12 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+#include "windows/base_property_page.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // COPTBuild dialog
 
-class COPTBuild : public CPropertyPage
+class COPTBuild : public CBasePropertyPage
 {
 // Construction
 public:

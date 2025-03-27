@@ -27,8 +27,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
-
 
 class CCullTreeNode;
 
@@ -71,7 +69,7 @@ static BOOL AddUsedTextures(CMapSolid *pSolid, CUsedTextureList *pList)
 		{
 			if (Tex.pTex != pLastTex)
 			{
-				int nElement = pList->Find(Tex.pTex);
+				intp nElement = pList->Find(Tex.pTex);
 				if (nElement == -1)
 				{
 					nElement = pList->AddToTail(Tex);
@@ -100,7 +98,7 @@ static BOOL AddOverlayTextures(CMapOverlay *pOverlay, CUsedTextureList *pList)
 
 	if (Tex.pTex != NULL)
 	{
-		int nElement = pList->Find(Tex.pTex);
+		intp nElement = pList->Find(Tex.pTex);
 		if (nElement == -1)
 			nElement = pList->AddToTail(Tex);
 
@@ -136,7 +134,10 @@ bool BoxesIntersect(Vector const &mins1, Vector const &maxs1, Vector const &mins
 //-----------------------------------------------------------------------------
 CMapWorld::CMapWorld( void )
 {
-
+	m_pCullTree = nullptr;
+	m_nNextFaceID = 0;
+	m_pWorldDispMgr = nullptr;
+	m_pOwningDocument = nullptr;
 }
 
 
@@ -246,8 +247,9 @@ void CMapWorld::AddObjectToWorld(CMapClass *pObject, CMapClass *pParent)
 //			and groups. These lists are then serialized in SaveVMF.
 // Input  : pSaveLists - Receives lists of objects.
 //-----------------------------------------------------------------------------
-BOOL CMapWorld::BuildSaveListsCallback(CMapClass *pObject, SaveLists_t *pSaveLists)
+BOOL CMapWorld::BuildSaveListsCallback(CMapClass *pObject, DWORD_PTR ctx)
 {
+	auto *pSaveLists = reinterpret_cast<SaveLists_t *>(ctx);
 	CMapEntity *pEntity = dynamic_cast<CMapEntity *>(pObject);
 	if (pEntity != NULL)
 	{
@@ -341,11 +343,11 @@ static inline int EntityBucketForName( const char *pszName )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int CMapWorld::FindEntityBucket( CMapEntity *pEntity, int *pnIndex )
+int CMapWorld::FindEntityBucket( CMapEntity *pEntity, intp *pnIndex )
 {
 	for ( int i = 0; i < NUM_HASHED_ENTITY_BUCKETS; i++ )
 	{
-		int nIndex = m_EntityListByName[ i ].Find( pEntity );
+		intp nIndex = m_EntityListByName[ i ].Find( pEntity );
 		if ( nIndex != -1 )
 		{
 			if ( pnIndex )
@@ -424,7 +426,7 @@ void CMapWorld::EntityList_Remove(CMapClass *pObject, bool bRemoveChildren)
 	if (pEntity != NULL)
 	{
 		// Remove the entity from the flat list.
-		int nIndex = m_EntityList.Find( pEntity );
+		intp nIndex = m_EntityList.Find( pEntity );
 		if ( nIndex != -1 )
 		{
 			m_EntityList.FastRemove( nIndex );
@@ -589,8 +591,8 @@ void CMapWorld::UpdateChild(CMapClass *pChild)
 void CMapWorld::GetUsedTextures(CUsedTextureList &List)
 {
 	List.RemoveAll();
-	EnumChildren((ENUMMAPCHILDRENPROC)AddUsedTextures, (DWORD)&List, MAPCLASS_TYPE(CMapSolid));
-	EnumChildren((ENUMMAPCHILDRENPROC)AddOverlayTextures, (DWORD)&List, MAPCLASS_TYPE(CMapOverlay));
+	EnumChildren((ENUMMAPCHILDRENPROC)AddUsedTextures, (DWORD_PTR)&List, MAPCLASS_TYPE(CMapSolid));
+	EnumChildren((ENUMMAPCHILDRENPROC)AddOverlayTextures, (DWORD_PTR)&List, MAPCLASS_TYPE(CMapOverlay));
 }
 
 
@@ -659,9 +661,9 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 		Vector Mids;
 		int nChild;
 
-		Mids[0] = (Mins[0] + Maxs[0]) / 2.0;
-		Mids[1] = (Mins[1] + Maxs[1]) / 2.0;
-		Mids[2] = (Mins[2] + Maxs[2]) / 2.0;
+		Mids[0] = (Mins[0] + Maxs[0]) / 2.0f;
+		Mids[1] = (Mins[1] + Maxs[1]) / 2.0f;
+		Mids[2] = (Mins[2] + Maxs[2]) / 2.0f;
 
 		for (nChild = 0; nChild < 8; nChild++)
 		{
@@ -862,8 +864,8 @@ void CMapWorld::PostloadWorld(void)
 	//
 	// Set the class name from our "classname" key and discard the key.
 	//
-	int nIndex;
-	const char *pszValue = pszValue = m_KeyValues.GetValue("classname", &nIndex);
+	intp nIndex;
+	const char *pszValue = m_KeyValues.GetValue("classname", &nIndex);
 	if (pszValue != NULL)
 	{
 		SetClass(pszValue);
@@ -1046,7 +1048,7 @@ ChunkFileResult_t CMapWorld::SaveSolids(CChunkFile *pFile, CSaveInfo *pSaveInfo,
 	PresaveWorld();
 
 	SaveLists_t SaveLists;
-	EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)BuildSaveListsCallback, (DWORD)&SaveLists);
+	EnumChildrenRecurseGroupsOnly(BuildSaveListsCallback, (DWORD_PTR)&SaveLists);
 
 	return SaveObjectListVMF(pFile, pSaveInfo, &SaveLists.Solids, saveFlags);
 }
@@ -1066,7 +1068,7 @@ ChunkFileResult_t CMapWorld::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, in
 	// Sort the world objects into lists for saving into different chunks.
 	//
 	SaveLists_t SaveLists;
-	EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)BuildSaveListsCallback, (DWORD)&SaveLists);
+	EnumChildrenRecurseGroupsOnly(BuildSaveListsCallback, (DWORD_PTR)&SaveLists);
 
 	//
 	// Begin the world chunk.
@@ -1693,7 +1695,7 @@ void CMapWorld::PostloadVisGroups()
 	if ( bFoundOrphans == true )
 	{
 		pDoc->VisGroups_CreateNamedVisGroup( orphans, "_orphaned hidden", true, false );
-		GetMainWnd()->MessageBox( "Orphaned objects were found and placed into the \"_orphaned hidden\" visgroup.", "Orphaned Objects Found", MB_OK | MB_ICONEXCLAMATION);
+		GetMainWnd()->MessageBox( "Orphaned objects were found and placed into the \"_orphaned hidden\" visgroup.", "Hammer - Orphaned Objects Found", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	// Link up all the connections to the entities
@@ -1759,11 +1761,11 @@ CMapEntity *CMapWorld::FindEntityByName( const char *pszName, bool bVisiblesOnly
 			CMapEntity *pEntity = dynamic_cast< CMapEntity *>( (*pEntities)[pos] );
 			if ( pEntity->ClassNameMatches( "func_instance" ) == true )
 			{
-				for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+				for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 				{
 					LPCTSTR	pInstanceKey = pEntity->GetKey( j );
 					LPCTSTR	pInstanceValue = pEntity->GetKeyValue( j );
-					if ( strnicmp( pInstanceKey, "replace", strlen( "replace" ) ) == 0 )
+					if ( strnicmp( pInstanceKey, "replace", ssize( "replace" ) - 1 ) == 0 )
 					{
 						const char *InstancePos = strchr( pInstanceValue, ' ' );
 						if ( InstancePos == NULL )
@@ -1931,7 +1933,7 @@ void CMapWorld::UpdateAllDependencies( CMapClass *pObject )
 			nNewBucket = EntityBucketForName( pszName );
 		}
 
-		int nIndex;
+		intp nIndex;
 		int nOldBucket = FindEntityBucket( pEntity, &nIndex );
 
 		if ( nOldBucket != nNewBucket )

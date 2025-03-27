@@ -325,7 +325,7 @@ void ProcessWorldModel (void)
 	// this turns portals with one solid side into faces
 	// it also subdivides each face if necessary to fit max lightmap dimensions
 	MakeFaces (tree->headnode);
-	Msg("done (%.2fs)", Plat_FloatTime() - start );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 
 	if (glview)
 	{
@@ -343,25 +343,36 @@ void ProcessWorldModel (void)
 	start = Plat_FloatTime();
 
 	Msg("\n");
-	Msg("FixTjuncs...\n");
+	Msg("FixTjuncs...");
 	
 	// This unifies the vertex list for all edges (splits collinear edges to remove t-junctions)
 	// It also welds the list of vertices out of each winding/portal and rounds nearly integer verts to integer
 	pLeafFaceList = FixTjuncs (tree->headnode, pLeafFaceList);
+	
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 
 	// this merges all of the solid nodes that have separating planes
 	if (!noprune)
 	{
-		Msg("PruneNodes...\n");
+		Msg("\n");
+		Msg("PruneNodes...");
+
+		start = Plat_FloatTime();
+
 		PruneNodes (tree->headnode);
+
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 	}
 
 //	Msg( "SplitSubdividedFaces...\n" );
 //	SplitSubdividedFaces( tree->headnode );
-
-	Msg("WriteBSP...\n");
-	WriteBSP (tree->headnode, pLeafFaceList);
-	Msg("done (%.2fs)\n", Plat_FloatTime() - start );
+	
+	Msg("\n");
+	Msg("Write BSP...");
+	start = Plat_FloatTime();
+	WriteBSP(tree->headnode, pLeafFaceList);
+	Msg("(%.2fs)", Plat_FloatTime() - start );
+	Msg("\n");
 
 	if (!leaked)
 	{
@@ -590,7 +601,7 @@ static void EmitOccluderBrushes()
 			continue;
 
 		// Output only those parts of the occluder tree which are a part of the brush
-		int nOccluder = g_OccluderData.AddToTail();
+		intp nOccluder = g_OccluderData.AddToTail();
 		doccluderdata_t &occluderData = g_OccluderData[ nOccluder ];
 		occluderData.firstpoly = g_OccluderPolyData.Count();
 		occluderData.mins.Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -603,7 +614,7 @@ static void EmitOccluderBrushes()
 		V_sprintf_safe (str, "%i", nOccluder);
 		SetKeyValue (&entities[entity_num], "occludernumber", str);
 
-		int nIndex = g_OccluderInfo.AddToTail();
+		intp nIndex = g_OccluderInfo.AddToTail();
 		g_OccluderInfo[nIndex].m_nOccluderEntityIndex = entity_num;
 		
 		sideList.RemoveAll();
@@ -633,7 +644,7 @@ static void EmitOccluderBrushes()
 				pEmitted[i] = entity_num;
 #endif
 
-				int k = g_OccluderPolyData.AddToTail();
+				intp k = g_OccluderPolyData.AddToTail();
 				doccluderpolydata_t *pOccluderPoly = &g_OccluderPolyData[k];
 
 				pOccluderPoly->planenum = f->planenum;
@@ -908,9 +919,9 @@ int RunVBSP( int argc, char **argv )
 	V_strcat_safe( mapFile, ".bsp" );
 
 #ifdef PLATFORM_64BITS
-	Msg( "Valve Software - vbsp.exe [64 bit] (%s)\n", __DATE__ );
+	Msg( "Valve Software - vbsp [64 bit] (%s)\n", __DATE__ );
 #else
-	Msg( "Valve Software - vbsp.exe (%s)\n", __DATE__ );
+	Msg( "Valve Software - vbsp (%s)\n", __DATE__ );
 #endif
 
 	int i;
@@ -1027,7 +1038,8 @@ int RunVBSP( int argc, char **argv )
 #if 0
 		else if (!Q_stricmp(argv[i], "-maxlightmapdim"))
 		{
-			g_maxLightmapDimension = atof(argv[i+1]);
+			// dimhotepus: atof -> strtof.
+			g_maxLightmapDimension = strtof(argv[i+1], nullptr);
 			Msg ("--max-lightmap-dimension: %f\n", g_maxLightmapDimension);
 			i++;
 		}
@@ -1162,9 +1174,9 @@ int RunVBSP( int argc, char **argv )
 			Msg( "--full-minidumps: true\n" );
 			se::utils::common::EnableFullMinidumps( true );
 		}
-		else if ( !Q_stricmp( argv[i], "-embed" ) && i < argc - 1 )
+		else if ( i < argc - 1 && !Q_stricmp( argv[i], "-embed" ) )
 		{
-			V_MakeAbsolutePath( g_szEmbedDir, sizeof( g_szEmbedDir ), argv[++i], "." );
+			V_MakeAbsolutePath( g_szEmbedDir, argv[++i], "." );
 			V_FixSlashes( g_szEmbedDir );
 			if ( !V_RemoveDotSlashes( g_szEmbedDir ) )
 			{
@@ -1305,6 +1317,7 @@ int RunVBSP( int argc, char **argv )
 
 	ThreadSetDefault();
 	numthreads = 1;		// multiple threads aren't helping...
+	//Msg("Using pool of %d threads.\n", numthreads);
 
 	// Setup the logfile.
 	char logFile[512];
@@ -1322,7 +1335,7 @@ int RunVBSP( int argc, char **argv )
 
 	V_sprintf_safe( materialPath, "%smaterials", gamedir );
 	InitMaterialSystem( materialPath, CmdLib_GetFileSystemFactory() );
-	Msg( "materialPath: %s\n", materialPath );
+	Msg( "Path to materials directory: %s.\n", materialPath );
 
 	char path[MAX_FILEPATH];
 	// delete portal and line files

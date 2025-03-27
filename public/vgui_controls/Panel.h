@@ -390,6 +390,8 @@ public:
 	MESSAGE_FUNC( OnSetFocus, "SetFocus" );			// called after the panel receives the keyboard focus
 	MESSAGE_FUNC( OnKillFocus, "KillFocus" );		// called after the panel loses the keyboard focus
 	MESSAGE_FUNC( OnDelete, "Delete" );				// called to delete the panel; Panel::OnDelete() does simply { delete this; }
+	// called when DPI changed.
+	MESSAGE_FUNC_INT_INT( OnDpiScalePercentChanged, "SetDpiScalePercent", xDpiScalePercent, yDpiScalePercent );
 	virtual void OnThink();							// called every frame before painting, but only if panel is visible
 	void OnChildAdded(VPANEL child) override;		// called when a child has been added to this panel
 	void OnSizeChanged(int newWide, int newTall) override;	// called after the size of a panel has been changed
@@ -680,10 +682,10 @@ protected:
 
 	void AddToOverridableColors( Color *pColor, char const *scriptname )
 	{
-		intp iIdx = m_OverridableColorEntries.AddToTail();
-		m_OverridableColorEntries[iIdx].m_pszScriptName = scriptname;
-		m_OverridableColorEntries[iIdx].m_pColor = pColor;
-		m_OverridableColorEntries[iIdx].m_bOverridden = false;
+		auto &entry = m_OverridableColorEntries[m_OverridableColorEntries.AddToTail()];
+		entry.m_pszScriptName = scriptname;
+		entry.m_pColor = pColor;
+		entry.m_bOverridden = false;
 	}
 
 	void ApplyOverridableColors( void );

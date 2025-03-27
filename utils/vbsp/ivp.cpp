@@ -14,7 +14,6 @@
 #include "utlvector.h"
 #include "vbsp.h"
 #include "phyfile.h"
-#include <float.h>
 #include "KeyValues.h"
 #include "UtlBuffer.h"
 #include "utlsymbol.h"
@@ -49,13 +48,6 @@ static CUtlVector<int> s_WorldPropList;
 //-----------------------------------------------------------------------------
 // Purpose: Write key/value pairs out to a memory buffer
 //-----------------------------------------------------------------------------
-CTextBuffer::CTextBuffer( void )
-{
-}
-CTextBuffer::~CTextBuffer( void )
-{
-}
-
 void CTextBuffer::WriteText( const char *pText )
 {
 	int len = strlen( pText );
@@ -135,7 +127,7 @@ void CTextBuffer::Terminate( void )
 
 void CTextBuffer::CopyData( const char *pData, int len )
 {
-	int offset = m_buffer.AddMultipleToTail( len );
+	intp offset = m_buffer.AddMultipleToTail( len );
 	memcpy( m_buffer.Base() + offset, pData, len );
 }
 
@@ -337,9 +329,8 @@ private:
 
 
 CPhysCollisionEntryFluid::CPhysCollisionEntryFluid( CPhysCollide *pCollide, const char *pSurfaceProp, float damping, const Vector &normal, float dist, int nContents )
-	: CPhysCollisionEntry( pCollide )
+	: CPhysCollisionEntry( pCollide ), m_surfaceNormal{normal}
 {
-	m_surfaceNormal = normal;
 	m_surfaceDist = dist;
 	m_pSurfaceProp = V_strdup(pSurfaceProp);
 	m_damping = damping;
@@ -1657,7 +1648,7 @@ void EmitPhysCollision()
 	memcpy( ptr, &model, sizeof(model) );
 	ptr += sizeof(model);
 	Assert( (ptr-g_pPhysCollide) == g_PhysCollideSize);
-	Msg("done (%.2fs) (%d bytes)\n", Plat_FloatTime() - start, g_PhysCollideSize );
+	Msg("(%.2fs) (%d bytes)\n", Plat_FloatTime() - start, g_PhysCollideSize );
 
 	// UNDONE: Collision models (collisionList) memory leak!
 }

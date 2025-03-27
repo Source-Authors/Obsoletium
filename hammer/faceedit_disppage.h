@@ -11,6 +11,7 @@
 
 #include "resource.h"
 #include "DispDlg.h"
+#include "windows/base_property_page.h"
 
 class CMapSolid;
 class CMapFace;
@@ -20,7 +21,7 @@ class CMapDisp;
 //
 // Face Edit Displacement Page Class
 //
-class CFaceEditDispPage : public CPropertyPage
+class CFaceEditDispPage : public CBasePropertyPage
 {
 
 	DECLARE_DYNAMIC( CFaceEditDispPage );

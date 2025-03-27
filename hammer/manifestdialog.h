@@ -10,6 +10,8 @@
 #pragma once
 
 #include "windows/base_dlg.h"
+#include "windows/dpi_wnd_behavior.h"
+
 #include <afxcmn.h>
 #include <afxwin.h>
 #include "HammerBar.h"
@@ -60,9 +62,9 @@ class CManifestListBox : public CListBox
 public:
 	CManifestListBox( void ); 
 
-	virtual void DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct );
-	virtual void MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct );
-	virtual int CompareItem( LPCOMPAREITEMSTRUCT lpCompareItemStruct );
+	void DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct ) override;
+	void MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct ) override;
+	int CompareItem( LPCOMPAREITEMSTRUCT lpCompareItemStruct ) override;
 
 private:
 	CImageList		m_Icons;
@@ -70,11 +72,17 @@ private:
 	CManifestMap	*m_pTrackerManifestMap;
 
 protected:
+	se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+
+protected:
 	//{{AFX_MSG(CManifestListBox)
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnMoveSelectionToSubMap();
@@ -94,7 +102,7 @@ public:
 class CManifestFilter : public CHammerBar
 {
 public:
-	CManifestFilter() : CHammerBar() { bInitialized = FALSE; }
+	CManifestFilter() : CHammerBar() { bInitialized = FALSE; m_pBkBrush = nullptr; }
 	BOOL Create(CWnd *pParentWnd);
 
 	virtual ~CManifestFilter();

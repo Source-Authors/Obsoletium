@@ -130,6 +130,7 @@ CMapSprite *CMapSprite::CreateMapSprite(const char *pszSpritePath)
 //-----------------------------------------------------------------------------
 CMapSprite::CMapSprite(void)
 {
+	m_pSpriteInfo = nullptr;
 	Initialize();
 }
 
@@ -166,7 +167,7 @@ void CMapSprite::CalcBounds(BOOL bFullUpdate)
 	
 	if (m_pSpriteInfo)
 	{
-		fRadius = max(m_pSpriteInfo->GetWidth(), m_pSpriteInfo->GetHeight()) * m_fScale / 2.0;
+		fRadius = max(m_pSpriteInfo->GetWidth(), m_pSpriteInfo->GetHeight()) * m_fScale / 2.0f;
 		if (fRadius == 0)
 		{
 			fRadius = 8;
@@ -222,9 +223,9 @@ CMapClass *CMapSprite::Copy(bool bUpdateDependencies)
 CMapClass *CMapSprite::CopyFrom(CMapClass *pObject, bool bUpdateDependencies)
 {
 	CMapSprite *pFrom = dynamic_cast<CMapSprite *>(pObject);
-	Assert(pObject != NULL);
+	Assert(pFrom != NULL);
 
-	if (pObject != NULL)
+	if (pFrom != NULL)
 	{
 		CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
@@ -378,7 +379,7 @@ void CMapSprite::Render3D(CRender3D *pRender)
 			}
 
 
-			m_pSpriteInfo->SetScale(m_fScale > 0 ? m_fScale : 1.0 );
+			m_pSpriteInfo->SetScale(m_fScale > 0 ? m_fScale : 1.0f );
 
 			float fBlend;
 			// dvs: lots of things contribute to blend factor. See r_blend in engine.
@@ -523,15 +524,16 @@ void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 {
 	if (!stricmp(szKey, "framerate"))
 	{
-		float fFramesPerSecond = atof(szValue);
-		if (fabs(fFramesPerSecond) > 0.001)
+		// dimhotepus: atof -> strtof
+		float fFramesPerSecond = strtof(szValue, nullptr);
+		if (fabs(fFramesPerSecond) > 0.001f)
 		{
 			m_fSecondsPerFrame = 1 / fFramesPerSecond;
 		}
 	}
 	else if (!stricmp(szKey, "scale"))
 	{
-		m_fScale = atof(szValue);
+		m_fScale = strtof(szValue, nullptr);
 		if (m_fScale == 0)
 		{
 			m_fScale = 1;
@@ -598,7 +600,7 @@ void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 	//
 	else if (!stricmp(szKey, "_light"))
 	{
-		sscanf(szValue, "%d %d %d", &m_RenderColor.r, &m_RenderColor.g, &m_RenderColor.b);
+		sscanf(szValue, "%u %u %u", &m_RenderColor.r, &m_RenderColor.g, &m_RenderColor.b);
 	}
 	else if (!stricmp(szKey, "angles"))
 	{

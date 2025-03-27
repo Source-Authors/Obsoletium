@@ -56,10 +56,18 @@ CImageList*			   COP_Input::m_pImageList = NULL;
 COP_Input::COP_Input(void)
 	: CObjectPage(COP_Input::IDD)
 {
-	m_pObjectList = NULL;
 	m_pEntityList = new CMapEntityList;
-	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCMapClass);
+	m_pEditGameClass = nullptr;
+	m_pEntity = nullptr;
+
+	m_pTargetEntityList = nullptr;
+	m_pConnectionList = nullptr;
+	m_bMultipleTargetNames = false;
+	
 	m_nSortColumn = OUTPUT_NAME_COLUMN;
+	
+	m_pObjectList = NULL;
+	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCMapClass);
 
 	//
 	// All columns initially sort in ascending order.
@@ -242,7 +250,7 @@ void COP_Input::AddEntityConnections(const char *pTargetName, CMapEntity *pTestE
 				CInputConnection *pInputConn	= new CInputConnection;
 				pInputConn->m_pConnection		= pConnection;
 				pInputConn->m_pEntity			= pTestEntity;
-				m_ListCtrl.SetItemData(nItemCount, (DWORD)pInputConn);
+				m_ListCtrl.SetItemData(nItemCount, (DWORD_PTR)pInputConn);
 
 				nItemCount++;
 			}
@@ -670,11 +678,11 @@ void COP_Input::UpdateColumnHeaderText(int nColumn, bool bIsSortColumn, SortDire
 	Column.cchTextMax = sizeof(szHeaderText);
 	m_ListCtrl.GetColumn(nColumn, &Column);
 
-	int nMarker = 0;
+	ptrdiff_t nMarker = 0;
 
 	if (szHeaderText[0] != '\0')
 	{
-		nMarker = strlen(szHeaderText) - 1;
+		nMarker = V_strlen(szHeaderText) - 1;
 		char chMarker = szHeaderText[nMarker];
 
 		if ((chMarker == '>') || (chMarker == '<'))

@@ -62,6 +62,7 @@ CMapClass *CMapPlayerHullHandle::Create(CHelperInfo *pHelperInfo, CMapEntity *pP
 //-----------------------------------------------------------------------------
 CMapPlayerHullHandle::CMapPlayerHullHandle(void)
 {
+	m_pOwner = nullptr;
 	Initialize();
 }
 
@@ -73,6 +74,7 @@ CMapPlayerHullHandle::CMapPlayerHullHandle(void)
 //-----------------------------------------------------------------------------
 CMapPlayerHullHandle::CMapPlayerHullHandle(const char *pszKey, bool bDrawLineToParent)
 {
+	m_pOwner = nullptr;
 	Initialize();
 	V_strcpy_safe(m_szKeyName, pszKey);
 	m_bDrawLineToParent = bDrawLineToParent;

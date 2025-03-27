@@ -179,6 +179,8 @@ public:
 	virtual int GetProportionalNormalizedValueEx( HScheme scheme, int scaledValue );
 
 	virtual bool DeleteImage( const char *pImageName );
+	virtual void GetDpiScalePercent( int &xDpiScalePercent, int &yDpiScalePercent );
+	virtual void SetDpiScalePercent( int xDpiScalePercent, int yDpiScalePercent );
 
 	// gets the proportional coordinates for doing screen-size independant panel layouts
 	// use these for font, image and panel size scaling (they all use the pixel height of the display for scaling)
@@ -204,6 +206,8 @@ private:
 	};
 	static bool BitmapHandleSearchFunc(const CachedBitmapHandle_t &, const CachedBitmapHandle_t &);
 	CUtlRBTree<CachedBitmapHandle_t, int> m_Bitmaps;
+
+	int m_xDpiScalePercent, m_yDpiScalePercent;
 };
 
 const char *CSchemeManager::s_pszSearchString = NULL;
@@ -712,9 +716,9 @@ void CScheme::LoadFonts()
 						if ( pRange )
 						{
 							bUseRange = true;
-							sscanf( pRange->GetString(), "%x %x", &nRangeMin, &nRangeMax );
 
-							if ( nRangeMin > nRangeMax )
+							if ( sscanf( pRange->GetString(), "%x %x", &nRangeMin, &nRangeMax ) == 2 &&
+								 nRangeMin > nRangeMax )
 							{
 								std::swap(nRangeMin, nRangeMax);
 							}
@@ -795,15 +799,37 @@ void CScheme::ReloadFontGlyphs()
 	KeyValues *fonts = m_pData->FindKey("Fonts", true);
 	FOR_EACH_DICT_FAST( m_FontAliases, i )
 	{
-		KeyValues *kv = fonts->FindKey( m_FontAliases[i]._trueFontName.String(), true );
+		const char *trueFontName = m_FontAliases[i]._trueFontName.String();
+		KeyValues *kv = fonts->FindKey( trueFontName, true );
+
+		// dimhotepus: Half-Life 2 20th Anniversary Update. Some fonts are without inner subkeys.
+		//
+		//"MenuLargeUnscaled"
+		//{
+		//	"name"		"Verdana"
+		//	...
+		//}
+		KeyValues *sub = kv->GetFirstSubKey();
+		bool hasInnerSubkey = sub && sub->GetDataType() == KeyValues::types_t::TYPE_NONE;
+		KeyValues *fontdata = hasInnerSubkey ? sub : kv;
+		// dimhotepus: Half-Life 2 20th Anniversary Update. Some fonts are empty on PC.
+		//
+		//GameUIButtons
+		//{
+		//	"1"	[$X360]
+		//	{
+		//		...
+		//	}
+		//}
+		fontdata = fontdata->GetFirstSubKey() ? fontdata : nullptr;
 	
 		// walk through creating adding the first matching glyph set to the font
-		for (KeyValues *fontdata = kv->GetFirstSubKey(); fontdata != NULL; fontdata = fontdata->GetNextKey())
+		for ( ; fontdata != nullptr; fontdata = fontdata->GetNextKey())
 		{
 			// skip over fonts not meant for this resolution
 			int fontYResMin = 0, fontYResMax = 0;
-			sscanf(fontdata->GetString("yres", ""), "%d %d", &fontYResMin, &fontYResMax);
-			if (fontYResMin)
+			const char *yres = fontdata->GetString("yres", "");
+			if (sscanf(yres, "%d %d", &fontYResMin, &fontYResMax) == 2 && fontYResMin)
 			{
 				if (!fontYResMax)
 				{
@@ -839,7 +865,8 @@ void CScheme::ReloadFontGlyphs()
 			{
 				flags |= ISurface::FONTFLAG_CLEARTYPE;
 			}
-			if (fontdata->GetInt( "cleartype_natural" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
+			if (flags & ISurface::FONTFLAG_ANTIALIAS ||
+				fontdata->GetInt( "cleartype_natural" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
 			{
 				flags |= ISurface::FONTFLAG_CLEARTYPE_NATURAL;
 			}
@@ -882,6 +909,19 @@ void CScheme::ReloadFontGlyphs()
 				scanlines = g_Scheme.GetProportionalScaledValueEx( this, scanlines ); 
 				scalex = g_Scheme.GetProportionalScaledValueEx( this, scalex * 10000.0f ) * 0.0001f;
 				scaley = g_Scheme.GetProportionalScaledValueEx( this, scaley * 10000.0f ) * 0.0001f;
+			}
+
+			// dimhotepus: Apply DPI for nonproportional fonts when it doesn't have a resolution filter specified
+			if ( ( !fontYResMin && !fontYResMax ) && !m_FontAliases[i].m_bProportional )
+			{
+				int xDpiScalePercent = 100, yDpiScalePercent = 100;
+				g_Scheme.GetDpiScalePercent(xDpiScalePercent, yDpiScalePercent);
+
+				tall = tall * yDpiScalePercent / 100;
+				blur = blur * yDpiScalePercent / 100;
+				scanlines = scanlines * xDpiScalePercent / 100;
+				scalex = scalex * 10000.0f * xDpiScalePercent / 100 * 0.0001f;
+				scaley = scaley * 10000.0f * yDpiScalePercent / 100 * 0.0001f;
 			}
 
 			// clip the font size so that fonts can't be too big
@@ -1306,6 +1346,18 @@ bool CSchemeManager::DeleteImage( const char *pImageName )
 	m_Bitmaps.RemoveAt( i );
 
 	return true;
+}
+
+void CSchemeManager::GetDpiScalePercent( int &xDpiScalePercent, int &yDpiScalePercent )
+{
+	xDpiScalePercent = m_xDpiScalePercent;
+	yDpiScalePercent = m_yDpiScalePercent;
+}
+
+void CSchemeManager::SetDpiScalePercent( int xDpiScalePercent, int yDpiScalePercent )
+{
+	m_xDpiScalePercent = xDpiScalePercent;
+	m_yDpiScalePercent = yDpiScalePercent;
 }
 
 //-----------------------------------------------------------------------------

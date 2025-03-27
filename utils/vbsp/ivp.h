@@ -18,7 +18,7 @@ class IPhysicsCollision;
 extern IPhysicsCollision *physcollision;
 
 // a list of all of the materials in the world model
-extern int RemapWorldMaterial( int materialIndexIn );
+extern intp RemapWorldMaterial( int materialIndexIn );
 
 class CPhysCollisionEntry
 {
@@ -54,8 +54,8 @@ private:
 class CTextBuffer
 {
 public:
-	CTextBuffer( void );
-	~CTextBuffer( void );
+	CTextBuffer( void ) = default;
+	~CTextBuffer( void ) = default;
 	inline int GetSize( void ) { return m_buffer.Count(); }
 	inline char *GetData( void ) { return m_buffer.Base(); }
 	

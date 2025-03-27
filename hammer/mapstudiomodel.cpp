@@ -312,12 +312,13 @@ void CMapStudioModel::OnParentKeyChanged(const char* szKey, const char* szValue)
 {
 	if (!stricmp(szKey, "angles"))
 	{
-		sscanf(szValue, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
+		[[maybe_unused]] const int scanned =
+			sscanf(szValue, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
 		PostUpdate(Notify_Changed);
 	}
 	else if (!stricmp(szKey, "pitch"))
 	{
-		m_flPitch = atof(szValue);
+		m_flPitch = strtof(szValue, nullptr);
 		m_bPitchSet = true;
 
 		PostUpdate(Notify_Changed);
@@ -341,11 +342,11 @@ void CMapStudioModel::OnParentKeyChanged(const char* szKey, const char* szValue)
 	}
 	else if (!stricmp(szKey, "fadescale"))
 	{
-		m_flFadeScale = atof(szValue);
+		m_flFadeScale = strtof(szValue, nullptr);
 	}
 	else if ( !stricmp( szKey, "solid") )
 	{
-		m_iSolid = atof( szValue );
+		m_iSolid = strtof(szValue, nullptr);
 	}
 }
 
@@ -433,7 +434,6 @@ void CMapStudioModel::Render2D(CRender2D *pRender)
 	pRender->TransformPoint(pt, vecMins);
 	pRender->TransformPoint(pt2, vecMaxs);
 
-	color32 rgbColor = GetRenderColor();
 	bool	bIsEditable = IsEditable();
 
 	if (GetSelectionState() != SELECT_NONE)
@@ -443,6 +443,8 @@ void CMapStudioModel::Render2D(CRender2D *pRender)
 	}
 	else
 	{
+		color32 rgbColor = GetRenderColor();
+
 		pRender->SetDrawColor( rgbColor.r, rgbColor.g, rgbColor.b );
 		pRender->SetHandleColor( rgbColor.r, rgbColor.g, rgbColor.b );
 	}
@@ -610,14 +612,14 @@ void CMapStudioModel::Render3D(CRender3D *pRender)
 			(fabs(ViewPoint[1] - Origin[1]) < m_fRenderDistance) &&
 			(fabs(ViewPoint[2] - Origin[2]) < m_fRenderDistance))
 		{
-			color32 rgbColor = GetRenderColor();
-
 			if (GetSelectionState() != SELECT_NONE)
 			{
 				pRender->SetDrawColor( GetRValue(Options.colors.clrSelection), GetGValue(Options.colors.clrSelection), GetBValue(Options.colors.clrSelection) );
 			}
 			else
 			{
+				color32 rgbColor = GetRenderColor();
+
 				// If the user disabled collisions on this instance of the model, color the wireframe differently
 				if ( m_iSolid != -1 )
 				{

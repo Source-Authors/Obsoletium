@@ -15,10 +15,11 @@
 #define OPTGENERAL_H
 #pragma once
 
+#include "windows/base_property_page.h"
 #include "Resource.h"
 
 
-class COPTGeneral : public CPropertyPage
+class COPTGeneral : public CBasePropertyPage
 {
 	DECLARE_DYNCREATE(COPTGeneral)
 

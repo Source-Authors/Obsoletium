@@ -106,6 +106,7 @@ enum GameInputEventType_t
 	IE_Close = IE_FirstAppEvent,
 	IE_WindowMove,
 	IE_AppActivated,
+	IE_DpiChanged,
 };
 
 //-----------------------------------------------------------------------------
@@ -164,6 +165,7 @@ public:
 // Message handlers.
 public:
 	void	HandleMsg_WindowMove( const InputEvent_t &event );
+	void	HandleMsg_DpiChanged( const InputEvent_t &event );
 	void	HandleMsg_ActivateApp( const InputEvent_t &event );
 	void	HandleMsg_Close( const InputEvent_t &event );
 
@@ -210,6 +212,8 @@ private:
 	bool			m_bCanPostActivateEvents;
 	int				m_iDesktopWidth, m_iDesktopHeight, m_iDesktopRefreshRate;
 
+	int				m_xDpiScalePercent, m_yDpiScalePercent;
+
 #if defined( IS_WINDOWS_PC )
 	// dimhotepus: Disable Win key.
 	source::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
@@ -254,6 +258,7 @@ GameMessageHandler_t g_GameMessageHandlers[] =
 {
 	{ IE_AppActivated,			&CGame::HandleMsg_ActivateApp },
 	{ IE_WindowMove,			&CGame::HandleMsg_WindowMove },
+	{ IE_DpiChanged,			&CGame::HandleMsg_DpiChanged },
 	{ IE_Close,					&CGame::HandleMsg_Close },
 	{ IE_Quit,					&CGame::HandleMsg_Close },
 };
@@ -320,6 +325,14 @@ void CGame::HandleMsg_WindowMove( const InputEvent_t &event )
 	game->SetWindowXY( event.m_nData, event.m_nData2 );
 #ifndef SWDS
 	videomode->UpdateWindowPosition();
+#endif
+}
+
+void CGame::HandleMsg_DpiChanged( const InputEvent_t &event )
+{
+#ifndef SWDS
+	// Recenter window.
+	videomode->AdjustWindow();
 #endif
 }
 
@@ -903,6 +916,19 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+	case WM_DPICHANGED:
+		{
+			m_xDpiScalePercent = static_cast<int>(LOWORD(wParam)) * 100 / USER_DEFAULT_SCREEN_DPI;
+			m_yDpiScalePercent = static_cast<int>(HIWORD(wParam)) * 100 / USER_DEFAULT_SCREEN_DPI;
+
+			// No need to apply suggested window rectangle as we will center window and
+			// do SetWindowPos with correct size here.
+			event.m_nType = IE_DpiChanged;
+			g_pInputSystem->PostUserEvent( event );
+
+			return 0;
+		}
+
 	case WM_SYSCHAR:
 		// keep Alt-Space from happening
 		break;
@@ -1114,6 +1140,10 @@ bool CGame::CreateGameWindow( void )
 	// NOTE: On some cards, CreateWindowExW slams the FPU control word
 	SetupFPUControlWord();
 
+	const unsigned dpi{::GetDpiForWindow(hwnd)};
+	// Windows claims x,y DPIs are same.
+	m_xDpiScalePercent = m_yDpiScalePercent = 150; // dpi * 100 / USER_DEFAULT_SCREEN_DPI;
+
 	SetMainWindow( hwnd );
 
 	AttachToWindow( );
@@ -1236,8 +1266,10 @@ void CGame::AttachToWindow()
 		// Attach the vgui matsurface window proc
 #if defined( WIN32 )
 		g_pMatSystemSurface->AttachToWindow( (void *)m_hWindow, true );
+		g_pMatSystemSurface->SetDpiScalePercent( m_xDpiScalePercent, m_yDpiScalePercent );
 #else
 		g_pMatSystemSurface->AttachToWindow( (void *)m_pSDLWindow, true );
+		g_pMatSystemSurface->SetDpiScalePercent( m_xDpiScalePercent, m_yDpiScalePercent );
 #endif
 		g_pMatSystemSurface->EnableWindowsMessages( true );
 	}
@@ -1260,6 +1292,7 @@ void CGame::DetachFromWindow()
 	{
 		// Detach the vgui matsurface window proc
 		g_pMatSystemSurface->AttachToWindow( NULL );
+		g_pMatSystemSurface->SetDpiScalePercent( 100, 100 );
 	}
 
 	if ( g_pInputSystem )
@@ -1622,6 +1655,8 @@ CGame::CGame()
 	m_iDesktopRefreshRate = 0;
 	m_rcLastRestoredClientRect.left = m_rcLastRestoredClientRect.right =
 	m_rcLastRestoredClientRect.top = m_rcLastRestoredClientRect.bottom = 0;
+
+	m_xDpiScalePercent = m_yDpiScalePercent = 100;
 }
 
 //-----------------------------------------------------------------------------

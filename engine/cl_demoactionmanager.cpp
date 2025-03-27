@@ -71,7 +71,8 @@ private:
 
 	bool				m_bDirty;
 	char				m_szCurrentFile[ MAX_OSPATH ];
-	long				m_lFileTime;
+	// dimhotepus: long -> time_t
+	time_t				m_lFileTime;
 };
 
 static CDemoActionManager g_DemoActionManager;
@@ -125,48 +126,48 @@ void CDemoActionManager::ReloadFromDisk( void )
 
 	ClearAll();
 
-		m_lFileTime = g_pFileSystem->GetFileTime( metafile );
+	m_lFileTime = g_pFileSystem->GetFileTime( metafile );
 
 	KeyValuesAD kv( metafile );
-		Assert( kv );
-		if ( kv )
+	Assert( kv );
+	if ( kv )
+	{
+		if ( kv->LoadFromFile( g_pFullFileSystem, metafile ) )
 		{
-			if ( kv->LoadFromFile( g_pFullFileSystem, metafile ) )
+			// Iterate over all metaclasses...
+			KeyValues* pIter = kv->GetFirstSubKey();
+			while( pIter )
 			{
-				// Iterate over all metaclasses...
-				KeyValues* pIter = kv->GetFirstSubKey();
-				while( pIter )
-				{
-					char factorytouse[ 512 ];
+				char factorytouse[ 512 ];
 				V_strcpy_safe( factorytouse, pIter->GetName() );
-					
-					// New format is to put numbers in here
-					if ( atoi( factorytouse ) > 0 )
-					{
+
+				// New format is to put numbers in here
+				if ( atoi( factorytouse ) > 0 )
+				{
 					V_strcpy_safe( factorytouse, pIter->GetString( "factory", "" ) );
-					}
-
-					CBaseDemoAction *action = CBaseDemoAction::CreateDemoAction( CBaseDemoAction::TypeForName( factorytouse ) );
-					if ( action )
-					{
-						if ( !action->Init( pIter ) )
-						{
-							delete action;
-						}
-						else
-						{
-							m_ActionStack.AddToTail( action );
-						}
-					}
-
-					pIter = pIter->GetNextKey();
 				}
-			}
-			else
-			{
-				SaveToFile();
+
+				CBaseDemoAction *action = CBaseDemoAction::CreateDemoAction( CBaseDemoAction::TypeForName( factorytouse ) );
+				if ( action )
+				{
+					if ( !action->Init( pIter ) )
+					{
+						delete action;
+					}
+					else
+					{
+						m_ActionStack.AddToTail( action );
+					}
+				}
+
+				pIter = pIter->GetNextKey();
 			}
 		}
+		else
+		{
+			SaveToFile();
+		}
+	}
 
 	OnVDMLoaded( m_szCurrentFile );
 
@@ -192,7 +193,7 @@ void CDemoActionManager::StartPlaying( char const *demfilename )
 	V_StripExtension( demfilename, metafile );
 	V_DefaultExtension( metafile, ".vdm" );
 
-	long filetime = g_pFileSystem->GetFileTime( metafile );
+	time_t filetime = g_pFileSystem->GetFileTime( metafile );
 
 	// If didn't change file and the timestamps are the same, don't transition to new .vdm
 	if ( !changedfile && ( m_lFileTime == filetime ) )

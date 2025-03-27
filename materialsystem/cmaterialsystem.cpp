@@ -1033,7 +1033,16 @@ static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_C
 	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;			
 	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;	
 	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;	
-	pMode->m_nBackBufferCount = 1;			
+
+#if defined(IS_WINDOWS_PC)
+	static ConVarRef mat_use_flipex_d3d9ex("mat_use_flipex_d3d9ex");
+	Assert(mat_use_flipex_d3d9ex.IsValid());
+	
+	pMode->m_nBackBufferCount = mat_use_flipex_d3d9ex.GetBool() ? 2 : 1;
+#else
+	pMode->m_nBackBufferCount = 1;
+#endif
+
 	pMode->m_nAASamples = config.m_nAASamples;
 	pMode->m_nAAQuality = config.m_nAAQuality;
 	pMode->m_nDXLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, config.dxSupportLevel );
@@ -1786,6 +1795,10 @@ static const char *pConvarsAllowedInDXSupport[]={
 	"mat_depthbias_decal",
 	"mat_depthbias_normal",
 	"mat_disable_ps_patch",
+	// dimhotepus: Added Windows Aero Extensions support.
+	"mat_disable_d3d9ex",
+	// dimhotepus: Added fast DWM surface copying.
+	"mat_use_flipex_d3d9ex",
 	"mat_forceaniso",
 	"mat_forcehardwaresync",
 	"mat_forcemanagedtextureintohardware",
@@ -1813,6 +1826,8 @@ static const char *pConvarsAllowedInDXSupport[]={
 	"r_overlayfademax",
 	"r_overlayfademin",
 	"r_rootlod",
+	// dimhotepus: Added r_lod. Present in Half-Life 2 Anniversary Update.
+	"r_lod",
 	"r_screenfademaxsize",
 	"r_screenfademinsize",
 	"r_shadowrendertotexture",
@@ -4885,7 +4900,7 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 	V_sprintf_safe( szBaseName, "%s/replacements.vmt", pszPathName );
 	if ( g_pFullFileSystem->FileExists( szBaseName ) )
 	{
-		KeyValues	*pKV = g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );
+		KeyValues *pKV = g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );
 		if ( pKV )
 		{
 			V_sprintf_safe( szBaseName, "%s/", pszPathName );
@@ -4928,7 +4943,7 @@ void CMaterialSystem::InitReplacementsFromFile( const char *pszPathName )
 	
 	for ( int i = 0; i < replacementCount; ++i ) 
 	{
-		V_snprintf( szBaseName, sizeof(szBaseName), "%s/%s/replacements.vmt", pszPathName, replacementFiles[i] );
+		V_sprintf_safe( szBaseName, "%s/%s/replacements.vmt", pszPathName, replacementFiles[i] );
 		if ( g_pFullFileSystem->FileExists(szBaseName) )
 		{
 			KeyValues *pKV = g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );

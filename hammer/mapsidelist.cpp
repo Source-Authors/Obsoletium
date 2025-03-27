@@ -79,12 +79,11 @@ CMapSideList::~CMapSideList(void)
 void CMapSideList::RebuildFaceList()
 {
 	CMapWorld *pWorld = GetWorldObject(this);
-	if (pWorld == NULL)
-	{
-		return;
-	}
+	if (pWorld == NULL)	return;
 
 	CMapEntity *pParent = dynamic_cast <CMapEntity *>(GetParent());
+	if (pParent == NULL) return;
+
 	const char *pszValue = pParent->GetKeyValue(m_szKeyName);
 	if (pszValue != NULL)
 	{
@@ -207,9 +206,8 @@ CMapClass *CMapSideList::CopyFrom(CMapClass *pOther, bool bUpdateDependencies)
 
 	if (bUpdateDependencies)
 	{
-		for (int i = 0; i < m_Faces.Count(); i++)
+		for (CMapFace *pFace : m_Faces)
 		{
-			CMapFace *pFace = m_Faces.Element(i);
 			CMapSolid *pSolid = (CMapSolid *)pFace->GetParent();
 			UpdateDependency(pSolid, NULL);
 		}
@@ -308,6 +306,8 @@ void CMapSideList::OnPaste(CMapClass *pCopyObject, CMapWorld *pSourceWorld, CMap
 	// we can remap them to faces in the clipboard.
 	//
 	CMapEntity *pParent = dynamic_cast <CMapEntity *>(pCopy->GetParent());
+	if (pParent == nullptr) return;
+
 	const char *pszValue = pParent->GetKeyValue(m_szKeyName);
 	if (pszValue != NULL)
 	{

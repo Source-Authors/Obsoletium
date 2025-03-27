@@ -989,6 +989,7 @@
 #define IDC_CHECK2                      1693
 #define ID_DISP_TAG_REMOVE              1694
 #define IDC_CHECKIN_LIST                1695
+#define IDC_BRIGHTNESSTEXT              1696
 #define IDI_OUTPUT_GREY                 31235
 #define IDI_OUTPUTBAD_GREY              31236
 #define IDI_INPUT_GREY                  31237

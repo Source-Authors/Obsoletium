@@ -23,11 +23,8 @@
 // If you change to serialization protocols, this must be bumped...
 #define UTL_CACHE_SYSTEM_VERSION		2
 
-#ifdef PLATFORM_64BITS
+// dimhotepus: long -> time_t
 using FileInfo_t = time_t;
-#else
-using FileInfo_t = long;
-#endif
 
 #define UTL_CACHED_FILE_DATA_UNDEFINED_DISKINFO	(FileInfo_t)-2
 
@@ -41,23 +38,23 @@ public:
 	virtual void Rebuild( char const *filename ) = 0;
 };
 
-typedef unsigned int (*PFNCOMPUTECACHEMETACHECKSUM)( void );
+using PFNCOMPUTECACHEMETACHECKSUM = unsigned int (*)();
 
-typedef enum
+enum UtlCachedFileDataType_t
 {
 	UTL_CACHED_FILE_USE_TIMESTAMP = 0,
 	UTL_CACHED_FILE_USE_FILESIZE,
-} UtlCachedFileDataType_t;
+};
 
 template <class T>
 class CUtlCachedFileData
 {
 public:
 	CUtlCachedFileData
-	( 
-		char const *repositoryFileName, 
+	(
+		std::enable_if_t<std::is_base_of_v<IBaseCacheInfo, T>, char const *> repositoryFileName,
 		int version, 
-		PFNCOMPUTECACHEMETACHECKSUM checksumfunc = NULL, 
+		PFNCOMPUTECACHEMETACHECKSUM checksumfunc = nullptr,
 		UtlCachedFileDataType_t fileCheckType = UTL_CACHED_FILE_USE_TIMESTAMP,
 		bool nevercheckdisk = false,
 		bool readonly = false,
@@ -112,31 +109,28 @@ public:
 		ElementType_t element;
 		element.handle = g_pFullFileSystem->FindOrAddFileName( filename );
 		auto idx = m_Elements.Find( element );
-		return idx != m_Elements.InvalidIndex() ? true : false;
+		return idx != m_Elements.InvalidIndex();
 	}
 
-	void SetElement( char const *name, long fileinfo, T* src )
+	void SetElement( char const *name, FileInfo_t fileinfo, T* src )
 	{
 		SetDirty( true );
 
 		unsigned short idx = GetIndex( name );
-
 		Assert( idx != m_Elements.InvalidIndex() );
 
 		ElementType_t& e = m_Elements[ idx ];
+		Assert( e.dataIndex != m_Data.InvalidIndex() );
 
 		CUtlBuffer buf( 0, 0, 0 );
 
-		Assert( e.dataIndex != m_Data.InvalidIndex() );
-
 		T *dest = m_Data[ e.dataIndex ];
-
 		Assert( dest );
 
 		// I suppose we could do an assignment operator, but this should save/restore the data element just fine for
 		//  tool purposes
-		((IBaseCacheInfo *)src)->Save( buf );
-		((IBaseCacheInfo *)dest)->Restore( buf );
+		src->Save( buf );
+		dest->Restore( buf );
 
 		e.fileinfo = fileinfo;
 		if ( ( e.fileinfo == -1 ) &&
@@ -168,7 +162,7 @@ public:
 
 	const char *GetRepositoryFileName() const { return m_sRepositoryFileName; }
 
-	long	GetFileInfo( char const *filename )
+	FileInfo_t	GetFileInfo( char const *filename )
 	{
 		ElementType_t element;
 		element.handle = g_pFullFileSystem->FindOrAddFileName( filename );
@@ -235,9 +229,11 @@ private:
 		}
 
 		FileNameHandle_t	handle;
+		// dimhotepus: long -> FileInfo_t
 		FileInfo_t			fileinfo;
+		// dimhotepus: long -> FileInfo_t
 		FileInfo_t			diskfileinfo;
-		int					dataIndex;
+		intp				dataIndex;
 	};
 
 	static bool FileNameHandleLessFunc( ElementType_t const &lhs, ElementType_t const &rhs )
@@ -363,9 +359,7 @@ bool CUtlCachedFileData<T>::IsUpToDate()
 	// Always compute meta checksum
 	m_uCurrentMetaChecksum = m_pfnMetaChecksum ? (*m_pfnMetaChecksum)() : 0;
 
-	FileHandle_t fh;
-
-	fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "rb", "MOD" );
+	FileHandle_t fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "rb", "MOD" );
 	if ( fh == FILESYSTEM_INVALID_HANDLE )
 	{
 		return false;

@@ -20,16 +20,17 @@
 #include "MapView3D.h"
 #include "GlobalFunctions.h"
 #include "materialdlg.h"
+#include "windows/base_mdi_child_wnd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #define WM_INITIALUPDATE 0x0364  // (params unused) - sent to children
 
-IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWnd)
+IMPLEMENT_DYNCREATE(CChildFrame, CBaseMDIChildWnd)
 
 
-BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWnd)
+BEGIN_MESSAGE_MAP(CChildFrame, CBaseMDIChildWnd)
 	//{{AFX_MSG_MAP(CChildFrame)
 	ON_WM_SETFOCUS()
 	ON_WM_SIZE()

@@ -59,7 +59,7 @@
 // Debugging / diagnostic stuff.
 //
 static bool g_bDrawWireFrameSelection = true;
-static bool g_bShowStatistics = false;
+static bool g_bShowStatistics = true;
 static bool g_bUseCullTree = true;
 static bool g_bRenderCullBoxes = false;
 
@@ -178,11 +178,13 @@ CRender3D::CRender3D(void) :
 
 	m_fFrameRate = 0;
 	m_nFramesThisSample = 0;
-	m_dwTimeLastSample = 0;
-	m_dwTimeLastFrame = 0;
-	m_fTimeElapsed = 0;
+	m_flTimeLastSample = 0;
+	m_flTimeLastFrame = 0;
+	m_flTimeElapsed = 0;
 
 	m_LastLPreviewCameraPos = Vector(1.0e22,1.0e22,1.0e22);
+	memset(m_fLastLPreviewAngles, 0, sizeof(m_fLastLPreviewAngles));
+	m_fLastLPreviewZoom = -1;
 	m_nLastLPreviewWidth = -1;
 	m_nLastLPreviewHeight = -1;
 
@@ -234,10 +236,24 @@ void CRender3D::BeginRenderHitTarget(CMapAtom *pObject, unsigned int uHandle)
 	}
 
 	CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
-	pRenderContext->PushSelectionName((unsigned int)pObject);
+	// dimhotepus: x64 support.
+	pRenderContext->PushSelectionName(LODWORD((size_t)pObject));
+#ifdef PLATFORM_64BITS
+	pRenderContext->PushSelectionName(HIDWORD((size_t)pObject));
+#else
+	pRenderContext->PushSelectionName(0);
+#endif
 	pRenderContext->PushSelectionName(uHandle);
 }
 
+static constexpr inline size_t MakeSizeT(unsigned low, unsigned hi)
+{
+#ifdef PLATFORM_64BITS
+  return static_cast<size_t>(hi) << 32 | low;
+#else
+  return low;
+#endif
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Called after rendering an object that should be hit tested when
@@ -255,15 +271,20 @@ void CRender3D::EndRenderHitTarget(void)
 		//
 
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
+		// handle.
 		pRenderContext->PopSelectionName();
+		// dimhotepus: x64 support.
+		// hidword(pObject)
+		pRenderContext->PopSelectionName();
+		// lodword(pObject)
 		pRenderContext->PopSelectionName();
 
 		if ((pRenderContext->SelectionMode(true) != 0) && (m_Pick.nNumHits < MAX_PICK_HITS))
 		{
-			if (m_Pick.uSelectionBuffer[0] == 2)
+			if (m_Pick.uSelectionBuffer[0] == 3)
 			{
-				m_Pick.Hits[m_Pick.nNumHits].pObject = (CMapClass *)m_Pick.uSelectionBuffer[3];
-				m_Pick.Hits[m_Pick.nNumHits].uData = m_Pick.uSelectionBuffer[4];
+				m_Pick.Hits[m_Pick.nNumHits].pObject = (CMapClass *)MakeSizeT(m_Pick.uSelectionBuffer[3], m_Pick.uSelectionBuffer[4]);
+				m_Pick.Hits[m_Pick.nNumHits].uData = m_Pick.uSelectionBuffer[5];
 				m_Pick.Hits[m_Pick.nNumHits].nDepth = m_Pick.uSelectionBuffer[1];
 				m_Pick.Hits[m_Pick.nNumHits].m_LocalMatrix = m_LocalMatrix.Head();
 				m_Pick.nNumHits++;
@@ -309,7 +330,7 @@ void CRender3D::AddTranslucentDeferredRendering( CMapPoint *pMapPoint )
 //-----------------------------------------------------------------------------
 float CRender3D::GetElapsedTime(void)
 {
-	return(m_fTimeElapsed);
+	return m_flTimeElapsed;
 }
 
 
@@ -488,47 +509,55 @@ Visibility_t CRender3D::IsBoxVisible(Vector const &BoxMins, Vector const &BoxMax
 	// Build the near and far vertices based on the octant of the plane normal.
 	//
 	int nInPlanes = 0;
-	for ( int i = 0; i < 6; i++ )
+	for ( auto &plane : m_FrustumPlanes )
 	{
-		if (m_FrustumPlanes[i][0] > 0)
+		if (plane.x > 0)
 		{
-			NearVertex[0] = BoxMins[0];
-			FarVertex[0] = BoxMaxs[0];
+			NearVertex.x = BoxMins.x;
+			FarVertex.x = BoxMaxs.x;
 		}
 		else
 		{
-			NearVertex[0] = BoxMaxs[0];
-			FarVertex[0] = BoxMins[0];
+			NearVertex.x = BoxMaxs.x;
+			FarVertex.x = BoxMins.x;
 		}
 
-		if (m_FrustumPlanes[i][1] > 0)
+		if (plane.y > 0)
 		{
-			NearVertex[1] = BoxMins[1];
-			FarVertex[1] = BoxMaxs[1];
+			NearVertex.y = BoxMins.y;
+			FarVertex.y = BoxMaxs.y;
 		}
 		else
 		{
-			NearVertex[1] = BoxMaxs[1];
-			FarVertex[1] = BoxMins[1];
+			NearVertex.y = BoxMaxs.y;
+			FarVertex.y = BoxMins.y;
 		}
 
-		if (m_FrustumPlanes[i][2] > 0)
+		if (plane.z > 0)
 		{
-			NearVertex[2] = BoxMins[2];
-			FarVertex[2] = BoxMaxs[2];
+			NearVertex.z = BoxMins.z;
+			FarVertex.z = BoxMaxs.z;
 		}
 		else
 		{
-			NearVertex[2] = BoxMaxs[2];
-			FarVertex[2] = BoxMins[2];
+			NearVertex.z = BoxMaxs.z;
+			FarVertex.z = BoxMins.z;
 		}
 
-		if (DotProduct(m_FrustumPlanes[i].AsVector3D(), NearVertex) >= m_FrustumPlanes[i][3])
+		const Vector &planeVector = plane.AsVector3D();
+
+		if (planeVector.x * NearVertex.x +
+			planeVector.y * NearVertex.y +
+			planeVector.z * NearVertex.z >= plane.w)
+		//if (DotProduct(planeVector, NearVertex) >= plane.w)
 		{
-			return(VIS_NONE);
+			return VIS_NONE;
 		}
 
-		if (DotProduct(m_FrustumPlanes[i].AsVector3D(), FarVertex) < m_FrustumPlanes[i][3])
+		if (planeVector.x * FarVertex.x +
+			planeVector.y * FarVertex.y +
+			planeVector.z * FarVertex.z < plane.w)
+		// if (DotProduct(planeVector, FarVertex) < plane.w)
 		{
 			nInPlanes++;
 		}
@@ -660,14 +689,13 @@ void CRender3D::StartRenderFrame(void)
 	//
 	// Determine the elapsed time since the last frame was rendered.
 	//
-	DWORD dwTimeNow = timeGetTime();
-	if (m_dwTimeLastFrame == 0)
+	const double flTimeNow = Plat_FloatTime();
+	if (m_flTimeLastFrame == 0)
 	{
-		m_dwTimeLastFrame = dwTimeNow;
+		m_flTimeLastFrame = flTimeNow;
 	}
-	DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastFrame;
-	m_fTimeElapsed = (float)dwTimeElapsed / 1000.0;
-	m_dwTimeLastFrame = dwTimeNow;
+	m_flTimeElapsed = flTimeNow - m_flTimeLastFrame;
+	m_flTimeLastFrame = flTimeNow;
 
 	//
 	// Animate the models based on elapsed time.
@@ -800,7 +828,8 @@ bool CompareLightPreview_Lights(CLightPreview_Light const &a, CLightPreview_Ligh
 	return (a.m_flDistanceToEye > b.m_flDistanceToEye);
 }
 
-#define MAX_PREVIEW_LIGHTS 10								// max # of lights to process.
+// dimhotepus: Increase max preview lights from 10 to 64.
+constexpr inline ptrdiff_t MAX_PREVIEW_LIGHTS = 64;								// max # of lights to process.
 
 
 void CRender3D::SendShadowTriangles( void )
@@ -811,7 +840,6 @@ void CRender3D::SendShadowTriangles( void )
 	if ( sendTimeStamp != LastSendTimeStamp )
 	{
 		LastSendTimeStamp = sendTimeStamp;
-		CUtlVector<Vector> *tri_list=new CUtlVector<Vector>;
 		CMapDoc *pDoc = m_pView->GetMapDoc();
 		CMapWorld *pWorld = pDoc->GetMapWorld();
 		
@@ -820,22 +848,25 @@ void CRender3D::SendShadowTriangles( void )
 
 		delete g_pLPreviewOutputBitmap;
 		g_pLPreviewOutputBitmap = NULL;
+
+		CUtlVector<Vector> tri_list;
+
 		EnumChildrenPos_t pos;
 		CMapClass *pChild = pWorld->GetFirstDescendent( pos );
+		
 		while ( pChild )
 		{
 			if (pChild->IsVisible())
-				pChild->AddShadowingTriangles( *tri_list );
+				pChild->AddShadowingTriangles( tri_list );
 			pChild = pWorld->GetNextDescendent( pos );
 		}
-		if ( tri_list->Count() )
+
+		if ( tri_list.Count() )
 		{
 			MessageToLPreview msg( LPREVIEW_MSG_GEOM_DATA );
-			msg.m_pShadowTriangleList = tri_list;
+			msg.m_shadowTriangleList.Swap(tri_list);
 			g_HammerToLPreviewMsgQueue.QueueMessage( msg );
 		}
-		else
-			delete tri_list;
 	}
 	
 }
@@ -912,7 +943,11 @@ static bool LightForKey (CMapEntity *ent, char *key, Vector& intensity )
 {
 	char const *pLight = ent->GetKeyValue( key );
 
-	return LightForString( pLight, intensity );
+	// dimhotepus: Missed light should not crash hammer.
+	if (pLight)
+		return LightForString( pLight, intensity );
+
+	return false;
 }
 
 static void GetVectorForKey( CMapEntity *e, char const *kname, Vector *out )
@@ -1139,7 +1174,7 @@ void CRender3D::SendLightList( void )
 		g_pLPreviewOutputBitmap = NULL;
 
 		// now, get list of lights
-		CUtlVector<CLightingPreviewLightDescription> *pList=new CUtlVector<CLightingPreviewLightDescription>;
+		auto *pList = new CUtlVector<CLightingPreviewLightDescription>;
 		BuildLightList( pList );
 		MessageToLPreview Msg( LPREVIEW_MSG_LIGHT_DATA );
 		Msg.m_pLightList = pList;								// thread deletes
@@ -1168,14 +1203,8 @@ void CRender3D::EndRenderFrame(void)
 		//
 		if (m_Pick.nNumHits > 1)
 		{
-			if (!m_RenderState.bReverseSelection)
-			{
-				qsort(m_Pick.Hits, m_Pick.nNumHits, sizeof(m_Pick.Hits[0]), _CompareHits);
-			}
-			else
-			{
-				qsort(m_Pick.Hits, m_Pick.nNumHits, sizeof(m_Pick.Hits[0]), _CompareHitsReverse);
-			}
+			qsort(m_Pick.Hits, m_Pick.nNumHits, sizeof(m_Pick.Hits[0]),
+				!m_RenderState.bReverseSelection ? _CompareHits : _CompareHitsReverse);
 		}
 
 		//
@@ -1232,12 +1261,15 @@ void CRender3D::EndRenderFrame(void)
 
 			if (m_pView->m_bUpdateView && (m_eCurrentRenderMode == RENDER_MODE_LIGHT_PREVIEW_RAYTRACED))
 			{
+				static bool did_dump = false;
+				static double Last_SendTime = 0;
 
-				static bool did_dump=false;
-				static float Last_SendTime=0;
-				// now, lets create floatbms with the deferred rendering data, so we can pass it to the lpreview thread
-				float newtime=Plat_FloatTime();
-				if (( n_gbufs_queued < 1 ) && ( newtime-Last_SendTime > 1.0) )
+				// now, lets create floatbms with the deferred rendering data,
+				// so we can pass it to the lpreview thread
+				double newtime = Plat_FloatTime();
+
+				if ( n_gbufs_queued.load( std::memory_order::memory_order_relaxed ) < 1 &&
+					 newtime-Last_SendTime > 1.0 )
 				{
 					SendShadowTriangles();
 					SendLightList();							// send light list to render thread
@@ -1252,41 +1284,63 @@ void CRender3D::EndRenderFrame(void)
 						m_nLastLPreviewHeight = height;
 						m_nLastLPreviewWidth = width;
 
-
 						g_nBitmapGenerationCounter++;
 
 						Last_SendTime = newtime;
 
 						delete g_pLPreviewOutputBitmap;
 						g_pLPreviewOutputBitmap = NULL;
-						static char const *rts_to_transmit[]={"_rt_albedo","_rt_normal","_rt_position",
-															  "_rt_flags" };
+
+						static char const *rts_to_transmit[] = {
+							"_rt_albedo",
+							"_rt_normal",
+							"_rt_position",
+							"_rt_flags"
+						};
+
+						static_assert(ssize(rts_to_transmit) ==
+							NELEMS(MessageToLPreview::m_pDefferedRenderingBMs));
+
 						MessageToLPreview Msg(LPREVIEW_MSG_G_BUFFERS);
-						for(int i=0; i < NELEMS( rts_to_transmit ); i++)
+						for (intp i=0; i < ssize( rts_to_transmit ); i++)
 						{
-							SetRenderTargetNamed(0,rts_to_transmit[i]);
-							FloatBitMap_t *fbm = new FloatBitMap_t( nTargetWidth, nTargetHeight );
-							Msg.m_pDefferedRenderingBMs[i]=fbm;
+							SetRenderTargetNamed(0, rts_to_transmit[i]);
+
+							auto *fbm = new FloatBitMap_t( nTargetWidth, nTargetHeight );
+							Msg.m_pDefferedRenderingBMs[i] = fbm;
+
 							pRenderContext->ReadPixels(0, 0, nTargetWidth, nTargetHeight, (uint8 *) &(fbm->Pixel(0,0,0)),
 												  IMAGE_FORMAT_RGBA32323232F);
-							if ( (i==0) && (! did_dump) )
+
+							if ( !did_dump )
 							{
-								fbm->WriteTGAFile("albedo.tga");
-							}
-							if ( (i==1) && (! did_dump) )
-							{
-								fbm->WriteTGAFile("normal.tga");
+								if ( i == 0 )
+									if ( !fbm->WriteTGAFile("albedo.tga") )
+									{
+										Warning( "Unable to write albedo TGA.\n" );
+										AssertMsg( 0, "Unable to write albedo TGA." );
+									}
+								else if ( i == 1 )
+									if ( !fbm->WriteTGAFile("normal.tga") )
+									{
+										Warning( "Unable to write normal TGA.\n" );
+										AssertMsg( 0, "Unable to write normal TGA." );
+									}
 							}
 						}
+
 						pRenderContext->SetRenderTarget( NULL );
+
 						did_dump = true;
-						n_gbufs_queued++;
+						n_gbufs_queued.fetch_add(1, std::memory_order::memory_order_relaxed);
+
 						pCamera->GetViewPoint( Msg.m_EyePosition );
 						Msg.m_nBitmapGenerationCounter=g_nBitmapGenerationCounter;
+
 						g_HammerToLPreviewMsgQueue.QueueMessage( Msg );
 					}
 				}
-			}			
+			}
 			
 			// only update non-ray traced lpreview if we have no ray traced one or if the scene has changed
 			if (m_pView->m_bUpdateView || (m_eCurrentRenderMode != RENDER_MODE_LIGHT_PREVIEW_RAYTRACED) || 
@@ -1320,17 +1374,15 @@ void CRender3D::EndRenderFrame(void)
 				Vector eye_pnt;
 				pCamera->GetViewPoint(eye_pnt);
 				// now, add lights in priority order
-				for( int i = 0; i < lightList.Count(); i++ )
+				for( auto &l : lightList )
 				{
-					LightDesc_t *pLight = &lightList[i];
 					if (
-						( pLight->m_Type == MATERIAL_LIGHT_SPOT ) ||
-						( pLight->m_Type == MATERIAL_LIGHT_POINT ) )
+						( l.m_Type == MATERIAL_LIGHT_SPOT ) ||
+						( l.m_Type == MATERIAL_LIGHT_POINT ) )
 					{
-						Vector lpnt;
 						CLightPreview_Light tmplight;
-						tmplight.m_Light = *pLight;
-						tmplight.m_flDistanceToEye = pLight->m_Position.DistTo( eye_pnt );
+						tmplight.m_Light = l;
+						tmplight.m_flDistanceToEye = l.m_Position.DistTo( eye_pnt );
 						light_queue.Insert(tmplight);
 					}
 				}
@@ -1354,7 +1406,6 @@ void CRender3D::EndRenderFrame(void)
 															  TEXTURE_GROUP_OTHER,true);
 				IMaterial *add_1_to_0=materials->FindMaterial("editor/addlight1",
 															  TEXTURE_GROUP_OTHER,true);
-				
 				IMaterial *sample_last=materials->FindMaterial("editor/sample_result_0",
 															   TEXTURE_GROUP_OTHER,true);
 				IMaterial *sample_other=materials->FindMaterial("editor/sample_result_1",
@@ -1375,8 +1426,8 @@ void CRender3D::EndRenderFrame(void)
 				pRenderContext->SetRenderTarget(dest_rt_other);
 				pRenderContext->ClearColor3ub(0,0,0);
 				pRenderContext->ClearBuffers( true, true );
-				int nlights=min(MAX_PREVIEW_LIGHTS,light_queue.Count());
-				for(int i=0;i<nlights;i++)
+				intp nlights=min(MAX_PREVIEW_LIGHTS,light_queue.Count());
+				for(intp i=0;i<nlights;i++)
 				{
 					IMaterial *src_mat=add_0_to_1;
 					LightDesc_t light = light_queue.ElementAtHead().m_Light;
@@ -1435,7 +1486,6 @@ void CRender3D::EndRenderFrame(void)
 					nTargetWidth, nTargetHeight,
 					dest_rt->GetActualWidth(),
 					dest_rt->GetActualHeight());
-			
 			}
 		}
 		MaterialSystemInterface()->SwapBuffers();
@@ -1476,21 +1526,20 @@ void CRender3D::EndRenderFrame(void)
 			//
 			// Calculate frame rate.
 			//
-			if (m_dwTimeLastSample != 0)
+			if (m_flTimeLastSample != 0.0)
 			{
-				DWORD dwTimeNow = timeGetTime();
-				DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastSample;
-				if ((dwTimeElapsed > 1000) && (m_nFramesThisSample > 0))
+				const double flTimeNow = Plat_FloatTime();
+				const double flTimeElapsed = flTimeNow - m_flTimeLastSample;
+				if (flTimeElapsed > 1.0 && m_nFramesThisSample > 0)
 				{
-					float fTimeElapsed = (float)dwTimeElapsed / 1000.0;
-					m_fFrameRate = m_nFramesThisSample / fTimeElapsed;
+					m_fFrameRate = m_nFramesThisSample / flTimeElapsed;
 					m_nFramesThisSample = 0;
-					m_dwTimeLastSample = dwTimeNow;
+					m_flTimeLastSample = flTimeNow;
 				}
 			}
 			else
 			{
-				m_dwTimeLastSample = timeGetTime();
+				m_flTimeLastSample = Plat_FloatTime();
 			}
 		
 			m_nFramesThisSample++;
@@ -1502,7 +1551,8 @@ void CRender3D::EndRenderFrame(void)
 			Vector ViewPoint;
 			GetCamera()->GetViewPoint(ViewPoint);
 			int nLen = V_sprintf_safe(szText, "FPS %3.2f @ Pos [%.2f %.2f %.2f]", m_fFrameRate, ViewPoint[0], ViewPoint[1], ViewPoint[2]);
-			TextOut(m_WinData.hDC, 2, 18, szText, nLen);
+			// dimhotepus: Why x2, looks like it should be scaled by DPI? 
+			TextOut(m_WinData.hDC, 2 * 2, 2 * 18, szText, nLen);
 		}
 	}
 }
@@ -1909,9 +1959,9 @@ void CRender3D::RenderBox(const Vector &Mins, const Vector &Maxs,
 			//
 			// If we are rendering using one of the lit modes, calculate lighting.
 			// 
-			unsigned char color[3];
+			unsigned char color[4];
 
-			assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
+			Assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
 					(eRenderModeThisPass != RENDER_MODE_TEXTURED_SHADED) && 
 					(eRenderModeThisPass != RENDER_MODE_LIGHT_PREVIEW2) && 
 					(eRenderModeThisPass != RENDER_MODE_LIGHT_PREVIEW_RAYTRACED) && 
@@ -1928,12 +1978,14 @@ void CRender3D::RenderBox(const Vector &Mins, const Vector &Maxs,
 					color[0] = SELECT_FACE_RED * fShade;
 					color[1] = SELECT_FACE_GREEN * fShade;
 					color[2] = SELECT_FACE_BLUE * fShade;
+					color[3] = UCHAR_MAX;
 				}
 				else
 				{
 					color[0] = chRed * fShade;
 					color[1] = chGreen * fShade;
 					color[2] = chBlue * fShade;
+					color[3] = UCHAR_MAX;
 				}
 			}
 			//
@@ -1946,12 +1998,14 @@ void CRender3D::RenderBox(const Vector &Mins, const Vector &Maxs,
 					color[0] = SELECT_FACE_RED;
 					color[1] = SELECT_FACE_GREEN;
 					color[2] = SELECT_FACE_BLUE;
+					color[3] = UCHAR_MAX;
 				}
 				else
 				{
 					color[0] = chRed;
 					color[1] = chGreen;
 					color[2] = chBlue;
+					color[3] = UCHAR_MAX;
 				}
 			}
 
@@ -2008,8 +2062,11 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	//
 	for( int i = 0; i < nSlices; i++ )
 	{
-		pPts[i].x = fRadius * cos( ( sliceAngle * -i ) );
-		pPts[i].y = fRadius * sin( ( sliceAngle * -i ) );
+		float fSin, fCos;
+		DirectX::XMScalarSinCos(&fSin, &fCos, sliceAngle * -i);
+
+		pPts[i].x = fRadius * fCos;
+		pPts[i].y = fRadius * fSin;
 		pPts[i].z = 0.0f;
 	}
 
@@ -2145,10 +2202,16 @@ void CRender3D::RenderSphere(Vector const &vCenter, float flRadius, int nTheta, 
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
+			float fSinPhi, fCosPhi;
+			DirectX::XMScalarSinCos(&fSinPhi, &fCosPhi, phi);
+
+			float fSinTheta, fCosTheta;
+			DirectX::XMScalarSinCos(&fSinTheta, &fCosTheta, theta);
+
 			Vector vecPos;
-			vecPos.x = flRadius * sin(phi) * cos(theta);
-			vecPos.y = flRadius * sin(phi) * sin(theta); 
-			vecPos.z = flRadius * cos(phi);
+			vecPos.x = flRadius * fSinPhi * fCosTheta;
+			vecPos.y = flRadius * fSinPhi * fSinTheta; 
+			vecPos.z = flRadius * fCosPhi;
 
 			Vector vecNormal = vecPos;
 			VectorNormalize(vecNormal);
@@ -2233,9 +2296,16 @@ void CRender3D::RenderWireframeSphere(Vector const &vCenter, float flRadius, int
 			float v = i / ( float )( nPhi - 1 );
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
-			meshBuilder3D.Position3f( vCenter.x + ( flRadius * sin(phi) * cos(theta) ),
-				                    vCenter.y + ( flRadius * sin(phi) * sin(theta) ), 
-									vCenter.z + ( flRadius * cos(phi) ) );
+
+			float fSinPhi, fCosPhi;
+			DirectX::XMScalarSinCos(&fSinPhi, &fCosPhi, phi);
+			
+			float fSinTheta, fCosTheta;
+			DirectX::XMScalarSinCos(&fSinTheta, &fCosTheta, theta);
+
+			meshBuilder3D.Position3f( vCenter.x + ( flRadius * fSinPhi * fCosTheta ),
+				                    vCenter.y + ( flRadius * fSinPhi * fSinTheta ), 
+									vCenter.z + ( flRadius * fCosPhi ) );
 			meshBuilder3D.Color3ub( chRed, chGreen, chBlue );
 			meshBuilder3D.AdvanceVertex();
 		}
@@ -2881,7 +2951,7 @@ void CRender3D::RenderEnable(RenderState_t eRenderState, bool bEnable)
 
 		case RENDER_POLYGON_OFFSET_LINE:
 		{
-			assert(0);
+			Assert(0);
 			/* FIXME:
 			   Think we'll need to have two versions of the wireframe material
 			   one which ztests with offset + culling, the other which doesn't

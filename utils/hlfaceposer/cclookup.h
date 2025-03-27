@@ -22,6 +22,6 @@ struct CCloseCaptionLookupParams : public CBaseDialogParams
 };
 
 // Display/create dialog
-int CloseCaptionLookup( CCloseCaptionLookupParams *params );
+intp CloseCaptionLookup( CCloseCaptionLookupParams *params );
 
 #endif // CCLOOKUP_H

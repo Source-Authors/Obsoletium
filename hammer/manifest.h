@@ -23,7 +23,7 @@ class CManifestMap
 public:
  	CManifestMap( void );
 
-	bool IsEditable( void );
+	bool IsEditable( void ) const;
 
 	CMapDoc				*m_Map;
 	CString				m_RelativeMapFileName, m_AbsoluteMapFileName;

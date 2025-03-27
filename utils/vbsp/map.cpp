@@ -841,7 +841,8 @@ ChunkFileResult_t LoadDispDistancesKeyCallback(const char *szKey, const char *sz
 
 		while (pszNext != NULL)
 		{
-			pMapDispInfo->dispDists[nIndex] = (float)atof(pszNext);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->dispDists[nIndex] = strtof(pszNext, nullptr);
 			pszNext = strtok(NULL, " ");
 			nIndex++;
 		}
@@ -992,9 +993,10 @@ ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szVa
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->vectorDisps[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->vectorDisps[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->vectorDisps[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->vectorDisps[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->vectorDisps[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->vectorDisps[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1046,9 +1048,10 @@ ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szVa
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->vectorOffsets[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->vectorOffsets[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->vectorOffsets[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->vectorOffsets[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->vectorOffsets[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->vectorOffsets[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1087,9 +1090,10 @@ ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->m_offsetNormals[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->m_offsetNormals[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->m_offsetNormals[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->m_offsetNormals[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->m_offsetNormals[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->m_offsetNormals[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1140,7 +1144,8 @@ ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szVal
 
 		while (pszNext0 != NULL)
 		{
-			pMapDispInfo->alphaValues[nIndex] = (float)atof(pszNext0);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->alphaValues[nIndex] = strtof(pszNext0, nullptr);
 			pszNext0 = strtok(NULL, " ");
 			nIndex++;
 		}
@@ -1409,10 +1414,8 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 
 static ChunkFileResult_t LoadOverlayDataTransitionCallback( CChunkFile *pFile, int nParam )
 {
-	int iOverlay = g_aMapWaterOverlays.AddToTail();
+	intp iOverlay = g_aMapWaterOverlays.AddToTail();
 	mapoverlay_t *pOverlay = &g_aMapWaterOverlays[iOverlay];
-	if ( !pOverlay )
-		return ChunkFile_Fail;
 
 	pOverlay->nId = ( MAX_MAP_OVERLAYS + 1 ) + g_aMapWaterOverlays.Count() - 1;
 	pOverlay->m_nRenderOrder = 0;
@@ -1624,8 +1627,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
 			if( ( g_nDXLevel == 0 ) || ( g_nDXLevel >= 70 ) )
 			{
 				const char *pSideListStr = ValueForKey( mapent, "sides" );
-				int size;
-				size = IntForKey( mapent, "cubemapsize" );
+				int size = IntForKey( mapent, "cubemapsize" );
 				Cubemap_InsertSample( mapent->origin, size );
 				Cubemap_SaveBrushSides( pSideListStr );
 			}
@@ -1989,7 +1991,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	KeyValues *GameInfoKV = ReadKeyValuesFile( GameInfoPath );
 	if ( !GameInfoKV )
 	{
-		Msg( "Could not locate gameinfo.txt for Instance Remapping at %s\n", GameInfoPath );
+		Msg( "Could not locate gameinfo.txt for Instance Remapping at '%s'.\n", GameInfoPath );
 		return;
 	}
 
@@ -2002,7 +2004,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	const char *GameDataFile = GameInfoKV->GetString( "GameData", NULL );
 	if ( !GameDataFile )
 	{
-		Msg( "Could not locate 'GameData' key in %s\n", GameInfoPath );
+		Msg( "Could not locate 'GameData' key in '%s'.\n", GameInfoPath );
 		return;
 	}
 
@@ -2011,7 +2013,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	{
 		if ( !g_pFullFileSystem->RelativePathToFullPath_safe( GameDataFile, NULL, FDGPath ) )
 		{
-			Msg( "Could not locate GameData file %s\n", GameDataFile );
+			Msg( "Could not locate GameData file '%s'.\n", GameDataFile );
 		}
 	}
 
@@ -2044,7 +2046,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 				{
 					Color red( 255, 0, 0, 255 );
 
-					ColorSpewMessage( SPEW_ERROR, &red, "Could not open instance file %s\n", pInstanceFile );
+					ColorSpewMessage( SPEW_ERROR, &red, "Could not open instance file '%s'.\n", pInstanceFile );
 				}
 			}
 
@@ -2290,7 +2292,7 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 	V_strcpy_safe( NewValue, pPair->value );
 	for ( epair_t *epInstance = pInstanceEntity->epairs; epInstance != NULL; epInstance = epInstance->next )
 	{
-		if ( strnicmp( epInstance->key, INSTANCE_VARIABLE_KEY, strlen( INSTANCE_VARIABLE_KEY ) ) == 0 )
+		if ( strnicmp( epInstance->key, INSTANCE_VARIABLE_KEY, ssize( INSTANCE_VARIABLE_KEY ) - 1 ) == 0 )
 		{
 			char InstanceVariable[ MAX_KEYVALUE_LEN ];
 
@@ -2409,7 +2411,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 			GDclass *EntClass = GD.BeginInstanceRemap( pEntity, NameFixup, InstanceOrigin, InstanceAngle );
 			if ( EntClass )
 			{
-				for( int i = 0; i < EntClass->GetVariableCount(); i++ )
+				for( intp i = 0; i < EntClass->GetVariableCount(); i++ )
 				{
 					GDinputvariable *EntVar = EntClass->GetVariableAt( i );
 					const char *pValue = ValueForKey( entity, ( char * )EntVar->GetName() );
@@ -2579,7 +2581,7 @@ bool LoadMapFile( const char *pszFileName )
 		//
 		if (eResult == ChunkFile_Ok)
 		{
-			int index = g_Maps.AddToTail( new CMapFile() );
+			intp index = g_Maps.AddToTail( new CMapFile() );
 			g_LoadingMap = g_Maps[ index ];
 			if ( g_MainMap == NULL )
 			{
@@ -2866,7 +2868,7 @@ ChunkFileResult_t LoadSideKeyCallback(const char *szKey, const char *szValue, Lo
 	}
 	else if (!stricmp(szKey, "lightmapscale"))
 	{
-		pSideInfo->td.lightmapWorldUnitsPerLuxel = atoi(szValue);
+		pSideInfo->td.lightmapWorldUnitsPerLuxel = strtof(szValue, nullptr);
 		if (pSideInfo->td.lightmapWorldUnitsPerLuxel == 0.0f)
 		{
 			g_MapError.ReportWarning("luxel size of 0");
@@ -3238,11 +3240,11 @@ mapdispinfo_t *ParseDispInfoChunk( void )
 
             if( i == 0 )
             {
-                pMapDispInfo->uAxis[j] = atof( token );
+                pMapDispInfo->uAxis[j] = strtof( token, nullptr );
             }
             else
             {
-                pMapDispInfo->vAxis[j] = atof( token );
+                pMapDispInfo->vAxis[j] = strtof( token, nullptr );
             }
         }
 
@@ -3255,7 +3257,7 @@ mapdispinfo_t *ParseDispInfoChunk( void )
    	if( g_nMapFileVersion < 350 )
 	{
 		GetToken( false );
-		pMapDispInfo->maxDispDist = atof( token );
+		pMapDispInfo->maxDispDist = strtof( token, nullptr );
 	}
 
     // minimum tesselation value
@@ -3264,39 +3266,39 @@ mapdispinfo_t *ParseDispInfoChunk( void )
 
     // light smoothing angle
     GetToken( false );
-    pMapDispInfo->smoothingAngle = atof( token );
+    pMapDispInfo->smoothingAngle = strtof( token, nullptr );
 
     //
     // get the displacement info displacement normals
     //
     GetToken( true );
-    pMapDispInfo->vectorDisps[0][0] = atof( token );
+    pMapDispInfo->vectorDisps[0][0] = strtof( token, nullptr );
     GetToken( false );
-    pMapDispInfo->vectorDisps[0][1] = atof( token );
+    pMapDispInfo->vectorDisps[0][1] = strtof( token, nullptr );
     GetToken( false );
-    pMapDispInfo->vectorDisps[0][2] = atof( token );
+    pMapDispInfo->vectorDisps[0][2] = strtof( token, nullptr );
 
     vertCount = ( ( ( 1 << pMapDispInfo->power ) + 1 ) * ( ( 1 << pMapDispInfo->power ) + 1 ) );
     for( i = 1; i < vertCount; i++ )
     {
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][0] = atof( token );
+        pMapDispInfo->vectorDisps[i][0] = strtof( token, nullptr );
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][1] = atof( token );
+        pMapDispInfo->vectorDisps[i][1] = strtof( token, nullptr );
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][2] = atof( token );
+        pMapDispInfo->vectorDisps[i][2] = strtof( token, nullptr );
     }
 
     //
     // get the displacement info displacement values
     //
     GetToken( true );
-    pMapDispInfo->dispDists[0] = atof( token );
+    pMapDispInfo->dispDists[0] = strtof( token, nullptr );
 
     for( i = 1; i < vertCount; i++ )
     {
         GetToken( false );
-        pMapDispInfo->dispDists[i] = atof( token );
+        pMapDispInfo->dispDists[i] = strtof( token, nullptr );
     }
 
     //

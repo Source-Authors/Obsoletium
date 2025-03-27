@@ -73,11 +73,11 @@ public:
 
 	Vector GetColor(void) const
 	{
-		float multiplier=m_fBrightness/256.0;
+		float multiplier=m_fBrightness/256.0f;
 		Vector ret;
-		ret.x=GammaToLinear(m_LightColor.x/255.0)*multiplier;
-		ret.y=GammaToLinear(m_LightColor.y/255.0)*multiplier;
-		ret.z=GammaToLinear(m_LightColor.z/255.0)*multiplier;
+		ret.x=GammaToLinear(m_LightColor.x/255.0f)*multiplier;
+		ret.y=GammaToLinear(m_LightColor.y/255.0f)*multiplier;
+		ret.z=GammaToLinear(m_LightColor.z/255.0f)*multiplier;
 		return ret;
 	}
 

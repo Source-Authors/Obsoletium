@@ -42,7 +42,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 #define ICON_CONN_BAD		0
@@ -260,6 +259,9 @@ COP_Output::COP_Output(void)
 	m_fDelay = 0;
 	m_bPickingEntities = false;
 
+	m_pEditGameClass = nullptr;
+	m_pEntity = nullptr;
+
 	bSkipEditControlRefresh = false;
 	//
 	// All columns initially sort in ascending order.
@@ -471,7 +473,7 @@ void COP_Output::AddEntityConnections(CMapEntity *pEntity, bool bFirst)
 				pOutputConn->m_pConnList->AddToTail(pConnection);
 				pOutputConn->m_pEntityList->AddToTail(pEntity);
 				pOutputConn->m_bOwnedByAll		= true;
-				m_ListCtrl.SetItemData(nItemCount, (DWORD)pOutputConn);
+				m_ListCtrl.SetItemData(nItemCount, (DWORD_PTR)pOutputConn);
 				
 				nItemCount++;
 			}
@@ -950,7 +952,7 @@ void COP_Output::OnMark(void)
 		}
 		else
 		{
-			MessageBox("No entities were found with that targetname.", "No entities found", MB_ICONINFORMATION | MB_OK);
+			MessageBox("No entities were found with that targetname.", "Hammer - No entities found", MB_ICONINFORMATION | MB_OK);
 			return;
 		}
 	}
@@ -1491,7 +1493,7 @@ void COP_Output::SetSelectedConnections(CEntityConnectionList &List)
 //-----------------------------------------------------------------------------
 void COP_Output::UpdateColumnHeaderText(int nColumn, bool bIsSortColumn, SortDirection_t eDirection)
 {
-	char szHeaderText[MAX_PATH];
+	char szHeaderText[MAX_PATH + 2];
 
 	LVCOLUMN Column;
 	memset(&Column, 0, sizeof(Column));
@@ -1500,11 +1502,11 @@ void COP_Output::UpdateColumnHeaderText(int nColumn, bool bIsSortColumn, SortDir
 	Column.cchTextMax = sizeof(szHeaderText);
 	m_ListCtrl.GetColumn(nColumn, &Column);
 
-	int nMarker = 0;
+	ptrdiff_t nMarker = 0;
 
 	if (szHeaderText[0] != '\0')
 	{
-		nMarker = strlen(szHeaderText) - 1;
+		nMarker = V_strlen(szHeaderText) - 3;
 		char chMarker = szHeaderText[nMarker];
 
 		if ((chMarker == '>') || (chMarker == '<'))
@@ -1528,7 +1530,7 @@ void COP_Output::UpdateColumnHeaderText(int nColumn, bool bIsSortColumn, SortDir
 		szHeaderText[nMarker++] = (eDirection == Sort_Ascending) ? '>' : '<';
 	}
 
-	szHeaderText[nMarker] = '\0';
+	szHeaderText[min(max(nMarker, static_cast<intp>(0)), ssize(szHeaderText) - static_cast<intp>(1))] = '\0';
 
 	m_ListCtrl.SetColumn(nColumn, &Column);
 }
@@ -1592,7 +1594,8 @@ void COP_Output::UpdateEditedDelays(void)
 	{
 		char strDelay[MAX_IO_NAME_LEN];
 		pDelayEdit->GetWindowText(strDelay, sizeof(strDelay));
-		float flDelay = atof(strDelay);
+		// dimhotepus: atof -> strtof
+		float flDelay = strtof(strDelay, nullptr);
 
 		// Update the connections
 		int nConnCount = m_EditList.Count();
@@ -1891,7 +1894,7 @@ void COP_Output::SetConnection(CEntityConnectionList *pConnectionList)
 	}
 
 	// Put a <none> in param box if no param
-	if (strlen(m_strParam) == 0)
+	if (m_strParam.IsEmpty())
 	{
 		m_strParam = PARAM_STRING_NONE;
 	}
@@ -1908,8 +1911,8 @@ void COP_Output::AddEntityOutputs(CMapEntity *pEntity)
 	GDclass *pClass = pEntity->GetClass();
 	if (pClass != NULL)
 	{
-		int nCount = pClass->GetOutputCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pClass->GetOutputCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CClassOutput *pOutput = pClass->GetOutput(i);
 			int nIndex = m_ComboOutput.AddString(pOutput->GetName());
@@ -1939,7 +1942,7 @@ void COP_Output::FillInputList(void)
 	m_ComboInput.ResetContent();
 
 	// CUtlVector<GDclass*> classCache;
-	CUtlRBTree<int,int> classCache;
+	CUtlRBTree<GDclass*,int> classCache;
 	SetDefLessFunc( classCache );
 	
 	FOR_EACH_OBJ( *m_pMapEntityList, pos )
@@ -1959,16 +1962,16 @@ void COP_Output::FillInputList(void)
 			continue;
 
 		// check if class was already added
-		if ( classCache.Find( (int)pClass ) != -1 )
+		if ( classCache.Find( pClass ) != -1 )
 			continue;
 
-		classCache.Insert( (int)pClass );
+		classCache.Insert( pClass );
 			
 		//
 		// Add this class' inputs to the list.
 		//
-		int nCount = pClass->GetInputCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pClass->GetInputCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CClassInput *pInput = pClass->GetInput(i);
 			bool bAddInput = true;
@@ -2404,7 +2407,7 @@ void COP_Output::UpdateCombosForSelectedInput(CClassInput *pInput)
 	if (!m_bNoParamEdit)
 	{
 		CComboBox *pParamCombo = (CComboBox *)GetDlgItem(IDC_EDIT_CONN_PARAM);
-		bool bEnable = ((!pInput) || (pInput && (pInput->GetType() != iotVoid)));
+		bool bEnable = (!pInput || pInput->GetType() != iotVoid);
 		if (!bEnable)
 		{
 			// Save the param so we can restore it if they switch right back.

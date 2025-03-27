@@ -171,7 +171,7 @@ void CMapClass::AddDependent(CMapClass *pDependent)
 	//
 	// Don't add the same dependent twice.
 	//
-	int nIndex = m_Dependents.Find(pDependent);
+	intp nIndex = m_Dependents.Find(pDependent);
 	if (nIndex != -1)
 		return;
 
@@ -621,7 +621,7 @@ void CMapClass::AddVisGroup(CVisGroup *pVisGroup)
 //-----------------------------------------------------------------------------
 void CMapClass::RemoveVisGroup(CVisGroup *pVisGroup)
 {
-	int nIndex = m_VisGroups.Find(pVisGroup);
+	intp nIndex = m_VisGroups.Find(pVisGroup);
 	
 	if (nIndex != -1 )
 	{
@@ -732,7 +732,7 @@ void CMapClass::RemoveAllChildren(void)
 //-----------------------------------------------------------------------------
 void CMapClass::RemoveChild(CMapClass *pChild, bool bUpdateBounds)
 {
-	int index = m_Children.Find(pChild);
+	intp index = m_Children.Find(pChild);
 
 	if (index == -1)
 	{
@@ -1521,7 +1521,7 @@ ChunkFileResult_t CMapClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 //-----------------------------------------------------------------------------
 void CMapClass::RemoveDependent(CMapClass *pDependent)
 {
-	int nIndex = m_Dependents.Find(pDependent);
+	intp nIndex = m_Dependents.Find(pDependent);
 	if (nIndex != -1)
 	{
 		m_Dependents.FastRemove(nIndex);

@@ -8,10 +8,12 @@
 // OPTView2D.h : header file
 //
 
+#include "windows/base_property_page.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // COPTView2D dialog
 
-class COPTView2D : public CPropertyPage
+class COPTView2D : public CBasePropertyPage
 {
 	DECLARE_DYNCREATE(COPTView2D)
 

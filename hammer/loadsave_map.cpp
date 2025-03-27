@@ -112,6 +112,18 @@ static void GetLine(std::fstream& file, OUT_Z_CAP(bufferSize) char *buf, intp bu
 //			buf - 
 //-----------------------------------------------------------------------------
 template<intp bufferSize>
+static void GetLine(std::fstream& file, char (&buf)[bufferSize])
+{
+	GetLine( file, buf, bufferSize );
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : file - 
+//			buf - 
+//-----------------------------------------------------------------------------
+template<intp bufferSize>
 static void GetLine(std::fstream& file, OUT_Z_ARRAY char (&buf)[bufferSize])
 {
 	GetLine( file, buf, bufferSize );
@@ -674,8 +686,8 @@ int CMapSolid::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		file << "{" << ENDLINE;
 
 		// serialize the Faces
-		int nFaces = Faces.GetCount();
-		for(int i = 0; i < nFaces; i++)
+		short nFaces = Faces.GetCount();
+		for(short i = 0; i < nFaces; i++)
 		{
 			if(!Faces[i].Points)
 				continue;
@@ -903,15 +915,15 @@ int CEditGameClass::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			//
 			// For each variable from the base class...
 			//
-			int nVariableCount = pGameDataClass->GetVariableCount();
-			for (int i = 0; i < nVariableCount; i++)
+			intp nVariableCount = pGameDataClass->GetVariableCount();
+			for (intp i = 0; i < nVariableCount; i++)
 			{
 				GDinputvariable *pVar = pGameDataClass->GetVariableAt(i);
 				Assert(pVar != NULL);
 
 				if (pVar != NULL)
 				{
-					int iIndex;
+					intp iIndex;
 					MDkeyvalue *pKey;
 					LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 

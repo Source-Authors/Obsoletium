@@ -33,10 +33,10 @@ struct CChoiceParams : public CBaseDialogParams
 	CUtlVector< ChoiceText > m_Choices;
 
 	// i/o active choice and output choice
-	int			m_nSelected; // -1 for none
+	intp		m_nSelected; // -1 for none
 };
 
 // Display/create dialog
-int ChoiceProperties( CChoiceParams *params );
+intp ChoiceProperties( CChoiceParams *params );
 
 #endif // CHOICEPROPERTIES_H

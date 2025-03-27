@@ -153,32 +153,32 @@ public:
 	void							SetBlendTime( float blendtime );
 	int								LookupSequence( const char *szSequence );
 	int								LookupActivity( const char *szActivity );
-	int								SetSequence( int iSequence );
-	int								SetSequence( const char *szSequence );
-	const char*						GetSequenceName( int iSequence );
+	intp							SetSequence( intp iSequence );
+	intp							SetSequence( const char *szSequence );
+	const char*						GetSequenceName( intp iSequence );
 	void							ClearOverlaysSequences( void );
 	void							ClearAnimationLayers( void );
 	int								GetNewAnimationLayer( int iPriority = 0 );
 
-	int								SetOverlaySequence( int iLayer, int iSequence, float flWeight );
+	int								SetOverlaySequence( int iLayer, intp iSequence, float flWeight );
 	float							SetOverlayRate( int iLayer, float flCycle, float flFrameRate );
 	int								GetOverlaySequence( int iLayer );
 	float							GetOverlaySequenceWeight( int iLayer );
 	void							StartBlending( void );
 
 	float							GetTransitionAmount( void );
-	int								GetSequence( void );
-	void							GetSequenceInfo( int iSequence, float *pflFrameRate, float *pflGroundSpeed );
+	intp							GetSequence( void ) const;
+	void							GetSequenceInfo( intp iSequence, float *pflFrameRate, float *pflGroundSpeed );
 	void							GetSequenceInfo( float *pflFrameRate, float *pflGroundSpeed );
-	float							GetFPS( int iSequence );
+	float							GetFPS( intp iSequence );
 	float							GetFPS( );
-	float							GetDuration( int iSequence );
+	float							GetDuration( intp iSequence );
 	float							GetDuration( );
-	int								GetNumFrames( int iSequence );
-	bool							GetSequenceLoops( int iSequence );
+	int								GetNumFrames( intp iSequence );
+	bool							GetSequenceLoops( intp iSequence );
 	void							GetMovement( float prevCycle[5], Vector &vecPos, QAngle &vecAngles );
-	void							GetMovement( int iSequence, float prevCycle, float currCycle, Vector &vecPos, QAngle &vecAngles );
-	void							GetSeqAnims( int iSequence, mstudioanimdesc_t *panim[4], float *pweights );
+	void							GetMovement( intp iSequence, float prevCycle, float currCycle, Vector &vecPos, QAngle &vecAngles );
+	void							GetSeqAnims( intp iSequence, mstudioanimdesc_t *panim[4], float *pweights );
 	void							GetSeqAnims( mstudioanimdesc_t *panim[4], float *pweights );
 	float							GetGroundSpeed( int iSequence );
 	float							GetGroundSpeed( void );
@@ -269,7 +269,7 @@ protected:
 	// Previouse sequence data
 	float							m_blendtime;
 	float							m_sequencetime;
-	int								m_prevsequence;
+	intp							m_prevsequence;
 	float							m_prevcycle;
 
 	float							m_dt;
@@ -284,7 +284,7 @@ protected:
 public:
 	float							m_cycle;			// 0 to 1 animation playback index
 protected:
-	int								m_sequence;			// sequence index
+	intp							m_sequence;			// sequence index
 	float							m_poseparameter[MAXSTUDIOPOSEPARAM];		// intra-sequence blending
 	float							m_weight;
 
@@ -345,7 +345,7 @@ public:
 	int								GetLodUsed( void );
 	float							GetLodMetric( void );
 
-	const char						*GetKeyValueText( int iSequence );
+	const char						*GetKeyValueText( intp iSequence );
 
 private:
 	// Drawing helper methods

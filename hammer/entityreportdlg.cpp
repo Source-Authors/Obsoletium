@@ -60,8 +60,9 @@ CEntityReportDlg::CEntityReportDlg(CMapDoc *pDoc, CWnd* pParent /*=NULL*/)
 	m_szFilterClass = pApp->GetProfileString(pszIniSection, "FilterClass", "");
 	m_szFilterKey = pApp->GetProfileString(pszIniSection, "FilterKey", "");
 	m_szFilterValue = pApp->GetProfileString(pszIniSection, "FilterValue", "");
-
+	
 	m_bFilterTextChanged = FALSE;
+	m_dwFilterTime = -1;
 
 	//{{AFX_DATA_INIT(CEntityReportDlg)
 	//}}AFX_DATA_INIT
@@ -470,8 +471,8 @@ void CEntityReportDlg::UpdateEntityList(void)
 void CEntityReportDlg::GenerateReport()
 {
 	CString str;
-	int nCount = pGD->GetClassCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pGD->GetClassCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDclass *pc = pGD->GetClass(i);
 		if(!pc->IsBaseClass())

@@ -246,7 +246,7 @@ ConVar filesystem_unbuffered_io( "filesystem_unbuffered_io", "1", 0, "" );
 #endif
 
 ConVar filesystem_native( "filesystem_native", "1", 0, "Use native FS or STDIO" );
-ConVar filesystem_max_stdio_read( "filesystem_max_stdio_read", IsX360() ? "64" : "16", 0, "" );
+ConVar filesystem_max_stdio_read( "filesystem_max_stdio_read", "32", 0, "Maximum chunk size to read in MiB" );
 ConVar filesystem_report_buffered_io( "filesystem_report_buffered_io", "0" );
 
 //-----------------------------------------------------------------------------
@@ -1328,7 +1328,7 @@ size_t CWin32ReadOnlyFile::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t de
 				{
 					if ( GetLastError() == ERROR_HANDLE_EOF )
 					{
-						nBytesToRead = 0; // we have hit the end of the file					
+						nBytesToRead = 0; // we have hit the end of the file
 					}
 					else
 					{
@@ -1410,7 +1410,7 @@ char *CWin32ReadOnlyFile::FS_fgets( OUT_Z_CAP(destSize) char *dest, int destSize
 	}
 
 	int64 nStartPos = m_ReadPos;
-	int nBytesRead = FS_fread( dest, destSize, destSize );
+	int nBytesRead = static_cast<int>( FS_fread( dest, destSize, destSize ) );
 	if ( !nBytesRead )
 	{
 		// dimhotepus: Zero-terminate on failure.

@@ -245,13 +245,8 @@ void CMapSweptPlayerHull::Render2D(CRender2D *pRender)
 		pRender->SetDrawColor( GetRValue(Options.colors.clrToolHandle), GetGValue(Options.colors.clrToolHandle), GetBValue(Options.colors.clrToolHandle) );
 	}
 
-	Vector line1[2];
-	Vector line2[2];
-	
-	line1[0].Init();
-	line1[1].Init();
-	line2[0].Init();
-	line2[1].Init();
+	Vector line1[2] { vec3_origin, vec3_origin };
+	Vector line2[2] { vec3_origin, vec3_origin };
 
 	if ( dx > 0 )
 	{
@@ -432,7 +427,9 @@ void CMapSweptPlayerHull::OnParentKeyChanged(const char *szKey, const char *szVa
 	if (!stricmp(szKey, "point0"))
 	{
 		Vector vecOrigin;
-		sscanf(szValue, "%f %f %f", &vecOrigin.x, &vecOrigin.y, &vecOrigin.z );
+		[[maybe_unused]] const int scanned =
+			sscanf(szValue, "%f %f %f", &vecOrigin.x, &vecOrigin.y, &vecOrigin.z );
+		Assert(scanned == 3);
 
 		vecOrigin += playerFixup;
 
@@ -442,7 +439,9 @@ void CMapSweptPlayerHull::OnParentKeyChanged(const char *szKey, const char *szVa
 	else if (!stricmp(szKey, "point1"))
 	{
 		Vector vecOrigin;
-		sscanf(szValue, "%f %f %f", &vecOrigin.x, &vecOrigin.y, &vecOrigin.z );
+		[[maybe_unused]] const int scanned =
+			sscanf(szValue, "%f %f %f", &vecOrigin.x, &vecOrigin.y, &vecOrigin.z );
+		Assert(scanned == 3);
 
 		vecOrigin += playerFixup;
 

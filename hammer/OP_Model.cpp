@@ -17,7 +17,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 IMPLEMENT_DYNCREATE(COP_Model, CObjectPage)
@@ -41,8 +40,12 @@ COP_Model::COP_Model() : CObjectPage(COP_Model::IDD), m_ComboSequence( this )
 	//{{AFX_DATA_INIT(COP_Model)
 	//}}AFX_DATA_INIT
 
+	pObjClass = nullptr;
+
 	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCEditGameClass);
 	m_ComboSequence.SetOnlyProvideSuggestions( true );
+
+	m_bOldAnimatedModels = FALSE;
 }
 
 

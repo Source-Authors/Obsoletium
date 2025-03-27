@@ -57,8 +57,6 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector *normal, float dist, CCheckFa
 LPCTSTR GetDefaultTextureName();
 
 
-#pragma warning(disable:4244)
-
 
 //
 // Static member data initialization.
@@ -181,7 +179,7 @@ void CMapFace::GetTextureName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) 
 	}
 }
 
-static char *InvisToolTextures[]={
+static const char *InvisToolTextures[]={
 	"occluder",
 	"areaportal",
 	"invisible",
@@ -1161,7 +1159,7 @@ void CMapFace::DebugPoints(void)
 				Points[j][1] == Points[i][1] &&
 				Points[j][2] == Points[i][2])
 			{
-				AfxMessageBox("Dup Points in CMapFace::Create(winding_t*)");
+				AfxMessageBox("Dup Points in CMapFace::Create(winding_t*)", MB_ICONERROR);
 				break;
 			}
 		}
@@ -1326,11 +1324,14 @@ void CMapFace::SetTexture(IEditorTexture *pTexture, bool bRescaleTextureCoordina
 	}
 
 	m_pTexture = pTexture;
-
-	// Copy other things from m_pTexture.
-	m_pTexture->GetShortName(texture.texture);
-	texture.q2surface = m_pTexture->GetSurfaceAttributes();
-	texture.q2contents = m_pTexture->GetSurfaceContents();
+	
+	if (m_pTexture != NULL)
+	{
+		// Copy other things from m_pTexture.
+		m_pTexture->GetShortName(texture.texture);
+		texture.q2surface = m_pTexture->GetSurfaceAttributes();
+		texture.q2contents = m_pTexture->GetSurfaceContents();
+	}
 
 	BOOL bTexValid = FALSE;
 	if (m_pTexture != NULL)
@@ -2607,7 +2608,8 @@ ChunkFileResult_t CMapFace::LoadKeyCallback(const char *szKey, const char *szVal
 	}
 	else if (!stricmp(szKey, "rotation"))
 	{
-		pFace->texture.rotate = atof(szValue);
+		// dimhotepus: atof -> strtof.
+		pFace->texture.rotate = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, "plane"))
 	{

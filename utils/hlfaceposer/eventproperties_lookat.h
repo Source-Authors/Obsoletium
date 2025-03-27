@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_LookAt( CEventParams *params );
+intp EventProperties_LookAt( CEventParams *params );
 
 #endif // EVENTPROPERTIES_LOOKAT_H

@@ -308,10 +308,10 @@ static CProgressDlg *pProgDlg;
 class CHammerClipboard : public IHammerClipboard
 {
 public:
-	CHammerClipboard(){}
+	CHammerClipboard() : pSourceWorld{nullptr}, vecOriginalCenter{vec3_invalid} {}
 
 public:
-	virtual void Destroy() { delete this; }
+	void Destroy() override { delete this; }
 
 public:
 	CMapObjectList Objects;
@@ -410,8 +410,6 @@ struct SelectLogicalBoxInfo_t
 CMapDoc::CMapDoc(void)
 {
 	m_nLogicalPositionCount = 0;
-	int nSize = sizeof(CMapFace);
-	nSize = sizeof(CMapSolid);
 
 	m_bHasInitialUpdate = false;
 	m_bLoading = false;
@@ -467,7 +465,7 @@ CMapDoc::CMapDoc(void)
 
 	m_bIsAnimating = false;
 
-	m_strLastExportFileName = "";
+	m_strLastExportFileName.Empty();
 
 	m_bDispSolidDrawMask = true;
 	m_bDispDrawWalkable = false;
@@ -488,7 +486,7 @@ CMapDoc::CMapDoc(void)
 	//setup autosave members
 	m_bNeedsAutosave = false;
 	m_bIsAutosave = false;
-	m_strAutosavedFrom = "";
+	m_strAutosavedFrom.Empty();
 
 	m_bIsCordoning = false;
 	m_vCordonMins = Vector(-1024,-1024,-1024);
@@ -652,11 +650,10 @@ void CMapDoc::AssignToGroups()
 	// Remove all the objects that were added to groups from the world, since they are
 	// now children of CMapGroup objects that are already in the world.
 	//
-	int nPairCount = GroupedObjects.Count();
-	for (int i = 0; i < nPairCount; i++)
+	for ( auto &go : GroupedObjects )
 	{
-		m_pWorld->RemoveChild(GroupedObjects.Element(i).pObject1);
-		GroupedObjects.Element(i).pObject2->AddChild(GroupedObjects.Element(i).pObject1);
+		m_pWorld->RemoveChild(go.pObject1);
+		go.pObject2->AddChild(go.pObject1);
 	}
 }
 
@@ -885,8 +882,6 @@ void CMapDoc::CenterLogicalViewsOnSelection()
 //-----------------------------------------------------------------------------
 void CMapDoc::CountGUIDs(void)
 {
-	CTypedPtrList<CPtrList, MapObjectPair_t *> GroupedObjects;
-
 	// This increments the CMapWorld face ID but it doesn't matter since we're setting it below.
 	int nNextFaceID = m_pWorld->FaceID_GetNext();
 
@@ -1106,7 +1101,7 @@ CMapEntity *CMapDoc::FindEntity(const char *pszClassName, float x, float y, floa
 		FindInfo.Pos[1] = V_rint(y);
 		FindInfo.Pos[2] = V_rint(z);
 
-		m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)FindEntityCallback, (DWORD)&FindInfo, MAPCLASS_TYPE(CMapEntity));
+		m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)FindEntityCallback, (DWORD_PTR)&FindInfo, MAPCLASS_TYPE(CMapEntity));
 
 		if (FindInfo.pEntityFound != NULL)
 		{
@@ -1215,7 +1210,7 @@ void CMapDoc::OnViewGotoCoords()
 			setposString[ssize(setposString) - 1] = '\0';
 			semicolonString[ssize(semicolonString) - 1] = '\0';
 			setangString[ssize(setangString) - 1] = '\0';
-			posVec.z += HALF_LIFE_2_EYE_HEIGHT;			
+			posVec.z += HALF_LIFE_2_EYE_HEIGHT;
 			CenterViewsOn( posVec );
 			Set3DViewsPosAng( posVec, angVec );
 			return;
@@ -1232,7 +1227,7 @@ void CMapDoc::OnViewGotoCoords()
 //-----------------------------------------------------------------------------
 void CMapDoc::OnEditFindEntities(void)
 {
-	CStrDlg dlg(0, "", "Targetname to find:", "Find Entities");
+	CStrDlg dlg(0, "", "Target name to find:", "Find Entities");
 	if (dlg.DoModal() == IDOK)
 	{
 		CMapEntityList Found;
@@ -1288,7 +1283,7 @@ void CMapDoc::OnViewGotoBrush(void)
 		}
 		else
 		{
-			AfxMessageBox("That brush ID does not exist.");
+			AfxMessageBox("That brush ID does not exist.", MB_ICONERROR);
 		}
 	}
 }
@@ -1334,7 +1329,7 @@ void CMapDoc::OnMapShowSelectedBrushNumber()
 
 	if ( m_pSelection->IsEmpty() )
 	{
-		AfxMessageBox( ID_NO_BRUSH_SELECTED, MB_OK );
+		AfxMessageBox( ID_NO_BRUSH_SELECTED, MB_OK | MB_ICONEXCLAMATION );
 		return;
 	}
 
@@ -1343,13 +1338,13 @@ void CMapDoc::OnMapShowSelectedBrushNumber()
 	info.m_pBrush = dynamic_cast< CMapSolid* >( pSelList->Element( 0 ) );
 	if ( !info.m_pBrush )
 	{
-		AfxMessageBox( ID_NO_BRUSH_SELECTED, MB_OK );
+		AfxMessageBox( ID_NO_BRUSH_SELECTED, MB_OK | MB_ICONEXCLAMATION );
 		return;
 	}
 
 	// Enumerate the visible brushes..
 	m_pWorld->EnumChildrenRecurseGroupsOnly(
-		(ENUMMAPCHILDRENPROC)&CMapDoc::GetBrushNumberCallback, (DWORD)&info, MAPCLASS_TYPE(CMapSolid));
+		(ENUMMAPCHILDRENPROC)&CMapDoc::GetBrushNumberCallback, (DWORD_PTR)&info, MAPCLASS_TYPE(CMapSolid));
 
 	CString str;
 	if ( info.m_bFound )
@@ -1360,7 +1355,7 @@ void CMapDoc::OnMapShowSelectedBrushNumber()
 	{
 		str.FormatMessage( ID_BRUSH_NOT_FOUND );
 	}
-	AfxMessageBox( str, MB_OK );
+	AfxMessageBox( str, MB_OK | (info.m_bFound ? MB_ICONINFORMATION : MB_ICONEXCLAMATION) );
 }
 
 
@@ -1482,8 +1477,10 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 
 	// Set the progress dialog title
 	CString caption;
-	caption.LoadString(IDS_LOADINGFILE);
-	pProgDlg->SetWindowText(caption);
+	if (caption.LoadString(IDS_LOADINGFILE))
+	{
+		pProgDlg->SetWindowText(caption);
+	}
 
 	g_nFileFormatVersion = 0;
 
@@ -1560,13 +1557,13 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 	}
 	else
 	{
-		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Error loading file", MB_OK | MB_ICONEXCLAMATION);
+		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Error loading file", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	if ( bLocked )
 		VisGroups_LockUpdates( false );
 
-	if ( pProgDlg && CreateProgressDlg )
+	if ( CreateProgressDlg )
 	{
 		pProgDlg->DestroyWindow();
 		delete pProgDlg;
@@ -1746,7 +1743,7 @@ void CMapDoc::Postload(const char *pszFileName)
 		char szError[ 1024 ];
 
 		V_sprintf_safe( szError, "For your information, %d solid(s) were not loaded due to errors in the file.\nWould you like to Re-Save your map with the invalid solids removed?", CMapSolid::GetBadSolidCount() );
-		if ( GetMainWnd()->MessageBox(szError, "Warning", MB_YESNO | MB_ICONQUESTION) == IDYES )
+		if ( GetMainWnd()->MessageBox(szError, "Hammer - Warning", MB_YESNO | MB_ICONQUESTION) == IDYES )
 		{
 			OnFileSave();
 		}
@@ -1806,8 +1803,8 @@ void CMapDoc::Postload(const char *pszFileName)
 	IWorldEditDispMgr *pDispMgr = GetActiveWorldEditDispManager();
 	if( pDispMgr )
 	{
-		int count = pDispMgr->WorldCount();
-		for( int ndx = 0; ndx < count; ndx++ )
+		intp count = pDispMgr->WorldCount();
+		for( intp ndx = 0; ndx < count; ndx++ )
 		{
 			CMapDisp *pDisp = pDispMgr->GetFromWorld( ndx );
 			if( pDisp )
@@ -1922,7 +1919,7 @@ bool CMapDoc::CreateNewManifest( void )
 
 	if ( IsModified() )
 	{
-		AfxMessageBox( "Manifest was NOT created as map was not able to be saved!", MB_OK );
+		AfxMessageBox( "Manifest was NOT created as map was not able to be saved!", MB_OK | MB_ICONERROR );
 		return false;
 	}
 
@@ -1940,12 +1937,12 @@ bool CMapDoc::CreateNewManifest( void )
 		ToolManager()->SetTool(	TOOL_POINTER );
 		GetMainWnd()->GlobalNotify( WM_MAPDOC_CHANGED );
 		pManifest->UpdateAllViews( MAPVIEW_UPDATE_SELECTION | MAPVIEW_UPDATE_TOOL | MAPVIEW_RENDER_NOW );
-		AfxMessageBox( "Manifest was successfully created and has automatically been saved.", MB_OK );
+		AfxMessageBox( "Manifest was successfully created and has automatically been saved.", MB_OK | MB_ICONINFORMATION );
 	}
 	else
 	{
 		pManifest->OnCloseDocument();
-		AfxMessageBox( "Manifest was NOT created!", MB_OK );
+		AfxMessageBox( "Manifest was NOT created!", MB_OK | MB_ICONERROR );
 		return false;
 	}
 
@@ -2023,7 +2020,7 @@ void CMapDoc::CollapseInstances( bool bOnlySelected )
 {
 	int		InstanceCount = 0;
 
-	if ( AfxMessageBox( "Collapsing does not perform all of the operations that the BSP process does for instancing.  There may be some issues or differences between results.  Are you sure you want to do this?", MB_YESNO | MB_ICONQUESTION ) == IDNO )
+	if ( AfxMessageBox( "Collapsing does not perform all of the operations that the BSP process does for instancing.\nThere may be some issues or differences between results.\n\nAre you sure you want to do this?", MB_YESNO | MB_ICONQUESTION ) == IDNO )
 	{
 		return;
 	}
@@ -2094,9 +2091,7 @@ void CMapDoc::CollapseInstances( bool bOnlySelected )
 //-----------------------------------------------------------------------------
 int FindInstanceParm( char *Text, ptrdiff_t StartPos, CString &Result )
 {
-	char	*found;
-
-	found = strchr( Text + StartPos, '$' );
+	char	*found = strchr( Text + StartPos, '$' );
 	if ( found == NULL )
 	{
 		return -1;
@@ -2132,7 +2127,7 @@ void CMapDoc::PopulateInstanceParms_r( CMapEntity *pEntity, const CMapObjectList
 
 		if ( pInstanceEntity && pInstanceEntity != pEntity )
 		{
-			for ( int i = pInstanceEntity->GetFirstKeyValue(); i != pInstanceEntity->GetInvalidKeyValue(); i = pInstanceEntity->GetNextKeyValue( i ) )
+			for ( auto i = pInstanceEntity->GetFirstKeyValue(); i != pInstanceEntity->GetInvalidKeyValue(); i = pInstanceEntity->GetNextKeyValue( i ) )
 			{
 				LPCTSTR	pValue = pInstanceEntity->GetKeyValue( i );
 
@@ -2189,10 +2184,12 @@ void CMapDoc::PopulateInstanceParms( CMapEntity *pEntity )
 	for( int i = 0; i < ParmList.Count(); i++ )
 	{
 		bool	bFound = false;
-		for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+		const size_t	szParamLen = strlen( ParmList[ i ] );
+
+		for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 		{
 			LPCTSTR	pValue = pEntity->GetKeyValue( j );
-			if ( strnicmp( pValue, ParmList[ i ], strlen( ParmList[ i ] ) ) == 0 )
+			if ( strnicmp( pValue, ParmList[ i ], szParamLen ) == 0 )
 			{
 				bFound = true;
 				break;
@@ -2248,12 +2245,12 @@ void CMapDoc::PopulateInstance( CMapEntity *pEntity )
 
 	CMapEntity *pInstanceParmsEntity = entityList.Element( 0 );
 
-	for ( int i = pInstanceParmsEntity->GetFirstKeyValue(); i != pInstanceParmsEntity->GetInvalidKeyValue(); i = pInstanceParmsEntity->GetNextKeyValue( i ) )
+	for ( auto i = pInstanceParmsEntity->GetFirstKeyValue(); i != pInstanceParmsEntity->GetInvalidKeyValue(); i = pInstanceParmsEntity->GetNextKeyValue( i ) )
 	{
 		LPCTSTR	pKey = pInstanceParmsEntity->GetKey( i );
 		LPCTSTR	pValue = pInstanceParmsEntity->GetKeyValue( i );
 
-		if ( strnicmp( pKey, "parm", strlen( "parm" ) ) == 0 )
+		if ( strnicmp( pKey, "parm", ssize( "parm" ) - 1 ) == 0 )
 		{
 			const char *pos = strchr( pValue, ' ' );
 			if ( pos == NULL )
@@ -2261,14 +2258,14 @@ void CMapDoc::PopulateInstance( CMapEntity *pEntity )
 				continue;
 			}
 
-			int		len = pos - pValue;
+			ptrdiff_t	len = pos - pValue;
 			bool	bFound = false;
 
-			for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+			for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 			{
 				LPCTSTR	pInstanceKey = pEntity->GetKey( j );
 				LPCTSTR	pInstanceValue = pEntity->GetKeyValue( j );
-				if ( strnicmp( pInstanceKey, "replace", strlen( "replace" ) ) == 0 &&
+				if ( strnicmp( pInstanceKey, "replace", ssize( "replace" ) - 1 ) == 0 &&
 					 strnicmp( pInstanceValue, pValue, len ) == 0 )
 				{
 					bFound = true;
@@ -2380,7 +2377,7 @@ BOOL CMapDoc::SelectDocType(void)
 	//
 	if (!g_Textures.HasTexturesForConfig(pGame))
 	{
-		AfxMessageBox(IDS_NO_TEXTURES_AVAILABLE);
+		AfxMessageBox(IDS_NO_TEXTURES_AVAILABLE, MB_ICONEXCLAMATION);
 
 		COptionProperties dlg("Configure Hammer", NULL, 0);
 		dlg.DoModal();
@@ -2457,7 +2454,7 @@ BOOL CMapDoc::Serialize(std::fstream& file, BOOL fIsStoring, BOOL bRMF)
 
 			AfxMessageBox("The library this prefab object belongs to has been\n"
 				"deleted. This document will now behave as a regular file\n"
-				"document.");
+				"document.", MB_ICONEXCLAMATION);
 			m_bEditingPrefab = FALSE;
 			
 			CString str;
@@ -2849,7 +2846,7 @@ void CMapDoc::VisGroups_SetParent(CVisGroup *pVisGroup, CVisGroup *pNewParent)
 		}
 		else
 		{
-			int nIndex = m_RootVisGroups->Find(pVisGroup);
+			intp nIndex = m_RootVisGroups->Find(pVisGroup);
 			if (nIndex != -1)
 			{
 				 m_RootVisGroups->Remove(nIndex);
@@ -3073,7 +3070,7 @@ BOOL CMapDoc::SaveModified(void)
 	// editing prefab and modified - update data?
 	if(m_bEditingPrefab)
 	{
-		switch(AfxMessageBox("Do you want to save the changes to this prefab object?", MB_YESNOCANCEL))
+		switch(AfxMessageBox("Do you want to save the changes to this prefab object?", MB_YESNOCANCEL | MB_ICONQUESTION))
 		{
 		case IDYES:
 			{
@@ -3225,7 +3222,7 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	//
 	char szFile[MAX_PATH];
 	V_strcpy_safe(szFile, lpszPathName);
-	szFile[strlen(szFile) - 1] = 'x';
+	szFile[max(V_strlen(szFile) - 1, static_cast<intp>(0))] = 'x';
 
 	if (access(lpszPathName, 0) != -1)
 	{
@@ -3492,15 +3489,17 @@ void CMapDoc::SetAnimationTime( float time )
 //-----------------------------------------------------------------------------
 void CMapDoc::UpdateCurrentTime( void )
 {
-	m_flCurrentTime = (float)timeGetTime() / 1000;
+	m_flCurrentTime = Plat_FloatTime();
 }
 
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-static BOOL SelectInBox(CMapClass *pObject, SelectBoxInfo_t *pInfo)
+static BOOL SelectInBox(CMapClass *pObject, DWORD_PTR ctx)
 {
+	auto *pInfo = reinterpret_cast<SelectBoxInfo_t *>(ctx);
+
 	//
 	// Skip hidden objects.
 	//
@@ -3577,8 +3576,10 @@ static BOOL SelectInBox(CMapClass *pObject, SelectBoxInfo_t *pInfo)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-static BOOL SelectInLogicalBox( CMapClass *pObject, SelectLogicalBoxInfo_t *pInfo)
+static BOOL SelectInLogicalBox( CMapClass *pObject, DWORD_PTR ctx )
 {
+	auto *pInfo = reinterpret_cast<SelectLogicalBoxInfo_t *>(ctx);
+
 	// Skip hidden objects.
 	if ( !pObject->IsVisible() || !pObject->IsLogical() || !pObject->IsVisibleLogical() )
 		return TRUE;
@@ -3647,7 +3648,7 @@ void CMapDoc::SelectRegion( BoundBox *pBox, bool bInsideOnly, bool ResetSelectio
 		SelectObject(NULL, scSaveChanges);
 	}
 
-	m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)SelectInBox, (DWORD)&info);
+	m_pWorld->EnumChildren(SelectInBox, (DWORD_PTR)&info);
 }
 
 
@@ -3665,7 +3666,7 @@ void CMapDoc::SelectLogicalRegion( const Vector2D &vecMins, const Vector2D &vecM
 
 	SelectObject(NULL, scSaveChanges);
 
-	m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)SelectInLogicalBox, (DWORD)&info);
+	m_pWorld->EnumChildren(SelectInLogicalBox, (DWORD_PTR)&info);
 }
 
 bool CMapDoc::SelectObject(CMapClass *pObj, int cmd)
@@ -4073,8 +4074,11 @@ void CMapDoc::OnEditClearselection(void)
 //			pszTexture - 
 // Output : Returns TRUE to continue iterating.
 //-----------------------------------------------------------------------------
-static BOOL ApplyTextureToSolid(CMapSolid *pSolid, LPCTSTR pszTexture)
+static BOOL ApplyTextureToSolid(CMapClass *mp, DWORD_PTR ctx)
 {
+	CMapSolid *pSolid = reinterpret_cast<CMapSolid *>(mp);
+	LPCTSTR pszTexture = reinterpret_cast<LPCTSTR>(ctx);
+
 	pSolid->SetTexture(pszTexture);
 	return TRUE;
 }
@@ -4118,7 +4122,7 @@ void CMapDoc::OnEditApplytexture(void)
 			((CMapSolid*)pobj)->SetTexture(GetDefaultTextureName());
 		}
 
-		pobj->EnumChildren((ENUMMAPCHILDRENPROC)ApplyTextureToSolid, (DWORD)GetDefaultTextureName(), MAPCLASS_TYPE(CMapSolid));
+		pobj->EnumChildren(ApplyTextureToSolid, (DWORD_PTR)GetDefaultTextureName(), MAPCLASS_TYPE(CMapSolid));
 	}
 
 	SetModifiedFlag();
@@ -4131,8 +4135,9 @@ void CMapDoc::OnEditApplytexture(void)
 //			pList - List to add the object to.
 // Output : Returns TRUE to continue iterating.
 //-----------------------------------------------------------------------------
-static BOOL CopyObjectsToList(CMapClass *pObject, CMapObjectList *pList)
+static BOOL CopyObjectsToList(CMapClass *pObject, DWORD_PTR ctx)
 {
+	auto *pList = reinterpret_cast<CMapObjectList *>(ctx);
 	pList->AddToTail(pObject);
 	return(TRUE);
 }
@@ -4172,14 +4177,14 @@ void CMapDoc::OnEditToEntity(void)
 		//
 		else if (pObject->IsGroup())
 		{
-			pObject->EnumChildren(ENUMMAPCHILDRENPROC(CopyObjectsToList), DWORD(&newobjects), MAPCLASS_TYPE(CMapSolid));
+			pObject->EnumChildren(CopyObjectsToList, DWORD_PTR(&newobjects), MAPCLASS_TYPE(CMapSolid));
 		}
 		//
 		// If the object is an entity, add any solid children of the entity to our list.
 		//
 		else if (pObject->IsMapClass(MAPCLASS_TYPE(CMapEntity)))
 		{
-			pObject->EnumChildren(ENUMMAPCHILDRENPROC(CopyObjectsToList), DWORD(&newobjects), MAPCLASS_TYPE(CMapSolid));
+			pObject->EnumChildren(CopyObjectsToList, DWORD_PTR(&newobjects), MAPCLASS_TYPE(CMapSolid));
 
 			//
 			// See if there is more than one solid entity selected. If so, we'll need to prompt the user
@@ -4207,7 +4212,7 @@ void CMapDoc::OnEditToEntity(void)
 	//
 	if ( newobjects.Count() == 0)
 	{
-		AfxMessageBox("There are no eligible selected objects.");
+		AfxMessageBox("There are no eligible selected objects.", MB_ICONEXCLAMATION);
 		return;
 	}
 
@@ -4223,7 +4228,7 @@ void CMapDoc::OnEditToEntity(void)
 			"If you select 'No', a new entity will be created.",
 			pNewEntity->GetClassName());
 	
-		if (AfxMessageBox(str, MB_YESNO) == IDNO)
+		if (AfxMessageBox(str, MB_YESNO | MB_ICONQUESTION) == IDNO)
 		{
 			pNewEntity = NULL;	// it'll be made down there
 		}
@@ -4516,7 +4521,7 @@ void CMapDoc::OnToolsSubtractselection(void)
 				//
 				if (Outside.Count() > 1)
 				{
-					pResult = (CMapClass *)(new CMapGroup);
+					pResult = new CMapGroup;
 					FOR_EACH_OBJ( Outside, pos2 )
 					{
 						CMapClass *pTemp = Outside.Element(pos2);
@@ -4599,7 +4604,7 @@ void CMapDoc::GetBestPastePoint(Vector &vecPasteOrigin)
 	CMapView *pView =  GetActiveMapView();
 	CView *pMFCView = dynamic_cast<CView*>(pView);
 
-	if ( pView )
+	if ( pMFCView )
 	{
 		// zoom in on cursor position
 		POINT ptClient;
@@ -4664,7 +4669,7 @@ void CMapDoc::GetBestPastePoint(Vector &vecPasteOrigin)
 							HitPos = vFinalStart + dist * delta;
 							HitNormal = GetNormalFromFace( face );
 							bOk = true;
-						}		
+						}
 					}
 
 					if ( bOk )
@@ -5187,7 +5192,7 @@ void CMapDoc::OnToolsGroup(void)
 {
 	if ( m_pSelection->IsEmpty() )
 	{
-		AfxMessageBox("No objects are selected.");
+		AfxMessageBox("No objects are selected.", MB_ICONEXCLAMATION);
 		return;
 	}
 
@@ -5204,7 +5209,7 @@ void CMapDoc::OnToolsGroup(void)
 		CMapClass *pobj = pSelList->Element(i);
 		if ((pobj->GetParent() != NULL) && (!IsWorldObject(pobj->GetParent())))
 		{
-			if (GetMainWnd()->MessageBox("Some selected objects are part of an entity or belong to a group. Grouping them now will remove them from the entity or group! Continue?", "Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
+			if (GetMainWnd()->MessageBox("Some selected objects are part of an entity or belong to a group.\nGrouping them now will remove them from the entity or group!\n\nContinue?", "Hammer - Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
 			{
 				return;
 			}
@@ -5419,22 +5424,27 @@ void CMapDoc::OnFileSaveAs(void)
 		}
 
 		char *pszFilter;
+		char *pszTitle;
 		if ( m_pManifest )
 		{
 			pszFilter = "Valve Manifest Map Files (*.vmm)|*.vmm||";
+			pszTitle = "Open Valve Manifest Map File";
 		}
 		else if (m_pGame->mapformat == mfHalfLife2)
 		{
 			pszFilter = "Valve Map Files (*.vmf)|*.vmf||";
+			pszTitle = "Open Valve Map File";
 		}
 		else
 		{
 			pszFilter = "Worldcraft Maps (*.rmf)|*.rmf|Game Maps (*.map)|*.map||";
+			pszTitle = "Open Worldcraft Map | Game Map File";
 		}
 
 		CFileDialog dlg(FALSE, NULL, str, OFN_LONGNAMES | OFN_NOCHANGEDIR |	OFN_HIDEREADONLY, pszFilter);
 		dlg.m_ofn.lpstrInitialDir = szBaseDir;
-		int rvl = dlg.DoModal();
+		dlg.m_ofn.lpstrTitle = pszTitle;
+		INT_PTR rvl = dlg.DoModal();
 
 		if (rvl == IDCANCEL)
 		{
@@ -5639,12 +5649,14 @@ void CMapDoc::OnFileExport(void)
 
 	char *pszFilter;
 	char *pszExtension;
+	char *pszTitle;
 	if (m_pGame->mapformat == mfHalfLife2)
 	{
 		strFile.SetAt(iIndex, '\0');
 		
 		pszFilter = "Valve Map Files (*.vmf)|*.vmf||";
 		pszExtension = "vmf";
+		pszTitle = "Export Valve Map File As";
 	}
 	else
 	{
@@ -5656,6 +5668,7 @@ void CMapDoc::OnFileExport(void)
 
 		pszFilter = "Game Maps (*.map)|*.map||";
 		pszExtension = "map";
+		pszTitle = "Export Game Map File As";
 	}
 
 	//
@@ -5663,7 +5676,7 @@ void CMapDoc::OnFileExport(void)
 	//
 	CExportDlg dlg(strFile, pszExtension, pszFilter);
 
-	dlg.m_ofn.lpstrTitle = "Export As";
+	dlg.m_ofn.lpstrTitle = pszTitle;
 	dlg.bVisibles = bLastVis;
 
 	if (dlg.DoModal() == IDOK)
@@ -5672,7 +5685,7 @@ void CMapDoc::OnFileExport(void)
 
 		if (strFile.CompareNoCase(dlg.GetPathName()) == 0)
 		{
-			if (GetMainWnd()->MessageBox("You are about to export over your current work file. Some data loss will occur if you have any objects hidden. Continue?", "Export Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
+			if (GetMainWnd()->MessageBox("You are about to export over your current work file.\nSome data loss will occur if you have any objects hidden.\n\nContinue?", "Hammer - Export Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
 			{
 				return;
 			}
@@ -5779,7 +5792,7 @@ void CMapDoc::OnFileRunmap(void)
 	//
 	if ((g_pGameConfig->GetTextureFormat() == tfWAD) && !Options.textures.nTextureFiles)
 	{
-		AfxMessageBox("There are no texture files defined yet. Add some texture files before you run the map.");
+		AfxMessageBox("There are no texture files defined yet. Add some texture files before you run the map.", MB_ICONEXCLAMATION);
 		GetMainWnd()->Configure();
 		return;
 	}
@@ -6071,11 +6084,11 @@ void CMapDoc::UpdateTitle(CView *pView)
 				break;
 			}
 
-			//case VIEW3D_ENGINE:
-			//{
-			//	pViewType = "Engine";
-			//	break;
-			//}
+			/*case VIEW3D_ENGINE:
+			{
+				pViewType = "Engine";
+				break;
+			}*/
 		}
 	}
 
@@ -6211,7 +6224,7 @@ void CMapDoc::UpdateForApplicator(BOOL bApplicator)
 				Solids.AddToTail(pSolid);
 			}
 
-			pObject->EnumChildren((ENUMMAPCHILDRENPROC)AddLeavesToListCallback, (DWORD)&Solids, MAPCLASS_TYPE(CMapSolid));
+			pObject->EnumChildren((ENUMMAPCHILDRENPROC)AddLeavesToListCallback, (DWORD_PTR)&Solids, MAPCLASS_TYPE(CMapSolid));
 		}
 
 		//
@@ -6277,7 +6290,7 @@ void CMapDoc::SelectFace(CMapSolid *pSolid, int iFace, int cmd)
 			if ( bDispSolidMask )
 			{
 				CMapFace *pFace = pSolid->GetFace( i );
-				if( pFace && pFace->HasDisp() )
+				if( pFace->HasDisp() )
 				{
 					SelectFace(pSolid, i, cmd);
 					if ( bFirst )
@@ -6586,7 +6599,7 @@ void CMapDoc::OnToolsHollow(void)
 	//
 	if ( m_pSelection->GetCount() > 1)
 	{
-		if (AfxMessageBox("Do you want to turn each of the selected solids into a hollow room?", MB_YESNO) == IDNO)
+		if (AfxMessageBox("Do you want to turn each of the selected solids into a hollow room?", MB_YESNO | MB_ICONQUESTION) == IDNO)
 		{
 			return;
 		}
@@ -6608,7 +6621,7 @@ void CMapDoc::OnToolsHollow(void)
 
 	if (abs(iWallWidth) < 2)
 	{
-		AfxMessageBox("The width of the walls must be less than -1 or greater than 1.");
+		AfxMessageBox("The width of the walls must be less than -1 or greater than 1.", MB_ICONERROR);
 		return;
 	}
 
@@ -6717,7 +6730,7 @@ void CMapDoc::OnToolsHollow(void)
 				//
 				if (Outside.Count() > 1)
 				{
-					pResult = (CMapClass *)(new CMapGroup);
+					pResult = new CMapGroup;
 					
 					FOR_EACH_OBJ( Outside, pos2 )
 					{
@@ -6871,7 +6884,7 @@ BOOL CMapDoc::OnUndoRedo(UINT nID)
 	//
 	if (m_pToolManager->GetActiveToolID() == TOOL_MORPH)
 	{
-		AfxMessageBox("You must exit morph mode to undo changes you've made.");
+		AfxMessageBox("You must exit morph mode to undo changes you've made.", MB_ICONEXCLAMATION);
 		return(TRUE);
 	}
 
@@ -6950,66 +6963,66 @@ bool CMapDoc::ExpandTargetNameKeywords(OUT_Z_BYTECAP(newTargetNameSize) char *sz
 
 	int nHighestIndex = 0;
 
-		const CMapEntityList *pEntityList = pWorld->EntityList_GetList();
+	const CMapEntityList *pEntityList = pWorld->EntityList_GetList();
 		
-		FOR_EACH_OBJ( *pEntityList, pos )
-		{
-			CMapEntity *pEntity = pEntityList->Element( pos );
-			const char *pszTargetName = pEntity->GetKeyValue("targetname");
+	FOR_EACH_OBJ( *pEntityList, pos )
+	{
+		CMapEntity *pEntity = pEntityList->Element( pos );
+		const char *pszTargetName = pEntity->GetKeyValue("targetname");
 
-			//
-			// If this entity has a targetname, check to see if it is of the
-			// form <prefix><number><suffix>. If so, it must be counted as
-			// we search for the highest instance number. 
-			//
+		//
+		// If this entity has a targetname, check to see if it is of the
+		// form <prefix><number><suffix>. If so, it must be counted as
+		// we search for the highest instance number. 
+		//
 		if (pszTargetName == nullptr) continue;
 
-				char szTemp[MAX_PATH];
+		char szTemp[MAX_PATH];
 		V_strcpy_safe(szTemp, pszTargetName);
 
 		size_t nFullLen = strlen(szTemp);
 
-				//
-				// It must be longer than the prefix and the suffix combined to be
-				// of the form <prefix><number><suffix>.
-				//
+		//
+		// It must be longer than the prefix and the suffix combined to be
+		// of the form <prefix><number><suffix>.
+		//
 		if (nFullLen <= nPrefixLen + nSuffixLen) continue;
 
-					char *pszTempSuffix = szTemp + nFullLen - nSuffixLen;
+		char *pszTempSuffix = szTemp + nFullLen - nSuffixLen;
 
-					//
-					// If the prefix and the suffix match ours, extract the instance number
-					// from between them and check it against our highest instance number.
-					//
-					if ((strnicmp(szTemp, szPrefix, nPrefixLen) == 0) && (stricmp(pszTempSuffix, szSuffix) == 0))
-					{
-						*pszTempSuffix = '\0';
+		//
+		// If the prefix and the suffix match ours, extract the instance number
+		// from between them and check it against our highest instance number.
+		//
+		if ((strnicmp(szTemp, szPrefix, nPrefixLen) == 0) && (stricmp(pszTempSuffix, szSuffix) == 0))
+		{
+			*pszTempSuffix = '\0';
 
-						bool bAllDigits = true;
+			bool bAllDigits = true;
 			for (size_t i = 0; i < strlen(&szTemp[nPrefixLen]); i++)
-						{
-							if (!V_isdigit(szTemp[nPrefixLen + i]))
-							{
-								bAllDigits = false;
-								break;
-							}
-						}
-
-						if (bAllDigits)
-						{
-							int nIndex = atoi(&szTemp[nPrefixLen]);
-							if (nIndex > nHighestIndex)
-							{
-								nHighestIndex = nIndex;
-							}
-						}
-					}
+			{
+				if (!V_isdigit(szTemp[nPrefixLen + i]))
+				{
+					bAllDigits = false;
+					break;
 				}
+			}
+
+			if (bAllDigits)
+			{
+				int nIndex = atoi(&szTemp[nPrefixLen]);
+				if (nIndex > nHighestIndex)
+				{
+					nHighestIndex = nIndex;
+				}
+			}
+		}
+	}
 
 	V_snprintf(szNewTargetName, newTargetNameSize, "%s%d%s", szPrefix, nHighestIndex + 1, szSuffix);
 	
-		return(true);
-	}
+	return(true);
+}
 
 
 //-----------------------------------------------------------------------------
@@ -7034,7 +7047,7 @@ bool CMapDoc::DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld,
 		if (pszOldTargetName != NULL)
 		{
 			char szNewTargetName[MAX_PATH];
-			if (ExpandTargetNameKeywords(szNewTargetName, pszOldTargetName, pWorld))
+			if (ExpandTargetNameKeywords(szNewTargetName, ssize(szNewTargetName), pszOldTargetName, pWorld))
 			{
 				V_strncpy(szOldKeyword, pszOldTargetName, oldKeywordSize);
 				V_strncpy(szNewKeyword, szNewTargetName, newKeywordSize);
@@ -7072,9 +7085,9 @@ static bool GetName( CMapClass *pObject, OUT_Z_ARRAY char (&szName)[size] )
 
 static bool FindName( CUtlVector<const char*>*pList, const char * pszString )
 {
-	for ( int i=0; i<pList->Count(); i++ )
+	for ( const char *name : *pList )
 	{
-		if ( Q_stricmp( pszString, pList->Element(i)) == 0 )
+		if ( Q_stricmp( pszString, name) == 0 )
 			return true;
 	}
 
@@ -7144,7 +7157,7 @@ void CMapDoc::ExpandObjectKeywords(CMapClass *pObject, CMapWorld *pWorld)
 	char szOldName[MAX_PATH];
 	char szNewName[MAX_PATH];
 
-	if (DoExpandKeywords(pObject, pWorld, szOldName, szNewName))
+	if (DoExpandKeywords(pObject, pWorld, szOldName, ssize(szOldName), szNewName, ssize(szNewName)))
 	{
 		pObject->ReplaceTargetname(szOldName, szNewName);
 	}
@@ -7156,7 +7169,7 @@ void CMapDoc::ExpandObjectKeywords(CMapClass *pObject, CMapWorld *pWorld)
 	CMapClass *pChild = pObject->GetFirstDescendent(pos);
 	while (pChild != NULL)
 	{
-		if (DoExpandKeywords(pChild, pWorld, szOldName, szNewName))
+		if (DoExpandKeywords(pChild, pWorld, szOldName, ssize(szOldName), szNewName, ssize(szNewName)))
 		{
 			pObject->ReplaceTargetname(szOldName, szNewName);
 		}
@@ -7442,13 +7455,13 @@ BOOL CMapDoc::OnViewHideObjects(UINT nID)
 					"that can be put in a Visible Group are objects that are not\n"
 					"part of an entity.", bSelected ? "" : "un");
 	
-		AfxMessageBox(str);
+		AfxMessageBox(str, MB_ICONEXCLAMATION);
 		return TRUE;
 	}
 	else if (nFinalCount < nOriginalCount)
 	{
 		AfxMessageBox("Some objects could not put in the new Visible Group because\n"
-						"they are part of an entity.");
+						"they are part of an entity.", MB_ICONEXCLAMATION);
 	}
 	
 	ShowNewVisGroupsDialog(Objects, bSelected);
@@ -7482,7 +7495,6 @@ bool CMapDoc::GetChildrenToHide(CMapClass *pObject, bool bSelected, CMapObjectLi
 		{
 			if (pChild->IsVisible())
 			{
-				pEntity = dynamic_cast<CMapEntity *>(pChild);
 				if (pGroup || (pEntity && pEntity->IsSolidClass()))
 				{
 					// This child is a group or a solid entity -- check all its children.
@@ -7666,30 +7678,26 @@ void CMapDoc::OnViewShowconnections(void)
 //-----------------------------------------------------------------------------
 void CMapDoc::OnMapEntityGallery(void)
 {
-	if (GetMainWnd()->MessageBox("This will place one of every possible point entity in the current map! Performing this operation in an empty map is recommended. Continue?", "Create Entity Gallery", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
+	if (GetMainWnd()->MessageBox("This will place one of every possible point entity in the current map!\nPerforming this operation in an empty map is recommended.\n\nContinue?", "Hammer - Create Entity Gallery", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
 	{
-		int x = -1024;
-		int y = -1024;
+		int x = -1024, y = -1024;
 
-		CString str;
-
-		int nCount = pGD->GetClassCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pGD->GetClassCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			GDclass *pc = pGD->GetClass(i);
-			if (!pc->IsBaseClass())
+			if (!pc->IsBaseClass() && !pc->IsSolidClass())
 			{
-				if (!pc->IsSolidClass())
+				if (!pc->IsClass("worldspawn"))
 				{
-					if (!pc->IsClass("worldspawn"))
+					CreateEntity(pc->GetName(), x, y, 0);
+
+					x += 128;
+
+					if (x > 1024)
 					{
-						CreateEntity(pc->GetName(), x, y, 0);
-						x += 128;
-						if (x > 1024)
-						{
-							x = -1024;
-							y += 128;
-						}
+						x = -1024;
+						y += 128;
 					}
 				}
 			}
@@ -7716,8 +7724,9 @@ bool GetSaveAsFilename(const char *pszBaseDir, char *pszFileName, int nSize)
 {
 	CString str;
 	CFileDialog dlg(FALSE, NULL, str, OFN_LONGNAMES | OFN_NOCHANGEDIR |	OFN_HIDEREADONLY, "Valve Map Files (*.vmf)|*.vmf||");
+	dlg.m_ofn.lpstrTitle = "Open Valve Map File";
 	dlg.m_ofn.lpstrInitialDir = pszBaseDir;
-	int nRet = dlg.DoModal();
+	INT_PTR nRet = dlg.DoModal();
 
 	if (nRet != IDCANCEL)
 	{
@@ -7817,7 +7826,6 @@ void CMapDoc::OnToolsCreateprefab(void)
 		//
 		// Write the map file version.
 		//
-		if (eResult == ChunkFile_Ok)
 		{
 			// HACK: make sure we save it as a prefab, not as a normal map
 			bool bPrefab = m_bPrefab;
@@ -7954,8 +7962,10 @@ static char * FindInString(char *pszSub, char *pszMain)
 //			*pInfo - 
 // Output : static BOOL
 //-----------------------------------------------------------------------------
-static BOOL ReplaceTexFunc(CMapSolid *pSolid, ReplaceTexInfo_t *pInfo)
+static BOOL ReplaceTexFunc(CMapClass *mp, DWORD_PTR ctx)
 {
+	auto *pSolid = static_cast<CMapSolid *>(mp);
+	auto *pInfo = reinterpret_cast<ReplaceTexInfo_t *>(ctx);
 	// make sure it's visible
 	if (!pInfo->bHidden && !pSolid->IsVisible())
 	{
@@ -8114,7 +8124,7 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 			SelectObject(NULL, scClear);
 		}
 
-		m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)ReplaceTexFunc, (DWORD)&info, MAPCLASS_TYPE(CMapSolid));
+		m_pWorld->EnumChildren(ReplaceTexFunc, (DWORD_PTR)&info, MAPCLASS_TYPE(CMapSolid));
 	}
 	else
 	{
@@ -8142,9 +8152,9 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 			//
 			if (pobj->IsMapClass(MAPCLASS_TYPE(CMapSolid)))
 			{
-				ReplaceTexFunc((CMapSolid *)pobj, &info);
+				ReplaceTexFunc(pobj, (DWORD_PTR)&info);
 			}
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)ReplaceTexFunc, (DWORD)&info, MAPCLASS_TYPE(CMapSolid));
+			pobj->EnumChildren(ReplaceTexFunc, (DWORD_PTR)&info, MAPCLASS_TYPE(CMapSolid));
 		}
 	}
 
@@ -8165,7 +8175,7 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 	pSheet->EnableUpdate(true);
 	SetCursor(hCursorOld);
 
-	AfxMessageBox(str);
+	AfxMessageBox(str, MB_ICONINFORMATION);
 }
 
 
@@ -8270,7 +8280,7 @@ void CMapDoc::BatchReplaceTextures( FileHandle_t fp )
 		}
 
 		// Search and replace all key textures with val.
-		m_pWorld->EnumChildren( ( ENUMMAPCHILDRENPROC )BatchReplaceTextureCallback, ( DWORD )&Info, MAPCLASS_TYPE( CMapSolid ) ); 
+		m_pWorld->EnumChildren( ( ENUMMAPCHILDRENPROC )BatchReplaceTextureCallback, ( DWORD_PTR )&Info, MAPCLASS_TYPE( CMapSolid ) ); 
 next_line:;
 	}
 }
@@ -8561,7 +8571,7 @@ void CMapDoc::OnToolsTransform(void)
 	if(m_pSelection->IsEmpty())
 	{
 		AfxMessageBox("You must select some objects before you can\n"
-			"transform them.");
+			"transform them.", MB_ICONEXCLAMATION);
 		return;
 	}
 
@@ -8930,8 +8940,11 @@ void CMapDoc::OnUpdateToggleInfiniteselect(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck(Options.view2d.bAutoSelect);
 }
 
-static BOOL SaveDXF(CMapSolid *pSolid, ExportDXFInfo_s *pInfo)
+static BOOL SaveDXF(CMapClass *mp, DWORD_PTR ctx)
 {
+	auto *pSolid = reinterpret_cast<CMapSolid *>(mp);
+	auto *pInfo = reinterpret_cast<ExportDXFInfo_s *>(ctx);
+
 	return pSolid->SaveDXF( pInfo );
 }
 
@@ -8956,6 +8969,7 @@ void CMapDoc::OnFileExporttodxf(void)
 	}
 
 	CExportDlg dlg(str, "dxf", "DXF files (*.dxf)|*.dxf||");
+	dlg.m_ofn.lpstrTitle = "Export DXF File As";
 	if(dlg.DoModal() == IDCANCEL)
 		return;
 
@@ -9014,7 +9028,7 @@ void CMapDoc::OnFileExporttodxf(void)
 	info.pWorld = m_pWorld;
 	info.fp = fp;
 
-	m_pWorld->EnumChildren(ENUMMAPCHILDRENPROC(SaveDXF), DWORD(&info), MAPCLASS_TYPE(CMapSolid));
+	m_pWorld->EnumChildren(SaveDXF, DWORD_PTR(&info), MAPCLASS_TYPE(CMapSolid));
 
 	EndWaitCursor();
 
@@ -9060,7 +9074,6 @@ static void SetFilenameExtension( CString &fileName, const char *pExt )
 void CMapDoc::OnMapLoadportalfile(void)
 {
 	delete m_pPortalFile;
-	m_pPortalFile = NULL;
 
 	m_pPortalFile = new portalfile_t;
 	m_pPortalFile->fileName = GetPathName();
@@ -9074,7 +9087,8 @@ void CMapDoc::OnMapLoadportalfile(void)
 	{
 		CFileDialog dlg(TRUE, ".prt", m_pPortalFile->fileName, OFN_HIDEREADONLY | 
 			OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR, 
-			"Portal files (*.prt)|*.prt|");
+			"Portal Files (*.prt)|*.prt|");
+		dlg.m_ofn.lpstrTitle = "Open Portal File";
 
 		if(dlg.DoModal() != IDOK)
 			return;
@@ -9084,7 +9098,7 @@ void CMapDoc::OnMapLoadportalfile(void)
 // load the file
 	if(GetFileAttributes(m_pPortalFile->fileName) == INVALID_FILE_ATTRIBUTES)
 	{
-		AfxMessageBox("Couldn't find portal file.");
+		AfxMessageBox("Couldn't find portal file.", MB_ICONERROR);
 		return;
 	}
 	FILE *fp = fopen(m_pPortalFile->fileName, "r");
@@ -9128,13 +9142,10 @@ void CMapDoc::OnMapLoadportalfile(void)
 	}
 
 	fclose(fp);
-	if ( m_pPortalFile )
+	if ( m_pPortalFile->vertCount.Count() != portalCount || portalCount <= 0 )
 	{
-		if ( m_pPortalFile->vertCount.Count() != portalCount || portalCount <= 0 )
-		{
-			delete m_pPortalFile;
-			m_pPortalFile = NULL;
-		}
+		delete m_pPortalFile;
+		m_pPortalFile = NULL;
 	}
 
 	UpdateAllViews( MAPVIEW_UPDATE_ONLY_2D );
@@ -9162,13 +9173,14 @@ void CMapDoc::OnMapLoadpointfile(void)
 	}
 
 	CString str;
-	str.Format("Load default pointfile?\n(%s)", m_strLastPointFile.GetBuffer());
+	str.Format("Load default point file?\n(%s)", m_strLastPointFile.GetBuffer());
 	if(GetFileAttributes(m_strLastPointFile) == INVALID_FILE_ATTRIBUTES ||
 		AfxMessageBox(str, MB_ICONQUESTION | MB_YESNO) == IDNO)
 	{
 		CFileDialog dlg(TRUE, ".pts", m_strLastPointFile, OFN_HIDEREADONLY | 
 			OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR, 
-			"Pointfiles (*.pts;*.lin)|*.pts; *.lin||");
+			"Point Files (*.pts;*.lin)|*.pts; *.lin||");
+		dlg.m_ofn.lpstrTitle = "Open Point File";
 		
 		if(dlg.DoModal() != IDOK)
 			return;
@@ -9179,7 +9191,7 @@ void CMapDoc::OnMapLoadpointfile(void)
 	// load the file
 	if(GetFileAttributes(m_strLastPointFile) == INVALID_FILE_ATTRIBUTES)
 	{
-		AfxMessageBox("Couldn't load pointfile.");
+		AfxMessageBox("Couldn't load pointfile.", MB_ICONERROR);
 		return;
 	}
 	
@@ -9842,8 +9854,6 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 	
 	// Change the main title bar.
 	GetMainWnd()->SetWindowText( "Saving..." );
-	// We can optionally use these calls if we want the document name to go away so the title bar only says "Saving...".
-	//GetMainWnd()->ModifyStyle( FWS_ADDTOTITLE, 0 );  //GetMainWnd()->ModifyStyle( 0, FWS_ADDTOTITLE );
 
 	if (eResult == ChunkFile_Ok)
 	{
@@ -9880,7 +9890,7 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 		//
 		// Write the map file version.
 		//
-			{
+		{
 			const bool bIsAutosave = ( SAVEFLAGS_AUTOSAVE & saveFlags );
 			eResult = SaveVersionInfoVMF(&File, bIsAutosave);
 		}
@@ -9891,10 +9901,10 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 		// dimhotepus: Check result.
 		if (eResult == ChunkFile_Ok)
 		{
-		if (!m_bPrefab && !(saveFlags & SAVEFLAGS_LIGHTSONLY))
-		{
-			eResult = VisGroups_SaveVMF(&File, &SaveInfo);
-		}
+			if (!m_bPrefab && !(saveFlags & SAVEFLAGS_LIGHTSONLY))
+			{
+				eResult = VisGroups_SaveVMF(&File, &SaveInfo);
+			}
 		}
 
 		//
@@ -9918,16 +9928,16 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 			//
 			if ( m_bIsCordoning )
 			{
-				FOR_EACH_OBJ( CordonList, pos )
+				for ( auto *mc : CordonList )
 				{
-					CMapClass *pobj = CordonList.Element(pos);
-					m_pWorld->RemoveObjectFromWorld(pobj, true);
+					m_pWorld->RemoveObjectFromWorld(mc, true);
 				}
 
 				//
 				// The cordon objects will be deleted in the cordon world's destructor.
 				//
 				delete pCordonWorld;
+				pCordonWorld = nullptr;
 			}
 
 			// Save tool information.
@@ -9962,7 +9972,7 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 	else
 	{
 		//save filename into registry for last known good file for crash recovery purposes.
-		AfxGetApp()->WriteProfileString("General", "Last Good Save", pszFileName);		
+		AfxGetApp()->WriteProfileString("General", "Last Good Save", pszFileName);
 	}
 	
 	EndWaitCursor();
@@ -10295,9 +10305,11 @@ void CMapDoc::Update(void)
 // Input  : pObject - 
 //			pDoc - 
 //-----------------------------------------------------------------------------
-BOOL CMapDoc::UpdateVisibilityCallback(CMapClass *pObject, UpdateVisibilityData_t *pData )
+BOOL CMapDoc::UpdateVisibilityCallback(CMapClass *pObject, DWORD_PTR ctx )
 {
 	Assert(!pObject->IsTemporary());
+
+	auto *pData = reinterpret_cast<UpdateVisibilityData_t *>(ctx);
 
 	bool bVisible = pData->pDoc->ShouldObjectBeVisible(pObject, pData);
 	pObject->SetVisible(bVisible);
@@ -10308,7 +10320,7 @@ BOOL CMapDoc::UpdateVisibilityCallback(CMapClass *pObject, UpdateVisibilityData_
 		//
 		if ( ( dynamic_cast< CMapEntity * >( pObject ) ) != NULL || ( dynamic_cast< CMapWorld * >( pObject ) ) != NULL )
 		{
-			pObject->EnumChildren((ENUMMAPCHILDRENPROC)UpdateVisibilityCallback, (DWORD)pData);
+			pObject->EnumChildren(UpdateVisibilityCallback, (DWORD_PTR)pData);
 		}
 	}
 
@@ -10360,10 +10372,10 @@ void CMapDoc::UpdateVisibility(CMapClass *pObject)
 	UpdateVisibilityData_t data;
 	InitUpdateVisibilityData( data );
 
-	UpdateVisibilityCallback(pObject, &data);
+	UpdateVisibilityCallback(pObject, (DWORD_PTR)&data);
 	if (pObject->IsGroup())
 	{
-		pObject->EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)UpdateVisibilityCallback, (DWORD)&data);
+		pObject->EnumChildrenRecurseGroupsOnly(UpdateVisibilityCallback, (DWORD_PTR)&data);
 	}
 }
 
@@ -10380,7 +10392,7 @@ void CMapDoc::UpdateVisibilityAll(void)
 	// Two stage recursion: first we recurse groups only, then from the callback we recurse
 	// solid children of entities.
 	//
-	m_pWorld->EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)UpdateVisibilityCallback, (DWORD)&data);
+	m_pWorld->EnumChildrenRecurseGroupsOnly(UpdateVisibilityCallback, (DWORD_PTR)&data);
 	m_pSelection->RemoveInvisibles();
 
 	CMainFrame *pwndMain = GetMainWnd();
@@ -10478,7 +10490,7 @@ bool CMapDoc::VisGroups_CanMoveDown(CVisGroup *pGroup)
 	}
 	else
 	{
-		int nIndex = m_RootVisGroups->Find(pGroup);
+		intp nIndex = m_RootVisGroups->Find(pGroup);
 		return (nIndex >= 0) && (nIndex < m_RootVisGroups->Count() - 1);
 	}
 }
@@ -10556,7 +10568,7 @@ void CMapDoc::VisGroups_MoveUp(CVisGroup *pGroup)
 	}
 	else
 	{
-		int nIndex = m_RootVisGroups->Find(pGroup);
+		intp nIndex = m_RootVisGroups->Find(pGroup);
 		if (nIndex > 0)
 		{
 			m_RootVisGroups->Remove(nIndex);
@@ -10579,7 +10591,7 @@ void CMapDoc::VisGroups_MoveDown(CVisGroup *pGroup)
 	}
 	else
 	{
-		int nIndex = m_RootVisGroups->Find(pGroup);
+		intp nIndex = m_RootVisGroups->Find(pGroup);
 		if (nIndex < (m_RootVisGroups->Count() - 1))
 		{
 			m_RootVisGroups->Remove(nIndex);
@@ -10897,6 +10909,7 @@ void CMapDoc::InternalEnableLightPreview( bool bCustomFilename )
 			"BSP Files (*.bsp)|*.bsp|All Files (*.*)|*.*||",
 			NULL 		// filter
 			);
+		dlg.m_ofn.lpstrTitle = "Open BSP | Any File";
 
 		if( dlg.DoModal() != IDOK )
 			return;
@@ -10912,7 +10925,7 @@ void CMapDoc::InternalEnableLightPreview( bool bCustomFilename )
 	{
 		char str[256];
 		Q_snprintf( str, sizeof(str), "Can't load lighting from '%s'.", finalPath );
-		AfxMessageBox( str );
+		AfxMessageBox( str, MB_ICONERROR );
 	}
 
 
@@ -10981,7 +10994,7 @@ void CMapDoc::OnUpdateLightPreview()
 	// Save out a file with just the ents.
 	char szFile[MAX_PATH];
 	V_strcpy_safe( szFile, GetPathName() );
-	szFile[strlen(szFile) - 1] = 'e';
+	szFile[max(V_strlen(szFile) - 1, static_cast<intp>(0))] = 'e';
 	
 	if( !SaveVMF( szFile, SAVEFLAGS_LIGHTSONLY ) )
 	{
@@ -10997,7 +11010,7 @@ void CMapDoc::OnUpdateLightPreview()
 	{
 		CString str;
 		str.FormatMessage( IDS_CANT_OPEN_ENTS_FILE, szFile );
-		AfxMessageBox( str, MB_OK );
+		AfxMessageBox( str, MB_OK | MB_ICONERROR );
 		return;
 	}
 
@@ -11147,7 +11160,7 @@ void CMapDoc::ProcessNotifyList()
 				if ( !bShowedWarning )
 				{
 					bShowedWarning = true;
-					AfxMessageBox( "ProcessNotifyList: encountered a deleted object. Tell a programmer.", MB_OK );
+					AfxMessageBox( "ProcessNotifyList: encountered a deleted object. Tell a programmer.", MB_OK | MB_ICONERROR );
 				}
 			}
 		}
@@ -11672,7 +11685,7 @@ void CMapDoc::OnInstancingCreatemanifest()
 	CManifest *pManifest = CMapDoc::GetManifest();
 	if ( !pManifest )
 	{
-		if ( AfxMessageBox( "Do you want to create a new manifest from this map?", MB_YESNO ) == IDNO )
+		if ( AfxMessageBox( "Do you want to create a new manifest from this map?", MB_YESNO | MB_ICONQUESTION ) == IDNO )
 		{
 			return;
 		}
@@ -12000,7 +12013,6 @@ void CMapDoc::QuickHide_HideObjects( void )
 			CMapClass *pParent = m_QuickHideGroupedParents[ index ];
 			int nChildCount = pParent->GetChildCount();
 
-			if ( pParent )
 			{
 				CMapClass *pChild = pParent->GetFirstDescendent( posParent );
 

@@ -425,7 +425,7 @@ void CToolPickEntity::DeselectEntity(int nIndex)
 //-----------------------------------------------------------------------------
 void CToolPickEntity::AddToList(CMapEntity *pEntity, EntityState_t eState)
 {
-	int nIndex = m_Entities.AddToTail();
+	intp nIndex = m_Entities.AddToTail();
 	m_Entities[nIndex].pEntity = pEntity;
 	m_Entities[nIndex].eState = eState;
 	m_Entities[nIndex].eOriginalState = eState;

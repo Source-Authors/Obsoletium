@@ -16,17 +16,14 @@
 #pragma once
 
 #include "IEditorTexture.h"
+#include "windows/base_combo_box.h"
 
-class CTextureBox : public CComboBox
+class CTextureBox : public CBaseComboBox
 {
 // Construction
 public:
 	CTextureBox();
 	BOOL Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID) override;
-
-// Attributes
-public:
-	BOOL bFirstMeasure;
 
 // Operations
 public:

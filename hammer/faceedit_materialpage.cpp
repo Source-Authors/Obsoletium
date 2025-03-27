@@ -34,9 +34,9 @@
 
 //=============================================================================
 
-IMPLEMENT_DYNAMIC( CFaceEditMaterialPage, CPropertyPage )
+IMPLEMENT_DYNAMIC( CFaceEditMaterialPage, CBasePropertyPage )
 
-BEGIN_MESSAGE_MAP( CFaceEditMaterialPage, CPropertyPage )
+BEGIN_MESSAGE_MAP( CFaceEditMaterialPage, CBasePropertyPage )
 	//{{AFX_MSG_MAP( CFaceEditMaterialPage )
 	ON_BN_CLICKED( ID_FACEEDIT_APPLY, OnButtonApply )
 	ON_COMMAND_EX( IDC_ALIGN_WORLD, OnAlign )
@@ -153,12 +153,13 @@ CFaceEditMaterialPage::FaceAttributeInfo_t FaceAttributes[] =
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-CFaceEditMaterialPage::CFaceEditMaterialPage() : CPropertyPage( IDD )
+CFaceEditMaterialPage::CFaceEditMaterialPage() : CBasePropertyPage( IDD )
 {
 	m_bHideMask = FALSE;
 	m_bInitialized = FALSE;
 	m_bIgnoreResize = FALSE;
 	m_bTreatAsOneFace = FALSE;
+	m_eOrientation = FACE_ORIENTATION_INVALID;
 	m_pCurTex = nullptr;
 }
 
@@ -354,7 +355,8 @@ void TransferToFloat( CWnd *pWnd, float &fValue )
 
 	if( !str.IsEmpty() )
 	{
-		fValue = ( float )atof( str );
+		// dimhotepus: atof -> strtof.
+		fValue = strtof( str, nullptr );
 	}
 }
 
@@ -837,17 +839,7 @@ void CFaceEditMaterialPage::UpdateDialogData( CMapFace *pOnlyFace )
 
 	for( int i = 0; i < faceCount || pOnlyFace; i++ )
 	{
-		CMapFace *pFace;
-
-		if( pOnlyFace )
-		{
-			pFace = pOnlyFace;
-		}
-		else
-		{
-			pFace = pSheet->GetFaceListDataFace( i );
-		}
-		
+		CMapFace *pFace = pOnlyFace ? pOnlyFace : pSheet->GetFaceListDataFace( i );
 		TEXTURE &t = pFace->texture;
 
 		//
@@ -948,7 +940,7 @@ void CFaceEditMaterialPage::UpdateDialogData( CMapFace *pOnlyFace )
 
 			if (!strTexture.IsEmpty() && strTexture != t.texture)
 			{
-				strTexture = "";
+				strTexture.Empty();
 			}
 
 			//

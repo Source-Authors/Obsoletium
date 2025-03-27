@@ -89,6 +89,9 @@ CMapFrustum::CMapFrustum(void)
 	m_flNearPlane = 10;
 	m_flFarPlane = 200;
 	m_flPitchScale = -1;
+	m_fBrightness = -1;
+
+	m_Angles.Init();
 }
 
 
@@ -274,15 +277,15 @@ void CMapFrustum::OnParentKeyChanged(const char *szKey, const char *szValue)
 	}
 	else if (!stricmp(szKey, m_szFOVKeyName))
 	{
-		m_flFOV = atof(szValue);
+		m_flFOV = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, m_szNearPlaneKeyName))
 	{
-		m_flNearPlane = atof(szValue);
+		m_flNearPlane = strtof(szValue, nullptr);
 	}
 	else if (!stricmp(szKey, m_szFarPlaneKeyName))
 	{
-		m_flFarPlane = atof(szValue);
+		m_flFarPlane = strtof(szValue, nullptr);
 	}
 	else
 	{

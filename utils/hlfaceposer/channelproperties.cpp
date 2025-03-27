@@ -4,9 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
-#include "resource.h"
 #include "ChannelProperties.h"
+#include "resource.h"
 #include "ChoreoView.h"
 #include "choreoactor.h"
 #include "choreoscene.h"
@@ -109,11 +108,11 @@ static BOOL CALLBACK ChannelPropertiesDialogProc ( HWND hwndDlg, UINT uMsg, WPAR
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int ChannelProperties( CChannelParams *params )
+intp ChannelProperties( CChannelParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_CHANNELPROPERTIES ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)ChannelPropertiesDialogProc );

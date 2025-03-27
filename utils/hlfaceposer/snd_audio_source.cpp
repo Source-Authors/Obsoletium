@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdio.h>
 #include "snd_audio_source.h"
 
 
@@ -20,7 +19,7 @@ extern CAudioSource *Audio_CreateMemoryWave( const char *pName );
 CAudioSource *AudioSource_Create( const char *pName )
 {
 	if ( !pName )
-		return NULL;
+		return nullptr;
 
 //	if ( pName[0] == '!' )		// sentence
 		;
@@ -30,14 +29,12 @@ CAudioSource *AudioSource_Create( const char *pName )
 	if ( pName[0] == '*' )
 	{
 
-		return NULL;
+		return nullptr;
 	}
 
 	// These are loaded into memory directly
 	return Audio_CreateMemoryWave( pName );
 }
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 #include "hlfaceposer.h"
 #include "ifaceposersound.h"

@@ -257,7 +257,7 @@ class COptionsSubVideoAdvancedDlg : public vgui::Frame
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( COptionsSubVideoAdvancedDlg, vgui::Frame );
 public:
-	COptionsSubVideoAdvancedDlg( vgui::Panel *parent ) : BaseClass( parent , "OptionsSubVideoAdvancedDlg" )
+	COptionsSubVideoAdvancedDlg( vgui::Panel *parent, vgui::ComboBox *pHDR ) : BaseClass( parent , "OptionsSubVideoAdvancedDlg" )
 	{
 		SetTitle("#GameUI_VideoAdvanced_Title", true);
 		SetSize( 260, 400 );
@@ -396,20 +396,32 @@ public:
 
 		ConVarRef mat_dxlevel( "mat_dxlevel" );
 
-		m_pHDR = new ComboBox( this, "HDR", 6, false );
-		m_pHDR->AddItem("#GameUI_hdr_level0", NULL);
-
-		if ( materials->SupportsHDRMode( HDR_TYPE_INTEGER ) )
+		// dimhotepus: Half-Life 2 20th Anniversary Update. Moved HDR setting to subvideo.
+		if ( !pHDR )
 		{
-			m_pHDR->AddItem("#GameUI_hdr_level1", NULL);
-		}
+			m_pHDR = new ComboBox( this, "HDR", 6, false );
+			m_pHDR->AddItem("#GameUI_hdr_level0", NULL);
 
-		if ( materials->SupportsHDRMode( HDR_TYPE_FLOAT ) )
+			if ( materials->SupportsHDRMode( HDR_TYPE_INTEGER ) )
+			{
+				m_pHDR->AddItem("#GameUI_hdr_level1", NULL);
+			}
+
+			if ( materials->SupportsHDRMode( HDR_TYPE_FLOAT ) )
+			{
+				m_pHDR->AddItem("#GameUI_hdr_level2", NULL);
+			}
+
+			m_pHDR->SetEnabled( mat_dxlevel.GetInt() >= 80 );
+
+			m_bOwnHDRSetting = true;
+		}
+		else
 		{
-			m_pHDR->AddItem("#GameUI_hdr_level2", NULL);
-		}
+			m_pHDR = pHDR;
 
-		m_pHDR->SetEnabled( mat_dxlevel.GetInt() >= 80 );
+			m_bOwnHDRSetting = false;
+		}
 
 		m_pWaterDetail = new ComboBox( this, "WaterDetail", 6, false );
 		m_pWaterDetail->AddItem("#gameui_noreflections", NULL);
@@ -435,6 +447,12 @@ public:
 		m_pMotionBlur = new ComboBox( this, "MotionBlur", 2, false );
 		m_pMotionBlur->AddItem("#gameui_disabled", NULL);
 		m_pMotionBlur->AddItem("#gameui_enabled", NULL);
+
+		// dimhotepus: Windows aero extensions.
+		m_pD3D9Ex = new ComboBox( this, "D3D9Ex", 2, false );
+		m_pD3D9Ex->AddItem("#gameui_disabled", NULL); // 0
+		m_pD3D9Ex->AddItem("#gameui_enabled", NULL);  // 1
+		m_pD3D9Ex->SetEnabled(mat_dxlevel.GetInt() >= 90);
 
 		LoadControlSettings( "resource/OptionsSubVideoAdvancedDlg.res" );
 		MoveToCenterOfScreen();
@@ -474,6 +492,7 @@ public:
 		MarkDefaultSettingsAsRecommended();
 
 		m_bUseChanges = false;
+		m_bDisplayedWindowsAeroChangeMessage = false;
 	}
 
 	void Activate() override
@@ -528,6 +547,23 @@ public:
 			box->SetCancelCommand(new KeyValues("ResetDXLevelCombo"));
 			box->DoModal();
 		}
+
+		if ( panel == m_pD3D9Ex )
+		{
+			// Windows Aero extensions changed.
+			if ( !m_bDisplayedWindowsAeroChangeMessage && m_pD3D9Ex->IsEnabled() )
+			{
+				ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
+				Assert( mat_disable_d3d9ex.IsValid() );
+				if ( mat_disable_d3d9ex.GetInt() != 1 - m_pD3D9Ex->GetActiveItem() )
+				{
+					m_bDisplayedWindowsAeroChangeMessage = true;
+					MessageBox *box = new MessageBox( "#GameUI_D3D9Ex", "#GameUI_D3D9ExRelaunchMsg", this );
+					box->MoveToFront();
+					box->DoModal();
+				}
+			}
+		}
 	}
 
 	MESSAGE_FUNC( OnGameUIHidden, "GameUIHidden" )	// called when the GameUI is hidden
@@ -554,6 +590,14 @@ public:
 			ConVarRef mat_hdr_level("mat_hdr_level");
 			Assert( mat_hdr_level.IsValid() );
 			m_pHDR->ActivateItem( clamp( mat_hdr_level.GetInt(), 0, 2 ) );
+		}
+
+		// Reset Windows Aero extensions too
+		if ( m_pD3D9Ex->IsEnabled() )
+		{
+			ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
+			Assert( mat_disable_d3d9ex.IsValid() );
+			m_pD3D9Ex->ActivateItem( mat_disable_d3d9ex.GetInt() ? 0 : 1 );
 		}
 	}
 
@@ -605,6 +649,7 @@ public:
 		int nDXLevel = pKeyValues->GetInt( "ConVar.mat_dxlevel", 0 );
 		int nColorCorrection = pKeyValues->GetInt( "ConVar.mat_colorcorrection", 0 );
 		int nMotionBlur = pKeyValues->GetInt( "ConVar.mat_motion_blur_enabled", 0 );
+		int nDisableD3d9ex = pKeyValues->GetInt( "ConVar.mat_disable_d3d9ex", 0 );
 		// It doesn't make sense to retrieve this convar from dxsupport, because we'll then have materialsystem setting this config at loadtime. (Also, it only has very minimal support for CPU related configuration.)
 		//int nMulticore = pKeyValues->GetInt( "ConVar.mat_queue_mode", 0 );
 		int nMulticore = GetCPUInformation()->m_nPhysicalProcessors >= 2;
@@ -690,11 +735,16 @@ public:
 
 		SetComboItemAsRecommended( m_pMulticore, nMulticore != 0 );
 
-		SetComboItemAsRecommended( m_pHDR, nDXLevel >= 90 ? 2 : 0 );
+		if ( m_bOwnHDRSetting )
+		{
+			SetComboItemAsRecommended( m_pHDR, nDXLevel >= 90 ? 2 : 0 );
+		}
 
 		SetComboItemAsRecommended( m_pColorCorrection, nColorCorrection );
 
 		SetComboItemAsRecommended( m_pMotionBlur, nMotionBlur );
+
+		SetComboItemAsRecommended( m_pD3D9Ex, nDisableD3d9ex ? 0 : 1 );
 
 		pKeyValues->deleteThis();
 	}
@@ -755,7 +805,7 @@ public:
 		ApplyChangesToConVar( "mat_antialias", m_nAAModes[nActiveAAItem].m_nNumSamples );
 		ApplyChangesToConVar( "mat_aaquality", m_nAAModes[nActiveAAItem].m_nQualityLevel );
 
-		if( m_pHDR->IsEnabled() )
+		if( m_bOwnHDRSetting && m_pHDR->IsEnabled() )
 		{
 			ConVarRef mat_hdr_level("mat_hdr_level");
 			Assert( mat_hdr_level.IsValid() );
@@ -811,10 +861,13 @@ public:
 		ApplyChangesToConVar( "mat_colorcorrection", m_pColorCorrection->GetActiveItem() );
 
 		ApplyChangesToConVar( "mat_motion_blur_enabled", m_pMotionBlur->GetActiveItem() );
-		
-		if ( m_pFOVSlider )
+
+		if ( m_pD3D9Ex->IsEnabled() )
 		{
-			m_pFOVSlider->ApplyChanges();
+			ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
+			Assert( mat_disable_d3d9ex.IsValid() );
+			// Inverse, disabled means not enabled.
+			mat_disable_d3d9ex.SetValue(1 - m_pD3D9Ex->GetActiveItem());
 		}
 		
 		m_pFOVSlider->ApplyChanges();
@@ -840,6 +893,7 @@ public:
 		ConVarRef mat_hdr_level( "mat_hdr_level" );
 		ConVarRef mat_colorcorrection( "mat_colorcorrection" );
 		ConVarRef mat_motion_blur_enabled( "mat_motion_blur_enabled" );
+		ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
 		ConVarRef r_shadowrendertotexture( "r_shadowrendertotexture" );
 
 		ResetDXLevelCombo();
@@ -862,7 +916,12 @@ public:
 		}
 
 		m_pShaderDetail->ActivateItem( mat_reducefillrate.GetBool() ? 0 : 1 );
-		m_pHDR->ActivateItem(clamp(mat_hdr_level.GetInt(), 0, 2));
+		if ( m_bOwnHDRSetting )
+		{
+			m_pHDR->ActivateItem(clamp( mat_hdr_level.GetInt(), 0, 2) );
+		}
+		// Inversed, disabled means not enabled.
+		m_pD3D9Ex->ActivateItem( mat_disable_d3d9ex.GetInt() ? 0 : 1 );
 
 		switch (mat_forceaniso.GetInt())
 		{
@@ -1025,9 +1084,13 @@ private:
 	vgui::ComboBox *m_pColorCorrection;
 	vgui::ComboBox *m_pMotionBlur;
 	vgui::ComboBox *m_pDXLevel;
+	vgui::ComboBox *m_pD3D9Ex;
 
 	int m_nNumAAModes;
 	AAMode_t m_nAAModes[16];
+
+	bool m_bOwnHDRSetting;
+	bool m_bDisplayedWindowsAeroChangeMessage;
 };
 
 #if defined( USE_SDL )
@@ -1171,12 +1234,26 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	}
 
 	SetCurrentHUDAspectRatio();
-	m_pHUDAspectRatio->AddItem( "#GameUI_Achievement_Unlocked", NULL );
-	m_pHUDAspectRatio->AddItem( "#GameUI_AspectNormal", NULL );
-	m_pHUDAspectRatio->AddItem( "#GameUI_AspectWide16x9", NULL );
-	m_pHUDAspectRatio->AddItem( "#GameUI_AspectWide16x10", NULL );
 
-	SetCurrentHUDAspectRatio();
+	// dimhotepus: Half-Life 2 20th Anniversary Update. Moved HDR setting to subvideo.
+	ConVarRef mat_dxlevel( "mat_dxlevel" );
+
+	m_pHDR = new ComboBox( this, "HDR", 6, false );
+	m_pHDR->AddItem("#GameUI_hdr_level0", NULL);
+
+	if ( materials->SupportsHDRMode( HDR_TYPE_INTEGER ) )
+	{
+		m_pHDR->AddItem("#GameUI_hdr_level1", NULL);
+	}
+
+	if ( materials->SupportsHDRMode( HDR_TYPE_FLOAT ) )
+	{
+		m_pHDR->AddItem("#GameUI_hdr_level2", NULL);
+	}
+
+	m_pHDR->SetEnabled( mat_dxlevel.GetInt() >= 80 );
+
+	const int initialHDRWidth = m_pHDR->GetWide();
 
 	m_pVRMode->AddItem( "#GameUI_Disabled", NULL );
 	m_pVRMode->AddItem( "#GameUI_Enabled", NULL );
@@ -1240,6 +1317,16 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 
 	LoadControlSettings("Resource\\OptionsSubVideo.res");
 
+	const int appliedHDRWidth = m_pHDR->GetWide();
+
+	// dimhotepus: Detect pre-Half-Life 2 20th Anniversary Update engine branch where HDR settings in advanced options.
+	if ( initialHDRWidth == appliedHDRWidth )
+	{
+		// dimhotepus: Old branch, use advanced options HDR.
+		m_pHDR->MarkForDeletion();
+		m_pHDR = nullptr;
+	}
+
 	// Moved down here so we can set the Drop down's
 	// menu state after the default (disabled) value is loaded
 	PrepareResolutionList();
@@ -1273,6 +1360,8 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 		m_pVRMode->GetTooltip()->SetText( "#GameUI_NoVRTooltip" );
 		EnableOrDisableWindowedForVR();
 	}
+
+	MarkDefaultSettingsAsRecommended();
 }
 
 //-----------------------------------------------------------------------------
@@ -1591,7 +1680,7 @@ void COptionsSubVideo::OnResetData()
     // reset UI elements
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
 	int ItemIndex;
-
+	
 	if ( config.Borderless() )
 	{
 		// Last before one item in the combobox is window borderless.
@@ -1636,6 +1725,12 @@ void COptionsSubVideo::OnResetData()
 	m_pHDContent->SetSelected( BUseHDContent() );
 
 	SetCurrentResolutionComboItem();
+
+	ConVarRef mat_hdr_level( "mat_hdr_level" );
+	if ( m_pHDR )
+	{
+		m_pHDR->ActivateItem(clamp(mat_hdr_level.GetInt(), 0, 2));
+	}
 
 	bool bVREnabled = config.m_nVRModeAdapter != UINT_MAX;
 	m_pVRMode->ActivateItem( bVREnabled ? 1 : 0 );
@@ -1744,6 +1839,13 @@ void COptionsSubVideo::OnApplyChanges()
 	bool windowed = ( m_pWindowed->GetActiveItem() == ( m_pWindowed->GetItemCount() - 2 ) ) ? true : false;
 	bool borderless = ( m_pWindowed->GetActiveItem() == ( m_pWindowed->GetItemCount() - 1 ) ) ? true : false;
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+
+	if ( m_pHDR && m_pHDR->IsEnabled() )
+	{
+		ConVarRef mat_hdr_level("mat_hdr_level");
+		Assert( mat_hdr_level.IsValid() );
+		mat_hdr_level.SetValue(m_pHDR->GetActiveItem());
+	}
 
 	bool bVRMode = m_pVRMode->GetActiveItem() != 0;
 	if( ( UINT_MAX != config.m_nVRModeAdapter ) != bVRMode )
@@ -1885,6 +1987,39 @@ void COptionsSubVideo::OnTextChanged(Panel *pPanel, const char *pszText)
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: enables windowed combo box
+//-----------------------------------------------------------------------------
+void COptionsSubVideo::MarkDefaultSettingsAsRecommended()
+{
+	if ( m_pHDR )
+	{
+		// Pull in data from dxsupport.cfg database (includes fine-grained per-vendor/per-device config data)
+		KeyValues *pKeyValues = new KeyValues( "config" );
+		materials->GetRecommendedConfigurationInfo( 0, pKeyValues );
+
+		const int nDXLevel = pKeyValues->GetInt( "ConVar.mat_dxlevel", 0 );
+
+		SetComboItemAsRecommended( m_pHDR, nDXLevel >= 90 ? 2 : 0 );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: sets combo box item as recommended
+//-----------------------------------------------------------------------------
+void COptionsSubVideo::SetComboItemAsRecommended( vgui::ComboBox *combo, int iItem )
+{
+	// get the item text
+	wchar_t text[512];
+	combo->GetItemText(iItem, text, sizeof(text));
+
+	// append the recommended flag
+	wchar_t newText[512];
+	_snwprintf( newText, sizeof(newText) / sizeof(wchar_t), L"%ls *", text );
+
+	// reset
+	combo->UpdateItem(iItem, newText, NULL);
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: enables windowed combo box
@@ -1939,7 +2074,7 @@ void COptionsSubVideo::OpenAdvanced()
 {
 	if ( !m_hOptionsSubVideoAdvancedDlg.Get() )
 	{
-		m_hOptionsSubVideoAdvancedDlg = new COptionsSubVideoAdvancedDlg( BasePanel()->FindChildByName( "OptionsDialog" ) ); // we'll parent this to the OptionsDialog directly
+		m_hOptionsSubVideoAdvancedDlg = new COptionsSubVideoAdvancedDlg( BasePanel()->FindChildByName( "OptionsDialog" ), m_pHDR ); // we'll parent this to the OptionsDialog directly
 	}
 
 	m_hOptionsSubVideoAdvancedDlg->Activate();

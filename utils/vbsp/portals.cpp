@@ -14,10 +14,7 @@
 #include "fmtstr.h"
 #include "bspflags.h"
 
-int		c_active_portals;
-int		c_peak_portals;
-int		c_boundary;
-int		c_boundary_sides;
+static std::atomic_int		c_active_portals;
 
 /*
 ===========
@@ -28,12 +25,8 @@ portal_t *AllocPortal (void)
 {
 	static int s_PortalCount = 0;
 
-	if (numthreads == 1)
-		c_active_portals++;
+	c_active_portals.fetch_add(1, std::memory_order::memory_order_acq_rel);
 
-	if (c_active_portals > c_peak_portals)
-		c_peak_portals = c_active_portals;
-	
 	portal_t *p = (portal_t*)calloc (1, sizeof(portal_t));
 	if (!p) return nullptr;
 
@@ -46,9 +39,10 @@ void FreePortal (portal_t *p)
 {
 	if (p->winding)
 		FreeWinding (p->winding);
-	if (numthreads == 1)
-		c_active_portals--;
+
 	free (p);
+
+	c_active_portals.fetch_sub(1, std::memory_order::memory_order_acq_rel);
 }
 
 //==============================================================
@@ -1376,7 +1370,7 @@ void FloodAreas (tree_t *tree)
 	FindAreas_r (tree->headnode);
 	SetAreaPortalAreas_r (tree, tree->headnode);
 	qprintf ("%5i areas\n", c_areas);
-	Msg("done (%.2fs)", Plat_FloatTime() - start );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 }
 
 //======================================================

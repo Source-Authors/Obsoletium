@@ -11,6 +11,7 @@
 #endif
 
 #include "windows/base_wnd.h"
+#include "windows/base_combo_box.h"
 #include "mathlib/vector.h"
 
 
@@ -98,7 +99,7 @@ void CAngleBox::SetEditControl(CAngleCombo *pEdit)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CAngleCombo : public CComboBox
+class CAngleCombo : public CBaseComboBox
 {
 public:
 

@@ -1,14 +1,7 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef PERFSTATS_H
-#define PERFSTATS_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_UTILS_STUDIOMDL_PERFSTATS_H_
+#define SE_UTILS_STUDIOMDL_PERFSTATS_H_
 
 #include "studio.h"
 #include "optimize.h"
@@ -22,4 +15,4 @@ enum
 
 void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int flags );
 
-#endif // PERFSTATS_H
+#endif  // !SE_UTILS_STUDIOMDL_PERFSTATS_H_

@@ -77,17 +77,17 @@ extern CUtlVector<IMesh *> g_WorldStaticMeshes;
 
 struct materiallist_t
 {
-	short			nextBlock;
-	short			count;
+	intp			nextBlock;
+	intp			count;
 	msurface2_t		*pSurfaces[15];
 };
 
 struct surfacesortgroup_t
 {
-	short			listHead;
-	short			listTail;
+	intp			listHead;
+	intp			listTail;
+	intp			groupListIndex;
 	unsigned short	vertexCount;
-	short			groupListIndex;
 	unsigned short	vertexCountNoDetail;
 	unsigned short	indexCountNoDetail;
 	unsigned short	triangleCount;
@@ -121,7 +121,7 @@ public:
 		return m_sortGroupLists[nSortGroup];
 	}
 
-	inline const materiallist_t &GetSurfaceBlock(short index) const
+	inline const materiallist_t &GetSurfaceBlock(intp index) const
 	{
 		return m_list[index];
 	}
@@ -151,10 +151,10 @@ private:
 
 #define MSL_FOREACH_SURFACE_IN_GROUP_BEGIN( _sortList, _group, _pSurface )	\
 	{																				\
-		for ( short _blockIndex = (_group).listHead; _blockIndex != -1; _blockIndex = (_sortList).GetSurfaceBlock(_blockIndex).nextBlock )	\
+		for ( intp _blockIndex = (_group).listHead; _blockIndex != -1; _blockIndex = (_sortList).GetSurfaceBlock(_blockIndex).nextBlock )	\
 		{																			\
 			const materiallist_t *_pList = &(_sortList).GetSurfaceBlock(_blockIndex); \
-			for ( int _index = 0; _index < _pList->count; ++_index )				\
+			for ( intp _index = 0; _index < _pList->count; ++_index )				\
 			{																		\
 				SurfaceHandle_t _pSurface = _pList->pSurfaces[_index];
 

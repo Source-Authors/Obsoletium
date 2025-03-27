@@ -25,8 +25,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244 4305)
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor, sets to inactive.
@@ -37,9 +35,10 @@ CMapView::CMapView(void)
 	m_bUpdateView = false;
 	m_eDrawType = VIEW_INVALID;
 	m_pCamera = NULL;
-	m_dwTimeLastRender = 0;
+	m_flTimeLastRender = 0;
 	m_nRenderedFrames = 0;
 	m_pToolManager = NULL;
+	m_nLastRaytracedBitmapRenderTimeStamp = -1;
 }
 
 bool CMapView::IsOrthographic()
@@ -75,20 +74,19 @@ void CMapView::ActivateView(bool bActivate)
 //-----------------------------------------------------------------------------
 bool CMapView::ShouldRender()
 {
-	DWORD dwTimeNow = timeGetTime();
+	const double flTimeNow = Plat_FloatTime();
 
-	if (m_dwTimeLastRender != 0)
+	if (m_flTimeLastRender != 0)
 	{
-		DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastRender;
-	
-		if ( dwTimeElapsed <= 0 )
+		const double flTimeElapsed = flTimeNow - m_flTimeLastRender;
+		if ( flTimeElapsed <= 0.0 )
 			return false;
 	
-		float flFrameRate = (1000.0f / dwTimeElapsed);
-
-		if (flFrameRate > 100.0f)
+		const double flFrameRate = 1.0 / flTimeElapsed;
+		// dimhotepus: Up max frequency from 100 to 210 Hz.
+		if (flFrameRate > 210.0)
 		{
-			// never update view faster then 100Hz
+			// never update view faster then 210Hz
 			return false;
 		}
 	}
@@ -96,7 +94,7 @@ bool CMapView::ShouldRender()
 	// update view if needed
 	if ( m_bUpdateView )
 	{
-		m_dwTimeLastRender = dwTimeNow;
+		m_flTimeLastRender = flTimeNow;
 		m_nRenderedFrames++;
 		return true;
 	}

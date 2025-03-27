@@ -28,7 +28,7 @@ class CToolManager;
 typedef struct HitInfo_s HitInfo_t;
 
 
-enum DrawType_t
+enum DrawType_t : int
 {
 	VIEW_INVALID = -1,
 	VIEW2D_XY = 0,
@@ -102,7 +102,7 @@ public:
 	bool			m_bActive;
 	bool			m_bUpdateView;
 	DrawType_t		m_eDrawType;
-	unsigned int	m_dwTimeLastRender;
+	double			m_flTimeLastRender;
 	CCamera			*m_pCamera;			// Defines the camera position and settings for this view.
 	CToolManager	*m_pToolManager;	// tool manager for this view
 	int				m_nRenderedFrames;

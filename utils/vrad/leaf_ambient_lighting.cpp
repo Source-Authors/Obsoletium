@@ -30,31 +30,6 @@ static TableVector g_BoxDirections[6] =
 
 
 
-static void ComputeAmbientFromSurface( dface_t *surfID, dworldlight_t* pSkylight, 
-									   Vector& radcolor )
-{
-	if ( !surfID )
-		return;
-
-	texinfo_t *pTexInfo = &texinfo[surfID->texinfo];
-
-	// If we hit the sky, use the sky ambient
-	if ( pTexInfo->flags & SURF_SKY )
-	{
-		if ( pSkylight )
-		{
-			// add in sky ambient
-			VectorCopy( pSkylight->intensity, radcolor );
-		}
-	}
-	else
-	{
-		Vector reflectivity = dtexdata[pTexInfo->texdata].reflectivity;
-		VectorMultiply( radcolor, reflectivity, radcolor );
-	}
-}
-
-
 // TODO: it's CRAZY how much lighting code we share with the engine. It should all be shared code.
 float Engine_WorldLightAngle( const dworldlight_t *wl, const Vector& lnormal, const Vector& snormal, const Vector& delta )
 {

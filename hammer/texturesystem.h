@@ -68,7 +68,7 @@ protected:
 	char m_szName[MAX_PATH];
 	TEXTUREFORMAT m_eTextureFormat;
 	CUtlVector<IEditorTexture *> m_Textures;
-	CUtlDict<int,int> m_TextureNameMap;	// Maps the texture name to an index into m_Textures (the key is IEditorTexture::GetName).
+	CUtlDict<intp,intp> m_TextureNameMap;	// Maps the texture name to an index into m_Textures (the key is IEditorTexture::GetName).
 
 	// Used to lazily load the textures in the group
 	int	m_nTextureToLoad;
@@ -207,7 +207,7 @@ public:
 	// Gets tools/toolsnodraw
 	IEditorTexture* GetNoDrawTexture() { return m_pNoDrawTexture; }
 
-	int AddTexture( IEditorTexture *pTexture );
+	intp AddTexture( IEditorTexture *pTexture );
 
 protected:
 

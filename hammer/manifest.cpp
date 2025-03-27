@@ -45,8 +45,8 @@ IMPLEMENT_MAPCLASS( CManifestInstance )
 CManifestMap::CManifestMap( void )
 {
 	m_Map = NULL;
-	m_RelativeMapFileName = "";
-	m_AbsoluteMapFileName = "";
+	m_RelativeMapFileName.Empty();
+	m_AbsoluteMapFileName.Empty();
 	m_FriendlyName = "unnamed";
 	m_bTopLevelMap = false;
 	m_bPrimaryMap = false;
@@ -64,7 +64,7 @@ CManifestMap::CManifestMap( void )
 //-----------------------------------------------------------------------------
 // Purpose: returns true if the manifest map is editable
 //-----------------------------------------------------------------------------
-bool CManifestMap::IsEditable( void )
+bool CManifestMap::IsEditable( void ) const
 {
 	return ( m_bProtected == false && m_bReadOnly == false && m_bPrimaryMap );
 }
@@ -364,8 +364,8 @@ ChunkFileResult_t CManifest::LoadManifestCordoningPrefsCallback( CChunkFile *pFi
 //-----------------------------------------------------------------------------
 bool CManifest::LoadVMFManifest( const char *pszFileName )
 {
-	FILE *fp = fopen( pszFileName, "rb" );
-	if ( !fp )
+	struct _stat fileInfo;
+	if ( _stat( pszFileName, &fileInfo ) )
 	{
 		return false;
 	}
@@ -409,12 +409,12 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 	}
 	else
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error loading manifest", MB_OK | MB_ICONEXCLAMATION );
 	}
 
 	if ( GetNumMaps() == 0 )
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Manifest file does not contain any maps!", MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest file does not contain any maps", MB_OK | MB_ICONEXCLAMATION );
 		return false;
 	}
 
@@ -493,8 +493,8 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	V_sprintf_safe( UserPrefsFileName, "%s.vmm_prefs", UserName );
 	V_strcat_safe( FileName, UserPrefsFileName );
 
-	FILE *fp = fopen( FileName, "rb" );
-	if ( !fp )
+	struct _stat fileInfo;
+	if ( _stat( FileName, &fileInfo ) )
 	{
 		return false;
 	}
@@ -536,7 +536,7 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	else
 	{
 		// no pref message for now
-//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error loading manifest", MB_OK | MB_ICONEXCLAMATION );
 	}
 
 	return true;
@@ -735,7 +735,7 @@ bool CManifest::SaveVMFManifestMaps( const char *pszFileName )
 
 	if ( !bSaved )
 	{
-		GetMainWnd()->MessageBox( "Not all pieces of the manifest were saved!", "Error saving Manifest!", MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( "Not all pieces of the manifest were saved!", "Hammer - Error saving Manifest", MB_OK | MB_ICONEXCLAMATION );
 	}
 
 	return bSaved;
@@ -1001,7 +1001,7 @@ void CManifest::SetPrimaryMap( CManifestMap	*pManifestMap )
 	{
 		m_pPrimaryMap->m_bPrimaryMap = false;
 		m_pPrimaryMap->m_Map->m_nNextMapObjectID = m_nNextMapObjectID;
-		m_pPrimaryMap->m_Map->m_nNextMapObjectID = m_nNextNodeID;
+		m_pPrimaryMap->m_Map->m_nNextNodeID = m_nNextNodeID;
 		m_pPrimaryMap->m_Map->SetEditable( false );
 	}
 
@@ -1016,7 +1016,7 @@ void CManifest::SetPrimaryMap( CManifestMap	*pManifestMap )
 		m_VisGroups = m_pPrimaryMap->m_Map->m_VisGroups;
 		m_RootVisGroups = m_pPrimaryMap->m_Map->m_RootVisGroups;
 		m_nNextMapObjectID = m_pPrimaryMap->m_Map->m_nNextMapObjectID;
-		m_nNextNodeID = m_pPrimaryMap->m_Map->m_nNextMapObjectID;
+		m_nNextNodeID = m_pPrimaryMap->m_Map->m_nNextNodeID;
 		m_pPrimaryMap->m_Map->SetEditable( !m_pPrimaryMap->m_bReadOnly );
 
 		m_pUndo = m_pPrimaryMap->m_Map->m_pUndo;
@@ -1253,6 +1253,9 @@ bool CManifest::AddExistingMap( const char *pszFileName, bool bFromInstance )
 
 	char FileExt[ MAX_PATH ];
 
+	// dimhotepus: Fast error path.
+	if (Q_isempty(pszFileName)) return false;
+
 	_splitpath_s( pszFileName, NULL, 0, NULL, 0, RelativeFileName, sizeof( RelativeFileName ), FileExt, sizeof( FileExt ) );
 	V_strcat_safe( RelativeFileName, FileExt );
 
@@ -1326,7 +1329,8 @@ bool CManifest::AddExistingMap( void )
 
 	CFileDialog dlg( TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf)|*.vmf||" );
 	dlg.m_ofn.lpstrInitialDir = szInitialDir;
-	int iRvl = dlg.DoModal();
+	dlg.m_ofn.lpstrTitle = "Open Valve Map File";
+	INT_PTR iRvl = dlg.DoModal();
 
 	if ( iRvl == IDCANCEL )
 	{

@@ -9,6 +9,8 @@
 #define ICONCOMBOBOX_H
 #pragma once
 
+#include "windows/base_combo_box.h"
+
 //=============================================================================
 //
 // Icon Combo Box
@@ -19,7 +21,7 @@
 //  HasStrings: checked
 //	VSCROLL
 //
-class CIconComboBox : public CComboBox
+class CIconComboBox : public CBaseComboBox
 {
 public:
 
@@ -59,8 +61,8 @@ public:
 	//
 	// Overrides
 	//
-	void MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct );
-	void DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct );
+	void MeasureItem( LPMEASUREITEMSTRUCT lpMeasureItemStruct ) override;
+	void DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct ) override;
 
 	//=========================================================================
 	//

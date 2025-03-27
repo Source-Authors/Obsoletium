@@ -119,7 +119,7 @@ private:
 		MoveLook = 1,
 	};
 
-	int m_iActiveCamera;
+	intp m_iActiveCamera;
 	// dimhotepus: int -> unsigned.
 	unsigned m_nMovePositionIndex;
 	Vector m_vOrgPos;

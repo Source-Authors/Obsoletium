@@ -155,6 +155,7 @@ IServerGameTags *serverGameTags = NULL;
 //			ft2 - 
 // Output : int
 //-----------------------------------------------------------------------------
+// dimhotepus: long -> time_t
 int Sys_CompareFileTime( time_t ft1, time_t ft2 )
 {
 	if ( ft1 < ft2 )

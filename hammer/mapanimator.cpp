@@ -308,7 +308,7 @@ void CMapAnimator::GetAnimationAtTime( CMapKeyFrame *currentKey, CMapKeyFrame *p
 {
 	// calculate the proportion of time to be spent on this keyframe
 	float animTime;
-	if ( currentKey->MoveTime() < 0.01 )
+	if ( currentKey->MoveTime() < 0.01f )
 	{
 		animTime = 1.0f;
 	}

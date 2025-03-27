@@ -219,9 +219,6 @@ void CMapCylinder::CalcBounds(BOOL bFullUpdate)
 		//
 		// Update the 3D bounds.
 		//
-		Vector Start;
-		Vector End;
-
 		Vector pStartVerts[CYLINDER_VERTEX_COUNT];
 		Vector pEndVerts[CYLINDER_VERTEX_COUNT];
 		ComputeCylinderPoints( CYLINDER_VERTEX_COUNT, pStartVerts, pEndVerts );
@@ -369,14 +366,14 @@ void CMapCylinder::OnParentKeyChanged( const char* key, const char* value )
 		if (m_pStartEntity && stricmp(key, m_szStartRadiusKey) == 0)
 		{
 			const char *pRadiusKey = m_pStartEntity->GetKeyValue( m_szStartRadiusKey );
-			m_flStartRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+			m_flStartRadius = pRadiusKey ? strtof( pRadiusKey, nullptr ) : 0.0f;
 			BuildCylinder();
 		}
 
 		if (m_pEndEntity && stricmp(key, m_szEndRadiusKey) == 0)
 		{
 			const char *pRadiusKey = m_pEndEntity->GetKeyValue( m_szEndRadiusKey );
-			m_flEndRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+			m_flEndRadius = pRadiusKey ? strtof( pRadiusKey, nullptr ) : 0.0f;
 			BuildCylinder();
 		}
 	}
@@ -405,12 +402,11 @@ void CMapCylinder::ComputeCylinderPoints( int nCount, Vector *pStartVerts, Vecto
 	}
 	VectorVectors( zvec, xvec, yvec );
 
-	int i;
-	float flDAngle = 2.0f * M_PI / nCount;
-	for ( i = 0; i < nCount; ++i )
+	float flDAngle = 2.0f * M_PI_F / nCount;
+	for ( int i = 0; i < nCount; ++i )
 	{
-		float flCosAngle = cos( flDAngle * i );
-		float flSinAngle = sin( flDAngle * i );
+		float flSinAngle, flCosAngle;
+		DirectX::XMScalarSinCos(&flSinAngle, &flCosAngle, flDAngle * i);
 
 		VectorMA( vecStart, flCosAngle * m_flStartRadius, xvec, pStartVerts[i] );
 		VectorMA( pStartVerts[i], flSinAngle * m_flStartRadius, yvec, pStartVerts[i] );
@@ -637,7 +633,7 @@ void CMapCylinder::UpdateDependencies(CMapWorld *pWorld, CMapClass *pObject)
 			if ( m_pStartEntity && m_szStartRadiusKey[0] != '\0' )
 			{
 				const char *pRadiusKey = m_pStartEntity->GetKeyValue( m_szStartRadiusKey );
-				m_flStartRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+				m_flStartRadius = pRadiusKey ? strtof( pRadiusKey, nullptr ) : 0.0f;
 			}
 		}
 
@@ -647,7 +643,7 @@ void CMapCylinder::UpdateDependencies(CMapWorld *pWorld, CMapClass *pObject)
 			if ( m_pEndEntity && m_szEndRadiusKey[0] != '\0' )
 			{
 				const char *pRadiusKey = m_pEndEntity->GetKeyValue( m_szEndRadiusKey );
-				m_flEndRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+				m_flEndRadius = pRadiusKey ? strtof( pRadiusKey, nullptr ) : 0.0f;
 			}
 		}
 

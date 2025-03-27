@@ -42,7 +42,7 @@ bool LoadBitmapFromFile( const char *relative, mxbitmapdata_t& bitmap )
 		if ( memdc )
 		{
 			char filename[ 512 ];
-			filesystem->RelativePathToFullPath( relative, "MOD", filename, sizeof( filename ) );
+			filesystem->RelativePathToFullPath_safe( relative, "MOD", filename );
 
 			bmNewImage = (HBITMAP)LoadImage( 
 				(HINSTANCE) GetModuleHandle(0), filename,
@@ -50,7 +50,7 @@ bool LoadBitmapFromFile( const char *relative, mxbitmapdata_t& bitmap )
 
 			if ( !bmNewImage )
 			{
-				filesystem->RelativePathToFullPath( relative, "GAME", filename, sizeof( filename ) );
+				filesystem->RelativePathToFullPath_safe( relative, "GAME", filename );
 
 				bmNewImage = (HBITMAP)LoadImage( 
 					(HINSTANCE) GetModuleHandle(0), filename,

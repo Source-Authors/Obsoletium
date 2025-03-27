@@ -12,10 +12,8 @@
 #endif
 
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
+
 #include "hammer_mathlib.h"
 #include "MapAtom.h"
 #include "DispManager.h"
@@ -355,7 +353,7 @@ public:
 
 	virtual void AddShadowingTriangles( CUtlVector<Vector> &tri_list );
 
-	DetailObjects		*m_pDetailObjects;
+	class DetailObjects		*m_pDetailObjects;
 	
 protected:
 
@@ -563,7 +561,7 @@ class CMapFaceList : public CUtlVector<CMapFace *>
 {
 public:
 
-	inline CMapFaceList(void) {}
+	inline CMapFaceList() = default;
 	inline CMapFaceList(CMapFaceList const &other);
 	inline CMapFaceList &CMapFaceList::operator =(CMapFaceList const &other);
 
@@ -618,7 +616,7 @@ class CMapFaceIDList : public CUtlVector<int>
 {
 public:
 
-	inline CMapFaceIDList(void) {}
+	inline CMapFaceIDList() = default;
 	inline CMapFaceIDList(CMapFaceIDList const &other);
 	inline CMapFaceIDList &CMapFaceIDList::operator =(CMapFaceIDList const &other);
 

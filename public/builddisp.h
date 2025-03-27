@@ -894,7 +894,7 @@ public:
 	const CDispNeighbor*	GetEdgeNeighbor( int iEdge ) const	{ return GetSurface()->GetEdgeNeighbor( iEdge ); }
 
 	void SetListIndex( intp nIndex )		{ m_nListIndex = nIndex; } 
-	intp GetListIndex( void )			{ return m_nListIndex; }
+	intp GetListIndex( void ) const			{ return m_nListIndex; }
 
 	CBitVec<MAX_DISPVERTS>&			GetAllowedVerts()		{ return m_AllowedVerts; }
 	const CBitVec<MAX_DISPVERTS>&	GetAllowedVerts() const	{ return m_AllowedVerts; }

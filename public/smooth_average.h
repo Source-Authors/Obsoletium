@@ -119,7 +119,7 @@ inline CTimingInfo< T > CalcSmoothAverage_Struct( const T &value, int nTimes, co
 	info.m_HighValue = pInfo->m_Values[0].m_Value;
 	info.m_LowValue = pInfo->m_Values[0].m_Value;
 
-	for ( int i=1; i < pInfo->m_Values.Count(); i++ )
+	for ( intp i=1; i < pInfo->m_Values.Count(); i++ )
 	{
 		if ( i != newValueIndex )
 		{

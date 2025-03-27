@@ -33,7 +33,7 @@ END_MESSAGE_MAP()
 // Input  : *pobj - Object to count.
 // Output : Returns TRUE to continue enumerating.
 //-----------------------------------------------------------------------------
-static BOOL CountObject(CMapClass *pobj, unsigned int dwParam)
+static BOOL CountObject(CMapClass *pobj, DWORD_PTR dwParam)
 {
 	CMapInfoDlg *pdlg = (CMapInfoDlg *)dwParam;
 
@@ -59,12 +59,17 @@ static BOOL CountObject(CMapClass *pobj, unsigned int dwParam)
 //			pParent
 //-----------------------------------------------------------------------------
 CMapInfoDlg::CMapInfoDlg(CMapWorld *pWorld, CWnd* pParent /*=NULL*/)
-	: CDialog(CMapInfoDlg::IDD, pParent)
+	: CBaseDlg(CMapInfoDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CMapInfoDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	this->pWorld = pWorld;
+
+	for ( auto &t : m_pTextures )
+	{
+		t = nullptr;
+	}
 }
 
 
@@ -112,10 +117,7 @@ void CMapInfoDlg::CountSolid(CMapSolid *pSolid)
 	for (UINT uFace = 0; uFace < uFaceCount; uFace++)
 	{
 		CMapFace *pFace = pSolid->GetFace(uFace);
-		if (pFace != NULL)
-		{
-			CountFace(pFace);
-		}
+		CountFace(pFace);
 	}
 }
 
@@ -148,8 +150,8 @@ void CMapInfoDlg::CountTexture(IEditorTexture *pTex)
 	//
 	// Calculate memory used by this texture.
 	//
-	short nWidth = pTex->GetWidth();
-	short nHeight = pTex->GetHeight();
+	int nWidth = pTex->GetWidth();
+	int nHeight = pTex->GetHeight();
 
 	m_uTextureMemory += nWidth * nHeight * 3;
 
@@ -202,7 +204,7 @@ BOOL CMapInfoDlg::OnInitDialog(void)
 	m_uTextureMemory = 0;
 
 	// count objects!
-	pWorld->EnumChildren(ENUMMAPCHILDRENPROC(CountObject), (DWORD)this);
+	pWorld->EnumChildren(CountObject, (DWORD_PTR)this);
 
 	char szBuf[128];
 	ultoa(m_uSolidCount, szBuf, 10);

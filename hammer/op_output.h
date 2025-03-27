@@ -32,6 +32,7 @@ enum SortDirection_t;
 class COP_OutputPickEntityTarget : public IPickEntityTarget
 {
 	public:
+		COP_OutputPickEntityTarget() : m_nDlgItem{-1}, m_pDlg{nullptr} {}
 
 		void AttachEntityDlg(COP_Output *pDlg) { m_pDlg = pDlg; }
 		void OnNotifyPickEntity(CToolPickEntity *pTool);

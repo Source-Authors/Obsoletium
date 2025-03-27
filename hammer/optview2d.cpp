@@ -19,9 +19,9 @@
 /////////////////////////////////////////////////////////////////////////////
 // COPTView2D property page
 
-IMPLEMENT_DYNCREATE(COPTView2D, CPropertyPage)
+IMPLEMENT_DYNCREATE(COPTView2D, CBasePropertyPage)
 
-COPTView2D::COPTView2D() : CPropertyPage(COPTView2D::IDD)
+COPTView2D::COPTView2D() : CBasePropertyPage(COPTView2D::IDD)
 {
 	//{{AFX_DATA_INIT(COPTView2D)
 	//}}AFX_DATA_INIT
@@ -77,7 +77,7 @@ void COPTView2D::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(COPTView2D, CPropertyPage)
+BEGIN_MESSAGE_MAP(COPTView2D, CBasePropertyPage)
 	//{{AFX_MSG_MAP(COPTView2D)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -87,12 +87,13 @@ END_MESSAGE_MAP()
 
 BOOL COPTView2D::OnInitDialog() 
 {
-	CWnd *pwnd = GetDlgItem(IDC_GRIDHIGH1024);
-	if (pwnd != NULL)
-	{
-		pwnd->EnableWindow(FALSE);
-		pwnd->ShowWindow(SW_HIDE);
-	}
+	// dimhotepus: Allow to control highlight of 1024 units in grid.
+	// CWnd *pwnd = GetDlgItem(IDC_GRIDHIGH1024);
+	// if (pwnd != NULL)
+	// {
+	// 	pwnd->EnableWindow(FALSE);
+	// 	pwnd->ShowWindow(SW_HIDE);
+	// }
 
 	__super::OnInitDialog();
 	return TRUE;

@@ -791,8 +791,8 @@ static void WriteShaderFiles(const char *pShaderName) {
     Msg("\b%c", chProgress[(++iProgressSymbol) % 4]);
   } else {
     char chShaderName[33];
-    Q_snprintf(chShaderName, 29, "%s...", pShaderName);
-    sprintf(chShaderName + sizeof(chShaderName) - 5, "...");
+    V_strcpy_safe(chShaderName, pShaderName);
+    V_strncpy(chShaderName + sizeof(chShaderName) - 4, "...", 4);
 
     Msg("\r%s %s   \r", szShaderFileOperation, chShaderName);
   }
@@ -1455,7 +1455,15 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
     void *pvMemory = shrmem.Lock();
     Assert(pvMemory);
 
-    Combo_FormatCommand(hCombo, (char *)pvMemory);
+    byte const *pBytes = (byte const *)pvMemory;
+    pBytes += sizeof(DWORD);
+    DWORD dwResultBufferLength = *(DWORD const *)pBytes;
+    pBytes += sizeof(DWORD);
+    pBytes += dwResultBufferLength;
+    pBytes += *pBytes ? V_strlen((const char *)pBytes) : 0;
+
+    Combo_FormatCommand(hCombo, (char *)pvMemory,
+                        pBytes - (byte const *)pvMemory);
 
     shrmem.Unlock();
   }
@@ -1470,7 +1478,7 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
     // when our subprocess dies and to recover we will
     // attempt to restart on another worker.
     if (!pvMemory)
-      // ::RaiseException( GetLastError(), EXCEPTION_NONCONTINUABLE, 0, NULL );
+    // ::RaiseException( GetLastError(), EXCEPTION_NONCONTINUABLE, 0, NULL );
     {
       Error("Unable to lock shared memory for combo 0x%p", hCombo);
       ExitProcess(1);
@@ -1552,8 +1560,8 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
     if (!szListing) {
       V_sprintf_safe(
           chUnreportedListing,
-              "(0): error 0000: Compiler failed without error description, "
-              "latest version of fxc.exe might give a description.");
+          "(0): error 0000: Compiler failed without error description, "
+          "latest version of fxc.exe might give a description.");
       szListing = chUnreportedListing;
     }
 

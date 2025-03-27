@@ -1286,7 +1286,7 @@ bool SVC_CreateStringTable::ReadFromBuffer( bf_read &buffer )
 	{
 		// table hosts filenames
 		m_bIsFilenames = true;
-		buffer.ReadByte();
+		(void)buffer.ReadByte();
 	}
 	else
 	{
@@ -1742,11 +1742,15 @@ bool SVC_Menu::WriteToBuffer( bf_write &buffer )
 	}
 
 	CUtlBuffer buf;
-	m_MenuKeyValues->WriteAsBinary( buf );
+	if ( !m_MenuKeyValues->WriteAsBinary( buf ) )
+	{
+		Warning( "Unable to write menu data to buffer.\n" );
+		return false;
+	}
 
 	if ( buf.TellPut() > 4096 )
 	{
-		Msg( "Too much menu data (4096 bytes max)\n" );
+		Warning( "Too much menu data %zd (4096 bytes max)\n", buf.TellPut() );
 		return false;
 	}
 
@@ -1776,14 +1780,12 @@ bool SVC_Menu::ReadFromBuffer( bf_read &buffer )
 	m_MenuKeyValues = new KeyValues( "menu" );
 	Assert( m_MenuKeyValues );
 	
-	m_MenuKeyValues->ReadAsBinary( buf );
-
-	return !buffer.IsOverflowed();
+	return m_MenuKeyValues->ReadAsBinary( buf ) && !buffer.IsOverflowed();
 }
 
 const char *SVC_Menu::ToString(void) const
 {
-	Q_snprintf(s_text, sizeof(s_text), "%s: %i \"%s\" (len:%i)", GetName(),
+	V_sprintf_safe(s_text, "%s: %i \"%s\" (len:%i)", GetName(),
 		m_Type, m_MenuKeyValues ? m_MenuKeyValues->GetName() : "No KeyValues", m_iLength );
 	return s_text;
 } 
@@ -1812,7 +1814,7 @@ bool SVC_GameEventList::ReadFromBuffer( bf_read &buffer )
 
 const char *SVC_GameEventList::ToString(void) const
 {
-	Q_snprintf(s_text, sizeof(s_text), "%s: number %i, bytes %i", GetName(), m_nNumEvents, Bits2Bytes(m_nLength) );
+	V_sprintf_safe(s_text, "%s: number %i, bytes %i", GetName(), m_nNumEvents, Bits2Bytes(m_nLength) );
 	return s_text;
 } 
 
@@ -1833,7 +1835,7 @@ bool MM_Heartbeat::ReadFromBuffer( bf_read &buffer )
 
 const char *MM_Heartbeat::ToString( void ) const
 {
-	Q_snprintf( s_text, sizeof( s_text ), "Heartbeat" );
+	V_sprintf_safe( s_text, "Heartbeat" );
 	return s_text;
 }
 

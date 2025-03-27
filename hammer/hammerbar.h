@@ -18,6 +18,7 @@
 #pragma once
 
 #include "utlvector.h"
+#include "windows/dpi_wnd_behavior.h"
 
 #define RIGHT_JUSTIFY	0x01
 #define BOTTOM_JUSTIFY	0x02
@@ -58,10 +59,16 @@ class CHammerBar : public CDialogBar
 		CUtlVector< ControlInfo_t > m_ControlList;
 
 	protected:
-
-		afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);		
+		
+		afx_msg int OnCreate(LPCREATESTRUCT lpcs);
+		afx_msg void OnDestroy();
+		afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
+		afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 
 		DECLARE_MESSAGE_MAP() 
+
+	private:
+		se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
 

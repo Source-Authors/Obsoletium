@@ -15,6 +15,7 @@
 #include "datacache/imdlcache.h"
 #include "vphysics_interface.h"
 #include "vcollide_parse.h"
+#include "tier0/platform.h"
 
 
 struct studiohdr_t;
@@ -55,7 +56,7 @@ public:
 	ICollisionQuery *m_pCollisionModel;
 };
 
-class IStudioPhysics
+abstract_class IStudioPhysics
 {
 public:
 	virtual ~IStudioPhysics( void ) {}

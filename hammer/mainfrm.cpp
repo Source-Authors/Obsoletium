@@ -5,17 +5,15 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include <afxadv.h>
-#include <oaidl.h>
+#include "MainFrm.h"
+
 #include "hammer.h"
 #include "Box3D.h"				// For units
 #include "FaceEditSheet.h"
-#include "MainFrm.h"
 #include "MessageWnd.h"
 #include "ControlBarIDs.h"
 #include "CustomMessages.h"
 #include "DynamicDialogWnd.h"
-#include "filesystem_tools.h"
 #include "GlobalFunctions.h"
 #include "Prefabs.h"
 #include "PrefabsDlg.h"
@@ -37,10 +35,12 @@
 #include "TextureSystem.h"
 #include "ToolManager.h"
 #include "Material.h"
-#include "materialsystem/imaterialsystem.h"
-#include "materialsystem/MaterialSystem_Config.h"
 #include "soundbrowser.h"
 #include "lprvwindow.h"
+
+#include "filesystem_tools.h"
+#include "materialsystem/imaterialsystem.h"
+#include "materialsystem/MaterialSystem_Config.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -61,6 +61,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	ON_WM_CLOSE()
 	ON_WM_DESTROY()
 	ON_WM_PAINT()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	ON_WM_TIMER()
 	ON_COMMAND(ID_TOOLS_OPTIONS, OnToolsOptions)
 	ON_COMMAND(ID_TOOLS_PREFABFACTORY, OnToolsPrefabfactory)
@@ -145,7 +146,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 END_MESSAGE_MAP()
 
 
-static UINT indicators[] =
+static constexpr UINT indicators[] =
 {
 	ID_SEPARATOR,           // status line indicator
 	ID_INDICATOR_SELECTION,
@@ -156,16 +157,19 @@ static UINT indicators[] =
 };
 
 
-const int NUMSTATUSPANES = 7;
 
 constexpr inline char WINSTATEFILENAME[] = "winstate.wc";
+constexpr char WINSTATETAG[] = "WCWINSTATE";
+constexpr inline float	 fVersion = 0.2f;
 
-const char * WINSTATETAG = "WCWINSTATE";
-const int	 WINSTATEEND = -1;
-const int	 WINSTATE2DVIEW = 0;
-const int	 WINSTATE3DVIEW = 1;
-const int	 WINSTATELOGICALVIEW = 2;
-const float	 fVersion = 0.1f;
+enum ViewWindowState_t : int
+{
+	End = -1,
+	View2D = 0,
+	View3D = 1,
+	Logical = 2
+};
+
 
 
 struct
@@ -174,12 +178,12 @@ struct
 	UINT nID;
 	UINT nStyle;
 	int cxWidth;
-} paneinfo[NUMSTATUSPANES] = 
+} paneinfo[] = 
 {
 	{ SBI_PROMPT,		ID_SEPARATOR,				SBPS_STRETCH | SBPS_NOBORDERS, 0 },
 	{ SBI_SELECTION,	ID_INDICATOR_SELECTION,		SBPS_NORMAL, 300 },
 	{ SBI_COORDS,		ID_INDICATOR_COORDS,		SBPS_NORMAL, 100 },
-	{ SBI_SIZE,			ID_INDICATOR_SIZE,			SBPS_NORMAL, 180 },
+	{ SBI_SIZE,			ID_INDICATOR_SIZE,			SBPS_NORMAL, 200 },
 	{ SBI_GRIDZOOM,		ID_INDICATOR_GRIDZOOM,		SBPS_NORMAL, 80 },
 	{ SBI_SNAP,			ID_INDICATOR_SNAP,			SBPS_NORMAL, 135 },
 	{ SBI_LIGHTPROGRESS,ID_INDICATOR_LIGHTPROGRESS,	SBPS_NORMAL, 50 }
@@ -193,24 +197,24 @@ static CMainFrame *pMainWnd;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
-CMainFrame::CMainFrame(void)
+CMainFrame::CMainFrame()
 {
 	pTextureBrowser = NULL;
 	pObjectProperties = NULL;
-	m_bUndoActive = TRUE;
-	m_bShellSessionActive = false;
 	m_pFaceEditSheet = NULL;
-	m_bMinimized = false;
-	m_pSearchReplaceDlg = NULL;
 	m_pLightingPreviewOutputWindow = NULL;
 	m_bLightingPreviewOutputWindowShowing = false;
+	m_pSearchReplaceDlg = NULL;
+	m_bUndoActive = TRUE;
+	m_bMinimized = false;
+	m_bShellSessionActive = false;
 }
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Destructor.
 //-----------------------------------------------------------------------------
-CMainFrame::~CMainFrame(void)
+CMainFrame::~CMainFrame()
 {
 	delete pObjectProperties;
 	delete pTextureBrowser;
@@ -284,7 +288,6 @@ void CMainFrame::OnEnterMenuLoop( BOOL bIsTrackPopupMenu )
 	if ( pDoc )
 	{
 		CBaseTool *pTool = pDoc->GetTools()->GetActiveTool();
-
 		if ( pTool && pTool->IsTranslating() )
 		{
 			SendMessage( WM_CANCELMODE );
@@ -299,24 +302,32 @@ void CMainFrame::OnEnterMenuLoop( BOOL bIsTrackPopupMenu )
 //-----------------------------------------------------------------------------
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	const DWORD dwDefStyles = WS_CHILD | WS_VISIBLE | CBRS_TOP;
+	constexpr DWORD dwDefStyles = WS_CHILD | WS_VISIBLE | CBRS_TOP;
+
 	lpCreateStruct->lpszClass = "VALVEWORLDCRAFT";
 
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-    if(!wndMDIClient.SubclassWindow(m_hWndMDIClient)) 
+	if (!wndMDIClient.SubclassWindow(m_hWndMDIClient)) 
 	{ 
-		TRACE ("Failed to subclass MDI client window\n");
-		return (-1);                                        
-    }                                                       
+		TRACE("Failed to subclass MDI client window\n");
+		return -1;
+	}
+
+	if (!m_dpi_behavior.OnCreateWindow(m_hWnd))
+	{
+		TRACE("Failed to create DPI window behavior for main window\n");
+		return -1;
+	}
 
 	//
 	// Map view toolbar.
 	//
-	if (!m_wndMapToolBar.Create(this, dwDefStyles, IDCB_MAPVIEWBAR) || !m_wndMapToolBar.LoadToolBar(IDR_MAPDOC_VALVE))
+	if (!m_wndMapToolBar.Create(this, dwDefStyles, IDCB_MAPVIEWBAR) ||
+		!m_wndMapToolBar.LoadToolBarForDpi(IDR_MAPDOC_VALVE))
 	{
-		TRACE0("Failed to create toolbar\n");
+		TRACE0("Failed to create map view toolbar\n");
 		return -1;      // fail to create
 	}
 	m_wndMapToolBar.ModifyStyle(0, TBSTYLE_FLAT); 
@@ -324,9 +335,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	// Undo redo toolbar.
 	//
-	if (!m_wndUndoRedoToolBar.Create(this, dwDefStyles, IDCB_UNDO_REDO_BAR) || !m_wndUndoRedoToolBar.LoadToolBar(IDR_UNDOREDO))
+	if (!m_wndUndoRedoToolBar.Create(this, dwDefStyles, IDCB_UNDO_REDO_BAR) ||
+		!m_wndUndoRedoToolBar.LoadToolBarForDpi(IDR_UNDOREDO))
 	{
-		TRACE0("Failed to create toolbar\n");
+		TRACE0("Failed to create undo/redo toolbar\n");
 		return -1;      // fail to create
 	}
 	m_wndUndoRedoToolBar.ModifyStyle(0, TBSTYLE_FLAT); 
@@ -336,16 +348,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	m_wndMapEditToolBar.Create(this, dwDefStyles, IDCB_MAPTOOLSBAR);
 	m_wndMapEditToolBar.ModifyStyle(0, TBSTYLE_FLAT); 
-	m_wndMapEditToolBar.LoadToolBar(IDR_MAPEDITTOOLS_VALVE);
+	m_wndMapEditToolBar.LoadToolBarForDpi(IDR_MAPEDITTOOLS_VALVE);
     m_bmMapEditTools256.LoadBitmap(IDB_MAPEDITTOOLS_256);
-    m_wndMapEditToolBar.SetBitmap((HBITMAP)m_bmMapEditTools256);
+    m_wndMapEditToolBar.SetBitmap(m_bmMapEditTools256);
 
 	//
 	// Map operations toolbar.
 	//
-	if (!m_wndMapOps.Create(this, dwDefStyles, IDCB_MAPOPERATIONS) || !m_wndMapOps.LoadToolBar(IDR_MAPOPERATIONS_VALVE))
+	if (!m_wndMapOps.Create(this, dwDefStyles, IDCB_MAPOPERATIONS) ||
+		!m_wndMapOps.LoadToolBarForDpi(IDR_MAPOPERATIONS_VALVE))
 	{
-		TRACE0("Failed to create toolbar\n");
+		TRACE0("Failed to create map operations toolbar\n");
 		return -1;      // fail to create
 	}
 	m_wndMapOps.ModifyStyle(0, TBSTYLE_FLAT); 
@@ -353,15 +366,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	// Status bar.
 	//
-	if (!m_wndStatusBar.Create(this) || !m_wndStatusBar.SetIndicators(NULL, NUMSTATUSPANES))
+	if (!m_wndStatusBar.Create(this) ||
+		!m_wndStatusBar.SetIndicators(NULL, ssize(paneinfo)))
 	{
 		TRACE0("Failed to create status bar\n");
 		return -1;      // fail to create
 	}
 
-	for(int i = 0; i < NUMSTATUSPANES; i++)
+	for ( auto &pi : paneinfo )
 	{
-		m_wndStatusBar.SetPaneInfo(paneinfo[i].nIndex, paneinfo[i].nID,	paneinfo[i].nStyle, paneinfo[i].cxWidth);
+		const int scaledWidth = m_dpi_behavior.ScaleOnX(pi.cxWidth);
+		m_wndStatusBar.SetPaneInfo(pi.nIndex, pi.nID, pi.nStyle, scaledWidth);
 	}
 
 	EnableDocking(CBRS_ALIGN_ANY);
@@ -412,8 +427,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockControlBar(&m_ManifestFilterControl, AFX_IDW_DOCKBAR_RIGHT);
 	
 	
-
-
 	m_pFaceEditSheet = new CFaceEditSheet( "Face Edit Sheet", this );
 	m_pFaceEditSheet->Setup();
 	m_pFaceEditSheet->Create( this );
@@ -457,7 +470,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	CRect clientrect;
 	wndMDIClient.GetClientRect(clientrect);
-	g_pwndMessage->CreateMessageWindow( this, CRect( 0, clientrect.Height() - 90, clientrect.Width(), clientrect.Height() ) );
+	g_pwndMessage->CreateMessageWindow( this, CRect( 0, clientrect.Height() - m_dpi_behavior.ScaleOnY(90), clientrect.Width(), clientrect.Height() ) );
 
 	CPrefabLibrary::LoadAllLibraries();
 
@@ -719,11 +732,7 @@ void CMainFrame::UpdateAllDocViews(DWORD dwCmd)
 // Input  : bActive - TRUE to activate, FALSE to deactivate.
 //			hTask - task becoming active.
 //-----------------------------------------------------------------------------
-#if _MSC_VER < 1300
-void CMainFrame::OnActivateApp(BOOL bActive, HTASK hTask)
-#else
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD hTask)
-#endif
 {
 	CMDIFrameWnd::OnActivateApp(bActive, hTask);
 
@@ -787,7 +796,12 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		CRect clientrect;
 		wndMDIClient.GetClientRect(clientrect);
 
-		g_pwndMessage->Resize(CRect(0, clientrect.Height() - 130, clientrect.Width(), clientrect.Height()));
+		CRect messageRect(0,
+			clientrect.Height() - m_dpi_behavior.ScaleOnY(130),
+			clientrect.Width(),
+			clientrect.Height()
+		);
+		g_pwndMessage->Resize(messageRect);
 	}
 }
 
@@ -899,8 +913,17 @@ void CMainFrame::OnClose()
 //-----------------------------------------------------------------------------
 void CMainFrame::OnDestroy(void)
 {
-	CMDIFrameWnd::OnDestroy();
-	PostQuitMessage(-1);
+	m_dpi_behavior.OnDestroyWindow();
+
+	if(!wndMDIClient.UnsubclassWindow()) 
+	{ 
+		TRACE ("Failed to unsubclass MDI client window\n");
+		PostQuitMessage(-1);
+		return;
+	}
+
+	__super::OnDestroy();
+	PostQuitMessage(0);
 }
 
 
@@ -920,13 +943,28 @@ void CMainFrame::OnPaint(void)
 	}
 }
 
+LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	const LRESULT rc{m_dpi_behavior.OnWindowDpiChanged(wParam, lParam)};
+
+	// Status bar will not get notification, need to do manually.
+	m_wndStatusBar.SendMessage(WM_DPICHANGED, wParam, lParam);
+
+	// Toolbars will not get notification, need to do manually.
+	m_wndMapToolBar.SendMessage(WM_DPICHANGED, wParam, lParam);
+	m_wndUndoRedoToolBar.SendMessage(WM_DPICHANGED, wParam, lParam);
+	m_wndMapEditToolBar.SendMessage(WM_DPICHANGED, wParam, lParam);
+	m_wndMapOps.SendMessage(WM_DPICHANGED, wParam, lParam);
+
+	return rc;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: This is called ONCE when the splash wnd is to be destroyed. OnPaint()
 //			sets the timer.  This is now also called for the autosave timer.
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMainFrame::OnTimer(UINT nIDEvent) 
+void CMainFrame::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (!::IsWindow(m_hWnd))
 	{
@@ -1157,7 +1195,7 @@ void CMainFrame::OnHelpFinder(void)
 //-----------------------------------------------------------------------------
 BOOL CMainFrame::OnHelpInfo(HELPINFO *pHelpInfo)
 {
-	return(Default());
+	return(Default()) != 0;
 }
 
 
@@ -1251,7 +1289,7 @@ void CMainFrame::GlobalNotify(int nCode)
 			if (pDoc != NULL)
 			{
 				pDoc->UpdateStatusbar();
-				//m_AnimationDlg.SelectionChanged(*pDoc->Selection_GetList());
+				//m_AnimationDlg.SelectionChanged( *pDoc->GetSelection()->GetList() );
 			}
 
 			m_ManifestFilterControl.UpdateManifestList();
@@ -1310,21 +1348,28 @@ BOOL CMainFrame::OnFileNew(UINT)
 //-----------------------------------------------------------------------------
 void CMainFrame::SaveWindowStates(std::fstream *pFile)
 {
-	char szRootDir[MAX_PATH];
-	char szFullPath[MAX_PATH];
+	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
+	if (!pDoc)
+	{
+		AfxMessageBox("Please open the map first.\n\nNeed all opened windows be present to save window states.", MB_ICONWARNING);
+		return;
+	}
+
+	char szRootDir[MAX_PATH], szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
 	V_MakeAbsolutePath( szFullPath, WINSTATEFILENAME, szRootDir ); 
 
 	std::fstream file(szFullPath, std::ios::out | std::ios::binary);
-
-	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
-	if (pDoc == NULL)
+	if (!file.is_open())
 	{
+		CString fmt;
+		fmt.Format("Unable to save window states to '%s'.", szFullPath);
+		AfxMessageBox(fmt.GetString(), MB_ICONERROR);
 		return;
 	}
 
 	file.write(WINSTATETAG, sizeof WINSTATETAG);
-	file.write((char*) &fVersion, sizeof fVersion);
+	file.write((const char*) &fVersion, sizeof fVersion);
 
 	CRect rectClient;
 	::GetClientRect(m_hWndMDIClient, &rectClient);
@@ -1338,21 +1383,25 @@ void CMainFrame::SaveWindowStates(std::fstream *pFile)
 		//
 		// Determine what type of view it is.
 		//
-		int iDrawType;
+		ViewWindowState_t iViewState;
+		DrawType_t iDrawType;
 		if (pView->IsKindOf(RUNTIME_CLASS(CMapView2D)))
 		{
-			file.write((char*) &WINSTATE2DVIEW, sizeof WINSTATE2DVIEW);
-			iDrawType = (int)((CMapView2D*)pView)->GetDrawType();
+			iViewState = ViewWindowState_t::View2D;
+			file.write((const char*) &iViewState, sizeof iViewState);
+			iDrawType = ((CMapView2D*)pView)->GetDrawType();
 		}
 		else if (pView->IsKindOf(RUNTIME_CLASS(CMapView3D)))
 		{
-			file.write((char*) &WINSTATE3DVIEW, sizeof WINSTATE3DVIEW);
-			iDrawType = (int)((CMapView3D*)pView)->GetDrawType();
+			iViewState = ViewWindowState_t::View3D;
+			file.write((const char*) &iViewState, sizeof iViewState);
+			iDrawType = ((CMapView3D*)pView)->GetDrawType();
 		}
 		else if (pView->IsKindOf(RUNTIME_CLASS(CMapViewLogical)))
 		{
-			file.write((char*) &WINSTATELOGICALVIEW, sizeof WINSTATELOGICALVIEW);
-			iDrawType = (int)((CMapViewLogical*)pView)->GetDrawType();
+			iViewState = ViewWindowState_t::Logical;
+			file.write((const char*) &iViewState, sizeof iViewState);
+			iDrawType = ((CMapViewLogical*)pView)->GetDrawType();
 		}
 		else
 		{
@@ -1365,30 +1414,36 @@ void CMainFrame::SaveWindowStates(std::fstream *pFile)
 		//
 		// Write view's draw type.
 		//
-		file.write((char*) &iDrawType, sizeof iDrawType);
+		file.write((const char*) &iDrawType, sizeof iDrawType);
+
+		//
+		// Write view splitter state.
+		//
+		// CChildFrame *pFrame = (CChildFrame *)pView->GetParentFrame();
+		// file.write((const char *)&pFrame->bUsingSplitter, sizeof(BOOL));
 
 		//
 		// Write position of view.
 		//
 		CRect rectView;
-		pView->GetParentFrame()->GetWindowRect(&rectView);
+		pView->GetWindowRect(&rectView);
 		CPoint pt1 = rectView.TopLeft(), pt2 = rectView.BottomRight();
 		::ScreenToClient(m_hWndMDIClient, &pt1);
 		::ScreenToClient(m_hWndMDIClient, &pt2);
 	
-		double left, top, right, bottom;
-		left =		double(pt1.x) / double(rectClient.right);
-		top =		double(pt1.y) / double(rectClient.bottom);
-		right =		double(pt2.x) / double(rectClient.right);
-		bottom =	double(pt2.y) / double(rectClient.bottom);
+		double left =	double(pt1.x) / rectClient.right;
+		double top =	double(pt1.y) / rectClient.bottom;
+		double right =	double(pt2.x) / rectClient.right;
+		double bottom =	double(pt2.y) / rectClient.bottom;
 
-		file.write((char*) &left, sizeof left);
-		file.write((char*) &top, sizeof top);
-		file.write((char*) &right, sizeof right);
-		file.write((char*) &bottom, sizeof bottom);
+		file.write((const char*) &left, sizeof left);
+		file.write((const char*) &top, sizeof top);
+		file.write((const char*) &right, sizeof right);
+		file.write((const char*) &bottom, sizeof bottom);
 	}
 
-	file.write((char *)&WINSTATEEND, sizeof WINSTATEEND);
+	constexpr auto end = ViewWindowState_t::End;
+	file.write((const char *)&end, sizeof end);
 }
 
 
@@ -1398,34 +1453,40 @@ void CMainFrame::SaveWindowStates(std::fstream *pFile)
 //-----------------------------------------------------------------------------
 void CMainFrame::LoadWindowStates(std::fstream *pFile)
 {
-	char szRootDir[MAX_PATH];
-	char szFullPath[MAX_PATH];
+	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
+	if (!pDoc)
+	{
+		AfxMessageBox("Please open the map first.\n\nNeed all opened windows be present to load window states.", MB_ICONWARNING);
+		return;
+	}
+
+	char szRootDir[MAX_PATH], szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
 	V_MakeAbsolutePath( szFullPath, WINSTATEFILENAME, szRootDir ); 
 
 	std::fstream file( szFullPath, std::ios::in | std::ios::binary );
-
 	if (!file.is_open())
 	{
+		CString fmt;
+		fmt.Format("Unable to load window states from '%s'.", szFullPath);
+		AfxMessageBox(fmt.GetString(), MB_ICONERROR);
 		return;
 	}
 
-	char tag[sizeof(WINSTATETAG)];
+	char tag[ssize(WINSTATETAG)];
 	file.read(tag, sizeof tag);
 
 	if(memcmp(tag, WINSTATETAG, sizeof tag))
 	{
-		file.seekg(-int(sizeof(tag)));
+		file.seekg(-ssize(tag));
+		CString fmt;
+		fmt.Format("Unable to load window states from '%s'.\n\nFile is in incorrect format or broken.", szFullPath);
+		AfxMessageBox(fmt.GetString(), MB_ICONERROR);
 		return;
 	}
 
 	float fThisVersion;
 	file.read((char*) &fThisVersion, sizeof fThisVersion);
-
-	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
-
-	if(!pDoc)
-		return;
 
 	// get client rect of MDI CHILD for relative positioning information
 	CRect rectClient;
@@ -1442,14 +1503,14 @@ void CMainFrame::LoadWindowStates(std::fstream *pFile)
 
 	while (1)
 	{
-		int iViewType;
+		ViewWindowState_t iViewType = ViewWindowState_t::End;
 		file.read((char *)&iViewType, sizeof iViewType);
-		if ((file.eof()) || (iViewType == WINSTATEEND))
+		if ((file.eof()) || (iViewType == ViewWindowState_t::End))
 		{
 			break;
 		}
 
-		int iDrawType;
+		DrawType_t iDrawType = DrawType_t::VIEW_INVALID;
 		file.read((char *)&iDrawType, sizeof iDrawType);
 
 		CView *pView = NULL;
@@ -1465,13 +1526,13 @@ void CMainFrame::LoadWindowStates(std::fstream *pFile)
 				continue;
 
 			// make sure it's the right type ..
-			if (iViewType == WINSTATE2DVIEW && !pThisView->IsKindOf(RUNTIME_CLASS(CMapView2D)))
+			if (iViewType == ViewWindowState_t::View2D && !pThisView->IsKindOf(RUNTIME_CLASS(CMapView2D)))
 				continue;
 
-			if (iViewType == WINSTATELOGICALVIEW && !pThisView->IsKindOf(RUNTIME_CLASS(CMapViewLogical)))
+			if (iViewType == ViewWindowState_t::Logical && !pThisView->IsKindOf(RUNTIME_CLASS(CMapViewLogical)))
 				continue;
 
-			if (iViewType == WINSTATE3DVIEW && !pThisView->IsKindOf(RUNTIME_CLASS(CMapView3D)))
+			if (iViewType == ViewWindowState_t::View3D && !pThisView->IsKindOf(RUNTIME_CLASS(CMapView3D)))
 				continue;
 
 			// yes! so modify this one.
@@ -1511,7 +1572,7 @@ void CMainFrame::LoadWindowStates(std::fstream *pFile)
 		// no redraws right now, please.
 		pFrame->SetRedraw(FALSE);
 
-		if (iViewType == WINSTATE3DVIEW)
+		if (iViewType == ViewWindowState_t::View3D)
 		{
 			//
 			// Handle import of old WinState files before draw types were consolidated
@@ -1519,18 +1580,23 @@ void CMainFrame::LoadWindowStates(std::fstream *pFile)
 			//
 			if ((iDrawType >= VIEW2D_XY) && (iDrawType <= VIEW2D_XZ))
 			{
-				iDrawType += 3;
+				iDrawType = static_cast<DrawType_t>(to_underlying(iDrawType) + 3);
 			}
-			pFrame->SetViewType((DrawType_t)iDrawType);
+			pFrame->SetViewType(iDrawType);
 		}
-		else if (iViewType == WINSTATE2DVIEW)
+		else if (iViewType == ViewWindowState_t::View2D)
 		{
-			pFrame->SetViewType((DrawType_t)iDrawType);
+			pFrame->SetViewType(iDrawType);
 		}
-		else if (iViewType == WINSTATELOGICALVIEW)
+		else if (iViewType == ViewWindowState_t::Logical)
 		{
-			pFrame->SetViewType( (DrawType_t)iDrawType );
+			pFrame->SetViewType(iDrawType);
 		}
+
+		// read splitter state.
+		// BOOL bUsingSplitter = FALSE;
+		// file.read((char*) &bUsingSplitter, sizeof(bUsingSplitter));
+		// pFrame->bUsingSplitter = bUsingSplitter;
 		
 		// read positioning info
 		double left, top, right, bottom;
@@ -1538,18 +1604,20 @@ void CMainFrame::LoadWindowStates(std::fstream *pFile)
 		file.read((char*) &top, sizeof top);
 		file.read((char*) &right, sizeof right);
 		file.read((char*) &bottom, sizeof bottom);
+
 		CRect r;
-		r.left		= int(left * double(rectClient.right));
-		r.top		= int(top * double(rectClient.bottom));
-		r.right		= int(right * double(rectClient.right));
-		r.bottom	= int(bottom * double(rectClient.bottom));
+		r.left		= long(left * rectClient.right);
+		r.top		= long(top * rectClient.bottom);
+		r.right		= long(right * rectClient.right);
+		r.bottom	= long(bottom * rectClient.bottom);
 
 		// Set the frame's position.
-		pFrame->MoveWindow(&r, FALSE);
+		pView->MoveWindow(&r, FALSE);
 
 		// Call OnInitialUpdate before any rendering takes place.
 		if (bNew)
 		{
+			pFrame->MoveWindow(&r, FALSE);
 			pTemplate->InitialUpdateFrame(pFrame, pDoc, TRUE);
 		}
 
@@ -1572,9 +1640,10 @@ void CMainFrame::OnInitMenu( CMenu *pMenu )
 
 void CMainFrame::OnHDR( void )
 {
-	CMenu *pMenu= GetMenu();
+	CMenu *pMenu = GetMenu();
 
 	UINT state = pMenu->GetMenuState(ID_HDR, MF_BYCOMMAND);
+	Assert(state != 0xFFFFFFFF);
 	
 	if (state & MF_CHECKED)
 	{
@@ -1586,6 +1655,7 @@ void CMainFrame::OnHDR( void )
 		pMenu->CheckMenuItem(ID_HDR, MF_CHECKED | MF_BYCOMMAND);
 		g_bHDR = true;
 	}
+
 	DrawMenuBar();
 	SignalUpdate( EVTYPE_LIGHTING_CHANGED );
 }

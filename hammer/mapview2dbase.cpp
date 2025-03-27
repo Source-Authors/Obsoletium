@@ -36,8 +36,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-
-#define SnapToGrid(line,grid) (line - (line % grid))
+[[nodiscard]] constexpr inline int SnapToGrid(int line, int grid) {
+  return line - (line % grid);
+}
 
 #define ZOOM_MIN_DEFAULT	0.02125
 #define ZOOM_MAX			256.0
@@ -107,21 +108,27 @@ CMapView2DBase::CMapView2DBase(void)
 	m_flMinZoom = ZOOM_MIN_DEFAULT;
 
 	m_fZoom = -1;			// make sure setzoom performs
+	m_fClientWidthHalf = 0.0f;
+	m_fClientHeightHalf = 0.0f;
 	m_vViewOrigin.Init();
 	
+	m_vViewAxis.Init();
 	m_ViewMin.Init();
 	m_ViewMax.Init();
 
+	m_ClientHeight = m_ClientWidth = 0;
 	m_xScroll = m_yScroll = 0;
+	m_bToolShown = false;
+
 	m_bActive = false;
 	m_bMouseDrag = false;
 	
 	m_pCamera = new CCamera();
-
 	m_pCamera->SetOrthographic( 0.25f, -99999, 99999 );
 
-	m_pRender = new CRender2D();
+	m_ptLDownClient = {-1, -1};
 
+	m_pRender = new CRender2D();
 	m_pRender->SetView( this );
 
 	m_pRender->SetDefaultRenderMode( RENDER_MODE_FLAT_NOZ );
@@ -286,7 +293,7 @@ void CMapView2DBase::SetColorMode(bool bWhiteOnBlack)
 	m_clrGridCustom.SetColor( GetRValue(clr), GetGValue(clr), GetBValue(clr), 255 );
 	if (Options.colors.bScaleGrid10Color)
 	{
-		AdjustColorIntensity(m_clrGridCustom, 1.5 * Options.view2d.iGridIntensity);
+		AdjustColorIntensity(m_clrGridCustom, 3 * Options.view2d.iGridIntensity / 2);
 	}
 	
 
@@ -442,7 +449,7 @@ void CMapView2DBase::DrawGrid(CRender2D *pRender, int xAxis, int yAxis, float de
 
 			while( nNumPoints > 0)
 			{
-                float roundfx = (int)(v2D.x+0.5);
+                float roundfx = (float)(int)(v2D.x+0.5f);
 				v2D.x += fOffset;
 
 				meshBuilder.Position3f( roundfx, v2D.y, 0 );
@@ -752,7 +759,7 @@ void CMapView2DBase::UpdateClientView(void)
 	Assert( m_ViewMin.z <= m_ViewMax.z );
 
 	OnRenderListDirty();
-	m_bUpdateView = true;
+	//m_bUpdateView = true;
 
 	UpdateStatusBar();
 }
@@ -981,11 +988,7 @@ void CMapView2DBase::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case '9':
 		case '0':
 		{
-			int iZoom = nChar - '1';
-			if (nChar == '0')
-			{
-				iZoom = 9;
-			}
+			int iZoom = nChar != '0' ? nChar - '1' : 9;
 			SetZoom(m_flMinZoom * (1 << iZoom));
 			break;
 		}
@@ -1701,7 +1704,7 @@ void CMapView2DBase::OnRButtonDown(UINT nFlags, CPoint point)
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapView2DBase::OnTimer(UINT nIDEvent) 
+void CMapView2DBase::OnTimer(UINT_PTR nIDEvent) 
 {
 	if ( nIDEvent == TIMER_SCROLLVIEW )
 	{
@@ -1923,7 +1926,7 @@ void CMapView2DBase::GetBestTransformPlane( Vector &horzAxis, Vector &vertAxis, 
 //-----------------------------------------------------------------------------
 void CMapView2DBase::ZoomIn(BOOL bAllViews)
 {
-	float newZoom = m_fZoom * 1.2;
+	float newZoom = m_fZoom * 1.2f;
 	SetZoom( newZoom );
 
 	//
@@ -1950,7 +1953,7 @@ void CMapView2DBase::ZoomIn(BOOL bAllViews)
 //-----------------------------------------------------------------------------
 void CMapView2DBase::ZoomOut(BOOL bAllViews)
 {
-	SetZoom(m_fZoom / 1.2);
+	SetZoom(m_fZoom / 1.2f);
 
 	//
 	// Set all doc 2d view zooms to this zoom level.
@@ -2002,7 +2005,7 @@ bool CMapView2DBase::CanBoxFitInView(const Vector &minsWorld, const Vector &maxs
 void CMapView2DBase::RenderView()
 {
 	DrawVGuiPanel();
-	m_bUpdateView = false;
+	//m_bUpdateView = false;
 }
 
 LRESULT CMapView2DBase::WindowProc( UINT message, WPARAM wParam, LPARAM lParam )

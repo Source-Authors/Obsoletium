@@ -28,6 +28,7 @@ CEditPrefabDlg::CEditPrefabDlg(CWnd* pParent /*=NULL*/)
 	m_strName = _T("");
 	//}}AFX_DATA_INIT
 
+	m_dwLibraryID = static_cast<DWORD>(-1);
 	iMaxDescriptChars = 80;
 	iMaxNameChars = 30;
 	m_bEnableLibrary = FALSE;

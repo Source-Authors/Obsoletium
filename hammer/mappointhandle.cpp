@@ -270,7 +270,7 @@ void CMapPointHandle::Render3D(CRender3D *pRender)
 		pRender->GetCamera()->GetViewPoint(vecViewPoint);
 		float flDist = (m_Origin - vecViewPoint).Length();
 
-		pRender->RenderSphere(m_Origin, 0.04 * flDist, 12, 12, 128, 128, 255);
+		pRender->RenderSphere(m_Origin, 0.04f * flDist, 12, 12, 128, 128, 255);
 
 		if ((m_pParent != NULL) && (m_bDrawLineToParent))
 		{

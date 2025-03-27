@@ -8,10 +8,12 @@
 // OPTView3D.h : header file
 //
 
+#include "windows/base_property_page.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // COPTView3D dialog
 
-class COPTView3D : public CPropertyPage
+class COPTView3D : public CBasePropertyPage
 {
 	DECLARE_DYNCREATE(COPTView3D)
 

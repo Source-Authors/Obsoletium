@@ -1547,7 +1547,7 @@ template<size_t size>
 // dimhotepus: Fast integral -> char conversion.
 template<size_t size, typename TIntegral>
 constexpr inline std::enable_if_t<std::is_integral_v<TIntegral>, std::errc>
-V_to_chars(OUT_Z_CAP(size) char (&buffer)[size], TIntegral value, int base = 10)
+V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TIntegral value, int base = 10)
 {
 	// Do not NULL terminate, so be careful.
 	const std::to_chars_result result{std::to_chars(buffer, buffer + size, value, base)};
@@ -1575,7 +1575,7 @@ V_to_chars(OUT_Z_CAP(size) char (&buffer)[size], TIntegral value, int base = 10)
 // dimhotepus: Fast floating point -> char conversion.
 template<size_t size, typename TFloat>
 constexpr inline std::enable_if_t<std::is_floating_point_v<TFloat>, std::errc>
-V_to_chars(OUT_Z_CAP(size) char (&buffer)[size], TFloat value)
+V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TFloat value)
 {
 	// Do not NULL terminate, so be careful.
 	const std::to_chars_result result{std::to_chars(buffer, buffer + size, value)};

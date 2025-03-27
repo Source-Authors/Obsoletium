@@ -34,7 +34,7 @@ struct MaterialCacheEntry_t;
 class IMaterialEnumerator
 {
 public:
-	virtual bool EnumMaterial( const char *pMaterialName, int nContext ) = 0;
+	virtual bool EnumMaterial( const char *pMaterialName, intp nContext ) = 0;
 };
 
 
@@ -46,7 +46,7 @@ class CMaterial : public IEditorTexture
 public:
 	static bool Initialize( HWND hwnd );
 	static void ShutDown(void);
-	static void	EnumerateMaterials( IMaterialEnumerator *pEnum, const char *szRoot, int nContext, int nFlags = INCLUDE_ALL_MATERIALS );
+	static void	EnumerateMaterials( IMaterialEnumerator *pEnum, const char *szRoot, intp nContext, int nFlags = INCLUDE_ALL_MATERIALS );
 	static CMaterial *CreateMaterial( const char *pszMaterialName, bool bLoadImmediately, bool* pFound = 0 );
 
 	virtual ~CMaterial(void);
@@ -80,7 +80,7 @@ public:
 
 	inline CPalette *GetPalette(void) const
 	{
-		return(NULL);
+		return nullptr;
 	}
 
 	inline int GetSurfaceAttributes(void) const
@@ -155,11 +155,11 @@ protected:
 
 	// Finds all .VMT files in a particular directory
 	static bool LoadMaterialsInDirectory( char const* pDirectoryName, int nDirectoryNameLen, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags );
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags );
 
 	// Discovers all .VMT files lying under a particular directory recursively
 	static bool InitDirectoryRecursive( char const* pDirectoryName, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags );
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags );
 
 	CMaterial(void);
 	bool LoadMaterialHeader(IMaterial *material);

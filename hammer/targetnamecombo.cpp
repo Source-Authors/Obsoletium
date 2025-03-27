@@ -71,7 +71,7 @@ void CTargetNameComboBox::CreateFonts()
 	//
 	if (!m_BoldFont.m_hObject)
 	{
-		CFont &nf = GetNormalFont();
+		DpiAwareFont &nf = GetNormalFont();
 		
 		if ( nf.m_hObject )
 		{
@@ -182,7 +182,7 @@ void CTargetNameComboBox::OnTextChanged( const char *pText )
 		nCount = pList->Count();
 	
 	// Figure out the font and color that we want.
-	CFont *pWantedFont = &m_BoldFont;
+	DpiAwareFont *pWantedFont = &m_BoldFont;
 	if ( (nCount == 0) || (nCount == 1) )
 		pWantedFont = &GetNormalFont();
 

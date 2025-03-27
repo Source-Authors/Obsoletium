@@ -1809,8 +1809,9 @@ void CPanelAnimationDictionary::PanelAnimationDumpVars( char const *className )
 //-----------------------------------------------------------------------------
 CPanelAnimationDictionary& GetPanelAnimationDictionary()
 {
-	static CPanelAnimationDictionary dictionary;
-	return dictionary;
+	// dimhotepus: Intentional leak.
+	static CPanelAnimationDictionary *dictionary = new CPanelAnimationDictionary();
+	return *dictionary;
 }
 
 //-----------------------------------------------------------------------------

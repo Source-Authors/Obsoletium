@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+﻿//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -20,43 +20,61 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "mdlviewer.h"
+
 #include <mxtk/mx.h>
 #include <mxtk/mxTga.h>
 #include <mxtk/mxEvent.h>
-#include "mdlviewer.h"
+
+#include "appframework/appframework.h"
+
+#include "tier0/icommandline.h"
+#include "tier0/threadtools.h"
+#include "tier1/strtools.h"
+#include "tier1/tier1.h"
+
+#include "vstdlib/IKeyValuesSystem.h"
+
+#include "datacache/imdlcache.h"
+#include "datacache/idatacache.h"
+
+#include "materialsystem/imaterialsystem.h"
+#include "materialsystem/imaterialsystemhardwareconfig.h"
+
+#include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "soundsystem/isoundsystem.h"
+
 #include "ViewerSettings.h"
 #include "MatSysWin.h"
 #include "ControlPanel.h"
 #include "StudioModel.h"
 #include "FileAssociation.h"
-#include "tier1/strtools.h"
-#include "tier0/icommandline.h"
 #include "filesystem.h"
 #include "ifilesystemopendialog.h"
-#include "appframework/appframework.h"
 #include "istudiorender.h"
-#include "materialsystem/imaterialsystem.h"
 #include "vphysics_interface.h"
-#include "Datacache/imdlcache.h"
-#include "datacache/idatacache.h"
 #include "filesystem_init.h"
-#include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "SoundEmitterSystem/isoundemittersystembase.h"
-#include "soundsystem/isoundsystem.h"
-#include "tier1/tier1.h"
 #include "valve_ipc_win32.h"
-#include "threadtools.h"
-#include "vstdlib/IKeyValuesSystem.h"
+#include "tools_minidump.h"
+
+#include "../out/build/app_version_config.h"
+
+#ifdef WIN32
+#include "windows/scoped_timer_resolution.h"
+
+#include <shellapi.h>
+#endif
 
 bool g_bOldFileDialogs = false;
 
 MDLViewer *g_MDLViewer = 0;
-char g_appTitle[] = "Half-Life Model Viewer v1.22";
+#ifdef PLATFORM_64BITS
+char g_appTitle[] = "Valve Model Viewer v" SRC_PRODUCT_FILE_VERSION_INFO_STRING " - 64 bit";
+#else
+char g_appTitle[] = "Valve Model Viewer v" SRC_PRODUCT_FILE_VERSION_INFO_STRING;
+#endif
 static char recentFiles[8][256] = { "", "", "", "", "", "", "", "" };
 extern int g_dxlevel;
 bool g_bInError = false;
@@ -79,8 +97,8 @@ ISoundSystem *g_pSoundSystem;
 CreateInterfaceFn g_Factory;
 
 // Filesystem dialog module wrappers.
-CSysModule *g_pFSDialogModule = 0;
-CreateInterfaceFn g_FSDialogFactory = 0;
+CSysModule *g_pFSDialogModule = nullptr;
+CreateInterfaceFnT<IFileSystemOpenDialog> g_FSDialogFactory = nullptr;
 
 
 class CHlmvIpcServer : public CValveIpcServerUtl
@@ -96,7 +114,7 @@ public:
 	void PopCommand();
 
 protected:
-	virtual BOOL ExecuteCommand( CUtlBuffer &cmd, CUtlBuffer &res );
+	BOOL ExecuteCommand( CUtlBuffer &cmd, CUtlBuffer &res ) override;
 
 protected:
 	CThreadFastMutex m_mtx;
@@ -116,7 +134,7 @@ void LoadFileSystemDialogModule()
 	g_pFSDialogModule = Sys_LoadModule( "filesystemopendialog" DLL_EXT_STRING );
 	if ( g_pFSDialogModule )
 	{
-		g_FSDialogFactory = Sys_GetFactory( g_pFSDialogModule );
+		g_FSDialogFactory = Sys_GetFactory<IFileSystemOpenDialog>( g_pFSDialogModule );
 	}
 
 	if ( !g_pFSDialogModule || !g_FSDialogFactory )
@@ -124,7 +142,7 @@ void LoadFileSystemDialogModule()
 		if ( g_pFSDialogModule )
 		{
 			Sys_UnloadModule( g_pFSDialogModule );
-			g_pFSDialogModule = NULL;
+			g_pFSDialogModule = nullptr;
 		}
 	}
 }
@@ -145,7 +163,7 @@ MDLViewer::initRecentFiles ()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		if (strlen (recentFiles[i]))
+		if (!Q_isempty (recentFiles[i]))
 		{
 			mb->modify (IDC_FILE_RECENTMODELS1 + i, IDC_FILE_RECENTMODELS1 + i, recentFiles[i]);
 		}
@@ -163,8 +181,8 @@ void
 MDLViewer::loadRecentFiles ()
 {
 	char path[256];
-	strcpy (path, mx::getApplicationPath ());
-	strcat (path, "/hlmv.rf");
+	V_strcpy_safe (path, mx::getApplicationPath ());
+	V_strcat_safe (path, "/hlmv.rf");
 	FILE *file = fopen (path, "rb");
 	if (file)
 	{
@@ -179,9 +197,8 @@ void
 MDLViewer::saveRecentFiles ()
 {
 	char path[256];
-
-	strcpy (path, mx::getApplicationPath ());
-	strcat (path, "/hlmv.rf");
+	V_strcpy_safe (path, mx::getApplicationPath ());
+	V_strcat_safe (path, "/hlmv.rf");
 
 	FILE *file = fopen (path, "wb");
 	if (file)
@@ -222,7 +239,6 @@ AccelTableEntry_t accelTable[] =					{{VK_F1, IDC_FLUSH_SHADERS,		mx::ACCEL_VIRT
 													{'T', IDC_ACCEL_TANGENTS,		mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY},
 													{'s', IDC_ACCEL_SHADOW,			mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY},
 													{'S', IDC_ACCEL_SHADOW,			mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY}};
-#define NUM_ACCELERATORS ARRAYSIZE( accelTable )
 
 
 MDLViewer::MDLViewer ()
@@ -328,7 +344,7 @@ MDLViewer::MDLViewer ()
 
 	menuView->addSeparator ();
 	menuView->add ("Show Activities", IDC_VIEW_ACTIVITIES);
-	menuView->add ("Show hidden", IDC_VIEW_HIDDEN );
+	menuView->add ("Show Hidden", IDC_VIEW_HIDDEN );
 
 #ifdef WIN32
 	menuHelp->add ("Goto Homepage...", IDC_HELP_GOTOHOMEPAGE);
@@ -338,9 +354,6 @@ MDLViewer::MDLViewer ()
 
 
 	d_MatSysWindow = new MatSysWindow (this, 0, 0, 100, 100, "", mxWindow::Normal);
-#ifdef WIN32
-	// SetWindowLong ((HWND) d_MatSysWindow->getHandle (), GWL_EXSTYLE, WS_EX_CLIENTEDGE);
-#endif
 
 	d_cpl = new ControlPanel (this);
 	d_cpl->setMatSysWindow (d_MatSysWindow);
@@ -351,17 +364,25 @@ MDLViewer::MDLViewer ()
 	loadRecentFiles ();
 	initRecentFiles ();
 
-	LoadViewerRootSettings( );
-
-	// FIXME: where do I actually find the domain size of the viewport, especially for multi-monitor
-	// try to catch weird initialization error
-	if (g_viewerSettings.xpos < -16384)
-		g_viewerSettings.xpos = 20;
-	if (g_viewerSettings.ypos < -16384)
-		g_viewerSettings.ypos = 20;
-	g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
-	g_viewerSettings.width = max( 640, g_viewerSettings.width );
-	g_viewerSettings.height = max( 700, g_viewerSettings.height );
+	if ( !LoadViewerRootSettings( ) )
+	{
+		// dimhotepus: Center window when no settings.
+		
+		const int displayWidth = mx::getDisplayWidth();
+		const int displayHeight = mx::getDisplayHeight();
+		
+		g_viewerSettings.width  = max( 1024, displayWidth / 2 );
+		g_viewerSettings.height = max( 768, displayHeight / 2 );
+		g_viewerSettings.xpos   = max( ( displayWidth - g_viewerSettings.width ) / 2, 0 );
+		g_viewerSettings.ypos   = max( ( displayHeight - g_viewerSettings.height ) / 2, 0 );
+	}
+	else
+	{
+		g_viewerSettings.xpos  = max( 0, g_viewerSettings.xpos );
+		g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
+		g_viewerSettings.width = max( 1024, g_viewerSettings.width );
+		g_viewerSettings.height = max( 768, g_viewerSettings.height );
+	}
 
 	setBounds( g_viewerSettings.xpos, g_viewerSettings.ypos, g_viewerSettings.width, g_viewerSettings.height );
 	setVisible (true);
@@ -370,11 +391,11 @@ MDLViewer::MDLViewer ()
 	CUtlVector< mx::Accel_t > accelerators;
 	mx::Accel_t accel;
 
-	for (int i=0; i < NUM_ACCELERATORS; i++)
+	for (auto &t : accelTable)
 	{
-		accel.flags	  = accelTable[i].flags ;
-		accel.key	  = accelTable[i].key;
-		accel.command = accelTable[i].command;
+		accel.flags	  = t.flags ;
+		accel.key	  = t.key;
+		accel.command = t.command;
 		accelerators.AddToTail( accel );
 	}
 
@@ -421,7 +442,7 @@ void MDLViewer::Refresh( void )
 	if ( recentFiles[0][0] != '\0' )
 	{
 		char szFile[MAX_PATH];
-		strcpy( szFile, recentFiles[0] );
+		V_strcpy_safe( szFile, recentFiles[0] );
 		g_pMaterialSystem->ReloadMaterials();
 		d_cpl->loadModel( szFile );
 	}
@@ -436,7 +457,7 @@ void MDLViewer::LoadModelFile( const char *pszFile, int slot )
 {
 	// copy off name, pszFile may be point into recentFiles array
 	char filename[1024];
-	strcpy( filename, pszFile );
+	V_strcpy_safe( filename, pszFile );
 
 	LoadModelResult_t eLoaded = d_cpl->loadModel( filename, slot );
 
@@ -478,10 +499,10 @@ void MDLViewer::LoadModelFile( const char *pszFile, int slot )
 		// shift down existing recent files
 		for (i = ((i > 7) ? 7 : i); i > 0; i--)
 		{
-			strcpy (recentFiles[i], recentFiles[i-1]);
+			V_strcpy_safe (recentFiles[i], recentFiles[i-1]);
 		}
 
-		strcpy( recentFiles[0], filename );
+		V_strcpy_safe( recentFiles[0], filename );
 
 		initRecentFiles ();
 
@@ -502,7 +523,7 @@ void MDLViewer::LoadModelFile( const char *pszFile, int slot )
 void MDLViewer::SaveScreenShot( const char *pszFile )
 {
 	char filename[1024];
-	strcpy( filename, pszFile );
+	V_strcpy_safe( filename, pszFile );
 	LoadModelResult_t eLoaded = d_cpl->loadModel( filename );
 
 	//
@@ -516,7 +537,7 @@ void MDLViewer::SaveScreenShot( const char *pszFile )
 
 		// Build the name of the TGA to write.
 		char szScreenShot[256];
-		strcpy(szScreenShot, filename);
+		V_strcpy_safe(szScreenShot, filename);
 		char *pchDot = strrchr(szScreenShot, '.');
 		if (pchDot)
 		{
@@ -524,7 +545,7 @@ void MDLViewer::SaveScreenShot( const char *pszFile )
 		}
 		else
 		{
-			strcat(szScreenShot, ".tga");
+			V_strcat_safe(szScreenShot, ".tga");
 		}
 
 		// Center the view and write the TGA.
@@ -541,7 +562,7 @@ void MDLViewer::SaveScreenShot( const char *pszFile )
 void MDLViewer::DumpText( const char *pszFile )
 {
 	char filename[1024];
-	strcpy( filename, pszFile );
+	V_strcpy_safe( filename, pszFile );
 	LoadModelResult_t eLoaded = d_cpl->loadModel( filename );
 
 	//
@@ -571,12 +592,11 @@ const char* MDLViewer::SteamGetOpenFilename()
 
 	static char filename[MAX_PATH];
 
-	IFileSystemOpenDialog *pDlg;
-	pDlg = (IFileSystemOpenDialog*)g_FSDialogFactory( FILESYSTEMOPENDIALOG_VERSION, NULL );
+	IFileSystemOpenDialog *pDlg = g_FSDialogFactory( FILESYSTEMOPENDIALOG_VERSION, NULL );
 	if ( !pDlg )
 	{
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
+		V_sprintf_safe( str, "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
 		MessageBox( NULL, str, "Error", MB_OK );
 		return NULL;
 	}
@@ -646,7 +666,7 @@ MDLViewer::handleEvent (mxEvent *event)
 						break;
 					}
 				}
-				strcpy( g_viewerSettings.mergeModelFile[iChosenSlot], ptr );
+				V_strcpy_safe( g_viewerSettings.mergeModelFile[iChosenSlot], ptr );
 				LoadModelFile( ptr, iChosenSlot );
 			}
 		}
@@ -667,7 +687,7 @@ MDLViewer::handleEvent (mxEvent *event)
 						break;
 					}
 				}
-				strcpy( g_viewerSettings.mergeModelFile[iChosenSlot], pFilename );
+				V_strcpy_safe( g_viewerSettings.mergeModelFile[iChosenSlot], pFilename );
 				LoadModelFile( pFilename, iChosenSlot );
 			}
 		}
@@ -787,9 +807,9 @@ MDLViewer::handleEvent (mxEvent *event)
 		{
 			float *cols[4] = { g_viewerSettings.bgColor, g_viewerSettings.gColor, g_viewerSettings.lColor, g_viewerSettings.aColor };
 			float *col = cols[event->action - IDC_OPTIONS_COLORBACKGROUND];
-			int r = (int) (col[0] * 255.0f);
-			int g = (int) (col[1] * 255.0f);
-			int b = (int) (col[2] * 255.0f);
+			auto r = (unsigned char) (col[0] * 255.0f);
+			auto g = (unsigned char) (col[1] * 255.0f);
+			auto b = (unsigned char) (col[2] * 255.0f);
 			if (mxChooseColor (this, &r, &g, &b))
 			{
 				col[0] = (float) r / 255.0f;
@@ -917,13 +937,13 @@ MDLViewer::handleEvent (mxEvent *event)
 
 #ifdef WIN32
 		case IDC_HELP_GOTOHOMEPAGE:
-			ShellExecute (0, "open", "http://www.swissquake.ch/chumbalum-soft/index.html", 0, 0, SW_SHOW);
+			ShellExecute (0, "open", "https://chumba.ch/chumbalum-soft/hlmv/index.html", 0, 0, SW_SHOW);
 			break;
 #endif
 
 		case IDC_HELP_ABOUT:
 			mxMessageBox (this,
-				"Half-Life Model Viewer v2.0 (c) 2004 Valve Corp.\n"
+				"Valve Model Viewer v" SRC_PRODUCT_FILE_VERSION_INFO_STRING " (c) 2004-2025 Valve Corp.\n"
 				"Portions (c) 1999 by Mete Ciragan\n\n"
 				"Left-drag inside circle to spin.\n"
 				"Left-drag outside circle to rotate.\n"
@@ -931,9 +951,10 @@ MDLViewer::handleEvent (mxEvent *event)
 				"Shift-left-drag to x-y-pan.\n"
 				"Shift-right-drag to z-pan.\n"
 				"Ctrl-left-drag to move light.\n\n"
-				"Build:\t" __DATE__ ".\n"
+				"Build:\t" __DATE__ "\n"
 				"Email:\tmete@swissquake.ch\n"
-				"Web:\thttp://www.swissquake.ch/chumbalum-soft/", "About Half-Life Model Viewer",
+				"Web:\thttps://www.chumba.ch/chumbalum-soft/hlmv/index.html",
+				"About Valve Model Viewer",
 				MX_MB_OK | MX_MB_INFORMATION);
 			break;
 
@@ -1092,7 +1113,7 @@ MDLViewer::handleEvent (mxEvent *event)
 
 
 
-void TranslateMayaToHLMVCoordinates( const Vector &vMayaPos, const QAngle &vMayaRot, Vector &vHLMVPos, QAngle &vHLMVAngles )
+static void TranslateMayaToHLMVCoordinates( const Vector &vMayaPos, const QAngle &vMayaRot, Vector &vHLMVPos, QAngle &vHLMVAngles )
 {
 	vHLMVPos.Init( vMayaPos.z, vMayaPos.x, vMayaPos.y );
 
@@ -1127,11 +1148,11 @@ void MDLViewer::handleIpcCommand( char *szCommand )
 		QAngle vMayaRot;
 
 		char szFirstPart[32];
-		sscanf( szCommand, "%s %f %f %f %f %f %f",
+		sscanf( szCommand, "%31s %f %f %f %f %f %f",
 			szFirstPart,
 			&vMayaPos.x, &vMayaPos.y, &vMayaPos.z, 
 			&vMayaRot.x, &vMayaRot.y, &vMayaRot.z );
-
+		szFirstPart[ssize(szFirstPart) - 1] = '\0';
 
 		//
 		// Obviously, this could all be simplified, but it's nice to make it easy to see what it's doing here.
@@ -1311,15 +1332,17 @@ void MDLViewer::SendLightRotToLinkedHlmv()
 SpewRetval_t HLMVSpewFunc( SpewType_t spewType, char const *pMsg )
 {
 	g_bInError = true;
+
+	Plat_DebugString(pMsg);
+
 	switch (spewType)
 	{
 	case SPEW_ERROR:
-		MessageBox(NULL, pMsg, "FATAL ERROR", MB_OK);
+		mxMessageBox(nullptr, pMsg, "Valve Model Viewer - Error", MX_MB_OK | MX_MB_ERROR);
 		g_bInError = false;
 		return SPEW_ABORT;
 
 	default:
-		OutputDebugString(pMsg);
 		g_bInError = false;
 #ifdef _DEBUG
 		return spewType == SPEW_ASSERT ? SPEW_DEBUGGER : SPEW_CONTINUE;
@@ -1336,12 +1359,17 @@ SpewRetval_t HLMVSpewFunc( SpewType_t spewType, char const *pMsg )
 class CHLModelViewerApp : public CSteamAppSystemGroup
 {
 public:
+	CHLModelViewerApp() : scoped_spew_output_{HLMVSpewFunc} {}
+
 	// Methods of IApplication
-	virtual bool Create();
-	virtual bool PreInit();
-	virtual int Main();
-	virtual void PostShutdown();
-	virtual void Destroy();
+	bool Create() override;
+	bool PreInit() override;
+	int Main() override;
+	void PostShutdown() override;
+	void Destroy() override;
+
+private:
+	const ScopedSpewOutputFunc scoped_spew_output_;
 };
 
 
@@ -1350,8 +1378,6 @@ public:
 //-----------------------------------------------------------------------------
 bool CHLModelViewerApp::Create()
 {
-	SpewOutputFunc( HLMVSpewFunc );
-
 	g_dxlevel = CommandLine()->ParmValue( "-dx", 0 );
 	g_bOldFileDialogs = ( CommandLine()->FindParm( "-olddialogs" ) != 0 );
 
@@ -1376,32 +1402,34 @@ bool CHLModelViewerApp::Create()
 			"Unable to add launcher systems from *" DLL_EXT_STRING
 			"s. Looks like required components are missed or broken.");
 		return false;
+	}
 
-	g_pFileSystem = (IFileSystem*)FindSystem( FILESYSTEM_INTERFACE_VERSION );
-	g_pMaterialSystem = (IMaterialSystem*)FindSystem( MATERIAL_SYSTEM_INTERFACE_VERSION );
-	g_pMaterialSystemHardwareConfig = (IMaterialSystemHardwareConfig*)FindSystem( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION );
-	g_pStudioRender = (IStudioRender*)FindSystem( STUDIO_RENDER_INTERFACE_VERSION );
-	g_pDataCache = (IDataCache*)FindSystem( DATACACHE_INTERFACE_VERSION );
-	g_pMDLCache = (IMDLCache*)FindSystem( MDLCACHE_INTERFACE_VERSION );
-	g_pStudioDataCache = (IStudioDataCache*)FindSystem( STUDIO_DATA_CACHE_INTERFACE_VERSION ); 
-	physcollision = (IPhysicsCollision *)FindSystem( VPHYSICS_COLLISION_INTERFACE_VERSION );
-	physprop = (IPhysicsSurfaceProps *)FindSystem( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION );
-	g_pSoundEmitterBase = (ISoundEmitterSystemBase *)FindSystem( SOUNDEMITTERSYSTEM_INTERFACE_VERSION );
-	g_pSoundSystem = (ISoundSystem *)FindSystem( SOUNDSYSTEM_INTERFACE_VERSION );
+	g_pFileSystem = FindSystem<IFileSystem>( FILESYSTEM_INTERFACE_VERSION );
+	g_pMaterialSystem = FindSystem<IMaterialSystem>( MATERIAL_SYSTEM_INTERFACE_VERSION );
+	g_pMaterialSystemHardwareConfig = FindSystem<IMaterialSystemHardwareConfig>( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION );
+	g_pStudioRender = FindSystem<IStudioRender>( STUDIO_RENDER_INTERFACE_VERSION );
+	g_pDataCache = FindSystem<IDataCache>( DATACACHE_INTERFACE_VERSION );
+	g_pMDLCache = FindSystem<IMDLCache>( MDLCACHE_INTERFACE_VERSION );
+	g_pStudioDataCache = FindSystem<IStudioDataCache>( STUDIO_DATA_CACHE_INTERFACE_VERSION ); 
+	physcollision = FindSystem<IPhysicsCollision>( VPHYSICS_COLLISION_INTERFACE_VERSION );
+	physprop = FindSystem<IPhysicsSurfaceProps>( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION );
+	g_pSoundEmitterBase = FindSystem<ISoundEmitterSystemBase>( SOUNDEMITTERSYSTEM_INTERFACE_VERSION );
+	g_pSoundSystem = FindSystem<ISoundSystem>( SOUNDSYSTEM_INTERFACE_VERSION );
 
-	if ( !g_pFileSystem || !physprop || !physcollision || !g_pMaterialSystem || !g_pStudioRender || !g_pMDLCache || !g_pDataCache )
+	if ( !g_pFileSystem || !physprop || !physcollision ||
+		!g_pMaterialSystem || !g_pStudioRender || !g_pMDLCache ||
+		!g_pDataCache )
 	{
 		Error("Unable to load required library interface!\n");
 	}
 
 	const char *pShaderDLL = CommandLine()->ParmValue("-shaderdll");
-    const char *pArg;
-	if ( CommandLine()->CheckParm( "-shaderapi", &pArg ))
+	if (const char *pArg; CommandLine()->CheckParm("-shaderapi", &pArg))
 	{
 		pShaderDLL = pArg;
 	}
 	
-	if(!pShaderDLL)
+	if (!pShaderDLL)
 	{
 		pShaderDLL = "shaderapidx9" DLL_EXT_STRING;
 	}
@@ -1437,16 +1465,15 @@ bool CHLModelViewerApp::PreInit( )
 	ConnectTier1Libraries( &factory, 1 );
 	ConVar_Register( 0 );
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
 
 	// Add paths...
 	if ( !SetupSearchPaths( NULL, false, true ) )
 		return false;
 
 	// Get the adapter from the command line....
-	const char *pAdapterString;
 	int nAdapter = 0;
-	if (CommandLine()->CheckParm( "-adapter", &pAdapterString ))
+	if ( const char *pAdapterString; CommandLine()->CheckParm( "-adapter", &pAdapterString ) )
 	{
 		nAdapter = atoi( pAdapterString );
 	}
@@ -1458,14 +1485,11 @@ bool CHLModelViewerApp::PreInit( )
 	}
 
 	g_pMaterialSystem->SetAdapter( nAdapter, nAdapterFlags );
-
-	g_bOldFileDialogs = true;
-	if ( CommandLine()->FindParm( "-NoSteamdDialog" ) )
-		g_bOldFileDialogs = false;
+	g_bOldFileDialogs = !CommandLine()->FindParm( "-NoSteamdDialog" );
 	
 	LoadFileSystemDialogModule();
 
-	return true; 
+	return true;
 }
 
 void CHLModelViewerApp::PostShutdown()
@@ -1483,9 +1507,13 @@ int CHLModelViewerApp::Main()
 	g_pMaterialSystem->ModInit();
 	g_pSoundEmitterBase->ModInit();
 
+	// dimhotepus: Double cache size on x86-64.
+#ifdef PLATFORM_64BITS
+	g_pDataCache->SetSize( 2 * 64 * 1024 * 1024 );
+#else
 	g_pDataCache->SetSize( 64 * 1024 * 1024 );
+#endif
 
-	//mx::setDisplayMode (0, 0, 0);
 	g_MDLViewer = new MDLViewer ();
 	g_MDLViewer->setMenuBar (g_MDLViewer->getMenuBar ());
 
@@ -1494,9 +1522,8 @@ int CHLModelViewerApp::Main()
 	g_pStudioModel->ClearLookTargets( );
 
 	// Load up the initial model
-	const char *pMdlName = NULL;
-	int nParmCount = CommandLine()->ParmCount();
-	if ( nParmCount > 1 )
+	const char *pMdlName = nullptr;
+	if (int nParmCount = CommandLine()->ParmCount(); nParmCount > 1)
 	{
 		pMdlName = CommandLine()->GetParm( nParmCount - 1 );
 	}
@@ -1504,7 +1531,7 @@ int CHLModelViewerApp::Main()
 	if ( pMdlName && Q_stristr( pMdlName, ".mdl" ) )
 	{
 		char absPath[MAX_PATH];
-		Q_MakeAbsolutePath( absPath, sizeof( absPath ), pMdlName );
+		V_MakeAbsolutePath( absPath, pMdlName );
 
 		if ( CommandLine()->FindParm( "-screenshot" ) )
 		{
@@ -1531,15 +1558,14 @@ int CHLModelViewerApp::Main()
 static bool CHLModelViewerApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsSteamSetupInfo, char *pchPathBuffer, int nBufferLength, bool *pbBubbleDirectories )
 {
 	const char *pMdlName = NULL;
-	int nParmCount = CommandLine()->ParmCount();
-	if ( nParmCount > 1 )
+	if ( int nParmCount = CommandLine()->ParmCount(); nParmCount > 1 )
 	{
 		pMdlName = CommandLine()->GetParm( nParmCount - 1 );
 	}
 
 	if ( pMdlName && Q_stristr( pMdlName, ".mdl" ) )
 	{
-		Q_MakeAbsolutePath( pchPathBuffer, nBufferLength, pMdlName );
+		V_MakeAbsolutePath( pchPathBuffer, nBufferLength, pMdlName );
 
 		if ( pbBubbleDirectories )
 			*pbBubbleDirectories = true;
@@ -1556,13 +1582,38 @@ static bool CHLModelViewerApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFs
 //-----------------------------------------------------------------------------
 int main (int argc, char *argv[])
 {
+	// Install an exception handler.
+	const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+
 	CommandLine()->CreateCmdLine( argc, argv );
-	mx::init( argc, argv );
+
+#ifdef _WIN32
+	using namespace std::chrono_literals;
+	constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
+
+	// System timer precision affects Sleep & friends performance.
+	const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
+		kSystemTimerResolution};
+	if (!scoped_timer_resolution) {
+		Warning(
+			"Unable to set Windows timer resolution to %lld ms. Will use default "
+			"one.",
+			static_cast<long long>(kSystemTimerResolution.count()));
+	}
+#endif
+
+	if (!mx::init( argc, argv ))
+	{
+		mxMessageBox( nullptr,
+			"Sorry, unable to initialize UI toolkit.",
+			"Valve Model Viewer - Error",
+			MX_MB_OK | MX_MB_ERROR );
+		return 1;
+	}
 
 	// make sure we start in the right directory
 	char szName[256];
-	strcpy( szName, mx::getApplicationPath() );
-	// mx_setcwd (szName);
+	V_strcpy_safe( szName, mx::getApplicationPath() );
 
 	// Set game info directory suggestion callback
 	const ScopedSuggestGameInfoDir scoped_suggest_game_info_dir( CHLModelViewerApp_SuggestGameInfoDirFn );
@@ -1578,9 +1629,9 @@ int main (int argc, char *argv[])
 
 CHlmvIpcServer::~CHlmvIpcServer()
 {
-	for ( int k = 0; k < m_lstCommands.Count(); ++ k )
+	for ( auto &c : m_lstCommands )
 	{
-		delete [] m_lstCommands[k];
+		delete [] c;
 	}
 	m_lstCommands.Purge();
 }
@@ -1615,8 +1666,8 @@ void CHlmvIpcServer::PopCommand()
 
 BOOL CHlmvIpcServer::ExecuteCommand(CUtlBuffer &cmd, CUtlBuffer &res)
 {
-	char *szCommand = ( char * ) cmd.Base();
-	int nLen = strlen( szCommand );
+	char *szCommand = cmd.Base<char>();
+	intp nLen = V_strlen( szCommand );
 	while ( nLen > 0 && V_isspace( szCommand[ nLen - 1 ] ) )
 		-- nLen;
 

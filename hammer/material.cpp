@@ -41,10 +41,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
-
-#define _GraphicCacheAllocate(n)	malloc(n)
-
 
 MaterialSystem_Config_t g_materialSystemConfig;
 static MaterialHandle_t g_CurrMaterial;
@@ -74,7 +70,7 @@ public:
 	//-----------------------------------------------------------------------------
 	static PreviewImageRetVal_t GetPreviewImageProperties( IMaterial *pMaterial, int *width, int *height, ImageFormat *imageFormat, bool* isTranslucent )
 	{
-		int i = s_PreviewImagePropertiesCache.Find( pMaterial );
+		auto i = s_PreviewImagePropertiesCache.Find( pMaterial );
 		if ( i == s_PreviewImagePropertiesCache.InvalidIndex() )
 		{
 			// Add an entry to the cache.
@@ -198,6 +194,7 @@ CMaterialCache::CMaterialCache(void)
 {
 	m_pCache = NULL;
 	m_nMaxEntries = 0;
+	m_nEntries = 0;
 }
 
 
@@ -428,7 +425,7 @@ CMaterial::~CMaterial(void)
 // Finds all .VMT files in a particular directory
 //-----------------------------------------------------------------------------
 bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirectoryNameLen,
-						IMaterialEnumerator *pEnum, int nContext, int nFlags )
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags )
 {
 	//Assert( Q_strnicmp( pDirectoryName, "materials", 9 ) == 0 );
 
@@ -482,14 +479,14 @@ bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirec
 // that we can load up at a later time 
 //-----------------------------------------------------------------------------
 bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags )
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags )
 {
 	// Make sure this is an ok directory, otherwise don't bother
 	if (ShouldSkipMaterial( pDirectoryName + MATERIAL_PREFIX_LEN, nFlags ))
 		return true;
 
 	// Compute directory name length
-	int nDirectoryNameLen = Q_strlen( pDirectoryName );
+	intp nDirectoryNameLen = Q_strlen( pDirectoryName );
 
 	if (!LoadMaterialsInDirectory( pDirectoryName, nDirectoryNameLen, pEnum, nContext, nFlags ))
 		return false;
@@ -510,7 +507,7 @@ bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName,
 			{
 				if( g_pFullFileSystem->FindIsDirectory( findHandle ) )
 				{
-					int fileNameStrLen = Q_strlen( pFileName );
+					intp fileNameStrLen = Q_strlen( pFileName );
 					char *pFileNameWithPath = ( char * )stackalloc( nPathStrLen + fileNameStrLen + 1 );
 					memcpy( pFileNameWithPath, pWildCard, nPathStrLen );
 					pFileNameWithPath[nPathStrLen] = '\0';
@@ -521,7 +518,7 @@ bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName,
 				}
 			}
 		}
-		pFileName = g_pFullFileSystem->FindNext( findHandle );		
+		pFileName = g_pFullFileSystem->FindNext( findHandle );
 	}
 
 	return true;
@@ -533,7 +530,7 @@ bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName,
 // It only finds their names so we can generate shell materials for them
 // that we can load up at a later time 
 //-----------------------------------------------------------------------------
-void CMaterial::EnumerateMaterials( IMaterialEnumerator *pEnum, const char *szRoot, int nContext, int nFlags )
+void CMaterial::EnumerateMaterials( IMaterialEnumerator *pEnum, const char *szRoot, intp nContext, int nFlags )
 {
 	InitDirectoryRecursive( szRoot, pEnum, nContext, nFlags );
 }
@@ -550,8 +547,6 @@ void CMaterial::EnumerateMaterials( IMaterialEnumerator *pEnum, const char *szRo
 //-----------------------------------------------------------------------------
 bool CMaterial::ShouldSkipMaterial(const char *pszName, int nFlags)
 {
-	static char szStrippedName[MAX_PATH];
-
 	// if NULL skip it
 	if( !pszName )
 		return true;
@@ -742,10 +737,7 @@ void CMaterial::Reload( bool bFullReload )
 	}
 
 	// Make sure to bump the refcount again. Not sure why this wasn't always done (check for leaks).
-	if (m_pMaterial)
-	{
-		m_pMaterial->IncrementReferenceCount();
-	}
+	m_pMaterial->IncrementReferenceCount();
 }
 
 
@@ -1194,7 +1186,7 @@ int CMaterial::GetImageDataRGBA(void *pImageRGBA)
 		src = (unsigned char *)m_pData;
 		dst = (unsigned char *)pImageRGBA;
 
-		while (src < (unsigned char *)m_pData + m_nWidth * m_nHeight * 4);	
+		while (src < (unsigned char *)m_pData + m_nWidth * m_nHeight * 4)
 		{
 			dst[0] = src[2];
 			dst[1] = src[1];
@@ -1347,9 +1339,12 @@ void AllocateLightingPreviewtextures(void)
 			sg_ExtraFP16Targets[idx].Init(
 				materials->CreateNamedRenderTargetTextureEx2(
 					s_rt_names[idx],
-					512, 512, RT_SIZE_DEFAULT, s_rt_formats[idx],
+					// dimhotepus: 512x512 -> 1024x1024 for quality.
+					1024, 1024, RT_SIZE_DEFAULT, s_rt_formats[idx],
 					MATERIAL_RT_DEPTH_SHARED, 
-					TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT,
+					TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT
+					// dimhotepus: Add anisotropic and trilinear filtering for quality.
+					| TEXTUREFLAGS_TRILINEAR | TEXTUREFLAGS_ANISOTROPIC,
 					CREATERENDERTARGETFLAGS_HDR )
 				);
 		

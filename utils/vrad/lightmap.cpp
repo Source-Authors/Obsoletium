@@ -583,7 +583,7 @@ bool BuildFacesamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFa
 
 	// ratio of world area / lightmap area
 	texinfo_t *pTex = &texinfo[pLightInfo->face->texinfo];
-	pFaceLight->worldAreaPerLuxel = 1.0 / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
+	pFaceLight->worldAreaPerLuxel = 1.0f / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[0] ) ) * 
 											sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[1], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[1] ) ) );
@@ -613,10 +613,10 @@ bool BuildFacesamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFa
 			pSamples->coord[0] = s;
 			pSamples->coord[1] = t;
 			// unused but initialized anyway
-			pSamples->mins[0] = s - 0.5;
-			pSamples->mins[1] = t - 0.5;
-			pSamples->maxs[0] = s + 0.5;
-			pSamples->maxs[1] = t + 0.5;
+			pSamples->mins[0] = s - 0.5f;
+			pSamples->mins[1] = t - 0.5f;
+			pSamples->maxs[0] = s + 0.5f;
+			pSamples->maxs[1] = t + 0.5f;
 			pSamples->area = pFaceLight->worldAreaPerLuxel;
 			LuxelSpaceToWorld( pLightInfo, pSamples->coord[0], pSamples->coord[1], pSamples->pos );
 			VectorCopy( pSamples->pos, *pLuxels );
@@ -657,7 +657,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 
 	// ratio of world area / lightmap area
 	texinfo_t *pTex = &texinfo[pLightInfo->face->texinfo];
-	pFaceLight->worldAreaPerLuxel = 1.0 / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
+	pFaceLight->worldAreaPerLuxel = 1.0f / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[0] ) ) * 
 											sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[1], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[1] ) ) );
@@ -678,7 +678,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 	Vector tNorm( 0.0f, 1.0f, 0.0f );
 
 	// sample center offset
-	float sampleOffset = ( do_centersamples ) ? 0.5 : 1.0;
+	float sampleOffset = ( do_centersamples ) ? 0.5f : 1.0f;
 
 	//
 	// clip the lightmap "spaced" winding by the lightmap cutting planes
@@ -1089,7 +1089,7 @@ int LightForString( const char *pLight, Vector& intensity )
 		return false;
 	}
 
-	intensity[0] = pow( r / 255.0, 2.2 ) * 255;				// convert to linear
+	intensity[0] = pow( r / 255.0f, 2.2f ) * 255;				// convert to linear
 	
 	switch( argCnt)
 	{
@@ -1101,14 +1101,14 @@ int LightForString( const char *pLight, Vector& intensity )
 		case 3:
 		case 4:
 			// Save the other two G,B values.
-			intensity[1] = pow( g / 255.0, 2.2 ) * 255;
-			intensity[2] = pow( b / 255.0, 2.2 ) * 255;
+			intensity[1] = pow( g / 255.0f, 2.2f ) * 255;
+			intensity[2] = pow( b / 255.0f, 2.2f ) * 255;
 			
 			// Did we also get an "intensity" scaler value too?
 			if ( argCnt == 4 )
 			{
 				// Scale the normalized 0-255 R,G,B values by the intensity scaler
-				VectorScale( intensity, scaler / 255.0, intensity );
+				VectorScale( intensity, scaler / 255.0f, intensity );
 			}
 			break;
 
@@ -1184,7 +1184,7 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 		if ( d0 < d50 )
 		{
 			Warning( "light has _fifty_percent_distance of %f but _zero_percent_distance of %f\n", d50, d0);
-			d0 = 2.0 * d50;
+			d0 = 2.0f * d50;
 		}
 		float a = 0, b = 1, c = 0;
 		if ( ! SolveInverseQuadraticMonotonic( 0, 1.0, d50, 2.0, d0, 256.0, a, b, c ))
@@ -1196,7 +1196,7 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 //		printf("50 percent=%f 0 percent=%f\n",d50,d0);
 // 		printf("a=%f b=%f c=%f\n",a,b,c);
 		float v50 = c + d50 * ( b + d50 * a );
-		float scale = 2.0 / v50;
+		float scale = 2.0f / v50;
 		a *= scale;
 		b *= scale;
 		c *= scale;
@@ -1212,7 +1212,7 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 		if ( IntForKey(e, "_hardfalloff" ) )
 		{
 			dl->m_flEndFadeDistance = d0;
-			dl->m_flStartFadeDistance = 0.75 * d0 + 0.25 * d50;		// start fading 3/4 way between 50 and 0. could allow adjust
+			dl->m_flStartFadeDistance = 0.75f * d0 + 0.25f * d50;		// start fading 3/4 way between 50 and 0. could allow adjust
 		}
 		else
 		{
@@ -1222,12 +1222,12 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 			// fading it from the minimum brightess point down to zero at 10x the minimum distance
 			if ( fabs( a ) > 0. )
 			{
-				float flMax = b / ( - 2.0 * a );				// where f' = 0
-				if ( flMax > 0.0 )
+				float flMax = b / ( - 2.0f * a );				// where f' = 0
+				if ( flMax > 0.0f )
 				{
 					dl->m_flCapDist = flMax;
 					dl->m_flStartFadeDistance = flMax;
-					dl->m_flEndFadeDistance = 10.0 * flMax;
+					dl->m_flEndFadeDistance = 10.0f * flMax;
 				}
 			}
 		}
@@ -1489,7 +1489,7 @@ static void ParseLightEnvironment( entity_t* e, directlight_t* dl )
 	{
 		// dimhotepus: atof -> strtof.
 		g_SunAngularExtent=strtof(angle_str, nullptr);
-		g_SunAngularExtent=sin((M_PI/180.0)*g_SunAngularExtent);
+		g_SunAngularExtent=sin(DEG2RAD(g_SunAngularExtent));
 		qprintf("sun extent from map=%f\n",g_SunAngularExtent);
 	}
 	if ( !gSkyLight )
@@ -1546,11 +1546,9 @@ static void ParseLightPoint( entity_t* e, directlight_t* dl )
 void CreateDirectLights (void)
 {
 	unsigned        i;
-	CPatch	        *p = NULL;
 	directlight_t	*dl = NULL;
 	entity_t	    *e = NULL;
 	const char	    *name;
-	Vector	        dest;
 
 	numdlights = 0;
 
@@ -1559,32 +1557,35 @@ void CreateDirectLights (void)
 	//
 	// surfaces
 	//
-	unsigned int uiPatchCount = g_Patches.Count();
-	for (i=0; i< uiPatchCount; i++)
-	{
-		p = &g_Patches.Element( i );
+	// CPatch	        *p = NULL;
+	// Vector	        dest;
+	//
+	//unsigned int uiPatchCount = g_Patches.Count();
+	//for (i=0; i< uiPatchCount; i++)
+	//{
+	//	p = &g_Patches.Element( i );
 
-		// skip parent patches
-		if (p->child1 != g_Patches.InvalidIndex() )
-			continue;
+	//	// skip parent patches
+	//	if (p->child1 != g_Patches.InvalidIndex() )
+	//		continue;
 
-		if (p->basearea < 1e-6)
-			continue;
+	//	if (p->basearea < 1e-6)
+	//		continue;
 
-		if( VectorAvg( p->baselight ) >= dlight_threshold )
-		{
-			dl = AllocDLight( p->origin, true );
+	//	if( VectorAvg( p->baselight ) >= dlight_threshold )
+	//	{
+	//		dl = AllocDLight( p->origin, true );
 
-			dl->light.type = emit_surface;
-			VectorCopy (p->normal, dl->light.normal);
-			Assert( VectorLength( p->normal ) > 1.0e-20 );
-			// scale intensity by number of texture instances
-			VectorScale( p->baselight, lightscale * p->area * p->scale[0] * p->scale[1] / p->basearea, dl->light.intensity );
+	//		dl->light.type = emit_surface;
+	//		VectorCopy (p->normal, dl->light.normal);
+	//		Assert( VectorLength( p->normal ) > 1.0e-20 );
+	//		// scale intensity by number of texture instances
+	//		VectorScale( p->baselight, lightscale * p->area * p->scale[0] * p->scale[1] / p->basearea, dl->light.intensity );
 
-			// scale to a range that results in actual light
-			VectorScale( dl->light.intensity, DIRECT_SCALE, dl->light.intensity );
-		}
-	}
+	//		// scale to a range that results in actual light
+	//		VectorScale( dl->light.intensity, DIRECT_SCALE, dl->light.intensity );
+	//	}
+	//}
 	
 	//
 	// entities
@@ -2080,7 +2081,7 @@ void AddSampleToPatch (sample_t *s, LightingValue_t& light, int facenum)
 	if( g_FacePatches.Element( facenum ) == g_FacePatches.InvalidIndex() )
 		return;
 
-	float radius = sqrt( s->area ) / 2.0;
+	float radius = sqrt( s->area ) / 2.0f;
 
 	CPatch *pNextPatch = NULL;
 	for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
@@ -2187,7 +2188,7 @@ void GetPhongNormal( int facenum, Vector const& spot, Vector& phongnormal )
 				float scale;
 				
 				// Interpolate between the center and edge normals based on sample position
-				scale = 1.0 - a1 - a2;
+				scale = 1.0f - a1 - a2;
 				VectorScale( fn->facenormal, scale, phongnormal );
 				VectorScale( n1, a1, temp );
 				VectorAdd( phongnormal, temp, phongnormal );
@@ -2694,7 +2695,7 @@ static int SupersampleLightAtPoint( lightinfo_t& l, SSE_SampleInfo_t& info,
 	// Some parameters related to supersampling
 	float sampleWidth = ( flags & NON_AMBIENT_ONLY ) ? 4 : 2;
 	float cscale = 1.0f / sampleWidth;
-	float csshift = -((sampleWidth - 1) * cscale) / 2.0;
+	float csshift = -((sampleWidth - 1) * cscale) / 2.0f;
 
 	// Clear out the light values
 	for (int i = 0; i < info.m_NormalCount; ++i )
@@ -2848,7 +2849,7 @@ static inline void ComputeLuxelIntensity( SSE_SampleInfo_t& info, int sampleIdx,
 		float intensity = ppLightSamples[n][sampleIdx].Intensity();
 
 		// convert to a linear perception space
-		pSampleIntensity[n * info.m_LightmapSize + destIdx] = pow( intensity / 256.0, 1.0 / 2.2 );
+		pSampleIntensity[n * info.m_LightmapSize + destIdx] = pow( intensity / 256.0f, 1.0f / 2.2f );
 	}
 }
 
@@ -3066,7 +3067,6 @@ void BuildFacelights (int iThread, int facenum)
 	facelight_t	*fl;
 	SSE_SampleInfo_t sampleInfo;
 	directlight_t *dl;
-	Vector spot;
 	Vector v[4], n[4];
 
 	if( g_bInterrupt.load(std::memory_order::memory_order_relaxed) )
@@ -3469,78 +3469,6 @@ static void ColorClampBumped( Vector& color1, Vector& color2, Vector& color3 )
 	if( color3[0] < 0.f ) color3[0] = 0.f;
 	if( color3[1] < 0.f ) color3[1] = 0.f;
 	if( color3[2] < 0.f ) color3[2] = 0.f;
-}
-
-static void LinearToBumpedLightmap(
-	const float		*linearColor, 
-	const float		*linearBumpColor1,
-	const float		*linearBumpColor2, 
-	const float		*linearBumpColor3,
-	unsigned char	*ret, 
-	unsigned char	*retBump1,
-	unsigned char	*retBump2, 
-	unsigned char	*retBump3 )
-{
-	const Vector &linearBump1 = *( ( const Vector * )linearBumpColor1 );
-	const Vector &linearBump2 = *( ( const Vector * )linearBumpColor2 );
-	const Vector &linearBump3 = *( ( const Vector * )linearBumpColor3 );
-
-	Vector gammaGoal;
-	// gammaGoal is premultiplied by 1/overbright, which we want
-	gammaGoal[0] = LinearToVertexLight( linearColor[0] );
-	gammaGoal[1] = LinearToVertexLight( linearColor[1] );
-	gammaGoal[2] = LinearToVertexLight( linearColor[2] );
-	Vector bumpAverage = linearBump1;
-	bumpAverage += linearBump2;
-	bumpAverage += linearBump3;
-	bumpAverage *= ( 1.0f / 3.0f );
-	
-	Vector correctionScale;
-	if( *( int * )&bumpAverage[0] != 0 && *( int * )&bumpAverage[1] != 0 && *( int * )&bumpAverage[2] != 0 )
-	{
-		// fast path when we know that we don't have to worry about divide by zero.
-		VectorDivide( gammaGoal, bumpAverage, correctionScale );
-//			correctionScale = gammaGoal / bumpSum;
-	}
-	else
-	{
-		correctionScale.Init( 0.0f, 0.0f, 0.0f );
-		if( bumpAverage[0] != 0.0f )
-		{
-			correctionScale[0] = gammaGoal[0] / bumpAverage[0];
-		}
-		if( bumpAverage[1] != 0.0f )
-		{
-			correctionScale[1] = gammaGoal[1] / bumpAverage[1];
-		}
-		if( bumpAverage[2] != 0.0f )
-		{
-			correctionScale[2] = gammaGoal[2] / bumpAverage[2];
-		}
-	}
-	Vector correctedBumpColor1;
-	Vector correctedBumpColor2;
-	Vector correctedBumpColor3;
-	VectorMultiply( linearBump1, correctionScale, correctedBumpColor1 );
-	VectorMultiply( linearBump2, correctionScale, correctedBumpColor2 );
-	VectorMultiply( linearBump3, correctionScale, correctedBumpColor3 );
-
-	Vector check = ( correctedBumpColor1 + correctedBumpColor2 + correctedBumpColor3 ) / 3.0f;
-
-	ColorClampBumped( correctedBumpColor1, correctedBumpColor2, correctedBumpColor3 );
-
-	ret[0] = RoundFloatToByte( gammaGoal[0] * 255.0f );
-	ret[1] = RoundFloatToByte( gammaGoal[1] * 255.0f );
-	ret[2] = RoundFloatToByte( gammaGoal[2] * 255.0f );
-	retBump1[0] = RoundFloatToByte( correctedBumpColor1[0] * 255.0f );
-	retBump1[1] = RoundFloatToByte( correctedBumpColor1[1] * 255.0f );
-	retBump1[2] = RoundFloatToByte( correctedBumpColor1[2] * 255.0f );
-	retBump2[0] = RoundFloatToByte( correctedBumpColor2[0] * 255.0f );
-	retBump2[1] = RoundFloatToByte( correctedBumpColor2[1] * 255.0f );
-	retBump2[2] = RoundFloatToByte( correctedBumpColor2[2] * 255.0f );
-	retBump3[0] = RoundFloatToByte( correctedBumpColor3[0] * 255.0f );
-	retBump3[1] = RoundFloatToByte( correctedBumpColor3[1] * 255.0f );
-	retBump3[2] = RoundFloatToByte( correctedBumpColor3[2] * 255.0f );
 }
 
 //-----------------------------------------------------------------------------

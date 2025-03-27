@@ -17,8 +17,9 @@
 #include "OPTTextures.h"
 #include "OPTConfigs.h"
 #include "OPTBuild.h"
+#include "windows/base_property_sheet.h"
 
-class COptionProperties : public CPropertySheet
+class COptionProperties : public CBasePropertySheet
 {
 	DECLARE_DYNAMIC(COptionProperties)
 

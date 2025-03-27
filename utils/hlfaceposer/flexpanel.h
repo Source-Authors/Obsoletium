@@ -110,10 +110,10 @@ public:
 	void EditExpression( void );
 	void NewExpression( void );
 
-	void setExpression( int index );
-	void DeleteExpression( int index );
-	void SaveExpression( int index );
-	void RevertExpression( int index );
+	void setExpression( intp index );
+	void DeleteExpression( intp index );
+	void SaveExpression( intp index );
+	void RevertExpression( intp index );
 
 	void CopyControllerSettings( void );
 	void PasteControllerSettings( void );

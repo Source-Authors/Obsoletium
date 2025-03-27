@@ -586,16 +586,14 @@ CMapClass *CMapSolid::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 // Purpose: Walks the faces of a solid for debugging.
 //-----------------------------------------------------------------------------
 #ifdef _DEBUG
-#pragma warning (disable:4189)
 void CMapSolid::DebugSolid(void)
 {
 	int nFaceCount = Faces.GetCount();
 	for (int nFace = 0; nFace < nFaceCount; nFace++)
 	{
-		CMapFace *pFace = GetFace(nFace);
+		[[maybe_unused]] CMapFace *pFace = GetFace(nFace);
 	}
 }
-#pragma warning (default:4189)
 #endif // _DEBUG
 
 
@@ -965,7 +963,8 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 			{
 				DeleteFace(nFace);
 
-				memcpy(useplane + nFace, useplane + nFace + 1, MAPSOLID_MAX_FACES - (nFace + 1));
+				// dimhotepus: memcpy -> memmove as src and dest overlaps! 
+				memmove(useplane + nFace, useplane + nFace + 1, MAPSOLID_MAX_FACES - (nFace + 1));
 			}
 		}
 	}
@@ -1058,7 +1057,7 @@ ChunkFileResult_t CMapSolid::LoadSideCallback(CChunkFile *pFile, CMapSolid *pSol
 	else
 	{
 		// UNDONE: need a better solution for user errors.
-		AfxMessageBox("Out of memory loading solid.");
+		AfxMessageBox("Out of memory loading solid.", MB_ICONERROR);
 		eResult = ChunkFile_OutOfMemory;
 	}
 
