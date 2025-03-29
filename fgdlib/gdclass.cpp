@@ -722,7 +722,7 @@ bool GDclass::ParseSpecifiers(TokenReader &tr)
 {
 	char szToken[MAX_TOKEN];
 
-	while (tr.PeekTokenType() == IDENT)
+	while (tr.PeekTokenType(nullptr, 0) == IDENT)
 	{
 		// dimhotepus: Skip identation.
 		(void)tr.NextToken(szToken, sizeof(szToken));

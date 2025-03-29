@@ -11,9 +11,10 @@
 #pragma once
 #endif
 
-#include "tier0/basetypes.h"
-
 #include <fstream>
+
+#include "tier0/annotations.h"
+#include "tier0/basetypes.h"
 #include "tier0/valve_minmax_on.h"
 
 
@@ -46,7 +47,12 @@ public:
 	TokenReader();
 
 	[[nodiscard]] bool Open(const char *pszFilename);
-	[[nodiscard]] trtoken_t NextToken(char *pszStore, ptrdiff_t nSize);
+	[[nodiscard]] trtoken_t NextToken(OUT_Z_CAP(nSize) char *pszStore, std::ptrdiff_t nSize);
+	template<std::ptrdiff_t size>
+	[[nodiscard]] trtoken_t NextToken(OUT_Z_ARRAY char (&pszStore)[size])
+	{
+		return NextToken(pszStore, size);
+	}
 	[[nodiscard]] trtoken_t NextTokenDynamic(char **ppszStore);
 	void Close();
 
@@ -54,7 +60,13 @@ public:
 	void Stuff(trtoken_t ttype, const char *pszToken);
 	[[nodiscard]] bool Expecting(trtoken_t ttype, const char *pszToken);
 	[[nodiscard]] const char *Error(char *error, ...);
-	[[nodiscard]] trtoken_t PeekTokenType(char* = nullptr, ptrdiff_t maxlen = 0);
+	// dimhotepus: Breaking change, drop = nullptr and = 0 by default to allow use safe-bounds overload
+	[[nodiscard]] trtoken_t PeekTokenType(OUT_Z_CAP(maxlen) char* pszStore, std::ptrdiff_t maxlen);
+	template<std::ptrdiff_t size>
+	[[nodiscard]] trtoken_t PeekTokenType(OUT_Z_ARRAY char (&pszStore)[size])
+	{
+		return PeekTokenType(pszStore, size);
+	}
 
 	inline int GetErrorCount(void) const;
 
@@ -63,7 +75,7 @@ private:
 	inline TokenReader(TokenReader const &) = delete;
 	inline int operator=(TokenReader const &) = delete;
 
-	trtoken_t GetString(char *pszStore, ptrdiff_t nSize);
+	trtoken_t GetString(char *pszStore, std::ptrdiff_t nSize);
 	bool SkipWhiteSpace();
 
 	int m_nLine;

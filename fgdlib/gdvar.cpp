@@ -449,7 +449,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 
 		while (1)
 		{
-			ttype = tr.PeekTokenType();
+			ttype = tr.PeekTokenType(nullptr, 0);
 			if (ttype != INTEGER)
 			{
 				break;
@@ -509,7 +509,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 
 		while (1)
 		{
-			ttype = tr.PeekTokenType();
+			ttype = tr.PeekTokenType(nullptr, 0);
 			if ((ttype != INTEGER) && (ttype != STRING))
 			{
 				break;
