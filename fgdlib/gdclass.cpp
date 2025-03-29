@@ -429,7 +429,7 @@ BOOL GDclass::InitFromTokens(TokenReader& tr, GameData *pGD)
 	//
 	// Parse the class name.
 	//
-	if (!GDGetToken(tr, m_szName, sizeof(m_szName), IDENT))
+	if (!GDGetToken(tr, m_szName, IDENT))
 	{
 		return(FALSE);
 	}
@@ -439,10 +439,10 @@ BOOL GDclass::InitFromTokens(TokenReader& tr, GameData *pGD)
 	// we have no description.
 	//
 	char szToken[MAX_TOKEN];
-	if ((tr.PeekTokenType(szToken,sizeof(szToken)) == OPERATOR) && IsToken(szToken, ":"))
+	if ((tr.PeekTokenType(szToken) == OPERATOR) && IsToken(szToken, ":"))
 	{
 		// Skip ":"
-		(void)tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken);
 
 		//
 		// Free any existing description and set the pointer to NULL so that GDGetToken
@@ -497,7 +497,7 @@ bool GDclass::ParseBase(TokenReader &tr)
 
 	while (1)
 	{
-		if (!GDGetToken(tr, szToken, sizeof(szToken), IDENT))
+		if (!GDGetToken(tr, szToken, IDENT))
 		{
 			return(false);
 		}
@@ -514,7 +514,7 @@ bool GDclass::ParseBase(TokenReader &tr)
 
 		AddBase(pBase);
 
-		if (!GDGetToken(tr, szToken, sizeof(szToken), OPERATOR))
+		if (!GDGetToken(tr, szToken, OPERATOR))
 		{
 			return(false);
 		}
@@ -546,7 +546,7 @@ bool GDclass::ParseColor(TokenReader &tr)
 	//
 	// Red.
 	//
-	if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+	if (!GDGetToken(tr, szToken, INTEGER))
 	{
 		return(false);
 	}
@@ -555,7 +555,7 @@ bool GDclass::ParseColor(TokenReader &tr)
 	//
 	// Green.
 	//
-	if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+	if (!GDGetToken(tr, szToken, INTEGER))
 	{
 		return(false);
 	}
@@ -564,7 +564,7 @@ bool GDclass::ParseColor(TokenReader &tr)
 	//
 	// Blue.
 	//
-	if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+	if (!GDGetToken(tr, szToken, INTEGER))
 	{
 		return(false);
 	}
@@ -577,7 +577,7 @@ bool GDclass::ParseColor(TokenReader &tr)
 
 	m_bGotColor = true;
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), OPERATOR, ")"))
+	if (!GDGetToken(tr, szToken, OPERATOR, ")"))
 	{
 		return(false);
 	}
@@ -606,11 +606,11 @@ bool GDclass::ParseHelper(TokenReader &tr, char *pszHelperName)
 	bool bCloseParen = false;
 	while (!bCloseParen)
 	{
-		trtoken_t eType = tr.PeekTokenType(szToken,sizeof(szToken));
+		trtoken_t eType = tr.PeekTokenType(szToken);
 
 		if (eType == OPERATOR)
 		{
-			if (!GDGetToken(tr, szToken, sizeof(szToken), OPERATOR))
+			if (!GDGetToken(tr, szToken, OPERATOR))
 			{
 				delete pHelper;
 				return(false);
@@ -628,7 +628,7 @@ bool GDclass::ParseHelper(TokenReader &tr, char *pszHelperName)
 		}
 		else
 		{
-			if (!GDGetToken(tr, szToken, sizeof(szToken), eType))
+			if (!GDGetToken(tr, szToken, eType))
 			{
 				delete pHelper;
 				return(false);
@@ -660,7 +660,7 @@ bool GDclass::ParseSize(TokenReader &tr)
 	//
 	for (int i = 0; i < 3; i++)
 	{
-		if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+		if (!GDGetToken(tr, szToken, INTEGER))
 		{
 			return(false);
 		}
@@ -669,19 +669,19 @@ bool GDclass::ParseSize(TokenReader &tr)
 		m_bmins[i] = strtof(szToken, nullptr);
 	}
 
-	if (tr.PeekTokenType(szToken,sizeof(szToken)) == OPERATOR && IsToken(szToken, ","))
+	if (tr.PeekTokenType(szToken) == OPERATOR && IsToken(szToken, ","))
 	{
 		//
 		// Skip ","
 		//
-		(void)tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken);
 
 		//
 		// Get maxes.
 		//
 		for (int i = 0; i < 3; i++)
 		{
-			if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+			if (!GDGetToken(tr, szToken, INTEGER))
 			{
 				return(false);
 			}
@@ -704,7 +704,7 @@ bool GDclass::ParseSize(TokenReader &tr)
 
 	m_bGotSize = true;
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), OPERATOR, ")"))
+	if (!GDGetToken(tr, szToken, OPERATOR, ")"))
 	{
 		return(false);
 	}
@@ -725,7 +725,7 @@ bool GDclass::ParseSpecifiers(TokenReader &tr)
 	while (tr.PeekTokenType(nullptr, 0) == IDENT)
 	{
 		// dimhotepus: Skip identation.
-		(void)tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken);
 
 		//
 		// Handle specifiers that don't have any parens after them.
@@ -787,7 +787,7 @@ bool GDclass::ParseInput(TokenReader &tr)
 {
 	char szToken[MAX_TOKEN];
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), IDENT, "input"))
+	if (!GDGetToken(tr, szToken, IDENT, "input"))
 	{
 		return(false);
 	}
@@ -821,7 +821,7 @@ bool GDclass::ParseInputOutput(TokenReader &tr, CClassInputOutputBase *pInputOut
 	//
 	// Read the name.
 	//
-	if (!GDGetToken(tr, szToken, sizeof(szToken), IDENT))
+	if (!GDGetToken(tr, szToken, IDENT))
 	{
 		return(false);
 	}
@@ -831,12 +831,12 @@ bool GDclass::ParseInputOutput(TokenReader &tr, CClassInputOutputBase *pInputOut
 	//
 	// Read the type.
 	//
-	if (!GDGetToken(tr, szToken, sizeof(szToken), OPERATOR, "("))
+	if (!GDGetToken(tr, szToken, OPERATOR, "("))
 	{
 		return(false);
 	}
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), IDENT))
+	if (!GDGetToken(tr, szToken, IDENT))
 	{
 		return(false);
 	}
@@ -848,7 +848,7 @@ bool GDclass::ParseInputOutput(TokenReader &tr, CClassInputOutputBase *pInputOut
 		return(false);
 	}
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), OPERATOR, ")"))
+	if (!GDGetToken(tr, szToken, OPERATOR, ")"))
 	{
 		return(false);
 	}
@@ -856,12 +856,12 @@ bool GDclass::ParseInputOutput(TokenReader &tr, CClassInputOutputBase *pInputOut
 	//
 	// Check the next operator - if ':', we have a description.
 	//
-	if ((tr.PeekTokenType(szToken,sizeof(szToken)) == OPERATOR) && (IsToken(szToken, ":")))
+	if ((tr.PeekTokenType(szToken) == OPERATOR) && (IsToken(szToken, ":")))
 	{
 		//
 		// Skip the ":".
 		//
-		(void)tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken);
 
 		//
 		// Read the description.
@@ -890,7 +890,7 @@ bool GDclass::ParseOutput(TokenReader &tr)
 {
 	char szToken[MAX_TOKEN];
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), IDENT, "output"))
+	if (!GDGetToken(tr, szToken, IDENT, "output"))
 	{
 		return(false);
 	}
@@ -922,7 +922,7 @@ bool GDclass::ParseVariables(TokenReader &tr)
 	{
 		char szToken[MAX_TOKEN];
 
-		if (tr.PeekTokenType(szToken,sizeof(szToken)) == OPERATOR)
+		if (tr.PeekTokenType(szToken) == OPERATOR)
 		{
 			break;
 		}
@@ -950,7 +950,7 @@ bool GDclass::ParseVariables(TokenReader &tr)
 		if (!stricmp(szToken, "key"))
 		{
 			// dimhotepus: Make error when no key token.
-			if (!GDGetToken(tr, szToken, sizeof(szToken)))
+			if (!GDGetToken(tr, szToken))
 			{
 				return(false);
 			}

@@ -161,7 +161,12 @@ int GameData::GetMaxMapCoord() const
 GameDataMessageFunc_t GDSetMessageFunc(GameDataMessageFunc_t pFunc);
 bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...);
 bool GDSkipToken(TokenReader &tr, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);
-bool GDGetToken(TokenReader &tr, char *pszStore, int nSize, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);
+bool GDGetToken(TokenReader &tr, OUT_Z_CAP(nSize) char *pszStore, intp nSize, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);
+template<intp size>
+bool GDGetToken(TokenReader &tr, OUT_Z_ARRAY char (&pszStore)[size], trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL)
+{
+	return GDGetToken(tr, pszStore, size, ttexpecting, pszExpecting);
+}
 bool GDGetTokenDynamic(TokenReader &tr, char **pszStore, trtoken_t ttexpecting, const char *pszExpecting = NULL);
 
 

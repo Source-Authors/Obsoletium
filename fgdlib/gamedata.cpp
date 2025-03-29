@@ -43,7 +43,7 @@ GameDataMessageFunc_t GDSetMessageFunc(GameDataMessageFunc_t pFunc)
 //			pszExpecting - 
 // Output : 
 //-----------------------------------------------------------------------------
-static bool DoGetToken(TokenReader &tr, char **ppszStore, int nSize, trtoken_t ttexpecting, const char *pszExpecting)
+static bool DoGetToken(TokenReader &tr, char **ppszStore, intp nSize, trtoken_t ttexpecting, const char *pszExpecting)
 {
 	trtoken_t ttype;
 
@@ -178,11 +178,15 @@ bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...)
 // Output : Returns TRUE if the operation succeeded, FALSE if there was an error.
 //			If there was an error, the error will be reported in the message window.
 //-----------------------------------------------------------------------------
-bool GDGetToken(TokenReader &tr, char *pszStore, int nSize, trtoken_t ttexpecting, const char *pszExpecting)
+bool GDGetToken(TokenReader &tr, OUT_Z_CAP(nSize) char *pszStore, intp nSize, trtoken_t ttexpecting, const char *pszExpecting)
 {
 	Assert(pszStore != NULL);
 	if (pszStore != NULL)
 	{
+		// dimhotepus: Always zero-terminate.
+		if (nSize > 0)
+			pszStore[0] = '\0';
+
 		return DoGetToken(tr, &pszStore, nSize, ttexpecting, pszExpecting);
 	}
 
@@ -292,7 +296,7 @@ BOOL GameData::Load(const char *pszFilename)
 			break;
 		}
 
-		ttype = tr.NextToken(szToken, sizeof(szToken));
+		ttype = tr.NextToken(szToken);
 
 		if(ttype == TOKENEOF)
 			break;
@@ -304,7 +308,7 @@ BOOL GameData::Load(const char *pszFilename)
 		}
 
 		// check what kind it is, and parse a new object
-		if (tr.NextToken(szToken, sizeof(szToken)) != IDENT)
+		if (tr.NextToken(szToken) != IDENT)
 		{
 			if(!GDError(tr, "expected identifier after @"))
 				return FALSE;
@@ -373,7 +377,7 @@ BOOL GameData::Load(const char *pszFilename)
 		}
 		else if (IsToken(szToken, "include"))
 		{
-			if (GDGetToken(tr, szToken, sizeof(szToken), STRING))
+			if (GDGetToken(tr, szToken, STRING))
 			{
 				// Let's assume it's in the same directory.
 				char justPath[MAX_PATH], loadFilename[MAX_PATH];
@@ -457,7 +461,7 @@ bool GameData::ParseMapSize(TokenReader &tr)
 	}
 
 	char szToken[128];
-	if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+	if (!GDGetToken(tr, szToken, INTEGER))
 	{
 		return false;
 	}
@@ -468,7 +472,7 @@ bool GameData::ParseMapSize(TokenReader &tr)
 		return false;
 	}
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+	if (!GDGetToken(tr, szToken, INTEGER))
 	{
 		return false;
 	}
@@ -759,11 +763,11 @@ bool GameData::LoadFGDMaterialExclusions( TokenReader &tr )
 		char szToken[128];
 		bool bMatchFound = false;
 
-		if ( tr.PeekTokenType( szToken, sizeof( szToken ) ) == OPERATOR )
+		if ( tr.PeekTokenType( szToken ) == OPERATOR )
 		{
 			break;
 		}
-		else if ( GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+		else if ( GDGetToken( tr, szToken, STRING ) )
 		{		
 			// Make sure we haven't loaded this from another FGD
 			for ( int i = 0; i < m_FGDMaterialExclusions.Count(); i++ )
@@ -812,7 +816,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 	if ( GDSkipToken( tr, OPERATOR, "=" ) )
 	{
 		// We expect a name
-		if ( !GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+		if ( !GDGetToken( tr, szToken, STRING ) )
 		{
 			return( FALSE );
 		}
@@ -830,7 +834,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 	// Handle the Class(es) -- Brush Entities, Occluders, Lights
 	while ( 1 )
 	{
-		if ( GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+		if ( GDGetToken( tr, szToken, STRING ) )
 		{
 			cindex = m_FGDAutoVisGroups[gindex].m_Classes.AddToTail();
 			auto &vgclass = m_FGDAutoVisGroups[gindex].m_Classes[cindex];
@@ -845,12 +849,12 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 			// Parse objects/entities -- func_detail, point_template, light_spot
 			while ( 1 )
 			{
-				if ( tr.PeekTokenType( szToken, sizeof( szToken ) ) == OPERATOR )
+				if ( tr.PeekTokenType( szToken ) == OPERATOR )
 				{
 					break;
 				}
 
-				if ( !GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+				if ( !GDGetToken( tr, szToken, STRING ) )
 				{
 					return( FALSE );
 				}
@@ -865,7 +869,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 			}
 
 			// See if we have another Class coming up
-			if ( tr.PeekTokenType( szToken, sizeof( szToken ) ) == STRING )
+			if ( tr.PeekTokenType( szToken ) == STRING )
 			{
 				continue;
 			}
