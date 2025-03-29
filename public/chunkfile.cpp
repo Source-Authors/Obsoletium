@@ -369,7 +369,7 @@ ChunkFileResult_t CChunkFile::HandleChunk(const char *szChunkName)
 				char szKey[MAX_KEYVALUE_LEN];
 				char szValue[MAX_KEYVALUE_LEN];
 
-				while ((eResult = ReadNext(szKey, szValue, sizeof(szValue), eChunkType)) == ChunkFile_Ok)
+				while ((eResult = ReadNext(szKey, szValue, eChunkType)) == ChunkFile_Ok)
 				{
 					if (eChunkType == ChunkType_Chunk)
 					{
@@ -474,10 +474,15 @@ void CChunkFile::PushHandlers(CChunkHandlerMap *pHandlerMap)
 //			eChunkType - ChunkType_Key or ChunkType_Chunk.
 // Output : Returns ChunkFile_Ok on success, an error code if a parsing error occurs.
 //-----------------------------------------------------------------------------
-ChunkFileResult_t CChunkFile::ReadNext(char *szName, char *szValue, int nValueSize, ChunkType_t &eChunkType)
+ChunkFileResult_t CChunkFile::ReadNext(OUT_Z_CAP(nNameSize) char *szName, intp nNameSize,
+	OUT_Z_CAP(nValueSize) char *szValue, intp nValueSize, ChunkType_t &eChunkType)
 {
+	// dimhotepus: Always zero-terminate.
+	if (nValueSize > 0)
+		szValue[0] = '\0';
+
 	// HACK: pass in buffer sizes?
-	trtoken_t eTokenType = m_TokenReader.NextToken(szName, MAX_KEYVALUE_LEN);
+	trtoken_t eTokenType = m_TokenReader.NextToken(szName, nNameSize);
 
 	if (eTokenType != TOKENEOF)
 	{
@@ -492,7 +497,7 @@ ChunkFileResult_t CChunkFile::ReadNext(char *szName, char *szValue, int nValueSi
 				//
 				// Read the next token to determine what we have.
 				//
-				eNextTokenType = m_TokenReader.NextToken(szNext, sizeof(szNext));
+				eNextTokenType = m_TokenReader.NextToken(szNext);
 
 				switch (eNextTokenType)
 				{
@@ -593,7 +598,7 @@ ChunkFileResult_t CChunkFile::ReadChunk(KeyHandler_t pfnKeyHandler, void *pData)
 		char szValue[MAX_KEYVALUE_LEN];
 		ChunkType_t eChunkType;
 
-		eResult = ReadNext(szName, szValue, sizeof(szValue), eChunkType);
+		eResult = ReadNext(szName, szValue, eChunkType);
 
 		if (eResult == ChunkFile_Ok)
 		{

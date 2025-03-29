@@ -12,6 +12,7 @@
 #pragma once
 #endif
 
+#include "tier0/platform.h"
 #include "tier1/tokenreader.h"
 
 
@@ -147,7 +148,14 @@ class CChunkFile
 		// Functions for reading chunk files.
 		//
 		[[nodiscard]] ChunkFileResult_t ReadChunk(KeyHandler_t pfnKeyHandler = NULL, void *pData = NULL);
-		[[nodiscard]] ChunkFileResult_t ReadNext(char *szKey, char *szValue, int nValueSize, ChunkType_t &eChunkType);
+		[[nodiscard]] ChunkFileResult_t ReadNext(OUT_Z_CAP(nNameSize) char *szName, intp nNameSize,
+			OUT_Z_CAP(nValueSize) char *szValue, intp nValueSize, ChunkType_t &eChunkType);
+		template<intp nKeySize, intp nValueSize>
+		[[nodiscard]] ChunkFileResult_t ReadNext(OUT_Z_ARRAY char (&szKey)[nKeySize],
+			OUT_Z_ARRAY char (&szValue)[nValueSize], ChunkType_t &eChunkType)
+		{
+			return ReadNext(szKey, nKeySize, szValue, nValueSize, eChunkType);
+		}
 		[[nodiscard]] ChunkFileResult_t HandleChunk(const char *szChunkName);
 		void HandleError(const char *szChunkName, ChunkFileResult_t eError);
 
