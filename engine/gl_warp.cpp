@@ -308,7 +308,7 @@ void R_DrawSkyBox( float zFar, int nDrawFlags /*= 0x3F*/  )
 			break;
 		}
 
-		// dimhotepus: Fix skybox culling on high FOVs (> 107).
+		// dimhotepus: Fix skybox culling on low and high FOVs.
 		ConVarRef fov_desired("fov_desired");
 		Assert( fov_desired.IsValid() );
 
@@ -316,8 +316,8 @@ void R_DrawSkyBox( float zFar, int nDrawFlags /*= 0x3F*/  )
 
 		// Normals are reversed so looking at face dots to 1.0, looking away from is -1.0
 		// Reject backfacing surfaces on the inside of the cube to avoid binding their texture
-		// Assuming a 90 fov looking at face is 0 degrees, so reject at fov + 17
-		if ( DotProduct( CurrentViewForward(), normal ) < cosf( DEG2RAD( min( 180.0f, fovDegrees + 17.0f ) ) ) ) // < cos(DEG2RAD(107.0311))
+		// Assuming a 90 fov looking at face is 0 degrees, so reject at fov + 26
+		if ( DotProduct( CurrentViewForward(), normal ) < cosf( DEG2RAD( min( 180.0f, fovDegrees + 26.0f ) ) ) ) // < cos(DEG2RAD(107.0311))
 			continue;
 
 		Vector positionArray[4];
