@@ -98,13 +98,13 @@ struct cbrushside_t
 	unsigned short bBevel;							// is the side a bevel plane?
 };
 
-#define NUMSIDES_BOXBRUSH	0xFFFF
+#define NUMSIDES_BOXBRUSH	-1
 
 struct cbrush_t
 {
 	int				contents;
-	unsigned short	numsides;
-	unsigned short	firstbrushside;
+	int				numsides;
+	int				firstbrushside;
 
 	inline int GetBox() const { return firstbrushside; }
 	inline void SetBox( int boxID )
