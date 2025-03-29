@@ -1349,7 +1349,9 @@ CON_COMMAND( getpos, "dump position and angles to the console" )
 		pCommand2 = "setang_exact";
 	}
 
-	Warning( "%s %f %f %f;", pCommand1, vecOrigin.x, vecOrigin.y, vecOrigin.z );
-	Warning( "%s %f %f %f\n", pCommand2, angles.x, angles.y, angles.z );
+	// dimhotepus: Join two warnings into one as first missed \n and second dumps channel name.
+	Warning( "%s %f %f %f;%s %f %f %f\n",
+		pCommand1, vecOrigin.x, vecOrigin.y, vecOrigin.z,
+		pCommand2, angles.x, angles.y, angles.z );
 }
 
