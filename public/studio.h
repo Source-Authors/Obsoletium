@@ -69,15 +69,9 @@ Studio models are position independent, so the cache manager can move them.
 
 #define STUDIO_VERSION		48
 
-#ifndef _XBOX
 #define MAXSTUDIOTRIANGLES	65536	// TODO: tune this
 #define MAXSTUDIOVERTS		65536	// TODO: tune this
 #define	MAXSTUDIOFLEXVERTS	10000	// max number of verts that can be flexed per mesh.  TODO: tune this
-#else
-#define MAXSTUDIOTRIANGLES	25000
-#define MAXSTUDIOVERTS		10000
-#define	MAXSTUDIOFLEXVERTS	1000
-#endif
 #define MAXSTUDIOSKINS		32		// total textures
 #define MAXSTUDIOBONES		128		// total bones actually used
 #define MAXSTUDIOFLEXDESC	1024	// maximum number of low level flexes (actual morph targets)
@@ -1699,28 +1693,16 @@ public:
 
 struct virtualsequence_t
 {
-#ifdef _XBOX
-	short flags;
-	short activity;
-	short group;
-	short index;
-#else
 	int	flags;
 	int activity;
 	int group;
 	int index;
-#endif
 };
 
 struct virtualgeneric_t
 {
-#ifdef _XBOX
-	short group;
-	short index;
-#else
 	int group;
 	int index;
-#endif
 };
 
 
@@ -2523,7 +2505,6 @@ public:
 	inline int			numflexcontrollerui() const{ return m_pStudioHdr->numflexcontrollerui; }
 	inline mstudioflexcontrollerui_t *pFlexcontrollerUI( int i ) const { return m_pStudioHdr->pFlexControllerUI( i ); }
 
-	//inline const char	*name() const { return m_pStudioHdr->name; }; // deprecated -- remove after full xbox merge
 	inline const char	*pszName() const { return m_pStudioHdr->pszName(); }
 
 	inline int			numbonecontrollers() const { return m_pStudioHdr->numbonecontrollers; }
