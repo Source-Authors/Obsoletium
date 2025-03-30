@@ -56,7 +56,20 @@ private:
 	};
 
 	// Returns the last error that occurred
-	char *GetErrorString( char *pBuf, int nBufLen );
+	template<intp size>
+	char *GetErrorString( char (&pBuf)[size] )
+	{
+		const std::string error{std::system_category().message( ::GetLastError() )};
+		const size_t index{error.find('\r')};
+		if ( index != std::string::npos )
+		{
+			const std::string substr{error.substr( 0, std::max( index, static_cast<size_t>(1) ) - 1 )};
+			V_strcpy_safe( pBuf, substr.c_str() );
+			return pBuf;
+		}
+		V_strcpy_safe( pBuf, error.c_str() );
+		return pBuf;
+	}
 
 	// creates the process, adds it to the list and writes the windows HANDLE into info.m_hProcess
 	ProcessHandle_t CreateProcess( ProcessInfo_t &info, bool bConnectStdPipes );
@@ -107,25 +120,6 @@ void CProcessUtils::Shutdown()
 	return BaseClass::Shutdown();
 }
 
-
-//-----------------------------------------------------------------------------
-// Returns the last error that occurred
-//-----------------------------------------------------------------------------
-char *CProcessUtils::GetErrorString( char *pBuf, int nBufLen )
-{
-	const std::string error{std::system_category().message( ::GetLastError() )};
-	const size_t index{error.find('\r')};
-	if ( index != std::string::npos )
-	{
-		const std::string substr{error.substr( 0, std::max( index, static_cast<size_t>(1) ) - 1 )};
-		V_strncpy( pBuf, substr.c_str(), nBufLen );
-		return pBuf;
-	}
-	V_strncpy( pBuf, error.c_str(), nBufLen );
-	return pBuf;
-}
-
-
 ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnectStdPipes )
 {
 	STARTUPINFO si;
@@ -151,7 +145,7 @@ ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnect
 	char buf[ 512 ];
 	Warning( "Could not execute the command:\n   %s\n"
 		"Windows gave the error message:\n   \"%s\"\n",
-		info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+		info.m_CommandLine.Get(), GetErrorString( buf ) );
 
 	return PROCESS_HANDLE_INVALID;
 }
@@ -337,7 +331,7 @@ intp CProcessUtils::GetActualProcessOutputSize( ProcessHandle_t hProcess )
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
 			"Windows gave the error message:\n   \"%s\"\n",
-			info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
 
@@ -361,7 +355,7 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
 			"Windows gave the error message:\n   \"%s\"\n",
-			info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
 
@@ -371,7 +365,7 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
 			"Windows gave the error message:\n   \"%s\"\n",
-			info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
 	
