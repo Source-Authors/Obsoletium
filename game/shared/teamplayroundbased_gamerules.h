@@ -228,12 +228,34 @@ public:
 
 	bool IsTeamReady( int iTeamNumber )
 	{
+		if ( iTeamNumber < 0 || iTeamNumber >= MAX_TEAMS_ARRAY_SAFE )
+			return false;
+
 		return m_bTeamReady[iTeamNumber];
 	}
 
 	bool IsPlayerReady( int iIndex )
 	{
+		if ( !IsIndexIntoPlayerArrayValid(iIndex) )
+			return false;
+
 		return m_bPlayerReady[iIndex];
+	}
+
+	float GetNextRespawnWave( int iTeamNumber )
+	{
+		if ( iTeamNumber < 0 || iTeamNumber >= MAX_TEAMS_ARRAY_SAFE )
+			return 0.0f;
+
+		return m_flNextRespawnWave[iTeamNumber];
+	}
+
+	void SetNextRespawnWave( int iTeamNumber, float flValue )
+	{
+		if ( iTeamNumber < 0 || iTeamNumber >= MAX_TEAMS_ARRAY_SAFE )
+			return;
+			
+		m_flNextRespawnWave.Set( iTeamNumber, flValue );
 	}
 
 	virtual void HandleTeamScoreModify( int iTeam, int iScore) {  };

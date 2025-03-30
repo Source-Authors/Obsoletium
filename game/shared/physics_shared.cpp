@@ -590,7 +590,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	solid_t solid;
 	fluid_t fluid;
 
-	if ( !physenv )
+	if ( !physenv || !pWorldCollide || pWorldCollide->solidCount < 1 )
 		return NULL;
 
 	int surfaceData = physprops->GetSurfaceIndex( "default" );
@@ -627,7 +627,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 			if ( solid.index == 0 )
 				continue;
 
-			if ( !pWorldCollide->solids[solid.index] )
+			if ( !pWorldCollide->solids[solid.index] || solid.index >= pWorldCollide->solidCount )
 			{
 				// this implies that the collision model is a mopp and the physics DLL doesn't support that.
 				bCreateVirtualTerrain = true;
@@ -655,7 +655,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 			pParse->ParseFluid( &fluid, NULL );
 
 			// create a fluid for floating
-			if ( fluid.index > 0 )
+			if ( fluid.index > 0 && fluid.index < pWorldCollide->solidCount )
 			{
 				solid.params = defaultParams;	// copy world's params
 				solid.params.enableCollisions = true;
