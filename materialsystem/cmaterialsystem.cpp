@@ -4885,7 +4885,7 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 	V_sprintf_safe( szBaseName, "%s/replacements.vmt", pszPathName );
 	if ( g_pFullFileSystem->FileExists( szBaseName ) )
 	{
-		KeyValues	*pKV = g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );
+		KeyValues *pKV = g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );
 		if ( pKV )
 		{
 			V_sprintf_safe( szBaseName, "%s/", pszPathName );
@@ -4928,7 +4928,7 @@ void CMaterialSystem::InitReplacementsFromFile( const char *pszPathName )
 	
 	for ( int i = 0; i < replacementCount; ++i ) 
 	{
-		V_snprintf( szBaseName, sizeof(szBaseName), "%s/%s/replacements.vmt", pszPathName, replacementFiles[i] );
+		V_sprintf_safe( szBaseName, "%s/%s/replacements.vmt", pszPathName, replacementFiles[i] );
 		if ( g_pFullFileSystem->FileExists(szBaseName) )
 		{
 			KeyValues *pKV = g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );
