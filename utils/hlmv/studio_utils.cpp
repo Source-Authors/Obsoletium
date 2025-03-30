@@ -1220,5 +1220,13 @@ intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
+	Assert((intp)cache <= 0xFFFF);
+	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+}
+
+// dimhotepus: Add const-correct API.
+studiohdr_t *virtualgroup_t::GetStudioHdr( void )
+{
+	Assert((intp)cache <= 0xFFFF);
 	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
 }

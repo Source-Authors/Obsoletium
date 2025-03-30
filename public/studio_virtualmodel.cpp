@@ -576,7 +576,7 @@ void virtualmodel_t::AppendIKLocks( int group, const studiohdr_t *pStudioHdr )
 	// copy knee directions for uninitialized knees
 	if ( group != 0 )
 	{
-		studiohdr_t *pBaseHdr = (studiohdr_t *)m_group[ 0 ].GetStudioHdr();
+		studiohdr_t *pBaseHdr = m_group[ 0 ].GetStudioHdr();
 		if ( pStudioHdr->numikchains == pBaseHdr->numikchains )
 		{
 			for (j = 0; j < pStudioHdr->numikchains; j++)
