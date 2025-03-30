@@ -1742,11 +1742,17 @@ bool SVC_Menu::WriteToBuffer( bf_write &buffer )
 	}
 
 	CUtlBuffer buf;
-	m_MenuKeyValues->WriteAsBinary( buf );
+	// dimhotepus: Ensure message is written successfully.
+	if ( !m_MenuKeyValues->WriteAsBinary( buf ) )
+	{
+		// dimhotepus: Exit if write failed.
+		Warning( "Unable to write menu data to buffer.\n" );
+		return false;
+	}
 
 	if ( buf.TellPut() > 4096 )
 	{
-		Msg( "Too much menu data (4096 bytes max)\n" );
+		Warning( "Too much menu data %zd (4096 bytes max)\n", buf.TellPut() );
 		return false;
 	}
 
@@ -1776,9 +1782,8 @@ bool SVC_Menu::ReadFromBuffer( bf_read &buffer )
 	m_MenuKeyValues = new KeyValues( "menu" );
 	Assert( m_MenuKeyValues );
 	
-	m_MenuKeyValues->ReadAsBinary( buf );
-
-	return !buffer.IsOverflowed();
+	// dimhotepus: Ensure message is read successfully.
+	return m_MenuKeyValues->ReadAsBinary( buf ) && !buffer.IsOverflowed();
 }
 
 const char *SVC_Menu::ToString(void) const
