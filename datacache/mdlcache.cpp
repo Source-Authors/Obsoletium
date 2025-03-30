@@ -3693,3 +3693,9 @@ const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 	return g_MDLCache.GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
 }
 
+// dimhotepus: Add const-correct API.
+studiohdr_t *virtualgroup_t::GetStudioHdr( void )
+{
+	return g_MDLCache.GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+}
+

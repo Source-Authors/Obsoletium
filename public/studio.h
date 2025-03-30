@@ -1685,6 +1685,8 @@ public:
 	void *cache;
 	// converts cache entry into a usable studiohdr_t *
 	const studiohdr_t *GetStudioHdr( void ) const;
+	// dimhotepus: Add const-correct API.
+	studiohdr_t *GetStudioHdr( void );
 
 	CUtlVector< int > boneMap;				// maps global bone to local bone
 	CUtlVector< int > masterBone;			// maps local bone to global bone

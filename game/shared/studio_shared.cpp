@@ -30,6 +30,12 @@ const studiohdr_t *virtualgroup_t::GetStudioHdr( ) const
 	return modelinfo->FindModel( this->cache );
 }
 
+// dimhotepus: Add const-correct API.
+studiohdr_t *virtualgroup_t::GetStudioHdr( void )
+{
+	return (studiohdr_t *)modelinfo->FindModel( this->cache );
+}
+
 
 byte *studiohdr_t::GetAnimBlock( intp iBlock ) const
 {

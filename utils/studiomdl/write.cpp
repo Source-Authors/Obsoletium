@@ -898,7 +898,13 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
-	return (studiohdr_t *)cache;
+	return static_cast<studiohdr_t *>(cache);
+}
+
+// dimhotepus: Add const-correct API.
+studiohdr_t *virtualgroup_t::GetStudioHdr( void )
+{
+	return static_cast<studiohdr_t *>(cache);
 }
 
 byte *studiohdr_t::GetAnimBlock( intp i ) const
