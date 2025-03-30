@@ -1783,7 +1783,7 @@ bool SVC_Menu::ReadFromBuffer( bf_read &buffer )
 
 const char *SVC_Menu::ToString(void) const
 {
-	Q_snprintf(s_text, sizeof(s_text), "%s: %i \"%s\" (len:%i)", GetName(),
+	V_sprintf_safe(s_text, "%s: %i \"%s\" (len:%i)", GetName(),
 		m_Type, m_MenuKeyValues ? m_MenuKeyValues->GetName() : "No KeyValues", m_iLength );
 	return s_text;
 } 
@@ -1812,7 +1812,7 @@ bool SVC_GameEventList::ReadFromBuffer( bf_read &buffer )
 
 const char *SVC_GameEventList::ToString(void) const
 {
-	Q_snprintf(s_text, sizeof(s_text), "%s: number %i, bytes %i", GetName(), m_nNumEvents, Bits2Bytes(m_nLength) );
+	V_sprintf_safe(s_text, "%s: number %i, bytes %i", GetName(), m_nNumEvents, Bits2Bytes(m_nLength) );
 	return s_text;
 } 
 
@@ -1833,7 +1833,7 @@ bool MM_Heartbeat::ReadFromBuffer( bf_read &buffer )
 
 const char *MM_Heartbeat::ToString( void ) const
 {
-	Q_snprintf( s_text, sizeof( s_text ), "Heartbeat" );
+	V_sprintf_safe( s_text, "Heartbeat" );
 	return s_text;
 }
 
