@@ -44,8 +44,8 @@ public:
 		GetDisplayText( pchText, size );
 	}
 	int CurrentMaterialIndex( void ) { return m_iCurrentMaterialIndex; }
-	int GetMaterialIndex( int iSlideIndex );
-	int NumMaterials( void );
+	int GetMaterialIndex( intp iSlideIndex );
+	intp NumMaterials( void );
 	int CurrentSlideIndex( void ) { return m_iCurrentSlideIndex; }
 
 private:
@@ -73,7 +73,7 @@ private:
 	int		m_iCycleType;
 	bool	m_bNoListRepeats;
 	int		m_iCurrentSlideList;
-	int		m_iCurrentSlide;
+	intp	m_iCurrentSlide;
 };
 
 extern CUtlVector< C_SlideshowDisplay* > g_SlideshowDisplays;
