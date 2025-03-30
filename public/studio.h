@@ -1708,15 +1708,14 @@ struct virtualgeneric_t
 
 struct virtualmodel_t
 {
-	void AppendSequences( int group, const studiohdr_t *pStudioHdr ); 
-	void AppendAnimations( int group, const studiohdr_t *pStudioHdr );
-	void AppendAttachments( int ground, const studiohdr_t *pStudioHdr );
-	void AppendPoseParameters( int group, const studiohdr_t *pStudioHdr );
-	void AppendBonemap( int group, const studiohdr_t *pStudioHdr );
-	void AppendNodes( int group, const studiohdr_t *pStudioHdr );
-	void AppendTransitions( int group, const studiohdr_t *pStudioHdr );
-	void AppendIKLocks( int group, const studiohdr_t *pStudioHdr );
-	void AppendModels( int group, const studiohdr_t *pStudioHdr );
+	void AppendSequences( intp group, const studiohdr_t *pStudioHdr ); 
+	void AppendAnimations( intp group, const studiohdr_t *pStudioHdr );
+	void AppendAttachments( intp group, const studiohdr_t *pStudioHdr );
+	void AppendPoseParameters( intp group, const studiohdr_t *pStudioHdr );
+	void AppendBonemap( intp group, const studiohdr_t *pStudioHdr );
+	void AppendNodes( intp group, const studiohdr_t *pStudioHdr );
+	void AppendIKLocks( intp group, const studiohdr_t *pStudioHdr );
+	void AppendModels( intp group, const studiohdr_t *pStudioHdr );
 	void UpdateAutoplaySequences( const studiohdr_t *pStudioHdr );
 
 	const virtualgroup_t *pAnimGroup( intp animation ) const { return &m_group[ m_anim[ animation ].group ]; } // Note: user must manage mutex for this
