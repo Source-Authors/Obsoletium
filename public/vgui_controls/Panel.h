@@ -680,10 +680,10 @@ protected:
 
 	void AddToOverridableColors( Color *pColor, char const *scriptname )
 	{
-		intp iIdx = m_OverridableColorEntries.AddToTail();
-		m_OverridableColorEntries[iIdx].m_pszScriptName = scriptname;
-		m_OverridableColorEntries[iIdx].m_pColor = pColor;
-		m_OverridableColorEntries[iIdx].m_bOverridden = false;
+		auto &entry = m_OverridableColorEntries[m_OverridableColorEntries.AddToTail()];
+		entry.m_pszScriptName = scriptname;
+		entry.m_pColor = pColor;
+		entry.m_bOverridden = false;
 	}
 
 	void ApplyOverridableColors( void );
