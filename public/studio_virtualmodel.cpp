@@ -26,29 +26,33 @@ extern IFileSystem *		g_pFileSystem;
 // a string table to speed up searching for sequences in the current virtual model
 struct modellookup_t
 {
-	CUtlDict<short,short> seqTable;
-	CUtlDict<short,short> animTable;
+	// dimhotepus: short -> intp
+	CUtlDict<intp,intp> seqTable;
+	// dimhotepus: short -> intp
+	CUtlDict<intp,intp> animTable;
 };
 
 static CUtlVector<modellookup_t> g_ModelLookup;
-static int g_ModelLookupIndex = -1;
+static intp g_ModelLookupIndex = -1;
 
-inline bool HasLookupTable()
+static inline bool HasLookupTable()
 {
 	return g_ModelLookupIndex >= 0 ? true : false;
 }
 
-inline CUtlDict<short,short> *GetSeqTable()
+// dimhotepus: short -> intp
+static inline CUtlDict<intp,intp> *GetSeqTable()
 {
 	return &g_ModelLookup[g_ModelLookupIndex].seqTable;
 }
 
-inline CUtlDict<short,short> *GetAnimTable()
+// dimhotepus: short -> intp
+static inline CUtlDict<intp,intp> *GetAnimTable()
 {
 	return &g_ModelLookup[g_ModelLookupIndex].animTable;
 }
 
-class CModelLookupContext
+class CModelLookupContext final
 {
 public:
 	CModelLookupContext(int group, const studiohdr_t *pStudioHdr);
@@ -78,7 +82,7 @@ CModelLookupContext::~CModelLookupContext()
 	}
 }
 
-void virtualmodel_t::AppendModels( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendModels( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
 
@@ -102,12 +106,11 @@ void virtualmodel_t::AppendModels( int group, const studiohdr_t *pStudioHdr )
 
 	// determine quantity of valid include models in one pass only
 	// temporarily cache results off, otherwise FindModel() causes ref counting problems
-	int j;
-	int nValidIncludes = 0;
-	for (j = 0; j < pStudioHdr->numincludemodels; j++)
+	intp nValidIncludes = 0;
+	for (int j = 0; j < pStudioHdr->numincludemodels; j++)
 	{
 		// find model (increases ref count)
-		void *tmp = NULL;
+		void *tmp = nullptr;
 		const studiohdr_t *pTmpHdr = pStudioHdr->FindModel( &tmp, pStudioHdr->pModelGroup( j )->pszName() );
 		if ( pTmpHdr )
 		{
@@ -127,7 +130,7 @@ void virtualmodel_t::AppendModels( int group, const studiohdr_t *pStudioHdr )
 	if ( nValidIncludes )
 	{
 		m_group.EnsureCapacity( m_group.Count() + nValidIncludes );
-		for (j = 0; j < nValidIncludes; j++)
+		for (intp j = 0; j < nValidIncludes; j++)
 		{
 			MEM_ALLOC_CREDIT();
 			intp groupi = m_group.AddToTail();
@@ -139,47 +142,52 @@ void virtualmodel_t::AppendModels( int group, const studiohdr_t *pStudioHdr )
 	UpdateAutoplaySequences( pStudioHdr );
 }
 
-void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendSequences( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	intp numCheck = m_seq.Count();
-
-	intp j, k;
+	const intp numCheck = m_seq.Count();
 
 	MEM_ALLOC_CREDIT();
 
 	CUtlVector< virtualsequence_t > seq;
-
 	seq = m_seq;
+	
+	auto &vgroup = m_group[group];
+	vgroup.masterSeq.SetCount( pStudioHdr->numlocalseq );
 
-	m_group[ group ].masterSeq.SetCount( pStudioHdr->numlocalseq );
+	auto *seqTable = GetSeqTable();
 
-	for (j = 0; j < pStudioHdr->numlocalseq; j++)
+	for (int j = 0; j < pStudioHdr->numlocalseq; j++)
 	{
 		const mstudioseqdesc_t *seqdesc = pStudioHdr->pLocalSeqdesc( j );
 		const char *s1 = seqdesc->pszLabel();
-
+		
+		intp k;
 		if ( HasLookupTable() )
 		{
 			k = numCheck;
-			short index = GetSeqTable()->Find( s1 );
-			if ( index != GetSeqTable()->InvalidIndex() )
+			const intp index = seqTable->Find( s1 );
+			if ( index != seqTable->InvalidIndex() )
 			{
-				k = GetSeqTable()->Element(index);
+				k = seqTable->Element(index);
 			}
 		}
 		else
 		{
 			for (k = 0; k < numCheck; k++)
 			{
-				const studiohdr_t *hdr = m_group[ seq[k].group ].GetStudioHdr();
-				const char *s2 = hdr->pLocalSeqdesc( seq[k].index )->pszLabel();
+				const auto &vseq = seq[k];
+				const studiohdr_t *hdr = m_group[ vseq.group ].GetStudioHdr();
+				const char *s2 = hdr->pLocalSeqdesc( vseq.index )->pszLabel();
 				if ( !stricmp( s1, s2 ) )
 				{
 					break;
 				}
 			}
 		}
+
+		auto &vseq = seq[k];
+
 		// no duplication
 		if (k == numCheck)
 		{
@@ -190,7 +198,7 @@ void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
 			tmp.activity = seqdesc->activity;
 			k = seq.AddToTail( tmp );
 		}
-		else if (m_group[ seq[k].group ].GetStudioHdr()->pLocalSeqdesc( seq[k].index )->flags & STUDIO_OVERRIDE)
+		else if (m_group[ vseq.group ].GetStudioHdr()->pLocalSeqdesc( vseq.index )->flags & STUDIO_OVERRIDE)
 		{
 			// the one in memory is a forward declared sequence, override it
 			virtualsequence_t tmp;
@@ -198,18 +206,20 @@ void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
 			tmp.index = j;
 			tmp.flags = seqdesc->flags;
 			tmp.activity = seqdesc->activity;
-			seq[k] = tmp;
+			vseq = tmp;
 		}
-		m_group[ group ].masterSeq[ j ] = k;
+
+		vgroup.masterSeq[ j ] = k;
 	}
 
 	if ( HasLookupTable() )
 	{
-		for ( j = numCheck; j < seq.Count(); j++ )
+		for ( intp j = numCheck; j < seq.Count(); j++ )
 		{
-			const studiohdr_t *hdr = m_group[ seq[j].group ].GetStudioHdr();
-			const char *s1 = hdr->pLocalSeqdesc( seq[j].index )->pszLabel();
-			GetSeqTable()->Insert( s1, j );
+			const auto &vseq = seq[j];
+			const studiohdr_t *hdr = m_group[ vseq.group ].GetStudioHdr();
+			const char *s1 = hdr->pLocalSeqdesc( vseq.index )->pszLabel();
+			seqTable->Insert( s1, j );
 		}
 	}
 
@@ -220,7 +230,7 @@ void virtualmodel_t::AppendSequences( int group, const studiohdr_t *pStudioHdr )
 void virtualmodel_t::UpdateAutoplaySequences( const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	int autoplayCount = pStudioHdr->CountAutoplaySequences();
+	const intp autoplayCount = pStudioHdr->CountAutoplaySequences();
 	m_autoplaySequences.SetCount( autoplayCount );
 	pStudioHdr->CopyAutoplaySequences( m_autoplaySequences.Base(), autoplayCount );
 }
@@ -229,43 +239,47 @@ void virtualmodel_t::UpdateAutoplaySequences( const studiohdr_t *pStudioHdr )
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void virtualmodel_t::AppendAnimations( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendAnimations( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	int numCheck = m_anim.Count();
+	const intp numCheck = m_anim.Count();
 
 	CUtlVector< virtualgeneric_t > anim;
 	anim = m_anim;
 
 	MEM_ALLOC_CREDIT();
 
-	int j, k;
+	auto &vgroup = m_group[group];
+	vgroup.masterAnim.SetCount( pStudioHdr->numlocalanim );
 
-	m_group[ group ].masterAnim.SetCount( pStudioHdr->numlocalanim );
+	auto *animTable = GetAnimTable();
 
-	for (j = 0; j < pStudioHdr->numlocalanim; j++)
+	for (int j = 0; j < pStudioHdr->numlocalanim; j++)
 	{
 		const char *s1 = pStudioHdr->pLocalAnimdesc( j )->pszName();
+		intp k;
 		if ( HasLookupTable() )
 		{
 			k = numCheck;
-			short index = GetAnimTable()->Find( s1 );
-			if ( index != GetAnimTable()->InvalidIndex() )
+			const intp index = animTable->Find( s1 );
+			if ( index != animTable->InvalidIndex() )
 			{
-				k = GetAnimTable()->Element(index);
+				k = animTable->Element(index);
 			}
 		}
 		else
 		{
 			for (k = 0; k < numCheck; k++)
 			{
-				const char *s2 = m_group[ anim[k].group ].GetStudioHdr()->pLocalAnimdesc( anim[k].index )->pszName();
+				const auto &vanim = anim[k];
+				const char *s2 = m_group[ vanim.group ].GetStudioHdr()->pLocalAnimdesc( vanim.index )->pszName();
 				if (stricmp( s1, s2 ) == 0)
 				{
 					break;
 				}
 			}
 		}
+
 		// no duplication
 		if (k == numCheck)
 		{
@@ -275,15 +289,16 @@ void virtualmodel_t::AppendAnimations( int group, const studiohdr_t *pStudioHdr 
 			k = anim.AddToTail( tmp );
 		}
 
-		m_group[ group ].masterAnim[ j ] = k;
+		vgroup.masterAnim[j] = k;
 	}
 	
 	if ( HasLookupTable() )
 	{
-		for ( j = numCheck; j < anim.Count(); j++ )
+		for ( intp j = numCheck; j < anim.Count(); j++ )
 		{
-			const char *s1 = m_group[ anim[j].group ].GetStudioHdr()->pLocalAnimdesc( anim[j].index )->pszName();
-			GetAnimTable()->Insert( s1, j );
+			const auto &vanim = anim[j];
+			const char *s1 = m_group[ vanim.group ].GetStudioHdr()->pLocalAnimdesc( vanim.index )->pszName();
+			animTable->Insert( s1, j );
 		}
 	}
 
@@ -295,63 +310,69 @@ void virtualmodel_t::AppendAnimations( int group, const studiohdr_t *pStudioHdr 
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void virtualmodel_t::AppendBonemap( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendBonemap( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
 	MEM_ALLOC_CREDIT();
 
 	const studiohdr_t *pBaseStudioHdr = m_group[ 0 ].GetStudioHdr( );
 
-	m_group[ group ].boneMap.SetCount( pBaseStudioHdr->numbones );
-	m_group[ group ].masterBone.SetCount( pStudioHdr->numbones );
-
-	int j, k;
+	auto &vgroup = m_group[ group ];
+	vgroup.boneMap.SetCount( pBaseStudioHdr->numbones );
+	vgroup.masterBone.SetCount( pStudioHdr->numbones );
 
 	if (group == 0)
 	{
-		for (j = 0; j < pStudioHdr->numbones; j++)
+		for (int j = 0; j < pStudioHdr->numbones; j++)
 		{
-			m_group[ group ].boneMap[ j ] = j;
-			m_group[ group ].masterBone[ j ] = j;
+			vgroup.boneMap[ j ] = j;
+			vgroup.masterBone[ j ] = j;
 		}
 	}
 	else
 	{
-		for (j = 0; j < pBaseStudioHdr->numbones; j++)
+		for (int j = 0; j < pBaseStudioHdr->numbones; j++)
 		{
-			m_group[ group ].boneMap[ j ] = -1;
+			vgroup.boneMap[ j ] = -1;
 		}
-		for (j = 0; j < pStudioHdr->numbones; j++)
+
+		for (int j = 0; j < pStudioHdr->numbones; j++)
 		{
+			const auto *studioBone = pStudioHdr->pBone( j );
+
+			int k;
 			// NOTE: studiohdr has a bone table - using the table is ~5% faster than this for alyx.mdl on a P4/3.2GHz
 			for (k = 0; k < pBaseStudioHdr->numbones; k++)
 			{
-				if (stricmp( pStudioHdr->pBone( j )->pszName(), pBaseStudioHdr->pBone( k )->pszName() ) == 0)
+				if (stricmp( studioBone->pszName(), pBaseStudioHdr->pBone( k )->pszName() ) == 0)
 				{
 					break;
 				}
 			}
+
+			const auto *baseBone = pBaseStudioHdr->pBone( k );
+
 			if (k < pBaseStudioHdr->numbones)
 			{
-				m_group[ group ].masterBone[ j ] = k;
-				m_group[ group ].boneMap[ k ] = j;
+				vgroup.masterBone[ j ] = k;
+				vgroup.boneMap[ k ] = j;
 
 				// FIXME: these runtime messages don't display in hlmv
-				if ((pStudioHdr->pBone( j )->parent == -1) || (pBaseStudioHdr->pBone( k )->parent == -1))
+				if (studioBone->parent == -1 || baseBone->parent == -1)
 				{
-					if ((pStudioHdr->pBone( j )->parent != -1) || (pBaseStudioHdr->pBone( k )->parent != -1))
+					if (studioBone->parent != -1 || baseBone->parent != -1)
 					{
-						Warning( "%s/%s : missmatched parent bones on \"%s\"\n", pBaseStudioHdr->pszName(), pStudioHdr->pszName(), pStudioHdr->pBone( j )->pszName() );
+						Warning( "%s/%s : missmatched parent bones on \"%s\"\n", pBaseStudioHdr->pszName(), pStudioHdr->pszName(), studioBone->pszName() );
 					}
 				}
-				else if (m_group[ group ].masterBone[ pStudioHdr->pBone( j )->parent ] != m_group[ 0 ].masterBone[ pBaseStudioHdr->pBone( k )->parent ])
+				else if (vgroup.masterBone[ studioBone->parent ] != m_group[ 0 ].masterBone[ baseBone->parent ])
 				{
-					Warning( "%s/%s : missmatched parent bones on \"%s\"\n", pBaseStudioHdr->pszName(), pStudioHdr->pszName(), pStudioHdr->pBone( j )->pszName() );
+					Warning( "%s/%s : missmatched parent bones on \"%s\"\n", pBaseStudioHdr->pszName(), pStudioHdr->pszName(), studioBone->pszName() );
 				}
 			}
 			else
 			{
-				m_group[ group ].masterBone[ j ] = -1;
+				vgroup.masterBone[ j ] = -1;
 			}
 		}
 	}
@@ -362,42 +383,41 @@ void virtualmodel_t::AppendBonemap( int group, const studiohdr_t *pStudioHdr )
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void virtualmodel_t::AppendAttachments( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendAttachments( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	int numCheck = m_attachment.Count();
+	const intp numCheck = m_attachment.Count();
 
 	CUtlVector< virtualgeneric_t > attachment;
 	attachment = m_attachment;
 
 	MEM_ALLOC_CREDIT();
 
-	int j, k, n;
+	auto &vgroup = m_group[ group ];
+	vgroup.masterAttachment.SetCount( pStudioHdr->numlocalattachments );
 
-	m_group[ group ].masterAttachment.SetCount( pStudioHdr->numlocalattachments );
-
-	for (j = 0; j < pStudioHdr->numlocalattachments; j++)
+	for (int j = 0; j < pStudioHdr->numlocalattachments; j++)
 	{
-
-		n = m_group[ group ].masterBone[ pStudioHdr->pLocalAttachment( j )->localbone ];
-		
+		auto n = vgroup.masterBone[ pStudioHdr->pLocalAttachment( j )->localbone ];
 		// skip if the attachments bone doesn't exist in the root model
 		if (n == -1)
 		{
 			continue;
 		}
 		
-		
 		const char *s1 = pStudioHdr->pLocalAttachment( j )->pszName();
+		intp k;
 		for (k = 0; k < numCheck; k++)
 		{
-			const char *s2 = m_group[ attachment[k].group ].GetStudioHdr()->pLocalAttachment( attachment[k].index )->pszName();
+			const auto &vattachment = attachment[k];
+			const char *s2 = m_group[ vattachment.group ].GetStudioHdr()->pLocalAttachment( vattachment.index )->pszName();
 
 			if (stricmp( s1, s2 ) == 0)
 			{
 				break;
 			}
 		}
+
 		// no duplication
 		if (k == numCheck)
 		{
@@ -406,25 +426,26 @@ void virtualmodel_t::AppendAttachments( int group, const studiohdr_t *pStudioHdr
 			tmp.index = j;
 			k = attachment.AddToTail( tmp );
 
+			const studiohdr_t *firstHdr = m_group[ 0 ].GetStudioHdr();
 			// make sure bone flags are set so attachment calculates
-			if ((m_group[ 0 ].GetStudioHdr()->pBone( n )->flags & BONE_USED_BY_ATTACHMENT) == 0)
+			if ((firstHdr->pBone( n )->flags & BONE_USED_BY_ATTACHMENT) == 0)
 			{
 				while (n != -1)
 				{
-					m_group[ 0 ].GetStudioHdr()->pBone( n )->flags |= BONE_USED_BY_ATTACHMENT;
+					firstHdr->pBone( n )->flags |= BONE_USED_BY_ATTACHMENT;
 
-					if (m_group[ 0 ].GetStudioHdr()->pLinearBones())
+					if (firstHdr->pLinearBones())
 					{
-						*m_group[ 0 ].GetStudioHdr()->pLinearBones()->pflags(n) |= BONE_USED_BY_ATTACHMENT;
+						*firstHdr->pLinearBones()->pflags( n ) |= BONE_USED_BY_ATTACHMENT;
 					}
 
-					n = m_group[ 0 ].GetStudioHdr()->pBone( n )->parent;
+					n = firstHdr->pBone( n )->parent;
 				}
 				continue;
 			}
 		}
 
-		m_group[ group ].masterAttachment[ j ] = k;
+		vgroup.masterAttachment[ j ] = k;
 	}
 
 	m_attachment.Swap(attachment);
@@ -435,32 +456,34 @@ void virtualmodel_t::AppendAttachments( int group, const studiohdr_t *pStudioHdr
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void virtualmodel_t::AppendPoseParameters( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendPoseParameters( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	int numCheck = m_pose.Count();
+	const intp numCheck = m_pose.Count();
 
 	CUtlVector< virtualgeneric_t > pose;
 	pose = m_pose;
 
 	MEM_ALLOC_CREDIT();
 
-	int j, k;
+	auto &vgroup = m_group[group];
+	vgroup.masterPose.SetCount( pStudioHdr->numlocalposeparameters );
 
-	m_group[ group ].masterPose.SetCount( pStudioHdr->numlocalposeparameters );
-
-	for (j = 0; j < pStudioHdr->numlocalposeparameters; j++)
+	for (int j = 0; j < pStudioHdr->numlocalposeparameters; j++)
 	{
 		const char *s1 = pStudioHdr->pLocalPoseParameter( j )->pszName();
+		intp k;
 		for (k = 0; k < numCheck; k++)
 		{
-			const char *s2 = m_group[ pose[k].group ].GetStudioHdr()->pLocalPoseParameter( pose[k].index )->pszName();
+			const auto &vpose = pose[k];
+			const char *s2 = m_group[ vpose.group ].GetStudioHdr()->pLocalPoseParameter( vpose.index )->pszName();
 
 			if (stricmp( s1, s2 ) == 0)
 			{
 				break;
 			}
 		}
+
 		if (k == numCheck)
 		{
 			// no duplication
@@ -473,14 +496,15 @@ void virtualmodel_t::AppendPoseParameters( int group, const studiohdr_t *pStudio
 		{
 			// duplicate, reset start and end to fit full dynamic range
 			mstudioposeparamdesc_t *pPose1 = pStudioHdr->pLocalPoseParameter( j );
-			mstudioposeparamdesc_t *pPose2 = m_group[ pose[k].group ].GetStudioHdr()->pLocalPoseParameter( pose[k].index );
-			float start =  min( pPose2->end, min( pPose1->end, min( pPose2->start, pPose1->start ) ) );
-			float end =  max( pPose2->end, max( pPose1->end, max( pPose2->start, pPose1->start ) ) );
+			const auto &vpose = pose[k];
+			mstudioposeparamdesc_t *pPose2 = m_group[ vpose.group ].GetStudioHdr()->pLocalPoseParameter( vpose.index );
+			const float start =  min( pPose2->end, min( pPose1->end, min( pPose2->start, pPose1->start ) ) );
+			const float end =  max( pPose2->end, max( pPose1->end, max( pPose2->start, pPose1->start ) ) );
 			pPose2->start = start;
 			pPose2->end = end;
 		}
 
-		m_group[ group ].masterPose[ j ] = k;
+		vgroup.masterPose[j] = k;
 	}
 
 	m_pose.Swap(pose);
@@ -491,32 +515,34 @@ void virtualmodel_t::AppendPoseParameters( int group, const studiohdr_t *pStudio
 // Purpose:
 //-----------------------------------------------------------------------------
 
-void virtualmodel_t::AppendNodes( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendNodes( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	int numCheck = m_node.Count();
+	const intp numCheck = m_node.Count();
 
 	CUtlVector< virtualgeneric_t > node;
 	node = m_node;
 
 	MEM_ALLOC_CREDIT();
 
-	int j, k;
+	auto &vgroup = m_group[ group ];
+	vgroup.masterNode.SetCount( pStudioHdr->numlocalnodes );
 
-	m_group[ group ].masterNode.SetCount( pStudioHdr->numlocalnodes );
-
-	for (j = 0; j < pStudioHdr->numlocalnodes; j++)
+	for (int j = 0; j < pStudioHdr->numlocalnodes; j++)
 	{
-		char *s1 = pStudioHdr->pszLocalNodeName( j );
+		const char *s1 = pStudioHdr->pszLocalNodeName( j );
+		intp k;
 		for (k = 0; k < numCheck; k++)
 		{
-			char *s2 = m_group[ node[k].group ].GetStudioHdr()->pszLocalNodeName( node[k].index );
+			const auto &vnode = node[k];
+			const char *s2 = m_group[ vnode.group ].GetStudioHdr()->pszLocalNodeName( vnode.index );
 
 			if (stricmp( s1, s2 ) == 0)
 			{
 				break;
 			}
 		}
+
 		// no duplication
 		if (k == numCheck)
 		{
@@ -526,7 +552,7 @@ void virtualmodel_t::AppendNodes( int group, const studiohdr_t *pStudioHdr )
 			k = node.AddToTail( tmp );
 		}
 
-		m_group[ group ].masterNode[ j ] = k;
+		vgroup.masterNode[ j ] = k;
 	}
 
 	m_node.Swap(node);
@@ -537,28 +563,29 @@ void virtualmodel_t::AppendNodes( int group, const studiohdr_t *pStudioHdr )
 //-----------------------------------------------------------------------------
 
 
-void virtualmodel_t::AppendIKLocks( int group, const studiohdr_t *pStudioHdr )
+void virtualmodel_t::AppendIKLocks( intp group, const studiohdr_t *pStudioHdr )
 {
 	AUTO_LOCK( m_Lock );
-	int numCheck = m_iklock.Count();
+	const intp numCheck = m_iklock.Count();
 
 	CUtlVector< virtualgeneric_t > iklock;
 	iklock = m_iklock;
 
-	int j, k;
-
-	for (j = 0; j < pStudioHdr->numlocalikautoplaylocks; j++)
+	for (int j = 0; j < pStudioHdr->numlocalikautoplaylocks; j++)
 	{
-		int chain1 = pStudioHdr->pLocalIKAutoplayLock( j )->chain;
+		const int chain1 = pStudioHdr->pLocalIKAutoplayLock( j )->chain;
+		intp k;
 		for (k = 0; k < numCheck; k++)
 		{
-			int chain2 = m_group[ iklock[k].group ].GetStudioHdr()->pLocalIKAutoplayLock( iklock[k].index )->chain;
+			const auto &vlock = iklock[k];
+			const int chain2 = m_group[ vlock.group ].GetStudioHdr()->pLocalIKAutoplayLock( vlock.index )->chain;
 
 			if (chain1 == chain2)
 			{
 				break;
 			}
 		}
+
 		// no duplication
 		if (k == numCheck)
 		{
@@ -579,13 +606,15 @@ void virtualmodel_t::AppendIKLocks( int group, const studiohdr_t *pStudioHdr )
 		studiohdr_t *pBaseHdr = m_group[ 0 ].GetStudioHdr();
 		if ( pStudioHdr->numikchains == pBaseHdr->numikchains )
 		{
-			for (j = 0; j < pStudioHdr->numikchains; j++)
+			for (int j = 0; j < pStudioHdr->numikchains; j++)
 			{
-				if ( pBaseHdr->pIKChain( j )->pLink(0)->kneeDir.LengthSqr() == 0.0f )
+				Vector &baseKneeDir = pBaseHdr->pIKChain( j )->pLink(0)->kneeDir;
+				if ( baseKneeDir.LengthSqr() == 0.0f )
 				{
-					if ( pStudioHdr->pIKChain( j )->pLink(0)->kneeDir.LengthSqr() > 0.0f )
+					const Vector &studioKneeDir = pStudioHdr->pIKChain( j )->pLink(0)->kneeDir;
+					if ( studioKneeDir.LengthSqr() > 0.0f )
 					{
-						pBaseHdr->pIKChain( j )->pLink(0)->kneeDir = pStudioHdr->pIKChain( j )->pLink(0)->kneeDir;
+						baseKneeDir = studioKneeDir;
 					}
 				}
 			}
