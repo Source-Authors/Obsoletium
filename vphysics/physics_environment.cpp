@@ -213,18 +213,17 @@ public:
 
 	void DeleteObject( CPhysicsObject *pObject )
 	{
-		int index = pObject->GetActiveIndex();
+		intp index = pObject->GetActiveIndex();
 		if ( index < m_activeObjects.Count() )
 		{
 			Assert( m_activeObjects[index] == pObject );
 			Remove( index );
-			pObject->SetActiveIndex( 0xFFFF );
+			pObject->SetActiveIndex( std::numeric_limits<intp>::max() );
 		}
 		else
 		{
-			Assert(index==0xFFFF);
+			Assert(index==std::numeric_limits<intp>::max());
 		}
-				
 	}
 
     void event_object_deleted( IVP_Event_Object *pEvent ) override
@@ -257,8 +256,8 @@ public:
 		// don't track static objects (like the world).  That way we only track objects that will move
 		if ( pObject->GetObject()->get_movement_state() != IVP_MT_STATIC )
 		{
-			Assert(pObject->GetActiveIndex()==0xFFFF);
-			if ( pObject->GetActiveIndex()!=0xFFFF)
+			Assert(pObject->GetActiveIndex()==std::numeric_limits<intp>::max());
+			if ( pObject->GetActiveIndex()!=std::numeric_limits<intp>::max())
 				return;
 
 			auto index = m_activeObjects.AddToTail( pObject );

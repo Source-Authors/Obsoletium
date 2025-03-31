@@ -1338,11 +1338,10 @@ bool CPhysicsCollision::IsBBoxCache( CPhysCollide *pCollide )
 
 void CPhysicsCollision::AddBBoxCache( CPhysCollideCompactSurface *pCollide, const Vector &mins, const Vector &maxs )
 {
-	auto index = m_bboxCache.AddToTail();
-	bboxcache_t *pCache = &m_bboxCache[index];
-	pCache->pCollide = pCollide;
-	pCache->mins = mins;
-	pCache->maxs = maxs;
+	bboxcache_t &pCache = m_bboxCache[m_bboxCache.AddToTail()];
+	pCache.pCollide = pCollide;
+	pCache.mins = mins;
+	pCache.maxs = maxs;
 }
 
 CPhysCollideCompactSurface *CPhysicsCollision::GetBBoxCache( const Vector &mins, const Vector &maxs )

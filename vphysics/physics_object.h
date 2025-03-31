@@ -199,8 +199,8 @@ public:
 	[[nodiscard]] int				GetSleepState( void ) const { return m_sleepState; }
 	inline void		ForceSilentDelete() { m_forceSilentDelete = true; }
 
-	[[nodiscard]] inline int		GetActiveIndex( void ) const { return m_activeIndex; }
-	inline void		SetActiveIndex( int index ) { m_activeIndex = index; }
+	[[nodiscard]] inline intp		GetActiveIndex( void ) const { return m_activeIndex; }
+	inline void		SetActiveIndex( intp index ) { m_activeIndex = index; }
 	[[nodiscard]] inline float	GetBuoyancyRatio( void ) const { return m_buoyancyRatio; }
 	// returns true if the mass center is set to the default for the collision model
 	[[nodiscard]] bool			IsMassCenterAtDefault() const;
@@ -250,8 +250,10 @@ private:
 	unsigned short	m_gameIndex;
 
 private:
-	unsigned short	m_materialIndex;
-	unsigned short	m_activeIndex;
+	// dimhotepus: unsigned short -> intp
+	intp	m_activeIndex;
+	// dimhotepus: unsigned short -> int
+	int		m_materialIndex;
 
 	unsigned short	m_callbacks;
 	unsigned short	m_gameFlags;

@@ -110,7 +110,7 @@ void CPhysicsObject::Init( const CPhysCollide *pCollisionModel, IVP_Real_Object 
 	m_gameIndex = 0;
 	m_sleepState = OBJ_SLEEP;		// objects start asleep
 	m_callbacks = CALLBACK_GLOBAL_COLLISION|CALLBACK_GLOBAL_FRICTION|CALLBACK_FLUID_TOUCH|CALLBACK_GLOBAL_TOUCH|CALLBACK_GLOBAL_COLLIDE_STATIC|CALLBACK_DO_FLUID_SIMULATION;
-	m_activeIndex = 0xFFFF;
+	m_activeIndex = std::numeric_limits<intp>::max();
 	m_pShadow = NULL;
 	m_shadowTempGravityDisable = false;
 	m_forceSilentDelete = false;

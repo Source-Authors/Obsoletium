@@ -133,7 +133,7 @@ public:
 	}
 	bool IsReservedMaterialIndex( int materialIndex ) const;
 	virtual const char *GetReservedMaterialName( int materialIndex ) const;
-	int	GetReservedFallBack( int materialIndex ) const;
+	intp GetReservedFallBack( int materialIndex ) const;
 
 	intp GetReservedSurfaceIndex( const char *pPropertyName ) const;
 
@@ -161,7 +161,7 @@ private:
 	CUtlVector<CUtlSymbol>		m_fileList;
 	CIVPMaterialManager			m_ivpManager;
 	bool						m_init;
-	int							m_shadowFallback;
+	intp						m_shadowFallback;
 };
 
 
@@ -365,7 +365,7 @@ IVP_Material *CPhysicsSurfaceProps::GetIVPMaterial( int materialIndex )
 }
 
 
-int	CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
+intp CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
 {
 	switch( materialIndex )
 	{
