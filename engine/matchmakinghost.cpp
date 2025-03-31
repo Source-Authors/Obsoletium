@@ -286,7 +286,7 @@ void CMatchmaking::HandleJoinRequest( netpacket_t *pPacket )
 			pNewClient->m_xuids[i] = pPacket->message.ReadLongLong();	// 64 bit
 			pPacket->message.ReadBytes( pNewClient->m_cVoiceState );
 			pNewClient->m_iTeam[i] = joinResponse.m_iTeam;
-			pPacket->message.ReadString( pNewClient->m_szGamertags[i], true );
+			pPacket->message.ReadString( pNewClient->m_szGamertags[i], ssize(pNewClient->m_szGamertags[i]), true );
 		}
 
 		// Tell everyone about the new client, and vice versa

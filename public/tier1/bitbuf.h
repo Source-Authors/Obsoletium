@@ -635,12 +635,12 @@ public:
 	// complete (this will never exceed bufLen-1).
 	//
 	bool			ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine=false, intp *pOutNumChars=NULL );
-	
+
 	// dimhotepus: Bounds-safe interface.
 	template<intp bufLen>
-	bool			ReadString( OUT_Z_ARRAY char (&pStr)[bufLen], bool bLine=false, intp *pOutNumChars=NULL )
+	bool			ReadString( OUT_Z_ARRAY char (&pStr)[bufLen] )
 	{
-		return ReadString( pStr, bufLen, bLine, pOutNumChars );
+		return ReadString( pStr, bufLen, false, nullptr );
 	}
 
 	// Reads a string and allocates memory for it. If the string in the buffer

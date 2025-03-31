@@ -1874,7 +1874,7 @@ bool MM_ClientInfo::ReadFromBuffer( bf_read &buffer )
 		buffer.ReadBytes( m_cVoiceState );
 		m_iTeam[i] = buffer.ReadLong();
 		m_iControllers[i] = buffer.ReadByte();
-		buffer.ReadString( m_szGamertags[i], true );
+		buffer.ReadString( m_szGamertags[i], ssize(m_szGamertags[i]), true );
 	}
 
 	return !buffer.IsOverflowed();

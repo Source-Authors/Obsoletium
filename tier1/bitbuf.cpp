@@ -1382,8 +1382,8 @@ char* bf_read::ReadAndAllocateString( bool *pOverflow )
 {
 	char str[2048];
 	
-	int nChars;
-	bool bOverflow = !ReadString( str, false, &nChars );
+	intp nChars;
+	bool bOverflow = !ReadString( str, ssize(str), false, &nChars );
 	if ( pOverflow )
 		*pOverflow = bOverflow;
 
