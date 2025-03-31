@@ -186,8 +186,6 @@ void virtualmodel_t::AppendSequences( intp group, const studiohdr_t *pStudioHdr 
 			}
 		}
 
-		auto &vseq = seq[k];
-
 		// no duplication
 		if (k == numCheck)
 		{
@@ -198,7 +196,7 @@ void virtualmodel_t::AppendSequences( intp group, const studiohdr_t *pStudioHdr 
 			tmp.activity = seqdesc->activity;
 			k = seq.AddToTail( tmp );
 		}
-		else if (m_group[ vseq.group ].GetStudioHdr()->pLocalSeqdesc( vseq.index )->flags & STUDIO_OVERRIDE)
+		else if (m_group[ seq[k].group ].GetStudioHdr()->pLocalSeqdesc( seq[k].index )->flags & STUDIO_OVERRIDE)
 		{
 			// the one in memory is a forward declared sequence, override it
 			virtualsequence_t tmp;
@@ -206,7 +204,7 @@ void virtualmodel_t::AppendSequences( intp group, const studiohdr_t *pStudioHdr 
 			tmp.index = j;
 			tmp.flags = seqdesc->flags;
 			tmp.activity = seqdesc->activity;
-			vseq = tmp;
+			seq[k] = tmp;
 		}
 
 		vgroup.masterSeq[ j ] = k;
