@@ -523,6 +523,8 @@ bool CImportVMT::UnserializeProxies( CDmElement *pElement, KeyValues *pKeyValues
 
 	CDmrElementArray<> array( pProxies );
 
+	bool ok = true;
+
 	// Proxies are a list of sub-keys, the name is the proxy name, subkeys are values
 	for ( KeyValues *pProxy = pKeyValues->GetFirstTrueSubKey(); pProxy != NULL; pProxy = pProxy->GetNextTrueSubKey() )
 	{
@@ -538,24 +540,29 @@ bool CImportVMT::UnserializeProxies( CDmElement *pElement, KeyValues *pKeyValues
 			{
 			case KeyValues::TYPE_INT:
 				pProxyElement->SetValue( pProxyParam->GetName(), pProxyParam->GetInt() );
-				return true;
+				// dimhotepus: return -> break to process all elements.
+				break;
 
 			case KeyValues::TYPE_FLOAT:
 				pProxyElement->SetValue( pProxyParam->GetName(), pProxyParam->GetFloat() );
-				return true;
+				// dimhotepus: return -> break to process all elements.
+				break;
 
 			case KeyValues::TYPE_STRING:
 				pProxyElement->SetValue( pProxyParam->GetName(), pProxyParam->GetString() );
-				return true;
+				// dimhotepus: return -> break to process all elements.
+				break;
 
 			default:
 				Warning( "Unhandled proxy keyvalues type (proxy %s var %s)\n", pProxy->GetName(), pProxyParam->GetName() );
-				return false;
+				// dimhotepus: return -> break to process all elements.
+				ok = false;
+				break;
 			}
 		}
 	}
 
-	return true;
+	return ok;
 }
 
 
