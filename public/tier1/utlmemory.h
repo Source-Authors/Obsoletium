@@ -287,9 +287,7 @@ public:
 	// constructor, destructor
 	CUtlMemoryConservative( intp nGrowSize = 0, intp nInitSize = 0 ) : m_pMemory( NULL )
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		m_nCurAllocSize = 0;
-#endif
 	}
 	CUtlMemoryConservative( T* pMemory, intp numElements ) = delete;
 	~CUtlMemoryConservative()								{ free( m_pMemory ); }
@@ -314,18 +312,12 @@ public:
 	// Size
 	FORCEINLINE void RememberAllocSize( size_t sz )
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		m_nCurAllocSize = sz;
-#endif
 	}
 
 	size_t AllocSize( void ) const
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		return m_nCurAllocSize;
-#else
-		return ( m_pMemory ) ? g_pMemAlloc->GetSize( m_pMemory ) : 0;
-#endif
 	}
 
 	intp NumAllocated() const
@@ -391,10 +383,7 @@ public:
 
 private:
 	T *m_pMemory;
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 	size_t m_nCurAllocSize;
-#endif
-
 };
 
 
@@ -651,7 +640,7 @@ inline bool CUtlMemory<T,I>::IsIdxValid( I i ) const
 //-----------------------------------------------------------------------------
 // Grows the memory
 //-----------------------------------------------------------------------------
-inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowSize, intp nNewSize, intp nBytesItem )
+[[nodiscard]] constexpr inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowSize, intp nNewSize, intp nBytesItem )
 {
 	if ( nGrowSize )
 	{ 
@@ -662,20 +651,13 @@ inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowS
 		if ( !nAllocationCount )
 		{
 			// Compute an allocation which is at least as big as a cache line...
+			// dimhotepus: Actually cache line size on modern CPUs (2010+) is 64 bytes, but it allocates too much.
 			nAllocationCount = (31 + nBytesItem) / nBytesItem;
 		}
 
 		while (nAllocationCount < nNewSize)
 		{
-#ifndef _X360
 			nAllocationCount *= 2;
-#else
-			intp nNewAllocationCount = ( nAllocationCount * 9) / 8; // 12.5 %
-			if ( nNewAllocationCount > nAllocationCount )
-				nAllocationCount = nNewAllocationCount;
-			else
-				nAllocationCount *= 2;
-#endif
 		}
 	}
 
@@ -703,9 +685,9 @@ void CUtlMemory<T,I>::Grow( intp num )
 	intp nNewAllocationCount = UtlMemory_CalcNewAllocationCount( m_nAllocationCount, m_nGrowSize, nAllocationRequested, sizeof(T) );
 
 	// if m_nAllocationRequested wraps index type I, recalculate
-	if ( ( intp )( I )nNewAllocationCount < nAllocationRequested )
+	if ( nNewAllocationCount < nAllocationRequested )
 	{
-		if ( ( intp )( I )nNewAllocationCount == 0 && ( intp )( I )( nNewAllocationCount - 1 ) >= nAllocationRequested )
+		if ( nNewAllocationCount == 0 && ( intp )( I )( nNewAllocationCount - 1 ) >= nAllocationRequested )
 		{
 			--nNewAllocationCount; // deal w/ the common case of m_nAllocationCount == MAX_USHORT + 1
 		}
