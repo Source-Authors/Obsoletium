@@ -348,10 +348,10 @@ void virtualmodel_t::AppendBonemap( intp group, const studiohdr_t *pStudioHdr )
 				}
 			}
 
-			const auto *baseBone = pBaseStudioHdr->pBone( k );
-
 			if (k < pBaseStudioHdr->numbones)
 			{
+				const auto *baseBone = pBaseStudioHdr->pBone( k );
+
 				vgroup.masterBone[ j ] = k;
 				vgroup.boneMap[ k ] = j;
 
