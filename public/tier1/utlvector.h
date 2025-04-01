@@ -323,12 +323,12 @@ public:
 class CUtlVectorUltraConservativeAllocator
 {
 public:
-	static void *Alloc( size_t nSize )
+	[[nodiscard]] ALLOC_CALL static void *Alloc( size_t nSize )
 	{
 		return malloc( nSize );
 	}
 
-	static void *Realloc( void *pMem, size_t nSize )
+	[[nodiscard]] ALLOC_CALL static void *Realloc( void *pMem, size_t nSize )
 	{
 		return realloc( pMem, nSize );
 	}
@@ -338,7 +338,7 @@ public:
 		free( pMem );
 	}
 
-	static size_t GetSize( void *pMem )
+	[[nodiscard]] static size_t GetSize( void *pMem )
 	{
 		return mallocsize( pMem );
 	}
@@ -351,7 +351,7 @@ class CUtlVectorUltraConservative : private A
 public:
 	// Don't inherit from base_vector_t because multiple-inheritance increases
 	// class size!
-	enum { IsUtlVector = true }; // Used to match this at compiletime 		
+	enum { IsUtlVector = true }; // Used to match this at compiletime
 
 	CUtlVectorUltraConservative()
 	{
@@ -377,6 +377,21 @@ public:
 	{
 		return (i >= 0) && (i < Count());
 	}
+
+	// dimhotepus: Add STL compatible member functions. 
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	T* begin()					{ return Base(); }
+	const T* begin() const		{ return Base(); }
+	
+	// dimhotepus: Add STL compatible member functions. 
+	T *end()					{ return Base() + Count(); }
+	const T *end() const		{ return Base() + Count(); }
+
+	// dimhotepus: Add CUtlVector compatible member functions. 
+	// Gets the base address (can change when adding elements!)
+	T* Base()								{ return m_pData->m_Elements; }
+	const T* Base() const					{ return m_pData->m_Elements; }
 
 	T& operator[]( intp i )
 	{
@@ -415,6 +430,8 @@ public:
 			if (m_pData)
 			{
 				m_pData->m_Size = 0;
+				// dimhotepus: Initialize elements.
+				m_pData->m_Elements = reinterpret_cast<T*>(m_pData + 1);
 			}
 		}
 		else
@@ -427,6 +444,8 @@ public:
 				if (tmp)
 				{
 					m_pData = tmp;
+					// dimhotepus: Initialize elements.
+					m_pData->m_Elements = reinterpret_cast<T*>(m_pData + 1);
 				}
 				else
 				{
@@ -1453,7 +1472,7 @@ void CUtlVector<T, A>::Validate( CValidator &validator, char *pchName )
 
 // A vector class for storing pointers, so that the elements pointed to by the pointers are deleted
 // on exit.
-template<class T> class CUtlVectorAutoPurge : public CUtlVector< T, CUtlMemory< T, intp> >
+template<class T> class CUtlVectorAutoPurge : public CUtlVector< std::enable_if_t<std::is_pointer_v<T>, T>, CUtlMemory< T, intp> >
 {
 public:
 	~CUtlVectorAutoPurge( void )
@@ -1465,7 +1484,7 @@ public:
 
 // A vector class for storing pointers, so that the elements pointed to by the pointers are deleted
 // on exit.
-template<class T> class CUtlVectorAutoPurgeArray : public CUtlVector< T, CUtlMemory< T, intp> >
+template<class T> class CUtlVectorAutoPurgeArray : public CUtlVector< std::enable_if_t<std::is_pointer_v<T>, T>, CUtlMemory< T, intp> >
 {
 public:
 	~CUtlVectorAutoPurgeArray( void )
