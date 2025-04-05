@@ -723,7 +723,7 @@ char const *CBaseEntity::DamageDecal( int bitsDamageType, int gameMaterial )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CBaseEntity::GetIndexForThinkContext( const char *pszContext )
+intp CBaseEntity::GetIndexForThinkContext( const char *pszContext )
 {
 	for ( intp i = 0; i < m_aThinkFunctions.Count(); i++ )
 	{
@@ -737,9 +737,9 @@ int	CBaseEntity::GetIndexForThinkContext( const char *pszContext )
 //-----------------------------------------------------------------------------
 // Purpose: Get a fresh think context for this entity
 //-----------------------------------------------------------------------------
-int CBaseEntity::RegisterThinkContext( const char *szContext )
+intp CBaseEntity::RegisterThinkContext( const char *szContext )
 {
-	int iIndex = GetIndexForThinkContext( szContext );
+	intp iIndex = GetIndexForThinkContext( szContext );
 	if ( iIndex != NO_THINK_CONTEXT )
 		return iIndex;
 
@@ -782,7 +782,7 @@ BASEPTR	CBaseEntity::ThinkSet( BASEPTR func, float thinkTime, const char *szCont
 	}
 
 	// Find the think function in our list, and if we couldn't find it, register it
-	int iIndex = GetIndexForThinkContext( szContext );
+	intp iIndex = GetIndexForThinkContext( szContext );
 	if ( iIndex == NO_THINK_CONTEXT )
 	{
 		iIndex = RegisterThinkContext( szContext );
@@ -812,7 +812,7 @@ void CBaseEntity::SetNextThink( float thinkTime, const char *szContext )
 	int thinkTick = ( thinkTime == TICK_NEVER_THINK ) ? TICK_NEVER_THINK : TIME_TO_TICKS( thinkTime );
 
 	// Are we currently in a think function with a context?
-	int iIndex = 0;
+	intp iIndex = 0;
 	if ( !szContext )
 	{
 #ifdef _DEBUG
@@ -848,7 +848,7 @@ void CBaseEntity::SetNextThink( float thinkTime, const char *szContext )
 float CBaseEntity::GetNextThink( const char *szContext )
 {
 	// Are we currently in a think function with a context?
-	int iIndex = 0;
+	intp iIndex = 0;
 	if ( !szContext )
 	{
 #ifdef _DEBUG
@@ -883,7 +883,7 @@ float CBaseEntity::GetNextThink( const char *szContext )
 int	CBaseEntity::GetNextThinkTick( const char *szContext /*= NULL*/ )
 {
 	// Are we currently in a think function with a context?
-	int iIndex = 0;
+	intp iIndex = 0;
 	if ( !szContext )
 	{
 #ifdef _DEBUG
@@ -922,7 +922,7 @@ int	CBaseEntity::GetNextThinkTick( const char *szContext /*= NULL*/ )
 float CBaseEntity::GetLastThink( const char *szContext )
 {
 	// Are we currently in a think function with a context?
-	int iIndex = 0;
+	intp iIndex = 0;
 	if ( !szContext )
 	{
 #ifdef _DEBUG
@@ -946,7 +946,7 @@ float CBaseEntity::GetLastThink( const char *szContext )
 int CBaseEntity::GetLastThinkTick( const char *szContext /*= NULL*/ )
 {
 	// Are we currently in a think function with a context?
-	int iIndex = 0;
+	intp iIndex = 0;
 	if ( !szContext )
 	{
 #ifdef _DEBUG
