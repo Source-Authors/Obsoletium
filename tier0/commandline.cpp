@@ -80,7 +80,7 @@ private:
 // Instance singleton and expose interface to rest of code
 //-----------------------------------------------------------------------------
 static CCommandLine g_CmdLine;
-ICommandLine *CommandLine()
+ICommandLine *CommandLine_Tier0()
 {
 	return &g_CmdLine;
 }
