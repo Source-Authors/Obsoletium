@@ -465,7 +465,7 @@ int	C_StriderFX::DrawModel( int )
 		m_t += gpGlobals->frametime;
 		if ( m_tMax > 0 )
 		{
-			m_t = clamp( m_t, 0, m_tMax );
+			m_t = clamp( m_t, 0.f, m_tMax );
 			m_beamEndPosition = m_worldPosition;
 		}
 	}

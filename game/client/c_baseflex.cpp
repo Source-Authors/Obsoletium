@@ -265,7 +265,7 @@ void C_BaseFlex::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternio
 		float cosAngle = DotProduct( p0, leanPos );
 		float angle = atan2f( sinAngle, cosAngle ) * 180 / M_PI_F;
 		Quaternion q1;
-		angle = clamp( angle, -45, 45 );
+		angle = clamp( angle, -45.f, 45.f );
 		AxisAngleQuaternion( p1, angle, q1 );
 		QuaternionMult( q1, q[0], q[0] );
 		QuaternionNormalize2( q[0] );
@@ -1274,8 +1274,8 @@ void C_BaseFlex::RunFlexDelay( int nFlexWeightCount, float *pFlexWeights, float 
 	// process the delayed version of the flexweights
 	if ( flFlexDelayTime > 0.0f && flFlexDelayTime < gpGlobals->curtime )
 	{
-		float d = clamp( gpGlobals->curtime - flFlexDelayTime, 0.0, gpGlobals->frametime );
-		d = ExponentialDecay( 0.8, 0.033, d );
+		float d = clamp( gpGlobals->curtime - flFlexDelayTime, 0.0f, gpGlobals->frametime );
+		d = ExponentialDecay( 0.8f, 0.033f, d );
 
 		for ( int i = 0; i < nFlexWeightCount; i++)
 		{
