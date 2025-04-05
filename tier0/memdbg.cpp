@@ -386,7 +386,7 @@ static inline void InternalFree( void *pMem )
 #ifdef OSX
 	malloc_zone_free( malloc_default_zone(), pMem );
 #else
-	free( pInternalMem );	
+	free( pInternalMem );
 #endif
 #else
 	_free_dbg( pInternalMem, _NORMAL_BLOCK );
@@ -1463,10 +1463,10 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	HEAP_LOCK();
 
 	char szFileName[MAX_PATH];
-	static int s_FileCount = 0;
+	static unsigned s_FileCount = 0;
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
-		_snprintf( szFileName, std::size( szFileName ), "%s%d.txt", pchFileBase, s_FileCount );
+		_snprintf( szFileName, std::size( szFileName ), "%s%u.txt", pchFileBase, s_FileCount );
 		szFileName[ std::size(szFileName) - 1 ] = '\0';
 
 		++s_FileCount;
