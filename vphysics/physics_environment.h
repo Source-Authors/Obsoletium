@@ -39,8 +39,8 @@ public:
 	[[nodiscard]] IVPhysicsDebugOverlay *GetDebugOverlay( void ) override;
 
 	void			SetGravity( const Vector& gravityVector ) override;
-	[[nodiscard]] IPhysicsObject	*CreatePolyObject( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams ) override;
-	[[nodiscard]] IPhysicsObject	*CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams ) override;
+	[[nodiscard]] IPhysicsObject	*CreatePolyObject( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams ) override;
+	[[nodiscard]] IPhysicsObject	*CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams ) override;
 	[[nodiscard]] unsigned int	GetObjectSerializeSize( IPhysicsObject *pObject ) const override;
 	void			SerializeObjectToBuffer( IPhysicsObject *pObject, unsigned char *pBuffer, unsigned int bufferSize ) override;
 	[[nodiscard]] IPhysicsObject *UnserializeObjectFromBuffer( void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions ) override;
@@ -107,7 +107,7 @@ public:
 	void SetAirDensity( float density ) override;
 	[[nodiscard]] float GetAirDensity( void ) const override;
 	void ResetSimulationClock( void ) override;
-	[[nodiscard]] IPhysicsObject *CreateSphereObject( float radius, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic ) override;
+	[[nodiscard]] IPhysicsObject *CreateSphereObject( float radius, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic ) override;
 	void CleanupDeleteList() override;
 	void EnableDeleteQueue( bool enable ) override { m_queueDeleteObject = enable; }
 	// debug

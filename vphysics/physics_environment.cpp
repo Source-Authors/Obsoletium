@@ -1277,7 +1277,7 @@ void CPhysicsEnvironment::GetGravity( Vector *pGravityVector ) const
 }
 
 
-IPhysicsObject *CPhysicsEnvironment::CreatePolyObject( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
+IPhysicsObject *CPhysicsEnvironment::CreatePolyObject( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
 {
 	IPhysicsObject *pObject = ::CreatePhysicsObject( this, pCollisionModel, materialIndex, position, angles, pParams, false );
 	if ( pObject )
@@ -1287,7 +1287,7 @@ IPhysicsObject *CPhysicsEnvironment::CreatePolyObject( const CPhysCollide *pColl
 	return pObject;
 }
 
-IPhysicsObject *CPhysicsEnvironment::CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
+IPhysicsObject *CPhysicsEnvironment::CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
 {
 	IPhysicsObject *pObject = ::CreatePhysicsObject( this, pCollisionModel, materialIndex, position, angles, pParams, true );
 	if ( pObject )
@@ -1877,7 +1877,7 @@ void CPhysicsEnvironment::PhantomRemove( CPhysicsObject *pObject )
 
 //-------------------------------------
 
-IPhysicsObject *CPhysicsEnvironment::CreateSphereObject( float radius, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
+IPhysicsObject *CPhysicsEnvironment::CreateSphereObject( float radius, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
 {
 	IPhysicsObject *pObject = ::CreatePhysicsSphere( this, radius, materialIndex, position, angles, pParams, isStatic );
 	m_objects.AddToTail( pObject );

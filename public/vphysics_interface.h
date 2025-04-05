@@ -556,11 +556,11 @@ public:
 	
 	// object creation
 	// create a polygonal object.  pCollisionModel was created by the physics builder DLL in a pre-process.
-	virtual [[nodiscard]] IPhysicsObject	*CreatePolyObject( const CPhysCollide *pCollisionModel, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams ) = 0;
+	virtual [[nodiscard]] IPhysicsObject	*CreatePolyObject( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams ) = 0;
 	// same as above, but this one cannot move or rotate (infinite mass/inertia)
-	virtual [[nodiscard]] IPhysicsObject	*CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams ) = 0;
+	virtual [[nodiscard]] IPhysicsObject	*CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams ) = 0;
 	// Create a perfectly spherical object
-	virtual [[nodiscard]] IPhysicsObject *CreateSphereObject( float radius, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic ) = 0;
+	virtual [[nodiscard]] IPhysicsObject *CreateSphereObject( float radius, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic ) = 0;
 	// destroy an object created with CreatePolyObject() or CreatePolyObjectStatic()
 	virtual void DestroyObject( IPhysicsObject * ) = 0;
 

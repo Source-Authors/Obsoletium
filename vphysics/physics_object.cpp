@@ -1471,7 +1471,7 @@ bool CPhysicsObject::IsAttachedToConstraint( bool bExternalOnly ) const
 	return false;
 }
 
-static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, int materialIndex, objectparams_t *pParams, bool isStatic )
+static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, intp materialIndex, objectparams_t *pParams, bool isStatic )
 {
 	objectTemplate.mass = clamp( pParams->mass, VPHYSICS_MIN_MASS, VPHYSICS_MAX_MASS );
 
@@ -1514,7 +1514,7 @@ static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, int ma
 	objectTemplate.auto_check_rot_inertia = pParams->rotInertiaLimit;
 }
 
-CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, int materialIndex, const Vector &position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
+CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, intp materialIndex, const Vector &position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
 {
 	if ( materialIndex < 0 )
 	{
@@ -1587,7 +1587,7 @@ CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CP
 	return pObject;
 }
 
-CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float radius, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic )
+CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float radius, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic )
 {
 	IVP_U_Quat rotation;
 	IVP_U_Point pos;
