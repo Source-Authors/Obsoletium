@@ -128,9 +128,9 @@ void CBudgetPanelShared::SendConfigDataToBase()
 		data.m_BudgetGroupInfo[i].m_Color = g_TempBudgetGroupSpace[i].m_Color;
 	}
 
-	data.m_HistoryLabelValues.AddToTail( 1000.0 / 20 );
-	data.m_HistoryLabelValues.AddToTail( 1000.0 / 30 );
-	data.m_HistoryLabelValues.AddToTail( 1000.0 / 60 );
+	data.m_HistoryLabelValues.AddToTail( 1000.0f / 20 );
+	data.m_HistoryLabelValues.AddToTail( 1000.0f / 30 );
+	data.m_HistoryLabelValues.AddToTail( 1000.0f / 60 );
 	
 	// Copy all the cvars in.
 	data.m_flHistoryRange = budget_history_range_ms.GetFloat();
