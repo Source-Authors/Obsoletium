@@ -217,10 +217,9 @@ public:
 
 	void PutObject( T *pInfo )
 	{
-		auto *pElem = reinterpret_cast<unsigned char *>(pInfo);
-		pElem -= offsetof(TSPoolNode_t, elem);
-		auto *pNode = reinterpret_cast<TSPoolNode_t *>(pElem);
-
+		// dimhotepus: Fix put object.
+		auto *pNode = new TSPoolNode_t;
+		pNode->elem = *pInfo;
 		CTSListBase::Push( pNode );
 	}
 
@@ -473,7 +472,7 @@ public:
 
 		m_Count.store(0, std::memory_order::memory_order_relaxed );
 		
-		 // list always contains a dummy node
+		// list always contains a dummy node
 		m_Head.value.pNode = m_Tail.value.pNode = new Node_t;
 		m_Head.value.pNode->SetNextNode(End());
 		m_Head.value.sequence = m_Tail.value.sequence = 0;
@@ -740,7 +739,7 @@ private:
 	{
 		return ThreadInterlockedAssignIf64x128( &pLink->value64x128, value.value64x128, comperand.value64x128 );
 	}
-
+	
 	void FinishPush( Node_t *pNode, const NodeLink_t &oldTail )
 	{
 		NodeLink_t newTail;
@@ -749,7 +748,7 @@ private:
 		newTail.value.sequence = oldTail.value.sequence + 1;
 
 		ThreadMemoryBarrier();
-	
+
 		InterlockedCompareExchangeNodeLink( &m_Tail, newTail, oldTail );
 	}
 
