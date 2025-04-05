@@ -617,9 +617,9 @@ void CrosshairImagePanelCS::UpdateCrosshair()
 	}
 	else
 	{
-		m_R = clamp( m_pColorRSlider->GetSliderValue(), 0, 255 );
-		m_G = clamp( m_pColorGSlider->GetSliderValue(), 0, 255 );
-		m_B = clamp( m_pColorBSlider->GetSliderValue(), 0, 255 );
+		m_R = clamp( m_pColorRSlider->GetSliderValue(), 0.f, 255.f );
+		m_G = clamp( m_pColorGSlider->GetSliderValue(), 0.f, 255.f );
+		m_B = clamp( m_pColorBSlider->GetSliderValue(), 0.f, 255.f );
 	}
 
 	m_barSize = m_pSizeSlider->GetSliderValue();
@@ -892,9 +892,9 @@ void CrosshairImagePanelAdvanced::Paint()
 void CrosshairImagePanelAdvanced::UpdateCrosshair()
 {
 	// get the color selected in the combo box.
-	m_R = clamp( m_pAdvCrosshairRedSlider->GetSliderValue(), 0, 255 );
-	m_G = clamp( m_pAdvCrosshairGreenSlider->GetSliderValue(), 0, 255 );
-	m_B = clamp( m_pAdvCrosshairBlueSlider->GetSliderValue(), 0, 255 );
+	m_R = clamp( m_pAdvCrosshairRedSlider->GetSliderValue(), 0.f, 255.f );
+	m_G = clamp( m_pAdvCrosshairGreenSlider->GetSliderValue(), 0.f, 255.f );
+	m_B = clamp( m_pAdvCrosshairBlueSlider->GetSliderValue(), 0.f, 255.f );
 
 	m_flScale = m_pAdvCrosshairScaleSlider->GetSliderValue();
 
