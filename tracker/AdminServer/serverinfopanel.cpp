@@ -277,8 +277,7 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 		// add to the list string that aren't comments
 		if (nameSize > 0 && !(customString[0] == '/' && customString[1] == '/'))
 		{
-			intp i = mapArray.AddToTail();
-			mapArray[i] = customString;
+			mapArray[mapArray.AddToTail()] = customString;
 		}
 	}
 }
