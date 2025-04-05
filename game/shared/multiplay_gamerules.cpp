@@ -1518,7 +1518,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//-----------------------------------------------------------------------------
 	void CMultiplayRules::LoadVoiceCommandScript( void )
 	{
-		KeyValues *pKV = new KeyValues( "VoiceCommands" );
+		KeyValuesAD pKV( "VoiceCommands" );
 
 		if ( pKV->LoadFromFile( filesystem, "scripts/voicecommands.txt", "GAME" ) )
 		{
@@ -1562,8 +1562,6 @@ ConVarRef suitcharger( "sk_suitcharger" );
 				}
 			}
 		}
-
-		pKV->deleteThis();
 	}
 
 #ifndef CLIENT_DLL
