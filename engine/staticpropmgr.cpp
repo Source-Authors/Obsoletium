@@ -1003,7 +1003,7 @@ int	CStaticProp::DrawModelSlow( int flags )
 	if ( r_colorstaticprops.GetBool() )
 	{
 		// deterministic random sequence
-		unsigned short hash[3];
+		unsigned int hash[3];
 		hash[0] = HashItem( m_ModelInstance );
 		hash[1] = HashItem( hash[0] );
 		hash[2] = HashItem( hash[1] );
@@ -1216,7 +1216,7 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 	solid.params.pGameData = pGameData;
 	solid.params.pName = "prop_static";
 
-	int surfaceData = physprop->GetSurfaceIndex( solid.surfaceprop );
+	intp surfaceData = physprop->GetSurfaceIndex( solid.surfaceprop );
 	pPhysEnv->CreatePolyObjectStatic( pPhysCollide, 
 		surfaceData, m_Origin, m_Angles, &solid.params );
 	//PhysCheckAdd( pPhys, "Static" );
@@ -1555,7 +1555,7 @@ void CStaticPropMgr::LevelShutdownClient()
 
 	Assert( m_bLevelInitialized );
 
-	for (int i = m_StaticProps.Count(); --i >= 0; )
+	for (intp i = m_StaticProps.Count(); --i >= 0; )
 	{
 		m_StaticProps[i].CleanUpRenderHandle( );
 		modelrender->SetStaticLighting( m_StaticProps[i].GetModelInstance(), NULL );
@@ -1575,8 +1575,8 @@ void CStaticPropMgr::LevelShutdownClient()
 void CStaticPropMgr::CreateVPhysicsRepresentations( IPhysicsEnvironment	*pPhysEnv, IVPhysicsKeyHandler *pDefaults, void *pGameData )
 {
 	// Walk through the static props + make collideable thingies for them.
-	int nCount = m_StaticProps.Count();
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = m_StaticProps.Count();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		m_StaticProps[i].CreateVPhysics( pPhysEnv, pDefaults, pGameData );
 	}
@@ -1627,9 +1627,9 @@ ICollideable *CStaticPropMgr::GetStaticPropByIndex( int propIndex )
 void CStaticPropMgr::GetAllStaticProps( CUtlVector<ICollideable *> *pOutput )
 {
 	if ( pOutput == NULL ) return;
-	int iPropVectorSize = m_StaticProps.Count();
+	intp iPropVectorSize = m_StaticProps.Count();
 
-	int counter;
+	intp counter;
 	for ( counter = 0; counter != iPropVectorSize; ++counter )
 	{
 		pOutput->AddToTail( &m_StaticProps[counter] );
@@ -1639,9 +1639,9 @@ void CStaticPropMgr::GetAllStaticProps( CUtlVector<ICollideable *> *pOutput )
 void CStaticPropMgr::GetAllStaticPropsInAABB( const Vector &vMins, const Vector &vMaxs, CUtlVector<ICollideable *> *pOutput )
 {
 	if ( pOutput == NULL ) return;
-	int iPropVectorSize = m_StaticProps.Count();
+	intp iPropVectorSize = m_StaticProps.Count();
 
-	int counter;
+	intp counter;
 	for ( counter = 0; counter != iPropVectorSize; ++counter )
 	{
 		CStaticProp *pProp = &m_StaticProps[counter];
@@ -1664,7 +1664,7 @@ void CStaticPropMgr::GetAllStaticPropsInAABB( const Vector &vMins, const Vector 
 void CStaticPropMgr::GetAllStaticPropsInOBB( const Vector &ptOrigin, const Vector &vExtent1, const Vector &vExtent2, const Vector &vExtent3, CUtlVector<ICollideable *> *pOutput )
 {
 	if ( pOutput == NULL ) return;
-	int counter;
+	intp counter;
 
 	Vector vAABBMins, vAABBMaxs;
 	vAABBMins = ptOrigin;
@@ -1709,7 +1709,7 @@ void CStaticPropMgr::GetAllStaticPropsInOBB( const Vector &ptOrigin, const Vecto
 	vOBBPlaneNormals[5] = -vOBBPlaneNormals[4];
 	fOBBPlaneDists[5] = vOBBPlaneNormals[5].Dot( ptOrigin );
 
-	int iPropVectorSize = m_StaticProps.Count();
+	intp iPropVectorSize = m_StaticProps.Count();
 
 	for ( counter = 0; counter != iPropVectorSize; ++counter )
 	{
@@ -1815,39 +1815,7 @@ void CStaticPropMgr::PrecacheLighting()
 {
 	COM_TimestampedLog( "CStaticPropMgr::PrecacheLighting - start");
 
-	int numVerts = 0;
-	if ( IsX360() )
-	{
-		if ( g_bLoadedMapHasBakedPropLighting && g_pMaterialSystemHardwareConfig->SupportsStreamOffset() )
-		{
-			// total the static prop verts
-			int i = m_StaticProps.Count();
-			while ( --i >= 0 )
-			{
-				if ( PropHasBakedLightingDisabled( m_StaticProps[i].GetEntityHandle() ) ) 
-				{
-					continue;
-				}
-
-				studiohwdata_t *pStudioHWData = g_pMDLCache->GetHardwareData( ( (model_t*)m_StaticProps[i].GetModel() )->studio );
-				for ( int lodID = pStudioHWData->m_RootLOD; lodID < pStudioHWData->m_NumLODs; lodID++ )
-				{
-					studioloddata_t *pLOD = &pStudioHWData->m_pLODs[lodID];
-					for ( int meshID = 0; meshID < pStudioHWData->m_NumStudioMeshes; meshID++ )
-					{
-						studiomeshdata_t *pMesh = &pLOD->m_pMeshData[meshID];
-						for ( int groupID = 0; groupID < pMesh->m_NumGroup; groupID++ )
-						{
-							numVerts += pMesh->m_pMeshGroup[groupID].m_NumVertices;
-						}
-					}
-				}
-			}
-		}
-		modelrender->SetupColorMeshes( numVerts );
-	}
-
-	int i = m_StaticProps.Count();
+	intp i = m_StaticProps.Count();
 	while ( --i >= 0 )
 	{
 		MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
@@ -1861,7 +1829,7 @@ void CStaticPropMgr::PrecacheLighting()
 
 void CStaticPropMgr::RecomputeStaticLighting( )
 {
-	int i = m_StaticProps.Count();
+	intp i = m_StaticProps.Count();
 	while ( --i >= 0 )
 	{
 		if ( !m_StaticProps[i].ShouldDraw() )
@@ -2040,8 +2008,8 @@ unsigned char CStaticPropMgr::ComputeScreenFade( CStaticProp &prop, float flMinS
 	{
 		if ( (flMaxSize >= 0) && (flPixelWidth < flMaxSize) )
 		{
-			int nAlpha = flFalloffFactor * (flPixelWidth - flMinSize);
-			alpha = clamp( nAlpha, 0, 255 );
+			int nAlpha = static_cast<int>(flFalloffFactor * (flPixelWidth - flMinSize));
+			alpha = static_cast<unsigned char>(clamp( nAlpha, 0, 255 ));
 		}
 		else
 		{
@@ -2138,8 +2106,8 @@ void CStaticPropMgr::ComputePropOpacity( CStaticProp &prop )
 			{
 				if ( (fade.m_MinDistSq >= 0) && (sqDist > fade.m_MinDistSq) )
 				{
-					int nAlpha = fade.m_FalloffFactor * (fade.m_MaxDistSq - sqDist);
-					alpha = clamp( nAlpha, 0, 255 );
+					int nAlpha = static_cast<int>(fade.m_FalloffFactor * (fade.m_MaxDistSq - sqDist));
+					alpha = static_cast<unsigned char>(clamp( nAlpha, 0, 255 ));
 				}
 				else
 				{
