@@ -194,7 +194,7 @@ void CParticleProperty::AddControlPoint( CNewParticleEffect *pEffect, int iPoint
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CParticleProperty::AddControlPoint( int iEffectIndex, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, int iAttachmentPoint, Vector vecOriginOffset )
+void CParticleProperty::AddControlPoint( intp iEffectIndex, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, int iAttachmentPoint, Vector vecOriginOffset )
 {
 	Assert( iEffectIndex >= 0 && iEffectIndex < m_ParticleEffects.Count() );
 	ParticleEffectList_t *pEffect = &m_ParticleEffects[iEffectIndex];

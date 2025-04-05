@@ -238,9 +238,7 @@ bool CreateTargetFile_VCD( const char *pSourceName, [[maybe_unused]] const char 
 		return false;
 	}
 
-	intp iScene = g_SceneFiles.AddToTail();
-
-	SceneFile_t &sceneFile = g_SceneFiles[iScene];
+	SceneFile_t &sceneFile = g_SceneFiles[g_SceneFiles.AddToTail()];
 	sceneFile.fileName.Set( pSourceName );
 
 	// Walk all events looking for SPEAK events

@@ -683,8 +683,7 @@ void CCurveData::Parse( ISceneTokenProcessor *tokenizer, ICurveDataAccessor *dat
 		float value = strtof(tokenizer->CurrentToken(), nullptr);
 		
 		// Add to counter
-		intp idx = samples.AddToTail();
-		CExpressionSample *s = &samples[ idx ];
+		CExpressionSample *s = &samples[ samples.AddToTail() ];
 			
 		s->time			= time;
 		s->value		= value;
@@ -886,9 +885,7 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 				float value = strtof(tokenizer->CurrentToken(), nullptr);
 				
 				// Add to counter
-				intp idx = samples[ samplecount ].AddToTail();
-				
-				CExpressionSample *s = &samples[ samplecount ][ idx ];
+				CExpressionSample *s = &samples[ samplecount ][ samples[ samplecount ].AddToTail() ];
 				
 				if ( samples_use_realtime )
 				{

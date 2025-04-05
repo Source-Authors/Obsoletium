@@ -884,10 +884,8 @@ CExpressionSample *CFlexAnimationTrack::AddSample( float time, float value, int 
 	sample.value = value;
 	sample.selected = false;
 
-	intp idx = m_Samples[ type ].AddToTail( sample );
-	
 	// Resort( type );
-	return &m_Samples[ type ][ idx ];
+	return &m_Samples[ type ][ m_Samples[ type ].AddToTail( sample ) ];
 }
 
 //-----------------------------------------------------------------------------
@@ -3447,8 +3445,7 @@ CExpressionSample *CCurveData::Add( float time, float value, bool selected )
 	sample.value = value;
 	sample.selected = selected;
 
-	intp idx = m_Ramp.AddToTail( sample );
-	return &m_Ramp[ idx ];
+	return &m_Ramp[ m_Ramp.AddToTail( sample ) ];
 }
 
 void CCurveData::Delete( intp index )

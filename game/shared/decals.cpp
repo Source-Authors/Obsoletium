@@ -227,10 +227,8 @@ void CDecalEmitterSystem::LoadDecalsFromScript( char const *filename )
 							decal.weight = sub->GetFloat();
 
 							// Add to global list
-							intp idx = m_AllDecals.AddToTail( decal );
-
 							// Add index only to local list
-							entry.indices.AddToTail( idx );
+							entry.indices.AddToTail( m_AllDecals.AddToTail( decal ) );
 						}
 
 						// Add entry to main dictionary
