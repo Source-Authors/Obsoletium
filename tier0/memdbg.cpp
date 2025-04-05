@@ -671,8 +671,8 @@ private:
 
 	// FIXME: specify a spew output func for dumping stats
 	// Stat output
-	void DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info );
-	void DumpFileStats();
+	void DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info ) const;
+	void DumpFileStats() const;
 	void DumpStats() override;
 	void DumpStatsFileBase( char const *pchFileBase ) override;
 	void DumpBlockStats( void *p ) override;
@@ -1415,7 +1415,7 @@ void CDbgMemAlloc::DumpBlockStats( void *p )
 //-----------------------------------------------------------------------------
 // Stat output
 //-----------------------------------------------------------------------------
-void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info )
+void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info ) const
 {
 	m_OutputFunc("%s, line %i\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%d",
 		pAllocationName,
@@ -1443,7 +1443,7 @@ void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const Mem
 //-----------------------------------------------------------------------------
 // Stat output
 //-----------------------------------------------------------------------------
-void CDbgMemAlloc::DumpFileStats()
+void CDbgMemAlloc::DumpFileStats() const
 {
 	if ( !m_pStatMap )
 		return;
@@ -1742,44 +1742,6 @@ static void override_free_hook(struct _malloc_zone_t *zone, void *ptr)
     
     set_override_hooks(); 
 } 
-
-
-/*
- 
- These are func's we could optionally override right now on OSX but don't need to
- 
- static size_t override_size_hook(struct _malloc_zone_t *zone, const void *ptr)
- {
- set_osx_hooks();  
- DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( (void *)ptr );
- set_override_hooks(); 
- if ( *((int*)pInternalMem->m_Reserved) == 0xf00df00d )
- {
- return pInternalMem->nLogicalSize;
- }
- return 0;
- } 
- 
- 
- static void *override_calloc_hook(struct _malloc_zone_t *zone, size_t num_items, size_t size )
- {
- void *ans = override_malloc_hook( zone, num_items*size );
- if ( !ans )
- return 0;
- memset( ans, 0x0, num_items*size );
- return ans;
- }
- 
- static void *override_valloc_hook(struct _malloc_zone_t *zone, size_t size )
- {
- return override_calloc_hook( zone, 1, size );
- }
- 
- static void override_destroy_hook(struct _malloc_zone_t *zone)
- {
- }
- */
-
 
 static inline void unprotect_malloc_zone( malloc_zone_t *malloc_zone )
 {
