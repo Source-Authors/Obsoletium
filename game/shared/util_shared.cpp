@@ -1364,10 +1364,10 @@ const char *UTIL_GetRandomSoundFromEntry( const char* pszEntryName )
 Color FloatRGBAToColor( float r, float g, float b, float a )
 {
 	return Color(
-		(unsigned char)clamp(r + .5f, 0.0, 255.0f),
-		(unsigned char)clamp(g + .5f, 0.0, 255.0f),
-		(unsigned char)clamp(b + .5f, 0.0, 255.0f),
-		(unsigned char)clamp(a + .5f, 0.0, 255.0f)
+		(unsigned char)clamp(r + .5f, 0.0f, 255.0f),
+		(unsigned char)clamp(g + .5f, 0.0f, 255.0f),
+		(unsigned char)clamp(b + .5f, 0.0f, 255.0f),
+		(unsigned char)clamp(a + .5f, 0.0f, 255.0f)
 	);
 }
 
