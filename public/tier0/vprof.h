@@ -67,54 +67,57 @@ constexpr inline int VPROF_BUDGET_GROUP_ID_UNACCOUNTED{0};
 
 // NOTE: You can use strings instead of these defines. . they are defined here and added
 // in vprof.cpp so that they are always in the same order.
-#define VPROF_BUDGETGROUP_OTHER_UNACCOUNTED			_T("Unaccounted")
-#define VPROF_BUDGETGROUP_WORLD_RENDERING			_T("World Rendering")
-#define VPROF_BUDGETGROUP_DISPLACEMENT_RENDERING	_T("Displacement_Rendering")
-#define VPROF_BUDGETGROUP_GAME						_T("Game")
-#define VPROF_BUDGETGROUP_NPCS						_T("NPCs")
-#define VPROF_BUDGETGROUP_SERVER_ANIM				_T("Server Animation")
-#define VPROF_BUDGETGROUP_PHYSICS					_T("Physics")
-#define VPROF_BUDGETGROUP_STATICPROP_RENDERING		_T("Static_Prop_Rendering")
-#define VPROF_BUDGETGROUP_MODEL_RENDERING			_T("Other_Model_Rendering")
-#define VPROF_BUDGETGROUP_MODEL_FAST_PATH_RENDERING _T("Fast Path Model Rendering")
-#define VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING		_T("Brush_Model_Rendering")
-#define VPROF_BUDGETGROUP_SHADOW_RENDERING			_T("Shadow_Rendering")
-#define VPROF_BUDGETGROUP_DETAILPROP_RENDERING		_T("Detail_Prop_Rendering")
-#define VPROF_BUDGETGROUP_PARTICLE_RENDERING		_T("Particle/Effect_Rendering")
-#define VPROF_BUDGETGROUP_ROPES						_T("Ropes")
-#define VPROF_BUDGETGROUP_DLIGHT_RENDERING			_T("Dynamic_Light_Rendering")
-#define VPROF_BUDGETGROUP_OTHER_NETWORKING			_T("Networking")
-#define VPROF_BUDGETGROUP_CLIENT_ANIMATION			_T("Client_Animation")
-#define VPROF_BUDGETGROUP_OTHER_SOUND				_T("Sound")
-#define VPROF_BUDGETGROUP_OTHER_VGUI				_T("VGUI")
-#define VPROF_BUDGETGROUP_OTHER_FILESYSTEM			_T("FileSystem")
-#define VPROF_BUDGETGROUP_PREDICTION				_T("Prediction")
-#define VPROF_BUDGETGROUP_INTERPOLATION				_T("Interpolation")
-#define VPROF_BUDGETGROUP_SWAP_BUFFERS				_T("Swap_Buffers")
-#define VPROF_BUDGETGROUP_PLAYER					_T("Player")
-#define VPROF_BUDGETGROUP_OCCLUSION					_T("Occlusion")
-#define VPROF_BUDGETGROUP_OVERLAYS					_T("Overlays")
-#define VPROF_BUDGETGROUP_TOOLS						_T("Tools")
-#define VPROF_BUDGETGROUP_LIGHTCACHE				_T("Light_Cache")
-#define VPROF_BUDGETGROUP_DISP_HULLTRACES			_T("Displacement_Hull_Traces")
-#define VPROF_BUDGETGROUP_TEXTURE_CACHE				_T("Texture_Cache")
-#define VPROF_BUDGETGROUP_REPLAY					_T("Replay")
-#define VPROF_BUDGETGROUP_PARTICLE_SIMULATION		_T("Particle Simulation")
-#define VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING	_T("Flashlight Shadows")
-#define VPROF_BUDGETGROUP_CLIENT_SIM				_T("Client Simulation") // think functions, tempents, etc.
-#define VPROF_BUDGETGROUP_STEAM						_T("Steam") 
-#define VPROF_BUDGETGROUP_CVAR_FIND					_T("Cvar_Find") 
-#define VPROF_BUDGETGROUP_CLIENTLEAFSYSTEM			_T("ClientLeafSystem")
-#define VPROF_BUDGETGROUP_JOBS_COROUTINES			_T("Jobs/Coroutines")
-#define VPROF_BUDGETGROUP_SLEEPING					_T("Sleeping")
-#define VPROF_BUDGETGROUP_THREADINGMAIN				_T("ThreadingMain")
-#define VPROF_BUDGETGROUP_HTMLSURFACE				_T("HTMLSurface")
-#define VPROF_BUDGETGROUP_VGUI						VPROF_BUDGETGROUP_HTMLSURFACE
-#define VPROF_BUDGETGROUP_TENFOOT					VPROF_BUDGETGROUP_HTMLSURFACE
-#define VPROF_BUDGETGROUP_STEAMUI					VPROF_BUDGETGROUP_HTMLSURFACE
-#define VPROF_BUDGETGROUP_ATTRIBUTES				_T("Attributes")
-#define VPROF_BUDGETGROUP_FINDATTRIBUTE				_T("FindAttribute")
-#define VPROF_BUDGETGROUP_FINDATTRIBUTEUNSAFE		_T("FindAttributeUnsafe")
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_UNACCOUNTED[] =		_T("Unaccounted");
+constexpr inline tchar VPROF_BUDGETGROUP_WORLD_RENDERING[] =		_T("World Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_DISPLACEMENT_RENDERING[] = _T("Displacement_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_GAME[]					  = _T("Game");
+constexpr inline tchar VPROF_BUDGETGROUP_NPCS[]					  = _T("NPCs");
+constexpr inline tchar VPROF_BUDGETGROUP_SERVER_ANIM[]			  = _T("Server Animation");
+constexpr inline tchar VPROF_BUDGETGROUP_PHYSICS[]				  = _T("Physics");
+constexpr inline tchar VPROF_BUDGETGROUP_STATICPROP_RENDERING[]	  = _T("Static_Prop_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_MODEL_RENDERING[]		  = _T("Other_Model_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_MODEL_FAST_PATH_RENDERING[] = _T("Fast Path Model Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING[]		= _T("Brush_Model_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_SHADOW_RENDERING[]	=		_T("Shadow_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_DETAILPROP_RENDERING[]	=	_T("Detail_Prop_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_PARTICLE_RENDERING[] =		_T("Particle/Effect_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_ROPES[] =					_T("Ropes");
+constexpr inline tchar VPROF_BUDGETGROUP_DLIGHT_RENDERING[]	=		_T("Dynamic_Light_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_NETWORKING[]	=		_T("Networking");
+constexpr inline tchar VPROF_BUDGETGROUP_CLIENT_ANIMATION[] =		_T("Client_Animation");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_SOUND[] =			_T("Sound");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_VGUI[] = 			_T("VGUI");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_FILESYSTEM[]	=		_T("FileSystem");
+constexpr inline tchar VPROF_BUDGETGROUP_PREDICTION[] =				_T("Prediction");
+constexpr inline tchar VPROF_BUDGETGROUP_INTERPOLATION[] =			_T("Interpolation");
+constexpr inline tchar VPROF_BUDGETGROUP_SWAP_BUFFERS[] =			_T("Swap_Buffers");
+constexpr inline tchar VPROF_BUDGETGROUP_PLAYER[] = 				_T("Player");
+constexpr inline tchar VPROF_BUDGETGROUP_OCCLUSION[] =				_T("Occlusion");
+constexpr inline tchar VPROF_BUDGETGROUP_OVERLAYS[]	=				_T("Overlays");
+constexpr inline tchar VPROF_BUDGETGROUP_TOOLS[] = 					_T("Tools");
+constexpr inline tchar VPROF_BUDGETGROUP_LIGHTCACHE[] = 			_T("Light_Cache");
+constexpr inline tchar VPROF_BUDGETGROUP_DISP_HULLTRACES[] =		_T("Displacement_Hull_Traces");
+constexpr inline tchar VPROF_BUDGETGROUP_TEXTURE_CACHE[] =			_T("Texture_Cache");
+constexpr inline tchar VPROF_BUDGETGROUP_REPLAY[] =					_T("Replay");
+constexpr inline tchar VPROF_BUDGETGROUP_PARTICLE_SIMULATION[] =	_T("Particle Simulation");
+constexpr inline tchar VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING[] =	_T("Flashlight Shadows");
+constexpr inline tchar VPROF_BUDGETGROUP_CLIENT_SIM[] =				_T("Client Simulation"); // think functions, tempents, etc.
+constexpr inline tchar VPROF_BUDGETGROUP_STEAM[] = 					_T("Steam");
+constexpr inline tchar VPROF_BUDGETGROUP_CVAR_FIND[] =				_T("Cvar_Find");
+constexpr inline tchar VPROF_BUDGETGROUP_CLIENTLEAFSYSTEM[] = 		_T("ClientLeafSystem");
+constexpr inline tchar VPROF_BUDGETGROUP_JOBS_COROUTINES[] =		_T("Jobs/Coroutines");
+constexpr inline tchar VPROF_BUDGETGROUP_SLEEPING[] =				_T("Sleeping");
+constexpr inline tchar VPROF_BUDGETGROUP_THREADINGMAIN[] =			_T("ThreadingMain");
+constexpr inline tchar VPROF_BUDGETGROUP_HTMLSURFACE[] =			_T("HTMLSurface");
+// dimhotepus: tchar[] -> tchar*
+constexpr inline auto VPROF_BUDGETGROUP_VGUI =						VPROF_BUDGETGROUP_HTMLSURFACE;
+// dimhotepus: tchar[] -> tchar*
+constexpr inline auto VPROF_BUDGETGROUP_TENFOOT =					VPROF_BUDGETGROUP_HTMLSURFACE;
+// dimhotepus: tchar[] -> tchar*
+constexpr inline auto VPROF_BUDGETGROUP_STEAMUI =					VPROF_BUDGETGROUP_HTMLSURFACE;
+constexpr inline tchar VPROF_BUDGETGROUP_ATTRIBUTES[] =				_T("Attributes");
+constexpr inline tchar VPROF_BUDGETGROUP_FINDATTRIBUTE[] = 			_T("FindAttribute");
+constexpr inline tchar VPROF_BUDGETGROUP_FINDATTRIBUTEUNSAFE[] =	_T("FindAttributeUnsafe");
 
 //-------------------------------------
 
