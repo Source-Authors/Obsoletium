@@ -576,18 +576,6 @@ public:
 #endif
 	}
 
-	void FinishPush( Node_t *pNode, const NodeLink_t &oldTail )
-	{
-		NodeLink_t newTail;
-
-		newTail.value.pNode = pNode;
-		newTail.value.sequence = oldTail.value.sequence + 1;
-
-		ThreadMemoryBarrier();
-
-		InterlockedCompareExchangeNodeLink( &m_Tail, newTail, oldTail );
-	}
-
 	Node_t *Push( Node_t *pNode )
 	{
 #ifdef _DEBUG
@@ -700,11 +688,6 @@ public:
 		return head.value.pNode;
 	}
 
-	void FreeNode( Node_t *pNode )
-	{
-		m_FreeNodes.Push( pNode );
-	}
-
 	void PushItem( const T &init )
 	{
 		auto *pNode = static_cast<Node_t *>(m_FreeNodes.Pop());
@@ -736,6 +719,15 @@ public:
 	}
 
 private:
+	NodeLink_t m_Head;
+	NodeLink_t m_Tail;
+
+	std::atomic_int m_Count;
+	
+	CTSListBase m_FreeNodes;
+
+	Node_t m_end;
+
 	// just need a unique signifier
 	Node_t *End() { return &m_end; }
 
@@ -749,14 +741,19 @@ private:
 		return ThreadInterlockedAssignIf64x128( &pLink->value64x128, value.value64x128, comperand.value64x128 );
 	}
 
-	NodeLink_t m_Head;
-	NodeLink_t m_Tail;
+	void FinishPush( Node_t *pNode, const NodeLink_t &oldTail )
+	{
+		NodeLink_t newTail;
 
-	std::atomic_int m_Count;
+		newTail.value.pNode = pNode;
+		newTail.value.sequence = oldTail.value.sequence + 1;
+
+		ThreadMemoryBarrier();
 	
-	CTSListBase m_FreeNodes;
+		InterlockedCompareExchangeNodeLink( &m_Tail, newTail, oldTail );
+	}
 
-	Node_t m_end;
+	void FreeNode(Node_t *pNode) { m_FreeNodes.Push(pNode); }
 };
 
 #endif  // TIER0_TSLIST_H_
