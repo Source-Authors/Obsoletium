@@ -730,7 +730,7 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::AddToHead( float changeTi
 			m_VarHistory[newslot].FastTransferFrom( m_VarHistory[i] );
 			newslot = i;
 		}
-		}
+	}
 
 	CInterpolatedVarEntry *e = &m_VarHistory[ newslot ];
 	e->NewEntry( values, m_nMaxCount, changeTime );
