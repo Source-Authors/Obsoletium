@@ -26,7 +26,7 @@
 #include <climits>
 #include "tier0/threadtools.h"
 #if ( !defined(_DEBUG) && defined(USE_MEM_DEBUG) )
-#pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't check this in!")
+#pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't commit this!")
 #endif
 #if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
 
@@ -770,7 +770,7 @@ CDbgMemAlloc::CDbgMemAlloc() : m_pStatMap{nullptr}, m_pFilenames{nullptr}, m_sMe
 
 	if ( !IsDebug() )
 	{
-		Plat_DebugString( "USE_MEM_DEBUG is enabled in a release build. Don't check this in!\n" );
+		Plat_DebugString( "USE_MEM_DEBUG is enabled in a release build. Don't commit this!\n" );
 	}
 }
 
