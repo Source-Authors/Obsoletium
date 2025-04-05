@@ -42,7 +42,7 @@
 #define DebugFree	free
 
 #ifdef WIN32
-int g_DefaultHeapFlags = _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF );
+static const int g_DefaultHeapFlags = _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF );
 #endif
 
 #if defined( _MEMTEST )
@@ -297,7 +297,7 @@ DbgMemHeader_t *GetCrtDbgMemHeader( void *pMem )
 }
 #endif
 
-inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
+static inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
 {
 #ifdef OSX
 	void *pAllocedMem = malloc_zone_malloc( malloc_default_zone(), nSize + sizeof(DbgMemHeader_t) );
@@ -338,7 +338,7 @@ inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
 #endif // LINUX || WIN32
 }
 
-inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName, int nLine )
+static inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName, int nLine )
 {
 	if ( !pMem )
 		return InternalMalloc( nNewSize, pFileName, nLine );
@@ -375,7 +375,7 @@ inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName
 #endif // LINUX || WIN32
 }
 
-inline void InternalFree( void *pMem )
+static inline void InternalFree( void *pMem )
 {
 	if ( !pMem )
 		return;
@@ -394,7 +394,7 @@ inline void InternalFree( void *pMem )
 #endif
 }
 
-inline size_t InternalMSize( void *pMem )
+static inline size_t InternalMSize( void *pMem )
 {
 	//$ TODO. For Linux, we could use 'int size = malloc_usable_size( pMem )'...
 #if defined(POSIX)
@@ -409,7 +409,7 @@ inline size_t InternalMSize( void *pMem )
 #endif	
 }
 
-inline size_t InternalLogicalSize( void *pMem )
+static inline size_t InternalLogicalSize( void *pMem )
 {
 #if defined(POSIX)
 	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( pMem );
@@ -694,11 +694,11 @@ private:
 	size_t				m_sMemoryAllocFailed;
 };
 
-static char const *g_pszUnknown = "unknown";
+static constexpr inline char g_pszUnknown[]{"unknown"};
 
 //-----------------------------------------------------------------------------
 
-constexpr int DBG_INFO_STACK_DEPTH = 32;
+static constexpr inline int DBG_INFO_STACK_DEPTH = 32;
 
 struct DbgInfoStack_t
 {
