@@ -1,11 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- tier1/utlsymbollarge.h -->
+
+  <Type Name="CUtlSymbolLarge">
+    <Intrinsic Name="id" Expression="u.m_Id" />
+    <Intrinsic Name="str" Expression="u.m_pAsString" />
+    <DisplayString Condition="u.m_Id != -1">{u.m_pAsString}</DisplayString>
+    <DisplayString Condition="u.m_Id == -1">{{empty}}</DisplayString>
+      <Expand>
+          <Item Condition="u.m_Id != -1" Name="[str]">u.m_pAsString</Item>
+      </Expand>
+  </Type>
+
+  <Type Name="CUtlSymbolTableLargeBaseTreeEntry_t">
+    <Intrinsic Name="hash" Expression="m_Hash" />
+    <Intrinsic Name="str" Expression="(const char *)&amp;m_String[0]" />
+    <DisplayString Condition="m_Hash != 0 || 0 != m_String[0]">{(const char *)&amp;m_String[0]}</DisplayString>
+    <DisplayString Condition="m_Hash == 0 &amp;&amp; 0 == m_String[0]">{{empty}}</DisplayString>
+      <Expand>
+          <Item Condition="m_Hash != 0 || 0 != m_String[0]" Name="[str]">(const char *)&amp;m_String[0]</Item>
+      </Expand>
+  </Type>
+
+  <Type Name="CNonThreadsafeTree&lt;*&gt;">
+    <Intrinsic Name="size" Expression="m_NumElements" />
+    <Intrinsic Name="capacity" Expression="m_Elements.m_nAllocationCount" />
+      <DisplayString>{{ size={m_NumElements} }}</DisplayString>
+      <Expand>
+          <Item Name="[root]" Condition="m_Root == -1" ExcludeView="simple">-1</Item>
+          <Item Name="[root]" Condition="m_Root != -1" ExcludeView="simple">m_Elements.m_pMemory[m_Root]</Item>
+          <Item Name="[capacity]" ExcludeView="simple">m_Elements.m_nAllocationCount</Item>
+          <Item Name="[allocator]" ExcludeView="simple">m_Elements</Item>
+          <ArrayItems>
+            <Size>m_NumElements</Size>
+            <ValuePointer>m_Elements.m_pMemory</ValuePointer>
+          </ArrayItems>
+      </Expand>
+  </Type>
+
+  <Type Name="CTreeEntryLess">
+    <DisplayString>less</DisplayString>
+    <Expand/>
+  </Type>
+
+  <Type Name="UtlRBTreeLinks_t&lt;*&gt;">
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right == -1" IncludeView="noparens">empty &lt;- empty -&gt; empty</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1" IncludeView="noparens">empty &lt;- empty -&gt; {m_Right}</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Right == -1" IncludeView="noparens">{m_Left} &lt;- empty -&gt; empty</DisplayString>
+    <DisplayString Condition="m_Parent == -1" IncludeView="noparens">{m_Left} &lt;- empty -&gt; {m_Right}</DisplayString>
+
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right == -1" ExcludeView="noparens">(empty &lt;- empty -&gt; empty)</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1" ExcludeView="noparens">(empty &lt;- empty -&gt; {m_Right})</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Right == -1" ExcludeView="noparens">({m_Left} &lt;- empty -&gt; empty)</DisplayString>
+    <DisplayString Condition="m_Parent == -1" ExcludeView="noparens">({m_Left} &lt;- empty -&gt; {m_Right})</DisplayString>
+
+    <DisplayString IncludeView="noparens">{m_Left} &lt;- {m_Parent} -&gt; {m_Right}</DisplayString>
+    <DisplayString ExcludeView="noparens">({m_Left} &lt;- {m_Parent} -&gt; {m_Right})</DisplayString>
+    <Expand>
+       <Item Name="parent">m_Parent</Item>
+       <Item Name="left">m_Left</Item>
+       <Item Name="right">m_Right</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="UtlRBTreeNode_t&lt;*&gt;">
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right == -1" IncludeView="noparens">empty &lt;- empty -&gt; empty</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right != -1" IncludeView="noparens">empty &lt;- empty -&gt; {m_Right}</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right == -1" IncludeView="noparens">{m_Left} &lt;- empty -&gt; empty</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right != -1" IncludeView="noparens">{m_Left} &lt;- empty -&gt; {m_Right}</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right == -1" IncludeView="noparens">empty &lt;- {m_Parent} -&gt; empty</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right != -1" IncludeView="noparens">empty &lt;- {m_Parent} -&gt; {m_Right}</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right == -1" IncludeView="noparens">{m_Left} &lt;- {m_Parent} -&gt; empty</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right != -1" IncludeView="noparens">{m_Left} &lt;- {m_Parent} -&gt; {m_Right}</DisplayString>
+    
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right == -1" ExcludeView="noparens">(empty &lt;- empty -&gt; empty)</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right != -1" ExcludeView="noparens">(empty &lt;- empty -&gt; {m_Right})</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right == -1" ExcludeView="noparens">({m_Left} &lt;- empty -&gt; empty)</DisplayString>
+    <DisplayString Condition="m_Parent == -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right != -1" ExcludeView="noparens">({m_Left} &lt;- empty -&gt; {m_Right})</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right == -1" ExcludeView="noparens">(empty &lt;- {m_Parent} -&gt; empty)</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left == -1 &amp;&amp; m_Right != -1" ExcludeView="noparens">(empty &lt;- {m_Parent} -&gt; {m_Right})</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right == -1" ExcludeView="noparens">({m_Left} &lt;- {m_Parent} -&gt; empty)</DisplayString>
+    <DisplayString Condition="m_Parent != -1 &amp;&amp; m_Left != -1 &amp;&amp; m_Right != -1" ExcludeView="noparens">({m_Left} &lt;- {m_Parent} -&gt; {m_Right})</DisplayString>
+    
+    <Expand>
+       <Item Name="data">m_Data</Item>
+       <Item Name="parent">m_Parent</Item>
+       <Item Name="left">m_Left</Item>
+       <Item Name="right">m_Right</Item>
+    </Expand>
+  </Type>
+
   <!-- utlvector.h -->
 
   <!-- CUtlVector<T,CUtlMemory<T>> -->
 
   <!-- VC 2015 -->
   <Type Name="CUtlVector&lt;bool,CUtlMemory&lt;bool&gt;&gt;">
+    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;bool,CUtlMemory&lt;bool&gt;&gt;,*&gt;" />
+    <AlternativeType Name="CCopyableUtlVector&lt;bool&gt;" />
     <Intrinsic Name="size" Expression="m_Size" />
     <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
       <DisplayString>{{ size={m_Size} }}</DisplayString>
@@ -21,6 +113,10 @@
 
   <!-- VC 2015 -->
   <Type Name="CUtlVector&lt;*,CUtlMemory&lt;*&gt;&gt;">
+    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;*,CUtlMemory&lt;*&gt;&gt;,*&gt;" />
+    <AlternativeType Name="CCopyableUtlVector&lt;*&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurge&lt;*&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;*&gt;" />
     <Intrinsic Name="size" Expression="m_Size" />
     <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
     <DisplayString>{{ size={m_Size} }}</DisplayString>
@@ -39,46 +135,42 @@
     <AlternativeType Name="CUtlVector&lt;char8_t,CUtlMemory&lt;char8_t&gt;&gt;" />
     <AlternativeType Name="CUtlVector&lt;char16_t,CUtlMemory&lt;char16_t&gt;&gt;" />
     <AlternativeType Name="CUtlVector&lt;char32_t,CUtlMemory&lt;char32_t&gt;&gt;" />
-    <Intrinsic Name="data" Expression="Base()" />
+
+    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;wchar_t,CUtlMemory&lt;wchar_t&gt;&gt;,*&gt;" />
+    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char,CUtlMemory&lt;char&gt;&gt;,*&gt;" />
+    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char8_t,CUtlMemory&lt;char18_t&gt;&gt;,*&gt;" />
+    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char16_t,CUtlMemory&lt;char16_t&gt;&gt;,*&gt;" />
+    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char32_t,CUtlMemory&lt;char32_t&gt;&gt;,*&gt;" />
+
+    <AlternativeType Name="CCopyableUtlVector&lt;wchar_t&gt;" />
+    <AlternativeType Name="CCopyableUtlVector&lt;char&gt;" />
+    <AlternativeType Name="CCopyableUtlVector&lt;char8_t&gt;" />
+    <AlternativeType Name="CCopyableUtlVector&lt;char16_t&gt;" />
+    <AlternativeType Name="CCopyableUtlVector&lt;char32_t&gt;" />
+
+    <AlternativeType Name="CUtlVectorAutoPurge&lt;wchar_t&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurge&lt;char&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurge&lt;char8_t&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurge&lt;char16_t&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurge&lt;char32_t&gt;" />
+
+    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;wchar_t&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char8_t&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char16_t&gt;" />
+    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char32_t&gt;" />
+
+    <AlternativeType Name="CUtlStringList" />
+    <AlternativeType Name="CSplitString" />
+
+    <Intrinsic Name="data" Expression="m_Memory.m_pMemory" />
     <Intrinsic Name="size" Expression="m_Size" />
     <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">Base()</SmartPointer>
-    <DisplayString Condition="Count() > 0">{Base(),[Count()]na}</DisplayString>
-    <DisplayString Condition="Count() == 0">{{empty}}</DisplayString>
+    <SmartPointer Usage="Indexable" DefaultExpansion="false">m_Memory.m_pMemory</SmartPointer>
+    <DisplayString Condition="m_Size > 0">{m_Memory.m_pMemory,[m_Size]na}</DisplayString>
+    <DisplayString Condition="m_Size == 0">{{empty}}</DisplayString>
     <Expand>
       <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>Base()</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <!-- CUtlVectorMT<CUtlVector<T,CUtlMemory<T>>,Mutex> -->
-
-  <!-- VC 2015 -->
-  <Type Name="CUtlVectorMT&lt;CUtlVector&lt;bool,CUtlMemory&lt;bool&gt;&gt;,*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-      <DisplayString>{{ size={m_Size} }}</DisplayString>
-      <Expand>
-          <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-          <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-          <IndexListItems>
-              <Size>m_Size</Size>
-              <ValueNode>(bool)((m_Memory.m_pMemory[$i] &gt;&gt; $i) &amp; 1)</ValueNode>
-          </IndexListItems>
-      </Expand>
-  </Type>
-
-  <!-- VC 2015 -->
-  <Type Name="CUtlVectorMT&lt;CUtlVector&lt;*,CUtlMemory&lt;*&gt;&gt;,*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <DisplayString>{{ size={m_Size} }}</DisplayString>
-    <Expand>
       <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
       <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
       <ArrayItems>
@@ -88,32 +180,11 @@
     </Expand>
   </Type>
 
-  <Type Name="CUtlVectorMT&lt;CUtlVector&lt;wchar_t,CUtlMemory&lt;wchar_t&gt;&gt;,*&gt;">
-    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char,CUtlMemory&lt;char&gt;&gt;,*&gt;" />
-    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char8_t,CUtlMemory&lt;char18_t&gt;&gt;,*&gt;" />
-    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char16_t,CUtlMemory&lt;char16_t&gt;&gt;,*&gt;" />
-    <AlternativeType Name="CUtlVectorMT&lt;CUtlVector&lt;char32_t,CUtlMemory&lt;char32_t&gt;&gt;,*&gt;" />
-    <Intrinsic Name="data" Expression="Base()" />
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">Base()</SmartPointer>
-    <DisplayString Condition="Count() > 0">{Base(),[Count()]na}</DisplayString>
-    <DisplayString Condition="Count() == 0">{{empty}}</DisplayString>
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>Base()</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
   <!-- CUtlVectorFixed<T,Size> -->
 
   <!-- VC 2015 -->
   <Type Name="CUtlVectorFixed&lt;bool,*&gt;">
+    <AlternativeType Name="CCopyableUtlVectorFixed&lt;bool,*&gt;" />
     <Intrinsic Name="size" Expression="m_Size" />
     <Intrinsic Name="capacity" Expression="sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)" />
       <DisplayString>{{ size={m_Size} }}</DisplayString>
@@ -129,6 +200,7 @@
 
   <!-- VC 2015 -->
   <Type Name="CUtlVectorFixed&lt;*&gt;">
+    <AlternativeType Name="CCopyableUtlVectorFixed&lt;*&gt;" />
     <Intrinsic Name="size" Expression="m_Size" />
     <Intrinsic Name="capacity" Expression="sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)" />
     <DisplayString>{{ size={m_Size} }}</DisplayString>
@@ -147,6 +219,13 @@
     <AlternativeType Name="CUtlVectorFixed&lt;char8_t,*&gt;" />
     <AlternativeType Name="CUtlVectorFixed&lt;char16_t,*&gt;" />
     <AlternativeType Name="CUtlVectorFixed&lt;char32_t,*&gt;" />
+
+    <AlternativeType Name="CCopyableUtlVectorFixed&lt;wchar_t,*&gt;" />
+    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char,*&gt;" />
+    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char8_t,*&gt;" />
+    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char16_t,*&gt;" />
+    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char32_t,*&gt;" />
+
     <Intrinsic Name="data" Expression="Base()" />
     <Intrinsic Name="size" Expression="m_Size" />
     <Intrinsic Name="capacity" Expression="sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)" />
@@ -319,262 +398,6 @@
       <ArrayItems>
         <Size>m_pData->m_Size</Size>
         <ValuePointer>Base()</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <!-- CCopyableUtlVector<T> -->
-
-  <!-- VC 2015 -->
-  <Type Name="CCopyableUtlVector&lt;bool&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-      <DisplayString>{{ size={m_Size} }}</DisplayString>
-      <Expand>
-          <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-          <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-          <IndexListItems>
-              <Size>m_Size</Size>
-              <ValueNode>(bool)((m_Memory.m_pMemory[$i] &gt;&gt; $i) &amp; 1)</ValueNode>
-          </IndexListItems>
-      </Expand>
-  </Type>
-
-  <!-- VC 2015 -->
-  <Type Name="CCopyableUtlVector&lt;*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <DisplayString>{{ size={m_Size} }}</DisplayString>
-    <Expand>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>m_Memory.m_pMemory</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <Type Name="CCopyableUtlVector&lt;wchar_t&gt;">
-    <AlternativeType Name="CCopyableUtlVector&lt;char&gt;" />
-    <AlternativeType Name="CCopyableUtlVector&lt;char8_t&gt;" />
-    <AlternativeType Name="CCopyableUtlVector&lt;char16_t&gt;" />
-    <AlternativeType Name="CCopyableUtlVector&lt;char32_t&gt;" />
-    <Intrinsic Name="data" Expression="Base()" />
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">Base()</SmartPointer>
-    <DisplayString Condition="Count() > 0">{Base(),[Count()]na}</DisplayString>
-    <DisplayString Condition="Count() == 0">{{empty}}</DisplayString>
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>Base()</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <!-- CCopyableUtlVectorFixed<T,Size> -->
-
-  <!-- VC 2015 -->
-  <Type Name="CCopyableUtlVectorFixed&lt;bool,*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)" />
-      <DisplayString>{{ size={m_Size} }}</DisplayString>
-      <Expand>
-          <Item Name="[capacity]" ExcludeView="simple">sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)</Item>
-          <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-          <IndexListItems>
-              <Size>m_Size</Size>
-              <ValueNode>(bool)((m_Memory.m_Memory[$i] &gt;&gt; $i) &amp; 1)</ValueNode>
-          </IndexListItems>
-      </Expand>
-  </Type>
-
-  <!-- VC 2015 -->
-  <Type Name="CCopyableUtlVectorFixed&lt;*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)" />
-    <DisplayString>{{ size={m_Size} }}</DisplayString>
-    <Expand>
-      <Item Name="[capacity]" ExcludeView="simple">sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>(ElemType_t*)(&amp;m_Memory.m_Memory[0])</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <Type Name="CCopyableUtlVectorFixed&lt;wchar_t,*&gt;">
-    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char,*&gt;" />
-    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char8_t,*&gt;" />
-    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char16_t,*&gt;" />
-    <AlternativeType Name="CCopyableUtlVectorFixed&lt;char32_t,*&gt;" />
-    <Intrinsic Name="data" Expression="Base()" />
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">Base()</SmartPointer>
-    <DisplayString Condition="Count() > 0">{Base(),[Count()]na}</DisplayString>
-    <DisplayString Condition="Count() == 0">{{empty}}</DisplayString>
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">sizeof(m_Memory.m_Memory) / sizeof(ElemType_t)</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>(ElemType_t*)(&amp;m_Memory.m_Memory[0])</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <!-- CUtlVectorAutoPurge<T> -->
-
-  <!-- VC 2015 -->
-  <Type Name="CUtlVectorAutoPurge&lt;bool*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-      <DisplayString>{{ size={m_Size} }}</DisplayString>
-      <Expand>
-          <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-          <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-          <ArrayItems>
-            <Size>m_Size</Size>
-            <ValuePointer>m_Memory.m_pMemory</ValuePointer>
-          </ArrayItems>
-      </Expand>
-  </Type>
-
-  <!-- VC 2015 -->
-  <Type Name="CUtlVectorAutoPurge&lt;*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <DisplayString>{{ size={m_Size} }}</DisplayString>
-    <Expand>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>m_Memory.m_pMemory</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <Type Name="CUtlVectorAutoPurge&lt;wchar_t&gt;">
-    <AlternativeType Name="CUtlVectorAutoPurge&lt;char&gt;" />
-    <AlternativeType Name="CUtlVectorAutoPurge&lt;char8_t&gt;" />
-    <AlternativeType Name="CUtlVectorAutoPurge&lt;char16_t&gt;" />
-    <AlternativeType Name="CUtlVectorAutoPurge&lt;char32_t&gt;" />
-    <Intrinsic Name="data" Expression="Base()" />
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">Base()</SmartPointer>
-    <DisplayString Condition="Count() > 0">{Base(),[Count()]na}</DisplayString>
-    <DisplayString Condition="Count() == 0">{{empty}}</DisplayString>
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-          <Size>m_Size</Size>
-          <ValuePointer>m_Memory.m_pMemory</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <!-- CUtlVectorAutoPurgeArray<T> -->
-
-  <!-- VC 2015 -->
-  <Type Name="CUtlVectorAutoPurgeArray&lt;bool*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-      <DisplayString>{{ size={m_Size} }}</DisplayString>
-      <Expand>
-          <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-          <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-          <ArrayItems>
-              <Size>m_Size</Size>
-              <ValuePointer>m_Memory.m_pMemory</ValuePointer>
-          </ArrayItems>
-      </Expand>
-  </Type>
-
-  <!-- VC 2015 -->
-  <Type Name="CUtlVectorAutoPurgeArray&lt;*&gt;">
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <DisplayString>{{ size={m_Size} }}</DisplayString>
-    <Expand>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>m_Memory.m_pMemory</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <Type Name="CUtlVectorAutoPurgeArray&lt;wchar_t&gt;">
-    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char&gt;" />
-    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char8_t&gt;" />
-    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char16_t&gt;" />
-    <AlternativeType Name="CUtlVectorAutoPurgeArray&lt;char32_t&gt;" />
-    <Intrinsic Name="data" Expression="Base()" />
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">Base()</SmartPointer>
-    <DisplayString Condition="Count() > 0">{Base(),[Count()]na}</DisplayString>
-    <DisplayString Condition="Count() == 0">{{empty}}</DisplayString>
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>Base()</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <!-- CUtlStringList -->
-
-  <Type Name="CUtlStringList">
-    <Intrinsic Name="data" Expression="m_Memory.m_pMemory" />
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">m_Memory.m_pMemory</SmartPointer>
-    <DisplayString Condition="m_Size > 0">{Base(),[m_Size]na}</DisplayString>
-    <DisplayString Condition="m_Size == 0">{{empty}}</DisplayString>
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>m_Memory.m_pMemory</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-
-  <!-- CSplitString -->
-
-  <Type Name="CSplitString">
-    <Intrinsic Name="data" Expression="m_Memory.m_pMemory" />
-    <Intrinsic Name="size" Expression="m_Size" />
-    <Intrinsic Name="capacity" Expression="m_Memory.m_nAllocationCount" />
-    <SmartPointer Usage="Indexable" DefaultExpansion="false">m_Memory.m_pMemory</SmartPointer>
-    <DisplayString Condition="m_Size > 0">{Base(),[m_Size]na}</DisplayString>
-    <DisplayString Condition="m_Size == 0">{{empty}}</DisplayString>
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">m_Size</Item>
-      <Item Name="[capacity]" ExcludeView="simple">m_Memory.m_nAllocationCount</Item>
-      <Item Name="[allocator]" ExcludeView="simple">m_Memory</Item>
-      <ArrayItems>
-        <Size>m_Size</Size>
-        <ValuePointer>m_Memory.m_pMemory</ValuePointer>
       </ArrayItems>
     </Expand>
   </Type>
