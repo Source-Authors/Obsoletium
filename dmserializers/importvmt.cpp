@@ -522,7 +522,7 @@ bool CImportVMT::UnserializeProxies( CDmElement *pElement, KeyValues *pKeyValues
 		return false;
 
 	CDmrElementArray<> array( pProxies );
-
+	
 	bool ok = true;
 
 	// Proxies are a list of sub-keys, the name is the proxy name, subkeys are values
