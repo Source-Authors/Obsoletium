@@ -5,17 +5,13 @@
 // $NoKeywords: $
 //=============================================================================
 
-//#include "..\..\serverbrowser\pch_serverbrowser.h"
+#include "blacklisted_server_manager.h"
 
-#undef _snprintf	// needed since matchmakingtypes.h inlines a bare _snprintf
-
-#include "convar.h"
+#include "tier1/convar.h"
 #include "KeyValues.h"
 #include "filesystem.h"
 #include "steam/steamclientpublic.h"
 #include "steam/matchmakingtypes.h"
-#include <time.h>
-#include "blacklisted_server_manager.h"
 
 
 //-----------------------------------------------------------------------------
@@ -64,12 +60,19 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 		const char *pszNetAddr = pData->GetString( "addr" );
 		if ( pszNetAddr && pszNetAddr[0] && pszName && pszName[0] )
 		{
+			netadr_t netadr;
+			if ( !netadr.SetFromString(pszNetAddr) )
+			{
+				Warning( "%s: %s is not a IPv4 address, skipping add to black list.\n", pszFilename, pszNetAddr );
+				continue;
+			}
+
 			auto iIdx = m_Blacklist.AddToTail();
 
 			m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
 			V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, pszName );
 			m_Blacklist[iIdx].m_ulTimeBlacklistedAt = ulDate;
-			m_Blacklist[iIdx].m_NetAdr.SetFromString( pszNetAddr );
+			m_Blacklist[iIdx].m_NetAdr = netadr;
 
 			++count;
 		}
