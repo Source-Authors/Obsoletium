@@ -43,50 +43,50 @@ class CHunkMemory
 {
 public:
 	// constructor, destructor
-	CHunkMemory( int nGrowSize = 0, int nInitSize = 0 )		{ m_pMemory = NULL; m_nAllocated = 0; if ( nInitSize ) Grow( nInitSize ); }
-	CHunkMemory( T* pMemory, int numElements )				{ Assert( 0 ); }
+	CHunkMemory( intp nGrowSize = 0, intp nInitSize = 0 )	{ m_pMemory = NULL; m_nAllocated = 0; if ( nInitSize ) Grow( nInitSize ); }
+	CHunkMemory( T* pMemory, intp numElements )				{ Assert( 0 ); }
 
 	// Can we use this index?
-	bool IsIdxValid( int i ) const							{ return (i >= 0) && (i < m_nAllocated); }
+	bool IsIdxValid( intp i ) const							{ return (i >= 0) && (i < m_nAllocated); }
 
 	// Gets the base address
 	T* Base()												{ return m_pMemory; }
 	const T* Base() const									{ return m_pMemory; }
 
 	// element access
-	T& operator[]( int i )									{ Assert( IsIdxValid(i) ); return Base()[i];	}
-	const T& operator[]( int i ) const						{ Assert( IsIdxValid(i) ); return Base()[i];	}
-	T& Element( int i )										{ Assert( IsIdxValid(i) ); return Base()[i];	}
-	const T& Element( int i ) const							{ Assert( IsIdxValid(i) ); return Base()[i];	}
+	T& operator[]( intp i )									{ Assert( IsIdxValid(i) ); return Base()[i];	}
+	const T& operator[]( intp i ) const						{ Assert( IsIdxValid(i) ); return Base()[i];	}
+	T& Element( intp i )									{ Assert( IsIdxValid(i) ); return Base()[i];	}
+	const T& Element( intp i ) const						{ Assert( IsIdxValid(i) ); return Base()[i];	}
 
 	// Attaches the buffer to external memory....
-	void SetExternalBuffer( T* pMemory, int numElements )	{ Assert( 0 ); }
+	void SetExternalBuffer( T* pMemory, intp numElements )	{ Assert( 0 ); }
 
 	// Size
-	int NumAllocated() const								{ return m_nAllocated; }
-	int Count() const										{ return m_nAllocated; }
+	intp NumAllocated() const								{ return m_nAllocated; }
+	intp Count() const										{ return m_nAllocated; }
 
 	// Grows the memory, so that at least allocated + num elements are allocated
-	void Grow( int num = 1 )								{ Assert( !m_nAllocated ); m_pMemory = Hunk_Alloc<T>( num, false ); m_nAllocated = num; }
+	void Grow( intp num = 1 )								{ Assert( !m_nAllocated ); m_pMemory = Hunk_Alloc<T>( num, false ); m_nAllocated = num; }
 
 	// Makes sure we've got at least this much memory
-	void EnsureCapacity( int num )							{ Assert( num <= m_nAllocated ); }
+	void EnsureCapacity( intp num )							{ Assert( num <= m_nAllocated ); }
 
 	// Memory deallocation
 	void Purge()											{ m_nAllocated = 0; }
 
 	// Purge all but the given number of elements (NOT IMPLEMENTED IN )
-	void Purge( int numElements )							{ Assert( 0 ); }
+	void Purge( intp numElements )							{ Assert( 0 ); }
 
 	// is the memory externally allocated?
 	bool IsExternallyAllocated() const						{ return false; }
 
 	// Set the size by which the memory grows
-	void SetGrowSize( int size )							{}
+	void SetGrowSize( intp size )							{}
 
 private:
 	T *m_pMemory;
-	int m_nAllocated;
+	intp m_nAllocated;
 };
 
 
