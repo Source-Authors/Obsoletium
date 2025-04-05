@@ -239,8 +239,8 @@ constexpr inline tchar VPROF_BUDGETGROUP_FINDATTRIBUTEUNSAFE[] =	_T("FindAttribu
 
 class DBG_CLASS CVProfNode 
 {
-friend class CVProfRecorder;
-friend class CVProfile;
+	friend class CVProfRecorder;
+	friend class CVProfile;
 
 public:
 	CVProfNode( const tchar * pszName, int detailLevel, CVProfNode *pParent, const tchar *pBudgetGroupName, int budgetFlags );
@@ -298,8 +298,9 @@ public:
 	// Not used in the common case...
 	void SetCurFrameTime( unsigned long milliseconds );
 	
-	void SetClientData( int iClientData )	{ m_iClientData = iClientData; }
-	int GetClientData() const				{ return m_iClientData; }
+	// dimhotepus: Use intp instead of int for user data.
+	void SetClientData( intp iClientData )	{ m_iClientData = iClientData; }
+	intp GetClientData() const				{ return m_iClientData; }
 
 #ifdef DBGFLAG_VALIDATE
 	void Validate( CValidator &validator, tchar *pchName );		// Validate our internal structures
@@ -375,8 +376,8 @@ private:
 	CVProfNode *m_pSibling;
 
 	int m_BudgetGroupID;
-	
-	int m_iClientData;
+
+	intp m_iClientData;
 	int m_iUniqueNodeID;
 };
 
