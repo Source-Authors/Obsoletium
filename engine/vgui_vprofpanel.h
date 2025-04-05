@@ -32,7 +32,7 @@ public:
 	CProfileHierarchyPanel(vgui::Panel *parent, const char *panelName);
 	~CProfileHierarchyPanel();
 
-struct PanelEntry_t
+	struct PanelEntry_t
 	{
 		PanelEntry_t() :
 			label( 0 ),
