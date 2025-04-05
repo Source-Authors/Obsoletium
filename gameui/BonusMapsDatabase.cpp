@@ -808,9 +808,7 @@ void CBonusMapsDatabase::ParseBonusMapData( char const *pszFileName, char const 
 
 	while ( kv )
 	{
-		intp iMap = m_BonusMaps.AddToTail();
-
-		BonusMapDescription_t *pMap = &m_BonusMaps[ iMap ];
+		BonusMapDescription_t *pMap = &m_BonusMaps[ m_BonusMaps.AddToTail() ];
 
 		// set required map data
 		Q_strncpy( pMap->szFileName, pszFileName, sizeof(pMap->szFileName) );
@@ -837,9 +835,7 @@ void CBonusMapsDatabase::ParseBonusMapData( char const *pszFileName, char const 
 				if ( !pMap->m_pChallenges )
 					pMap->m_pChallenges = new CUtlVector<ChallengeDescription_t>;
 
-				intp iChallenge = pMap->m_pChallenges->AddToTail();
-
-				ChallengeDescription_t *pChallenge = &(*pMap->m_pChallenges)[ iChallenge ];
+				ChallengeDescription_t *pChallenge = &(*pMap->m_pChallenges)[ pMap->m_pChallenges->AddToTail() ];
 				V_strcpy_safe( pChallenge->szName, pChallengeKey->GetName() );
 				V_strcpy_safe( pChallenge->szComment, pChallengeKey->GetString( "comment" ) );
 				pChallenge->iType = pChallengeKey->GetInt( "type", -1 );
