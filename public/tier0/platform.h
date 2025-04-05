@@ -1026,10 +1026,14 @@ struct MemoryInformation
 {
 	int m_nStructVersion;
 
+	// Total physical RAM in MiBs.
 	uint m_nPhysicalRamMbTotal;
+	// Available physical RAM in MiBs.
 	uint m_nPhysicalRamMbAvailable;
 	
+	// Total virtual RAM in MiBs.
 	uint m_nVirtualRamMbTotal;
+	// Available virtual RAM in MiBs.
 	uint m_nVirtualRamMbAvailable;
 
 	inline MemoryInformation()
