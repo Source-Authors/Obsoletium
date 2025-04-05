@@ -1134,7 +1134,7 @@ void CBaseAnimatingOverlay::FastRemoveLayer( int iLayer )
 
 CAnimationLayer *CBaseAnimatingOverlay::GetAnimOverlay( int iIndex )
 {
-	iIndex = clamp( iIndex, 0, m_AnimOverlay.Count()-1 );
+	iIndex = clamp( (intp)iIndex, (intp)0, m_AnimOverlay.Count()-1 );
 
 	return &m_AnimOverlay[iIndex];
 }

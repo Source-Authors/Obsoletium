@@ -3223,8 +3223,8 @@ void CHL2_Player::UpdateClientData( void )
 		int iShowHudDamage = g_pGameRules->Damage_GetShowOnHud();
 		int visibleDamageBits = m_bitsDamageType & iShowHudDamage;
 
-		m_DmgTake = clamp( m_DmgTake, 0, 255 );
-		m_DmgSave = clamp( m_DmgSave, 0, 255 );
+		m_DmgTake = clamp( m_DmgTake, 0.f, 255.f );
+		m_DmgSave = clamp( m_DmgSave, 0.f, 255.f );
 
 		// If we're poisoned, but it wasn't this frame, don't send the indicator
 		// Without this check, any damage that occured to the player while they were

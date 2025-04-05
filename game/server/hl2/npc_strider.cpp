@@ -4521,7 +4521,7 @@ void CNPC_Strider::CNavigator::MoveCalcBaseGoal( AILocalMoveGoal_t *pMoveGoal )
 	pMoveGoal->flags |= ( AILMG_NO_STEER | AILMG_NO_AVOIDANCE_PATHS );
 	if ( heightAdj < -1 )
 	{
-		heightAdj = clamp( heightAdj, -192, 0 );
+		heightAdj = clamp( heightAdj, -192.f, 0.f );
 		pMoveGoal->target.z += heightAdj;
 		pMoveGoal->dir = unitDir * CNPC_Strider::gm_strideLength * 0.1;
 		pMoveGoal->dir.z += heightAdj;

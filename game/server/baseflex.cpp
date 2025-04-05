@@ -2123,9 +2123,9 @@ void CBaseFlex::DoBodyLean( void )
 		}
 
 		vecDelta = vecOrigin - m_vecPrevOrigin;
-		vecDelta.x = clamp( vecDelta.x, -50, 50 );
-		vecDelta.y = clamp( vecDelta.y, -50, 50 );
-		vecDelta.z = clamp( vecDelta.z, -50, 50 );
+		vecDelta.x = clamp( vecDelta.x, -50.f, 50.f );
+		vecDelta.y = clamp( vecDelta.y, -50.f, 50.f );
+		vecDelta.z = clamp( vecDelta.z, -50.f, 50.f );
 
 		float dt = gpGlobals->curtime - GetLastThink();
 		bool bSkip = ((GetFlags() & (FL_FLY | FL_SWIM)) != 0) || (GetMoveParent() != NULL) || (GetGroundEntity() == NULL) || (GetGroundEntity()->IsMoving());

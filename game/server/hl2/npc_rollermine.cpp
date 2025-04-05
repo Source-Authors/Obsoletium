@@ -116,7 +116,7 @@ IMotionEvent::simresult_e CRollerController::Simulate( IPhysicsMotionController 
 #define ROLLERMINE_MIN_ATTACK_DIST	1
 #define ROLLERMINE_MAX_ATTACK_DIST	4096
 
-#define	ROLLERMINE_OPEN_THRESHOLD	256
+#define	ROLLERMINE_OPEN_THRESHOLD	256.f
 
 #define ROLLERMINE_VEHICLE_OPEN_THRESHOLD	400
 #define ROLLERMINE_VEHICLE_HOP_THRESHOLD	300
@@ -2558,7 +2558,7 @@ float CNPC_RollerMine::RollingSpeed()
 		AngularImpulse angVel;
 		pPhysics->GetVelocity( NULL, &angVel );
 		float rollingSpeed = angVel.Length() - 90;
-		rollingSpeed = clamp( rollingSpeed, 1, MAX_ROLLING_SPEED );
+		rollingSpeed = clamp( rollingSpeed, 1.f, MAX_ROLLING_SPEED );
 		rollingSpeed *= (1/MAX_ROLLING_SPEED);
 		return rollingSpeed;
 	}
@@ -2685,7 +2685,7 @@ void CNPC_RollerMine::UpdatePingSound()
 		if ( pEnemy )
 		{
 			pingSpeed = EnemyDistance( pEnemy );
-			pingSpeed = clamp( pingSpeed, 1, ROLLERMINE_OPEN_THRESHOLD );
+			pingSpeed = clamp( pingSpeed, 1.f, ROLLERMINE_OPEN_THRESHOLD );
 			pingSpeed *= (1.0f/ROLLERMINE_OPEN_THRESHOLD);
 		}
 	}

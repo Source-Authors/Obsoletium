@@ -620,7 +620,7 @@ void CNPC_Crow::MoveCrowFly( float flInterval )
 	AngleVectors( vRollAngle, NULL, &vRight, NULL );
 
 	float flRoll = DotProduct( vRight, vecMoveDir ) * 45;
-	flRoll = clamp( flRoll, -45, 45 );
+	flRoll = clamp( flRoll, -45.f, 45.f );
 
 	vRollAngle[ROLL] = flRoll;
 	SetAbsAngles( vRollAngle );
