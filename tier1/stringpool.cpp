@@ -189,7 +189,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 		return INVALID_ELEMENT;
 
 	unsigned short nHashBucketIndex = (HashStringCaseless( pIntrinsic ) % HASH_TABLE_SIZE);
-	unsigned short nCurrentBucket =  m_HashTable[ nHashBucketIndex ];
+	intp nCurrentBucket =  m_HashTable[ nHashBucketIndex ];
 
 	// Does the bucket already exist?
 	if( nCurrentBucket != INVALID_ELEMENT )
@@ -203,7 +203,8 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 				{
 					m_Elements[nCurrentBucket].nReferenceCount ++ ;
 				}
-				return nCurrentBucket;
+				Assert(nCurrentBucket <= std::numeric_limits<unsigned short>::max());
+				return static_cast<unsigned short>(nCurrentBucket);
 			}
 		}
 	}
@@ -222,11 +223,13 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 
 	// Insert at the beginning of the bucket:
 	m_Elements[nCurrentBucket].nNextElement = m_HashTable[ nHashBucketIndex ];
-	m_HashTable[ nHashBucketIndex ] = nCurrentBucket;
+	
+	Assert(nCurrentBucket <= std::numeric_limits<unsigned short>::max());
+	m_HashTable[ nHashBucketIndex ] = static_cast<unsigned short>(nCurrentBucket);
 
 	m_Elements[nCurrentBucket].pString = V_strdup( pIntrinsic );
 	
-    return nCurrentBucket;
+	return static_cast<unsigned short>(nCurrentBucket);
 }
 
 
@@ -244,7 +247,7 @@ void CCountedStringPool::DereferenceString( const char* pIntrinsic )
 	if (!pIntrinsic)
 		return;
 
-	unsigned short nHashBucketIndex = (HashStringCaseless( pIntrinsic ) % m_HashTable.Count());
+	intp nHashBucketIndex = (HashStringCaseless( pIntrinsic ) % m_HashTable.Count());
 	unsigned short nCurrentBucket =  m_HashTable[ nHashBucketIndex ];
 
 	// If there isn't anything in the bucket, just return.
