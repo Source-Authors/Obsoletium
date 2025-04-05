@@ -727,8 +727,7 @@ inline float CClient_Precipitation::GetRemainingLifetime( CPrecipitationParticle
 
 inline CPrecipitationParticle* CClient_Precipitation::CreateParticle()
 {
-	auto i = m_Particles.AddToTail();
-	CPrecipitationParticle* pParticle = &m_Particles[i];
+	CPrecipitationParticle* pParticle = &m_Particles[m_Particles.AddToTail()];
 
 	pParticle->m_SpawnTime = gpGlobals->curtime;
 	pParticle->m_Ramp = m_InitialRamp;
