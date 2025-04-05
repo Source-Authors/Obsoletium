@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- tier0/cpumonitoring.h -->
+
+  <Type Name="CPUFrequencyResults">
+    <DisplayString IncludeView="noparens">{m_GHz} GHz, {m_percentage} Avg %</DisplayString>
+    <DisplayString ExcludeView="noparens">({m_GHz} GHz, {m_percentage} Avg %)</DisplayString>
+    <Expand>
+       <Item Name="[timestamp (s)]">m_timeStamp</Item>
+       <Item Name="[ghz]">m_GHz</Item>
+       <Item Name="[avg %]">m_percentage</Item>
+       <Item Name="[min %]">m_lowestPercentage</Item>
+    </Expand>
+  </Type>
+
+  <!-- tier0/dbg.h -->
+
+  <Type Name="CScopeMsg">
+    <DisplayString IncludeView="noparens">{m_pszScope}</DisplayString>
+    <DisplayString ExcludeView="noparens">({m_pszScope})</DisplayString>
+    <Expand>
+       <Item Name="[message]">m_pszScope</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CReentryGuard">
+    <DisplayString IncludeView="noparens">semaphore #{*m_pSemaphore}</DisplayString>
+    <DisplayString ExcludeView="noparens">(semaphore #{*m_pSemaphore})</DisplayString>
+    <Expand>
+       <Item Name="[semaphore]">*m_pSemaphore</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CDbgFmtMsg">
+    <DisplayString IncludeView="noparens">{m_szBuf}</DisplayString>
+    <DisplayString ExcludeView="noparens">({m_szBuf})</DisplayString>
+    <Expand>
+       <Item Name="[message]">m_szBuf</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CDataWatcher&lt;*&gt;">
+    <DisplayString IncludeView="noparens">{m_Value}</DisplayString>
+    <DisplayString ExcludeView="noparens">({m_Value})</DisplayString>
+    <Expand>
+       <Item Name="[data]">m_Value</Item>
+    </Expand>
+  </Type>
+
+  <!-- tier0/fasttimer.h -->
+
+  <Type Name="CCycleCount">
+    <Intrinsic Name="count" Expression="m_Int64" />
+    <DisplayString IncludeView="noparens">{{ cycles={m_Int64} }}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ cycles={m_Int64} }})</DisplayString>
+    <Expand>
+       <Item Name="[count]">m_Int64</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CFastTimer">
+    <Intrinsic Name="duration" Expression="m_Duration" />
+    <DisplayString IncludeView="noparens">{m_Duration}</DisplayString>
+    <DisplayString ExcludeView="noparens">{m_Duration}</DisplayString>
+    <Expand>
+       <Item Name="[duration]">m_Duration</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTimeScope">
+    <DisplayString IncludeView="noparens">{m_pTimer->m_Duration}</DisplayString>
+    <DisplayString ExcludeView="noparens">{m_pTimer->m_Duration}</DisplayString>
+    <Expand>
+       <Item Name="[duration]">m_pTimer->m_Duration</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTimeAdder">
+    <DisplayString Condition="m_pTotal != nullptr" IncludeView="noparens">{*m_pTotal}</DisplayString>
+    <DisplayString Condition="m_pTotal == nullptr" IncludeView="noparens">-1</DisplayString>
+    <DisplayString Condition="m_pTotal != nullptr" ExcludeView="noparens">{*m_pTotal}</DisplayString>
+    <DisplayString Condition="m_pTotal == nullptr" ExcludeView="noparens">(-1)</DisplayString>
+    <Expand>
+       <Item Condition="m_pTotal != nullptr" Name="[duration]">*m_pTotal</Item>
+       <Item Condition="m_pTotal == nullptr" Name="[duration]">-1</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CAverageCycleCounter">
+    <DisplayString Condition="m_nIters != 0" IncludeView="noparens">avg {m_Total.m_Int64 / m_nIters}, peak {m_Peak.m_Int64}, total {m_Total.m_Int64}</DisplayString>
+    <DisplayString Condition="m_nIters == 0" IncludeView="noparens">peak {m_Peak.m_Int64}, total {m_Total.m_Int64}</DisplayString>
+    <DisplayString Condition="m_nIters != 0" ExcludeView="noparens">(avg {m_Total.m_Int64 / m_nIters}, peak {m_Peak.m_Int64}, total {m_Total.m_Int64})</DisplayString>
+    <DisplayString Condition="m_nIters == 0" ExcludeView="noparens">(peak {m_Peak.m_Int64}, total {m_Total.m_Int64})</DisplayString>
+    <Expand>
+       <Item Name="[iterations]">m_nIters</Item>
+       <Item Condition="m_nIters != 0" Name="[avg cycles]">m_Total.m_Int64 / m_nIters</Item>
+       <Item Name="[peak_cycles]">m_Peak.m_Int64</Item>
+       <Item Name="[total_cycles]">m_Total.m_Int64</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CAverageTimeMarker">
+    <DisplayString Condition="m_pCounter != nullptr" IncludeView="noparens">{*m_pCounter}</DisplayString>
+    <DisplayString Condition="m_pCounter == nullptr" IncludeView="noparens">-1</DisplayString>
+    <DisplayString Condition="m_pCounter != nullptr" ExcludeView="noparens">{*m_pCounter}</DisplayString>
+    <DisplayString Condition="m_pCounter == nullptr" ExcludeView="noparens">(-1)</DisplayString>
+    <Expand>
+       <Item Condition="m_pCounter != nullptr" Name="[counter]">*m_pCounter</Item>
+       <Item Condition="m_pCounter == nullptr" Name="[counter]">-1</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CLimitTimer">
+    <DisplayString IncludeView="noparens">{m_lCycleLimit}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ limit={m_lCycleLimit} }})</DisplayString>
+    <Expand>
+       <Item Name="[limit_cycles]">m_lCycleLimit</Item>
+    </Expand>
+  </Type>
+
+  <!-- tier0/icommandline.h -->
+
+  <Type Name="CCommandLine">
+    <DisplayString IncludeView="noparens">argc={m_nParmCount}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ argc={m_nParmCount} }})</DisplayString>
+    <Expand>
+       <Item Name="[cmd]">m_pszCmdLine</Item>
+       <Item Name="[argc]">m_nParmCount</Item>
+       <ArrayItems>
+         <Size>m_nParmCount</Size>
+         <ValuePointer>m_ppParms</ValuePointer>
+       </ArrayItems>
+    </Expand>
+  </Type>
+
+  <!-- tier0/imemalloc.h -->
+
+  <Type Name="CDbgMemAlloc">
+    <DisplayString IncludeView="noparens">failed={m_sMemoryAllocFailed}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ failed={m_sMemoryAllocFailed} }})</DisplayString>
+    <Expand>
+       <Item Name="[failed_alloc_bytes]">m_sMemoryAllocFailed</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CDbgMemAlloc::MemInfo_t">
+    <DisplayString IncludeView="noparens">file={m_pFileName}, line={m_nLine}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ file={m_pFileName}, line={m_nLine} }})</DisplayString>
+    <Expand>
+       <Item Name="[now_bytes]">m_nCurrentSize</Item>
+       <Item Name="[peak_bytes]">m_nPeakSize</Item>
+       <Item Name="[total_bytes]">m_nTotalSize</Item>
+       <Item Name="[now_overhead_bytes]">m_nOverheadSize</Item>
+       <Item Name="[peak_overhead_bytes]">m_nPeakOverheadSize</Item>
+       <Item Name="[now_no_allocs]">m_nCurrentCount</Item>
+       <Item Name="[peak_no_allocs]">m_nPeakCount</Item>
+       <Item Name="[total_no_allocs]">m_nTotalCount</Item>
+       <Item Name="[&lt;= 16 bytes # allocs]">m_pCount[0]</Item>
+       <Item Name="[&lt;= 32 bytes # allocs]">m_pCount[1]</Item>
+       <Item Name="[&lt;= 128 bytes # allocs]">m_pCount[2]</Item>
+       <Item Name="[&lt;= 1024 bytes # allocs]">m_pCount[3]</Item>
+       <Item Name="[&gt; 1024 bytes # allocs]">m_pCount[4]</Item>
+       <Item Name="[time_spent (mcs)]">m_nTime</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CDbgMemAlloc::MemInfoKey_t">
+    <DisplayString IncludeView="noparens">file={m_pFileName}, line={m_nLine}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ file={m_pFileName}, line={m_nLine} }})</DisplayString>
+    <Expand>
+       <Item Name="[file]">m_pFileName</Item>
+       <Item Name="[line]">m_nLine</Item>
+    </Expand>
+  </Type>
+
+  <!-- tier0/platform.h -->
+
+  <Type Name="CPUInformation">
+    <DisplayString IncludeView="noparens">{m_Speed / 1000000} MHz, cores #{(int)m_nPhysicalProcessors}, logical #{(int)m_nLogicalProcessors}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ {m_Speed / 1000000} MHz, cores #{(int)m_nPhysicalProcessors}, logical #{(int)m_nLogicalProcessors} }})</DisplayString>
+    <Expand>
+       <Item Name="[rdtsc]">m_bRDTSC</Item>
+       <Item Name="[cmov]">m_bCMOV</Item>
+       <Item Name="[fcmov]">m_bFCMOV</Item>
+       <Item Name="[sse]">m_bSSE</Item>
+       <Item Name="[sse2]">m_bSSE2</Item>
+       <Item Name="[sse3]">m_bSSE3</Item>
+       <Item Name="[ssse3]">m_bSSSE3</Item>
+       <Item Name="[sse4a]">m_bSSE4a</Item>
+       <Item Name="[sse4.1]">m_bSSE41</Item>
+       <Item Name="[sse4.2]">m_bSSE42</Item>
+       <Item Name="[3dnow]">m_b3DNow</Item>
+       <Item Name="[mmx]">m_bMMX</Item>
+       <Item Name="[hyperthreaded]">m_bHT</Item>
+       <Item Name="[vendor]">m_szProcessorID</Item>
+       <Item Name="[brand]">m_szProcessorBrand</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="MemoryInformation">
+    <DisplayString IncludeView="noparens">total_phys={m_nPhysicalRamMbTotal} MiB, avail_phys={m_nPhysicalRamMbAvailable} MiB}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ total_phys={m_nPhysicalRamMbTotal} MiB, avail_phys={m_nPhysicalRamMbAvailable} MiB} }})</DisplayString>
+    <Expand>
+       <Item Name="[total_virtual_mib]">m_nVirtualRamMbTotal</Item>
+       <Item Name="[avail_virtual_mib]">m_nVirtualRamMbAvailable</Item>
+    </Expand>
+  </Type>
+
+  <!-- tier0/threadtools.h -->
+
+  <Type Name="CThreadLocalBase">
+    <AlternativeType Name="CThreadLocal&lt;*&gt;" />
+    <AlternativeType Name="CThreadLocalInt&lt;*&gt;" />
+    <AlternativeType Name="CThreadLocalPtr&lt;*&gt;" />
+    <DisplayString IncludeView="noparens">slot_no={m_index}</DisplayString>
+    <DisplayString ExcludeView="noparens">({{ slot_no={m_index} }})</DisplayString>
+    <Expand>
+       <Item Name="[slot_no]">m_index</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CInterlockedIntT&lt;*&gt;">
+    <AlternativeType Name="CInterlockedPtr&lt;*&gt;" />
+    <Intrinsic Name="value" Expression="m_value"/>
+    <DisplayString>{m_value}</DisplayString>
+    <Expand>
+      <Item Name="[value]">m_value</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="ReentrancyVerifier">
+    <DisplayString Condition="mCounter != nullptr">{*mCounter}</DisplayString>
+    <Expand>
+      <Item Name="[counter]" Condition="mCounter != nullptr">*mCounter</Item>
+      <Item Name="[counter]" Condition="mCounter == nullptr">nullptr</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CThreadMutex">
+    <DisplayString Condition="m_lockCount == 0">unlocked</DisplayString>
+    <DisplayString Condition="m_lockCount != 0">locked #{m_lockCount}</DisplayString>
+    <Expand>
+      <Item Name="[locking_thread_id]" Condition="m_lockCount != 0">m_currentOwnerID</Item>
+      <Item Name="[ownership_levels]" Condition="m_lockCount != 0">m_lockCount</Item>
+      <Item Name="[is_tracing]">m_bTrace</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CThreadFastMutex">
+    <AlternativeType Name="CAlignedThreadFastMutex" />
+    <DisplayString Condition="m_ownerID.m_value.value() == 0">unlocked</DisplayString>
+    <DisplayString Condition="m_ownerID.m_value.value() != 0">locked #{m_depth}</DisplayString>
+    <Expand>
+      <Item Name="[locking_thread_id]" Condition="m_ownerID.m_value.value() != 0">m_ownerID</Item>
+      <Item Name="[ownership_levels]" Condition="m_ownerID.m_value.value() != 0">m_depth</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CAutoLockT&lt;*&gt;">
+    <DisplayString Condition="m_pFilename == nullptr">empty</DisplayString>
+    <DisplayString Condition="m_pFilename != nullptr &amp;&amp; !m_bOwned">{m_lock} - unowned</DisplayString>
+    <DisplayString Condition="m_pFilename != nullptr &amp;&amp; m_bOwned">{m_lock} - owned</DisplayString>
+    <Expand>
+      <Item Name="[mutex]">m_lock</Item>
+      <Item Name="[owned]">m_bOwned</Item>
+      <Item Name="[mutex_name]">m_pMutexName</Item>
+      <Item Name="[file_name]">m_pFilename</Item>
+      <Item Name="[line]">m_nLineNum</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CThreadSyncObject">
+    <AlternativeType Name="CThreadSemaphore" />
+    <AlternativeType Name="CThreadFullMutex" />
+    <AlternativeType Name="CThreadEvent" />
+    <AlternativeType Name="CThreadManualEvent" />
+    <DisplayString Condition="!m_hSyncObject">empty</DisplayString>
+    <DisplayString Condition="m_hSyncObject">created</DisplayString>
+    <Expand>
+      <Item Name="[handle]" Condition="m_hSyncObject">m_hSyncObject</Item>
+      <Item Name="[created]">m_bCreatedHandle</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CThreadRWLock">
+    <DisplayString Condition="m_nWriters == 0 &amp;&amp; m_nActiveReaders == 0 &amp;&amp; m_nPendingReaders == 0">empty</DisplayString>
+    <DisplayString Condition="m_nActiveReaders != 0">locked read ({m_nActiveReaders})</DisplayString>
+    <DisplayString Condition="m_nWriters != 0">locked write (write={m_nWriters}, pending_read={m_nPendingReaders})</DisplayString>
+    <Expand>
+      <Item Name="[writers]" Condition="m_nWriters != 0">m_nWriters</Item>
+      <Item Name="[active_readers]" Condition="m_nActiveReaders != 0">m_nActiveReaders</Item>
+      <Item Name="[pending_readers]" Condition="m_nPendingReaders != 0">m_nPendingReaders</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CThreadSpinRWLock">
+    <DisplayString Condition="m_nWriters.m_value.value() == 0 &amp;&amp; m_lockInfo.m_nReaders == 0">empty</DisplayString>
+    <DisplayString Condition="m_lockInfo.m_nReaders != 0">locked read ({m_lockInfo.m_nReaders})</DisplayString>
+    <DisplayString Condition="m_nWriters.m_value.value() != 0">locked write ({m_nWriters})</DisplayString>
+    <Expand>
+      <Item Name="[writers]" Condition="m_nWriters.m_value.value() != 0">m_nWriters</Item>
+      <Item Name="[readers]" Condition="m_lockInfo.m_nReaders != 0">m_lockInfo.m_nReaders</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CThreadSpinRWLock::LockInfo_t">
+    <DisplayString Condition="m_writerId == 0 &amp;&amp; m_nReaders == 0">empty</DisplayString>
+    <DisplayString Condition="m_writerId != 0">locked write by {m_writerId}</DisplayString>
+    <DisplayString Condition="m_nReaders">locked read ({m_nReaders})</DisplayString>
+    <Expand>
+      <Item Name="[locking_thread_id]" Condition="m_writerId != 0">m_writerId</Item>
+      <Item Name="[active_readers]" Condition="m_nReaders != 0">m_nReaders</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CThread">
+    <DisplayString Condition="m_szName[0] == '\0'">{{ id={m_threadId} }}</DisplayString>
+    <DisplayString Condition="m_szName[0] != '\0'">{{ id={m_threadId}, name={m_szName} }}</DisplayString>
+    <Expand>
+      <Item Name="[id]">m_threadId</Item>
+      <Item Name="[name]" Condition="m_szName[0] != '\0'">m_szName</Item>
+      <Item Name="[suspend_no]">m_nSuspendCount</Item>
+      <Item Name="[result]">m_result</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CValidatableThread">
+    <DisplayString Condition="m_szName[0] == '\0'">{{ id={m_threadId} }}</DisplayString>
+    <DisplayString Condition="m_szName[0] != '\0'">{{ id={m_threadId}, name={m_szName} }}</DisplayString>
+    <Expand>
+      <Item Name="[id]">m_threadId</Item>
+      <Item Name="[name]" Condition="m_szName[0] != '\0'">m_szName</Item>
+      <Item Name="[suspend_no]">m_nSuspendCount</Item>
+      <Item Name="[result]">m_result</Item>
+      <Item Name="[should_sleep_for_validate]">m_bSleepForValidate</Item>
+      <Item Name="[is_sleeping_for_validate]">m_bSleepingForValidate</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CWorkerThread">
+    <DisplayString Condition="m_szName[0] == '\0'">{{ id={m_threadId} }}</DisplayString>
+    <DisplayString Condition="m_szName[0] != '\0'">{{ id={m_threadId}, name={m_szName} }}</DisplayString>
+    <Expand>
+      <Item Name="[id]">m_threadId</Item>
+      <Item Name="[name]" Condition="m_szName[0] != '\0'">m_szName</Item>
+      <Item Name="[suspend_no]">m_nSuspendCount</Item>
+      <Item Name="[result]">m_result</Item>
+      <Item Name="[param]">m_Param</Item>
+      <Item Name="[return_value]">m_ReturnVal</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="Singleton&lt;*&gt;">
+    <DisplayString Condition="m_instance.value() == nullptr">empty</DisplayString>
+    <DisplayString Condition="m_instance.value() != nullptr">created</DisplayString>
+    <Expand>
+      <Item Name="[instance]" Condition="m_instance.value() != nullptr">m_instance</Item>
+      <Item Name="[mutex]">m_mutex</Item>
+    </Expand>
+  </Type>
+
+  <!-- tier0/tslist.h -->
+
+  <Type Name="TSLNodeBase_t">
+    <DisplayString Condition="Next == nullptr">root</DisplayString>
+    <DisplayString Condition="Next != nullptr">{{ next={Next} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]" Condition="Next != nullptr">Next</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="TSLHead_t">
+    <Intrinsic Name="size" Expression="value.Depth" />
+    <DisplayString Condition="value.Next == nullptr">root</DisplayString>
+    <DisplayString Condition="value.Next != nullptr">{{ size={value.Depth} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]" Condition="value.Next != nullptr">value.Next</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSListBase">
+    <AlternativeType Name="CTSSimpleList&lt;*&gt;" />
+    <AlternativeType Name="CTSList&lt;*&gt;" />
+    <Intrinsic Name="size" Expression="head_.value().value.Depth" />
+    <DisplayString Condition="head_.value().value.Next == nullptr">empty</DisplayString>
+    <DisplayString Condition="head_.value().value.Next != nullptr">{{ size={head_.value().value.Depth} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]">head_.value().value.Next</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSPool&lt;*&gt;::TSPoolNode_t">
+    <DisplayString>{{ value={elem} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]" Condition="Next != nullptr">Next</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSPool&lt;*&gt;">
+    <Intrinsic Name="size" Expression="head_.value().value.Depth" />
+    <DisplayString Condition="head_.value().value.Next == nullptr">empty</DisplayString>
+    <DisplayString Condition="head_.value().value.Next != nullptr">{{ size={head_.value().value.Depth} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]">head_.value().value.Next</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSList&lt;*&gt;::Node_t">
+    <DisplayString>{{ value={elem} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]" Condition="Next != nullptr">Next</Item>
+    </Expand>
+  </Type>
+
+  <!--<Type Name="CTSList&lt;*&gt;">
+    <Intrinsic Name="size" Expression="head_.value().value.Depth" />
+    <DisplayString Condition="head_.value().value.Next == nullptr">empty</DisplayString>
+    <DisplayString Condition="head_.value().value.Next != nullptr">{{ size={head_.value().value.Depth} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]">head_.value().value.Next</Item>
+    </Expand>
+  </Type>-->
+
+  <Type Name="CTSListWithFreeList&lt;*&gt;::Node_t">
+    <DisplayString>{{ value={elem} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]" Condition="Next != nullptr">Next</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSListWithFreeList&lt;*&gt;">
+    <Intrinsic Name="size" Expression="head_.value().value.Depth" />
+    <DisplayString Condition="head_.value().value.Next == nullptr">empty</DisplayString>
+    <DisplayString Condition="head_.value().value.Next != nullptr">{{ size={head_.value().value.Depth} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]">head_.value().value.Next</Item>
+      <Item Name="[free]">m_FreeList</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSQueue&lt;*&gt;::Node_t">
+    <DisplayString>{{ value={elem} }}</DisplayString>
+    <Expand>
+      <Item Name="[next]" Condition="Next != nullptr">Next</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSQueue&lt;*&gt;::NodeLink_t">
+    <DisplayString Condition="value.pNode != nullptr">{{ link={value.pNode} }}</DisplayString>
+    <DisplayString Condition="value.pNode == nullptr">empty</DisplayString>
+    <Expand>
+      <Item Name="[link]" Condition="value.pNode != nullptr">value.pNode</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CTSQueue&lt;*&gt;">
+    <Intrinsic Name="size" Expression="m_Count" />
+    <DisplayString Condition="m_Head.value.pNode == m_Tail.value.pNode">empty</DisplayString>
+    <DisplayString Condition="m_Head.value.pNode != m_Tail.value.pNode">{{ size={m_Count} }}</DisplayString>
+    <Expand>
+      <Item Name="[head]">m_Head</Item>
+      <Item Name="[tail]">m_Tail</Item>
+      <Item Name="[free]">m_FreeNodes</Item>
+    </Expand>
+  </Type>
+
+  <!-- tier0/vprof.h -->
+
+  <Type Name="CVProfNode">
+    <Intrinsic Name="name" Expression="m_pszName" />
+    <Intrinsic Name="id" Expression="m_iUniqueNodeID" />
+    <Intrinsic Name="parent" Expression="m_pParent" />
+    <DisplayString>{{ name={m_pszName},now={m_CurFrameTime},peak={m_PeakTime},total={m_TotalTime} }}</DisplayString>
+    <Expand>
+      <Item Name="[name]">m_pszName</Item>
+      <Item Name="[id]">m_iUniqueNodeID</Item>
+      <Item Name="[previous_time]">m_PrevFrameTime</Item>
+      <Item Name="[now_time]">m_CurFrameTime</Item>
+      <Item Name="[peak_time]">m_PeakTime</Item>
+      <Item Name="[total_time]">m_TotalTime</Item>
+      <Item Name="[previous_calls]">m_nPrevFrameCalls</Item>
+      <Item Name="[now_calls]">m_nCurFrameCalls</Item>
+      <Item Name="[total_calls]">m_nTotalCalls</Item>
+      <Item Name="[recursions]">m_nRecursions</Item>
+      <Item Name="[parent]" Condition="m_pParent != nullptr">m_pParent</Item>
+      <Item Name="[child]" Condition="m_pChild != nullptr">m_pChild</Item>
+      <Item Name="[sibling]" Condition="m_pSibling != nullptr">m_pSibling</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CVProfile">
+    <DisplayString Condition="m_enabled == false">off</DisplayString>
+    <DisplayString Condition="m_enabled == true &amp;&amp; m_pCurNode != nullptr">{{ root={m_Root},now={*m_pCurNode} }}</DisplayString>
+    <Expand>
+      <Item Name="[root]">m_Root</Item>
+      <Item Name="[now]" Condition="m_pCurNode != nullptr">*m_pCurNode</Item>
+      <Item Name="[target_thread_id]">m_TargetThreadId</Item>
+      <Item Name="[frames]">m_nFrames</Item>
+      <ArrayItems>
+         <Size>m_NumCounters</Size>
+         <ValuePointer>m_Counters</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="CVProfSpikeDetector">
+    <DisplayString>{{ detect_spike (ms)={m_spike},timer={m_Timer} }}</DisplayString>
+    <Expand>
+      <Item Name="[detect_spike (ms)]">m_spike</Item>
+      <Item Name="[timer]">m_Timer</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="CVProfScope">
+    <DisplayString Condition="m_bEnabled == false">off</DisplayString>
+    <DisplayString Condition="m_bEnabled == true">on</DisplayString>
+  </Type>
+
+  <Type Name="CVProfCounter">
+    <DisplayString Condition="m_pCounter != nullptr">{{ name={m_pName},counter={*m_pCounter} }}</DisplayString>
+    <DisplayString Condition="m_pCounter == nullptr">{{ name={m_pName} }}</DisplayString>
+    <Expand>
+      <Item Name="[name]">m_pName</Item>
+      <Item Name="[counter]" Condition="m_pCounter != nullptr">*m_pCounter</Item>
+    </Expand>
+  </Type>
+
+</AutoVisualizer>
