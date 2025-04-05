@@ -1280,8 +1280,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 	if ( !dirCount )
 	{
 		// add directory name to search tree
-		intp j = dirList.AddToTail();
-		dirList[j].Set( pDirPath );
+		dirList[dirList.AddToTail()].Set( pDirPath );
 		return;
 	}
 
@@ -1291,8 +1290,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 		RecurseFileTree_r( fileList[i].fileName.String(), depth+1, dirList );
 	}
 
-	intp j = dirList.AddToTail();
-	dirList[j].Set( pDirPath );
+	dirList[dirList.AddToTail()].Set( pDirPath );
 }
 
 //-----------------------------------------------------------------------------
