@@ -67,7 +67,7 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 			auto iIdx = m_Blacklist.AddToTail();
 
 			m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
-			V_strncpy( m_Blacklist[iIdx].m_szServerName, pszName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
+			V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, pszName );
 			m_Blacklist[iIdx].m_ulTimeBlacklistedAt = ulDate;
 			m_Blacklist[iIdx].m_NetAdr.SetFromString( pszNetAddr );
 
@@ -114,7 +114,7 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( gameserveritem_t &se
  		return NULL;
 
 	auto iIdx = m_Blacklist.AddToTail();
-	V_strncpy( m_Blacklist[iIdx].m_szServerName, server.GetName(), sizeof( m_Blacklist[iIdx].m_szServerName ) );
+	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, server.GetName() );
 
 	time_t today;
 	time( &today );
@@ -138,13 +138,11 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
  		return NULL;
 
 	auto iIdx = m_Blacklist.AddToTail();
-
-	V_strncpy( m_Blacklist[iIdx].m_szServerName, serverName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
+	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, serverName );
 
 	time_t today;
 	time( &today );
 	m_Blacklist[iIdx].m_ulTimeBlacklistedAt = today;
-
 	m_Blacklist[iIdx].m_NetAdr = netAdr;
 	m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
 
@@ -167,8 +165,8 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 		return NULL;
 
 	auto iIdx = m_Blacklist.AddToTail();
+	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, serverName );
 
-	V_strncpy( m_Blacklist[iIdx].m_szServerName, serverName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
 	m_Blacklist[iIdx].m_ulTimeBlacklistedAt = timestamp;
 	m_Blacklist[iIdx].m_NetAdr = netAdr;
 	m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
