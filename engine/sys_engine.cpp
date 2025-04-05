@@ -377,7 +377,7 @@ void CEngine::Frame( void )
 		}
 		else
 		{
-			int nSleepMicrosecs = (int) ceilf( clamp( ( m_flMinFrameTime - m_flFrameTime ) * 1000000.f, 1.f, 1000000.f ) );
+			int nSleepMicrosecs = (int) ceilf( clamp( static_cast<float>( m_flMinFrameTime - m_flFrameTime ) * 1000000.f, 1.f, 1000000.f ) );
 			ThreadSleep( (nSleepMicrosecs + 999) / 1000 );
 		}
 	}
