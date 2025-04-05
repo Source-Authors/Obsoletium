@@ -22,29 +22,36 @@
 // Profiling instrumentation macros
 //
 
-#define MAXCOUNTERS 256
+constexpr inline int MAXCOUNTERS = 256;
 
 
 #ifdef VPROF_ENABLED
 
 #define VPROF_VTUNE_GROUP
 
-#define	VPROF( name )						VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0)
-#define	VPROF_ASSERT_ACCOUNTED( name )		VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, true, 0)
-#define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags )		VPROF_##detail(name,group, bAssertAccounted, budgetFlags)
+#define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags ) \
+	VPROF_##detail(name, group, bAssertAccounted, budgetFlags)
+#define	VPROF( name ) \
+	VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0)
+#define	VPROF_ASSERT_ACCOUNTED( name ) \
+	VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, true, 0)
 
-#define VPROF_BUDGET( name, group )					VPROF_BUDGET_FLAGS(name, group, BUDGETFLAG_OTHER)
-#define VPROF_BUDGET_FLAGS( name, group, flags )	VPROF_(name, 0, group, false, flags)
+#define VPROF_BUDGET_FLAGS( name, group, flags ) \
+	VPROF_(name, 0, group, false, flags)
+#define VPROF_BUDGET( name, group ) \
+	VPROF_BUDGET_FLAGS(name, group, BUDGETFLAG_OTHER)
 
 #define VPROF_SCOPE_BEGIN( tag )	do { VPROF( tag )
 #define VPROF_SCOPE_END()			} while (0)
 
 #define VPROF_ONLY( expression )	expression
 
-#define VPROF_ENTER_SCOPE( name )			g_VProfCurrentProfile.EnterScope( name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0 )
-#define VPROF_EXIT_SCOPE()					g_VProfCurrentProfile.ExitScope()
+#define VPROF_ENTER_SCOPE( name ) \
+	g_VProfCurrentProfile.EnterScope( name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0 )
+#define VPROF_EXIT_SCOPE() \
+	g_VProfCurrentProfile.ExitScope()
 
-#define VPROF_BUDGET_GROUP_ID_UNACCOUNTED 0
+constexpr inline int VPROF_BUDGET_GROUP_ID_UNACCOUNTED{0};
 
 
 // Budgetgroup flags. These are used with VPROF_BUDGET_FLAGS.
@@ -122,28 +129,35 @@
 #define VPROF_VAR_NAME_INTERNAL( a, b )		VPROF_VAR_NAME_INTERNAL_CAT( a, b )
 #define VPROF_VAR_NAME( a )					VPROF_VAR_NAME_INTERNAL( a, __LINE__ )
 
-#define	VPROF_0(name,group,assertAccounted,budgetFlags)	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "(%s)%s", group, name ); CVProfScope VPROF_VAR_NAME( VProf_ )(name, 0, group, assertAccounted, budgetFlags);
+#define	VPROF_0(name,group,assertAccounted,budgetFlags) \
+	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "(%s)%s", group, name ); \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 0, group, assertAccounted, budgetFlags);
 
 #if VPROF_LEVEL > 0 
-#define	VPROF_1(name,group,assertAccounted,budgetFlags)	tmZone( TELEMETRY_LEVEL3, TMZF_NONE, "(%s)%s", group, name ); CVProfScope VPROF_VAR_NAME( VProf_ )(name, 1, group, assertAccounted, budgetFlags);
+#define	VPROF_1(name,group,assertAccounted,budgetFlags) \
+	tmZone( TELEMETRY_LEVEL3, TMZF_NONE, "(%s)%s", group, name ); \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 1, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_1(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
 
 #if VPROF_LEVEL > 1 
-#define	VPROF_2(name,group,assertAccounted,budgetFlags)	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 2, group, assertAccounted, budgetFlags);
+#define	VPROF_2(name,group,assertAccounted,budgetFlags) \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 2, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_2(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
 
 #if VPROF_LEVEL > 2 
-#define	VPROF_3(name,group,assertAccounted,budgetFlags)	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 3, group, assertAccounted, budgetFlags);
+#define	VPROF_3(name,group,assertAccounted,budgetFlags) \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 3, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_3(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
 
 #if VPROF_LEVEL > 3 
-#define	VPROF_4(name,group,assertAccounted,budgetFlags)	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 4, group, assertAccounted, budgetFlags);
+#define	VPROF_4(name,group,assertAccounted,budgetFlags) \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 4, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_4(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
@@ -173,8 +187,16 @@
 
 //-------------------------------------
 
-#define VPROF_INCREMENT_COUNTER(name,amount)			do { static CVProfCounter _counter( name ); _counter.Increment( amount ); } while( 0 )
-#define VPROF_INCREMENT_GROUP_COUNTER(name,group,amount)			do { static CVProfCounter _counter( name, group ); _counter.Increment( amount ); } while( 0 )
+#define VPROF_INCREMENT_COUNTER(name,amount) \
+	do { \
+		static CVProfCounter _counter( name ); \
+		_counter.Increment( amount ); \
+	} while( 0 )
+#define VPROF_INCREMENT_GROUP_COUNTER(name,group,amount) \
+	do { \
+		static CVProfCounter _counter( name, group ); \
+		_counter.Increment( amount ); \
+	} while( 0 )
 
 #else
 
