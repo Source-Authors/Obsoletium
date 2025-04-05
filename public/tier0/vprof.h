@@ -58,12 +58,14 @@ constexpr inline int VPROF_BUDGET_GROUP_ID_UNACCOUNTED{0};
 // These control which budget panels the groups show up in.
 // If a budget group uses VPROF_BUDGET, it gets the default 
 // which is BUDGETFLAG_OTHER.
-#define BUDGETFLAG_CLIENT	(1<<0)		// Shows up in the client panel.
-#define BUDGETFLAG_SERVER	(1<<1)		// Shows up in the server panel.
-#define BUDGETFLAG_OTHER	(1<<2)		// Unclassified (the client shows these but the dedicated server doesn't).
-#define BUDGETFLAG_HIDDEN	(1<<15)
-#define BUDGETFLAG_ALL		0xFFFF
-
+// dimhotepus: Defines -> enum.
+enum {
+	BUDGETFLAG_CLIENT =	(1<<0),		// Shows up in the client panel.
+	BUDGETFLAG_SERVER = (1<<1),		// Shows up in the server panel.
+	BUDGETFLAG_OTHER  = (1<<2),		// Unclassified (the client shows these but the dedicated server doesn't).
+	BUDGETFLAG_HIDDEN = (1<<15),
+	BUDGETFLAG_ALL	  = 0xFFFF
+};
 
 // NOTE: You can use strings instead of these defines. . they are defined here and added
 // in vprof.cpp so that they are always in the same order.
