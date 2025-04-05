@@ -2267,7 +2267,7 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 // Purpose: Add a new group or increment count of the existing one
 // Input  : *pSentenceName - text of the sentence name
 //-----------------------------------------------------------------------------
-int VOX_GroupAdd( const char *pSentenceName )
+intp VOX_GroupAdd( const char *pSentenceName )
 {
 	intp len = V_strlen( pSentenceName ) - 1;
 
@@ -2739,8 +2739,7 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 		// skip entire line if first char is /
 		if (*pch != '/')
 		{
-			auto addIndex = g_Sentences.AddToTail();
-			sentence_t *pSentence = &g_Sentences[addIndex];
+			sentence_t *pSentence = &g_Sentences[g_Sentences.AddToTail()];
 			pName = pch;
 			pSentence->pName = pch;
 			pSentence->length = 0;

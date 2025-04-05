@@ -910,9 +910,7 @@ CClientFrame *CReplayServer::GetDeltaFrame( int nTick )
 			return m_FrameCache[iFrame].pFrame;
 	}
 
-	intp i = m_FrameCache.AddToTail();
-
-	CReplayFrameCacheEntry_s &entry = m_FrameCache[i];
+	CReplayFrameCacheEntry_s &entry = m_FrameCache[m_FrameCache.AddToTail()];
 
 	entry.nTick = nTick;
 	entry.pFrame = GetClientFrame( nTick ); //expensive

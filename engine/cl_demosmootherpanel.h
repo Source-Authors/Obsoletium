@@ -60,26 +60,26 @@ public:
 
 	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual void	DrawDebuggingInfo(  int frame, float elapsed );
+	virtual void	DrawDebuggingInfo(  intp frame, float elapsed );
 
 
 protected:
 
-	bool		CanEdit();
+	bool		CanEdit() const;
 
 	void		Reset( void );
 
 	demosmoothing_t *GetCurrent( void );
 
-	void		DrawSmoothingSample( bool original, bool processed, int samplenumber, demosmoothing_t *sample, demosmoothing_t *next );
+	void		DrawSmoothingSample( bool original, bool processed, intp samplenumber, demosmoothing_t *sample, demosmoothing_t *next );
 	void		DrawTargetSpline( void );
 	void		DrawKeySpline( void );
-	int			GetTickForFrame( int frame );
-	int			GetFrameForTick( int tick );
+	int			GetTickForFrame( intp frame ) const;
+	intp		GetFrameForTick( int tick ) const;
 	bool		GetInterpolatedViewPoint( Vector& origin, QAngle& angles );
 	bool		GetInterpolatedOriginAndAngles( bool readonly, Vector& origin, QAngle& angles );
 
-	void		DrawLegend( int startframe, int endframe );
+	void		DrawLegend( intp startframe, intp endframe );
 
 	void		OnRevert();
 	void		OnPreview( bool original );
@@ -101,15 +101,15 @@ protected:
 	void		OnRevertPoint( void );
 
 	void		PopulateMenuList();
-	int			GetStartFrame();
-	int			GetEndFrame();
+	intp		GetStartFrame();
+	intp		GetEndFrame();
 
 	void		OnSaveKey();
 	void		OnSetView();
 
 	void		OnSmoothEdges( bool left, bool right );
 
-	void		PerformLinearInterpolatedAngleSmoothing( int startframe, int endframe );
+	void		PerformLinearInterpolatedAngleSmoothing( intp startframe, intp endframe );
 
 	void		OnSmoothSelectionAngles( void );
 	void		OnSmoothSelectionOrigin( void );
@@ -122,11 +122,11 @@ protected:
 
 	void		OnOriginEaseCurve( EASEFUNC easefunc );
 
-	void		SetLastFrame( bool jumptotarget, int frame );
+	void		SetLastFrame( bool jumptotarget, intp frame );
 
-	void		AddSamplePoints( bool usetarget, bool includeboundaries, CUtlVector< demosmoothing_t * >& points, int start, int end );
-	demosmoothing_t *GetBoundedSample(  CUtlVector< demosmoothing_t * >& points, int sample );
-	void		FindSpanningPoints( int tick, CUtlVector< demosmoothing_t * >& points, int& prev, int& next );
+	void		AddSamplePoints( bool usetarget, bool includeboundaries, CUtlVector< demosmoothing_t * >& points, intp start, intp end );
+	demosmoothing_t *GetBoundedSample(  CUtlVector< demosmoothing_t * >& points, intp sample );
+	void		FindSpanningPoints( int tick, CUtlVector< demosmoothing_t * >& points, intp& prev, intp& next );
 
 	// Undo/Redo
 	void				Undo( void );
@@ -204,14 +204,14 @@ protected:
 	vgui::Button		*m_pGoto;
 
 	bool				m_bHasSelection;
-	int					m_nSelection[2];
+	intp				m_nSelection[2];
 	int					m_iSelectionTicksSpan;
 
 	bool				m_bPreviewing;
 	bool				m_bPreviewOriginal;
 	int					m_iPreviewStartTick;
 	float				m_fPreviewCurrentTime;
-	int					m_nPreviewLastFrame;
+	intp				m_nPreviewLastFrame;
 	bool				m_bPreviewPaused;
 
 	CSmoothingContext	m_Smoothing;

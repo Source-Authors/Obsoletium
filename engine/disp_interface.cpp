@@ -263,8 +263,8 @@ DispDecalHandle_t CDispInfo::NotifyAddDecal( decal_t *pDecal, float flSize )
 	if ( h != s_DispDecals.InvalidIndex() )
 	{
 		int nDecalCount = 0;
-		int iDecal = m_FirstDecal;
-		int iLastDecal = s_DispDecals.InvalidIndex();
+		DispDecalHandle_t iDecal = m_FirstDecal;
+		DispDecalHandle_t iLastDecal = s_DispDecals.InvalidIndex();
 		while( iDecal != s_DispDecals.InvalidIndex() )
 		{
 			iLastDecal = iDecal;
@@ -788,8 +788,8 @@ inline void DispInfo_DrawDecalMeshList( DecalMeshList_t &meshList )
 
 	bool bMatFullbright = ( g_pMaterialSystemConfig->nFullbright == 1 );
 
-	int nBatchCount = meshList.m_aBatches.Count();
-	for ( int iBatch = 0; iBatch < nBatchCount; ++iBatch )
+	intp nBatchCount = meshList.m_aBatches.Count();
+	for ( intp iBatch = 0; iBatch < nBatchCount; ++iBatch )
 	{
 		const DecalBatchList_t &batch = meshList.m_aBatches[iBatch];
 
@@ -825,14 +825,14 @@ void DispInfo_DrawDecalsGroup( int iGroup, int iTreeType )
 
 	bool bMatWireframe = ShouldDrawInWireFrameMode();
 
-	int nSortTreeCount = g_aDispDecalSortTrees.Count();
-	for ( int iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
+	intp nSortTreeCount = g_aDispDecalSortTrees.Count();
+	for ( intp iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
 	{
 		bool bMeshInit = true;
 		
 		const CUtlVector<DecalMaterialBucket_t> &materialBucketList = g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType];
-		int nBucketCount = materialBucketList.Count();
-		for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
+		intp nBucketCount = materialBucketList.Count();
+		for ( intp iBucket = 0; iBucket < nBucketCount; ++iBucket )
 		{
 			if ( materialBucketList.Element( iBucket ).m_nCheckCount != g_nDispDecalSortCheckCount )
 				continue;

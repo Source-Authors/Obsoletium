@@ -2364,7 +2364,7 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 		if ( !g_bDspOff )
 		{
 			// apply 1ch filtering to SOUND_BUFFER_SPECIALs
-			for ( int iDSP = 0; iDSP < list.m_nSpecialDSPs.Count(); ++iDSP )
+			for ( intp iDSP = 0; iDSP < list.m_nSpecialDSPs.Count(); ++iDSP )
 			{
 				bool bFoundMixer = false;
 				

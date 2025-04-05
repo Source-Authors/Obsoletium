@@ -687,8 +687,7 @@ static void AddSpewRecord( char const *pMsg )
 		g_SpewHistory.Remove( g_SpewHistory.Head() );
 	}
 
-	auto i = g_SpewHistory.AddToTail();
-	g_SpewHistory[ i ].Format( "%d(%f):  %s", g_nSpewLines++, Plat_FloatTime(), pMsg );
+	g_SpewHistory[ g_SpewHistory.AddToTail() ].Format( "%d(%f):  %s", g_nSpewLines++, Plat_FloatTime(), pMsg );
 
 	s_bReentrancyGuard = false;
 }

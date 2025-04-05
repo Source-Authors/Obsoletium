@@ -56,8 +56,7 @@ void ReadCheatCommandsFromFile( const char *pchFileName )
 
 	for ( auto *pKey = pCheatCodeKeys->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 	{
-		auto iCheat = s_CheatCodeCommands.AddToTail();
-		CheatCodeData_t *pNewCheatCode = &(s_CheatCodeCommands[ iCheat ]);
+		CheatCodeData_t *pNewCheatCode = &(s_CheatCodeCommands[ s_CheatCodeCommands.AddToTail() ]);
 
 		V_strcpy_safe( pNewCheatCode->szName, pKey->GetName() );	// Get the name
 		pNewCheatCode->bDevOnly = ( pKey->GetInt( "dev", 0 ) != 0 );				// Get developer only flag

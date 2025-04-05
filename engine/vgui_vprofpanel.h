@@ -57,7 +57,7 @@ struct PanelEntry_t
 
 	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual int AddItem( KeyValues *data, int parentItemIndex, ColumnPanels_t& columnPanels );
+	virtual intp AddItem( KeyValues *data, int parentItemIndex, ColumnPanels_t& columnPanels );
 	virtual void ModifyItem( KeyValues *data, int itemIndex );
 	virtual void SetItemColors( int id, const Color& fg, const Color& bg );
 	virtual void SetItemColumnColors( int id, int col, const Color& fg, const Color& bg );

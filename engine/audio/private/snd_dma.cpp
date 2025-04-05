@@ -6911,8 +6911,7 @@ static void S_Say( const CCommand &args )
 		V_strcpy_safe( sound, SRC_SPEAK_TEST_SOUND_NAME " " );
 		V_strcat_safe( sound, args[1] );
 
-		auto addIndex = g_Sentences.AddToTail();
-		sentence_t *pSentence = &g_Sentences[addIndex];
+		sentence_t *pSentence = &g_Sentences[g_Sentences.AddToTail()];
 		pSentence->pName = sound;
 		pSentence->length = 0;
 

@@ -153,8 +153,7 @@ static int CreateExecutionMarker()
 		nIndex = g_ExecutionMarkers.Find( nRandomNumber );
 	} while ( nIndex != g_ExecutionMarkers.InvalidIndex() );
 
-	auto i = g_ExecutionMarkers.AddToTail( nRandomNumber );
-	return g_ExecutionMarkers[i];
+	return g_ExecutionMarkers[g_ExecutionMarkers.AddToTail( nRandomNumber )];
 }
 
 static bool FindAndRemoveExecutionMarker( int iCode )
