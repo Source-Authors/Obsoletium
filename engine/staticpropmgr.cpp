@@ -65,7 +65,7 @@ static bool g_MakingDevShots = false;
 //-----------------------------------------------------------------------------
 enum
 {
-	INVALID_FADE_INDEX = (unsigned short)~0
+	INVALID_FADE_INDEX = (intp)~0
 };
 
 
@@ -267,8 +267,8 @@ public:
 	float Radius() const { return m_flRadius; }
 	int Flags() const { return m_Flags; }
 
-	void SetFadeIndex( unsigned short nIndex ) { m_FadeIndex = nIndex; }
-	unsigned short FadeIndex() const { return m_FadeIndex; }
+	void SetFadeIndex( intp nIndex ) { m_FadeIndex = nIndex; }
+	intp FadeIndex() const { return m_FadeIndex; }
 	float ForcedFadeScale() const { return m_flForcedFadeScale; }
 	int	DrawModelSlow( int flags );
 
@@ -307,7 +307,8 @@ private:
 	unsigned short			m_LeafCount;
 	CBaseHandle				m_EntHandle;	// FIXME: Do I need client + server handles?
 	ClientRenderHandle_t	m_RenderHandle;
-	unsigned short			m_FadeIndex;	// Index into the m_StaticPropFade dictionary
+	// dimhotepus: unsigned short -> intp. 
+	intp					m_FadeIndex;	// Index into the m_StaticPropFade dictionary
 	float					m_flForcedFadeScale;
 
 	// bbox is the same for both GetBounds and GetRenderBounds since static props never move.
@@ -1360,7 +1361,7 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 		if (lump.m_Flags & STATIC_PROP_FLAG_FADES)
 		{
 			intp idx = m_StaticPropFade.AddToTail();
-			m_StaticProps[i].SetFadeIndex( (unsigned short)idx );
+			m_StaticProps[i].SetFadeIndex( idx );
 			StaticPropFade_t& fade = m_StaticPropFade[idx];
 			fade.m_Model = i;
 			fade.m_MinDistSq = lump.m_FadeMinDist;
