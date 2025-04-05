@@ -9,11 +9,11 @@
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"
 #include "mem_helpers.h"
-#ifdef _WIN32
+
+#if defined(_WIN32)
 #include "winlite.h"
 #include <crtdbg.h>
-#endif
-#ifdef OSX
+#elif defined(OSX)
 #include <malloc/malloc.h>
 #include <mach/mach.h>
 #include <stdlib.h>
@@ -25,6 +25,7 @@
 #include <unordered_set>
 #include <climits>
 #include "tier0/threadtools.h"
+
 #if ( !defined(_DEBUG) && defined(USE_MEM_DEBUG) )
 #pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't commit this!")
 #endif
@@ -384,8 +385,6 @@ static inline void InternalFree( void *pMem )
 #if !defined( _DEBUG ) || defined( POSIX )
 #ifdef OSX
 	malloc_zone_free( malloc_default_zone(), pMem );
-#elif LINUX
-	free( pInternalMem );
 #else
 	free( pInternalMem );	
 #endif
