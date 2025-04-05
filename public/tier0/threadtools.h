@@ -403,130 +403,130 @@ PLATFORM_INTERFACE void ThreadNotifySyncReleasing(void *p);
 #ifndef NO_THREAD_LOCAL
 
 class PLATFORM_CLASS CThreadLocalBase
-	{
+{
 public:
-		CThreadLocalBase();
-		~CThreadLocalBase();
+	CThreadLocalBase();
+	~CThreadLocalBase();
 
-		void * Get() const;
-		void   Set(void *);
+	void * Get() const;
+	void   Set(void *);
 
 private:
 #ifdef _WIN32
 	uint32 m_index;
 #elif POSIX
-		pthread_key_t m_index;
+	pthread_key_t m_index;
 #endif
-	};
+};
 
 	//---------------------------------------------------------
 
 #ifndef __AFXTLS_H__
 
-	template <typename T>
-	class CThreadLocal : public CThreadLocalBase
+template <typename T>
+class CThreadLocal : public CThreadLocalBase
+{
+public:
+	CThreadLocal()
 	{
-	public:
-		CThreadLocal()
-		{
-			COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
-		}
+		COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
+	}
 
-		T Get() const
+	T Get() const
+	{
+		if constexpr (std::is_pointer_v<T>)
 		{
-			if constexpr (std::is_pointer_v<T>)
-			{
-				return reinterpret_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
-			}
-			else
-			{
-				return static_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
-			}
+			return reinterpret_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
 		}
+		else
+		{
+			return static_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
+		}
+	}
 
-		void Set(T val)
+	void Set(T val)
+	{
+		if constexpr (std::is_pointer_v<T>)
 		{
-			if constexpr (std::is_pointer_v<T>)
-			{
-				CThreadLocalBase::Set( reinterpret_cast<void *>( reinterpret_cast<intp>( val ) ) );
-			}
-			else
-			{
-				CThreadLocalBase::Set( reinterpret_cast<void *>( static_cast<intp>( val ) ) );
-			}
+			CThreadLocalBase::Set( reinterpret_cast<void *>( reinterpret_cast<intp>( val ) ) );
 		}
-	};
+		else
+		{
+			CThreadLocalBase::Set( reinterpret_cast<void *>( static_cast<intp>( val ) ) );
+		}
+	}
+};
 
 #endif
 
 	//---------------------------------------------------------
 
 template <typename T = intp>
-	class CThreadLocalInt : public CThreadLocal<T>
-	{
-	public:
+class CThreadLocalInt : public CThreadLocal<T>
+{
+public:
 	CThreadLocalInt()
 	{
 		COMPILE_TIME_ASSERT( sizeof(T) >= sizeof(int) );
 		COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
 	}
-
+	
 	operator T() const { return this->Get(); }
 	T	operator=( T i ) { this->Set( i ); return i; }
-
+	
 	T operator++()					{ T i = this->Get(); this->Set( ++i ); return i; }
 	T operator++(int)				{ T i = this->Get(); this->Set( i + 1 ); return i; }
-
+	
 	T operator--()					{ T i = this->Get(); this->Set( --i ); return i; }
 	T operator--(int)				{ T i = this->Get(); this->Set( i - 1 ); return i; }
-	};
+};
 
+//---------------------------------------------------------
 
-	//---------------------------------------------------------
+template <class T>
+class CThreadLocalPtr : private CThreadLocalBase
+{
+public:
+	CThreadLocalPtr() = default;
 
-	template <class T>
-	class CThreadLocalPtr : private CThreadLocalBase
-	{
-	public:
-		CThreadLocalPtr() = default;
+	operator const void *() const							{ return static_cast<T *>(Get()); }
+	operator void *()										{ return static_cast<T *>(Get()); }
 
-		operator const void *() const          					{ return static_cast<T *>(Get()); }
-		operator void *()                      					{ return static_cast<T *>(Get()); }
+	operator const T *() const								{ return static_cast<T *>(Get()); }
+	operator const T *()									{ return static_cast<T *>(Get()); }
+	operator T *()											{ return static_cast<T *>(Get()); }
 
-		operator const T *() const							    { return static_cast<T *>(Get()); }
-		operator const T *()          							{ return static_cast<T *>(Get()); }
-		operator T *()											{ return static_cast<T *>(Get()); }
+	int			operator=( int i )							{ AssertMsg( i == 0, "Only nullptr allowed on integer assign" ); Set( nullptr ); return 0; }
+	nullptr_t	operator=( std::nullptr_t i )				{ Set( nullptr ); return nullptr; }
+	T *			operator=( T *p )							{ Set( p ); return p; }
 
-		int			operator=( int i )							{ AssertMsg( i == 0, "Only nullptr allowed on integer assign" ); Set( nullptr ); return 0; }
-		T *			operator=( T *p )							{ Set( p ); return p; }
+	bool        operator !() const							{ return (!Get()); }
+	bool        operator!=( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() != nullptr); }
+	bool        operator==( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() == nullptr); }
+	bool		operator==( const void *p ) const			{ return (Get() == p); }
+	bool		operator!=( const void *p ) const			{ return (Get() != p); }
+	bool		operator==( const T *p ) const				{ return operator==((const void*)p); }
+	bool		operator!=( const T *p ) const				{ return operator!=((const void*)p); }
 
-		bool        operator !() const							{ return (!Get()); }
-		bool        operator!=( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() != nullptr); }
-		bool        operator==( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() == nullptr); }
-		bool		operator==( const void *p ) const			{ return (Get() == p); }
-		bool		operator!=( const void *p ) const			{ return (Get() != p); }
-		bool		operator==( const T *p ) const				{ return operator==((const void*)p); }
-		bool		operator!=( const T *p ) const				{ return operator!=((const void*)p); }
+	T *  		operator->()								{ return (T *)Get(); }
+	T &  		operator *()								{ return *((T *)Get()); }
 
-		T *  		operator->()								{ return (T *)Get(); }
-		T &  		operator *()								{ return *((T *)Get()); }
+	const T *   operator->() const							{ return (T *)Get(); }
+	const T &   operator *() const							{ return *((T *)Get()); }
 
-		const T *   operator->() const							{ return (T *)Get(); }
-		const T &   operator *() const							{ return *((T *)Get()); }
+	const T &	operator[]( size_t i ) const				{ return *((T *)Get() + i); }
+	T &			operator[]( size_t i )						{ return *((T *)Get() + i); }
 
-		const T &	operator[]( size_t i ) const					{ return *((T *)Get() + i); }
-		T &			operator[]( size_t i )							{ return *((T *)Get() + i); }
-
-	private:
-		// Disallowed operations
-		CThreadLocalPtr( T *pFrom );
-		CThreadLocalPtr( const CThreadLocalPtr<T> &from );
-		T **operator &();
-		T * const *operator &() const;
-		void operator=( const CThreadLocalPtr<T> &from );
-		bool operator==( const CThreadLocalPtr<T> &p ) const;
-		bool operator!=( const CThreadLocalPtr<T> &p ) const;
-	};
+private:
+	// Disallowed operations
+	CThreadLocalPtr( T *pFrom ) = delete;
+	CThreadLocalPtr( const CThreadLocalPtr<T> &from ) = delete;
+	T **operator &() = delete;
+	T * const *operator &() const = delete;
+	void operator=( const CThreadLocalPtr<T> &from ) = delete;
+	bool operator==( const CThreadLocalPtr<T> &p ) const = delete;
+	bool operator!=( const CThreadLocalPtr<T> &p ) const = delete;
+};
 
 #endif // NO_THREAD_LOCAL
 #endif // !__AFXTLS_H__
@@ -709,19 +709,15 @@ public:
 
 private:
 	// Disallow copying
-	CThreadMutex( const CThreadMutex & );
-	CThreadMutex &operator=( const CThreadMutex & );
+	CThreadMutex( const CThreadMutex & ) = delete;
+	CThreadMutex &operator=( const CThreadMutex & ) = delete;
 
-#if defined( _WIN32 )
+#if defined(_WIN32)
 	// Efficient solution to breaking the windows.h dependency, invariant is tested.
-#ifdef _WIN64
-	#define TT_SIZEOF_CRITICALSECTION 40	
+#if defined(_WIN64)
+	#define TT_SIZEOF_CRITICALSECTION 40
 #else
-#ifndef _X360
 	#define TT_SIZEOF_CRITICALSECTION 24
-#else
-	#define TT_SIZEOF_CRITICALSECTION 28
-#endif // !_XBOX
 #endif // _WIN64
 	byte m_CriticalSection[TT_SIZEOF_CRITICALSECTION];
 #elif defined(POSIX)
@@ -980,18 +976,18 @@ private:
 	const char* m_pMutexName;
 	const char* m_pFilename;
 	int m_nLineNum;
-	bool m_bOwned;	 // Did owenership of the lock pass to another instance?
+	bool m_bOwned;	 // Did ownership of the lock pass to another instance?
 
 #ifdef RAD_TELEMETRY_ENABLED
 	TmU64 m_uLockMatcher;
 #endif
 
 	// Disallow copying
-	CAutoLockT<MUTEX_TYPE>( const CAutoLockT<MUTEX_TYPE> & );
-	CAutoLockT<MUTEX_TYPE> &operator=( const CAutoLockT<MUTEX_TYPE> & );
+	CAutoLockT<MUTEX_TYPE>( const CAutoLockT<MUTEX_TYPE> & ) = delete;
+	CAutoLockT<MUTEX_TYPE> &operator=( const CAutoLockT<MUTEX_TYPE> & ) = delete;
 
 	// No move assignment because no default construction.
-	CAutoLockT<MUTEX_TYPE> &operator=( CAutoLockT<MUTEX_TYPE> && );
+	CAutoLockT<MUTEX_TYPE> &operator=( CAutoLockT<MUTEX_TYPE> && ) = delete;
 };
 
 typedef CAutoLockT<CThreadMutex> CAutoLock;
@@ -1065,8 +1061,8 @@ protected:
 #endif
 
 private:
-	CThreadSyncObject( const CThreadSyncObject & );
-	CThreadSyncObject &operator=( const CThreadSyncObject & );
+	CThreadSyncObject( const CThreadSyncObject & ) = delete;
+	CThreadSyncObject &operator=( const CThreadSyncObject & ) = delete;
 };
 
 
@@ -1096,8 +1092,8 @@ public:
 	bool Release(long releaseCount = 1, long * pPreviousCount = nullptr );
 
 private:
-	CThreadSemaphore(const CThreadSemaphore &);
-	CThreadSemaphore &operator=(const CThreadSemaphore &);
+	CThreadSemaphore(const CThreadSemaphore &) = delete;
+	CThreadSemaphore &operator=(const CThreadSemaphore &) = delete;
 };
 
 
@@ -1125,8 +1121,8 @@ public:
 	void SetTrace( bool )				{}
 
 private:
-	CThreadFullMutex( const CThreadFullMutex & );
-	CThreadFullMutex &operator=( const CThreadFullMutex & );
+	CThreadFullMutex( const CThreadFullMutex & ) = delete;
+	CThreadFullMutex &operator=( const CThreadFullMutex & ) = delete;
 };
 #endif
 
@@ -1156,8 +1152,8 @@ public:
 	bool Wait( uint32 dwTimeout = TT_INFINITE );
 
 private:
-	CThreadEvent( const CThreadEvent & );
-	CThreadEvent &operator=( const CThreadEvent & );
+	CThreadEvent( const CThreadEvent & ) = delete;
+	CThreadEvent &operator=( const CThreadEvent & ) = delete;
 };
 
 // Hard-wired manual event for use in array declarations
@@ -1217,7 +1213,7 @@ private:
 #ifdef WIN32
 	CThreadFastMutex m_mutex;
 #else
-	CThreadMutex m_mutex;	
+	CThreadMutex m_mutex;
 #endif
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
@@ -1238,7 +1234,12 @@ private:
 class ALIGN8 PLATFORM_CLASS CThreadSpinRWLock : public CAlignedNewDelete<8>
 {
 public:
-	CThreadSpinRWLock()	{ COMPILE_TIME_ASSERT( sizeof( LockInfo_t ) == sizeof( int64 ) ); Assert( (intp)this % 8 == 0 ); memset( this, 0, sizeof( *this ) ); }
+	CThreadSpinRWLock()
+	{
+		COMPILE_TIME_ASSERT( sizeof( LockInfo_t ) == sizeof( int64 ) );
+		Assert( (intp)this % 8 == 0 );
+		memset( this, 0, sizeof( *this ) );
+	}
 
 	bool TryLockForWrite();
 	bool TryLockForRead();
@@ -1257,10 +1258,10 @@ public:
 
 private:
 	struct LockInfo_t
-		{
-			ThreadId_t	m_writerId;
-			int		m_nReaders;
-		};
+	{
+		ThreadId_t	m_writerId;
+		int		m_nReaders;
+	};
 
 	bool AssignIf( const LockInfo_t &newValue, const LockInfo_t &comperand );
 	bool TryLockForWrite( const ThreadId_t threadId );
@@ -1425,8 +1426,8 @@ private:
 	static unsigned __stdcall ThreadProc( void * pv );
 
 	// make copy constructor and assignment operator inaccessible
-	CThread( const CThread & );
-	CThread &operator=( const CThread & );
+	CThread( const CThread & ) = delete;
+	CThread &operator=( const CThread & ) = delete;
 
 #ifdef _WIN32
 	HANDLE 	m_hThread;
@@ -1539,13 +1540,13 @@ protected:
 	int WaitForReply( unsigned timeout, WaitFunc_t );
 
 private:
-	CWorkerThread( const CWorkerThread & );
-	CWorkerThread &operator=( const CWorkerThread & );
+	CWorkerThread( const CWorkerThread & ) = delete;
+	CWorkerThread &operator=( const CWorkerThread & ) = delete;
 
 	CThreadEvent	m_EventSend;
 	CThreadEvent	m_EventComplete;
 
-	unsigned        m_Param;
+	unsigned		m_Param;
 	CFunctor		*m_pParamFunctor;
 	int				m_ReturnVal;
 };
@@ -1825,10 +1826,10 @@ inline bool CThreadSpinRWLock::TryLockForWrite( const ThreadId_t threadId )
 
 inline bool CThreadSpinRWLock::TryLockForWrite()
 {
-  ++m_nWriters;
+	++m_nWriters;
 	if ( !TryLockForWrite( ThreadGetCurrentId() ) )
 	{
-    --m_nWriters;
+		--m_nWriters;
 		return false;
 	}
 	return true;
@@ -1850,12 +1851,6 @@ inline bool CThreadSpinRWLock::TryLockForRead()
 		newValue.m_writerId = 0;
 
 	const bool bSuccess = AssignIf( newValue, oldValue );
-#if defined(_X360)
-	if ( bSuccess )
-	{
-		// X360TBD: Serious perf implications. Not Yet. __sync();
-	}
-#endif
 	return bSuccess;
 }
 
@@ -1873,7 +1868,7 @@ inline void CThreadSpinRWLock::LockForWrite()
 }
 
 // read data from a memory address
-template<class T> FORCEINLINE T ReadVolatileMemory( T const *pPtr )
+template<class T> [[nodiscard]] FORCEINLINE T ReadVolatileMemory( T const *pPtr )
 {
 	volatile const T * pVolatilePtr = ( volatile const T * ) pPtr;
 	return *pVolatilePtr;
@@ -1886,7 +1881,7 @@ template<typename T>
 class Singleton
 {
 public:
-	T *GetInstance()
+	[[nodiscard]] T *GetInstance()
 	{
 		T *tmp{m_instance.load(std::memory_order_relaxed)};
 		std::atomic_thread_fence(std::memory_order_acquire);
