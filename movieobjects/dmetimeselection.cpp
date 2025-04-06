@@ -143,14 +143,14 @@ void CDmeTimeSelection::GetAlphaForTime( DmeTime_t t, DmeTime_t curtime, byte& a
 		t >= times[ 0 ] && t < times[ 1 ] )
 	{
 		float frac = GetFractionOfTime( t - times[ 0 ], dt1, false );
-		alpha = static_cast<byte>(clamp( alpha * frac, minAlpha, 255 ));
+		alpha = static_cast<byte>(clamp( static_cast<int>(alpha * frac), (int)minAlpha, 255 ));
 		return;
 	}
 	if ( dt2 > DmeTime_t( 0 ) &&
 		t > times[ 2 ] && t <= times[ 3 ] )
 	{
 		float frac = GetFractionOfTime( times[ 3 ] - t, dt2, false );
-		alpha = static_cast<byte>(clamp( alpha * frac, minAlpha, 255 ));
+		alpha = static_cast<byte>(clamp( static_cast<int>(alpha * frac), (int)minAlpha, 255 ));
 		return;
 	}
 	if ( t < times[ 0 ] )

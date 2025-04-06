@@ -702,7 +702,7 @@ bool CExpressionCalculator::Parse3ArgFunc( const char *&expr )
 			m_stack.Push( lerp( f1, f2, f3 ) );
 			break;
 		case 4: // cramp
-			m_stack.Push( clamp( ramp( f1, f2, f3 ), 0, 1 ) );
+			m_stack.Push( clamp( ramp( f1, f2, f3 ), 0.f, 1.f ) );
 			break;
 		case 5: // clerp
 			m_stack.Push( clamp( lerp( f1, f2, f3 ), f2, f3 ) );
