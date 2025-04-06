@@ -1007,10 +1007,10 @@ void CScheme::LoadBorders()
 			Assert(border);
 
 			// add an entry that just references the existing border
-			auto i = m_BorderList.AddToTail();
-			m_BorderList[i].border = border;
-			m_BorderList[i].bSharedBorder = true;
-			m_BorderList[i].borderSymbol = kv->GetNameSymbol();
+			auto &vborder = m_BorderList[m_BorderList.AddToTail()];
+			vborder.border = border;
+			vborder.bSharedBorder = true;
+			vborder.borderSymbol = kv->GetNameSymbol();
 		}
 	}
 	
