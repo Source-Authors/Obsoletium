@@ -61,15 +61,12 @@ const char * CStringPool::Find( const char *pszValue )
 
 const char * CStringPool::Allocate( const char *pszValue )
 {
-	char	*pszNew;
-
 	auto i 	= m_Strings.Find(pszValue);
-	bool bNew = (i == m_Strings.InvalidIndex());
-
+	const bool bNew = i == m_Strings.InvalidIndex();
 	if ( !bNew )
 		return m_Strings[i];
 
-	pszNew = strdup( pszValue );
+	char *pszNew = strdup( pszValue );
 
 	if ( bNew )
 		m_Strings.Insert( pszNew );
