@@ -356,8 +356,8 @@ float Studio_SetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, int iSequence, int iLocalIndex, float &flSetting, int &index );
 
 void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight );
-int Studio_MaxFrame( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
-float Studio_FPS( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
+int Studio_MaxFrame( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
+float Studio_FPS( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
 float Studio_CPS( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[] );
 float Studio_Duration( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
 void Studio_MovementRate( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], Vector *pVec );

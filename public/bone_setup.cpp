@@ -5476,7 +5476,7 @@ void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, i
 // Purpose: returns max frame number for a sequence
 //-----------------------------------------------------------------------------
 
-int Studio_MaxFrame( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] )
+int Studio_MaxFrame( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] )
 {
 	mstudioanimdesc_t *panim[4];
 	float	weight[ssize(panim)];
@@ -5505,7 +5505,7 @@ int Studio_MaxFrame( const CStudioHdr *pStudioHdr, int iSequence, const float po
 // Purpose: returns frames per second of a sequence
 //-----------------------------------------------------------------------------
 
-float Studio_FPS( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] )
+float Studio_FPS( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] )
 {
 	mstudioanimdesc_t *panim[4];
 	float	weight[4];
