@@ -610,7 +610,7 @@ void TreeNode::OnGetAdditionalDragPanels( CUtlVector< Panel * >& dragabbles )
 		if ( itemIndex == m_ItemIndex )
 			continue;
 
-		dragabbles.AddToTail( ( Panel * )m_pTreeView->GetItem( itemIndex ) );
+		dragabbles.AddToTail( m_pTreeView->GetItem( itemIndex ) );
 	}
 }
 
