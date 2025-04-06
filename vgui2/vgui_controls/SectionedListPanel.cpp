@@ -1180,12 +1180,12 @@ void SectionedListPanel::AddSection(int sectionID, const wchar_t *name, SectionS
 void SectionedListPanel::AddSection(int sectionID, SectionedListPanelHeader *header, SectionSortFunc_t sortFunc)
 {
 	header = SETUP_PANEL( header );
-	intp index = m_Sections.AddToTail();
-	m_Sections[index].m_iID = sectionID;
-	m_Sections[index].m_pHeader = header;
-	m_Sections[index].m_pSortFunc = sortFunc;
-	m_Sections[index].m_bAlwaysVisible = false;
-	m_Sections[index].m_iMinimumHeight = 0;
+	auto &section = m_Sections[m_Sections.AddToTail()];
+	section.m_iID = sectionID;
+	section.m_pHeader = header;
+	section.m_pSortFunc = sortFunc;
+	section.m_bAlwaysVisible = false;
+	section.m_iMinimumHeight = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -2263,9 +2263,9 @@ void SectionedListPanel::SetColorOverrideForCell( int sectionID, int itemID, int
 		}
 	}
 
-	intp iIndex = m_ColorOverrides.AddToTail();
-	m_ColorOverrides[iIndex].m_SectionID = sectionID;
-	m_ColorOverrides[iIndex].m_ItemID = itemID;
-	m_ColorOverrides[iIndex].m_ColumnID = columnID;
-	m_ColorOverrides[iIndex].m_clrOverride = clrOverride;
+	auto &color = m_ColorOverrides[m_ColorOverrides.AddToTail()];
+	color.m_SectionID = sectionID;
+	color.m_ItemID = itemID;
+	color.m_ColumnID = columnID;
+	color.m_clrOverride = clrOverride;
 }

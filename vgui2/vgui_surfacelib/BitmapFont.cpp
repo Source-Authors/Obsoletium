@@ -104,14 +104,6 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 			return false;
 		}
 
-		if ( IsX360() )
-		{
-			CByteswap swap;
-			swap.ActivateByteSwapping( true );
-			swap.SwapFieldsToTargetEndian( (BitmapFont_t*)pBuf );
-			swap.SwapFieldsToTargetEndian( (BitmapGlyph_t*)((char*)pBuf + sizeof( BitmapFont_t )), ((BitmapFont_t*)pBuf)->m_NumGlyphs );
-		}
-
 		// create it
 		m_bitmapFontHandle = g_BitmapFontTable.AddToTail();
 		pFontTable = &g_BitmapFontTable[m_bitmapFontHandle];

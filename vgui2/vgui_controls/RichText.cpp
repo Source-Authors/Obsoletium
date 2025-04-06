@@ -1159,10 +1159,9 @@ void RichText::InsertClickableTextStart( const char *pchClickAction )
 	{
 		// add to text stream, based off existing item
 		TFormatStream formatStreamCopy = prevItem;
-		intp iFormatStream = m_FormatStream.AddToTail( formatStreamCopy );
 		
 		// set the new params
-		pFormatStream = &m_FormatStream[iFormatStream];
+		pFormatStream = &m_FormatStream[m_FormatStream.AddToTail( formatStreamCopy )];
 		pFormatStream->textStreamIndex = m_TextStream.Count();
 		pFormatStream->textClickable = true;
 		pFormatStream->m_sClickableTextAction = pchClickAction;

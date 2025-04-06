@@ -241,11 +241,11 @@ void Splitter::RecreateSplitters( int nCount )
 		char pBuffer[512];
 		Q_snprintf( pBuffer, sizeof(pBuffer), "child%zd", i );
 
-		intp nIndex = m_Splitters.AddToTail( );
 		SplitterChildPanel *pEditablePanel = new SplitterChildPanel( this, pBuffer );
-		m_Splitters[nIndex].m_pPanel = pEditablePanel;
-		m_Splitters[nIndex].m_bLocked = false;
-		m_Splitters[nIndex].m_nLockedSize = 0;
+		auto &splitter = m_Splitters[m_Splitters.AddToTail( )];
+		splitter.m_pPanel = pEditablePanel;
+		splitter.m_bLocked = false;
+		splitter.m_nLockedSize = 0;
 	}
 
 	// We do this in 2 loops so that the first N children are actual child panels

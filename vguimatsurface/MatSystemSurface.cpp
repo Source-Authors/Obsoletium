@@ -800,8 +800,7 @@ void CMatSystemSurface::PushMakeCurrent(VPANEL pPanel, bool useInSets)
 
 	g_pVGuiPanel->GetClipRect(pPanel, clipRect[0], clipRect[1], clipRect[2], clipRect[3]);
 
-	intp i = m_PaintStateStack.AddToTail();
-	PaintState_t &paintState = m_PaintStateStack[i];
+	PaintState_t &paintState = m_PaintStateStack[m_PaintStateStack.AddToTail()];
 	paintState.m_pPanel = pPanel;
 
 	// Determine corrected top left origin

@@ -818,10 +818,11 @@ void Label::OnSetText(KeyValues *params)
 intp Label::AddImage(IImage *image, int offset)
 {
 	intp newImage = _imageDar.AddToTail();
-	_imageDar[newImage].image = image;
-	_imageDar[newImage].offset = (short)offset;
-	_imageDar[newImage].xpos = -1;
-	_imageDar[newImage].width = -1;
+	auto &dar = _imageDar[newImage];
+	dar.image = image;
+	dar.offset = (short)offset;
+	dar.xpos = -1;
+	dar.width = -1;
 	InvalidateLayout();
 	return newImage;
 }
