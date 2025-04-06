@@ -712,9 +712,9 @@ void CScheme::LoadFonts()
 						if ( pRange )
 						{
 							bUseRange = true;
-							sscanf( pRange->GetString(), "%x %x", &nRangeMin, &nRangeMax );
-
-							if ( nRangeMin > nRangeMax )
+							// dimhotepus: Check font range is valid before swap.
+							if ( sscanf( pRange->GetString(), "%x %x", &nRangeMin, &nRangeMax ) == 2 &&
+								 nRangeMin > nRangeMax )
 							{
 								std::swap(nRangeMin, nRangeMax);
 							}
