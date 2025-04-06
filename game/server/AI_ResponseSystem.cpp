@@ -274,7 +274,7 @@ struct ResponseGroup
 		return false;
 	}
 
-	void	MarkResponseUsed( int idx )
+	void	MarkResponseUsed( intp idx )
 	{
 		if ( !m_bDepleteBeforeRepeat )
 			return;
@@ -308,15 +308,15 @@ struct ResponseGroup
 		}
 	}
 
-	bool HasUndepletedFirst( int& index )
+	bool HasUndepletedFirst( intp& index )
 	{
 		index = -1;
 
 		if ( !m_bDepleteBeforeRepeat )
 			return false;
 
-		int c = group.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = group.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &group[ i ];
 
@@ -330,15 +330,15 @@ struct ResponseGroup
 		return false;
 	}
 	
-	bool HasUndepletedLast( int& index )
+	bool HasUndepletedLast( intp& index )
 	{
 		index = -1;
 
 		if ( !m_bDepleteBeforeRepeat )
 			return false;
 
-		int c = group.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = group.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &group[ i ];
 
@@ -364,9 +364,8 @@ struct ResponseGroup
 	bool	IsEnabled() const { return m_bEnabled; }
 	void	SetEnabled( bool enabled ) { m_bEnabled = enabled; }
 
-	// dimhotepus: Changed return type int -> byte.
-	byte	GetCurrentIndex() const { return m_nCurrentIndex; }
-	void	SetCurrentIndex( byte idx ) { m_nCurrentIndex = idx; }
+	intp	GetCurrentIndex() const { return m_nCurrentIndex; }
+	void	SetCurrentIndex( intp idx ) { m_nCurrentIndex = idx; }
 
 	CUtlVector< Response >	group;
 
@@ -374,7 +373,7 @@ struct ResponseGroup
 
 	bool					m_bEnabled;
 
-	byte					m_nCurrentIndex;
+	intp					m_nCurrentIndex;
 	// Invalidation counter
 	byte					m_nDepletionCount;
 
@@ -676,8 +675,8 @@ public:
 	float		ScoreCriteriaAgainstRuleCriteria( const AI_CriteriaSet& set, unsigned short icriterion, bool& exclude, bool verbose = false );
 	bool		GetBestResponse( ResponseSearchResult& result, Rule *rule, bool verbose = false, IResponseFilter *pFilter = NULL );
 	bool		ResolveResponse( ResponseSearchResult& result, int depth, const char *name, bool verbose = false, IResponseFilter *pFilter = NULL );
-	int			SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter );
-	void		DescribeResponseGroup( ResponseGroup *group, int selected, int depth );
+	intp		SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter );
+	void		DescribeResponseGroup( ResponseGroup *group, intp selected, int depth );
 	void		DebugPrint( int depth, const char *fmt, ... );
 
 	void		LoadFromBuffer( const char *scriptfile, const char *buffer, CStringPool &includedFiles );
@@ -887,7 +886,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 	token[ 0 ] = 0;
 	rawtoken[ 0 ] = 0;
 
-	int n = 0;
+	intp n = 0;
 
 	bool gt = false;
 	bool lt = false;
@@ -1293,24 +1292,22 @@ void CResponseSystem::ResetResponseGroups()
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *g - 
-// Output : int
+// Output : intp
 //-----------------------------------------------------------------------------
-int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter )
+intp CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter )
 {
-	int c = g->group.Count();
+	intp c = g->group.Count();
 	if ( !c )
 	{
 		AssertMsg( false, "Expecting response group with >= 1 elements" );
 		return -1;
 	}
 
-	int i;
-
 	// Fake depletion of unavailable choices
-	CUtlVector<int> fakedDepletes;
+	CUtlVector<intp> fakedDepletes;
 	if ( pFilter && g->ShouldCheckRepeats() )
 	{
-		for ( i = 0; i < c; i++ )
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &g->group[ i ];
 			if ( r->depletioncount != g->GetDepletionCount() && !pFilter->IsValidResponse( r->GetType(), r->value ) )
@@ -1328,7 +1325,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 		if ( pFilter && g->ShouldCheckRepeats() )
 		{
 			fakedDepletes.RemoveAll();
-			for ( i = 0; i < c; i++ )
+			for ( intp i = 0; i < c; i++ )
 			{
 				Response *r = &g->group[ i ];
 				if ( !pFilter->IsValidResponse( r->GetType(), r->value ) )
@@ -1354,11 +1351,11 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 	int	depletioncount = g->GetDepletionCount();
 
 	float totalweight = 0.0f;
-	int slot = -1;
+	intp slot = -1;
 
 	if ( checkrepeats )
 	{
-		int check= -1;
+		intp check= -1;
 		// Snag the first slot right away
 		if ( g->HasUndepletedFirst( check ) && check != -1 )
 		{
@@ -1367,6 +1364,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 
 		if ( slot == -1 && g->HasUndepletedLast( check ) && check != -1 )
 		{
+			intp i;
 			// If this is the only undepleted one, use it now
 			for ( i = 0; i < c; i++ )
 			{
@@ -1397,7 +1395,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 
 	if ( slot == -1 )
 	{
-		for ( i = 0; i < c; i++ )
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &g->group[ i ];
 			if ( checkrepeats && 
@@ -1410,7 +1408,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 			if ( checkrepeats && r->last )
 				continue;
 
-			int prevSlot = slot;
+			intp prevSlot = slot;
 
 			if ( !totalweight )
 			{
@@ -1466,16 +1464,16 @@ bool CResponseSystem::ResolveResponse( ResponseSearchResult& searchResult, int d
 	if ( !g->IsEnabled() )
 		return false;
 
-	int c = g->group.Count();
+	intp c = g->group.Count();
 	if ( !c )
 		return false;
 
-	int idx = 0;
+	intp idx = 0;
 
 	if ( g->IsSequential() )
 	{
 		// See if next index is valid
-		byte initialIndex = g->GetCurrentIndex();
+		intp initialIndex = g->GetCurrentIndex();
 		bool bFoundValid = false;
 
 		do 
@@ -1546,11 +1544,11 @@ bool CResponseSystem::ResolveResponse( ResponseSearchResult& searchResult, int d
 //			selected - 
 //			depth - 
 //-----------------------------------------------------------------------------
-void CResponseSystem::DescribeResponseGroup( ResponseGroup *group, int selected, int depth )
+void CResponseSystem::DescribeResponseGroup( ResponseGroup *group, intp selected, int depth )
 {
-	int c = group->group.Count();
+	intp c = group->group.Count();
 
-	for ( int i = 0; i < c ; i++ )
+	for ( intp i = 0; i < c ; i++ )
 	{
 		Response *r = &group->group[ i ];
 		DebugPrint( depth + 1, "%s%20s : %40s %5.3f\n",
@@ -1568,11 +1566,11 @@ void CResponseSystem::DescribeResponseGroup( ResponseGroup *group, int selected,
 //-----------------------------------------------------------------------------
 bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule *rule, bool verbose /*=false*/, IResponseFilter *pFilter )
 {
-	int c = rule->m_Responses.Count();
+	intp c = rule->m_Responses.Count();
 	if ( !c )
 		return false;
 
-	int index = random->RandomInt( 0, c - 1 );
+	int index = random->RandomInt( 0, static_cast<int>(min(static_cast<intp>(std::numeric_limits<int>::max()), c) - 1) );
 	auto groupIndex = rule->m_Responses[ index ];
 
 	ResponseGroup *g = &m_Responses[ groupIndex ];
@@ -1581,16 +1579,16 @@ bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule 
 	if ( !g->IsEnabled() )
 		return false;
 
-	int count = g->group.Count();
+	intp count = g->group.Count();
 	if ( !count )
 		return false;
 
-	int responseIndex = 0;
+	intp responseIndex = 0;
 
 	if ( g->IsSequential() )
 	{
 		// See if next index is valid
-		byte initialIndex = g->GetCurrentIndex();
+		intp initialIndex = g->GetCurrentIndex();
 		bool bFoundValid = false;
 
 		do 
@@ -1697,10 +1695,10 @@ short CResponseSystem::FindBestMatchingRule( const AI_CriteriaSet& set, bool ver
 		return bestrules[0];
 
 	// Randomly pick one of the tied matching rules
-	int idx = random->RandomInt( 0, bestCount - 1 );
+	int idx = random->RandomInt( 0, static_cast<int>(min(static_cast<intp>(std::numeric_limits<int>::max()), bestCount - 1)) );
 	if ( verbose )
 	{
-		DevMsg( "Found %i matching rules, selecting slot %i\n", bestCount, idx );
+		DevMsg( "Found %zd matching rules, selecting slot %d\n", bestCount, idx );
 	}
 	return bestrules[ idx ];
 }
@@ -1929,9 +1927,9 @@ void CResponseSystem::LoadFromBuffer( const char *scriptfile, const char *buffer
 		}
 		else
 		{
-			int byteoffset = m_ScriptStack[ 0 ].currenttoken - (const char *)m_ScriptStack[ 0 ].buffer;
+			intp byteoffset = m_ScriptStack[ 0 ].currenttoken - (const char *)m_ScriptStack[ 0 ].buffer;
 
-			Error( "CResponseSystem::LoadFromBuffer:  Unknown entry type '%s', expecting 'response', 'criterion', 'enumeration' or 'rules' in file %s(offset:%i)\n", 
+			Error( "CResponseSystem::LoadFromBuffer:  Unknown entry type '%s', expecting 'response', 'criterion', 'enumeration' or 'rules' in file %s(offset:%zd)\n", 
 				token, scriptfile, byteoffset );
 			break;
 		}
@@ -2462,7 +2460,7 @@ void CResponseSystem::ParseEnumeration( void )
 //-----------------------------------------------------------------------------
 void CResponseSystem::ParseRule( void )
 {
-	static int instancedCriteria = 0;
+	static intp instancedCriteria = 0;
 
 	char ruleName[ 128 ];
 	ParseToken();
@@ -2567,7 +2565,7 @@ void CResponseSystem::ParseRule( void )
 		}
 
 		// It's an inline criteria, generate a name and parse it in
-		Q_snprintf( sz, sizeof( sz ), "[%s%03i]", ruleName, ++instancedCriteria );
+		V_sprintf_safe( sz, "[%s%03zi]", ruleName, ++instancedCriteria );
 		Unget();
 		short idx = ParseOneCriterion( sz );
 		if ( idx != m_Criteria.InvalidIndex() )
