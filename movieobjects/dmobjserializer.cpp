@@ -1137,7 +1137,7 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 {
 	char tmpBuf0[ 4096 ];
 
-	int nCurrentMtl = -1;
+	intp nCurrentMtl = -1;
 	while ( buf.IsValid() )
 	{
 		buf.GetLine( tmpBuf0 );
