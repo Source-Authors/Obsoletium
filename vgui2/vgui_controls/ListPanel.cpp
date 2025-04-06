@@ -2389,7 +2389,7 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 	};
 
 	// make sure newly selected item is a valid range
-	nSelectedRow = clamp(nSelectedRow, 0, nTotalRows - 1);
+	nSelectedRow = clamp(nSelectedRow, (intp)0, nTotalRows - 1);
 
 	int row = m_VisibleItems[ nSelectedRow ];
 
