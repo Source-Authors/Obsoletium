@@ -2045,7 +2045,8 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 		if ( !Q_stricmp( token, "weight" ) )
 		{
 			ParseToken();
-			newResponse.weight.SetFloat( (float)atof( token ) );
+			// dimhotepus: atof -> strtof
+			newResponse.weight.SetFloat( strtof( token, nullptr ) );
 			continue;
 		}
 
