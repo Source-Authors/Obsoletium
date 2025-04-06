@@ -2792,11 +2792,10 @@ VertexShader_t CShaderManager::CreateVertexShader( const char *pFileName, int nS
 		}
 	#endif
 	
-	VertexShader_t shader;
 	ShaderLookup_t lookup;
 	lookup.m_Name = m_ShaderSymbolTable.AddString( pFileName );
 	lookup.m_nStaticIndex = nStaticVshIndex;
-	shader = m_VertexShaderDict.Find( lookup );
+	VertexShader_t shader = m_VertexShaderDict.Find( lookup );
 	if ( shader == m_VertexShaderDict.InvalidIndex() )
 	{
 		//printf("\nCShaderManager::CreateVertexShader( filename = %s, staticVshIndex = %d - not in cache", pFileName, nStaticVshIndex );
@@ -2830,11 +2829,10 @@ PixelShader_t CShaderManager::CreatePixelShader( const char *pFileName, int nSta
 		}
 	#endif
 	
-	PixelShader_t shader;
 	ShaderLookup_t lookup;
 	lookup.m_Name = m_ShaderSymbolTable.AddString( pFileName );
 	lookup.m_nStaticIndex = nStaticPshIndex;
-	shader = m_PixelShaderDict.Find( lookup );
+	PixelShader_t shader = m_PixelShaderDict.Find( lookup );
 	if ( shader == m_PixelShaderDict.InvalidIndex() )
 	{
 		shader = m_PixelShaderDict.AddToTail( lookup );

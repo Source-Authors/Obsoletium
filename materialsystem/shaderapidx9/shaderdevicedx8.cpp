@@ -304,8 +304,7 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 	unsigned nCount = m_pD3D->GetAdapterCount( );
 	for( unsigned i = 0; i < nCount; ++i )
 	{
-		intp j = m_Adapters.AddToTail();
-		AdapterInfo_t &info = m_Adapters[j];
+		AdapterInfo_t &info = m_Adapters[m_Adapters.AddToTail()];
 
 #ifdef _DEBUG
 		memset( &info.m_ActualCaps, 0xDD, sizeof(info.m_ActualCaps) );
