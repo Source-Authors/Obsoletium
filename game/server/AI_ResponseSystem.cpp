@@ -829,11 +829,11 @@ float CResponseSystem::LookupEnumeration( const char *name, bool& found )
 // Purpose: 
 // Input  : matcher - 
 //-----------------------------------------------------------------------------
-void CResponseSystem::ResolveToken( Matcher& matcher, char *token, size_t bufsize, char const *rawtoken )
+void CResponseSystem::ResolveToken( Matcher& matcher, char *in_token, size_t bufsize, char const *rawtoken )
 {
 	if ( rawtoken[0] != '[' )
 	{
-		Q_strncpy( token, rawtoken, bufsize );
+		Q_strncpy( in_token, rawtoken, bufsize );
 		return;
 	}
 
@@ -842,12 +842,12 @@ void CResponseSystem::ResolveToken( Matcher& matcher, char *token, size_t bufsiz
 	float f = LookupEnumeration( rawtoken, found );
 	if ( !found )
 	{
-		Q_strncpy( token, rawtoken, bufsize );
-		ResponseWarning( "No such enumeration '%s'\n", token );
+		Q_strncpy( in_token, rawtoken, bufsize );
+		ResponseWarning( "No such enumeration '%s'\n", in_token );
 		return;
 	}
 
-	Q_snprintf( token, bufsize, "%f", f );
+	Q_snprintf( in_token, bufsize, "%f", f );
 }
 
 
