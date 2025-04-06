@@ -192,8 +192,8 @@ void CTreeViewListControl::RecalculateRows_R( int index )
 	if ( !m_pTree->IsItemExpanded( index ) )
 		return;
 	
-	int nChildren = m_pTree->GetNumChildren( index );
-	for ( int i=0; i < nChildren; i++ )
+	intp nChildren = m_pTree->GetNumChildren( index );
+	for ( intp i=0; i < nChildren; i++ )
 	{
 		int iChild = m_pTree->GetChild( index, i );
 		RecalculateRows_R( iChild );
