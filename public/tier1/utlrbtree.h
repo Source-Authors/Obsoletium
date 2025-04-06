@@ -171,7 +171,7 @@ public:
 	// but we should really remove patterns using this anyways, for safety and generality
 	I  MaxElement() const;
 
-	// Gets the children                               
+	// Gets the children
 	I  Parent( I i ) const;
 	I  LeftChild( I i ) const;
 	I  RightChild( I i ) const;
@@ -245,7 +245,7 @@ public:
 
 private:
 	// Can't copy the tree this way!
-	CUtlRBTree<T, I, L, M>& operator=( const CUtlRBTree<T, I, L, M> &other );
+	CUtlRBTree<T, I, L, M>& operator=( const CUtlRBTree<T, I, L, M> &other ) = delete;
 
 protected:
 	enum NodeColor_t
@@ -285,7 +285,7 @@ protected:
 	I  InsertAt( I parent, bool leftchild );
 
 	// copy constructors not allowed
-	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree );
+	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree ) = delete;
 
 	// Inserts a node into the tree, doesn't copy the data in.
 	void FindInsertionPosition( T const &insert, I &parent, bool &leftchild );
@@ -352,7 +352,7 @@ protected:
 
 private:
 	// this doesn't make sense for fixed rbtrees, since there's no useful max pointer, and the index space isn't contiguous anyways
-	I  MaxElement() const;
+	I  MaxElement() const = delete;
 };
 
 template < class T, class I = unsigned short, typename L = bool (*)( const T &, const T & )  >
