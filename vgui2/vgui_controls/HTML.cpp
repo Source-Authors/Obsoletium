@@ -870,7 +870,7 @@ void HTML::AddCustomURLHandler(const char *customProtocolName, vgui::Panel *targ
 {
 	intp index = m_CustomURLHandlers.AddToTail();
 	m_CustomURLHandlers[index].hPanel = target;
-	Q_strncpy(m_CustomURLHandlers[index].url, customProtocolName, sizeof(m_CustomURLHandlers[index].url));
+	V_strcpy_safe(m_CustomURLHandlers[index].url, customProtocolName);
 }
 
 

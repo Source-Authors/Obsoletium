@@ -239,7 +239,7 @@ void Splitter::RecreateSplitters( int nCount )
 	for ( i = 0; i < (nCount + 1); ++i )
 	{
 		char pBuffer[512];
-		Q_snprintf( pBuffer, sizeof(pBuffer), "child%zd", i );
+		V_sprintf_safe( pBuffer, "child%zd", i );
 
 		SplitterChildPanel *pEditablePanel = new SplitterChildPanel( this, pBuffer );
 		auto &splitter = m_Splitters[m_Splitters.AddToTail( )];
