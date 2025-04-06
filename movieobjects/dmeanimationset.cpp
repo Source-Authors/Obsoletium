@@ -412,8 +412,7 @@ static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, const CDme
 				if ( !pControl )
 					continue;
 
-				intp j = uniqueControls.AddToTail();
-				ExportedControl_t &control = uniqueControls[j];
+				ExportedControl_t &control = uniqueControls[uniqueControls.AddToTail()];
 				control.m_Name = pControlName;
 				control.m_bIsStereo = pControl->GetValue<bool>( "combo" );
 				control.m_bIsMulti = pControl->GetValue<bool>( "multi" );
@@ -422,8 +421,7 @@ static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, const CDme
 			}
 			else
 			{
-				intp j = uniqueControls.AddToTail();
-				ExportedControl_t &control = uniqueControls[j];
+				ExportedControl_t &control = uniqueControls[uniqueControls.AddToTail()];
 				control.m_Name = pControlName;
 				// this isn't quite as reliable as querying the animation set but if we don't have one...
 				control.m_bIsStereo = controls[ i ]->GetAttribute( "balance" ) ? true : false;
@@ -1363,8 +1361,7 @@ void CModelPresetGroupManager::LoadModelPresets( const char *pModelName, PresetG
 		pPresetGroup->m_bIsReadOnly = true;
 		pPresetGroup->SetShared( true );
 
-		intp i = list.AddToTail();
-		list[i] = pPresetGroup;
+		list[list.AddToTail()] = pPresetGroup;
 	}
 	g_pFullFileSystem->FindClose( fh );
 }

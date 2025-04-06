@@ -378,8 +378,7 @@ void CDmeMakefile::GetSources( const char *pSourceType, CUtlVector< CDmeHandle< 
 	{
 		if ( m_Sources[i]->IsA( pSourceType ) )
 		{
-			intp j = sources.AddToTail();
-			sources[j] = m_Sources[i];
+			sources[sources.AddToTail()] = m_Sources[i];
 		}
 	}
 }

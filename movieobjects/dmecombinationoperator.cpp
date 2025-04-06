@@ -1095,8 +1095,7 @@ void CDmeCombinationOperator::RebuildRawControlList()
 		float flStep = ( nRemapCount > 2 ) ? 1.0f / ( nRemapCount - 1 ) : 0.0f;
 		for ( intp j = 0; j < nRemapCount; ++j )
 		{
-			intp k = m_RawControlInfo.AddToTail( );
-			RawControlInfo_t &info = m_RawControlInfo[k];
+			RawControlInfo_t &info = m_RawControlInfo[m_RawControlInfo.AddToTail( )];
 			
 			info.m_Name = pInputControl->RawControlName( j );
 			info.m_InputControl = i;

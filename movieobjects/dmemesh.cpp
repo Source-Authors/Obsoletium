@@ -4843,13 +4843,13 @@ static bool CollapseRedundantBaseNormals( CDmeVertexData *pDmeVertexData, CUtlVe
 		intp nNewNormalDataIndex = newNormalData.Count();
 
 		const CUtlVector< int > &vertexIndices = pDmeVertexData->FindVertexIndicesFromDataIndex( CDmeVertexData::FIELD_POSITION, i );
-		for ( int j = 0; j < vertexIndices.Count(); ++j )
+		for ( intp j = 0; j < vertexIndices.Count(); ++j )
 		{
 			bool bUnique = true;
 			const int nVertexIndex = vertexIndices[j];
 			const Vector &vNormal = oldNormalData[ oldNormalIndices[ vertexIndices[j] ] ];
 
-			for ( int k = nNewNormalDataIndex; k < newNormalData.Count(); ++k )
+			for ( intp k = nNewNormalDataIndex; k < newNormalData.Count(); ++k )
 			{
 				if ( DotProduct( vNormal, newNormalData[k] ) > flNormalBlend )
 				{
@@ -4879,13 +4879,13 @@ static bool CollapseRedundantBaseNormals( CDmeVertexData *pDmeVertexData, CUtlVe
 		return false;
 
 	normalMap.SetCount( oldNormalData.Count() );
-	for ( int i = 0; i < normalMap.Count(); ++i )
+	for ( intp i = 0; i < normalMap.Count(); ++i )
 	{
 		normalMap[i] = -1;
 	}
 
 	Assert( newNormalIndices.Count() == oldNormalIndices.Count() );
-	for ( int i = 0; i < oldNormalIndices.Count(); ++i )
+	for ( intp i = 0; i < oldNormalIndices.Count(); ++i )
 	{
 		if ( normalMap[ oldNormalIndices[i] ] == -1 )
 		{
@@ -4927,12 +4927,12 @@ static bool CollapseRedundantBaseNormalsAggressive( CDmeVertexData *pDmeVertexDa
 
 	CUtlVector< Vector > newNormalData;
 
-	for ( int i = 0; i < oldNormalData.Count(); ++i )
+	for ( intp i = 0; i < oldNormalData.Count(); ++i )
 	{
 		bool bUnique = true;
 		const Vector &vNormal = oldNormalData[ i ];
 
-		for ( int j = 0; j < newNormalData.Count(); ++j )
+		for ( intp j = 0; j < newNormalData.Count(); ++j )
 		{
 			if ( DotProduct( vNormal, newNormalData[j] ) > flNormalBlend )
 			{
@@ -4955,7 +4955,7 @@ static bool CollapseRedundantBaseNormalsAggressive( CDmeVertexData *pDmeVertexDa
 	CUtlVector< int > newNormalIndices;
 	newNormalIndices.SetCount( oldNormalIndices.Count() );
 
-	for ( int i = 0; i < oldNormalIndices.Count(); ++i )
+	for ( intp i = 0; i < oldNormalIndices.Count(); ++i )
 	{
 		newNormalIndices[i] = normalMap[ oldNormalIndices[i] ];
 	}
