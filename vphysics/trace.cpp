@@ -323,8 +323,7 @@ public:
 	CTraceIVP( const CPhysCollide *pCollide, const Vector &origin, const QAngle &angles );
 	~CTraceIVP()
 	{
-		if ( m_pVisitHash )
-			FreeVisitHash(m_pVisitHash);
+		FreeVisitHash(m_pVisitHash);
 	}
 	unsigned short SupportMap( const Vector &dir, Vector *pOut ) const override;
 	Vector GetVertByIndex( int index ) const override;
