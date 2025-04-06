@@ -22,9 +22,9 @@
 #if MEASURE_PARTICLE_PERF
 
 #if VPROF_LEVEL > 0
-#define START_OP float flOpStartTime = Plat_FloatTime(); VPROF_ENTER_SCOPE(pOp->GetDefinition()->GetName())
+#define START_OP double flOpStartTime = Plat_FloatTime(); VPROF_ENTER_SCOPE(pOp->GetDefinition()->GetName())
 #else
-#define START_OP float flOpStartTime = Plat_FloatTime();
+#define START_OP double flOpStartTime = Plat_FloatTime();
 #endif
 
 #if VPROF_LEVEL > 0
