@@ -222,10 +222,9 @@ struct ResponseGroup
 
 	ResponseGroup( const ResponseGroup& src )
 	{
-		int c = src.group.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( auto &r : src.group )
 		{
-			group.AddToTail( src.group[ i ] );
+			group.AddToTail( r );
 		}
 
 		rp = src.rp;
@@ -243,10 +242,10 @@ struct ResponseGroup
 	{
 		if ( this == &src )
 			return *this;
-		int c = src.group.Count();
-		for ( int i = 0; i < c; i++ )
+
+		for ( auto &r : src.group )
 		{
-			group.AddToTail( src.group[ i ] );
+			group.AddToTail( r );
 		}
 
 		rp = src.rp;
@@ -266,10 +265,9 @@ struct ResponseGroup
 		if ( !m_bDepleteBeforeRepeat )
 			return true;
 
-		int c = group.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( const auto &r : group )
 		{
-			if ( group[ i ].depletioncount != m_nDepletionCount )
+			if ( r.depletioncount != m_nDepletionCount )
 				return true;
 		}
 
@@ -304,9 +302,9 @@ struct ResponseGroup
 		SetCurrentIndex( 0 );
 		m_nDepletionCount = 1;
 
-		for ( int i = 0; i < group.Count(); ++i )
+		for ( auto &r : group )
 		{
-			group[ i ].depletioncount = 0;
+			r.depletioncount = 0;
 		}
 	}
 
@@ -410,10 +408,9 @@ struct Criteria
 
 		matcher = src.matcher;
 
-		int c = src.subcriteria.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( auto &s : src.subcriteria )
 		{
-			subcriteria.AddToTail( src.subcriteria[ i ] );
+			subcriteria.AddToTail( s );
 		}
 
 		return *this;
@@ -427,10 +424,9 @@ struct Criteria
 
 		matcher = src.matcher;
 
-		int c = src.subcriteria.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( auto &s : src.subcriteria )
 		{
-			subcriteria.AddToTail( src.subcriteria[ i ] );
+			subcriteria.AddToTail( s );
 		}
 	}
 	~Criteria()
@@ -470,19 +466,14 @@ struct Rule
 		if ( this == &src )
 			return *this;
 
-		int i;
-		int c;
-		
-		c = src.m_Criteria.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &c : src.m_Criteria )
 		{
-			m_Criteria.AddToTail( src.m_Criteria[ i ] );
+			m_Criteria.AddToTail( c );
 		}
 
-		c = src.m_Responses.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &r : src.m_Responses )
 		{
-			m_Responses.AddToTail( src.m_Responses[ i ] );
+			m_Responses.AddToTail( r );
 		}
 
 		SetContext( src.m_szContext );
@@ -494,19 +485,14 @@ struct Rule
 
 	Rule( const Rule& src )
 	{
-		int i;
-		int c;
-		
-		c = src.m_Criteria.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &c : src.m_Criteria )
 		{
-			m_Criteria.AddToTail( src.m_Criteria[ i ] );
+			m_Criteria.AddToTail( c );
 		}
 
-		c = src.m_Responses.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &r : src.m_Responses )
 		{
-			m_Responses.AddToTail( src.m_Responses[ i ] );
+			m_Responses.AddToTail( r );
 		}
 
 		SetContext( src.m_szContext );
@@ -1101,17 +1087,14 @@ bool CResponseSystem::Compare( const char *setValue, Criteria *c, bool verbose /
 float CResponseSystem::RecursiveScoreSubcriteriaAgainstRule( const AI_CriteriaSet& set, Criteria *parent, bool& exclude, bool verbose /*=false*/ )
 {
 	float score = 0.0f;
-	int subcount = parent->subcriteria.Count();
-	for ( int i = 0; i < subcount; i++ )
+	for ( auto &s : parent->subcriteria )
 	{
-		auto icriterion = parent->subcriteria[ i ];
-
 		bool excludesubrule = false;
 		if (verbose)
 		{
 			DevMsg( "\n" );
 		}
-		score += ScoreCriteriaAgainstRuleCriteria( set, icriterion, excludesubrule, verbose );
+		score += ScoreCriteriaAgainstRuleCriteria( set, s, excludesubrule, verbose );
 	}
 
 	exclude = ( parent->required && score == 0.0f ) ? true : false;
@@ -1122,11 +1105,9 @@ float CResponseSystem::RecursiveScoreSubcriteriaAgainstRule( const AI_CriteriaSe
 float CResponseSystem::RecursiveLookForCriteria( const AI_CriteriaSet &criteriaSet, Criteria *pParent )
 {
 	float flScore = 0.0f;
-	int nSubCount = pParent->subcriteria.Count();
-	for ( int iSub = 0; iSub < nSubCount; ++iSub )
+	for ( auto &s : pParent->subcriteria )
 	{
-		auto iCriteria = pParent->subcriteria[iSub];
-		flScore += LookForCriteria( criteriaSet, iCriteria );
+		flScore += LookForCriteria( criteriaSet, s );
 	}
 
 	return flScore;
@@ -1457,9 +1438,9 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 	// Revert fake depletion of unavailable choices
 	if ( pFilter && g->ShouldCheckRepeats() )
 	{
-		for ( i = 0; i < fakedDepletes.Count(); i++ )
+		for ( auto &f : fakedDepletes )
 		{
-			g->group[ fakedDepletes[ i ] ].depletioncount = 0;;
+			g->group[ f ].depletioncount = 0;;
 		}
 	}
 
@@ -1798,9 +1779,8 @@ void CResponseSystem::GetAllResponses( CUtlVector<AI_Response *> *pResponses )
 	{
 		ResponseGroup &group = m_Responses[i];
 
-		for ( int j = 0; j < group.group.Count(); j++)
+		for ( auto &response : group.group )
 		{
-			Response &response = group.group[j];
 			if ( response.type != RESPONSE_RESPONSE )
 			{
 				AI_Response *pResponse = new AI_Response;
@@ -1828,10 +1808,8 @@ void CResponseSystem::Precache()
 	{
 		ResponseGroup &group = m_Responses[i];
 
-		for ( int j = 0; j < group.group.Count(); j++)
+		for ( auto &response : group.group )
 		{
-			Response &response = group.group[j];
-
 			switch ( response.type )
 			{
 			default:
