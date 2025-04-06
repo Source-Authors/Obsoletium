@@ -671,7 +671,7 @@ bool CBinkMaterial::SetTime( float flTime )
 	float newTime = ( flTime * m_QTMovieFrameRate.GetUnitsPerSecond() + 0.5f) ;
 	
 	// dimhotepus: Fix clamping.
-	newTime = clamp( newTime, m_MovieFirstFrameTime, m_QTMovieDuration ); 
+	newTime = clamp( newTime, (float)m_MovieFirstFrameTime, m_QTMovieDuration ); 
 
 	// Are we paused?
 	if ( m_bMoviePaused )
