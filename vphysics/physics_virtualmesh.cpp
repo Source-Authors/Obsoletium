@@ -368,10 +368,10 @@ static void FlushFrameLocks()
 	CUtlVector<CPhysCollideVirtualMesh *> *pLocks = g_pMeshFrameLocks;
 	if ( pLocks )
 	{
-		for ( intp i = 0; i < pLocks->Count(); i++ )
+		for ( auto *lock : *pLocks )
 		{
-			Assert( (*pLocks)[i] );
-			(*pLocks)[i]->Release();
+			Assert( lock );
+			lock->Release();
 		}
 		pLocks->RemoveAll();
 		g_MeshFrameLocksPool.PutObject( g_pMeshFrameLocks );
