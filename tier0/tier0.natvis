@@ -412,15 +412,6 @@
     </Expand>
   </Type>
 
-  <!--<Type Name="CTSList&lt;*&gt;">
-    <Intrinsic Name="size" Expression="head_.value().value.Depth" />
-    <DisplayString Condition="head_.value().value.Next == nullptr">empty</DisplayString>
-    <DisplayString Condition="head_.value().value.Next != nullptr">{{ size={head_.value().value.Depth} }}</DisplayString>
-    <Expand>
-      <Item Name="[next]">head_.value().value.Next</Item>
-    </Expand>
-  </Type>-->
-
   <Type Name="CTSListWithFreeList&lt;*&gt;::Node_t">
     <DisplayString>{{ value={elem} }}</DisplayString>
     <Expand>
