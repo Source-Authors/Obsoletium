@@ -3653,8 +3653,7 @@ void CParticleSystemMgr::BuildBatchList( intp iRenderCache, IMatRenderContext *p
 	int nRemainingVertices = nMaxVertices;
 	int nRemainingIndices = nMaxIndices;
 
-	intp i = batches.AddToTail();
-	Batch_t* pBatch = &batches[i];
+	Batch_t* pBatch = &batches[batches.AddToTail()];
 	pBatch->m_nVertCount = 0;
 	pBatch->m_nIndexCount = 0;
 
