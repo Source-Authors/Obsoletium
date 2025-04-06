@@ -1888,7 +1888,8 @@ void CResponseSystem::ParseInclude( CStringPool &includedFiles )
 
 void CResponseSystem::LoadFromBuffer( const char *scriptfile, const char *buffer, CStringPool &includedFiles )
 {
-	includedFiles.Allocate( scriptfile );
+	// dimhotepus: Assign allocation result to script file.
+	scriptfile = includedFiles.Allocate( scriptfile );
 	PushScript( scriptfile, (unsigned char * )buffer );
 
 	if( rr_dumpresponses.GetBool() )
