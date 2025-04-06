@@ -2233,13 +2233,13 @@ HFont SectionedListPanel::GetColumnFallbackFontBySection( int sectionID, int col
 //-----------------------------------------------------------------------------
 Color *SectionedListPanel::GetColorOverrideForCell( int sectionID, int itemID, int columnID )
 {
-	FOR_EACH_VEC( m_ColorOverrides, i )
+	for (auto &color : m_ColorOverrides)
 	{
-		if ( ( m_ColorOverrides[i].m_SectionID == sectionID ) && 
-			 ( m_ColorOverrides[i].m_ItemID == itemID ) && 
-			 ( m_ColorOverrides[i].m_ColumnID == columnID ) )
+		if ( ( color.m_SectionID == sectionID ) && 
+			 ( color.m_ItemID == itemID ) && 
+			 ( color.m_ColumnID == columnID ) )
 		{
-			return &(m_ColorOverrides[i].m_clrOverride);
+			return &(color.m_clrOverride);
 		}
 	}
 
@@ -2252,13 +2252,13 @@ Color *SectionedListPanel::GetColorOverrideForCell( int sectionID, int itemID, i
 void SectionedListPanel::SetColorOverrideForCell( int sectionID, int itemID, int columnID, Color clrOverride )
 {
 	// is this value already in the override list?
-	FOR_EACH_VEC( m_ColorOverrides, i )
+	for (auto &color : m_ColorOverrides)
 	{
-		if ( ( m_ColorOverrides[i].m_SectionID == sectionID ) &&
-			( m_ColorOverrides[i].m_ItemID == itemID ) &&
-			( m_ColorOverrides[i].m_ColumnID == columnID ) )
+		if ( ( color.m_SectionID == sectionID ) &&
+			( color.m_ItemID == itemID ) &&
+			( color.m_ColumnID == columnID ) )
 		{
-			m_ColorOverrides[i].m_clrOverride = clrOverride;
+			color.m_clrOverride = clrOverride;
 			return;
 		}
 	}
