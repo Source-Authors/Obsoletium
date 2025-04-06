@@ -535,7 +535,7 @@ void CDmeClip::FindClipsWithinTime( DmeClipType_t clipType, DmeTime_t startTime,
 //-----------------------------------------------------------------------------
 // Build a list of all referring clips
 //-----------------------------------------------------------------------------
-static intp BuildReferringClipList( CDmeClip *pClip, CDmeClip** ppParents, intp nMaxCount )
+static intp BuildReferringClipList( CDmeClip *pClip, CDmeClip* (&ppParents)[1024] )
 {
 	intp nCount = 0;
 
@@ -573,8 +573,8 @@ static intp BuildReferringClipList( CDmeClip *pClip, CDmeClip** ppParents, intp 
 				if ( !pParent )
 					continue;
 
-				Assert( nCount < nMaxCount );
-				if ( nCount >= nMaxCount )
+				Assert( nCount < ssize(ppParents) );
+				if ( nCount >= ssize(ppParents) )
 					return nCount;
 				ppParents[nCount++] = pParent;
 			}
@@ -609,7 +609,7 @@ static bool BuildClipStack_R( DmeClipStack_t* pStack, CDmeClip *pMovie, CDmeClip
 		// NOTE: This algorithm assumes a clip can never appear twice under another clip
 		// at a single level of hierarchy.
 		CDmeClip* ppParents[1024];
-		intp nCount = BuildReferringClipList( pCurrent, ppParents, 1024 );
+		intp nCount = BuildReferringClipList( pCurrent, ppParents );
 		for ( intp i = 0; i < nCount; ++i )
 		{
 			// Can we find a path to the root through the shot? We succeeded!
