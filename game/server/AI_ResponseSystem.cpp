@@ -1259,7 +1259,7 @@ float CResponseSystem::ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, shor
 void CResponseSystem::DebugPrint( int depth, const char *fmt, ... )
 {
 	int indentchars = 3 * depth;
-	char *indent = (char *)_alloca( indentchars + 1);
+	char *indent = stackallocT( char, indentchars + 1);
 	indent[ indentchars ] = 0;
 	while ( --indentchars >= 0 )
 	{
@@ -1816,7 +1816,7 @@ void CResponseSystem::Precache()
 				{
 					// fixup $gender references
 					char file[_MAX_PATH];
-					Q_strncpy( file, response.value, sizeof(file) );
+					V_strcpy_safe( file, response.value );
 					char *gender = strstr( file, "$gender" );
 					if ( gender )
 					{
@@ -1825,7 +1825,7 @@ void CResponseSystem::Precache()
 						*gender = 0;
 						char genderFile[_MAX_PATH];
 						// male
-						Q_snprintf( genderFile, sizeof(genderFile), "%smale%s", file, postGender);
+						V_sprintf_safe( genderFile, "%smale%s", file, postGender);
 
 						PrecacheInstancedScene( genderFile );
 						if ( bTouchFiles )
@@ -1833,7 +1833,7 @@ void CResponseSystem::Precache()
 							TouchFile( genderFile );
 						}
 
-						Q_snprintf( genderFile, sizeof(genderFile), "%sfemale%s", file, postGender);
+						V_sprintf_safe( genderFile, "%sfemale%s", file, postGender);
 
 						PrecacheInstancedScene( genderFile );
 						if ( bTouchFiles )
@@ -1865,7 +1865,7 @@ void CResponseSystem::ParseInclude( CStringPool &includedFiles )
 {
 	char includefile[ 256 ];
 	ParseToken();
-	Q_snprintf( includefile, sizeof( includefile ), "scripts/%s", token );
+	V_sprintf_safe( includefile, "scripts/%s", token );
 
 	// check if the file is already included
 	if ( includedFiles.Find( includefile ) != NULL )
