@@ -279,8 +279,7 @@ void CMatLightmaps::BeginLightmapAllocation()
 	CleanupLightmaps();
 
 	m_ImagePackers.RemoveAll();
-	intp i = m_ImagePackers.AddToTail();
-	m_ImagePackers[i].Reset( 0, GetMaxLightmapPageWidth(), GetMaxLightmapPageHeight() );
+	m_ImagePackers[m_ImagePackers.AddToTail()].Reset( 0, GetMaxLightmapPageWidth(), GetMaxLightmapPageHeight() );
 
 	SetCurrentMaterialInternal(0);
 	m_currentWhiteLightmapMaterial = 0;

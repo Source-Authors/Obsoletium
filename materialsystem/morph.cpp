@@ -1100,11 +1100,10 @@ void CMorph::BuildQuadList( const CUtlVector< MorphSegmentList_t > &morphSegment
 	intp nMorphCount = morphSegments.Count();
 	for ( intp i = 0; i < nMorphCount; ++i )
 	{
-		intp k = m_MorphQuads.AddToTail();
-		MorphQuadList_t &quadList = m_MorphQuads[k];
+		MorphQuadList_t &quadList = m_MorphQuads[m_MorphQuads.AddToTail()];
 
 		const MorphSegmentList_t& segmentList = morphSegments[i];
-		int nSegmentCount = segmentList.Count();
+		intp nSegmentCount = segmentList.Count();
 		for ( intp j = 0; j < nSegmentCount; ++j )
 		{
 			const MorphSegment_t &segment = segmentList[j];
@@ -1122,8 +1121,7 @@ void CMorph::BuildQuadList( const CUtlVector< MorphSegmentList_t > &morphSegment
 				int nCount = min( nMaxCount, nTotalCount );
 				nTotalCount -= nCount;
 
-				intp l = quadList.AddToTail();
-				MorphQuad_t &quad = quadList[l];
+				MorphQuad_t &quad = quadList[quadList.AddToTail()];
 				quad.m_nQuadIndex = nQuadIndex++;
 				quad.m_nCount = nCount;
 				quad.m_nFirstSrc = nSrc;
