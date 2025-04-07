@@ -398,7 +398,7 @@ public:
 	const char			*RelativePathToFullPath( const char *pFileName, const char *pPathID, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars, PathTypeFilter_t pathFilter = FILTER_NONE, PathTypeQuery_t *pPathType = NULL ) override;
 
 	// Returns the search path, each path is separated by ;s. Returns the length of the string returned
-	int					GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) override;
+	int					GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars ) override;
 
 #if defined( TRACK_BLOCKING_IO )
 	void				EnableBlockingFileAccessTracking( bool state ) override;

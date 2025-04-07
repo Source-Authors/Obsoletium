@@ -1480,7 +1480,7 @@ void CBaseFileSystem::AddSearchPath( const char *pPath, const char *pathID, Sear
 // Pack search paths include the pack name, so that callers can still form absolute paths
 // and that absolute path can be sent to the filesystem, and mounted as a file inside a pack.
 //-----------------------------------------------------------------------------
-int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )
+int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars )
 {
 	AUTO_LOCK( m_SearchPathsMutex );
 

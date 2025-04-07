@@ -584,7 +584,7 @@ public:
 
 	// Returns the search path, each path is separated by ;s. Returns the length of the string returned
 	// Prefer using the GetSearchPath_safe template wrapper to calling this directly
-	virtual int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
+	virtual int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars ) = 0;
 	template <size_t maxLenInChars> int GetSearchPath_safe( const char *pathID, bool bGetPackFiles, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
 		return GetSearchPath( pathID, bGetPackFiles, pDest, (int)maxLenInChars );

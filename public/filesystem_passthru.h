@@ -183,7 +183,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	bool			AsyncSuspend()																		override { return m_pFileSystemPassThru->AsyncSuspend(); }
 	bool			AsyncResume()																		override { return m_pFileSystemPassThru->AsyncResume(); }
 	const char		*RelativePathToFullPath( const char *pFileName, const char *pPathID, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars, PathTypeFilter_t pathFilter = FILTER_NONE, PathTypeQuery_t *pPathType = nullptr ) override { return m_pFileSystemPassThru->RelativePathToFullPath( pFileName, pPathID, pDest, maxLenInChars, pathFilter, pPathType ); }
-	int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )	override { return m_pFileSystemPassThru->GetSearchPath( pathID, bGetPackFiles, pDest, maxLenInChars ); }
+	int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars )	override { return m_pFileSystemPassThru->GetSearchPath( pathID, bGetPackFiles, pDest, maxLenInChars ); }
 
 	FileHandle_t	OpenEx( const char *pFileName, const char *pOptions, unsigned flags = 0, const char *pathID = nullptr, char **ppszResolvedFilename = nullptr ) override { return m_pFileSystemPassThru->OpenEx( pFileName, pOptions, flags, pathID, ppszResolvedFilename );}
 	int				ReadEx( void* pOutput, int destSize, int size, FileHandle_t file )					override { return m_pFileSystemPassThru->ReadEx( pOutput, destSize, size, file ); }
