@@ -181,8 +181,8 @@ public:
 	int m_nPosition;
 
 private:
-	CMemoryFileHandle( const CMemoryFileHandle& ); // not defined
-	CMemoryFileHandle& operator=( const CMemoryFileHandle& ); // not defined
+	CMemoryFileHandle( const CMemoryFileHandle& ) = delete; // not defined
+	CMemoryFileHandle& operator=( const CMemoryFileHandle& ) = delete; // not defined
 };
 
 
@@ -305,7 +305,7 @@ public:
 	long				GetFileTime( const char *pFileName, const char *pPathID = NULL ) override;
 	bool				IsFileWritable( char const *pFileName, const char *pPathID = NULL ) override;
 	bool				SetFileWritable( char const *pFileName, bool writable, const char *pPathID = 0 ) override;
-	void				FileTimeToString( char *pString, int maxChars, long fileTime ) override;
+	void				FileTimeToString( OUT_Z_CAP(maxChars) char *pString, intp maxChars, time_t fileTime ) override;
 	
 	const char			*FindFirst( const char *pWildCard, FileFindHandle_t *pHandle ) override;
 	const char			*FindFirstEx( const char *pWildCard, const char *pPathID, FileFindHandle_t *pHandle ) override;

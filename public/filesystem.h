@@ -609,7 +609,14 @@ public:
 	// File I/O and info
 	virtual bool			IsDirectory( const char *pFileName, const char *pathID = nullptr ) = 0;
 
-	virtual void			FileTimeToString( char* pStrip, int maxCharsIncludingTerminator, long fileTime ) = 0;
+	// dimhotepus: long -> time_t
+	virtual void			FileTimeToString( OUT_Z_CAP(maxChars) char* pStrip, intp maxChars, time_t fileTime ) = 0;
+
+	template<intp bufferSize>
+	void FileTimeToString( OUT_Z_ARRAY char (&buffer)[bufferSize], time_t fileTime )
+	{
+		FileTimeToString( buffer, bufferSize, fileTime );
+	}
 
 	//--------------------------------------------------------
 	// Open file operations
@@ -959,8 +966,8 @@ public:
 	int m_nLength;
 
 private:
-	CMemoryFileBacking( const CMemoryFileBacking& ); // not defined
-	CMemoryFileBacking& operator=( const CMemoryFileBacking& ); // not defined
+	CMemoryFileBacking( const CMemoryFileBacking& ) = delete;
+	CMemoryFileBacking& operator=( const CMemoryFileBacking& ) = delete;
 };
 
 //-----------------------------------------------------------------------------

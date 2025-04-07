@@ -3556,22 +3556,22 @@ void CBaseFileSystem::SetWhitelistSpewFlags( int flags )
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pString - 
-//			maxCharsIncludingTerminator - 
+//			maxChars - 
 //			fileTime - 
 //-----------------------------------------------------------------------------
-void CBaseFileSystem::FileTimeToString( char *pString, int maxCharsIncludingTerminator, long fileTime )
+void CBaseFileSystem::FileTimeToString( OUT_Z_CAP(maxChars) char *pString, intp maxChars, time_t fileTime )
 {
 		time_t time = fileTime;
-		V_strncpy( pString, ctime( &time ), maxCharsIncludingTerminator );
+	V_strncpy( pString, ctime( &time ), maxChars );
 
 		// We see a linefeed at the end of these strings...if there is one, gobble it up
 		intp len = V_strlen( pString );
-		if ( pString[ len - 1 ] == '\n' )
+	if ( len > 0 && pString[ len - 1 ] == '\n' )
 		{
 			pString[ len - 1 ] = '\0';
 		}
 
-		pString[maxCharsIncludingTerminator-1] = '\0';
+	pString[maxChars - 1] = '\0';
 	}
 
 //-----------------------------------------------------------------------------
