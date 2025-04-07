@@ -138,9 +138,8 @@ public:
 	{
 		Assert( pName );
 		Assert( !m_pszTrueFileName );
-		intp len = Q_strlen( pName );
-		m_pszTrueFileName = new char[len + 1];
-		memcpy( m_pszTrueFileName, pName, len + 1 );
+
+		m_pszTrueFileName = V_strdup( pName );
 	}
 #endif
 
