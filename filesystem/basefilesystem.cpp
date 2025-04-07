@@ -5259,9 +5259,9 @@ void CFileHandle::Init( CBaseFileSystem *fs )
 #endif
 }
 
-bool CFileHandle::IsValid()
+bool CFileHandle::IsValid() const
 {
-	return ( m_nMagic == MAGIC );
+	return m_nMagic == MAGIC;
 }
 
 int CFileHandle::GetSectorSize()

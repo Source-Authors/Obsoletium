@@ -161,7 +161,7 @@ protected:
 	};
 	unsigned int	m_nMagic;
 
-	bool IsValid();
+	bool IsValid() const;
 };
 
 class CMemoryFileHandle : public CFileHandle
