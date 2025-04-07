@@ -786,7 +786,7 @@ protected:
 	void						HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath );
 
 	FileHandle_t				FindFileInSearchPath( CFileOpenInfo &openInfo );
-	long						FastFileTime( const CSearchPath *path, const char *pFileName );
+	time_t						FastFileTime( const CSearchPath *path, const char *pFileName );
 
 	const char					*GetWritePath( const char *pFilename, const char *pathID );
 

@@ -2677,7 +2677,7 @@ unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 //			*pFileName - 
 // Output : long
 //-----------------------------------------------------------------------------
-long CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileName )
+time_t CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileName )
 {
 	struct	_stat buf;
 
@@ -3215,7 +3215,7 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 
 	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
 	{
-		long ft = FastFileTime( pSearchPath, tempFileName );
+		time_t ft = FastFileTime( pSearchPath, tempFileName );
 		if ( ft != 0L )
 		{
 			if ( !pSearchPath->GetPackFile() && m_LogFuncs.Count() )
@@ -3254,10 +3254,10 @@ long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 	Q_strlower( tempFileName );
 #endif
 
-	long pathTime = 0L;
+	time_t pathTime = 0L;
 	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
 	{
-		long ft = FastFileTime( pSearchPath, tempFileName );
+		time_t ft = FastFileTime( pSearchPath, tempFileName );
 		if ( ft > pathTime )
 			pathTime = ft;
 		if ( ft != 0L )
