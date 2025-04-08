@@ -1865,8 +1865,15 @@ void CNPC_CombineDropship::InputPickup( inputdata_t &inputdata )
 		return;
 	}
 
+	CBaseAnimating *pTargetAnimating = pTarget->GetBaseAnimating();
+	if ( !pTargetAnimating )
+	{
+		Warning("npc_combinedropship %s with target %s wasn't a CBaseAnimating\n", STRING(GetEntityName()), STRING(iszTargetName) );
+		return;
+	}
+
 	// Start heading to the point
-	m_hPickupTarget = pTarget;
+	m_hPickupTarget = pTargetAnimating;
 
 	m_bHasDroppedOff = false;
 
