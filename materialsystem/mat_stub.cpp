@@ -1774,7 +1774,7 @@ public:
 	}
 
 	// Used to iterate over all shaders for editing purposes
-	virtual int	 ShaderCount() const
+	virtual intp ShaderCount() const
 	{
 		return 0;
 	}

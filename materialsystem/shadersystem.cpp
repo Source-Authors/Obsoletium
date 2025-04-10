@@ -81,8 +81,8 @@ public:
 	virtual void		DrawElements( IShader *pShader, IMaterialVar **params, ShaderRenderState_t* pShaderState, VertexCompressionType_t vertexCompression, uint32 nVarChangeID );
 
 	// Used to iterate over all shaders for editing purposes
-	virtual int			ShaderCount() const;
-	virtual int			GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const;
+	virtual intp		ShaderCount() const;
+	virtual int			GetShaders( int nFirstShader, int nMaxCount, OUT_CAP(nMaxCount) IShader **ppShaderList ) const;
 
 	// Methods of IShaderInit
 	virtual void		LoadTexture( IMaterialVar *pTextureVar, const char *pTextureGroupName, int nAdditionalCreationFlags = 0 );
@@ -309,12 +309,13 @@ void CShaderSystem::LoadAllShaderDLLs( )
 
 	// Loads local defined or statically linked shaders
 	intp i = m_ShaderDLLs.AddToHead();
+	auto &dll = m_ShaderDLLs[i];
 
-	m_ShaderDLLs[i].m_pFileName     = new char[1];
-	m_ShaderDLLs[i].m_pFileName[0]  = 0;
-	m_ShaderDLLs[i].m_hInstance     = nullptr;
-	m_ShaderDLLs[i].m_pShaderDLL    = GetShaderDLLInternal();
-	m_ShaderDLLs[i].m_bModShaderDLL = false;
+	dll.m_pFileName     = new char[1];
+	dll.m_pFileName[0]  = 0;
+	dll.m_hInstance     = nullptr;
+	dll.m_pShaderDLL    = GetShaderDLLInternal();
+	dll.m_bModShaderDLL = false;
 
 	// Add the shaders to the dictionary of shaders...
 	SetupShaderDictionary( i );
@@ -542,9 +543,7 @@ bool CShaderSystem::LoadShaderDLL( const char *pFullPath, const char *pPathID, b
 	else
 	{
 		nShaderDLLIndex = m_ShaderDLLs.AddToTail();
-		intp nLen = Q_strlen(pFullPath) + 1;
-		m_ShaderDLLs[nShaderDLLIndex].m_pFileName = new char[ nLen ];
-		Q_strncpy( m_ShaderDLLs[nShaderDLLIndex].m_pFileName, pFullPath, nLen );
+		m_ShaderDLLs[nShaderDLLIndex].m_pFileName = V_strdup(pFullPath);
 	}
 
 	// Ok, the shader DLL's good!
@@ -677,9 +676,9 @@ void CShaderSystem::SetupShaderDictionary( intp nShaderDLLIndex )
 {
 	// We could have put the shader dictionary into each shader DLL
 	// I'm not sure if that makes this system any less secure than it already is
-	int i;
+	intp i;
 	ShaderDLLInfo_t &info = m_ShaderDLLs[nShaderDLLIndex];
-	int nCount = info.m_pShaderDLL->ShaderCount();
+	intp nCount = info.m_pShaderDLL->ShaderCount();
 	for ( i = 0; i < nCount; ++i )
 	{
 		IShader *pShader = info.m_pShaderDLL->GetShader( i );
@@ -693,12 +692,11 @@ void CShaderSystem::SetupShaderDictionary( intp nShaderDLLIndex )
 		// Make sure it doesn't try to override another shader DLL's names.
 		if ( info.m_bModShaderDLL )
 		{
-			for ( intp iTestDLL=0; iTestDLL < m_ShaderDLLs.Count(); iTestDLL++ )
+			for ( const auto &pTestDLL : m_ShaderDLLs )
 			{
-				ShaderDLLInfo_t *pTestDLL = &m_ShaderDLLs[iTestDLL];
-				if ( !pTestDLL->m_bModShaderDLL )
+				if ( !pTestDLL.m_bModShaderDLL )
 				{
-					if ( pTestDLL->m_ShaderDict.Find( pShaderName ) != pTestDLL->m_ShaderDict.InvalidIndex() )
+					if ( pTestDLL.m_ShaderDict.Find( pShaderName ) != pTestDLL.m_ShaderDict.InvalidIndex() )
 					{ 
 						Error( "Game shader '%s' trying to override a base shader '%s'.", info.m_pFileName, pShaderName );
 					}
@@ -741,12 +739,12 @@ IShader* CShaderSystem::FindShader( char const* pShaderName )
 //-----------------------------------------------------------------------------
 // Used to iterate over all shaders for editing purposes
 //-----------------------------------------------------------------------------
-int CShaderSystem::ShaderCount() const
+intp CShaderSystem::ShaderCount() const
 {
 	return GetShaders( 0, 65536, NULL );
 }
 
-int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const
+int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const
 {
 	CUtlSymbolTable	uniqueNames( 0, 512, true ); 
 

@@ -3942,12 +3942,12 @@ void CMaterialSystem::ToggleDebugMaterial( char const* pMaterialName )
 //-----------------------------------------------------------------------------
 // Used to iterate over all shaders for editing purposes
 //-----------------------------------------------------------------------------
-int CMaterialSystem::ShaderCount() const
+intp CMaterialSystem::ShaderCount() const
 {
 	return ShaderSystem()->ShaderCount();
 }
 
-int CMaterialSystem::GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const
+int CMaterialSystem::GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const
 {
 	return ShaderSystem()->GetShaders( nFirstShader, nMaxCount, ppShaderList );
 }
@@ -3975,13 +3975,13 @@ void CMaterialSystem::GetShaderFallback( const char *pShaderName, char *pFallbac
 {
 	// FIXME: This is pretty much a hack. We need a better way for the
 	// editor to get ahold of shader fallbacks
-	int nCount = ShaderCount();
-	IShader** ppShaderList = (IShader**)_alloca( nCount * sizeof(IShader) );
+	intp nCount = ShaderCount();
+	IShader** ppShaderList = stackallocT( IShader*, nCount );
 	GetShaders( 0, nCount, ppShaderList );
 
 	do
 	{
-		int i;
+		intp i;
 		for ( i = 0; i < nCount; ++i )
 		{
 			if ( !Q_stricmp( pShaderName, ppShaderList[i]->GetName() ) )
