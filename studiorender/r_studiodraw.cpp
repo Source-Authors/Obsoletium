@@ -1479,7 +1479,7 @@ void CStudioRender::R_StudioSoftwareProcessMesh( mstudiomesh_t* pmesh, CMeshBuil
 		bool bNeedsTangentSpace, bool bDX8Vertex, IMaterial *pMaterial )
 {
 	unsigned int nAlphaMask = RoundFloatToInt( r_blend * 255.0f ); 
-	nAlphaMask = clamp( nAlphaMask, 0, 255 );
+	nAlphaMask = clamp( nAlphaMask, 0u, 255u );
 	nAlphaMask <<= 24;
 
 	// FIXME: Use function pointers to simplify this?!?
