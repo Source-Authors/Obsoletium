@@ -302,7 +302,7 @@ public:
 	void				MarkPathIDByRequestOnly( const char *pPathID, bool bRequestOnly ) override;
 
 	bool				FileExists( const char *pFileName, const char *pPathID = NULL ) override;
-	long				GetFileTime( const char *pFileName, const char *pPathID = NULL ) override;
+	time_t				GetFileTime( const char *pFileName, const char *pPathID = NULL ) override;
 	bool				IsFileWritable( char const *pFileName, const char *pPathID = NULL ) override;
 	bool				SetFileWritable( char const *pFileName, bool writable, const char *pPathID = 0 ) override;
 	void				FileTimeToString( OUT_Z_CAP(maxChars) char *pString, intp maxChars, time_t fileTime ) override;
@@ -328,7 +328,7 @@ public:
 	FileNameHandle_t	FindFileName( char const *pFileName ) override;
 	bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen ) override;
 	int					GetPathIndex( const FileNameHandle_t &handle ) override;
-	long				GetPathTime( const char *pFileName, const char *pPathID ) override;
+	time_t				GetPathTime( const char *pFileName, const char *pPathID ) override;
 	
 	void				EnableWhitelistFileTracking( bool bEnable, bool bCacheAllVPKHashes, bool bRecalculateAndCheckHashes ) override;
 	void				RegisterFileWhitelist( IPureServerWhitelist *pWhiteList, IFileList **ppFilesToReload ) override;

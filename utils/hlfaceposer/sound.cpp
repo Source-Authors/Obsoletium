@@ -1019,7 +1019,8 @@ struct CSoundFile
 {
 	char				filename[ 512 ];
 	CAudioSource		*source;
-	long				filetime;
+	// dimhotepus: long -> time_t
+	time_t				filetime;
 };
 
 //-----------------------------------------------------------------------------
@@ -1108,7 +1109,7 @@ CAudioSource *CFacePoserSound::FindOrAddSound( const char *filename )
 		Assert( s );
 		if ( !stricmp( s->filename, filename ) )
 		{
-			long filetime = filesystem->GetFileTime( filename );
+			time_t filetime = filesystem->GetFileTime( filename );
 			if ( filetime != s->filetime )
 			{
 				Con_Printf( "Reloading sound %s\n", filename );

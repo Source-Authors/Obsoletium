@@ -1734,11 +1734,12 @@ void CBugUIPanel::OnSubmit()
 		extern CGlobalVars g_ServerGlobalVariables;
 		char misc2[ 256 ];
 
-		long mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
+		// dimhotepus: long -> time_t
+		time_t mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
 		if ( !isPublic && mapfiletime != 0L )
 		{
 			char filetimebuf[ 64 ];
-			g_pFileSystem->FileTimeToString( filetimebuf, sizeof( filetimebuf ), mapfiletime );
+			g_pFileSystem->FileTimeToString( filetimebuf, mapfiletime );
 
 			V_sprintf_safe( misc2, "Map version:  %i\nFile timestamp:  %s", g_ServerGlobalVariables.mapversion, filetimebuf );
 			V_strcat_safe( misc, misc2 );

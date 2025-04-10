@@ -3198,7 +3198,7 @@ char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars
 // Input  : *pFileName - 
 // Output : long
 //-----------------------------------------------------------------------------
-long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
+time_t CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 {
 	VPROF_BUDGET( "CBaseFileSystem::GetFileTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
@@ -3208,12 +3208,12 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 
 	char tempFileName[MAX_PATH];
 	V_strcpy_safe( tempFileName, pFileName );
-	Q_FixSlashes( tempFileName );
+	V_FixSlashes( tempFileName );
 #ifdef _WIN32
-	Q_strlower( tempFileName );
+	V_strlower( tempFileName );
 #endif
 
-	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
+	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != nullptr; pSearchPath = iter.GetNext() )
 	{
 		time_t ft = FastFileTime( pSearchPath, tempFileName );
 		if ( ft != 0L )
@@ -3230,8 +3230,7 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 					V_sprintf_safe( pTmpFileName, "%s%s", pSearchPath->GetPathString(), tempFileName );
 				}
 
-				Q_FixSlashes( tempFileName );
-
+				V_FixSlashes( tempFileName );
 				LogAccessToFile( "filetime", pTmpFileName, "" );
 			}
 
@@ -3241,7 +3240,7 @@ long CBaseFileSystem::GetFileTime( const char *pFileName, const char *pPathID )
 	return 0L;
 }
 
-long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
+time_t CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 {
 	VPROF_BUDGET( "CBaseFileSystem::GetPathTime", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 
@@ -3249,13 +3248,13 @@ long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 
 	char tempFileName[MAX_PATH];
 	V_strcpy_safe( tempFileName, pFileName );
-	Q_FixSlashes( tempFileName );
+	V_FixSlashes( tempFileName );
 #ifdef _WIN32
-	Q_strlower( tempFileName );
+	V_strlower( tempFileName );
 #endif
 
 	time_t pathTime = 0L;
-	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
+	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != nullptr; pSearchPath = iter.GetNext() )
 	{
 		time_t ft = FastFileTime( pSearchPath, tempFileName );
 		if ( ft > pathTime )
@@ -3274,7 +3273,7 @@ long CBaseFileSystem::GetPathTime( const char *pFileName, const char *pPathID )
 					V_sprintf_safe( pTmpFileName, "%s%s", pSearchPath->GetPathString(), tempFileName );
 				}
 
-				Q_FixSlashes( tempFileName );
+				V_FixSlashes( tempFileName );
 
 				LogAccessToFile( "filetime", pTmpFileName, "" );
 			}

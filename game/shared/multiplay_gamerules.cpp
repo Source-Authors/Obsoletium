@@ -144,7 +144,7 @@ ConVar nextlevel( "nextlevel",
 #endif
 
 #ifndef CLIENT_DLL
-int CMultiplayRules::m_nMapCycleTimeStamp = 0;
+time_t CMultiplayRules::m_nMapCycleTimeStamp = 0;
 int CMultiplayRules::m_nMapCycleindex = 0;
 CUtlVector<char*> CMultiplayRules::m_MapList;
 #endif
@@ -1175,7 +1175,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		DetermineMapCycleFilename( mapcfile, sizeof(mapcfile), false );
 
 		// Check the time of the mapcycle file and re-populate the list of level names if the file has been modified
-		const int nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "GAME" );
+		const time_t nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "GAME" );
 
 		if ( 0 == nMapCycleTimeStamp )
 		{
@@ -1384,7 +1384,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 		FreeMapCycleFileVector( m_MapList );
 
-		const int nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "GAME" );
+		const time_t nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "GAME" );
 		m_nMapCycleTimeStamp = nMapCycleTimeStamp;
 
 		// Repopulate map list from mapcycle file

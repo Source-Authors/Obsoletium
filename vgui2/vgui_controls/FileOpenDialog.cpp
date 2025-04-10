@@ -1229,8 +1229,8 @@ void FileOpenDialog::PopulateFileList()
 
 					kv->SetString( "attributes", g_pFullFileSystem->IsFileWritable( pFullPath )? "" : "R" );
 
-					long fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
-					g_pFullFileSystem->FileTimeToString( pszFileModified, sizeof( pszFileModified ), fileModified );
+					time_t fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
+					g_pFullFileSystem->FileTimeToString( pszFileModified, fileModified );
 					kv->SetString( "modified", pszFileModified );
 
 //					kv->SetString( "created", GetFileTimetamp( findData.ftCreationTime ) );
@@ -1268,8 +1268,8 @@ void FileOpenDialog::PopulateFileList()
 			
 			kv->SetString( "attributes", g_pFullFileSystem->IsFileWritable( pFullPath )? "" : "R" );
 
-			long fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
-			g_pFullFileSystem->FileTimeToString( pszFileModified, sizeof( pszFileModified ), fileModified );
+			time_t fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
+			g_pFullFileSystem->FileTimeToString( pszFileModified, fileModified );
 			kv->SetString( "modified", pszFileModified );
 
 //			kv->SetString( "created", GetFileTimetamp( findData.ftCreationTime ) );

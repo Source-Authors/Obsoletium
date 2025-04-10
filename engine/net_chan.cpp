@@ -200,8 +200,8 @@ void CNetChan::CompressFragments()
 			Q_snprintf( compressedfilename, sizeof(compressedfilename), "%s.ztmp", data->filename);
 
 			// check the timestamps 
-			int compressedFileTime = g_pFileSystem->GetFileTime( compressedfilename );
-			int fileTime = g_pFileSystem->GetFileTime( data->filename );
+			time_t compressedFileTime = g_pFileSystem->GetFileTime( compressedfilename );
+			time_t fileTime = g_pFileSystem->GetFileTime( data->filename );
 
 			if ( compressedFileTime >= fileTime )
 			{
