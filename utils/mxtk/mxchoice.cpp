@@ -63,7 +63,7 @@ mxChoice::add (const char *item)
 
 
 void
-mxChoice::select (int index)
+mxChoice::select (intp index)
 {
 	SendMessage ((HWND) getHandle (), CB_SETCURSEL, (WPARAM) index, 0L);
 }
@@ -71,7 +71,7 @@ mxChoice::select (int index)
 
 
 void
-mxChoice::remove (int index)
+mxChoice::remove (intp index)
 {
 	SendMessage ((HWND) getHandle (), CB_DELETESTRING, (WPARAM) index, 0L);
 }
