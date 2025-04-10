@@ -323,7 +323,7 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 		const char *pShaderParam = CommandLine()->ParmValue( "-shader" );
 		if ( pShaderParam )
 		{
-			Q_strncpy( info.m_ActualCaps.m_pShaderDLL, pShaderParam, sizeof( info.m_ActualCaps.m_pShaderDLL ) );
+			V_strcpy_safe( info.m_ActualCaps.m_pShaderDLL, pShaderParam );
 		}
 	}
 }
