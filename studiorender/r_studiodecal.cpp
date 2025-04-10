@@ -1005,7 +1005,7 @@ void CStudioRender::RetireDecal( DecalModelList_t &list, DecalId_t nRetireID, in
 //-----------------------------------------------------------------------------
 // Adds a decal to the history list
 //-----------------------------------------------------------------------------
-int CStudioRender::AddDecalToMaterialList( DecalMaterial_t* pMaterial )
+unsigned short CStudioRender::AddDecalToMaterialList( DecalMaterial_t* pMaterial )
 {
 	DecalList_t& decalList = pMaterial->m_Decals;
 	return decalList.AddToTail();
@@ -1302,7 +1302,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 			intp decalIndexCount = buildInfo.m_pDecalMaterial->m_Indices.Count() - prevIndexCount;
 			Assert(decalIndexCount > 0);
 
-			int decalIndex = AddDecalToMaterialList( buildInfo.m_pDecalMaterial );
+			unsigned short decalIndex = AddDecalToMaterialList( buildInfo.m_pDecalMaterial );
 			Decal_t& decal = buildInfo.m_pDecalMaterial->m_Decals[decalIndex];
 			decal.m_VertexCount = buildInfo.m_VertexCount;
 			decal.m_IndexCount = decalIndexCount;

@@ -523,7 +523,7 @@ private:
 	void			AddTriangleToDecal( DecalBuildInfo_t& build, int i1, int i2, int i3, int gi1, int gi2, int gi3 );
 	void			AddDecalToMesh( DecalBuildInfo_t& build );
 	int				GetDecalMaterial( DecalLod_t& decalLod, IMaterial* pDecalMaterial );
-	int				AddDecalToMaterialList( DecalMaterial_t* pMaterial );
+	unsigned short			AddDecalToMaterialList( DecalMaterial_t* pMaterial );
 
 	// Total number of meshes we have to deal with
 	int ComputeTotalMeshCount( int iRootLOD, int iMaxLOD, int body ) const;
