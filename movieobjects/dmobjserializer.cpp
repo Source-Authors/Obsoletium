@@ -1052,7 +1052,7 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 		if ( rename( pFilename, pFilename ) )
 		{
 			Warning( "Unable to rename '%s' to '%s'.\n", pFilename, pFilename );
-	}
+		}
 	}
 
 	if ( !bWriteOBJs )
