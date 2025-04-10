@@ -880,10 +880,10 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 
 	const char *in = s;
 
-	char token[ 128 ];
+	char in_token[ 128 ];
 	char rawtoken[ 128 ];
 
-	token[ 0 ] = 0;
+	in_token[ 0 ] = 0;
 	rawtoken[ 0 ] = 0;
 
 	intp n = 0;
@@ -922,7 +922,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 				n = 0;
 
 				// Convert raw token to real token in case token is an enumerated type specifier
-				ResolveToken( matcher, token, sizeof( token ), rawtoken );
+				ResolveToken( matcher, in_token, sizeof( in_token ), rawtoken );
 
 				// Fill in first data set
 				if ( gt )
@@ -930,7 +930,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 					matcher.usemin = true;
 					matcher.minequals = eq;
 					// dimhotepus: atof -> strtof.
-					matcher.minval = strtof( token, nullptr );
+					matcher.minval = strtof( in_token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -939,7 +939,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 					matcher.usemax = true;
 					matcher.maxequals = eq;
 					// dimhotepus: atof -> strtof.
-					matcher.maxval = strtof( token, nullptr );
+					matcher.maxval = strtof( in_token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -953,7 +953,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 
 					matcher.notequal = nt;
 
-					matcher.isnumeric = AppearsToBeANumber( token );
+					matcher.isnumeric = AppearsToBeANumber( in_token );
 				}
 
 				gt = lt = eq = nt = false;
@@ -975,7 +975,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 		in++;
 	}
 
-	matcher.SetToken( token );
+	matcher.SetToken( in_token );
 	matcher.SetRaw( rawtoken );
 	matcher.valid = true;
 }
