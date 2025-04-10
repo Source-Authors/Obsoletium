@@ -178,9 +178,10 @@ static void r_printdecalinfo_f()
 
 	for ( int i=0; i < g_nMaxDecals; i++ )
 	{
-		if ( s_aDecalPool[i] )
+		const auto *decal = s_aDecalPool[i];
+		if ( decal )
 		{
-			if ( s_aDecalPool[i]->flags & FDECAL_PERMANENT )
+			if ( decal->flags & FDECAL_PERMANENT )
 				++nPermanent;
 			else
 				++nDynamic;
