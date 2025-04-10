@@ -28,7 +28,7 @@ using namespace vgui;
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define NEW_SAVE_GAME_TIMESTAMP	0xFFFFFFFF
+constexpr time_t NEW_SAVE_GAME_TIMESTAMP = -1;
 
 //-----------------------------------------------------------------------------
 // Purpose:Constructor
@@ -61,7 +61,7 @@ void CSaveGameDialog::OnCommand( const char *command )
 {
 	if ( !stricmp( command, "loadsave" )  )
 	{
-		int saveIndex = GetSelectedItemSaveIndex();
+		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{
 			// see if we're overwriting
@@ -83,7 +83,7 @@ void CSaveGameDialog::OnCommand( const char *command )
 	}
 	else if ( !stricmp( command, "SaveOverwriteConfirmed" ) )
 	{
-		int saveIndex = GetSelectedItemSaveIndex();
+		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{
 			// delete any existing save

@@ -180,13 +180,13 @@ void CBaseSaveGameDialog::CreateSavedGamesList()
 //-----------------------------------------------------------------------------
 // Purpose: returns the save file name of the selected item
 //-----------------------------------------------------------------------------
-int CBaseSaveGameDialog::GetSelectedItemSaveIndex()
+intp CBaseSaveGameDialog::GetSelectedItemSaveIndex()
 {
 	CSaveGamePanel *panel = dynamic_cast<CSaveGamePanel *>(m_pGameList->GetSelectedPanel());
 	if ( panel )
 	{
 		// find the panel in the list
-		for ( int i = 0; i < m_SaveGames.Count(); i++ )
+		for ( intp i = 0; i < m_SaveGames.Count(); i++ )
 		{
 			if ( i == panel->GetSaveGameListItemID() )
 			{

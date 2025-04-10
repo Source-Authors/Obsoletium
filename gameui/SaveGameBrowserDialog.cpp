@@ -1212,7 +1212,7 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		minutes %= 60;
 
 		wchar_t wzHours[6];
-		wchar_t wzMins[4];	
+		wchar_t wzMins[4];
 		wchar_t wzSecs[4];
 
 		_snwprintf( wzHours, std::size(wzHours), L"%d", hours );
