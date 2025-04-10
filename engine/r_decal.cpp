@@ -404,7 +404,8 @@ static VertexFormat_t GetUncompressedFormat( const IMaterial * pMaterial )
 void Shader_DecalDrawPoly( CDecalVert *v, IMaterial *pMaterial, SurfaceHandle_t surfID, int vertCount, decal_t *pdecal, float flFade )
 {
 #ifndef SWDS
-	int vertexFormat = 0;
+	// dimhotepus: int -> VertexFormat_t
+	VertexFormat_t vertexFormat = 0;
 	CMatRenderContextPtr pRenderContext( materials );
 
 #ifdef USE_CONVARS
