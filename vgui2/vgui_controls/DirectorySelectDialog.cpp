@@ -508,7 +508,7 @@ void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 
 		// create the new directory underneath
 		V_strcat_safe(fullPath, dir);
-		if (_mkdir(fullPath) == 0)
+		if (_mkdir(fullPath) == 0 || errno == EEXIST)
 		{
 			// add new path to tree view
 			KeyValues *kv = new KeyValues("item");

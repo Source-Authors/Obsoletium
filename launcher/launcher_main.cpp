@@ -519,13 +519,11 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 
   // Figure out the directory the executable is running from and make that be
   // the current working directory.
-#ifdef WIN32
-  if (_chdir(base_directory)) {
-#else
   if (chdir(base_directory)) {
-#endif
+    int rc = errno;
     Warning("Unable to change current directory to %s: %s.", base_directory,
-            std::generic_category().message(errno).c_str());
+            std::generic_category().message(rc).c_str());
+    return rc;
   }
 
   // This call is to emulate steam's injection of the GameOverlay DLL into our

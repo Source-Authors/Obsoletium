@@ -2598,7 +2598,7 @@ bool V_GetCurrentDirectory( OUT_Z_CAP(maxLen) char *pOut, int maxLen )
 
 bool V_SetCurrentDirectory( IN_Z const char *pDirName )
 {
-	return _chdir( pDirName ) == 0;
+	return chdir( pDirName ) == 0;
 }
 
 

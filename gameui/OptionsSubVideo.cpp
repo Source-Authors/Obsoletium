@@ -1574,7 +1574,11 @@ void COptionsSubVideo::SetUseHDContent( bool bUse )
 		const char *pGameDir = engine->GetGameDirectory();
 		char szModSteamInfPath[ 1024 ];
 		V_ComposeFileName( pGameDir, "game_hd.txt", szModSteamInfPath );
-		_unlink( szModSteamInfPath );
+		if (unlink(szModSteamInfPath))
+		{
+			Warning("Unable to remove hd content config '%s': %s.\n", szModSteamInfPath,
+				std::generic_category().message(errno).c_str());
+		}
 	}
 }
 

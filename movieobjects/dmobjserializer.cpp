@@ -1049,7 +1049,10 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 
 		// Filesystem is silly
 		// On WIN32 filesystem changes all of the characters to lowercase grrrr.....
-		rename( pFilename, pFilename );
+		if ( rename( pFilename, pFilename ) )
+		{
+			Warning( "Unable to rename '%s' to '%s'.\n", pFilename, pFilename );
+	}
 	}
 
 	if ( !bWriteOBJs )
@@ -1120,7 +1123,10 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 					Q_ComposeFileName( path, deltaFile.Get(), filename, sizeof( filename ) );
 					g_pFullFileSystem->WriteFile( filename, NULL, b );
 					// On WIN32 filesystem changes all of the characters to lowercase grrrr.....
-					rename( filename, filename );
+					if ( rename( filename, filename ) )
+					{
+						Warning( "Unable to rename '%s' to '%s'.\n", filename, filename );
+					}
 				}
 			}
 		}

@@ -186,7 +186,10 @@ bool WriteMiniDumpUsingExceptionInfo(
 			// Ensure null-termination.
 			rgchFailedFileName[ std::size(rgchFailedFileName) - 1 ] = '\0';
 			// dimhotepus: If rename failed, well, do nothing.
-			(void)rename( rgchFileName, rgchFailedFileName );
+			if ( rename( rgchFileName, rgchFailedFileName ) )
+			{
+				Warning( "Unable to rename '%s' to '%s'.\n", rgchFileName, rgchFailedFileName );
+			}
 		}
 	}
 

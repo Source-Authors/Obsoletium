@@ -382,7 +382,7 @@ bool CQcData::ParseQc(
 {
 	bool bRetVal = false;
 
-	if ( _access( qcPath.Get(), 04 ) == 0 )
+	if ( access( qcPath.Get(), 04 ) == 0 )
 	{
 		std::string buf;
 		std::ifstream ifs( qcPath.Get() );
@@ -475,7 +475,7 @@ bool CQcData::GetQcData(
 
 		V_strncpy( szBuf0, smdPath.Get(), ssize( szBuf0 ) );
 		V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
-		if ( _access( szBuf0, 04 ) == 0 )
+		if ( access( szBuf0, 04 ) == 0 )
 			return ParseQc( smdPath, szBuf0 );
 
 		// Remove "_reference" if found
@@ -485,7 +485,7 @@ bool CQcData::GetQcData(
 			*pszRef = '\0';
 
 			V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
-			if ( _access( szBuf0, 04 ) == 0 )
+			if ( access( szBuf0, 04 ) == 0 )
 				return ParseQc( smdPath, szBuf0 );
 		}
 		else
@@ -495,7 +495,7 @@ bool CQcData::GetQcData(
 			V_SetExtension( szBuf0, "", ssize( szBuf0 ) );
 			V_strcat( szBuf0, "_reference", ssize( szBuf0 ) );
 			V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
-			if ( _access( szBuf0, 04 ) == 0 )
+			if ( access( szBuf0, 04 ) == 0 )
 				return ParseQc( smdPath, szBuf0 );
 		}
 

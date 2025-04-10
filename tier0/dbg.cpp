@@ -974,7 +974,12 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 
 		if ( !is_first_write )
 		{
-			unlink( kLogFileName );
+			if ( unlink( kLogFileName ) )
+			{
+				Warning( "Unable to remove timestamp log file '%s': %s.\n",
+					kLogFileName,
+					std::generic_category().message(errno).c_str() );
+			}
 
 			is_first_write = true;
 		}

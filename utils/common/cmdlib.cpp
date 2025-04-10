@@ -452,13 +452,14 @@ void GetHourMinuteSecondsString(int nInputSeconds, char *pOut, int outLen) {
 }
 
 void Q_mkdir(char *path) {
-#if defined(_WIN32) || defined(WIN32)
-  if (mkdir(path) != -1) return;
+#if defined(_WIN32)
+  if (!mkdir(path) || errno == EEXIST) return;
 #else
-  if (mkdir(path, 0777) != -1) return;
+  if (!mkdir(path, 0777) || errno == EEXIST) return;
 #endif
 
-  Error("mkdir failed %s\n", path);
+  Error( "Unable to create directory '%s': %s.\n",
+      path, std::generic_category().message(errno).c_str() );
 }
 
 void CmdLib_InitFileSystem(const char *pFilename, int maxMemoryUsage) {
@@ -732,7 +733,7 @@ void SafeCreatePath(char *path) {
     ptr = strchr(ptr + 1, '\\');
     if (ptr) {
       *ptr = '\0';
-      _mkdir(path);
+      Q_mkdir(path);
       *ptr = '\\';
     }
   }

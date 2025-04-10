@@ -1021,7 +1021,7 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 		if ( ptr )
 		{
 			*ptr = '\0';
-			if ( _mkdir( dirPath ) ) return false;
+			if ( _mkdir( dirPath ) && errno != EEXIST ) return false;
 			*ptr = '\\';
 		}
 	}
@@ -1106,7 +1106,6 @@ char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, in
 //-----------------------------------------------------------------------------
 void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 {
-#if !defined( _X360 )
 	const char *pEnv = getenv( "temp" );
 	if ( !pEnv )
 	{
@@ -1122,14 +1121,14 @@ void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 
 		CUtlVector<fileList_t> fileList;
 		FindFiles( tempPath, false, fileList );
-		for ( intp i=0; i<fileList.Count(); i++ )
+		for ( auto &l : fileList )
 		{
-			_unlink( fileList[i].fileName.String() );
+			if (unlink(l.fileName.String())) {
+				Warning("Unable to remove temp file '%s': %s.\n", l.fileName.String(),
+						std::generic_category().message(errno).c_str());
+			}
 		}
 	}
-#else
-	AssertOnce( !"CScriptLib::DeleteTemporaryFiles:  Not avail on 360\n" );
-#endif
 }
 
 //-----------------------------------------------------------------------------

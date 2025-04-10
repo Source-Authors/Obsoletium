@@ -544,11 +544,17 @@ void CZipFile::Reset( void )
 	{
 #ifdef WIN32
 		CloseHandle( m_hDiskCacheWriteFile );
-		DeleteFile( m_DiskCacheName.String() );
 #else
 		fclose( (FILE *)m_hDiskCacheWriteFile );
-		unlink( m_DiskCacheName.String() );
 #endif
+
+		if ( unlink( m_DiskCacheName.String() ) )
+		{
+			Warning( "Unable to remove zip file '%s': %s.\n",
+				m_DiskCacheName.String(),
+				std::generic_category().message(errno).c_str() );
+		}
+
 		m_hDiskCacheWriteFile = INVALID_HANDLE_VALUE;
 	}
 

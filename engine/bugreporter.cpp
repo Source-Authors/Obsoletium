@@ -2126,18 +2126,26 @@ bool CBugUIPanel::OnFinishBugReport()
 	return success;
 }
 
-void NonFileSystem_CreatePath (const char *path)
+static void NonFileSystem_CreatePath (const char *path)
 {
 	char temppath[512];
-	Q_strncpy( temppath, path, sizeof(temppath) );
+	V_strcpy_safe( temppath, path );
 	
 	for (char *ofs = temppath+1 ; *ofs ; ofs++)
 	{
 		if (*ofs == '/' || *ofs == '\\')
-		{       // create the directory
+		{
+			// create the directory
 			char old = *ofs;
 			*ofs = 0;
-			_mkdir (temppath);
+			if ( _mkdir (temppath) && errno != EEXIST )
+			{
+				Warning( "Unable to create directory '%s' in hierarchy '%s': %s.\n",
+					temppath,
+					path,
+					std::generic_category().message(errno).c_str() );
+				return;
+			}
 			*ofs = old;
 		}
 	}
@@ -2244,7 +2252,12 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 	}
 	else if ( bDeleteLocal )
 	{
-		unlink( local );
+		if ( unlink( local ) )
+		{
+			Warning( "Unable to remove bug reporter upload file '%s': %s.\n",
+				local,
+				std::generic_category().message(errno).c_str() );
+		}
 	}
 	return bResult;
 }

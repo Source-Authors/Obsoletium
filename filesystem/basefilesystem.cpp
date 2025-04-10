@@ -1159,7 +1159,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 		if ( !fp )
 		{
 			// Couldn't open it
-			Warning( FILESYSTEM_WARNING, "Couldn't open .bsp %s for embedded pack file check\n", fullpath );
+			Warning( FILESYSTEM_WARNING, "Couldn't open .bsp %s for embedded pack file check.\n", fullpath );
 			return;
 		}
 	
@@ -2576,7 +2576,7 @@ void CBaseFileSystem::Close( FileHandle_t file )
 	VPROF_BUDGET( "CBaseFileSystem::Close", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	if ( !file )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to Close NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to Close nullptr file handle!\n" );
 		return;
 	}
 	
@@ -2594,7 +2594,7 @@ void CBaseFileSystem::Seek( FileHandle_t file, int pos, FileSystemSeek_t whence 
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
-		Warning( FILESYSTEM_WARNING, "Tried to Seek NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "Tried to Seek nullptr file handle!\n" );
 		return;
 	}
 	
@@ -2612,7 +2612,7 @@ unsigned int CBaseFileSystem::Tell( FileHandle_t file )
 
 	if ( !file )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to Tell NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to Tell nullptr file handle!\n" );
 		return 0;
 	}
 
@@ -2633,7 +2633,7 @@ unsigned int CBaseFileSystem::Size( FileHandle_t file )
 	VPROF_BUDGET( "CBaseFileSystem::Size", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	if ( !file )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size nullptr file handle!\n" );
 		return 0;
 	}
 
@@ -2653,7 +2653,7 @@ unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 	// handle the case where no name passed...
 	if ( !pFileName || !pFileName[0] )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size NULL filename!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size nullptr filename!\n" );
 		return 0;
 	}
 	
@@ -2737,7 +2737,7 @@ bool CBaseFileSystem::EndOfFile( FileHandle_t file )
 {
 	if ( !file )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to EndOfFile NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to EndOfFile nullptr file handle!\n" );
 		return true;
 	}
 
@@ -2762,7 +2762,7 @@ int CBaseFileSystem::ReadEx( OUT_BYTECAP(destSize) void *pOutput, int destSize, 
 	VPROF_BUDGET( "CBaseFileSystem::Read", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	if ( !file )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to Read NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to Read nullptr file handle!\n" );
 		return 0;
 	}
 	if ( size < 0 )
@@ -3031,7 +3031,7 @@ int CBaseFileSystem::Write( IN_BYTECAP(size) void const* pInput, int size, FileH
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to Write NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to Write nullptr file handle!\n" );
 		return 0;
 	}
 	return fh->Write( pInput, size );
@@ -3048,7 +3048,7 @@ int CBaseFileSystem::FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char
 	VPROF_BUDGET( "CBaseFileSystem::FPrintf", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
 	if ( !file )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to FPrintf NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to FPrintf nullptr file handle!\n" );
 		return 0;
 	}
 
@@ -3074,7 +3074,7 @@ void CBaseFileSystem::SetBufferSize( FileHandle_t file, unsigned nBytes )
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to SetBufferSize NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to SetBufferSize nullptr file handle!\n" );
 		return;
 	}
 	fh->SetBufferSize( nBytes );
@@ -3088,7 +3088,7 @@ bool CBaseFileSystem::IsOk( FileHandle_t file )
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to IsOk NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to IsOk nullptr file handle!\n" );
 		return false;
 	}
 
@@ -3104,7 +3104,7 @@ void CBaseFileSystem::Flush( FileHandle_t file )
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to Flush NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to Flush nullptr file handle!\n" );
 		return;
 	}
 
@@ -3144,7 +3144,7 @@ char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
-		Warning( FILESYSTEM_WARNING, "FS:  Tried to ReadLine NULL file handle!\n" );
+		Warning( FILESYSTEM_WARNING, "FS:  Tried to ReadLine nullptr file handle!\n" );
 		// dimhotepus: Always zero-terminate.
 		if (maxChars > 0) pOutput[0] = '\0';
 		return NULL;
@@ -3781,20 +3781,33 @@ void CBaseFileSystem::CreateDirHierarchy( const char *pRelativePathT, const char
 		{
 			*s = '\0';
 #if defined( _WIN32 )
-			_mkdir( szScratchFileName );
+			if ( _mkdir( szScratchFileName ) && errno != EEXIST )
 #elif defined( POSIX )
-			mkdir( szScratchFileName, S_IRWXU |  S_IRGRP |  S_IROTH );// owner has rwx, rest have r
+			if ( mkdir( szScratchFileName, S_IRWXU |  S_IRGRP |  S_IROTH ) && errno != EEXIST )// owner has rwx, rest have r
 #endif
+			{
+				::Warning( "Unable to create file or directory '%s' in hierarchy '%s': %s.\n",
+					szScratchFileName,
+					pRelativePathT,
+					std::generic_category().message(errno).c_str() );
+			}
+
 			*s = CORRECT_PATH_SEPARATOR;
 		}
 		s++;
 	}
 
 #if defined( _WIN32 )
-	_mkdir( szScratchFileName );
+	if ( _mkdir( szScratchFileName ) && errno != EEXIST )
 #elif defined( POSIX )
-	mkdir( szScratchFileName, S_IRWXU |  S_IRGRP |  S_IROTH );
+	if ( mkdir( szScratchFileName, S_IRWXU |  S_IRGRP |  S_IROTH ) && errno != EEXIST )
 #endif
+	{
+		::Warning( "Unable to create file '%s' in hierarchy '%s': %s.\n",
+			szScratchFileName,
+			pRelativePathT,
+			std::generic_category().message(errno).c_str() );
+	}
 }
 
 
@@ -4484,10 +4497,12 @@ void CBaseFileSystem::RemoveFile( char const* pRelativePath, const char *pathID 
 	{
 		ComputeFullWritePath( szScratchFileName, sizeof( szScratchFileName ), pRelativePath, pathID );
 	}
-	int fail = unlink( szScratchFileName );
-	if ( fail != 0 )
+
+	if ( unlink( szScratchFileName ) )
 	{
-		Warning( FILESYSTEM_WARNING, "Unable to remove %s!\n", szScratchFileName );
+		Warning( FILESYSTEM_WARNING, "Unable to remove file '%s': %s.\n",
+			szScratchFileName,
+			std::generic_category().message(errno).c_str() );
 	}
 }
 
@@ -4542,11 +4557,13 @@ bool CBaseFileSystem::RenameFile( char const *pOldPath, char const *pNewPath, co
 	V_StripFilename( pPathOnly );
 	CreateDirHierarchy( pPathOnly, pathID );
 
-	// Now copy the file over
-	int fail = rename( szScratchFileName, pNewFileName );
-	if (fail != 0)
+	// Now copy the file over.
+	if ( rename( szScratchFileName, pNewFileName ) )
 	{
-		Warning( FILESYSTEM_WARNING, "Unable to rename %s to %s!\n", szScratchFileName, pNewFileName );
+		::Warning( "Unable to rename file '%s' to '%s': %s.\n",
+			szScratchFileName,
+			pNewFileName,
+			std::generic_category().message(errno).c_str() );
 		return false;
 	}
 
@@ -4560,9 +4577,9 @@ bool CBaseFileSystem::RenameFile( char const *pOldPath, char const *pNewPath, co
 //-----------------------------------------------------------------------------
 bool CBaseFileSystem::GetCurrentDirectory( char* pDirectory, int maxlen )
 {
-#if defined( _WIN32 ) && !defined( _X360 )
-	if ( !::GetCurrentDirectoryA( maxlen, pDirectory ) )
-#elif defined( POSIX ) || defined( _X360 )
+#if defined( _WIN32 )
+	if ( !_getcwd( pDirectory, maxlen ) )
+#elif defined( POSIX )
 	if ( !getcwd( pDirectory, maxlen ) )
 #endif
 		return false;
@@ -5302,7 +5319,7 @@ bool CFileHandle::IsOK()
 		return IsValid();
 	}
 
-	m_fs->Warning( FILESYSTEM_WARNING, "FS:  Tried to IsOk NULL file pointer inside valid file handle!\n" );
+	m_fs->Warning( FILESYSTEM_WARNING, "FS:  Tried to IsOk nullptr file pointer inside valid file handle!\n" );
 	return false;
 }
 
@@ -5378,7 +5395,7 @@ int CFileHandle::Write( IN_BYTECAP(nLength) const void* pBuffer, int nLength )
 
 	if ( !m_pFile )
 	{
-		m_fs->Warning( FILESYSTEM_WARNING, "FS:  Tried to Write NULL file pointer inside valid file handle!\n" );
+		m_fs->Warning( FILESYSTEM_WARNING, "FS:  Tried to Write nullptr file pointer inside valid file handle!\n" );
 		return 0;
 	}
 

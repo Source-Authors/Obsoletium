@@ -21,8 +21,6 @@
 #elif defined( POSIX )
 #include <unistd.h>
 #include <sys/stat.h>
-#define _chdir chdir
-#define _access access
 #endif
 
 #include "tier1/strtools.h"
@@ -794,7 +792,7 @@ static bool DoesFileExistIn( const char *pDirectoryName, const char *pFilename )
 	V_AppendSlash( filename );
 	V_strcat_safe( filename, pFilename );
 	Q_FixSlashes( filename );
-	bool bExist = ( _access( filename, 0 ) == 0 );
+	bool bExist = ( access( filename, 0 ) == 0 );
 
 	return bExist;
 }
