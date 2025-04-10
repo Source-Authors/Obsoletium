@@ -17,11 +17,14 @@
 
 namespace {
 
-template <typename TSystemKey,
-          typename = std::enable_if_t<std::is_same_v<TSystemKey, STICKYKEYS> ||
-                                      std::is_same_v<TSystemKey, TOGGLEKEYS> ||
-                                      std::is_same_v<TSystemKey, FILTERKEYS>>>
-void SystemKeysInfo(_In_ UINT action, _In_ TSystemKey &key) noexcept
+template<typename TSystemKey, typename TResult>
+using is_system_key_t =
+    std::enable_if_t<std::disjunction_v<std::is_same<TSystemKey, STICKYKEYS>,
+                                        std::is_same<TSystemKey, TOGGLEKEYS>,
+                                        std::is_same<TSystemKey, FILTERKEYS>>, TResult>;
+
+template <typename TSystemKey>
+is_system_key_t<TSystemKey, void> SystemKeysInfo(_In_ UINT action, _In_ TSystemKey &key) noexcept
 {
   const BOOL is_succeeded{
       ::SystemParametersInfoW(action, sizeof(key), &key, 0)};
