@@ -1157,11 +1157,14 @@ void MySystem(char const *const pCommand,
 size_t AssembleWorkerReplyPackage(
     se::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
     uint64_t nComboOfEntry, MessageBuffer *pBuf) {
-  GLOBAL_DATA_MTX_LOCK();
-  CStaticCombo *pStComboRec =
-      StaticComboFromDict(pEntry->m_szName, nComboOfEntry);
-  StaticComboNodeHash_t *pByteCodeArray = g_ShaderByteCode[pEntry->m_szName];
-  GLOBAL_DATA_MTX_UNLOCK();
+  CStaticCombo *pStComboRec;
+  StaticComboNodeHash_t *pByteCodeArray;
+
+  {
+    GLOBAL_DATA_MTX_LOCK_AUTO;
+    pStComboRec = StaticComboFromDict(pEntry->m_szName, nComboOfEntry);
+    pByteCodeArray = g_ShaderByteCode[pEntry->m_szName];
+  }
 
   size_t nBytesWritten = 0;
 
@@ -1171,8 +1174,7 @@ size_t AssembleWorkerReplyPackage(
 
     pStComboRec->SortDynamicCombos();
     // iterate over all dynamic combos.
-    for (int i = 0; i < pStComboRec->m_DynamicCombos.Count(); i++) {
-      CByteCodeBlock *pCode = pStComboRec->m_DynamicCombos[i];
+    for (auto *pCode : pStComboRec->m_DynamicCombos) {
       // check if we have already output an identical combo
       bool bDup = false;
 #if 0
@@ -1202,17 +1204,16 @@ size_t AssembleWorkerReplyPackage(
   }
 
   // Time to limit amount of prints
-  static float s_fLastInfoTime = 0;
-  float fCurTime = (float)Plat_FloatTime();
+  static double s_fLastInfoTime = 0;
+  double fCurTime = Plat_FloatTime();
 
-  GLOBAL_DATA_MTX_LOCK();
+  GLOBAL_DATA_MTX_LOCK_AUTO;
   if (pStComboRec) pByteCodeArray->DeleteByKey(nComboOfEntry);
   if (fabs(fCurTime - s_fLastInfoTime) > 1.f) {
     Msg("\rCompiling  %s  [ %2llu remaining ] ...         \r", pEntry->m_szName,
         nComboOfEntry);
     s_fLastInfoTime = fCurTime;
   }
-  GLOBAL_DATA_MTX_UNLOCK();
 
   return nBytesWritten;
 }
@@ -1241,9 +1242,8 @@ size_t CopyWorkerReplyPackage(
   }
 
   if (pStComboRec) {
-    GLOBAL_DATA_MTX_LOCK();
+    GLOBAL_DATA_MTX_LOCK_AUTO;
     pByteCodeArray->DeleteByKey(nComboOfEntry);
-    GLOBAL_DATA_MTX_UNLOCK();
   }
 
   return size_t(len);
@@ -1537,21 +1537,19 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
   uint64_t iCommandNumber = Combo_GetCommandNum(hCombo);
 
   if (pResponse->Succeeded()) {
-    GLOBAL_DATA_MTX_LOCK();
+    GLOBAL_DATA_MTX_LOCK_AUTO;
     uint64_t nStComboIdx = iComboIndex / pEntryInfo->m_numDynamicCombos;
     uint64_t nDyComboIdx =
         iComboIndex - (nStComboIdx * pEntryInfo->m_numDynamicCombos);
     StaticComboFromDictAdd(pEntryInfo->m_szName, nStComboIdx)
         ->AddDynamicCombo(nDyComboIdx, pResponse->GetResultBuffer(),
                           pResponse->GetResultBufferLen());
-    GLOBAL_DATA_MTX_UNLOCK();
   }
 
   // Tell the master that this shader failed
   if (!pResponse->Succeeded()) {
-    GLOBAL_DATA_MTX_LOCK();
+    GLOBAL_DATA_MTX_LOCK_AUTO;
     ShaderHadErrorDispatchInt(pEntryInfo->m_szName);
-    GLOBAL_DATA_MTX_UNLOCK();
   }
 
   // Process listing even if the shader succeeds for warnings
@@ -1580,9 +1578,8 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
 
     V_snprintf(msg, errMsg.Length(), "%s\n%s\n", chCommandNumber, szListing);
 
-    GLOBAL_DATA_MTX_LOCK();
+    GLOBAL_DATA_MTX_LOCK_AUTO;
     ErrMsgDispatchInt(msg, pEntryInfo->m_szShaderFileName);
-    GLOBAL_DATA_MTX_UNLOCK();
   }
 
   // Maybe zip things up
@@ -1638,12 +1635,13 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
         AssembleWorkerReplyPackage(pInfoBegin, nComboBegin, &mbPacked);
 
     if (nPackedLength) {
+      uint8 *pCodeBuffer;
+      {
       // Packed buffer
-      GLOBAL_DATA_MTX_LOCK();
-      uint8 *pCodeBuffer =
-          StaticComboFromDictAdd(pInfoBegin->m_szName, nComboBegin)
+        GLOBAL_DATA_MTX_LOCK_AUTO;
+        pCodeBuffer = StaticComboFromDictAdd(pInfoBegin->m_szName, nComboBegin)
               ->AllocPackedCodeBlock(nPackedLength);
-      GLOBAL_DATA_MTX_UNLOCK();
+      }
 
       if (pCodeBuffer) mbPacked.read(pCodeBuffer, nPackedLength);
     }
