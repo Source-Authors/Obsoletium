@@ -34,19 +34,21 @@ BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
       CloseHandle(m_hMemorySection);
       m_hMemorySection = nullptr;
 
-      Assert(0 && "CreateFileMapping - already exists!\n");
+      Error("Unable to create file mapping for '%s'. It is already exists.",
+            chBufferName);
     }
   }
 
   V_sprintf_safe(chBufferName, "%s_mtx", szBaseName);
   m_hMutex = CreateMutex(nullptr, FALSE, chBufferName);
 
-  for (int k = 0; k < 2; ++k) {
-    V_sprintf_safe(chBufferName, "%s_evt%d", szBaseName, k);
+  // Child
+  V_sprintf_safe(chBufferName, "%s_evt0", szBaseName);
+  m_hEvent[0] = CreateEvent(nullptr, FALSE, FALSE, chBufferName);
 
-    m_hEvent[k] = CreateEvent(nullptr, FALSE, (k ? TRUE /* = master */ : FALSE),
-                              chBufferName);
-  }
+  // Master
+  V_sprintf_safe(chBufferName, "%s_evt1", szBaseName);
+  m_hEvent[1] = CreateEvent(nullptr, FALSE, TRUE, chBufferName);
 
   return IsValid();
 }
@@ -73,12 +75,13 @@ BOOL SubProcessKernelObjects::IsValid() const {
 }
 
 void SubProcessKernelObjects::Close() {
-  if (m_hMemorySection) CloseHandle(m_hMemorySection);
+  // In reverse order.
+  for (int k = 0; k < 2; ++k)
+    if (m_hEvent[k]) CloseHandle(m_hEvent[k]);
 
   if (m_hMutex) CloseHandle(m_hMutex);
 
-  for (int k = 0; k < 2; ++k)
-    if (m_hEvent[k]) CloseHandle(m_hEvent[k]);
+  if (m_hMemorySection) CloseHandle(m_hMemorySection);
 }
 
 //
@@ -89,7 +92,7 @@ void *SubProcessKernelObjects_Memory::Lock() {
   // Wait for our turn to act
   for (unsigned iWaitAttempt = 0; iWaitAttempt < 13u; ++iWaitAttempt) {
     DWORD dwWait =
-        ::WaitForSingleObject(m_pObjs->m_hEvent[m_pObjs->m_dwCookie], 10000);
+        ::WaitForSingleObject(m_pObjs->m_hEvent[m_pObjs->m_dwCookie], 10000u);
 
     switch (dwWait) {
       case WAIT_OBJECT_0: {
