@@ -43,7 +43,7 @@ class CachedFileData final {
 
   unsigned char m_data[1];  // file data spans further
 
-  CachedFileData() = default;
+  CachedFileData() : m_numDataBytes{0} { m_chFilename[0] = '\0'; }
 };
 
 class FileCache final {
