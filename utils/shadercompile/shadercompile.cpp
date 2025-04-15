@@ -862,7 +862,7 @@ static void WriteShaderFiles(const char *pShaderName) {
   // we know how much ram we need
   StaticComboHeaders.EnsureCapacity(1 + pByteCodeArray->Count());
 
-  CUtlVector<int> comboIndicesHashedByCRC32[STATIC_COMBO_HASH_SIZE];
+  CUtlVector<intp> comboIndicesHashedByCRC32[STATIC_COMBO_HASH_SIZE];
   CUtlVector<StaticComboAliasRecord_t> duplicateCombos;
 
   // now, lets fill in our combo headers, sort, and write
@@ -982,7 +982,7 @@ static void WriteShaderFiles(const char *pShaderName) {
       exit(1);
     }
 
-    fseek(Handle, nDictionaryOffset, SEEK_SET);
+    _fseeki64(Handle, nDictionaryOffset, SEEK_SET);
 
     // now, rewrite header. data is already byte-swapped appropriately
     for (auto &c : StaticComboHeaders) {
