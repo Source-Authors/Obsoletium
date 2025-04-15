@@ -420,11 +420,11 @@ char *FindNext(char *szString, char *szSearchSet) {
   return bFound ? szNext : (szString + strlen(szString));
 }
 
-char *FindLast(char *szString, char *szSearchSet) {
-  bool bFound = (szString != NULL);
+char *FindLast(_In_z_ char *szString, char *szSearchSet) {
+  bool bFound = true;
   char *szNext = NULL;
 
-  if (szString && szSearchSet) {
+  if (szSearchSet) {
     for (; *szSearchSet; ++szSearchSet) {
       if (char *szTmp = strrchr(szString, *szSearchSet)) {
         szNext = bFound ? (max(szNext, szTmp)) : szTmp;
@@ -728,7 +728,10 @@ void GetVCSFilenames(OUT_Z_ARRAY char (&pszMainOutFileName)[outSize],
   if (_stat(pszMainOutFileName, &buf) == -1) {
     printf("mkdir %s\n", pszMainOutFileName);
     // doh. . need to make the directory that the vcs file is going to go into.
-    _mkdir(pszMainOutFileName);
+    if (_mkdir(pszMainOutFileName) && errno != EEXIST) {
+      Error("Unable to create directory for '%s' to place vcs files: '%s'.\n",
+            pszMainOutFileName, std::generic_category().message(errno).c_str());
+  }
   }
 
   V_strcat(pszMainOutFileName, "\\", outSize);
@@ -742,10 +745,13 @@ void GetVCSFilenames(OUT_Z_ARRAY char (&pszMainOutFileName)[outSize],
     if (!(buf.st_mode & _S_IWRITE)) {
       // It isn't writable. . we'd better change its permissions (or check it
       // out possibly)
-      printf("Warning: making %s writable!\n", pszMainOutFileName);
-      _chmod(pszMainOutFileName, _S_IREAD | _S_IWRITE);
+      fprintf(stderr, "Warning: making %s writable!\n", pszMainOutFileName);
+      if (_chmod(pszMainOutFileName, _S_IREAD | _S_IWRITE)) {
+        Error("Unable to make file '%s' writable: '%s'.\n", pszMainOutFileName,
+              std::generic_category().message(errno).c_str());
     }
   }
+}
 }
 
 // WriteShaderFiles
@@ -833,7 +839,10 @@ static void WriteShaderFiles(const char *pShaderName) {
 
   if (bShaderFailed) {
     DebugOut("Removing failed shader file \"%s\".\n", szVCSfilename);
-    unlink(szVCSfilename);
+    if (unlink(szVCSfilename) && errno != ENOENT) {
+      Warning("Unable to remove failed shader file '%s': %s.\n", szVCSfilename,
+              std::generic_category().message(errno).c_str());
+    }
     return;
   }
 
@@ -1076,9 +1085,7 @@ void DebugSafeWaitPoint(bool bForceWait) {
   static bool s_bDebuggerAttached =
       (CommandLine()->FindParm("-debugwait") == 0);
 
-  if (bForceWait) {
-    s_bDebuggerAttached = false;
-  }
+  if (bForceWait) s_bDebuggerAttached = false;
 
   if (!s_bDebuggerAttached) {
     Msg("Waiting for right Ctrl+Alt+Shift to continue...");
@@ -1106,9 +1113,14 @@ void MySystem(char const *const pCommand,
     return;
   }
 
-  unlink("shader.o");
+  if (unlink("shader.o") && errno != ENOENT) {
+    Warning("Unable to remove failed shader file '%s': %s.\n", "shader.o",
+            std::generic_category().message(errno).c_str());
+  }
 
   FILE *batFp = fopen("temp.bat", "w");
+  if (!batFp) Error("Unable to create writable temp.bat.\n");
+
   fprintf(batFp, "%s\n", pCommand);
   fclose(batFp);
 
@@ -1136,8 +1148,8 @@ void MySystem(char const *const pCommand,
   WaitForSingleObject(pi.hProcess, INFINITE);
 
   // Close process and thread handles.
-  CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
+  CloseHandle(pi.hProcess);
 }
 
 // Assemble a reply package to the master from the compiled bytecode
