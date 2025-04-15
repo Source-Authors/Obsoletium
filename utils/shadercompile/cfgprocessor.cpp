@@ -268,7 +268,7 @@ struct CExprBinary : public IExpression {
   ;
 
 BEGIN_EXPR_BINARY(CExprBinary_And)
-  EVAL { return m_x->Evaluate(pCtx) && m_y->Evaluate(pCtx); }
+  EVAL { return !!m_x->Evaluate(pCtx) && !!m_y->Evaluate(pCtx); }
   PRNT {
     OutputF(stdout, "( ");
     m_x->Print(pCtx);
@@ -280,7 +280,7 @@ BEGIN_EXPR_BINARY(CExprBinary_And)
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_Or)
-  EVAL { return m_x->Evaluate(pCtx) || m_y->Evaluate(pCtx); }
+  EVAL { return !!m_x->Evaluate(pCtx) || !!m_y->Evaluate(pCtx); }
   PRNT {
     OutputF(stdout, "( ");
     m_x->Print(pCtx);
