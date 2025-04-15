@@ -49,7 +49,7 @@ class HLSLCompilerResponse final
  private:
   se::win::com::com_ptr<ID3DBlob> shader_;
   se::win::com::com_ptr<ID3DBlob> listing_;
-  HRESULT hr_;
+  const HRESULT hr_;
 };
 
 HLSLCompilerResponse::HLSLCompilerResponse(
@@ -62,10 +62,10 @@ HLSLCompilerResponse::HLSLCompilerResponse(
 // TODO: Avoid writing "shader.o" and "output.txt" files to avoid extra
 // filesystem access.
 //
-// @param pszFilename		the filename to compile (e.g.
+// @param file_name	filename to compile (e.g.
 // "debugdrawenvmapmask_vs20.fxc")
-// @param pMacros			null-terminated array of macro-defines
-// @param shader_model		shader model for compilation
+// @param macroses null-terminated array of macro-defines
+// @param shader_model shader model for compilation
 static void FastShaderCompile(
     const char *file_name, const D3D_SHADER_MACRO *macroses,
     const char *shader_model,
