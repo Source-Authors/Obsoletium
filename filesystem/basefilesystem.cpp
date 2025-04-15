@@ -4659,15 +4659,6 @@ void CBaseFileSystem::Warning( FileWarningLevel_t level, PRINTF_FORMAT_STRING co
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CBaseFileSystem::COpenedFile::COpenedFile( void )
-{
-	m_pFile = NULL;
-	m_pName = NULL;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 CBaseFileSystem::COpenedFile::~COpenedFile( void )
 {
 	delete[] m_pName;
@@ -4677,18 +4668,11 @@ CBaseFileSystem::COpenedFile::~COpenedFile( void )
 // Purpose: 
 // Input  : src - 
 //-----------------------------------------------------------------------------
-CBaseFileSystem::COpenedFile::COpenedFile( const COpenedFile& src )
-{
+CBaseFileSystem::COpenedFile::COpenedFile( const COpenedFile& src ) : m_pName{nullptr} {
 	m_pFile = src.m_pFile;
 	if ( src.m_pName )
 	{
-		intp len = strlen( src.m_pName ) + 1;
-		m_pName = new char[ len ];
-		Q_strncpy( m_pName, src.m_pName, len );
-	}
-	else
-	{
-		m_pName = NULL;
+		SetName( src.m_pName );
 	}
 }
 
@@ -4709,9 +4693,7 @@ bool CBaseFileSystem::COpenedFile::operator==( const CBaseFileSystem::COpenedFil
 void CBaseFileSystem::COpenedFile::SetName( char const *name )
 {
 	delete[] m_pName;
-	intp len = strlen( name ) + 1;
-	m_pName = new char[ len ];
-	Q_strncpy( m_pName, name, len );
+	m_pName = V_strdup( name );
 }
 
 //-----------------------------------------------------------------------------

@@ -731,10 +731,10 @@ protected:
 	class COpenedFile
 	{
 	public:
-					COpenedFile( void );
-					~COpenedFile( void );
+		COpenedFile() : m_pFile{nullptr}, m_pName{nullptr} {}
+		~COpenedFile();
 
-					COpenedFile( const COpenedFile& src );
+		COpenedFile( const COpenedFile& src );
 
 		bool operator==( const COpenedFile& src ) const;
 
