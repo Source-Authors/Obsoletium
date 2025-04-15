@@ -794,7 +794,7 @@ class ComboHandleImpl : public IEvaluationContext {
   bool AdvanceCommands(uint64_t &riAdvanceMore);
   bool NextNotSkipped(uint64_t iTotalCommand);
   bool IsSkipped() { return (m_pEntry->m_pExpr->Evaluate(this) != 0); }
-  void FormatCommand(OUT_Z_CAP(buffer_size) char *pchBuffer, intp bufferSize);
+  void FormatCommand(OUT_Z_CAP(bufferSize) char *pchBuffer, intp bufferSize);
 };
 
 QuickMap<uint64_t, ComboHandleImpl> s_mapComboCommands;
