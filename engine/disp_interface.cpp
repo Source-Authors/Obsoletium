@@ -760,8 +760,8 @@ void DispInfo_BatchDecals( CDispInfo **pVisibleDisps, int nVisibleDisps )
 			intp iPool = g_aDispDecalSortPool.Alloc( true );
 			g_aDispDecalSortPool[iPool] = decal.m_pDecal;
 			
-			int iSortTree = decal.m_pDecal->m_iSortTree;
-			int iSortMaterial = decal.m_pDecal->m_iSortMaterial;
+			intp iSortTree = decal.m_pDecal->m_iSortTree;
+			intp iSortMaterial = decal.m_pDecal->m_iSortMaterial;
 
 			DecalMaterialBucket_t &materialBucket = g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iSortMaterial );
 			if ( materialBucket.m_nCheckCount == g_nDispDecalSortCheckCount )

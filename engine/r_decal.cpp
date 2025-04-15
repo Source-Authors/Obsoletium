@@ -949,7 +949,7 @@ static void R_DecalNodeSurfaces( mnode_t* node, decalinfo_t *decalinfo )
 
 		R_DecalSurface( surfID, decalinfo, false );
 	}
-}						 
+}
 
 
 void R_DecalLeaf( mleaf_t *pLeaf, decalinfo_t *decalinfo )
@@ -1598,7 +1598,7 @@ static void R_DecalMaterialSort( decal_t *pDecal, SurfaceHandle_t surfID )
 	}
 
 	// Get an index for the current sort tree.
-	int iSortTree = g_aDecalFormats[iFormat].m_iSortTree;
+	const intp iSortTree = g_aDecalFormats[iFormat].m_iSortTree;
 	int iTreeType = -1;
 
 	// Lightmapped.
@@ -2360,9 +2360,9 @@ void R_DrawDecalsAll_GatherDecals( IMatRenderContext *pRenderContext, int iGroup
 					continue;
 
 				DrawDecals.AddToTail( pDecal );
-			}			
+			}
 		}
-	}	
+	}
 }
 
 void R_DecalsGetMaxMesh( IMatRenderContext *pRenderContext, int &nDecalSortMaxVerts, int &nDecalSortMaxIndices )
