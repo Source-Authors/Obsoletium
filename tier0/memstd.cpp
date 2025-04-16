@@ -83,17 +83,6 @@ static constexpr size_t RoundUpToPage( size_t nSize )
 	return nSize;
 }
 
-// Convenience function to deal with the necessary type-casting
-static void InterlockedAddSizeT( size_t volatile *Addend, size_t Value )
-{
-#ifdef PLATFORM_WINDOWS_PC32
-	COMPILE_TIME_ASSERT( sizeof( size_t ) == sizeof( int32 ) );
-	InterlockedExchangeAdd( ( LONG* )Addend, LONG( Value ) );
-#else
-	InterlockedExchangeAdd64( ( LONGLONG* )Addend, LONGLONG( Value ) );
-#endif
-}
-
 class CHeapMemAlloc final : public IMemAlloc
 {
 public:
@@ -139,10 +128,10 @@ public:
 		void* pMem = HeapAlloc( m_heap, m_HeapFlags, nSize );
 		if ( pMem )
 		{
-			InterlockedAddSizeT( &m_nOutstandingBytes, nSize );
-			InterlockedAddSizeT( &m_nOutstandingPageHeapBytes, RoundUpToPage( nSize ) );
-			InterlockedIncrement( &m_nOutstandingAllocations );
-			InterlockedIncrement( &m_nLifetimeAllocations );
+			m_nOutstandingBytes.fetch_add( nSize, std::memory_order::memory_order_relaxed );
+			m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ), std::memory_order::memory_order_relaxed );
+			m_nOutstandingAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
+			m_nLifetimeAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
 		}
 		else if ( nSize )
 		{
@@ -150,7 +139,7 @@ public:
 			// then lead to crashes. In order to avoid confusion about the cause of
 			// these crashes, halt immediately on allocation failures.
 			__debugbreak();
-			InterlockedIncrement( &m_nAllocFailures );
+			m_nAllocFailures.fetch_add( 1, std::memory_order::memory_order_relaxed );
 		}
 
 		return pMem;
@@ -177,12 +166,20 @@ public:
 			// change.
 			if ( pNewMem )
 			{
-				InterlockedAddSizeT( &m_nOutstandingBytes, nSize - nOldSize );
-				InterlockedAddSizeT( &m_nOutstandingPageHeapBytes,  RoundUpToPage( nSize ) );
-				InterlockedAddSizeT( &m_nOutstandingPageHeapBytes, 0 - RoundUpToPage( nOldSize ) );
+				if ( nSize >= nOldSize )
+				{
+					m_nOutstandingBytes.fetch_add( nSize - nOldSize, std::memory_order::memory_order_relaxed );
+					m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ) - RoundUpToPage( nOldSize ), std::memory_order::memory_order_relaxed );
+				}
+				else
+				{
+					m_nOutstandingBytes.fetch_sub( nOldSize - nSize, std::memory_order::memory_order_relaxed );
+					m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ) - RoundUpToPage( nSize ), std::memory_order::memory_order_relaxed );
+				}
+
 				// Outstanding allocation count isn't affected by Realloc, but
 				// lifetime allocation count is.
-				InterlockedIncrement( &m_nLifetimeAllocations );
+				m_nLifetimeAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
 			}
 			else
 			{
@@ -190,8 +187,9 @@ public:
 				// then lead to crashes. In order to avoid confusion about the cause of
 				// these crashes, halt immediately on allocation failures.
 				__debugbreak();
-				InterlockedIncrement( &m_nAllocFailures );
+				m_nAllocFailures.fetch_add( 1, std::memory_order::memory_order_relaxed );
 			}
+
 			return pNewMem;
 		}
 
@@ -203,10 +201,10 @@ public:
 	{
 		if ( pMem )
 		{
-			size_t nOldSize = HeapSize( m_heap, 0, pMem );
-			InterlockedAddSizeT( &m_nOutstandingBytes, 0 - nOldSize );
-			InterlockedAddSizeT( &m_nOutstandingPageHeapBytes, 0 - RoundUpToPage( nOldSize ) );
-			InterlockedDecrement( &m_nOutstandingAllocations );
+			const size_t nOldSize = HeapSize( m_heap, 0, pMem );
+			m_nOutstandingBytes.fetch_sub( nOldSize, std::memory_order::memory_order_relaxed );
+			m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ), std::memory_order::memory_order_relaxed );
+			m_nOutstandingAllocations.fetch_sub( 1, std::memory_order::memory_order_relaxed );
 			HeapFree( m_heap, 0, pMem );
 		}
 	}
@@ -260,21 +258,25 @@ public:
 
 		Msg( "Sorry -- no stats saved to file memstats.txt when the heap allocator is enabled.\n" );
 		// Print requested memory.
-		Msg( "%u MiB allocated.\n", ( unsigned )( m_nOutstandingBytes / MiB ) );
+		Msg( "%zu MiB allocated.\n", m_nOutstandingBytes / MiB );
 		// Print memory after rounding up to pages.
-		Msg( "%u MiB assuming maximum PageHeap overhead.\n", ( unsigned )( m_nOutstandingPageHeapBytes / MiB ));
-		// Print memory after adding in reserved page after every allocation. Do 64-bit calculations
+		Msg( "%zu MiB assuming maximum PageHeap overhead.\n", m_nOutstandingPageHeapBytes / MiB );
+		// Print memory after adding in reserved page after every allocation.  Do 64-bit calculations
 		// because the pageHeap required memory can easily go over 4 GiB.
-		__int64 pageHeapBytes = m_nOutstandingPageHeapBytes + m_nOutstandingAllocations * 4096LL;
-		Msg( "%u MiB address space used assuming maximum PageHeap overhead.\n", ( unsigned )( pageHeapBytes / MiB ));
-		Msg( "%u outstanding allocations (%d delta).\n", ( unsigned )m_nOutstandingAllocations, ( int )( m_nOutstandingAllocations - m_nOldOutstandingAllocations ) );
-		Msg( "%u lifetime allocations (%u delta).\n", ( unsigned )m_nLifetimeAllocations, ( unsigned )( m_nLifetimeAllocations - m_nOldLifetimeAllocations ) );
-		Msg( "%u allocation failures.\n", ( unsigned )m_nAllocFailures );
+		const size_t pageHeapBytes = m_nOutstandingPageHeapBytes + m_nOutstandingAllocations * 4096;
+		Msg( "%zu MiB address space used assuming maximum PageHeap overhead.\n", pageHeapBytes / MiB );
+		Msg( "%zu outstanding allocations (%zd delta).\n",
+			m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed),
+			(ptrdiff_t)m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed) - (ptrdiff_t)m_nOldOutstandingAllocations );
+		Msg( "%zu lifetime allocations (%u delta).\n",
+			m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed),
+			(ptrdiff_t)m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed) - (ptrdiff_t)m_nOldLifetimeAllocations );
+		Msg( "%zu allocation failures.\n", m_nAllocFailures.load(std::memory_order::memory_order_relaxed) );
 
 		// Update the numbers on outstanding and lifetime allocation counts so
 		// that we can print out deltas.
-		m_nOldOutstandingAllocations = m_nOutstandingAllocations;
-		m_nOldLifetimeAllocations = m_nLifetimeAllocations;
+		m_nOldOutstandingAllocations = m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed);
+		m_nOldLifetimeAllocations = m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed);
 	}
 	virtual void DumpStatsFileBase( char const *pchFileBase ) {}
 	virtual size_t ComputeMemoryUsedBy( char const *pchSubStr ) { return 0; }
@@ -315,24 +317,24 @@ private:
 	uint32 m_HeapFlags;
 
 	// Total outstanding bytes allocated.
-	volatile size_t m_nOutstandingBytes;
+	std::atomic_size_t m_nOutstandingBytes;
 
 	// Total outstanding committed bytes assuming that all allocations are
 	// put on individual 4-KiB pages (true when using full PageHeap from
 	// App Verifier).
-	volatile size_t m_nOutstandingPageHeapBytes;
+	std::atomic_size_t m_nOutstandingPageHeapBytes;
 
 	// Total outstanding allocations. With PageHeap enabled each allocation
 	// requires an extra 4-KiB page of address space.
-	volatile LONG m_nOutstandingAllocations;
-	LONG m_nOldOutstandingAllocations;
+	std::atomic_size_t m_nOutstandingAllocations;
+	std::size_t m_nOldOutstandingAllocations;
 
 	// Total allocations without subtracting freed memory.
-	volatile LONG m_nLifetimeAllocations;
-	LONG m_nOldLifetimeAllocations;
+	std::atomic_size_t m_nLifetimeAllocations;
+	std::size_t m_nOldLifetimeAllocations;
 
 	// Total number of allocation failures.
-	volatile LONG m_nAllocFailures;
+	std::atomic_size_t m_nAllocFailures;
 };
 
 #endif //ALLOW_PROCESS_HEAP
