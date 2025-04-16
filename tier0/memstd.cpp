@@ -1046,392 +1046,11 @@ CSmallBlockPool *CSmallBlockHeap::FindPool( void *p )
 	return &m_Pools[i];
 }
 
-
-#endif
-
-#if USE_PHYSICAL_SMALL_BLOCK_HEAP
-
-CX360SmallBlockPool *CX360SmallBlockPool::gm_AddressToPool[BYTES_X360_SBH/PAGESIZE_X360_SBH];
-byte *CX360SmallBlockPool::gm_pPhysicalBlock;
-byte *CX360SmallBlockPool::gm_pPhysicalBase;
-byte *CX360SmallBlockPool::gm_pPhysicalLimit;
-
-void CX360SmallBlockPool::Init( unsigned nBlockSize )
+const CSmallBlockPool *CSmallBlockHeap::FindPool( void *p ) const
 {
-	if ( !gm_pPhysicalBlock )
-	{
-		gm_pPhysicalBase = (byte *)XPhysicalAlloc( BYTES_X360_SBH, MAXULONG_PTR, 4096, PAGE_READWRITE | MEM_16MB_PAGES );
-		gm_pPhysicalLimit = gm_pPhysicalBase + BYTES_X360_SBH;
-		gm_pPhysicalBlock = gm_pPhysicalBase;
-	}
-
-	if ( !( nBlockSize % MIN_SBH_ALIGN == 0 && nBlockSize >= MIN_SBH_BLOCK && nBlockSize >= sizeof(TSLNodeBase_t) ) )
-		DebuggerBreak();
-
-	m_nBlockSize = nBlockSize;
-	m_pCurBlockEnd = m_pNextAlloc = NULL;
-	m_CommittedSize = 0;
+	size_t i = ((byte *)p - m_pBase) / MAX_POOL_REGION;
+	return &m_Pools[i];
 }
-
-size_t CX360SmallBlockPool::GetBlockSize()
-		{
-	return m_nBlockSize;
-}
-
-bool CX360SmallBlockPool::IsOwner( void *p )
-			{
-	return ( FindPool( p ) == this );
-			}
-
-void *CX360SmallBlockPool::Alloc()
-{
-	void *pResult = m_FreeList.Pop();
-	if ( !pResult )
-	{
-		if ( !m_pNextAlloc && gm_pPhysicalBlock >= gm_pPhysicalLimit )
-		{
-			return NULL;
-		}
-
-		int nBlockSize = m_nBlockSize;
-		byte *pCurBlockEnd;
-		byte *pNextAlloc;
-		for (;;)
-		{
-			pCurBlockEnd = m_pCurBlockEnd;
-			pNextAlloc = m_pNextAlloc;
-			if ( pNextAlloc + nBlockSize <= pCurBlockEnd )
-			{
-				if ( m_pNextAlloc.AssignIf( pNextAlloc, pNextAlloc + m_nBlockSize ) )
-				{
-					pResult = pNextAlloc;
-					break;
-		}
-	}
-	else
-	{
-				AUTO_LOCK( m_CommitMutex );
-
-				if ( pCurBlockEnd == m_pCurBlockEnd )
-				{
-					for (;;)
-					{
-						if ( gm_pPhysicalBlock >= gm_pPhysicalLimit )
-						{
-							m_pCurBlockEnd = m_pNextAlloc = NULL;
-							return NULL;
-						}
-						byte *pPhysicalBlock = gm_pPhysicalBlock;
-						if ( ThreadInterlockedAssignPointerIf( (void **)&gm_pPhysicalBlock, (void *)(pPhysicalBlock + PAGESIZE_X360_SBH), (void *)pPhysicalBlock ) )
-		{
-							int index = (size_t)((byte *)pPhysicalBlock - gm_pPhysicalBase) / PAGESIZE_X360_SBH;
-							gm_AddressToPool[index] = this;
-							m_pNextAlloc = pPhysicalBlock;
-							m_CommittedSize += PAGESIZE_X360_SBH;
-							__sync();
-							m_pCurBlockEnd = pPhysicalBlock + PAGESIZE_X360_SBH;
-							break;
-						}
-					}
-		}
-	}
-}
-	}
-	return pResult;
-}
-
-void CX360SmallBlockPool::Free( void *p )
-{
-	Assert( IsOwner( p ) );
-
-	m_FreeList.Push( p );
-}
-
-// Count the free blocks.  
-int CX360SmallBlockPool::CountFreeBlocks()
-{
-	return m_FreeList.Count();
-}
-
-// Size of committed memory managed by this heap:
-int CX360SmallBlockPool::GetCommittedSize()
-{
-	return m_CommittedSize;
-}
-
-// Return the total blocks memory is committed for in the heap
-int CX360SmallBlockPool::CountCommittedBlocks()
-{
-	return  GetCommittedSize() / GetBlockSize();
-}
-
-// Count the number of allocated blocks in the heap:
-int CX360SmallBlockPool::CountAllocatedBlocks()
-{
-	int nBytesPossible = ( m_pNextAlloc ) ? ( m_pCurBlockEnd - (byte *)m_pNextAlloc ) : 0;
-	return CountCommittedBlocks( ) - ( CountFreeBlocks( ) + nBytesPossible / GetBlockSize() );
-}
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-#define GetInitialCommitForPool( i ) 0
-
-CX360SmallBlockHeap::CX360SmallBlockHeap()
-{
-	if ( !UsingSBH() )
-{
-		return;
-	}
-
-	// Build a lookup table used to find the correct pool based on size
-	const int MAX_TABLE = MAX_SBH_BLOCK >> 2;
-	int i = 0;
-	int nBytesElement = 0;
-	CX360SmallBlockPool *pCurPool = NULL;
-	int iCurPool = 0;
-
-	// Blocks sized 0 - 128 are in pools in increments of 8
-	for ( ; i < 32; i++ )
-{
-		if ( (i + 1) % 2 == 1)
-	{
-			nBytesElement += 8;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-		}
-		else
-		{
-			m_PoolLookup[i] = pCurPool;
-	}
-}
-
-	// Blocks sized 129 - 256 are in pools in increments of 16
-	for ( ; i < 64; i++ )
-{
-		if ( (i + 1) % 4 == 1)
-	{
-			nBytesElement += 16;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-		}
-		else
-		{
-			m_PoolLookup[i] = pCurPool;
-	}
-}
-
-
-	// Blocks sized 257 - 512 are in pools in increments of 32
-	for ( ; i < 128; i++ )
-{
-		if ( (i + 1) % 8 == 1)
-	{
-			nBytesElement += 32;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-	}
-	else
-	{
-			m_PoolLookup[i] = pCurPool;
-		}
-	}
-
-	// Blocks sized 513 - 768 are in pools in increments of 64
-	for ( ; i < 192; i++ )
-	{
-		if ( (i + 1) % 16 == 1)
-	{
-			nBytesElement += 64;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-	}
-	else
-	{
-			m_PoolLookup[i] = pCurPool;
-	}
-}
-
-	// Blocks sized 769 - 1024 are in pools in increments of 128
-	for ( ; i < 256; i++ )
-{
-		if ( (i + 1) % 32 == 1)
-	{
-			nBytesElement += 128;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-	}
-		else
-	{
-			m_PoolLookup[i] = pCurPool;
-	}
-	}
-
-	// Blocks sized 1025 - 2048 are in pools in increments of 256
-	for ( ; i < MAX_TABLE; i++ )
-	{
-		if ( (i + 1) % 64 == 1)
-		{
-			nBytesElement += 256;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-		}
-		else
-			{
-			m_PoolLookup[i] = pCurPool;
-			}
-		}
-
-	Assert( iCurPool == NUM_POOLS );
-	}
-
-bool CX360SmallBlockHeap::ShouldUse( size_t nBytes )
-{
-	return ( UsingSBH() && nBytes <= MAX_SBH_BLOCK );
-}
-
-bool CX360SmallBlockHeap::IsOwner( void * p )
-{
-	int index = (size_t)((byte *)p - CX360SmallBlockPool::gm_pPhysicalBase) / PAGESIZE_X360_SBH;
-	return ( UsingSBH() && ( index >= 0 && index < ssize(CX360SmallBlockPool::gm_AddressToPool) ) );
-	}
-
-void *CX360SmallBlockHeap::Alloc( size_t nBytes )
-{
-	if ( nBytes == 0)
-	{
-		nBytes = 1;
-	}
-	Assert( ShouldUse( nBytes ) );
-	CX360SmallBlockPool *pPool = FindPool( nBytes );
-
-	void *p = pPool->Alloc();
-	if ( p )
-	{
-		return p;
-	}
-
-	return GetStandardSBH()->Alloc( nBytes );
-}
-
-void *CX360SmallBlockHeap::Realloc( void *p, size_t nBytes )
-{
-	if ( nBytes == 0)
-	{
-		nBytes = 1;
-	}
-
-	CX360SmallBlockPool *pOldPool = FindPool( p );
-	CX360SmallBlockPool *pNewPool = ( ShouldUse( nBytes ) ) ? FindPool( nBytes ) : NULL;
-
-	if ( pOldPool == pNewPool )
-	{
-		return p;
-	}
-
-	void *pNewBlock = NULL;
-
-	if ( pNewPool )
-	{
-		pNewBlock = pNewPool->Alloc();
-
-		if ( !pNewBlock )
-	{
-			pNewBlock = GetStandardSBH()->Alloc( nBytes );
-		}
-	}
-
-	if ( !pNewBlock )
-	{
-		pNewBlock = malloc( nBytes );
-		}
-
-	if ( pNewBlock )
-	{
-		int nBytesCopy = min( nBytes, pOldPool->GetBlockSize() );
-		memcpy( pNewBlock, p, nBytesCopy );
-	}
-
-	pOldPool->Free( p );
-
-	return pNewBlock;
-}
-
-void CX360SmallBlockHeap::Free( void *p )
-{
-	CX360SmallBlockPool *pPool = FindPool( p );
-	pPool->Free( p );
-	}
-
-size_t CX360SmallBlockHeap::GetSize( void *p )
-{
-	CX360SmallBlockPool *pPool = FindPool( p );
-	return pPool->GetBlockSize();
-}
-
-void CX360SmallBlockHeap::DumpStats( FILE *pFile )
-{
-	bool bSpew = true;
-
-	if ( pFile )
-	{
-		for( int i = 0; i < NUM_POOLS; i++ )
-	{
-			// output for vxconsole parsing
-			fprintf( pFile, "Pool %i: Size: %u Allocated: %i Free: %i Committed: %i CommittedSize: %i\n", 
-				i, 
-				m_Pools[i].GetBlockSize(), 
-				m_Pools[i].CountAllocatedBlocks(), 
-				m_Pools[i].CountFreeBlocks(),
-				m_Pools[i].CountCommittedBlocks(), 
-				m_Pools[i].GetCommittedSize() );
-	}
-		bSpew = false;
-}
-
-	if ( bSpew )
-{
-		unsigned bytesCommitted = 0;
-		unsigned bytesAllocated = 0;
-
-		for( int i = 0; i < NUM_POOLS; i++ )
-	{
-		
-			bytesCommitted += m_Pools[i].GetCommittedSize();
-			bytesAllocated += ( m_Pools[i].CountAllocatedBlocks() * m_Pools[i].GetBlockSize() );
-		}
-
-		Msg( "Totals: Committed:%u KiB Allocated:%u KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
-	}
-}
-
-CSmallBlockHeap *CX360SmallBlockHeap::GetStandardSBH()
-{
-	return &(GET_OUTER( CStdMemAlloc, m_LargePageSmallBlockHeap )->m_SmallBlockHeap);
-}
-
-CX360SmallBlockPool *CX360SmallBlockHeap::FindPool( size_t nBytes )
-	{
-	return m_PoolLookup[(nBytes - 1) >> 2];
-	}
-
-CX360SmallBlockPool *CX360SmallBlockHeap::FindPool( void *p )
-	{
-	return CX360SmallBlockPool::FindPool( p );
-	}
-
 
 #endif
 
@@ -1446,15 +1065,6 @@ void *CStdMemAlloc::Alloc( size_t nSize )
 	void *pMem;
 
 #ifdef _WIN32
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	if ( m_LargePageSmallBlockHeap.ShouldUse( nSize ) )
-		{
-		pMem = m_LargePageSmallBlockHeap.Alloc( nSize );
-			ApplyMemoryInitializations( pMem, nSize );
-			return pMem;
-		}
-#endif
-
 	if ( m_SmallBlockHeap.ShouldUse( nSize ) )
 	{
 		pMem = m_SmallBlockHeap.Alloc( nSize );
@@ -1494,13 +1104,6 @@ void *CStdMemAlloc::Realloc( void *pMem, size_t nSize )
 	PROFILE_ALLOC(Realloc);
 
 #ifdef MEM_SBH_ENABLED
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	if ( m_LargePageSmallBlockHeap.IsOwner( pMem ) )
-	{
-		return m_LargePageSmallBlockHeap.Realloc( pMem, nSize );
-	}
-#endif
-
 	if ( m_SmallBlockHeap.IsOwner( pMem ) )
 	{
 		return m_SmallBlockHeap.Realloc( pMem, nSize );
@@ -1532,14 +1135,6 @@ void CStdMemAlloc::Free( void *pMem )
 	PROFILE_ALLOC(Free);
 
 #ifdef MEM_SBH_ENABLED
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	if ( m_LargePageSmallBlockHeap.IsOwner( pMem ) )
-	{
-		m_LargePageSmallBlockHeap.Free( pMem );
-		return;
-	}
-#endif
-
 	if ( m_SmallBlockHeap.IsOwner( pMem ) )
 	{
 		m_SmallBlockHeap.Free( pMem );
@@ -1598,12 +1193,6 @@ size_t CStdMemAlloc::GetSize( void *pMem )
 		return CalcHeapUsed();
 	else
 	{
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-		if ( m_LargePageSmallBlockHeap.IsOwner( pMem ) )
-		{
-			return m_LargePageSmallBlockHeap.GetSize( pMem );
-		}
-#endif
 		if ( m_SmallBlockHeap.IsOwner( pMem ) )
 		{
 			return m_SmallBlockHeap.GetSize( pMem );
@@ -1702,18 +1291,16 @@ void CStdMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	_snprintf( filename, std::size( filename ) - 1, "%s.txt", pchFileBase );
 	filename[ std::size( filename ) - 1 ] = '\0';
 	FILE *pFile = fopen( filename, "wt" );
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	fprintf( pFile, "X360 Large Page SBH:\n" );
-	m_LargePageSmallBlockHeap.DumpStats(pFile);
-#endif
-	fprintf( pFile, "\nSBH:\n" );
-	m_SmallBlockHeap.DumpStats(pFile);	// Dump statistics to small block heap
-
-#if defined( _X360 ) && !defined( _RETAIL )
-	XBX_rMemDump( filename );
-#endif
-
+	if (pFile)
+	{
+		fprintf( pFile, "\nSBH:\n" );
+		m_SmallBlockHeap.DumpStats(pFile);	// Dump statistics to small block heap
 		fclose( pFile );
+	}
+	else
+	{
+		Warning( "Unable to open '%s' to dump small block heap stats.", filename );
+	}
 #endif
 }
 
