@@ -730,7 +730,7 @@ void GetVCSFilenames(OUT_Z_ARRAY char (&pszMainOutFileName)[outSize],
     if (_mkdir(pszMainOutFileName) && errno != EEXIST) {
       Error("Unable to create directory for '%s' to place vcs files: '%s'.\n",
             pszMainOutFileName, std::generic_category().message(errno).c_str());
-  }
+    }
   }
 
   V_strcat(pszMainOutFileName, "\\", outSize);
@@ -748,9 +748,9 @@ void GetVCSFilenames(OUT_Z_ARRAY char (&pszMainOutFileName)[outSize],
       if (_chmod(pszMainOutFileName, _S_IREAD | _S_IWRITE)) {
         Error("Unable to make file '%s' writable: '%s'.\n", pszMainOutFileName,
               std::generic_category().message(errno).c_str());
+      }
     }
   }
-}
 }
 
 // WriteShaderFiles
@@ -1104,17 +1104,19 @@ void DebugSafeWaitPoint(bool bForceWait) {
 }
 
 // same as "system", but doesn't pop up a window
-void MySystem(char const *const pCommand,
-              se::shader_compile::command_sink::IResponse **ppResponse) {
+static std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
+    char const *const pCommand) {
   // Trap the command in se::shader_compile::fxc_intercept
-  if (se::shader_compile::fxc_intercept::TryExecuteCommand(pCommand,
-                                                           ppResponse)) {
+  if (auto response =
+          se::shader_compile::fxc_intercept::TryExecuteCommand(pCommand)) {
     SwitchToThread();
-    return;
+    return response;
   }
 
-  if (unlink("shader.o") && errno != ENOENT) {
-    Warning("Unable to remove failed shader file '%s': %s.\n", "shader.o",
+  if (unlink(se::shader_compile::fxc_intercept::kShaderArtefactOutputName) &&
+      errno != ENOENT) {
+    Warning("Unable to remove failed shader file '%s': %s.\n",
+            se::shader_compile::fxc_intercept::kShaderArtefactOutputName,
             std::generic_category().message(errno).c_str());
   }
 
@@ -1150,6 +1152,10 @@ void MySystem(char const *const pCommand,
   // Close process and thread handles.
   CloseHandle(pi.hThread);
   CloseHandle(pi.hProcess);
+
+  return std::make_unique<se::shader_compile::command_sink::CResponseFiles>(
+      se::shader_compile::fxc_intercept::kShaderArtefactOutputName,
+      kShaderCompilerOutputName);
 }
 
 // Assemble a reply package to the master from the compiled bytecode
@@ -1286,7 +1292,7 @@ class CWorkerAccumState
       se::shader_compile::shader_combo_processor::ComboHandle hCombo);
   void HandleCommandResponse(
       se::shader_compile::shader_combo_processor::ComboHandle hCombo,
-      se::shader_compile::command_sink::IResponse *pResponse);
+      std::unique_ptr<se::shader_compile::command_sink::IResponse> pResponse);
 
  public:
   using ThisParallelProcessorBase_t::Run;
@@ -1483,19 +1489,22 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
     // when our subprocess dies and to recover we will
     // attempt to restart on another worker.
     if (!pvMemory)
-      // ::RaiseException( GetLastError(), EXCEPTION_NONCONTINUABLE, 0, NULL );
+    // ::RaiseException( GetLastError(), EXCEPTION_NONCONTINUABLE, 0, NULL );
     {
       Error("Unable to lock shared memory for combo 0x%p", hCombo);
       ExitProcess(1);
     }
 
-    se::shader_compile::command_sink::IResponse *pResponse;
-    if (pvMemory)
-      pResponse = new CSubProcessResponse(pvMemory);
-    else
-      pResponse = new se::shader_compile::command_sink::CResponseError;
+    {
+      se::shader_compile::command_sink::IResponse *res =
+          pvMemory ? static_cast<se::shader_compile::command_sink::IResponse *>(
+                         new CSubProcessResponse(pvMemory))
+                   : new se::shader_compile::command_sink::CResponseError();
+      std::unique_ptr<se::shader_compile::command_sink::IResponse> pResponse{
+          res};
 
-    HandleCommandResponse(hCombo, pResponse);
+      HandleCommandResponse(hCombo, std::move(pResponse));
+    }
 
     shrmem.Unlock();
   }
@@ -1504,32 +1513,23 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
 template <typename TMutexType>
 void CWorkerAccumState<TMutexType>::ExecuteCompileCommand(
     se::shader_compile::shader_combo_processor::ComboHandle hCombo) {
-  se::shader_compile::command_sink::IResponse *pResponse = NULL;
+  char chBuffer[4096] = {};
+  Combo_FormatCommand(hCombo, chBuffer);
 
-  {
-    char chBuffer[4096] = {};
-    Combo_FormatCommand(hCombo, chBuffer);
+  DebugOut("running: \"%s\"\n", chBuffer);
 
-    DebugOut("running: \"%s\"\n", chBuffer);
+  auto response = MySystem(chBuffer);
 
-    MySystem(chBuffer, &pResponse);
-  }
-
-  HandleCommandResponse(hCombo, pResponse);
+  HandleCommandResponse(hCombo, std::move(response));
 }
 
 template <typename TMutexType>
 void CWorkerAccumState<TMutexType>::HandleCommandResponse(
     se::shader_compile::shader_combo_processor::ComboHandle hCombo,
-    se::shader_compile::command_sink::IResponse *pResponse) {
+    std::unique_ptr<se::shader_compile::command_sink::IResponse> pResponse) {
   const bool should_use_vmpi{CommandLine()->FindParm("-nompi") == 0};
   // dimhotepus: Do not handle socket errors if no vmpi.
   if (should_use_vmpi) VMPI_HandleSocketErrors();
-
-  if (!pResponse) {
-    pResponse = new se::shader_compile::command_sink::CResponseFiles(
-        "shader.o", "output.txt");
-  }
 
   // Command info
   se::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntryInfo =
@@ -1563,8 +1563,8 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
     if (!szListing) {
       V_sprintf_safe(
           chUnreportedListing,
-              "(0): error 0000: Compiler failed without error description, "
-              "latest version of fxc.exe might give a description.");
+          "(0): error 0000: Compiler failed without error description, "
+          "latest version of fxc.exe might give a description.");
       szListing = chUnreportedListing;
     }
 
@@ -1638,10 +1638,10 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
     if (nPackedLength) {
       uint8 *pCodeBuffer;
       {
-      // Packed buffer
+        // Packed buffer
         GLOBAL_DATA_MTX_LOCK_AUTO;
         pCodeBuffer = StaticComboFromDictAdd(pInfoBegin->m_szName, nComboBegin)
-              ->AllocPackedCodeBlock(nPackedLength);
+                          ->AllocPackedCodeBlock(nPackedLength);
       }
 
       if (pCodeBuffer) mbPacked.read(pCodeBuffer, nPackedLength);

@@ -106,24 +106,18 @@ HLSLCompilerResponse::HLSLCompilerResponse(
 
 // Perform a fast shader file compilation.
 //
-// TODO: Avoid writing "shader.o" and "output.txt" files to avoid extra
-// filesystem access.
-//
 // @param file_name	filename to compile (e.g.
 // "debugdrawenvmapmask_vs20.fxc")
 // @param macroses null-terminated array of macro-defines
 // @param shader_model shader model for compilation
-static void FastShaderCompile(
-    const char *file_name, const D3D_SHADER_MACRO *macroses,
-    const char *shader_model,
-    se::shader_compile::command_sink::IResponse **response) {
-  if (!response) return;
-
+static std::unique_ptr<se::shader_compile::command_sink::IResponse>
+FastShaderCompile(const char *file_name, const D3D_SHADER_MACRO *macroses,
+                  const char *shader_model) {
   // DxProxyModule.
   static se::dx_proxy::DxProxyModule d3dProxyModule;
 
   constexpr unsigned kCommonFlags{
-      D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS  // |
+      /* D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS  // |
                                                                      // Gfa
       /* D3DCOMPILE_AVOID_FLOW_CONTROL */};
 
@@ -148,8 +142,8 @@ static void FastShaderCompile(
                                                "main", shader_model, flags1, 0,
                                                &shader, &errors)};
 
-  *response =
-      new HLSLCompilerResponse(std::move(shader), std::move(errors), hr);
+  return std::make_unique<HLSLCompilerResponse>(std::move(shader),
+                                                std::move(errors), hr);
 }
 
 };  // namespace
@@ -162,8 +156,8 @@ static void FastShaderCompile(
 // /DNUMDYNAMICCOMBOS=4 /DFLAGS=0x0 /DNUM_BONES=1 /Dmain=main /Emain /Tvs_2_0
 // /DSHADER_MODEL_VS_2_0=1 /nologo /Foshader.o
 // debugdrawenvmapmask_vs20.fxc>output.txt 2>&1"
-void ExecuteCommand(const char *in_command,
-                    se::shader_compile::command_sink::IResponse **response) {
+static std::unique_ptr<se::shader_compile::command_sink::IResponse>
+ExecuteCommand(const char *in_command) {
   // Expect that the command passed is exactly "fxc.exe"
   Assert(!strncmp(in_command, kFxcCommand, kFxcCommandSize));
 
@@ -236,7 +230,8 @@ void ExecuteCommand(const char *in_command,
   // Determine the file name (at the end of the command line before
   // redirection).
   char const *file_name = "";
-  if (const char *redirect_command{strstr(in_command, ">output.txt ")}) {
+  if (const char *redirect_command{
+          strstr(in_command, ">" kShaderCompilerOutputName " ")}) {
     size_t offset = redirect_command - in_command;
 
     editable_command[offset] = '\0';
@@ -249,11 +244,11 @@ void ExecuteCommand(const char *in_command,
   }
 
   // Compile the stuff.
-  FastShaderCompile(file_name, macros.Base(), out_shader_model, response);
+  return FastShaderCompile(file_name, macros.Base(), out_shader_model);
 }
 
-bool TryExecuteCommand(const char *command,
-                       se::shader_compile::command_sink::IResponse **response) {
+std::unique_ptr<se::shader_compile::command_sink::IResponse> TryExecuteCommand(
+    const char *command) {
   static int dummy{(Msg("[shadercompile] Using new faster Vitaliy's "
                         "implementation.\n"),
                     1)};
@@ -263,10 +258,10 @@ bool TryExecuteCommand(const char *command,
                          se::shader_compile::fxc_intercept::kFxcCommandSize)};
   if (ok) {
     // Trap "fxc.exe" so that we did not spawn extra process every time
-    se::shader_compile::fxc_intercept::ExecuteCommand(command, response);
+    return se::shader_compile::fxc_intercept::ExecuteCommand(command);
   }
 
-  return ok;
+  return nullptr;
 }
 
 };  // namespace se::shader_compile::fxc_intercept

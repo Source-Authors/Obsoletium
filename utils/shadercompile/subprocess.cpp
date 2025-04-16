@@ -25,9 +25,8 @@ BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
   char chBufferName[0x100] = {0};
   V_sprintf_safe(chBufferName, "%s_msec", szBaseName);
 
-  m_hMemorySection =
-      CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
-                        Size(), chBufferName);
+  m_hMemorySection = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr,
+                                       PAGE_READWRITE, 0, Size(), chBufferName);
   if (nullptr != m_hMemorySection) {
     if (ERROR_ALREADY_EXISTS == GetLastError()) {
       CloseHandle(m_hMemorySection);
@@ -225,9 +224,9 @@ int ShaderCompile_Subprocess_Main(char const *subprocess_data) {
       return 0;
     }
 
-    se::shader_compile::command_sink::IResponse *response{nullptr};
-    if (se::shader_compile::fxc_intercept::TryExecuteCommand(command,
-                                                             &response)) {
+    std::unique_ptr<se::shader_compile::command_sink::IResponse> response{
+        se::shader_compile::fxc_intercept::TryExecuteCommand(command)};
+    if (response) {
       byte *bytes = static_cast<byte *>(mem);
 
       // Result
@@ -254,8 +253,6 @@ int ShaderCompile_Subprocess_Main(char const *subprocess_data) {
       } else {
         *(bytes++) = 0;
       }
-
-      response->Release();
     } else {
       ZeroMemory(mem, 4 * sizeof(DWORD));
     }
