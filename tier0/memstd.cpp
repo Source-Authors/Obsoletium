@@ -1463,18 +1463,29 @@ void *CStdMemAlloc::Alloc( size_t nSize )
 	if ( m_SmallBlockHeap.ShouldUse( nSize ) )
 	{
 		pMem = m_SmallBlockHeap.Alloc( nSize );
-	ApplyMemoryInitializations( pMem, nSize );
-	return pMem;
-}
+		ApplyMemoryInitializations( pMem, nSize );
 
+		// dimhotepus: Fallback to common allocator if pool has no empty blocks.
+		if ( pMem )
+			return pMem;
+	}
 #endif
 
 	pMem = malloc( nSize );
 	ApplyMemoryInitializations( pMem, nSize );
+	if ( !pMem )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+
+		pMem = malloc( nSize );
+		ApplyMemoryInitializations( pMem, nSize );
 		if ( !pMem )
 		{
 			SetCRTAllocFailed( nSize );
 		}
+	}
+
 	return pMem;
 }
 
@@ -1502,10 +1513,17 @@ void *CStdMemAlloc::Realloc( void *pMem, size_t nSize )
 #endif
 
 	void *pRet = realloc( pMem, nSize );
+	if ( !pRet )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+
+		pRet = realloc( pMem, nSize );
 		if ( !pRet )
 		{
 			SetCRTAllocFailed( nSize );
 		}
+	}
 	return pRet;
 }
 
@@ -1744,8 +1762,8 @@ void CStdMemAlloc::CompactHeap()
 {
 #if !defined( NO_SBH ) && defined( _WIN32 )
 	intp nBytesRecovered = m_SmallBlockHeap.Compact();
-	Msg( "Compact freed %zd bytes.\n", nBytesRecovered );
-
+	Msg( "Compact heap freed %zd  bytes from small block heap.\n", nBytesRecovered );
+	
 	// dimhotepus: Cleanup caches and decommit if possible.
 	// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
 	// in the process with a low-fragmentation heap (LFH) will have their caches
@@ -1755,8 +1773,14 @@ void CStdMemAlloc::CompactHeap()
 	// https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation
 	HEAP_OPTIMIZE_RESOURCES_INFORMATION information{
 		HEAP_OPTIMIZE_RESOURCES_CURRENT_VERSION, 0U};
-	::HeapSetInformation(
+	const BOOL ok = ::HeapSetInformation(
 		nullptr, HeapOptimizeResources, &information, sizeof(information));
+
+	// dimhotepus: Last attempt to allow app allocate smth later.
+	const size_t largestFreeBytes = HeapCompact( ::GetProcessHeap(), 0 );
+	
+	Msg( "Compacted heap. Largest free block is %zu bytes, optimize heap %s.\n",
+		largestFreeBytes, ok ? "OK" : "FAIL" );
 #endif
 }
 

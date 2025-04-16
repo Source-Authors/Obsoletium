@@ -537,8 +537,6 @@ public:
 	void CompactHeap() override
 	{
 #if defined( _DEBUG )
-		HeapCompact( GetProcessHeap(), 0 );
-
 		// dimhotepus: Cleanup caches and decommit if possible.
 		// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
 		// in the process with a low-fragmentation heap (LFH) will have their caches
@@ -548,8 +546,13 @@ public:
 		// https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation
 		HEAP_OPTIMIZE_RESOURCES_INFORMATION information{
 		    HEAP_OPTIMIZE_RESOURCES_CURRENT_VERSION, 0U};
-		::HeapSetInformation(
+		const BOOL ok = ::HeapSetInformation(
 		    nullptr, HeapOptimizeResources, &information, sizeof(information));
+
+		const size_t largestFreeBytes = ::HeapCompact( ::GetProcessHeap(), 0 );
+
+		Msg( "Compacted heap. Largest free block is %zu bytes, optimize heap %s.\n",
+			largestFreeBytes, ok ? "OK" : "FAIL" );
 #endif
 	}
 
@@ -1211,6 +1214,13 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 
 	m_Timer.Start();
 	void *pMem = InternalMalloc( nSize, pFileName, nLine );
+	if ( !pMem )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+		
+		void *pMem = InternalMalloc( nSize, pFileName, nLine );
+	}
 	m_Timer.End();
 
 	if ( pMem )
@@ -1243,6 +1253,13 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, in
 
 	m_Timer.Start();
 	pMem = InternalRealloc( pMem, nSize, pFileName, nLine );
+	if ( !pMem )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+
+		pMem = InternalRealloc( pMem, nSize, pFileName, nLine );
+	}
 	m_Timer.End();
 
 	if ( pMem )
