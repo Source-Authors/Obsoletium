@@ -1305,35 +1305,9 @@ void CStdMemAlloc::GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory 
 	if ( !pUsedMemory || !pFreeMemory )
 		return;
 
-#if defined ( _X360 )
-
-	// GlobalMemoryStatus tells us how much physical memory is free
-	MEMORYSTATUS stat;
-	::GlobalMemoryStatus( &stat );
-	*pFreeMemory = stat.dwAvailPhys;
-
-	// NOTE: we do not count free memory inside our small block heaps, as this could be misleading
-	//       (even with lots of SBH memory free, a single allocation over 2kb can still fail)
-
-#if defined( USE_DLMALLOC )
-	// Account for free memory contained within DLMalloc
-	for ( int i = 0; i < ssize( g_AllocRegions ); i++ )
-	{
-		mallinfo info = mspace_mallinfo( g_AllocRegions[ i ] );
-		*pFreeMemory += info.fordblks;
-	}
-#endif
-
-	// Used is total minus free (discount the 32MB system reservation)
-	*pUsedMemory = ( stat.dwTotalPhys - 32*1024*1024 ) - *pFreeMemory;
-
-#else
-
 	// no data
 	*pFreeMemory = 0;
 	*pUsedMemory = 0;
-
-#endif
 }
 
 void CStdMemAlloc::CompactHeap()
