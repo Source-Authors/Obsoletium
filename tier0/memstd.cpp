@@ -76,7 +76,7 @@ void PrintAllocTimes()
 
 // Round a size up to a multiple of 4 KiB to aid in calculating how much
 // memory is required if full pageheap is enabled.
-static size_t RoundUpToPage( size_t nSize )
+static constexpr size_t RoundUpToPage( size_t nSize )
 {
 	nSize += 0xFFF;
 	nSize &= ~0xFFF;
@@ -120,20 +120,22 @@ public:
 		{
 			OutputDebugStringA("PageHeap is off. Memory use will be normal.\n" );
 		}
-		if( bZeroMemory )
+
+		if ( bZeroMemory )
 		{
 			OutputDebugStringA( "  HEAP_ZERO_MEMORY is specified.\n" );
 		}
 	}
 
 	// Release versions
-	virtual void *Alloc( size_t nSize )
+	void *Alloc( size_t nSize ) override
 	{
 		// Ensure that the constructor has run already. Poorly defined
 		// order of construction can result in the allocator being used
 		// before it is constructed. Which could be bad.
 		if ( !m_heap )
 			__debugbreak();
+
 		void* pMem = HeapAlloc( m_heap, m_HeapFlags, nSize );
 		if ( pMem )
 		{
@@ -153,7 +155,8 @@ public:
 
 		return pMem;
 	}
-	virtual void *Realloc( void *pMem, size_t nSize )
+
+	void *Realloc( void *pMem, size_t nSize ) override
 	{
 		// If you pass zero to HeapReAlloc then it fails (with GetLastError() saying S_OK!)
 		// so only call HeapReAlloc if pMem is non-zero.
@@ -165,6 +168,7 @@ public:
 				Free( pMem );
 				return 0;
 			}
+
 			size_t nOldSize = HeapSize( m_heap, 0, pMem );
 			void* pNewMem = HeapReAlloc( m_heap, m_HeapFlags, pMem, nSize );
 
@@ -194,7 +198,8 @@ public:
 		// Call the regular alloc function.
 		return Alloc( nSize );
 	}
-	virtual void  Free( void *pMem )
+
+	void Free( void *pMem ) override
 	{
 		if ( pMem )
 		{
@@ -205,21 +210,21 @@ public:
 			HeapFree( m_heap, 0, pMem );
 		}
 	}
-	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize ) { return 0; }
+	void *Expand_NoLongerSupported( void *pMem, size_t nSize ) override { return nullptr; }
 
 	// Debug versions
-	virtual void *Alloc( size_t nSize, const char *pFileName, int nLine ) { return Alloc( nSize ); }
-	virtual void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine ) { return Realloc(pMem, nSize); }
-	virtual void  Free( void *pMem, const char *pFileName, int nLine ) { Free( pMem ); }
-	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine ) { return 0; }
+	void *Alloc( size_t nSize, const char *pFileName, int nLine ) override { return Alloc( nSize ); }
+	void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine ) override { return Realloc(pMem, nSize); }
+	void  Free( void *pMem, const char *pFileName, int nLine ) override { Free( pMem ); }
+	void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine ) override { return nullptr; }
 
 #ifdef MEMALLOC_SUPPORTS_ALIGNED_ALLOCATIONS
 	// Not currently implemented
 #error "Please define your platform"
 #endif
 
-	virtual void *RegionAlloc( int region, size_t nSize ) { __debugbreak(); return 0; }
-	virtual void *RegionAlloc( int region, size_t nSize, const char *pFileName, int nLine ) { __debugbreak(); return 0; }
+	virtual void *RegionAlloc( int region, size_t nSize ) { __debugbreak(); return nullptr; }
+	virtual void *RegionAlloc( int region, size_t nSize, const char *pFileName, int nLine ) { __debugbreak(); return nullptr; }
 
 	// Returns size of a particular allocation
 	// If zero is returned then return the total size of allocated memory.
@@ -251,7 +256,8 @@ public:
 
 	virtual void DumpStats()
 	{
-		const size_t MiB = 1024 * 1024;
+		constexpr size_t MiB = 1024u * 1024;
+
 		Msg( "Sorry -- no stats saved to file memstats.txt when the heap allocator is enabled.\n" );
 		// Print requested memory.
 		Msg( "%u MiB allocated.\n", ( unsigned )( m_nOutstandingBytes / MiB ) );
@@ -373,7 +379,7 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 
 	// First we get the application's name so we can look in the registry
 	// for App Verifier settings.
-	HMODULE exeHandle = GetModuleHandle( 0 );
+	HMODULE exeHandle = GetModuleHandle( nullptr );
 	if ( exeHandle )
 	{
 		char appName[ MAX_PATH ];
@@ -430,7 +436,7 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 
 // Check for various allocator overrides such as -processheap and -reservelowmem.
 // Returns true if -processheap is enabled, by a command line switch or other method.
-bool CheckWindowsAllocSettings( const char* upperCommandLine )
+static bool CheckWindowsAllocSettings( const char* upperCommandLine )
 {
 	// Are we doing ETW heap profiling?
 	bool bETWHeapEnabled = false;
@@ -494,7 +500,7 @@ class CInitGlobalMemAllocPtr
 public:
 	CInitGlobalMemAllocPtr()
 	{
-		char *pStr = (char*)Plat_GetCommandLineA();
+		const char *pStr = Plat_GetCommandLineA();
 		if ( pStr )
 		{
 			char tempStr[512];
@@ -504,6 +510,7 @@ public:
 
 			CheckWindowsAllocSettings( tempStr );
 		}
+
 #if defined(FORCE_PROCESS_HEAP)
 		// This may cause EnableHeapMemAlloc to be called twice, but that's okay.
 		EnableHeapMemAlloc( false );
@@ -739,7 +746,7 @@ CSmallBlockHeap::CSmallBlockHeap()
 	m_pLimit = m_pBase + NUM_POOLS * MAX_POOL_REGION;
 
 	// Build a lookup table used to find the correct pool based on size
-	const int MAX_TABLE = MAX_SBH_BLOCK >> 2;
+	constexpr int MAX_TABLE = MAX_SBH_BLOCK >> 2;
 	int i = 0;
 	int nBytesElement = 0;
 	byte *pCurBase = m_pBase;
@@ -1544,9 +1551,9 @@ void CStdMemAlloc::Free( void *pMem )
 }
 
 void *CStdMemAlloc::Expand_NoLongerSupported( void *pMem, size_t nSize )
-		{
-			return NULL;
-		}
+{
+	return NULL;
+}
 
 
 //-----------------------------------------------------------------------------
@@ -1669,7 +1676,7 @@ void* CStdMemAlloc::CrtSetReportHook( void* pfnNewHook )
 }
 
 int CStdMemAlloc::CrtDbgReport( int nRptType, const char * szFile,
-		int nLine, const char * szModule, const char * pMsg )
+	int nLine, const char * szModule, const char * pMsg )
 {
 	return 0;
 }
