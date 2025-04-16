@@ -158,7 +158,7 @@ private:
 		m_bWaitingForSendCompletion = false;
 		m_nBytesToReceive = -1;
 		m_bWaitingForSize = false;
-		m_bErrorSignal = false;
+		m_bErrorSignal.store(false, std::memory_order::memory_order_relaxed);
 		m_pRecvBuffer = NULL;
 	}
 
@@ -667,7 +667,7 @@ private:
 	// This checks to see if either thread has signaled an error. If so, it shuts down the socket and returns true.
 	bool CheckErrorSignal() const
 	{
-		return m_bErrorSignal;
+		return m_bErrorSignal.load(std::memory_order_seq_cst);
 	}
 
 	// This is called from any of the threads and signals that something went awry. It shuts down the object
@@ -689,7 +689,7 @@ private:
 		m_hExitThreadsEvent.SetEvent();
 		
 		// Notify the main thread so it can call Term() when it gets a chance.
-		m_bErrorSignal = true;
+		m_bErrorSignal.store(true, std::memory_order::memory_order_acq_rel);
 	}
 
 
@@ -728,8 +728,8 @@ private:
 		CTCPPacket *m_pRecvBuffer;		// This is allocated for each packet we're receiving and given to the
 										// app when the packet is done being received.
 
-	
-	volatile bool m_bErrorSignal;
+	// dimhotepus: volatile bool -> atomic_bool
+	std::atomic_bool m_bErrorSignal;
 
 	
 	CEvent m_hExitThreadsEvent;
