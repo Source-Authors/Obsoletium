@@ -796,8 +796,9 @@ static void WriteShaderFiles(const char *pShaderName) {
     Msg("\b%c", chProgress[(++iProgressSymbol) % 4]);
   } else {
     char chShaderName[33];
-    Q_snprintf(chShaderName, 29, "%s...", pShaderName);
-    sprintf(chShaderName + sizeof(chShaderName) - 5, "...");
+    // dimhotepus: Truncate here, so no V_strcpy_safe.
+    V_strncpy(chShaderName, pShaderName, sizeof(chShaderName));
+    V_strncpy(chShaderName + sizeof(chShaderName) - 4, "...", 4);
 
     Msg("\r%s %s   \r", szShaderFileOperation, chShaderName);
   }
