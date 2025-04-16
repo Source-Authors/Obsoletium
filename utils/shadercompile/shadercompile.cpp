@@ -1466,7 +1466,8 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
     void *pvMemory = shrmem.Lock();
     Assert(pvMemory);
 
-    Combo_FormatCommand(hCombo, (char *)pvMemory);
+    Combo_FormatCommand(hCombo, (char *)pvMemory,
+                        SubProcessKernelObjects::Size());
 
     shrmem.Unlock();
   }

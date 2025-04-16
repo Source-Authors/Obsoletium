@@ -25,10 +25,9 @@ BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
   char chBufferName[0x100] = {0};
   V_sprintf_safe(chBufferName, "%s_msec", szBaseName);
 
-  // 4Mb for a piece
   m_hMemorySection =
       CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
-                        4 * 1024 * 1024, chBufferName);
+                        Size(), chBufferName);
   if (nullptr != m_hMemorySection) {
     if (ERROR_ALREADY_EXISTS == GetLastError()) {
       CloseHandle(m_hMemorySection);
