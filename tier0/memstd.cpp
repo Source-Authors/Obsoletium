@@ -538,14 +538,6 @@ static bool g_UsingSBH = true;
 
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-template <typename T>
-inline T MemAlign( T val, size_t alignment )
-{
-	return (T)( ( (size_t)val + alignment - 1 ) & ~( alignment - 1 ) );
-}
-//-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
 
@@ -560,7 +552,7 @@ void CSmallBlockPool::Init( unsigned nBlockSize, byte *pBase, unsigned initialCo
 
 	if ( initialCommit )
 	{
-		initialCommit = MemAlign( initialCommit, SBH_PAGE_SIZE );
+		initialCommit = AlignValue( initialCommit, SBH_PAGE_SIZE );
 		if ( !VirtualAlloc( m_pCommitLimit, initialCommit, VA_COMMIT_FLAGS, PAGE_READWRITE ) )
 		{
 			Assert( 0 );
@@ -699,7 +691,7 @@ int CSmallBlockPool::Compact()
 
 		if ( pOldNextAlloc != m_pNextAlloc )
 		{
-			byte *pNewCommitLimit = MemAlign( (byte *)m_pNextAlloc, SBH_PAGE_SIZE );
+			byte *pNewCommitLimit = AlignValue( (byte *)m_pNextAlloc, SBH_PAGE_SIZE );
 			if ( pNewCommitLimit < m_pCommitLimit )
 		{
 				nBytesFreed = m_pCommitLimit - pNewCommitLimit;
