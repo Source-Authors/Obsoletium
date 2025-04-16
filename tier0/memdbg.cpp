@@ -538,6 +538,18 @@ public:
 	{
 #if defined( _DEBUG )
 		HeapCompact( GetProcessHeap(), 0 );
+
+		// dimhotepus: Cleanup caches and decommit if possible.
+		// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
+		// in the process with a low-fragmentation heap (LFH) will have their caches
+		// optimized, and the memory will be decommitted if possible.
+		//
+		// See
+		// https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation
+		HEAP_OPTIMIZE_RESOURCES_INFORMATION information{
+		    HEAP_OPTIMIZE_RESOURCES_CURRENT_VERSION, 0U};
+		::HeapSetInformation(
+		    nullptr, HeapOptimizeResources, &information, sizeof(information));
 #endif
 	}
 

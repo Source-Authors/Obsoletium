@@ -301,7 +301,7 @@ public:
 
 	virtual void OutOfMemory( size_t nBytesAttempted = 0 ) {}
 
-	virtual void CompactHeap() {}
+	void CompactHeap() override {}
 	virtual void CompactIncremental() {}
 
 	virtual MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler ) { return 0; }
@@ -1743,8 +1743,20 @@ void CStdMemAlloc::GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory 
 void CStdMemAlloc::CompactHeap()
 {
 #if !defined( NO_SBH ) && defined( _WIN32 )
-	int nBytesRecovered = m_SmallBlockHeap.Compact();
-	Msg( "Compact freed %d bytes\n", nBytesRecovered );
+	intp nBytesRecovered = m_SmallBlockHeap.Compact();
+	Msg( "Compact freed %zd bytes.\n", nBytesRecovered );
+
+	// dimhotepus: Cleanup caches and decommit if possible.
+	// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
+	// in the process with a low-fragmentation heap (LFH) will have their caches
+	// optimized, and the memory will be decommitted if possible.
+	//
+	// See
+	// https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation
+	HEAP_OPTIMIZE_RESOURCES_INFORMATION information{
+		HEAP_OPTIMIZE_RESOURCES_CURRENT_VERSION, 0U};
+	::HeapSetInformation(
+		nullptr, HeapOptimizeResources, &information, sizeof(information));
 #endif
 }
 
