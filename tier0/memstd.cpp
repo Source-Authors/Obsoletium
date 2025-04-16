@@ -457,15 +457,17 @@ static bool CheckWindowsAllocSettings( const char* upperCommandLine )
 	// We don't really care whether this allocation succeeds, but it's
 	// worth trying. Note that we do this in all cases -- whether we are using
 	// -processheap or not.
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 0xFFEEFFEE->0xFFEEFFEEFFEEFFEE
+	VirtualAlloc( (void*)0xFFEEFFEEFFEEFFEE, 1, MEM_RESERVE, PAGE_NOACCESS );
+#else
 	VirtualAlloc( (void*)0xFFEEFFEE, 1, MEM_RESERVE, PAGE_NOACCESS );
+#endif
 
 	// Enable application termination (breakpoint) on heap corruption. This is
 	// better than trying to patch it up and continue, both from a security and
 	// a bug-finding point of view. Do this always on Windows since the heap is
 	// used by video drivers and other in-proc components.
-	//HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
-	// The HeapEnableTerminationOnCorruption requires a recent platform SDK,
-	// so fake it up.
 #if defined(PLATFORM_WINDOWS_PC)
 	HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
 #endif
