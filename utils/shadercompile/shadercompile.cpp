@@ -2168,7 +2168,7 @@ void SetupDebugFile() {
                  pComputerName);
   g_WorkerDebugFp = fopen(filename, "w");
   Assert(g_WorkerDebugFp);
-  DebugOut("opened debug file\n");
+  DebugOut("opened debug file '%s'.\n", filename);
 #endif
 }
 
