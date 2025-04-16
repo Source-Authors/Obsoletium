@@ -56,9 +56,8 @@ static inline uint32 uint64_as_uint32(uint64_t x) {
   return uint32(x);
 }
 
-static inline UtlSymId_t int_as_symid(int x) {
-  Assert((sizeof(UtlSymId_t) >= sizeof(int)) ||
-         (x >= 0 && x < (int)(unsigned int)(UtlSymId_t(~0))));
+static constexpr inline UtlSymId_t ushort_as_symid(unsigned short x) {
+  static_assert(std::is_same_v<decltype(x), UtlSymId_t>);
   return UtlSymId_t(x);
 }
 
@@ -1896,7 +1895,7 @@ void Worker_ProcessWorkUnitFn(int iThread, uint64_t iWorkUnit,
   for (unsigned short k = 0, kEnd = g_Master_ShaderHadError.GetNumStrings();
        k < kEnd; ++k) {
     char const *szShaderName = g_Master_ShaderHadError.String(k);
-    if (!g_Master_ShaderHadError[int_as_symid(k)]) continue;
+    if (!g_Master_ShaderHadError[ushort_as_symid(k)]) continue;
 
     intp const len = V_strlen(szShaderName);
 
@@ -1913,7 +1912,7 @@ void Worker_ProcessWorkUnitFn(int iThread, uint64_t iWorkUnit,
   for (unsigned short k = 0, kEnd = g_Master_CompilerMsgInfo.GetNumStrings();
        k < kEnd; ++k) {
     char const *const szMsg = g_Master_CompilerMsgInfo.String(k);
-    CompilerMsgInfo const &cmi = g_Master_CompilerMsgInfo[int_as_symid(k)];
+    CompilerMsgInfo const &cmi = g_Master_CompilerMsgInfo[ushort_as_symid(k)];
 
     char const *const szFirstCmd = cmi.GetFirstCommand();
     int const numReported = cmi.GetNumTimesReported();
@@ -2552,7 +2551,7 @@ int ShaderCompile_Main(int argc, char *argv[]) {
     for (unsigned short k = 0, kEnd = g_Master_CompilerMsgInfo.GetNumStrings();
          k < kEnd; ++k) {
       char const *const szMsg = g_Master_CompilerMsgInfo.String(k);
-      CompilerMsgInfo const &cmi = g_Master_CompilerMsgInfo[int_as_symid(k)];
+      CompilerMsgInfo const &cmi = g_Master_CompilerMsgInfo[ushort_as_symid(k)];
 
       char const *const szFirstCmd = cmi.GetFirstCommand();
       int const numReported = cmi.GetNumTimesReported();
@@ -2622,7 +2621,7 @@ int ShaderCompile_Main(int argc, char *argv[]) {
     for (unsigned short k = 0, kEnd = g_Master_ShaderHadError.GetNumStrings();
          k < kEnd; ++k) {
       const char *shader_name = g_Master_ShaderHadError.String(k);
-      if (!g_Master_ShaderHadError[int_as_symid(k)]) continue;
+      if (!g_Master_ShaderHadError[ushort_as_symid(k)]) continue;
 
       Msg("FAILED:    %s\n", shader_name);
     }
