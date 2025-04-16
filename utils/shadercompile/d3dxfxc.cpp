@@ -10,6 +10,7 @@
 #include "dx_proxy/dx_proxy.h"
 
 #include <d3dcompiler.h>
+#include <comdef.h>
 #include "com_ptr.h"
 
 #include "tier0/icommandline.h"
@@ -22,6 +23,45 @@ static constexpr inline const char kFxcCommand[]{"fxc.exe "};
 static constexpr size_t kFxcCommandSize{std::size(kFxcCommand) - 1};
 
 namespace {
+
+// dimhotepus: Allow to report non DirectX compiler errors in blobs.
+class ErrorD3DBlob final : public ID3DBlob {
+ public:
+  explicit ErrorD3DBlob(std::string &&error) noexcept
+      : m_error{std::move(error)}, m_ref_counter{1} {}
+  ~ErrorD3DBlob() noexcept = default;
+
+  // IUnknown
+  STDMETHODIMP QueryInterface(REFIID iid, LPVOID *ppv) override {
+    if (!ppv) return E_POINTER;
+
+    if (IsEqualGUID(iid, __uuidof(ID3DBlob))) {
+      auto *blob = static_cast<ID3DBlob *>(this);
+      blob->AddRef();
+      *ppv = blob;
+      return S_OK;
+    }
+
+    return E_NOINTERFACE;
+  }
+  STDMETHODIMP_(ULONG) AddRef() override {
+    return m_ref_counter.fetch_add(1, std::memory_order::memory_order_relaxed);
+  }
+  STDMETHODIMP_(ULONG) Release() override {
+    const ULONG rc =
+        m_ref_counter.fetch_sub(1, std::memory_order::memory_order_acq_rel);
+    if (rc == 0) delete this;
+    return rc;
+  }
+
+  // ID3DBlob
+  STDMETHODIMP_(LPVOID) GetBufferPointer() override { return m_error.data(); }
+  STDMETHODIMP_(SIZE_T) GetBufferSize() override { return m_error.length(); }
+
+ private:
+  std::string m_error;
+  std::atomic_ulong m_ref_counter;
+};
 
 class HLSLCompilerResponse final
     : public se::shader_compile::command_sink::IResponse {
@@ -55,7 +95,14 @@ class HLSLCompilerResponse final
 HLSLCompilerResponse::HLSLCompilerResponse(
     se::win::com::com_ptr<ID3DBlob> shader,
     se::win::com::com_ptr<ID3DBlob> errors, HRESULT hr)
-    : shader_(std::move(shader)), listing_(std::move(errors)), hr_(hr) {}
+    : shader_(std::move(shader)), listing_(std::move(errors)), hr_(hr) {
+  // dimhotepus: Report error if no errors blob.
+  if (!listing_ && FAILED(hr)) {
+    auto err = _com_error{hr};
+    auto msg = std::string{err.ErrorMessage()};
+    listing_.Attach(new ErrorD3DBlob{std::move(msg)});
+  }
+}
 
 // Perform a fast shader file compilation.
 //
