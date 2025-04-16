@@ -2057,7 +2057,8 @@ void Worker_GetLocalCopyOfBinary(const char *pFilename) {
   if (!fp) {
     AssertMsg(false, "Unable to open '%s' for read", tmpFilename);
     fprintf(stderr, "Can't open %s!\n", pFilename);
-    exit(-1);
+    // dimhotepus: -1 -> ENOENT.
+    exit(ENOENT);
   }
   fseek(fp, 0, SEEK_END);
   int fileLen = ftell(fp);
