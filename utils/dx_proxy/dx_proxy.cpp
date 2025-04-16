@@ -310,8 +310,11 @@ SRC_DX_PROXY_API HRESULT WINAPI Proxy_D3DCompileFromFile(
   // The current HLSL shader D3DCompile* functions don't support legacy 1.x
   // pixel shaders.  The last version of HLSL to support these targets was D3DX9
   // in the October 2006 release of the DirectX SDK.
-  if (IsTargetEqual(pTarget, "ps_1_1") || IsTargetEqual(pTarget, "ps_1_2") ||
-      IsTargetEqual(pTarget, "ps_1_3") || IsTargetEqual(pTarget, "ps_1_4")) {
+  if (!IsTargetEqual(pTarget, "ps_1_1") && !IsTargetEqual(pTarget, "ps_1_2") ||
+      !IsTargetEqual(pTarget, "ps_1_3") && !IsTargetEqual(pTarget, "ps_1_4")) {
+    hr = D3DCompile(data, numBytes, pFileName, pDefines, include, pEntrypoint,
+                    pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
+  } else {
     static_assert(sizeof(*pDefines) == sizeof(D3DXMACRO),
                   "Ensure D3D_SHADER_MACRO and D3DXMACRO are same size.");
     static_assert(alignof(decltype(pDefines)) == alignof(D3DXMACRO),
@@ -339,14 +342,11 @@ SRC_DX_PROXY_API HRESULT WINAPI Proxy_D3DCompileFromFile(
 
       if (ppErrorMsgs) *ppErrorMsgs = nullptr;
     }
-  } else {
-#else
-  {
-#endif  // defined(DX9_V00_PC) || defined(DX9_V30_PC)
-
-    hr = D3DCompile(data, numBytes, pFileName, pDefines, include, pEntrypoint,
-                    pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
   }
+#else
+  hr = D3DCompile(data, numBytes, pFileName, pDefines, include, pEntrypoint,
+                  pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
+#endif  // defined(DX9_V00_PC) || defined(DX9_V30_PC)
 
   // Close the file
   include->Close(data);
