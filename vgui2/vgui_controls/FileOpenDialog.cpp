@@ -1339,7 +1339,7 @@ void FileOpenDialog::ChooseExtension( OUT_Z_CAP(nBufLen) char *pExt, intp nBufLe
 {
 	// dimhotepus: Always zero-terminate.
 	if ( nBufLen > 0 )
-	pExt[0] = 0;
+		pExt[0] = 0;
 
 	KeyValues *combokv = m_pFileTypeCombo->GetActiveItemUserData();
 	if ( !combokv )
