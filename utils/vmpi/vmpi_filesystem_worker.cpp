@@ -643,7 +643,7 @@ void CWorkerVMPIFileSystem::CreateVirtualFile(const char *pFilename,
 }
 
 time_t CWorkerVMPIFileSystem::GetFileTime(const char *pFileName,
-                                        const char *pathID) {
+                                          const char *pathID) {
   Error("GetFileTime not supported in VMPI worker filesystem.");
   return 0;
 }

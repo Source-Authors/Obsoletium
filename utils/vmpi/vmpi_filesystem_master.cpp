@@ -494,10 +494,12 @@ class CMasterMulticastThread {
   // Events used to communicate with our thread.
   HANDLE m_hTermEvent;
 
+  // dimhotepus: volatile int -> atomic_int
   // The thread walks through this as it spews chunks of data.
-  volatile int m_iCurFile;  // Index into m_Files.
-  volatile int
-      m_iCurActiveChunk;  // Current index into CMulticastFile::m_ActiveChunks.
+  std::atomic_int m_iCurFile;  // Index into m_Files.
+  // dimhotepus: volatile int -> atomic_int
+  // // Current index into CMulticastFile::m_ActiveChunks.
+  std::atomic_int m_iCurActiveChunk;
 
   CUtlLinkedList<char *, int> m_WarningSuppressions;
 };
