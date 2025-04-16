@@ -278,7 +278,7 @@ public:
 	void AddSubkeyUsingKnownLastChild( KeyValues *pSubKey, KeyValues *pLastChild );
 
 private:
-	KeyValues( KeyValues& );	// prevent copy constructor being used
+	KeyValues( KeyValues& ) = delete;  // prevent copy constructor being used
 
 	// prevent delete being called except through deleteThis()
 	~KeyValues();
@@ -321,9 +321,6 @@ private:
 	void Init();
 	const char * ReadToken( CUtlBuffer &buf, bool &wasQuoted, bool &wasConditional );
 	void WriteIndents( IBaseFileSystem *filesystem, FileHandle_t f, CUtlBuffer *pBuf, int indentLevel );
-
-	void FreeAllocatedValue();
-	void AllocateValueBlock(int size);
 
 	HKeySymbol m_iKeyName;	// keyname is a symbol defined in KeyValuesSystem
 
