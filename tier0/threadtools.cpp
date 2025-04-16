@@ -408,11 +408,11 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 #endif
 
 #ifdef _WIN32
-	if ( Plat_IsInDebugSession() )
+	// dimhotepus: Always set thread debug name, not just for debug session.
 	{
 		HANDLE handle = OpenThread( STANDARD_RIGHTS_READ | THREAD_SET_INFORMATION,
 			FALSE,
-			id != -1 ? id : GetThreadId( GetCurrentThread() ) );
+			id != std::numeric_limits<ThreadId_t>::max() ? id : GetThreadId( GetCurrentThread() ) );
 		if ( handle )
 		{
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
@@ -423,35 +423,34 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 			Assert( wcharsNeeded == wcharsConverted );
 			description[descriptionSize / sizeof(wchar_t) - 1] = L'\0';
 
-			SetThreadDescription( handle, description );
+			::SetThreadDescription( handle, description );
 
-			CloseHandle( handle );
+			::CloseHandle( handle );
 		}
 	}
 #elif defined( _LINUX )
 	// As of glibc v2.12, we can use pthread_setname_np.
-	typedef int (pthread_setname_np_func)(pthread_t, const char *);
-	static pthread_setname_np_func *s_pthread_setname_np_func = (pthread_setname_np_func *)dlsym(RTLD_DEFAULT, "pthread_setname_np");
-
-	if ( s_pthread_setname_np_func )
-	{
-		if ( id == (ThreadId_t)-1 )
+	if ( id == std::numeric_limits<ThreadId_t>::max() )
 			id = pthread_self();
 
-		/* 
-			pthread_setname_np() in phthread_setname.c has the following code:
-		
-			#define TASK_COMM_LEN 16
-			  size_t name_len = strlen (name);
-			  if (name_len >= TASK_COMM_LEN)
-				return ERANGE;
-		
-			So we need to truncate the threadname to 16 or the call will just fail.
-		*/
+	// The thread name is a meaningful C language string, whose length is
+	// restricted to 16 characters, including the terminating null byte ('\0').
 		char szThreadName[ 16 ];
 		strncpy( szThreadName, pszName, std::size( szThreadName ) );
 		szThreadName[ std::size( szThreadName ) - 1 ] = 0;
-		(*s_pthread_setname_np_func)( id, szThreadName );
+
+	pthread_setname_np( id, szThreadName );
+#elif defined( OSX )
+	// dimhotepus: MacOS only supports set name for current thread.
+	if ( id == ThreadGetCurrentId() || id == std::numeric_limits<ThreadId_t>::max() )
+	{
+		// The thread name is a meaningful C language string, whose length is
+		// restricted to 64 characters, including the terminating null byte ('\0').
+		char szThreadName[ 64 ];
+		strncpy( szThreadName, pszName, std::size( szThreadName ) );
+		szThreadName[ std::size( szThreadName ) - 1 ] = 0;
+
+		pthread_setname_np( szThreadName );
 	}
 #endif
 }
