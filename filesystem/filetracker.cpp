@@ -28,7 +28,7 @@ unsigned CFileTracker2::ThreadedProcessMD5Requests()
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName( "MD5Calculator" );
 
-	while ( m_bThreadShouldRun )
+	while ( m_bThreadShouldRun.load(std::memory_order_acq_rel) )
 	{
 		StuffToMD5_t stuff;
 
@@ -127,7 +127,7 @@ int CFileTracker2::SubmitThreadedMD5Request( uint8 *pubBuffer, int cubBuffer, in
 	if ( m_hWorkThread == NULL )
 	{
 		Assert( !m_bThreadShouldRun );
-		m_bThreadShouldRun = true;
+		m_bThreadShouldRun.store(true, std::memory_order::memory_order_relaxed);
 		m_hWorkThread = CreateSimpleThread( ThreadStubProcessMD5Requests, this );
 	}
 
@@ -207,7 +207,7 @@ CFileTracker2::CFileTracker2( CBaseFileSystem *pFileSystem ):
 	m_cComputedMD5ForVPKFiles = 0;
 
 #ifdef SUPPORT_PACKED_STORE
-	m_bThreadShouldRun = false;
+	m_bThreadShouldRun.store(false, std::memory_order::memory_order_relaxed);
 	m_hWorkThread = NULL;
 #endif
 }
@@ -223,7 +223,7 @@ CFileTracker2::~CFileTracker2()
 void CFileTracker2::ShutdownAsync()
 {
 #ifdef SUPPORT_PACKED_STORE
-	m_bThreadShouldRun = false;
+	m_bThreadShouldRun.store(false, std::memory_order::memory_order_relaxed);
 	m_threadEventWorkToDo.Set();
 	// wait for it to die
 	if ( m_hWorkThread )
