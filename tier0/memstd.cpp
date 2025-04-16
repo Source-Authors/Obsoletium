@@ -566,77 +566,78 @@ void CSmallBlockPool::Init( unsigned nBlockSize, byte *pBase, unsigned initialCo
 	}
 }
 
-size_t CSmallBlockPool::GetBlockSize()
+uintp CSmallBlockPool::GetBlockSize() const
 {
 	return m_nBlockSize;
 }
 
-bool CSmallBlockPool::IsOwner( void *p )
+bool CSmallBlockPool::IsOwner( void *p ) const
 {
 	return ( p >= m_pBase && p < m_pAllocLimit );
-	}
+}
 
 void *CSmallBlockPool::Alloc()
-	{
+{
 	void *pResult = m_FreeList.Pop();
-		if ( !pResult )
-		{
-			int nBlockSize = m_nBlockSize;
+	if ( !pResult )
+	{
+		int nBlockSize = m_nBlockSize;
 		byte *pCommitLimit;
-			byte *pNextAlloc;
+		byte *pNextAlloc;
+
 		for (;;)
-				{
+		{
 			pCommitLimit = m_pCommitLimit;
 			pNextAlloc = m_pNextAlloc;
 			if ( pNextAlloc + nBlockSize <= pCommitLimit )
-					{
+			{
 				if ( m_pNextAlloc.AssignIf( pNextAlloc, pNextAlloc + m_nBlockSize ) )
-					{
+				{
 					pResult = pNextAlloc;
-						break;
-					}
+					break;
 				}
-						else
-						{
+			}
+			else
+			{
 				AUTO_LOCK( m_CommitMutex );
 				if ( pCommitLimit == m_pCommitLimit )
-							{
+				{
 					if ( pCommitLimit + COMMIT_SIZE <= m_pAllocLimit )
-								{
+					{
 						if ( !VirtualAlloc( pCommitLimit, COMMIT_SIZE, VA_COMMIT_FLAGS, PAGE_READWRITE ) )
-								{
+						{
 							Assert( 0 );
 							return NULL;
-							}
+						}
 
 						m_pCommitLimit = pCommitLimit + COMMIT_SIZE;
-						}
-						else
-						{
-							return NULL;
-						}
 					}
+					else
+					{
+						return NULL;
 					}
 				}
 			}
+		}
+	}
 	return pResult;
 }
 
 void CSmallBlockPool::Free( void *p )
-	{	
+{	
 	Assert( IsOwner( p ) );
 
 	m_FreeList.Push( p );
 }
 
 // Count the free blocks.  
-int CSmallBlockPool::CountFreeBlocks()
+int CSmallBlockPool::CountFreeBlocks() const
 {
 	return m_FreeList.Count();
 }
 
 // Size of committed memory managed by this heap:
-intp CSmallBlockPool::GetCommittedSize()
+uintp CSmallBlockPool::GetCommittedSize() const
 {
 	uintp totalSize = (uintp)m_pCommitLimit - (uintp)m_pBase;
 	Assert( 0 != m_nBlockSize );
@@ -645,79 +646,79 @@ intp CSmallBlockPool::GetCommittedSize()
 }
 
 // Return the total blocks memory is committed for in the heap
-int CSmallBlockPool::CountCommittedBlocks()
+uintp CSmallBlockPool::CountCommittedBlocks() const
 {		 
-	return  GetCommittedSize() / GetBlockSize();
+	return GetCommittedSize() / GetBlockSize();
 }
 
 // Count the number of allocated blocks in the heap:
-int CSmallBlockPool::CountAllocatedBlocks()
+uintp CSmallBlockPool::CountAllocatedBlocks() const
 {
 	return CountCommittedBlocks( ) - ( CountFreeBlocks( ) + ( m_pCommitLimit - (byte *)m_pNextAlloc ) / GetBlockSize() );
 }
 
-int CSmallBlockPool::Compact()
+intp CSmallBlockPool::Compact()
 {
-	int nBytesFreed = 0;
+	intp nBytesFreed = 0;
 	if ( m_FreeList.Count() )
-{
-	int i;
-		int nFree = CountFreeBlocks();
+	{
+		const int nFree = CountFreeBlocks();
 		FreeBlock_t **pSortArray = (FreeBlock_t **)malloc( nFree * sizeof(FreeBlock_t *) ); // can't use new because will reenter
 
 		if ( !pSortArray )
 		{
-		return 0;
+			return 0;
 		}
 
-		i = 0;
+		int i = 0;
 		while ( i < nFree )
 		{
 			pSortArray[i++] = m_FreeList.Pop();
-			}
+		}
 
 		std::sort( pSortArray, pSortArray + nFree );
 
 		byte *pOldNextAlloc = m_pNextAlloc;
 
 		for ( i = nFree - 1; i >= 0; i-- )
-			{
+		{
 			if ( (byte *)pSortArray[i] == static_cast<byte*>( m_pNextAlloc ) - m_nBlockSize )
-				{
+			{
 				pSortArray[i] = NULL;
 				m_pNextAlloc -= m_nBlockSize;
-				}
-				else
-				{
-							break;
-						}
 			}
+			else
+			{
+				break;
+			}
+		}
 
 		if ( pOldNextAlloc != m_pNextAlloc )
 		{
 			byte *pNewCommitLimit = AlignValue( (byte *)m_pNextAlloc, SBH_PAGE_SIZE );
 			if ( pNewCommitLimit < m_pCommitLimit )
-		{
+			{
 				nBytesFreed = m_pCommitLimit - pNewCommitLimit;
 				VirtualFree( pNewCommitLimit, nBytesFreed, MEM_DECOMMIT );
 				m_pCommitLimit = pNewCommitLimit;
+			}
 		}
-	}
 
 		if ( pSortArray[0] )
-	{
-			for ( i = 0; i < nFree ; i++ )
 		{
-				if ( !pSortArray[i] )
+			for ( i = 0; i < nFree ; i++ )
 			{
+				if ( !pSortArray[i] )
+				{
 					break;
 				}
+
 				m_FreeList.Push( pSortArray[i] );
 			}
-			}
+		}
 
 		free( pSortArray );
-		}
+	}
 
 	return nBytesFreed;
 }
@@ -880,12 +881,12 @@ CSmallBlockHeap::CSmallBlockHeap()
 	Assert( iCurPool == NUM_POOLS );
 }
 
-bool CSmallBlockHeap::ShouldUse( size_t nBytes )
+bool CSmallBlockHeap::ShouldUse( size_t nBytes ) const
 {
 	return ( UsingSBH() && nBytes <= MAX_SBH_BLOCK );
 }
 
-bool CSmallBlockHeap::IsOwner( void * p )
+bool CSmallBlockHeap::IsOwner( void * p ) const
 {
 	return ( UsingSBH() && p >= m_pBase && p < m_pLimit );
 }
@@ -910,8 +911,8 @@ void *CSmallBlockHeap::Alloc( size_t nBytes )
 		p = pPool->Alloc();
 		if ( p )
 		{
-	return p;
-}
+			return p;
+		}
 	}
 
 	void *pRet = malloc( nBytes );
@@ -963,7 +964,7 @@ void *CSmallBlockHeap::Realloc( void *p, size_t nBytes )
 
 	if ( pNewBlock )
 	{
-		int nBytesCopy = min( nBytes, pOldPool->GetBlockSize() );
+		size_t nBytesCopy = min( nBytes, pOldPool->GetBlockSize() );
 		memcpy( pNewBlock, p, nBytesCopy );
 	} 
 
@@ -978,9 +979,9 @@ void CSmallBlockHeap::Free( void *p )
 		pPool->Free( p );
 	}
 
-size_t CSmallBlockHeap::GetSize( void *p )
+uintp CSmallBlockHeap::GetSize( void *p ) const
 {
-	CSmallBlockPool *pPool = FindPool( p );
+	const CSmallBlockPool *pPool = FindPool( p );
 	return pPool->GetBlockSize();
 }
 
@@ -993,9 +994,9 @@ void CSmallBlockHeap::DumpStats( FILE *pFile )
 		for ( int i = 0; i < NUM_POOLS; i++ )
 		{
 			// output for vxconsole parsing
-			fprintf( pFile, "Pool %i: Size: %llu Allocated: %i Free: %i Committed: %i CommittedSize: %i\n", 
+			fprintf( pFile, "Pool %i: Size: %zu Allocated: %zu Free: %i Committed: %zu CommittedSize: %zu\n", 
 				i, 
-				(uint64)m_Pools[i].GetBlockSize(), 
+				m_Pools[i].GetBlockSize(), 
 				m_Pools[i].CountAllocatedBlocks(), 
 				m_Pools[i].CountFreeBlocks(),
 				m_Pools[i].CountCommittedBlocks(), 
@@ -1006,32 +1007,37 @@ void CSmallBlockHeap::DumpStats( FILE *pFile )
 
 	if ( bSpew )
 	{
-		unsigned bytesCommitted = 0;
-		unsigned bytesAllocated = 0;
+		uintp bytesCommitted = 0, bytesAllocated = 0;
 
 		for ( int i = 0; i < NUM_POOLS; i++ )
 		{
-			Msg( "Pool %i: (size: %llu) blocks: allocated:%i free:%i committed:%i (committed size:%u KiB)\n",i, (uint64)m_Pools[i].GetBlockSize(),m_Pools[i].CountAllocatedBlocks(), m_Pools[i].CountFreeBlocks(),m_Pools[i].CountCommittedBlocks(), m_Pools[i].GetCommittedSize() / 1024);
+			Msg( "Pool %i: (size: %zu) blocks: allocated:%zu free:%i committed:%zu (committed size:%zu KiB)\n",
+				i,
+				m_Pools[i].GetBlockSize(),
+				m_Pools[i].CountAllocatedBlocks(),
+				m_Pools[i].CountFreeBlocks(),
+				m_Pools[i].CountCommittedBlocks(),
+				m_Pools[i].GetCommittedSize() / 1024);
 
 			bytesCommitted += m_Pools[i].GetCommittedSize();
 			bytesAllocated += ( m_Pools[i].CountAllocatedBlocks() * m_Pools[i].GetBlockSize() );
 		}
 
-		Msg( "Totals: Committed:%u KiB Allocated:%u KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
+		Msg( "Totals: Committed:%zu KiB Allocated:%zu KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
 	}
 }
 
-int CSmallBlockHeap::Compact()
+intp CSmallBlockHeap::Compact()
 {
-	int nBytesFreed = 0;
-	for( int i = 0; i < NUM_POOLS; i++ )
+	intp nBytesFreed = 0;
+	for( intp i = 0; i < NUM_POOLS; i++ )
 	{
 		nBytesFreed += m_Pools[i].Compact();
 	}
 	return nBytesFreed;
 }
 
-CSmallBlockPool *CSmallBlockHeap::FindPool( size_t nBytes )
+CSmallBlockPool *CSmallBlockHeap::FindPool( size_t nBytes ) const
 {
 	return m_PoolLookup[(nBytes - 1) >> 2];
 }
@@ -1338,9 +1344,7 @@ void CStdMemAlloc::CompactHeap()
 
 MemAllocFailHandler_t CStdMemAlloc::SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler )
 {
-	MemAllocFailHandler_t pfnPrevious = m_pfnFailHandler;
-	m_pfnFailHandler = pfnMemAllocFailHandler;
-	return pfnPrevious;
+	return std::exchange(m_pfnFailHandler, pfnMemAllocFailHandler);
 }
 
 size_t CStdMemAlloc::DefaultFailHandler( size_t nBytes )

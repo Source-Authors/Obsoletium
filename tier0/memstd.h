@@ -57,15 +57,15 @@ class ALIGN16 CSmallBlockPool
 {
 public:
 	void Init( unsigned nBlockSize, byte *pBase, unsigned initialCommit = 0 );
-	size_t GetBlockSize();
-	bool IsOwner( void *p );
+	uintp GetBlockSize() const;
+	bool IsOwner( void *p ) const;
 	void *Alloc();
 	void Free( void *p );
-	int CountFreeBlocks();
-	intp GetCommittedSize();
-	int CountCommittedBlocks();
-	int CountAllocatedBlocks();
-	int Compact();
+	int CountFreeBlocks() const;
+	uintp GetCommittedSize() const;
+	uintp CountCommittedBlocks() const;
+	uintp CountAllocatedBlocks() const;
+	intp Compact();
 
 private:
 
@@ -93,18 +93,19 @@ class ALIGN16 CSmallBlockHeap
 {
 public:
 	CSmallBlockHeap();
-	bool ShouldUse( size_t nBytes );
-	bool IsOwner( void * p );
+	bool ShouldUse( size_t nBytes ) const;
+	bool IsOwner( void * p ) const;
 	void *Alloc( size_t nBytes );
 	void *Realloc( void *p, size_t nBytes );
 	void Free( void *p );
-	size_t GetSize( void *p );
+	uintp GetSize( void *p ) const;
 	void DumpStats( FILE *pFile = NULL );
-	int Compact();
+	intp Compact();
 
 private:
-	CSmallBlockPool *FindPool( size_t nBytes );
+	CSmallBlockPool *FindPool( size_t nBytes ) const;
 	CSmallBlockPool *FindPool( void *p );
+	const CSmallBlockPool *FindPool( void *p ) const;
 
 	CSmallBlockPool *m_PoolLookup[MAX_SBH_BLOCK >> 2];
 	CSmallBlockPool m_Pools[NUM_POOLS];
