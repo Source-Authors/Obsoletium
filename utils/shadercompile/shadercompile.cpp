@@ -1123,7 +1123,8 @@ static std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
   FILE *batFp = fopen("temp.bat", "w");
   if (!batFp) Error("Unable to create writable temp.bat.\n");
 
-  fprintf(batFp, "%s\n", pCommand);
+  // dimhotepus: Honor command (fxc) exit code.
+  fprintf(batFp, "%s\nexit %%errorlevel%%\n", pCommand);
   fclose(batFp);
 
   STARTUPINFO si{(DWORD)sizeof(si)};
@@ -1148,6 +1149,11 @@ static std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
 
   // Wait until child process exits.
   WaitForSingleObject(pi.hProcess, INFINITE);
+
+  DWORD rc;
+  if (GetExitCodeProcess(pi.hProcess, &rc) && rc != 0) {
+    Warning("'%s' command failed w/e %lu.\n", pCommand, rc);
+  }
 
   // Close process and thread handles.
   CloseHandle(pi.hThread);
