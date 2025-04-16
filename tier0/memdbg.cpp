@@ -805,6 +805,14 @@ void CDbgMemAlloc::Initialize()
 		// dimhotepus: Allocate reasonable amount.
 		m_pStatMap->reserve( 2048 + 1024 );
 		m_bInitialized = true;
+
+		// Enable application termination (breakpoint) on heap corruption. This is
+		// better than trying to patch it up and continue, both from a security and
+		// a bug-finding point of view. Do this always on Windows since the heap is
+		// used by video drivers and other in-proc components.
+#if defined(PLATFORM_WINDOWS_PC)
+		HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
+#endif
 	}
 }
 

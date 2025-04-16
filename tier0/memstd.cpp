@@ -69,18 +69,6 @@ void PrintAllocTimes()
 #define PrintAllocTimes() ((void)0)
 #endif
 
-#if _MSC_VER < 1400 && defined( MSVC ) && !defined(_STATIC_LINKED) && (defined(_DEBUG) || defined(USE_MEM_DEBUG))
-void *operator new( unsigned int nSize, int nBlockUse, const char *pFileName, int nLine )
-{
-	return ::operator new( nSize );
-}
-
-void *operator new[] ( unsigned int nSize, int nBlockUse, const char *pFileName, int nLine )
-{
-	return ::operator new[]( nSize );
-}
-#endif
-
 #if (!defined(_DEBUG) && !defined(USE_MEM_DEBUG))
 
 // Support for CHeapMemAlloc for easy switching to using the process heap.
@@ -473,7 +461,7 @@ bool CheckWindowsAllocSettings( const char* upperCommandLine )
 	// The HeapEnableTerminationOnCorruption requires a recent platform SDK,
 	// so fake it up.
 #if defined(PLATFORM_WINDOWS_PC)
-	HeapSetInformation( NULL, (HEAP_INFORMATION_CLASS)1, NULL, 0 );
+	HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
 #endif
 
 	bool bZeroMemory = false;
