@@ -1969,15 +1969,6 @@ protected:
 	int m_numChans;
 };
 
-// comparator for qsort as used below (eg a lambda)
-// returns < 0 if a should come before b, > 0 if a should come after, 0 otherwise
-static int __cdecl ChannelVolComparator ( const void * a, const void * b ) 
-{
-	// greater numbers come first.
-	return static_cast<const CChannelCullList::sChannelVolData *>(b)->m_vol - static_cast<const CChannelCullList::sChannelVolData *>(a)->m_vol;
-}
-
-
 void CChannelCullList::Initialize( CChannelList &list )
 {
 	VPROF("CChannelCullList::Initialize");
@@ -2009,7 +2000,15 @@ void CChannelCullList::Initialize( CChannelList &list )
 	}
 
 	// Sort the list.
-	qsort( m_channelInfo, MAX_CHANNELS, sizeof(sChannelVolData), ChannelVolComparator );
+	std::sort( std::begin(m_channelInfo), std::end(m_channelInfo), []
+	(
+		const CChannelCullList::sChannelVolData &a,
+		const CChannelCullList::sChannelVolData &b
+	) 
+	{
+		// greater numbers come first.
+		return b.m_vol < a.m_vol;
+	});
 
 	// Then, determine if the given sound is less than the nth loudest of its hash. If so, mark its flag
 	// for removal.
