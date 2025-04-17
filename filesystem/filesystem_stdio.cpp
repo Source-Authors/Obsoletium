@@ -1375,7 +1375,7 @@ size_t CWin32ReadOnlyFile::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t de
 	{
 		if ( nBytesRead && hReadFile == m_hFileUnbuffered && pDest != dest )
 		{
-			int nBytesExtra = ( m_ReadPos - offset );
+			int64 nBytesExtra = ( m_ReadPos - offset );
 			nBytesRead -= nBytesExtra;
 			if ( nBytesRead )
 			{
