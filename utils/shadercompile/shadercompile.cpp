@@ -800,7 +800,8 @@ static void WriteShaderFiles(const char *pShaderName) {
     V_strncpy(chShaderName, pShaderName, sizeof(chShaderName));
     V_strncpy(chShaderName + sizeof(chShaderName) - 4, "...", 4);
 
-    Msg("\r%s %s   \r", szShaderFileOperation, chShaderName);
+    // dimhotepus: Correctly rewrite long strings. 
+    Msg("\r%s %s\t\t\t\t\r", szShaderFileOperation, chShaderName);
   }
 
   //
@@ -1222,8 +1223,9 @@ size_t AssembleWorkerReplyPackage(
   GLOBAL_DATA_MTX_LOCK_AUTO;
   if (pStComboRec) pByteCodeArray->DeleteByKey(nComboOfEntry);
   if (fabs(fCurTime - s_fLastInfoTime) > 1.f) {
-    Msg("\rCompiling  %s  [ %2llu remaining ] ...         \r", pEntry->m_szName,
-        nComboOfEntry);
+    // dimhotepus: Correctly rewrite long strings.
+    Msg("Compiling  %s  [ %2llu remaining ] ...                            \r",
+        pEntry->m_szName, nComboOfEntry);
     s_fLastInfoTime = fCurTime;
   }
 
@@ -2127,7 +2129,7 @@ void Shared_ParseListOfCompileCommands() {
 
   double tt_end = Plat_FloatTime();
 
-  Msg("\rRead %s shaders compilation configurations in %.2fs.\n",
+  Msg("Read %s shaders compilation configurations in %.2fs.\n",
       PrettyPrintNumber(g_numShaders), tt_end - tt_start);
 
   char chCommands[32], chNumShaders[32], chStaticCombos[32],
@@ -2138,7 +2140,7 @@ void Shared_ParseListOfCompileCommands() {
   V_sprintf_safe(chStaticCombos, "%s", PrettyPrintNumber(g_numStaticCombos));
   V_sprintf_safe(chDynamicCombos, "%s", PrettyPrintNumber(g_numDynamicCombos));
 
-  Msg("\rGoing to compile %s commands from %s shaders. Static combos %s, "
+  Msg("Going to compile %s commands from %s shaders. Static combos %s, "
       "dynamic combos %s.\n",
       chCommands, chNumShaders, chStaticCombos, chDynamicCombos);
 }
@@ -2212,7 +2214,8 @@ void CompileShaders_NoVMPI() {
     g_numCommandsCompleted = pEntry->m_iCommandEnd;
   }
 
-  Msg("\r                                                  \r");
+  // dimhotepus: Correctly rewrite long strings.
+  Msg("\r                                                                \r");
 }
 
 class CDistributeShaderCompileMaster : public IWorkUnitDistributorCallbacks {
@@ -2469,7 +2472,7 @@ int ShaderCompile_Main(int argc, char *argv[]) {
         V_sprintf_safe(chNumWorkUnits, "%s", PrettyPrintNumber(nWorkUnits));
         V_sprintf_safe(chNumShaders, "%s", PrettyPrintNumber(g_numShaders));
 
-        Msg("\rCompiling %s commands in %s work units from %s shaders.\n",
+        Msg("Compiling %s commands in %s work units from %s shaders.\n",
             chCommands, chNumWorkUnits, chNumShaders);
       }
 
@@ -2526,7 +2529,7 @@ int ShaderCompile_Main(int argc, char *argv[]) {
       V_sprintf_safe(chDynamicCombos, "%s",
                      PrettyPrintNumber(g_numDynamicCombos));
 
-      Msg("\rCompiling %s commands in %s static, %s dynamic combos...\n",
+      Msg("Compiling %s commands in %s static, %s dynamic combos...\n",
           chCommands, chStaticCombos, chDynamicCombos);
     }
 
