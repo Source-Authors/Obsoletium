@@ -2016,7 +2016,7 @@ void CChannelCullList::Initialize( CChannelList &list )
 	// (I'm using it for now because we don't have convenient/fast hash table 
 	// classes, which would be the linear-time way to deal with this).
 	const int cutoff = snd_cull_duplicates.GetInt();
-	for ( int i = 0 ; i < m_numChans ; ++i ) // i is index in original channel list
+	for ( int i = 0 ; i < m_numChans; ++i ) // i is index in original channel list
 	{
 		channel_t *ch = list.GetChannel(i);
 		// for each sound, determine where it ranks in loudness

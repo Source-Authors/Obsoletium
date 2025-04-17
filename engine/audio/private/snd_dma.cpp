@@ -1461,16 +1461,15 @@ void S_GetCurrentlyPlayingMusic( CUtlVector< musicsave_t >& musiclist )
 {
 	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( auto &ch : list )
 	{
-		channel_t *pChannel = &channels[list.GetChannelIndex(i)];
-		if ( !S_IsMusic( pChannel ) )
+		if ( !S_IsMusic( &ch ) )
 			continue;
 
 		musicsave_t song;
-		Q_strncpy( song.songname, pChannel->sfx->getname(), sizeof( song.songname ) );
-		song.sampleposition = pChannel->pMixer->GetPositionForSave();
-		song.master_volume = pChannel->master_vol;
+		V_strcpy_safe( song.songname, ch.sfx->getname() );
+		song.sampleposition = ch.pMixer->GetPositionForSave();
+		song.master_volume = ch.master_vol;
 
 		musiclist.AddToTail( song );
 	}
@@ -4541,7 +4540,6 @@ void SND_SpatializeFirstFrameNoTrace( channel_t *pChannel)
 int S_AlterChannel( int soundsource, int entchannel, CSfxTable *sfx, int vol, int pitch, int flags )
 {
 	THREAD_LOCK_SOUND();
-	int ch_idx;
 
 	const char *name = sfx->getname();
 	if ( name && TestSoundChar( name, CHAR_SENTENCE ) )
@@ -4554,23 +4552,22 @@ int S_AlterChannel( int soundsource, int entchannel, CSfxTable *sfx, int vol, in
 
 		CChannelList list;
 		g_ActiveChannels.GetActiveChannels( list );
-		for ( int i = 0; i < list.Count(); i++ )
+		for ( auto &ch : list )
 		{
-			ch_idx = list.GetChannelIndex(i);
-			if (channels[ch_idx].soundsource == soundsource
-				&& channels[ch_idx].entchannel == entchannel
-				&& channels[ch_idx].sfx != NULL )
+			if (ch.soundsource == soundsource
+				&& ch.entchannel == entchannel
+				&& ch.sfx != NULL )
 			{
 
 				if (flags & SND_CHANGE_PITCH)
-					channels[ch_idx].basePitch = pitch;
+					ch.basePitch = pitch;
 				
 				if (flags & SND_CHANGE_VOL)
-					channels[ch_idx].master_vol = vol;
+					ch.master_vol = vol;
 				
 				if (flags & SND_STOP)
 				{
-					S_FreeChannel(&channels[ch_idx]);
+					S_FreeChannel(&ch);
 				}
 			
 				return TRUE;
@@ -4587,22 +4584,21 @@ int S_AlterChannel( int soundsource, int entchannel, CSfxTable *sfx, int vol, in
 
 	bool bSuccess = false;
 
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( auto &ch : list )
 	{
-		ch_idx = list.GetChannelIndex(i);
-		if ( channels[ch_idx].soundsource == soundsource && 
+		if ( ch.soundsource == soundsource && 
 			 ( ( flags & SND_IGNORE_NAME ) || 
-			   ( channels[ch_idx].entchannel == entchannel && channels[ch_idx].sfx == sfx ) ) )
+			   ( ch.entchannel == entchannel && ch.sfx == sfx ) ) )
 		{
 			if (flags & SND_CHANGE_PITCH)
-				channels[ch_idx].basePitch = pitch;
+				ch.basePitch = pitch;
 			
 			if (flags & SND_CHANGE_VOL)
-				channels[ch_idx].master_vol = vol;
+				ch.master_vol = vol;
 			
 			if (flags & SND_STOP)
 			{
-				S_FreeChannel(&channels[ch_idx]);
+				S_FreeChannel(&ch);
 			}
 		
 			if ( ( flags & SND_IGNORE_NAME ) == 0 )
@@ -4610,7 +4606,7 @@ int S_AlterChannel( int soundsource, int entchannel, CSfxTable *sfx, int vol, in
 			else
 				bSuccess = true;
 		}
-   }
+	}
 
 	return ( bSuccess ) ? ( TRUE ) : ( FALSE );
 }
@@ -5537,9 +5533,10 @@ int S_StartSound( StartSoundParams_t& params )
 // Restart all the sounds on the specified channel
 inline bool IsChannelLooped( int iChannel )
 {
-	return (channels[iChannel].sfx &&
-			channels[iChannel].sfx->pSource && 
-			channels[iChannel].sfx->pSource->IsLooped() );
+	auto &ch = channels[iChannel];
+	return (ch.sfx &&
+			ch.sfx->pSource && 
+			ch.sfx->pSource->IsLooped() );
 }
 
 int S_GetCurrentStaticSounds( SoundInfo_t *pResult, int nSizeResult, int entchannel )
@@ -5547,19 +5544,20 @@ int S_GetCurrentStaticSounds( SoundInfo_t *pResult, int nSizeResult, int entchan
 	int nSpaceRemaining = nSizeResult;
 	for (int i = MAX_DYNAMIC_CHANNELS; i < total_channels && nSpaceRemaining; i++)
 	{
-		if ( channels[i].entchannel == entchannel && channels[i].sfx )
+		auto &ch = channels[i];
+		if ( ch.entchannel == entchannel && ch.sfx )
 		{
-			pResult->Set( channels[i].soundsource, 
-						  channels[i].entchannel, 
-						  channels[i].sfx->getname(), 
-						  channels[i].origin,
-						  channels[i].direction,
-						  ( (float)channels[i].master_vol / 255.0F ),
-						  DIST_MULT_TO_SNDLVL( channels[i].dist_mult ),
+			pResult->Set( ch.soundsource, 
+						  ch.entchannel, 
+						  ch.sfx->getname(), 
+						  ch.origin,
+						  ch.direction,
+						  ( (float)ch.master_vol / 255.0F ),
+						  DIST_MULT_TO_SNDLVL( ch.dist_mult ),
 						  IsChannelLooped( i ),
-						  channels[i].basePitch,
+						  ch.basePitch,
 						  listener_origin,
-						  channels[i].speakerentity );
+						  ch.speakerentity );
 			pResult++;
 			nSpaceRemaining--;
 		}
@@ -5753,7 +5751,7 @@ void S_StopAllSounds( bool bClear )
 	intp i = 0;
 	for ( auto &channel : list )
 	{
-		if ( auto *sfx = channels[i].sfx; sfx )
+		if ( auto *sfx = channel.sfx; sfx )
 		{
 			DevMsg( 1, "%2zd:Stopped sound %s.\n", i, sfx->getname() );
 		}
@@ -5762,7 +5760,7 @@ void S_StopAllSounds( bool bClear )
 		++i;
 	}
 
-	Q_memset( channels, 0, MAX_CHANNELS * sizeof(channel_t) );
+	Q_memset( channels, 0, sizeof(channels) );
 
 	if ( bClear )
 	{
@@ -7445,31 +7443,25 @@ void MXR_UpdateAllDuckerVolumes( void )
 	// clear out all total volume values for groups
 
 	for ( i = 0; i < g_cgrouprules; i++)
-		g_grouprules[i].total_vol = 0.0;
+		g_grouprules[i].total_vol = 0.0f;
 	
 	// for every channel in a mix group which can cause ducking:
 	// get total volume, store total in grouprule:
 	
-	CChannelList list;
-	int ch_idx;
-
-	channel_t *pchan;
 	bool b_found_ducked_channel = false;
 
+	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
 
-	for ( i = 0; i < list.Count(); i++ )
+	for ( auto &ch : list )
 	{
-		ch_idx = list.GetChannelIndex(i);
-		pchan = &channels[ch_idx];
-
-		if (pchan->last_vol > 0.0)
+		if (ch.last_vol > 0.0f)
 		{
 			// account for all mix groups this channel belongs to...
 
 			for (int j = 0; j < 8; j++)
 			{
-				int imixgroup = pchan->mixgroups[j];
+				int imixgroup = ch.mixgroups[j];
 
 				if (imixgroup < 0)
 					continue;
@@ -7477,14 +7469,14 @@ void MXR_UpdateAllDuckerVolumes( void )
 				int	grouprulesid = g_mapMixgroupidToGrouprulesid[imixgroup];
 			
 				if (g_grouprules[grouprulesid].causes_ducking)
-					g_grouprules[grouprulesid].total_vol += pchan->last_vol;
+					g_grouprules[grouprulesid].total_vol += ch.last_vol;
 
 				if (g_grouprules[grouprulesid].is_ducked)
 					b_found_ducked_channel = true;
 			}
-		}		
+		}
 	}
-	
+
 	// if no channels playing which may be ducked, do nothing
 
 	if ( !b_found_ducked_channel )
@@ -7591,7 +7583,6 @@ void MXR_DebugShowMixVolumes( void )
 
 	debug_showvols_t groupvols[CMXRGROUPMAX];
 
-	int i;
 	int cgroups = 0;
 
 	if (g_isoundmixer < 0)
@@ -7605,7 +7596,7 @@ void MXR_DebugShowMixVolumes( void )
 	// for every entry in mapMixgroupidToValue which is not -1, 
 	// set up groupvols
 
-	for (i = 0; i < CMXRGROUPMAX; i++)
+	for (int i = 0; i < CMXRGROUPMAX; i++)
 	{
 		if (pmixer->mapMixgroupidToValue[i] >= 0)
 		{
@@ -7621,31 +7612,25 @@ void MXR_DebugShowMixVolumes( void )
 	// the selected mixgroupid, add to groupvols totalvol
 
 	CChannelList list;
-	int ch_idx;
-	channel_t *pchan;
-
 	g_ActiveChannels.GetActiveChannels( list );
 
-	for ( i = 0; i < list.Count(); i++ )
+	for ( auto &ch : list )
 	{
-		ch_idx = list.GetChannelIndex(i);
-		pchan = &channels[ch_idx];
-		if (pchan->last_vol > 0.0)
+		if (ch.last_vol > 0.0f)
 		{
 			// find entry in groupvols
-			for (int j = 0; j < CMXRGROUPMAX; j++)
+			for (auto &vol : groupvols)
 			{
-				if (pchan->last_mixgroupid == groupvols[j].mixgroupid)
+				if (ch.last_mixgroupid == vol.mixgroupid)
 				{
-					groupvols[j].totalvol += pchan->last_vol;
+					vol.totalvol += ch.last_vol;
 					break;
 				}
 			}
-		}	
+		}
 	}
 
 	// groupvols is now fully initialized - just display it
-
 	MXR_DebugGraphMixVolumes( groupvols, cgroups);
 }
 
@@ -8032,9 +8017,9 @@ bool MXR_LoadAllSoundMixers( void )
 
 		// init all mixer values to -1.
 
-		for (int j = 0; j < CMXRGROUPMAX; j++)
+		for (auto &id : pmixer->mapMixgroupidToValue)
 		{
-			pmixer->mapMixgroupidToValue[j] = -1.0;
+			id = -1.0f;
 		}
 
 		// load all groupnames for this soundmixer

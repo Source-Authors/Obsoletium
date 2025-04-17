@@ -177,7 +177,6 @@ static void			VOX_BuildVirtualNameList( char *word, CUtlVector< WordBuf >& list 
 
 // This module depends on these engine calls:
 // DevMsg
-// S_FreeChannel
 // S_LoadSound
 // S_FindName
 // It also depends on vstdlib/RandomInt (all other random calls go through g_pSoundServices)
