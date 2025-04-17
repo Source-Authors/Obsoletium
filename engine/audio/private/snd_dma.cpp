@@ -1503,6 +1503,9 @@ void S_RestartSong( const musicsave_t *song )
 
 		if ( IsPC() )
 		{
+			// dimhotepus: channels is a shared resource.
+			THREAD_LOCK_SOUND();
+
 			// Now find the channel this went on and skip ahead in the mixer
 			for (int i = 0; i < total_channels; i++)
 			{
@@ -6866,7 +6869,13 @@ static void S_Say( const CCommand &args )
 
 		// paint a boatload of sound
 
-		MIX_PaintChannels( g_paintedtime + count, s_bIsListenerUnderwater );
+		{
+			// dimhotepus: Ensure thread-safety as MIX_PaintChannels can change
+			// sound channels which is shared resource.
+			THREAD_LOCK_SOUND();
+
+			MIX_PaintChannels( g_paintedtime + count, s_bIsListenerUnderwater );
+		}
 
 		// display system time delta 
 		double totalMs = (Plat_FloatTime() - startTime) * 1000.0;
