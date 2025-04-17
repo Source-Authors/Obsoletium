@@ -3601,9 +3601,9 @@ bool CBaseFileSystem::SetFileWritable( char const *pFileName, bool writable, con
 	CHECK_DOUBLE_SLASHES( pFileName );
 
 #ifdef _WIN32
-	int pmode = writable ? ( _S_IWRITE | _S_IREAD ) : ( _S_IREAD );
+	const int pmode = writable ? ( _S_IWRITE | _S_IREAD ) : ( _S_IREAD );
 #else
-	int pmode = writable ? ( S_IWRITE | S_IREAD ) : ( S_IREAD );
+	const int pmode = writable ? ( S_IWRITE | S_IREAD ) : ( S_IREAD );
 #endif
 
 	char tempPathID[MAX_PATH];
