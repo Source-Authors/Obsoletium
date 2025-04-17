@@ -29,7 +29,6 @@ struct HierarchicalSpawnMapData_t
 	int			m_iMapDataLength;
 };
 
-static CStringRegistry *g_pClassnameSpawnPriority = NULL;
 extern edict_t *g_pForceAttachEdict;
 
 // creates an entity by string name, but does not spawn it
@@ -91,36 +90,6 @@ string_t ExtractParentName(string_t parentName)
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Callback function for qsort, used to sort entities by their depth
-//			in the movement hierarchy.
-// Input  : pEnt1 - 
-//			pEnt2 - 
-// Output : Returns -1, 0, or 1 per qsort spec.
-//-----------------------------------------------------------------------------
-static int __cdecl CompareSpawnOrder(HierarchicalSpawn_t *pEnt1, HierarchicalSpawn_t *pEnt2)
-{
-	if (pEnt1->m_nDepth == pEnt2->m_nDepth)
-	{
-		if ( g_pClassnameSpawnPriority )
-		{
-			int o1 = pEnt1->m_hEntity ? g_pClassnameSpawnPriority->GetStringID( pEnt1->m_hEntity->GetClassname() ) : -1;
-			int o2 = pEnt2->m_hEntity ? g_pClassnameSpawnPriority->GetStringID( pEnt2->m_hEntity->GetClassname() ) : -1;
-			if ( o1 < o2 )
-				return 1;
-			if ( o2 < o1 )
-				return -1;
-		}
-		return 0;
-	}
-
-	if (pEnt1->m_nDepth > pEnt2->m_nDepth)
-		return 1;
-
-	return -1;
-}
-
-
-//-----------------------------------------------------------------------------
 // Computes the hierarchical depth of the entities to spawn..
 //-----------------------------------------------------------------------------
 static int ComputeSpawnHierarchyDepth_r( CBaseEntity *pEntity )
@@ -164,43 +133,63 @@ static void ComputeSpawnHierarchyDepth( int nEntities, HierarchicalSpawn_t *pSpa
 	}
 }
 
-static void SortSpawnListByHierarchy( int nEntities, HierarchicalSpawn_t *pSpawnList )
+static std::once_flag g_create_spawn_hierarchy_registry_once;
+static CStringRegistry g_spawn_hierarchy_registry;
+
+static void CreateHiearchyStringRegistryOnce()
 {
-	MEM_ALLOC_CREDIT();
-	g_pClassnameSpawnPriority = new CStringRegistry;
 	// this will cause the entities to be spawned in the indicated order
 	// Highest string ID spawns first.  String ID is spawn priority.
 	// by default, anything not in this list has priority -1
-	g_pClassnameSpawnPriority->AddString( "func_wall", 10 );
-	g_pClassnameSpawnPriority->AddString( "scripted_sequence", 9 );
-	g_pClassnameSpawnPriority->AddString( "phys_hinge", 8 );
-	g_pClassnameSpawnPriority->AddString( "phys_ballsocket", 8 );
-	g_pClassnameSpawnPriority->AddString( "phys_slideconstraint", 8 );
-	g_pClassnameSpawnPriority->AddString( "phys_constraint", 8 );
-	g_pClassnameSpawnPriority->AddString( "phys_pulleyconstraint", 8 );
-	g_pClassnameSpawnPriority->AddString( "phys_lengthconstraint", 8 );
-	g_pClassnameSpawnPriority->AddString( "phys_ragdollconstraint", 8 );
-	g_pClassnameSpawnPriority->AddString( "info_mass_center", 8 ); // spawn these before physbox/prop_physics
-	g_pClassnameSpawnPriority->AddString( "trigger_vphysics_motion", 8 ); // spawn these before physbox/prop_physics
+	g_spawn_hierarchy_registry.AddString( "func_wall", 10 );
+	g_spawn_hierarchy_registry.AddString( "scripted_sequence", 9 );
+	g_spawn_hierarchy_registry.AddString( "phys_hinge", 8 );
+	g_spawn_hierarchy_registry.AddString( "phys_ballsocket", 8 );
+	g_spawn_hierarchy_registry.AddString( "phys_slideconstraint", 8 );
+	g_spawn_hierarchy_registry.AddString( "phys_constraint", 8 );
+	g_spawn_hierarchy_registry.AddString( "phys_pulleyconstraint", 8 );
+	g_spawn_hierarchy_registry.AddString( "phys_lengthconstraint", 8 );
+	g_spawn_hierarchy_registry.AddString( "phys_ragdollconstraint", 8 );
+	g_spawn_hierarchy_registry.AddString( "info_mass_center", 8 ); // spawn these before physbox/prop_physics
+	g_spawn_hierarchy_registry.AddString( "trigger_vphysics_motion", 8 ); // spawn these before physbox/prop_physics
 
-	g_pClassnameSpawnPriority->AddString( "prop_physics", 7 );
-	g_pClassnameSpawnPriority->AddString( "prop_ragdoll", 7 );
+	g_spawn_hierarchy_registry.AddString( "prop_physics", 7 );
+	g_spawn_hierarchy_registry.AddString( "prop_ragdoll", 7 );
+}
+
+static void SortSpawnListByHierarchy( int nEntities, HierarchicalSpawn_t *pSpawnList )
+{
+	MEM_ALLOC_CREDIT();
+
+	std::call_once(g_create_spawn_hierarchy_registry_once, CreateHiearchyStringRegistryOnce);
+
 	// Sort the entities (other than the world) by hierarchy depth, in order to spawn them in
 	// that order. This insures that each entity's parent spawns before it does so that
 	// it can properly set up anything that relies on hierarchy.
-#ifdef _WIN32
-	qsort(&pSpawnList[0], nEntities, sizeof(pSpawnList[0]), (int (__cdecl *)(const void *, const void *))CompareSpawnOrder);
-#elif POSIX
-	qsort(&pSpawnList[0], nEntities, sizeof(pSpawnList[0]), (int (*)(const void *, const void *))CompareSpawnOrder);
-#endif
-	delete g_pClassnameSpawnPriority;
-	g_pClassnameSpawnPriority = NULL;
+	// 
+	// Callback function for qsort, used to sort entities by their depth in the movement hierarchy.
+	std::sort(pSpawnList,
+		pSpawnList + nEntities,
+		[&](const HierarchicalSpawn_t &ent1, const HierarchicalSpawn_t &ent2)
+		{
+			if (ent1.m_nDepth == ent2.m_nDepth)
+			{
+				const int o1 = ent1.m_hEntity ? g_spawn_hierarchy_registry.GetStringID( ent1.m_hEntity->GetClassname() ) : -1;
+				const int o2 = ent2.m_hEntity ? g_spawn_hierarchy_registry.GetStringID( ent2.m_hEntity->GetClassname() ) : -1;
+				if ( o1 < o2 )
+					return false;
+				if ( o2 < o1 )
+					return true;
+				return false;
+			}
+
+			return ent1.m_nDepth < ent2.m_nDepth;
+		});
 }
 
 void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 {
-	int nEntity;
-	for (nEntity = nEntities - 1; nEntity >= 0; nEntity--)
+	for (int nEntity = nEntities - 1; nEntity >= 0; nEntity--)
 	{
 		CBaseEntity *pEntity = pSpawnList[nEntity].m_hEntity;
 		if ( pEntity )
