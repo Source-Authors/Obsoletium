@@ -45,26 +45,26 @@ struct chapter_t
 {
 	char filename[32];
 };
-static int __cdecl ChapterSortFunc(const void *elem1, const void *elem2)
+static bool ChapterSortFunc(const chapter_t &c1, const chapter_t &c2)
 {
-	chapter_t *c1 = (chapter_t *)elem1;
-	chapter_t *c2 = (chapter_t *)elem2;
-
 	// compare chapter number first
-	static intp chapterlen = ssize("chapter") - 1;
-	if (atoi(c1->filename + chapterlen) > atoi(c2->filename + chapterlen))
-		return 1;
-	else if (atoi(c1->filename + chapterlen) < atoi(c2->filename + chapterlen))
-		return -1;
+	constexpr intp chapterlen = ssize("chapter") - 1;
+	if (atoi(c1.filename + chapterlen) > atoi(c2.filename + chapterlen))
+		return false;
+	if (atoi(c1.filename + chapterlen) < atoi(c2.filename + chapterlen))
+		return true;
+
+	const size_t len1 = strlen(c1.filename);
+	const size_t len2 = strlen(c2.filename);
 
 	// compare length second (longer string show up later in the list, eg. chapter9 before chapter9a)
-	if (strlen(c1->filename) > strlen(c2->filename))
-		return 1;
-	else if (strlen(c1->filename) < strlen(c2->filename))
-		return -1;
+	if (len1 > len2)
+		return false;
+	if (len1 < len2)
+		return true;
 
 	// compare strings third
-	return strcmp(c1->filename, c2->filename);
+	return strcmp(c1.filename, c2.filename) < 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -411,7 +411,7 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	}
 
 	// sort the chapters
-	qsort(chapters, chapterIndex, sizeof(chapter_t), &ChapterSortFunc);
+	std::sort(std::begin(chapters), std::begin(chapters) + chapterIndex, ChapterSortFunc);
 
 	// work out which chapters are unlocked
 	ConVarRef var( "sv_unlockedchapters" );
