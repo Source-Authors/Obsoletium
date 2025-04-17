@@ -1329,7 +1329,7 @@ size_t CWin32ReadOnlyFile::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t de
 				{
 					if ( GetLastError() == ERROR_HANDLE_EOF )
 					{
-						nBytesToRead = 0; // we have hit the end of the file					
+						nBytesToRead = 0; // we have hit the end of the file
 					}
 					else
 					{
