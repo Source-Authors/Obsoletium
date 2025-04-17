@@ -3662,7 +3662,7 @@ bool CBaseFileSystem::IsDirectory( const char *pFileName, const char *pathID )
 	}
 
 	CSearchPathsIterator iter( this, &pFileName, pathID, FILTER_CULLPACK );
-	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
+	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != nullptr; pSearchPath = iter.GetNext() )
 	{
 #ifdef SUPPORT_PACKED_STORE
 		if ( pSearchPath->GetPackedStore() )
