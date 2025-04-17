@@ -5464,7 +5464,7 @@ void CBaseFileSystem::CFileCacheObject::AddFiles( const char **ppFileNames, int 
 	}
 
 	AUTO_LOCK( m_InfosMutex );
-	intp offset = m_Infos.AddMultipleToTail( nFileNames, infos.Base() );
+	const intp offset = m_Infos.AddMultipleToTail( nFileNames, infos.Base() );
 
 	m_nPending += nFileNames;
 	ProcessNewEntries(offset);
@@ -5496,7 +5496,7 @@ void CBaseFileSystem::CFileCacheObject::ProcessNewEntries( intp start )
 void CBaseFileSystem::CFileCacheObject::IOCallback( const FileAsyncRequest_t &request, int nBytesRead, FSAsyncStatus_t err )
 {
 	Assert( request.pContext );
-	Info_t &info = *(Info_t *)request.pContext;
+	Info_t &info = *static_cast<Info_t *>(request.pContext);
 
 	auto *pBacking = new CMemoryFileBacking( info.pOwner->m_pFS );
 	pBacking->m_pData = nullptr;
