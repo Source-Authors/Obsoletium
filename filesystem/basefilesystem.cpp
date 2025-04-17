@@ -3672,7 +3672,7 @@ bool CBaseFileSystem::IsDirectory( const char *pFileName, const char *pathID )
 
 			FOR_EACH_VEC( outDir, i )
 			{
-				if ( !Q_stricmp( outDir[i], pFileName ) )
+				if ( !V_stricmp( outDir[i], pFileName ) )
 					return true;
 			}
 		}
@@ -4987,7 +4987,7 @@ bool CBaseFileSystem::GetFileTypeForFullPath( char const *pFullPath, wchar_t *bu
 		V_wcsncpy( buf, info.szTypeName, bufSizeInBytes );
 		return true;
 	}
-	else
+
 #endif
 	char ext[32];
 	V_ExtractFileExtension( pFullPath, ext );
@@ -5086,12 +5086,10 @@ bool CBaseFileSystem::RegisterMemoryFile( CMemoryFileBacking *pFile, CMemoryFile
 		*ppExistingFileWithRef = nullptr;
 		return true;
 	}
-	else
-	{
-		Assert( pInTable->m_nRegistered > 1 );
-		*ppExistingFileWithRef = pInTable;
-		return false;
-	}
+
+	Assert( pInTable->m_nRegistered > 1 );
+	*ppExistingFileWithRef = pInTable;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -5178,18 +5176,13 @@ int CFileHandle::GetSectorSize()
 	{
 		return m_fs->FS_GetSectorSize( m_pFile );
 	}
-	else if ( m_pPackFileHandle )
+
+	if ( m_pPackFileHandle )
 	{
 		return m_pPackFileHandle->GetSectorSize();
 	}
-	else if ( m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
-	{
-		return 1;
-	}
-	else
-	{
-		return -1;
-	}
+
+	return  m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT ? 1 : -1;
 }
 
 bool CFileHandle::IsOK()
@@ -5203,9 +5196,10 @@ bool CFileHandle::IsOK()
 
 	if ( m_pFile )
 	{
-		return ( IsValid() && m_fs->FS_ferror( m_pFile ) == 0 );
+		return IsValid() && m_fs->FS_ferror( m_pFile ) == 0;
 	}
-	else if ( m_pPackFileHandle || m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
+
+	if ( m_pPackFileHandle || m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
 	{
 		return IsValid();
 	}
@@ -5268,7 +5262,8 @@ int CFileHandle::Read( void* pBuffer, int nDestSize, int nLength )
 		// Pack file handle handles clamping all the reads:
 		return m_pPackFileHandle->Read( pBuffer, nDestSize, nLength );
 	}
-	else if ( m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
+
+	if ( m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
 	{
 		return static_cast< CMemoryFileHandle* >( this )->Read( pBuffer, nDestSize, nLength );
 	}
@@ -5309,17 +5304,20 @@ int CFileHandle::Seek( int64 nOffset, int nWhence )
 		return m_VPKHandle.Seek( nOffset, nWhence );
 	}
 #endif
+
 	if ( m_pFile )
 	{
 		m_fs->FS_fseek( m_pFile, nOffset, nWhence );
 		// TODO - FS_fseek should return the resultant offset
 		return 0;
 	}
-	else if ( m_pPackFileHandle )
+
+	if ( m_pPackFileHandle )
 	{
 		return m_pPackFileHandle->Seek( nOffset, nWhence );
 	}
-	else if ( m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
+
+	if ( m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
 	{
 		return static_cast< CMemoryFileHandle* >( this )->Seek( nOffset, nWhence );
 	}
@@ -5337,15 +5335,18 @@ int CFileHandle::Tell()
 		return m_VPKHandle.Tell();
 	}
 #endif
+
 	if ( m_pFile )
 	{
 		return m_fs->FS_ftell( m_pFile );
 	}
-	else if ( m_pPackFileHandle )
+
+	if ( m_pPackFileHandle )
 	{
 		return m_pPackFileHandle->Tell();
 	}
-	else if ( m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
+
+	if ( m_type == FT_MEMORY_BINARY || m_type == FT_MEMORY_TEXT )
 	{
 		return static_cast< CMemoryFileHandle* >( this )->Tell();
 	}
@@ -5432,7 +5433,7 @@ int CMemoryFileHandle::Seek( int64 nOffset64, int nWhence )
 	}
 	else if ( nWhence == SEEK_END )
 	{
-		m_nPosition = (int) m_nLength + (int) clamp( nOffset64, -m_nLength, 0ll );
+		m_nPosition = (int) m_nLength + (int) clamp( nOffset64, -m_nLength, 0LL );
 	}
 	return m_nPosition;
 }
