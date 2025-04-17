@@ -1601,14 +1601,10 @@ intp CParticleMgr::ComputeParticleDefScreenArea( intp nInfoCount, RetireInfo_t *
 	return nCollection;
 }
 
-int CParticleMgr::RetireSort( const void *p1, const void *p2 ) 
+bool CParticleMgr::RetireSort( const RetireInfo_t &pRetire1, const RetireInfo_t &pRetire2 ) 
 {
-	RetireInfo_t *pRetire1 = (RetireInfo_t*)p1;
-	RetireInfo_t *pRetire2 = (RetireInfo_t*)p2;
-	float flArea = pRetire1->m_flScreenArea - pRetire2->m_flScreenArea;
-	if ( flArea == 0.0f )
-		return 0;
-	return ( flArea > 0 ) ? -1 : 1;
+	float flArea = pRetire1.m_flScreenArea - pRetire2.m_flScreenArea;
+	return flArea > 0;
 }
 
 bool CParticleMgr::RetireParticleCollections( CParticleSystemDefinition* pDef, 
@@ -1622,7 +1618,7 @@ bool CParticleMgr::RetireParticleCollections( CParticleSystemDefinition* pDef,
 		return false;
 
 	// Quicksort the retirement info
-	qsort( pInfo, nCount, sizeof(RetireInfo_t), RetireSort );
+	std::sort( pInfo, pInfo + nCount, RetireSort );
 
 	for ( intp i = 0; i < nCount; ++i )
 	{

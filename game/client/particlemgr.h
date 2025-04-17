@@ -725,7 +725,7 @@ private:
 
 	void BuildParticleSimList( CUtlVector< ParticleSimListEntry_t > &list );
 	bool EarlyRetireParticleSystems( intp nCount, ParticleSimListEntry_t *ppEffects );
-	static int RetireSort( const void *p1, const void *p2 ); 
+	static bool RetireSort( const RetireInfo_t &p1, const RetireInfo_t &p2 ); 
 
 private:
 
