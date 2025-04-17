@@ -6387,7 +6387,7 @@ void S_Update_Thread()
 
 		// mimic a frametime needed for sound update
 		double t1 = Plat_FloatTime();
-		frameTime = t1 - lastFrameTime;
+		frameTime = static_cast<float>(t1 - lastFrameTime);
 		lastFrameTime = t1;
 
 		if ( snd_showthreadframetime.GetBool() )
