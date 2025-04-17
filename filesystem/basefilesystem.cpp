@@ -58,7 +58,7 @@ static bool V_CheckDoubleSlashes( const char *pStr )
 	{
 		if ( (pStr[i] == '/' || pStr[i] == '\\') && (pStr[i+1] == '/' || pStr[i+1] == '\\') )
 		{
-			Msg( "Double slashes found in path '%s'\n", pStr );
+			Msg( "Double slashes found in path '%s'.\n", pStr );
 			return true;
 		}
 	}
@@ -91,7 +91,6 @@ static void LogFileOpen( const char *vpk, const char *pFilename, const char *pAb
 	if ( f )
 	{
 		fprintf( f, "%s, %s, %s\n", vpk, pFilename, pAbsPath );
-		//fprintf( f, "%s\n", pFilename );
 		fclose(f);
 
 		// If this was the first time, switch from write to append for further writes
@@ -3475,9 +3474,9 @@ void CBaseFileSystem::SetSearchPathIsTrustedSource( CSearchPath *pSearchPath )
 	// Treat map packs as trusted, because we will send the CRC of the map pack to the server
 	if ( pSearchPath->GetPackFile() && pSearchPath->GetPackFile()->m_bIsMapPath )
 	{
-		#ifdef PURE_SERVER_DEBUG_SPEW
-			Msg( "Setting map pack search path %s as trusted\n", pSearchPath->GetDebugString() );
-		#endif
+#ifdef PURE_SERVER_DEBUG_SPEW
+		Msg( "Setting map pack search path %s as trusted\n", pSearchPath->GetDebugString() );
+#endif
 		pSearchPath->m_bIsTrustedForPureServer = true;
 		return;
 	}
@@ -3487,16 +3486,16 @@ void CBaseFileSystem::SetSearchPathIsTrustedSource( CSearchPath *pSearchPath )
 		CPackedStoreRefCount *pVPK = pSearchPath->GetPackedStore();
 		if ( pVPK == NULL )
 		{
-			#ifdef PURE_SERVER_DEBUG_SPEW
-				Msg( "Setting %s as untrusted (loose files)\n", pSearchPath->GetDebugString() );
-			#endif
+#ifdef PURE_SERVER_DEBUG_SPEW
+			Msg( "Setting %s as untrusted (loose files)\n", pSearchPath->GetDebugString() );
+#endif
 			return;
 		}
 		if ( !pVPK->m_bSignatureValid )
 		{
-			#ifdef PURE_SERVER_DEBUG_SPEW
-				Msg( "Setting %s as untrusted (unsigned VPK)\n", pSearchPath->GetDebugString() );
-			#endif
+#ifdef PURE_SERVER_DEBUG_SPEW
+			Msg( "Setting %s as untrusted (unsigned VPK)\n", pSearchPath->GetDebugString() );
+#endif
 			return;
 		}
 		const CUtlVector<uint8> &key = pVPK->GetSignaturePublicKey();
@@ -3507,18 +3506,18 @@ void CBaseFileSystem::SetSearchPathIsTrustedSource( CSearchPath *pSearchPath )
 			Assert( pbKey != NULL && nKeySz > 0 );
 			if ( key.Count() == nKeySz && V_memcmp( pbKey, key.Base(), nKeySz ) == 0 )
 			{
-				#ifdef PURE_SERVER_DEBUG_SPEW
-					Msg( "Setting %s as untrusted\n", pSearchPath->GetDebugString() );
-				#endif
+#ifdef PURE_SERVER_DEBUG_SPEW
+				Msg( "Setting %s as untrusted\n", pSearchPath->GetDebugString() );
+#endif
 				pSearchPath->m_bIsTrustedForPureServer = true;
 				return;
 			}
 		}
 
-		#ifdef PURE_SERVER_DEBUG_SPEW
-			Msg( "Setting %s as untrusted.  (Key not in trusted key list)\n", pSearchPath->GetDebugString() );
-		#endif
-	#endif
+#ifdef PURE_SERVER_DEBUG_SPEW
+		Msg( "Setting %s as untrusted.  (Key not in trusted key list)\n", pSearchPath->GetDebugString() );
+#endif
+#endif
 }
 
 
