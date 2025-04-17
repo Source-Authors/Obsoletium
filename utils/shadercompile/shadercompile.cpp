@@ -1501,7 +1501,7 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommandThreaded(
     if (!pvMemory)
     // ::RaiseException( GetLastError(), EXCEPTION_NONCONTINUABLE, 0, NULL );
     {
-      Error("Unable to lock shared memory for combo 0x%p", hCombo);
+      Error("Unable to lock shared memory for combo 0x%p.\n", hCombo);
       ExitProcess(1);
     }
 
@@ -2073,10 +2073,10 @@ void Worker_GetLocalCopyOfBinary(const char *pFilename) {
     exit(ENOENT);
   }
   fseek(fp, 0, SEEK_END);
-  int fileLen = ftell(fp);
+  long fileLen = ftell(fp);
   fseek(fp, 0, SEEK_SET);
   fileBuf.EnsureCapacity(fileLen);
-  int nBytesRead = fread(fileBuf.Base(), 1, fileLen, fp);
+  intp nBytesRead = fread(fileBuf.Base(), 1, fileLen, fp);
   fclose(fp);
   fileBuf.SeekPut(CUtlBuffer::SEEK_HEAD, nBytesRead);
 
