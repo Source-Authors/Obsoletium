@@ -12,24 +12,26 @@
 #include "particledraw.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterialvar.h"
-#include "mempool.h"
 #include "iclientmode.h"
 #include "view_scene.h"
+#include "tier0/icommandline.h"
 #include "tier0/vprof.h"
+#include "tier1/KeyValues.h"
+#include "tier1/mempool.h"
+#include "vstdlib/jobthread.h"
 #include "engine/ivdebugoverlay.h"
 #include "view.h"
-#include "KeyValues.h"
 #include "particles/particles.h"							// get new particle system access
 #include "tier1/utlintrusivelist.h"
 #include "particles_new.h"
-#include "vstdlib/jobthread.h"
 #include "filesystem.h"
 #include "particle_parse.h"
 #include "model_types.h"
+
 #ifdef TF_CLIENT_DLL
 #include "rtime.h"
 #endif
-#include "tier0/icommandline.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -116,7 +118,7 @@ CEffectMaterial::CEffectMaterial()
 	m_pGroup = NULL;
 }
 
-					
+
 //-----------------------------------------------------------------------------
 // CParticleEffectBinding.
 //-----------------------------------------------------------------------------
