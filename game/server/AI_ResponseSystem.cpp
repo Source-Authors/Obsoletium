@@ -364,8 +364,8 @@ struct ResponseGroup
 	bool	IsEnabled() const { return m_bEnabled; }
 	void	SetEnabled( bool enabled ) { m_bEnabled = enabled; }
 
-	intp	GetCurrentIndex() const { return m_nCurrentIndex; }
-	void	SetCurrentIndex( intp idx ) { m_nCurrentIndex = idx; }
+	byte	GetCurrentIndex() const { return m_nCurrentIndex; }
+	void	SetCurrentIndex( intp idx ) { Assert(idx <= std::numeric_limits<byte>::max()); m_nCurrentIndex = static_cast<byte>(idx); }
 
 	CUtlVector< Response >	group;
 
@@ -373,7 +373,7 @@ struct ResponseGroup
 
 	bool					m_bEnabled;
 
-	intp					m_nCurrentIndex;
+	byte					m_nCurrentIndex;
 	// Invalidation counter
 	byte					m_nDepletionCount;
 
@@ -1473,7 +1473,7 @@ bool CResponseSystem::ResolveResponse( ResponseSearchResult& searchResult, int d
 	if ( g->IsSequential() )
 	{
 		// See if next index is valid
-		intp initialIndex = g->GetCurrentIndex();
+		byte initialIndex = g->GetCurrentIndex();
 		bool bFoundValid = false;
 
 		do 
@@ -1588,7 +1588,7 @@ bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule 
 	if ( g->IsSequential() )
 	{
 		// See if next index is valid
-		intp initialIndex = g->GetCurrentIndex();
+		byte initialIndex = g->GetCurrentIndex();
 		bool bFoundValid = false;
 
 		do 
