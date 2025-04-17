@@ -3561,9 +3561,7 @@ bool CBaseFileSystem::IsFileWritable( char const *pFileName, char const *pPathID
 		{
 #ifdef WIN32
 			if( buf.st_mode & _S_IWRITE )
-#elif LINUX
-			if( buf.st_mode & S_IWRITE )
-#else
+#elif POSIX
 			if( buf.st_mode & S_IWRITE )
 #endif
 			{
