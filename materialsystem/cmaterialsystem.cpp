@@ -1786,6 +1786,8 @@ static const char *pConvarsAllowedInDXSupport[]={
 	"mat_depthbias_decal",
 	"mat_depthbias_normal",
 	"mat_disable_ps_patch",
+	// dimhotepus: Added Windows Aero Extensions support.
+	"mat_disable_d3d9ex",
 	"mat_forceaniso",
 	"mat_forcehardwaresync",
 	"mat_forcemanagedtextureintohardware",
@@ -1854,7 +1856,7 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 	if ( !g_pCVar )
 		return;
 
-	auto pKeyValues = KeyValues::AutoDelete( "config" );
+	KeyValuesAD pKeyValues("config");
 	if ( !GetRecommendedConfigurationInfo( g_config.dxSupportLevel, pKeyValues ) )
 	{
 		return;
@@ -1867,6 +1869,7 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 			continue;
 
 		pConfigName += 7;
+
 		// check if legal
 		bool bLegalVar = false;
 		for( auto *convar : pConvarsAllowedInDXSupport )
@@ -1877,6 +1880,7 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 				break;
 			}
 		}
+
 		if (! bLegalVar )
 		{
 			Warning("Not supported convar found in %s - %s %.2f\n", SUPPORT_CFG_FILE, pConfigName, pKey->GetFloat() );
@@ -1890,17 +1894,12 @@ void CMaterialSystem::WriteConfigurationInfoToConVars( bool bOverwriteCommandLin
 			{
 				// NOTE: This is essential for dealing with convars that
 				// are not specified in either the app that uses the materialsystem
-				// or the materialsystem itself
+				// or the materialsystem itself.
 				
 				// Yes, this causes a memory leak. Too bad!
-				intp nLen = Q_strlen( pConfigName ) + 1;
-				char *pString = new char[nLen];
-				Q_strncpy( pString, pConfigName, nLen );
-
+				char *pString = V_strdup( pConfigName );
 				// Actually, we need two memory leaks, or we lose the default string.
-				intp nDefaultLen = Q_strlen( pKey->GetString() ) + 1;
-				char *pDefaultString = new char[nDefaultLen];
-				Q_strncpy( pDefaultString, pKey->GetString(), nDefaultLen );
+				char *pDefaultString = V_strdup( pKey->GetString() );
 
 				pConVar = new ConVar( pString, pDefaultString );
 			}

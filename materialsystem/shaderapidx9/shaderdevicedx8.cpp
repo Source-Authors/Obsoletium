@@ -77,10 +77,60 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceMgrDx8, IShaderDeviceMgr,
 IDirect3DDevice *g_pD3DDevice = NULL;
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
+#define NOD3D9EX_CMD_OPTION "-nod3d9ex"
+
 // HACK: need to pass knowledge of D3D9Ex usage into callers of D3D Create* methods
 // so they do not try to specify D3DPOOL_MANAGED, which is unsupported in D3D9Ex
 bool g_ShaderDeviceUsingD3D9Ex = false;
 static ConVar mat_supports_d3d9ex( "mat_supports_d3d9ex", "0", FCVAR_HIDDEN );
+static std::atomic_bool g_allow_set_mat_disable_d3d9ex = false;
+
+class ScopedAllowSetMatDisableD3D9Ex
+{
+public:
+	explicit ScopedAllowSetMatDisableD3D9Ex(bool new_value) noexcept
+		: m_old_value{g_allow_set_mat_disable_d3d9ex.exchange(new_value)}
+	{
+	}
+
+	ScopedAllowSetMatDisableD3D9Ex(ScopedAllowSetMatDisableD3D9Ex&) = delete;
+	ScopedAllowSetMatDisableD3D9Ex(ScopedAllowSetMatDisableD3D9Ex&&) = delete;
+	ScopedAllowSetMatDisableD3D9Ex& operator=(ScopedAllowSetMatDisableD3D9Ex&) = delete;
+	ScopedAllowSetMatDisableD3D9Ex& operator=(ScopedAllowSetMatDisableD3D9Ex&&) = delete;
+
+	~ScopedAllowSetMatDisableD3D9Ex() noexcept
+	{
+		g_allow_set_mat_disable_d3d9ex.exchange(m_old_value);
+	}
+
+private:
+	const bool m_old_value;
+};
+
+// dimhotepus: Remove archive. Problem is convar read later than DirectX device created, so it is meaningless to set.
+static ConVar mat_disable_d3d9ex( "mat_disable_d3d9ex", "0", 0,
+	"Read-only. Use " NOD3D9EX_CMD_OPTION " command line arg.\n"
+	"Disables Windows Aero DirectX extensions (may positively or negatively "
+	"affect performance depending on video drivers)",
+	true, 0, true, 1,
+	[](IConVar *var, const char *, float old_value) {
+	auto *convar = static_cast<ConVar*>(var);
+
+	// dimhotepus: User tries to change mat_disable_d3d9ex.
+	if (!g_allow_set_mat_disable_d3d9ex && convar->GetFloat() != old_value)
+	{
+		Warning("%s is read-only. Use " NOD3D9EX_CMD_OPTION " command line arg to disable Windows Aero DirectX extensions.\n", var->GetName() );
+
+		const ScopedAllowSetMatDisableD3D9Ex scoped_allow_set_mat_disable_d3d9ex{true};
+		convar->SetValue(old_value);
+	}
+});
+static ConVar mat_disable_d3d9ex_hidden("mat_disable_d3d9ex_hidden", "0", FCVAR_HIDDEN, "Hidden mat_disable_d3d9ex", [](IConVar* var, const char*, float old_value) {
+	auto *convar = static_cast<ConVar*>(var);
+	
+	const ScopedAllowSetMatDisableD3D9Ex scoped_allow_set_mat_disable_d3d9ex{true};
+	mat_disable_d3d9ex.SetValue(convar->GetFloat());
+});
 #endif
 
 // hook into mat_forcedynamic from the engine.
@@ -140,7 +190,8 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	m_pD3D = NULL;
 
 	// Attempt to create a D3D9Ex device (Windows Vista and later) if possible
-	bool bD3D9ExForceDisable = ( CommandLine()->FindParm( "-nod3d9ex" ) != 0 ) ||
+	bool bD3D9ExForceDisable = mat_disable_d3d9ex.GetInt() == 1 ||
+								( CommandLine()->FindParm( NOD3D9EX_CMD_OPTION ) != 0 ) ||
 								( CommandLine()->ParmValue( "-dxlevel", 95 ) < 90 );
 
 	IDirect3D9Ex *pD3D9Ex = NULL;
@@ -166,6 +217,13 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	{
 		g_ShaderDeviceUsingD3D9Ex = false;
 		m_pD3D = Direct3DCreate9( D3D_SDK_VERSION );
+	}
+	
+	// dimhotepus: When command line option is passed, it should apply to mat_disable_d3d9ex
+	// as later signals D3D9Ex state to user.  mat_disable_d3d9ex should be readonly for user.
+	if ( CommandLine()->FindParm( NOD3D9EX_CMD_OPTION ) && !mat_disable_d3d9ex.GetInt() )
+	{
+		mat_disable_d3d9ex_hidden.SetValue( g_ShaderDeviceUsingD3D9Ex ? 0 : 1 );
 	}
 	
 	mat_supports_d3d9ex.SetValue( bD3D9ExAvailable ? 1 : 0 );
@@ -205,7 +263,7 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	// FIXME: Want this to be here, but we can't because Steam
 	// hasn't had it's application ID set up yet.
 	// dimhotepus: Init adapters immediately.
-  InitAdapterInfo();
+	InitAdapterInfo();
 	return true;
 }
 

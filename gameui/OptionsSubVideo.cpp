@@ -436,9 +436,23 @@ public:
 		m_pMotionBlur->AddItem("#gameui_disabled", NULL);
 		m_pMotionBlur->AddItem("#gameui_enabled", NULL);
 
+		// dimhotepus: Windows Aero extensions.
+		m_pD3D9Ex = new ComboBox( this, "D3D9Ex", 2, false );
+		m_pD3D9Ex->AddItem("#gameui_disabled", NULL); // 0
+		m_pD3D9Ex->AddItem("#gameui_enabled", NULL);  // 1
+
 		LoadControlSettings( "resource/OptionsSubVideoAdvancedDlg.res" );
 		MoveToCenterOfScreen();
 		SetSizeable( false );
+
+		// dimhotepus: Always disable. Convar loaded after DirectX startup so changing this
+		// doesn't work in Source, too.
+		//
+		// Bug: Disabling D3D9Ex through console command or in video options does not work
+		// on Windows 10/11.  Using -nod3d9ex works, however.
+		//
+		// See https://developer.valvesoftware.com/wiki/DirectX_Versions
+		m_pD3D9Ex->SetEnabled(false);
 
 		m_pDXLevel->SetEnabled(false);
 		
@@ -474,6 +488,7 @@ public:
 		MarkDefaultSettingsAsRecommended();
 
 		m_bUseChanges = false;
+		m_bDisplayedWindowsAeroChangeMessage = false;
 	}
 
 	void Activate() override
@@ -528,6 +543,23 @@ public:
 			box->SetCancelCommand(new KeyValues("ResetDXLevelCombo"));
 			box->DoModal();
 		}
+
+		if ( panel == m_pD3D9Ex )
+		{
+			// Windows Aero extensions changed.
+			if ( !m_bDisplayedWindowsAeroChangeMessage && m_pD3D9Ex->IsEnabled() )
+			{
+				ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
+				Assert( mat_disable_d3d9ex.IsValid() );
+				if ( mat_disable_d3d9ex.GetInt() != 1 - m_pD3D9Ex->GetActiveItem() )
+				{
+					m_bDisplayedWindowsAeroChangeMessage = true;
+					MessageBox *box = new MessageBox( "#GameUI_D3D9Ex", "#GameUI_D3D9ExRelaunchMsg", this );
+					box->MoveToFront();
+					box->DoModal();
+				}
+			}
+		}
 	}
 
 	MESSAGE_FUNC( OnGameUIHidden, "GameUIHidden" )	// called when the GameUI is hidden
@@ -554,6 +586,14 @@ public:
 			ConVarRef mat_hdr_level("mat_hdr_level");
 			Assert( mat_hdr_level.IsValid() );
 			m_pHDR->ActivateItem( clamp( mat_hdr_level.GetInt(), 0, 2 ) );
+		}
+
+		// Reset Windows Aero extensions too
+		if ( m_pD3D9Ex->IsEnabled() )
+		{
+			ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
+			Assert( mat_disable_d3d9ex.IsValid() );
+			m_pD3D9Ex->ActivateItem( mat_disable_d3d9ex.GetInt() ? 0 : 1 );
 		}
 	}
 
@@ -584,7 +624,7 @@ public:
 	void MarkDefaultSettingsAsRecommended()
 	{
 		// Pull in data from dxsupport.cfg database (includes fine-grained per-vendor/per-device config data)
-		KeyValues *pKeyValues = new KeyValues( "config" );
+		KeyValuesAD pKeyValues( "config" );
 		materials->GetRecommendedConfigurationInfo( 0, pKeyValues );	
 
 		// Read individual values from keyvalues which came from dxsupport.cfg database
@@ -605,6 +645,10 @@ public:
 		int nDXLevel = pKeyValues->GetInt( "ConVar.mat_dxlevel", 0 );
 		int nColorCorrection = pKeyValues->GetInt( "ConVar.mat_colorcorrection", 0 );
 		int nMotionBlur = pKeyValues->GetInt( "ConVar.mat_motion_blur_enabled", 0 );
+		// dimhotepus: mat_supports_d3d9ex not present in original Valve config. Need direct access.s
+		ConVarRef mat_supports_d3d9ex( "mat_supports_d3d9ex" );
+		Assert( mat_supports_d3d9ex.IsValid() );
+		int nSupportD3d9ex = mat_supports_d3d9ex.GetInt();
 		// It doesn't make sense to retrieve this convar from dxsupport, because we'll then have materialsystem setting this config at loadtime. (Also, it only has very minimal support for CPU related configuration.)
 		//int nMulticore = pKeyValues->GetInt( "ConVar.mat_queue_mode", 0 );
 		int nMulticore = GetCPUInformation()->m_nPhysicalProcessors >= 2;
@@ -696,7 +740,7 @@ public:
 
 		SetComboItemAsRecommended( m_pMotionBlur, nMotionBlur );
 
-		pKeyValues->deleteThis();
+		SetComboItemAsRecommended(m_pD3D9Ex, nSupportD3d9ex ? 1 : 0);
 	}
 
 	void ApplyChangesToConVar( const char *pConVarName, int value )
@@ -811,10 +855,13 @@ public:
 		ApplyChangesToConVar( "mat_colorcorrection", m_pColorCorrection->GetActiveItem() );
 
 		ApplyChangesToConVar( "mat_motion_blur_enabled", m_pMotionBlur->GetActiveItem() );
-		
-		if ( m_pFOVSlider )
+
+		if ( m_pD3D9Ex->IsEnabled() )
 		{
-			m_pFOVSlider->ApplyChanges();
+			ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
+			Assert( mat_disable_d3d9ex.IsValid() );
+			// Inverse, disabled means not enabled.
+			mat_disable_d3d9ex.SetValue(1 - m_pD3D9Ex->GetActiveItem());
 		}
 		
 		m_pFOVSlider->ApplyChanges();
@@ -840,6 +887,7 @@ public:
 		ConVarRef mat_hdr_level( "mat_hdr_level" );
 		ConVarRef mat_colorcorrection( "mat_colorcorrection" );
 		ConVarRef mat_motion_blur_enabled( "mat_motion_blur_enabled" );
+		ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
 		ConVarRef r_shadowrendertotexture( "r_shadowrendertotexture" );
 
 		ResetDXLevelCombo();
@@ -863,6 +911,8 @@ public:
 
 		m_pShaderDetail->ActivateItem( mat_reducefillrate.GetBool() ? 0 : 1 );
 		m_pHDR->ActivateItem(clamp(mat_hdr_level.GetInt(), 0, 2));
+		// Inversed, disabled means not enabled.
+		m_pD3D9Ex->ActivateItem( mat_disable_d3d9ex.GetInt() ? 0 : 1 );
 
 		switch (mat_forceaniso.GetInt())
 		{
@@ -1025,9 +1075,11 @@ private:
 	vgui::ComboBox *m_pColorCorrection;
 	vgui::ComboBox *m_pMotionBlur;
 	vgui::ComboBox *m_pDXLevel;
+	vgui::ComboBox *m_pD3D9Ex;
 
 	int m_nNumAAModes;
 	AAMode_t m_nAAModes[16];
+	bool m_bDisplayedWindowsAeroChangeMessage;
 };
 
 #if defined( USE_SDL )
