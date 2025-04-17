@@ -28,7 +28,8 @@ struct cache_user_t;
 
 //============================================================================
 
-#define COM_COPY_CHUNK_SIZE 1024   // For copying operations
+// dimhotepus: Increase 1024 -> 65535 to speedup copying.
+constexpr inline int COM_COPY_CHUNK_SIZE{65535};  // For copying operations
 
 #include "tier1/strtools.h"
 
