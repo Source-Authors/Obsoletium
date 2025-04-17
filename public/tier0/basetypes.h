@@ -29,11 +29,6 @@
 #define XBOX_CODELINE_ONLY() Error_Compiling_Code_Only_Valid_in_Xbox_Codeline
 #endif
 
-// cstdio
-#ifndef NULL
-#define NULL 0
-#endif
-
 #define ExecuteNTimes( nTimes, x )	   \
 	{								   \
 		static int executeCount__{0};  \
