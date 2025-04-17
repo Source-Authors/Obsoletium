@@ -89,19 +89,17 @@ private:
 };
 
 
-
-[[nodiscard]] FORCEINLINE float XM_CALLCONV clamp( float val, float minVal, float maxVal )
-{
-	DirectX::XMVECTOR vres = DirectX::XMVectorClamp
-	(
-		DirectX::XMLoadFloat( &val ),
-		DirectX::XMLoadFloat( &minVal ),
-		DirectX::XMLoadFloat( &maxVal )
-	);
-	return DirectX::XMVectorGetX( vres ); //-V2002
-	//val = fpmax(minVal, val);
-	//val = fpmin(maxVal, val);
-}
+// dimhotepus: Causes implicit float conversion issues. Just use std::clamp
+//[[nodiscard]] FORCEINLINE float XM_CALLCONV clamp( float val, float minVal, float maxVal )
+//{
+//	DirectX::XMVECTOR vres = DirectX::XMVectorClamp
+//	(
+//		DirectX::XMLoadFloat( &val ),
+//		DirectX::XMLoadFloat( &minVal ),
+//		DirectX::XMLoadFloat( &maxVal )
+//	);
+//	return DirectX::XMVectorGetX( vres ); //-V2002
+//}
 
 //
 // Returns a clamped value in the range [min, max].
