@@ -49,11 +49,10 @@ protected:
 
 	void ScanCommentaryFiles();
 	void CreateCommentaryItemList();
-	int GetSelectedItemIndex();
+	intp GetSelectedItemIndex();
 	void AddCommentaryItemToList( int saveIndex );
 
 	void ParseCommentaryFile( char const *pszFileName, char const *pszShortName );
-	static int __cdecl SaveGameSortFunc( const void *lhs, const void *rhs );
 
 private:
 	MESSAGE_FUNC( OnPanelSelected, "PanelSelected" );

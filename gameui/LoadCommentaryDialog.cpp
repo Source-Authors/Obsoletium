@@ -195,7 +195,7 @@ void CLoadCommentaryDialog::OnCommand( const char *command )
 {
 	if ( !Q_stricmp( command, "loadcommentary" ) )
 	{
-		int itemIndex = GetSelectedItemIndex();
+		intp itemIndex = GetSelectedItemIndex();
 		if ( m_CommentaryItems.IsValidIndex(itemIndex) )
 		{
 			const char *mapName = m_CommentaryItems[itemIndex].szMapName;
@@ -246,13 +246,13 @@ void CLoadCommentaryDialog::CreateCommentaryItemList()
 //-----------------------------------------------------------------------------
 // Purpose: returns the save file name of the selected item
 //-----------------------------------------------------------------------------
-int CLoadCommentaryDialog::GetSelectedItemIndex()
+intp CLoadCommentaryDialog::GetSelectedItemIndex()
 {
 	CCommentaryItemPanel *panel = dynamic_cast<CCommentaryItemPanel *>(m_pGameList->GetSelectedPanel());
 	if ( panel )
 	{
 		// find the panel in the list
-		for ( int i = 0; i < m_CommentaryItems.Count(); i++ )
+		for ( intp i = 0; i < m_CommentaryItems.Count(); i++ )
 		{
 			if ( i == panel->GetListItemID() )
 			{
@@ -299,7 +299,11 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 	g_pFullFileSystem->FindClose( handle );
 
 	// sort the save list
-	qsort( m_CommentaryItems.Base(), m_CommentaryItems.Count(), sizeof(CommentaryItem_t), &SaveGameSortFunc );
+	std::sort( m_CommentaryItems.begin(), m_CommentaryItems.end(), []( const CommentaryItem_t &s1, const CommentaryItem_t &s2 )
+	{
+		// Sort by map name
+		return Q_stricmp( s1.szPrintName, s2.szPrintName ) < 0;
+	});
 
 	// add to the list
 	for ( int saveIndex = 0; saveIndex < m_CommentaryItems.Count() && saveIndex < MAX_LISTED_COMMENTARY_ITEMS; saveIndex++ )
@@ -388,17 +392,6 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 	return;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: timestamp sort function for savegames
-//-----------------------------------------------------------------------------
-int CLoadCommentaryDialog::SaveGameSortFunc( const void *lhs, const void *rhs )
-{
-	// Sort by map name
-	const CommentaryItem_t *s1 = (const CommentaryItem_t *)lhs;
-	const CommentaryItem_t *s2 = (const CommentaryItem_t *)rhs;
-
-	return Q_stricmp( s1->szPrintName, s2->szPrintName );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: One item has been selected
