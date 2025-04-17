@@ -141,6 +141,46 @@ extern	int			total_channels;
 class CChannelList
 {
 public:
+    class Iterator 
+    {
+	public:
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = channel_t;
+        using pointer           = channel_t*;
+        using reference         = channel_t&;
+
+        explicit Iterator(value_type (&data)[MAX_CHANNELS],
+                          short (&indexes_map)[MAX_CHANNELS],
+                          difference_type map_index)
+            : m_data{data}, m_indexes_map{indexes_map}, m_map_index{map_index} {}
+
+        reference operator*() const { return GetReference(m_map_index); }
+        pointer operator->() { return &GetReference(m_map_index); }
+
+        Iterator& operator++() { m_map_index++; return *this; }
+        Iterator operator++(int) { Iterator tmp{*this}; ++(*this); return tmp; }
+
+        friend bool operator==(const Iterator& a, const Iterator& b) { return a.m_map_index == b.m_map_index; }
+        friend bool operator!=(const Iterator& a, const Iterator& b) { return !(a == b); }
+
+    private:
+        value_type (&m_data)[MAX_CHANNELS];
+        short (&m_indexes_map)[MAX_CHANNELS];
+        difference_type m_map_index;
+
+        inline short MapIndex(difference_type map_index) const {
+          return m_indexes_map[map_index];
+        }
+
+        inline reference GetReference(difference_type map_index) const {
+          return m_data[MapIndex(map_index)];
+        }
+    };
+
+    Iterator begin() { return Iterator(channels, m_list, 0); }
+    Iterator end()   { return Iterator(channels, m_list, m_count); }
+
 	int		Count();
 	int		GetChannelIndex( int listIndex );
 	channel_t *GetChannel( int listIndex );

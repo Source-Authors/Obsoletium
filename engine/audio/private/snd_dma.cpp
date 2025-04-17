@@ -5459,17 +5459,16 @@ int S_StartStaticSound( StartSoundParams_t& params )
 		//  kill the new version and update the soundsource
 		CChannelList list;
 		g_ActiveChannels.GetActiveChannels( list );
-		for ( int i = 0; i < list.Count(); i++ )
+		for ( auto &pChannel : list )
 		{
-			channel_t *pChannel = list.GetChannel(i);
 			// Don't mess with the channel we just created, of course
-			if ( ch == pChannel )
+			if ( ch == &pChannel )
 				continue;
-			if ( ch->sfx != pChannel->sfx )
+			if ( ch->sfx != pChannel.sfx )
 				continue;
-			if ( pChannel->soundsource != SOUND_FROM_WORLD )
+			if ( pChannel.soundsource != SOUND_FROM_WORLD )
 				continue;
-			if ( !S_IsMusic( pChannel ) )
+			if ( !S_IsMusic( &pChannel ) )
 				continue;
 
 			DevMsg( 1, "Hooking duplicate restored song track %s\n", sndname );
@@ -5478,10 +5477,10 @@ int S_StartStaticSound( StartSoundParams_t& params )
 			// has an updated pitch or volume since we are receiving this sound message
 			// after the sound has started playing (usually a volume change)
 			// copy that data out of the source
-			pChannel->soundsource = ch->soundsource;
-			pChannel->master_vol = ch->master_vol;
-			pChannel->basePitch = ch->basePitch;
-			pChannel->pitch = ch->pitch;
+			pChannel.soundsource = ch->soundsource;
+			pChannel.master_vol = ch->master_vol;
+			pChannel.basePitch = ch->basePitch;
+			pChannel.pitch = ch->pitch;
 			S_FreeChannel( ch );
 			
 			return 0;
@@ -5575,13 +5574,12 @@ void S_StopSound(int soundsource, int entchannel)
 	THREAD_LOCK_SOUND();
 	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( auto &channel : list )
 	{
-		channel_t *pChannel = list.GetChannel(i);
-		if (pChannel->soundsource == soundsource
-			&& pChannel->entchannel == entchannel)
+		if (channel.soundsource == soundsource
+			&& channel.entchannel == entchannel)
 		{
-			S_FreeChannel( pChannel );
+			S_FreeChannel( &channel );
 		}
 	}
 }
@@ -5590,12 +5588,11 @@ channel_t *S_FindChannelByGuid( int guid )
 {
 	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( auto &channel : list )
 	{
-		channel_t *pChannel = list.GetChannel(i);
-		if ( pChannel->guid == guid )
+		if ( channel.guid == guid )
 		{
-			return pChannel;
+			return &channel;
 		}
 	}
 	return NULL;
@@ -5706,39 +5703,37 @@ void S_GetActiveSounds( CUtlVector< SndInfo_t >& sndlist )
 {
 	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( auto &ch : list )
 	{
-		channel_t *ch = list.GetChannel(i);
-
 		SndInfo_t info;
 
-		info.m_nGuid			= ch->guid;
-		info.m_filenameHandle	= ch->sfx ? ch->sfx->GetFileNameHandle() : NULL;
-		info.m_nSoundSource		= ch->soundsource;
-		info.m_nChannel			= ch->entchannel;
+		info.m_nGuid			= ch.guid;
+		info.m_filenameHandle	= ch.sfx ? ch.sfx->GetFileNameHandle() : NULL;
+		info.m_nSoundSource		= ch.soundsource;
+		info.m_nChannel			= ch.entchannel;
 		// If a sound is being played through a speaker entity (e.g., on a monitor,), this is the
 		//  entity upon which to show the lips moving, if the sound has sentence data
-		info.m_nSpeakerEntity	= ch->speakerentity;
-		info.m_flVolume			= (float)ch->master_vol / 255.0f;
-		info.m_flLastSpatializedVolume = ch->last_vol;
+		info.m_nSpeakerEntity	= ch.speakerentity;
+		info.m_flVolume			= (float)ch.master_vol / 255.0f;
+		info.m_flLastSpatializedVolume = ch.last_vol;
 		// Radius of this sound effect (spatialization is different within the radius)
-		info.m_flRadius			= ch->radius;
-		info.m_nPitch			= ch->basePitch;
-		info.m_pOrigin			= &ch->origin;
-		info.m_pDirection		= &ch->direction;
+		info.m_flRadius			= ch.radius;
+		info.m_nPitch			= ch.basePitch;
+		info.m_pOrigin			= &ch.origin;
+		info.m_pDirection		= &ch.direction;
 
 		// if true, assume sound source can move and update according to entity
-		info.m_bUpdatePositions = ch->flags.bUpdatePositions;
+		info.m_bUpdatePositions = ch.flags.bUpdatePositions;
 		// true if playing linked sentence
-		info.m_bIsSentence		= ch->flags.isSentence;
+		info.m_bIsSentence		= ch.flags.isSentence;
 		// if true, bypass all dsp processing for this sound (ie: music)	
-		info.m_bDryMix			= ch->flags.bdry;
+		info.m_bDryMix			= ch.flags.bdry;
 		// true if sound is playing through in-game speaker entity.
-		info.m_bSpeaker			= ch->flags.bSpeaker;
+		info.m_bSpeaker			= ch.flags.bSpeaker;
 		// true if sound is using special DSP effect
-		info.m_bSpecialDSP		= ( ch->special_dsp != 0 );
+		info.m_bSpecialDSP		= ( ch.special_dsp != 0 );
 		// for snd_show, networked sounds get colored differently than local sounds
-		info.m_bFromServer		= ch->flags.fromserver; 
+		info.m_bFromServer		= ch.flags.fromserver; 
 
 		sndlist.AddToTail( info );
 	}
@@ -5747,26 +5742,24 @@ void S_GetActiveSounds( CUtlVector< SndInfo_t >& sndlist )
 void S_StopAllSounds( bool bClear )
 {
 	THREAD_LOCK_SOUND();
-	int		i;
 
-	if ( !g_AudioDevice )
-		return;
-
-	if ( !g_AudioDevice->IsActive() )
+	if ( !g_AudioDevice || !g_AudioDevice->IsActive() )
 		return;
 
 	total_channels = MAX_DYNAMIC_CHANNELS;	// no statics
 
 	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
-	for ( i = 0; i < list.Count(); i++ )
+	intp i = 0;
+	for ( auto &channel : list )
 	{
-		channel_t *pChannel = list.GetChannel(i);
-		if ( channels[i].sfx )
+		if ( auto *sfx = channels[i].sfx; sfx )
 		{
-			DevMsg( 1, "%2d:Stopped sound %s\n", i, channels[i].sfx->getname() );
+			DevMsg( 1, "%2zd:Stopped sound %s.\n", i, sfx->getname() );
 		}
-		S_FreeChannel( pChannel );
+
+		S_FreeChannel( &channel );
+		++i;
 	}
 
 	Q_memset( channels, 0, MAX_CHANNELS * sizeof(channel_t) );
@@ -5952,7 +5945,6 @@ Called once each time through the main loop
 void S_Update( const AudioState_t *pAudioState )
 {
 	VPROF("S_Update");
-	channel_t	*ch;
 	channel_t	*combine;
 	static unsigned int s_roundrobin = 0 ; ///< number of times this function is called.
 									  ///< used instead of host_frame because that number
@@ -6005,43 +5997,44 @@ void S_Update( const AudioState_t *pAudioState )
 	if (snd_spatialize_roundrobin.GetInt() == 0)
 	{
 		// spatialize each channel each time
-		for ( int i = 0; i < list.Count(); i++ )
+		for ( auto &ch : list )
 		{
-			ch = list.GetChannel(i);
-			Assert(ch->sfx);
-			Assert(ch->activeIndex > 0);
+			Assert(ch.sfx);
+			Assert(ch.activeIndex > 0);
 
-			SND_Spatialize(ch);         // respatialize channel
+			SND_Spatialize(&ch);         // respatialize channel
 
-			if ( ch->sfx->pSource && ch->sfx->pSource->IsVoiceSource() )
+			if ( ch.sfx->pSource && ch.sfx->pSource->IsVoiceSource() )
 			{
 				voiceChannelCount++;
-				voiceChannelMaxVolume = max(voiceChannelMaxVolume, ChannelGetMaxVol( ch) );
+				voiceChannelMaxVolume = max(voiceChannelMaxVolume, ChannelGetMaxVol( &ch ) );
 			}
 		}
 	}
 	else	// lowend performance improvement: spatialize only some  channels each frame.
 	{
 		unsigned int robinmask = (1 << snd_spatialize_roundrobin.GetInt()) - 1;
+		unsigned int i = 0;
 
 		// now do static channels
-		for ( int i = 0 ; i < list.Count() ; ++i )
+		for ( auto &ch : list )
 		{
-			ch = list.GetChannel(i);
-			Assert(ch->sfx);
-			Assert(ch->activeIndex > 0);
+			Assert(ch.sfx);
+			Assert(ch.activeIndex > 0);
 
 			// need to check bfirstpass because sound tracing may have been deferred
-			if ( ch->flags.bfirstpass || (robinmask & s_roundrobin) == ( i & robinmask ) )
+			if ( ch.flags.bfirstpass || (robinmask & s_roundrobin) == ( i & robinmask ) )
 			{
-				SND_Spatialize(ch);         // respatialize channel
+				SND_Spatialize(&ch);         // respatialize channel
 			}
 
-			if ( ch->sfx->pSource && ch->sfx->pSource->IsVoiceSource() )
+			if ( ch.sfx->pSource && ch.sfx->pSource->IsVoiceSource() )
 			{
 				voiceChannelCount++;
-				voiceChannelMaxVolume = max( voiceChannelMaxVolume, ChannelGetMaxVol( ch) );
+				voiceChannelMaxVolume = max( voiceChannelMaxVolume, ChannelGetMaxVol( &ch ) );
 			}
+
+			++i;
 		}
 
 		++s_roundrobin;
@@ -6071,14 +6064,13 @@ void S_Update( const AudioState_t *pAudioState )
 
 		CChannelList activeChannels;
 		g_ActiveChannels.GetActiveChannels( activeChannels );
-		for ( int i = 0; i < activeChannels.Count(); i++ )
+		for ( auto &channel : activeChannels )
 		{
-			channel_t *channel = activeChannels.GetChannel(i);
-			if ( !channel->sfx )
+			if ( !channel.sfx )
 				continue;
 
 			np.index = total + 2;
-			if ( channel->flags.fromserver )
+			if ( channel.flags.fromserver )
 			{
 				np.color[0] = 1.0;
 				np.color[1] = 0.8;
@@ -6091,47 +6083,47 @@ void S_Update( const AudioState_t *pAudioState )
 				np.color[2] = 1.0;
 			}
 
-			unsigned int sampleCount = RemainingSamples( channel );
-			float timeleft = (float)sampleCount / (float)channel->sfx->pSource->SampleRate();
-			bool bLooping = channel->sfx->pSource->IsLooped();
+			unsigned int sampleCount = RemainingSamples( &channel );
+			float timeleft = (float)sampleCount / (float)channel.sfx->pSource->SampleRate();
+			bool bLooping = channel.sfx->pSource->IsLooped();
 
 			if (snd_surround.GetInt() < 4)
 			{
 				Con_NXPrintf ( &np, "%02i l(%03d) r(%03d) vol(%03d) ent(%03d) pos(%6d %6d %6d) timeleft(%f) looped(%d) %50s", 
 					total+ 1, 
-					(int)channel->fvolume[IFRONT_LEFT],
-					(int)channel->fvolume[IFRONT_RIGHT],
-					channel->master_vol,
-					channel->soundsource,
-					(int)channel->origin[0],
-					(int)channel->origin[1],
-					(int)channel->origin[2],
+					(int)channel.fvolume[IFRONT_LEFT],
+					(int)channel.fvolume[IFRONT_RIGHT],
+					channel.master_vol,
+					channel.soundsource,
+					(int)channel.origin[0],
+					(int)channel.origin[1],
+					(int)channel.origin[2],
 					timeleft,
 					bLooping, 
-					channel->sfx->getname());
+					channel.sfx->getname());
 			}
 			else
 			{
 				Con_NXPrintf ( &np, "%02i l(%03d) c(%03d) r(%03d) rl(%03d) rr(%03d) vol(%03d) ent(%03d) pos(%6d %6d %6d) timeleft(%f) looped(%d) %50s", 
 					total+ 1, 
-					(int)channel->fvolume[IFRONT_LEFT],
-					(int)channel->fvolume[IFRONT_CENTER],
-					(int)channel->fvolume[IFRONT_RIGHT],
-					(int)channel->fvolume[IREAR_LEFT],
-					(int)channel->fvolume[IREAR_RIGHT],
-					channel->master_vol,
-					channel->soundsource,
-					(int)channel->origin[0],
-					(int)channel->origin[1],
-					(int)channel->origin[2],
+					(int)channel.fvolume[IFRONT_LEFT],
+					(int)channel.fvolume[IFRONT_CENTER],
+					(int)channel.fvolume[IFRONT_RIGHT],
+					(int)channel.fvolume[IREAR_LEFT],
+					(int)channel.fvolume[IREAR_RIGHT],
+					channel.master_vol,
+					channel.soundsource,
+					(int)channel.origin[0],
+					(int)channel.origin[1],
+					(int)channel.origin[2],
 					timeleft,
 					bLooping,
-					channel->sfx->getname());
+					channel.sfx->getname());
 			}
 
 			if ( snd_visualize.GetInt() )
 			{
-				CDebugOverlay::AddTextOverlay( channel->origin, 0.05f, channel->sfx->getname() );
+				CDebugOverlay::AddTextOverlay( channel.origin, 0.05f, channel.sfx->getname() );
 			}
 
 			total++;
@@ -6171,34 +6163,33 @@ CON_COMMAND( snd_dumpclientsounds, "Dump sounds to VXConsole" )
 
 	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( auto &ch : list )
 	{
-		channel_t *ch = list.GetChannel(i);
-		if ( !ch->sfx )
+		if ( !ch.sfx )
 			continue;
 
-		unsigned int sampleCount = RemainingSamples( ch );
-		float timeleft = (float)sampleCount / (float)ch->sfx->pSource->SampleRate();
-		bool bLooping = ch->sfx->pSource->IsLooped();
-		const char *pszclassname = GetClientClassname(ch->soundsource);
+		unsigned int sampleCount = RemainingSamples( &ch );
+		float timeleft = (float)sampleCount / (float)ch.sfx->pSource->SampleRate();
+		bool bLooping = ch.sfx->pSource->IsLooped();
+		const char *pszclassname = GetClientClassname(ch.soundsource);
 
 		Msg( "%02i %s l(%03d) c(%03d) r(%03d) rl(%03d) rr(%03d) vol(%03d) pos(%6d %6d %6d) timeleft(%f) looped(%d) %50s chan:%d ent(%03d):%s\n", 
 			total+ 1, 
-			ch->flags.fromserver ? "SERVER" : "CLIENT",
-			(int)ch->fvolume[IFRONT_LEFT], 
-			(int)ch->fvolume[IFRONT_CENTER],
-			(int)ch->fvolume[IFRONT_RIGHT], 
-			(int)ch->fvolume[IREAR_LEFT], 
-			(int)ch->fvolume[IREAR_RIGHT], 
-			ch->master_vol,
-			(int)ch->origin[0],
-			(int)ch->origin[1],
-			(int)ch->origin[2],
+			ch.flags.fromserver ? "SERVER" : "CLIENT",
+			(int)ch.fvolume[IFRONT_LEFT], 
+			(int)ch.fvolume[IFRONT_CENTER],
+			(int)ch.fvolume[IFRONT_RIGHT], 
+			(int)ch.fvolume[IREAR_LEFT], 
+			(int)ch.fvolume[IREAR_RIGHT], 
+			ch.master_vol,
+			(int)ch.origin[0],
+			(int)ch.origin[1],
+			(int)ch.origin[2],
 			timeleft,
 			bLooping, 
-			ch->sfx->getname(),
-			ch->entchannel,
-			ch->soundsource,
+			ch.sfx->getname(),
+			ch.entchannel,
+			ch.soundsource,
 			pszclassname ? pszclassname : "NULL" );
 
 		total++;
@@ -6344,19 +6335,6 @@ void S_Update_Guts( float mixAheadTime )
 	// 'g_paintedtime' indicates how many samples we've actually mixed
 	// and sent to the dma buffer since sound system startup.
 	GetSoundTime();
-
-//	if ( g_soundtime > g_paintedtime )
-//	{
-//		// if soundtime > paintedtime, then the dma buffer
-//		// has played out more sound than we've actually
-//		// mixed.  We need to call S_Update_ more often.
-//
-//		DevMsg ("S_Update_ : Underflow\n"); 
-//		paintedtime = g_soundtime;		
-//	}
-//	(kdb) above code doesn't handle underflow correctly 
-//	should actually zero out the paintbuffer to advance to the new
-//	time.
 
 	// mix ahead of current position
 	unsigned endtime = g_AudioDevice->PaintBegin( mixAheadTime, g_soundtime, g_paintedtime );
