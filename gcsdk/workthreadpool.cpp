@@ -106,9 +106,9 @@ int CWorkThread::Run()
 
 					CFastTimer fastTimer;
 					fastTimer.Start();
-					pWorkItem->m_bRunning = true;
+					pWorkItem->m_bRunning.store(true, std::memory_order::memory_order_acq_rel);
 					bool bSuccess = pWorkItem->ThreadProcess( this );
-					pWorkItem->m_bRunning = false;
+					pWorkItem->m_bRunning.store(false, std::memory_order::memory_order_acq_rel);
 					fastTimer.End();
 					CCycleCount cycleCount = fastTimer.GetDuration();
 					pWorkItem->SetCycleCount(cycleCount);

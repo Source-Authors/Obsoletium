@@ -129,7 +129,7 @@ protected:
 
 private:
 	bool		m_bResubmit;		// true if the item should be resubmitted after last run
-	volatile bool m_bRunning;		// true if the work item is running right now
+	std::atomic_bool m_bRunning;	// true if the work item is running right now
 	bool		m_bCanceled;		// true if the work was canceled due to timeout
 	CJobTime	m_jobtimeTimeout;	// time at which this result is no longer valid, so it shouldn't start to be processed
 	CJobTime	m_jobtimeQueued;
@@ -160,8 +160,8 @@ public:
 
 protected:
 	CWorkThreadPool *m_pThreadPool;	// parent pool
-	volatile bool m_bExitThread;	// set by CWorkThreadPool::StopWorkerThreads and possibly by subclasses of CWorkThread
-	volatile bool m_bFinished;		// set by CWorkThread::Run [note: must still check IsThreadRunning, and/or call Join]
+	std::atomic_bool m_bExitThread;	// set by CWorkThreadPool::StopWorkerThreads and possibly by subclasses of CWorkThread
+	std::atomic_bool m_bFinished;	// set by CWorkThread::Run [note: must still check IsThreadRunning, and/or call Join]
 	virtual void OnStart() { }
 	virtual void OnExit() { }
 
@@ -350,10 +350,10 @@ protected:
 	CUtlVector< CWorkThread * > m_WorkThreads; 
 	CThreadMutex m_WorkThreadMutex;
 	CInterlockedUInt m_cThreadsRunning;	// how many threads are running 
-	volatile bool m_bExiting;			// are we exiting
+	std::atomic_bool m_bExiting;		// are we exiting
 	CThreadEvent m_EventNewWorkItem;	// event set when a new work item is available to process
 	CInterlockedInt m_cActiveThreads;
-	volatile bool m_bNeverSetOnAdd;
+	std::atomic_bool m_bNeverSetOnAdd;
 
 	bool m_bAutoCreateThreads;
 	int m_cMaxThreads;
