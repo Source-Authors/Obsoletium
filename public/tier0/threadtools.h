@@ -1238,7 +1238,6 @@ public:
 	{
 		COMPILE_TIME_ASSERT( sizeof( LockInfo_t ) == sizeof( int64 ) );
 		Assert( (intp)this % 8 == 0 );
-		memset( this, 0, sizeof( *this ) );
 	}
 
 	bool TryLockForWrite();
@@ -1263,15 +1262,14 @@ private:
 		int		m_nReaders;
 	};
 
-	bool AssignIf( const LockInfo_t &newValue, const LockInfo_t &comperand );
+	bool AssignIf( const LockInfo_t &newValue, LockInfo_t &comperand );
 	bool TryLockForWrite( const ThreadId_t threadId );
 	void SpinLockForWrite( const ThreadId_t threadId );
-
-	volatile LockInfo_t m_lockInfo;
-
+	
+	// DLL export looks safe. 
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
-  // DLL export looks safe. 
 	MSVC_DISABLE_WARNING(4251)
+	std::atomic<LockInfo_t> m_lockInfo;
 	CInterlockedInt m_nWriters;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 } ALIGN8_POST;
@@ -1804,23 +1802,25 @@ inline void CThreadRWLock::UnlockRead()
 //
 //-----------------------------------------------------------------------------
 
-inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, const LockInfo_t &comperand )
+inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, LockInfo_t &comperand )
 {
-	return ThreadInterlockedAssignIf64( (volatile int64 *)&m_lockInfo, *((const int64 *)&newValue), *((const int64 *)&comperand) );
+	return m_lockInfo.compare_exchange_strong(comperand, newValue);
 }
 
 inline bool CThreadSpinRWLock::TryLockForWrite( const ThreadId_t threadId )
 {
+	auto lockInfo = m_lockInfo.load();
+
 	// In order to grab a write lock, there can be no readers and no owners of the write lock
-	if ( m_lockInfo.m_nReaders > 0 || ( m_lockInfo.m_writerId && m_lockInfo.m_writerId != threadId ) )
+	if ( lockInfo.m_nReaders > 0 || ( lockInfo.m_writerId && lockInfo.m_writerId != threadId ) )
 	{
 		return false;
 	}
 
-	static const LockInfo_t oldValue = { 0, 0 };
-	LockInfo_t newValue = { threadId, 0 };
-	const bool bSuccess = AssignIf( newValue, oldValue );
+	LockInfo_t oldValue{0UL, 0};
+	LockInfo_t newValue{threadId, 0};
 
+	const bool bSuccess = AssignIf( newValue, oldValue );
 	return bSuccess;
 }
 
@@ -1841,14 +1841,10 @@ inline bool CThreadSpinRWLock::TryLockForRead()
 	{
 		return false;
 	}
-	// In order to grab a write lock, the number of readers must not change and no thread can own the write
-	LockInfo_t oldValue;
-	LockInfo_t newValue;
 
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
-		oldValue.m_writerId = 0;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
-		newValue.m_writerId = 0;
+	// In order to grab a write lock, the number of readers must not change and no thread can own the write
+	LockInfo_t oldValue{0UL, m_lockInfo.load().m_nReaders};
+	LockInfo_t newValue{0UL, oldValue.m_nReaders + 1};
 
 	const bool bSuccess = AssignIf( newValue, oldValue );
 	return bSuccess;

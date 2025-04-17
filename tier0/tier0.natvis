@@ -294,12 +294,12 @@
   </Type>
 
   <Type Name="CThreadSpinRWLock">
-    <DisplayString Condition="m_nWriters.m_value.value() == 0 &amp;&amp; m_lockInfo.m_nReaders == 0">empty</DisplayString>
-    <DisplayString Condition="m_lockInfo.m_nReaders != 0">locked read ({m_lockInfo.m_nReaders})</DisplayString>
+    <DisplayString Condition="m_nWriters.m_value.value() == 0 &amp;&amp; m_lockInfo.value().m_nReaders == 0">empty</DisplayString>
+    <DisplayString Condition="m_lockInfo.value().m_nReaders != 0">locked read ({m_lockInfo.value().m_nReaders})</DisplayString>
     <DisplayString Condition="m_nWriters.m_value.value() != 0">locked write ({m_nWriters})</DisplayString>
     <Expand>
       <Item Name="[writers]" Condition="m_nWriters.m_value.value() != 0">m_nWriters</Item>
-      <Item Name="[readers]" Condition="m_lockInfo.m_nReaders != 0">m_lockInfo.m_nReaders</Item>
+      <Item Name="[readers]" Condition="m_lockInfo.value().m_nReaders != 0">m_lockInfo.value().m_nReaders</Item>
     </Expand>
   </Type>
 

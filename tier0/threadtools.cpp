@@ -431,13 +431,13 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 #elif defined( _LINUX )
 	// As of glibc v2.12, we can use pthread_setname_np.
 	if ( id == std::numeric_limits<ThreadId_t>::max() )
-			id = pthread_self();
+		id = pthread_self();
 
 	// The thread name is a meaningful C language string, whose length is
 	// restricted to 16 characters, including the terminating null byte ('\0').
-		char szThreadName[ 16 ];
-		strncpy( szThreadName, pszName, std::size( szThreadName ) );
-		szThreadName[ std::size( szThreadName ) - 1 ] = 0;
+	char szThreadName[ 16 ];
+	strncpy( szThreadName, pszName, std::size( szThreadName ) );
+	szThreadName[ std::size( szThreadName ) - 1 ] = 0;
 
 	pthread_setname_np( id, szThreadName );
 #elif defined( OSX )
@@ -1487,14 +1487,14 @@ void CThreadSpinRWLock::LockForRead()
 	int i;
 
 	// In order to grab a read lock, the number of readers must not change and no thread can own the write lock
-	LockInfo_t oldValue{0, m_lockInfo.m_nReaders};
+	LockInfo_t oldValue{0, m_lockInfo.load().m_nReaders};
 	LockInfo_t newValue{0, oldValue.m_nReaders + 1};
 
 	if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
 		return;
 
 	ThreadPause();
-	oldValue.m_nReaders = m_lockInfo.m_nReaders;
+	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 	newValue.m_nReaders = oldValue.m_nReaders + 1;
 
 	for ( i = 1000; i != 0; --i )
@@ -1502,7 +1502,7 @@ void CThreadSpinRWLock::LockForRead()
 		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
 			return;
 		ThreadPause();
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
@@ -1512,7 +1512,7 @@ void CThreadSpinRWLock::LockForRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 0 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
@@ -1522,7 +1522,7 @@ void CThreadSpinRWLock::LockForRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 1 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 }
@@ -1531,19 +1531,14 @@ void CThreadSpinRWLock::UnlockRead()
 {
 	int i;
 
-	Assert( m_lockInfo.m_nReaders > 0 && m_lockInfo.m_writerId == 0 );
-	LockInfo_t oldValue;
-	LockInfo_t newValue;
-
-	oldValue.m_nReaders = m_lockInfo.m_nReaders;
-	oldValue.m_writerId = 0;
-	newValue.m_nReaders = oldValue.m_nReaders - 1;
-	newValue.m_writerId = 0;
-
+	Assert( m_lockInfo.load().m_nReaders > 0 && m_lockInfo.load().m_writerId == 0 );
+	LockInfo_t oldValue{0UL, m_lockInfo.load().m_nReaders};
+	LockInfo_t newValue{0UL, oldValue.m_nReaders - 1};
+	
 	if( AssignIf( newValue, oldValue ) )
 		return;
 	ThreadPause();
-	oldValue.m_nReaders = m_lockInfo.m_nReaders;
+	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 	newValue.m_nReaders = oldValue.m_nReaders - 1;
 
 	for ( i = 500; i != 0; --i )
@@ -1551,7 +1546,7 @@ void CThreadSpinRWLock::UnlockRead()
 		if( AssignIf( newValue, oldValue ) )
 			return;
 		ThreadPause();
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 
@@ -1561,7 +1556,7 @@ void CThreadSpinRWLock::UnlockRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 0 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 
@@ -1571,19 +1566,16 @@ void CThreadSpinRWLock::UnlockRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 1 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 }
 
 void CThreadSpinRWLock::UnlockWrite()
 {
-	Assert( m_lockInfo.m_writerId == ThreadGetCurrentId()  && m_lockInfo.m_nReaders == 0 );
+	Assert( m_lockInfo.load().m_writerId == ThreadGetCurrentId() && m_lockInfo.load().m_nReaders == 0 );
 	alignas(int64) static const LockInfo_t newValue = { 0, 0 };
-#if defined(_X360)
-	// X360TBD: Serious Perf implications, not yet. __sync();
-#endif
-	ThreadInterlockedExchange64(  (volatile int64 *)&m_lockInfo, *((const int64 *)&newValue) );
+	m_lockInfo.exchange(newValue);
 	--m_nWriters;
 }
 
