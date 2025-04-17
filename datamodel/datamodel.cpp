@@ -337,7 +337,7 @@ void CDataModel::DisplayMemoryStats( )
 	}
 
 	// Sort
-	DmMemorySortInfo_t* pSortInfo = (DmMemorySortInfo_t*)_alloca( typeHistogram.Count() * sizeof(DmMemorySortInfo_t) );
+	DmMemorySortInfo_t* pSortInfo = stackallocT( DmMemorySortInfo_t, typeHistogram.Count() );
 	decltype(typeHistogram.FirstInorder()) nCount = 0;
 	for ( auto i = typeHistogram.FirstInorder(); typeHistogram.IsValidIndex( i ); i = typeHistogram.NextInorder( i ) )
 	{
