@@ -295,17 +295,6 @@ CBaseFileSystem::CBaseFileSystem()
 
 	// allows very specifc constrained behavior
 	m_DVDMode = DVDMODE_OFF;
-	if ( IsX360() )
-	{
-		if ( CommandLine()->FindParm( "-dvd" ) )
-		{
-			m_DVDMode = DVDMODE_STRICT;
-		}
-		else if ( CommandLine()->FindParm( "-dvddev" ) )
-		{
-			m_DVDMode = DVDMODE_DEV;
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -314,6 +303,7 @@ CBaseFileSystem::CBaseFileSystem()
 CBaseFileSystem::~CBaseFileSystem()
 {
 	m_PathIDInfos.PurgeAndDeleteElements();
+
 #if defined( TRACK_BLOCKING_IO )
 	delete m_pBlockingItems;
 #endif
@@ -1417,11 +1407,8 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 		Assert( nIndex >= 0 );
 	}
 
-	if ( IsPC() || !bAddPackFiles || !bAdded )
-	{
-		// Grab last entry and set the path
-		m_SearchPaths.InsertBefore( nIndex );
-	}
+	// Grab last entry and set the path
+	m_SearchPaths.InsertBefore( nIndex );
 
 	CSearchPath *sp = &m_SearchPaths[ nIndex ];
 	
@@ -1992,6 +1979,7 @@ void CBaseFileSystem::LogFileAccess( const char *pFullFileName )
 	{
 		return;
 	}
+
 	char buf[1024];
 #if BSPOUTPUT
 	Q_snprintf( buf, sizeof( buf ), "%s\n%s\n", pShortFileName, pFullFileName);
@@ -2049,10 +2037,6 @@ public:
 	
 	~CFileOpenInfo()
 	{
-		if ( IsX360() )
-		{
-			return;
-		}
 	}
 	
 	void SetAbsolutePath( const char *pFormat, ... )
@@ -2078,11 +2062,6 @@ public:
 	// where the file came from, and possibly calculate a CRC if necessary.
 	void HandleFileCRCTracking( const char *pRelativeFileName )
 	{
-		if ( IsX360() )
-		{
-			return;
-		}
-
 		if ( m_pFileSystem->m_WhitelistFileTrackingEnabled == 0 )
 			return;
 
@@ -2370,19 +2349,6 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 
 	// Run through all the search paths.
 	PathTypeFilter_t pathFilter = FILTER_NONE;
-	if ( IsX360() )
-	{
-		if ( flags & FSOPEN_NEVERINPACK )
-		{
-			pathFilter = FILTER_CULLPACK;
-		}
-		else if ( m_DVDMode == DVDMODE_STRICT )
-		{
-			// most all files on the dvd are expected to be in the pack
-			// don't allow disk paths to be searched, which is very expensive on the dvd
-			pathFilter = FILTER_CULLNONPACK;
-		}
-	}
 
 	CSearchPathsIterator iter( this, &pFileName, pathID, pathFilter );
 	for ( openInfo.m_pSearchPath = iter.GetFirst(); openInfo.m_pSearchPath != nullptr; openInfo.m_pSearchPath = iter.GetNext() )
@@ -2546,7 +2512,6 @@ FileHandle_t CBaseFileSystem::OpenEx( const char *pFileName, const char *pOption
 	char tempPathID[MAX_PATH];
 	ParsePathID( pFileName, pathID, tempPathID );
 
-
 	// Try each of the search paths in succession
 	// FIXME: call createdirhierarchy upon opening for write.
 	if ( strchr( pOptions, 'r' ) && !strchr( pOptions, '+' ) )
@@ -2564,6 +2529,7 @@ FileHandle_t CBaseFileSystem::OpenEx( const char *pFileName, const char *pOption
 void CBaseFileSystem::Close( FileHandle_t file )
 {
 	VPROF_BUDGET( "CBaseFileSystem::Close", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
+
 	if ( !file )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to Close nullptr file handle!\n" );
@@ -2631,7 +2597,6 @@ unsigned int CBaseFileSystem::Size( FileHandle_t file )
 }
 
 
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : file - 
@@ -2646,7 +2611,7 @@ unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size nullptr filename!\n" );
 		return 0;
 	}
-	
+
 	CHECK_DOUBLE_SLASHES( pFileName );
 	
 	// Ok, fall through to the fast path.
@@ -2801,12 +2766,11 @@ void CBaseFileSystem::LoadCompiledKeyValues( KeyValuesPreloadType_t type, char c
 //-----------------------------------------------------------------------------
 bool CBaseFileSystem::LoadKeyValues( KeyValues& head, KeyValuesPreloadType_t type, char const *filename, char const *pPathID /*= 0*/ )
 {
-	bool bret = true;
-
 #ifndef DEDICATED
 	char tempPathID[MAX_PATH];
 	ParsePathID( filename, pPathID, tempPathID );
-
+	
+	bool bret = true;
 	// FIXME:  THIS STUFF DOESN'T TRACK pPathID AT ALL RIGHT NOW!!!!!
 	if ( !m_PreloadData[ type ].m_pReader || !m_PreloadData[ type ].m_pReader->InstanceInPlace( head, filename ) )
 	{
@@ -2814,8 +2778,7 @@ bool CBaseFileSystem::LoadKeyValues( KeyValues& head, KeyValuesPreloadType_t typ
 	}
 	return bret;
 #else
-	bret = head.LoadFromFile( this, filename, pPathID );
-	return bret;
+	return head.LoadFromFile( this, filename, pPathID );
 #endif
 }
 
@@ -3035,7 +2998,9 @@ int CBaseFileSystem::FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char
 {
 	va_list args;
 	va_start( args, pFormat ); //-V2018 //-V2019
+
 	VPROF_BUDGET( "CBaseFileSystem::FPrintf", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
+
 	if ( !file )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to FPrintf nullptr file handle!\n" );
@@ -3131,6 +3096,7 @@ bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
 char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars, FileHandle_t file )
 {
 	VPROF_BUDGET( "CBaseFileSystem::ReadLine", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
+
 	CFileHandle *fh = ( CFileHandle *)file;
 	if ( !fh )
 	{
@@ -3396,6 +3362,7 @@ bool CBaseFileSystem::CheckVPKFileHash( int PackFileID, int nPackFileNumber, int
 		CPackedStore *pVPK = sp.GetPackedStore();
 		if ( pVPK == nullptr || pVPK->m_PackFileID != PackFileID )
 			continue;
+
 		ChunkHashFraction_t fileHashFraction;
 		if ( pVPK->FindFileHashFraction( nPackFileNumber, nFileFraction, fileHashFraction ) )
 		{
@@ -3784,6 +3751,7 @@ void CBaseFileSystem::CreateDirHierarchy( const char *pRelativePathT, const char
 
 			*s = CORRECT_PATH_SEPARATOR;
 		}
+
 		s++;
 	}
 
@@ -3818,6 +3786,7 @@ const char *CBaseFileSystem::FindFirstEx( const char *pWildCard, const char *pPa
 const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char *pPathID, FileFindHandle_t *pHandle, int *pFoundStoreID )
 {
 	VPROF_BUDGET( "CBaseFileSystem::FindFirst", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
+
  	Assert(pWildCardT);
  	Assert(pHandle);
 
@@ -4228,7 +4197,6 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 	CSearchPathsIterator iter( this, &pFileName, pPathID, pathFilter );
 	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
 	{
-
 		CPackFile *pPack = pSearchPath->GetPackFile();
 		if ( pPack )
 		{
@@ -4782,37 +4750,6 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::CSearchPathsIterator::GetNext()
 		if ( CBaseFileSystem::FilterByPathID( pSearchPath, m_pathID ) )
 			continue;
 
-		// 360 can optionally ignore a local search path in dvddev mode
-		// ignoring a local search path falls through to its cloned remote path
-		// map paths are exempt from this exclusion logic
-		if ( IsX360() && ( m_DVDMode == DVDMODE_DEV ) && m_Filename[0] && !pSearchPath->m_bIsRemotePath )
-		{
-			bool bIsMapPath = pSearchPath->GetPackFile() && pSearchPath->GetPackFile()->m_bIsMapPath;
-			if ( !bIsMapPath )
-			{
-				bool bIgnorePath = false;
-				char szExcludePath[MAX_PATH];
-				char szFilename[MAX_PATH];
-				V_ComposeFileName( pSearchPath->GetPathString(), m_Filename, szFilename );
-				for ( auto &ep : m_ExcludePaths )
-				{
-					if ( g_pFullFileSystem->String( ep, szExcludePath ) )
-					{
-						if ( !V_strnicmp( szFilename, szExcludePath, strlen( szExcludePath ) ) )
-						{
-							bIgnorePath = true;
-							break;
-						}
-					}
-				}
-				if ( bIgnorePath )
-				{
-					// filename matches exclusion path, skip it
-					continue;
-				}
-			}
-		}
-
 		if ( !m_visits.MarkVisit( *pSearchPath ) )
 			break;
 	}
@@ -4929,13 +4866,7 @@ static void AddSeperatorAndFixPath( char *str )
 		lastChar[1] = CORRECT_PATH_SEPARATOR;
 		lastChar[2] = '\0';
 	}
-	Q_FixSlashes( str );
-
-	if ( IsX360() )
-	{
-		// 360 FS won't resolve any path with ../
-		V_RemoveDotSlashes( str );
-	}
+	V_FixSlashes( str );
 }
 
 //-----------------------------------------------------------------------------
@@ -4989,7 +4920,6 @@ CBaseFileSystem::CPathIDInfo* CBaseFileSystem::FindOrAddPathIDInfo( const CUtlSy
 	pInfo->m_bByRequestOnly = (bByRequestOnly == 1);
 	return pInfo;
 }
-		
 
 void CBaseFileSystem::MarkPathIDByRequestOnly( const char *pPathID, bool bRequestOnly )
 {
@@ -5050,7 +4980,7 @@ void CBaseFileSystem::BlockingFileAccess_LeaveCriticalSection()
 
 bool CBaseFileSystem::GetFileTypeForFullPath( char const *pFullPath, wchar_t *buf, size_t bufSizeInBytes )
 {
-#if !defined( _X360 ) && !defined( POSIX )
+#if !defined( POSIX )
 	wchar_t wcharpath[512];
 	::MultiByteToWideChar( CP_UTF8, 0, pFullPath, -1, wcharpath, sizeof( wcharpath ) / sizeof(wchar_t) );
 	wcharpath[(sizeof( wcharpath ) / sizeof(wchar_t)) - 1] = L'\0';
@@ -5282,6 +5212,7 @@ bool CFileHandle::IsOK()
 		return true;
 	}
 #endif
+
 	if ( m_pFile )
 	{
 		return ( IsValid() && m_fs->FS_ferror( m_pFile ) == 0 );
@@ -5337,12 +5268,14 @@ int CFileHandle::Read( void* pBuffer, int nDestSize, int nLength )
 		return m_VPKHandle.Read( pBuffer, nLength );
 	}
 #endif
+
 	// Is this a regular file or a pack file?  
 	if ( m_pFile )
 	{
 		return m_fs->FS_fread( pBuffer, nDestSize, nLength, m_pFile );
 	}
-	else if ( m_pPackFileHandle )
+
+	if ( m_pPackFileHandle )
 	{
 		// Pack file handle handles clamping all the reads:
 		return m_pPackFileHandle->Read( pBuffer, nDestSize, nLength );
@@ -5444,6 +5377,7 @@ int CFileHandle::Size()
 		return m_VPKHandle.m_nFileSize;
 	}
 #endif
+
 	if ( m_pFile  )
 	{
 		nReturnedSize = m_nLength; 
@@ -5468,10 +5402,8 @@ int64 CFileHandle::AbsoluteBaseOffset()
 	{
 		return m_pPackFileHandle->AbsoluteBaseOffset();
 	}
-	else
-	{
-		return 0;
-	}
+
+	return 0LL;
 }
 
 bool CFileHandle::EndOfFile()
