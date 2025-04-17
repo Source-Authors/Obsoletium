@@ -72,16 +72,17 @@ static bool V_CheckDoubleSlashes( const char *pStr )
 
 static void LogFileOpen( const char *vpk, const char *pFilename, const char *pAbsPath )
 {
-	static const char *mode = NULL;
+	static const char *mode = nullptr;
 
 	// Figure out if we should be doing this at all, the first time we are acalled
-	if ( mode == NULL )
+	if ( mode == nullptr )
 	{
 		if ( CommandLine()->FindParm( "-log_opened_files" ) )
 			mode = "wt";
 		else
 			mode = "";
 	}
+
 	if ( *mode == '\0' )
 		return;
 
@@ -273,14 +274,15 @@ CBaseFileSystem::CBaseFileSystem()
 	memset( &m_Stats, 0, sizeof(m_Stats) );
 
 	m_fwLevel    = FILESYSTEM_WARNING_REPORTUNCLOSED;
-	m_pfnWarning = NULL;
-	m_pLogFile   = NULL;
+	m_pfnWarning = nullptr;
+	m_pLogFile   = nullptr;
 	m_bOutputDebugString = false;
 	m_WhitelistSpewFlags = 0;
-	m_DirtyDiskReportFunc = NULL;
-	m_pPureServerWhitelist = NULL;
+	m_DirtyDiskReportFunc = nullptr;
+	m_pPureServerWhitelist = nullptr;
 
-	m_pThreadPool = NULL;
+	m_pThreadPool = nullptr;
+
 #if defined( TRACK_BLOCKING_IO )
 	m_pBlockingItems = new CBlockingFileItemList( this );
 	m_bBlockingFileAccessReportingEnabled = false;
@@ -317,7 +319,7 @@ CBaseFileSystem::~CBaseFileSystem()
 #endif
 
 	// Free the whitelist.
-	RegisterFileWhitelist( NULL, NULL );
+	RegisterFileWhitelist( nullptr, nullptr );
 }
 
 
@@ -330,7 +332,7 @@ void *CBaseFileSystem::QueryInterface( const char *pInterfaceName )
 	if (!Q_strncmp(	pInterfaceName, BASEFILESYSTEM_INTERFACE_VERSION, Q_strlen(BASEFILESYSTEM_INTERFACE_VERSION) + 1))
 		return (IBaseFileSystem*)this;
 
-	return NULL;
+	return nullptr;
 }
 
 InitReturnVal_t CBaseFileSystem::Init()
@@ -380,7 +382,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 
 			// populate the exclusion list
 			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
-			if ( ReadFile( szExcludeFile, NULL, buf, 0, 0 ) )
+			if ( ReadFile( szExcludeFile, nullptr, buf, 0, 0 ) )
 			{
 				characterset_t breakSet;
 				CharacterSetBuild( &breakSet, "" );
@@ -764,7 +766,7 @@ void CBaseFileSystem::AddVPKFile( char const *pPath, const char *pPathID, Search
 	CUtlSymbol pathIDSym = g_PathIDTable.AddString( pPathID );
 
 	// See if we already have this vpk file as a search path
-	CPackedStoreRefCount *pVPK = NULL;
+	CPackedStoreRefCount *pVPK = nullptr;
 	for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
 	{
 		CPackedStoreRefCount *p = m_SearchPaths[i].GetPackedStore();
@@ -780,7 +782,7 @@ void CBaseFileSystem::AddVPKFile( char const *pPath, const char *pPathID, Search
 	}
 
 	// Create a new VPK if we didn't don't already have it opened
-	if ( pVPK == NULL )
+	if ( pVPK == nullptr )
 	{
 		char pszFName[MAX_PATH];
 		pVPK = new CPackedStoreRefCount( nameBuf, pszFName, ssize(pszFName), this ); 
@@ -868,7 +870,7 @@ bool CBaseFileSystem::AddPackFileFromPath( const char *pPath, const char *pakfil
 		return false;
 
 	CPackFile *pf = new CZipPackFile( this );
-	pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, NULL );
+	pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr );
 	if ( !pf->m_hPackFileHandleFS )
 	{
 		delete pf;
@@ -886,7 +888,7 @@ bool CBaseFileSystem::AddPackFileFromPath( const char *pPath, const char *pakfil
 	{
 		// Failed for some reason, ignore it
 		Trace_FClose( pf->m_hPackFileHandleFS );
-		pf->m_hPackFileHandleFS = NULL;
+		pf->m_hPackFileHandleFS = nullptr;
 		delete pf;
 
 		return false;
@@ -993,7 +995,7 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 		sp->m_storeId = g_iNextSearchPathID++;
 		sp->SetPath( g_PathIDTable.AddString( pPath ) );
 
-		CPackFile *pf = NULL;
+		CPackFile *pf = nullptr;
 		for ( auto *p : m_ZipFiles )
 		{
 			if ( !Q_stricmp( p->m_ZipName.Get(), fullpath ) )
@@ -1017,7 +1019,7 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 			sp->SetPackFile( pf );
 			pf->m_lPackFileTime = GetFileTime( fullpath );
 
-			pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, NULL );
+			pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr );
 
 			if ( pf->m_hPackFileHandleFS )
 			{
@@ -1033,7 +1035,7 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 					if ( pf->m_hPackFileHandleFS )
 					{
 						Trace_FClose( pf->m_hPackFileHandleFS );
-						pf->m_hPackFileHandleFS = NULL;
+						pf->m_hPackFileHandleFS = nullptr;
 					}
 					m_SearchPaths.Remove( nIndex );
 				}
@@ -1143,7 +1145,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	}
 
 	{
-		FILE *fp = Trace_FOpen( fullpath, "rb", 0, NULL );
+		FILE *fp = Trace_FOpen( fullpath, "rb", 0, nullptr );
 		if ( !fp )
 		{
 			// Couldn't open it
@@ -1206,7 +1208,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 			pf->m_lPackFileTime = GetFileTime( newPath );
 	
 			Trace_FClose( pf->m_hPackFileHandleFS );
-			pf->m_hPackFileHandleFS = NULL;
+			pf->m_hPackFileHandleFS = nullptr;
 
 			m_ZipFiles.AddToTail( pf );
 
@@ -1234,13 +1236,13 @@ void CBaseFileSystem::BeginMapAccess()
 				pPackFile->m_mutex.Lock();
 
 #if defined( SUPPORT_PACKED_STORE )
-				if ( pPackFile->m_nOpenFiles == 0 && pPackFile->m_hPackFileHandleFS == NULL && !pPackFile->m_hPackFileHandleVPK )
+				if ( pPackFile->m_nOpenFiles == 0 && pPackFile->m_hPackFileHandleFS == nullptr && !pPackFile->m_hPackFileHandleVPK )
 #else
-				if ( pPackFile->m_nOpenFiles == 0 && pPackFile->m_hPackFileHandleFS == NULL )
+				if ( pPackFile->m_nOpenFiles == 0 && pPackFile->m_hPackFileHandleFS == nullptr )
 #endif
 				{
 					// Try opening the file as a regular file 
-					pPackFile->m_hPackFileHandleFS = Trace_FOpen( pPackFile->m_ZipName, "rb", 0, NULL );
+					pPackFile->m_hPackFileHandleFS = Trace_FOpen( pPackFile->m_ZipName, "rb", 0, nullptr );
 
 // !NOTE! Pack files inside of VPK not supported
 //#if defined( SUPPORT_PACKED_STORE )
@@ -1275,7 +1277,7 @@ void CBaseFileSystem::EndMapAccess()
 					if ( pPackFile->m_hPackFileHandleFS )
 					{
 						Trace_FClose( pPackFile->m_hPackFileHandleFS );
-						pPackFile->m_hPackFileHandleFS = NULL;
+						pPackFile->m_hPackFileHandleFS = nullptr;
 					}
 				}
 				pPackFile->m_mutex.Unlock();
@@ -1439,7 +1441,7 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::FindSearchPathByStoreId( int stor
 			return &m_SearchPaths[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1480,7 +1482,7 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 	// Build up result into string object
 	CUtlString sResult;
 	CSearchPathsIterator iter( this, pathID, bGetPackFiles ? FILTER_NONE : FILTER_CULLPACK );
-	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != NULL; pSearchPath = iter.GetNext() )
+	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != nullptr; pSearchPath = iter.GetNext() )
 	{
 		if ( !sResult.IsEmpty() )
 			sResult += ";";
@@ -1508,7 +1510,7 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 		V_strncpy( pDest, sResult.String(), maxLenInChars );
 	}
 
-	// Return 1 extra for the NULL terminator
+	// Return 1 extra for the nullptr terminator
 	return sResult.Length()+1;
 }
 
@@ -1529,7 +1531,7 @@ bool CBaseFileSystem::RemoveSearchPath( const char *pPath, const char *pathID )
 	if ( pPath )
 	{
 		// +2 for '\0' and potential slash added at end.
-		Q_strncpy( newPath, pPath, sizeof( newPath ) );
+		V_strcpy_safe( newPath, pPath );
 #ifdef _WIN32 // don't do this on linux!
 		Q_strlower( newPath );
 #endif
@@ -1616,7 +1618,7 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::FindWritePath( const char *pFilen
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1625,7 +1627,7 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::FindWritePath( const char *pFilen
 //-----------------------------------------------------------------------------
 const char *CBaseFileSystem::GetWritePath( const char *pFilename, const char *pathID )
 {
-	CSearchPath *pSearchPath = NULL;
+	CSearchPath *pSearchPath = nullptr;
 	if ( pathID && pathID[ 0 ] != '\0' )
 	{
 
@@ -1635,7 +1637,7 @@ const char *CBaseFileSystem::GetWritePath( const char *pFilename, const char *pa
 		else if ( V_stricmp( pathID, "mod" ) == 0 )
 			pSearchPath = FindWritePath( pFilename, "mod_write" );
 
-		if ( pSearchPath == NULL )
+		if ( pSearchPath == nullptr )
 			pSearchPath = FindWritePath( pFilename, pathID );
 
 		if ( pSearchPath )
@@ -1652,7 +1654,7 @@ const char *CBaseFileSystem::GetWritePath( const char *pFilename, const char *pa
 		return pSearchPath->GetPathString();
 	}
 
-	pSearchPath = FindWritePath( pFilename, NULL ); // okay, just return the first search path added!
+	pSearchPath = FindWritePath( pFilename, nullptr ); // okay, just return the first search path added!
 	if ( pSearchPath )
 	{
 		return pSearchPath->GetPathString();
@@ -1890,7 +1892,7 @@ bool CBaseFileSystem::WriteFile( const char *pFileName, const char *pPath, CUtlB
 
 bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const char *pDestination )
 {
-	IZip *pZip = IZip::CreateZip( NULL, true );
+	IZip *pZip = IZip::CreateZip( nullptr, true );
 
 	HANDLE hZipFile = pZip->ParseFromDisk( pFileName );
 	if ( !hZipFile )
@@ -1981,7 +1983,6 @@ void CBaseFileSystem::RemoveAllSearchPaths( void )
 {
 	AUTO_LOCK( m_SearchPathsMutex );
 	m_SearchPaths.Purge();
-	//m_PackFileHandles.Purge();
 }
 
 
@@ -2031,7 +2032,7 @@ public:
 	CFileOpenInfo( CBaseFileSystem *pFileSystem, const char *pFileName, const CBaseFileSystem::CSearchPath *path, const char *pOptions, int flags, char **ppszResolvedFilename ) : 
 		m_pFileSystem( pFileSystem ), m_ppszResolvedFilename( ppszResolvedFilename ), m_pFileName( pFileName ), m_pSearchPath( path ), m_pOptions( pOptions ), m_Flags( flags )
 	{
-		m_pFileHandle = NULL;
+		m_pFileHandle = nullptr;
 		m_ePureFileClass = ePureServerFileClass_Any;
 		if ( m_pFileSystem->m_pPureServerWhitelist )
 		{
@@ -2039,9 +2040,10 @@ public:
 		}
 
 		if ( m_ppszResolvedFilename )
-			*m_ppszResolvedFilename = NULL;
-		m_pPackFile = NULL;
-		m_pVPKFile = NULL;
+			*m_ppszResolvedFilename = nullptr;
+
+		m_pPackFile = nullptr;
+		m_pVPKFile = nullptr;
 		m_AbsolutePath[0] = '\0';
 	}
 	
@@ -2104,7 +2106,7 @@ public:
 	void SetFromPackedStoredFileHandle( const CPackedStoreFileHandle &fHandle, CBaseFileSystem *pFileSystem )
 	{
 		Assert( fHandle );
-		Assert( m_pFileHandle == NULL );
+		Assert( m_pFileHandle == nullptr );
 		m_pFileHandle = new CFileHandle(pFileSystem);
 		m_pFileHandle->m_VPKHandle = fHandle;
 		m_pFileHandle->m_type = FT_NORMAL;
@@ -2135,7 +2137,7 @@ public:
 
 void CBaseFileSystem::HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath )
 {
-	openInfo.m_pFileHandle = NULL;
+	openInfo.m_pFileHandle = nullptr;
 
 	int64 size;
 	FILE *fp = Trace_FOpen( openInfo.m_AbsolutePath, openInfo.m_pOptions, openInfo.m_Flags, &size );
@@ -2183,7 +2185,7 @@ FileHandle_t CBaseFileSystem::FindFileInSearchPath( CFileOpenInfo &openInfo )
 	VPROF( "CBaseFileSystem::FindFile" );
 	
 	Assert( openInfo.m_pSearchPath );
-	openInfo.m_pFileHandle = NULL;
+	openInfo.m_pFileHandle = nullptr;
 
 	// Loading from pack file?
 	CPackFile *pPackFile = openInfo.m_pSearchPath->GetPackFile();
@@ -2218,7 +2220,7 @@ FileHandle_t CBaseFileSystem::FindFileInSearchPath( CFileOpenInfo &openInfo )
 				openInfo.HandleFileCRCTracking( openInfo.m_pFileName );
 				return ( FileHandle_t ) openInfo.m_pFileHandle;
 			}
-			return NULL;
+			return nullptr;
 		}
 	#endif
 
@@ -2252,7 +2254,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 	// Try the memory cache for un-restricted searches or "GAME" items.
 	if ( !pathID || Q_stricmp( pathID, "GAME" ) == 0 )
 	{
-		CMemoryFileBacking* pBacking = NULL;
+		CMemoryFileBacking* pBacking = nullptr;
 		{
 			AUTO_LOCK( m_MemoryFileMutex );
 			CUtlHashtable< const char*, CMemoryFileBacking* >& table = m_MemoryFileHash;
@@ -2274,7 +2276,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 			else
 			{
 				// length -1 == cached failure to read
-				return ( FileHandle_t )NULL;
+				return ( FileHandle_t )nullptr;
 			}
 		}
 		else if ( ThreadInMainThread() && fs_report_sync_opens.GetInt() > 0 )
@@ -2283,7 +2285,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 		}
 	}
 
-	CFileOpenInfo openInfo( this, pFileName, NULL, pOptions, flags, ppszResolvedFilename );
+	CFileOpenInfo openInfo( this, pFileName, nullptr, pOptions, flags, ppszResolvedFilename );
 
 	// Already have an absolute path?
 	// If so, don't bother iterating search paths.
@@ -2383,7 +2385,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 	}
 
 	CSearchPathsIterator iter( this, &pFileName, pathID, pathFilter );
-	for ( openInfo.m_pSearchPath = iter.GetFirst(); openInfo.m_pSearchPath != NULL; openInfo.m_pSearchPath = iter.GetNext() )
+	for ( openInfo.m_pSearchPath = iter.GetFirst(); openInfo.m_pSearchPath != nullptr; openInfo.m_pSearchPath = iter.GetNext() )
 	{
 		FileHandle_t filehandle = FindFileInSearchPath( openInfo );
 		if ( filehandle )
@@ -2398,11 +2400,11 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 
 				m_FileTracker2.NoteFileIgnoredForPureServer( openInfo.m_pFileName, pathID, openInfo.m_pSearchPath->m_storeId );
 				Close( filehandle );
-				openInfo.m_pFileHandle = NULL;
+				openInfo.m_pFileHandle = nullptr;
 				if ( ppszResolvedFilename && *ppszResolvedFilename )
 				{
 					free( *ppszResolvedFilename );
-					*ppszResolvedFilename = NULL;
+					*ppszResolvedFilename = nullptr;
 				}
 				continue;
 			}
@@ -2414,7 +2416,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 	}
 
 	LogFileOpen( "[Failed]", pFileName, "" );
-	return ( FileHandle_t )0;
+	return nullptr;
 }
 
 
@@ -2435,7 +2437,7 @@ FileHandle_t CBaseFileSystem::OpenForWrite( const char *pFileName, const char *p
 	// Unless an absolute path is specified...
 	const char *pTmpFileName;
 	char szScratchFileName[MAX_PATH];
-	if ( Q_IsAbsolutePath( pFileName ) )
+	if ( V_IsAbsolutePath( pFileName ) )
 	{
 		pTmpFileName = pFileName;
 	}
@@ -2449,7 +2451,7 @@ FileHandle_t CBaseFileSystem::OpenForWrite( const char *pFileName, const char *p
 	FILE *fp = Trace_FOpen( pTmpFileName, pOptions, 0, &size );
 	if ( !fp )
 	{
-		return ( FileHandle_t )0;
+		return nullptr;
 	}
 
 	CFileHandle *fh = new CFileHandle( this );
@@ -2497,8 +2499,8 @@ void CBaseFileSystem::ParsePathID( const char* &pFilename, const char* &pPathID,
 
 	if ( tempPathID[0] == '*' )
 	{
-		// * means NULL.
-		pPathID = NULL;
+		// * means nullptr.
+		pPathID = nullptr;
 	}
 	else
 	{
@@ -2767,10 +2769,10 @@ int CBaseFileSystem::ReadEx( OUT_BYTECAP(destSize) void *pOutput, int destSize, 
 void CBaseFileSystem::UnloadCompiledKeyValues()
 {
 #ifndef DEDICATED
-	for ( int i = 0; i < IFileSystem::NUM_PRELOAD_TYPES; ++i )
+	for ( auto &preload : m_PreloadData )
 	{
-		delete m_PreloadData[ i ].m_pReader;
-		m_PreloadData[ i ].m_pReader = NULL;
+		delete preload.m_pReader;
+		preload.m_pReader = nullptr;
 	}
 #endif
 }
@@ -2829,7 +2831,7 @@ bool CBaseFileSystem::LoadKeyValues( KeyValues& head, KeyValuesPreloadType_t typ
 //-----------------------------------------------------------------------------
 KeyValues *CBaseFileSystem::LoadKeyValues( KeyValuesPreloadType_t type, char const *filename, char const *pPathID /*= 0*/ )
 {
-	KeyValues *kv = NULL;
+	KeyValues *kv = nullptr;
 
 	if ( !m_PreloadData[ type ].m_pReader )
 	{
@@ -3135,7 +3137,7 @@ char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to ReadLine nullptr file handle!\n" );
 		// dimhotepus: Always zero-terminate.
 		if (maxChars > 0) pOutput[0] = '\0';
-		return NULL;
+		return nullptr;
 	}
 	++m_Stats.nReads;
 
@@ -3162,7 +3164,7 @@ char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars
 			break;
 		}
 
-		// Get outta here if we find a NULL.
+		// Get outta here if we find a nullptr.
 		if( pOutput[nRead] == '\0' )
 		{
 			pOutput[nRead] = '\n';
@@ -3178,7 +3180,7 @@ char *CBaseFileSystem::ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars
 	pOutput[nRead] = '\0';
 
 	m_Stats.nBytesRead += nRead;
-	return ( nRead ) ? pOutput : NULL;
+	return ( nRead ) ? pOutput : nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -3307,7 +3309,7 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 	for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
 	{
 		CPackedStore *pVPK = m_SearchPaths[i].GetPackedStore();
-		if ( pVPK == NULL )
+		if ( pVPK == nullptr )
 			continue;
 		if ( !pVPK->BTestDirectoryHash() )
 		{
@@ -3392,7 +3394,7 @@ bool CBaseFileSystem::CheckVPKFileHash( int PackFileID, int nPackFileNumber, int
 	for ( auto &sp : m_SearchPaths )
 	{
 		CPackedStore *pVPK = sp.GetPackedStore();
-		if ( pVPK == NULL || pVPK->m_PackFileID != PackFileID )
+		if ( pVPK == nullptr || pVPK->m_PackFileID != PackFileID )
 			continue;
 		ChunkHashFraction_t fileHashFraction;
 		if ( pVPK->FindFileHashFraction( nPackFileNumber, nFileFraction, fileHashFraction ) )
@@ -3431,12 +3433,12 @@ bool CBaseFileSystem::CheckVPKFileHash( int PackFileID, int nPackFileNumber, int
 void CBaseFileSystem::RegisterFileWhitelist( IPureServerWhitelist *pWhiteList, IFileList **pFilesToReload )
 {
 	if ( pFilesToReload )
-		*pFilesToReload = NULL;
+		*pFilesToReload = nullptr;
 
 	if ( m_pPureServerWhitelist )
 	{
 		m_pPureServerWhitelist->Release();
-		m_pPureServerWhitelist = NULL;
+		m_pPureServerWhitelist = nullptr;
 	}
 	if ( pWhiteList )
 	{
@@ -3468,7 +3470,7 @@ void CBaseFileSystem::SetSearchPathIsTrustedSource( CSearchPath *pSearchPath )
 	// If we don't have a pure server whitelist, we cannot say that any
 	// particular files are trusted.  (But then again, all files will be
 	// accepted, so it won't really matter.)
-	if ( m_pPureServerWhitelist == NULL )
+	if ( m_pPureServerWhitelist == nullptr )
 		return;
 
 	// Treat map packs as trusted, because we will send the CRC of the map pack to the server
@@ -3484,7 +3486,7 @@ void CBaseFileSystem::SetSearchPathIsTrustedSource( CSearchPath *pSearchPath )
 	#ifdef SUPPORT_PACKED_STORE
 		// Only signed VPK's can be trusted
 		CPackedStoreRefCount *pVPK = pSearchPath->GetPackedStore();
-		if ( pVPK == NULL )
+		if ( pVPK == nullptr )
 		{
 #ifdef PURE_SERVER_DEBUG_SPEW
 			Msg( "Setting %s as untrusted (loose files)\n", pSearchPath->GetDebugString() );
@@ -3503,7 +3505,7 @@ void CBaseFileSystem::SetSearchPathIsTrustedSource( CSearchPath *pSearchPath )
 		{
 			int nKeySz = 0;
 			const byte *pbKey = m_pPureServerWhitelist->GetTrustedKey( iKeyIndex, &nKeySz );
-			Assert( pbKey != NULL && nKeySz > 0 );
+			Assert( pbKey != nullptr && nKeySz > 0 );
 			if ( key.Count() == nKeySz && V_memcmp( pbKey, key.Base(), nKeySz ) == 0 )
 			{
 #ifdef PURE_SERVER_DEBUG_SPEW
@@ -3809,7 +3811,7 @@ const char *CBaseFileSystem::FindFirstEx( const char *pWildCard, const char *pPa
 {
 	CHECK_DOUBLE_SLASHES( pWildCard );
 
-	return FindFirstHelper( pWildCard, pPathID, pHandle, NULL );
+	return FindFirstHelper( pWildCard, pPathID, pHandle, nullptr );
 }
 
 
@@ -3929,12 +3931,12 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 	m_FindData.Remove(hTmpHandle);
 	*pHandle = -1;
 
-	return NULL;
+	return nullptr;
 }
 
 const char *CBaseFileSystem::FindFirst( const char *pWildCard, FileFindHandle_t *pHandle )
 {
-	return FindFirstEx( pWildCard, NULL, pHandle );
+	return FindFirstEx( pWildCard, nullptr, pHandle );
 }
 
 
@@ -4063,7 +4065,7 @@ const char *CBaseFileSystem::FindNext( FileFindHandle_t handle )
 
 	while( 1 )
 	{
-		if( FindNextFileHelper( pFindData, NULL ) )
+		if( FindNextFileHelper( pFindData, nullptr ) )
 		{
 			if ( pFindData->m_VisitedFiles.Find( pFindData->findData.cFileName ) == -1 )
 			{
@@ -4073,7 +4075,7 @@ const char *CBaseFileSystem::FindNext( FileFindHandle_t handle )
 		}
 		else
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
 }
@@ -4257,7 +4259,7 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 					::Warning( "File %s was found in %s, but resulting abs filename won't fit in callers buffer of %d bytes\n",
 						pFileName, pszPackName, maxLenInChars );
 					Assert( false );
-					return NULL;
+					return nullptr;
 				}
 
 				V_strncpy( pDest, pszPackName, maxLenInChars );
@@ -4279,7 +4281,7 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 				if ( vpkHandle )
 				{
 					const char *pszVpkName = vpkHandle.m_pOwner->FullPathName();
-					Assert( V_GetFileExtension( pszVpkName ) != NULL );
+					Assert( V_GetFileExtension( pszVpkName ) != nullptr );
 
 					intp len = V_strlen( pszVpkName );
 					intp nTotalLen = len + 1 + V_strlen( pFileName );
@@ -4288,7 +4290,7 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 						::Warning( "File %s was found in %s, but resulting abs filename won't fit in callers buffer of %d bytes\n",
 							pFileName, pszVpkName, maxLenInChars );
 						Assert( false );
-						return NULL;
+						return nullptr;
 					}
 
 					V_strncpy( pDest, pszVpkName, maxLenInChars );
@@ -4316,14 +4318,14 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 	}
 
 	// not found
-	return NULL;
+	return nullptr;
 }
 
 const char *CBaseFileSystem::GetLocalPath( const char *pFileName, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )
 {
 	CHECK_DOUBLE_SLASHES( pFileName );
 
-	return RelativePathToFullPath( pFileName, NULL, pDest, maxLenInChars );
+	return RelativePathToFullPath( pFileName, nullptr, pDest, maxLenInChars );
 }
 
 
@@ -4389,7 +4391,7 @@ bool CBaseFileSystem::FullPathToRelativePathEx( const char *pFullPath, const cha
 //-----------------------------------------------------------------------------
 bool CBaseFileSystem::FullPathToRelativePath( const char *pFullPath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )
 {
-	return FullPathToRelativePathEx( pFullPath, NULL, pDest, maxLenInChars );
+	return FullPathToRelativePathEx( pFullPath, nullptr, pDest, maxLenInChars );
 }
 
 
@@ -4442,7 +4444,7 @@ bool CBaseFileSystem::GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_C
 	// If drive path, no need to recurse anymore.
 	bool bResult = false;
 	char szDir[MAX_PATH];
-	if ( !IsDirectory( szCurrentDir, NULL ) )
+	if ( !IsDirectory( szCurrentDir, nullptr ) )
 	{
 		V_strupr( szCurrentDir );
 		V_strncpy( szDir, szCurrentDir, sizeof( szDir ) );
@@ -4703,10 +4705,10 @@ CBaseFileSystem::CSearchPath::CSearchPath( void )
 	m_pDebugPath = "";
 
 	m_storeId = 0;
-	m_pPackFile = NULL;
-	m_pPathIDInfo = NULL;
+	m_pPackFile = nullptr;
+	m_pPathIDInfo = nullptr;
 	m_bIsRemotePath = false;
-	m_pPackedStore = NULL;
+	m_pPackedStore = nullptr;
 	m_bIsTrustedForPureServer = false;
 }
 
@@ -4820,7 +4822,7 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::CSearchPathsIterator::GetNext()
 		return pSearchPath;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CBaseFileSystem::CSearchPathsIterator::CopySearchPaths( const CUtlVector<CSearchPath>	&searchPaths )
@@ -5164,7 +5166,7 @@ bool CBaseFileSystem::RegisterMemoryFile( CMemoryFileBacking *pFile, CMemoryFile
 	if ( pFile == pInTable )
 	{
 		Assert( pInTable->m_nRegistered == 1 );
-		*ppExistingFileWithRef = NULL;
+		*ppExistingFileWithRef = nullptr;
 		return true;
 	}
 	else
@@ -5218,13 +5220,13 @@ CFileHandle::~CFileHandle()
 	if ( m_pPackFileHandle )
 	{
 		delete m_pPackFileHandle;
-		m_pPackFileHandle = NULL;
+		m_pPackFileHandle = nullptr;
 	}
 
 	if ( m_pFile )
 	{
 		m_fs->Trace_FClose( m_pFile );
-		m_pFile = NULL;
+		m_pFile = nullptr;
 	}
 
 	m_nMagic = FREE_MAGIC;
@@ -5233,10 +5235,10 @@ CFileHandle::~CFileHandle()
 void CFileHandle::Init( CBaseFileSystem *fs )
 {
 	m_nMagic = MAGIC;
-	m_pFile = NULL;
+	m_pFile = nullptr;
 	m_nLength = 0;
 	m_type = FT_NORMAL;		
-	m_pPackFileHandle = NULL;
+	m_pPackFileHandle = nullptr;
 
 	m_fs = fs;
 
@@ -5536,9 +5538,9 @@ void CBaseFileSystem::CFileCacheObject::AddFiles( const char **ppFileNames, int 
 		V_strlower( pFileName );
 #endif
 		info.pFileName = pFileName;
-		info.hIOAsync = NULL;
-		info.pBacking = NULL;
-		info.pOwner = NULL;
+		info.hIOAsync = nullptr;
+		info.pBacking = nullptr;
+		info.pOwner = nullptr;
 	}
 
 	AUTO_LOCK( m_InfosMutex );
@@ -5576,8 +5578,8 @@ void CBaseFileSystem::CFileCacheObject::IOCallback( const FileAsyncRequest_t &re
 	Assert( request.pContext );
 	Info_t &info = *(Info_t *)request.pContext;
 
-	CMemoryFileBacking *pBacking = new CMemoryFileBacking( info.pOwner->m_pFS );
-	pBacking->m_pData = NULL;
+	auto *pBacking = new CMemoryFileBacking( info.pOwner->m_pFS );
+	pBacking->m_pData = nullptr;
 	pBacking->m_pFileName = info.pFileName;
 	pBacking->m_nLength = ( err == FSASYNC_OK && nBytesRead == 0 ) ? 0 : -1;
 
@@ -5594,7 +5596,7 @@ void CBaseFileSystem::CFileCacheObject::IOCallback( const FileAsyncRequest_t &re
 		}
 	}
 
-	CMemoryFileBacking *pExistingBacking = NULL;
+	CMemoryFileBacking *pExistingBacking = nullptr;
 	if ( !info.pOwner->m_pFS->RegisterMemoryFile( pBacking, &pExistingBacking ) )
 	{
 		// Someone already registered this file
