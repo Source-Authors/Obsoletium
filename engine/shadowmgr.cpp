@@ -810,18 +810,19 @@ inline ShadowVertex_t* CShadowMgr::AllocateVertices( ShadowVertexCache_t& cache,
 	cache.m_pVerts = 0;
 	if (count <= SHADOW_VERTEX_SMALL_CACHE_COUNT)
 	{
-		cache.m_Count = count;
+		cache.m_Count = static_cast<unsigned short>(count);
 		cache.m_CachedVerts = m_SmallVertexList.AddToTail( );
 		return m_SmallVertexList[cache.m_CachedVerts].m_Verts;
 	}
 	else if (count <= SHADOW_VERTEX_LARGE_CACHE_COUNT)
 	{
-		cache.m_Count = count;
+		cache.m_Count = static_cast<unsigned short>(count);
 		cache.m_CachedVerts = m_LargeVertexList.AddToTail( );
 		return m_LargeVertexList[cache.m_CachedVerts].m_Verts;
 	}
 
-	cache.m_Count = count;
+	Assert(count <= std::numeric_limits<unsigned short>::max());
+	cache.m_Count = static_cast<unsigned short>(count);
 	if (count > 0)
 	{
 		cache.m_pVerts = new ShadowVertex_t[count];
@@ -856,7 +857,7 @@ inline void CShadowMgr::FreeVertices( ShadowVertexCache_t& cache )
 void CShadowMgr::ClearTempCache( )
 {
 	// Clear out the vertices
-	for (int i = m_TempVertexCache.Count(); --i >= 0; ) 
+	for (intp i = m_TempVertexCache.Count(); --i >= 0; ) 
 	{
 		FreeVertices( m_TempVertexCache[i] );
 	}
@@ -2702,24 +2703,24 @@ void CShadowMgr::RenderShadowList( IMatRenderContext *pRenderContext, ShadowDeca
 	if ( m_DecalsToRender > m_ShadowDecalCache.Count() )
 	{
 		// Don't grow past the MAX_SHADOW_DECAL_CACHE_COUNT cap.
-		int diff = min( m_DecalsToRender, (int)MAX_SHADOW_DECAL_CACHE_COUNT ) - m_ShadowDecalCache.Count();
+		intp diff = min( m_DecalsToRender, (int)MAX_SHADOW_DECAL_CACHE_COUNT ) - m_ShadowDecalCache.Count();
 		if ( diff > 0 )
 		{
 			// Grow the cache.
 			m_ShadowDecalCache.Grow( diff );
-			DevMsg( "[CShadowMgr::RenderShadowList] growing shadow decal cache (decals: %d, cache: %d, diff: %d).\n", m_DecalsToRender, m_ShadowDecalCache.Count(), diff );
+			DevMsg( "[CShadowMgr::RenderShadowList] growing shadow decal cache (decals: %d, cache: %zd, diff: %zd).\n", m_DecalsToRender, m_ShadowDecalCache.Count(), diff );
 		}
 	}
 
 	if ( m_DecalsToRender > m_DispShadowDecalCache.Count() )
 	{
 		// Don't grow past the MAX_SHADOW_DECAL_CACHE_COUNT cap.
-		int diff = min( m_DecalsToRender, (int)MAX_SHADOW_DECAL_CACHE_COUNT ) - m_DispShadowDecalCache.Count();
+		intp diff = min( m_DecalsToRender, (int)MAX_SHADOW_DECAL_CACHE_COUNT ) - m_DispShadowDecalCache.Count();
 		if ( diff > 0 )
 		{
 			// Grow the cache.
 			m_DispShadowDecalCache.Grow( diff );
-			DevMsg( "[CShadowMgr::RenderShadowList] growing disp shadow decal cache (decals: %d, cache: %d, diff: %d).\n", m_DecalsToRender, m_DispShadowDecalCache.Count(), diff );
+			DevMsg( "[CShadowMgr::RenderShadowList] growing disp shadow decal cache (decals: %d, cache: %zd, diff: %zd).\n", m_DecalsToRender, m_DispShadowDecalCache.Count(), diff );
 		}
 	}
 
