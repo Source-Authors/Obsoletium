@@ -4971,8 +4971,7 @@ bool CBaseFileSystem::GetFileTypeForFullPath( char const *pFullPath, wchar_t *bu
 {
 #if !defined( POSIX )
 	wchar_t wcharpath[512];
-	::MultiByteToWideChar( CP_UTF8, 0, pFullPath, -1, wcharpath, sizeof( wcharpath ) / sizeof(wchar_t) );
-	wcharpath[(sizeof( wcharpath ) / sizeof(wchar_t)) - 1] = L'\0';
+	V_UTF8ToUnicode( pFullPath, wcharpath, sizeof(wcharpath) );
 
 	SHFILEINFOW info = {};
 	DWORD_PTR dwResult = SHGetFileInfoW( 
