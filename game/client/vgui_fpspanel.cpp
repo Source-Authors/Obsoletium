@@ -28,7 +28,7 @@ static ConVar cl_showpos( "cl_showpos", "0", 0, "Draw current position at top of
 static ConVar cl_showbattery( "cl_showbattery", "0", 0, "Draw current battery level at top of screen when on battery power", true, 0, true, 1 );
 
 extern bool g_bDisplayParticlePerformance;
-int GetParticlePerformance();
+int64_t GetParticlePerformance();
 
 #ifdef _WIN32
 typedef struct _SYSTEM_POWER_STATUS {
@@ -252,14 +252,14 @@ void CFPSPanel::Paint()
 
 	if ( g_bDisplayParticlePerformance )
 	{
-		int nPerf = GetParticlePerformance();
+		int64_t nPerf = GetParticlePerformance();
 		if ( nPerf )
 		{
 			unsigned char ucColor[3]={ 0,255,0 };
 			g_pMatSystemSurface->DrawColoredText(
 				m_hFont, x, 42,
 				ucColor[0], ucColor[1], ucColor[2],
-				255, "Particle Performance Metric : %d", (nPerf + 50) / 100 );
+				255, "Particle Performance Metric : %lld", (nPerf + 50) / 100 );
 		}
 	}
 	float realFrameTime = gpGlobals->realtime - m_lastRealTime;

@@ -718,13 +718,13 @@ private:
 
 	CParticleSubTextureGroup* FindOrAddSubTextureGroup( IMaterial *pPageMaterial );
 
-	int ComputeParticleDefScreenArea( int nInfoCount, RetireInfo_t *pInfo, float *pTotalArea, CParticleSystemDefinition* pDef, 
+	intp ComputeParticleDefScreenArea( intp nInfoCount, RetireInfo_t *pInfo, float *pTotalArea, CParticleSystemDefinition* pDef, 
 		const CViewSetup& view, const VMatrix &worldToPixels, float flFocalDist );
 
-	bool RetireParticleCollections( CParticleSystemDefinition* pDef, int nCount, RetireInfo_t *pInfo, float flScreenArea, float flMaxTotalArea );
+	bool RetireParticleCollections( CParticleSystemDefinition* pDef, intp nCount, RetireInfo_t *pInfo, float flScreenArea, float flMaxTotalArea );
 
 	void BuildParticleSimList( CUtlVector< ParticleSimListEntry_t > &list );
-	bool EarlyRetireParticleSystems( int nCount, ParticleSimListEntry_t *ppEffects );
+	bool EarlyRetireParticleSystems( intp nCount, ParticleSimListEntry_t *ppEffects );
 	static int RetireSort( const void *p1, const void *p2 ); 
 
 private:

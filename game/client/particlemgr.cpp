@@ -1173,7 +1173,7 @@ bool CParticleMgr::ShouldRenderParticleSystems() const
 //-----------------------------------------------------------------------------
 void CParticleMgr::AddEffectListener( IClientParticleListener *pListener )
 {
-	int i = m_effectListeners.Find( pListener );
+	auto i = m_effectListeners.Find( pListener );
 	if ( !m_effectListeners.IsValidIndex( i ) )
 	{
 		m_effectListeners.AddToTail( pListener );
@@ -1182,7 +1182,7 @@ void CParticleMgr::AddEffectListener( IClientParticleListener *pListener )
 
 void CParticleMgr::RemoveEffectListener( IClientParticleListener *pListener )
 {
-	int i = m_effectListeners.Find( pListener );
+	auto i = m_effectListeners.Find( pListener );
 	if ( m_effectListeners.IsValidIndex( i ) )
 	{
 		m_effectListeners.Remove( i );
@@ -1198,7 +1198,7 @@ void CParticleMgr::RemoveEffectListener( IClientParticleListener *pListener )
 void CParticleMgr::RegisterEffect( const char *pEffectType, CreateParticleEffectFN func )
 {
 #ifdef _DEBUG
-	int i = m_effectFactories.Find( pEffectType );
+	auto i = m_effectFactories.Find( pEffectType );
 	Assert( !m_effectFactories.IsValidIndex( i ) );
 #endif
 
@@ -1207,7 +1207,7 @@ void CParticleMgr::RegisterEffect( const char *pEffectType, CreateParticleEffect
 
 IParticleEffect *CParticleMgr::CreateEffect( const char *pEffectType )
 {
-	int i = m_effectFactories.Find( pEffectType );
+	auto i = m_effectFactories.Find( pEffectType );
 	if ( !m_effectFactories.IsValidIndex( i ) )
 	{
 		Msg( "CParticleMgr::CreateEffect: factory not found for effect '%s'\n", pEffectType );
@@ -1267,10 +1267,9 @@ bool CParticleMgr::AddEffect( CParticleEffectBinding *pEffect, IParticleEffect *
 	Assert( pEffect->m_ListIndex != 0xFFFF );
 
 	// notify listeners
-	int nListeners = m_effectListeners.Count();
-	for ( int i = 0; i < nListeners; ++i )
+	for ( auto *l : m_effectListeners )
 	{
-		m_effectListeners[ i ]->OnParticleEffectAdded( pSim );
+		l->OnParticleEffectAdded( pSim );
 	}
 
 	return true;
@@ -1291,10 +1290,9 @@ void CParticleMgr::RemoveEffect( CParticleEffectBinding *pEffect )
 	Assert( !m_bUpdatingEffects );
 
 	// notify listeners
-	int nListeners = m_effectListeners.Count();
-	for ( int i = 0; i < nListeners; ++i )
+	for ( auto *l : m_effectListeners )
 	{
-		m_effectListeners[ i ]->OnParticleEffectRemoved( pEffect->m_pSim );
+		l->OnParticleEffectRemoved( pEffect->m_pSim );
 	}
 
 	// Take it out of the leaf system.
@@ -1426,11 +1424,11 @@ void CParticleMgr::Simulate( float flTimeDelta )
 bool g_bMeasureParticlePerformance;
 bool g_bDisplayParticlePerformance;
 
-static int64 g_nNumParticlesSimulated;
-static int64 g_nNumUSSpentSimulatingParticles;
+static int64_t g_nNumParticlesSimulated;
+static int64_t g_nNumUSSpentSimulatingParticles;
 static double g_flStartSimTime;
 
-int GetParticlePerformance()
+int64_t GetParticlePerformance()
 {
 	if (! g_nNumUSSpentSimulatingParticles )
 		return 0;
@@ -1546,17 +1544,17 @@ static void ProcessPSystem( ParticleSimListEntry_t& pSimListEntry )
 }
 
 
-int CParticleMgr::ComputeParticleDefScreenArea( int nInfoCount, RetireInfo_t *pInfo, float *pTotalArea, CParticleSystemDefinition* pDef, 
+intp CParticleMgr::ComputeParticleDefScreenArea( intp nInfoCount, RetireInfo_t *pInfo, float *pTotalArea, CParticleSystemDefinition* pDef, 
 	const CViewSetup& viewParticle, const VMatrix &worldToPixels, float flFocalDist )
 {
-	int nCollection = 0;
+	intp nCollection = 0;
 	float flCullCost = pDef->GetCullFillCost();
 	float flCullRadius = pDef->GetCullRadius();
 	float flCullRadiusSqr = flCullRadius * flCullRadius;
 	*pTotalArea = 0.0f;
 
 #ifdef DBGFLAG_ASSERT
-	float flMaxPixels = viewParticle.width * viewParticle.height;
+	int flMaxPixels = viewParticle.width * viewParticle.height;
 #endif
 
 	CParticleCollection *pCollection = pDef->FirstCollection();
@@ -1614,7 +1612,7 @@ int CParticleMgr::RetireSort( const void *p1, const void *p2 )
 }
 
 bool CParticleMgr::RetireParticleCollections( CParticleSystemDefinition* pDef, 
-	int nCount, RetireInfo_t *pInfo, float flScreenArea, float flMaxTotalArea )
+	intp nCount, RetireInfo_t *pInfo, float flScreenArea, float flMaxTotalArea )
 {
 	bool bRetirementOccurred = false;
 
@@ -1626,7 +1624,7 @@ bool CParticleMgr::RetireParticleCollections( CParticleSystemDefinition* pDef,
 	// Quicksort the retirement info
 	qsort( pInfo, nCount, sizeof(RetireInfo_t), RetireSort );
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( flScreenArea <= flMaxTotalArea )
 			break;
@@ -1651,7 +1649,7 @@ bool CParticleMgr::RetireParticleCollections( CParticleSystemDefinition* pDef,
 // Next, see if there are new particle systems that need early retirement
 static ConVar cl_particle_retire_cost( "cl_particle_retire_cost", "0", FCVAR_CHEAT | FCVAR_ALLOWED_IN_COMPETITIVE );
 
-bool CParticleMgr::EarlyRetireParticleSystems( int nCount, ParticleSimListEntry_t *ppEffects )
+bool CParticleMgr::EarlyRetireParticleSystems( intp nCount, ParticleSimListEntry_t *ppEffects )
 {
 	// NOTE: Doing a cheap and hacky estimate of worst-case fillrate
 	const CViewSetup *pViewSetup = view->GetPlayerViewSetup();
@@ -1662,9 +1660,9 @@ bool CParticleMgr::EarlyRetireParticleSystems( int nCount, ParticleSimListEntry_
 	if ( flMaxScreenArea == 0.0f )
 		return false;
 
-	int nDefCount = 0;
-	CParticleSystemDefinition **ppDefs = (CParticleSystemDefinition**)stackalloc( nCount * sizeof(CParticleSystemDefinition*) );
-	for ( int i = 0; i < nCount; ++i )
+	intp nDefCount = 0;
+	CParticleSystemDefinition **ppDefs = stackallocT( CParticleSystemDefinition*, nCount );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CParticleSystemDefinition *pDef = ppEffects[i].m_pNewParticleEffect->m_pDef;
 
@@ -1687,7 +1685,7 @@ bool CParticleMgr::EarlyRetireParticleSystems( int nCount, ParticleSimListEntry_
 	if ( nDefCount == 0 )
 		return false;
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		ppEffects[i].m_pNewParticleEffect->MarkShouldPerformCullCheck( true );
 	}
@@ -1698,12 +1696,11 @@ bool CParticleMgr::EarlyRetireParticleSystems( int nCount, ParticleSimListEntry_
 
 	bool bRetiredCollections = true;
 	float flScreenArea;
-	int nSize = nCount * sizeof(RetireInfo_t);
-	RetireInfo_t *pInfo = (RetireInfo_t*)stackalloc( nSize );
-	for ( int i = 0; i < nDefCount; ++i )
+	RetireInfo_t *pInfo = stackallocT( RetireInfo_t, nCount );
+	for ( intp i = 0; i < nDefCount; ++i )
 	{
 		CParticleSystemDefinition* pDef = ppDefs[i];
-		int nActualCount = ComputeParticleDefScreenArea( nCount, pInfo, &flScreenArea, pDef, *pViewSetup, worldToScreen, flFocalDist );
+		intp nActualCount = ComputeParticleDefScreenArea( nCount, pInfo, &flScreenArea, pDef, *pViewSetup, worldToScreen, flFocalDist );
 		if ( flScreenArea > flMaxScreenArea )
 		{
 			if ( RetireParticleCollections( pDef, nActualCount, pInfo, flScreenArea, flMaxScreenArea ) )
@@ -1713,7 +1710,7 @@ bool CParticleMgr::EarlyRetireParticleSystems( int nCount, ParticleSimListEntry_
 		}
 	}
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		ppEffects[i].m_pNewParticleEffect->MarkShouldPerformCullCheck( false );
 	}
@@ -1815,7 +1812,7 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 
 	CUtlVector<ParticleSimListEntry_t> particlesToSimulate;
 	BuildParticleSimList(particlesToSimulate);
-	int nCount = particlesToSimulate.Count();
+	intp nCount = particlesToSimulate.Count();
 
 	// See if there are new particle systems that need early retirement
 	// This has to happen after the first update
@@ -1831,7 +1828,7 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 		UpdateDirtySpatialPartitionEntities();
 		if ( !r_threaded_particles.GetBool() )
 		{
-			for( int i=0; i<nCount; i++)
+			for( intp i=0; i<nCount; i++)
 			{
 				ProcessPSystem( particlesToSimulate[i] );
 			}
@@ -1843,7 +1840,7 @@ void CParticleMgr::UpdateNewEffects( float flTimeDelta )
 	}
 
 	// now, run non-reentrant part for updating changes
-	for( int i=0; i<nCount; i++)
+	for( intp i=0; i<nCount; i++)
 	{
 		// this one can call into random entity code which may not be thread-safe
 		particlesToSimulate[i].m_pNewParticleEffect->DetectChanges();
@@ -1971,13 +1968,13 @@ void CParticleMgr::UpdateAllEffects( float flTimeDelta )
 
 CParticleSubTextureGroup* CParticleMgr::FindOrAddSubTextureGroup( IMaterial *pPageMaterial )
 {
-	for ( int i=0; i < m_SubTextureGroups.Count(); i++ )
+	for ( auto &g : m_SubTextureGroups )
 	{
-		if ( m_SubTextureGroups[i]->m_pPageMaterial == pPageMaterial )
-			return m_SubTextureGroups[i];
+		if ( g->m_pPageMaterial == pPageMaterial )
+			return g;
 	}
 
-	CParticleSubTextureGroup *pGroup = new CParticleSubTextureGroup;
+	auto *pGroup = new CParticleSubTextureGroup;
 	m_SubTextureGroups.AddToTail( pGroup );
 	pGroup->m_pPageMaterial = pPageMaterial;
 	pPageMaterial->AddRef();
