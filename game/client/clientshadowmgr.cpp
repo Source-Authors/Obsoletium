@@ -1822,7 +1822,7 @@ ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( ClientEntityHandl
 		pShadowProxyData = (void*)(uintp)h;
 	}
 
-	int createShadowFlags;
+	ShadowCreateFlags_t createShadowFlags;
 	if( flags & SHADOW_FLAGS_FLASHLIGHT )
 	{
 		// don't use SHADOW_CACHE_VERTS with projective lightsources since we expect that they will change every frame.

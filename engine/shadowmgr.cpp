@@ -134,8 +134,8 @@ public:
 	CShadowMgr();
 
 	// Methods inherited from IShadowMgr
-	virtual ShadowHandle_t CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags );
-	virtual ShadowHandle_t CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags );
+	virtual ShadowHandle_t CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags );
+	virtual ShadowHandle_t CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags );
 	virtual void DestroyShadow( ShadowHandle_t handle );
 	virtual void SetShadowMaterial( ShadowHandle_t handle, IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy );
 	virtual void EnableShadow( ShadowHandle_t handle, bool bEnable );
@@ -201,7 +201,8 @@ public:
 	virtual bool ModelHasShadows( ModelInstanceHandle_t instance );
 
 private:
-	enum
+	// dimhotepus: int -> unsigned short to match ShadowCreateFlags_t 
+	enum : unsigned short
 	{
 		SHADOW_DISABLED = (SHADOW_LAST_FLAG << 1),
 	};
@@ -245,7 +246,8 @@ private:
 		IMaterial*		m_pMaterial;		// material for rendering surfaces
 		IMaterial*		m_pModelMaterial;	// material for rendering models
 		void*			m_pBindProxy;
-		unsigned short	m_Flags;
+		// dimhotepus: unsigned short -> ShadowCreateFlags_t
+		ShadowCreateFlags_t	m_Flags;
 		unsigned short	m_SortOrder;
 		float			m_flSphereRadius;	// Radius of sphere surrounding the shadow
 		Ray_t			m_Ray;				// NOTE: Ray needs to be on 16-byte boundaries.
@@ -665,13 +667,13 @@ unsigned short CShadowMgr::InvalidShadowIndex( )
 //-----------------------------------------------------------------------------
 // Create, destroy shadows
 //-----------------------------------------------------------------------------
-ShadowHandle_t CShadowMgr::CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags )
+ShadowHandle_t CShadowMgr::CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags )
 {
 	return CreateShadowEx( pMaterial, pModelMaterial, pBindProxy, creationFlags );
 }
 
 
-ShadowHandle_t CShadowMgr::CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags )
+ShadowHandle_t CShadowMgr::CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags )
 {
 #ifndef SWDS
 	ShadowHandle_t h = m_Shadows.AddToTail();
@@ -701,11 +703,11 @@ ShadowHandle_t CShadowMgr::CreateShadowEx( IMaterial* pMaterial, IMaterial* pMod
 	shadow.m_pFlashlightDepthTexture = NULL;
 	shadow.m_FlashlightHandle = m_FlashlightStates.InvalidIndex();
 
-	if ( ( creationFlags & SHADOW_FLASHLIGHT ) != 0 )
+	if ( to_underlying(creationFlags) & SHADOW_FLASHLIGHT )
 	{
 		shadow.m_FlashlightHandle = m_FlashlightStates.AddToTail();
 		m_FlashlightStates[shadow.m_FlashlightHandle].m_Shadow = h;
-		if ( !IsX360() && !r_flashlight_version2.GetInt() )
+		if ( !r_flashlight_version2.GetInt() )
 		{
 			AllocFlashlightMaterialBuckets( shadow.m_FlashlightHandle );
 		}
@@ -1112,7 +1114,7 @@ inline void CShadowMgr::RemoveShadowDecalFromSurface( SurfaceHandle_t surfID, Sh
 void CShadowMgr::AddSurfaceToFlashlightMaterialBuckets( ShadowHandle_t handle, SurfaceHandle_t surfID )
 {
 	// Make sure that this is a flashlight.
-	Assert( m_Shadows[handle].m_Flags & SHADOW_FLASHLIGHT );
+	Assert( to_underlying( m_Shadows[handle].m_Flags ) & SHADOW_FLASHLIGHT );
 	
 	// Get the flashlight id for this particular shadow handle and make sure that it's valid.
 	FlashlightHandle_t flashlightID = m_Shadows[handle].m_FlashlightHandle;
@@ -1134,15 +1136,9 @@ void CShadowMgr::AddSurfaceToShadow( ShadowHandle_t handle, SurfaceHandle_t surf
 	// material alpha would have to be taken into account, so that
 	// no multiplication occurs where the alpha == 0
 	// FLASHLIGHTFIXME: get rid of some of these checks for the ones that will work just fine with the flashlight.	
-	bool bIsFlashlight = ( ( m_Shadows[handle].m_Flags & SHADOW_FLASHLIGHT ) != 0 );
+	bool bIsFlashlight = ( to_underlying( m_Shadows[handle].m_Flags ) & SHADOW_FLASHLIGHT ) != 0;
 	if ( !bIsFlashlight && MSurf_Flags(surfID) & (SURFDRAW_TRANS | SURFDRAW_ALPHATEST | SURFDRAW_NOSHADOWS) )
 		return;
-
-#ifdef _XBOX
-	// Don't let the flashlight get on water on XBox
-	if ( bIsFlashlight && ( MSurf_Flags(surfID) & SURFDRAW_WATERSURFACE ) )
-		return;
-#endif
 
 #if 0
 	// Make sure the surface has the shadow on it exactly once...
@@ -1321,7 +1317,7 @@ void CShadowMgr::SetModelShadowState( ModelInstanceHandle_t instance )
 
 			if( !bWireframe )
 			{
-				if( shadow.m_Flags & SHADOW_FLASHLIGHT )
+				if ( to_underlying( shadow.m_Flags ) & SHADOW_FLASHLIGHT )
 				{
 					// NULL means that the models material should be used.
 					// This is what we want in the case of the flashlight
@@ -1334,7 +1330,7 @@ void CShadowMgr::SetModelShadowState( ModelInstanceHandle_t instance )
 					g_pStudioRender->AddShadow( shadow.m_pModelMaterial, shadow.m_pBindProxy );
 				}
 			}
-			else if( ( shadow.m_Flags & SHADOW_FLASHLIGHT ) || r_shadows_gamecontrol.GetInt() != 0 )
+			else if( ( to_underlying( shadow.m_Flags ) & SHADOW_FLASHLIGHT ) || r_shadows_gamecontrol.GetInt() != 0 )
 			{
 				g_pStudioRender->AddShadow( g_pMaterialMRMWireframe, NULL );
 			}
@@ -1439,12 +1435,18 @@ void CShadowMgr::EnableShadow( ShadowHandle_t handle, bool bEnable )
 		RemoveAllSurfacesFromShadow( handle );
 		RemoveAllModelsFromShadow( handle );
 
-		m_Shadows[handle].m_Flags |= SHADOW_DISABLED;
+		m_Shadows[handle].m_Flags = static_cast<ShadowCreateFlags_t>
+		(
+			to_underlying(m_Shadows[handle].m_Flags) | SHADOW_DISABLED
+		);
 	}
 	else
 	{
 		// FIXME: Could make this recompute the cache...
-		m_Shadows[handle].m_Flags &= ~SHADOW_DISABLED;
+		m_Shadows[handle].m_Flags = static_cast<ShadowCreateFlags_t>
+		(
+			to_underlying(m_Shadows[handle].m_Flags) & ~SHADOW_DISABLED
+		);
 	}
 }
 
@@ -1477,7 +1479,7 @@ void CShadowMgr::ProjectShadow( ShadowHandle_t handle, const Vector &origin,
 
 	// Don't bother with this shadow if it's disabled
 	Shadow_t &shadow = m_Shadows[handle];
-	if ( shadow.m_Flags & SHADOW_DISABLED )
+	if ( to_underlying( shadow.m_Flags ) & SHADOW_DISABLED )
 		return;
 
 	// Don't compute the surface cache if shadows are off..
@@ -1601,7 +1603,7 @@ void CShadowMgr::ProjectFlashlight( ShadowHandle_t handle, const VMatrix& worldT
 	}
 
 	// Don't bother with this shadow if it's disabled
-	if ( m_Shadows[handle].m_Flags & SHADOW_DISABLED )
+	if ( to_underlying( m_Shadows[handle].m_Flags ) & SHADOW_DISABLED )
 		return;
 
 	// Don't compute the surface cache if shadows are off..
@@ -1615,7 +1617,7 @@ void CShadowMgr::ProjectFlashlight( ShadowHandle_t handle, const VMatrix& worldT
 	MatrixInverseGeneral( shadow.m_WorldToShadow, shadowToWorld );
 
 	// Set up the frustum for the flashlight so that we can cull each leaf against it.
-	Assert( shadow.m_Flags & SHADOW_FLASHLIGHT );
+	Assert( to_underlying( shadow.m_Flags ) & SHADOW_FLASHLIGHT );
 	Frustum_t &frustum = m_FlashlightStates[shadow.m_FlashlightHandle].m_Frustum;
 	FrustumPlanesFromMatrix( shadowToWorld, frustum );
 	CalculateSphereFromProjectionMatrixInverse( shadowToWorld, &shadow.m_vecSphereCenter, &shadow.m_flSphereRadius );
@@ -1825,7 +1827,7 @@ bool CShadowMgr::EnumerateLeaf( int leaf, intp context )
 	mleaf_t* pLeaf = &host_state.worldbrush->leafs[leaf];
 
 	bool bIsFlashlight;
-	if( shadow.m_Flags & SHADOW_FLASHLIGHT )
+	if( to_underlying( shadow.m_Flags ) & SHADOW_FLASHLIGHT )
 	{
 		bIsFlashlight = true;
 		ApplyFlashlightToLeaf( shadow, pLeaf, pBuild );
@@ -1868,7 +1870,7 @@ void CShadowMgr::AddShadowToBrushModel( ShadowHandle_t handle, model_t* pModel,
 
 	// Transform the shadow ray direction into model space
 	Vector shadowDirInModelSpace;
-	bool bIsFlashlight = ( pShadow->m_Flags & SHADOW_FLASHLIGHT ) != 0;
+	bool bIsFlashlight = ( to_underlying( pShadow->m_Flags ) & SHADOW_FLASHLIGHT ) != 0;
 	if( !bIsFlashlight )
 	{
 		// FLASHLIGHTFIXME: should do backface culling for projective light sources.
@@ -1933,7 +1935,7 @@ void CShadowMgr::AddShadowsOnSurfaceToRenderList( ShadowDecalHandle_t decalHandl
 	while( decalHandle != m_ShadowDecals.InvalidIndex() )
 	{
 		ShadowDecal_t& shadowDecal = m_ShadowDecals[decalHandle];
-		if( m_Shadows[shadowDecal.m_Shadow].m_Flags & SHADOW_FLASHLIGHT )
+		if( to_underlying( m_Shadows[shadowDecal.m_Shadow].m_Flags ) & SHADOW_FLASHLIGHT )
 		{
 			AddSurfaceToFlashlightMaterialBuckets( shadowDecal.m_Shadow, shadowDecal.m_SurfID );
 
@@ -2365,7 +2367,7 @@ bool CShadowMgr::ComputeShadowVertices( ShadowDecal_t& decal,
 //-----------------------------------------------------------------------------
 inline bool CShadowMgr::ShouldCacheVertices( const ShadowDecal_t& decal )
 {
-	return (m_Shadows[decal.m_Shadow].m_Flags & SHADOW_CACHE_VERTS) != 0;
+	return (to_underlying(m_Shadows[decal.m_Shadow].m_Flags) & SHADOW_CACHE_VERTS) != 0;
 }
 
 
@@ -3537,14 +3539,14 @@ void CShadowMgr::RenderFlashlights( bool bDoMasking, const VMatrix* pModelToWorl
 
 const Frustum_t &CShadowMgr::GetFlashlightFrustum( ShadowHandle_t handle )
 {
-	Assert( m_Shadows[handle].m_Flags & SHADOW_FLASHLIGHT );
+	Assert( to_underlying( m_Shadows[handle].m_Flags ) & SHADOW_FLASHLIGHT );
 	Assert( m_Shadows[handle].m_FlashlightHandle != m_Shadows.InvalidIndex() );
 	return m_FlashlightStates[m_Shadows[handle].m_FlashlightHandle].m_Frustum;
 }
 
 const FlashlightState_t &CShadowMgr::GetFlashlightState( ShadowHandle_t handle )
 {
-	Assert( m_Shadows[handle].m_Flags & SHADOW_FLASHLIGHT );
+	Assert( to_underlying( m_Shadows[handle].m_Flags ) & SHADOW_FLASHLIGHT );
 	Assert( m_Shadows[handle].m_FlashlightHandle != m_Shadows.InvalidIndex() );
 	return m_FlashlightStates[m_Shadows[handle].m_FlashlightHandle].m_FlashlightState;
 }
