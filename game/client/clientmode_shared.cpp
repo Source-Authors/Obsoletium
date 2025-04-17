@@ -164,17 +164,12 @@ CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 
 	switch (crashtype)
 	{
 		case 0:
-			dummy = *((volatile int *) NULL);
+			dummy = *((volatile int *)nullptr);
 			Msg("Crashed! %d\n", dummy); // keeps dummy from optimizing out
 			break;
 		case 1:
-			*((volatile int *)NULL) = 42;
+			*((volatile int *)nullptr) = 42;
 			break;
-#if defined( _X360 )
-		case 2:
-			XBX_CrashDump(false);
-			break;
-#endif
 		default:
 			Msg("Unknown variety of crash. You have now failed to crash. I hope you're happy.\n");
 			break;
