@@ -2171,7 +2171,7 @@ void UTIL_SetClientVisibilityPVS( edict_t *pClient, const unsigned char *pvs, in
 			const unsigned char newValue = ((unsigned char *)&pFrom[limit])[i] & ~((unsigned char *)&pMask[limit])[i];
 
 			if ( oldValue != newValue )
-				DevWarning( "%s: PVS change - old value (%hhu) is not same as new one (%hhu).",
+				DevWarning( "%s: PVS change - old value (%hhu) is not same as new one (%hhu).\n",
 					pClient->GetClassName(), oldValue, newValue );
 
 			((unsigned char *)&pTo[limit])[i] = newValue;
