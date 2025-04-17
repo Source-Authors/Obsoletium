@@ -2634,7 +2634,7 @@ unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 //-----------------------------------------------------------------------------
 time_t CBaseFileSystem::FastFileTime( const CSearchPath *path, const char *pFileName )
 {
-	struct	_stat buf;
+	struct _stat buf;
 
 	if ( path->GetPackFile() )
 	{
@@ -3078,7 +3078,7 @@ bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
 
 	// dimhotepus: Double buffer size.
 	char buffer[65535];
-		while( sizeof(buffer) == Read(buffer,sizeof(buffer),f) );
+	while( sizeof(buffer) == Read(buffer,sizeof(buffer),f) );
 
 	Close( f );
 
@@ -3445,7 +3445,7 @@ void CBaseFileSystem::SetSearchPathIsTrustedSource( CSearchPath *pSearchPath )
 		return;
 	}
 
-	#ifdef SUPPORT_PACKED_STORE
+#ifdef SUPPORT_PACKED_STORE
 		// Only signed VPK's can be trusted
 		CPackedStoreRefCount *pVPK = pSearchPath->GetPackedStore();
 		if ( pVPK == nullptr )
@@ -3550,14 +3550,14 @@ bool CBaseFileSystem::IsFileWritable( char const *pFileName, char const *pPathID
 {
 	CHECK_DOUBLE_SLASHES( pFileName );
 
-	struct	_stat buf;
+	struct _stat buf;
 
 	char tempPathID[MAX_PATH];
 	ParsePathID( pFileName, pPathID, tempPathID );
 
 	if ( V_IsAbsolutePath( pFileName ) )
 	{
-		if( FS_stat( pFileName, &buf ) != -1 )
+		if ( FS_stat( pFileName, &buf ) != -1 )
 		{
 #ifdef WIN32
 			if( buf.st_mode & _S_IWRITE )
@@ -3728,11 +3728,12 @@ void CBaseFileSystem::CreateDirHierarchy( const char *pRelativePathT, const char
 	intp len = V_strlen( szScratchFileName ) + 1;
 	char *end = szScratchFileName + len;
 	char *s = szScratchFileName;
-	while( s < end )
+	while ( s < end )
 	{
-		if( *s == CORRECT_PATH_SEPARATOR && s != szScratchFileName && ( IsLinux() || *( s - 1 ) != ':' ) )
+		if ( *s == CORRECT_PATH_SEPARATOR && s != szScratchFileName && ( IsLinux() || *( s - 1 ) != ':' ) )
 		{
 			*s = '\0';
+
 #if defined( _WIN32 )
 			if ( _mkdir( szScratchFileName ) && errno != EEXIST )
 #elif defined( POSIX )
@@ -3843,7 +3844,7 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 				bIsVPKOrPak = true;
 			}
 
-			#ifdef SUPPORT_PACKED_STORE
+#ifdef SUPPORT_PACKED_STORE
 				if ( pSearchPath->GetPackedStore() )
 				{
 					Assert( pFindData->m_dirMatchesFromVPKOrPak.Count() == 0 );
@@ -3851,7 +3852,7 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 					pSearchPath->GetPackedStore()->GetFileAndDirLists( pWildCard, pFindData->m_dirMatchesFromVPKOrPak, pFindData->m_fileMatchesFromVPKOrPak, true );
 					bIsVPKOrPak = true;
 				}
-			#endif
+#endif
 
 			if ( bIsVPKOrPak )
 			{
@@ -3961,7 +3962,7 @@ bool CBaseFileSystem::FindNextFileHelper( FindData_t *pFindData, int *pFoundStor
 			continue;
 		}
 
-		#ifdef SUPPORT_PACKED_STORE
+#ifdef SUPPORT_PACKED_STORE
 			if ( pSearchPath->GetPackedStore() )
 			{
 				Assert( pFindData->m_dirMatchesFromVPKOrPak.Count() == 0 );
@@ -3971,7 +3972,7 @@ bool CBaseFileSystem::FindNextFileHelper( FindData_t *pFindData, int *pFoundStor
 					return true;
 				continue;
 			}
-		#endif
+#endif
 
 		char pTmpFileName[ MAX_FILEPATH ];
 		V_sprintf_safe( pTmpFileName, "%s%s", pSearchPath->GetPathString(), pFindData->wildCardString.Base() );
@@ -4153,7 +4154,7 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 {
 	CHECK_DOUBLE_SLASHES( pFileName );
 
-	struct	_stat buf;
+	struct _stat buf;
 
 	if ( pPathType )
 	{
@@ -4232,7 +4233,7 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 		}
 
 		// Found in VPK?
-		#ifdef SUPPORT_PACKED_STORE
+#ifdef SUPPORT_PACKED_STORE
 			CPackedStore *pVPK = pSearchPath->GetPackedStore();
 			if ( pVPK )
 			{
@@ -4260,7 +4261,7 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 				}
 				continue;
 			}
-		#endif
+#endif
 
 		char pTmpFileName[ MAX_FILEPATH ];
 		V_sprintf_safe( pTmpFileName, "%s%s", pSearchPath->GetPathString(), pFileName );
@@ -4676,12 +4677,12 @@ const char *CBaseFileSystem::CSearchPath::GetDebugString() const
 	{
 		return GetPackFile()->m_ZipName;
 	}
-	#ifdef SUPPORT_PACKED_STORE
-		if ( GetPackedStore()  )
-		{
-			return GetPackedStore()->FullPathName();
-		}
-	#endif
+#ifdef SUPPORT_PACKED_STORE
+	if ( GetPackedStore()  )
+	{
+		return GetPackedStore()->FullPathName();
+	}
+#endif
 	return GetPathString();
 }
 
@@ -4693,7 +4694,7 @@ bool CBaseFileSystem::CSearchPath::IsMapPath() const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CBaseFileSystem::CSearchPath::~CSearchPath( void )
+CBaseFileSystem::CSearchPath::~CSearchPath()
 {
 	if ( m_pPackFile )
 	{	
