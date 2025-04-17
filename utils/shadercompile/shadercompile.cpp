@@ -1038,8 +1038,10 @@ void Master_ReceiveWorkUnitFn(uint64_t iWorkUnit, MessageBuffer *pBuf,
       // remember how many static combos get skipped
       g_numSkippedStaticCombos += -len;
 
+      int64 numSkips = -static_cast<int64>(len) - 1;
+
       // then we skip as instructed
-      for (int64 numSkips = -len - 1; numSkips > 0;) {
+      for (; numSkips > 0;) {
         if (numSkips <= nComboOfTheEntry) {
           nComboOfTheEntry -= numSkips;
           iCombo += numSkips;
