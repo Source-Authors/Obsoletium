@@ -12,16 +12,6 @@
 #pragma once
 #endif
 
-// #include <vgui/VGUI.h>
-
-#ifndef NULL
-#ifdef __cplusplus
-#define NULL    0
-#else
-#define NULL    ((void *)0)
-#endif
-#endif
-
 #include "tier1/utlvector.h"
 #include "Color.h"
 
@@ -254,7 +244,7 @@ public:
 		TYPE_WSTRING,
 		TYPE_COLOR,
 		TYPE_UINT64,
-		TYPE_NUMTYPES, 
+		TYPE_NUMTYPES,
 	};
 	[[nodiscard]] types_t GetDataType(const char *keyName = nullptr);
 
@@ -271,7 +261,7 @@ public:
 
 	// Dump keyvalues recursively into a dump context
 	bool Dump( class IKeyValuesDumpContext *pDump, int nIndentLevel = 0, bool bSorted = false );
-		
+
 	// Merge in another KeyValues, keeping "our" settings
 	void RecursiveMergeKeyValues( KeyValues *baseKV );
 
