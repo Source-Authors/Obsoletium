@@ -5,41 +5,30 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#ifdef POSIX
-#define _snwprintf swprintf
-#endif
-
 #include "basefilesystem.h"
 #include "tier0/vprof.h"
+#include "tier0/icommandline.h"
 #include "tier1/characterset.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"
-#include "tier0/icommandline.h"
 #include "tier1/generichash.h"
 #include "tier1/utllinkedlist.h"
 #include "filesystem/IQueuedLoader.h"
 #include "tier2/tier2.h"
 #include "zip_utils.h"
 #include "packfile.h"
-#ifdef _X360
-#include "xbox/xbox_launch.h"
-#endif
 
 #ifndef DEDICATED
 #include "keyvaluescompiler.h"
 #endif
+
 #include "ifilelist.h"
 
 #ifdef IS_WINDOWS_PC
 // Needed for getting file type string
 #define WIN32_LEAN_AND_MEAN
 #include <shellapi.h>
-#endif
-
-#if defined( _X360 )
-#include "xbox\xbox_win32stubs.h"
-#undef GetCurrentDirectory
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
