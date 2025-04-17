@@ -246,7 +246,8 @@ ConVar filesystem_unbuffered_io( "filesystem_unbuffered_io", "1", 0, "" );
 #endif
 
 ConVar filesystem_native( "filesystem_native", "1", 0, "Use native FS or STDIO" );
-ConVar filesystem_max_stdio_read( "filesystem_max_stdio_read", IsX360() ? "64" : "16", 0, "" );
+// dimhotepus: 16 -> 64 on PCs.
+ConVar filesystem_max_stdio_read( "filesystem_max_stdio_read", "64", 0, "Maximum chunk size to read in MiB" );
 ConVar filesystem_report_buffered_io( "filesystem_report_buffered_io", "0" );
 
 //-----------------------------------------------------------------------------
