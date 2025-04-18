@@ -2185,28 +2185,6 @@ bool CShaderAPIDx8::OnDeviceInit()
 
 	RECORD_COMMAND( DX8_BEGIN_SCENE, 0 );
 
-	// Apply mandatory initialization HW fixups, GPU state will be left as expected
-	if ( IsX360() )
-	{
-		// place the possible persisted display into the back buffer, ready for present()
-		RestorePersistedDisplay( false );
-
-		// 360 MUST perform an initial swap to stabilize the state
-		// this ensures any states (e.g. gamma) are respected
-		// without this, the 360 resets to internal default state on the first swap
-		OwnGPUResources( false );
-		Dx9Device()->Present( 0, 0, 0, 0 );
-
-		// present corrupts the GPU state and back buffer (according to docs)
-		// re-clear the back buffer in order to re-establish the expected contents
-		ResetRenderState( false );
-		ClearBuffers( true, true, true, -1, -1 );
-
-		// place the front buffer image in the back buffer, later systems will detect and grab
-		// other systems will detect and grab
-		RestorePersistedDisplay( true );
-	}
-
 	Dx9Device()->BeginScene();
 
 	return true;

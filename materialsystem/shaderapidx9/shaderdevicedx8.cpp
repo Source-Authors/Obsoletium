@@ -1675,9 +1675,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		m_PresentParameters.BackBufferWidth = useDefault ? mode.m_nWidth : info.m_DisplayMode.m_nWidth;
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
-#if defined( _X360 )
-		m_PresentParameters.FrontBufferFormat = D3DFMT_LE_X8R8G8B8;
-#endif
 		if ( !info.m_bWaitForVSync || CommandLine()->FindParm( "-forcenovsync" ) )
 		{
 			m_PresentParameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -1690,40 +1687,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		m_PresentParameters.FullScreen_RefreshRateInHz = info.m_DisplayMode.m_nRefreshRateDenominator ? 
 			info.m_DisplayMode.m_nRefreshRateNumerator / info.m_DisplayMode.m_nRefreshRateDenominator : D3DPRESENT_RATE_DEFAULT;
 
-#if defined( _X360 )
-		XVIDEO_MODE videoMode;
-		XGetVideoMode( &videoMode );
-
-		// want 30 for 60Hz, and 25 for 50Hz (PAL)
-		int nNewFpsMax = ( ( int )( videoMode.RefreshRate + 0.5f ) ) >> 1;
-		// slam to either 30 or 25 so that we don't end up with any other cases.
-		if( nNewFpsMax < 26 )
-		{
-			nNewFpsMax = 25;
-		}
-		else
-		{
-			nNewFpsMax = 30;
-		}
-		DevMsg( "*******Monitor refresh is %f, setting fps_max to %d*********\n", videoMode.RefreshRate, nNewFpsMax );
-		ConVarRef fps_max( "fps_max" );
-		fps_max.SetValue( nNewFpsMax );
-
-		// setup hardware scaling - should be native 720p upsampling to 1080i
-		if ( info.m_bScaleToOutputResolution )
-		{
-			m_PresentParameters.VideoScalerParameters.ScalerSourceRect.x2 = m_PresentParameters.BackBufferWidth;
-			m_PresentParameters.VideoScalerParameters.ScalerSourceRect.y2 = m_PresentParameters.BackBufferHeight;
-			m_PresentParameters.VideoScalerParameters.ScaledOutputWidth = videoMode.dwDisplayWidth;
-			m_PresentParameters.VideoScalerParameters.ScaledOutputHeight = videoMode.dwDisplayHeight;
-			DevMsg( "VIDEO SCALING: scaling from %dx%d to %dx%d\n", ( int )m_PresentParameters.BackBufferWidth, ( int )m_PresentParameters.BackBufferHeight,
-				( int )videoMode.dwDisplayWidth, ( int )videoMode.dwDisplayHeight );
-		}
-		else
-		{
-			DevMsg( "VIDEO SCALING: No scaling: %dx%d\n", ( int )m_PresentParameters.BackBufferWidth, ( int )m_PresentParameters.BackBufferHeight );
-		}
-#endif
 	}
 	else
 	{
@@ -3092,13 +3055,6 @@ void CShaderDeviceDx8::Present()
 	if ( bInMainThread )
 	{
 		CheckDeviceLost( m_bOtherAppInitializing );
-	}
-
-	if ( IsX360() )
-	{
-		// according to docs  - "Mandatory Reset of GPU Registers"
-		// 360 must force the cached state to be dirty after any present()
-		g_pShaderAPI->ResetRenderState( false );
 	}
 
 #ifdef RECORD_KEYFRAMES
