@@ -2990,13 +2990,9 @@ void CShaderDeviceDx8::Present()
 	}
 
 	// If we're not iconified, try to present (without this check, we can flicker when Alt-Tabbed away)
-#ifdef _WIN32
-	if ( IsX360() || (IsIconic( ( HWND )m_hWnd ) == 0 && bValidPresent) )
-#else
-	if ( IsX360() || (IsIconic( (VD3DHWND)m_hWnd ) == 0 && bValidPresent) )
-#endif
+	if ( IsIconic( (VD3DHWND)m_hWnd ) == FALSE && bValidPresent )
 	{
-		if ( IsPC() && ( m_IsResizing || ( m_ViewHWnd != (VD3DHWND)m_hWnd ) ) )
+		if ( m_IsResizing || ( m_ViewHWnd != (VD3DHWND)m_hWnd ) )
 		{
 			RECT destRect;
 			#ifndef DX_TO_GL_ABSTRACTION
