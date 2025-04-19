@@ -1227,7 +1227,7 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 		// dimhotepus: Try to free some space and allocate again.
 		CompactHeap();
 		
-		void *pMem = InternalMalloc( nSize, pFileName, nLine );
+		pMem = InternalMalloc( nSize, pFileName, nLine );
 	}
 	m_Timer.End();
 
