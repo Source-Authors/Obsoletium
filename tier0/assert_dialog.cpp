@@ -93,10 +93,6 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 		g_hTier0Instance = module;
 
 		InitTime();
-
-#ifdef DEBUG
-		MemDbgDllMain( module, fdwReason, lpvReserved );
-#endif
 		
 		// dimhotepus: Do not notify on thread creation for performance.
 		DisableThreadLibraryCalls(module);
@@ -106,6 +102,10 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 		// dimhotepus: Cleanup instance.
 		g_hTier0Instance = nullptr;
 	}
+
+#ifdef DEBUG
+	MemDbgDllMain( module, fdwReason, lpvReserved );
+#endif
 
 	return TRUE;
 }
