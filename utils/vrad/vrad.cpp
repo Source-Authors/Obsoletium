@@ -37,9 +37,9 @@ every surface must be divided into at least two patches each axis
 */
 
 CUtlVector<CPatch>		g_Patches;			
-CUtlVector<int>			g_FacePatches;		// contains all patches, children first
-CUtlVector<int>			faceParents;		// contains only root patches, use next parent to iterate
-CUtlVector<int>			clusterChildren;
+CUtlVector<intp>		g_FacePatches;		// contains all patches, children first
+CUtlVector<intp>		faceParents;		// contains only root patches, use next parent to iterate
+CUtlVector<intp>		clusterChildren;
 CUtlVector<Vector>		emitlight;
 CUtlVector<bumplights_t>	addlight;
 
@@ -548,7 +548,7 @@ void MakePatchForFace (int fn, winding_t *w)
 	totalarea += area;
 
 	// get a patch
-	int ndxPatch = g_Patches.AddToTail();
+	intp ndxPatch = g_Patches.AddToTail();
 	patch = &g_Patches[ndxPatch];
 	memset( patch, 0, sizeof( CPatch ) );
 	patch->ndxNext = g_Patches.InvalidIndex();

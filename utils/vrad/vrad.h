@@ -217,13 +217,13 @@ struct CPatch
 	int			faceNumber;
 	int			clusterNumber;
 
-	int			parent;			// patch index of parent
+	intp		parent;			// patch index of parent
 	intp		child1;			// patch index for children
 	intp		child2;
 
-	int			ndxNext;					// next patch index in face
-	int			ndxNextParent;				// next parent patch index in face
-	int			ndxNextClusterChild;		// next terminal child index in cluster
+	intp		ndxNext;					// next patch index in face
+	intp		ndxNextParent;				// next parent patch index in face
+	intp		ndxNextClusterChild;		// next terminal child index in cluster
 //	struct		patch_s		*next;					// next in face
 //	struct		patch_s		*nextparent;		    // next in face
 //	struct		patch_s		*nextclusterchild;		// next terminal child in cluster
@@ -236,9 +236,9 @@ struct CPatch
 
 
 extern CUtlVector<CPatch>	g_Patches;
-extern CUtlVector<int>		g_FacePatches;		// constains all patches, children first
-extern CUtlVector<int>		faceParents;		// contains only root patches, use next parent to iterate
-extern CUtlVector<int>		clusterChildren;
+extern CUtlVector<intp>		g_FacePatches;		// constains all patches, children first
+extern CUtlVector<intp>		faceParents;		// contains only root patches, use next parent to iterate
+extern CUtlVector<intp>		clusterChildren;
 
 
 struct sky_camera_t

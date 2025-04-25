@@ -738,9 +738,9 @@ public:
 		}
 	}
 	
-	int AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
+	intp AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
 	{
-		int index = m_MaterialEntries.AddToTail();
+		intp index = m_MaterialEntries.AddToTail();
 		m_MaterialEntries[index].textureIndex = shadowTextureIndex;
 		m_MaterialEntries[index].uv[0] = t0;
 		m_MaterialEntries[index].uv[1] = t1;
@@ -1215,7 +1215,7 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 					for ( int nGroup = 0; nGroup < pVtxMesh->numStripGroups; ++nGroup )
 					{
 						OptimizedModel::StripGroupHeader_t* pStripGroup = pVtxMesh->pStripGroup( nGroup );
-						int nMeshIdx = prop.m_MeshData.AddToTail();
+						intp nMeshIdx = prop.m_MeshData.AddToTail();
 
 						if (colorVerts)
 						{
@@ -2661,7 +2661,7 @@ static void DumpLightmapLinear( const char* _dstFilename, const CUtlVector<color
 	BuildFineMipmap( _width, _height, true, _srcTexels, NULL, &linearFloats );
 	linearBuffer.SetCount( linearFloats.Count() );
 
-	for ( int i = 0; i < linearFloats.Count(); ++i ) {
+	for ( intp i = 0; i < linearFloats.Count(); ++i ) {
 		linearBuffer[i].b = RoundFloatToByte(linearFloats[i].z * 255.0f);
 		linearBuffer[i].g = RoundFloatToByte(linearFloats[i].y * 255.0f);
 		linearBuffer[i].r = RoundFloatToByte(linearFloats[i].x * 255.0f);

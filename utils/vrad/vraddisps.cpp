@@ -439,7 +439,7 @@ void CVRadDispMgr::UnserializeDisps( void )
 			return;
 		}
 
-		int nIndex = builderDisps.AddToTail();
+		intp nIndex = builderDisps.AddToTail();
 		pDisp->SetListIndex( nIndex );
 		builderDisps[nIndex] = pDisp;
 	}
@@ -760,7 +760,7 @@ bool CVRadDispMgr::DispRayDistance_EnumerateElement( int userId, CBSPDispRayDist
 /*
 float CVRadDispMgr::ClipRayToDisp( Ray_t const &ray, int dispinfo )
 {
-	assert( m_DispTrees.IsValidIndex(dispinfo) );
+	Assert( m_DispTrees.IsValidIndex(dispinfo) );
 
 	RayDispOutput_t output;
 	if (!m_DispTrees[dispinfo].m_pDispTree->AABBTree_Ray( ray, output ))
@@ -783,8 +783,8 @@ bool CVRadDispMgr::DispFaceList_EnumerateLeaf( int ndxLeaf, intp context )
 		int ndxLeafFace = pLeaf->firstleafface + ndxFace;
 
 		// check to see if the face already lives in the list
-		int ndx;
-		int size = m_EnumDispFaceList.m_FaceList.Count();
+		intp ndx;
+		intp size = m_EnumDispFaceList.m_FaceList.Count();
 		for( ndx = 0; ndx < size; ndx++ )
 		{
 			if( m_EnumDispFaceList.m_FaceList[ndx] == ndxLeafFace )
@@ -793,7 +793,7 @@ bool CVRadDispMgr::DispFaceList_EnumerateLeaf( int ndxLeaf, intp context )
 
 		if( ndx == size )
 		{
-			int ndxList = m_EnumDispFaceList.m_FaceList.AddToTail();
+			intp ndxList = m_EnumDispFaceList.m_FaceList.AddToTail();
 			m_EnumDispFaceList.m_FaceList[ndxList] = ndxLeafFace;
 		}
 	}
@@ -812,8 +812,8 @@ bool CVRadDispMgr::DispFaceList_EnumerateElement( int userId, intp context )
 		return false;
 
 	// check to see if the displacement already lives in the list
-	int ndx;
-	int size = m_EnumDispFaceList.m_DispList.Count();
+	intp ndx;
+	intp size = m_EnumDispFaceList.m_DispList.Count();
 	for( ndx = 0; ndx < size; ndx++ )
 	{
 		if( m_EnumDispFaceList.m_DispList[ndx] == pDispTree )
