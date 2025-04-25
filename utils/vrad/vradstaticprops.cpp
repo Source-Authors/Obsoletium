@@ -512,6 +512,7 @@ bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuffer& buf )
 {
 	char	filename[MAX_PATH];
+	filename[0] = '\0';
 
 	// construct filename
 	Q_StripExtension( pModelName, filename );
