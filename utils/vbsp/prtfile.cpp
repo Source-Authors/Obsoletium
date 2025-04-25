@@ -342,7 +342,7 @@ void WritePortalFile (tree_t *tree)
 
 // set the cluster field in every leaf and count the total number of portals
 	num_visclusters = 0;
-	Msg("Building visibility clusters...\n");
+	Msg("Building visibility clusters...");
 	CUtlVector<node_t *> leaves;
 	BuildVisLeafList_r( headnode, leaves );
 
@@ -371,6 +371,7 @@ void WritePortalFile (tree_t *tree)
 	clusterleaf = 1;
 	SaveClusters_r (headnode);
 
-	Msg("done (%.2fs)\n", Plat_FloatTime() - start );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
+	Msg("\n");
 }
 

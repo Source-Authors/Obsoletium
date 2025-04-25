@@ -1657,7 +1657,7 @@ void EmitPhysCollision()
 	memcpy( ptr, &model, sizeof(model) );
 	ptr += sizeof(model);
 	Assert( (ptr-g_pPhysCollide) == g_PhysCollideSize);
-	Msg("done (%.2fs) (%d bytes)\n", Plat_FloatTime() - start, g_PhysCollideSize );
+	Msg("(%.2fs) (%d bytes)\n", Plat_FloatTime() - start, g_PhysCollideSize );
 
 	// UNDONE: Collision models (collisionList) memory leak!
 }

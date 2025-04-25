@@ -1376,7 +1376,7 @@ void FloodAreas (tree_t *tree)
 	FindAreas_r (tree->headnode);
 	SetAreaPortalAreas_r (tree, tree->headnode);
 	qprintf ("%5i areas\n", c_areas);
-	Msg("done (%.2fs)", Plat_FloatTime() - start );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 }
 
 //======================================================

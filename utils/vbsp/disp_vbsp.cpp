@@ -596,7 +596,7 @@ void EmitDispLMAlphaAndNeighbors()
 		CalculateLightmapSamplePositions( pCoreDispInfo, pFace, g_DispLightmapSamplePositions );
 	}
 
-	StartPacifier( "Displacement Alpha : ");
+	StartPacifier( "Displacement Alpha: ");
 
 	// Build lightmap alphas.
 	int dispCount = 0;	// How many we've processed.

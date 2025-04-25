@@ -325,7 +325,7 @@ void ProcessWorldModel (void)
 	// this turns portals with one solid side into faces
 	// it also subdivides each face if necessary to fit max lightmap dimensions
 	MakeFaces (tree->headnode);
-	Msg("done (%.2fs)", Plat_FloatTime() - start );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 
 	if (glview)
 	{
@@ -343,25 +343,35 @@ void ProcessWorldModel (void)
 	start = Plat_FloatTime();
 
 	Msg("\n");
-	Msg("FixTjuncs...\n");
+	Msg("FixTjuncs...");
 	
 	// This unifies the vertex list for all edges (splits collinear edges to remove t-junctions)
 	// It also welds the list of vertices out of each winding/portal and rounds nearly integer verts to integer
 	pLeafFaceList = FixTjuncs (tree->headnode, pLeafFaceList);
 
+	// dimhotepus: Add fix tjuncs time log.
+	Msg("(%.2fs)", Plat_FloatTime() - start );
+
 	// this merges all of the solid nodes that have separating planes
 	if (!noprune)
 	{
-		Msg("PruneNodes...\n");
+		Msg("\n");
+		Msg("PruneNodes...");
+
 		PruneNodes (tree->headnode);
+
+		// dimhotepus: Add prune nodes time log.
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 	}
 
 //	Msg( "SplitSubdividedFaces...\n" );
 //	SplitSubdividedFaces( tree->headnode );
 
-	Msg("WriteBSP...\n");
-	WriteBSP (tree->headnode, pLeafFaceList);
-	Msg("done (%.2fs)\n", Plat_FloatTime() - start );
+	Msg("\n");
+	Msg("Write BSP...");
+	WriteBSP(tree->headnode, pLeafFaceList);
+	Msg("(%.2fs)", Plat_FloatTime() - start );
+	Msg("\n");
 
 	if (!leaked)
 	{
@@ -1322,7 +1332,7 @@ int RunVBSP( int argc, char **argv )
 
 	V_sprintf_safe( materialPath, "%smaterials", gamedir );
 	InitMaterialSystem( materialPath, CmdLib_GetFileSystemFactory() );
-	Msg( "materialPath: %s\n", materialPath );
+	Msg( "Path to materials directory: %s.\n", materialPath );
 
 	char path[MAX_FILEPATH];
 	// delete portal and line files

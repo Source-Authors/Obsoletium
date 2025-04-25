@@ -1989,7 +1989,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	KeyValues *GameInfoKV = ReadKeyValuesFile( GameInfoPath );
 	if ( !GameInfoKV )
 	{
-		Msg( "Could not locate gameinfo.txt for Instance Remapping at %s\n", GameInfoPath );
+		Msg( "Could not locate gameinfo.txt for Instance Remapping at '%s'.\n", GameInfoPath );
 		return;
 	}
 
@@ -2002,7 +2002,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	const char *GameDataFile = GameInfoKV->GetString( "GameData", NULL );
 	if ( !GameDataFile )
 	{
-		Msg( "Could not locate 'GameData' key in %s\n", GameInfoPath );
+		Msg( "Could not locate 'GameData' key in '%s'.\n", GameInfoPath );
 		return;
 	}
 
@@ -2011,7 +2011,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	{
 		if ( !g_pFullFileSystem->RelativePathToFullPath_safe( GameDataFile, NULL, FDGPath ) )
 		{
-			Msg( "Could not locate GameData file %s\n", GameDataFile );
+			Msg( "Could not locate GameData file '%s'.\n", GameDataFile );
 		}
 	}
 
@@ -2044,7 +2044,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 				{
 					Color red( 255, 0, 0, 255 );
 
-					ColorSpewMessage( SPEW_ERROR, &red, "Could not open instance file %s\n", pInstanceFile );
+					ColorSpewMessage( SPEW_ERROR, &red, "Could not open instance file '%s'.\n", pInstanceFile );
 				}
 			}
 
