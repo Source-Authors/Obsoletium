@@ -673,7 +673,7 @@ static void EmitDetailObjectsOnFace( dface_t* pFace, DetailObject_t& detail )
 			{
 				u = 1.0f - u;
 				v = 1.0f - v;
-				assert( u + v <= 1.0f );
+				Assert( u + v <= 1.0f );
 			}
 
 			// Compute alpha
@@ -738,7 +738,7 @@ static float ComputeDisplacementFaceArea( dface_t* pFace )
 static void EmitDetailObjectsOnDisplacementFace( dface_t* pFace, 
 						DetailObject_t& detail, CCoreDispInfo& coreDispInfo )
 {
-	assert(pFace->numedges == 4);
+	Assert(pFace->numedges == 4);
 
 	// We're going to pick a bunch of random points, and then probabilistically
 	// decide whether or not to plant a detail object there.
