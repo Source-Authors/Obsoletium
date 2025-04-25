@@ -351,9 +351,7 @@ FreeBrush
 */
 void FreeBrush (bspbrush_t *brushes)
 {
-	int			i;
-
-	for (i=0 ; i<brushes->numsides ; i++)
+	for (int i=0 ; i<brushes->numsides ; i++)
 		if (brushes->sides[i].winding)
 			FreeWinding(brushes->sides[i].winding);
 	free (brushes);
