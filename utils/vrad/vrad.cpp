@@ -239,8 +239,10 @@ void ReadLightFile (char *filename)
 
 			g_NonShadowCastingMaterialStrings.AddToTail( strdup( NoShadName ));
 		}
-		else if ( sscanf( scan, "forcetextureshadow %s", NoShadName ) == 1 )
+		// dimhotepus: Prevent overflow,
+		else if ( sscanf( scan, "forcetextureshadow %1023s", NoShadName ) == 1 )
 		{
+			NoShadName[std::size(NoShadName) - 1] = '\0';
 			// dimhotepus: Add verbose log.
 			qprintf( "Added '%s' as a force texture shadows model.\n",NoShadName);
 
