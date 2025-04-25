@@ -23,7 +23,7 @@ int Overlay_GetFromEntity( entity_t *pMapEnt )
 	int iAccessorID = -1;
 
 	// Allocate the new overlay.
-	int iOverlay = g_aMapOverlays.AddToTail();
+	intp iOverlay = g_aMapOverlays.AddToTail();
 	mapoverlay_t *pMapOverlay = &g_aMapOverlays[iOverlay];
 
 	// Get the overlay data.
@@ -123,20 +123,20 @@ void Overlay_UpdateSideLists( int StartIndex )
 	for( int iMapOverlay = StartIndex; iMapOverlay < nMapOverlayCount; ++iMapOverlay )
 	{
 		mapoverlay_t *pMapOverlay = &g_aMapOverlays.Element( iMapOverlay );
-			int nSideCount = pMapOverlay->aSideList.Count();
-			for( int iSide = 0; iSide < nSideCount; ++iSide )
+		int nSideCount = pMapOverlay->aSideList.Count();
+		for( int iSide = 0; iSide < nSideCount; ++iSide )
+		{
+			side_t *pSide = GetSide( pMapOverlay->aSideList[iSide] );
+			if ( pSide )
 			{
-				side_t *pSide = GetSide( pMapOverlay->aSideList[iSide] );
-				if ( pSide )
+				if ( pSide->aOverlayIds.Find( pMapOverlay->nId ) == -1 )
 				{
-					if ( pSide->aOverlayIds.Find( pMapOverlay->nId ) == -1 )
-					{
-						pSide->aOverlayIds.AddToTail( pMapOverlay->nId );
-					}
+					pSide->aOverlayIds.AddToTail( pMapOverlay->nId );
 				}
 			}
 		}
 	}
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -149,16 +149,16 @@ void OverlayTransition_UpdateSideLists( int StartIndex )
 		for( auto iSide : pOverlay->aSideList )
 		{
 			side_t *pSide = GetSide( iSide );
-				if ( pSide )
+			if ( pSide )
+			{
+				if ( pSide->aWaterOverlayIds.Find( pOverlay->nId ) == -1 )
 				{
-					if ( pSide->aWaterOverlayIds.Find( pOverlay->nId ) == -1 )
-					{
-						pSide->aWaterOverlayIds.AddToTail( pOverlay->nId );
-					}
+					pSide->aWaterOverlayIds.AddToTail( pOverlay->nId );
 				}
 			}
 		}
 	}
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -168,12 +168,12 @@ void Overlay_AddFaceToLists( int iFace, side_t *pSide )
 	for( int iOverlayId = 0; iOverlayId < nOverlayIdCount; ++iOverlayId )
 	{
 		mapoverlay_t *pMapOverlay = &g_aMapOverlays.Element( pSide->aOverlayIds[iOverlayId] );
-			if( pMapOverlay->aFaceList.Find( iFace ) == -1 )
-			{
-				pMapOverlay->aFaceList.AddToTail( iFace );
-			}
+		if( pMapOverlay->aFaceList.Find( iFace ) == -1 )
+		{
+			pMapOverlay->aFaceList.AddToTail( iFace );
 		}
 	}
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -182,12 +182,12 @@ void OverlayTransition_AddFaceToLists( int iFace, side_t *pSide )
 	for( auto id : pSide->aWaterOverlayIds )
 	{
 		mapoverlay_t *pMapOverlay = &g_aMapWaterOverlays.Element( id - ( MAX_MAP_OVERLAYS + 1 ) );
-			if( pMapOverlay->aFaceList.Find( iFace ) == -1 )
-			{
-				pMapOverlay->aFaceList.AddToTail( iFace );
-			}
+		if( pMapOverlay->aFaceList.Find( iFace ) == -1 )
+		{
+			pMapOverlay->aFaceList.AddToTail( iFace );
 		}
 	}
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
