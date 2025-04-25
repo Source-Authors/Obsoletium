@@ -225,8 +225,8 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 			// These are used to prevent emission on steep surfaces
 			float minAngle = pIter->GetFloat( "minAngle", 180 );
 			float maxAngle = pIter->GetFloat( "maxAngle", 180 );
-			model.m_MinCosAngle = cos(minAngle * M_PI / 180.f);
-			model.m_MaxCosAngle = cos(maxAngle * M_PI / 180.f);
+			model.m_MinCosAngle = cos(DEG2RAD(minAngle));
+			model.m_MaxCosAngle = cos(DEG2RAD(maxAngle));
 			model.m_Orientation = pIter->GetInt( "detailOrientation", 0 );
 
 			// Make sure minAngle < maxAngle
