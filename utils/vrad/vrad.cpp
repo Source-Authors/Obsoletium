@@ -682,15 +682,13 @@ void MakePatchForFace (int fn, winding_t *w)
 
 entity_t *EntityForModel (int modnum)
 {
-	int		i;
-	const char	*s;
 	char	name[16];
 	V_sprintf_safe (name, "*%i", modnum);
 
 	// search the entities for one using modnum
-	for (i=0 ; i<num_entities ; i++)
+	for (int i=0 ; i<num_entities ; i++)
 	{
-		s = ValueForKey (&entities[i], "model");
+		const char *s = ValueForKey (&entities[i], "model");
 		if (!strcmp (s, name))
 			return &entities[i];
 	}
