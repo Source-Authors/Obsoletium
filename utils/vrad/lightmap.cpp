@@ -3066,7 +3066,6 @@ void BuildFacelights (int iThread, int facenum)
 	facelight_t	*fl;
 	SSE_SampleInfo_t sampleInfo;
 	directlight_t *dl;
-	Vector spot;
 	Vector v[4], n[4];
 
 	if( g_bInterrupt.load(std::memory_order::memory_order_relaxed) )
