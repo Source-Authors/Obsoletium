@@ -199,7 +199,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 					model.m_flRandomScaleStdDev = pIter->GetFloat( "spriterandomscale", 0.0f );
 
 					// sway is a percent of max sway, cl_detail_max_sway
-					float flSway = clamp( pIter->GetFloat( "sway", 0.0f ), 0.0, 1.0 );
+					float flSway = clamp( pIter->GetFloat( "sway", 0.0f ), 0.0f, 1.0f );
 					model.m_SwayAmount = (unsigned char)( 255.0 * flSway );
 
 					// shape angle
@@ -208,7 +208,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 
 					// shape size
 					// for the tri shape, this is the distance from the origin to the center of a side
-					float flShapeSize = clamp( pIter->GetFloat( "shape_size", 0.0f ), 0.0, 1.0 );
+					float flShapeSize = clamp( pIter->GetFloat( "shape_size", 0.0f ), 0.0f, 1.0f );
 					model.m_ShapeSize = (unsigned char)( 255.0 * flShapeSize );
 				}
 			}
@@ -661,7 +661,7 @@ static void EmitDetailObjectsOnFace( dface_t* pFace, DetailObject_t& detail )
 		float area = 0.5f * normalLength;
 
 		// Compute the number of samples to take
-		int numSamples = area * detail.m_Density * 0.000001;
+		int numSamples = area * detail.m_Density * 0.000001f;
 
 		// Now take a sample, and randomly place an object there
 		for (int i = 0; i < numSamples; ++i )
