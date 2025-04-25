@@ -583,7 +583,7 @@ bool BuildFacesamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFa
 
 	// ratio of world area / lightmap area
 	texinfo_t *pTex = &texinfo[pLightInfo->face->texinfo];
-	pFaceLight->worldAreaPerLuxel = 1.0 / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
+	pFaceLight->worldAreaPerLuxel = 1.0f / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[0] ) ) * 
 											sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[1], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[1] ) ) );
@@ -613,10 +613,10 @@ bool BuildFacesamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFa
 			pSamples->coord[0] = s;
 			pSamples->coord[1] = t;
 			// unused but initialized anyway
-			pSamples->mins[0] = s - 0.5;
-			pSamples->mins[1] = t - 0.5;
-			pSamples->maxs[0] = s + 0.5;
-			pSamples->maxs[1] = t + 0.5;
+			pSamples->mins[0] = s - 0.5f;
+			pSamples->mins[1] = t - 0.5f;
+			pSamples->maxs[0] = s + 0.5f;
+			pSamples->maxs[1] = t + 0.5f;
 			pSamples->area = pFaceLight->worldAreaPerLuxel;
 			LuxelSpaceToWorld( pLightInfo, pSamples->coord[0], pSamples->coord[1], pSamples->pos );
 			VectorCopy( pSamples->pos, *pLuxels );
@@ -657,7 +657,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 
 	// ratio of world area / lightmap area
 	texinfo_t *pTex = &texinfo[pLightInfo->face->texinfo];
-	pFaceLight->worldAreaPerLuxel = 1.0 / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
+	pFaceLight->worldAreaPerLuxel = 1.0f / ( sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[0], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[0] ) ) * 
 											sqrt( DotProduct( pTex->lightmapVecsLuxelsPerWorldUnits[1], 
 															  pTex->lightmapVecsLuxelsPerWorldUnits[1] ) ) );
@@ -678,7 +678,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 	Vector tNorm( 0.0f, 1.0f, 0.0f );
 
 	// sample center offset
-	float sampleOffset = ( do_centersamples ) ? 0.5 : 1.0;
+	float sampleOffset = ( do_centersamples ) ? 0.5f : 1.0f;
 
 	//
 	// clip the lightmap "spaced" winding by the lightmap cutting planes
@@ -1089,7 +1089,7 @@ int LightForString( const char *pLight, Vector& intensity )
 		return false;
 	}
 
-	intensity[0] = pow( r / 255.0, 2.2 ) * 255;				// convert to linear
+	intensity[0] = pow( r / 255.0f, 2.2f ) * 255;				// convert to linear
 	
 	switch( argCnt)
 	{
@@ -1101,14 +1101,14 @@ int LightForString( const char *pLight, Vector& intensity )
 		case 3:
 		case 4:
 			// Save the other two G,B values.
-			intensity[1] = pow( g / 255.0, 2.2 ) * 255;
-			intensity[2] = pow( b / 255.0, 2.2 ) * 255;
+			intensity[1] = pow( g / 255.0f, 2.2f ) * 255;
+			intensity[2] = pow( b / 255.0f, 2.2f ) * 255;
 			
 			// Did we also get an "intensity" scaler value too?
 			if ( argCnt == 4 )
 			{
 				// Scale the normalized 0-255 R,G,B values by the intensity scaler
-				VectorScale( intensity, scaler / 255.0, intensity );
+				VectorScale( intensity, scaler / 255.0f, intensity );
 			}
 			break;
 
@@ -1184,7 +1184,7 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 		if ( d0 < d50 )
 		{
 			Warning( "light has _fifty_percent_distance of %f but _zero_percent_distance of %f\n", d50, d0);
-			d0 = 2.0 * d50;
+			d0 = 2.0f * d50;
 		}
 		float a = 0, b = 1, c = 0;
 		if ( ! SolveInverseQuadraticMonotonic( 0, 1.0, d50, 2.0, d0, 256.0, a, b, c ))
@@ -1196,7 +1196,7 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 //		printf("50 percent=%f 0 percent=%f\n",d50,d0);
 // 		printf("a=%f b=%f c=%f\n",a,b,c);
 		float v50 = c + d50 * ( b + d50 * a );
-		float scale = 2.0 / v50;
+		float scale = 2.0f / v50;
 		a *= scale;
 		b *= scale;
 		c *= scale;
@@ -1212,7 +1212,7 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 		if ( IntForKey(e, "_hardfalloff" ) )
 		{
 			dl->m_flEndFadeDistance = d0;
-			dl->m_flStartFadeDistance = 0.75 * d0 + 0.25 * d50;		// start fading 3/4 way between 50 and 0. could allow adjust
+			dl->m_flStartFadeDistance = 0.75f * d0 + 0.25f * d50;		// start fading 3/4 way between 50 and 0. could allow adjust
 		}
 		else
 		{
@@ -1222,12 +1222,12 @@ static void SetLightFalloffParams( entity_t * e, directlight_t * dl )
 			// fading it from the minimum brightess point down to zero at 10x the minimum distance
 			if ( fabs( a ) > 0. )
 			{
-				float flMax = b / ( - 2.0 * a );				// where f' = 0
-				if ( flMax > 0.0 )
+				float flMax = b / ( - 2.0f * a );				// where f' = 0
+				if ( flMax > 0.0f )
 				{
 					dl->m_flCapDist = flMax;
 					dl->m_flStartFadeDistance = flMax;
-					dl->m_flEndFadeDistance = 10.0 * flMax;
+					dl->m_flEndFadeDistance = 10.0f * flMax;
 				}
 			}
 		}
@@ -2080,7 +2080,7 @@ void AddSampleToPatch (sample_t *s, LightingValue_t& light, int facenum)
 	if( g_FacePatches.Element( facenum ) == g_FacePatches.InvalidIndex() )
 		return;
 
-	float radius = sqrt( s->area ) / 2.0;
+	float radius = sqrt( s->area ) / 2.0f;
 
 	CPatch *pNextPatch = NULL;
 	for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
@@ -2187,7 +2187,7 @@ void GetPhongNormal( int facenum, Vector const& spot, Vector& phongnormal )
 				float scale;
 				
 				// Interpolate between the center and edge normals based on sample position
-				scale = 1.0 - a1 - a2;
+				scale = 1.0f - a1 - a2;
 				VectorScale( fn->facenormal, scale, phongnormal );
 				VectorScale( n1, a1, temp );
 				VectorAdd( phongnormal, temp, phongnormal );
@@ -2694,7 +2694,7 @@ static int SupersampleLightAtPoint( lightinfo_t& l, SSE_SampleInfo_t& info,
 	// Some parameters related to supersampling
 	float sampleWidth = ( flags & NON_AMBIENT_ONLY ) ? 4 : 2;
 	float cscale = 1.0f / sampleWidth;
-	float csshift = -((sampleWidth - 1) * cscale) / 2.0;
+	float csshift = -((sampleWidth - 1) * cscale) / 2.0f;
 
 	// Clear out the light values
 	for (int i = 0; i < info.m_NormalCount; ++i )
@@ -2848,7 +2848,7 @@ static inline void ComputeLuxelIntensity( SSE_SampleInfo_t& info, int sampleIdx,
 		float intensity = ppLightSamples[n][sampleIdx].Intensity();
 
 		// convert to a linear perception space
-		pSampleIntensity[n * info.m_LightmapSize + destIdx] = pow( intensity / 256.0, 1.0 / 2.2 );
+		pSampleIntensity[n * info.m_LightmapSize + destIdx] = pow( intensity / 256.0f, 1.0f / 2.2f );
 	}
 }
 

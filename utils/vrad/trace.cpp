@@ -36,7 +36,7 @@ private:
 
 
 // 1/32 epsilon to keep floating point happy
-#define	DIST_EPSILON	(0.03125)
+#define	DIST_EPSILON	(0.03125f)
 
 // JAYHL2: This used to be -1, but that caused lots of epsilon issues
 // around slow sloping planes.  Perhaps Quake2 limited maps to a certain

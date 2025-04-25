@@ -140,13 +140,13 @@ void InitMacroTexture( const char *pBSPFilename )
 
 inline Vector SampleMacroTexture( const CMacroTextureData *t, const Vector &vWorldPos )
 {
-	int ix = (int)RemapVal( vWorldPos.x, g_MacroWorldMins.x, g_MacroWorldMaxs.x, 0, t->m_Width-0.00001 );
-	int iy = (int)RemapVal( vWorldPos.y, g_MacroWorldMins.y, g_MacroWorldMaxs.y, 0, t->m_Height-0.00001 );
+	int ix = (int)RemapVal( vWorldPos.x, g_MacroWorldMins.x, g_MacroWorldMaxs.x, 0, t->m_Width-0.00001f );
+	int iy = (int)RemapVal( vWorldPos.y, g_MacroWorldMins.y, g_MacroWorldMaxs.y, 0, t->m_Height-0.00001f );
 	ix = clamp( ix, 0, t->m_Width-1 );
 	iy = t->m_Height - 1 - clamp( iy, 0, t->m_Height-1 );
 
 	const unsigned char *pInputColor = &t->m_ImageData[(iy*t->m_Width + ix) * 4];
-	return Vector( pInputColor[0] / 255.0, pInputColor[1] / 255.0, pInputColor[2] / 255.0 );
+	return Vector( pInputColor[0] / 255.0f, pInputColor[1] / 255.0f, pInputColor[2] / 255.0f );
 }
 
 

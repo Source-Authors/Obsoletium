@@ -1171,7 +1171,7 @@ void MakeTransfer( int ndxPatch1, int ndxPatch2, transfer_t *all_transfers )
 	// Test 5 times rule
 	Vector vDelta;
 	VectorSubtract( pPatch1->origin, pPatch2->origin, vDelta );
-	float flThreshold = ( M_PI * 0.04 ) * DotProduct( vDelta, vDelta );
+	float flThreshold = ( M_PI_F * 0.04f ) * DotProduct( vDelta, vDelta );
 
 	if (flThreshold < pPatch2->area)
 	{
@@ -1767,13 +1767,11 @@ RadWorld
 */
 void RadWorld_Start()
 {
-	unsigned	i;
-
-	if (luxeldensity < 1.0)
+	if (luxeldensity < 1.0f)
 	{
 		// Remember the old lightmap vectors.
 		float oldLightmapVecs[MAX_MAP_TEXINFO][2][4];
-		for (i = 0; i < texinfo.Count(); i++)
+		for (intp i = 0; i < texinfo.Count(); i++)
 		{
 			for( int j=0; j < 2; j++ )
 			{
@@ -1785,7 +1783,7 @@ void RadWorld_Start()
 		}
 
 		// rescale luxels to be no denser than "luxeldensity"
-		for (i = 0; i < texinfo.Count(); i++)
+		for (intp i = 0; i < texinfo.Count(); i++)
 		{
 			texinfo_t	*tx = &texinfo[i];
 

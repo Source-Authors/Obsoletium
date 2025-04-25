@@ -762,10 +762,10 @@ public:
 		vmax = max(vmax, t2.y);
 
 		// UNDONE: Do something about tiling
-		umin = clamp(umin, 0, 1);
-		umax = clamp(umax, 0, 1);
-		vmin = clamp(vmin, 0, 1);
-		vmax = clamp(vmax, 0, 1);
+		umin = clamp(umin, 0.f, 1.f);
+		umax = clamp(umax, 0.f, 1.f);
+		vmin = clamp(vmin, 0.f, 1.f);
+		vmax = clamp(vmax, 0.f, 1.f);
 		Assert(umin>=0.0f && umax <= 1.0f);
 		Assert(vmin>=0.0f && vmax <= 1.0f);
 		const alphatexture_t &tex = m_Textures.Element(shadowTextureIndex);

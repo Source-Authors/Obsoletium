@@ -113,9 +113,9 @@ void AddDirectToRadial( radial_t *rad,
 
 				r = max( ds, dt );
 
-				if (r < 0.1)
+				if (r < 0.1f)
 				{
-					r = area / 0.1;
+					r = area / 0.1f;
 				}
 				else
 				{
@@ -514,7 +514,7 @@ bool SampleRadial( radial_t *rad, Vector& pnt, LightingValue_t light[NUM_BUMP_VE
 		if (rad->weight[i] > WEIGHT_EPS)
 		{
 			light[bumpSample]= rad->light[bumpSample][i];
-			light[bumpSample].Scale( 1.0 / rad->weight[i] );
+			light[bumpSample].Scale( 1.0f / rad->weight[i] );
 		}
 		else
 		{
