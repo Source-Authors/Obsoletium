@@ -385,7 +385,7 @@ void CompressLightData(
 	CUtlBuffer *pBuf )
 {
 	unsigned char runLength=0;
-	unsigned short flLastValue;
+	unsigned short flLastValue=0;
 
 	for( int i=0; i < nValues; i++ )
 	{
