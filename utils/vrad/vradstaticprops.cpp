@@ -2668,5 +2668,9 @@ static void DumpLightmapLinear( const char* _dstFilename, const CUtlVector<color
 		linearBuffer[i].r = RoundFloatToByte(linearFloats[i].x * 255.0f);
 	}
 	
-	TGAWriter::WriteTGAFile( _dstFilename, _width, _height, IMAGE_FORMAT_BGR888, (uint8*)(linearBuffer.Base()), _width * ImageLoader::SizeInBytes(IMAGE_FORMAT_BGR888) );
+	// dimhotepus: Dump warning if TGA write fails.
+	if (!TGAWriter::WriteTGAFile(_dstFilename, _width, _height, IMAGE_FORMAT_BGR888, (uint8*)(linearBuffer.Base()), _width * ImageLoader::SizeInBytes(IMAGE_FORMAT_BGR888)))
+	{
+		Warning( "Unable to write lightmap TGA to '%s'.\n", _dstFilename );
+	}
 }
