@@ -1489,7 +1489,7 @@ static void ParseLightEnvironment( entity_t* e, directlight_t* dl )
 	{
 		// dimhotepus: atof -> strtof.
 		g_SunAngularExtent=strtof(angle_str, nullptr);
-		g_SunAngularExtent=sin((M_PI/180.0)*g_SunAngularExtent);
+		g_SunAngularExtent=sin(DEG2RAD(g_SunAngularExtent));
 		qprintf("sun extent from map=%f\n",g_SunAngularExtent);
 	}
 	if ( !gSkyLight )
