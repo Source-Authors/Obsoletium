@@ -918,9 +918,9 @@ int RunVBSP( int argc, char **argv )
 	V_strcat_safe( mapFile, ".bsp" );
 
 #ifdef PLATFORM_64BITS
-	Msg( "Valve Software - vbsp.exe [64 bit] (%s)\n", __DATE__ );
+	Msg( "Valve Software - vbsp [64 bit] (%s)\n", __DATE__ );
 #else
-	Msg( "Valve Software - vbsp.exe (%s)\n", __DATE__ );
+	Msg( "Valve Software - vbsp (%s)\n", __DATE__ );
 #endif
 
 	int i;
