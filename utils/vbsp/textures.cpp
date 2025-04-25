@@ -356,7 +356,6 @@ int GetSurfaceProperties( MaterialSystemMaterial_t matID, const char *pMatName )
 			if ( surfaceIndex < 0 )
 			{
 				Msg("Can't find surfaceprop %s for material %s, using default\n", pPropString, pMatName );
-				surfaceIndex = physprops->GetSurfaceIndex( pPropString );
 				surfaceIndex = physprops->GetSurfaceIndex( "default" );
 			}
 		}
