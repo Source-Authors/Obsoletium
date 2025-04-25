@@ -1126,7 +1126,6 @@ void BeginBSPFile (void)
 	numfaces = 0;
 	numnodes = 0;
 	numbrushsides = 0;
-	numvertexes = 0;
 	numleaffaces = 0;
 	numleafbrushes = 0;
 	numsurfedges = 0;
