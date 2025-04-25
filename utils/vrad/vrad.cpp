@@ -379,7 +379,7 @@ MAKE FACES
 WindingFromFace
 =============
 */
-winding_t	*WindingFromFace (dface_t *f, Vector& origin )
+winding_t	*WindingFromFace (dface_t *f, const Vector& origin )
 {
 	int			i;
 	int			se;

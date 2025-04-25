@@ -408,7 +408,7 @@ bool RadWorld_Go();
 
 dleaf_t		*PointInLeaf (Vector const& point);
 int			ClusterFromPoint( Vector const& point );
-winding_t	*WindingFromFace (dface_t *f, Vector& origin );
+winding_t	*WindingFromFace (dface_t *f, const Vector& origin );
 
 void WriteWinding (FileHandle_t out, winding_t *w, Vector& color );
 void WriteNormal( FileHandle_t out, Vector const &nPos, Vector const &nDir, 
