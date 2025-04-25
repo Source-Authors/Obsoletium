@@ -2958,9 +2958,9 @@ void PrintUsage( int argc, char **argv )
 int RunVRAD( int argc, char **argv )
 {
 #ifdef PLATFORM_64BITS
-	Msg("Valve Software - vrad.exe SSE4.2+ [64 bit] (" __DATE__ ")\n" );
+	Msg("Valve Software - vrad SSE4.2+ [64 bit] (" __DATE__ ")\n" );
 #else
-	Msg("Valve Software - vrad.exe SSE4.2+ (" __DATE__ ")\n");
+	Msg("Valve Software - vrad SSE4.2+ (" __DATE__ ")\n");
 #endif
 
 	verbose = false;  // Originally FALSE
