@@ -4,14 +4,12 @@
 //
 //=============================================================================
 
+#include "checkuv.h"
 
 #include "tier1/fmtstr.h"
 #include "tier1/utlmap.h"
 
-
 #include "studiomdl.h"
-#include "checkuv.h"
-
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -179,7 +177,7 @@ bool CCheckUVCmd::CheckOverlap( const struct s_source_t *pSource ) const
 		}
 	}
 
-	for ( int i = 0; i < faceOverlapMap.Count(); ++i )
+	for ( intp i = 0; i < faceOverlapMap.Count(); ++i )
 	{
 		const CUtlVector< int > &overlapList = faceOverlapMap[i];
 		
@@ -191,7 +189,7 @@ bool CCheckUVCmd::CheckOverlap( const struct s_source_t *pSource ) const
 		PrintFace( pSource, nMeshA, nFaceA );
 		Msg( "       Overlaps\n" );
 
-		for ( int j = 0; j < overlapList.Count(); ++j )
+		for ( intp j = 0; j < overlapList.Count(); ++j )
 		{
 			const int nFaceB = overlapList[j];
 			const int nMeshB = FindMeshIndex( pSource, nFaceB );
