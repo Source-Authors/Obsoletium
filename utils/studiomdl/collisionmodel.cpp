@@ -297,8 +297,8 @@ CJointedModel::CJointedModel( void )
 
 	m_flFrictionTimeIn = 0.0f;
 	m_flFrictionTimeOut = 0.0f;
-	m_iMinAnimatedFriction = 1.0f;
-	m_iMaxAnimatedFriction = 1.0f;
+	m_iMinAnimatedFriction = 1;
+	m_iMaxAnimatedFriction = 1;
 	m_bHasAnimatedFriction = false;
 }
 
