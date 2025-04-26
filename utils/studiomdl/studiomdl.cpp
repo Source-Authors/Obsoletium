@@ -482,6 +482,8 @@ void *kalloc( int num, int size )
 	// ensure memory alignment on maximum of ALIGN
 	nMemSize += 511;
 	void *ptr = malloc( nMemSize );
+	if (!ptr) return nullptr;
+
 	memset( ptr, 0, nMemSize );
 	ptr = (byte *)((int)((byte *)ptr + 511) & ~511);
 	return ptr;
