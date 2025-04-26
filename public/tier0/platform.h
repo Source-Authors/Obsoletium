@@ -752,7 +752,7 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 
 // If a swapped float passes through the fpu, the bytes may get changed.
 // Prevent this by swapping floats as DWORDs.
-#define SafeSwapFloat( pOut, pIn )	(*((uint*)pOut) = DWordSwap( *((uint*)pIn) ))
+#define SafeSwapFloat( pOut, pIn )	(*((uint*)pOut) = DWordSwap( *((const uint*)pIn) ))
 
 #if defined(VALVE_LITTLE_ENDIAN)
 
@@ -801,23 +801,23 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 // @Note (toml 05-02-02): this technique expects the compiler to
 // optimize the expression and eliminate the other path. On any new
 // platform/compiler this should be tested.
-inline short BigShort( short val )		{ int test = 1; return ( *(char *)&test == 1 ) ? WordSwap( val )  : val; }
-inline uint16 BigWord( uint16 val )		{ int test = 1; return ( *(char *)&test == 1 ) ? WordSwap( val )  : val; }
-inline long BigLong( long val )			{ int test = 1; return ( *(char *)&test == 1 ) ? DWordSwap( val ) : val; }
-inline uint32 BigDWord( uint32 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? DWordSwap( val ) : val; }
-inline short LittleShort( short val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : WordSwap( val ); }
-inline uint16 LittleWord( uint16 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : WordSwap( val ); }
-inline long LittleLong( long val )		{ int test = 1; return ( *(char *)&test == 1 ) ? val : DWordSwap( val ); }
-inline uint32 LittleDWord( uint32 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : DWordSwap( val ); }
-inline uint64 LittleQWord( uint64 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : QWordSwap( val ); }
+inline short BigShort( short val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; }
+inline uint16 BigWord( uint16 val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; }
+inline long BigLong( long val )			{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; }
+inline uint32 BigDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; }
+inline short LittleShort( short val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); }
+inline uint16 LittleWord( uint16 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); }
+inline long LittleLong( long val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); }
+inline uint32 LittleDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); }
+inline uint64 LittleQWord( uint64 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : QWordSwap( val ); }
 inline short SwapShort( short val )					{ return WordSwap( val ); }
 inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
 inline long SwapLong( long val )					{ return DWordSwap( val ); }
 inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
 
 // Pass floats by pointer for swapping to avoid truncation in the fpu
-inline void BigFloat( float *pOut, const float *pIn )		{ int test = 1; ( *(char *)&test == 1 ) ? SafeSwapFloat( pOut, pIn ) : ( *pOut = *pIn ); }
-inline void LittleFloat( float *pOut, const float *pIn )	{ int test = 1; ( *(char *)&test == 1 ) ? ( *pOut = *pIn ) : SafeSwapFloat( pOut, pIn ); }
+inline void BigFloat( float *pOut, const float *pIn )		{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? SafeSwapFloat( pOut, pIn ) : ( *pOut = *pIn ); }
+inline void LittleFloat( float *pOut, const float *pIn )	{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? ( *pOut = *pIn ) : SafeSwapFloat( pOut, pIn ); }
 inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, pIn ); }
 
 #endif
