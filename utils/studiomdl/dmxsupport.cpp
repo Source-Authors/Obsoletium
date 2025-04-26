@@ -661,7 +661,6 @@ static bool LoadMeshes( CDmeModel *pModel, float flScale, int *pBoneRemap, s_sou
 	{
 		CDmeTransform *pTransform = pBindPose ? pBindPose->GetTransform(i) : pModel->GetJointTransform(i);
 
-		matrix3x4_t jointTransform;
 		pTransform->GetTransform( info.m_pBindPose[i] );
 	}
 
