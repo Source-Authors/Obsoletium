@@ -44,7 +44,6 @@ extern int numcommandnodes;
 
 bool FixupToSortedLODVertexes( studiohdr_t *pStudioHdr );
 bool Clamp_RootLOD(  studiohdr_t *phdr );
-static void WriteAllSwappedFiles( const char *filename );
 
 /*
 ============
@@ -4533,56 +4532,4 @@ void WriteSwappedFile( char *srcname, char *outname, int(*pfnSwapFunc)(void*, co
 			MdlError( "Aborted byteswap on '%s':\n", srcname );
 		}
 	}
-}
-
-//----------------------------------------------------------------------
-// For a particular .qc, converts all studiomdl generated files to big-endian format.
-//----------------------------------------------------------------------
-void WriteAllSwappedFiles( const char *filename )
-{
-	char srcname[ MAX_PATH ];
-	char outname[ MAX_PATH ];
-
-	extern IPhysicsCollision *physcollision;
-	if ( physcollision )
-	{
-		StudioByteSwap::SetCollisionInterface( physcollision );
 	}
-
-	// Convert PHY
-	Q_StripExtension( filename, srcname, sizeof( srcname ) );
-	Q_strncpy( outname, srcname, sizeof( outname ) );
-
-	Q_strcat( srcname, ".phy", sizeof( srcname ) );
-	Q_strcat( outname, ".360.phy", sizeof( outname ) );
-
-	WriteSwappedFile( srcname, outname, StudioByteSwap::ByteswapPHY );
-
-	// Convert VVD
-	Q_StripExtension( filename, srcname, sizeof( srcname ) );
-	Q_strncpy( outname, srcname, sizeof( outname ) );
-
-	Q_strcat( srcname, ".vvd", sizeof( srcname ) );
-	Q_strcat( outname, ".360.vvd", sizeof( outname ) );
-
-	WriteSwappedFile( srcname, outname, StudioByteSwap::ByteswapVVD );
-
-	// Convert VTX
-	Q_StripExtension( filename, srcname, sizeof( srcname ) );
-	Q_StripExtension( srcname, srcname, sizeof( srcname ) );
-	Q_strncpy( outname, srcname, sizeof( outname ) );
-
-	Q_strcat( srcname, ".dx90.vtx", sizeof( srcname ) );
-	Q_strcat( outname, ".360.vtx", sizeof( outname ) );
-
-	WriteSwappedFile( srcname, outname, StudioByteSwap::ByteswapVTX );
-
-	// Convert MDL
-	Q_StripExtension( filename, srcname, sizeof( srcname ) );
-	Q_strncpy( outname, srcname, sizeof( outname ) );
-
-	Q_strcat( srcname, ".mdl", sizeof( srcname ) );
-	Q_strcat( outname, ".360.mdl", sizeof( outname ) );
-
-	WriteSwappedFile( srcname, outname, StudioByteSwap::ByteswapMDL );
-}
