@@ -1776,7 +1776,7 @@ int ProcessSingleBody( CJointedModel &joints )
 		// Init mass, write routine will distribute the total mass
 		pPhys->m_mass = 1.0;
 		char tmp[512];
-		Q_FileBase( pmodel->filename, tmp, sizeof( tmp ) );
+		V_FileBase( pmodel->filename, tmp );
 
 		// UNDONE: Memory leak
 		pPhys->m_name = V_strdup(tmp);
@@ -1947,7 +1947,7 @@ void CCmd_JointMerge( CJointedModel &joints, const char *pParent, const char *pC
 void CCmd_JointRoot( CJointedModel &joints, const char *pBone )
 {
 	// save the root bone name
-	strcpy( joints.m_rootName, pBone );
+	V_strcpy_safe( joints.m_rootName, pBone );
 }
 
 
@@ -1978,7 +1978,7 @@ void ParseCollisionCommands( CJointedModel &joints )
 		if ( !strcmp( token, "}" ) )
 			return;
 
-		strcpy( command, token );
+		V_strcpy_safe( command, token );
 
 		if ( !stricmp( command, "$mass" ) )
 		{
@@ -2544,7 +2544,7 @@ void CollisionModel_Write( long checkSum )
 			printf("Collision model volume %.2f in^3\n", volume );
 		}
 
-		Q_SetExtension( filename, ".phy", sizeof( filename ) );
+		Q_SetExtension( filename, ".phy" );
 		CPlainAutoPtr< CP4File > spFile( g_p4factory->AccessFile( filename ) );
 		spFile->Edit();
 		FILE *fp = fopen( filename, "wb" );
