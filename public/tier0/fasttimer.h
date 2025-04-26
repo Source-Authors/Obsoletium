@@ -296,7 +296,7 @@ inline bool CCycleCount::IsLessThan(CCycleCount const &other) const
 
 inline unsigned long CCycleCount::GetCycles() const
 {
-	return (unsigned long)m_Int64;
+	return static_cast<unsigned long>(m_Int64);
 }
 
 inline uint64 CCycleCount::GetLongCycles() const
@@ -306,7 +306,7 @@ inline uint64 CCycleCount::GetLongCycles() const
 
 inline unsigned long CCycleCount::GetMicroseconds() const
 {
-	return (unsigned long)((m_Int64 * 1000000) / g_ClockSpeed);
+  return static_cast<unsigned long>(m_Int64 * 1000000 / g_ClockSpeed);
 }
 
 inline uint64 CCycleCount::GetUlMicroseconds() const
@@ -317,31 +317,31 @@ inline uint64 CCycleCount::GetUlMicroseconds() const
 
 inline double CCycleCount::GetMicrosecondsF() const
 {
-	return (double)( m_Int64 * g_ClockSpeedMicrosecondsMultiplier );
+	return static_cast<double>( m_Int64 * g_ClockSpeedMicrosecondsMultiplier );
 }
 
 
 inline void	CCycleCount::SetMicroseconds( unsigned long nMicroseconds )
 {
-	m_Int64 = ((uint64)nMicroseconds * g_ClockSpeed) / 1000000;
+	m_Int64 = static_cast<uint64>(nMicroseconds) * g_ClockSpeed / 1000000;
 }
 
 
 inline unsigned long CCycleCount::GetMilliseconds() const
 {
-	return (unsigned long)((m_Int64 * 1000) / g_ClockSpeed);
+	return static_cast<unsigned long>(m_Int64 * 1000 / g_ClockSpeed);
 }
 
 
 inline double CCycleCount::GetMillisecondsF() const
 {
-	return (double)( m_Int64 * g_ClockSpeedMillisecondsMultiplier );
+	return static_cast<double>( m_Int64 * g_ClockSpeedMillisecondsMultiplier );
 }
 
 
 inline double CCycleCount::GetSeconds() const
 {
-	return (double)( m_Int64 * g_ClockSpeedSecondsMultiplier );
+	return static_cast<double>( m_Int64 * g_ClockSpeedSecondsMultiplier );
 }
 
 
@@ -427,7 +427,7 @@ inline unsigned CAverageCycleCounter::GetIters() const
 inline double CAverageCycleCounter::GetAverageMilliseconds() const
 {
 	if ( m_nIters )
-		return (m_Total.GetMillisecondsF() / (double)m_nIters);
+		return (m_Total.GetMillisecondsF() / static_cast<double>(m_nIters));
 	else
 		return 0;
 }
@@ -514,7 +514,7 @@ inline int CLimitTimer::CMicroSecOverage() const
 	if ( lcCycles < m_lCycleLimit )
 		return 0;
 
-	return( ( int ) ( ( lcCycles - m_lCycleLimit ) * ( uint64 ) 1000000L / g_ClockSpeed ) );
+	return( ( int ) ( ( lcCycles - m_lCycleLimit ) * 1000000ULL / g_ClockSpeed ) );
 }
 
 
@@ -531,7 +531,7 @@ inline uint64 CLimitTimer::CMicroSecLeft() const
 	if ( lcCycles >= m_lCycleLimit )
 		return 0;
 
-	return( ( uint64 ) ( ( m_lCycleLimit - lcCycles ) * ( uint64 ) 1000000L / g_ClockSpeed ) );
+	return( ( uint64 ) ( ( m_lCycleLimit - lcCycles ) * 1000000ULL / g_ClockSpeed ) );
 }
 
 
