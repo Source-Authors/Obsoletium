@@ -9794,19 +9794,6 @@ bool CStudioMDLApp::ParseArguments()
 			continue;
 		}
 
-		if (!Q_stricmp( pArgv, "-x360"))
-		{
-			StudioByteSwap::ActivateByteSwapping( true ); // Set target to big endian
-			g_bX360  = true;
-			continue;
-		}
-
-		if (!Q_stricmp( pArgv, "-nox360"))
-		{
-			g_bX360  = false;
-			continue;
-		}
-
 		if ( !Q_stricmp( pArgv, "-nowarnings" ) )
 		{
 			g_bNoWarnings = true;
