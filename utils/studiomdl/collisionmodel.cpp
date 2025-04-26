@@ -102,12 +102,14 @@ public:
 	CJointConstraint( void )
 	{
 		m_pJointName = NULL;
+		m_pNext = NULL;
 	}
 
 	CJointConstraint( const char *pName, int axis, jointlimit_t type, float min, float max, float friction )
 		: m_axis(axis), m_jointType(type), m_limitMin(min), m_limitMax(max), m_friction(friction)
 	{
 		m_pJointName = pName;
+		m_pNext = nullptr;
 	}
 
 	const char		*m_pJointName;
