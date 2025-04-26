@@ -40,19 +40,19 @@ public:
 	}
 
 #ifdef _DEBUG
-	void TestWritten( int EndOfFileOffset )
+	void TestWritten( intp EndOfFileOffset )
 	{
 		if ( !g_quiet )
 		{
 			printf( "testing to make sure that the whole file has been written\n" );
 		}
-		int i;
-		for( i = 0; i < EndOfFileOffset; i++ )
+
+		for( intp i = 0; i < EndOfFileOffset; i++ )
 		{
 			if( !m_pUsed[i] )
 			{
-				printf( "offset %d not written, end of file invalid!\n", i );
-				assert( 0 );
+				fprintf( stderr, "offset %zd not written, end of file invalid!\n", i );
+				Assert( 0 );
 			}
 		}
 	}
@@ -77,23 +77,21 @@ public:
 		//spFile->Add();
 	}
 	
-	void WriteAt( int offset, void *data, int size, const char *name )
+	void WriteAt( intp offset, void *data, intp size, const char *name )
 	{
-//		printf( "WriteAt: \"%s\" offset: %d end: %d size: %d\n", name, offset, offset + size - 1, size );
 		m_pCurPos = m_pData + offset;
 
 #ifdef _DEBUG
-		int i;
 		const char **used = m_pUsed + offset;
 		bool bitched = false;
-		for( i = 0; i < size; i++ )
+		for( intp i = 0; i < size; i++ )
 		{
 			if( used[i] )
 			{
 				if( !bitched )
 				{
-					printf( "overwrite at %d! (overwriting \"%s\" with \"%s\")\n", i + offset, used[i], name );
-					assert( 0 );
+					fprintf( stderr, "overwrite at %zd! (overwriting \"%s\" with \"%s\")\n", i + offset, used[i], name );
+					Assert( 0 );
 					bitched = true;
 				}
 			}
@@ -117,7 +115,7 @@ public:
 private:
 	void Append( void *data, int size )
 	{
-		assert( m_pCurPos + size - m_pData < m_Size );
+		Assert( m_pCurPos + size - m_pData < m_Size );
 		memcpy( m_pCurPos, data, size );
 		m_pCurPos += size;
 	}
