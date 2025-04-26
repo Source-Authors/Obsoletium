@@ -315,7 +315,9 @@ int Load_SMD ( s_source_t *psource )
 
 	while (GetLineInput()) 
 	{
-		int numRead = sscanf( g_szLine, "%s %d", cmd, &option );
+		// dimhotepus: Prevent overflow for scanning command.
+		int numRead = sscanf( g_szLine, "%1023s %d", cmd, &option );
+		cmd[ssize(cmd) - 1] = '\0';
 
 		// Blank line
 		if ((numRead == EOF) || (numRead == 0))
