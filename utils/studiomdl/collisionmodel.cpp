@@ -1779,9 +1779,7 @@ int ProcessSingleBody( CJointedModel &joints )
 		Q_FileBase( pmodel->filename, tmp, sizeof( tmp ) );
 
 		// UNDONE: Memory leak
-		char *out = new char[strlen(tmp)+1];
-		strcpy( out, tmp );
-		pPhys->m_name = out;
+		pPhys->m_name = V_strdup(tmp);
 		pPhys->m_parent = NULL;
 
 		joints.AppendCollisionModel( pPhys );
