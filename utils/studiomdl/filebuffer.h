@@ -1,16 +1,9 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef FILEBUFFER_H
-#define FILEBUFFER_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_UTILS_STUDIOMDL_FILE_BUFFER_H_
+#define SE_UTILS_STUDIOMDL_FILE_BUFFER_H_
 
+#include "tier0/dbg.h"
 #include "tier1/smartptr.h"
 // dimhotepus: Drop P4.
 // #include "tier2/p4helpers.h"
@@ -128,5 +121,4 @@ private:
 #endif
 };
 	
-
-#endif // FILEBUFFER_H
+#endif  // !SE_UTILS_STUDIOMDL_FILE_BUFFER_H_

@@ -4,15 +4,14 @@
 //
 //===========================================================================//
 
-#include <stdlib.h>
-#include <tier0/dbg.h>
-#include "interface.h"
+#include "perfstats.h"
+
+#include "tier1/interface.h"
 #include "istudiorender.h"
 #include "studio.h"
 #include "optimize.h"
 #include "cmdlib.h"
 #include "studiomdl.h"
-#include "perfstats.h"
 
 extern void MdlError( char const *pMsg, ... );
 

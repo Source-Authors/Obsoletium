@@ -1,36 +1,25 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Command-line tool used to compile models from intermediate formats exported
+// from modeling packages to the binary .mdl format that is read by the Source
+// engine.
 //
-// $NoKeywords: $
-//
-//===========================================================================//
-
-
+// See
+// https://developer.valvesoftware.com/wiki/StudioMDL_(Source)
+// https://developer.valvesoftware.com/wiki/QC
 //
 // studiomdl.c: generates a studio .mdl file from a .qc script
 // models/<scriptname>.mdl.
-//
 
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-#include <windows.h>
+#include "winlite.h"
 #undef GetCurrentDirectory
 
 #include <Shlwapi.h> // PathCanonicalize
 #pragma comment( lib, "shlwapi" )
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
 #include <direct.h>
 #include "istudiorender.h"
 #include "filesystem_tools.h"
-#include "tier2/fileutils.h"
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
@@ -41,18 +30,19 @@
 #include "optimize.h"
 #include "byteswap.h"
 #include "studiobyteswap.h"
-#include "tier1/strtools.h"
 #include "bspflags.h"
-#include "tier0/icommandline.h"
-#include "utldict.h"
-#include "tier1/utlsortvector.h"
 #include "bitvec.h"
 #include "appframework/appframework.h"
 #include "datamodel/idatamodel.h"
 #include "materialsystem/materialsystem_config.h"
 #include "vstdlib/cvar.h"
+#include "tier0/icommandline.h"
 #include "tier1/tier1.h"
+#include "tier1/utlsortvector.h"
+#include "tier1/utldict.h"
+#include "tier1/strtools.h"
 #include "tier2/tier2.h"
+#include "tier2/fileutils.h"
 #include "tier3/tier3.h"
 #include "datamodel/dmelementfactoryhelper.h"
 #include "mdlobjects/dmeboneflexdriver.h"
@@ -62,10 +52,13 @@
 #include "movieobjects/dmecombinationoperator.h"
 #include "dmserializers/idmserializers.h"
 #include "tier2/p4helpers.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No P4
+//#include "p4lib/ip4.h"
 #include "mdllib/mdllib.h"
 #include "perfstats.h"
 #include "worldsize.h"
+
+#include "tier0/memdbgon.h"
 
 bool g_collapse_bones = false;
 bool g_collapse_bones_aggressive = false;

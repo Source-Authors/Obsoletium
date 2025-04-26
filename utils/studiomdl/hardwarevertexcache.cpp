@@ -5,9 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "HardwareVertexCache.h"
+
+#include <cstdio>
 
 CHardwareVertexCache::CHardwareVertexCache()
 {

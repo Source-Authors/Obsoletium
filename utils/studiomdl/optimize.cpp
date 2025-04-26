@@ -5,9 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#pragma warning( disable : 4786 )
-
-#pragma warning( disable : 4748 )		// buffer overrun with optimizations off
 // This file has tons of problems with global optimizations. . turn 'em off.
 // NOTE: Would be nice to have a test case for this! - not verified in vs2005
 #pragma optimize( "g", off )
@@ -16,14 +13,9 @@
 #define FILEBUFFER_SIZE ( 4 * 1024 * 1024 )
 
 //#define IGNORE_BONES
-
 #define NVTRISTRIP
-
 #define EMIT_TRILISTS
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <float.h>
 #include "mathlib/mathlib.h"
 #include "cmdlib.h"
 #include "studio.h"
@@ -31,13 +23,12 @@
 #include "HardwareMatrixState.h"
 #include "HardwareVertexCache.h"
 #include "optimize.h"
-#include <malloc.h>
 #include <nvtristrip.h>
 #include "FileBuffer.h"
-#include "tier1/utlvector.h"
 #include "materialsystem/imaterial.h"
-#include "tier1/utllinkedlist.h"
 
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
 #include "tier1/smartptr.h"
 #include "tier2/p4helpers.h"
 

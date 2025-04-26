@@ -5,30 +5,11 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-
-
-//
-// studiomdl.c: generates a studio .mdl file from a .qc script
-// models/<scriptname>.mdl.
-//
-
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
-
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
 #include "studio.h"
 #include "studiomdl.h"
-//#include "..\..\dlls\activity.h"
 
 bool IsEnd( char const* pLine )
 {

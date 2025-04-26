@@ -14,13 +14,9 @@
 // I chose to refer to them as joints to avoid confusion.  Yes they encompass bones and joints,
 // but they use the same names, and the data is actually linked.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
+#include "collisionmodel.h"
 
 #include "vphysics/constraints.h"
-#include "collisionmodel.h"
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
@@ -28,14 +24,14 @@
 #include "studiomdl.h"
 #include "physdll.h"
 #include "phyfile.h"
-#include "utlvector.h"
 #include "vcollide_parse.h"
-#include "tier1/strtools.h"
-#include "tier2/tier2.h"
-#include "KeyValues.h"
 
+#include "tier1/utlvector.h"
+#include "tier1/strtools.h"
+#include "tier1/KeyValues.h"
 #include "tier1/smartptr.h"
 #include "tier2/p4helpers.h"
+#include "tier2/tier2.h"
 
 
 // these functions just wrap atoi/atof and check for NULL

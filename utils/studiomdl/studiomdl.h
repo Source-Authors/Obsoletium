@@ -1,24 +1,13 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//===========================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef STUDIOMDL_H
-#define STUDIOMDL_H
+#ifndef SE_UTILS_STUDIOMDL_STUDIOMDL_H_
+#define SE_UTILS_STUDIOMDL_STUDIOMDL_H_
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
-#include <stdio.h>
-#include "basetypes.h"
+#include "tier0/basetypes.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlsymbol.h"
 #include "tier1/utlstring.h"
+
 #include "mathlib/vector.h"
 #include "studio.h"
 #include "datamodel/dmelementhandle.h"

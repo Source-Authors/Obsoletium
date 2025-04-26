@@ -5,11 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
 #include "HardwareMatrixState.h"
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "studio.h"
 #include "studiomdl.h"
 
@@ -197,17 +194,19 @@ void CHardwareMatrixState::DumpState( void )
 	return;
 //#endif
 	
-	OutputDebugString( "DumpState\n:" );
+	// dimhotepus: OutputDebugString -> printf
+	printf( "DumpState\n:" );
 	for( i = 0; i < m_NumMatrices; i++ )
 	{
 		if( m_matrixState[i].allocated )
 		{
-			sprintf( buf, "%d: allocated: %s lastUsageID: %d globalMatrixID: %d\n",
+			V_sprintf_safe( buf, "%d: allocated: %s lastUsageID: %d globalMatrixID: %d\n",
 				i, 
 				m_matrixState[i].allocated ? "true " : "false",
 				m_matrixState[i].lastUsageID,
 				m_matrixState[i].globalMatrixID );
-			OutputDebugString( buf );
+			// dimhotepus: OutputDebugString -> printf
+			printf( buf );
 		}
 	}
 }
