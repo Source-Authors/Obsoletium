@@ -504,9 +504,8 @@ void MaterialSystem_CreateSortinfo( void )
 	Assert( materialSortInfoArray );
 	materials->GetSortInfo( materialSortInfoArray );
 
-	int i = 0;
-	sortmap_t *pMap = (sortmap_t *)_alloca( sizeof(sortmap_t) * nSortIDs );
-	for ( i = 0; i < nSortIDs; i++ )
+	sortmap_t *pMap = stackallocT( sortmap_t, nSortIDs );
+	for ( int i = 0; i < nSortIDs; i++ )
 	{
 		pMap[i].info = materialSortInfoArray[i];
 		pMap[i].index = i;
@@ -517,8 +516,8 @@ void MaterialSystem_CreateSortinfo( void )
 
 	qsort( pMap, nSortIDs, sizeof( sortmap_t ), SortMapCompareFunc );
 
-	int *pSortIDRemap = (int *)_alloca( sizeof(int) * nSortIDs );
-	for ( i = 0; i < nSortIDs; i++ )
+	int *pSortIDRemap = stackallocT( int, nSortIDs );
+	for ( int i = 0; i < nSortIDs; i++ )
 	{
 		materialSortInfoArray[i] = pMap[i].info;
 		pSortIDRemap[pMap[i].index] = i;
