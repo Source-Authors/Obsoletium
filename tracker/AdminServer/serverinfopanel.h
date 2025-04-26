@@ -46,9 +46,12 @@ private:
 
 	float m_flUpdateTime;
 	int m_iPlayerCount, m_iMaxPlayers;
-	float m_flLastUptimeReceiveTime;
-	long m_iLastUptimeReceived;
-	long m_iLastUptimeDisplayed;
+	// dimhotepus: float -> double
+	double m_flLastUptimeReceiveTime;
+	// dimhotepus: long -> double
+	double m_iLastUptimeReceived;
+	// dimhotepus: long -> double
+	double m_iLastUptimeDisplayed;
 
 	bool m_bMapListRetrieved;
 

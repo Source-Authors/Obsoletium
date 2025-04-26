@@ -248,7 +248,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 		}
 
 		msg.PutChar(0);
-		RemoteServer().SetValue("mapcycle", (const char *)msg.Base());
+		RemoteServer().SetValue("mapcycle", msg.Base<const char>());
 
 		// post message to tell varlist update
 		PostActionSignal(new KeyValues("VarChanged", "var", "mapcycle"));

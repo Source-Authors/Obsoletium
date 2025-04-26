@@ -53,7 +53,7 @@ public:
 	void AddServerMessageHandler(IServerDataResponse *handler, const char *watch);
 
 	// removes a requester from the list to guarantee the pointer won't be used
-	void RemoveServerDataResponseTarget(IServerDataResponse *invalidRequester);
+	void RemoveServerDataResponseTarget(const IServerDataResponse *invalidRequester);
 
 private:
 	int m_iCurrentRequestID;

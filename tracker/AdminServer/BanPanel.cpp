@@ -56,7 +56,7 @@ CBanPanel::CBanPanel(vgui::Panel *parent, const char *name) : PropertyPage(paren
 	m_pBanContextMenu = new CBanContextMenu(this);
 	m_pBanContextMenu->SetVisible(false);
 
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 	m_bPageViewed = false;
 
 	LoadControlSettings("Admin/BanPanel.res", "PLATFORM");
@@ -80,7 +80,7 @@ void CBanPanel::OnPageShow()
 	{
 		m_bPageViewed = true;
 		// force update on first page view
-		m_flUpdateTime = 0.0f;
+		m_flUpdateTime = 0.0;
 	}
 }
 
@@ -90,8 +90,8 @@ void CBanPanel::OnPageShow()
 void CBanPanel::OnResetData()
 {
 	RemoteServer().RequestValue(this, "banlist");
-	// update once every 5 minutes
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 5.0f);
+	// update once every 1 minute
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +164,7 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 			m_pBanListPanel->AddItem(ban, 0, false, false);
 
 			// move to the next item
-			response = (const char *)strchr(response, '\n');
+			response = strchr(response, '\n');
 			if (!response)
 				break;
 			response++;

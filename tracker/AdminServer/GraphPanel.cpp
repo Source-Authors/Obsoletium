@@ -27,7 +27,7 @@
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/CheckButton.h>
 
-#define STATS_UPDATE_RATE	5.0f
+constexpr inline double STATS_UPDATE_RATE{5.0};
 
 
 // colors for the various graph lines+controls
@@ -141,7 +141,7 @@ void CGraphPanel::OnTick()
 	if (m_flNextStatsUpdateTime > system()->GetFrameTime())
 		return;
 
-	m_flNextStatsUpdateTime = (float)system()->GetFrameTime() + STATS_UPDATE_RATE;
+	m_flNextStatsUpdateTime = system()->GetFrameTime() + STATS_UPDATE_RATE;
 	RemoteServer().RequestValue(this, "stats");	
 }
 
@@ -175,8 +175,12 @@ void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 	{
 		// parse the stats out of the response
 		Points_t p;
-		float uptime, users;
-		sscanf(response, "%f %f %f %f %f %f %f", &p.cpu, &p.in, &p.out, &uptime, &users, &p.fps, &p.players);
+		// dimhotepus: float -> int.
+		int uptime, users;
+		// format: CPU percent (float), Bandwidth in (float), Bandwidth out (float),
+		// uptime (mins, int), changelevels (int), framerate (float), total players (int),
+		// total connections (int)
+		sscanf(response, "%f %f %f %i %i %f %f", &p.cpu, &p.in, &p.out, &uptime, &users, &p.fps, &p.players);
 		p.cpu = p.cpu / 100; // its given as a value between 0<x<100, we want 0<x<1
 		p.ping = 0;
 		p.time = (float)system()->GetCurrentTime();
@@ -702,7 +706,7 @@ void CGraphPanel::OnTextChanged(Panel *panel, const char *text)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CGraphPanel::SetAxisLabels(Color c, char *max, char *mid, char *min)
+void CGraphPanel::SetAxisLabels(Color c, const char *max, const char *mid, const char *min)
 {
 	Label *lab;
 	lab= GetLabel("AxisMax");

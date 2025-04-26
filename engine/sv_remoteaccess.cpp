@@ -838,7 +838,9 @@ void CServerRemoteAccess::GetStatsString(OUT_Z_CAP(bufSize) char *buf, intp bufS
 
 	sv.GetNetStats( avgIn, avgOut );
 
-	// format: CPU percent, Bandwidth in, Bandwidth out, uptime, changelevels, framerate, total players
+	// format: CPU percent (float), Bandwidth in (float), Bandwidth out (float),
+	// uptime (mins, int), changelevels (int), framerate (float), total players (int),
+	// total connections (int)
 	V_snprintf(buf, bufSize, "%-6.2f %-10.2f %-11.2f %-7i %-12i %-8.2f %-8i %-8i",
 				sv.GetCPUUsage() * 100, 
 				avgIn / 1024.0f,

@@ -65,7 +65,7 @@ CPlayerPanel::CPlayerPanel(vgui::Panel *parent, const char *name) : vgui::Proper
 
 	OnItemSelected(); // disable the buttons
 
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 	RemoteServer().AddServerMessageHandler(this, "UpdatePlayers");
 }
 
@@ -85,7 +85,7 @@ void CPlayerPanel::OnResetData()
 	RemoteServer().RequestValue(this, "playerlist");
 
 	// update once every minute
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 1.0f);
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void CPlayerPanel::OnServerDataResponse(const char *value, const char *response)
 	if (!stricmp(value, "UpdatePlayers"))
 	{
 		// server has indicated a change, force an update
-		m_flUpdateTime = 0.0f;
+		m_flUpdateTime = 0.0;
 	}
 	else if (!stricmp(value, "playerlist"))
 	{

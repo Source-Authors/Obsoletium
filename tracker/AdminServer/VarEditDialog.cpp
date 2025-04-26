@@ -48,7 +48,7 @@ CVarEditDialog::~CVarEditDialog()
 //-----------------------------------------------------------------------------
 // Purpose: Configures and shows the var edit dialog
 //-----------------------------------------------------------------------------
-void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
+void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, const KeyValues *rules)
 {
 	// configure
 	AddActionSignalTarget(actionSignalTarget);

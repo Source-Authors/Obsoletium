@@ -225,7 +225,7 @@ void CRemoteServer::AddServerMessageHandler(IServerDataResponse *handler, const 
 //-----------------------------------------------------------------------------
 // Purpose: removes a requester from the list to guarantee the pointer won't be used
 //-----------------------------------------------------------------------------
-void CRemoteServer::RemoveServerDataResponseTarget(IServerDataResponse *invalidRequester)
+void CRemoteServer::RemoveServerDataResponseTarget(const IServerDataResponse *invalidRequester)
 {
 	// iterate the responses
 	for (intp i = 0; i < m_ResponseHandlers.MaxElementIndex(); i++)

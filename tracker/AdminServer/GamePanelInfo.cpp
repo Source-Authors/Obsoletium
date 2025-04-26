@@ -285,7 +285,7 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 	if (!m_hOutOfDateQueryBox.Get())
 	{
 		const size_t msgLen = strlen(msg) + ssize("\n\nDo you wish to shutdown now?\n");
-		char *fullmsg = (char *) _alloca( msgLen );
+		char *fullmsg = stackallocT( char, msgLen );
 
 		// _snprintf -> strcpy + strcat
 		V_strncpy( fullmsg, msg, msgLen );
