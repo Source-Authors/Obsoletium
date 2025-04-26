@@ -1234,7 +1234,7 @@ private:
 class ALIGN8 PLATFORM_CLASS CThreadSpinRWLock : public CAlignedNewDelete<8>
 {
 public:
-	CThreadSpinRWLock()
+	CThreadSpinRWLock() : m_lockInfo{}
 	{
 		COMPILE_TIME_ASSERT( sizeof( LockInfo_t ) == sizeof( int64 ) );
 		Assert( (intp)this % 8 == 0 );
