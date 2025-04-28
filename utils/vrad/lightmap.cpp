@@ -756,10 +756,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 			//
 			// if winding T2 still exists free it and set it equal S1 (the rest of the row minus the sample just created)
 			//
-			if( pWindingT2 )
-			{
 				FreeWinding( pWindingT2 );
-			}
 
 			// clip the rest of "s"
 			pWindingT2 = pWindingS1;
@@ -768,10 +765,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 		//
 		// if the original lightmap winding exists free it and set it equal to T1 (the rest of the winding not cut into samples) 
 		//
-		if( pLightmapWinding )
-		{
 			FreeWinding( pLightmapWinding );
-		}
 
 		if( pWindingT2 )
 		{

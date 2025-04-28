@@ -71,10 +71,7 @@ bool CVRADDispColl::Create( CCoreDispInfo *pDisp )
 	// a better world-space uniform approx. due to the non-linear nature
 	// of the displacement surface in uv-space
 	dface_t *pFace = &g_pFaces[m_iParent];
-	if( pFace )
-	{
-		CalcSampleRadius2AndBox( pFace );	
-	}
+	CalcSampleRadius2AndBox( pFace );	
 
 	return true;
 }
@@ -86,9 +83,6 @@ void CVRADDispColl::CalcSampleRadius2AndBox( dface_t *pFace )
 {
 	// Get the luxel sample size.
 	texinfo_t *pTexInfo = &texinfo[pFace->texinfo];
-	Assert ( pTexInfo );
-	if ( !pTexInfo )
-		return;
 
 	// Todo: Width = Height now, should change all the code to look at one value.
 	Vector vecTmp( pTexInfo->lightmapVecsLuxelsPerWorldUnits[0][0],
@@ -430,8 +424,6 @@ void CVRADDispColl::CreateChildPatchesFromRoot( intp iParentPatch, intp (&pChild
 
 	// Get the parent patch.
 	CPatch *pParentPatch = &g_Patches[iParentPatch];
-	if ( !pParentPatch )
-		return;
 
 	// Split along the longest edge.
 	Vector vecEdges[4];
@@ -530,8 +522,6 @@ void CVRADDispColl::CreateChildPatches( intp iParentPatch, int nLevel )
 {
 	// Get the parent patch.
 	CPatch *pParentPatch = &g_Patches[iParentPatch];
-	if ( !pParentPatch )
-		return;
 
 	// The root face is a quad - special case.
 	if ( pParentPatch->winding->numpoints == 4 )
@@ -651,8 +641,6 @@ void CVRADDispColl::CreateChildPatchesSub( intp iParentPatch )
 {
 	// Get the parent patch.
 	CPatch *pParentPatch = &g_Patches[iParentPatch];
-	if ( !pParentPatch )
-		return;
 
 	// Calculate the the area of the patch (triangle!).
 	Assert( pParentPatch->winding->numpoints == 3 );
@@ -906,8 +894,6 @@ bool CVRADDispColl::InitPatch( intp iPatch, intp iParentPatch, int iChild, Vecto
 {
 	// Get the current patch.
 	CPatch *pPatch = &g_Patches[iPatch];
-	if ( !pPatch )
-		return false;
 
 	// Clear the patch data.
 	memset( pPatch, 0, sizeof( CPatch ) );
