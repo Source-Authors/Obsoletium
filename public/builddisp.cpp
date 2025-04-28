@@ -2890,8 +2890,6 @@ bool CCoreDispInfo::SurfToBaseFacePlane( Vector const &surfPt, Vector &planePt )
 	{
 		// Get the current displacement triangle-pair bounding-box.
 		CoreDispBBox_t *pBox = &pBBox[iBox];
-		if( !pBox )
-			continue;
 
 		// Check the point against the current displacement bounding-box.
 		if ( !PointInDispBBox( pBox, surfPt ) )
