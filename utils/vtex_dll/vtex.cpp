@@ -235,6 +235,8 @@ struct VTexConfigInfo_t
 		m_nStartFrame = -1;
 		m_nEndFrame = -1;
 		m_nFlags = 0;
+		m_flBumpScale = 1.0f;
+		m_LookDir = LOOK_DOWN_X;
 		m_bNormalToDuDv = false;
 		m_bAlphaToLuminance = false;
 		m_flBumpScale = 1.0f;
