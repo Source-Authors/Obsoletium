@@ -206,6 +206,7 @@ int CUniformRandomStream::RandomInt( int iLow, int iHigh )
 //
 //-----------------------------------------------------------------------------
 CGaussianRandomStream::CGaussianRandomStream( IUniformRandomStream *pUniformStream )
+	: m_flRandomValue{0.0f}
 {
 	AttachToStream( pUniformStream );
 }
