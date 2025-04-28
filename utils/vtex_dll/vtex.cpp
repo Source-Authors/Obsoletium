@@ -550,7 +550,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 		if ( !stricmp( pKeyValue, "alpha" ) || !stricmp( pKeyValue, "a" ) )
 			iDecayChannel = 3;
 
-		if ( iDecayChannel >= 0 && iDecayChannel < 4 )
+		if ( iDecayChannel >= 0 )
 		{
 			m_vtfProcOptions.flags0 |= ( VtfProcessingOptions::OPT_DECAY_R | VtfProcessingOptions::OPT_DECAY_EXP_R ) << iDecayChannel;
 			m_vtfProcOptions.numNotDecayMips[iDecayChannel] = 0;
