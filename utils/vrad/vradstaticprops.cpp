@@ -34,6 +34,7 @@
 #include "tier1/utldict.h"
 #include "tier1/utlsymbol.h"
 #include "bitmap/tgawriter.h"
+#include "posix_file_stream.h"
 
 #include "messbuf.h"
 #include "vmpi.h"
@@ -564,7 +565,16 @@ void DumpCollideToGlView( vcollide_t *pCollide, const char *pFilename )
 
 	Msg("Writing %s...\n", pFilename );
 
-	FILE *fp = fopen( pFilename, "w" );
+	auto [fp, errc] = se::posix::posix_file_stream_factory::open(pFilename, "w");
+	if (errc)
+	{
+		Warning("Unable to open file to dump collide '%s': %s.\n",
+			pFilename, errc.message().c_str());
+		return;
+	}
+
+	constexpr float kRgbFactor = 1 / 255.0f;
+
 	for (int i = 0; i < pCollide->solidCount; ++i)
 	{
 		Vector *outVerts;
@@ -576,26 +586,49 @@ void DumpCollideToGlView( vcollide_t *pCollide, const char *pFilename )
 		unsigned char g = (i & 2) * 64 + 64;
 		unsigned char b = (i & 4) * 64 + 64;
 
-		float fr = r / 255.0f;
-		float fg = g / 255.0f;
-		float fb = b / 255.0f;
+		float fr = r * kRgbFactor;
+		float fg = g * kRgbFactor;
+		float fb = b * kRgbFactor;
 
 		for ( int i = 0; i < triCount; i++ )
 		{
-			fprintf( fp, "3\n" );
-			fprintf( fp, "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
+			std::tie(std::ignore, errc) = fp.print( "3\n" );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
+			std::tie(std::ignore, errc) = fp.print( "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
 				outVerts[vert].x, outVerts[vert].y, outVerts[vert].z, fr, fg, fb );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
 			vert++;
-			fprintf( fp, "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
+			std::tie(std::ignore, errc) = fp.print( "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
 				outVerts[vert].x, outVerts[vert].y, outVerts[vert].z, fr, fg, fb );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
 			vert++;
-			fprintf( fp, "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
+			std::tie(std::ignore, errc) = fp.print( "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
 				outVerts[vert].x, outVerts[vert].y, outVerts[vert].z, fr, fg, fb );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
 			vert++;
 		}
 		s_pPhysCollision->DestroyDebugMesh( vertCount, outVerts );
 	}
-	fclose( fp );
 }
 
 
