@@ -79,7 +79,7 @@ dat g_Dats[] =
 int CalcDatSize()
 {
 	int ret = 0;
-	int count = sizeof( g_Dats ) / sizeof( g_Dats[0] );
+	constexpr int count = sizeof( g_Dats ) / sizeof( g_Dats[0] );
 	
 	int i;
 	for( i=1; i < count; i++ )
