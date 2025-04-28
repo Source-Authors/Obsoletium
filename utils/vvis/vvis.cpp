@@ -456,7 +456,7 @@ void LoadPortals (char *name)
 	// dimhotepus: Ensure zero termination.
 	magic[std::size(magic) - 1] = '\0';
 
-	if (stricmp(magic,PORTALFILE))
+	if (stricmp(magic,PORTALFILE) != 0)
 		Error ("LoadPortals %s: not a portal file", name);
 
 	Msg ("%4i portalclusters\n", portalclusters);
