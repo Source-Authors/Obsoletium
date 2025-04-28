@@ -495,7 +495,7 @@ bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 {
 	char tmp[1024];
 	V_strcpy_safe( tmp, pModelName );
-	Q_SetExtension( tmp, ".phy" );
+	V_SetExtension( tmp, ".phy" );
 	// No luck, gotta build it	
 	if (!LoadFile( tmp, buf ))
 	{
@@ -517,7 +517,7 @@ bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuf
 	filename[0] = '\0';
 
 	// construct filename
-	Q_StripExtension( pModelName, filename );
+	V_StripExtension( pModelName, filename );
 	V_strcat_safe( filename, ".dx80.vtx" );
 
 	if ( !LoadFile( filename, buf ) )
@@ -656,10 +656,10 @@ public:
 	std::unique_ptr<unsigned char[]> LoadVTFRGB8888( const char *pName, int *pWidth, int *pHeight, bool *pClampU, bool *pClampV )
 	{
 		char szPath[MAX_PATH];
-		Q_strncpy( szPath, "materials/", sizeof( szPath ) );
-		Q_strncat( szPath, pName, sizeof( szPath ), COPY_ALL_CHARACTERS );
-		Q_strncat( szPath, ".vtf", sizeof( szPath ), COPY_ALL_CHARACTERS );
-		Q_FixSlashes( szPath, CORRECT_PATH_SEPARATOR );
+		V_strcpy_safe( szPath, "materials/" );
+		V_strcat_safe( szPath, pName );
+		V_strcat_safe( szPath, ".vtf" );
+		V_FixSlashes( szPath, CORRECT_PATH_SEPARATOR );
 
 		CUtlBuffer buf;
 		if ( !LoadFileIntoBuffer( buf, szPath ) )
@@ -900,32 +900,32 @@ float ComputeCoverageFromTexture( float b0, float b1, float b2, int32 hitID )
 }
 
 // this is here to strip models/ or .mdl or whatnot
-void CleanModelName( const char *pModelName, char *pOutput, int outLen )
+template<intp outLen>
+static void CleanModelName( const char *pModelName, char (&pOutput)[outLen] )
 {
 	// strip off leading models/ if it exists
-	const char pModelDir[] = "models/";
+	constexpr char pModelDir[] = "models/";
 	constexpr intp modelLen = ssize(pModelDir) - 1;
 
 	if ( !Q_strnicmp(pModelName, pModelDir, modelLen ) )
 	{
 		pModelName += modelLen;
 	}
-	Q_strncpy( pOutput, pModelName, outLen );
+	V_strcpy_safe( pOutput, pModelName );
 
 	// truncate any .mdl extension
-	char *dot = strchr(pOutput,'.');
+	char *dot = strchr(pOutput, '.');
 	if ( dot )
 	{
 		*dot = '\0';
 	}
-
 }
 
 
 void ForceTextureShadowsOnModel( const char *pModelName )
 {
 	char buf[MAX_FILEPATH];
-	CleanModelName( pModelName, buf, sizeof(buf) );
+	CleanModelName( pModelName, buf );
 	if ( !g_ForcedTextureShadowsModels.Find(buf).IsValid())
 	{
 		g_ForcedTextureShadowsModels.AddString(buf);
@@ -935,7 +935,7 @@ void ForceTextureShadowsOnModel( const char *pModelName )
 bool IsModelTextureShadowsForced( const char *pModelName )
 {
 	char buf[1024];
-	CleanModelName( pModelName, buf, sizeof(buf) );
+	CleanModelName( pModelName, buf );
 	return g_ForcedTextureShadowsModels.Find(buf).IsValid();
 }
 
@@ -1108,7 +1108,6 @@ void CVradStaticPropMgr::Init()
 
 void CVradStaticPropMgr::Shutdown()
 {
-
 	// Remove all static prop model data
 	for (int i = m_StaticPropDict.Count(); --i >= 0; )
 	{
@@ -1272,9 +1271,8 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 							if (g_bDumpPropLightmaps)
 							{
 								char buffer[_MAX_PATH];
-								V_snprintf( 
+								V_sprintf_safe( 
 									buffer, 
-									_MAX_PATH - 1, 
 									"staticprop_lightmap_%d_%.0f_%.0f_%.0f_%s_%d_%d_%d_%d_%d.tga", 
 									iStaticProp, 
 									prop.m_Origin.x, 
