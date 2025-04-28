@@ -125,7 +125,7 @@ CKeyValuesSystem::CKeyValuesSystem()
 	if ( !m_Strings.Init( size, 64u*1024, 0, 4 ) )
 	{
 		// dimhotepus: Handle allocator failure.
-		Error( "KeyValues allocator unable to allocate %u virtual bytes.\n", size );
+		Error( "KeyValues allocator unable to allocate %zu virtual bytes.\n", size );
 	}
 
 	char *pszEmpty = ((char *)m_Strings.Alloc(1));
