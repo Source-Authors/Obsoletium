@@ -399,7 +399,7 @@ static bool LoadFile( char const* pFileName, CUtlBuffer& buf )
 //-----------------------------------------------------------------------------
 static CPhysConvex* ComputeConvexHull( mstudiomesh_t* pMesh, studiohdr_t *pStudioHdr  )
 {
-	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( (void *)pStudioHdr );
+	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( pStudioHdr );
 	Assert( vertData ); // This can only return NULL on X360 for now
 
 	// Generate a list of all verts in the mesh
@@ -526,7 +526,7 @@ bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuf
 		return false;
 	}
 
-	OptimizedModel::FileHeader_t* pVtxHdr = (OptimizedModel::FileHeader_t *)buf.Base();
+	const auto* pVtxHdr = buf.Base<OptimizedModel::FileHeader_t>();
 
 	// Check that it's valid
 	if ( pVtxHdr->version != OPTIMIZED_MODEL_FILE_VERSION )
@@ -993,7 +993,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 
 	// clone it
 	m_StaticPropDict[i].m_pStudioHdr = (studiohdr_t *)malloc( buf.Size() );
-	memcpy( m_StaticPropDict[i].m_pStudioHdr, (studiohdr_t*)buf.Base(), buf.Size() );
+	memcpy( m_StaticPropDict[i].m_pStudioHdr, buf.Base<studiohdr_t>(), buf.Size() );
 
 	if ( !LoadVTXFile( pModelName, m_StaticPropDict[i].m_pStudioHdr, m_StaticPropDict[i].m_VtxBuf ) )
 	{
@@ -1032,7 +1032,6 @@ void CVradStaticPropMgr::UnserializeModelDict( CUtlBuffer& buf )
 void CVradStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 {
 	int count = buf.GetInt();
-
 
 	m_StaticProps.AddMultipleToTail(count);
 	for ( int i = 0; i < count; ++i )				  
@@ -1218,7 +1217,7 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 
 	StaticPropDict_t &dict = m_StaticPropDict[prop.m_ModelIdx];
 	studiohdr_t	*pStudioHdr = dict.m_pStudioHdr;
-	OptimizedModel::FileHeader_t *pVtxHdr = (OptimizedModel::FileHeader_t *)dict.m_VtxBuf.Base();
+	auto *pVtxHdr = dict.m_VtxBuf.Base<OptimizedModel::FileHeader_t>();
 	Assert( pStudioHdr && pVtxHdr );
 
 	int iCurColorVertsArray = 0;
@@ -1315,7 +1314,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 
 	StaticPropDict_t &dict = m_StaticPropDict[prop.m_ModelIdx];
 	studiohdr_t	*pStudioHdr = dict.m_pStudioHdr;
-	OptimizedModel::FileHeader_t *pVtxHdr = (OptimizedModel::FileHeader_t *)dict.m_VtxBuf.Base();
+	auto *pVtxHdr = dict.m_VtxBuf.Base<OptimizedModel::FileHeader_t>();
 	if ( !pStudioHdr || !pVtxHdr )
 	{
 		// must have model and its verts for lighting computation
@@ -1366,7 +1365,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 			for ( int meshID = 0; meshID < pStudioModel->nummeshes; ++meshID )
 			{
 				mstudiomesh_t *pStudioMesh = pStudioModel->pMesh( meshID );
-				const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData((void *)pStudioHdr);
+				const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData(pStudioHdr);
 
 				Assert(vertData); // This can only return NULL on X360 for now
 				
