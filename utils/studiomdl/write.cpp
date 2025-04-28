@@ -59,11 +59,11 @@ static byte *pBlockStart;
 #undef ALIGN4
 #undef ALIGN16
 #undef ALIGN32
-#define ALIGN4( a ) a = (byte *)((int)((byte *)a + 3) & ~ 3)
-#define ALIGN16( a ) a = (byte *)((int)((byte *)a + 15) & ~ 15)
-#define ALIGN32( a ) a = (byte *)((int)((byte *)a + 31) & ~ 31)
-#define ALIGN64( a ) a = (byte *)((int)((byte *)a + 63) & ~ 63)
-#define ALIGN512( a ) a = (byte *)((int)((byte *)a + 511) & ~ 511)
+#define ALIGN4( a ) a = (byte *)((intp)((byte *)a + 3) & ~ 3)
+#define ALIGN16( a ) a = (byte *)((intp)((byte *)a + 15) & ~ 15)
+#define ALIGN32( a ) a = (byte *)((intp)((byte *)a + 31) & ~ 31)
+#define ALIGN64( a ) a = (byte *)((intp)((byte *)a + 63) & ~ 63)
+#define ALIGN512( a ) a = (byte *)((intp)((byte *)a + 511) & ~ 511)
 // make sure kalloc aligns to maximum alignment size
 
 #define FILEBUFFER (8 * 1024 * 1024)
