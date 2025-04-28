@@ -192,7 +192,7 @@ void Rasterizer::Build()
 	mRasterizedLocations.EnsureCount(count);
 	memset( mRasterizedLocations.Base(), 0, mRasterizedLocations.Count() * sizeof( Location ) );
 	
-	// Computing Barycentrics adapted from here http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+	// Computing Barycentrics adapted from here https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 	Vector2D edgeA = mT1 - mT0;
 	Vector2D edgeB = mT2 - mT0;
 
@@ -402,7 +402,7 @@ static CPhysConvex* ComputeConvexHull( mstudiomesh_t* pMesh, studiohdr_t *pStudi
 	Assert( vertData ); // This can only return NULL on X360 for now
 
 	// Generate a list of all verts in the mesh
-	Vector** ppVerts = (Vector**)_alloca(pMesh->numvertices * sizeof(Vector*) );
+	Vector** ppVerts = stackallocT(Vector*, pMesh->numvertices);
 	for (int i = 0; i < pMesh->numvertices; ++i)
 	{
 		ppVerts[i] = vertData->Position(i);
