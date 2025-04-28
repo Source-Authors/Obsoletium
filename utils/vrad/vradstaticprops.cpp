@@ -450,7 +450,7 @@ CPhysCollide* ComputeConvexHull( studiohdr_t* pStudioHdr )
 
 bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 {
-	// No luck, gotta build it	
+	// No luck, gotta build it
 	// Construct the file name...
 	if (!LoadFile( pModelName, buf ))
 	{
@@ -496,7 +496,7 @@ bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 	char tmp[1024];
 	V_strcpy_safe( tmp, pModelName );
 	V_SetExtension( tmp, ".phy" );
-	// No luck, gotta build it	
+	// No luck, gotta build it
 	if (!LoadFile( tmp, buf ))
 	{
 		// this is not an error, the model simply has no PHY file
@@ -1034,7 +1034,7 @@ void CVradStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 	int count = buf.GetInt();
 
 	m_StaticProps.AddMultipleToTail(count);
-	for ( int i = 0; i < count; ++i )				  
+	for ( int i = 0; i < count; ++i )
 	{
 		StaticPropLump_t lump;
 		buf.Get( &lump, sizeof(StaticPropLump_t) );
@@ -1094,7 +1094,7 @@ void CVradStaticPropMgr::Init()
 	CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
 	if ( !physicsFactory )
 		Error( "Unable to load vphysics" DLL_EXT_STRING );
-		
+
 	s_pPhysCollision = physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
 	if( !s_pPhysCollision )
 	{
@@ -1389,7 +1389,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 						badVertex.m_ColorVertex = numVertexes;
 						badVertex.m_Position = samplePosition;
 						badVertex.m_Normal = sampleNormal;
-						badVerts.AddToTail( badVertex );			
+						badVerts.AddToTail( badVertex );
 					}
 					else
 					{
@@ -2180,7 +2180,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
 	char fileName[MAX_PATH];
-	V_strcpy_safe( fileName, "models/" );	
+	V_strcpy_safe( fileName, "models/" );
 	V_strcat_safe( fileName, pActiveStudioHdr->pszName() );
 	Q_StripExtension( fileName, fileName );
 	V_strcat_safe( fileName, ".vvd" );
@@ -2697,7 +2697,7 @@ static void DumpLightmapLinear( const char* _dstFilename, const CUtlVector<color
 		linearBuffer[i].g = RoundFloatToByte(linearFloats[i].y * 255.0f);
 		linearBuffer[i].r = RoundFloatToByte(linearFloats[i].x * 255.0f);
 	}
-	
+
 	// dimhotepus: Dump warning if TGA write fails.
 	if (!TGAWriter::WriteTGAFile(_dstFilename, _width, _height, IMAGE_FORMAT_BGR888, (uint8*)(linearBuffer.Base()), _width * ImageLoader::SizeInBytes(IMAGE_FORMAT_BGR888)))
 	{
