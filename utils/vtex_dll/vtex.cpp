@@ -2060,7 +2060,6 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 
 	info.m_LookDir = LOOK_DOWN_Z;
 
-	
 	// Try TGA file with config
 	memcpy( pFileName + lenBaseName, ".tga", 4 );
 	if ( !bOK && !g_bNoTga && ( 00 == access( pFileName, 00 ) ) ) // TGA file exists
@@ -2387,7 +2386,7 @@ static int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedi
 		_splitpath( wfd.cFileName, NULL, NULL, fname, ext );
 
 		// Not the type we want.
-		if ( stricmp( ext, extension ) )
+		if ( stricmp( ext, extension ) != 0 )
 			return FF_DONTPROCESS;
 
 		// Check for .vmt
