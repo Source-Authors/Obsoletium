@@ -124,14 +124,12 @@ struct WorldTextureStats_t {
   int refCount;
 };
 
-int WorldTextureCompareFunc(const void *t1, const void *t2) {
-  auto *pStat1 = (WorldTextureStats_t *)t1;
-  auto *pStat2 = (WorldTextureStats_t *)t2;
+bool WorldTextureCompareFunc(const WorldTextureStats_t &pStat1,
+                             const WorldTextureStats_t &pStat2) {
+  if (pStat1.refCount < pStat2.refCount) return false;
+  if (pStat1.refCount > pStat2.refCount) return true;
 
-  if (pStat1->refCount < pStat2->refCount) return 1;
-  if (pStat1->refCount > pStat2->refCount) return -1;
-
-  return 0;
+  return false;
 }
 
 void PrintWorldTextureStats(FILE *fp) {
@@ -150,8 +148,7 @@ void PrintWorldTextureStats(FILE *fp) {
     stats[texdataID].refCount++;
   }
 
-  qsort(stats, numtexdata, sizeof(WorldTextureStats_t),
-        WorldTextureCompareFunc);
+  std::sort(stats, stats + numtexdata, WorldTextureCompareFunc);
   for (int i = 0; i < numtexdata; i++) {
     const char *pTextureName = TexDataStringTable_GetString(
         dtexdata[stats[i].texdataID].nameStringTableID);
