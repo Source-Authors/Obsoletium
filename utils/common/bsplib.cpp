@@ -3251,7 +3251,7 @@ static constexpr const char* GetVector3FormatSpecifier() {
 
 	return "";
 };
-static constexpr const char *GetAnglesFormatSpecifier() {
+static constexpr const char *GetAnglesFormatSpecifier() { //-V524
 	if constexpr (std::is_same_v<float, vector_type_t>)
 		return "%f %f %f";
 
@@ -3896,7 +3896,7 @@ static bool CRC_MapFile(dheader_t *header, CRC32_t *crcvalue, const char *pszFil
 bool SetHDRMode( bool bHDR )
 {
 	bool bOldHDR = std::exchange(g_bHDR, bHDR);
-	if ( bHDR )
+	if ( bHDR ) //-V1051
 	{
 		pdlightdata = &dlightdataHDR;
 		g_pLeafAmbientLighting = &g_LeafAmbientLightingHDR;
