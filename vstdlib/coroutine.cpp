@@ -20,7 +20,7 @@
 //#include "pch_vstdlib.h"
 #if defined(_DEBUG)
 // Verify that something is false
-#define DbgVerifyNot(x) Assert(!x)
+#define DbgVerifyNot(x) Assert(!(x))
 #else
 #define DbgVerifyNot(x) x
 #endif
@@ -270,6 +270,7 @@ public:
 		m_hCoroutine = -1;
 #endif
 #ifdef _M_X64
+		memset( m_rgubRegisters, 0, sizeof(m_rgubRegisters) );
 		m_nAlignmentBytes = CalcAlignOffset( m_rgubRegisters );
 #endif	
 #if defined( VPROF_ENABLED )
