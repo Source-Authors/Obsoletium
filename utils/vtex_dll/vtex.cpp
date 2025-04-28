@@ -239,7 +239,6 @@ struct VTexConfigInfo_t
 		m_LookDir = LOOK_DOWN_X;
 		m_bNormalToDuDv = false;
 		m_bAlphaToLuminance = false;
-		m_flBumpScale = 1.0f;
 		m_bDuDv = false;
 		m_flAlphaThreshhold = -1.0f;
 		m_flAlphaHiFreqThreshhold = -1.0f;
