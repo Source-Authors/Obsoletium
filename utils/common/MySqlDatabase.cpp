@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 CMySqlDatabase::CMySqlDatabase()
 {
-	m_bRunThread = false;
+	m_bRunThread.store(false, std::memory_order::memory_order_relaxed);
 	m_pcsThread   = new CRITICAL_SECTION;
 	m_pcsInQueue  = new CRITICAL_SECTION;
 	m_pcsOutQueue = new CRITICAL_SECTION;
@@ -30,7 +30,7 @@ CMySqlDatabase::CMySqlDatabase()
 CMySqlDatabase::~CMySqlDatabase()
 {
 	// flag the thread to stop
-	m_bRunThread = false;
+	m_bRunThread.store(false, std::memory_order::memory_order_acq_rel);
 
 	// pulse the thread to make it run
 	::SetEvent(m_hEvent);
@@ -74,7 +74,7 @@ bool CMySqlDatabase::Initialize()
 	m_hEvent = ::CreateEvent(NULL, false, true, NULL);
 
 	// start the DB-access thread
-	m_bRunThread = true;
+	m_bRunThread.store(true, std::memory_order::memory_order_acq_rel);
 
 	::_beginthreadex(NULL, 0, staticThreadFunc, this, 0, nullptr);
 
@@ -87,7 +87,7 @@ bool CMySqlDatabase::Initialize()
 void CMySqlDatabase::RunThread()
 {
 	::EnterCriticalSection(m_pcsThread);
-	while (m_bRunThread)
+	while (m_bRunThread.load(std::memory_order_acq_rel))
 	{
 		if (m_InQueue.Count() > 0)
 		{
