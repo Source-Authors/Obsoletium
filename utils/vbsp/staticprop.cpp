@@ -569,10 +569,10 @@ static void SetLumpData( )
 
 void EmitStaticProps()
 {
-	CreateInterfaceFn physicsFactory = GetPhysicsFactory();
+	CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
 	if ( physicsFactory )
 	{
-		s_pPhysCollision = (IPhysicsCollision *)physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
+		s_pPhysCollision = physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
 		if( !s_pPhysCollision )
 			return;
 	}

@@ -1091,11 +1091,11 @@ void CVradStaticPropMgr::UnserializeStaticProps()
 
 void CVradStaticPropMgr::Init()
 {
-	CreateInterfaceFn physicsFactory = GetPhysicsFactory();
+	CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
 	if ( !physicsFactory )
-		Error( "Unable to load vphysics DLL." );
+		Error( "Unable to load vphysics" DLL_EXT_STRING );
 		
-	s_pPhysCollision = (IPhysicsCollision *)physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
+	s_pPhysCollision = physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
 	if( !s_pPhysCollision )
 	{
 		Error( "Unable to get '%s' for physics interface.", VPHYSICS_COLLISION_INTERFACE_VERSION );
@@ -2489,7 +2489,7 @@ static void FilterFineMipmap(unsigned int _resX, unsigned int _resY, const CUtlV
 		ConvertRGBExp32ToLinear( &rgbColor, &(filterSrc[i]) );
 	}
 
-	const int cRadius = 1;
+	constexpr int cRadius = 1;
 	const float cOneOverDiameter = 1.0f / pow(2.0f * cRadius + 1.0f, 2.0f) ;
 	// Filter here.
 	for (int j = 0; j < _resY; ++j) 

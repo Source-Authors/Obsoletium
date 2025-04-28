@@ -710,17 +710,17 @@ void LoadSurfacePropFile( const char *pMaterialFilename )
 //-----------------------------------------------------------------------------
 void LoadSurfaceProperties( void )
 {
-	CreateInterfaceFn physicsFactory = GetPhysicsFactory();
+	CreateInterfaceFnT<IPhysicsSurfaceProps> physicsFactory = GetPhysicsFactory2();
 	if ( !physicsFactory )
 		return;
 
-	physprops = (IPhysicsSurfaceProps *)physicsFactory( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL );
+	physprops = physicsFactory( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, nullptr );
 
 	const char *SURFACEPROP_MANIFEST_FILE = "scripts/surfaceproperties_manifest.txt";
-	KeyValues *manifest = new KeyValues( SURFACEPROP_MANIFEST_FILE );
+	KeyValuesAD manifest( SURFACEPROP_MANIFEST_FILE );
 	if ( manifest->LoadFromFile( g_pFileSystem, SURFACEPROP_MANIFEST_FILE, "GAME" ) )
 	{
-		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
+		for ( auto *sub = manifest->GetFirstSubKey(); sub != nullptr; sub = sub->GetNextKey() )
 		{
 			if ( !Q_stricmp( sub->GetName(), "file" ) )
 			{
@@ -730,8 +730,6 @@ void LoadSurfaceProperties( void )
 			}
 		}
 	}
-
-	manifest->deleteThis();
 }
 
 

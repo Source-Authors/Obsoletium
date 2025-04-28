@@ -656,9 +656,9 @@ void ReadPolyFile(const char *name) {
 
   bool isPHY = !Q_stricmp(ext, "phy");
   if (isPHY) {
-    CreateInterfaceFn physicsFactory = GetPhysicsFactory();
-    physcollision = (IPhysicsCollision *)physicsFactory(
-        VPHYSICS_COLLISION_INTERFACE_VERSION, NULL);
+    CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
+    physcollision =
+        physicsFactory(VPHYSICS_COLLISION_INTERFACE_VERSION, nullptr);
     if (physcollision) {
       phyviewparams_t params;
       params.Defaults();
@@ -803,7 +803,8 @@ void DrawDisplacementData() {
   for (i = 0; i < halfWidth - 1; i++) {
     for (j = 0; j < halfWidth - 1; j++) {
       glBegin(GL_POLYGON);
-      glVertex3f(dispPoints[i * halfWidth + j][0], dispPoints[i * halfWidth + j][1],
+      glVertex3f(dispPoints[i * halfWidth + j][0],
+                 dispPoints[i * halfWidth + j][1],
                  dispPoints[i * halfWidth + j][2]);
       glVertex3f(dispPoints[(i + 1) * halfWidth + j][0],
                  dispPoints[(i + 1) * halfWidth + j][1],
@@ -1185,7 +1186,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     g_nLeafHighlight = CommandLine()->ParmValue("-leafhighlight", -1);
   }
 
-  g_flMovementSpeed = static_cast<float>(CommandLine()->ParmValue("-speed", 320));
+  g_flMovementSpeed =
+      static_cast<float>(CommandLine()->ParmValue("-speed", 320));
 
   if (CommandLine()->CheckParm("-disp")) {
     ReadDisplacementFile(pFileName);

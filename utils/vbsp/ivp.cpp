@@ -14,7 +14,6 @@
 #include "utlvector.h"
 #include "vbsp.h"
 #include "phyfile.h"
-#include <float.h>
 #include "KeyValues.h"
 #include "UtlBuffer.h"
 #include "utlsymbol.h"
@@ -1507,10 +1506,10 @@ void EmitPhysCollision()
 {
 	ClearLeafWaterData();
 	
-	CreateInterfaceFn physicsFactory = GetPhysicsFactory();
+	CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
 	if ( physicsFactory )
 	{
-		physcollision = (IPhysicsCollision *)physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
+		physcollision = physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
 	}
 
 	if ( !physcollision )
@@ -1656,7 +1655,7 @@ void EmitPhysCollision()
 	model.solidCount = 0;
 	memcpy( ptr, &model, sizeof(model) );
 	ptr += sizeof(model);
-	Assert( (ptr-g_pPhysCollide) == g_PhysCollideSize);
+	Assert( ptr - g_pPhysCollide == g_PhysCollideSize);
 	Msg("(%.2fs) (%d bytes)\n", Plat_FloatTime() - start, g_PhysCollideSize );
 
 	// UNDONE: Collision models (collisionList) memory leak!
