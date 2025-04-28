@@ -2347,8 +2347,6 @@ void DumpSamples( int ndxFace, facelight_t *pFaceLight )
 	ScopedThreadsLock lock;
 
 	dface_t *pFace = &g_pFaces[ndxFace];
-	if( pFace )
-	{
 		bool bBumpped = ( ( texinfo[pFace->texinfo].flags & SURF_BUMPLIGHT ) != 0 );
 
 		for( int iStyle = 0; iStyle < 4; ++iStyle )
@@ -2373,7 +2371,6 @@ void DumpSamples( int ndxFace, facelight_t *pFaceLight )
 			}
 		}
 	}
-}
 
 
 //-----------------------------------------------------------------------------
