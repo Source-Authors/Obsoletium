@@ -2062,7 +2062,7 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 
 	// Try TGA file with config
 	memcpy( pFileName + lenBaseName, ".tga", 4 );
-	if ( !bOK && !g_bNoTga && ( 00 == access( pFileName, 00 ) ) ) // TGA file exists
+	if ( !g_bNoTga && ( 00 == access( pFileName, 00 ) ) ) // TGA file exists
 	{
 		g_eMode = Mode::eModeTGA;
 
@@ -3023,10 +3023,7 @@ int CVTex::VTex( int argc, char **argv )
 				iFFType = Find_Files( wfd, hResult, basedir, ext );
 			}
 
-			if ( iFFType == 0 )
-			{
-				FindClose( hResult );
-			}
+			FindClose( hResult );
 		}
 #endif
 
