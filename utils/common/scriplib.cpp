@@ -76,7 +76,7 @@ SCRIPT_LOADED_CALLBACK SetScriptLoadedCallback( SCRIPT_LOADED_CALLBACK pfnNewScr
 AddScriptToStack
 ==============
 */
-void AddScriptToStack (char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_ABSOLUTE_PATH)
+void AddScriptToStack (const char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_ABSOLUTE_PATH)
 {
 	script++;
 	if (script == &scriptstack[MAX_INCLUDES])
@@ -1052,8 +1052,8 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 //-----------------------------------------------------------------------------
 int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB )
 {
-	time_t timeA = g_pFullFileSystem->GetFileTime( (char *)pFilenameA );
-	time_t timeB = g_pFullFileSystem->GetFileTime( (char *)pFilenameB );
+	time_t timeA = g_pFullFileSystem->GetFileTime( pFilenameA );
+	time_t timeB = g_pFullFileSystem->GetFileTime( pFilenameB );
 
 	if ( timeA == -1)
 	{
