@@ -706,7 +706,7 @@ void CCvar::DisplayQueuedMessages( )
 			clr.SetRawColor( m_TempConsoleBuffer.GetInt() );
 		}
 		nStringLength = m_TempConsoleBuffer.PeekStringLength();
-		char* pTemp = (char*)stackalloc( nStringLength + 1 );
+		char* pTemp = stackallocT( char, nStringLength + 1 );
 		m_TempConsoleBuffer.GetStringManualCharCount( pTemp, nStringLength + 1 );
 
 		switch( nType )
