@@ -432,17 +432,20 @@ void LoadPortals (char *name)
 			Error( "LoadPortals( %s ): couldn't get file from master.\n", name );
 
 		CUtlVector<char> data;
-		data.SetSize( g_pFileSystem->Size( hFile ) );
+		data.SetCount( g_pFileSystem->Size( hFile ) );
 		g_pFileSystem->Read( data.Base(), data.Count(), hFile );
 		g_pFileSystem->Close( hFile );
 
 		// Dump it into a temp file.
 		f = fopen( tempFile, "wt" );
+		if (f)
+		{
 		fwrite( data.Base(), 1, data.Count(), f );
 		fclose( f );
 
 		// Open the temp file up.
 		f = fopen( tempFile, "rSTD" ); // read only, sequential, temporary, delete on close
+	}
 	}
 	else
 	{
