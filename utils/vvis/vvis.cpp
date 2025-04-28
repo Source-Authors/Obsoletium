@@ -107,14 +107,9 @@ Sorts the portals from the least complex, so the later ones can reuse
 the earlier information.
 =============
 */
-int PComp (const void *a, const void *b)
+static bool PComp (const portal_t *a, const portal_t *b)
 {
-	if ( (*(portal_t **)a)->nummightsee == (*(portal_t **)b)->nummightsee)
-		return 0;
-	if ( (*(portal_t **)a)->nummightsee < (*(portal_t **)b)->nummightsee)
-		return -1;
-
-	return 1;
+	return a->nummightsee < b->nummightsee;
 }
 
 void BuildTracePortals( int clusterStart )
@@ -136,7 +131,7 @@ void SortPortals (void)
 
 	if (nosort)
 		return;
-	qsort (sorted_portals, g_numportals*2, sizeof(sorted_portals[0]), PComp);
+	std::sort (sorted_portals, sorted_portals + g_numportals*2, PComp);
 }
 
 
