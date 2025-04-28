@@ -1456,19 +1456,11 @@ void CollectLight( Vector& total )
 		{
 			// This is an interior node.
 			// Pull received light from children.
-			float s1, s2;
-			CPatch *child1;
-			CPatch *child2;
+			CPatch *child1 = &g_Patches[patch->child1];
+			CPatch *child2 = &g_Patches[patch->child2];
 
-			child1 = &g_Patches[patch->child1];
-			child2 = &g_Patches[patch->child2];
-
-			// BUG: This doesn't do anything?
-			if ((int)patch->area != (int)(child1->area + child2->area))
-				s1 = 0;
-
-			s1 = child1->area / (child1->area + child2->area);
-			s2 = child2->area / (child1->area + child2->area);
+			float s1 = child1->area / (child1->area + child2->area);
+			float s2 = child2->area / (child1->area + child2->area);
 
 			// patch->totallight = s1 * child1->totallight + s2 * child2->totallight
 			for ( j = 0; j < normalCount; j++ )
@@ -2379,8 +2371,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 	// default to LDR
 	SetHDRMode( false );
 
-	int i;
-	for( i=1 ; i<argc ; i++ )
+	for( int i=1 ; i<argc ; i++ )
 	{
 		if ( !Q_stricmp( argv[i], "-StaticPropLighting" ) )
 		{
