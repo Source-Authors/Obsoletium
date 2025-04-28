@@ -136,7 +136,6 @@ unsigned long	g_CurrentMessageIndex = 0;
 
 
 HANDLE	g_hPerfThread = NULL;
-DWORD	g_PerfThreadID = 0xFEFEFEFE;
 HANDLE	g_hPerfThreadExitEvent = NULL;
 
 // These are set by the app and they go into the database.
@@ -464,9 +463,9 @@ void PerfThread_AddGraphEntry( ULONGLONG startTicks, DWORD &lastSent, DWORD &las
 
 
 // This function adds a graph_entry into the database periodically.
-DWORD WINAPI PerfThreadFn( LPVOID pParameter )
+unsigned WINAPI PerfThreadFn( void* pParameter )
 {
-	// dimhotepus: Add thread name to aid debugging.	
+	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("VmpiPerfStats");
 
 	DWORD lastSent = 0;
@@ -560,7 +559,7 @@ bool VMPI_Stats_Init_Master(
 	
 	// Connect the database.
 	g_pDB = new CMySqlDatabase;
-	if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) )
+	if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) ) //-V668
 	{
 		delete g_pDB;
 		g_pDB = NULL;
@@ -605,7 +604,7 @@ bool VMPI_Stats_Init_Worker( const char *pHostName, const char *pDBName, const c
 		
 		// Connect the database.
 		g_pDB = new CMySqlDatabase;
-		if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) )
+		if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) ) //-V668
 		{
 			delete g_pDB;
 			g_pDB = NULL;
@@ -636,15 +635,15 @@ bool VMPI_Stats_Init_Worker( const char *pHostName, const char *pDBName, const c
 
 	// Now create a thread that samples perf data and stores it in the database.
 	g_hPerfThreadExitEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
-	g_hPerfThread = CreateThread(
-		NULL,
+	g_hPerfThread = reinterpret_cast<HANDLE>(_beginthreadex(
+		nullptr,
 		0,
 		PerfThreadFn,
-		NULL,
+		nullptr,
 		0,
-		&g_PerfThreadID );
+		nullptr ));
 
-	return true;	
+	return true;
 }
 
 
