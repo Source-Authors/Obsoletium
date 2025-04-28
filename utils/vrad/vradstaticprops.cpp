@@ -653,7 +653,7 @@ class CShadowTextureList
 {
 public:
 	// This loads a vtf and converts it to RGB8888 format
-	unsigned char *LoadVTFRGB8888( const char *pName, int *pWidth, int *pHeight, bool *pClampU, bool *pClampV )
+	std::unique_ptr<unsigned char[]> LoadVTFRGB8888( const char *pName, int *pWidth, int *pHeight, bool *pClampU, bool *pClampV )
 	{
 		char szPath[MAX_PATH];
 		Q_strncpy( szPath, "materials/", sizeof( szPath ) );
@@ -663,10 +663,10 @@ public:
 
 		CUtlBuffer buf;
 		if ( !LoadFileIntoBuffer( buf, szPath ) )
-			return NULL;
+			return {};
 		IVTFTexture *pTex = CreateVTFTexture();
 		if (!pTex->Unserialize( buf ))
-			return NULL;
+			return {};
 		Msg("Loaded alpha texture %s\n", szPath );
 		unsigned char *pSrcImage = pTex->ImageData( 0, 0, 0, 0, 0, 0 );
 		int iWidth = pTex->Width();
@@ -675,13 +675,13 @@ public:
 		ImageFormat srcFormat = pTex->Format();
 		*pClampU = (pTex->Flags() & TEXTUREFLAGS_CLAMPS) ? true : false;
 		*pClampV = (pTex->Flags() & TEXTUREFLAGS_CLAMPT) ? true : false;
-		unsigned char *pDstImage = new unsigned char[ImageLoader::GetMemRequired( iWidth, iHeight, 1, dstFormat, false )];
+		std::unique_ptr<unsigned char[]> pDstImage =
+			std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired( iWidth, iHeight, 1, dstFormat, false ));
 
 		if( !ImageLoader::ConvertImageFormat( pSrcImage, srcFormat, 
-			pDstImage, dstFormat, iWidth, iHeight, 0, 0 ) )
+			pDstImage.get(), dstFormat, iWidth, iHeight, 0, 0 ) )
 		{
-			delete[] pDstImage;
-			return NULL;
+			return {};
 		}
 
 		*pWidth = iWidth;
@@ -703,7 +703,7 @@ public:
 		}
 		else
 		{
-			auto pVMT = KeyValues::AutoDelete("vmt");
+			KeyValuesAD pVMT("vmt");
 			CUtlBuffer buf((intp)0,0,CUtlBuffer::TEXT_BUFFER);
 			LoadFileIntoBuffer( buf, pMaterialName );
 			if ( pVMT->LoadFromBuffer( pMaterialName, buf ) )
@@ -720,11 +720,11 @@ public:
 							int w, h;
 							bool bClampU = false;
 							bool bClampV = false;
-							unsigned char *pImageBits = LoadVTFRGB8888( pBaseTextureName, &w, &h, &bClampU, &bClampV );
+							std::unique_ptr<unsigned char[]> pImageBits = LoadVTFRGB8888( pBaseTextureName, &w, &h, &bClampU, &bClampV );
 							if ( pImageBits )
 							{
-								int index = m_Textures.Insert( pMaterialName );
-								m_Textures[index].InitFromRGB8888( w, h, pImageBits );
+								const auto index = m_Textures.Insert( pMaterialName );
+								m_Textures[index].InitFromRGB8888( w, h, pImageBits.get() );
 								*pIndex = index;
 								if ( pVMT->FindKey("$nocull") )
 								{
@@ -733,7 +733,6 @@ public:
 								}
 								m_Textures[index].clampU = bClampU;
 								m_Textures[index].clampV = bClampV;
-								delete[] pImageBits;
 							}
 						}
 					}
@@ -892,7 +891,7 @@ CShadowTextureList g_ShadowTextureList;
 
 float ComputeCoverageFromTexture( float b0, float b1, float b2, int32 hitID )
 {
-	const float alphaScale = 1.0f / 255.0f;
+	constexpr float alphaScale = 1.0f / 255.0f;
 	// UNDONE: Pass ray down to determine backfacing?
 	//Vector normal( tri.m_flNx, tri.m_flNy, tri.m_flNz );
 	//bool bBackface = DotProduct(delta, tri.N) > 0 ? true : false;
