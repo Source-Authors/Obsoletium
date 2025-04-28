@@ -410,7 +410,7 @@ private:
 
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-		m_pOwner->m_nIdleThreads++;
+		++m_pOwner->m_nIdleThreads;
 		m_IdleEvent.Set();
 		while (!bExit && ( ( waitResult = Wait() ) != WAIT_FAILED ) )
 		{
@@ -469,21 +469,21 @@ private:
 					if ( !bTookJob )
 					{
 						m_IdleEvent.Reset();
-						m_pOwner->m_nIdleThreads--;
+						--m_pOwner->m_nIdleThreads;
 						bTookJob = true;
 					}
 					ServiceJobAndRelease( pJob, m_iThread );
-					m_pOwner->m_nJobs--;
+					--m_pOwner->m_nJobs;
 				} while ( !PeekCall() );
 
 				if ( bTookJob )
 				{
-					m_pOwner->m_nIdleThreads++;
+					++m_pOwner->m_nIdleThreads;
 					m_IdleEvent.Set();
 				}
 			}
 		}
-		m_pOwner->m_nIdleThreads--;
+		--m_pOwner->m_nIdleThreads;
 		m_IdleEvent.Reset();
 		return 0;
 	}
@@ -624,7 +624,7 @@ int CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, 
 		if ( !m_bExecOnThreadPoolThreadsOnly && m_SharedQueue.Pop( &pJob ) )
 		{
 			ServiceJobAndRelease( pJob );
-			m_nJobs--;
+			--m_nJobs;
 		}
 		else
 		{
@@ -830,13 +830,13 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 					}
 					else
 					{
-						m_nJobs--;
+						--m_nJobs;
 						pJob->Release(); // an already serviced job in queue, may as well ditch it (as in, main thread probably force executed)
 					}
 					continue;
 				}
 				ServiceJobAndRelease( pJob );
-				m_nJobs--;
+				--m_nJobs;
 				nExecuted++;
 			}
 
@@ -854,14 +854,14 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 				}
 				else
 				{
-					m_nJobs--;
+					--m_nJobs;
 					pJob->Release(); // see above
 				}
 				continue;
 			}
 
 			ServiceJobAndRelease( pJob );
-			m_nJobs--;
+			--m_nJobs;
 			nExecuted++;
 		}
 	}
