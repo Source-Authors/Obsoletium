@@ -461,7 +461,8 @@ bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 	if (strncmp ((const char *) buf.PeekGet(), "IDST", 4) &&
 		strncmp ((const char *) buf.PeekGet(), "IDAG", 4))
 	{
-		Warning("Error! Invalid model file \"%s\"\n", pModelName );
+		Warning("Error! Invalid model file \"%s\": tag %s is not expected.\n",
+			pModelName, (const char *) buf.PeekGet() );
 		return false;
 	}
 
