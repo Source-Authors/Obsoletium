@@ -18,7 +18,7 @@
 
 namespace {
 
-template <int size>
+template <intp size>
 [[nodiscard]] std::error_code MakeFullPath(const char *in, char (&out)[size]) {
   if (in[0] == CORRECT_PATH_SEPARATOR || in[0] == INCORRECT_PATH_SEPARATOR ||
       in[1] == ':') {
