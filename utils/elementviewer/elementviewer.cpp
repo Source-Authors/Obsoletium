@@ -1,18 +1,10 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// The copyright to the contents herein is the property of Valve, L.L.C.
-// The contents may be used and/or copied only with the written permission of
-// Valve, L.L.C., or in accordance with the terms and conditions stipulated in
-// the agreement/contract under which the contents have been supplied.
+// Tool used to edit generic DMX files, providing a GUI for editing and creating
+// new DMX files.
 //
-// $Header: $
-// $NoKeywords: $
-//
-// Material editor
-//=============================================================================
-#include <windows.h>
-#include "vstdlib/cvar.h"
-#include "appframework/vguimatsysapp.h"
+// See https://developer.valvesoftware.com/wiki/Elementviewer
+
 #include "filesystem.h"
 #include "materialsystem/imaterialsystem.h"
 #include "vgui/IVGui.h"
@@ -23,10 +15,13 @@
 #include "vgui/ILocalize.h"
 #include "vgui/IPanel.h"
 #include "tier0/dbg.h"
+#include "tier0/icommandline.h"
+#include "vstdlib/cvar.h"
+#include "appframework/AppFramework.h"
+#include "appframework/vguimatsysapp.h"
 #include "vgui_controls/Frame.h"
 #include "vgui_controls/AnimationController.h"
 #include "datamodel/dmelementfactoryhelper.h"
-#include "tier0/icommandline.h"
 #include "materialsystem/MaterialSystem_Config.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "datamodel/dmelement.h"
@@ -34,8 +29,14 @@
 #include "vstdlib/iprocessutils.h"
 #include "dmserializers/idmserializers.h"
 #include "dme_controls/dmecontrols.h"
-#include "p4lib/ip4.h"
+#include "tools_minidump.h"
+// dimhotepus: Disable Perforce.
+// #include "p4lib/ip4.h"
 #include "tier3/tier3.h"
+
+#include "tier0/memdbgon.h"
+
+using HINSTANCE = void*;
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -48,7 +49,7 @@ vgui::Panel *CreateElementViewerPanel();
 //-----------------------------------------------------------------------------
 SpewRetval_t SpewToODS( SpewType_t spewType, char const *pMsg )
 {
-	OutputDebugString( pMsg );
+	Plat_DebugString( pMsg );
 
 	switch( spewType )
 	{
@@ -73,14 +74,20 @@ class CElementViewerApp : public CVguiMatSysApp
 	typedef CVguiMatSysApp BaseClass;
 
 public:
+	CElementViewerApp() : scoped_spew_output_{SpewToODS} {}
+
 	// Methods of IApplication
-	virtual bool Create();
-	virtual bool PreInit( );
-	virtual int Main();
-	virtual void Destroy();
+	bool Create() override;
+	bool PreInit() override;
+	int Main() override;
+	void Destroy() override;
 
 private:
-	virtual const char *GetAppName() { return "ElementViewer"; }
+	const char *GetAppName() override { return "ElementViewer"; }
+
+	// Install an exception handler.
+	const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps_;
+	const ScopedSpewOutputFunc scoped_spew_output_;
 };
 
 DEFINE_WINDOWED_STEAM_APPLICATION_OBJECT( CElementViewerApp );
@@ -91,8 +98,6 @@ DEFINE_WINDOWED_STEAM_APPLICATION_OBJECT( CElementViewerApp );
 //-----------------------------------------------------------------------------
 bool CElementViewerApp::Create()
 {
-	SpewOutputFunc( SpewToODS );
-
 	// This is a little cheezy but fast...
 	CommandLine()->AppendParm( "-resizing", NULL );
 
@@ -125,10 +130,17 @@ void CElementViewerApp::Destroy()
 //-----------------------------------------------------------------------------
 bool CElementViewerApp::PreInit( )
 {
+#ifdef PLATFORM_64BITS
+	Msg("\nValve Software - elementviewer [64 bit] (%s)\n", __DATE__);
+#else
+	Msg("\nValve Software - elementviewer (%s)\n", __DATE__);
+#endif
+
 	if ( !BaseClass::PreInit() )
 		return false;
 
-	if ( !g_pFullFileSystem || !g_pMaterialSystem || !g_pVGui || !g_pVGuiSurface || !g_pDataModel || !g_pMatSystemSurface || !p4 )
+	// dimhotepus: Drop Perforce support.
+	if ( !g_pFullFileSystem || !g_pMaterialSystem || !g_pVGui || !g_pVGuiSurface || !g_pDataModel || !g_pMatSystemSurface /* || !p4 */ )
 	{
 		Error( "Element viewer is missing required interfaces!\n" );
 		return false;
@@ -199,8 +211,8 @@ void VGui_DrawPopups( void )
 	if ( !VGUI_DRAWPOPUPS )
 		return;
 	
-	int c = vgui::surface()->GetPopupCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = vgui::surface()->GetPopupCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		vgui::VPANEL popup = vgui::surface()->GetPopup( i );
 		if ( !popup )
@@ -217,7 +229,7 @@ void VGui_DrawPopups( void )
 
 		//Con_NPrintf( i, 
 		Msg( 
-			"%i:  %s : %x, %s pos(%i,%i) w(%i) h(%i)\n",
+			"%zd:  %s : %x, %s pos(%i,%i) w(%i) h(%i)\n",
 			i,
 			p,
 			popup,
@@ -307,13 +319,15 @@ int CElementViewerApp::Main()
 	vgui::surface()->Invalidate( root );
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-	int nLastTime = Plat_MSTime();
+	// dimhotepus: ms -> us to not overflow in ~49.7 days.
+	uint64 nLastTime = Plat_USTime();
 	while (g_pVGui->IsRunning())
 	{
 		// Give other applications a chance to run
-		Sleep( 1 );
-		int nTime = Plat_MSTime();
-		if ( ( nTime - nLastTime ) < 16 )
+		ThreadSleep( 1 );
+
+		const uint64 nTime = Plat_USTime();
+		if ( ( nTime - nLastTime ) < 16000 )
 			continue;
 		nLastTime = nTime;
 
@@ -323,7 +337,7 @@ int CElementViewerApp::Main()
 
 		pRenderContext->Viewport( 0, 0, GetWindowWidth(), GetWindowHeight() );
 	
-		vgui::GetAnimationController()->UpdateAnimations( Sys_FloatTime() );
+		vgui::GetAnimationController()->UpdateAnimations( Plat_FloatTime() );
 
 		g_pMaterialSystem->BeginFrame( 0 );
 		pRenderContext->ClearColor4ub( 76, 88, 68, 255 ); 
@@ -344,6 +358,3 @@ int CElementViewerApp::Main()
 
 	return 1;
 }
-
-
-
