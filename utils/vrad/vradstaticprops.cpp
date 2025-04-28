@@ -694,7 +694,7 @@ public:
 	bool FindOrLoadIfValid( const char *pMaterialName, int *pIndex )
 	{
 		*pIndex = -1;
-		int index = m_Textures.Find(pMaterialName);
+		const auto index = m_Textures.Find(pMaterialName);
 		bool bFound = false;
 		if ( index != m_Textures.InvalidIndex() )
 		{
@@ -1063,7 +1063,7 @@ void CVradStaticPropMgr::UnserializeStaticProps()
 {
 	// Unserialize static props, insert them into the appropriate leaves
 	GameLumpHandle_t handle = g_GameLumps.GetGameLumpHandle( GAMELUMP_STATIC_PROPS );
-	int size = g_GameLumps.GameLumpSize( handle );
+	intp size = g_GameLumps.GameLumpSize( handle );
 	if (!size)
 		return;
 
@@ -1432,7 +1432,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 			// must punt, leave black coloring
 			if ( badVerts.Count() && ( prop.m_bLightingOriginValid || badVerts.Count() != numVertexes ) )
 			{
-				for ( int nBadVertex = 0; nBadVertex < badVerts.Count(); nBadVertex++ )
+				for ( intp nBadVertex = 0; nBadVertex < badVerts.Count(); nBadVertex++ )
 				{		
 					Vector bestPosition;
 					if ( prop.m_bLightingOriginValid )
@@ -1572,7 +1572,7 @@ void CVradStaticPropMgr::SerializeLighting()
 			pMesh->m_nOffset   = (unsigned int)pVertexData - (unsigned int)pVhvHdr; 
 
 			// construct vertexes
-			for (int k=0; k<pMesh->m_nVertexes; k++)
+			for (unsigned k=0; k<pMesh->m_nVertexes; k++)
 			{
 				Vector &vertexColor = m_StaticProps[i].m_MeshData[n].m_VertexColors[k];
 
