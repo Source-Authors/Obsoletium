@@ -352,13 +352,13 @@ void ReceivePortalFlow( uint64 iWorkUnit, MessageBuffer *pBuf, int iWorker )
 }
 
 
-DWORD WINAPI PortalMCThreadFn( LPVOID p )
+unsigned WINAPI PortalMCThreadFn( void* p )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("VmpiVvis");
 
 	CUtlVector<char> data;
-	data.SetSize( portalbytes + 128 );
+	data.SetCount( static_cast<intp>(portalbytes) + 128 );
 
 	DWORD waitTime = 0;
 	while ( WaitForSingleObject( g_MCThreadExitEvent.GetEventHandle(), waitTime ) != WAIT_OBJECT_0 )
@@ -405,7 +405,7 @@ void MCThreadCleanupFn()
 {
 	g_MCThreadExitEvent.SetEvent();
 }
-		
+
 
 // --------------------------------------------------------------------------------- //
 // Cheesy hack to let them stop the job early and keep the results of what has
@@ -579,19 +579,18 @@ void RunMPIPortalFlow()
 		}
 
 		// Make a thread to listen for the data on the multicast socket.
-		DWORD dwDummy = 0;
 		g_MCThreadExitEvent.Init( false, false );
 
 		// Make sure we kill the MC thread if the app exits ungracefully.
 		CmdLib_AtCleanup( MCThreadCleanupFn );
 		
-		g_hMCThread = CreateThread( 
-			NULL,
+		g_hMCThread = reinterpret_cast<HANDLE>(_beginthreadex( 
+			nullptr,
 			0,
 			PortalMCThreadFn,
-			NULL,
+			nullptr,
 			0,
-			&dwDummy );
+			nullptr ));
 
 		if ( !g_hMCThread )
 		{

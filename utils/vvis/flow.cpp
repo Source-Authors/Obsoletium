@@ -274,7 +274,7 @@ winding_t	*ClipToSeperators (winding_t *source, winding_t *pass, winding_t *targ
 				if (d < -ON_VIS_EPSILON)
 				{	// source is on the negative side, so we want all
 					// pass and target on the positive side
-					fliptest = false;
+					fliptest = false; //-V1048
 					break;
 				}
 				else if (d > ON_VIS_EPSILON)
