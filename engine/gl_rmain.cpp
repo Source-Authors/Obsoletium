@@ -751,13 +751,11 @@ void CRender::SetMainView( const Vector &vecOrigin, const QAngle &angles )
 CUtlVector<LightmapUpdateInfo_t> g_LightmapUpdateList;
 CUtlVector<LightmapTransformInfo_t> g_LightmapTransformList;
 
-int __cdecl LightmapPageCompareFunc( const void *pElem0, const void *pElem1 )
+static bool __cdecl LightmapPageCompareFunc( const LightmapUpdateInfo_t &pSurf0, const LightmapUpdateInfo_t &pSurf1 )
 {
-	const LightmapUpdateInfo_t *pSurf0 = (const LightmapUpdateInfo_t *)pElem0;
-	const LightmapUpdateInfo_t *pSurf1 = (const LightmapUpdateInfo_t *)pElem1;
-	int page0 = materialSortInfoArray[MSurf_MaterialSortID( (pSurf0->m_SurfHandle) )].lightmapPageID;
-	int page1 = materialSortInfoArray[MSurf_MaterialSortID( (pSurf1->m_SurfHandle) )].lightmapPageID;
-	return page0 - page1;
+	int page0 = materialSortInfoArray[MSurf_MaterialSortID( (pSurf0.m_SurfHandle) )].lightmapPageID;
+	int page1 = materialSortInfoArray[MSurf_MaterialSortID( (pSurf1.m_SurfHandle) )].lightmapPageID;
+	return page0 - page1 < 0;
 }
 
 void CRender::BeginUpdateLightmaps( void )
@@ -832,9 +830,8 @@ void CRender::EndUpdateLightmaps( void )
 				threadFrameCount = (threadFrameCount+1) & 1;
 			}
 
-			qsort( g_LightmapUpdateList.Base(), g_LightmapUpdateList.Count(), sizeof(decltype(g_LightmapUpdateList)::ElemType_t), LightmapPageCompareFunc );
-			int i;
-			for ( i = g_LightmapUpdateList.Count()-1; i >= 0; --i )
+			std::sort( g_LightmapUpdateList.begin(), g_LightmapUpdateList.end(), LightmapPageCompareFunc );
+			for ( intp i = g_LightmapUpdateList.Count()-1; i >= 0; --i )
 			{
 				const LightmapUpdateInfo_t &lightmapUpdateInfo = g_LightmapUpdateList.Element(i);
 				// a surface can get queued more than once if it's visible in multiple views (e.g. water reflection can do this)
