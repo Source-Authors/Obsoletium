@@ -1081,16 +1081,9 @@ static int DecalListAdd( decallist_t *pList, int count )
 }
 
 
-typedef int (__cdecl *qsortFunc_t)( const void *, const void * );
-
-static int __cdecl DecalDepthCompare( const decallist_t *elem1, const decallist_t *elem2 )
+static bool __cdecl DecalDepthCompare( const decallist_t &elem1, const decallist_t &elem2 )
 {
-	if ( elem1->depth > elem2->depth )
-		return -1;
-	if ( elem1->depth < elem2->depth )
-		return 1;
-
-	return 0;
+	return elem1.depth > elem2.depth;
 }
 
 //-----------------------------------------------------------------------------
@@ -1138,7 +1131,7 @@ int DecalListCreate( decallist_t *pList )
 	}
 
 	// Sort the decals lowest depth first, so they can be re-applied in order
-	qsort( pList, total, sizeof(decallist_t), ( qsortFunc_t )DecalDepthCompare );
+	std::sort( pList, pList + total, DecalDepthCompare );
 
 	return total;
 }
