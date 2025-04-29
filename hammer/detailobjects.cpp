@@ -96,9 +96,7 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	{
 		if (pIter->GetFirstSubKey())
 		{
-			int i = group.m_Models.AddToTail();
-
-			DetailModel_t &model = group.m_Models[i];
+			DetailModel_t &model = group.m_Models[group.m_Models.AddToTail()];
 
 			model.m_ModelName = pIter->GetString( "model", 0 );
 			if (model.m_ModelName != UTL_INVAL_SYMBOL)
