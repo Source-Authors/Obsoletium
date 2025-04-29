@@ -108,7 +108,7 @@ void processAnimations()
 	int i, j;
 
 	// find global root bone.
-	if ( strlen( rootname ) )
+	if ( !Q_isempty( rootname ) )
 	{
 		g_rootIndex = findGlobalBone( rootname );
 		if (g_rootIndex == -1)
@@ -1994,7 +1994,7 @@ void localHierarchy( s_animation_t *panim, char *pBonename, char *pParentname, i
 		MdlError("anim '%s' references unknown bone '%s' in localhierarchy\n", panim->name, pBonename );
 	}
 
-	if (strlen( pParentname ) == 0)
+	if (Q_isempty( pParentname ))
 	{
 		pRule->newparent = -1;
 	}
