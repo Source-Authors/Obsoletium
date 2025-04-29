@@ -354,7 +354,7 @@ IRender *g_EngineRenderer = &gRender;
 CRender::CRender()
 {
 	// Make sure the stack isn't empty
-	int i = m_ViewStack.Push();
+	intp i = m_ViewStack.Push();
 	memset( &m_ViewStack[i], 0, sizeof( CViewSetup ) );
 	m_ViewStack[i].m_bIs2DView = true;
 	m_iLightmapUpdateDepth = 0;
@@ -609,7 +609,7 @@ void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 {
 	Assert( !IsX360() || (pDepthTexture == NULL) ); //Don't render to a depth texture on the 360. Instead, render using a normal depth buffer and use IDirect3DDevice9::Resolve()
 
-	int i = m_ViewStack.Push( );
+	intp i = m_ViewStack.Push( );
 	m_ViewStack[i].m_View = view;
 	m_ViewStack[i].m_bIs2DView = false;
 	m_ViewStack[i].m_bNoDraw = ( ( nFlags & VIEW_NO_DRAW ) != 0 );
@@ -665,7 +665,7 @@ void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 
 void CRender::Push2DView( const CViewSetup &view, int nFlags, ITexture* pRenderTarget, Frustum frustumPlanes )
 {
-	int i = m_ViewStack.Push( );
+	intp i = m_ViewStack.Push( );
 	m_ViewStack[i].m_View = view;
 	m_ViewStack[i].m_bIs2DView = true;
 	m_ViewStack[i].m_bNoDraw = ( ( nFlags & VIEW_NO_DRAW ) != 0 );
