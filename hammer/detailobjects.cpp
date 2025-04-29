@@ -166,7 +166,7 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 					model.m_flRandomScaleStdDev = pIter->GetFloat( "spriterandomscale", 0.0f );
 
 					// sway is a percent of max sway, cl_detail_max_sway
-					float flSway = clamp( pIter->GetFloat( "sway", 0.0f ), 0.0, 1.0 );
+					float flSway = clamp( pIter->GetFloat( "sway", 0.0f ), 0.0f, 1.0f );
 					model.m_SwayAmount = (unsigned char)( 255.0 * flSway );
 
 					// shape angle
@@ -175,7 +175,7 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 
 					// shape size
 					// for the tri shape, this is the distance from the origin to the center of a side
-					float flShapeSize = clamp( pIter->GetFloat( "shape_size", 0.0f ), 0.0, 1.0 );
+					float flShapeSize = clamp( pIter->GetFloat( "shape_size", 0.0f ), 0.0f, 1.0f );
 					model.m_ShapeSize = (unsigned char)( 255.0 * flShapeSize );
 				}
 			}
@@ -507,7 +507,7 @@ void DetailObjects::EmitDetailObjectsOnFace( CMapFace *pMapFace, DetailObject_t&
 		float	area = 0.5f * normalLength;
 
 		// Calculate the detail prop density based on the expected density and the tesselated triangle area
-		int numSamples = clamp( area * detail.m_Density * 0.000001f, 0, MAX_DETAIL_SPRITES_PER_FACE );
+		int numSamples = clamp( area * detail.m_Density * 0.000001f, 0.0f, MAX_DETAIL_SPRITES_PER_FACE * 1.f );
 		
 		// For each possible sample, attempt to randomly place a detail object there
 		for (int j = 0; j < numSamples; ++j )
