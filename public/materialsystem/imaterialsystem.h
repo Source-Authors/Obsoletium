@@ -1576,7 +1576,7 @@ public:
 template< class E > inline E* IMatRenderContext::LockRenderDataTyped( int nCount, const E* pSrcData )
 {
 	int nSizeInBytes = nCount * sizeof(E);
-	E *pDstData = (E*)LockRenderData( nSizeInBytes );
+	E *pDstData = static_cast<E*>( LockRenderData( nSizeInBytes ) );
 	if ( pSrcData && pDstData )
 	{
 		memcpy( pDstData, pSrcData, nSizeInBytes );
