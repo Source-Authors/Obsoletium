@@ -1172,7 +1172,7 @@ template <typename NameArray>
 		return true;
 	}
 
-	intp newlen = prefixLength + ( intp )log10( i ) + 1;
+	intp newlen = prefixLength + static_cast<intp>( log10( i ) ) + 1;
 	if ( newlen + 1 > memsize )
 	{
 		V_strncpy( name, prefix, memsize );
