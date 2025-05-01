@@ -1131,7 +1131,12 @@ template <typename NameArray>
 		const char *pIndexStr = StringAfterPrefix( pName, prefix );
 		if ( pIndexStr )
 		{
-			int index = *pIndexStr ? atoi( pIndexStr ) : 1;
+#ifdef PLATFORM_64BITS
+			// dimhotepus: Handle 64 bit counters.
+			intp index = *pIndexStr ? strtoll( pIndexStr, nullptr, 10 ) : 1;
+#else
+			intp index = *pIndexStr ? atoi( pIndexStr ) : 1;
+#endif
 			if ( index >= freeindex )
 			{
 				// TODO - check that there isn't more junk after the index in pElementName
