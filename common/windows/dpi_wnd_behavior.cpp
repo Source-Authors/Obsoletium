@@ -198,8 +198,8 @@ BOOL CDpiWindowBehavior::ApplyDpiToWindow(bool recompute_window_size) {
     const BOOL window_has_menu{::GetMenu(m_window_handle) ? TRUE : FALSE};
 
     rc = ::AdjustWindowRectExForDpi(
-        &rc_window, GetWindowLong(m_window_handle, GWL_STYLE), window_has_menu,
-        GetWindowLong(m_window_handle, GWL_EXSTYLE), m_current_dpi_y);
+        &rc_window, GetWindowLong(m_window_handle, GWL_STYLE), window_has_menu, //-V303
+        GetWindowLong(m_window_handle, GWL_EXSTYLE), m_current_dpi_y); //-V303
     Assert(rc);
 
     if (rc) {
