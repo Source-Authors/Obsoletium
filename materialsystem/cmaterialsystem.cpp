@@ -3685,7 +3685,6 @@ int __cdecl MaterialNameCompareFunc( const void *elem1, const void *elem2 )
 
 void CMaterialSystem::DebugPrintUsedMaterials( const char *pSearchSubString, bool bVerbose )
 {
-	MaterialHandle_t	h;
 	int					i;
 	int					nNumCached;
 	int					nRefCount;
@@ -3693,9 +3692,9 @@ void CMaterialSystem::DebugPrintUsedMaterials( const char *pSearchSubString, boo
 	int					nNumErrors;
 	
 	// build a mapping to sort the material names
-	MaterialHandle_t *pSorted = (MaterialHandle_t*)stackalloc( GetNumMaterials() * sizeof(MaterialHandle_t) );
+	MaterialHandle_t *pSorted = stackallocT( MaterialHandle_t, GetNumMaterials() );
 	nSortedMaterials = 0;
-	for (h = FirstMaterial(); h != InvalidMaterial(); h = NextMaterial(h) )
+	for (auto h = FirstMaterial(); h != InvalidMaterial(); h = NextMaterial(h) )
 	{
 		pSorted[nSortedMaterials++] = h;
 	}
