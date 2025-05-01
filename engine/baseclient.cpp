@@ -16,9 +16,11 @@
 #include "GameEventManager.h"
 #include "LocalNetworkBackdoor.h"
 #include "dt_send_eng.h"
+
 #ifndef SWDS
 #include "vgui_baseui_interface.h"
 #endif
+
 #include "sv_remoteaccess.h" // NotifyDedicatedServerUI()
 #include "MapReslistGenerator.h"
 #include "sv_steamauth.h"
@@ -26,8 +28,8 @@
 #include "iregistry.h"
 #include "sv_main.h"
 #include "hltvserver.h"
-#include <ctype.h>
-#if defined( REPLAY_ENABLED )
+
+#ifdef REPLAY_ENABLED
 #include "replay_internal.h"
 #endif
 
@@ -81,14 +83,7 @@ void CBaseClient::SetRate(int nRate, bool bForce )
 
 int	CBaseClient::GetRate( void ) const
 {
-	if ( m_NetChannel )
-	{
-		return m_NetChannel->GetDataRate(); 
-	}
-	else
-	{
-		return 0;
-	}
+	return m_NetChannel ? m_NetChannel->GetDataRate() : 0; 
 }
 
 bool CBaseClient::FillUserInfo( player_info_s &userInfo )
