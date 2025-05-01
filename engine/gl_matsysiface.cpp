@@ -745,7 +745,7 @@ void BuildBrushModelVertexArray(worldbrushdata_t *pBrushData, SurfaceHandle_t su
 }
 #endif // SWDS
 
-void CMSurfaceSortList::Init( int maxSortIDs, int minMaterialLists )
+void CMSurfaceSortList::Init( int maxSortIDs, intp minMaterialLists )
 {
 	m_list.RemoveAll();
 	m_list.EnsureCapacity(minMaterialLists);
@@ -811,7 +811,7 @@ void CMSurfaceSortList::EnsureMaxSortIDs( int newMaxSortIDs )
 {
 	if ( newMaxSortIDs > m_maxSortIDs )
 	{
-		int oldMax = m_maxSortIDs;
+		intp oldMax = m_maxSortIDs;
 		// compute new size, expand by minimum of 256
 		newMaxSortIDs += 255;
 		newMaxSortIDs -= (newMaxSortIDs&255);
@@ -825,13 +825,13 @@ void CMSurfaceSortList::EnsureMaxSortIDs( int newMaxSortIDs )
 		{
 			for ( int j = newMaxSortIDs; --j >= 0; )
 			{
-				int newIndex = (i * newMaxSortIDs) + j;
+				intp newIndex = (i * newMaxSortIDs) + j;
 				if ( j < oldMax )
 				{
 					// when i == 0, the group indices overlap so they don't need to be remapped
 					if ( i != 0 )
 					{
-						int oldIndex = (i * oldMax) + j;
+						intp oldIndex = (i * oldMax) + j;
 						MarkGroupNotUsed(newIndex);
 						if ( IsGroupUsed(oldIndex) )
 						{
@@ -861,7 +861,7 @@ void CMSurfaceSortList::EnsureMaxSortIDs( int newMaxSortIDs )
 void CMSurfaceSortList::AddSurfaceToTail( msurface2_t *pSurface, int sortGroup, int sortID )
 {
 	Assert(sortGroup<MAX_MAT_SORT_GROUPS);
-	int index = groupOffset[sortGroup] + sortID;
+	intp index = groupOffset[sortGroup] + sortID;
 	surfacesortgroup_t *pGroup = &m_groups[index];
 	if ( !IsGroupUsed(index) )
 	{
@@ -869,7 +869,7 @@ void CMSurfaceSortList::AddSurfaceToTail( msurface2_t *pSurface, int sortGroup, 
 		InitGroup(pGroup);
 	}
 	materiallist_t *pList = NULL;
-	short prevIndex = -1;
+	intp prevIndex = -1;
 	int vertCount = MSurf_VertCount(pSurface);
 	int triangleCount = vertCount - 2;
 	pGroup->triangleCount += triangleCount;
@@ -900,7 +900,7 @@ void CMSurfaceSortList::AddSurfaceToTail( msurface2_t *pSurface, int sortGroup, 
 	else
 	{
 		// allocate a new block
-		short nextBlock = m_list.AddToTail();
+		intp nextBlock = m_list.AddToTail();
 		if ( prevIndex >= 0 )
 		{
 			m_list[prevIndex].nextBlock = nextBlock;
