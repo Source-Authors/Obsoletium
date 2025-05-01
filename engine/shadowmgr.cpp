@@ -2561,7 +2561,8 @@ int CShadowMgr::AddNormalShadowsToMeshBuilder( CMeshBuilder& meshBuilder, Shadow
 		}
 		else
 		{
-			pVertexCache = &m_VertexCache[info.m_pCache[i]];
+			Assert(info.m_pCache[i] <= (intp)std::numeric_limits<unsigned short>::max());
+			pVertexCache = &m_VertexCache[static_cast<unsigned short>(info.m_pCache[i])];
 		}
 
 		ShadowVertex_t* pVerts = GetCachedVerts( *pVertexCache );
@@ -2659,7 +2660,8 @@ void CShadowMgr::RenderDebuggingInfo( const ShadowRenderInfo_t &info, ShadowDebu
 		}
 		else
 		{
-			pVertexCache = &m_VertexCache[info.m_pCache[i]];
+			Assert(info.m_pCache[i] <= (intp)std::numeric_limits<unsigned short>::max());
+			pVertexCache = &m_VertexCache[static_cast<unsigned short>(info.m_pCache[i])];
 		}
 
 		ShadowVertex_t* pVerts = GetCachedVerts( *pVertexCache );
