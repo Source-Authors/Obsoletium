@@ -315,7 +315,7 @@ typename CUtlHandleTable<T, HandleBits>::EntryType_t *CUtlHandleTable<T, HandleB
 	if ( nIndex >= m_list.Count() )
 		return NULL;
 
-	const EntryType_t &entry = m_list[ nIndex ];
+	EntryType_t &entry = m_list[ nIndex ];
 	if ( entry.m_nSerial != GetSerialNumber( handle ) )
 		return NULL;
 
