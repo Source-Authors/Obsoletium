@@ -276,7 +276,8 @@ int LoadFile (const char *filename, void **bufferptr)
 	return length;
 }
 
-char *ExpandPath(char *path)
+// dimhotepus: Make const version.
+const char *ExpandPath(const char *path)
 {
 	static char full[1024];
 	if (path[0] == '/' || path[0] == '\\' || path[1] == ':')

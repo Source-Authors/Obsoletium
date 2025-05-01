@@ -413,7 +413,7 @@ char *ExpandArg(char *path) {
   return full;
 }
 
-char *ExpandPath(char *path) {
+const char *ExpandPath(const char *path) {
   static char full[1024];
   if (path[0] == '/' || path[0] == '\\' || path[1] == ':') {
     return path;
@@ -569,7 +569,7 @@ intp CmdLib_ExpandWithBasePaths(CUtlVector<CUtlString> &expandedPathList,
   intp nPathLength = 0;
 
   // Kind of redundant but it's how CmdLib_HasBasePath needs things
-  pszPath = ExpandPath(const_cast<char *>(pszPath));
+  pszPath = ExpandPath(pszPath);
 
   if (CmdLib_HasBasePath(pszPath, nPathLength)) {
     pszPath = pszPath + nPathLength;

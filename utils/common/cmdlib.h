@@ -61,7 +61,8 @@ time_t FileTime(char *path);
 void Q_mkdir(char *path);
 
 char *ExpandArg(char *path);   // expand relative to CWD
-char *ExpandPath(char *path);  // expand relative to gamedir
+// dimhotepus: Make const version.
+const char *ExpandPath(const char *path);  // expand relative to gamedir
 
 char *ExpandPathAndArchive(char *path);
 
