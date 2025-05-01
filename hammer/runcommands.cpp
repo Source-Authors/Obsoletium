@@ -193,7 +193,8 @@ void FixGameVars(char *pszSrc, OUT_Z_CAP(dstSize) char *pszDst, intp dstSize, BO
 	pDst[0] = '\0';
 }
 
-static void RemoveQuotes(IN_Z_CAP(bufferSize) char *pBuf, intp bufferSize) {
+static void RemoveQuotes(IN_Z_CAP(bufferSize) char *pBuf, intp bufferSize)
+{
 	if (Q_isempty(pBuf)) return;
 
 	if (pBuf[0] == '"')

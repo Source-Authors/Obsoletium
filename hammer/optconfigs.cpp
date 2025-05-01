@@ -58,7 +58,7 @@ bool GetPersistentEnvironmentVariable( const char *pName, char *pReturn, int siz
 void SetPersistentEnvironmentVariable( const char *pName, const char *pValue )
 {
 	HKEY hregkey; 
-	DWORD dwReturnValue = 0;
+	DWORD_PTR dwReturnValue = 0;
 
 	// Changed from HKEY_LOCAL_MACHINE to HKEY_CURRENT_USER
 	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
@@ -407,7 +407,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 
 	// load info from newly selected config into controls
 	int iCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(iCurSel));
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
 
 	BOOL bKillFields = FALSE;
 	if (pConfig == NULL)
@@ -499,8 +499,8 @@ void COPTConfigs::UpdateEntityLists(void)
 
 	CGameConfig *pConfig = m_pLastSelConfig;
 
-	int nCount = pConfig->GD.GetClassCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pConfig->GD.GetClassCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDclass *pClass = pConfig->GD.GetClass(i);
 		if (pClass->IsBaseClass())
@@ -549,7 +549,7 @@ void UpdateConfigList(CComboBox &combo)
 	DWORD dwSelID = 0xffffffff;
 	if (iCurSel != CB_ERR)
 	{
-		dwSelID = combo.GetItemData(iCurSel);
+		dwSelID = static_cast<DWORD>(combo.GetItemData(iCurSel));
 	}
 
 	combo.ResetContent();
@@ -572,7 +572,7 @@ void UpdateConfigList(CComboBox &combo)
 	int nSelIndex = -1;
 	for (int i = 0; i < Options.configs.nConfigs; i++)
 	{
-		DWORD dwData = combo.GetItemData(i);
+		DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
 		if (dwData == dwSelID)
 		{
 			nSelIndex = i;
@@ -599,7 +599,7 @@ void SelectActiveConfig(CComboBox &combo)
 			int nCount = combo.GetCount();
 			for (int i = 0; i < nCount; i++)
 			{
-				DWORD dwData = combo.GetItemData(i);
+				DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
 				if (pConfig->dwID == dwData)
 				{
 					nSelIndex = i;
@@ -662,7 +662,7 @@ BOOL COPTConfigs::OnInitDialog(void)
 	UpdateConfigList();
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	m_pInitialSelectedConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(nCurSel));
+	m_pInitialSelectedConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	m_strInitialGameDir.Empty();
 	if (m_pInitialSelectedConfig)
@@ -705,7 +705,7 @@ BOOL COPTConfigs::OnApply(void)
 	SaveInfo(m_pLastSelConfig);
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(nCurSel));
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	if ( pConfig != NULL && ConfigChanged( pConfig ) )
 	{

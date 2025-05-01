@@ -428,7 +428,7 @@ CMaterial::~CMaterial(void)
 // Finds all .VMT files in a particular directory
 //-----------------------------------------------------------------------------
 bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirectoryNameLen,
-						IMaterialEnumerator *pEnum, int nContext, int nFlags )
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags )
 {
 	//Assert( Q_strnicmp( pDirectoryName, "materials", 9 ) == 0 );
 
@@ -482,14 +482,14 @@ bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirec
 // that we can load up at a later time 
 //-----------------------------------------------------------------------------
 bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags )
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags )
 {
 	// Make sure this is an ok directory, otherwise don't bother
 	if (ShouldSkipMaterial( pDirectoryName + MATERIAL_PREFIX_LEN, nFlags ))
 		return true;
 
 	// Compute directory name length
-	int nDirectoryNameLen = Q_strlen( pDirectoryName );
+	intp nDirectoryNameLen = Q_strlen( pDirectoryName );
 
 	if (!LoadMaterialsInDirectory( pDirectoryName, nDirectoryNameLen, pEnum, nContext, nFlags ))
 		return false;
@@ -510,7 +510,7 @@ bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName,
 			{
 				if( g_pFullFileSystem->FindIsDirectory( findHandle ) )
 				{
-					int fileNameStrLen = Q_strlen( pFileName );
+					intp fileNameStrLen = Q_strlen( pFileName );
 					char *pFileNameWithPath = ( char * )stackalloc( nPathStrLen + fileNameStrLen + 1 );
 					memcpy( pFileNameWithPath, pWildCard, nPathStrLen );
 					pFileNameWithPath[nPathStrLen] = '\0';

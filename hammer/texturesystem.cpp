@@ -190,7 +190,7 @@ void CTextureSystem::FreeAllTextures()
 // Input  : pTexture - Pointer to texture to add.
 // Output : Returns the index of the texture in the master texture list.
 //-----------------------------------------------------------------------------
-int CTextureSystem::AddTexture(IEditorTexture *pTexture)
+intp CTextureSystem::AddTexture(IEditorTexture *pTexture)
 {
 	return m_Textures.AddToTail(pTexture);
 }
@@ -406,7 +406,7 @@ void CTextureSystem::AddMRU(IEditorTexture *pTex)
 	if (!m_pActiveContext)
 		return;
 
-	int nIndex = m_pActiveContext->MRU.Find(pTex);
+	intp nIndex = m_pActiveContext->MRU.Find(pTex);
 	if (nIndex != -1)
 	{
 		m_pActiveContext->MRU.Remove(nIndex);
@@ -441,7 +441,7 @@ void CTextureSystem::InformPaletteChanged()
 //-----------------------------------------------------------------------------
 TextureContext_t *CTextureSystem::FindTextureContextForConfig(CGameConfig *pConfig)
 {
-	for (int i = 0; i < m_TextureContexts.Count(); i++)
+	for (intp i = 0; i < m_TextureContexts.Count(); i++)
 	{
 		if (m_TextureContexts.Element(i).pConfig == pConfig)
 		{
@@ -483,8 +483,8 @@ void CTextureSystem::SetActiveGroup(const char *pcszName)
 	char szBuf[MAX_PATH];
 	V_sprintf_safe(szBuf, "textures\\%s", pcszName);
 
-	int iCount = m_pActiveContext->Groups.Count();
-	for (int i = 0; i < iCount; i++)
+	intp iCount = m_pActiveContext->Groups.Count();
+	for (intp i = 0; i < iCount; i++)
 	{
 		CTextureGroup *pGroup = m_pActiveContext->Groups.Element(i);
 		if (!strcmpi(pGroup->GetName(), pcszName))
@@ -633,7 +633,7 @@ void CTextureSystem::LoadMaterials(CGameConfig *pConfig)
 	
 	// Get the nodraw texture.
 	m_pNoDrawTexture = NULL;
-	for ( int i=0; i < m_Textures.Count(); i++ )
+	for ( intp i=0; i < m_Textures.Count(); i++ )
 	{
 		if ( V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 )
 		{
@@ -659,7 +659,7 @@ void CTextureSystem::RebindDefaultCubeMap()
 
 void CTextureSystem::UpdateFileChangeWatchers()
 {
-	for ( int i=0; i < m_ChangeWatchers.Count(); i++ )
+	for ( intp i=0; i < m_ChangeWatchers.Count(); i++ )
 		m_ChangeWatchers[i]->Update();
 }
 
@@ -717,7 +717,7 @@ void CTextureSystem::OnFileChange( const char *pFilename, intp context, CTexture
 //-----------------------------------------------------------------------------
 void CTextureSystem::ReloadMaterialsUsingTexture( ITexture *pTestTexture )
 {
-	for ( int i=0; i < m_Textures.Count(); i++ )
+	for ( intp i=0; i < m_Textures.Count(); i++ )
 	{
 		IEditorTexture *pEditorTex = m_Textures[i];
 		IMaterial *pMat = pEditorTex->GetMaterial( false );
@@ -772,7 +772,7 @@ void CTextureSystem::ReloadTextures( const char *pFilterName )
 {
 	MaterialSystemInterface()->ReloadMaterials( pFilterName );
 
-	for ( int i = 0; i < m_Textures.Count(); i++ )
+	for ( intp i = 0; i < m_Textures.Count(); i++ )
 	{
 		if ( !Q_stristr( pFilterName, m_Textures[i]->GetName() ) )
 			continue;
@@ -1217,7 +1217,7 @@ void CTextureSystem::LazyLoadTextures()
 TextureContext_t *CTextureSystem::AddTextureContext()
 {
 	// Allocate a new texture context.
-	int nIndex = m_TextureContexts.AddToTail();
+	intp nIndex = m_TextureContexts.AddToTail();
 
 	// Add the group to this config's list of texture groups.
 	TextureContext_t *pContext = &m_TextureContexts.Element(nIndex);

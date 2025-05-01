@@ -155,11 +155,11 @@ protected:
 
 	// Finds all .VMT files in a particular directory
 	static bool LoadMaterialsInDirectory( char const* pDirectoryName, int nDirectoryNameLen, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags );
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags );
 
 	// Discovers all .VMT files lying under a particular directory recursively
 	static bool InitDirectoryRecursive( char const* pDirectoryName, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags );
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags );
 
 	CMaterial(void);
 	bool LoadMaterialHeader(IMaterial *material);

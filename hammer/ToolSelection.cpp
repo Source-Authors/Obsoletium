@@ -1643,8 +1643,8 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 			nEntityCount++;
 			GDclass *pClass = pEntity->GetClass();
 
-			int nVarCount = pClass->GetVariableCount();
-			for (int nVar = 0; nVar < nVarCount; nVar++)
+			intp nVarCount = pClass->GetVariableCount();
+			for (intp nVar = 0; nVar < nVarCount; nVar++)
 			{
 				GDinputvariable *pVar = pClass->GetVariableAt(nVar);
 				if (pVar && ((pVar->GetType() == ivTargetDest) || (pVar->GetType() == ivTargetNameOrClass)))

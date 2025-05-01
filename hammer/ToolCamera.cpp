@@ -83,10 +83,10 @@ void Camera3D::EnsureMaxCameras()
 {
 	int nMax = max( Options.general.nMaxCameras, 1 );
 	
-	int nToRemove = Cameras.Count() - nMax;
+	intp nToRemove = Cameras.Count() - nMax;
 	if ( nToRemove > 0 )
 	{
-		m_iActiveCamera = max( m_iActiveCamera - nToRemove, 0 );
+		m_iActiveCamera = max( m_iActiveCamera - nToRemove, static_cast<intp>(0) );
 		
 		while ( nToRemove-- )
 			Cameras.Remove( 0 );

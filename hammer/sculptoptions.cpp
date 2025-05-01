@@ -1291,7 +1291,7 @@ void CSculptPushOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -2770,7 +2770,7 @@ void CSculptCarveOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{

@@ -1701,7 +1701,7 @@ void CMapView2DBase::OnRButtonDown(UINT nFlags, CPoint point)
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapView2DBase::OnTimer(UINT nIDEvent) 
+void CMapView2DBase::OnTimer(UINT_PTR nIDEvent) 
 {
 	if ( nIDEvent == TIMER_SCROLLVIEW )
 	{
