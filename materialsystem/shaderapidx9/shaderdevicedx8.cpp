@@ -420,22 +420,14 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 		pCaps->m_NullTextureFormat = IMAGE_FORMAT_RGB565;
 	}
 
-#if defined( _X360 )
-	pCaps->m_ShadowDepthTextureFormat = ReverseDepthOnX360() ? IMAGE_FORMAT_X360_DST24F : IMAGE_FORMAT_X360_DST24;
-	pCaps->m_bSupportsShadowDepthTextures = true;
-	pCaps->m_bSupportsFetch4 = false;
-	return;
-#elif defined ( DX_TO_GL_ABSTRACTION )
+#if defined ( DX_TO_GL_ABSTRACTION )
 	// We may want to only do this on the higher-end Mac SKUs, since it's not free...
 	pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST16; // This format shunts us down the right shader combo path
-
 	pCaps->m_bSupportsShadowDepthTextures = true;
-
 	pCaps->m_bSupportsFetch4 = false;
 	return;
 #endif
 
-	if ( IsPC() || !IsX360() )
 	{
 		bool bToolsMode = IsWindows() && ( CommandLine()->CheckParm( "-tools" ) != NULL );
 		bool bFound16Bit = false;
@@ -540,16 +532,6 @@ void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *p
 
 	if ( pCaps->m_nDXSupportLevel < 90 )
 		return;
-
-#ifdef _X360
-	{
-		pCaps->m_bSupportsAlphaToCoverage	 = true;
-		pCaps->m_AlphaToCoverageEnableValue	 = TRUE;
-		pCaps->m_AlphaToCoverageDisableValue = FALSE;
-		pCaps->m_AlphaToCoverageState		 = D3DRS_ALPHATOMASKENABLE;
-		return;
-	}
-#endif // _X360
 
 	if ( pCaps->m_VendorID == VENDORID_NVIDIA )
 	{
@@ -900,11 +882,6 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	pCaps->m_ZBiasAndSlopeScaledDepthBiasSupported =
 		( ( caps.RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) != 0 ) &&
 		( ( caps.RasterCaps & D3DPRASTERCAPS_SLOPESCALEDEPTHBIAS ) != 0 );
-	if ( IsX360() )
-	{
-		// driver lies, force it
-		pCaps->m_ZBiasAndSlopeScaledDepthBiasSupported = true;
-	}
 
 	// Spheremapping supported?
 	pCaps->m_bSupportsSpheremapping = (caps.VertexProcessingCaps & D3DVTXPCAPS_TEXGEN_SPHEREMAP) != 0;
@@ -937,7 +914,6 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 #endif
 	
 	// Query for SRGB support as needed for our DX 9 stuff
-	if ( IsPC() || !IsX360() )
 	{
 		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
 
@@ -945,11 +921,6 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		{
 			pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
 		}
-	}
-	else
-	{
-		// 360 does support it, but is queried in the wrong manner, so force it
-		pCaps->m_SupportsSRGB = true;
 	}
 
 	if ( CommandLine()->CheckParm( "-nosrgb" ) )
@@ -965,8 +936,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		pCaps->m_bSupportsVertexTextures = false;
 	}
 
-	// FIXME: vs30 has a fixed setting here at 4.
-	// Future hardware will need some other way of computing this.
+	// Up t0 4 vertex textures supported (D3DVERTEXTEXTURESAMPLER0..3).
 	pCaps->m_nVertexTextureCount = pCaps->m_bSupportsVertexTextures ? 4 : 0;
 
 	// FIXME: How do I actually compute this?
@@ -1203,12 +1173,6 @@ void CShaderDeviceMgrDx8::ComputeDXSupportLevel( HardwareCaps_t &caps )
 
 	// FIXME: Improve this!! There should be a whole list of features
 	// we require in order to be considered a DX7 board, DX8 board, etc.
-
-	if ( IsX360() )
-	{
-		caps.m_nMaxDXSupportLevel = 98;
-		return;
-	}
 
 	bool bIsOpenGL = IsOpenGL();
 
