@@ -83,9 +83,9 @@ void AddScriptToStack (const char *filename, ScriptPathMode_t pathMode = SCRIPT_
 		Error ("script file exceeded MAX_INCLUDES");
 	
 	if ( pathMode == SCRIPT_USE_RELATIVE_PATH )
-		Q_strncpy( script->filename, filename, sizeof( script->filename ) );
+		V_strcpy_safe( script->filename, filename );
 	else
-		Q_strncpy (script->filename, ExpandPath (filename), sizeof( script->filename ) );
+		V_strcpy_safe( script->filename, ExpandPath (filename) );
 
 	int size = LoadFile (script->filename, (void **)&script->buffer);
 
