@@ -31,7 +31,8 @@ struct VisibleFogVolumeInfo_t;
 struct LightmapUpdateInfo_t
 {
 	SurfaceHandle_t m_SurfHandle;
-	int				transformIndex;
+	// dimhotepus: int -> intp
+	intp			transformIndex;
 };
 
 struct LightmapTransformInfo_t

@@ -1101,7 +1101,7 @@ void DrawSurfaceID( SurfaceHandle_t surfID, const Vector &vecCentroid )
 
 void DrawSurfaceIDAsInt( SurfaceHandle_t surfID, const Vector &vecCentroid )
 {
-	int nInt = (msurface2_t*)surfID - host_state.worldbrush->surfaces2;
+	intp nInt = (msurface2_t*)surfID - host_state.worldbrush->surfaces2;
 	char buf[16];
 	V_to_chars( buf, nInt );
 	CDebugOverlay::AddTextOverlay( vecCentroid, 0, buf );
@@ -1624,7 +1624,7 @@ static void Shader_BuildDynamicLightmaps( CWorldRenderList *pRenderList )
 #if 0
 		int updateStart = g_LightmapUpdateList.Count();
 #endif
-		for ( int i = pRenderList->m_DlightSurfaces[nSortGroup].Count()-1; i >= 0; --i )
+		for ( intp i = pRenderList->m_DlightSurfaces[nSortGroup].Count()-1; i >= 0; --i )
 		{
 			LightmapUpdateInfo_t tmp;
 			tmp.m_SurfHandle = pRenderList->m_DlightSurfaces[nSortGroup].Element(i);
@@ -2192,7 +2192,7 @@ static void Shader_WorldEnd( CWorldRenderList *pRenderList, unsigned long flags,
 		AddProjectedTextureDecalsToList( pRenderList, nSortGroup );
 
 		// Adds shadows to render lists
-		for ( int j = pRenderList->m_ShadowHandles[nSortGroup].Count()-1; j >= 0; --j )
+		for ( intp j = pRenderList->m_ShadowHandles[nSortGroup].Count()-1; j >= 0; --j )
 		{
 			g_pShadowMgr->AddShadowsOnSurfaceToRenderList( pRenderList->m_ShadowHandles[nSortGroup].Element(j) );
 		}
@@ -2308,7 +2308,7 @@ void Shader_DrawTranslucentSurfaces( IWorldRenderList *pRenderListIn, int sortIn
 		pRenderList->m_AlphaSortList.GetSurfaceListForGroup( surfaceList, group );
 
 		// Interate in back-to-front order
-		for ( int listIndex = surfaceList.Count(); --listIndex >= 0; )
+		for ( intp listIndex = surfaceList.Count(); --listIndex >= 0; )
 		{
 			SurfaceHandle_t surfID = surfaceList[listIndex];
 			pRenderContext->Bind( MSurf_TexInfo( surfID )->material );
