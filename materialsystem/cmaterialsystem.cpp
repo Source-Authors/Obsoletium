@@ -134,7 +134,7 @@ ILauncherMgr *g_pLauncherMgr = NULL;	// set in CMaterialSystem::Connect
 //-----------------------------------------------------------------------------
 // Factory used to get at internal interfaces (used by shaderapi + shader dlls)
 //-----------------------------------------------------------------------------
-void *ShaderFactory( const char *pName, int *pReturnCode )
+static void *ShaderFactory( const char *pName, int *pReturnCode )
 {
 	if (pReturnCode)
 	{
