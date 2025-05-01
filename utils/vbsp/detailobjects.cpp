@@ -105,7 +105,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	// Sort the group by alpha
 	float alpha = pGroupKeyValues->GetFloat( "alpha", 1.0f );
 	
-	int i = s_DetailObjectDict[detailId].m_Groups.Count();
+	intp i = s_DetailObjectDict[detailId].m_Groups.Count();
 	while ( --i >= 0 )
 	{
 		if (alpha > s_DetailObjectDict[detailId].m_Groups[i].m_Alpha)
@@ -125,7 +125,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	{
 		if (pIter->GetFirstSubKey())
 		{
-			int i = group.m_Models.AddToTail();
+			intp i = group.m_Models.AddToTail();
 
 			DetailModel_t &model = group.m_Models[i];
 
@@ -261,7 +261,7 @@ static void ParseDetailObjectFile( KeyValues& keyValues )
 		if (!pIter->GetFirstSubKey())
 			continue;
 
-		int i = s_DetailObjectDict.AddToTail( );
+		intp i = s_DetailObjectDict.AddToTail( );
 		s_DetailObjectDict[i].m_Name = pIter->GetName() ;
 		s_DetailObjectDict[i].m_Density = pIter->GetFloat( "density", 0.0f );
 
@@ -473,7 +473,7 @@ static void AddDetailToLump( const char* pModelName, const Vector& pt, const QAn
 	}
 
 	// Insert an element into the object dictionary if it aint there...
-	int i = s_DetailObjectLump.AddToTail( );
+	intp i = s_DetailObjectLump.AddToTail( );
 
 	DetailObjectLump_t& objectLump = s_DetailObjectLump[i];
 	objectLump.m_DetailModel = AddDetailDictLump( pModelName ); 
@@ -499,7 +499,7 @@ static void AddDetailSpriteToLump( const Vector &vecOrigin, const QAngle &vecAng
 									int iShapeAngle = 0, int iShapeSize = 0, int iSwayAmount = 0 )
 {
 	// Insert an element into the object dictionary if it aint there...
-	int i = s_DetailObjectLump.AddToTail( );
+	intp i = s_DetailObjectLump.AddToTail( );
 
 	if (i >= 65535)
 	{
@@ -863,7 +863,7 @@ void EmitDetailModels()
 		// Get the detail type...
 		DetailObject_t search;
 		search.m_Name = pDetailType;
-		int objectType = s_DetailObjectDict.Find(search);
+		intp objectType = s_DetailObjectDict.Find(search);
 		if (objectType < 0)
 		{
 			Warning("Material %s uses unknown detail object type %s!\n",	
