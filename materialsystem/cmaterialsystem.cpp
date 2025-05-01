@@ -268,17 +268,17 @@ void CMaterialSystem::CreateCompositorMaterials()
 //-----------------------------------------------------------------------------
 void CMaterialSystem::CleanUpCompositorMaterials()
 {
-	FOR_EACH_VEC( m_pCompositorMaterials, i )
+	for ( auto *m :  m_pCompositorMaterials )
 	{
-		if ( m_pCompositorMaterials[ i ] == NULL )
+		if ( m == nullptr )
 			continue;
 
-		m_pCompositorMaterials[ i ]->DecrementReferenceCount();
+		m->DecrementReferenceCount();
 
 		// dimhotepus: Remove only loaded material, as nothing to remove + warning for not loaded one.
-		if ( !m_pCompositorMaterials[i]->IsErrorMaterial() )
+		if ( !m->IsErrorMaterial() )
 		{
-			RemoveMaterial( m_pCompositorMaterials[ i ] );
+			RemoveMaterial( m );
 		}
 	}
 
@@ -296,11 +296,11 @@ void CMaterialSystem::CleanUpDebugMaterials()
 		RemoveMaterial( m_pDrawFlatMaterial );
 		m_pDrawFlatMaterial = NULL;
 
-		for ( int i = BUFFER_CLEAR_NONE; i < BUFFER_CLEAR_TYPE_COUNT; ++i )
+		for ( auto &b : m_pBufferClearObeyStencil )
 		{
-			m_pBufferClearObeyStencil[i]->DecrementReferenceCount();
-			RemoveMaterial( m_pBufferClearObeyStencil[i] );
-			m_pBufferClearObeyStencil[i] = NULL;
+			b->DecrementReferenceCount();
+			RemoveMaterial( b );
+			b = nullptr;
 		}
 
 		ShaderSystem()->CleanUpDebugMaterials();
@@ -1228,9 +1228,9 @@ void CMaterialSystem::ReleaseShaderObjects()
 	TextureManager()->ReleaseTextures();
 	ReleaseStandardTextures();
 	GetLightmaps()->ReleaseLightmapPages();
-	for (int i = 0; i < m_ReleaseFunc.Count(); ++i)
+	for (auto f : m_ReleaseFunc)
 	{
-		m_ReleaseFunc[i]();
+		f();
 	}
 }
 
@@ -1266,9 +1266,9 @@ void CMaterialSystem::RestoreShaderObjects( CreateInterfaceFn shaderFactory, int
 	AllocateStandardTextures();
 	GetLightmaps()->RestoreLightmapPages();
 	g_pOcclusionQueryMgr->AllocOcclusionQueryObjects();
-	for (int i = 0; i < m_RestoreFunc.Count(); ++i)
+	for (auto f : m_RestoreFunc)
 	{
-		m_RestoreFunc[i]( nChangeFlags );
+		f( nChangeFlags );
 	}
 	TextureManager()->RestoreNonRenderTargetTextures( );
 }
