@@ -175,9 +175,9 @@ static const char *PrefixMessageGroup(
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+    V_sprintf_safe(out, "[%s] %s", out_group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    V_sprintf_safe(out, "%s", message);
   }
 
   return out;
@@ -405,9 +405,9 @@ char *ExpandArg(char *path) {
   if (path[0] != '/' && path[0] != '\\' && path[1] != ':') {
     CmdLib_getwd(full, sizeof(full));
 
-    Q_strncat(full, path, sizeof(full), COPY_ALL_CHARACTERS);
+    V_strcat_safe(full, path);
   } else {
-    Q_strncpy(full, path, sizeof(full));
+    V_strcpy_safe(full, path);
   }
 
   return full;
