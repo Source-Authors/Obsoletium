@@ -242,15 +242,11 @@ static bool s_bSortAscendingSecondary = true;
 //-----------------------------------------------------------------------------
 // Purpose: Basic sort function, for use in qsort
 //-----------------------------------------------------------------------------
-static int __cdecl AscendingSortFunc(const void *elem1, const void *elem2)
+static bool __cdecl AscendingSortFunc(const int itemID1, const int itemID2)
 {
-	int itemID1 = *((int *) elem1);
-	int itemID2 = *((int *) elem2);
-
 	// convert the item index into the ListPanelItem pointers
-	vgui::ListPanelItem *p1, *p2;
-	p1 = s_pCurrentSortingListPanel->GetItemData(itemID1);
-	p2 = s_pCurrentSortingListPanel->GetItemData(itemID2);
+	vgui::ListPanelItem *p1 = s_pCurrentSortingListPanel->GetItemData(itemID1);
+	vgui::ListPanelItem *p2 = s_pCurrentSortingListPanel->GetItemData(itemID2);
 	
 	int result = s_pSortFunc( s_pCurrentSortingListPanel, *p1, *p2 );
 	if (result == 0)
@@ -285,7 +281,7 @@ static int __cdecl AscendingSortFunc(const void *elem1, const void *elem2)
 		}
 	}
 
-	return result;
+	return result < 0;
 }
 
 
@@ -2668,7 +2664,7 @@ void ListPanel::SortList( void )
 	}
 
 	// quick sort the list
-	qsort(m_VisibleItems.Base(), (size_t) m_VisibleItems.Count(), (size_t) sizeof(int), AscendingSortFunc);
+	std::sort(m_VisibleItems.begin(), m_VisibleItems.end(), AscendingSortFunc);
 
 	if ( screenPosition != -1 )
 	{
