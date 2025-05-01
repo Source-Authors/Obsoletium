@@ -25,17 +25,8 @@
 #include "vstdlib/IKeyValuesSystem.h"
 #include "ctexturecompositor.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 // NOTE: This must be the last file included!!!
 #include "tier0/memdbgon.h"
-
-#ifdef POSIX
-#define _finite finite
-#endif
 
 // this is hooked into the engines convar
 ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
@@ -98,13 +89,11 @@ CThreadFastMutex g_MatSysMutex;
 //-----------------------------------------------------------------------------
 // Purpose: additional materialsystem information, internal use only
 //-----------------------------------------------------------------------------
-#ifndef _X360
 struct MaterialSystem_Config_Internal_t
 {
 	int r_waterforceexpensive;
 };
 MaterialSystem_Config_Internal_t g_config_internal;
-#endif
 
 //-----------------------------------------------------------------------------
 // Necessary to allow the shader DLLs to get ahold of IMaterialSystemHardwareConfig
@@ -245,12 +234,6 @@ void CMaterialSystem::CreateDebugMaterials()
 		pVMTKeyValues->SetInt( "$vertexcolor", 1 );
 		m_pBufferClearObeyStencil[BUFFER_CLEAR_COLOR_AND_ALPHA_AND_DEPTH] = static_cast<IMaterialInternal*>(CreateMaterial( "___buffer_clear_obey_stencil7.vmt", pVMTKeyValues ))->GetRealTimeVersion();
 
-		if ( IsX360() )
-		{
-			pVMTKeyValues = new KeyValues( "RenderTargetBlit_X360" );
-			m_pRenderTargetBlitMaterial = static_cast<IMaterialInternal*>(CreateMaterial( "___renderTargetBlit.vmt", pVMTKeyValues ))->GetRealTimeVersion();
-		}
-
 		ShaderSystem()->CreateDebugMaterials();
 	}
 }
@@ -318,13 +301,6 @@ void CMaterialSystem::CleanUpDebugMaterials()
 			m_pBufferClearObeyStencil[i]->DecrementReferenceCount();
 			RemoveMaterial( m_pBufferClearObeyStencil[i] );
 			m_pBufferClearObeyStencil[i] = NULL;
-		}
-
-		if ( IsX360() )
-		{
-			m_pRenderTargetBlitMaterial->DecrementReferenceCount();
-			RemoveMaterial( m_pRenderTargetBlitMaterial );
-			m_pRenderTargetBlitMaterial = NULL;
 		}
 
 		ShaderSystem()->CleanUpDebugMaterials();
@@ -488,8 +464,6 @@ bool CMaterialSystem::HasShaderAPI() const
 
 bool CMaterialSystem::Connect( CreateInterfaceFn factory )
 {
-//	__stop__();
-	
 	if ( !factory )
 		return false;
 
@@ -1569,7 +1543,7 @@ static void MatProxyCallback( IConVar *pConVar, const char *old, float flOldValu
 // Convars that control the config record
 //-----------------------------------------------------------------------------
 static ConVar mat_vsync(			"mat_vsync", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Force sync to vertical retrace", true, 0.0, true, 1.0 );
-static ConVar mat_forcehardwaresync( "mat_forcehardwaresync", IsPC() ? "1" : "0", FCVAR_ALLOWED_IN_COMPETITIVE );
+static ConVar mat_forcehardwaresync( "mat_forcehardwaresync", "1", FCVAR_ALLOWED_IN_COMPETITIVE );
 
 // Texture-related
 static ConVar mat_trilinear(		"mat_trilinear", "0", FCVAR_ALLOWED_IN_COMPETITIVE );
@@ -1616,11 +1590,7 @@ static ConVar mat_monitorgamma_tv_range_min( "mat_monitorgamma_tv_range_min", "1
 static ConVar mat_monitorgamma_tv_range_max( "mat_monitorgamma_tv_range_max", "255" );
 // TV's generally have a 2.5 gamma, so we need to convert our 2.2 frame buffer into a 2.5 frame buffer for display on a TV
 static ConVar mat_monitorgamma_tv_exp( "mat_monitorgamma_tv_exp", "2.5", 0, "", true, 1.0f, true, 4.0f );
-#ifdef _X360
-static ConVar mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled", "1", FCVAR_ARCHIVE, "" );
-#else
 static ConVar mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled", "0", FCVAR_ARCHIVE, "" );
-#endif
 
 static ConVar mat_antialias(		"mat_antialias", "0", FCVAR_ARCHIVE );
 static ConVar mat_aaquality(		"mat_aaquality", "0", FCVAR_ARCHIVE );
@@ -1655,9 +1625,7 @@ static ConVar mat_fastnobump(		"mat_fastnobump", "0", FCVAR_CHEAT ); // Binds 1-
 // These are not controlled by the material system, but are limited by settings in the material system
 static ConVar r_shadowrendertotexture(		"r_shadowrendertotexture", "0", FCVAR_ARCHIVE );
 static ConVar r_flashlightdepthtexture(		"r_flashlightdepthtexture", "1" );
-#ifndef _X360
 static ConVar r_waterforceexpensive(		"r_waterforceexpensive", "0", FCVAR_ARCHIVE );
-#endif
 static ConVar r_waterforcereflectentities(	"r_waterforcereflectentities", "0", FCVAR_ALLOWED_IN_COMPETITIVE );
 static ConVar mat_motion_blur_enabled( "mat_motion_blur_enabled", "0", FCVAR_ARCHIVE );
 
