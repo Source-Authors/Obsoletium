@@ -151,7 +151,7 @@ inline int NumComponents( DmAttributeType_t type )
 	case AT_COLOR: //rgba
 	case AT_VECTOR4:
 	case AT_QUATERNION:
-		return 4;
+		return 4; //-V112
 
 	case AT_VMATRIX:
 		return 16;
