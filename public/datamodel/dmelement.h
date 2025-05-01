@@ -567,9 +567,7 @@ int DmeEstimateMemorySize( T* )
 			baseClassName( handle, pElementTypeName, id, pElementName, fileid )					\
 		{																						\
 		}																						\
-		virtual ~className()																	\
-		{																						\
-		}																						\
+		virtual ~className() = default;															\
 		void OnConstruction();																	\
 		void OnDestruction();																	\
 		virtual void PerformConstruction()														\
