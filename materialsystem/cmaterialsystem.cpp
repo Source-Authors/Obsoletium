@@ -61,7 +61,7 @@ IMaterialInternal *g_pErrorMaterial = NULL;
 
 CreateInterfaceFn g_fnMatSystemConnectCreateInterface = NULL;  
 
-static int ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const char *pszPathName);
+static intp ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const char *pszPathName);
 
 //#define PERF_TESTING 1
 
@@ -4889,9 +4889,9 @@ void CMaterialSystem::InitReplacementsFromFile( const char *pszPathName )
 	char szBaseName[MAX_PATH];
 	V_sprintf_safe( szBaseName, "%s/replacements.txt", pszPathName );
 
-	int replacementCount = ReadListFromFile( &replacementFiles, szBaseName );
+	intp replacementCount = ReadListFromFile( &replacementFiles, szBaseName );
 	
-	for ( int i = 0; i < replacementCount; ++i ) 
+	for ( intp i = 0; i < replacementCount; ++i ) 
 	{
 		V_sprintf_safe( szBaseName, "%s/%s/replacements.vmt", pszPathName, replacementFiles[i] );
 		if ( g_pFullFileSystem->FileExists(szBaseName) )
@@ -5187,7 +5187,7 @@ CON_COMMAND( mat_hdr_enabled, "Report if HDR is enabled for debugging" )
 }
 
 
-static int ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const char *pszPathName)
+static intp ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const char *pszPathName)
 {
 	Assert(outReplacementMaterials != NULL);
 	Assert(pszPathName != NULL);
