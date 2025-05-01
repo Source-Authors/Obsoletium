@@ -437,10 +437,8 @@ void CMaterialSystem::SetShaderAPI( char const *pShaderAPIDLL )
 
 	// m_pShaderDLL is needed to spew driver info
 	Assert( pShaderAPIDLL );
-	intp len = Q_strlen( pShaderAPIDLL ) + 1;
-	m_pShaderDLL = new char[len];
-	memcpy( m_pShaderDLL, pShaderAPIDLL, len );
 
+	m_pShaderDLL = V_strdup( pShaderAPIDLL );
 	m_ShaderAPIFactory = CreateShaderAPI( pShaderAPIDLL );
 	if ( !m_ShaderAPIFactory )
 	{
