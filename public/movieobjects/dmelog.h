@@ -748,7 +748,7 @@ template<>
 inline float Normalize( const Color& val )
 {
 	float sum = 0.0f;
-	for ( int i = 0 ; i < 4; ++i )
+	for ( int i = 0 ; i < 4; ++i ) //-V112
 	{
 		sum += val[ i ];
 	}
