@@ -137,7 +137,7 @@ inline char *MemAlloc_StrDup(const char *pString, const char *pFileName, unsigne
 		return nullptr;
 
 	const size_t len = strlen(pString) + 1;
-	if (char* pMemory = (char *)g_pMemAlloc->Alloc(len, pFileName, nLine); pMemory != nullptr)
+	if (char* pMemory = static_cast<char *>(g_pMemAlloc->Alloc(len, pFileName, nLine)); pMemory != nullptr)
 	{
 		return strcpy( pMemory, pString );
 	}
@@ -151,7 +151,7 @@ inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString, const char *pFileName,
 		return nullptr;
 
 	const size_t len = wcslen(pString) + 1;
-	if (wchar_t *pMemory = (wchar_t *)g_pMemAlloc->Alloc(len * sizeof(wchar_t), pFileName, nLine); pMemory != nullptr)
+	if (wchar_t *pMemory = static_cast<wchar_t *>(g_pMemAlloc->Alloc(len * sizeof(wchar_t), pFileName, nLine)); pMemory != nullptr)
 	{
 		return wcscpy( pMemory, pString );
 	}

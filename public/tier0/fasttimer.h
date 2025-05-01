@@ -482,7 +482,7 @@ private:
 //-----------------------------------------------------------------------------
 inline void CLimitTimer::SetLimit( uint64 cMicroSecDuration )
 {
-	uint64 dlCycles = ( ( uint64 ) cMicroSecDuration * g_ClockSpeed ) / ( uint64 ) 1000000L;
+	uint64 dlCycles = static_cast<uint64>( cMicroSecDuration ) * g_ClockSpeed / 1000000ULL;
 	CCycleCount cycleCount;
 	cycleCount.Sample( );
 	m_lCycleLimit = cycleCount.GetLongCycles( ) + dlCycles;
@@ -514,7 +514,7 @@ inline int CLimitTimer::CMicroSecOverage() const
 	if ( lcCycles < m_lCycleLimit )
 		return 0;
 
-	return( ( int ) ( ( lcCycles - m_lCycleLimit ) * 1000000ULL / g_ClockSpeed ) );
+	return static_cast<int>( ( lcCycles - m_lCycleLimit ) * 1000000ULL / g_ClockSpeed );
 }
 
 
@@ -531,7 +531,7 @@ inline uint64 CLimitTimer::CMicroSecLeft() const
 	if ( lcCycles >= m_lCycleLimit )
 		return 0;
 
-	return( ( uint64 ) ( ( m_lCycleLimit - lcCycles ) * 1000000ULL / g_ClockSpeed ) );
+	return static_cast<uint64>( ( m_lCycleLimit - lcCycles ) * 1000000ULL / g_ClockSpeed );
 }
 
 
