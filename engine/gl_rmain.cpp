@@ -203,11 +203,9 @@ void R_DrawPortals()
 		CMeshBuilder builder;
 		builder.Begin( pMesh, MATERIAL_LINES, pAreaPortal->m_nClipPortalVerts );
 
-		for( int j=0; j < pAreaPortal->m_nClipPortalVerts; j++ )
+		for( unsigned short j=0; j < pAreaPortal->m_nClipPortalVerts; j++ )
 		{
-			unsigned short iVert;
-
-			iVert = pAreaPortal->m_FirstClipPortalVert + j;
+			unsigned short iVert = pAreaPortal->m_FirstClipPortalVert + j;
 			builder.Position3f( VectorExpand( pBrushData->m_pClipPortalVerts[iVert] ) );
 			builder.Color4f( 0, 0, 0, 1 );
 			builder.AdvanceVertex();
