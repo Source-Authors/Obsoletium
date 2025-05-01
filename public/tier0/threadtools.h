@@ -1802,7 +1802,7 @@ inline void CThreadRWLock::UnlockRead()
 //
 //-----------------------------------------------------------------------------
 
-inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, LockInfo_t &comperand )
+inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, LockInfo_t &comperand ) //-V835
 {
 	return m_lockInfo.compare_exchange_strong(comperand, newValue);
 }

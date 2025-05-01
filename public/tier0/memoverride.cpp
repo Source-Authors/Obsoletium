@@ -432,7 +432,7 @@ void *__cdecl operator new( size_t nSize )
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL)
 _Post_writable_byte_size_(size) __declspec(allocator)
-void *__cdecl operator new( size_t size, ::std::nothrow_t const & ) noexcept
+void *__cdecl operator new( size_t size, ::std::nothrow_t const & ) noexcept //-V835
 {
 	return AllocUnattributed( size );
 }
@@ -448,7 +448,7 @@ void *__cdecl operator new[]( size_t nSize )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void *__cdecl operator new[]( size_t nSize, std::nothrow_t const& ) noexcept
+void *__cdecl operator new[]( size_t nSize, std::nothrow_t const& ) noexcept //-V835
 {
 	return AllocUnattributed( nSize );
 }
@@ -462,7 +462,7 @@ void* __cdecl operator new( std::size_t nSize, std::align_val_t align )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept
+void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
@@ -474,7 +474,7 @@ void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept
+void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
@@ -493,7 +493,7 @@ void __cdecl operator delete( void* pMem, std::align_val_t align ) noexcept
 	MemAlloc_FreeAligned( pMem );
 }
 
-void __cdecl operator delete( void* pMem, std::align_val_t align, std::nothrow_t const& ) noexcept
+void __cdecl operator delete( void* pMem, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 #ifdef _WIN32
 	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
@@ -535,7 +535,7 @@ void __cdecl operator delete[]( void* ptr, std::align_val_t align ) noexcept
 	MemAlloc_FreeAligned(ptr);
 }
 
-void __cdecl operator delete[]( void* ptr, std::align_val_t align, std::nothrow_t const& ) noexcept
+void __cdecl operator delete[]( void* ptr, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 #ifdef _WIN32
 	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
@@ -598,7 +598,7 @@ void __cdecl operator delete( void *pMem ) noexcept
 	g_pMemAlloc->Free( pMem );
 }
 
-void __cdecl operator delete( void *block, ::std::nothrow_t const & ) noexcept
+void __cdecl operator delete( void *block, ::std::nothrow_t const & ) noexcept //-V835
 {
 	g_pMemAlloc->Free( block );
 }
