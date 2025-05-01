@@ -80,7 +80,7 @@
 template <typename T>
 [[nodiscard]] inline unsigned HashItem( const T &item )
 {
-	if constexpr ( sizeof(item) == 4 )
+	if constexpr ( sizeof(item) == 4 ) //-V112
 		return Hash4( &item );
 	if constexpr ( sizeof(item) == 8 )
 		return Hash8( &item );
