@@ -2139,11 +2139,9 @@ static int CompareVertexFormats( VertexFormat_t Fmt1, VertexFormat_t Fmt2 )
 
 int CMatRenderContext::CompareMaterialCombos( IMaterial *pMaterial1, IMaterial *pMaterial2, int lightMapID1, int lightMapID2 )
 {
-	pMaterial1 = ((IMaterialInternal *)pMaterial1)->GetRealTimeVersion(); //always work with the real time version of materials internally.
-	pMaterial2 = ((IMaterialInternal *)pMaterial2)->GetRealTimeVersion(); //always work with the real time version of materials internally.
+	IMaterialInternal *pMat1 = ((IMaterialInternal *)pMaterial1)->GetRealTimeVersion(); //always work with the real time version of materials internally.
+	IMaterialInternal *pMat2 = ((IMaterialInternal *)pMaterial2)->GetRealTimeVersion(); //always work with the real time version of materials internally.
 
-	IMaterialInternal *pMat1 = (IMaterialInternal *)pMaterial1;
-	IMaterialInternal *pMat2 = (IMaterialInternal *)pMaterial2;
 	ShaderRenderState_t *pState1 = pMat1->GetRenderState();
 	ShaderRenderState_t *pState2 = pMat2->GetRenderState();
 	int dPass = pState2->m_pSnapshots->m_nPassCount - pState1->m_pSnapshots->m_nPassCount;
