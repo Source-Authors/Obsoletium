@@ -170,9 +170,9 @@ struct RGBA8888_t
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...
 	unsigned char b;		//  Last one is MSB, 1st is LSB.
 	unsigned char a;
-	inline RGBA8888_t& operator=( const BGRA8888_t& in );
-	inline RGBA8888_t& operator=( const RGB888_t& in );
-	inline RGBA8888_t& operator=( const BGRX8888_t& in );
+	inline RGBA8888_t& operator=( BGRA8888_t in );
+	inline RGBA8888_t& operator=( RGB888_t in );
+	inline RGBA8888_t& operator=( BGRX8888_t in );
 };
 
 struct RGB888_t
@@ -180,7 +180,7 @@ struct RGB888_t
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
-	inline RGB888_t& operator=( const BGRA8888_t& in )
+	inline RGB888_t& operator=( BGRA8888_t in )
 	{
 		r = in.r;
 		g = in.g;
@@ -202,7 +202,7 @@ struct BGR888_t
 	unsigned char b;
 	unsigned char g;
 	unsigned char r;
-	inline BGR888_t& operator=( const BGRA8888_t& in )
+	inline BGR888_t& operator=( BGRA8888_t in )
 	{
 		r = in.r;
 		g = in.g;
@@ -216,7 +216,7 @@ struct BGR565_t
 	unsigned short b : 5;		// order of names changes
 	unsigned short g : 6;		//  byte order of output to 32 bit
 	unsigned short r : 5;
-	inline BGR565_t& operator=( const BGRA8888_t& in )
+	inline BGR565_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 3;
 		g = in.g >> 2;
@@ -238,7 +238,7 @@ struct BGRA5551_t
 	unsigned short g : 5;		//  byte order of output to 32 bit
 	unsigned short r : 5;
 	unsigned short a : 1;
-	inline BGRA5551_t& operator=( const BGRA8888_t& in )
+	inline BGRA5551_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 3;
 		g = in.g >> 3;
@@ -254,7 +254,7 @@ struct BGRA4444_t
 	unsigned short g : 4;		//  byte order of output to 32 bit
 	unsigned short r : 4;
 	unsigned short a : 4;
-	inline BGRA4444_t& operator=( const BGRA8888_t& in )
+	inline BGRA4444_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 4;
 		g = in.g >> 4;
@@ -270,7 +270,7 @@ struct RGBX5551_t
 	unsigned short g : 5;
 	unsigned short b : 5;
 	unsigned short x : 1;
-	inline RGBX5551_t& operator=( const BGRA8888_t& in )
+	inline RGBX5551_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 3;
 		g = in.g >> 3;
@@ -283,7 +283,7 @@ struct RGBX5551_t
 //-----------------------------------------------------------------------------
 // Conversion assignments
 //-----------------------------------------------------------------------------
-RGBA8888_t& RGBA8888_t::operator=( const BGRA8888_t& in )
+RGBA8888_t& RGBA8888_t::operator=( BGRA8888_t in )
 {
 	r = in.r;
 	g = in.g;
@@ -292,7 +292,7 @@ RGBA8888_t& RGBA8888_t::operator=( const BGRA8888_t& in )
 	return *this;
 }
 
-RGBA8888_t& RGBA8888_t::operator=( const RGB888_t& in )
+RGBA8888_t& RGBA8888_t::operator=( RGB888_t in )
 {
 	r = in.r;
 	g = in.g;
@@ -301,7 +301,7 @@ RGBA8888_t& RGBA8888_t::operator=( const RGB888_t& in )
 	return *this;
 }
 
-RGBA8888_t& RGBA8888_t::operator=( const BGRX8888_t& in )
+RGBA8888_t& RGBA8888_t::operator=( BGRX8888_t in )
 {
 	r = in.r;
 	g = in.g;

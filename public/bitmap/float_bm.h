@@ -38,7 +38,7 @@ struct PixRGBA8
 	unsigned char Alpha;
 };
 
-[[nodiscard]] constexpr inline PixRGBAF PixRGBA8_to_F( PixRGBA8 const &x )
+[[nodiscard]] constexpr inline PixRGBAF PixRGBA8_to_F( PixRGBA8 x )
 {
 	PixRGBAF f{x.Red / 255.f, x.Green / 255.f, x.Blue / 255.f, x.Alpha / 255.f};
 	return f;
