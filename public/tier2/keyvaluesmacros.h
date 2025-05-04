@@ -23,6 +23,6 @@ class KeyValues;
 // #update updates sibling KeyValues blocks subkeys with its subkeys, overwriting and adding
 // KeyValues as necessary
 //--------------------------------------------------------------------------------------------------
-[[nodiscard]] KeyValues *HandleKeyValuesMacros( KeyValues *kv, KeyValues *pkvParent = nullptr );
+KeyValues *HandleKeyValuesMacros( KeyValues *kv, KeyValues *pkvParent = nullptr );
 
 #endif  // SE_TIER2_KEYVALUESMACROS_H_
