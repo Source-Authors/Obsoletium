@@ -244,7 +244,7 @@ void VGui_DrawPopups( void )
 //-----------------------------------------------------------------------------
 void VGui_DrawHierarchy( void )
 {
-	if ( VGUI_DRAWTREE <= 0 && Q_strlen( VGUI_DRAWPANEL ) <= 0 )
+	if constexpr ( VGUI_DRAWTREE <= 0 && ssize( VGUI_DRAWPANEL ) <= 1 )
 		return;
 
 	Msg( "\n" );
