@@ -631,7 +631,6 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 
 	bool bFoundReference = false;
 	bool bFoundCollision = false;
-	bool bFoundLOD = false;
 
 	//iterate through .smd files
 	const char *startName = pszScene;
@@ -663,8 +662,6 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 
 			if ( !strncmp( filenameEnd, "_lod", 4) )
 			{
-				bFoundLOD = true;
-
 				//we found an LOD smd.
 				char lodName[255];
 				V_sprintf_safe( lodName, "lod%d", currentLOD );
