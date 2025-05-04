@@ -39,7 +39,7 @@ struct StringChoice_t
 
 struct ElementChoice_t
 {
-	ElementChoice_t() {}
+	ElementChoice_t() = default;
 	ElementChoice_t( CDmElement *pValue, const char *pChoiceString = NULL ) : m_pValue( pValue ), m_pChoiceString( pChoiceString ) {}
 	CDmElement *m_pValue;
 	const char *m_pChoiceString;
@@ -101,33 +101,34 @@ public:
 class CBaseElementPropertiesChoices : public IElementPropertiesChoices
 {
 public:
-	virtual bool GetBoolChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-		const char *pAttributeName, bool bArrayElement, const char *pChoiceStrings[2] )
+	bool GetBoolChoiceList( const char *, CDmElement *, 
+		const char *, bool , const char *[2] ) override
 	{
 		return false;
 	}
 
-	virtual bool GetIntChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-		const char *pAttributeName, bool bArrayElement, IntChoiceList_t &list )
+	bool GetIntChoiceList( const char *, CDmElement *, 
+		const char *, bool, IntChoiceList_t & ) override
 	{
 		return false;
 	}
 
-	virtual bool GetStringChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-		const char *pAttributeName, bool bArrayElement, StringChoiceList_t &list )
+	bool GetStringChoiceList( const char *, CDmElement *, 
+		const char *, bool , StringChoiceList_t & ) override
 	{
 		return false;
 	}
 
-	virtual bool GetElementChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-		const char *pAttributeName, bool bArrayElement, ElementChoiceList_t &list )
+	bool GetElementChoiceList( const char *, CDmElement *, 
+		const char *, bool , ElementChoiceList_t & ) override
 	{
 		return false;
 	}
-	virtual const char *GetElementChoiceString( const char *pChoiceListType, CDmElement *pElement, 
-		const char *pAttributeName, bool bArrayElement, CDmElement *pValue )
+
+	const char *GetElementChoiceString( const char *, CDmElement *, 
+		const char *, bool , CDmElement * ) override
 	{
-		return NULL;
+		return nullptr;
 	}
 };
 

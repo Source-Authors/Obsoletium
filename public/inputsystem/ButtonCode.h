@@ -19,14 +19,14 @@
 //-----------------------------------------------------------------------------
 // Button enum. "Buttons" are binary-state input devices (mouse buttons, keyboard keys)
 //-----------------------------------------------------------------------------
-enum
+enum JoystickCount
 {
 	JOYSTICK_MAX_BUTTON_COUNT = 32,
 	JOYSTICK_POV_BUTTON_COUNT = 4,
 	JOYSTICK_AXIS_BUTTON_COUNT = MAX_JOYSTICK_AXES * 2,
 };
 
-#define JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) ( to_underlying(JOYSTICK_FIRST_BUTTON) + ((_joystick) * to_underlying(JOYSTICK_MAX_BUTTON_COUNT)) + (_button) )
+#define JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) ( static_cast<int>(JOYSTICK_FIRST_BUTTON) + ((_joystick) * to_underlying(JOYSTICK_MAX_BUTTON_COUNT)) + (_button) )
 #define JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_POV_BUTTON + ((_joystick) * to_underlying(JOYSTICK_POV_BUTTON_COUNT)) + (_button) )
 #define JOYSTICK_AXIS_BUTTON_INTERNAL(_joystick, _button) ( JOYSTICK_FIRST_AXIS_BUTTON + ((_joystick) * to_underlying(JOYSTICK_AXIS_BUTTON_COUNT)) + (_button) )
 

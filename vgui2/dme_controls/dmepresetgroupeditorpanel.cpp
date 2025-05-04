@@ -58,7 +58,7 @@ DEFINE_SOURCE_NOTIFY_SCOPE_GUARD( PresetGroup, NOTIFY_SOURCE_PRESET_GROUP_EDITOR
 //-----------------------------------------------------------------------------
 class CDmePresetRemapPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetRemapPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetRemapPanel, vgui::Frame );
 
 public:
 	CDmePresetRemapPanel( vgui::Panel *pParent, const char *pTitle );
@@ -68,9 +68,9 @@ public:
 	void DoModal( CDmeAnimationSet *pAnimationSet, CDmePresetGroup *pDestGroup );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 private:
 	MESSAGE_FUNC( OnTextChanged, "TextChanged" );
@@ -397,18 +397,18 @@ void CDmePresetRemapPanel::OnCommand( const char *command )
 //-----------------------------------------------------------------------------
 class CDmePresetGroupListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetGroupListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetGroupListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmePresetGroupListPanel( vgui::Panel *pParent, const char *pName, CDmePresetGroupEditorPanel *pComboPanel );
 
-	virtual void OnCreateDragData( KeyValues *msg );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msgList );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msgList );
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
-	virtual void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels );
+	void OnCreateDragData( KeyValues *msg ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msgList ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msgList ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
+	void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels ) override;
 
 private:
 	CDmePresetGroupEditorPanel *m_pPresetGroupPanel;
@@ -424,17 +424,17 @@ private:
 //-----------------------------------------------------------------------------
 class CDmePresetListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmePresetListPanel( vgui::Panel *pParent, const char *pName, CDmePresetGroupEditorPanel *pComboPanel );
 
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnCreateDragData( KeyValues *msg );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msgList );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msgList );
-	virtual void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnCreateDragData( KeyValues *msg ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msgList ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msgList ) override;
+	void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels ) override;
 
 private:
 
@@ -2232,7 +2232,7 @@ void CDmePresetGroupEditorFrame::OnCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 // Inherited from IDmNotify
 //-----------------------------------------------------------------------------
-void CDmePresetGroupEditorFrame::NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags )
+void CDmePresetGroupEditorFrame::NotifyDataChanged( [[maybe_unused]] const char *pReason, int nNotifySource, int nNotifyFlags )
 {
 	if ( !IsVisible() )
 		return;

@@ -52,33 +52,33 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CElementTreeViewListControl : public vgui::CTreeViewListControl
 {
-	DECLARE_CLASS_SIMPLE( CElementTreeViewListControl, CTreeViewListControl );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CElementTreeViewListControl, CTreeViewListControl );
 
 public:
 	CElementTreeViewListControl( Panel *pParent, const char *pName );
 
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	virtual int		AddItem( KeyValues *data, bool allowLabelEditing, int parentItemIndex, CUtlVector< vgui::Panel * >& columnPanels );
 	virtual void	RemoveItem( int nItemIndex ); 
-	virtual void	PerformLayout();
+	void	PerformLayout() override;
 	virtual void	RemoveAll();
 	virtual vgui::HFont	GetFont( int size );
 	virtual void	SetFont( vgui::HFont font );
 	virtual int		GetFontSize();
 	virtual void	SetFontSize( int size );
-	virtual void	PostChildPaint();
-    virtual void	ExpandItem( int itemIndex, bool bExpand );
+	void	PostChildPaint() override;
+	virtual void	ExpandItem( int itemIndex, bool bExpand );
 	virtual bool	IsItemExpanded( int itemIndex );
 	virtual bool	IsItemSelected( int itemIndex );
 	virtual KeyValues *GetItemData( int itemIndex );
 	virtual int		GetTreeColumnWidth();
 	virtual void	SetTreeColumnWidth( int w );
-	virtual void	OnCursorMoved( int x, int y );
-	virtual void	OnMousePressed( vgui::MouseCode code );
-	virtual void	OnMouseReleased( vgui::MouseCode code );
-	virtual void	OnMouseDoublePressed( vgui::MouseCode code );
-	virtual void	OnMouseWheeled( int delta );
-	virtual int		GetScrollBarSize();
+	void	OnCursorMoved( int x, int y ) override;
+	void	OnMousePressed( vgui::MouseCode code ) override;
+	void	OnMouseReleased( vgui::MouseCode code ) override;
+	void	OnMouseDoublePressed( vgui::MouseCode code ) override;
+	void	OnMouseWheeled( int delta ) override;
+	int		GetScrollBarSize() override;
 	virtual void	ToggleDrawGrid();
 	virtual bool	IsDrawingGrid();
 
@@ -140,7 +140,7 @@ private:
 //-----------------------------------------------------------------------------
 class CElementPropertiesTreeInternal : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CElementPropertiesTreeInternal, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CElementPropertiesTreeInternal, vgui::EditablePanel );
 
 public:
 	enum RefreshType_t
@@ -166,7 +166,7 @@ public:
 	virtual bool GetItemDropContextMenu( int itemIndex, vgui::Menu *menu, CUtlVector< KeyValues * >& msglist );
 	virtual vgui::HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist );
 	virtual void SetObject( CDmElement *object );
-	virtual void OnCommand( const char *cmd );
+	void OnCommand( const char *cmd ) override;
 
 	MESSAGE_FUNC( OnShowMemoryUsage, "OnShowMemoryUsage" );
 
@@ -427,17 +427,17 @@ protected:
 //-----------------------------------------------------------------------------
 class CElementPropertiesTree : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CElementPropertiesTree, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CElementPropertiesTree, vgui::Frame );
 public:
 
 	CElementPropertiesTree( vgui::Panel *parent, IDmNotify *pNotify, CDmElement *pObject, CDmeEditorTypeDictionary *pDict = NULL );
 
-	virtual void Init( );
+	virtual void Init();
 	virtual void Refresh( CElementPropertiesTreeInternal::RefreshType_t rebuild = CElementPropertiesTreeInternal::REFRESH_REBUILD, bool preservePrevSelectedItem = false );
 	virtual void GenerateChildrenOfNode( int itemIndex );
 	virtual void SetObject( CDmElement *object );
-	virtual void OnCommand( const char *cmd );
-	virtual void ActivateBuildMode();
+	virtual void OnCommand( const char *cmd ) override;
+	void ActivateBuildMode() override;
 
 	CElementPropertiesTreeInternal *GetInternal();
 
@@ -463,7 +463,7 @@ inline CElementPropertiesTreeInternal *CElementPropertiesTree::GetInternal()
 //-----------------------------------------------------------------------------
 class CDmeElementPanel : public CElementPropertiesTreeInternal, public IDmNotify
 {
-	DECLARE_CLASS_SIMPLE( CDmeElementPanel, CElementPropertiesTreeInternal );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeElementPanel, CElementPropertiesTreeInternal );
 
 public:
 	CDmeElementPanel( vgui::Panel *pParent, const char *pPanelName );
@@ -471,7 +471,7 @@ public:
 	void SetDmeElement( CDmElement *pElement );
 
 	// Inherited from IDmNotify
-	virtual void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags );
+	void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags ) override;
 };
 
 #endif // ELEMENTPROPERTIESTREE_H

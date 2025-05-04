@@ -85,10 +85,10 @@ class CDmeExpressionOperator : public CDmeOperator
 	DEFINE_ELEMENT( CDmeExpressionOperator, CDmeOperator );
 
 public:
-	virtual void Operate();
+	void Operate() override;
 
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs );
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) override;
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 	void		SetSpewResult( bool state );
 

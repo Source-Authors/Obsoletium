@@ -6,24 +6,24 @@
 //
 //=============================================================================//
 
-#include "dme_controls/filelistmanager.h"
+#include "dme_controls/FileListManager.h"
 #include "vgui_controls/FileOpenDialog.h"
-#include "vgui_controls/menu.h"
-#include "vgui_controls/messagebox.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/MessageBox.h"
 #include "datamodel/idatamodel.h"
 #include "datamodel/dmelement.h"
 #include "datamodel/dmattribute.h"
 #include "datamodel/dmattributevar.h"
 #include "vgui/ISurface.h"
 #include <vgui/IInput.h>
-#include "vgui/mousecode.h"
+#include "vgui/MouseCode.h"
 #include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
 #include "tier2/tier2.h"
 // dimhotepus: Drop Perforce support.
 // #include "p4lib/ip4.h"
 #include "filesystem.h"
-#include "dme_controls/INotifyUI.h"
+#include "dme_controls/inotifyui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -273,7 +273,7 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 	vgui::Menu::PlaceContextMenu( this, m_hContextMenu.Get() );
 }
 
-void CFileListManager::OnLoadFiles( KeyValues *pParams )
+void CFileListManager::OnLoadFiles( KeyValues * )
 {
 	CNotifyScopeGuard notify( "CFileListManager::OnLoadFiles", NOTIFY_SOURCE_FILE_LIST_MANAGER, NOTIFY_SETDIRTYFLAG );
 
@@ -291,7 +291,7 @@ void CFileListManager::OnLoadFiles( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnUnloadFiles( KeyValues *pParams )
+void CFileListManager::OnUnloadFiles( KeyValues * )
 {
 	CNotifyScopeGuard notify( "CFileListManager::OnUnloadFiles", NOTIFY_SOURCE_FILE_LIST_MANAGER, NOTIFY_SETDIRTYFLAG );
 
@@ -309,7 +309,7 @@ void CFileListManager::OnUnloadFiles( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnSaveFiles( KeyValues *pParams )
+void CFileListManager::OnSaveFiles( KeyValues * )
 {
 	int nSelected = GetSelectedItemsCount();
 	for ( int i = 0; i < nSelected; ++i )
@@ -337,7 +337,7 @@ void CFileListManager::OnSaveFiles( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnOpenFile( KeyValues *pParams )
+void CFileListManager::OnOpenFile( KeyValues * )
 {
 	KeyValues *pContextKeyValues = new KeyValues( "OnOpen" );
 	vgui::FileOpenDialog *pFileOpenDialog = new vgui::FileOpenDialog( this, "Save .dmx File As", false, pContextKeyValues );
@@ -347,7 +347,7 @@ void CFileListManager::OnOpenFile( KeyValues *pParams )
 	pFileOpenDialog->DoModal( false );
 }
 
-void CFileListManager::OnSaveFileAs( KeyValues *pParams )
+void CFileListManager::OnSaveFileAs( KeyValues * )
 {
 	int nSelected = GetSelectedItemsCount();
 	Assert( nSelected == 1 );
@@ -420,9 +420,9 @@ void CFileListManager::OnFileSelected( KeyValues *pParams )
 	}
 }
 
-void CFileListManager::OnAddToPerforce( KeyValues *pParams )
+void CFileListManager::OnAddToPerforce( KeyValues * )
 {
-	int nFileCount = 0;
+	//int nFileCount = 0;
 	int nSelected = GetSelectedItemsCount();
 	const char **ppFileNames = ( const char** )_alloca( nSelected * sizeof( char* ) );
 	for ( int i = 0; i < nSelected; ++i )
@@ -434,7 +434,7 @@ void CFileListManager::OnAddToPerforce( KeyValues *pParams )
 		if ( !pFilename )
 			continue;
 
-		++nFileCount;
+		//++nFileCount;
 		ppFileNames[ i ] = pFilename;
 	}
 
@@ -450,9 +450,9 @@ void CFileListManager::OnAddToPerforce( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnOpenForEdit( KeyValues *pParams )
+void CFileListManager::OnOpenForEdit( KeyValues * )
 {
-	int nFileCount = 0;
+	//int nFileCount = 0;
 	int nSelected = GetSelectedItemsCount();
 	const char **ppFileNames = ( const char** )_alloca( nSelected * sizeof( char* ) );
 	for ( int i = 0; i < nSelected; ++i )
@@ -464,7 +464,7 @@ void CFileListManager::OnOpenForEdit( KeyValues *pParams )
 		if ( !pFilename )
 			continue;
 
-		++nFileCount;
+		//++nFileCount;
 		ppFileNames[ i ] = pFilename;
 	}
 	

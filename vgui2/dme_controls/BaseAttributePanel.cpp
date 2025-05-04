@@ -9,7 +9,7 @@
 //=============================================================================//
 
 #include "dme_controls/BaseAttributePanel.h"
-#include "dme_controls/attributewidgetfactory.h"
+#include "dme_controls/AttributeWidgetFactory.h"
 #include "tier1/KeyValues.h"
 #include "vgui_controls/Label.h"
 #include "movieobjects/dmeeditortypedictionary.h"
@@ -36,8 +36,8 @@ CBaseAttributePanel::CBaseAttributePanel( vgui::Panel *parent, const AttributeWi
 	m_hObject( info.m_pElement ),
 	m_hEditorInfo( info.m_pEditorInfo ),
 	m_hEditorTypeDict( info.m_pEditorTypeDictionary ),
-	m_pNotify( info.m_pNotify ),
 	m_nArrayIndex( info.m_nArrayIndex ),
+	m_pNotify( info.m_pNotify ),
 	m_ColumnSize( 0, 0, ColInfoLessFunc )
 {
 	Assert( info.m_pElement );

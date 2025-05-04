@@ -13,7 +13,7 @@
 #endif
 
 #include "tier1/utlvector.h"
-#include "matsys_controls/PotteryWheelPanel.h"
+#include "matsys_controls/potterywheelpanel.h"
 #include "datamodel/dmehandle.h"
 
 
@@ -28,11 +28,11 @@ class CDmeSourceSkin;
 class CDmeSourceAnimation;
 class CDmeDCCMakefile;
 class CDmeDrawSettings;
-class vgui::MenuBar;
 
 namespace vgui
 {
 	class IScheme;
+	class MenuBar;
 }
 
 
@@ -41,7 +41,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CDmeDagRenderPanel : public CPotteryWheelPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeDagRenderPanel, CPotteryWheelPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeDagRenderPanel, CPotteryWheelPanel );
 
 public:
 	// constructor, destructor
@@ -49,9 +49,9 @@ public:
 	virtual ~CDmeDagRenderPanel();
 
 	// Overriden methods of vgui::Panel
-	virtual void PerformLayout();
-	virtual void Paint();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void PerformLayout() override;
+	void Paint() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	// Sets the current scene + animation list
 	void SetDmeElement( CDmeDag *pScene );
@@ -78,9 +78,9 @@ private:
 	void SelectVertexAnimation( int nIndex );
 
 	// paint it!
-	void OnPaint3D();
-	void OnMouseDoublePressed( vgui::MouseCode code );
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnPaint3D() override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	MESSAGE_FUNC( OnSmoothShade, "SmoothShade" );
 	MESSAGE_FUNC( OnFlatShade, "FlatShade" );

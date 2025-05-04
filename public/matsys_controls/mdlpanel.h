@@ -129,11 +129,11 @@ protected:
 private:
 	// paint it!
 	void OnPaint3D() override;
-	virtual void PrePaint3D( IMatRenderContext *pRenderContext ) { };
-	virtual void PostPaint3D( IMatRenderContext *pRenderContext ) { };
-	virtual void RenderingRootModel( IMatRenderContext *pRenderContext, CStudioHdr *pStudioHdr, MDLHandle_t mdlHandle, matrix3x4_t *pWorldMatrix ) { };
-	virtual void RenderingMergedModel( IMatRenderContext *pRenderContext, CStudioHdr *pStudioHdr, MDLHandle_t mdlHandle, matrix3x4_t *pWorldMatrix ) { };
-	virtual IMaterial* GetOverrideMaterial( MDLHandle_t mdlHandle ) { return NULL; }
+	virtual void PrePaint3D( [[maybe_unused]] IMatRenderContext *pRenderContext ) { };
+	virtual void PostPaint3D( [[maybe_unused]] IMatRenderContext *pRenderContext ) { };
+	virtual void RenderingRootModel( [[maybe_unused]] IMatRenderContext *pRenderContext, [[maybe_unused]] CStudioHdr *pStudioHdr, [[maybe_unused]] MDLHandle_t mdlHandle, [[maybe_unused]] matrix3x4_t *pWorldMatrix ) { };
+	virtual void RenderingMergedModel( [[maybe_unused]] IMatRenderContext *pRenderContext, [[maybe_unused]] CStudioHdr *pStudioHdr, [[maybe_unused]] MDLHandle_t mdlHandle, [[maybe_unused]] matrix3x4_t *pWorldMatrix ) { };
+	virtual IMaterial* GetOverrideMaterial( [[maybe_unused]] MDLHandle_t mdlHandle ) { return nullptr; }
 
 	void OnMouseDoublePressed( vgui::MouseCode code ) override;
 

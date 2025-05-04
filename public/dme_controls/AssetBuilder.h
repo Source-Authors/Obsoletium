@@ -45,16 +45,16 @@ enum CompilationState_t;
 //-----------------------------------------------------------------------------
 class CAssetBuilder : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CAssetBuilder, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAssetBuilder, EditablePanel );
 
 public:
 	CAssetBuilder( vgui::Panel *pParent, const char *pPanelName );
 	virtual ~CAssetBuilder();
 
 	// Inherited from vgui::Frame
-	virtual void OnCommand( const char *pCommand );
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnTick();
+	void OnCommand( const char *pCommand ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnTick() override;
 
 	void SetRootMakefile( CDmeMakefile *pMakeFile );
 	void SetCurrentMakefile( CDmeMakefile *pMakeFile );
@@ -172,16 +172,16 @@ private:
 //-----------------------------------------------------------------------------
 class CAssetBuilderFrame : public vgui::Frame, public vgui::IFileOpenStateMachineClient
 {
-	DECLARE_CLASS_SIMPLE( CAssetBuilderFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAssetBuilderFrame, vgui::Frame );
 
 public:
 	CAssetBuilderFrame( vgui::Panel *pParent, const char *pTitle );
 	virtual ~CAssetBuilderFrame();
 
 	// Inherited from IFileOpenStateMachineClient
-	virtual void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
+	void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
 
 protected:
 	// Call to change the makefile
@@ -190,12 +190,12 @@ protected:
 	CAssetBuilder *m_pAssetBuilder;
 
 private:
-	MESSAGE_FUNC( OnDmeElementChanged, "DmeElementChanged" );	
-	MESSAGE_FUNC( OnFileNew, "FileNew" );	
-	MESSAGE_FUNC( OnFileOpen, "FileOpen" );	
-	MESSAGE_FUNC( OnFileSave, "FileSave" );	
+	MESSAGE_FUNC( OnDmeElementChanged, "DmeElementChanged" );
+	MESSAGE_FUNC( OnFileNew, "FileNew" );
+	MESSAGE_FUNC( OnFileOpen, "FileOpen" );
+	MESSAGE_FUNC( OnFileSave, "FileSave" );
 	MESSAGE_FUNC( OnFileSaveAs, "FileSaveAs" );
-	MESSAGE_FUNC_PARAMS( OnPicked, "Picked", kv );	
+	MESSAGE_FUNC_PARAMS( OnPicked, "Picked", kv );
 	MESSAGE_FUNC_PARAMS( OnFileSelected, "FileSelected", kv );
 	MESSAGE_FUNC_PARAMS( OnFileStateMachineFinished, "FileStateMachineFinished", kv );
 	MESSAGE_FUNC_PARAMS( OnPerformFileNew, "PerformFileNew", kv );

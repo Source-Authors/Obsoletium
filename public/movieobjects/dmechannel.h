@@ -168,7 +168,7 @@ public:
 	void SetChannelToPlayToSelf( const char *outputAttributeName, float defaultValue, bool force = false );
 
 	// need this until we have the EditApply message queue
-	void OnAttributeChanged( CDmAttribute *pAttribute );
+	void OnAttributeChanged( CDmAttribute *pAttribute ) override;
 
 	template< class T >
 	bool	GetCurrentPlaybackValue( T& value );

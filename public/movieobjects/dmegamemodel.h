@@ -35,10 +35,10 @@ public:
 
 	void		SetGameModel( CDmeGameModel *gameModel );
 
-	virtual void Resolve();
-	virtual void Operate();
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs );
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void Resolve() override;
+	void Operate() override;
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) override;
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 	void	SetWeight( float flWeight );
 	void	SetMapping( int globalIndex );
@@ -46,7 +46,7 @@ public:
 
 	int	GetGlobalIndex() const;
 
-	virtual void OnAttributeChanged( CDmAttribute *pAttribute );
+	void OnAttributeChanged( CDmAttribute *pAttribute ) override;
 	CDmaVar< float >	m_flexWeight;
 	CDmaElement< CDmeGameModel >	m_gameModel;
 	

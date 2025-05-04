@@ -54,37 +54,6 @@ static AnimSetLayout_t g_AnimSetLayout[] =
 	{	CBaseAnimationSetEditor::LAYOUT_HORIZONTAL,		"horizontal",	"#BxAnimSetHorizontalLayout" },
 };
 
-static const char *NameForLayout( CBaseAnimationSetEditor::EAnimSetLayout_t layout, bool menu )
-{
-	intp c = ssize( g_AnimSetLayout );
-	for ( intp i = 0; i < c; ++i )
-	{
-		const AnimSetLayout_t& data = g_AnimSetLayout[ i ];
-		if ( data.type == layout )
-		{
-			return menu ? data.contextmenulabel : data.shortname;
-		}
-	}
-	Assert( 0 );
-	return menu ? g_AnimSetLayout[ 0 ].contextmenulabel : g_AnimSetLayout[ 0 ].shortname;
-}
-
-static CBaseAnimationSetEditor::EAnimSetLayout_t LayoutForName( const char *name )
-{
-	intp c = ssize( g_AnimSetLayout );
-	for ( intp i = 0; i < c; ++i )
-	{
-		const AnimSetLayout_t& data = g_AnimSetLayout[ i ];
-		if ( !Q_stricmp( data.shortname, name ) )
-		{
-			return data.type;
-		}
-	}
-
-	Assert( 0 );
-	return CBaseAnimationSetEditor::LAYOUT_SPLIT;
-}
-
 CBaseAnimationSetEditor::CBaseAnimationSetEditor( vgui::Panel *parent, const char *className, bool bShowGroups ) :
 	BaseClass( parent, className ),
 	m_Layout( LAYOUT_SPLIT ),

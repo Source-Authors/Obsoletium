@@ -43,7 +43,7 @@ class CDmeCombinationInputControl : public CDmElement
 	DEFINE_ELEMENT( CDmeCombinationInputControl, CDmElement );
 
 public:
-	virtual void OnElementUnserialized();
+	void OnElementUnserialized() override;
 
 	// Adds a control, returns the control index, 
 	// returns true if remapped control lists need updating
@@ -105,7 +105,7 @@ class CDmeCombinationDominationRule : public CDmElement
 
 public:
 	// Methods of IDmElement
-	virtual void	OnAttributeChanged( CDmAttribute *pAttribute );
+	void	OnAttributeChanged( CDmAttribute *pAttribute ) override;
 
 	// Adds a dominating control
 	void AddDominator( const char *pDominatorControl );
@@ -293,12 +293,12 @@ public:
 	// Does one of the targets we refer to contain a particular delta state?
 	bool DoesTargetContainDeltaState( const char *pDeltaStateName );
 
-	virtual void Operate();
+	void Operate() override;
 
-	virtual void Resolve();
+	void Resolve() override;
 
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs );
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) override;
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 	// Would a particular delta state attached to this combination operator end up stero?
 	bool IsDeltaStateStereo( const char *pDeltaStateName );

@@ -47,7 +47,7 @@ public:
 	int GetNumFrames() override;
 	void SetFrame( int nFrame ) override;
 	HTexture GetID() override;
-	void SetRotation( int ) override { return; };
+	void SetRotation( int ) override {}
 
 protected:
 	void SetSize(int wide, int tall) override;

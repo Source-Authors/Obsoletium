@@ -28,7 +28,7 @@ class CMDLPickerFrame;
 //-----------------------------------------------------------------------------
 class CAttributeMDLPickerPanel : public CAttributeBasePickerPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeMDLPickerPanel, CAttributeBasePickerPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeMDLPickerPanel, CAttributeBasePickerPanel );
 
 public:
 	CAttributeMDLPickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
@@ -36,7 +36,7 @@ public:
 
 private:
 	MESSAGE_FUNC_PARAMS( OnMDLSelected, "MDLSelected", kv );
-	virtual void ShowPickerDialog();
+	void ShowPickerDialog() override;
 };
 
 

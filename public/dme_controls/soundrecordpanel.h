@@ -28,15 +28,15 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CSoundRecordPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CSoundRecordPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSoundRecordPanel, vgui::Frame );
 
 public:
 	CSoundRecordPanel( vgui::Panel *pParent, const char *pTitle );
 	~CSoundRecordPanel();
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
-	virtual void OnTick();
+	void OnCommand( const char *pCommand ) override;
+	void OnTick() override;
 
 	// Purpose: Activate the dialog
 	// The message "SoundRecorded" will be sent if a sound is recorded

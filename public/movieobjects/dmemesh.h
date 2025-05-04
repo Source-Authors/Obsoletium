@@ -61,11 +61,11 @@ DEFINE_ELEMENT( CDmeMesh, CDmeShape );
 
 public:
 	// resolve internal data from changed attributes
-	virtual void OnAttributeChanged( CDmAttribute *pAttribute );
+	void OnAttributeChanged( CDmAttribute *pAttribute ) override;
 
 	void GetBoundingSphere( Vector &c, float &r, CDmeVertexData *pPassedBase, CDmeSingleIndexedComponent *pPassedSelection ) const;
 
-	virtual void GetBoundingSphere( Vector &c, float &r ) const { return GetBoundingSphere( c, r, NULL, NULL ); }
+	void GetBoundingSphere( Vector &c, float &r ) const override { return GetBoundingSphere( c, r, NULL, NULL ); }
 
 	void GetBoundingBox( Vector &min, Vector &max, CDmeVertexData *pPassedBase /* = NULL */, CDmeSingleIndexedComponent *pPassedSelection /* = NULL */ ) const;
 	
@@ -98,7 +98,7 @@ public:
 	const CDmeVertexData *GetBindBaseState() const;
 
 	// Draws the mesh
-	void Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSettings = NULL );
+	void Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSettings = NULL ) override;
 
 	// Compute triangulated indices
 	void ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDmeFaceSet *pFaceSet, intp nFirstIndex, int *pIndices, intp nOutCount );
@@ -230,7 +230,7 @@ private:
 
 	struct FaceSet_t
 	{
-		FaceSet_t() : m_bBuilt(false) {}
+		FaceSet_t() : m_pMesh{nullptr}, m_bBuilt(false) {}
 		IMesh *m_pMesh;
 		bool m_bBuilt;
 	};

@@ -54,7 +54,7 @@ public:
 	RecordingState_t	GetRecordingState() const;
 
 private:
-	CDmeTimeSelection & operator =( const CDmeTimeSelection& src );
+	CDmeTimeSelection & operator =( const CDmeTimeSelection& src ) = delete;
 
 	void				ConvertToRelative( DmeTime_t time );
 	void				ConvertToAbsolute( DmeTime_t time );

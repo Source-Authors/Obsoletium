@@ -14,7 +14,7 @@
 #endif
 
 #include "dme_controls/AttributeBasePickerPanel.h"
-#include "matsys_controls/Picker.h"
+#include "matsys_controls/picker.h"
 
 
 //-----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class CPickerFrame;
 //-----------------------------------------------------------------------------
 class CAttributeSurfacePropertyPickerPanel : public CAttributeBasePickerPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeSurfacePropertyPickerPanel, CAttributeBasePickerPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeSurfacePropertyPickerPanel, CAttributeBasePickerPanel );
 
 public:
 	CAttributeSurfacePropertyPickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
@@ -39,7 +39,7 @@ private:
 	void AddSurfacePropertiesToList( PickerList_t &list );
 
 	MESSAGE_FUNC_PARAMS( OnPicked, "Picked", kv );
-	virtual void ShowPickerDialog();
+	void ShowPickerDialog() override;
 };
 
 

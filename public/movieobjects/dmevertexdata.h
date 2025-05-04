@@ -55,7 +55,7 @@ public:
 	};
 
 	// resolve internal data from changed attributes
-	virtual void Resolve();
+	void Resolve() override;
 
 	// Returns the number of joints per vertex
 	int JointCount() const;
@@ -302,7 +302,7 @@ public:
 	int AddVertexIndices( int nCount );
 
 private:
-	virtual bool IsVertexDeltaData() const { return false; }
+	bool IsVertexDeltaData() const override { return false; }
 };
 
 
@@ -327,7 +327,7 @@ public:
 	CDmaVar< bool > m_bCorrected;
 
 private:
-	virtual bool IsVertexDeltaData() const { return true; }
+	bool IsVertexDeltaData() const override { return true; }
 
 	// Computes max positional delta length
 	float ComputeMaxDeflection( );

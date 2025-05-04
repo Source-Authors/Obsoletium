@@ -37,29 +37,29 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeTextEntry : public vgui::TextEntry
 {
-	DECLARE_CLASS_SIMPLE( CAttributeTextEntry, vgui::TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeTextEntry, vgui::TextEntry );
 
 public:
 	CAttributeTextEntry( Panel *parent, const char *panelName );
-	virtual bool GetSelectedRange(int& cx0,int& cx1)
+	bool GetSelectedRange(int& cx0,int& cx1) override
 	{
 		return BaseClass::GetSelectedRange( cx0, cx1 );
 	}
 
 protected:
 	CAttributeTextPanel *GetParentAttributePanel();
-	virtual void OnMouseWheeled( int delta );
+	void OnMouseWheeled( int delta ) override;
 
 	// We'll only create an "undo" record if the values differ upon focus change
-	virtual void OnSetFocus();
-	virtual void OnKillFocus();
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
+	void OnSetFocus() override;
+	void OnKillFocus() override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& data  );
-	virtual bool GetDropContextMenu( vgui::Menu *menu, CUtlVector< KeyValues * >& msglist );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msglist );
+	void OnPanelDropped( CUtlVector< KeyValues * >& data ) override;
+	bool GetDropContextMenu( vgui::Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msglist ) override;
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", data );
 

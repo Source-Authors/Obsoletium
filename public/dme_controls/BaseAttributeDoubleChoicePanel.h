@@ -36,14 +36,14 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CDoubleComboBoxContainerPanel : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CDoubleComboBoxContainerPanel, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDoubleComboBoxContainerPanel, vgui::Panel );
 public:
 	CDoubleComboBoxContainerPanel( vgui::Panel *parent, char const *name );
 	void AddComboBox( int slot, vgui::ComboBox *box );
 
 private:
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	vgui::ComboBox	*m_pBoxes[ 2 ];
 };
@@ -53,16 +53,16 @@ private:
 //-----------------------------------------------------------------------------
 class CBaseAttributeDoubleChoicePanel : public CBaseAttributePanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseAttributeDoubleChoicePanel, CBaseAttributePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAttributeDoubleChoicePanel, CBaseAttributePanel );
 
 public:
 	CBaseAttributeDoubleChoicePanel( vgui::Panel *parent,	const AttributeWidgetInfo_t &info );
 
-	virtual void PostConstructor();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void PostConstructor() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 protected:
-	virtual void Refresh();
+	void Refresh() override;
 
 private:
 	// Derived classes can re-implement this to fill the combo box however they like
@@ -72,8 +72,8 @@ private:
 
 	MESSAGE_FUNC_PTR( OnTextChanged, "TextChanged", panel );
 
-	virtual void Apply();
-	virtual vgui::Panel *GetDataPanel();
+	void Apply() override;
+	vgui::Panel *GetDataPanel() override;
 
 	CDoubleComboBoxContainerPanel		*m_pContainerPanel;
 	vgui::ComboBox	*m_pData[2];

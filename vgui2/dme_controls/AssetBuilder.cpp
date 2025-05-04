@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "dme_controls/AssetBuilder.h"
-#include "dme_controls/DmePanel.h"
+#include "dme_controls/dmepanel.h"
 #include "dme_controls/dmecontrols_utils.h"
 #include "tier1/KeyValues.h"
 #include "vgui_controls/ListPanel.h"
@@ -18,14 +18,14 @@
 #include "vgui_controls/FileOpenStateMachine.h"
 #include "vgui_controls/PropertySheet.h"
 #include "vgui_controls/PropertyPage.h"
-#include "vgui/ischeme.h"
+#include "vgui/IScheme.h"
 #include "vgui/IVGui.h"
 #include "vgui/ISurface.h"
 #include "tier1/tier1.h"
 #include "movieobjects/dmemakefile.h"
 #include "matsys_controls/picker.h"
 #include "tier2/fileutils.h"
-#include "vgui/keycode.h"
+#include "vgui/KeyCode.h"
 #include "filesystem.h"
 #include "movieobjects/idmemakefileutils.h"
 #include "tier3/tier3.h"
@@ -43,7 +43,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CCompileStatusBar : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CCompileStatusBar, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCompileStatusBar, EditablePanel );
 
 public:
 	enum CompileStatus_t
@@ -57,7 +57,7 @@ public:
 	CCompileStatusBar( vgui::Panel *pParent, const char *pPanelName );
 	virtual ~CCompileStatusBar();
 
-	virtual void PaintBackground();
+	void PaintBackground() override;
 
 	void SetStatus( CompileStatus_t status, const char *pMessage );
 

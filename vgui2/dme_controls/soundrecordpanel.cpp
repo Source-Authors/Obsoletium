@@ -10,8 +10,8 @@
 #include "vgui_controls/Button.h"
 #include "vgui_controls/TextEntry.h"
 #include "dme_controls/dmecontrols.h"
-#include "vgui_controls/messagebox.h"
-#include "soundemittersystem/isoundemittersystembase.h"
+#include "vgui_controls/MessageBox.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "vgui/IVGui.h"
 #include "mathlib/mathlib.h"
 

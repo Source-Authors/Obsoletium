@@ -170,7 +170,7 @@ public:
 	CDmElement *FindSelectionGroup( const char *pSelectionGroupName );
 	CDmElement *FindOrAddSelectionGroup( const char *pSelectionGroupName );
 
-	virtual void OnElementUnserialized();
+	void OnElementUnserialized() override;
 
 	void CollectOperators( CUtlVector< DmElementHandle_t > &operators );
 	void AddOperator( CDmeOperator *pOperator );

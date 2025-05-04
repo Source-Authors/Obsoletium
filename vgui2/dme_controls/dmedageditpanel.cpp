@@ -21,10 +21,10 @@
 #include "vgui_controls/Image.h"
 #include "vgui_controls/TextImage.h"
 #include "vgui/ISurface.h"
-#include "vgui/ischeme.h"
-#include "vgui/iinput.h"
+#include "vgui/IScheme.h"
+#include "vgui/IInput.h"
 #include "vgui/IVGui.h"
-#include "vgui/cursor.h"
+#include "vgui/Cursor.h"
 #include "movieobjects/dmemakefile.h"
 #include "movieobjects/dmemdlmakefile.h"
 #include "movieobjects/dmedccmakefile.h"
@@ -54,7 +54,7 @@ IMPLEMENT_DMEPANEL_FACTORY( CDmeDagEditPanel, DmeDCCMakefile, "DmeMakeFileOutput
 //-----------------------------------------------------------------------------
 class CDmeAnimationListPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeAnimationListPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeAnimationListPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -169,12 +169,12 @@ void CDmeAnimationListPanel::OnItemDeselected( )
 
 class CDmeCombinationOperatorPanel : public CBaseAnimationSetEditor
 {	
-	DECLARE_CLASS_SIMPLE( CDmeCombinationOperatorPanel, CBaseAnimationSetEditor );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeCombinationOperatorPanel, CBaseAnimationSetEditor );
 public:
 	CDmeCombinationOperatorPanel( vgui::Panel *parent, const char *panelName );
 	virtual ~CDmeCombinationOperatorPanel();
 
-	virtual void OnTick();
+	void OnTick() override;
 
 	void SetCombinationOperator( CDmeCombinationOperator *pOp );
 	void RefreshCombinationOperator();

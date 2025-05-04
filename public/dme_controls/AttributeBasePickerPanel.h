@@ -32,14 +32,14 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeBasePickerPanel : public CAttributeTextPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeBasePickerPanel, CAttributeTextPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeBasePickerPanel, CAttributeTextPanel );
 
 public:
 	CAttributeBasePickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
 
 	// Inherited from Panel
-	virtual void	OnCommand( const char *cmd );
-	virtual void	PerformLayout();
+	void	OnCommand( const char *cmd ) override;
+	void	PerformLayout() override;
 
 private:
 	// Inherited classes must implement this

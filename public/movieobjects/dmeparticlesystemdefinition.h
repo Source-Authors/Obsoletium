@@ -33,8 +33,8 @@ class CDmeParticleFunction : public CDmElement
 
 public:
 	virtual const char *GetFunctionType() const { return NULL; }
-	virtual void Resolve();
-	virtual void OnElementUnserialized();
+	void Resolve() override;
+	void OnElementUnserialized() override;
 
 	// Used for backward compat
 	void AddMissingFields( const DmxElementUnpackStructure_t *pUnpack );
@@ -69,7 +69,7 @@ public:
 	void SetFunction( IParticleOperatorDefinition *pDefinition );
 
 	// Returns the function type
-	virtual const char *GetFunctionType() const;
+	const char *GetFunctionType() const override;
 
 private:
 	CDmaString m_FunctionName;
@@ -88,7 +88,7 @@ public:
 	void SetChildParticleSystem( CDmeParticleSystemDefinition *pDef, IParticleOperatorDefinition *pDefinition );
 
 	// Returns the function type
-	virtual const char *GetFunctionType() const;
+	const char *GetFunctionType() const override;
 
 	CDmaElement< CDmeParticleSystemDefinition > m_Child;
 };
@@ -103,8 +103,8 @@ class CDmeParticleSystemDefinition : public CDmElement
 	DEFINE_ELEMENT( CDmeParticleSystemDefinition, CDmElement );
 
 public:
-	virtual void OnElementUnserialized();
-	virtual void Resolve();
+	void OnElementUnserialized() override;
+	void Resolve() override;
 
 	// Add, remove
 	CDmeParticleFunction* AddOperator( ParticleFunctionType_t type, const char *pFunctionName );

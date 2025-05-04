@@ -50,7 +50,7 @@ public:
 	CDmeTransformList *FindBaseState( const char *pBaseStateName );
 
 	// Recursively render the Dag hierarchy
-	virtual void Draw( CDmeDrawSettings *pDrawSettings = NULL );
+	void Draw( CDmeDrawSettings *pDrawSettings = NULL ) override;
 
 	// Set if Z is the up axis of the model
 	void ZUp( bool bYUp );

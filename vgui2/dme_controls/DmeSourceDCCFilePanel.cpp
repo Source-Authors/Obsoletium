@@ -5,14 +5,14 @@
 //=============================================================================
 
 #include "dme_controls/DmeSourceDCCFilePanel.h"
-#include "dme_controls/DmePanel.h"
+#include "dme_controls/dmepanel.h"
 #include "movieobjects/dmedccmakefile.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/ListPanel.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/InputDialog.h"
 #include "vgui_controls/MessageBox.h"
-#include "vgui/keycode.h"
+#include "vgui/KeyCode.h"
 #include "tier1/KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

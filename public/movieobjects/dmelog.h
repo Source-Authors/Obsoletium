@@ -363,7 +363,7 @@ public:
 
 
 	// Resolve
-	virtual void Resolve();
+	void Resolve() override;
 
 	// curve info helpers
 	bool IsUsingCurveTypes() const;
@@ -390,7 +390,7 @@ protected:
 
 	void	OnUsingCurveTypesChanged();
 
-	virtual void OnAttributeChanged( CDmAttribute *pAttribute );
+	void OnAttributeChanged( CDmAttribute *pAttribute ) override;
 
 	CDmaElementArray< CDmeLogLayer >	m_Layers;
 	CDmaElement< CDmeCurveInfo > m_CurveInfo;
@@ -450,10 +450,10 @@ class CDmeTypedLogLayer : public CDmeLogLayer
 	DEFINE_ELEMENT( CDmeTypedLogLayer, CDmeLogLayer );
 
 public:
-	virtual void CopyLayer( const CDmeLogLayer *src );
-	virtual void CopyPartialLayer( const CDmeLogLayer *src, DmeTime_t startTime, DmeTime_t endTime, bool bRebaseTimestamps );
-	virtual void ExplodeLayer( const CDmeLogLayer *src, DmeTime_t startTime, DmeTime_t endTime, bool bRebaseTimestamps, DmeTime_t tResampleInterval );
-	virtual void InsertKeyFromLayer( DmeTime_t keyTime, const CDmeLogLayer *src, DmeTime_t srcKeyTime );
+	void CopyLayer( const CDmeLogLayer *src ) override;
+	void CopyPartialLayer( const CDmeLogLayer *src, DmeTime_t startTime, DmeTime_t endTime, bool bRebaseTimestamps ) override;
+	void ExplodeLayer( const CDmeLogLayer *src, DmeTime_t startTime, DmeTime_t endTime, bool bRebaseTimestamps, DmeTime_t tResampleInterval ) override;
+	void InsertKeyFromLayer( DmeTime_t keyTime, const CDmeLogLayer *src, DmeTime_t srcKeyTime ) override;
 
 	// Finds a key within tolerance, or adds one. Unlike SetKey, this will *not* delete keys after the specified time
 	intp FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType = CURVE_DEFAULT );
@@ -461,7 +461,7 @@ public:
 	// Sets a key, removes all keys after this time
 	void SetKey( DmeTime_t time, const T& value, int curveType = CURVE_DEFAULT );
 	// This inserts a key using the current values to construct the proper value for the time
-	virtual intp InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT );
+	intp InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT ) override;
 
 	void SetKeyValue( intp nKey, const T& value );
 
@@ -474,20 +474,20 @@ public:
 	intp InsertKey( DmeTime_t nTime, const T& value, int curveType = CURVE_DEFAULT );
 
 	// inherited from CDmeLog
-	virtual void ClearKeys();
-	virtual void SetKey( DmeTime_t time, const CDmAttribute *pAttr, uint index = 0, int curveType = CURVE_DEFAULT );
-	virtual bool SetDuplicateKeyAtTime( DmeTime_t time );
-	virtual void GetValue( DmeTime_t time, CDmAttribute *pAttr, uint index = 0 ) const;
-	virtual float GetComponent( DmeTime_t time, int componentIndex ) const;
-	virtual DmAttributeType_t GetDataType() const;
-	virtual bool IsConstantValued() const;
-	virtual void RemoveRedundantKeys();
-	virtual void RemoveRedundantKeys( float threshold );
+	void ClearKeys() override;
+	void SetKey( DmeTime_t time, const CDmAttribute *pAttr, uint index = 0, int curveType = CURVE_DEFAULT ) override;
+	bool SetDuplicateKeyAtTime( DmeTime_t time ) override;
+	void GetValue( DmeTime_t time, CDmAttribute *pAttr, uint index = 0 ) const override;
+	float GetComponent( DmeTime_t time, int componentIndex ) const override;
+	DmAttributeType_t GetDataType() const override;
+	bool IsConstantValued() const override;
+	void RemoveRedundantKeys() override;
+	void RemoveRedundantKeys( float threshold ) override;
 
-	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 );
-	virtual void Resample( DmeFramerate_t samplerate );
-	virtual void Filter( intp nSampleRadius );
-	virtual void Filter2( DmeTime_t sampleRadius );
+	void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 ) override;
+	void Resample( DmeFramerate_t samplerate ) override;
+	void Filter( intp nSampleRadius ) override;
+	void Filter2( DmeTime_t sampleRadius ) override;
 
 	void RemoveKeys( DmeTime_t starttime );
 
@@ -500,7 +500,7 @@ public:
 	const T&		GetDefaultEdgeZeroValue() const;
 	DmeTime_t		GetRightEdgeTime() const;
 
-	void			SetOwnerLog( CDmeLog *owner );
+	void			SetOwnerLog( CDmeLog *owner ) override;
 
 	      CDmeTypedLog< T >	*GetTypedOwnerLog();
 	const CDmeTypedLog< T >	*GetTypedOwnerLog() const;
@@ -539,28 +539,28 @@ public:
 	const CDmeTypedLogLayer< T > *GetLayer( intp index ) const;
 
 	void		StampKeyAtHead( DmeTime_t tHeadPosition, DmeTime_t tPreviousHeadPosition, const DmeLog_TimeSelection_t& params, const T& value );
-	void		StampKeyAtHead( DmeTime_t tHeadPosition, DmeTime_t tPreviousHeadPosition, const DmeLog_TimeSelection_t& params, const CDmAttribute *pAttr, uint index = 0 );
-	void		FinishTimeSelection( DmeTime_t tHeadPosition, DmeLog_TimeSelection_t& params ); // in attached, timeadvancing mode, we need to blend out of the final sample over the fadeout interval
-	void		FilterUsingTimeSelection( IUniformRandomStream *random, float flScale, const DmeLog_TimeSelection_t& params, int filterType, bool bResample, bool bApplyFalloff, const CDmeLogLayer *baseLayer, CDmeLogLayer *writeLayer );
-	void		FilterUsingTimeSelection( IUniformRandomStream *random, const DmeLog_TimeSelection_t& params, int filterType, bool bResample, bool bApplyFalloff );
-	void		StaggerUsingTimeSelection( const DmeLog_TimeSelection_t& params, DmeTime_t tStaggerAmount, const CDmeLogLayer *baseLayer, CDmeLogLayer *writeLayer );
-	void		RevealUsingTimeSelection( const DmeLog_TimeSelection_t &params, CDmeLogLayer *savedLayer );
-	void		BlendLayersUsingTimeSelection( const DmeLog_TimeSelection_t &params );
-	void		BlendLayersUsingTimeSelection( const CDmeLogLayer *firstLayer, const CDmeLogLayer *secondLayer, CDmeLogLayer *outputLayer, const DmeLog_TimeSelection_t &params, bool bUseBaseLayerSamples, DmeTime_t tStartOffset );
-	void		BlendTimesUsingTimeSelection( const CDmeLogLayer *firstLayer, const CDmeLogLayer *secondLayer, CDmeLogLayer *outputLayer, const DmeLog_TimeSelection_t &params, DmeTime_t tStartOffset );
+	void		StampKeyAtHead( DmeTime_t tHeadPosition, DmeTime_t tPreviousHeadPosition, const DmeLog_TimeSelection_t& params, const CDmAttribute *pAttr, uint index = 0 ) override;
+	void		FinishTimeSelection( DmeTime_t tHeadPosition, DmeLog_TimeSelection_t& params ) override; // in attached, timeadvancing mode, we need to blend out of the final sample over the fadeout interval
+	void		FilterUsingTimeSelection( IUniformRandomStream *random, float flScale, const DmeLog_TimeSelection_t& params, int filterType, bool bResample, bool bApplyFalloff, const CDmeLogLayer *baseLayer, CDmeLogLayer *writeLayer ) override;
+	void		FilterUsingTimeSelection( IUniformRandomStream *random, const DmeLog_TimeSelection_t& params, int filterType, bool bResample, bool bApplyFalloff ) override;
+	void		StaggerUsingTimeSelection( const DmeLog_TimeSelection_t& params, DmeTime_t tStaggerAmount, const CDmeLogLayer *baseLayer, CDmeLogLayer *writeLayer ) override;
+	void		RevealUsingTimeSelection( const DmeLog_TimeSelection_t &params, CDmeLogLayer *savedLayer ) override;
+	void		BlendLayersUsingTimeSelection( const DmeLog_TimeSelection_t &params ) override;
+	void		BlendLayersUsingTimeSelection( const CDmeLogLayer *firstLayer, const CDmeLogLayer *secondLayer, CDmeLogLayer *outputLayer, const DmeLog_TimeSelection_t &params, bool bUseBaseLayerSamples, DmeTime_t tStartOffset ) override;
+	void		BlendTimesUsingTimeSelection( const CDmeLogLayer *firstLayer, const CDmeLogLayer *secondLayer, CDmeLogLayer *outputLayer, const DmeLog_TimeSelection_t &params, DmeTime_t tStartOffset ) override;
 	
-	virtual void		PasteAndRescaleSamples( const CDmeLogLayer *src, const DmeLog_TimeSelection_t& srcParams, const DmeLog_TimeSelection_t& destParams, bool bBlendAreaInFalloffRegion );
-	virtual void		PasteAndRescaleSamples( const CDmeLogLayer *pBaseLayer, const CDmeLogLayer *pDataLayer, CDmeLogLayer *pOutputLayer, const DmeLog_TimeSelection_t& srcParams, const DmeLog_TimeSelection_t& destParams, bool bBlendAreaInFalloffRegion );
-	virtual void		BuildCorrespondingLayer( const CDmeLogLayer *pReferenceLayer, const CDmeLogLayer *pDataLayer, CDmeLogLayer *pOutputLayer );
+	void		PasteAndRescaleSamples( const CDmeLogLayer *src, const DmeLog_TimeSelection_t& srcParams, const DmeLog_TimeSelection_t& destParams, bool bBlendAreaInFalloffRegion ) override;
+	void		PasteAndRescaleSamples( const CDmeLogLayer *pBaseLayer, const CDmeLogLayer *pDataLayer, CDmeLogLayer *pOutputLayer, const DmeLog_TimeSelection_t& srcParams, const DmeLog_TimeSelection_t& destParams, bool bBlendAreaInFalloffRegion ) override;
+	void		BuildCorrespondingLayer( const CDmeLogLayer *pReferenceLayer, const CDmeLogLayer *pDataLayer, CDmeLogLayer *pOutputLayer ) override;
 
-	virtual void		BuildNormalizedLayer( CDmeTypedLogLayer< float > *target );
+	void		BuildNormalizedLayer( CDmeTypedLogLayer< float > *target ) override;
 
 	// Finds a key within tolerance, or adds one. Unlike SetKey, this will *not* delete keys after the specified time
 	intp FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType = CURVE_DEFAULT );
 
 	// Sets a key, removes all keys after this time
 	void SetKey( DmeTime_t time, const T& value, int curveType = CURVE_DEFAULT );
-	int InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT );
+	int InsertKeyAtTime( DmeTime_t nTime, int curveType = CURVE_DEFAULT ) override;
 	bool ValuesDiffer( const T& a, const T& b ) const;
 	const T& GetValue( DmeTime_t time ) const;
 	const T& GetValueSkippingTopmostLayer( DmeTime_t time ) const;
@@ -571,40 +571,40 @@ public:
 	int InsertKey( DmeTime_t nTime, const T& value, int curveType = CURVE_DEFAULT );
 
 	// inherited from CDmeLog
-	virtual void ClearKeys();
-	virtual void SetKey( DmeTime_t time, const CDmAttribute *pAttr, uint index = 0, int curveType = CURVE_DEFAULT );
-	virtual bool SetDuplicateKeyAtTime( DmeTime_t time );
-	virtual void GetValue( DmeTime_t time, CDmAttribute *pAttr, uint index = 0 ) const;
-	virtual void GetValueSkippingTopmostLayer( DmeTime_t time, CDmAttribute *pAttr, uint index = 0 ) const;
-	virtual float GetComponent( DmeTime_t time, int componentIndex ) const;
-	virtual DmAttributeType_t GetDataType() const;
-	virtual float GetValueThreshold() const { return m_threshold; }
-	virtual void SetValueThreshold( float thresh );
-	virtual bool IsConstantValued() const;
-	virtual void RemoveRedundantKeys();
-	virtual void RemoveRedundantKeys( float threshold );
-	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 );
-	virtual void Resample( DmeFramerate_t samplerate );
-	virtual void Filter( int nSampleRadius );
-	virtual void Filter2( DmeTime_t sampleRadius );
+	void ClearKeys() override;
+	void SetKey( DmeTime_t time, const CDmAttribute *pAttr, uint index = 0, int curveType = CURVE_DEFAULT ) override;
+	bool SetDuplicateKeyAtTime( DmeTime_t time ) override;
+	void GetValue( DmeTime_t time, CDmAttribute *pAttr, uint index = 0 ) const override;
+	void GetValueSkippingTopmostLayer( DmeTime_t time, CDmAttribute *pAttr, uint index = 0 ) const override;
+	float GetComponent( DmeTime_t time, int componentIndex ) const override;
+	DmAttributeType_t GetDataType() const override;
+	float GetValueThreshold() const override { return m_threshold; }
+	void SetValueThreshold( float thresh ) override;
+	bool IsConstantValued() const override;
+	void RemoveRedundantKeys() override;
+	void RemoveRedundantKeys( float threshold ) override;
+	void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 ) override;
+	void Resample( DmeFramerate_t samplerate ) override;
+	void Filter( int nSampleRadius ) override;
+	void Filter2( DmeTime_t sampleRadius ) override;
 
-	virtual intp FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance );
-	virtual DmeTime_t GetKeyTime( intp nKeyIndex ) const;
-	virtual void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime );
+	intp FindKeyWithinTolerance( DmeTime_t time, DmeTime_t nTolerance ) override;
+	DmeTime_t GetKeyTime( intp nKeyIndex ) const override;
+	void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime ) override;
 
-	virtual CDmeLogLayer *AddNewLayer();
-	virtual void		FlattenLayers( float threshhold, int flags );
+	CDmeLogLayer *AddNewLayer() override;
+	void		FlattenLayers( float threshhold, int flags ) override;
 
 	// Only used by undo system!!!
-	virtual void		AddLayerToTail( CDmeLogLayer *layer );
-	virtual CDmeLogLayer *RemoveLayerFromTail();
-	virtual CDmeLogLayer *RemoveLayer( intp iLayer );
+	void		AddLayerToTail( CDmeLogLayer *layer ) override;
+	CDmeLogLayer *RemoveLayerFromTail() override;
+	CDmeLogLayer *RemoveLayer( intp iLayer ) override;
 
 	// curve info helpers
 	const CDmeTypedCurveInfo< T > *GetTypedCurveInfo() const;
 	      CDmeTypedCurveInfo< T > *GetTypedCurveInfo();
-	virtual CDmeCurveInfo *GetOrCreateCurveInfo();
-	virtual void SetCurveInfo( CDmeCurveInfo *pCurveInfo );
+	CDmeCurveInfo *GetOrCreateCurveInfo() override;
+	void SetCurveInfo( CDmeCurveInfo *pCurveInfo ) override;
 
 	// For "faceposer" style left/right edges, this controls whether interpolators try to mimic faceposer left/right edge behavior
 	void			SetUseEdgeInfo( bool state );
@@ -629,7 +629,7 @@ public:
 
 	void			SetDefaultValue( const T& value );
 	const T&		GetDefaultValue() const;
-	bool			HasDefaultValue() const;
+	bool			HasDefaultValue() const override;
 	void			ClearDefaultValue();
 
 	static void SetDefaultValueThreshold( float thresh );

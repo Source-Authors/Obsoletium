@@ -13,9 +13,9 @@
 #include "vgui_controls/PropertyPage.h"
 #include "dme_controls/filtercombobox.h"
 #include "vgui/ISurface.h"
-#include "vgui/iinput.h"
+#include "vgui/IInput.h"
 #include "dme_controls/dmecontrols.h"
-#include "soundemittersystem/isoundemittersystembase.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "mathlib/mathlib.h"
 
 // FIXME: Move sound code out of the engine + into a library!

@@ -27,7 +27,7 @@ class CPickerFrame;
 //-----------------------------------------------------------------------------
 class CAttributeShaderPickerPanel : public CAttributeBasePickerPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeShaderPickerPanel, CAttributeBasePickerPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeShaderPickerPanel, CAttributeBasePickerPanel );
 
 public:
 	CAttributeShaderPickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
@@ -35,7 +35,7 @@ public:
 
 private:
 	MESSAGE_FUNC_PARAMS( OnPicked, "Picked", kv );
-	virtual void ShowPickerDialog();
+	void ShowPickerDialog() override;
 };
 
 

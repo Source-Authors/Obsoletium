@@ -459,8 +459,8 @@ enum EStringConvertErrorPolicy
 [[nodiscard]] intp Q_UnicodeLength( const uchar32 *pUTF32 );
 
 // Returns length of string in elements, not characters! These are analogous to Q_strlen and Q_wcslen
-inline [[nodiscard]] intp Q_strlen16( IN_Z const uchar16 *puc16 ) { intp nElems = 0; while ( puc16[nElems] ) ++nElems; return nElems; }
-inline [[nodiscard]] intp Q_strlen32( const uchar32 *puc32 ) { intp nElems = 0; while ( puc32[nElems] ) ++nElems; return nElems; }
+[[nodiscard]] inline intp Q_strlen16( IN_Z const uchar16 *puc16 ) { intp nElems = 0; while ( puc16[nElems] ) ++nElems; return nElems; }
+[[nodiscard]] inline intp Q_strlen32( const uchar32 *puc32 ) { intp nElems = 0; while ( puc32[nElems] ) ++nElems; return nElems; }
 
 
 // Repair invalid Unicode strings by dropping truncated characters and fixing improperly-double-encoded UTF-16 sequences.
@@ -1551,7 +1551,7 @@ template<size_t size>
 
 // dimhotepus: Fast integral -> char conversion.
 template<size_t size, typename TIntegral>
-constexpr inline std::enable_if_t<std::is_integral_v<TIntegral>, std::errc>
+inline std::enable_if_t<std::is_integral_v<TIntegral>, std::errc>
 V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TIntegral value, int base = 10)
 {
 	// Do not NULL terminate, so be careful.
@@ -1579,7 +1579,7 @@ V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TIntegral value, int base = 10)
 
 // dimhotepus: Fast floating point -> char conversion.
 template<size_t size, typename TFloat>
-constexpr inline std::enable_if_t<std::is_floating_point_v<TFloat>, std::errc>
+inline std::enable_if_t<std::is_floating_point_v<TFloat>, std::errc>
 V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TFloat value)
 {
 	// Do not NULL terminate, so be careful.
