@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#include "fgdlib/InputOutput.h"
+#include "fgdlib/inputoutput.h"
 
 #include "tier0/dbg.h"
 
@@ -15,11 +15,11 @@
 struct TypeMap_t
 {
 	InputOutputType_t eType;	// The enumeration of this type.
-	char *pszName;				// The name of this type.
+	const char *pszName;		// The name of this type.
 };
 
 
-char *CClassInputOutputBase::g_pszEmpty = "";
+const char *CClassInputOutputBase::g_pszEmpty = "";
 
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,8 @@ CClassInputOutputBase::CClassInputOutputBase(void)
 //-----------------------------------------------------------------------------
 CClassInputOutputBase::CClassInputOutputBase(const char *pszName, InputOutputType_t eType)
 {
-	m_szName[0] = '\0';
+	// dimhotepus: Read name from ctor arg.
+	V_strcpy_safe(m_szName, pszName);
 	m_eType = eType;
 	m_pszDescription = NULL;
 }

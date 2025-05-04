@@ -10,7 +10,7 @@
 
 
 #include "tier1/utlvector.h"
-#include "fgdlib/EntityDefs.h"
+#include "fgdlib/entitydefs.h"
 
 
 enum InputOutputType_t
@@ -52,7 +52,7 @@ class CClassInputOutputBase
 
 	protected:
 
-		static char *g_pszEmpty;
+		static const char *g_pszEmpty;
 
 		char m_szName[MAX_IO_NAME_LEN];
 		InputOutputType_t m_eType;

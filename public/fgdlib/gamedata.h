@@ -11,8 +11,8 @@
 #endif
 
 #include <fstream>
-#include "GDClass.h"
-#include "InputOutput.h"
+#include "gdclass.h"
+#include "inputoutput.h"
 #include "tier1/tokenreader.h"
 #include "tier1/utlstring.h"
 #include "tier1/utlvector.h"

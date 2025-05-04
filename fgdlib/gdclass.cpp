@@ -4,9 +4,9 @@
 //
 //=============================================================================
 
-#include "fgdlib/GDClass.h"
+#include "fgdlib/gdclass.h"
 
-#include "fgdlib/GameData.h" // FGDLIB: eliminate dependency
+#include "fgdlib/gamedata.h" // FGDLIB: eliminate dependency
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

@@ -2,10 +2,10 @@
 //
 //=============================================================================
 
-#include "fgdlib/GameData.h"
+#include "fgdlib/gamedata.h"
 
-#include "WorldSize.h"
-#include "fgdlib/HelperInfo.h"
+#include "worldsize.h"
+#include "fgdlib/helperinfo.h"
 #include "filesystem_tools.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
@@ -87,7 +87,7 @@ static bool DoGetToken(TokenReader &tr, char **ppszStore, intp nSize, trtoken_t 
 		// We didn't get the expected token type but no expected
 		// string was specified.
 		//
-		char *pszTokenName;
+		const char *pszTokenName;
 		switch (ttexpecting)
 		{
 			case IDENT:
@@ -739,6 +739,10 @@ bool GameData::RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *p
 
 			case NAME_FIXUP_POSTFIX:
 				V_snprintf( pszOutValue, outLen, "%s-%s", pszInValue, m_InstancePrefix );
+				break;
+
+				// dimhotepus: Handle all enum values.
+			case NAME_FIXUP_NONE:
 				break;
 		}
 	}
