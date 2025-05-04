@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxSlider.h"
+#include "mxtk/mxslider.h"
 #include <windows.h>
 #include <commctrl.h>
 
@@ -26,7 +26,7 @@ public:
 
 
 mxSlider::mxSlider (mxWindow *parent, int x, int y, int w, int h, int id, int style)
-: mxWidget (parent, x, y, w, h), m_ticks (-1), m_min(FLT_MIN), m_max (FLT_MAX)
+: mxWidget (parent, x, y, w, h), m_min(FLT_MIN), m_max (FLT_MAX), m_ticks (-1)
 {
 	if (!parent)
 		return;

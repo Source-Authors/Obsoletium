@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxPopupMenu.h"
+#include "mxtk/mxpopupmenu.h"
 #include <windows.h>
 
 

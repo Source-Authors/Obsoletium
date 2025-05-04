@@ -23,111 +23,111 @@
 
 
 #ifndef INCLUDED_MXBUTTON
-#include "mxtk/mxButton.h"
+#include "mxtk/mxbutton.h"
 #endif
 
 #ifndef INCLUDED_MXCHECKBOX
-#include "mxtk/mxCheckBox.h"
+#include "mxtk/mxcheckbox.h"
 #endif
 
 #ifndef INCLUDED_MXCHOICE
-#include "mxtk/mxChoice.h"
+#include "mxtk/mxchoice.h"
 #endif
 
 #ifndef INCLUDED_MXCHOOSECOLOR
-#include "mxtk/mxChooseColor.h"
+#include "mxtk/mxchoosecolor.h"
 #endif
 
 #ifndef INCLUDED_MXEVENT
-#include "mxtk/mxEvent.h"
+#include "mxtk/mxevent.h"
 #endif
 
 #ifndef INCLUDED_MXFILEDIALOG
-#include "mxtk/mxFileDialog.h"
+#include "mxtk/mxfiledialog.h"
 #endif
 
 #ifndef INCLUDED_MXGLWINDOW
-#include "mxtk/mxGlWindow.h"
+#include "mxtk/mxglwindow.h"
 #endif
 
 #ifndef INCLUDED_MXGROUPBOX
-#include "mxtk/mxGroupBox.h"
+#include "mxtk/mxgroupbox.h"
 #endif
 
 #ifndef INCLUDED_MXINIT
-#include "mxtk/mxInit.h"
+#include "mxtk/mxinit.h"
 #endif
 
 #ifndef INCLUDED_MXLABEL
-#include "mxtk/mxLabel.h"
+#include "mxtk/mxlabel.h"
 #endif
 
 #ifndef INCLUDED_MXLINEEDIT
-#include "mxtk/mxLineEdit.h"
+#include "mxtk/mxlineedit.h"
 #endif
 
 #ifndef INCLUDED_MXLINKEDLIST
-#include "mxtk/mxLinkedList.h"
+#include "mxtk/mxlinkedlist.h"
 #endif
 
 #ifndef INCLUDED_MXLISTBOX
-#include "mxtk/mxListBox.h"
+#include "mxtk/mxlistbox.h"
 #endif
 
 #ifndef INCLUDED_MXMENU
-#include "mxtk/mxMenu.h"
+#include "mxtk/mxmenu.h"
 #endif
 
 #ifndef INCLUDED_MXMENUBAR
-#include "mxtk/mxMenuBar.h"
+#include "mxtk/mxmenubar.h"
 #endif
 
 #ifndef INCLUDED_MXMESSAGEBOX
-#include "mxtk/mxMessageBox.h"
+#include "mxtk/mxmessagebox.h"
 #endif
 
 #ifndef INCLUDED_MXPOPUPMENU
-#include "mxtk/mxPopupMenu.h"
+#include "mxtk/mxpopupmenu.h"
 #endif
 
 #ifndef INCLUDED_MXPROGRESSBAR
-#include "mxtk/mxProgressBar.h"
+#include "mxtk/mxprogressbar.h"
 #endif
 
 #ifndef INCLUDED_MXRADIOBUTTON
-#include "mxtk/mxRadioButton.h"
+#include "mxtk/mxradiobutton.h"
 #endif
 
 #ifndef INCLUDED_MXSLIDER
-#include "mxtk/mxSlider.h"
+#include "mxtk/mxslider.h"
 #endif
 
 #ifndef INCLUDED_MXSCROLLBAR
-#include "mxtk/mxScrollbar.h"
+#include "mxtk/mxscrollbar.h"
 #endif
 
 #ifndef INCLUDED_MXTAB
-#include "mxtk/mxTab.h"
+#include "mxtk/mxtab.h"
 #endif
 
 #ifndef INCLUDED_MXTOGGLEBUTTON
-#include "mxtk/mxToggleButton.h"
+#include "mxtk/mxtogglebutton.h"
 #endif
 
 #ifndef INCLUDED_MXTOOLTIP
-#include "mxtk/mxToolTip.h"
+#include "mxtk/mxtooltip.h"
 #endif
 
 #ifndef INCLUDED_MXTREEVIEW
-#include "mxtk/mxTreeView.h"
+#include "mxtk/mxtreeview.h"
 #endif
 
 #ifndef INCLUDED_MXWIDGET
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #endif
 
 #ifndef INCLUDED_MXWINDOW
-#include "mxtk/mxWindow.h"
+#include "mxtk/mxwindow.h"
 #endif
 
 #ifndef INCLUDED_MXPATH

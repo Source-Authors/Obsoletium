@@ -11,8 +11,8 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxFileDialog.h"
-#include "mxtk/mxWindow.h"
+#include "mxtk/mxfiledialog.h"
+#include "mxtk/mxwindow.h"
 #include <windows.h>
 #include <commdlg.h>
 #include <string.h>

@@ -11,8 +11,8 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxChooseColor.h"
-#include "mxtk/mxWindow.h"
+#include "mxtk/mxchoosecolor.h"
+#include "mxtk/mxwindow.h"
 #include <windows.h>
 #include <commdlg.h>
 

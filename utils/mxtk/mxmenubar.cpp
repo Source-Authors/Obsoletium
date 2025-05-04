@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxMenuBar.h"
+#include "mxtk/mxmenubar.h"
 #include <windows.h>
 #include <string.h>
 

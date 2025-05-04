@@ -11,10 +11,10 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxLineEdit.h"
+#include "mxtk/mxlineedit.h"
 #include <windows.h>
-#include "mxtk/mxEvent.h"
-#include "mxtk/mxWindow.h"
+#include "mxtk/mxevent.h"
+#include "mxtk/mxwindow.h"
 
 
 class mxLineEdit_i

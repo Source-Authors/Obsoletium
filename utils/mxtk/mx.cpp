@@ -12,9 +12,9 @@
 //                 implied.
 //
 #include "mxtk/mx.h"
-#include "mxtk/mxWindow.h"
-#include "mxtk/mxEvent.h"
-#include "mxtk/mxLinkedList.h"
+#include "mxtk/mxwindow.h"
+#include "mxtk/mxevent.h"
+#include "mxtk/mxlinkedlist.h"
 #include <windows.h>
 #include <commctrl.h>
 #include <stdio.h>
@@ -131,7 +131,7 @@ static void RecursiveHandleEvent( mxWindow *window, mxEvent *event )
 	}
 }
 
-char const *translatecode( int code )
+char const *translatecode( unsigned code )
 {
 	switch ( code )
 	{
@@ -274,7 +274,7 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 				HTREEITEM hItem = TreeView_GetSelection (nmhdr->hwndFrom);
 
 				char sz[ 256 ];
-				V_sprintf_safe( sz, "tree view receiving notify %i : %s action %i old %p new %p selection %p\n", nmhdr->code, translatecode( nmhdr->code ),
+				V_sprintf_safe( sz, "tree view receiving notify %u : %s action %i old %p new %p selection %p\n", nmhdr->code, translatecode( nmhdr->code ),
 					nmt->action, nmt->itemOld, nmt->itemNew, hItem );
 				
 				OutputDebugString( sz );
@@ -811,7 +811,6 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 		if (window)
 		{
 			mxEvent event;
-			memset( &event, 0, sizeof( event ) );
 			event.event = mxEvent::MouseWheeled;
 			event.x = (short) LOWORD (lParam);
 			event.y = (short) HIWORD (lParam);

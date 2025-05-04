@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxChoice.h"
+#include "mxtk/mxchoice.h"
 #include <windows.h>
 
 

@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxGlWindow.h"
+#include "mxtk/mxglwindow.h"
 #include <windows.h>
 //#include <ostream.h"
 
@@ -124,7 +124,7 @@ mxGlWindow::~mxGlWindow ()
 
 
 int
-mxGlWindow::handleEvent (mxEvent *event)
+mxGlWindow::handleEvent ([[maybe_unused]] mxEvent *event)
 {
 	return 0;
 }

@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxListBox.h"
+#include "mxtk/mxlistbox.h"
 #include <windows.h>
 
 
@@ -30,13 +30,13 @@ mxListBox::mxListBox (mxWindow *parent, int x, int y, int w, int h, int id, int 
 	if (!parent)
 		return;
 
-	DWORD dwStyle = WS_VISIBLE | WS_CHILD | LBS_NOTIFY | WS_VSCROLL | WS_HSCROLL;
+	DWORD dwStyle = WS_VISIBLE | WS_CHILD | LBS_NOTIFY | WS_VSCROLL; // | WS_HSCROLL;
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
 	if (style == MultiSelection)
 		dwStyle |= LBS_MULTIPLESEL | LBS_EXTENDEDSEL;
 
-	void *handle = (void *) CreateWindowEx (WS_EX_CLIENTEDGE, "LISTBOX", "", WS_VISIBLE | WS_CHILD | LBS_NOTIFY | WS_VSCROLL,
+	void *handle = (void *) CreateWindowEx (WS_EX_CLIENTEDGE, "LISTBOX", "", dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	
@@ -101,7 +101,7 @@ mxListBox::removeAll ()
 void
 mxListBox::setItemText (int index, const char *item)
 {
-	//SendMessage ((HWND) getHandle (), LB_SETTEXT, (WPARAM) index, (LPARAM) (LPCTSTR) item);
+	// SendMessage ((HWND) getHandle (), WM_SETTEXT, (WPARAM) index, (LPARAM) (LPCTSTR) item);
 }
 
 

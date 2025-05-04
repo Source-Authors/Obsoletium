@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #include "tier0/dbg.h"
 #include <windows.h>
 #include <commctrl.h>
@@ -37,7 +37,7 @@ public:
 
 
 
-mxWidget::mxWidget (mxWindow *parent, int x, int y, int w, int h, const char *label)
+mxWidget::mxWidget (mxWindow *parent, [[maybe_unused]] int x, [[maybe_unused]] int y, [[maybe_unused]] int w, [[maybe_unused]] int h, const char *label)
 {
 	d_this = new mxWidget_i;
 

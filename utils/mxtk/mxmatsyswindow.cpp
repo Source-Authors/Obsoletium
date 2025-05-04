@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxMatSysWindow.h"
+#include "mxtk/mxmatsyswindow.h"
 #include <windows.h>
 
 class mxMatSysWindow_i
@@ -56,7 +56,7 @@ mxMatSysWindow::~mxMatSysWindow ()
 
 
 int
-mxMatSysWindow::handleEvent (mxEvent *event)
+mxMatSysWindow::handleEvent ([[maybe_unused]] mxEvent *event)
 {
 	return 0;
 }
