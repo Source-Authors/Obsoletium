@@ -676,7 +676,7 @@ void FloatBitMap_t::MakeTileable(void) const
 					float desiredx=DiffMapX.Pixel(x,y,c)+cursrc->Pixel(x+1,y,c);
 					float desiredy=DiffMapY.Pixel(x,y,c)+cursrc->Pixel(x,y+1,c);
 					float desired=0.5f*(desiredy+desiredx);
-					curdst->Pixel(x,y,c)=FLerp(cursrc->Pixel(x,y,c),desired,0.5);
+					curdst->Pixel(x,y,c)=Lerp(0.5f,cursrc->Pixel(x,y,c),desired);
 					error+=Square(desired-cursrc->Pixel(x,y,c));
 				}
 		std::swap(cursrc,curdst);
@@ -757,7 +757,7 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 						{
 							for(int c=0;c<3;c++)
 								Pixel(x*2+xi,y*2+yi,c)=
-								FLerp(Pixel(x*2+xi,y*2+yi,c),tmp->Pixel(x,y,c),Alpha(x*2+xi,y*2+yi));
+								Lerp(Alpha(x*2+xi,y*2+yi),Pixel(x*2+xi,y*2+yi,c),tmp->Pixel(x,y,c));
 						}
 
 		char fname[80];
@@ -793,8 +793,8 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 						for(int i=0;i<NDELTAS;i++)
 							desired+=deltas[i]->Pixel(x,y,c)+cursrc->Pixel(x+dx[i],y+dy[i],c);
 						desired*=(1.0f/NDELTAS);
-						//            desired=FLerp(Pixel(x,y,c),desired,Alpha(x,y));
-						curdst->Pixel(x,y,c)=FLerp(cursrc->Pixel(x,y,c),desired,0.5);
+						//            desired=Lerp(Alpha(x,y),Pixel(x,y,c),desired);
+						curdst->Pixel(x,y,c)=Lerp(0.5f,cursrc->Pixel(x,y,c),desired);
 						error+=Square(desired-cursrc->Pixel(x,y,c));
 					}
 				}

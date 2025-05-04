@@ -13,14 +13,14 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static [[nodiscard]] constexpr float ScaleValue(float f, float overbright)
+[[nodiscard]] static constexpr float ScaleValue(float f, float overbright)
 {
 	// map a value between 0..255 to the scale factor
 	int ival=static_cast<int>(f);
 	return ival*(overbright/255.0f);
 }
 
-static [[nodiscard]] constexpr float IScaleValue(float f, float overbright)
+[[nodiscard]] static constexpr float IScaleValue(float f, float overbright)
 {
 	f*=(1.0f/overbright);
 	float ival=min(255.0f,ceilf(f*255.0f));

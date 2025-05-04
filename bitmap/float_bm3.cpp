@@ -71,7 +71,7 @@ FloatImagePyramid_t::FloatImagePyramid_t(FloatBitMap_t const &src, [[maybe_unuse
 	m_nLevels = 1;
 
 	m_pLevels[0] = new FloatBitMap_t(&src);
-	if ( !m_pLevels )
+	if ( !m_pLevels[0] )
 		Error( "Unable to allocate new bitmap %dx%d to copy to.\n", src.Width, src.Height );
 
 	ReconstructLowerResolutionLevels(0);

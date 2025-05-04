@@ -60,6 +60,10 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 	case IMAGE_FORMAT_RGBA8888:
 		dstFormat = IMAGE_FORMAT_BGRA8888;
 		break;
+
+		// dimhotepus: Just to honor Clang -Wswitch warning.
+	default:
+		break;
 	}
 	
 	TGAHeader_t header = {};
@@ -106,7 +110,7 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 	buffer.PutChar( header.pixel_size );
 	buffer.PutChar( header.attributes );
 
-	int nSizeInBytes = width * height * ImageLoader::SizeInBytes( dstFormat );
+	const int nSizeInBytes = width * height * ImageLoader::SizeInBytes( dstFormat );
 	buffer.EnsureCapacity( buffer.TellPut() + nSizeInBytes );
 	unsigned char *pDst = (unsigned char*)buffer.PeekPut();
 

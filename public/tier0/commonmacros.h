@@ -384,6 +384,12 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
   _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")
 
 /*
+ * @brief Disables GCC / Clang switch warning.
+ */
+#define SRC_GCC_DISABLE_SWITCH_WARNING() \
+  _Pragma("GCC diagnostic ignored \"-Wswitch\"")
+
+/*
  * @brief Ends GCC / Clang warning override scope.
  */
 #define SRC_GCC_END_WARNING_OVERRIDE_SCOPE() _Pragma("GCC diagnostic pop")
@@ -397,6 +403,11 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
  * @brief Do nothing.
  */
 #define SRC_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING()
+
+/*
+ * @brief Do nothing.
+ */
+#define SRC_GCC_DISABLE_SWITCH_WARNING()
 
 /*
  * @brief Do nothing.

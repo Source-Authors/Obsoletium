@@ -331,13 +331,6 @@ public:
 	[[nodiscard]] Vector FaceNormal( int nFaceNumber );
 };
 
-
-static constexpr inline [[nodiscard]] float FLerp(float f1, float f2, float t)
-{
-	return f1+(f2-f1)*t;
-}
-
-
 // Image Pyramid class.
 constexpr int MAX_IMAGE_PYRAMID_LEVELS{16};  // up to 64kx64k;
 

@@ -800,7 +800,8 @@ void GenerateMipmapLevels( unsigned char* pSrc, unsigned char* pDst, int width,
 		info.m_flSrcGamma = srcGamma;
 		info.m_flDestGamma = dstGamma;
 
-		ResampleRGBA8888( info );
+		[[maybe_unused]] const bool ok = ResampleRGBA8888( info );
+		AssertMsg(ok, "Unable to resample image %dx%d to RGBA8888.", width, height);
 
 		// each mipmap level needs to be color converted separately
 		ConvertImageFormat( tmpImage.Base(), IMAGE_FORMAT_RGBA8888,

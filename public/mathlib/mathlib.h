@@ -740,8 +740,9 @@ template <class T>
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
 // YWB:  Specialization for interpolating euler angles via quaternions...
-template<> FORCEINLINE [[nodiscard]] QAngle Lerp<QAngle>( float flPercent, const QAngle& q1, const QAngle& q2 )
-{
+template <>
+[[nodiscard]] FORCEINLINE QAngle Lerp<QAngle>(float flPercent, const QAngle &q1,
+                                              const QAngle &q2) {
 	// Avoid precision errors
 	if ( q1 == q2 )
 		return q1;
@@ -1457,16 +1458,16 @@ inline void XM_CALLCONV GetBarycentricCoords2D(
 }
 
 
-extern [[nodiscard]] float XM_CALLCONV GammaToLinearFullRange( float gamma );
-extern [[nodiscard]] float XM_CALLCONV LinearToGammaFullRange( float linear );
-extern [[nodiscard]] float XM_CALLCONV GammaToLinear( float gamma );
-extern [[nodiscard]] float XM_CALLCONV LinearToGamma( float linear );
+[[nodiscard]] extern float XM_CALLCONV GammaToLinearFullRange( float gamma );
+[[nodiscard]] extern float XM_CALLCONV LinearToGammaFullRange( float linear );
+[[nodiscard]] extern float XM_CALLCONV GammaToLinear( float gamma );
+[[nodiscard]] extern float XM_CALLCONV LinearToGamma( float linear );
 
-extern [[nodiscard]] float XM_CALLCONV SrgbGammaToLinear( float flSrgbGammaValue );
-extern [[nodiscard]] float XM_CALLCONV SrgbLinearToGamma( float flLinearValue );
-extern [[nodiscard]] float XM_CALLCONV X360GammaToLinear( float fl360GammaValue );
-extern [[nodiscard]] float XM_CALLCONV X360LinearToGamma( float flLinearValue );
-extern [[nodiscard]] float XM_CALLCONV SrgbGammaTo360Gamma( float flSrgbGammaValue );
+[[nodiscard]] extern float XM_CALLCONV SrgbGammaToLinear( float flSrgbGammaValue );
+[[nodiscard]] extern float XM_CALLCONV SrgbLinearToGamma( float flLinearValue );
+[[nodiscard]] extern float XM_CALLCONV X360GammaToLinear( float fl360GammaValue );
+[[nodiscard]] extern float XM_CALLCONV X360LinearToGamma( float flLinearValue );
+[[nodiscard]] extern float XM_CALLCONV SrgbGammaTo360Gamma( float flSrgbGammaValue );
 
 // linear (0..4) to screen corrected vertex space (0..1?)
 [[nodiscard]] FORCEINLINE float XM_CALLCONV LinearToVertexLight( float f )

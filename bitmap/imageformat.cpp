@@ -130,9 +130,12 @@ ptrdiff_t GetMemRequired( int width, int height, int depth, ImageFormat imageFor
 			case IMAGE_FORMAT_DXT5_RUNTIME:
 			case IMAGE_FORMAT_ATI2N:
 				return numBlocks * 16;
+
+			default:
+				AssertMsg(false, "Unsupported image format %d", imageFormat);
+				break;
 			}
 
-			Assert( 0 );
 			return 0;
 		}
 
@@ -307,7 +310,10 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 		return IMAGE_FORMAT_R32F;
 	case D3DFMT_A32B32G32R32F:
 		return IMAGE_FORMAT_RGBA32323232F;
-		
+	
+	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
+	SRC_GCC_DISABLE_SWITCH_WARNING()
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
 	MSVC_DISABLE_WARNING(4063)
@@ -319,11 +325,15 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 	case (D3DFORMAT)(MAKEFOURCC('N','U','L','L')):
 		return IMAGE_FORMAT_NV_NULL;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
+	SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	case D3DFMT_D16:
 		return IMAGE_FORMAT_NV_DST16;
 	case D3DFMT_D24S8:
 		return IMAGE_FORMAT_NV_DST24;
+	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
+	SRC_GCC_DISABLE_SWITCH_WARNING()
 	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
 	MSVC_DISABLE_WARNING(4063)
 	case (D3DFORMAT)(MAKEFOURCC('D','F','1','6')):
@@ -337,11 +347,12 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 	case (D3DFORMAT)(MAKEFOURCC('A','T','I','2')):
 		return IMAGE_FORMAT_ATI2N;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
+	SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
+
+	default:
+		AssertMsg( false, "Unknown D3DFORMAT 0x%x.", format );
+		return IMAGE_FORMAT_UNKNOWN;
 	}
-
-	Assert( 0 );
-
-	return IMAGE_FORMAT_UNKNOWN;
 }
 
 D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
@@ -417,11 +428,11 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 		return D3DFMT_DXT1;
 	case IMAGE_FORMAT_DXT5_RUNTIME:
 		return D3DFMT_DXT5;
+
+	default:
+		AssertMsg( false, "Unknown ImageFormat 0x%x.", format );
+		return D3DFMT_UNKNOWN;
 	}
-
-	Assert( 0 );
-
-	return D3DFMT_UNKNOWN;
 }
 
 } // ImageLoader namespace ends
