@@ -4,9 +4,9 @@
 //
 //=============================================================================
 
-#include "sfmobjects/SFMPhonemeExtractor.h"
+#include "sfmobjects/sfmphonemeextractor.h"
 #include "tier2/riff.h"
-#include "PhonemeConverter.h"
+#include "phonemeconverter.h"
 #include "filesystem.h"
 #include "tier1/utlbuffer.h"
 #include "sentence.h"
@@ -81,7 +81,8 @@ private:
 	void BuildPhonemeToPresetMapping( const CUtlVector< CBasePhonemeTag * > &stream, CDmeAnimationSet *pSet, CDmePresetGroup * pPresetGroup, CUtlDict< CDmePreset *, unsigned short > &phonemeToPresetDict );
 
 	CUtlVector< Extractor >	m_Extractors;
-	int m_nCurrentExtractor;
+	// dimhotepus: Comment unused field.
+	// int m_nCurrentExtractor;
 };
 
 
@@ -95,7 +96,7 @@ ISFMPhonemeExtractor *sfm_phonemeextractor = &g_ExtractorSingleton;
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CSFMPhonemeExtractor::CSFMPhonemeExtractor() : m_nCurrentExtractor( -1 )
+CSFMPhonemeExtractor::CSFMPhonemeExtractor() // dimhotepus: Comment unused field. : m_nCurrentExtractor( -1 )
 {
 }
 

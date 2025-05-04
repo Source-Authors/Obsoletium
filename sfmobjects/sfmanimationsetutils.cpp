@@ -473,8 +473,8 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 static void SetupRootTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannelsClip, 
 	CDmeChannelsClip *channelsClip, CDmElement *control, CDmeGameModel *gameModel, const char *basename, bool bAttachToGameRecording )
 {
-	char *channelNames[] = { "position", "orientation" };
-	char *valueNames[] = { "valuePosition", "valueOrientation" };
+	const char *channelNames[] = { "position", "orientation" };
+	const char *valueNames[] = { "valuePosition", "valueOrientation" };
 	DmAttributeType_t channelTypes[] = { AT_VECTOR3, AT_QUATERNION };
 	const char *suffix[]			= { "Pos", "Rot" };
 	DmAttributeType_t logType[]		= { AT_VECTOR3, AT_QUATERNION };

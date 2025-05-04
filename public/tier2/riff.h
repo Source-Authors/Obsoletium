@@ -26,12 +26,12 @@
 class IFileReadBinary
 {
 public:
-	virtual [[nodiscard]] ptrdiff_t open( const char *pFileName ) = 0;
+	[[nodiscard]] virtual ptrdiff_t open( const char *pFileName ) = 0;
 	virtual int read( void *pOutput, int size, ptrdiff_t file ) = 0;
 	virtual void close( ptrdiff_t file ) = 0;
 	virtual void seek( ptrdiff_t file, int pos ) = 0;
-	virtual [[nodiscard]] unsigned int tell( ptrdiff_t file ) = 0;
-	virtual [[nodiscard]] unsigned int size( ptrdiff_t file ) = 0;
+	[[nodiscard]] virtual unsigned int tell( ptrdiff_t file ) = 0;
+	[[nodiscard]] virtual unsigned int size( ptrdiff_t file ) = 0;
 };
 
 
@@ -100,11 +100,11 @@ private:
 class IFileWriteBinary
 {
 public:
-	virtual [[nodiscard]] ptrdiff_t create( const char *pFileName ) = 0;
+	[[nodiscard]] virtual ptrdiff_t create( const char *pFileName ) = 0;
 	virtual int write( void *pData, int size, ptrdiff_t file ) = 0;
 	virtual void close( ptrdiff_t file ) = 0;
 	virtual void seek( ptrdiff_t file, int pos ) = 0;
-	virtual [[nodiscard]] unsigned int tell( ptrdiff_t file ) = 0;
+	[[nodiscard]] virtual unsigned int tell( ptrdiff_t file ) = 0;
 };
 //-----------------------------------------------------------------------------
 // Purpose: Used to write a RIFF format file

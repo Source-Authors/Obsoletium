@@ -38,7 +38,7 @@ class CDmeTrack : public CDmElement
 
 public:
 	// Methods of IDmElement
-	virtual void	OnAttributeChanged( CDmAttribute *pAttribute );
+	void			OnAttributeChanged( CDmAttribute *pAttribute ) override;
 
 	void			SetCollapsed( bool state );
 	bool			IsCollapsed() const;
