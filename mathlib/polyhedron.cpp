@@ -1399,12 +1399,11 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 #endif
 
 			GeneratePolyhedronFromPlanes_LineLL *pLastLineLink;
-			GeneratePolyhedronFromPlanes_Polygon *pWorkPolygon;			
+			GeneratePolyhedronFromPlanes_Polygon *pWorkPolygon;
 			GeneratePolyhedronFromPlanes_LineLL *pTestLine;
 
 #ifdef _DEBUG
 			GeneratePolyhedronFromPlanes_Polygon *pLastWorkPolygon = NULL;
-			GeneratePolyhedronFromPlanes_Point *pLastWorkPoint = NULL;
 #endif
 
 			if( pActivePolygonWalk )
@@ -1607,7 +1606,6 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 #ifdef _DEBUG
 					pLastWorkPolygon = pWorkPolygon;
-					pLastWorkPoint = pWorkPoint;
 #endif
 					//move to the next point
 					pWorkPoint = pJoinLine->pPoints[0];
@@ -1667,7 +1665,6 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 #ifdef _DEBUG
 					pLastWorkPolygon = pWorkPolygon;
-					pLastWorkPoint = pWorkPoint;
 #endif
 
 					pWorkPoint = pTestLine->pLine->pPoints[pTestLine->iReferenceIndex];
