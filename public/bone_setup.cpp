@@ -886,44 +886,28 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 	mstudioseqdesc_t &seqdesc, int sequence, int animation,
 	float cycle, int boneMask )
 {
-	//int	i, k;
-
-	const mstudiobone_t *pbone;
-	const virtualgroup_t *pSeqGroup;
-	const studiohdr_t *pSeqStudioHdr;
-	const mstudiolinearbone_t *pSeqLinearBones;
-	const mstudiobone_t *pSeqbone;
-	const mstudioanim_t *panim;
-	const studiohdr_t *pAnimStudioHdr;
-	const mstudiolinearbone_t *pAnimLinearBones;
-	const mstudiobone_t *pAnimbone;
-	const virtualgroup_t *pAnimGroup;
-
-	pSeqGroup = pVModel->pSeqGroup( sequence );
+	const virtualgroup_t *pSeqGroup = pVModel->pSeqGroup( sequence );
 	int baseanimation = pStudioHdr->iRelativeAnim( sequence, animation );
 	mstudioanimdesc_t &animdesc = ((CStudioHdr *)pStudioHdr)->pAnimdesc( baseanimation );
-	pSeqStudioHdr = ((CStudioHdr *)pStudioHdr)->pSeqStudioHdr( sequence );
-	pSeqLinearBones = pSeqStudioHdr->pLinearBones();
-	pSeqbone = pSeqStudioHdr->pBone( 0 );
-	pAnimGroup = pVModel->pAnimGroup( baseanimation );
-	pAnimStudioHdr = ((CStudioHdr *)pStudioHdr)->pAnimStudioHdr( baseanimation );
-	pAnimLinearBones = pAnimStudioHdr->pLinearBones();
-	pAnimbone = pAnimStudioHdr->pBone( 0 );
-
-	int					iFrame;
-	float				s;
+	const studiohdr_t *pSeqStudioHdr = ((CStudioHdr *)pStudioHdr)->pSeqStudioHdr( sequence );
+	const mstudiolinearbone_t *pSeqLinearBones = pSeqStudioHdr->pLinearBones();
+	const mstudiobone_t *pSeqbone = pSeqStudioHdr->pBone( 0 );
+	const virtualgroup_t *pAnimGroup = pVModel->pAnimGroup( baseanimation );
+	const studiohdr_t *pAnimStudioHdr = ((CStudioHdr *)pStudioHdr)->pAnimStudioHdr( baseanimation );
+	const mstudiolinearbone_t *pAnimLinearBones = pAnimStudioHdr->pLinearBones();
+	const mstudiobone_t *pAnimbone = pAnimStudioHdr->pBone( 0 );
 
 	float fFrame = cycle * (animdesc.numframes - 1);
 
-	iFrame = (int)fFrame;
-	s = (fFrame - iFrame);
+	int iFrame = (int)fFrame;
+	float s = (fFrame - iFrame);
 
 	int iLocalFrame = iFrame;
 	float flStall;
-	panim = animdesc.pAnim( &iLocalFrame, flStall );
+	const mstudioanim_t *panim = animdesc.pAnim( &iLocalFrame, flStall );
 
 	float *pweight = seqdesc.pBoneweight( 0 );
-	pbone = pStudioHdr->pBone( 0 );
+	const mstudiobone_t *pbone = pStudioHdr->pBone( 0 );
 
 	for (int i = 0; i < pStudioHdr->numbones(); i++)
 	{
@@ -993,11 +977,9 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 		matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
 		CBoneBitList boneComputed;
 
-		int i;
-		for (i = 0; i < animdesc.numlocalhierarchy; i++)
+		for (int i = 0; i < animdesc.numlocalhierarchy; i++)
 		{
 			const mstudiolocalhierarchy_t *pHierarchy = animdesc.pHierarchy( i );
-
 			if ( !pHierarchy )
 				break;
 
@@ -1029,7 +1011,7 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 // Purpose: Find and decode a sub-frame of animation
 //-----------------------------------------------------------------------------
 
-static void CalcAnimation( const CStudioHdr *pStudioHdr,	Vector *pos, Quaternion *q, 
+static void CalcAnimation( const CStudioHdr *pStudioHdr, Vector *pos, Quaternion *q, 
 	mstudioseqdesc_t &seqdesc,
 	int sequence, int animation,
 	float cycle, int boneMask )
