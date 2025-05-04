@@ -1539,12 +1539,9 @@ static void ParseLightPoint( entity_t* e, directlight_t* dl )
 #define DIRECT_SCALE (100.0*100.0)
 void CreateDirectLights (void)
 {
-	unsigned        i;
-	CPatch	        *p = NULL;
 	directlight_t	*dl = NULL;
 	entity_t	    *e = NULL;
 	const char	    *name;
-	Vector	        dest;
 
 	numdlights = 0;
 
@@ -1553,27 +1550,24 @@ void CreateDirectLights (void)
 	//
 	// surfaces
 	//
-	unsigned int uiPatchCount = g_Patches.Count();
-	for (i=0; i< uiPatchCount; i++)
+	for (auto &p : g_Patches)
 	{
-		p = &g_Patches.Element( i );
-
 		// skip parent patches
-		if (p->child1 != g_Patches.InvalidIndex() )
+		if (p.child1 != g_Patches.InvalidIndex() )
 			continue;
 
-		if (p->basearea < 1e-6)
+		if (p.basearea < 1e-6f)
 			continue;
 
-		if( VectorAvg( p->baselight ) >= dlight_threshold )
+		if ( VectorAvg( p.baselight ) >= dlight_threshold )
 		{
-			dl = AllocDLight( p->origin, true );
-
+			dl = AllocDLight( p.origin, true );
 			dl->light.type = emit_surface;
-			VectorCopy (p->normal, dl->light.normal);
-			Assert( VectorLength( p->normal ) > 1.0e-20 );
+
+			VectorCopy (p.normal, dl->light.normal);
+			Assert( VectorLength( p.normal ) > 1.0e-20 );
 			// scale intensity by number of texture instances
-			VectorScale( p->baselight, lightscale * p->area * p->scale[0] * p->scale[1] / p->basearea, dl->light.intensity );
+			VectorScale( p.baselight, lightscale * p.area * p.scale[0] * p.scale[1] / p.basearea, dl->light.intensity );
 
 			// scale to a range that results in actual light
 			VectorScale( dl->light.intensity, DIRECT_SCALE, dl->light.intensity );
@@ -1583,7 +1577,7 @@ void CreateDirectLights (void)
 	//
 	// entities
 	//
-	for (i=0 ; i<(unsigned)num_entities ; i++)
+	for (unsigned i=0 ; i<(unsigned)num_entities ; i++)
 	{
 		e = &entities[i];
 		name = ValueForKey (e, "classname");
@@ -1613,7 +1607,6 @@ void CreateDirectLights (void)
 	}
 
 	qprintf ("%i direct lights\n", numdlights);
-	// exit(1);
 }
 
 /*
