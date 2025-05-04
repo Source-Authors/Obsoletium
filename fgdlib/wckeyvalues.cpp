@@ -151,7 +151,7 @@ void WCKeyValuesT<Base>::RemoveKey(const char *pszKey)
 template<class Base>
 void WCKeyValuesT<Base>::SetValue(const char *pszKey, int iValue)
 {
-	char szValue[100];
+	char szValue[16];
 	// dimhotepus: itoa -> V_to_chars.
 	V_to_chars(szValue, iValue);
 
