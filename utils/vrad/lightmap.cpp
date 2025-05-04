@@ -963,9 +963,7 @@ void MergeDLightVis( directlight_t *dl, int cluster );
 
 directlight_t *AllocDLight( Vector& origin, bool bAddToList )
 {
-	directlight_t *dl;
-
-	dl = ( directlight_t* )calloc(1, sizeof(directlight_t));
+	directlight_t *dl = ( directlight_t* )calloc(1, sizeof(directlight_t));
 	if (!dl) return nullptr;
 
 	dl->index = numdlights++;
@@ -3043,8 +3041,6 @@ static void InitSampleInfo( lightinfo_t const& l, int iThread, SSE_SampleInfo_t&
 
 void BuildFacelights (int iThread, int facenum)
 {
-	int	i, j;
-
 	lightinfo_t	l;
 	dface_t *f;
 	facelight_t	*fl;
@@ -3068,7 +3064,7 @@ void BuildFacelights (int iThread, int facenum)
 	// some surfaces don't need lightmaps
 	f = &g_pFaces[facenum];
 	f->lightofs = -1;
-	for (j=0 ; j<MAXLIGHTMAPS ; j++)
+	for (int j=0 ; j<MAXLIGHTMAPS ; j++)
 		f->styles[j] = 255;
 
 	// Trivial-reject the whole face?	
@@ -3146,7 +3142,7 @@ void BuildFacelights (int iThread, int facenum)
 	if (do_extra && !sampleInfo.m_IsDispFace)
 	{
 		// For each lightstyle, perform a supersampling pass
-		for ( i = 0; i < MAXLIGHTMAPS; ++i )
+		for ( int i = 0; i < MAXLIGHTMAPS; ++i )
 		{
 			// Stop when we run out of lightstyles
 			if (f->styles[i] == 255)
