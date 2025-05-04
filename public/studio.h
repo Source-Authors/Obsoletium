@@ -912,7 +912,11 @@ struct mstudioflexcontrollerui_t
 	{
 		return !stereo ? (mstudioflexcontroller_t *)( (char *)this + szindex0 ) : nullptr;
 	}
-	inline const char *	pszControllerName( void ) const { return !stereo ? pController()->pszName() : nullptr; }
+	inline const char *	pszControllerName( void ) const 
+	{
+		const auto *controller = pController();
+		return controller ? controller->pszName() : nullptr;
+	}
 	inline intp			controllerIndex( const CStudioHdr &cStudioHdr ) const;
 
 	inline const mstudioflexcontroller_t *pLeftController( void ) const
@@ -2934,7 +2938,8 @@ inline int flexsetting_t::psetting( [[maybe_unused]] byte *base, int i, flexweig
 //-----------------------------------------------------------------------------
 inline intp mstudioflexcontrollerui_t::controllerIndex( const CStudioHdr &cStudioHdr ) const
 {
-	return !stereo ? pController() - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
+	const auto *controller = pController();
+	return controller ? controller - cStudioHdr.pFlexcontroller( (LocalFlexController_t)0 ) : -1;
 }
 
 
