@@ -577,7 +577,8 @@ template<class T>
 }
 
 // Math routines for optimizing division
-void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient, int *rem);
+// dimhotepus: double -> float.
+void XM_CALLCONV FloorDivMod (float numer, float denom, int *quotient, int *rem);
 [[nodiscard]] int XM_CALLCONV GreatestCommonDivisor (int i1, int i2);
 
 // Test for FPU denormal mode

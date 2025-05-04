@@ -722,23 +722,20 @@ quotient must fit in 32 bits.
 ====================
 */
 
-void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient,
+void XM_CALLCONV FloorDivMod (float numer, float denom, int *quotient,
 		int *rem)
 {
 	Assert( s_bMathlibInitialized );
-	int		q, r;
-	double	x;
 
 #ifdef PARANOID
-	if (denom <= 0.0)
-		Sys_Error ("FloorDivMod: bad denominator %d\n", denom);
-
-//	if ((floor(numer) != numer) || (floor(denom) != denom))
-//		Sys_Error ("FloorDivMod: non-integer numer or denom %f %f\n",
-//				numer, denom);
+	if (denom <= 0.0f)
+		Sys_Error ("FloorDivMod: bad denominator %f.\n", denom);
 #endif
 
-	if (numer >= 0.0)
+	int q, r;
+	float x;
+
+	if (numer >= 0.0f)
 	{
 
 		x = floor(numer / denom);
@@ -747,9 +744,7 @@ void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient,
 	}
 	else
 	{
-		//
 		// perform operations with positive values, and fix mod to make floor-based
-		//
 		x = floor(-numer / denom);
 		q = -(int)x;
 		r = Floor2Int(-numer - (x * denom));
