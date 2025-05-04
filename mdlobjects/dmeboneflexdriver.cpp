@@ -7,7 +7,7 @@
 
 // Valve includes
 #include "datamodel/dmelementfactoryhelper.h"
-#include "mdlobjects/dmeBoneFlexDriver.h"
+#include "mdlobjects/dmeboneflexdriver.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -29,13 +29,13 @@ class CDmeLODList : public CDmeBodyPart
 
 public:
 	// Returns the number of LODs in this body part, can be 0
-	virtual intp LODCount() const;
+	intp LODCount() const override;
 
 	// Returns the root LOD. This is the one with the switch metric 0
-	virtual CDmeLOD *GetRootLOD();
+	CDmeLOD *GetRootLOD() override;
 
 	// Returns the shadow LOD
-	virtual CDmeLOD *GetShadowLOD();
+	CDmeLOD *GetShadowLOD() override;
 
 	// NOTE: It may be possible to eliminate the skeleton here
 	// and assume the LOD always uses the root skeleton.
