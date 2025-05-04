@@ -1399,7 +1399,7 @@ _CRT_REPORT_HOOK __cdecl _CrtSetReportHook
 	_In_opt_ _CRT_REPORT_HOOK pfnNewHook
 )
 {
-	return reinterpret_cast<_CRT_REPORT_HOOK>( g_pMemAlloc->CrtSetReportHook( reinterpret_cast<void*>(pfnNewHook) ) );
+	return reinterpret_cast<_CRT_REPORT_HOOK>( g_pMemAlloc->CrtSetReportHook( reinterpret_cast<void*>(pfnNewHook) ) ); //-V206
 }
 
 int __cdecl _CrtSetReportHook2
