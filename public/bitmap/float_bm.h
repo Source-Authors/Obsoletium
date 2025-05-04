@@ -152,7 +152,7 @@ public:
 		Assert((x>=0) && (x<Width));
 		Assert((y>=0) && (y<Height));
 		
-		int RGBoffset= 4*(x+Width*y);
+		int RGBoffset= 4*(x+Width*y); //-V112
 		PixRGBAF RetPix {
 			RGBAData[RGBoffset+0],
 			RGBAData[RGBoffset+1],
@@ -169,7 +169,7 @@ public:
 		Assert((x>=0) && (x<Width));
 		Assert((y>=0) && (y<Height));
 
-		int RGBoffset= 4*(x+Width*y);
+		int RGBoffset= 4*(x+Width*y); //-V112
 		RGBAData[RGBoffset+0]= value.Red;
 		RGBAData[RGBoffset+1]= value.Green;
 		RGBAData[RGBoffset+2]= value.Blue;
