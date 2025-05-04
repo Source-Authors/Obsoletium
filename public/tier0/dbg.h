@@ -268,8 +268,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 			if (!!(_exp)) { 													\
 			} else {																\
 				_SpewInfo( SPEW_ASSERT, __TFILE__, __LINE__ );				\
-				const auto _movedMsg = std::move(_msg);				\
-				const tchar *_message = static_cast<const tchar *>( _movedMsg );				\
+				const tchar *_message = static_cast<const tchar *>( _msg );				\
 				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _message ));	\
 				CallAssertFailedNotifyFunc( __TFILE__, __LINE__, _message );					\
 				_executeExp; 												\
