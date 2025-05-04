@@ -205,7 +205,7 @@ public:
 	// If inputBuffer is omitted or nullptr, then it is assumed to be the same as
 	// outputBuffer - effectively swapping the contents of the buffer in place.
 	//-----------------------------------------------------------------------------
-	template<typename T> inline void SwapBuffer( T* outputBuffer, T* inputBuffer = nullptr, int count = 1 )
+	template<typename T> inline void SwapBuffer( T* outputBuffer, T* inputBuffer = nullptr, intp count = 1 )
 	{
 		Assert( count >= 0 );
 		Assert( outputBuffer );
@@ -221,7 +221,7 @@ public:
 		}
 
 		// Swap everything in the buffer:
-		for( int i = 0; i < count; i++ )
+		for( intp i = 0; i < count; i++ )
 		{
 			LowLevelByteSwap<T>( outputBuffer[i], inputBuffer[i] );
 		}
@@ -234,13 +234,13 @@ public:
 	// If inputBuffer is omitted or nullptr, then it is assumed to be the same as
 	// outputBuffer - effectively swapping the contents of the buffer in place.
 	//-----------------------------------------------------------------------------
-	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, const T* inputBuffer = nullptr, int count = 1 )
+	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, const T* inputBuffer = nullptr, intp count = 1 )
 	{
 		Assert( count >= 0 );
 		Assert( outputBuffer );
 
 		// Fail gracefully in release:
-		if( count <=0 || !outputBuffer )
+		if( count <= 0 || !outputBuffer )
 			return;
 
 		// Optimization for the case when we are swapping in place.
@@ -258,7 +258,7 @@ public:
 		}
 
 		// Swap everything in the buffer:
-		for( int i = 0; i < count; i++ )
+		for( intp i = 0; i < count; i++ )
 		{
 			LowLevelByteSwap<T>( outputBuffer[i], inputBuffer[i] );
 		}
