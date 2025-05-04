@@ -523,7 +523,7 @@ public:
 	Vector48& operator=(const Vector &vOther);
 	[[nodiscard]] operator Vector ();
 
-	[[nodiscard]] float operator[]( int i ) const { return (((const float16 *)this)[i]).GetFloat(); }
+	[[nodiscard]] float operator[]( int i ) const { return (((const float16 *)this)[i]).GetFloat(); } //-V302
 
 	float16 x;
 	float16 y;
