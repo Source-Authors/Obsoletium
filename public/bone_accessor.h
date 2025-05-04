@@ -106,10 +106,7 @@ inline const matrix3x4_t& CBoneAccessor::GetBone( int iBone ) const
 
 inline const matrix3x4_t& CBoneAccessor::operator[]( int iBone ) const
 {
-#if defined( CLIENT_DLL ) && defined( _DEBUG )
-	SanityCheckBone( iBone, true );
-#endif
-	return m_pBones[iBone];
+	return GetBone(iBone);
 }
 
 inline matrix3x4_t& CBoneAccessor::GetBoneForWrite( int iBone )
