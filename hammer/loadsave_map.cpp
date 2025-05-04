@@ -69,9 +69,9 @@ static void StuffLine(char * buf)
 	bStuffed = TRUE;
 }
 
-static void GetLine(std::fstream& file, OUT_Z_CAP(bufferSize) char *buf, intp bufferSize)
+static void GetLine(std::fstream& file, OUT_Z_CAP_OPT(bufferSize) char *buf, intp bufferSize)
 {
-	if (bufferSize > 0)
+	if (buf && bufferSize > 0)
 		buf[0] = '\0';
 
 	if(bStuffed)
