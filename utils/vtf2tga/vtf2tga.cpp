@@ -269,7 +269,7 @@ int main(int argc, char **argv) {
           std::unique_ptr<unsigned char[]> dst_data =
               std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired(
                   mip_width, mip_height, 1, dst_format, false));
-          if (!ImageLoader::ConvertImageFormat(src_data, src_format,
+          if (!ImageLoader::ConvertImageFormat(src_data, src_format, //-V1051
                                                dst_data.get(), dst_format,
                                                mip_width, mip_height, 0, 0)) {
             Error("Error converting '%s' from '%s' to '%s'.\n",
