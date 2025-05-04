@@ -756,7 +756,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 			//
 			// if winding T2 still exists free it and set it equal S1 (the rest of the row minus the sample just created)
 			//
-				FreeWinding( pWindingT2 );
+			FreeWinding( pWindingT2 );
 
 			// clip the rest of "s"
 			pWindingT2 = pWindingS1;
@@ -765,7 +765,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 		//
 		// if the original lightmap winding exists free it and set it equal to T1 (the rest of the winding not cut into samples) 
 		//
-			FreeWinding( pLightmapWinding );
+		FreeWinding( pLightmapWinding );
 
 		if( pWindingT2 )
 		{
@@ -2338,30 +2338,30 @@ void DumpSamples( int ndxFace, facelight_t *pFaceLight )
 	ScopedThreadsLock lock;
 
 	dface_t *pFace = &g_pFaces[ndxFace];
-		bool bBumpped = ( ( texinfo[pFace->texinfo].flags & SURF_BUMPLIGHT ) != 0 );
+	bool bBumpped = ( ( texinfo[pFace->texinfo].flags & SURF_BUMPLIGHT ) != 0 );
 
-		for( int iStyle = 0; iStyle < 4; ++iStyle )
+	for( int iStyle = 0; iStyle < 4; ++iStyle )
+	{
+		if( pFace->styles[iStyle] != 255 )
 		{
-			if( pFace->styles[iStyle] != 255 )
+			for ( int iBump = 0; iBump < 4; ++iBump )
 			{
-				for ( int iBump = 0; iBump < 4; ++iBump )
+				if ( iBump == 0 || ( iBump > 0 && bBumpped ) )
 				{
-					if ( iBump == 0 || ( iBump > 0 && bBumpped ) )
+					for( int iSample = 0; iSample < pFaceLight->numsamples; ++iSample )
 					{
-						for( int iSample = 0; iSample < pFaceLight->numsamples; ++iSample )
+						sample_t *pSample = &pFaceLight->sample[iSample];
+						WriteWinding( pFileSamples[iStyle][iBump], pSample->w, pFaceLight->light[iStyle][iBump][iSample].m_vecLighting );
+						if( bDumpNormals )
 						{
-							sample_t *pSample = &pFaceLight->sample[iSample];
-							WriteWinding( pFileSamples[iStyle][iBump], pSample->w, pFaceLight->light[iStyle][iBump][iSample].m_vecLighting );
-							if( bDumpNormals )
-							{
-								WriteNormal( pFileSamples[iStyle][iBump], pSample->pos, pSample->normal, 15.0f, pSample->normal * 255.0f );
-							}
+							WriteNormal( pFileSamples[iStyle][iBump], pSample->pos, pSample->normal, 15.0f, pSample->normal * 255.0f );
 						}
 					}
 				}
 			}
 		}
 	}
+}
 
 
 //-----------------------------------------------------------------------------
@@ -3397,58 +3397,6 @@ void PrecompLightmapOffsets()
 	pdlightdata->SetSize( lightdatasize );
 }
 
-// Clamp the three values for bumped lighting such that we trade off directionality for brightness.
-static void ColorClampBumped( Vector& color1, Vector& color2, Vector& color3 )
-{
-	Vector maxs;
-	Vector *colors[3] = { &color1, &color2, &color3 };
-	maxs[0] = VectorMaximum( color1 );
-	maxs[1] = VectorMaximum( color2 );
-	maxs[2] = VectorMaximum( color3 );
-
-	// HACK!  Clean this up, and add some else statements
-#define CONDITION(a,b,c) do { if( maxs[a] >= maxs[b] && maxs[b] >= maxs[c] ) { order[0] = a; order[1] = b; order[2] = c; } } while( 0 )
-	
-	int order[3] = {};
-	CONDITION(0,1,2);
-	CONDITION(0,2,1);
-	CONDITION(1,0,2);
-	CONDITION(1,2,0);
-	CONDITION(2,0,1);
-	CONDITION(2,1,0);
-
-	int i;
-	for( i = 0; i < 3; i++ )
-	{
-		float max = VectorMaximum( *colors[order[i]] );
-		if( max <= 1.0f )
-		{
-			continue;
-		}
-		// This channel is too bright. . take half of the amount that we are over and 
-		// add it to the other two channel.
-		float factorToRedist = ( max - 1.0f ) / max;
-		Vector colorToRedist = factorToRedist * *colors[order[i]];
-		*colors[order[i]] -= colorToRedist;
-		colorToRedist *= 0.5f;
-		*colors[order[(i+1)%3]] += colorToRedist;
-		*colors[order[(i+2)%3]] += colorToRedist;
-	}
-
-	ColorClamp( color1 );
-	ColorClamp( color2 );
-	ColorClamp( color3 );
-	
-	if( color1[0] < 0.f ) color1[0] = 0.f;
-	if( color1[1] < 0.f ) color1[1] = 0.f;
-	if( color1[2] < 0.f ) color1[2] = 0.f;
-	if( color2[0] < 0.f ) color2[0] = 0.f;
-	if( color2[1] < 0.f ) color2[1] = 0.f;
-	if( color2[2] < 0.f ) color2[2] = 0.f;
-	if( color3[0] < 0.f ) color3[0] = 0.f;
-	if( color3[1] < 0.f ) color3[1] = 0.f;
-	if( color3[2] < 0.f ) color3[2] = 0.f;
-}
 
 //-----------------------------------------------------------------------------
 // Convert a RGBExp32 to a RGBA8888
