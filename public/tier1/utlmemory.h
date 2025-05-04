@@ -212,8 +212,8 @@ public:
 	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address
-	T* Base()												{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); }
-	const T* Base() const									{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); }
+	T* Base()											{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); } //-V106
+	const T* Base() const								{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); } //-V106
 
 	// element access
 	// Use unsigned math and inlined checks to improve performance.
@@ -263,7 +263,7 @@ public:
 	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 private:
-	char m_Memory[ SIZE*sizeof(T) + nAlignment ];
+	char m_Memory[ SIZE*sizeof(T) + nAlignment ]; //-V104
 };
 
 #if defined(POSIX)
@@ -869,7 +869,7 @@ private:
 template< class T, unsigned nAlignment >
 void *CUtlMemoryAligned<T, nAlignment>::Align( const void *pAddr )
 {
-	size_t nAlignmentMask = nAlignment - 1;
+	const size_t nAlignmentMask = nAlignment - 1; //-V101
 	return (void*)( ((size_t)pAddr + nAlignmentMask) & (~nAlignmentMask) );
 }
 
@@ -892,7 +892,7 @@ CUtlMemoryAligned<T, nAlignment>::CUtlMemoryAligned( intp nGrowSize, intp nInitA
 	{
 		UTLMEMORY_TRACK_ALLOC();
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)_aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)_aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 }
 
@@ -981,13 +981,13 @@ void CUtlMemoryAligned<T, nAlignment>::Grow( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 }
@@ -1018,12 +1018,12 @@ inline void CUtlMemoryAligned<T, nAlignment>::EnsureCapacity( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 }
 
