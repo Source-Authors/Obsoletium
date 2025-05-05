@@ -10634,7 +10634,8 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 		m_DynamicState.m_UserClipLastUpdatedUsingFixedFunction = bUsingFixedFunction;
 	}
 
-	DirectX::XMMATRIX worldToProjectionInvTrans;
+	// dimhotepus: Add default init as var can be accessed.
+	DirectX::XMMATRIX worldToProjectionInvTrans = DirectX::XMMatrixIdentity();
 #ifndef _DEBUG
 	if( m_DynamicState.m_UserClipPlaneChanged & m_DynamicState.m_UserClipPlaneEnabled & ((1 << g_pHardwareConfig->MaxUserClipPlanes()) - 1) )
 #endif
@@ -10681,7 +10682,7 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 			continue;
 		}
 
-		m_DynamicState.m_UserClipPlaneChanged &= ~(1 << i);		
+		m_DynamicState.m_UserClipPlaneChanged &= ~(1 << i);
 
 		DirectX::XMVECTOR clipPlaneProj{ DirectX::XMPlaneTransform( m_DynamicState.m_UserClipPlaneWorld[i], worldToProjectionInvTrans ) };
 
