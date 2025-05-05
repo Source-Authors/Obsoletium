@@ -34,15 +34,15 @@ public:
 	// registers the size of the KeyValues in the specified instance
 	// so it can build a properly sized memory pool for the KeyValues objects
 	// the sizes will usually never differ but this is for versioning safety
-	void RegisterSizeofKeyValues(intp size);
+	void RegisterSizeofKeyValues(intp size) override;
 
 	// allocates/frees a KeyValues object from the shared mempool
 	void *AllocKeyValuesMemory(intp size) override;
 	void FreeKeyValuesMemory(void *pMem) override;
 
 	// symbol table access (used for key names)
-	HKeySymbol GetSymbolForString( const char *name, bool bCreate );
-	const char *GetStringForSymbol(HKeySymbol symbol);
+	HKeySymbol GetSymbolForString( const char *name, bool bCreate ) override;
+	const char *GetStringForSymbol(HKeySymbol symbol) override;
 
 	// returns the wide version of ansi, also does the lookup on #'d strings
 	void GetLocalizedFromANSI( const char *ansi, wchar_t *outBuf, int unicodeBufferSizeInBytes);
@@ -54,9 +54,9 @@ public:
 
 	// maintain a cache of KeyValues we load from disk. This saves us quite a lot of time on app startup. 
 	void AddFileKeyValuesToCache( const KeyValues* _kv, const char *resourceName, const char *pathID ) override;
-	virtual bool LoadFileKeyValuesFromCache( KeyValues* outKv, const char *resourceName, const char *pathID, IBaseFileSystem *filesystem ) const;
-	virtual void InvalidateCache();
-	virtual void InvalidateCacheForFile( const char *resourceName, const char *pathID );
+	bool LoadFileKeyValuesFromCache( KeyValues* outKv, const char *resourceName, const char *pathID, IBaseFileSystem *filesystem ) const override;
+	void InvalidateCache() override;
+	void InvalidateCacheForFile( const char *resourceName, const char *pathID ) override;
 
 private:
 #ifdef KEYVALUES_USE_POOL
