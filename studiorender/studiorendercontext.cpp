@@ -418,10 +418,10 @@ int CStudioRenderContext::CountFlexedVertices( mstudiomesh_t* pMesh, OptimizedMo
 // Determine if any strip groups shouldn't be morphed
 //-----------------------------------------------------------------------------
 static int* s_pVertexCount;
-static int SortVertCount( const void *arg1, const void *arg2 )
+static bool SortVertCount( int arg1, int arg2 )
 {
 	/* Compare all of both strings: */
-	return s_pVertexCount[*( const int* )arg2] - s_pVertexCount[*( const int* )arg1];
+	return s_pVertexCount[arg2] - s_pVertexCount[arg1] < 0;
 }
 
 #define MIN_HWMORPH_FLEX_COUNT 200
@@ -458,7 +458,7 @@ void CStudioRenderContext::DetermineHWMorphing( mstudiomodel_t *pModel, Optimize
 
 	// FIXME: We should do this at studiomdl time?
 	// Certainly counting the # of flexed vertices can be done at studiomdl time.
-	int *pVertexCount = (int*)_alloca( nFlexedStripGroup * sizeof(int) );
+	int *pVertexCount = stackallocT( int, nFlexedStripGroup );
 	int nCount = 0;
 	for ( int k = 0; k < pModel->nummeshes; ++k )
 	{
@@ -475,15 +475,15 @@ void CStudioRenderContext::DetermineHWMorphing( mstudiomodel_t *pModel, Optimize
 		}
 	}
 
-	int *pSortedVertexIndices = (int*)_alloca( nFlexedStripGroup * sizeof(int) );
+	int *pSortedVertexIndices = stackallocT( int, nFlexedStripGroup);
 	for ( int i = 0; i < nFlexedStripGroup; ++i )
 	{
 		pSortedVertexIndices[i] = i;
 	}
 	s_pVertexCount = pVertexCount;
-	qsort( pSortedVertexIndices, nCount, sizeof(int), SortVertCount );
+	std::sort( pSortedVertexIndices, pSortedVertexIndices + nCount, SortVertCount );
 
-	bool *pSuppressHWMorph = (bool*)_alloca( nFlexedStripGroup * sizeof(bool) ); 
+	bool *pSuppressHWMorph = stackallocT( bool, nFlexedStripGroup ); 
 	memset(	pSuppressHWMorph, 1, nFlexedStripGroup * sizeof(bool) );
 	for ( int i = 0; i < nMaxHWMorphBatchCount; ++i )
 	{
