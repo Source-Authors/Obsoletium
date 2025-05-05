@@ -166,7 +166,7 @@ enum
 // if pReturnCode is set, it will return one of the following values (IFACE_OK, IFACE_FAILED)
 // extend this for other error conditions/code
 //-----------------------------------------------------------------------------
-DLL_EXPORT [[nodiscard]] void* CreateInterface(const char *pName, int *pReturnCode);
+[[nodiscard]] __declspec(dllexport) void* CreateInterface(const char *pName, int *pReturnCode);
 
 //-----------------------------------------------------------------------------
 // UNDONE: This is obsolete, use the module load/unload/get instead!!!
@@ -204,7 +204,7 @@ enum Sys_Flags
 // The factory for that module should be passed on to dependent components for
 // proper versioning.
 //-----------------------------------------------------------------------------
-extern [[nodiscard]] CSysModule			*Sys_LoadModule( const char *pModuleName, Sys_Flags flags = SYS_NOFLAGS );
+[[nodiscard]] extern CSysModule			*Sys_LoadModule( const char *pModuleName, Sys_Flags flags = SYS_NOFLAGS );
 extern void					Sys_UnloadModule( CSysModule *pModule );
 
 // This is a helper function to load a module, get its factory, and get a specific interface.
