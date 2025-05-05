@@ -1726,33 +1726,37 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 			int tupleOffset = seqsPerAct[seqdesc.activity];
 			Assert( tupleOffset < element.count );
 
+			// dimhotepus: Cache frequently accessed things.
+			auto *it = tupleList + element.startingIdx + tupleOffset;
+
 			if ( seqdesc.numactivitymodifiers > 0 )
 			{
+				const int iNumActivityModifiers = seqdesc.numactivitymodifiers;
 				// add entries for this model's activity modifiers
-				(tupleList + element.startingIdx + tupleOffset)->pActivityModifiers = new CUtlSymbol[ seqdesc.numactivitymodifiers ];
-				(tupleList + element.startingIdx + tupleOffset)->iNumActivityModifiers = seqdesc.numactivitymodifiers;
+				it->pActivityModifiers = new CUtlSymbol[ iNumActivityModifiers ];
+				it->iNumActivityModifiers = iNumActivityModifiers;
 
-				for ( int k = 0; k < seqdesc.numactivitymodifiers; k++ )
+				for ( int k = 0; k < iNumActivityModifiers; k++ )
 				{
-					(tupleList + element.startingIdx + tupleOffset)->pActivityModifiers[ k ] = g_ActivityModifiersTable.AddString( seqdesc.pActivityModifier( k )->pszName() );
+					it->pActivityModifiers[ k ] = g_ActivityModifiersTable.AddString( seqdesc.pActivityModifier( k )->pszName() );
 				}
 			}
 			else
 			{
-				(tupleList + element.startingIdx + tupleOffset)->pActivityModifiers = nullptr;
-				(tupleList + element.startingIdx + tupleOffset)->iNumActivityModifiers = 0;
+				it->pActivityModifiers = nullptr;
+				it->iNumActivityModifiers = 0;
 			}
 
 			// You might be tempted to collapse this pointer math into a single pointer --
 			// don't! the tuple list is marked __restrict above.
-			(tupleList + element.startingIdx + tupleOffset)->seqnum = i; // store sequence number
-			(tupleList + element.startingIdx + tupleOffset)->weight = abs(seqdesc.actweight);
+			it->seqnum = i; // store sequence number
+			it->weight = abs(seqdesc.actweight);
 
 			// We can't have weights of 0
-			// Assert( (tupleList + element.startingIdx + tupleOffset)->weight > 0 );
-			if ( (tupleList + element.startingIdx + tupleOffset)->weight == 0 )
+			// Assert( it->weight > 0 );
+			if ( it->weight == 0 )
 			{
-				(tupleList + element.startingIdx + tupleOffset)->weight = 1;
+				it->weight = 1;
 			}
 
 			seqsPerAct[seqdesc.activity] += 1;
