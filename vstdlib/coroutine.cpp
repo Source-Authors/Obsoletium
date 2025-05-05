@@ -73,15 +73,10 @@ void OutputDebugStringA( const char *pchMsg ) { fprintf( stderr, pchMsg ); fflus
 extern "C" NORETURN void Coroutine_LongJmp_Unchecked( jmp_buf buffer, int nResult );
 #define Coroutine_longjmp Coroutine_LongJmp_Unchecked
 
-#ifdef  _WIN64
-#define Q_offsetof(s,m)   (size_t)( (ptrdiff_t)&reinterpret_cast<const volatile char&>((((s *)0)->m)) )
-#else
-#define Q_offsetof(s,m)   (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
-#endif
 #define SIZEOF_MEMBER( className, memberName ) sizeof( ((className*)nullptr)->memberName )
 
 
-#define Validate_Jump_Buffer( _Member ) COMPILE_TIME_ASSERT( (Q_offsetof( _JUMP_BUFFER, _Member ) == Q_offsetof( _Duplicate_JUMP_BUFFER, _Member )) && (SIZEOF_MEMBER( _JUMP_BUFFER, _Member ) == SIZEOF_MEMBER( _Duplicate_JUMP_BUFFER, _Member )) )
+#define Validate_Jump_Buffer( _Member ) COMPILE_TIME_ASSERT( (offsetof( _JUMP_BUFFER, _Member ) == offsetof( _Duplicate_JUMP_BUFFER, _Member )) && (SIZEOF_MEMBER( _JUMP_BUFFER, _Member ) == SIZEOF_MEMBER( _Duplicate_JUMP_BUFFER, _Member )) )
 
 	//validate that the structure in assembly matches what the crt setjmp thinks it is
 #	if defined( PLATFORM_64BITS )
