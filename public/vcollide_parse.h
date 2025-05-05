@@ -61,8 +61,8 @@ abstract_class IVPhysicsKeyParser
 public:
 	virtual ~IVPhysicsKeyParser() {}
 
-	virtual [[nodiscard]] const char *GetCurrentBlockName() = 0;
-	virtual [[nodiscard]] bool		Finished() = 0;
+	[[nodiscard]] virtual const char *GetCurrentBlockName() = 0;
+	[[nodiscard]] virtual bool		Finished() = 0;
 	virtual void		ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKeyHandler ) = 0;
 	virtual void		ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKeyHandler ) = 0;
 	virtual void		ParseRagdollConstraint( constraint_ragdollparams_t *pConstraint, IVPhysicsKeyHandler *unknownKeyHandler ) = 0;
