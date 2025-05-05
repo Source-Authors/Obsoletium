@@ -16,7 +16,7 @@
 #include "filesystem.h"
 #include "movieobjects/movieobjects.h"
 
-#include "dme_controls/INotifyUI.h"
+#include "dme_controls/inotifyui.h"
 #include "dme_controls/ElementPropertiesTree.h"
 #include "dme_controls/filelistmanager.h"
 #include "dme_controls/dmecontrols.h"
