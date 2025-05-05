@@ -841,7 +841,8 @@ ChunkFileResult_t LoadDispDistancesKeyCallback(const char *szKey, const char *sz
 
 		while (pszNext != NULL)
 		{
-			pMapDispInfo->dispDists[nIndex] = (float)atof(pszNext);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->dispDists[nIndex] = strtof(pszNext, nullptr);
 			pszNext = strtok(NULL, " ");
 			nIndex++;
 		}
@@ -992,9 +993,10 @@ ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szVa
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->vectorDisps[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->vectorDisps[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->vectorDisps[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->vectorDisps[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->vectorDisps[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->vectorDisps[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1046,9 +1048,10 @@ ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szVa
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->vectorOffsets[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->vectorOffsets[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->vectorOffsets[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->vectorOffsets[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->vectorOffsets[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->vectorOffsets[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1087,9 +1090,10 @@ ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->m_offsetNormals[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->m_offsetNormals[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->m_offsetNormals[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->m_offsetNormals[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->m_offsetNormals[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->m_offsetNormals[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1140,7 +1144,8 @@ ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szVal
 
 		while (pszNext0 != NULL)
 		{
-			pMapDispInfo->alphaValues[nIndex] = (float)atof(pszNext0);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->alphaValues[nIndex] = strtof(pszNext0, nullptr);
 			pszNext0 = strtok(NULL, " ");
 			nIndex++;
 		}
@@ -1272,7 +1277,8 @@ void ConvertSideList( entity_t *mapent, char *key )
 					}
 
 					char szIndex[15];
-					itoa( nIndex, szIndex, 10 );
+					// dimhotepus: itoa -> V_to_chars.
+					V_to_chars( szIndex, nIndex, 10 );
 					V_strcat_safe( szNewValue, szIndex );
 				}
 			}
@@ -2287,7 +2293,7 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 	V_strcpy_safe( NewValue, pPair->value );
 	for ( epair_t *epInstance = pInstanceEntity->epairs; epInstance != NULL; epInstance = epInstance->next )
 	{
-		if ( strnicmp( epInstance->key, INSTANCE_VARIABLE_KEY, strlen( INSTANCE_VARIABLE_KEY ) ) == 0 )
+		if ( strnicmp( epInstance->key, INSTANCE_VARIABLE_KEY, ssize( INSTANCE_VARIABLE_KEY ) - 1 ) == 0 )
 		{
 			char InstanceVariable[ MAX_KEYVALUE_LEN ];
 
@@ -2863,7 +2869,8 @@ ChunkFileResult_t LoadSideKeyCallback(const char *szKey, const char *szValue, Lo
 	}
 	else if (!stricmp(szKey, "lightmapscale"))
 	{
-		pSideInfo->td.lightmapWorldUnitsPerLuxel = atoi(szValue);
+		// dimhotepus: atof -> strtof.
+		pSideInfo->td.lightmapWorldUnitsPerLuxel = strtof(szValue, nullptr);
 		if (pSideInfo->td.lightmapWorldUnitsPerLuxel == 0.0f)
 		{
 			g_MapError.ReportWarning("luxel size of 0");
@@ -3235,11 +3242,13 @@ mapdispinfo_t *ParseDispInfoChunk( void )
 
             if( i == 0 )
             {
-                pMapDispInfo->uAxis[j] = atof( token );
+                // dimhotepus: atof -> strtof.
+                pMapDispInfo->uAxis[j] = strtof( token, nullptr );
             }
             else
             {
-                pMapDispInfo->vAxis[j] = atof( token );
+                // dimhotepus: atof -> strtof.
+                pMapDispInfo->vAxis[j] = strtof( token, nullptr );
             }
         }
 
@@ -3252,7 +3261,8 @@ mapdispinfo_t *ParseDispInfoChunk( void )
    	if( g_nMapFileVersion < 350 )
 	{
 		GetToken( false );
-		pMapDispInfo->maxDispDist = atof( token );
+		// dimhotepus: atof -> strtof.
+		pMapDispInfo->maxDispDist = strtof( token, nullptr );
 	}
 
     // minimum tesselation value
@@ -3261,39 +3271,48 @@ mapdispinfo_t *ParseDispInfoChunk( void )
 
     // light smoothing angle
     GetToken( false );
-    pMapDispInfo->smoothingAngle = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->smoothingAngle = strtof(token, nullptr);
 
     //
     // get the displacement info displacement normals
     //
     GetToken( true );
-    pMapDispInfo->vectorDisps[0][0] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->vectorDisps[0][0] = strtof(token, nullptr);
     GetToken( false );
-    pMapDispInfo->vectorDisps[0][1] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->vectorDisps[0][1] = strtof(token, nullptr);
     GetToken( false );
-    pMapDispInfo->vectorDisps[0][2] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->vectorDisps[0][2] = strtof(token, nullptr);
 
     vertCount = ( ( ( 1 << pMapDispInfo->power ) + 1 ) * ( ( 1 << pMapDispInfo->power ) + 1 ) );
     for( i = 1; i < vertCount; i++ )
     {
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][0] = atof( token );
+        // dimhotepus: atof -> strtof.
+        pMapDispInfo->vectorDisps[i][0] = strtof( token, nullptr );
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][1] = atof( token );
+        // dimhotepus: atof -> strtof.
+        pMapDispInfo->vectorDisps[i][1] = strtof( token, nullptr );
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][2] = atof( token );
+        // dimhotepus: atof -> strtof.
+        pMapDispInfo->vectorDisps[i][2] = strtof(token, nullptr);
     }
 
     //
     // get the displacement info displacement values
     //
     GetToken( true );
-    pMapDispInfo->dispDists[0] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->dispDists[0] = strtof(token, nullptr);
 
     for( i = 1; i < vertCount; i++ )
     {
         GetToken( false );
-        pMapDispInfo->dispDists[i] = atof( token );
+        // dimhotepus: atof -> strtof.
+		pMapDispInfo->dispDists[i] = strtof( token, nullptr );
     }
 
     //

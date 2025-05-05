@@ -348,7 +348,7 @@ void ProcessWorldModel (void)
 	// This unifies the vertex list for all edges (splits collinear edges to remove t-junctions)
 	// It also welds the list of vertices out of each winding/portal and rounds nearly integer verts to integer
 	pLeafFaceList = FixTjuncs (tree->headnode, pLeafFaceList);
-
+	
 	// dimhotepus: Add fix tjuncs time log.
 	Msg("(%.2fs)", Plat_FloatTime() - start );
 
@@ -366,7 +366,7 @@ void ProcessWorldModel (void)
 
 //	Msg( "SplitSubdividedFaces...\n" );
 //	SplitSubdividedFaces( tree->headnode );
-
+	
 	Msg("\n");
 	Msg("Write BSP...");
 	WriteBSP(tree->headnode, pLeafFaceList);
@@ -1037,7 +1037,8 @@ int RunVBSP( int argc, char **argv )
 #if 0
 		else if (!Q_stricmp(argv[i], "-maxlightmapdim"))
 		{
-			g_maxLightmapDimension = atof(argv[i+1]);
+			// dimhotepus: atof -> strtof.
+			g_maxLightmapDimension = strtof(argv[i+1], nullptr);
 			Msg ("--max-lightmap-dimension: %f\n", g_maxLightmapDimension);
 			i++;
 		}
