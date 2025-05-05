@@ -26,20 +26,20 @@ public:
 	CProcessUtils() : BaseClass( false ), m_hCurrentProcess{PROCESS_HANDLE_INVALID}, m_bInitialized{false} {}
 
 	// Inherited from IAppSystem
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Inherited from IProcessUtils
-	virtual ProcessHandle_t StartProcess( const char *pCommandLine, bool bConnectStdPipes );
-	virtual ProcessHandle_t StartProcess( int argc, const char **argv, bool bConnectStdPipes );
+	ProcessHandle_t StartProcess( const char *pCommandLine, bool bConnectStdPipes ) override;
+	ProcessHandle_t StartProcess( int argc, const char **argv, bool bConnectStdPipes ) override;
 	void CloseProcess( ProcessHandle_t hProcess ) override;
 	void AbortProcess( ProcessHandle_t hProcess ) override;
-	virtual bool IsProcessComplete( ProcessHandle_t hProcess );
-	virtual void WaitUntilProcessCompletes( ProcessHandle_t hProcess );
-	virtual intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
-	virtual ptrdiff_t GetProcessOutputSize( ProcessHandle_t hProcess );
-	virtual ptrdiff_t GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
-	virtual int GetProcessExitCode( ProcessHandle_t hProcess );
+	bool IsProcessComplete( ProcessHandle_t hProcess ) override;
+	void WaitUntilProcessCompletes( ProcessHandle_t hProcess ) override;
+	intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) override;
+	ptrdiff_t GetProcessOutputSize( ProcessHandle_t hProcess ) override;
+	ptrdiff_t GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) override;
+	int GetProcessExitCode( ProcessHandle_t hProcess ) override;
 
 private:
 	struct ProcessInfo_t
