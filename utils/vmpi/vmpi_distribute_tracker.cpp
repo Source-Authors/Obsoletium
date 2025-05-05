@@ -113,8 +113,8 @@ static LRESULT CALLBACK TrackerWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, 
 		case WM_PAINT:
 		{
 			// Do one pass for each color..
-			HBRUSH hStateColors[ARRAYSIZE( g_StateColors )];
-			for ( int i=0; i < ARRAYSIZE( hStateColors ); i++ )
+			HBRUSH hStateColors[ssize( g_StateColors )];
+			for ( intp i=0; i < ssize( hStateColors ); i++ )
 				hStateColors[i] = CreateSolidBrush( g_StateColors[i] );
 
 			// Copy the WU statuses.
@@ -129,11 +129,11 @@ static LRESULT CALLBACK TrackerWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, 
 
 			PAINTSTRUCT ps;
 			HDC hDC = BeginPaint( hwnd, &ps );		
-			for ( int iState=0; iState < ARRAYSIZE( hStateColors ); iState++ )
+			for ( intp iState=0; iState < ssize( hStateColors ); iState++ )
 			{
 				HGDIOBJ hOldObj = SelectObject( hDC, hStateColors[iState] );
 
-				for ( int iWU=0; iWU < wuStatus.Count(); iWU++ )
+				for ( intp iWU=0; iWU < wuStatus.Count(); iWU++ )
 				{
 					if ( wuStatus[iWU].m_iState != iState )
 						continue;
@@ -216,7 +216,7 @@ static void CheckFlashTimers()
 	LeaveCriticalSection( &g_CS );
 }
 
-static DWORD WINAPI ThreadProc( LPVOID lpParameter )
+static DWORD WINAPI ThreadProc( void* )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("VmpiDistrTracker");
@@ -546,7 +546,7 @@ void VMPITracker_HandleDebugKeypresses()
 			int nMaxTries = 128;
 			char filename[512];
 			int iFile = 1;
-			for ( iFile; iFile < nMaxTries; iFile++ )
+			for ( ; iFile < nMaxTries; iFile++ )
 			{
 				V_sprintf_safe( filename, "vmpi_tracker_%d.txt", iFile );
 				if ( _access( filename, 0 ) != 0 )

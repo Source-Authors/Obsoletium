@@ -58,7 +58,7 @@ public:
 		
 		m_WorkerInfos.RemoveAll();
 		m_WorkerInfos.EnsureCount( m_MatrixHeight );
-		for ( int i=0; i < m_MatrixHeight; i++ )
+		for ( WUIndexType i=0; i < m_MatrixHeight; i++ )
 		{
 			m_WorkerInfos[i].m_iStartWorkUnit = matrixWidth * i;
 			m_WorkerInfos[i].m_iWorkUnitOffset = 0;
@@ -139,7 +139,7 @@ public:
 		int nBytes = PAD_NUMBER( nWorkUnits, 8 ) / 8;
 		m_CompletedWUBits.SetSize( nBytes );
 		m_LocalCompletedWUBits.SetSize( nBytes );
-		for ( WUIndexType i=0; i < m_CompletedWUBits.Count(); i++ )
+		for ( intp i=0; i < m_CompletedWUBits.Count(); i++ )
 			m_LocalCompletedWUBits[i] = m_CompletedWUBits[i] = 0;		
 	
 		// Setup our list of work units remaining.
@@ -333,7 +333,7 @@ private:
 
 
 
-class CDistributor_SDKMaster : public IWorkUnitDistributorMaster, public IShuffleRequester
+class CDistributor_SDKMaster final : public IWorkUnitDistributorMaster, public IShuffleRequester
 {
 public:
 	virtual void Release()
@@ -595,7 +595,7 @@ public:
 };
 
 
-class CDistributor_SDKWorker : public IWorkUnitDistributorWorker, public IShuffleRequester
+class CDistributor_SDKWorker final : public IWorkUnitDistributorWorker, public IShuffleRequester
 {
 public:
 	virtual void Init( CDSInfo *pInfo )

@@ -203,12 +203,12 @@ class CVMPIConnection final : public ITCPSocketHandler {
       CCriticalSectionLock csLock(&g_ErrorSocketsCS);
       csLock.Lock();
       char str[512];
-      Q_strncpy(str, m_ErrorString.Base(), sizeof(str));
+      V_strcpy_safe(str, m_ErrorString.Base());
       csLock.Unlock();
 
       // Tell the app.
       FOR_EACH_LL(g_DisconnectHandlers, i)
-      g_DisconnectHandlers[i](m_iConnection, str);
+        g_DisconnectHandlers[i](m_iConnection, str);
 
       // Free our socket.
       m_pSocket->Release();
@@ -247,7 +247,7 @@ class CVMPIConnection final : public ITCPSocketHandler {
 
   virtual void OnError(int errorCode, const char *pErrorString) {
     if (!g_bMPIMaster) {
-      Msg("%s - CVMPIConnection::OnError( %s )\n", GetMachineName(),
+      Msg("%s - CVMPIConnection::OnError( %d, %s )\n", errorCode, GetMachineName(),
           pErrorString);
     }
 
@@ -916,17 +916,21 @@ bool CMasterBroadcaster::Init(int argc, char **argv,
     m_BroadcastInfo.m_Args.InsertBefore(
         0, V_strdup(m_BroadcastInfo.m_WorkerExeFilename));
 
+    char flag1[] = "-mpi_file";
+
     // Now add arguments for each file they need to transmit. The service will
     // use this to get all the files from the master before it starts the app.
     for (intp i = 0; i < dependencyInfo.m_Files.Count(); i++) {
-      m_BroadcastInfo.m_Args.InsertAfter(0, "-mpi_file");
+      m_BroadcastInfo.m_Args.InsertAfter(0, flag1);
       m_BroadcastInfo.m_Args.InsertAfter(
           1, V_strdup(dependencyInfo.m_Files[i]->m_Name));
     }
 
+    char flag2[] = "-mpi_filebase";
+
     // Add -mpi_filebase so it can use absolute paths with the filesystem so
     // we get the exact right set of files.
-    m_BroadcastInfo.m_Args.InsertAfter(0, "-mpi_filebase");
+    m_BroadcastInfo.m_Args.InsertAfter(0, flag2);
     m_BroadcastInfo.m_Args.InsertAfter(
         1, V_strdup(dependencyInfo.m_DependencyFilesDir));
 
@@ -1834,8 +1838,8 @@ bool VMPI_GetNextMessage(MessageBuffer *pBuf, int *pSource,
 
 bool VMPI_InternalDispatch(MessageBuffer *pBuf, int iSource) {
   if (pBuf->getLen() >= 1 && pBuf->data[0] >= 0 &&
-      pBuf->data[0] < MAX_VMPI_PACKET_IDS && g_VMPIDispatch[pBuf->data[0]]) {
-    return g_VMPIDispatch[pBuf->data[0]](pBuf, iSource, pBuf->data[0]);
+      pBuf->data[0] < MAX_VMPI_PACKET_IDS && g_VMPIDispatch[static_cast<unsigned>(pBuf->data[0])]) {
+    return g_VMPIDispatch[static_cast<unsigned>(pBuf->data[0])](pBuf, iSource, pBuf->data[0]);
   }
 
   return false;

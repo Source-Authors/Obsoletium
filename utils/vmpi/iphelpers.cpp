@@ -397,7 +397,7 @@ bool ConvertStringToIPAddr(const char *pStr, IpV4 *pOut) {
   const char *pColon = strchr(pStr, ':');
   if (pColon) {
     intp toCopy = pColon - pStr;
-    if (toCopy < 2 || toCopy > sizeof(ipStr) - 1) {
+    if (toCopy < 2 || toCopy > ssize(ipStr) - 1) {
       Assert(false);
       return false;
     }

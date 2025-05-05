@@ -710,8 +710,8 @@ bool CWorkerVMPIFileSystem::HandleFileSystemPacket(MessageBuffer *pBuf,
 }
 
 CSysModule *CWorkerVMPIFileSystem::LoadModule(const char *pFileName,
-                                              const char *pPathID,
-                                              bool bValidatedDllOnly) {
+                                              [[maybe_unused]] const char *pPathID,
+                                              [[maybe_unused]] bool bValidatedDllOnly) {
   return Sys_LoadModule(pFileName);
 }
 

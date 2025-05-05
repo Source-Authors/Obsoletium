@@ -91,7 +91,7 @@ RETRY:;
 // ------------------------------------------------------------------------------------------------------------------------
 // //
 
-class CVMPIFile_PassThru : public IVMPIFile {
+class CVMPIFile_PassThru final : public IVMPIFile {
  public:
   CVMPIFile_PassThru(IBaseFileSystem *pPassThru, FileHandle_t fp) {
     m_pPassThru = pPassThru;
@@ -1016,8 +1016,7 @@ DWORD CMasterMulticastThread::MulticastThread() {
 
     int nBytesSent = 0;
 
-    bool bSuccess;
-    bSuccess = Thread_SendFileChunk_Multicast(&nBytesSent);
+    bool bSuccess = Thread_SendFileChunk_Multicast(&nBytesSent);
 
     g_nMulticastBytesSent += (int)nBytesSent;
 
