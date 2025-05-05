@@ -378,6 +378,12 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
 #define SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE() _Pragma("GCC diagnostic push")
 
 /*
+ * @brief Disables GCC / Clang cast-function-type-mismatch.
+ */
+#define SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING() \
+  _Pragma("GCC diagnostic ignored \"-Wcast-function-type-mismatch\"")
+
+/*
  * @brief Disables GCC / Clang overloaded-virtual.
  */
 #define SRC_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING() \
@@ -398,6 +404,11 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
  * @brief Do nothing.
  */
 #define SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+
+ /*
+ * @brief Do nothing.
+ */
+#define SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
 
 /*
  * @brief Do nothing.

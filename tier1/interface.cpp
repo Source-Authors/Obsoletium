@@ -387,7 +387,10 @@ CreateInterfaceFn Sys_GetFactory( CSysModule *pModule )
 
 	HMODULE	hDLL = reinterpret_cast<HMODULE>(pModule);
 #ifdef _WIN32
+	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
 	return reinterpret_cast<CreateInterfaceFn>(GetProcAddress( hDLL, CREATEINTERFACE_PROCNAME ));
+	SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 #elif defined(POSIX)
 	// Linux gives this error:
 	//../public/interface.cpp: In function `IBaseInterface *(*Sys_GetFactory
