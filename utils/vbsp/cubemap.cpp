@@ -85,7 +85,7 @@ inline bool SideHasCubemapAndWasntManuallyReferenced( int iSide )
 }
 
 
-void Cubemap_InsertSample( const Vector& origin, int size )
+void Cubemap_InsertSample( const Vector& origin, byte size )
 {
 	dcubemapsample_t *pSample = &g_CubemapSamples[g_nCubemapSamples];
 	pSample->origin[0] = ( int )origin[0];	
