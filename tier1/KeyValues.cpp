@@ -2036,6 +2036,11 @@ KeyValues *KeyValues::MakeCopy( void ) const
 		newKeyValue->m_sValue = new char[sizeof(uint64)];
 		Q_memcpy( newKeyValue->m_sValue, m_sValue, sizeof(uint64) );
 		break;
+
+		// dimhotepus: Do nothing.
+	case TYPE_NONE:
+	case TYPE_NUMTYPES:
+		break;
 	}
 
 	// recursively copy subkeys
