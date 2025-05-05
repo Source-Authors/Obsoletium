@@ -18,7 +18,7 @@ class IPhysicsCollision;
 extern IPhysicsCollision *physcollision;
 
 // a list of all of the materials in the world model
-extern int RemapWorldMaterial( int materialIndexIn );
+extern intp RemapWorldMaterial( int materialIndexIn );
 
 class CPhysCollisionEntry
 {

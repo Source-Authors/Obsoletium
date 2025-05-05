@@ -134,7 +134,7 @@ void CTextBuffer::Terminate( void )
 
 void CTextBuffer::CopyData( const char *pData, int len )
 {
-	int offset = m_buffer.AddMultipleToTail( len );
+	intp offset = m_buffer.AddMultipleToTail( len );
 	memcpy( m_buffer.Base() + offset, pData, len );
 }
 
@@ -389,7 +389,7 @@ static int PropIndex( CUtlVector<int> &propList, int propIndex )
 	return 0;
 }
 
-int RemapWorldMaterial( int materialIndexIn )
+intp RemapWorldMaterial( int materialIndexIn )
 {
 	return PropIndex( s_WorldPropList, materialIndexIn );
 }

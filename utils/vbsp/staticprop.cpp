@@ -128,12 +128,12 @@ isstaticprop_ret IsStaticProp( studiohdr_t* pHdr )
 // Add static prop model to the list of models
 //-----------------------------------------------------------------------------
 
-static int AddStaticPropDictLump( char const* pModelName )
+static intp AddStaticPropDictLump( char const* pModelName )
 {
 	StaticPropDictLump_t dictLump;
 	V_strcpy_safe( dictLump.m_Name, pModelName );
 
-	for (int i = s_StaticPropDictLump.Count(); --i >= 0; )
+	for (intp i = s_StaticPropDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_StaticPropDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -259,7 +259,7 @@ static CPhysCollide* GetCollisionModel( char const* pModelName )
 	// Find it in the cache
 	ModelCollisionLookup_t lookup;
 	lookup.m_Name = pTemp;
-	int i = s_ModelCollisionCache.Find( lookup );
+	unsigned short i = s_ModelCollisionCache.Find( lookup );
 	if (i != s_ModelCollisionCache.InvalidIndex())
 		return s_ModelCollisionCache[i].m_pCollide;
 
@@ -490,7 +490,7 @@ static void AddStaticPropToLump( StaticPropBuild_t const& build )
 		return;
 	}
 	// Insert an element into the lump data...
-	int i = s_StaticPropLump.AddToTail( );
+	intp i = s_StaticPropLump.AddToTail( );
 	StaticPropLump_t& propLump = s_StaticPropLump[i];
 	propLump.m_PropType = AddStaticPropDictLump( build.m_pModelName ); 
 	VectorCopy( build.m_Origin, propLump.m_Origin );

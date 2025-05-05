@@ -758,7 +758,7 @@ void CompactTexdataArray( texdatamap_t *pMap )
 
 		// get old string and re-add to table
 		const char *pString = &oldStringData[oldStringTable[oldTexData[i].nameStringTableID]];
-		int nameIndex = TexDataStringTable_AddOrFindString( pString );
+		intp nameIndex = TexDataStringTable_AddOrFindString( pString );
 		// copy old texdata and fixup with new name in compacted table
 		dtexdata[numtexdata] = oldTexData[i];
 		dtexdata[numtexdata].nameStringTableID = nameIndex;
@@ -1185,7 +1185,7 @@ void DiscoverMacroTextures()
 				tempDict.Insert( pMacroTextureName, 0 );
 			}
 
-			int stringID = TexDataStringTable_AddOrFindString( pMacroTextureName );
+			intp stringID = TexDataStringTable_AddOrFindString( pMacroTextureName );
 			g_FaceMacroTextureInfos[iFace].m_MacroTextureNameID = (unsigned short)stringID;
 		}
 		else
@@ -1438,7 +1438,7 @@ static void AddNodeToBounds(int node, CUtlVector<int>& skipAreas, Vector& mins, 
 			if (tex.flags & (SURF_SKY | SURF_NODRAW))
 				continue;
 
-			unsigned int firstedge = dfaces[face].firstedge;
+			int firstedge = dfaces[face].firstedge;
 			Assert( firstedge >= 0 );
 
 			for (int j = 0; j < dfaces[face].numedges; ++j)

@@ -456,7 +456,7 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 
 	if ( eResult == ChunkFile_Ok )
 	{
-		int index = g_Maps.AddToTail( new CMapFile() );
+		intp index = g_Maps.AddToTail( new CMapFile() );
 		g_LoadingMap = g_Maps[ index ];
 		if ( g_MainMap == NULL )
 		{

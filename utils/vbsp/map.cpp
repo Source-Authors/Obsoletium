@@ -1409,10 +1409,8 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 
 static ChunkFileResult_t LoadOverlayDataTransitionCallback( CChunkFile *pFile, int nParam )
 {
-	int iOverlay = g_aMapWaterOverlays.AddToTail();
+	intp iOverlay = g_aMapWaterOverlays.AddToTail();
 	mapoverlay_t *pOverlay = &g_aMapWaterOverlays[iOverlay];
-	if ( !pOverlay )
-		return ChunkFile_Fail;
 
 	pOverlay->nId = ( MAX_MAP_OVERLAYS + 1 ) + g_aMapWaterOverlays.Count() - 1;
 	pOverlay->m_nRenderOrder = 0;
@@ -1624,8 +1622,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
 			if( ( g_nDXLevel == 0 ) || ( g_nDXLevel >= 70 ) )
 			{
 				const char *pSideListStr = ValueForKey( mapent, "sides" );
-				int size;
-				size = IntForKey( mapent, "cubemapsize" );
+				int size = IntForKey( mapent, "cubemapsize" );
 				Cubemap_InsertSample( mapent->origin, size );
 				Cubemap_SaveBrushSides( pSideListStr );
 			}
@@ -2409,7 +2406,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 			GDclass *EntClass = GD.BeginInstanceRemap( pEntity, NameFixup, InstanceOrigin, InstanceAngle );
 			if ( EntClass )
 			{
-				for( int i = 0; i < EntClass->GetVariableCount(); i++ )
+				for( intp i = 0; i < EntClass->GetVariableCount(); i++ )
 				{
 					GDinputvariable *EntVar = EntClass->GetVariableAt( i );
 					const char *pValue = ValueForKey( entity, ( char * )EntVar->GetName() );
@@ -2579,7 +2576,7 @@ bool LoadMapFile( const char *pszFileName )
 		//
 		if (eResult == ChunkFile_Ok)
 		{
-			int index = g_Maps.AddToTail( new CMapFile() );
+			intp index = g_Maps.AddToTail( new CMapFile() );
 			g_LoadingMap = g_Maps[ index ];
 			if ( g_MainMap == NULL )
 			{

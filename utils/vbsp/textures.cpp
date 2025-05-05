@@ -532,9 +532,9 @@ int AddCloneTexData( dtexdata_t *pExistingTexData, char const *cloneTexDataName 
 //-----------------------------------------------------------------------------
 // Finds a texinfo that exactly matches the passed in texinfo
 //-----------------------------------------------------------------------------
-int FindTexInfo( const texinfo_t &searchTexInfo )
+intp FindTexInfo( const texinfo_t &searchTexInfo )
 {
-	for( int i = 0; i < texinfo.Count(); i++ )
+	for( intp i = 0; i < texinfo.Count(); i++ )
 	{
 		// Just an early-out for performance
 		if ( texinfo[i].texdata != searchTexInfo.texdata )
@@ -551,9 +551,9 @@ int FindTexInfo( const texinfo_t &searchTexInfo )
 //-----------------------------------------------------------------------------
 // Finds or creates a texinfo that exactly matches the passed in texinfo
 //-----------------------------------------------------------------------------
-int FindOrCreateTexInfo( const texinfo_t &searchTexInfo )
+intp FindOrCreateTexInfo( const texinfo_t &searchTexInfo )
 {
-	int i = FindTexInfo( searchTexInfo );
+	intp i = FindTexInfo( searchTexInfo );
 	if ( i >= 0 )
 		return i;
 
@@ -567,7 +567,7 @@ int FindOrCreateTexInfo( const texinfo_t &searchTexInfo )
 	return i;
 }
 
-int TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& origin)
+intp TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& origin)
 {
 	Vector	vecs[2];
 	int		sv, tv;

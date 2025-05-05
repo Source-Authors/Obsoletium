@@ -1300,7 +1300,7 @@ FaceFromPortal
 
 ============
 */
-extern int FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
+extern intp FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
 
 face_t *FaceFromPortal (portal_t *p, int pside)
 {

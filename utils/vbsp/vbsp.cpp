@@ -600,7 +600,7 @@ static void EmitOccluderBrushes()
 			continue;
 
 		// Output only those parts of the occluder tree which are a part of the brush
-		int nOccluder = g_OccluderData.AddToTail();
+		intp nOccluder = g_OccluderData.AddToTail();
 		doccluderdata_t &occluderData = g_OccluderData[ nOccluder ];
 		occluderData.firstpoly = g_OccluderPolyData.Count();
 		occluderData.mins.Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -613,7 +613,7 @@ static void EmitOccluderBrushes()
 		V_sprintf_safe (str, "%i", nOccluder);
 		SetKeyValue (&entities[entity_num], "occludernumber", str);
 
-		int nIndex = g_OccluderInfo.AddToTail();
+		intp nIndex = g_OccluderInfo.AddToTail();
 		g_OccluderInfo[nIndex].m_nOccluderEntityIndex = entity_num;
 		
 		sideList.RemoveAll();
@@ -643,7 +643,7 @@ static void EmitOccluderBrushes()
 				pEmitted[i] = entity_num;
 #endif
 
-				int k = g_OccluderPolyData.AddToTail();
+				intp k = g_OccluderPolyData.AddToTail();
 				doccluderpolydata_t *pOccluderPoly = &g_OccluderPolyData[k];
 
 				pOccluderPoly->planenum = f->planenum;

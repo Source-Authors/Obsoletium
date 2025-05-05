@@ -145,7 +145,7 @@ int GetDispInfoEntityNum( mapdispinfo_t *pDisp )
 
 // Setup a CCoreDispInfo given a mapdispinfo_t.
 // If pFace is non-NULL, then lightmap texture coordinates will be generated.
-void DispMapToCoreDispInfo( mapdispinfo_t *pMapDisp, CCoreDispInfo *pCoreDispInfo, dface_t *pFace, int *pSwappedTexInfos )
+void DispMapToCoreDispInfo( mapdispinfo_t *pMapDisp, CCoreDispInfo *pCoreDispInfo, dface_t *pFace, intp *pSwappedTexInfos )
 {
 	winding_t *pWinding = pMapDisp->face.originalface->winding;
 
@@ -536,7 +536,7 @@ void EmitDispLMAlphaAndNeighbors()
 			return;
 		}
 
-		int nIndex = g_CoreDispInfos.AddToTail();
+		intp nIndex = g_CoreDispInfos.AddToTail();
 		pDisp->SetListIndex( nIndex );
 		g_CoreDispInfos[nIndex] = pDisp;
 	}
@@ -548,8 +548,8 @@ void EmitDispLMAlphaAndNeighbors()
 
 	faces.SetSize( nummapdispinfo );
 
-	int nMemSize = texinfo.Count() * sizeof(int);
-	int *pSwappedTexInfos = (int*)stackalloc( nMemSize );
+	int nMemSize = texinfo.Count() * sizeof(intp);
+	intp *pSwappedTexInfos = (intp*)stackalloc( nMemSize );
 	memset( pSwappedTexInfos, 0xFF, nMemSize );
 	for( i = 0; i < numfaces; i++ )
 	{

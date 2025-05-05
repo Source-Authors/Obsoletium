@@ -377,12 +377,12 @@ static int SelectDetail( DetailObjectGroup_t const& group )
 //-----------------------------------------------------------------------------
 // Adds a detail dictionary element (expected to oftentimes be shared)
 //-----------------------------------------------------------------------------
-static int AddDetailDictLump( const char* pModelName )
+static intp AddDetailDictLump( const char* pModelName )
 {
 	DetailObjectDictLump_t dictLump;
 	V_strcpy_safe( dictLump.m_Name, pModelName );
 
-	for (int i = s_DetailObjectDictLump.Count(); --i >= 0; )
+	for (intp i = s_DetailObjectDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_DetailObjectDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -391,7 +391,7 @@ static int AddDetailDictLump( const char* pModelName )
 	return s_DetailObjectDictLump.AddToTail( dictLump );
 }
 
-static int AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
+static intp AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
 {
 	DetailSpriteDictLump_t dictLump;
 	dictLump.m_UL = pPos[0];
@@ -399,7 +399,7 @@ static int AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
 	dictLump.m_TexUL = pTex[0];
 	dictLump.m_TexLR = pTex[1];
 
-	for (int i = s_DetailSpriteDictLump.Count(); --i >= 0; )
+	for (intp i = s_DetailSpriteDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_DetailSpriteDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -438,7 +438,7 @@ static bool IsModelValid( const char* pModelName )
 	StaticPropLookup_t lookup;
 	lookup.m_ModelName = pModelName;
 
-	int i = s_StaticPropLookup.Find( lookup );
+	unsigned short i = s_StaticPropLookup.Find( lookup );
 	if (i != s_StaticPropLookup.InvalidIndex() )
 		return s_StaticPropLookup[i].m_IsValid;
 
