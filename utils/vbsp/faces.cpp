@@ -1451,6 +1451,7 @@ void MakeFaces_r (node_t *node)
 
 typedef winding_t *pwinding_t;
 
+#if 0
 static void PrintWinding( winding_t *w )
 {
 	int i;
@@ -1460,6 +1461,7 @@ static void PrintWinding( winding_t *w )
 		Msg( "\t%f %f %f\n", w->p[i].x, w->p[i].y, w->p[i].z );
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Adds a winding to the current list of primverts
