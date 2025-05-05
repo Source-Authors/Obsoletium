@@ -840,7 +840,7 @@ void Shader_DrawChainsStatic( const CMSurfaceSortList &sortList, int nSortGroup,
 		IMesh *pLastMesh = NULL;
 #endif
 		int indexCount = 0;
-		int meshIndex = -1;
+		intp meshIndex = -1;
 
 		for ( ; listIndex < count; listIndex++ )
 		{
@@ -3613,7 +3613,8 @@ public:
 	struct brushrendersurface_t
 	{
 		short	surfaceIndex;
-		short	planeIndex;
+		// dimhotepus: short -> intp.
+		intp	planeIndex;
 	};
 
 	// a batch is a list of surfaces with the same material - they can be drawn with one call to the materialsystem
@@ -3667,7 +3668,8 @@ public:
 	{
 		SurfaceHandle_t surfID;
 		short	surfaceIndex;
-		short	planeIndex;
+		// dimhotepus: short -> intp.
+		intp	planeIndex;
 	};
 	
 	// These are the compact structs produced for translucent brush models.  These structs contain
