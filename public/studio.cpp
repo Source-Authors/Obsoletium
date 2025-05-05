@@ -702,7 +702,7 @@ int studiohdr_t::RemapSeqBone( intp iSequence, int iLocalBone ) const
 	if (pVModel)
 	{
 		const virtualgroup_t *pSeqGroup = pVModel->pSeqGroup( iSequence );
-		return pSeqGroup->masterBone[iLocalBone];
+		return pSeqGroup ? pSeqGroup->masterBone[iLocalBone] : iLocalBone;
 	}
 	return iLocalBone;
 }
@@ -1376,7 +1376,7 @@ int	CStudioHdr::RemapSeqBone( intp iSequence, int iLocalBone ) const
 	if (m_pVModel)
 	{
 		const virtualgroup_t *pSeqGroup = m_pVModel->pSeqGroup( iSequence );
-		return pSeqGroup->masterBone[iLocalBone];
+		return pSeqGroup ? pSeqGroup->masterBone[iLocalBone] : iLocalBone;
 	}
 	return iLocalBone;
 }
