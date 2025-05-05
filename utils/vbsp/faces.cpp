@@ -1580,10 +1580,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			planeDist = -( float )( x + subdivsize );
 			ClipWindingEpsilon( tempWinding, normal, planeDist, ON_EPSILON, 
 				&frontWinding, &backWinding );
-			if( tempWinding )
-			{
 				FreeWinding( tempWinding );
-			}
 			if( backWinding )
 			{
 				FreeWinding( backWinding );
@@ -1598,10 +1595,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			planeDist = ( float )y;
 			ClipWindingEpsilon( tempWinding, normal, planeDist, ON_EPSILON, 
 				&frontWinding, &backWinding );
-			if( tempWinding )
-			{
 				FreeWinding( tempWinding );
-			}
 			if( backWinding )
 			{
 				FreeWinding( backWinding );
@@ -1616,10 +1610,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			planeDist = -( float )( y + subdivsize );
 			ClipWindingEpsilon( tempWinding, normal, planeDist, ON_EPSILON, 
 				&frontWinding, &backWinding );
-			if( tempWinding )
-			{
 				FreeWinding( tempWinding );
-			}
 			if( backWinding )
 			{
 				FreeWinding( backWinding );
@@ -1634,12 +1625,9 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			PrintWinding( frontWinding );
 #endif
 			
-			if( frontWinding )
-			{
 				windings[xi + yi * xSteps] = frontWinding;
 			}
 		}
-	}
 	FreeWinding( w );
 	dprimitive_t &newPrim = g_primitives[g_numprimitives];
 	f->firstPrimID = g_numprimitives;
