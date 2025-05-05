@@ -273,13 +273,8 @@ FORCEINLINE_PIXEL void CPixelWriter::SetPixelMemory( ImageFormat format, void* p
 	// FIXME: Add more color formats as need arises
 	default:
 		{
-			static bool format_error_printed[NUM_IMAGE_FORMATS];
-			if ( !format_error_printed[format] )
-			{
-				Assert( 0 );
-				Msg( "CPixelWriter::SetPixelMemory:  Unsupported image format %i\n", format );
-				format_error_printed[format] = true;
-			}
+			Assert( 0 );
+			Msg( "CPixelWriter::SetPixelMemory:  Unsupported image format %i\n", format );
 			m_Size = 0; // set to zero so that we don't stomp memory for formats that we don't understand.
 			m_RShift = 0;
 			m_GShift = 0;
