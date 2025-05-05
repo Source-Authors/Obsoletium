@@ -519,9 +519,10 @@ int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bI
 	if ( bIsDir )
 		return m_iLabel_Folder;
 
-	CString extension = name.Right( 4 );
+	// dimhotepus: Honor .jpeg.
+	CString extension = name.Right( 5 );
 	extension.MakeLower();
-	if ( extension == ".jpg" || extension == ".jpeg" )
+	if ( extension.Right( 4 ) == ".jpg" || extension == ".jpeg" )
 	{
 		pInfo->m_pBitmap = SetupJpegLabel( m_pFileSystem, m_CurrentDir + "\\" + name, PREVIEW_IMAGE_SIZE, GetPathID() );
 		if ( pInfo->m_pBitmap )
@@ -541,11 +542,12 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 	CUtlDict<int,int> jpgFiles;
 	for ( int i=0; i < files.Count(); i++ )
 	{
-		CString extension = files[i].Right( 4 );
+		// dimhotepus: Honor .jpeg.
+		CString extension = files[i].Right( 5 );
 		extension.MakeLower();
-		if ( extension == ".jpg" || extension == ".jpeg" )
+		if ( extension.Right( 4 ) == ".jpg" || extension == ".jpeg" )
 		{
-			CString base = files[i].Left( files[i].GetLength() - 4 );
+			CString base = files[i].Left( files[i].GetLength() - (extension == ".jpg" ? 4 : 5) );
 			jpgFiles.Insert( base, 1 );
 		}
 	}
@@ -553,11 +555,11 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 	// Now look for all mdls and remove them if they have a jpg.
 	for ( int i=0; i < files.Count(); i++ )
 	{
-		CString extension = files[i].Right( 4 );
+		CString extension = files[i].Right( 4 ); //-V112
 		extension.MakeLower();
 		if ( extension == ".mdl" )
 		{
-			CString base = files[i].Left( files[i].GetLength() - 4 );
+			CString base = files[i].Left( files[i].GetLength() - 4 ); //-V112
 			if ( jpgFiles.Find( base ) != -1 )
 			{
 				files.Remove( i );
