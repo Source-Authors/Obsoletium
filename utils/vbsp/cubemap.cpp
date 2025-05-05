@@ -484,6 +484,7 @@ void Cubemap_SaveBrushSides( const char *pSideListStr )
 	{
 		return;
 	}
+
 	do
 	{
 		int brushSideID;
@@ -590,7 +591,7 @@ static bool PatchEnvmapForMaterialAndDependents( const char *pMaterialName, cons
 // default (skybox) cubemap into this file so the cubemap doesn't have the pink checkerboard at
 // runtime before they run buildcubemaps.
 //-----------------------------------------------------------------------------
-static int Cubemap_CreateTexInfo( int originalTexInfo, int origin[3] )
+static intp Cubemap_CreateTexInfo( int originalTexInfo, int origin[3] )
 {
 	// Don't make cubemap tex infos for nodes
 	if ( originalTexInfo == TEXINFO_NODE )
@@ -654,7 +655,7 @@ static int Cubemap_CreateTexInfo( int originalTexInfo, int origin[3] )
 	newTexInfo = *pTexInfo;
 	newTexInfo.texdata = nTexDataID;
 	
-	int nTexInfoID = -1;
+	intp nTexInfoID = -1;
 
 	// See if we need to make a new texinfo
 	bool bHasTexInfo = false;
@@ -792,7 +793,7 @@ void Cubemap_InitCubemapSideData( void )
 		info.m_nTableId = pTexData->nameStringTableID;
 
 		// Have we encountered this materal? If so, then copy the data we cached off before
-		int i = lookup.Find( info );
+		auto i = lookup.Find( info );
 		if ( i != lookup.InvalidIndex() )
 		{
 			s_aCubemapSideData[iSide].bHasEnvMapInMaterial = lookup[i].m_bSpecular;
@@ -954,9 +955,8 @@ void Cubemap_AddUnreferencedCubemaps()
 	char				pFileName[1024];
 	PatchInfo_t			info;
 	dcubemapsample_t	*pSample;
-	int					i,j;
 
-	for ( i=0; i<g_nCubemapSamples; ++i )
+	for ( int i=0; i<g_nCubemapSamples; ++i )
 	{
 		pSample = &g_CubemapSamples[i];	
 
