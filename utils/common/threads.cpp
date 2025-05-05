@@ -28,7 +28,6 @@ int workcount;
 bool pacifier;
 
 bool enable_threads;
-bool enter;
 
 HANDLE g_ThreadHandles[MAX_THREADS];
 
@@ -86,11 +85,10 @@ void ThreadWorker(int iThread, void *pUserData) {
 class ScopedThreadsLock::Impl {
  public:
   explicit Impl(ScopedCriticalSection &section) noexcept
-      : section_{section}, lock_{section.Lock()} {}
+      : lock_{section.Lock()} {}
   ~Impl() noexcept = default;
 
  private:
-  ScopedCriticalSection &section_;
   ScopedCriticalSectionLock lock_;
 };
 
