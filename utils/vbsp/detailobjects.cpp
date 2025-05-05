@@ -779,14 +779,9 @@ static void EmitDetailObjectsOnDisplacementFace( dface_t* pFace,
 //-----------------------------------------------------------------------------
 // Sort detail objects by leaf
 //-----------------------------------------------------------------------------
-static int SortFunc( const void *arg1, const void *arg2 )
+static bool SortFunc( const DetailObjectLump_t &arg1, const DetailObjectLump_t &arg2 )
 {
-	int nDelta = ((DetailObjectLump_t*)arg1)->m_Leaf - ((DetailObjectLump_t*)arg2)->m_Leaf;
-	if ( nDelta < 0 )
-		return -1;
-	if ( nDelta > 0 )
-		return 1;
-	return 0;
+	return arg1.m_Leaf - arg2.m_Leaf < 0;
 }
 
 
@@ -796,7 +791,7 @@ static int SortFunc( const void *arg1, const void *arg2 )
 static void SetLumpData( )
 {
 	// Sort detail props by leaf
-	qsort( s_DetailObjectLump.Base(), s_DetailObjectLump.Count(), sizeof(DetailObjectLump_t), SortFunc );
+	std::sort( s_DetailObjectLump.begin(), s_DetailObjectLump.end(), SortFunc );
 
 	GameLumpHandle_t handle = g_GameLumps.GetGameLumpHandle(GAMELUMP_DETAIL_PROPS);
 	if (handle != g_GameLumps.InvalidGameLump())
