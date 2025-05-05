@@ -2230,10 +2230,9 @@ int DoCollisionModel( bool separateJoints )
 
 	V_strcpy_safe( name, token );
 
-	PhysicsDLLPath( "VPHYSICS.DLL" );
+	PhysicsDLLPath( "VPHYSICS" DLL_EXT_STRING );
 
-//	CreateInterfaceFn physicsFactory = GetPhysicsFactory();
-	CreateInterfaceFn physicsFactory = Sys_GetFactory(Sys_LoadModule( "vphysics.dll" ));
+	CreateInterfaceFn physicsFactory = Sys_GetFactory(Sys_LoadModule( "vphysics" DLL_EXT_STRING ));
 	if ( !physicsFactory )
 		return 0;
 
