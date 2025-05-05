@@ -29,7 +29,7 @@ set SrcDirBase=..\..
 set ChangeToDir=../../../game/bin/x64
 set shaderDir=shaders
 set SDKArgs=-nompi
-set SHADERINCPATH=vshtmp9/... fxctmp9/...
+set SHADERINCPATH=include/...
 
 
 set DIRECTX_SDK_VER=pc09.00
