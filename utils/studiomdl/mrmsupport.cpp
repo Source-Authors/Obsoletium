@@ -516,24 +516,18 @@ static void BuildUniqueVertexList( s_source_t *pSource, const int *pDesiredToVLi
 //-----------------------------------------------------------------------------
 // sort new vertices by materials, last used
 //-----------------------------------------------------------------------------
-static int vlistCompare( const void *elem1, const void *elem2 )
-{
-	v_unify_t *u1 = &v_listdata[*(int *)elem1];
-	v_unify_t *u2 = &v_listdata[*(int *)elem2];
+static bool vlistCompare( const int elem1, const int elem2 ) {
+	RESTRICT v_unify_t *u1 = &v_listdata[elem1];
+	RESTRICT v_unify_t *u2 = &v_listdata[elem2];
 
 	// sort by material
 	if (u1->m < u2->m)
-		return -1;
+		return true;
 	if (u1->m > u2->m)
-		return 1;
+		return false;
 
 	// sort by last used
-	if (u1->lastref < u2->lastref)
-		return -1;
-	if (u1->lastref > u2->lastref)
-		return 1;
-
-	return 0;
+	return u1->lastref < u2->lastref;
 }
 
 static void SortVerticesByMaterial( int *pDesiredToVList, int *pVListToDesired )
@@ -542,7 +536,7 @@ static void SortVerticesByMaterial( int *pDesiredToVList, int *pVListToDesired )
 	{
 		pDesiredToVList[i] = i;
 	}
-	qsort( pDesiredToVList, numvlist, sizeof( int ), vlistCompare );
+	std::sort( pDesiredToVList, pDesiredToVList + numvlist, vlistCompare );
 	for ( int i = 0; i < numvlist; i++ )
 	{
 		pVListToDesired[ pDesiredToVList[i] ] = i;
@@ -553,24 +547,16 @@ static void SortVerticesByMaterial( int *pDesiredToVList, int *pVListToDesired )
 //-----------------------------------------------------------------------------
 // sort new faces by materials, last used
 //-----------------------------------------------------------------------------
-static int faceCompare( const void *elem1, const void *elem2 )
+static bool faceCompare( const int i1, const int i2 )
 {
-	int i1 = *(int *)elem1;
-	int i2 = *(int *)elem2;
-
 	// sort by material
 	if (g_face[i1].material < g_face[i2].material)
-		return -1;
+		return true;
 	if (g_face[i1].material > g_face[i2].material)
-		return 1;
+		return false;
 
 	// sort by original usage
-	if (i1 < i2)
-		return -1;
-	if (i1 > i2)
-		return 1;
-
-	return 0;
+	return i1 < i2;
 }
 
 static void SortFacesByMaterial( int *pDesiredToSrcFace )
@@ -580,7 +566,7 @@ static void SortFacesByMaterial( int *pDesiredToSrcFace )
 	{
 		pDesiredToSrcFace[i] = i;
 	}
-	qsort( pDesiredToSrcFace, g_numfaces, sizeof( int ), faceCompare );
+	std::sort( pDesiredToSrcFace, pDesiredToSrcFace + g_numfaces, faceCompare );
 }
 
 
