@@ -19,8 +19,6 @@
 #include "mathlib/vector2d.h"
 #include "mathlib/math_pfns.h"
 
-// XXX remove me
-#undef clamp
 
 // Uncomment this to enable FP exceptions in parts of the code.
 // This can help track down FP bugs. However the code is not
