@@ -442,8 +442,8 @@ void DownsampleRGBToRGBAImage(
 	int destWidth,
 	int destHeight )
 {
-	int srcPixelSize = 3;
-	int destPixelSize = 4;
+	constexpr int srcPixelSize = 3;
+	constexpr int destPixelSize = 4;
 	destData.SetSize( destWidth * destHeight * destPixelSize );
 	memset( destData.Base(), 0xFF, destWidth * destHeight * destPixelSize );
 
