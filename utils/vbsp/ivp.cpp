@@ -48,13 +48,6 @@ static CUtlVector<int> s_WorldPropList;
 //-----------------------------------------------------------------------------
 // Purpose: Write key/value pairs out to a memory buffer
 //-----------------------------------------------------------------------------
-CTextBuffer::CTextBuffer( void )
-{
-}
-CTextBuffer::~CTextBuffer( void )
-{
-}
-
 void CTextBuffer::WriteText( const char *pText )
 {
 	int len = strlen( pText );
@@ -336,9 +329,8 @@ private:
 
 
 CPhysCollisionEntryFluid::CPhysCollisionEntryFluid( CPhysCollide *pCollide, const char *pSurfaceProp, float damping, const Vector &normal, float dist, int nContents )
-	: CPhysCollisionEntry( pCollide )
+	: CPhysCollisionEntry( pCollide ), m_surfaceNormal{normal}
 {
-	m_surfaceNormal = normal;
 	m_surfaceDist = dist;
 	m_pSurfaceProp = V_strdup(pSurfaceProp);
 	m_damping = damping;

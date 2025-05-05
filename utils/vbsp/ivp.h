@@ -54,8 +54,8 @@ private:
 class CTextBuffer
 {
 public:
-	CTextBuffer( void );
-	~CTextBuffer( void );
+	CTextBuffer( void ) = default;
+	~CTextBuffer( void ) = default;
 	inline int GetSize( void ) { return m_buffer.Count(); }
 	inline char *GetData( void ) { return m_buffer.Base(); }
 	
