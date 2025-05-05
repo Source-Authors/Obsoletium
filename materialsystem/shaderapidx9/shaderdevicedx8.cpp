@@ -7,6 +7,7 @@
 //===========================================================================//
 #define DISABLE_PROTECTED_THINGS
 #include "locald3dtypes.h"
+#include <comdef.h>
 
 #include "shaderdevicedx8.h"
 #include "shaderapi/ishaderutil.h"
@@ -2923,12 +2924,15 @@ void CShaderDeviceDx8::Present()
 	// need to flush the dynamic buffer
 	g_pShaderAPI->FlushBufferedPrimitives();
 
+	HRESULT hr = S_OK;
 	if ( !IsDeactivated() )
 	{
-		Dx9Device()->EndScene();
-	}
+		hr = Dx9Device()->EndScene();
 
-	HRESULT hr = S_OK;
+		AssertMsg(SUCCEEDED(hr),
+			"Dx9Device()->EndScene() failed w/e '%s'.",
+			_com_error{hr}.ErrorMessage());
+	}
 
 	// if we're in queued mode, don't present if the device is already lost
 	bool bValidPresent = true;
@@ -3040,7 +3044,11 @@ void CShaderDeviceDx8::Present()
 		}
 #endif
 
-		Dx9Device()->BeginScene();
+		hr = Dx9Device()->BeginScene();
+		
+		AssertMsg(SUCCEEDED(hr),
+			"Dx9Device()->BeginScene() failed w/e '%s'.",
+			_com_error{hr}.ErrorMessage());
 	}
 }
 
