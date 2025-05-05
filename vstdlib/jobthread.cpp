@@ -211,9 +211,9 @@ public:
 	//-----------------------------------------------------
 	// Offer the current thread to the pool
 	//-----------------------------------------------------
-	virtual int YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE );
-	virtual int YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE );
-	void Yield( unsigned timeout );
+	int YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
+	int YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
+	void Yield( unsigned timeout ) override;
 
 	//-----------------------------------------------------
 	// Add a native job to the queue (master thread)
@@ -226,7 +226,7 @@ public:
 	//  and execute or execute pFunctor right after completing current job and
 	//  before looking for another job.
 	//-----------------------------------------------------
-	void ExecuteHighPriorityFunctor( CFunctor *pFunctor );
+	void ExecuteHighPriorityFunctor( CFunctor *pFunctor ) override;
 
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
@@ -241,10 +241,10 @@ public:
 	//-----------------------------------------------------
 	// Bulk job manipulation (blocking)
 	//-----------------------------------------------------
-	int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = NULL  );
+	int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = NULL ) override;
 	int AbortAll() override;
 
-	virtual void Reserved1() {}
+	void Reserved1() override {}
 
 	void WaitForIdle( bool bAll = true );
 
@@ -259,7 +259,7 @@ private:
 	//
 	//-----------------------------------------------------
 	CJob *PeekJob();
-	CJob *GetDummyJob();
+	CJob *GetDummyJob() override;
 
 	//-----------------------------------------------------
 	// Thread functions
