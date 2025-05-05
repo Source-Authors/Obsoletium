@@ -1545,11 +1545,11 @@ public:
 	// Allocates temp render data. Renderdata goes out of scope at frame end in multicore
 	// Renderdata goes out of scope after refcount goes to zero in singlecore.
 	// Locking/unlocking increases + decreases refcount
-	virtual void *			LockRenderData( int nSizeInBytes ) = 0;
+	virtual void *			LockRenderData( intp nSizeInBytes ) = 0;
 	virtual void			UnlockRenderData( void *pData ) = 0;
 
 	// Typed version. If specified, pSrcData is copied into the locked memory.
-	template< class E > E*  LockRenderDataTyped( int nCount, const E* pSrcData = nullptr );
+	template< class E > E*  LockRenderDataTyped( intp nCount, const E* pSrcData = nullptr );
 
 	// Temp render data gets immediately freed after it's all unlocked in single core.
 	// This prevents it from being freed
@@ -1573,9 +1573,9 @@ public:
 	virtual void AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) = 0;
 };
 
-template< class E > inline E* IMatRenderContext::LockRenderDataTyped( int nCount, const E* pSrcData )
+template< class E > inline E* IMatRenderContext::LockRenderDataTyped( intp nCount, const E* pSrcData )
 {
-	int nSizeInBytes = nCount * sizeof(E);
+	intp nSizeInBytes = nCount * sizeof(E);
 	E *pDstData = static_cast<E*>( LockRenderData( nSizeInBytes ) );
 	if ( pSrcData && pDstData )
 	{

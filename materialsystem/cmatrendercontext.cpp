@@ -671,13 +671,13 @@ void CMatRenderContextBase::GetWorldSpaceCameraVectors( Vector *pVecForward, Vec
 	}
 }
 
-void *CMatRenderContextBase::LockRenderData( int nSizeInBytes )
+void *CMatRenderContextBase::LockRenderData( intp nSizeInBytes )
 {
 	MEM_ALLOC_CREDIT();
 	void *pDest = sm_RenderData[ sm_nRenderStack ].Alloc( nSizeInBytes, false );
 	if ( !pDest )
 	{
-		ExecuteNTimes( 10, Warning( "MaterialSystem: Out of memory in render data!\n" ) );
+		ExecuteNTimes( 10, Warning( "MaterialSystem: Out of memory in render data (%zd bytes alloc failed)!\n", nSizeInBytes ) );
 	}
 	AddRefRenderData();
 	return pDest;

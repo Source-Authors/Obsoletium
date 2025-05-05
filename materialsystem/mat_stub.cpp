@@ -2265,7 +2265,7 @@ public:
 	virtual void EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode ) {}
 	virtual void RefreshFrontBufferNonInteractive() {}
 
-	virtual void *			LockRenderData( int nSizeInBytes ) { return NULL; }
+	virtual void *			LockRenderData( intp nSizeInBytes ) { return NULL; }
 	virtual void			UnlockRenderData( void *pData ) {}
 	virtual bool			IsRenderData( const void *pData ) const { return false; }
 	virtual void			AddRefRenderData() override {}
