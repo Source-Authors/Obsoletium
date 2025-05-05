@@ -840,14 +840,14 @@ template <class T> [[nodiscard]] FORCEINLINE T AVG(T a, T b)
 //
 // Note: This code has been run against all possible integers.
 //
-[[nodiscard]] inline int XM_CALLCONV ClampArrayBounds( int n, unsigned maxindex )
+[[nodiscard]] inline intp XM_CALLCONV ClampArrayBounds( intp n, uintp maxindex )
 {
 	// mask is 0 if less than 4096, 0xFFFFFFFF if greater than
-	unsigned int inrangemask = 0xFFFFFFFF + (((unsigned) n) > maxindex );
-	unsigned int lessthan0mask = 0xFFFFFFFF + ( n >= 0 );
+	const uintp inrangemask = std::numeric_limits<uintp>::max() + (static_cast<uintp>(n) > maxindex);
+	const uintp lessthan0mask = std::numeric_limits<uintp>::max() + (n >= 0);
 	
 	// If the result was valid, set the result, (otherwise sets zero)
-	int result = (inrangemask & n);
+	intp result = (inrangemask & n);
 
 	// if the result was out of range or zero.
 	result |= ((~inrangemask) & (~lessthan0mask)) & maxindex;
