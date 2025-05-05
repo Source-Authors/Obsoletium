@@ -1220,13 +1220,13 @@ void SplitBrush( bspbrush_t *brush, int planenum, bspbrush_t **front, bspbrush_t
 {
 	vec_t	v1;
 
-	for (int i=0 ; i<2 ; i++)
+	for (int k=0 ; k<2 ; k++)
 	{
-		v1 = BrushVolume (b[i]);
-		if (v1 < 1.0)
+		v1 = BrushVolume (b[k]);
+		if (v1 < 1.0f)
 		{
-			FreeBrush (b[i]);
-			b[i] = NULL;
+			FreeBrush (b[k]);
+			b[k] = NULL;
 //			qprintf ("tiny volume after clip\n");
 		}
 	}
