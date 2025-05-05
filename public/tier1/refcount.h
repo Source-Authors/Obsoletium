@@ -1,14 +1,13 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: Tools for correctly implementing & handling reference counted
-//			objects
-//
-//=============================================================================
+// Tools for correctly implementing & handling reference counted objects.
 
 #ifndef REFCOUNT_H
 #define REFCOUNT_H
 
 #include "tier0/threadtools.h"
+
+#include <atomic>
 
 #if defined( _WIN32 )
 #pragma once
@@ -45,51 +44,42 @@ inline void SafeRelease( T** ppInoutPtr )
 	if ( *ppInoutPtr )
 		( *ppInoutPtr )->Release();
 
-	( *ppInoutPtr ) = NULL;
+	*ppInoutPtr = nullptr;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose:	Implement a standard reference counted interface. Use of this
-//			is optional insofar as all the concrete tools only require
-//			at compile time that the function signatures match.
-//-----------------------------------------------------------------------------
-
-class IRefCounted
+// Implement a standard reference counted interface.  Use of this is optional
+// insofar as all the concrete tools only require at compile time that the
+// function signatures match.
+// dimhotepus: Add NO_VTABLE.
+struct NO_VTABLE IRefCounted
 {
-public:
 	virtual int AddRef() = 0;
 	virtual int Release() = 0;
 };
 
 
-//-----------------------------------------------------------------------------
-// Purpose:	Release a pointer and mark it NULL
-//-----------------------------------------------------------------------------
-
+// Release a pointer and mark it nullptr.
 template <class REFCOUNTED_ITEM_PTR>
 inline int SafeRelease( REFCOUNTED_ITEM_PTR &pRef )
 {
-	// Use funny syntax so that this works on "auto pointers"
-	REFCOUNTED_ITEM_PTR *ppRef = &pRef;
+	// Use funny syntax so that this works on "auto pointers".
+	auto *ppRef = &pRef;
 	if ( *ppRef )
 	{
 		int result = (*ppRef)->Release();
-		*ppRef = NULL;
+		*ppRef = nullptr;
 		return result;
 	}
 	return 0;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose:	Maintain a reference across a scope
-//-----------------------------------------------------------------------------
-
+// Maintain a reference across a scope.
 template <class T = IRefCounted>
 class CAutoRef
 {
 public:
-	CAutoRef( T *pRef )
-	  : m_pRef( pRef )
+	// dimhotepus: Mark explicit.
+	explicit CAutoRef( T *pRef ) : m_pRef( pRef )
 	{
 		if ( m_pRef )
 			m_pRef->AddRef();
@@ -105,26 +95,21 @@ private:
    T *m_pRef;
 };
 
-//-----------------------------------------------------------------------------
-// Purpose:	Do a an inline AddRef then return the pointer, useful when
-//			returning an object from a function
-//-----------------------------------------------------------------------------
-
+// Do a an inline AddRef then return the pointer, useful when returning an
+// object from a function.
 #define RetAddRef( p ) ( (p)->AddRef(), (p) )
 #define InlineAddRef( p ) ( (p)->AddRef(), (p) )
 
 
-//-----------------------------------------------------------------------------
-// Purpose:	A class to both hold a pointer to an object and its reference.
-//			Base exists to support other cleanup models
-//-----------------------------------------------------------------------------
-
+// A class to both hold a pointer to an object and its reference.  Base exists
+// to support other cleanup models.
 template <class T>
 class CBaseAutoPtr
 {
 public:
-	CBaseAutoPtr()                                         	: m_pObject(0) {}
-	CBaseAutoPtr(T *pFrom)                        			: m_pObject(pFrom) {}
+	CBaseAutoPtr()	: CBaseAutoPtr(nullptr) {}
+	// dimhotepus: Mark explicit.
+	explicit CBaseAutoPtr(T *pFrom) : m_pObject(pFrom) {}
 
 	[[nodiscard]] operator const void *() const							{ return m_pObject; }
 	[[nodiscard]] operator void *()										{ return m_pObject; }
@@ -133,17 +118,19 @@ public:
 	[[nodiscard]] operator const T *()									{ return m_pObject; }
 	[[nodiscard]] operator T *()										{ return m_pObject; }
 
-	[[nodiscard]] int		operator=( int i )							{ AssertMsg( i == 0, "Only NULL allowed on integer assign" ); m_pObject = 0; return 0; }
+	// dimhotepus: Drop unsafe type casts.
+	//[[nodiscard]] int		operator=( int i )							{ AssertMsg( i == 0, "Only NULL allowed on integer assign" ); m_pObject = 0; return 0; }
 	[[nodiscard]] T *		operator=( T *p )							{ m_pObject = p; return p; }
 
-    [[nodiscard]] bool		operator !() const							{ return ( !m_pObject ); }
-    [[nodiscard]] bool		operator!=( int i ) const					{ AssertMsg( i == 0, "Only NULL allowed on integer compare" ); return (m_pObject != NULL); }
+	[[nodiscard]] bool		operator !() const							{ return ( !m_pObject ); }
+	// dimhotepus: Drop unsafe type casts.
+	// [[nodiscard]] bool		operator!=( int i ) const					{ AssertMsg( i == 0, "Only NULL allowed on integer compare" ); return (m_pObject != NULL); }
 	[[nodiscard]] bool		operator==( const void *p ) const			{ return ( m_pObject == p ); }
 	[[nodiscard]] bool		operator!=( const void *p ) const			{ return ( m_pObject != p ); }
-	[[nodiscard]] bool		operator==( T *p ) const					{ return operator==( (void *)p ); }
-	[[nodiscard]] bool		operator!=( T *p ) const					{ return operator!=( (void *)p ); }
-	[[nodiscard]] bool		operator==( const CBaseAutoPtr<T> &p ) const { return operator==( (const void *)p ); }
-	[[nodiscard]] bool		operator!=( const CBaseAutoPtr<T> &p ) const { return operator!=( (const void *)p ); }
+	[[nodiscard]] bool		operator==( T *p ) const					{ return operator==( static_cast<void *>(p) ); }
+	[[nodiscard]] bool		operator!=( T *p ) const					{ return operator!=( static_cast<void *>(p) ); }
+	[[nodiscard]] bool		operator==( const CBaseAutoPtr<T> &p ) const { return operator==( static_cast<const void *>(p) ); }
+	[[nodiscard]] bool		operator!=( const CBaseAutoPtr<T> &p ) const { return operator!=( static_cast<const void *>(p) ); }
 
 	[[nodiscard]] T *  		operator->()								{ return m_pObject; }
 	[[nodiscard]] T &  		operator *()								{ return *m_pObject; }
@@ -154,31 +141,32 @@ public:
 	[[nodiscard]] T * const * operator &() const							{ return &m_pObject; }
 
 protected:
-	CBaseAutoPtr( const CBaseAutoPtr<T> &from )				: m_pObject( from.m_pObject ) {}
-	void operator=( const CBaseAutoPtr<T> &from ) 			{ m_pObject = from.m_pObject; }
+	CBaseAutoPtr( const CBaseAutoPtr<T> &from ) : m_pObject( from.m_pObject ) {}
+	CBaseAutoPtr<T>& operator=( const CBaseAutoPtr<T> &from ) { m_pObject = from.m_pObject; return *this; }
 
 	T *m_pObject;
 };
 
-//---------------------------------------------------------
-
 template <class T>
 class CRefPtr : public CBaseAutoPtr<T>
 {
-	typedef CBaseAutoPtr<T> BaseClass;
+	using BaseClass = CBaseAutoPtr<T>;
+
 public:
 	CRefPtr()	= default;
-	CRefPtr( T *pInit )										: BaseClass( pInit ) {}
+	// dimhotepus: Mark explicit.
+	explicit CRefPtr( T *pInit )							: BaseClass( pInit ) {}
 	CRefPtr( const CRefPtr<T> &from )						: BaseClass( from ) {}
 	~CRefPtr()												{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->Release(); }
 
-	void operator=( const CRefPtr<T> &from )				{ BaseClass::operator=( from ); }
+	CRefPtr<T>& operator=( const CRefPtr<T> &from )			{ BaseClass::operator=( from ); return *this; }
 
-	int operator=( int i )									{ return BaseClass::operator=( i ); }
+	// dimhotepus: Drop unsafe type casts.
+	//int operator=( int i )									{ return BaseClass::operator=( i ); }
 	T *operator=( T *p )									{ return BaseClass::operator=( p ); }
 
-	[[nodiscard]] operator bool() const									{ return !BaseClass::operator!(); }
-	[[nodiscard]] operator bool()											{ return !BaseClass::operator!(); }
+	[[nodiscard]] operator bool() const						{ return !BaseClass::operator!(); }
+	[[nodiscard]] operator bool()							{ return !BaseClass::operator!(); }
 
 	void SafeRelease()										{ if ( BaseClass::m_pObject ) BaseClass::m_pObject->Release(); BaseClass::m_pObject = nullptr; }
 	void AssignAddRef( T *pFrom )							{ SafeRelease(); if (pFrom) pFrom->AddRef(); BaseClass::m_pObject = pFrom; }
@@ -186,58 +174,69 @@ public:
 };
 
 
-//-----------------------------------------------------------------------------
-// Purpose:	Traits classes defining reference count threading model
-//-----------------------------------------------------------------------------
-
+// Traits class defining multithreaded reference count threading model.
 class CRefMT
 {
 public:
-	static int Increment( int *p) { return ThreadInterlockedIncrement( (volatile long *)p ); }
-	static int Decrement( int *p) { return ThreadInterlockedDecrement( (volatile long *)p ); }
+	// dimhotepus: Mark explicit.
+	explicit CRefMT(int initial) : m_Ref{initial} {}
+
+	int Increment() { return m_Ref.fetch_add(1, std::memory_order::memory_order_relaxed) + 1; }
+	// Acquire-release because destructor in some smart pointer impl depends on it.
+	int Decrement() { return m_Ref.fetch_sub(1, std::memory_order::memory_order_acq_rel) - 1; }
+	
+	// Acquire-release because destructor in some smart pointer impl depends on it.
+	[[nodiscard]] int Counter() const { return m_Ref.load(std::memory_order_acq_rel); }
+
+private:
+	std::atomic_int m_Ref;
 };
 
+// Traits class defining singlethreaded reference count threading model.
 class CRefST
 {
 public:
-	static int Increment( int *p) { return ++(*p); }
-	static int Decrement( int *p) { return --(*p); }
+	// dimhotepus: Mark explicit.
+	explicit CRefST(int initial) : m_Ref{initial} {}
+
+	int Increment() { return ++m_Ref; }
+	int Decrement() { return --m_Ref; }
+
+	[[nodiscard]] int Counter() const { return m_Ref; }
+
+private:
+	int m_Ref;
 };
 
-//-----------------------------------------------------------------------------
-// Purpose:	Actual reference counting implementation. Pulled out to reduce
-//			code bloat.
-//-----------------------------------------------------------------------------
-
+// Actual reference counting implementation.  Pulled out to reduce code bloat.
 template <const bool bSelfDelete, typename CRefThreading = CRefMT>
 class NO_VTABLE CRefCountServiceBase
 {
 protected:
-	CRefCountServiceBase()
-	  : m_iRefs( 1 )
+	CRefCountServiceBase() : m_iRefs( 1 )
 	{
 	}
 
 	virtual ~CRefCountServiceBase() = default;
 
-	virtual bool OnFinalRelease()
+	[[nodiscard]] virtual bool OnFinalRelease()
 	{
 		return true;
 	}
 
 	[[nodiscard]] int GetRefCount() const
 	{
-		return m_iRefs;
+		return m_iRefs.Counter();
 	}
 
 	int DoAddRef()
 	{
-		return CRefThreading::Increment( &m_iRefs );
+		return m_iRefs.Increment();
 	}
 
 	int DoRelease()
 	{
-		int result = CRefThreading::Decrement( &m_iRefs );
+		const int result = m_iRefs.Decrement();
 		if ( result )
 			return result;
 		if ( OnFinalRelease() && bSelfDelete )
@@ -246,7 +245,7 @@ protected:
 	}
 
 private:
-	int m_iRefs;
+	CRefThreading m_iRefs;
 };
 
 class CRefCountServiceNull
@@ -260,8 +259,7 @@ template <typename CRefThreading = CRefMT>
 class NO_VTABLE CRefCountServiceDestruct
 {
 protected:
-	CRefCountServiceDestruct()
-		: m_iRefs( 1 )
+	CRefCountServiceDestruct() : m_iRefs( 1 )
 	{
 	}
 
@@ -269,17 +267,17 @@ protected:
 
 	[[nodiscard]] int GetRefCount() const
 	{
-		return m_iRefs;
+		return m_iRefs.Counter();
 	}
 
 	int DoAddRef()
 	{
-		return CRefThreading::Increment( &m_iRefs );
+		return m_iRefs.Increment();
 	}
 
 	int DoRelease()
 	{
-		int result = CRefThreading::Decrement( &m_iRefs );
+		const int result = m_iRefs.Decrement();
 		if ( result )
 			return result;
 		this->~CRefCountServiceDestruct();
@@ -287,7 +285,7 @@ protected:
 	}
 
 private:
-	int m_iRefs;
+	CRefThreading m_iRefs;
 };
 
 
