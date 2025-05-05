@@ -1708,9 +1708,8 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 	// so far for each activity. (This is basically a very simple way of doing a map.)
 	// This stack may potentially grow very large; so if you have problems with it, 
 	// go to a utlmap or similar structure.
-	unsigned int allocsize = (topActivity + 1) * sizeof(int);
-	allocsize = AlignValue(allocsize,16);
-	int * __restrict seqsPerAct = static_cast<int *>(stackalloc(allocsize));
+	const unsigned int allocsize = AlignValue((topActivity + 1) * sizeof(int), 16);
+	int * __restrict seqsPerAct = stackallocT( int, topActivity + 1 );
 	memset(seqsPerAct, 0, allocsize);
 
 	// okay, walk through all the sequences again, and write the relevant data into 
