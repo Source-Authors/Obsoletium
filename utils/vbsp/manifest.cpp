@@ -403,14 +403,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 
 	if ( eResult == ChunkFile_Ok )
 	{
-	}
-	else
-	{
-		// no pref message for now
-		//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+		return true;
 	}
 
-	return true;
+	// no pref message for now
+	//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+	return false;
 }
 
 
