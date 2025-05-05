@@ -373,12 +373,6 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	V_StripExtension( pszFileName, FileName );
 	V_strcat_safe( FileName, UserPrefsFileName );
 
-	FILE *fp = fopen( FileName, "rb" );
-	if ( !fp )
-	{
-		return false;
-	}
-
 	CChunkFile File;
 	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Read );
 
