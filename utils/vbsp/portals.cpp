@@ -14,30 +14,19 @@
 #include "fmtstr.h"
 #include "bspflags.h"
 
-int		c_active_portals;
-int		c_peak_portals;
-int		c_boundary;
-int		c_boundary_sides;
-
 /*
 ===========
 AllocPortal
 ===========
 */
-portal_t *AllocPortal (void)
+portal_t *AllocPortal ()
 {
-	static int s_PortalCount = 0;
+	static int portalCount = 0;
 
-	if (numthreads == 1)
-		c_active_portals++;
-
-	if (c_active_portals > c_peak_portals)
-		c_peak_portals = c_active_portals;
-	
-	portal_t *p = (portal_t*)calloc (1, sizeof(portal_t));
+	auto *p = static_cast<portal_t*>(calloc (1, sizeof(portal_t)));
 	if (!p) return nullptr;
 
-	p->id = s_PortalCount++;
+	p->id = portalCount++;
 
 	return p;
 }
@@ -46,8 +35,7 @@ void FreePortal (portal_t *p)
 {
 	if (p->winding)
 		FreeWinding (p->winding);
-	if (numthreads == 1)
-		c_active_portals--;
+
 	free (p);
 }
 

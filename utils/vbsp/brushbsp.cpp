@@ -10,10 +10,6 @@
 #include "bspflags.h"
 
 
-int		c_nodes;
-int		c_nonvis;
-int		c_active_brushes;
-
 // if a brush just barely pokes onto the other side,
 // let it slide by without chopping
 #define	PLANESIDE_EPSILON	0.001
@@ -339,8 +335,6 @@ bspbrush_t *AllocBrush (int numsides)
 	if (!bb) Error("BSP brush allocation failure.\n");
 
 	bb->id = s_BrushId++;
-	if (numthreads == 1)
-		c_active_brushes++;
 	return bb;
 }
 
@@ -355,8 +349,6 @@ void FreeBrush (bspbrush_t *brushes)
 		if (brushes->sides[i].winding)
 			FreeWinding(brushes->sides[i].winding);
 	free (brushes);
-	if (numthreads == 1)
-		c_active_brushes--;
 }
 
 
@@ -969,11 +961,6 @@ side_t *SelectSplitSide (bspbrush_t *brushes, node_t *node)
 		// other passes
 		if (bestside)
 		{
-			if (pass > 0)
-			{
-				if (numthreads == 1)
-					c_nonvis++;
-			}
 			break;
 		}
 	}
@@ -1331,9 +1318,6 @@ node_t *BuildTree_r (node_t *node, bspbrush_t *brushes)
 	int			i;
 	bspbrush_t	*children[2];
 
-	if (numthreads == 1)
-		c_nodes++;
-
 	// find the best plane to use as a splitter
 	bestside = SelectSplitSide (brushes, node);
 
@@ -1432,8 +1416,6 @@ tree_t *BrushBSP (bspbrush_t *brushlist, Vector& mins, Vector& maxs)
 	qprintf ("%5i visible faces\n", c_faces);
 	qprintf ("%5i nonvisible faces\n", c_nonvisfaces);
 
-	c_nodes = 0;
-	c_nonvis = 0;
 	node = AllocNode ();
 
 	node->volume = BrushFromBounds (mins, maxs);
@@ -1441,9 +1423,6 @@ tree_t *BrushBSP (bspbrush_t *brushlist, Vector& mins, Vector& maxs)
 	tree->headnode = node;
 
 	node = BuildTree_r (node, brushlist);
-	qprintf ("%5i visible nodes\n", c_nodes/2 - c_nonvis);
-	qprintf ("%5i nonvis nodes\n", c_nonvis);
-	qprintf ("%5i leafs\n", (c_nodes+1)/2);
 #if 0
 {	// debug code
 static node_t	*tnode;
