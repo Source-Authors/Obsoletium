@@ -69,7 +69,7 @@ static CUtlVector< VertIndices_t > s_UniqueVertices;	// A list of the unique ver
 // But as both arrays contain information for all meshes in the DMX
 // The proper offset for the desired mesh must be added to the lookup
 // into the map but the value returned has the offset already built in
-static CUtlVector< int > s_UniqueVerticesMap;
+static CUtlVector< intp > s_UniqueVerticesMap;
 
 
 //-----------------------------------------------------------------------------
@@ -108,8 +108,8 @@ static CUtlVector<DeltaState_t> s_DeltaStates;
 //-----------------------------------------------------------------------------
 static DeltaState_t* FindOrAddDeltaState( const char *pDeltaStateName, int nBaseStateVertexCount )
 {
-	int nCount = s_DeltaStates.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = s_DeltaStates.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( s_DeltaStates[i].m_Name, pDeltaStateName ) )
 		{
@@ -120,7 +120,7 @@ static DeltaState_t* FindOrAddDeltaState( const char *pDeltaStateName, int nBase
 		}
 	}
 
-	int j = s_DeltaStates.AddToTail();
+	intp j = s_DeltaStates.AddToTail();
 	s_DeltaStates[j].m_Name = pDeltaStateName;
 	s_DeltaStates[j].m_DeltaIndices.SetCount( nBaseStateVertexCount );
 	return &s_DeltaStates[j];
@@ -138,11 +138,11 @@ static bool DefineUniqueVertices( CDmeVertexData *pBindState, int nStartingUniqu
 	const CUtlVector<int> &balanceIndices = pBindState->GetVertexIndexData( CDmeVertexData::FIELD_BALANCE );
 	const CUtlVector<int> &speedIndices = pBindState->GetVertexIndexData( CDmeVertexData::FIELD_MORPH_SPEED );
 
-	int nPositionCount = positionIndices.Count();
-	int nNormalCount = normalIndices.Count();
-	int nTexcoordCount = texcoordIndices.Count();
-	int nBalanceCount = balanceIndices.Count();
-	int nSpeedCount = speedIndices.Count();
+	intp nPositionCount = positionIndices.Count();
+	intp nNormalCount = normalIndices.Count();
+	intp nTexcoordCount = texcoordIndices.Count();
+	intp nBalanceCount = balanceIndices.Count();
+	intp nSpeedCount = speedIndices.Count();
 	if ( nNormalCount && nPositionCount != nNormalCount )
 	{
 		MdlError( "Encountered a mesh with invalid geometry (different number of indices for various data fields)\n" );
@@ -176,7 +176,7 @@ static bool DefineUniqueVertices( CDmeVertexData *pBindState, int nStartingUniqu
 		vert.speed = s_Speed.Count() + ( ( nSpeedCount > 0 ) ? speedIndices[i] : 0 );
 
 		bool unique( true );
-		for ( int j = nStartingUniqueCount; j < s_UniqueVertices.Count(); ++j )
+		for ( intp j = nStartingUniqueCount; j < s_UniqueVertices.Count(); ++j )
 		{
 			const VertIndices_t &tmpVert( s_UniqueVertices[j] );
 
@@ -195,7 +195,7 @@ static bool DefineUniqueVertices( CDmeVertexData *pBindState, int nStartingUniqu
 		if ( !unique )
 			continue;
 
-		int k = s_UniqueVertices.AddToTail();
+		intp k = s_UniqueVertices.AddToTail();
 		s_UniqueVertices[k] = vert;
 		s_UniqueVerticesMap.AddToTail( k );
 	}
@@ -226,7 +226,7 @@ static bool LoadVertices( CDmeVertexData *pBindState, const matrix3x4_t& mat, fl
 	const CUtlVector<float> &balances = pBindState->GetBalanceData( );
 	const CUtlVector<float> &speeds = pBindState->GetMorphSpeedData( );
 
-	int nCount = positions.Count();
+	intp nCount = positions.Count();
 	int nJointCount = pBindState->HasSkinningData() ? pBindState->JointCount() : 0;
 	if ( nJointCount > MAXSTUDIOBONEWEIGHTS )
 	{
@@ -323,7 +323,7 @@ static bool LoadVertices( CDmeVertexData *pBindState, const matrix3x4_t& mat, fl
 //-----------------------------------------------------------------------------
 // Hook delta into delta list
 //-----------------------------------------------------------------------------
-static void AddToDeltaList( DeltaState_t *pDeltaStateData, int nUniqueVertex )
+static void AddToDeltaList( DeltaState_t *pDeltaStateData, intp nUniqueVertex )
 {
 	DeltaIndex_t &index = pDeltaStateData->m_DeltaIndices[ nUniqueVertex ];
 	if ( !index.m_bInList )
@@ -379,8 +379,8 @@ static bool LoadDeltaState(
 	}
 
 	// Copy position delta
-	int nCount = positions.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = positions.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		Vector vecDelta;
 
@@ -390,14 +390,14 @@ static bool LoadDeltaState(
 		VectorRotate( positions[i], mat, vecDelta );
 		vecDelta *= flScale;
 
-		int nPositionIndex = pDeltaStateData->m_PositionDeltas.AddToTail( vecDelta );
+		intp nPositionIndex = pDeltaStateData->m_PositionDeltas.AddToTail( vecDelta );
 
 		// Indices 
 		const CUtlVector< int > &baseVerts = pBindState->FindVertexIndicesFromDataIndex( CDmeVertexData::FIELD_POSITION, positionIndices[i] );
-		int nBaseVertCount = baseVerts.Count();
-		for ( int k = 0; k < nBaseVertCount; ++k )
+		intp nBaseVertCount = baseVerts.Count();
+		for ( intp k = 0; k < nBaseVertCount; ++k )
 		{
-			int nUniqueVertexIndex = s_UniqueVerticesMap[ nStartingUniqueVertexMap + baseVerts[k] ];
+			intp nUniqueVertexIndex = s_UniqueVerticesMap[ nStartingUniqueVertexMap + baseVerts[k] ];
 			AddToDeltaList( pDeltaStateData, nUniqueVertexIndex );
 			DeltaIndex_t &index = pDeltaStateData->m_DeltaIndices[ nUniqueVertexIndex ];
 			index.m_nPositionIndex = nPositionIndex;
@@ -406,18 +406,18 @@ static bool LoadDeltaState(
 
 	// Copy normals
 	nCount = normals.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		Vector vecDelta;
 		VectorRotate( normals[i], normalMat, vecDelta );
-		int nNormalIndex = pDeltaStateData->m_NormalDeltas.AddToTail( vecDelta );
+		intp nNormalIndex = pDeltaStateData->m_NormalDeltas.AddToTail( vecDelta );
 
 		// Indices 
 		const CUtlVector< int > &baseVerts = pBindState->FindVertexIndicesFromDataIndex( CDmeVertexData::FIELD_NORMAL, normalIndices[i] );
-		int nBaseVertCount = baseVerts.Count();
-		for ( int k = 0; k < nBaseVertCount; ++k )
+		intp nBaseVertCount = baseVerts.Count();
+		for ( intp k = 0; k < nBaseVertCount; ++k )
 		{
-			int nUniqueVertexIndex = s_UniqueVerticesMap[ nStartingUniqueVertexMap + baseVerts[k] ];
+			intp nUniqueVertexIndex = s_UniqueVerticesMap[ nStartingUniqueVertexMap + baseVerts[k] ];
 			AddToDeltaList( pDeltaStateData, nUniqueVertexIndex );
 			DeltaIndex_t &index = pDeltaStateData->m_DeltaIndices[ nUniqueVertexIndex ];
 			index.m_nNormalIndex = nNormalIndex;
@@ -426,16 +426,16 @@ static bool LoadDeltaState(
 
 	// Copy wrinkle
 	nCount = wrinkle.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int nWrinkleIndex = pDeltaStateData->m_WrinkleDeltas.AddToTail( wrinkle[i] );
+		intp nWrinkleIndex = pDeltaStateData->m_WrinkleDeltas.AddToTail( wrinkle[i] );
 
 		// Indices 
 		const CUtlVector< int > &baseVerts = pBindState->FindVertexIndicesFromDataIndex( CDmeVertexData::FIELD_WRINKLE, wrinkleIndices[i] );
-		int nBaseVertCount = baseVerts.Count();
-		for ( int k = 0; k < nBaseVertCount; ++k )
+		intp nBaseVertCount = baseVerts.Count();
+		for ( intp k = 0; k < nBaseVertCount; ++k )
 		{
-			int nUniqueVertexIndex = s_UniqueVerticesMap[ nStartingUniqueVertexMap + baseVerts[k] ];
+			intp nUniqueVertexIndex = s_UniqueVerticesMap[ nStartingUniqueVertexMap + baseVerts[k] ];
 			AddToDeltaList( pDeltaStateData, nUniqueVertexIndex );
 			DeltaIndex_t &index = pDeltaStateData->m_DeltaIndices[ nUniqueVertexIndex ];
 			index.m_nWrinkleIndex = nWrinkleIndex;
@@ -486,15 +486,15 @@ static bool LoadMesh( CDmeMesh *pMesh, CDmeVertexData *pBindState, const matrix3
 	int nStartingVertex = g_numverts;
 	int nStartingNormal = g_numnormals;
 	int nStartingTexCoord = g_numtexcoords;
-	int nStartingUniqueCount = s_UniqueVertices.Count();
-	int nStartingUniqueMapCount = s_UniqueVerticesMap.Count();
+	intp nStartingUniqueCount = s_UniqueVertices.Count();
+	intp nStartingUniqueMapCount = s_UniqueVerticesMap.Count();
 
 	// This defines s_UniqueVertices & s_UniqueVerticesMap
 	LoadVertices( pBindState, mat, flScale, nBoneAssign, pBoneRemap, nStartingUniqueCount );
 
 	// Load the deltas
-	int nDeltaStateCount = pMesh->DeltaStateCount();
-	for ( int i = 0; i < nDeltaStateCount; ++i )
+	intp nDeltaStateCount = pMesh->DeltaStateCount();
+	for ( intp i = 0; i < nDeltaStateCount; ++i )
 	{
 		CDmeVertexDeltaData *pDeltaState = pMesh->GetDeltaState( i );
 		if ( !LoadDeltaState( pDeltaState, pBindState, mat, flScale, nStartingUniqueCount, nStartingUniqueMapCount ) )
@@ -532,7 +532,7 @@ static bool LoadMesh( CDmeMesh *pMesh, CDmeVertexData *pBindState, const matrix3
 
 		// skip all faces with the null texture on them.
 		char pPathNoExt[MAX_PATH];
-		Q_StripExtension( pTextureName, pPathNoExt, sizeof(pPathNoExt) );
+		Q_StripExtension( pTextureName, pPathNoExt );
 		if ( !Q_stricmp( pPathNoExt, "null" ) )
 			continue;
 
@@ -681,7 +681,7 @@ static bool LoadMeshes( CDmeModel *pModel, float flScale, int *pBoneRemap, s_sou
 //-----------------------------------------------------------------------------
 static void BuildVertexAnimations( s_source_t *pSource )
 {
-	int nCount = s_DeltaStates.Count();
+	intp nCount = s_DeltaStates.Count();
 	if ( nCount == 0 )
 		return;
 
@@ -689,8 +689,8 @@ static void BuildVertexAnimations( s_source_t *pSource )
 	Assert( s_Balance.Count() > 0 );
 
 	Assert( s_UniqueVertices.Count() == numvlist );
-	s_vertanim_t *pVertAnim = (s_vertanim_t *)_alloca( numvlist * sizeof( s_vertanim_t ) );
-	for ( int i = 0; i < nCount; ++i )
+	s_vertanim_t *pVertAnim = stackallocT( s_vertanim_t, numvlist );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		DeltaState_t &state = s_DeltaStates[i];
 
@@ -872,7 +872,7 @@ static void LoadAttachments( CDmeDag *pRoot, CDmeDag *pDag, s_source_t *pSource 
 	CDmeAttachment *pAttachment = CastElement< CDmeAttachment >( pDag->GetShape() );
 	if ( pAttachment && ( pDag != pRoot ) )
 	{
-		int i = pSource->m_Attachments.AddToTail();
+		intp i = pSource->m_Attachments.AddToTail();
 		s_attachment_t &attachment = pSource->m_Attachments[i];
 		memset( &attachment, 0, sizeof(s_attachment_t) );
 		Q_strncpy( attachment.name, pAttachment->GetName(), sizeof( attachment.name ) );
@@ -946,8 +946,8 @@ static void LoadBindPose( CDmeModel *pModel, float flScale, int *pBoneRemap, s_s
 //-----------------------------------------------------------------------------
 static void PrepareChannels( CDmeChannelsClip *pAnimation ) 
 {
-	int nChannelsCount = pAnimation->m_Channels.Count();
-	for ( int i = 0; i < nChannelsCount; ++i )
+	intp nChannelsCount = pAnimation->m_Channels.Count();
+	for ( intp i = 0; i < nChannelsCount; ++i )
 	{
 		pAnimation->m_Channels[i]->SetMode( CM_PLAY );
 	}
@@ -959,10 +959,10 @@ static void PrepareChannels( CDmeChannelsClip *pAnimation )
 //-----------------------------------------------------------------------------
 static void UpdateChannels( CDmeChannelsClip *pAnimation, DmeTime_t clipTime ) 
 {
-	int nChannelsCount = pAnimation->m_Channels.Count();
+	intp nChannelsCount = pAnimation->m_Channels.Count();
 	DmeTime_t channelTime = pAnimation->ToChildMediaTime( clipTime );
-	CUtlVector< IDmeOperator* > operators( 0, nChannelsCount );
-	for ( int i = 0; i < nChannelsCount; ++i )
+	CUtlVector< IDmeOperator* > operators( (intp)0, nChannelsCount );
+	for ( intp i = 0; i < nChannelsCount; ++i )
 	{
 		pAnimation->m_Channels[i]->SetCurrentTime( channelTime );
 		operators.AddToTail( pAnimation->m_Channels[i] );
@@ -1091,7 +1091,7 @@ void LoadModelInfo( CDmElement *pRoot, char const *pFullPath )
 		if ( CDmAttribute *pSources = pMakeFile->GetAttribute( "sources" ) )
 		{
 			CDmrElementArray< CDmElement > arrSources( pSources );
-			for ( int kk = 0; kk < arrSources.Count(); ++ kk )
+			for ( intp kk = 0; kk < arrSources.Count(); ++ kk )
 			{
 				if ( CDmElement *pModelSource = arrSources.Element( kk ) )
 				{
@@ -1120,7 +1120,7 @@ int Load_DMX( s_source_t *pSource )
 
 	// use the full search tree, including mod hierarchy to find the file
 	char pFullPath[MAX_PATH];
-	if ( !GetGlobalFilePath( pSource->filename, pFullPath, sizeof(pFullPath) ) )
+	if ( !GetGlobalFilePath( pSource->filename, pFullPath ) )
 		return 0;
 
 	// When reading, keep the CRLF; this will make ReadFile read it in binary format
