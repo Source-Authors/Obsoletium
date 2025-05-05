@@ -1820,7 +1820,8 @@ float Safe_atof( const char *pString )
 	if ( !pString )
 		return 0;
 
-	return atof(pString);
+	// dimhotepus: atof -> strtof.
+	return strtof(pString, nullptr);
 }
 
 //-----------------------------------------------------------------------------
