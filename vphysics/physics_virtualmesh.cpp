@@ -86,7 +86,11 @@ public:
 	}
 
 	// locals
-	CMeshInstance() { m_memSize = 0; m_pMemory = 0; m_hullOffset = 0; m_hullCount = 0; } //-V730
+	CMeshInstance(const virtualmeshlist_t &list)
+	{
+		m_hullOffset = 0;
+		Init(list);
+	}
 	~CMeshInstance();
 
 private:
@@ -134,9 +138,7 @@ unsigned int CMeshInstance::ComputeRootLedgeSize( const byte *pData )
 
 CMeshInstance *CMeshInstance::CreateResource( const virtualmeshlist_t &list )
 {
-	CMeshInstance *pMesh = new CMeshInstance;
-	pMesh->Init( list );
-	return pMesh;
+	return new CMeshInstance(list);
 }
 
 
