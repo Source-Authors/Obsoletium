@@ -95,7 +95,7 @@ public:
 
 private:
 	void Init( const virtualmeshlist_t &list );
-
+	
 	// dimhotepus: Reordered to reduce size on x86-64.
 	byte			*m_pMemory;
 	unsigned int	m_memSize;
@@ -167,13 +167,24 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 		ConvertPositionToIVP( list.pVerts[i], pPoints[i] );
 	}
 
-	for ( i = 0; i < list.triangleCount; i++ )
+	for ( int i = 0; i < list.triangleCount; i++ )
 	{
-		Vector v0 = list.pVerts[list.indices[i*3+0]];
-		Vector v1 = list.pVerts[list.indices[i*3+1]];
-		Vector v2 = list.pVerts[list.indices[i*3+2]];
+		const int factor3 = i * 3;
+
+#ifdef _DEBUG
+		const Vector v0 = list.pVerts[list.indices[factor3+0]];
+		const Vector v1 = list.pVerts[list.indices[factor3+1]];
+		const Vector v2 = list.pVerts[list.indices[factor3+2]];
+
 		Assert( v0 != v1 && v1 != v2 && v0 != v2 );
-		CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( &pLedges[i], pPoints, list.indices[i*3+0], list.indices[i*3+1], list.indices[i*3+2], 0 );
+#endif
+
+		CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( &pLedges[i],
+			pPoints,
+			list.indices[factor3+0],
+			list.indices[factor3+1],
+			list.indices[factor3+2],
+			0 );
 	}
 
 	Assert( list.triangleCount > 0 && list.triangleCount <= MAX_VIRTUAL_TRIANGLES );
