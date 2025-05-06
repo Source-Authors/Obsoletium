@@ -426,7 +426,7 @@ public:
 		}
 		if ( m_pData == StaticData() )
 		{
-			m_pData = (Data_t *)A::Alloc( sizeof(Data_t) + ( num * sizeof(T) ) );
+			m_pData = (Data_t *)A::Alloc( sizeof(Data_t) + ( num * sizeof(T) ) ); //-V119
 			if (m_pData)
 			{
 				m_pData->m_Size = 0;
@@ -436,7 +436,7 @@ public:
 		}
 		else
 		{
-			intp nNeeded = sizeof(Data_t) + ( num * sizeof(T) );
+			intp nNeeded = sizeof(Data_t) + ( num * sizeof(T) ); //-V119
 			intp nHave = A::GetSize( m_pData );
 			if ( nNeeded > nHave )
 			{
@@ -769,7 +769,7 @@ template< typename T, class A >
 inline T& CUtlVector<T, A>::Random()
 {
 	Assert( m_Size > 0 );
-	int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
+	const int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
 	return m_Memory[ RandomInt( 0, upperBound ) ];
 }
 
@@ -777,7 +777,7 @@ template< typename T, class A >
 inline const T& CUtlVector<T, A>::Random() const
 {
 	Assert( m_Size > 0 );
-	int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
+	const int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
 	return m_Memory[ RandomInt( 0, upperBound ) ];
 }
 
