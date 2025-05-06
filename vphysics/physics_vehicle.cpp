@@ -396,6 +396,10 @@ void CVehicleController::ResetState()
 	m_wheelRadius = 0;
 	memset( &m_currentState, 0, sizeof(m_currentState) );
 	m_bodyMass = 0;
+	// dimhotepus: Need to reset total wheel mass, too.
+	m_totalWheelMass = 0;
+	// dimhotepus: Need to reset gravity length, too.
+	m_gravityLength = 0;
 	m_vehicleFlags = 0;
 	memset( m_wheelPosition_Bs, 0, sizeof(m_wheelPosition_Bs) );
 	memset( m_tracePosition_Bs, 0, sizeof(m_tracePosition_Bs) );
