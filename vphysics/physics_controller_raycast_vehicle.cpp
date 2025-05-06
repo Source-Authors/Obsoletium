@@ -72,9 +72,9 @@ void CPhysics_Car_System_Raycast_Wheels::do_raycasts( IVP_Event_Sim *es,
 	IVP_Ray_Solver_Min ray_solver2(&t_in[j]);
     j++; if ( j >= n_wheels_in) j--;    
 	IVP_Ray_Solver_Min ray_solver3(&t_in[j]);
-    
-    IVP_Ray_Solver_Min *solvers[4] = { &ray_solver0, &ray_solver1, &ray_solver2, &ray_solver3 };
-    IVP_Ray_Solver_Group rs_group( n_wheels_in, (IVP_Ray_Solver **)solvers );
+    // dimhotepus: Do not clash accessing array of derived types by base pointer.
+    IVP_Ray_Solver *solvers[4] = { &ray_solver0, &ray_solver1, &ray_solver2, &ray_solver3 };
+    IVP_Ray_Solver_Group rs_group( n_wheels_in, solvers );
 
 #if 0
 	// Debug!
@@ -95,7 +95,7 @@ void CPhysics_Car_System_Raycast_Wheels::do_raycasts( IVP_Event_Sim *es,
 
     for ( int i = 0; i < n_wheels_in; i++ )
 	{
-		IVP_Ray_Hit *hit = solvers[i]->get_ray_hit();
+		IVP_Ray_Hit *hit = static_cast<IVP_Ray_Solver_Min*>(solvers[i])->get_ray_hit();
 		if (hit)
 		{
 			hits_out[i] = *hit;
