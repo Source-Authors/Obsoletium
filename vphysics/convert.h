@@ -85,7 +85,7 @@ inline void ConvertPositionToIVP( const Vector &in, IVP_U_Float_Point3 &out )
 inline void ConvertPositionToIVP( float &x, float &y, float &z )
 {
 	float tmpZ = y;
-	y = -HL2IVP(z);
+	y = -HL2IVP(z); //-V537
 	z = HL2IVP(tmpZ);
 	x = HL2IVP(x);
 }

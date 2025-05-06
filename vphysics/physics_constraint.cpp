@@ -486,7 +486,7 @@ public:
 
 	hk_Constraint *CreateBreakableConstraint( hk_Constraint *pRealConstraint, hk_Local_Constraint_System *pLcs, const constraint_breakableparams_t &constraint )
 	{
-		m_isBreakable = true;
+		m_isBreakable = 1;
 		hk_Breakable_Constraint_BP bp;
 		bp.m_real_constraint = pRealConstraint;
 		float forceLimit = ConvertDistanceToIVP( constraint.forceLimit );
@@ -572,7 +572,7 @@ CPhysicsConstraint::CPhysicsConstraint( CPhysicsObject *pReferenceObject, CPhysi
 	m_HkConstraint = NULL;
 	m_HkLCS = NULL;
 	m_constraintType = CONSTRAINT_UNKNOWN;
-	m_isBreakable = false;
+	m_isBreakable = 0;
 
 	if ( pReferenceObject && pAttachedObject )
 	{

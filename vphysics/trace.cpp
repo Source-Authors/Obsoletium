@@ -234,7 +234,7 @@ void InitLeafmap( IVP_Compact_Ledge *pLedge, leafmap_t *pLeafmapOut )
 						// mark each vert in the list
 						const IVP_Compact_Edge *pEdge = pTri->get_edge( j );
 						int v = pEdge->get_start_point_index();
-						hasVert[v-minV] = true;
+						hasVert[v-minV] = 1;
 					}
 				}
 				// now find the vertex spans and encode them
@@ -365,7 +365,7 @@ public:
 
 	inline void TransformPositionFromLocal( const IVP_U_Float_Point &local, Vector &out ) const
 	{
-		VectorTransform( *(const Vector *)&local, *((const matrix3x4_t *)&m_ivpLocalToHLWorld), out );
+		VectorTransform( *(const Vector *)&local.k, m_ivpLocalToHLWorld, out );
 	}
 
 #if USE_VERT_CACHE

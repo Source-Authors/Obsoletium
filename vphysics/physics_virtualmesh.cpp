@@ -85,7 +85,7 @@ public:
 	}
 
 	// locals
-	CMeshInstance() { m_memSize = 0; m_pMemory = 0; m_hullOffset = 0; m_hullCount = 0; }
+	CMeshInstance() { m_memSize = 0; m_pMemory = 0; m_hullOffset = 0; m_hullCount = 0; } //-V730
 	~CMeshInstance();
 
 private:
