@@ -371,6 +371,13 @@ CVehicleController::CVehicleController( const vehicleparams_t &params, CPhysicsE
 
 CVehicleController::CVehicleController()
 {
+	// dimhotepus: Use safe defaults.
+	m_pEnv = nullptr;
+	m_pGameTrace = nullptr;
+	memset( &m_vehicleData, 0, sizeof(m_vehicleData) );
+	// dimhotepus: Unknown vehicle type.
+	m_nVehicleType = 0;
+
 	ResetState();
 }
 
