@@ -284,6 +284,6 @@ extern [[nodiscard]] CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *p
 extern [[nodiscard]] CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float radius, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic );
 extern void PostRestorePhysicsObject();
 extern [[nodiscard]] IPhysicsObject *CreateObjectFromBuffer( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions );
-extern [[nodiscard]] IPhysicsObject *CreateObjectFromBuffer_UseExistingMemory( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, CPhysicsObject *pExistingMemory );
+extern IPhysicsObject *CreateObjectFromBuffer_UseExistingMemory( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, CPhysicsObject *pExistingMemory );
 
 #endif // PHYSICS_OBJECT_H
