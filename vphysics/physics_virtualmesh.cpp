@@ -75,7 +75,7 @@ public:
 	const IVP_Compact_Ledge *GetOuterHull() const { return (m_hullCount==1) ? (const IVP_Compact_Ledge *)(m_pMemory + m_hullOffset) : NULL; }
 	int GetRootLedges( IVP_Compact_Ledge **pLedges, int outCount ) const
 	{ 
-		int hullOffset = m_hullOffset;
+		unsigned int hullOffset = m_hullOffset;
 		int count = min(outCount, (int)m_hullCount);
 		for ( int i = 0; i < count; i++ )
 		{
@@ -114,10 +114,10 @@ CMeshInstance::~CMeshInstance()
 
 unsigned int CMeshInstance::EstimatedSize( const virtualmeshlist_t &list )
 {
-	int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
-	int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
+	unsigned int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
+	unsigned int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
+	unsigned int hullSize = ComputeRootLedgeSize(list.pHull);
 
-	int hullSize = ComputeRootLedgeSize(list.pHull);
 	return ledgeSize + pointSize + hullSize;
 }
 
@@ -126,13 +126,16 @@ unsigned int CMeshInstance::ComputeRootLedgeSize( const byte *pData )
 {
 	if ( !pData )
 		return 0;
+
 	const virtualmeshhull_t *pHeader = (const virtualmeshhull_t *)pData;
 	const packedhull_t *pHull = (const packedhull_t *)(pHeader+1);
 	unsigned int size = pHeader->hullCount * sizeof(IVP_Compact_Ledge);
+
 	for ( int i = 0; i < pHeader->hullCount; i++ )
 	{
 		size += sizeof(IVP_Compact_Triangle) * pHull[i].triangleCount;
 	}
+
 	return size;
 }
 
@@ -145,9 +148,9 @@ CMeshInstance *CMeshInstance::CreateResource( const virtualmeshlist_t &list )
 // flat memory footprint has triangleledges (ledge + 2 triangles for terrain), then has verts, then optional convex hull
 void CMeshInstance::Init( const virtualmeshlist_t &list )
 {
-	int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
-	int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
-	int memSize = ledgeSize + pointSize + ComputeRootLedgeSize(list.pHull);
+	const unsigned int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
+	const unsigned int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
+	const unsigned int memSize = ledgeSize + pointSize + ComputeRootLedgeSize(list.pHull);
 	m_memSize = memSize;
 	m_hullCount = 0;
 	m_pMemory = (char *)ivp_malloc_aligned( memSize, 16 );
@@ -180,8 +183,9 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 		m_hullOffset = ledgeSize + pointSize;
 		byte *pMem = (byte *)m_pMemory + m_hullOffset;
 #if _DEBUG
-		int hullSize = CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
-		Assert((m_hullOffset+hullSize)==memSize);
+		const unsigned hullSize =
+			CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
+		Assert(m_hullOffset + hullSize == memSize);
 #else
 		CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
 #endif
