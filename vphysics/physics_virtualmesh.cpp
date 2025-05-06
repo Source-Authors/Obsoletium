@@ -66,13 +66,14 @@ public:
 	static unsigned int EstimatedSize( const virtualmeshlist_t &list );
 	static CMeshInstance *CreateResource( const virtualmeshlist_t &list );
 	static unsigned int ComputeRootLedgeSize( const byte *pHull );
+
 	void DestroyResource() { delete this; }
-	unsigned int Size() { return m_memSize; }
+	unsigned int Size() const { return m_memSize; }
 	CMeshInstance *GetData() { return this; }
-	const triangleledge_t	*GetLedges() { return (triangleledge_t *)m_pMemory; }
-	inline int HullCount() { return m_hullCount; }
-	const IVP_Compact_Ledge *GetOuterHull() { return (m_hullCount==1) ? (const IVP_Compact_Ledge *)(m_pMemory + m_hullOffset) : NULL; }
-	int GetRootLedges( IVP_Compact_Ledge **pLedges, int outCount ) 
+	const triangleledge_t *GetLedges() const { return (triangleledge_t *)m_pMemory; }
+	inline int HullCount() const { return m_hullCount; }
+	const IVP_Compact_Ledge *GetOuterHull() const { return (m_hullCount==1) ? (const IVP_Compact_Ledge *)(m_pMemory + m_hullOffset) : NULL; }
+	int GetRootLedges( IVP_Compact_Ledge **pLedges, int outCount ) const
 	{ 
 		int hullOffset = m_hullOffset;
 		int count = min(outCount, (int)m_hullCount);
