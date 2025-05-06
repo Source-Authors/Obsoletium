@@ -1093,7 +1093,6 @@ void CVehicleController::UpdateSkidding( bool bHandbrake )
 		Vector velocity;
 		int surfaceProps;
 		m_currentState.wheelsInContact = 0;
-		m_currentState.wheelsNotInContact = 0;
 
 		for( int iWheel = 0; iWheel < m_wheelCount; ++iWheel )
 		{
