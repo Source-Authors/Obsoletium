@@ -1693,9 +1693,7 @@ void CPhysics_Airboat::InitRaycastCarWheels( const IVP_Template_Car_System *pCar
 
 		do_steering_wheel( IVP_POS_WHEEL( iWheel ), 0.0f );
 		
-		pRaycastWheel->wheel_is_fixed = IVP_FALSE;	
 		pRaycastWheel->max_rotation_speed = pCarSystemTemplate->wheel_max_rotation_speed[iWheel>>1];
-
 		pRaycastWheel->wheel_is_fixed = IVP_TRUE;
     }
 }
