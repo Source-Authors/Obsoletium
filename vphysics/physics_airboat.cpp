@@ -564,7 +564,7 @@ bool CPhysics_Airboat::PostRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplate
 		IVP_Raycast_Airboat_Wheel *pPontoonPoint = get_wheel( IVP_POS_WHEEL( iPoint ) );
 		IVP_Raycast_Airboat_Impact *pImpact = &pImpacts[iPoint];
 		IVP_Ray_Solver_Template *pRaySolver = &pRaySolverTemplates[iPoint];
-		if ( !pPontoonPoint || !pImpact || !pRaySolver )
+		if ( !pPontoonPoint )
 			continue;
 
 		// Copy the ray length back, it may have changed.
@@ -783,7 +783,7 @@ void CPhysics_Airboat::DoSimulationDrag( IVP_Raycast_Airboat_Impact *pImpacts,
 	{
 		// Get data at raycast position.
 		IVP_Raycast_Airboat_Impact *pImpact = &pImpacts[iPoint];
-		if ( !pImpact || !pImpact->bImpact )
+		if ( !pImpact->bImpact )
 			continue;
 
 		if ( pImpact->bImpactWater )
@@ -1076,9 +1076,6 @@ int CPhysics_Airboat::CountSurfaceContactPoints( IVP_Raycast_Airboat_Impact *pIm
 	{
 		// Get data at raycast position.
 		IVP_Raycast_Airboat_Impact *pImpact = &pImpacts[iPoint];
-		if ( !pImpact )
-			continue;
-
 		if ( pImpact->bImpact )
 		{
 			nContacts++;

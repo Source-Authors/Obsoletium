@@ -1954,9 +1954,8 @@ void CPhysicsEnvironment::ReadStats( physics_stats_t *pOutput )
 {
 	if ( !pOutput )
 		return;
+
 	IVP_Statistic_Manager *stats = m_pPhysEnv->get_statistic_manager();
-	if ( stats )
-	{
 		pOutput->maxRescueSpeed = ConvertDistanceToHL( stats->max_rescue_speed );
 		pOutput->maxSpeedGain = ConvertDistanceToHL( stats->max_speed_gain );
 		pOutput->impactSysNum = stats->impact_sys_num;
@@ -1979,16 +1978,12 @@ void CPhysicsEnvironment::ReadStats( physics_stats_t *pOutput )
 
 		pOutput->frictionEventsProcessed = stats->processed_fmindists;
 	}
-}
 
 void CPhysicsEnvironment::ClearStats()
 {
 	IVP_Statistic_Manager *stats = m_pPhysEnv->get_statistic_manager();
-	if ( stats )
-	{
 		stats->clear_statistic();
 	}
-}
 
 void CPhysicsEnvironment::EnableConstraintNotify( bool bEnable )
 {
