@@ -29,19 +29,6 @@ struct fluid_t
 	char surfaceprop[512];
 
 	fluidparams_t params;
-
-	fluid_t() = default;
-	fluid_t( fluid_t const& src ) : params(src.params)
-	{
-		index = src.index;
-	}
-	fluid_t &operator=(const fluid_t &f) 
-	{
-		index = f.index;
-		params = f.params;
-
-		return *this;
-	}
 };
 
 //-----------------------------------------------------------------------------
