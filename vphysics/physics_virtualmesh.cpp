@@ -96,10 +96,11 @@ public:
 private:
 	void Init( const virtualmeshlist_t &list );
 
-	int		m_memSize;
-	char	*m_pMemory;
-	unsigned short m_hullOffset;
-	byte	m_hullCount;
+	// dimhotepus: Reordered to reduce size on x86-64.
+	byte			*m_pMemory;
+	unsigned int	m_memSize;
+	unsigned short	m_hullOffset;
+	byte			m_hullCount;
 	[[maybe_unused]] byte	m_pad;
 };
 
@@ -151,16 +152,17 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 	const unsigned int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
 	const unsigned int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
 	const unsigned int memSize = ledgeSize + pointSize + ComputeRootLedgeSize(list.pHull);
+	
+	m_pMemory = static_cast<byte *>(ivp_calloc_aligned( memSize, 16 ));
+	Assert( (intp(m_pMemory) & 15) == 0 );	// make sure it is aligned
+
 	m_memSize = memSize;
 	m_hullCount = 0;
-	m_pMemory = (char *)ivp_malloc_aligned( memSize, 16 );
-	Assert( (intp(m_pMemory) & 15) == 0 );	// make sure it is aligned
-	IVP_Compact_Poly_Point *pPoints = (IVP_Compact_Poly_Point *)&m_pMemory[ledgeSize];
-	triangleledge_t *pLedges = (triangleledge_t *) m_pMemory;
-	memset( m_pMemory, 0, memSize );
-	int i;
 
-	for ( i = 0; i < list.vertexCount; i++ )
+	auto *pPoints = reinterpret_cast<IVP_Compact_Poly_Point *>(&m_pMemory[ledgeSize]);
+	auto *pLedges = reinterpret_cast<triangleledge_t *>(m_pMemory);
+
+	for ( int i = 0; i < list.vertexCount; i++ )
 	{
 		ConvertPositionToIVP( list.pVerts[i], pPoints[i] );
 	}
@@ -173,15 +175,21 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 		Assert( v0 != v1 && v1 != v2 && v0 != v2 );
 		CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( &pLedges[i], pPoints, list.indices[i*3+0], list.indices[i*3+1], list.indices[i*3+2], 0 );
 	}
+
 	Assert( list.triangleCount > 0 && list.triangleCount <= MAX_VIRTUAL_TRIANGLES );
+
 	// if there's a hull, build it out too
 	if ( list.pHull )
 	{
-		virtualmeshhull_t *pHeader = (virtualmeshhull_t *)list.pHull;
+		auto *pHeader = reinterpret_cast<virtualmeshhull_t *>(list.pHull);
+
+		Assert(ledgeSize + pointSize < 65536u);
+
 		m_hullCount = pHeader->hullCount;
-		Assert( (ledgeSize + pointSize) < 65536 );
 		m_hullOffset = ledgeSize + pointSize;
-		byte *pMem = (byte *)m_pMemory + m_hullOffset;
+
+		byte *pMem = m_pMemory + m_hullOffset;
+
 #if _DEBUG
 		const unsigned hullSize =
 			CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
