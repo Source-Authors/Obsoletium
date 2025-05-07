@@ -78,7 +78,7 @@ static HRESULT GetSurfaceFromTexture( IDirect3DBaseTexture* pBaseTexture, UINT l
 
 	if ( !pBaseTexture )
 	{
-		return ( HRESULT )-1;
+		return E_POINTER;
 	}
 
 	HRESULT hr;
@@ -89,16 +89,11 @@ static HRESULT GetSurfaceFromTexture( IDirect3DBaseTexture* pBaseTexture, UINT l
 		hr = ( ( IDirect3DTexture * )pBaseTexture )->GetSurfaceLevel( level, ppSurfLevel );
 		break;
 	case D3DRTYPE_CUBETEXTURE:
-		if (cubeFaceID !=0)
-		{
-			//Debugger();
-		}
-		
 		hr = ( ( IDirect3DCubeTexture * )pBaseTexture )->GetCubeMapSurface( cubeFaceID, level, ppSurfLevel );
 		break;
 	default:
 		Assert(0);
-		return ( HRESULT )-1;
+		return E_NOTIMPL;
 	}
 	return hr;
 }
