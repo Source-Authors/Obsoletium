@@ -71,13 +71,13 @@ public:
 	unsigned int Size() const { return m_memSize; }
 	CMeshInstance *GetData() { return this; }
 	const triangleledge_t *GetLedges() const { return (triangleledge_t *)m_pMemory; }
-	inline int HullCount() const { return m_hullCount; }
+	inline byte HullCount() const { return m_hullCount; }
 	const IVP_Compact_Ledge *GetOuterHull() const { return (m_hullCount==1) ? (const IVP_Compact_Ledge *)(m_pMemory + m_hullOffset) : NULL; }
-	int GetRootLedges( IVP_Compact_Ledge **pLedges, int outCount ) const
+	byte GetRootLedges( IVP_Compact_Ledge **pLedges, byte outCount ) const
 	{ 
 		unsigned int hullOffset = m_hullOffset;
-		int count = min(outCount, (int)m_hullCount);
-		for ( int i = 0; i < count; i++ )
+		byte count = min(outCount, m_hullCount);
+		for ( byte i = 0; i < count; i++ )
 		{
 			pLedges[i] = (IVP_Compact_Ledge *)(m_pMemory + hullOffset);
 			hullOffset += sizeof(IVP_Compact_Ledge) + (sizeof(IVP_Compact_Triangle) * pLedges[i]->get_n_triangles());
@@ -197,7 +197,7 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 		Assert(ledgeSize + pointSize < 65536u);
 
 		m_hullCount = pHeader->hullCount;
-		m_hullOffset = ledgeSize + pointSize;
+		m_hullOffset = static_cast<unsigned short>(ledgeSize + pointSize);
 
 		byte *pMem = m_pMemory + m_hullOffset;
 
@@ -348,9 +348,9 @@ public:
 	static void DestroyMeshBoundingHull(virtualmeshhull_t *pHull) { CVPhysicsVirtualMeshWriter::DestroyPackedHull(pHull); }
 	static IVP_Compact_Surface *CreateBoundingSurfaceFromRange( const virtualmeshlist_t &list, int firstIndex, int indexCount );
 
-	int GetRootLedges( IVP_Compact_Ledge **pLedges, int outCount )
+	byte GetRootLedges( IVP_Compact_Ledge **pLedges, byte outCount )
 	{
-		int count = AddRef()->GetRootLedges(pLedges, outCount);
+		byte count = AddRef()->GetRootLedges(pLedges, outCount);
 		FrameRelease();
 		return count;
 	}
@@ -642,10 +642,10 @@ void IVP_SurfaceManager_VirtualMesh::get_all_ledges_within_radius(const IVP_U_Po
 	if ( !root_ledge )
 	{
 		IVP_Compact_Ledge *pLedges[2];
-		int count = m_pMesh->GetRootLedges( pLedges, ssize(pLedges) );
+		byte count = m_pMesh->GetRootLedges( pLedges, static_cast<byte>(ssize(pLedges)) );
 		if ( count )
 		{
-			for ( int i = 0; i < count; i++ )
+			for ( byte i = 0; i < count; i++ )
 			{
 				resulting_ledges->add( pLedges[i] ); // return the recursive/virtual outer hull
 			}
