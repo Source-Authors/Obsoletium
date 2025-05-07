@@ -104,7 +104,7 @@ const char *KeyValueText( CUtlVector< char > *pKeyValue );
 extern vec_t Q_rint (vec_t in);
 
 extern void WriteModelFiles(void);
-void *kalloc( int num, int size );
+void *kalloc( intp num, intp size );
 
 // --------------------------------------------------------------------
 
@@ -1297,7 +1297,13 @@ struct s_bonesaveframe_t
 EXTERN CUtlVector< s_bonesaveframe_t > g_bonesaveframe;
 
 int OpenGlobalFile( char *src );
-bool GetGlobalFilePath( const char *pSrc, char *pFullPath, int nMaxLen );
+bool GetGlobalFilePath( const char *pSrc, char *pFullPath, intp nMaxLen );
+template<intp fullPathSize>
+bool GetGlobalFilePath( const char *pSrc, char (&pFullPath)[fullPathSize] )
+{
+	return GetGlobalFilePath( pSrc, pFullPath, fullPathSize );
+}
+
 s_source_t *Load_Source( char const *filename, const char *ext, bool reverse = false, bool isActiveModel = false );
 int Load_VRM( s_source_t *psource );
 int Load_SMD( s_source_t *psource );
@@ -1344,7 +1350,7 @@ void scale_vertex( Vector &org );
 void clip_rotations( RadianEuler& rot );
 void clip_rotations( Vector& rot );
 
-void *kalloc( int num, int size );
+void *kalloc( intp num, intp size );
 void kmemset( void *ptr, int value, int size );
 char *stristr( const char *string, const char *string2 );
 
@@ -1443,21 +1449,13 @@ class CLodScriptReplacement_t
 public:
 	void SetSrcName( const char *pSrcName )
 	{
-		if( m_pSrcName )
-		{
 			delete [] m_pSrcName;
+		m_pSrcName = V_strdup( pSrcName );
 		}
-		m_pSrcName = new char[strlen( pSrcName ) + 1];
-		strcpy( m_pSrcName, pSrcName );
-	}
 	void SetDstName( const char *pDstName )
 	{
-		if( m_pDstName )
-		{
 			delete [] m_pDstName;
-		}
-		m_pDstName = new char[strlen( pDstName ) + 1];
-		strcpy( m_pDstName, pDstName );
+		m_pDstName = V_strdup( pDstName );
 	}
 
 	const char *GetSrcName( void ) const 
@@ -1569,7 +1567,7 @@ extern DmElementHandle_t g_hDmeBoneFlexDriverList;
 
 // the first time these are called, the name of the model/QC file is printed so that when 
 // running in batch mode, no echo, when dumping to a file, it can be determined which file is broke.
-void MdlError( PRINTF_FORMAT_STRING char const *pMsg, ... );
+[[noreturn]] void MdlError( PRINTF_FORMAT_STRING char const *pMsg, ... );
 void MdlWarning( PRINTF_FORMAT_STRING char const *pMsg, ... );
 
 void CreateMakefile_AddDependency( const char *pFileName );
@@ -1587,5 +1585,5 @@ unsigned short IsUShort( int val );
 extern CCheckUVCmd g_StudioMdlCheckUVCmd;
 
 
-#endif // STUDIOMDL_H
+#endif  // !SE_UTILS_STUDIOMDL_STUDIOMDL_H_
 

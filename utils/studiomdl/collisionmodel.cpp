@@ -1765,7 +1765,7 @@ int ProcessSingleBody( CJointedModel &joints )
 		CreateCollide( pPhys, convexOut.Base(), convexOut.Count(), bv );
 
 		// Init mass, write routine will distribute the total mass
-		pPhys->m_mass = 1.0;
+		pPhys->m_mass = 1.0f;
 		char tmp[512];
 		V_FileBase( pmodel->filename, tmp );
 
@@ -2518,12 +2518,6 @@ void CollisionModel_Write( long checkSum )
 		char filename[MAX_PATH];
 
 		V_strcpy_safe( filename, gamedir );
-//		if( *g_pPlatformName )
-//		{
-//			strcat( filename, "platform_" );
-//			strcat( filename, g_pPlatformName );
-//			strcat( filename, "/" );	
-//		}
 		V_strcat_safe( filename, "models/" );	
 		V_strcat_safe( filename, outname );	
 

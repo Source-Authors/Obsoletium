@@ -74,7 +74,7 @@ int SortAndBalanceBones( int iCount, int iMaxCount, int bones[], float weights[]
 	{
 		// missing weights?, go ahead and evenly share?
 		// FIXME: shouldn't this error out?
-		t = 1.0 / iCount;
+		t = 1.0f / iCount;
 
 		for (i = 0; i < iCount; i++)
 		{
@@ -84,7 +84,7 @@ int SortAndBalanceBones( int iCount, int iMaxCount, int bones[], float weights[]
 	else
 	{
 		// scale to sum to 1.0
-		t = 1.0 / t;
+		t = 1.0f / t;
 
 		for (i = 0; i < iCount; i++)
 		{
@@ -174,7 +174,7 @@ void Grab_Facelist( s_source_t *psource )
 			if (IsEnd(g_szLine)) 
 				return;
 
-			if (sscanf( g_szLine, "%d %d %d %d",
+			if (sscanf( g_szLine, "%d %lu %lu %lu",
 				&j, 
 				&f.a, &f.b, &f.c) == 4)
 			{
@@ -253,7 +253,7 @@ void Grab_Texcoordlist( s_source_t *psource )
 				&j, 
 				&t[0], &t[1]) == 3)
 			{
-				t[1] = 1.0 - t[1];
+				t[1] = 1.0f - t[1];
 				g_texcoord[j][0] = t[0];
 				g_texcoord[j][1] = t[1];
 			}
@@ -325,7 +325,7 @@ void Grab_Faceattriblist( s_source_t *psource )
 			if (IsEnd(g_szLine)) 
 				return;
 
-			if (sscanf( g_szLine, "%d %d %d %d %d %d %d %d %d",
+			if (sscanf( g_szLine, "%d %d %d %lu %lu %lu %lu %lu %lu",
 				&j, 
 				&material,
 				&smooth,
