@@ -140,7 +140,7 @@ public:
 	// The database is derived from the IVP material class
 	const IVP_Material *GetIVPMaterial( int materialIndex ) const;
 	IVP_Material *GetIVPMaterial( int materialIndex ) override;
-	int GetIVPMaterialIndex( const IVP_Material *pIVP ) const override;
+	intp GetIVPMaterialIndex( const IVP_Material *pIVP ) const override;
 	IVP_Material_Manager *GetIVPManager( void ) override { return &m_ivpManager; }
 
 	const char *GetNameString( CUtlSymbol name ) const
@@ -377,9 +377,9 @@ intp CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
 }
 
 
-int CPhysicsSurfaceProps::GetIVPMaterialIndex( const IVP_Material *pIVP ) const
+intp CPhysicsSurfaceProps::GetIVPMaterialIndex( const IVP_Material *pIVP ) const
 {
-	intp index = (const CSurface *)pIVP - m_props.Base();
+	intp index = static_cast<const CSurface *>(pIVP) - m_props.Base();
 	if ( index >= 0 && index < m_props.Count() )
 		return index;
 

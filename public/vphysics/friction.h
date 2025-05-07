@@ -26,7 +26,7 @@ public:
 
 	// Object 0 is this object, Object 1 is the other object
 	virtual [[nodiscard]] IPhysicsObject *GetObject( int index ) = 0;
-	virtual [[nodiscard]] int GetMaterial( int index ) = 0;
+	virtual [[nodiscard]] intp GetMaterial( int index ) = 0;
 
 	virtual void GetContactPoint( Vector &out ) = 0;
 	
