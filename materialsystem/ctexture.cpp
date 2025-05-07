@@ -2854,12 +2854,12 @@ const void *CTexture::GetResourceData( uint32 eDataType, size_t *pnumBytes ) con
 				return pDataChunk.m_pvData;
 			}
 
-				if ( pnumBytes )
+			if ( pnumBytes )
 				*pnumBytes = sizeof( pDataChunk.m_numBytes );
 
 			return &pDataChunk.m_numBytes;
-			}
 		}
+	}
 
 	if ( pnumBytes )
 		pnumBytes = 0;
