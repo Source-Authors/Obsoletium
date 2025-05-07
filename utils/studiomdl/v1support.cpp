@@ -172,7 +172,7 @@ void ParseFaceData( s_source_t *psource, int material, s_face_t *pFace )
 		// VectorNormalize( normal );
 
 		// invert v
-		t[1] = 1.0 - t[1];
+		t[1] = 1.0f - t[1];
 
 		if (i == 9 || iCount == 0)
 		{

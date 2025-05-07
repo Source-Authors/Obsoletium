@@ -406,7 +406,7 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 		return;
 	}
 
-	float fFrame = (iStartFrame + iSrcFrame) / 2.0;
+	float fFrame = (iStartFrame + iSrcFrame) / 2.0f;
 	int iMidFrame = (int)fFrame;
 	float s = fFrame - iMidFrame;
 
@@ -523,14 +523,14 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 	else if (v0 < 0.0f)
 	{
 		v0 = 0.0;
-		v1 = p2.Length() * 2.0;
+		v1 = p2.Length() * 2.0f;
 	}
 	else if (v1 < 0.0)
 	{
-		v0 = p2.Length() * 2.0;
+		v0 = p2.Length() * 2.0f;
 		v1 = 0.0;
 	}
-	else if ((v0+v1) > 0.01 && (fabs(v0-v1) / (v0+v1)) < 0.2)
+	else if ((v0+v1) > 0.01f && (fabs(v0-v1) / (v0+v1)) < 0.2f)
 	{
 		// if they're within 10% of each other, assum no acceleration
 		v0 = v1 = p2.Length();
@@ -544,9 +544,9 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 	Vector A, B, C;
 	if (motiontype & STUDIO_QUADRATIC_MOTION)
 	{
-		SolveInverseQuadratic( 0, 0, 0.5, p1.x, 1.0, p2.x, A.x, B.x, C.x );
-		SolveInverseQuadratic( 0, 0, 0.5, p1.y, 1.0, p2.y, A.y, B.y, C.y );
-		SolveInverseQuadratic( 0, 0, 0.5, p1.z, 1.0, p2.z, A.z, B.z, C.z );
+		SolveInverseQuadratic( 0, 0, 0.5f, p1.x, 1.0f, p2.x, A.x, B.x, C.x );
+		SolveInverseQuadratic( 0, 0, 0.5f, p1.y, 1.0f, p2.y, A.y, B.y, C.y );
+		SolveInverseQuadratic( 0, 0, 0.5f, p1.z, 1.0f, p2.z, A.z, B.z, C.z );
 	}
 
 	Vector	adjpos;
@@ -564,7 +564,7 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 		}
 		else
 		{
-			VectorScale( v, v0 * t + 0.5 * (v1 - v0) * t * t, adjpos );
+			VectorScale( v, v0 * t + 0.5f * (v1 - v0) * t * t, adjpos );
 		}
 
 		VectorScale( rot, t, adjangle );
@@ -669,7 +669,7 @@ Vector calcPosition( s_animation_t *panim, int iFrame )
 		{
 			float f = (iFrame - prevframe) / (pmove->endframe - prevframe);
 
-			float d = pmove->v0 * f + 0.5 * (pmove->v1 - pmove->v0) * f * f;
+			float d = pmove->v0 * f + 0.5f * (pmove->v1 - pmove->v0) * f * f;
 
 			vecPos = vecPos + d * pmove->vector;
 			if (iLoops != 0)
@@ -2301,7 +2301,7 @@ void fixupIKErrors( s_animation_t *panim, s_ikrule_t *pRule )
 				Vector orig;
 				MatrixPosition( boneToWorld[g_ikchain[pRule->chain].link[2].bone], orig );
 
-				Vector pos = (footfall + calcMovement( panim, k + pRule->start, pRule->contact )) * s + orig * (1.0 - s);
+				Vector pos = (footfall + calcMovement( panim, k + pRule->start, pRule->contact )) * s + orig * (1.0f - s);
 
 				//printf("%d (%.1f:%.1f) : %.1f %.1f %1.f\n", k + pRule->start, cycle, s, pos.x, pos.y, pos.z );
 
@@ -2342,7 +2342,7 @@ static void ComputeSideAndScale( const s_flexkey_t &flexKey, s_vertanim_t *pVAni
 		}
 		else 
 		{
-			float t = ( flexKey.split - pVAnim->pos.x ) / (2.0 * flexKey.split);
+			float t = ( flexKey.split - pVAnim->pos.x ) / (2.0f * flexKey.split);
 			*pScale = 3.0f * t * t - 2.0f * t * t * t;
 			// printf( "%.1f : %.2f\n", pSrcAnim->pos.x, *pScale );
 		}
@@ -2368,8 +2368,8 @@ static void ComputeSideAndScale( const s_flexkey_t &flexKey, s_vertanim_t *pVAni
 	if ( flexKey.flexpair != 0)
 	{
 		// paired flexes are full scale but variable side to side
-		*pSide = 1.0 - *pScale;
-		*pScale = 1.0;
+		*pSide = 1.0f - *pScale;
+		*pScale = 1.0f;
 	}
 	else
 	{
@@ -3256,7 +3256,7 @@ void limitIKChainLength( void )
 						// rotate knee into local space
 						Vector tmp;
 						VectorIRotate( ikKneeDir, boneToWorld[ g_ikchain[k].link[0].bone ], tmp );
-						float bend = (((DotProduct( worldThigh - worldKnee, worldFoot - worldKnee ) ) / (l1 * l3)) + 1) / 2.0;
+						float bend = (((DotProduct( worldThigh - worldKnee, worldFoot - worldKnee ) ) / (l1 * l3)) + 1) / 2.0f;
 						kneeDir += tmp * bend;
 						hasKnees = true;
 					}
@@ -3420,14 +3420,14 @@ int RadianEulerCompareEpsilon(const RadianEuler& v1, const RadianEuler& v2, floa
 	for (i=0 ; i<3 ; i++)
 	{
 		// clamp to 2pi
-		float a1 = fmod(v1[i],(float) (2*M_PI));
-		float a2 = fmod(v2[i],(float) (2*M_PI));
+		float a1 = fmod(v1[i],2*M_PI_F);
+		float a2 = fmod(v2[i],2*M_PI_F);
 		float delta =  fabs(a1-a2);
 		
 		// use the smaller angle (359 == 1 degree off)
-		if ( delta > M_PI )
+		if ( delta > M_PI_F )
 		{
-			delta = 2*M_PI - delta;
+			delta = 2*M_PI_F - delta;
 		}
 
 		if (delta > epsilon)
@@ -3439,7 +3439,7 @@ int RadianEulerCompareEpsilon(const RadianEuler& v1, const RadianEuler& v2, floa
 
 bool AnimationDifferent( const Vector& startPos, const RadianEuler& startRot, const Vector& pos, const RadianEuler& rot )
 {
-	if ( !VectorCompareEpsilon( startPos, pos, 0.01 ) )
+	if ( !VectorCompareEpsilon( startPos, pos, 0.01f ) )
 		return true;
 	if ( !RadianEulerCompareEpsilon( startRot, rot, 0.01 ) )
 		return true;
@@ -5448,7 +5448,7 @@ void SlerpBones(
 			s2 = s * pseqdesc->weight[i];	// blend in based on this animations weights
 			if (s2 > 0.0)
 			{
-				s1 = 1.0 - s2;
+				s1 = 1.0f - s2;
 
 				if (g_bonetable[i].flags & BONE_FIXED_ALIGNMENT)
 				{
@@ -6278,14 +6278,14 @@ static void CalcPoseParameters( void )
 
 					for (int m = 0; m < pseq->groupsize[iPose]; m++)
 					{
-						float f = (m / (float)(pseq->groupsize[iPose] - 1.0));
+						float f = (m / (float)(pseq->groupsize[iPose] - 1.0f));
 						if (iPose == 0)
 						{
-							pseq->param0[m] = pseq->paramstart[iPose] * (1.0 - f) + pseq->paramend[iPose] * f;
+							pseq->param0[m] = pseq->paramstart[iPose] * (1.0f - f) + pseq->paramend[iPose] * f;
 						}
 						else
 						{
-							pseq->param1[m] = pseq->paramstart[iPose] * (1.0 - f) + pseq->paramend[iPose] * f;
+							pseq->param1[m] = pseq->paramstart[iPose] * (1.0f - f) + pseq->paramend[iPose] * f;
 						}
 					}
 				}
@@ -7117,7 +7117,7 @@ static void CompressAnimations( )
 			{
 				if (-minv> maxv)
 				{
-					scale = minv / -32768.0;
+					scale = minv / -32768.0f;
 				}
 				else
 				{
@@ -7126,7 +7126,7 @@ static void CompressAnimations( )
 			}
 			else
 			{
-				scale = 1.0 / 32.0;
+				scale = 1.0f / 32.0f;
 			}
 			switch(k)
 			{
@@ -7411,7 +7411,7 @@ static void CompressSingle( s_animationstream_t *pStream )
 		{
 			if (-minv> maxv)
 			{
-				scale = minv / -32768.0;
+				scale = minv / -32768.0f;
 			}
 			else
 			{
