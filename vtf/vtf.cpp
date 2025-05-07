@@ -2664,8 +2664,6 @@ void CVTFTexture::ComputeReflectivity( )
 		return;
 	}
 
-	Assert( m_Format == IMAGE_FORMAT_RGBA8888 );
-
 	int divisor = 0;
 	m_vecReflectivity.Init( 0.0f, 0.0f, 0.0f );
 	for( int iFrame = 0; iFrame < m_nFrameCount; ++iFrame )
@@ -2705,7 +2703,6 @@ void CVTFTexture::ComputeAlphaFlags()
 		m_Options.flags0 &= ~( VtfProcessingOptions::OPT_MIP_ALPHATEST );
 		return;
 	}
-	Assert( m_Format == IMAGE_FORMAT_RGBA8888 );
 
 	m_nFlags &= ~(TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA);
 	
@@ -2826,7 +2823,7 @@ bool CVTFTexture::ConstructLowResImage()
 	{
 		return true;
 	}
-	Assert( m_Format == IMAGE_FORMAT_RGBA8888 );
+
 	Assert( m_pLowResImageData );
 
 	CUtlMemory<unsigned char> lowResSizeImage;
