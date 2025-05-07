@@ -1446,8 +1446,6 @@ static void AddNodeToBounds(int node, CUtlVector<int>& skipAreas, Vector& mins, 
 				Assert( firstedge+j < numsurfedges );
 				int edge = abs(dsurfedges[firstedge+j]); 
 				dedge_t* pEdge = &dedges[edge];
-				Assert( pEdge->v[0] >= 0 );
-				Assert( pEdge->v[1] >= 0 );
 				AddPointToBounds (dvertexes[pEdge->v[0]].point, mins, maxs);
 				AddPointToBounds (dvertexes[pEdge->v[1]].point, mins, maxs);
 			}
