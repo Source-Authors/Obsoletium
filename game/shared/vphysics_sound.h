@@ -31,15 +31,15 @@ namespace physicssound
 	struct soundlist_t
 	{
 		CUtlVector<impactsound_t>	elements;
-		impactsound_t	&GetElement(int index) { return elements[index]; }
+		impactsound_t	&GetElement(intp index) { return elements[index]; }
 		impactsound_t	&AddElement() { return elements[elements.AddToTail()]; }
-		int Count() { return elements.Count(); }
+		intp Count() { return elements.Count(); }
 		void RemoveAll() { elements.RemoveAll(); }
 	};
 
 	void PlayImpactSounds( soundlist_t &list )
 	{
-		for ( int i = list.Count()-1; i >= 0; --i )
+		for ( intp i = list.Count()-1; i >= 0; --i )
 		{
 			impactsound_t &sound = list.GetElement(i);
 			const surfacedata_t *psurf = physprops->GetSurfaceData( sound.surfaceProps );
@@ -82,7 +82,7 @@ namespace physicssound
 	void AddImpactSound( soundlist_t &list, void *pGameData, int entityIndex, int soundChannel, IPhysicsObject *pObject, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed )
 	{
 		impactSpeed += 1e-4;
-		for ( int i = list.Count()-1; i >= 0; --i )
+		for ( intp i = list.Count()-1; i >= 0; --i )
 		{
 			impactsound_t &sound = list.GetElement(i);
 			// UNDONE: Compare entity or channel somehow?
@@ -129,7 +129,7 @@ namespace physicssound
 		if ( !psurf->sounds.breakSound )
 			return;
 
-		for ( int i = list.Count()-1; i >= 0; --i )
+		for ( intp i = list.Count()-1; i >= 0; --i )
 		{
 			breaksound_t &sound = list.Element(i);
 			// Allow 3 break sounds before you start merging anything.
@@ -148,7 +148,7 @@ namespace physicssound
 
 	void PlayBreakSounds( CUtlVector<breaksound_t> &list )
 	{
-		for ( int i = list.Count()-1; i >= 0; --i )
+		for ( intp i = list.Count()-1; i >= 0; --i )
 		{
 			breaksound_t &sound = list.Element(i);
 

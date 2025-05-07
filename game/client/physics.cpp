@@ -895,7 +895,7 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 //-----------------------------------------------------------------------------
 void CCollisionEvent::UpdateFluidEvents( void )
 {
-	for ( int i = m_fluidEvents.Count()-1; i >= 0; --i )
+	for ( intp i = m_fluidEvents.Count()-1; i >= 0; --i )
 	{
 		if ( (gpGlobals->curtime - m_fluidEvents[i].impactTime) > FLUID_TIME_MAX )
 		{
@@ -911,7 +911,7 @@ void CCollisionEvent::UpdateFluidEvents( void )
 //-----------------------------------------------------------------------------
 float CCollisionEvent::DeltaTimeSinceLastFluid( CBaseEntity *pEntity )
 {
-	for ( int i = m_fluidEvents.Count()-1; i >= 0; --i )
+	for ( intp i = m_fluidEvents.Count()-1; i >= 0; --i )
 	{
 		if ( m_fluidEvents[i].hEntity.Get() == pEntity )
 		{
