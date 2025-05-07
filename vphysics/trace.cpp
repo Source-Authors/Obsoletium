@@ -727,11 +727,11 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		IVP_U_Float_Point mapdir;
 		TransformDirectionToLocal( dir, mapdir );
 		// just iterate the range if one is specified
-		int startPoint = m_pLeafmap->startVert[0];
-		int pointCount = m_pLeafmap->vertCount;
+		unsigned short startPoint = m_pLeafmap->startVert[0];
+		unsigned short pointCount = m_pLeafmap->vertCount;
 		IVP_DOUBLE bestDot = pPoints[startPoint].dot_product(&mapdir);
 		int best = startPoint;
-		for ( int i = 1; i < pointCount; i++ )
+		for ( unsigned short i = 1; i < pointCount; i++ )
 		{
 			IVP_DOUBLE dot = pPoints[startPoint+i].dot_product(&mapdir);
 			if ( dot > bestDot )
