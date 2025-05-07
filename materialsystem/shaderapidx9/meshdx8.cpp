@@ -3451,17 +3451,7 @@ void CMeshDX8::RenderPass()
 
 					numPrimitives );// Number of primitives to render. The number of vertices used is a function of the primitive count and the primitive type.
 			}
-		}
 	}
-
-	if ( g_pLastVertex )
-	{
-		g_pLastVertex->MarkUsedInRendering();
-	}
-
-	if( g_pLastIndex )
-	{
-		g_pLastIndex->MarkUsedInRendering();
 	}
 }
 
