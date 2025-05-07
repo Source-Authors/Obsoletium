@@ -628,7 +628,7 @@ public:
 
 	virtual void			SetQuickDelete( bool bQuick ) = 0;
 
-	[[nodiscard]] virtual int				GetActiveObjectCount() const = 0;
+	[[nodiscard]] virtual intp				GetActiveObjectCount() const = 0;
 	virtual void			GetActiveObjects( IPhysicsObject **pOutputObjectList ) const = 0;
 	[[nodiscard]] virtual const IPhysicsObject **GetObjectList( intp *pOutputObjectCount ) const = 0;
 	[[nodiscard]] virtual bool			TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment ) = 0;

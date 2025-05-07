@@ -95,7 +95,7 @@ public:
 	virtual void TraceBox( trace_t *ptr, const Vector &mins, const Vector &maxs, const Vector &start, const Vector &end );
 	void SetCollisionSolver( IPhysicsCollisionSolver *pCollisionSolver ) override;
 	void GetGravity( Vector *pGravityVector ) const override;
-	[[nodiscard]] int	 GetActiveObjectCount() const override;
+	[[nodiscard]] intp GetActiveObjectCount() const override;
 	void GetActiveObjects( IPhysicsObject **pOutputObjectList ) const override;
 	[[nodiscard]] const IPhysicsObject **GetObjectList( intp *pOutputObjectCount ) const override;
 	[[nodiscard]] bool TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment ) override;

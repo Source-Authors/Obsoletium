@@ -1805,7 +1805,7 @@ void CPhysicsEnvironment::DestroyVehicleController( IPhysicsVehicleController *p
 	delete pController;
 }
 
-int	CPhysicsEnvironment::GetActiveObjectCount( void ) const
+intp	CPhysicsEnvironment::GetActiveObjectCount( void ) const
 {
 	return m_pSleepEvents->GetActiveObjectCount();
 }

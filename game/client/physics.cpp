@@ -432,24 +432,24 @@ void CPhysicsSystem::PhysicsSimulate()
 
 	if ( physenv )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, physenv->GetActiveObjectCount() );
+		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %zd", __FUNCTION__, physenv->GetActiveObjectCount() );
 
 		g_Collisions.BufferTouchEvents( true );
+
 #ifdef _DEBUG
 		physenv->DebugCheckContacts();
 #endif
 		physenv->Simulate( frametime * cl_phys_timescale.GetFloat() );
 
-		int activeCount = physenv->GetActiveObjectCount();
-		IPhysicsObject **pActiveList = NULL;
+		const intp activeCount = physenv->GetActiveObjectCount();
 		if ( activeCount )
 		{
-			pActiveList = (IPhysicsObject **)stackalloc( sizeof(IPhysicsObject *)*activeCount );
+			IPhysicsObject **pActiveList = stackallocT( IPhysicsObject *, activeCount );
 			physenv->GetActiveObjects( pActiveList );
 
-			for ( int i = 0; i < activeCount; i++ )
+			for ( intp i = 0; i < activeCount; i++ )
 			{
-				C_BaseEntity *pEntity = reinterpret_cast<C_BaseEntity *>(pActiveList[i]->GetGameData());
+				auto *pEntity = static_cast<C_BaseEntity *>(pActiveList[i]->GetGameData());
 				if ( pEntity )
 				{
 					if ( pEntity->CollisionProp()->DoesVPhysicsInvalidateSurroundingBox() )
