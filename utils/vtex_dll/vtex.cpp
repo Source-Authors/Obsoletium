@@ -1836,7 +1836,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 		}
 
 		size_t numDataBytes;
-		void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
+		const void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
 		if ( !pCrcData || numDataBytes != sizeof( CRC32_t ) )
 		{
 			fprintf( stderr, "OLD TEXTURE FORMAT: %s\n", dstFileName );
@@ -1864,7 +1864,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 			if ( spExistingVtf->Unserialize( bufFile ) )
 			{
 				size_t numDataBytes;
-				void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
+				const void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
 				if ( pCrcData && numDataBytes == sizeof( CRC32_t ) )
 				{
 					CRC32_t crcFile = * reinterpret_cast< CRC32_t const * >( pCrcData );
