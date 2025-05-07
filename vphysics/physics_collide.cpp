@@ -796,7 +796,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	IVP_Compact_Ledge *pLedge = (IVP_Compact_Ledge *)pConvex;
 	int iTriangles = pLedge->get_n_triangles();
 
-	PolyhedronMesh_Triangle *pTriangles = (PolyhedronMesh_Triangle *)stackalloc( iTriangles * sizeof( PolyhedronMesh_Triangle ) );
+	PolyhedronMesh_Triangle *pTriangles = stackallocT( PolyhedronMesh_Triangle, iTriangles );
 	
 	int iHighestPointIndex = 0;
 	const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle();
@@ -820,7 +820,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	++iHighestPointIndex;
 
 	//apparently points might be shared between ledges and not all points will be used. So now we get to compress them into a smaller set
-	int *pPointRemapping = (int *)stackalloc( iHighestPointIndex * sizeof( int ) );
+	int *pPointRemapping = stackallocT( int, iHighestPointIndex );
 	memset( pPointRemapping, 0, iHighestPointIndex * sizeof( int ) );
 	for( int i = 0; i != iTriangles; ++i )
 	{
@@ -855,7 +855,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	}
 	
 
-	bool *bLinks = (bool *)stackalloc( iNumPoints * iNumPoints * sizeof( bool ) );
+	bool *bLinks = stackallocT( bool, iNumPoints * iNumPoints );
 	memset( bLinks, 0, iNumPoints * iNumPoints * sizeof( bool ) );
 
 	int iLinkCount = 0;
