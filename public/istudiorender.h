@@ -167,8 +167,8 @@ enum
 
 struct DrawModelResults_t
 {
-	int m_ActualTriCount; 
-	int m_TextureMemoryBytes;
+	intp m_ActualTriCount; 
+	intp m_TextureMemoryBytes;
 	int m_NumHardwareBones;
 	int m_NumBatches;
 	int m_NumMaterials;

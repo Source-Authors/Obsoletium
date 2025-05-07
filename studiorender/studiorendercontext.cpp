@@ -1815,11 +1815,11 @@ void CStudioRenderContext::GetPerfStats( DrawModelResults_t *pResults, const Dra
 			{
 				pSpewBuf->Printf( "        numPasses:%d\n", numPasses );
 			}
-			int bytes = pMaterial->GetTextureMemoryBytes();
+			intp bytes = pMaterial->GetTextureMemoryBytes();
 			pResults->m_TextureMemoryBytes += bytes;
 			if( pSpewBuf )
 			{
-				pSpewBuf->Printf( "        texture memory: %d (Only valid in a rendering app)\n", bytes );
+				pSpewBuf->Printf( "        texture memory: %zd (Only valid in a rendering app)\n", bytes );
 			}
 
 			// Iterate over all stripgroups

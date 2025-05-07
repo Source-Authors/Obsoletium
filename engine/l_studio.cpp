@@ -1903,7 +1903,7 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, info.m_pStudioHdr->pszName() );
 	Q_snprintf( buf, sizeof( buf ), "lod: %d/%d\n", results.m_nLODUsed+1, ( int )info.m_pHardwareData->m_NumLODs );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
-	Q_snprintf( buf, sizeof( buf ), "tris: %d\n",  results.m_ActualTriCount );
+	Q_snprintf( buf, sizeof( buf ), "tris: %zd\n",  results.m_ActualTriCount );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
 	Q_snprintf( buf, sizeof( buf ), "hardware bones: %d\n",  results.m_NumHardwareBones );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
