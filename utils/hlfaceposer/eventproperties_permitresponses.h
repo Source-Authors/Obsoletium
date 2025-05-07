@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_PermitResponses( CEventParams *params );
+intp EventProperties_PermitResponses( CEventParams *params );
 
 #endif // EVENTPROPERTIES_PERMITRESPONSES_H

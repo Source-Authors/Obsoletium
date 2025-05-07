@@ -11,6 +11,7 @@
 #endif
 
 #include "sceneimage.h"
+#include "mxtk/mxwindow.h"
 
 #define IDC_FILE_LOADMODEL			1001
 #define IDC_FILE_LOADBACKGROUNDTEX	1002

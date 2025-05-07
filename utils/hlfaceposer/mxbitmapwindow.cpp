@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #include "mxBitmapWindow.h"
-#include <mxtk/mxWindow.h>
+#include <mxtk/mxwindow.h>
 #include "tier0/dbg.h"
 #include "winlite.h"
 

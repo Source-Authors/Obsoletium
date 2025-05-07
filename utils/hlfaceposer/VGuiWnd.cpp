@@ -6,7 +6,6 @@
 #include "vgui/IVGui.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "FacePoser_VGui.h"
-// #include "material.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterial.h"
 

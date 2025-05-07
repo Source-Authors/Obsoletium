@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "mxexpressiontray.h"
 #include "hlfaceposer.h"
-#include <mxtk/mxWindow.h>
+#include <mxtk/mxwindow.h>
 #include <mxtk/mxScrollBar.h>
 #include "expressions.h"
 #include "expclass.h"
@@ -166,8 +166,8 @@ void mxExpressionTray::AddButton( const char *name, const char *tooltip, const c
 	bool active, int x, int y, int w, int h )
 {
 	mxETButton *btn = new mxETButton;
-	strcpy( btn->m_szName, name );
-	strcpy( btn->m_szToolTip, tooltip );
+	V_strcpy_safe( btn->m_szName, name );
+	V_strcpy_safe( btn->m_szToolTip, tooltip );
 	btn->m_bActive = active;
 	btn->m_rc.left = x;
 	btn->m_rc.top = y;
@@ -567,7 +567,7 @@ void mxExpressionTray::redraw()
 
 		// Arial 36 normal
 		char sz[ 256 ];
-		sprintf( sz, "No expression file loaded" );
+		V_sprintf_safe( sz, "No expression file loaded" );
 
 		int pointsize = 18;
 
@@ -1172,7 +1172,7 @@ bool IsUsingPerPlayerExpressions()
 	{
 		// Returns the search path, each path is separated by ;s. Returns the length of the string returned
 		char pSearchPath[2048];
-		if ( g_pFullFileSystem->GetSearchPath( "GAME", false, pSearchPath, sizeof(pSearchPath) ) )
+		if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, pSearchPath ) )
 		{
 			Q_FixSlashes( pSearchPath );
 			if ( Q_stristr( pSearchPath, "\\tf" ) )

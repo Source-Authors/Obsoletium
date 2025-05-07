@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <mxtk/mx.h>
-#include <stdio.h>
-#include "resource.h"
+#include "eventproperties_permitresponses.h"
 #include "EventProperties.h"
+#include <mxtk/mx.h>
+#include "resource.h"
 #include "mdlviewer.h"
 
 static CEventParams g_Params;
@@ -143,9 +143,11 @@ BOOL CEventPropertiesPermitResponsesDialog::HandleMessage( HWND hwndDlg, UINT uM
 
 				char szTime[ 32 ];
 				GetDlgItemText( m_hDialog, IDC_STARTTIME, szTime, sizeof( szTime ) );
-				g_Params.m_flStartTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flStartTime = strtof( szTime, nullptr );
 				GetDlgItemText( m_hDialog, IDC_ENDTIME, szTime, sizeof( szTime ) );
-				g_Params.m_flEndTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flEndTime = strtof( szTime, nullptr );
 
 				// Parse tokens from tags
 				ParseTags( &g_Params );
@@ -202,11 +204,11 @@ BOOL CEventPropertiesPermitResponsesDialog::HandleMessage( HWND hwndDlg, UINT uM
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int EventProperties_PermitResponses( CEventParams *params )
+intp EventProperties_PermitResponses( CEventParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_EVENTPROPERTIES_PERMITRESPONSES ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)EventPropertiesPermitResponsesDialogProc );

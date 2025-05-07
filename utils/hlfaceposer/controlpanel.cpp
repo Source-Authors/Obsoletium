@@ -484,7 +484,7 @@ ControlPanel::initBodypartChoices()
 			for (i = 0; i < pbodyparts[0].nummodels; i++)
 			{
 				char str[64];
-				sprintf (str, "Submodel %d", i + 1);
+				V_sprintf_safe (str, "Submodel %d", i + 1);
 				cSubmodel->add (str);
 			}
 			cSubmodel->select (0);
@@ -510,7 +510,7 @@ ControlPanel::setBodypart (int index)
 			for (int i = 0; i < pbodyparts[index].nummodels; i++)
 			{
 				char str[64];
-				sprintf (str, "Submodel %d", i + 1);
+				V_sprintf_safe (str, "Submodel %d", i + 1);
 				cSubmodel->add (str);
 			}
 			cSubmodel->select (0);
@@ -543,7 +543,7 @@ ControlPanel::initBoneControllerChoices()
 		{
 			mstudiobonecontroller_t *pbonecontroller = hdr->pBonecontroller(i);
 			char str[32];
-			sprintf (str, "Controller %d", pbonecontroller->inputfield);
+			V_sprintf_safe (str, "Controller %d", pbonecontroller->inputfield);
 			cController->add (str);
 		}
 
@@ -611,7 +611,7 @@ ControlPanel::initSkinChoices()
 		for (int i = 0; i < hdr->numskinfamilies(); i++)
 		{
 			char str[32];
-			sprintf (str, "Skin %d", i + 1);
+			V_sprintf_safe (str, "Skin %d", i + 1);
 			cSkin->add (str);
 		}
 
@@ -638,7 +638,7 @@ ControlPanel::setModelInfo()
 		hbcount += hdr->iHitboxCount( s );
 	}
 
-	sprintf (str,
+	V_sprintf_safe (str,
 		"Bones: %d\n"
 		"Bone Controllers: %d\n"
 		"Hit Boxes: %d in %d sets\n"
@@ -652,7 +652,7 @@ ControlPanel::setModelInfo()
 
 	lModelInfo1->setLabel (str);
 
-	sprintf (str,
+	V_sprintf_safe (str,
 		"Textures: %d\n"
 		"Skin Families: %d\n"
 		"Bodyparts: %d\n"
@@ -701,7 +701,7 @@ void ControlPanel::CenterOnFace( void )
 	Vector size;
 	VectorSubtract( hdr->hull_max(), hdr->hull_min(), size );
 
-	float eyeheight = hdr->hull_min().z + 0.9 * size.z;
+	float eyeheight = hdr->hull_min().z + 0.9f * size.z;
 
 	if ( hdr->GetNumAttachments() > 0 )
 	{
@@ -769,10 +769,10 @@ void ControlPanel::CenterOnFace( void )
 		}
 	}
 
-	int modelcount = modellist.Count();
-	int countover2 = modelcount / 2;
+	intp modelcount = modellist.Count();
+	intp countover2 = modelcount / 2;
 	int ydelta = GetModelGap();
-	int yoffset = -countover2 * ydelta;
+	intp yoffset = -countover2 * ydelta;
 	for ( i = 0 ; i < modelcount; i++ )
 	{
 		if ( models->GetStudioHeader( i ) == hdr )
@@ -826,7 +826,7 @@ ControlPanel::centerView()
 
 bool ControlPanel::Close()
 {
-	int index = g_pExpressionClass->getSelectedIndex();
+	intp index = g_pExpressionClass->getSelectedIndex();
 	CExpClass *cl = expressions->GetClass( index );
 	if ( !cl )
 		return true;
@@ -877,7 +877,7 @@ void ControlPanel::Undo( void )
 	CExpClass *active = expressions->GetActiveClass();
 	if ( !active )
 		return;
-	int index = active->GetSelectedExpression();
+	intp index = active->GetSelectedExpression();
 	if ( index != -1 )
 	{
 		UndoExpression( index );
@@ -892,7 +892,7 @@ void ControlPanel::Redo( void )
 	CExpClass *active = expressions->GetActiveClass();
 	if ( !active )
 		return;
-	int index = active->GetSelectedExpression();
+	intp index = active->GetSelectedExpression();
 	if ( index != -1 )
 	{
 		RedoExpression( index );
@@ -902,7 +902,7 @@ void ControlPanel::Redo( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ControlPanel::UndoExpression( int index )
+void ControlPanel::UndoExpression( intp index )
 {
 	if ( index == -1 )
 		return;
@@ -923,7 +923,7 @@ void ControlPanel::UndoExpression( int index )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ControlPanel::RedoExpression( int index )
+void ControlPanel::RedoExpression( intp index )
 {
 	if ( index == -1 )
 		return;
@@ -941,7 +941,7 @@ void ControlPanel::RedoExpression( int index )
 	}
 }
 
-void ControlPanel::DeleteExpression( int index )
+void ControlPanel::DeleteExpression( intp index )
 {
 	CExpClass *active = expressions->GetActiveClass();
 	if ( !active )
@@ -954,7 +954,7 @@ void ControlPanel::DeleteExpression( int index )
 			
 		g_pFlexPanel->DeleteExpression( index );
 
-		active->SelectExpression( max( 0, index - 1 ) );
+		active->SelectExpression( max( (intp)0, index - 1 ) );
 	}
 }
 

@@ -5,12 +5,8 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#pragma warning( disable : 4201 )
-#include <mmsystem.h>
-#include <stdio.h>
-#include <math.h>
+#include "sound.h"
+
 #include "snd_audio_source.h"
 #include "AudioWaveOutput.h"
 #include "ifaceposersound.h"
@@ -19,7 +15,7 @@
 #include "expressions.h"
 #include "expclass.h"
 #include "PhonemeConverter.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "filesystem.h"
 #include "sentence.h"
 #include "faceposer_models.h"
@@ -28,7 +24,13 @@
 #include "wavebrowser.h"
 #include "choreoscene.h"
 #include "choreoview.h"
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
+
+#include "winlite.h"
+#include <mmsystem.h>
+#include <mmreg.h>
+
+#undef PlaySound
 
 extern ISoundEmitterSystemBase *soundemitter;
 
@@ -73,7 +75,7 @@ public:
 	// stop sampling
 	void Stop( void );
 
-	void WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD dwParam1, DWORD dwParam2 );
+	void WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD_PTR dwParam1, DWORD_PTR dwParam2 );
 
 private:
 	void	OpenDevice( void );
@@ -99,7 +101,7 @@ private:
 	WAVEHDR	*m_buffers[ INPUT_BUFFER_COUNT ];
 };
 
-extern "C" void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, CAudioWaveInput *pAudio, DWORD dwParam1, DWORD dwParam2 );
+extern "C" void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, DWORD_PTR instance, DWORD_PTR dwParam1, DWORD_PTR dwParam2 );
 
 CAudioWaveInput::CAudioWaveInput( void )
 {
@@ -176,15 +178,16 @@ CAudioWaveInput::~CAudioWaveInput( void )
 	}
 }
 
-void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, CAudioWaveInput *pAudio, DWORD dwParam1, DWORD dwParam2 )
+void CALLBACK WaveData( HWAVEIN hwi, UINT uMsg, DWORD_PTR instance, DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
+	auto *pAudio = reinterpret_cast<CAudioWaveInput *>(instance);
 	if ( pAudio )
 	{
 		pAudio->WaveMessage( hwi, uMsg, dwParam1, dwParam2 );
 	}
 }
 
-void CAudioWaveInput::WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD dwParam1, DWORD dwParam2 )
+void CAudioWaveInput::WaveMessage( HWAVEIN hdevice, UINT uMsg, DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
 	if ( hdevice != m_deviceHandle )
 		return;
@@ -212,7 +215,7 @@ void CAudioWaveInput::OpenDevice( void )
 	format.wFormatTag = WAVE_FORMAT_PCM;
 	format.nBlockAlign = m_sampleSize;
 
-	MMRESULT errorCode = waveInOpen( &m_deviceHandle, m_deviceId, &format, (DWORD)WaveData, (DWORD)this, CALLBACK_FUNCTION );
+	MMRESULT errorCode = waveInOpen( &m_deviceHandle, m_deviceId, &format, (DWORD_PTR)WaveData, (DWORD_PTR)this, CALLBACK_FUNCTION );
 	if ( errorCode == MMSYSERR_NOERROR )
 	{
 		// valid device opened
@@ -1079,8 +1082,8 @@ IFacePoserSound *sound = ( IFacePoserSound * )&g_FacePoserSound;
 
 CFacePoserSound::~CFacePoserSound( void )
 {
-	OutputDebugString( va( "Removing %i sounds\n", m_ActiveSounds.Size() ) );
-	for ( int i = 0 ; i < m_ActiveSounds.Size(); i++ )
+	OutputDebugString( va( "Removing %zi sounds\n", m_ActiveSounds.Count() ) );
+	for ( intp i = 0 ; i < m_ActiveSounds.Count(); i++ )
 	{
 		CSoundFile *p = &m_ActiveSounds[ i ];
 		OutputDebugString( va( "Removing sound:  %s\n", p->filename ) );
@@ -1100,34 +1103,30 @@ CAudioOuput	*CFacePoserSound::GetAudioOutput( void )
 
 CAudioSource *CFacePoserSound::FindOrAddSound( const char *filename )
 {
-	CSoundFile *s;
-
-	int i;
-	for ( i = 0; i < m_ActiveSounds.Size(); i++ )
+	for ( auto &s : m_ActiveSounds )
 	{
-		s = &m_ActiveSounds[ i ];
-		Assert( s );
-		if ( !stricmp( s->filename, filename ) )
+		if ( !stricmp( s.filename, filename ) )
 		{
 			time_t filetime = filesystem->GetFileTime( filename );
-			if ( filetime != s->filetime )
+			if ( filetime != s.filetime )
 			{
 				Con_Printf( "Reloading sound %s\n", filename );
-				delete s->source;
-				s->source = LoadSound( filename );
-				s->filetime = filetime;
+
+				delete s.source;
+				s.source = LoadSound( filename );
+				s.filetime = filetime;
 			}
-			return s->source;
+			return s.source;
 		}
 	}
 
-	i = m_ActiveSounds.AddToTail();
-	s = &m_ActiveSounds[ i ];
-	strcpy( s->filename, filename );
-	s->source = LoadSound( filename );
-	s->filetime = filesystem->GetFileTime( filename );
+	auto &s = m_ActiveSounds[ m_ActiveSounds.AddToTail() ];
+	V_strcpy_safe( s.filename, filename );
 
-	return s->source;
+	s.source = LoadSound( filename );
+	s.filetime = filesystem->GetFileTime( filename );
+
+	return s.source;
 }
 
 void CFacePoserSound::Init( void )
@@ -1137,7 +1136,7 @@ void CFacePoserSound::Init( void )
 
 	// Load SoundOverrides for Faceposer
 
-	KeyValues *manifest = new KeyValues( "scripts/game_sounds_manifest.txt" );
+	KeyValuesAD manifest( "scripts/game_sounds_manifest.txt" );
 	if ( filesystem->LoadKeyValues( *manifest, IFileSystem::TYPE_SOUNDEMITTER, "scripts/game_sounds_manifest.txt", "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -1149,7 +1148,6 @@ void CFacePoserSound::Init( void )
 			}
 		}
 	}
-	manifest->deleteThis();
 }
 
 void CFacePoserSound::Shutdown( void )
@@ -1331,8 +1329,6 @@ void ComputeBlendedSetting( Emphasized_Phoneme *classes, float emphasis_intensit
 
 void CFacePoserSound::AddViseme( float intensity, StudioModel *model, int phoneme, float scale )
 {
-	int i;
-
 	Assert( model );
 	CStudioHdr *hdr = model->GetStudioHdr();
 	Assert( hdr );

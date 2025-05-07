@@ -34,6 +34,6 @@ struct CEditPhraseParams : public CBaseDialogParams
 };
 
 // Display/create dialog
-int EditPhrase( CEditPhraseParams *params );
+intp EditPhrase( CEditPhraseParams *params );
 
 #endif // EDITPHRASE_H

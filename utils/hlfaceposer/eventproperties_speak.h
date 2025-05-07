@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_Speak( CEventParams *params );
+intp EventProperties_Speak( CEventParams *params );
 
 #endif // EVENTPROPERTIES_SPEAK_H

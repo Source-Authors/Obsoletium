@@ -5,9 +5,8 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdio.h>
-#include "hlfaceposer.h"
 #include "GestureTool.h"
+#include "hlfaceposer.h"
 #include "mdlviewer.h"
 #include "choreowidgetdrawhelper.h"
 #include "TimelineItem.h"
@@ -187,7 +186,7 @@ void GestureTool::GetScrubHandleRect( RECT& rcHandle, float scrub, bool clipped 
 
 		if  ( clipped )
 		{
-			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH / 2, w2() - SCRUBBER_HANDLE_WIDTH / 2 );
+			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH / 2.f, w2() - SCRUBBER_HANDLE_WIDTH / 2.f );
 		}
 	}
 
@@ -206,7 +205,7 @@ void GestureTool::GetScrubHandleReferenceRect( RECT& rcHandle, float scrub, bool
 
 		if  ( clipped )
 		{
-			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH/2, w2() - SCRUBBER_HANDLE_WIDTH/2 );
+			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH/2.f, w2() - SCRUBBER_HANDLE_WIDTH/2.f );
 		}
 	}
 
@@ -236,7 +235,7 @@ void GestureTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT& rc
 
 	// 
 	char sz[ 32 ];
-	sprintf( sz, "%.3f", scrub );
+	V_sprintf_safe( sz, "%.3f", scrub );
 
 	CChoreoEvent *ev = GetSafeEvent();
 	if ( ev )
@@ -248,7 +247,7 @@ void GestureTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT& rc
 		float dt = ed - st;
 		if ( dt > 0.0f )
 		{
-			sprintf( sz, "%.3f", st + scrub );
+			V_sprintf_safe( sz, "%.3f", st + scrub );
 		}
 	}
 
@@ -1392,7 +1391,7 @@ void GestureTool::DrawAbsoluteTags( CChoreoWidgetDrawHelper& drawHelper )
 			}
 			
 			char text[ 256 ];
-			sprintf( text, "%s", tag->GetName() );
+			V_sprintf_safe( text, "%s", tag->GetName() );
 
 			int len = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, text );
 			rcText.left = ( rcMark.left + rcMark.right ) / 2 - len / 2;
@@ -1411,8 +1410,8 @@ void GestureTool::DrawAbsoluteTags( CChoreoWidgetDrawHelper& drawHelper )
 				rcText.top += 10;
 			}
 			
-			// sprintf( text, "%.3f", tag->GetPercentage() * event->GetDuration() + event->GetStartTime() );
-			sprintf( text, "%.3f", tag->GetPercentage() );
+			// V_sprintf_safe( text, "%.3f", tag->GetPercentage() * event->GetDuration() + event->GetStartTime() );
+			V_sprintf_safe( text, "%.3f", tag->GetPercentage() );
 
 			len = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, text );
 			rcText.left = ( rcMark.left + rcMark.right ) / 2 - len / 2;
@@ -1456,7 +1455,7 @@ void GestureTool::DrawTimeLine( CChoreoWidgetDrawHelper& drawHelper, RECT& rc, f
 			}
 
 			char sz[ 32 ];
-			sprintf( sz, "%.2f", f );
+			V_sprintf_safe( sz, "%.2f", f );
 
 			int textWidth = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, sz );
 
@@ -1570,10 +1569,10 @@ void GestureTool::OnInsertTag( void )
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Absolute Tag Name" );
-	strcpy( params.m_szPrompt, "Name:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Absolute Tag Name" );
+	V_strcpy_safe( params.m_szPrompt, "Name:" );
 
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	if ( !InputProperties( &params ) )
 		return;
@@ -1941,8 +1940,8 @@ void GestureTool::OnChangeScale( void )
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Change Zoom" );
-	strcpy( params.m_szPrompt, "New scale (e.g., 2.5x):" );
+	V_strcpy_safe( params.m_szDialogTitle, "Change Zoom" );
+	V_strcpy_safe( params.m_szPrompt, "New scale (e.g., 2.5x):" );
 
 	Q_snprintf( params.m_szInputText, sizeof( params.m_szInputText ), "%.2f", (float)g_pChoreoView->GetTimeZoom( GetToolName() ) / 100.0f );
 

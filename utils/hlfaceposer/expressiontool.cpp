@@ -5,9 +5,8 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdio.h>
-#include "hlfaceposer.h"
 #include "ExpressionTool.h"
+#include "hlfaceposer.h"
 #include "mdlviewer.h"
 #include "choreowidgetdrawhelper.h"
 #include "TimelineItem.h"
@@ -784,8 +783,8 @@ void CExpressionToolWorkspace::OnDeleteColumn()
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Delete Column" );
-	strcpy( params.m_szPrompt, "Frame(s) to delete [e.g., 82 or 81-91 ]:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Delete Column" );
+	V_strcpy_safe( params.m_szPrompt, "Frame(s) to delete [e.g., 82 or 81-91 ]:" );
 	Q_snprintf( params.m_szInputText, sizeof( params.m_szInputText ), "%i", clickedframe );
 
 	if ( !InputProperties( &params ) )
@@ -1293,7 +1292,7 @@ void ExpressionTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT&
 
 	// 
 	char sz[ 32 ];
-	sprintf( sz, "%.3f", m_flScrub );
+	V_sprintf_safe( sz, "%.3f", m_flScrub );
 
 	CChoreoEvent *ev = GetSafeEvent();
 	if ( ev )
@@ -1305,7 +1304,7 @@ void ExpressionTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT&
 		float dt = ed - st;
 		if ( dt > 0.0f )
 		{
-			sprintf( sz, "%.3f", st + m_flScrub );
+			V_sprintf_safe( sz, "%.3f", st + m_flScrub );
 		}
 	}
 
@@ -1761,10 +1760,10 @@ void ExpressionTool::DrawRelativeTags( CChoreoWidgetDrawHelper& drawHelper )
 		rcText.top -= 20;
 		
 		char text[ 256 ];
-		sprintf( text, "%s", tag->GetName() );
+		V_sprintf_safe( text, "%s", tag->GetName() );
 		if ( tag->GetLocked() )
 		{
-			strcat( text, " - locked" );
+			V_strcat_safe( text, " - locked" );
 		}
 
 		int len = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, text );
@@ -2850,10 +2849,10 @@ void ExpressionTool::AddFlexTimingTag( int mx )
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Event Tag Name" );
-	strcpy( params.m_szPrompt, "Name:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Event Tag Name" );
+	V_strcpy_safe( params.m_szPrompt, "Name:" );
 
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	if ( !InputProperties( &params ) )
 		return;
@@ -3289,9 +3288,9 @@ void ExpressionTool::OnNewExpression( void )
 	CExpressionParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Add Expression" );
-	strcpy( params.m_szName, "" );
-	strcpy( params.m_szDescription, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Add Expression" );
+	V_strcpy_safe( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDescription, "" );
 
 	if ( !ExpressionProperties( &params ) )
 		return;
@@ -3781,11 +3780,11 @@ void ExpressionTool::OnExportFlexAnimation( void )
 		return;
 	}
 
-	Q_DefaultExtension( fafilename, ".vfa", sizeof( fafilename ) );
+	Q_DefaultExtension( fafilename, ".vfa" );
 
 	Con_Printf( "Exporting events to %s\n", fafilename );
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	CChoreoScene::FileSaveFlexAnimations( buf, 0, event );
 
@@ -3818,7 +3817,7 @@ void ExpressionTool::OnImportFlexAnimation( void )
 		return;
 
 	char fullpath[ 512 ];
-	filesystem->RelativePathToFullPath( fafilename, "MOD", fullpath, sizeof( fullpath ) );
+	filesystem->RelativePathToFullPath_safe( fafilename, "MOD", fullpath );
 
 	LoadScriptFile( (char *)fullpath );
 
@@ -4339,8 +4338,8 @@ void ExpressionTool::OnChangeScale( void )
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Change Zoom" );
-	strcpy( params.m_szPrompt, "New scale (e.g., 2.5x):" );
+	V_strcpy_safe( params.m_szDialogTitle, "Change Zoom" );
+	V_strcpy_safe( params.m_szPrompt, "New scale (e.g., 2.5x):" );
 
 	Q_snprintf( params.m_szInputText, sizeof( params.m_szInputText ), "%.2f", (float)g_pChoreoView->GetTimeZoom( GetToolName() ) / 100.0f );
 
@@ -4574,14 +4573,15 @@ void ExpressionTool::OnScaleSamples()
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Scale selected samples" );
-	strcpy( params.m_szPrompt, "Factor:" );
-	strcpy( params.m_szInputText, "1.0" );
+	V_strcpy_safe( params.m_szDialogTitle, "Scale selected samples" );
+	V_strcpy_safe( params.m_szPrompt, "Factor:" );
+	V_strcpy_safe( params.m_szInputText, "1.0" );
 
 	if ( !InputProperties( &params ) )
 		return;
 
-	float scale_factor = atof( params.m_szInputText );
+	// dimhotepus: atof -> strtof.
+	float scale_factor = strtof( params.m_szInputText, nullptr );
 	if( scale_factor <= 0.0f )
 	{
 		Con_Printf( "Can't scale to %.2f\n", scale_factor );

@@ -11,15 +11,16 @@
 #endif
 
 #include "utlvector.h"
+#include "tier0/platform.h"
 
 class CWaveFile;
 
-class IFileLoader
+abstract_class IFileLoader
 {
 public:
 	virtual void			AddWaveFilesToThread( CUtlVector< CWaveFile * >& wavefiles ) = 0;
 
-	virtual int				ProcessCompleted() = 0;
+	virtual intp			ProcessCompleted() = 0;
 
 	virtual	void			Start() = 0;
 
