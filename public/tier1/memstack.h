@@ -139,7 +139,11 @@ public:
 	{ 
 		static_assert( sizeof(T) % 4 == 0 );
 		constexpr size_t size = MAX_SIZE * sizeof(T);
+#ifdef PLATFORM_64BITS
+		if ( !m_MemoryStack.Init( size, COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 8 ) )
+#else
 		if ( !m_MemoryStack.Init( size, COMMIT_SIZE * sizeof(T), INITIAL_COMMIT * sizeof(T), 4 ) )
+#endif
 		{
 			Warning( "Common memory stack unable to allocate %zu bytes.\n", size );
 		}

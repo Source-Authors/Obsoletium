@@ -32,15 +32,23 @@ public:
 		MEM_ALLOC_CREDIT_( "CMatCallQueue.m_Allocator" );
 #ifdef SWDS
 		constexpr size_t size = 2u*1024;
+#ifdef PLATFORM_64BITS
+		if ( !m_Allocator.Init( size, 0, 0, 8 ) )
+#else
 		if ( !m_Allocator.Init( size, 0, 0, 4 ) )
+#endif
 		{
-			Error( "Material call queue allocator unable to allocate %u virtual bytes.\n", size );
+			Error( "Material call queue allocator unable to allocate %zu virtual bytes.\n", size );
 		}
 #else
 		constexpr size_t size = 8u*1024*1024;
+#ifdef PLATFORM_64BITS
+		if ( !m_Allocator.Init( size, 64u*1024, 256u*1024, 8u ) )
+#else
 		if ( !m_Allocator.Init( size, 64u*1024, 256u*1024, 4u ) )
+#endif
 		{
-			Error( "Material call queue allocator unable to allocate %u virtual bytes.\n", size );
+			Error( "Material call queue allocator unable to allocate %zu virtual bytes.\n", size );
 		}
 #endif
 		m_FunctorFactory.SetAllocator( &m_Allocator );

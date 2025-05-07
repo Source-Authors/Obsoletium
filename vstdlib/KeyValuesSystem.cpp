@@ -121,8 +121,12 @@ CKeyValuesSystem::CKeyValuesSystem()
 		t.next = NULL;
 	}
 
-	constexpr size_t size = 4u * 1024 * 1024;
-	if ( !m_Strings.Init( size, 64u*1024, 0, 4 ) )
+	constexpr size_t size = 4u * 1024 * 1024; //-V112
+#ifdef PLATFORM_64BITS
+	if ( !m_Strings.Init( size, 64u*1024, 0, 8 ) ) //-V112
+#else
+	if ( !m_Strings.Init( size, 64u*1024, 0, 4 ) ) //-V112
+#endif
 	{
 		// dimhotepus: Handle allocator failure.
 		Error( "KeyValues allocator unable to allocate %zu virtual bytes.\n", size );
