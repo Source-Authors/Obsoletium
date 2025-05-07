@@ -152,7 +152,7 @@ private:
 	const CSurface	*GetInternalSurface( intp materialIndex ) const;
 	CSurface	*GetInternalSurface( intp materialIndex );
 	
-	void			CopyPhysicsProperties( CSurface *pOut, int baseIndex );
+	void			CopyPhysicsProperties( CSurface *pOut, intp baseIndex );
 	bool			AddFileToDatabase( const char *pFilename );
 
 private:
@@ -387,7 +387,7 @@ int CPhysicsSurfaceProps::GetIVPMaterialIndex( const IVP_Material *pIVP ) const
 }
 
 
-void CPhysicsSurfaceProps::CopyPhysicsProperties( CSurface *pOut, int baseIndex )
+void CPhysicsSurfaceProps::CopyPhysicsProperties( CSurface *pOut, intp baseIndex )
 {
 	const CSurface *pSurface = GetInternalSurface( baseIndex );
 	if ( pSurface )
@@ -416,7 +416,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 			CSurface prop;
 			memset( &prop.data, 0, sizeof(prop.data) );
 			prop.m_name = m_strings.AddString( key );
-			int baseMaterial = GetSurfaceIndex( key );
+			intp baseMaterial = GetSurfaceIndex( key );
 			if ( baseMaterial < 0 )
 			{
 				baseMaterial = GetSurfaceIndex( "default" );
@@ -431,7 +431,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 				{
 					// already in the database, don't add again, override values instead
 					const char *pOverride = m_strings.String(prop.m_name);
-					int propIndex = GetSurfaceIndex( pOverride );
+					intp propIndex = GetSurfaceIndex( pOverride );
 					if (  propIndex >= 0 )
 					{
 						CSurface *pSurface = GetInternalSurface( propIndex );
