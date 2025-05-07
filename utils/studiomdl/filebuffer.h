@@ -11,15 +11,18 @@
 class CFileBuffer
 {
 public:
-	CFileBuffer( int size )
+	explicit CFileBuffer( intp size )
 	{
 		m_pData = new unsigned char[size];
+
 #ifdef _DEBUG
 		m_pUsed = new const char *[size];
 		memset( m_pUsed, 0, size * sizeof( const char * ) );
 #endif
+
 		m_Size = size;
 		m_pCurPos = m_pData;
+
 #ifdef _DEBUG
 		memset( m_pData, 0xbaadf00d, size );
 #endif
@@ -27,6 +30,7 @@ public:
 	~CFileBuffer()
 	{
 		delete [] m_pData;
+
 #ifdef _DEBUG
 		delete [] m_pUsed;
 #endif
@@ -51,7 +55,7 @@ public:
 	}
 #endif
 	
-	void WriteToFile( const char *fileName, int size )
+	bool WriteToFile( const char *fileName, intp size )
 	{
 		// dimhotepus: Drop P4.
 		//CPlainAutoPtr< CP4File > spFile( g_p4factory->AccessFile( fileName ) );
@@ -61,13 +65,16 @@ public:
 		if( !fp )
 		{
 			MdlWarning( "Can't open \"%s\" for writing!\n", fileName );
-			return;
+			return false;
 		}
 
-		fwrite( m_pData, 1, size, fp );
+		bool ok = static_cast<intp>(fwrite( m_pData, 1, size, fp )) == size;
 		
 		fclose( fp );
 		//spFile->Add();
+
+		// dimhotepus: Report status.
+		return ok;
 	}
 	
 	void WriteAt( intp offset, void *data, intp size, const char *name )
@@ -97,28 +104,31 @@ public:
 
 		Append( data, size );
 	}
-	int GetOffset( void )
+	intp GetOffset( void )
 	{
 		return m_pCurPos - m_pData;
 	}
-	void *GetPointer( int offset )
+	void *GetPointer( intp offset )
 	{
 		return m_pData + offset;
 	}
 private:
-	void Append( void *data, int size )
+	void Append( void *data, intp size )
 	{
 		Assert( m_pCurPos + size - m_pData < m_Size );
 		memcpy( m_pCurPos, data, size );
 		m_pCurPos += size;
 	}
-	CFileBuffer(); // undefined
-	int m_Size;
+
+	CFileBuffer() = delete;
+
+	intp m_Size;
 	unsigned char *m_pData;
 	unsigned char *m_pCurPos;
+
 #ifdef _DEBUG
 	const char **m_pUsed;
 #endif
 };
-	
+
 #endif  // !SE_UTILS_STUDIOMDL_FILE_BUFFER_H_
