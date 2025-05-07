@@ -646,9 +646,9 @@ Vector CPhysicsObject::GetInvInertia( void ) const
 void CPhysicsObject::SetInertia( const Vector &inertia )
 {
 	IVP_U_Float_Point ri; ConvertDirectionToIVP( inertia, ri );
-	ri.k[0] = IVP_Inline_Math::fabsd(ri.k[0]);
-	ri.k[1] = IVP_Inline_Math::fabsd(ri.k[1]);
-	ri.k[2] = IVP_Inline_Math::fabsd(ri.k[2]);
+	ri.k[0] = fabs(ri.k[0]);
+	ri.k[1] = fabs(ri.k[1]);
+	ri.k[2] = fabs(ri.k[2]);
 
 	m_pObject->get_core()->set_rotation_inertia( &ri );
 }
@@ -1218,16 +1218,16 @@ float CPhysicsObject::GetDragInDirection( const IVP_U_Float_Point &velocity ) co
 	const IVP_U_Matrix *m_world_f_core = m_pObject->get_core()->get_m_world_f_core_PSI();
 	m_world_f_core->vimult3( &velocity, &local );
 
-	return m_dragCoefficient * IVP_Inline_Math::fabsd( local.k[0] * m_dragBasis.x ) + 
-		IVP_Inline_Math::fabsd( local.k[1] * m_dragBasis.y ) + 
-		IVP_Inline_Math::fabsd( local.k[2] * m_dragBasis.z );
+	return m_dragCoefficient * fabs( local.k[0] * m_dragBasis.x ) + 
+		fabs( local.k[1] * m_dragBasis.y ) + 
+		fabs( local.k[2] * m_dragBasis.z );
 }
 
 float CPhysicsObject::GetAngularDragInDirection( const IVP_U_Float_Point &angVelocity ) const
 {
-	return m_angDragCoefficient * IVP_Inline_Math::fabsd( angVelocity.k[0] * m_angDragBasis.x ) + 
-		IVP_Inline_Math::fabsd( angVelocity.k[1] * m_angDragBasis.y ) + 
-		IVP_Inline_Math::fabsd( angVelocity.k[2] * m_angDragBasis.z );
+	return m_angDragCoefficient * fabs( angVelocity.k[0] * m_angDragBasis.x ) + 
+		fabs( angVelocity.k[1] * m_angDragBasis.y ) + 
+		fabs( angVelocity.k[2] * m_angDragBasis.z );
 }
 
 const char *CPhysicsObject::GetName() const
