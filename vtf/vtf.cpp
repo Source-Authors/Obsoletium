@@ -894,7 +894,7 @@ bool CVTFTexture::ResourceMemorySection::WriteData( CUtlBuffer &buf ) const
 //-----------------------------------------------------------------------------
 bool CVTFTexture::SetupByteSwap( CUtlBuffer &buf )
 {
-	VTFFileBaseHeader_t *header = (VTFFileBaseHeader_t*)buf.PeekGet();
+	const VTFFileBaseHeader_t *header = (const VTFFileBaseHeader_t*)buf.PeekGet();
 
 	if ( header->version[0] == SwapLong( VTF_MAJOR_VERSION ) )
 	{
