@@ -5190,8 +5190,7 @@ void CMeshMgr::CopyStaticMeshIndexBufferToTempMeshIndexBuffer( CTempMeshDX8 *pDs
 	CIndexBuffer *srcIndexBuffer = pSrcIndexMesh->GetIndexBuffer();
 	int dummy = 0;
 	unsigned short *srcIndexArray = srcIndexBuffer->Lock( false, nIndexCount, dummy, 0 );
-	int i;
-	for( i = 0; i < nIndexCount; i++ )
+	for( int i = 0; i < nIndexCount; i++ )
 	{
 		dstMeshBuilder.Index( srcIndexArray[i] );
 		dstMeshBuilder.AdvanceIndex();
