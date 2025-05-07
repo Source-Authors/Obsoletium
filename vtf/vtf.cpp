@@ -219,7 +219,7 @@ unsigned short VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
 		case 2:
 			return sizeof( VTFFileHeaderV7_2_t );
 		case 3:
-			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
+			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES; //-V119
 		case VTF_MINOR_VERSION:
 		// dimhotepus: CS-GO backport.
 		case 5:
@@ -231,7 +231,7 @@ unsigned short VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
 		break;
 	
 	case VTF_X360_MAJOR_VERSION:
-		return sizeof( VTFFileHeaderX360_t ) + sizeof( ResourceEntryInfo ) * MAX_X360_RSRC_DICTIONARY_ENTRIES;
+		return sizeof( VTFFileHeaderX360_t ) + sizeof( ResourceEntryInfo ) * MAX_X360_RSRC_DICTIONARY_ENTRIES; //-V119
 	}
 
 	return 0;
@@ -1375,7 +1375,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	Q_strncpy( header.fileTypeString, "VTF", 4 );
 	header.version[0] = VTF_MAJOR_VERSION;
 	header.version[1] = VTF_MINOR_VERSION;
-	size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo );
+	const size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ); //-V119
 	Assert(headerSize <= std::numeric_limits<unsigned>::max());
 	header.headerSize = static_cast<unsigned>(headerSize);
 
@@ -2677,7 +2677,7 @@ void CVTFTexture::ComputeReflectivity( )
 			int nNumPixels = m_nWidth * m_nHeight * m_nDepth;
 
 			VectorClear( vecFaceReflect );
-			for (int i = 0; i < nNumPixels; ++i, pSrc += 4 )
+			for (int i = 0; i < nNumPixels; ++i, pSrc += 4 ) //-V112
 			{
 				vecFaceReflect[0] += TextureToLinear( pSrc[0] );
 				vecFaceReflect[1] += TextureToLinear( pSrc[1] );
@@ -2830,7 +2830,7 @@ bool CVTFTexture::ConstructLowResImage()
 	Assert( m_pLowResImageData );
 
 	CUtlMemory<unsigned char> lowResSizeImage;
-	lowResSizeImage.EnsureCapacity( m_nLowResImageWidth * m_nLowResImageHeight * 4 );
+	lowResSizeImage.EnsureCapacity( m_nLowResImageWidth * m_nLowResImageHeight * 4 ); //-V112
 
 	ImageLoader::ResampleInfo_t info;
 	info.m_pSrc = ImageData(0, 0, 0);
@@ -2900,17 +2900,17 @@ void CVTFTexture::SetupTextureEdgeIncrements(
 {
 	// Figure out the coordinates of the verts we're blending.
 	SetupFaceVert( iMipLevel, iFace1Edge, incs->iFace1Start );
-	SetupFaceVert( iMipLevel, (iFace1Edge+1)%4, incs->iFace1End );
+	SetupFaceVert( iMipLevel, (iFace1Edge+1)%4, incs->iFace1End ); //-V112
 
 	if ( bFlipFace2Edge )
 	{
-		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2Start );
+		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2Start ); //-V112
 		SetupFaceVert( iMipLevel, iFace2Edge, incs->iFace2End );
 	}
 	else
 	{
 		SetupFaceVert( iMipLevel, iFace2Edge, incs->iFace2Start );
-		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2End );
+		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2End ); //-V112
 	}
 
 	// Figure out the increments from start to end.
@@ -3063,7 +3063,7 @@ void CVTFTexture::BuildCubeMapMatchLists(
 	int nTotalEdgesMatched = 0;
 	for ( int iFace = 0; iFace < 6; iFace++ )
 	{
-		for ( int iEdge=0; iEdge < 4; iEdge++ )
+		for ( int iEdge=0; iEdge < 4; iEdge++ ) //-V112
 		{
 			int i1 = faceVertsList[iFace][iEdge];
 			int i2 = faceVertsList[iFace][(iEdge+1)%4];
