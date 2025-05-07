@@ -126,7 +126,7 @@ static ImageFormat GetImageFormat( IDirect3DBaseTexture* pTexture )
 	}
 
 	// Bogus baby!
-	return (ImageFormat)-1;
+	return IMAGE_FORMAT_UNKNOWN;
 }
 
 
