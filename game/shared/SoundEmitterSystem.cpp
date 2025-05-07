@@ -1170,7 +1170,17 @@ void CBaseEntity::EmitSound( const char *soundname, float soundtime /*= 0.0f*/, 
 	params.m_pflSoundDuration = duration;
 	params.m_bWarnOnDirectWaveReference = true;
 
-	EmitSound( filter, entindex(), params );
+	// dimhotepus: See https://github.com/ValveSoftware/source-sdk-2013/pull/936
+	int iEntIndex = entindex();
+#if defined( CLIENT_DLL )
+	if ( iEntIndex == -1 )
+	{
+		// If we're a clientside entity, we need to use the soundsourceindex instead of the entindex
+		iEntIndex = GetSoundSourceIndex();
+	}
+#endif
+
+	EmitSound( filter, iEntIndex, params );
 }
 
 //-----------------------------------------------------------------------------
@@ -1190,7 +1200,17 @@ void CBaseEntity::EmitSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle, 
 	params.m_pflSoundDuration = duration;
 	params.m_bWarnOnDirectWaveReference = true;
 
-	EmitSound( filter, entindex(), params, handle );
+	// dimhotepus: See https://github.com/ValveSoftware/source-sdk-2013/pull/936
+	int iEntIndex = entindex();
+#if defined( CLIENT_DLL )
+	if ( iEntIndex == -1 )
+	{
+		// If we're a clientside entity, we need to use the soundsourceindex instead of the entindex
+		iEntIndex = GetSoundSourceIndex();
+	}
+#endif
+
+	EmitSound( filter, iEntIndex, params, handle );
 }
 
 //-----------------------------------------------------------------------------
