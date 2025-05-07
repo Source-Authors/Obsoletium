@@ -226,7 +226,7 @@ public:
 	void FixCubemapFaceOrientation( ) override;
 
 	// Normalize the top mip level if necessary
-	virtual void NormalizeTopMipLevel();
+	void NormalizeTopMipLevel();
 	
 	// Generates mipmaps from the base mip levels
 	void GenerateMipmaps() override;

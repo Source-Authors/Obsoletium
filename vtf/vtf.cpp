@@ -823,15 +823,15 @@ const void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) cons
 			return rms.m_pData;
 		}
 
-			if ( pDataSize )
-			{
-				*pDataSize = sizeof( pInfo->resData );
-			}
-		return &pInfo->resData;
-		}
-
 		if ( pDataSize )
-			*pDataSize = 0;
+		{
+			*pDataSize = sizeof( pInfo->resData );
+		}
+		return &pInfo->resData;
+	}
+
+	if ( pDataSize )
+		*pDataSize = 0;
 
 	return nullptr;
 }
