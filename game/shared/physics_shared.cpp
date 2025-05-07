@@ -917,10 +917,8 @@ void PhysForceClearVelocity( IPhysicsObject *pPhys )
 {
 	IPhysicsFrictionSnapshot *pSnapshot = pPhys->CreateFrictionSnapshot();
 	// clear the velocity of the rigid body
-	Vector vel;
-	AngularImpulse angVel;
-	vel.Init();
-	angVel.Init();
+	Vector vel{0.0f, 0.0f, 0.0f};
+	AngularImpulse angVel{0.0f, 0.0f, 0.0f};
 	pPhys->SetVelocity( &vel, &angVel );
 	// now clear the "strain" stored in the contact points
 	while ( pSnapshot->IsValid() )
