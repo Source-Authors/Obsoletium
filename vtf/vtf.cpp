@@ -2603,20 +2603,18 @@ void CVTFTexture::GenerateMipmaps()
 		{
 			for ( int iFace = 0; iFace < m_nFaceCount; ++iFace )
 			{
-				unsigned char *pSrcLevel = ImageData( iFrame, iFace, nSrcMipLevel );
 				unsigned char *pDstLevel = ImageData( iFrame, iFace, iMipLevel );
 
-				info.m_pSrc = pSrcLevel;
+				info.m_pSrc = ImageData( iFrame, iFace, nSrcMipLevel );
 				info.m_pDest = pDstLevel;
+
 				ComputeMipLevelDimensions( nSrcMipLevel, &info.m_nSrcWidth, &info.m_nSrcHeight, &info.m_nSrcDepth );
-				if( m_Format == IMAGE_FORMAT_RGB323232F )
-				{
-					ImageLoader::ResampleRGB323232F( info );
-				}
-				else
-				{
-					ImageLoader::ResampleRGBA8888( info );
-				}
+
+				[[maybe_unused]] const bool ok = m_Format == IMAGE_FORMAT_RGB323232F
+					? ImageLoader::ResampleRGB323232F( info )
+					: ImageLoader::ResampleRGBA8888( info );
+				AssertMsg(ok, "Unable to resample image of format 0x%x.", m_Format);
+				if (!ok) Warning("Unable to resample image of format 0x%x.", m_Format);
 				if ( Flags() & TEXTUREFLAGS_NORMAL )
 				{
 					ImageLoader::NormalizeNormalMapRGBA8888( pDstLevel, info.m_nDestWidth * info.m_nDestHeight * info.m_nDestDepth );
