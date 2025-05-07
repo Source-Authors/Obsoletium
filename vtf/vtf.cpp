@@ -1372,7 +1372,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 
 	VTFFileHeader_t header;
 	memset( &header, 0, sizeof( header ) );
-	Q_strncpy( header.fileTypeString, "VTF", 4 );
+	V_strcpy_safe( header.fileTypeString, "VTF" );
 	header.version[0] = VTF_MAJOR_VERSION;
 	header.version[1] = VTF_MINOR_VERSION;
 	const size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ); //-V119
