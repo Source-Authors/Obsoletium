@@ -20,7 +20,7 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #ifndef INCLUDED_FILEASSOCIATION
 #define INCLUDED_FILEASSOCIATION
@@ -28,7 +28,7 @@
 
 
 #ifndef INCLUDED_MXWINDOW
-#include <mxtk/mxWindow.h>
+#include <mxtk/mxwindow.h>
 #endif
 
 

@@ -20,7 +20,7 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +32,8 @@
 #include "StudioModel.h"
 #include "ControlPanel.h"
 #include "FileAssociation.h"
-
+#include <shellapi.h>
+#include <mmsystem.h>
 
 
 int
@@ -97,8 +98,8 @@ pak_ExtractFile (const char *pakFile, const char *lumpName, char *outFile)
 PAKViewer::PAKViewer (mxWindow *window)
 : mxWindow (window, 0, 0, 0, 0, "", mxWindow::Normal)
 {
-	strcpy (d_pakFile, "");
-	strcpy (d_currLumpName, "");
+	V_strcpy_safe (d_pakFile, "");
+	V_strcpy_safe (d_currLumpName, "");
 
 	tvPAK = new mxTreeView (this, 0, 0, 0, 0, IDC_PAKVIEWER);
 	pmMenu = new mxPopupMenu ();
@@ -126,13 +127,14 @@ PAKViewer::~PAKViewer ()
 
 
 
+template<intp strSize>
 void
-_makeTempFileName (char *str, const char *suffix)
+_makeTempFileName (char (&str)[strSize], const char *suffix)
 {
-	strcpy (str, mx_gettemppath ());
+	V_strncpy (str, mx_gettemppath (), strSize);
 
-	strcat (str, "/hltempmodel");
-	strcat (str, suffix);
+	V_strncat (str, "/hltempmodel", strSize);
+	V_strncat (str, suffix, strSize);
 }
 
 
@@ -182,7 +184,7 @@ PAKViewer::handleEvent (mxEvent *event)
 				OnPAKViewer ();
 				char e[16];
 
-				strncpy (e, mx_getextension (d_currLumpName), 16);
+				V_strcpy_safe (e, mx_getextension (d_currLumpName));
 				int mode = g_FileAssociation->getMode (&e[1]);
 				if (mode == -1)
 					return 1;
@@ -200,11 +202,14 @@ PAKViewer::handleEvent (mxEvent *event)
 					{
 						if (program)
 						{
-							char path[256];
-							strcpy (path, program);
-							strcat (path, " ");
-							strcat (path, str);
-							if ((int) WinExec (path, SW_SHOW) <= 32)
+							const char *argv[] =
+							{
+								program,
+								str,
+								nullptr
+							};
+
+							if (_spawnv( _P_NOWAIT, program, argv ) == -1)
 								mxMessageBox (this, "Error executing specified program.", g_appTitle, MX_MB_OK | MX_MB_ERROR);
 						}
 					}
@@ -218,7 +223,7 @@ PAKViewer::handleEvent (mxEvent *event)
 					if (!pak_ExtractFile (d_pakFile, d_currLumpName, str))
 						mxMessageBox (this, "Error extracting from PAK file.", g_appTitle, MX_MB_OK | MX_MB_ERROR);
 					else
-						if ((int) ShellExecute ((HWND) getHandle (), "open", str, 0, 0, SW_SHOW) <= 32)
+						if ((int)(intp)ShellExecute ((HWND) getHandle (), "open", str, 0, 0, SW_SHOW) <= 32)
 							mxMessageBox (this, "Error executing document with associated program.", g_appTitle, MX_MB_OK | MX_MB_ERROR);
 				}
 
@@ -264,26 +269,26 @@ PAKViewer::OnPAKViewer ()
 	mxTreeViewItem *tvi = tvPAK->getSelectedItem ();
 	if (tvi)
 	{
-		strcpy (d_currLumpName, tvPAK->getLabel (tvi));
+		V_strcpy_safe (d_currLumpName, tvPAK->getLabel (tvi));
 
 		// find the full lump name
 		mxTreeViewItem *tviParent = tvPAK->getParent (tvi);
 		char tmp[128];
 		while (tviParent)
 		{
-			strcpy (tmp, d_currLumpName);
-			strcpy (d_currLumpName, tvPAK->getLabel (tviParent));
-			strcat (d_currLumpName, "/");
-			strcat (d_currLumpName, tmp);
+			V_strcpy_safe (tmp, d_currLumpName);
+			V_strcpy_safe (d_currLumpName, tvPAK->getLabel (tviParent));
+			V_strcat_safe (d_currLumpName, "/");
+			V_strcat_safe (d_currLumpName, tmp);
 			tviParent = tvPAK->getParent (tviParent);
 		}
 
 		if (!d_loadEntirePAK)
 		{
 			// finally insert "models/"
-			strcpy (tmp, d_currLumpName);
-			strcpy (d_currLumpName, "models/");
-			strcat (d_currLumpName, tmp);
+			V_strcpy_safe (tmp, d_currLumpName);
+			V_strcpy_safe (d_currLumpName, "models/");
+			V_strcat_safe (d_currLumpName, tmp);
 		}
 	}
 
@@ -297,7 +302,7 @@ int PAKViewer::OnLoadModel ()
 	static char str2[256];
 	char suffix[16];
 
-	strcpy (suffix, ".mdl");
+	V_strcpy_safe(suffix, ".mdl");
 	_makeTempFileName (str2, suffix);
 
 	if (!pak_ExtractFile (d_pakFile, d_currLumpName, str2))
@@ -324,7 +329,7 @@ int PAKViewer::OnLoadTexture (int pos)
 	char suffix[16] = "";
 
 	if (strstr (d_currLumpName, ".tga"))
-		sprintf (suffix, "%d%s", pos, ".tga");
+		V_sprintf_safe (suffix, "%d%s", pos, ".tga");
 
 	_makeTempFileName (str2, suffix);
 
@@ -360,7 +365,7 @@ PAKViewer::OnPlaySound ()
 	PlaySound (0, 0, SND_FILENAME | SND_ASYNC);
 
 	if (strstr (d_currLumpName, ".wav"))
-		sprintf (suffix, "%d%s", 44, ".wav");
+		V_sprintf_safe (suffix, "%d%s", 44, ".wav");
 
 	_makeTempFileName (str2, suffix);
 
@@ -444,7 +449,7 @@ PAKViewer::openPAKFile (const char *pakFile)
 	qsort (lumps, numLumps, sizeof (lump_t), _compare);
 
 	// save pakFile for later
-	strcpy (d_pakFile, pakFile);
+	V_strcpy_safe(d_pakFile, pakFile);
 
 	tvPAK->remove (0);
 
@@ -452,7 +457,7 @@ PAKViewer::openPAKFile (const char *pakFile)
 	mxTreeViewItem *tvistack[32];
 	for (int k = 0; k < 32; k++)
 	{
-		strcpy (namestack[k], "");
+		V_strcpy_safe(namestack[k], "");
 		tvistack[k] = 0;
 	}
 
@@ -475,7 +480,7 @@ PAKViewer::openPAKFile (const char *pakFile)
 
 				if (strcmp (namestack[i], tok))
 				{
-					strcpy (namestack[i], tok);
+					V_strcpy_safe(namestack[i], tok);
 /*
 					if (i == 0)
 						tvistack[i] = tvPAK->add (0, tok);
@@ -484,7 +489,7 @@ PAKViewer::openPAKFile (const char *pakFile)
 
 					for (int j = i + 1; j < 32; j++)
 					{
-						strcpy (namestack[j], "");
+						namestack[j][0] = '\0';
 						tvistack[j] = 0;
 					}
 				}
@@ -511,6 +516,6 @@ PAKViewer::openPAKFile (const char *pakFile)
 void
 PAKViewer::closePAKFile ()
 {
-	strcpy (d_pakFile, "");
+	d_pakFile[0] = '\0';
 	setVisible (false);
 }

@@ -20,9 +20,17 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include "ControlPanel.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <mxtk/mx.h>
+#include <mxtk/mxBmp.h>
+
 #include "ViewerSettings.h"
 #include "StudioModel.h"
 #include "IStudioRender.h"
@@ -30,23 +38,18 @@
 #include "vphysics/constraints.h"
 #include "physmesh.h"
 #include "sys.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <mxtk/mx.h>
-#include <mxtk/mxBmp.h>
 #include "vphysics_interface.h"
 #include "utlvector.h"
 #include "utlsymbol.h"
 #include "UtlBuffer.h"
 #include "attachments_window.h"
-#include "istudiorender.h"
 #include "studio_render.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "tier1/KeyValues.h"
 #include "tier0/icommandline.h"
 #include "valve_ipc_win32.h"
 #include "mdlviewer.h"
+
 
 extern char g_appTitle[];
 extern IPhysicsSurfaceProps *physprop;
@@ -197,7 +200,7 @@ void SetFrameString( mxLineEdit2 *pLineEdit, int iLayer )
 	int nFrame = int( flFrame + 0.5f );
 
 	char msg[ 16 ];
-	sprintf( msg, "%d", nFrame );
+	V_sprintf_safe( msg, "%d", nFrame );
 	pLineEdit->setText( msg );
 }
 
@@ -584,7 +587,7 @@ void CBoneControlWindow::ComputeHitboxList( )
 			for (int i = 0; i < count; ++i )
 			{
 				char buf[32];
-				sprintf( buf, "%d", m_SetBoneHitBoxes[ m_nHitboxSet ][m_Bone][i] );
+				V_sprintf_safe( buf, "%d", m_SetBoneHitBoxes[ m_nHitboxSet ][m_Bone][i] );
 				m_cHitbox->add( buf );
 			}
 		}
@@ -907,7 +910,7 @@ void CBoneControlWindow::OnAddHitbox( )
 	m_SetBoneHitBoxes[ m_nHitboxSet ][m_Bone].AddToTail(i);
 
 	char buf[32];
-	sprintf(buf, "%d", i );
+	V_sprintf_safe(buf, "%d", i );
 	m_cHitbox->add ( buf );
 	OnHitboxSelected(m_SetBoneHitBoxes[ m_nHitboxSet ][m_Bone].Count() - 1);
 }
@@ -1044,7 +1047,7 @@ bool CBoneControlWindow::SerializeQC( CUtlBuffer& buf )
 //-----------------------------------------------------------------------------
 void CBoneControlWindow::OnGenerateQC( )
 {
-	CUtlBuffer outbuf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer outbuf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	SerializeQC( outbuf );
 	if ( outbuf.TellPut() )
 	{
@@ -1060,7 +1063,7 @@ void CBoneControlWindow::OnGenerateQC( )
 void CBoneControlWindow::OnHitboxAddSet( void )
 {
 	char sz[ 32 ];
-	sprintf( sz, "set%02i", g_pStudioModel->m_HitboxSets.Count() + 1 );
+	V_sprintf_safe( sz, "set%02i", g_pStudioModel->m_HitboxSets.Count() + 1 );
 
 	int newsetnumber = g_pStudioModel->m_HitboxSets.AddToTail();
 	g_pStudioModel->m_HitboxSets[ newsetnumber ].m_Name = sz;
@@ -1102,7 +1105,7 @@ void CBoneControlWindow::OnHitboxSetChangeName( void )
 
 	char newname[ 512 ];
 
-	strcpy( newname, m_eHitboxSetName->getLabel() );
+	V_strcpy_safe( newname, m_eHitboxSetName->getLabel() );
 	if ( !newname[ 0 ] )
 		return;
 
@@ -1735,12 +1738,12 @@ void ControlPanel::BuildEventQCString()
 		return;
 
 	char qcstr[ 256 ];
-	Q_strcpy( qcstr, "{ event AE_CL_PLAYSOUND " );
-	Q_strcat( qcstr, leEventSoundFrame->getLabel(), sizeof(qcstr) );
-	Q_strcat( qcstr, " \"", sizeof(qcstr) );
+	V_strcpy_safe( qcstr, "{ event AE_CL_PLAYSOUND " );
+	V_strcat_safe( qcstr, leEventSoundFrame->getLabel() );
+	V_strcat_safe( qcstr, " \"" );
 	int i = lbEventSoundName->getSelectedIndex();
-	Q_strcat( qcstr, lbEventSoundName->getItemText( i ), sizeof(qcstr) );
-	Q_strcat( qcstr, "\" }", sizeof(qcstr) );
+	V_strcat_safe( qcstr, lbEventSoundName->getItemText( i ) );
+	V_strcat_safe( qcstr, "\" }" );
 
 	leEventQCString->setText( qcstr );
 }
@@ -1751,53 +1754,53 @@ void ControlPanel::BuildIKRuleQCString()
 		return;
 
 	char qcstr[ 256 ];
-	Q_strcpy( qcstr, "ikrule " );
-	Q_strcat( qcstr, cIKChain->getLabel(), sizeof(qcstr) );
-	Q_strcat( qcstr, " ", sizeof(qcstr) );
+	V_strcpy_safe( qcstr, "ikrule " );
+	V_strcat_safe( qcstr, cIKChain->getLabel() );
+	V_strcat_safe( qcstr, " " );
 	const char *pType = cIKType->getLabel();
-	Q_strcat( qcstr, pType, sizeof(qcstr) );
+	V_strcat_safe( qcstr, pType );
 
 	if ( Q_strcmp( pType, "touch" ) == 0 )
 	{
-		Q_strcat( qcstr, " \"", sizeof(qcstr) );
+		V_strcat_safe( qcstr, " \"" );
 		if ( cIKTouch->getSelectedIndex() > 0 )
 		{
-			Q_strcat( qcstr, cIKTouch->getLabel(), sizeof(qcstr) );
+			V_strcat_safe( qcstr, cIKTouch->getLabel() );
 		}
-		Q_strcat( qcstr, "\"", sizeof(qcstr) );
+		V_strcat_safe( qcstr, "\"" );
 	}
 	else if ( Q_strcmp( pType, "attachment" ) == 0 )
 	{
-		Q_strcat( qcstr, " \"", sizeof(qcstr) );
-		Q_strcat( qcstr, leIKAttachment->getLabel(), sizeof(qcstr) );
-		Q_strcat( qcstr, "\"", sizeof(qcstr) );
+		V_strcat_safe( qcstr, " \"" );
+		V_strcat_safe( qcstr, leIKAttachment->getLabel() );
+		V_strcat_safe( qcstr, "\"" );
 	}
 
 	if ( cbIKRangeToggle->isChecked() )
 	{
-		Q_strcat( qcstr, " range ", sizeof(qcstr) );
+		V_strcat_safe( qcstr, " range " );
 
 		char str[ 20 ];
 		leIKRangeStart->getText( str, sizeof( str ) );
-		Q_strcat( qcstr, str, sizeof(qcstr) );
-		Q_strcat( qcstr, " ", sizeof(qcstr) );
+		V_strcat_safe( qcstr, str );
+		V_strcat_safe( qcstr, " " );
 		leIKRangePeak->getText( str, sizeof( str ) );
-		Q_strcat( qcstr, str, sizeof(qcstr) );
-		Q_strcat( qcstr, " ", sizeof(qcstr) );
+		V_strcat_safe( qcstr, str );
+		V_strcat_safe( qcstr, " " );
 		leIKRangeTail->getText( str, sizeof( str ) );
-		Q_strcat( qcstr, str, sizeof(qcstr) );
-		Q_strcat( qcstr, " ", sizeof(qcstr) );
+		V_strcat_safe( qcstr, str );
+		V_strcat_safe( qcstr, " " );
 		leIKRangeEnd->getText( str, sizeof( str ) );
-		Q_strcat( qcstr, str, sizeof(qcstr) );
+		V_strcat_safe( qcstr, str );
 	}
 
 	if ( cbIKContactToggle->isChecked() )
 	{
-		Q_strcat( qcstr, " contact ", sizeof(qcstr) );
+		V_strcat_safe( qcstr, " contact " );
 
 		char str[ 20 ];
 		leIKContactFrame->getText( str, sizeof( str ) );
-		Q_strcat( qcstr, str, sizeof(qcstr) );
+		V_strcat_safe( qcstr, str );
 	}
 
 	int nUsing = cIKUsing->getSelectedIndex();
@@ -1805,11 +1808,11 @@ void ControlPanel::BuildIKRuleQCString()
 	{
 		if ( nUsing == 1 ) // source
 		{
-			Q_strcat( qcstr, " usesource", sizeof(qcstr) );
+			V_strcat_safe( qcstr, " usesource" );
 		}
 		else if ( nUsing == 2 ) // sequence
 		{
-			Q_strcat( qcstr, " usesequence", sizeof(qcstr) );
+			V_strcat_safe( qcstr, " usesequence" );
 		}
 	}
 
@@ -2157,7 +2160,7 @@ ControlPanel::handleEvent (mxEvent *event)
 		case IDC_BLENDTIME:
 			{
 				char sz[ 256 ];
-				sprintf( sz, "%.2f s", (float)((mxSlider *) event->widget)->getValue() );
+				V_sprintf_safe( sz, "%.2f s", (float)((mxSlider *) event->widget)->getValue() );
 
 				g_pStudioModel->SetBlendTime( ((mxSlider *) event->widget)->getValue() );
 				laBlendTime->setLabel( sz );
@@ -2746,7 +2749,7 @@ ControlPanel::setLOD( int index, bool setLODchoice, bool force )
 	g_viewerSettings.lod = index;
 	float lodSwitch = g_pStudioModel->GetLODSwitchValue( index );
 	char tmp[128];
-	sprintf( tmp, "%0.0f", lodSwitch );
+	V_sprintf_safe( tmp, "%0.0f", lodSwitch );
 	leLODSwitch->setLabel( tmp );
 	HWND wnd = ( HWND )leLODSwitch->getHandle();
 	if( setLODchoice )
@@ -2769,7 +2772,7 @@ ControlPanel::setLODMetric( float metric )
 	}
 	saveMetric = intMetric;
 	char tmp[128];
-	sprintf( tmp, "%d", intMetric );
+	V_sprintf_safe( tmp, "%d", intMetric );
 	lLODMetric->setLabel( tmp );
 }
 
@@ -2783,7 +2786,7 @@ ControlPanel::setPolycount( int polycount )
 	}
 	savePolycount = polycount;
 	char tmp[128];
-	sprintf( tmp, "Shader Draw Count: %d", polycount );
+	V_sprintf_safe( tmp, "Shader Draw Count: %d", polycount );
 	lModelInfo3->setLabel( tmp );
 }
 
@@ -2803,7 +2806,7 @@ void ControlPanel::setModelInfo( int nVertCount, int nIndexCount, int nTriCount 
 	nSaveTriCount = nTriCount;
 
 	char tmp[ 128 ];
-	sprintf( tmp, "Verts: %d  Indexes: %d  Triangles: %d", nVertCount, nIndexCount, nTriCount );
+	V_sprintf_safe( tmp, "Verts: %d  Indexes: %d  Triangles: %d", nVertCount, nIndexCount, nTriCount );
 	lModelInfo4->setLabel( tmp );
 }
 
@@ -2816,7 +2819,7 @@ ControlPanel::setTransparent( bool isTransparent )
 
 	saveTransparent = isTransparent;
 	char tmp[128];
-	sprintf( tmp, "Model is: %s", isTransparent ? "transparent" : "opaque" );
+	V_sprintf_safe( tmp, "Model is: %s", isTransparent ? "transparent" : "opaque" );
 	lModelInfo5->setLabel( tmp );
 }
 
@@ -3133,7 +3136,7 @@ void ControlPanel::updateGroundSpeed( void )
 {
 	char sz[100];
 	float flGroundSpeed = g_pStudioModel->GetCurrentVelocity();
-	sprintf( sz, "Speed: %.2f", flGroundSpeed );
+	V_sprintf_safe( sz, "Speed: %.2f", flGroundSpeed );
 	laGroundSpeed->setLabel( sz );
 }
 
@@ -3157,7 +3160,7 @@ void ControlPanel::startBlending( void )
 void ControlPanel::updateTransitionAmount( void )
 {
 	char sz[ 256 ];
-	sprintf( sz, "%.3f %%", 100.0f * g_pStudioModel->GetTransitionAmount() );
+	V_sprintf_safe( sz, "%.3f %%", 100.0f * g_pStudioModel->GetTransitionAmount() );
 	laBlendAmount->setLabel( sz );
 }
 
@@ -3175,7 +3178,7 @@ void ControlPanel::setFrame( float frame )
 	int iLayer = getFrameSelection();
 	int iFrame = g_pStudioModel->SetFrame( iLayer, frame );
 	char buf[128];
-	sprintf(buf, "%3d", iFrame );
+	V_sprintf_safe(buf, "%3d", iFrame );
 	lForcedFrame->setLabel( buf );
 }
 
@@ -3193,7 +3196,7 @@ void ControlPanel::updateFrameSlider( void )
 	int iLayer = getFrameSelection();
 	float flFrame = g_pStudioModel->GetFrame( iLayer );
 	char buf[128];
-	sprintf(buf, "%3.1f", flFrame );
+	V_sprintf_safe(buf, "%3.1f", flFrame );
 	lForcedFrame->setLabel( buf );
 	slForceFrame->setValue( flFrame );
 }
@@ -3210,7 +3213,7 @@ void ControlPanel::setSpeedScale( float scale )
 void ControlPanel::updateSpeedScale( void )
 {
 	char szFPS[32];
-	sprintf( szFPS, "x %.2f = %.1f fps", g_viewerSettings.speedScale, g_viewerSettings.speedScale * g_pStudioModel->GetFPS( ) );
+	V_sprintf_safe( szFPS, "x %.2f = %.1f fps", g_viewerSettings.speedScale, g_viewerSettings.speedScale * g_pStudioModel->GetFPS( ) );
 	laFPS->setLabel( szFPS );
 }
 
@@ -3245,7 +3248,7 @@ ControlPanel::initBodypartChoices()
 			for (i = 0; i < pbodyparts[0].nummodels; i++)
 			{
 				char str[64];
-				sprintf (str, "Submodel %d", i );
+				V_sprintf_safe (str, "Submodel %d", i );
 				cSubmodel->add (str);
 			}
 			cSubmodel->select (0);
@@ -3271,7 +3274,7 @@ ControlPanel::setBodypart (int index)
 			for (int i = 0; i < pbodyparts[index].nummodels; i++)
 			{
 				char str[64];
-				sprintf (str, "Submodel %d", i );
+				V_sprintf_safe (str, "Submodel %d", i );
 				cSubmodel->add (str);
 			}
 			cSubmodel->select (0);
@@ -3312,7 +3315,7 @@ ControlPanel::initLODs()
 	for ( int i = 0; i < g_pStudioModel->GetNumLODs(); i++ )
 	{
 		char tmp[10];
-		sprintf( tmp, "%d", i );
+		V_sprintf_safe( tmp, "%d", i );
 		cLODChoice->add( tmp );
 	}
 	setLOD( 0, true, true );
@@ -3333,7 +3336,7 @@ ControlPanel::initBoneControllers()
 		{
 			char str[32];
 			mstudiobonecontroller_t *pbonecontroller = hdr->pBonecontroller(i);
-			sprintf (str, "Controller %d", pbonecontroller->inputfield);
+			V_sprintf_safe (str, "Controller %d", pbonecontroller->inputfield);
 			cController->add (str);
 		}
 
@@ -3388,7 +3391,7 @@ ControlPanel::initSkinChoices()
 		for (int i = 0; i < hdr->numskinfamilies(); i++)
 		{
 			char str[32];
-			sprintf (str, "Skin %d", i );
+			V_sprintf_safe (str, "Skin %d", i );
 			cSkin->add (str);
 		}
 
@@ -3412,7 +3415,7 @@ void ControlPanel::initMaterialChoices()
 			for (int i = 0; i < pStudioHdr->numtextures; i++)
 			{
 				char str[512];
-				sprintf (str, "%s", pStudioHdr->pTexture(i)->pszName() );
+				V_sprintf_safe (str, "%s", pStudioHdr->pTexture(i)->pszName() );
 				cMaterials->add (str);
 			}
 
@@ -3439,7 +3442,7 @@ void ControlPanel::showActivityModifiers( int sequence )
 	for (int i = 0; i < desc.numactivitymodifiers; i++)
 	{
 		char str[512];
-		sprintf (str, "%s", desc.pActivityModifier( i )->pszName() );
+		V_sprintf_safe (str, "%s", desc.pActivityModifier( i )->pszName() );
 		cActivityModifiers->add (str);
 	}
 
@@ -3478,7 +3481,7 @@ ControlPanel::setModelInfo()
 		hbcount += hdr->iHitboxCount( s );
 	}
 	
-	sprintf (str,
+	V_sprintf_safe (str,
 		"Total bones: %d\n"
 		"HW Bones: %d\n"
 		"Batches: %d\n"
@@ -3496,7 +3499,7 @@ ControlPanel::setModelInfo()
 
 	lModelInfo1->setLabel (str);
 
-	sprintf (str,
+	V_sprintf_safe (str,
 		"Materials: %d\n"
 		"Skin Families: %d\n"
 		"Bodyparts: %d\n"
@@ -3521,15 +3524,15 @@ void ControlPanel::UpdateMaterialList( )
 		for ( int i = 0; i < nMaterials; i++ )
 		{
 			char c_MaterialLine[256];
-			Q_strcpy( c_MaterialLine, "" );
+			c_MaterialLine[0] = '\0';
 
 			if ( pMaterials[i]->IsErrorMaterial() )
 			{
-				Q_strcat( c_MaterialLine, "*** ERROR *** Model attempted to load one or more VMTs it can't find." , sizeof( c_MaterialLine ) );
+				V_strcat_safe( c_MaterialLine, "*** ERROR *** Model attempted to load one or more VMTs it can't find." );
 			}
 			else
 			{
-				Q_strcat( c_MaterialLine, pMaterials[i]->GetName() , sizeof( c_MaterialLine ) );
+				V_strcat_safe( c_MaterialLine, pMaterials[i]->GetName() );
 			}
 			cMessageList->add( c_MaterialLine );
 		}
@@ -3621,7 +3624,7 @@ void ControlPanel::setFOV( float fov )
 {
 	char buf[64];
 	g_viewerSettings.fov = fov;
-	sprintf( buf, "%.0f", fov );
+	V_sprintf_safe( buf, "%.0f", fov );
 	leFOV->setLabel( buf );
 }
 
@@ -3706,7 +3709,7 @@ static void UpdateSliderLabel( mxSlider *slider, mxLabel *label )
 {
 	float value = slider->getValue();
 	char buf[80];
-	sprintf( buf, "%0.2f", value );
+	V_sprintf_safe( buf, "%0.2f", value );
 	label->setLabel( buf );
 }
 
@@ -3841,7 +3844,7 @@ void ControlPanel::setupPhysics( void )
 	setupPhysicsBone( 0 );
 
 	char buf[64];
-	sprintf( buf, "%.2f", g_pStudioModel->Physics_GetMass() );
+	V_sprintf_safe( buf, "%.2f", g_pStudioModel->Physics_GetMass() );
 	leMass->setLabel( buf );
 
 	// Default to "None"
