@@ -249,7 +249,7 @@ public:
 	//		pnumBytes		on return is the number of bytes available in the read-only data buffer or is undefined
 	// Returns:
 	//		pointer to the resource data, or NULL
-	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const
+	virtual const void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const
 	{
 		return NULL;
 	}

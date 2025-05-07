@@ -804,7 +804,7 @@ void *CVTFTexture::SetResourceData( uint32 eType, void const *pData, size_t nNum
 	}
 }
 
-void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) const
+const void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) const
 {
 	Assert( ( eType & RSRCF_MASK ) == 0 );
 	eType &= ~RSRCF_MASK;
@@ -822,22 +822,18 @@ void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) const
 			}
 			return rms.m_pData;
 		}
-		else
-		{
+
 			if ( pDataSize )
 			{
 				*pDataSize = sizeof( pInfo->resData );
 			}
-			return (void *)&pInfo->resData;
+		return &pInfo->resData;
 		}
-	}
-	else
-	{
+
 		if ( pDataSize )
 			*pDataSize = 0;
-	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CVTFTexture::HasResourceEntry( uint32 eType ) const

@@ -285,7 +285,7 @@ public:
 	// Returns:
 	//		pointer to the resource data, or NULL. Note that the data from this pointer can disappear when
 	// the texture goes away - you want to copy this data!
-	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const;
+	virtual const void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const;
 
 	virtual intp GetApproximateVidMemBytes( void ) const;
 
@@ -653,7 +653,7 @@ public:
 	// Returns:
 	//		pointer to the resource data, or NULL. Note that the data from this pointer can disappear when
 	// the texture goes away - you want to copy this data!
-	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const { return NULL; }
+	virtual const void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const { return NULL; }
 
 	virtual intp GetApproximateVidMemBytes( void ) const { return 32; }
 
@@ -2841,31 +2841,29 @@ void CTexture::LoadLowResTexture( IVTFTexture *pTexture )
 	Assert( retVal );
 }
 
-void *CTexture::GetResourceData( uint32 eDataType, size_t *pnumBytes ) const
+const void *CTexture::GetResourceData( uint32 eDataType, size_t *pnumBytes ) const
 {
-	for ( DataChunk const *pDataChunk = m_arrDataChunks.Base(),
-		  *pDataChunkEnd = pDataChunk + m_arrDataChunks.Count();
-		  pDataChunk < pDataChunkEnd; ++pDataChunk )
+	for ( const auto &pDataChunk : m_arrDataChunks )
 	{
-		if ( ( pDataChunk->m_eType & ~RSRCF_MASK ) == eDataType )
+		if ( ( pDataChunk.m_eType & ~RSRCF_MASK ) == eDataType )
 		{
-			if ( ( pDataChunk->m_eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
+			if ( ( pDataChunk.m_eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
 			{
 				if ( pnumBytes)
-					*pnumBytes = pDataChunk->m_numBytes;
-				return pDataChunk->m_pvData;
+					*pnumBytes = pDataChunk.m_numBytes;
+				return pDataChunk.m_pvData;
 			}
-			else
-			{
-				if ( pnumBytes )
-					*pnumBytes = sizeof( pDataChunk->m_numBytes );
 
-				return ( void *)( &pDataChunk->m_numBytes );
+				if ( pnumBytes )
+				*pnumBytes = sizeof( pDataChunk.m_numBytes );
+
+			return &pDataChunk.m_numBytes;
 			}
 		}
-	}
+
 	if ( pnumBytes )
 		pnumBytes = 0;
+
 	return NULL;
 }
 
@@ -3287,7 +3285,7 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 					dc.m_eType &= ~RSRCF_MASK;
 
 					size_t numBytes;
-					if ( void *pvData = pVTFTexture->GetResourceData( dc.m_eType, &numBytes ) )
+					if ( const void *pvData = pVTFTexture->GetResourceData( dc.m_eType, &numBytes ) )
 					{
 						Assert( numBytes >= sizeof( uint32 ) );
 						if ( numBytes == sizeof( dc.m_numBytes ) )

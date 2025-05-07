@@ -198,7 +198,7 @@ public:
 
 	// find the resource data and return a pointer to it. The data pointed to by this pointer will
 	// go away when the ivtftexture does. retruns null if resource not present
-	virtual void *GetResourceData( uint32 eType, size_t *pDataSize ) const = 0;
+	virtual const void *GetResourceData( uint32 eType, size_t *pDataSize ) const = 0;
 
 	// Locates the resource entry info if it's present, easier than crawling array types
 	virtual bool HasResourceEntry( uint32 eType ) const = 0;
@@ -533,7 +533,7 @@ struct VTFFileHeaderV7_3_t : public VTFFileHeaderV7_2_t
 	char			pad4[3];
 	unsigned int	numResources;
 
-#if defined( _X360 ) || defined( POSIX )
+#if defined( POSIX )
 	// must manually align in order to maintain pack(1) expected layout with existing binaries
 	char			pad5[8];
 #endif
