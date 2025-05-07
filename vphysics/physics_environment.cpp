@@ -489,8 +489,7 @@ public:
 		}
 			
 
-		CPhysicsCollisionData data(contact);
-		m_event.pInternalData = &data;
+		m_event.pInternalData = std::make_shared<CPhysicsCollisionData>(contact);
 
 		// clear out any static object collisions unless flagged to keep them
 		if ( contact->objects[0]->get_movement_state() == IVP_MT_STATIC )
@@ -536,8 +535,7 @@ public:
 
 		float collisionSpeed = contact->speed.dot_product(&contact->surf_normal);
 		m_event.collisionSpeed = ConvertDistanceToHL( fabs(collisionSpeed) );
-		CPhysicsCollisionData data(contact);
-		m_event.pInternalData = &data;
+		m_event.pInternalData = std::make_shared<CPhysicsCollisionData>(contact);
 
 		m_pCallback->PostCollision( &m_event );
 	}
@@ -1192,7 +1190,7 @@ CPhysicsEnvironment::~CPhysicsEnvironment( void )
 		PhantomRemove( pObject );
 		delete pObject;
 	}
-		
+
 	m_objects.RemoveAll();
 	ClearDeadObjects();
 
@@ -1957,34 +1955,34 @@ void CPhysicsEnvironment::ReadStats( physics_stats_t *pOutput )
 		return;
 
 	IVP_Statistic_Manager *stats = m_pPhysEnv->get_statistic_manager();
-		pOutput->maxRescueSpeed = ConvertDistanceToHL( stats->max_rescue_speed );
-		pOutput->maxSpeedGain = ConvertDistanceToHL( stats->max_speed_gain );
-		pOutput->impactSysNum = stats->impact_sys_num;
-		pOutput->impactCounter = stats->impact_counter;
-		pOutput->impactSumSys = stats->impact_sum_sys;
-		pOutput->impactHardRescueCount = stats->impact_hard_rescue_counter;
-		pOutput->impactRescueAfterCount = stats->impact_rescue_after_counter;
+	pOutput->maxRescueSpeed = ConvertDistanceToHL( stats->max_rescue_speed );
+	pOutput->maxSpeedGain = ConvertDistanceToHL( stats->max_speed_gain );
+	pOutput->impactSysNum = stats->impact_sys_num;
+	pOutput->impactCounter = stats->impact_counter;
+	pOutput->impactSumSys = stats->impact_sum_sys;
+	pOutput->impactHardRescueCount = stats->impact_hard_rescue_counter;
+	pOutput->impactRescueAfterCount = stats->impact_rescue_after_counter;
 	
-		pOutput->impactDelayedCount = stats->impact_delayed_counter;
-		pOutput->impactCollisionChecks = stats->impact_coll_checks;
-		pOutput->impactStaticCount = stats->impact_unmov;
+	pOutput->impactDelayedCount = stats->impact_delayed_counter;
+	pOutput->impactCollisionChecks = stats->impact_coll_checks;
+	pOutput->impactStaticCount = stats->impact_unmov;
 
-		pOutput->totalEnergyDestroyed = stats->sum_energy_destr;
-		pOutput->collisionPairsTotal = stats->sum_of_mindists;
-		pOutput->collisionPairsCreated = stats->mindists_generated;
-		pOutput->collisionPairsDestroyed = stats->mindists_deleted;
+	pOutput->totalEnergyDestroyed = stats->sum_energy_destr;
+	pOutput->collisionPairsTotal = stats->sum_of_mindists;
+	pOutput->collisionPairsCreated = stats->mindists_generated;
+	pOutput->collisionPairsDestroyed = stats->mindists_deleted;
 
-		pOutput->potentialCollisionsObjectVsObject = stats->range_intra_exceeded;
-		pOutput->potentialCollisionsObjectVsWorld = stats->range_world_exceeded;
+	pOutput->potentialCollisionsObjectVsObject = stats->range_intra_exceeded;
+	pOutput->potentialCollisionsObjectVsWorld = stats->range_world_exceeded;
 
-		pOutput->frictionEventsProcessed = stats->processed_fmindists;
-	}
+	pOutput->frictionEventsProcessed = stats->processed_fmindists;
+}
 
 void CPhysicsEnvironment::ClearStats()
 {
 	IVP_Statistic_Manager *stats = m_pPhysEnv->get_statistic_manager();
-		stats->clear_statistic();
-	}
+	stats->clear_statistic();
+}
 
 void CPhysicsEnvironment::EnableConstraintNotify( bool bEnable )
 {

@@ -19,6 +19,7 @@
 #include "mathlib/vector4d.h"
 #include "vcollide.h"
 
+#include <memory>
 
 // ------------------------------------------------------------------------------------
 // UNITS:
@@ -366,7 +367,8 @@ struct vcollisionevent_t
 	float			deltaCollisionTime;
 
 	float			collisionSpeed;				// only valid at postCollision
-	IPhysicsCollisionData *pInternalData;		// may change pre/post collision
+	// dimhotepus: Should own data as accessed in multiple times.
+	std::shared_ptr<IPhysicsCollisionData> pInternalData;		// may change pre/post collision
 };
 
 abstract_class IPhysicsCollisionEvent
