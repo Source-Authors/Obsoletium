@@ -143,14 +143,6 @@ static ConVar r_pix_recordframes( "r_pix_recordframes", "0" );
 
 #define D3DDeviceWrapper IDirect3DDevice9
 
-//-----------------------------------------------------------------------------
-// Some important enumerations
-//-----------------------------------------------------------------------------
-enum
-{
-	MAX_VERTEX_TEXTURE_COUNT = 4,
-};
-
 
 //-----------------------------------------------------------------------------
 // These board states change with high frequency; are not shadowed
@@ -305,7 +297,7 @@ struct DynamicState_t
 	SamplerState_t m_SamplerState[MAX_SAMPLERS];
 
 	// Vertex texture stage state
-	VertexTextureState_t m_VertexTextureState[MAX_VERTEX_TEXTURE_COUNT];
+	VertexTextureState_t m_VertexTextureState[SHADER_VERTEXTEXTURE_COUNT];
 
 	DWORD m_RenderState[MAX_NUM_RENDERSTATES];
 
@@ -385,7 +377,7 @@ enum CommitShaderType_t
 	}
 
 #define ADD_VERTEX_TEXTURE_FUNC( _func, _shader, _func_name, _stage, _state, _val )	\
-	Assert( _stage >= SHADER_VERTEXTEXTURE_SAMPLER0 && _stage < MAX_VERTEX_TEXTURE_COUNT );							\
+	Assert( _stage >= SHADER_VERTEXTEXTURE_SAMPLER0 && _stage < SHADER_VERTEXTEXTURE_COUNT );							\
 	if ( m_bResettingRenderState || (m_DesiredState.m_VertexTextureState[_stage]._state != _val) )	\
 	{																		\
 		m_DesiredState.m_VertexTextureState[_stage]._state = _val;		\
