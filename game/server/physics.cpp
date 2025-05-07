@@ -1860,21 +1860,20 @@ void CCollisionEvent::PreCollision( vcollisionevent_t *pEvent )
 void CCollisionEvent::PostCollision( vcollisionevent_t *pEvent )
 {
 	CallbackContext check(this);
-	bool isShadow[2] = {false,false};
-	int i;
+	bool isShadow[2] = {false, false};
 
-	for ( i = 0; i < 2; i++ )
+	for ( int i = 0; i < 2; i++ )
 	{
 		IPhysicsObject *pObject = pEvent->pObjects[i];
 		if ( pObject )
 		{
-			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pObject->GetGameData());
+			auto *pEntity = reinterpret_cast<CBaseEntity *>(pObject->GetGameData());
 			if ( !pEntity )
 				return;
 
 			// UNDONE: This is here to trap crashes due to NULLing out the game data on delete
 			m_gameEvent.pEntities[i] = pEntity;
-			unsigned int flags = pObject->GetCallbackFlags();
+			unsigned short flags = pObject->GetCallbackFlags();
 			pObject->GetVelocity( &m_gameEvent.postVelocity[i], NULL );
 			if ( flags & CALLBACK_SHADOW_COLLISION )
 			{
@@ -1905,7 +1904,7 @@ void CCollisionEvent::PostCollision( vcollisionevent_t *pEvent )
 		pEvent->isCollision = false;
 	}
 
-	for ( i = 0; i < 2; i++ )
+	for ( int i = 0; i < 2; i++ )
 	{
 		if ( pEvent->isCollision )
 		{
