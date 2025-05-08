@@ -297,8 +297,10 @@ void CreateDefaultCubemaps( bool bHDR )
 		Warning( "Can't load skybox file %s to build the default cubemap!\n", skyboxMaterialName );
 		return;
 	}
+
 	Msg( "Creating default %scubemaps for env_cubemap using skybox materials:\n   %s*.vmt\n"
-		" ! Run buildcubemaps in the engine to get the correct cube maps.\n", bHDR ? "HDR " : "LDR ", skyboxMaterialName );
+		" ! Run buildcubemaps in the engine to get the correct cube maps.\n",
+		bHDR ? "HDR " : "LDR ", skyboxMaterialName );
 			
 	// Figure out the mip differences between the two textures
 	int iMipLevelOffset = 0;
@@ -392,8 +394,11 @@ void CreateDefaultCubemaps( bool bHDR )
 				}
 				else
 				{
-					// ERROR! This code only supports square and rectangluar 2x wide
-					Warning( "%s - Couldn't create default cubemap because texture res is %dx%d\n", skyboxMaterialName, pSrcVTFTextures[iFace]->Width(), pSrcVTFTextures[iFace]->Height() );
+					// ERROR! This code only supports square and rectangular 2x wide
+					Warning( "%s - Couldn't create default cubemap because texture res is %dx%d\n",
+						skyboxMaterialName,
+						pSrcVTFTextures[iFace]->Width(),
+						pSrcVTFTextures[iFace]->Height() );
 					memset( pDstBits, 0, iSize );
 					return;
 				}
