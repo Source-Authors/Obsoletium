@@ -450,7 +450,7 @@ private:
 	CUtlLinkedList< Shadow_t, ShadowHandle_t, false, ShadowHandle_t, CUtlMemoryAligned< UtlLinkedListElem_t< Shadow_t, ShadowHandle_t >, 16 > > m_Shadows;
 	
 	// List of all shadow decals (one per surface hit by a shadow)
-	CUtlLinkedList< ShadowDecal_t, ShadowDecalHandle_t, true, int > m_ShadowDecals;
+	CUtlLinkedList< ShadowDecal_t, ShadowDecalHandle_t, true > m_ShadowDecals;
 
 	// List of all shadow decals associated with a particular shadow
 	CUtlFixedLinkedList< ShadowDecalHandle_t > m_ShadowSurfaces;
