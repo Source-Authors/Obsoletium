@@ -9648,7 +9648,7 @@ void CShaderAPIDx8::LoadBoneMatrix( int boneIndex, const float *m )
 	{
 		MatrixMode( MATERIAL_MODEL );
 		VMatrix transposeMatrix;
-		transposeMatrix.Init( *(matrix3x4_t *)m );
+		transposeMatrix.Init( *(const matrix3x4_t *)m );
 		MatrixTranspose( transposeMatrix, transposeMatrix );
 		LoadMatrix( (float*)transposeMatrix.m );
 	}
