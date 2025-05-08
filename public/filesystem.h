@@ -588,7 +588,7 @@ public:
 	virtual int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars ) = 0;
 	template <size_t maxLenInChars> int GetSearchPath_safe( const char *pathID, bool bGetPackFiles, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return GetSearchPath( pathID, bGetPackFiles, pDest, (int)maxLenInChars );
+		return GetSearchPath( pathID, bGetPackFiles, pDest, maxLenInChars );
 	}
 
 	// interface for custom pack files > 4Gb
@@ -682,7 +682,7 @@ public:
 	virtual bool			FullPathToRelativePath( const char *pFullpath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
 	template <size_t maxLenInChars> bool FullPathToRelativePath_safe( const char *pFullpath, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return FullPathToRelativePath( pFullpath, pDest, (int)maxLenInChars );
+		return FullPathToRelativePath( pFullpath, pDest, (int)maxLenInChars ); //-V2001
 	}
 
 	// Gets the current working directory
@@ -843,7 +843,7 @@ public:
 	// Optimal IO operations
 	//--------------------------------------------------------
 	virtual bool		GetOptimalIOConstraints( FileHandle_t hFile, unsigned *pOffsetAlign, unsigned *pSizeAlign, unsigned *pBufferAlign ) = 0;
-	inline unsigned		GetOptimalReadSize( FileHandle_t hFile, unsigned nLogicalSize );
+	unsigned			GetOptimalReadSize( FileHandle_t hFile, unsigned nLogicalSize );
 	virtual void		*AllocOptimalReadBuffer( FileHandle_t hFile, unsigned nSize = 0, unsigned nOffset = 0 ) = 0;
 	virtual void		FreeOptimalReadBuffer( void * ) = 0;
 
@@ -986,7 +986,7 @@ inline unsigned IFileSystem::GetOptimalReadSize( FileHandle_t hFile, unsigned nL
 { 
 	unsigned align; 
 	if ( GetOptimalIOConstraints( hFile, &align, nullptr, nullptr ) ) 
-		return AlignValue( nLogicalSize, align );
+		return AlignValue( nLogicalSize, align ); //-V106
 	else
 		return nLogicalSize;
 }

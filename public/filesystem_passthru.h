@@ -124,12 +124,12 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	}
 	CSysModule 		*LoadModule( const char *pFileName, const char *pPathID, bool bValidatedDllOnly )	override { return m_pFileSystemPassThru->LoadModule( pFileName, pPathID, bValidatedDllOnly ); }
 	void			UnloadModule( CSysModule *pModule )													override { m_pFileSystemPassThru->UnloadModule( pModule ); }
-	const char		*FindFirst( const char *pWildCard, FileFindHandle_t *pHandle )						override { return m_pFileSystemPassThru->FindFirst( pWildCard, pHandle ); }
+	const char		*FindFirst( const char *pWildCard, FileFindHandle_t *pHandle )						override { return m_pFileSystemPassThru->FindFirst( pWildCard, pHandle ); } //-V2001
 	const char		*FindNext( FileFindHandle_t handle )												override { return m_pFileSystemPassThru->FindNext( handle ); }
 	bool			FindIsDirectory( FileFindHandle_t handle )											override { return m_pFileSystemPassThru->FindIsDirectory( handle ); }
 	void			FindClose( FileFindHandle_t handle )												override { m_pFileSystemPassThru->FindClose( handle ); }
 	const char		*GetLocalPath( const char *pFileName, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )	override { return m_pFileSystemPassThru->GetLocalPath( pFileName, pDest, maxLenInChars ); }
-	bool			FullPathToRelativePath( const char *pFullpath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )		override { return m_pFileSystemPassThru->FullPathToRelativePath( pFullpath, pDest, maxLenInChars ); }
+	bool			FullPathToRelativePath( const char *pFullpath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )		override { return m_pFileSystemPassThru->FullPathToRelativePath( pFullpath, pDest, maxLenInChars ); } //-V2001
 	bool			GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) override { return m_pFileSystemPassThru->GetCaseCorrectFullPath_Ptr( pFullPath, pDest, maxLenInChars ); }
 	bool			GetCurrentDirectory( char* pDirectory, int maxlen )									override { return m_pFileSystemPassThru->GetCurrentDirectory( pDirectory, maxlen ); }
 	void			PrintOpenedFiles( void )															override { m_pFileSystemPassThru->PrintOpenedFiles(); }
