@@ -1537,7 +1537,7 @@ void CBaseClientState::ReadPacketEntities( CEntityReadInfo &u )
 	}
 
 	// Something didn't parse...
-	if ( u.m_pBuf->IsOverflowed() )							
+	if ( u.m_pBuf->IsOverflowed() )
 	{	
 		Host_Error ( "CL_ParsePacketEntities:  buffer read overflow\n" );
 	}
