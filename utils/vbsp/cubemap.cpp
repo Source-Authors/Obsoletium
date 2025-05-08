@@ -183,7 +183,7 @@ static const char *FindDependentMaterial( const char *pMaterialName, const char 
 static bool LoadSrcVTFFiles( IVTFTexture *pSrcVTFTextures[6], const char *pSkyboxMaterialBaseName,
 							int *pUnionTextureFlags, bool bHDR )
 {
-	const char *facingName[6] = { "rt", "lf", "bk", "ft", "up", "dn" };
+	constexpr char facingName[6][3] = {"rt", "lf", "bk", "ft", "up", "dn"};
 	int i;
 	for( i = 0; i < 6; i++ )
 	{
