@@ -813,8 +813,8 @@ BITBUF_INLINE unsigned int bf_read::ReadUBitLong( int numbits )
 	unsigned bitmask = g_ExtraMasks[numbits];
 #endif
 
-	unsigned dw1 = LoadLittleDWord( (unsigned* RESTRICT)m_pData, iWordOffset1 ) >> iStartBit;
-	unsigned dw2 = LoadLittleDWord( (unsigned* RESTRICT)m_pData, iWordOffset2 ) << (32 - iStartBit);
+	unsigned dw1 = LoadLittleDWord( (const unsigned* RESTRICT)m_pData, iWordOffset1 ) >> iStartBit;
+	unsigned dw2 = LoadLittleDWord( (const unsigned* RESTRICT)m_pData, iWordOffset2 ) << (32 - iStartBit);
 
 	return (dw1 | dw2) & bitmask;
 }
