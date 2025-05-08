@@ -326,7 +326,7 @@ private:
 	struct FlashlightInfo_t
 	{
 		FlashlightState_t m_FlashlightState;
-		unsigned short m_Shadow;
+		ShadowHandle_t m_Shadow;
 		Frustum_t m_Frustum;
 		CMaterialsBuckets<SurfaceHandle_t> m_MaterialBuckets;
 		CMaterialsBuckets<SurfaceHandle_t> m_OccluderBuckets;
@@ -447,7 +447,7 @@ private:
 private:
 	// List of all shadows (one per cast shadow)
 	// Align it so the Ray in the Shadow_t is aligned
-	CUtlLinkedList< Shadow_t, ShadowHandle_t, false, int, CUtlMemoryAligned< UtlLinkedListElem_t< Shadow_t, ShadowHandle_t >, 16 > > m_Shadows;
+	CUtlLinkedList< Shadow_t, ShadowHandle_t, false, ShadowHandle_t, CUtlMemoryAligned< UtlLinkedListElem_t< Shadow_t, ShadowHandle_t >, 16 > > m_Shadows;
 	
 	// List of all shadow decals (one per surface hit by a shadow)
 	CUtlLinkedList< ShadowDecal_t, ShadowDecalHandle_t, true, int > m_ShadowDecals;
