@@ -225,7 +225,7 @@ static bool LoadSrcVTFFiles( IVTFTexture *pSrcVTFTextures[6], const char *pSkybo
 		pSrcVTFTextures[i] = CreateVTFTexture();
 		if (!pSrcVTFTextures[i]->Unserialize(buf))
 		{
-			Warning("*** Error unserializing skybox texture: %s\n", pSkyboxMaterialBaseName );
+			Warning("*** Error unserializing skybox texture: '%s'.\n", pSkyboxMaterialBaseName );
 			return false;
 		}
 
@@ -294,7 +294,7 @@ void CreateDefaultCubemaps( bool bHDR )
 	int unionTextureFlags = 0;
 	if( !LoadSrcVTFFiles( pSrcVTFTextures, skyboxMaterialName, &unionTextureFlags, bHDR ) )
 	{
-		Warning( "Can't load skybox file %s to build the default cubemap!\n", skyboxMaterialName );
+		Warning( "Can't load skybox '%s' vtfs to build the default cubemap!\n", skyboxMaterialName );
 		return;
 	}
 
@@ -439,7 +439,7 @@ void CreateDefaultCubemaps( bool bHDR )
 	CUtlBuffer outputBuf;
 	if (!pDstCubemap->Serialize( outputBuf ))
 	{
-		Warning( "Error serializing default cubemap %s\n", dstVTFFileName );
+		Warning( "Error serializing default cubemap '%s'.\n", dstVTFFileName );
 		return;
 	}
 
