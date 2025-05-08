@@ -4,7 +4,7 @@
 
 #include "blockingudpsocket.h"
 
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
 #include <winsock.h>
 #elif POSIX
 #define INVALID_SOCKET -1
