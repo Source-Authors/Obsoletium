@@ -426,7 +426,7 @@ void CreateDefaultCubemaps( bool bHDR )
 	}
 
 	// Write the puppy out!
-	char dstVTFFileName[1024];
+	char dstVTFFileName[MAX_PATH];
 	if( bHDR )
 	{
 		V_sprintf_safe( dstVTFFileName, "materials/maps/%s/cubemapdefault.hdr.vtf", mapbase );
