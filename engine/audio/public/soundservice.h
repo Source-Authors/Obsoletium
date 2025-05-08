@@ -118,10 +118,6 @@ public:
 
 	virtual bool		GetToolSpatialization( int iUserData, int guid, SpatializationInfo_t& info ) = 0;
 
-#if defined( _XBOX )
-	virtual bool		ShouldSuppressNonUISounds() = 0;
-#endif
-
 	virtual char const *GetUILanguage() = 0;
 };
 

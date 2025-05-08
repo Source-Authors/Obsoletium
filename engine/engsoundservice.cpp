@@ -385,11 +385,6 @@ public:
 		return table->GetString( index );
 	}
 
-	virtual bool ShouldSuppressNonUISounds()
-	{
-		return EngineVGui()->IsGameUIVisible() || IsGamePaused();
-	}
-
 	virtual char const *GetUILanguage()
 	{
 		extern ConVar cl_language;
