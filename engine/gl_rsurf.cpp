@@ -1583,7 +1583,6 @@ void Shader_DrawDispChain( int nSortGroup, const CMSurfaceSortList &list, unsign
 	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
 	int count = 0;
-	msurface2_t **pList;
 	MSL_FOREACH_GROUP_BEGIN( list, nSortGroup, group )
 	{
 		count += group.surfaceCount;
@@ -1592,8 +1591,8 @@ void Shader_DrawDispChain( int nSortGroup, const CMSurfaceSortList &list, unsign
 
 	if (count)
 	{
-		pList = (msurface2_t **)stackalloc( count * sizeof(msurface2_t *));
-		int i = 0;
+		msurface2_t **pList = stackallocT( msurface2_t *, count );
+		intp i = 0;
 		MSL_FOREACH_GROUP_BEGIN( list, nSortGroup, group )
 		{
 			MSL_FOREACH_SURFACE_IN_GROUP_BEGIN(list,group,surfID)
@@ -1743,9 +1742,9 @@ void Shader_WorldBegin( CWorldRenderList *pRenderList )
 //-----------------------------------------------------------------------------
 // Performs the z-fill
 //-----------------------------------------------------------------------------
-static void Shader_WorldZFillSurfChain( const CMSurfaceSortList &sortList, const surfacesortgroup_t &group, CMeshBuilder &meshBuilder, int &nStartVertIn, unsigned int includeFlags )
+static void Shader_WorldZFillSurfChain( const CMSurfaceSortList &sortList, const surfacesortgroup_t &group, CMeshBuilder &meshBuilder, intp &nStartVertIn, unsigned int includeFlags )
 {
-	int nStartVert = nStartVertIn;
+	intp nStartVert = nStartVertIn;
 	mvertex_t *pWorldVerts = host_state.worldbrush->vertexes;
 
 	MSL_FOREACH_SURFACE_IN_GROUP_BEGIN(sortList, group, nSurfID)
@@ -1930,7 +1929,7 @@ static void Shader_WorldShadowDepthFill( CWorldRenderList *pRenderList, unsigned
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nBatchVertexCount, nBatchIndexCount );
 
-	int nStartVert = 0;
+	intp nStartVert = 0;
 	for ( g = 0; g < MAX_MAT_SORT_GROUPS; ++g )
 	{
 		if ( ( flags & ( 1 << g ) ) == 0 )
@@ -2064,7 +2063,7 @@ static void Shader_WorldZFill( CWorldRenderList *pRenderList, unsigned long flag
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nBatchVertexCount, nBatchIndexCount );
 
-	int nStartVert = 0;
+	intp nStartVert = 0;
 	for ( g = 0; g < MAX_MAT_SORT_GROUPS; ++g )
 	{
 		if ( ( flags & ( 1 << g ) ) == 0 )

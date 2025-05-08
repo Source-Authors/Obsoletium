@@ -2139,20 +2139,19 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 {
 	char tempBuffer[512];
-	char *pNext, *pStart;
-	int  length, tempBufferPos = 0;
+	intp tempBufferPos = 0;
 
 	if ( !pSentenceData )
 		return;
 
-	pStart = pSentenceData;
+	char *pStart = pSentenceData;
 
 	while ( *pSentenceData )
 	{
-		pNext = ScanForwardUntil( pSentenceData, '{' );
+		char *pNext = ScanForwardUntil( pSentenceData, '{' );
 
 		// Find length of "good" portion of the string (not a {} command)
-		length = pNext - pSentenceData;
+		intp length = pNext - pSentenceData;
 		if ( tempBufferPos + length > ssize(tempBuffer) )
 		{
 			DevMsg("Error! sentence '%s' is too long (%zu > %zu max)!\n",

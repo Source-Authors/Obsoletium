@@ -222,7 +222,7 @@ public:
 							break;
 
 						char manifest_file[ 512 ];
-						Q_snprintf( manifest_file, sizeof( manifest_file ), "%s/%s.manifest", AUDIOSOURCE_CACHE_ROOTDIR, com_token );
+						V_sprintf_safe( manifest_file, "%s/%s.manifest", AUDIOSOURCE_CACHE_ROOTDIR, com_token );
 
 						if ( g_pFileSystem->FileExists( manifest_file, "MOD" ) )
 						{

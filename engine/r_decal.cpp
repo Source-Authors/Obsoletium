@@ -2619,8 +2619,8 @@ void R_DrawDecalsAll( IMatRenderContext *pRenderContext, int iGroup, int iTreeTy
 	decalcontext_t context(pRenderContext, vModelOrg);
 	Vector vecNormal( 0.0f, 0.0f, 1.0f ), vecTangentS( 1.0f, 0.0f, 0.0f ), vecTangentT( 0.0f, 1.0f, 0.0f );
 
-	int nVertCount = 0;
-	int nIndexCount = 0;
+	intp nVertCount = 0;
+	intp nIndexCount = 0;
 
 	int nDecalSortMaxVerts;
 	int nDecalSortMaxIndices;

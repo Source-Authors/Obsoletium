@@ -1819,9 +1819,9 @@ void BuildMSurfaceVertexArrays( worldbrushdata_t *pBrushData, SurfaceHandle_t su
 }
 #endif // NEWMESH
 
-static int VertexCountForSurfaceList( const CMSurfaceSortList &list, const surfacesortgroup_t &group )
+static intp VertexCountForSurfaceList( const CMSurfaceSortList &list, const surfacesortgroup_t &group )
 {
-	int vertexCount = 0;
+	intp vertexCount = 0;
 	MSL_FOREACH_SURFACE_IN_GROUP_BEGIN(list, group, surfID)
 		vertexCount += MSurf_VertCount(surfID);
 	MSL_FOREACH_SURFACE_IN_GROUP_END();
@@ -1854,7 +1854,7 @@ static VertexFormat_t GetUncompressedFormat( const IMaterial * pMaterial )
 	return ( pMaterial->GetVertexFormat() & ~VERTEX_FORMAT_COMPRESSED );
 }
 
-static intp FindOrAddMesh( IMaterial *pMaterial, int vertexCount )
+static intp FindOrAddMesh( IMaterial *pMaterial, intp vertexCount )
 {
 	VertexFormat_t format = GetUncompressedFormat( pMaterial );
 
@@ -1998,7 +1998,7 @@ void WorldStaticMeshCreate( void )
 	for ( intp i = 0; i < g_WorldStaticMeshes.Count(); i++ )
 	{
 		const surfacesortgroup_t &group = matSortArray.GetGroupForSortID(0,i);
-		int vertexCount = VertexCountForSurfaceList( matSortArray, group );
+		intp vertexCount = VertexCountForSurfaceList( matSortArray, group );
 
 		SurfaceHandle_t surfID = matSortArray.GetSurfaceAtHead( group );
 		g_WorldStaticMeshes[i] = NULL;
@@ -2045,7 +2045,7 @@ void WorldStaticMeshCreate( void )
 			g_VBAllocTracker->TrackMeshAllocations( "WorldStaticMeshCreate" );
 		VertexFormat_t vertexFormat = ComputeWorldStaticMeshVertexFormat( g_Meshes[i].pMaterial );
 		g_Meshes[i].pMesh = pRenderContext->CreateStaticMesh( vertexFormat, TEXTURE_GROUP_STATIC_VERTEX_BUFFER_WORLD, g_Meshes[i].pMaterial );
-		int vertBufferIndex = 0;
+		intp vertBufferIndex = 0;
 		// NOTE: Index count is zero because this will be a static vertex buffer!!!
 		CMeshBuilder meshBuilder;
 		meshBuilder.Begin( g_Meshes[i].pMesh, MATERIAL_TRIANGLES, g_Meshes[i].vertCount, 0 );
