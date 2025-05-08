@@ -475,7 +475,7 @@ private:
 	CBidirectionalSet< ModelInstanceHandle_t, ShadowHandle_t, unsigned short >	m_ShadowsOnModels;
 
 	// Cache of information for surface bounds
-	typedef CUtlLinkedList< SurfaceBounds_t, unsigned short, false, int, CUtlMemoryFixed< UtlLinkedListElem_t< SurfaceBounds_t, unsigned short >, SURFACE_BOUNDS_CACHE_COUNT, 16 > > SurfaceBoundsCache_t;
+	typedef CUtlLinkedList< SurfaceBounds_t, unsigned short, false, unsigned short, CUtlMemoryFixed< UtlLinkedListElem_t< SurfaceBounds_t, unsigned short >, SURFACE_BOUNDS_CACHE_COUNT, 16 > > SurfaceBoundsCache_t;
 	typedef SurfaceBoundsCache_t::IndexType_t SurfaceBoundsCacheIndex_t;
 	SurfaceBoundsCache_t m_SurfaceBoundsCache;
 	SurfaceBoundsCacheIndex_t *m_pSurfaceBounds;
