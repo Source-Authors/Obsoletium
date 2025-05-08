@@ -247,7 +247,7 @@ int Grab_Nodes(s_node_t *pnodes) {
     if (sscanf(g_szLine, "%d \"%1023[^\"]\" %d", &index, name, &parent) == 3) {
       // check for duplicated bones
       /*
-      if (strlen(pnodes[index].name) != 0)
+      if (!Q_isempty(pnodes[index].name))
       {
               MdlError( "bone \"%s\" exists more than once\n", name );
       }
