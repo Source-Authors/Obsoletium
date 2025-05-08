@@ -4316,7 +4316,7 @@ void V_StripAndPreserveHTMLCore( CUtlBuffer *pbuffer, IN_Z const char *pchHTML, 
 				if ( bInStrippedTag )
 				{
 					const char *szTagStart = &pchHTML[ iContents ];
-					if ( Q_strnicmp( szTagStart, "<li>", Q_strlen( "<li>" ) ) == 0 )
+					if ( Q_strnicmp( szTagStart, "<li>", ssize( "<li>" ) - 1 ) == 0 )
 					{
 						if ( bInListItemTag )
 						{
