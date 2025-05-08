@@ -1821,8 +1821,8 @@ void VGui_PlaySound( const char *pFileName )
 		S_MarkUISound( pSound );
 
 		StartSoundParams_t params;
-		params.staticsound = IsX360() ? true : false;
-		params.soundsource = cl.m_nViewEntity;
+		params.staticsound = false;
+		params.soundsource = static_cast<SoundSource>(cl.m_nViewEntity);
 		params.entchannel = CHAN_AUTO;
 		params.pSfx = pSound;
 		params.origin = vDummyOrigin;

@@ -641,7 +641,7 @@ int CEngineTool::StartSound(
 	StartSoundParams_t params;
 	params.userdata = iUserData;
 	params.staticsound = staticsound;
-	params.soundsource = iEntIndex;
+	params.soundsource = static_cast<SoundSource>(iEntIndex);
 	params.entchannel = iChannel;
 	params.pSfx = S_PrecacheSound( pSample );
 	params.origin = origin; 

@@ -1186,7 +1186,7 @@ void VOX_ReplaceVirtualNames( channel_t *pchan )
 	int cnew = 0;
 	bool fbymap;
 	char *pszmaptoken;
-	SoundSource	soundsource = pchan ? pchan->soundsource : 0;
+	SoundSource	soundsource = pchan ? pchan->soundsource : SoundSource::SOUND_FROM_WORLD;
 
 	const char *pszmap = host_map.GetString();
 

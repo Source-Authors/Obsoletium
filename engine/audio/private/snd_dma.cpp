@@ -155,7 +155,7 @@ void S_EnableMusic( bool bEnable )
 	}
 }
 
-bool IsSoundSourceLocalPlayer( int soundsource )
+static bool IsSoundSourceLocalPlayer( SoundSource soundsource )
 {
 	if ( soundsource == SOUND_FROM_UI_PANEL )
 		return true;
@@ -958,7 +958,9 @@ void S_InternalReloadSound( CSfxTable *sfx )
 
 	char pExt[10];
 	V_ExtractFileExtension( sfx->getname(), pExt );
-	int nSource = !Q_stricmp( pExt, "mp3" ) ? CAudioSource::AUDIO_SOURCE_MP3 : CAudioSource::AUDIO_SOURCE_WAV;
+	CAudioSource::AudioSource nSource = !Q_stricmp( pExt, "mp3" )
+		? CAudioSource::AUDIO_SOURCE_MP3
+		: CAudioSource::AUDIO_SOURCE_WAV;
 	audiosourcecache->GetInfo( nSource, sfx->IsPrecachedSound(), sfx ); // Do a size/date check and rebuild the cache entry if necessary.
 }
 
@@ -6507,7 +6509,7 @@ void S_Play( const char *pszName, bool flush = false )
 
 	StartSoundParams_t params;
 	params.staticsound = false;
-	params.soundsource = g_pSoundServices->GetViewEntity();
+	params.soundsource = static_cast<SoundSource>(g_pSoundServices->GetViewEntity());
 	params.entchannel = CHAN_REPLACE;
 	params.pSfx = pSfx;
 	params.origin = listener_origin;
@@ -6552,7 +6554,7 @@ static void S_PlayVol( const CCommand &args )
 
 		StartSoundParams_t params;
 		params.staticsound = false;
-		params.soundsource = hash++;
+		params.soundsource = static_cast<SoundSource>(hash++);
 		params.entchannel = CHAN_AUTO;
 		params.pSfx = pSfx;
 		params.origin = listener_origin;
@@ -6588,7 +6590,7 @@ static void S_PlayDelay( const CCommand &args )
 	
 	StartSoundParams_t params;
 	params.staticsound = false;
-	params.soundsource = g_pSoundServices->GetViewEntity();
+	params.soundsource = static_cast<SoundSource>(g_pSoundServices->GetViewEntity());
 	params.entchannel = CHAN_REPLACE;
 	params.pSfx = pSfx;
 	params.origin = listener_origin;
@@ -6853,7 +6855,7 @@ static void S_Say( const CCommand &args )
 
 		StartSoundParams_t params;
 		params.staticsound = false;
-		params.soundsource = hash++;
+		params.soundsource = static_cast<SoundSource>(hash++);
 		params.entchannel = CHAN_AUTO;
 		params.pSfx = pSfx;
 		params.origin = listener_origin;
@@ -6912,7 +6914,7 @@ static void S_Say( const CCommand &args )
 
 		StartSoundParams_t params;
 		params.staticsound = false;
-		params.soundsource = g_pSoundServices->GetViewEntity();
+		params.soundsource = static_cast<SoundSource>(g_pSoundServices->GetViewEntity());
 		params.entchannel = CHAN_REPLACE;
 		params.pSfx = pSfx;
 		params.origin = vec3_origin;
@@ -6941,7 +6943,7 @@ static void S_Say( const CCommand &args )
 
 	StartSoundParams_t params;
 	params.staticsound = false;
-	params.soundsource = g_pSoundServices->GetViewEntity();
+	params.soundsource = static_cast<SoundSource>(g_pSoundServices->GetViewEntity());
 	params.entchannel = CHAN_REPLACE;
 	params.pSfx = pSfx;
 	params.origin = vec3_origin;

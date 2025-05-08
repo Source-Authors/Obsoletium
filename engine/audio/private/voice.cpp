@@ -1591,7 +1591,7 @@ void Voice_Spatialize( channel_t *channel )
 	DevMsg( 1, "Voice_Spatialize changing voice tweak entity from %d to %d\n", pVoiceChannel->m_nViewEntityIndex, g_pSoundServices->GetViewEntity() );
 
 	pVoiceChannel->m_nViewEntityIndex = g_pSoundServices->GetViewEntity();
-	channel->soundsource = pVoiceChannel->m_nViewEntityIndex;
+	channel->soundsource = static_cast<SoundSource>(pVoiceChannel->m_nViewEntityIndex);
 }
 
 IVoiceTweak g_VoiceTweakAPI =

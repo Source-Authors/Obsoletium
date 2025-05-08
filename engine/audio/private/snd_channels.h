@@ -7,15 +7,14 @@
 #ifndef SND_CHANNELS_H
 #define SND_CHANNELS_H
 
-#include "mathlib/vector.h"
-
-#if defined( _WIN32 )
+#if defined(_WIN32)
 #pragma once
 #endif
 
+#include "mathlib/vector.h"
+
 class CSfxTable;
 class CAudioMixer;
-typedef int SoundSource;
 
 // DO NOT REORDER: indices to fvolume arrays in channel_t 
 
@@ -56,7 +55,7 @@ struct channel_t
 	float		fvolume_inc[CCHANVOLUMES];		// volume increment, per frame, moves volume[i] to vol_target[i] (per spatialization)		
 	uint		nFreeChannelAtSampleTime;
 
-	SoundSource	soundsource;	// see iclientsound.h for description.
+	enum SoundSource	soundsource;	// see iclientsound.h for description.
 	int			entchannel;		// sound channel (CHAN_STREAM, CHAN_VOICE, etc.)
 	int			speakerentity;  // if a sound is being played through a speaker entity (e.g., on a monitor,), this is the
 								//  entity upon which to show the lips moving, if the sound has sentence data

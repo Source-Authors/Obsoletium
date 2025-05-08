@@ -423,7 +423,7 @@ bool CAudioSourceWave::IsStreaming( void )
 }
 
 
-int CAudioSourceWave::GetCacheStatus( void )
+CAudioSource::AudioStatus CAudioSourceWave::GetCacheStatus( void )
 {
 	return AUDIO_IS_LOADED;
 }
@@ -826,7 +826,7 @@ public:
 	virtual int				ZeroCrossingBefore( int sample );
 	virtual int				ZeroCrossingAfter( int sample );
 
-	virtual int				GetCacheStatus( void );
+	virtual CAudioSource::AudioStatus			GetCacheStatus( void );
 	virtual void			CacheLoad( void );
 	virtual void			CacheUnload( void );
 
@@ -1195,28 +1195,21 @@ void CAudioSourceMemWave::ParseDataChunk( IterateRIFF &walk )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-int CAudioSourceMemWave::GetCacheStatus( void )
+CAudioSource::AudioStatus CAudioSourceMemWave::GetCacheStatus( void )
 {
 	VPROF("CAudioSourceMemWave::GetCacheStatus");
 
-	if ( IsPC() || !IsX360() )
+	// NOTE: This will start the load if it isn't started
+	bool bCacheValid;
+	bool bCompleted = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
+	if ( !bCacheValid )
 	{
-		// NOTE: This will start the load if it isn't started
-		bool bCacheValid;
-		bool bCompleted = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
-		if ( !bCacheValid )
-		{
-			wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
-		}
-		if ( bCompleted )
-			return AUDIO_IS_LOADED;
-		if ( wavedatacache->IsDataLoadInProgress( m_hCache ) )
-			return AUDIO_LOADING;
+		wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
 	}
-	else
-	{
-		return wavedatacache->IsStreamedDataReady( m_hStream ) ? AUDIO_IS_LOADED : AUDIO_NOT_LOADED;
-	}
+	if ( bCompleted )
+		return AUDIO_IS_LOADED;
+	if ( wavedatacache->IsDataLoadInProgress( m_hCache ) )
+		return AUDIO_LOADING;
 
 	return AUDIO_NOT_LOADED;
 }
@@ -1226,58 +1219,19 @@ int CAudioSourceMemWave::GetCacheStatus( void )
 //-----------------------------------------------------------------------------
 void CAudioSourceMemWave::CacheLoad( void )
 {
-	if ( IsPC() || !IsX360() )
+	// Commence lazy load?
+	if ( m_hCache != 0 )
 	{
-		// Commence lazy load?
-		if ( m_hCache != 0 )
+		bool bCacheValid;
+		wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
+		if ( !bCacheValid )
 		{
-			bool bCacheValid;
-			wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
-			if ( !bCacheValid )
-			{
-				wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
-			}
-			return;
+			wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
 		}
-
-		m_hCache = wavedatacache->AsyncLoadCache( m_pSfx->GetFileName(), m_dataSize, m_dataStart );
+		return;
 	}
-	else
-	{
-		if ( m_hStream == INVALID_STREAM_HANDLE )
-		{
-			// memory wave is resident
-			const char *pFilename = m_pSfx->GetFileName();
-			streamFlags_t streamFlags = STREAMED_FROMDVD;
-			char szFilename[MAX_PATH];
-			if ( m_format == WAVE_FORMAT_XMA || m_format == WAVE_FORMAT_PCM )
-			{
-				V_strcpy_safe( szFilename, pFilename );
-				V_SetExtension( szFilename, ".360.wav" );
-				pFilename = szFilename;
 
-				// memory resident xma waves use the queued loader
-				// restricting to XMA due to not correctly running a post ConvertSamples, which is not an issue for XMA
-				if ( g_pQueuedLoader->IsMapLoading() )
-				{
-					// hint the wave data cache
-					streamFlags |= STREAMED_QUEUEDLOAD;
-				}
-			}
-
-			// open stream to load as a single monolithic buffer
-			m_hStream = wavedatacache->OpenStreamedLoad( pFilename, m_dataSize, m_dataStart, 0, -1, m_dataSize, 1, streamFlags );
-			if ( m_hStream != INVALID_STREAM_HANDLE && !( streamFlags & STREAMED_QUEUEDLOAD ) )
-			{
-				// block and finish load, convert data once right now
-				char *pWaveData = (char *)wavedatacache->GetStreamedDataPointer( m_hStream, true );
-				if ( pWaveData )
-				{
-					ConvertSamples( pWaveData, m_dataSize/m_sampleSize );
-				}
-			}
-		}
-	}
+	m_hCache = wavedatacache->AsyncLoadCache( m_pSfx->GetFileName(), m_dataSize, m_dataStart );
 }
 
 //-----------------------------------------------------------------------------
@@ -1285,20 +1239,9 @@ void CAudioSourceMemWave::CacheLoad( void )
 //-----------------------------------------------------------------------------
 void CAudioSourceMemWave::CacheUnload( void )
 {
-	if ( IsPC() || !IsX360() )
+	if ( m_hCache != 0 )
 	{
-		if ( m_hCache != 0 )
-		{
-			wavedatacache->Unload( m_hCache );
-		}
-	}
-	else
-	{
-		if ( m_hStream != INVALID_STREAM_HANDLE )
-		{
-			wavedatacache->CloseStreamedLoad( m_hStream );
-			m_hStream = INVALID_STREAM_HANDLE;
-		}
+		wavedatacache->Unload( m_hCache );
 	}
 }
 
@@ -1310,42 +1253,30 @@ void CAudioSourceMemWave::CacheUnload( void )
 char *CAudioSourceMemWave::GetDataPointer( void )
 {
 	char *pWaveData = NULL;
+	bool bSamplesConverted = false;
 
-	if ( IsPC() || !IsX360() )
+	if ( m_hCache == 0 )
 	{
-		bool bSamplesConverted = false;
-
-		if ( m_hCache == 0 )
-		{
-			// not in cache, start loading
-			CacheLoad();
-		}
-
-		// mount the requested data, blocks if necessary
-		wavedatacache->GetDataPointer( 
-			m_hCache, 
-			m_pSfx->GetFileName(), 
-			m_dataSize, 
-			m_dataStart, 
-			(void **)&pWaveData, 
-			0, 
-			&bSamplesConverted );
-
-		// If we have reloaded data from disk (async) and we haven't converted the samples yet, do it now
-		// FIXME:  Is this correct for stereo wavs?
-		if ( pWaveData && !bSamplesConverted )
-		{
-			ConvertSamples( pWaveData, m_dataSize/m_sampleSize );
-			wavedatacache->SetPostProcessed( m_hCache, true );
-		}
+		// not in cache, start loading
+		CacheLoad();
 	}
-	else
+
+	// mount the requested data, blocks if necessary
+	wavedatacache->GetDataPointer( 
+		m_hCache, 
+		m_pSfx->GetFileName(), 
+		m_dataSize, 
+		m_dataStart, 
+		(void **)&pWaveData, 
+		0, 
+		&bSamplesConverted );
+
+	// If we have reloaded data from disk (async) and we haven't converted the samples yet, do it now
+	// FIXME:  Is this correct for stereo wavs?
+	if ( pWaveData && !bSamplesConverted )
 	{
-		if ( m_hStream != INVALID_STREAM_HANDLE )
-		{
-			// expected to be valid, unless failure during setup
-			pWaveData = (char *)wavedatacache->GetStreamedDataPointer( m_hStream, true );
-		}
+		ConvertSamples( pWaveData, m_dataSize/m_sampleSize );
+		wavedatacache->SetPostProcessed( m_hCache, true );
 	}
 
 	return pWaveData;
@@ -1367,7 +1298,7 @@ public:
 	void			ParseChunk( IterateRIFF &walk, int chunkName );
 	bool			IsStreaming( void ) { return true; }
 
-	virtual int		GetCacheStatus( void );
+	virtual CAudioSource::AudioStatus		GetCacheStatus( void );
 
 	// IWaveStreamSource
 	virtual int UpdateLoopingSamplePosition( int samplePosition )
@@ -1549,7 +1480,7 @@ int CAudioSourceStreamWave::GetOutputData( void **, int, int, char [AUDIOSOURCE_
 	return 0;
 }
 
-int CAudioSourceStreamWave::GetCacheStatus( void )
+CAudioSource::AudioStatus CAudioSourceStreamWave::GetCacheStatus( void )
 {
 	if ( !m_dataSize || !m_dataStart )
 	{

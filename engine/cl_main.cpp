@@ -623,8 +623,8 @@ void CL_DispatchSound( const SoundInfo_t &sound )
 	}
 
 	StartSoundParams_t params;
-	params.staticsound = (sound.nChannel == CHAN_STATIC) ? true : false;
-	params.soundsource = sound.nEntityIndex;
+	params.staticsound = sound.nChannel == CHAN_STATIC;
+	params.soundsource = static_cast<SoundSource>(sound.nEntityIndex);
 	params.entchannel = params.staticsound ? CHAN_STATIC : sound.nChannel;
 	params.pSfx = pSfx;
 	params.origin = sound.vOrigin;

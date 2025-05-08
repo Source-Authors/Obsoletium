@@ -452,9 +452,7 @@ bool CAsyncWaveData::IsCurrentlyLoading()
 	if ( m_bLoaded )
 		return true;
 	FSAsyncStatus_t status = g_pFileSystem->AsyncStatus( m_hAsyncControl );
-	if ( status == FSASYNC_STATUS_INPROGRESS || status == FSASYNC_OK )
-		return true;
-	return false;
+	return status == FSASYNC_STATUS_INPROGRESS || status == FSASYNC_OK;
 }
 
 //-----------------------------------------------------------------------------
@@ -2114,7 +2112,7 @@ bool CWaveDataMemoryAsync::IsReadyToMix()
 	if ( !m_source.IsAsyncLoad() && !snd_async_fullyasync.GetBool() )
 	{
 		// Wait until we're pending at least
-		if ( m_source.GetCacheStatus() == CAudioSource::AUDIO_NOT_LOADED )
+		if ( m_source.GetCacheStatus() == CAudioSource::AudioStatus::AUDIO_NOT_LOADED )
 		{
 			return false;
 		}
