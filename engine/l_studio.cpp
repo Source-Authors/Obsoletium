@@ -877,7 +877,7 @@ public:
 	bool Init();
 	void Shutdown();
 
-	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, unsigned nMaxLen );
+	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen );
 
 	struct staticPropAsyncContext_t
 	{
@@ -1131,7 +1131,7 @@ void CModelRender::SuppressEngineLighting( bool bSuppress )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, unsigned nMaxLen )
+bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen )
 {
 	CColorMeshData *pColorMeshData = (CColorMeshData *)pItem;
 	g_pFileSystem->String( pColorMeshData->m_fnHandle, pDest, nMaxLen );
