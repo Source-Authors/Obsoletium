@@ -89,9 +89,9 @@ public:
 		return (char *) m_string.Get();
 	}
 
-	[[nodiscard]] operator char *() const
+	[[nodiscard]] operator const char *() const
 	{
-		return (char *) m_string.Get();
+		return m_string.Get();
 	}
 
 	[[nodiscard]] operator void *()
@@ -99,9 +99,9 @@ public:
 		return (void *) m_string.Get();
 	}
 
-	[[nodiscard]] operator void *() const
+	[[nodiscard]] operator const void *() const
 	{
-		return (void *)m_string.Get();
+		return m_string.Get();
 	}
 
 private:
