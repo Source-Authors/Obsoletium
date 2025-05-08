@@ -4367,7 +4367,7 @@ void EnforceHierarchy( )
 		*/
 
 		/*
-		if (strlen(g_forcedhierarchy[i].subparentname) != 0)
+		if (!Q_isempty(g_forcedhierarchy[i].subparentname))
 		{
 			int n, m;
 
