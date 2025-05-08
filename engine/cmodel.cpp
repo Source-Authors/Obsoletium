@@ -811,8 +811,8 @@ BOX TRACING
 // Custom SIMD implementation for box brushes
 
 const fltx4 Four_DistEpsilons={DIST_EPSILON,DIST_EPSILON,DIST_EPSILON,DIST_EPSILON};
-alignas(16) const int32 g_CubeFaceIndex0[4] = {0, 1, 2, -1};
-alignas(16) const int32 g_CubeFaceIndex1[4] = {3, 4, 5, -1};
+alignas(16) const uint32_t g_CubeFaceIndex0[4] = {0, 1, 2, std::numeric_limits<uint32_t>::max()};
+alignas(16) const uint32_t g_CubeFaceIndex1[4] = {3, 4, 5, std::numeric_limits<uint32_t>::max()};
 bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, cboxbrush_t *pBox )
 {
 	// Suppress floating-point exceptions in this function because invDelta's
@@ -876,8 +876,8 @@ bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, 
 		tmins = MulSIMD( offsetMinsExpanded, invDelta );
 		tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 
-		fltx4 minface0 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex0 ) );
-		fltx4 minface1 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex1 ) );
+		fltx4 minface0 = DirectX::XMLoadInt4A( g_CubeFaceIndex0 );
+		fltx4 minface1 = DirectX::XMLoadInt4A( g_CubeFaceIndex1 );
 		fltx4 faceMask = CmpLeSIMD( tmins, tmaxs );
 		mint = MinSIMD( tmins, tmaxs );
 		maxt = MaxSIMD( tmins, tmaxs );
@@ -1040,8 +1040,8 @@ bool IntersectRayWithBox( const Ray_t &ray, const VectorAligned &inInvDelta, con
 		tmins = MulSIMD( offsetMinsExpanded, invDelta );
 		tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 
-		fltx4 minface0 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex0 ) );
-		fltx4 minface1 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex1 ) );
+		fltx4 minface0 = DirectX::XMLoadInt4A( g_CubeFaceIndex0 );
+		fltx4 minface1 = DirectX::XMLoadInt4A( g_CubeFaceIndex1 );
 		fltx4 faceMask = CmpLeSIMD( tmins, tmaxs );
 		mint = MinSIMD( tmins, tmaxs );
 		maxt = MaxSIMD( tmins, tmaxs );
