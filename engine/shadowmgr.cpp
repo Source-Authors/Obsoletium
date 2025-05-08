@@ -304,7 +304,7 @@ private:
 		int		m_nMaxVertices;
 		int		m_nMaxIndices;
 		int		m_Count;
-		int*	m_pCache;
+		intp*	m_pCache;
 		int		m_DispCount;
 		const VMatrix* m_pModelToWorld;
 		VMatrix m_WorldToModel;
@@ -491,7 +491,7 @@ private:
 	// HPE_BEGIN:
 	// [smessick] These used to be dynamically allocated on the stack.
 	//=============================================================================
-	CUtlMemory<int> m_ShadowDecalCache;
+	CUtlMemory<intp> m_ShadowDecalCache;
 	CUtlMemory<DispShadowHandle_t> m_DispShadowDecalCache;
 	//=============================================================================
 	// HPE_END
