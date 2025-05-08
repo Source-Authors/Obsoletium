@@ -945,7 +945,7 @@ private:
         bool Less( const intp& src1, const intp& src2, void *pCtx );
 	};
 
-	static int __cdecl SurfCompare( const void *elem1, const void *elem2 );
+	static bool __cdecl SurfCompare( const intp elem1, const intp elem2 );
 
 private:
 	// Used to sort surfaces by screen area
@@ -1246,19 +1246,12 @@ void CEdgeList::AddEdge( Vector **ppEdgeVertices, int nSurfID )
 // Used to sort the surfaces
 //-----------------------------------------------------------------------------
 thread_local CEdgeList::Surface_t *CEdgeList::s_pSortSurfaces = NULL;
-int __cdecl CEdgeList::SurfCompare( const void *elem1, const void *elem2 )
+bool CEdgeList::SurfCompare( const intp nSurfID1, const intp nSurfID2 )
 {
-	int nSurfID1 = *(int*)elem1;
 	float flArea1 = s_pSortSurfaces[nSurfID1].m_flArea;
-
-	int nSurfID2 = *(int*)elem2;
 	float flArea2 = s_pSortSurfaces[nSurfID2].m_flArea;
 
-	if (flArea1 > flArea2)
-		return -1;
-	if (flArea1 < flArea2)
-		return 1;
-	return 0;
+	return flArea1 > flArea2;
 }
 
 
@@ -1271,7 +1264,7 @@ void CEdgeList::CullSmallOccluders()
 	// Sort the surfaces by screen area, in descending order
 	intp nSurfCount = m_Surfaces.Count();
 	s_pSortSurfaces = m_Surfaces.Base();
-	qsort( m_SurfaceSort.Base(), nSurfCount, sizeof(int), SurfCompare );
+	std::sort( m_SurfaceSort.begin(), m_SurfaceSort.end(), SurfCompare );
 
 	// We're going to keep the greater of r_occludermin + All surfaces with a screen area >= r_occluderarea
 	int nMinSurfaces = r_occludermincount.GetInt();
