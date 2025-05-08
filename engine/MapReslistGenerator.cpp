@@ -619,14 +619,14 @@ void CMapReslistGenerator::OnModelPrecached(const char *relativePathFileName)
 		// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
 		char file[_MAX_PATH];
 
-		if (!Q_strnicmp(relativePathFileName, "materials", strlen("materials")))
+		if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 		{
-			Q_strncpy(file, relativePathFileName, sizeof(file));
+			V_strcpy_safe(file, relativePathFileName);
 		}
 		else
 		{
 			// prepend the materials directory
-			Q_snprintf(file, sizeof(file), "materials\\%s", relativePathFileName);
+			V_sprintf_safe(file, "materials\\%s", relativePathFileName);
 		}
 		OnResourcePrecached(file);
 
@@ -657,14 +657,14 @@ void CMapReslistGenerator::OnSoundPrecached(const char *relativePathFileName)
 
 	// prepend the sound/ directory if necessary
 	char file[_MAX_PATH];
-	if (!Q_strnicmp(relativePathFileName, "sound", strlen("sound")))
+	if (!Q_strnicmp(relativePathFileName, "sound", ssize("sound") - 1))
 	{
-		Q_strncpy(file, relativePathFileName, sizeof(file));
+		V_strcpy_safe(file, relativePathFileName);
 	}
 	else
 	{
 		// prepend the sound directory
-		Q_snprintf(file, sizeof(file), "sound\\%s", relativePathFileName);
+		V_sprintf_safe(file, "sound\\%s", relativePathFileName);
 	}
 
 	OnResourcePrecached(file);
