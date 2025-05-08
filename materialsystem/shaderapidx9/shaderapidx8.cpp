@@ -1829,7 +1829,7 @@ static void PIXifyName( char *pDst, int destSize, const char *pSrc )
 static int AdjustUpdateRange( float const* pVec, void const *pOut, int numVecs, int* pSkip )
 {
 	int skip = 0;
-	uint32* pSrc = (uint32*)pVec;
+	const uint32* pSrc = (const uint32*)pVec;
 	uint32* pDst = (uint32*)pOut;
 	while( numVecs && !( ( pSrc[0] ^ pDst[0] ) | ( pSrc[1] ^ pDst[1] ) | ( pSrc[2] ^ pDst[2] ) | ( pSrc[3] ^ pDst[3] ) ) )
 	{
@@ -1842,7 +1842,7 @@ static int AdjustUpdateRange( float const* pVec, void const *pOut, int numVecs, 
 	if ( !numVecs )
 		return 0;
 
-	uint32* pSrcLast = pSrc + numVecs * 4 - 4;
+	const uint32* pSrcLast = pSrc + numVecs * 4 - 4;
 	uint32* pDstLast = pDst + numVecs * 4 - 4;
 	while( numVecs > 1 && !( ( pSrcLast[0] ^ pDstLast[0] ) | ( pSrcLast[1] ^ pDstLast[1] ) | ( pSrcLast[2] ^ pDstLast[2] ) | ( pSrcLast[3] ^ pDstLast[3] ) ) )
 	{
