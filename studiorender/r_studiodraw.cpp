@@ -1483,21 +1483,12 @@ void CStudioRender::R_StudioSoftwareProcessMesh( mstudiomesh_t* pmesh, CMeshBuil
 	nAlphaMask <<= 24;
 
 	// FIXME: Use function pointers to simplify this?!?
-	int idx;
-	if ( IsPC() )
-	{
-		idx	= bDX8Vertex * 24 + bNeedsTangentSpace * 12 + doFlex * 6 + MathLib_SSEEnabled() * 3 + lighting;
-	}
-	else
-	{
-		idx = bNeedsTangentSpace * 6 + doFlex * 3 + lighting;
-	}
-
+	int idx	= bDX8Vertex * 24 + bNeedsTangentSpace * 12 + doFlex * 6 + MathLib_SSEEnabled() * 3 + to_underlying(lighting);
 	const mstudio_meshvertexdata_t *pVertData = GetFatVertexData( pmesh, m_pStudioHdr );
 	if ( pVertData )
 	{
 		// invoke the software mesh processing handler
-		g_SoftwareProcessMeshFunc[idx]( pVertData, m_PoseToWorld, m_VertexCache, meshBuilder, numVertices, pGroupToMesh, nAlphaMask, pMaterial ); 
+		g_SoftwareProcessMeshFunc[idx]( pVertData, m_PoseToWorld, m_VertexCache, meshBuilder, numVertices, pGroupToMesh, nAlphaMask, pMaterial );
 	}
 }
 
