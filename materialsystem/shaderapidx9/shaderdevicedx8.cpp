@@ -1928,7 +1928,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_ON\n" );
 		break;
 	case COMPRESSED_TEXTURES_OFF:
-		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_ON\n" );
+		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_OFF\n" );
 		break;
 	case COMPRESSED_TEXTURES_NOT_INITIALIZED:
 		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_NOT_INITIALIZED\n" );
