@@ -83,7 +83,7 @@ public:
 	// APIS required by CManagedDataCacheClient
 	void DestroyResource();
 	CAsyncWaveData *GetData();
-	size_t Size();
+	size_t Size() const;
 
 	static void AsyncCallback( const FileAsyncRequest_t &asyncRequest, int numReadBytes, FSAsyncStatus_t err );
 	static void QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
@@ -95,11 +95,11 @@ public:
 	bool BlockingGetDataPointer( void **ppData );
 	void SetAsyncPriority( int priority );
 	void StartAsyncLoading( const asyncwaveparams_t& params );
-	bool GetPostProcessed();
+	bool GetPostProcessed() const;
 	void SetPostProcessed( bool proc );
 
-	bool IsCurrentlyLoading();
-	char const *GetFileName();
+	bool IsCurrentlyLoading() const;
+	char const *GetFileName() const;
 
 	// Data
 public:
@@ -144,57 +144,23 @@ CAsyncWaveData::CAsyncWaveData() :
 //-----------------------------------------------------------------------------
 void CAsyncWaveData::DestroyResource()
 {
-	if ( IsPC() )
+	if ( m_hAsyncControl )
 	{
-		if ( m_hAsyncControl )
+		if ( !m_bLoaded && !m_bMissing )
 		{
-			if ( !m_bLoaded && !m_bMissing )
-			{
-				// NOTE:  We CANNOT call AsyncAbort since if the file is actually being read we'll end 
-				//  up still getting a callback, but our this ptr (deleted below) will be feeefeee and we'll trash the heap 
-				//  pretty bad.  So we call AsyncFinish, which will do a blocking read and will definitely succeed	
-				// Block until we are finished
-				g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
-			}
+			// NOTE:  We CANNOT call AsyncAbort since if the file is actually being read we'll end 
+			//  up still getting a callback, but our this ptr (deleted below) will be feeefeee and we'll trash the heap 
+			//  pretty bad.  So we call AsyncFinish, which will do a blocking read and will definitely succeed	
+			// Block until we are finished
+			g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
+		}
 			
-			g_pFileSystem->AsyncRelease( m_hAsyncControl );
-			m_hAsyncControl = NULL;
-		}
-	}
-
-	if ( IsX360() )
-	{
-		if ( m_hAsyncControl )
-		{
-			if ( !m_bLoaded && !m_bMissing )
-			{
-				// force an abort
-				int errStatus = g_pFileSystem->AsyncAbort( m_hAsyncControl );
-				if ( errStatus != FSASYNC_ERR_UNKNOWNID )
-				{
-					// must wait for abort to finish before deallocating data
-					g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
-				}
-			}
-			g_pFileSystem->AsyncRelease( m_hAsyncControl );
-			m_hAsyncControl = NULL;
-		}
-		if ( m_hBuffer != INVALID_BUFFER_HANDLE )
-		{
-			// hint the manager that this tracked buffer is invalid
-			wavedatacache->MarkBufferDiscarded( m_hBuffer );
-		}
+		g_pFileSystem->AsyncRelease( m_hAsyncControl );
+		m_hAsyncControl = NULL;
 	}
 
 	// delete buffers
-	if ( IsPC() || !IsX360() )
-	{
-		g_pFileSystem->FreeOptimalReadBuffer( m_pAlloc );
-	}
-	else
-	{
-		delete [] m_pAlloc;
-	}
+	g_pFileSystem->FreeOptimalReadBuffer( m_pAlloc );
 
 	delete this;
 }
@@ -203,11 +169,11 @@ void CAsyncWaveData::DestroyResource()
 // Purpose: 
 // Output : char const
 //-----------------------------------------------------------------------------
-char const *CAsyncWaveData::GetFileName()
+char const *CAsyncWaveData::GetFileName() const
 {
 	static char sz[MAX_PATH];
 
-	if ( m_hFileNameHandle )	
+	if ( m_hFileNameHandle )
 	{
 		if ( g_pFileSystem->String( m_hFileNameHandle, sz ) )
 		{
@@ -232,23 +198,9 @@ CAsyncWaveData *CAsyncWaveData::GetData()
 // Purpose: 
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-size_t CAsyncWaveData::Size()
+size_t CAsyncWaveData::Size() const
 { 
-	size_t size = sizeof( *this );
-	
-	if ( IsPC() )
-	{
-		size += m_nDataSize;
-	}
-
-	if ( IsX360() )
-	{
-		// the data size can shrink during streaming near end of file
-		// need the real contant size of this object's allocations
-		size += m_nBufferBytes;
-	}
-
-	return size;
+	return sizeof( *this ) + m_nDataSize;
 }
 
 //-----------------------------------------------------------------------------
@@ -447,7 +399,7 @@ bool CAsyncWaveData::BlockingCopyData( void *destbuffer, int destbufsize, int st
 }
 
 
-bool CAsyncWaveData::IsCurrentlyLoading()
+bool CAsyncWaveData::IsCurrentlyLoading() const
 {
 	if ( m_bLoaded )
 		return true;
@@ -586,7 +538,7 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CAsyncWaveData::GetPostProcessed()
+bool CAsyncWaveData::GetPostProcessed() const
 {
 	return m_bPostProcessed;
 }
@@ -610,14 +562,14 @@ public:
 	CAsyncWavDataCache();
 	~CAsyncWavDataCache() = default;
 
-	virtual bool			Init( size_t memSize );
-	virtual void			Shutdown();
+	bool			Init( size_t memSize ) override;
+	void			Shutdown() override;
 
 	// implementation that treats file as monolithic
-	virtual memhandle_t		AsyncLoadCache( char const *filename, int datasize, int startpos, bool bIsPrefetch = false );
-	virtual void			PrefetchCache( char const *filename, int datasize, int startpos );
-	virtual bool			CopyDataIntoMemory( char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed );
-	virtual bool			CopyDataIntoMemory( memhandle_t& handle, char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed );
+	memhandle_t		AsyncLoadCache( char const *filename, int datasize, int startpos, bool bIsPrefetch = false ) override;
+	void			PrefetchCache( char const *filename, int datasize, int startpos ) override;
+	bool			CopyDataIntoMemory( char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed ) override;
+	bool			CopyDataIntoMemory( memhandle_t& handle, char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed ) override;
 	virtual void			SetPostProcessed( memhandle_t handle, bool proc );
 	virtual void			Unload( memhandle_t handle );
 	virtual bool			GetDataPointer( memhandle_t& handle, char const *filename, int datasize, int startpos, void **pData, int copystartpos, bool *pbPostProcessed );
@@ -641,7 +593,7 @@ public:
 	void					SpewMemoryUsage( int level );
 
 	// Cache helpers
-	bool					GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  );
+	bool					GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, size_t nMaxLen  );
 
 private:
 	void					Clear();
@@ -1593,7 +1545,7 @@ void CAsyncWavDataCache::OnMixEnd()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CAsyncWavDataCache::GetItemName( DataCacheClientID_t, const void *pItem, char *pDest, unsigned nMaxLen  )
+bool CAsyncWavDataCache::GetItemName( DataCacheClientID_t, const void *pItem, char *pDest, size_t nMaxLen  )
 {
 	CAsyncWaveData *pWaveData = (CAsyncWaveData *)pItem;
 	Q_strncpy( pDest, pWaveData->GetFileName(), nMaxLen );
