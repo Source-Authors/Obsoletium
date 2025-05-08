@@ -5165,7 +5165,7 @@ void CShaderAPIDx8::SetClipPlane( int index, const float *pPlane )
 //-----------------------------------------------------------------------------
 // Converts a DirectX::XMMATRIX to a VMatrix and back
 //-----------------------------------------------------------------------------
-void XM_CALLCONV CShaderAPIDx8::XMMatrixToVMatrix( DirectX::XMMATRIX in, VMatrix& out )
+void XM_CALLCONV CShaderAPIDx8::XMMatrixToVMatrix( DirectX::FXMMATRIX in, VMatrix& out )
 {
 	DirectX::XMMATRIX result = DirectX::XMMatrixTranspose( in );
 	DirectX::XMStoreFloat4x4( out.XmMBase(), result );
