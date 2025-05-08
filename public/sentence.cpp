@@ -1586,12 +1586,12 @@ unsigned int CSentence::GetDataCheckSum() const
 
 #define STARTEND_TIMEGAP 0.1F
 
-int CSentence::CountWords( char const *str )
+intp CSentence::CountWords( char const *str )
 {
 	if ( !str || !str[ 0 ] )
 		return 0;
 
-	int c = 1;
+	intp c = 1;
 	
 	unsigned char *p = (unsigned char *)str;
 	while ( *p )
@@ -1646,7 +1646,7 @@ void CSentence::CreateEventWordDistribution( char const *pszText, float flSenten
 	if ( !pszText )
 		return;
 
-	int wordCount = CountWords( pszText );
+	intp wordCount = CountWords( pszText );
 	if ( wordCount <= 0 )
 		return;
 

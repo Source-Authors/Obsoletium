@@ -257,7 +257,7 @@ public:
 	void			AddRuntimePhoneme( const CPhonemeTag *src );
 
 	void			CreateEventWordDistribution( char const *pszText, float flSentenceDuration );
-	static int		CountWords( char const *pszText );
+	static intp		CountWords( char const *pszText );
 	static bool		ShouldSplitWord( char in );
 
 public:
