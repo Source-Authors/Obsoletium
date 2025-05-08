@@ -80,7 +80,7 @@ void CEventPropertiesMoveToDialog::InitControlData( CEventParams *params )
 
 	PopulateMovementStyle( choices2, params );
 
-	if (strlen( params->m_szParameters3 ) != 0)
+	if (!Q_isempty( params->m_szParameters3 ))
 	{
 		// make sure blank is a valid choice
 		SendMessage( choices3, CB_ADDSTRING, 0, (LPARAM)"" ); 

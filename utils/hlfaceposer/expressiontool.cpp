@@ -2857,7 +2857,7 @@ void ExpressionTool::AddFlexTimingTag( int mx )
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		Con_ErrorPrintf( "Timing Tag Name:  No name entered!\n" );
 		return;
@@ -3295,14 +3295,14 @@ void ExpressionTool::OnNewExpression( void )
 	if ( !ExpressionProperties( &params ) )
 		return;
 
-	if ( ( strlen( params.m_szName ) <= 0 ) ||
+	if ( ( Q_isempty( params.m_szName ) ) ||
 		!stricmp( params.m_szName, "unnamed" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid name\n" );
 		return;
 	}
 
-	if ( ( strlen( params.m_szDescription ) <= 0 ) ||
+	if ( ( Q_isempty( params.m_szDescription ) ) ||
    	   !stricmp( params.m_szDescription, "description" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid description\n" );

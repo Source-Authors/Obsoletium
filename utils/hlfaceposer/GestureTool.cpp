@@ -1577,7 +1577,7 @@ void GestureTool::OnInsertTag( void )
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		Con_ErrorPrintf( "Timing Tag Name:  No name entered!\n" );
 		return;

@@ -3416,7 +3416,7 @@ void PhonemeEditor::EditInsertWordBefore( void )
 		return;
 	}
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		return;
 	}
@@ -3516,7 +3516,7 @@ void PhonemeEditor::EditInsertWordAfter( void )
 		return;
 	}
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		return;
 	}
@@ -3764,7 +3764,7 @@ void PhonemeEditor::SentenceFromString( CSentence& sentence, char const *str )
 				in++;
 			}
 			
-			if ( strlen( word ) > 0 )
+			if ( !Q_isempty( word ) )
 			{
 				CWordTag *w = new CWordTag( (char *)word );
 				Assert( w );
@@ -3779,7 +3779,7 @@ void PhonemeEditor::SentenceFromString( CSentence& sentence, char const *str )
 	}
 	
 	*out = 0;
-	if ( strlen( word ) > 0 )
+	if ( !Q_isempty( word ) )
 	{
 		CWordTag *w = new CWordTag( (char *)word );
 		Assert( w );
@@ -3857,7 +3857,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		if ( !InputProperties( &params ) )
 			return;
 
-		if ( strlen( params.m_szInputText ) <= 0 )
+		if ( Q_isempty( params.m_szInputText ) )
 		{
 			Con_ErrorPrintf( "Edit word list:  No words entered!\n" );
 			return;
@@ -5104,7 +5104,7 @@ void PhonemeEditor::EditWordList( void )
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		// Could be foreign language...
 		Warning( "Edit word list:  No words entered!\n" );
@@ -5642,7 +5642,7 @@ void PhonemeEditor::AddTag( void )
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		Con_ErrorPrintf( "Event Tag Name:  No name entered!\n" );
 		return;

@@ -5972,7 +5972,7 @@ void CChoreoView::New( void )
 	if ( !ActorProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6424,7 +6424,7 @@ void CChoreoView::EditChannel( CChoreoChannel *channel )
 	if ( !ChannelProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6491,7 +6491,7 @@ void CChoreoView::NewActor( void )
 	if ( !ActorProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6590,7 +6590,7 @@ void CChoreoView::EditActor( CChoreoActor *actor )
 	if ( !ActorProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6915,13 +6915,13 @@ void CChoreoView::AddGlobalEvent( CChoreoEvent::EVENTTYPE type )
 	if ( !GlobalEventProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 	{
 		Con_Printf( "Pause section event must have a valid name\n" );
 		return;
 	}
 
-	if ( strlen( params.m_szAction ) <= 0 )
+	if ( Q_isempty( params.m_szAction ) )
 	{
 		Con_Printf( "No action specified for section pause\n" );
 		return;
@@ -7038,13 +7038,13 @@ void CChoreoView::EditGlobalEvent( CChoreoEvent *event )
 	if ( !GlobalEventProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 	{
 		Con_Printf( "Event %s must have a valid name\n", event->GetName() );
 		return;
 	}
 
-	if ( strlen( params.m_szAction ) <= 0 )
+	if ( Q_isempty( params.m_szAction ) )
 	{
 		Con_Printf( "No action specified for %s\n", event->GetName() );
 		return;
@@ -8548,7 +8548,7 @@ void CChoreoView::AddEventRelativeTag( void )
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		Con_ErrorPrintf( "Event Tag Name:  No name entered!\n" );
 		return;
