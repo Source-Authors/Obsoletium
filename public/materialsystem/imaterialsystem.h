@@ -121,8 +121,8 @@ enum MaterialMatrixMode_t
 };
 
 // FIXME: How do I specify the actual number of matrix modes?
-const int NUM_MODEL_TRANSFORMS = 53;
-const int MATERIAL_MODEL_MAX = MATERIAL_MODEL + NUM_MODEL_TRANSFORMS;
+constexpr inline int NUM_MODEL_TRANSFORMS = 53;
+constexpr inline int MATERIAL_MODEL_MAX = MATERIAL_MODEL + NUM_MODEL_TRANSFORMS;
 
 enum MaterialPrimitiveType_t 
 { 
@@ -1645,20 +1645,20 @@ class CMatRenderData
 {
 public:
 	CMatRenderData( IMatRenderContext* pRenderContext );
-	CMatRenderData( IMatRenderContext* pRenderContext, int nCount, const E *pSrcData = nullptr );
+	CMatRenderData( IMatRenderContext* pRenderContext, intp nCount, const E *pSrcData = nullptr );
 	~CMatRenderData();
-	E* Lock( int nCount, const E* pSrcData = nullptr ); 
+	E* Lock( intp nCount, const E* pSrcData = nullptr ); 
 	void Release();
 	bool IsValid() const;
 	const E* Base() const;
 	E* Base();
-	const E& operator[]( int i ) const; //-V302
-	E& operator[]( int i ); //-V302
+	const E& operator[]( intp i ) const; //-V302
+	E& operator[]( intp i ); //-V302
 
 private:
 	IMatRenderContext* m_pRenderContext;
 	E *m_pRenderData;
-	int m_nCount;
+	intp m_nCount;
 	bool m_bNeedsUnlock;
 };
 
@@ -1672,7 +1672,7 @@ inline CMatRenderData<E>::CMatRenderData( IMatRenderContext* pRenderContext )
 }
 
 template< typename E >
-inline CMatRenderData<E>::CMatRenderData( IMatRenderContext* pRenderContext, int nCount, const E* pSrcData )
+inline CMatRenderData<E>::CMatRenderData( IMatRenderContext* pRenderContext, intp nCount, const E* pSrcData )
 {
 	m_pRenderContext = pRenderContext;
 	m_nCount = 0;
@@ -1694,7 +1694,7 @@ inline bool CMatRenderData<E>::IsValid() const
 }
 
 template< typename E >
-inline E* CMatRenderData<E>::Lock( int nCount, const E* pSrcData )
+inline E* CMatRenderData<E>::Lock( intp nCount, const E* pSrcData )
 {
 	m_nCount = nCount;
 	if ( pSrcData && m_pRenderContext->IsRenderData( pSrcData ) )
@@ -1743,14 +1743,14 @@ inline const E* CMatRenderData<E>::Base() const
 }
 
 template< typename E >
-inline E& CMatRenderData<E>::operator[]( int i )
+inline E& CMatRenderData<E>::operator[]( intp i )
 {
 	Assert( ( i >= 0 ) && ( i < m_nCount ) );
 	return m_pRenderData[i];
 }
 
 template< typename E >
-inline const E& CMatRenderData<E>::operator[]( int i ) const
+inline const E& CMatRenderData<E>::operator[]( intp i ) const
 {
 	Assert( ( i >= 0 ) && ( i < m_nCount ) );
 	return m_pRenderData[i];
