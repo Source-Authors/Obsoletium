@@ -180,22 +180,33 @@ static const char *FindDependentMaterial( const char *pMaterialName, const char 
 //-----------------------------------------------------------------------------
 // Loads VTF files
 //-----------------------------------------------------------------------------
-static bool LoadSrcVTFFiles( IVTFTexture *pSrcVTFTextures[6], const char *pSkyboxMaterialBaseName,
+static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pSkyboxMaterialBaseName,
 							int *pUnionTextureFlags, bool bHDR )
 {
 	constexpr char facingName[6][3] = {"rt", "lf", "bk", "ft", "up", "dn"};
-	int i;
-	for( i = 0; i < 6; i++ )
+	static_assert(ARRAYSIZE(pSrcVTFTextures) == ssize(facingName));
+	
+	char srcMaterialName[MAX_PATH], src0VTFFileName[MAX_PATH], srcVTFFileName[MAX_PATH];
+
+	intp i = -1;
+	for( const char *name : facingName )
 	{
-		char srcMaterialName[1024];
-		sprintf( srcMaterialName, "%s%s", pSkyboxMaterialBaseName, facingName[i] );
+		++i;
+
+		V_sprintf_safe( srcMaterialName, "%s%s", pSkyboxMaterialBaseName, name );
 
 		IMaterial *pSkyboxMaterial = g_pMaterialSystem->FindMaterial( srcMaterialName, "skybox" );
 		//IMaterialVar *pSkyTextureVar = pSkyboxMaterial->FindVar( bHDR ? "$hdrbasetexture" : "$basetexture", NULL ); //, bHDR ? false : true );
-		IMaterialVar *pSkyTextureVar = pSkyboxMaterial->FindVar( "$basetexture", NULL ); // Since we're setting it to black anyway, just use $basetexture for HDR
+		// Since we're setting it to black anyway, just use $basetexture for HDR
+		IMaterialVar *pSkyTextureVar = pSkyboxMaterial->FindVar( "$basetexture", NULL );
+		
 		const char *vtfName = pSkyTextureVar->GetStringValue();
-		char srcVTFFileName[MAX_PATH];
-		Q_snprintf( srcVTFFileName, MAX_PATH, "materials/%s.vtf", vtfName );
+		V_sprintf_safe( srcVTFFileName, "materials/%s.vtf", vtfName );
+
+		if (i == 0)
+		{
+			V_strcpy_safe( src0VTFFileName, srcVTFFileName );
+		}
 
 		CUtlBuffer buf;
 		if ( !g_pFullFileSystem->ReadFile( srcVTFFileName, NULL, buf ) )
@@ -222,31 +233,55 @@ static bool LoadSrcVTFFiles( IVTFTexture *pSrcVTFTextures[6], const char *pSkybo
 			}
 		}
 
-		pSrcVTFTextures[i] = CreateVTFTexture();
-		if (!pSrcVTFTextures[i]->Unserialize(buf))
+		IVTFTexture *texture = pSrcVTFTextures[i] = CreateVTFTexture();
+		if (!texture->Unserialize(buf))
 		{
 			Warning("*** Error unserializing skybox texture: '%s'.\n", pSkyboxMaterialBaseName );
 			return false;
 		}
 
-		*pUnionTextureFlags |= pSrcVTFTextures[i]->Flags();
-		int flagsNoAlpha = pSrcVTFTextures[i]->Flags() & ~( TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA );
-		int flagsFirstNoAlpha = pSrcVTFTextures[0]->Flags() & ~( TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA );
+		*pUnionTextureFlags |= texture->Flags();
+		CompiledVtfFlags flagsNoAlpha = static_cast<CompiledVtfFlags>(texture->Flags() & ~( TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA ));
+		CompiledVtfFlags flagsFirstNoAlpha = static_cast<CompiledVtfFlags>(pSrcVTFTextures[0]->Flags() & ~( TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA ));
 		
+		bool isIncorrectWidth = texture->Width() != pSrcVTFTextures[0]->Width() && texture->Width() != 4;
+
 		// NOTE: texture[0] is a side texture that could be 1/2 height, so allow this and also allow 4x4 faces
-		if ( ( ( pSrcVTFTextures[i]->Width() != pSrcVTFTextures[0]->Width() ) && ( pSrcVTFTextures[i]->Width() != 4 ) ) ||
-			 ( ( pSrcVTFTextures[i]->Height() != pSrcVTFTextures[0]->Height() ) && ( pSrcVTFTextures[i]->Height() != pSrcVTFTextures[0]->Height()*2 )  && ( pSrcVTFTextures[i]->Height() != 4 ) ) ||
-			 ( flagsNoAlpha != flagsFirstNoAlpha ) )
+		if ( isIncorrectWidth )
 		{
-			Warning("*** Error: Skybox vtf files for %s weren't compiled with the same size texture and/or same flags!\n", pSkyboxMaterialBaseName );
+			Warning("*** Error: Skybox vtfs for '%s' have different width! Expected %d or 4 from '%s', got %d from '%s'.\n",
+				pSkyboxMaterialBaseName,
+				pSrcVTFTextures[0]->Width(), src0VTFFileName,
+				texture->Width(), srcVTFFileName);
+			return false;
+		}
+
+		bool isIncorrectHeight = texture->Height() != pSrcVTFTextures[0]->Height() &&
+			texture->Height() != pSrcVTFTextures[0]->Height() * 2 &&
+			texture->Height() != 4;
+
+		if ( isIncorrectHeight )
+		{
+			Warning("*** Error: Skybox vtfs for '%s' have different height! Expected %d or 4 from '%s', got %d from '%s'.\n",
+				pSkyboxMaterialBaseName,
+				pSrcVTFTextures[0]->Height(), src0VTFFileName,
+				texture->Height(), srcVTFFileName);
+			return false;
+		}
+
+		if ( flagsNoAlpha != flagsFirstNoAlpha )
+		{
+			Warning("*** Error: Skybox vtfs for '%s' have different flags! Expected 0x%x from '%s', got 0x%x from '%s'.\n",
+				pSkyboxMaterialBaseName,
+				flagsFirstNoAlpha, src0VTFFileName, flagsNoAlpha, srcVTFFileName);
 			return false;
 		}
 
 		if ( bHDR )
 		{
-			pSrcVTFTextures[i]->ConvertImageFormat( IMAGE_FORMAT_RGB323232F, false );
-			pSrcVTFTextures[i]->GenerateMipmaps();
-			pSrcVTFTextures[i]->ConvertImageFormat( IMAGE_FORMAT_RGBA16161616F, false );
+			texture->ConvertImageFormat( IMAGE_FORMAT_RGB323232F, false );
+			texture->GenerateMipmaps();
+			texture->ConvertImageFormat( IMAGE_FORMAT_RGBA16161616F, false );
 		}
 	}
 
@@ -285,7 +320,7 @@ void CreateDefaultCubemaps( bool bHDR )
 		}
 		return;
 	}
-
+	
 	char skyboxMaterialName[MAX_PATH];
 	V_sprintf_safe( skyboxMaterialName, "skybox/%s", pSkyboxBaseName );
 
@@ -447,7 +482,7 @@ void CreateDefaultCubemaps( bool bHDR )
 
 	// spit out the default one.
 	AddBufferToPak( pak, dstVTFFileName, outputBuf.Base(), outputBuf.TellPut(), false );
-
+	
 	char vtfName[MAX_PATH];
 	// spit out all of the ones that are attached to world geometry.
 	for( auto *name : s_DefaultCubemapNames )
