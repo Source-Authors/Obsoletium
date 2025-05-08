@@ -2630,7 +2630,7 @@ void ControlPanel::OnLoadModel( void )
 
 	for ( i = 0; i < HLMV_MAX_MERGED_MODELS; ++i )
 	{
-		if ( strlen( g_viewerSettings.mergeModelFile[i] ) != 0 )
+		if ( !Q_isempty( g_viewerSettings.mergeModelFile[i] ) )
 		{
 			loadModel( g_viewerSettings.mergeModelFile[i], i );
 		}
