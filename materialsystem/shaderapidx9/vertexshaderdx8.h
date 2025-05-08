@@ -103,11 +103,6 @@ public:
 	virtual void BindVertexShader( VertexShaderHandle_t shader ) = 0;
 	virtual void BindPixelShader( PixelShaderHandle_t shader ) = 0;
 
-#if defined( _X360 )
-	virtual const char *GetActiveVertexShaderName() = 0;
-	virtual const char *GetActivePixelShaderName() = 0;
-#endif
-
 #if defined( DX_TO_GL_ABSTRACTION )
 	virtual void DoStartupShaderPreloading() = 0;
 #endif

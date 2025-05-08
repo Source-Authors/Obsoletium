@@ -571,8 +571,7 @@ public:
 	virtual void				ClearVertexAndPixelShaderRefCounts();
 	virtual void				PurgeUnusedVertexAndPixelShaders();
 	void						SpewVertexAndPixelShaders();
-	const char					*GetActiveVertexShaderName();
-	const char					*GetActivePixelShaderName();
+
 	bool						CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuffer );
 	bool						CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuffer, char *debugLabel = NULL );
 
@@ -3293,32 +3292,6 @@ void CShaderManager::SpewVertexAndPixelShaders( void )
 CON_COMMAND( mat_spewvertexandpixelshaders, "Print all vertex and pixel shaders currently loaded to the console" )
 {
 	( ( CShaderManager * )ShaderManager() )->SpewVertexAndPixelShaders();
-}
-
-const char *CShaderManager::GetActiveVertexShaderName()
-{
-#if !defined( _DEBUG )
-	return "";
-#else
-	if ( !m_HardwareVertexShader )
-	{
-		return "NULL";
-	}
-	return vshDebugName[vshDebugIndex];
-#endif
-}
-
-const char *CShaderManager::GetActivePixelShaderName()
-{
-#if !defined( _DEBUG )
-	return "";
-#else
-	if ( !m_HardwarePixelShader )
-	{
-		return "NULL";
-	}
-	return pshDebugName[pshDebugIndex];
-#endif
 }
 
 #ifdef DYNAMIC_SHADER_COMPILE
