@@ -4960,9 +4960,6 @@ void CMeshMgr::DestroyDynamicIndexBuffer()
 //-----------------------------------------------------------------------------
 void CMeshMgr::CreateVertexIDBuffer()
 {
-	if ( IsX360() )
-		return;
-
 	DestroyVertexIDBuffer();
 
 	// Track mesh allocations
