@@ -764,9 +764,8 @@ void CWingedEdgeList::Visualize( unsigned char *pColor )
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_LINES, m_WingedEdges.Count() );
 
-	int i;
-	int nCount = m_WingedEdges.Count();
-	for ( i = nCount; --i >= 0; )
+	intp nCount = m_WingedEdges.Count();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		WingedEdge_t *pEdge = &m_WingedEdges[i];
 		meshBuilder.Position3fv( pEdge->m_vecPosition.Base() );
@@ -1501,10 +1500,8 @@ void CEdgeList::IntroduceNewActiveEdges( float y )
 void CEdgeList::ReduceActiveEdgeList( CWingedEdgeList &wingedEdgeList, float flMinY, float flMaxY )
 {
 	// Surface lists should be empty
-	int i;
-
 #ifdef DEBUG_OCCLUSION_SYSTEM
-	for ( i = m_Surfaces.Count(); --i >= 0; )
+	for ( intp i = m_Surfaces.Count(); --i >= 0; )
 	{
 		Assert( m_Surfaces[i].m_pNextSurface == NULL );
 	}
@@ -1546,6 +1543,7 @@ void CEdgeList::ReduceActiveEdgeList( CWingedEdgeList &wingedEdgeList, float flM
 		Assert( ( nLeaveSurfID != -1 ) || ( nEnterSurfID != -1 )  );
 
 		int nEdgeSurfID = ( nEnterSurfID != -1 ) ? nEnterSurfID : nLeaveSurfID;
+		intp i;
 
 		// Seam up edges...
 		for ( i = m_nPrevReduceCount; --i >= 0; )
@@ -1867,17 +1865,16 @@ void CEdgeList::ReduceActiveList( CWingedEdgeList &newEdgeList )
 		return;
 
 	// Copy the surfaces over
-	int nCount = m_Surfaces.Count();
 //	newEdgeList.m_Surfaces.EnsureCapacity( nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( auto &surface : m_Surfaces )
 	{
-		newEdgeList.AddSurface( m_Surfaces[i].m_Plane );
+		newEdgeList.AddSurface( surface.m_Plane );
 	}
 
 	Edge_t *pEdgeCrossings[MAX_EDGE_CROSSINGS];
 	ReduceInfo_t *pBuf[2];
-	pBuf[0] = (ReduceInfo_t*)stackalloc( nEdgeCount * sizeof(ReduceInfo_t) );
-	pBuf[1] = (ReduceInfo_t*)stackalloc( nEdgeCount * sizeof(ReduceInfo_t) );
+	pBuf[0] = stackallocT( ReduceInfo_t, nEdgeCount );
+	pBuf[1] = stackallocT( ReduceInfo_t, nEdgeCount );
 	m_nPrevReduceCount = m_nNewReduceCount = 0;
 	int nIndex = 0;
 
@@ -2005,7 +2002,7 @@ void CEdgeList::Visualize( unsigned char *pColor )
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_LINES, m_Edges.Count() );
 
-	int i;
+	intp i;
 	for ( i = m_Edges.Count(); --i >= 0; )
 	{
 		meshBuilder.Position3fv( m_Edges[i].m_vecPosition.Base() );
@@ -2333,7 +2330,7 @@ void COcclusionSystem::StitchClippedVertices( Vector *pVertices, int nCount )
 		if ( fabs( pVertices[i].z ) > 1e-3 )
 			continue;
 
-		int j;
+		intp j;
 		for ( j = m_ClippedVerts.Count(); --j >= 0; )
 		{
 			if ( VectorsAreEqual( pVertices[i], m_ClippedVerts[j], 1e-3 ) )
@@ -2744,14 +2741,13 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	// Compute the 8 box verts, and transform them into projective space...
 	// NOTE: We'd want to project them *after* the plane test if there were
 	// no frustum culling.
-	int i;
 	Vector pVecProjectedVertex[8];
 
 	// NOTE: The code immediately below is an optimized version of this loop
 	// The optimization takes advantage of the fact that the verts are all
 	// axis aligned.
 //	Vector vecBoxVertex;
-//	for ( i = 0; i < 8; ++i )
+//	for ( int i = 0; i < 8; ++i )
 //	{
 //		vecBoxVertex.x = pCornerVert[ (i & 0x1) ]->x;
 //		vecBoxVertex.y = pCornerVert[ (i & 0x2) >> 1 ]->y;
@@ -2761,7 +2757,7 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 //			return false;
 //	}
 
-	Vector4D vecProjVert[8];
+	Vector4D vecProjVert[ssize(pVecProjectedVertex)];
 	Vector4D vecDeltaProj[3];
 	Vector4D vecAbsMins4D( vecAbsMins.x, vecAbsMins.y, vecAbsMins.z, 1.0f );
 	Vector4DMultiply( m_WorldToProjection, vecAbsMins4D, vecProjVert[0] );
@@ -2777,7 +2773,7 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	if ( pVecProjectedVertex[0].z <= 0.0f )
 		return false;
 
-	for ( i = 1; i < 8; ++i )
+	for ( int i = 1; i < ssize(s_pSourceIndices); ++i )
 	{
 		int nIndex = s_pSourceIndices[i];
 		int nDelta = s_pDeltaIndices[i];
@@ -2798,8 +2794,8 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 
 	// Determine which faces + edges are visible...
 	++m_nTests;
-	int pSurfInd[6];
-	for ( i = 0; i < 6; ++i )
+	intp pSurfInd[6];
+	for ( int i = 0; i < ssize(pSurfInd); ++i )
 	{
 		int nDim = ( i >> 1 );
 		int nInd = i & 0x1;
@@ -2828,10 +2824,10 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	}
 
 	// Sort edges by minimum Y + dx/dy...
-	int pEdgeSort[12];
+	int pEdgeSort[ssize(s_pEdges)];
 	CUtlSortVector< int, WingedEdgeLessFunc > edgeSort( pEdgeSort, 12 );
 	edgeSort.SetLessContext( pVecProjectedVertex );
-	for ( i = 0; i < 12; ++i )
+	for ( int i = 0; i < ssize(s_pEdges); ++i )
 	{
 		// Skip non-visible edges
 		EdgeInfo_t *pEdge = &s_pEdges[i];
@@ -2843,8 +2839,8 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	}
 
 	// Now add them into the winged edge list, in sorted order...
-	int nEdgeCount = edgeSort.Count();
-	for ( i = 0; i < nEdgeCount; ++i )
+	intp nEdgeCount = edgeSort.Count();
+	for ( intp i = 0; i < nEdgeCount; ++i )
 	{
 		EdgeInfo_t *pEdge = &s_pEdges[edgeSort[i]];
 
@@ -2905,7 +2901,7 @@ void VisualizeQueuedEdges( )
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_LINES, g_EdgeVisualization.Count() );
 
-	int i;
+	intp i;
 	for ( i = g_EdgeVisualization.Count(); --i >= 0; )
 	{
 		EdgeVisualizationInfo_t &info = g_EdgeVisualization[i];
