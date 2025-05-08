@@ -449,7 +449,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-typedef CBitVec<32> CDWordBitVec;
+typedef CBitVec<32> CDWordBitVec; //-V112
 
 //-----------------------------------------------------------------------------
 
@@ -574,7 +574,7 @@ template <class BASE_OPS>
 inline CBitVecT<BASE_OPS>::CBitVecT()
 {
 	// undef this is ints are not 4 bytes
-	COMPILE_TIME_ASSERT( sizeof(int)==4 );
+	COMPILE_TIME_ASSERT( sizeof(int)==4 ); //-V112
 	
 	// Initialize bitstring by clearing all bits
 	ClearAll();
@@ -586,7 +586,7 @@ inline CBitVecT<BASE_OPS>::CBitVecT(typename BASE_OPS::BitCountType numBits)
  : BASE_OPS( numBits )
 {
 	// undef this is ints are not 4 bytes
-	COMPILE_TIME_ASSERT( sizeof(int)==4 );
+	COMPILE_TIME_ASSERT( sizeof(int)==4 ); //-V112
 	
 	// Initialize bitstring by clearing all bits
 	ClearAll();
