@@ -386,9 +386,9 @@ void V_strcpy_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], IN_Z const char *p
 
 // dimhotepus: V_strdup on stack.
 #define V_strdup_stack( src, name ) \
-  const intp V_strdup_stack_len_{V_strlen(src) + 1};  \
-  char *name{stackallocT(char, V_strdup_stack_len_)}; \
-  V_strncpy( name, src, V_strdup_stack_len_ )
+  const intp V_strdup_stack_##name##_len_{V_strlen(src) + 1};  \
+  char *name{stackallocT(char, V_strdup_stack_##name##_len_)}; \
+  V_strncpy(name, src, V_strdup_stack_##name##_len_)
 
 // dimhotepus: V_wcsdup on stack.
 #define V_wcsdup_stack( src, name ) \
