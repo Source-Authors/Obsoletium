@@ -2618,7 +2618,7 @@ void	CShaderManager::SaveShaderCache( char *cacheName )
 		i++;
 	} while( info.m_status >= 0 );
 	
-	pProgramCache->SaveToFile( g_pFullFileSystem, cacheName, "MOD" );
+	pProgramCache->SaveToFile( g_pFullFileSystem, cacheName, "MOD" );	
 	// done! whew
 #endif
 }
@@ -2626,7 +2626,7 @@ void	CShaderManager::SaveShaderCache( char *cacheName )
 bool	CShaderManager::LoadShaderCache( char *cacheName )
 {
 #ifdef DX_TO_GL_ABSTRACTION
-	KeyValues *pProgramCache = new KeyValues( "" );
+	KeyValuesAD pProgramCache( "" );
 	bool found = pProgramCache->LoadFromFile( g_pFullFileSystem, cacheName, "MOD" );
 
 	if ( !found ) 
