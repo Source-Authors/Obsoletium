@@ -1608,7 +1608,7 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 //-----------------------------------------------------------------------------
 CUtlSymbolTable g_ActivityModifiersTable;
 
-extern void SetActivityForSequence( CStudioHdr *pstudiohdr, int i );
+extern void SetActivityForSequence( CStudioHdr *pstudiohdr, intp i );
 
 void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict pstudiohdr )
 {
