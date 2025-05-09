@@ -136,7 +136,7 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 		{
 			id[std::size(id) - 1] = '\0';
 
-			auto ban = KeyValues::AutoDelete("ban");
+			KeyValuesAD ban("ban");
 
 			// determine type
 			if (IsIPAddress(id))
@@ -167,6 +167,7 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 			response = strchr(response, '\n');
 			if (!response)
 				break;
+
 			response++;
 		}
 	}
