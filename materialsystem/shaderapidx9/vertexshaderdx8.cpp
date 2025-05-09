@@ -2580,8 +2580,7 @@ void	CShaderManager::SaveShaderCache( char *cacheName )
 {
 #ifdef DX_TO_GL_ABSTRACTION	// must ifdef, it uses calls which don't exist in the real DX9 interface
 
-	KeyValues *pProgramCache = new KeyValues( k_pszShaderCacheRootKey );
-
+	KeyValuesAD pProgramCache( k_pszShaderCacheRootKey );
 	if ( !pProgramCache )
 	{
 		Warning( "Could not write to program cache file!\n" );
@@ -2620,8 +2619,6 @@ void	CShaderManager::SaveShaderCache( char *cacheName )
 	} while( info.m_status >= 0 );
 	
 	pProgramCache->SaveToFile( g_pFullFileSystem, cacheName, "MOD" );
-	pProgramCache->deleteThis();
-	
 	// done! whew
 #endif
 }
