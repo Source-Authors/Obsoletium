@@ -140,7 +140,7 @@ void CHudCredits::PrepareCredits( const char *pKeyName )
 {
 	Clear();
 
-	auto pKV = KeyValues::AutoDelete( "CreditsFile" );
+	KeyValuesAD pKV("CreditsFile");
 	if ( !pKV->LoadFromFile( filesystem, CREDITS_FILE, "MOD" ) )
 	{
 		AssertMsg( false, "env_credits couldn't be initialized!" );
