@@ -361,7 +361,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
     return false;
   }
 
-  KeyValues::AutoDelete kv = KeyValues::AutoDelete("reslists");
+  KeyValuesAD kv("reslists");
   if (!kv->LoadFromBuffer("reslists", buf.Base<const char>())) {
     Error("Unable to parse keyvalues from '%s'\n", fullpath);
   }
