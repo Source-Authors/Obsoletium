@@ -471,7 +471,7 @@ const sessionProperty_t &COptionsItem::GetActiveOption()
 //-----------------------------------------------------------------------
 // Return the index of the current active option
 //-----------------------------------------------------------------------
-int COptionsItem::GetActiveOptionIndex()
+intp COptionsItem::GetActiveOptionIndex()
 {
 	return m_nActiveOption;
 }
@@ -479,19 +479,19 @@ int COptionsItem::GetActiveOptionIndex()
 //-----------------------------------------------------------------------
 // Sets which option currently has focus
 //-----------------------------------------------------------------------
-void COptionsItem::SetOptionFocus( unsigned int idx )
+void COptionsItem::SetOptionFocus( intp idx )
 {
-	unsigned int itemCt = (unsigned int)m_OptionLabels.Count();
-	if ( idx > itemCt )
+	intp itemCt = m_OptionLabels.Count();
+	if ( idx < 0 || idx > itemCt )
 		return;
 
 	m_nActiveOption = idx;
 
-	for ( unsigned int i = 0; i < itemCt; ++i )
+	for ( intp i = 0; i < itemCt; ++i )
 	{
 		vgui::Label *pLabel = m_OptionLabels[i];
 
-		const bool bVisible = ( i == idx );
+		const bool bVisible = i == idx;
 		pLabel->SetVisible( bVisible );
 	}
 
@@ -1048,7 +1048,8 @@ void CDialogMenu::ApplySettings( KeyValues *pResourceData )
 			}
   
 			// Set the default active option
-  			int active = pMenuData->GetInt( "activeoption", 0 );
+			// dimhotepus: int -> uint64.
+  			intp active = (intp)pMenuData->GetUint64( "activeoption", 0 );
   			pItem->SetOptionFocus( active );
 
 			// Notify our parent that each option has been set to its current setting
@@ -1059,7 +1060,7 @@ void CDialogMenu::ApplySettings( KeyValues *pResourceData )
 
 	// Calculate the final menu size according to the widest menu item
 	int wide = m_nMinWide;
-	for ( int i = 0; i < m_MenuItems.Count(); ++i )
+	for ( intp i = 0; i < m_MenuItems.Count(); ++i )
 	{
 		wide = max( wide, m_MenuItems[i]->GetWide() );
 	}
@@ -1283,9 +1284,9 @@ void CDialogMenu::SetColumnFocusPrev()
 //--------------------------------------------------------------------------------------
 // For OptionsItems: Lets the dialog find out which option is currently selected
 //--------------------------------------------------------------------------------------
-int	CDialogMenu::GetActiveOptionIndex( int nMenuItemIdx )
+intp CDialogMenu::GetActiveOptionIndex( int nMenuItemIdx )
 {
-	int retval = -1;
+	intp retval = -1;
 	COptionsItem *pItem = dynamic_cast< COptionsItem* >( GetItem( nMenuItemIdx ) );
 	if ( pItem )
 	{

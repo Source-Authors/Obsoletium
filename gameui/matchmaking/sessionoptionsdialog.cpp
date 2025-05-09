@@ -224,7 +224,8 @@ void CSessionOptionsDialog::SetupSession( void )
 		pProperty->SetInt( "type", prop.nType );
 		pProperty->SetString( "valuestring", prop.szValue );
 		pProperty->SetString( "valuetype", prop.szValueType );
-		pProperty->SetInt( "optionindex", pItem->GetActiveOptionIndex() );
+		// dimhotpeus: int -> uint64.
+		pProperty->SetUint64( "optionindex", pItem->GetActiveOptionIndex() );
 	}
 
 	// Send contexts and properties parsed from the resource file
@@ -341,7 +342,8 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 			KeyValues *pKey = m_pDialogKeys->FindKey( pID );
 			if ( pKey )
 			{
-				pItemKeys->SetInt( "activeoption", pKey->GetInt( "optionindex" ) );	
+				// dimhotpeus: int -> uint64.
+				pItemKeys->SetUint64( "activeoption", pKey->GetUint64( "optionindex" ) );	
 			}
 		}
 	}
@@ -359,7 +361,8 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 			const char *pID	= pItemKeys->GetString( "id", "NULL" );
 			if ( !Q_stricmp( pID, "PROPERTY_GAME_SIZE" ) )
 			{
-				pItemKeys->SetInt( "activeoption", GetMaxPlayersRecommendedOption() );
+				// dimhotpeus: int -> uint64.
+				pItemKeys->SetUint64( "activeoption", GetMaxPlayersRecommendedOption() );
 			}
 		}
 	}
