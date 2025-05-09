@@ -582,14 +582,14 @@ void CMaterial::SetShaderAndParams( KeyValues *pKeyValues )
 		}
 	}
 
-	KeyValues *pLoadedKeyValues = new KeyValues( "vmt" );
+	KeyValuesAD pLoadedKeyValues( "vmt" );
 	if ( pLoadedKeyValues->LoadFromFile( g_pFullFileSystem, pFileName, pPathID ) )
 	{
 		// Load succeeded, check if it's a patch file
 		if ( V_stricmp( pLoadedKeyValues->GetName(), "patch" ) == 0 )
 		{
 			// it's a patch file, recursively build up patch keyvalues
-			KeyValues *pPatchKeyValues = new KeyValues( "vmt_patch" );
+			KeyValuesAD pPatchKeyValues( "vmt_patch" );
 			bool bSuccess = AccumulateRecursiveVmtPatches( *pPatchKeyValues, NULL, *pLoadedKeyValues, pPathID, NULL );
 			if ( bSuccess )
 			{
@@ -598,10 +598,8 @@ void CMaterial::SetShaderAndParams( KeyValues *pKeyValues )
 				// Apply accumulated patches to final vmt
 				ApplyPatchKeyValues( *m_pVMTKeyValues, *pPatchKeyValues );
 			}
-			pPatchKeyValues->deleteThis();
 		}
 	}
-	pLoadedKeyValues->deleteThis();
 
 	if ( g_pShaderDevice->IsUsingGraphics() )
 	{
@@ -1582,7 +1580,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 			if ( Q_stricmp( GetName(), pFallbackMaterial ) )
 			{
 				// Gotta copy it off; clearing the keyvalues will blow the string away
-				Q_strncpy( pFallbackMaterialNameBuf, pFallbackMaterial, 256 );
+				V_strcpy_safe( pFallbackMaterialNameBuf, pFallbackMaterial );
 				keyValues.Clear();
 				if( !LoadVMTFile( keyValues, patchKeyValues, pFallbackMaterialNameBuf, UsesUNCFileName(), NULL ) )
 				{
