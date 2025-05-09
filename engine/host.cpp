@@ -917,10 +917,9 @@ void SetupNewBindings()
 
 	// Load the file
 	const char *pFilename = "scripts\\newbindings.txt";
-	KeyValues *pNewBindingsData = new KeyValues( pFilename );
+	KeyValuesAD pNewBindingsData( pFilename );
 	if ( !pNewBindingsData->LoadFromFile( g_pFileSystem, pFilename ) )
 	{
-		pNewBindingsData->deleteThis();
 		return;
 	}
 
