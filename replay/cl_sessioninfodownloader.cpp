@@ -389,7 +389,8 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 		const char *pErrorToken = GetErrorString( m_nError, m_nHttpError );
 		if ( m_nError == ERROR_DOWNLOAD_FAILED )
 		{
-			KeyValues *pParams = new KeyValues( "args", "url", pDownloader->GetURL() );
+			// dimhotepus: Fix KeyValues leak.
+			KeyValuesAD pParams( new KeyValues( "args", "url", pDownloader->GetURL() ) );
 			CL_GetErrorSystem()->AddFormattedErrorFromTokenName( pErrorToken, pParams );
 		}
 		else

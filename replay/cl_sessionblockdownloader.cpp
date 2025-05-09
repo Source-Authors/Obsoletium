@@ -302,12 +302,8 @@ void CSessionBlockDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, 
 			const char *pToken = CHttpDownloader::GetHttpErrorToken( pDownloader->GetError() );
 			CL_GetErrorSystem()->AddFormattedErrorFromTokenName(
 				"#Replay_DL_Err_HTTP_Prefix",
-				new KeyValues(
-					"args",
-					"err",
-					pToken
-				)
-			);
+				// dimhotepus: Fix KeyValues leak.
+				KeyValuesAD( new KeyValues(	"args",	"err", pToken ) ) );
 		}
 
 		break;
