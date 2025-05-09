@@ -377,7 +377,7 @@ void VGui_RecursivePrintTree(
 
 	char str[1024];
 	if ( vgui_drawtree_panelptr.GetInt() )
-		Q_snprintf( str, sizeof( str ), "%s - [0x%x]", name, current );
+		Q_snprintf( str, sizeof( str ), "%s - [0x%llux]", name, current );
 	else if (vgui_drawtree_panelalpha.GetInt() )
 	{
 		KeyValuesAD kv("alpha");

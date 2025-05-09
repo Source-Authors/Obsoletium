@@ -472,10 +472,10 @@ private:
 	{
 		VPROF("OnSoundStarted");
 
-		if ( IsX360() || !toolframework->IsToolRecording() || params.suppressrecording )
+		if ( !toolframework->IsToolRecording() || params.suppressrecording )
 			return;
 
-		KeyValues *msg = new KeyValues( "StartSound" );
+		KeyValuesAD msg( "StartSound" );
 		msg->SetInt( "guid", guid );
 		msg->SetFloat( "time", cl.GetTime() );
 		msg->SetInt( "staticsound", params.staticsound ? 1 : 0 );
@@ -499,8 +499,6 @@ private:
 		msg->SetInt( "speakerentity", params.speakerentity );
 
 		toolframework->PostMessage( msg );
-
-		msg->deleteThis();
 	}
 
 	virtual void OnSoundStopped( int guid, int soundsource, int channel, char const *soundname )
@@ -513,10 +511,10 @@ private:
 
 		VPROF("OnSoundStopped");
 
-		if ( IsX360() || !toolframework->IsToolRecording() )
+		if ( !toolframework->IsToolRecording() )
 			return;
 
-		KeyValues *msg = new KeyValues( "StopSound" );
+		KeyValuesAD msg( "StopSound" );
 		msg->SetInt( "guid", guid );
 		msg->SetFloat( "time", cl.GetTime() );
 		msg->SetInt( "soundsource", soundsource );
@@ -524,8 +522,6 @@ private:
 		msg->SetString( "soundname", soundname );
 
 		toolframework->PostMessage( msg );
-
-		msg->deleteThis();
 	}
 };
 

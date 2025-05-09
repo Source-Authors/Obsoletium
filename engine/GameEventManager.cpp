@@ -50,7 +50,8 @@ CGameEvent::CGameEvent( CGameEventDescriptor *descriptor )
 
 CGameEvent::~CGameEvent()
 {
-	m_pDataKeys->deleteThis();
+	if (m_pDataKeys)
+		m_pDataKeys->deleteThis();
 }
 
 bool CGameEvent::GetBool( const char *keyName, bool defaultValue)
@@ -633,9 +634,7 @@ int CGameEventManager::LoadEventsFromFile( const char * filename )
 		m_EventFileNames.AddToTail( id );
 	}
 
-	KeyValues * key = new KeyValues(filename);
-	KeyValues::AutoDelete autodelete_key( key );
-
+	KeyValuesAD key(filename);
 	if  ( !key->LoadFromFile( g_pFileSystem, filename, "GAME" ) )
 		return false;
 
