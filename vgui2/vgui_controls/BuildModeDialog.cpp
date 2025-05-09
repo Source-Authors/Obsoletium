@@ -304,7 +304,7 @@ public:
 				EditablePanel *ep = dynamic_cast < EditablePanel * >( p );
 				if ( ep && ep->GetBuildGroup() )
 				{
-					KeyValues *kv = new KeyValues( "Panel" );
+					KeyValuesAD kv( "Panel" );
 					kv->SetPtr( "ptr", p );
 					char const *text = ep->GetName() ? ep->GetName() : "unnamed";
 					menu->AddMenuItem( text, new KeyValues("SetText", "text", text), GetParent(), kv );
@@ -321,7 +321,7 @@ public:
 				EditablePanel *ep = dynamic_cast < EditablePanel * >( m_hContext->GetChild( i ) );
 				if ( ep && ep->IsVisible() && ep->GetBuildGroup() )
 				{
-					KeyValues *kv = new KeyValues( "Panel" );
+					KeyValuesAD kv( "Panel" );
 					kv->SetPtr( "ptr", ep );
 					char const *text = ep->GetName() ? ep->GetName() : "unnamed";
 					menu->AddMenuItem( text, new KeyValues("SetText", "text", text), GetParent(), kv );
