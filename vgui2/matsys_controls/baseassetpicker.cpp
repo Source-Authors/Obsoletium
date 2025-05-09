@@ -1200,12 +1200,12 @@ void CBaseAssetPicker::BuildAssetNameList( )
 	s_AssetCache.BuildModList();
 
 	m_pModSelector->RemoveAll();
-	m_pModSelector->AddItem( "All Mods", new KeyValues( "Mod", "mod", -1 ) );
+	m_pModSelector->AddItem( "All Mods", KeyValuesAD( new KeyValues( "Mod", "mod", -1 ) ) );
 	int nModCount = s_AssetCache.ModCount();
 	for ( int i = 0; i < nModCount; ++i )
 	{
 		const char *pModName = s_AssetCache.ModInfo( i ).m_ModName;
-		m_pModSelector->AddItem( pModName, new KeyValues( "Mod", "mod", i ) );
+		m_pModSelector->AddItem( pModName, KeyValuesAD( new KeyValues( "Mod", "mod", i ) ) );
 	}
 	m_pModSelector->ActivateItemByRow( 0 );
 
