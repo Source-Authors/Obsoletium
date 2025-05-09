@@ -122,14 +122,13 @@ void CAssetTreeView::OpenRoot()
 
 	// add the base node
 	const char *pRootDir = m_DirectoryStructure[ m_DirectoryStructure.Root() ];
-	KeyValues *pkv = new KeyValues( "root" );
+	KeyValuesAD pkv( "root" );
 	pkv->SetString( "text", m_RootFolderName.Get() );
 	pkv->SetInt( "root", 1 );
 	pkv->SetInt( "expand", 1 );
 	pkv->SetInt( "dirHandle", m_DirectoryStructure.Root() );
 	pkv->SetString( "path", pRootDir );
 	int iRoot = AddItem( pkv, GetRootItemIndex() );
-	pkv->deleteThis();
 	ExpandItem( iRoot, true );
 }
 
@@ -188,7 +187,7 @@ void CAssetTreeView::SetItemColorForDirectories( int nItemID )
 void CAssetTreeView::AddDirectoryToTreeView( int nParentItemIndex, const char *pFullParentPath, DirHandle_t hPath )
 {
 	const char *pDirName = m_DirectoryStructure[hPath].Get();
-	KeyValues *kv = new KeyValues( "node", "text", pDirName );
+	KeyValuesAD kv( new KeyValues( "node", "text", pDirName ) );
 
 	char pFullPath[MAX_PATH];
 	Q_snprintf( pFullPath, sizeof( pFullPath ), "%s/%s", pFullParentPath, pDirName );
@@ -201,7 +200,6 @@ void CAssetTreeView::AddDirectoryToTreeView( int nParentItemIndex, const char *p
 	kv->SetInt( "dirHandle", hPath );
 
 	int nItemID = AddItem( kv, nParentItemIndex );
-	kv->deleteThis();
 
 	// mark directories in orange
 	SetItemColorForDirectories( nItemID );
@@ -1111,12 +1109,11 @@ void CBaseAssetPicker::AddAssetToList( int nAssetIndex )
 
 	bool bInRootDir = !strchr( info.m_AssetName, '\\' ) && !strchr( info.m_AssetName, '/' );
 
-	KeyValues *kv = new KeyValues( "node", "asset", info.m_AssetName );
+	KeyValuesAD kv( new KeyValues( "node", "asset", info.m_AssetName ) );
 	kv->SetString( "mod", s_AssetCache.ModInfo( info.m_nModIndex ).m_ModName );
 	kv->SetInt( "modIndex", info.m_nModIndex );
 	kv->SetInt( "root", bInRootDir );
 	int nItemID = m_pAssetBrowser->AddItem( kv, 0, false, false );
-	kv->deleteThis();
 	
 	if ( m_pAssetBrowser->GetSelectedItemsCount() == 0 && !Q_strcmp( m_SelectedAsset, info.m_AssetName ) )
 	{
