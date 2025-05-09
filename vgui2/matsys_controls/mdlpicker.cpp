@@ -1054,7 +1054,7 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 {
 	char	temp[ _MAX_PATH ];
 
-	// dimhotepus: add RAII.
+	// dimhotepus: Do RAII.
 	KeyValuesAD CaptureData( "ScreenCaps" );
 
 	Vector	vecPos;
@@ -1149,8 +1149,8 @@ bool CMDLPicker::RestoreCaps( const char *szFileName )
 		V_strcat_safe( temp, "ScreenCaps.cfg" );
 	}
 
-	KeyValues *CaptureData = new KeyValues( "ScreenCaps" );
-
+	// dimhotepus: Do not leak KeyValues.
+	KeyValuesAD CaptureData( "ScreenCaps" );
 	if ( !CaptureData->LoadFromFile( g_pFullFileSystem, temp ) )
 	{
 		return false;
@@ -1723,7 +1723,7 @@ int CMDLPicker::UpdatePropDataList( const char* pszPropData, bool &bIsStatic )
 				return iCount;
 			}
 			beginChunk++;
-			endChunk = strchr( beginChunk, '\"' );		
+			endChunk = strchr( beginChunk, '\"' );
 		}
 	}
 	return iCount;
