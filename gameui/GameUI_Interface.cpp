@@ -844,12 +844,12 @@ void CGameUI::RunFrame()
 				KeyValues *pKV = new KeyValues("ActiveGameName" );
 				pKV->SetString( "name", pathSep + 1 );
 				pKV->SetInt( "appid", engine->GetAppID() );
-				KeyValues *modinfo = new KeyValues("ModInfo");
+
+				KeyValuesAD modinfo("ModInfo");
 				if ( modinfo->LoadFromFile( g_pFullFileSystem, "gameinfo.txt" ) )
 				{
 					pKV->SetString( "game", modinfo->GetString( "game", "" ) );
 				}
-				modinfo->deleteThis();
 				
 				g_VModuleLoader.PostMessageToAllModules( pKV );
 			}

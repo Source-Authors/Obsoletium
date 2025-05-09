@@ -99,31 +99,26 @@ const char *CCreateMultiplayerGameGameplayPage::GetHostName()
 //-----------------------------------------------------------------------------
 const char *CCreateMultiplayerGameGameplayPage::GetValue(const char *cvarName, const char *defaultValue)
 {
+	static char buf[128];
+
 	for (mpcontrol_t *mp = m_pList; mp != NULL; mp = mp->next)
 	{
 		Panel *control = mp->pControl;
 		if (control && !stricmp(mp->GetName(), cvarName))
 		{
-			KeyValues *data = new KeyValues("GetText");
-			static char buf[128];
+			KeyValuesAD data("GetText");
 			if (control && control->RequestInfo(data))
 			{
-				strncpy(buf, data->GetString("text", defaultValue), sizeof(buf) - 1);
+				V_strcpy_safe(buf, data->GetString("text", defaultValue));
 			}
 			else
 			{
 				// no value found, copy in default text
-				strncpy(buf, defaultValue, sizeof(buf) - 1);
+				V_strcpy_safe(buf, defaultValue);
 			}
 
-			// ensure null termination of string
-			buf[sizeof(buf) - 1] = 0;
-
-			// free
-			data->deleteThis();
 			return buf;
 		}
-
 	}
 
 	return defaultValue;

@@ -1344,7 +1344,7 @@ void CBasePanel::DrawBackgroundImage()
 void CBasePanel::CreateGameMenu()
 {
 	// load settings from config file
-	KeyValues::AutoDelete datafile = KeyValues::AutoDelete("GameMenu");
+	KeyValuesAD datafile("GameMenu");
 	datafile->UsesEscapeSequences( true );	// VGUI uses escape sequences
 	if (datafile->LoadFromFile( g_pFullFileSystem, "Resource/GameMenu.res" ) )
 	{
@@ -4561,7 +4561,7 @@ void CMainMenuGameLogo::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	KeyValues *pConditions = new KeyValues( "conditions" );
+	KeyValuesAD pConditions( "conditions" );
 	if ( pConditions )
 	{
 		char background[MAX_PATH];
@@ -4571,15 +4571,10 @@ void CMainMenuGameLogo::ApplySchemeSettings( vgui::IScheme *pScheme )
 		if ( pSubKey )
 		{
 			pConditions->AddSubKey( pSubKey );
-		}	
+		}
 	}
 
 	LoadControlSettings( "Resource/GameLogo.res", NULL, NULL, pConditions );
-
-	if ( pConditions )
-	{
-		pConditions->deleteThis();
-	}
 }
 
 //-----------------------------------------------------------------------------

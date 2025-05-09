@@ -189,8 +189,6 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 	char szBinding[256];
 	char szDescription[256];
 
-	KeyValues *item;
-
 	// Load the default keys list
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( "scripts/kb_act.lst", NULL, buf ) )
@@ -231,7 +229,7 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 			else
 			{
 				// Create a new: blank item
-				item = new KeyValues( "Item" );
+				KeyValuesAD item( "Item" );
 				
 				// fill in data
 				item->SetString("Action", szDescription);
@@ -240,7 +238,6 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 
 				// Add to list
 				m_pKeyBindList->AddItem(sectionIndex, item);
-				item->deleteThis();
 			}
 		}
 	}

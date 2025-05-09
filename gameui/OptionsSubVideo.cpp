@@ -265,7 +265,8 @@ public:
 		m_pDXLevel = new ComboBox(this, "dxlabel", 6, false );
 
 		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-		KeyValues *pKeyValues = new KeyValues( "config" );
+
+		KeyValuesAD pKeyValues( "config" );
 		materials->GetRecommendedConfigurationInfo( 0, pKeyValues );
 		m_pDXLevel->DeleteAllItems();
 
@@ -278,7 +279,7 @@ public:
 				dxl < pKeyValues->GetInt("ConVar.mat_dxlevel"))
 				continue;
 
-			KeyValues *pTempKV = new KeyValues("config");
+			KeyValuesAD pTempKV("config");
 			if (dxl == pKeyValues->GetInt("ConVar.mat_dxlevel")
 				|| materials->GetRecommendedConfigurationInfo( dxl, pTempKV ))
 			{
@@ -287,10 +288,7 @@ public:
 				GetNameForDXLevel( dxl, szDXLevelName, sizeof(szDXLevelName) );
 				m_pDXLevel->AddItem( szDXLevelName, new KeyValues("dxlevel", "dxlevel", dxl) );
 			}
-
-			pTempKV->deleteThis();
 		}
-		pKeyValues->deleteThis();
 
 		m_pModelDetail = new ComboBox( this, "ModelDetail", 6, false );
 		m_pModelDetail->AddItem("#gameui_low", NULL);

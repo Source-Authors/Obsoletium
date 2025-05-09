@@ -170,7 +170,7 @@ void CrosshairImagePanelSimple::InitCrosshairColorEntries()
 {
 	if (m_pCrosshairColorCombo != NULL)
 	{
-		KeyValues *data = new KeyValues("data");
+		KeyValuesAD data("data");
 
 		// add in the "Default" selection
 		data->Clear();
@@ -181,8 +181,6 @@ void CrosshairImagePanelSimple::InitCrosshairColorEntries()
 			data->SetInt("color", i);
 			m_pCrosshairColorCombo->AddItem( s_crosshairColors[ i ].name, data);
 		}
-
-		data->deleteThis();
 	}
 }
 
@@ -486,7 +484,7 @@ void CrosshairImagePanelCS::InitCrosshairColorEntries()
 {
 	if (m_pColorComboBox != NULL)
 	{
-		KeyValues *data = new KeyValues("data");
+		KeyValuesAD data("data");
 
 		// add in the "Default" selection
 		data->Clear();
@@ -500,8 +498,6 @@ void CrosshairImagePanelCS::InitCrosshairColorEntries()
 
 		data->SetInt("color", NumCrosshairColors);
 		m_pColorComboBox->AddItem( "Custom", data);
-
-		data->deleteThis();
 	}
 }
 
