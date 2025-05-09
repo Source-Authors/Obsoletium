@@ -1209,7 +1209,7 @@ void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
 		MP3Dir_t *sub = current->m_Subdirectories[ i ];
 		Assert( sub );
 		
-		KeyValues *kv = new KeyValues( "TVI" );
+		KeyValuesAD kv( "TVI" );
 		kv->SetString( "Text", sub->m_DirName.String() );
 		kv->SetPtr( "MP3Dir", sub );
 
@@ -1226,7 +1226,7 @@ void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
 	{
 		MP3File_t *song = &m_Files[ current->m_FilesInDirectory[ i ] ];
 
-		KeyValues *kv = new KeyValues( "TVI" );
+		KeyValuesAD kv( "TVI" );
 
 		kv->SetString( "Text", song->shortname.String() );
 		kv->SetInt( "SongIndex", current->m_FilesInDirectory[ i ] );
@@ -1246,7 +1246,7 @@ void CMP3Player::PopulateTree()
 	m_pTree->RemoveAll();
 
 	// Now populate tree
-	KeyValues *kv = new KeyValues( "TVI" );
+	KeyValuesAD kv( "TVI" );
 	kv->SetString( "Text", "Songs" );
 
 	int rootIndex = m_pTree->AddItem( kv, -1 );
@@ -1261,8 +1261,8 @@ void CMP3Player::PopulateTree()
 
 		char const *dirname = tree->m_DirName.String();
 
-		kv = new KeyValues( "TVI" );
-		kv->SetString( "Text", dirname );
+		KeyValuesAD kv2( "TVI" );
+		kv2->SetString( "Text", dirname );
 
 		int index = m_pTree->AddItem( kv, rootIndex );
 
