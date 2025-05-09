@@ -43,7 +43,6 @@ KeyValues *KeyValuesJSONParser::ParseFile()
 		return NULL;
 	if ( m_eToken == '{' )
 	{
-
 		// Parse the the entire file as one big object
 		KeyValues *pResult = new KeyValues("");
 		if ( !ParseObject( pResult ) )
@@ -665,9 +664,9 @@ const char *KeyValuesJSONParser::GetTokenDebugText()
 static void JSONTest_ParseValid( const char *pszData )
 {
 	KeyValuesJSONParser parser( pszData );
-	KeyValues *pFile = parser.ParseFile();
+
+	KeyValuesAD pFile{parser.ParseFile()};
 	Assert( pFile );
-	if (pFile) pFile->deleteThis();
 }
 
 static void JSONTest_ParseInvalid( const char *pszData, const char *pszExpectedErrMsgSnippet, int nExpectedFailureLine )
