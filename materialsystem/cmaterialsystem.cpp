@@ -2601,16 +2601,12 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 		Q_strncpy( vmtName, pTemp, nLen );
 	}
 
-	//Q_strncat( vmtName, ".vmt", nLen, COPY_ALL_CHARACTERS );
 	Assert( nLen >= Q_strlen( vmtName ) + 1 );
 
 	CUtlVector<FileNameHandle_t> includes;
 	KeyValuesAD pKeyValues("vmt");
 	KeyValuesAD pPatchKeyValues( "vmt_patches" );
-	if ( !LoadVMTFile( *pKeyValues, *pPatchKeyValues, vmtName, true, &includes ) )
-	{
-	}
-	else
+	if ( LoadVMTFile( *pKeyValues, *pPatchKeyValues, vmtName, true, &includes ) )
 	{
 		nLen = Q_strlen( pTemp ) + ssize( ".vmt" );
 		char *matNameWithExtension = stackallocT( char, nLen );
@@ -2649,11 +2645,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 
 		if ( m_MaterialDict.NoteMissing( name ) )
 		{
-			if ( pComplainPrefix )
-			{
-				DevWarning( "%s", pComplainPrefix );
-			}
-			DevWarning( "Material '%s' not found.\n", name );
+			DevWarning( "%sMaterial '%s' not found.\n", pComplainPrefix ? pComplainPrefix : "", name );
 		}
 	}
 
@@ -2681,7 +2673,7 @@ ITexture *CMaterialSystem::FindTexture( char const *pTextureName, const char *pT
 		bool bIsUNCName = ( pTextureName[0] == '/' && pTextureName[1] == '/' && pTextureName[2] != '/' );
 		if ( !bIsUNCName )
 		{
-			const char* pPathID = "GAME";
+			constexpr char pPathID[]{"GAME"};
 			char buf[MAX_PATH];
 			V_sprintf_safe( buf, "materials/%s", pTextureName );
 			V_SetExtension( buf, ".vtf" );
@@ -2696,16 +2688,14 @@ ITexture *CMaterialSystem::FindTexture( char const *pTextureName, const char *pT
 	Assert( pTexture );
 	if ( pTexture->IsError() )
 	{
-		if ( IsPC() )
-		{
 			for ( intp i=0; i<ssize( TextureAliases ); i+=2 )
 			{
-				if ( !Q_stricmp( pTextureName, TextureAliases[i] ) )
+			if ( !V_stricmp( pTextureName, TextureAliases[i] ) )
 				{
 					return FindTexture( TextureAliases[i+1], pTextureGroupName, bComplain, nAdditionalCreationFlags );
 				}
 			}
-		}
+
 		if ( bComplain )
 		{
 			DevWarning( "Texture '%s' not found.\n", pTextureName );
@@ -2819,13 +2809,6 @@ void CMaterialSystem::UncacheUnusedMaterials( bool bRecomputeStateSnapshots )
 		}
 	}
 
-	if ( IsX360() && bRecomputeStateSnapshots )
-	{
-		// Always recompute snapshots because the queued loading process skips it during pre-purge,
-		// allowing it to happen just once, here.
-		bDidUncacheMaterial = true;
-	}
-
 	if ( bDidUncacheMaterial && bRecomputeStateSnapshots )
 	{
 		// Clear the state snapshots since we are going to rebuild all of them.
@@ -2909,9 +2892,6 @@ void CMaterialSystem::ReloadTextures( void )
 	// Add by jay in changelist 621420.
 	ForceSingleThreaded();
 
-	// 360 should not have gotten here
-	Assert( !IsX360() );
-
 	KeyValuesSystem()->InvalidateCache();
 
 	TextureManager()->RestoreRenderTargets();
@@ -2921,7 +2901,6 @@ void CMaterialSystem::ReloadTextures( void )
 void CMaterialSystem::ReloadMaterials( const char *pSubString )
 {
 	bool bDeviceReady = g_pShaderAPI->CanDownloadTextures();
-
 	if ( !bDeviceReady )
 	{
 		//$ TODO: Merge m_bDeferredMaterialReload from cs:go?
@@ -2933,10 +2912,9 @@ void CMaterialSystem::ReloadMaterials( const char *pSubString )
 
 	KeyValuesSystem()->InvalidateCache();
 
-	bool bVertexFormatChanged = false;
-	if( pSubString == NULL )
+	bool bVertexFormatChanged = pSubString == NULL;
+	if( bVertexFormatChanged )
 	{
-		bVertexFormatChanged = true;
 		UncacheAllMaterials();
 		CacheUsedMaterials();
 	}
@@ -2961,9 +2939,9 @@ void CMaterialSystem::ReloadMaterials( const char *pSubString )
 			}
 		}
 
-		for (MaterialHandle_t i = FirstMaterial(); i != InvalidMaterial(); i = NextMaterial(i) )
+		for (auto i = FirstMaterial(); i != InvalidMaterial(); i = NextMaterial(i) )
 		{
-			if( GetMaterialInternal(i)->GetReferenceCount() <= 0 )
+			if ( GetMaterialInternal(i)->GetReferenceCount() <= 0 )
 				continue;
 
 			char const *szMatName = GetMaterialInternal(i)->GetName();
@@ -5109,26 +5087,12 @@ void CMaterialSystem::OnRenderingAsyncComplete()
 //-----------------------------------------------------------------------------
 void CMaterialSystem::DebugPrintUsedMaterials( const CCommand &args )
 {
-	if( args.ArgC() == 1 )
-	{
-		DebugPrintUsedMaterials( NULL, false );
-	}
-	else
-	{
-		DebugPrintUsedMaterials( args[ 1 ], false );
-	}
+	DebugPrintUsedMaterials( args.ArgC() == 1 ? nullptr : args[ 1 ], false );
 }
 
 void CMaterialSystem::DebugPrintUsedMaterialsVerbose( const CCommand &args )
 {
-	if( args.ArgC() == 1 )
-	{
-		DebugPrintUsedMaterials( NULL, true );
-	}
-	else
-	{
-		DebugPrintUsedMaterials( args[ 1 ], true );
-	}
+	DebugPrintUsedMaterials( args.ArgC() == 1 ? nullptr : args[ 1 ], true );
 }
 
 void CMaterialSystem::DebugPrintUsedTextures( const CCommand &args )
@@ -5136,26 +5100,20 @@ void CMaterialSystem::DebugPrintUsedTextures( const CCommand &args )
 	DebugPrintUsedTextures();
 }
 
-#if defined( _X360 )
-void CMaterialSystem::ListUsedMaterials( const CCommand &args )
-{
-	ListUsedMaterials();
-}
-#endif // !_X360
-
 void CMaterialSystem::ReloadAllMaterials( const CCommand &args )
 {
-	ReloadMaterials( NULL );
+	ReloadMaterials( nullptr );
 }
 
 void CMaterialSystem::ReloadMaterials( const CCommand &args )
 {
-	if( args.ArgC() != 2 )
+	if ( args.ArgC() != 2 )
 	{
 		ConWarning( "Usage: mat_reloadmaterial material_name_substring\n"
 					"   or  mat_reloadmaterial substring1*substring2*...*substringN\n" );
 		return;
 	}
+
 	ReloadMaterials( args[ 1 ] );
 }
 
@@ -5166,14 +5124,11 @@ void CMaterialSystem::ReloadTextures( const CCommand &args )
 
 CON_COMMAND( mat_hdr_enabled, "Report if HDR is enabled for debugging" )
 {
-	if( HardwareConfig() && HardwareConfig()->GetHDREnabled() )
-	{
-		Warning( "HDR Enabled\n" );
-	}
-	else
-	{
-		Warning( "HDR Disabled\n" );
-	}
+	Warning
+	(
+		HardwareConfig() && HardwareConfig()->GetHDREnabled()
+		? "HDR Enabled\n" : "HDR Disabled\n"
+	);
 }
 
 
