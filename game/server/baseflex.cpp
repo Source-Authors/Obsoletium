@@ -544,7 +544,8 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 
 	// FIXME: this seems like way too much code
 	info->m_bIsGesture = false;
-	KeyValues *seqKeyValues = GetSequenceKeyValues( info->m_nSequence );
+	// dimhotepus: Do not leak KeyValues.
+	KeyValuesAD seqKeyValues(GetSequenceKeyValues( info->m_nSequence ));
 	if (seqKeyValues)
 	{
 		// Do we have a build point section?
@@ -641,8 +642,6 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 				DevWarning("out of order tags : %s : (%s:%s:%s)\n", scene->GetFilename(), actor->GetName(), event->GetName(), event->GetParameters() );
 			}
 		}
-
-		seqKeyValues->deleteThis();
 	}
 
 	// initialize posture suppression
