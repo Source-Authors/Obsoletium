@@ -1933,7 +1933,7 @@ void CMP3Player::SaveDbFile( int level, CUtlBuffer& buf, MP3File_t *file, intp f
 		bpr( level + 1, buf, "fromfs 1\n" );
 	}
 
-	bpr( level + 1, buf, "subdirindex %i\n", file->dirnum );
+	bpr( level + 1, buf, "subdirindex %zd\n", file->dirnum );
 
 	bpr( level + 1, buf, "short \"%s\"\n", file->shortname.String() );
 	char fn[ 512 ];
@@ -1991,7 +1991,7 @@ void CMP3Player::SaveDbDirectory( int level, CUtlBuffer& buf, SoundDirectory_t *
 		bpr( level + 1, buf, "{\n" );
 		for ( intp i = 0; i < c; ++i )
 		{
-			bpr( level + 2, buf, "file %i\n", files[ i ] );
+			bpr( level + 2, buf, "file %zd\n", files[ i ] );
 		}
 		bpr( level + 1, buf, "}\n" );
 	}
