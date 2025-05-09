@@ -1182,7 +1182,8 @@ void CGameUI::ShowLoadingBackgroundDialog()
 		vgui::ipanel()->PerformApplySchemeSettings( g_hLoadingBackgroundDialog );
 		vgui::ipanel()->SetVisible( g_hLoadingBackgroundDialog, true );		
 		vgui::ipanel()->MoveToFront( g_hLoadingBackgroundDialog );
-		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, new KeyValues( "activate" ), staticPanel->GetVPanel() );
+		// dimhotepus: Fix KeyValues leak.
+		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, KeyValuesAD( "activate" ), staticPanel->GetVPanel() );
 	}
 }
 
@@ -1196,7 +1197,8 @@ void CGameUI::HideLoadingBackgroundDialog()
 		vgui::ipanel()->SetParent( g_hLoadingBackgroundDialog, NULL );
 		vgui::ipanel()->SetVisible( g_hLoadingBackgroundDialog, false );		
 		vgui::ipanel()->MoveToBack( g_hLoadingBackgroundDialog );
-		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, new KeyValues( "deactivate" ), staticPanel->GetVPanel() );
+		// dimhotepus: Fix KeyValues leak.
+		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, KeyValuesAD( "deactivate" ), staticPanel->GetVPanel() );
 	}
 }
 

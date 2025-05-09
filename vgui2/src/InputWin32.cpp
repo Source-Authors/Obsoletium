@@ -613,8 +613,8 @@ void CInputSystem::RunFrame()
 			// send a message to the window saying that it's losing focus
 			{
 				MEM_ALLOC_CREDIT();
-				KeyValues *pMessage = new KeyValues( "KillFocus" );
-				KeyValues::AutoDelete autodelete_pMessage( pMessage );
+				// dimhotepus: Do not leak KeyValues.
+				KeyValuesAD pMessage( "KillFocus" );
 				pMessage->SetPtr( "newPanel", wantedKeyFocus );
 				pContext->_keyFocus->SendMessage( pMessage, 0 );
 			}
@@ -646,8 +646,8 @@ void CInputSystem::RunFrame()
 			// send a message to the window saying that it's gaining focus
 			{
 				MEM_ALLOC_CREDIT();
-				KeyValues *pMsg = new KeyValues("SetFocus");
-				KeyValues::AutoDelete autodelete_pMsg( pMsg );
+				// dimhotepus: Do not leak KeyValues.
+				KeyValuesAD pMsg("SetFocus");
 				wantedKeyFocus->SendMessage( pMsg, 0 );
 			}
 			wantedKeyFocus->Client()->Repaint();

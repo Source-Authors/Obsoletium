@@ -3401,7 +3401,8 @@ void TextEntry::Paste()
 				if (GetVParent() && ipanel()->GetCurrentKeyFocus(GetVParent()) != GetVPanel())
 				{
 					bHaveMovedFocusAwayFromCurrentEntry = true;
-					ipanel()->SendMessage(ipanel()->GetCurrentKeyFocus(GetVParent()), new KeyValues("DoPaste"), GetVPanel());
+					// dimhotepus: Do not leak KeyValues.
+					ipanel()->SendMessage(ipanel()->GetCurrentKeyFocus(GetVParent()), KeyValuesAD("DoPaste"), GetVPanel());
 				}
 				break;
 			}

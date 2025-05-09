@@ -227,14 +227,16 @@ public:
 		{
 			if ( g_DrawTreeSelectedPanel )
 			{
-				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, new KeyValues("Command", "command", "performlayout"), GetVPanel() );
+				// dimhotepus: Fix KeyValues leak.
+				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, KeyValuesAD( new KeyValues("Command", "command", "performlayout") ), GetVPanel() );
 			}
 		}
 		else if ( !Q_stricmp( command, "reloadscheme" ) )
 		{
 			if ( g_DrawTreeSelectedPanel )
 			{
-				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, new KeyValues("Command", "command", "reloadscheme"), GetVPanel() );
+				// dimhotepus: Fix KeyValues leak.
+				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, KeyValuesAD( new KeyValues("Command", "command", "reloadscheme") ), GetVPanel() );
 			}
 		}
 		else

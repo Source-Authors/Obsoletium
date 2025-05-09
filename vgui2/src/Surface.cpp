@@ -3723,7 +3723,8 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		// so all necessary shutdown functions need to occur now
 		if (g_pSurface->GetEmbeddedPanel())
 		{
-			g_pIPanel->SendMessage(g_pSurface->GetEmbeddedPanel(), new KeyValues("WindowsEndSession"), NULL);
+			// dimhotepus: Do not leak KeyValues.
+			g_pIPanel->SendMessage(g_pSurface->GetEmbeddedPanel(), KeyValuesAD("WindowsEndSession"), NULL);
 		}
 		return 0;
 	}

@@ -715,9 +715,10 @@ void PropertySheet::SetTabWidth(int pixels)
 void PropertySheet::ResetAllData()
 {
 	// iterate all the dialogs resetting them
-	for (int i = 0; i < m_Pages.Count(); i++)
+	for (intp i = 0; i < m_Pages.Count(); i++)
 	{
-		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), new KeyValues("ResetData"), GetVPanel());
+		// dimhotepus: Do not leak KeyValues.
+		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), KeyValuesAD("ResetData"), GetVPanel());
 	}
 }
 
@@ -727,9 +728,10 @@ void PropertySheet::ResetAllData()
 void PropertySheet::ApplyChanges()
 {
 	// iterate all the dialogs resetting them
-	for (int i = 0; i < m_Pages.Count(); i++)
+	for (intp i = 0; i < m_Pages.Count(); i++)
 	{
-		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), new KeyValues("ApplyChanges"), GetVPanel());
+		// dimhotepus: Do not leak KeyValues.
+		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), KeyValuesAD("ApplyChanges"), GetVPanel());
 	}
 }
 
