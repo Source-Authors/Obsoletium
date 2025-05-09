@@ -52,7 +52,7 @@ CON_COMMAND( showinfo, "Shows a info panel: <type> <title> <message> [<command n
 
 	 if ( panel )
 	 {
-		 KeyValues *kv = new KeyValues("data");
+		 KeyValuesAD kv("data");
 		 kv->SetInt( "type", Q_atoi(args[ 1 ]) );
 		 kv->SetString( "title", args[ 2 ] );
 		 kv->SetString( "message", args[ 3 ] );
@@ -63,8 +63,6 @@ CON_COMMAND( showinfo, "Shows a info panel: <type> <title> <message> [<command n
 		 panel->SetData( kv );
 
 		 gViewPortInterface->ShowPanel( panel, true );
-
-		 kv->deleteThis();
 	 }
 	 else
 	 {

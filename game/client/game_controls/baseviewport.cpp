@@ -125,7 +125,7 @@ bool Helper_LoadFile( IBaseFileSystem *pFileSystem, const char *pFilename, CUtlV
 bool CBaseViewport::LoadHudAnimations( void )
 {
 	const char HUDANIMATION_MANIFEST_FILE[] = "scripts/hudanimations_manifest.txt";
-	auto manifest = KeyValues::AutoDelete( HUDANIMATION_MANIFEST_FILE );
+	KeyValuesAD manifest( HUDANIMATION_MANIFEST_FILE );
 	if ( manifest->LoadFromFile( g_pFullFileSystem, HUDANIMATION_MANIFEST_FILE, "GAME" ) == false )
 	{
 		return false;

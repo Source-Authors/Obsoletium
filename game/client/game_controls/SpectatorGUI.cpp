@@ -363,9 +363,7 @@ void CSpectatorMenu::Update( void )
 
 		V_to_chars( szPlayerIndex, iPlayerIndex );
 
-		KeyValues *kv = new KeyValues( "UserData", "player", gr->GetPlayerName( iPlayerIndex ), "index", szPlayerIndex );
-		m_pPlayerList->AddItem( playerText, kv );
-		kv->deleteThis();
+		m_pPlayerList->AddItem( playerText, KeyValuesAD( new KeyValues( "UserData", "player", gr->GetPlayerName( iPlayerIndex ), "index", szPlayerIndex ) ) );
 	}
 
 	// make sure the player combo box is up to date

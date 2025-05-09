@@ -319,7 +319,7 @@ void CClientScoreBoardDialog::UpdatePlayerInfo()
 		if ( gr && gr->IsConnected( i ) )
 		{
 			// add the player to the list
-			KeyValues *playerData = new KeyValues("data");
+			KeyValuesAD playerData("data");
 			GetPlayerScoreInfo( i, playerData );
 			UpdatePlayerAvatar( i, playerData );
 
@@ -350,8 +350,6 @@ void CClientScoreBoardDialog::UpdatePlayerInfo()
 
 			// set the row color based on the players team
 			m_pPlayerList->SetItemFgColor( itemID, gr->GetTeamColor( sectionID ) );
-
-			playerData->deleteThis();
 		}
 		else
 		{

@@ -33,14 +33,12 @@ CommandMenu::CommandMenu( Panel *parent, const char *panelName, IViewPort * view
 
 bool CommandMenu::LoadFromFile( const char * fileName)	// load menu from KeyValues
 {
-	KeyValues * kv = new KeyValues(fileName);
-
+	KeyValuesAD kv(fileName);
 	if  ( !kv->LoadFromFile( g_pFullFileSystem, fileName, "GAME" ) )
 		return false;
 
 	bool ret = LoadFromKeyValues( kv );
 
-	kv->deleteThis();
 	return ret;
 }
 
