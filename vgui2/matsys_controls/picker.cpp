@@ -100,7 +100,7 @@ void CPicker::SetStringList( const PickerList_t &list )
 	for ( int i = 0; i < nCount; ++i )
 	{
 		const char *pPickerName = list[i].m_pChoiceString;
-		KeyValues *kv = new KeyValues( "node", "choice", pPickerName );
+		KeyValuesAD kv( new KeyValues( "node", "choice", pPickerName ) );
 		if ( m_Type == PICKER_CHOICE_STRING )
 		{
 			kv->SetString( "value", list[i].m_pChoiceValue ); 

@@ -1243,7 +1243,7 @@ void CMDLPicker::RefreshActivitiesAndSequencesList()
 				// Multiple sequences can have the same activity name; only add unique activity names
 				if ( activityNames.Find( pActivityName ) == activityNames.InvalidIndex() )
 				{
-					KeyValues *pkv = new KeyValues("node", "activity", pActivityName );
+					KeyValuesAD pkv( new KeyValues("node", "activity", pActivityName ) );
 					int nItemID = m_pActivitiesList->AddItem( pkv, 0, false, false );
 
 					KeyValues *pDrag = new KeyValues( "drag", "text", pActivityName );
@@ -1258,7 +1258,7 @@ void CMDLPicker::RefreshActivitiesAndSequencesList()
 			const char *pSequenceName = hdr->pSeqdesc(j).pszLabel();
 			if ( pSequenceName && pSequenceName[0] )
 			{
-				KeyValues *pkv = new KeyValues("node", "sequence", pSequenceName);
+				KeyValuesAD pkv( new KeyValues("node", "sequence", pSequenceName) );
 				int nItemID = m_pSequencesList->AddItem( pkv, 0, false, false );
 
 				KeyValues *pDrag = new KeyValues( "drag", "text", pSequenceName );
@@ -1615,7 +1615,7 @@ int CMDLPicker::UpdateSkinsList()
 			{
 				char skinText[25] = "";
 				V_sprintf_safe( skinText, "skin%i", i );
-				KeyValues *pkv = new KeyValues("node", "skin", skinText );
+				KeyValuesAD pkv( new KeyValues("node", "skin", skinText ) );
 				m_pSkinsList->AddItem( pkv, 0, false, false );
 			}
 		}
@@ -1711,7 +1711,7 @@ int CMDLPicker::UpdatePropDataList( const char* pszPropData, bool &bIsStatic )
 				}
 				bIsStatic &= true;
 			}
-			KeyValues *pkv = new KeyValues("node", "key", keyText, "value", valueText );
+			KeyValuesAD pkv( new KeyValues("node", "key", keyText, "value", valueText ) );
 			m_pPropDataList->AddItem( pkv, 0, false, false );
 			Q_memset( keyText, 0, 255 );
 			Q_memset( valueText, 0, 255 );

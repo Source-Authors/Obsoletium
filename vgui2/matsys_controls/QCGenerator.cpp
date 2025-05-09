@@ -668,7 +668,7 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 
 				// we found an LOD
 				// dimhotepus: Do not leak KeyValues.
-				auto newKv = KeyValues::AutoDelete(new KeyValues( lodName, "SMD", filename, "LOD", "10" ));
+				KeyValuesAD newKv(new KeyValues( lodName, "SMD", filename, "LOD", "10" ));
 				m_pLODPanel->AddItem( newKv, currentLOD, false, false );
 
 				currentLOD++;

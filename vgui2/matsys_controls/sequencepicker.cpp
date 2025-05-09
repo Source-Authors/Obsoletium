@@ -172,7 +172,7 @@ void CSequencePicker::RefreshActivitiesAndSequencesList()
 				// Multiple sequences can have the same activity name; only add unique activity names
 				if ( activityNames.Find( pActivityName ) == activityNames.InvalidIndex() )
 				{
-					KeyValues *pkv = new KeyValues("node", "activity", pActivityName );
+					KeyValuesAD pkv( new KeyValues("node", "activity", pActivityName ) );
 					int nItemID = m_pActivitiesList->AddItem( pkv, 0, false, false );
 
 					KeyValues *pDrag = new KeyValues( "drag", "text", pActivityName );
@@ -187,7 +187,7 @@ void CSequencePicker::RefreshActivitiesAndSequencesList()
 			const char *pSequenceName = hdr->pSeqdesc(j).pszLabel();
 			if ( m_pSequencesList && pSequenceName && pSequenceName[0] )
 			{
-				KeyValues *pkv = new KeyValues("node", "sequence", pSequenceName);
+				KeyValuesAD pkv( new KeyValues("node", "sequence", pSequenceName) );
 				int nItemID = m_pSequencesList->AddItem( pkv, 0, false, false );
 
 				KeyValues *pDrag = new KeyValues( "drag", "text", pSequenceName );
