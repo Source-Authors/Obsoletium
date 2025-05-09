@@ -1411,7 +1411,7 @@ void AnimationController::RunCmd_SetFont( PostedMessage_t &msg )
 		return;
 	
 	const char *varName = g_ScriptSymbols.String(msg.variable);
-	auto inputData = KeyValues::AutoDelete(varName);
+	KeyValuesAD inputData(varName);
 	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
@@ -1430,7 +1430,7 @@ void AnimationController::RunCmd_SetTexture( PostedMessage_t &msg )
 		return;
 	
 	const char *varName = g_ScriptSymbols.String(msg.variable);
-	auto inputData = KeyValues::AutoDelete(varName);
+	KeyValuesAD inputData(varName);
 	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
@@ -1449,7 +1449,7 @@ void AnimationController::RunCmd_SetString( PostedMessage_t &msg )
 		return;
 
 	const char *varName = g_ScriptSymbols.String(msg.variable);
-	auto inputData = KeyValues::AutoDelete(varName);
+	KeyValuesAD inputData(varName);
 	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
@@ -1571,7 +1571,7 @@ AnimationController::Value_t AnimationController::GetValue(ActiveAnimation_t& an
 	else
 	{
 		const char *varName = g_ScriptSymbols.String(var);
-		auto outputData = KeyValues::AutoDelete(varName);
+		KeyValuesAD outputData(varName);
 		if (panel->RequestInfo(outputData))
 		{
 			// find the var and lookup it's type
@@ -1668,7 +1668,7 @@ void AnimationController::SetValue(ActiveAnimation_t& anim, Panel *panel, UtlSym
 	else
 	{
 		const char *varName = g_ScriptSymbols.String(var);
-		auto inputData = KeyValues::AutoDelete(varName);
+		KeyValuesAD inputData(varName);
 		// set the custom value
 		if (value.b == 0.0f && value.c == 0.0f && value.d == 0.0f)
 		{

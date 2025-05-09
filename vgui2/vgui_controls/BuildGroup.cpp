@@ -1185,7 +1185,7 @@ bool BuildGroup::SaveControlSettings( void )
 	bool bSuccess = false;
 	if ( m_pResourceName )
 	{
-		KeyValues *rDat = new KeyValues( m_pResourceName );
+		KeyValuesAD rDat( m_pResourceName );
 
 		// get the data from our controls
 		GetSettings( rDat );
@@ -1200,8 +1200,6 @@ bool BuildGroup::SaveControlSettings( void )
 			MessageBox *dlg = new MessageBox("BuildMode - Error saving file", "Error: Could not save changes.  File is most likely read only.");
 			dlg->DoModal();
 		}
-
-		rDat->deleteThis();
 	}
 
 	return bSuccess;
@@ -1346,11 +1344,10 @@ Panel *BuildGroup::NewControl( KeyValues *controlKeys, int x, int y)
 	if (controlKeys)
 	{
 //		Warning( "Creating new control \"%s\" of type \"%s\"\n", controlKeys->GetString( "fieldName" ), controlKeys->GetString( "ControlName" ) );
-		KeyValues *keyVal = new KeyValues("ControlFactory", "ControlName", controlKeys->GetString("ControlName"));
+		KeyValuesAD keyVal( new KeyValues("ControlFactory", "ControlName", controlKeys->GetString("ControlName")) );
 		m_pBuildContext->RequestInfo(keyVal);
 		// returns NULL on failure
 		newPanel = (Panel *)keyVal->GetPtr("PanelPtr");
-		keyVal->deleteThis();
 	}
 	else
 	{

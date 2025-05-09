@@ -260,6 +260,7 @@ int FileCompletionEdit::AddItem(const char *itemText, KeyValues *userData)
 	// when the menu item is selected it will send the custom message "SetText"
 	return m_pDropDown->AddMenuItem(itemText, new KeyValues("SetText", "text", itemText), this, userData);
 }
+
 int FileCompletionEdit::AddItem(const wchar_t *itemText, KeyValues *userData)
 {
 	// add the element to the menu
@@ -944,7 +945,7 @@ void FileOpenDialog::SetStartDirectory( const char *dir )
 //-----------------------------------------------------------------------------
 void FileOpenDialog::AddFilter( const char *filter, const char *filterName, bool bActive, const char *pFilterInfo  )
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete("item");
+	KeyValuesAD kv("item");
 	kv->SetString( "filter", filter );
 	kv->SetString( "filterinfo", pFilterInfo );
 	int itemID = m_pFileTypeCombo->AddItem(filterName, kv);
@@ -1168,7 +1169,7 @@ void FileOpenDialog::PopulateFileList()
 	
 	
 	char *filterPtr = filterList;
-	KeyValues *kv = new KeyValues("item");
+	KeyValuesAD kv("item");
 
 	if ( m_DialogType != FOD_SELECT_DIRECTORY )
 	{
@@ -1281,7 +1282,6 @@ void FileOpenDialog::PopulateFileList()
 	}
 	g_pFullFileSystem->FindClose( findHandle );
 
-	kv->deleteThis();
 	m_pFileList->SortList();
 }
 

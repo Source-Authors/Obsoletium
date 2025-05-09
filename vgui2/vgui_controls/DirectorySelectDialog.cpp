@@ -340,7 +340,7 @@ void DirectorySelectDialog::BuildDriveChoices()
 	char drives[256] = { 0 };
 	int len = system()->GetAvailableDrives(drives, sizeof(drives));
 	char *pBuf = drives;
-	KeyValues *kv = new KeyValues("drive");
+	KeyValuesAD kv("drive");
 	for (int i = 0; i < len / 4; i++)
 	{
 		kv->SetString("drive", pBuf);
@@ -352,7 +352,6 @@ void DirectorySelectDialog::BuildDriveChoices()
 
 		pBuf += 4;
 	}
-	kv->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -364,7 +363,7 @@ void DirectorySelectDialog::BuildDirTree()
 	m_pDirTree->RemoveAll();
 
 	// dimhotepus: Do not leak KevValues.
-	auto kv = KeyValues::AutoDelete(new KeyValues("root", "Text", m_szCurrentDrive));
+	KeyValuesAD kv(new KeyValues("root", "Text", m_szCurrentDrive));
 	// add in a root
 	int rootIndex = m_pDirTree->AddItem(kv, -1);
 
@@ -394,7 +393,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 		if ( !Q_stricmp( pFileName, ".." ) || !Q_stricmp( pFileName, "." ) )
 			continue;
 
-		KeyValues::AutoDelete kv = KeyValues::AutoDelete("item");
+		KeyValuesAD kv("item");
 		kv->SetString("Text", pFileName);
 		// set the folder image
 		kv->SetInt("Image", 1);

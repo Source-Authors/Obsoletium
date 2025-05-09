@@ -945,11 +945,10 @@ int EditablePanel::GetControlInt(const char *controlName, int defaultState)
 	Panel *control = FindChildByName(controlName);
 	if (control)
 	{
-		KeyValues *data = new KeyValues("GetState");
+		KeyValuesAD data("GetState");
 		if (control->RequestInfo(data))
 		{
 			int state = data->GetInt("state", defaultState);
-			data->deleteThis();
 			return state;
 		}
 	}
@@ -972,7 +971,7 @@ const char *EditablePanel::GetControlString(const char *controlName, const char 
 void EditablePanel::GetControlString(const char *controlName, char *buf, int bufSize, const char *defaultString)
 {
 	Panel *control = FindChildByName(controlName);
-	KeyValues *data = new KeyValues("GetText");
+	KeyValuesAD data("GetText");
 	if (control && control->RequestInfo(data))
 	{
 		Q_strncpy(buf, data->GetString("text", defaultString), bufSize);
@@ -984,10 +983,7 @@ void EditablePanel::GetControlString(const char *controlName, char *buf, int buf
 	}
 
 	// ensure null termination of string
-	buf[bufSize - 1] = 0;
-
-	// free
-	data->deleteThis();
+	buf[bufSize - 1] = '\0';
 }
 
 //-----------------------------------------------------------------------------

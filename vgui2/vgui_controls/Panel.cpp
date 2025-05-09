@@ -521,7 +521,7 @@ void Panel::LoadKeyBindingsForOnePanel( KeyBindingContextHandle_t handle, Panel 
 	char const *filename = g_KBMgr.GetKeyBindingsFile( handle );
 	char const *pathID = g_KBMgr.GetKeyBindingsFilePathID( handle );
 
-	KeyValues *kv = new KeyValues( "keybindings" );
+	KeyValuesAD kv( "keybindings" );
 	if ( kv->LoadFromFile( g_pFullFileSystem, filename, pathID ) )
 	{
 		int c = GetPanelsWithKeyBindingsCount( handle );
@@ -549,7 +549,6 @@ void Panel::LoadKeyBindingsForOnePanel( KeyBindingContextHandle_t handle, Panel 
             kbPanel->ParseKeyBindings( subKey );
 		}
 	}
-	kv->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -562,7 +561,7 @@ void Panel::ReloadKeyBindings( KeyBindingContextHandle_t handle )
 	char const *filename = g_KBMgr.GetKeyBindingsFile( handle );
 	char const *pathID = g_KBMgr.GetKeyBindingsFilePathID( handle );
 
-	KeyValues *kv = new KeyValues( "keybindings" );
+	KeyValuesAD kv( "keybindings" );
 	if ( kv->LoadFromFile( g_pFullFileSystem, filename, pathID ) )
 	{
 		int c = GetPanelsWithKeyBindingsCount( handle );
@@ -587,7 +586,6 @@ void Panel::ReloadKeyBindings( KeyBindingContextHandle_t handle )
             kbPanel->ParseKeyBindings( subKey );
 		}
 	}
-	kv->deleteThis();
 }
 #endif // VGUI_USEKEYBINDINGMAPS
 
@@ -3024,7 +3022,7 @@ void Panel::OnCursorMoved(int x, int y)
 		// figure out x and y in parent space
 		int thisX, thisY;
 		ipanel()->GetPos( GetVPanel(), thisX, thisY );
-		CallParentFunction( new KeyValues( "OnCursorMoved", "x", x + thisX, "y", y + thisY ) );
+		CallParentFunction(new KeyValues("OnCursorMoved", "x", x + thisX, "y", y + thisY));
 	}
 }
 

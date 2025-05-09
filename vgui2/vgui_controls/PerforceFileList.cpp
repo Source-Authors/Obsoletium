@@ -239,7 +239,7 @@ int PerforceFileList::AddFileToFileList( const char *pFullPath, bool bExistsOnDi
 	bool bIsFileWriteable = bExistsOnDisk ? g_pFullFileSystem->IsFileWritable( pFullPath, NULL ) : true;
 
 	// add the file to the list
-	KeyValues *kv = new KeyValues("item");
+	KeyValuesAD kv("item");
 
 	const char *pRelativePath = Q_UnqualifiedFileName( pFullPath );
 	kv->SetString( "text", pRelativePath );
@@ -268,7 +268,6 @@ int PerforceFileList::AddFileToFileList( const char *pFullPath, bool bExistsOnDi
 	kv->SetString( "attributes", bIsFileWriteable ? "" : "R" );
 
 	int nItemID = AddItem( kv, 0, false, false );
-	kv->deleteThis();
 
 	AddItemToDirectoryList( pFullPath, nItemID, false );
 	return nItemID;
@@ -280,7 +279,7 @@ int PerforceFileList::AddFileToFileList( const char *pFullPath, bool bExistsOnDi
 //-----------------------------------------------------------------------------
 int PerforceFileList::AddDirectoryToFileList( const char *pFullPath, bool bExistsOnDisk )
 {
-	KeyValues *kv = new KeyValues("item");
+	KeyValuesAD kv("item");
 
 	const char *pRelativePath = Q_UnqualifiedFileName( pFullPath );
 	kv->SetString( "text", pRelativePath );
@@ -300,7 +299,6 @@ int PerforceFileList::AddDirectoryToFileList( const char *pFullPath, bool bExist
 	kv->SetString( "attributes", "D" );
 
 	int nItemID = AddItem(kv, 0, false, false);
-	kv->deleteThis();
 
 	AddItemToDirectoryList( pFullPath, nItemID, true );
 	return nItemID;

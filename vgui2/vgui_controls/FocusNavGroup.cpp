@@ -414,13 +414,13 @@ bool FocusNavGroup::CanButtonBeDefault(VPANEL panel)
 	if( panel == 0 )
 		return false;
 
-	KeyValues *data = new KeyValues("CanBeDefaultButton");
+	KeyValuesAD data("CanBeDefaultButton");
 
 	bool bResult = false;
 	if (ipanel()->RequestInfo(panel, data))
 	{
-		bResult = (data->GetInt("result") == 1);
+		bResult = data->GetInt("result") == 1;
 	}
-	data->deleteThis();
+
 	return bResult;
 }
