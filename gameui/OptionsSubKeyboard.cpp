@@ -151,17 +151,10 @@ void COptionsSubKeyboard::OnCommand( const char *command )
 	}
 }
 
-const char *UTIL_Parse( const char *data, char *token, int sizeofToken )
+template<intp size>
+const char *UTIL_Parse( const char *data, OUT_Z_ARRAY char (&token)[size] )
 {
-	data = engine->ParseFile( data, token, sizeofToken );
-	return data;
-}
-static char *UTIL_CopyString( const char *in )
-{
-	intp len = strlen( in ) + 1;
-	char *out = new char[ len ];
-	Q_strncpy( out, in, len );
-	return out;
+	return engine->ParseFile( data, token, size );
 }
 
 #ifndef _XBOX
@@ -200,20 +193,20 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 	char token[512];
 	while ( 1 )
 	{
-		data = UTIL_Parse( data, token, sizeof(token) );
+		data = UTIL_Parse( data, token );
 		// Done.
 		if ( Q_isempty( token ) )
 			break;
 
-		Q_strncpy( szBinding, token, sizeof( szBinding ) );
+		V_strcpy_safe( szBinding, token );
 
-		data = UTIL_Parse( data, token, sizeof(token) );
+		data = UTIL_Parse( data, token );
 		if ( Q_isempty( token ) )
 		{
 			break;
 		}
 
-		Q_strncpy(szDescription, token, sizeof( szDescription ) );
+		V_strcpy_safe(szDescription, token );
 
 		// Skip '======' rows
 		if ( szDescription[ 0 ] != '=' )
@@ -478,7 +471,7 @@ void COptionsSubKeyboard::SaveCurrentBindings( void )
 			continue;
 
 		// Copy the binding string
-		m_Bindings[ i ].binding = UTIL_CopyString( binding );
+		m_Bindings[ i ].binding = V_strdup( binding );
 	}
 }
 
@@ -547,7 +540,7 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
             ButtonCode_t code = g_pInputSystem->StringToButtonCode( keyname );
             if ( code != BUTTON_CODE_INVALID )
 			{
-				m_Bindings[ code ].binding = UTIL_CopyString( binding );
+				m_Bindings[ code ].binding = V_strdup( binding );
 			}
 		}
 	}
@@ -575,7 +568,7 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 	while ( data != NULL )
 	{
 		char cmd[64];
-		data = UTIL_Parse( data, cmd, sizeof(cmd) );
+		data = UTIL_Parse( data, cmd );
 		if ( !cmd[0] )
 			break;
 
@@ -583,12 +576,12 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 		{
 			// Key name
 			char szKeyName[256];
-			data = UTIL_Parse( data, szKeyName, sizeof(szKeyName) );
+			data = UTIL_Parse( data, szKeyName );
 			if ( !szKeyName[0] )
 				break; // Error
 
 			char szBinding[256];
-			data = UTIL_Parse( data, szBinding, sizeof(szBinding) );
+			data = UTIL_Parse( data, szBinding );
 			if ( !szKeyName[0] )  
 				break; // Error
 

@@ -145,7 +145,11 @@ static OptionsDataContainer s_OptionsDataContainer;
 static CUtlVector<OptionChoiceData_t> s_DisabledOptions;
 
 
-const char *UTIL_Parse( const char *data, char *token, int sizeofToken );
+template<intp size>
+const char *UTIL_Parse( const char *data, OUT_Z_ARRAY char (&token)[size] )
+{
+	return engine->ParseFile( data, token, size );
+}
 
 
 bool ActionsAreTheSame( const char *pchAction1, const char *pchAction2 )
@@ -1375,7 +1379,7 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 	while ( data != NULL )
 	{
 		char cmd[64];
-		data = UTIL_Parse( data, cmd, sizeof(cmd) );
+		data = UTIL_Parse( data, cmd );
 		if ( Q_isempty( cmd ) )
 			break;
 
@@ -1383,12 +1387,12 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 		{
 			// Key name
 			char szKeyName[256];
-			data = UTIL_Parse( data, szKeyName, sizeof(szKeyName) );
+			data = UTIL_Parse( data, szKeyName );
 			if ( Q_isempty( szKeyName ) )
 				break; // Error
 
 			char szBinding[256];
-			data = UTIL_Parse( data, szBinding, sizeof(szBinding) );
+			data = UTIL_Parse( data, szBinding );
 			if ( Q_isempty( szKeyName ) )
 				break; // Error
 
