@@ -87,11 +87,11 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 //-----------------------------------------------------------------------------
 void CBlacklistedServerManager::SaveToFile( const char *pszFilename )
 {
-	KeyValues *pKV = new KeyValues( "serverblacklist" );
+	KeyValuesAD pKV( "serverblacklist" );
 
 	for ( auto &bl : m_Blacklist )
 	{
-		KeyValues *pSubKey = new KeyValues( "server" );
+		auto *pSubKey = new KeyValues( "server" );
 		pSubKey->SetString( "name", bl.m_szServerName );
 		pSubKey->SetInt( "date", bl.m_ulTimeBlacklistedAt );
 		pSubKey->SetString( "addr", bl.m_NetAdr.ToString() );
@@ -99,8 +99,6 @@ void CBlacklistedServerManager::SaveToFile( const char *pszFilename )
 	}
 
 	pKV->SaveToFile( g_pFullFileSystem, pszFilename, "MOD" );
-
-	pKV->deleteThis();
 }
 
 
