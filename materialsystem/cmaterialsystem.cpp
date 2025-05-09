@@ -2502,9 +2502,7 @@ IMaterial *CMaterialSystem::CreateMaterial( const char *pMaterialName, KeyValues
 IMaterial *CMaterialSystem::FindProceduralMaterial( const char *pMaterialName, const char *pTextureGroupName, KeyValues *pVMTKeyValues )
 {
 	// We need lower-case symbols for this to work
-	intp nLen = Q_strlen( pMaterialName ) + 1;
-	char *pTemp = (char*)stackalloc( nLen );
-	Q_strncpy( pTemp, pMaterialName, nLen );
+	V_strdup_stack( pMaterialName, pTemp );
 	Q_strlower( pTemp );
 	Q_FixSlashes( pTemp, '/' );
 
@@ -2564,10 +2562,11 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 {
 	// We need lower-case symbols for this to work
 	intp nLen = Q_strlen( pMaterialName ) + 1;
-	char *pFixedNameTemp = (char*)stackalloc( nLen );
-	char *pTemp = (char*)stackalloc( nLen );
-	Q_strncpy( pFixedNameTemp, pMaterialName, nLen );
+
+	V_strdup_stack(pMaterialName, pFixedNameTemp);
 	Q_strlower( pFixedNameTemp );
+
+	char *pTemp = stackallocT( char, nLen );
 #ifdef POSIX
 	// strip extensions needs correct slashing for the OS, so fix it up early for Posix
 	Q_FixSlashes( pFixedNameTemp, '/' );
@@ -2586,7 +2585,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 
 	// It hasn't been seen yet, so let's check to see if it's in the filesystem.
 	nLen = ssize( "materials/" ) - 1 + Q_strlen( pTemp ) + ssize( ".vmt" );
-	char *vmtName = (char *)stackalloc( nLen );
+	char *vmtName = stackallocT( char, nLen );
 
 	// Check to see if this is a UNC-specified material name
 	bool bIsUNC = pTemp[0] == '/' && pTemp[1] == '/' && pTemp[2] != '/';
@@ -2617,9 +2616,8 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 	}
 	else
 	{
-		char *matNameWithExtension;
 		nLen = Q_strlen( pTemp ) + ssize( ".vmt" );
-		matNameWithExtension = (char *)stackalloc( nLen );
+		char *matNameWithExtension = stackallocT( char, nLen );
 		Q_strncpy( matNameWithExtension, pTemp, nLen );
 		Q_strncat( matNameWithExtension, ".vmt", nLen, COPY_ALL_CHARACTERS );
 
@@ -2652,9 +2650,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 		Assert( pTemp );
 
 		// convert to lowercase
-		nLen = Q_strlen(pTemp) + 1 ;
-		char *name = (char*)stackalloc( nLen );
-		Q_strncpy( name, pTemp, nLen );
+		V_strdup_stack(pTemp, name);
 		Q_strlower( name );
 
 		if ( m_MaterialDict.NoteMissing( name ) )
