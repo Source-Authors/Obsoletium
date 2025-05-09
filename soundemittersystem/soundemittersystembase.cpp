@@ -615,13 +615,10 @@ void CSoundEmitterSystemBase::GenderExpandString( char const *actormodel, char c
 void CSoundEmitterSystemBase::LoadGlobalActors()
 {
 	// Now load the global actor list from the scripts/globalactors.txt file
-	KeyValues *allActors = NULL;
-	
-	allActors = new KeyValues( "allactors" );
+	KeyValuesAD allActors( "allactors" );
 	if ( allActors->LoadFromFile( filesystem, "scripts/global_actors.txt", NULL ) )
 	{
-		KeyValues *pvkActor;
-		for ( pvkActor = allActors->GetFirstSubKey(); pvkActor != NULL; pvkActor = pvkActor->GetNextKey() )
+		for ( auto *pvkActor = allActors->GetFirstSubKey(); pvkActor != NULL; pvkActor = pvkActor->GetNextKey() )
 		{
 			UtlHashHandle_t idx = m_ActorGenders.Find( pvkActor->GetName() );
 			if ( idx == m_ActorGenders.InvalidHandle() )
@@ -645,7 +642,6 @@ void CSoundEmitterSystemBase::LoadGlobalActors()
 			}
 		}
 	}
-	allActors->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
