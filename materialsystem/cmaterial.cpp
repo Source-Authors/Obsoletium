@@ -105,7 +105,7 @@ public:
 	bool	IsTwoSided();
 
 	int		GetNumPasses( void );
-	intp		GetTextureMemoryBytes( void );
+	intp	GetTextureMemoryBytes( void );
 
 	void	SetUseFixedFunctionBakedLighting( bool bEnable );
 
@@ -459,18 +459,11 @@ CMaterial::CMaterial( char const* materialName, const char *pTextureGroupName, K
 	Q_StripExtension( materialName, pTemp, len+1 );
 	Q_strlower( pTemp );
 
-#if defined( _X360 )
-	// material names are expected to be forward slashed for correct sort and find behavior!
-	// assert now to track alternate or regressed path that is source of inconsistency
-	Assert( strchr( pTemp, '\\' ) == NULL );
-#endif
-
 	// Convert it to a symbol
 	m_Name = pTemp;
 
 #if defined( _DEBUG )
-	m_pDebugName = new char[strlen(pTemp) + 1];
-	Q_strncpy( m_pDebugName, pTemp, strlen(pTemp) + 1 );
+	m_pDebugName = V_strdup(pTemp);
 #endif
 
 	m_bShouldReloadFromWhitelist = false;
