@@ -1099,8 +1099,7 @@ void BuildModeDialog::DoPaste()
 //-----------------------------------------------------------------------------
 KeyValues *BuildModeDialog::StoreSettings()
 {
-	KeyValues *storedSettings;
-	storedSettings = new KeyValues( m_pCurrentPanel->GetName() );
+	KeyValues *storedSettings = new KeyValues( m_pCurrentPanel->GetName() );
 
 	// loop through the textedit filling in settings
 	for ( const auto &panel : m_pPanelList->m_PanelList )
