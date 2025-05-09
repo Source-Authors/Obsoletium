@@ -77,8 +77,8 @@ public:
 	// Simply construct it with the keyvalues you allocated and it will free them when falls out of scope.
 	// When you decide that keyvalues shouldn't be deleted call Assign(nullptr) on it.
 	// If you constructed AutoDelete(nullptr) you can later assign the keyvalues to be deleted with Assign(pKeyValues).
-	// You can also pass temporary KeyValues object as an argument to a function by wrapping it into KeyValues::AutoDelete
-	// instance:   call_my_function( KeyValues::AutoDelete( new KeyValues( "test" ) ) )
+	// You can also pass temporary KeyValues object as an argument to a function by wrapping it into KeyValuesAD
+	// instance:   call_my_function( KeyValuesAD( new KeyValues( "test" ) ) )
 	//
 	class AutoDelete
 	{
