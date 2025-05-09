@@ -210,14 +210,12 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 
 	if ( count > 0 )
 	{
-		KeyValues *keys = new KeyValues("data");
+		KeyValuesAD keys("data");
 		//Msg( "MsgFunc_VGUIMenu:\n" );
-
+		
+		char name[255], data[255];
 		for ( int i=0; i<count; i++)
 		{
-			char name[255];
-			char data[255];
-
 			msg.ReadString( name );
 			msg.ReadString( data );
 			//Msg( "  %s <- '%s'\n", name, data );
@@ -234,14 +232,11 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 			if ( Q_strncmp( pszURL, "http://", 7 ) != 0 && Q_strncmp( pszURL, "https://", 8 ) != 0 && Q_stricmp( pszURL, "about:blank" ) != 0 )
 			{
 				Warning( "Blocking MOTD URL '%s'; must begin with 'http://' or 'https://' or be about:blank\n", pszURL );
-				keys->deleteThis();
 				return;
 			}
 		}
 
 		viewport->SetData( keys );
-
-		keys->deleteThis();
 	}
 
 	// is the server telling us to show the scoreboard (at the end of a map)?

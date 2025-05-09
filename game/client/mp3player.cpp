@@ -173,7 +173,7 @@ public:
 			return;
 		}
 
-		KeyValues::AutoDelete kv = KeyValues::AutoDelete("LI");
+		KeyValuesAD kv("LI");
 		kv->SetString( "File", songInfo->shortname.String() );
 		char fn[ 512 ];
 		if ( g_pFullFileSystem->String( songInfo->filename, fn ) )
@@ -322,7 +322,7 @@ public:
 			return;
 		}
 
-		KeyValues::AutoDelete kv = KeyValues::AutoDelete("LI");
+		KeyValuesAD kv("LI");
 		kv->SetString( "File", songInfo->shortname.String() );
 		char fn[ 512 ];
 		if ( g_pFullFileSystem->String( songInfo->filename, fn ) )
@@ -1881,7 +1881,7 @@ void CMP3Player::RestoreDirectories( KeyValues *dirs )
 
 bool CMP3Player::RestoreDb( char const *filename )
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "db" );
+	KeyValuesAD kv( "db" );
 	Assert( kv );
 	if ( !kv->LoadFromFile( g_pFullFileSystem, filename, "MOD" ) )
 	{
@@ -2068,7 +2068,7 @@ void CMP3Player::OnSliderMoved()
 
 void CMP3Player::LoadPlayList( char const *filename )
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "playlist" );
+	KeyValuesAD kv( "playlist" );
 	Assert( kv );
 	if ( !kv->LoadFromFile( g_pFullFileSystem, filename, "MOD" ) )
 	{
@@ -2204,7 +2204,7 @@ void CMP3Player::SetMostRecentPlayList( char const *filename )
 
 void CMP3Player::LoadSettings()
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "settings" );
+	KeyValuesAD kv( "settings" );
 	Assert( kv );
 	if ( !kv->LoadFromFile( g_pFullFileSystem, MP3_SETTINGS_FILE, "MOD" ) )
 	{

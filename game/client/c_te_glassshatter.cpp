@@ -126,7 +126,7 @@ void C_TEShatterSurface::RecordShatterSurface( )
 		Color front( m_uchFrontColor[0], m_uchFrontColor[1], m_uchFrontColor[2], 255 );
 		Color back( m_uchBackColor[0], m_uchBackColor[1], m_uchBackColor[2], 255 );
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_SHATTER_SURFACE );
  		msg->SetString( "name", "TE_ShatterSurface" );
@@ -151,7 +151,6 @@ void C_TEShatterSurface::RecordShatterSurface( )
 		msg->SetInt( "surfacetype", m_nSurfaceType );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

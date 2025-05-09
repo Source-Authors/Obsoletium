@@ -216,7 +216,7 @@ void C_TEExplosion::RecordExplosion( )
 		const model_t* pModel = (m_nModelIndex != 0) ? modelinfo->GetModel( m_nModelIndex ) : NULL;
 		const char *pModelName = pModel ? modelinfo->GetModelName( pModel ) : "";
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_EXPLOSION );
  		msg->SetString( "name", "TE_Explosion" );
@@ -236,7 +236,6 @@ void C_TEExplosion::RecordExplosion( )
 		msg->SetInt( "magnitude", m_nMagnitude );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

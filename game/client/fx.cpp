@@ -389,7 +389,7 @@ void FX_MuzzleEffectAttached(
 	// NOTE: Particle system destruction message will be sent by the particle effect itself.
 	int nId = pSimple->AllocateToolParticleEffectId();
 
-	KeyValues *msg = new KeyValues( "OldParticleSystem_Create" );
+	KeyValuesAD msg( "OldParticleSystem_Create" );
 	msg->SetString( "name", "FX_MuzzleEffectAttached" );
 	msg->SetInt( "id", nId );
 	msg->SetFloat( "time", gpGlobals->curtime );
@@ -457,7 +457,6 @@ void FX_MuzzleEffectAttached(
 	pUpdaters->FindKey( "DmeSizeUpdater", true );
 */
 	ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-	msg->deleteThis();
 }
 
 //-----------------------------------------------------------------------------

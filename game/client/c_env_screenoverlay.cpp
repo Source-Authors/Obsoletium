@@ -237,7 +237,7 @@ void C_EnvScreenEffect::ReceiveMessage( int classID, bf_read &msg )
 		case 0: // FIXME: Declare
 			{		
 				// Create a keyvalue block to set these params
-				KeyValues *pKeys = new KeyValues( "keys" );
+				KeyValuesAD pKeys( "keys" );
 				if ( pKeys == NULL )
 					return;
 
@@ -275,8 +275,6 @@ void C_EnvScreenEffect::ReceiveMessage( int classID, bf_read &msg )
 					g_pScreenSpaceEffects->SetScreenSpaceEffectParams( "ep2_groggy", pKeys );
 					g_pScreenSpaceEffects->EnableScreenSpaceEffect( "ep2_groggy" );
 				}
-                
-				pKeys->deleteThis();
 			}
 			break;
 

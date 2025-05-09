@@ -71,7 +71,7 @@ static inline void RecordMetalSparks( const Vector &start, const Vector &directi
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_METAL_SPARKS );
  		msg->SetString( "name", "TE_MetalSparks" );
@@ -84,7 +84,6 @@ static inline void RecordMetalSparks( const Vector &start, const Vector &directi
 		msg->SetFloat( "directionz", direction.z );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 
@@ -130,7 +129,7 @@ static inline void RecordArmorRicochet( const Vector &start, const Vector &direc
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_ARMOR_RICOCHET );
  		msg->SetString( "name", "TE_ArmorRicochet" );
@@ -143,7 +142,6 @@ static inline void RecordArmorRicochet( const Vector &start, const Vector &direc
 		msg->SetFloat( "directionz", direction.z );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

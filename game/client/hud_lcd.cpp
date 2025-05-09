@@ -213,7 +213,7 @@ void CLCD::Init( void )
 	m_TextAlignments.Insert( "center", DT_CENTER );
 	m_TextAlignments.Insert( "right", DT_RIGHT );
 
-	KeyValues *kv = new KeyValues( "G15" );
+	KeyValuesAD kv( "G15" );
 	if ( kv->LoadFromFile( filesystem, G15_RESOURCE_FILE, "MOD" ) )
 	{
 		char const *title = kv->GetString( "game", "Source Engine" );
@@ -243,7 +243,6 @@ void CLCD::Init( void )
 			}
 		}
 	}
-	kv->deleteThis();
 
 	UpdateChat();
 

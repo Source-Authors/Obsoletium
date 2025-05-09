@@ -57,7 +57,7 @@ void LoadHudTextures( CUtlDict< CHudTexture *, int >& list, const char *szFilena
 {
 	KeyValues *pTemp, *pTextureSection;
 
-	KeyValues *pKeyValuesData = ReadEncryptedKVFile( filesystem, szFilenameWithoutExtension, pICEKey );
+	KeyValuesAD pKeyValuesData(ReadEncryptedKVFile( filesystem, szFilenameWithoutExtension, pICEKey ));
 	if ( pKeyValuesData )
 	{
 		CUtlVector<HudTextureFileRef> hudTextureFileRefs;
@@ -133,9 +133,6 @@ void LoadHudTextures( CUtlDict< CHudTexture *, int >& list, const char *szFilena
 			}
 		}
 	}
-
-	// Failed for some reason. Delete the Key data and abort.
-	pKeyValuesData->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -413,40 +410,35 @@ void CHud::Init( void )
 
 	m_bHudTexturesLoaded = false;
 
-	KeyValues *kv = new KeyValues( "layout" );
-	if ( kv )
+	KeyValuesAD kv( "layout" );
+	if ( kv && kv->LoadFromFile( filesystem, "scripts/HudLayout.res" ) )
 	{
-		if ( kv->LoadFromFile( filesystem, "scripts/HudLayout.res" ) )
+		intp numelements = m_HudList.Count();
+
+		for ( intp i = 0; i < numelements; i++ )
 		{
-			intp numelements = m_HudList.Count();
+			CHudElement *element = m_HudList[i];
 
-			for ( intp i = 0; i < numelements; i++ )
+			vgui::Panel *pPanel = dynamic_cast<vgui::Panel*>(element);
+			if ( !pPanel )
 			{
-				CHudElement *element = m_HudList[i];
+				Msg( "Non-vgui hud element %s\n", m_HudList[i]->GetName() );
+				continue;
+			}
 
-				vgui::Panel *pPanel = dynamic_cast<vgui::Panel*>(element);
-				if ( !pPanel )
-				{
-					Msg( "Non-vgui hud element %s\n", m_HudList[i]->GetName() );
-					continue;
-				}
+			KeyValues *key = kv->FindKey( pPanel->GetName(), false );
+			if ( !key )
+			{
+				Msg( "Hud element '%s' doesn't have an entry '%s' in scripts/HudLayout.res\n", m_HudList[i]->GetName(), pPanel->GetName() );
+			}
 
-				KeyValues *key = kv->FindKey( pPanel->GetName(), false );
-				if ( !key )
-				{
-					Msg( "Hud element '%s' doesn't have an entry '%s' in scripts/HudLayout.res\n", m_HudList[i]->GetName(), pPanel->GetName() );
-				}
-
-				// Note:  When a panel is parented to the module root, it's "parent" is returned as NULL.
-				if ( !element->IsParentedToClientDLLRootPanel() && 
-					 !pPanel->GetParent() )
-				{
-					DevMsg( "Hud element '%s'/'%s' doesn't have a parent\n", m_HudList[i]->GetName(), pPanel->GetName() );
-				}
+			// Note:  When a panel is parented to the module root, it's "parent" is returned as NULL.
+			if ( !element->IsParentedToClientDLLRootPanel() && 
+					!pPanel->GetParent() )
+			{
+				DevMsg( "Hud element '%s'/'%s' doesn't have a parent\n", m_HudList[i]->GetName(), pPanel->GetName() );
 			}
 		}
-
-		kv->deleteThis();
 	}
 
 	if ( m_bHudTexturesLoaded )

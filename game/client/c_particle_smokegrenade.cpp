@@ -904,7 +904,7 @@ void C_ParticleSmokeGrenade::CleanupToolRecordingState( KeyValues *msg )
 
 		int nId = AllocateToolParticleEffectId();
 
-		KeyValues *oldmsg = new KeyValues( "OldParticleSystem_Create" );
+		KeyValuesAD oldmsg( "OldParticleSystem_Create" );
 		oldmsg->SetString( "name", "C_ParticleSmokeGrenade" );
 		oldmsg->SetInt( "id", nId );
 		oldmsg->SetFloat( "time", gpGlobals->curtime );
@@ -988,7 +988,6 @@ void C_ParticleSmokeGrenade::CleanupToolRecordingState( KeyValues *msg )
 		pSmokeGrenadeUpdater->SetFloat( "cutoffFraction", 0.7f );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, oldmsg );
-		oldmsg->deleteThis();
 	}
 }
 

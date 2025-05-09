@@ -173,32 +173,29 @@ void CHudAnimationInfo::PaintMappingInfo( int& x, int& y, Panel *element, PanelA
 
 		Color col( 0, 0, 0, 0 );
 		Color  *pColor = NULL;
-		KeyValues *kv = new KeyValues( e->name() );
+		KeyValuesAD kv( e->name() );
 		if ( element->RequestInfo( kv ) )
 		{
 			KeyValues *dat = kv->FindKey(e->name());
 			if ( dat && dat->GetDataType() == KeyValues::TYPE_COLOR )
 			{
 				col = dat->GetColor();
-				Q_snprintf( value, sizeof( value ), "%i, %i, %i, %i",
+				V_sprintf_safe( value, "%i, %i, %i, %i",
 					col[0], col[1], col[2], col[3] );
 				pColor = &col;
 			}
 			else
 			{
-				Q_snprintf( value, sizeof( value ), "%s",
-					dat->GetString() );
+				V_strcpy_safe( value, dat->GetString() );
 			}
 		}
 		else
 		{
-			Q_strncpy( value, "???", sizeof( value ) );
+			V_strcpy_safe( value, "???" );
 		}
 
-		Q_snprintf( sz, sizeof( sz ), "%-30s %-20s (%s)",
+		V_sprintf_safe( sz, "%-30s %-20s (%s)",
 			e->name(), e->type(), value );
-
-		kv->deleteThis();
 
 		PaintString( x, y, sz, pColor );
 	}

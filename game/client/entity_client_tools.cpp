@@ -555,9 +555,8 @@ void CClientTools::OnEntityDeleted( CBaseEntity *pEntity )
 	if ( m_bInRecordingMode )
 	{
 		// Send deletion message to tool interface
-		KeyValues *kv = new KeyValues( "deleted" );
+		KeyValuesAD kv( "deleted" );
 		ToolFramework_PostToolMessage( handle, kv );
-		kv->deleteThis();
 	}
 
 	DetachFromEntity( pEntity );
@@ -571,9 +570,8 @@ void CClientTools::OnEntityCreated( CBaseEntity *pEntity )
 	HTOOLHANDLE h = AttachToEntity( pEntity );
 
 	// Send deletion message to tool interface
-	KeyValues *kv = new KeyValues( "created" );
+	KeyValuesAD kv( "created" );
 	ToolFramework_PostToolMessage( h, kv );
-	kv->deleteThis();
 }
 
 HTOOLHANDLE CClientTools::GetToolHandleForEntityByIndex( int entindex )

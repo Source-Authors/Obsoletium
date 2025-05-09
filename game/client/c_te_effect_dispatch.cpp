@@ -96,7 +96,7 @@ static void RecordEffect( const char *pEffectName, const CEffectData &data )
 
 	if ( clienttools->IsInRecordingMode() && ( (data.m_fFlags & EFFECTDATA_NO_RECORD) == 0 ) )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
 		const char *pSurfacePropName = physprops->GetPropName( data.m_nSurfaceProp );
 
@@ -135,7 +135,6 @@ static void RecordEffect( const char *pEffectName, const CEffectData &data )
 		msg->SetInt( "entindex", data.entindex() );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 
