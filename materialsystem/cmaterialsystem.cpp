@@ -2605,14 +2605,10 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 	Assert( nLen >= Q_strlen( vmtName ) + 1 );
 
 	CUtlVector<FileNameHandle_t> includes;
-	KeyValues *pKeyValues = new KeyValues("vmt");
-	KeyValues *pPatchKeyValues = new KeyValues( "vmt_patches" );
+	KeyValuesAD pKeyValues("vmt");
+	KeyValuesAD pPatchKeyValues( "vmt_patches" );
 	if ( !LoadVMTFile( *pKeyValues, *pPatchKeyValues, vmtName, true, &includes ) )
 	{
-		pKeyValues->deleteThis();
-		pKeyValues = NULL;
-		pPatchKeyValues->deleteThis();
-		pPatchKeyValues = NULL;
 	}
 	else
 	{
@@ -2639,8 +2635,6 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 				m_pForcedTextureLoadPathID = NULL;
 			}
 		}
-		pKeyValues->deleteThis();
-		pPatchKeyValues->deleteThis();
 
 		return pMat->GetQueueFriendlyVersion();
 	}
