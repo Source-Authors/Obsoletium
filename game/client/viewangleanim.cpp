@@ -162,10 +162,8 @@ void CViewAngleAnimation::Spawn( void )
 
 void CViewAngleAnimation::DeleteKeyFrames()
 {
-	int i, c;
-
-	c = m_KeyFrames.Count();
-	for ( i = c - 1; i >= 0 ; --i )
+	intp c = m_KeyFrames.Count();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		delete m_KeyFrames[ i ];
 	}
@@ -274,8 +272,7 @@ void CViewAngleAnimation::ClientThink()
 		flCurrentTime = 0.001;
 
 	// find two nearest points
-	int i, c;
-	c = m_KeyFrames.Count();
+	intp i, c = m_KeyFrames.Count();
 	float flTime = 0;
 	for ( i=0;i<c;i++ )
 	{
