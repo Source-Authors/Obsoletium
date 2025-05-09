@@ -343,11 +343,9 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 		return;
 
 	// load the file as keyvalues
-	KeyValues *pData = new KeyValues( "commentary_data" );
-
-	if ( false == pData->LoadFromFile( g_pFullFileSystem, pszFileName, "MOD" ) )
+	KeyValuesAD pData( "commentary_data" );
+	if ( !pData->LoadFromFile( g_pFullFileSystem, pszFileName, "MOD" ) )
 	{
-		pData->deleteThis();
 		return;
 	}
 	
@@ -360,10 +358,10 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 			//Msg( "track found: %s %s\n", track->GetString("map", "?"), track->GetString( "description", "asdf" ) );
 
 			CommentaryItem_t item;
-			Q_strncpy( item.szMapFileName, pszFileName, sizeof(item.szMapFileName) );
-			Q_strncpy( item.szMapName, track->GetString( "map", "" ), sizeof(item.szMapName) );
-			Q_strncpy( item.szPrintName, track->GetString( "printname", "" ), sizeof(item.szPrintName) );
-			Q_strncpy( item.szDescription, track->GetString( "description", "" ), sizeof(item.szDescription) );
+			V_strcpy_safe( item.szMapFileName, pszFileName );
+			V_strcpy_safe( item.szMapName, track->GetString( "map", "" ) );
+			V_strcpy_safe( item.szPrintName, track->GetString( "printname", "" ) );
+			V_strcpy_safe( item.szDescription, track->GetString( "description", "" ) );
 
 			//item.iChannel = track->GetInt( "channel" );
 
@@ -373,10 +371,10 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 	else
 	{
 		CommentaryItem_t item;
-		Q_strncpy( item.szMapFileName, pszFileName, sizeof(item.szMapFileName) );
+		V_strcpy_safe( item.szMapFileName, pszFileName );
 
 		char mapname[_MAX_PATH];
-		Q_strncpy( mapname, pszFileName, sizeof(item.szMapName) );
+		V_strcpy_safe( mapname, pszFileName );
 		char *ext = strstr( mapname, "_commentary" );
 		if ( !ext )
 			return;
@@ -384,12 +382,10 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 		*ext = '\0';
 		V_FileBase( mapname, item.szMapName );
 
-		Q_strncpy( item.szPrintName, "No trackinfo found.", sizeof(item.szPrintName) );
-		Q_strncpy( item.szDescription, "No trackinfo found.", sizeof(item.szDescription) );
+		V_strcpy_safe( item.szPrintName, "No trackinfo found." );
+		V_strcpy_safe( item.szDescription, "No trackinfo found." );
 		m_CommentaryItems.AddToTail( item );
 	}
-
-	return;
 }
 
 

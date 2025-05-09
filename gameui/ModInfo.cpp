@@ -30,7 +30,7 @@ CModInfo &ModInfo()
 CModInfo::CModInfo()
 {
 	m_pModData = new KeyValues("ModData");
-	m_wcsGameTitle[0] = 0;
+	m_wcsGameTitle[0] = L'\0';
 }
 
 //-----------------------------------------------------------------------------
