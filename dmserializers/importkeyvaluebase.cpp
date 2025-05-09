@@ -277,7 +277,7 @@ bool CImportKeyValueBase::Unserialize( CUtlBuffer &buf, [[maybe_unused]] const c
 	*ppRoot = NULL;
 	m_pFileName = g_pDataModel->GetFileName( fileid );
 
-	KeyValues *kv = new KeyValues( "dmx file" );
+	KeyValuesAD kv( "dmx file" );
 	if ( !kv )
 		return false;
 
@@ -287,6 +287,5 @@ bool CImportKeyValueBase::Unserialize( CUtlBuffer &buf, [[maybe_unused]] const c
 		*ppRoot = UnserializeFromKeyValues( kv );
 	}
 
-	kv->deleteThis();
 	return bOk;
 }

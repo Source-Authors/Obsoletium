@@ -653,8 +653,8 @@ void CImportVMT::ExpandPatchFile( KeyValues *pKeyValues )
 		const char *pIncludeFileName = pKeyValues->GetString( "include" );
 		if( pIncludeFileName )
 		{
-			KeyValues * includeKeyValues = new KeyValues( "vmt" );
-			bool success = includeKeyValues->LoadFromFile( g_pFullFileSystem, pIncludeFileName, IsX360() ? "GAME" : NULL );
+			KeyValuesAD includeKeyValues( "vmt" );
+			bool success = includeKeyValues->LoadFromFile( g_pFullFileSystem, pIncludeFileName, NULL );
 			if( success )
 			{
 				KeyValues *pInsertSection = pKeyValues->FindKey( "insert" );
@@ -670,12 +670,10 @@ void CImportVMT::ExpandPatchFile( KeyValues *pKeyValues )
 				}
 
 				*pKeyValues = *includeKeyValues;
-				includeKeyValues->deleteThis();
 				// Could add other commands here, like "delete", "rename", etc.
 			}
 			else
 			{
-				includeKeyValues->deleteThis();
 				return;
 			}
 		}
