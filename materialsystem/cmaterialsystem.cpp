@@ -1438,7 +1438,7 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 	g_pShaderDeviceMgr->GetAdapterInfo( m_nAdapter, adapterInfo );
 
 	pConfig->dxSupportLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, adapterInfo.m_nDXSupportLevel );
-	KeyValues::AutoDelete pKeyValues = KeyValues::AutoDelete ( "config" );
+	KeyValuesAD pKeyValues( "config" );
 	if ( !GetRecommendedConfigurationInfo( pConfig->dxSupportLevel, pKeyValues ) )
 	{
 		return;
