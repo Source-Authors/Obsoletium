@@ -2951,7 +2951,7 @@ void CMaterialSystem::ReloadMaterials( const char *pSubString )
 			{
 				bool bMatched = false;
 				
-				for ( int k = 0; !bMatched && ( k < arrSearchItems.Count() ); ++ k )
+				for ( intp k = 0; !bMatched && ( k < arrSearchItems.Count() ); ++ k )
 					if( Q_stristr( szMatName, arrSearchItems[k] ) )
 						bMatched = true;
 				
