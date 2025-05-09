@@ -163,14 +163,14 @@ void COperationFileListFrame::ClearAllOperations()
 //-----------------------------------------------------------------------------
 void COperationFileListFrame::AddOperation( const char *pOperation, const char *pFileName )
 {
-	KeyValues *kv = new KeyValues( "node", "filename", pFileName );
+	KeyValuesAD kv( new KeyValues( "node", "filename", pFileName ) );
 	kv->SetString( "operation", pOperation );
 	m_pFileBrowser->AddItem( kv, 0, false, false );
 }
 
 void COperationFileListFrame::AddOperation( const char *pOperation, const char *pFileName, const Color& clr )
 {
-	KeyValues *kv = new KeyValues( "node", "filename", pFileName );
+	KeyValuesAD kv( new KeyValues( "node", "filename", pFileName ) );
 	kv->SetString( "operation", pOperation );
 	kv->SetColor( "cellcolor", clr );
 	m_pFileBrowser->AddItem( kv, 0, false, false );
