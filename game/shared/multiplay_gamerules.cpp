@@ -1427,7 +1427,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		if ( g_pStringTableServerMapCycleMvM )
 		{
 			ConVarRef tf_mvm_missioncyclefile( "tf_mvm_missioncyclefile" );
-			KeyValues *pKV = new KeyValues( tf_mvm_missioncyclefile.GetString() );
+			KeyValuesAD pKV( tf_mvm_missioncyclefile.GetString() );
 			if ( pKV->LoadFromFile( g_pFullFileSystem, tf_mvm_missioncyclefile.GetString(), "MOD" ) )
 			{
 				CUtlVector<CUtlString> mapList;
@@ -1470,8 +1470,6 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 					g_pStringTableServerMapCycleMvM->AddString( CBaseEntity::IsServer(), "ServerMapCycleMvM", sFileList.Length() + 1, sFileList.String() );
 				}
-
-				pKV->deleteThis();
 			}
 		}
 #endif
