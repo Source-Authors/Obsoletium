@@ -620,8 +620,11 @@ private:
 			if (storage.tymed == TYMED_HGLOBAL)
 			{
 				const char *buf = (const char *)GlobalLock(storage.hGlobal);
-				dragData = new KeyValues("DragDrop", "type", "text", "text", buf);
-				GlobalUnlock(storage.hGlobal);
+				if (buf)
+				{
+					dragData = new KeyValues("DragDrop", "type", "text", "text", buf);
+					GlobalUnlock(storage.hGlobal);
+				}
 			}
 
 			ReleaseStgMedium(&storage);
@@ -637,15 +640,18 @@ private:
 
 				// parse out the file list
 				HDROP hdrop = (HDROP)GlobalLock(storage.hGlobal);
-				char namebuf[32], buf[512];
-				int count = DragQueryFile(hdrop, 0xFFFFFFFF, buf, 511);
-				for (int i = 0; i < count; i++)
+				if (hdrop)
 				{
-					V_to_chars(namebuf, i);
-					DragQueryFile(hdrop, i, buf, 511);
-					fileList->SetString(namebuf, buf);
+					char namebuf[32], buf[512];
+					int count = DragQueryFile(hdrop, 0xFFFFFFFF, buf, 511);
+					for (int i = 0; i < count; i++)
+					{
+						V_to_chars(namebuf, i);
+						DragQueryFile(hdrop, i, buf, 511);
+						fileList->SetString(namebuf, buf);
+					}
+					GlobalUnlock(storage.hGlobal);
 				}
-				GlobalUnlock(storage.hGlobal);
 			}
 		}
 
