@@ -13,7 +13,6 @@
 
 #include "filesystem.h"
 #include "ModInfo.h"
-#include "EngineInterface.h"
 #include "ixboxsystem.h"
 #include "KeyValues.h"
 #include "BasePanel.h"
@@ -803,68 +802,71 @@ void CBonusMapsDatabase::ParseBonusMapData( char const *pszFileName, char const 
 	}
 
 	KeyValues *kv = new KeyValues( pszShortName );
+	KeyValuesAD autodeletekv(kv);
 	if ( !kv->LoadFromFile( g_pFullFileSystem, szMapInfo, NULL ) )
-		DevMsg( "Unable to load bonus map info file %s\n", szMapInfo );
-
-	while ( kv )
+		DevMsg( "Unable to load bonus map info file %s.\n", szMapInfo );
+	else
 	{
-		BonusMapDescription_t *pMap = &m_BonusMaps[ m_BonusMaps.AddToTail() ];
-
-		// set required map data
-		Q_strncpy( pMap->szFileName, pszFileName, sizeof(pMap->szFileName) );
-		Q_strncpy( pMap->szShortName, pszShortName, sizeof(pMap->szShortName) );
-		pMap->bIsFolder = bIsFolder;
-
-		// set optional map data
-		V_strcpy_safe( pMap->szMapName, kv->GetName() );
-		V_strcpy_safe( pMap->szMapFileName, kv->GetString( "map" ) );
-		V_strcpy_safe( pMap->szChapterName, kv->GetString( "chapter" ) );
-		V_strcpy_safe( pMap->szImageName, kv->GetString( "image" ) );
-		V_strcpy_safe( pMap->szComment, kv->GetString( "comment" ) );
-		pMap->bLocked = ( kv->GetInt( "lock", 0 ) != 0 );
-		pMap->bComplete = ( kv->GetInt( "complete", 0 ) != 0 );
-
-		float fCompletion = 0.0f;
-
-		KeyValues *pChallenges = kv->FindKey( "challenges" );
-
-		if ( pChallenges )
+		while ( kv )
 		{
-			for ( KeyValues *pChallengeKey = pChallenges->GetFirstSubKey(); pChallengeKey; pChallengeKey = pChallengeKey->GetNextKey() )
-			{
-				if ( !pMap->m_pChallenges )
-					pMap->m_pChallenges = new CUtlVector<ChallengeDescription_t>;
+			BonusMapDescription_t *pMap = &m_BonusMaps[ m_BonusMaps.AddToTail() ];
 
-				ChallengeDescription_t *pChallenge = &(*pMap->m_pChallenges)[ pMap->m_pChallenges->AddToTail() ];
-				V_strcpy_safe( pChallenge->szName, pChallengeKey->GetName() );
-				V_strcpy_safe( pChallenge->szComment, pChallengeKey->GetString( "comment" ) );
-				pChallenge->iType = pChallengeKey->GetInt( "type", -1 );
-				pChallenge->iBronze = pChallengeKey->GetInt( "bronze" );
-				pChallenge->iSilver = pChallengeKey->GetInt( "silver" );
-				pChallenge->iGold = pChallengeKey->GetInt( "gold" );
+			// set required map data
+			Q_strncpy( pMap->szFileName, pszFileName, sizeof(pMap->szFileName) );
+			Q_strncpy( pMap->szShortName, pszShortName, sizeof(pMap->szShortName) );
+			pMap->bIsFolder = bIsFolder;
+
+			// set optional map data
+			V_strcpy_safe( pMap->szMapName, kv->GetName() );
+			V_strcpy_safe( pMap->szMapFileName, kv->GetString( "map" ) );
+			V_strcpy_safe( pMap->szChapterName, kv->GetString( "chapter" ) );
+			V_strcpy_safe( pMap->szImageName, kv->GetString( "image" ) );
+			V_strcpy_safe( pMap->szComment, kv->GetString( "comment" ) );
+			pMap->bLocked = ( kv->GetInt( "lock", 0 ) != 0 );
+			pMap->bComplete = ( kv->GetInt( "complete", 0 ) != 0 );
+
+			float fCompletion = 0.0f;
+
+			KeyValues *pChallenges = kv->FindKey( "challenges" );
+
+			if ( pChallenges )
+			{
+				for ( KeyValues *pChallengeKey = pChallenges->GetFirstSubKey(); pChallengeKey; pChallengeKey = pChallengeKey->GetNextKey() )
+				{
+					if ( !pMap->m_pChallenges )
+						pMap->m_pChallenges = new CUtlVector<ChallengeDescription_t>;
+
+					ChallengeDescription_t *pChallenge = &(*pMap->m_pChallenges)[ pMap->m_pChallenges->AddToTail() ];
+					V_strcpy_safe( pChallenge->szName, pChallengeKey->GetName() );
+					V_strcpy_safe( pChallenge->szComment, pChallengeKey->GetString( "comment" ) );
+					pChallenge->iType = pChallengeKey->GetInt( "type", -1 );
+					pChallenge->iBronze = pChallengeKey->GetInt( "bronze" );
+					pChallenge->iSilver = pChallengeKey->GetInt( "silver" );
+					pChallenge->iGold = pChallengeKey->GetInt( "gold" );
+				}
+
+				fCompletion = GetChallengeBests( m_pBonusMapSavedData->FindKey( "bonusfiles", true ), *pMap );
+
+				// If all the challenges are completed set it as complete
+				if ( fCompletion == 1.0f )
+					SetBooleanStatus( "complete", pMap->szFileName, pMap->szMapName, true );
 			}
 
-			fCompletion = GetChallengeBests( m_pBonusMapSavedData->FindKey( "bonusfiles", true ), *pMap );
+			// Get boolean status last because it can be altered if all the challenges were completed
+			GetBooleanStatus( m_pBonusMapSavedData->FindKey( "bonusfiles", true ), *pMap );
 
-			// If all the challenges are completed set it as complete
-			if ( fCompletion == 1.0f )
-				SetBooleanStatus( "complete", pMap->szFileName, pMap->szMapName, true );
+			if ( pMap->bComplete )
+				fCompletion = 1.0f;
+
+			if ( !pMap->bIsFolder )
+			{
+				m_fCurrentCompletion += fCompletion;
+				++m_iCompletableLevels;
+				kv = kv->GetNextTrueSubKey();
+			}
+			else
+				kv = nullptr;
 		}
-
-		// Get boolean status last because it can be altered if all the challenges were completed
-		GetBooleanStatus( m_pBonusMapSavedData->FindKey( "bonusfiles", true ), *pMap );
-
-		if ( pMap->bComplete )
-			fCompletion = 1.0f;
-
-		if ( !pMap->bIsFolder )
-		{
-			m_fCurrentCompletion += fCompletion;
-			++m_iCompletableLevels;
-			kv = kv->GetNextTrueSubKey();
-		}
-		else
-			kv = NULL;
 	}
 }
 
