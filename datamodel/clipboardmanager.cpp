@@ -151,7 +151,7 @@ void CClipboardManager::GetClipboardData( CUtlVector< KeyValues * >& data )
 
 						::GlobalUnlock( hmem );
 
-						KeyValues *newData = new KeyValues( "ClipBoard", "text", buf );
+						auto *newData = new KeyValues( "ClipBoard", "text", buf );
 						delete[] buf;
 
 						data.AddToTail( newData );
