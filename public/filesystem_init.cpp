@@ -272,30 +272,30 @@ const char *FileSystem_GetLastErrorString()
 }
 
 
-static KeyValues::AutoDelete ReadKeyValuesFile( const char *pFilename )
+static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 {
 	// Read in the gameinfo.txt file and null-terminate it.
 	auto [fp, errc] = se::posix::posix_file_stream_factory::open(pFilename, "rb");
 	if ( errc )
-		return KeyValues::AutoDelete{ nullptr };
+		return KeyValuesAD{ nullptr };
 	
 	std::int64_t size;
 	std::tie(size, errc) = fp.size();
 	if ( errc || size > std::numeric_limits<intp>::max() - 1 )
-		return KeyValues::AutoDelete{ nullptr };
+		return KeyValuesAD{ nullptr };
 
 	CUtlVector<char> buf;
 	buf.SetSize( static_cast<intp>(size) + 1 );
 
 	std::tie(std::ignore, errc) = fp.read( buf.Base(), static_cast<intp>(size) );
 	if ( errc )
-		return KeyValues::AutoDelete{ nullptr };
+		return KeyValuesAD{ nullptr };
 
-	auto kv = KeyValues::AutoDelete( "" );
+	KeyValuesAD kv("");
 	// File system is not ready yet so load from buffer.
 	if ( !kv->LoadFromBuffer( pFilename, buf.Base() ) )
 	{
-		return KeyValues::AutoDelete{ nullptr };
+		return KeyValuesAD{ nullptr };
 	}
 	
 	return kv;
@@ -447,7 +447,7 @@ static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t ret
 
 static FSReturnCode_t LoadGameInfoFile( 
 	const char *pDirectoryName, 
-	KeyValues::AutoDelete &pMainFile, 
+	KeyValuesAD &pMainFile, 
 	KeyValues *&pSearchPaths )
 {
 	// If GameInfo.txt exists under pBaseDir, then this is their game directory.
@@ -554,7 +554,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	if ( !initInfo.m_pFileSystem || !initInfo.m_pDirectoryName )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_LoadSearchPaths: Invalid parameters specified." );
 
-	KeyValues::AutoDelete pMainFile{nullptr};
+	KeyValuesAD pMainFile{nullptr};
 	KeyValues *pSearchPaths;
 	FSReturnCode_t retVal = LoadGameInfoFile( initInfo.m_pDirectoryName, pMainFile, pSearchPaths );
 	if ( retVal != FS_OK )

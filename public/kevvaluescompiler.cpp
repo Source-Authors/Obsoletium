@@ -97,7 +97,7 @@ void CCompiledKeyValuesWriter::AppendKeyValuesFile( char const *filename )
 	kvf.firstElement = m_Data.Count();
 
 	{
-		auto kv = KeyValues::AutoDelete( filename );
+		KeyValuesAD kv( filename );
 		if ( kv->LoadFromFile( g_pFullFileSystem, filename ) )
 		{
 			// Add to dictionary
