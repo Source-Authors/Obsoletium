@@ -253,7 +253,7 @@ inline unsigned short CDataManagerBase::FromHandle( memhandle_t handle )
 {
 	Assert((uintp)handle <= std::numeric_limits<unsigned>::max() || handle == INVALID_MEMHANDLE);
 
-	unsigned int fullWord = (unsigned int)(uintp)handle;
+	unsigned int fullWord = (unsigned int)(uintp)handle; //-V221
 	unsigned short serial = fullWord>>16;
 	unsigned short index = fullWord & 0xFFFF;
 
