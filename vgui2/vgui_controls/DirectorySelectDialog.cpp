@@ -510,7 +510,7 @@ void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 		if (_mkdir(fullPath) == 0 || errno == EEXIST)
 		{
 			// add new path to tree view
-			KeyValues *kv = new KeyValues("item");
+			KeyValuesAD kv("item");
 			kv->SetString("Text", dir);
 			// set the folder image
 			kv->SetInt("Image", 1);
