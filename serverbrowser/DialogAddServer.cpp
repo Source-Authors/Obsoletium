@@ -269,7 +269,7 @@ void CDialogAddServer::TestServers()
 //-----------------------------------------------------------------------------
 void CDialogAddServer::ServerResponded( gameserveritem_t &server )
 {
-	KeyValues *kv = new KeyValues( "Server" );
+	KeyValuesAD kv( "Server" );
 
 	kv->SetString( "name", server.GetName() );
 	kv->SetString( "map", server.m_szMap );
@@ -308,7 +308,6 @@ void CDialogAddServer::ServerResponded( gameserveritem_t &server )
 	{
 		m_pDiscoveredGames->AddSelectedItem( iListID );
 	}
-	kv->deleteThis();
 
 	m_pDiscoveredGames->InvalidateLayout();
 }

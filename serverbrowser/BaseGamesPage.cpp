@@ -668,7 +668,7 @@ void CBaseGamesPage::CreateFilters()
 	m_pQuickListCheckButton = new CCheckBoxWithStatus(this, "QuickListCheck", "");
 	m_pReplayFilterCheck = new CheckButton(this, "ReplayFilterCheck", "");
 
-	KeyValues *pkv = new KeyValues("mod", "gamedir", "", "appid", NULL );
+	KeyValuesAD pkv( new KeyValues("mod", "gamedir", "", "appid", NULL ) );
 	m_pGameFilter->AddItem("#ServerBrowser_All", pkv);
 
 	for (int i = 0; i < ModList().ModCount(); i++)
@@ -678,8 +678,6 @@ void CBaseGamesPage::CreateFilters()
 		int iItemID = m_pGameFilter->AddItem(ModList().GetModName(i), pkv);
 		m_mapGamesFilterItem.Insert( ModList().GetAppID(i).ToUint64(), iItemID );
 	}
-	pkv->deleteThis();
-
 }
 
 
@@ -1172,7 +1170,7 @@ void CBaseGamesPage::ApplyGameFilters()
 			// re-add item to list
 			if ( !m_pGameList->IsValidItemID( server.m_iListID ) )
 			{
-				KeyValues *kv = new KeyValues("Server");
+				KeyValuesAD kv("Server");
 				kv->SetString("name", pServer->GetName());
 				kv->SetString("map", pServer->m_szMap);
 				kv->SetString("GameDir", pServer->m_szGameDir);
@@ -1201,7 +1199,6 @@ void CBaseGamesPage::ApplyGameFilters()
 				kv->SetInt("Replay", IsReplayServer( *pServer ) ? m_nImageIndexReplay : 0);
 				
 				server.m_iListID = m_pGameList->AddItem(kv, server.m_iServerID, false, false);
-				kv->deleteThis();
 			}
 			
 			// make sure the server is visible

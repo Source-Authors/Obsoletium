@@ -755,7 +755,7 @@ void CDialogGameInfo::AddPlayerToList(const char *playerName, int score, float t
 		m_pPlayerList->RemoveAll();
 	}
 
-	KeyValues *player = new KeyValues("player");
+	KeyValuesAD player("player");
 	player->SetString("PlayerName", playerName);
 	player->SetInt("Score", score);
 	player->SetInt("TimeSec", (int)timePlayedSeconds);
@@ -783,7 +783,6 @@ void CDialogGameInfo::AddPlayerToList(const char *playerName, int score, float t
 	player->SetString("Time", buf);
 	
 	m_pPlayerList->AddItem(player, 0, false, true);
-	player->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
