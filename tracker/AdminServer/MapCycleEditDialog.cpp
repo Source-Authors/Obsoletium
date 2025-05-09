@@ -77,12 +77,12 @@ void CMapCycleEditDialog::Activate(vgui::Panel *updateTarget, CUtlVector<CUtlSym
 
 		if (!inMapCycle)
 		{
-			m_pAvailableMapList->AddItem(new KeyValues("MapItem", "Map", availableMaps[i].String()), 0, false, false);
+			m_pAvailableMapList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", availableMaps[i].String()) ), 0, false, false);
 		}
 	}
 	for (int i = 0; i < mapCycle.Count(); i++)
 	{
-		m_pMapCycleList->AddItem(new KeyValues("MapItem", "Map", mapCycle[i].String()), 0, false, false);
+		m_pMapCycleList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", mapCycle[i].String()) ), 0, false, false);
 	}
 
 	// show window
@@ -160,7 +160,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 				return;
 
 			const char *map = data->GetString("Map");
-			m_pAvailableMapList->AddItem(new KeyValues("MapItem", "Map", map), 0, true, false);
+			m_pAvailableMapList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", map)), 0, true, false);
 			m_pMapCycleList->RemoveItem(itemID);
 		}
 	}
@@ -175,7 +175,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 				return;
 
 			const char *map = data->GetString("Map");
-			m_pMapCycleList->AddItem(new KeyValues("MapItem", "Map", map), 0, true, false);
+			m_pMapCycleList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", map) ), 0, true, false);
 			m_pAvailableMapList->RemoveItem(itemID);
 		}
 	}

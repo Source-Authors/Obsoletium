@@ -208,7 +208,7 @@ void CPlayerPanel::OnServerDataResponse(const char *value, const char *response)
 			ivgui()->DPrintf2("pars:  \"%s\" %s %s %d %d %d %s\n", name, authID, netAdr, ping, packetLoss, frags, timeStr);
 
 			// add to list
-			KeyValues *player = new KeyValues("Player");
+			KeyValuesAD player("Player");
 			player->SetString("name", name);
 			player->SetString("authID", authID);
 			player->SetString("netAdr", netAdr);
