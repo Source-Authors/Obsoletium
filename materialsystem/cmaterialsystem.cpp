@@ -2564,19 +2564,19 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 	intp nLen = Q_strlen( pMaterialName ) + 1;
 
 	V_strdup_stack(pMaterialName, pFixedNameTemp);
-	Q_strlower( pFixedNameTemp );
+	V_strlower( pFixedNameTemp );
 
 	char *pTemp = stackallocT( char, nLen );
 #ifdef POSIX
 	// strip extensions needs correct slashing for the OS, so fix it up early for Posix
-	Q_FixSlashes( pFixedNameTemp, '/' );
+	V_FixSlashes( pFixedNameTemp, '/' );
 #endif
-	Q_StripExtension( pFixedNameTemp, pTemp, nLen );
+	V_StripExtension( pFixedNameTemp, pTemp, nLen );
 #ifndef POSIX
-	Q_FixSlashes( pTemp, '/' );
+	V_FixSlashes( pTemp, '/' );
 #endif
 	
-	Assert( nLen >= Q_strlen( pTemp ) + 1 );
+	Assert( nLen >= V_strlen( pTemp ) + 1 );
 
 	IMaterialInternal *pExistingMaterial = m_MaterialDict.FindMaterial( pTemp, false );	// 'false' causes the search to find only file-created materials
 
@@ -2584,21 +2584,21 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 		return pExistingMaterial->GetQueueFriendlyVersion();
 
 	// It hasn't been seen yet, so let's check to see if it's in the filesystem.
-	nLen = ssize( "materials/" ) - 1 + Q_strlen( pTemp ) + ssize( ".vmt" );
+	nLen = ssize( "materials/" ) - 1 + V_strlen( pTemp ) + ssize( ".vmt" );
 	char *vmtName = stackallocT( char, nLen );
 
 	// Check to see if this is a UNC-specified material name
 	bool bIsUNC = pTemp[0] == '/' && pTemp[1] == '/' && pTemp[2] != '/';
 	if ( !bIsUNC )
 	{
-		Q_strncpy( vmtName, "materials/", nLen );
-		Q_strncat( vmtName, pTemp, nLen, COPY_ALL_CHARACTERS );
+		V_strncpy( vmtName, "materials/", nLen );
+		V_strncat( vmtName, pTemp, nLen, COPY_ALL_CHARACTERS );
 		
 		V_FixDoubleSlashes( vmtName );
 	}
 	else
 	{
-		Q_strncpy( vmtName, pTemp, nLen );
+		V_strncpy( vmtName, pTemp, nLen );
 	}
 
 	Assert( nLen >= Q_strlen( vmtName ) + 1 );
@@ -2608,10 +2608,11 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 	KeyValuesAD pPatchKeyValues( "vmt_patches" );
 	if ( LoadVMTFile( *pKeyValues, *pPatchKeyValues, vmtName, true, &includes ) )
 	{
-		nLen = Q_strlen( pTemp ) + ssize( ".vmt" );
+		nLen = V_strlen( pTemp ) + ssize( ".vmt" );
+
 		char *matNameWithExtension = stackallocT( char, nLen );
-		Q_strncpy( matNameWithExtension, pTemp, nLen );
-		Q_strncat( matNameWithExtension, ".vmt", nLen, COPY_ALL_CHARACTERS );
+		V_strncpy( matNameWithExtension, pTemp, nLen );
+		V_strncat( matNameWithExtension, ".vmt", nLen, COPY_ALL_CHARACTERS );
 
 		IMaterialInternal *pMat = NULL;
 		if ( !Q_stricmp( pKeyValues->GetName(), "subrect" ) )
@@ -2641,7 +2642,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 
 		// convert to lowercase
 		V_strdup_stack(pTemp, name);
-		Q_strlower( name );
+		V_strlower( name );
 
 		if ( m_MaterialDict.NoteMissing( name ) )
 		{
