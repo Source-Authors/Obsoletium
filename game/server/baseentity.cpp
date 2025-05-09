@@ -4869,8 +4869,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 	// particles
 	{
 		// Check keyvalues for auto-emitting particles
-		KeyValues *pModelKeyValues = new KeyValues("");
-		KeyValues::AutoDelete autodelete_pModelKeyValues( pModelKeyValues );
+		KeyValuesAD pModelKeyValues("");
 		if ( pModelKeyValues->LoadFromBuffer( modelinfo->GetModelName( pModel ), modelinfo->GetModelKeyValueText( pModel ) ) )
 		{
 			KeyValues *pParticleEffects = pModelKeyValues->FindKey("Particles");
