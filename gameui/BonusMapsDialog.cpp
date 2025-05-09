@@ -763,7 +763,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 		BuildMapsList();
 
 		m_pChallengeSelection->RemoveAll();
-		m_pChallengeSelection->AddItem( "<Select A Challenge>", new KeyValues( "ChallengeSelection", "challenge", -1 ) );
+		m_pChallengeSelection->AddItem( "<Select A Challenge>", KeyValuesAD( new KeyValues( "ChallengeSelection", "challenge", -1 ) ) );
 
 		RefreshDialog( NULL );
 
@@ -944,8 +944,7 @@ void CBonusMapsDialog::OnPanelSelected()
 		int iSelectedChallenge = GetSelectedChallenge();
 
 		m_pChallengeSelection->RemoveAll();
-
-		m_pChallengeSelection->AddItem( "<Select A Challenge>", new KeyValues( "ChallengeSelection", "challenge", -1 ) );
+		m_pChallengeSelection->AddItem( "<Select A Challenge>", KeyValuesAD( new KeyValues( "ChallengeSelection", "challenge", -1 ) ) );
 
 		int iFoundSimilar = 0;
 
@@ -958,7 +957,7 @@ void CBonusMapsDialog::OnPanelSelected()
 			if ( pChallenge->iType != -1 )
 				iType = pChallenge->iType;
 
-			m_pChallengeSelection->AddItem( pChallenge->szName, new KeyValues( "ChallengeSelection", "challenge", iType ) );
+			m_pChallengeSelection->AddItem( pChallenge->szName, KeyValuesAD( new KeyValues( "ChallengeSelection", "challenge", iType ) ) );
 
 			if ( iSelectedChallenge == iNumChallenges )
 				iFoundSimilar = iNumChallenges + 1;
