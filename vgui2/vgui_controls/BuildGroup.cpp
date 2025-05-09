@@ -741,7 +741,8 @@ Panel *BuildGroup::CreateBuildDialog( void )
 {
 	// request the panel
 	Panel *buildDialog = NULL;
-	KeyValues *data = new KeyValues("BuildDialog");
+	// dimhotepus: Do not leak KeyValues.
+	KeyValuesAD data("BuildDialog");
 	data->SetPtr("BuildGroupPtr", this);
 	if (m_pBuildContext->RequestInfo(data))
 	{
