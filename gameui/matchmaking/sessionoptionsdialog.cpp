@@ -206,7 +206,7 @@ void CSessionOptionsDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 //---------------------------------------------------------------------
 void CSessionOptionsDialog::SetupSession( void )
 {
-	KeyValues *pKeys = new KeyValues( "SessionKeys" );
+	KeyValuesAD pKeys( "SessionKeys" );
 
 	// Send user-selected properties and contexts
 	for ( int i = 0; i < m_Menu.GetItemCount(); ++i )
@@ -241,7 +241,6 @@ void CSessionOptionsDialog::SetupSession( void )
 
 	// Matchmaking will make a copy of these keys
 	matchmaking->SetSessionProperties( pKeys );
-	pKeys->deleteThis();
 }
 
 //-----------------------------------------------------------------
