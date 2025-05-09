@@ -485,9 +485,9 @@ void CCreateMultiplayerGameServerPage::LoadMODList() {
 
   // add steam games
   if (CommandLine()->CheckParm("-steam")) {
-    const char *pSteamGamesFilename = "hlds_steamgames.vdf";
+    constexpr char pSteamGamesFilename[] = "hlds_steamgames.vdf";
 
-    KeyValues *gamesFile = new KeyValues(pSteamGamesFilename);
+    KeyValuesAD gamesFile(pSteamGamesFilename);
 
     if (gamesFile->LoadFromFile(g_pFullFileSystem, pSteamGamesFilename, NULL)) {
       for (KeyValues *kv = gamesFile->GetFirstSubKey(); kv != NULL;
@@ -500,8 +500,6 @@ void CCreateMultiplayerGameServerPage::LoadMODList() {
         AddMod(pGameDir, pSteamGamesFilename, kv);
       }
     }
-    gamesFile->deleteThis();
-    gamesFile = NULL;
   }
 
   // For backward compatibility, check inside the dedicated server's own
@@ -560,15 +558,12 @@ void CCreateMultiplayerGameServerPage::LoadPossibleMod(
   if (!g_pFullFileSystem->FileExists(gameInfoFilename)) return;
 
   // don't want to add single player games to the list
-  KeyValues *pGameInfo = new KeyValues("GameInfo");
+  KeyValuesAD pGameInfo("GameInfo");
   bool loadedFile =
       pGameInfo->LoadFromFile(g_pFullFileSystem, gameInfoFilename);
   if (!loadedFile) return;
 
   AddMod(pGameDirName, gameInfoFilename, pGameInfo);
-
-  pGameInfo->deleteThis();
-  pGameInfo = NULL;
 }
 
 void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
@@ -606,13 +601,10 @@ void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
     if (!gameName) Error("%s missing 'game' key.", pGameInfoFilename);
 
     // add to drop-down combo and mod list
-    KeyValues *kv = pGameInfo->MakeCopy();
+    KeyValuesAD kv(pGameInfo->MakeCopy());
     kv->SetString("gamedir", pGameDirName);
 
     m_pGameCombo->AddItem(gameName, kv);
-
-    kv->deleteThis();
-    kv = NULL;
   }
 }
 
