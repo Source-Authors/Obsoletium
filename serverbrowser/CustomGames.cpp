@@ -361,7 +361,7 @@ void CCustomGames::RecalculateCommonTags( void )
 	for ( int i = 0; i < iTagsToAdd; i++ )
 	{
 		const char *pszTag = aTagsInUse[i].pszTag;
-		m_pTagListMenu->AddMenuItem( pszTag, new KeyValues("AddTag", "tag", pszTag), this, new KeyValues( "data", "tag", pszTag ) );
+		m_pTagListMenu->AddMenuItem( pszTag, new KeyValues("AddTag", "tag", pszTag), this, KeyValuesAD( new KeyValues( "data", "tag", pszTag ) ) );
 	}
 
 	m_pTagListMenu->SetFixedWidth( m_pAddTagList->GetWide() );
