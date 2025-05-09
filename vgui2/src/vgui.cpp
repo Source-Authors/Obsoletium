@@ -833,16 +833,6 @@ bool CVGui::DispatchMessages()
 					g_pInput->UpdateCursorPosInternal( nXPos, nYPos );
 				}
 			}
-#ifdef _X360
-			else if ( messageItem->_messageTo == 0xFFFFFFFE ) // special tag to always give message to the active key focus
-			{
-				VPanel *vto = (VPanel *) g_pInput->GetCalculatedFocus();
-				if (vto)
-				{
-					vto->SendMessage(params, g_pIVgui->HandleToPanel(messageItem->_from));
-				}
-			}
-#endif
 			else
 			{
 				VPanel *vto = (VPanel *)g_pIVgui->HandleToPanel(messageItem->_messageTo);
