@@ -61,7 +61,7 @@ IMaterialInternal *g_pErrorMaterial = NULL;
 
 CreateInterfaceFn g_fnMatSystemConnectCreateInterface = NULL;  
 
-static intp ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const char *pszPathName);
+static intp ReadListFromFile(CUtlVector<char*> &outReplacementMaterials, const char *pszPathName);
 
 //#define PERF_TESTING 1
 
@@ -4875,20 +4875,21 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 void CMaterialSystem::InitReplacementsFromFile( const char *pszPathName )
 {
 	CUtlVector<char*> replacementFiles;
+
 	char szBaseName[MAX_PATH];
 	V_sprintf_safe( szBaseName, "%s/replacements.txt", pszPathName );
 
-	intp replacementCount = ReadListFromFile( &replacementFiles, szBaseName );
-	
-	for ( intp i = 0; i < replacementCount; ++i ) 
+	ReadListFromFile( replacementFiles, szBaseName );
+	for ( const auto *file : replacementFiles ) 
 	{
-		V_sprintf_safe( szBaseName, "%s/%s/replacements.vmt", pszPathName, replacementFiles[i] );
+		V_sprintf_safe( szBaseName, "%s/%s/replacements.vmt", pszPathName, file );
 		if ( g_pFullFileSystem->FileExists(szBaseName) )
 		{
-			KeyValues *pKV = g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );
+			KeyValues *pKV =
+				g_pFullFileSystem->LoadKeyValues( IFileSystem::TYPE_VMT, szBaseName );
 			if (pKV)
 			{
-				V_sprintf_safe( szBaseName, "%s/%s/", pszPathName, replacementFiles[i] );
+				V_sprintf_safe( szBaseName, "%s/%s/", pszPathName, file );
 				m_Replacements.Insert( szBaseName, pKV );
 			}
 		}
@@ -5176,18 +5177,16 @@ CON_COMMAND( mat_hdr_enabled, "Report if HDR is enabled for debugging" )
 }
 
 
-static intp ReadListFromFile(CUtlVector<char*>* outReplacementMaterials, const char *pszPathName)
+static intp ReadListFromFile(CUtlVector<char*> &outReplacementMaterials, const char *pszPathName)
 {
-	Assert(outReplacementMaterials != NULL);
-	Assert(pszPathName != NULL);
+	Assert(pszPathName != nullptr);
 
 	CUtlBuffer fileContents;
-	if ( !g_pFullFileSystem->ReadFile( pszPathName, NULL, fileContents ) ) 
+	if ( !g_pFullFileSystem->ReadFile( pszPathName, nullptr, fileContents ) ) 
 		return 0;
 
 	const char* seps[] = { "\r", "\r\n", "\n" };
-	V_SplitString2( fileContents.Base<char>(), seps, *outReplacementMaterials );
+	V_SplitString2( fileContents.Base<char>(), seps, outReplacementMaterials );
 
-
-	return outReplacementMaterials->Count();
+	return outReplacementMaterials.Count();
 }
