@@ -243,7 +243,7 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 //-----------------------------------------------------------------------------
 KeyValues *COptionsSubKeyboard::GetItemForBinding( const char *binding )
 {
-	static int bindingSymbol = KeyValuesSystem()->GetSymbolForString("Binding");
+	static HKeySymbol bindingSymbol = KeyValuesSystem()->GetSymbolForString("Binding");
 
 	// Loop through all items
 	for (int i = 0; i < m_pKeyBindList->GetItemCount(); i++)
