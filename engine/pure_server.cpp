@@ -65,37 +65,34 @@ void CPureServerWhitelist::Load( int iPureMode )
 
 	// Load base trusted keys
 	{
-		KeyValues *kv = new KeyValues( "" );
+		KeyValuesAD kv( "" );
 		bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/trusted_keys_base.txt", "game" );
 		if ( bLoaded )
 			bLoaded = LoadTrustedKeysFromKeyValues( kv );
 		else
 			Warning( "Error loading cfg/trusted_keys_base.txt\n" );
-		kv->deleteThis();
 	}
 
 	// sv_pure 0: minimal rules only
 	if ( iPureMode == 0 )
 	{
-		KeyValues *kv = new KeyValues( "" );
+		KeyValuesAD kv( "" );
 		bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/pure_server_minimal.txt", "game" );
 		if ( bLoaded )
 			bLoaded = LoadCommandsFromKeyValues( kv );
 		else
 			Warning( "Error loading cfg/pure_server_minimal.txt\n" );
-		kv->deleteThis();
 		return;
 	}
 
 	// Load up full pure rules
 	{
-		KeyValues *kv = new KeyValues( "" );
+		KeyValuesAD kv( "" );
 		bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/pure_server_full.txt", "game" );
 		if ( bLoaded )
 			bLoaded = LoadCommandsFromKeyValues( kv );
 		else
 			Warning( "Error loading cfg/pure_server_full.txt\n" );
-		kv->deleteThis();
 	}
 
 	// Now load user customizations
@@ -103,7 +100,7 @@ void CPureServerWhitelist::Load( int iPureMode )
 	{
 		{
 			// Load custom whitelist
-			auto kv = KeyValues::AutoDelete( "" );
+			KeyValuesAD kv( "" );
 			bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/pure_server_whitelist.txt", "game" );
 			if ( !bLoaded )
 				// Check the old location
@@ -115,7 +112,7 @@ void CPureServerWhitelist::Load( int iPureMode )
 		}
 
 		// Load custom trusted keys
-		auto kv = KeyValues::AutoDelete( "" );
+		KeyValuesAD kv( "" );
 		bool bLoaded = kv->LoadFromFile( g_pFileSystem, "cfg/trusted_keys.txt", "game" );
 		if ( bLoaded )
 			bLoaded = LoadTrustedKeysFromKeyValues( kv );

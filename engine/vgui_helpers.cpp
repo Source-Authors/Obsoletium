@@ -113,10 +113,9 @@ bool IncrementalUpdateTree(
 		if ( iRoot == -1 )
 		{
 			// Add a root if there isn't one yet.
-			KeyValues *pTempValues = new KeyValues( "" );
+			KeyValuesAD pTempValues( "" );
 			pTempValues->SetString( "Text", "" );
 			iRoot = pTree->AddItem( pTempValues, iRoot );
-			pTempValues->deleteThis();
 		}
 	}
 

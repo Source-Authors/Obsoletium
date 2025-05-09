@@ -66,12 +66,11 @@ void CDownloadListGenerator::SetStringTable( INetworkStringTable *pStringTable )
 	OnResourcePrecached(path);
 
 	bool useNodeGraph = true;
-	KeyValues *modinfo = new KeyValues("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		useNodeGraph = modinfo->GetInt( "nodegraph", 1 ) != 0;
 	}
-	modinfo->deleteThis();
 
 	if ( useNodeGraph )
 	{
@@ -83,7 +82,7 @@ void CDownloadListGenerator::SetStringTable( INetworkStringTable *pStringTable )
 	OnResourcePrecached(path);
 
 	char resfilename[MAX_OSPATH];
-	KeyValues *resfilekeys = new KeyValues( "resourefiles" );
+	KeyValuesAD resfilekeys( "resourefiles" );
 
 	Q_snprintf( resfilename, sizeof( resfilename), "maps/%s.res", m_mapName );
 
@@ -96,7 +95,6 @@ void CDownloadListGenerator::SetStringTable( INetworkStringTable *pStringTable )
 			entry = entry->GetNextKey();
 		}
 	}
-	resfilekeys->deleteThis();
 }
 
 //-----------------------------------------------------------------------------

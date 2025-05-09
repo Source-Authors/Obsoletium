@@ -484,12 +484,11 @@ void CMapReslistGenerator::OnLevelLoadStart(const char *levelName)
 	OnResourcePrecached( path );
 
 	bool useNodeGraph = true;
-	KeyValues *modinfo = new KeyValues("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		useNodeGraph = modinfo->GetInt( "nodegraph", 1 ) != 0;
 	}
-	modinfo->deleteThis();
 
 	if ( useNodeGraph )
 	{

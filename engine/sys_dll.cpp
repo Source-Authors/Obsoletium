@@ -1126,7 +1126,7 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 
 	{
 		// Listing file for this game.
-		KeyValues::AutoDelete modinfo = KeyValues::AutoDelete("modinfo");
+		KeyValuesAD modinfo("modinfo");
 		MEM_ALLOC_CREDIT();
 		if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
 		{

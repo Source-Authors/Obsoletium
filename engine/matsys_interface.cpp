@@ -260,7 +260,7 @@ static int ReadVideoConfigInt( const char *pName, int nDefault )
 	AUTO_LOCK( g_VideoConfigMutex );
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	bool bFileExists = pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	// We probably didn't have one on disk yet, just bail.  It'll get created soon.
@@ -268,7 +268,6 @@ static int ReadVideoConfigInt( const char *pName, int nDefault )
 		return nDefault;
 	
 	int nInt = pVideoConfig->GetInt( pName, nDefault );
-	pVideoConfig->deleteThis();
 	return nInt;
 #else
 	return registry->ReadInt( pName, nDefault );
@@ -281,7 +280,7 @@ static void ReadVideoConfigInt( const char *pName, int *pEntry )
 	AUTO_LOCK( g_VideoConfigMutex );
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	bool bFileExists = pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	// We probably didn't have one on disk yet, just bail.  It'll get created soon.
@@ -292,8 +291,6 @@ static void ReadVideoConfigInt( const char *pName, int *pEntry )
 	{
 		*pEntry = pVideoConfig->GetInt( pName, 0 );
 	}
-
-	pVideoConfig->deleteThis();
 #else
 	if ( registry->ReadInt( pName, -1 ) != -1 )
 	{
@@ -309,7 +306,7 @@ static const char *ReadVideoConfigString( const char *pName, const char *pDefaul
 	static char szRetString[ 255 ];
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	bool bFileExists = pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	// We probably didn't have one on disk yet, just bail.  It'll get created soon.
@@ -318,7 +315,6 @@ static const char *ReadVideoConfigString( const char *pName, const char *pDefaul
 	
 	const char *pString = pVideoConfig->GetString( pName, pDefault );
 	Q_strncpy( szRetString, pString, sizeof(szRetString) );
-	pVideoConfig->deleteThis();
 	return szRetString;
 #else
 	return registry->ReadString( pName, pDefault );
@@ -333,13 +329,12 @@ static void WriteVideoConfigInt( const char *pName, int nEntry )
 	AUTO_LOCK( g_VideoConfigMutex );
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	pVideoConfig->SetInt( pName, nEntry );
 	
 	pVideoConfig->SaveToFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD", false, false, true );
-	pVideoConfig->deleteThis();
 #else
 	registry->WriteInt( pName, nEntry );
 #endif
@@ -352,13 +347,12 @@ static void WriteVideoConfigString( const char *pName, const char *pString )
 	AUTO_LOCK( g_VideoConfigMutex );
 
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	pVideoConfig->SetString( pName, pString );
 	
 	pVideoConfig->SaveToFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD", false, false, true );
-	pVideoConfig->deleteThis();
 #else
 	registry->WriteString( pName, pString );
 #endif

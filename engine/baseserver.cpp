@@ -2398,7 +2398,7 @@ void CBaseServer::RecalculateTags( void )
 	// Games without this interface will have no tagged cvars besides "increased_maxplayers"
 	if ( serverGameTags )
 	{
-		auto pKV = KeyValues::AutoDelete( "GameTags" );
+		KeyValuesAD pKV( "GameTags" );
 
 		serverGameTags->GetTaggedConVarList( pKV );
 

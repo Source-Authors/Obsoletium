@@ -1110,7 +1110,7 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 
 	m_bSupportsVR = false;
 
-	KeyValues::AutoDelete modinfo = KeyValues::AutoDelete("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		// Enable file tracking - client always does this in case it connects to a pure server.

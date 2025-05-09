@@ -380,10 +380,9 @@ void VGui_RecursivePrintTree(
 		Q_snprintf( str, sizeof( str ), "%s - [0x%x]", name, current );
 	else if (vgui_drawtree_panelalpha.GetInt() )
 	{
-		KeyValues *kv = new KeyValues("alpha");
+		KeyValuesAD kv("alpha");
 		vgui::ipanel()->RequestInfo(current, kv);
 		Q_snprintf( str, sizeof( str ), "%s - [%d]", name, kv->GetInt("alpha") );
-		kv->deleteThis();
 	}
 	else
 		Q_snprintf( str, sizeof( str ), "%s", name );
@@ -553,16 +552,13 @@ void VGui_DrawHierarchy( void )
 	g_pDrawTreeFrame->SetVisible( true );
 
 	// Now reconstruct the tree control.
-	KeyValues *pRoot = new KeyValues("");
+	KeyValuesAD pRoot("");
 	pRoot->SetString( "Text", "<shouldn't see this>" );
 	
 	VGui_FillKeyValues( pRoot );
 
 	// Now incrementally update the tree control so we can preserve which nodes are open.
 	IncrementalUpdateTree( g_pDrawTreeFrame->m_pTree, pRoot );
-
-	// Delete the keyvalues.
-	pRoot->deleteThis();
 }
 
 

@@ -707,7 +707,7 @@ void CBaseActionTextMessageStartDialog::FillInFonts()
 {
 	m_pFontName->AddItem( "TextMessageDefault", NULL );
 
-	KeyValues *schemeFile = new KeyValues( "Fonts" );
+	KeyValuesAD schemeFile( "Fonts" );
 	if ( !schemeFile )
 		return;
 
@@ -721,8 +721,6 @@ void CBaseActionTextMessageStartDialog::FillInFonts()
 			m_pFontName->AddItem( kv->GetName(), NULL );
 		}
 	}
-
-	schemeFile->deleteThis();
 }
 
 

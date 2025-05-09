@@ -2308,7 +2308,7 @@ void CL_GetBackgroundLevelName( char *pszBackgroundName, int bufSize, bool bMapN
 {
 	Q_strncpy( pszBackgroundName, DEFAULT_BACKGROUND_NAME, bufSize );
 
-	KeyValues *pChapterFile = new KeyValues( pszBackgroundName );
+	KeyValuesAD pChapterFile( pszBackgroundName );
 
 	if ( pChapterFile->LoadFromFile( g_pFileSystem, "scripts/ChapterBackgrounds.txt" ) )
 	{
@@ -2369,8 +2369,6 @@ void CL_GetBackgroundLevelName( char *pszBackgroundName, int bufSize, bool bMapN
 			Q_strncpy( pszBackgroundName, pLoadChapter->GetString(), bufSize );
 		}
 	}
-
-	pChapterFile->deleteThis();
 }
 
 //-----------------------------------------------------------------------------

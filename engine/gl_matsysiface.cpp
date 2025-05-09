@@ -114,10 +114,9 @@ CON_COMMAND_F( mat_edit, "Bring up the material under the crosshair in the edito
 		{
 			ConMsg( "editing material \"%s\"\n", pMaterial->GetName() );
 
-			KeyValues *pKeyValues = new KeyValues( "EditMaterial" );
+			KeyValuesAD pKeyValues( "EditMaterial" );
 			pKeyValues->SetString( "material", pMaterial->GetName() );
 			pToolSystem->PostMessage( 0, pKeyValues );
-			pKeyValues->deleteThis();
 		}
 	}
 }

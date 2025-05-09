@@ -1033,7 +1033,7 @@ void CVProfPanel::UpdateProfile( float filteredtime )
 			m_pVProfile->Pause();
 		}
 
-		KeyValues * pVal = new KeyValues("");
+		KeyValuesAD pVal("");
 		
 		if ( !m_pHierarchy->GetTree()->GetItemCount() )
 		{
@@ -1054,8 +1054,6 @@ void CVProfPanel::UpdateProfile( float filteredtime )
 		{
 			FillTree( pVal, pStartNode, m_RootItem );
 		}
-		
-		pVal->deleteThis();
 
 		if( bEnabled )
 		{

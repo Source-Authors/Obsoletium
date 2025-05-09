@@ -265,31 +265,27 @@ public:
 	{
 		SetTitle( "Debug Options", true );
 
-		KeyValues *kv = new KeyValues( "DebugOptions" );
-		if ( kv )
+		KeyValuesAD kv( "DebugOptions" );
+		if ( kv->LoadFromFile(g_pFullFileSystem, "scripts/DebugOptions.txt") )
 		{
-			if ( kv->LoadFromFile(g_pFullFileSystem, "scripts/DebugOptions.txt") )
+			for (KeyValues *dat = kv->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
 			{
-				for (KeyValues *dat = kv->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
+				if ( !Q_strcasecmp( dat->GetName(), "width" ) )
 				{
-					if ( !Q_strcasecmp( dat->GetName(), "width" ) )
-					{
-						SetWide( dat->GetInt() );
-						continue;
-					}
-					else if ( !Q_strcasecmp( dat->GetName(), "height" ) )
-					{
-						SetTall( dat->GetInt() );
-						continue;
-					}
-
-					CDebugOptionsPage *page = new CDebugOptionsPage( this, dat->GetName() );
-					page->Init( dat );
-	
-					AddPage( page, dat->GetName() );
+					SetWide( dat->GetInt() );
+					continue;
 				}
+				else if ( !Q_strcasecmp( dat->GetName(), "height" ) )
+				{
+					SetTall( dat->GetInt() );
+					continue;
+				}
+
+				CDebugOptionsPage *page = new CDebugOptionsPage( this, dat->GetName() );
+				page->Init( dat );
+	
+				AddPage( page, dat->GetName() );
 			}
-			kv->deleteThis();
 		}
 	
 		GetPropertySheet()->SetTabWidth(72);

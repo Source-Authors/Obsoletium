@@ -1316,13 +1316,12 @@ bool XBX_SetProfileDefaultSettings( void )
 	}
 
 	// If the mod has no difficulty setting, only easy is allowed
-	KeyValues *modinfo = new KeyValues("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		if ( stricmp(modinfo->GetString("nodifficulty", "0"), "1") == 0 )
 			nResultSkill = 1;
 	}
-	modinfo->deleteThis();
 
 	char szScratch[MAX_PATH];
 	Q_snprintf( szScratch, sizeof(szScratch), "skill %d", nResultSkill );

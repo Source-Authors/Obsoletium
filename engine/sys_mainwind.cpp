@@ -993,7 +993,7 @@ bool CGame::CreateGameWindow( void )
 	char utf8_window_name[256];
 	utf8_window_name[0] = '\0';
 
-	if ( auto modinfo = KeyValues::AutoDelete("ModInfo");
+	if ( KeyValuesAD modinfo("ModInfo");
 		 modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt") )
 	{
 		V_strncpy( utf8_window_name, modinfo->GetString("game"), sizeof(utf8_window_name) );
@@ -1123,9 +1123,6 @@ bool CGame::CreateGameWindow( void )
 #endif
 #elif defined( USE_SDL )
 	bool windowed = videomode->IsWindowedMode();
-
-	modinfo->deleteThis();
-	modinfo = NULL;
 
 	if ( !g_pLauncherMgr->CreateGameWindow( windowName, windowed, 0, 0 ) )
 	{

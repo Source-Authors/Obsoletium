@@ -201,15 +201,12 @@ void CAudioDeviceSDLAudio::OpenWaveOut( void )
 
 #ifndef WIN32
 	char appname[ 256 ];
-	KeyValues *modinfo = new KeyValues( "ModInfo" );
+	KeyValuesAD modinfo( "ModInfo" );
 
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 		Q_strncpy( appname, modinfo->GetString( "game" ), sizeof( appname ) );
 	else
 		Q_strncpy( appname, "Source1 Game", sizeof( appname ) );
-
-	modinfo->deleteThis();
-	modinfo = NULL;
 
 	// Set these environment variables, in case we're using PulseAudio.
 	setenv("PULSE_PROP_application.name", appname, 1);
