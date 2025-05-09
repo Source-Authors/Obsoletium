@@ -4891,7 +4891,7 @@ void CColorOperationListPanel::PopulateList( )
 		IColorOperation *op = m_OperationList.GetOperation( i );
 		if( op )
 		{
-			KeyValues *kv = new KeyValues( "operation", "layer", op->GetName() );
+			KeyValuesAD kv(new KeyValues( "operation", "layer", op->GetName() ));
 			kv->SetInt( "image", (op->IsEnabled())?1:0 );
 			
 			m_pOperationListPanel->AddItem( kv, (uintp)op, false, false );
