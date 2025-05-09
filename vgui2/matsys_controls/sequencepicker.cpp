@@ -175,7 +175,7 @@ void CSequencePicker::RefreshActivitiesAndSequencesList()
 					KeyValuesAD pkv( new KeyValues("node", "activity", pActivityName ) );
 					int nItemID = m_pActivitiesList->AddItem( pkv, 0, false, false );
 
-					KeyValues *pDrag = new KeyValues( "drag", "text", pActivityName );
+					KeyValuesAD pDrag( new KeyValues( "drag", "text", pActivityName ) );
 					pDrag->SetString( "texttype", "activityName" );
 					pDrag->SetString( "mdl", vgui::MDLCache()->GetModelName( m_hSelectedMDL ) );
 					m_pActivitiesList->SetItemDragData( nItemID, pDrag );
@@ -190,7 +190,7 @@ void CSequencePicker::RefreshActivitiesAndSequencesList()
 				KeyValuesAD pkv( new KeyValues("node", "sequence", pSequenceName) );
 				int nItemID = m_pSequencesList->AddItem( pkv, 0, false, false );
 
-				KeyValues *pDrag = new KeyValues( "drag", "text", pSequenceName );
+				KeyValuesAD pDrag( new KeyValues( "drag", "text", pSequenceName ) );
 				pDrag->SetString( "texttype", "sequenceName" );
 				pDrag->SetString( "mdl", vgui::MDLCache()->GetModelName( m_hSelectedMDL ) );
 				m_pSequencesList->SetItemDragData( nItemID, pDrag );

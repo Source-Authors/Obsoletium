@@ -1123,7 +1123,7 @@ void CBaseAssetPicker::AddAssetToList( int nAssetIndex )
 		m_pAssetBrowser->SetSelectedCell( nItemID, 0 );
 	}
 
-	KeyValues *pDrag = new KeyValues( "drag", "text", info.m_AssetName );
+	KeyValuesAD pDrag( new KeyValues( "drag", "text", info.m_AssetName ) );
 	if ( m_pAssetTextType )
 	{
 		pDrag->SetString( "texttype", m_pAssetTextType );

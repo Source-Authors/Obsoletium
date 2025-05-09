@@ -113,7 +113,7 @@ void CPicker::SetStringList( const PickerList_t &list )
 
 		if ( m_Type == PICKER_CHOICE_STRING )
 		{
-			KeyValues *pDrag = new KeyValues( "drag", "text", list[i].m_pChoiceValue );
+			KeyValuesAD pDrag( new KeyValues( "drag", "text", list[i].m_pChoiceValue ) );
 			if ( m_pPickerTextType )
 			{
 				pDrag->SetString( "texttype", m_pPickerTextType );
