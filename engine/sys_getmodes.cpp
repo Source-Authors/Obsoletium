@@ -1319,8 +1319,8 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 
 #ifndef USE_SDL
 	// Get window style
-	DWORD style = GetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE );
-	DWORD exStyle = GetWindowLong( (HWND)game->GetMainWindow(), GWL_EXSTYLE );
+	DWORD style = GetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE ); //-V303 //-V2002
+	DWORD exStyle = GetWindowLong( (HWND)game->GetMainWindow(), GWL_EXSTYLE ); //-V303 //-V2002
 
 	if ( bWindowed )
 	{
@@ -1337,7 +1337,7 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 
 		// remove topmost flag
 		exStyle &= ~WS_EX_TOPMOST;
-		SetWindowLong( (HWND)game->GetMainWindow(), GWL_EXSTYLE, exStyle );
+		SetWindowLong( (HWND)game->GetMainWindow(), GWL_EXSTYLE, exStyle ); //-V303 //-V2002
 	}
 	else
 	{
@@ -1345,7 +1345,7 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 		style &= ~WS_OVERLAPPEDWINDOW;
 	}
 
-	SetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE, style );
+	SetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE, style ); //-V303 //-V2002
 
 	// Compute rect needed for that size client area based on window style
 	AdjustWindowRectEx( &WindowRect, style, FALSE, exStyle );
@@ -1529,7 +1529,7 @@ void CVideoMode_Common::CenterEngineWindow( int width, int height)
     // Use system metrics for fullscreen or when game didn't have a chance to initialize.
     int cxScreen = 0, cyScreen = 0, refreshRate = 0;
 
-    if ( m_bBorderless || ( !( WS_EX_TOPMOST & ::GetWindowLong( hWndCenter, GWL_EXSTYLE ) ) && m_bWindowed ) )
+    if ( m_bBorderless || ( !( WS_EX_TOPMOST & ::GetWindowLong( hWndCenter, GWL_EXSTYLE ) ) && m_bWindowed ) ) //-V303 //-V2002
     {
         game->GetDesktopInfo( cxScreen, cyScreen, refreshRate );
     }
