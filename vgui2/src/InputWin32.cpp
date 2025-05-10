@@ -1543,7 +1543,7 @@ bool CInputSystem::InternalMousePressed(MouseCode code)
 				if ( code == MOUSE_WHEEL_DOWN || code == MOUSE_WHEEL_UP )
 					return true;
 
-				g_pIVgui->PostMessage( ( VPANEL )pContext->m_pUnhandledMouseClickListener, new KeyValues( "UnhandledMouseClick", "code", code ), NULL );
+				g_pIVgui->PostMessage((VPANEL)pContext->m_pUnhandledMouseClickListener, new KeyValues( "UnhandledMouseClick", "code", code ), NULL);
 				pTargetPanel = pContext->m_pUnhandledMouseClickListener;
 				bFilter = true;
 			}
