@@ -40,7 +40,7 @@ public:
 	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) = 0;
 	virtual int Seek( int nOffset, int nWhence )                 = 0;
 	virtual int Tell()                                           = 0;
-	virtual int Size()                                           = 0;
+	virtual unsigned Size()                                      = 0;
 
 	virtual void   SetBufferSize( int nBytes ) = 0;
 	virtual int    GetSectorSize()             = 0;
@@ -53,15 +53,15 @@ public:
 	CZipPackFileHandle( CZipPackFile* pOwner, int64 nBase, unsigned int nLength, unsigned int nIndex = -1, unsigned int nFilePointer = 0 );
 	virtual ~CZipPackFileHandle();
 
-	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) override;
-	virtual int Seek( int nOffset, int nWhence )                 override;
+	int Read( void* pBuffer, int nDestSize, int nBytes ) override;
+	int Seek( int nOffset, int nWhence )                 override;
 
-	virtual int Tell() override { return m_nFilePointer; };
-	virtual int Size() override { return m_nLength; };
+	int Tell() override { return m_nFilePointer; };
+	int Size() override { return m_nLength; };
 
-	virtual void   SetBufferSize( int nBytes ) override;
-	virtual int    GetSectorSize()             override;
-	virtual int64  AbsoluteBaseOffset()        override;
+	void   SetBufferSize( int nBytes ) override;
+	int    GetSectorSize()             override;
+	int64  AbsoluteBaseOffset()        override;
 
 protected:
 	int64         m_nBase;        // Base offset of the file inside the pack file.
@@ -78,11 +78,11 @@ public:
 	                        unsigned int nIndex = -1, unsigned int nFilePointer = 0 );
 	~CLZMAZipPackFileHandle();
 
-	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) override;
-	virtual int Seek( int nOffset, int nWhence )                 override;
+	int Read( void* pBuffer, int nDestSize, int nBytes ) override;
+	int Seek( int nOffset, int nWhence )                 override;
 
-	virtual int Tell() override;
-	virtual int Size() override;
+	int Tell() override;
+	int Size() override;
 
 private:
 	// Ensure there are bytes in the read buffer, assuming we're not at the end of the underlying data
