@@ -131,8 +131,7 @@ CElementViewerPanel::CElementViewerPanel() : vgui::Panel( NULL, "ElementViewer" 
 		char buf[ MAX_PATH ];
 		V_StrSubst( fileName, "\"", "", buf );
 
-		KeyValuesAD pKeyValues(new KeyValues( "OnFileSelected", "fullpath", buf ));
-		OnFileSelected( pKeyValues );
+		OnFileSelected( KeyValuesAD(new KeyValues( "OnFileSelected", "fullpath", buf )) );
 	}
 
 	g_pDataModel->InstallNotificationCallback( this );
@@ -261,8 +260,7 @@ void CElementViewerPanel::OnSaveAs()
 
 	DmFileId_t fileid = m_Docs[ 0 ].m_fileid;
 	// Save As file
-	KeyValues *pContextKeyValues = new KeyValues( "OnSaveAs" );
-	auto *pFileOpenDialog = new FileOpenDialog( this, "Save .dmx File As", false, pContextKeyValues );
+	auto *pFileOpenDialog = new FileOpenDialog( this, "Save .dmx File As", false, new KeyValues( "OnSaveAs" ) );
 
 	const char *pFileFormat = g_pDataModel->GetFileFormat( fileid );
 	const char *pDescription = ( pFileFormat && *pFileFormat ) ? g_pDataModel->GetFormatDescription( pFileFormat ) : NULL;
