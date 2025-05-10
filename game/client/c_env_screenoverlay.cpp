@@ -288,7 +288,8 @@ void C_EnvScreenEffect::ReceiveMessage( int classID, bf_read &msg )
 					return;
 				}
 				// Create a keyvalue block to set these params
-				KeyValues *pKeys = new KeyValues( "keys" );
+				// dimhotepus: Fix KeyValues leak.
+				KeyValuesAD pKeys( "keys" );
 				if ( pKeys == NULL )
 					return;
 
@@ -309,7 +310,8 @@ void C_EnvScreenEffect::ReceiveMessage( int classID, bf_read &msg )
 					return;
 				}
 				// Create a keyvalue block to set these params
-				KeyValues *pKeys = new KeyValues( "keys" );
+				KeyValuesAD pKeys( "keys" );
+				// dimhotepus: Fix KeyValues leak.
 				if ( pKeys == NULL )
 					return;
 
