@@ -320,8 +320,8 @@ void CGameConfigManager::UpdateConfigsInternal( void )
 		return;
 	}
 
-	KeyValues *pDefaultBlock = new KeyValues( "DefaultConfigs" );
-	if ( pDefaultBlock != NULL )
+	KeyValuesAD pDefaultBlock( "DefaultConfigs" );
+	if ( pDefaultBlock )
 	{
 		// Compile our default configurations
 		GetDefaultGameBlock( pDefaultBlock );
@@ -345,9 +345,6 @@ void CGameConfigManager::UpdateConfigsInternal( void )
 			// Advance by one key
 			pNextSubKey = pNextSubKey->GetNextTrueSubKey();
 		}
-		
-		// All done
-		pDefaultBlock->deleteThis();
 	}
 
 	// Save the new config.
@@ -585,7 +582,7 @@ bool CGameConfigManager::IsAppSubscribed( int nAppID )
 bool CGameConfigManager::CreateAllDefaultConfigs( void )
 {
 	// Start our new block
-	KeyValues *configBlock = new KeyValues( "Configs" );
+	KeyValuesAD configBlock( "Configs" );
 	KeyValues *gameBlock = configBlock->CreateNewKey();
 	gameBlock->SetName( "Games" );
 
@@ -600,8 +597,6 @@ bool CGameConfigManager::CreateAllDefaultConfigs( void )
 	CUtlBuffer buffer;
 	configBlock->RecursiveSaveToFile( buffer, 0 );
 	SaveUtlBufferToFile( buffer, szPath );
-
-	configBlock->deleteThis();
 
 	m_LoadStatus = LOADSTATUS_CREATED;
 
