@@ -105,7 +105,7 @@ isstaticprop_ret IsStaticProp( studiohdr_t* pHdr )
 		return RET_FAIL_NOT_MARKED_STATIC_PROP;
 
 	// If it's got a propdata section in the model's keyvalues, it's not allowed to be a prop_static
-	KeyValues *modelKeyValues = new KeyValues(pHdr->pszName());
+	KeyValuesAD modelKeyValues(pHdr->pszName());
 	if ( StudioKeyValues( pHdr, modelKeyValues ) )
 	{
 		KeyValues *sub = modelKeyValues->FindKey("prop_data");
@@ -113,12 +113,10 @@ isstaticprop_ret IsStaticProp( studiohdr_t* pHdr )
 		{
 			if ( !(sub->GetInt( "allowstatic", 0 )) )
 			{
-				modelKeyValues->deleteThis();
 				return RET_FAIL_DYNAMIC;
 			}
 		}
 	}
-	modelKeyValues->deleteThis();
 
 	return RET_VALID;
 }

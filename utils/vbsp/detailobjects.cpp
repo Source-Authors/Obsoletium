@@ -308,12 +308,11 @@ void LoadEmitDetailObjectDictionary( const char* pGameDir )
 {
 	// Set the required global lights filename and try looking in qproject
 	const char *pDetailVBSP = FindDetailVBSPName();
-	KeyValues * values = new KeyValues( pDetailVBSP );
+	KeyValuesAD values( pDetailVBSP );
 	if ( values->LoadFromFile( g_pFileSystem, pDetailVBSP ) )
 	{
 		ParseDetailObjectFile( *values );
 	}
-	values->deleteThis();
 }
 
 
