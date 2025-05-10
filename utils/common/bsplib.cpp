@@ -3185,7 +3185,7 @@ void SetKeyValue(entity_t *ent, const char *key, const char *value)
 	ep->value = copystring(value);
 }
 
-const char 	*ValueForKey (entity_t *ent, char *key)
+const char 	*ValueForKey (entity_t *ent, const char *key)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
 		if (!Q_stricmp (ep->key, key) )
@@ -3193,13 +3193,13 @@ const char 	*ValueForKey (entity_t *ent, char *key)
 	return "";
 }
 
-vec_t	FloatForKey (entity_t *ent, char *key)
+vec_t	FloatForKey (entity_t *ent, const char *key)
 {
 	const char *k = ValueForKey (ent, key);
 	return strtof(k, nullptr);
 }
 
-vec_t	FloatForKeyWithDefault (entity_t *ent, char *key, float default_value)
+vec_t	FloatForKeyWithDefault (entity_t *ent, const char *key, float default_value)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
 		if (!Q_stricmp (ep->key, key) )
@@ -3209,7 +3209,7 @@ vec_t	FloatForKeyWithDefault (entity_t *ent, char *key, float default_value)
 
 
 
-int		IntForKey (entity_t *ent, char *key)
+int		IntForKey (entity_t *ent, const char *key)
 {
 	const char *k = ValueForKey (ent, key);
 	return atol(k);
@@ -3261,7 +3261,7 @@ static constexpr const char *GetAnglesFormatSpecifier() { //-V524
 	return "";
 };
 
-void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
+void 	GetVectorForKey (entity_t *ent, const char *key, Vector& vec)
 {
 	const char *k = ValueForKey (ent, key);
 	vector_type_t v1 = 0, v2 = 0, v3 = 0;
@@ -3276,7 +3276,7 @@ void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
 	vec[2] = v3;
 }
 
-void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
+void 	GetVector2DForKey (entity_t *ent, const char *key, Vector2D& vec)
 {
 	const char *k = ValueForKey (ent, key);
 	vector_type_t v1 = 0, v2 = 0;
@@ -3290,7 +3290,7 @@ void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
 	vec[1] = v2;
 }
 
-void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& angle)
+void 	GetAnglesForKey (entity_t *ent, const char *key, QAngle& angle)
 {
 	const char *k = ValueForKey (ent, key);
 	vector_type_t v1 = 0, v2 = 0, v3 = 0;
