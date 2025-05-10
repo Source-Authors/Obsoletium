@@ -462,7 +462,10 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 	// NOTE: Freed by head keyvalue
 	KeyValues *newConfig = new KeyValues( info.gameName );
 	if ( newConfig->LoadFromBuffer( "defaultcfg.txt", szDefaultConfigText ) == false )
+	{
+		newConfig->deleteThis();
 		return false;
+	}
 
 	newConfig->SetName( info.gameName );
 	
@@ -480,7 +483,10 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 	Q_snprintf( szPath, sizeof( szPath ), "%s\\%s", rootGameDir, info.gameDir );
 
 	if ( !g_pFullFileSystem->IsDirectory( szPath ) )
+	{
+		newConfig->deleteThis();
 		return false;
+	}
 
 	newConfig->SetString( "GameDir", szPath );
 
@@ -488,7 +494,10 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 	KeyValues *hammerBlock = newConfig->FindKey( "Hammer" );
 
 	if ( hammerBlock == NULL )
+	{
+		newConfig->deleteThis();
 		return false;
+	}
 
 	hammerBlock->SetString( "GameExeDir", gameExeDir );
 
@@ -897,6 +906,9 @@ void CGameConfigManager::SetBaseDirectory( const char *pDirectory )
 //-----------------------------------------------------------------------------
 bool CGameConfigManager::GetDefaultGameBlock( KeyValues *pIn )
 {
+	if ( pIn == NULL )
+		return false;
+
 	CUtlVector<defaultConfigInfo_t> defaultConfigs;
 
 	// Add HL2 games to list
@@ -911,9 +923,6 @@ bool CGameConfigManager::GetDefaultGameBlock( KeyValues *pIn )
 	defaultConfigs.AddToTail( TF2Info );
 	defaultConfigs.AddToTail( DODInfo );
 	defaultConfigs.AddToTail( CStrikeInfo );
-
-	if ( pIn == NULL )
-		return false;
 
 	char szPath[MAX_PATH];
 
