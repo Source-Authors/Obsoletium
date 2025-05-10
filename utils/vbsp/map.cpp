@@ -1866,12 +1866,13 @@ static GameData	GD;
 // Input  : pFilename - the absolute name of the file to read
 // Output : returns the KeyValues of the file, NULL if the file could not be read.
 //-----------------------------------------------------------------------------
-static KeyValues *ReadKeyValuesFile( const char *pFilename )
+static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 {
 	// Read in the gameinfo.txt file and null-terminate it.
 	FILE *fp = fopen( pFilename, "rb" );
 	if ( !fp )
-		return NULL;
+		return KeyValuesAD{nullptr};
+
 	CUtlVector<char> buf;
 	fseek( fp, 0, SEEK_END );
 	buf.SetSize( ftell( fp ) + 1 );
@@ -1880,11 +1881,10 @@ static KeyValues *ReadKeyValuesFile( const char *pFilename )
 	fclose( fp );
 	buf[buf.Count()-1] = 0;
 
-	KeyValues *kv = new KeyValues( "" );
+	KeyValuesAD kv( "" );
 	if ( !kv->LoadFromBuffer( pFilename, buf.Base() ) )
 	{
-		kv->deleteThis();
-		return NULL;
+		return KeyValuesAD{nullptr};
 	}
 
 	return kv;
@@ -1989,7 +1989,8 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	char	GameInfoPath[ MAX_PATH ];
 
 	g_pFullFileSystem->RelativePathToFullPath_safe( "gameinfo.txt", "MOD", GameInfoPath );
-	KeyValues *GameInfoKV = ReadKeyValuesFile( GameInfoPath );
+	// dimhotepus: Use RAII to not leak KeyValues.
+	KeyValuesAD GameInfoKV = ReadKeyValuesFile( GameInfoPath );
 	if ( !GameInfoKV )
 	{
 		Msg( "Could not locate gameinfo.txt for Instance Remapping at '%s'.\n", GameInfoPath );
