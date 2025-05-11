@@ -40,7 +40,7 @@ public:
 	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) = 0;
 	virtual int Seek( int nOffset, int nWhence )                 = 0;
 	virtual int Tell()                                           = 0;
-	virtual unsigned Size()                                      = 0;
+	virtual int Size()											 = 0;
 
 	virtual void   SetBufferSize( int nBytes ) = 0;
 	virtual int    GetSectorSize()             = 0;
