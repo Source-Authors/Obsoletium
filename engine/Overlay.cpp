@@ -1579,7 +1579,7 @@ void COverlayMgr::DoClipFragment( moverlayfragment_t *pFragment, cplane_t *pClip
 		return;
 
 	float	flDists[128] = {};
-	int		nSides[128] = {};
+	SideType	nSides[128] = {};
 	int		nSideCounts[3] = {};
 
 	//

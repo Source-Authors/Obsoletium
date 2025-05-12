@@ -583,8 +583,11 @@ void CMapOverlay::ClipFace_Clip( ClipFace_t *pClipFace, cplane_t *pClipPlane, fl
 		return;
 
 	float flDists[128];
-	int	nSides[128];
+	SideType	nSides[128];
 	int nSideCounts[3];
+
+	flDists[0] = 0;
+	nSides[0] = SIDE_ON;
 
 	// Initialize
 	*ppFront = *ppBack = NULL;
@@ -720,8 +723,11 @@ void CMapOverlay::ClipFace_ClipBarycentric( ClipFace_t *pClipFace, cplane_t *pCl
 		return;
 
 	float flDists[128];
-	int nSides[128];
+	SideType nSides[128];
 	int	nSideCounts[3];
+	
+	flDists[0] = 0;
+	nSides[0] = SIDE_ON;
 
 	// Determine "sidedness" of all the polygon points.
 	nSideCounts[0] = nSideCounts[1] = nSideCounts[2] = 0;
@@ -748,7 +754,7 @@ void CMapOverlay::ClipFace_ClipBarycentric( ClipFace_t *pClipFace, cplane_t *pCl
 
 	// Wrap around (close the polygon).
 	nSides[iPoint] = nSides[0];
-	flDists[iPoint] =  flDists[0];
+	flDists[iPoint] = flDists[0];
 
 	// All points in back - no split (copy face to back).
 	if( !nSideCounts[SIDE_FRONT] )

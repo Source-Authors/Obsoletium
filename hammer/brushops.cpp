@@ -151,7 +151,7 @@ Frees the input winding.
 winding_t *ClipWinding (winding_t *in, PLANE *split)
 {
 	float	dists[MAX_POINTS_ON_WINDING];
-	int		sides[MAX_POINTS_ON_WINDING];
+	SideType	sides[MAX_POINTS_ON_WINDING];
 	int		counts[3];
 	float	dot;
 	int		i, j;

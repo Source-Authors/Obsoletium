@@ -102,7 +102,7 @@ ChopWinding
 winding_t	*ChopWinding (winding_t *in, pstack_t *stack, plane_t *split)
 {
 	vec_t	dists[128];
-	int		sides[128];
+	SideType		sides[128];
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;

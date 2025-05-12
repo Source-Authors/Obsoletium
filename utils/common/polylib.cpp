@@ -353,7 +353,7 @@ void ClipWindingEpsilon (winding_t *in, const Vector &normal, vec_t dist,
 				vec_t epsilon, winding_t **front, winding_t **back)
 {
 	vec_t	dists[MAX_POINTS_ON_WINDING+4];
-	int		sides[MAX_POINTS_ON_WINDING+4];
+	SideType	sides[MAX_POINTS_ON_WINDING+4];
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;
@@ -811,17 +811,12 @@ void CheckWinding (winding_t *w)
 WindingOnPlaneSide
 ============
 */
-int WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist)
+SideType WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist)
 {
-	qboolean	front, back;
-	int			i;
-	vec_t		d;
-
-	front = false;
-	back = false;
-	for (i=0 ; i<w->numpoints ; i++)
+	bool front = false, back = false;
+	for (int i=0 ; i<w->numpoints ; i++)
 	{
-		d = DotProduct (w->p[i], normal) - dist;
+		vec_t d = DotProduct (w->p[i], normal) - dist;
 		if (d < -ON_EPSILON)
 		{
 			if (front)

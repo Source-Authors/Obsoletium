@@ -17,6 +17,7 @@
 
 #include "mathlib/vector.h"
 #include "mathlib/vector2d.h"
+#include "mathlib/vplane.h"
 #include "mathlib/math_pfns.h"
 
 
@@ -298,12 +299,6 @@ struct matrix3x4_t
 [[nodiscard]] constexpr inline float XM_CALLCONV DEG2RAD(float x) { return x * (M_PI_F / 180.f); }
 [[nodiscard]] constexpr inline double XM_CALLCONV DEG2RAD(double x) { return x * (M_PI / 180.0); }
 #endif
-
-// Used to represent sides of things like planes.
-#define	SIDE_FRONT	0
-#define	SIDE_BACK	1
-#define	SIDE_ON		2
-#define SIDE_CROSS  -2      // necessary for polylib.c
 
 #define ON_VIS_EPSILON  0.01    // necessary for vvis (flow.c) -- again look into moving later!
 #define	EQUAL_EPSILON	0.001f   // necessary for vbsp (faces.c) -- should look into moving it there?

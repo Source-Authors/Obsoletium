@@ -3643,8 +3643,8 @@ int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dis
 
 int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon )
 {
-	vec_t	*dists = (vec_t *)stackalloc( sizeof(vec_t) * vertCount * 4 ); //4x vertcount should cover all cases
-	int		*sides = (int *)stackalloc( sizeof(vec_t) * vertCount * 4 );
+	vec_t	 *dists = stackallocT( vec_t, vertCount * 4 ); //4x vertcount should cover all cases
+	SideType *sides = stackallocT( SideType, vertCount * 4 );
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;
@@ -3733,8 +3733,8 @@ int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVert
 
 int XM_CALLCONV ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon )
 {
-	double	*dists = (double *)stackalloc( sizeof(double) * vertCount * 4 ); //4x vertcount should cover all cases
-	int		*sides = (int *)stackalloc( sizeof(double) * vertCount * 4 );
+	double	 *dists = stackallocT( double, vertCount * 4 ); //4x vertcount should cover all cases
+	SideType *sides = stackallocT( SideType, vertCount * 4 );
 	int		counts[3];
 	double	dot;
 	int		i, j;
