@@ -166,7 +166,7 @@ enum
 // if pReturnCode is set, it will return one of the following values (IFACE_OK, IFACE_FAILED)
 // extend this for other error conditions/code
 //-----------------------------------------------------------------------------
-DLL_EXPORT [[nodiscard]] void *CreateInterface(const char *pName, int *pReturnCode);
+DLL_EXPORT void *CreateInterface(const char *pName, int *pReturnCode);
 
 //-----------------------------------------------------------------------------
 // UNDONE: This is obsolete, use the module load/unload/get instead!!!
