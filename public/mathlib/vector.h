@@ -371,7 +371,7 @@ class VectorByValue : public Vector
 {
 public:
 	// Construction/destruction:
-	VectorByValue(void) : Vector() {} 
+	VectorByValue() : Vector() {} 
 	VectorByValue(vec_t X, vec_t Y, vec_t Z) : Vector( X, Y, Z ) {}
 	VectorByValue(const VectorByValue& vOther) = default;
 };

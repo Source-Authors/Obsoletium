@@ -16,23 +16,23 @@
 
 #include "mathlib/vector.h"
 
-typedef int SideType;
+using SideType = int;
 
 // Used to represent sides of things like planes.
 #define	SIDE_FRONT	0
 #define	SIDE_BACK	1
 #define	SIDE_ON		2
 
-#define VP_EPSILON	0.01f
+constexpr inline vec_t VP_EPSILON{0.01f};
 
 
 class VPlane
 {
 public:
-				VPlane() : m_Normal(), m_Dist(0) {}
-				VPlane(const Vector &vNormal, vec_t dist);
+	VPlane() : m_Normal(), m_Dist(0) {}
+	VPlane(const Vector &vNormal, vec_t dist);
 
-	void		Init(const Vector &vNormal, vec_t dist);
+	void Init(const Vector &vNormal, vec_t dist);
 
 	// Return the distance from the point to the plane.
 	[[nodiscard]] vec_t		DistTo(const Vector &vVec) const;

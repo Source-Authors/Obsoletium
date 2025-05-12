@@ -571,7 +571,7 @@ inline void VMatrix::Init( const matrix3x4_t& matrix3x4 )
 	m[3][0] = 0.0f;
 	m[3][1] = 0.0f;
 	m[3][2] = 0.0f;
-	m[3][3] = 1.0f;	
+	m[3][3] = 1.0f;
 }
 
 

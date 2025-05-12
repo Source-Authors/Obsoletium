@@ -122,11 +122,11 @@ struct cplane_t
 	byte	pad[2];
 
 #ifdef VECTOR_NO_SLOW_OPERATIONS
-	cplane_t() {}
+	cplane_t() = default;
 
 private:
 	// No copy constructors allowed if we're in optimal mode
-	cplane_t(const cplane_t& vOther);
+	cplane_t(const cplane_t& vOther) = delete;
 #endif
 };
 
@@ -151,11 +151,8 @@ private:
 #define	PLANE_ANYZ		5
 
 
-//-----------------------------------------------------------------------------
 // Frustum plane indices.
 // WARNING: there is code that depends on these values
-//-----------------------------------------------------------------------------
-
 enum
 {
 	FRUSTUM_RIGHT		= 0,
