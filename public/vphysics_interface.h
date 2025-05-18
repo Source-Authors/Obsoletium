@@ -835,7 +835,7 @@ public:
 	virtual void			UpdateShadow( const Vector &targetPosition, const QAngle &targetAngles, bool tempDisableGravity, float timeOffset ) = 0;
 	
 	// returns number of ticks since last Update() call
-	[[nodiscard]] virtual int				GetShadowPosition( Vector *position, QAngle *angles ) const = 0;
+	virtual int				GetShadowPosition( Vector *position, QAngle *angles ) const = 0;
 	[[nodiscard]] virtual IPhysicsShadowController *GetShadowController( void ) const = 0;
 	virtual void			RemoveShadowController() = 0;
 	// applies the math of the shadow controller to this object.
