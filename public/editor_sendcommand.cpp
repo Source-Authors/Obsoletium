@@ -193,7 +193,7 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 		//
 
 		COPYDATASTRUCT CopyData;
-		CopyData.cbData = strlen(pszCommand) + 1;
+		CopyData.cbData = static_cast<DWORD>(strlen(pszCommand) + 1);
 		CopyData.dwData = 0;
 		CopyData.lpData = (void *)pszCommand;
 		
