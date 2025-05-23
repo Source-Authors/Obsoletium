@@ -137,7 +137,7 @@ void C_EntityParticleTrail::AddParticle( float flInitialDeltaTime, const Vector 
 		return;
 
 	pParticle->m_Pos			= vecWorldPosition;
-	pParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+	pParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 	pParticle->m_flRollDelta	= Helper_RandomFloat( -2.0f, 2.0f );
 
 	pParticle->m_flLifetime		= flInitialDeltaTime;

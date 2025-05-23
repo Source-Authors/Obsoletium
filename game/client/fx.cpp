@@ -283,7 +283,7 @@ void FX_MuzzleEffect(
 		pParticle->m_uchEndAlpha	= 0;
 		pParticle->m_uchStartSize	= random->RandomInt( 4, 8 ) * flScale;
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize*2;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -4.0f, 4.0f );
 	}
 	*/
@@ -579,7 +579,7 @@ void FX_Smoke( const Vector &origin, const QAngle &angles, float scale, int numP
 		}
 
 		// Scale
-		int iSize = random->RandomInt( 4, 8 ) * scale;
+		float flSize = random->RandomFloat( 4, 8 ) * scale;
 
 		// Roll
 		float flRoll = random->RandomFloat( 0.0f, 360.0f );
@@ -587,7 +587,7 @@ void FX_Smoke( const Vector &origin, const QAngle &angles, float scale, int numP
 
 		//pParticle->m_uchEndSize		= pParticle->m_uchStartSize*2;
 
-		FX_Smoke( origin, vecVelocity, iSize, 1, random->RandomFloat( 0.5f, 1.0f ), particlecolor, alpha, "particle/particle_smokegrenade", flRoll, flRollDelta );
+		FX_Smoke( origin, vecVelocity, flSize, 1, random->RandomFloat( 0.5f, 1.0f ), particlecolor, alpha, "particle/particle_smokegrenade", flRoll, flRollDelta );
 	}
 }
 

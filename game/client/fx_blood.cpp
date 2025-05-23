@@ -237,7 +237,7 @@ void FX_BloodSpray( const Vector &origin, const Vector &normal, float scale, uns
 					pParticle->m_uchStartAlpha	= random->RandomInt( 200, 255 );
 					pParticle->m_uchEndAlpha	= 0;
 					
-					pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+					pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 					pParticle->m_flRollDelta	= 0.0f;
 				}
 			}
@@ -282,7 +282,7 @@ void FX_BloodSpray( const Vector &origin, const Vector &normal, float scale, uns
 					pParticle->m_uchStartAlpha	= random->RandomInt( 80, 128 );
 					pParticle->m_uchEndAlpha	= 0;
 					
-					pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+					pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 					pParticle->m_flRollDelta	= 0.0f;
 				}
 			}
@@ -367,7 +367,7 @@ void FX_BloodBulletImpact( const Vector &origin, const Vector &normal, float sca
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 0;
 		
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -403,7 +403,7 @@ void FX_BloodBulletImpact( const Vector &origin, const Vector &normal, float sca
 			pParticle->m_uchStartAlpha	= 255;
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= 0.0f;
 		}
 	}

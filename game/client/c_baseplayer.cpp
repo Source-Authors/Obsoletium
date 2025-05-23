@@ -1393,7 +1393,7 @@ void C_BasePlayer::CreateWaterEffects( void )
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 0;
 		
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -0.5f, 0.5f );
 	}
 }

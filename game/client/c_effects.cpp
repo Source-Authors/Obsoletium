@@ -2183,7 +2183,7 @@ void CSnowFallManager::CreateSnowFallParticle( const Vector &vecParticleSpawn, i
 	pParticle->m_uchStartAlpha	= r_SnowStartAlpha.GetInt();
 	pParticle->m_uchEndAlpha	= r_SnowEndAlpha.GetInt();
 
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	pParticle->m_flRollDelta	= random->RandomFloat( -0.15f, 0.15f );
 
 	pParticle->m_iFlags			= SIMPLE_PARTICLE_FLAG_WINDBLOWN;

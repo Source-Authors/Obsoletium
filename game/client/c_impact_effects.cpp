@@ -303,7 +303,7 @@ void FX_DebrisFlecks( const Vector& origin, trace_t *tr, char materialType, int 
 			pParticle->m_uchStartAlpha	= random->RandomInt( 200, 255 );
 			pParticle->m_uchEndAlpha	= 0;
 
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
 		}
 	}			
@@ -336,7 +336,7 @@ void FX_DebrisFlecks( const Vector& origin, trace_t *tr, char materialType, int 
 		pParticle->m_uchStartAlpha	= random->RandomInt( 64, 128 );
 		pParticle->m_uchEndAlpha	= 0;
 
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -0.1f, 0.1f );
 	}
 
@@ -594,7 +594,7 @@ void FX_GlassImpact( const Vector &pos, const Vector &normal )
 	newParticle.m_uchStartAlpha	= random->RandomInt( 32, 64 );
 	newParticle.m_uchEndAlpha	= 0;
 	
-	newParticle.m_flRoll			= random->RandomFloat( 0, 360 );
+	newParticle.m_flRoll		= random->RandomFloat( 0, 360 );
 	newParticle.m_flRollDelta	= random->RandomFloat( -2, 2 );
 
 	colorRamp = random->RandomFloat( 0.5f, 1.25f );
@@ -801,7 +801,7 @@ void FX_BugBlood( Vector &pos, Vector &dir, Vector &vWorldMins, Vector &vWorldMa
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= random->RandomInt( 1, 2 );
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize*random->RandomInt( 1, 4 );
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 	}
 
@@ -829,7 +829,7 @@ void FX_BugBlood( Vector &pos, Vector &dir, Vector &vWorldMins, Vector &vWorldMa
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= random->RandomInt( 1, 3 );
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize*random->RandomInt( 1, 4 );
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 	}
 
@@ -864,7 +864,7 @@ void FX_BugBlood( Vector &pos, Vector &dir, Vector &vWorldMins, Vector &vWorldMa
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= random->RandomInt( 1, 2 );
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize*4;
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 	}
 }
@@ -915,7 +915,7 @@ void FX_Blood( Vector &pos, Vector &dir, float r, float g, float b, float a )
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= 2;
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize*4;
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 	}
 
@@ -942,7 +942,7 @@ void FX_Blood( Vector &pos, Vector &dir, float r, float g, float b, float a )
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= 2;
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize*4;
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= random->RandomFloat( -4.0f, 4.0f );
 	}
 }
@@ -1018,7 +1018,7 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, int iScale )
 			pParticle->m_uchStartAlpha	= random->RandomInt( 32, 255 );
 			pParticle->m_uchEndAlpha	= 0;
 
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 
 			if ( i == 3 )
 			{
@@ -1058,7 +1058,7 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, int iScale )
 		pParticle->m_uchStartAlpha	= random->RandomInt( 32, 64 );
 		pParticle->m_uchEndAlpha	= 0;
 
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
 	}
 
@@ -1133,7 +1133,7 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 			pParticle->m_uchStartAlpha	= random->RandomInt( 32, 255 );
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 		}
 	}			
@@ -1171,7 +1171,7 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 			pParticle->m_uchStartAlpha	= 255;
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 		}
 	}
@@ -1215,7 +1215,7 @@ void FX_DustImpact( const Vector &origin, trace_t *tr, float flScale )
 			pParticle->m_uchStartAlpha	= random->RandomInt( 32, 64 );
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -16.0f, 16.0f );
 		}
 	}			

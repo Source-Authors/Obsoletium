@@ -349,7 +349,7 @@ void C_SmokeTrail::Update( float fTimeDelta )
 		pParticle->m_uchStartAlpha	= alpha * 255; 
 		pParticle->m_uchEndAlpha	= 0;
 			
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
     }
 }
@@ -701,7 +701,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 
 		pParticle->m_uchStartSize	= (random->RandomFloat( 5.0f, 6.0f ) * (12-(i))/9) * flScale;
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -762,7 +762,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 				pParticle->m_uchStartAlpha	= alpha * 255; 
 				pParticle->m_uchEndAlpha	= 0;
 				
-				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+				pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 				pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 			}
 		}
@@ -809,7 +809,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 				pParticle->m_uchStartAlpha	= 255;
 				pParticle->m_uchEndAlpha	= 0;
 				
-				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+				pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 				pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 			}
 		}
@@ -1296,7 +1296,7 @@ void C_SporeTrail::AddParticles( void )
 		return;
 
 	sParticle->m_Pos			= offset;
-	sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+	sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 	sParticle->m_flRollDelta	= Helper_RandomFloat( -2.0f, 2.0f );
 
 	sParticle->m_flLifetime		= 0.0f;
@@ -1579,7 +1579,7 @@ void C_FireTrail::Update( float fTimeDelta )
 			pParticle->m_uchStartAlpha	= 64; 
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -16.0f, 16.0f );
 		}
 	}

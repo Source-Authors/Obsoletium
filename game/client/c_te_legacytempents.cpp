@@ -1368,9 +1368,9 @@ void CTempEnts::Sprite_Trail( const Vector &vecStart, const Vector &vecEnd, int 
 		pTemp->flags |= FTENT_COLLIDEWORLD | FTENT_SPRCYCLE | FTENT_FADEOUT | FTENT_SLOWGRAVITY;
 
 		Vector vecVel = vecDir * flSpeed;
-		vecVel.x += random->RandomInt( -127,128 ) * flAmplitude;
-		vecVel.y += random->RandomInt( -127,128 ) * flAmplitude;
-		vecVel.z += random->RandomInt( -127,128 ) * flAmplitude;
+		vecVel.x += random->RandomFloat( -127,128 ) * flAmplitude;
+		vecVel.y += random->RandomFloat( -127,128 ) * flAmplitude;
+		vecVel.z += random->RandomFloat( -127,128 ) * flAmplitude;
 		pTemp->SetVelocity( vecVel );
 		pTemp->SetLocalOrigin( vecPos );
 
@@ -1380,7 +1380,7 @@ void CTempEnts::Sprite_Trail( const Vector &vecStart, const Vector &vecEnd, int 
 		pTemp->tempent_renderamt	= nRenderamt;
 		pTemp->SetRenderColor( 255, 255, 255 );
 
-		pTemp->m_flFrame	= random->RandomInt( 0, flFrameCount - 1 );
+		pTemp->m_flFrame	= random->RandomFloat( 0, flFrameCount - 1 );
 		pTemp->m_flFrameMax	= flFrameCount - 1;
 		pTemp->die			= gpGlobals->curtime + flLife + random->RandomFloat( 0, 4 );
 	}
@@ -2586,7 +2586,7 @@ void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int at
 	pParticle->m_uchStartSize	= random->RandomInt( 10, 16 );
 	pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
 	
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	pParticle->m_flRollDelta	= 0.0f;
 }
 
@@ -2757,7 +2757,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 
 	pParticle->m_uchStartSize	= flScale * random->RandomFloat( 12.0f, 16.0f );
 	pParticle->m_uchEndSize		= 0;
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	pParticle->m_flRollDelta	= 0.0f;
 
 	matrix3x4_t	matAttachment;
@@ -2791,7 +2791,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 			el->color.b = 255;
 			el->color.exponent = 5;
 
-			el->radius	= random->RandomInt( 32, 128 );
+			el->radius	= random->RandomFloat( 32, 128 );
 			el->decay	= el->radius / 0.05f;
 			el->die		= gpGlobals->curtime + 0.05f;
 		}
@@ -3261,10 +3261,9 @@ void CTempEnts::RocketFlare( const Vector& pos )
 	pTemp->SetRenderMode( kRenderGlow );
 	pTemp->m_nRenderFX = kRenderFxNoDissipation;
 	pTemp->tempent_renderamt = 255;
-	pTemp->m_flFrameRate = 1.0;
-	// dimhotepus: RandomInt -> RandomFloat.
-	pTemp->m_flFrame = random->RandomFloat( 0, nframeCount - 1);
-	pTemp->m_flSpriteScale = 1.0;
+	pTemp->m_flFrameRate = 1.0f;
+	pTemp->m_flFrame = random->RandomInt( 0, nframeCount - 1);
+	pTemp->m_flSpriteScale = 1.0f;
 	pTemp->SetAbsOrigin( pos );
 	pTemp->die = gpGlobals->curtime + 0.01f;
 }
