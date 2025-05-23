@@ -22,7 +22,9 @@
       </Expand>
   </Type>
 
-  <Type Name="CNonThreadsafeTree&lt;*&gt;">
+  <!-- tier1/utlrbtree.h -->
+
+  <Type Name="CUtlRBTree&lt;*&gt;">
     <Intrinsic Name="size" Expression="m_NumElements" />
     <Intrinsic Name="capacity" Expression="m_Elements.m_nAllocationCount" />
       <DisplayString>{{ size={m_NumElements} }}</DisplayString>
@@ -90,7 +92,7 @@
     </Expand>
   </Type>
 
-  <!-- utlvector.h -->
+  <!-- tier1/utlvector.h -->
 
   <!-- CUtlVector<T,CUtlMemory<T>> -->
 
@@ -402,7 +404,7 @@
     </Expand>
   </Type>
 
-  <!-- utlcommon.h -->
+  <!-- tier1/utlcommon.h -->
 
   <!-- CUtlKeyValuePair<K,V> -->
 
