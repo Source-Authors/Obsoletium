@@ -2705,7 +2705,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 				return;
 
 			pFriction->pObject = pEntity;
-			CPASAttenuationFilter filter( pEntity, params.soundlevel );
+			CPASAttenuationFilter filter( pEntity, SNDLVL_TO_ATTN( params.soundlevel ) );
 			pFriction->patch = CSoundEnvelopeController::GetController().SoundCreate( 
 				filter, pEntity->entindex(), CHAN_BODY, pSoundName, params.soundlevel );
 			CSoundEnvelopeController::GetController().Play( pFriction->patch, params.volume * flVolume, params.pitch );

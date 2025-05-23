@@ -9879,7 +9879,7 @@ int CAI_BaseNPC::PlaySentence( const char *pszSentence, float delay, float volum
 		if ( pszSentence[0] == '!' )
 		{
 			sentenceIndex = SENTENCEG_Lookup( pszSentence );
-			CPASAttenuationFilter filter( this, soundlevel );
+			CPASAttenuationFilter filter( this, SNDLVL_TO_ATTN( soundlevel ) );
 			CBaseEntity::EmitSentenceByIndex( filter, entindex(), CHAN_VOICE, sentenceIndex, volume, soundlevel, 0, PITCH_NORM );
 		}
 		else

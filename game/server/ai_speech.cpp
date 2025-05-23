@@ -575,7 +575,7 @@ int CAI_Expresser::SpeakRawSentence( const char *pszSentence, float delay, float
 			return -1;
 		}
 
-		CPASAttenuationFilter filter( GetOuter(), soundlevel );
+		CPASAttenuationFilter filter( GetOuter(), SNDLVL_TO_ATTN( soundlevel ) );
 		CBaseEntity::EmitSentenceByIndex( filter, GetOuter()->entindex(), CHAN_VOICE, sentenceIndex, volume, soundlevel, 0, GetVoicePitch());
 	}
 	else

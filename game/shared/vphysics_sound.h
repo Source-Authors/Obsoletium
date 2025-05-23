@@ -63,7 +63,7 @@ namespace physicssound
 
 				if ( sound.volume > 1 )
 					sound.volume = 1;
-				CPASAttenuationFilter filter( sound.origin, params.soundlevel );
+				CPASAttenuationFilter filter( sound.origin, SNDLVL_TO_ATTN( params.soundlevel ) );
 				// JAY: If this entity gets deleted, the sound comes out at the world origin
 				// this sounds bad!  Play on ent 0 for now.
 				EmitSound_t ep;
@@ -159,7 +159,7 @@ namespace physicssound
 				return;
 
 			// Play from the world, because the entity is breaking, so it'll be destroyed soon
-			CPASAttenuationFilter filter( sound.origin, params.soundlevel );
+			CPASAttenuationFilter filter( sound.origin, SNDLVL_TO_ATTN( params.soundlevel ) );
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_STATIC;
 			ep.m_pSoundName = params.soundname;
