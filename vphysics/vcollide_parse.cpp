@@ -744,7 +744,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		}
 		else
 		{
-			DWarning( "vphysics", 0, "Unknown vehicle engine parser configuration key '%s' (%s). ", key, value );
+			DWarning( "vphysics", 0, "Unknown vehicle engine parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -840,7 +840,7 @@ void CVPhysicsParse::ParseVehicleSteering( vehicle_steeringparams_t &steering )
 		}
 		else
 		{
-			DWarning( "vphysics", 0, "Unknown vehicle steering parser configuration key '%s' (%s). ", key, value );
+			DWarning( "vphysics", 0, "Unknown vehicle steering parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -907,7 +907,7 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 		}
 		else
 		{
-			DWarning( "vphysics", 0, "Unknown vehicle parser configuration key '%s' (%s). ", key, value );
+			DWarning( "vphysics", 0, "Unknown vehicle parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
