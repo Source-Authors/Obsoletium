@@ -12593,8 +12593,9 @@ void CShaderAPIDx8::ClearStencilBufferRectangle(
 int CShaderAPIDx8::CompareSnapshots( StateSnapshot_t snapshot0, StateSnapshot_t snapshot1 )
 {
 	LOCK_SHADERAPI();
-	const ShadowState_t &shadow0 = m_TransitionTable.GetSnapshot(snapshot0);
-	const ShadowState_t &shadow1 = m_TransitionTable.GetSnapshot(snapshot1);
+	// dimhotepus: Comment unused shadows.
+	//const ShadowState_t &shadow0 = m_TransitionTable.GetSnapshot(snapshot0);
+	//const ShadowState_t &shadow1 = m_TransitionTable.GetSnapshot(snapshot1);
 	const ShadowShaderState_t &shader0 = m_TransitionTable.GetSnapshotShader(snapshot0);
 	const ShadowShaderState_t &shader1 = m_TransitionTable.GetSnapshotShader(snapshot1);
 
