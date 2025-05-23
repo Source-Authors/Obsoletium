@@ -682,12 +682,12 @@ bool CMapOverview::DrawIcon( MapObject_t *obj )
 		// draw black shadow text
 		surface()->DrawSetTextColor( 0, 0, 0, 255 );
 		surface()->DrawSetTextPos( x+1, y );
-		surface()->DrawPrintText( iconText, wcslen(iconText) );
+		surface()->DrawPrintText( iconText, V_wcslen(iconText) );
 
 		// draw name in color 
 		surface()->DrawSetTextColor( textColor->r(), textColor->g(), textColor->b(), 255 );
 		surface()->DrawSetTextPos( x, y );
-		surface()->DrawPrintText( iconText, wcslen(iconText) );
+		surface()->DrawPrintText( iconText, V_wcslen(iconText) );
 	}
 
 	return true;
