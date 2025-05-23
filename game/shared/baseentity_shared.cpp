@@ -2079,7 +2079,7 @@ bool CBaseEntity::HandleShotImpactingWater( const FireBulletsInfo_t &info,
 		CEffectData	data;
  		data.m_vOrigin = waterTrace.endpos;
 		data.m_vNormal = waterTrace.plane.normal;
-		data.m_flScale = random->RandomFloat( nMinSplashSize, nMaxSplashSize );
+		data.m_flScale = random->RandomFloat( nMinSplashSize * 1.f, nMaxSplashSize * 1.f );
 		if ( waterTrace.contents & CONTENTS_SLIME )
 		{
 			data.m_fFlags |= FX_WATER_IN_SLIME;

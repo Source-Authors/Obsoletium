@@ -396,7 +396,7 @@ void CSheetSimulator::InitPosition( int i )
 		// collision plane
 		Vector delta;
 		VectorSubtract( m_ControlPoints[i], m_Origin, delta );
-		int maxdist = VectorNormalize( delta ); 
+		float maxdist = VectorNormalize( delta ); 
 		float dist = (m_pCollisionPlanes[i].dist - DotProduct( m_Origin, m_pCollisionPlanes[i].normal )) / 
 			DotProduct( delta, m_pCollisionPlanes[i].normal );
 
