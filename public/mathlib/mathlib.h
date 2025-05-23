@@ -1251,8 +1251,88 @@ void XM_CALLCONV VectorYawRotate( const Vector& in, float flYaw, Vector &out);
 {
 #if defined(_XM_SSE_INTRINSICS_)
 	return _mm_cvtss_si32(_mm_load_ss(&f));
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+#if (defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC)) || \
+    defined(__ARM_FEATURE_DIRECTED_ROUNDING)
+  return vgetq_lane_s32(vcvtnq_s32_f32(vrndiq_f32(vreinterpretq_f32_m128(a))),
+                        0);
 #else
-#error "Please define your platform"
+  float32_t data = vgetq_lane_f32(
+      vreinterpretq_f32_m128(_mm_round_ps(a, _MM_FROUND_CUR_DIRECTION)), 0);
+  return (int32_t)data;
+#endif
+#else
+#error "Please implement RoundFloatToInt in your hardware."
+#endif
+}
+
+[[nodiscard]] FORCEINLINE
+#if defined(_XM_SSE_INTRINSICS_)
+__m128i
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+int32x4_t
+#endif
+    XM_CALLCONV RoundFloatToInt(DirectX::XMVECTOR f) {
+#if defined(_XM_SSE_INTRINSICS_)
+  return _mm_cvtps_epi32(f);
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+//
+// *NOTE*. The default rounding mode on SSE is 'round to even', which ARMv7-A
+// does not support! It is supported on ARMv8-A however.
+#if defined(__ARM_FEATURE_FRINT)
+  return vreinterpretq_m128i_s32(vcvtq_s32_f32(vrnd32xq_f32(a)));
+#elif (defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC)) || \
+    defined(__ARM_FEATURE_DIRECTED_ROUNDING)
+  switch (_MM_GET_ROUNDING_MODE()) {
+    case _MM_ROUND_NEAREST:
+      return vreinterpretq_m128i_s32(vcvtnq_s32_f32(a));
+    case _MM_ROUND_DOWN:
+      return vreinterpretq_m128i_s32(vcvtmq_s32_f32(a));
+    case _MM_ROUND_UP:
+      return vreinterpretq_m128i_s32(vcvtpq_s32_f32(a));
+    default:  // _MM_ROUND_TOWARD_ZERO
+      return vreinterpretq_m128i_s32(vcvtq_s32_f32(a));
+  }
+#else
+  float *f = (float *)&a;
+  switch (_MM_GET_ROUNDING_MODE()) {
+    case _MM_ROUND_NEAREST: {
+      uint32x4_t signmask = vdupq_n_u32(0x80000000);
+      float32x4_t half = vbslq_f32(signmask, vreinterpretq_f32_m128(a),
+                                   vdupq_n_f32(0.5f)); /* +/- 0.5 */
+      int32x4_t r_normal = vcvtq_s32_f32(vaddq_f32(
+          vreinterpretq_f32_m128(a), half)); /* round to integer: [a + 0.5]*/
+      int32x4_t r_trunc = vcvtq_s32_f32(
+          vreinterpretq_f32_m128(a)); /* truncate to integer: [a] */
+      int32x4_t plusone = vreinterpretq_s32_u32(vshrq_n_u32(
+          vreinterpretq_u32_s32(vnegq_s32(r_trunc)), 31)); /* 1 or 0 */
+      int32x4_t r_even = vbicq_s32(vaddq_s32(r_trunc, plusone),
+                                   vdupq_n_s32(1)); /* ([a] + {0,1}) & ~1 */
+      float32x4_t delta = vsubq_f32(
+          vreinterpretq_f32_m128(a),
+          vcvtq_f32_s32(r_trunc)); /* compute delta: delta = (a - [a]) */
+      uint32x4_t is_delta_half = vceqq_f32(delta, half); /* delta == +/- 0.5 */
+      return vreinterpretq_m128i_s32(
+          vbslq_s32(is_delta_half, r_even, r_normal));
+    }
+    case _MM_ROUND_DOWN:
+      return _mm_set_epi32(floorf(f[3]), floorf(f[2]), floorf(f[1]),
+                           floorf(f[0]));
+    case _MM_ROUND_UP:
+      return _mm_set_epi32(ceilf(f[3]), ceilf(f[2]), ceilf(f[1]), ceilf(f[0]));
+    default:  // _MM_ROUND_TOWARD_ZERO
+      return _mm_set_epi32((int32_t)f[3], (int32_t)f[2], (int32_t)f[1],
+                           (int32_t)f[0]);
+  }
+#endif
+#else
+#error "Please implement RoundFloatToInt in your hardware."
 #endif
 }
 

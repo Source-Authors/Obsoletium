@@ -13,28 +13,10 @@
 namespace details
 {
 
-// MIT License
-// 
-// Copyright (c) 2015-2024 SSE2NEON Contributors
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+//
 // Compute the square root of packed single-precision (32-bit) floating-point
 // elements in a, and store the results in dst.
 // Due to ARMv7-A NEON's lack of a precise square root intrinsic, we implement
@@ -79,6 +61,10 @@ namespace details
 #endif
 }
 
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+//
 // Compute the square root of the lower single-precision (32-bit) floating-point
 // element in a, store the result in the lower element of dst, and copy the
 // upper 3 packed elements from a to the upper elements of dst.
@@ -102,6 +88,10 @@ namespace details
 #endif
 }
 
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+//
 // Compute the approximate reciprocal square root of packed single-precision
 // (32-bit) floating-point elements in a, and store the results in dst. The
 // maximum relative error for this approximation is less than 1.5*2^-12.
@@ -131,6 +121,10 @@ namespace details
 #endif
 }
 
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+//
 // Compute the approximate reciprocal square root of the lower single-precision
 // (32-bit) floating-point element in a, store the result in the lower element
 // of dst, and copy the upper 3 packed elements from a to the upper elements of
