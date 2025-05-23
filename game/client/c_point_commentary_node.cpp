@@ -451,7 +451,7 @@ void CHudCommentary::Paint()
 	vgui::surface()->DrawSetTextFont( hFont );
 	vgui::surface()->DrawSetTextColor( clr ); 
 	vgui::surface()->DrawSetTextPos( m_iSpeakersX, m_iSpeakersY );
-	vgui::surface()->DrawPrintText( m_szSpeakers, wcslen(m_szSpeakers) );
+	vgui::surface()->DrawPrintText( m_szSpeakers, V_wcslen(m_szSpeakers) );
 
 	if ( COMMENTARY_BUTTONS & IN_ATTACK )
 	{
@@ -463,7 +463,7 @@ void CHudCommentary::Paint()
 		{
 			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal, sizeof( wzFinal ) );
 			vgui::surface()->DrawSetTextPos( m_iSpeakersX, iY );
-			vgui::surface()->DrawPrintText( wzFinal, wcslen(wzFinal) );
+			vgui::surface()->DrawPrintText( wzFinal, V_wcslen(wzFinal) );
 		}
 
 		pszText = g_pVGuiLocalize->Find( "#Commentary_SecondaryAttack" );
@@ -473,7 +473,7 @@ void CHudCommentary::Paint()
 			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal, sizeof( wzFinal ) );
 			vgui::surface()->GetTextSize( hFont, wzFinal, w, h );
 			vgui::surface()->DrawSetTextPos( m_iBarX + m_iBarWide - w, iY );
-			vgui::surface()->DrawPrintText( wzFinal, wcslen(wzFinal) );
+			vgui::surface()->DrawPrintText( wzFinal, V_wcslen(wzFinal) );
 		}
 	}
 
@@ -482,7 +482,7 @@ void CHudCommentary::Paint()
 	int iCountWide, iCountTall;
 	vgui::surface()->GetTextSize( hFont, m_szCount, iCountWide, iCountTall );
 	vgui::surface()->DrawSetTextPos( wide - m_iCountXFR - iCountWide, m_iCountY );
-	vgui::surface()->DrawPrintText( m_szCount, wcslen(m_szCount) );
+	vgui::surface()->DrawPrintText( m_szCount, V_wcslen(m_szCount) );
 
 	// Draw the icon
  	vgui::surface()->DrawSetColor( Color(255,170,0,GetAlpha()) );

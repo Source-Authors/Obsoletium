@@ -117,12 +117,12 @@ void CHudAnimationInfo::PaintString( int& x, int &y, const char *sz, Color *pLeg
 		surface()->DrawSetTextColor( Color( 0, 0, 0, 0 ) );
 	}
 
-	surface()->DrawPrintText( szconverted, wcslen( szconverted ) );
+	surface()->DrawPrintText( szconverted, V_wcslen( szconverted ) );
 
 	g_pVGuiLocalize->ConvertANSIToUnicode( sz, szconverted );
 
 	surface()->DrawSetTextColor( m_ItemColor );
-	surface()->DrawPrintText( szconverted, wcslen( szconverted ) );
+	surface()->DrawPrintText( szconverted, V_wcslen( szconverted ) );
 
 	int fontHeight = surface()->GetFontTall( m_ItemFont );
 
