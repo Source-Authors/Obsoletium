@@ -118,10 +118,10 @@ static const char *s_pChunkModelName[CHOPPER_MAX_CHUNKS] =
 
 #define CHOPPER_SLOW_BOMB_SPEED	250
 
-#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED	250
+#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED	250.f
 #define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_SQ	(CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED * CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED)
 
-#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2	450
+#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2	450.f
 #define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2_SQ	(CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2 * CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2)
 
 // CVars
@@ -3454,7 +3454,7 @@ void CNPC_AttackHelicopter::DropCorpse( int nDamage )
 	m_flLastCorpseFall = gpGlobals->curtime + 3.0f;
 
 	// Spawn a ragdoll combine guard
-	float forceScale = nDamage * 75 * 4;
+	float forceScale = nDamage * 75.f * 4;
 	Vector vecForceVector = RandomVector(-1,1);
 	vecForceVector.z = 0.5f;
 	vecForceVector *= forceScale;
@@ -4336,7 +4336,7 @@ float CNPC_AttackHelicopter::ComputeBullrushLeadingDistance( float flSpeed, floa
 		return 0.0f;
 
 	case BULLRUSH_MODE_DROP_BOMBS_FIXED_SPEED:
-		return m_bRushForward ? 7000 : -7000;
+		return m_bRushForward ? 7000.f : -7000.f;
 
 	case BULLRUSH_MODE_MEGA_BOMB:
 		return m_bRushForward ? CHOPPER_BULLRUSH_MODE_DISTANCE : -CHOPPER_BULLRUSH_MODE_DISTANCE;

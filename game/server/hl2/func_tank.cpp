@@ -2246,7 +2246,7 @@ void CFuncTank::Fire( int bulletCount, const Vector &barrelEnd, const Vector &fo
 		}
 		else
 		{
-			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, barrelEnd + forward * 32.0f, 32.0f, 0.2f, pAttacker, SOUNDENT_CHANNEL_WEAPON );
+			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, barrelEnd + forward * 32.0f, 32, 0.2f, pAttacker, SOUNDENT_CHANNEL_WEAPON );
 		}
 	}
 
@@ -3539,7 +3539,7 @@ void CMortarShell::FlyThink()
 	if ( gpGlobals->curtime > m_flNPCWarnTime )
 	{
 		// Warn the AI. Make this radius a little larger than the explosion will be, and make the sound last a little longer.
-		CSoundEnt::InsertSound ( SOUND_DANGER | SOUND_CONTEXT_MORTAR, GetAbsOrigin(), MORTAR_BLAST_RADIUS * 1.25f, (m_flImpactTime - m_flNPCWarnTime) + 0.15f );
+		CSoundEnt::InsertSound ( SOUND_DANGER | SOUND_CONTEXT_MORTAR, GetAbsOrigin(), MORTAR_BLAST_RADIUS * 5 / 4, (m_flImpactTime - m_flNPCWarnTime) + 0.15f );
 		m_flNPCWarnTime = FLT_MAX;
 	}
 
@@ -4350,7 +4350,7 @@ void CFuncTankCombineCannon::Fire( int bulletCount, const Vector &barrelEnd, con
 	DestroyBeam();
 	m_flTimeBeamOn = gpGlobals->curtime + 0.2f;
 
-	m_flTimeNextSweep = gpGlobals->curtime + random->RandomInt( 1.0f, 2.0f );
+	m_flTimeNextSweep = gpGlobals->curtime + random->RandomFloat( 1.0f, 2.0f );
 }
 
 //---------------------------------------------------------

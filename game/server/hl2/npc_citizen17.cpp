@@ -638,7 +638,7 @@ void CNPC_Citizen::SelectModel()
 		else
 		{
 			// Count the heads
-			int headCounts[ARRAYSIZE(g_ppszRandomHeads)] = { 0 };
+			int headCounts[ssize(g_ppszRandomHeads)] = { 0 };
 			int i;
 
 			for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
@@ -651,7 +651,7 @@ void CNPC_Citizen::SelectModel()
 			}
 
 			// Find all candidates
-			CUtlVectorFixed<HeadCandidate_t, ARRAYSIZE(g_ppszRandomHeads)> candidates;
+			CUtlVectorFixed<HeadCandidate_t, ssize(g_ppszRandomHeads)> candidates;
 
 			for ( i = 0; i < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)); i++ )
 			{

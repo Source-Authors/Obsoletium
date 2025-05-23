@@ -1113,9 +1113,9 @@ Vector CAI_MoveProbe::CalcJumpLaunchVelocity(const Vector &startPos, const Vecto
 	*pminHeight = MAX( *pminHeight, stepHeight );
 
 	// time from start to apex
-	float t0 = sqrt( ( 2.0 * *pminHeight) / flGravity );
+	float t0 = sqrt( ( 2.0f * *pminHeight) / flGravity );
 	// time from apex to end
-	float t1 = sqrt( ( 2.0 * fabs( *pminHeight - stepHeight) ) / flGravity );
+	float t1 = sqrt( ( 2.0f * fabs( *pminHeight - stepHeight) ) / flGravity );
 
 	float velHorz = distance / (t0 + t1);
 

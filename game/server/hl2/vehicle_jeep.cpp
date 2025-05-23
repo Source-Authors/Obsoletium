@@ -864,7 +864,7 @@ void CPropJeep::DrawBeam( const Vector &startPos, const Vector &endPos, float wi
 	pBeam->SetWidth( width );
 	pBeam->SetEndWidth( 0.05f );
 	pBeam->SetBrightness( 255 );
-	pBeam->SetColor( 255, 185+random->RandomInt( -16, 16 ), 40 );
+	pBeam->SetColor( 255, static_cast<byte>(185+random->RandomInt( -16, 16 )), 40 );
 	pBeam->RelinkBeam();
 	pBeam->LiveForTime( 0.1f );
 
@@ -875,7 +875,7 @@ void CPropJeep::DrawBeam( const Vector &startPos, const Vector &endPos, float wi
 	pBeam->PointEntInit( endPos, this );
 	pBeam->SetEndAttachment( LookupAttachment("Muzzle") );
 
-	pBeam->SetBrightness( random->RandomInt( 64, 255 ) );
+	pBeam->SetBrightness( static_cast<byte>(random->RandomInt( 64, 255 )) );
 	pBeam->SetColor( 255, 255, 150+random->RandomInt( 0, 64 ) );
 	pBeam->RelinkBeam();
 	pBeam->LiveForTime( 0.1f );

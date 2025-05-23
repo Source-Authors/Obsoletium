@@ -212,7 +212,7 @@ void CGrenadePathfollower::PlayFlySound(void)
 {
 	if (gpGlobals->curtime > m_flNextFlySoundTime)
 	{
-		CPASAttenuationFilter filter( this, 0.8 );
+		CPASAttenuationFilter filter( this, 0.8f );
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_BODY;

@@ -1994,7 +1994,7 @@ ConVar	sk_battery( "sk_battery","0" );
 
 bool CHL2_Player::ApplyBattery( float powerMultiplier )
 {
-	const float MAX_NORMAL_BATTERY = 100;
+	constexpr float MAX_NORMAL_BATTERY = 100;
 	if ((ArmorValue() < MAX_NORMAL_BATTERY) && IsSuitEquipped())
 	{
 		int pct;

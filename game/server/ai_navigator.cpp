@@ -1467,7 +1467,7 @@ AIMoveResult_t CAI_Navigator::MoveClimb()
 	// Look for a block by another NPC, and attempt to recover
 	AIMoveTrace_t moveTrace;
 	if ( climbDist > 0.01 &&
-		 !GetMoveProbe()->MoveLimit( NAV_CLIMB, GetLocalOrigin(), GetLocalOrigin() + ( climbDir * MIN(0.1,climbDist - 0.005) ), MASK_NPCSOLID, GetNavTargetEntity(), &moveTrace ) )
+		 !GetMoveProbe()->MoveLimit( NAV_CLIMB, GetLocalOrigin(), GetLocalOrigin() + ( climbDir * MIN(0.1f,climbDist - 0.005f) ), MASK_NPCSOLID, GetNavTargetEntity(), &moveTrace ) )
 	{
 		CAI_BaseNPC *pOther = ( moveTrace.pObstruction ) ? moveTrace.pObstruction->MyNPCPointer() : NULL;
 		if ( pOther )
@@ -1838,7 +1838,7 @@ bool CAI_Navigator::OnInsufficientStopDist( AILocalMoveGoal_t *pMoveGoal, float 
 
 			for ( int i = 1; i > -2; i -= 2 )
 			{
-				Vector testLoc = GetLocalOrigin() + ( vDeflection * GetHullWidth() * 2.0) * i;
+				Vector testLoc = GetLocalOrigin() + ( vDeflection * GetHullWidth() * 2.0f) * i;
 				GetMoveProbe()->MoveLimit( GetNavType(), GetLocalOrigin(), testLoc, MASK_NPCSOLID, NULL, &moveTrace );
 				if ( moveTrace.fStatus == AIMR_OK )
 				{
@@ -1911,7 +1911,7 @@ bool CAI_Navigator::OnFailedSteer( AILocalMoveGoal_t *pMoveGoal, float distClear
 	if ( !(	pMoveGoal->flags & AILMG_TARGET_IS_TRANSITION ) )
 	{
 		float distToWaypoint = GetPathDistToCurWaypoint();
-		float halfHull 		 = GetHullWidth() * 0.5;
+		float halfHull 		 = GetHullWidth() * 0.5f;
 		
 		if ( distToWaypoint < halfHull )
 		{
@@ -2069,7 +2069,7 @@ bool CAI_Navigator::MoveUpdateWaypoint( AIMoveResult_t *pResult )
 	AI_Waypoint_t *pCurWaypoint = GetPath()->GetCurWaypoint();
 	float 		   waypointDist = ComputePathDistance( GetNavType(), GetLocalOrigin(), pCurWaypoint->GetPos() );
 	bool		   bIsGoal		= CurWaypointIsGoal();
-	float		   tolerance	= ( npc_vphysics.GetBool() ) ? 0.25 : 0.0625;
+	float		   tolerance	= ( npc_vphysics.GetBool() ) ? 0.25f : 0.0625f;
 
 	bool fHit = false;
 
@@ -2639,9 +2639,9 @@ float CAI_Navigator::CalcYawSpeed( void )
 			float waypointDist = (GetPath()->CurWaypointPos() - GetLocalOrigin()).Length();
 
 			// If waypoint is close, aim for the waypoint
-			if (waypointDist < 100)
+			if (waypointDist < 100.f)
 			{
-				float scale = 1 + (0.01*(100 - waypointDist));
+				float scale = 1 + (0.01f*(100.f - waypointDist));
 				return (maxYaw * scale);
 			}
 		}

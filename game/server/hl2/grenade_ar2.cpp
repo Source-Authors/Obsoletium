@@ -153,10 +153,10 @@ void CGrenadeAR2::GrenadeAR2Think( void )
 	// dangerous to a larger area downrange than it does from where it was fired.
 	if( m_fDangerRadius <= AR2_GRENADE_MAX_DANGER_RADIUS )
 	{
-		m_fDangerRadius += ( AR2_GRENADE_MAX_DANGER_RADIUS * 0.05 );
+		m_fDangerRadius += ( AR2_GRENADE_MAX_DANGER_RADIUS * 0.05f );
 	}
 
-	CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5, m_fDangerRadius, 0.2, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+	CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5f, m_fDangerRadius, 0.2f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 }
 
 void CGrenadeAR2::Event_Killed( const CTakeDamageInfo &info )

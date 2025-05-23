@@ -2204,8 +2204,6 @@ float	CAI_BaseNPC::GetHintDelay( short sHintType )
 //-----------------------------------------------------------------------------
 CBaseGrenade* CAI_BaseNPC::IncomingGrenade(void)
 {
-	int				iDist;
-
 	AIEnemiesIter_t iter;
 	for( AI_EnemyInfo_t *pEMemory = GetEnemies()->GetFirst(&iter); pEMemory != NULL; pEMemory = GetEnemies()->GetNext(&iter) )
 	{
@@ -2220,7 +2218,7 @@ CBaseGrenade* CAI_BaseNPC::IncomingGrenade(void)
 			continue;
 
 		// Check if it's near me
-		iDist = ( pBG->GetAbsOrigin() - GetAbsOrigin() ).Length();
+		float iDist = ( pBG->GetAbsOrigin() - GetAbsOrigin() ).Length();
 		if ( iDist <= NPC_GRENADE_FEAR_DIST )
 			return pBG;
 
@@ -3985,9 +3983,7 @@ void CAI_BaseNPC::NPCThink( void )
 					color = 96;
 
 				Vector right;
-				Vector vecPoint;
-
-				vecPoint = EyePosition() + Vector( 0, 0, 12 );
+				Vector vecPoint = EyePosition() + Vector( 0, 0, 12 );
 				GetVectors( NULL, &right, NULL );
 				NDebugOverlay::Line( vecPoint, vecPoint + Vector( 0, 0, 64 ), color, 0, 0, false , 1.0 );
 				NDebugOverlay::Line( vecPoint, vecPoint + Vector( 0, 0, 16 ) + right * 16, color, 0, 0, false , 1.0 );
@@ -6498,7 +6494,7 @@ float CAI_BaseNPC::ThrowLimit(	const Vector &vecStart,
 
 	// Calculate the total time of the jump minus a tiny fraction
 	float jumpTime		= (vecStart - vecEnd).Length2D()/rawJumpVel.Length2D();
-	float timeStep		= jumpTime / 10.0;
+	float timeStep		= jumpTime / 10.0f;
 
 	Vector gravity = Vector(0,0,fGravity);
 
@@ -8815,7 +8811,7 @@ void CAI_BaseNPC::DrawDebugGeometryOverlays(void)
 				CBaseCombatCharacter *npcEnemy = (eMemory->hEnemy)->MyCombatCharacterPointer();
 				if (npcEnemy)
 				{
-					float	r,g,b;
+					int	r,g,b;
 					char	debugText[255];
 					debugText[0] = NULL;
 

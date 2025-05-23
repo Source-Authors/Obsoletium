@@ -2931,7 +2931,7 @@ bool CNPC_CombineDropship::FireCannonRound( void )
 
 	// Fire the bullet
 	int ammoType = GetAmmoDef()->Index("CombineCannon"); 
-	FireBullets( 1, vecMuzzle, vecAimDir, VECTOR_CONE_2DEGREES, 8192, ammoType, 1, -1, -1, sk_npc_dmg_dropship.GetInt() );
+	FireBullets( 1, vecMuzzle, vecAimDir, VECTOR_CONE_2DEGREES, 8192, ammoType, 1, -1, -1, sk_npc_dmg_dropship.GetFloat() );
 
 	return true;
 }

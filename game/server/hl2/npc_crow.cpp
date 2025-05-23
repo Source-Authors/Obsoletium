@@ -814,7 +814,7 @@ void CNPC_Crow::StartTask( const Task_t *pTask )
 				//
 				m_vSavePosition = GetAbsOrigin() - vecEnemyOrigin;
 				VectorNormalize( m_vSavePosition );
-				m_vSavePosition = GetAbsOrigin() + m_vSavePosition * ( 32 + random->RandomInt( 0, 32 ) );
+				m_vSavePosition = GetAbsOrigin() + m_vSavePosition * ( 32.f + random->RandomFloat( 0, 32 ) );
 
 				GetMotor()->SetIdealYawToTarget( m_vSavePosition );
 				TaskComplete();
@@ -912,7 +912,7 @@ void CNPC_Crow::StartTask( const Task_t *pTask )
 		//
 		case TASK_CROW_FLY:
 		{
-			float flYaw = UTIL_AngleMod( random->RandomInt( -180, 180 ) );
+			float flYaw = UTIL_AngleMod( random->RandomFloat( -180, 180 ) );
 
 			Vector vecNewVelocity( cos( DEG2RAD( flYaw ) ), sin( DEG2RAD( flYaw ) ), random->RandomFloat( 0.1f, 0.5f ) );
 			vecNewVelocity *= CROW_AIRSPEED;

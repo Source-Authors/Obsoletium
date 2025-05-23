@@ -2944,11 +2944,11 @@ int	CNPC_CombineGunship::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 		int iHealthIncrements = sk_gunship_health_increments.GetInt();
 		if ( g_pGameRules->IsSkillLevel( SKILL_EASY ) )
 		{
-			iHealthIncrements = ceil( iHealthIncrements * 0.5f );
+			iHealthIncrements = iHealthIncrements / 2;
 		}
 		else if ( g_pGameRules->IsSkillLevel( SKILL_HARD ) )
 		{
-			iHealthIncrements = floor( iHealthIncrements * 1.5f );
+			iHealthIncrements = iHealthIncrements * 3 / 2;
 		}
 		info.SetDamage( ( GetMaxHealth() / (float)iHealthIncrements ) + 1 );
 		
