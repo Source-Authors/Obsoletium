@@ -183,10 +183,10 @@ extern "C" NORETURN void Coroutine_LongJmp_Unchecked( jmp_buf buffer, int nResul
 
 
 // return values from setjmp()
-static const int k_iSetJmpStateSaved = 0x00;
-static const int k_iSetJmpContinue	= 0x01;
-static const int k_iSetJmpDone		= 0x02;
-static const int k_iSetJmpDbgBreak	= 0x03;
+static constexpr inline int k_iSetJmpStateSaved = 0x00;
+static constexpr inline int k_iSetJmpContinue	= 0x01;
+static constexpr inline int k_iSetJmpDone		= 0x02;
+static constexpr inline int k_iSetJmpDbgBreak	= 0x03;
 
 // distance up the stack that coroutine functions stacks' start
 #ifdef _PS3
@@ -194,8 +194,8 @@ static const int k_iSetJmpDbgBreak	= 0x03;
 static const int k_cubCoroutineStackGap = (3 * 1024);	
 static const int k_cubCoroutineStackGapSmall = 64;	
 #else
-static const int k_cubCoroutineStackGap = (64 * 1024);	
-static const int k_cubCoroutineStackGapSmall = 64;	
+static constexpr inline int k_cubCoroutineStackGap = (64 * 1024);	
+static constexpr inline int k_cubCoroutineStackGapSmall = 64;	
 #endif
 
 // Warning size for allocated stacks
