@@ -868,7 +868,7 @@ void GenerateMipmapLevelsLQ( unsigned char* pSrc, unsigned char* pDst, int width
 	int srcHeight = height;
 
 	// Distance from one pixel to the next
-	const int cStride = 4;
+	constexpr int cStride = 4;
 	
 	do 
 	{
