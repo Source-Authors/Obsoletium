@@ -1789,21 +1789,21 @@ bool Mod_LoadSurfaceLightingV1( msurfacelighting_t *pLighting, dface_t *in, Colo
 	return ((pLighting->m_nStyles[0] != 0) && (pLighting->m_nStyles[0] != 255)) || (pLighting->m_nStyles[1] != 255);
 }
 
-void *Hunk_AllocNameAlignedClear_( intp size, intp alignment, const char *pHunkName )
+template<intp alignment>
+void *Hunk_AllocNameAlignedClear_( intp size, const char *pHunkName )
 {
-	Assert(IsPowerOfTwo(alignment));
-	void *pMem = Hunk_AllocName( alignment + size, pHunkName );
-	memset( pMem, 0, size + alignment );
-	pMem = (void *)( ( ( ( uintp )pMem ) + (alignment-1) ) & ~(alignment-1) );
+	static_assert(IsPowerOfTwo(alignment));
 
-	return pMem;
+	void *pMem = Hunk_AllocName( alignment + size, pHunkName );
+
+	return AlignValue( pMem, alignment );
 }
 
 // Allocates a block of T from the hunk.  Aligns as specified and clears the memory
-template< typename T > 
-T *Hunk_AllocNameAlignedClear( intp count, intp alignment, const char *pHunkName )
+template< typename T, intp alignment > 
+T *Hunk_AllocNameAlignedClear( intp count, const char *pHunkName )
 {
-	return static_cast<T *>(Hunk_AllocNameAlignedClear_( alignment + count * sizeof(T), alignment, pHunkName ));
+	return static_cast<T *>(Hunk_AllocNameAlignedClear_<alignment>( alignment + count * sizeof(T), pHunkName ));
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1842,16 +1842,16 @@ void Mod_LoadFaces( void )
 	static_assert( sizeof(msurfacelighting_t) == 32 );
 #endif
 
-	msurface1_t *out1 = Hunk_AllocNameAlignedClear< msurface1_t >( count, 16, va( "%s [%s]", lh.GetLoadName(), "surface1" ) );
-	msurface2_t *out2 = Hunk_AllocNameAlignedClear< msurface2_t >( count, 32, va( "%s [%s]", lh.GetLoadName(), "surface2" ) );
+	msurface1_t *out1 = Hunk_AllocNameAlignedClear< msurface1_t, 16 >( count, va( "%s [%s]", lh.GetLoadName(), "surface1" ) );
+	msurface2_t *out2 = Hunk_AllocNameAlignedClear< msurface2_t, 32 >( count, va( "%s [%s]", lh.GetLoadName(), "surface2" ) );
 
-	msurfacelighting_t *pLighting = Hunk_AllocNameAlignedClear< msurfacelighting_t >( count, 32, va( "%s [%s]", lh.GetLoadName(), "surfacelighting" ) );
+	msurfacelighting_t *pLighting = Hunk_AllocNameAlignedClear< msurfacelighting_t, 32 >( count, va( "%s [%s]", lh.GetLoadName(), "surfacelighting" ) );
 
 	worldbrushdata_t *pBrushData = lh.GetMap();
 	pBrushData->surfaces1 = out1;
 	pBrushData->surfaces2 = out2;
 	pBrushData->surfacelighting = pLighting;
-	pBrushData->surfacenormals = Hunk_AllocNameAlignedClear< msurfacenormal_t >( count, 2, va( "%s [%s]", lh.GetLoadName(), "surfacenormal" ) );
+	pBrushData->surfacenormals = Hunk_AllocNameAlignedClear< msurfacenormal_t, 2 >( count, va( "%s [%s]", lh.GetLoadName(), "surfacenormal" ) );
 	pBrushData->numsurfaces = count;
 
 	for ( surfnum=0 ; surfnum<count ; ++surfnum, ++in, ++out1, ++out2, ++pLighting )
