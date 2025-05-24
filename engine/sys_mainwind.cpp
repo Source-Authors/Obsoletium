@@ -21,8 +21,10 @@
 #include <imm.h>
 // dimhotepus: Disable accessibility keys (ex. five times Shift).
 #include "accessibility_shortcut_keys_toggler.h"
+#ifndef _DEBUG
 // dimhotepus: Disable Win key.
 #include "windows_shortcut_keys_toggler.h"
+#endif
 // dimhotepus: Notify when system suspend / resume. Save game when suspend.
 #include "scoped_power_suspend_resume_notifications_registrator.h"
 // dimhotepus: Notify when system power settings changed (battery, AC, power plan, etc.).
@@ -210,16 +212,20 @@ private:
 	bool			m_bCanPostActivateEvents;
 	int				m_iDesktopWidth, m_iDesktopHeight, m_iDesktopRefreshRate;
 
-#if defined( IS_WINDOWS_PC )
+#ifdef IS_WINDOWS_PC
+#ifndef _DEBUG
 	// dimhotepus: Disable Win key.
+	// Only in Release builds as it slowdowns IDE typing a lot in debugging sessions.
+	// See https://github.com/Source-Authors/Obsoletium/issues/124
 	source::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
+#endif
 	// dimhotepus: Disable accessibility keys (ex. five times Shift).
 	source::engine::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
 	// dimhotepus: Notify when system suspend / resume.
 	std::unique_ptr<source::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator> m_powerSuspendResumeRegistrator;
 	// dimhotepus: Notify when active session display on / offs changed.
 	std::unique_ptr<source::engine::win::ScopedPowerSettingNotificationsRegistrator> m_sessionDisplayStatusChangedNotificationsRegistrator;
-#endif
+#endif  // IS_WINDOWS_PC
 
 	void			UpdateDesktopInformation();
 #ifdef WIN32
@@ -1582,11 +1588,11 @@ bool ShouldEnableWindowsShortcutKeys() noexcept
 //-----------------------------------------------------------------------------
 CGame::CGame()
 	// dimhotepus: Disable Win key.
-#if defined( IS_WINDOWS_PC )
+#if !defined(_DEBUG) && defined(IS_WINDOWS_PC)
 	: m_windowsShortcutKeysToggler{ ::GetModuleHandleW( L"engine.dll" ), ShouldEnableWindowsShortcutKeys }
 #endif
 {
-#if defined(IS_WINDOWS_PC)
+#if !defined(_DEBUG) && defined(IS_WINDOWS_PC)
 	// dimhotepus: Disable Win key.
 	if ( m_windowsShortcutKeysToggler.errno_code() )
 	{
