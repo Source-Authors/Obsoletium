@@ -727,7 +727,7 @@ void bf_write::WriteLongLong(int64 val)
 
 	// dimhotepus: Fix writing int64 bits in LP64 model.
 	// Insert the two DWORDS according to network endian
-	const short endianIndex = 0x0100;
+	constexpr short endianIndex = 0x0100;
 	byte *idx = (byte*)&endianIndex;
 	WriteUBitLong(pLongs[*idx++], sizeof(uint32) * CHAR_BIT);
 	WriteUBitLong(pLongs[*idx], sizeof(uint32) * CHAR_BIT);
@@ -1317,7 +1317,7 @@ int64 bf_read::ReadLongLong()
 	
 	// dimhotepus: Fix reading int64 bits in LP64 model.
 	// Read the two DWORDs according to network endian
-	const short endianIndex = 0x0100;
+	constexpr short endianIndex = 0x0100;
 	const byte *idx = (const byte*)&endianIndex;
 	pLongs[*idx++] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);
 	pLongs[*idx] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);

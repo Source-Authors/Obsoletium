@@ -49,7 +49,7 @@ static char s_pTokenBuf[KEYVALUES_TOKEN_SIZE];
 
 
 // a simple class to keep track of a stack of valid parsed symbols
-const int MAX_ERROR_STACK = 64;
+constexpr inline int MAX_ERROR_STACK = 64;
 class CKeyValuesErrorStack
 {
 public:

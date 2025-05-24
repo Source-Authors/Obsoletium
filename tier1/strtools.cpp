@@ -3132,7 +3132,7 @@ void V_LogMultiline( bool input, char const *label, const char *data, size_t len
 {
 	constexpr char HEX[] = "0123456789abcdef";
 	const char * direction = (input ? " << " : " >> ");
-	const size_t LINE_SIZE = 24;
+	constexpr size_t LINE_SIZE = 24;
 	char hex_line[LINE_SIZE * 9 / 4 + 2], asc_line[LINE_SIZE + 1];
 	while (len > 0) 
 	{

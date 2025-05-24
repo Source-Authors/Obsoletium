@@ -39,7 +39,7 @@ int ILocalize::ConvertUnicodeToANSI(const wchar_t *unicode, OUT_Z_BYTECAP(ansiBu
 template < typename T >
 void ConstructStringVArgsInternal_Impl(T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, va_list argList)
 {
-	static const int k_cMaxFormatStringArguments = 9; // We only look one character ahead and start at %s1
+	constexpr int k_cMaxFormatStringArguments = 9; // We only look one character ahead and start at %s1
 	Assert( numFormatParameters <= k_cMaxFormatStringArguments );
 
 	// Safety check
