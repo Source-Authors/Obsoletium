@@ -173,10 +173,14 @@ public:
 	byte				*LumpBase( void );
 	int					LumpSize( void );
 	int					LumpOffset( void );
+	int					LumpSize( void ) const;
+	int					LumpOffset( void ) const;
+	int					LumpSize() const;
+	int					LumpOffset() const;
 	int					LumpVersion() const;
-	const char			*GetMapName( void );
-	char				*GetLoadName( void );
-	struct worldbrushdata_t	*GetMap( void );
+	const char			*GetMapName() const;
+	char				*GetLoadName();
+	struct worldbrushdata_t	*GetMap();
 
 	// Global setup/shutdown
 	static void			Init( model_t *pMapModel, const char *pLoadname );

@@ -875,7 +875,7 @@ worldbrushdata_t *CMapLoadHelper::GetMap( void )
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CMapLoadHelper::GetMapName( void )
+const char *CMapLoadHelper::GetMapName() const
 {
 	return s_szMapName;
 }
@@ -900,7 +900,7 @@ char *CMapLoadHelper::GetLoadName( void )
 // Purpose: 
 // Output : byte
 //-----------------------------------------------------------------------------
-byte *CMapLoadHelper::LumpBase( void )
+byte *CMapLoadHelper::LumpBase()
 {
 	return m_pData;
 }
@@ -909,12 +909,12 @@ byte *CMapLoadHelper::LumpBase( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CMapLoadHelper::LumpSize()
+int CMapLoadHelper::LumpSize() const
 {
 	return m_nLumpSize;
 }
 
-int CMapLoadHelper::LumpOffset()
+int CMapLoadHelper::LumpOffset() const
 {
 	return m_nLumpOffset;
 }
