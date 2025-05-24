@@ -1200,10 +1200,9 @@ static float RadiusFromBounds (Vector& mins, Vector& maxs)
 {
 	Vector	corner;
 
-	for (int i=0 ; i<3 ; i++)
-	{
-		corner[i] = max( fabsf(mins[i]), fabsf(maxs[i]) );
-	}
+	corner[0] = max( fabsf(mins[0]), fabsf(maxs[0]) );
+	corner[1] = max( fabsf(mins[1]), fabsf(maxs[1]) );
+	corner[2] = max( fabsf(mins[2]), fabsf(maxs[2]) );
 
 	return VectorLength( corner );
 }
