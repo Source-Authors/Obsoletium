@@ -1803,7 +1803,7 @@ void *Hunk_AllocNameAlignedClear_( intp size, const char *pHunkName )
 template< typename T, intp alignment > 
 T *Hunk_AllocNameAlignedClear( intp count, const char *pHunkName )
 {
-	return static_cast<T *>(Hunk_AllocNameAlignedClear_<alignment>( alignment + count * sizeof(T), pHunkName ));
+	return static_cast<T *>(Hunk_AllocNameAlignedClear_<alignment>( count * sizeof(T), pHunkName ));
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
