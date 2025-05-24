@@ -584,7 +584,7 @@ const CPUInformation* GetCPUInformation()
 	{
 		int nLogicalProcs = 0;
 		int nProcId = -1, nCoreId = -1;
-		const int kMaxPhysicalCores = 128;
+		constexpr int kMaxPhysicalCores = 128;
 		int anKnownIds[kMaxPhysicalCores];
 		int nKnownIdCount = 0;
 		char buf[255];

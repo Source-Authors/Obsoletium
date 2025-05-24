@@ -143,8 +143,8 @@ uint64 CalculateCPUFreq()
 	// Compute the period. Loop until we get 3 consecutive periods that
 	// are the same to within a small error. The error is chosen
 	// to be +/- 0.02% on a P-200.
-	const uint64 error = 40000;
-	const int max_iterations = 600;
+	constexpr uint64 error = 40000;
+	constexpr int max_iterations = 600;
 	int count;
 	uint64 period, period1 = error * 2, period2 = 0,  period3 = 0;
 

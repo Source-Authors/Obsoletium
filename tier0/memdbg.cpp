@@ -248,7 +248,7 @@ inline int WalkStack( void **ppAddresses, int nMaxAddresses, [[maybe_unused]] in
 //-----------------------------------------------------------------------------
 
 // The size of the no-man's land used in unaligned and aligned allocations:
-static size_t const no_mans_land_size = 4;
+static constexpr inline size_t no_mans_land_size = 4;
 
 // NOTE: This exactly mirrors the dbg header in the MSDEV crt
 // eventually when we write our own allocator, we can kill this

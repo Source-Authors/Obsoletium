@@ -214,7 +214,7 @@ unsigned __stdcall HeartbeatThread( void* )
 				// Read and write all the state that is shared with the main thread while holding the lock.
 				AUTO_LOCK( s_lock );
 				float freqPercentage = maxActualFreq / (MaxCurrentMHz * 1e-5f);
-				const float kFudgeFactor = 1.03f;	// Make results match reality better
+				constexpr float kFudgeFactor = 1.03f;	// Make results match reality better
 				s_results.m_timeStamp = Plat_FloatTime();
 				s_results.m_GHz = maxActualFreq * kFudgeFactor;
 				s_results.m_percentage = freqPercentage * kFudgeFactor;

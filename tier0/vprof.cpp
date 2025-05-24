@@ -969,7 +969,7 @@ CounterGroup_t CVProfile::GetCounterGroup( int index ) const
 #error the below is presumably broken on 64 bit
 #endif // _WIN64
 
-const int k_cSTLMapAllocOffset = 4;
+constexpr inline int k_cSTLMapAllocOffset = 4;
 #define GET_INTERNAL_MAP_ALLOC_PTR( pMap ) \
 	( * ( (void **) ( ( ( byte * ) ( pMap ) ) + k_cSTLMapAllocOffset ) ) )
 //-----------------------------------------------------------------------------
