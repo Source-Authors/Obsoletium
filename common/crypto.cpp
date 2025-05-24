@@ -55,7 +55,7 @@
 #undef Verify
 #define VPROF_BUDGETGROUP_ENCRYPTION				_T("Encryption")
 #define SPEW_CRYPTO "crypto"
-const int k_cMedBuff = 1024;					// medium buffer 
+constexpr inline int k_cMedBuff = 1024;					// medium buffer 
 
 #if defined(GNUC)
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -1231,7 +1231,7 @@ bool CCrypto::HexDecode( const char *pchData, uint8 *pubDecodedData, size_t *pcu
 }
 
 
-static const int k_LineBreakEveryNGroups = 18; // line break every 18 groups of 4 characters (every 72 characters)
+static constexpr inline int k_LineBreakEveryNGroups = 18; // line break every 18 groups of 4 characters (every 72 characters)
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the expected buffer size that should be passed to Base64Encode.
