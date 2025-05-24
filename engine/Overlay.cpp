@@ -1119,19 +1119,16 @@ bool COverlayMgr::LoadOverlays( )
 	CMapLoadHelper lh2( LUMP_WATEROVERLAYS );
 	CMapLoadHelper lhOverlayFades( LUMP_OVERLAY_FADES );
 
-	doverlay_t *pOverlayIn;
-	dwateroverlay_t	*pWaterOverlayIn;
-
-	pOverlayIn = ( doverlay_t* )lh.LumpBase();
+	auto *pOverlayIn = lh.LumpBase<doverlay_t>();
 	if ( lh.LumpSize() % sizeof( doverlay_t ) )
 		return false;
 
-	pWaterOverlayIn = ( dwateroverlay_t* )lh2.LumpBase();
+	auto *pWaterOverlayIn = lh2.LumpBase<dwateroverlay_t>();
 	if ( lh2.LumpSize() % sizeof( dwateroverlay_t ) )
 		return false;
 		
 	// Fade distances are in a parallel lump
-	doverlayfade_t *pOverlayFadesIn = (doverlayfade_t *)lhOverlayFades.LumpBase();
+	auto *pOverlayFadesIn = lhOverlayFades.LumpBase<doverlayfade_t>();
 	if ( lhOverlayFades.LumpSize() % sizeof( doverlayfade_t ) )
 		return false;
 
@@ -1139,7 +1136,7 @@ bool COverlayMgr::LoadOverlays( )
 	int nWaterOverlayCount = lh2.LumpSize() / sizeof( dwateroverlay_t );
 
 	// Memory allocation!
-	m_aOverlays.SetSize( nOverlayCount + nWaterOverlayCount );
+	m_aOverlays.SetSize( static_cast<intp>(nOverlayCount) + nWaterOverlayCount );
 
 	for( int iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay, ++pOverlayIn )
 	{
@@ -1572,7 +1569,7 @@ void COverlayMgr::InitTexCoords( moverlay_t *pOverlay, moverlayfragment_t &overl
 void COverlayMgr::DoClipFragment( moverlayfragment_t *pFragment, cplane_t *pClipPlane,
 								  moverlayfragment_t **ppFront, moverlayfragment_t **ppBack )
 {
-	const float OVERLAY_EPSILON	= 0.0001f;
+	constexpr float OVERLAY_EPSILON	= 0.0001f;
 
 	// Verify.
 	if ( !pFragment )
@@ -1872,7 +1869,7 @@ void Overlay_TriTLToBR(
 	int nWidth, 
 	const Vector &vecIntersectPoint )
 {
-	const float TRIEDGE_EPSILON = 0.000001f;
+	constexpr float TRIEDGE_EPSILON = 0.000001f;
 
 	int nHeight = nWidth;
 
