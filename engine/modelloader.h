@@ -170,11 +170,14 @@ public:
 						~CMapLoadHelper( void );
 
 	// Get raw memory pointer
-	byte				*LumpBase( void );
-	int					LumpSize( void );
-	int					LumpOffset( void );
-	int					LumpSize( void ) const;
-	int					LumpOffset( void ) const;
+	byte				*LumpBase();
+	template<typename T>
+	std::enable_if_t<std::is_trivially_copyable_v<T>, T *> LumpBase() {
+		T* data = reinterpret_cast<T*>(LumpBase());
+		Assert(data == nullptr || static_cast<intp>(sizeof(T)) <= static_cast<intp>(LumpSize()));
+		return data;
+	}
+
 	int					LumpSize() const;
 	int					LumpOffset() const;
 	int					LumpVersion() const;

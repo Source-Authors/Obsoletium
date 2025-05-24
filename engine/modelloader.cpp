@@ -1245,30 +1245,27 @@ void Mod_LoadSubmodels( CUtlVector<mmodel_t> &submodelList )
 // Purpose: 
 // Output : medge_t *Mod_LoadEdges
 //-----------------------------------------------------------------------------
-medge_t *Mod_LoadEdges ( void )
+std::unique_ptr<medge_t[]> Mod_LoadEdges()
 {
-	dedge_t *in;
-	medge_t *out;
-	int 	i, count;
-
 	CMapLoadHelper lh( LUMP_EDGES );
 
-	in = (dedge_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dedge_t>();
 	if (lh.LumpSize() % sizeof(*in))
-		Host_Error ("Mod_LoadEdges: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
-	medge_t *pedges = new medge_t[count];
+		Host_Error( "Mod_LoadEdges: funny lump size in %s", lh.GetMapName() );
 
-	out = pedges;
+	int count = lh.LumpSize() / sizeof(*in);
+	std::unique_ptr<medge_t[]> medges = std::make_unique<medge_t[]>(count);
 
-	for ( i=0 ; i<count ; i++, in++, out++)
+	medge_t *out = medges.get();
+
+	for ( int i=0 ; i<count ; i++, in++, out++)
 	{
 		out->v[0] = in->v[0];
 		out->v[1] = in->v[1];
 	}
 
 	// delete this in the loader
-	return pedges;
+	return medges;
 }
 
 
@@ -2558,27 +2555,24 @@ void Mod_LoadMarksurfaces( void )
 //			*l - 
 //			*loadname - 
 //-----------------------------------------------------------------------------
-void Mod_LoadSurfedges( medge_t *pedges )
+void Mod_LoadSurfedges( std::unique_ptr<medge_t[]> &pedges )
 {	
-	int		i, count;
-	int		*in;
-	unsigned short *out;
-	
 	CMapLoadHelper lh( LUMP_SURFEDGES );
 
-	in = (int *)lh.LumpBase();
+	int *in = lh.LumpBase<int>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadSurfedges: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
+
+	int count = lh.LumpSize() / sizeof(*in);
 	if (count < 1 || count >= MAX_MAP_SURFEDGES)
-		Host_Error ("Mod_LoadSurfedges: bad surfedges count in %s: %i",
-		lh.GetMapName(), count);
-	out = (unsigned short *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "surfedges" ) );
+		Host_Error ("Mod_LoadSurfedges: bad surfedges count in %s: %i",lh.GetMapName(), count);
+
+	unsigned short *out = Hunk_AllocName<unsigned short>( count, va( "%s [%s]", lh.GetLoadName(), "surfedges" ) );
 
 	lh.GetMap()->vertindices = out;
 	lh.GetMap()->numvertindices = count;
 
-	for ( i=0 ; i<count ; i++)
+	for ( int i=0 ; i<count ; i++)
 	{
 		int edge = in[i];
 		int index = 0;
@@ -2589,8 +2583,6 @@ void Mod_LoadSurfedges( medge_t *pedges )
 		}
 		out[i] = pedges[edge].v[index];
 	}
-
-	delete[] pedges;
 }
 
 //-----------------------------------------------------------------------------
@@ -4373,11 +4365,13 @@ void CModelLoader::Map_LoadModel( model_t *mod )
 	COM_TimestampedLog( "  Mod_LoadVertices" );
 	Mod_LoadVertices();
 	
+	{
 	COM_TimestampedLog( "  Mod_LoadEdges" );
-	medge_t *pedges = Mod_LoadEdges();
+		std::unique_ptr<medge_t[]> pedges = Mod_LoadEdges();
 
 	COM_TimestampedLog( "  Mod_LoadSurfedges" );
 	Mod_LoadSurfedges( pedges );
+	}
 
 	COM_TimestampedLog( "  Mod_LoadPlanes" );
 	Mod_LoadPlanes();
