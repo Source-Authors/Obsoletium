@@ -54,7 +54,7 @@ ConVar sdl_double_click_time( "sdl_double_click_time", "400" );
 COpenGLEntryPoints *gGL = NULL;
 #endif
 
-const int kBogusSwapInterval = INT_MAX;
+constexpr inline int kBogusSwapInterval = INT_MAX;
 
 /*
 From Ryan Gordon:
