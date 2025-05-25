@@ -31,6 +31,10 @@
 #include <cstring>  // std::memset
 #include <cstddef>  // std::ptrdiff_t, std::size
 
+#if defined(__GCC__) && (defined(__i386__) || defined(__x86_64__))
+#include <x86intrin.h>  // __rdtsc, __rdtscp
+#endif
+
 #include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
 #ifdef _RETAIL
@@ -889,24 +893,19 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 
 #if defined( _WIN32 )
 	extern "C" unsigned __int64 __rdtsc();
+	extern "C" unsigned __int64 __rdtscp(unsigned *aux);
 	#pragma intrinsic(__rdtsc)
+	#pragma intrinsic(__rdtscp)
 #endif
 
 inline uint64 Plat_Rdtsc()
 {
-#if defined( _WIN64 ) || defined ( _WIN32 )
 	return __rdtsc();
-#elif defined( __i386__ )
-	uint64 val;
-	__asm__ __volatile__ ( "rdtsc" : "=A" (val) );
-	return val;
-#elif defined( __x86_64__ )
-	uint32 lo, hi;
-	__asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
-	return ( ( ( uint64 )hi ) << 32 ) | lo;
-#else
-#error "Please define your platform"
-#endif
+}
+
+inline uint64 Plat_Rdtscp(uint32 &coreId)
+{
+	return __rdtscp(&coreId);
 }
 
 // b/w compatibility
