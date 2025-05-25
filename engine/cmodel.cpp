@@ -545,7 +545,7 @@ struct leafnums_t
 int CM_BoxLeafnums( leafnums_t &context, const Vector &center, const Vector &extents, int nodenum )
 {
 	int leafCount = 0;
-	const int NODELIST_MAX = 1024;
+	constexpr int NODELIST_MAX = 1024;
 	int nodeList[NODELIST_MAX];
 	int nodeReadIndex = 0;
 	int nodeWriteIndex = 0;

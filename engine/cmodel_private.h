@@ -296,7 +296,7 @@ protected:
 };
 #include "tier0/memdbgoff.h"
 
-const int SURFACE_INDEX_INVALID = 0xFFFF;
+constexpr inline int SURFACE_INDEX_INVALID = 0xFFFF;
 
 //=============================================================================
 //

@@ -1929,7 +1929,7 @@ void CStaticPropMgr::DrawStaticProps_Fast( IClientRenderable **pProps, int count
 // NOTE: This is a work in progress for a new static prop (eventually new model) rendering pipeline
 void CStaticPropMgr::DrawStaticProps_FastPipeline( IClientRenderable **pProps, int count, bool bShadowDepth )
 {
-	const int MAX_OBJECTS = 2048;
+	constexpr int MAX_OBJECTS = 2048;
 	StaticPropRenderInfo_t propList[MAX_OBJECTS];
 	int listCount = 0;
 	if ( count > MAX_OBJECTS )

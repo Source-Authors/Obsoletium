@@ -225,7 +225,7 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 	}
 
 	// And decompress!
-	const int OutBufSize = 65536;
+	constexpr int OutBufSize = 65536;
 	char    buf[ OutBufSize ];
 	BZFILE *bzfp = BZ2_bzopen( fullSrcPath, "rb" );
 	int totalBytes = 0;

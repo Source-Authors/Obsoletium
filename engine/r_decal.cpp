@@ -71,8 +71,8 @@ static int				g_iLastReplacedDynamic = -1;
 
 CUtlVector<decal_t*>		s_aDecalPool;
 
-const int DECALCACHE_ENTRY_COUNT = 1024;
-const int INVALID_CACHE_ENTRY = 0xFFFF;
+constexpr inline int DECALCACHE_ENTRY_COUNT = 1024;
+constexpr inline int INVALID_CACHE_ENTRY = 0xFFFF;
 
 // dimhotepus: Fix aligned alloc.
 class alignas(16) CDecalVertCache : public CAlignedNewDelete<16>

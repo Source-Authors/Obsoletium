@@ -489,7 +489,7 @@ struct msurfacelighting_t
 	ColorRGBExp32 *m_pSamples;
 };
 
-const int WORLD_DECAL_HANDLE_INVALID = 0xFFFF;
+constexpr inline int WORLD_DECAL_HANDLE_INVALID = 0xFFFF;
 typedef unsigned short WorldDecalHandle_t;
 
 #pragma pack(1)

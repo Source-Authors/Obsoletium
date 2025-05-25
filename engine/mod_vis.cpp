@@ -62,7 +62,7 @@ static VISINFO vis;
 // 2) camera/monitor (actually, this is merged with the regular world)
 // 3) 3dskybox
 // 4) regular world
-const int VISCACHE_SIZE = 8;
+constexpr inline int VISCACHE_SIZE = 8;
 
 class VisCacheEntry
 {

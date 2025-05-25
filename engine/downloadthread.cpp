@@ -163,7 +163,7 @@ void __stdcall DownloadStatusCallback( HINTERNET hOpenResource, DWORD dwContext,
  */
 void ReadData( RequestContext_t& rc )
 {
-	const int BufferSize = 2048;
+	constexpr int BufferSize = 2048;
 	unsigned char data[BufferSize];
 	DWORD dwSize = 0;
 

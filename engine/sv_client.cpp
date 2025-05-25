@@ -1267,7 +1267,7 @@ bool CGameClient::ShouldSendMessages( void )
 #if defined( REPLAY_ENABLED )
 	if ( m_bIsReplay )
 	{
-		const float replay_snapshotrate = 16.0f;
+		constexpr float replay_snapshotrate = 16.0f;
 
 		// calc snapshot interval
 		int nSnapshotInterval = 1.0f / ( m_Server->GetTickInterval() * replay_snapshotrate );

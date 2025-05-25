@@ -281,7 +281,7 @@ void CAudioDeviceSDLAudio::CloseWaveOut( void )
 void CAudioDeviceSDLAudio::AllocateOutputBuffers()
 {
 	// Allocate and lock memory for the waveform data.  
-	const int nBufferSize = WAV_BUFFER_SIZE * WAV_BUFFERS;
+	constexpr int nBufferSize = WAV_BUFFER_SIZE * WAV_BUFFERS;
 	m_pBuffer = new uint8_t[nBufferSize];
 	memset(m_pBuffer, '\0', nBufferSize);
 	m_readPos = 0;

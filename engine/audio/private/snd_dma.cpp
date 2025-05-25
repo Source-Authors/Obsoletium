@@ -135,7 +135,7 @@ static float g_EstFrameTime = 0.1f;			// estimated frame time running average
 // x360 override to fade out game music when the user is playing music through the dashboard
 static float g_DashboardMusicMixValue = 1.0f;
 static float g_DashboardMusicMixTarget = 1.0f;
-const float g_DashboardMusicFadeRate = 0.5f;	// Fades one half full-scale volume per second (two seconds for complete fadeout)
+constexpr inline float g_DashboardMusicFadeRate = 0.5f;	// Fades one half full-scale volume per second (two seconds for complete fadeout)
 
 // sound mixers
 int g_csoundmixers	= 0;					// total number of soundmixers found
@@ -167,7 +167,7 @@ CThreadMutex g_SndMutex;
 
 #define THREAD_LOCK_SOUND() AUTO_LOCK( g_SndMutex )
 
-const int MASK_BLOCK_AUDIO = CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW;
+constexpr inline int MASK_BLOCK_AUDIO = CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW;
 
 void CActiveChannels::Add( channel_t *pChannel )
 {

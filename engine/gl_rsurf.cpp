@@ -57,7 +57,7 @@
 #define BACKFACE_EPSILON	-0.01f
 
 #define BRUSHMODEL_DECAL_SORT_GROUP		MAX_MAT_SORT_GROUPS
-const int MAX_VERTEX_FORMAT_CHANGES = 128;
+constexpr inline int MAX_VERTEX_FORMAT_CHANGES = 128;
 int g_MaxLeavesVisible = 512;
 
 //-----------------------------------------------------------------------------
@@ -1841,7 +1841,7 @@ static void Shader_WorldZFillSurfChain( const CMSurfaceSortList &sortList, const
 	nStartVertIn = nStartVert;
 }
 
-static const int s_DrawWorldListsToSortGroup[MAX_MAT_SORT_GROUPS] = 
+static constexpr int s_DrawWorldListsToSortGroup[MAX_MAT_SORT_GROUPS] = 
 {
 	MAT_SORT_GROUP_STRICTLY_ABOVEWATER,
 	MAT_SORT_GROUP_STRICTLY_UNDERWATER,
@@ -3598,10 +3598,10 @@ void Shader_BrushSurface( SurfaceHandle_t surfID, model_t *model, IClientEntity 
 
 
 // UNDONE: These are really guesses.  Do we ever exceed these limits?
-const int MAX_TRANS_NODES = 256;
-const int MAX_TRANS_DECALS = 256;
-const int MAX_TRANS_BATCHES = 1024;
-const int MAX_TRANS_SURFACES = 1024;
+constexpr inline int MAX_TRANS_NODES = 256;
+constexpr inline int MAX_TRANS_DECALS = 256;
+constexpr inline int MAX_TRANS_BATCHES = 1024;
+constexpr inline int MAX_TRANS_SURFACES = 1024;
 
 class CBrushBatchRender
 {

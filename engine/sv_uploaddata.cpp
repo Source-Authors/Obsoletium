@@ -81,7 +81,7 @@ void BuildUploadDataMessage( bf_write& buf, char const *tablename, KeyValues *fi
 
 	encrypted.StartWriting( encrypted_data, sizeof( encrypted_data ) );
 
-	const byte corruption_identifier = 0x01;
+	constexpr byte corruption_identifier = 0x01;
 	encrypted.WriteByte( corruption_identifier );
 
 	// Data version protocol

@@ -42,8 +42,8 @@
 
 using namespace vgui;
 
-const int g_nPreviewImageWidth  = 128;
-const int g_nPreviewImageHeight =  96;
+constexpr inline int g_nPreviewImageWidth  = 128;
+constexpr inline int g_nPreviewImageHeight =  96;
 
 ConVar mat_colorcorrection( "mat_colorcorrection", "0", FCVAR_ARCHIVE );
 ConVar mat_colcorrection_disableentities( "mat_colcorrection_disableentities", "0" );

@@ -73,7 +73,7 @@ public:
 			return;
 		m_firstIndex[index] = m_dispList.Count();
 		m_leafCount[index] = 0;
-		const int MAX_NODES = 1024;
+		constexpr int MAX_NODES = 1024;
 		int nodeList[MAX_NODES];
 		int listRead = 0;
 		int listWrite = 1;

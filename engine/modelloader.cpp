@@ -1489,7 +1489,7 @@ static void CheckSurfaceLighting( SurfaceHandle_t surfID, worldbrushdata_t *pBru
 		}
 		unsigned char color[4];
 		LinearToGamma( color, maxLight.Base() );
-		constexpr inline int minLightVal = 1;
+		constexpr int minLightVal = 1;
 		if ( color[0] <= minLightVal && color[1] <= minLightVal && color[2] <= minLightVal )
 		{
 			// found a lightmap that is too dark, remove it and shift over the subsequent maps/styles

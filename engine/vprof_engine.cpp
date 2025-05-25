@@ -59,8 +59,8 @@ static void ExecuteDeferredOp()
 	}
 }
 	
-const double MAX_SPIKE_REPORT = 1.0;
-const int MAX_SPIKE_REPORT_FRAMES = 10;
+constexpr inline double MAX_SPIKE_REPORT = 1.0;
+constexpr inline int MAX_SPIKE_REPORT_FRAMES = 10;
 static double LastSpikeTime = 0;
 static int LastSpikeFrame = 0;
 //bool g_VProfSignalSpike; // used by xbox

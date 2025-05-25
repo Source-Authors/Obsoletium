@@ -199,7 +199,7 @@ void DemoOverlay::DrawOverlay( float fSetting )
 			) : OVR_NONE;
 	}
 
-	int const idx = 1;
+	constexpr int idx = 1;
 
 	if ( OVR_NONE == maskDrawnOverlay &&
 		 OVR_NONE != m_maskDrawnOverlay )

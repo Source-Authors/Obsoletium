@@ -140,22 +140,22 @@ const CommandResponse_t			cuMaxCommandResponse
 typedef u32								ContextID_t;
 
 // This is the version of the protocol used by latest-build clients.
-const ProtocolVersion_t			cuCurrentProtocolVersion		= 1;
+constexpr inline ProtocolVersion_t			cuCurrentProtocolVersion		= 1;
 
 // This is the minimum protocol version number that the client must 
 // be able to speak in order to communicate with the server.
 // The client sends its protocol version this before every command, and if we 
 // don't support that version anymore then we tell it nicely.  The client 
 // should respond by doing an auto-update.
-const ProtocolVersion_t			cuRequiredProtocolVersion		= 1;
+constexpr inline ProtocolVersion_t			cuRequiredProtocolVersion		= 1;
 
 
 namespace Commands
 {
-	const Command_t				cuGracefulClose					= 0;
-	const Command_t				cuSendGameStats					= 1;
-	const Command_t				cuNumCommands					= 2;
-	const Command_t				cuNoCommandReceivedYet			= cuMaxCommand;
+	constexpr inline Command_t				cuGracefulClose					= 0;
+	constexpr inline Command_t				cuSendGameStats					= 1;
+	constexpr inline Command_t				cuNumCommands					= 2;
+	constexpr inline Command_t				cuNoCommandReceivedYet			= cuMaxCommand;
 }
 
 
@@ -172,12 +172,12 @@ namespace HarvestFileCommand
 	// Legal values defined by ESendMethod
 	typedef u32							SendMethod_t;
 
-	const CommandResponse_t		cuOkToSendFile					= 0;
-	const CommandResponse_t		cuFileTooBig					= 1;
-	const CommandResponse_t		cuInvalidSendMethod				= 2;
-	const CommandResponse_t		cuInvalidMaxCompressedChunkSize	= 3;
-	const CommandResponse_t		cuInvalidGameStatsContext		= 4;
-	const uint							cuNumCommandResponses			= 5;
+	constexpr inline CommandResponse_t		cuOkToSendFile					= 0;
+	constexpr inline CommandResponse_t		cuFileTooBig					= 1;
+	constexpr inline CommandResponse_t		cuInvalidSendMethod				= 2;
+	constexpr inline CommandResponse_t		cuInvalidMaxCompressedChunkSize	= 3;
+	constexpr inline CommandResponse_t		cuInvalidGameStatsContext		= 4;
+	constexpr inline uint					cuNumCommandResponses			= 5;
 }
 
 //#############################################################################

@@ -1543,7 +1543,7 @@ void CShadowMgr::ProjectShadow( ShadowHandle_t handle, const Vector &origin,
 
 void DrawFrustum( Frustum_t &frustum )
 {
-	const int maxPoints = 8;
+	constexpr int maxPoints = 8;
 	int i;
 	for( i = 0; i < FRUSTUM_NUMPLANES; i++ )
 	{
@@ -3136,7 +3136,7 @@ void CShadowMgr::SetStencilAndScissor( IMatRenderContext *pRenderContext, Flashl
 
 	// Express near and far planes of View frustum in world space
 	Frustum frustumPlanes;
-	const float flPlaneEpsilon = 0.4f;
+	constexpr float flPlaneEpsilon = 0.4f;
 	ExtractFrustumPlanes( frustumPlanes, flPlaneEpsilon );
 	Vector vNearNormal = frustumPlanes[FRUSTUM_NEARZ].m_Normal;
 	Vector vFarNormal  = frustumPlanes[FRUSTUM_FARZ].m_Normal;
