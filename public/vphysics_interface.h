@@ -453,7 +453,7 @@ public:
 
 
 	//Basically get the last inputs to IPhysicsShadowController::Update(), returns last input to timeOffset in Update()
-	[[nodiscard]] virtual float GetTargetPosition( Vector *pPositionOut, QAngle *pAnglesOut ) = 0;
+	virtual float GetTargetPosition( Vector *pPositionOut, QAngle *pAnglesOut ) = 0;
 	
 	[[nodiscard]] virtual float GetTeleportDistance( void ) = 0;
 	virtual void GetMaxSpeed( float *pMaxSpeedOut, float *pMaxAngularSpeedOut ) = 0;
