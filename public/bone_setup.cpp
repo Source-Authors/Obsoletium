@@ -5137,7 +5137,7 @@ float Studio_GetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 //-----------------------------------------------------------------------------
 static int ClipRayToHitbox( const Ray_t &ray, mstudiobbox_t *pbox, matrix3x4_t& matrix, trace_t &tr )
 {
-	const float flProjEpsilon = 0.01f;
+	constexpr float flProjEpsilon = 0.01f;
 	// scale by current t so hits shorten the ray and increase the likelihood of early outs
 	Vector delta2;
 	VectorScale( ray.m_Delta, (0.5f * tr.fraction), delta2 );
