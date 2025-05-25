@@ -10469,7 +10469,7 @@ void CShaderAPIDx8::CommitPixelShaderLighting( int pshReg )
 	SortLights( lightIndex );
 
 	// Offset to create a point light from directional
-	const float fFarAway = 10000.0f;
+	constexpr float fFarAway = 10000.0f;
 
 	// Total pixel shader lighting state for four lights
 	Vector4D lightState[6];
