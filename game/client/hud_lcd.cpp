@@ -12,9 +12,9 @@
 
 #ifdef POSIX
 #define HICON int
-const int DT_LEFT = 1;
-const int DT_CENTER = 2;
-const int DT_RIGHT = 3;
+constexpr inline int DT_LEFT = 1;
+constexpr inline int DT_CENTER = 2;
+constexpr inline int DT_RIGHT = 3;
 #endif
 
 #include "hud_lcd.h"

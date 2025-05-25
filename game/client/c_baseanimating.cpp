@@ -2518,7 +2518,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 					if (trace.DidHitWorld())
 					{
 						// clamp normal to 33 degrees
-						const float limit = 0.832;
+						constexpr float limit = 0.832;
 						float dot = DotProduct(trace.plane.normal, up);
 						if (dot < limit)
 						{
@@ -4854,7 +4854,7 @@ C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
 		matrix3x4_t boneDelta0[MAXSTUDIOBONES];
 		matrix3x4_t boneDelta1[MAXSTUDIOBONES];
 		matrix3x4_t currentBones[MAXSTUDIOBONES];
-		const float boneDt = 0.1f;
+		constexpr float boneDt = 0.1f;
 
 		bool bInitAsClient = false;
 		bool bInitBoneArrays = GetRagdollInitBoneArrays( boneDelta0, boneDelta1, currentBones, boneDt );
@@ -5494,7 +5494,7 @@ float C_BaseAnimating::FrameAdvance( float flInterval )
 			float originalAdvance = addcycle;
 			addcycle = (serverAdvance + addcycle) / 2;
 
-			const float MAX_CYCLE_ADJUSTMENT = 0.1f;
+			constexpr float MAX_CYCLE_ADJUSTMENT = 0.1f;
 			addcycle = MIN( MAX_CYCLE_ADJUSTMENT, addcycle );// Don't do too big of a jump; it's too jarring as well.
 
 			DevMsg( 2, "(%d): Cycle latch used to correct %.2f in to %.2f instead of %.2f.\n",

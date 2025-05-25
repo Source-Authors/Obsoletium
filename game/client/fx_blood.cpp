@@ -539,8 +539,8 @@ void HunterDamageCallback( const CEffectData &data )
 	pGlassEmitter->SetSortOrigin( data.m_vOrigin );
 
 	// Handle increased scale
-	const float flMaxSpeed = 400.0f;
-	const float flMinSpeed = 50.0f;
+	constexpr float flMaxSpeed = 400.0f;
+	constexpr float flMinSpeed = 50.0f;
 	float flAngularSpray = 1.0f;
 
 	// Setup our collision information

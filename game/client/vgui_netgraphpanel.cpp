@@ -889,7 +889,7 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 	{
 		const CPUFrequencyResults frequency = GetCPUFrequencyResults();
 		double currentTime = Plat_FloatTime();
-		const double displayTime = 5.0f; // Display frequency results for this long.
+		constexpr double displayTime = 5.0f; // Display frequency results for this long.
 		if ( frequency.m_GHz > 0 && frequency.m_timeStamp + displayTime > currentTime )
 		{
 			// Optionally print out the CPU frequency monitoring data.

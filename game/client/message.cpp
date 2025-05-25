@@ -43,7 +43,7 @@ using namespace vgui;
 
 static const char *s_NetworkMessageNames[MAX_NETMESSAGE] = { NETWORK_MESSAGE1, NETWORK_MESSAGE2, NETWORK_MESSAGE3, NETWORK_MESSAGE4, NETWORK_MESSAGE5, NETWORK_MESSAGE6 };
 
-const int maxHUDMessages = 16;
+constexpr inline int maxHUDMessages = 16;
 struct message_parms_t
 {
 	client_textmessage_t	*pMessage;

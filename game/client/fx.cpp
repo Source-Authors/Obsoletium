@@ -67,7 +67,7 @@ public:
 	{
 		m_flLifetime += gpGlobals->frametime;
 		
-		const float flTotalLifetime = 0.1f;
+		constexpr float flTotalLifetime = 0.1f;
 
 		if ( m_flLifetime < flTotalLifetime )
 		{

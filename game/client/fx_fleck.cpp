@@ -96,7 +96,7 @@ PARTICLE_EFFECT *CParticleMergeList<PARTICLE_EFFECT,PARTICLE_MERGE>::FindAndMerg
 }
 
 // merge anything within 10 feet
-const float MAX_RADIUS_BBOX_MERGE = 120.0f;
+constexpr inline float MAX_RADIUS_BBOX_MERGE = 120.0f;
 
 template< class PARTICLE_EFFECT >
 class CMergeSameNameBbox

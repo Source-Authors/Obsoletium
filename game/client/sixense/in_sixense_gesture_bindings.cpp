@@ -156,7 +156,7 @@ int SixenseGestureBindings::GetNumBindings()
 void SixenseGestureBindings::ListBindings()
 {
 
-	const int strbuflen=256;
+	constexpr int strbuflen=256;
 	char strbuf[strbuflen];
 
 	// Just go through all the bindings, use helpers to convert from tokens to strings, and print.
@@ -219,7 +219,7 @@ void SixenseGestureBindings::WriteBindings( CUtlString filename_str )
 
 	FileHandle_t hFile;
 
-	const int filenamelen = 1024;
+	constexpr int filenamelen = 1024;
 	char filename[filenamelen];
 
 	// If no filename was provided, use "cfg/sixense_bindings.cfg"
@@ -240,7 +240,7 @@ void SixenseGestureBindings::WriteBindings( CUtlString filename_str )
 		return;
 	}
 	
-	const int strbuflen=256;
+	constexpr int strbuflen = 256;
 	char strbuf[strbuflen];
 	char writebuf[strbuflen];
 

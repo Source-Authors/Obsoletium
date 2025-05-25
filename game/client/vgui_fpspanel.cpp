@@ -274,7 +274,7 @@ void CFPSPanel::Paint()
 			unsigned char ucColor[3];
 			if ( cl_showfps.GetInt() == 2 )
 			{
-				const float NewWeight  = 0.1f;
+				constexpr float NewWeight  = 0.1f;
 				float NewFrame = 1.0f / realFrameTime;
 
 				if ( m_AverageFPS < 0.0f )
@@ -308,7 +308,7 @@ void CFPSPanel::Paint()
 
 			const CPUFrequencyResults frequency = GetCPUFrequencyResults();
 			double currentTime = Plat_FloatTime();
-			const double displayTime = 5.0; // Display frequency results for this long.
+			constexpr double displayTime = 5.0; // Display frequency results for this long.
 			if ( frequency.m_GHz > 0 && frequency.m_timeStamp + displayTime > currentTime )
 			{
 				int lineHeight = vgui::surface()->GetFontTall( m_hFont );

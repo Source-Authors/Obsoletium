@@ -23,7 +23,7 @@
 // This test will flag any circular references and bail.
 #define MAX_SOUNDSCAPE_RECURSION	8
 
-const float DEFAULT_SOUND_RADIUS = 36.0f;
+constexpr inline float DEFAULT_SOUND_RADIUS = 36.0f;
 // Keep an array of all looping sounds so they can be faded in/out
 // OPTIMIZE: Get a handle/pointer to the engine's sound channel instead 
 //			of searching each frame!
