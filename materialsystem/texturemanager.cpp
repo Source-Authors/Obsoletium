@@ -2904,7 +2904,7 @@ void CTextureManager::UpdatePostAsync()
 	}
 
 	// Then update streaming
-	const int cThirtySecondsOrSoInFrames = 2000;
+	constexpr int cThirtySecondsOrSoInFrames = 2000;
 
 	// First, remove old stuff.
 	FOR_EACH_MAP_FAST( m_textureStreamingRequests, i )

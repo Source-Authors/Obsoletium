@@ -3114,7 +3114,7 @@ void CMaterialSystem::AllocateStandardTextures()
 
 		// generate the linear->gamma conversion table texture.
 		{
-			const int LINEAR_TO_GAMMA_TABLE_WIDTH = 512;
+			constexpr int LINEAR_TO_GAMMA_TABLE_WIDTH = 512;
 			m_LinearToGammaTableTextureHandle = g_pShaderAPI->CreateTexture( LINEAR_TO_GAMMA_TABLE_WIDTH, 1, 1, gammalookupfmt, 1, 1, iGammaLookupFlags, "[LINEAR_TO_GAMMA_LOOKUP_SRGBON_TEXID]", TEXTURE_GROUP_PIXEL_SHADERS );
 			g_pShaderAPI->ModifyTexture( m_LinearToGammaTableTextureHandle );
 			g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );
@@ -3144,7 +3144,7 @@ void CMaterialSystem::AllocateStandardTextures()
 
 		// generate the identity conversion table texture.
 		{
-			const int LINEAR_TO_GAMMA_IDENTITY_TABLE_WIDTH = 256;
+			constexpr int LINEAR_TO_GAMMA_IDENTITY_TABLE_WIDTH = 256;
 			m_LinearToGammaIdentityTableTextureHandle = g_pShaderAPI->CreateTexture( LINEAR_TO_GAMMA_IDENTITY_TABLE_WIDTH, 1, 1, gammalookupfmt, 1, 1, tcFlags, "[LINEAR_TO_GAMMA_LOOKUP_SRGBOFF_TEXID]", TEXTURE_GROUP_PIXEL_SHADERS );
 			g_pShaderAPI->ModifyTexture( m_LinearToGammaIdentityTableTextureHandle );
 			g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );

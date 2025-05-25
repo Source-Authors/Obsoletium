@@ -28,7 +28,7 @@
 	ConVar r_texcomp_dump( "r_texcomp_dump", "0", FCVAR_NONE, "Whether we should dump the textures to disk or not. 1: Save all; 2: Save Final; 3: Save Final with name suitable for scripting; 4: Save Final and skip saving workshop icons." );
 #endif
 
-const int cMaxSelectors = 16;
+constexpr inline int cMaxSelectors = 16;
 
 // Ugh, this is annoying and matches TF's enums. That's lame. We should workaround this.
 enum { Neutral = 0, Red = 2, Blue = 3 };
@@ -332,7 +332,7 @@ void ParseRangeFromKV( KeyValues* _kv, void* _pDest )
 // ------------------------------------------------------------------------------------------------
 void ParseInverseRangeFromKV( KeyValues* _kv, void* _pDest )
 {
-	const float kSubstValue = 0.00001;
+	constexpr float kSubstValue = 0.00001;
 	ParseRangeFromKV( _kv, _pDest );
 	Range* realDest = ( Range* ) _pDest;
 
