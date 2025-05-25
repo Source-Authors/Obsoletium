@@ -350,45 +350,11 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const uint64 & i64_value)
 // Return the frequency of the processor in Hz.
 //
 
+extern int64 QueryCurrentCpuFrequency();
+
 double PME::GetCPUClockSpeedFast(void)
 {
-	int64	i64_perf_start, i64_perf_freq, i64_perf_end;
-	int64	i64_clock_start,i64_clock_end;
-	double d_loop_period, d_clock_freq;
-
-	//-----------------------------------------------------------------------
-	// Query the performance of the Windows high resolution timer.
-	//-----------------------------------------------------------------------
-	QueryPerformanceFrequency((LARGE_INTEGER*)&i64_perf_freq);
-
-	//-----------------------------------------------------------------------
-	// Query the current value of the Windows high resolution timer.
-	//-----------------------------------------------------------------------
-	QueryPerformanceCounter((LARGE_INTEGER*)&i64_perf_start);
-	i64_perf_end = 0;
-
-	unsigned aux;
-
-	//-----------------------------------------------------------------------
-	// Time of loop of 250000 windows cycles with RDTSC
-	//-----------------------------------------------------------------------
-	RDTSC(i64_clock_start);
-	while(i64_perf_end<i64_perf_start+250000)
-	{
-		QueryPerformanceCounter((LARGE_INTEGER*)&i64_perf_end);
-	}
-	RDTSCP(i64_clock_end, &aux);
-
-	//-----------------------------------------------------------------------
-	// Caclulate the frequency of the RDTSC timer and therefore calculate
-	// the frequency of the processor.
-	//-----------------------------------------------------------------------
-	i64_clock_end -= i64_clock_start;
-
-	d_loop_period = ((double)(i64_perf_freq)) / 250000.0;
-	d_clock_freq = ((double)(i64_clock_end & 0xffffffff))*d_loop_period;
-
-	return d_clock_freq;
+	return QueryCurrentCpuFrequency();
 }
 
 

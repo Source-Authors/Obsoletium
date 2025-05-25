@@ -483,7 +483,7 @@ CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 #endif
 
 #if defined(POSIX)
-// Move this declaration out of the CalculateClockSpeed() function because
+// Move this declaration out of the QueryCurrentCpuFrequency() function because
 // otherwise clang warns that it is non-obvious whether it is a variable
 // or a function declaration: [-Wvexing-parse]
 uint64 CalculateCPUFreq(); // from cpu_linux.cpp
@@ -491,46 +491,77 @@ uint64 CalculateCPUFreq(); // from cpu_linux.cpp
 
 }  // namespace
 
-// Measure the processor clock speed by sampling the cycle count, waiting
-// for some fraction of a second, then measuring the elapsed number of cycles.
-static int64 CalculateClockSpeed()
+#if defined(_WIN32)
+inline uint64_t QueryCpuCycleValue(uint32_t &cpu_id)
 {
-#if defined( _WIN32 )
+	// See https://www.felixcloutier.com/x86/rdtscp
+	// 
+	// The RDTSCP instruction is not a serializing instruction, but it does wait
+	// until all previous instructions have executed and all previous loads are
+	// globally visible.  But it does not wait for previous stores to be
+	// globally visible, and subsequent instructions may begin execution before
+	// the read operation is performed.  The following items may guide software
+	// seeking to order executions of RDTSCP:
+	// * If software requires RDTSCP to be executed only after all previous
+	// stores are globally visible, it can execute MFENCE immediately before
+	// RDTSCP.
+	// * If software requires RDTSCP to be executed prior to execution of any
+	// subsequent instruction (including any memory accesses), it can execute
+	// LFENCE immediately after RDTSCP.
+	_mm_mfence();
+	const uint64_t tsc{__rdtscp(&cpu_id)};
+	_mm_lfence();
+	return tsc;
+}
+#endif  // _WIN32
+
+// Measure the processor clock speed by sampling the cycle count, waiting for
+// some fraction of a second, then measuring the elapsed number of cycles.
+int64 QueryCurrentCpuFrequency()
+{
+#if defined(_WIN32)
 	LARGE_INTEGER waitTime, startCount, curCount;
-	CCycleCount start, end;
+	uint32_t cpu_id_start, cpu_id_end;
 
 	// Take 1/128 of a second for the measurement.
 	QueryPerformanceFrequency( &waitTime );
-	int scale = 7;
+	constexpr unsigned scale = 7;
 	waitTime.QuadPart >>= scale;
 
 	QueryPerformanceCounter( &startCount );
-	start.Sample();
+	const uint64_t startTicks = QueryCpuCycleValue(cpu_id_start);
 	do
 	{
 		QueryPerformanceCounter( &curCount );
 	}
 	while ( curCount.QuadPart - startCount.QuadPart < waitTime.QuadPart );
-	end.Sample();
+	const uint64_t endTicks = QueryCpuCycleValue(cpu_id_end);
 
-	int64 freq = (end.m_Int64 - start.m_Int64) << scale;
+	if (cpu_id_start != cpu_id_end)
+	{
+		// dimhotepus: Thread migrated to another CPU core, results are
+		// approximate.  Retry till thread executed on the same CPU core.
+		return QueryCurrentCpuFrequency();
+	}
+
+	int64_t freq = (endTicks - startTicks) << scale;
 	if ( freq == 0 )
 	{
 		// Steam was seeing Divide-by-zero crashes on some Windows machines due to
 		// WIN64_AMD_DUALCORE_TIMER_WORKAROUND that can cause rdtsc to effectively
-		// stop. Staging doesn't have the workaround but I'm checking in the fix
-		// anyway. Return a plausible speed and get on with our day.
+		// stop.  Staging doesn't have the workaround but I'm checking in the fix
+		// anyway.  Return a plausible speed and get on with our day.
 		freq = 2000000000;
 	}
 	return freq;
 #elif defined(POSIX)
-	int64 freq =(int64)CalculateCPUFreq();
-	if ( freq == 0 ) // couldn't calculate clock speed
+	int64 freq = (int64)CalculateCPUFreq();
+	if ( freq == 0 )  // Couldn't calculate clock speed.
 	{
-		Error( "Unable to determine CPU Frequency\n" );
+		Error( "Unable to determine CPU Frequency.\n" );
 	}
 	return freq;
-#endif
+#endif  // POSIX
 }
 
 const CPUInformation* GetCPUInformation()
@@ -545,7 +576,7 @@ const CPUInformation* GetCPUInformation()
 	memset(&pi, 0x0, sizeof(pi));
 
 	// Grab the processor frequency:
-	pi.m_Speed = CalculateClockSpeed();
+	pi.m_Speed = QueryCurrentCpuFrequency();
 
 	unsigned int eax, ebx, edx, ecx;
 	if (cpuid(1, eax, ebx, ecx, edx))

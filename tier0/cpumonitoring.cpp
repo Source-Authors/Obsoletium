@@ -48,6 +48,8 @@ constexpr unsigned kMinimumDelayMs = 300;
 
 constexpr int nMaxCPUs = 128;
 
+extern int64 QueryCurrentCpuFrequency();
+
 namespace {
 
 struct CPUMonitoringStarter {
@@ -56,37 +58,6 @@ struct CPUMonitoringStarter {
     if (kDelayMsWhenDisabled) SetCPUMonitoringInterval(0);
   }
 } s_CPUMonitoringStarter;
-
-int64 GetFrequency()
-{
-	LARGE_INTEGER waitTime, startCount, curCount;
-	CCycleCount start, end;
-
-	// Take 1/128 of a second for the measurement.
-	QueryPerformanceFrequency( &waitTime );
-	int scale = 7;
-	waitTime.QuadPart >>= scale;
-
-	QueryPerformanceCounter( &startCount );
-	start.Sample();
-	do
-	{
-		QueryPerformanceCounter( &curCount );
-	}
-	while ( curCount.QuadPart - startCount.QuadPart < waitTime.QuadPart );
-	end.Sample();
-
-	int64 freq = (end.m_Int64 - start.m_Int64) << scale;
-	if ( freq == 0 )
-	{
-		// Steam was seeing Divide-by-zero crashes on some Windows machines due to
-		// WIN64_AMD_DUALCORE_TIMER_WORKAROUND that can cause rdtsc to effectively
-		// stop. Staging doesn't have the workaround but I'm checking in the fix
-		// anyway. Return a plausible speed and get on with our day.
-		freq = 2000000000;
-	}
-	return freq;
-}
 
 // This semaphore is used to release all of the measurement threads simultaneously.
 HANDLE g_releaseSemaphore;
@@ -103,7 +74,7 @@ int64 GetSampledFrequency( unsigned iterations )
 	int64 maxFrequency = 0;
 	for ( unsigned i = 0; i < iterations; ++i )
 	{
-		int64 frequency = GetFrequency();
+		int64 frequency = QueryCurrentCpuFrequency();
 		if ( frequency > maxFrequency )
 			maxFrequency = frequency;
 	}
