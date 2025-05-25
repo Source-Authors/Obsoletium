@@ -74,7 +74,7 @@ int CWorkThread::Run()
 	CWorkThreadPool *pPool = m_pThreadPool;
 
 	int nIterations = 0;
-	const int nMaxFastIterations = 4;
+	constexpr int nMaxFastIterations = 4;
 	while ( !m_bExitThread )
 	{
 #if 0 // game vprof doesn't yet support TLS'd vprof instances, until new vprof code is ported
@@ -383,7 +383,7 @@ void CWorkThreadPool::StopWorkThreads()
 		}
 #endif
 
-		const uint k_uJoinTimeoutMillisec = 10000; // 10 seconds seems pretty arbitrary.
+		constexpr uint k_uJoinTimeoutMillisec = 10000; // 10 seconds seems pretty arbitrary.
 
 		CWorkThread *pWorkThread = m_WorkThreads[0];
 		bool bJoined = pWorkThread->Join( k_uJoinTimeoutMillisec );

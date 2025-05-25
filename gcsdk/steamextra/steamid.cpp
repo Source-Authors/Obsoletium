@@ -525,9 +525,9 @@ const char * CSteamID::Render() const
 	// longest length of returned string is k_cBufLen
 	//	[A:%u:%u:%u]
 	//	 %u == 10 * 3 + 6 == 36, plus terminator == 37
-	const int k_cBufLen = 37;
+	constexpr int k_cBufLen = 37;
 
-	const int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
+	constexpr int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
 	static char rgchBuf[k_cBufs][k_cBufLen];
 	static int nBuf = 0;
 	char * pchBuf = rgchBuf[nBuf];	// get pointer to current static buf
@@ -705,9 +705,9 @@ CGameID::CGameID( const char *pchGameID )
 const char * CGameID::Render() const
 {
 	// longest buffer is log10(2**64) == 20 + 1 == 21
-	const int k_cBufLen = 21;
+	constexpr inline int k_cBufLen = 21;
 
-	const int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
+	constexpr inline int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
 	static char rgchBuf[k_cBufs][k_cBufLen];
 	static int nBuf = 0;
 	char * pchBuf = rgchBuf[nBuf];	// get pointer to current static buf
