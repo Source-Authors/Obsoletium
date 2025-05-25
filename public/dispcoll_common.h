@@ -136,8 +136,8 @@ public:
 };
 
 // a power 4 displacement can have 341 nodes, pad out to 344 for 16-byte alignment
-const int MAX_DISP_AABB_NODES = 341;
-const int MAX_AABB_LIST = 344;
+constexpr inline int MAX_DISP_AABB_NODES = 341;
+constexpr inline int MAX_AABB_LIST = 344;
 
 struct rayleaflist_t
 {

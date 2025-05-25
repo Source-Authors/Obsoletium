@@ -99,7 +99,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 	// large between frames to simulate with a simple Euler integration
 	float deltaT = currenttime - data->lastUpdate;
 
-	const float thousandHZ = 0.001f;
+	constexpr float thousandHZ = 0.001f;
 	bool bMaxDeltaT = deltaT < thousandHZ;
 	bool bUseGoalMatrix = cl_jiggle_bone_framerate_cutoff.GetFloat() <= 0.0f || deltaT > ( 1.0f / cl_jiggle_bone_framerate_cutoff.GetFloat() );
 
@@ -279,7 +279,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 					if ( cl_jiggle_bone_debug_yaw_constraints.GetBool() )
 					{
 						float dT = 0.01f;
-						const float axisSize = 10.0f;
+						constexpr float axisSize = 10.0f;
 						if ( debugoverlay )
 						{
 							debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + axisSize * limitLeft, 0, 255, 255, true, dT );
@@ -377,7 +377,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 					if (cl_jiggle_bone_debug_pitch_constraints.GetBool())
 					{
 						float dT = 0.01f;
-						const float axisSize = 10.0f;
+						constexpr float axisSize = 10.0f;
 						if ( debugoverlay )
 						{
 							debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + axisSize * limitLeft, 0, 255, 255, true, dT );
@@ -606,8 +606,8 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 		data->boingTime += deltaT;
 
 		// if velocity changed a lot, we impacted and should *boing*
-		const float minSpeed = 5.0f; // 15.0f;
-		const float minReBoingTime = 0.5f;
+		constexpr float minSpeed = 5.0f; // 15.0f;
+		constexpr float minReBoingTime = 0.5f;
 		if ( ( speed > minSpeed || data->boingSpeed > minSpeed ) && data->boingTime > minReBoingTime )
 		{
 			if ( fabs( data->boingSpeed - speed ) > jiggleInfo->boingImpactSpeed || DotProduct( vel, data->boingVelDir ) < jiggleInfo->boingImpactAngle )
@@ -771,7 +771,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 	if ( cl_jiggle_bone_debug.GetBool() )
 	{
 		float dT = 0.01f;
-		const float axisSize = 5.0f;
+		constexpr float axisSize = 5.0f;
 		if ( debugoverlay )
 		{
 			debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + axisSize * goalLeft, 255, 0, 0, true, dT );
@@ -790,7 +790,7 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 						goalForward.x, goalForward.y, goalForward.z );
 		}
 
-		const float sz = 1.0f;
+		constexpr float sz = 1.0f;
 
 		if ( jiggleInfo->flags & ( JIGGLE_IS_FLEXIBLE | JIGGLE_IS_RIGID ) )
 		{

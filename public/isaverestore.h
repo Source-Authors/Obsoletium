@@ -52,8 +52,8 @@ struct SaveRestoreRecordHeader_t
 //
 //-----------------------------------------------------------------------------
 
-const int MAX_BLOCK_NAME_LEN = 31;
-const int SIZE_BLOCK_NAME_BUF = 31 + 1;
+constexpr inline int MAX_BLOCK_NAME_LEN = 31;
+constexpr inline int SIZE_BLOCK_NAME_BUF = 31 + 1;
 
 //-------------------------------------
 
