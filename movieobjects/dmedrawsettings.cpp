@@ -245,7 +245,7 @@ void CDmeDrawSettings::DrawDag( CDmeDag *pDag )
 		const float far = d / ( c + 1.0f );
 		*/
 
-		const float zBias = 0.00025;
+		constexpr float zBias = 0.00025;
 		m[ 2 ][ 2 ] += zBias;
 		m[ 2 ][ 3 ] += zBias;
 
