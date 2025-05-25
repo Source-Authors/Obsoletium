@@ -10,7 +10,7 @@
 using namespace vgui;
 
 // How often to re-sort the server list
-const float MINIMUM_SORT_TIME = 1.5f;
+constexpr inline float MINIMUM_SORT_TIME = 1.5f;
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor

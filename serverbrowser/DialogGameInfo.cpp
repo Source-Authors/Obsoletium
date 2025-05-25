@@ -9,7 +9,7 @@
 
 using namespace vgui;
 
-static const long RETRY_TIME = 10000;		// refresh server every 10 seconds
+static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 seconds
 
 extern "C"
 {
