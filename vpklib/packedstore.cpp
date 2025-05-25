@@ -1304,7 +1304,7 @@ void CPackedStore::DiscardChunkHashes( intp iChunkFileIndex )
 void CPackedStore::HashChunkFile( int iChunkFileIndex )
 {
 	AUTO_LOCK( m_Mutex );
-	static const int k_nFileFractionSize = 0x00100000; // 1 MiB
+	constexpr int k_nFileFractionSize = 0x00100000; // 1 MiB
 
 	// Purge any hashes we already have for this chunk.
 	DiscardChunkHashes( iChunkFileIndex );

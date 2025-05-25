@@ -254,9 +254,9 @@ public:
 
 
 	// cache 64 MiB total
-	static const int k_nCacheBuffersToKeep = 8;
-	static const int k_cubCacheBufferSize = 0x00100000; // 1MiB
-	static const int k_nCacheBufferMask = 0x7FF00000;
+	static constexpr inline int k_nCacheBuffersToKeep = 8;
+	static constexpr inline int k_cubCacheBufferSize = 0x00100000; // 1MiB
+	static constexpr inline int k_nCacheBufferMask = 0x7FF00000;
 
 	CThreadRWLock m_rwlock;
 	CUtlRBTree<CachedVPKRead_t> m_treeCachedVPKRead; // all the reads we have done
