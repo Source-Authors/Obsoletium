@@ -62,7 +62,7 @@ ConVar vr_debug_nodistortion ( "vr_debug_nodistortion", "0" );
 ConVar vr_debug_nochromatic ( "vr_debug_nochromatic", "0" );
 
 // Resolution of the undistort map.
-static const int distortionTextureSize = 128;
+static constexpr inline int distortionTextureSize = 128;
 
 
 void CC_vr_refresh_distortion_texture( const CCommand& )
