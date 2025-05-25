@@ -21,7 +21,7 @@ public:
 	virtual void EnableCollisions( int index0, int index1 ) = 0;
 	virtual void DisableCollisions( int index0, int index1 ) = 0;
 
-	virtual [[nodiscard]] bool ShouldCollide( int index0, int index1 ) = 0;
+	[[nodiscard]] virtual bool ShouldCollide( int index0, int index1 ) = 0;
 };
 
 #endif

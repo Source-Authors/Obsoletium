@@ -18,13 +18,13 @@ public:
 	virtual ~IPhysicsObjectPairHash() {}
 	virtual void AddObjectPair( void *pObject0, void *pObject1 ) = 0;
 	virtual void RemoveObjectPair( void *pObject0, void *pObject1 ) = 0;
-	virtual [[nodiscard]] bool IsObjectPairInHash( void *pObject0, void *pObject1 ) = 0;
+	[[nodiscard]] virtual bool IsObjectPairInHash( void *pObject0, void *pObject1 ) = 0;
 	virtual void RemoveAllPairsForObject( void *pObject0 ) = 0;
-	virtual [[nodiscard]] bool IsObjectInHash( void *pObject0 ) = 0;
+	[[nodiscard]] virtual bool IsObjectInHash( void *pObject0 ) = 0;
 
 	// Used to iterate over all pairs an object is part of
-	virtual [[nodiscard]] int GetPairCountForObject( void *pObject0 ) = 0;
-	virtual [[nodiscard]] int GetPairListForObject( void *pObject0, int nMaxCount, void **ppObjectList ) = 0;
+	[[nodiscard]] virtual int GetPairCountForObject( void *pObject0 ) = 0;
+	[[nodiscard]] virtual int GetPairListForObject( void *pObject0, int nMaxCount, void **ppObjectList ) = 0;
 };
 
 

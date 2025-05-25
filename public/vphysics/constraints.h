@@ -314,17 +314,17 @@ public:
 	virtual void *GetGameData( void ) const = 0;
 
 	// Get the parent/referenced object
-	virtual [[nodiscard]] IPhysicsObject *GetReferenceObject( void ) const = 0;
+	[[nodiscard]] virtual IPhysicsObject *GetReferenceObject( void ) const = 0;
 
 	// Get the attached object
-	virtual [[nodiscard]] IPhysicsObject *GetAttachedObject( void ) const = 0;
+	[[nodiscard]] virtual IPhysicsObject *GetAttachedObject( void ) const = 0;
 
 	virtual void			SetLinearMotor( float speed, float maxLinearImpulse ) = 0;
 	virtual void			SetAngularMotor( float rotSpeed, float maxAngularImpulse ) = 0;
 
 	virtual void			UpdateRagdollTransforms( const matrix3x4_t &constraintToReference, const matrix3x4_t &constraintToAttached ) = 0;
-	virtual [[nodiscard]] bool			GetConstraintTransform( matrix3x4_t *pConstraintToReference, matrix3x4_t *pConstraintToAttached ) const = 0;
-	virtual [[nodiscard]] bool			GetConstraintParams( constraint_breakableparams_t *pParams ) const = 0;
+	[[nodiscard]] virtual bool			GetConstraintTransform( matrix3x4_t *pConstraintToReference, matrix3x4_t *pConstraintToAttached ) const = 0;
+	[[nodiscard]] virtual bool			GetConstraintParams( constraint_breakableparams_t *pParams ) const = 0;
 
 	virtual void			OutputDebugInfo() = 0;
 };
@@ -335,7 +335,7 @@ abstract_class IPhysicsConstraintGroup
 public:
 	virtual ~IPhysicsConstraintGroup( void ) {}
 	virtual void Activate() = 0;
-	virtual [[nodiscard]] bool IsInErrorState() = 0;
+	[[nodiscard]] virtual bool IsInErrorState() = 0;
 	virtual void ClearErrorState() = 0;
 	virtual void GetErrorParams( constraint_groupparams_t *pParams ) = 0;
 	virtual void SetErrorParams( const constraint_groupparams_t &params ) = 0;
