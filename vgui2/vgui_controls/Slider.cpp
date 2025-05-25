@@ -27,7 +27,7 @@ using namespace vgui;
 
 DECLARE_BUILD_FACTORY( Slider );
 
-static const float NOB_SIZE = 8.0f;
+static constexpr inline float NOB_SIZE = 8.0f;
 
 //-----------------------------------------------------------------------------
 // Purpose: Create a slider bar with ticks underneath it

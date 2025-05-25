@@ -32,9 +32,9 @@
 
 using namespace vgui;
 
-static const int DEFAULT_SNAP_RANGE = 10; // number of pixels distance before the frame will snap to an edge
-static const int CAPTION_TITLE_BORDER = 7;
-static const int CAPTION_TITLE_BORDER_SMALL = 0;
+static constexpr int DEFAULT_SNAP_RANGE = 10; // number of pixels distance before the frame will snap to an edge
+static constexpr int CAPTION_TITLE_BORDER = 7;
+static constexpr int CAPTION_TITLE_BORDER_SMALL = 0;
 
 namespace
 {
@@ -1168,7 +1168,7 @@ void Frame::OnFrameFocusChanged(bool bHasFocus)
 
 int Frame::GetDraggerSize()
 {
-	const int DRAGGER_SIZE = 5;
+	constexpr int DRAGGER_SIZE = 5;
 	if ( m_bSmallCaption )
 	{
 		return 3;
@@ -1179,7 +1179,7 @@ int Frame::GetDraggerSize()
 
 int Frame::GetCornerSize()
 {
-	const int CORNER_SIZE = 8;
+	constexpr int CORNER_SIZE = 8;
 	if ( m_bSmallCaption )
 	{
 		return 6;
@@ -1190,7 +1190,7 @@ int Frame::GetCornerSize()
 
 int Frame::GetBottomRightSize()
 {
-	const int BOTTOMRIGHTSIZE = 18;
+	constexpr int BOTTOMRIGHTSIZE = 18;
 	if ( m_bSmallCaption )
 	{
 		return 12;
@@ -1201,7 +1201,7 @@ int Frame::GetBottomRightSize()
 
 int Frame::GetCaptionHeight()
 {
-	const int CAPTIONHEIGHT = 23;
+	constexpr int CAPTIONHEIGHT = 23;
 	if ( m_bSmallCaption )
 	{
 		return 12;

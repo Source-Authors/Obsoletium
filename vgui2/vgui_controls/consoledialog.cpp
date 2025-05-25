@@ -679,7 +679,7 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	{
 		m_pCompletionList->SetVisible(true);
 		m_pCompletionList->DeleteAllItems();
-		const int MAX_MENU_ITEMS = 10;
+		constexpr int MAX_MENU_ITEMS = 10;
 
 		// add the first ten items to the list
 		for (int i = 0; i < m_CompletionList.Count() && i < MAX_MENU_ITEMS; i++)
@@ -828,12 +828,12 @@ void CConsolePanel::PerformLayout()
 
 	if ( !m_bStatusVersion )
 	{
-		const int inset = 8;
-		const int entryHeight = 24;
-		const int topHeight = 4;
-		const int entryInset = 4;
-		const int submitWide = 64;
-		const int submitInset = 7; // x inset to pull the submit button away from the frame grab
+		constexpr int inset = 8;
+		constexpr int entryHeight = 24;
+		constexpr int topHeight = 4;
+		constexpr int entryInset = 4;
+		constexpr int submitWide = 64;
+		constexpr int submitInset = 7; // x inset to pull the submit button away from the frame grab
 
 		m_pHistory->SetPos(inset, inset + topHeight); 
 		m_pHistory->SetSize(wide - (inset * 2), tall - (entryInset * 2 + inset * 2 + topHeight + entryHeight));
@@ -848,7 +848,7 @@ void CConsolePanel::PerformLayout()
 	}
 	else
 	{
-		const int inset = 2;
+		constexpr int inset = 2;
 
 		int entryWidth = wide / 2;
 		if ( wide > 400 )

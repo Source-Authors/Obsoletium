@@ -984,9 +984,9 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 	case INTERPOLATOR_BOUNCE:
 	{
 		// fall from startValue to endValue, bouncing a few times and settling out at endValue
-		const float hit1 = 0.33f;
-		const float hit2 = 0.67f;
-		const float hit3 = 1.0f;
+		constexpr float hit1 = 0.33f;
+		constexpr float hit2 = 0.67f;
+		constexpr float hit3 = 1.0f;
 
 		if ( pos < hit1 )
 		{
