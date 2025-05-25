@@ -690,7 +690,7 @@ void UTIL_ClipTraceToPlayers( const Vector& vecAbsStart, const Vector& vecAbsEnd
 	trace_t playerTrace;
 	Ray_t ray;
 	float smallestFraction = tr->fraction;
-	const float maxRange = 60.0f;
+	constexpr float maxRange = 60.0f;
 
 	ray.Init( vecAbsStart, vecAbsEnd );
 

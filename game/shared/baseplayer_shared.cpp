@@ -1096,10 +1096,10 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 	// try the hit entity if there is one, or the ground entity if there isn't.
 	CBaseEntity *pNearest = NULL;
 
-	const int NUM_TANGENTS = 8;
+	constexpr int NUM_TANGENTS = 8;
 	// trace a box at successive angles down
 	//							forward, 45 deg, 30 deg, 20 deg, 15 deg, 10 deg, -10, -15
-	const float tangents[NUM_TANGENTS] = { 0, 1, 0.57735026919f, 0.3639702342f, 0.267949192431f, 0.1763269807f, -0.1763269807f, -0.267949192431f };
+	constexpr float tangents[NUM_TANGENTS] = { 0, 1, 0.57735026919f, 0.3639702342f, 0.267949192431f, 0.1763269807f, -0.1763269807f, -0.267949192431f };
 	for ( int i = 0; i < NUM_TANGENTS; i++ )
 	{
 		if ( i == 0 )
@@ -1465,7 +1465,7 @@ void CBasePlayer::SmoothViewOnStairs( Vector& eyeOrigin )
 
 		m_flOldPlayerZ += steptime * 150 * dir;
 
-		const float stepSize = 18.0f;
+		constexpr float stepSize = 18.0f;
 
 		if ( dir > 0 )
 		{

@@ -1061,7 +1061,7 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 	if ( sv_nostats.GetBool() )
 	{
 		// prevent message spam
-		const float fNotificationCooldown = 60.0f;
+		constexpr float fNotificationCooldown = 60.0f;
 		static float fNextNotification = 0.0f;
 		if (gpGlobals->curtime >= fNextNotification)
 		{
