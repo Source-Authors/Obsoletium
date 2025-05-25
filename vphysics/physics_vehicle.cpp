@@ -1286,8 +1286,8 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
 	{
 		m_vehicleFlags &= ~FVEHICLE_THROTTLE_STOPPED;
 		// calculate the force that propels the car
-		const float watt_per_hp = 745.0f;
-		const float seconds_per_minute = 60.0f;
+		constexpr float watt_per_hp = 745.0f;
+		constexpr float seconds_per_minute = 60.0f;
 
 		float wheel_force_by_throttle = throttle * 
 			m_vehicleData.engine.horsepower * (watt_per_hp * seconds_per_minute) * 

@@ -382,7 +382,7 @@ void CPlayerController::Jump()
 #endif
 }
 
-const int MAX_LIST_NORMALS = 8;
+constexpr int MAX_LIST_NORMALS = 8;
 class CNormalList
 {
 public:
