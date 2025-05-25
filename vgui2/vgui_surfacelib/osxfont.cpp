@@ -285,7 +285,7 @@ bool COSXFont::Create( const char *windowsFontName, int tall, int weight, int bl
 	m_pContextMemory = new char[ (int)bytesPerRow * m_iHeight ];
 	Q_memset( m_pContextMemory, 0x0, (int)( bytesPerRow * m_iHeight ) );
 
-	const size_t bitsPerComponent = 8;
+	constexpr size_t bitsPerComponent = 8;
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 	m_ContextRef = CGBitmapContextCreate(
 						  m_pContextMemory,
