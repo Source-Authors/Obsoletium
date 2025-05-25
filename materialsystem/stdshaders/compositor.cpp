@@ -15,8 +15,8 @@
 
 struct CompositorInfo_t
 {
-	static const int cTextureCount = 4;
-	static const int cSelectorCount = 16;
+	static constexpr inline int cTextureCount = 4;
+	static constexpr inline int cSelectorCount = 16;
 
 	CompositorInfo_t( ) { memset( this, -1, sizeof( *this ) ); }
 

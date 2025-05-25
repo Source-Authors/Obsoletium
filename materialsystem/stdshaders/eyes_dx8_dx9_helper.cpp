@@ -445,7 +445,7 @@ static void DrawUsingVertexShader( bool bDX9, CBaseVSShader *pShader, IMaterialV
 
 			// Get luminance of ambient cube and saturate it
 			float fGlintDamping = max(0.0f, min( pShaderAPI->GetAmbientLightCubeLuminance(), 1.0f ) );
-			const float fDimGlint = 0.01f;
+			constexpr float fDimGlint = 0.01f;
 
 			// Remap so that glint damping smooth steps to zero for low luminances
 			if ( fGlintDamping > fDimGlint )
