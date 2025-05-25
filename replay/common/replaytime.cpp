@@ -225,8 +225,8 @@ void CReplayTime::Write( KeyValues *pOut )
 /*static*/ const char *CReplayTime::FormatTimeString( int nSecs )
 {
 	static int nWhichStr = 0;
-	static const int nNumStrings = 2;
-	static const int nStrLen = 32;
+	static constexpr int nNumStrings = 2;
+	static constexpr int nStrLen = 32;
 	static char s_szResult[nNumStrings][nStrLen];
 
 	char *pResult = s_szResult[ nWhichStr ];
@@ -253,8 +253,8 @@ void CReplayTime::Write( KeyValues *pOut )
 /*static*/ const char *CReplayTime::FormatPreciseTimeString( float flSecs )
 {
 	static int nWhichStr = 0;
-	static const int nNumStrings = 2;
-	static const int nStrLen = 32;
+	static constexpr int nNumStrings = 2;
+	static constexpr int nStrLen = 32;
 	static char s_szResult[nNumStrings][nStrLen];
 
 	char *pResult = s_szResult[ nWhichStr ];
