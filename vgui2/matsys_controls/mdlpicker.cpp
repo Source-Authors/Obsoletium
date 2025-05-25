@@ -966,7 +966,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	// which essentially just point-samples the image.
 	//
 	CUtlMemory<unsigned char> smallTGAImageData;
-	const int kSmallSize = 128;
+	constexpr int kSmallSize = 128;
 	smallTGAImageData.EnsureCapacity(kSmallSize*kSmallSize*4);
 	ImageLoader::ResampleInfo_t resampleInfo;
 	resampleInfo.m_nSrcWidth = width;

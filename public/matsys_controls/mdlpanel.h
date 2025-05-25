@@ -119,7 +119,7 @@ protected:
 	MDLData_t				m_RootMDL;
 	CUtlVector<MDLData_t>	m_aMergeMDLs;
 
-	static const int MAX_SEQUENCE_LAYERS = 8;
+	static constexpr inline int MAX_SEQUENCE_LAYERS = 8;
 	int					m_nNumSequenceLayers;
 	MDLSquenceLayer_t	m_SequenceLayers[ MAX_SEQUENCE_LAYERS ];
 
