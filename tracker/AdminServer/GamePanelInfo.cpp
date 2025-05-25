@@ -41,9 +41,9 @@
 
 using namespace vgui;
 
-static const long RETRY_TIME = 10000;		// refresh server every 10 seconds
-static const long MAP_CHANGE_TIME = 20000;		// refresh 20 seconds after a map change 
-static const long RESTART_TIME = 60000;		// refresh 60 seconds after a "_restart"
+static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 seconds
+static constexpr inline long MAP_CHANGE_TIME = 20000;		// refresh 20 seconds after a map change 
+static constexpr inline long RESTART_TIME = 60000;		// refresh 60 seconds after a "_restart"
 
 #include "IManageServer.h"
 
