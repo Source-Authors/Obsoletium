@@ -17,7 +17,7 @@
 
 using namespace vgui;
 
-static const int MAX_CVAR_TEXT = 64;
+static constexpr inline int MAX_CVAR_TEXT = 64;
 
 CCvarTextEntry::CCvarTextEntry( Panel *parent, const char *panelName, char const *cvarname )
  : TextEntry( parent, panelName)

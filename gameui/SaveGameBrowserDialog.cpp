@@ -326,8 +326,8 @@ void CSaveGameBrowserDialog::LayoutPanels( void )
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::AnimateDialogStart( void )
 {
-	const float flAnimInTime = 0.5f;
-	const float flOffset = 0.1f;
+	constexpr float flAnimInTime = 0.5f;
+	constexpr float flOffset = 0.1f;
 
 	for ( int i = 0; i < NUM_SLOTS; i++ )
 	{
@@ -532,7 +532,7 @@ void CSaveGameBrowserDialog::FinishInsert( void )
 {
 	CGameSavePanel *panel = m_SavePanels[ m_nAddedPanel ];
 
-	const float flScrollSpeed = 0.75f;
+	constexpr float flScrollSpeed = 0.75f;
 
 	// Run the actual movement
 	GetAnimationController()->RunAnimationCommand( panel, "xpos",  m_PanelXPos[SLOT_RIGHT],  0, flScrollSpeed, vgui::AnimationController::INTERPOLATOR_SIMPLESPLINE );
@@ -599,7 +599,7 @@ void CSaveGameBrowserDialog::AnimateInsertNewPanel( const SaveGameDescription_t 
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::FinishOverwriteFadeDown( void )
 {
-	const float flFadeInTime = 0.25f;
+	constexpr float flFadeInTime = 0.25f;
 
 	// Fade the right panel away
 	CGameSavePanel *pActivePanel = GetActivePanel();

@@ -24,7 +24,7 @@ class CBaseDialog;
 
 struct sessionProperty_t
 {
-	static const int MAX_KEY_LEN = 64;
+	static constexpr inline int MAX_KEY_LEN = 64;
 	byte		nType;
 	char		szID[MAX_KEY_LEN];
 	char		szValue[MAX_KEY_LEN];

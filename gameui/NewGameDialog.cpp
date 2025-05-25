@@ -366,7 +366,7 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	}
 
 	// parse out the chapters off disk
-	static const int MAX_CHAPTERS = 32;
+	constexpr int MAX_CHAPTERS = 32;
 	chapter_t chapters[MAX_CHAPTERS];
 
 	char szFullFileName[MAX_PATH];

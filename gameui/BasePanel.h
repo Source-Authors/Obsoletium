@@ -51,7 +51,7 @@ public:
 	void PositionDialog( vgui::PHandle dlg, int wide, int tall );
 
 private:
-	static const int MAX_MESSAGE_DIALOGS = 3;
+	static constexpr inline int MAX_MESSAGE_DIALOGS = 3;
 	vgui::DHANDLE< CMessageDialog > m_hMessageDialogs[MAX_MESSAGE_DIALOGS];
 	int							m_iDialogStackTop;
 };
