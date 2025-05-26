@@ -2452,7 +2452,7 @@ void CCoreDispInfo::DispUVToSurf_TriTLToBR_2( const Vector &vecIntersectPoint,
 void CCoreDispInfo::DispUVToSurf_TriTLToBR( Vector &vecPoint, Vector *pNormal, float *pAlpha, 
 											float flU, float flV, const Vector &vecIntersectPoint )
 {
-	const float TRIEDGE_EPSILON = 0.00001f;
+	constexpr float TRIEDGE_EPSILON = 0.00001f;
 
 	int nWidth = GetWidth();
 	int nHeight = GetHeight();
