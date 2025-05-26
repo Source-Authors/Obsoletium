@@ -268,13 +268,16 @@ void CFPSPanel::Paint()
 	{
 		if ( m_lastRealTime != -1.0f )
 		{
+			// dimhotepus: TF2 backport, do not show path to map, just show map name.
+			const char *pszMapName = V_GetFileName( engine->GetLevelName() );
+
 			i++;
 
 			int nFps = -1;
 			unsigned char ucColor[3];
 			if ( cl_showfps.GetInt() == 2 )
 			{
-				constexpr float NewWeight  = 0.1f;
+				constexpr float NewWeight = 0.1f;
 				float NewFrame = 1.0f / realFrameTime;
 
 				if ( m_AverageFPS < 0.0f )
@@ -296,14 +299,15 @@ void CFPSPanel::Paint()
 				nFps = static_cast<int>( m_AverageFPS );
 				float frameMS = realFrameTime * 1000.0f;
 				GetFPSColor( nFps, ucColor );
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps (%3i, %3i) %.1f ms on %s", nFps, m_low, m_high, frameMS, engine->GetLevelName() );
+				// dimhotepus: Use 4 width for frame time (2 digits, dot and 1 digit) to draw FPS on same place.
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps (%3i, %3i) %4.1f ms on %s", nFps, m_low, m_high, frameMS, pszMapName );
 			} 
 			else
 			{
 				m_AverageFPS = -1;
 				nFps = static_cast<int>( 1.0f / realFrameTime );
 				GetFPSColor( nFps, ucColor );
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps on %s", nFps, engine->GetLevelName() );
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps on %s", nFps, pszMapName );
 			}
 
 			const CPUFrequencyResults frequency = GetCPUFrequencyResults();
