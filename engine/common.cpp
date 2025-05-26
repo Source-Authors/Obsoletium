@@ -92,22 +92,13 @@ COM_ExplainDisconnection
 */
 void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
-	if ( IsX360() )
-	{
-		g_pMatchmaking->SessionNotification( SESSION_NOTIFY_LOST_SERVER );
-	}
-	else
-	{
-		va_list		argptr;
-		char		string[1024];
+	va_list		argptr;
 
-		va_start (argptr, fmt);
-		V_vsprintf_safe(string, fmt,argptr);
-		va_end (argptr);
+	va_start (argptr, fmt);
+	V_vsprintf_safe(gszDisconnectReason, fmt, argptr);
+	va_end (argptr);
 
-		Q_strncpy( gszDisconnectReason, string, 256 );
-		gfExtendedError = true;
-	}
+	gfExtendedError = true;
 
 	if ( bPrint )
 	{
@@ -117,7 +108,7 @@ void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt
 			const wchar_t *wpchReason = g_pVGuiLocalize ? g_pVGuiLocalize->Find(gszDisconnectReason) : NULL;
 			if ( wpchReason )
 			{
-				wcsncpy(formatStr, wpchReason, sizeof( formatStr ) / sizeof( wchar_t ) );
+				V_wcscpy_safe( formatStr, wpchReason );
 
 				char conStr[256];
 				g_pVGuiLocalize->ConvertUnicodeToANSI(formatStr, conStr);

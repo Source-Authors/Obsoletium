@@ -1196,7 +1196,7 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 		if ( m_nSolidType != SOLID_BBOX  )
 		{
 			char szModel[MAX_PATH];
-			Q_strncpy( szModel, m_pModel ? modelloader->GetName( m_pModel ) : "unknown model", sizeof( szModel ) );
+			V_strcpy_safe( szModel, m_pModel ? modelloader->GetName( m_pModel ) : "unknown model" );
 			Warning( "Map Error:  Static prop with bogus solid type %d! (%s)\n", m_nSolidType, szModel );
 			m_nSolidType = SOLID_NONE;
 			return;

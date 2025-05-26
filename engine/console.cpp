@@ -108,7 +108,7 @@ static const char *GetTimestampString( void )
 	static char string[128];
 	tm today;
 	VCRHook_LocalTime( &today );
-	Q_snprintf( string, sizeof( string ), "%02i/%02i/%04i - %02i:%02i:%02i",
+	V_sprintf_safe( string, "%02i/%02i/%04i - %02i:%02i:%02i",
 		today.tm_mon+1, today.tm_mday, 1900 + today.tm_year,
 		today.tm_hour, today.tm_min, today.tm_sec );
 	return string;
@@ -629,7 +629,7 @@ bool HandleRedirectAndDebugLog( const char *msg )
 
 void Con_Print( const char *msg )
 {
-	if ( !msg || !msg[0] )
+	if ( Q_isempty( msg ) )
 		return;
 
 	if ( !HandleRedirectAndDebugLog( msg ) )
@@ -875,11 +875,10 @@ void CConPanel::Con_NPrintf( int idx, const char *msg )
 		return;
 
 #ifdef WIN32
-    _snwprintf( da_notify[idx].szNotify, sizeof( da_notify[idx].szNotify ) / sizeof( wchar_t ) - 1, L"%S", msg );
+    V_swprintf_safe( da_notify[idx].szNotify, L"%S", msg );
 #else
-    _snwprintf( da_notify[idx].szNotify, sizeof( da_notify[idx].szNotify ) / sizeof( wchar_t ) - 1, L"%s", msg );
+    V_swprintf_safe( da_notify[idx].szNotify, L"%s", msg );
 #endif
-	da_notify[idx].szNotify[ sizeof( da_notify[idx].szNotify ) / sizeof( wchar_t ) - 1 ] = L'\0';
 
 	// Reset values
 	da_notify[idx].expire = realtime + DBG_NOTIFY_TIMEOUT;
@@ -897,11 +896,10 @@ void CConPanel::Con_NXPrintf( const struct con_nprint_s *info, const char *msg )
 		return;
 
 #ifdef WIN32
-	_snwprintf( da_notify[info->index].szNotify, sizeof( da_notify[info->index].szNotify ) / sizeof( wchar_t ) - 1, L"%S", msg );
+	V_swprintf_safe( da_notify[info->index].szNotify, L"%S", msg );
 #else
-	_snwprintf( da_notify[info->index].szNotify, sizeof( da_notify[info->index].szNotify ) / sizeof( wchar_t ) - 1, L"%s", msg );
+	V_swprintf_safe( da_notify[info->index].szNotify, L"%s", msg );
 #endif
-	da_notify[info->index].szNotify[ sizeof( da_notify[info->index].szNotify ) / sizeof( wchar_t ) - 1 ] = L'\0';
 
 	// Reset values
 	if ( info->time_to_live == -1 )
@@ -948,7 +946,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 	}
 
 	// Nothing left
-	if ( !msg[0] )
+	if ( Q_isempty( msg ) )
 		return;
 
 	// Protect against background modifications to m_NotifyText.
@@ -962,7 +960,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 		slot = m_NotifyText.AddToTail();
 		current = &m_NotifyText[ slot ];
 		current->clr = clr;
-		current->text[ 0 ] = 0;
+		current->text[ 0 ] = L'\0';
 		current->liferemaining = con_notifytime.GetFloat();;
 	}
 	else
@@ -1234,7 +1232,7 @@ int CConPanel::ProcessNotifyLines( int &left, int &top, int &right, int &bottom,
 					da_notify[i].szNotify );
 			}
 
-			if ( da_notify[i].szNotify[0] )
+			if ( !Q_isempty( notify.szNotify ) )
 			{
 				// Extend the bounds.
 				left = min( left, x );
