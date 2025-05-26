@@ -508,8 +508,11 @@ inline uint64_t QueryCpuCycleValue(uint32_t &cpu_id)
 	// * If software requires RDTSCP to be executed prior to execution of any
 	// subsequent instruction (including any memory accesses), it can execute
 	// LFENCE immediately after RDTSCP.
-	_mm_mfence();
+	//
+	// We do not mfence before as for timing only ordering matters, not finished
+	// memory stores are ok. 
 	const uint64_t tsc{__rdtscp(&cpu_id)};
+	// Ensure no reordering aka acquire barrier.
 	_mm_lfence();
 	return tsc;
 }
