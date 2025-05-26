@@ -269,10 +269,9 @@ double MIX_GetMaxRate( double rate, int sampleCount )
 
 	// make sure sampleCount is never greater than paintbuffer samples
 	// (this should have been set up in MIX_PaintChannels)
-
 	Assert (sampleCount <= PAINTBUFFER_SIZE);
 
-	return fpmin( rate, rate_max );
+	return min( rate, rate_max );
 }
 
 
@@ -282,15 +281,6 @@ double MIX_GetMaxRate( double rate, int sampleCount )
 // endtime - total number of 32 bit stereo samples currently mixed in paintbuffer
 void S_TransferStereo16( void *pOutput, const portable_samplepair_t *pfront, int lpaintedtime, int endtime )
 {
-	int		lpos;
-	
-	if ( IsX360() )
-	{
-		// not the right path for 360
-		Assert( 0 );
-		return;
-	}
-
 	Assert( pOutput );
 
 	snd_vol = S_GetMasterVolume()*256;
@@ -303,13 +293,13 @@ void S_TransferStereo16( void *pOutput, const portable_samplepair_t *pfront, int
 	bool bShouldPlaySound = !cl_movieinfo.IsRecording() && !IsReplayRendering();
 
 	while ( lpaintedtime < endtime )
-	{														
+	{
 		// pbuf can hold 16384, 16 bit L/R samplepairs.
 		// lpaintedtime - where to start painting into dma buffer. 
 		// (modulo size of dma buffer for current position).
 		// handle recirculating buffer issues
-		// lpos - samplepair index into dma buffer. First samplepair from paintbuffer to be xfered here.															
-		lpos = lpaintedtime & sampleMask;
+		// lpos - samplepair index into dma buffer. First samplepair from paintbuffer to be xfered here.	
+		int lpos = lpaintedtime & sampleMask;
 
 		// snd_out is L/R sample index into dma buffer.  First L sample from paintbuffer goes here.
 		snd_out = (short *)pOutput + (lpos<<1);
@@ -343,61 +333,47 @@ void S_TransferStereo16( void *pOutput, const portable_samplepair_t *pfront, int
 	}
 }
 
-// Transfer contents of main paintbuffer pfront out to 
-// device.  Perform volume multiply on each sample.
+// Transfer contents of main paintbuffer pfront out to device.  Perform volume multiply on each sample.
 void S_TransferPaintBuffer(void *pOutput, const portable_samplepair_t *pfront, int lpaintedtime, int endtime)
 {
-	int 		out_idx;		// mono sample index
-	int 		count;			// number of mono samples to output
-	int 		out_mask;
-	int 		step;
-	int			val;
-	int			nSoundVol;
-	const int 	*p;
- 
-	if ( IsX360() )
-	{
-		// not the right path for 360
-		Assert( 0 );
-		return;
-	}
-
 	Assert( pOutput );
 
-	p = (const int *) pfront;
+	const int *p = (const int *)pfront;
+	const int device_channels{g_AudioDevice->DeviceChannels()};
 
-	count = ((endtime - lpaintedtime) * g_AudioDevice->DeviceChannels()); 
+	// number of mono samples to output
+	int count = (endtime - lpaintedtime) * device_channels;
+	const int out_mask = g_AudioDevice->DeviceSampleCount() - 1;
+	int out_idx = (lpaintedtime * device_channels) & out_mask; // mono sample index
 	
-	out_mask = g_AudioDevice->DeviceSampleCount() - 1; 
+	const int step = 3 - device_channels;	// mono output buffer - step 2, stereo - step 1
+	const int nSoundVol = S_GetMasterVolume() * 256;
 
-	// 44k: remove old 22k sound support << HISPEED_DMA
-	// out_idx = ((paintedtime << HISPEED_DMA) * g_AudioDevice->DeviceChannels()) & out_mask;
+	const int device_sample_bits{g_AudioDevice->DeviceSampleBits()};
 
-	out_idx = (lpaintedtime * g_AudioDevice->DeviceChannels()) & out_mask;
-	
-	step = 3 - g_AudioDevice->DeviceChannels();	// mono output buffer - step 2, stereo - step 1
-	nSoundVol = S_GetMasterVolume()*256;
-
-	if (g_AudioDevice->DeviceSampleBits() == 16)
+	if (device_sample_bits == 16)
 	{
 		short *out = (short *) pOutput;
 		while (count--)
 		{
-			val = (*p * nSoundVol) >> 8;
-			p+= step;
+			int val = (*p * nSoundVol) >> 8;
+			p += step;
 			val = CLIP(val);
 			
 			out[out_idx] = val;
 			out_idx = (out_idx + 1) & out_mask;
 		}
+
+		return;
 	}
-	else if (g_AudioDevice->DeviceSampleBits() == 8)
+
+	if (device_sample_bits == 8)
 	{
 		unsigned char *out = (unsigned char *) pOutput;
 		while (count--)
 		{
-			val = (*p * nSoundVol) >> 8;
-			p+= step;
+			int val = (*p * nSoundVol) >> 8;
+			p += step;
 			val = CLIP(val);
 			
 			out[out_idx] = (val>>8) + 128;
