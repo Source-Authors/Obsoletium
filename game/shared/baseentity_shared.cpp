@@ -408,7 +408,8 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		}
 
 		// Do this so inherited classes looking for 'angles' don't have to bother with 'angle'
-		return KeyValue( szKeyName, szBuf );
+		// dimhotepus: Do not crash with stack overflow on Entity:KeyValue("angle", 0).
+		return KeyValue( "angles", szBuf );
 	}
 
 	// NOTE: Have to do these separate because they set two values instead of one
