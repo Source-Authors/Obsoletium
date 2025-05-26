@@ -357,12 +357,6 @@ void CAudioDeviceSDLAudio::AudioCallback(Uint8 *stream, int len)
 			const uint8_t *buf = m_pBuffer + m_readPos;
 			debugsdl("SDLAUDIO: Writing %d bytes...\n", writeLen);
 
-			#if 0
-			static FILE *io = NULL;
-			if (io == NULL) io = fopen("dumpplayback.raw", "wb");
-			if (io != NULL) { fwrite(buf, writeLen, 1, io); fflush(io); }
-			#endif
-
 			memcpy(stream, buf, writeLen);
 			stream += writeLen;
 			len -= writeLen;
