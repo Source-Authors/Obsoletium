@@ -7,7 +7,8 @@
 #include "tier0/wchartypes.h"
 
 #include <cstdint>
-#include <limits>  // std::numeric_limits
+#include <cstddef>  // std::ptrdiff_t
+#include <limits>   // std::numeric_limits
 
 #include "tier0/valve_off.h"
 
@@ -140,6 +141,24 @@ template< typename T >
 #define TRUE (!FALSE)
 #endif
 
+using int8 = int8_t;
+using uint8 = uint8_t;
+
+using int16 = int16_t;
+using uint16 = uint16_t;
+
+using int32 = int32_t;
+using uint32 = uint32_t;
+
+using int64 = int64_t;
+using uint64 = uint64_t;
+
+// intp is an integer that can accomodate a pointer
+// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
+using intp = std::ptrdiff_t;
+// uintp is an unsigned integer that can accomodate a pointer
+// (ie, sizeof(uintp) >= sizeof(unsigned int) && sizeof(uintp) >= sizeof(void *)
+using uintp = std::size_t;
 
 #ifndef DONT_DEFINE_BOOL // Needed for Cocoa stuff to compile.
 using BOOL = int;
