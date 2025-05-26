@@ -254,7 +254,7 @@ void CCustomGames::OnSaveFilter(KeyValues *filter)
 	if ( m_pTagFilter )
 	{
 		// tags
-		m_pTagFilter->GetText(m_szTagFilter, sizeof(m_szTagFilter) - 1);
+		m_pTagFilter->GetText(m_szTagFilter);
 	}
 
 	if ( m_szTagFilter[0] )
@@ -401,7 +401,7 @@ int SortServerTags( char* const *p1, char* const *p2 )
 void CCustomGames::AddTagToFilterList( const char *pszTag )
 {
 	char txt[ 128 ];
-	m_pTagFilter->GetText( txt, sizeof( txt ) );
+	m_pTagFilter->GetText( txt );
 
 	CUtlVector<char*> TagList;
 	V_SplitString( txt, ",", TagList );

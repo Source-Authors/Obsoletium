@@ -784,7 +784,7 @@ bool Label::RequestInfo(KeyValues *outputData)
 	if (!stricmp(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[256];
-		_textImage->GetText(wbuf, 255);
+		_textImage->GetText(wbuf);
 		outputData->SetWString("text", wbuf);
 		return true;
 	}
@@ -1059,7 +1059,7 @@ void Label::GetSettings( KeyValues *outResourceData )
 
 	// label settings
 	char buf[256];
-	_textImage->GetUnlocalizedText( buf, 255 );
+	_textImage->GetUnlocalizedText( buf );
 	if (!strnicmp(buf, "#var_", 5))
 	{
 		// strip off the variable prepender on save

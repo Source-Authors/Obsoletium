@@ -103,8 +103,18 @@ public:
 	int GetActiveItem();
 	KeyValues *GetActiveItemUserData();
 	KeyValues *GetItemUserData(int itemID);
-	void GetItemText( int itemID, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *text, int bufLenInBytes );
-	void GetItemText( int itemID, OUT_Z_BYTECAP(bufLenInBytes) char *text, int bufLenInBytes );
+	void GetItemText(int itemID, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *text, int bufLenInBytes);
+	template<int size>
+	void GetItemText(int itemID, OUT_Z_ARRAY wchar_t (&text)[size])
+	{
+		GetItemText( itemID, text, size * static_cast<int>(sizeof(text[0])) );
+	}
+	void GetItemText(int itemID, OUT_Z_BYTECAP(bufLenInBytes) char *text, int bufLenInBytes);
+	template<int size>
+	void GetItemText(int itemID, OUT_Z_ARRAY char (&text)[size])
+	{
+		GetItemText( itemID, text, size * static_cast<int>(sizeof(text[0])) );
+	}
 
 	// sets a custom menu to use for the dropdown
 	virtual void SetMenu( Menu *menu );

@@ -305,7 +305,7 @@ public:
 		msg->SetPtr( "propertypage", m_pPage );
 		msg->SetPtr( "propertysheet", m_pParent );
 		char sz[ 256 ];
-		GetText( sz, sizeof( sz ) );
+		GetText( sz );
 		msg->SetString( "tabname", sz  );
 		msg->SetString( "text", sz );
 	}

@@ -43,6 +43,19 @@ public:
 		float currentAnalogValue,
 		float lastAnalogValueUpdateTime,
 		bool addRemainingSuffix);
+	template<intp size>
+	static bool ConstructTimeRemainingString(OUT_Z_ARRAY wchar_t (&output)[size],
+		float startTime,
+		float currentTime,
+		float currentAnalogValue,
+		float lastAnalogValueUpdateTime,
+		bool addRemainingSuffix)
+	{
+		return ConstructTimeRemainingString( output, size,
+			startTime, currentTime,
+			currentProgress, lastProgressUpdateTime,
+			addRemainingSuffix );
+	}
 
 	void SetBarInset( int pixels );
 	int GetBarInset( void ) const;

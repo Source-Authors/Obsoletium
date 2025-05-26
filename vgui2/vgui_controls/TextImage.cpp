@@ -255,7 +255,7 @@ void TextImage::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buffer, int bufLen
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-void TextImage::GetUnlocalizedText(char *buffer, int bufferSize)
+void TextImage::GetUnlocalizedText(OUT_Z_CAP(bufferSize) char *buffer, int bufferSize)
 {
 	if (_unlocalizedTextSymbol != INVALID_LOCALIZE_STRING_INDEX)
 	{

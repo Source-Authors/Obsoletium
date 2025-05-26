@@ -254,7 +254,7 @@ void ProgressBox::OnThink()
 	if (m_flFirstProgressUpdate >= 0.0f && m_wcsInfoString[0])
 	{
 		wchar_t timeRemaining[128];
-		if (ProgressBar::ConstructTimeRemainingString(timeRemaining, sizeof(timeRemaining), m_flFirstProgressUpdate, (float)system()->GetFrameTime(), m_flCurrentProgress, m_flLastProgressUpdate, true))
+		if (ProgressBar::ConstructTimeRemainingString(timeRemaining, m_flFirstProgressUpdate, (float)system()->GetFrameTime(), m_flCurrentProgress, m_flLastProgressUpdate, true))
 		{
 			wchar_t unicode[256];
 			g_pVGuiLocalize->ConstructString_safe(unicode, m_wcsInfoString, 1, timeRemaining);

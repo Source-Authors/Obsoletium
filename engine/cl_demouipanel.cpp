@@ -257,10 +257,10 @@ void CDemoUIPanel::OnCommand(const char *command)
 	else if ( !Q_strcasecmp( command, "gototick" ) )
 	{
 		char tick[ 32 ];
-		m_pGotoTick->GetText( tick, sizeof( tick ) );
+		m_pGotoTick->GetText( tick );
 
 		char cmd[256];
-		Q_snprintf( cmd, sizeof(cmd), "demo_gototick %s 0 1\n", tick );
+		V_sprintf_safe( cmd, "demo_gototick %s 0 1\n", tick );
 
 		Cbuf_AddText( cmd );
 		

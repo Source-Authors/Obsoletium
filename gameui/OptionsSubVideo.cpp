@@ -222,7 +222,7 @@ public:
 		if (panel == m_pGammaEntry)
 		{
 			char buf[64];
-			m_pGammaEntry->GetText(buf, 64);
+			m_pGammaEntry->GetText(buf);
 
 			// dimhotepus: atof -> strtof
 			float fValue = strtof(buf, nullptr);
@@ -506,11 +506,11 @@ public:
 	{
 		// get the item text
 		wchar_t text[512];
-		combo->GetItemText(iItem, text, sizeof(text));
+		combo->GetItemText(iItem, text);
 
 		// append the recommended flag
 		wchar_t newText[512];
-		_snwprintf( newText, sizeof(newText) / sizeof(wchar_t), L"%ls *", text );
+		V_swprintf_safe( newText, L"%ls *", text );
 
 		// reset
 		combo->UpdateItem(iItem, newText, NULL);
@@ -1420,7 +1420,7 @@ void COptionsSubVideo::PrepareResolutionList()
 {
 	// get the currently selected resolution
 	char sz[256];
-	m_pMode->GetText(sz, 256);
+	m_pMode->GetText(sz);
 	int currentWidth = 0, currentHeight = 0;
 	sscanf( sz, "%i x %i", &currentWidth, &currentHeight );
 
@@ -1783,11 +1783,11 @@ void COptionsSubVideo::OnApplyChanges()
 	char sz[256];
 	if ( m_nSelectedMode == -1 )
 	{
-		m_pMode->GetText( sz, 256 );
+		m_pMode->GetText( sz );
 	}
 	else
 	{
-		m_pMode->GetItemText( m_nSelectedMode, sz, 256 );
+		m_pMode->GetItemText( m_nSelectedMode, sz );
 	}
 
 	int width = 0, height = 0;

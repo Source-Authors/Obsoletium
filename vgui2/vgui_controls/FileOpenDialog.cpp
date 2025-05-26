@@ -316,7 +316,7 @@ void FileCompletionEdit::OnSetText(const wchar_t *newtext)
 {
 	// see if the combobox text has changed, and if so, post a message detailing the new text
 	wchar_t wbuf[255];
-	GetText( wbuf, 254 );
+	GetText( wbuf );
 	
 	if ( wcscmp(wbuf, newtext) )
 	{
@@ -435,7 +435,7 @@ void FileCompletionEdit::OnMenuItemHighlight( int itemID )
 	char wbuf[80];
 	if ( m_pDropDown->IsValidMenuID(itemID) )
 	{
-		m_pDropDown->GetMenuItem(itemID)->GetText(wbuf, 80);
+		m_pDropDown->GetMenuItem(itemID)->GetText(wbuf);
 	}
 	else
 	{
@@ -1607,10 +1607,10 @@ void FileOpenDialog::OnOpen()
 void FileOpenDialog::PopulateFileNameCompletion()
 {
 	char buf[80];
-	m_pFileNameEdit->GetText(buf, 80);
+	m_pFileNameEdit->GetText(buf);
 	wchar_t wbuf[80];
-	m_pFileNameEdit->GetText(wbuf, 80);
-	int bufLen = wcslen(wbuf);
+	m_pFileNameEdit->GetText(wbuf);
+	intp bufLen = V_wcslen(wbuf);
 
 	// delete all items before we check if there's even a string
 	m_pFileNameEdit->DeleteAllItems();

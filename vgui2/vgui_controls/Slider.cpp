@@ -309,13 +309,13 @@ void Slider::GetSettings(KeyValues *outResourceData)
 	char buf[256];
 	if (_leftCaption)
 	{
-		_leftCaption->GetUnlocalizedText(buf, sizeof(buf));
+		_leftCaption->GetUnlocalizedText(buf);
 		outResourceData->SetString("leftText", buf);
 	}
 	
 	if (_rightCaption)
 	{
-		_rightCaption->GetUnlocalizedText(buf, sizeof(buf));
+		_rightCaption->GetUnlocalizedText(buf);
 		outResourceData->SetString("rightText", buf);
 	}
 }

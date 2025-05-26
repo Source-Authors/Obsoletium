@@ -606,7 +606,7 @@ void CDemoSmootherPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 intp CDemoSmootherPanel::GetStartFrame()
 {
 	char text[ 32 ];
-	m_pStartFrame->GetText( text, sizeof( text ) );
+	m_pStartFrame->GetText( text );
 	int tick = atoi( text );
 	return GetFrameForTick( tick );
 }
@@ -618,7 +618,7 @@ intp CDemoSmootherPanel::GetStartFrame()
 intp CDemoSmootherPanel::GetEndFrame()
 {
 	char text[ 32 ];
-	m_pEndFrame->GetText( text, sizeof( text ) );
+	m_pEndFrame->GetText( text );
 	int tick = atoi( text );
 	return GetFrameForTick( tick );
 }
@@ -2333,7 +2333,7 @@ void CDemoSmootherPanel::OnSmoothEdges( bool left, bool right )
 
 	// Get number of frames
 	char sz[ 512 ];
-	m_pFixEdgeFrames->GetText( sz, sizeof( sz ) );
+	m_pFixEdgeFrames->GetText( sz );
 
 	int frames = atoi( sz );
 	if ( frames <= 2 )
@@ -2404,7 +2404,7 @@ void CDemoSmootherPanel::OnGotoFrame()
 		return;
 
 	char sz[ 256 ];
-	m_pGotoFrame->GetText( sz, sizeof( sz ) );
+	m_pGotoFrame->GetText( sz );
 	int frame = atoi( sz );
 
 	if ( !m_bPreviewing )

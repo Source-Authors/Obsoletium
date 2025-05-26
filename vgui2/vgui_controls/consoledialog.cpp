@@ -628,7 +628,7 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	Q_strncpy( m_szPreviousPartialText, m_szPartialText, sizeof( m_szPreviousPartialText ) );
 
 	// get the partial text the user type
-	m_pEntry->GetText(m_szPartialText, sizeof(m_szPartialText));
+	m_pEntry->GetText(m_szPartialText);
 
 	// see if they've hit the tilde key (which opens & closes the console)
 	intp len = Q_strlen(m_szPartialText);

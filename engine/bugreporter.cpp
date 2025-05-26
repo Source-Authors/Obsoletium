@@ -1289,7 +1289,7 @@ void CBugUIPanel::Activate()
 		{
 			int id = m_pMapNumber->GetItemIDFromRow(i);
 			char level[256];
-			m_pMapNumber->GetItemText(id, level, sizeof(level));
+			m_pMapNumber->GetItemText(id, level);
 			if (!Q_strcmp(currentLevel, level))
 			{
 				item = id;
@@ -1771,25 +1771,25 @@ void CBugUIPanel::OnSubmit()
 
 	if ( !isPublic )
 	{
-		m_pSeverity->GetText( severity, sizeof( severity ) );
+		m_pSeverity->GetText( severity );
 		Msg( "severity %s\n", severity );
 
-		m_pGameArea->GetText( area, sizeof( area ) );
+		m_pGameArea->GetText( area );
 		Msg( "area %s\n", area );
 
-		m_pMapNumber->GetText( mapnumber, sizeof( mapnumber) );
+		m_pMapNumber->GetText( mapnumber );
 		Msg( "map number %s\n", mapnumber);
 
-		m_pPriority->GetText( priority, sizeof( priority ) );
+		m_pPriority->GetText( priority );
 		Msg( "priority %s\n", priority );
 
-		m_pAssignTo->GetText( assignedto, sizeof( assignedto ) );
+		m_pAssignTo->GetText( assignedto );
 		Msg( "owner %s\n", assignedto );
 	}
 
 	if ( isPublic )
 	{
-		m_pEmail->GetText( email, sizeof( email ) );
+		m_pEmail->GetText( email );
 		if ( !Q_isempty( email ) )
 		{
 			Msg( "email %s\n", email );
@@ -1801,7 +1801,7 @@ void CBugUIPanel::OnSubmit()
 
 		m_pBugReporter->SetOwner( email );
 		char submitter[ 80 ];
-		m_pSubmitterLabel->GetText( submitter, sizeof( submitter ) );
+		m_pSubmitterLabel->GetText( submitter );
 		m_pBugReporter->SetSubmitter( submitter );
 	}
 	else
@@ -1811,7 +1811,7 @@ void CBugUIPanel::OnSubmit()
 		if ( m_bUseNameForSubmitter )
 		{
 			char submitter[ 80 ];
-			m_pSubmitter->GetText( submitter, sizeof( submitter ) );
+			m_pSubmitter->GetText( submitter );
 			m_pBugReporter->SetSubmitter( submitter );
 		}
 		else
@@ -1820,7 +1820,7 @@ void CBugUIPanel::OnSubmit()
 		}
 	}
 
-	m_pReportType->GetText( reporttype, sizeof( reporttype ) );
+	m_pReportType->GetText( reporttype );
 	Msg( "report type %s\n", reporttype );
 
 	Msg( "submitter %s\n", m_pBugReporter->GetUserName() );

@@ -36,7 +36,27 @@ public:
 	virtual void SetSegmentInfo( int gap, int width );
 
 	// utility function for calculating a time remaining string
-	static bool ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output, intp outputBufferSizeInBytes, float startTime, float currentTime, float currentProgress, float lastProgressUpdateTime, bool addRemainingSuffix);
+	static bool ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output,
+		intp outputBufferSizeInBytes,
+		float startTime,
+		float currentTime,
+		float currentProgress,
+		float lastProgressUpdateTime,
+		bool addRemainingSuffix);
+
+	template<intp size>
+	static bool ConstructTimeRemainingString(OUT_Z_ARRAY wchar_t (&output)[size],
+		float startTime,
+		float currentTime,
+		float currentProgress,
+		float lastProgressUpdateTime,
+		bool addRemainingSuffix)
+	{
+		return ConstructTimeRemainingString( output, size,
+			startTime, currentTime,
+			currentProgress, lastProgressUpdateTime,
+			addRemainingSuffix );
+	}
 
 	void SetBarInset( int pixels );
 	int GetBarInset( void );

@@ -310,17 +310,17 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 			break;
 		case O_NUMBER:
 			pEdit = ( TextEntry * )pList->pControl;
-			pEdit->GetText( strValue, sizeof( strValue ) );
+			pEdit->GetText( strValue );
 			Q_snprintf( szValue, sizeof( szValue ), "%s", strValue );
 			break;
 		case O_STRING:
 			pEdit = ( TextEntry * )pList->pControl;
-			pEdit->GetText( strValue, sizeof( strValue ) );
+			pEdit->GetText( strValue );
 			Q_snprintf( szValue, sizeof( szValue ), "%s", strValue );
 			break;
 		case O_LIST:
 			pCombo = ( ComboBox *)pList->pControl;
-			pCombo->GetText( w_szStrValue, sizeof( w_szStrValue ) / sizeof( wchar_t ) );
+			pCombo->GetText( w_szStrValue );
 			
 			pItem = pObj->pListItems;
 

@@ -1281,12 +1281,12 @@ void CBaseGamesPage::UpdateFilterSettings()
 	Q_strlower(m_szGameFilter);
 
 	// map
-	m_pMapFilter->GetText(m_szMapFilter, sizeof(m_szMapFilter) - 1);
+	m_pMapFilter->GetText(m_szMapFilter);
 	Q_strlower(m_szMapFilter);
 
 	// max player
 	char buf[256];
-	m_pMaxPlayerFilter->GetText(buf, sizeof(buf));
+	m_pMaxPlayerFilter->GetText(buf);
 	if (buf[0])
 	{
 		m_iMaxPlayerFilter = atoi(buf);
@@ -1297,7 +1297,7 @@ void CBaseGamesPage::UpdateFilterSettings()
 	}
 
 	// ping
-	m_pPingFilter->GetText(buf, sizeof(buf));
+	m_pPingFilter->GetText(buf);
 	if (buf[0])
 	{
 		m_iPingFilter = atoi(buf + 2);
@@ -1456,7 +1456,7 @@ void CBaseGamesPage::RecalculateFilterString()
 
 	if (m_pLocationFilter->GetActiveItem() > 0)
 	{
-		m_pLocationFilter->GetText(tempUnicode, sizeof(tempUnicode));
+		m_pLocationFilter->GetText(tempUnicode);
 		V_wcscat_safe( unicode, tempUnicode );
 		V_wcscat_safe( unicode, spacerUnicode );
 	}

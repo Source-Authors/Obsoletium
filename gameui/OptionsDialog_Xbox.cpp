@@ -1418,7 +1418,7 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 					wchar_t szWideBuff[ 64 ];
 					char szBinds[ OPTION_STRING_LENGTH ];
 					if ( pOption->iNumBinds > 0 )
-						m_pValueLabels[ iLabel ]->GetText( szBinds, sizeof( szBinds ) );
+						m_pValueLabels[ iLabel ]->GetText( szBinds );
 
 					// Turn localized string into icon character
 					Q_snprintf( szBuff, sizeof( szBuff ), "#GameUI_Icons_%s", szKeyName );

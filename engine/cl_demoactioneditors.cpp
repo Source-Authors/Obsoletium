@@ -96,7 +96,7 @@ bool CBaseActionEditDialog::OnSaveChanges( void )
 	g_BaseActionEditSaveChained = true;
 
 	char actionname[ 512 ];
-	m_pActionName->GetText( actionname, sizeof( actionname ) );
+	m_pActionName->GetText( actionname );
 	if ( Q_strcmp( m_pAction->GetActionName(), actionname ) )
 	{
 		bret = true;
@@ -104,9 +104,9 @@ bool CBaseActionEditDialog::OnSaveChanges( void )
 	}
 
 	char starttext[ 512 ];
-	m_pStart->GetText( starttext, sizeof( starttext ) );
+	m_pStart->GetText( starttext );
 	char starttype[ 512 ];
-	m_pStartType->GetText( starttype, sizeof( starttype ) );
+	m_pStartType->GetText( starttype );
 
 	DEMOACTIONTIMINGTYPE timingType = CBaseDemoAction::TimingTypeForName( starttype );
 
@@ -234,7 +234,7 @@ bool CBaseActionWithTargetDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char actiontarget[ 512 ];
-	m_pActionTarget->GetText( actiontarget, sizeof( actiontarget ) );
+	m_pActionTarget->GetText( actiontarget );
 
 	if ( Q_strcmp( m_pAction->GetActionTarget(), actiontarget ) )
 	{
@@ -308,10 +308,10 @@ bool CBaseActionSkipAheadDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char skiptype[ 512 ];
-	m_pSkipType->GetText( skiptype, sizeof( skiptype ) );
+	m_pSkipType->GetText( skiptype );
 
 	char skipto[ 512 ];
-	m_pSkip->GetText( skipto, sizeof( skipto ) );
+	m_pSkip->GetText( skipto );
 
 	float fskip = (float)atof( skipto );
 	int	 iskip = (int)atoi( skipto );
@@ -469,13 +469,13 @@ bool CBaseActionScreenFadeStartDialog::OnSaveChanges( void )
 	int a = f->a;
 
 	char sz[ 512 ];
-	m_pDuration->GetText( sz, sizeof( sz ) );
+	m_pDuration->GetText( sz );
 	if ( (float)atof( sz ) != duration )
 	{
 		bret = true;
 		f->duration = (unsigned short)((float)(1<<SCREENFADE_FRACBITS) * (float)atof( sz ) );
 	}
-	m_pHoldTime->GetText( sz, sizeof( sz ) );
+	m_pHoldTime->GetText( sz );
 	if ( (float)atof( sz ) != holdTime )
 	{
 		bret = true;
@@ -483,7 +483,7 @@ bool CBaseActionScreenFadeStartDialog::OnSaveChanges( void )
 	}
 
 	int rr, gg, bb, aa;
-	m_pColor->GetText( sz, sizeof( sz ) );
+	m_pColor->GetText( sz );
 	if ( 4 == sscanf( sz, "%i %i %i %i", &rr, &gg, &bb, &aa ) )
 	{
 		rr = clamp( rr, 0, 255 );
@@ -737,7 +737,7 @@ bool CBaseActionTextMessageStartDialog::SaveDifferingFloat( vgui::TextEntry *con
 	Assert( curval && control );
 
 	char sz[ 512 ];
-	control->GetText( sz, sizeof( sz ) );
+	control->GetText( sz );
 
 	float fcontrol = (float)atof( sz );
 	if ( fcontrol != *curval )
@@ -762,7 +762,7 @@ bool CBaseActionTextMessageStartDialog::SaveDifferingInt( vgui::TextEntry *contr
 	Assert( curval && control );
 
 	char sz[ 512 ];
-	control->GetText( sz, sizeof( sz ) );
+	control->GetText( sz );
 
 	int icontrol = atoi( sz );
 	if ( icontrol != *curval )
@@ -781,7 +781,7 @@ bool CBaseActionTextMessageStartDialog::SaveDifferingColor( vgui::TextEntry *con
 	Assert( r && g && b && a && control );
 
 	char sz[ 512 ];
-	control->GetText( sz, sizeof( sz ) );
+	control->GetText( sz );
 
 	int rr, gg, bb, aa;
 	if ( sscanf( sz, "%i %i %i %i", &rr, &gg, &bb, &aa ) == 4 )
@@ -833,7 +833,7 @@ bool CBaseActionTextMessageStartDialog::OnSaveChanges( void )
 	bret |= SaveDifferingColor( m_pColor2, &tm->r2, &tm->g2, &tm->b2, &tm->a2 );
 
 	char sz[ 1024 ];
-	m_pEffectType->GetText( sz, sizeof( sz ) );
+	m_pEffectType->GetText( sz );
 	int iEffect = EffectTypeForName( sz );
 	if ( iEffect != tm->effect )
 	{
@@ -841,14 +841,14 @@ bool CBaseActionTextMessageStartDialog::OnSaveChanges( void )
 		bret = true;
 	}
 
-	m_pMessageText->GetText( sz, sizeof( sz ) );
+	m_pMessageText->GetText( sz );
 	if ( Q_strcasecmp( sz, GetAction()->GetMessageText() ) )
 	{
 		GetAction()->SetMessageText( sz );
 		bret = true;
 	}
 
-	m_pFontName->GetText( sz, sizeof( sz ) );
+	m_pFontName->GetText( sz );
 	if ( Q_strcasecmp( sz, GetAction()->GetFontName() ) )
 	{
 		GetAction()->SetFontName( sz );
@@ -907,7 +907,7 @@ bool CBaseActionPlayCommandsDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char commands[ 512 ];
-	m_pCommands->GetText( commands, sizeof( commands ) );
+	m_pCommands->GetText( commands );
 
 	if ( Q_strcasecmp( commands, GetAction()->GetCommandStream() ) )
 	{
@@ -967,7 +967,7 @@ bool CBaseActionCDTrackStartDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char track[ 512 ];
-	m_pTrackNumber->GetText( track, sizeof( track ) );
+	m_pTrackNumber->GetText( track );
 	int itrack = atoi( track );
 
 	if ( itrack != GetAction()->GetTrack() )
@@ -1037,7 +1037,7 @@ bool CBaseActionPlaySoundStartDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char soundname[ 512 ];
-	m_pSoundName->GetText( soundname, sizeof( soundname ) );
+	m_pSoundName->GetText( soundname );
 
 	if ( Q_strcasecmp( soundname, GetAction()->GetSoundName() ) )
 	{
@@ -1153,10 +1153,10 @@ bool CBaseActionWithStopTimeDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char stoptype[ 512 ];
-	m_pStopType->GetText( stoptype, sizeof( stoptype ) );
+	m_pStopType->GetText( stoptype );
 
 	char stop[ 512 ];
-	m_pStop->GetText( stop, sizeof( stop ) );
+	m_pStop->GetText( stop );
 
 	float fstop = (float)atof( stop );
 	int	 istop = (int)atoi( stop );
@@ -1234,7 +1234,7 @@ bool CBaseActionChangePlaybackRateDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char rate[ 512 ];
-	m_pRate->GetText( rate, sizeof( rate ) );
+	m_pRate->GetText( rate );
 
 	float frate = (float)atof( rate );
 
@@ -1300,7 +1300,7 @@ bool CBaseActionPauseDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char pausetime[ 512 ];
-	m_pPauseTime->GetText( pausetime, sizeof( pausetime ) );
+	m_pPauseTime->GetText( pausetime );
 
 	float ftime = (float)atof( pausetime );
 
@@ -1406,7 +1406,7 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 	bool bret = BaseClass::OnSaveChanges();
 
 	char sz[ 512 ];
-	m_pFinalFOV->GetText( sz, sizeof( sz ) );
+	m_pFinalFOV->GetText( sz );
 	float f = (float)atof( sz );
 
 	if ( GetAction()->m_flFinalFOV != f )
@@ -1415,7 +1415,7 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 		GetAction()->m_flFinalFOV = f;
 	}
 
-	m_pOutRate->GetText( sz, sizeof( sz ) );
+	m_pOutRate->GetText( sz );
 	f = (float)atof( sz );
 
 	if ( GetAction()->m_flFOVRateOut != f )
@@ -1424,7 +1424,7 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 		GetAction()->m_flFOVRateOut = f;
 	}
 
-	m_pInRate->GetText( sz, sizeof( sz ) );
+	m_pInRate->GetText( sz );
 	f = (float)atof( sz );
 
 	if ( GetAction()->m_flFOVRateIn != f )
@@ -1433,7 +1433,7 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 		GetAction()->m_flFOVRateIn = f;
 	}
 
-	m_pHoldTime->GetText( sz, sizeof( sz ) );
+	m_pHoldTime->GetText( sz );
 	f = (float)atof( sz );
 
 	if ( GetAction()->m_flHoldTime != f )

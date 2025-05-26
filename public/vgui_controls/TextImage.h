@@ -74,7 +74,12 @@ public:
 	}
 
 	// get the text in it's unlocalized form
-	virtual void GetUnlocalizedText(char *buffer, int bufferSize);
+	virtual void GetUnlocalizedText(OUT_Z_CAP(bufferSize) char *buffer, int bufferSize);
+	template<int bufferSize>
+	void GetUnlocalizedText(OUT_Z_ARRAY char (&buf)[bufferSize]) 
+	{
+		GetUnlocalizedText( buf, static_cast<int>(sizeof(char)) * bufferSize );
+	}
 	virtual StringIndex_t GetUnlocalizedTextSymbol();
 
 	// set the font of the text

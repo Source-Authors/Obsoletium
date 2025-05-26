@@ -1118,8 +1118,8 @@ void CDialogMenu::SortMenuItems()
 	{
 		for ( int j = 0; j < m_MenuItems.Count() - i; ++j )
 		{
-			((CSectionedItem*)m_MenuItems[j])->m_Sections[m_nActiveColumn].pLabel->GetText( szBufferOne, sizeof( szBufferOne ) );
-			((CSectionedItem*)m_MenuItems[j+1])->m_Sections[m_nActiveColumn].pLabel->GetText( szBufferTwo, sizeof( szBufferTwo ) );
+			((CSectionedItem*)m_MenuItems[j])->m_Sections[m_nActiveColumn].pLabel->GetText( szBufferOne );
+			((CSectionedItem*)m_MenuItems[j+1])->m_Sections[m_nActiveColumn].pLabel->GetText( szBufferTwo );
 
 			int diff = Q_stricmp( szBufferOne, szBufferTwo );
 			bool bSwap = bSortDown ? diff > 0 : diff < 0;

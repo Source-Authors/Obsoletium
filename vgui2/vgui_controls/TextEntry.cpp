@@ -2106,7 +2106,7 @@ void TextEntry::OnCreateDragData( KeyValues *msg )
 	BaseClass::OnCreateDragData( msg );
 
 	char txt[ 256 ];
-	GetText( txt, sizeof( txt ) );
+	GetText( txt );
 
 	int r0, r1;
 	if ( GetSelectedRange( r0, r1 ) && r0 != r1 )
@@ -3578,7 +3578,7 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 float TextEntry::GetValueAsFloat()
 {
 	intp nTextLength = GetTextLength() + 1;
-	char* txt = ( char* )_alloca( nTextLength * sizeof( char ) );
+	char* txt = stackallocT( char, nTextLength );
 	GetText( txt, nTextLength );
 
 	return V_atof( txt );
@@ -3587,7 +3587,7 @@ float TextEntry::GetValueAsFloat()
 int TextEntry::GetValueAsInt()
 {
 	intp nTextLength = GetTextLength() + 1;
-	char* txt = ( char* )_alloca( nTextLength * sizeof( char ) );
+	char* txt = stackallocT( char, nTextLength );
 	GetText( txt, nTextLength );
 
 	return V_atoi( txt );
@@ -3691,14 +3691,14 @@ bool TextEntry::RequestInfo(KeyValues *outputData)
 	if (!stricmp(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[256];
-		GetText(wbuf, 255);
+		GetText(wbuf);
 		outputData->SetWString("text", wbuf);
 		return true;
 	}
 	else if (!stricmp(outputData->GetName(), "GetState"))
 	{
 		char buf[64];
-		GetText(buf, sizeof(buf));
+		GetText(buf);
 		outputData->SetInt("state", atoi(buf));
 		return true;
 	}

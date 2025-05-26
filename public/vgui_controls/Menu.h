@@ -155,8 +155,18 @@ public:
 	virtual int GetInvalidMenuID();
 
 	KeyValues *GetItemUserData(int itemID);
-	void GetItemText(int itemID, wchar_t *text, int bufLenInBytes);
-	void GetItemText(int itemID, char *text, int bufLenInBytes);
+	void GetItemText(int itemID, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *text, int bufLenInBytes);
+	template<int size>
+	void GetItemText(int itemID, OUT_Z_ARRAY wchar_t (&text)[size])
+	{
+		GetItemText( itemID, text, size * static_cast<int>(sizeof(text[0])) );
+	}
+	void GetItemText(int itemID, OUT_Z_BYTECAP(bufLenInBytes) char *text, int bufLenInBytes);
+	template<int size>
+	void GetItemText(int itemID, OUT_Z_ARRAY char (&text)[size])
+	{
+		GetItemText( itemID, text, size * static_cast<int>(sizeof(text[0])) );
+	}
 
 	virtual void SetItemEnabled(const char *itemName, bool state);
 	virtual void SetItemEnabled(int itemID, bool state);

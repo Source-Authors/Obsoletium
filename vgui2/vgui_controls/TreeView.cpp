@@ -252,7 +252,7 @@ public:
 
 		m_bEditingInPlace = true;
 		char buf[ 1024 ];
-		GetText( buf, sizeof( buf ) );
+		GetText( buf );
 		m_OriginalText = buf;
 		SetCursor(dc_ibeam);
 		SetEditable( true );
@@ -273,7 +273,7 @@ public:
 		SetCursor(dc_arrow);
 		m_bEditingInPlace = false;
 		char buf[ 1024 ];
-		GetText( buf, sizeof( buf ) );
+		GetText( buf );
 
 		// Not actually changed...
 		if ( !Q_strcmp( buf, m_OriginalText.Get() ) )

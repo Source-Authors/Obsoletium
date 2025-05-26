@@ -119,25 +119,25 @@ void QCInfo::SyncFromControls()
 	bAutomass = ((CheckButton *)pTargetField)->IsSelected();
 
 	pTargetField = pQCGenerator->FindChildByName( "massField" );
-	((TextEntry *)pTargetField)->GetText(tempText, MAX_PATH);
+	((TextEntry *)pTargetField)->GetText( tempText );
 	// dimhotepus: atof -> strtof
 	fMass = strtof(tempText, nullptr);
 
 	pTargetField = pQCGenerator->FindChildByName( "scaleField" );
-	((TextEntry *)pTargetField)->GetText(tempText, MAX_PATH);
+	((TextEntry *)pTargetField)->GetText( tempText );
 	// dimhotepus: atof -> strtof
 	fScale = strtof(tempText, nullptr);
 
     pTargetField = pQCGenerator->FindChildByName( "collisionSMDField" );
-	((TextEntry *)pTargetField)->GetText( tempText, MAX_PATH );	
+	((TextEntry *)pTargetField)->GetText( tempText );
 	V_strcpy_safe( pszCollisionPath, tempText );
 
 	pTargetField = pQCGenerator->FindChildByName( "surfacePropertyDropDown" );
-	((ComboBox *)pTargetField)->GetText( tempText, MAX_PATH );
+	((ComboBox *)pTargetField)->GetText( tempText );
     V_strcpy_safe( pszSurfaceProperty, tempText );
 
 	pTargetField = pQCGenerator->FindChildByName( "materialsField" );
-	((TextEntry *)pTargetField)->GetText( tempText, MAX_PATH );
+	((TextEntry *)pTargetField)->GetText( tempText );
 	V_strcpy_safe( pszMaterialPath, tempText );
 
 	LODs.RemoveAll();
@@ -197,7 +197,7 @@ void QCInfo::SyncToControls()
 	int numItems = ((ComboBox *)pTargetField)->GetItemCount();
 	for( int i = 0; i < numItems; i++ )
 	{
-		((ComboBox *)pTargetField)->GetItemText( i, tempText, MAX_PATH );
+		((ComboBox *)pTargetField)->GetItemText( i, tempText );
 		if ( !Q_strcmp( tempText, pszSurfaceProperty ) )
 		{
 			((ComboBox *)pTargetField)->SetItemEnabled( i, true );
@@ -751,7 +751,7 @@ void CQCGenerator::OnNewLODText()
 	}
 	
 	wchar_t szEditText[MAX_PATH];
-	m_pLODEdit->GetText( szEditText, MAX_PATH );
+	m_pLODEdit->GetText( szEditText );
 
 	pListItem->SetWString( name, szEditText );
 

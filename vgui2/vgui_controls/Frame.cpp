@@ -1782,7 +1782,7 @@ void Frame::GetSettings(KeyValues *outResourceData)
 	if (_title)
 	{
 		char buf[256];
-		_title->GetUnlocalizedText( buf, 255 );
+		_title->GetUnlocalizedText( buf );
 		if (buf[0])
 		{
 			outResourceData->SetString("title", buf);

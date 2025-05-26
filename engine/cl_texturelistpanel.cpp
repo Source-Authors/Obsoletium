@@ -3193,8 +3193,7 @@ void CTextureListPanel::Paint()
 	if ( m_pFilteringChk->IsSelected() && m_pFilteringText->GetTextLength() )
 	{
 		char chFilterString[ MAX_PATH ];
-		m_pFilteringText->GetText( chFilterString, sizeof( chFilterString ) - 1 );
-		chFilterString[ sizeof( chFilterString ) - 1 ] = 0;
+		m_pFilteringText->GetText( chFilterString );
 		KeepKeysMatchingFilter( textureList.Get(), chFilterString );
 	}
 

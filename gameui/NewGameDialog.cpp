@@ -189,7 +189,7 @@ public:
 
 		// HACK: Detect new episode teasers by the "Coming Soon" text
 		wchar_t w_szStrTemp[256];
-		m_pChapterNameLabel->GetText( w_szStrTemp, sizeof(w_szStrTemp)  );
+		m_pChapterNameLabel->GetText( w_szStrTemp );
 		m_bTeaserChapter = !wcscmp(w_szStrTemp, L"Coming Soon");
 		m_bHasBonus = false;
 	}
@@ -648,7 +648,7 @@ void CNewGameDialog::UpdateMenuComponents( EScrollDirection dir )
 		if ( m_PanelIndex[centerIdx] != INVALID_INDEX )
 		{
 			wchar_t buffer[ MAX_PATH ];
-			m_ChapterPanels[ m_PanelIndex[centerIdx] ]->m_pChapterNameLabel->GetText( buffer, sizeof(buffer) );
+			m_ChapterPanels[ m_PanelIndex[centerIdx] ]->m_pChapterNameLabel->GetText( buffer );
 			m_pChapterTitleLabels[(unsigned)m_ActiveTitleIdx]->SetText( buffer );
 
 			// If it has bonuses show the scroll up and down arrows

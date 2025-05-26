@@ -166,7 +166,7 @@ void CPrecisionSlider::SetEnabled( bool state )
 void CPrecisionSlider::OnTextNewLine( KeyValues *data )
 {
 	char buf[256];
-	m_pTextEntry->GetText( buf, 256 );
+	m_pTextEntry->GetText( buf );
 
 	int value = 0;
 	sscanf( buf, "%d", &value );
@@ -4323,7 +4323,7 @@ void CNewOperationDialog::OnCommand( const char *command )
 		if( m_pName->GetTextLength()>0 )
 		{
 			char buf[256];
-			m_pName->GetText( buf, 256 );
+			m_pName->GetText( buf );
 			newOp->SetName( buf );
 		}
 
@@ -4520,7 +4520,7 @@ void COperationListPanel::OnMouseDoublePressed( MouseCode code )
 void COperationListPanel::OnTextNewLine( KeyValues *data )
 {
 	char newName[256];
-	m_pNameEditPanel->GetText( newName, 256 );
+	m_pNameEditPanel->GetText( newName );
 
 	if( m_nEditItem!=-1 )
 	{

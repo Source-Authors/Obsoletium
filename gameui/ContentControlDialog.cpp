@@ -159,8 +159,8 @@ void CContentControlDialog::OnCommand( const char *command )
 		char pw1[ 256 ];
 		char pw2[ 256 ];
 
-		m_pPassword->GetText( pw1, 256 );
-		m_pPassword2->GetText( pw2, 256 );
+		m_pPassword->GetText( pw1 );
+		m_pPassword2->GetText( pw2 );
 
         // Get text and check
 //        bool enabled = PasswordEnabled(); //( m_szGorePW[0]!=0 ) ? true : false;

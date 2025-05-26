@@ -970,41 +970,41 @@ void CColorPickerPanel::OnTextChanged( KeyValues *data )
 	char buf[256];
 	if ( pPanel == m_pRedText )
 	{
-		m_pRedText->GetText( buf, sizeof(buf) );
+		m_pRedText->GetText( buf );
 		int val = atoi( buf );
 		m_CurrentColor.r = clamp( val, 0, 255 );
 		RGBtoHSV( m_CurrentColor, m_CurrentHSVColor );
 	}
 	else if ( pPanel == m_pGreenText )
 	{
-		m_pGreenText->GetText( buf, sizeof(buf) );
+		m_pGreenText->GetText( buf );
 		int val = atoi( buf );
 		m_CurrentColor.g = clamp( val, 0, 255 );
 		RGBtoHSV( m_CurrentColor, m_CurrentHSVColor );
 	}
 	else if ( pPanel == m_pBlueText )
 	{
-		m_pBlueText->GetText( buf, sizeof(buf) );
+		m_pBlueText->GetText( buf );
 		int val = atoi( buf );
 		m_CurrentColor.b = clamp( val, 0, 255 );
 		RGBtoHSV( m_CurrentColor, m_CurrentHSVColor );
 	}
 	else if ( pPanel == m_pAlphaText )
 	{
-		m_pAlphaText->GetText( buf, sizeof( buf ) );
+		m_pAlphaText->GetText( buf );
 		int val = atoi( buf );
 		m_CurrentAlpha = clamp( val, 0, 255 );
 	}
 	else if ( pPanel == m_pHueText )
 	{
-		m_pHueText->GetText( buf, sizeof(buf) );
+		m_pHueText->GetText( buf );
 		int val = atoi( buf );
 		m_CurrentHSVColor.x = clamp( val, 0, 360 );
 		HSVtoRGB( m_CurrentHSVColor, m_CurrentColor );
 	}
 	else if ( pPanel == m_pSaturationText )
 	{
-		m_pSaturationText->GetText( buf, sizeof(buf) );
+		m_pSaturationText->GetText( buf );
 		int val = atoi( buf );
 		val = clamp( val, 0, 100 );
 		m_CurrentHSVColor.y = (float)val / 100.0f;
@@ -1012,7 +1012,7 @@ void CColorPickerPanel::OnTextChanged( KeyValues *data )
 	}
 	else if ( pPanel == m_pValueText )
 	{
-		m_pValueText->GetText( buf, sizeof(buf) );
+		m_pValueText->GetText( buf );
 		int val = atoi( buf );
 		val = clamp( val, 0, 100 );
 		m_CurrentHSVColor.z = (float)val / 100.0f;

@@ -207,6 +207,8 @@ private:
 		CHTMLFindBar( HTML *parent );
 		void SetText( const char *pchText ) { m_pFindBar->SetText( pchText ); }
 		void GetText( OUT_Z_CAP(ccText) char *pText, int ccText ) { m_pFindBar->GetText( pText, ccText ); }
+		template<int size>
+		void GetText( OUT_Z_ARRAY char (&pText)[size] ) { GetText( pText, size ); }
 		void OnCommand( const char *pchCmd ) override;
 		void ShowCountLabel() { m_pFindCountLabel->SetVisible( true ); }
 		void HideCountLabel() { m_pFindCountLabel->SetVisible( false ); }

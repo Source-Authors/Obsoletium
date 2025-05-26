@@ -177,18 +177,18 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 			break;
 		case O_NUMBER:
 			pEdit = ( TextEntry * )pList->pControl;
-			pEdit->GetText( strValue, sizeof( strValue ) );
+			pEdit->GetText( strValue );
 			V_sprintf_safe( szValue, "%s", strValue );
 			break;
 		case O_STRING:
 			pEdit = ( TextEntry * )pList->pControl;
-			pEdit->GetText( strValue, sizeof( strValue ) );
+			pEdit->GetText( strValue );
 			V_sprintf_safe( szValue, "%s", strValue );
 			break;
 		case O_LIST:
 			{
 				pCombo = (ComboBox *)pList->pControl;
-				// pCombo->GetText( strValue, sizeof( strValue ) );
+				// pCombo->GetText( strValue );
 				int activeItem = pCombo->GetActiveItem();
 				
 				pItem = pObj->pListItems;

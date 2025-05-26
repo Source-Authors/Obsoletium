@@ -1499,14 +1499,14 @@ void Menu::OnTypeAhead(wchar_t unichar)
 	do
 	{
 		wchar_t menuItemName[255];
-		m_MenuItems[i]->GetText(menuItemName, 254);
+		m_MenuItems[i]->GetText(menuItemName);
 
 		// This is supposed to be case insensitive but we don't have a portable case
 		// insensitive wide-character routine.
-		if ( wcsncmp( m_szTypeAheadBuf, menuItemName, m_iNumTypeAheadChars) == 0 )			
+		if ( wcsncmp( m_szTypeAheadBuf, menuItemName, m_iNumTypeAheadChars) == 0 )
 		{
 			itemToSelect = i;
-			break;			
+			break;
 		}
 
 		i = (i+1) % m_MenuItems.Count();
@@ -1562,7 +1562,7 @@ void Menu::OnKeyTyped(wchar_t unichar)
 
 	while ( i != itemToSelect )
 	{
-		 m_MenuItems[i]->GetText(menuItemName, 254);
+		 m_MenuItems[i]->GetText(menuItemName);
 
 		if ( tolower( unichar ) == tolower( menuItemName[0] ) )
 		{
@@ -2039,21 +2039,21 @@ KeyValues *Menu::GetItemUserData(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-void Menu::GetItemText(int itemID, wchar_t *text, int bufLenInBytes)
+void Menu::GetItemText(int itemID, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *text, int bufLenInBytes)
 {
 	if ( m_MenuItems.IsValidIndex( itemID ) )
 	{
 		MenuItem *menuItem = dynamic_cast<MenuItem *>(m_MenuItems[itemID]);
 		if (menuItem)
 		{
-			menuItem->GetText(text, bufLenInBytes);
+			menuItem->GetText( text, bufLenInBytes );
 			return;
 		}
 	}
-	text[0] = 0;
+	text[0] = L'\0';
 }
 
-void Menu::GetItemText(int itemID, char *text, int bufLenInBytes)
+void Menu::GetItemText(int itemID, OUT_Z_BYTECAP(bufLenInBytes) char *text, int bufLenInBytes)
 {
 	if ( m_MenuItems.IsValidIndex( itemID ) )
 	{
@@ -2494,7 +2494,7 @@ void Menu::MoveAlongMenuItemList(int direction, int loopCount)
 	{
 		// see if the text is empty, if so skip
 		wchar_t text[256];
-		m_MenuItems[m_iCurrentlySelectedItemID]->GetText(text, 255);
+		m_MenuItems[m_iCurrentlySelectedItemID]->GetText(text);
 		if (text[0] == 0 || !m_MenuItems[m_iCurrentlySelectedItemID]->IsVisible())
 		{
 			// menu item is empty, keep moving along

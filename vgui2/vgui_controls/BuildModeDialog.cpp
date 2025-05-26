@@ -951,11 +951,11 @@ void BuildModeDialog::ApplyDataToControls()
 	char fieldName[512];
 	if (m_pPanelList->m_PanelList[0].m_EditPanel)
 	{
-		m_pPanelList->m_PanelList[0].m_EditPanel->GetText(fieldName, sizeof(fieldName));
+		m_pPanelList->m_PanelList[0].m_EditPanel->GetText(fieldName);
 	}
 	else
 	{
-		m_pPanelList->m_PanelList[0].m_EditButton->GetText(fieldName, sizeof(fieldName));
+		m_pPanelList->m_PanelList[0].m_EditButton->GetText(fieldName);
 	}
 
 	// check to see if any buildgroup panels have this name
@@ -985,11 +985,11 @@ void BuildModeDialog::ApplyDataToControls()
 		char buf[512];
 		if (p.m_EditPanel)
 		{
-			p.m_EditPanel->GetText(buf, sizeof(buf));
+			p.m_EditPanel->GetText(buf);
 		}
 		else
 		{
-			p.m_EditButton->GetText(buf, sizeof(buf));
+			p.m_EditButton->GetText(buf);
 		}
 
 		switch (p.m_iType)
@@ -1108,11 +1108,11 @@ KeyValues *BuildModeDialog::StoreSettings()
 		char buf[512];
 		if (panel.m_EditPanel)
 		{
-			panel.m_EditPanel->GetText(buf, sizeof(buf));
+			panel.m_EditPanel->GetText(buf);
 		}
 		else
 		{
-			panel.m_EditButton->GetText(buf, sizeof(buf));
+			panel.m_EditButton->GetText(buf);
 		}
 
 		switch (panel.m_iType)
@@ -1157,7 +1157,7 @@ void BuildModeDialog::OnTextChanged( Panel *panel )
 	{
 		// reload file if it's changed
 		char newFile[512];
-		m_pFileSelectionCombo->GetText(newFile, sizeof(newFile));
+		m_pFileSelectionCombo->GetText(newFile);
 
 		if (stricmp(newFile, m_pBuildGroup->GetResourceName()) != 0)
 		{
@@ -1171,7 +1171,7 @@ void BuildModeDialog::OnTextChanged( Panel *panel )
 	if (panel == m_pAddNewControlCombo)
 	{
 		char buf[40];
-		m_pAddNewControlCombo->GetText(buf, 40);
+		m_pAddNewControlCombo->GetText(buf);
 		if (stricmp(buf, "None") != 0)
 		{	
 			OnNewControl(buf);

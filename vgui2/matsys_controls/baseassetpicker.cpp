@@ -1377,7 +1377,7 @@ void CBaseAssetPicker::OnTextChanged( KeyValues *pKeyValues )
 	if ( pSource == m_pFilter )
 	{
 		int nLength = m_pFilter->GetTextLength();
-		char *pNewFilter = (char*)_alloca( (nLength+1) * sizeof(char) );
+		char *pNewFilter = stackallocT( char, nLength+1 );
 		if ( nLength > 0 )
 		{
 			m_pFilter->GetText( pNewFilter, nLength+1 );

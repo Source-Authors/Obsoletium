@@ -1198,7 +1198,7 @@ void HTML::OnEditNewLine( Panel *pPanel )
 void HTML::OnTextChanged( Panel *pPanel )
 {
 	char rgchText[2048];
-	m_pFindBar->GetText( rgchText, sizeof( rgchText ) );
+	m_pFindBar->GetText( rgchText );
 	Find( rgchText );
 }
 

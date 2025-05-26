@@ -392,7 +392,7 @@ void CMDLPicker::OnCommand( const char *pCommand )
 		Label	*m_pOutputDirectory;
 		char	temp[ MAX_PATH ];
 		m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
+		m_pOutputDirectory->GetText( temp );
 
 		m_hDirectorySelectDialog->MakeReadyForUse();
 		m_hDirectorySelectDialog->SetStartDirectory( temp );
@@ -447,7 +447,7 @@ void CMDLPicker::OnCommand( const char *pCommand )
 					Label		*m_pOutputDirectory;
 
 					m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-					m_pOutputDirectory->GetText( szBathPath, sizeof( szBathPath ) );
+					m_pOutputDirectory->GetText( szBathPath );
 
 					char szPathedFileName[ _MAX_PATH ];
 					V_sprintf_safe( szPathedFileName, "%s%s", szBathPath, pSelectedAsset );
@@ -621,13 +621,13 @@ void CMDLPicker::CaptureScreenCaps( void )
 	Label		*m_pOutputDirectory;
 
 	m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-	m_pOutputDirectory->GetText( szBathPath, sizeof( szBathPath ) );
+	m_pOutputDirectory->GetText( szBathPath );
 
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "WidthText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	width = atoi( temp );
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "HeightText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	height = atoi( temp );
 
 	int		PanelX, PanelY, PanelWidth, PanelHeight;
@@ -1041,7 +1041,7 @@ CUtlString CMDLPicker::GetOutputFileSuffix()
 	TextEntry *pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "SuffixText" );
 	if ( pTempValue )
 	{
-		pTempValue->GetText( temp, sizeof( temp ) );
+		pTempValue->GetText( temp );
 	}
 	return temp;
 }
@@ -1079,11 +1079,11 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 
 	TextEntry	*pTempValue;
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "WidthText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	CaptureData->SetString( "Width", temp );
 
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "HeightText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	CaptureData->SetString( "Height", temp );
 
 	vgui::CheckButton *pToggle;
@@ -1120,7 +1120,7 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 	else
 	{
 		Label *m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
+		m_pOutputDirectory->GetText( temp );
 
 		V_strcat_safe( temp, "ScreenCaps.cfg" );
 	}
@@ -1145,7 +1145,7 @@ bool CMDLPicker::RestoreCaps( const char *szFileName )
 	else
 	{
 		Label *m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
+		m_pOutputDirectory->GetText( temp );
 		V_strcat_safe( temp, "ScreenCaps.cfg" );
 	}
 

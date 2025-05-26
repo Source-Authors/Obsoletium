@@ -913,11 +913,12 @@ void CConPanel::Con_NXPrintf( const struct con_nprint_s *info, const char *msg )
 	m_bDrawDebugAreas = true;
 }
 
-static void safestrncat( wchar_t *text, int maxCharactersWithNullTerminator, wchar_t const *add, int addchars )
+template<intp size>
+static void safestrncat( OUT_Z_ARRAY wchar_t (&text)[size], wchar_t const *add, intp addchars )
 {
-	int maxCharactersWithoutTerminator = maxCharactersWithNullTerminator - 1;
+	constexpr intp maxCharactersWithoutTerminator = size - 1;
 
-	int curlen = wcslen( text );
+	intp curlen = V_wcslen( text );
 	if ( curlen >= maxCharactersWithoutTerminator )
 		return;
 
@@ -927,7 +928,7 @@ static void safestrncat( wchar_t *text, int maxCharactersWithNullTerminator, wch
 	{
 		*p++ = *add++;
 	}
-	*p = 0;
+	*p = L'\0';
 }
 
 void CConPanel::AddToNotify( const Color& clr, char const *msg )
@@ -981,8 +982,8 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 		const wchar_t *nextreturn = wcschr( p, L'\n' );
 		if ( nextreturn != NULL )
 		{
-			int copysize = nextreturn - p + 1;
-			safestrncat( current->text, MAX_NOTIFY_TEXT_LINE, p, copysize );
+			intp copysize = nextreturn - p + 1;
+			safestrncat( current->text, p, copysize );
 
 			// Add a new notify, but don't add a new one if the previous one was empty...
 			if ( current->text[0] && current->text[0] != L'\n' )
@@ -992,7 +993,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 			}
 			// Clear it
 			current->clr = clr;
-			current->text[ 0 ] = 0;
+			current->text[ 0 ] = L'\0';
 			current->liferemaining = con_notifytime.GetFloat();
 			// Skip return character
 			p += copysize;
