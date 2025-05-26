@@ -524,9 +524,9 @@ int	CReplayServer::GetReplaySlot( void )
 	return m_nPlayerSlot;
 }
 
-float CReplayServer::GetOnlineTime( void )
+double CReplayServer::GetOnlineTime( void )
 {
-	return MAX(0.0, net_time - m_flStartTime);
+	return max(0.0, net_time - m_flStartTime);
 }
 
 void CReplayServer::FireGameEvent(IGameEvent *event)

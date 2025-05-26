@@ -771,7 +771,7 @@ int	CHLTVServer::GetHLTVSlot( void )
 	return m_nPlayerSlot;
 }
 
-float CHLTVServer::GetOnlineTime( void )
+double CHLTVServer::GetOnlineTime( void )
 {
 	return max(0.0, net_time - m_flStartTime);
 }
