@@ -74,7 +74,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 			#ifdef TCHAR_IS_WCHAR
 				::GetModuleFileNameW( nullptr, rgchModuleName, std::size(rgchModuleName) );
 			#else
-				::GetModuleFileName( nullptr, rgchModuleName, std::size(rgchModuleName) );
+				Plat_GetModuleFilename( rgchModuleName, static_cast<int>( ssize(rgchModuleName) ) );
 			#endif
 
 			// strip off the rest of the path from the .exe name
