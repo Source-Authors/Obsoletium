@@ -341,8 +341,20 @@ typedef void * HINSTANCE;
 //-----------------------------------------------------------------------------
 // Convert int<-->pointer, avoiding 32/64-bit compiler warnings:
 //-----------------------------------------------------------------------------
-#define INT_TO_POINTER( i ) (void *)( ( i ) + (char *)NULL )
-#define POINTER_TO_INT( p ) ( (int)(uintp)( p ) )
+template<typename T>
+constexpr inline std::enable_if_t<std::is_integral_v<T>, void*> INT_TO_POINTER(T i) noexcept {
+	if constexpr (std::is_unsigned_v<T>) {
+		return reinterpret_cast<void*>(static_cast<uintp>(i));
+	}
+	return reinterpret_cast<void*>(static_cast<intp>(i));
+}
+template <typename R, typename T>
+constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) noexcept {
+	if constexpr (std::is_unsigned_v<R>) {
+		return static_cast<uint>(reinterpret_cast<uintp>(p));
+	}
+	return static_cast<int>(reinterpret_cast<intp>(p));
+}
 
 
 //-----------------------------------------------------------------------------
