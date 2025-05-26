@@ -318,9 +318,9 @@ bool CClientTools::DrawSprite( IClientRenderable *pRenderable, float scale, floa
 				return false;
 
 			//Fade out the sprite depending on distance from the view origin.
-			r *= blend;
-			g *= blend;
-			b *= blend;
+			r = static_cast<byte>(r * blend);
+			g = static_cast<byte>(g * blend);
+			b = static_cast<byte>(b * blend);
 
 			render->SetBlend( blend );
 		}

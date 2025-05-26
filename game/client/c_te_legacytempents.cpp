@@ -1623,7 +1623,7 @@ void CTempEnts::Sprite_Smoke( C_LocalTempEntity *pTemp, float scale )
 	pTemp->SetRenderMode( kRenderTransAlpha );
 	pTemp->m_nRenderFX = kRenderFxNone;
 	pTemp->SetVelocity( Vector( 0, 0, 30 ) );
-	int iColor = random->RandomInt(20,35);
+	byte iColor = static_cast<byte>(random->RandomInt(20,35));
 	pTemp->SetRenderColor( iColor,
 		iColor,
 		iColor,
@@ -2554,7 +2554,7 @@ void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int at
 
 		pParticle->m_uchColor[0]	= 255;
 		pParticle->m_uchColor[1]	= 255;
-		pParticle->m_uchColor[2]	= 200+random->RandomInt(0,55);
+		pParticle->m_uchColor[2]	= static_cast<byte>(200+random->RandomInt(0,55));
 
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 255;
@@ -2580,10 +2580,10 @@ void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int at
 	pParticle->m_uchColor[1]	= 255;
 	pParticle->m_uchColor[2]	= 255;
 
-	pParticle->m_uchStartAlpha	= random->RandomInt( 64, 128 );
+	pParticle->m_uchStartAlpha	= static_cast<byte>(random->RandomInt( 64, 128 ));
 	pParticle->m_uchEndAlpha	= 32;
 
-	pParticle->m_uchStartSize	= random->RandomInt( 10, 16 );
+	pParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 10, 16 ));
 	pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
 	
 	pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
@@ -2852,7 +2852,7 @@ void CTempEnts::MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attac
 
 		pParticle->m_uchColor[0]	= 255;
 		pParticle->m_uchColor[1]	= 255;
-		pParticle->m_uchColor[2]	= 200+random->RandomInt(0,55);
+		pParticle->m_uchColor[2]	= static_cast<byte>(200+random->RandomInt(0,55));
 
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 255;
@@ -2911,7 +2911,7 @@ void CTempEnts::MuzzleFlash_Shotgun_Player( ClientEntityHandle_t hEntity, int at
 
 		pParticle->m_uchColor[0]	= 255;
 		pParticle->m_uchColor[1]	= 255;
-		pParticle->m_uchColor[2]	= 200+random->RandomInt(0,55);
+		pParticle->m_uchColor[2]	= static_cast<byte>(200+random->RandomInt(0,55));
 
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 255;

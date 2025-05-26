@@ -1901,8 +1901,7 @@ void CHudCloseCaption::DrawStream( wrect_t &rcText, wrect_t &rcWindow, CCloseCap
 		}
 
 		Color useColor = wu->GetColor();
-
-		useColor[ 3 ] *= flLineAlpha;
+		useColor[ 3 ] = static_cast<byte>(useColor[ 3 ] * flLineAlpha);
 
 		if ( !item->IsValid() )
 		{

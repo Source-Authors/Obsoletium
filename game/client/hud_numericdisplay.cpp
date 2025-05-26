@@ -178,7 +178,7 @@ void CHudNumericDisplay::Paint()
 			{
 				// draw a percentage of the last one
 				Color col = GetFgColor();
-				col[3] *= fl;
+				col[3] = static_cast<byte>(col[3] * fl);
 				surface()->DrawSetTextColor(col);
 				PaintNumbers(m_hNumberGlowFont, digit_xpos, digit_ypos, m_iValue);
 			}

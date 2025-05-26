@@ -755,9 +755,9 @@ static void SetClearColorToFogColor()
 	{
 		// @MULTICORE (toml 8/16/2006): Find a way to not do this twice in eye above water case
 		float scale = LinearToGammaFullRange( pRenderContext->GetToneMappingScaleLinear().x );
-		ucFogColor[0] *= scale;
-		ucFogColor[1] *= scale;
-		ucFogColor[2] *= scale;
+		ucFogColor[0] = static_cast<byte>(ucFogColor[0] * scale);
+		ucFogColor[1] = static_cast<byte>(ucFogColor[1] * scale);
+		ucFogColor[2] = static_cast<byte>(ucFogColor[2] * scale);
 	}
 	pRenderContext->ClearColor4ub( ucFogColor[0], ucFogColor[1], ucFogColor[2], 255 );
 }

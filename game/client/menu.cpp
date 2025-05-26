@@ -231,7 +231,7 @@ void CHudMenu::Paint()
 				{
 					// draw a percentage of the last one
 					Color col = clr;
-					col[3] *= fl;
+					col[3] = static_cast<byte>(col[3] * fl);
 					vgui::surface()->DrawSetTextColor(col);
 					PaintString( &g_szMenuString[ line->startchar ], drawLen, m_hItemFontPulsing, x, y );
 				}

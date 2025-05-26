@@ -1075,7 +1075,7 @@ static unsigned char ComputeDistanceFade( C_BaseEntity *pEntity, float flMinDist
 	// NOTE: Because of the if-checks above, flMinDist != flMinDist here
 	float flFalloffFactor = 255.0f / (flMaxDist - flMinDist);
 	int nAlpha = flFalloffFactor * (flMaxDist - flCurrentDistanceSq);
-	return clamp( nAlpha, 0, 255 );
+	return static_cast<byte>( clamp( nAlpha, 0, 255 ) );
 }
 
 
