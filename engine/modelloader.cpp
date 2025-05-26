@@ -538,47 +538,8 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 //-----------------------------------------------------------------------------
 void CMapLoadHelper::InitFromMemory( model_t *pMapModel, const void *pData, int nDataSize )
 {
-	// valid for 360 only 
-	// 360 has reorganized bsp format and no external lump files
-	Assert( IsX360() && pData && nDataSize );
-
-	if ( ++s_nMapLoadRecursion > 1 )
-	{
-		return;
-	}
-
-	s_pMap = NULL;
-	s_MapFileHandle = FILESYSTEM_INVALID_HANDLE;
-	V_memset( &s_MapHeader, 0, sizeof( s_MapHeader ) );
-	V_memset( &s_MapLumpFiles, 0, sizeof( s_MapLumpFiles ) );
-
-	V_strcpy_safe( s_szMapName, pMapModel->strName );
-	V_FileBase( s_szMapName, s_szLoadName );
-
-	s_MapBuffer.SetExternalBuffer( (void *)pData, nDataSize, nDataSize );
-
-	V_memcpy( &s_MapHeader, pData, sizeof( dheader_t ) );
-
-	if ( s_MapHeader.ident != IDBSPHEADER )
-	{
-		Host_Error( "CMapLoadHelper::Init, map %s has wrong identifier\n", s_szMapName );
-		return;
-	}
-
-	if ( s_MapHeader.version < MINBSPVERSION || s_MapHeader.version > BSPVERSION )
-	{
-		Host_Error( "CMapLoadHelper::Init, map %s has wrong version (%i when expecting %i)\n", s_szMapName, s_MapHeader.version, BSPVERSION );
-		return;
-	}
-
-	// Store map version
-	g_ServerGlobalVariables.mapversion = s_MapHeader.mapRevision;
-
-#ifndef SWDS
-	InitDLightGlobals( s_MapHeader.version );
-#endif
-
-	s_pMap = &g_ModelLoader.m_worldBrushData;
+	// valid for 360 only
+	Assert( false );
 }
 
 //-----------------------------------------------------------------------------
@@ -1137,7 +1098,7 @@ void Mod_LoadVertices( void )
 
 	lh.GetMap()->vertexes = out;
 	lh.GetMap()->numvertexes = count;
-	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -4295,11 +4256,11 @@ void CModelLoader::Map_LoadModel( model_t *mod )
 	Mod_LoadVertices();
 	
 	{
-	COM_TimestampedLog( "  Mod_LoadEdges" );
+		COM_TimestampedLog( "  Mod_LoadEdges" );
 		std::unique_ptr<medge_t[]> pedges = Mod_LoadEdges();
 
-	COM_TimestampedLog( "  Mod_LoadSurfedges" );
-	Mod_LoadSurfedges( pedges );
+		COM_TimestampedLog( "  Mod_LoadSurfedges" );
+		Mod_LoadSurfedges( pedges );
 	}
 
 	COM_TimestampedLog( "  Mod_LoadPlanes" );
@@ -4833,8 +4794,8 @@ void CModelLoader::DumpVCollideStats()
 	intp bboxCount;
 	if ( physcollision->GetBBoxCacheSize( &bboxSize, &bboxCount ) )
 	{
-	Msg( "%8zu bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
-	totalVCollideMemory += bboxSize;
+		Msg( "%8zu bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
+		totalVCollideMemory += bboxSize;
 	}
 	Msg( "--------------\n%8zu bytes total VCollide Memory\n", totalVCollideMemory );
 }
