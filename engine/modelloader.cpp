@@ -1047,7 +1047,8 @@ void Mod_LoadLighting( CMapLoadHelper &lh )
 		return;
 	}
 
-	Assert( lh.LumpSize() % sizeof( ColorRGBExp32 ) == 0 );
+	// dimhotepus: Checked in AllocateLightingData
+	// Assert( lh.LumpSize() % sizeof( ColorRGBExp32 ) == 0 );
 	Assert ( lh.LumpVersion() != 0 );
 
 	AllocateLightingData( lh.GetMap(), lh.LumpSize() );
