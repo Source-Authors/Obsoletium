@@ -164,20 +164,14 @@ const char *CHistoryItem::GetExtra() const
 void CHistoryItem::SetText( const char *text, const char *extra )
 {
 	delete[] m_text;
-	intp len = strlen( text ) + 1;
-
-	m_text = new char[ len ];
-	Q_memset( m_text, 0x0, len );
-	Q_strncpy( m_text, text, len );
+	m_text = V_strdup( text );
 
 	if ( extra )
 	{
 		m_bHasExtra = true;
+
 		delete[] m_extraText;
-		intp elen = strlen( extra ) + 1;
-		m_extraText = new char[ elen ];
-		Q_memset( m_extraText, 0x0, elen);
-		Q_strncpy( m_extraText, extra, elen );
+		m_extraText = V_strdup( extra );
 	}
 	else
 	{
@@ -952,23 +946,16 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 		m_CommandHistory.Remove( 0 );
 	}
 
-	const size_t commandTextLen = strlen( commandText );
-
 	// strip the space off the end of the command before adding it to the history
 	// If this code gets cleaned up then we should remove the redundant calls to strlen,
 	// the check for whether _alloca succeeded, and should use V_strncpy instead of the
 	// error prone memset/strncpy sequence.
-	char *command = static_cast<char *>( _alloca( (commandTextLen + 1 ) * sizeof( char ) ));
-	if ( command )
-	{
-		memset( command, 0x0, commandTextLen + 1 );
-		strncpy( command, commandText, commandTextLen );
+	V_strdup_stack(commandText, command);
 
-		const size_t len = strlen(command) - 1;
-		if ( command[ len ] == ' ' )
-		{
-			 command[ len ] = '\0';
-		}
+	const size_t len = strlen(command) - 1;
+	if ( command[ len ] == ' ' )
+	{
+		command[ len ] = '\0';
 	}
 
 	// strip the quotes off the extra text
@@ -976,14 +963,11 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 
 	if ( extraText )
 	{
-		extra = static_cast<char *>( malloc( (strlen( extraText ) + 1 ) * sizeof( char ) ));
+		extra = V_strdup( extraText );
 		if ( extra )
 		{
-			memset( extra, 0x0, strlen( extraText ) + 1 );
-			strncpy( extra, extraText, strlen( extraText )); // +1 to dodge the starting quote
-			
 			// Strip trailing spaces
-			intp i = strlen( extra ) - 1; 
+			intp i = V_strlen( extra ) - 1;
 			while ( i >= 0 &&  // Check I before referencing i == -1 into the extra array!
 				extra[ i ] == ' ' )
 			{
@@ -1019,11 +1003,10 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 	CHistoryItem *item = &m_CommandHistory[ m_CommandHistory.AddToTail() ];
 	Assert( item );
 	item->SetText( command, extra );
+	delete [] extra;
 
 	m_iNextCompletion = 0;
 	RebuildCompletionList( m_szPartialText );
-
-	free( extra );
 }
 
 void CConsolePanel::GetConsoleText( char *pchText, size_t bufSize ) const
