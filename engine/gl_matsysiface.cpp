@@ -484,11 +484,13 @@ struct sortmap_t
 
 IMatRenderContext *pSortMapRenderContext;
 
-int __cdecl SortMapCompareFunc( const void *pElem0, const void *pElem1 )
+bool __cdecl SortMapCompareFunc( const sortmap_t &pMap0, const sortmap_t &pMap1 )
 {
-	const sortmap_t *pMap0 = (const sortmap_t *)pElem0;
-	const sortmap_t *pMap1 = (const sortmap_t *)pElem1;
-	return pSortMapRenderContext->CompareMaterialCombos( pMap0->info.material, pMap1->info.material, pMap0->info.lightmapPageID, pMap1->info.lightmapPageID );
+	return pSortMapRenderContext->CompareMaterialCombos
+	(
+		pMap0.info.material, pMap1.info.material,
+		pMap0.info.lightmapPageID, pMap1.info.lightmapPageID
+	) < 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -513,7 +515,8 @@ void MaterialSystem_CreateSortinfo( void )
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pSortMapRenderContext = pRenderContext;
 
-	qsort( pMap, nSortIDs, sizeof( sortmap_t ), SortMapCompareFunc );
+	// dimhotepus: qsort -> sort
+	std::sort( pMap, pMap + nSortIDs, SortMapCompareFunc );
 
 	int *pSortIDRemap = stackallocT( int, nSortIDs );
 	for ( int i = 0; i < nSortIDs; i++ )
