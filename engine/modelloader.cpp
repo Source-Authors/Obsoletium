@@ -4831,9 +4831,11 @@ void CModelLoader::DumpVCollideStats()
 	}
 	size_t bboxSize;
 	intp bboxCount;
-	physcollision->GetBBoxCacheSize( &bboxSize, &bboxCount );
+	if ( physcollision->GetBBoxCacheSize( &bboxSize, &bboxCount ) )
+	{
 	Msg( "%8zu bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
 	totalVCollideMemory += bboxSize;
+	}
 	Msg( "--------------\n%8zu bytes total VCollide Memory\n", totalVCollideMemory );
 }
 
