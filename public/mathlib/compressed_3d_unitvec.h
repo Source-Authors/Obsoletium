@@ -157,7 +157,7 @@ public:
 		
          // calculate the amount of normalization required
          mUVAdjustment[idx] = 1.0f / sqrtf( y*y + z*z + x*x );
-         Assert( _finite( mUVAdjustment[idx]));
+         Assert( std::isfinite( mUVAdjustment[idx]));
 
          //cerr << mUVAdjustment[idx] << "\t";
          //if ( xbits == 0 ) cerr << "\n";
@@ -193,7 +193,7 @@ public:
                float ang = vec.dot( vec2 );
                ang = (( fabs( ang ) > 0.99999f ) ? 0 : (float)acos(ang));
 
-               if (( ang > TEST_ANGERROR ) | ( !_finite( ang )))
+               if (( ang > TEST_ANGERROR ) | ( !std::isfinite( ang )))
                {
                   cerr << "error: " << ang << endl;
                   cerr << "orig vec:       " << vec.x << ",\t"
@@ -222,7 +222,7 @@ public:
          float ang =vec.dot( vec2 );
          ang = (( ang > 0.999f ) ? 0 : (float)acos(ang));
 
-         if (( ang > TEST_ANGERROR ) | ( !_finite( ang )))
+         if (( ang > TEST_ANGERROR ) | ( !std::isfinite( ang )))
          {
             cerr << "error: " << ang << endl;
             cerr << "orig vec:       " << vec.x << ",\t"
@@ -249,7 +249,7 @@ public:
          float ang = vec.dot( vec2 );
          ang = (( fabs( ang ) > 0.999f ) ? 0 : (float)acos(ang));
 
-         if (( ang > TEST_ANGERROR ) | ( !_finite( ang )))
+         if (( ang > TEST_ANGERROR ) | ( !std::isfinite( ang )))
          {
             cerr << "error: " << ang << endl;
             cerr << "orig vec:       " << vec.x << ",\t"
