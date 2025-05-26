@@ -31,13 +31,11 @@
 #include "MapReslistGenerator.h"
 #include "DownloadListGenerator.h"
 #include "GameEventManager.h"
-#include "vgui_baseui_interface.h"
 #include "clockdriftmgr.h"
 #include "snd_audio_source.h"
 #include "vgui_controls/Controls.h"
 #include "vgui/ILocalize.h"
 #include "download.h"
-#include "checksum_engine.h"
 #include "ModelInfo.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/materialsystem_config.h"
@@ -1592,46 +1590,6 @@ void CClientState::CheckFileCRCsWithServer()
 //! Rich has pointed out that we really need pure server client work to be something that the client
 //! cannot easily bypass.  Currently that is the case.  But I need to ship the SteamPipe conversion now.
 //! We can revisit pure server security after that has shipped.
-//
-//	VPROF_( "CheckFileCRCsWithServer", 1, VPROF_BUDGETGROUP_OTHER_NETWORKING, false, BUDGETFLAG_CLIENT );
-//	const float flBatchInterval = 1.0f / 5.0f;
-//	const int nBatchSize = 5;
-//
-//	// Don't do this yet..
-//	if ( !m_bCheckCRCsWithServer )
-//		return;
-//
-//	if ( m_nSignonState != SIGNONSTATE_FULL )
-//		return;
-//
-//	// Only send a batch every so often.
-//	float flCurTime = Plat_FloatTime();
-//	if ( (flCurTime - m_flLastCRCBatchTime) < flBatchInterval )
-//		return;
-//
-//	m_flLastCRCBatchTime = flCurTime;
-//
-//	CUnverifiedFileHash rgUnverifiedFiles[nBatchSize];
-//	int count = g_pFileSystem->GetUnverifiedFileHashes( rgUnverifiedFiles, ARRAYSIZE( rgUnverifiedFiles ) );
-//	if ( count == 0 )
-//		return;
-//
-//	// Send the messages to the server.
-//	for ( int i=0; i < count; i++ )
-//	{
-//		CLC_FileCRCCheck crcCheck;
-//		V_strncpy( crcCheck.m_szPathID, rgUnverifiedFiles[i].m_PathID, sizeof( crcCheck.m_szPathID ) );
-//		V_strncpy( crcCheck.m_szFilename, rgUnverifiedFiles[i].m_Filename, sizeof( crcCheck.m_szFilename ) );
-//		crcCheck.m_nFileFraction = rgUnverifiedFiles[i].m_nFileFraction;
-//		crcCheck.m_MD5 = rgUnverifiedFiles[i].m_FileHash.m_md5contents;
-//		crcCheck.m_CRCIOs = rgUnverifiedFiles[i].m_FileHash.m_crcIOSequence;
-//		crcCheck.m_eFileHashType = rgUnverifiedFiles[i].m_FileHash.m_eFileHashType;
-//		crcCheck.m_cbFileLen = rgUnverifiedFiles[i].m_FileHash.m_cbFileLen;
-//		crcCheck.m_nPackFileNumber = rgUnverifiedFiles[i].m_FileHash.m_nPackFileNumber;
-//		crcCheck.m_PackFileID = rgUnverifiedFiles[i].m_FileHash.m_PackFileID;
-//
-//		m_NetChannel->SendNetMsg( crcCheck );
-//	}
 }
 
 
