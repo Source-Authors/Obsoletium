@@ -191,9 +191,6 @@ public:
 	static void			Shutdown( void );
 	static int			GetRefCount( void );
 	
-	// Free the lighting lump (increases free memory during loading on 360)
-	static void			FreeLightingLump();
-
 	// Returns the size of a particular lump without loading it
 	static int			LumpSize( int lumpId );
 	static int			LumpOffset( int lumpId );

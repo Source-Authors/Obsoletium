@@ -443,7 +443,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 		V_strcpy_safe( s_szMapName, pMapModel->strName );
 	}
 
-	s_MapFileHandle = g_pFileSystem->OpenEx( s_szMapName, "rb", IsX360() ? FSOPEN_NEVERINPACK : 0, IsX360() ? "GAME" : NULL );
+	s_MapFileHandle = g_pFileSystem->OpenEx( s_szMapName, "rb", 0, NULL );
 	if ( s_MapFileHandle == FILESYSTEM_INVALID_HANDLE )
 	{
 		Host_Error( "CMapLoadHelper::Init, unable to open %s\n", s_szMapName );
@@ -621,42 +621,6 @@ void CMapLoadHelper::Shutdown( void )
 		s_MapBuffer.SetExternalBuffer( NULL, 0, 0 );
 	}
 }
-
-//-----------------------------------------------------------------------------
-// Free the lighting lump (increases free memory during loading on 360)
-//-----------------------------------------------------------------------------
-void CMapLoadHelper::FreeLightingLump( void )
-{
-	if ( IsX360() && ( s_MapFileHandle == FILESYSTEM_INVALID_HANDLE ) && s_MapBuffer.Base() )
-	{
-		int lightingLump = LumpSize( LUMP_LIGHTING_HDR ) ? LUMP_LIGHTING_HDR : LUMP_LIGHTING;
-		// Should never have both lighting lumps on 360
-		Assert( ( lightingLump == LUMP_LIGHTING ) || ( LumpSize( LUMP_LIGHTING ) == 0 ) );
-
-		if ( LumpSize( lightingLump ) )
-		{
-			// Check that the lighting lump is the last one in the BSP
-			int lightingOffset = LumpOffset( lightingLump );
-			for ( int i = 0;i < HEADER_LUMPS; i++ )
-			{
-				if ( ( LumpOffset( i ) > lightingOffset ) && ( i != LUMP_PAKFILE ) )
-				{
-					Warning( "CMapLoadHelper: Cannot free lighting lump (should be last before the PAK lump). Regenerate the .360.bsp file with the latest version of makegamedata." );
-					return;
-				}
-			}
-
-			// Flag the lighting chunk as gone from the BSP (principally, this sets 'filelen' to 0)
-			V_memset( &s_MapHeader.lumps[ lightingLump ], 0, sizeof( lump_t ) );
-
-			// Shrink the buffer to free up the space that was used by the lighting lump
-			void * shrunkBuffer = realloc( s_MapBuffer.Base(), lightingOffset );
-			Assert( shrunkBuffer == s_MapBuffer.Base() ); // A shrink would surely never move!!!
-			s_MapBuffer.SetExternalBuffer( shrunkBuffer, lightingOffset, lightingOffset );
-		}
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // Returns the size of a particular lump without loading it...
