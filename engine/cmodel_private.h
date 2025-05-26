@@ -107,7 +107,8 @@ struct cbrush_t
 	unsigned short	firstbrushside;
 
 	inline int GetBox() const { return firstbrushside; }
-	inline void SetBox( int boxID )
+	// dimhotepus: int -> unsigned short
+	inline void SetBox( unsigned short boxID )
 	{
 		numsides = NUMSIDES_BOXBRUSH;
 		firstbrushside = boxID;
