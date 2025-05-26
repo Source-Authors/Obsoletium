@@ -22,8 +22,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// dimhotepus: Add callback to adjust fps panel size.
+void OnShowFpsChangeCallback( IConVar* var, const char* pOldValue, float flOldValue );
 // dimhotepus: Restrict cl_show* as boolean vars.
-static ConVar cl_showfps( "cl_showfps", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Draw fps meter at top of screen (1 = fps, 2 = smooth fps)", true, 0, true, 2 );
+static ConVar cl_showfps( "cl_showfps", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Draw fps meter at top of screen (1 = fps, 2 = smooth fps)", true, 0, true, 2, OnShowFpsChangeCallback );
 static ConVar cl_showpos( "cl_showpos", "0", 0, "Draw current position at top of screen", true, 0, true, 1 );
 static ConVar cl_showbattery( "cl_showbattery", "0", FCVAR_ALLOWED_IN_COMPETITIVE , "Draw current battery level at top of screen when on battery power", true, 0, true, 1 );
 
@@ -60,12 +62,14 @@ public:
 	void	OnTick( void ) override;
 
 	virtual bool	ShouldDraw( void );
+	
+	// dimhotepus: To adjust size.
+	void ComputeSize( void );
 
 protected:
 	MESSAGE_FUNC_INT_INT_OVERRIDE( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
 
 private:
-	void ComputeSize( void );
 	void InitAverages()
 	{
 		m_AverageFPS = -1;
@@ -133,23 +137,35 @@ void CFPSPanel::ComputeSize( void )
 	int wide, tall;
 	vgui::ipanel()->GetSize(GetVParent(), wide, tall );
 
-	int x = wide - FPS_PANEL_WIDTH;
+	// dimhotepus: Make FPS panel proportional.
+	int width = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), FPS_PANEL_WIDTH );
+	if ( cl_showfps.GetInt() == 1 )
+	{
+		width = width / 1.70f;
+	}
+
+	int x = wide - width;
 	int y = 0;
 
 	SetPos( x, y );
-	SetSize( FPS_PANEL_WIDTH, 4 * vgui::surface()->GetFontTall( m_hFont ) + 8 );
+	
+	// dimhotepus: Make FPS panel proportional.
+	const int height = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(),
+		4 * vgui::surface()->GetFontTall( m_hFont ) + 8 );
+
+	SetSize( width, height );
 }
 
 void CFPSPanel::ApplySchemeSettings(vgui::IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 
-	m_hFont = pScheme->GetFont( "DefaultFixedOutline" );
-	Assert( m_hFont );
+	// dimhotepus: Make FPS panel proportional.
+	m_hFont = pScheme->GetFont( "DefaultFixedOutline", true );
+	Assert(m_hFont);
 
 	ComputeSize();
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -172,8 +188,9 @@ bool CFPSPanel::ShouldDraw( void )
 	if ( g_bDisplayParticlePerformance )
 		return true;
 
+	// dimhotepus: Should not draw if no battery shown, too.
 	if ( ( !cl_showfps.GetInt() || ( gpGlobals->absoluteframetime <= 0 ) ) &&
-		 ( !cl_showpos.GetInt() ) )
+		 ( !cl_showpos.GetInt() ) && ( !cl_showbattery.GetInt() )  )
 	{
 		m_bLastDraw = false;
 		return false;
@@ -285,16 +302,16 @@ void CFPSPanel::Paint()
 					m_AverageFPS = NewFrame;
 					m_high = (int)m_AverageFPS;
 					m_low = (int)m_AverageFPS;
-				} 
+				}
 				else
-				{				
+				{
 					m_AverageFPS *= ( 1.0f - NewWeight ) ;
 					m_AverageFPS += ( ( NewFrame ) * NewWeight );
 				}
 			
 				int NewFrameInt = (int)NewFrame;
 				if( NewFrameInt < m_low ) m_low = NewFrameInt;
-				if( NewFrameInt > m_high ) m_high = NewFrameInt;	
+				if( NewFrameInt > m_high ) m_high = NewFrameInt;
 
 				nFps = static_cast<int>( m_AverageFPS );
 				float frameMS = realFrameTime * 1000.0f;
@@ -315,10 +332,13 @@ void CFPSPanel::Paint()
 			constexpr double displayTime = 5.0; // Display frequency results for this long.
 			if ( frequency.m_GHz > 0 && frequency.m_timeStamp + displayTime > currentTime )
 			{
-				int lineHeight = vgui::surface()->GetFontTall( m_hFont );
+				int fontTall = vgui::surface()->GetFontTall( m_hFont );
+
 				// Optionally print out the CPU frequency monitoring data.
 				GetCPUColor( frequency.m_percentage, ucColor );
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, lineHeight + 2, ucColor[0], ucColor[1], ucColor[2], 255, "CPU frequency percent: %3.1f%%   Min percent: %3.1f%%", frequency.m_percentage, frequency.m_lowestPercentage );
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2 + i * (fontTall + 2), ucColor[0], ucColor[1], ucColor[2], 255, "CPU frequency percent: %3.1f%%   Min percent: %3.1f%%", frequency.m_percentage, frequency.m_lowestPercentage );
+
+				i++;
 			}
 		}
 	}
@@ -364,6 +384,9 @@ void CFPSPanel::Paint()
 											  255, 255, 255, 255, 
 											  "vel:  %.2f", 
 											  vel.Length() );
+
+		// dimhotepus: Allow battery info do not overlap.
+		i++;
 	}
 	
 	if ( cl_showbattery.GetInt() > 0 )
@@ -430,10 +453,25 @@ public:
 			fpsPanel = NULL;
 		}
 	}
+
+	// dimhotepus: Expose panel.
+	CFPSPanel* GetPanel()
+	{
+		return fpsPanel;
+	}
 };
 
 static CFPS g_FPSPanel;
 IFPSPanel *fps = &g_FPSPanel;
+
+void OnShowFpsChangeCallback( IConVar* var, const char* pOldValue, float flOldValue )
+{
+	CFPSPanel* panel = g_FPSPanel.GetPanel();
+	if (panel != nullptr)
+	{
+		panel->ComputeSize();
+	}
+}
 
 #if defined( TRACK_BLOCKING_IO ) && !defined( _RETAIL )
 
