@@ -136,9 +136,6 @@ private:
     // Purpose: Loads the startup graphic
     void                SetupStartupGraphic();
     void                CenterEngineWindow(int width, int height);
-    void                DrawStartupGraphic( HWND window );
-    void                BlitGraphicToHDC(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1);
-    void                BlitGraphicToHDCWithAlpha(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1);
     IVTFTexture         *LoadVTF( CUtlBuffer &temp, const char *szFileName );
     void                RecomputeClientViewRect();
 
@@ -148,10 +145,8 @@ private:
     void        ReadScreenPixels( int x, int y, int w, int h, void *pBuffer, ImageFormat format ) override;
 
     // PFM screenshot methods
-    ITexture *GetBuildCubemaps16BitTexture( void );
     ITexture *GetFullFrameFB0( void );
 
-    void BlitHiLoScreenBuffersTo16Bit( void );
     void TakeSnapshotPFMRect( const char *pFilename, int x, int y, int w, int h, int resampleWidth, int resampleHeight, CubeMapFaceIndex_t faceIndex );
 
 protected:
@@ -947,41 +942,6 @@ void CVideoMode_Common::DrawStartupGraphic()
     m_pLoadingTexture = NULL;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Blits an image to the loading window hdc
-//-----------------------------------------------------------------------------
-void CVideoMode_Common::BlitGraphicToHDCWithAlpha(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1)
-{
-#ifdef WIN32
-    int x = x0;
-    int y = y0;
-    int wide = x1 - x0;
-    int tall = y1 - y0;
-
-    Assert(imageWidth == wide && imageHeight == tall);
-
-    int texwby4 = imageWidth << 2;
-
-    for ( int v = 0; v < tall; v++ )
-    {
-        int *src = (int *)(rgba + (v * texwby4));
-        int xaccum = 0;
-
-        for ( int u = 0; u < wide; u++ )
-        {
-            byte *xsrc = (byte *)(src + xaccum);
-            if (xsrc[3])
-            {
-                ::SetPixel(hdc, x + u, y + v, RGB(xsrc[0], xsrc[1], xsrc[2]));
-            }
-            xaccum += 1;
-        }
-    }
-#else
-    AssertMsg( false, "Impl me" );
-#endif
-}
-
 void CVideoMode_Common::InvalidateWindow()
 {
     if ( CommandLine()->FindParm( "-noshaderapi" ) )
@@ -1118,138 +1078,6 @@ typedef struct _GUID
 typedef GUID UUID;
 
 #endif //WIN32
-//-----------------------------------------------------------------------------
-// Purpose: Blits an image to the loading window hdc
-//-----------------------------------------------------------------------------
-void CVideoMode_Common::BlitGraphicToHDC(HDC hdc, byte *rgba, int imageWidth, int imageHeight, int x0, int y0, int x1, int y1)
-{
-#ifdef WIN32
-    int x = x0;
-    int y = y0;
-    int wide = x1 - x0;
-    int tall = y1 - y0;
-
-    // Needs to be a multiple of 4
-    int dibwide = ( wide + 3 ) & ~3;
-
-    Assert(rgba);
-    int texwby4 = imageWidth << 2;
-
-    double st = Plat_FloatTime();
-
-    void *destBits = NULL;
-
-    HBITMAP bm;
-    BITMAPINFO bmi;
-    Q_memset( &bmi, 0, sizeof( bmi ) );
-
-    BITMAPINFOHEADER *hdr = &bmi.bmiHeader;
-
-    hdr->biSize = sizeof( *hdr );
-    hdr->biWidth = dibwide;
-    hdr->biHeight = -tall;  // top down bitmap
-    hdr->biBitCount = 24;
-    hdr->biPlanes = 1;
-    hdr->biCompression = BI_RGB;
-    hdr->biSizeImage = dibwide * tall * 3;
-    hdr->biXPelsPerMeter = 3780;
-    hdr->biYPelsPerMeter = 3780;
-
-    // Create a "source" DC
-    HDC tempDC = CreateCompatibleDC( hdc );
-
-    // Create the dibsection bitmap
-    bm = CreateDIBSection
-    (
-        tempDC,                     // handle to DC
-        &bmi,                       // bitmap data
-        DIB_RGB_COLORS,             // data type indicator
-        &destBits,                  // bit values
-        NULL,                       // handle to file mapping object
-        0                           // offset to bitmap bit values
-    );
-    
-    // Select it into the source DC
-    HBITMAP oldBitmap = (HBITMAP)SelectObject( tempDC, bm );
-
-    // Setup for bilinaer filtering. If we don't do this filter here, there will be a big
-    // annoying pop when it switches to the vguimatsurface version of the background.
-    // We leave room for 14 bits of integer precision, so the image can be up to 16k x 16k.
-    const int BILINEAR_FIX_SHIFT = 17;
-    const int BILINEAR_FIX_MUL = (1 << BILINEAR_FIX_SHIFT);
-
-    #define FIXED_BLEND( a, b, out, frac ) \
-        out[0] = (a[0]*frac + b[0]*(BILINEAR_FIX_MUL-frac)) >> BILINEAR_FIX_SHIFT; \
-        out[1] = (a[1]*frac + b[1]*(BILINEAR_FIX_MUL-frac)) >> BILINEAR_FIX_SHIFT; \
-        out[2] = (a[2]*frac + b[2]*(BILINEAR_FIX_MUL-frac)) >> BILINEAR_FIX_SHIFT;
-
-    float eps = 0.001f;
-    float uMax = imageWidth - 1 - eps;
-    float vMax = imageHeight - 1 - eps;
-
-    int fixedBilinearV = 0;
-    int bilinearUInc = (int)( (uMax / (dibwide-1)) * BILINEAR_FIX_MUL );
-    int bilinearVInc = (int)( (vMax / (tall-1)) * BILINEAR_FIX_MUL );
-
-    for ( int v = 0; v < tall; v++ )
-    {
-        int iBilinearV = fixedBilinearV >> BILINEAR_FIX_SHIFT;
-        int fixedFractionV = fixedBilinearV & (BILINEAR_FIX_MUL-1);
-        fixedBilinearV += bilinearVInc;
-
-        int fixedBilinearU = 0;
-        byte *dest = (byte *)destBits + ( ( y + v ) * dibwide + x ) * 3;
-
-        for ( int u = 0; u < dibwide; u++, dest+=3 )
-        {
-            int iBilinearU = fixedBilinearU >> BILINEAR_FIX_SHIFT;
-            int fixedFractionU = fixedBilinearU & (BILINEAR_FIX_MUL-1);
-            fixedBilinearU += bilinearUInc;
-        
-            Assert( iBilinearU >= 0 && iBilinearU+1 < imageWidth );
-            Assert( iBilinearV >= 0 && iBilinearV+1 < imageHeight );
-
-            byte *srcTopLine    = rgba + iBilinearV * texwby4;
-            byte *srcBottomLine = rgba + (iBilinearV+1) * texwby4;
-
-            byte *xsrc[4] = {
-                srcTopLine + (iBilinearU+0)*4,    srcTopLine + (iBilinearU+1)*4,
-                srcBottomLine + (iBilinearU+0)*4, srcBottomLine + (iBilinearU+1)*4  };
-
-            int topColor[3], bottomColor[3], finalColor[3];
-            FIXED_BLEND( xsrc[1], xsrc[0], topColor, fixedFractionU );
-            FIXED_BLEND( xsrc[3], xsrc[2], bottomColor, fixedFractionU );
-            FIXED_BLEND( bottomColor, topColor, finalColor, fixedFractionV );
-
-            // Windows wants the colors in reverse order.
-            dest[0] = finalColor[2];
-            dest[1] = finalColor[1];
-            dest[2] = finalColor[0];
-        }
-    }
-    
-    // Now do the Blt
-    BitBlt( hdc, 0, 0, dibwide, tall, tempDC, 0, 0, SRCCOPY );
-
-    // This only draws if running -noshaderapi
-    DrawNullBackground( hdc, dibwide, tall );
-
-    // Restore the old Bitmap
-    SelectObject( tempDC, oldBitmap );
-
-    // Destroy the temporary DC
-    DeleteDC( tempDC );
-
-    // Destroy the DIBSection bitmap
-    DeleteObject( bm );
-
-    double elapsed = Plat_FloatTime() - st;
-
-    COM_TimestampedLog( "BlitGraphicToHDC: new ver took %.4fs", elapsed );
-#else
-    AssertMsg( false, "Impl me" );
-#endif
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: This is called in response to a WM_MOVE message
@@ -1620,35 +1448,9 @@ void CVideoMode_Common::TakeSnapshotTGA( const char *pFilename )
 //-----------------------------------------------------------------------------
 // PFM screenshot helpers
 //-----------------------------------------------------------------------------
-ITexture *CVideoMode_Common::GetBuildCubemaps16BitTexture( void )
-{
-    return materials->FindTexture( "_rt_BuildCubemaps16bit", TEXTURE_GROUP_RENDER_TARGET );
-}
-
 ITexture *CVideoMode_Common::GetFullFrameFB0( void )
 {
     return materials->FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
-}
-
-void CVideoMode_Common::BlitHiLoScreenBuffersTo16Bit( void )
-{
-    IMaterial *pHDRCombineMaterial = materials->FindMaterial( "dev/hdrcombineto16bit", TEXTURE_GROUP_OTHER, true );
-
-    CMatRenderContextPtr pRenderContext( materials );
-    ITexture *pSaveRenderTarget;
-    pSaveRenderTarget = pRenderContext->GetRenderTarget();
-
-    int oldX, oldY, oldW, oldH;
-    pRenderContext->GetViewport( oldX, oldY, oldW, oldH );
-
-    pRenderContext->SetRenderTarget( GetBuildCubemaps16BitTexture() );
-    int width, height;
-    pRenderContext->GetRenderTargetDimensions( width, height );
-    pRenderContext->Viewport( 0, 0, width, height );
-    pRenderContext->DrawScreenSpaceQuad( pHDRCombineMaterial );
-
-    pRenderContext->SetRenderTarget( pSaveRenderTarget );
-    pRenderContext->Viewport( oldX, oldY, oldW, oldH );
 }
 
 void GetCubemapOffset( CubeMapFaceIndex_t faceIndex, int &x, int &y, int &faceDim )
