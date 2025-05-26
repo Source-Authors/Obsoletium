@@ -16,6 +16,8 @@ PLATFORM_INTERFACE double g_ClockSpeedMicrosecondsMultiplier;
 PLATFORM_INTERFACE double g_ClockSpeedMillisecondsMultiplier;
 PLATFORM_INTERFACE double g_ClockSpeedSecondsMultiplier;
 
+PLATFORM_INTERFACE uint64 g_ClockRtscpOverhead;
+
 class CCycleCount
 {
 friend class CFastTimer;
@@ -261,7 +263,10 @@ inline void CCycleCount::Init( uint64 cycles )
 
 inline void CCycleCount::Sample()
 {
-	m_Int64 = Plat_Rdtsc();
+	// dimhotepus: Adjust by half of measurement overhead as we measure between
+	// 2 points.
+	uint32 coreId;
+	m_Int64 = Plat_Rdtscp(coreId) - (g_ClockRtscpOverhead / 2);
 }
 
 inline CCycleCount& CCycleCount::operator+=( CCycleCount const &other )

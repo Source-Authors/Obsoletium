@@ -491,33 +491,6 @@ uint64 CalculateCPUFreq(); // from cpu_linux.cpp
 
 }  // namespace
 
-#if defined(_WIN32)
-inline uint64_t QueryCpuCycleValue(uint32_t &cpu_id)
-{
-	// See https://www.felixcloutier.com/x86/rdtscp
-	// 
-	// The RDTSCP instruction is not a serializing instruction, but it does wait
-	// until all previous instructions have executed and all previous loads are
-	// globally visible.  But it does not wait for previous stores to be
-	// globally visible, and subsequent instructions may begin execution before
-	// the read operation is performed.  The following items may guide software
-	// seeking to order executions of RDTSCP:
-	// * If software requires RDTSCP to be executed only after all previous
-	// stores are globally visible, it can execute MFENCE immediately before
-	// RDTSCP.
-	// * If software requires RDTSCP to be executed prior to execution of any
-	// subsequent instruction (including any memory accesses), it can execute
-	// LFENCE immediately after RDTSCP.
-	//
-	// We do not mfence before as for timing only ordering matters, not finished
-	// memory stores are ok. 
-	const uint64_t tsc{__rdtscp(&cpu_id)};
-	// Ensure no reordering aka acquire barrier.
-	_mm_lfence();
-	return tsc;
-}
-#endif  // _WIN32
-
 // Measure the processor clock speed by sampling the cycle count, waiting for
 // some fraction of a second, then measuring the elapsed number of cycles.
 int64 QueryCurrentCpuFrequency()
@@ -532,13 +505,13 @@ int64 QueryCurrentCpuFrequency()
 	waitTime.QuadPart >>= scale;
 
 	QueryPerformanceCounter( &startCount );
-	const uint64_t startTicks = QueryCpuCycleValue(cpu_id_start);
+	const uint64_t startTicks = Plat_Rdtscp(cpu_id_start);
 	do
 	{
 		QueryPerformanceCounter( &curCount );
 	}
 	while ( curCount.QuadPart - startCount.QuadPart < waitTime.QuadPart );
-	const uint64_t endTicks = QueryCpuCycleValue(cpu_id_end);
+	const uint64_t endTicks = Plat_Rdtscp(cpu_id_end);
 
 	if (cpu_id_start != cpu_id_end)
 	{
@@ -547,7 +520,7 @@ int64 QueryCurrentCpuFrequency()
 		return QueryCurrentCpuFrequency();
 	}
 
-	int64_t freq = (endTicks - startTicks) << scale;
+	int64_t freq = (endTicks - startTicks - Plat_MeasureRtscpOverhead()) << scale;
 	if ( freq == 0 )
 	{
 		// Steam was seeing Divide-by-zero crashes on some Windows machines due to

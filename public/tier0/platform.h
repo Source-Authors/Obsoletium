@@ -472,6 +472,11 @@ typedef void * HINSTANCE;
 	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
 	// this macro lets us not force inlining in that case
 	#define  FORCEINLINE_TEMPLATE		__forceinline
+#else
+	#define FORCEINLINE inline __attribute__((always_inline))
+	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
+	// this macro lets us not force inlining in that case
+	#define  FORCEINLINE_TEMPLATE		__forceinline
 #endif
 
 // Force a function call site -not- to inlined. (useful for profiling)
@@ -898,14 +903,85 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 	#pragma intrinsic(__rdtscp)
 #endif
 
-inline uint64 Plat_Rdtsc()
+FORCEINLINE uint64_t Plat_Rdtsc()
 {
-	return __rdtsc();
+	// See https://www.felixcloutier.com/x86/rdtsc
+	// 
+	// The RDTSC instruction is not a serializing instruction.  It does not
+	// necessarily wait until all previous instructions have been executed
+	// before reading the counter.  Similarly, subsequent instructions may begin
+	// execution before the read operation is performed.  The following items
+	// may guide software seeking to order executions of RDTSC:
+	// * If software requires RDTSC to be executed only after all previous
+	// instructions have executed and all previous loads are globally visible,
+	// it can execute LFENCE immediately before RDTSC.
+	// * If software requires RDTSC to be executed only after all previous
+	// instructions have executed and all previous loads and stores are globally
+	// visible, it can execute the sequence MFENCE;LFENCE immediately before
+	// RDTSC.
+	// * If software requires RDTSC to be executed prior to execution of any
+	// subsequent instruction (including any memory accesses), it can execute
+	// the sequence LFENCE immediately after RDTSC.
+	//
+	// We do not mfence before as for timing only ordering matters, not finished
+	// memory stores are ok.
+	// Ensure no reordering aka acquire barrier.
+	_mm_lfence();
+	const uint64_t tsc{__rdtsc()};
+	// Ensure no reordering aka acquire barrier.
+	_mm_lfence();
+	return tsc;
 }
 
-inline uint64 Plat_Rdtscp(uint32 &coreId)
+FORCEINLINE uint64_t Plat_Rdtscp(uint32_t &coreId)
 {
-	return __rdtscp(&coreId);
+	// See https://www.felixcloutier.com/x86/rdtscp
+	// 
+	// The RDTSCP instruction is not a serializing instruction, but it does wait
+	// until all previous instructions have executed and all previous loads are
+	// globally visible.  But it does not wait for previous stores to be
+	// globally visible, and subsequent instructions may begin execution before
+	// the read operation is performed.  The following items may guide software
+	// seeking to order executions of RDTSCP:
+	// * If software requires RDTSCP to be executed only after all previous
+	// stores are globally visible, it can execute MFENCE immediately before
+	// RDTSCP.
+	// * If software requires RDTSCP to be executed prior to execution of any
+	// subsequent instruction (including any memory accesses), it can execute
+	// LFENCE immediately after RDTSCP.
+	//
+	// We do not mfence before as for timing only ordering matters, not finished
+	// memory stores are ok. 
+	const uint64_t tsc{__rdtscp(&coreId)};
+	// Ensure no reordering aka acquire barrier.
+	_mm_lfence();
+	return tsc;
+}
+
+inline uint64_t Plat_MeasureRtscpOverhead()
+{
+	uint32_t coreIdStart, coreIdEnd;
+	uint64_t overheads[64];
+	for (size_t i{0}; i < std::size(overheads);)
+	{
+		uint64_t start = Plat_Rdtscp(coreIdStart);
+		uint64_t end = Plat_Rdtscp(coreIdEnd);
+		// Usually tsc synced over cores (constant_tsc), but due to UEFI / CPU
+		// bugs all is possible.  So expect clock is monotonic only on a single
+		// core.
+		if (coreIdStart == coreIdEnd)
+		{
+			 overheads[i++] = end - start;
+		}
+	}
+
+	// median.
+	std::nth_element(std::begin(overheads),
+		std::begin(overheads) + std::size(overheads) / 2,
+		std::end(overheads));
+	uint64_t median = overheads[std::size(overheads) / 2];
+
+	return median;
 }
 
 // b/w compatibility

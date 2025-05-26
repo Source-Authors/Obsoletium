@@ -15,6 +15,8 @@ double g_ClockSpeedMicrosecondsMultiplier;
 double g_ClockSpeedMillisecondsMultiplier;
 double g_ClockSpeedSecondsMultiplier;
 
+uint64 g_ClockRtscpOverhead;
+
 // Constructor init the clock speed.
 CClockSpeedInit g_ClockSpeedInit CONSTRUCT_EARLY;
 
@@ -33,4 +35,6 @@ void CClockSpeedInit::Init()
 	g_ClockSpeedMicrosecondsMultiplier = 1000000.0 / (double)g_ClockSpeed;
 	g_ClockSpeedMillisecondsMultiplier = 1000.0 / (double)g_ClockSpeed;
 	g_ClockSpeedSecondsMultiplier = 1.0 / (double)g_ClockSpeed;
+
+	g_ClockRtscpOverhead = Plat_MeasureRtscpOverhead();
 }
