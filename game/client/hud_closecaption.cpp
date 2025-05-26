@@ -198,11 +198,8 @@ void CCloseCaptionWorkUnit::SetStream( const wchar_t *stream )
 	delete[] m_pszStream;
 	m_pszStream = NULL;
 
-	int len = wcslen( stream );
-	Assert( len < 4096 );
-	m_pszStream = new wchar_t[ len + 1 ];
-	wcsncpy( m_pszStream, stream, len );
-	m_pszStream[ len ] = L'\0';
+	Assert( V_wcslen( stream ) < 4096 );
+	m_pszStream = V_wcsdup( m_pszStream );
 }
 
 const wchar_t *CCloseCaptionWorkUnit::GetStream() const
@@ -2227,9 +2224,7 @@ private:
 			if ( !in )
 				return;
 
-			int len = wcslen( in );
-			stream = new wchar_t[ len + 1 ];
-			wcsncpy( stream, in, len + 1 );
+			stream = V_wcsdup( in );
 		}
 			
 		char		*token;

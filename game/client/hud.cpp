@@ -992,7 +992,7 @@ void CHud::ProcessInput( bool bActive )
 	}
 }
 
-int CHud::LookupRenderGroupIndexByName( const char *pszGroupName )
+intp CHud::LookupRenderGroupIndexByName( const char *pszGroupName )
 {
 	return m_RenderGroupNames.Find( pszGroupName );
 }
