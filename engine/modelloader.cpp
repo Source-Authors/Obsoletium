@@ -622,7 +622,6 @@ void CMapLoadHelper::Shutdown( void )
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 // Free the lighting lump (increases free memory during loading on 360)
 //-----------------------------------------------------------------------------
@@ -1089,12 +1088,6 @@ void Mod_LoadLighting( CMapLoadHelper &lh )
 
 	AllocateLightingData( lh.GetMap(), lh.LumpSize() );
 	memcpy( lh.GetMap()->lightdata, lh.LumpBase(), lh.LumpSize());
-
-	if ( IsX360() )
-	{
-		// Free the lighting lump, to increase the amount of memory free during the rest of loading
-		CMapLoadHelper::FreeLightingLump();
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -5022,11 +5015,6 @@ void CModelLoader::Studio_UnloadModel( model_t *pModel )
 	// leave these flags alone since we are going to return from alt-tab at some point.
 	//	Assert( !( mod->needload & FMODELLOADER_REFERENCEMASK ) );
 	pModel->nLoadFlags &= ~( FMODELLOADER_LOADED | FMODELLOADER_LOADED_BY_PRELOAD );
-	if ( IsX360() )
-	{
-		// 360 doesn't need to keep the reference flags, but the PC does
-		pModel->nLoadFlags &= ~FMODELLOADER_REFERENCEMASK;
-	}
 
 #ifdef DBGFLAG_ASSERT
 	int nRef = 
@@ -5261,16 +5249,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 		return false;
 	}
 
-	FileHandle_t mapfile;
-
-	if ( IsX360() )
-	{
-		char szMapName360[MAX_PATH];
-		UpdateOrCreate( szMapFile, szMapName360, sizeof( szMapName360 ), false );
-		V_strcpy_safe( szMapFile, szMapName360 );
-	}
-
-	mapfile = g_pFileSystem->OpenEx( szMapFile, "rb", IsX360() ? FSOPEN_NEVERINPACK : 0, "GAME" );
+	FileHandle_t mapfile = g_pFileSystem->OpenEx( szMapFile, "rb", 0, "GAME" );
 	if ( mapfile != FILESYSTEM_INVALID_HANDLE )
 	{
 		dheader_t header;

@@ -1201,10 +1201,6 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 			m_nSolidType = SOLID_NONE;
 			return;
 		}
-#ifdef _XBOX
-		else
-			solid.surfaceprop[0] = '\0';
-#endif
 
 		// If there's no collide, we need a bbox...
 		pPhysCollide = physcollision->BBoxToCollide( m_pModel->mins, m_pModel->maxs );
