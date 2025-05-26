@@ -2251,14 +2251,13 @@ int RichText::GetStartDrawIndex(int &lineBreakIndexIndex)
 // Input:	offset - index to Start reading from 
 //			bufLen - length of string
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, int bufLenInBytes)
+void RichText::GetText(intp offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, intp bufLenInBytes)
 {
 	if (!buf)
 		return;
 	
-	Assert( bufLenInBytes >= static_cast<int>(sizeof(buf[0])) );
-	int bufLen = bufLenInBytes / sizeof(wchar_t);
-	int i;
+	intp bufLen = bufLenInBytes / sizeof(wchar_t);
+	intp i;
 	for (i = offset; i < (offset + bufLen - 1); i++)
 	{
 		if (i >= m_TextStream.Count())
@@ -2273,10 +2272,10 @@ void RichText::GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, in
 //-----------------------------------------------------------------------------
 // Purpose: gets text from the buffer
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, OUT_Z_CAP(bufLenInBytes) char *pch, int bufLenInBytes)
+void RichText::GetText(intp offset, OUT_Z_CAP(bufLenInBytes) char *pch, intp bufLenInBytes)
 {
 	wchar_t rgwchT[4096];
-	GetText(offset, rgwchT, sizeof(rgwchT));
+	GetText(offset, rgwchT);
     Q_UnicodeToUTF8(rgwchT, pch, bufLenInBytes);
 }
 
@@ -2308,7 +2307,7 @@ bool RichText::RequestInfo(KeyValues *outputData)
 	if (!stricmp(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[512];
-		GetText(0, wbuf, sizeof(wbuf));
+		GetText(0, wbuf);
 		outputData->SetWString("text", wbuf);
 		return true;
 	}

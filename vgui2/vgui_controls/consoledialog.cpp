@@ -1051,7 +1051,7 @@ void CConsolePanel::DumpConsoleTextToFile()
 		while (1)
 		{
 			wchar_t buf[512];
-			m_pHistory->GetText(pos, buf, sizeof(buf));
+			m_pHistory->GetText(pos, buf);
 			pos += sizeof(buf) / sizeof(wchar_t);
 
 			// don't continue if none left

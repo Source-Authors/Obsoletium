@@ -283,7 +283,7 @@ void CBaseHudChatLine::PerformFadeout( void )
 		alpha = clamp( alpha, 0, 255 );
 
 		wchar_t wbuf[4096];
-		GetText(0, wbuf, sizeof(wbuf));
+		GetText(0, wbuf);
 
 		SetText( "" );
 
@@ -298,7 +298,7 @@ void CBaseHudChatLine::PerformFadeout( void )
 		alpha = clamp( alpha, 0, 255 );
 
 		wchar_t wbuf[4096];
-		GetText(0, wbuf, sizeof(wbuf));
+		GetText(0, wbuf);
 
 		SetText( "" );
 
@@ -308,7 +308,7 @@ void CBaseHudChatLine::PerformFadeout( void )
 	else
 	{
 		wchar_t wbuf[4096];
-		GetText(0, wbuf, sizeof(wbuf));
+		GetText(0, wbuf);
 
 		SetText( "" );
 
