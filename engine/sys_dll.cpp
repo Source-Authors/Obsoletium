@@ -1347,7 +1347,7 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 #if defined(_WIN32)
 	char appname[ 512 ];
 
-	GetModuleFileName( 0, appname, sizeof( appname ) );
+	Plat_GetModuleFilename( appname, sizeof( appname ) );
 	Q_FixSlashes( appname );
 	Q_strlower( appname );
 
