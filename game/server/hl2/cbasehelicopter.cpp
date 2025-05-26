@@ -1182,7 +1182,7 @@ void CBaseHelicopter::UpdateRotorSoundPitch( int iPitch )
 	if (m_pRotorSound)
 	{
 		CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
-		controller.SoundChangePitch( m_pRotorSound, iPitch, 0.1 );
+		controller.SoundChangePitch( m_pRotorSound, iPitch, 0.1f );
 		UpdateRotorWashVolume();
 	}
 }
