@@ -156,8 +156,6 @@ void Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 	GetModuleFileName( NULL, pOut, nMaxBytes );
 	if ( GetLastError() != ERROR_SUCCESS )
 		Error( "Plat_GetModuleFilename: The buffer given is too small (%d bytes).", nMaxBytes );
-#elif PLATFORM_X360
-	pOut[0] = 0x00;		// return null string on Xbox 360
 #else
 	// We shouldn't need this on POSIX.
 	Assert( false );
