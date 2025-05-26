@@ -865,7 +865,7 @@ void SporeEffect::UpdateVelocity( SimpleParticle *pParticle, float timeDelta )
 Vector SporeEffect::UpdateColor( const SimpleParticle *pParticle )
 {
 	Vector	color;
-	float	ramp = ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) );//1.0f - ( pParticle->m_flLifetime / pParticle->m_flDieTime );
+	float	ramp = ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) );//1.0f - ( pParticle->m_flLifetime / pParticle->m_flDieTime );
 
 	color[0] = ( (float) pParticle->m_uchColor[0] * ramp ) / 255.0f;
 	color[1] = ( (float) pParticle->m_uchColor[1] * ramp ) / 255.0f;
@@ -1025,7 +1025,7 @@ void C_SporeExplosion::AddParticles( void )
 	}
 
 	//Add smokey bits
-	offset.Random( -(m_flSpawnRadius * 0.5), (m_flSpawnRadius * 0.5) );
+	offset.Random( -(m_flSpawnRadius * 0.5f), (m_flSpawnRadius * 0.5f) );
 	sParticle = (SimpleParticle *) m_pSporeEffect->AddParticle( sizeof(SimpleParticle), g_Mat_DustPuff[1], GetAbsOrigin()+offset );
 
 	if ( sParticle == NULL )

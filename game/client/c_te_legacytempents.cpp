@@ -2242,11 +2242,11 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 		
 		if ( isshellcasing )
 		{
-			fvol *= MIN (1.0f, ((float)zvel) / 350.0f); 
+			fvol *= MIN (1.0f, zvel / 350.0f); 
 		}
 		else
 		{
-			fvol *= MIN (1.0f, ((float)zvel) / 450.0f); 
+			fvol *= MIN (1.0f, zvel / 450.0f); 
 		}
 		
 		if ( !random->RandomInt(0,3) && !isshellcasing )
