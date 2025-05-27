@@ -335,7 +335,8 @@ bool CBonusMapsDatabase::ReadBonusMapSaveData( void )
 	V_sprintf_safe( szFilename, "%s/bonus_maps_data.bmd", SAVE_DIR );
 
 	// dimhotepus: Support bonus maps in mods.
-	if ( !m_pBonusMapSavedData->LoadFromFile( g_pFullFileSystem, szFilename, MOD_DIR ) )
+	if ( g_pFullFileSystem->FileExists( szFilename, MOD_DIR ) &&
+		!m_pBonusMapSavedData->LoadFromFile( g_pFullFileSystem, szFilename, MOD_DIR ) )
 	{
 		Warning( "Unable to load bonus maps data from '%s'.\n", szFilename );
 	}
