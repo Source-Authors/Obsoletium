@@ -5,11 +5,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <stdio.h>
-
-#include "threadtools.h"
-
 #include "BasePanel.h"
+
 #include "EngineInterface.h"
 #include "VGuiSystemModuleLoader.h"
 
@@ -22,15 +19,10 @@
 #include "filesystem.h"
 #include "GameConsole.h"
 #include "GameUI_Interface.h"
-#include "vgui_controls/PropertyDialog.h"
-#include "vgui_controls/PropertySheet.h"
 #include "materialsystem/materialsystem_config.h"
 #include "materialsystem/imaterialsystem.h"
 #include "sourcevr/isourcevirtualreality.h"
 
-using namespace vgui;
-
-#include "GameConsole.h"
 #include "ModInfo.h"
 
 #include "IGameUIFuncs.h"
@@ -46,8 +38,8 @@ using namespace vgui;
 #include "vgui_controls/QueryBox.h"
 #include "vgui_controls/ControllerMap.h"
 #include "vgui_controls/KeyRepeat.h"
-#include "tier0/icommandline.h"
-#include "tier1/convar.h"
+#include "vgui_controls/PropertyDialog.h"
+#include "vgui_controls/PropertySheet.h"
 #include "NewGameDialog.h"
 #include "BonusMapsDialog.h"
 #include "LoadGameDialog.h"
@@ -55,35 +47,33 @@ using namespace vgui;
 #include "OptionsDialog.h"
 #include "CreateMultiplayerGameDialog.h"
 #include "ChangeGameDialog.h"
-#include "BackgroundMenuButton.h"
 #include "PlayerListDialog.h"
 #include "BenchmarkDialog.h"
 #include "LoadCommentaryDialog.h"
 #include "ControllerDialog.h"
 #include "BonusMapsDatabase.h"
 #include "engine/IEngineSound.h"
-#include "bitbuf.h"
-#include "tier1/fmtstr.h"
 #include "inputsystem/iinputsystem.h"
 #include "ixboxsystem.h"
 #include "matchmaking/matchmakingbasepanel.h"
 #include "matchmaking/achievementsdialog.h"
 #include "iachievementmgr.h"
-#include "UtlSortVector.h"
 
 #include "game/client/IGameClientExports.h"
 
 #include "OptionsSubAudio.h"
 #include "hl2orange.spa.h"
 #include "CustomTabExplanationDialog.h"
-#if defined( _X360 )
-#include "xbox/xbox_launch.h"
-#else
 #include "xbox/xboxstubs.h"
-#endif
 
 #include "engine/imatchmaking.h"
+#include "tier0/icommandline.h"
+#include "tier0/threadtools.h"
+#include "tier1/convar.h"
+#include "tier1/bitbuf.h"
 #include "tier1/utlstring.h"
+#include "tier1/UtlSortVector.h"
+#include "tier1/fmtstr.h"
 #include "steam/steam_api.h"
 
 #ifdef _WIN32
@@ -95,6 +85,7 @@ using namespace vgui;
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+using namespace vgui;
 
 #define MAIN_MENU_INDENT_X360 10
 
