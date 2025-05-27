@@ -432,7 +432,7 @@ void Con_DebugLog( const char *fmt, ...)
 			char const *prefix = MapReslistGenerator().LogPrefix();
 			if ( prefix )
 			{
-				g_pFileSystem->Write( prefix, strlen(prefix), fh );
+				g_pFileSystem->Write( prefix, V_strlen(prefix), fh );
 			}
 		}
 
@@ -442,13 +442,13 @@ void Con_DebugLog( const char *fmt, ...)
 			if ( needTimestamp )
 			{
 				const char *timestamp = GetTimestampString();
-				g_pFileSystem->Write( timestamp, strlen( timestamp ), fh );
+				g_pFileSystem->Write( timestamp, V_strlen( timestamp ), fh );
 				g_pFileSystem->Write( ": ", 2, fh );
 			}
 			needTimestamp = V_stristr( data, "\n" ) != 0;   
 		}
 
-		g_pFileSystem->Write( data, strlen(data), fh );
+		g_pFileSystem->Write( data, V_strlen(data), fh );
 		// Now that we don't close the file we need to flush it in order
 		// to make sure that the data makes it to the file system.
 		g_pFileSystem->Flush( fh );
@@ -942,7 +942,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 		}
 
 		// Append it
-		safestrncat( current->text, MAX_NOTIFY_TEXT_LINE, p, wcslen( p ) );
+		safestrncat( current->text, p, V_wcslen( p ) );
 		current->clr = clr;
 		current->liferemaining = con_notifytime.GetFloat();
 		break;
@@ -1009,9 +1009,8 @@ bool CConPanel::ShouldDraw()
 		// Protect against background modifications to m_NotifyText.
 		AUTO_LOCK( g_AsyncNotifyTextMutex );
 
-		int i;
-		int c = m_NotifyText.Count();
-		for ( i = c - 1; i >= 0; i-- )
+			intp c = m_NotifyText.Count();
+			for ( intp i = c - 1; i >= 0; i-- )
 		{
 			CNotifyText *notify = &m_NotifyText[ i ];
 
@@ -1069,20 +1068,18 @@ void CConPanel::DrawNotify( void )
 		textToDraw = m_NotifyText;
 	}
 
-	int c = textToDraw.Count();
-	for ( int i = 0; i < c; i++ )
+	intp i{0};
+	for ( auto &notify : textToDraw )
 	{
-		CNotifyText *notify = &textToDraw[ i ];
-
-		float timeleft = notify->liferemaining;
+		float timeleft = notify.liferemaining;
 	
-		Color clr = notify->clr;
+		Color clr = notify.clr;
 
 		if ( timeleft < .5f )
 		{
 			float f = clamp( timeleft, 0.0f, .5f ) / .5f;
 
-			clr[3] = (int)( f * 255.0f );
+			clr[3] = (byte)( f * 255.0f );
 
 			if ( i == 0 && f < 0.2f )
 			{
@@ -1094,9 +1091,11 @@ void CConPanel::DrawNotify( void )
 			clr[3] = 255;
 		}
 
-		DrawColoredText( m_hFontFixed, x, y, clr[0], clr[1], clr[2], clr[3], notify->text );
+		DrawColoredText( m_hFontFixed, x, y, clr[0], clr[1], clr[2], clr[3], notify.text );
 
 		y += fontTall;
+
+		++i;
 	}
 }
 
