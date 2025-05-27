@@ -1471,7 +1471,6 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 	{
 		if ( !sResult.IsEmpty() )
 			sResult += ";";
-		CUtlString sName;
 		if ( pSearchPath->GetPackFile() )
 		{
 			sResult += pSearchPath->GetPackFile()->m_ZipName.String();
