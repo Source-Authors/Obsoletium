@@ -273,7 +273,7 @@ void Con_Clear_f()
 	EngineVGui()->ClearConsole();
 	Con_ClearNotify();
 }
-						
+
 /*
 ================
 Con_ClearNotify
@@ -287,7 +287,7 @@ void Con_ClearNotify ()
 	}
 }
 
-#endif // SWDS												
+#endif // SWDS
 
 
 ConsoleLogManager::ConsoleLogManager()
@@ -474,99 +474,99 @@ extern ConVar spew_consolelog_to_debugstring;
 
 void Con_ColorPrint( const Color& clr, char const *msg )
 {
-		if ( g_bInColorPrint )
-			return;
+	if ( g_bInColorPrint )
+		return;
 
-		int nCon_Filter_Enable = con_filter_enable.GetInt();
-		if ( nCon_Filter_Enable > 0 )
+	int nCon_Filter_Enable = con_filter_enable.GetInt();
+	if ( nCon_Filter_Enable > 0 )
+	{
+		const char *pszText = con_filter_text.GetString();
+		const char *pszIgnoreText = con_filter_text_out.GetString();
+
+		switch( nCon_Filter_Enable )
 		{
-			const char *pszText = con_filter_text.GetString();
-			const char *pszIgnoreText = con_filter_text_out.GetString();
+		case 1:
+			// if line does not contain keyword do not print the line
+			if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
+				return;
+			if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
+				return;
+			break;
 
-			switch( nCon_Filter_Enable )
+		case 2:
+			if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
+				return;
+			// if line does not contain keyword print it in a darker color
+			if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
 			{
-			case 1:
-				// if line does not contain keyword do not print the line
-				if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
-					return;
-				if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
-					return;
-				break;
-
-			case 2:
-				if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
-					return;
-				// if line does not contain keyword print it in a darker color
-				if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
-				{
-					Color mycolor(200, 200, 200, 150 );
-					g_pCVar->ConsoleColorPrintf( mycolor, "%s", msg );
-					return;
-				}
-				break;
-
-			default:
-				// by default do no filtering
-				break;
+				Color mycolor(200, 200, 200, 150 );
+				g_pCVar->ConsoleColorPrintf( mycolor, "%s", msg );
+				return;
 			}
-		}
+			break;
 
-		g_bInColorPrint = true;
-
-		// also echo to debugging console
-		if ( Plat_IsInDebugSession() && !con_trace.GetInt() && !spew_consolelog_to_debugstring.GetBool() )
-		{
-			Sys_OutputDebugString(msg);
+		default:
+			// by default do no filtering
+			break;
 		}
+	}
+
+	g_bInColorPrint = true;
+
+	// also echo to debugging console
+	if ( Plat_IsInDebugSession() && !con_trace.GetInt() && !spew_consolelog_to_debugstring.GetBool() )
+	{
+		Sys_OutputDebugString(msg);
+	}
 			
-		if ( sv.IsDedicated() )
-		{
-			g_bInColorPrint = false;
-			return;		// no graphics mode
-		}
+	if ( sv.IsDedicated() )
+	{
+		g_bInColorPrint = false;
+		return;		// no graphics mode
+	}
 
-		bool convisible = Con_IsVisible();
-		bool indeveloper = ( developer.GetInt() > 0 );
-		bool debugprint = g_fIsDebugPrint;
+	bool convisible = Con_IsVisible();
+	bool indeveloper = ( developer.GetInt() > 0 );
+	bool debugprint = g_fIsDebugPrint;
 
-		if ( g_fColorPrintf )
+	if ( g_fColorPrintf )
+	{
+		g_pCVar->ConsoleColorPrintf( clr, "%s", msg );
+	}
+	else
+	{
+		// write it out to the vgui console no matter what
+		if ( g_fIsDebugPrint )
 		{
-			g_pCVar->ConsoleColorPrintf( clr, "%s", msg );
+			// Don't spew debug stuff to actual console once in game, unless console isn't up
+			if ( !cl.IsActive() || !convisible )
+			{
+				g_pCVar->ConsoleDPrintf( "%s", msg );
+			}
 		}
 		else
 		{
-			// write it out to the vgui console no matter what
-			if ( g_fIsDebugPrint )
-			{
-				// Don't spew debug stuff to actual console once in game, unless console isn't up
-				if ( !cl.IsActive() || !convisible )
-				{
-					g_pCVar->ConsoleDPrintf( "%s", msg );
-				}
-			}
-			else
-			{
-				g_pCVar->ConsolePrintf( "%s", msg );
-			}
+			g_pCVar->ConsolePrintf( "%s", msg );
 		}
-
-		// Make sure we "spew" if this wan't generated from the spew system
-		if ( !g_bInSpew )
-		{
-			Msg( "%s", msg );
-		}
-
-		// Only write to notify if it's non-debug or we are running with developer set > 0
-		// Buf it it's debug then make sure we don't have the console down
-		if ( ( !debugprint || indeveloper ) && !( debugprint && convisible ) )
-		{
-			if ( g_pConPanel )
-			{
-				g_pConPanel->AddToNotify( clr, msg );
-			}
-		}
-		g_bInColorPrint = false;
 	}
+
+	// Make sure we "spew" if this wan't generated from the spew system
+	if ( !g_bInSpew )
+	{
+		Msg( "%s", msg );
+	}
+
+	// Only write to notify if it's non-debug or we are running with developer set > 0
+	// Buf it it's debug then make sure we don't have the console down
+	if ( ( !debugprint || indeveloper ) && !( debugprint && convisible ) )
+	{
+		if ( g_pConPanel )
+		{
+			g_pConPanel->AddToNotify( clr, msg );
+		}
+	}
+	g_bInColorPrint = false;
+}
 #endif
 
 // returns false if the print function shouldn't continue
@@ -762,8 +762,8 @@ void Con_NPrintf( int idx, const char *fmt, ... )
     V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
-		g_pConPanel->Con_NPrintf( idx, outtext );
-	}
+	g_pConPanel->Con_NPrintf( idx, outtext );
+}
 
 void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
 {
@@ -774,8 +774,8 @@ void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
     V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
-		g_pConPanel->Con_NXPrintf( info, outtext );
-	}
+	g_pConPanel->Con_NXPrintf( info, outtext );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Creates the console panel
@@ -971,8 +971,8 @@ void CConPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 	BaseClass::ApplySchemeSettings( pScheme );
 
 	// Console font
-	m_hFont = pScheme->GetFont( "DefaultSmallDropShadow", false );
-	m_hFontFixed = pScheme->GetFont( "DefaultFixedDropShadow", false );
+	m_hFont = pScheme->GetFont( "DefaultSmallDropShadow", true );
+	m_hFontFixed = pScheme->GetFont( "DefaultFixedDropShadow", true );
 }
 
 int CConPanel::DrawText( vgui::HFont font, int x, int y, wchar_t *data )
@@ -1002,28 +1002,28 @@ bool CConPanel::ShouldDraw()
 		bool bVisible = m_bDrawDebugAreas;
 
 		{
-		// Protect against background modifications to m_NotifyText.
-		AUTO_LOCK( g_AsyncNotifyTextMutex );
+			// Protect against background modifications to m_NotifyText.
+			AUTO_LOCK( g_AsyncNotifyTextMutex );
 
 			intp c = m_NotifyText.Count();
 			for ( intp i = c - 1; i >= 0; i-- )
-		{
-			CNotifyText *notify = &m_NotifyText[ i ];
-
-			notify->liferemaining -= host_frametime;
-
-			if ( notify->liferemaining <= 0.0f )
 			{
-				m_NotifyText.Remove( i );
-				continue;
-			}
-			
-			bVisible = true;
-		}
-	}
+				CNotifyText *notify = &m_NotifyText[ i ];
 
-	return bVisible;
-}
+				notify->liferemaining -= host_frametime;
+
+				if ( notify->liferemaining <= 0.0f )
+				{
+					m_NotifyText.Remove( i );
+					continue;
+				}
+			
+				bVisible = true;
+			}
+		}
+
+		return bVisible;
+	}
 
 	return true;
 }
@@ -1133,43 +1133,47 @@ void CConPanel::DrawDebugAreas( void )
 
 int CConPanel::ProcessNotifyLines( int &left, int &top, int &right, int &bottom, bool bDraw )
 {
+	const int oneProportional = vgui::scheme()->GetProportionalScaledValue( 1 );
+	const int tenProportional = 10 * oneProportional;
+	const int twentyProportional = 2 * tenProportional;
+
 	int count = 0;
-	int y = 20;
+	int y = tenProportional * 2;
 
 	for ( int i = 0; i < MAX_DBG_NOTIFY; i++ )
 	{
-		if ( realtime < da_notify[i].expire || da_notify[i].expire == -1 )
+		auto &notify = da_notify[i];
+
+		if ( realtime < notify.expire || notify.expire == -1 )
 		{
 			// If it's marked this way, only draw it once.
-			if ( da_notify[i].expire == -1 && bDraw )
+			if ( notify.expire == -1 && bDraw )
 			{
-				da_notify[i].expire = realtime - 1;
+				notify.expire = realtime - 1;
 			}
 			
-			int len;
-			int x;
+			vgui::HFont font = notify.fixed_width_font ? m_hFontFixed : m_hFont;
 
-			vgui::HFont font = da_notify[i].fixed_width_font ? m_hFontFixed : m_hFont ;
+			int fontTall = vgui::surface()->GetFontTall( m_hFontFixed ) + oneProportional;
 
-			int fontTall = vgui::surface()->GetFontTall( m_hFontFixed ) + 1;
+			int len = DrawTextLen( font, notify.szNotify );
+			int x = videomode->GetModeStereoWidth() - tenProportional - len;
 
-			len = DrawTextLen( font, da_notify[i].szNotify );
-			x = videomode->GetModeStereoWidth() - 10 - len;
-
-			if ( y + fontTall > videomode->GetModeStereoHeight() - 20 )
+			if ( y + fontTall > videomode->GetModeStereoHeight() - twentyProportional )
 				return count;
 
 			count++;
-			y = 20 + 10 * i;
+
+			y = twentyProportional + tenProportional * i;
 
 			if ( bDraw )
 			{
 				DrawColoredText( font, x, y, 
-					da_notify[i].color[0] * 255, 
-					da_notify[i].color[1] * 255, 
-					da_notify[i].color[2] * 255,
+					static_cast<int>(notify.color[0] * 255), 
+					static_cast<int>(notify.color[1] * 255), 
+					static_cast<int>(notify.color[2] * 255),
 					255,
-					da_notify[i].szNotify );
+					notify.szNotify );
 			}
 
 			if ( !Q_isempty( notify.szNotify ) )
@@ -1215,35 +1219,43 @@ void CConPanel::PaintBackground()
 		return;
 
 	int wide = GetWide();
-	char ver[ 128 ];
+	wchar_t ver[ 256 ];
 	// dimhotepus: Add SemVer version number.
-	V_sprintf_safe(ver, "Source Engine %i (build %d [v.%s])",
+	V_swprintf_safe(ver, L"Source Engine %i (build %d [v.%S])",
 		PROTOCOL_VERSION, build_number(), SRC_PRODUCT_VERSION_INFO_STRING );
-	wchar_t unicode[ 200 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( ver, unicode );
 
 	vgui::surface()->DrawSetTextColor( Color( 255, 255, 255, 255 ) );
-	int x = wide - DrawTextLen( m_hFont, unicode ) - 2;
-	DrawText( m_hFont, x, 0, unicode );
+	int xTwoOffset = vgui::scheme()->GetProportionalScaledValue( 2 );
+	int x = wide - DrawTextLen( m_hFont, ver ) - xTwoOffset;
+	DrawText( m_hFont, x, 0, ver );
 
 	if ( cl.IsActive() )
 	{
 		if ( cl.m_NetChannel->IsLoopback() )
 		{
-			V_sprintf_safe(ver, "Map '%s'", cl.m_szLevelBaseName );
+			V_swprintf_safe(ver,
+#ifdef _WIN32
+				L"Map '%S'",
+#else
+				L"Map '%ls'",
+#endif
+				cl.m_szLevelBaseName );
 		}
 		else
 		{
-			V_sprintf_safe(ver, "Server '%s' Map '%s'", cl.m_NetChannel->GetRemoteAddress().ToString(), cl.m_szLevelBaseName );
+			V_swprintf_safe(ver,
+#ifdef _WIN32
+				L"Server '%S' Map '%S'",
+#else
+				L"Server '%ls' Map '%ls'",
+#endif
+				cl.m_NetChannel->GetRemoteAddress().ToString(), cl.m_szLevelBaseName );
 		}
-
-		wchar_t wUnicode[ 200 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( ver, wUnicode );
 
 		int tall = vgui::surface()->GetFontTall( m_hFont );
 
-		x = wide - DrawTextLen( m_hFont, wUnicode ) - 2;
-		DrawText( m_hFont, x, tall + 1, wUnicode );
+		x = wide - DrawTextLen( m_hFont, ver ) - xTwoOffset;
+		DrawText( m_hFont, x, tall + xTwoOffset / 2, ver );
 	}
 }
 
