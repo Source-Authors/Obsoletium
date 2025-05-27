@@ -308,8 +308,7 @@ void TextTooltip::ShowTooltip(Panel *currentPanel)
 {
 	if ( s_TooltipWindow.Get() )
 	{
-		int nLen = s_TooltipWindow->GetTextLength();
-
+		intp nLen = s_TooltipWindow->GetTextLength();
 		if ( nLen <= 0 )
 		{
 			// Empty tool tip, no need to show it

@@ -209,8 +209,8 @@ void InputDialog::OnCommand(const char *command)
 
 	if (!stricmp(command, "OK"))
 	{
-		int nTextLength = m_pInput->GetTextLength() + 1;
-		char* txt = (char*)_alloca( nTextLength * sizeof(char) );
+		intp nTextLength = m_pInput->GetTextLength() + 1;
+		char* txt = stackallocT( char, nTextLength );
 		m_pInput->GetText( txt, nTextLength );
 		KeyValues *kv = new KeyValues( "InputCompleted", "text", txt );
 		if ( m_pContextKeyValues )

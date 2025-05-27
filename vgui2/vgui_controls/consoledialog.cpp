@@ -673,10 +673,10 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	{
 		m_pCompletionList->SetVisible(true);
 		m_pCompletionList->DeleteAllItems();
-		constexpr int MAX_MENU_ITEMS = 10;
+		constexpr intp MAX_MENU_ITEMS = 10;
 
 		// add the first ten items to the list
-		for (int i = 0; i < m_CompletionList.Count() && i < MAX_MENU_ITEMS; i++)
+		for (intp i = 0; i < m_CompletionList.Count() && i < MAX_MENU_ITEMS; i++)
 		{
 			char text[256];
 			text[0] = 0;
