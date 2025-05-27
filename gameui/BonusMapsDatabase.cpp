@@ -54,10 +54,9 @@ bool WriteBonusMapSavedData( KeyValues *data )
 
 void GetBooleanStatus( KeyValues *pBonusFilesKey, BonusMapDescription_t &map )
 {
-	KeyValues *pFileKey = NULL;
 	KeyValues *pBonusKey = NULL;
 
-	for ( pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
+	for ( auto *pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
 	{
 		if ( Q_strcmp( pFileKey->GetName(), map.szFileName ) == 0 )
 		{
@@ -139,10 +138,9 @@ float GetChallengeBests( KeyValues *pBonusFilesKey, BonusMapDescription_t &chall
 	if ( challenge.m_pChallenges == NULL || challenge.m_pChallenges->Count() == 0 )
 		return 0.0f;
 
-	KeyValues *pFileKey = NULL;
 	KeyValues *pBonusKey = NULL;
 
-	for ( pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
+	for ( auto *pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
 	{
 		if ( Q_strcmp( pFileKey->GetName(), challenge.szFileName ) == 0 )
 		{
@@ -679,12 +677,10 @@ void CBonusMapsDatabase::NumMedals( int piNumMedals[ 3 ] )
 
 		if ( pMap && pMap->m_pChallenges )
 		{
-			for ( int iChallenge = 0; iChallenge < pMap->m_pChallenges->Count(); ++iChallenge )
+			for ( auto &desc : *pMap->m_pChallenges )
 			{
-				ChallengeDescription_t *pChallengeDescription = &((*pMap->m_pChallenges)[ iChallenge ]);
-
 				int iBest, iEarnedMedal, iNext, iNextMedal;
-				GetChallengeMedals( pChallengeDescription, iBest, iEarnedMedal, iNext, iNextMedal );
+				GetChallengeMedals( &desc, iBest, iEarnedMedal, iNext, iNextMedal );
 
 				// Increase the count for this medal and every medal below it
 				while ( iEarnedMedal > 0 )
