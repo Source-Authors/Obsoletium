@@ -226,7 +226,7 @@ void CQuickListPanel::SetServerInfo ( KeyValues *pKV, int iListID, int iTotalSer
 
 	g_pVGuiLocalize->ConvertANSIToUnicode( pKV->GetString( "players", " " ), playercount );
 
-	_snwprintf( players, std::size( players ), L"%ls %ls",  playercount, pwszPlayers );
+	V_swprintf_safe( players, L"%ls %ls",  playercount, pwszPlayers );
 	
 	m_pPlayerCountLabel->SetText( players );
 	m_pPlayerCountLabel->SetVisible( true );
@@ -241,7 +241,7 @@ void CQuickListPanel::SetServerInfo ( KeyValues *pKV, int iListID, int iTotalSer
 	else if ( iTotalServers > 2 )
 	{
 		wchar_t *pwszServers = g_pVGuiLocalize->Find("#ServerBrowser_QuickListOtherServers");
-		_snwprintf( playercount, std::size(playercount), L"%d", (iTotalServers-1) );
+		V_swprintf_safe( playercount, L"%d", (iTotalServers-1) );
 		g_pVGuiLocalize->ConstructString_safe( players, pwszServers, 1, playercount );
 		m_pOtherServersLabel->SetText( players );
 		m_pOtherServersLabel->SetVisible( true );
