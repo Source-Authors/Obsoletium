@@ -38,9 +38,6 @@ const char *COM_GetModDirectory();
 
 bool WriteBonusMapSavedData( KeyValues *data )
 {
-	if ( IsX360() && ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED ) )
-		return false;
-
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	data->RecursiveSaveToFile( buf, 0 );
