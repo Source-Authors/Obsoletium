@@ -168,8 +168,8 @@ void CDialogAddServer::OnOK()
 	// try and parse out IP address
 	const char *address = GetControlString("ServerNameText", "");
 	netadr_t netaddr;
-	netaddr.SetFromString( address, true );
-	if ( !netaddr.GetPort() && !AllowInvalidIPs() )
+	// dimhotepus: Handle bad IPs.
+	if ( !netaddr.SetFromString( address, true ) || ( !netaddr.GetPort() && !AllowInvalidIPs() ) )
 	{
 		// use the default port since it was not entered
 		netaddr.SetPort( 27015 );
@@ -214,7 +214,9 @@ void CDialogAddServer::TestServers()
 	// If they specified a port, then send a query to that port.
 	const char *address = GetControlString("ServerNameText", "");
 	netadr_t netaddr;
-	netaddr.SetFromString( address, true );
+	// dimhotepus: Handle bad IPs.
+	if ( !netaddr.SetFromString( address, true ) )
+		return;
 	
 	m_Servers.RemoveAll();
 	CUtlVector<netadr_t> vecAdress;
