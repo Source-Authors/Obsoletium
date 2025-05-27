@@ -235,7 +235,7 @@ void ProgressBox::UpdateTitle()
 	wchar_t completion[64];
 	if ((int)(m_flCurrentProgress * 100.0f) > 0)
 	{
-		_snwprintf(completion, sizeof(completion) / sizeof(wchar_t), L"- %d%% complete", (int)(m_flCurrentProgress * 100.0f));
+		V_swprintf_safe(completion, L"- %d%% complete", (int)(m_flCurrentProgress * 100.0f));
 	}
 	else
 	{

@@ -4037,8 +4037,7 @@ void TextEntry::ShowIMECandidates()
 		input()->GetCandidate( i, unicode, sizeof( unicode ) );
 
 		wchar_t label[ 64 ];
-		_snwprintf( label, sizeof( label ) / sizeof( wchar_t ) - 1, L"%i %s", i - pageStart + startAtOne, unicode );
-		label[ sizeof( label ) / sizeof( wchar_t ) - 1 ] = L'\0';
+		V_swprintf_safe( label, L"%i %s", i - pageStart + startAtOne, unicode );
 
 		intp id = m_pIMECandidates->AddMenuItem( "Candidate", label, (KeyValues *)NULL, this );
 		if ( isSelected )
@@ -4167,8 +4166,7 @@ void TextEntry::UpdateIMECandidates()
 		input()->GetCandidate( i, unicode, sizeof( unicode ) );
 
 		wchar_t label[ 64 ];
-		_snwprintf( label, sizeof( label ) / sizeof( wchar_t ) - 1, L"%i %s", i - pageStart + startAtOne, unicode );
-		label[ sizeof( label ) / sizeof( wchar_t ) - 1 ] = L'\0';
+		V_swprintf_safe( label, L"%i %s", i - pageStart + startAtOne, unicode );
 		item->SetText( label );
 		if ( isSelected )
 		{
