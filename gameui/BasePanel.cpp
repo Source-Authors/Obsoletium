@@ -670,10 +670,6 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 		{
 			m_pConsoleControlSettings->ProcessResolutionKeys( surface()->GetResolutionKey() );
 		}
-
-#ifdef _X360
-		x360_audio_english.SetValue( XboxLaunch()->GetForceEnglish() );
-#endif
 	}
 
 	m_pGameMenuButtons.AddToTail( CreateMenuButton( this, "GameMenuButton", ModInfo().GetGameTitle() ) );
@@ -732,36 +728,7 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 		ArmFirstMenuItem();
 		m_pConsoleAnimationController->StartAnimationSequence( "InitializeUILayout" );
 	}
-
-	// Record data used for rich presence updates
-	if ( IsX360() )
-	{
-		// Get our active mod directory name
-		const char *pGameName = CommandLine()->ParmValue( "-game", "hl2" );;
-
-		// Set the game we're playing
-		m_iGameID = CONTEXT_GAME_GAME_HALF_LIFE_2;
-		m_bSinglePlayer = true;
-		if ( Q_stristr( pGameName, "episodic" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_EPISODE_ONE;
 		}
-		else if ( Q_stristr( pGameName, "ep2" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_EPISODE_TWO;
-		}
-		else if ( Q_stristr( pGameName, "portal" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_PORTAL;
-		}
-		else if ( Q_stristr( pGameName, "tf" ) )
-		{
-			m_iGameID = CONTEXT_GAME_GAME_TEAM_FORTRESS;
-			m_bSinglePlayer = false;
-		}
-
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Xbox 360 - Get the console UI keyvalues to pass to LoadControlSettings()

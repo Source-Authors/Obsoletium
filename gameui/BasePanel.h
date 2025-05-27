@@ -434,7 +434,6 @@ private:
 
 	// Used for rich presence updates on xbox360
 	bool m_bSinglePlayer;
-	uint m_iGameID;	// matches context value in hl2orange.spa.h
 
 	// background fill transition
 	bool m_bHaveDarkenedBackground;
