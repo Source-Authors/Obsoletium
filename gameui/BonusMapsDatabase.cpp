@@ -316,6 +316,11 @@ CBonusMapsDatabase::CBonusMapsDatabase( void )
 CBonusMapsDatabase::~CBonusMapsDatabase()
 {
 	g_pBonusMapsDatabase = NULL;
+	// dimhotepus: Do not leak 
+	if (m_pBonusMapSavedData)
+	{
+		m_pBonusMapSavedData->deleteThis();
+	}
 }
 
 extern bool g_bIsCreatingNewGameMenuForPreFetching;
