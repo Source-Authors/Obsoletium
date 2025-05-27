@@ -736,15 +736,15 @@ void Con_SafePrintf (const char *fmt, ...)
 	va_end (argptr);
 
 #ifndef SWDS
-	bool		temp;
-	temp = scr_disabled_for_loading;
-	scr_disabled_for_loading = true;
+	const bool old_disabled_for_loading = std::exchange( scr_disabled_for_loading, true );
 #endif
+
 	g_fIsDebugPrint = true;
 	Con_Printf ("%s", msg);
 	g_fIsDebugPrint = false;
+
 #ifndef SWDS
-	scr_disabled_for_loading = temp;
+	scr_disabled_for_loading = old_disabled_for_loading;
 #endif
 }
 
