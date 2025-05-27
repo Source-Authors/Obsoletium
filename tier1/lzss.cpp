@@ -93,7 +93,7 @@ unsigned char *CLZSS::CompressNoAlloc(
 	m_pHashTable = stackallocT( lzss_list_t, 256 );
 	memset( m_pHashTable, 0, tableSize );
 
-	const ptrdiff_t targetSize = m_nWindowSize * sizeof( lzss_node_t );
+	const intp targetSize = m_nWindowSize * sizeof( lzss_node_t );
 	m_pHashTarget = stackallocT( lzss_node_t, m_nWindowSize );
 	memset( m_pHashTarget, 0, targetSize );
 

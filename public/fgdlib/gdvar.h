@@ -93,14 +93,14 @@ class GDinputvariable
 		inline GDIV_TYPE GetType() const { return m_eType; }
 		const char *GetTypeText(void) const;
 		
-		inline void GetDefault(int *pnStore, ptrdiff_t storeLen) const
+		inline void GetDefault(int *pnStore, intp storeLen) const
 		{
 			// dimhotepus: Ensure buffer has room.
 			if (storeLen > 0)
 				pnStore[0] = m_nDefault;
 		}
 
-		inline void GetDefault(char *pszStore, ptrdiff_t storeLen) const
+		inline void GetDefault(char *pszStore, intp storeLen) const
 		{ 
 			V_strncpy(pszStore, m_szDefault, storeLen); 
 		}

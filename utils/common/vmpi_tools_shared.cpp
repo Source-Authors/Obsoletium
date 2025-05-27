@@ -143,7 +143,7 @@ void RecvQDirInfo() {
 void SendDBInfo(const CDBInfo *pInfo, unsigned long jobPrimaryID) {
   char cPacketInfo[2] = {VMPI_SHARED_PACKET_ID, VMPI_SUBPACKETID_DBINFO};
   const void *pChunks[] = {cPacketInfo, pInfo, &jobPrimaryID};
-  ptrdiff_t chunkLengths[] = {2, sizeof(CDBInfo), sizeof(jobPrimaryID)};
+  intp chunkLengths[] = {2, sizeof(CDBInfo), sizeof(jobPrimaryID)};
 
   VMPI_SendChunks(pChunks, chunkLengths, ARRAYSIZE(pChunks), VMPI_PERSISTENT);
 }
@@ -297,8 +297,8 @@ void VMPI_ExceptionFilter(unsigned long code, void *exception_info) {
   // process immediately.
   ::SetUnhandledExceptionFilter(VMPI_SecondExceptionFilter);
 
-  constexpr ptrdiff_t nErrors = ssize(g_errorDescriptions);
-  ptrdiff_t i = 0;
+  constexpr intp nErrors = ssize(g_errorDescriptions);
+  intp i = 0;
 
   const char *pchReason = nullptr;
   char chUnknownBuffer[32];

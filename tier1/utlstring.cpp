@@ -43,7 +43,7 @@ void *CUtlString::AllocMemory( size_t length )
 }
 
 //-----------------------------------------------------------------------------
-void CUtlString::SetDirect( const char *pValue, ptrdiff_t nChars )
+void CUtlString::SetDirect( const char *pValue, intp nChars )
 {
 	if ( pValue && nChars > 0 )
 	{
@@ -53,7 +53,7 @@ void CUtlString::SetDirect( const char *pValue, ptrdiff_t nChars )
 			return; // Do nothing. Realloc in AllocMemory might move pValue's location resulting in a bad memcpy.
 		}
 
-		Assert( nChars <= Min<ptrdiff_t>( strnlen(pValue, nChars) + 1, nChars ) );
+		Assert( nChars <= Min<intp>( strnlen(pValue, nChars) + 1, nChars ) );
 		AllocMemory( nChars );
 		Q_memcpy( m_pString, pValue, nChars );
 	}
@@ -66,17 +66,17 @@ void CUtlString::SetDirect( const char *pValue, ptrdiff_t nChars )
 
 void CUtlString::Set( const char *pValue )
 {
-	ptrdiff_t length = pValue ? V_strlen( pValue ) : 0;
+	intp length = pValue ? V_strlen( pValue ) : 0;
 	SetDirect( pValue, length );
 }
 
 // Sets the length (used to serialize into the buffer )
-void CUtlString::SetLength( ptrdiff_t nLen )
+void CUtlString::SetLength( intp nLen )
 {
 	if ( nLen > 0 )
 	{
 #ifdef _DEBUG
-		ptrdiff_t prevLen = m_pString ? Length() : 0;
+		intp prevLen = m_pString ? Length() : 0;
 #endif
 		AllocMemory( nLen );
 #ifdef _DEBUG
@@ -116,7 +116,7 @@ char *CUtlString::GetForModify()
 	return m_pString;
 }
 
-char CUtlString::operator[]( ptrdiff_t i ) const
+char CUtlString::operator[]( intp i ) const
 {
 	if ( !m_pString )
 		return '\0';
@@ -215,15 +215,15 @@ bool CUtlString::operator==( const CUtlString &src ) const
 
 CUtlString &CUtlString::operator+=( const CUtlString &rhs )
 {
-	const ptrdiff_t lhsLength( Length() );
-	const ptrdiff_t rhsLength( rhs.Length() );
+	const intp lhsLength( Length() );
+	const intp rhsLength( rhs.Length() );
 
 	if (!rhsLength)
 	{
 		return *this;
 	}
 
-	const ptrdiff_t requestedLength( lhsLength + rhsLength );
+	const intp requestedLength( lhsLength + rhsLength );
 
 	AllocMemory( requestedLength );
 	Q_memcpy( m_pString + lhsLength, rhs.m_pString, rhsLength );
@@ -233,9 +233,9 @@ CUtlString &CUtlString::operator+=( const CUtlString &rhs )
 
 CUtlString &CUtlString::operator+=( const char *rhs )
 {
-	const ptrdiff_t lhsLength( Length() );
-	const ptrdiff_t rhsLength( V_strlen( rhs ) );
-	const ptrdiff_t requestedLength( lhsLength + rhsLength );
+	const intp lhsLength( Length() );
+	const intp rhsLength( V_strlen( rhs ) );
+	const intp requestedLength( lhsLength + rhsLength );
 
 	if (!requestedLength)
 	{
@@ -250,7 +250,7 @@ CUtlString &CUtlString::operator+=( const char *rhs )
 
 CUtlString &CUtlString::operator+=( char c )
 {
-	const ptrdiff_t lhsLength( Length() );
+	const intp lhsLength( Length() );
 
 	AllocMemory( lhsLength + 1 );
 	m_pString[ lhsLength ] = c;
@@ -304,7 +304,7 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 			continue;
 		}
 
-		ptrdiff_t nLength = 0;
+		intp nLength = 0;
 
 		while( ( *pszPattern ) != '*' && ( *pszPattern ) != '\0' )
 		{
@@ -317,7 +317,7 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 			const char *pszStartPattern = pszPattern - nLength;
 			const char *pszSearch = pszSource;
 
-			for( ptrdiff_t i = 0; i < nLength; i++, pszSearch++, pszStartPattern++ )
+			for( intp i = 0; i < nLength; i++, pszSearch++, pszStartPattern++ )
 			{
 				if ( ( *pszSearch ) == 0 )
 				{
@@ -390,7 +390,7 @@ void CUtlString::StripTrailingSlash()
 	if ( IsEmpty() )
 		return;
 
-	ptrdiff_t nLastChar = Length() - 1;
+	intp nLastChar = Length() - 1;
 	char c = m_pString[ nLastChar ];
 	if ( c == '\\' || c == '/' )
 	{
@@ -411,7 +411,7 @@ void CUtlString::FixSlashes( char cSeparator/*=CORRECT_PATH_SEPARATOR*/ )
 //-----------------------------------------------------------------------------
 void CUtlString::TrimLeft( char cTarget )
 {
-	ptrdiff_t nIndex = 0;
+	intp nIndex = 0;
 
 	if ( IsEmpty() )
 	{
@@ -434,7 +434,7 @@ void CUtlString::TrimLeft( char cTarget )
 
 void CUtlString::TrimLeft( const char *szTargets )
 {
-	ptrdiff_t i;
+	intp i;
 
 	if ( IsEmpty() )
 	{
@@ -471,8 +471,8 @@ void CUtlString::TrimLeft( const char *szTargets )
 
 void CUtlString::TrimRight( char cTarget )
 {
-	const ptrdiff_t nLastCharIndex = Length() - 1;
-	ptrdiff_t nIndex = nLastCharIndex;
+	const intp nLastCharIndex = Length() - 1;
+	intp nIndex = nLastCharIndex;
 
 	while ( nIndex >= 0 && m_pString[nIndex] == cTarget )
 	{
@@ -490,14 +490,14 @@ void CUtlString::TrimRight( char cTarget )
 
 void CUtlString::TrimRight( const char *szTargets )
 {
-	const ptrdiff_t nLastCharIndex = Length() - 1;
-	ptrdiff_t i;
+	const intp nLastCharIndex = Length() - 1;
+	intp i;
 
 	for( i = nLastCharIndex; i > 0; i-- )
 	{
 		bool bWhitespace = false;
 
-		for( ptrdiff_t j = 0; szTargets[j] != 0; j++ )
+		for( intp j = 0; szTargets[j] != 0; j++ )
 		{
 			if ( m_pString[i] == szTargets[j] )
 			{
@@ -535,9 +535,9 @@ void CUtlString::Trim( const char *szTargets )
 }
 
 
-CUtlString CUtlString::Slice( ptrdiff_t nStart, ptrdiff_t nEnd ) const
+CUtlString CUtlString::Slice( intp nStart, intp nEnd ) const
 {
-	ptrdiff_t length = Length();
+	intp length = Length();
 	if ( length == 0 )
 	{
 		return CUtlString();
@@ -566,12 +566,12 @@ CUtlString CUtlString::Slice( ptrdiff_t nStart, ptrdiff_t nEnd ) const
 }
 
 // Grab a substring starting from the left or the right side.
-CUtlString CUtlString::Left( ptrdiff_t nChars ) const
+CUtlString CUtlString::Left( intp nChars ) const
 {
 	return Slice( 0, nChars );
 }
 
-CUtlString CUtlString::Right( ptrdiff_t nChars ) const
+CUtlString CUtlString::Right( intp nChars ) const
 {
 	return Slice( -nChars );
 }
@@ -584,8 +584,8 @@ CUtlString CUtlString::Replace( char cFrom, char cTo ) const
 	}
 
 	CUtlString ret = *this;
-	ptrdiff_t len = ret.Length();
-	for ( ptrdiff_t i=0; i < len; i++ )
+	intp len = ret.Length();
+	for ( intp i=0; i < len; i++ )
 	{
 		if ( ret.m_pString[i] == cFrom )
 			ret.m_pString[i] = cTo;
@@ -609,18 +609,18 @@ CUtlString CUtlString::Replace( const char *pszFrom, const char *pszTo ) const
 	const char *pFirstFound = pos;
 
 	// count number of search string
-	ptrdiff_t nSearchCount = 0;
-	ptrdiff_t nSearchLength = V_strlen( pszFrom );
+	intp nSearchCount = 0;
+	intp nSearchLength = V_strlen( pszFrom );
 	while ( pos )
 	{
 		nSearchCount++;
-		ptrdiff_t nSrcOffset = ( pos - String() ) + nSearchLength;
+		intp nSrcOffset = ( pos - String() ) + nSearchLength;
 		pos = V_strstr( String() + nSrcOffset, pszFrom );
 	}
 
 	// allocate the new string
-	ptrdiff_t nReplaceLength = V_strlen( pszTo );
-	ptrdiff_t nAllocOffset = nSearchCount * ( nReplaceLength - nSearchLength );
+	intp nReplaceLength = V_strlen( pszTo );
+	intp nAllocOffset = nSearchCount * ( nReplaceLength - nSearchLength );
 	size_t srcLength = Length();
 	CUtlString strDest;
 	size_t destLength = srcLength + nAllocOffset;
@@ -628,13 +628,13 @@ CUtlString CUtlString::Replace( const char *pszFrom, const char *pszTo ) const
 
 	// find and replace the search string
 	pos = pFirstFound;
-	ptrdiff_t nDestOffset = 0;
-	ptrdiff_t nSrcOffset = 0;
+	intp nDestOffset = 0;
+	intp nSrcOffset = 0;
 	while ( pos )
 	{
 		// Found an instance
-		ptrdiff_t nCurrentSearchOffset = pos - String();
-		ptrdiff_t nCopyLength = nCurrentSearchOffset - nSrcOffset;
+		intp nCurrentSearchOffset = pos - String();
+		intp nCopyLength = nCurrentSearchOffset - nSrcOffset;
 		V_strncpy( strDest.GetForModify() + nDestOffset, String() + nSrcOffset, nCopyLength + 1 );
 		nDestOffset += nCopyLength;
 		V_strncpy( strDest.GetForModify() + nDestOffset, pszTo, nReplaceLength + 1 );
@@ -685,7 +685,7 @@ CUtlString CUtlString::StripExtension() const
 CUtlString CUtlString::StripFilename() const
 {
 	const char *pFilename = V_UnqualifiedFileName( Get() ); // NOTE: returns 'Get()' on failure, never NULL
-	ptrdiff_t nCharsToCopy = pFilename - Get();
+	intp nCharsToCopy = pFilename - Get();
 	CUtlString result;
 	result.SetDirect( Get(), nCharsToCopy );
 	result.StripTrailingSlash();
@@ -743,17 +743,17 @@ void CUtlString::Append( const char *pchAddition )
 	(*this) += pchAddition;
 }
 
-void CUtlString::Append( const char *pchAddition, ptrdiff_t nChars )
+void CUtlString::Append( const char *pchAddition, intp nChars )
 {
 	nChars = Min( nChars, V_strlen(	pchAddition ) );
 
-	const ptrdiff_t lhsLength( Length() );
-	const ptrdiff_t rhsLength( nChars );
-	const ptrdiff_t requestedLength( lhsLength + rhsLength );
+	const intp lhsLength( Length() );
+	const intp rhsLength( nChars );
+	const intp requestedLength( lhsLength + rhsLength );
 
 	AllocMemory( requestedLength );
-	const ptrdiff_t allocatedLength( requestedLength );
-	const ptrdiff_t copyLength( allocatedLength - lhsLength < rhsLength ? allocatedLength - lhsLength : rhsLength );
+	const intp allocatedLength( requestedLength );
+	const intp copyLength( allocatedLength - lhsLength < rhsLength ? allocatedLength - lhsLength : rhsLength );
 	memcpy( GetForModify() + lhsLength, pchAddition, copyLength );
 	m_pString[ allocatedLength ] = '\0';
 }

@@ -29,7 +29,8 @@
 */
 
 #if !defined(_MINIMUM_BUILD_)
-#include <cstdio>  // Needed for file access
+#include <cstdio>   // Needed for file access
+#include <cstddef>  // std::ptrdiff_t
 #include <memory.h>
 #endif
 
@@ -88,7 +89,7 @@ public:
 	// Finalize hash and report
 	void Final();
 #if !defined(_MINIMUM_BUILD_) 
-	void ReportHash(char *szReport, ptrdiff_t nReportSize, unsigned char uReportType = REPORT_HEX);
+	void ReportHash(char *szReport, std::ptrdiff_t nReportSize, unsigned char uReportType = REPORT_HEX);
 #endif
 	void GetHash(unsigned char *uDest);
 

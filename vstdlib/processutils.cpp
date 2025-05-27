@@ -37,8 +37,8 @@ public:
 	bool IsProcessComplete( ProcessHandle_t hProcess ) override;
 	void WaitUntilProcessCompletes( ProcessHandle_t hProcess ) override;
 	intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) override;
-	ptrdiff_t GetProcessOutputSize( ProcessHandle_t hProcess ) override;
-	ptrdiff_t GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) override;
+	intp GetProcessOutputSize( ProcessHandle_t hProcess ) override;
+	intp GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) override;
 	int GetProcessExitCode( ProcessHandle_t hProcess ) override;
 
 private:

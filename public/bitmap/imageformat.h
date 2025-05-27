@@ -12,6 +12,7 @@
 #endif
 
 #include <cstdio>
+#include "tier0/basetypes.h"
 
 enum NormalDecodeMode_t
 {
@@ -339,8 +340,8 @@ namespace ImageLoader
 {
 
 	[[nodiscard]] bool GetInfo( const char *fileName, int *width, int *height, ImageFormat *imageFormat, float *sourceGamma );
-	[[nodiscard]] ptrdiff_t  GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap );
-	[[nodiscard]] ptrdiff_t  GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels );
+	[[nodiscard]] intp  GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap );
+	[[nodiscard]] intp  GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels );
 	void GetMipMapLevelDimensions( int *width, int *height, int skipMipLevels );
 	[[nodiscard]] int  GetNumMipMapLevels( int width, int height, int depth = 1 );
 	[[nodiscard]] bool Load( unsigned char *imageData, const char *fileName, int width,
@@ -357,9 +358,9 @@ namespace ImageLoader
 							 int width, int height, int srcStride = 0, int dstStride = 0 );
 
 	// must be used in conjunction with ConvertImageFormat() to pre-swap and post-swap
-	void PreConvertSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
-	void PostConvertSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
-	void ByteSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void PreConvertSwapImageData( unsigned char *pImageData, intp nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void PostConvertSwapImageData( unsigned char *pImageData, intp nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void ByteSwapImageData( unsigned char *pImageData, intp nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
 	[[nodiscard]] bool IsFormatValidForConversion( ImageFormat fmt );
 
 	//-----------------------------------------------------------------------------

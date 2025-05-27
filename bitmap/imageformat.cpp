@@ -88,7 +88,7 @@ const ImageFormatInfo_t& ImageFormatInfo( ImageFormat fmt )
 	return g_ImageFormatInfo[ fmt + 1 ];
 }
 
-ptrdiff_t GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap )
+intp GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap )
 {
 	if ( depth <= 0 )
 	{
@@ -116,7 +116,7 @@ ptrdiff_t GetMemRequired( int width, int height, int depth, ImageFormat imageFor
 			{
 				depth = 4;
 			}
-			ptrdiff_t numBlocks = ( static_cast<ptrdiff_t>(width) * height ) >> 4;
+			intp numBlocks = ( static_cast<intp>(width) * height ) >> 4;
 			numBlocks *= depth;
 			switch ( imageFormat )
 			{
@@ -139,11 +139,11 @@ ptrdiff_t GetMemRequired( int width, int height, int depth, ImageFormat imageFor
 			return 0;
 		}
 
-		return static_cast<ptrdiff_t>(width) * height * depth * SizeInBytes( imageFormat );
+		return static_cast<intp>(width) * height * depth * SizeInBytes( imageFormat );
 	}
 
 	// Mipmap version
-	ptrdiff_t memSize = 0;
+	intp memSize = 0;
 	while ( 1 )
 	{
 		memSize += GetMemRequired( width, height, depth, imageFormat, false );
@@ -171,13 +171,13 @@ ptrdiff_t GetMemRequired( int width, int height, int depth, ImageFormat imageFor
 	return memSize;
 }
 
-ptrdiff_t GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels )
+intp GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels )
 {
-	ptrdiff_t offset = 0;
+	intp offset = 0;
 
 	while( skipMipLevels > 0 )
 	{
-		offset += static_cast<ptrdiff_t>(width) * height * SizeInBytes(imageFormat);
+		offset += static_cast<intp>(width) * height * SizeInBytes(imageFormat);
 		if( width == 1 && height == 1 )
 		{
 			break;

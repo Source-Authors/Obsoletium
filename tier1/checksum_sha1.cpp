@@ -254,7 +254,7 @@ void CSHA1::Final()
 
 #if !defined(_MINIMUM_BUILD_)
 // Get the final hash as a pre-formatted string
-void CSHA1::ReportHash(char *szReport, ptrdiff_t nReportSize, unsigned char uReportType)
+void CSHA1::ReportHash(char *szReport, std::ptrdiff_t nReportSize, unsigned char uReportType)
 {
 	unsigned char i = 0;
 	char szTemp[12];

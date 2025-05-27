@@ -212,7 +212,7 @@ ChunkFileResult_t CChunkFile::BeginChunk(const char *pszChunkName)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CChunkFile::BuildIndentString(char *pszDest, ptrdiff_t destLen, ptrdiff_t nDepth)
+void CChunkFile::BuildIndentString(char *pszDest, intp destLen, intp nDepth)
 {
 	if (nDepth >= 0)
 	{

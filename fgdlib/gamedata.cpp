@@ -610,7 +610,7 @@ static bool CUtlType_LessThan( const GDIV_TYPE &type1, const GDIV_TYPE &type2 )
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
+bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, intp outLen, TNameFixup NameFixup )
 {
 	if ( RemapOperation.Count() == 0 )
 	{
@@ -725,7 +725,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
+bool GameData::RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, intp outLen, TNameFixup NameFixup )
 {
 	V_strncpy( pszOutValue, pszInValue, outLen );
 

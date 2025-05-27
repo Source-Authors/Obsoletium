@@ -450,7 +450,7 @@ public:
 	byte *m_pStackHigh;		// position of initial entry to the coroutine (stack ptr before continue is ran)
 	byte *m_pStackLow;		// low point on the stack we plan on saving (stack ptr when we yield)
 	byte *m_pSavedStack;	// pointer to the saved stack (allocated on heap)
-	ptrdiff_t m_cubSavedStack;	// amount of data on stack
+	intp m_cubSavedStack;	// amount of data on stack
 	const char *m_pchName;
 	int m_iJumpCode;
 	const char *m_pchDebugMsg;
@@ -708,7 +708,7 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 				if ( coroutine.m_pStackLow < pStackSavePoint )
 				{
 					// push ourselves down
-					ptrdiff_t cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
+					intp cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
 					volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
 					pvStackGap[ cubPush-1 ] = 0xF;
 					CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
@@ -947,7 +947,7 @@ void Coroutine_YieldToMain()
 		GetStackPtr( pStackPtr );
 		if ( pStackPtr >= (coroutinePrev.m_pStackHigh - coroutinePrev.m_cubSavedStack) && ( pStackPtr - 2048 ) <= coroutinePrev.m_pStackHigh )
 		{
-			ptrdiff_t cubPush = coroutinePrev.m_cubSavedStack + 512;
+			intp cubPush = coroutinePrev.m_cubSavedStack + 512;
 			volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
 			pvStackGap[ cubPush - 1 ] = 0xF;
 			CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );

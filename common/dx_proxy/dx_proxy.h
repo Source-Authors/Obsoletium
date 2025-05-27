@@ -66,7 +66,7 @@ inline BOOL DxProxyModule::Load() {
   if (m_hModule == nullptr &&
       (m_hModule = ::LoadLibrary("dx_proxy.dll")) != nullptr) {
     // Acquire the functions
-    for (ptrdiff_t k{0}; k < ssize(m_arrFuncs); ++k) {
+    for (intp k{0}; k < ssize(m_arrFuncs); ++k) {
       m_arrFuncs[k] = ::GetProcAddress(m_hModule, arrFuncNames[k]);
     }
   }

@@ -183,7 +183,7 @@ class CChunkFile
 
 	protected:
 
-		void BuildIndentString(char *pszDest, ptrdiff_t destLen, ptrdiff_t nDepth);
+		void BuildIndentString(char *pszDest, intp destLen, intp nDepth);
 
 		TokenReader m_TokenReader;
 

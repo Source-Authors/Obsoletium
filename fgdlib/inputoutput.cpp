@@ -131,9 +131,7 @@ CClassInputOutputBase &CClassInputOutputBase::operator =(CClassInputOutputBase &
 	delete m_pszDescription;
 	if (Other.m_pszDescription != NULL)
 	{
-		const ptrdiff_t len = strlen(Other.m_pszDescription) + 1;
-		m_pszDescription = new char[len];
-		V_strncpy(m_pszDescription, Other.m_pszDescription, len);
+		m_pszDescription = V_strdup(Other.m_pszDescription);
 	}
 	else
 	{

@@ -290,16 +290,16 @@ bool CValveVideoServices::DisconnectVideoLibraries()
 }
 
 
-ptrdiff_t CValveVideoServices::DestroyAllVideoInterfaces()
+intp CValveVideoServices::DestroyAllVideoInterfaces()
 {
-	ptrdiff_t n = m_RecorderList.Count() + m_MaterialList.Count();
+	intp n = m_RecorderList.Count() + m_MaterialList.Count();
 
-	for ( ptrdiff_t i = m_RecorderList.Count() -1; i >= 0; i-- )
+	for ( intp i = m_RecorderList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoRecorder( (IVideoRecorder*) m_RecorderList[i].m_pObject );
 	}
 
-	for ( ptrdiff_t i = m_MaterialList.Count() -1; i >= 0; i-- )
+	for ( intp i = m_MaterialList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoMaterial( (IVideoMaterial*) m_MaterialList[i].m_pObject );
 	}

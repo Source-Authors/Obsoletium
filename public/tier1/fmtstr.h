@@ -333,7 +333,7 @@ public:
 	void AddQuotes()
 	{
 		Assert( m_szBuf[0] != '"' );
-		const ptrdiff_t nLength = V_strlen( m_szBuf );
+		const intp nLength = V_strlen( m_szBuf );
 
 		// dimhotepus: Prevent overflow.
 		if (nLength < ssize(m_szBuf) - 2)

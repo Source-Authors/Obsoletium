@@ -47,8 +47,8 @@ public:
 	TokenReader();
 
 	[[nodiscard]] bool Open(const char *pszFilename);
-	[[nodiscard]] trtoken_t NextToken(OUT_Z_CAP(nSize) char *pszStore, std::ptrdiff_t nSize);
-	template<std::ptrdiff_t size>
+	[[nodiscard]] trtoken_t NextToken(OUT_Z_CAP(nSize) char *pszStore, intp nSize);
+	template<intp size>
 	[[nodiscard]] trtoken_t NextToken(OUT_Z_ARRAY char (&pszStore)[size])
 	{
 		return NextToken(pszStore, size);
@@ -61,8 +61,8 @@ public:
 	[[nodiscard]] bool Expecting(trtoken_t ttype, const char *pszToken);
 	[[nodiscard]] const char *Error(char *error, ...);
 	// dimhotepus: Breaking change, drop = nullptr and = 0 by default to allow use safe-bounds overload
-	[[nodiscard]] trtoken_t PeekTokenType(OUT_Z_CAP(maxlen) char* pszStore, std::ptrdiff_t maxlen);
-	template<std::ptrdiff_t size>
+	[[nodiscard]] trtoken_t PeekTokenType(OUT_Z_CAP(maxlen) char* pszStore, intp maxlen);
+	template<intp size>
 	[[nodiscard]] trtoken_t PeekTokenType(OUT_Z_ARRAY char (&pszStore)[size])
 	{
 		return PeekTokenType(pszStore, size);
@@ -75,7 +75,7 @@ private:
 	inline TokenReader(TokenReader const &) = delete;
 	inline int operator=(TokenReader const &) = delete;
 
-	trtoken_t GetString(char *pszStore, std::ptrdiff_t nSize);
+	trtoken_t GetString(char *pszStore, intp nSize);
 	bool SkipWhiteSpace();
 
 	int m_nLine;

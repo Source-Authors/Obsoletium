@@ -15,7 +15,7 @@
 #define RIFF_H
 #pragma once
 
-#include <cstddef>
+#include "tier0/basetypes.h"
 #include "tier0/commonmacros.h"
 
 
@@ -26,12 +26,12 @@
 class IFileReadBinary
 {
 public:
-	[[nodiscard]] virtual ptrdiff_t open( const char *pFileName ) = 0;
-	virtual int read( void *pOutput, int size, ptrdiff_t file ) = 0;
-	virtual void close( ptrdiff_t file ) = 0;
-	virtual void seek( ptrdiff_t file, int pos ) = 0;
-	[[nodiscard]] virtual unsigned int tell( ptrdiff_t file ) = 0;
-	[[nodiscard]] virtual unsigned int size( ptrdiff_t file ) = 0;
+	[[nodiscard]] virtual intp open( const char *pFileName ) = 0;
+	virtual int read( void *pOutput, int size, intp file ) = 0;
+	virtual void close( intp file ) = 0;
+	virtual void seek( intp file, int pos ) = 0;
+	[[nodiscard]] virtual unsigned int tell( intp file ) = 0;
+	[[nodiscard]] virtual unsigned int size( intp file ) = 0;
 };
 
 
@@ -57,7 +57,7 @@ private:
 	const InFileRIFF & operator=( const InFileRIFF & ) = delete;
 
 	IFileReadBinary		&m_io;
-	ptrdiff_t			m_file;
+	intp				m_file;
 	unsigned int		m_riffName;
 	unsigned int		m_riffSize;
 };
@@ -100,11 +100,11 @@ private:
 class IFileWriteBinary
 {
 public:
-	[[nodiscard]] virtual ptrdiff_t create( const char *pFileName ) = 0;
-	virtual int write( void *pData, int size, ptrdiff_t file ) = 0;
-	virtual void close( ptrdiff_t file ) = 0;
-	virtual void seek( ptrdiff_t file, int pos ) = 0;
-	[[nodiscard]] virtual unsigned int tell( ptrdiff_t file ) = 0;
+	[[nodiscard]] virtual intp create( const char *pFileName ) = 0;
+	virtual int write( void *pData, int size, intp file ) = 0;
+	virtual void close( intp file ) = 0;
+	virtual void seek( intp file, int pos ) = 0;
+	[[nodiscard]] virtual unsigned int tell( intp file ) = 0;
 };
 //-----------------------------------------------------------------------------
 // Purpose: Used to write a RIFF format file
@@ -127,7 +127,7 @@ private:
 	const OutFileRIFF & operator=( const OutFileRIFF & ) = delete;
 
 	IFileWriteBinary	&m_io;
-	ptrdiff_t			m_file;
+	intp				m_file;
 	unsigned int		m_riffName;
 	unsigned int		m_riffSize;
 	unsigned int		m_nNamePos;

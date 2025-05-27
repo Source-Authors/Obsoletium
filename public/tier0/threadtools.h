@@ -173,7 +173,7 @@ PLATFORM_INTERFACE void ThreadDetach( ThreadHandle_t );
 PLATFORM_INTERFACE void ThreadSetDebugName( ThreadId_t id, const char *pszName );
 inline void ThreadSetDebugName( const char *pszName ) { ThreadSetDebugName( static_cast<ThreadId_t>(-1), pszName ); }
 
-PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, ptrdiff_t nAffinityMask );
+PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, intp nAffinityMask );
 
 //-----------------------------------------------------------------------------
 
@@ -623,15 +623,15 @@ public:
 
 	T *operator=( T *newValue )		{ m_value.exchange(newValue); return newValue; }
 
-	CInterlockedPtr& operator+=( ptrdiff_t add )	{ m_value += add; return *this; }
-	CInterlockedPtr& operator-=( ptrdiff_t subtract )	{ m_value -= subtract; return *this; }
+	CInterlockedPtr& operator+=( intp add )	{ m_value += add; return *this; }
+	CInterlockedPtr& operator-=( intp subtract )	{ m_value -= subtract; return *this; }
 
-	T *operator+( ptrdiff_t rhs ) const		{ return m_value.load() + rhs; }
-	T *operator-( ptrdiff_t rhs ) const		{ return m_value.load() - rhs; }
+	T *operator+( intp rhs ) const		{ return m_value.load() + rhs; }
+	T *operator-( intp rhs ) const		{ return m_value.load() - rhs; }
 	T *operator+( size_t rhs ) const		{ return m_value.load() + rhs; }
 	T *operator-( size_t rhs ) const		{ return m_value.load() - rhs; }
-	ptrdiff_t operator-( T *p ) const		{ return m_value.load() - p; }
-	ptrdiff_t operator-( const CInterlockedPtr<T> &p ) const { return m_value.load() - p.m_value.load(); }
+	intp operator-( T *p ) const		{ return m_value.load() - p; }
+	intp operator-( const CInterlockedPtr<T> &p ) const { return m_value.load() - p.m_value.load(); }
 
 private:
 	std::atomic<T *> m_value;

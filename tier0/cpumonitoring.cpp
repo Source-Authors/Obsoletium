@@ -91,7 +91,7 @@ unsigned __stdcall MeasureThread( void* vThreadNum )
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName( "CPUBurnMonitor" );
 
-	ptrdiff_t threadNum = reinterpret_cast<ptrdiff_t>(vThreadNum);
+	intp threadNum = reinterpret_cast<intp>(vThreadNum);
 
 	for ( ; ; )
 	{
@@ -257,7 +257,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		// ensure that they will run promptly on a specific CPU.
 		for ( int i = 0; i < g_numCPUs; ++i )
 		{
-			HANDLE thread = (HANDLE)_beginthreadex( NULL, 0x10000, MeasureThread, (void*)static_cast<ptrdiff_t>(i), 0, NULL );
+			HANDLE thread = (HANDLE)_beginthreadex( NULL, 0x10000, MeasureThread, (void*)static_cast<intp>(i), 0, NULL );
 			if (thread)
 			{
 				SetThreadAffinityMask( thread, static_cast<size_t>(1u) << i );

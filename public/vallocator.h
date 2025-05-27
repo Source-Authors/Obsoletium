@@ -20,6 +20,7 @@
 #define VALLOCATOR_H
 
 #include <cstddef>
+#include "tier0/platform.h"
 
 class VAllocator
 {
@@ -68,16 +69,16 @@ inline void operator delete(void *ptrToDelete, void *ptr, DummyAllocatorHelper *
 
 // Use these to manually construct and destruct lists of objects.
 template<class T>
-inline void VAllocator_CallConstructors(T *pObjects, ptrdiff_t count=1)
+inline void VAllocator_CallConstructors(T *pObjects, intp count=1)
 {
-	for(ptrdiff_t i=0; i < count; i++)
-		new(&pObjects[i], (DummyAllocatorHelper*)0) T;
+	for(intp i=0; i < count; i++)
+		new(&pObjects[i], (DummyAllocatorHelper*)nullptr) T;
 }
 
 template<class T>
-inline void VAllocator_CallDestructors(T *pObjects, ptrdiff_t count)
+inline void VAllocator_CallDestructors(T *pObjects, intp count)
 {
-	for(ptrdiff_t i=0; i < count; i++)
+	for(intp i=0; i < count; i++)
 		pObjects[i].~T();
 }
 

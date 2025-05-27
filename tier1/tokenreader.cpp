@@ -75,7 +75,7 @@ const char *TokenReader::Error(char *error, ...)
 //			nSize - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::GetString(char *pszStore, std::ptrdiff_t nSize)
+trtoken_t TokenReader::GetString(char *pszStore, intp nSize)
 {
 	if (nSize <= 0)
 	{
@@ -212,7 +212,7 @@ trtoken_t TokenReader::NextTokenDynamic(char **ppszStore)
 // Input  : pszStore - Pointer to a string that will receive the token.
 // Output : Returns the type of token that was read, or TOKENERROR.
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::NextToken(OUT_Z_CAP(nSize) char *pszStore, std::ptrdiff_t nSize)
+trtoken_t TokenReader::NextToken(OUT_Z_CAP(nSize) char *pszStore, intp nSize)
 {
 	// dimhotepus: Always zero-terminate.
 	if (nSize > 0)
@@ -413,7 +413,7 @@ bool TokenReader::Expecting(trtoken_t ttype, const char *pszToken)
 // Input  : pszStore - 
 // Output : 
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::PeekTokenType(OUT_Z_CAP(maxlen) char *pszStore, std::ptrdiff_t maxlen )
+trtoken_t TokenReader::PeekTokenType(OUT_Z_CAP(maxlen) char *pszStore, intp maxlen )
 {
 	if (!m_bStuffed)
 	{

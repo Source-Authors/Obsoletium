@@ -429,7 +429,7 @@ CUtlLinkedList<T,S,ML,I,M>::CUtlLinkedList( intp growSize, intp initSize ) :
 	m_Memory( growSize, initSize ), m_LastAlloc( m_Memory.InvalidIterator() )
 {
 	// Prevent signed non-int datatypes
-	COMPILE_TIME_ASSERT( sizeof(S) <= sizeof(ptrdiff_t) || static_cast<S>(-1) > 0 );
+	COMPILE_TIME_ASSERT( sizeof(S) <= sizeof(intp) || static_cast<S>(-1) > 0 );
 	ConstructList();
 	ResetDbgInfo();
 }

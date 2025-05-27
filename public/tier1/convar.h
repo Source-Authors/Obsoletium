@@ -199,7 +199,7 @@ private:
 	};
 
 	int		m_nArgc;
-	std::ptrdiff_t		m_nArgv0Size;
+	intp	m_nArgv0Size;
 	char	m_pArgSBuffer[ COMMAND_MAX_LENGTH ];
 	char	m_pArgvBuffer[ COMMAND_MAX_LENGTH ];
 	const char*	m_ppArgv[ COMMAND_MAX_ARGC ];

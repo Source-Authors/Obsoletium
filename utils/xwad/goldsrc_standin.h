@@ -18,7 +18,7 @@ void Warning(const char *pMsg, ...);
 [[noreturn]] void Error(const char *pMsg, ...);
 
 long LoadFile(char *filename, void **bufferptr);
-void SaveFile(char *filename, void *buffer, ptrdiff_t count);
+void SaveFile(char *filename, void *buffer, std::ptrdiff_t count);
 
 short BigShort(short l);
 short LittleShort(short l);
@@ -30,7 +30,7 @@ float LittleFloat(float l);
 
 FILE *SafeOpenWrite(char *filename);
 FILE *SafeOpenRead(char *filename);
-void SafeRead(FILE *f, void *buffer, ptrdiff_t count);
-void SafeWrite(FILE *f, void *buffer, ptrdiff_t count);
+void SafeRead(FILE *f, void *buffer, std::ptrdiff_t count);
+void SafeWrite(FILE *f, void *buffer, std::ptrdiff_t count);
 
 #endif  // !SE_UTILS_XWAD_GOLDSRC_STANDIN_H_

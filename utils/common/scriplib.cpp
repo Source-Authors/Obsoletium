@@ -184,7 +184,7 @@ void DefineMacro( char *macroname )
 		}
 	}
 
-	ptrdiff_t size = (cp - script->script_p);
+	intp size = (cp - script->script_p);
 
 	pmacro->buffer = (char *)malloc( size + 1);
 	if (!pmacro->buffer) Error("Out of memory in macro buffer");
@@ -265,7 +265,7 @@ bool AddMacroToStack( char *macroname )
 	script = pnext;
 	V_strcpy_safe( script->filename, pmacro->filename );
 
-	ptrdiff_t size = pmacro->end_p - pmacro->buffer;
+	intp size = pmacro->end_p - pmacro->buffer;
 	script->buffer = (char *)malloc( size + 1 );
 	if (!script->buffer) return false;
 	memcpy( script->buffer, pmacro->buffer, size );

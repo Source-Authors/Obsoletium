@@ -175,8 +175,7 @@ void StripEdgeWhiteSpace(char *psz)
 		psz++;
 	}
 
-	ptrdiff_t iLen = V_strlen(psz) - 1;
-	
+	intp iLen = V_strlen(psz) - 1;
 	if ( iLen >= 0 )
 	{
 		while (V_isspace(psz[iLen]))

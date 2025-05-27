@@ -267,10 +267,10 @@ public:
 		Msg( "%zu MiB address space used assuming maximum PageHeap overhead.\n", pageHeapBytes / MiB );
 		Msg( "%zu outstanding allocations (%zd delta).\n",
 			m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed),
-			(ptrdiff_t)m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed) - (ptrdiff_t)m_nOldOutstandingAllocations );
+			(intp)m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed) - (intp)m_nOldOutstandingAllocations );
 		Msg( "%zu lifetime allocations (%u delta).\n",
 			m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed),
-			(ptrdiff_t)m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed) - (ptrdiff_t)m_nOldLifetimeAllocations );
+			(intp)m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed) - (intp)m_nOldLifetimeAllocations );
 		Msg( "%zu allocation failures.\n", m_nAllocFailures.load(std::memory_order::memory_order_relaxed) );
 
 		// Update the numbers on outstanding and lifetime allocation counts so

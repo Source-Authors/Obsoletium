@@ -26,11 +26,11 @@ unsigned long SampleMilliseconds() {
 }
 
 CChunkWalker::CChunkWalker(void const *const *chunks,
-                           const ptrdiff_t *chunk_sizes,
-                           ptrdiff_t chunk_count) {
+                           const intp *chunk_sizes,
+                           intp chunk_count) {
   m_TotalLength = 0;
 
-  for (ptrdiff_t i = 0; i < chunk_count; i++) m_TotalLength += chunk_sizes[i];
+  for (intp i = 0; i < chunk_count; i++) m_TotalLength += chunk_sizes[i];
 
   m_iCurChunk = 0;
   m_iCurChunkPos = 0;
@@ -39,17 +39,17 @@ CChunkWalker::CChunkWalker(void const *const *chunks,
   m_nChunks = chunk_count;
 }
 
-ptrdiff_t CChunkWalker::GetTotalLength() const { return m_TotalLength; }
+intp CChunkWalker::GetTotalLength() const { return m_TotalLength; }
 
-void CChunkWalker::CopyTo(void *out, ptrdiff_t nBytes) {
+void CChunkWalker::CopyTo(void *out, intp nBytes) {
   unsigned char *pOutPos = (unsigned char *)out;
 
-  ptrdiff_t nBytesLeft = nBytes;
+  intp nBytesLeft = nBytes;
   while (nBytesLeft > 0) {
-    ptrdiff_t toCopy = nBytesLeft;
-    ptrdiff_t curChunkLen = m_pChunkLengths[m_iCurChunk];
+    intp toCopy = nBytesLeft;
+    intp curChunkLen = m_pChunkLengths[m_iCurChunk];
 
-    ptrdiff_t amtLeft = curChunkLen - m_iCurChunkPos;
+    intp amtLeft = curChunkLen - m_iCurChunkPos;
     if (nBytesLeft > amtLeft) {
       toCopy = amtLeft;
     }

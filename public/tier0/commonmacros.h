@@ -7,7 +7,7 @@
 #define TIER0_COMMONMACROS_H_
 
 #include <cassert>  // assert
-#include <cstddef>  // memcmp
+#include <cstddef>  // memcmp, std::ptrdiff_t
 #include <cstring>  // strlen
 #include <utility>  // to_underlying
 
@@ -72,6 +72,7 @@ constexpr inline unsigned MAKEUID(char d, char c, char b, char a) noexcept {
  * @return true if string is packed signed ID.
  */
 inline bool STRING_MATCHES_ID(const char* s, int id) noexcept {
+  // dimhotepus: Use assert here to not self-reference tier0.
   assert(strlen(s) >= sizeof(id));
   return memcmp(s, &id, sizeof(id)) == 0;
 }
@@ -83,6 +84,7 @@ inline bool STRING_MATCHES_ID(const char* s, int id) noexcept {
  * @return true if string is packed unsigned ID.
  */
 inline bool STRING_MATCHES_ID(const char* s, unsigned id) noexcept {
+  // dimhotepus: Use assert here to not self-reference tier0.
   assert(strlen(s) >= sizeof(id));
   return memcmp(s, &id, sizeof(id)) == 0;
 }
@@ -157,7 +159,7 @@ constexpr inline bool IsPowerOfTwo(T value) noexcept {
 // C++20 ssize
 using std::ssize;
 #else
-#include <type_traits>
+#include <type_traits> 
 
 template <class C>
 constexpr auto ssize(const C& c) noexcept(noexcept(c.size()))

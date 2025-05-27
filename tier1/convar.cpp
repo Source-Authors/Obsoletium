@@ -264,20 +264,16 @@ ConCommandBase *ConCommandBase::GetNext( void )
 //-----------------------------------------------------------------------------
 char *ConCommandBase::CopyString( const char *from )
 {
-	ptrdiff_t	len;
-	char	*to;
-
-	len = V_strlen( from );
+	intp len = V_strlen( from );
 	if ( len <= 0 )
 	{
-		to = new char[1];
-		to[0] = 0;
+		char *to = new char[1];
+		to[0] = '\0';
+		return to;
 	}
-	else
-	{
-		to = new char[len+1];
-		Q_strncpy( to, from, len+1 );
-	}
+
+	char *to = new char[len+1];
+	V_strncpy( to, from, len+1 );
 	return to;
 }
 

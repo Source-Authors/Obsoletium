@@ -117,7 +117,7 @@ inline void CUtlDataEnvelope::Assign( const void *pData, intp nBytes )
 	if ( pData )
 	{
 		m_nBytes = nBytes;
-		if ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) )
+		if ( m_nBytes > ssize( m_data ) )
 		{
 			m_pData = new byte[nBytes];
 			memcpy( m_pData, pData, nBytes );
@@ -141,7 +141,7 @@ inline void CUtlDataEnvelope::Assign( const CUtlDataEnvelope &from )
 
 inline void CUtlDataEnvelope::Purge()
 {
-	if (m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) )
+	if (m_nBytes > ssize( m_data ))
 		delete [] m_pData;
 	m_nBytes = 0;
 }
@@ -175,7 +175,7 @@ inline CUtlDataEnvelope::operator void *()
 		return nullptr;
 	}
 
-	return ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) ) ? m_pData : m_data;
+	return ( m_nBytes > ssize( m_data ) ) ? m_pData : m_data;
 }
 
 inline CUtlDataEnvelope::operator void *() const
@@ -185,7 +185,7 @@ inline CUtlDataEnvelope::operator void *() const
 		return nullptr;
 	}
 
-	return ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) ) ? (void *)m_pData : (void *)m_data;
+	return m_nBytes > ssize( m_data ) ? static_cast<void *>(m_pData) : static_cast<void *>(const_cast<byte*>(m_data));
 }
 
 //-----------------------------------------------------------------------------

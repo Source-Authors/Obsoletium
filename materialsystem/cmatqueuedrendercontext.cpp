@@ -401,7 +401,7 @@ public:
 				}
 				while ( i < nIndices )
 				{
-					int nToCopy = min( ssize(tempIndices), (ptrdiff_t)nIndices - i );
+					int nToCopy = min( ssize(tempIndices), (intp)nIndices - i );
 					for ( int j = 0; j < nToCopy; j++ )
 					{
 						tempIndices[j] = pIndexData[i+j] + desc.m_nFirstVertex;
