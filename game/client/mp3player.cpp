@@ -1195,7 +1195,7 @@ intp CMP3Player::AddSong( char const *relative, intp dirnum )
 	return songIndex;
 }
 
-void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
+void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, intp parentIndex )
 {
 	if ( !current )
 	{
@@ -1213,7 +1213,7 @@ void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
 		kv->SetString( "Text", sub->m_DirName.String() );
 		kv->SetPtr( "MP3Dir", sub );
 
-		int index = m_pTree->AddItem( kv, parentIndex );
+		intp index = m_pTree->AddItem( kv, parentIndex );
 		m_pTree->SetItemFgColor( index, TREE_TEXT_COLOR );
 
 		// Recurse...
@@ -1231,7 +1231,7 @@ void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
 		kv->SetString( "Text", song->shortname.String() );
 		kv->SetInt( "SongIndex", current->m_FilesInDirectory[ i ] );
 
-		int index = m_pTree->AddItem( kv, parentIndex );
+		intp index = m_pTree->AddItem( kv, parentIndex );
 		m_pTree->SetItemFgColor( index, TREE_TEXT_COLOR );
 	}
 }
@@ -1249,7 +1249,7 @@ void CMP3Player::PopulateTree()
 	KeyValuesAD kv( "TVI" );
 	kv->SetString( "Text", "Songs" );
 
-	int rootIndex = m_pTree->AddItem( kv, -1 );
+	intp rootIndex = m_pTree->AddItem( kv, -1 );
 	m_pTree->SetItemFgColor( rootIndex, TREE_TEXT_COLOR );
 
 	intp dircount = m_SoundDirectories.Count();
@@ -1264,7 +1264,7 @@ void CMP3Player::PopulateTree()
 		KeyValuesAD kv2( "TVI" );
 		kv2->SetString( "Text", dirname );
 
-		int index = m_pTree->AddItem( kv, rootIndex );
+		intp index = m_pTree->AddItem( kv, rootIndex );
 
 		RecursiveAddToTree( tree, index );
 

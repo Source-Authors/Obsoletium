@@ -874,7 +874,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BY
 	if ( !inbuf || !inbuf[0] )
 		return;
 
-	int pos = 0;
+	intp pos = 0;
 	const wchar_t *inbufend = NULL;
 	if ( inbufsizebytes > 0 )
 	{
@@ -943,7 +943,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BY
 
 					outbuf[pos] = '\0';
 					V_wcscat( outbuf, token, outbufsizebytes / static_cast<int>(sizeof(wchar_t)) );
-					pos += wcslen(token);
+					pos += V_wcslen(token);
 				}
 				else
 				{
@@ -954,7 +954,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BY
 						pos += 1;
 					}
 					V_wcscat( outbuf, locName, outbufsizebytes / static_cast<int>(sizeof(wchar_t)) );
-					pos += wcslen(locName);
+					pos += V_wcslen(locName);
 					if ( bAddBrackets )
 					{
 						V_wcscat( outbuf, L"]", outbufsizebytes / static_cast<int>(sizeof(wchar_t)) );

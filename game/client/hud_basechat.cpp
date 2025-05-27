@@ -116,11 +116,11 @@ void StripEndNewlineFromString( char *str )
 
 void StripEndNewlineFromString( wchar_t *str )
 {
-	int s = wcslen( str ) - 1;
+	intp s = V_wcslen( str ) - 1;
 	if ( s >= 0 )
 	{
 		if ( str[s] == L'\n' || str[s] == L'\r' )
-			str[s] = 0;
+			str[s] = '\0';
 	}
 }
 
@@ -371,7 +371,7 @@ void CBaseHudChatLine::Expire( void )
 
 	// Spit out label text now
 //	char text[ 256 ];
-//	GetText( text, 256 );
+//	GetText( text );
 
 //	Msg( "%s\n", text );
 }
@@ -1365,7 +1365,7 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 		return;
 
 	wchar_t *txt = m_text;
-	int lineLen = wcslen( m_text );
+	intp lineLen = V_wcslen( m_text );
 	Color colCustom;
 	if ( m_text[0] == COLOR_PLAYERNAME || m_text[0] == COLOR_LOCATION || m_text[0] == COLOR_NORMAL || m_text[0] == COLOR_ACHIEVEMENT || m_text[0] == COLOR_CUSTOM || m_text[0] == COLOR_HEXCODE || m_text[0] == COLOR_HEXCODE_ALPHA )
 	{
@@ -1374,7 +1374,7 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 			TextRange range;
 			bool bFoundColorCode = false;
 			bool bDone = false;
-			int nBytesIn = txt - m_text;
+			intp nBytesIn = txt - m_text;
 
 			switch ( *txt )
 			{
@@ -1437,7 +1437,7 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 
 			if ( bFoundColorCode )
 			{
-				int count = m_textRanges.Count();
+				intp count = m_textRanges.Count();
 				if ( count )
 				{
 					m_textRanges[count-1].end = nBytesIn;
@@ -1462,7 +1462,7 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 		m_textRanges.AddToTail( range );
 
 		range.start = range.end;
-		range.end = wcslen( m_text );
+		range.end = V_wcslen( m_text );
 		range.color = pChat->GetTextColorForClient( COLOR_NORMAL, clientIndex );
 		m_textRanges.AddToTail( range );
 	}
@@ -1471,12 +1471,12 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 	{
 		TextRange range;
 		range.start = 0;
-		range.end = wcslen( m_text );
+		range.end = V_wcslen( m_text );
 		range.color = pChat->GetTextColorForClient( COLOR_NORMAL, clientIndex );
 		m_textRanges.AddToTail( range );
 	}
 
-	for ( int i=0; i<m_textRanges.Count(); ++i )
+	for ( intp i=0; i<m_textRanges.Count(); ++i )
 	{
 		wchar_t * start = m_text + m_textRanges[i].start;
 		if ( *start > 0 && *start < COLOR_MAX )
@@ -1739,8 +1739,8 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, PRINTF_FORMAT_STRI
 
 	line->SetText( "" );
 
-	int iNameStart = 0;
-	int iNameLength = 0;
+	intp iNameStart = 0;
+	intp iNameLength = 0;
 
 	player_info_t sPlayerInfo;
 	if ( iPlayerIndex == 0 )
@@ -1751,7 +1751,7 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, PRINTF_FORMAT_STRI
 	else
 	{
 		engine->GetPlayerInfo( iPlayerIndex, &sPlayerInfo );
-	}	
+	}
 
 	intp bufSize = (V_strlen( pmsg ) + 1 ) * sizeof(wchar_t);
 	wchar_t *wbuf = static_cast<wchar_t *>( _alloca( bufSize ) );
@@ -1776,7 +1776,7 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, PRINTF_FORMAT_STRI
 			if ( nameInString )
 			{
 				iNameStart = (nameInString - wbuf);
-				iNameLength = wcslen( wideName );
+				iNameLength = V_wcslen( wideName );
 			}
 		}
 

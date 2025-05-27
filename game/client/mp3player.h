@@ -223,7 +223,7 @@ protected:
 
 	void					PopulateTree();
 	void					PopulateLists();
-	void					RecursiveAddToTree( MP3Dir_t *current, int parentIndex );
+	void					RecursiveAddToTree( MP3Dir_t *current, intp parentIndex );
 	void					DeleteSoundDirectories();
 	// Leave root objects, clear all subdirs
 	void					WipeSoundDirectories();

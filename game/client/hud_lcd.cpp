@@ -392,8 +392,8 @@ bool CLCD::IsConnected( void ) const
 
 void CLCD::ShowItems_R( CLCDPage *page, unsigned int dwCurTime, CUtlVector< CLCDItem * >& list, bool bShowItems )
 {
-	int itemCount = list.Count();
-	for ( int j = 0; j < itemCount; ++j )
+	intp itemCount = list.Count();
+	for ( intp j = 0; j < itemCount; ++j )
 	{
 		CLCDItem *item = list[ j ];
 		if ( !item->m_bActive )
@@ -865,11 +865,11 @@ typedescription_t *FindField( datamap_t *pMap, char const *relativePath )
 
 bool CDescribeData::BuildFieldPath( CUtlString& path )
 {
-	int c = m_FieldPath.Count();
+	intp c = m_FieldPath.Count();
 	if ( c == 0 )
 		return false;
 
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		CUtlString& s = m_FieldPath[ i ];
 		if ( i != 0 )
@@ -1254,10 +1254,10 @@ bool CLCD::ExtractArrayIndex( char *str, size_t bufsize, int *index )
 	Q_strncpy( num, pos + 1, pos2 - pos );
 	*index = Q_atoi( num );
 
-	int left = pos - s + 1;
+	intp left = pos - s + 1;
 	char o[ 2048 ];
 	Q_strncpy( o, s, left );
-	Q_strncat( o, pos2 + 1, sizeof( o ), COPY_ALL_CHARACTERS );
+	V_strcat_safe( o, pos2 + 1 );
 
 	Q_strncpy( str, o, bufsize );
 	return true;
@@ -1570,14 +1570,14 @@ void CLCD::ReduceParentheses( CUtlString& str )
 
 		char temp[ 4096 ];
 		// Found an instance
-		int left = pos - s + 1;
-		Assert( left < static_cast<int>(sizeof( temp )) );
+		intp left = pos - s + 1;
+		Assert( left < sizeof( temp ) );
 		Q_strncpy( temp, s, left );
-		int rightofs = end - s + 1;
+		intp rightofs = end - s + 1;
 		Q_strncat( temp, &s[ rightofs ], sizeof( temp ), COPY_ALL_CHARACTERS );
 
 		// Replace entire string
-		Q_strncpy( s, temp, sizeof( s ) );
+		V_strcpy_safe( s, temp );
 	}
 
 	str = s;

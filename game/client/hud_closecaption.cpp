@@ -590,8 +590,8 @@ public:
 		DataCacheStatus_t status;
 		DataCacheLimits_t limits;
 		GetCacheSection()->GetStatus( &status, &limits );
-		int bytesUsed = status.nBytes;
-		int bytesTotal = limits.nMaxBytes;
+		size_t bytesUsed = status.nBytes;
+		size_t bytesTotal = limits.nMaxBytes;
 
 		float percent = 100.0f * (float)bytesUsed / (float)bytesTotal;
 
@@ -1911,7 +1911,7 @@ void CHudCloseCaption::DrawStream( wrect_t &rcText, wrect_t &rcWindow, CCloseCap
 		vgui::surface()->DrawSetTextFont( useF );
 		vgui::surface()->DrawSetTextPos( rcOut.left, rcOut.top );
 		vgui::surface()->DrawSetTextColor( useColor );
-		vgui::surface()->DrawPrintText( wu->GetStream(), wcslen( wu->GetStream() ) );
+		vgui::surface()->DrawPrintText( wu->GetStream(), V_wcslen( wu->GetStream() ) );
 	}
 }
 
@@ -2117,9 +2117,9 @@ public:
 		CaptionLookup_t search;
 		search.SetHash( token );
 
-		int idx = -1;
-		int i;
-		int dc = directories.Count();
+		intp idx = -1;
+		intp i;
+		intp dc = directories.Count();
 		for ( i = 0; i < dc; ++i )
 		{
             idx = directories[ i ].m_CaptionDirectory.Find( search );
@@ -2813,7 +2813,7 @@ void CHudCloseCaption::FindSound( char const *pchANSI )
 
 		Q_memset( block, 0, data.m_Header.blocksize );
 		CaptionDictionary_t &dict = data.m_CaptionDirectory;
-		for ( int j = 0; j < dict.Count(); ++j )
+		for ( intp j = 0; j < dict.Count(); ++j )
 		{
 			CaptionLookup_t &lu = dict[ j ];
 

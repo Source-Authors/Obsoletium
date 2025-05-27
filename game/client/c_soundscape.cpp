@@ -574,11 +574,9 @@ void C_SoundscapeSystem::UpdateAudioParams( audioparams_t &audio )
 // Called when a soundscape is activated (leading edge of becoming the active soundscape)
 void C_SoundscapeSystem::StartNewSoundscape( KeyValues *pSoundscape )
 {
-	int i;
-
 	// Reset the system
 	// fade out the current loops
-	for ( i = m_loopingSounds.Count()-1; i >= 0; --i )
+	for ( intp i = m_loopingSounds.Count()-1; i >= 0; --i )
 	{
 		m_loopingSounds[i].volumeTarget = 0;
 		if ( !pSoundscape )
@@ -848,8 +846,8 @@ void C_SoundscapeSystem::TouchSoundFiles()
 	if ( !CommandLine()->FindParm( "-makereslists" ) )
 		return;
 
-	int c = m_soundscapes.Count();
-	for ( int i = 0; i < c ; ++i )
+	intp c = m_soundscapes.Count();
+	for ( intp i = 0; i < c ; ++i )
 	{
 		TouchWaveFiles( m_soundscapes[ i ] );
 	}
@@ -1289,7 +1287,7 @@ void C_SoundscapeSystem::UpdateRandomSounds( float gameTime )
 
 	m_nextRandomTime = gameTime + 3600;	// add some big time to check again (an hour)
 
-	for ( int i = m_randomSounds.Count()-1; i >= 0; i-- )
+	for ( intp i = m_randomSounds.Count()-1; i >= 0; i-- )
 	{
 		// time to play?
 		if ( gameTime >= m_randomSounds[i].nextPlayTime )

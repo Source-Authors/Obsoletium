@@ -813,7 +813,7 @@ inline bool CInterpolatedVarArrayBase<Type, IS_ARRAY>::GetInterpolationInfo(
 	pInfo->frac = 0;
 	pInfo->oldest = pInfo->older = pInfo->newer = varHistory.InvalidIndex();
 	
-	for ( int i = 0; i < varHistory.Count(); i++ )
+	for ( intp i = 0; i < varHistory.Count(); i++ )
 	{
 		pInfo->older = i;
 		
