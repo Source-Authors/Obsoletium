@@ -270,14 +270,10 @@ void GetChallengeMedals( ChallengeDescription_t *pChallengeDescription, int &iBe
 }
 
 
-CBonusMapsDatabase *g_pBonusMapsDatabase = NULL;
-
 CBonusMapsDatabase *BonusMapsDatabase( void )
 {
-	if ( !g_pBonusMapsDatabase )
 		static CBonusMapsDatabase StaticBonusMapsDatabase;
-
-	return g_pBonusMapsDatabase;
+	return &StaticBonusMapsDatabase;
 }
 
 
@@ -286,9 +282,6 @@ CBonusMapsDatabase *BonusMapsDatabase( void )
 //-----------------------------------------------------------------------------
 CBonusMapsDatabase::CBonusMapsDatabase( void )
 {
-	Assert( g_pBonusMapsDatabase == NULL );	// There should only be 1 bonus maps database
-	g_pBonusMapsDatabase = this;
-
 	RootPath();
 
 	m_pBonusMapsManifest = new KeyValues( "bonus_maps_manifest" );
@@ -310,8 +303,7 @@ CBonusMapsDatabase::CBonusMapsDatabase( void )
 //-----------------------------------------------------------------------------
 CBonusMapsDatabase::~CBonusMapsDatabase()
 {
-	g_pBonusMapsDatabase = NULL;
-	// dimhotepus: Do not leak 
+	// dimhotepus: Do not leak KeyValues.
 	if (m_pBonusMapSavedData)
 	{
 		m_pBonusMapSavedData->deleteThis();
