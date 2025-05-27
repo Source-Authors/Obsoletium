@@ -14,10 +14,9 @@
 #include <climits>
 #include "utlmemory.h"
 #include "tier1/utlvector.h"
-#include "utllinkedlist.h"
-#include "utllinkedlist.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/generichash.h"
 #include "tier0/commonmacros.h"
-#include "generichash.h"
 #include "tier0/dbg.h"
 
 typedef uintp UtlHashHandle_t;
