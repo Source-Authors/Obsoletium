@@ -291,12 +291,12 @@ void CLoadingDialog::DisplayGenericError(const char *failureReason, const char *
 	
 	SetupControlSettingsForErrorDisplay("Resource/LoadingDialogError.res");
 
-	if ( extendedReason && extendedReason[0] ) 
+	if ( !Q_isempty( extendedReason ) ) 
 	{
 		wchar_t compositeReason[256], finalMsg[512], formatStr[256];
 		if ( extendedReason[0] == '#' )
 		{
-			wcsncpy(compositeReason, g_pVGuiLocalize->Find(extendedReason), sizeof( compositeReason ) / sizeof( wchar_t ) );
+			V_wcscpy_safe(compositeReason, g_pVGuiLocalize->Find(extendedReason) );
 		}
 		else
 		{
@@ -305,7 +305,7 @@ void CLoadingDialog::DisplayGenericError(const char *failureReason, const char *
 
 		if ( failureReason[0] == '#' )
 		{
-			wcsncpy(formatStr, g_pVGuiLocalize->Find(failureReason), sizeof( formatStr ) / sizeof( wchar_t ) );
+			V_wcscpy_safe(formatStr, g_pVGuiLocalize->Find(failureReason) );
 		}
 		else
 		{
@@ -430,7 +430,7 @@ void CLoadingDialog::OnThink()
 		{
 			m_pTimeRemainingLabel->SetText("complete");
 		}
-		else if (ProgressBar::ConstructTimeRemainingString(unicode, sizeof(unicode), m_flSecondaryProgressStartTime, (float)system()->GetFrameTime(), m_flSecondaryProgress, m_flLastSecondaryProgressUpdateTime, true))
+		else if (ProgressBar::ConstructTimeRemainingString(unicode, m_flSecondaryProgressStartTime, (float)system()->GetFrameTime(), m_flSecondaryProgress, m_flLastSecondaryProgressUpdateTime, true))
 		{
 			m_pTimeRemainingLabel->SetText(unicode);
 		}

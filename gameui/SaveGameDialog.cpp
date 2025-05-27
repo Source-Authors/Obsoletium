@@ -136,26 +136,27 @@ void CSaveGameDialog::OnScanningSaveGames()
 //-----------------------------------------------------------------------------
 // Purpose: generates a new save game name
 //-----------------------------------------------------------------------------
-void CSaveGameDialog::FindSaveSlot( char *buffer, int bufsize )
+void CSaveGameDialog::FindSaveSlot( OUT_Z_CAP(bufsize) char *buffer, intp bufsize )
 {
-	buffer[0] = 0;
+	buffer[0] = '\0';
 	char szFileName[MAX_PATH];
 	for (int i = 0; i < 1000; i++)
 	{
-		Q_snprintf(szFileName, sizeof( szFileName ), "%s/half-life-%03i.sav", SAVE_DIR, i );
+		V_sprintf_safe(szFileName, "%s/half-life-%03i.sav", SAVE_DIR, i );
 
 		FileHandle_t fp = g_pFullFileSystem->Open( szFileName, "rb", MOD_DIR );
 		if (!fp)
 		{
 			// clean up name
-			Q_strncpy( buffer, szFileName + std::size(SAVE_DIR), bufsize );
+			V_strncpy( buffer, szFileName + std::size(SAVE_DIR), bufsize );
 			char *ext = strstr( buffer, ".sav" );
 			if ( ext )
 			{
-			 *ext = 0;
+				*ext = '\0';
 			}
 			return;
 		}
+
 		g_pFullFileSystem->Close(fp);
 	}
 

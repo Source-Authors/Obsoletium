@@ -133,8 +133,8 @@ class CGameChapterPanel : public vgui::EditablePanel
 public:
 	CGameChapterPanel( CNewGameDialog *parent, const char *name, const char *chapterName, int chapterIndex, const char *chapterNumber, const char *chapterConfigFile, bool bCommentary ) : BaseClass( parent, name )
 	{
-		Q_strncpy( m_szConfigFile, chapterConfigFile, sizeof(m_szConfigFile) );
-		Q_strncpy( m_szChapter, chapterNumber, sizeof(m_szChapter) );
+		V_strcpy_safe( m_szConfigFile, chapterConfigFile );
+		V_strcpy_safe( m_szChapter, chapterNumber );
 
 		m_pLevelPicBorder = SETUP_PANEL( new ImagePanel( this, "LevelPicBorder" ) );
 		m_pLevelPic = SETUP_PANEL( new ImagePanel( this, "LevelPic" ) );
@@ -163,7 +163,7 @@ public:
 
 		// the image has the same name as the config file
 		char szMaterial[ MAX_PATH ];
-		Q_snprintf( szMaterial, sizeof(szMaterial), "chapters/%s", chapterConfigFile );
+		V_sprintf_safe( szMaterial, "chapters/%s", chapterConfigFile );
 		char *ext = strchr( szMaterial, '.' );
 		if ( ext )
 		{
@@ -382,14 +382,14 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 			{
 				// Only load chapter configs from the current mod's cfg dir
 				// or else chapters appear that we don't want!
-				Q_snprintf( szFullFileName, sizeof(szFullFileName), "cfg/%s", fileName );
+				V_sprintf_safe( szFullFileName, "cfg/%s", fileName );
 				FileHandle_t f = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
 				if ( f )
 				{	
 					// don't load chapter files that are empty, used in the demo
 					if ( g_pFullFileSystem->Size(f) > 0	)
 					{
-						Q_strncpy(chapters[chapterIndex].filename, fileName, sizeof(chapters[chapterIndex].filename));
+						V_strcpy_safe(chapters[chapterIndex].filename, fileName);
 						++chapterIndex;
 					}
 					g_pFullFileSystem->Close( f );
@@ -434,6 +434,8 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 		sscanf(fileName, "chapter%31s", chapterID);
 		chapterID[ssize(chapterID) - 1] = '\0';
 
+		V_sprintf_safe( szFullFileName, "%s", fileName );
+
 		// strip the extension
 		char *ext = V_stristr(chapterID, ".cfg");
 		if (ext)
@@ -446,7 +448,6 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 		char chapterName[64];
 		V_sprintf_safe(chapterName, "#%s_Chapter%s_Title", pGameDir, chapterID);
 
-		V_sprintf_safe( szFullFileName, "%s", fileName );
 		CGameChapterPanel *chapterPanel = SETUP_PANEL( new CGameChapterPanel( this, NULL, chapterName, i, chapterID, szFullFileName, m_bCommentaryMode ) );
 		chapterPanel->SetVisible( false );
 
@@ -784,7 +785,7 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		char szMapAdvancedName[ 256 ] = "";
 		if ( m_pBonusMapDescription )
 		{
-			Q_snprintf( szMapAdvancedName, sizeof( szMapAdvancedName ), "%s_advanced", m_pBonusMapDescription->szMapFileName );
+			V_sprintf_safe( szMapAdvancedName, "%s_advanced", m_pBonusMapDescription->szMapFileName );
 		}
 
 		BonusMapDescription_t *pAdvancedDescription = NULL;
@@ -821,9 +822,9 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		if ( iEarnedMedal > -1 && iBest != -1 )
 		{
 			if ( iChallenge < 10 )
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
 			else
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
 
 			CBitmapImagePanel *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeEarnedMedal" ) );
 			pBitmap->SetVisible( true );
@@ -839,9 +840,9 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		if ( iNextMedal > 0 )
 		{
 			if ( iChallenge < 10 )
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
 			else
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
 
 			CBitmapImagePanel *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeNextMedal" ) );
 			pBitmap->SetVisible( true );
@@ -1323,8 +1324,7 @@ void CNewGameDialog::StartGame( void )
 	if ( m_ChapterPanels.IsValidIndex( m_iSelectedChapter ) )
 	{
 		char mapcommand[512];
-		mapcommand[0] = 0;
-		Q_snprintf( mapcommand, sizeof( mapcommand ), "disconnect\ndeathmatch 0\nprogress_enable\nexec %s\n", m_ChapterPanels[m_iSelectedChapter]->GetConfigFile() );
+		V_sprintf_safe( mapcommand, "disconnect\ndeathmatch 0\nprogress_enable\nexec %s\n", m_ChapterPanels[m_iSelectedChapter]->GetConfigFile() );
 
 		// Set commentary
 		ConVarRef commentary( "commentary" );

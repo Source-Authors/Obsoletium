@@ -593,7 +593,7 @@ void CGameMenu::OnCursorEnteredMenuItem(VPANEL menuItem)
 	if ( !pCommand->GetFirstSubKey() )
 		return;
 	const char *pszCmd = pCommand->GetFirstSubKey()->GetString();
-	if ( !pszCmd || !pszCmd[0] )
+	if ( Q_isempty( pszCmd ) )
 		return;
 
 	BaseClass::OnCursorEnteredMenuItem( menuItem );
@@ -829,15 +829,15 @@ static void CC_GameMenuCommand( const CCommand &args )
 
 static int CC_GameMenuCompletionFunc( char const *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
 {
-	char const *cmdname = "gamemenucommand";
+	constexpr char kCmdArgName[]{ "gamemenucommand" };
 
-	char *substring = (char *)partial;
-	if ( Q_strstr( partial, cmdname ) )
+	char const *substring = partial;
+	if ( Q_strstr( partial, kCmdArgName ) )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + ssize( kCmdArgName );
 	}
 
-	intp checklen = Q_strlen( substring );
+	const intp checklen = V_strlen( substring );
 
 	CUtlRBTree< CUtlString > symbols( 0, 0, UtlStringLessFunc );
 
@@ -846,26 +846,24 @@ static int CC_GameMenuCompletionFunc( char const *partial, char commands[ COMMAN
 		if ( Q_strnicmp( c, substring, checklen ) )
 			continue;
 
-		CUtlString str = c;
-		symbols.Insert( str );
+		symbols.Insert( c );
 
 		// Too many
 		if ( symbols.Count() >= COMMAND_COMPLETION_MAXITEMS )
 			break;
 	}
 
+	char buf[ 512 ];
 	// Now fill in the results
 	int slot = 0;
 	for ( auto i = symbols.FirstInorder(); i != symbols.InvalidIndex(); i = symbols.NextInorder( i ) )
 	{
 		char const *name = symbols[ i ].String();
 
-		char buf[ 512 ];
-		Q_strncpy( buf, name, sizeof( buf ) );
-		Q_strlower( buf );
+		V_strcpy_safe( buf, name );
+		V_strlower( buf );
 
-		Q_snprintf( commands[ slot++ ], COMMAND_COMPLETION_ITEM_LENGTH, "%s %s",
-			cmdname, buf );
+		V_sprintf_safe( commands[ slot++ ], "%s %s", kCmdArgName, buf );
 	}
 
 	return slot;
@@ -1589,21 +1587,10 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	bool bIsWidescreen = aspectRatio >= 1.5999f;
 
 	// work out which background image to use
-	if ( IsPC() || !IsX360() )
-	{
 		// pc uses blurry backgrounds based on the background level
-		char background[MAX_PATH];
+	char background[MAX_PATH], filename[MAX_PATH];
 		engine->GetMainMenuBackgroundName( background, sizeof(background) );
-		Q_snprintf( filename, sizeof( filename ), "console/%s%s", background, ( bIsWidescreen ? "_widescreen" : "" ) );
-	}
-	else
-	{
-		// 360 uses hi-res game specific backgrounds
-		char gameName[MAX_PATH];
-		const char *pGameDir = engine->GetGameDirectory();
-		V_FileBase( pGameDir, gameName );
-		V_snprintf( filename, sizeof( filename ), "vgui/appchooser/background_%s%s", gameName, ( bIsWidescreen ? "_widescreen" : "" ) );
-	}
+	V_sprintf_safe( filename, "console/%s%s", background, ( bIsWidescreen ? "_widescreen" : "" ) );
 
 	if ( m_iBackgroundImageID == -1 )
 	{
@@ -1982,23 +1969,22 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "RestartWithNewLanguage" ) )
 	{
-		if ( !IsX360() )
-		{
-			char szSteamURL[50];
-
 			// hide everything while we quit
 			SetVisible( false );
 			vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
 			engine->ClientCmd_Unrestricted( "quit\n" );
 
-			// Construct Steam URL. Pattern is steam://run/<appid>/<language>. (e.g. Ep1 In French ==> steam://run/380/french)
-			V_snprintf( szSteamURL, sizeof(szSteamURL), "steam://run/%d/%s", engine->GetAppID(), COptionsSubAudio::GetUpdatedAudioLanguage() );
+		char szSteamURL[50];
+		// Construct Steam URL. Pattern is steam://run/<appid>/<language>.
+		// (e.g. Ep1 In French ==> steam://run/380/french)
+		V_sprintf_safe( szSteamURL, "steam://run/%d/%s", engine->GetAppID(), COptionsSubAudio::GetUpdatedAudioLanguage() );
 
-			// Set Steam URL for re-launch in registry. Launcher will check this registry key and exec it in order to re-load the game in the proper language
-#if defined( WIN32 ) && !defined( _X360 )
+		// Set Steam URL for re-launch in registry. Launcher will check this
+		// registry key and exec it in order to re-load the game in the proper language
+#if defined( WIN32 )
 			HKEY hKey;
 
-			if ( IsPC() && RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
+		if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
 			{
 				RegSetValueEx( hKey, "Relaunch URL", 0, REG_SZ, (const unsigned char *)szSteamURL, sizeof( szSteamURL ) );
 
@@ -2011,12 +1997,8 @@ void CBasePanel::RunMenuCommand(const char *command)
 				fprintf( fp, "%s\n", szSteamURL );
 			}
 			fclose( fp );
-#elif defined( _X360 )
-#else
-#error "Please define your platform"
 #endif
 		}
-	}
 	else
 	{
 		BaseClass::OnCommand( command);
@@ -2619,12 +2601,12 @@ public:
 		{
 			// find a new name to save
 			char saveName[128];
-			CSaveGameDialog::FindSaveSlot( saveName, sizeof(saveName) );
-			if ( saveName[ 0 ] )
+			CSaveGameDialog::FindSaveSlot( saveName );
+			if ( !Q_isempty( saveName ) )
 			{
 				// save the game
-				char sz[ 256 ];
-				Q_snprintf(sz, sizeof( sz ), "save %s\n", saveName );
+				char sz[ 156 ];
+				V_sprintf_safe(sz, "save %s\n", saveName );
 				engine->ClientCmd_Unrestricted( sz );
 			}
 
@@ -3600,12 +3582,12 @@ void CFooterPanel::ApplySettings( KeyValues *inResourceData )
 	m_bPaintBackground = ( inResourceData->GetInt( "paintbackground", 0 ) == 1 );
 
 	// fonts for text and button
-	Q_strncpy( m_szTextFont, inResourceData->GetString( "fonttext", "MenuLarge" ), sizeof( m_szTextFont ) );
-	Q_strncpy( m_szButtonFont, inResourceData->GetString( "fontbutton", "GameUIButtons" ), sizeof( m_szButtonFont ) );
+	V_strcpy_safe( m_szTextFont, inResourceData->GetString( "fonttext", "MenuLarge" ) );
+	V_strcpy_safe( m_szButtonFont, inResourceData->GetString( "fontbutton", "GameUIButtons" ) );
 
 	// fg and bg colors
-	Q_strncpy( m_szFGColor, inResourceData->GetString( "fgcolor", "White" ), sizeof( m_szFGColor ) );
-	Q_strncpy( m_szBGColor, inResourceData->GetString( "bgcolor", "Black" ), sizeof( m_szBGColor ) );
+	V_strcpy_safe( m_szFGColor, inResourceData->GetString( "fgcolor", "White" ) );
+	V_strcpy_safe( m_szBGColor, inResourceData->GetString( "bgcolor", "Black" ) );
 
 	for ( KeyValues *pButton = inResourceData->GetFirstSubKey(); pButton != NULL; pButton = pButton->GetNextKey() )
 	{
@@ -3692,7 +3674,7 @@ void CFooterPanel::AddNewButtonLabel( const char *text, const char *icon )
 {
 	ButtonLabel_t *button = new ButtonLabel_t;
 
-	Q_strncpy( button->name, text, MAX_PATH );
+	V_strcpy_safe( button->name, text );
 	button->bVisible = true;
 
 	// Button icons are a single character
@@ -3700,22 +3682,22 @@ void CFooterPanel::AddNewButtonLabel( const char *text, const char *icon )
 	if ( pIcon )
 	{
 		button->icon[0] = pIcon[0];
-		button->icon[1] = '\0';
+		button->icon[1] = L'\0';
 	}
 	else
 	{
-		button->icon[0] = '\0';
+		button->icon[0] = L'\0';
 	}
 
 	// Set the help text
 	wchar_t *pText = g_pVGuiLocalize->Find( text );
 	if ( pText )
 	{
-		wcsncpy( button->text, pText, wcslen( pText ) + 1 );
+		V_wcscpy_safe( button->text, pText );
 	}
 	else
 	{
-		button->text[0] = '\0';
+		button->text[0] = L'\0';
 	}
 
 	m_ButtonLabels.AddToTail( button );
@@ -3818,7 +3800,7 @@ void CFooterPanel::Paint( void )
 			vgui::surface()->DrawSetTextFont( m_hTextFont );
 			vgui::surface()->DrawSetTextColor( GetFgColor() );
 			vgui::surface()->DrawSetTextPos( x, y + textY );
-			vgui::surface()->DrawPrintText( pButton->text, wcslen( pButton->text ) );
+			vgui::surface()->DrawPrintText( pButton->text, V_wcslen( pButton->text ) );
 
 			// Draw the button
 			// back up button width and a little extra to leave a gap between button and text
@@ -3886,7 +3868,7 @@ void CFooterPanel::Paint( void )
 			vgui::surface()->DrawSetTextFont( m_hTextFont );
 			vgui::surface()->DrawSetTextColor( GetFgColor() );
 			vgui::surface()->DrawSetTextPos( x, y + textY );
-			vgui::surface()->DrawPrintText( pButton->text, wcslen( pButton->text ) );
+			vgui::surface()->DrawPrintText( pButton->text, V_wcslen( pButton->text ) );
 			
 			x += iTextWidth + m_nButtonGap;
 		}
