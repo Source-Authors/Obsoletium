@@ -624,7 +624,7 @@ bool CDmePresetGroup::ExportToVFE( const char *pFileName, CDmeAnimationSet *pAni
 
 	fhdr->id = ('V' << 16) + ('F' << 8) + ('E');
 	fhdr->version = 0;
-	if ( !g_pFullFileSystem->FullPathToRelativePathEx( pFileName, "GAME", fhdr->name, sizeof(fhdr->name) ) )
+	if ( !g_pFullFileSystem->FullPathToRelativePathEx_safe( pFileName, "GAME", fhdr->name ) )
 	{
 		V_strcpy_safe( fhdr->name, pFileName );
 	}

@@ -232,7 +232,7 @@ CDmElement *CDmeMDLMakefile::CreateOutputElement( )
 	Q_snprintf( pFullPath, sizeof(pFullPath), "%s\\%s.mdl", pOutputDir, pOutputName );
 
 	char pRelativePath[MAX_PATH];
-	g_pFullFileSystem->FullPathToRelativePathEx( pFullPath, "GAME", pRelativePath, sizeof( pRelativePath ) );
+	g_pFullFileSystem->FullPathToRelativePathEx_safe( pFullPath, "GAME", pRelativePath );
 
 	MDLHandle_t h = g_pMDLCache->FindMDL( pRelativePath );
 	m_hMDL->SetMDL( h );
