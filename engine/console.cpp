@@ -1,18 +1,17 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-//=====================================================================================//
+// Console interactions.
 
 #include "client_pch.h"
 #include "console.h"
-#include <ctime>
 #include "ivideomode.h"
 #include "zone.h"
 #include "sv_main.h"
 #include "server.h"
 #include "MapReslistGenerator.h"
 #include "tier0/vcrmode.h"
+
+#include <ctime>
 
 #include "../out/build/app_version_config.h"
 
@@ -794,14 +793,15 @@ CConPanel::CConPanel( vgui::Panel *parent ) : CBasePanel( parent, "CConPanel" )
 	SetMouseInputEnabled( false );
 	SetKeyBoardInputEnabled( false );
 
-	da_default_color[0] = 1.0;
-	da_default_color[1] = 1.0;
-	da_default_color[2] = 1.0;
+	da_default_color[0] = 1.0f;
+	da_default_color[1] = 1.0f;
+	da_default_color[2] = 1.0f;
 
 	m_bDrawDebugAreas = false;
 
 	g_pConPanel = this;
-	memset( da_notify, 0, sizeof(da_notify) );
+
+	BitwiseClear( da_notify );
 }
 
 //-----------------------------------------------------------------------------
