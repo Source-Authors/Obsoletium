@@ -262,7 +262,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 		if ( !_getcwd( szCwd, sizeof( szCwd ) ) )
 		{
 			const auto error = std::generic_category().message(errno);
-			Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
+			Warning( "Failed to load %s: %s\n", pModuleName, error.c_str() );
 			return nullptr;
 		}
 
@@ -301,9 +301,9 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 			// So you can see what the error is in the debugger...
 #if defined( _WIN32 ) && !defined( _X360 )
 			const auto error = std::system_category().message(::GetLastError());
-			Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
+			Warning( "Failed to load %s: %s\n", pModuleName, error.c_str() );
 #else
-			Msg( "Failed to load %s: %s\n", pModuleName, dlerror() );
+			Warning( "Failed to load %s: %s\n", pModuleName, dlerror() );
 #endif // _WIN32
 		}
 #endif // DEBUG

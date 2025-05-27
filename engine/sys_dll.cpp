@@ -1025,7 +1025,7 @@ static bool LoadThisDll( const char *szDllFilename, bool bIsServerOnly )
 	// this will have to be undone when we want mods to be able to run
 	if ((pDLL = g_pFileSystem->LoadModule(szDllFilename, "GAMEBIN", false)) == NULL)
 	{
-		ConMsg("Failed to load %s\n", szDllFilename);
+		ConWarning("Failed to load %s\n", szDllFilename);
 		goto IgnoreThisDLL;
 	}
 
