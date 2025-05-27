@@ -1106,7 +1106,10 @@ void CConPanel::DrawDebugAreas( void )
 		return;
 
 	// Find the top and bottom of all the nprint text so we can draw a box behind it.
-	int left=99999, top=99999, right=-99999, bottom=-99999;
+	int left = std::numeric_limits<int>::max(),
+		top = std::numeric_limits<int>::max(),
+		right = std::numeric_limits<int>::min(),
+		bottom = std::numeric_limits<int>::min();
 	if ( con_nprint_bgalpha.GetInt() )
 	{
 		// First, figure out the bounds of all the con_nprint text.
