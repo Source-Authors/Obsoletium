@@ -317,8 +317,9 @@ void TextTooltip::ShowTooltip(Panel *currentPanel)
 			return;
 		}
 
-		char *pBuf = (char*)_alloca( nLen+1 );
-		s_TooltipWindow->GetText( pBuf, nLen+1 );
+		// dimhotepus: Drop no side effects code.
+		//char *pBuf = (char*)_alloca( nLen+1 );
+		//s_TooltipWindow->GetText( pBuf, nLen+1 );
 		Panel *pCurrentParent = s_TooltipWindow->GetParent();
 
 		_isDirty = _isDirty || ( pCurrentParent != currentPanel );
