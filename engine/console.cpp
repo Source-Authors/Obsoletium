@@ -188,13 +188,13 @@ private:
 
 	float da_default_color[3];
 
-	typedef struct
+	struct da_notify_t
 	{
 		wchar_t	szNotify[MAX_NOTIFY_TEXT_LINE];
-		float	expire;
+		double	expire;
 		float	color[3];
 		bool	fixed_width_font;
-	} da_notify_t;
+	};
 
 	da_notify_t da_notify[MAX_DBG_NOTIFY];
 	bool m_bDrawDebugAreas;
