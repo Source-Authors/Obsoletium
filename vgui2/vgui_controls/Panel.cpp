@@ -546,7 +546,7 @@ void Panel::LoadKeyBindingsForOnePanel( KeyBindingContextHandle_t handle, Panel 
 				continue;
 			}
 			
-            kbPanel->ParseKeyBindings( subKey );
+			kbPanel->ParseKeyBindings( subKey );
 		}
 	}
 }
@@ -583,7 +583,7 @@ void Panel::ReloadKeyBindings( KeyBindingContextHandle_t handle )
 				continue;
 			}
 			
-            kbPanel->ParseKeyBindings( subKey );
+			kbPanel->ParseKeyBindings( subKey );
 		}
 	}
 }
@@ -4668,11 +4668,11 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 				// dimhotepus: Check all 4 color components are present.
 				if ( sscanf( pColorStr, "%f %f %f %f", &r, &g, &b, &a ) == 4 ) 
 				{
-				clrDest[0] = (unsigned char)r;
-				clrDest[1] = (unsigned char)g;
-				clrDest[2] = (unsigned char)b;
-				clrDest[3] = (unsigned char)a;
-			}
+					clrDest[0] = (unsigned char)r;
+					clrDest[1] = (unsigned char)g;
+					clrDest[2] = (unsigned char)b;
+					clrDest[3] = (unsigned char)a;
+				}
 			}
 			else
 			{
@@ -4755,7 +4755,7 @@ void Panel::GetSettings( KeyValues *outResourceData )
 	}
 	if (m_pTooltips)
 	{
-		if (m_pTooltips->GetText()[0])
+		if (!Q_isempty( m_pTooltips->GetText() ))
 		{
 			outResourceData->SetString("tooltiptext", m_pTooltips->GetText());
 		}

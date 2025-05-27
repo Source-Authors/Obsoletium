@@ -249,11 +249,11 @@ const char *CConsolePanel::CompletionItem::GetItemText( void )
 	{
 		if ( m_pText->HasExtra() )
 		{
-			Q_snprintf( text, sizeof( text ), "%s %s", m_pText->GetText(), m_pText->GetExtra() );
+			V_sprintf_safe( text, "%s %s", m_pText->GetText(), m_pText->GetExtra() );
 		}
 		else
 		{
-			Q_strncpy( text, m_pText->GetText(), sizeof( text ) );
+			V_strcpy_safe( text, m_pText->GetText() );
 		}
 	}
 	return text;
@@ -265,7 +265,7 @@ const char *CConsolePanel::CompletionItem::GetCommand( void ) const
 	text[0] = 0;
 	if ( m_pText )
 	{
-		Q_strncpy( text, m_pText->GetText(), sizeof( text ) );
+		V_strcpy_safe( text, m_pText->GetText() );
 	}
 	return text;
 }
@@ -606,7 +606,7 @@ void CConsolePanel::OnAutoComplete(bool reverse)
 
 	if ( !Q_strstr( completedText, " " ) )
 	{
-		Q_strncat(completedText, " ", sizeof(completedText), COPY_ALL_CHARACTERS );
+		V_strcat_safe(completedText, " " );
 	}
 
 	m_pEntry->SetText(completedText);
@@ -625,13 +625,13 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	if (panel != m_pEntry)
 		return;
 
-	Q_strncpy( m_szPreviousPartialText, m_szPartialText, sizeof( m_szPreviousPartialText ) );
+	V_strcpy_safe( m_szPreviousPartialText, m_szPartialText );
 
 	// get the partial text the user type
 	m_pEntry->GetText(m_szPartialText);
 
 	// see if they've hit the tilde key (which opens & closes the console)
-	intp len = Q_strlen(m_szPartialText);
+	intp len = V_strlen(m_szPartialText);
 
 	bool hitTilde = ( m_szPartialText[len - 1] == '~' || m_szPartialText[len - 1] == '`' ) ? true : false;
 
@@ -679,16 +679,17 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 		for (intp i = 0; i < m_CompletionList.Count() && i < MAX_MENU_ITEMS; i++)
 		{
 			char text[256];
-			text[0] = 0;
+
 			if (i == MAX_MENU_ITEMS - 1)
 			{
-				Q_strncpy(text, "...", sizeof( text ) );
+				V_strcpy_safe(text, "..." );
 			}
 			else
 			{
 				Assert( m_CompletionList[i] );
-				Q_strncpy(text, m_CompletionList[i]->GetItemText(), sizeof( text ) );
+				V_strcpy_safe(text, m_CompletionList[i]->GetItemText() );
 			}
+
 			KeyValues *kv = new KeyValues("CompletionCommand");
 			kv->SetString("command",text);
 			m_pCompletionList->AddMenuItem(text, kv, this);
@@ -711,7 +712,7 @@ void CConsolePanel::OnCommand(const char *command)
 	{
 		// submit the entry as a console commmand
 		char szCommand[256];
-		m_pEntry->GetText(szCommand, sizeof(szCommand));
+		m_pEntry->GetText(szCommand);
 		PostActionSignal( new KeyValues( "CommandSubmitted", "command", szCommand ) );
 
 		// add to the history
@@ -1009,12 +1010,12 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 	RebuildCompletionList( m_szPartialText );
 }
 
-void CConsolePanel::GetConsoleText( char *pchText, size_t bufSize ) const
+void CConsolePanel::GetConsoleText( char *pchText, intp bufSize ) const
 {
-	wchar_t *temp = new wchar_t[ bufSize ];
-	m_pHistory->GetText( 0, temp, bufSize * sizeof( wchar_t ) );
-	g_pVGuiLocalize->ConvertUnicodeToANSI( temp, pchText, bufSize );
-	delete[] temp;
+	// dimhotepus: Use unique_ptr<[]>. Can't allocate on stack as text may be long.
+	std::unique_ptr<wchar_t[]> temp = std::make_unique<wchar_t[]>( bufSize );
+	m_pHistory->GetText( 0, temp.get(), bufSize * sizeof( wchar_t ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( temp.get(), pchText, bufSize );
 }
 
 //-----------------------------------------------------------------------------
@@ -1047,7 +1048,7 @@ void CConsolePanel::DumpConsoleTextToFile()
 	FileHandle_t handle = g_pFullFileSystem->Open(szfile, "wb");
 	if ( handle != FILESYSTEM_INVALID_HANDLE )
 	{
-		int pos = 0;
+		intp pos = 0;
 		while (1)
 		{
 			wchar_t buf[512];
@@ -1063,7 +1064,7 @@ void CConsolePanel::DumpConsoleTextToFile()
 			g_pVGuiLocalize->ConvertUnicodeToANSI(buf, ansi);
 
 			// write to disk
-			intp len = strlen(ansi);
+			intp len = V_strlen(ansi);
 			for (intp i = 0; i < len; i++)
 			{
 				// preceed newlines with a return
