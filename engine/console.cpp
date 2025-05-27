@@ -995,17 +995,13 @@ int CConPanel::DrawText( vgui::HFont font, int x, int y, wchar_t *data )
 //-----------------------------------------------------------------------------
 bool CConPanel::ShouldDraw()
 {
-	bool bVisible = false;
-
-	if ( m_bDrawDebugAreas )
-	{
-		bVisible = true;
-	}
-
 	// Should be invisible if there's no notifys and the console is up.
 	// and if the launcher isn't active
 	if ( !Con_IsVisible() )
 	{
+		bool bVisible = m_bDrawDebugAreas;
+
+		{
 		// Protect against background modifications to m_NotifyText.
 		AUTO_LOCK( g_AsyncNotifyTextMutex );
 
@@ -1025,12 +1021,11 @@ bool CConPanel::ShouldDraw()
 			bVisible = true;
 		}
 	}
-	else
-	{
-		bVisible = true;
-	}
 
 	return bVisible;
+}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
