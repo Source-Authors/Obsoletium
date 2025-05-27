@@ -19,11 +19,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if !defined( _X360 )
-#define	MAXPRINTMSG	4096
-#else
-#define	MAXPRINTMSG	1024
-#endif
+constexpr inline int MAXPRINTMSG{4096};
 
 bool con_debuglog = false;
 bool con_initialized = false;
@@ -106,11 +102,13 @@ ConVar con_logfile( "con_logfile", "", 0, "Console output gets written to this f
 static const char *GetTimestampString( void )
 {
 	static char string[128];
+
 	tm today;
 	VCRHook_LocalTime( &today );
 	V_sprintf_safe( string, "%02i/%02i/%04i - %02i:%02i:%02i",
 		today.tm_mon+1, today.tm_mday, 1900 + today.tm_year,
 		today.tm_hour, today.tm_min, today.tm_sec );
+
 	return string;
 }
 
@@ -141,7 +139,7 @@ public:
 	};
 
 					CConPanel( vgui::Panel *parent );
-	virtual			~CConPanel( void );
+	virtual			~CConPanel();
 
 	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
 
@@ -210,11 +208,8 @@ Con_HideConsole_f
 
 ================
 */
-void Con_HideConsole_f( void )
+void Con_HideConsole_f()
 {
-	if ( IsX360() )
-		return;
-
 	if ( EngineVGui()->IsConsoleVisible() )
 	{
 		// hide the console
@@ -227,7 +222,7 @@ void Con_HideConsole_f( void )
 Con_ShowConsole_f
 ================
 */
-void Con_ShowConsole_f( void )
+void Con_ShowConsole_f()
 {
 	if ( vgui::input()->GetAppModalSurface() )
 	{
@@ -256,11 +251,8 @@ void Con_ShowConsole_f( void )
 //-----------------------------------------------------------------------------
 // Purpose: toggles the console
 //-----------------------------------------------------------------------------
-void Con_ToggleConsole_f( void )
+void Con_ToggleConsole_f()
 {
-	if ( IsX360() )
-		return;
-
 	if (EngineVGui()->IsConsoleVisible())
 	{
 		Con_HideConsole_f();
@@ -277,11 +269,8 @@ void Con_ToggleConsole_f( void )
 //-----------------------------------------------------------------------------
 // Purpose: Clears the console
 //-----------------------------------------------------------------------------
-void Con_Clear_f( void )
+void Con_Clear_f()
 {	
-	if ( IsX360() )
-		return;
-
 	EngineVGui()->ClearConsole();
 	Con_ClearNotify();
 }
@@ -291,7 +280,7 @@ void Con_Clear_f( void )
 Con_ClearNotify
 ================
 */
-void Con_ClearNotify (void)
+void Con_ClearNotify ()
 {
 	if ( g_pConPanel )
 	{
@@ -369,7 +358,7 @@ const char *ConsoleLogManager::GetConsoleLogFilename() const
 Con_Init
 ================
 */
-void Con_Init (void)
+void Con_Init()
 {
 #ifdef DEDICATED
 	con_debuglog = false; // the dedicated server's console will handle this
@@ -486,8 +475,6 @@ extern ConVar spew_consolelog_to_debugstring;
 
 void Con_ColorPrint( const Color& clr, char const *msg )
 {
-	if ( IsPC() )
-	{
 		if ( g_bInColorPrint )
 			return;
 
@@ -581,29 +568,6 @@ void Con_ColorPrint( const Color& clr, char const *msg )
 		}
 		g_bInColorPrint = false;
 	}
-
-#if defined( _X360 )
-	int			r,g,b,a;
-	char		buffer[MAXPRINTMSG];
-	const char	*pFrom;
-	char		*pTo;
-
-	clr.GetColor(r, g, b, a);
-
-	// fixup percent printers
-	pFrom = msg;
-	pTo   = buffer;
-	while ( *pFrom && pTo < buffer+sizeof(buffer)-1 )
-	{
-		*pTo = *pFrom++;
-		if ( *pTo++ == '%' )
-			*pTo++ = '%';
-	}
-	*pTo = '\0';
-
-	XBX_DebugString( XMAKECOLOR(r,g,b), buffer );
-#endif
-}
 #endif
 
 // returns false if the print function shouldn't continue
@@ -646,11 +610,7 @@ void Con_Print( const char *msg )
 	}
 	else
 	{
-#if !defined( _X360 )
 		Color clr( 255, 255, 255, 255 );
-#else
-		Color clr( 0, 0, 0, 255 );
-#endif
 		Con_ColorPrint( clr, msg );
 	}
 #endif
@@ -689,11 +649,7 @@ void Con_Printf( const char *fmt, ... )
 	}
 	else
 	{
-#if !defined( _X360 )
 		Color clr( 255, 255, 255, 255 );
-#else
-		Color clr( 0, 0, 0, 255 );
-#endif
 		Con_ColorPrint( clr, msg );
 	}
 #endif
@@ -807,15 +763,8 @@ void Con_NPrintf( int idx, const char *fmt, ... )
     V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
-	if ( IsPC() )
-	{
 		g_pConPanel->Con_NPrintf( idx, outtext );
 	}
-	else
-	{
-		Con_Printf( outtext );
-	}
-}
 
 void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
 {
@@ -826,15 +775,8 @@ void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
     V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
-	if ( IsPC() )
-	{
 		g_pConPanel->Con_NXPrintf( info, outtext );
 	}
-	else
-	{
-		Con_Printf( outtext );
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Creates the console panel
@@ -865,7 +807,7 @@ CConPanel::CConPanel( vgui::Panel *parent ) : CBasePanel( parent, "CConPanel" )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CConPanel::~CConPanel( void )
+CConPanel::~CConPanel()
 {
 }
 
@@ -906,6 +848,7 @@ void CConPanel::Con_NXPrintf( const struct con_nprint_s *info, const char *msg )
 		da_notify[ info->index ].expire = -1; // special marker means to just draw it once
 	else
 		da_notify[ info->index ].expire = realtime + info->time_to_live;
+
 	VectorCopy( info->color, da_notify[ info->index ].color );
 	da_notify[ info->index ].fixed_width_font = info->fixed_width_font;
 	m_bDrawDebugAreas = true;
