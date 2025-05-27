@@ -22,7 +22,8 @@
 #include <cstddef>
 #include "tier0/platform.h"
 
-class VAllocator
+// dimhotepus: Mark class as abstract
+abstract_class VAllocator
 {
 public:
 	virtual void*	Alloc(size_t size) = 0;
@@ -53,18 +54,13 @@ public:
 	int x;
 };
 
-inline void* operator new(size_t size, void *ptr, DummyAllocatorHelper *asdf)
+inline void* operator new(size_t, void *ptr, DummyAllocatorHelper *)
 {
-	(void)asdf;	// Suppress unused-variable compiler warnings.
-	(void)size;
 	return ptr;
 }
 
-inline void operator delete(void *ptrToDelete, void *ptr, DummyAllocatorHelper *asdf)
+inline void operator delete(void *, void *, DummyAllocatorHelper *)
 {
-	(void)asdf;	// Suppress unused-variable compiler warnings.
-	(void)ptr;
-	(void)ptrToDelete;
 }
 
 // Use these to manually construct and destruct lists of objects.
