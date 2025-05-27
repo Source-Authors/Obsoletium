@@ -394,7 +394,7 @@ void CFileSystem_Stdio::FreeOptimalReadBuffer( void *p )
 FILE *CFileSystem_Stdio::FS_fopen( const char *filenameT, const char *options, unsigned flags, int64 *size )
 {
 	char filename[ MAX_PATH ];
-	CBaseFileSystem::FixUpPath ( filenameT, filename, sizeof( filename ) );
+	CBaseFileSystem::FixUpPath ( filenameT, filename );
 
 	alignas(FILE *) CStdFilesystemFile *pFile = nullptr;
 
@@ -555,7 +555,7 @@ int CFileSystem_Stdio::FS_chmod( const char *pathT, int pmode )
 
 	char path[ MAX_PATH ];
 
-	CBaseFileSystem::FixUpPath ( pathT, path, sizeof( path ) );
+	CBaseFileSystem::FixUpPath ( pathT, path );
 
 	int rt = _chmod( path, pmode );
 #if defined(LINUX)
@@ -587,7 +587,7 @@ int CFileSystem_Stdio::FS_stat( const char *pathT, struct _stat *buf, bool *pbLo
 
 	char path[ MAX_PATH ];
 
-	CBaseFileSystem::FixUpPath ( pathT, path, sizeof( path ) );
+	CBaseFileSystem::FixUpPath ( pathT, path );
 
 	int rt = _stat( path, buf );
 
@@ -612,7 +612,7 @@ HANDLE CFileSystem_Stdio::FS_FindFirstFile(const char *findnameT, WIN32_FIND_DAT
 {
 	char findname[ MAX_PATH ];
 
-	CBaseFileSystem::FixUpPath ( findnameT, findname, sizeof( findname ) );
+	CBaseFileSystem::FixUpPath ( findnameT, findname );
 
 	return ::FindFirstFile(findname, dat);
 }

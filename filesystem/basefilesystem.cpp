@@ -535,11 +535,9 @@ FILE *CBaseFileSystem::Trace_FOpen( const char *filenameT, const char *options, 
 	AUTOBLOCKREPORTER_FN( Trace_FOpen, this, true, filenameT, FILESYSTEM_BLOCKING_SYNCHRONOUS, FileBlockingItem::FB_ACCESS_OPEN );
 
 	char filename[MAX_PATH];
-
-	FixUpPath ( filenameT, filename, sizeof( filename ) );
+	FixUpPath ( filenameT, filename );
 
 	FILE *fp = FS_fopen( filename, options, flags, size );
-
 	if ( fp )
 	{
 		if ( options[0] == 'r' )
@@ -2228,7 +2226,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 	char pFileNameBuff[MAX_PATH];
 	const char *pFileName = pFileNameBuff;
 
-	FixUpPath ( pFileNameT, pFileNameBuff, sizeof( pFileNameBuff ) );		
+	FixUpPath ( pFileNameT, pFileNameBuff );
 
 	// Try the memory cache for un-restricted searches or "GAME" items.
 	if ( !pathID || Q_stricmp( pathID, "GAME" ) == 0 )
@@ -3707,7 +3705,7 @@ void CBaseFileSystem::CreateDirHierarchy( const char *pRelativePathT, const char
 	char pRelativePathBuff[ MAX_PATH ];
 	const char *pRelativePath = pRelativePathBuff;
 
-	FixUpPath( pRelativePathT, pRelativePathBuff, sizeof( pRelativePathBuff ) );
+	FixUpPath( pRelativePathT, pRelativePathBuff );
 
 	CHECK_DOUBLE_SLASHES( pRelativePath );
 
@@ -3794,7 +3792,7 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 	}
 
 	char pWildCard[ MAX_PATH ];
-	FixUpPath ( pWildCardT, pWildCard, sizeof( pWildCard ) );
+	FixUpPath ( pWildCardT, pWildCard );
 
 	intp maxlen = V_strlen( pWildCard ) + 1;
 	pFindData->wildCardString.AddMultipleToTail( maxlen );
@@ -4162,7 +4160,7 @@ const char *CBaseFileSystem::RelativePathToFullPath( const char *pFileName, cons
 	// Convert filename to lowercase.  All files in the
 	// game logical filesystem must be accessed by lowercase name
 	char szLowercaseFilename[ MAX_PATH ];
-	FixUpPath( pFileName, szLowercaseFilename, sizeof( szLowercaseFilename ) );
+	FixUpPath( pFileName, szLowercaseFilename );
 	pFileName = szLowercaseFilename;
 
 	// Fill in the default in case it's not found...

@@ -322,7 +322,12 @@ public:
 
 	void				GetLocalCopy( const char *pFileName ) override;
 
-	virtual bool				FixUpPath( const char *pFileName, char *pFixedUpFileName, int sizeFixedUpFileName );
+	virtual bool		FixUpPath( const char *pFileName, char *pFixedUpFileName, int sizeFixedUpFileName );
+	template<int size>
+	bool				FixUpPath( const char *pFileName, char (&pFixedUpFileName)[size] )
+	{
+		return FixUpPath( pFileName, pFixedUpFileName, size );
+	}
 
 	FileNameHandle_t	FindOrAddFileName( char const *pFileName ) override;
 	FileNameHandle_t	FindFileName( char const *pFileName ) override;
@@ -576,7 +581,7 @@ public:
 				CopySearchPaths( pFileSystem->m_SearchPaths );
 				pFileSystem->m_SearchPathsMutex.Unlock();
 
-				pFileSystem->FixUpPath ( *ppszFilename, m_Filename, sizeof( m_Filename ) );
+				pFileSystem->FixUpPath ( *ppszFilename, m_Filename );
 			}
 			else
 			{
