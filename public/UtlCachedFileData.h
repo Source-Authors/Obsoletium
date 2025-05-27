@@ -195,7 +195,7 @@ public:
 
 private:
 
-	void		InitSmallBuffer( FileHandle_t& fh, int fileSize, bool& deleteFile );
+	void		InitSmallBuffer( FileHandle_t& fh, bool& deleteFile );
 	void		InitLargeBuffer( FileHandle_t& fh, bool& deleteFile );
 
 	unsigned short			GetIndex( const char *filename )
@@ -423,7 +423,7 @@ bool CUtlCachedFileData<T>::IsUpToDate()
 }
 
 template <class T>
-void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, int fileSize, bool& deleteFile )
+void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, bool& deleteFile )
 {
 	deleteFile = false;
 
@@ -631,9 +631,7 @@ bool CUtlCachedFileData<T>::Init()
 	// Always compute meta checksum
 	m_uCurrentMetaChecksum = m_pfnMetaChecksum ? (*m_pfnMetaChecksum)() : 0;
 
-	FileHandle_t fh;
-
-	fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "rb", "MOD" );
+	FileHandle_t fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "rb", "MOD" );
 	if ( fh == FILESYSTEM_INVALID_HANDLE )
 	{
 		// Nothing on disk, we'll recreate everything from scratch...
@@ -641,7 +639,7 @@ bool CUtlCachedFileData<T>::Init()
 		return true;
 	}
 	time_t fileTime = g_pFullFileSystem->GetFileTime( m_sRepositoryFileName, "MOD" );
-	int size = g_pFullFileSystem->Size( fh );
+	unsigned size = g_pFullFileSystem->Size( fh );
 
 	bool deletefile = false;
 
@@ -651,10 +649,11 @@ bool CUtlCachedFileData<T>::Init()
 	}
 	else
 	{
-		InitSmallBuffer( fh, size, deletefile );
+		InitSmallBuffer( fh, deletefile );
 	}
 
-	if ( deletefile )
+	// dimhotepus: File may be in pack, so delete only if local.
+	if ( deletefile && g_pFullFileSystem->FileExists( m_sRepositoryFileName, "MOD" ) )
 	{
 		Assert( !m_bReadOnly );
 		if ( !m_bReadOnly )
