@@ -1584,7 +1584,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 				keyValues.Clear();
 				if( !LoadVMTFile( keyValues, patchKeyValues, pFallbackMaterialNameBuf, UsesUNCFileName(), NULL ) )
 				{
-					Warning( "CMaterial::PrecacheVars: error loading vmt file %s for %s\n", pFallbackMaterialNameBuf, GetName() );
+					Warning( "CMaterial::PrecacheVars: error loading fallback vmt file %s for %s\n", pFallbackMaterialNameBuf, GetName() );
 					keyValues = *(((CMaterial *)g_pErrorMaterial)->m_pVMTKeyValues);
 				}
 			}
