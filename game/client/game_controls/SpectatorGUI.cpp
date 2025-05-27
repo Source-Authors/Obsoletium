@@ -667,7 +667,7 @@ void CSpectatorGUI::Update()
 		int iHealth = gr->GetHealth( playernum );
 		if ( iHealth > 0  && gr->IsAlive(playernum) )
 		{
-			_snwprintf( health, ARRAYSIZE( health ), L"%i", iHealth );
+			V_swprintf_safe( health, L"%i", iHealth );
 			g_pVGuiLocalize->ConstructString_safe( playerText, g_pVGuiLocalize->Find( "#Spec_PlayerItem_Team" ), 2, playerName,  health );
 		}
 		else

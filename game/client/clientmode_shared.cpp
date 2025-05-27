@@ -1066,7 +1066,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			}
 			else
 			{
-				_snwprintf ( wszTeam, sizeof( wszTeam ) / sizeof( wchar_t ), L"%d", team );
+				V_swprintf_safe ( wszTeam, L"%d", team );
 			}
 #endif
 
@@ -1265,7 +1265,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			if ( pszLocString )
 			{
 				wchar_t wszItemFound[256];
-				_snwprintf( wszItemFound, ARRAYSIZE( wszItemFound ), L"%ls", g_pVGuiLocalize->Find( pszLocString ) );
+				V_swprintf_safe( wszItemFound, L"%ls", g_pVGuiLocalize->Find( pszLocString ) );
 
 				wchar_t *colorMarker = wcsstr( wszItemFound, L"::" );
 				const CEconItemRarityDefinition* pItemRarity = GetItemSchema()->GetRarityDefinition( pItemDefinition->GetRarity() );

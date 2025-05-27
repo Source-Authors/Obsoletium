@@ -916,11 +916,10 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 		if ( tempString )
 		{
 #ifdef WIN32
-			_snwprintf(text, sizeof(text)/sizeof(wchar_t) - 1, L"%s", tempString);
+			V_swprintf_safe(text, L"%s", tempString);
 #else
-			_snwprintf(text, sizeof(text)/sizeof(wchar_t) - 1, L"%S", tempString);
+			V_swprintf_safe(text, L"%S", tempString);
 #endif
-			text[sizeof(text)/sizeof(wchar_t) - 1] = 0;
 		}
 		else
 		{
