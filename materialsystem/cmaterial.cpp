@@ -791,7 +791,7 @@ void CMaterial::CleanUpMaterialProxy()
 		return;
 
 	// Clean up material proxies
-	for ( int i = m_ProxyInfo.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_ProxyInfo.Count() - 1; i >= 0; i-- )
 	{
 		IMaterialProxy *pProxy = m_ProxyInfo[ i ];
 
