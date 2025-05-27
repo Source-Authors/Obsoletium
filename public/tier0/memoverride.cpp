@@ -43,31 +43,35 @@
 #endif
 
 #if defined( _WIN32 )
-const char *MakeModuleFileName()
+// dimhotepus: Use static buffer to prevent heap leaks.
+const char *MakeModuleFileName(_Out_z_cap_(MAX_PATH) char (&moduleName)[MAX_PATH])
 {
+	moduleName[0] = '\0';
 	if ( g_pMemAlloc && g_pMemAlloc->IsDebugHeap() )
 	{
-		char *pszModuleName = (char *)HeapAlloc( GetProcessHeap(), 0, MAX_PATH ); // small leak, debug only
-		if (pszModuleName)
+		MEMORY_BASIC_INFORMATION mbi;
+		static int dummy;
+		if ( VirtualQuery( &dummy, &mbi, sizeof(mbi) ) )
 		{
-			MEMORY_BASIC_INFORMATION mbi;
-			static int dummy;
-			if ( VirtualQuery( &dummy, &mbi, sizeof(mbi) ) )
-			{
-				GetModuleFileName( static_cast<HMODULE>(mbi.AllocationBase), pszModuleName, MAX_PATH );
-				char *pDot = strrchr( pszModuleName, '.' );
-				if ( pDot )
-				{
-					char *pSlash = strrchr( pszModuleName, '\\' );
-					if ( pSlash )
-					{
-						pszModuleName = pSlash + 1;
-						*pDot = '\0';
-					}
-				}
+			// dimhotepus: Correctly handle insufficient buffer errors.
+			SetLastError(ERROR_SUCCESS);
+			GetModuleFileName( static_cast<HMODULE>(mbi.AllocationBase), moduleName, std::size(moduleName) );
+			if ( GetLastError() != ERROR_SUCCESS )
+				Error( "Unable to get module 0x%p path, %zu buffer size is not enough.\n",
+					mbi.AllocationBase, std::size(moduleName) );
 
-				return pszModuleName;
+			char *pDot = strrchr( moduleName, '.' );
+			if ( pDot )
+			{
+				char *pSlash = strrchr( moduleName, '\\' );
+				if ( pSlash )
+				{
+					memmove( moduleName, pSlash + 1, moduleName + std::size(moduleName) - pSlash - 1 );
+					*pDot = '\0';
+				}
 			}
+
+			return moduleName;
 		}
 	}
 	return nullptr;
@@ -92,8 +96,11 @@ const char *GetModuleFileName()
 		return nullptr;
 #endif
 
-	static const char *pszOwner = MakeModuleFileName();
-	return pszOwner;
+	// dimhotepus: Simplify getting
+	static char owner[MAX_PATH];
+	if (owner[0]) return owner;
+
+	return MakeModuleFileName(owner);
 }
 
 
