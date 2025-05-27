@@ -368,9 +368,7 @@ HScheme  CSchemeManager::LoadSchemeFromFileEx( VPANEL sizingPanel, const char *f
 		return hScheme;
 	}
 
-	KeyValues *data;
-	data = new KeyValues("Scheme");
-
+	KeyValues *data = new KeyValues("Scheme");
 	data->UsesEscapeSequences( true );	// VGUI uses this
 	
 	// Look first in game directory
