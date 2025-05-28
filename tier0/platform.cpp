@@ -10,6 +10,12 @@
 #include "winlite.h"
 #endif
 
+#if defined(POSIX)
+#include <unistd.h>
+#endif
+
+#include <system_error>
+
 #include "tier0/platform.h"
 #include "tier0/minidump.h"
 #include "tier0/vcrmode.h"
@@ -155,11 +161,12 @@ void Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 	SetLastError( ERROR_SUCCESS ); // clear the error code
 	GetModuleFileName( NULL, pOut, nMaxBytes );
 	if ( GetLastError() != ERROR_SUCCESS )
-		Error( "Plat_GetModuleFilename: The buffer given is too small (%d bytes).", nMaxBytes );
+		Error( "Plat_GetModuleFilename: Unable to read exe file name: %s.", 
+			std::system_category().message(GetLastError()).c_str());
 #else
-	// We shouldn't need this on POSIX.
-	Assert( false );
-	pOut[0] = 0x00;    // Null the returned string in release builds
+	if ( -1 == readlink( "/proc/self/exe", pOut, nMaxBytes ) )
+		Error( "Plat_GetModuleFilename: Unable to read exe file name: %s.", 
+			std::system_category().message(errno).c_str() );
 #endif
 }
 
