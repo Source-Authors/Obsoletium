@@ -31,8 +31,8 @@ bool g_fDrawLines = FALSE;
 bool FBoxVisible( CBaseEntity *pLooker, CBaseEntity *pTarget, Vector &vecTargetOrigin, float flSize )
 {
 	// don't look through water
-	if ((pLooker->GetWaterLevel() != 3 && pTarget->GetWaterLevel() == 3) 
-		|| (pLooker->GetWaterLevel() == 3 && pTarget->GetWaterLevel() == 0))
+	if ((pLooker->GetWaterLevel() != WaterLevel::WL_Eyes && pTarget->GetWaterLevel() == WaterLevel::WL_Eyes) 
+		|| (pLooker->GetWaterLevel() == WaterLevel::WL_Eyes && pTarget->GetWaterLevel() == WaterLevel::WL_NotInWater))
 		return FALSE;
 
 	trace_t tr;

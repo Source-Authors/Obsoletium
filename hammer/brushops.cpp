@@ -6,8 +6,7 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include <stdio.h>
-#include <math.h>
+#include "BrushOps.h"
 #include "hammer.h"
 #include "MapEntity.h"
 #include "MapDefs.h"
@@ -15,32 +14,26 @@
 #include "hammer_mathlib.h"
 #include "history.h"
 #include "Error3d.h"
-#include "BrushOps.h"
 #include "GlobalFunctions.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 
-#pragma warning( disable : 4244 )  // Disable warning messages
 
-
-#define	SIDE_FRONT		0
-#define	SIDE_BACK		1
-#define	SIDE_ON			2
 
 #define	BOGUS_RANGE	( MAX_COORD_INTEGER * 4 )
 
 
 float		lightaxis[3] = {1, 0.6f, 0.75f};
 
-const int MAX_POINTS_ON_WINDING	= 128;
+constexpr inline int MAX_POINTS_ON_WINDING	= 128;
 
 
 void Error(char* fmt, ...)
 {
 	char str[300];
-	sprintf(str, fmt, (&fmt)+1);
+	V_sprintf_safe(str, fmt, (&fmt)+1);
 	Msg(mwError, str);
 }
 
@@ -75,9 +68,15 @@ winding_t *NewWinding (int points)
 
 void FreeWinding (winding_t *w)
 {
-	if (*(unsigned *)w == 0xdeaddead)
+#ifdef PLATFORM_64BITS
+	if (*(size_t*)w == 0xdeaddeaddeaddead)
 		Error ("FreeWinding: freed a freed winding");
-	*(unsigned *)w = 0xdeaddead;
+	*(unsigned *)w = 0xdeaddeaddeaddead;
+#else
+	if (*(size_t*)w == 0xdeaddead)
+		Error ("FreeWinding: freed a freed winding");
+	*(size_t*)w = 0xdeaddead;
+#endif
 
 	if (w->p)
 	{
@@ -131,12 +130,9 @@ CopyWinding
 */
 winding_t	*CopyWinding (winding_t *w)
 {
-	int			size;
-	winding_t	*c;
-
-	c = NewWinding (w->numpoints);
+	winding_t	*c = NewWinding (w->numpoints);
 	c->numpoints = w->numpoints;
-	size = w->numpoints*sizeof(w->p[0]);
+	int size = w->numpoints*sizeof(w->p[0]);
 	memcpy (c->p, w->p, size);
 	return c;
 }
@@ -155,7 +151,7 @@ Frees the input winding.
 winding_t *ClipWinding (winding_t *in, PLANE *split)
 {
 	float	dists[MAX_POINTS_ON_WINDING];
-	int		sides[MAX_POINTS_ON_WINDING];
+	SideType	sides[MAX_POINTS_ON_WINDING];
 	int		counts[3];
 	float	dot;
 	int		i, j;
@@ -163,6 +159,9 @@ winding_t *ClipWinding (winding_t *in, PLANE *split)
 	winding_t	*neww;
 	int		maxpts;
 
+	// dimhotepus: Initialize to prevent UB on uninitialized read.
+	dists[0] = 0.0f;
+	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 
 	// determine sides for each point

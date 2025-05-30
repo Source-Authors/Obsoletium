@@ -153,7 +153,7 @@ public:
 	MESSAGE_FUNC_PTR( OnCheckButtonChecked, "CheckButtonChecked", panel );
 
 private:
-	void PreloadResourceFile( void );
+	KeyValues *PreloadResourceFile( void );
 
 	IAchievement* m_pSourceAchievement;
 	int	m_iSourceAchievementIndex;

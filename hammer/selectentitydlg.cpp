@@ -8,8 +8,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "SelectEntityDlg.h"
+#include "hammer.h"
 #include "GlobalFunctions.h"
 #include "MapDoc.h"
 #include "MapEntity.h"
@@ -20,26 +20,28 @@
 
 CSelectEntityDlg::CSelectEntityDlg(const CMapObjectList *pList,
 								   CWnd* pParent /*=NULL*/)
-	: CDialog(CSelectEntityDlg::IDD, pParent)
+	: CBaseDlg(CSelectEntityDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CSelectEntityDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 
 	m_pEntityList = pList;
+	// dimhotepus: Init member.
+	m_pFinalEntity = nullptr;
 }
 
 
 void CSelectEntityDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CSelectEntityDlg)
 	DDX_Control(pDX, IDC_ENTITIES, m_cEntities);
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CSelectEntityDlg, CDialog)
+BEGIN_MESSAGE_MAP(CSelectEntityDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CSelectEntityDlg)
 	ON_LBN_SELCHANGE(IDC_ENTITIES, OnSelchangeEntities)
 	//}}AFX_MSG_MAP
@@ -62,7 +64,7 @@ void CSelectEntityDlg::OnSelchangeEntities()
 
 BOOL CSelectEntityDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// add entities from our list of entities to the listbox
 	FOR_EACH_OBJ( *m_pEntityList, pos )
@@ -74,7 +76,7 @@ BOOL CSelectEntityDlg::OnInitDialog()
 		if(pEntity->IsPlaceholder())
 			continue;
 		int iIndex = m_cEntities.AddString(pEntity->GetClassName());
-		m_cEntities.SetItemData(iIndex, DWORD(pEntity));
+		m_cEntities.SetItemData(iIndex, DWORD_PTR(pEntity));
 	}
 
 	m_cEntities.SetCurSel(0);
@@ -88,5 +90,5 @@ void CSelectEntityDlg::OnOK()
 	int iSel = m_cEntities.GetCurSel();
 	m_pFinalEntity = (CMapEntity*) m_cEntities.GetItemData(iSel);
 	
-	CDialog::OnOK();
+	__super::OnOK();
 }

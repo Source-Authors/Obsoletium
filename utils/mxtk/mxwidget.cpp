@@ -11,12 +11,14 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
+#include "tier0/dbg.h"
 #include <windows.h>
 #include <commctrl.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "tier1/strtools.h"
 
 void mxTab_resizeChild (HWND hwnd);
 void mx_addWidget (mxWidget *widget);
@@ -35,17 +37,18 @@ public:
 
 
 
-mxWidget::mxWidget (mxWindow *parent, int x, int y, int w, int h, const char *label)
+mxWidget::mxWidget (mxWindow *parent, [[maybe_unused]] int x, [[maybe_unused]] int y, [[maybe_unused]] int w, [[maybe_unused]] int h, const char *label)
 {
 	d_this = new mxWidget_i;
 
 	setHandle (0);
 	setType (-1);
 	setParent (parent);
-	setBounds (x, y, w, h);
-	setVisible (true);
-	setEnabled (true);
-	setId (0);
+	// dimhotepus: Do not set window props as there is no window yet.
+	// setBounds (x, y, w, h);
+	// setVisible (true);
+	// setEnabled (true);
+	// setId (0);
 	setUserData (0);
 	setLabel (label);
 
@@ -106,6 +109,8 @@ mxWidget::setParent (mxWindow *parentWindow)
 void
 mxWidget::setBounds (int x, int y, int w, int h)
 {
+	AssertMsg (d_this->d_hwnd, "Window must be present to set bounds. Widget 0x%p.", this);
+
 	char str[128];
 	GetClassName (d_this->d_hwnd, str, 128);
 
@@ -121,7 +126,7 @@ mxWidget::setBounds (int x, int y, int w, int h)
 
 
 void
-mxWidget::setLabel (const char *format, ... )
+mxWidget::setLabel (PRINTF_FORMAT_STRING const char *format, ... )
 {
 	if (format == NULL)
 	{
@@ -136,7 +141,7 @@ mxWidget::setLabel (const char *format, ... )
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	vsprintf (string, format,argptr);
+	V_vsprintf_safe (string, format, argptr);
 	va_end (argptr);
 
 	if (d_this->d_hwnd)
@@ -149,6 +154,8 @@ mxWidget::setLabel (const char *format, ... )
 void
 mxWidget::setVisible (bool b)
 {
+	AssertMsg (d_this->d_hwnd, "Window must be present to set visibility. Widget 0x%p.", this);
+
 	if (b)
 		SetWindowPos (d_this->d_hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 	else
@@ -160,6 +167,8 @@ mxWidget::setVisible (bool b)
 void
 mxWidget::setEnabled (bool b)
 {
+	AssertMsg (d_this->d_hwnd, "Window must be present to toggle. Widget 0x%p.", this);
+
 	EnableWindow (d_this->d_hwnd, b);
 }
 
@@ -168,7 +177,9 @@ mxWidget::setEnabled (bool b)
 void
 mxWidget::setId (int id)
 {
-	SetWindowLong (d_this->d_hwnd, GWL_ID, (LONG) id);
+	AssertMsg (d_this->d_hwnd, "Window must be present to set id. Widget 0x%p.", this);
+
+	SetWindowLongPtr (d_this->d_hwnd, GWLP_ID, (LONG_PTR) id);
 }
 
 
@@ -294,7 +305,9 @@ mxWidget::isEnabled () const
 int
 mxWidget::getId () const
 {
-	return (int) GetWindowLong (d_this->d_hwnd, GWL_ID);
+	AssertMsg (d_this->d_hwnd, "Window must be present to get id. Widget 0x%p.", this);
+
+	return (int) GetWindowLongPtr (d_this->d_hwnd, GWLP_ID);
 }
 
 

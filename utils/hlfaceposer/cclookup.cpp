@@ -5,13 +5,14 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <commctrl.h>
+#include "CCLookup.h"
 #include "mxtk/mx.h"
 #include "resource.h"
-#include "CCLookup.h"
 #include "mdlviewer.h"
 #include "addsoundentry.h"
 #include <vgui/ILocalize.h>
+
+#include <commctrl.h>
 
 using namespace vgui;
 
@@ -176,7 +177,7 @@ static BOOL CALLBACK CloseCaptionLookupDialogProc( HWND hwndDlg, UINT uMsg, WPAR
 
 						if ( ListView_GetItem( control, &lvi ) )
 						{
-							char const *name = g_pLocalize->GetNameByIndex( lvi.lParam );
+							char const *name = g_pLocalize->GetNameByIndex( (StringIndex_t)lvi.lParam );
 							if ( name )
 							{
 								Q_strncpy( g_Params.m_szCCToken, name, sizeof( g_Params.m_szCCToken ) );
@@ -206,7 +207,7 @@ static BOOL CALLBACK CloseCaptionLookupDialogProc( HWND hwndDlg, UINT uMsg, WPAR
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CloseCaptionLookup( CCloseCaptionLookupParams *params )
+intp CloseCaptionLookup( CCloseCaptionLookupParams *params )
 {
 	g_Params = *params;
 
@@ -226,7 +227,7 @@ int CloseCaptionLookup( CCloseCaptionLookupParams *params )
 		 DEFAULT_PITCH,
 		 "Tahoma" );
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_CCLOOKUP ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)CloseCaptionLookupDialogProc );

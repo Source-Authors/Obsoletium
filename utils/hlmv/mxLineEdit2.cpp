@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <windows.h>
+#include "winlite.h"
 #include <richedit.h>
 #include "mxLineEdit2.h"
 

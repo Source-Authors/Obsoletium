@@ -54,7 +54,7 @@ public:
 	virtual bool AllowedToPrintText( void );
 	
 #ifndef _XBOX
-	virtual int GetViewPortScheme() { return m_pBackGround->GetScheme(); }
+	virtual vgui::HScheme GetViewPortScheme() { return m_pBackGround->GetScheme(); }
 	virtual VPANEL GetViewPortPanel() { return m_pBackGround->GetVParent(); }
 #endif
 	virtual AnimationController *GetAnimationController() { return m_pAnimController; }

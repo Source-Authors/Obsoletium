@@ -74,7 +74,7 @@ public:
 	{
 		BaseClass::Activate();
 
-		KeyValues::AutoDelete kv = KeyValues::AutoDelete( "Benchmark" );
+		KeyValuesAD kv( "Benchmark" );
 		if ( kv->LoadFromFile( g_pFullFileSystem, "results/results.txt", "MOD" ) )
 		{
 			// get the framerate

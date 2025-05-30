@@ -10,8 +10,9 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 
-class CSplashWnd : public CWnd
+class CSplashWnd : public CBaseWnd
 {
 // Construction
 protected:
@@ -48,7 +49,7 @@ protected:
 	//{{AFX_MSG(CSplashWnd)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnPaint();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()

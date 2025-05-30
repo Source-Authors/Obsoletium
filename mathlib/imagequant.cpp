@@ -31,7 +31,7 @@ void ColorQuantize(uint8 const *Image,
 				   int firstcolor)
 {
 	int Error[MAX_QUANTIZE_IMAGE_WIDTH+1][3][2];
-	struct Sample *s=AllocSamples(Width*Height,N_DIMENSIONS);
+	Sample * RESTRICT s=AllocSamples(Width*Height,N_DIMENSIONS);
 	int x,y,c;
 	for(y=0;y<Height;y++)
 		for(x=0;x<Width;x++)
@@ -49,13 +49,13 @@ void ColorQuantize(uint8 const *Image,
 					(min(255,max(0,val1)));
 			}
 		}
-	struct QuantizedValue *q=Quantize(s,Width*Height,N_DIMENSIONS,
+	QuantizedValue * RESTRICT q=Quantize(s,Width*Height,N_DIMENSIONS,
 									  ncolors,Weights,firstcolor);
 	delete[] s;
 	memset(out_palette,0x55,768);
 	for(int p=0;p<256;p++)
 	{
-		struct QuantizedValue *v=FindQNode(q,p);
+		const QuantizedValue *v=FindQNode(q,p);
 		if (v)
 			for(c=0;c<3;c++)
 				out_palette[p*3+c]=v->Mean[c];
@@ -78,7 +78,7 @@ void ColorQuantize(uint8 const *Image,
 				}
 				samp[c]=(uint8) min(255,max(0,tryc));
 			}
-			struct QuantizedValue *f=FindMatch(samp,3,Weights,q);
+			QuantizedValue *f=FindMatch(samp,3,Weights,q);
 			out_pixels[Width*y+x]=(uint8) (f->value);
 			if (! (flags & QUANTFLAGS_NODITHER))
 				for(int i=0;i<3;i++)
@@ -91,6 +91,6 @@ void ColorQuantize(uint8 const *Image,
 				}
 		}
 	}
-	if (q) FreeQuantization(q);
+	FreeQuantization(q);
 }
 

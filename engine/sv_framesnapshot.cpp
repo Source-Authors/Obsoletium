@@ -30,11 +30,13 @@ CFrameSnapshotManager *framesnapshotmanager = &g_FrameSnapshotManager;
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CFrameSnapshotManager::CFrameSnapshotManager( void ) : m_PackedEntitiesPool( MAX_EDICTS / 16, CUtlMemoryPool::GROW_SLOW )
+CFrameSnapshotManager::CFrameSnapshotManager( void )
+	: m_PackedEntitiesPool( MAX_EDICTS / 16, CUtlMemoryPool::GROW_SLOW )
 {
 	COMPILE_TIME_ASSERT( INVALID_PACKED_ENTITY_HANDLE == 0 );
-	Q_memset( m_pPackedData, 0x00, MAX_EDICTS * sizeof(PackedEntityHandle_t) );
-
+	m_nPackedEntityCacheCounter = 0;
+	V_memset( m_pPackedData, 0x00, sizeof(m_pPackedData) );
+	V_memset( m_pSerialNumber, 0x00, sizeof(m_pSerialNumber) );
 }
 
 //-----------------------------------------------------------------------------
@@ -65,10 +67,10 @@ void CFrameSnapshotManager::LevelChanged()
 
 CFrameSnapshot*	CFrameSnapshotManager::NextSnapshot( const CFrameSnapshot *pSnapshot )
 {
-	if ( !pSnapshot || ((unsigned short)pSnapshot->m_ListIndex == m_FrameSnapshots.InvalidIndex()) )
+	if ( !pSnapshot || (pSnapshot->m_ListIndex == m_FrameSnapshots.InvalidIndex()) )
 		return NULL;
 
-	int next = m_FrameSnapshots.Next(pSnapshot->m_ListIndex);
+	auto next = m_FrameSnapshots.Next(pSnapshot->m_ListIndex);
 
 	if ( next == m_FrameSnapshots.InvalidIndex() )
 		return NULL;

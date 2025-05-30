@@ -48,19 +48,19 @@ COptionsSubAudio::COptionsSubAudio(vgui::Panel *parent) : PropertyPage(parent, N
 	m_pCloseCaptionCombo->AddItem( "#GameUI_Subtitles", NULL );
 
 	m_pSoundQualityCombo = new ComboBox( this, "SoundQuality", 6, false );
-	m_pSoundQualityCombo->AddItem( "#GameUI_High", new KeyValues("SoundQuality", "quality", SOUNDQUALITY_HIGH) );
-	m_pSoundQualityCombo->AddItem( "#GameUI_Medium", new KeyValues("SoundQuality", "quality", SOUNDQUALITY_MEDIUM) );
-	m_pSoundQualityCombo->AddItem( "#GameUI_Low", new KeyValues("SoundQuality", "quality", SOUNDQUALITY_LOW) );
+	m_pSoundQualityCombo->AddItem( "#GameUI_High", KeyValuesAD( new KeyValues("SoundQuality", "quality", SOUNDQUALITY_HIGH) ) );
+	m_pSoundQualityCombo->AddItem( "#GameUI_Medium", KeyValuesAD( new KeyValues("SoundQuality", "quality", SOUNDQUALITY_MEDIUM) ) );
+	m_pSoundQualityCombo->AddItem( "#GameUI_Low", KeyValuesAD( new KeyValues("SoundQuality", "quality", SOUNDQUALITY_LOW) ) );
 
 	m_pSpeakerSetupCombo = new ComboBox( this, "SpeakerSetup", 6, false );
 #ifndef POSIX
-	m_pSpeakerSetupCombo->AddItem( "#GameUI_Headphones", new KeyValues("SpeakerSetup", "speakers", 0) );
+	m_pSpeakerSetupCombo->AddItem( "#GameUI_Headphones", KeyValuesAD( new KeyValues("SpeakerSetup", "speakers", 0) ) );
 #endif
-	m_pSpeakerSetupCombo->AddItem( "#GameUI_2Speakers", new KeyValues("SpeakerSetup", "speakers", 2) );
+	m_pSpeakerSetupCombo->AddItem( "#GameUI_2Speakers", KeyValuesAD( new KeyValues("SpeakerSetup", "speakers", 2) ) );
 #ifndef POSIX
-	m_pSpeakerSetupCombo->AddItem( "#GameUI_4Speakers", new KeyValues("SpeakerSetup", "speakers", 4) );
-	m_pSpeakerSetupCombo->AddItem( "#GameUI_5Speakers", new KeyValues("SpeakerSetup", "speakers", 5) );
-	m_pSpeakerSetupCombo->AddItem( "#GameUI_7Speakers", new KeyValues("SpeakerSetup", "speakers", 7) );
+	m_pSpeakerSetupCombo->AddItem( "#GameUI_4Speakers", KeyValuesAD( new KeyValues("SpeakerSetup", "speakers", 4) ) );
+	m_pSpeakerSetupCombo->AddItem( "#GameUI_5Speakers", KeyValuesAD( new KeyValues("SpeakerSetup", "speakers", 5) ) );
+	m_pSpeakerSetupCombo->AddItem( "#GameUI_7Speakers", KeyValuesAD( new KeyValues("SpeakerSetup", "speakers", 7) ) );
 #endif
 	m_pSpokenLanguageCombo = new ComboBox (this, "AudioSpokenLanguage", 6, false );
 
@@ -190,7 +190,7 @@ void COptionsSubAudio::OnResetData()
       for ( int i=0; i < languagesList.Count(); i++ )
       {
          const ELanguage languageCode = PchLanguageToELanguage( languagesList[i] );
-         m_pSpokenLanguageCombo->AddItem( GetLanguageVGUILocalization( languageCode ), new KeyValues ("Audio Languages", "language", languageCode) );
+         m_pSpokenLanguageCombo->AddItem( GetLanguageVGUILocalization( languageCode ), KeyValuesAD( new KeyValues ("Audio Languages", "language", languageCode) ) );
       }
 
 	  languagesList.PurgeAndDeleteElementsArray();
@@ -198,7 +198,7 @@ void COptionsSubAudio::OnResetData()
    else
    {
       // Add the current language to the combo
-      m_pSpokenLanguageCombo->AddItem( GetLanguageVGUILocalization( m_nCurrentAudioLanguage ), new KeyValues ("Audio Languages", "language", m_nCurrentAudioLanguage) );
+      m_pSpokenLanguageCombo->AddItem( GetLanguageVGUILocalization( m_nCurrentAudioLanguage ), KeyValuesAD( new KeyValues ("Audio Languages", "language", m_nCurrentAudioLanguage) ) );
    }
 
    // Activate the current language in the combo

@@ -10,6 +10,7 @@
 #pragma once
 
 #include "hammer_mathlib.h"
+#include "Color.h"
 #include "tier1/utlvector.h"
 
 class Box3D;
@@ -270,9 +271,10 @@ protected:
 
 	CMapAtom(void)
 	{
-		m_eSelectionState = SELECT_NONE;
-		m_pParent = NULL;
 		m_nObjectID = s_nObjectIDCtr++;
+		m_pParent = NULL;
+		m_eSelectionState = SELECT_NONE;
+		r = g = b = 0;
 	}
 
 	//-----------------------------------------------------------------------------

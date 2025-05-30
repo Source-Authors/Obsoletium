@@ -28,12 +28,12 @@ public:
 	void SetGameData( void *pGameData ) override;
 	void *GetGameData( void ) const override;
 	void GetSurfacePlane( Vector *pNormal, float *pDist ) const override;
-	float GetDensity() const override;
+	[[nodiscard]] float GetDensity() const override;
 	void WakeAllSleepingObjects() override; 
-	int	GetContents() const override;
+	[[nodiscard]] int	GetContents() const override;
 
-	class IVP_Real_Object *GetIVPObject();
-	const class IVP_Real_Object *GetIVPObject() const;
+	[[nodiscard]] class IVP_Real_Object *GetIVPObject();
+	[[nodiscard]] const class IVP_Real_Object *GetIVPObject() const;
 
 private:
 	CBuoyancyAttacher				*m_pBuoyancy;
@@ -43,7 +43,7 @@ private:
 	void							*m_pGameData;
 };
 
-extern CPhysicsFluidController *CreateFluidController( IVP_Environment *pEnvironment, CPhysicsObject *pFluidObject, fluidparams_t *pParams );
+[[nodiscard]] extern CPhysicsFluidController *CreateFluidController( IVP_Environment *pEnvironment, CPhysicsObject *pFluidObject, fluidparams_t *pParams );
 
 
 #endif // PHYSICS_FLUID_H

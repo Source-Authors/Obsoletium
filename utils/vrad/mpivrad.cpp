@@ -9,7 +9,6 @@
 // mpivrad.cpp
 //
 
-#include <windows.h>
 #include <conio.h>
 #include "vrad.h"
 #include "physdll.h"
@@ -36,8 +35,8 @@
 CUtlVector<char> g_LightResultsFilename;
 
 
-extern int total_transfer;
-extern int max_transfer;
+extern std::atomic_int total_transfer;
+extern std::atomic_int max_transfer;
 
 extern void BuildVisLeafs(int);
 extern void BuildPatchLights( int facenum );
@@ -71,15 +70,15 @@ void VRAD_SetupMPI( int &argc, char **&argv )
 	//
 	// Preliminary check -mpi flag
 	//
-	if ( !VMPI_FindArg( argc, argv, "-mpi", "" ) && !VMPI_FindArg( argc, argv, VMPI_GetParamString( mpi_Worker ), "" ) )
+	if ( !VMPI_FindArg( argc, argv, "-mpi", "" ) && !VMPI_FindArg( argc, argv, VMPI_GetParamString( EVMPICmdLineParam::mpi_Worker ), "" ) )
 		return;
 
 	// Force local mode?
 	VMPIRunMode mode;
-	if ( VMPI_FindArg( argc, argv, VMPI_GetParamString( mpi_Local ), "" ) )
-		mode = VMPI_RUN_LOCAL;
+	if ( VMPI_FindArg( argc, argv, VMPI_GetParamString( EVMPICmdLineParam::mpi_Local ), "" ) )
+		mode = VMPIRunMode::VMPI_RUN_LOCAL;
 	else
-		mode = VMPI_RUN_NETWORKED;
+		mode = VMPIRunMode::VMPI_RUN_NETWORKED;
 
 	VMPI_Stats_InstallSpewHook();
 

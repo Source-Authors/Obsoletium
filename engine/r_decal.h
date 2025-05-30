@@ -62,14 +62,14 @@ enum
 struct DecalSortVertexFormat_t
 {
 	VertexFormat_t		m_VertexFormat;
-	int					m_iSortTree;			// Sort tree index.
+	intp				m_iSortTree;			// Sort tree index.
 };
 
 struct DecalMaterialSortData_t
 {
 	IMaterial	*m_pMaterial;
 	int			m_iLightmapPage; 
-	int			m_iBucket;			// Index into the s_aDecalMaterialHead list.
+	intp		m_iBucket;			// Index into the s_aDecalMaterialHead list.
 };
 
 struct DecalMaterialBucket_t

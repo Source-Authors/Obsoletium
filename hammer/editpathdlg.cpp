@@ -15,7 +15,7 @@
 
 
 CEditPathDlg::CEditPathDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CEditPathDlg::IDD, pParent)
+	: CBaseDlg(CEditPathDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditPathDlg)
 	m_strClass = _T("");
@@ -27,7 +27,7 @@ CEditPathDlg::CEditPathDlg(CWnd* pParent /*=NULL*/)
 
 void CEditPathDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditPathDlg)
 	DDX_Control(pDX, IDC_CLASS, m_cClass);
 	DDX_CBString(pDX, IDC_CLASS, m_strClass);
@@ -37,7 +37,7 @@ void CEditPathDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEditPathDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEditPathDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditPathDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -45,7 +45,7 @@ END_MESSAGE_MAP()
 
 BOOL CEditPathDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	CString strCurrent;
 	m_cClass.GetWindowText(strCurrent);

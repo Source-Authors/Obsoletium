@@ -385,12 +385,12 @@ static bool g_bSaveChained = false;
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CBaseDemoAction::BufPrintf( int depth, CUtlBuffer& buf, char const *fmt, ... )
+void CBaseDemoAction::BufPrintf( int depth, CUtlBuffer& buf, PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	va_list		argptr;
 	char		string[1024];
 	va_start (argptr,fmt);
-	Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe(string, fmt,argptr);
 	va_end (argptr);
 
 	while ( depth-- > 0 )

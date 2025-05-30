@@ -140,7 +140,7 @@ void CBlacklistedServers::LoadBlacklistedList()
 //-----------------------------------------------------------------------------
 bool CBlacklistedServers::AddServersFromFile( const char *pszFilename, bool bResetTimes )
 {
-	KeyValues *pKV = new KeyValues( "serverblacklist" );
+	KeyValuesAD pKV( "serverblacklist" );
 	if ( !pKV->LoadFromFile( g_pFullFileSystem, pszFilename, "GAME" ) )
 		return false;
 
@@ -168,8 +168,6 @@ bool CBlacklistedServers::AddServersFromFile( const char *pszFilename, bool bRes
 
 	// write out blacklist to preserve changes
 	SaveBlacklistedList();
-
-	pKV->deleteThis();
 
 	return true;
 }

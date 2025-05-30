@@ -82,7 +82,7 @@ struct IVMPIFile {
 };
 
 // Both the workers and masters use this to hand out the file data.
-class CVMPIFile_Memory : public IVMPIFile {
+class CVMPIFile_Memory final : public IVMPIFile {
  public:
   CVMPIFile_Memory(const char *pData, ptrdiff_t len, char chMode = 'b');
   virtual void Close();

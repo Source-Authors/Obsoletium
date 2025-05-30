@@ -4,9 +4,10 @@
 //
 //=============================================================================
 
+#include "windows/base_dlg.h"
 #include "BoundBox.h"
 
-class CPasteSpecialDlg : public CDialog
+class CPasteSpecialDlg : public CBaseDlg
 {
 // Construction
 public:

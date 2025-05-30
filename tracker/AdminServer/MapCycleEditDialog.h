@@ -12,8 +12,8 @@
 #endif
 
 #include <vgui_controls/Frame.h>
-#include "utlvector.h"
-#include "utlsymbol.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlsymbol.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Dialog for editing the game server map cycle list
@@ -23,12 +23,13 @@ class CMapCycleEditDialog : public vgui::Frame
 	DECLARE_CLASS_SIMPLE( CMapCycleEditDialog, vgui::Frame ); 
 public:
 	CMapCycleEditDialog(vgui::Panel *parent, const char *name);
-	~CMapCycleEditDialog();
+	virtual ~CMapCycleEditDialog();
+
 	virtual void Activate(vgui::Panel *updateTarget, CUtlVector<CUtlSymbol> &availableMaps, CUtlVector<CUtlSymbol> &mapCycle);
 
 protected:
-	virtual void OnCommand(const char *command);
-	virtual void PerformLayout();
+	void OnCommand(const char *command) override;
+	void PerformLayout() override;
 
 private:
 	MESSAGE_FUNC_PTR( OnItemSelected, "ItemSelected", panel );

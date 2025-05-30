@@ -10,13 +10,25 @@
 #pragma once
 #endif
 
-#include <stdlib.h>
+#include "tier0/annotations.h"
+#include "tier0/basetypes.h"
+#include "tier0/platform.h"
 
 // helper functions for parsing unicode file buffers
-ucs2 *AdvanceOverWhitespace(ucs2 *start);
-ucs2 *ReadUnicodeToken(ucs2 *start, ucs2 *token, int tokenBufferSize, bool &quoted);
-ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, ucs2 *token, int tokenBufferSize, bool &quoted);
-ucs2 *ReadToEndOfLine(ucs2 *start);
+[[nodiscard]] ucs2 *AdvanceOverWhitespace(ucs2 *start);
+ucs2 *ReadUnicodeToken(ucs2 *start, OUT_CAP(tokenBufferSize) ucs2 *token, intp tokenBufferSize, bool &quoted);
+template<intp tokenSize>
+ucs2 *ReadUnicodeToken(ucs2 *start, ucs2 (&token)[tokenSize], bool &quoted)
+{
+	return ReadUnicodeToken( start, token, tokenSize, quoted );
+}
+ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, OUT_CAP(tokenBufferSize) ucs2 *token, intp tokenBufferSize, bool &quoted);
+template<intp tokenSize>
+ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, ucs2 (&token)[tokenSize], bool &quoted)
+{
+	return ReadUnicodeTokenNoSpecial( start, token, tokenSize, quoted );
+}
+[[nodiscard]] ucs2 *ReadToEndOfLine(ucs2 *start);
 
 // writing to unicode files via CUtlBuffer
 class CUtlBuffer;

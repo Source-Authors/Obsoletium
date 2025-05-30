@@ -9,18 +9,19 @@
 #include "Manifest.h"
 #include "MapInstance.h"
 #include "ControlBarIDs.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No Perforce
+// #include "p4lib/ip4.h"
 
 // CManifestMove dialog
 
-IMPLEMENT_DYNAMIC(CManifestMove, CDialog)
+IMPLEMENT_DYNAMIC(CManifestMove, CBaseDlg)
 
 //-----------------------------------------------------------------------------
 // Purpose: contructor
 // Input  : pParent - the parent window of this dialog
 //-----------------------------------------------------------------------------
 CManifestMove::CManifestMove( bool bIsMove, CWnd* pParent /*=NULL*/ )
-	: CDialog(CManifestMove::IDD, pParent)
+	: CBaseDlg(CManifestMove::IDD, pParent)
 {
 	m_bIsMove = bIsMove;
 }
@@ -40,7 +41,7 @@ CManifestMove::~CManifestMove()
 //-----------------------------------------------------------------------------
 void CManifestMove::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MANIFEST_FILENAME, m_FileNameControl);
 	DDX_Control(pDX, IDC_MANIFEST_CENTER_AROUND_BRUSH, m_CenterContentsControl);
 	DDX_Control(pDX, IDC_MANIFEST_NAME2, m_FriendlyNameControl);
@@ -48,7 +49,7 @@ void CManifestMove::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CManifestMove, CDialog)
+BEGIN_MESSAGE_MAP(CManifestMove, CBaseDlg)
 	ON_EN_CHANGE(IDC_MANIFEST_FILENAME, &CManifestMove::OnEnChangeManifestFilename)
 END_MESSAGE_MAP()
 
@@ -59,7 +60,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 BOOL CManifestMove::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_FileNameControl.SetWindowText( "" );
 
@@ -79,12 +80,12 @@ void CManifestMove::OnOK()
 {
 	char		FullFileName[ MAX_PATH ];
 
-	CDialog::OnOK();
+	__super::OnOK();
 
 	m_FriendlyNameControl.GetWindowText( m_FriendlyName );
 	m_FileNameControl.GetWindowText( m_FileName );
-	strcpy( FullFileName, m_FileName );
-	V_SetExtension( FullFileName, ".vmf", sizeof( FullFileName ) );
+	V_strcpy_safe( FullFileName, m_FileName );
+	V_SetExtension( FullFileName, ".vmf" );
 	m_FileName = FullFileName;
 	m_CenterContents = ( m_CenterContentsControl.GetCheck() == BST_CHECKED );
 }
@@ -106,9 +107,9 @@ void CManifestMove::OnEnChangeManifestFilename()
 			char		FullFileName[ MAX_PATH ];
 
 			m_FileNameControl.GetWindowText( m_FileName );
-			strcpy( FullFileName, m_FileName );
+			V_strcpy_safe( FullFileName, m_FileName );
 			GetDlgItem( IDOK )->EnableWindow( FullFileName[ 0 ] != 0 );
-			V_SetExtension( FullFileName, ".vmf", sizeof( FullFileName ) );
+			V_SetExtension( FullFileName, ".vmf" );
 			m_FileName = FullFileName;
 			pManifest->GetFullMapPath( m_FileName, FullFileName );
 
@@ -419,24 +420,25 @@ void CManifestListBox::OnRButtonUp(UINT nFlags, CPoint point)
 	pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKIN, nDisable );
 	pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_ADD, nDisable );
 
-	if ( p4 && m_pTrackerManifestMap )
-	{
-		if ( m_pTrackerManifestMap->m_bIsVersionControlled )
-		{
-			if ( m_pTrackerManifestMap->m_bCheckedOut )
-			{
-				pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKIN, nEnable );
-			}
-			else
-			{
-				pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKOUT, nEnable );
-			}
-		}
-		else
-		{
-			pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_ADD, nEnable );
-		}
-	}
+	// dimhotepus: No Perforce support
+	// if ( p4 && m_pTrackerManifestMap )
+	// {
+	// 	if ( m_pTrackerManifestMap->m_bIsVersionControlled )
+	// 	{
+	// 		if ( m_pTrackerManifestMap->m_bCheckedOut )
+	// 		{
+	// 			pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKIN, nEnable );
+	// 		}
+	// 		else
+	// 		{
+	// 			pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_CHECKOUT, nEnable );
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		pWhichMenu->EnableMenuItem( ID_VERSIONCONTROL_ADD, nEnable );
+	// 	}
+	// }
 
 	Invalidate();
 	pWhichMenu->TrackPopupMenu( TPM_LEFTBUTTON | TPM_RIGHTBUTTON | TPM_LEFTALIGN, ptScreen.x, ptScreen.y, this );
@@ -505,25 +507,25 @@ void CManifestListBox::OnMoveSelectionToNewSubMap()
 //-----------------------------------------------------------------------------
 void CManifestListBox::OnVersionControlCheckOut()
 {
-	CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
-	if ( !activeDoc || !activeDoc->GetManifest() )
-	{
-		return;
-	}
-	CManifest	*pManifest = activeDoc->GetManifest();
-
-	if ( !p4->OpenFileForEdit( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
-	{
+	//CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
+	//if ( !activeDoc || !activeDoc->GetManifest() )
+	//{
+	//	return;
+	//}
+	//CManifest	*pManifest = activeDoc->GetManifest();
+	//
+	//if ( !p4->OpenFileForEdit( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
+	//{
 		char temp[ 2048 ];
 		
-		sprintf( temp, "Could not check out map: %s", p4->GetLastError() );
+		V_sprintf_safe( temp, "Could not check out map: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
-	}
-	else
-	{
-		pManifest->CheckFileStatus();
-		Invalidate();
-	}
+	// }
+	// else
+	// {
+	// 	pManifest->CheckFileStatus();
+	// 	Invalidate();
+	// }
 }
 
 
@@ -569,25 +571,25 @@ void CManifestListBox::OnVersionControlCheckIn()
 //-----------------------------------------------------------------------------
 void CManifestListBox::OnVersionControlAdd()
 {
-	CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
-	if ( !activeDoc || !activeDoc->GetManifest() )
-	{
-		return;
-	}
-	CManifest	*pManifest = activeDoc->GetManifest();
-
-	if ( !p4->OpenFileForAdd( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
-	{
+	//CMapDoc		*activeDoc = CMapDoc::GetActiveMapDoc();
+	//if ( !activeDoc || !activeDoc->GetManifest() )
+	//{
+	//	return;
+	//}
+	//CManifest	*pManifest = activeDoc->GetManifest();
+	//
+	//if ( !p4->OpenFileForAdd( m_pTrackerManifestMap->m_AbsoluteMapFileName ) )
+	//{
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not add map: %s", p4->GetLastError() );
+		V_sprintf_safe( temp, "Could not add map: %s",  /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
-	}
-	else
-	{
-		pManifest->CheckFileStatus();
-		Invalidate();
-	}
+	//}
+	//else
+	//{
+	//	pManifest->CheckFileStatus();
+	//	Invalidate();
+	//}
 }
 
 
@@ -902,7 +904,7 @@ void CManifestFilter::OnSize(UINT nType, int cx, int cy)
 }
 
 
-IMPLEMENT_DYNAMIC(CManifestMapDlg, CDialog)
+IMPLEMENT_DYNAMIC(CManifestMapDlg, CBaseDlg)
 
 
 //-----------------------------------------------------------------------------
@@ -911,7 +913,7 @@ IMPLEMENT_DYNAMIC(CManifestMapDlg, CDialog)
 //			pParent - the parent window
 //-----------------------------------------------------------------------------
 CManifestMapDlg::CManifestMapDlg( CManifestMap *pManifestMap, CWnd* pParent /*=NULL*/ )
-	: CDialog(CManifestMapDlg::IDD, pParent)
+	: CBaseDlg(CManifestMapDlg::IDD, pParent)
 {
 	m_pManifestMap = pManifestMap;
 }
@@ -930,13 +932,13 @@ CManifestMapDlg::~CManifestMapDlg()
 //-----------------------------------------------------------------------------
 void CManifestMapDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_MANIFEST_FRIENDLY_NAME, m_FriendlyNameControl);
 	DDX_Control(pDX, IDC_MANIFEST_FULL_FILENAME, m_FullFileNameCtrl);
 }
 
 
-BEGIN_MESSAGE_MAP(CManifestMapDlg, CDialog)
+BEGIN_MESSAGE_MAP(CManifestMapDlg, CBaseDlg)
 END_MESSAGE_MAP()
 
 
@@ -945,7 +947,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 BOOL CManifestMapDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_FriendlyNameControl.SetWindowText( m_pManifestMap->m_FriendlyName );
 	m_FullFileNameCtrl.SetWindowText( m_pManifestMap->m_AbsoluteMapFileName );
@@ -961,14 +963,14 @@ void CManifestMapDlg::OnOK()
 {
 	m_FriendlyNameControl.GetWindowText( m_pManifestMap->m_FriendlyName );
 
-	CDialog::OnOK();
+	__super::OnOK();
 }
 
 
 
 // CManifestCheckin dialog
 
-IMPLEMENT_DYNAMIC(CManifestCheckin, CDialog)
+IMPLEMENT_DYNAMIC(CManifestCheckin, CBaseDlg)
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -976,7 +978,7 @@ IMPLEMENT_DYNAMIC(CManifestCheckin, CDialog)
 // Output : 
 //-----------------------------------------------------------------------------
 CManifestCheckin::CManifestCheckin(CWnd* pParent /*=NULL*/)
-	: CDialog(CManifestCheckin::IDD, pParent)
+	: CBaseDlg(CManifestCheckin::IDD, pParent)
 {
 
 }
@@ -999,13 +1001,13 @@ CManifestCheckin::~CManifestCheckin()
 //-----------------------------------------------------------------------------
 void CManifestCheckin::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CHECKIN_LIST, m_CheckinListCtrl);
 	DDX_Control(pDX, IDC_CHECKIN_DESCRIPTION, m_DescriptionCtrl);
 }
 
 
-BEGIN_MESSAGE_MAP(CManifestCheckin, CDialog)
+BEGIN_MESSAGE_MAP(CManifestCheckin, CBaseDlg)
 	ON_BN_CLICKED(IDOK, &CManifestCheckin::OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -1017,9 +1019,9 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 BOOL CManifestCheckin::OnInitDialog()
 {
-	P4File_t	FileInfo;
+	// P4File_t	FileInfo;
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_CheckinListCtrl.SetExtendedStyle( m_CheckinListCtrl.GetExtendedStyle() | LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT );
 
@@ -1033,7 +1035,7 @@ BOOL CManifestCheckin::OnInitDialog()
 		return TRUE;
 	}
 
-	int nCount = 0;
+	//int nCount = 0;
 
 	CMapDoc	*activeDoc = CMapDoc::GetActiveMapDoc();
 	if ( activeDoc && activeDoc->GetManifest() )
@@ -1042,29 +1044,29 @@ BOOL CManifestCheckin::OnInitDialog()
 
 		if ( pManifest->m_bCheckedOut )
 		{
-			if ( p4->GetFileInfo( pManifest->GetPathName(), &FileInfo ) == true )
-			{
-				int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
-				nCount++;
-				m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )NULL );
-				switch( FileInfo.m_eOpenState )
-				{	
-					case P4FILE_OPENED_FOR_ADD:
-						m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
-						break;
-
-					case P4FILE_OPENED_FOR_EDIT:
-						m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
-						break;
-				}
-				m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
-				m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
-
-				if ( pManifest->m_bDefaultCheckin )
-				{
-					ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
-				}
-			}
+			// if ( p4->GetFileInfo( pManifest->GetPathName(), &FileInfo ) == true )
+			// {
+			// 	int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
+			// 	nCount++;
+			// 	m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )NULL );
+			// 	switch( FileInfo.m_eOpenState )
+			// 	{	
+			// 		case P4FILE_OPENED_FOR_ADD:
+			// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
+			// 			break;
+			// 
+			// 		case P4FILE_OPENED_FOR_EDIT:
+			// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
+			// 			break;
+			// 	}
+			// 	m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
+			// 	m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
+			// 
+			// 	if ( pManifest->m_bDefaultCheckin )
+			// 	{
+			// 		ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
+			// 	}
+			// }
 		}
 
 		for( int i = 0; i < pManifest->GetNumMaps(); i++ )
@@ -1073,29 +1075,29 @@ BOOL CManifestCheckin::OnInitDialog()
 
 			if ( pManifestMap->m_bCheckedOut )
 			{
-				if ( p4->GetFileInfo( pManifestMap->m_AbsoluteMapFileName, &FileInfo ) == true )
-				{
-					int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
-					nCount++;
-					m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )pManifestMap );
-					switch( FileInfo.m_eOpenState )
-					{	
-						case P4FILE_OPENED_FOR_ADD:
-							m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
-							break;
-
-						case P4FILE_OPENED_FOR_EDIT:
-							m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
-							break;
-					}
-					m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
-					m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
-
-					if ( pManifestMap->m_bDefaultCheckin )
-					{
-						ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
-					}
-				}
+				// if ( p4->GetFileInfo( pManifestMap->m_AbsoluteMapFileName, &FileInfo ) == true )
+				// {
+				// 	int nIndex = m_CheckinListCtrl.InsertItem( nCount, "" );
+				// 	nCount++;
+				// 	m_CheckinListCtrl.SetItemData( nIndex, ( DWORD_PTR )pManifestMap );
+				// 	switch( FileInfo.m_eOpenState )
+				// 	{	
+				// 		case P4FILE_OPENED_FOR_ADD:
+				// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Add" );
+				// 			break;
+				// 
+				// 		case P4FILE_OPENED_FOR_EDIT:
+				// 			m_CheckinListCtrl.SetItemText( nIndex, 1, "Edit" );
+				// 			break;
+				// 	}
+				// 	m_CheckinListCtrl.SetItemText( nIndex, 2, p4->String( FileInfo.m_sName ) );
+				// 	m_CheckinListCtrl.SetItemText( nIndex, 3, p4->String( FileInfo.m_sPath ) );
+				// 
+				// 	if ( pManifestMap->m_bDefaultCheckin )
+				// 	{
+				// 		ListView_SetItemState( m_CheckinListCtrl.m_hWnd, nIndex, INDEXTOSTATEIMAGEMASK( LVIS_SELECTED ), LVIS_STATEIMAGEMASK );
+				// 	}
+				// }
 			}
 		}
 	}
@@ -1162,15 +1164,15 @@ void CManifestCheckin::OnBnClickedOk()
 			}
 		}
 
-		if ( p4->SubmitFiles( nFileCount, ppFileNames, Description ) == false )
-		{
+		// if ( p4->SubmitFiles( nFileCount, ppFileNames, Description ) == false )
+		// {
 			char temp[ 2048 ];
 
-			sprintf( temp, "Could not check in map(s): %s", p4->GetLastError() );
+			V_sprintf_safe( temp, "Could not check in map(s): %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 			AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 
 			return;
-		}
+		// }
 	}
 
 	OnOK();

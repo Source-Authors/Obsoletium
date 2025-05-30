@@ -3760,7 +3760,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 
 	case mod_brush:
 		{
-			color32 cColor32 = { (byte)cColor.r(), (byte)cColor.g(), (byte)cColor.b(), (byte)cColor.a() };
+			color32 cColor32 = { cColor.r(), cColor.g(), cColor.b(), cColor.a() };
 			effects->DecalColorShoot( decalIndex, index, model, GetAbsOrigin(), GetAbsAngles(), decalCenter, 0, 0, cColor32 );
 		}
 		break;
@@ -6236,15 +6236,13 @@ void C_BaseEntity::RecordToolMessage()
 	if ( HasRecordedThisFrame() )
 		return;
 
-	KeyValues *msg = new KeyValues( "entity_state" );
+	KeyValuesAD msg( "entity_state" );
 
 	// Post a message back to all IToolSystems
 	GetToolRecordingState( msg );
 	Assert( (int)GetToolHandle() != 0 );
 	ToolFramework_PostToolMessage( GetToolHandle(), msg );
 	CleanupToolRecordingState( msg );
-
-	msg->deleteThis();
 
 	m_nLastRecordedFrame = gpGlobals->framecount;
 }

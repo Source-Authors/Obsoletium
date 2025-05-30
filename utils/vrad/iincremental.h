@@ -13,7 +13,7 @@
 
 
 #include "mathlib/vector.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 
 typedef unsigned short IncrementalLightID;

@@ -4,10 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+#include "PhonemeProperties.h"
 #include "hlfaceposer.h"
 #include <mxtk/mx.h>
 #include "resource.h"
-#include "PhonemeProperties.h"
 #include "expressions.h"
 #include "expclass.h"
 #include "mdlviewer.h"
@@ -24,10 +24,10 @@ static HWND		*g_rgButtons = NULL;
 #define PHONEME_GAP			10
 #define PHONEME_VGAP		5
 
-typedef long (__stdcall *WINPROCTYPE)( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+typedef LRESULT (__stdcall *WINPROCTYPE)( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 static WINPROCTYPE lpfnOldButtonProc;
 
-static BOOL CALLBACK PhonemeBtnProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+static LRESULT CALLBACK PhonemeBtnProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	switch ( uMsg )
 	{
@@ -40,7 +40,7 @@ static BOOL CALLBACK PhonemeBtnProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
 				HWND helpText = GetDlgItem( dialog, IDC_STATIC_HELPTEXT );
 				if ( helpText )
 				{
-					CExpression *exp = ( CExpression * )GetWindowLong( (HWND)hwnd, GWL_USERDATA );
+					CExpression *exp = ( CExpression * )GetWindowLongPtr( (HWND)hwnd, GWLP_USERDATA );
 					if ( exp )
 					{
 						SendMessage( helpText, WM_SETTEXT, 0, (LPARAM)exp->description );
@@ -82,14 +82,14 @@ static void ClickedPhoneme( HWND hwndDlg, int phoneme )
 	}
 
 	HWND button = g_rgButtons[ phoneme ];
-	CExpression *exp = ( CExpression * )GetWindowLong( (HWND)button, GWL_USERDATA );
+	CExpression *exp = ( CExpression * )GetWindowLongPtr( (HWND)button, GWLP_USERDATA );
 	if ( exp )
 	{
-		if ( strlen( g_Params.m_szName ) > 0 )
+		if ( !Q_isempty( g_Params.m_szName ) )
 		{
-			strcat( g_Params.m_szName, " " );
+			V_strcat_safe( g_Params.m_szName, " " );
 		}
-		strcat( g_Params.m_szName, exp->name );
+		V_strcat_safe( g_Params.m_szName, exp->name );
 
 		if ( g_Params.m_bMultiplePhoneme )
 		{
@@ -200,14 +200,14 @@ static void CreateAndLayoutControls( HWND hwndDlg, CPhonemeParams* params )
 			PHONEME_WIDTH,
 			PHONEME_HEIGHT,
 			hwndDlg,
-			(HMENU)( IDC_PHONEME + i ),
+			(HMENU)(intp)( IDC_PHONEME + i ),
 			(HINSTANCE)GetModuleHandle( 0 ),
 			NULL );
 		Assert( button );
-		SetWindowLong( (HWND)button, GWL_USERDATA, (LONG)exp );
+		SetWindowLongPtr( (HWND)button, GWLP_USERDATA, (LONG_PTR)exp );
 
 		// Subclass it
-		lpfnOldButtonProc = (WINPROCTYPE)SetWindowLong( (HWND)button, GWL_WNDPROC, (LONG)PhonemeBtnProc );
+		lpfnOldButtonProc = (WINPROCTYPE)SetWindowLongPtr( (HWND)button, GWLP_WNDPROC, (LONG_PTR)PhonemeBtnProc );
 
 		SendMessage ((HWND)button, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
 
@@ -261,7 +261,8 @@ static void PhonemePropertiesDialogExit( HWND hwndDlg, int exitCode )
 //			*output - 
 // Output : static bool
 //-----------------------------------------------------------------------------
-static bool ValidatePhonemeString( bool allowmultiple, char const *input, char *output )
+template<intp outSize>
+static bool ValidatePhonemeString( bool allowmultiple, char const *input, char (&output)[outSize] )
 {
 	// Make sure phonemes are loaded
 	FacePoser_EnsurePhonemesLoaded();
@@ -303,9 +304,9 @@ static bool ValidatePhonemeString( bool allowmultiple, char const *input, char *
 				// Found it
 				if ( count != 1 )
 				{
-					strcat( output, " " );
+					V_strcat_safe( output, " " );
 				}
-				strcat( output, phoneme );
+				V_strcat_safe( output, phoneme );
 				break;
 			}
 		}
@@ -419,11 +420,11 @@ static BOOL CALLBACK PhonemePropertiesDialogProc( HWND hwndDlg, UINT uMsg, WPARA
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int PhonemeProperties( CPhonemeParams *params )
+intp PhonemeProperties( CPhonemeParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_PHONEMEPROPERTIES ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)PhonemePropertiesDialogProc );

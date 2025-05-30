@@ -42,7 +42,7 @@ class CGizmo : public CMapAtom
 		inline void SetAxisLength(float fLength); 
 		inline void SetPosition(float x, float y, float z);
 
-		void DrawGizmoAxis(CRender3D *pRender, Vector& Origin, Vector& EndPoint, int red, int green, int blue, unsigned int uAxisHandle);
+		void DrawGizmoAxis(CRender3D *pRender, Vector& Origin, Vector& EndPoint, unsigned char red, unsigned char green, unsigned char blue, unsigned int uAxisHandle);
 
 	protected:
 

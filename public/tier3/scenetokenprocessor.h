@@ -12,7 +12,7 @@
 
 class ISceneTokenProcessor;
 
-ISceneTokenProcessor *GetTokenProcessor();
+[[nodiscard]] ISceneTokenProcessor *GetTokenProcessor();
 void SetTokenProcessorBuffer( const char *buf );
 
 #endif // SCENETOKENPROCESSOR_H

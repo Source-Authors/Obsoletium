@@ -1478,7 +1478,7 @@ void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
 	Vector forward;
 	AngleVectors( GetLocalAngles(), &forward );
 	forward *= 500;
-	QAngle qaPunch( 15, random->RandomInt(-5,5), random->RandomInt(-5,5) );
+	QAngle qaPunch( 15, random->RandomFloat(-5,5), random->RandomFloat(-5,5) );
 	
 	ClawAttack( GetClawAttackRange(), 5, qaPunch, forward, ZOMBIE_BLOOD_BOTH_HANDS );
 

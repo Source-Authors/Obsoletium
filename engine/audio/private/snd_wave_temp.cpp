@@ -7,19 +7,20 @@
 
 #include "audio_pch.h"
 
+// dimhotepus: COM_CopyFile declaration
+#include "common.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 extern IFileSystem *g_pFileSystem;
-// FIXME: shouldn't this API be part of IFileSystem?
-extern bool COM_CopyFile( const char *netpath, const char *cachepath );
 
 // Create a wave file
 void WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels )
 {
 	char tmpfilename[MAX_PATH];
-	Q_StripExtension( filename, tmpfilename, sizeof( tmpfilename ) );
-	Q_DefaultExtension( tmpfilename, ".WAV", sizeof( tmpfilename ) );
+	V_StripExtension( filename, tmpfilename );
+	V_DefaultExtension( tmpfilename, ".WAV" );
 
 	FileHandle_t file;
 	file = g_pFileSystem->Open( tmpfilename, "wb" );
@@ -60,38 +61,23 @@ void WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels 
 void WaveAppendTmpFile( const char *filename, void *pBuffer, int sampleBits, int numSamples )
 {
 	char tmpfilename[MAX_PATH];
-	Q_StripExtension( filename, tmpfilename, sizeof( tmpfilename ) );
-	Q_DefaultExtension( tmpfilename, ".WAV", sizeof( tmpfilename ) );
+	V_StripExtension( filename, tmpfilename );
+	V_DefaultExtension( tmpfilename, ".WAV" );
 
-	FileHandle_t file;
-	file = g_pFileSystem->Open( tmpfilename, "r+b" );
+	FileHandle_t file = g_pFileSystem->Open( tmpfilename, "r+b" );
 	if ( file == FILESYSTEM_INVALID_HANDLE )
 		return;
 
 	g_pFileSystem->Seek( file, 0, FILESYSTEM_SEEK_TAIL );
-
-	if ( IsX360() && sampleBits == 16 )
-	{
-		short *pSwapped = (short * )_alloca( numSamples * sampleBits/8 );
-		for ( int i=0; i<numSamples; i++ )
-		{
-			pSwapped[i] = LittleShort( ((short*)pBuffer)[i] );
-		}
-		g_pFileSystem->Write( pSwapped, numSamples * sizeof( short ), file );
-	}
-	else
-	{
-		g_pFileSystem->Write( pBuffer, numSamples * sampleBits/8, file );
-	}
-
+	g_pFileSystem->Write( pBuffer, numSamples * sampleBits/8, file );
 	g_pFileSystem->Close( file );
 }
 
 void WaveFixupTmpFile( const char *filename )
 {
 	char tmpfilename[MAX_PATH];
-	Q_StripExtension( filename, tmpfilename, sizeof( tmpfilename ) );
-	Q_DefaultExtension( tmpfilename, ".WAV", sizeof( tmpfilename ) );
+	V_StripExtension( filename, tmpfilename );
+	V_DefaultExtension( tmpfilename, ".WAV" );
 
 	FileHandle_t file;
 	file = g_pFileSystem->Open( tmpfilename, "r+b" );
@@ -136,9 +122,9 @@ CON_COMMAND( movie_fixwave, "Fixup corrupted .wav file if engine crashed during 
 	}
 
 	char tmpfilename[256];
-	Q_StripExtension( wavname, tmpfilename, sizeof( tmpfilename ) );
-	Q_strncat( tmpfilename, "_fixed", sizeof( tmpfilename ), COPY_ALL_CHARACTERS );
-	Q_DefaultExtension( tmpfilename, ".wav", sizeof( tmpfilename ) );
+	V_StripExtension( wavname, tmpfilename );
+	V_strcat_safe( tmpfilename, "_fixed" );
+	V_DefaultExtension( tmpfilename, ".wav" );
 
 	// Now copy the file
 	Msg( "Copying '%s' to '%s'\n", wavname, tmpfilename );

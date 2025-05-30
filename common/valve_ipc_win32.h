@@ -12,7 +12,9 @@
 #pragma once
 #endif
 
+#include <rpc.h>
 #include <rpcdce.h>
+#include <ks.h>
 
 // Fwd declarations
 class CValveIpcMgr;

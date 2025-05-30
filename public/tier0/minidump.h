@@ -91,7 +91,7 @@ PLATFORM_INTERFACE void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 //  Index 1..: comment string
 //  Returns NULL when you've reached the end of the comment string array
 //  Empty strings ("\0") can be returned if comment hasn't been set
-PLATFORM_INTERFACE const char *MinidumpUserStreamInfoGet( int Index );
+PLATFORM_INTERFACE const char *MinidumpUserStreamInfoGet( intp Index );
 
 #endif  // TIER0_MINIDUMP_H_
 

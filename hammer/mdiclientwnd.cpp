@@ -13,7 +13,7 @@
 #include <tier0/memdbgon.h>
 
 
-BEGIN_MESSAGE_MAP(CMDIClientWnd, CWnd)
+BEGIN_MESSAGE_MAP(CMDIClientWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CMDIClientWnd)
 	ON_WM_ERASEBKGND()
 	//}}AFX_MSG_MAP

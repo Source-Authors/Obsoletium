@@ -6,8 +6,9 @@
 //=============================================================================//
 
 #include <stdafx.h>
-#include "hammer.h"
 #include "ToolDisplace.h"
+
+#include "hammer.h"
 #include "MainFrm.h"
 #include "FaceEditSheet.h"
 #include "GlobalFunctions.h"
@@ -59,7 +60,7 @@ CToolDisplace::CToolDisplace()
 	// load filters from file
 	static char szProgramDir[MAX_PATH];
 	APP()->GetDirectory( DIR_PROGRAM, szProgramDir );
-	strcat( szProgramDir, "filters\\dispfilters.txt" );
+	V_strcat_safe( szProgramDir, "filters\\dispfilters.txt" );
 	LoadFilters( szProgramDir );
 	AddFiltersToManagers();
 
@@ -477,7 +478,7 @@ void CToolDisplace::LiftFaceNormal( CMapView3D *pView, const Vector2D &vPoint )
 	//
 	// check for closest solid object
 	//
-	ULONG		ulFace;
+	unsigned		ulFace;
 	CMapClass	*pObject;
 
 	if( ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL ) )
@@ -605,7 +606,7 @@ void CToolDisplace::Nudge_Do( void )
 		
 		// set the dynamic filter data
 		pFilter->m_DataType = DISPPAINT_CHANNEL_POSITION;
-		pFilter->m_Scale = ( delta * 0.25 ) * ( float )( ( int )( m_flPaintValueGeo / 10.0f ) + 1 ) ;
+		pFilter->m_Scale = ( delta * 0.25f ) * ( float )( ( int )( m_flPaintValueGeo / 10.0f ) + 1 ) ;
 		
 		// apply the filter to the displacement surface(s)
 		m_FilterRaiseLowerMgr.Apply( pFilter, pNudgeDisp, m_iPaintAxis, m_vecPaintAxis, m_bAutoSew );
@@ -761,7 +762,7 @@ void CToolDisplace::ApplySpatialPaintTool( UINT nFlags, const Vector2D &vPoint, 
 void CToolDisplace::ApplySculptSpatialPaintTool( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint )
 {
 	// Initialize the spatial paint data.
-	SpatialPaintData_t spatialData;
+	SpatialPaintData_t spatialData = {};
 
 	spatialData.m_vCenter.Init();
 
@@ -860,7 +861,7 @@ void CToolDisplace::HandleSelection( CMapView3D *pView, const Vector2D &vPoint )
 	//
 	// check for closest solid object
 	//
-	ULONG		ulFace;
+	unsigned		ulFace;
 	CMapClass	*pObject;
 
 	bool bShift = ( ( GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) != 0 );
@@ -907,7 +908,7 @@ void CToolDisplace::HandleSelection( CMapView3D *pView, const Vector2D &vPoint )
 void CToolDisplace::HandleTagging( CMapView3D *pView, const Vector2D &vPoint )
 {
 	// Get the displacement face (if any) at the 2d point.
-	ULONG ulFace;
+	unsigned ulFace;
 	CMapClass *pObject = NULL;
 
 	if( ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL ) )
@@ -916,7 +917,7 @@ void CToolDisplace::HandleTagging( CMapView3D *pView, const Vector2D &vPoint )
 		{
 			// Get the face and check for a displacement.
 			CMapSolid *pSolid = ( CMapSolid* )pObject;
-			CMapFace *pFace = pSolid->GetFace( ( int )ulFace );
+			CMapFace *pFace = pSolid->GetFace( ulFace );
 			if ( pFace && pFace->HasDisp() )
 			{
 				EditDispHandle_t hDisp = pFace->GetDisp();
@@ -998,7 +999,7 @@ void CToolDisplace::HandleTaggingRemove( CMapDisp *pDisp, int nTriIndex )
 void CToolDisplace::HandleTaggingReset( CMapView3D *pView, const Vector2D &vPoint )
 {
 	// Get the displacement face (if any) at the 2d point.
-	ULONG ulFace;
+	unsigned ulFace;
 	CMapClass *pObject = NULL;
 
 	if( ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL ) )
@@ -1007,7 +1008,7 @@ void CToolDisplace::HandleTaggingReset( CMapView3D *pView, const Vector2D &vPoin
 		{
 			// Get the face and check for a displacement.
 			CMapSolid *pSolid = ( CMapSolid* )pObject;
-			CMapFace *pFace = pSolid->GetFace( ( int )ulFace );
+			CMapFace *pFace = pSolid->GetFace( ulFace );
 			if ( pFace && pFace->HasDisp() )
 			{
 				EditDispHandle_t hDisp = pFace->GetDisp();

@@ -8,6 +8,7 @@
 #include "tier0/basetypes.h"
 
 #ifdef WIN32
+#define NOMINMAX
 #include <winsock.h>
 #elif defined(POSIX)
 #define INVALID_SOCKET -1
@@ -358,14 +359,14 @@ void UpdateProgress( const TBugReportParameters & params, char const *fmt, ... )
 	char str[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( str, sizeof( str ) - 1, fmt, argptr );
+	V_vsprintf_safe( str, fmt, argptr );
 	va_end( argptr );
 
 	char outstr[ 2060 ];
-	Q_snprintf( outstr, sizeof( outstr ), "(%u): %s", params.m_uProgressContext, str );
+	V_sprintf_safe( outstr, "(%u): %s", params.m_uProgressContext, str );
 
 	TBugReportProgress progress;
-	Q_strncpy( progress.m_sStatus, outstr, sizeof( progress.m_sStatus ) );
+	V_strcpy_safe( progress.m_sStatus, outstr );
 
 	// Invoke the callback
 	( *params.m_pOptionalProgressFunc )( params.m_uProgressContext, progress );
@@ -947,10 +948,15 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 #ifdef WIN32
 			adr.sin_addr.S_un.S_addr = harvester_ip;
 #else
-			adr.sin_addr.s_addr = harvester_ip;			
+			adr.sin_addr.s_addr = harvester_ip;
 #endif
 			netadr_t BugReportHarvesterFSMIPAddress;
-			BugReportHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr );
+			if ( !BugReportHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr ) )
+			{
+				// dimhotepus: Handle invalid address.
+				UpdateProgress( rBugReportParameters, "Request denied, server IP:port pair is not IPv4 address." );
+				return eBugReportSendingBugReportHeaderFailed;
+			}
 
 			UpdateProgress( rBugReportParameters, "Server requested bug report upload." );
 

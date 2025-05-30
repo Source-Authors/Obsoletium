@@ -69,7 +69,7 @@ void SV_RedirectEnd (void)
 // Purpose: 
 // Input  : len - 
 //-----------------------------------------------------------------------------
-void SV_RedirectCheckFlush( int len )
+void SV_RedirectCheckFlush( intp len )
 {
 	if ( len + Q_strlen( sv_redirect_buffer ) > ssize(sv_redirect_buffer) - 1)
 	{
@@ -92,6 +92,6 @@ bool SV_RedirectActive( void )
 //-----------------------------------------------------------------------------
 void SV_RedirectAddText( const char *txt )
 {
-	SV_RedirectCheckFlush( strlen( txt ) );
-	Q_strncat( sv_redirect_buffer, (char *)txt, sizeof( sv_redirect_buffer ), COPY_ALL_CHARACTERS );
+	SV_RedirectCheckFlush( V_strlen( txt ) );
+	V_strcat_safe( sv_redirect_buffer, txt );
 }

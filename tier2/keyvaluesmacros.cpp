@@ -2,10 +2,9 @@
 //
 //==================================================================================================
 
-
+#include "tier2/keyvaluesmacros.h"
 #include "filesystem.h"
 #include "tier1/KeyValues.h"
-#include "tier2/keyvaluesmacros.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -241,9 +240,9 @@ static KeyValues *HandleKeyValuesMacro_Insert( KeyValues *pkvInsert, KeyValues *
 		pkvNew->deleteThis();
 	}
 
-	for ( intp i = 0; i < newKeyList.Count(); ++i )
+	for ( auto *kv : newKeyList )
 	{
-		HandleKeyValuesMacros( pkvParent, newKeyList[i] );
+		HandleKeyValuesMacros( pkvParent, kv );
 	}
 
 	return pkvReturn;

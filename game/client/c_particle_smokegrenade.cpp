@@ -383,7 +383,7 @@ void C_ParticleSmokeGrenade::ClientThink()
 		float fadeEnd = m_ExpandRadius;
 
 		// The center of the smoke cloud that always gives full fog overlay
-		float flCoreDistance = fadeEnd * 0.3;
+		float flCoreDistance = fadeEnd * 0.3f;
 		
 		if(testDist < fadeEnd)
 		{			
@@ -904,7 +904,7 @@ void C_ParticleSmokeGrenade::CleanupToolRecordingState( KeyValues *msg )
 
 		int nId = AllocateToolParticleEffectId();
 
-		KeyValues *oldmsg = new KeyValues( "OldParticleSystem_Create" );
+		KeyValuesAD oldmsg( "OldParticleSystem_Create" );
 		oldmsg->SetString( "name", "C_ParticleSmokeGrenade" );
 		oldmsg->SetInt( "id", nId );
 		oldmsg->SetFloat( "time", gpGlobals->curtime );
@@ -966,17 +966,17 @@ void C_ParticleSmokeGrenade::CleanupToolRecordingState( KeyValues *msg )
 		pSize->SetFloat( "minEndSize", SMOKEPARTICLE_SIZE );
 		pSize->SetFloat( "maxEndSize", SMOKEPARTICLE_SIZE );
 
-		pInitializers->FindKey( "DmeSolidKillInitializer", true );
+		(void)pInitializers->FindKey( "DmeSolidKillInitializer", true );
 
 		KeyValues *pUpdaters = pEmitter->FindKey( "updaters", true );
 
-		pUpdaters->FindKey( "DmeRollUpdater", true );
-		pUpdaters->FindKey( "DmeColorUpdater", true );
+		(void)pUpdaters->FindKey( "DmeRollUpdater", true );
+		(void)pUpdaters->FindKey( "DmeColorUpdater", true );
 
 		KeyValues *pAlphaCosineUpdater = pUpdaters->FindKey( "DmeAlphaCosineUpdater", true );
 		pAlphaCosineUpdater->SetFloat( "duration", m_FadeEndTime - m_FadeStartTime );
 		
-		pUpdaters->FindKey( "DmeColorDynamicLightUpdater", true );
+		(void)pUpdaters->FindKey( "DmeColorDynamicLightUpdater", true );
 
 		KeyValues *pSmokeGrenadeUpdater = pUpdaters->FindKey( "DmeSmokeGrenadeUpdater", true );
  		pSmokeGrenadeUpdater->SetFloat( "centerx", m_SmokeBasePos.x );
@@ -988,7 +988,6 @@ void C_ParticleSmokeGrenade::CleanupToolRecordingState( KeyValues *msg )
 		pSmokeGrenadeUpdater->SetFloat( "cutoffFraction", 0.7f );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, oldmsg );
-		oldmsg->deleteThis();
 	}
 }
 

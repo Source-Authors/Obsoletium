@@ -5,13 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/ToolWindow.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include "vgui/IInput.h"
 #include "vgui/MouseCode.h"
 #include "vgui/ISurface.h"
 
-#include <vgui_controls/ToolWindow.h>
 #include <vgui_controls/PropertySheet.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -26,7 +28,7 @@ CUtlVector< ToolWindow * > ToolWindow::s_ToolWindows;
 // Input  :  - 
 // Output : int
 //-----------------------------------------------------------------------------
-int ToolWindow::GetToolWindowCount()
+intp ToolWindow::GetToolWindowCount()
 {
 	return s_ToolWindows.Count();
 }
@@ -36,7 +38,7 @@ int ToolWindow::GetToolWindowCount()
 // Input  : index - 
 // Output : PropertySheet
 //-----------------------------------------------------------------------------
-ToolWindow *ToolWindow::GetToolWindow( int index )
+ToolWindow *ToolWindow::GetToolWindow( intp index )
 {
 	return s_ToolWindows[ index ];
 }

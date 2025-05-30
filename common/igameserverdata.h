@@ -11,11 +11,11 @@
 #pragma once
 #endif
 
-#include "interface.h"
-#include "netadr.h"
+#include "tier1/interface.h"
+#include "tier1/netadr.h"
 
-typedef unsigned int ra_listener_id;
-const ra_listener_id INVALID_LISTENER_ID = 0xffffffff;
+using ra_listener_id = unsigned int;
+constexpr inline ra_listener_id INVALID_LISTENER_ID = 0xffffffff;
 
 
 //-----------------------------------------------------------------------------
@@ -27,10 +27,16 @@ abstract_class IGameServerData : public IBaseInterface
 {
 public:
 	// writes out a request
-	virtual void WriteDataRequest( ra_listener_id listener, const void *buffer, int bufferSize) = 0;
+	virtual void WriteDataRequest( ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize) = 0;
 
 	// returns the number of bytes read
-	virtual int ReadDataResponse( ra_listener_id listener, void *buffer, int bufferSize) = 0;
+	virtual intp ReadDataResponse( ra_listener_id listener, IN_BYTECAP(bufferSize) void *buffer, intp bufferSize) = 0;
+
+	template<typename T, intp bufferSize>
+	intp ReadDataResponse( ra_listener_id listener, T (&buffer)[bufferSize] )
+	{
+		return ReadDataResponse( listener, &buffer, bufferSize );
+	}
 
 	// get a handle to refer to this connection to the gameserver data interface
 	// is authConnection is true the SERVERDATA_AUTH command needs to succeed before other commands
@@ -80,7 +86,7 @@ RESPONSE:
 
 */
 
-#define GAMESERVERDATA_INTERFACE_VERSION "GameServerData001"
+constexpr inline char GAMESERVERDATA_INTERFACE_VERSION[]{"GameServerData001"};
 
 
 #endif // IGAMESERVERDATA_H

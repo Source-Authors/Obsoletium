@@ -57,10 +57,10 @@ CMapClass *CMapGroup::Copy(bool bUpdateDependencies)
 //-----------------------------------------------------------------------------
 // Purpose: Returns a string describing this group.
 //-----------------------------------------------------------------------------
-const char* CMapGroup::GetDescription(void)
+const char* CMapGroup::GetDescription(void) const
 {
 	static char szBuf[128];
-	sprintf(szBuf, "group of %d objects", m_Children.Count());
+	V_sprintf_safe(szBuf, "group of %zd objects", m_Children.Count());
 	return(szBuf);
 }
 

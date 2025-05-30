@@ -54,7 +54,7 @@ ConVar sdl_double_click_time( "sdl_double_click_time", "400" );
 COpenGLEntryPoints *gGL = NULL;
 #endif
 
-const int kBogusSwapInterval = INT_MAX;
+constexpr inline int kBogusSwapInterval = INT_MAX;
 
 /*
 From Ryan Gordon:
@@ -102,7 +102,7 @@ static void DebugPrintf( const char *pMsg, ... )
 	va_list args;
 	va_start( args, pMsg );
 	char buf[2048];
-	V_vsnprintf( buf, sizeof( buf ), pMsg, args );
+	V_vsprintf_safe( buf, pMsg, args );
 	va_end( args );
 
 	Plat_DebugString( buf );
@@ -724,13 +724,15 @@ bool CSDLMgr::CreateHiddenGameWindow( const char *pTitle, int width, int height 
 		if ( rendererInfo.m_osComboVersion < 0x0A0607 )
 		{
 			Error( "This game requires OS X version 10.6.7 or higher" );
-			exit(1);
+			// dimhotepus: 1 -> ENOTSUP
+			exit(ENOTSUP);
 		}
 		// forbidden chipsets
 		if ( rendererInfo.m_atiR5xx || rendererInfo.m_intel95x || rendererInfo.m_intel3100 || rendererInfo.m_nvG7x )
 		{
 			Error( "This game does not support this type of graphics processor" );
-			exit(1);
+			// dimhotepus: 1 -> ENOTSUP
+			exit(ENOTSUP);
 		}
 	}
 #endif

@@ -8,6 +8,7 @@
 #define MATERIALDLG_H
 #pragma once
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "smoothinggroupmgr.h"
 
@@ -15,7 +16,7 @@
 //
 // Face Smoothing Group Dialog
 //
-class CFaceSmoothingDlg : public CDialog
+class CFaceSmoothingDlg : public CBaseDlg
 {
 public:
 
@@ -70,7 +71,7 @@ private:
 //
 // Face Smoothing Group Visual Dialog
 //
-class CFaceSmoothingVisualDlg : public CDialog
+class CFaceSmoothingVisualDlg : public CBaseDlg
 {
 public:
 

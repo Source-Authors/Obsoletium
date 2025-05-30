@@ -997,7 +997,7 @@ void CPerformanceController::DebugRender()
 				const bool bCut = pIt->GetBool( "cut" );
 				const int r = bCut ? 0 : 255;
 				const int g = bCut ? 255 : 0;
-				const int b = 0;
+				constexpr int b = 0;
 				Vector tickpos = pos + Vector(10,0,0);
 				g_pDebugOverlay->AddLineOverlay( prevpos, pos, r, g, b, true, 0.0f );
 				g_pDebugOverlay->AddLineOverlay( pos, tickpos, 0, 255, 255, true, 0.0f );

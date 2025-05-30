@@ -412,7 +412,7 @@ font_t *CFontManager::GetFontForChar(vgui::HFont font, wchar_t wch)
 //-----------------------------------------------------------------------------
 // Purpose: returns the abc widths of a single character
 //-----------------------------------------------------------------------------
-void CFontManager::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
+void CFontManager::GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c)
 {
 	if ( !m_FontAmalgams.IsValidIndex( font ) )
 	{
@@ -485,10 +485,10 @@ bool CFontManager::IsBitmapFont(HFont font)
 //-----------------------------------------------------------------------------
 // Purpose: returns the pixel width of a single character
 //-----------------------------------------------------------------------------
-int CFontManager::GetCharacterWidth(HFont font, int ch)
+int CFontManager::GetCharacterWidth(HFont font, wchar_t ch)
 {
-  Assert( ch <= (int)std::numeric_limits<wint_t>::max() );
-  if (!iswcntrl( static_cast<wint_t>(ch) ))
+  Assert( ch <= std::numeric_limits<wint_t>::max() );
+  if (!iswcntrl( ch ))
 	{
 		int a, b, c;
 		GetCharABCwide(font, ch, a, b, c);

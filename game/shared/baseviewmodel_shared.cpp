@@ -432,7 +432,7 @@ void CBaseViewModel::CalcViewModelView( CBasePlayer *owner, const Vector& eyePos
 #ifdef SIXENSE
 	if( g_pSixenseInput->IsEnabled() && (owner->GetObserverMode()==OBS_MODE_NONE) && !UseVR() )
 	{
-		const float max_gun_pitch = 20.0f;
+		constexpr float max_gun_pitch = 20.0f;
 
 		float viewmodel_fov_ratio = g_pClientMode->GetViewModelFOV()/owner->GetFOV();
 		QAngle gun_angles = g_pSixenseInput->GetViewAngleOffset() * -viewmodel_fov_ratio;

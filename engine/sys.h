@@ -21,7 +21,8 @@
 // system IO
 //
 void Sys_mkdir (const char *path);
-int Sys_CompareFileTime(long ft1, long ft2);
+// dimhotepus: long -> time_t
+int Sys_CompareFileTime(time_t ft1, time_t ft2);
 char const* Sys_FindFirst(const char *path, char *basename, int namelength );
 char const* Sys_FindNext(char *basename, int namelength);
 void Sys_FindClose (void);

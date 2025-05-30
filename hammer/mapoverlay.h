@@ -95,12 +95,12 @@ public:
 	// Attributes.
 	inline virtual bool IsVisualElement( void ) { return true; }
 	inline virtual bool ShouldRenderLast( void ) { return true; }
-	inline const char* GetDescription() { return ( "Overlay" ); }
+	inline const char* GetDescription() const override { return ( "Overlay" ); }
 	void SetOverlayType( unsigned short uiType )			{ m_uiFlags |= uiType; }
 	void ResetOverlayType( unsigned short uiType )			{ m_uiFlags &= ~uiType; }
 	unsigned short GetOverlayType( void )					{ return m_uiFlags; }
 
-	ChunkFileResult_t SaveDataToVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
+	[[nodiscard]] ChunkFileResult_t SaveDataToVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
 
 private:
 

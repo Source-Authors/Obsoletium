@@ -165,4 +165,12 @@ enum SoundFlags_t
 #define DEFAULT_SOUND_PACKET_PITCH	100
 #define DEFAULT_SOUND_PACKET_DELAY	0.0f
 
+// Handy defines for EmitSound
+enum SoundSource : int
+{
+	SOUND_FROM_UI_PANEL	= -2,		// Sound being played inside a UI panel on the client
+	SOUND_FROM_LOCAL_PLAYER	= -1,
+	SOUND_FROM_WORLD = 0
+};
+
 #endif // SOUNDFLAGS_H

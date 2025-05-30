@@ -54,7 +54,7 @@ class CMapQuadBounds : public CMapHelper
 
 		bool IsVisualElement(void) { return(false); } // Only visible when the parent entity is selected.
 		
-		const char* GetDescription() { return("Quad bounds helper"); }
+		const char* GetDescription() const override { return("Quad bounds helper"); }
 
 	protected:
 		Vector			m_vLowerLeft;

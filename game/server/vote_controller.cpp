@@ -959,7 +959,7 @@ void CVoteController::TrackVoteCaller( CBasePlayer *pPlayer )
 #ifndef NO_STEAM
 	pPlayer->GetSteamID( &steamID );
 
-	int iIdx = m_VoteCallers.Find( steamID.ConvertToUint64() );
+	auto iIdx = m_VoteCallers.Find( steamID.ConvertToUint64() );
 	if ( iIdx != m_VoteCallers.InvalidIndex() )
 	{
 		// Already being tracked - update timer
@@ -984,7 +984,7 @@ bool CVoteController::CanEntityCallVote( CBasePlayer *pPlayer, int &nCooldown, v
 	pPlayer->GetSteamID( &steamID );
 
 	// Has this SteamID tried to call a vote recently?
-	int iIdx = m_VoteCallers.Find( steamID.ConvertToUint64() );
+	auto iIdx = m_VoteCallers.Find( steamID.ConvertToUint64() );
 	if ( iIdx != m_VoteCallers.InvalidIndex() )
 	{
 		// Timer elapsed?

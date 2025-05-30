@@ -83,7 +83,7 @@ public:
 	// APIS required by CManagedDataCacheClient
 	void DestroyResource();
 	CAsyncWaveData *GetData();
-	size_t Size();
+	size_t Size() const;
 
 	static void AsyncCallback( const FileAsyncRequest_t &asyncRequest, int numReadBytes, FSAsyncStatus_t err );
 	static void QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
@@ -95,11 +95,11 @@ public:
 	bool BlockingGetDataPointer( void **ppData );
 	void SetAsyncPriority( int priority );
 	void StartAsyncLoading( const asyncwaveparams_t& params );
-	bool GetPostProcessed();
+	bool GetPostProcessed() const;
 	void SetPostProcessed( bool proc );
 
-	bool IsCurrentlyLoading();
-	char const *GetFileName();
+	bool IsCurrentlyLoading() const;
+	char const *GetFileName() const;
 
 	// Data
 public:
@@ -144,57 +144,23 @@ CAsyncWaveData::CAsyncWaveData() :
 //-----------------------------------------------------------------------------
 void CAsyncWaveData::DestroyResource()
 {
-	if ( IsPC() )
+	if ( m_hAsyncControl )
 	{
-		if ( m_hAsyncControl )
+		if ( !m_bLoaded && !m_bMissing )
 		{
-			if ( !m_bLoaded && !m_bMissing )
-			{
-				// NOTE:  We CANNOT call AsyncAbort since if the file is actually being read we'll end 
-				//  up still getting a callback, but our this ptr (deleted below) will be feeefeee and we'll trash the heap 
-				//  pretty bad.  So we call AsyncFinish, which will do a blocking read and will definitely succeed	
-				// Block until we are finished
-				g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
-			}
+			// NOTE:  We CANNOT call AsyncAbort since if the file is actually being read we'll end 
+			//  up still getting a callback, but our this ptr (deleted below) will be feeefeee and we'll trash the heap 
+			//  pretty bad.  So we call AsyncFinish, which will do a blocking read and will definitely succeed	
+			// Block until we are finished
+			g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
+		}
 			
-			g_pFileSystem->AsyncRelease( m_hAsyncControl );
-			m_hAsyncControl = NULL;
-		}
-	}
-
-	if ( IsX360() )
-	{
-		if ( m_hAsyncControl )
-		{
-			if ( !m_bLoaded && !m_bMissing )
-			{
-				// force an abort
-				int errStatus = g_pFileSystem->AsyncAbort( m_hAsyncControl );
-				if ( errStatus != FSASYNC_ERR_UNKNOWNID )
-				{
-					// must wait for abort to finish before deallocating data
-					g_pFileSystem->AsyncFinish( m_hAsyncControl, true );
-				}
-			}
-			g_pFileSystem->AsyncRelease( m_hAsyncControl );
-			m_hAsyncControl = NULL;
-		}
-		if ( m_hBuffer != INVALID_BUFFER_HANDLE )
-		{
-			// hint the manager that this tracked buffer is invalid
-			wavedatacache->MarkBufferDiscarded( m_hBuffer );
-		}
+		g_pFileSystem->AsyncRelease( m_hAsyncControl );
+		m_hAsyncControl = NULL;
 	}
 
 	// delete buffers
-	if ( IsPC() || !IsX360() )
-	{
-		g_pFileSystem->FreeOptimalReadBuffer( m_pAlloc );
-	}
-	else
-	{
-		delete [] m_pAlloc;
-	}
+	g_pFileSystem->FreeOptimalReadBuffer( m_pAlloc );
 
 	delete this;
 }
@@ -203,13 +169,13 @@ void CAsyncWaveData::DestroyResource()
 // Purpose: 
 // Output : char const
 //-----------------------------------------------------------------------------
-char const *CAsyncWaveData::GetFileName()
+char const *CAsyncWaveData::GetFileName() const
 {
 	static char sz[MAX_PATH];
 
-	if ( m_hFileNameHandle )	
+	if ( m_hFileNameHandle )
 	{
-		if ( g_pFileSystem->String( m_hFileNameHandle, sz, sizeof( sz ) ) )
+		if ( g_pFileSystem->String( m_hFileNameHandle, sz ) )
 		{
 			return sz;
 		}
@@ -232,23 +198,9 @@ CAsyncWaveData *CAsyncWaveData::GetData()
 // Purpose: 
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-size_t CAsyncWaveData::Size()
+size_t CAsyncWaveData::Size() const
 { 
-	size_t size = sizeof( *this );
-	
-	if ( IsPC() )
-	{
-		size += m_nDataSize;
-	}
-
-	if ( IsX360() )
-	{
-		// the data size can shrink during streaming near end of file
-		// need the real contant size of this object's allocations
-		size += m_nBufferBytes;
-	}
-
-	return size;
+	return sizeof( *this ) + m_nDataSize;
 }
 
 //-----------------------------------------------------------------------------
@@ -405,7 +357,7 @@ bool CAsyncWaveData::BlockingCopyData( void *destbuffer, int destbufsize, int st
 		m_bMissing = false;
 
 		char fn[MAX_PATH];
-		if ( g_pFileSystem->String( m_hFileNameHandle, fn, sizeof( fn ) ) )
+		if ( g_pFileSystem->String( m_hFileNameHandle, fn ) )
 		{
 			MaybeReportMissingWav( fn );
 		}
@@ -447,14 +399,12 @@ bool CAsyncWaveData::BlockingCopyData( void *destbuffer, int destbufsize, int st
 }
 
 
-bool CAsyncWaveData::IsCurrentlyLoading()
+bool CAsyncWaveData::IsCurrentlyLoading() const
 {
 	if ( m_bLoaded )
 		return true;
 	FSAsyncStatus_t status = g_pFileSystem->AsyncStatus( m_hAsyncControl );
-	if ( status == FSASYNC_STATUS_INPROGRESS || status == FSASYNC_OK )
-		return true;
-	return false;
+	return status == FSASYNC_STATUS_INPROGRESS || status == FSASYNC_OK;
 }
 
 //-----------------------------------------------------------------------------
@@ -489,7 +439,7 @@ bool CAsyncWaveData::BlockingGetDataPointer( void **ppData )
 		m_bMissing = false;
 
 		char fn[MAX_PATH];
-		if ( g_pFileSystem->String( m_hFileNameHandle, fn, sizeof( fn ) ) )
+		if ( g_pFileSystem->String( m_hFileNameHandle, fn ) )
 		{
 			MaybeReportMissingWav( fn );
 		}
@@ -532,14 +482,14 @@ void CAsyncWaveData::SetAsyncPriority( int priority )
 //-----------------------------------------------------------------------------
 void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 {
-	Assert( IsX360() || ( IsPC() && !m_bLoaded ) );
+	Assert( !m_bLoaded );
 
 	// expected to be relative to the sound\ dir
 	m_hFileNameHandle = params.hFilename;
 
 	// build the real filename
 	char szFilename[MAX_PATH];
-	Q_snprintf( szFilename, sizeof( szFilename ), "sound\\%s", GetFileName() );
+	V_sprintf_safe( szFilename, "sound\\%s", GetFileName() );
 
 	int nPriority = 1;
 	if ( params.bPrefetch )
@@ -548,34 +498,22 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 		nPriority = 0;
 	}
 
-	if ( !IsX360() )
+	m_async.pData = NULL;
+	if ( SndAlignReads() )
 	{
-		m_async.pData = NULL;
-		if ( SndAlignReads() )
-		{
-			m_async.nOffset = 0;
-			m_async.nBytes = params.seekpos + params.datasize;
-		}
-		else
-		{
-			m_async.nOffset = params.seekpos;
-			m_async.nBytes = params.datasize;
-		}
+		m_async.nOffset = 0;
+		m_async.nBytes = params.seekpos + params.datasize;
 	}
 	else
 	{
-		Assert( params.datasize > 0 );
-
-		// using explicit allocated buffer on xbox
-		m_async.pData = m_pvData;
 		m_async.nOffset = params.seekpos;
-		m_async.nBytes = AlignValue( params.datasize, params.alignment ); 
+		m_async.nBytes = params.datasize;
 	}
 
 	m_async.pfnCallback	= AsyncCallback;	// optional completion callback
-	m_async.pContext = (void *)this;		// caller's unique context
+	m_async.pContext = this;		// caller's unique context
 	m_async.priority = nPriority;			// inter list priority, 0=lowest
-	m_async.flags = IsX360() ? 0 : FSASYNC_FLAGS_ALLOCNOFREE;
+	m_async.flags = FSASYNC_FLAGS_ALLOCNOFREE;
 	m_async.pszPathID = "GAME";
 
 	m_bLoaded = false;
@@ -589,38 +527,6 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 	// The async layer creates a copy of this string, ok to send a local reference
 	m_async.pszFilename	= szFilename;
 
-	char szFullName[MAX_PATH];
-	if ( IsX360() && ( g_pFileSystem->GetDVDMode() == DVDMODE_STRICT ) )
-	{
-		// all audio is expected be in zips
-		// resolve to absolute name now, where path can be filtered to just the zips (fast find, no real i/o)
-		// otherwise the dvd will do a costly seek for each zip miss due to search path fall through
-		PathTypeQuery_t pathType;
-		if ( !g_pFileSystem->RelativePathToFullPath( m_async.pszFilename, m_async.pszPathID, szFullName, sizeof( szFullName ), FILTER_CULLNONPACK, &pathType ) )
-		{
-			// not found, do callback now to handle error
-			m_async.pfnCallback( m_async, 0, FSASYNC_ERR_FILEOPEN );
-			return;
-		}
-		m_async.pszFilename	= szFullName;
-	}
-
-	if ( IsX360() && params.bCanBeQueued )
-	{
-		// queued loader takes over
-		LoaderJob_t loaderJob;
-		loaderJob.m_pFilename = m_async.pszFilename;
-		loaderJob.m_pPathID = m_async.pszPathID;
-		loaderJob.m_pCallback = QueuedLoaderCallback;
-		loaderJob.m_pContext = (void *)this;
-		loaderJob.m_Priority = LOADERPRIORITY_DURINGPRELOAD;
-		loaderJob.m_pTargetData = m_async.pData;
-		loaderJob.m_nBytesToRead = m_async.nBytes;
-		loaderJob.m_nStartOffset = m_async.nOffset;
-		g_pQueuedLoader->AddJob( &loaderJob );
-		return;
-	}
-
 	MEM_ALLOC_CREDIT();
 	
 	// Commence async I/O
@@ -632,7 +538,7 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CAsyncWaveData::GetPostProcessed()
+bool CAsyncWaveData::GetPostProcessed() const
 {
 	return m_bPostProcessed;
 }
@@ -656,14 +562,14 @@ public:
 	CAsyncWavDataCache();
 	~CAsyncWavDataCache() = default;
 
-	virtual bool			Init( size_t memSize );
-	virtual void			Shutdown();
+	bool			Init( size_t memSize ) override;
+	void			Shutdown() override;
 
 	// implementation that treats file as monolithic
-	virtual memhandle_t		AsyncLoadCache( char const *filename, int datasize, int startpos, bool bIsPrefetch = false );
-	virtual void			PrefetchCache( char const *filename, int datasize, int startpos );
-	virtual bool			CopyDataIntoMemory( char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed );
-	virtual bool			CopyDataIntoMemory( memhandle_t& handle, char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed );
+	memhandle_t		AsyncLoadCache( char const *filename, int datasize, int startpos, bool bIsPrefetch = false ) override;
+	void			PrefetchCache( char const *filename, int datasize, int startpos ) override;
+	bool			CopyDataIntoMemory( char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed ) override;
+	bool			CopyDataIntoMemory( memhandle_t& handle, char const *filename, int datasize, int startpos, void *buffer, int bufsize, int copystartpos, int bytestocopy, bool *pbPostProcessed ) override;
 	virtual void			SetPostProcessed( memhandle_t handle, bool proc );
 	virtual void			Unload( memhandle_t handle );
 	virtual bool			GetDataPointer( memhandle_t& handle, char const *filename, int datasize, int startpos, void **pData, int copystartpos, bool *pbPostProcessed );
@@ -687,7 +593,7 @@ public:
 	void					SpewMemoryUsage( int level );
 
 	// Cache helpers
-	bool					GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  );
+	bool					GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, size_t nMaxLen  );
 
 private:
 	void					Clear();
@@ -888,7 +794,7 @@ memhandle_t CAsyncWavDataCache::FindOrCreateBuffer( asyncwaveparams_t &params, b
 	if ( bFind )
 	{
 		// look for an existing buffer that matches exactly (same file, offset, and share)
-		int iBuffer = m_BufferList.Find( search );
+		BufferHandle_t iBuffer = m_BufferList.Find( search );
 		if ( iBuffer != m_BufferList.InvalidIndex() )
 		{
 			// found
@@ -896,7 +802,7 @@ memhandle_t CAsyncWavDataCache::FindOrCreateBuffer( asyncwaveparams_t &params, b
 			if ( snd_async_stream_spew.GetInt() >= 2 )
 			{
 				char tempBuff[MAX_PATH];
-				g_pFileSystem->String( params.hFilename, tempBuff, sizeof( tempBuff ) );
+				g_pFileSystem->String( params.hFilename, tempBuff );
 				Msg( "Found Buffer: %s, offset: %d\n", tempBuff, params.seekpos );
 			}
 		}
@@ -1639,7 +1545,7 @@ void CAsyncWavDataCache::OnMixEnd()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CAsyncWavDataCache::GetItemName( DataCacheClientID_t, const void *pItem, char *pDest, unsigned nMaxLen  )
+bool CAsyncWavDataCache::GetItemName( DataCacheClientID_t, const void *pItem, char *pDest, size_t nMaxLen  )
 {
 	CAsyncWaveData *pWaveData = (CAsyncWaveData *)pItem;
 	Q_strncpy( pDest, pWaveData->GetFileName(), nMaxLen );
@@ -1670,7 +1576,7 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 			i = m_CacheHandles.NextInorder(i) )
 		{
 			char name[MAX_PATH];
-			if ( !g_pFileSystem->String( m_CacheHandles[ i ].name, name, sizeof( name ) ) )
+			if ( !g_pFileSystem->String( m_CacheHandles[ i ].name, name ) )
 			{
 				Assert( 0 );
 				continue;
@@ -1867,97 +1773,6 @@ CWaveDataStreamAsync::CWaveDataStreamAsync
 
 		m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 	}
-	
-	if ( IsX360() )
-	{
-		// size of a sample
-		m_sampleSize = source.SampleSize();
-		// size in samples (not bytes) of the wave itself
-		m_waveSize = fileSize / m_sampleSize;
-
-		streamFlags_t flags = STREAMED_FROMDVD;
-
-		if ( !Q_strnicmp( pFileName, "music", 5 ) && ( pFileName[5] == '\\' || pFileName[5] == '/') )
-		{
-			// music discards and cycles its buffers
-			flags |= STREAMED_SINGLEPLAY;
-		}
-		else if ( !Q_strnicmp( pFileName, "vo", 2 ) && ( pFileName[2] == '\\' || pFileName[2] == '/' ) && !source.IsSentenceWord() )
-		{
-			// vo discards and cycles its buffers, except for sentence sources, which do recur
-			flags |= STREAMED_SINGLEPLAY;
-		}
-
-		int bufferSize;
-		if ( source.Format() == WAVE_FORMAT_XMA )
-		{
-			// each xma block has its own compression rate
-			// the buffer must be large enough to cover worst case delivery i/o latency
-			// the xma mixer expects quantum xma blocks
-			COMPILE_TIME_ASSERT( ( STREAM_BUFFER_DATASIZE % XMA_BLOCK_SIZE ) == 0 );
-			bufferSize = STREAM_BUFFER_DATASIZE;
-		}
-		else
-		{
-			// calculate a worst case buffer size based on rate
-			bufferSize = STREAM_BUFFER_TIME*source.SampleRate()*m_sampleSize;
-			if ( source.Format() == WAVE_FORMAT_ADPCM )
-			{
-				// consider adpcm as 4 bit samples
-				bufferSize /= 2;
-			}
-
-			if ( source.IsLooped() )
-			{
-				// lighten the streaming load for looping samples
-				// doubling the buffer halves the buffer search/load requests
-				bufferSize *= 2;
-			}
-		}
-
-		// streaming buffers obey alignments
-		bufferSize = AlignValue( bufferSize, XBOX_DVD_SECTORSIZE );
-
-		// use double buffering
-		int numBuffers = 2;
-
-		if ( m_dataSize <= STREAM_BUFFER_DATASIZE || m_dataSize <= numBuffers*bufferSize )
-		{
-			// no gain for buffering a small file or multiple buffering
-			// match the expected transfer with a single buffer
-			bufferSize = m_dataSize;
-			numBuffers = 1;
-		}
-
-		// size in samples of the transfer buffer
-		m_bufferSize = bufferSize / m_sampleSize;
-
-		// allocate a transfer buffer
-		// matches the size of the streaming buffer exactly
-		// ensures that buffers can be filled and then consumed/requeued at the same time
-		m_buffer = new char[bufferSize];
-
-		int loopStart;
-		if ( source.IsLooped() )
-		{
-			int loopBlock;
-			loopStart = m_pStreamSource->GetLoopingInfo( &loopBlock, NULL, NULL ) * m_sampleSize;
-			if ( source.Format() == WAVE_FORMAT_XMA )
-			{
-				// xma works in blocks, mixer handles inter-block accurate loop positioning
-				// block streaming will cycle from the block where the loop occurs
-				loopStart = loopBlock * XMA_BLOCK_SIZE;
-			}
-		}
-		else
-		{
-			// sample not looped
-			loopStart = -1;
-		}
-
-		// load the file piecewise through a buffering implementation
-		m_hStream = wavedatacache->OpenStreamedLoad( pFileName, m_dataSize, m_dataStart, startOffset, loopStart, bufferSize, numBuffers, flags );
-	}
 
 	m_bValid = true;
 }
@@ -1991,7 +1806,7 @@ char const *CWaveDataStreamAsync::GetFileName()
 
 	if ( m_hFileName )
 	{
-		if ( g_pFileSystem->String( m_hFileName, fn, sizeof( fn ) ) )
+		if ( g_pFileSystem->String( m_hFileName, fn ) )
 		{
 			return fn;
 		}
@@ -2249,7 +2064,7 @@ bool CWaveDataMemoryAsync::IsReadyToMix()
 	if ( !m_source.IsAsyncLoad() && !snd_async_fullyasync.GetBool() )
 	{
 		// Wait until we're pending at least
-		if ( m_source.GetCacheStatus() == CAudioSource::AUDIO_NOT_LOADED )
+		if ( m_source.GetCacheStatus() == CAudioSource::AudioStatus::AUDIO_NOT_LOADED )
 		{
 			return false;
 		}

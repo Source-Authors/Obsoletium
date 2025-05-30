@@ -5,15 +5,18 @@
 //=============================================================================
 
 #include "vgui_controls/KeyBindingHelpDialog.h"
-#include "vgui_controls/ListPanel.h"
+
+#include "tier1/KeyValues.h"
+#include "tier1/utldict.h"
+
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
 #include "vgui/ILocalize.h"
 #include "vgui/IInput.h"
 #include "vgui/ISystem.h"
-#include "KeyValues.h"
 #include "vgui/Cursor.h"
-#include "tier1/utldict.h"
+
+#include "vgui_controls/ListPanel.h"
 #include "vgui_controls/KeyBoardEditorDialog.h"
 
 // NOTE: This has to be the last file included!
@@ -231,7 +234,7 @@ void CKeyBindingHelpDialog::PopulateList()
 {
 	m_pList->DeleteAllItems();
 
-	int i, j;
+	intp i;
 
 	CUtlVector< ListInfo_t > maps;
 	vgui::Panel *pPanel = m_hPanel;
@@ -240,8 +243,8 @@ void CKeyBindingHelpDialog::PopulateList()
 		PanelKeyBindingMap *map = pPanel->GetKBMap();
 		while ( map )
 		{
-			int k;
-			int c = maps.Count();
+			intp k;
+			intp c = maps.Count();
 			for ( k = 0; k < c; ++k )
 			{
 				if ( maps[k].m_pMap == map )
@@ -264,15 +267,15 @@ void CKeyBindingHelpDialog::PopulateList()
 	CUtlRBTree< KeyValues *, int >	sorted( 0, 0, BindingLessFunc );
 
 	// add header item
-	int c = maps.Count();
+	intp c = maps.Count();
 	for ( i = 0; i < c; ++i )
 	{
 		PanelKeyBindingMap *m = maps[ i ].m_pMap;
 		pPanel = maps[i].m_pPanel;
 		Assert( m );
 
-		int bindings = m->boundkeys.Count();
-		for ( j = 0; j < bindings; ++j )
+		intp bindings = m->boundkeys.Count();
+		for ( intp j = 0; j < bindings; ++j )
 		{
 			BoundKey_t *kbMap = &m->boundkeys[ j ];
 			Assert( kbMap );
@@ -305,8 +308,8 @@ void CKeyBindingHelpDialog::PopulateList()
 		}
 
 		// Now try and find any "unbound" keys...
-		int mappings = m->entries.Count();
-		for ( j = 0; j < mappings; ++j )
+		intp mappings = m->entries.Count();
+		for ( intp j = 0; j < mappings; ++j )
 		{
 			KeyBindingMap_t *kbMap = &m->entries[ j ];
 
@@ -341,7 +344,7 @@ void CKeyBindingHelpDialog::PopulateList()
 		}
 	}
 
-	for ( j = sorted.FirstInorder() ; j != sorted.InvalidIndex(); j = sorted.NextInorder( j ) )
+	for ( intp j = sorted.FirstInorder() ; j != sorted.InvalidIndex(); j = sorted.NextInorder( j ) )
 	{
 		KeyValues *item = sorted[ j ];
 

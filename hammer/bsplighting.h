@@ -14,10 +14,11 @@
 
 #include "stdafx.h"
 #include "ibsplighting.h"
-#include "utlvector.h"
-#include "utllinkedlist.h"
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/interface.h"
+#include "materialsystem/imesh.h"
 #include "bspfile.h"
-#include "interface.h"
 #include "ivraddll.h"
 #include "ibsplightingthread.h"
 
@@ -72,6 +73,8 @@ private:
 	class CDrawCommand
 	{
 	public:
+		CDrawCommand() : m_LightmapPageID{-1} {}
+
 		CUtlVector<CPrimList>	m_PrimLists;
 		int						m_LightmapPageID;
 	};
@@ -99,7 +102,8 @@ private:
 	class CFaceMaterial
 	{
 	public:
-										~CFaceMaterial();
+		CFaceMaterial() : m_pMaterial{nullptr} {}
+		~CFaceMaterial();
 
 		IMaterial						*m_pMaterial;
 	

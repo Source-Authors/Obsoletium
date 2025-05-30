@@ -6,9 +6,9 @@
 //
 //=============================================================================//
 
-#include "dme_controls/AttributeShaderPickerPanel.h"
+#include "dme_controls/attributeshaderpickerpanel.h"
 #include "dme_controls/AttributeTextEntry.h"
-#include "matsys_controls/Picker.h"
+#include "matsys_controls/picker.h"
 #include "tier1/KeyValues.h"
 #include "matsys_controls/matsyscontrols.h"
 #include "materialsystem/imaterialsystem.h"
@@ -46,7 +46,7 @@ void CAttributeShaderPickerPanel::ShowPickerDialog()
 	{
 		if ( ( ppShaderList[i]->GetFlags() & SHADER_NOT_EDITABLE ) == 0 )
 		{
-			int j = shaderList.AddToTail( );
+			intp j = shaderList.AddToTail( );
 			shaderList[j].m_pChoiceString = ppShaderList[i]->GetName();
 			shaderList[j].m_pChoiceValue = ppShaderList[i]->GetName();
 		}

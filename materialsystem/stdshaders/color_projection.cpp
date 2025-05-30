@@ -87,9 +87,9 @@ Vector monochrome( Vector r)
 
 Vector blindMK( Vector vColor )
 {
-	const float wx=0.312713;
-	const float wy=0.329016;
-	const float wz=0.358271;
+	constexpr float wx=0.312713;
+	constexpr float wy=0.329016;
+	constexpr float wz=0.358271;
 
 	Vector c_xyz = xyz_from_rgb( vColor );
 

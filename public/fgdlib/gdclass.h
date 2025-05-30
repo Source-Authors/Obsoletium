@@ -17,10 +17,12 @@
 #pragma once
 #endif
 
-#include "HelperInfo.h"
-#include "TokenReader.h"
-#include "GDVar.h"
-#include "InputOutput.h"
+#include <cstring>
+
+#include "helperinfo.h"
+#include "tier1/tokenreader.h"
+#include "gdvar.h"
+#include "inputoutput.h"
 #include "Color.h"
 #include "mathlib/vector.h"
 
@@ -28,21 +30,21 @@ class CHelperInfo;
 class GameData;
 class GDinputvariable;
 
-const int GD_MAX_VARIABLES = 128;
+constexpr inline int GD_MAX_VARIABLES = 128;
 
 
 class GDclass
 {
 	public:
 
-		GDclass(void);
-		~GDclass(void);
+		GDclass();
+		~GDclass();
 
 		//
 		// Interface to class information:
 		//
-		inline const char *GetName(void) { return(m_szName); }
-		inline const char *GetDescription(void);
+		inline const char *GetName() const { return(m_szName); }
+		inline const char *GetDescription() const;
 
 		//
 		// Reading a class from the game data file:
@@ -52,11 +54,11 @@ class GDclass
 		//
 		// Interface to variable information (keys):
 		//
-		inline int GetVariableCount(void) { return(m_nVariables); }
-		GDinputvariable *GetVariableAt(int iIndex);
+		inline intp GetVariableCount() const { return(m_nVariables); }
+		GDinputvariable *GetVariableAt(intp iIndex);
 		void GetHelperForGDVar( GDinputvariable *pVar, CUtlVector<const char *> *helperName );
-		GDinputvariable *VarForName(const char *pszName, int *piIndex = NULL);
-		BOOL AddVariable(GDinputvariable *pVar, GDclass *pBase, int iBaseIndex, int iVarIndex);
+		GDinputvariable *VarForName(const char *pszName, intp *piIndex = NULL);
+		BOOL AddVariable(GDinputvariable *pVar, GDclass *pBase, intp iBaseIndex, intp iVarIndex);
 		void AddBase(GDclass *pBase);
 
 		//
@@ -64,23 +66,23 @@ class GDclass
 		//
 		inline void AddInput(CClassInput *pInput);
 		CClassInput *FindInput(const char *szName);
-		inline int GetInputCount(void) { return(m_Inputs.Count()); }
-		CClassInput *GetInput(int nIndex);
+		inline intp GetInputCount() const { return(m_Inputs.Count()); }
+		CClassInput *GetInput(intp nIndex);
 
 		//
 		// Interface to output information:
 		//
 		inline void AddOutput(CClassOutput *pOutput);
 		CClassOutput *FindOutput(const char *szName);
-		inline int GetOutputCount(void) { return(m_Outputs.Count()); }
-		CClassOutput *GetOutput(int nIndex);
+		inline intp GetOutputCount() const { return(m_Outputs.Count()); }
+		CClassOutput *GetOutput(intp nIndex);
 
 		GameData *Parent;
 
 		//
 		// Interface to class attributes:
 		//
-		inline bool IsClass(const char *pszClass);
+		inline bool IsClass(const char *pszClass) const;
 		inline bool IsSolidClass(void) const { return(m_bSolid); }
 		inline bool IsBaseClass(void) const { return(m_bBase); }
 		inline bool IsMoveClass(void) const { return(m_bMove); }
@@ -91,7 +93,7 @@ class GDclass
 		inline bool IsNodeClass(void) const;
 		static inline bool IsNodeClass(const char *pszClassName);
 
-		inline bool ShouldSnapToHalfGrid() { return m_bHalfGridSnap; }
+		inline bool ShouldSnapToHalfGrid() const { return m_bHalfGridSnap; }
 
 		inline void SetNPCClass(bool bNPC) { m_bNPC = bNPC; }
 		inline void SetFilterClass(bool bFilter) { m_bFilter = bFilter; }
@@ -104,17 +106,17 @@ class GDclass
 		inline const Vector &GetMins(void) const { return(m_bmins); }
 		inline const Vector &GetMaxs(void) const { return(m_bmaxs); }
 		
-		BOOL GetBoundBox(Vector& pfMins, Vector& pfMaxs);
+		BOOL GetBoundBox(Vector& pfMins, Vector& pfMaxs) const;
 		bool HasBoundBox() const { return m_bGotSize; }
 
-		inline color32 GetColor(void) const;
+		inline color32 GetColor() const;
 
 		//
 		// Interface to helper information:
 		//
 		inline void AddHelper(CHelperInfo *pHelper);
-		inline int GetHelperCount(void) const { return(m_Helpers.Count()); }
-		CHelperInfo *GetHelper(int nIndex);
+		inline intp GetHelperCount() const { return(m_Helpers.Count()); }
+		CHelperInfo *GetHelper(intp nIndex);
 
 	protected:
 
@@ -154,7 +156,7 @@ class GDclass
 		char *m_pszDescription;				// Description of this class, dynamically allocated.
 
 		CUtlVector<GDinputvariable *> m_Variables;		// Variables for this class.
-		int m_nVariables;								// Count of base & local variables combined.
+		intp m_nVariables;								// Count of base & local variables combined.
 		CUtlVector<GDclass *> m_Bases;					// List of base classes this class inherits from.
 
 		CClassInputList m_Inputs;
@@ -166,7 +168,7 @@ class GDclass
 		//	[0] = base number from Bases, or -1 if not in a base.
 		//	[1] = index into base's variables
 		//
-		int m_VariableMap[GD_MAX_VARIABLES][2];
+		intp m_VariableMap[GD_MAX_VARIABLES][2];
 
 		Vector m_bmins;		// 3D minima of object (pointclass).
 		Vector m_bmaxs;		// 3D maxima of object (pointclass).
@@ -216,7 +218,7 @@ color32 GDclass::GetColor(void) const
 // Purpose: Returns a description of this entity class, or the entity class name
 //			if no description exists.
 //-----------------------------------------------------------------------------
-const char *GDclass::GetDescription(void)
+const char *GDclass::GetDescription(void) const
 {
 	if (m_pszDescription == NULL)
 	{
@@ -231,7 +233,7 @@ const char *GDclass::GetDescription(void)
 // Purpose: 
 // Input  : pszClass - 
 //-----------------------------------------------------------------------------
-bool GDclass::IsClass(const char *pszClass)
+bool GDclass::IsClass(const char *pszClass) const
 {
 	Assert(pszClass != NULL);
 	return(!stricmp(pszClass, m_szName));

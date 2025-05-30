@@ -52,7 +52,7 @@ static const char *s_pSupportedReplayGames[] =
 void ReplaySystem_Init( bool bDedicated )
 {
 #if defined( REPLAY_ENABLED )
-	COM_TimestampedLog( "Loading replay.dll" );
+	COM_TimestampedLog( "Loading replay" DLL_EXT_STRING );
 
 	extern IFileSystem *g_pFileSystem;
 
@@ -78,7 +78,7 @@ void ReplaySystem_Init( bool bDedicated )
 	extern CreateInterfaceFn g_AppSystemFactory;
 	if ( !g_pReplay->Connect( g_AppSystemFactory ) )
 	{
-		Error( "Connect on replay.dll failed!\n" );
+		Error( "Connect on replay" DLL_EXT_STRING " failed!\n" );
 	}
 
 	// Cache some pointers

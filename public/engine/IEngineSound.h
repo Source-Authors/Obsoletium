@@ -12,12 +12,12 @@
 #pragma once
 #endif
 
+#include "tier0/basetypes.h"
+#include "tier1/interface.h"
+#include "tier1/utlvector.h"
 
-#include "basetypes.h"
-#include "interface.h"
 #include "soundflags.h"
 #include "irecipientfilter.h"
-#include "utlvector.h"
 #include "engine/SndInfo.h"
 
 //-----------------------------------------------------------------------------
@@ -25,33 +25,36 @@
 //-----------------------------------------------------------------------------
 class Vector;
 
-// Handy defines for EmitSound
-#define SOUND_FROM_UI_PANEL			-2		// Sound being played inside a UI panel on the client
-#define SOUND_FROM_LOCAL_PLAYER		-1
-#define SOUND_FROM_WORLD			0
-
-
+constexpr inline int SoundLevelCompatibilityBorder = 256;
 
 // These are used to feed a soundlevel to the sound system and have it use
-// goldsrc-type attenuation. We should use this as little as possible and 
+// goldsrc-type attenuation.  We should use this as little as possible and 
 // phase it out as soon as possible.
 
 // Take a regular sndlevel and convert it to compatibility mode.
-#define SNDLEVEL_TO_COMPATIBILITY_MODE( x )		((soundlevel_t)(int)( (x) + 256 ))
+constexpr inline soundlevel_t SNDLEVEL_TO_COMPATIBILITY_MODE( uint16_t x )	noexcept
+{
+	return static_cast<soundlevel_t>(static_cast<int>(x) + SoundLevelCompatibilityBorder);
+}
 
 // Take a compatibility-mode sndlevel and get the REAL sndlevel out of it.
-#define SNDLEVEL_FROM_COMPATIBILITY_MODE( x )	((soundlevel_t)(int)( (x) - 256 ))
+constexpr inline soundlevel_t SNDLEVEL_FROM_COMPATIBILITY_MODE( soundlevel_t x ) noexcept
+{
+	return static_cast<soundlevel_t>(to_underlying(x) - SoundLevelCompatibilityBorder);
+}
 
 // Tells if the given sndlevel is marked as compatibility mode.
-#define SNDLEVEL_IS_COMPATIBILITY_MODE( x )		( (x) >= soundlevel_t(256) )
-
+constexpr inline bool SNDLEVEL_IS_COMPATIBILITY_MODE( soundlevel_t x ) noexcept
+{
+	return to_underlying(x) >= SoundLevelCompatibilityBorder;
+}
 
 	
 //-----------------------------------------------------------------------------
 // Client-server neutral effects interface
 //-----------------------------------------------------------------------------
-#define IENGINESOUND_CLIENT_INTERFACE_VERSION	"IEngineSoundClient003"
-#define IENGINESOUND_SERVER_INTERFACE_VERSION	"IEngineSoundServer003"
+constexpr inline char IENGINESOUND_CLIENT_INTERFACE_VERSION[]{"IEngineSoundClient003"};
+constexpr inline char IENGINESOUND_SERVER_INTERFACE_VERSION[]{"IEngineSoundServer003"};
 
 abstract_class IEngineSound
 {

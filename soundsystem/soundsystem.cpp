@@ -5,25 +5,26 @@
 //===========================================================================//
 
 #include "soundsystem/isoundsystem.h"
-#include "filesystem.h"
-#include "tier1/strtools.h"
+
 #include "tier1/convar.h"
+#include "tier1/strtools.h"
+#include "tier1/utldict.h"
 #include "mathlib/mathlib.h"
 #include "soundsystem/snd_device.h"
 #include "datacache/idatacache.h"
+#include "tier2/tier2.h"
+#include "filesystem.h"
 #include "soundchars.h"
-#include "tier1/utldict.h"
 #include "snd_wave_source.h"
 #include "snd_dev_wave.h"
-#include "tier2/tier2.h"
 
 
 //-----------------------------------------------------------------------------
 // External interfaces
 //-----------------------------------------------------------------------------
-IAudioDevice *g_pAudioDevice = NULL;
-ISoundSystem *g_pSoundSystem = NULL;
-IDataCache *g_pDataCache = NULL;
+IAudioDevice *g_pAudioDevice = nullptr;
+ISoundSystem *g_pSoundSystem = nullptr;
+IDataCache *g_pDataCache = nullptr;
 
 
 //-----------------------------------------------------------------------------
@@ -37,35 +38,35 @@ int g_nSoundFrameCount = 0;
 //-----------------------------------------------------------------------------
 class CSoundSystem : public CTier2AppSystem< ISoundSystem >
 {
-	typedef CTier2AppSystem< ISoundSystem > BaseClass;
+	using BaseClass = CTier2AppSystem< ISoundSystem >;
 
 public:
 	// Inherited from IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
-	void		Update( float dt );
-	void		Flush( void );
+	void		Update( float dt ) override;
+	void		Flush( void ) override;
 
-	CAudioSource *FindOrAddSound( const char *filename );
-	CAudioSource *LoadSound( const char *wavfile );
-	void		PlaySound( CAudioSource *source, float volume, CAudioMixer **ppMixer );
+	CAudioSource *FindOrAddSound( const char *filename ) override;
+	CAudioSource *LoadSound( const char *wavfile ) override;
+	void		PlaySound( CAudioSource *source, float volume, CAudioMixer **ppMixer ) override;
 
-	bool		IsSoundPlaying( CAudioMixer *pMixer );
-	CAudioMixer *FindMixer( CAudioSource *source );
+	bool		IsSoundPlaying( CAudioMixer *pMixer ) override;
+	CAudioMixer *FindMixer( CAudioSource *source ) override;
 
-	void		StopAll( void );
-	void		StopSound( CAudioMixer *mixer );
+	void		StopAll( void ) override;
+	void		StopSound( CAudioMixer *mixer ) override;
 
 private:
 	struct CSoundFile
 	{
 		char				filename[ 512 ];
 		CAudioSource		*source;
-		long				filetime;
+		time_t				filetime;
 	};
 
 	IAudioDevice *m_pAudioDevice;
@@ -89,15 +90,16 @@ bool CSoundSystem::Connect( CreateInterfaceFn factory )
 	if ( !BaseClass::Connect( factory ) )
 		return false;
 
-	g_pDataCache = (IDataCache*)factory( DATACACHE_INTERFACE_VERSION, NULL );
+	g_pDataCache = (IDataCache*)factory( DATACACHE_INTERFACE_VERSION, nullptr );
 	g_pSoundSystem = this;
-	return (g_pFullFileSystem != NULL) && (g_pDataCache != NULL);
+
+	return g_pFullFileSystem && g_pDataCache;
 }
 
 void CSoundSystem::Disconnect()
 {
-	g_pSoundSystem = NULL;
-	g_pDataCache = NULL;
+	g_pSoundSystem = nullptr;
+	g_pDataCache = nullptr;
 	BaseClass::Disconnect();
 }
 
@@ -110,7 +112,7 @@ void *CSoundSystem::QueryInterface( const char *pInterfaceName )
 	if (!Q_strncmp(	pInterfaceName, SOUNDSYSTEM_INTERFACE_VERSION, Q_strlen(SOUNDSYSTEM_INTERFACE_VERSION) + 1))
 		return (ISoundSystem*)this;
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -123,7 +125,8 @@ InitReturnVal_t CSoundSystem::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( 2.2f, 2.2f, 0.0f, 2 );
+
 	m_flElapsedTime = 0.0f;
 	m_pAudioDevice = Audio_CreateWaveDevice();
 	if ( !m_pAudioDevice->Init() )
@@ -134,12 +137,11 @@ InitReturnVal_t CSoundSystem::Init()
 
 void CSoundSystem::Shutdown()
 {
-	Msg( "Removing %i sounds\n", m_ActiveSounds.Size() );
-	for ( int i = 0 ; i < m_ActiveSounds.Size(); i++ )
+	Msg( "Removing %zd sounds\n", m_ActiveSounds.Count() );
+	for ( auto &s : m_ActiveSounds )
 	{
-		CSoundFile *p = &m_ActiveSounds[ i ];
-		Msg( "Removing sound:  %s\n", p->filename );
-		delete p->source;
+		Msg( "Removing sound:  %s\n", s.filename );
+		delete s.source;
 	}
 
 	m_ActiveSounds.RemoveAll();
@@ -161,17 +163,18 @@ CAudioSource *CSoundSystem::FindOrAddSound( const char *filename )
 {
 	CSoundFile *s;
 
-	int i;
-	for ( i = 0; i < m_ActiveSounds.Size(); i++ )
+	intp i;
+	for ( i = 0; i < m_ActiveSounds.Count(); i++ )
 	{
 		s = &m_ActiveSounds[ i ];
 		Assert( s );
 		if ( !stricmp( s->filename, filename ) )
 		{
-			long filetime = g_pFullFileSystem->GetFileTime( filename );
+			time_t filetime = g_pFullFileSystem->GetFileTime( filename );
 			if ( filetime != s->filetime )
 			{
-				Msg( "Reloading sound %s\n", filename );
+				Msg( "Reloading sound %s.\n", filename );
+
 				delete s->source;
 				s->source = LoadSound( filename );
 				s->filetime = filetime;
@@ -182,7 +185,7 @@ CAudioSource *CSoundSystem::FindOrAddSound( const char *filename )
 
 	i = m_ActiveSounds.AddToTail();
 	s = &m_ActiveSounds[ i ];
-	strcpy( s->filename, filename );
+	V_strcpy_safe( s->filename, filename );
 	s->source = LoadSound( filename );
 	s->filetime = g_pFullFileSystem->GetFileTime( filename );
 
@@ -192,7 +195,7 @@ CAudioSource *CSoundSystem::FindOrAddSound( const char *filename )
 CAudioSource *CSoundSystem::LoadSound( const char *wavfile )
 {
 	if ( !m_pAudioDevice )
-		return NULL;
+		return nullptr;
 
 	CAudioSource *wave = AudioSource_Create( wavfile );
 	return wave;
@@ -202,7 +205,7 @@ void CSoundSystem::PlaySound( CAudioSource *source, float volume, CAudioMixer **
 {
 	if ( ppMixer )
 	{
-		*ppMixer = NULL;
+		*ppMixer = nullptr;
 	}
 
 	if ( m_pAudioDevice )
@@ -273,7 +276,7 @@ bool CSoundSystem::IsSoundPlaying( CAudioMixer *pMixer )
 CAudioMixer *CSoundSystem::FindMixer( CAudioSource *source )
 {
 	if ( !m_pAudioDevice )
-		return NULL;
+		return nullptr;
 
 	return m_pAudioDevice->GetMixerForSource( source );
 }

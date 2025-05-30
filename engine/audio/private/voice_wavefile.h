@@ -12,7 +12,7 @@
 
 // Load in a wave file. This isn't very flexible and is only guaranteed to work with files
 // saved with WriteWaveFile.
-bool ReadWaveFile(
+[[nodiscard]] bool ReadWaveFile(
 	const char *pFilename,
 	char *&pData,
 	int &nDataBytes,
@@ -22,7 +22,7 @@ bool ReadWaveFile(
 
 
 // Write out a wave file.
-bool WriteWaveFile(
+[[nodiscard]] bool WriteWaveFile(
 	const char *pFilename, 
 	const char *pData, 
 	int nBytes, 

@@ -71,7 +71,8 @@ private:
 
 	bool				m_bDirty;
 	char				m_szCurrentFile[ MAX_OSPATH ];
-	long				m_lFileTime;
+	// dimhotepus: long -> time_t
+	time_t				m_lFileTime;
 };
 
 static CDemoActionManager g_DemoActionManager;
@@ -120,66 +121,53 @@ void CDemoActionManager::Shutdown( void )
 void CDemoActionManager::ReloadFromDisk( void )
 {
 	char metafile[ 512 ];
-	Q_StripExtension( m_szCurrentFile, metafile, sizeof( metafile ) );
-	Q_DefaultExtension( metafile, ".vdm", sizeof( metafile ) );
+	V_StripExtension( m_szCurrentFile, metafile );
+	V_DefaultExtension( metafile, ".vdm" );
 
 	ClearAll();
 
-	//const char *buffer = NULL;
-	//int sz = 0;
-	//buffer = (const char *)COM_LoadFile( metafile, 5, &sz );
-//	if ( buffer )
-//	{
-		m_lFileTime = g_pFileSystem->GetFileTime( metafile );
+	m_lFileTime = g_pFileSystem->GetFileTime( metafile );
 
-		KeyValues *kv = new KeyValues( metafile );
-		Assert( kv );
-		if ( kv )
+	KeyValuesAD kv( metafile );
+	Assert( kv );
+	if ( kv )
+	{
+		if ( kv->LoadFromFile( g_pFullFileSystem, metafile ) )
 		{
-			if ( kv->LoadFromFile( g_pFullFileSystem, metafile ) )
+			// Iterate over all metaclasses...
+			KeyValues* pIter = kv->GetFirstSubKey();
+			while( pIter )
 			{
-				// Iterate over all metaclasses...
-				KeyValues* pIter = kv->GetFirstSubKey();
-				while( pIter )
+				char factorytouse[ 512 ];
+				V_strcpy_safe( factorytouse, pIter->GetName() );
+
+				// New format is to put numbers in here
+				if ( atoi( factorytouse ) > 0 )
 				{
-					char factorytouse[ 512 ];
-					
-					Q_strncpy( factorytouse, pIter->GetName(), sizeof( factorytouse ) );
-
-					// New format is to put numbers in here
-					if ( atoi( factorytouse ) > 0 )
-					{
-						Q_strncpy( factorytouse, pIter->GetString( "factory", "" ), sizeof( factorytouse ) );
-					}
-
-					CBaseDemoAction *action = CBaseDemoAction::CreateDemoAction( CBaseDemoAction::TypeForName( factorytouse ) );
-					if ( action )
-					{
-						if ( !action->Init( pIter ) )
-						{
-							delete action;
-						}
-						else
-						{
-							m_ActionStack.AddToTail( action );
-						}
-					}
-
-					pIter = pIter->GetNextKey();
+					V_strcpy_safe( factorytouse, pIter->GetString( "factory", "" ) );
 				}
-			}
-			else
-			{
-				SaveToFile();
+
+				CBaseDemoAction *action = CBaseDemoAction::CreateDemoAction( CBaseDemoAction::TypeForName( factorytouse ) );
+				if ( action )
+				{
+					if ( !action->Init( pIter ) )
+					{
+						delete action;
+					}
+					else
+					{
+						m_ActionStack.AddToTail( action );
+					}
+				}
+
+				pIter = pIter->GetNextKey();
 			}
 		}
-
-//	}
-//	else
-//	{
-		// This will save out an empty .vdm of the proper name
-//		SaveToFile();
-//	}
+		else
+		{
+			SaveToFile();
+		}
+	}
 
 	OnVDMLoaded( m_szCurrentFile );
 
@@ -199,13 +187,13 @@ void CDemoActionManager::StartPlaying( char const *demfilename )
 
 	bool changedfile = Q_strcasecmp( demfilename, m_szCurrentFile ) != 0;
 
-	Q_strncpy( m_szCurrentFile, demfilename, sizeof( m_szCurrentFile ) );
+	V_strcpy_safe( m_szCurrentFile, demfilename );
 
 	char metafile[ 512 ];
-	Q_StripExtension( demfilename, metafile, sizeof( metafile ) );
-	Q_DefaultExtension( metafile, ".vdm", sizeof( metafile ) );
+	V_StripExtension( demfilename, metafile );
+	V_DefaultExtension( metafile, ".vdm" );
 
-	long filetime = g_pFileSystem->GetFileTime( metafile );
+	time_t filetime = g_pFileSystem->GetFileTime( metafile );
 
 	// If didn't change file and the timestamps are the same, don't transition to new .vdm
 	if ( !changedfile && ( m_lFileTime == filetime ) )
@@ -241,11 +229,9 @@ void CDemoActionManager::ClearAll()
 //-----------------------------------------------------------------------------
 void CDemoActionManager::StopPlaying()
 {
-	int count = m_ActionStack.Count();
-	for ( int i = 0; i < count; i++ )
+	for ( auto *action : m_ActionStack )
 	{
-		CBaseDemoAction *a = m_ActionStack[ i ];
-		a->Reset();
+		action->Reset();
 	}
 
 	// Reset counters
@@ -263,7 +249,7 @@ void CDemoActionManager::StopPlaying()
 void CDemoActionManager::Update(  bool newframe, int demotick, float demotime )
 {
 	// Nothing to do?
-	int count = m_ActionStack.Count();
+	intp count = m_ActionStack.Count();
 	if ( count <= 0 )
 		return;
 
@@ -274,10 +260,8 @@ void CDemoActionManager::Update(  bool newframe, int demotick, float demotime )
 	ctx.prevtime = m_flPrevTime;
 	ctx.curtime = demotime;
 
-	int i;
-	for ( i = 0; i < count; i++ )
+	for ( auto *action : m_ActionStack )
 	{
-		CBaseDemoAction *action = m_ActionStack[ i ];
 		Assert( action );
 		if ( !action )
 			continue;
@@ -298,16 +282,16 @@ void CDemoActionManager::SaveToBuffer( CUtlBuffer& buf )
 	buf.Printf( "demoactions\n" );
 	buf.Printf( "{\n" );
 
-	int count = m_ActionStack.Count();
-	int i;
-	for ( i = 0; i < count; i++ )
+	intp i = 0;
+	for ( auto *action : m_ActionStack )
 	{
-		CBaseDemoAction *action = m_ActionStack[ i ];
 		Assert( action );
 		if ( !action )
 			continue;
 
 		action->SaveToBuffer( 1, i + 1, buf );
+
+		++i;
 	}
 
 	buf.Printf( "}\n" );
@@ -328,16 +312,15 @@ void CDemoActionManager::SaveToFile( void )
 		return;
 
 	char metafile[ 512 ];
-	Q_StripExtension( m_szCurrentFile, metafile, sizeof( metafile ) );
-	Q_DefaultExtension( metafile, ".vdm", sizeof( metafile ) );
+	V_StripExtension( m_szCurrentFile, metafile );
+	V_DefaultExtension( metafile, ".vdm" );
 
 	// Save data
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	SaveToBuffer( buf );
 
 	// Write to file
-	FileHandle_t fh;
-	fh = g_pFileSystem->Open( metafile, "w" );
+	FileHandle_t fh = g_pFileSystem->Open( metafile, "w" );
 	if ( fh != FILESYSTEM_INVALID_HANDLE )
 	{
 		g_pFileSystem->Write( buf.Base(), buf.TellPut(), fh );
@@ -460,11 +443,8 @@ void CDemoActionManager::InsertFireEvent( CBaseDemoAction *action )
 //-----------------------------------------------------------------------------
 void CDemoActionManager::DispatchEvents()
 {
-	int c = m_PendingFireActionStack.Count();
-	int i;
-	for ( i = 0; i < c; i++ )
+	for ( auto *action : m_PendingFireActionStack )
 	{
-		CBaseDemoAction *action = m_PendingFireActionStack[ i ];
 		Assert( action );
 		action->FireAction();
 		action->SetActionFired( true );

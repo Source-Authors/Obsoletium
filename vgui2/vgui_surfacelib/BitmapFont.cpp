@@ -70,8 +70,8 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 
 	CUtlSymbol symbol;
 	char fontName[MAX_PATH];
-	Q_FileBase( pFontFilename, fontName, MAX_PATH );
-	Q_strlower( fontName );
+	V_FileBase( pFontFilename, fontName );
+	V_strlower( fontName );
 	symbol = fontName;
 
 	// find a match that can use same entries
@@ -102,14 +102,6 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 		{
 			// bad version
 			return false;
-		}
-
-		if ( IsX360() )
-		{
-			CByteswap swap;
-			swap.ActivateByteSwapping( true );
-			swap.SwapFieldsToTargetEndian( (BitmapFont_t*)pBuf );
-			swap.SwapFieldsToTargetEndian( (BitmapGlyph_t*)((char*)pBuf + sizeof( BitmapFont_t )), ((BitmapFont_t*)pBuf)->m_NumGlyphs );
 		}
 
 		// create it
@@ -207,7 +199,7 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 bool CBitmapFont::IsEqualTo( const char *windowsFontName, float scalex, float scaley, int flags )
 {
 	char fontname[MAX_PATH];
-	Q_FileBase( windowsFontName, fontname, MAX_PATH );
+	V_FileBase( windowsFontName, fontname );
 
 	if ( !Q_stricmp( fontname, m_szName.String() ) &&
 		m_scalex == scalex && 
@@ -236,7 +228,7 @@ void CBitmapFont::SetScale( float sx, float sy )
 //-----------------------------------------------------------------------------
 // Purpose: gets the abc widths for a character
 //-----------------------------------------------------------------------------
-void CBitmapFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
+void CBitmapFont::GetCharABCWidths( wchar_t ch, int &a, int &b, int &c )
 {
 	Assert( IsValid() && ch >= 0 && ch <= 255 );
 
@@ -274,7 +266,7 @@ void CBitmapFont::GetKernedCharWidth( wchar_t ch, wchar_t, wchar_t, float &wide,
 //-----------------------------------------------------------------------------
 // Purpose: gets the texcoords for a character
 //-----------------------------------------------------------------------------
-void CBitmapFont::GetCharCoords( int ch, float *left, float *top, float *right, float *bottom )
+void CBitmapFont::GetCharCoords( wchar_t ch, float *left, float *top, float *right, float *bottom )
 {
 	Assert( IsValid() && ch >= 0 && ch <= 255 );
 

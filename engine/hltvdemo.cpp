@@ -74,19 +74,18 @@ void CHLTVDemoRecorder::StartRecording( const char *filename, bool bContinuously
 	// open demo header file containing sigondata
 	Q_memset( dh, 0, sizeof(demoheader_t));
 
-	Q_strncpy( dh->demofilestamp, DEMO_HEADER_ID, sizeof(dh->demofilestamp) );
+	V_strcpy_safe( dh->demofilestamp, DEMO_HEADER_ID );
 	dh->demoprotocol = DEMO_PROTOCOL;
 	dh->networkprotocol = PROTOCOL_VERSION;
 
-	Q_strncpy( dh->mapname, hltv->GetMapName(), sizeof( dh->mapname ) );
+	V_strcpy_safe( dh->mapname, hltv->GetMapName() );
 
 	char szGameDir[MAX_OSPATH];
-	Q_strncpy(szGameDir, com_gamedir, sizeof( szGameDir ) );
-	Q_FileBase ( szGameDir, dh->gamedirectory, sizeof( dh->gamedirectory ) );
+	V_strcpy_safe(szGameDir, com_gamedir );
+	Q_FileBase ( szGameDir, dh->gamedirectory );
 
-	Q_strncpy( dh->servername, host_name.GetString(), sizeof( dh->servername ) );
-
-	Q_strncpy( dh->clientname, "SourceTV Demo", sizeof( dh->servername ) );
+	V_strcpy_safe( dh->servername, host_name.GetString() );
+	V_strcpy_safe( dh->clientname, "SourceTV Demo" );
 
 	// write demo file header info
 	m_DemoFile.WriteDemoHeader();

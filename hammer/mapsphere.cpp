@@ -46,11 +46,11 @@ CMapClass *CMapSphere::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		const char *pszKeyName = pHelperInfo->GetParameter(0);
 		if (pszKeyName != NULL)
 		{
-			strcpy(pSphere->m_szKeyName, pszKeyName);
+			V_strcpy_safe(pSphere->m_szKeyName, pszKeyName);
 		}
 		else
 		{
-			strcpy(pSphere->m_szKeyName, "radius");
+			V_strcpy_safe(pSphere->m_szKeyName, "radius");
 		}
 
 		//
@@ -165,7 +165,7 @@ CMapClass *CMapSphere::CopyFrom(CMapClass *pObject, bool bUpdateDependencies)
 	CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
 	m_flRadius = pFrom->m_flRadius;
-	strcpy(m_szKeyName, pFrom->m_szKeyName);
+	V_strcpy_safe(m_szKeyName, pFrom->m_szKeyName);
 
 	return(this);
 }
@@ -183,7 +183,7 @@ void CMapSphere::SetRadius(float flRadius)
 	if (pEntity != NULL)
 	{
 		char szValue[80];
-		sprintf(szValue, "%g", m_flRadius);
+		V_sprintf_safe(szValue, "%g", m_flRadius);
 		pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 	}
 }

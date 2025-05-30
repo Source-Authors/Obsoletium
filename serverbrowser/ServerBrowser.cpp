@@ -396,11 +396,9 @@ void LoadGameTypes( void )
 
 	#define GAMETYPES_FILE				"servers/ServerBrowserGameTypes.txt"
 
-	KeyValues * kv = new KeyValues( GAMETYPES_FILE );
-
+	KeyValuesAD kv( GAMETYPES_FILE );
 	if  ( !kv->LoadFromFile( g_pFullFileSystem, GAMETYPES_FILE, "MOD" ) )
 	{
-		kv->deleteThis();
 		return;
 	}
 
@@ -414,9 +412,6 @@ void LoadGameTypes( void )
 		gametype.pGametypeName = CloneString( pData->GetString( "name", "" ) );
 		g_GameTypes.AddToTail( gametype );
 	}
-	
-
-	kv->deleteThis();
 }
 
 const char *GetGameTypeName( const char *pMapName )

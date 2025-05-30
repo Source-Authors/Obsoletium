@@ -87,7 +87,7 @@ static inline void RecordSpriteSpray( const Vector& start, const Vector &directi
 		const model_t* pModel = (nModelIndex != 0) ? modelinfo->GetModel( nModelIndex ) : NULL;
 		const char *pModelName = pModel ? modelinfo->GetModelName( pModel ) : "";
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_SPRITE_SPRAY );
  		msg->SetString( "name", "TE_SpriteSpray" );
@@ -104,7 +104,6 @@ static inline void RecordSpriteSpray( const Vector& start, const Vector &directi
  		msg->SetInt( "count", nCount );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

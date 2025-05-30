@@ -10,7 +10,7 @@
 #include "appframework/ilaunchermgr.h"
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #include "winlite.h"
 #include <Psapi.h>
 #endif
@@ -61,6 +61,7 @@
 #include "appframework/IAppSystemGroup.h"
 #include "tier0/systeminformation.h"
 #include "host_cmd.h"
+#include "posix_file_stream.h"
 #ifdef _WIN32
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #endif
@@ -83,16 +84,18 @@
 #include "cl_steamauth.h"
 #endif // SWDS
 
+#include "scoped_app_locale.h"
+
 #if defined(_WIN32)
 #include <eh.h>
 #include <thread>
 #endif
 
+#include <chrono>
+
 #if POSIX
 #include <dlfcn.h>
 #endif
-
-#include "xbox/xboxstubs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -331,7 +334,7 @@ template< int _SIZE >
 class CErrorText
 {
 public:
-	CErrorText() : m_bIsDedicatedServer( false ) {}
+	CErrorText() : m_bIsDedicatedServer(false) { m_errorText[0] = '\0'; }
 	~CErrorText() = default;
 
 	void Steam_SetMiniDumpComment()
@@ -352,8 +355,7 @@ public:
 		va_start( args, fmt );
 		
 		size_t len = strlen( m_errorText );
-		vsnprintf( m_errorText + len, sizeof( m_errorText ) - len - 1, fmt, args );
-		m_errorText[ sizeof( m_errorText ) - 1 ] = 0;
+		V_vsnprintf( m_errorText + len, sizeof( m_errorText ) - len, fmt, args );
 
 		va_end( args );
 	}
@@ -682,6 +684,8 @@ static void PosixPreMinidumpCallback( void *context )
 //-----------------------------------------------------------------------------
 // steam.inf keys.
 #define VERSION_KEY				"PatchVersion="
+// dimhotepus: Read client version as it is present in modern engine.
+#define CLIENT_VERSION_KEY		"ClientVersion="
 #define PRODUCT_KEY				"ProductName="
 #define SERVER_VERSION_KEY		"ServerVersion="
 #define APPID_KEY				"AppID="
@@ -715,9 +719,9 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 	bool bFoundInf = false;
 	if ( g_pFileSystem )
 	{
-		FileHandle_t fh;
-		fh = g_pFileSystem->Open( "steam.inf", "rb", "GAME" );
+		FileHandle_t fh = g_pFileSystem->Open( "steam.inf", "rb", "GAME" );
 		bFoundInf = fh && g_pFileSystem->ReadToBuffer( fh, infBuf );
+		if (fh) g_pFileSystem->Close(fh);
 	}
 
 	if ( !bFoundInf )
@@ -725,26 +729,32 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		// We may try to load the steam.inf BEFORE we turn on the filesystem, so use raw filesystem API's here.
 		char szFullPath[ MAX_PATH ] = { 0 };
 		char szModSteamInfPath[ MAX_PATH ] = { 0 };
-		V_ComposeFileName( pchMod, "steam.inf", szModSteamInfPath, sizeof( szModSteamInfPath ) );
-		V_MakeAbsolutePath( szFullPath, sizeof( szFullPath ), szModSteamInfPath, pchBaseDir );
+		V_ComposeFileName( pchMod, "steam.inf", szModSteamInfPath );
+		V_MakeAbsolutePath( szFullPath, szModSteamInfPath, pchBaseDir );
 
 		// Try opening steam.inf
-		FILE *fp = fopen( szFullPath, "rb" );
-		if ( fp )
+		auto [f, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
+		if ( !errc )
 		{
-			// Read steam.inf data.
-			fseek( fp, 0, SEEK_END );
-			size_t bufsize = ftell( fp );
-			fseek( fp, 0, SEEK_SET );
+			int64_t bufsize = -1;
+			std::tie(bufsize, errc) = f.size();
 
-			infBuf.EnsureCapacity( bufsize + 1 );
+			const intp correctedBufferSize = static_cast<intp>(bufsize);
 
-			size_t iBytesRead = fread( infBuf.Base(), 1, bufsize, fp );
-			(infBuf.Base<char>())[iBytesRead] = 0;
-			infBuf.SeekPut( CUtlBuffer::SEEK_CURRENT, iBytesRead + 1 );
-			fclose( fp );
+			size_t iBytesRead = 0;
+			if ( !errc && bufsize < std::numeric_limits<intp>::max() )
+			{
+				infBuf.EnsureCapacity( correctedBufferSize + 1 );
 
-			bFoundInf = ( iBytesRead == bufsize );
+				std::tie(iBytesRead, errc) = f.read( infBuf.Base<char>(), correctedBufferSize + 1 );
+			}
+
+			if ( !errc && bufsize < std::numeric_limits<intp>::max() )
+			{
+				infBuf.SeekPut( CUtlBuffer::SEEK_CURRENT, iBytesRead + 1 );
+			}
+
+			bFoundInf = static_cast<intp>(iBytesRead) == correctedBufferSize;
 		}
 	}
 
@@ -760,15 +770,23 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 			if ( !Q_strnicmp( com_token, VERSION_KEY, ssize( VERSION_KEY ) - 1 ) )
 			{
 				V_strcpy_safe( VerInfo.szVersionString, com_token + ssize( VERSION_KEY ) - 1 );
+				// Use version as client version by default.
 				VerInfo.ClientVersion = atoi( VerInfo.szVersionString );
 			}
-			else if ( !Q_strnicmp( com_token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
+			// dimhotepus: Explicitly read client version if present.
+			else if ( !Q_strnicmp( com_token, CLIENT_VERSION_KEY, ssize( CLIENT_VERSION_KEY ) - 1 ) )
 			{
-				V_strcpy_safe( VerInfo.szProductString, com_token + ssize( PRODUCT_KEY ) - 1 );
+				char szClientVersion[32];
+				V_strcpy_safe( szClientVersion, com_token + ssize( CLIENT_VERSION_KEY ) - 1 );
+				VerInfo.ClientVersion = atoi( szClientVersion );
 			}
 			else if ( !Q_strnicmp( com_token, SERVER_VERSION_KEY, ssize( SERVER_VERSION_KEY ) - 1 ) )
 			{
 				VerInfo.ServerVersion = atoi( com_token + ssize( SERVER_VERSION_KEY ) - 1 );
+			}
+			else if ( !Q_strnicmp( com_token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
+			{
+				V_strcpy_safe( VerInfo.szProductString, com_token + ssize( PRODUCT_KEY ) - 1 );
 			}
 			else if ( !Q_strnicmp( com_token, APPID_KEY, ssize( APPID_KEY ) - 1 ) )
 			{
@@ -791,25 +809,30 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		// breakpad there when we hit this case)
 		char szModGameinfoPath[ MAX_PATH ] = { 0 };
 		char szFullPath[ MAX_PATH ] = { 0 };
-		V_ComposeFileName( pchMod, "gameinfo.txt", szModGameinfoPath, sizeof( szModGameinfoPath ) );
-		V_MakeAbsolutePath( szFullPath, sizeof( szFullPath ), szModGameinfoPath, pchBaseDir );
+		V_ComposeFileName( pchMod, "gameinfo.txt", szModGameinfoPath );
+		V_MakeAbsolutePath( szFullPath, szModGameinfoPath, pchBaseDir );
 
 		// Try opening gameinfo.txt
-		FILE *fp = fopen( szFullPath, "rb" );
-		if( fp )
+		auto [f, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
+		if ( !errc )
 		{
-			fseek( fp, 0, SEEK_END );
-			size_t bufsize = ftell( fp );
-			fseek( fp, 0, SEEK_SET );
+			int64_t bufsize = -1;
+			std::tie(bufsize, errc) = f.size();
 
-			char *buffer = ( char * )_alloca( bufsize + 1 );
+			const intp correctedBufferSize = static_cast<intp>(bufsize);
 
-			size_t iBytesRead = fread( buffer, 1, bufsize, fp );
-			buffer[ iBytesRead ] = 0;
-			fclose( fp );
+			char *buffer = stackallocT(char, correctedBufferSize + 1);
+
+			size_t iBytesRead = 0;
+			if ( !errc && bufsize < std::numeric_limits<intp>::max() )
+			{
+				std::tie(iBytesRead, errc) = f.read( buffer, correctedBufferSize + 1 );
+			}
 
 			KeyValuesAD pkvGameInfo( "gameinfo" );
-			if ( pkvGameInfo->LoadFromBuffer( "gameinfo.txt", buffer ) )
+			if ( !errc &&
+				bufsize <= std::numeric_limits<intp>::max() &&
+				pkvGameInfo->LoadFromBuffer( "gameinfo.txt", buffer ) )
 			{
 				VerInfo.AppID = (AppId_t)pkvGameInfo->GetInt( "FileSystem/SteamAppId", k_uAppIdInvalid );
 			}
@@ -824,17 +847,21 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 
 	if ( VerInfo.AppID )
 	{
+		constexpr char appidFile[]{"steam_appid.txt"};
 		// steamclient.dll doesn't know about steam.inf files in mod folder,
 		// it accepts a steam_appid.txt in the root directory if the game is
 		// not started through Steam. So we create one there containing the
 		// current AppID
-		FILE *fh = fopen( "steam_appid.txt", "wb" );
-		if ( fh  )
+		auto [fh, errc] = se::posix::posix_file_stream_factory::open( appidFile, "wb" );
+		if ( !errc )
 		{
-			CFmtStrN< 128 > strAppID( "%u\n", VerInfo.AppID );
-
-			fwrite( strAppID.Get(), strAppID.Length() + 1, 1, fh );
-			fclose( fh );
+			std::tie(std::ignore, errc) = fh.print("%u\n", VerInfo.AppID);
+		}
+		
+		if ( errc )
+		{
+			Warning( "Failed to write Steam app id %u to '%s': %s.\n",
+				VerInfo.AppID, appidFile, errc.message().c_str() );
 		}
 	}
 
@@ -1083,7 +1110,7 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 
 	m_bSupportsVR = false;
 
-	KeyValues::AutoDelete modinfo = KeyValues::AutoDelete("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		// Enable file tracking - client always does this in case it connects to a pure server.
@@ -1531,7 +1558,8 @@ bool CEngineAPI::InitVR()
 			// let this client connect to secure servers.
 			if ( !Host_AllowLoadModule( "sourcevr" DLL_EXT_STRING, "EXECUTABLE_PATH", false ) )
 			{
-				Warning( "Preventing connections to secure servers because sourcevr.dll is not signed.\n" );
+
+				Warning( "Preventing connections to secure servers because sourcevr" DLL_EXT_STRING " is not signed.\n" );
 				Host_DisallowSecureServers();
 			}
 		}
@@ -2017,6 +2045,15 @@ bool CModAppSystemGroup::PreInit()
 void SV_ShutdownGameDLL();
 int CModAppSystemGroup::Main()
 {
+	// dimhotepus: Always set locale to utf8 one.
+	const char kEnUsUtf8Locale[] = "en_US.UTF-8";
+	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(),
+					kEnUsUtf8Locale)) {
+		Warning("setlocale('%s') failed, current locale is '%s'.\n",
+				kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+	}
+
 	int nRunResult = RUN_OK;
 
 	if ( IsServerOnly() )
@@ -2127,6 +2164,7 @@ int g_bTotalDumps = 0;
 
 void LongTickWatcherThread()
 {
+	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("LongTickWatcher");
 
 	int nLastTick = 0;

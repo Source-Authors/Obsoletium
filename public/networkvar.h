@@ -12,7 +12,7 @@
 
 
 #include "tier0/dbg.h"
-#include "convar.h"
+#include "tier1/convar.h"
 #include "Color.h"
 
 #if defined( CLIENT_DLL ) || defined( GAME_DLL )
@@ -31,7 +31,7 @@
 
 
 
-inline int InternalCheckDeclareClass( const char *pClassName, const char *pClassNameMatch, void *pTestPtr, void *pBasePtr )
+inline int InternalCheckDeclareClass( [[maybe_unused]] const char *pClassName, [[maybe_unused]] const char *pClassNameMatch, [[maybe_unused]] void *pTestPtr, [[maybe_unused]] void *pBasePtr )
 {
 	// This makes sure that casting from ThisClass to BaseClass works right. You'll get a compiler error if it doesn't
 	// work at all, and you'll get a runtime error if you use multiple inheritance.
@@ -40,7 +40,7 @@ inline int InternalCheckDeclareClass( const char *pClassName, const char *pClass
 	// This is triggered by IMPLEMENT_SERVER_CLASS. It does DLLClassName::CheckDeclareClass( #DLLClassName ).
 	// If they didn't do a DECLARE_CLASS in DLLClassName, then it'll be calling its base class's version
 	// and the class names won't match.
-	Assert( (void*)pClassName == (void*)pClassNameMatch );
+	Assert( pClassName == pClassNameMatch );
 	return 0;
 }
 
@@ -685,6 +685,7 @@ private:
 			NetworkStateChanged(); \
 			return m_Value; \
 		} \
+		constexpr intp Size() const { return length; }; \
 	protected: \
 		inline void NetworkStateChanged() \
 		{ \

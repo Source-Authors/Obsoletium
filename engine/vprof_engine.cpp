@@ -20,7 +20,6 @@
 #include "vgui_baseui_interface.h"
 #include "vgui_vprofpanel.h"
 #endif
-#include "utlvector.h"
 #include "sv_remoteaccess.h"
 #include "ivprofexport.h"
 #include "vprof_record.h"
@@ -60,8 +59,8 @@ static void ExecuteDeferredOp()
 	}
 }
 	
-const double MAX_SPIKE_REPORT = 1.0;
-const int MAX_SPIKE_REPORT_FRAMES = 10;
+constexpr inline double MAX_SPIKE_REPORT = 1.0;
+constexpr inline int MAX_SPIKE_REPORT_FRAMES = 10;
 static double LastSpikeTime = 0;
 static int LastSpikeFrame = 0;
 //bool g_VProfSignalSpike; // used by xbox
@@ -236,10 +235,9 @@ void PreUpdateProfile( float filteredtime )
 		{
 			if( g_VProfCurrentProfile.GetCounterGroup( i ) != ( nCounterType - 1 ) )
 				continue;
-			const char *pName;
-			intp val;
-			pName = g_VProfCurrentProfile.GetCounterNameAndValue( i, val );
-			Con_NPrintf( nprintIndex, "%s = %d\n", pName, val );
+			uintp val;
+			const char *pName = g_VProfCurrentProfile.GetCounterNameAndValue( i, val );
+			Con_NPrintf( nprintIndex, "%s = %zu\n", pName, val );
 			nprintIndex++;
 		}
 	}
@@ -1047,7 +1045,7 @@ struct VProfListenInfo_t
 	float m_flLastSentVProfDataTime;
 	CUtlVector< CUtlString > m_SentGroups;
 
-	VProfListenInfo_t() : m_flLastSentVProfDataTime( 0.0f ) {}
+	VProfListenInfo_t() : m_nListenerId{std::numeric_limits<ra_listener_id>::max()}, m_flLastSentVProfDataTime( 0.0f ) {}
 	VProfListenInfo_t( ra_listener_id nListenerId ) : m_nListenerId( nListenerId ), m_flLastSentVProfDataTime( 0.0f ) {}
 	bool operator==( const VProfListenInfo_t& src ) const { return src.m_nListenerId == m_nListenerId; }
 

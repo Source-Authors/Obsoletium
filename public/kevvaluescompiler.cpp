@@ -16,7 +16,7 @@ bool CRunTimeKeyValuesStringTable::ReadStringTable( int numStrings, CUtlBuffer& 
 	CUtlVector< int > offsets;
 	offsets.EnsureCapacity( numStrings );
 
-	offsets.CopyArray( (int *)( buf.PeekGet() ), numStrings );
+	offsets.CopyArray( (const int *)( buf.PeekGet() ), numStrings );
 
 	// Skip over data
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, buf.TellGet() + numStrings * sizeof( int ) );
@@ -36,7 +36,7 @@ bool CRunTimeKeyValuesStringTable::ReadStringTable( int numStrings, CUtlBuffer& 
 	return true;
 }
 
-void CCompiledKeyValuesWriter::BuildKVData_R( KeyValues *kv, int parent )
+void CCompiledKeyValuesWriter::BuildKVData_R( KeyValues *kv, intp parent )
 {
 	// Add self
 	KVInfo_t info;
@@ -96,14 +96,15 @@ void CCompiledKeyValuesWriter::AppendKeyValuesFile( char const *filename )
 	kvf.filename = m_StringTable.AddString( filename );
 	kvf.firstElement = m_Data.Count();
 
-	KeyValues *kv = new KeyValues( filename );
-	if ( kv->LoadFromFile( g_pFullFileSystem, filename ) )
 	{
-		// Add to dictionary
-		// do a depth first traversal of the keyvalues
-		BuildKVData_R( kv, -1 );
+		KeyValuesAD kv( filename );
+		if ( kv->LoadFromFile( g_pFullFileSystem, filename ) )
+		{
+			// Add to dictionary
+			// do a depth first traversal of the keyvalues
+			BuildKVData_R( kv, -1 );
+		}
 	}
-	kv->deleteThis();
 
 	kvf.numElements = m_Data.Count() - kvf.firstElement;
 
@@ -114,9 +115,9 @@ void CCompiledKeyValuesWriter::AppendKeyValuesFile( char const *filename )
 
 void CCompiledKeyValuesWriter::WriteData( CUtlBuffer& buf )
 {
-	int c = m_Data.Count();
+	intp c = m_Data.Count();
 	buf.PutInt( c );
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		KVInfo_t &info = m_Data[ i ];
 		buf.PutShort( info.key );
@@ -128,9 +129,9 @@ void CCompiledKeyValuesWriter::WriteData( CUtlBuffer& buf )
 
 void CCompiledKeyValuesWriter::WriteFiles( CUtlBuffer &buf )
 {
-	int c = m_Files.Count();
+	intp c = m_Files.Count();
 	buf.PutInt( c );
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		KVFile_t &file = m_Files[ i ];
 		buf.PutShort( file.filename );
@@ -200,7 +201,7 @@ int CCompiledKeyValuesReader::InvalidIndex() const
 	return m_Dict.InvalidIndex();
 }
 
-void CCompiledKeyValuesReader::GetFileName( int index, char *buf, size_t bufsize )
+void CCompiledKeyValuesReader::GetFileName( int index, OUT_Z_CAP(bufsize) char *buf, intp bufsize )
 {
 	Assert( buf );
 	buf[ 0 ] = 0;
@@ -307,7 +308,7 @@ bool CCompiledKeyValuesReader::CreateInPlaceFromData( KeyValues& head, const Fil
 		{
 			CreateHelper_t search;
 			search.index = info.GetParent();
-			int idx = helper.Find( search );
+			auto idx = helper.Find( search );
 			if ( idx == helper.InvalidIndex() )
 			{
 				return NULL;
@@ -381,7 +382,7 @@ bool CCompiledKeyValuesReader::InstanceInPlace( KeyValues& head, char const *kvf
 	FileInfo_t search;
 	search.hFile = g_pFullFileSystem->FindOrAddFileName( sz );
 
-	int idx = m_Dict.Find( search );
+	auto idx = m_Dict.Find( search );
 	if ( idx == m_Dict.InvalidIndex() )
 	{
 		return false;
@@ -401,7 +402,7 @@ KeyValues *CCompiledKeyValuesReader::Instance( char const *kvfilename )
 	FileInfo_t search;
 	search.hFile = g_pFullFileSystem->FindOrAddFileName( sz );
 
-	int idx = m_Dict.Find( search );
+	auto idx = m_Dict.Find( search );
 	if ( idx == m_Dict.InvalidIndex() )
 	{
 		return NULL;
@@ -412,23 +413,25 @@ KeyValues *CCompiledKeyValuesReader::Instance( char const *kvfilename )
 	return CreateFromData( info );
 }
 
-bool CCompiledKeyValuesReader::LookupKeyValuesRootKeyName( char const *kvfilename, char *outbuf, size_t bufsize )
+bool CCompiledKeyValuesReader::LookupKeyValuesRootKeyName( char const *kvfilename, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize )
 {
 	char sz[ 512 ];
-	Q_strncpy( sz, kvfilename, sizeof( sz ) );
-	Q_FixSlashes( sz );
+	V_strcpy_safe( sz, kvfilename );
+	V_FixSlashes( sz );
 
 	FileInfo_t search;
 	search.hFile = g_pFullFileSystem->FindOrAddFileName( sz );
 
-	int idx = m_Dict.Find( search );
+	auto idx = m_Dict.Find( search );
 	if ( idx == m_Dict.InvalidIndex() )
 	{
+		// dimhotepus: Ensure zero-terminate.
+		if (bufsize) outbuf[0] = '\0';
 		return false;
 	}
 
 	const FileInfo_t& info = m_Dict[ idx ];
 
-	Q_strncpy( outbuf, m_StringTable.Lookup( m_Data[ info.nFirstIndex ].key ), bufsize );
+	V_strncpy( outbuf, m_StringTable.Lookup( m_Data[ info.nFirstIndex ].key ), bufsize );
 	return true;
 }

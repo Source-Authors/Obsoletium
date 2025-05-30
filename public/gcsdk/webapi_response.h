@@ -467,8 +467,7 @@ public:
 
 	void Copy( const CWebAPIValues *pwav )
 	{
-		if ( m_pwav )
-			delete m_pwav;
+		delete m_pwav;
 
 		if ( pwav )
 		{

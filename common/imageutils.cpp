@@ -46,7 +46,6 @@ extern void longjmp( jmp_buf, int ) __attribute__((noreturn));
 	extern class IGameUIFuncs *gameuifuncs;
 	extern class IEngineSound *enginesound;
 	extern class IMatchmaking *matchmaking;
-	extern class IXboxSystem  *xboxsystem;
 	extern class IAchievementMgr *achievementmgr; 
 	extern class CSteamAPIContext *steamapicontext;
 #elif REPLAY_DLL
@@ -76,16 +75,6 @@ extern void longjmp( jmp_buf, int ) __attribute__((noreturn));
 #ifdef OSX
 #include <copyfile.h>
 #endif
-
-#ifndef WIN32
-#define DeleteFile(s)	remove(s)
-#endif
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
-
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -1528,11 +1517,12 @@ static void DoCopyFile( const char *source, const char *destination )
 
 static void DoDeleteFile( const char *filename )
 {
-#ifdef WIN32
-	DeleteFile( filename );
-#else
-	unlink( filename );
-#endif
+	if ( unlink( filename ) )
+	{
+		Warning( "Unable to remove image file '%s': %s.\n",
+			filename,
+			std::generic_category().message(errno).c_str() );
+	}
 }
 
 ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const char *pMaterialsSubDir, int nMaxWidth/*=-1*/, int nMaxHeight/*=-1*/ )
@@ -1583,7 +1573,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 		do {
 			Q_snprintf(tgaPath, sizeof(tgaPath), "%stemp%d.tga", origpath, index);
 			++index;
-		} while (_access(tgaPath, 0) != -1);
+		} while (access(tgaPath, 0) != -1);
 
 
 		//  Convert the other formats to TGA

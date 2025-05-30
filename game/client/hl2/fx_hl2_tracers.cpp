@@ -471,7 +471,7 @@ void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (9-(i))/7) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -571,7 +571,7 @@ void MuzzleFlash_Chopper( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (10-(i))/7) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 	
@@ -633,7 +633,7 @@ void MuzzleFlash_Gunship( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 	pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * 10.0f/7.0f) * flScale );
 	pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	pParticle->m_flRollDelta	= 0.0f;
 	
 	// Grab the origin out of the transform for the attachment

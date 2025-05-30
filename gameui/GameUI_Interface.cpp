@@ -332,10 +332,19 @@ void CGameUI::BonusMapChallengeUpdate( const char *pchFileName, const char *pchM
 
 void CGameUI::BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName )
 {
+	BonusMapChallengeNames( pchFileName, ARRAYSIZE(BonusMapChallenge_t::szFileName),
+		pchMapName, ARRAYSIZE(BonusMapChallenge_t::szMapName),
+		pchChallengeName, ARRAYSIZE(BonusMapChallenge_t::szChallengeName) );
+}
+
+void CGameUI::BonusMapChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,
+		OUT_Z_CAP(mapSize) char *pchMapName, intp mapSize,
+		OUT_Z_CAP(challengeSize) char *pchChallengeName, intp challengeSize )
+{
 	if ( !pchFileName || !pchMapName || !pchChallengeName )
 		return;
 
-	BonusMapsDatabase()->GetCurrentChallengeNames( pchFileName, pchMapName, pchChallengeName );
+	BonusMapsDatabase()->GetCurrentChallengeNames( pchFileName, fileSize, pchMapName, mapSize, pchChallengeName, challengeSize );
 }
 
 void CGameUI::BonusMapChallengeObjectives( int &iBronze, int &iSilver, int &iGold )
@@ -835,12 +844,12 @@ void CGameUI::RunFrame()
 				KeyValues *pKV = new KeyValues("ActiveGameName" );
 				pKV->SetString( "name", pathSep + 1 );
 				pKV->SetInt( "appid", engine->GetAppID() );
-				KeyValues *modinfo = new KeyValues("ModInfo");
+
+				KeyValuesAD modinfo("ModInfo");
 				if ( modinfo->LoadFromFile( g_pFullFileSystem, "gameinfo.txt" ) )
 				{
 					pKV->SetString( "game", modinfo->GetString( "game", "" ) );
 				}
-				modinfo->deleteThis();
 				
 				g_VModuleLoader.PostMessageToAllModules( pKV );
 			}
@@ -1022,7 +1031,7 @@ void CGameUI::StopProgressBar(bool bError, const char *failureReason, const char
 	if (!g_hLoadingDialog.Get())
 		return;
 
-	if ( !IsX360() && bError )
+	if ( bError )
 	{
 		// turn the dialog to error display mode
 		g_hLoadingDialog->DisplayGenericError(failureReason, extendedReason);
@@ -1173,7 +1182,8 @@ void CGameUI::ShowLoadingBackgroundDialog()
 		vgui::ipanel()->PerformApplySchemeSettings( g_hLoadingBackgroundDialog );
 		vgui::ipanel()->SetVisible( g_hLoadingBackgroundDialog, true );		
 		vgui::ipanel()->MoveToFront( g_hLoadingBackgroundDialog );
-		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, new KeyValues( "activate" ), staticPanel->GetVPanel() );
+		// dimhotepus: Fix KeyValues leak.
+		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, KeyValuesAD( "activate" ), staticPanel->GetVPanel() );
 	}
 }
 
@@ -1187,7 +1197,8 @@ void CGameUI::HideLoadingBackgroundDialog()
 		vgui::ipanel()->SetParent( g_hLoadingBackgroundDialog, NULL );
 		vgui::ipanel()->SetVisible( g_hLoadingBackgroundDialog, false );		
 		vgui::ipanel()->MoveToBack( g_hLoadingBackgroundDialog );
-		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, new KeyValues( "deactivate" ), staticPanel->GetVPanel() );
+		// dimhotepus: Fix KeyValues leak.
+		vgui::ipanel()->SendMessage( g_hLoadingBackgroundDialog, KeyValuesAD( "deactivate" ), staticPanel->GetVPanel() );
 	}
 }
 

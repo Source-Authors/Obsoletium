@@ -21,29 +21,32 @@
 #elif defined( POSIX )
 #include <unistd.h>
 #include <sys/stat.h>
-#define _chdir chdir
-#define _access access
 #endif
 
 #include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/KeyValues.h"
 #include "tier0/icommandline.h"
+#include "posix_file_stream.h"
+
 #include "appframework/IAppSystemGroup.h"
+
+#include <atomic>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-constexpr char GAMEINFO_FILENAME[]{"gameinfo.txt"};
+constexpr inline char GAMEINFO_FILENAME[]{"gameinfo.txt"};
 
-static char g_FileSystemError[256];
-static bool s_bUseVProjectBinDir = false;
-static FSErrorMode_t g_FileSystemErrorMode = FS_ERRORMODE_VCONFIG;
+// dimhotepus: Thread-safe global state.
+static thread_local char g_FileSystemError[256];
+static std::atomic_bool s_bUseVProjectBinDir = false;
+static std::atomic<FSErrorMode_t> g_FileSystemErrorMode = FS_ERRORMODE_VCONFIG;
 
 // Call this to use a bin directory relative to VPROJECT
-void FileSystem_UseVProjectBinDir( bool bEnable )
+bool FileSystem_UseVProjectBinDir( bool bEnable )
 {
-	s_bUseVProjectBinDir = bEnable;
+	return s_bUseVProjectBinDir.exchange(bEnable, std::memory_order::memory_order_relaxed);
 }
 
 namespace {
@@ -133,13 +136,13 @@ public:
 	{
 		char valueString[4096];
 		va_list marker;
-		va_start( marker, pValue );
-		Q_vsnprintf( valueString, sizeof( valueString ), pValue, marker );
+		va_start( marker, pValue ); //-V2018 //-V2019
+		V_vsprintf_safe( valueString, pValue, marker );
 		va_end( marker );
 
 #ifdef WIN32
 		char str[4096];
-		Q_snprintf( str, sizeof( str ), "%s=%s", m_pVarName, valueString );
+		V_sprintf_safe( str, "%s=%s", m_pVarName, valueString );
 		bool ok = !_putenv( str );
 #else
 		bool ok = !setenv( m_pVarName, valueString, 1 );
@@ -157,7 +160,7 @@ public:
 	{
 #ifdef WIN32
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "%s=", m_pVarName );
+		V_sprintf_safe( str, "%s=", m_pVarName );
 		bool ok = !_putenv( str );
 #else
 		bool ok = !setenv( m_pVarName, "", 1 );
@@ -204,32 +207,21 @@ public:
 	CTempEnvVar m_Path;
 };
 
+}  // namespace
 
 // ---------------------------------------------------------------------------------------------------- //
 // Helpers.
 // ---------------------------------------------------------------------------------------------------- //
-template<size_t outSize>
-[[nodiscard]] bool Q_getwd( char (&out)[outSize] ) {
-#if defined( _WIN32 ) || defined( WIN32 )
-	bool ok = !!_getcwd( out, outSize );
+[[nodiscard]] bool Q_getwd( char *out, int outSize )
+{
+	const bool ok{!!_getcwd( out, outSize )};
 	if (ok)
 	{
-		V_strcat_safe( out, "\\" );
+		V_strncat( out, CORRECT_PATH_SEPARATOR_S, outSize );
 		Q_FixSlashes( out );
 	}
 	return ok;
-#else
-	bool ok = !!getcwd( out, outSize );
-	if (ok)
-	{
-		strcat( out, "/" );
-		Q_FixSlashes( out );
-	}
-	return ok;
-#endif
 }
-
-}  // namespace
 
 // ---------------------------------------------------------------------------------------------------- //
 // Module interface.
@@ -280,26 +272,30 @@ const char *FileSystem_GetLastErrorString()
 }
 
 
-KeyValues* ReadKeyValuesFile( const char *pFilename )
+static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 {
 	// Read in the gameinfo.txt file and null-terminate it.
-	FILE *fp = fopen( pFilename, "rb" );
-	if ( !fp )
-		return nullptr;
+	auto [fp, errc] = se::posix::posix_file_stream_factory::open(pFilename, "rb");
+	if ( errc )
+		return KeyValuesAD{ nullptr };
 	
-	fseek( fp, 0, SEEK_END );
-	CUtlVector<char> buf;
-	buf.SetSize( ftell( fp ) + 1 );
-	fseek( fp, 0, SEEK_SET );
-	fread( buf.Base(), 1, buf.Count()-1, fp );
-	fclose( fp );
-	buf[buf.Count()-1] = 0;
+	std::int64_t size;
+	std::tie(size, errc) = fp.size();
+	if ( errc || size > std::numeric_limits<intp>::max() - 1 )
+		return KeyValuesAD{ nullptr };
 
-	KeyValues *kv = new KeyValues( "" );
+	CUtlVector<char> buf;
+	buf.SetSize( static_cast<intp>(size) + 1 );
+
+	std::tie(std::ignore, errc) = fp.read( buf.Base(), static_cast<intp>(size) );
+	if ( errc )
+		return KeyValuesAD{ nullptr };
+
+	KeyValuesAD kv("");
+	// File system is not ready yet so load from buffer.
 	if ( !kv->LoadFromBuffer( pFilename, buf.Base() ) )
 	{
-		kv->deleteThis();
-		return nullptr;
+		return KeyValuesAD{ nullptr };
 	}
 	
 	return kv;
@@ -315,7 +311,7 @@ static bool Sys_GetExecutableName( char *out, unsigned len )
 #else
 	if ( CommandLine()->GetParm(0) )
 	{
-		Q_MakeAbsolutePath( out, len, CommandLine()->GetParm(0) );
+		V_MakeAbsolutePath( out, len, CommandLine()->GetParm(0) );
 	}
 	else
 	{
@@ -326,11 +322,12 @@ static bool Sys_GetExecutableName( char *out, unsigned len )
 	return true;
 }
 
-bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen )
+bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned exeDirLen )
 {
-	exedir[0] = '\0';
+	if ( exeDirLen )
+		exedir[0] = '\0';
 
-	if ( s_bUseVProjectBinDir )
+	if ( s_bUseVProjectBinDir.load(std::memory_order::memory_order_relaxed) )
 	{
 		const char *pProject = GetVProjectCmdLineValue();
 		if ( !pProject )
@@ -348,14 +345,14 @@ bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen )
 
 	if ( !Sys_GetExecutableName( exedir, exeDirLen ) )
 		return false;
-	Q_StripFilename( exedir );
 
-	Q_FixSlashes( exedir );
+	V_StripFilename( exedir );
+	V_FixSlashes( exedir );
 
 	// Return the bin directory as the executable dir if it's not in there
 	// because that's really where we're running from...
 	char ext[MAX_PATH];
-	Q_StrRight( exedir, 4, ext, sizeof( ext ) );
+	V_StrRight( exedir, 4, ext );
 	if ( ext[0] != CORRECT_PATH_SEPARATOR ||
 #ifdef PLATFORM_64BITS
 		Q_stricmp( ext+1, "x64" ) != 0
@@ -383,10 +380,10 @@ static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 	if ( FileSystem_GetExecutableDir( baseDir ) )
 	{
 #ifdef PLATFORM_64BITS
-		// dimhteopus: Need to strip x64, too.
-		Q_StripFilename( baseDir );
+		// dimhotepus: Need to strip x64, too.
+		V_StripFilename( baseDir );
 #endif
-		Q_StripFilename( baseDir );
+		V_StripFilename( baseDir );
 		return true;
 	}
 	
@@ -396,8 +393,10 @@ static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 static bool LaunchVConfig()
 {
 	char vconfigExe[MAX_PATH];
-	FileSystem_GetExecutableDir( vconfigExe );
-	Q_AppendSlash( vconfigExe, sizeof( vconfigExe ) );
+	if ( !FileSystem_GetExecutableDir( vconfigExe ) )
+		return false;
+
+	V_AppendSlash( vconfigExe );
 	V_strcat_safe( vconfigExe, "vconfig.exe" );
 
 	const char *argv[] =
@@ -415,18 +414,20 @@ const char* GetVProjectCmdLineValue()
 	return CommandLine()->ParmValue( "-vproject", CommandLine()->ParmValue( "-game" ) );
 }
 
-FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, const char *pMsg, ... )
+static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, const char *pMsg, ... )
 {
 	va_list marker;
-	va_start( marker, pMsg );
-	Q_vsnprintf( g_FileSystemError, sizeof( g_FileSystemError ), pMsg, marker );
+	va_start( marker, pMsg ); //-V2018 //-V2019
+	V_vsprintf_safe( g_FileSystemError, pMsg, marker );
 	va_end( marker );
 
 	Warning( "%s\n", g_FileSystemError );
 
 	// Run vconfig?
 	// Don't do it if they specifically asked for it not to, or if they manually specified a vconfig with -game or -vproject.
-	if ( bRunVConfig && g_FileSystemErrorMode == FS_ERRORMODE_VCONFIG && !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
+	if ( bRunVConfig &&
+		 g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG &&
+		 !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
 	{
 		if ( !LaunchVConfig() )
 		{
@@ -435,7 +436,8 @@ FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, co
 		}
 	}
 
-	if ( g_FileSystemErrorMode == FS_ERRORMODE_AUTO || g_FileSystemErrorMode == FS_ERRORMODE_VCONFIG )
+	const auto errorMode = g_FileSystemErrorMode.load(std::memory_order::memory_order_seq_cst);
+	if ( errorMode == FS_ERRORMODE_AUTO || errorMode == FS_ERRORMODE_VCONFIG )
 	{
 		Error( "%s\n", g_FileSystemError );
 	}
@@ -443,29 +445,28 @@ FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t retVal, co
 	return retVal;
 }
 
-FSReturnCode_t LoadGameInfoFile( 
+static FSReturnCode_t LoadGameInfoFile( 
 	const char *pDirectoryName, 
-	KeyValues *&pMainFile, 
-	KeyValues *&pFileSystemInfo, 
+	KeyValuesAD &pMainFile, 
 	KeyValues *&pSearchPaths )
 {
 	// If GameInfo.txt exists under pBaseDir, then this is their game directory.
 	// All the filesystem mappings will be in this file.
 	char gameinfoFilename[MAX_PATH];
 	V_strcpy_safe( gameinfoFilename, pDirectoryName );
-	Q_AppendSlash( gameinfoFilename, sizeof( gameinfoFilename ) );
+	V_AppendSlash( gameinfoFilename );
 	V_strcat_safe( gameinfoFilename, GAMEINFO_FILENAME );
 	Q_FixSlashes( gameinfoFilename );
+
 	pMainFile = ReadKeyValuesFile( gameinfoFilename );
 	if ( !pMainFile )
 	{
 		return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "%s is missing.", gameinfoFilename );
 	}
 
-	pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
+	auto *pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
 	if ( !pFileSystemInfo )
 	{
-		pMainFile->deleteThis();
 		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
 	}
 
@@ -473,9 +474,9 @@ FSReturnCode_t LoadGameInfoFile(
 	pSearchPaths = pFileSystemInfo->FindKey( "SearchPaths" );
 	if ( !pSearchPaths )
 	{
-		pMainFile->deleteThis();
 		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
 	}
+
 	return FS_OK;
 }
 
@@ -518,7 +519,8 @@ static void FileSystem_AddLoadedSearchPath(
 		if ( CommandLine()->FindParm( "-tempcontent" ) != 0 )
 		{
 			char szPath[MAX_PATH];
-			Q_snprintf( szPath, sizeof(szPath), "%s_tempcontent", fullLocationPath );
+			V_sprintf_safe( szPath, "%s_tempcontent", fullLocationPath );
+
 			initInfo.m_pFileSystem->AddSearchPath( szPath, pPathID, PATH_ADD_TO_TAIL );
 		}
 	}
@@ -533,8 +535,9 @@ static void FileSystem_AddLoadedSearchPath(
 		
 		// Need to add a language version of this path first
 
-		Q_snprintf( szLangString, sizeof(szLangString), "_%s", initInfo.m_pLanguage);
-		V_StrSubst( fullLocationPath, "_english", szLangString, szPath, sizeof( szPath ), true );
+		V_sprintf_safe( szLangString, "_%s", initInfo.m_pLanguage);
+		V_StrSubst( fullLocationPath, "_english", szLangString, szPath, true );
+
 		initInfo.m_pFileSystem->AddSearchPath( szPath, pPathID, PATH_ADD_TO_TAIL );
 	}
 
@@ -551,8 +554,9 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	if ( !initInfo.m_pFileSystem || !initInfo.m_pDirectoryName )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_LoadSearchPaths: Invalid parameters specified." );
 
-	KeyValues *pMainFile, *pFileSystemInfo, *pSearchPaths;
-	FSReturnCode_t retVal = LoadGameInfoFile( initInfo.m_pDirectoryName, pMainFile, pFileSystemInfo, pSearchPaths );
+	KeyValuesAD pMainFile{nullptr};
+	KeyValues *pSearchPaths;
+	FSReturnCode_t retVal = LoadGameInfoFile( initInfo.m_pDirectoryName, pMainFile, pSearchPaths );
 	if ( retVal != FS_OK )
 		return retVal;
 	
@@ -577,10 +581,12 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		{
 			char szAbsSearchPath[MAX_PATH];
 			Q_StripPrecedingAndTrailingWhitespace( vecPaths[ idxExtraPath ] );
-			V_MakeAbsolutePath( szAbsSearchPath, sizeof( szAbsSearchPath ), vecPaths[ idxExtraPath ], baseDir );
+			V_MakeAbsolutePath( szAbsSearchPath, vecPaths[ idxExtraPath ], baseDir );
 			V_FixSlashes( szAbsSearchPath );
+
 			if ( !V_RemoveDotSlashes( szAbsSearchPath ) )
 				Error( "Bad -insert_search_path - Can't resolve pathname for '%s'", szAbsSearchPath );
+
 			V_StripTrailingSlash( szAbsSearchPath );
 			FileSystem_AddLoadedSearchPath( initInfo, "GAME", szAbsSearchPath, false );
 			FileSystem_AddLoadedSearchPath( initInfo, "MOD", szAbsSearchPath, false );
@@ -589,7 +595,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 	bool bLowViolence = initInfo.m_bLowViolence;
 	bool bFirstGamePath = true;
-	for ( KeyValues *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
+	for ( auto *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
 	{
 		const char *pLocation = pCur->GetString();
 		const char *pszBaseDir = baseDir;
@@ -614,12 +620,14 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 		CUtlStringList vecFullLocationPaths;
 		char szAbsSearchPath[MAX_PATH];
-		V_MakeAbsolutePath( szAbsSearchPath, sizeof( szAbsSearchPath ), pLocation, pszBaseDir );
+		V_MakeAbsolutePath( szAbsSearchPath, pLocation, pszBaseDir );
 
 		// Now resolve any ./'s.
 		V_FixSlashes( szAbsSearchPath );
+
 		if ( !V_RemoveDotSlashes( szAbsSearchPath ) )
 			Error( "FileSystem_AddLoadedSearchPath - Can't resolve pathname for '%s'", szAbsSearchPath );
+
 		V_StripTrailingSlash( szAbsSearchPath );
 
 		// Don't bother doing any wildcard expansion unless it has wildcards.  This avoids the weird
@@ -641,8 +649,8 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					if ( pszFoundShortName[0] != '.' && ( initInfo.m_pFileSystem->FindIsDirectory( findHandle ) || V_stristr( pszFoundShortName, ".vpk" ) ) )
 					{
 						char szAbsName[MAX_PATH];
-						V_ExtractFilePath( szAbsSearchPath, szAbsName, sizeof( szAbsName ) );
-						V_AppendSlash( szAbsName, sizeof(szAbsName) );
+						V_ExtractFilePath( szAbsSearchPath, szAbsName );
+						V_AppendSlash( szAbsName );
 						V_strcat_safe( szAbsName, pszFoundShortName );
 
 						vecFullLocationPaths.CopyAndAddToTail( szAbsName );
@@ -658,8 +666,8 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 						{
 
 							char szReadme[MAX_PATH];
-							V_ExtractFilePath( szAbsSearchPath, szReadme, sizeof( szReadme ) );
-							V_AppendSlash( szReadme, sizeof(szReadme) );
+							V_ExtractFilePath( szAbsSearchPath, szReadme );
+							V_AppendSlash( szReadme );
 							V_strcat_safe( szReadme, "readme.txt" );
 
 							Error(
@@ -672,6 +680,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					}
 					pszFoundShortName = initInfo.m_pFileSystem->FindNext( findHandle );
 				} while ( pszFoundShortName );
+
 				initInfo.m_pFileSystem->FindClose( findHandle );
 			}
 
@@ -731,9 +740,9 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					{
 						char szGameBinPath[MAX_PATH];
 #ifdef PLATFORM_64BITS
-						Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s" CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64", pFullPath );
+						V_sprintf_safe( szGameBinPath, "%s" CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64", pFullPath );
 #else
-						Q_snprintf( szGameBinPath, sizeof(szGameBinPath), "%s" CORRECT_PATH_SEPARATOR_S "bin", pFullPath );
+						V_sprintf_safe( szGameBinPath, "%s" CORRECT_PATH_SEPARATOR_S "bin", pFullPath );
 #endif
 
 						// 1. For each "Game" search path, it adds a "GameBin" path, in <dir>\bin[\x64]
@@ -759,8 +768,6 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		}
 	}
 
-	pMainFile->deleteThis();
-
 	// Also, mark specific path IDs as "by request only". That way, we won't waste time searching in them
 	// when people forget to specify a search path.
 	initInfo.m_pFileSystem->MarkPathIDByRequestOnly( "executable_path", true );
@@ -782,29 +789,30 @@ static bool DoesFileExistIn( const char *pDirectoryName, const char *pFilename )
 	char filename[MAX_PATH];
 
 	V_strcpy_safe( filename, pDirectoryName );
-	Q_AppendSlash( filename, sizeof( filename ) );
+	V_AppendSlash( filename );
 	V_strcat_safe( filename, pFilename );
 	Q_FixSlashes( filename );
-	bool bExist = ( _access( filename, 0 ) == 0 );
+	bool bExist = ( access( filename, 0 ) == 0 );
 
 	return bExist;
 }
 
 namespace
 {
-	SuggestGameInfoDirFn_t & GetSuggestGameInfoDirFn( void )
-	{
-		static SuggestGameInfoDirFn_t s_pfnSuggestGameInfoDir = nullptr;
-		return s_pfnSuggestGameInfoDir;
-	}
-}; // `anonymous` namespace
+
+// dimhotepus: Global state so thread-safe.
+static std::atomic<SuggestGameInfoDirFn_t> g_pfnSuggestGameInfoDir = nullptr;
+
+SuggestGameInfoDirFn_t GetSuggestGameInfoDirFn()
+{
+	return g_pfnSuggestGameInfoDir.load(std::memory_order::memory_order_relaxed);
+}
+
+};  // namespace
 
 SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn )
 {
-	SuggestGameInfoDirFn_t &rfn = GetSuggestGameInfoDirFn();
-	SuggestGameInfoDirFn_t pfnOldFn = rfn;
-	rfn = pfnNewFn;
-	return pfnOldFn;
+	return g_pfnSuggestGameInfoDir.exchange(pfnNewFn, std::memory_order::memory_order_relaxed);
 }
 
 template<int outDirLen>
@@ -833,13 +841,13 @@ static FSReturnCode_t TryLocateGameInfoFile(char (&pOutDir)[outDirLen],
 			return FS_OK;
 		}
 	} 
-	while ( bBubbleDir && Q_StripLastDir( pOutDir, outDirLen ) );
+	while ( bBubbleDir && V_StripLastDir( pOutDir, outDirLen ) );
 
 	// Make an attempt to resolve from "content -> game" directory
 	V_strcpy_safe( pOutDir, spchCopyNameBuffer );
 	if ( char *pchContentFix = Q_stristr( pOutDir, "/content/" ) )
 	{
-		sprintf( pchContentFix, "/game/" );
+		V_strncpy( pchContentFix, "/game/", ssize("/content/") );
 		memmove( pchContentFix + 6, pchContentFix + 9, pOutDir + outDirLen - (pchContentFix + 9) );
 
 		// Try in the mapped "game" directory
@@ -850,7 +858,7 @@ static FSReturnCode_t TryLocateGameInfoFile(char (&pOutDir)[outDirLen],
 				return FS_OK;
 			}
 		} 
-		while ( bBubbleDir && Q_StripLastDir( pOutDir, outDirLen ) );
+		while ( bBubbleDir && V_StripLastDir( pOutDir, outDirLen ) );
 	}
 
 	// Could not find it here
@@ -883,7 +891,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 	{
 		if ( DoesFileExistIn( pProject, GAMEINFO_FILENAME ) )
 		{
-			Q_MakeAbsolutePath( pOutDir, outDirLen, pProject );
+			V_MakeAbsolutePath( pOutDir, outDirLen, pProject );
 			return FS_OK;
 		}
 		
@@ -922,21 +930,20 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 	// Try to use the environment variable / registry
 	if ( ( pProject = getenv( GAMEDIR_TOKEN ) ) != nullptr )
 	{
-		Q_MakeAbsolutePath( pOutDir, outDirLen, pProject );
+		V_MakeAbsolutePath( pOutDir, outDirLen, pProject );
 
 		if ( FS_OK == TryLocateGameInfoFile( pOutDir, false ) )
 			return FS_OK;
 	}
 
-	if ( IsPC() )
 	{
 		Warning( "Warning: falling back to auto detection of vproject directory.\n" );
 		
 		// Now look for it in the directory they passed in.
 		if ( fsInfo.m_pDirectoryName )
-			Q_MakeAbsolutePath( pOutDir, outDirLen, fsInfo.m_pDirectoryName );
+			V_MakeAbsolutePath( pOutDir, outDirLen, fsInfo.m_pDirectoryName );
 		else
-			Q_MakeAbsolutePath( pOutDir, outDirLen, "." );
+			V_MakeAbsolutePath( pOutDir, outDirLen, "." );
 
 		if ( FS_OK == TryLocateGameInfoFile( pOutDir, true ) )
 			return FS_OK;
@@ -1014,7 +1021,7 @@ FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem )
 //-----------------------------------------------------------------------------
 // Returns the name of the file system DLL to use
 //-----------------------------------------------------------------------------
-FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, size_t nMaxLen, bool &bSteam )
+FSReturnCode_t FileSystem_GetFileSystemDLLName( OUT_Z_CAP(nMaxLen) char *pFileSystemDLL, size_t nMaxLen, bool &bSteam )
 {
 	bSteam = false;
 
@@ -1061,7 +1068,8 @@ FSReturnCode_t FileSystem_SetupSteamEnvironment( CFSSteamSetupInfo &fsInfo )
 	// This is so that processes spawned by this application will have the same VPROJECT
 #ifdef WIN32
 	char pEnvBuf[MAX_PATH+32];
-	Q_snprintf( pEnvBuf, sizeof(pEnvBuf), "%s=%s", GAMEDIR_TOKEN, fsInfo.m_GameInfoPath );
+	V_sprintf_safe( pEnvBuf, "%s=%s", GAMEDIR_TOKEN, fsInfo.m_GameInfoPath );
+
 	return !_putenv( pEnvBuf )
 		? FS_OK
 		: SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Unable to set env variable %s: %s.", pEnvBuf, strerror(errno) );
@@ -1084,11 +1092,11 @@ FSReturnCode_t FileSystem_LoadFileSystemModule( CFSLoadModuleInfo &fsInfo )
 		return ret;
 
 	// Now that the environment is setup, load the filesystem module.
-	if ( !Sys_LoadInterface(
+	if ( !Sys_LoadInterfaceT(
 		fsInfo.m_pFileSystemDLLName,
 		FILESYSTEM_INTERFACE_VERSION,
 		&fsInfo.m_pModule,
-		(void**)&fsInfo.m_pFileSystem ) )
+		&fsInfo.m_pFileSystem ) )
 	{
 		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Can't load %s.", fsInfo.m_pFileSystemDLLName );
 	}
@@ -1117,9 +1125,9 @@ FSReturnCode_t FileSystem_MountContent( CFSMountContentInfo &mountContentInfo )
 	return FileSystem_SetBasePaths( mountContentInfo.m_pFileSystem );
 }
 
-void FileSystem_SetErrorMode( FSErrorMode_t errorMode )
+FSErrorMode_t FileSystem_SetErrorMode( FSErrorMode_t errorMode )
 {
-	g_FileSystemErrorMode = errorMode;
+	return g_FileSystemErrorMode.exchange(errorMode, std::memory_order::memory_order_relaxed);
 }
 
 void FileSystem_ClearSteamEnvVars()

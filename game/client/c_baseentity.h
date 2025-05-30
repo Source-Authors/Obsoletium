@@ -1129,7 +1129,7 @@ public:
 	void	NetworkStateForceUpdate()					{ }
 
 	// Think functions with contexts
-	int		RegisterThinkContext( const char *szContext );
+	intp	RegisterThinkContext( const char *szContext );
 	BASEPTR	ThinkSet( BASEPTR func, float flNextThinkTime = 0, const char *szContext = NULL );
 	void	SetNextThink( float nextThinkTime, const char *szContext = NULL );
 	float	GetNextThink( const char *szContext = NULL );
@@ -1427,7 +1427,7 @@ protected:
 	int								m_nSimulationTick;
 
 	// Think contexts
-	int								GetIndexForThinkContext( const char *pszContext );
+	intp							GetIndexForThinkContext( const char *pszContext );
 	CUtlVector< thinkfunc_t >		m_aThinkFunctions;
 	int								m_iCurrentThinkContext;
 

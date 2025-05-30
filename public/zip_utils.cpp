@@ -98,7 +98,7 @@ END_BYTESWAP_DATADESC()
 class CWin32File
 {
 public:
-	static HANDLE CreateTempFile( CUtlString &WritePath, CUtlString &FileName )
+	static HANDLE CreateTempFile( const CUtlString &WritePath, CUtlString &FileName )
 	{
 		char tempFileName[MAX_PATH];
 		if ( WritePath.IsEmpty() )
@@ -123,10 +123,10 @@ public:
 		{
 			// generate safe name at the desired prefix
 			char uniqueFilename[MAX_PATH];
-			SYSTEMTIME sysTime;                                                       \
+			SYSTEMTIME sysTime;
 			GetLocalTime( &sysTime );   
-			sprintf( uniqueFilename, "%d_%d_%d_%d_%d.tmp", sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond, sysTime.wMilliseconds );                                                \
-			V_ComposeFileName( WritePath.String(), uniqueFilename, tempFileName, sizeof( tempFileName ) );
+			V_sprintf_safe( uniqueFilename, "%d_%d_%d_%d_%d.tmp", sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond, sysTime.wMilliseconds );
+			V_ComposeFileName( WritePath.String(), uniqueFilename, tempFileName );
 		}
 
 		FileName = tempFileName;
@@ -161,7 +161,7 @@ public:
 		return bSuccess && ( numBytesRead == size );
 	}
 
-	static bool FileWrite( HANDLE hFile, void *pBuffer, unsigned int size )
+	static bool FileWrite( HANDLE hFile, const void *pBuffer, unsigned int size )
 	{
 		DWORD numBytesWritten;
 		BOOL bSuccess = WriteFile( hFile, pBuffer, size, &numBytesWritten, NULL );
@@ -199,8 +199,8 @@ public:
 			static int counter = 0;
 			time_t now = time( NULL );
 			struct tm *tm = localtime( &now );
-			sprintf( uniqueFilename, "%d_%d_%d_%d_%d.tmp", tm->tm_wday, tm->tm_hour, tm->tm_min, tm->tm_sec, ++counter );                                                \
-			V_ComposeFileName( WritePath.String(), uniqueFilename, tempFileName, sizeof( tempFileName ) );
+			V_sprintf_safe( uniqueFilename, "%d_%d_%d_%d_%d.tmp", tm->tm_wday, tm->tm_hour, tm->tm_min, tm->tm_sec, ++counter );                                                \
+			V_ComposeFileName( WritePath.String(), uniqueFilename, tempFileName );
 		}
 
 		FileName = tempFileName;
@@ -544,11 +544,17 @@ void CZipFile::Reset( void )
 	{
 #ifdef WIN32
 		CloseHandle( m_hDiskCacheWriteFile );
-		DeleteFile( m_DiskCacheName.String() );
 #else
 		fclose( (FILE *)m_hDiskCacheWriteFile );
-		unlink( m_DiskCacheName.String() );
 #endif
+
+		if ( unlink( m_DiskCacheName.String() ) )
+		{
+			Warning( "Unable to remove zip file '%s': %s.\n",
+				m_DiskCacheName.String(),
+				std::generic_category().message(errno).c_str() );
+		}
+
 		m_hDiskCacheWriteFile = INVALID_HANDLE_VALUE;
 	}
 
@@ -994,7 +1000,7 @@ void CZipFile::AddBufferToZip( const char *relativename, void *data, int length,
 {
 	// Lower case only
 	char name[512];
-	Q_strcpy( name, relativename );
+	V_strcpy_safe( name, relativename );
 	Q_strlower( name );
 
 	int outLength = length;

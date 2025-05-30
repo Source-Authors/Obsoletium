@@ -189,7 +189,7 @@ void COP_Model::UpdateForClass(LPCTSTR pszClass)
 void COP_Model::UpdateFrameText(float flFrame)
 {
 	char szFrame[40];
-	sprintf(szFrame, "%0.2f", flFrame);
+	V_sprintf_safe(szFrame, "%0.2f", flFrame);
 	GetDlgItem(IDC_FRAME_TEXT)->SetWindowText(szFrame);
 }
 
@@ -236,7 +236,7 @@ void COP_Model::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 		}
 	}
 	
-	CPropertyPage::OnHScroll(nSBCode, nPos, pScrollBar);
+	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 

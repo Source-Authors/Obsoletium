@@ -6,13 +6,13 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
 #include "vbsp.h"
 #include "bsplib.h"
-#include "KeyValues.h"
-#include "utlsymbol.h"
-#include "utlvector.h"
-#include <io.h>
+#include "tier1/KeyValues.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
 #include "bspfile.h"
 #include "utilmatlib.h"
 #include "gamebspfile.h"
@@ -22,10 +22,7 @@
 #include "vstdlib/random.h"
 #include "builddisp.h"
 #include "disp_vbsp.h"
-#include "UtlBuffer.h"
 #include "CollisionUtils.h"
-#include <float.h>
-#include "UtlLinkedList.h"
 #include "byteswap.h"
 #include "writebsp.h"
 
@@ -108,7 +105,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	// Sort the group by alpha
 	float alpha = pGroupKeyValues->GetFloat( "alpha", 1.0f );
 	
-	int i = s_DetailObjectDict[detailId].m_Groups.Count();
+	intp i = s_DetailObjectDict[detailId].m_Groups.Count();
 	while ( --i >= 0 )
 	{
 		if (alpha > s_DetailObjectDict[detailId].m_Groups[i].m_Alpha)
@@ -128,7 +125,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	{
 		if (pIter->GetFirstSubKey())
 		{
-			int i = group.m_Models.AddToTail();
+			intp i = group.m_Models.AddToTail();
 
 			DetailModel_t &model = group.m_Models[i];
 
@@ -184,7 +181,11 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 					pSpriteData = pIter->GetString( "spritesize", 0 );
 					if (pSpriteData)
 					{
-						sscanf( pSpriteData, "%f %f %f %f", &x, &y, &flWidth, &flHeight );
+						// dimhotepus: Ensure sprite data is correct.
+						if ( sscanf( pSpriteData, "%f %f %f %f", &x, &y, &flWidth, &flHeight ) != 4 )
+						{
+							Error( "spritesize '%s' missed 4 dimensions.\n", pSpriteData );
+						}
 
 						float ox = flWidth * x;
 						float oy = flHeight * y;
@@ -198,7 +199,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 					model.m_flRandomScaleStdDev = pIter->GetFloat( "spriterandomscale", 0.0f );
 
 					// sway is a percent of max sway, cl_detail_max_sway
-					float flSway = clamp( pIter->GetFloat( "sway", 0.0f ), 0.0, 1.0 );
+					float flSway = clamp( pIter->GetFloat( "sway", 0.0f ), 0.0f, 1.0f );
 					model.m_SwayAmount = (unsigned char)( 255.0 * flSway );
 
 					// shape angle
@@ -207,7 +208,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 
 					// shape size
 					// for the tri shape, this is the distance from the origin to the center of a side
-					float flShapeSize = clamp( pIter->GetFloat( "shape_size", 0.0f ), 0.0, 1.0 );
+					float flShapeSize = clamp( pIter->GetFloat( "shape_size", 0.0f ), 0.0f, 1.0f );
 					model.m_ShapeSize = (unsigned char)( 255.0 * flShapeSize );
 				}
 			}
@@ -224,8 +225,8 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 			// These are used to prevent emission on steep surfaces
 			float minAngle = pIter->GetFloat( "minAngle", 180 );
 			float maxAngle = pIter->GetFloat( "maxAngle", 180 );
-			model.m_MinCosAngle = cos(minAngle * M_PI / 180.f);
-			model.m_MaxCosAngle = cos(maxAngle * M_PI / 180.f);
+			model.m_MinCosAngle = cos(DEG2RAD(minAngle));
+			model.m_MaxCosAngle = cos(DEG2RAD(maxAngle));
 			model.m_Orientation = pIter->GetInt( "detailOrientation", 0 );
 
 			// Make sure minAngle < maxAngle
@@ -260,7 +261,7 @@ static void ParseDetailObjectFile( KeyValues& keyValues )
 		if (!pIter->GetFirstSubKey())
 			continue;
 
-		int i = s_DetailObjectDict.AddToTail( );
+		intp i = s_DetailObjectDict.AddToTail( );
 		s_DetailObjectDict[i].m_Name = pIter->GetName() ;
 		s_DetailObjectDict[i].m_Density = pIter->GetFloat( "density", 0.0f );
 
@@ -285,7 +286,7 @@ static const char *FindDetailVBSPName( void )
 {
 	for( int i = 0; i < num_entities; i++ )
 	{
-		char* pEntity = ValueForKey( &entities[i], "classname" );
+		const char* pEntity = ValueForKey( &entities[i], "classname" );
 		if ( !strcmp( pEntity, "worldspawn" ) )
 		{
 			const char *pDetailVBSP = ValueForKey( &entities[i], "detailvbsp" );
@@ -307,12 +308,11 @@ void LoadEmitDetailObjectDictionary( const char* pGameDir )
 {
 	// Set the required global lights filename and try looking in qproject
 	const char *pDetailVBSP = FindDetailVBSPName();
-	KeyValues * values = new KeyValues( pDetailVBSP );
+	KeyValuesAD values( pDetailVBSP );
 	if ( values->LoadFromFile( g_pFileSystem, pDetailVBSP ) )
 	{
 		ParseDetailObjectFile( *values );
 	}
-	values->deleteThis();
 }
 
 
@@ -376,12 +376,12 @@ static int SelectDetail( DetailObjectGroup_t const& group )
 //-----------------------------------------------------------------------------
 // Adds a detail dictionary element (expected to oftentimes be shared)
 //-----------------------------------------------------------------------------
-static int AddDetailDictLump( const char* pModelName )
+static intp AddDetailDictLump( const char* pModelName )
 {
 	DetailObjectDictLump_t dictLump;
-	strncpy( dictLump.m_Name, pModelName, DETAIL_NAME_LENGTH );
+	V_strcpy_safe( dictLump.m_Name, pModelName );
 
-	for (int i = s_DetailObjectDictLump.Count(); --i >= 0; )
+	for (intp i = s_DetailObjectDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_DetailObjectDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -390,7 +390,7 @@ static int AddDetailDictLump( const char* pModelName )
 	return s_DetailObjectDictLump.AddToTail( dictLump );
 }
 
-static int AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
+static intp AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
 {
 	DetailSpriteDictLump_t dictLump;
 	dictLump.m_UL = pPos[0];
@@ -398,7 +398,7 @@ static int AddDetailSpriteDictLump( const Vector2D *pPos, const Vector2D *pTex )
 	dictLump.m_TexUL = pTex[0];
 	dictLump.m_TexLR = pTex[1];
 
-	for (int i = s_DetailSpriteDictLump.Count(); --i >= 0; )
+	for (intp i = s_DetailSpriteDictLump.Count(); --i >= 0; )
 	{
 		if (!memcmp(&s_DetailSpriteDictLump[i], &dictLump, sizeof(dictLump) ))
 			return i;
@@ -437,7 +437,7 @@ static bool IsModelValid( const char* pModelName )
 	StaticPropLookup_t lookup;
 	lookup.m_ModelName = pModelName;
 
-	int i = s_StaticPropLookup.Find( lookup );
+	unsigned short i = s_StaticPropLookup.Find( lookup );
 	if (i != s_StaticPropLookup.InvalidIndex() )
 		return s_StaticPropLookup[i].m_IsValid;
 
@@ -472,7 +472,7 @@ static void AddDetailToLump( const char* pModelName, const Vector& pt, const QAn
 	}
 
 	// Insert an element into the object dictionary if it aint there...
-	int i = s_DetailObjectLump.AddToTail( );
+	intp i = s_DetailObjectLump.AddToTail( );
 
 	DetailObjectLump_t& objectLump = s_DetailObjectLump[i];
 	objectLump.m_DetailModel = AddDetailDictLump( pModelName ); 
@@ -498,7 +498,7 @@ static void AddDetailSpriteToLump( const Vector &vecOrigin, const QAngle &vecAng
 									int iShapeAngle = 0, int iShapeSize = 0, int iSwayAmount = 0 )
 {
 	// Insert an element into the object dictionary if it aint there...
-	int i = s_DetailObjectLump.AddToTail( );
+	intp i = s_DetailObjectLump.AddToTail( );
 
 	if (i >= 65535)
 	{
@@ -660,7 +660,7 @@ static void EmitDetailObjectsOnFace( dface_t* pFace, DetailObject_t& detail )
 		float area = 0.5f * normalLength;
 
 		// Compute the number of samples to take
-		int numSamples = area * detail.m_Density * 0.000001;
+		int numSamples = area * detail.m_Density * 0.000001f;
 
 		// Now take a sample, and randomly place an object there
 		for (int i = 0; i < numSamples; ++i )
@@ -672,7 +672,7 @@ static void EmitDetailObjectsOnFace( dface_t* pFace, DetailObject_t& detail )
 			{
 				u = 1.0f - u;
 				v = 1.0f - v;
-				assert( u + v <= 1.0f );
+				Assert( u + v <= 1.0f );
 			}
 
 			// Compute alpha
@@ -737,7 +737,7 @@ static float ComputeDisplacementFaceArea( dface_t* pFace )
 static void EmitDetailObjectsOnDisplacementFace( dface_t* pFace, 
 						DetailObject_t& detail, CCoreDispInfo& coreDispInfo )
 {
-	assert(pFace->numedges == 4);
+	Assert(pFace->numedges == 4);
 
 	// We're going to pick a bunch of random points, and then probabilistically
 	// decide whether or not to plant a detail object there.
@@ -778,14 +778,9 @@ static void EmitDetailObjectsOnDisplacementFace( dface_t* pFace,
 //-----------------------------------------------------------------------------
 // Sort detail objects by leaf
 //-----------------------------------------------------------------------------
-static int SortFunc( const void *arg1, const void *arg2 )
+static bool SortFunc( const DetailObjectLump_t &arg1, const DetailObjectLump_t &arg2 )
 {
-	int nDelta = ((DetailObjectLump_t*)arg1)->m_Leaf - ((DetailObjectLump_t*)arg2)->m_Leaf;
-	if ( nDelta < 0 )
-		return -1;
-	if ( nDelta > 0 )
-		return 1;
-	return 0;
+	return arg1.m_Leaf - arg2.m_Leaf < 0;
 }
 
 
@@ -795,7 +790,7 @@ static int SortFunc( const void *arg1, const void *arg2 )
 static void SetLumpData( )
 {
 	// Sort detail props by leaf
-	qsort( s_DetailObjectLump.Base(), s_DetailObjectLump.Count(), sizeof(DetailObjectLump_t), SortFunc );
+	std::sort( s_DetailObjectLump.begin(), s_DetailObjectLump.end(), SortFunc );
 
 	GameLumpHandle_t handle = g_GameLumps.GetGameLumpHandle(GAMELUMP_DETAIL_PROPS);
 	if (handle != g_GameLumps.InvalidGameLump())
@@ -834,7 +829,7 @@ static void SetLumpData( )
 //-----------------------------------------------------------------------------
 void EmitDetailModels()
 {
-	StartPacifier("Placing detail props : ");
+	StartPacifier("Placing detail props: ");
 
 	// Place stuff on each face
 	dface_t* pFace = dfaces;
@@ -862,7 +857,7 @@ void EmitDetailModels()
 		// Get the detail type...
 		DetailObject_t search;
 		search.m_Name = pDetailType;
-		int objectType = s_DetailObjectDict.Find(search);
+		intp objectType = s_DetailObjectDict.Find(search);
 		if (objectType < 0)
 		{
 			Warning("Material %s uses unknown detail object type %s!\n",	
@@ -904,12 +899,12 @@ void EmitDetailModels()
 	Vector2D tex[2];
 	for (int i = 0; i < num_entities; ++i)
 	{
-		char* pEntity = ValueForKey(&entities[i], "classname");
+		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!strcmp(pEntity, "detail_prop") || !strcmp(pEntity, "prop_detail"))
 		{
 			GetVectorForKey( &entities[i], "origin", origin );
 			GetAnglesForKey( &entities[i], "angles", angles );
-			char* pModelName = ValueForKey( &entities[i], "model" );
+			const char* pModelName = ValueForKey( &entities[i], "model" );
 			int nOrientation = IntForKey( &entities[i], "detailOrientation" );
 
 			AddDetailToLump( pModelName, origin, angles, nOrientation );

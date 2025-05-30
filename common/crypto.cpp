@@ -20,18 +20,15 @@
 /* this stuff needs to be before the crypto headers, as it relies on memdbg, which doesn't 
    do the right thing in the face of xdebug getting included below */
 // tier0
-//#include "tier0/tier0.h"
 #include "tier0/basetypes.h"
 #include "tier0/vprof.h"
-//#include "constants.h"
-#include "vstdlib/vstdlib.h"
-#include "strtools.h"
-//#include "version.h"
-//#include "globals.h"
-//#include "ivalidate.h"
+#include "tier1/strtools.h"
 #include "tier1/utlvector.h"
-#include "simplebitstring.h"
 #include "tier1/checksum_sha1.h"
+#include "vstdlib/vstdlib.h"
+
+#include "simplebitstring.h"
+
 #include "tier0/memdbgon.h"
 #include "tier0/tslist.h"
 #include "tier0/memdbgoff.h"
@@ -58,7 +55,7 @@
 #undef Verify
 #define VPROF_BUDGETGROUP_ENCRYPTION				_T("Encryption")
 #define SPEW_CRYPTO "crypto"
-const int k_cMedBuff = 1024;					// medium buffer 
+constexpr inline int k_cMedBuff = 1024;					// medium buffer 
 
 #if defined(GNUC)
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -122,7 +119,7 @@ public:
 		g_tslistPAutoSeededRNG.Push( m_pRNGNode );
 	}
 
-	CAutoSeededRNG &GetRNG()
+	CAutoSeededRNG &GetRNG() const
 	{
 		return m_pRNGNode->elem;
 	}
@@ -162,10 +159,10 @@ volatile static CGlobalInitConstructor s_StaticCryptoConstructor;
 //			cubKey -			Size of the key (must be k_nSymmetricKeyLen)
 // Output:  true if successful, false if encryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const uint32 cubPlaintextData, 
-									  const uint8 *pIV, const uint32 cubIV,
-									  uint8 *pubEncryptedData, uint32 *pcubEncryptedData,
-									  const uint8 *pubKey, const uint32 cubKey )
+bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const size_t cubPlaintextData, 
+									  const uint8 *pIV, const size_t cubIV,
+									  uint8 *pubEncryptedData, size_t *pcubEncryptedData,
+									  const uint8 *pubKey, const size_t cubKey )
 {
 	VPROF_BUDGET( "CCrypto::SymmetricEncrypt", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubPlaintextData );
@@ -178,7 +175,7 @@ bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const uint3
 
 	bool bRet = false;
 
-	uint32 cubEncryptedData = *pcubEncryptedData;	// remember how big the caller's buffer is
+	size_t cubEncryptedData = *pcubEncryptedData;	// remember how big the caller's buffer is
 	bool bUseTempBuffer = false;
 	uint8 *pTemp = pubEncryptedData;
 
@@ -206,30 +203,30 @@ bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const uint3
 			Assert( std::size( rgubIVEncrypted ) >= aesEncrypt.BlockSize() );
 			Assert( pIV != NULL && cubIV >= aesEncrypt.BlockSize() );
 
-			ArraySink * pOutputSink = new ArraySink( pTemp, *pcubEncryptedData );
+			ArraySink pOutputSink( pTemp, *pcubEncryptedData );
 
 			// encrypt the initial vector with the key
 			aesEncrypt.ProcessBlock( pIV, rgubIVEncrypted );
 
 			// store the encrypted IV in the output - the recipient will need it
-			pOutputSink->Put( rgubIVEncrypted, aesEncrypt.BlockSize() );
+			pOutputSink.Put( rgubIVEncrypted, aesEncrypt.BlockSize() );
 
 			// encrypt the message, given the key & IV
 			CBC_Mode_ExternalCipher::Encryption cipher( aesEncrypt, pIV );
 			// Note: StreamTransformationFilter now owns the pointer to pOutputSink and will
 			// free it when the filter goes out of scope and destructs
-			StreamTransformationFilter filter( cipher, pOutputSink );
-			filter.Put( (byte *) pubPlaintextData, cubPlaintextData );
+			StreamTransformationFilter filter( cipher, &pOutputSink );
+			filter.Put( pubPlaintextData, cubPlaintextData );
 			filter.MessageEnd();
 			// return length of encrypted data to caller
-			*pcubEncryptedData = pOutputSink->TotalPutLength();
+			*pcubEncryptedData = pOutputSink.TotalPutLength();
 			// CryptoPP may leave garbage hanging around in the caller's buffer past the stated output length.
 			// Just to be safe, zero out caller's buffer from end out output to end of max buffer
 			if ( bUseTempBuffer )
 			{
-				Q_memcpy( pubEncryptedData, pTemp, *pcubEncryptedData );
+				memcpy( pubEncryptedData, pTemp, *pcubEncryptedData );
 			}
-			Q_memset( pubEncryptedData + *pcubEncryptedData, 0, (cubEncryptedData - *pcubEncryptedData ) );
+			memset( pubEncryptedData + *pcubEncryptedData, 0, (cubEncryptedData - *pcubEncryptedData ) );
 			bRet = true;
 		}
 	}
@@ -263,9 +260,9 @@ bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const uint3
 // Output:  true if successful, false if encryption failed
 //-----------------------------------------------------------------------------
 
-bool CCrypto::SymmetricEncrypt( const uint8 *pubPlaintextData, const uint32 cubPlaintextData, 
-								uint8 *pubEncryptedData, uint32 *pcubEncryptedData,
-								const uint8 *pubKey, const uint32 cubKey )
+bool CCrypto::SymmetricEncrypt( const uint8 *pubPlaintextData, const size_t cubPlaintextData, 
+								uint8 *pubEncryptedData, size_t *pcubEncryptedData,
+								const uint8 *pubKey, const size_t cubKey )
 {
 	bool bRet = false;
 
@@ -286,7 +283,7 @@ bool CCrypto::SymmetricEncrypt( const uint8 *pubPlaintextData, const uint32 cubP
 #ifdef USE_OPENSSL_AES_DECRYPT
 
 // Local helper to perform AES+CBC decryption using optimized OpenSSL AES routines
-static bool BDecryptAESUsingOpenSSL( const uint8 *pubEncryptedData, uint32 cubEncryptedData, uint8 *pubPlaintextData, uint32 *pcubPlaintextData, AES_KEY *key, const uint8 *pIV )
+static bool BDecryptAESUsingOpenSSL( const uint8 *pubEncryptedData, size_t cubEncryptedData, uint8 *pubPlaintextData, size_t *pcubPlaintextData, AES_KEY *key, const uint8 *pIV )
 {
 	COMPILE_TIME_ASSERT( k_nSymmetricBlockSize == 16 );
 
@@ -303,7 +300,7 @@ static bool BDecryptAESUsingOpenSSL( const uint8 *pubEncryptedData, uint32 cubEn
 		return false;
 
 	uint8 rgubWorking[k_nSymmetricBlockSize];
-	uint32 nDecrypted = 0;
+	size_t nDecrypted = 0;
 
 	// Process non-final blocks
 #if defined(_M_IX86) || defined (_M_X64) || defined(__i386__) || defined(__x86_64__)
@@ -367,9 +364,9 @@ static bool BDecryptAESUsingOpenSSL( const uint8 *pubEncryptedData, uint32 cubEn
 #else
 
 /* function, not method */
-static bool SymmetricDecryptWorker( const uint8 *pubEncryptedData, uint32 cubEncryptedData, 
-									const uint8 * pIV, uint32 cubIV,
-									uint8 *pubPlaintextData, uint32 *pcubPlaintextData, 
+static bool SymmetricDecryptWorker( const uint8 *pubEncryptedData, size_t cubEncryptedData, 
+									const uint8 * pIV, size_t cubIV,
+									uint8 *pubPlaintextData, size_t *pcubPlaintextData, 
 									AESDecryption &aesDecrypt )
 {
 	VPROF_BUDGET( "CCrypto::SymmetricDecrypt", VPROF_BUDGETGROUP_ENCRYPTION );
@@ -383,7 +380,7 @@ static bool SymmetricDecryptWorker( const uint8 *pubEncryptedData, uint32 cubEnc
 
 	bool bRet = false;
 
-	uint32 cubPlaintextData = *pcubPlaintextData;	// remember how big the caller's buffer is
+	size_t cubPlaintextData = *pcubPlaintextData;	// remember how big the caller's buffer is
 	bool bUseTempBuffer = false;
 	uint8* pTemp = pubPlaintextData;
 
@@ -405,22 +402,22 @@ static bool SymmetricDecryptWorker( const uint8 *pubEncryptedData, uint32 cubEnc
 	{
 		if ( pTemp != NULL )
 		{
-			CryptoPP::ArraySink* pOutputSink = new CryptoPP::ArraySink( pTemp, *pcubPlaintextData );
+			CryptoPP::ArraySink pOutputSink( pTemp, *pcubPlaintextData );
 			CryptoPP::CBC_Mode_ExternalCipher::Decryption cbc( aesDecrypt, pIV );
 			// Note: StreamTransformationFilter now owns the pointer to pOutputSink and will
 			// free it when the filter goes out of scope and destructs
-			CryptoPP::StreamTransformationFilter padding( cbc, pOutputSink );
+			CryptoPP::StreamTransformationFilter padding( cbc, &pOutputSink );
 			padding.Put( pubEncryptedData, cubEncryptedData );
 			padding.MessageEnd();
 			// return length of decrypted data to caller
-			*pcubPlaintextData = pOutputSink->TotalPutLength();
+			*pcubPlaintextData = pOutputSink.TotalPutLength();
 			// CryptoPP may leave garbage hanging around in the caller's buffer past the stated output length.
 			// Just to be safe, zero out caller's buffer from end out output to end of max buffer
 			if ( bUseTempBuffer )
 			{
-				Q_memcpy( pubPlaintextData, pTemp, *pcubPlaintextData );
+				memcpy( pubPlaintextData, pTemp, *pcubPlaintextData );
 			}
-			Q_memset( pubPlaintextData + *pcubPlaintextData, 0, (cubPlaintextData - *pcubPlaintextData ) );
+			memset( pubPlaintextData + *pcubPlaintextData, 0, (cubPlaintextData - *pcubPlaintextData ) );
 
 			bRet = true;
 		}
@@ -455,9 +452,9 @@ static bool SymmetricDecryptWorker( const uint8 *pubEncryptedData, uint32 cubEnc
 //			cubKey -			Size of the key (must be k_nSymmetricKeyLen)
 // Output:  true if successful, false if decryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::SymmetricDecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData, 
-							   uint8 *pubPlaintextData, uint32 *pcubPlaintextData, 
-							   const uint8 *pubKey, const uint32 cubKey )
+bool CCrypto::SymmetricDecrypt( const uint8 *pubEncryptedData, size_t cubEncryptedData, 
+							   uint8 *pubPlaintextData, size_t *pcubPlaintextData, 
+							   const uint8 *pubKey, const size_t cubKey )
 {
 	Assert( pubEncryptedData );
 	Assert( cubEncryptedData);
@@ -524,10 +521,10 @@ bool CCrypto::SymmetricDecrypt( const uint8 *pubEncryptedData, uint32 cubEncrypt
 //			cubKey -			Size of the key (must be k_nSymmetricKeyLen)
 // Output:  true if successful, false if decryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::SymmetricDecryptWithIV( const uint8 *pubEncryptedData, uint32 cubEncryptedData, 
-								const uint8 * pIV, uint32 cubIV,
-								uint8 *pubPlaintextData, uint32 *pcubPlaintextData, 
-								const uint8 *pubKey, const uint32 cubKey )
+bool CCrypto::SymmetricDecryptWithIV( const uint8 *pubEncryptedData, size_t cubEncryptedData, 
+								const uint8 * pIV, size_t cubIV,
+								uint8 *pubPlaintextData, size_t *pcubPlaintextData, 
+								const uint8 *pubKey, const size_t cubKey )
 {
 	Assert( pubEncryptedData );
 	Assert( cubEncryptedData);
@@ -569,11 +566,11 @@ bool CCrypto::SymmetricDecryptWithIV( const uint8 *pubEncryptedData, uint32 cubE
 // Purpose: For specified plaintext data size, returns what size of symmetric
 //			encrypted data will be
 //-----------------------------------------------------------------------------
-uint32 CCrypto::GetSymmetricEncryptedSize( uint32 cubPlaintextData )
+size_t CCrypto::GetSymmetricEncryptedSize( size_t cubPlaintextData )
 {
 	// empirically determined encrypted size as function of plaintext size for AES encryption
-	uint k_cubBlock = 16;
-	uint k_cubHeader = 16;
+	constexpr size_t k_cubBlock = 16;
+	constexpr size_t k_cubHeader = 16;
 	return k_cubHeader + ( ( cubPlaintextData / k_cubBlock ) * k_cubBlock ) + k_cubBlock;
 }
 
@@ -594,8 +591,8 @@ uint32 CCrypto::GetSymmetricEncryptedSize( uint32 cubPlaintextData )
 //			pchPassword -		text password
 // Output:  true if successful, false if encryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::EncryptWithPasswordAndHMAC( const uint8 *pubPlaintextData, uint32 cubPlaintextData,
-								 uint8 * pubEncryptedData, uint32 * pcubEncryptedData,
+bool CCrypto::EncryptWithPasswordAndHMAC( const uint8 *pubPlaintextData, size_t cubPlaintextData,
+								 uint8 * pubEncryptedData, size_t * pcubEncryptedData,
 								 const char *pchPassword )
 {
 	//
@@ -628,9 +625,9 @@ bool CCrypto::EncryptWithPasswordAndHMAC( const uint8 *pubPlaintextData, uint32 
 //			pchPassword -		text password
 // Output:  true if successful, false if encryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, uint32 cubPlaintextData,
-								 const uint8 * pIV, uint32 cubIV,
-								 uint8 * pubEncryptedData, uint32 * pcubEncryptedData,
+bool CCrypto::EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, size_t cubPlaintextData,
+								 const uint8 * pIV, size_t cubIV,
+								 uint8 * pubEncryptedData, size_t * pcubEncryptedData,
 								 const char *pchPassword )
 {
 	uint8 rgubKey[k_nSymmetricKeyLen];
@@ -640,15 +637,15 @@ bool CCrypto::EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, u
 	if ( !cubPlaintextData )
 		return false;
 
-	uint32 cubBuffer = *pcubEncryptedData;
-	uint32 cubExpectedResult = GetSymmetricEncryptedSize( cubPlaintextData ) + sizeof( SHADigest_t );
+	size_t cubBuffer = *pcubEncryptedData;
+	size_t cubExpectedResult = GetSymmetricEncryptedSize( cubPlaintextData ) + sizeof( SHADigest_t );
 
 	if ( cubBuffer < cubExpectedResult )
 		return false;
 
 	try
 	{
-		CryptoPP::SHA256().CalculateDigest( rgubKey, (const uint8 *)pchPassword, Q_strlen( pchPassword ) );
+		CryptoPP::SHA256().CalculateDigest( rgubKey, (const uint8 *)pchPassword, strlen( pchPassword ) );
 	}
 	catch ( const Exception &e ) 
 	{
@@ -661,7 +658,7 @@ bool CCrypto::EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, u
 	if ( bRet )
 	{
 		// calc HMAC
-		uint32 cubEncrypted = *pcubEncryptedData;
+		size_t cubEncrypted = *pcubEncryptedData;
 		*pcubEncryptedData += sizeof( SHADigest_t );
 		if ( cubBuffer < *pcubEncryptedData )
 			return false;
@@ -687,8 +684,8 @@ bool CCrypto::EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, u
 //			pchPassword -		the text password to decrypt the data with
 // Output:  true if successful, false if decryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData, uint32 cubEncryptedData, 
-								 uint8 * pubPlaintextData, uint32 * pcubPlaintextData,
+bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData, size_t cubEncryptedData, 
+								 uint8 * pubPlaintextData, size_t * pcubPlaintextData,
 								 const char *pchPassword )
 {
 	uint8 rgubKey[k_nSymmetricKeyLen];
@@ -700,7 +697,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 
 	try
 	{
-		CryptoPP::SHA256().CalculateDigest( rgubKey, (const uint8 *)pchPassword, Q_strlen( pchPassword ) );
+		CryptoPP::SHA256().CalculateDigest( rgubKey, (const uint8 *)pchPassword, strlen( pchPassword ) );
 	}
 	catch ( const Exception &e ) 
 	{
@@ -709,7 +706,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 		return false;
 	}
 
-	uint32 cubCiphertext = cubEncryptedData - sizeof( SHADigest_t );
+	size_t cubCiphertext = cubEncryptedData - sizeof(SHADigest_t);
 	SHADigest_t *pHMAC = (SHADigest_t*)( pubEncryptedData + cubCiphertext  );
 	SHADigest_t hmacActual;
 	bool bRet = CCrypto::GenerateHMAC( pubEncryptedData, cubCiphertext, rgubKey, k_nSymmetricKeyLen, &hmacActual );
@@ -717,7 +714,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 	if ( bRet )
 	{
 		// invalid ciphertext or key
-		if ( Q_memcmp( &hmacActual, pHMAC, sizeof( SHADigest_t ) ) )
+		if ( memcmp( &hmacActual, pHMAC, sizeof( SHADigest_t ) ) != 0 )
 			return false;
 		
 		bRet = SymmetricDecrypt( pubEncryptedData, cubCiphertext, pubPlaintextData, pcubPlaintextData, rgubKey, k_nSymmetricKeyLen );
@@ -737,7 +734,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 //								this is filled in with the actual size of the private key
 // Output:  true if successful, false if key generation failed
 //-----------------------------------------------------------------------------
-bool CCrypto::RSAGenerateKeys( uint8 *pubPublicKey, uint32 *pcubPublicKey, uint8 *pubPrivateKey, uint32 *pcubPrivateKey )
+bool CCrypto::RSAGenerateKeys( uint8 *pubPublicKey, size_t *pcubPublicKey, uint8 *pubPrivateKey, size_t *pcubPrivateKey )
 {
 	VPROF_BUDGET( "CCrypto::RSAGenerateKeys", VPROF_BUDGETGROUP_ENCRYPTION );
 	bool bRet = false;
@@ -787,9 +784,9 @@ bool CCrypto::RSAGenerateKeys( uint8 *pubPublicKey, uint32 *pcubPublicKey, uint8
 //			cubPublicKey -		Size of the key (must be k_nSymmetricKeyLen)
 // Output:  true if successful, false if encryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::RSAEncrypt( const uint8 *pubPlaintextData, uint32 cubPlaintextData, 
-						  uint8 *pubEncryptedData, uint32 *pcubEncryptedData, 
-						  const uint8 *pubPublicKey, const uint32 cubPublicKey )
+bool CCrypto::RSAEncrypt( const uint8 *pubPlaintextData, size_t cubPlaintextData, 
+						  uint8 *pubEncryptedData, size_t *pcubEncryptedData, 
+						  const uint8 *pubPublicKey, const size_t cubPublicKey )
 {
 	VPROF_BUDGET( "CCrypto::RSAEncrypt", VPROF_BUDGETGROUP_ENCRYPTION );
 	bool bRet = false;
@@ -802,10 +799,10 @@ bool CCrypto::RSAEncrypt( const uint8 *pubPlaintextData, uint32 cubPlaintextData
 
 		// calculate how many blocks of encryption will we need to do
 		AssertFatal( rsaEncryptor.FixedMaxPlaintextLength() <= ULONG_MAX );
-		uint32 cBlocks = 1 + ( ( cubPlaintextData - 1 ) / (uint32)rsaEncryptor.FixedMaxPlaintextLength() );
+		size_t cBlocks = 1 + ( ( cubPlaintextData - 1 ) / rsaEncryptor.FixedMaxPlaintextLength() );
 		// calculate how big the output will be
 		AssertFatal( rsaEncryptor.FixedCiphertextLength() <= ULONG_MAX / cBlocks );
-		uint32 cubCipherText = cBlocks * (uint32)rsaEncryptor.FixedCiphertextLength();
+		size_t cubCipherText = cBlocks * rsaEncryptor.FixedCiphertextLength();
 		Assert( cubCipherText > 0 );
 
 		// ensure there is sufficient room in output buffer for result
@@ -818,10 +815,10 @@ bool CCrypto::RSAEncrypt( const uint8 *pubPlaintextData, uint32 cubPlaintextData
 
 		// encrypt the message, using as many blocks as required
 		CPoolAllocatedRNG rng;
-		for ( uint32 nBlock = 0; nBlock < cBlocks; nBlock++ )
+		for ( size_t nBlock = 0; nBlock < cBlocks; nBlock++ )
 		{
 			// encrypt either all remaining plaintext, or maximum allowed plaintext per RSA encryption operation
-			uint32 cubToEncrypt = min( cubPlaintextData, (uint32)rsaEncryptor.FixedMaxPlaintextLength() );
+			size_t cubToEncrypt = min( cubPlaintextData, rsaEncryptor.FixedMaxPlaintextLength() );
 			// encrypt the plaintext
 			rsaEncryptor.Encrypt( rng.GetRNG(), pubPlaintextData, cubToEncrypt, pubEncryptedData );
 			// adjust input and output pointers and remaining plaintext byte count
@@ -856,9 +853,9 @@ bool CCrypto::RSAEncrypt( const uint8 *pubPlaintextData, uint32 cubPlaintextData
 //			cubPrivateKey -		Size of the key (must be k_nSymmetricKeyLen)
 // Output:  true if successful, false if decryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData, 
-						  uint8 *pubPlaintextData, uint32 *pcubPlaintextData, 
-						  const uint8 *pubPrivateKey, const uint32 cubPrivateKey )
+bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, size_t cubEncryptedData, 
+						  uint8 *pubPlaintextData, size_t *pcubPlaintextData, 
+						  const uint8 *pubPrivateKey, const size_t cubPrivateKey )
 {
 	VPROF_BUDGET( "CCrypto::RSADecrypt", VPROF_BUDGETGROUP_ENCRYPTION );
 	bool bRet = false;
@@ -872,7 +869,7 @@ bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData
 
 		// calculate how many blocks of decryption will we need to do
 		AssertFatal( rsaDecryptor.FixedCiphertextLength() <= ULONG_MAX );
-		uint32 cubFixedCiphertextLength = (uint32)rsaDecryptor.FixedCiphertextLength();
+		size_t cubFixedCiphertextLength = rsaDecryptor.FixedCiphertextLength();
 		// Ensure encrypted data is valid and has length that is exact multiple of 128 bytes
 		if ( 0 != ( cubEncryptedData % cubFixedCiphertextLength ) )
 		{
@@ -880,28 +877,28 @@ bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData
 				cubEncryptedData, cubFixedCiphertextLength );
 			return false;
 		}
-		uint32 cBlocks = cubEncryptedData / cubFixedCiphertextLength;
+		size_t cBlocks = cubEncryptedData / cubFixedCiphertextLength;
 
 		// calculate how big the maximum output will be
 		size_t cubMaxPlaintext = rsaDecryptor.MaxPlaintextLength( rsaDecryptor.FixedCiphertextLength() );
 		AssertFatal( cubMaxPlaintext <= ULONG_MAX / cBlocks );
-		uint32 cubPlaintextDataMax = cBlocks * (uint32)cubMaxPlaintext;
+		size_t cubPlaintextDataMax = cBlocks * cubMaxPlaintext;
 		Assert( cubPlaintextDataMax > 0 );
 		// ensure there is sufficient room in output buffer for result
 		if ( cubPlaintextDataMax >= ( *pcubPlaintextData ) )
 		{
-			AssertMsg2( false, "CCrypto::RSADecrypt: insufficient output buffer for decryption, needed %d got %d\n",
+			AssertMsg2( false, "CCrypto::RSADecrypt: insufficient output buffer for decryption, needed %zu got %zu\n",
 						cubPlaintextDataMax, *pcubPlaintextData );
 			return false;
 		}
 
 		// decrypt the data, using as many blocks as required
 		CPoolAllocatedRNG rng;
-		uint32 cubPlaintextData = 0;
-		for ( uint32 nBlock = 0; nBlock < cBlocks; nBlock++ )
+		size_t cubPlaintextData = 0;
+		for ( size_t nBlock = 0; nBlock < cBlocks; nBlock++ )
 		{
 			// decrypt one block (always of fixed size)
-			int cubToDecrypt = cubFixedCiphertextLength;
+			size_t cubToDecrypt = cubFixedCiphertextLength;
 			DecodingResult decodingResult = rsaDecryptor.Decrypt( rng.GetRNG(), pubEncryptedData, cubToDecrypt, pubPlaintextData );
 			if ( !decodingResult.isValidCoding )
 			{
@@ -913,7 +910,7 @@ bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData
 			cubEncryptedData -= cubToDecrypt;
 			pubPlaintextData += decodingResult.messageLength;
 			AssertFatal( decodingResult.messageLength <= ULONG_MAX );
-			cubPlaintextData += (uint32)decodingResult.messageLength;
+			cubPlaintextData += decodingResult.messageLength;
 		}
 		Assert( 0 == cubEncryptedData );	// should have no remaining encrypted data to decrypt
 		*pcubPlaintextData = cubPlaintextData;
@@ -943,9 +940,9 @@ bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, uint32 cubEncryptedData
 //			cubPublicKey -		Size of the key
 // Output:  true if successful, false if decryption failed
 //-----------------------------------------------------------------------------
-bool CCrypto::RSAPublicDecrypt_NoPadding( const uint8 *pubEncryptedData, uint32 cubEncryptedData, 
-						 uint8 *pubPlaintextData, uint32 *pcubPlaintextData, 
-						 const uint8 *pubPublicKey, const uint32 cubPublicKey )
+bool CCrypto::RSAPublicDecrypt_NoPadding( const uint8 *pubEncryptedData, size_t cubEncryptedData, 
+						 uint8 *pubPlaintextData, size_t *pcubPlaintextData, 
+						 const uint8 *pubPublicKey, const size_t cubPublicKey )
 {
 	VPROF_BUDGET( "CCrypto::RSADecrypt", VPROF_BUDGETGROUP_ENCRYPTION );
 	bool bRet = false;
@@ -1010,9 +1007,9 @@ bool CCrypto::RSAPublicDecrypt_NoPadding( const uint8 *pubEncryptedData, uint32 
 //			cubPrivateKey -		Size of the key
 // Output:  true if successful, false if signature failed
 //-----------------------------------------------------------------------------
-bool CCrypto::RSASign( const uint8 *pubData, const uint32 cubData, 
-					   uint8 *pubSignature, uint32 *pcubSignature,
-					   const uint8 *pubPrivateKey, const uint32 cubPrivateKey )
+bool CCrypto::RSASign( const uint8 *pubData, const size_t cubData, 
+					   uint8 *pubSignature, size_t *pcubSignature,
+					   const uint8 *pubPrivateKey, const size_t cubPrivateKey )
 {
 	VPROF_BUDGET( "CCrypto::RSASign", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1026,9 +1023,8 @@ bool CCrypto::RSASign( const uint8 *pubData, const uint32 cubData,
 		StringSource stringSourcePrivateKey( pubPrivateKey, cubPrivateKey, true );
 		RSASSA_PKCS1v15_SHA_Signer rsaSigner( stringSourcePrivateKey );
 		CPoolAllocatedRNG rng;
-		size_t len = rsaSigner.SignMessage( rng.GetRNG(), (byte *)pubData, cubData, pubSignature );
-		AssertFatal( len <= ULONG_MAX );
-		*pcubSignature = (uint32)len;
+		size_t len = rsaSigner.SignMessage( rng.GetRNG(), pubData, cubData, pubSignature );
+		*pcubSignature = len;
 		bRet = true;
 	}
 	catch ( const Exception &e ) 
@@ -1052,9 +1048,9 @@ bool CCrypto::RSASign( const uint8 *pubData, const uint32 cubData,
 //			cubPublicKey -		Size of the key
 // Output:  true if successful and signature is authentic, false if signature does not match or other error
 //-----------------------------------------------------------------------------
-bool CCrypto::RSAVerifySignature( const uint8 *pubData, const uint32 cubData, 
-								  const uint8 *pubSignature, const uint32 cubSignature, 
-								  const uint8 *pubPublicKey, const uint32 cubPublicKey )
+bool CCrypto::RSAVerifySignature( const uint8 *pubData, const size_t cubData, 
+								  const uint8 *pubSignature, const size_t cubSignature, 
+								  const uint8 *pubPublicKey, const size_t cubPublicKey )
 {
 	VPROF_BUDGET( "CCrypto::RSAVerifySignature", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1091,9 +1087,9 @@ bool CCrypto::RSAVerifySignature( const uint8 *pubData, const uint32 cubData,
 //			cubPrivateKey -		Size of the key
 // Output:  true if successful, false if signature failed
 //-----------------------------------------------------------------------------
-bool CCrypto::RSASignSHA256( const uint8 *pubData, const uint32 cubData, 
-					   uint8 *pubSignature, uint32 *pcubSignature,
-					   const uint8 *pubPrivateKey, const uint32 cubPrivateKey )
+bool CCrypto::RSASignSHA256( const uint8 *pubData, const size_t cubData, 
+					   uint8 *pubSignature, size_t *pcubSignature,
+					   const uint8 *pubPrivateKey, const size_t cubPrivateKey )
 {
 	VPROF_BUDGET( "CCrypto::RSASign", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1107,9 +1103,8 @@ bool CCrypto::RSASignSHA256( const uint8 *pubData, const uint32 cubData,
 		StringSource stringSourcePrivateKey( pubPrivateKey, cubPrivateKey, true );
 		RSASS<PKCS1v15, SHA256>::Signer rsaSigner( stringSourcePrivateKey );
 		CPoolAllocatedRNG rng;
-		size_t len = rsaSigner.SignMessage( rng.GetRNG(), (byte *)pubData, cubData, pubSignature );
-		AssertFatal( len <= ULONG_MAX );
-		*pcubSignature = (uint32)len;
+		size_t len = rsaSigner.SignMessage( rng.GetRNG(), pubData, cubData, pubSignature );
+		*pcubSignature = len;
 		bRet = true;
 	}
 	catch ( const Exception &e ) 
@@ -1133,9 +1128,9 @@ bool CCrypto::RSASignSHA256( const uint8 *pubData, const uint32 cubData,
 //			cubPublicKey -		Size of the key
 // Output:  true if successful and signature is authentic, false if signature does not match or other error
 //-----------------------------------------------------------------------------
-bool CCrypto::RSAVerifySignatureSHA256( const uint8 *pubData, const uint32 cubData, 
-								  const uint8 *pubSignature, const uint32 cubSignature, 
-								  const uint8 *pubPublicKey, const uint32 cubPublicKey )
+bool CCrypto::RSAVerifySignatureSHA256( const uint8 *pubData, const size_t cubData, 
+								  const uint8 *pubSignature, const size_t cubSignature, 
+								  const uint8 *pubPublicKey, const size_t cubPublicKey )
 {
 	VPROF_BUDGET( "CCrypto::RSAVerifySignature", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1167,7 +1162,7 @@ bool CCrypto::RSAVerifySignatureSHA256( const uint8 *pubData, const uint32 cubDa
 //			pchEncodedData -	Pointer to string buffer to store output in
 //			cchEncodedData -	Size of pchEncodedData buffer
 //-----------------------------------------------------------------------------
-bool CCrypto::HexEncode( const uint8 *pubData, const uint32 cubData, char *pchEncodedData, uint32 cchEncodedData )
+bool CCrypto::HexEncode( const uint8 *pubData, const size_t cubData, char *pchEncodedData, size_t cchEncodedData )
 {
 	VPROF_BUDGET( "CCrypto::HexEncode", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1182,16 +1177,16 @@ bool CCrypto::HexEncode( const uint8 *pubData, const uint32 cubData, char *pchEn
 		return false;
 	}
 
-	ArraySink * pArraySinkOutput = new ArraySink( (byte *) pchEncodedData, cchEncodedData );
+	ArraySink pArraySinkOutput( (byte *) pchEncodedData, cchEncodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
-	HexEncoder hexEncoder( pArraySinkOutput );
+	HexEncoder hexEncoder( &pArraySinkOutput );
 	hexEncoder.Put( pubData, cubData );
 	hexEncoder.MessageEnd();
 
-	uint32 len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput.TotalPutLength();
 	if ( len >= cchEncodedData )
 	{
-		AssertMsg2( false, "CCrypto::HexEncode: insufficient output buffer for encoding, needed %d got %d\n",
+		AssertMsg2( false, "CCrypto::HexEncode: insufficient output buffer for encoding, needed %zu got %zu\n",
 					len, cchEncodedData );
 		return false;
 	}
@@ -1209,24 +1204,24 @@ bool CCrypto::HexEncode( const uint8 *pubData, const uint32 cubData, char *pchEn
 //								output buffer.  At exit, is filled in with actual size
 //								of decoded data.
 //-----------------------------------------------------------------------------
-bool CCrypto::HexDecode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData )
+bool CCrypto::HexDecode( const char *pchData, uint8 *pubDecodedData, size_t *pcubDecodedData )
 {
 	VPROF_BUDGET( "CCrypto::HexDecode", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pchData );
 	Assert( pubDecodedData );
 	Assert( pcubDecodedData );
 	Assert( *pcubDecodedData );
-
-	ArraySink * pArraySinkOutput = new ArraySink( pubDecodedData, *pcubDecodedData );
+	
+	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
-	HexDecoder hexDecoder( pArraySinkOutput );
-	hexDecoder.Put( (byte *) pchData, Q_strlen( pchData ) );
+	HexDecoder hexDecoder( &pArraySinkOutput );
+	hexDecoder.Put( (const byte *) pchData, strlen( pchData ) );
 	hexDecoder.MessageEnd();
 
-	uint32 len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput.TotalPutLength();
 	if ( len > *pcubDecodedData )
 	{
-		AssertMsg2( false, "CCrypto::HexDecode: insufficient output buffer for decoding, needed %d got %d\n",
+		AssertMsg2( false, "CCrypto::HexDecode: insufficient output buffer for decoding, needed %zu got %zu\n",
 					len, *pcubDecodedData );
 		return false;
 	}
@@ -1236,18 +1231,18 @@ bool CCrypto::HexDecode( const char *pchData, uint8 *pubDecodedData, uint32 *pcu
 }
 
 
-static const int k_LineBreakEveryNGroups = 18; // line break every 18 groups of 4 characters (every 72 characters)
+static constexpr inline int k_LineBreakEveryNGroups = 18; // line break every 18 groups of 4 characters (every 72 characters)
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the expected buffer size that should be passed to Base64Encode.
 // Input:	cubData -			Size of data to encode
 //			bInsertLineBreaks -	If line breaks should be inserted automatically
 //-----------------------------------------------------------------------------
-uint32 CCrypto::Base64EncodeMaxOutput( const uint32 cubData, const char *pszLineBreak )
+size_t CCrypto::Base64EncodeMaxOutput( const size_t cubData, const char *pszLineBreak )
 {
 	// terminating null + 4 chars per 3-byte group + line break after every 18 groups (72 output chars) + final line break
-	uint32 nGroups = (cubData+2)/3;
-	str_size cchRequired = 1 + nGroups*4 + ( pszLineBreak ? Q_strlen(pszLineBreak)*(1+(nGroups-1)/k_LineBreakEveryNGroups) : 0 );
+	size_t nGroups = (cubData+2)/3;
+	size_t cchRequired = 1 + nGroups*4 + ( pszLineBreak ? strlen(pszLineBreak)*(1+(nGroups-1)/k_LineBreakEveryNGroups) : 0 );
 	return cchRequired;
 }
 
@@ -1261,12 +1256,11 @@ uint32 CCrypto::Base64EncodeMaxOutput( const uint32 cubData, const char *pszLine
 //			cchEncodedData -	Size of pchEncodedData buffer
 //			bInsertLineBreaks -	If "\n" line breaks should be inserted automatically
 //-----------------------------------------------------------------------------
-bool CCrypto::Base64Encode( const uint8 *pubData, uint32 cubData, char *pchEncodedData, uint32 cchEncodedData, bool bInsertLineBreaks )
+bool CCrypto::Base64Encode( const uint8 *pubData, size_t cubData, char *pchEncodedData, size_t cchEncodedData, bool bInsertLineBreaks )
 {
 	const char *pszLineBreak = bInsertLineBreaks ? "\n" : NULL;
-	uint32 cchRequired = Base64EncodeMaxOutput( cubData, pszLineBreak );
-	(void)cchRequired;
-	AssertMsg2( cchEncodedData >= cchRequired, "CCrypto::Base64Encode: insufficient output buffer for encoding, needed %d got %d\n", cchRequired, cchEncodedData );
+	[[maybe_unused]] size_t cchRequired = Base64EncodeMaxOutput( cubData, pszLineBreak );
+	AssertMsg2( cchEncodedData >= cchRequired, "CCrypto::Base64Encode: insufficient output buffer for encoding, needed %zu got %zu\n", cchRequired, cchEncodedData );
 	return Base64Encode( pubData, cubData, pchEncodedData, &cchEncodedData, pszLineBreak );
 }
 
@@ -1281,7 +1275,7 @@ bool CCrypto::Base64Encode( const uint8 *pubData, uint32 cubData, char *pchEncod
 // Note: if pchEncodedData is NULL and *pcchEncodedData is zero, *pcchEncodedData is filled with the actual required length
 // for output. A simpler approximation for maximum output size is (cubData * 4 / 3) + 5 if there are no linebreaks.
 //-----------------------------------------------------------------------------
-bool CCrypto::Base64Encode( const uint8 *pubData, uint32 cubData, char *pchEncodedData, uint32* pcchEncodedData, const char *pszLineBreak )
+bool CCrypto::Base64Encode( const uint8 *pubData, size_t cubData, char *pchEncodedData, size_t* pcchEncodedData, const char *pszLineBreak )
 {
 	VPROF_BUDGET( "CCrypto::Base64Encode", VPROF_BUDGETGROUP_ENCRYPTION );
 	
@@ -1294,12 +1288,12 @@ bool CCrypto::Base64Encode( const uint8 *pubData, uint32 cubData, char *pchEncod
 	
 	const uint8 *pubDataEnd = pubData + cubData;
 	char *pchEncodedDataStart = pchEncodedData;
-	str_size unLineBreakLen = pszLineBreak ? Q_strlen( pszLineBreak ) : 0;
+	size_t unLineBreakLen = pszLineBreak ? strlen( pszLineBreak ) : 0;
 	int nNextLineBreak = unLineBreakLen ? k_LineBreakEveryNGroups : INT_MAX;
 
-	const char * const pszBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	constexpr char pszBase64Chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	uint32 cchEncodedData = *pcchEncodedData;
+	size_t cchEncodedData = *pcchEncodedData;
 	if ( cchEncodedData == 0 )
 		goto out_of_space;
 
@@ -1393,7 +1387,7 @@ out_of_space:
 // will calculate the actual required size and place it in *pcubDecodedData. A simpler upper
 // bound on the required size is ( strlen(pchData)*3/4 + 1 ).
 //-----------------------------------------------------------------------------
-bool CCrypto::Base64Decode( const char *pchData, uint8 *pubDecodedData, uint32 *pcubDecodedData, bool bIgnoreInvalidCharacters )
+bool CCrypto::Base64Decode( const char *pchData, uint8 *pubDecodedData, size_t *pcubDecodedData, bool bIgnoreInvalidCharacters )
 {
 	return Base64Decode( pchData, ~0u, pubDecodedData, pcubDecodedData, bIgnoreInvalidCharacters );
 }
@@ -1410,12 +1404,12 @@ bool CCrypto::Base64Decode( const char *pchData, uint8 *pubDecodedData, uint32 *
 // will calculate the actual required size and place it in *pcubDecodedData. A simpler upper
 // bound on the required size is ( strlen(pchData)*3/4 + 2 ).
 //-----------------------------------------------------------------------------
-bool CCrypto::Base64Decode( const char *pchData, uint32 cchDataMax, uint8 *pubDecodedData, uint32 *pcubDecodedData, bool bIgnoreInvalidCharacters )
+bool CCrypto::Base64Decode( const char *pchData, size_t cchDataMax, uint8 *pubDecodedData, size_t *pcubDecodedData, bool bIgnoreInvalidCharacters )
 {
 	VPROF_BUDGET( "CCrypto::Base64Decode", VPROF_BUDGETGROUP_ENCRYPTION );
 	
-	uint32 cubDecodedData = *pcubDecodedData;
-	uint32 cubDecodedDataOrig = cubDecodedData;
+	size_t cubDecodedData = *pcubDecodedData;
+	size_t cubDecodedDataOrig = cubDecodedData;
 
 	if ( pubDecodedData == NULL )
 	{
@@ -1425,7 +1419,7 @@ bool CCrypto::Base64Decode( const char *pchData, uint32 cchDataMax, uint8 *pubDe
 	
 	// valid base64 character range: '+' (0x2B) to 'z' (0x7A)
 	// table entries are 0-63, -1 for invalid entries, -2 for '='
-	static const char rgchInvBase64[] = {
+	static constexpr char rgchInvBase64[] = {
 		62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
 		-1, -1, -1, -2, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,  7,
 		 8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
@@ -1523,7 +1517,7 @@ decode_failed:
 // Input:	pchInput -			Plaintext string of item to hash (null terminated)
 //			pOutDigest -		Pointer to receive hashed digest output
 //-----------------------------------------------------------------------------
-bool CCrypto::GenerateSHA1Digest( const uint8 *pubInput, const int cubInput, SHADigest_t *pOutDigest )
+bool CCrypto::GenerateSHA1Digest( const uint8 *pubInput, const size_t cubInput, SHADigest_t *pOutDigest )
 {
 	VPROF_BUDGET( "CCrypto::GenerateSHA1Digest", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubInput );
@@ -1581,29 +1575,27 @@ bool CCrypto::GenerateSaltedSHA1Digest( const char *pchInput, const Salt_t *pSal
 	Assert( pSalt );
 	Assert( pOutDigest );
 
-	ptrdiff_t iInputLen = Q_strlen( pchInput );
-	uint8 *pubSaltedInput = new uint8[ iInputLen + sizeof( Salt_t ) ];
+	size_t iInputLen = strlen( pchInput );
+	std::unique_ptr<uint8[]> pubSaltedInput = std::make_unique<uint8[]>(iInputLen + sizeof( Salt_t ));
 
 	// Insert half the salt before the input string and half at the end.
 	// This is probably unnecessary (to split the salt) but we're stuck with it for historical reasons.
-	uint8 *pubCursor = pubSaltedInput;
-	Q_memcpy( pubCursor, (uint8 *)pSalt, sizeof(Salt_t) / 2 );
+	uint8 *pubCursor = pubSaltedInput.get();
+	memcpy( pubCursor, pSalt, sizeof(Salt_t) / 2 );
 	pubCursor += sizeof( Salt_t ) / 2;
-	Q_memcpy( pubCursor, pchInput, iInputLen );
+	memcpy( pubCursor, pchInput, iInputLen );
 	pubCursor += iInputLen;
-	Q_memcpy( pubCursor, (uint8 *)pSalt + sizeof(Salt_t) / 2, sizeof(Salt_t) / 2 );
+	memcpy( pubCursor, pSalt + sizeof(Salt_t) / 2, sizeof(Salt_t) / 2 );
 
 	bool bSuccess = true;
 	try
 	{
-		CryptoPP::SHA1().CalculateDigest( *pOutDigest, pubSaltedInput, iInputLen + sizeof( Salt_t ) );
+		CryptoPP::SHA1().CalculateDigest( *pOutDigest, pubSaltedInput.get(), iInputLen + sizeof( Salt_t ) );
 	}
 	catch(...)
 	{
 		bSuccess = false;
 	}
-
-	delete [] pubSaltedInput;
 
 	return bSuccess;
 }
@@ -1612,7 +1604,7 @@ bool CCrypto::GenerateSaltedSHA1Digest( const char *pchInput, const Salt_t *pSal
 //-----------------------------------------------------------------------------
 // Purpose: Generates a random block of data
 //-----------------------------------------------------------------------------
-bool CCrypto::GenerateRandomBlock( uint8 *pubDest, int cubDest )
+bool CCrypto::GenerateRandomBlock( uint8 *pubDest, size_t cubDest )
 {
 	CPoolAllocatedRNG rng;
 	rng.GetRNG().GenerateBlock( pubDest, cubDest );
@@ -1629,7 +1621,7 @@ bool CCrypto::GenerateRandomBlock( uint8 *pubDest, int cubDest )
 //			cubKey -			length of key
 //			pOutDigest -		Pointer to receive hashed digest output
 //-----------------------------------------------------------------------------
-bool CCrypto::GenerateHMAC( const uint8 *pubData, uint32 cubData, const uint8 *pubKey, uint32 cubKey, SHADigest_t *pOutputDigest )
+bool CCrypto::GenerateHMAC( const uint8 *pubData, size_t cubData, const uint8 *pubKey, size_t cubKey, SHADigest_t *pOutputDigest )
 {
 	VPROF_BUDGET( "CCrypto::GenerateHMAC", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1656,7 +1648,7 @@ bool CCrypto::GenerateHMAC( const uint8 *pubData, uint32 cubData, const uint8 *p
 //-----------------------------------------------------------------------------
 // Purpose: Generate a keyed-hash MAC using SHA-256
 //-----------------------------------------------------------------------------
-bool CCrypto::GenerateHMAC256( const uint8 *pubData, uint32 cubData, const uint8 *pubKey, uint32 cubKey, SHA256Digest_t *pOutputDigest )
+bool CCrypto::GenerateHMAC256( const uint8 *pubData, size_t cubData, const uint8 *pubKey, size_t cubKey, SHA256Digest_t *pOutputDigest )
 {
 	VPROF_BUDGET( "CCrypto::GenerateHMAC256", VPROF_BUDGETGROUP_ENCRYPTION );
 	Assert( pubData );
@@ -1680,14 +1672,16 @@ bool CCrypto::GenerateHMAC256( const uint8 *pubData, uint32 cubData, const uint8
 }
 
 
-bool CCrypto::BGzipBuffer( const uint8 *pubData, uint32 cubData, CCryptoOutBuffer &bufOutput )
+bool CCrypto::BGzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuffer &bufOutput )
 {
 	bool bSuccess = true;
 	try
 	{
 		std::string gzip_output;
-		StringSource( (byte *)pubData, cubData, true, new Gzip( new StringSink( gzip_output ) ) ); 
-		bufOutput.Set( (uint8*)gzip_output.c_str(), (uint32)gzip_output.length() );
+		StringSink sink{gzip_output};
+		Gzip zip{&sink};
+		StringSource src( pubData, cubData, true, &zip );
+		bufOutput.Set( (const uint8*)gzip_output.c_str(), gzip_output.length() );
 	}
 	catch( ... )
 	{
@@ -1697,14 +1691,16 @@ bool CCrypto::BGzipBuffer( const uint8 *pubData, uint32 cubData, CCryptoOutBuffe
 }
 
 
-bool CCrypto::BGunzipBuffer( const uint8 *pubData, uint32 cubData, CCryptoOutBuffer &bufOutput   )
+bool CCrypto::BGunzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuffer &bufOutput   )
 {
 	bool bSuccess = true;
 	try
 	{
 		std::string gunzip_output;
-		StringSource( (byte *)pubData, cubData, true, new Gunzip( new StringSink( gunzip_output ) ) ); 
-		bufOutput.Set( (uint8*)gunzip_output.c_str(), (uint32)gunzip_output.length() );
+		StringSink sink{gunzip_output};
+		Gunzip unzip{&sink};
+		StringSource src( pubData, cubData, true, &unzip ); 
+		bufOutput.Set( (const uint8*)gunzip_output.c_str(), gunzip_output.length() );
 	}
 	catch( ... )
 	{
@@ -1745,15 +1741,19 @@ public:
 CCustomHexEncoder::CCustomHexEncoder( const char *pchEncodingTable )
 {
 	m_bValidEncoding = false;
-	if ( Q_strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
+
+	BitwiseClear(m_rgnDecodingTable);
+
+	if ( strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
 	{
-		Q_memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
+		memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
 
 		BaseN_Decoder::InitializeDecodingLookupArray( m_rgnDecodingTable, m_rgubEncodingTable, 16, false );
 		m_bValidEncoding = true;
 	}
 	else
 	{
+		BitwiseClear(m_rgubEncodingTable);
 		AssertMsg( false, "CCrypto::CustomHexEncoder: Improper encoding table\n" );
 	}
 }
@@ -1779,18 +1779,18 @@ bool CCustomHexEncoder::Encode( const uint8 *pubData, const size_t cubData, char
 	if ( !m_bValidEncoding )
 		return false;
 
-	ArraySink * pArraySinkOutput = new ArraySink( (byte *) pchEncodedData, cchEncodedData );
+	ArraySink pArraySinkOutput( (byte *) pchEncodedData, cchEncodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
-	HexEncoder hexEncoder( pArraySinkOutput );
+	HexEncoder hexEncoder( &pArraySinkOutput );
 	hexEncoder.IsolatedInitialize( MakeParameters( Name::EncodingLookupArray(), (const uint8 *)m_rgubEncodingTable ) );
 	hexEncoder.Put( pubData, cubData );
 	hexEncoder.MessageEnd();
 
-	size_t len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput.TotalPutLength();
 	pchEncodedData[len] = 0;	// NULL-terminate
 	if ( len >= cchEncodedData )
 	{
-		AssertMsg2( false, "CCrypto::CustomHexEncode: insufficient output buffer for encoding, needed %d got %d\n",
+		AssertMsg2( false, "CCrypto::CustomHexEncode: insufficient output buffer for encoding, needed %zu got %zu\n",
 			len, cchEncodedData );
 		return false;
 	}
@@ -1819,16 +1819,16 @@ bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, size
 	if ( !m_bValidEncoding )
 		return false;
 
-	ArraySink * pArraySinkOutput = new ArraySink( pubDecodedData, *pcubDecodedData );
+	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
-	HexDecoderTKS hexDecoder( pArraySinkOutput, (const int *)m_rgnDecodingTable );
-	hexDecoder.Put( (byte *) pchData, Q_strlen( pchData ) );
+	HexDecoderTKS hexDecoder( &pArraySinkOutput, (const int *)m_rgnDecodingTable );
+	hexDecoder.Put( (const byte *) pchData, strlen( pchData ) );
 	hexDecoder.MessageEnd();
 
-	size_t len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput.TotalPutLength();
 	if ( len > *pcubDecodedData )
 	{
-		AssertMsg2( false, "CCrypto::CustomHexDecode: insufficient output buffer for decoding, needed %d got %d\n",
+		AssertMsg2( false, "CCrypto::CustomHexDecode: insufficient output buffer for decoding, needed %zu got %zu\n",
 			len, *pcubDecodedData );
 		return false;
 	}
@@ -1847,15 +1847,19 @@ bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, size
 CCustomBase32Encoder::CCustomBase32Encoder( const char *pchEncodingTable )
 {
 	m_bValidEncoding = false;
-	if ( Q_strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
+	
+	BitwiseClear(m_rgnDecodingTable);
+
+	if ( strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
 	{
-		Q_memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
+		memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
 
 		BaseN_Decoder::InitializeDecodingLookupArray( m_rgnDecodingTable, m_rgubEncodingTable, 32, false );
 		m_bValidEncoding = true;
 	}
 	else
 	{
+		BitwiseClear(m_rgubEncodingTable);
 		AssertMsg( false, "CCrypto::CustomBase32Encoder: Improper encoding table\n" );
 	}
 }
@@ -1881,18 +1885,18 @@ bool CCustomBase32Encoder::Encode( const uint8 *pubData, const size_t cubData, c
 	if ( !m_bValidEncoding )
 		return false;
 
-	ArraySink * pArraySinkOutput = new ArraySink( (byte *) pchEncodedData, cchEncodedData );
+	ArraySink pArraySinkOutput( (byte *) pchEncodedData, cchEncodedData );
 	// Note: Base32Encoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
-	Base32Encoder base32Encoder( pArraySinkOutput );
+	Base32Encoder base32Encoder( &pArraySinkOutput );
 	base32Encoder.IsolatedInitialize( MakeParameters( Name::EncodingLookupArray(), (const uint8 *)m_rgubEncodingTable ) );
 	base32Encoder.Put( pubData, cubData );
 	base32Encoder.MessageEnd();
 
-	size_t len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput.TotalPutLength();
 	pchEncodedData[len] = 0;	// NULL-terminate
 	if ( len >= cchEncodedData )
 	{
-		AssertMsg2( false, "CCrypto::CustomBase32Encode: insufficient output buffer for encoding, needed %d got %d\n",
+		AssertMsg2( false, "CCrypto::CustomBase32Encode: insufficient output buffer for encoding, needed %zu got %zu\n",
 			len, cchEncodedData );
 		return false;
 	}
@@ -1921,16 +1925,16 @@ bool CCustomBase32Encoder::Decode( const char *pchData, uint8 *pubDecodedData, s
 	if ( !m_bValidEncoding )
 		return false;
 
-	ArraySink * pArraySinkOutput = new ArraySink( pubDecodedData, *pcubDecodedData );
+	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: Base32Encoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
-	Base32DecoderTKS base32Decoder( pArraySinkOutput, (const int *)m_rgnDecodingTable );
-	base32Decoder.Put( (byte *) pchData, Q_strlen( pchData ) );
+	Base32DecoderTKS base32Decoder( &pArraySinkOutput, (const int *)m_rgnDecodingTable );
+	base32Decoder.Put( (const byte *) pchData, strlen( pchData ) );
 	base32Decoder.MessageEnd();
 
-	size_t len = pArraySinkOutput->TotalPutLength();
+	size_t len = pArraySinkOutput.TotalPutLength();
 	if ( len > *pcubDecodedData )
 	{
-		AssertMsg2( false, "CCrypto::CustomBase32Decode: insufficient output buffer for decoding, needed %d got %d\n",
+		AssertMsg2( false, "CCrypto::CustomBase32Decode: insufficient output buffer for decoding, needed %zu got %zu\n",
 			len, *pcubDecodedData );
 		return false;
 	}
@@ -1996,7 +2000,7 @@ bool CCustomBase32Encoder::Decode( const char *pchData, CSimpleBitString *pBitSt
 	// Decoded into a CSimpleBitString, it will yield all 125 bits
 	while ( *pchData )
 	{
-		uint32 unData = m_rgnDecodingTable[(unsigned)*pchData++];
+		uint32 unData = m_rgnDecodingTable[(unsigned char)*pchData++];
 		if ( unData == 0xFFFFFFFF )
 			return false;
 
@@ -2035,8 +2039,8 @@ bool CCrypto::BValidatePasswordHash( const char *pchInput, EPasswordHashAlg hash
 		pOutputDigest = &tmpDigest;
 	}
 
-	BGeneratePasswordHash( pchInput, hashType, Salt, *pOutputDigest );
-	bResult = ( 0 == Q_memcmp( &DigestStored, pOutputDigest, cDigest ) );
+	bResult = BGeneratePasswordHash( pchInput, hashType, Salt, *pOutputDigest );
+	bResult = bResult && ( 0 == memcmp( &DigestStored, pOutputDigest, cDigest ) );
 
 	return bResult;
 }
@@ -2068,10 +2072,9 @@ bool CCrypto::BGeneratePasswordHash( const char *pchInput, EPasswordHashAlg hash
 		
 		AssertMsg( ( ( cDigest - cDigestSHA1 ) % 2 ) == 0, "Invalid hash width for k_EHashBigPassword, needs to be even." );
 
-		CCrypto::GenerateSaltedSHA1Digest( pchInput, &Salt, (SHADigest_t *)( (uint8 *)&OutPasswordHash.bigpassword + cPadding ) );
-		Q_memset( (uint8 *)&OutPasswordHash, 0x01, cPadding );
-		Q_memset( (uint8 *)&OutPasswordHash + cPadding + cDigestSHA1 , 0x01, cPadding );
-		bResult = true;
+		bResult = CCrypto::GenerateSaltedSHA1Digest( pchInput, &Salt, (SHADigest_t *)( (uint8 *)&OutPasswordHash.bigpassword + cPadding ) );
+		memset( &OutPasswordHash, 0x01, cPadding );
+		memset( &OutPasswordHash + cPadding + cDigestSHA1, 0x01, cPadding );
 		break;
 	}
 	case k_EHashPBKDF2_1000:
@@ -2098,11 +2101,11 @@ bool CCrypto::BGeneratePasswordHash( const char *pchInput, EPasswordHashAlg hash
 // Purpose: Given a plaintext password and salt and a count of rounds, generate a PBKDF2 hash
 //			with the requested number of rounds.
 //-----------------------------------------------------------------------------
-bool CCrypto::BGeneratePBKDF2Hash( const char* pchInput, const Salt_t &Salt, unsigned int rounds, PasswordHash_t &OutPasswordHash )
+bool CCrypto::BGeneratePBKDF2Hash( const char* pchInput, const Salt_t &Salt, unsigned rounds, PasswordHash_t &OutPasswordHash )
 {
 	PKCS5_PBKDF2_HMAC<SHA256> pbkdf;
 
-	size_t iterations = pbkdf.DeriveKey( (byte *)&OutPasswordHash.pbkdf2, sizeof(OutPasswordHash.pbkdf2), 0, (const byte *)pchInput, Q_strlen(pchInput), (const byte *)&Salt, sizeof(Salt), rounds );
+	size_t iterations = pbkdf.DeriveKey( (byte *)&OutPasswordHash.pbkdf2, sizeof(OutPasswordHash.pbkdf2), 0, (const byte *)pchInput, strlen(pchInput), (const byte *)&Salt, sizeof(Salt), rounds );
 
 	return ( iterations == rounds );
 }
@@ -2113,10 +2116,9 @@ bool CCrypto::BGeneratePBKDF2Hash( const char* pchInput, const Salt_t &Salt, uns
 //			a PBKDF2 hash with the specified number of rounds.
 //			Used to provide a stronger password hash for accounts that haven't logged in in a while.
 //-----------------------------------------------------------------------------
-bool CCrypto::BGenerateWrappedSHA1PasswordHash( const char *pchInput, const Salt_t &Salt, unsigned int rounds, PasswordHash_t &OutPasswordHash )
+bool CCrypto::BGenerateWrappedSHA1PasswordHash( const char *pchInput, const Salt_t &Salt, unsigned rounds, PasswordHash_t &OutPasswordHash )
 {
-	bool bResult;
-	bResult = CCrypto::GenerateSaltedSHA1Digest( pchInput, &Salt, (SHADigest_t *)&OutPasswordHash.sha );
+	bool bResult = CCrypto::GenerateSaltedSHA1Digest( pchInput, &Salt, (SHADigest_t *)&OutPasswordHash.sha );
 	if ( bResult )
 	{
 		PKCS5_PBKDF2_HMAC<SHA256> pbkdf;
@@ -2135,9 +2137,9 @@ bool CCrypto::BGenerateWrappedSHA1PasswordHash( const char *pchInput, const Salt
 //			hash to a PBKDF2 hash with 10,000 rounds.  In the future this function
 //			may be extended to allow additional transformations.
 //-----------------------------------------------------------------------------
-bool CCrypto::BUpgradeOrWrapPasswordHash( PasswordHash_t &InPasswordHash, EPasswordHashAlg hashTypeIn, const Salt_t &Salt, PasswordHash_t &OutPasswordHash, EPasswordHashAlg &hashTypeOut )
+bool CCrypto::BUpgradeOrWrapPasswordHash( PasswordHash_t &InPasswordHash, EPasswordHashAlg hashTypeIn, const Salt_t &Salt, PasswordHash_t &OutPasswordHash, EPasswordHashAlg &hashTypeOut, unsigned rounds )
 {
-	bool bResult = true;;
+	bool bResult = true;
 
 	if ( hashTypeIn == k_EHashSHA1 || hashTypeIn == k_EHashBigPassword )
 	{
@@ -2169,12 +2171,12 @@ bool CCrypto::BUpgradeOrWrapPasswordHash( PasswordHash_t &InPasswordHash, EPassw
 
 			PKCS5_PBKDF2_HMAC<SHA256> pbkdf;
 			PasswordHash_t passOut;
-			size_t iterations = pbkdf.DeriveKey( (byte *)passOut.pbkdf2, sizeof(passOut.pbkdf2), 0, pbHash, k_HashLengths[k_EHashSHA1], (const byte *)&Salt, sizeof(Salt), 10000 );
+			size_t iterations = pbkdf.DeriveKey( (byte *)passOut.pbkdf2, sizeof(passOut.pbkdf2), 0, pbHash, k_HashLengths[k_EHashSHA1], (const byte *)&Salt, sizeof(Salt), rounds );
 
-			bResult = ( iterations == 10000 );
+			bResult = ( iterations == rounds );
 			if ( bResult )
 			{
-				Q_memcpy( &OutPasswordHash, &passOut, sizeof(OutPasswordHash) );
+				memcpy( &OutPasswordHash, &passOut, sizeof(OutPasswordHash) );
 			}
 		}
 		else

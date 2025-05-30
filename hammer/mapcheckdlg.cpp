@@ -128,7 +128,7 @@ static void FixOverlayFaceList(MapError *pError);
 CMapCheckDlg *s_pDlg = NULL;
 
 
-BEGIN_MESSAGE_MAP(CMapCheckDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMapCheckDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CMapCheckDlg)
 	ON_BN_CLICKED(IDC_GO, OnGo)
 	ON_LBN_SELCHANGE(IDC_ERRORS, OnSelchangeErrors)
@@ -176,7 +176,7 @@ void CMapCheckDlg::CheckForProblems(CWnd *pwndParent)
 // Input  : pParent - 
 //-----------------------------------------------------------------------------
 CMapCheckDlg::CMapCheckDlg(CWnd *pParent)
-	: CDialog(CMapCheckDlg::IDD, pParent)
+	: CBaseDlg(CMapCheckDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CMapCheckDlg)
 	m_bCheckVisible = FALSE;
@@ -192,7 +192,7 @@ CMapCheckDlg::CMapCheckDlg(CWnd *pParent)
 //-----------------------------------------------------------------------------
 void CMapCheckDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CMapCheckDlg)
 	DDX_Control(pDX, IDC_FIXALL, m_cFixAll);
@@ -1767,6 +1767,7 @@ void CMapCheckDlg::OnClose()
 //-----------------------------------------------------------------------------
 void CMapCheckDlg::OnDestroy()
 {
+	__super::OnDestroy();
 	delete this;
 	s_pDlg = NULL;
 }

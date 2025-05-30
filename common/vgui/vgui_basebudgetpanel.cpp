@@ -14,6 +14,7 @@ CBaseBudgetPanel::CBaseBudgetPanel( vgui::Panel *pParent, const char *pElementNa
 	 :	vgui::Panel( pParent, pElementName )
 {
 	m_BudgetHistoryOffset = 0;
+	m_hFont = vgui::INVALID_FONT;
 
 	SetProportional( false );
 	SetKeyBoardInputEnabled( false );
@@ -221,7 +222,7 @@ void CBaseBudgetPanel::Rebuild( const CBudgetPanelConfigData &data )
 		for( i = oldNumTimeLabels; i < m_TimeLabels.Count(); i++ )
 		{
 			char name[1024];
-			Q_snprintf( name, sizeof( name ), "time_label_%zd", i );
+			V_sprintf_safe( name, "time_label_%zd", i );
 			m_TimeLabels[i] = new vgui::Label( this, name, "TEXT NOT SET YET" );
 		}
 	}
@@ -431,7 +432,7 @@ void CBaseBudgetPanel::MarkForFullRepaint()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseBudgetPanel::GetGraphLabelScreenSpaceTopAndBottom( int id, int &top, int &bottom )
+void CBaseBudgetPanel::GetGraphLabelScreenSpaceTopAndBottom( intp id, int &top, int &bottom )
 {
 	int x = 0;
 	int y = 0;

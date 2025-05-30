@@ -64,7 +64,7 @@ const char *s_m_iv_AnimOverlayNames[C_BaseAnimatingOverlay::MAX_OVERLAYS] =
 	"C_BaseAnimatingOverlay::m_iv_AnimOverlay14"
 };
 
-void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len )
+void ResizeAnimationLayerCallback( void *pStruct, intp offsetToUtlVector, intp len )
 {
 	C_BaseAnimatingOverlay *pEnt = (C_BaseAnimatingOverlay*)pStruct;
 	CUtlVector < C_AnimationLayer > *pVec = &pEnt->m_AnimOverlay;
@@ -74,17 +74,14 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 	Assert( pVec->Count() == pVecIV->Count() );
 	Assert( pVec->Count() <= C_BaseAnimatingOverlay::MAX_OVERLAYS );
 	
-	int diff = len - pVec->Count();
-
-	
-
+	intp diff = len - pVec->Count();
 	if ( diff == 0 )
 		return;
 
 	// remove all entries
-	for ( int i=0; i < pVec->Count(); i++ )
+	for ( auto &e : *pVec )
 	{
-		pEnt->RemoveVar( &pVec->Element( i ) );
+		pEnt->RemoveVar( &e );
 	}
 
 	// adjust vector sizes
@@ -100,7 +97,7 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 	}
 
 	// Rebind all the variables in the ent's list.
-	for ( int i=0; i < len; i++ )
+	for ( intp i=0; i < len; i++ )
 	{
 		IInterpolatedVar *pWatcher = &pVecIV->Element( i );
 		pWatcher->SetDebugName( s_m_iv_AnimOverlayNames[i] );

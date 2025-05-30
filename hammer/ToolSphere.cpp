@@ -109,7 +109,7 @@ bool CToolSphere::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &
 	// Update the status bar text with the new value of the radius.
 	//
 	char szBuf[128];
-	sprintf(szBuf, " %s = %g ", m_pSphere->m_szKeyName, (double)m_pSphere->m_flRadius);
+	V_sprintf_safe(szBuf, " %s = %g ", m_pSphere->m_szKeyName, (double)m_pSphere->m_flRadius);
 	SetStatusText(SBI_COORDS, szBuf);
 
 	m_pDocument->UpdateAllViews( MAPVIEW_UPDATE_TOOL );

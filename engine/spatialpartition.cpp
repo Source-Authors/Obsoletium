@@ -180,7 +180,7 @@ public:
 	// Gets the voxel size for this hash
 	int VoxelSize( ) const;
 
-	int EntityCount();
+	intp EntityCount();
 
 	// Rendering methods
 	void RenderGrid();
@@ -445,9 +445,7 @@ inline CVoxelTree *CSpatialPartition::VoxelTreeForHandle( SpatialPartitionHandle
 //-----------------------------------------------------------------------------
 // Constructor, destructor
 //-----------------------------------------------------------------------------
-CVoxelHash::CVoxelHash( )
-{
-}
+CVoxelHash::CVoxelHash() = default;
 
 CVoxelHash::~CVoxelHash()
 {
@@ -1549,9 +1547,9 @@ void CVoxelHash::RenderObjectsInVoxel( Voxel_t voxel, CPartitionVisitor *pVisito
 //-----------------------------------------------------------------------------
 // Returns number of entities in the hash
 //-----------------------------------------------------------------------------
-int CVoxelHash::EntityCount()
+intp CVoxelHash::EntityCount()
 {
-	int nCount = 0;
+	intp nCount = 0;
 	int nBucketCount = SPHASH_BUCKET_COUNT;
 	for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
 	{
@@ -1711,7 +1709,9 @@ CVoxelTree::CVoxelTree() : m_pVoxelHash( NULL ), m_pOwner( NULL ), m_nNextVisitB
 	// Various optimizations I've made require 4 levels
 	Assert( m_nLevelCount == 4 );
 
-	m_pVoxelHash = new CVoxelHash[m_nLevelCount]; 
+	m_pVoxelHash = new CVoxelHash[m_nLevelCount];
+
+	m_TreeId = -1;
 
 	m_AvailableVisitBits.EnsureCapacity( 2048 );
 }
@@ -2407,7 +2407,10 @@ ISpatialPartitionInternal *SpatialPartition()
 //-----------------------------------------------------------------------------
 CSpatialPartition::CSpatialPartition()
 {
+	memset(m_pQueryCallback, 0, sizeof(m_pQueryCallback));
+	memset(m_bUseOldQueryCallback, 0, sizeof(m_bUseOldQueryCallback));
 	m_nQueryCallbackCount = 0;
+	m_nSuppressedListMask = 0;
 }
 
 
@@ -2872,13 +2875,13 @@ void CVoxelTree::ReportStats( const char *pFileName )
 	Msg( "Histogram : Entities per level\n" );
 	for ( int i = 0; i < m_nLevelCount; ++i )
 	{
-		Msg( "\t%d - %d\n", i, m_pVoxelHash[i].EntityCount() );
+		Msg( "\t%d - %zd\n", i, m_pVoxelHash[i].EntityCount() );
 	}
 }
 
 void CSpatialPartition::ReportStats( const char *pFileName )
 {
-	Msg( "Handle Count %d (%llu bytes)\n", m_aHandles.Count(), ( (uint64)m_aHandles.Count() * ( sizeof(EntityInfo_t) + 2 * sizeof(SpatialPartitionHandle_t) ) ) );
+	Msg( "Handle Count %zd (%zu bytes)\n", m_aHandles.Count(), m_aHandles.Count() * ( sizeof(EntityInfo_t) + 2 * sizeof(SpatialPartitionHandle_t) ) );
 	for ( int i = 0; i < NUM_TREES; i++ )
 	{
 		m_VoxelTrees[i].ReportStats( pFileName );

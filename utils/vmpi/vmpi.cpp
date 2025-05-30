@@ -85,8 +85,8 @@ CUtlVector<char *> g_OriginalCommandLineParameters;
 // This queues up all the incoming VMPI messages.
 CCriticalSection g_VMPIMessagesCS;
 CUtlLinkedList<CTCPPacket *, int> g_VMPIMessages;
-CEvent
-    g_VMPIMessagesEvent;  // This is set when there are messages in the queue.
+// This is set when there are messages in the queue.
+CEvent g_VMPIMessagesEvent;
 
 // These are used to notify the main thread when some socket had OnError()
 // called on it.
@@ -113,14 +113,15 @@ VMPIFileSystemMode g_VMPIFileSystemMode =
 
 static char g_GroupedPacketHeader[] = {VMPI_INTERNAL_PACKET_ID,
                                        VMPI_INTERNAL_SUBPACKET_GROUPED_PACKET};
-static unsigned long g_LastFlushGroupedPacketsTime = 0;
+// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+static unsigned long long g_LastFlushGroupedPacketsTimeMcs = 0;
 
 // Set to true if we're running under the SDK (i.e. vmpi_transfer.exe is not
 // found).
 bool g_bVMPISDKMode = false;
-bool g_bVMPISDKModeSet =
-    false;  // If g_bVMPISDKMode has not been set, then VMPI_IsSDKMode just
-            // looks for VMPI_Transfer (and doesn't check the command line).
+// If g_bVMPISDKMode has not been set, then VMPI_IsSDKMode just
+// looks for VMPI_Transfer (and doesn't check the command line).
+bool g_bVMPISDKModeSet = false;
 
 int g_nBytesSent = 0;
 int g_nMessagesSent = 0;
@@ -202,12 +203,12 @@ class CVMPIConnection final : public ITCPSocketHandler {
       CCriticalSectionLock csLock(&g_ErrorSocketsCS);
       csLock.Lock();
       char str[512];
-      Q_strncpy(str, m_ErrorString.Base(), sizeof(str));
+      V_strcpy_safe(str, m_ErrorString.Base());
       csLock.Unlock();
 
       // Tell the app.
       FOR_EACH_LL(g_DisconnectHandlers, i)
-      g_DisconnectHandlers[i](m_iConnection, str);
+        g_DisconnectHandlers[i](m_iConnection, str);
 
       // Free our socket.
       m_pSocket->Release();
@@ -246,7 +247,7 @@ class CVMPIConnection final : public ITCPSocketHandler {
 
   virtual void OnError(int errorCode, const char *pErrorString) {
     if (!g_bMPIMaster) {
-      Msg("%s - CVMPIConnection::OnError( %s )\n", GetMachineName(),
+      Msg("%s - CVMPIConnection::OnError( %d, %s )\n", errorCode, GetMachineName(),
           pErrorString);
     }
 
@@ -380,8 +381,7 @@ void SetupDependencyFilename(CDependencyInfo *pInfo,
     V_strcpy_safe(pInfo->m_DependencyFilesDir, pPatchDirectory);
   } else {
     V_strcpy_safe(pInfo->m_DependencyFilesDir, baseExeFilename);
-    V_StripLastDir(pInfo->m_DependencyFilesDir,
-                   sizeof(pInfo->m_DependencyFilesDir));
+    V_StripLastDir(pInfo->m_DependencyFilesDir);
   }
 
   // Get the exe filename.
@@ -422,8 +422,7 @@ void ParseDependencyFile(CDependencyInfo *pInfo, const char *pDepFilename) {
 
     // Now get the file info.
     char fullFilename[MAX_PATH];
-    V_ComposeFileName(pInfo->m_DependencyFilesDir, pFile->m_Name, fullFilename,
-                      sizeof(fullFilename));
+    V_ComposeFileName(pInfo->m_DependencyFilesDir, pFile->m_Name, fullFilename);
 
     if (_access(fullFilename, 0) == 0) {
       pInfo->m_Files.AddToTail(pFile);
@@ -440,7 +439,7 @@ void ParseDependencyFile(CDependencyInfo *pInfo, const char *pDepFilename) {
 void SetupDependenciesForPatch(CDependencyInfo *pInfo,
                                const char *pPatchDirectory) {
   char searchStr[MAX_PATH];
-  V_ComposeFileName(pPatchDirectory, "*.*", searchStr, sizeof(searchStr));
+  V_ComposeFileName(pPatchDirectory, "*.*", searchStr);
 
   _finddata_t data;
   intptr_t handle = _findfirst(searchStr, &data);
@@ -474,7 +473,7 @@ void SetupDependencyInfo(CDependencyInfo *pInfo,
     char depFilename[MAX_PATH];
 
     V_ComposeFileName(pInfo->m_DependencyFilesDir, pDependencyFilename,
-                      depFilename, sizeof(depFilename));
+                      depFilename);
     ParseDependencyFile(pInfo, depFilename);
   }
 }
@@ -545,13 +544,6 @@ static CVMPIConnection *FindConnectionBySocket(IThreadedTCPSocket *pSocket,
   return nullptr;
 }
 
-static char *CopyString(const char *pStr) {
-  intp len = V_strlen(pStr) + 1;
-  char *pArg = new char[len];
-  Q_strncpy(pArg, pStr, len);
-  return pArg;
-}
-
 // ----------------------------------------------------------------------------------------
 // // Internal VMPI dispatch..
 // ----------------------------------------------------------------------------------------
@@ -592,7 +584,7 @@ bool VMPI_InternalDispatchFn(MessageBuffer *pBuf, int iSource, int iPacketID) {
           if (pBuf->ReadString(str, sizeof(str)) == -1)
             Error("Error in ReadString() while reading command line.");
 
-          g_WorkerCommandLine.AddToTail(CopyString(str));
+          g_WorkerCommandLine.AddToTail(V_strdup(str));
         }
 
         g_bReceivedWorkerCommandLine = true;
@@ -668,7 +660,7 @@ void VMPI_SendExeName() {
                          sizeof(baseExeFilename)))
     Error("VMPI_CheckSDKMode -> GetModuleFileName failed.");
 
-  V_FileBase(baseExeFilename, fileBase, sizeof(fileBase));
+  V_FileBase(baseExeFilename, fileBase);
   mb.WriteString(fileBase);
 
   VMPI_SendData(mb.data, mb.getLen(), VMPI_PERSISTENT);
@@ -690,7 +682,7 @@ void VMPI_ReceiveExeName() {
     Error("VMPI_CheckSDKMode -> GetModuleFileName failed.");
 
   // Unless we're a vmpi_transfer.. vmpi_transfer can always connect.
-  V_FileBase(baseExeFilename, fileBase, sizeof(fileBase));
+  V_FileBase(baseExeFilename, fileBase);
   if (V_stricmp(fileBase, "vmpi_transfer") != 0) {
     if (V_stricmp(fileBase, g_MasterExeName) != 0) {
       Error(
@@ -756,11 +748,11 @@ class CMasterBroadcaster {
   ITCPConnectSocket *m_pDownloaderListenSocket;
   ISocket *m_pSocket;
 
-  DWORD m_LastSendTime;
+  unsigned long long m_LastSendTime;
   CMasterBroadcastInfo m_BroadcastInfo;
-  CUtlVector<IpV4>
-      m_PatchWorkerIPs;  // If in patch mode, these are the IPs we send the
-                         // job request to (instead of broadcasting).
+  // If in patch mode, these are the IPs we send the
+  // job request to (instead of broadcasting).
+  CUtlVector<IpV4> m_PatchWorkerIPs;
   bool m_bPatching;
 
   CVMPIConnectionCreator m_ConnectionCreator;
@@ -918,25 +910,29 @@ bool CMasterBroadcaster::Init(int argc, char **argv,
     // Store the command-line args.
     m_BroadcastInfo.m_Args.Purge();
     for (int i = 1; i < argc; i++) {
-      m_BroadcastInfo.m_Args.AddToTail(CopyString(argv[i]));
+      m_BroadcastInfo.m_Args.AddToTail(V_strdup(argv[i]));
     }
     // 0th arg is the exe name.
     m_BroadcastInfo.m_Args.InsertBefore(
-        0, CopyString(m_BroadcastInfo.m_WorkerExeFilename));
+        0, V_strdup(m_BroadcastInfo.m_WorkerExeFilename));
+
+    char flag1[] = "-mpi_file";
 
     // Now add arguments for each file they need to transmit. The service will
     // use this to get all the files from the master before it starts the app.
     for (intp i = 0; i < dependencyInfo.m_Files.Count(); i++) {
-      m_BroadcastInfo.m_Args.InsertAfter(0, "-mpi_file");
+      m_BroadcastInfo.m_Args.InsertAfter(0, flag1);
       m_BroadcastInfo.m_Args.InsertAfter(
-          1, CopyString(dependencyInfo.m_Files[i]->m_Name));
+          1, V_strdup(dependencyInfo.m_Files[i]->m_Name));
     }
+
+    char flag2[] = "-mpi_filebase";
 
     // Add -mpi_filebase so it can use absolute paths with the filesystem so
     // we get the exact right set of files.
-    m_BroadcastInfo.m_Args.InsertAfter(0, "-mpi_filebase");
+    m_BroadcastInfo.m_Args.InsertAfter(0, flag2);
     m_BroadcastInfo.m_Args.InsertAfter(
-        1, CopyString(dependencyInfo.m_DependencyFilesDir));
+        1, V_strdup(dependencyInfo.m_DependencyFilesDir));
 
     if (bPatchMode) {
       GetPatchWorkerList(argc, argv);
@@ -947,7 +943,8 @@ bool CMasterBroadcaster::Init(int argc, char **argv,
   m_ConnectionCreator.CreateNewHandler();
 
   // Initiate as many connections as we can for a few seconds.
-  m_LastSendTime = Plat_MSTime() - MASTER_BROADCAST_INTERVAL * 2;
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  m_LastSendTime = Plat_USTime() - MASTER_BROADCAST_INTERVAL * 2 * 1000ULL;
 
   m_hShutdownEvent.Init(false, false);
   m_hShutdownReply.Init(false, false);
@@ -1011,8 +1008,9 @@ bool CMasterBroadcaster::Update() {
 
   // Only broadcast our presence so often.
   if (m_pSocket) {
-    DWORD curTime = Plat_MSTime();
-    if (curTime - m_LastSendTime >= MASTER_BROADCAST_INTERVAL) {
+    // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+    unsigned long long curTime = Plat_USTime();
+    if (curTime - m_LastSendTime >= MASTER_BROADCAST_INTERVAL * 1000ULL) {
       char packetData[512] = {};
       bf_write packetBuf("packetBuf", packetData, sizeof(packetData));
       BuildBroadcastPacket(packetBuf);
@@ -1093,6 +1091,9 @@ void CMasterBroadcaster::ThreadFn() {
 }
 
 DWORD CMasterBroadcaster::StaticThreadFn(LPVOID lpParameter) {
+  // dimhotepus: Add thread name to aid debugging.
+  ThreadSetDebugName("VmpiMstBroadcast");
+
   ((CMasterBroadcaster *)lpParameter)->ThreadFn();
   return 0;
 }
@@ -1430,9 +1431,9 @@ bool VMPI_CheckForNonSDKExecutables() {
                          sizeof(baseExeFilename)))
     Error("VMPI_CheckSDKMode -> GetModuleFileName failed.");
 
-  V_StripLastDir(baseExeFilename, sizeof(baseExeFilename));
-  V_AppendSlash(baseExeFilename, sizeof(baseExeFilename));
-  V_strncat(baseExeFilename, "mysql_wrapper.dll", sizeof(baseExeFilename));
+  V_StripLastDir(baseExeFilename);
+  V_AppendSlash(baseExeFilename);
+  V_strcat_safe(baseExeFilename, "mysql_wrapper" DLL_EXT_STRING);
 
   // If mysql_wrapper.dll doesn't exist, then we assume we're in SDK mode.
   return (_access(baseExeFilename, 0) == 0);
@@ -1479,15 +1480,14 @@ bool IsValidSDKBinPath(CUtlVector<char *> &outStrings, int *pError) {
 
   // Check the last-access date on clientregistry.blob
   char baseSteamPath[MAX_PATH];
-  V_strncpy(baseSteamPath, outStrings[0], sizeof(baseSteamPath));
+  V_strcpy_safe(baseSteamPath, outStrings[0]);
   for (intp i = 1; i < outStrings.Count() - 7; i++) {
-    V_AppendSlash(baseSteamPath, sizeof(baseSteamPath));
-    V_strncat(baseSteamPath, outStrings[i], sizeof(baseSteamPath));
+    V_AppendSlash(baseSteamPath);
+    V_strcat_safe(baseSteamPath, outStrings[i]);
   }
 
   char blobPath[MAX_PATH];
-  V_ComposeFileName(baseSteamPath, "ClientRegistry.blob", blobPath,
-                    sizeof(blobPath));
+  V_ComposeFileName(baseSteamPath, "ClientRegistry.blob", blobPath);
   struct _stat results;
   if (_stat(blobPath, &results) != 0) {
     *pError = 4;
@@ -1508,18 +1508,17 @@ bool IsValidSDKBinPath(CUtlVector<char *> &outStrings, int *pError) {
 
   // Check for some of the files under sourcesdk_content.
   char sourcesdkContentPath[MAX_PATH];
-  strcpy_s(sourcesdkContentPath, outStrings[0]);
-  for (int i = 1; i < outStrings.Count() - 5; i++) {
-    V_AppendSlash(sourcesdkContentPath, sizeof(sourcesdkContentPath));
-    strcat_s(sourcesdkContentPath, outStrings[i]);
+  V_strcpy_safe(sourcesdkContentPath, outStrings[0]);
+  for (intp i = 1; i < outStrings.Count() - 5; i++) {
+    V_AppendSlash(sourcesdkContentPath);
+    V_strcat_safe(sourcesdkContentPath, outStrings[i]);
   }
-  V_AppendSlash(sourcesdkContentPath, sizeof(sourcesdkContentPath));
-  strcat_s(sourcesdkContentPath, "sourcesdk_content");
+  V_AppendSlash(sourcesdkContentPath);
+  V_strcat_safe(sourcesdkContentPath, "sourcesdk_content");
 
   char tempFilename[MAX_PATH], mapsrcFilename[MAX_PATH];
-  sprintf_s(tempFilename, "cstrike%cmapsrc", CORRECT_PATH_SEPARATOR);
-  V_ComposeFileName(sourcesdkContentPath, tempFilename, mapsrcFilename,
-                    sizeof(mapsrcFilename));
+  V_sprintf_safe(tempFilename, "cstrike%cmapsrc", CORRECT_PATH_SEPARATOR);
+  V_ComposeFileName(sourcesdkContentPath, tempFilename, mapsrcFilename);
   if (_access(mapsrcFilename, 0) != 0) {
     *pError = 6;
     return false;
@@ -1582,7 +1581,7 @@ void VMPI_SetupAutoRestartParameters(int argc, char **argv) {
                    VMPI_GetParamString(EVMPICmdLineParam::mpi_AutoRestart))) {
     g_OriginalCommandLineParameters.SetSize(argc);
     for (int i = 0; i < argc; i++) {
-      g_OriginalCommandLineParameters[i] = CopyString(argv[i]);
+      g_OriginalCommandLineParameters[i] = V_strdup(argv[i]);
     }
   }
 }
@@ -1739,7 +1738,8 @@ bool VMPI_GetNextMessage(MessageBuffer *pBuf, int *pSource,
   HANDLE handles[2] = {g_ErrorSocketsEvent.GetEventHandle(),
                        g_VMPIMessagesEvent.GetEventHandle()};
 
-  DWORD startTime = Plat_MSTime();
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  const unsigned long long startTime = Plat_USTime();
   DWORD timeout = startTimeout;
 
   while (1) {
@@ -1754,10 +1754,11 @@ bool VMPI_GetNextMessage(MessageBuffer *pBuf, int *pSource,
       InternalHandleSocketErrors();
 
       // Update the timeout.
-      DWORD delta = Plat_MSTime() - startTime;
-      if (delta >= startTimeout) return false;
+      unsigned long long delta = Plat_USTime() - startTime;
+      if (delta >= startTimeout * 1000ULL) return false;
 
-      timeout = startTimeout - delta;
+      timeout = static_cast<unsigned long>((startTimeout * 1000ULL - delta) /
+                                           1000ULL);
       continue;
     }
 
@@ -1837,8 +1838,8 @@ bool VMPI_GetNextMessage(MessageBuffer *pBuf, int *pSource,
 
 bool VMPI_InternalDispatch(MessageBuffer *pBuf, int iSource) {
   if (pBuf->getLen() >= 1 && pBuf->data[0] >= 0 &&
-      pBuf->data[0] < MAX_VMPI_PACKET_IDS && g_VMPIDispatch[pBuf->data[0]]) {
-    return g_VMPIDispatch[pBuf->data[0]](pBuf, iSource, pBuf->data[0]);
+      pBuf->data[0] < MAX_VMPI_PACKET_IDS && g_VMPIDispatch[static_cast<unsigned>(pBuf->data[0])]) {
+    return g_VMPIDispatch[static_cast<unsigned>(pBuf->data[0])](pBuf, iSource, pBuf->data[0]);
   }
 
   return false;
@@ -1955,9 +1956,11 @@ void VMPI_GroupPackets(CVMPIConnection *pConn, void const *const *pChunks,
 
 void VMPI_FlushGroupedPackets(unsigned long msInterval) {
   if (msInterval != 0) {
-    unsigned long curTime = Plat_MSTime();
-    if (curTime - g_LastFlushGroupedPacketsTime < msInterval) return;
-    g_LastFlushGroupedPacketsTime = curTime;
+    // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+    unsigned long long curTime = Plat_USTime();
+    if (curTime - g_LastFlushGroupedPacketsTimeMcs < msInterval * 1000ULL)
+      return;
+    g_LastFlushGroupedPacketsTimeMcs = curTime;
   }
 
   CCriticalSectionLock connectionsLock(&g_ConnectionsCS);

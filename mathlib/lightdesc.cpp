@@ -159,6 +159,8 @@ void LightDesc_t::ComputeLightAtPoints( const FourVectors &pos, const FourVector
 		break;
 
 		case MATERIAL_LIGHT_DISABLE:
+			// dimhotepus: Just to shutdown Clang warnings.
+		case MATERIAL_LIGHT_DIRECTIONAL:
 			break;
 	}
 	strength=MulSIMD(strength,falloff);
@@ -255,6 +257,8 @@ void LightDesc_t::ComputeNonincidenceLightAtPoints( const FourVectors &pos, Four
 		break;
 
 		case MATERIAL_LIGHT_DISABLE:
+			// dimhotepus: Just to shutdown Clang warnings.
+		case MATERIAL_LIGHT_DIRECTIONAL:
 			break;
 	}
 	strength=MulSIMD(strength,falloff);

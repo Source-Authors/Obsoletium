@@ -65,8 +65,8 @@ void CDmxSerializationDictionary::BuildElementList_R( CDmxElement *pElement, boo
 	info.m_pElement = pElement;
 	m_Dict.Insert( info );
 
-	int nCount = pElement->AttributeCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pElement->AttributeCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = pElement->GetAttribute(i);
 		switch( pAttribute->GetType() )
@@ -134,9 +134,9 @@ void CDmxSerializationDictionary::Clear()
 //-----------------------------------------------------------------------------
 // How many root elements do we have?
 //-----------------------------------------------------------------------------
-int CDmxSerializationDictionary::RootElementCount() const
+intp CDmxSerializationDictionary::RootElementCount() const
 {
-	int nCount = 0;
+	intp nCount = 0;
 	DmxSerializationHandle_t h = m_Dict.FirstInorder();
 	while( h != m_Dict.InvalidIndex() )
 	{
@@ -158,7 +158,7 @@ DmxSerializationHandle_t CDmxSerializationDictionary::FirstRootElement() const
 	// NOTE: I don't have to use First/NextInorder here because there
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
-	intp nCount = m_Dict.Count();
+	DmxSerializationHandle_t nCount = m_Dict.Count();
 	for ( DmxSerializationHandle_t h = 0; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
@@ -170,7 +170,7 @@ DmxSerializationHandle_t CDmxSerializationDictionary::FirstRootElement() const
 DmxSerializationHandle_t CDmxSerializationDictionary::NextRootElement( DmxSerializationHandle_t h ) const
 {
 	++h;
-	intp nCount = m_Dict.Count();
+	DmxSerializationHandle_t nCount = m_Dict.Count();
 	for ( ; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )

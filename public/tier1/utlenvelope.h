@@ -26,8 +26,8 @@ public:
 
 	CUtlDataEnvelope &operator=( const CUtlDataEnvelope &from );
 
-	operator void *();
-	operator void *() const;
+	[[nodiscard]] operator void *();
+	[[nodiscard]] operator void *() const;
 
 private:
 	void Assign( const void *pData, intp nBytes );
@@ -55,11 +55,11 @@ public:
 
 	CUtlEnvelope<T> &operator=( const CUtlEnvelope<T> &from );
 
-	operator T *();
-	operator T *() const;
+	[[nodiscard]] operator T *();
+	[[nodiscard]] operator T *() const;
 
-	operator void *();
-	operator void *() const;
+	[[nodiscard]] operator void *();
+	[[nodiscard]] operator void *() const;
 };
 
 //-----------------------------------------------------------------------------
@@ -84,24 +84,24 @@ public:
 		return *this;
 	}
 
-	operator char *()
+	[[nodiscard]] operator char *()
 	{
 		return (char *) m_string.Get();
 	}
 
-	operator char *() const
+	[[nodiscard]] operator const char *() const
 	{
-		return (char *) m_string.Get();
+		return m_string.Get();
 	}
 
-	operator void *()
+	[[nodiscard]] operator void *()
 	{
 		return (void *) m_string.Get();
 	}
 
-	operator void *() const
+	[[nodiscard]] operator const void *() const
 	{
-		return (void *) m_string.Get();
+		return m_string.Get();
 	}
 
 private:
@@ -117,7 +117,7 @@ inline void CUtlDataEnvelope::Assign( const void *pData, intp nBytes )
 	if ( pData )
 	{
 		m_nBytes = nBytes;
-		if ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) )
+		if ( m_nBytes > ssize( m_data ) )
 		{
 			m_pData = new byte[nBytes];
 			memcpy( m_pData, pData, nBytes );
@@ -141,7 +141,7 @@ inline void CUtlDataEnvelope::Assign( const CUtlDataEnvelope &from )
 
 inline void CUtlDataEnvelope::Purge()
 {
-	if (m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) )
+	if (m_nBytes > ssize( m_data ))
 		delete [] m_pData;
 	m_nBytes = 0;
 }
@@ -175,7 +175,7 @@ inline CUtlDataEnvelope::operator void *()
 		return nullptr;
 	}
 
-	return ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) ) ? m_pData : m_data;
+	return ( m_nBytes > ssize( m_data ) ) ? m_pData : m_data;
 }
 
 inline CUtlDataEnvelope::operator void *() const
@@ -185,7 +185,7 @@ inline CUtlDataEnvelope::operator void *() const
 		return nullptr;
 	}
 
-	return ( m_nBytes > static_cast<ptrdiff_t>( std::size( m_data ) ) ) ? (void *)m_pData : (void *)m_data;
+	return m_nBytes > ssize( m_data ) ? static_cast<void *>(m_pData) : static_cast<void *>(const_cast<byte*>(m_data));
 }
 
 //-----------------------------------------------------------------------------

@@ -6,8 +6,6 @@
 // $Date:         $
 // $NoKeywords: $
 //===========================================================================//
-#include <stdio.h>
-
 #include "snd_dev_wave.h"
 #include "snd_wave_source.h"
 #include "soundsystem/snd_audio_source.h"
@@ -28,8 +26,9 @@
 class CAudioMixerWave8Mono : public CAudioMixerWave
 {
 public:
-	CAudioMixerWave8Mono( CWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true )
+	explicit CAudioMixerWave8Mono( CWaveData *data ) : CAudioMixerWave( data ) {}
+
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true ) override
 	{
 		pDevice->Mix8Mono( pChannel, (char *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress, forward );
 	}
@@ -41,8 +40,9 @@ public:
 class CAudioMixerWave8Stereo : public CAudioMixerWave
 {
 public:
-	CAudioMixerWave8Stereo( CWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true )
+	explicit CAudioMixerWave8Stereo( CWaveData *data ) : CAudioMixerWave( data ) {}
+
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true ) override
 	{
 		pDevice->Mix8Stereo( pChannel, (char *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress, forward );
 	}
@@ -54,8 +54,9 @@ public:
 class CAudioMixerWave16Mono : public CAudioMixerWave
 {
 public:
-	CAudioMixerWave16Mono( CWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true )
+	explicit CAudioMixerWave16Mono( CWaveData *data ) : CAudioMixerWave( data ) {}
+
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true ) override
 	{
 		pDevice->Mix16Mono( pChannel, (short *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress, forward );
 	}
@@ -68,8 +69,9 @@ public:
 class CAudioMixerWave16Stereo : public CAudioMixerWave
 {
 public:
-	CAudioMixerWave16Stereo( CWaveData *data ) : CAudioMixerWave( data ) {}
-	virtual void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true )
+	explicit CAudioMixerWave16Stereo( CWaveData *data ) : CAudioMixerWave( data ) {}
+
+	void Mix( IAudioDevice *pDevice, channel_t *pChannel, void *pData, int outputOffset, int inputOffset, fixedint fracRate, int outCount, int timecompress, bool forward = true ) override
 	{
 		pDevice->Mix16Stereo( pChannel, (short *)pData, outputOffset, inputOffset, fracRate, outCount, timecompress, forward );
 	}
@@ -373,7 +375,6 @@ bool CAudioMixerWave::SkipSamples( IAudioDevice *pDevice, channel_t *pChannel,
 
 	while ( sampleCount > 0 )
 	{
-		int availableSamples;
 		int inputSampleCount;
 		char *pData = NULL;
 		int outputSampleCount = sampleCount;
@@ -406,7 +407,7 @@ bool CAudioMixerWave::SkipSamples( IAudioDevice *pDevice, channel_t *pChannel,
 			{
 				startSample = max( 0, startSample - sampleCount );
 			}
-			availableSamples = GetOutputData( (void **)&pData, startSample, sampleCount, forward );
+			int availableSamples = GetOutputData( (void **)&pData, startSample, sampleCount, forward );
 			if ( !availableSamples )
 				break;
 			outputSampleCount = availableSamples;
@@ -476,7 +477,7 @@ bool CAudioMixerWave::MixDataToDevice( IAudioDevice *pDevice, channel_t *pChanne
 		{
 			inputSampleCount = (int)(sampleCount * rate);
 
-			int availableSamples = GetOutputData( (void **)&pData, startpos, inputSampleCount, forward );
+			availableSamples = GetOutputData( (void **)&pData, startpos, inputSampleCount, forward );
 			if ( !availableSamples )
 				break;
 

@@ -8,10 +8,11 @@
 #include <VGuiMatSurface/IMatSystemSurface.h>
 #include <matsys_controls/matsyscontrols.h>
 #include <dme_controls/dmecontrols.h>
-//#include "material.h"
 #include "vgui_controls/AnimationController.h"
 #include "inputsystem/iinputsystem.h"
 #include "VGuiWnd.h"
+
+#undef GetCurrentTime
 
 extern CreateInterfaceFn g_Factory;
 

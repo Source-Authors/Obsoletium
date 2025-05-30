@@ -18,36 +18,39 @@ $Configuration
 	}
 }
 
-$Project "Captioncompiler"
+$Project "captioncompiler"
 {
 	$Folder	"Source Files"
 	{
-		$File	"captioncompiler.cpp"
 		$File	"$SRCDIR\common\compiledcaptionswap.cpp"
-		$File	"..\common\filesystem_tools.cpp"
+		$File	"captioncompiler.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
-		$File	"cbase.h"
-		$File	"..\common\filesystem_tools.h"
+		$File	"resource.h"
+		$File	"$SRCDIR\public\captioncompiler.h"
 	}
 
 	$Folder	"Shared Code"
 	{
-		$File	"..\common\cmdlib.cpp"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\filesystem_tools.cpp"
+		$File	"..\common\tools_minidump.h"
+		$File	"..\common\tools_minidump.cpp"
 		$File	"..\common\cmdlib.h"
-		$File	"$SRCDIR\public\filesystem_helpers.cpp"
-		$File	"$SRCDIR\public\filesystem_helpers.h"
-		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"$SRCDIR\public\filesystem_init.h"
-		$File	"$SRCDIR\public\mathlib\mathlib.h"
-		$File	"..\common\pacifier.cpp"
+		$File	"..\common\cmdlib.cpp"
 		$File	"..\common\pacifier.h"
-		$File	"..\common\scriplib.cpp"
+		$File	"..\common\pacifier.cpp"
 		$File	"..\common\scriplib.h"
-		$File	"$SRCDIR\public\stringregistry.cpp"
+		$File	"..\common\scriplib.cpp"
+		$File	"$SRCDIR\public\filesystem_helpers.h"
+		$File	"$SRCDIR\public\filesystem_helpers.cpp"
+		$File	"$SRCDIR\public\filesystem_init.h"
+		$File	"$SRCDIR\public\filesystem_init.cpp"
+		$File	"$SRCDIR\public\mathlib\mathlib.h"
 		$File	"$SRCDIR\public\stringregistry.h"
+		$File	"$SRCDIR\public\stringregistry.cpp"
 	}
 
 	$Folder "Link Libraries"

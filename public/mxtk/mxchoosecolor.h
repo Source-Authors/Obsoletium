@@ -23,7 +23,7 @@ class mxWindow;
 extern "C" {
 #endif
 
-bool mxChooseColor (mxWindow *parent, int *r, int *g, int *b);
+bool mxChooseColor (mxWindow *parent, unsigned char *r, unsigned char *g, unsigned char *b);
 
 #ifdef __cplusplus
 }

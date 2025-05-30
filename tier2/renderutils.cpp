@@ -835,10 +835,10 @@ void DrawScreenSpaceRectangle( IMaterial *pMaterial,
 	pRenderContext->GetViewport( vx, vy, vw, vh );
 
 	// map from screen pixel coords to -1..1
-	flRightX = FLerp( -1, 1, 0, vw, flRightX );
-	flLeftX = FLerp( -1, 1, 0, vw, flLeftX );
-	flTopY = FLerp( 1, -1, 0, vh ,flTopY );
-	flBottomY = FLerp( 1, -1, 0, vh, flBottomY );
+	flRightX = FLerp( -1, 1, 0, static_cast<float>(vw), flRightX );
+	flLeftX = FLerp( -1, 1, 0, static_cast<float>(vw), flLeftX );
+	flTopY = FLerp( 1, -1, 0, static_cast<float>(vh), flTopY );
+	flBottomY = FLerp( 1, -1, 0, static_cast<float>(vh), flBottomY );
 
 	// Dice the quad up...
 	if ( ( xSegments > 1 ) || ( ySegments > 1 ) )

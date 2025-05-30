@@ -15,8 +15,13 @@
 #include "winlite.h" // UUIDCreate
 #include <rpc.h>
 #else
-#include "checksum_crc.h"
+#ifdef LINUX
+#include <uuid.h>
+#elif defined(OSX)
+#include <uuid/uuid.h>
 #endif
+#endif
+
 #include "tier1/utlbuffer.h"
 
 //-----------------------------------------------------------------------------
@@ -24,13 +29,35 @@
 //-----------------------------------------------------------------------------
 bool CreateUniqueId( UniqueId_t *pDest )
 {
+	if ( !pDest ) return false;
+
 #ifdef IS_WINDOWS_PC
-	static_assert( sizeof( UUID ) == sizeof( *pDest ) );
-	return SUCCEEDED( UuidCreate( (UUID *)pDest ) );
-#else
-	// X360/linux TBD: Need a real UUID Implementation
-	Q_memset( pDest, 0, sizeof( UniqueId_t ) );
+	uuid_t out;
+	static_assert(sizeof(out) == sizeof(*pDest));
+
+	const bool ok = SUCCEEDED( UuidCreate( &out ) );
+	if (ok)
+	{
+		V_memcpy( pDest, &out, sizeof(*pDest) );
+		return true;
+	}
+
+	InvalidateUniqueId( pDest );
+	return false;
+#elif defined(LINUX) || defined(OSX)
+	// dimhotepus: Add basic libuuid implementation.
+
+	// See https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/uuid_generate.3.html
+	// See https://www.man7.org/linux/man-pages/man3/uuid_generate.3.html
+	uuid_t out;
+	static_assert(sizeof(out) == sizeof(*pDest));
+
+	uuid_generate(out);
+	V_memcpy( pDest, out, sizeof(*pDest) );
+
 	return true;
+#else
+#error "Please implement CreateUniqueId on your platform."
 #endif
 }
 
@@ -38,20 +65,26 @@ bool CreateUniqueId( UniqueId_t *pDest )
 //-----------------------------------------------------------------------------
 // Creates a new unique id from a string representation of one
 //-----------------------------------------------------------------------------
-bool UniqueIdFromString( UniqueId_t *pDest, const char *pBuf, intp nMaxLen )
+bool UniqueIdFromString( UniqueId_t *pDest, IN_CAP(nMaxLen) const char *pBuf, intp nMaxLen )
 {
+	if ( !pDest ) return false;
+
 	if ( nMaxLen == 0 )
 	{
-		nMaxLen = Q_strlen( pBuf );
+		nMaxLen = V_strlen( pBuf );
+
+		if ( nMaxLen == 0 ) return false;
 	}
 
-	char *pTemp = (char*)stackalloc( nMaxLen + 1 );
+	char *pTemp = stackallocT( char, nMaxLen + 1 );
 	V_strncpy( pTemp, pBuf, nMaxLen + 1 );
+
 	--nMaxLen;
-	while( (nMaxLen >= 0) && V_isspace( pTemp[nMaxLen] ) )
+	while( (nMaxLen > 0) && V_isspace( pTemp[nMaxLen] ) )
 	{
 		--nMaxLen;
 	}
+
 	pTemp[ nMaxLen ] = '\0';
 
 	while( *pTemp && V_isspace( *pTemp ) )
@@ -60,28 +93,32 @@ bool UniqueIdFromString( UniqueId_t *pDest, const char *pBuf, intp nMaxLen )
 	}
 
 #ifdef IS_WINDOWS_PC
-	static_assert( sizeof( UUID ) == sizeof( *pDest ) );
+	uuid_t out;
+	static_assert( sizeof( out ) == sizeof( *pDest ) );
 
-	if ( RPC_S_OK != UuidFromString( (unsigned char *)pTemp, (UUID *)pDest ) )
+	if ( SUCCEEDED( UuidFromString( (unsigned char *)pTemp, &out ) ) )
 	{
-		InvalidateUniqueId( pDest );
-		return false;
+		V_memcpy( pDest, &out, sizeof(*pDest) );
+		return true;
+	}
+#elif defined(LINUX) || defined(OSX)
+	// dimhotepus: Add basic libuuid implementation.
+	// See https://www.man7.org/linux/man-pages/man3/uuid_parse.3.html
+	// See https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/uuid_parse.3.html#//apple_ref/doc/man/3/uuid_parse
+	uuid_t out;
+	static_assert( sizeof( out ) == sizeof( *pDest ) );
+
+	if ( uuid_parse( pTemp, out ) == 0 )
+	{
+		V_memcpy( pDest, out, sizeof(UniqueId_t) );
+		return true;
 	}
 #else
-	// X360TBD: Need a real UUID Implementation
-	// For now, use crc to generate a unique ID from the UUID string.
-	Q_memset( pDest, 0, sizeof( UniqueId_t ) );
-	if ( nMaxLen > 0 )
-	{
-		CRC32_t crc;
-		CRC32_Init( &crc );
-		CRC32_ProcessBuffer( &crc, pBuf, nMaxLen );
-		CRC32_Final( &crc );
-		Q_memcpy( pDest, &crc, sizeof( CRC32_t ) );
-	}
+#error "Please implement UniqueIdFromString on your platform."
 #endif
 
-	return true;
+	InvalidateUniqueId( pDest );
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -96,7 +133,7 @@ void InvalidateUniqueId( UniqueId_t *pDest )
 bool IsUniqueIdValid( const UniqueId_t &id )
 {
 	UniqueId_t invalidId;
-	memset( &invalidId, 0, sizeof( UniqueId_t ) );
+	InvalidateUniqueId( &invalidId );
 	return !IsUniqueIdEqual( invalidId, id );
 }
 
@@ -105,20 +142,41 @@ bool IsUniqueIdEqual( const UniqueId_t &id1, const UniqueId_t &id2 )
 	return memcmp( &id1, &id2, sizeof( UniqueId_t ) ) == 0; 
 }
 
-void UniqueIdToString( const UniqueId_t &id, char *pBuf, intp nMaxLen )
+bool UniqueIdToString( const UniqueId_t &id, OUT_Z_CAP(nMaxLen) char *pBuf, intp nMaxLen )
 {
-	pBuf[ 0 ] = '\0';
+	if ( nMaxLen > 0 )
+		pBuf[ 0 ] = '\0';
 
-// X360TBD: Need a real UUID Implementation
 #ifdef IS_WINDOWS_PC
-	UUID *self = ( UUID * )&id;
+	uuid_t out;
+	static_assert( sizeof( out ) == sizeof( id ) );
+	V_memcpy( &out, &id, sizeof(out) );
 
 	unsigned char *outstring = nullptr;
-	if ( UuidToString( self, &outstring ) == RPC_S_OK && outstring && *outstring )
+	if ( SUCCEEDED( UuidToString( &out, &outstring ) ) && outstring && *outstring )
 	{
-		Q_strncpy( pBuf, (const char *)outstring, nMaxLen );
+		V_strncpy( pBuf, reinterpret_cast<const char *>(outstring), nMaxLen );
 		RpcStringFree( &outstring );
+		return true;
 	}
+
+	return false;
+#elif defined(LINUX) || defined(OSX)
+	// uuid_unparse_lower expects 36-byte string (plus tailing '\0').
+	if (nMaxLen < 37)
+		return false;
+
+	// See https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/uuid_unparse.3.html#//apple_ref/doc/man/3/uuid_unparse
+	// See https://www.man7.org/linux/man-pages/man3/uuid_unparse.3.html
+	uuid_t out;
+	static_assert( sizeof( out ) == sizeof( id ) );
+	V_memcpy( &out, &id, sizeof(out) );
+
+	// Use uuid_unparse_lower to match Windows UuidToString behavior.
+	uuid_unparse_lower( out, pBuf );
+	return true;
+#else
+#error "Please implement UniqueIdToString on your platform."
 #endif
 }
 
@@ -129,48 +187,36 @@ void CopyUniqueId( const UniqueId_t &src, UniqueId_t *pDest )
 
 bool Serialize( CUtlBuffer &buf, const UniqueId_t &src )
 {
-// X360TBD: Need a real UUID Implementation
-#ifdef IS_WINDOWS_PC
 	if ( buf.IsText() )
 	{
-		UUID *pId = ( UUID * )&src;
+		char idstr[37];
+		if ( UniqueIdToString( src, idstr ) )
+		{
+			buf.PutString( idstr );
+			return buf.IsValid();
+		}
 
-		unsigned char *outstring = nullptr;
-		if ( UuidToString( pId, &outstring ) == RPC_S_OK && outstring && *outstring )
-		{
-			buf.PutString( (const char *)outstring );
-			RpcStringFree( &outstring );
-		}
-		else
-		{
-			buf.PutChar( '\0' );
-		}
+		buf.PutChar( '\0' );
+		return false;
 	}
-	else
-	{
-		buf.Put( &src, sizeof(UniqueId_t) );
-	}
+
+	buf.Put( src );
 	return buf.IsValid();
-#else
-	return false;
-#endif
 }
 
 bool Unserialize( CUtlBuffer &buf, UniqueId_t &dest )
 {
 	if ( buf.IsText() )
 	{
-		intp nTextLen = buf.PeekStringLength();
-		char *pBuf = (char*)stackalloc( nTextLen );
+		const intp nTextLen = buf.PeekStringLength();
+
+		char *pBuf = stackallocT( char, nTextLen );
 		buf.GetStringManualCharCount( pBuf, nTextLen );
-		UniqueIdFromString( &dest, pBuf, nTextLen );
+
+		// dimhotepus: Check buf is valid first.
+		return buf.IsValid() && UniqueIdFromString( &dest, pBuf, nTextLen );
 	}
-	else
-	{
-		buf.Get( &dest, sizeof(UniqueId_t) );
-	}
+
+	buf.Get( dest );
 	return buf.IsValid();
 }
-
-
-

@@ -55,7 +55,7 @@ public:
 
 	virtual CMapClass *PrepareSelection(SelectMode_t eSelectMode);
 		
-	const char* GetDescription() { return("Light cone helper"); }
+	const char* GetDescription() const override { return("Light cone helper"); }
 
 	void OnParentKeyChanged( const char* key, const char* value );
 	bool ShouldRenderLast(void) { return(true); }

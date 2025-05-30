@@ -14,7 +14,8 @@
 ******************************************************************************/
 
 #include "TokenLine.h"
-#include <cstring>
+
+#include "tier1/strtools.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -22,10 +23,7 @@
 //////////////////////////////////////////////////////////////////////
 
 
-TokenLine::~TokenLine()
-{
-
-}
+TokenLine::~TokenLine() = default;
 
 
 bool TokenLine::SetLine(const char * newLine)
@@ -39,11 +37,8 @@ bool TokenLine::SetLine(const char * newLine)
 		return false;
 	}
 
-	strncpy( m_fullLine, newLine, MAX_LINE_CHARS-1 );
-	m_fullLine[ MAX_LINE_CHARS-1 ] = '\0';
-
-	strncpy( m_tokenBuffer, newLine, MAX_LINE_CHARS-1 );
-	m_tokenBuffer[ MAX_LINE_CHARS-1 ] = '\0';
+	V_strcpy_safe( m_fullLine, newLine );
+	V_strcpy_safe( m_tokenBuffer, newLine );
 
 	// parse tokens 
 	char * charPointer = m_tokenBuffer;
@@ -101,7 +96,7 @@ char * TokenLine::GetToken(int i)
 
 // if the given parm is not present return NULL
 // otherwise return the address of the following token, or an empty string
-char* TokenLine::CheckToken(char * parm)
+char* TokenLine::CheckToken(const char * parm)
 {
 	for (int i = 0 ; i < m_tokenNumber; i ++)
 	{
@@ -121,7 +116,7 @@ char* TokenLine::CheckToken(char * parm)
 	return NULL;
 }
 
-int TokenLine::CountToken()
+int TokenLine::CountToken() const
 {
 	int c = 0;
 	for (int i = 0 ; i < m_tokenNumber; i ++)
@@ -141,10 +136,14 @@ char* TokenLine::GetRestOfLine(int i)
 
 TokenLine::TokenLine(char * string)
 {
+	BitwiseClear(m_token);
 	SetLine(string);
 }
 
 TokenLine::TokenLine()
 {
-
+	BitwiseClear(m_tokenBuffer);
+	BitwiseClear(m_fullLine);
+	BitwiseClear(m_token);
+	m_tokenNumber = 0;
 }

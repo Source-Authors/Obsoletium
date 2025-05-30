@@ -55,10 +55,9 @@ CCreateMultiplayerGameDialog::CCreateMultiplayerGameDialog(vgui::Panel *parent) 
 	m_pSavedData = new KeyValues( "ServerConfig" );
 
 	// load the config data
-	if (m_pSavedData)
+	if (m_pSavedData &&
+		m_pSavedData->LoadFromFile( g_pFullFileSystem, "ServerConfig.vdf", "GAME" ) ) // this is game-specific data, so it should live in GAME, not CONFIG
 	{
-		m_pSavedData->LoadFromFile( g_pFullFileSystem, "ServerConfig.vdf", "GAME" ); // this is game-specific data, so it should live in GAME, not CONFIG
-
 		const char *startMap = m_pSavedData->GetString("map", "");
 		if (startMap[0])
 		{

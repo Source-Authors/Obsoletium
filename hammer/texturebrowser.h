@@ -9,13 +9,13 @@
 #define TEXTUREBROWSER_H
 #pragma once
 
-
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "AutoSelCombo.h"
 #include "texturewindow.h"
 
 
-class CTextureBrowser : public CDialog
+class CTextureBrowser : public CBaseDlg
 {
 public:
 
@@ -42,7 +42,7 @@ protected:
 	afx_msg void OnSelendokTexturesize();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnClose();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnUsed();
 	afx_msg void OnReplace();
 	afx_msg void OnMark();
@@ -74,7 +74,8 @@ protected:
 	CButton m_cUsed;
 	char szInitialTexture[128];
 	char m_szNameFilter[128];				// Overrides the name filter history for a single browser session.
-	DWORD m_uLastFilterChange;
+	// dimhotepus: DWORD -> time_t.
+	time_t m_uLastFilterChange;
 	BOOL m_bFilterChanged;
 	BOOL m_bUsed;
 	CAutoSelComboBox m_cFilter;

@@ -45,7 +45,7 @@ void CEntityReportDlg::ShowEntityReport(CMapDoc *pDoc, CWnd *pwndParent)
 // Purpose: Private constructor.
 //-----------------------------------------------------------------------------
 CEntityReportDlg::CEntityReportDlg(CMapDoc *pDoc, CWnd* pParent /*=NULL*/)
-	: CDialog(CEntityReportDlg::IDD, pParent)
+	: CBaseDlg(CEntityReportDlg::IDD, pParent)
 {
 	m_pDoc = pDoc;
 
@@ -84,7 +84,7 @@ void CEntityReportDlg::SaveToIni()
 
 void CEntityReportDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEntityReportDlg)
 	DDX_Control(pDX, IDC_EXACTVALUE, m_cExact);
 	DDX_Control(pDX, IDC_FILTERCLASS, m_cFilterClass);
@@ -108,7 +108,7 @@ void CEntityReportDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEntityReportDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEntityReportDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEntityReportDlg)
 	ON_BN_CLICKED(IDC_DELETE, OnDelete)
 	ON_BN_CLICKED(IDC_FILTERBYHIDDEN, OnFilterbyhidden)
@@ -138,7 +138,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 void CEntityReportDlg::OnDelete(void)
 {
-	if (AfxMessageBox("Delete Objects?", MB_YESNO) == IDNO)
+	if (AfxMessageBox("Delete Objects?", MB_YESNO | MB_ICONQUESTION) == IDNO)
 	{
 		return;
 	}
@@ -293,9 +293,9 @@ void CEntityReportDlg::OnProperties()
 	}
 }
 
-void CEntityReportDlg::OnTimer(UINT nIDEvent) 
+void CEntityReportDlg::OnTimer(UINT_PTR nIDEvent) 
 {
-	CDialog::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 
 	// check filters
 	if(!m_bFilterTextChanged)
@@ -309,8 +309,11 @@ void CEntityReportDlg::OnTimer(UINT nIDEvent)
 	}
 }
 
-BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
+BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx)
 {
+	auto *pEntity = reinterpret_cast<CMapEntity *>(mp);
+	auto *pDlg = reinterpret_cast<CEntityReportDlg *>(ctx);
+
 	char szString[256];
 	
 	// nope.
@@ -337,10 +340,10 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 			return TRUE;
 		}
 	}
-		
+
 	const char* pszClassName = pEntity->GetClassName();
 
-	if ( pEntity && stricmp( pszClassName, "func_instance" ) == 0 )
+	if ( stricmp( pszClassName, "func_instance" ) == 0 )
 	{
 		CMapInstance	*pMapInstance = pEntity->GetChildOfType( ( CMapInstance * )NULL );
 		if ( pMapInstance )
@@ -350,7 +353,7 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 			{
 				CMapWorld	*pWorld = pMapDoc->GetMapWorld();
 
-				pWorld->EnumChildren(ENUMMAPCHILDRENPROC(AddEntityToList), DWORD(pDlg), MAPCLASS_TYPE(CMapEntity));
+				pWorld->EnumChildren(AddEntityToList, DWORD_PTR(pDlg), MAPCLASS_TYPE(CMapEntity));
 			}
 		}
 	}
@@ -375,7 +378,7 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 		}
 	}
 
-	strcpy(szString, pszClassName);
+	V_strcpy_safe(szString, pszClassName);
 
 	BOOL bAdd = TRUE;
 
@@ -383,7 +386,7 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 		bAdd = FALSE;
 
 	MDkeyvalue tmpkv;
-	for (int i = pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for (auto i = pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		// if filtering by keyvalue, check!
 		if (pDlg->m_bFilterByKeyvalue && !bAdd && !pDlg->m_szFilterValue.IsEmpty())
@@ -395,7 +398,7 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 				char szTmp1[128], szTmp2[128];
 				V_strcpy_safe( szTmp1, pEntity->GetKeyValue( i ) );
 				strupr(szTmp1);
-				strcpy(szTmp2, pDlg->m_szFilterValue);
+				V_strcpy_safe( szTmp2, pDlg->m_szFilterValue );
 				if ((!pDlg->m_bExact && strstr(szTmp1, szTmp2)) || !strcmpi(szTmp1, szTmp2))
 				{
 					bAdd = TRUE;
@@ -416,7 +419,8 @@ BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 			pszName = pVar->GetLongName();
 		}
 
-		sprintf(szString + strlen(szString), "\t%s \"%s\"", pszName, pEntity->GetKeyValue(i));
+		const intp stringLen = V_strlen(szString); 
+		V_snprintf(szString + stringLen, ssize(szString) - stringLen, "\t%s \"%s\"", pszName, pEntity->GetKeyValue(i));
 
 		if (pClass == NULL)
 		{
@@ -453,7 +457,7 @@ void CEntityReportDlg::UpdateEntityList(void)
 
 	// add items to list
 	CMapWorld *pWorld = m_pDoc->GetMapWorld();
-	pWorld->EnumChildren(ENUMMAPCHILDRENPROC(AddEntityToList), DWORD(this), MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(AddEntityToList, DWORD_PTR(this), MAPCLASS_TYPE(CMapEntity));
 
 	m_cEntities.SetRedraw(TRUE);
 	m_cEntities.Invalidate();
@@ -569,5 +573,6 @@ void CEntityReportDlg::OnDestroy()
 {
 	SaveToIni();
 	s_pDlg = NULL;
+	__super::OnDestroy();
 	delete this;
 }

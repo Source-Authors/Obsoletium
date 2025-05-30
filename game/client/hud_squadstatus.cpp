@@ -272,7 +272,7 @@ void CHudSquadStatus::Paint()
 		surface()->DrawSetTextFont(m_hTextFont);
 		surface()->DrawSetTextColor(m_SquadTextColor);
 		surface()->DrawSetTextPos(text_xpos, text_ypos);
-		surface()->DrawPrintText(text, wcslen(text));
+		surface()->DrawPrintText(text, V_wcslen(text));
 	}
 }
 

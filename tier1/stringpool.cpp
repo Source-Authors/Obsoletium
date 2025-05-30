@@ -5,12 +5,12 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include "stringpool.h"
+#include "tier1/stringpool.h"
 
-#include "convar.h"
+#include "tier1/convar.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
-#include "generichash.h"
+#include "tier1/generichash.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -52,7 +52,7 @@ size_t CStringPool::Count() const
 //-----------------------------------------------------------------------------
 const char * CStringPool::Find( const char *pszValue )
 {
-	unsigned short i = m_Strings.Find(pszValue);
+	auto i = m_Strings.Find(pszValue);
 	if ( m_Strings.IsValidIndex(i) )
 		return m_Strings[i];
 
@@ -61,15 +61,12 @@ const char * CStringPool::Find( const char *pszValue )
 
 const char * CStringPool::Allocate( const char *pszValue )
 {
-	char	*pszNew;
-
-	unsigned short i 	= m_Strings.Find(pszValue);
-	bool		   bNew = (i == m_Strings.InvalidIndex());
-
+	auto i 	= m_Strings.Find(pszValue);
+	const bool bNew = i == m_Strings.InvalidIndex();
 	if ( !bNew )
 		return m_Strings[i];
 
-	pszNew = strdup( pszValue );
+	char *pszNew = strdup( pszValue );
 
 	if ( bNew )
 		m_Strings.Insert( pszNew );
@@ -82,7 +79,7 @@ const char * CStringPool::Allocate( const char *pszValue )
 
 void CStringPool::FreeAll()
 {
-	unsigned short i = m_Strings.FirstInorder();
+	auto i = m_Strings.FirstInorder();
 	while ( i != m_Strings.InvalidIndex() )
 	{
 		free( (void *)m_Strings[i] );
@@ -189,7 +186,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 		return INVALID_ELEMENT;
 
 	unsigned short nHashBucketIndex = (HashStringCaseless( pIntrinsic ) % HASH_TABLE_SIZE);
-	unsigned short nCurrentBucket =  m_HashTable[ nHashBucketIndex ];
+	intp nCurrentBucket =  m_HashTable[ nHashBucketIndex ];
 
 	// Does the bucket already exist?
 	if( nCurrentBucket != INVALID_ELEMENT )
@@ -203,7 +200,8 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 				{
 					m_Elements[nCurrentBucket].nReferenceCount ++ ;
 				}
-				return nCurrentBucket;
+				Assert(nCurrentBucket <= std::numeric_limits<unsigned short>::max());
+				return static_cast<unsigned short>(nCurrentBucket);
 			}
 		}
 	}
@@ -222,12 +220,13 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 
 	// Insert at the beginning of the bucket:
 	m_Elements[nCurrentBucket].nNextElement = m_HashTable[ nHashBucketIndex ];
-	m_HashTable[ nHashBucketIndex ] = nCurrentBucket;
-
-	m_Elements[nCurrentBucket].pString = new char[Q_strlen( pIntrinsic ) + 1];
-	Q_strcpy( m_Elements[nCurrentBucket].pString, pIntrinsic );
 	
-    return nCurrentBucket;
+	Assert(nCurrentBucket <= std::numeric_limits<unsigned short>::max());
+	m_HashTable[ nHashBucketIndex ] = static_cast<unsigned short>(nCurrentBucket);
+
+	m_Elements[nCurrentBucket].pString = V_strdup( pIntrinsic );
+	
+	return static_cast<unsigned short>(nCurrentBucket);
 }
 
 
@@ -245,7 +244,7 @@ void CCountedStringPool::DereferenceString( const char* pIntrinsic )
 	if (!pIntrinsic)
 		return;
 
-	unsigned short nHashBucketIndex = (HashStringCaseless( pIntrinsic ) % m_HashTable.Count());
+	intp nHashBucketIndex = (HashStringCaseless( pIntrinsic ) % m_HashTable.Count());
 	unsigned short nCurrentBucket =  m_HashTable[ nHashBucketIndex ];
 
 	// If there isn't anything in the bucket, just return.
@@ -309,17 +308,11 @@ void CCountedStringPool::SpewStrings()
 CON_COMMAND( test_stringpool, "Tests the class CStringPool" )
 {
 	CStringPool pool;
-
 	Assert(pool.Count() == 0);
 
-	pool.Allocate("test");
-	Assert(pool.Count() == 1);
-
-	pool.Allocate("test");
-	Assert(pool.Count() == 1);
-
-	pool.Allocate("test2");
-	Assert(pool.Count() == 2);
+	Assert(pool.Allocate("test") && pool.Count() == 1);
+	Assert(pool.Allocate("test") && pool.Count() == 1);
+	Assert(pool.Allocate("test2") && pool.Count() == 2);
 
 	Assert( pool.Find("test2") != NULL );
 	Assert( pool.Find("TEST") != NULL );

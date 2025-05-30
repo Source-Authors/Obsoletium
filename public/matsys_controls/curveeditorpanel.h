@@ -45,13 +45,13 @@ public:
 
 protected:
 	// Control points + values...
-	virtual int FindOrAddControlPoint( float flIn, float flTolerance, float flOut ) = 0;
-	virtual int FindControlPoint( float flIn, float flTolerance ) = 0;
-	virtual int ModifyControlPoint( int nPoint, float flIn, float flOut ) = 0;
-	virtual void RemoveControlPoint( int nPoint ) = 0;
+	virtual intp FindOrAddControlPoint( float flIn, float flTolerance, float flOut ) = 0;
+	virtual intp FindControlPoint( float flIn, float flTolerance ) = 0;
+	virtual intp ModifyControlPoint( intp nPoint, float flIn, float flOut ) = 0;
+	virtual void RemoveControlPoint( intp nPoint ) = 0;
 	virtual float GetValue( float flIn ) = 0;
-	virtual int ControlPointCount() = 0;
-	virtual void GetControlPoint( int nPoint, float *pIn, float *pOut ) = 0;
+	virtual intp ControlPointCount() = 0;
+	virtual void GetControlPoint( intp nPoint, float *pIn, float *pOut ) = 0;
 
 private:
 	// Converts screen location to normalized values and back

@@ -8,17 +8,12 @@
 //===========================================================================//
 
 #include "stdafx.h"
+#include "ChildFrm.h"
 #include <oleauto.h>
 #include <oaidl.h>
-#if _MSC_VER < 1300
-#include <afxpriv.h>
-#else
-#define WM_INITIALUPDATE    0x0364  // (params unused) - sent to children
-#endif
 #include "hammer.h"
 #include "Options.h"
 #include "MainFrm.h"
-#include "ChildFrm.h"
 #include "MapDoc.h"
 #include "MapView2D.h"
 #include "MapViewLogical.h"
@@ -29,6 +24,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#define WM_INITIALUPDATE 0x0364  // (params unused) - sent to children
 
 IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWnd)
 
@@ -113,7 +109,7 @@ BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
 	//cs.style |= WS_MAXIMIZE;
 
-	return(CMDIChildWnd::PreCreateWindow(cs));
+	return(__super::PreCreateWindow(cs));
 }
 
 
@@ -139,7 +135,7 @@ CView * CChildFrame::GetActiveView()
 	}
 	else
 	{
-		pCurrentView = CMDIChildWnd::GetActiveView();
+		pCurrentView = __super::GetActiveView();
 	}
 
 	return pCurrentView;
@@ -338,7 +334,7 @@ CView *CChildFrame::ReplaceView(CRuntimeClass *pViewClass)
 //-----------------------------------------------------------------------------
 void CChildFrame::AssertValid() const
 {
-	CMDIChildWnd::AssertValid();
+	__super::AssertValid();
 }
 
 //-----------------------------------------------------------------------------
@@ -347,7 +343,7 @@ void CChildFrame::AssertValid() const
 //-----------------------------------------------------------------------------
 void CChildFrame::Dump(CDumpContext& dc) const
 {
-	CMDIChildWnd::Dump(dc);
+	__super::Dump(dc);
 }
 
 #endif //_DEBUG
@@ -371,7 +367,7 @@ void CChildFrame::SaveOptions(void)
 				if (pView != NULL)
 				{
 					char szKey[30];
-					sprintf(szKey, "DrawType%d,%d", nRow, nCol);
+					V_sprintf_safe(szKey, "DrawType%d,%d", nRow, nCol);
 					APP()->WriteProfileInt("Splitter", szKey, pView->GetDrawType());
 				}
 			}
@@ -392,7 +388,7 @@ void CChildFrame::SaveOptions(void)
 		GetWindowPlacement(&wp);
 
 		char szPlacement[100];
-		sprintf(szPlacement, "(%d %d) (%d %d) (%d %d %d %d) %d", wp.ptMaxPosition.x, wp.ptMaxPosition.y, wp.ptMinPosition.x, wp.ptMinPosition.y, wp.rcNormalPosition.bottom, wp.rcNormalPosition.left, wp.rcNormalPosition.right, wp.rcNormalPosition.top, wp.showCmd);
+		V_sprintf_safe(szPlacement, "(%d %d) (%d %d) (%d %d %d %d) %d", wp.ptMaxPosition.x, wp.ptMaxPosition.y, wp.ptMinPosition.x, wp.ptMinPosition.y, wp.rcNormalPosition.bottom, wp.rcNormalPosition.left, wp.rcNormalPosition.right, wp.rcNormalPosition.top, wp.showCmd);
 		APP()->WriteProfileString("Splitter", "WindowPlacement", szPlacement);
 	}
 }
@@ -660,7 +656,7 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 	//
 	// No splitter, call default creation code.
 	//
-	return(CMDIChildWnd::OnCreateClient(lpcs, pContext));
+	return(__super::OnCreateClient(lpcs, pContext));
 }
 
 
@@ -680,8 +676,8 @@ void CChildFrame::CenterViews(void)
 	GetClientRect(r);
 	CSize sizeView(r.Width()/2 - 3, r.Height()/2 - 3);
 
-	sizeView.cy = max(0, sizeView.cy);
-	sizeView.cx = max(0, sizeView.cx);
+	sizeView.cy = max(0L, sizeView.cy);
+	sizeView.cx = max(0L, sizeView.cx);
 
 	m_wndSplitter->SetRowInfo(0, sizeView.cy, 0);
 	m_wndSplitter->SetRowInfo(1, sizeView.cy, 0);
@@ -732,7 +728,7 @@ void CChildFrame::OnUpdateViewAutosize4(CCmdUI *pCmdUI)
 //-----------------------------------------------------------------------------
 void CChildFrame::OnSize(UINT nType, int cx, int cy) 
 {
-	CMDIChildWnd::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 }
 
 
@@ -743,7 +739,7 @@ void CChildFrame::OnSize(UINT nType, int cx, int cy)
 //-----------------------------------------------------------------------------
 int CChildFrame::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-	if (CMDIChildWnd::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 	{
 		return(-1);
 	}
@@ -759,7 +755,13 @@ int CChildFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 			WINDOWPLACEMENT wp;
 			wp.length = sizeof(wp);
 			wp.flags = 0;
-			sscanf(str, "(%d %d) (%d %d) (%d %d %d %d) %d", &wp.ptMaxPosition.x, &wp.ptMaxPosition.y, &wp.ptMinPosition.x, &wp.ptMinPosition.y, &wp.rcNormalPosition.bottom, &wp.rcNormalPosition.left, &wp.rcNormalPosition.right, &wp.rcNormalPosition.top, &wp.showCmd);
+			[[maybe_unused]] const int scanned = sscanf(str, "(%d %d) (%d %d) (%d %d %d %d) %d",
+				&wp.ptMaxPosition.x, &wp.ptMaxPosition.y,
+				&wp.ptMinPosition.x, &wp.ptMinPosition.y,
+				&wp.rcNormalPosition.bottom, &wp.rcNormalPosition.left,
+				&wp.rcNormalPosition.right, &wp.rcNormalPosition.top,
+				&wp.showCmd);
+			Assert(scanned == 9);
 
 			if (wp.showCmd == SW_SHOWMAXIMIZED)
 			{
@@ -897,11 +899,11 @@ void CChildFrame::OnWindowToggle(void)
 void CChildFrame::OnClose(void)
 {
 	SaveOptions();
-	CFrameWnd::OnClose();
+	__super::OnClose();
 }
 void CChildFrame::OnSetFocus( CWnd* pOldWnd )
 {
-	CMDIChildWnd::OnSetFocus( pOldWnd );
+	__super::OnSetFocus( pOldWnd );
 
 	CMapDoc *pDoc = dynamic_cast<CMapDoc*>(GetActiveDocument());
 

@@ -330,7 +330,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 		return;
 
 	//Must have ammo
-	if ( ( pPlayer->GetAmmoCount( m_iSecondaryAmmoType ) <= 0 ) || ( pPlayer->GetWaterLevel() == 3 ) )
+	if ( ( pPlayer->GetAmmoCount( m_iSecondaryAmmoType ) <= 0 ) || ( pPlayer->GetWaterLevel() == WaterLevel::WL_Eyes ) )
 	{
 		SendWeaponAnim( ACT_VM_DRYFIRE );
 		BaseClass::WeaponSound( EMPTY );
@@ -422,7 +422,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition( float flDot, float flDist )
 	//	return COND_NONE;
 
 	//Vector vecEnemyLKP = npcOwner->GetEnemyLKP();
-	//if ( !( pEnemy->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z) )
+	//if ( !( pEnemy->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == WaterLevel::WL_NotInWater && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z) )
 	//{
 	//	//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 	//	// be grenaded.

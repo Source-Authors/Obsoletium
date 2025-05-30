@@ -38,9 +38,9 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CMapAnimationDlg::CMapAnimationDlg()
 {
-	m_flAnimationDuration = 5.0f;
-	m_flAnimationStart = 0.0f;
-	m_flAnimTime = 0.0f;
+	m_flAnimationDuration = 5.0;
+	m_flAnimationStart = 0.0;
+	m_flAnimTime = 0.0;
 	m_bPlaying = false;
 }
 
@@ -147,7 +147,7 @@ void CMapAnimationDlg::UpdateAnimationTime( void )
 void CMapAnimationDlg::OnHScroll( UINT nSBCode, UINT nPos, CScrollBar *pScrollBar ) 
 {
 	// get the new time from the slider bar
-	m_flAnimTime = ((float)m_TimeSlider.GetPos() / ANIMSLIDER_NUMTICS) * m_flAnimationDuration;
+	m_flAnimTime = ((double)m_TimeSlider.GetPos() / ANIMSLIDER_NUMTICS) * m_flAnimationDuration;
 
 	// stop any playback
 	PausePlayback();
@@ -279,8 +279,8 @@ void CMapAnimationDlg::AdvanceAnimationTime( void )
 void CMapAnimationDlg::ResetTimeSlider( void )
 {
 	PausePlayback();
-	m_flAnimTime = 0.0f;
-	m_flAnimationStart = 0.0f;
+	m_flAnimTime = 0.0;
+	m_flAnimationStart = 0.0;
 	m_TimeSlider.SetPos( 0 );
 	UpdateAnimationTime();
 }
@@ -291,7 +291,7 @@ void CMapAnimationDlg::ResetTimeSlider( void )
 //			with the selected keyframe info
 // Input  : &selection - 
 //-----------------------------------------------------------------------------
-void CMapAnimationDlg::SelectionChanged( CMapObjectList &selection )
+void CMapAnimationDlg::SelectionChanged( const CMapObjectList &selection )
 {
 	// reset the slider
 	ResetTimeSlider();

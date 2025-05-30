@@ -18,13 +18,12 @@
 #include "materialsystem/deformations.h"
 
 #include "tier1/utlintrusivelist.h"
-#include "utlvector.h"
-#include "utldict.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
 #include "cmaterialdict.h"
 #include "cmatlightmaps.h"
 #include "cmatrendercontext.h"
 #include "cmatqueuedrendercontext.h"
-#include "materialsystem_global.h"
 
 #ifndef MATSYS_INTERNAL
 #error "This file is private to the implementation of IMaterialSystem/IMaterialSystemInternal"
@@ -279,8 +278,8 @@ public:
 	// -----------------------------------------------------------
 	// Shaders
 	// -----------------------------------------------------------
-	int										ShaderCount() const;
-	int										GetShaders( int nFirstShader, int nCount, IShader **ppShaderList ) const;
+	intp									ShaderCount() const;
+	int										GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const;
 	int										ShaderFlagCount() const;
 	const char *							ShaderFlagName( int nIndex ) const;
 	void									GetShaderFallback( const char *pShaderName, char *pFallbackShader, int nFallbackLength );

@@ -17,16 +17,18 @@ $Configuration
 	}
 }
 
-$Project "Height2normal"
+$Project "height2normal"
 {
 	$Folder	"Source Files"
 	{
 		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
+		$File	"..\common\tools_minidump.h"
 		$File	"height2normal.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
+		$File	"..\common\tools_minidump.cpp"
 		$File	"$SRCDIR\public\tier1\interface.h"
 		$File	"$SRCDIR\public\tier1\utlbuffer.h"
 	}

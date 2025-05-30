@@ -17,7 +17,7 @@
 
 
 #ifdef WIN32
-#include "windows.h"
+#include "winlite.h"
 #endif
 
 

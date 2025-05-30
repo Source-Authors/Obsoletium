@@ -57,7 +57,7 @@ void CLoadGameDialog::OnCommand( const char *command )
 {
 	if ( !stricmp( command, "loadsave" ) )
 	{
-		int saveIndex = GetSelectedItemSaveIndex();
+		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{
 			const char *shortName = m_SaveGames[saveIndex].szShortName;
@@ -65,7 +65,7 @@ void CLoadGameDialog::OnCommand( const char *command )
 			{
 				// Load the game, return to top and switch to engine
 				char sz[ 256 ];
-				Q_snprintf(sz, sizeof( sz ), "progress_enable\nload %s\n", shortName );
+				V_sprintf_safe(sz, "progress_enable\nload %s\n", shortName );
 				
 				engine->ClientCmd_Unrestricted( sz );
 				
@@ -76,7 +76,7 @@ void CLoadGameDialog::OnCommand( const char *command )
 	}
 	else if ( !stricmp( command, "Delete" ) )
 	{
-		int saveIndex = GetSelectedItemSaveIndex();
+		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{
 			// confirm the deletion
@@ -89,7 +89,7 @@ void CLoadGameDialog::OnCommand( const char *command )
 	}
 	else if ( !stricmp( command, "DeleteConfirmed" ) )
 	{
-		int saveIndex = GetSelectedItemSaveIndex();
+		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{
 			DeleteSaveGame( m_SaveGames[saveIndex].szFileName );

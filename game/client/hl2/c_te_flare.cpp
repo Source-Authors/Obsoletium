@@ -341,7 +341,7 @@ void C_Flare::Update( float timeDelta )
 			sParticle->m_uchEndAlpha	= 0;
 			sParticle->m_uchStartSize	= random->RandomInt( 2, 4 );
 			sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 8;
-			sParticle->m_flRoll			= random->RandomInt( 0, 2*M_PI );
+			sParticle->m_flRoll			= random->RandomFloat( 0, 2*M_PI );
 			sParticle->m_flRollDelta	= random->RandomFloat( -(M_PI/6.0f), M_PI/6.0f );
 		}
 	}

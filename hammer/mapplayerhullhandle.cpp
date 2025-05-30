@@ -74,7 +74,7 @@ CMapPlayerHullHandle::CMapPlayerHullHandle(void)
 CMapPlayerHullHandle::CMapPlayerHullHandle(const char *pszKey, bool bDrawLineToParent)
 {
 	Initialize();
-	strcpy(m_szKeyName, pszKey);
+	V_strcpy_safe(m_szKeyName, pszKey);
 	m_bDrawLineToParent = bDrawLineToParent;
 }
 
@@ -159,7 +159,7 @@ CMapClass *CMapPlayerHullHandle::CopyFrom(CMapClass *pObject, bool bUpdateDepend
 
 	CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
-	strcpy(m_szKeyName, pFrom->m_szKeyName);
+	V_strcpy_safe(m_szKeyName, pFrom->m_szKeyName);
 
 	return(this);
 }
@@ -349,7 +349,7 @@ void CMapPlayerHullHandle::UpdateParentKey(void)
 		if (pEntity != NULL)
 		{
 			char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-			sprintf(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
+			V_sprintf_safe(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
 			pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 
 		}

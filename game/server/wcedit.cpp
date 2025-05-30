@@ -446,9 +446,12 @@ void NWCEdit::DestroyAILink( CBasePlayer *pPlayer )
 	}
 }
 
-Vector *g_EntityPositions = NULL;
-QAngle *g_EntityOrientations = NULL;
-string_t *g_EntityClassnames = NULL;
+// dimhotepus: Allocate statically to not leak heap.
+Vector g_EntityPositions[NUM_ENT_ENTRIES] = {};
+QAngle g_EntityOrientations[NUM_ENT_ENTRIES] = {};
+// have to save these too because some entities change the classname on spawn
+// (e.g. prop_physics_override, physics_prop)
+string_t g_EntityClassnames[NUM_ENT_ENTRIES] = {};
 
 //-----------------------------------------------------------------------------
 // Purpose: Saves the entity's position for future communication with Hammer
@@ -458,13 +461,6 @@ void NWCEdit::RememberEntityPosition( CBaseEntity *pEntity )
 	if ( !(pEntity->ObjectCaps() & FCAP_WCEDIT_POSITION) )
 		return;
 
-	if ( !g_EntityPositions )
-	{
-		g_EntityPositions = new Vector[NUM_ENT_ENTRIES];
-		g_EntityOrientations = new QAngle[NUM_ENT_ENTRIES];
-		// have to save these too because some entities change the classname on spawn (e.g. prop_physics_override, physics_prop)
-		g_EntityClassnames = new string_t[NUM_ENT_ENTRIES];
-	}
 	int index = pEntity->entindex();
 	g_EntityPositions[index] = pEntity->GetAbsOrigin();
 	g_EntityOrientations[index] = pEntity->GetAbsAngles();

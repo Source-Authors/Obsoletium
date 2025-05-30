@@ -12,6 +12,10 @@
 #endif
 
 #include "boundbox.h"
+#include "chunkfile.h"
+
+#include "tier1/utlstring.h"
+#include "tier1/utlvector.h"
 
 //
 // Each cordon is a named collection of bounding boxes.
@@ -52,8 +56,8 @@ public:
 	static ChunkFileResult_t LoadCordonsCallback( CChunkFile *pFile, CManifest *pManifest );
 	static ChunkFileResult_t LoadManifestCordoningPrefsCallback( CChunkFile *pFile, CManifest *pManifest );
 
-	bool			LoadSubMaps( CMapFile *pMapFile, const char *pszFileName );
-	epair_t			*CreateEPair( char *pKey, char *pValue );
+	bool			LoadSubMaps( class CMapFile *pMapFile, const char *pszFileName );
+	struct epair_t	*CreateEPair( char *pKey, char *pValue );
 	bool			LoadVMFManifest( const char *pszFileName );
 	const char		*GetInstancePath( ) { return m_InstancePath; }
 
@@ -67,7 +71,7 @@ private:
 	char							m_InstancePath[ MAX_PATH ];
 	bool							m_bIsCordoning;
 	CUtlVector< Cordon_t >			m_Cordons;
-	entity_t						*m_CordoningMapEnt;
+	struct entity_t						*m_CordoningMapEnt;
 };
 
 #endif // #ifndef __MANIFEST_H

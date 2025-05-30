@@ -22,7 +22,7 @@
 //-----------------------------------------------------------------------------
 // Main interface for input. This is a low-level interface
 //-----------------------------------------------------------------------------
-#define INPUTSYSTEM_INTERFACE_VERSION	"InputSystemVersion001"
+constexpr inline char INPUTSYSTEM_INTERFACE_VERSION[]{"InputSystemVersion001"};
 abstract_class IInputSystem : public IAppSystem
 {
 public:

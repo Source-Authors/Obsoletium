@@ -6,15 +6,17 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include <sys\types.h>
-#include <sys\stat.h>
-#include "ChunkFile.h"
 #include "Prefab3D.h"
+
+#include "ChunkFile.h"
 #include "Options.h"
 #include "History.h"
 #include "MapGroup.h"
 #include "MapWorld.h"
 #include "GlobalFunctions.h"
+
+#include <sys\types.h>
+#include <sys\stat.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -76,7 +78,7 @@ CMapClass *CPrefab3D::Create(void)
 		pOriginal = m_pWorld;
 
 		// New object is a new group
-		pCopy = (CMapClass *)new CMapGroup;
+		pCopy = new CMapGroup;
 	}
 
 	//
@@ -263,8 +265,7 @@ int CPrefabRMF::DoLoad(std::fstream& file, DWORD dwFlags)
 
 	AddMRU(this);
 
-	if(m_pWorld)
-		delete m_pWorld;
+	delete m_pWorld;
 	m_pWorld = new CMapWorld( NULL );
 
 	// read data
@@ -340,7 +341,7 @@ int CPrefabRMF::Init(LPCTSTR pszFilename, BOOL bLoadNow, DWORD dwFlags)
 
 	// ensure we're named
 	memset(szName, 0, sizeof szName);
-	strncpy(szName, pszFilename, sizeof szName - 1);
+	V_strcpy_safe(szName, pszFilename);
 	return Init(file, bLoadNow, dwFlags);
 }
 
@@ -365,7 +366,7 @@ int CPrefabRMF::Init(std::fstream &file, BOOL bLoadNow, DWORD dwFlags)
 	if(!szName[0])
 	{
 		// ensure we're named
-		strcpy(szName, "Prefab");
+		V_strcpy_safe(szName, "Prefab");
 	}
 
 	return iRvl;
@@ -395,7 +396,7 @@ int CPrefabRMF::Save(std::fstream& file, DWORD dwFlags)
 {
 	if (!IsLoaded() && (Load() == -1))
 	{
-		AfxMessageBox("Couldn't Load prefab to Save it.");
+		AfxMessageBox("Couldn't Load prefab to Save it.", MB_ICONERROR);
 		return -1;
 	}
 
@@ -408,6 +409,8 @@ int CPrefabRMF::Save(std::fstream& file, DWORD dwFlags)
 //-----------------------------------------------------------------------------
 CPrefabVMF::CPrefabVMF()
 {
+	m_szFilename[0] = '\0';
+	m_nFileTime = -1;
 }
 
 
@@ -456,11 +459,7 @@ int CPrefabVMF::Load(DWORD dwFlags)
 	//
 	// Create a new world to hold the loaded objects.
 	//
-	if (m_pWorld != NULL)
-	{
-		delete m_pWorld;
-	}
-
+	delete m_pWorld;
 	m_pWorld = new CMapWorld( NULL );
 
 	//
@@ -510,7 +509,8 @@ int CPrefabVMF::Load(DWORD dwFlags)
 		m_pWorld->PostloadWorld();
 		m_pWorld->CalcBounds();
 
-		File.Close();
+		// dimhotepus: Check result.
+		eResult = File.Close();
 
 		//
 		// Store the file modification time to use as a cache check.
@@ -523,7 +523,7 @@ int CPrefabVMF::Load(DWORD dwFlags)
 	}
 	else
 	{
-		//GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Error loading prefab", MB_OK | MB_ICONEXCLAMATION);
+		//GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Error loading prefab", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	return(eResult == ChunkFile_Ok);
@@ -588,6 +588,6 @@ void CPrefabVMF::SetFilename(const char *szFilename)
 	//
 	_splitpath(szFilename, NULL, NULL, szName, NULL);
 
-	strcpy(m_szFilename, szFilename);
+	V_strcpy_safe(m_szFilename, szFilename);
 }
 

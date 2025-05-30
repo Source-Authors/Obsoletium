@@ -4,35 +4,28 @@
 //
 //===========================================================================//
 
-// If we are going to include winsock.h then we need to disable protected_things.h
-// or else we get many warnings.
-#undef PROTECTED_THINGS_ENABLE
+#include "cl_rcon.h"
+
+#include "XUnzip.h"
+
+#include "tier0/dbg.h"
 #include "tier0/platform.h"
+#include "tier1/utlbuffer.h"
+#include "tier2/fileutils.h"
+
+#include "vprof_engine.h"
+#include "proto_oob.h" // PORT_RCON define
+#include "cmd.h"
+
 #ifdef POSIX
 #include "net_ws_headers.h"
 #define WSAGetLastError() errno
 #else
-#if !defined( _X360 )
 #include <winsock.h>
-#else
-#include "winsockx.h"
-#endif
-#undef SetPort // winsock screws with the SetPort string... *sigh*8
 #endif
 
-#include <tier0/dbg.h>
-#include "utlbuffer.h"
-#include "cl_rcon.h"
-#include "vprof_engine.h"
-#include "proto_oob.h" // PORT_RCON define
-#include "cmd.h"
-#include "tier2/fileutils.h"
-#include "zip/XUnzip.h"
+#undef SetPort  // winsock screws with the SetPort string... *sigh*8
 
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -103,9 +96,7 @@ static ConVar	rcon_address( "rcon_address", "", FCVAR_SERVER_CANNOT_QUERY|FCVAR_
 //-----------------------------------------------------------------------------
 // Implementation of remote vprof
 //-----------------------------------------------------------------------------
-CRConVProfExport::CRConVProfExport()
-{
-}
+CRConVProfExport::CRConVProfExport() = default;
 
 void CRConVProfExport::AddListener()
 {
@@ -254,9 +245,7 @@ CRConClient::CRConClient() : m_Socket( this )
 //-----------------------------------------------------------------------------
 // Purpose: Destructor
 //-----------------------------------------------------------------------------
-CRConClient::~CRConClient()
-{
-}
+CRConClient::~CRConClient() = default;
 
 
 //-----------------------------------------------------------------------------
@@ -565,7 +554,8 @@ void CRConClient::RunFrame()
 	// we have a command to process
 	// Read data into a utlbuffer
 	m_RecvBuffer.EnsureCapacity( m_RecvBuffer.TellPut() + readLen + 1 );
-	char *recvbuffer = (char *)_alloca( min( 1024ul, readLen + 1 ) );
+	const size_t recvbufferLen = min( 1024ul, readLen + 1 );
+	char *recvbuffer = (char *)_alloca( recvbufferLen );
 	unsigned int len = 0;
 	while ( len < readLen )
 	{
@@ -781,21 +771,25 @@ void CRConClient::SaveRemoteScreenshot( const void* pBuffer, int nBufLen )
 	char pScreenshotPath[MAX_PATH];
 	do 
 	{
-		Q_snprintf( pScreenshotPath, sizeof( pScreenshotPath ), "%s/screenshot%04d.jpg", m_RemoteFileDir.Get(), m_nScreenShotIndex++ );	
+		V_sprintf_safe( pScreenshotPath, "%s/screenshot%04d.jpg", m_RemoteFileDir.Get(), m_nScreenShotIndex++ );
 	} while ( g_pFullFileSystem->FileExists( pScreenshotPath, "MOD" ) );
 
 	char pFullPath[MAX_PATH];
-	GetModSubdirectory( pScreenshotPath, pFullPath, sizeof(pFullPath) );
-	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
+	GetModSubdirectory( pScreenshotPath, pFullPath );
+	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, nullptr );
+	Assert(hZip);
+	if (!hZip) return;
 
 	int nIndex;
 	ZIPENTRY zipInfo;
-	FindZipItem( hZip, "screenshot.jpg", true, &nIndex, &zipInfo );
-	if ( nIndex >= 0 )
+	ZRESULT rc = FindZipItem( hZip, "screenshot.jpg", true, &nIndex, &zipInfo );
+	if ( rc == ZR_OK && nIndex >= 0 )
 	{
-		UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		rc = UnzipItem( hZip, nIndex, pFullPath, 0 );
+		Assert(rc == ZR_OK);
 	}
-	CloseZip( hZip );
+	rc = CloseZip( hZip );
+	Assert(rc == ZR_OK);
 }
 
 void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
@@ -806,19 +800,23 @@ void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
 	char pLogPath[MAX_PATH];
 	do 
 	{
-		Q_snprintf( pLogPath, sizeof( pLogPath ), "%s/console%04d.log", m_RemoteFileDir.Get(), m_nConsoleLogIndex++ );	
+		V_sprintf_safe( pLogPath, "%s/console%04d.log", m_RemoteFileDir.Get(), m_nConsoleLogIndex++ );	
 	} while ( g_pFullFileSystem->FileExists( pLogPath, "MOD" ) );
 
 	char pFullPath[MAX_PATH];
-	GetModSubdirectory( pLogPath, pFullPath, sizeof(pFullPath) );
-	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
+	GetModSubdirectory( pLogPath, pFullPath );
+	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, nullptr );
+	Assert(hZip);
+	if (!hZip) return;
 
 	int nIndex;
 	ZIPENTRY zipInfo;
-	FindZipItem( hZip, "console.log", true, &nIndex, &zipInfo );
-	if ( nIndex >= 0 )
+	ZRESULT rc = FindZipItem( hZip, "console.log", true, &nIndex, &zipInfo );
+	if ( rc == ZR_OK && nIndex >= 0 )
 	{
-		UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
+		rc = UnzipItem( hZip, nIndex, pFullPath, 0 );
+		Assert(rc == ZR_OK);
 	}
-	CloseZip( hZip );
+	rc = CloseZip( hZip );
+	Assert(rc == ZR_OK);
 }

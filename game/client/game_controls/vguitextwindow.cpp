@@ -52,7 +52,7 @@ CON_COMMAND( showinfo, "Shows a info panel: <type> <title> <message> [<command n
 
 	 if ( panel )
 	 {
-		 KeyValues *kv = new KeyValues("data");
+		 KeyValuesAD kv("data");
 		 kv->SetInt( "type", Q_atoi(args[ 1 ]) );
 		 kv->SetString( "title", args[ 2 ] );
 		 kv->SetString( "message", args[ 3 ] );
@@ -63,8 +63,6 @@ CON_COMMAND( showinfo, "Shows a info panel: <type> <title> <message> [<command n
 		 panel->SetData( kv );
 
 		 gViewPortInterface->ShowPanel( panel, true );
-
-		 kv->deleteThis();
 	 }
 	 else
 	 {
@@ -244,11 +242,11 @@ void CTextWindow::ShowFile( const char *filename )
 	{
 		// it's a local HTML file
 		char localURL[ _MAX_PATH + 7 ];
-		Q_strncpy( localURL, "file://", sizeof( localURL ) );
+		V_strcpy_safe( localURL, "file://" );
 		
 		char pPathData[ _MAX_PATH ];
-		g_pFullFileSystem->GetLocalPath( filename, pPathData, sizeof(pPathData) );
-		Q_strncat( localURL, pPathData, sizeof( localURL ), COPY_ALL_CHARACTERS );
+		g_pFullFileSystem->GetLocalPath_safe( filename, pPathData );
+		V_strcat_safe( localURL, pPathData );
 
 		ShowURL( localURL );
 	}
@@ -385,7 +383,8 @@ void CTextWindow::OnKeyCodePressed( vgui::KeyCode code )
 
 void CTextWindow::SetData(KeyValues *data)
 {
-	SetData( data->GetInt( "type" ), data->GetString( "title" ), data->GetString( "msg" ), data->GetString( "msg_fallback" ), data->GetInt( "cmd" ), data->GetBool( "unload" ) );
+	// dimhotepus: Fix message and command reading from data.
+	SetData( data->GetInt( "type" ), data->GetString( "title" ), data->GetString( "message" ), data->GetString( "msg_fallback" ), data->GetInt( "command" ), data->GetBool( "unload" ) );
 }
 
 void CTextWindow::SetData( int type, const char *title, const char *message, const char *message_fallback, int command, bool bUnload )

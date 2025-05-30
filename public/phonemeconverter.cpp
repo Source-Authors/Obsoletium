@@ -5,8 +5,7 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-#include <stdio.h>
-#include <string.h>
+#include "phonemeconverter.h"
 #include "tier0/dbg.h"
 
 struct PhonemeMap_t
@@ -150,7 +149,7 @@ float WeightForPhoneme( char *text )
 
 int NumPhonemes()
 {
-	return ssize( g_Phonemes );
+	return static_cast<int>(ssize( g_Phonemes ));
 }
 
 const char *NameForPhonemeByIndex( int index )
@@ -166,7 +165,7 @@ const char *NameForPhonemeByIndex( int index )
 //-----------------------------------------------------------------------------
 int TextToPhonemeIndex( const char *text )
 {
-	for ( size_t i = 0; i < std::size( g_Phonemes ); ++i )
+	for ( int i = 0; i < static_cast<int>(std::size( g_Phonemes )); ++i )
 	{
 		PhonemeMap_t *test = &g_Phonemes[ i ];
 		if ( !stricmp( test->string, text ) )

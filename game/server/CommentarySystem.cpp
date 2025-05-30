@@ -600,7 +600,7 @@ public:
 		char szFullName[512];
 		Q_snprintf(szFullName,sizeof(szFullName), "maps/%s_commentary.txt", STRING( gpGlobals->mapname ));
 		// dimhotepus: Fix pkvFile memory leak.
-		KeyValues::AutoDelete pkvFile = KeyValues::AutoDelete( "Commentary" );
+		KeyValuesAD pkvFile( "Commentary" );
 		if ( pkvFile->LoadFromFile( filesystem, szFullName, "MOD" ) )
 		{
 			Msg( "Commentary: Loading commentary data from %s. \n", szFullName );

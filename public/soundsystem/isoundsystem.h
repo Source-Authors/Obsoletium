@@ -24,7 +24,7 @@ class CAudioMixer;
 //-----------------------------------------------------------------------------
 // Sound handle
 //-----------------------------------------------------------------------------
-typedef unsigned short AudioSourceHandle_t;
+using AudioSourceHandle_t = unsigned short;
 enum
 {
 	AUDIOSOURCEHANDLE_INVALID = (AudioSourceHandle_t)~0
@@ -45,7 +45,7 @@ enum FindAudioSourceFlags_t
 //-----------------------------------------------------------------------------
 // Purpose: DLL interface for low-level sound utilities
 //-----------------------------------------------------------------------------
-#define SOUNDSYSTEM_INTERFACE_VERSION "SoundSystem001"
+constexpr inline char SOUNDSYSTEM_INTERFACE_VERSION[]{"SoundSystem001"};
 
 abstract_class ISoundSystem : public IAppSystem
 {

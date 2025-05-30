@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "vgui_controls/combobox.h"
+#include "vgui_controls/ComboBox.h"
 
 
 //-----------------------------------------------------------------------------
@@ -19,11 +19,11 @@
 //-----------------------------------------------------------------------------
 class CFilterComboBox : public vgui::ComboBox
 {
-	DECLARE_CLASS_SIMPLE( CFilterComboBox, vgui::ComboBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFilterComboBox, vgui::ComboBox );
 
 public:
 	CFilterComboBox( Panel *parent, const char *panelName, int numLines, bool allowEdit );
-	virtual void OnKillFocus();
+	void OnKillFocus() override;
 };
 
 

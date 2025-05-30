@@ -99,7 +99,7 @@ bool IsPSDFile( CUtlBuffer &buf )
 {
 	intp nGet = buf.TellGet();
 	PSDHeader_t header;
-	buf.Get( &header, sizeof(header) );
+	buf.Get( header );
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, nGet );
 
 	if ( BigLong( header.m_nSignature ) != PSD_SIGNATURE )
@@ -128,7 +128,7 @@ bool PSDGetInfo( CUtlBuffer &buf, int *pWidth, int *pHeight, ImageFormat *pImage
 {
 	intp nGet = buf.TellGet();
 	PSDHeader_t header;
-	buf.Get( &header, sizeof(header) );
+	buf.Get( header );
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, nGet );
 
 	if ( BigLong( header.m_nSignature ) != PSD_SIGNATURE )
@@ -166,7 +166,7 @@ PSDImageResources PSDGetImageResources( CUtlBuffer &buf )
 
 	// Header
 	PSDHeader_t header;
-	buf.Get( &header, sizeof( header ) );
+	buf.Get( header );
 
 	// Then palette
 	unsigned int numBytesPalette = BigLong( buf.GetUnsignedInt() );
@@ -381,7 +381,7 @@ static void PSDReadCompressedChannels( CUtlBuffer &buf, int nChannelsCount, PSDM
 bool PSDReadFileRGBA8888( CUtlBuffer &buf, Bitmap_t &bitmap )
 {
 	PSDHeader_t header;
-	buf.Get( &header, sizeof(header) );
+	buf.Get( header );
 
 	if ( BigLong( header.m_nSignature ) != PSD_SIGNATURE )
 		return false;
@@ -499,7 +499,7 @@ bool PSDReadFileRGBA8888( const char *pFileName, const char *pPathID, Bitmap_t &
 PSDImageResources::ResElement PSDImageResources::FindElement( Resource eType ) const
 {
 	ResElement res;
-	memset( &res, 0, sizeof( res ) );
+	BitwiseClear( res );
 
 	unsigned char const *pvBuffer = m_pvBuffer, * const pvBufferEnd = m_pvBuffer + m_numBytes;
 	while ( pvBuffer < pvBufferEnd )

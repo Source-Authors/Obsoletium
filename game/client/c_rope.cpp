@@ -157,8 +157,12 @@ public:
 	{
 		m_nCurrentStack = 0;
 		MEM_ALLOC_CREDIT();
-		m_QueuedRopeMemory[0].Init( 131072, 0, 16384 );
-		m_QueuedRopeMemory[1].Init( 131072, 0, 16384 );
+
+		constexpr size_t size = 131072u;
+		if ( !m_QueuedRopeMemory[0].Init( size, 0, 16384 ) )
+			Error( "Queued rope memory stack #1 unable to alloc %zu bytes.\n", size );
+		if ( !m_QueuedRopeMemory[1].Init( size, 0, 16384 ) )
+			Error( "Queued rope memory stack #2 unable to alloc %zu bytes.\n", size );
 	}
 	~CQueuedRopeMemoryManager( void )
 	{

@@ -9,7 +9,7 @@
 #define IMATERIALPROXY_H
 #pragma once
 
-#include "interface.h"
+#include "tier1/interface.h"
 
 #define IMATERIAL_PROXY_INTERFACE_VERSION "_IMaterialProxy003"
 

@@ -381,7 +381,7 @@ bool CInputSystem::InitializeSteamControllers()
 
 ControllerActionSetHandle_t CInputSystem::GetActionSetHandle( GameActionSet_t eActionSet )
 {
-	return g_GameActionSets[eActionSet].handle;
+	return g_GameActionSets[to_underlying(eActionSet)].handle;
 }
 
 ControllerActionSetHandle_t CInputSystem::GetActionSetHandle( const char* szActionSet )
@@ -416,7 +416,7 @@ void CInputSystem::ActivateSteamControllerActionSetForSlot( uint64 nSlot, GameAc
 				}
 			}
 
-			steamcontroller->ActivateActionSet( STEAM_CONTROLLER_HANDLE_ALL_CONTROLLERS, g_GameActionSets[eActionSet].handle );
+			steamcontroller->ActivateActionSet( STEAM_CONTROLLER_HANDLE_ALL_CONTROLLERS, g_GameActionSets[to_underlying(eActionSet)].handle );
 		}
 		else
 		{
@@ -432,7 +432,7 @@ void CInputSystem::ActivateSteamControllerActionSetForSlot( uint64 nSlot, GameAc
 					m_currentActionSet[nSlot] = eActionSet;
 				}
 
-				steamcontroller->ActivateActionSet( nControllerHandles[nSlot], g_GameActionSets[eActionSet].handle );
+				steamcontroller->ActivateActionSet( nControllerHandles[nSlot], g_GameActionSets[to_underlying(eActionSet)].handle );
 			}
 		}
 	}
@@ -452,7 +452,7 @@ void CInputSystem::ActivateSteamControllerActionSetForSlot( uint64 nSlot, GameAc
 
 int CInputSystem::GetSteamPadDeadZone( ESteamPadAxis axis )
 {
-  int nDeadzone = s_nSteamPadDeadZoneTable[ axis ];
+  int nDeadzone = s_nSteamPadDeadZoneTable[ to_underlying(axis) ];
 
   // Do modifications if required here?
 
@@ -559,27 +559,27 @@ void CInputSystem::PostKeyEvent( int iIndex, sKey_t sKey, int nSample )
 	if ( ANALOG_CODE_LAST != code )
 	{
 		InputState_t &state = m_InputState[ m_bIsPolling ];
-		state.m_pAnalogDelta[ code ] = ( int )( value - state.m_pAnalogValue[ code ] );
-		state.m_pAnalogValue[ code ] = ( int )value;
-		if ( state.m_pAnalogDelta[ code ] != 0 )
+		state.m_pAnalogDelta[ to_underlying(code) ] = static_cast<int>( value - state.m_pAnalogValue[ to_underlying(code) ] );
+		state.m_pAnalogValue[ to_underlying(code) ] = static_cast<int>( value );
+		if ( state.m_pAnalogDelta[ to_underlying(code) ] != 0 )
 		{
-			PostEvent( IE_AnalogValueChanged, m_nLastSampleTick, code, ( int )value, state.m_pAnalogDelta[ code ] );
+			PostEvent( to_underlying(IE_AnalogValueChanged), m_nLastSampleTick, to_underlying(code), static_cast<int>(value), state.m_pAnalogDelta[ to_underlying(code) ] );
 		}
 	}
 
 	// store the key
-	m_Device[iIndex].m_appSKeys[sKey].sample = nSample;
+	m_Device[iIndex].m_appSKeys[to_underlying(sKey)].sample = nSample;
 	if ( nSample > nSampleThreshold )
 	{
-		m_Device[iIndex].m_appSKeys[sKey].repeats++;
+		m_Device[iIndex].m_appSKeys[to_underlying(sKey)].repeats++;
 	}
 	else
 	{
-		m_Device[iIndex].m_appSKeys[sKey].repeats = 0;
+		m_Device[iIndex].m_appSKeys[to_underlying(sKey)].repeats = 0;
 		nSample = 0;
 	}
 
-	if ( m_Device[iIndex].m_appSKeys[sKey].repeats > 1 )
+	if ( m_Device[iIndex].m_appSKeys[to_underlying(sKey)].repeats > 1 )
 	{
 		// application cannot handle streaming keys
 		// first keypress is the only edge trigger
@@ -587,7 +587,7 @@ void CInputSystem::PostKeyEvent( int iIndex, sKey_t sKey, int nSample )
 	}
 
 	// package the key
-	ButtonCode_t buttonCode = SKeyToButtonCode( nMsgSlot, sKey );
+	ButtonCode_t buttonCode = SKeyToButtonCode( nMsgSlot, to_underlying(sKey) );
 	if ( nSample )
 	{
 		PostButtonPressedEvent( IE_ButtonPressed, m_nLastSampleTick, buttonCode, buttonCode );
@@ -664,9 +664,9 @@ EControllerActionOrigin CInputSystem::GetSteamControllerActionOrigin( const char
 // Maps a Steam Controller action origin to a string (consisting of a single character) in our SC icon font
 const wchar_t*	CInputSystem::GetSteamControllerFontCharacterForActionOrigin( EControllerActionOrigin origin )
 {
-	if ( origin >= 0 && origin < ssize( g_MapSteamControllerOriginToIconFont ) )
+	if ( to_underlying(origin) >= 0 && to_underlying(origin) < ssize( g_MapSteamControllerOriginToIconFont ) )
 	{
-		return g_MapSteamControllerOriginToIconFont[origin];
+		return g_MapSteamControllerOriginToIconFont[to_underlying(origin)];
 	}
 	else
 	{
@@ -678,9 +678,9 @@ const wchar_t*	CInputSystem::GetSteamControllerFontCharacterForActionOrigin( ECo
 // Prefer to actually use the icon font wherever possible.
 const wchar_t* CInputSystem::GetSteamControllerDescriptionForActionOrigin( EControllerActionOrigin origin )
 {
-	if ( origin >= 0 && origin < ssize( g_MapSteamControllerOriginToDescription ) )
+	if ( to_underlying(origin) >= 0 && to_underlying(origin) < ssize( g_MapSteamControllerOriginToDescription ) )
 	{
-		return g_MapSteamControllerOriginToDescription[origin];
+		return g_MapSteamControllerOriginToDescription[to_underlying(origin)];
 	}
 	else
 	{

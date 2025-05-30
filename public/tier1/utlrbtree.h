@@ -163,7 +163,7 @@ public:
 	I  Root() const;
 
 	// Num elements
-	size_t Count() const;
+	I Count() const;
 
 	// Max "size" of the vector
 	// it's not generally safe to iterate from index 0 to MaxElement()-1
@@ -171,7 +171,7 @@ public:
 	// but we should really remove patterns using this anyways, for safety and generality
 	I  MaxElement() const;
 
-	// Gets the children                               
+	// Gets the children
 	I  Parent( I i ) const;
 	I  LeftChild( I i ) const;
 	I  RightChild( I i ) const;
@@ -191,7 +191,7 @@ public:
 	bool  IsValid() const;
 
 	// Invalid index
-	static I InvalidIndex();
+	static constexpr I InvalidIndex();
 
 	// returns the tree depth (not a very fast operation)
 	intp   Depth( I node ) const;
@@ -245,7 +245,7 @@ public:
 
 private:
 	// Can't copy the tree this way!
-	CUtlRBTree<T, I, L, M>& operator=( const CUtlRBTree<T, I, L, M> &other );
+	CUtlRBTree<T, I, L, M>& operator=( const CUtlRBTree<T, I, L, M> &other ) = delete;
 
 protected:
 	enum NodeColor_t
@@ -285,7 +285,7 @@ protected:
 	I  InsertAt( I parent, bool leftchild );
 
 	// copy constructors not allowed
-	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree );
+	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree ) = delete;
 
 	// Inserts a node into the tree, doesn't copy the data in.
 	void FindInsertionPosition( T const &insert, I &parent, bool &leftchild );
@@ -352,23 +352,11 @@ protected:
 
 private:
 	// this doesn't make sense for fixed rbtrees, since there's no useful max pointer, and the index space isn't contiguous anyways
-	I  MaxElement() const;
+	I  MaxElement() const = delete;
 };
 
-// this is kind of ugly, but until C++ gets templatized typedefs in C++0x, it's our only choice
 template < class T, class I = unsigned short, typename L = bool (*)( const T &, const T & )  >
-class CUtlBlockRBTree : public CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >
-{
-public:
-	typedef L LessFunc_t;
-	CUtlBlockRBTree( intp growSize = 0, intp initSize = 0, const LessFunc_t &lessfunc = 0 )
-		: CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >( growSize, initSize, lessfunc ) {}
-	CUtlBlockRBTree( const LessFunc_t &lessfunc )
-		: CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >( lessfunc ) {}
-protected:
-	void ResetDbgInfo() {}
-};
-
+using CUtlBlockRBTree = CUtlRBTree< T, I, L, CUtlBlockMemory< UtlRBTreeNode_t< T, I >, I > >;
 
 //-----------------------------------------------------------------------------
 // constructor, destructor
@@ -473,9 +461,9 @@ inline	I  CUtlRBTree<T, I, L, M>::Root() const
 //-----------------------------------------------------------------------------
 
 template < class T, class I, typename L, class M >
-inline	size_t CUtlRBTree<T, I, L, M>::Count() const          
+inline	I CUtlRBTree<T, I, L, M>::Count() const          
 { 
-	return static_cast<size_t>(m_NumElements); 
+	return m_NumElements; 
 }
 
 //-----------------------------------------------------------------------------
@@ -485,7 +473,7 @@ inline	size_t CUtlRBTree<T, I, L, M>::Count() const
 template < class T, class I, typename L, class M >
 inline	I  CUtlRBTree<T, I, L, M>::MaxElement() const       
 {
-	return ( I )m_Elements.NumAllocated();
+	return static_cast<I>(m_Elements.NumAllocated());
 }
 
 
@@ -567,9 +555,9 @@ inline	bool CUtlRBTree<T, I, L, M>::IsValidIndex( I i ) const
 //-----------------------------------------------------------------------------
 
 template < class T, class I, typename L, class M >
-inline I CUtlRBTree<T, I, L, M>::InvalidIndex()         
+inline constexpr I CUtlRBTree<T, I, L, M>::InvalidIndex()         
 {
-	return ( I )M::InvalidIndex();
+	return static_cast<I>(M::InvalidIndex());
 }
 
 
@@ -658,7 +646,7 @@ inline typename CUtlRBTree<T, I, L, M>::NodeColor_t  CUtlRBTree<T, I, L, M>::Col
 template < class T, class I, typename L, class M >
 inline void CUtlRBTree<T, I, L, M>::SetColor( I i, typename CUtlRBTree<T, I, L, M>::NodeColor_t c ) 
 { 
-	Links(i).m_Tag = (I)c; 
+	Links(i).m_Tag = static_cast<I>(c); 
 }
 
 //-----------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 class IVP_Real_Object;
 class IPhysicsFrictionSnapshot;
 
-IPhysicsFrictionSnapshot *CreateFrictionSnapshot( IVP_Real_Object *pObject );
+[[nodiscard]] IPhysicsFrictionSnapshot *CreateFrictionSnapshot( IVP_Real_Object *pObject );
 void DestroyFrictionSnapshot( IPhysicsFrictionSnapshot *pSnapshot );
 void DeleteAllFrictionPairs( IVP_Real_Object *pObject0, IVP_Real_Object *pObject1 );
 

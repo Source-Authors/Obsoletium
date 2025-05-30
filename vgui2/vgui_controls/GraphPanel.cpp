@@ -4,9 +4,8 @@
 //
 //=============================================================================//
 
-#include <math.h>
-
 #include <vgui_controls/GraphPanel.h>
+
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
@@ -123,53 +122,6 @@ void GraphPanel::AddItem(float sampleEnd, float sampleValue)
 			m_Samples.Remove(m_Samples.Head());
 		}
 	}
-
-/*
-	// see the max number of samples necessary to display this information reasonably precisely
-	static const int MAX_LIKELY_GRAPH_WIDTH = 800;
-	int maxSamplesNeeded = 2 * MAX_LIKELY_GRAPH_WIDTH / (m_iGraphBarWidth + m_iGraphBarGapWidth);
-	if (m_Samples.Count() > 2)
-	{
-		// see if we can collapse some items
-		float highestSample = m_Samples[m_Samples.Tail()].sampleEnd;
-
-		// iterate the items
-		// always keep the head around so we have something to go against
-		int sampleIndex = m_Samples.Next(m_Samples.Head());
-		int nextSampleIndex = m_Samples.Next(sampleIndex);
-
-		while (m_Samples.IsInList(nextSampleIndex))
-		{
-			// calculate what sampling precision is actually needed to display this data
-			float distanceFromEnd = highestSample - m_Samples[sampleIndex].sampleEnd;
-
-//			if (distanceFromEnd < m_flDomainSize)
-//				break;
-
-			//!! this calculation is very incorrect
-			float minNeededSampleSize = distanceFromEnd / (m_flMinDomainSize * maxSamplesNeeded);
-			float sampleSize = m_Samples[nextSampleIndex].sampleEnd - m_Samples[sampleIndex].sampleEnd;
-
-			if (sampleSize < minNeededSampleSize)
-			{
-				// collapse the item into the next index
-				m_Samples[nextSampleIndex].value = 0.5f * (m_Samples[nextSampleIndex].value + m_Samples[sampleIndex].value);
-
-				// remove the item from the list
-				m_Samples.Remove(sampleIndex);
-				
-				// move to the next item
-				sampleIndex = nextSampleIndex;
-				nextSampleIndex = m_Samples.Next(sampleIndex);
-			}
-			else
-			{
-				// this item didn't need collapsing, so assume the next item won't
-				break;
-			}
-		}
-	}
-*/
 
 	InvalidateLayout();
 	Repaint();

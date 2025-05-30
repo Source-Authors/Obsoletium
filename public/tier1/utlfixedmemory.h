@@ -58,12 +58,12 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( BlockHeader_t *p, intp i ) : m_pBlockHeader( p ), m_nIndex( i ) {}
+		constexpr Iterator_t( BlockHeader_t *p, intp i ) : m_pBlockHeader( p ), m_nIndex( i ) {}
 		BlockHeader_t *m_pBlockHeader;
 		intp m_nIndex;
 
-		bool operator==( const Iterator_t it ) const	{ return m_pBlockHeader == it.m_pBlockHeader && m_nIndex == it.m_nIndex; }
-		bool operator!=( const Iterator_t it ) const	{ return m_pBlockHeader != it.m_pBlockHeader || m_nIndex != it.m_nIndex; }
+		constexpr bool operator==( const Iterator_t it ) const	{ return m_pBlockHeader == it.m_pBlockHeader && m_nIndex == it.m_nIndex; }
+		constexpr bool operator!=( const Iterator_t it ) const	{ return m_pBlockHeader != it.m_pBlockHeader || m_nIndex != it.m_nIndex; }
 	};
 	Iterator_t First() const							{ return m_pBlocks ? Iterator_t( m_pBlocks, 0 ) : InvalidIterator(); }
 	Iterator_t Next( const Iterator_t &it ) const
@@ -105,7 +105,7 @@ public:
 		return false;
 	}
 	bool IsValidIterator( const Iterator_t &it ) const	{ return it.m_pBlockHeader && it.m_nIndex >= 0 && it.m_nIndex < it.m_pBlockHeader->m_nBlockSize; }
-	Iterator_t InvalidIterator() const					{ return Iterator_t( NULL, INVALID_INDEX ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( NULL, INVALID_INDEX ); }
 
 	// element access
 	T& operator[]( intp i );
@@ -117,8 +117,8 @@ public:
 	bool IsIdxValid( intp i ) const;
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static const intp INVALID_INDEX = 0; // For use with COMPILE_TIME_ASSERT
-	static intp InvalidIndex() { return INVALID_INDEX; }
+	static constexpr intp INVALID_INDEX = 0; // For use with COMPILE_TIME_ASSERT
+	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Size
 	intp NumAllocated() const;
@@ -150,8 +150,8 @@ protected:
 		intp m_nBlockSize;
 	};
 
-	const T *HeaderToBlock( const BlockHeader_t *pHeader ) const { return ( T* )( pHeader + 1 ); }
-	const BlockHeader_t *BlockToHeader( const T *pBlock ) const { return ( BlockHeader_t* )( pBlock ) - 1; }
+	const T *HeaderToBlock( const BlockHeader_t *pHeader ) const { return ( const T* )( pHeader + 1 ); }
+	const BlockHeader_t *BlockToHeader( const T *pBlock ) const { return ( const BlockHeader_t* )( pBlock ) - 1; }
 
 	BlockHeader_t* m_pBlocks;
 	intp m_nAllocationCount;

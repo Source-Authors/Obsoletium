@@ -1,30 +1,22 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================
+// Copyright Valve Corporation, All rights reserved.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <malloc.h>
 #include "tier0/dbg.h"
-#include "vgui_controls/Panel.h"
 #include "elementviewer.h"
+#include "vgui_controls/Panel.h"
 #include "vgui_controls/MenuBar.h"
+#include "vgui_controls/Menu.h"
 #include "vgui/ISurface.h"
 #include "vgui/IInput.h"
-#include "vgui_controls/Menu.h"
-#include "KeyValues.h"
+#include "vgui/IVGui.h"
 #include "tier0/icommandline.h"
+#include "tier1/KeyValues.h"
 #include "datamodel/dmelement.h"
 #include "datamodel/idatamodel.h"
 #include "vgui_controls/FileOpenDialog.h"
 #include "filesystem.h"
-#include "vgui/IVGui.h"
 #include "movieobjects/movieobjects.h"
-//#include "view.h"
-#include "dme_controls/INotifyUI.h"
+
+#include "dme_controls/inotifyui.h"
 #include "dme_controls/ElementPropertiesTree.h"
 #include "dme_controls/filelistmanager.h"
 #include "dme_controls/dmecontrols.h"
@@ -55,26 +47,26 @@ public:
 	CElementViewerPanel();
 	~CElementViewerPanel();
 
-	virtual void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags );
+	void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags ) override;
 
 	// Resize this panel to match its parent
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
-	virtual void OnCommand( const char *cmd );
+	void OnCommand( const char *cmd ) override;
 
-	virtual void OnThink();
+	void OnThink() override;
 
 	void	OnOpen();
 	void	OnSaveAs();
 	void	OnSave();
 	void	OnNew();
 
-	int NumDocs()
+	intp NumDocs() const
 	{
 		return m_Docs.Count();
 	}
 
-	CDmElement *GetRoot( int docNum )
+	CDmElement *GetRoot( intp docNum )
 	{
 		return GetElement< CDmElement >( g_pDataModel->GetFileRoot( m_Docs[ docNum ].m_fileid ) );
 	}
@@ -137,11 +129,9 @@ CElementViewerPanel::CElementViewerPanel() : vgui::Panel( NULL, "ElementViewer" 
 	{
 		// trim off any quotes (paths with spaces need to be quoted on the commandline)
 		char buf[ MAX_PATH ];
-		V_StrSubst( fileName, "\"", "", buf, sizeof( buf ) );
+		V_StrSubst( fileName, "\"", "", buf );
 
-		KeyValues *pKeyValues = new KeyValues( "OnFileSelected", "fullpath", buf );
-		OnFileSelected( pKeyValues );
-		pKeyValues->deleteThis();
+		OnFileSelected( KeyValuesAD(new KeyValues( "OnFileSelected", "fullpath", buf )) );
 	}
 
 	g_pDataModel->InstallNotificationCallback( this );
@@ -179,8 +169,8 @@ void ReportElementStats()
 
 CElementViewerPanel::~CElementViewerPanel()
 {
-	int nDocs = m_Docs.Count();
-	for ( int i = 0; i < nDocs; ++i )
+	intp nDocs = m_Docs.Count();
+	for ( intp i = 0; i < nDocs; ++i )
 	{
 		RemoveFileId( m_Docs[ i ].m_fileid );
 	}
@@ -223,8 +213,8 @@ void CElementViewerPanel::NotifyDataChanged( const char *pReason, int nNotifySou
 	{
 		m_pFileManager->Refresh();
 
-		int nViews = m_Views.Count();
-		for ( int i = 0; i < nViews; ++i )
+		intp nViews = m_Views.Count();
+		for ( intp i = 0; i < nViews; ++i )
 		{
 			if ( m_Views[ i ] )
 			{
@@ -270,8 +260,7 @@ void CElementViewerPanel::OnSaveAs()
 
 	DmFileId_t fileid = m_Docs[ 0 ].m_fileid;
 	// Save As file
-	KeyValues *pContextKeyValues = new KeyValues( "OnSaveAs" );
-	FileOpenDialog *pFileOpenDialog = new FileOpenDialog( this, "Save .dmx File As", false, pContextKeyValues );
+	auto *pFileOpenDialog = new FileOpenDialog( this, "Save .dmx File As", false, new KeyValues( "OnSaveAs" ) );
 
 	const char *pFileFormat = g_pDataModel->GetFileFormat( fileid );
 	const char *pDescription = ( pFileFormat && *pFileFormat ) ? g_pDataModel->GetFormatDescription( pFileFormat ) : NULL;
@@ -279,7 +268,7 @@ void CElementViewerPanel::OnSaveAs()
 	if ( pDescription && *pDescription )
 	{
 		char description[ 256 ];
-		V_snprintf( description, sizeof( description ), "%s (*.dmx)", g_pDataModel->GetFormatDescription( pFileFormat ) );
+		V_sprintf_safe( description, "%s (*.dmx)", g_pDataModel->GetFormatDescription( pFileFormat ) );
 		pFileOpenDialog->AddFilter( "*.dmx", description, true, pFileFormat );
 	}
 	else
@@ -293,7 +282,7 @@ void CElementViewerPanel::OnSaveAs()
 
 void CElementViewerPanel::OnSave()
 {
-	int docCount = m_Docs.Count();
+	intp docCount = m_Docs.Count();
 	if ( docCount > 0 )
 	{
 		DmFileId_t fileid = m_Docs[ docCount - 1 ].m_fileid;
@@ -321,7 +310,9 @@ struct DataModelFilenameArray
 void CElementViewerPanel::OnNew()
 {
 	char filename[ MAX_PATH ];
-	V_GenerateUniqueName( filename, sizeof( filename ), "unnamed", DataModelFilenameArray() );
+	// dimhotepus: Notify unique name gen failed.
+	if ( !V_GenerateUniqueName( filename, "unnamed", DataModelFilenameArray() ) )
+		Warning( "Unable to generate unique file name for new tab.\n" );
 
 	ViewerDoc_t doc;
 	doc.m_fileid = g_pDataModel->FindOrCreateFileId( filename );
@@ -336,10 +327,10 @@ void CElementViewerPanel::OnNew()
 void CElementViewerPanel::OnOpen()
 {
 	// Open file
-	FileOpenDialog *pFileOpenDialog = new FileOpenDialog( this, "Choose .dmx file", true );
+	auto *pFileOpenDialog = new FileOpenDialog( this, "Choose .dmx file", true );
 	pFileOpenDialog->AddFilter( "*.*", "All Files (*.*)", false );
 	pFileOpenDialog->AddFilter( "*.dmx", "DmElement Files (*.dmx)", true );
-	for ( int i = 0; i < g_pDataModel->GetFormatCount(); ++i )
+	for ( intp i = 0; i < g_pDataModel->GetFormatCount(); ++i )
 	{
 		const char *pFormatName = g_pDataModel->GetFormatName(i);
 		const char *pDesc = g_pDataModel->GetFormatDescription(pFormatName);
@@ -347,8 +338,8 @@ void CElementViewerPanel::OnOpen()
 
 		char pExtBuf[512];
 		char pDescBuf[512];
-		Q_snprintf( pExtBuf, sizeof(pExtBuf), "*.%s", pExt );
-		Q_snprintf( pDescBuf, sizeof(pDescBuf), "%s (*.%s)", pDesc, pExt );
+		V_sprintf_safe( pExtBuf, "*.%s", pExt );
+		V_sprintf_safe( pDescBuf, "%s (*.%s)", pDesc, pExt );
 
 		pFileOpenDialog->AddFilter( pExtBuf, pDescBuf, false );
 	}
@@ -371,7 +362,7 @@ void CElementViewerPanel::OnFileSelected( KeyValues *pKeyValues )
 
 		// TODO - figure out which panel is on top, and save the file associated with it
 
-		int docCount = m_Docs.Count();
+		intp docCount = m_Docs.Count();
 		if ( docCount == 1 )
 		{
 			g_pDataModel->SetFileName( m_Docs[ 0 ].m_fileid, pFullPath );
@@ -381,7 +372,7 @@ void CElementViewerPanel::OnFileSelected( KeyValues *pKeyValues )
 	}
 
 //	char relativepath[ 512 ];
-//	g_pFileSystem->FullPathToRelativePath( fullpath, relativepath, sizeof( relativepath ) );
+//	g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath );
 
 	g_pDataModel->OnlyCreateUntypedElements( true );
 	g_pDataModel->SetDefaultElementFactory( NULL );

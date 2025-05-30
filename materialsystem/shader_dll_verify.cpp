@@ -18,11 +18,13 @@ extern "C"
 };
 
 
-extern "C" BOOL WINAPI DllMain (HANDLE hInst, ULONG ulInit, LPVOID)
+extern "C" BOOL WINAPI DllMain (HMODULE module, ULONG ulInit, LPVOID)
 {
 	if (ulInit == DLL_PROCESS_ATTACH)
 	{
-		g_hDLLInst = hInst;
+		// dimhotepus: Do not notify on thread creation for performance.
+		::DisableThreadLibraryCalls(module);
+		g_hDLLInst = module;
 	}
 	else if (ulInit == DLL_PROCESS_DETACH)
 	{

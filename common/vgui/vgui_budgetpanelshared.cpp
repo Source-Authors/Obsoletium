@@ -10,7 +10,7 @@
 #include "vgui/ISurface.h"
 #include "vgui_controls/Label.h"
 #include "ivprofexport.h"
-#include "convar.h"
+#include "tier1/convar.h"
 #include "mathlib/mathlib.h"
 
 // NOTE: This has to be the last file included!
@@ -128,9 +128,9 @@ void CBudgetPanelShared::SendConfigDataToBase()
 		data.m_BudgetGroupInfo[i].m_Color = g_TempBudgetGroupSpace[i].m_Color;
 	}
 
-	data.m_HistoryLabelValues.AddToTail( 1000.0 / 20 );
-	data.m_HistoryLabelValues.AddToTail( 1000.0 / 30 );
-	data.m_HistoryLabelValues.AddToTail( 1000.0 / 60 );
+	data.m_HistoryLabelValues.AddToTail( 1000.0f / 20 );
+	data.m_HistoryLabelValues.AddToTail( 1000.0f / 30 );
+	data.m_HistoryLabelValues.AddToTail( 1000.0f / 60 );
 	
 	// Copy all the cvars in.
 	data.m_flHistoryRange = budget_history_range_ms.GetFloat();
@@ -158,12 +158,12 @@ void CBudgetPanelShared::DrawColoredText(
 {
 	char msg[4096];
 	va_list marker;
-	va_start( marker, pText );
-	_vsnprintf( msg, sizeof( msg ), pText, marker );
+	va_start( marker, pText ); //-V2018 //-V2019
+	V_vsprintf_safe( msg, pText, marker );
 	va_end( marker );
 
 	wchar_t unicodeStr[4096];
-	int nChars = g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicodeStr, sizeof( unicodeStr ) );
+	int nChars = g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicodeStr );
 
 	vgui::surface()->DrawSetTextFont( font );
 	vgui::surface()->DrawSetTextColor( r, g, b, a );
@@ -249,7 +249,7 @@ void CBudgetPanelShared::SetTimeLabelText()
 	for ( intp i=0; i < m_TimeLabels.Count(); i++ )
 	{
 		char text[512];
-		Q_snprintf( text, sizeof( text ), "%dms", (int)( i * GetConfigData().m_flTimeLabelInterval ) );
+		V_sprintf_safe( text, "%dms", (int)( i * GetConfigData().m_flTimeLabelInterval ) );
 		m_TimeLabels[i]->SetText( text );
 	}
 }

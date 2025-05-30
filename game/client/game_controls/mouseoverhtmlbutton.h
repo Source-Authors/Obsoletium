@@ -83,15 +83,15 @@ private:
 			}
 			else
 			{
-				g_pVGuiLocalize->ConvertANSIToUnicode( text, localizeText, sizeof( localizeText ) );
+				g_pVGuiLocalize->ConvertANSIToUnicode( text, localizeText );
 			}
 
 			if ( m_bAddShortCut )
 			{
 #ifdef WIN32
-				_snwprintf( newText, sizeof( newText )/ sizeof( wchar_t ), L"&%i %s", m_iIndex, localizeText);
+				V_swprintf_safe( newText, L"&%i %s", m_iIndex, localizeText);
 #else
-				_snwprintf( newText, sizeof( newText )/ sizeof( wchar_t ), L"&%i %S", m_iIndex, localizeText);
+				V_swprintf_safe( newText, L"&%i %S", m_iIndex, localizeText);
 #endif
 
 			}

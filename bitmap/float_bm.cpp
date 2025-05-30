@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 #include <utility>
 
 #include "tier2/tier2.h"
@@ -21,6 +22,7 @@
 #include "filesystem.h"
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
+#include "posix_file_stream.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -43,103 +45,187 @@ constexpr static inline float BiLinInterp(float Xfrac, float Yfrac, float UL, fl
 	return( LinInterp(Yfrac, iu, il) );
 }
 
+[[nodiscard]] bool PFMWrite(IFileSystem* file_system, float* img,
+							const char* file_path, int width, int height) {
+  FileHandle_t f = file_system->Open(file_path, "wb");
+  if (!f) {
+    Warning("Unable to open PFM '%s' for writing.\n", file_path);
+    return false;
+  }
+
+  if (!file_system->FPrintf(f, "PF\n%d %d\n-1.000000\n", width, height)) {
+    file_system->Close(f);
+    Warning("Unable to write PFM header to '%s'.\n", file_path);
+    return false;
+  }
+
+  for (int i = height - 1; i >= 0; i--) {
+    const float *row = &img[3 * width * i];
+
+    if (!file_system->Write(row, width * sizeof(float) * 3, f)) {
+      file_system->Close(f);
+      Warning("Unable to write PFM row #%d to '%s'.\n", height - i,
+              file_path);
+      return false;
+    }
+  }
+
+  file_system->Close(f);
+  return true;
+}
+
+[[nodiscard]] bool PFMWrite(float *img, const char *file_path, int width, int height) {
+  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "wb");
+  if (errc) {
+    Warning("Unable to open PFM '%s' for writing: %s.\n", file_path,
+            errc.message().c_str());
+    return false;
+  }
+
+  std::tie(std::ignore, errc) =
+      f.print("PF\n%d %d\n-1.000000\n", width, height);
+  if (errc) {
+    Warning("Unable to write PFM header to '%s': %s.\n", file_path,
+            errc.message().c_str());
+    return false;
+  }
+
+  for (int i = height - 1; i >= 0; i--) {
+    const float *row = &img[3 * width * i];
+
+    std::tie(std::ignore, errc) = f.write(row, width * sizeof(float) * 3, 1);
+    if (errc) {
+      Warning("Unable to write PFM row #%d to '%s': %s.\n", height - i,
+			  file_path, errc.message().c_str());
+      return false;
+    }
+  }
+
+  return true;
+}
+
 FloatBitMap_t::FloatBitMap_t(int width, int height) : FloatBitMap_t{}
 {
-	RGBAData=AllocateRGB(width,height);
+	RGBAData = AllocateRGB(width,height);
 }
 
 FloatBitMap_t::FloatBitMap_t(FloatBitMap_t const *orig) : FloatBitMap_t{}
 {
-	RGBAData=AllocateRGB(orig->Width,orig->Height);
-	memcpy(RGBAData,orig->RGBAData,orig->Width*orig->Height*sizeof(float)*4);
+	RGBAData = AllocateRGB(orig->Width,orig->Height);
+	if (RGBAData) memcpy(RGBAData, orig->RGBAData, orig->Width * orig->Height * sizeof(float) * 4);
 }
 
-static char GetChar(FileHandle_t &f)
+static char GetChar(IFileSystem *file_system, FileHandle_t &f)
 {
 	char a;
-	g_pFullFileSystem->Read(&a,1,f);
+	file_system->Read(&a,1,f);
 	return a;
 }
 
-static int GetInt(FileHandle_t &f)
+static int GetInt(IFileSystem *file_system, FileHandle_t &f)
 {
-	char buf[100];
+	char buf[16];
+	intp i = ssize(buf) - 1;
 	char *bout=buf;
-	for(;;)
+	while(i--)
 	{
-		char c=GetChar(f);
+		char c=GetChar(file_system, f);
 		if ((c<'0') || (c>'9'))
 			break;
 		*(bout++)=c;
 	}
-	*(bout++)=0;
+	*(bout++)='\0';
 	return atoi(buf);
 
 }
-
-constexpr int PFM_MAX_XSIZE{2048};
 
 bool FloatBitMap_t::LoadFromPFM(char const *fname)
 {
 	FileHandle_t f = g_pFullFileSystem->Open(fname, "rb");
 	if (f)
 	{
-		if( ( GetChar(f) == 'P' ) && (GetChar(f) == 'F' ) && ( GetChar(f) == '\n' ))
+		if( GetChar(g_pFullFileSystem, f) == 'P' &&
+			GetChar(g_pFullFileSystem, f) == 'F' &&
+			GetChar(g_pFullFileSystem, f) == '\n' )
 		{
-			Width=GetInt(f);
-			Height=GetInt(f);
+			Width = GetInt(g_pFullFileSystem, f);
+			Height = GetInt(g_pFullFileSystem, f);
 
-			// eat crap until the next newline
-			while( GetChar(f) != '\n')
+			// dimhotepus: Protect from overflow as input is untrusted.
+			constexpr int kMaxDimension = std::numeric_limits<int>::max() /
+				( static_cast<int>( sizeof(float) ) * 3 );
+			if ( Width < 0 || Width > kMaxDimension ||
+				 Height < 0 || Height > kMaxDimension )
 			{
+				fprintf(stderr, "'%s': width (%d) and height (%d) should be in range [0...%d].\n",
+					fname, Width, Height, kMaxDimension );
+				return false;
 			}
 
-			//			printf("file %s w=%d h=%d\n",fname,Width,Height);
-			AllocateRGB(Width,Height);
+			// eat crap until the next newline
+			while( GetChar(g_pFullFileSystem, f) != '\n')
+			{
+			}
+			
+			// dimhotepus: Handle OOM.
+			std::unique_ptr<float[]> linebuffer = std::make_unique<float[]>( Width * 3 );
+			if ( !linebuffer )
+			{
+				fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
+					fname, sizeof(float) * Width * 3 );
+				return false;
+			}
+
+			// dimhotepus: Handle OOM.
+			if ( !AllocateRGB(Width, Height) )
+			{
+				fprintf(stderr, "'%s': unable to allocate %zu bytes result buffer.\n",
+					fname, sizeof(float) * Width * Height * 4 );
+				return false;
+			}
 
 			for( int y = Height-1; y >= 0; y-- )
 			{
-				float linebuffer[PFM_MAX_XSIZE*3];
-				g_pFullFileSystem->Read(linebuffer,3*Width*sizeof(float),f);
-				for(int x=0;x<Width;x++)
+				g_pFullFileSystem->Read(linebuffer.get(), 3*Width*sizeof(float), f);
+				for (int x=0;x<Width;x++)
 				{
-					for(int c=0;c<3;c++)
+					for (int c=0;c<3;c++)
 					{
-						Pixel(x,y,c)=linebuffer[x*3+c];
+						Pixel(x,y,c) = linebuffer[x*3+c];
 					}
 				}
 			}
 		}
 		g_pFullFileSystem->Close( f );	// close file after reading
 	}
-	return (RGBAData!=0);
+	return RGBAData != nullptr;
 }
 
 bool FloatBitMap_t::WritePFM(char const *fname) const
 {
-	FileHandle_t f = g_pFullFileSystem->Open(fname, "wb");
-
-	if ( f )
+	// dimhotepus: Handle OOM.
+	std::unique_ptr<float[]> data =
+		std::make_unique<float[]>( static_cast<size_t>(4) * Width * Height );
+	if ( !data )
 	{
-		g_pFullFileSystem->FPrintf(f,"PF\n%d %d\n-1.000000\n",Width,Height);
-		for( int y = Height-1; y >= 0; y-- )
-		{
-			float linebuffer[PFM_MAX_XSIZE*3];
-			for(int x=0;x<Width;x++)
-			{
-				for(int c=0;c<3;c++)
-				{
-					linebuffer[x*3+c]=Pixel(x,y,c);
-				}
-			}
-			g_pFullFileSystem->Write(linebuffer,3*Width*sizeof(float),f);
-		}
-		g_pFullFileSystem->Close(f);
-
-		return true;
+		fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
+			fname, static_cast<size_t>(4) * Width * Height );
+		return false;
 	}
 
-	return false;
+	for( int y = 0; y < Height; y++ )
+	{
+		const intp base = static_cast<intp>(y) * Width * 3;
+		for ( int x = 0; x < Width; x++ )
+		{
+			for ( int c = 0; c < 3; c++ )
+			{
+				data[base + x * 3 + c] = Pixel(x, y, c);
+			}
+		}
+	}
+
+	return PFMWrite( g_pFullFileSystem, data.get(), fname, Width, Height );
 }
 
 
@@ -170,7 +256,10 @@ void FloatBitMap_t::ReSize(int NewWidth, int NewHeight)
 	float SourceX, SourceY, Xfrac, Yfrac;
 	int Top, Bot, Left, Right;
 
-	float *newrgba=new float[NewWidth * NewHeight * 4];
+	float * RESTRICT newrgba=new float[NewWidth * NewHeight * 4];
+	if (!newrgba)
+		Error( "Unable to allocate new bitmap %dx%d for resize from %dx%d.\n",
+			NewWidth, NewHeight, Width, Height );
 
 	SourceY= 0;
 	for(int y=0;y<NewHeight;y++)
@@ -218,37 +307,34 @@ struct TGAHeader_t
 bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 {
 	FileHandle_t f = g_pFullFileSystem->Open(filename, "wb");
-	if (f)
-	{
-		TGAHeader_t myheader;
-		memset(&myheader,0,sizeof(myheader));
-		myheader.image_type=2;
-		myheader.pixel_size=32;
-		myheader.width0= Width & 0xff;
-		myheader.width1= static_cast<unsigned char>(Width>>8);
-		myheader.height0= Height & 0xff;
-		myheader.height1= static_cast<unsigned char>(Height>>8);
-		myheader.attributes=0x20;
-		g_pFullFileSystem->Write(&myheader,sizeof(myheader),f);
-		// now, write the pixels
-		for(int y=0;y<Height;y++)
-		{
-			for(int x=0;x<Width;x++)
-			{
-				PixRGBAF fpix = PixelRGBAF( x, y );
-				PixRGBA8 pix8 = PixRGBAF_to_8( fpix );
+	if (!f) return false;
 
-				g_pFullFileSystem->Write(&pix8.Blue,1,f);
-				g_pFullFileSystem->Write(&pix8.Green,1,f);
-				g_pFullFileSystem->Write(&pix8.Red,1,f);
-				g_pFullFileSystem->Write(&pix8.Alpha,1,f);
-			}
+	TGAHeader_t myheader = {};
+	myheader.image_type=2;
+	myheader.pixel_size=32;
+	myheader.width0= Width & 0xff;
+	myheader.width1= static_cast<unsigned char>(Width>>8);
+	myheader.height0= Height & 0xff;
+	myheader.height1= static_cast<unsigned char>(Height>>8);
+	myheader.attributes=0x20;
+	g_pFullFileSystem->Write(&myheader,sizeof(myheader),f);
+	// now, write the pixels
+	for(int y=0;y<Height;y++)
+	{
+		for(int x=0;x<Width;x++)
+		{
+			PixRGBAF fpix = PixelRGBAF( x, y );
+			PixRGBA8 pix8 = PixRGBAF_to_8( fpix );
+
+			// dimhotepus: 4x speedup - write 4 colors at once.
+			const unsigned char pixels[]{pix8.Blue, pix8.Green, pix8.Red, pix8.Alpha};
+
+			g_pFullFileSystem->Write(pixels, sizeof(pixels), f);
 		}
-		g_pFullFileSystem->Close( f );	// close file after reading
-		
-		return true;
 	}
-	return false;
+	g_pFullFileSystem->Close( f );	// close file after reading
+		
+	return true;
 }
 
 
@@ -257,7 +343,10 @@ FloatBitMap_t::FloatBitMap_t(char const *tgafilename) : FloatBitMap_t{}
 	// load from a tga or pfm
 	if (Q_stristr(tgafilename, ".pfm"))
 	{
-		LoadFromPFM(tgafilename);
+		if (!LoadFromPFM(tgafilename))
+		{
+			fprintf(stderr, "Unable to load '%s'. Expected PFM.\n", tgafilename);
+		}
 		return;
 	}
 
@@ -267,23 +356,29 @@ FloatBitMap_t::FloatBitMap_t(char const *tgafilename) : FloatBitMap_t{}
 
 	if( !TGALoader::GetInfo( tgafilename, &width1, &height1, &imageFormat1, &gamma1 ) )
 	{
-		fprintf(stderr, "error loading %s\n", tgafilename);
-		exit( -1 );
+		fprintf(stderr, "Error loading '%s'. Expected TGA.\n", tgafilename);
+		return;
 	}
-	AllocateRGB(width1,height1);
 
-	uint8 *pImage1Tmp = 
-		new uint8 [ImageLoader::GetMemRequired( width1, height1, 1, imageFormat1, false )];
-
-	if( !TGALoader::Load( pImage1Tmp, tgafilename, width1, height1, imageFormat1, 2.2f, false ) )
+	if ( !AllocateRGB(width1,height1))
 	{
-		fprintf(stderr, "error loading %s\n", tgafilename);
-		exit( -1 );
+		fprintf(stderr, "Error allocating memory bytes for '%s'.\n", tgafilename);
+		return;
 	}
-	uint8 *pImage1 = 
-		new uint8 [ImageLoader::GetMemRequired( width1, height1, 1, IMAGE_FORMAT_ABGR8888, false )];
 
-	ImageLoader::ConvertImageFormat( pImage1Tmp, imageFormat1, pImage1, IMAGE_FORMAT_ABGR8888, width1, height1, 0, 0 );
+	std::unique_ptr<uint8[]> pImage1Tmp = 
+		std::make_unique<uint8[]>(ImageLoader::GetMemRequired( width1, height1, 1, imageFormat1, false ));
+
+	if( !TGALoader::Load( pImage1Tmp.get(), tgafilename, width1, height1, imageFormat1, 2.2f, false ) )
+	{
+		fprintf(stderr, "Error loading '%s'. Expected TGA.\n", tgafilename);
+		return;
+	}
+
+	std::unique_ptr<uint8[]> pImage1 = 
+		std::make_unique<uint8[]>(ImageLoader::GetMemRequired( width1, height1, 1, IMAGE_FORMAT_ABGR8888, false ));
+
+	ImageLoader::ConvertImageFormat( pImage1Tmp.get(), imageFormat1, pImage1.get(), IMAGE_FORMAT_ABGR8888, width1, height1, 0, 0 );
 
 	for(int y=0;y<height1;y++)
 	{
@@ -295,22 +390,21 @@ FloatBitMap_t::FloatBitMap_t(char const *tgafilename) : FloatBitMap_t{}
 			}
 		}
 	}
-
-	delete[] pImage1;
-	delete[] pImage1Tmp;
 }
 
-FloatBitMap_t::~FloatBitMap_t(void)
+FloatBitMap_t::~FloatBitMap_t()
 {
 	delete[] RGBAData;
 }
 
 
-FloatBitMap_t *FloatBitMap_t::QuarterSize(void) const
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSize() const
 {
 	// generate a new bitmap half on each axis
+	FloatBitMap_t * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
+	if (!newbm)
+		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 
-	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
 	for(int y=0;y<Height/2;y++)
 		for(int x=0;x<Width/2;x++)
 		{
@@ -321,11 +415,13 @@ FloatBitMap_t *FloatBitMap_t::QuarterSize(void) const
 	return newbm;
 }
 
-FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky(void) const
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky(void) const
 {
 	// generate a new bitmap half on each axis
+	FloatBitMap_t * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
+	if (!newbm)
+		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 
-	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
 	for(int y=0;y<Height/2;y++)
 		for(int x=0;x<Width/2;x++)
 		{
@@ -356,13 +452,6 @@ float FloatBitMap_t::BrightestColor(void) const
 			ret=max(ret,v.Length());
 		}
 	return ret;
-}
-
-template <class T> static inline void SWAP(T & a, T & b)
-{
-	T temp=a;
-	a=b;
-	b=temp;
 }
 
 void FloatBitMap_t::RaiseToPower(float power) const
@@ -587,10 +676,10 @@ void FloatBitMap_t::MakeTileable(void) const
 					float desiredx=DiffMapX.Pixel(x,y,c)+cursrc->Pixel(x+1,y,c);
 					float desiredy=DiffMapY.Pixel(x,y,c)+cursrc->Pixel(x,y+1,c);
 					float desired=0.5f*(desiredy+desiredx);
-					curdst->Pixel(x,y,c)=FLerp(cursrc->Pixel(x,y,c),desired,0.5);
+					curdst->Pixel(x,y,c)=Lerp(0.5f,cursrc->Pixel(x,y,c),desired);
 					error+=Square(desired-cursrc->Pixel(x,y,c));
 				}
-		SWAP(cursrc,curdst);
+		std::swap(cursrc,curdst);
 	}
 	// paste result
 	for(int x=0;x<Width;x++)
@@ -668,14 +757,18 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 						{
 							for(int c=0;c<3;c++)
 								Pixel(x*2+xi,y*2+yi,c)=
-								FLerp(Pixel(x*2+xi,y*2+yi,c),tmp->Pixel(x,y,c),Alpha(x*2+xi,y*2+yi));
+								Lerp(Alpha(x*2+xi,y*2+yi),Pixel(x*2+xi,y*2+yi,c),tmp->Pixel(x,y,c));
 						}
 
 		char fname[80];
-		sprintf(fname,"sub%dx%d.tga",tmp->Width,tmp->Height);
-		tmp->WriteTGAFile(fname);
-		sprintf(fname,"submrg%dx%d.tga",tmp->Width,tmp->Height);
-		WriteTGAFile(fname);
+		V_sprintf_safe(fname,"sub%dx%d.tga",tmp->Width,tmp->Height);
+		if ( !tmp->WriteTGAFile(fname) )
+			Warning("Unable to write sub TGA '%s'.\n", fname);
+
+		V_sprintf_safe(fname,"submrg%dx%d.tga",tmp->Width,tmp->Height);
+		if ( !WriteTGAFile(fname) )
+			Warning("Unable to write submerged TGA '%s'.\n", fname);
+
 		delete tmp;
 		for(int i=0;i<NDELTAS;i++)
 			delete lowdeltas[i];
@@ -700,12 +793,12 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 						for(int i=0;i<NDELTAS;i++)
 							desired+=deltas[i]->Pixel(x,y,c)+cursrc->Pixel(x+dx[i],y+dy[i],c);
 						desired*=(1.0f/NDELTAS);
-						//            desired=FLerp(Pixel(x,y,c),desired,Alpha(x,y));
-						curdst->Pixel(x,y,c)=FLerp(cursrc->Pixel(x,y,c),desired,0.5);
+						//            desired=Lerp(Alpha(x,y),Pixel(x,y,c),desired);
+						curdst->Pixel(x,y,c)=Lerp(0.5f,cursrc->Pixel(x,y,c),desired);
 						error+=Square(desired-cursrc->Pixel(x,y,c));
 					}
 				}
-				SWAP(cursrc,curdst);
+				std::swap(cursrc,curdst);
 			}
 		}
 	}

@@ -15,6 +15,7 @@
 #endif
 
 #include "tier2/tier2.h"
+#include "tier0/platform.h"
 #include "appframework/IAppSystem.h"
 
 
@@ -32,7 +33,7 @@ struct VideoFileExtensionInfo_t
 
 
 
-class IVideoCommonServices
+abstract_class IVideoCommonServices
 {
 	public:
 		virtual bool			CalculateVideoDimensions( int videoWidth, int videoHeight, int displayWidth, int displayHeight, VideoPlaybackFlags_t playbackFlags, 
@@ -52,9 +53,9 @@ class IVideoCommonServices
 //-----------------------------------------------------------------------------
 // Main VIDEO_SERVICES interface
 //-----------------------------------------------------------------------------
-#define VIDEO_SUBSYSTEM_INTERFACE_VERSION   "IVideoSubSystem002"
+constexpr inline char VIDEO_SUBSYSTEM_INTERFACE_VERSION[]{"IVideoSubSystem002"};
 
-class IVideoSubSystem : public IAppSystem
+abstract_class IVideoSubSystem : public IAppSystem
 {
 	public:
 		// SubSystem Identification functions

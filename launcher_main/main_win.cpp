@@ -269,5 +269,5 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   const auto rc = Run(instance, old_instance, cmd_line, window_flags);
 
   // Prevent tail call optimization and incorrect stack traces.
-  exit(rc);
+  exit(rc); //-V2014
 }

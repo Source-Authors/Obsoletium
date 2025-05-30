@@ -1,36 +1,26 @@
-Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smp", "smp.vcproj", "{F2E998F8-1482-4A51-A70C-C3B225A7A201}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smp", "smp.vcxproj", "{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}"
 EndProject
 Global
-	GlobalSection(SolutionConfiguration) = preSolution
-		Debug = Debug
-		Release = Release
-		Release MinDependency = Release MinDependency
-		Release MinSize = Release MinSize
-		Unicode Debug = Unicode Debug
-		Unicode Release MinDependency = Unicode Release MinDependency
-		Unicode Release MinSize = Unicode Release MinSize
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Debug.ActiveCfg = Debug|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Debug.Build.0 = Debug|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Release.ActiveCfg = Release MinSize|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Release.Build.0 = Release MinSize|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Release MinDependency.ActiveCfg = Release MinDependency|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Release MinDependency.Build.0 = Release MinDependency|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Release MinSize.ActiveCfg = Release MinSize|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Release MinSize.Build.0 = Release MinSize|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Unicode Debug.ActiveCfg = Unicode Debug|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Unicode Debug.Build.0 = Unicode Debug|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Unicode Release MinDependency.ActiveCfg = Unicode Release MinDependency|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Unicode Release MinDependency.Build.0 = Unicode Release MinDependency|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Unicode Release MinSize.ActiveCfg = Unicode Release MinSize|Win32
-		{F2E998F8-1482-4A51-A70C-C3B225A7A201}.Unicode Release MinSize.Build.0 = Unicode Release MinSize|Win32
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}.Debug|x64.ActiveCfg = Debug|x64
+		{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}.Debug|x64.Build.0 = Debug|x64
+		{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}.Debug|x86.ActiveCfg = Debug|Win32
+		{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}.Debug|x86.Build.0 = Debug|Win32
+		{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}.Release|x64.ActiveCfg = Release|x64
+		{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}.Release|x64.Build.0 = Release|x64
+		{6ACEBE96-D4A4-439D-881A-A3DD1F6FEB89}.Release|x86.ActiveCfg = Release|Win32
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

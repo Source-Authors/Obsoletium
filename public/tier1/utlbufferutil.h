@@ -43,60 +43,60 @@ void SetSerializationArrayDelimiter( const char *pDelimiter );
 //-----------------------------------------------------------------------------
 // Standard serialization methods for basic types
 //-----------------------------------------------------------------------------
-bool Serialize( CUtlBuffer &buf, const bool &src );
-bool Unserialize( CUtlBuffer &buf, bool &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const bool &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, bool &dest );
 
-bool Serialize( CUtlBuffer &buf, const int &src );
-bool Unserialize( CUtlBuffer &buf, int &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const int &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, int &dest );
 
-bool Serialize( CUtlBuffer &buf, const float &src );
-bool Unserialize( CUtlBuffer &buf, float &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const float &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, float &dest );
 
-bool Serialize( CUtlBuffer &buf, const Vector2D &src );
-bool Unserialize( CUtlBuffer &buf, Vector2D &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const Vector2D &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, Vector2D &dest );
 
-bool Serialize( CUtlBuffer &buf, const Vector &src );
-bool Unserialize( CUtlBuffer &buf, Vector &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const Vector &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, Vector &dest );
 
-bool Serialize( CUtlBuffer &buf, const Vector4D &src );
-bool Unserialize( CUtlBuffer &buf, Vector4D &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const Vector4D &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, Vector4D &dest );
 
-bool Serialize( CUtlBuffer &buf, const QAngle &src );
-bool Unserialize( CUtlBuffer &buf, QAngle &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const QAngle &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, QAngle &dest );
 
-bool Serialize( CUtlBuffer &buf, const Quaternion &src );
-bool Unserialize( CUtlBuffer &buf, Quaternion &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const Quaternion &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, Quaternion &dest );
 
-bool Serialize( CUtlBuffer &buf, const VMatrix &src );
-bool Unserialize( CUtlBuffer &buf, VMatrix &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const VMatrix &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, VMatrix &dest );
 
-bool Serialize( CUtlBuffer &buf, const Color &src );
-bool Unserialize( CUtlBuffer &buf, Color &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const Color &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, Color &dest );
 
-bool Serialize( CUtlBuffer &buf, const CUtlBinaryBlock &src );
-bool Unserialize( CUtlBuffer &buf, CUtlBinaryBlock &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const CUtlBinaryBlock &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, CUtlBinaryBlock &dest );
 
-bool Serialize( CUtlBuffer &buf, const CUtlString &src );
-bool Unserialize( CUtlBuffer &buf, CUtlString &dest );
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const CUtlString &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, CUtlString &dest );
 
 
 //-----------------------------------------------------------------------------
 // You can use this to check if a type serializes on multiple lines
 //-----------------------------------------------------------------------------
 template< class T >
-inline bool SerializesOnMultipleLines()
+[[nodiscard]] inline bool SerializesOnMultipleLines()
 {
 	return false;
 }
 
 template< >
-inline bool SerializesOnMultipleLines<VMatrix>()
+[[nodiscard]] inline bool SerializesOnMultipleLines<VMatrix>()
 {
 	return true;
 }
 
 template< >
-inline bool SerializesOnMultipleLines<CUtlBinaryBlock>()
+[[nodiscard]] inline bool SerializesOnMultipleLines<CUtlBinaryBlock>()
 {
 	return true;
 }
@@ -106,28 +106,40 @@ inline bool SerializesOnMultipleLines<CUtlBinaryBlock>()
 // Vector serialization
 //-----------------------------------------------------------------------------
 template< class T >
-bool Serialize( CUtlBuffer &buf, const CUtlVector<T> &src )
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const CUtlVector<T> &src )
 {
 	extern const char *s_pUtlBufferUtilArrayDelim;
 
-	int nCount = src.Count();
+	intp nCount = src.Count();
 
 	if ( !buf.IsText() )
 	{
+		bool ok = true;
+
 		buf.PutInt( nCount );
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
-			::Serialize( buf, src[i] );
+			if ( !::Serialize( buf, src[i] ) )
+			{
+				ok = false;
+			}
 		}
-		return buf.IsValid();
+
+		return ok && buf.IsValid();
 	}
+	
+	bool ok = true;
 
 	if ( !SerializesOnMultipleLines<T>() )
 	{
 		buf.PutChar('\n');
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
-			::Serialize( buf, src[i] );
+			if ( !::Serialize( buf, src[i] ) )
+			{
+				ok = false;
+			}
+
 			if ( s_pUtlBufferUtilArrayDelim && (i != nCount-1) )
 			{
 				buf.PutString( s_pUtlBufferUtilArrayDelim );
@@ -137,9 +149,13 @@ bool Serialize( CUtlBuffer &buf, const CUtlVector<T> &src )
 	}
 	else
 	{
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
-			::Serialize( buf, src[i] );
+			if ( !::Serialize( buf, src[i] ) )
+			{
+				ok = false;
+			}
+
 			if ( s_pUtlBufferUtilArrayDelim && (i != nCount-1) )
 			{
 				buf.PutString( s_pUtlBufferUtilArrayDelim );
@@ -148,11 +164,11 @@ bool Serialize( CUtlBuffer &buf, const CUtlVector<T> &src )
 		}
 	}
 
-	return buf.IsValid();
+	return ok && buf.IsValid();
 }
 
 template< class T >
-bool Unserialize( CUtlBuffer &buf, CUtlVector<T> &dest )
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, CUtlVector<T> &dest )
 {
 	dest.RemoveAll();
 

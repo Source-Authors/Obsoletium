@@ -216,7 +216,7 @@ CMapEntity *CMapAnimator::CreateNewKeyFrame( float time )
 	pNewEntity->SetClass( "keyframe_track" );
 
 	char buf[128];
-	sprintf( buf, "%f %f %f", angles[0], angles[1], angles[2] );
+	V_sprintf_safe( buf, "%f %f %f", angles[0], angles[1], angles[2] );
 	pNewEntity->SetKeyValue( "angles", buf );
 
 	// link it into the keyframe list
@@ -375,7 +375,7 @@ void CMapAnimator::UpdateAnimation( float animTime )
 	Quaternion newAngles;
 	GetAnimationAtTime( animTime, newOrigin, newAngles );
 
-	VMatrix mat, tmpMat;
+	VMatrix mat;
 	Vector ourOrigin;
 	GetOrigin( ourOrigin );
 

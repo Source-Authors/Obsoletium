@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: Prompt for user to enter a password to be able to connect to the server
 //-----------------------------------------------------------------------------
-class CDialogServerPassword : public vgui::Frame
+class CDialogServerPassword final : public vgui::Frame
 {
 public:
 	CDialogServerPassword(vgui::Panel *parent);
@@ -30,7 +30,7 @@ public:
 	*/
 
 private:
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 	vgui::Label *m_pInfoLabel;
 	vgui::Label *m_pGameLabel;

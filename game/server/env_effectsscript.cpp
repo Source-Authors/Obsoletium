@@ -9,7 +9,6 @@
 #include "baseanimating.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
-#include <ctype.h>
 #include "animation.h"
 #include "eventlist.h"
 #include "npcevent.h"
@@ -25,7 +24,6 @@ enum EffectType
 
 
 bool			g_bUnget = false;
-unsigned char	*buffer;
 char			name[ 256 ];
 const char		*currenttoken;
 int				tokencount;
@@ -528,15 +526,13 @@ void CEnvEffectsScript::ParseNewEffect( void )
 
 CEffectScriptElement *CEnvEffectsScript::GetScriptElementByName( const char *pName )
 {
-	for ( int i = 0; i < m_ScriptElements.Count(); i++ )
+	for ( auto &e : m_ScriptElements )
 	{
-		CEffectScriptElement *pCurrent = &m_ScriptElements.Element( i );
-
-		if ( pCurrent && !Q_stricmp( pCurrent->m_szEffectName, pName ) ) 
+		if ( !Q_stricmp( e.m_szEffectName, pName ) ) 
 		{
-			return pCurrent;
+			return &e;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }

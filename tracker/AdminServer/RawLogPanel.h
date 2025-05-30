@@ -27,11 +27,11 @@ class CRawLogPanel : public vgui::PropertyPage
 	DECLARE_CLASS_SIMPLE( CRawLogPanel, vgui::PropertyPage );
 public:
 	CRawLogPanel(vgui::Panel *parent, const char *name);
-	~CRawLogPanel();
+	virtual ~CRawLogPanel();
 
 	// property page handlers
-	virtual void OnPageShow();
-	virtual void OnPageHide();
+	void OnPageShow() override;
+	void OnPageHide() override;
 	void DoInsertString(const char *str);
 
 private:

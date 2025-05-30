@@ -16,6 +16,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
+IEditDispSubdivMesh::~IEditDispSubdivMesh() = default;
+
 //=============================================================================
 //
 // Editable Displacement Subdivision Mesh Implementation
@@ -703,9 +705,9 @@ CEditDispSubdivMesh::SubdivQuadHandle_t CEditDispSubdivMesh::BuildSubdivQuad( in
 		{
 			// displacement quad indices
 			pQuad->m_QuadIndices[0] = pParentQuad->m_QuadIndices[0];
-			pQuad->m_QuadIndices[1] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[1] ) * 0.5f;
-			pQuad->m_QuadIndices[2] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) * 0.5f;
-			pQuad->m_QuadIndices[3] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[3] ) * 0.5f;
+			pQuad->m_QuadIndices[1] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[1] ) / 2;
+			pQuad->m_QuadIndices[2] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) / 2;
+			pQuad->m_QuadIndices[3] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[3] ) / 2;
 
 			// new verts
 			SubdivEdge_t *pEdge0 = GetEdge( pParentQuad->m_EdgeHandles[0] );
@@ -723,10 +725,10 @@ CEditDispSubdivMesh::SubdivQuadHandle_t CEditDispSubdivMesh::BuildSubdivQuad( in
 	case 1:
 		{
 			// displacement quad indices
-			pQuad->m_QuadIndices[0] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[1] ) * 0.5f;
+			pQuad->m_QuadIndices[0] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[1] ) / 2;
 			pQuad->m_QuadIndices[1] = pParentQuad->m_QuadIndices[1];
-			pQuad->m_QuadIndices[2] = ( pParentQuad->m_QuadIndices[1] + pParentQuad->m_QuadIndices[2] ) * 0.5f;
-			pQuad->m_QuadIndices[3] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) * 0.5f;
+			pQuad->m_QuadIndices[2] = ( pParentQuad->m_QuadIndices[1] + pParentQuad->m_QuadIndices[2] ) / 2;
+			pQuad->m_QuadIndices[3] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) / 2;
 
 			// new verts
 			SubdivEdge_t *pEdge0 = GetEdge( pParentQuad->m_EdgeHandles[0] );
@@ -744,10 +746,10 @@ CEditDispSubdivMesh::SubdivQuadHandle_t CEditDispSubdivMesh::BuildSubdivQuad( in
 	case 2:
 		{
 			// displacement quad indices
-			pQuad->m_QuadIndices[0] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) * 0.5f;
-			pQuad->m_QuadIndices[1] = ( pParentQuad->m_QuadIndices[1] + pParentQuad->m_QuadIndices[2] ) * 0.5f;
+			pQuad->m_QuadIndices[0] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) / 2;
+			pQuad->m_QuadIndices[1] = ( pParentQuad->m_QuadIndices[1] + pParentQuad->m_QuadIndices[2] ) / 2;
 			pQuad->m_QuadIndices[2] = pParentQuad->m_QuadIndices[2];
-			pQuad->m_QuadIndices[3] = ( pParentQuad->m_QuadIndices[2] + pParentQuad->m_QuadIndices[3] ) * 0.5f;
+			pQuad->m_QuadIndices[3] = ( pParentQuad->m_QuadIndices[2] + pParentQuad->m_QuadIndices[3] ) / 2;
 
 			// new verts
 			SubdivEdge_t *pEdge1 = GetEdge( pParentQuad->m_EdgeHandles[1] );
@@ -765,9 +767,9 @@ CEditDispSubdivMesh::SubdivQuadHandle_t CEditDispSubdivMesh::BuildSubdivQuad( in
 	case 3:
 		{
 			// displacement quad indices
-			pQuad->m_QuadIndices[0] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[3] ) * 0.5f;
-			pQuad->m_QuadIndices[1] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) * 0.5f;
-			pQuad->m_QuadIndices[2] = ( pParentQuad->m_QuadIndices[2] + pParentQuad->m_QuadIndices[3] ) * 0.5f;
+			pQuad->m_QuadIndices[0] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[3] ) / 2;
+			pQuad->m_QuadIndices[1] = ( pParentQuad->m_QuadIndices[0] + pParentQuad->m_QuadIndices[2] ) / 2;
+			pQuad->m_QuadIndices[2] = ( pParentQuad->m_QuadIndices[2] + pParentQuad->m_QuadIndices[3] ) / 2;
 			pQuad->m_QuadIndices[3] = pParentQuad->m_QuadIndices[3];
 
 			// new verts

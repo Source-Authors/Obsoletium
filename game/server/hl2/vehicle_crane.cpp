@@ -616,7 +616,7 @@ void CPropCrane::DriveCrane( int iDriverButtons, int iButtonsPressed, float flNP
 		}
 	}
 
-	float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0, 1 );
+	float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0.f, 1.f );
 	vbs_sound_update_t params;
 	params.Defaults();
 	params.bThrottleDown = (m_iTurning != TURNING_NOT);
@@ -665,7 +665,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 	if ( m_flExtensionRate )
 	{
 		// Extend / Retract the crane
-		m_flExtension = clamp( m_flExtension + (m_flExtensionRate * 10 * flTime), 0, 2 );
+		m_flExtension = clamp( m_flExtension + (m_flExtensionRate * 10.f * flTime), 0.f, 2.f );
 		SetPoseParameter( "armextensionpose", m_flExtension );
 		StudioFrameAdvance();
 	}
@@ -689,7 +689,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 	{
 		float flDelta = (gpGlobals->curtime - m_flSlowRaiseTime);
 
-		flDelta = clamp( flDelta, 0, CRANE_SLOWRAISE_TIME );
+		flDelta = clamp( flDelta, 0.f, CRANE_SLOWRAISE_TIME );
 		float flCurrentSpringConstant = RemapVal( flDelta, 0, CRANE_SLOWRAISE_TIME, CRANE_SPRING_CONSTANT_INITIAL_RAISING, CRANE_SPRING_CONSTANT_HANGING );
 		m_hCraneTip->m_pSpring->SetSpringConstant( flCurrentSpringConstant );
 	}
@@ -729,7 +729,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 	if ( (m_flNextCreakSound < gpGlobals->curtime) && (m_hCraneMagnet->GetTotalMassAttachedObjects() > 100) )
 	{
 		// Randomly play creaks from the magnet, and increase the chance based on the turning speed
-		float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0, 1 );
+		float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0.f, 1.f );
 		if ( RandomFloat(0,1) > (0.95 - (0.1 * flSpeedPercentage)) )
 		{
 			if ( m_ServerVehicle.m_vehicleSounds.iszSound[VS_MISC4] != NULL_STRING )

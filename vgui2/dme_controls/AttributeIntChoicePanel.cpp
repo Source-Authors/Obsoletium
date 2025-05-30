@@ -87,8 +87,8 @@ void CAttributeIntChoicePanel::PopulateComboBox( vgui::ComboBox *pComboBox )
 		return;
 
 	// Fill in the choices
-	int c = pInfo->GetChoiceCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = pInfo->GetChoiceCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		KeyValues *kv = new KeyValues( "entry" );
 		kv->SetInt( "value", pInfo->GetChoiceValue( i ) );
@@ -102,7 +102,7 @@ void CAttributeIntChoicePanel::PopulateComboBox( vgui::ComboBox *pComboBox )
 		if ( ElementPropertiesChoices()->GetIntChoiceList( pInfo->GetChoiceType(), GetPanelElement(), GetAttributeName(), IsArrayEntry(), choices ) )
 		{
 			c = choices.Count();
-			for ( int i = 0; i < c; ++i )
+			for ( intp i = 0; i < c; ++i )
 			{
 				KeyValues *kv = new KeyValues( "entry" );
 				kv->SetInt( "value", choices[i].m_nValue );
@@ -138,8 +138,8 @@ void CAttributeIntChoicePanel::SetComboBoxFromAttribute( vgui::ComboBox *pComboB
 		return;
 
 	int nValue = GetAttributeValue<int>();
-	int c = pInfo->GetChoiceCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = pInfo->GetChoiceCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( nValue == pInfo->GetChoiceValue( i ) )
 		{
@@ -155,7 +155,7 @@ void CAttributeIntChoicePanel::SetComboBoxFromAttribute( vgui::ComboBox *pComboB
 		if ( ElementPropertiesChoices()->GetIntChoiceList( pInfo->GetChoiceType(), GetPanelElement(), GetAttributeName(), IsArrayEntry(), choices ) )
 		{
 			c = choices.Count();
-			for ( int i = 0; i < c; ++i )
+			for ( intp i = 0; i < c; ++i )
 			{
 				if ( nValue == choices[i].m_nValue )
 				{

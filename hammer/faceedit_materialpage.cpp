@@ -26,6 +26,7 @@
 #include "MapDisp.h"
 #include "ToolManager.h"
 #include "Selection.h"
+#include "bspflags.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -158,6 +159,7 @@ CFaceEditMaterialPage::CFaceEditMaterialPage() : CPropertyPage( IDD )
 	m_bInitialized = FALSE;
 	m_bIgnoreResize = FALSE;
 	m_bTreatAsOneFace = FALSE;
+	m_pCurTex = nullptr;
 }
 
 
@@ -175,7 +177,7 @@ BOOL CFaceEditMaterialPage::PreTranslateMessage( MSG *pMsg )
 	HACCEL hAccel = GetMainWnd()->GetAccelTable();
 	if( !(hAccel && ::TranslateAccelerator( GetMainWnd()->m_hWnd, hAccel, pMsg ) ) )
 	{
-		return CPropertyPage::PreTranslateMessage( pMsg );
+		return __super::PreTranslateMessage( pMsg );
 	}
 	else
 	{
@@ -265,16 +267,16 @@ void FloatToSpin(float fValue, CSpinButtonCtrl *pSpin, BOOL bMantissa)
 	else
 	{
 		if(bMantissa)
-			sprintf(szNew, "%.2f", fValue);
+			V_sprintf_safe(szNew, "%.2f", fValue);
 		else
-			sprintf(szNew, "%.0f", fValue);
+			V_sprintf_safe(szNew, "%.0f", fValue);
 	}
 
 	pSpin->SetPos(atoi(szNew));
 
 	char szCurrent[128];
 	pEdit->GetWindowText(szCurrent, 128);
-	if (strcmp(szNew, szCurrent))
+	if (strcmp(szNew, szCurrent) != 0)
 	{
 		pEdit->SetWindowText(szNew);
 	}
@@ -299,7 +301,7 @@ void IntegerToSpin(int nValue, CSpinButtonCtrl *pSpin)
 	}
 	else
 	{
-		sprintf(szNew, "%d", abs(nValue));
+		V_sprintf_safe(szNew, "%d", abs(nValue));
 	}
 
 	pSpin->SetPos(atoi(szNew));
@@ -330,11 +332,11 @@ void FloatToWnd(float fValue, CWnd *pWnd)
 	}
 	else
 	{
-		sprintf(szNew, "%g", fValue);
+		V_sprintf_safe(szNew, "%g", fValue);
 	}
 
 	pWnd->GetWindowText(szCurrent, 128);
-	if(strcmp(szNew, szCurrent))
+	if(strcmp(szNew, szCurrent) != 0)
 		pWnd->SetWindowText(szNew);
 }
 
@@ -521,9 +523,7 @@ void CFaceEditMaterialPage::AlignToView( CMapFace *pFace )
 void CFaceEditMaterialPage::CopyTCoordSystem( const CMapFace *pFrom, CMapFace *pTo )
 {
 	Vector		axis[2], vEdge, vEdgePt, vOrigin;
-	Vector		vFromPt, vNextFromPt;
-	Vector		vToPt, vPrevToPt;
-	Vector		vTestTextureNormal, vTextureNormal;
+	Vector		vTextureNormal;
 	VMatrix		mEdgeRotation, mOriginRotation, mTranslation;
 	float		fAngle, fDot;
 	bool		bRotate;
@@ -609,7 +609,6 @@ void CFaceEditMaterialPage::CopyTCoordSystem( const CMapFace *pFrom, CMapFace *p
 void CFaceEditMaterialPage::Apply( CMapFace *pOnlyFace, int flags )
 {
 	int			i;
-	CString		str;
 	float		fshiftX = NOT_INIT;
 	float		fshiftY = NOT_INIT;
 	float		fscaleX = NOT_INIT;
@@ -775,7 +774,7 @@ void CFaceEditMaterialPage::Apply( CMapFace *pOnlyFace, int flags )
 			//
 			// Update our variables based on the state of the checkboxes.
 			//
-			for( int nItem = 0; nItem < sizeof( FaceAttributes ) / sizeof( FaceAttributes[0] ); nItem++ )
+			for( int nItem = 0; nItem < ssize( FaceAttributes ); nItem++ )
 			{
 				CButton *pButton = ( CButton* )GetDlgItem( FaceAttributes[nItem].uControlID );
 				if( pButton != NULL )
@@ -892,7 +891,7 @@ void CFaceEditMaterialPage::UpdateDialogData( CMapFace *pOnlyFace )
 			m_FaceContents = t.q2contents;
 			m_FaceSurface = t.q2surface;
 
-			for (int nItem = 0; nItem < sizeof(FaceAttributes) / sizeof(FaceAttributes[0]); nItem++)
+			for (int nItem = 0; nItem < ssize(FaceAttributes); nItem++)
 			{
 				int nSet = ((*FaceAttributes[nItem].puAttribute & FaceAttributes[nItem].uFlag) != 0);
 				CButton *pButton = (CButton *)GetDlgItem(FaceAttributes[nItem].uControlID);
@@ -960,7 +959,7 @@ void CFaceEditMaterialPage::UpdateDialogData( CMapFace *pOnlyFace )
 			m_FaceContents = t.q2contents;
 			m_FaceSurface = t.q2surface;
 
-			for (int nItem = 0; nItem < sizeof(FaceAttributes) / sizeof(FaceAttributes[0]); nItem++)
+			for (int nItem = 0; nItem < ssize(FaceAttributes); nItem++)
 			{
 				int nSet = ((*FaceAttributes[nItem].puAttribute & FaceAttributes[nItem].uFlag) != 0);
 				CButton *pButton = (CButton *)GetDlgItem(FaceAttributes[nItem].uControlID);
@@ -1374,7 +1373,8 @@ void CFaceEditMaterialPage::OnDeltaPosFloatSpin( NMHDR *pNMHDR, LRESULT *pResult
 	{
 		CString str;
 		pEdit->GetWindowText(str);
-		float fTmp = atof(str);
+		// dimhotepus: atof -> strtof
+		float fTmp = strtof(str, nullptr);
 		fTmp += 0.1f * float( pNMUpDown->iDelta );
 		str.Format( "%.2f", fTmp );
 		pEdit->SetWindowText( str );
@@ -1501,7 +1501,7 @@ void CFaceEditMaterialPage::UpdateTexture( void )
 	if( m_pCurTex )
 	{
 		char szBuf[128];
-		sprintf( szBuf, "%dx%d", m_pCurTex->GetWidth(), m_pCurTex->GetHeight() );
+		V_sprintf_safe( szBuf, "%dx%d", m_pCurTex->GetWidth(), m_pCurTex->GetHeight() );
 		GetDlgItem( IDC_TEXTURESIZE )->SetWindowText( szBuf );
 
 		char szTexName[128];
@@ -1579,7 +1579,7 @@ void CFaceEditMaterialPage::NotifyGraphicsChanged( void )
 				const char *p = strstr(pGroup->GetName(), "textures\\");
 				if (p)
 				{
-					p += strlen("textures\\");
+					p += ssize("textures\\") - 1;
 				}
 				else
 				{
@@ -1705,7 +1705,7 @@ BOOL CFaceEditMaterialPage::OnSetActive( void )
 	// Set the initial face edit tool state.
 	SetMaterialPageTool( MATERIALPAGETOOL_MATERIAL );
 
-	return CPropertyPage::OnSetActive();
+	return __super::OnSetActive();
 }
 
 //-----------------------------------------------------------------------------

@@ -457,7 +457,7 @@ void CFlexAnimationTrack::Clear( void )
 // Purpose: 
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void CFlexAnimationTrack::RemoveSample( int index, int type /*=0*/ )
+void CFlexAnimationTrack::RemoveSample( intp index, int type /*=0*/ )
 {
 	Assert( type == 0 || type == 1 );
 
@@ -884,10 +884,8 @@ CExpressionSample *CFlexAnimationTrack::AddSample( float time, float value, int 
 	sample.value = value;
 	sample.selected = false;
 
-	intp idx = m_Samples[ type ].AddToTail( sample );
-	
 	// Resort( type );
-	return &m_Samples[ type ][ idx ];
+	return &m_Samples[ type ][ m_Samples[ type ].AddToTail( sample ) ];
 }
 
 //-----------------------------------------------------------------------------
@@ -2613,7 +2611,7 @@ CFlexAnimationTrack *CChoreoEvent::AddTrack( const char *controllername )
 // Purpose: 
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void CChoreoEvent::RemoveTrack( int index )
+void CChoreoEvent::RemoveTrack( intp index )
 {	
 	CFlexAnimationTrack *track = GetFlexAnimationTrack( index );
 	if ( !track )
@@ -3447,11 +3445,10 @@ CExpressionSample *CCurveData::Add( float time, float value, bool selected )
 	sample.value = value;
 	sample.selected = selected;
 
-	intp idx = m_Ramp.AddToTail( sample );
-	return &m_Ramp[ idx ];
+	return &m_Ramp[ m_Ramp.AddToTail( sample ) ];
 }
 
-void CCurveData::Delete( int index )
+void CCurveData::Delete( intp index )
 {
 	if ( index < 0 || index >= GetCount() )
 		return;
@@ -3851,10 +3848,10 @@ bool CChoreoEvent::GetCloseCaptionTokenValid() const
 //			destlen - 
 // Output : static void
 //-----------------------------------------------------------------------------
-static void CleanupTokenName( char const *in, char *dest, int destlen )
-{
+template<intp destSize>
+static void CleanupTokenName( char const *in, OUT_Z_ARRAY char (&dest)[destSize] ) {
 	char *out = dest;
-	while ( *in && ( out - dest ) < destlen )
+	while ( *in && ( out - dest ) < destSize )
 	{
 		if ( V_isalnum( *in ) ||   // lowercase, uppercase, digits and underscore are valid
 			*in == '_' )
@@ -3886,14 +3883,14 @@ bool CChoreoEvent::ComputeCombinedBaseFileName( char *dest, int destlen, bool cr
 
 	char vcdpath[ 512 ];
 	char cleanedtoken[ MAX_CCTOKEN_STRING ];
-	CleanupTokenName( m_CCToken.Get(), cleanedtoken, sizeof( cleanedtoken ) );
+	CleanupTokenName( m_CCToken.Get(), cleanedtoken );
 
 	if ( Q_isempty( cleanedtoken ) )
 		return false;
 
 	Q_strncpy( vcdpath, m_pScene->GetFilename(), sizeof( vcdpath ) );
-	Q_StripFilename( vcdpath );
-	Q_FixSlashes( vcdpath, '/' );
+	V_StripFilename( vcdpath );
+	V_FixSlashes( vcdpath, '/' );
 
 	char *pvcd = vcdpath;
 
@@ -4176,18 +4173,18 @@ bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoS
 
 	SetType( (EVENTTYPE)buf.GetChar() );
 	char sz[ 256 ];
-	pStringPool->GetString( buf.GetShort(), sz, sizeof( sz ) );
+	pStringPool->GetString( buf.GetShort(), sz );
 	SetName( sz );
 
 	SetStartTime( buf.GetFloat() );
 	SetEndTime( buf.GetFloat() );
 
 	char params[ 2048 ];
-	pStringPool->GetString( buf.GetShort(), params, sizeof( params ) );
+	pStringPool->GetString( buf.GetShort(), params );
 	SetParameters( params );
-	pStringPool->GetString( buf.GetShort(), params, sizeof( params ) );
+	pStringPool->GetString( buf.GetShort(), params );
 	SetParameters2( params );
-	pStringPool->GetString( buf.GetShort(), params, sizeof( params ) );
+	pStringPool->GetString( buf.GetShort(), params );
 	SetParameters3( params );
 
 	if ( !m_Ramp.RestoreFromBuffer( buf, pStringPool ) )
@@ -4207,7 +4204,7 @@ bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoS
 	for ( int i = 0; i < numRelTags; ++i )
 	{
 		char tagName[ 256 ];
-		pStringPool->GetString( buf.GetShort(), tagName, sizeof( tagName ) );
+		pStringPool->GetString( buf.GetShort(), tagName );
 		float percentage = (float)buf.GetUnsignedChar() * 1.0f/255.0f;
 		AddRelativeTag( tagName, percentage );
 	}
@@ -4216,7 +4213,7 @@ bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoS
 	for ( int i = 0; i < numTimingTags; ++i )
 	{
 		char tagName[ 256 ];
-		pStringPool->GetString( buf.GetShort(), tagName, sizeof( tagName ) );
+		pStringPool->GetString( buf.GetShort(), tagName );
 		float percentage = (float)buf.GetUnsignedChar() * 1.0f/255.0f;
 		// Don't parse locked state, only used by editors
 		AddTimingTag( tagName, percentage, false );
@@ -4229,7 +4226,7 @@ bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoS
 		for ( int i = 0; i < num; ++i )
 		{
 			char tagName[ 256 ];
-			pStringPool->GetString( buf.GetShort(), tagName, sizeof( tagName ) );
+			pStringPool->GetString( buf.GetShort(), tagName );
 			float percentage = (float)buf.GetUnsignedShort() * 1.0f/4096.0f;
 
 			// Don't parse locked state, only used by editors
@@ -4250,8 +4247,8 @@ bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoS
 	{
 		char tagname[ 256 ];
 		char wavname[ 256 ];
-		pStringPool->GetString( buf.GetShort(), tagname, sizeof( tagname ) );
-		pStringPool->GetString( buf.GetShort(), wavname, sizeof( wavname ) );
+		pStringPool->GetString( buf.GetShort(), tagname );
+		pStringPool->GetString( buf.GetShort(), wavname );
 
 		SetUsingRelativeTag( true, tagname, wavname );
 	}
@@ -4268,7 +4265,7 @@ bool CChoreoEvent::RestoreFromBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoS
 	{
 		SetCloseCaptionType( (CLOSECAPTION)buf.GetChar() );
 		char cctoken[ 256 ];
-		pStringPool->GetString( buf.GetShort(), cctoken, sizeof( cctoken ) );
+		pStringPool->GetString( buf.GetShort(), cctoken );
 		SetCloseCaptionToken( cctoken );
 		flags = buf.GetChar();
 		if ( flags & ( 1<<0 ) )
@@ -4388,7 +4385,7 @@ bool CChoreoEvent::RestoreFlexAnimationsFromBuffer( CUtlBuffer& buf, IChoreoStri
 	for ( int i = 0; i < numTracks; i++ )
 	{
 		char name[ 256 ];
-		pStringPool->GetString( buf.GetShort(), name, sizeof( name ) );
+		pStringPool->GetString( buf.GetShort(), name );
 
 		CFlexAnimationTrack *track = AddTrack( name );
 

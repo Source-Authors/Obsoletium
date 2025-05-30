@@ -93,18 +93,25 @@ IEntityFactoryDictionary *EntityFactoryDictionary()
 	return &s_EntityFactory;
 }
 
-void DumpEntityFactories_f()
+static void DumpEntityFactories_f()
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CEntityFactoryDictionary *dict = ( CEntityFactoryDictionary * )EntityFactoryDictionary();
+	auto *dict = static_cast<CEntityFactoryDictionary *>(EntityFactoryDictionary());
 	if ( dict )
 	{
-		for ( auto i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
+		size_t total = 0;
+		const auto &factories = dict->m_Factories;
+		for ( auto i = factories.First(); i != factories.InvalidIndex(); i = factories.Next( i ) )
 		{
-			Warning( "%s\n", dict->m_Factories.GetElementName( i ) );
+			// dimhotepus: Warning -> Msg.
+			Msg( "%s\n", factories.GetElementName( i ) );
+			++total;
 		}
+
+		// dimhotepus: Print total entity factories count.
+		Msg( "Total entity factories: %zu.\n", total );
 	}
 }
 
@@ -203,10 +210,23 @@ void CEntityFactoryDictionary::Destroy( const char *pClassName, IServerNetworkab
 //-----------------------------------------------------------------------------
 void CEntityFactoryDictionary::ReportEntitySizes()
 {
+	size_t totalCount = 0, totalSize = 0;
 	for ( auto i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next( i ) )
 	{
-		Msg( " %32s: %zu\n", m_Factories.GetElementName( i ), m_Factories[i]->GetEntitySize() );
+		const size_t entitySize = m_Factories[i]->GetEntitySize();
+
+		Msg( " %32s: %zu\n", m_Factories.GetElementName( i ), entitySize );
+
+		totalSize += entitySize;
+
+		++totalCount;
 	}
+
+	// dimhotepus: Dump total entities count.
+	char prefix[64];
+	V_vsprintf_safe( prefix, " %32s", "Total %zu entities size" );
+
+	Msg( "%s: %.2f MiB.\n", prefix, totalCount, totalSize / (1024.f * 1024.f) );
 }
 
 
@@ -719,15 +739,9 @@ void UTIL_GetPlayerConnectionInfo( int playerIndex, int& ping, int &packetloss )
 
 static unsigned short FixedUnsigned16( float value, float scale )
 {
-	int output;
-
-	output = value * scale;
-	if ( output < 0 )
-		output = 0;
-	if ( output > 0xFFFF )
-		output = 0xFFFF;
-
-	return (unsigned short)output;
+	float scaled = value * scale;
+	int output = static_cast<int>(scaled);
+	return static_cast<unsigned short>(Clamp(output, 0, 0xFFFF));
 }
 
 
@@ -928,7 +942,7 @@ void UTIL_ViewPunch( const Vector &center, QAngle angPunch, float radius, bool b
 }
 
 
-void UTIL_ScreenFadeBuild( ScreenFade_t &fade, const color32 &color, float fadeTime, float fadeHold, int flags )
+static void UTIL_ScreenFadeBuild( ScreenFade_t &fade, const color32 &color, float fadeTime, float fadeHold, short flags )
 {
 	fade.duration = FixedUnsigned16( fadeTime, 1<<SCREENFADE_FRACBITS );		// 7.9 fixed
 	fade.holdTime = FixedUnsigned16( fadeHold, 1<<SCREENFADE_FRACBITS );		// 7.9 fixed
@@ -960,7 +974,7 @@ void UTIL_ScreenFadeWrite( const ScreenFade_t &fade, CBaseEntity *pEntity )
 }
 
 
-void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, int flags )
+void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, short flags )
 {
 	int			i;
 	ScreenFade_t	fade;
@@ -977,7 +991,7 @@ void UTIL_ScreenFadeAll( const color32 &color, float fadeTime, float fadeHold, i
 }
 
 
-void UTIL_ScreenFade( CBaseEntity *pEntity, const color32 &color, float fadeTime, float fadeHold, int flags )
+void UTIL_ScreenFade( CBaseEntity *pEntity, const color32 &color, float fadeTime, float fadeHold, short flags )
 {
 	ScreenFade_t	fade;
 
@@ -1308,13 +1322,13 @@ void UTIL_SnapDirectionToAxis( Vector &direction, float epsilon )
 	}
 }
 
-const char *UTIL_VarArgs( const char *format, ... )
+const char *UTIL_VarArgs( PRINTF_FORMAT_STRING const char *format, ... )
 {
 	va_list		argptr;
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	Q_vsnprintf(string, sizeof(string), format,argptr);
+	V_vsprintf_safe(string, format,argptr);
 	va_end (argptr);
 
 	return string;	
@@ -1748,13 +1762,13 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 // UTIL_LogPrintf - Prints a logged message to console.
 // Preceded by LOG: ( timestamp ) < message >
 //=========================================================
-void UTIL_LogPrintf( const char *fmt, ... )
+void UTIL_LogPrintf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 	char		tempString[1024];
 	
 	va_start ( argptr, fmt );
-	Q_vsnprintf( tempString, sizeof(tempString), fmt, argptr );
+	V_vsprintf_safe( tempString, fmt, argptr );
 	va_end   ( argptr );
 
 	// Print to server console
@@ -1809,7 +1823,7 @@ extern "C" void Sys_Error( char *error, ... )
 	char	string[1024];
 	
 	va_start( argptr, error );
-	Q_vsnprintf( string, sizeof(string), error, argptr );
+	V_vsprintf_safe( string, error, argptr );
 	va_end( argptr );
 
 	Warning( "%s", string );
@@ -2132,14 +2146,13 @@ void UTIL_SetClientVisibilityPVS( edict_t *pClient, const unsigned char *pvs, in
 
 		g_CheckClient.m_bClientPVSIsExpanded = false;
 
-		unsigned *pFrom = (unsigned *)pvs;
-		unsigned *pMask = (unsigned *)g_CheckClient.m_checkPVS;
-		unsigned *pTo = (unsigned *)g_CheckClient.m_checkVisibilityPVS;
+		// dimhotepus: 2x speedup PVS visibility check on x86-64.
+		size_t *pFrom = (size_t *)pvs;
+		size_t *pMask = (size_t *)g_CheckClient.m_checkPVS;
+		size_t *pTo = (size_t *)g_CheckClient.m_checkVisibilityPVS;
 
-		int limit = pvssize / 4;
-		int i;
-
-		for ( i = 0; i < limit; i++ )
+		int limit = pvssize / static_cast<int>(sizeof(size_t));
+		for ( int i = 0; i < limit; i++ )
 		{
 			pTo[i] = pFrom[i] & ~pMask[i];
 
@@ -2149,10 +2162,19 @@ void UTIL_SetClientVisibilityPVS( edict_t *pClient, const unsigned char *pvs, in
 			}
 		}
 
-		int remainder = pvssize % 4;
-		for ( i = 0; i < remainder; i++ )
+		int remainder = pvssize % static_cast<int>(sizeof(size_t));
+		for ( int i = 0; i < remainder; i++ )
 		{
-			((unsigned char *)&pTo[limit])[i] = ((unsigned char *)&pFrom[limit])[i] & !((unsigned char *)&pMask[limit])[i];
+			// Original Valve PVS.
+			const unsigned char oldValue = ((unsigned char *)&pFrom[limit])[i] & !((unsigned char *)&pMask[limit])[i];
+			// dimhotepus: Correct PVS.
+			const unsigned char newValue = ((unsigned char *)&pFrom[limit])[i] & ~((unsigned char *)&pMask[limit])[i];
+
+			if ( oldValue != newValue )
+				DevWarning( "%s: PVS change - old value (%hhu) is not same as new one (%hhu).\n",
+					pClient->GetClassName(), oldValue, newValue );
+
+			((unsigned char *)&pTo[limit])[i] = newValue;
 
 			if ( ((unsigned char *)&pFrom[limit])[i] != 0)
 			{
@@ -2627,7 +2649,7 @@ void LoadAndSpawnEntities_ParseEntKVBlockHelper( CBaseEntity *pNode, KeyValues *
 //-----------------------------------------------------------------------------
 bool UTIL_LoadAndSpawnEntitiesFromScript( CUtlVector <CBaseEntity*> &entities, const char *pScriptFile, const char *pBlock, bool bActivate )
 {
-	KeyValues *pkvFile = new KeyValues( pBlock );
+	KeyValuesAD pkvFile( pBlock );
 
 	if ( pkvFile->LoadFromFile( filesystem, pScriptFile, "MOD" ) )
 	{	

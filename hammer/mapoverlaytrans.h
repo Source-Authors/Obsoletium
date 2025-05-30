@@ -69,18 +69,18 @@ public:
 
 	inline virtual bool IsVisualElement( void ) { return true; }
 	inline virtual bool ShouldRenderLast( void ) { return true; }
-	inline const char* GetDescription() { return ( "Overlay Transition" ); }
+	inline const char* GetDescription() const override { return ( "Overlay Transition" ); }
 
-	ChunkFileResult_t LoadVMF( CChunkFile *pFile );
-	ChunkFileResult_t SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
+	[[nodiscard]] ChunkFileResult_t LoadVMF( CChunkFile *pFile );
+	[[nodiscard]] ChunkFileResult_t SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
 	bool ShouldSerialize( void ) { return true; }
 
 private:
 
 	bool BuildFaceCaches( void );
 
-	static ChunkFileResult_t OverlayDataCallback( CChunkFile *pFile, CMapDisp *pDisp );
-	static ChunkFileResult_t OverlayDataKeyCallback( const char *szKey, const char *szValue, CMapDisp *pDisp );
+	[[nodiscard]] static ChunkFileResult_t OverlayDataCallback( CChunkFile *pFile, CMapDisp *pDisp );
+	[[nodiscard]] static ChunkFileResult_t OverlayDataKeyCallback( const char *szKey, const char *szValue, CMapDisp *pDisp );
 
 private:
 

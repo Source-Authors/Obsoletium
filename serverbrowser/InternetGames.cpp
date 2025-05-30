@@ -10,7 +10,7 @@
 using namespace vgui;
 
 // How often to re-sort the server list
-const float MINIMUM_SORT_TIME = 1.5f;
+constexpr inline float MINIMUM_SORT_TIME = 1.5f;
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -30,7 +30,7 @@ CInternetGames::CInternetGames(vgui::Panel *parent, const char *panelName, EPage
 	m_bAnyServersRespondedToQuery = false;
 
 	m_pLocationFilter->DeleteAllItems();
-	KeyValues *kv = new KeyValues("Regions");
+	KeyValuesAD kv("Regions");
 	if (kv->LoadFromFile( g_pFullFileSystem, "servers/Regions.vdf", NULL))
 	{
 		// iterate the list loading all the servers
@@ -40,9 +40,8 @@ CInternetGames::CInternetGames(vgui::Panel *parent, const char *panelName, EPage
 
 			region.name = srv->GetString("text");
 			region.code = srv->GetInt("code");
-			KeyValues *regionKV = new KeyValues("region", "code", region.code);
+			KeyValuesAD regionKV( new KeyValues("region", "code", region.code) );
 			m_pLocationFilter->AddItem( region.name.String(), regionKV );
-			regionKV->deleteThis();
 			m_Regions.AddToTail(region);
 		}
 	}
@@ -50,7 +49,6 @@ CInternetGames::CInternetGames(vgui::Panel *parent, const char *panelName, EPage
 	{
 		Assert(!("Could not load file servers/Regions.vdf; server browser will not function."));
 	}
-	kv->deleteThis();
 
 	LoadFilterSettings();
 

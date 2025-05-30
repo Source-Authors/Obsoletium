@@ -52,10 +52,11 @@ QueryCvarCookie_t SendCvarValueQueryToClient( IClient *client, const char *pCvar
 //---------------------------------------------------------------------------------
 CPlugin::CPlugin()
 {
-	m_pPlugin = NULL;
-	m_pPluginModule = NULL;
+	m_szName[0] = '\0';
 	m_bDisable = false;
-	m_szName[0] = 0;
+	m_pPlugin = nullptr;
+	m_iPluginInterfaceVersion = -1;
+	m_pPluginModule = nullptr;
 }
 
 CPlugin::~CPlugin()
@@ -78,11 +79,6 @@ CPlugin::~CPlugin()
 //---------------------------------------------------------------------------------
 bool CPlugin::Load( const char *fileName )
 {
-	if ( IsX360() )
-	{
-		return false;
-	}
-
 	char fixedFileName[ MAX_PATH ];
 	Q_strncpy( fixedFileName, fileName, sizeof(fixedFileName) );
 	Q_FixSlashes( fixedFileName );
@@ -217,20 +213,13 @@ CServerPlugin::CServerPlugin()
 	m_PluginHelperCheck = NULL;
 }
 
-CServerPlugin::~CServerPlugin()
-{
-}
+CServerPlugin::~CServerPlugin() = default;
 
 //---------------------------------------------------------------------------------
 // Purpose: loads all plugins
 //---------------------------------------------------------------------------------
 void CServerPlugin::LoadPlugins()
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	m_Plugins.PurgeAndDeleteElements();
 
 	char const *findfn = Sys_FindFirst( "addons/*.vdf", NULL, 0 );
@@ -243,12 +232,15 @@ void CServerPlugin::LoadPlugins()
 			continue;
 		}
 	
-		KeyValues::AutoDelete pluginsFile = KeyValues::AutoDelete("Plugins");
-		pluginsFile->LoadFromFile( g_pFileSystem, va("addons/%s", findfn), "MOD" );
-
-		if ( pluginsFile->GetString("file", NULL) ) 
+		KeyValuesAD pluginsFile("Plugins");
+		// dimhotepus: Check plugin KVs are loaded.
+		if ( pluginsFile->LoadFromFile( g_pFileSystem, va("addons/%s", findfn), "MOD" ) )
 		{
-			LoadPlugin(pluginsFile->GetString("file"));
+			const char *fileName = pluginsFile->GetString("file", NULL);
+			if ( fileName ) 
+			{
+				LoadPlugin(fileName);
+			}
 		}
 
 		// move to next item

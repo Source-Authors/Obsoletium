@@ -14,12 +14,14 @@
 // TorusDlg.h : header file
 //
 
+#include "mathlib/vector.h"
+
+#include "windows/base_dlg.h"
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CTorusDlg dialog
-
-#define ARC_MAX_POINTS 4096
-
-class CTorusDlg : public CDialog
+class CTorusDlg : public CBaseDlg
 {
 // Construction
 public:

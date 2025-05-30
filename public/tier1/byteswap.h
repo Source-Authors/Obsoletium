@@ -94,20 +94,20 @@ public:
 	//-----------------------------------------------------------------------------
 	// Write a single field.
 	//-----------------------------------------------------------------------------
-	void SwapFieldToTargetEndian( void* pOutputBuffer, void *pData, typedescription_t *pField );
+	void SwapFieldToTargetEndian( void* pOutputBuffer, const void *pData, typedescription_t *pField );
 
 	//-----------------------------------------------------------------------------
 	// Write a block of fields.  Works a bit like the saverestore code.  
 	//-----------------------------------------------------------------------------
-	void SwapFieldsToTargetEndian( void *pOutputBuffer, void *pBaseData, datamap_t *pDataMap );
+	void SwapFieldsToTargetEndian( void *pOutputBuffer, const void *pBaseData, datamap_t *pDataMap );
 
 	// Swaps fields for the templated type to the output buffer.
-	template<typename T> inline void SwapFieldsToTargetEndian( T* pOutputBuffer, void *pBaseData, unsigned int objectCount = 1 )
+	template<typename T> inline void SwapFieldsToTargetEndian( T* pOutputBuffer, const void *pBaseData, unsigned int objectCount = 1 )
 	{
 		for ( unsigned int i = 0; i < objectCount; ++i, ++pOutputBuffer )
 		{
 			SwapFieldsToTargetEndian( (void*)pOutputBuffer, pBaseData, &T::m_DataMap );
-			pBaseData = (byte*)pBaseData + sizeof(T);
+			pBaseData = (const byte*)pBaseData + sizeof(T);
 		}
 	}
 
@@ -122,7 +122,7 @@ public:
 	// (Endienness is effectively detected at compile time when optimizations are
 	// enabled)
 	//-----------------------------------------------------------------------------
-	constexpr bool IsMachineBigEndian()
+	[[nodiscard]] constexpr bool IsMachineBigEndian()
 	{
 		return endian::native == endian::big;
 	}
@@ -158,12 +158,12 @@ public:
 	//
 	// Used to determine when a byteswap needs to take place.
 	//-----------------------------------------------------------------------------
-	constexpr inline bool IsSwappingBytes() const	// Are bytes being swapped?
+	[[nodiscard]] constexpr inline bool IsSwappingBytes() const	// Are bytes being swapped?
 	{
 		return m_bSwapBytes;
 	}
 
-	constexpr inline bool IsTargetBigEndian() const	// What is the current target endian?
+	[[nodiscard]] constexpr inline bool IsTargetBigEndian() const	// What is the current target endian?
 	{
 		return m_bBigEndian;
 	}
@@ -183,7 +183,7 @@ public:
 	// ( This is useful for detecting byteswapping in magic numbers in structure 
 	// headers for example. )
 	//-----------------------------------------------------------------------------
-	template<typename T> inline int SourceIsNativeEndian( T input, T nativeConstant )
+	template<typename T> [[nodiscard]] inline int SourceIsNativeEndian( T input, T nativeConstant )
 	{
 		// If it's the same, it isn't byteswapped:
 		if( input == nativeConstant )
@@ -205,7 +205,7 @@ public:
 	// If inputBuffer is omitted or nullptr, then it is assumed to be the same as
 	// outputBuffer - effectively swapping the contents of the buffer in place.
 	//-----------------------------------------------------------------------------
-	template<typename T> inline void SwapBuffer( T* outputBuffer, T* inputBuffer = nullptr, int count = 1 )
+	template<typename T> inline void SwapBuffer( T* outputBuffer, T* inputBuffer = nullptr, intp count = 1 )
 	{
 		Assert( count >= 0 );
 		Assert( outputBuffer );
@@ -221,7 +221,7 @@ public:
 		}
 
 		// Swap everything in the buffer:
-		for( int i = 0; i < count; i++ )
+		for( intp i = 0; i < count; i++ )
 		{
 			LowLevelByteSwap<T>( outputBuffer[i], inputBuffer[i] );
 		}
@@ -234,13 +234,13 @@ public:
 	// If inputBuffer is omitted or nullptr, then it is assumed to be the same as
 	// outputBuffer - effectively swapping the contents of the buffer in place.
 	//-----------------------------------------------------------------------------
-	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, T* inputBuffer = nullptr, int count = 1 )
+	template<typename T> inline void SwapBufferToTargetEndian( T* outputBuffer, const T* inputBuffer = nullptr, intp count = 1 )
 	{
 		Assert( count >= 0 );
 		Assert( outputBuffer );
 
 		// Fail gracefully in release:
-		if( count <=0 || !outputBuffer )
+		if( count <= 0 || !outputBuffer )
 			return;
 
 		// Optimization for the case when we are swapping in place.
@@ -258,7 +258,7 @@ public:
 		}
 
 		// Swap everything in the buffer:
-		for( int i = 0; i < count; i++ )
+		for( intp i = 0; i < count; i++ )
 		{
 			LowLevelByteSwap<T>( outputBuffer[i], inputBuffer[i] );
 		}
@@ -270,7 +270,7 @@ private:
 	// swapped version of input.  ( Doesn't compare machine to target endianness )
 	//-----------------------------------------------------------------------------
 	template <typename T>
-	inline void LowLevelByteSwap( T &output, T &input )
+	inline void LowLevelByteSwap( T &output, const T &input )
 	{
 		if constexpr (sizeof(T) == 1U)
 		{

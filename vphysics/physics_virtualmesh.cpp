@@ -18,8 +18,8 @@
 #include "ivp_surbuild_ledge_soup.hxx"
 #include "physics_trace.h"
 #include "collisionutils.h"
-#include "datamanager.h"
-#include "utlbuffer.h"
+#include "tier1/datamanager.h"
+#include "tier1/utlbuffer.h"
 #include "ledgewriter.h"
 #include "tier1/mempool.h"
 #include "tier0/memdbgon.h"
@@ -66,17 +66,18 @@ public:
 	static unsigned int EstimatedSize( const virtualmeshlist_t &list );
 	static CMeshInstance *CreateResource( const virtualmeshlist_t &list );
 	static unsigned int ComputeRootLedgeSize( const byte *pHull );
+
 	void DestroyResource() { delete this; }
-	unsigned int Size() { return m_memSize; }
+	unsigned int Size() const { return m_memSize; }
 	CMeshInstance *GetData() { return this; }
-	const triangleledge_t	*GetLedges() { return (triangleledge_t *)m_pMemory; }
-	inline int HullCount() { return m_hullCount; }
-	const IVP_Compact_Ledge *GetOuterHull() { return (m_hullCount==1) ? (const IVP_Compact_Ledge *)(m_pMemory + m_hullOffset) : NULL; }
-	int GetRootLedges( IVP_Compact_Ledge **pLedges, int outCount ) 
+	const triangleledge_t *GetLedges() const { return (triangleledge_t *)m_pMemory; }
+	inline byte HullCount() const { return m_hullCount; }
+	const IVP_Compact_Ledge *GetOuterHull() const { return (m_hullCount==1) ? (const IVP_Compact_Ledge *)(m_pMemory + m_hullOffset) : NULL; }
+	byte GetRootLedges( IVP_Compact_Ledge **pLedges, byte outCount ) const
 	{ 
-		int hullOffset = m_hullOffset;
-		int count = min(outCount, (int)m_hullCount);
-		for ( int i = 0; i < count; i++ )
+		unsigned int hullOffset = m_hullOffset;
+		byte count = min(outCount, m_hullCount);
+		for ( byte i = 0; i < count; i++ )
 		{
 			pLedges[i] = (IVP_Compact_Ledge *)(m_pMemory + hullOffset);
 			hullOffset += sizeof(IVP_Compact_Ledge) + (sizeof(IVP_Compact_Triangle) * pLedges[i]->get_n_triangles());
@@ -85,16 +86,21 @@ public:
 	}
 
 	// locals
-	CMeshInstance() { m_memSize = 0; m_pMemory = 0; m_hullOffset = 0; m_hullCount = 0; }
+	CMeshInstance(const virtualmeshlist_t &list)
+	{
+		m_hullOffset = 0;
+		Init(list);
+	}
 	~CMeshInstance();
 
 private:
 	void Init( const virtualmeshlist_t &list );
-
-	int		m_memSize;
-	char	*m_pMemory;
-	unsigned short m_hullOffset;
-	byte	m_hullCount;
+	
+	// dimhotepus: Reordered to reduce size on x86-64.
+	byte			*m_pMemory;
+	unsigned int	m_memSize;
+	unsigned short	m_hullOffset;
+	byte			m_hullCount;
 	[[maybe_unused]] byte	m_pad;
 };
 
@@ -109,10 +115,10 @@ CMeshInstance::~CMeshInstance()
 
 unsigned int CMeshInstance::EstimatedSize( const virtualmeshlist_t &list )
 {
-	int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
-	int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
+	unsigned int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
+	unsigned int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
+	unsigned int hullSize = ComputeRootLedgeSize(list.pHull);
 
-	int hullSize = ComputeRootLedgeSize(list.pHull);
 	return ledgeSize + pointSize + hullSize;
 }
 
@@ -121,71 +127,91 @@ unsigned int CMeshInstance::ComputeRootLedgeSize( const byte *pData )
 {
 	if ( !pData )
 		return 0;
-	virtualmeshhull_t *pHeader = (virtualmeshhull_t *)pData;
-	packedhull_t *pHull = (packedhull_t *)(pHeader+1);
+
+	const virtualmeshhull_t *pHeader = (const virtualmeshhull_t *)pData;
+	const packedhull_t *pHull = (const packedhull_t *)(pHeader+1);
 	unsigned int size = pHeader->hullCount * sizeof(IVP_Compact_Ledge);
+
 	for ( int i = 0; i < pHeader->hullCount; i++ )
 	{
 		size += sizeof(IVP_Compact_Triangle) * pHull[i].triangleCount;
 	}
+
 	return size;
 }
 
 CMeshInstance *CMeshInstance::CreateResource( const virtualmeshlist_t &list )
 {
-	CMeshInstance *pMesh = new CMeshInstance;
-	pMesh->Init( list );
-	return pMesh;
+	return new CMeshInstance(list);
 }
 
 
 // flat memory footprint has triangleledges (ledge + 2 triangles for terrain), then has verts, then optional convex hull
 void CMeshInstance::Init( const virtualmeshlist_t &list )
 {
-	int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
-	int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
-	int memSize = ledgeSize + pointSize + ComputeRootLedgeSize(list.pHull);
+	const unsigned int ledgeSize = sizeof(triangleledge_t) * list.triangleCount;
+	const unsigned int pointSize = sizeof(IVP_Compact_Poly_Point) * list.vertexCount;
+	const unsigned int memSize = ledgeSize + pointSize + ComputeRootLedgeSize(list.pHull);
+	
+	m_pMemory = static_cast<byte *>(ivp_calloc_aligned( memSize, 16 ));
+	Assert( (intp(m_pMemory) & 15) == 0 );	// make sure it is aligned
+
 	m_memSize = memSize;
 	m_hullCount = 0;
-	m_pMemory = (char *)ivp_malloc_aligned( memSize, 16 );
-	Assert( (intp(m_pMemory) & 15) == 0 );	// make sure it is aligned
-	IVP_Compact_Poly_Point *pPoints = (IVP_Compact_Poly_Point *)&m_pMemory[ledgeSize];
-	triangleledge_t *pLedges = (triangleledge_t *) m_pMemory;
-	memset( m_pMemory, 0, memSize );
-	int i;
 
-	for ( i = 0; i < list.vertexCount; i++ )
+	auto *pPoints = reinterpret_cast<IVP_Compact_Poly_Point *>(&m_pMemory[ledgeSize]);
+	auto *pLedges = reinterpret_cast<triangleledge_t *>(m_pMemory);
+
+	for ( int i = 0; i < list.vertexCount; i++ )
 	{
 		ConvertPositionToIVP( list.pVerts[i], pPoints[i] );
 	}
 
-	for ( i = 0; i < list.triangleCount; i++ )
+	for ( int i = 0; i < list.triangleCount; i++ )
 	{
-		Vector v0 = list.pVerts[list.indices[i*3+0]];
-		Vector v1 = list.pVerts[list.indices[i*3+1]];
-		Vector v2 = list.pVerts[list.indices[i*3+2]];
+		const int factor3 = i * 3;
+
+#ifdef _DEBUG
+		const Vector v0 = list.pVerts[list.indices[factor3+0]];
+		const Vector v1 = list.pVerts[list.indices[factor3+1]];
+		const Vector v2 = list.pVerts[list.indices[factor3+2]];
+
 		Assert( v0 != v1 && v1 != v2 && v0 != v2 );
-		CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( &pLedges[i], pPoints, list.indices[i*3+0], list.indices[i*3+1], list.indices[i*3+2], 0 );
+#endif
+
+		CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( &pLedges[i],
+			pPoints,
+			list.indices[factor3+0],
+			list.indices[factor3+1],
+			list.indices[factor3+2],
+			0 );
 	}
+
 	Assert( list.triangleCount > 0 && list.triangleCount <= MAX_VIRTUAL_TRIANGLES );
+
 	// if there's a hull, build it out too
 	if ( list.pHull )
 	{
-		virtualmeshhull_t *pHeader = (virtualmeshhull_t *)list.pHull;
+		auto *pHeader = reinterpret_cast<virtualmeshhull_t *>(list.pHull);
+
+		Assert(ledgeSize + pointSize < 65536u);
+
 		m_hullCount = pHeader->hullCount;
-		Assert( (ledgeSize + pointSize) < 65536 );
-		m_hullOffset = ledgeSize + pointSize;
-		byte *pMem = (byte *)m_pMemory + m_hullOffset;
+		m_hullOffset = static_cast<unsigned short>(ledgeSize + pointSize);
+
+		byte *pMem = m_pMemory + m_hullOffset;
+
 #if _DEBUG
-		int hullSize = CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
-		Assert((m_hullOffset+hullSize)==memSize);
+		const unsigned hullSize =
+			CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
+		Assert(m_hullOffset + hullSize == memSize);
 #else
 		CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
 #endif
 	}
 }
 
-const int g_MeshSize = (2048 * 1024 * 4); // nillerusr: 2 MiB should be enough, old value causes problems in ep2
+constexpr inline int g_MeshSize = 2048 * 1024 * 4; // nillerusr: 2 MiB should be enough, old value causes problems in ep2
 static CDataManager<CMeshInstance, virtualmeshlist_t, CMeshInstance *, CThreadFastMutex> g_MeshManager( g_MeshSize );
 
 //-----------------------------------------------------------------------------
@@ -218,16 +244,16 @@ public:
 		}
 		const_cast<CPhysCollideVirtualMesh *>(this)->Release();
 	}
-	unsigned int GetSerializationSize() const override 
+	size_t GetSerializationSize() const override 
 	{ 
 		if ( !m_pHull )
 			return 0; 
 		return m_pHull->TotalSize();
 	}
 
-	unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const override 
+	size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const override 
 	{
-		unsigned int size = GetSerializationSize();
+		size_t size = GetSerializationSize();
 		if ( size )
 		{
 			memcpy( pDest, m_pHull, size );
@@ -322,16 +348,16 @@ public:
 	static void DestroyMeshBoundingHull(virtualmeshhull_t *pHull) { CVPhysicsVirtualMeshWriter::DestroyPackedHull(pHull); }
 	static IVP_Compact_Surface *CreateBoundingSurfaceFromRange( const virtualmeshlist_t &list, int firstIndex, int indexCount );
 
-	int GetRootLedges( IVP_Compact_Ledge **pLedges, int outCount )
+	byte GetRootLedges( IVP_Compact_Ledge **pLedges, byte outCount )
 	{
-		int count = AddRef()->GetRootLedges(pLedges, outCount);
+		byte count = AddRef()->GetRootLedges(pLedges, outCount);
 		FrameRelease();
 		return count;
 	}
 
-	IVP_Compact_Ledge *GetBoundingLedge()
+	const IVP_Compact_Ledge *GetBoundingLedge()
 	{
-		IVP_Compact_Ledge *pLedge = const_cast<IVP_Compact_Ledge *>(AddRef()->GetOuterHull());
+		const IVP_Compact_Ledge *pLedge = AddRef()->GetOuterHull();
 		FrameRelease();
 		return pLedge;
 	}
@@ -360,7 +386,7 @@ private:
 	virtualmeshparams_t m_params;
 	virtualmeshhull_t *m_pHull;
 	memhandle_t		m_hMemory;
-	short			m_ledgeCount;
+	int			m_ledgeCount;
 };
 
 static void FlushFrameLocks()
@@ -368,10 +394,10 @@ static void FlushFrameLocks()
 	CUtlVector<CPhysCollideVirtualMesh *> *pLocks = g_pMeshFrameLocks;
 	if ( pLocks )
 	{
-		for ( intp i = 0; i < pLocks->Count(); i++ )
+		for ( auto *lock : *pLocks )
 		{
-			Assert( (*pLocks)[i] );
-			(*pLocks)[i]->Release();
+			Assert( lock );
+			lock->Release();
 		}
 		pLocks->RemoveAll();
 		g_MeshFrameLocksPool.PutObject( g_pMeshFrameLocks );
@@ -521,7 +547,7 @@ IVP_Compact_Surface *CPhysCollideVirtualMesh::CreateBoundingSurfaceFromRange( co
 
 #if _DEBUG
 	const IVP_Compact_Ledgetree_Node *node = pSurface->get_compact_ledge_tree_root();
-	IVP_Compact_Ledge *pLedge = const_cast<IVP_Compact_Ledge *>(node->get_compact_hull());	// we're going to write into client data on each vert before we throw this away
+	const IVP_Compact_Ledge *pLedge = node->get_compact_hull();	// we're going to write into client data on each vert before we throw this away
 	Assert(pLedge && !pLedge->is_terminal());
 #endif
 	return pSurface;
@@ -616,10 +642,10 @@ void IVP_SurfaceManager_VirtualMesh::get_all_ledges_within_radius(const IVP_U_Po
 	if ( !root_ledge )
 	{
 		IVP_Compact_Ledge *pLedges[2];
-		int count = m_pMesh->GetRootLedges( pLedges, ssize(pLedges) );
+		byte count = m_pMesh->GetRootLedges( pLedges, static_cast<byte>(ssize(pLedges)) );
 		if ( count )
 		{
-			for ( int i = 0; i < count; i++ )
+			for ( byte i = 0; i < count; i++ )
 			{
 				resulting_ledges->add( pLedges[i] ); // return the recursive/virtual outer hull
 			}

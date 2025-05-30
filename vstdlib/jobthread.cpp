@@ -211,9 +211,9 @@ public:
 	//-----------------------------------------------------
 	// Offer the current thread to the pool
 	//-----------------------------------------------------
-	virtual int YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE );
-	virtual int YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE );
-	void Yield( unsigned timeout );
+	int YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
+	int YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
+	void Yield( unsigned timeout ) override;
 
 	//-----------------------------------------------------
 	// Add a native job to the queue (master thread)
@@ -226,7 +226,7 @@ public:
 	//  and execute or execute pFunctor right after completing current job and
 	//  before looking for another job.
 	//-----------------------------------------------------
-	void ExecuteHighPriorityFunctor( CFunctor *pFunctor );
+	void ExecuteHighPriorityFunctor( CFunctor *pFunctor ) override;
 
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
@@ -241,10 +241,10 @@ public:
 	//-----------------------------------------------------
 	// Bulk job manipulation (blocking)
 	//-----------------------------------------------------
-	int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = NULL  );
+	int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = NULL ) override;
 	int AbortAll() override;
 
-	virtual void Reserved1() {}
+	void Reserved1() override {}
 
 	void WaitForIdle( bool bAll = true );
 
@@ -259,7 +259,7 @@ private:
 	//
 	//-----------------------------------------------------
 	CJob *PeekJob();
-	CJob *GetDummyJob();
+	CJob *GetDummyJob() override;
 
 	//-----------------------------------------------------
 	// Thread functions
@@ -410,7 +410,7 @@ private:
 
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-		m_pOwner->m_nIdleThreads++;
+		++m_pOwner->m_nIdleThreads;
 		m_IdleEvent.Set();
 		while (!bExit && ( ( waitResult = Wait() ) != WAIT_FAILED ) )
 		{
@@ -469,21 +469,21 @@ private:
 					if ( !bTookJob )
 					{
 						m_IdleEvent.Reset();
-						m_pOwner->m_nIdleThreads--;
+						--m_pOwner->m_nIdleThreads;
 						bTookJob = true;
 					}
 					ServiceJobAndRelease( pJob, m_iThread );
-					m_pOwner->m_nJobs--;
+					--m_pOwner->m_nJobs;
 				} while ( !PeekCall() );
 
 				if ( bTookJob )
 				{
-					m_pOwner->m_nIdleThreads++;
+					++m_pOwner->m_nIdleThreads;
 					m_IdleEvent.Set();
 				}
 			}
 		}
-		m_pOwner->m_nIdleThreads--;
+		--m_pOwner->m_nIdleThreads;
 		m_IdleEvent.Reset();
 		return 0;
 	}
@@ -603,7 +603,8 @@ int CThreadPool::ResumeExecution()
 
 void CThreadPool::WaitForIdle( bool bAll )
 {
-	ThreadWaitForEvents( m_IdleEvents.Count(), m_IdleEvents.Base(), bAll, 60000 );
+	Assert(m_IdleEvents.Count() <= INT_MAX);
+	ThreadWaitForEvents( static_cast<int>(m_IdleEvents.Count()), m_IdleEvents.Base(), bAll, 60000 );
 }
 
 //---------------------------------------------------------
@@ -623,7 +624,7 @@ int CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, 
 		if ( !m_bExecOnThreadPoolThreadsOnly && m_SharedQueue.Pop( &pJob ) )
 		{
 			ServiceJobAndRelease( pJob );
-			m_nJobs--;
+			--m_nJobs;
 		}
 		else
 		{
@@ -658,8 +659,9 @@ int CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsigned ti
 	{
 		handles.AddToTail( ppJobs[i]->AccessEvent() );
 	}
-
-	return YieldWait( handles.Base(), handles.Count(), bWaitAll, timeout);
+	
+	Assert(handles.Count() <= INT_MAX);
+	return YieldWait( handles.Base(), static_cast<int>(handles.Count()), bWaitAll, timeout);
 }
 
 //---------------------------------------------------------
@@ -828,13 +830,13 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 					}
 					else
 					{
-						m_nJobs--;
+						--m_nJobs;
 						pJob->Release(); // an already serviced job in queue, may as well ditch it (as in, main thread probably force executed)
 					}
 					continue;
 				}
 				ServiceJobAndRelease( pJob );
-				m_nJobs--;
+				--m_nJobs;
 				nExecuted++;
 			}
 
@@ -852,14 +854,14 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 				}
 				else
 				{
-					m_nJobs--;
+					--m_nJobs;
 					pJob->Release(); // see above
 				}
 				continue;
 			}
 
 			ServiceJobAndRelease( pJob );
-			m_nJobs--;
+			--m_nJobs;
 			nExecuted++;
 		}
 	}

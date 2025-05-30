@@ -28,9 +28,8 @@ enum RequestRetval_t
 //-----------------------------------------------------------------------------
 // Interface used to drive hammer
 //-----------------------------------------------------------------------------
-#define INTERFACEVERSION_HAMMER	"Hammer001"
-class IHammer : public IAppSystem
-{
+constexpr inline char INTERFACEVERSION_HAMMER[]{"Hammer001"};
+class IHammer : public IAppSystem {
 public:
 	virtual bool HammerPreTranslateMessage( MSG * pMsg ) = 0;
 	virtual bool HammerIsIdleMessage( MSG * pMsg ) = 0;

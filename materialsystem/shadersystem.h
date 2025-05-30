@@ -208,8 +208,8 @@ public:
 							   uint32 nMaterialVarTimeStamp ) = 0;
 
 	// Used to iterate over all shaders for editing purposes
-	virtual int	 ShaderCount() const = 0;
-	virtual int  GetShaders( int nFirstShader, int nCount, IShader **ppShaderList ) const = 0;
+	virtual intp ShaderCount() const = 0;
+	virtual int  GetShaders( int nFirstShader, int nCount, OUT_CAP_OPT(nCount) IShader **ppShaderList ) const = 0;
 };
 
 

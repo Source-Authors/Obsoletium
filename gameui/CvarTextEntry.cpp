@@ -17,7 +17,7 @@
 
 using namespace vgui;
 
-static const int MAX_CVAR_TEXT = 64;
+static constexpr inline int MAX_CVAR_TEXT = 64;
 
 CCvarTextEntry::CCvarTextEntry( Panel *parent, const char *panelName, char const *cvarname )
  : TextEntry( parent, panelName)
@@ -56,7 +56,7 @@ void CCvarTextEntry::ApplyChanges( bool immediate )
 		return;
 
 	char szText[ MAX_CVAR_TEXT ];
-	GetText( szText, MAX_CVAR_TEXT );
+	GetText( szText );
 
 	if ( !szText[ 0 ] )
 		return;
@@ -70,7 +70,7 @@ void CCvarTextEntry::ApplyChanges( bool immediate )
 	else
 	{
 		char szCommand[ 256 ];
-		sprintf( szCommand, "%s \"%s\"\n", m_pszCvarName, szText );
+		V_sprintf_safe( szCommand, "%s \"%s\"\n", m_pszCvarName, szText );
 		engine->ClientCmd_Unrestricted( szCommand );
 	}
 
@@ -94,7 +94,7 @@ void CCvarTextEntry::Reset()
 bool CCvarTextEntry::HasBeenModified()
 {
 	char szText[ MAX_CVAR_TEXT ];
-	GetText( szText, MAX_CVAR_TEXT );
+	GetText( szText );
 
 	return stricmp( szText, m_pszStartValue );
 }

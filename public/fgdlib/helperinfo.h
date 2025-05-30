@@ -6,8 +6,8 @@
 #define HELPERINFO_H
 #pragma once
 
-#include <tier0/dbg.h>
-#include <utlvector.h>
+#include "tier0/dbg.h"
+#include "tier1/utlvector.h"
 
 
 #define MAX_HELPER_NAME_LEN			256
@@ -31,8 +31,8 @@ class CHelperInfo
 
 		inline bool AddParameter(const char *pszParameter);
 
-		inline int GetParameterCount(void) const { return(m_Parameters.Count()); }
-		inline const char *GetParameter(int nIndex) const;
+		inline intp GetParameterCount(void) const { return(m_Parameters.Count()); }
+		inline const char *GetParameter(intp nIndex) const;
 
 	protected:
 
@@ -56,18 +56,7 @@ inline CHelperInfo::CHelperInfo(void)
 //-----------------------------------------------------------------------------
 inline CHelperInfo::~CHelperInfo(void)
 {
-	intp nCount = m_Parameters.Count();
-	for (intp i = 0; i < nCount; i++)
-	{
-		char *pszParam = m_Parameters.Element(i);
-		Assert(pszParam != NULL);
-		if (pszParam != NULL)
-		{
-			delete [] pszParam;
-		}
-	}
-
-	m_Parameters.RemoveAll();
+	m_Parameters.PurgeAndDeleteElementsArray();
 }
 
 
@@ -78,34 +67,24 @@ inline CHelperInfo::~CHelperInfo(void)
 //-----------------------------------------------------------------------------
 inline bool CHelperInfo::AddParameter(const char *pszParameter)
 {
-	if ((pszParameter != NULL) && (pszParameter[0] != '\0'))
+	if (pszParameter && !Q_isempty(pszParameter))
 	{
-		size_t nLen = strlen(pszParameter);
-		
-		if (nLen > 0)
-		{
-			char *pszNew = new char [nLen + 1];
-			if (pszNew != NULL)
-			{
-				strcpy(pszNew, pszParameter);
-				m_Parameters.AddToTail(pszNew);
-				return(true);
-			}
-		}
+		m_Parameters.AddToTail(V_strdup(pszParameter));
+		return true;
 	}
 
-	return(false);
+	return false;
 }
 
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline const char *CHelperInfo::GetParameter(int nIndex) const
+inline const char *CHelperInfo::GetParameter(intp nIndex) const
 {
 	if (nIndex >= m_Parameters.Count())
 		return NULL;
 	
-	return m_Parameters.Element(nIndex); 
+	return m_Parameters.Element(nIndex);
 }
 
 
@@ -117,7 +96,7 @@ inline void CHelperInfo::SetName(const char *pszName)
 {
 	if (pszName != NULL)
 	{	
-		strcpy(m_szName, pszName);
+		V_strcpy_safe(m_szName, pszName);
 	}
 }
 

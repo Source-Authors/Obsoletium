@@ -61,7 +61,7 @@ void CTextEntryBox::PerformLayout()
 	wide += x;
 	tall += y;
 
-	const int borderW = 10;
+	constexpr int borderW = 10;
 
 	int labelW, labelH;
 	int entryW, entryH;

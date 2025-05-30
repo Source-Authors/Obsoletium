@@ -41,10 +41,10 @@
 #define STRIDER_MSG_DEAD				3
 
 #define STOMP_IK_SLOT					11
-const int NUM_STRIDER_IK_TARGETS = 6;
+constexpr inline int NUM_STRIDER_IK_TARGETS = 6;
 
-const float	STRIDERFX_BIG_SHOT_TIME = 1.25f;
-const float STRIDERFX_END_ALL_TIME = 4.0f;
+constexpr inline float	STRIDERFX_BIG_SHOT_TIME = 1.25f;
+constexpr inline float STRIDERFX_END_ALL_TIME = 4.0f;
 
 class C_StriderFX : public C_EnvelopeFX
 {
@@ -249,16 +249,16 @@ public:
 };
 
 // NOTE: Beam widths are half-widths or radii, so this is a beam that represents a cylinder with 2" radius
-const float NARROW_BEAM_WIDTH = 2;
-const float WIDE_BEAM_WIDTH = 16;
-const float FLARE_SIZE = 128;
-const float	DARK_SIZE = 64;
-const float AFTERGLOW_SIZE = 64;
+constexpr inline float NARROW_BEAM_WIDTH = 2;
+constexpr inline float WIDE_BEAM_WIDTH = 16;
+constexpr inline float FLARE_SIZE = 128;
+constexpr inline float	DARK_SIZE = 64;
+constexpr inline float AFTERGLOW_SIZE = 64;
 
-const float WARP_SIZE = 512;
-const float WARP_REFRACT = 0.075f;
-const float WARP_BUBBLE_SIZE = 256;
-const float WARP_BUBBLE_REFRACT = 1.0f;
+constexpr inline float WARP_SIZE = 512;
+constexpr inline float WARP_REFRACT = 0.075f;
+constexpr inline float WARP_BUBBLE_SIZE = 256;
+constexpr inline float WARP_BUBBLE_REFRACT = 1.0f;
 
 CStriderFXEnvelope::CStriderFXEnvelope()
 {
@@ -465,7 +465,7 @@ int	C_StriderFX::DrawModel( int )
 		m_t += gpGlobals->frametime;
 		if ( m_tMax > 0 )
 		{
-			m_t = clamp( m_t, 0, m_tMax );
+			m_t = clamp( m_t, 0.f, m_tMax );
 			m_beamEndPosition = m_worldPosition;
 		}
 	}
@@ -798,7 +798,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 6.0f, 8.0f ) * (FRONT_LENGTH-(i))/(FRONT_LENGTH*0.75f)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 	
@@ -833,7 +833,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 2.0f, 4.0f ) * (SIDE_LENGTH-(i))/(SIDE_LENGTH*0.5f)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -864,7 +864,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 2.0f, 4.0f ) * (SIDE_LENGTH-(i))/(SIDE_LENGTH*0.5f)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -895,7 +895,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 		pParticle->m_uchStartSize	= ( (random->RandomFloat( 2.0f, 4.0f ) * (SIDE_LENGTH-(i))/(SIDE_LENGTH*0.5f)) * flScale );
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -918,7 +918,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 
 	pParticle->m_uchStartSize	= flScale * random->RandomFloat( 12.0f, 16.0f );
 	pParticle->m_uchEndSize		= 0;
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	pParticle->m_flRollDelta	= 0.0f;
 
 	Vector		origin;

@@ -45,7 +45,7 @@ public:
 	};
 
 	// resolve internal data from changed attributes
-	virtual void Resolve();
+	void Resolve() override;
 
 	DrawType_t GetDrawType() const;
 	DrawType_t SetDrawType( int drawType );

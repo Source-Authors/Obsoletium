@@ -112,7 +112,7 @@ void CSessionBlockPublisher::WriteAndPublishSessionBlock()
 		"%s%s_part_%u.%s", SV_GetTmpDir(),
 		SV_GetRecordingSessionManager()->GetCurrentSessionName(), iCurrentSessionBlock, BLOCK_FILE_EXTENSION
 	);
-	V_strcpy( pNewBlock->m_szFullFilename, pFullFilename );
+	V_strcpy_safe( pNewBlock->m_szFullFilename, pFullFilename );
 	pNewBlock->m_nWriteStatus = CServerRecordingSessionBlock::WRITESTATUS_INVALID;	// Must be set here to trigger write
 	pNewBlock->m_nRemoteStatus = CBaseRecordingSessionBlock::STATUS_WRITING;
 	pNewBlock->m_iReconstruction = iCurrentSessionBlock;

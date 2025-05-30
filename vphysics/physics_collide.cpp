@@ -72,8 +72,8 @@ public:
 	void PolysoupAddTriangle( CPhysPolysoup *pSoup, const Vector &a, const Vector &b, const Vector &c, int materialIndex7bits ) override;
 	CPhysCollide *ConvertPolysoupToCollide( CPhysPolysoup *pSoup, bool useMOPP = true ) override;
 
-	int	CollideSize( CPhysCollide *pCollide ) override;
-	int	CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap = false ) override;
+	size_t CollideSize(CPhysCollide *pCollide) override;
+	size_t CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap = false ) override;
 	// Get the AABB of an oriented collide
 	void CollideGetAABB( Vector *pMins, Vector *pMaxs, const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles ) override;
 	Vector CollideGetExtent( const CPhysCollide *pCollide, const Vector &collideOrigin, const QAngle &collideAngles, const Vector &direction ) override;
@@ -126,7 +126,7 @@ public:
 	Vector			CollideGetOrthographicAreas( const CPhysCollide *pCollide ) override;
 	void			OutputDebugInfo( const CPhysCollide *pCollide ) override;
 	CPhysCollide	*CreateVirtualMesh(const virtualmeshparams_t &params) override { return ::CreateVirtualMesh(params); }
-	bool			GetBBoxCacheSize( unsigned *pCachedSize, intp *pCachedCount ) override;
+	bool			GetBBoxCacheSize( size_t *pCachedSize, intp *pCachedCount ) override;
 
 	bool			SupportsVirtualMesh() override { return true; }
 
@@ -233,10 +233,10 @@ public:
 	virtual int GetVCollideIndex() const { return 0; }
 	virtual IVP_SurfaceManager *CreateSurfaceManager( short & ) const;
 	virtual void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const;
-	virtual unsigned int GetSerializationSize() const;
+	virtual size_t GetSerializationSize() const;
 	virtual Vector GetMassCenter() const;
 	virtual void SetMassCenter( const Vector &massCenter );
-	virtual unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const;
+	virtual size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const;
 	virtual void OutputDebugInfo() const;
 
 private:
@@ -258,10 +258,10 @@ public:
 	int GetVCollideIndex() const override { return m_pCompactSurface->dummy[0]; }
 	IVP_SurfaceManager *CreateSurfaceManager( short & ) const override;
 	void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const override;
-	unsigned int GetSerializationSize() const override;
+	size_t GetSerializationSize() const override;
 	Vector GetMassCenter() const override;
 	void SetMassCenter( const Vector &massCenter ) override;
-	unsigned int SerializeToBuffer( char *pDest, bool bSwap = false ) const override;
+	size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const override;
 	Vector GetOrthographicAreas() const override;
 	void SetOrthographicAreas( const Vector &areas ) override;
 	void ComputeOrthographicAreas( float epsilon ) override;
@@ -317,7 +317,7 @@ CPhysCollide *CPhysCollide::UnserializeFromBuffer( const char *pBuffer, unsigned
 		switch( pHeader->modelType )
 		{
 		case COLLIDE_POLY:
-			return new CPhysCollideCompactSurface( (compactsurfaceheader_t *)pHeader, index, swap );
+			return new CPhysCollideCompactSurface( (const compactsurfaceheader_t *)pHeader, index, swap );
 		case COLLIDE_MOPP:
 #if ENABLE_IVP_MOPP
 			return new CPhysCollideMopp( (moppheader_t *)pHeader );
@@ -396,12 +396,12 @@ IVP_SurfaceManager *CPhysCollideMopp::CreateSurfaceManager( short &collideType )
 	return new IVP_SurfaceManager_Mopp( m_pMopp );
 }
 
-unsigned int CPhysCollideMopp::GetSerializationSize() const
+size_t CPhysCollideMopp::GetSerializationSize() const
 {
 	return m_pMopp->byte_size + sizeof(moppheader_t);
 }
 
-unsigned int CPhysCollideMopp::SerializeToBuffer( char *pDest, bool bSwap ) const
+size_t CPhysCollideMopp::SerializeToBuffer( char *pDest, bool bSwap ) const
 {
 	moppheader_t header;
 	header.Mopp( m_pMopp );
@@ -501,12 +501,12 @@ void CPhysCollideCompactSurface::GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge
 	IVP_Compact_Ledge_Solver::get_all_ledges( m_pCompactSurface, &ledges );
 }
 
-unsigned int CPhysCollideCompactSurface::GetSerializationSize() const
+size_t CPhysCollideCompactSurface::GetSerializationSize() const
 {
 	return m_pCompactSurface->byte_size + sizeof(compactsurfaceheader_t);
 }
 
-unsigned int CPhysCollideCompactSurface::SerializeToBuffer( char *pDest, bool bSwap ) const
+size_t CPhysCollideCompactSurface::SerializeToBuffer( char *pDest, bool bSwap ) const
 {
 	compactsurfaceheader_t header;
 	header.CompactSurface( m_pCompactSurface, m_orthoAreas );
@@ -519,7 +519,7 @@ unsigned int CPhysCollideCompactSurface::SerializeToBuffer( char *pDest, bool bS
 	memcpy( pDest, &header, sizeof(header) );
 	pDest += sizeof(header);
 	int surfaceSize = m_pCompactSurface->byte_size;
-	int serializationSize = GetSerializationSize();
+	size_t serializationSize = GetSerializationSize();
 	if ( bSwap )
 	{
 		m_pCompactSurface->byte_swap_all();
@@ -796,7 +796,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	IVP_Compact_Ledge *pLedge = (IVP_Compact_Ledge *)pConvex;
 	int iTriangles = pLedge->get_n_triangles();
 
-	PolyhedronMesh_Triangle *pTriangles = (PolyhedronMesh_Triangle *)stackalloc( iTriangles * sizeof( PolyhedronMesh_Triangle ) );
+	PolyhedronMesh_Triangle *pTriangles = stackallocT( PolyhedronMesh_Triangle, iTriangles );
 	
 	int iHighestPointIndex = 0;
 	const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle();
@@ -820,7 +820,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	++iHighestPointIndex;
 
 	//apparently points might be shared between ledges and not all points will be used. So now we get to compress them into a smaller set
-	int *pPointRemapping = (int *)stackalloc( iHighestPointIndex * sizeof( int ) );
+	int *pPointRemapping = stackallocT( int, iHighestPointIndex );
 	memset( pPointRemapping, 0, iHighestPointIndex * sizeof( int ) );
 	for( int i = 0; i != iTriangles; ++i )
 	{
@@ -855,7 +855,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	}
 	
 
-	bool *bLinks = (bool *)stackalloc( iNumPoints * iNumPoints * sizeof( bool ) );
+	bool *bLinks = stackallocT( bool, iNumPoints * iNumPoints );
 	memset( bLinks, 0, iNumPoints * iNumPoints * sizeof( bool ) );
 
 	int iLinkCount = 0;
@@ -985,8 +985,8 @@ int CPhysicsCollision::GetConvexesUsedInCollideable( const CPhysCollide *pCollid
 
 void CPhysicsCollision::ConvexesFromConvexPolygon( const Vector &vPolyNormal, const Vector *pPoints, int iPointCount, CPhysConvex **pOutput )
 {
-	IVP_U_Point *pIVP_Points = (IVP_U_Point *)stackalloc( sizeof( IVP_U_Point ) * iPointCount );
-	IVP_U_Point **pTriangulator = (IVP_U_Point **)stackalloc( sizeof( IVP_U_Point * ) * iPointCount );
+	IVP_U_Point *pIVP_Points = stackallocT( IVP_U_Point, iPointCount );
+	IVP_U_Point **pTriangulator = stackallocT( IVP_U_Point*, iPointCount );
 	IVP_U_Point **pRead = pTriangulator;
 	IVP_U_Point **pWrite = pTriangulator;
 
@@ -1338,11 +1338,10 @@ bool CPhysicsCollision::IsBBoxCache( CPhysCollide *pCollide )
 
 void CPhysicsCollision::AddBBoxCache( CPhysCollideCompactSurface *pCollide, const Vector &mins, const Vector &maxs )
 {
-	auto index = m_bboxCache.AddToTail();
-	bboxcache_t *pCache = &m_bboxCache[index];
-	pCache->pCollide = pCollide;
-	pCache->mins = mins;
-	pCache->maxs = maxs;
+	bboxcache_t &pCache = m_bboxCache[m_bboxCache.AddToTail()];
+	pCache.pCollide = pCollide;
+	pCache.mins = mins;
+	pCache.maxs = maxs;
 }
 
 CPhysCollideCompactSurface *CPhysicsCollision::GetBBoxCache( const Vector &mins, const Vector &maxs )
@@ -1364,12 +1363,12 @@ void CPhysicsCollision::ConvexFree( CPhysConvex *pConvex )
 }
 
 // Get the size of the collision model for serialization
-int	CPhysicsCollision::CollideSize( CPhysCollide *pCollide )
+size_t	CPhysicsCollision::CollideSize( CPhysCollide *pCollide )
 {
 	return pCollide->GetSerializationSize();
 }
 
-int	CPhysicsCollision::CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap )
+size_t	CPhysicsCollision::CollideWrite( char *pDest, CPhysCollide *pCollide, bool bSwap )
 {
 	return pCollide->SerializeToBuffer( pDest, bSwap );
 }
@@ -1646,7 +1645,7 @@ void CPhysicsCollision::VCollideLoad( vcollide_t *pOutput, int solidCount, const
 
 		if (size > currentSize || !tmpbuf)
 		{
-			delete[] tmpbuf;
+				delete[] tmpbuf;
 			tmpbuf = new char[size];
 			currentSize = size;
 		}
@@ -1682,7 +1681,7 @@ void CPhysicsCollision::VCollideUnload( vcollide_t *pVCollide )
 			if ( !pEnv )
 				break;
 
-			if ( pEnv->IsCollisionModelUsed( (CPhysCollide *)pVCollide->solids[i] ) )
+			if ( pEnv->IsCollisionModelUsed( (const CPhysCollide *)pVCollide->solids[i] ) )
 			{
  				AssertMsg(0, "Freed collision model while in use!!!\n");
 				return;
@@ -1755,7 +1754,7 @@ void CPhysicsCollision::OutputDebugInfo( const CPhysCollide *pCollide )
 	pCollide->OutputDebugInfo();
 }
 
-bool CPhysicsCollision::GetBBoxCacheSize( unsigned *pCachedSize, intp *pCachedCount )
+bool CPhysicsCollision::GetBBoxCacheSize( size_t *pCachedSize, intp *pCachedCount )
 {
 	*pCachedSize = 0;
 	*pCachedCount = m_bboxCache.Count();

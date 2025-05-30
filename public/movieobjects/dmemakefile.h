@@ -104,13 +104,13 @@ public:
 
 	// Gets/sets paths associated with sources
 	void SetSourceFullPath( CDmeSource *pSource, const char *pFullPath );
-	void GetSourceFullPath( CDmeSource *pSource, char *pFullPath, int nBufLen );
+	void GetSourceFullPath( CDmeSource *pSource, char *pFullPath, intp nBufLen );
 
 	// Returns the output directory we expect to compile files into
-	bool GetOutputDirectory( char *pFullPath, int nBufLen );
+	bool GetOutputDirectory( char *pFullPath, intp nBufLen );
 
 	// Returns the output name (output directory + filename, no extension)
-	bool GetOutputName( char *pFullPath, int nBufLen );
+	bool GetOutputName( char *pFullPath, intp nBufLen );
 
 	// Call this to change the file the makefile is stored in
 	// Will make all sources be relative to this path
@@ -123,8 +123,8 @@ public:
 	void GetSources( CUtlVector< CDmeHandle<T> > &sources );
 
 	// Gets a list of all sources, regardless of type
-	int GetSourceCount();
-	CDmeSource *GetSource( int nIndex );
+	intp GetSourceCount();
+	CDmeSource *GetSource( intp nIndex );
 
 	virtual DmeMakefileType_t *GetMakefileType() { return NULL; }
 	virtual DmeMakefileType_t* GetSourceTypes() { Assert(0); return NULL; }
@@ -133,7 +133,7 @@ public:
 	virtual void GetOutputs( CUtlVector<CUtlString> & ) { Assert(0); }
 
 	// Converts the m_pDefaultDirectoryID field of the DmeMakefileType_t to a full path
-	bool GetDefaultDirectory( const char *pDefaultDirectoryID, char *pFullPath, int nBufLen );
+	bool GetDefaultDirectory( const char *pDefaultDirectoryID, char *pFullPath, intp nBufLen );
 
 	// These methods are used to help traverse a dependency graph.
 	// They work with information that is not saved.
@@ -155,7 +155,13 @@ protected:
 	void MakeOutputsWriteable( );
 
 	// Gets the path of the makefile
-	void GetMakefilePath( char *pFullPath, int nBufLen );
+	void GetMakefilePath( OUT_Z_CAP(nBufLen) char *pFullPath, intp nBufLen );
+    // dimhotepus: Bounds safe interface.	
+	template<intp pathSize>
+	void GetMakefilePath( OUT_Z_ARRAY char (&pFullPath)[pathSize] )
+	{
+		GetMakefilePath( pFullPath, pathSize );
+	}
 
 private:
 	// Inherited classes should re-implement these methods
@@ -166,10 +172,22 @@ private:
 
 private:
 	// Relative path to full path
-	void RelativePathToFullPath( const char *pRelativePath, char *pFullPath, int nBufLen );
+	void RelativePathToFullPath( const char *pRelativePath, OUT_Z_CAP(nBufLen) char *pFullPath, intp nBufLen );
+	// dimhotepus: Bounds safe interface.
+	template<intp pathSize>
+	void RelativePathToFullPath( const char *pRelativePath, OUT_Z_ARRAY char (&pFullPath)[pathSize] )
+	{
+		RelativePathToFullPath( pRelativePath, pFullPath, pathSize );
+	}
 
 	// Fullpath to relative path
-	void FullPathToRelativePath( const char *pFullPath, char *pRelativePath, int nBufLen );
+	void FullPathToRelativePath( const char *pFullPath, OUT_Z_CAP(nBufLen) char *pRelativePath, intp nBufLen );
+	// dimhotepus: Bounds safe interface.
+	template<intp pathSize>
+	void FullPathToRelativePath( const char *pFullPath, OUT_Z_ARRAY char (&pRelativePath)[pathSize] )
+	{
+		FullPathToRelativePath( pFullPath, pRelativePath, pathSize );
+	}
 
 	// Updates the source names to be relative to a particular path
 	bool UpdateSourceNames( const char *pOldRootDir, const char *pNewRootDir, bool bApplyChanges );

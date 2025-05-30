@@ -30,16 +30,16 @@ COptionsSubPortal::COptionsSubPortal(vgui::Panel *parent) : PropertyPage(parent,
 		"sv_player_funnel_into_portals" );
 
 	m_pPortalDepthCombo = new ComboBox( this, "PortalDepth", 6, false );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth0", new KeyValues("PortalDepth", "depth", 0) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth1", new KeyValues("PortalDepth", "depth", 1) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth2", new KeyValues("PortalDepth", "depth", 2) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth3", new KeyValues("PortalDepth", "depth", 3) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth4", new KeyValues("PortalDepth", "depth", 4) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth5", new KeyValues("PortalDepth", "depth", 5) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth6", new KeyValues("PortalDepth", "depth", 6) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth7", new KeyValues("PortalDepth", "depth", 7) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth8", new KeyValues("PortalDepth", "depth", 8) );
-	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth9", new KeyValues("PortalDepth", "depth", 9) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth0", KeyValuesAD( new KeyValues("PortalDepth", "depth", 0) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth1", KeyValuesAD( new KeyValues("PortalDepth", "depth", 1) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth2", KeyValuesAD( new KeyValues("PortalDepth", "depth", 2) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth3", KeyValuesAD( new KeyValues("PortalDepth", "depth", 3) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth4", KeyValuesAD( new KeyValues("PortalDepth", "depth", 4) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth5", KeyValuesAD( new KeyValues("PortalDepth", "depth", 5) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth6", KeyValuesAD( new KeyValues("PortalDepth", "depth", 6) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth7", KeyValuesAD( new KeyValues("PortalDepth", "depth", 7) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth8", KeyValuesAD( new KeyValues("PortalDepth", "depth", 8) ) );
+	m_pPortalDepthCombo->AddItem( "#GameUI_PortalDepth9", KeyValuesAD( new KeyValues("PortalDepth", "depth", 9) ) );
 
 	LoadControlSettings("Resource\\OptionsSubPortal.res");
 }

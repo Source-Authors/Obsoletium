@@ -7,11 +7,20 @@
 
 #include "MySqlDatabase.h"
 
+#include "winlite.h"
+
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 CMySqlDatabase::CMySqlDatabase()
 {
+	m_bRunThread.store(false, std::memory_order::memory_order_relaxed);
+	m_pcsThread   = new CRITICAL_SECTION;
+	m_pcsInQueue  = new CRITICAL_SECTION;
+	m_pcsOutQueue = new CRITICAL_SECTION;
+	m_pcsDBAccess = new CRITICAL_SECTION;
+
+	m_hEvent = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -21,21 +30,29 @@ CMySqlDatabase::CMySqlDatabase()
 CMySqlDatabase::~CMySqlDatabase()
 {
 	// flag the thread to stop
-	m_bRunThread = false;
+	m_bRunThread.store(false, std::memory_order::memory_order_acq_rel);
 
 	// pulse the thread to make it run
 	::SetEvent(m_hEvent);
 
 	// make sure it's done
-	::EnterCriticalSection(&m_csThread);
-	::LeaveCriticalSection(&m_csThread);
+	::EnterCriticalSection(m_pcsThread);
+	::LeaveCriticalSection(m_pcsThread);
+	
+	delete m_pcsDBAccess;
+	delete m_pcsOutQueue;
+	delete m_pcsInQueue;
+	delete m_pcsThread;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Thread access function
 //-----------------------------------------------------------------------------
-static DWORD WINAPI staticThreadFunc(void *param)
+static unsigned WINAPI staticThreadFunc(void *param)
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("MySQLQueryRunner");
+
 	((CMySqlDatabase *)param)->RunThread();
 	return 0;
 }
@@ -47,20 +64,19 @@ static DWORD WINAPI staticThreadFunc(void *param)
 bool CMySqlDatabase::Initialize()
 {
 	// prepare critical sections
-	//!! need to download SDK and replace these with InitializeCriticalSectionAndSpinCount() calls
-	::InitializeCriticalSection(&m_csThread);
-	::InitializeCriticalSection(&m_csInQueue);
-	::InitializeCriticalSection(&m_csOutQueue);
-	::InitializeCriticalSection(&m_csDBAccess);
+	// always succeeds since Windows Vista.
+	(void)::InitializeCriticalSectionAndSpinCount(m_pcsThread, 4000);
+	(void)::InitializeCriticalSectionAndSpinCount(m_pcsInQueue, 4000);
+	(void)::InitializeCriticalSectionAndSpinCount(m_pcsOutQueue, 4000);
+	(void)::InitializeCriticalSectionAndSpinCount(m_pcsDBAccess, 4000);
 
 	// initialize wait calls
 	m_hEvent = ::CreateEvent(NULL, false, true, NULL);
 
 	// start the DB-access thread
-	m_bRunThread = true;
+	m_bRunThread.store(true, std::memory_order::memory_order_acq_rel);
 
-	unsigned long threadID;
-	::CreateThread(NULL, 0, staticThreadFunc, this, 0, &threadID);
+	::_beginthreadex(NULL, 0, staticThreadFunc, this, 0, nullptr);
 
 	return true;
 }
@@ -70,34 +86,30 @@ bool CMySqlDatabase::Initialize()
 //-----------------------------------------------------------------------------
 void CMySqlDatabase::RunThread()
 {
-	::EnterCriticalSection(&m_csThread);
-	while (m_bRunThread)
+	::EnterCriticalSection(m_pcsThread);
+	while (m_bRunThread.load(std::memory_order_acq_rel))
 	{
 		if (m_InQueue.Count() > 0)
 		{
 			// get a dispatched DB request
-			::EnterCriticalSection(&m_csInQueue);
-
+			::EnterCriticalSection(m_pcsInQueue);
 			// pop the front of the queue
-			int headIndex = m_InQueue.Head();
+			auto headIndex = m_InQueue.Head();
 			msg_t msg = m_InQueue[headIndex];
 			m_InQueue.Remove(headIndex);
+			::LeaveCriticalSection(m_pcsInQueue);
 
-			::LeaveCriticalSection(&m_csInQueue);
-
-			::EnterCriticalSection(&m_csDBAccess);
-			
+			::EnterCriticalSection(m_pcsDBAccess);
 			// run sqldb command
 			msg.result = msg.cmd->RunCommand();
-
-			::LeaveCriticalSection(&m_csDBAccess);
+			::LeaveCriticalSection(m_pcsDBAccess);
 
 			if (msg.replyTarget)
 			{
 				// put the results in the outgoing queue
-				::EnterCriticalSection(&m_csOutQueue);
+				::EnterCriticalSection(m_pcsOutQueue);
 				m_OutQueue.AddToTail(msg);
-				::LeaveCriticalSection(&m_csOutQueue);
+				::LeaveCriticalSection(m_pcsOutQueue);
 
 				// wake up out queue
 				msg.replyTarget->WakeUp();
@@ -120,7 +132,7 @@ void CMySqlDatabase::RunThread()
 			::Sleep(2);
 		}
 	}
-	::LeaveCriticalSection(&m_csThread);
+	::LeaveCriticalSection(m_pcsThread);
 }
 
 //-----------------------------------------------------------------------------
@@ -128,13 +140,11 @@ void CMySqlDatabase::RunThread()
 //-----------------------------------------------------------------------------
 void CMySqlDatabase::AddCommandToQueue(ISQLDBCommand *cmd, ISQLDBReplyTarget *replyTarget, int returnState)
 {
-	::EnterCriticalSection(&m_csInQueue);
-
+	::EnterCriticalSection(m_pcsInQueue);
 	// add to the queue
 	msg_t msg = { cmd, replyTarget, 0, returnState };
 	m_InQueue.AddToTail(msg);
-
-	::LeaveCriticalSection(&m_csInQueue);
+	::LeaveCriticalSection(m_pcsInQueue);
 
 	// signal the thread to start running
 	::SetEvent(m_hEvent);
@@ -149,14 +159,12 @@ bool CMySqlDatabase::RunFrame()
 
 	while (m_OutQueue.Count() > 0)
 	{
-		::EnterCriticalSection(&m_csOutQueue);
-
+		::EnterCriticalSection(m_pcsOutQueue);
 		// pop the first item in the queue
-		int headIndex = m_OutQueue.Head();
+		auto headIndex = m_OutQueue.Head();
 		msg_t msg = m_OutQueue[headIndex];
 		m_OutQueue.Remove(headIndex);
-
-		::LeaveCriticalSection(&m_csOutQueue);
+		::LeaveCriticalSection(m_pcsOutQueue);
 
 		// run result
 		if (msg.replyTarget)

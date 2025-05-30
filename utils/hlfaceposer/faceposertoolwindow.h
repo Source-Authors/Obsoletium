@@ -12,7 +12,7 @@
 #endif
 
 #include <mxtk/mx.h>
-#include "mxtk/mxWindow.h"
+#include "mxtk/mxwindow.h"
 
 class CChoreoWidgetDrawHelper;
 

@@ -28,6 +28,8 @@ class SubProcessKernelObjects {
  public:
   BOOL IsValid() const;
   void Close();
+  // 4Mb for a piece
+  constexpr static unsigned Size() { return 4U * 1024 * 1024; }
 
  protected:
   HANDLE m_hMemorySection;

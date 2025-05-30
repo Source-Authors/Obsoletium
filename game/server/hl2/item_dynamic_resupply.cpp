@@ -460,7 +460,7 @@ void CItem_DynamicResupply::ComputeHealthRatios( CItem_DynamicResupply* pMaster,
 
 		pSpawnInfo[i].m_flDesiredRatio = pMaster->m_flDesiredHealth[i] * sk_dynamic_resupply_modifier.GetFloat();
 		pSpawnInfo[i].m_flDelta = pSpawnInfo[i].m_flDesiredRatio - pSpawnInfo[i].m_flCurrentRatio;
-		pSpawnInfo[i].m_flDelta = clamp( pSpawnInfo[i].m_flDelta, 0, 1 );
+		pSpawnInfo[i].m_flDelta = clamp( pSpawnInfo[i].m_flDelta, 0.f, 1.f );
 	}
 
 	if ( iDebug )
@@ -502,7 +502,7 @@ void CItem_DynamicResupply::ComputeAmmoRatios( CItem_DynamicResupply* pMaster, C
 		// Use the master if we're supposed to
 		pSpawnInfo[i].m_flDesiredRatio = pMaster->m_flDesiredAmmo[i] * sk_dynamic_resupply_modifier.GetFloat();
 		pSpawnInfo[i].m_flDelta = pSpawnInfo[i].m_flDesiredRatio - pSpawnInfo[i].m_flCurrentRatio;
-		pSpawnInfo[i].m_flDelta = clamp( pSpawnInfo[i].m_flDelta, 0, 1 );
+		pSpawnInfo[i].m_flDelta = clamp( pSpawnInfo[i].m_flDelta, 0.f, 1.f );
 	}
 
 	if ( iDebug )

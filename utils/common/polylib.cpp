@@ -17,18 +17,11 @@
 // doesn't seem to need to be here? -- in threads.h
 //extern int numthreads;
 
-// counters are only bumped when running single threaded,
-// because they are an awefull coherence problem
-int	c_active_windings;
-int	c_peak_windings;
-int	c_winding_allocs;
-int	c_winding_points;
-
 void pw(winding_t *w)
 {
 	int		i;
 	for (i=0 ; i<w->numpoints ; i++)
-		printf ("(%5.1f, %5.1f, %5.1f)\n",w->p[i][0], w->p[i][1],w->p[i][2]);
+		qprintf ("(%5.1f, %5.1f, %5.1f)\n",w->p[i][0], w->p[i][1],w->p[i][2]);
 }
 
 winding_t *winding_pool[MAX_POINTS_ON_WINDING+4];
@@ -41,27 +34,28 @@ AllocWinding
 winding_t *AllocWinding (int points)
 {
 	winding_t	*w;
+	{
+		bool need_new = true;
 
-	if (numthreads == 1)
-	{
-		c_winding_allocs++;
-		c_winding_points += points;
-		c_active_windings++;
-		if (c_active_windings > c_peak_windings)
-			c_peak_windings = c_active_windings;
+		{
+			ScopedThreadsLock lock;
+			// Assign from pool to w.
+			if ((w = winding_pool[points]))
+			{
+				winding_pool[points] = w->next;
+
+				need_new = false;
+			}
+		}
+
+		if (need_new)
+		{
+			w = (winding_t *)malloc( sizeof(*w) );
+			if (!w) return nullptr;
+
+			w->p = (Vector *)calloc( points, sizeof(Vector) );
+		}
 	}
-	ThreadLock();
-	if (winding_pool[points])
-	{
-		w = winding_pool[points];
-		winding_pool[points] = w->next;
-	}
-	else
-	{
-		w = (winding_t *)malloc(sizeof(*w));
-		w->p = (Vector *)calloc( points, sizeof(Vector) );
-	}
-	ThreadUnlock();
 	w->numpoints = 0; // None are occupied yet even though allocated.
 	w->maxpoints = points;
 	w->next = NULL;
@@ -73,11 +67,10 @@ void FreeWinding (winding_t *w)
 	if (w->numpoints == 0xdeaddead)
 		Error ("FreeWinding: freed a freed winding");
 	
-	ThreadLock();
+	ScopedThreadsLock lock;
 	w->numpoints = 0xdeaddead; // flag as freed
 	w->next = winding_pool[w->maxpoints];
 	winding_pool[w->maxpoints] = w;
-	ThreadUnlock();
 }
 
 /*
@@ -85,8 +78,6 @@ void FreeWinding (winding_t *w)
 RemoveColinearPoints
 ============
 */
-int	c_removed;
-
 void RemoveColinearPoints (winding_t *w)
 {
 	int		i, j, k;
@@ -113,8 +104,6 @@ void RemoveColinearPoints (winding_t *w)
 	if (nump == w->numpoints)
 		return;
 
-	if (numthreads == 1)
-		c_removed += w->numpoints - nump;
 	w->numpoints = nump;
 	memcpy (w->p, p, nump*sizeof(p[0]));
 }
@@ -165,7 +154,7 @@ vec_t WindingArea(winding_t *w)
 		CrossProduct (d1, d2, cross);
 		total += VectorLength ( cross );
 	}
-	return total * 0.5;
+	return total * 0.5f;
 }
 
 void WindingBounds (winding_t *w, Vector &mins, Vector &maxs)
@@ -203,7 +192,7 @@ void WindingCenter (winding_t *w, Vector &center)
 	for (i=0 ; i<w->numpoints ; i++)
 		VectorAdd (w->p[i], center, center);
 
-	scale = 1.0/w->numpoints;
+	scale = 1.0f/w->numpoints;
 	VectorScale (center, scale, center);
 }
 
@@ -234,15 +223,15 @@ vec_t WindingAreaAndBalancePoint( winding_t *w, Vector &center )
 		total += area;
 
 		// center of triangle, weighed by area
-		VectorMA( center, area / 3.0, w->p[i-1], center );
-		VectorMA( center, area / 3.0, w->p[i], center );
-		VectorMA( center, area / 3.0, w->p[0], center );
+		VectorMA( center, area / 3.0f, w->p[i-1], center );
+		VectorMA( center, area / 3.0f, w->p[i], center );
+		VectorMA( center, area / 3.0f, w->p[0], center );
 	}
 	if (total)
 	{
-		VectorScale( center, 1.0 / total, center );
+		VectorScale( center, 1.0f / total, center );
 	}
-	return total * 0.5;
+	return total * 0.5f;
 }
 
 /*
@@ -323,12 +312,10 @@ CopyWinding
 */
 winding_t *CopyWinding (winding_t *w)
 {
-	int			size;
-	winding_t	*c;
-
-	c = AllocWinding (w->numpoints);
+	winding_t	*c = AllocWinding (w->numpoints);
 	c->numpoints = w->numpoints;
-	size = w->numpoints*sizeof(w->p[0]);
+
+	size_t size = w->numpoints*sizeof(w->p[0]);
 	memcpy (c->p, w->p, size);
 	return c;
 }
@@ -353,8 +340,9 @@ winding_t *ReverseWinding (winding_t *w)
 }
 
 
+// dimhotepus: Reenable optimizer.
 // BUGBUG: Hunt this down - it's causing CSG errors
-#pragma optimize("g", off)
+// #pragma optimize("g", off)
 /*
 =============
 ClipWindingEpsilon
@@ -365,7 +353,7 @@ void ClipWindingEpsilon (winding_t *in, const Vector &normal, vec_t dist,
 				vec_t epsilon, winding_t **front, winding_t **back)
 {
 	vec_t	dists[MAX_POINTS_ON_WINDING+4];
-	int		sides[MAX_POINTS_ON_WINDING+4];
+	SideType	sides[MAX_POINTS_ON_WINDING+4];
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;
@@ -373,6 +361,8 @@ void ClipWindingEpsilon (winding_t *in, const Vector &normal, vec_t dist,
 	winding_t	*f, *b;
 	int		maxpts;
 	
+	dists[0] = 0;
+	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 
 // determine sides for each point
@@ -465,7 +455,9 @@ void ClipWindingEpsilon (winding_t *in, const Vector &normal, vec_t dist,
 	if (f->numpoints > MAX_POINTS_ON_WINDING || b->numpoints > MAX_POINTS_ON_WINDING)
 		Error ("ClipWinding: MAX_POINTS_ON_WINDING");
 }
-#pragma optimize("", on)
+
+// dimhotepus: Reenable optimizer.
+// #pragma optimize("", on)
 
 
 // NOTE: This is identical to ClipWindingEpsilon, but it does a pre/post translation to improve precision
@@ -521,6 +513,8 @@ void ClassifyWindingEpsilon( winding_t *in, const Vector &normal, vec_t dist,
 	winding_t	*f, *b;
 	int		maxpts;
 	
+	dists[0] = 0;
+	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 
 // determine sides for each point
@@ -638,6 +632,9 @@ void ChopWindingInPlace (winding_t **inout, const Vector &normal, vec_t dist, ve
 	int		maxpts;
 
 	in = *inout;
+
+	dists[0] = 0;
+	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 // determine sides for each point
 	for (i=0 ; i<in->numpoints ; i++)
@@ -814,17 +811,12 @@ void CheckWinding (winding_t *w)
 WindingOnPlaneSide
 ============
 */
-int WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist)
+SideType WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist)
 {
-	qboolean	front, back;
-	int			i;
-	vec_t		d;
-
-	front = false;
-	back = false;
-	for (i=0 ; i<w->numpoints ; i++)
+	bool front = false, back = false;
+	for (int i=0 ; i<w->numpoints ; i++)
 	{
-		d = DotProduct (w->p[i], normal) - dist;
+		vec_t d = DotProduct (w->p[i], normal) - dist;
 		if (d < -ON_EPSILON)
 		{
 			if (front)

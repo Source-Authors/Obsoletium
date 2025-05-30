@@ -11,12 +11,13 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxFileDialog.h"
-#include "mxtk/mxWindow.h"
+#include "mxtk/mxfiledialog.h"
+#include "mxtk/mxwindow.h"
 #include <windows.h>
 #include <commdlg.h>
 #include <string.h>
 
+#include "tier1/strtools.h"
 
 
 static char sd_path[_MAX_PATH] = "";
@@ -28,21 +29,21 @@ mxGetOpenFileName (mxWindow *parent, const char *path, const char *filter)
 {
 	CHAR szPath[_MAX_PATH], szFilter[_MAX_PATH];
 
-	strcpy (sd_path, "");
+	sd_path[0] = '\0';
 
 	if (path)
-		strcpy (szPath, path);
+		V_strcpy_safe (szPath, path);
 	else
-		strcpy (szPath, "");
+		szPath[0] = '\0';
 
 	if (filter)
 	{
 		memset (szFilter, 0, _MAX_PATH);
-		strcpy (szFilter, filter);
+		V_strcpy_safe (szFilter, filter);
 		strcpy (szFilter + strlen (szFilter) + 1, filter);
 	}
 	else
-		strcpy (szFilter, "");
+		szFilter[0] = '\0';
 
 
 	OPENFILENAME ofn;
@@ -72,21 +73,21 @@ mxGetSaveFileName (mxWindow *parent, const char *path, const char *filter)
 {
 	CHAR szPath[_MAX_PATH], szFilter[_MAX_PATH];
 
-	strcpy (sd_path, "");
+	sd_path[0] = '\0';
 
 	if (path)
-		strcpy (szPath, path);
+		V_strcpy_safe (szPath, path);
 	else
-		strcpy (szPath, "");
+        szPath[0] = '\0';
 
 	if (filter)
 	{
 		memset (szFilter, 0, _MAX_PATH);
-		strcpy (szFilter, filter);
+		V_strcpy_safe (szFilter, filter);
 		strcpy (szFilter + strlen (szFilter) + 1, filter);
 	}
 	else
-		strcpy (szFilter, "");
+		szFilter[0] = '\0';
 
 	OPENFILENAME ofn;
 	memset (&ofn, 0, sizeof (ofn));

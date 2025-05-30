@@ -49,7 +49,7 @@ SendProp SendPropUtlVector(
 	EnsureCapacityFn ensureFn,
 
 	int nMaxElements,			// Max # of elements in the array. Keep this as low as possible.
-	SendProp pArrayProp,		// Describe the data inside of each element in the array.
+	const SendProp& pArrayProp,		// Describe the data inside of each element in the array.
 	SendTableProxyFn varProxy=SendProxy_DataTableToDataTable	// This can be overridden to control who the array is sent to.
 	);
 

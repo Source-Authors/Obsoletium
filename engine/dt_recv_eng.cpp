@@ -396,7 +396,7 @@ static void CopySendPropsToRecvProps(
 		const SendProp *pSendProp = sendProps[iSendProp];
 		MatchingProp_t search;
 		search.m_pProp = (SendProp *)pSendProp;
-		int idx = lookup.Find( search );
+		auto idx = lookup.Find( search );
 		if ( idx == lookup.InvalidIndex() )
 		{
 			recvProps[iSendProp] = 0;

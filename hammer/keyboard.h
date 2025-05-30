@@ -237,8 +237,8 @@ class CKeyboard
 {
 	public:
 			
-		CKeyboard(void);
-		~CKeyboard(void);
+		CKeyboard();
+		~CKeyboard() = default;
 
 		void AddKeyMap(unsigned int uChar, unsigned int uModifierKeys, unsigned int uLogicalKey);
 		void ClearImpulseFlags(void);

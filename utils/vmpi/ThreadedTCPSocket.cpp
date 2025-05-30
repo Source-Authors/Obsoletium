@@ -158,7 +158,7 @@ private:
 		m_bWaitingForSendCompletion = false;
 		m_nBytesToReceive = -1;
 		m_bWaitingForSize = false;
-		m_bErrorSignal = false;
+		m_bErrorSignal.store(false, std::memory_order::memory_order_relaxed);
 		m_pRecvBuffer = NULL;
 	}
 
@@ -199,9 +199,6 @@ private:
 			SetThreadPriority( m_hRecvThread, THREAD_PRIORITY_LOWEST );
 		}
 		
-		ThreadSetDebugName( (ThreadId_t)dwSendThreadID, "TCPSend" );
-		ThreadSetDebugName( (ThreadId_t)dwRecvThreadID, "TCPRecv" );
-
 		// Make sure to init the handler before the threads actually run, so it isn't handed data before initializing.
 		m_pHandler->Init( this );
 
@@ -368,7 +365,7 @@ private:
 
 		// Send it off!
 		SendData_t *pSendData = m_SendDatas[ m_SendDatas.Head() ];
-		WSABUF buf = { pSendData->m_Len, pSendData->m_Payload };
+		WSABUF buf = { static_cast<ULONG>(pSendData->m_Len), pSendData->m_Payload };
 
 		m_nBytesToTransfer = pSendData->m_Len;
 		m_bWaitingForSendCompletion = true;
@@ -378,7 +375,7 @@ private:
 		DWORD dwNumBytesSent = 0;
 		DWORD ret = WSASend( m_Socket, &buf, 1, &dwNumBytesSent, 0, &m_SendOverlapped, NULL );
 		DWORD err = WSAGetLastError();
-		if ( ret == 0 || ( ret == SOCKET_ERROR && err == WSA_IO_PENDING ) )
+		if ( ret == 0 || ( ret == static_cast<DWORD>(SOCKET_ERROR) && err == WSA_IO_PENDING ) )
 		{
 			// Either way, the operation completed successfully, and m_hSendCompletionEvent is now set.
 			return true;
@@ -463,6 +460,9 @@ private:
 
 	static DWORD WINAPI StaticSendThreadFn( LPVOID pParameter )
 	{
+		// dimhotepus: Add thread name to aid debugging.
+		ThreadSetDebugName("TcpSender");
+
 		return ((CThreadedTCPSocket*)pParameter)->SendThreadFn();
 	}
 
@@ -562,7 +562,7 @@ private:
 
 	bool RecvThread_InternalRecv( void *pDest, int destSize, bool bContinuation, bool bWaitingForSize = false )
 	{
-		WSABUF buf = { destSize, (char*)pDest };
+		WSABUF buf = { static_cast<ULONG>(destSize), (char*)pDest };
 
 		if ( !bContinuation )
 		{
@@ -576,7 +576,7 @@ private:
 		DWORD nBytesReceived = 0;
 		DWORD ret = WSARecv( m_Socket, &buf, 1, &nBytesReceived, &dwFlags, &m_RecvOverlapped, NULL );
 		DWORD dwLastError = WSAGetLastError();
-		if ( ret == 0 || ( ret == SOCKET_ERROR && dwLastError == WSA_IO_PENDING ) )
+		if ( ret == 0 || ( ret == static_cast<DWORD>(SOCKET_ERROR) && dwLastError == WSA_IO_PENDING ) )
 		{
 			// Note: m_hRecvEvent is in a signaled state, so the RecvThread will pick up the results next time around.
 			return true;
@@ -653,6 +653,9 @@ private:
 
 	static DWORD WINAPI StaticRecvThreadFn( LPVOID pParameter )
 	{
+		// dimhotepus: Add thread name to aid debugging.
+		ThreadSetDebugName("TcpReceiver");
+
 		return ((CThreadedTCPSocket*)pParameter)->RecvThreadFn();
 	}
 
@@ -664,7 +667,7 @@ private:
 	// This checks to see if either thread has signaled an error. If so, it shuts down the socket and returns true.
 	bool CheckErrorSignal() const
 	{
-		return m_bErrorSignal;
+		return m_bErrorSignal.load(std::memory_order_seq_cst);
 	}
 
 	// This is called from any of the threads and signals that something went awry. It shuts down the object
@@ -686,7 +689,7 @@ private:
 		m_hExitThreadsEvent.SetEvent();
 		
 		// Notify the main thread so it can call Term() when it gets a chance.
-		m_bErrorSignal = true;
+		m_bErrorSignal.store(true, std::memory_order::memory_order_acq_rel);
 	}
 
 
@@ -725,8 +728,8 @@ private:
 		CTCPPacket *m_pRecvBuffer;		// This is allocated for each packet we're receiving and given to the
 										// app when the packet is done being received.
 
-	
-	volatile bool m_bErrorSignal;
+	// dimhotepus: volatile bool -> atomic_bool
+	std::atomic_bool m_bErrorSignal;
 
 	
 	CEvent m_hExitThreadsEvent;
@@ -782,7 +785,7 @@ public:
 			listen( pRet->m_Socket, nQueueLength == -1 ? SOMAXCONN : nQueueLength ) != 0 )
 		{
 			pRet->Release();
-			return false;
+			return nullptr;
 		}
 
 		pRet->m_pHandler = pHandlerCreator;
@@ -808,7 +811,7 @@ public:
 		fd_set readSet = {};
 		readSet.fd_count = 1;
 		readSet.fd_array[0] = m_Socket;
-		TIMEVAL timeVal = {0, milliseconds*1000};
+		TIMEVAL timeVal = {0, static_cast<long>(min(LONG_MAX, milliseconds*1000))};
 
 		// Wait until it connects.
 		int status = select( 0, &readSet, NULL, NULL, &timeVal );
@@ -970,7 +973,7 @@ public:
 		// Ok, see if we're connected now.
 		if ( !m_bConnected )
 		{
-			TIMEVAL timeVal = { 0, milliseconds*1000 };
+			TIMEVAL timeVal = { 0, static_cast<long>(min(LONG_MAX, milliseconds*1000)) };
 			
 			fd_set writeSet = {};
 			writeSet.fd_count = 1;

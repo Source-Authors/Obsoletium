@@ -27,7 +27,7 @@ typedef DmeTime_t (*TimeAccessor_t)();
 //-----------------------------------------------------------------------------
 class CChannelGraphPanel : public Panel
 {
-	DECLARE_CLASS_SIMPLE( CChannelGraphPanel, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CChannelGraphPanel, Panel );
 
 public:
 	CChannelGraphPanel( Panel *parent, const char *name );
@@ -35,16 +35,16 @@ public:
 	void SetChannel( CDmeChannel *pChannel );
 
 	// input messages
-	virtual void OnCursorMoved( int mx, int my );
-	virtual void OnMousePressed( MouseCode code );
-	virtual void OnMouseReleased( MouseCode code );
-	virtual void OnMouseWheeled( int delta );
-	virtual void OnSizeChanged( int newWide, int newTall );	// called after the size of a panel has been changed
+	void OnCursorMoved( int mx, int my ) override;
+	void OnMousePressed( MouseCode code ) override;
+	void OnMouseReleased( MouseCode code ) override;
+	void OnMouseWheeled( int delta ) override;
+	void OnSizeChanged( int newWide, int newTall ) override;	// called after the size of a panel has been changed
 
 protected:
-	virtual void Paint();
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings( IScheme *pScheme );
+	void Paint() override;
+	void PerformLayout() override;
+	void ApplySchemeSettings( IScheme *pScheme ) override;
 
 	int TimeToPixel( DmeTime_t time );
 	int ValueToPixel( float flValue );
@@ -52,7 +52,8 @@ protected:
 private:
 	CDmeHandle< CDmeChannel > m_hChannel;
 	HFont m_font;
-	TimeAccessor_t m_timeFunc;
+	// dimhotepus: Comment unused field.
+	// TimeAccessor_t m_timeFunc;
 	DmeTime_t m_graphMinTime, m_graphMaxTime;
 	float m_graphMinValue, m_graphMaxValue;
 	int m_nMouseStartX, m_nMouseStartY;
@@ -70,15 +71,15 @@ private:
 //-----------------------------------------------------------------------------
 class CChannelGraphFrame : public Frame
 {
-	DECLARE_CLASS_SIMPLE( CChannelGraphFrame, Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CChannelGraphFrame, Frame );
 
 public:
 	CChannelGraphFrame( Panel *parent, const char *pTitle );
 
 	void SetChannel( CDmeChannel *pChannel );
 
-	virtual void OnCommand( const char *cmd );
-	virtual void PerformLayout();
+	void OnCommand( const char *cmd ) override;
+	void PerformLayout() override;
 
 protected:
 	CChannelGraphPanel *m_pChannelGraph;

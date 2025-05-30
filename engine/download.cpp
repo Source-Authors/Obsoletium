@@ -82,8 +82,8 @@ public:
 private:
 	KeyValues *m_cache;
 
-	void GetCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] );
-	void GenerateCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] );
+	void GetCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] );
+	void GenerateCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] );
 
 	void BuildKeyNames( const char *gamePath );			///< Convenience function to build the keys to index into m_cache
 	char m_cachefileKey[BufferSize + 64];
@@ -95,6 +95,8 @@ static DownloadCache *TheDownloadCache = NULL;
 DownloadCache::DownloadCache()
 {
 	m_cache = NULL;
+	memset(m_cachefileKey, 0, sizeof(m_cachefileKey));
+	memset(m_timestampKey, 0, sizeof(m_timestampKey));
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -132,7 +134,12 @@ void DownloadCache::Init()
 	}
 
 	m_cache = new KeyValues( "DownloadCache" );
-	m_cache->LoadFromFile( g_pFileSystem, CacheFilename, NULL );
+	if ( !m_cache->LoadFromFile( g_pFileSystem, CacheFilename, NULL ) )
+	{
+		// dimhotepus: Note missed download cache.
+		Msg( "There is no or broken download cache '%s' yet.\n", CacheFilename );
+	}
+
 	g_pFileSystem->CreateDirHierarchy( CacheDirectory, "DEFAULT_WRITE_PATH" );
 }
 
@@ -166,7 +173,7 @@ void DownloadCache::GetCachedData( RequestContext_t *rc )
 	{
 		BuildKeyNames( rc->gamePath );
 		rc->nBytesCached = size;
-		strncpy( rc->cachedTimestamp, m_cache->GetString( m_timestampKey, "" ), BufferSize );
+		V_strcpy_safe( rc->cachedTimestamp, m_cache->GetString( m_timestampKey, "" ) );
 	}
 }
 
@@ -189,7 +196,7 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 
 	// open the file for writing
 	char fullSrcPath[MAX_PATH];
-	Q_MakeAbsolutePath( fullSrcPath, sizeof( fullSrcPath ), srcFilename, com_gamedir );
+	V_MakeAbsolutePath( fullSrcPath, srcFilename, com_gamedir );
 
 	if ( !g_pFileSystem->FileExists( fullSrcPath ) )
 	{
@@ -218,14 +225,14 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 	}
 
 	// And decompress!
-	const int OutBufSize = 65536;
+	constexpr int OutBufSize = 65536;
 	char    buf[ OutBufSize ];
 	BZFILE *bzfp = BZ2_bzopen( fullSrcPath, "rb" );
 	int totalBytes = 0;
 
 	bool bMapFile = false;
 	char szOutFilenameBase[MAX_PATH];
-	Q_FileBase( outFilename, szOutFilenameBase, sizeof( szOutFilenameBase ) );
+	Q_FileBase( outFilename, szOutFilenameBase );
 	const char *pszMapName = cl.m_szLevelBaseName;
 	if ( pszMapName && pszMapName[0] )
 	{
@@ -288,11 +295,11 @@ void DownloadCache::PersistToDisk( const RequestContext_t *rc )
 		char absPath[MAX_PATH];
 		if ( rc->bIsBZ2 )
 		{
-			Q_StripExtension( rc->absLocalPath, absPath, sizeof( absPath ) );
+			Q_StripExtension( rc->absLocalPath, absPath );
 		}
 		else
 		{
-			Q_strncpy( absPath, rc->absLocalPath, sizeof( absPath ) );
+			V_strcpy_safe( absPath, rc->absLocalPath );
 		}
 
 		if ( !g_pFileSystem->FileExists( absPath ) )
@@ -366,27 +373,25 @@ void DownloadCache::PersistToCache( const RequestContext_t *rc )
 }
 
 //--------------------------------------------------------------------------------------------------------------
-void DownloadCache::GetCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] )
+void DownloadCache::GetCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] )
 {
 	BuildKeyNames( rc->gamePath );
 	const char *path = m_cache->GetString( m_cachefileKey, NULL );
 	if ( !path || strncmp( path, CacheDirectory, strlen(CacheDirectory) ) )
 	{
-		cachePath[0] = 0;
+		cachePath[0] = '\0';
 		return;
 	}
-	strncpy( cachePath, path, _MAX_PATH );
-	cachePath[_MAX_PATH-1] = 0;
+	V_strcpy_safe( cachePath, path );
 }
 
 //--------------------------------------------------------------------------------------------------------------
-void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char cachePath[_MAX_PATH] )
+void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char (&cachePath)[_MAX_PATH] )
 {
 	GetCacheFilename( rc, cachePath );
 	BuildKeyNames( rc->gamePath );
 
 	m_cache->SetString( m_timestampKey, rc->cachedTimestamp );
-	//ConDColorMsg( DownloadColor,"DownloadCache::GenerateCacheFilename() set %s = %s\n", m_timestampKey, rc->cachedTimestamp );
 
 	if ( !*cachePath )
 	{
@@ -399,17 +404,15 @@ void DownloadCache::GenerateCacheFilename( const RequestContext_t *rc, char cach
 		}
 		for( int i=0; i<1000; ++i )
 		{
-			Q_snprintf( cachePath, _MAX_PATH, "%s/%s%4.4d", CacheDirectory, gameFilename, i );
+			V_sprintf_safe( cachePath, "%s/%s%4.4d", CacheDirectory, gameFilename, i );
 			if ( !g_pFileSystem->FileExists( cachePath ) )
 			{
 				m_cache->SetString( m_cachefileKey, cachePath );
-				//ConDColorMsg( DownloadColor,"DownloadCache::GenerateCacheFilename() set %s = %s\n", m_cachefileKey, cachePath );
 				return;
 			}
 		}
 		// all 1000 were invalid?!?
-		Q_snprintf( cachePath, _MAX_PATH, "%s/overflow", CacheDirectory );
-		//ConDColorMsg( DownloadColor,"DownloadCache::GenerateCacheFilename() set %s = %s\n", m_cachefileKey, cachePath );
+		V_sprintf_safe( cachePath, "%s/overflow", CacheDirectory );
 		m_cache->SetString( m_cachefileKey, cachePath );
 	}
 }
@@ -466,8 +469,6 @@ protected:
 	int m_lastPercent;					///< last percent value the progress bar was updated with (to avoid spamming it)
 	int m_totalRequests;				///< Total number of requests (used to set the top progress bar)
 
-	int m_RequestIDCounter;				///< global increasing request ID counter
-
 	typedef CUtlVector< char * > StrVector;
 	StrVector m_downloadedMaps;			///< List of maps for which we have already tried to download assets.
 };
@@ -504,12 +505,12 @@ RequestContext_t *CDownloadManager::NewRequestContext()
 //--------------------------------------------------------------------------------------------------------------
 void CDownloadManager::SetupURLPath( RequestContext_t *pRequestContext, const char *pURLPath )
 {
-	V_strcpy( pRequestContext->urlPath, pRequestContext->gamePath );
+	V_strcpy_safe( pRequestContext->urlPath, pRequestContext->gamePath );
 }
 //--------------------------------------------------------------------------------------------------------------
 void CDownloadManager::SetupServerURL( RequestContext_t *pRequestContext )
 {
-	Q_strncpy( pRequestContext->serverURL, cl.m_NetChannel->GetRemoteAddress().ToString(), BufferSize );
+	V_strcpy_safe( pRequestContext->serverURL, cl.m_NetChannel->GetRemoteAddress().ToString() );
 }
 //--------------------------------------------------------------------------------------------------------------
 bool CDownloadManager::HasMapBeenDownloadedFromServer( const char *serverMapName )
@@ -617,7 +618,7 @@ void CDownloadManager::QueueInternal( const char *pBaseURL, const char *pURLPath
 
 	// Setup base path.  We put it in the "download" search path, if they have set one
 	char szBasePath[ MAX_PATH ];
-	if ( g_pFileSystem->GetSearchPath( k_szDownloadPathID, false, szBasePath, sizeof(szBasePath) ) > 0 )
+	if ( g_pFileSystem->GetSearchPath_safe( k_szDownloadPathID, false, szBasePath ) > 0 )
 	{
 		char *split = V_strstr( szBasePath, ";" );
 		if ( split != NULL )
@@ -648,7 +649,7 @@ void CDownloadManager::QueueInternal( const char *pBaseURL, const char *pURLPath
 	// Now set the full absolute path.  Why does the file system not provide a convenient method to
 	// do stuff like this?
 	V_strcpy_safe( rc->absLocalPath, szBasePath );
-	V_AppendSlash( rc->absLocalPath, sizeof(rc->absLocalPath) );
+	V_AppendSlash( rc->absLocalPath );
 	V_strcat_safe( rc->absLocalPath, szGamePathLower );
 	V_FixSlashes( rc->absLocalPath );
 
@@ -748,11 +749,8 @@ void CDownloadManager::Reset()
 	}
 	m_queuedRequests.RemoveAll();
 
-	if ( TheDownloadCache )
-	{
-		delete TheDownloadCache;
-		TheDownloadCache = NULL;
-	}
+	delete TheDownloadCache;
+	TheDownloadCache = NULL;
 
 	m_lastPercent = 0;
 	m_totalRequests = 0;
@@ -969,7 +967,7 @@ void CDownloadManager::UpdateProgressBar()
 	}
 
 #ifndef DEDICATED
-	_snwprintf( filenameBuf, 256, L"Downloading %hs", m_activeRequest->gamePath );
+	V_swprintf_safe( filenameBuf, L"Downloading %hs", m_activeRequest->gamePath );
 	EngineVGui()->UpdateCustomProgressBar( progress, filenameBuf );
 #endif
 }

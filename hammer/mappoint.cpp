@@ -36,7 +36,7 @@ void CMapPoint::GetOrigin(Vector &Origin)
 //-----------------------------------------------------------------------------
 // Purpose: Sets this point's X, Y, Z coordinates.
 //-----------------------------------------------------------------------------
-void CMapPoint::SetOrigin(Vector &Origin)
+void CMapPoint::SetOrigin(const Vector &Origin)
 {
 	m_Origin = Origin;
 }

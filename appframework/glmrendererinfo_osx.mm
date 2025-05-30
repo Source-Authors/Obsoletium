@@ -930,11 +930,11 @@ void	GLMDisplayDB::PopulateRenderers( void )
 						{
 							int length = CFDataGetLength(model);
 							char *data = (char*)CFDataGetBytePtr(model);
-							Q_strncpy( fields.m_pciModelString, data, sizeof(fields.m_pciModelString) );
+							V_strcpy_safe( fields.m_pciModelString, data );
 						}
 						else
 						{
-							Q_strncpy( fields.m_pciModelString, "UnknownModel", sizeof(fields.m_pciModelString) );
+							V_strcpy_safe( fields.m_pciModelString, "UnknownModel" );
 						}
 						
 
@@ -1002,7 +1002,7 @@ void	GLMDisplayDB::PopulateRenderers( void )
 															{
 																const char* theString = [ this_driverInfo UTF8String ];
 																
-																strncpy(fields.m_driverInfoString, theString, sizeof( fields.m_driverInfoString )  );
+																V_strcpy_safe(fields.m_driverInfoString, theString );
 															}												
 														}
 														

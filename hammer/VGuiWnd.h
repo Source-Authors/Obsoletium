@@ -1,7 +1,9 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 #pragma once
-#include "afxwin.h"
+
+#include <afxwin.h>
 #include "color.h"
+#include "windows/base_wnd.h"
 
 namespace vgui
 {
@@ -33,7 +35,7 @@ public:
 	
 protected:
 	void DrawVGuiPanel();  // overridden to draw this view
-	long WindowProcVGui( UINT message, WPARAM wParam, LPARAM lParam ); //
+	LRESULT WindowProcVGui( UINT message, WPARAM wParam, LPARAM lParam ); //
 	
 	vgui::EditablePanel	*m_pMainPanel;
 	CWnd		*m_pParentWnd;
@@ -43,7 +45,7 @@ protected:
 	bool		m_bClearZBuffer;
 };
 
-class CVGuiPanelWnd: public CWnd, public CVGuiWnd
+class CVGuiPanelWnd: public CBaseWnd, public CVGuiWnd
 {
 protected:
 	DECLARE_DYNCREATE(CVGuiPanelWnd)

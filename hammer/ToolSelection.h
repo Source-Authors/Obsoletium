@@ -122,7 +122,7 @@ protected:
 	bool HitTestLogical( CMapView *pView, const Vector2D &ptClient );
 	void SelectInLogicalBox(CMapDoc *pDoc, bool bInsideOnly);
 
-	CSelection	*m_pSelection;	// the documents selection opject
+	class CSelection	*m_pSelection;	// the documents selection opject
 	
 	bool m_bEyedropper;			// True if we are holding down the eyedropper hotkey.
 

@@ -6,18 +6,17 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "AngleBox.h"
+#include "hammer.h"
 #include "hammer_mathlib.h"
 #include "CustomMessages.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning(disable: 4244)
 
 
-BEGIN_MESSAGE_MAP(CAngleBox, CWnd)
+BEGIN_MESSAGE_MAP(CAngleBox, CBaseWnd)
 	//{{AFX_MSG_MAP(CAngleBox)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONUP()
@@ -32,8 +31,9 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CAngleBox::CAngleBox(void)
 {
-	m_vecAngles.Init();
+	m_bDifferent = false;
 	m_bDragging = false;
+	m_vecAngles.Init();
 	m_pEdit = NULL;
 }
 
@@ -73,7 +73,7 @@ void CAngleBox::OnMouseMove(UINT nFlags, CPoint point)
 		DrawAngleLine(&m_DragDC);
 	}
 
-	CWnd::OnMouseMove(nFlags, point);
+	__super::OnMouseMove(nFlags, point);
 }
 
 
@@ -100,7 +100,7 @@ void CAngleBox::OnLButtonUp(UINT nFlags, CPoint point)
 		GetParent()->PostMessage(ABN_CHANGED, GetDlgCtrlID(), 0);
 	}
 		
-	CWnd::OnLButtonUp(nFlags, point);
+	__super::OnLButtonUp(nFlags, point);
 }
 
 
@@ -118,7 +118,7 @@ void CAngleBox::OnLButtonDown(UINT nFlags, CPoint point)
 	m_bDragging = true;
 	SetCapture();
 
-	CWnd::OnLButtonDown(nFlags, point);
+	__super::OnLButtonDown(nFlags, point);
 
 	OnMouseMove(0, point);
 }
@@ -143,11 +143,14 @@ void CAngleBox::DrawAngleLine(CDC *pDC)
 	GetClientRect(r);
 	m_ptClientCenter = r.CenterPoint();
 
-	double rad = r.Width() / 2 - 3;
+	float rad = r.Width() / 2 - 3;
+
+	float fSin, fCos;
+	DirectX::XMScalarSinCos(&fSin, &fCos, DEG2RAD(m_vecAngles[YAW] + 90));
 
 	CPoint pt;
-	pt.x = m_ptClientCenter.x + sin(DEG2RAD((double)(m_vecAngles[YAW] + 90))) * rad + 0.5;
-	pt.y = m_ptClientCenter.y + cos(DEG2RAD((double)(m_vecAngles[YAW] + 90))) * rad + 0.5;
+	pt.x = m_ptClientCenter.x + fSin * rad + 0.5f;
+	pt.y = m_ptClientCenter.y + fCos * rad + 0.5f;
 
 	pDC->MoveTo(m_ptClientCenter);
 	pDC->LineTo(pt);
@@ -177,11 +180,11 @@ bool CAngleBox::GetAngles(QAngle &vecAngles)
 // Input  : szAngles - Buffer to receive angles string.
 // Output : Returns 'szAngles'.
 //-----------------------------------------------------------------------------
-char *CAngleBox::GetAngles(char *szAngles)
+char *CAngleBox::GetAngles(char *szAngles, intp size)
 {
 	QAngle vecAngles;
 	GetAngles(vecAngles);
-	sprintf(szAngles, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
+	V_snprintf(szAngles, size, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
 	return(szAngles);
 }
 
@@ -191,21 +194,22 @@ char *CAngleBox::GetAngles(char *szAngles)
 //			This is used for setting the text in the companion edit control.
 // Input  : szBuf - Buffer to receive string.
 //-----------------------------------------------------------------------------
-char *CAngleBox::GetAngleEditText(char *szBuf)
+char *CAngleBox::GetAngleEditText(char *szBuf, ptrdiff_t len)
 {
-	szBuf[0] = '\0';
+	if (len > 0)
+		szBuf[0] = '\0';
 
 	if (m_bDifferent)
 	{
-		strcpy(szBuf, "(diff)");
+		V_strncpy(szBuf, "(diff)", len);
 	}
 	else if ((m_vecAngles[PITCH] == 90) && (m_vecAngles[YAW] == 0) && (m_vecAngles[ROLL] == 0))
 	{
-		strcpy(szBuf, "Down");
+		V_strncpy(szBuf, "Down", len);
 	}
 	else if ((m_vecAngles[PITCH] == -90) && (m_vecAngles[YAW] == 0) && (m_vecAngles[ROLL] == 0))
 	{
-		strcpy(szBuf, "Up");
+		V_strncpy(szBuf, "Up", len);
 	}
 	else if (m_vecAngles[YAW] >= 0)
 	{
@@ -283,7 +287,9 @@ void CAngleBox::SetAngles(const QAngle &vecAngles, bool bRedraw)
 void CAngleBox::SetAngles(const char *szAngles, bool bRedraw)
 {
 	QAngle vecAngles(0, 0, 0);
-	sscanf(szAngles, "%f %f %f", &vecAngles[PITCH], &vecAngles[YAW], &vecAngles[ROLL]);
+	[[maybe_unused]] const int scanned =
+		sscanf(szAngles, "%f %f %f", &vecAngles[PITCH], &vecAngles[YAW], &vecAngles[ROLL]);
+	Assert(scanned == 3);
 	SetAngles(vecAngles, bRedraw);
 }
 
@@ -466,7 +472,7 @@ void CAngleBox::UpdateAngleEditText(void)
 	if (m_pEdit)
 	{
 		char szBuf[20];
-		GetAngleEditText(szBuf);
+		GetAngleEditText(szBuf, ssize(szBuf));
 		m_pEdit->SetAnglesInternal(szBuf);
 	}
 }

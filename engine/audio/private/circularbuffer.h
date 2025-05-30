@@ -87,7 +87,10 @@ template< int size >
 class CSizedCircularBuffer : public CCircularBuffer
 {
 public:
-	CSizedCircularBuffer() : CCircularBuffer(size) {}
+	CSizedCircularBuffer() : CCircularBuffer(size)
+	{
+		memset(myData, 0, sizeof(myData));
+	}
 
 private:
 	char	myData[size-1];

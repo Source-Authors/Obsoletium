@@ -11,13 +11,12 @@
 #define UTLHASH_H
 #pragma once
 
-#include <limits.h>
+#include <climits>
 #include "utlmemory.h"
-#include "utlvector.h"
-#include "utllinkedlist.h"
-#include "utllinkedlist.h"
-#include "commonmacros.h"
-#include "generichash.h"
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/generichash.h"
+#include "tier0/commonmacros.h"
 #include "tier0/dbg.h"
 
 typedef uintp UtlHashHandle_t;
@@ -169,7 +168,7 @@ template<class Data, typename C, typename K>
 inline intp CUtlHash<Data, C, K>::GetBucketIndex( UtlHashHandle_t handle ) const
 {
 #ifdef PLATFORM_64BITS
-	return ( ( ( handle >> 32 ) & 0x00000000ffffffff ) );
+	return ( ( ( handle >> 32 ) & 0x00000000ffffffffLL ) );
 #else
 	return ( ( ( handle >> 16 ) & 0x0000ffff ) );
 #endif
@@ -182,7 +181,7 @@ template<class Data, typename C, typename K>
 inline intp CUtlHash<Data, C, K>::GetKeyDataIndex( UtlHashHandle_t handle ) const
 {
 #ifdef PLATFORM_64BITS
-	return ( handle & 0x00000000ffffffff );
+	return ( handle & 0x00000000ffffffffLL );
 #else
 	return ( handle & 0x0000ffff );
 #endif
@@ -394,7 +393,7 @@ inline Data const &CUtlHash<Data, C, K>::Element( UtlHashHandle_t handle ) const
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 template<class Data, typename C, typename K>
-inline Data &CUtlHash<Data, C, K>::operator[]( UtlHashHandle_t handle )
+inline Data &CUtlHash<Data, C, K>::operator[]( UtlHashHandle_t handle ) //-V524
 {
 	intp ndxBucket = GetBucketIndex( handle );
 	intp ndxKeyData = GetKeyDataIndex( handle );
@@ -406,7 +405,7 @@ inline Data &CUtlHash<Data, C, K>::operator[]( UtlHashHandle_t handle )
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 template<class Data, typename C, typename K>
-inline Data const &CUtlHash<Data, C, K>::operator[]( UtlHashHandle_t handle ) const
+inline Data const &CUtlHash<Data, C, K>::operator[]( UtlHashHandle_t handle ) const //-V524
 {
 	intp ndxBucket = GetBucketIndex( handle );
 	intp ndxKeyData = GetKeyDataIndex( handle );
@@ -722,7 +721,7 @@ template<class Data, class HashFuncs> inline Data const &CUtlHashFast<Data,HashF
 //-----------------------------------------------------------------------------
 // Purpose: Return data given a hash handle.
 //-----------------------------------------------------------------------------
-template<class Data, class HashFuncs> inline Data &CUtlHashFast<Data,HashFuncs>::operator[]( UtlHashFastHandle_t hHash )
+template<class Data, class HashFuncs> inline Data &CUtlHashFast<Data,HashFuncs>::operator[]( UtlHashFastHandle_t hHash ) //-V524
 {
 	return ( m_aDataPool[hHash].m_Data );
 }
@@ -730,7 +729,7 @@ template<class Data, class HashFuncs> inline Data &CUtlHashFast<Data,HashFuncs>:
 //-----------------------------------------------------------------------------
 // Purpose: Return data given a hash handle.
 //-----------------------------------------------------------------------------
-template<class Data, class HashFuncs> inline Data const &CUtlHashFast<Data,HashFuncs>::operator[]( UtlHashFastHandle_t hHash ) const
+template<class Data, class HashFuncs> inline Data const &CUtlHashFast<Data,HashFuncs>::operator[]( UtlHashFastHandle_t hHash ) const //-V524
 {
 	return ( m_aDataPool[hHash].m_Data );
 }
@@ -953,7 +952,7 @@ template<class Data, intp NUM_BUCKETS, class HashFuncs> inline Data const &CUtlH
 //-----------------------------------------------------------------------------
 // Purpose: Return data given a hash handle.
 //-----------------------------------------------------------------------------
-template<class Data, intp NUM_BUCKETS, class HashFuncs> inline Data &CUtlHashFixed<Data,NUM_BUCKETS,HashFuncs>::operator[]( UtlHashFixedHandle_t hHash )
+template<class Data, intp NUM_BUCKETS, class HashFuncs> inline Data &CUtlHashFixed<Data,NUM_BUCKETS,HashFuncs>::operator[]( UtlHashFixedHandle_t hHash ) //-V524
 {
 	return ((HashFixedData_t *)hHash)->m_Data;
 }
@@ -961,7 +960,7 @@ template<class Data, intp NUM_BUCKETS, class HashFuncs> inline Data &CUtlHashFix
 //-----------------------------------------------------------------------------
 // Purpose: Return data given a hash handle.
 //-----------------------------------------------------------------------------
-template<class Data, intp NUM_BUCKETS, class HashFuncs> inline Data const &CUtlHashFixed<Data,NUM_BUCKETS,HashFuncs>::operator[]( UtlHashFixedHandle_t hHash ) const
+template<class Data, intp NUM_BUCKETS, class HashFuncs> inline Data const &CUtlHashFixed<Data,NUM_BUCKETS,HashFuncs>::operator[]( UtlHashFixedHandle_t hHash ) const //-V524
 {
 	return ((HashFixedData_t *)hHash)->m_Data;
 }

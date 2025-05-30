@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 #include "IEditorTexture.h"
 #include "utlvector.h"
 
@@ -25,9 +26,9 @@ class TextureWindowTexList : public CUtlVector<TextureWindowTex_t>
 {
 public:
 
-	inline int Find(IEditorTexture *pTex)
+	inline intp Find(IEditorTexture *pTex) const
 	{
-		for (int i = 0; i < Count(); i++)
+		for (intp i = 0; i < Count(); i++)
 		{
 			if (Element(i).pTex == pTex)
 			{
@@ -40,7 +41,7 @@ public:
 };
 
 
-class CTextureWindow : public CWnd
+class CTextureWindow : public CBaseWnd
 {
 public:
 	CTextureWindow();
@@ -72,7 +73,7 @@ public:
 	void EnableUpdate(bool bEnable);
 	void UpdateScrollSizes();
 	BOOL EnumTexturePositions(TWENUMPOS *pTE, BOOL bStart = FALSE);
-	void SetDisplaySize(int iSize);
+	void SetDisplaySize(int iSizeX, int iSizeY);
 	void HighlightCurTexture(CDC *pDC = NULL);
 	void SetNameFilter(LPCTSTR pszFilter);
 	void SetKeywords(const char *pszKeywords);
@@ -94,7 +95,8 @@ protected:
 
 	int total_x;
 	int total_y;
-	int iDisplaySize;
+	int iDisplaySizeX;
+	int iDisplaySizeY;
 	int iTexNameCharWidth;
 	BOOL bFirstPaint;
 	CFont TexFont;

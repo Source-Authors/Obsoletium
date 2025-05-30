@@ -2,8 +2,8 @@
 //
 //  LZMA Codec interface for engine. Based largely on LzmaUtil.c in SDK
 //
-//  LZMA SDK 9.38 beta
-//  2015-01-03 : Igor Pavlov : Public domain
+//  LZMA SDK 24.09
+//  2024-11-29 : Igor Pavlov : Public domain
 //  https://www.7-zip.org/
 //
 //========================================================================//
@@ -15,14 +15,14 @@
 #include "tier0/memdbgon.h"
 
 #include "../../public/tier1/lzmaDecoder.h"
-#include "C/7zTypes.h"
-#include "C/LzmaEnc.h"
-#include "C/LzmaDec.h"
+#include "../../thirdparty/7zip/C/7zTypes.h"
+#include "../../thirdparty/7zip/C/LzmaEnc.h"
+#include "../../thirdparty/7zip/C/LzmaDec.h"
 #include "tier0/dbg.h"
 
 // Allocator to pass to LZMA functions
-static void *SzAlloc(void *, size_t size) { return malloc(size); }
-static void SzFree(void *, void *address) { free(address); }
+static void *SzAlloc(ISzAllocPtr, size_t size) { return malloc(size); }
+static void SzFree(ISzAllocPtr, void *address) { free(address); }
 static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 // lzma buffers will have a 13 byte trivial header
@@ -33,14 +33,14 @@ static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 // [13..]	lzma compressed data
 #define LZMA_ORIGINAL_HEADER_SIZE	13
 
-SRes CInStreamRam_StaticRead(void *p, void *buf, size_t *size );
-size_t COutStreamRam_StaticWrite(void *p, const void *buf, size_t size);
+SRes CInStreamRam_StaticRead(ISeqInStreamPtr p, void *buf, size_t *size );
+size_t COutStreamRam_StaticWrite(ISeqOutStreamPtr p, const void *buf, size_t size);
 
 class CInStreamRam : public ISeqInStream
 {
 	const Byte *Data;
 	size_t Size;
-	size_t Pos;
+	mutable size_t Pos;
 
 public:
 	void Init(const Byte *data, size_t size)
@@ -51,7 +51,7 @@ public:
 		Read = CInStreamRam_StaticRead;
 	}
 
-	SRes DoRead( void *buf, size_t *size )
+	SRes DoRead( void *buf, size_t *size ) const
 	{
 		size_t inSize = *size;
 		size_t remain = Size - Pos;
@@ -75,8 +75,8 @@ class COutStreamRam: public ISeqOutStream
 
 public:
 	Byte *Data;
-	size_t Pos;
-	bool Overflow;
+	mutable size_t Pos;
+	mutable bool Overflow;
 
 	void Init(Byte *data, size_t size)
 	{
@@ -87,7 +87,7 @@ public:
 		Write = COutStreamRam_StaticWrite;
 	}
 
-	size_t DoWrite( const void *buf, size_t size )
+	size_t DoWrite( const void *buf, size_t size ) const
 	{
 		size_t i;
 		for (i = 0; i < size && Pos < Size; i++)
@@ -100,14 +100,14 @@ public:
 	}
 };
 
-SRes CInStreamRam_StaticRead(void *p, void *buf, size_t *size )
+SRes CInStreamRam_StaticRead(ISeqInStreamPtr p, void *buf, size_t *size )
 {
-	return reinterpret_cast<CInStreamRam *>(p)->DoRead( buf, size );
+	return reinterpret_cast<const CInStreamRam *>(p)->DoRead( buf, size );
 }
 
-size_t COutStreamRam_StaticWrite(void *p, const void *buf, size_t size)
+size_t COutStreamRam_StaticWrite(ISeqOutStreamPtr p, const void *buf, size_t size)
 {
-	return reinterpret_cast<COutStreamRam *>(p)->DoWrite( buf, size );
+	return reinterpret_cast<const COutStreamRam *>(p)->DoWrite( buf, size );
 }
 
 SRes

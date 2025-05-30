@@ -5,14 +5,13 @@
 // $NoKeywords: $
 //===========================================================================//
 #include "cbase.h"
-#include <stdio.h>
-#include <mxtk/mxWindow.h>
+#include "ChoreoView.h"
+#include <mxtk/mxwindow.h>
 #include "mdlviewer.h"
 #include "hlfaceposer.h"
 #include "StudioModel.h"
 #include "expressions.h"
 #include "expclass.h"
-#include "ChoreoView.h"
 #include "choreoevent.h"
 #include "choreoactor.h"
 #include "choreochannel.h"
@@ -36,7 +35,6 @@
 #include "PhonemeEditor.h"
 #include "iscenetokenprocessor.h"
 #include "InputProperties.h"
-#include "filesystem.h"
 #include "ExpressionTool.h"
 #include "ControlPanel.h"
 #include "faceposer_models.h"
@@ -537,7 +535,7 @@ void CChoreoView::DrawTimeLine( CChoreoWidgetDrawHelper& drawHelper, RECT& rc, f
 			}
 
 			char sz[ 32 ];
-			sprintf( sz, "%.2f", f );
+			V_sprintf_safe( sz, "%.2f", f );
 
 			int textWidth = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, sz );
 
@@ -751,7 +749,7 @@ void CChoreoView::redraw()
 	if ( !m_pScene )
 	{
 		char sz[ 256 ];
-		sprintf( sz, "No choreography scene file (.vcd) loaded" );
+		V_sprintf_safe( sz, "No choreography scene file (.vcd) loaded" );
 
 		int pointsize = 18;
 		int textlen = drawHelper.CalcTextWidth( "Arial", pointsize, FW_NORMAL, sz );
@@ -787,7 +785,7 @@ void CChoreoView::redraw()
 	if ( m_UndoStack.Size() > 0 )
 	{
 		int length = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, 
-			"undo %i/%i", m_nUndoLevel, m_UndoStack.Size() );
+			"undo %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
 		RECT rcText = rc;
 		rcText.top = rc.top + 48;
 		rcText.bottom = rcText.top + 10;
@@ -795,13 +793,13 @@ void CChoreoView::redraw()
 		rcText.right = rcText.left + length;
 
 		drawHelper.DrawColoredText( "Arial", 9, FW_NORMAL, RGB( 100, 180, 100 ), rcText,
-			"undo %i/%i", m_nUndoLevel, m_UndoStack.Size() );
+			"undo %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
 	}
 
 	DrawScrubHandle( drawHelper );
 
 	char sz[ 48 ];
-	sprintf( sz, "Speed: %.2fx", m_flPlaybackRate );
+	V_sprintf_safe( sz, "Speed: %.2fx", m_flPlaybackRate );
 
 	int fontsize = 9;
 
@@ -816,7 +814,7 @@ void CChoreoView::redraw()
 	drawHelper.DrawColoredText( "Arial", fontsize, FW_NORMAL, 
 		RGB( 50, 50, 50 ), rcText, sz );
 
-	sprintf( sz, "Zoom: %.2fx", (float)GetTimeZoom( GetToolName() ) / 100.0f );
+	V_sprintf_safe( sz, "Zoom: %.2fx", (float)GetTimeZoom( GetToolName() ) / 100.0f );
 
 	length = drawHelper.CalcTextWidth( "Arial", fontsize, FW_NORMAL, sz);
 
@@ -839,7 +837,7 @@ void CChoreoView::redraw()
 void CChoreoView::GetUndoLevels( int& current, int& number )
 {
 	current = m_nUndoLevel;
-	number	= m_UndoStack.Size();
+	number	= m_UndoStack.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -1443,12 +1441,12 @@ void CChoreoView::AssociateModel( void )
 		return;
 
 	CChoiceParams params;
-	strcpy( params.m_szDialogTitle, "Associate Model" );
+	V_strcpy_safe( params.m_szDialogTitle, "Associate Model" );
 
 	params.m_bPositionDialog = false;
 	params.m_nLeft = 0;
 	params.m_nTop = 0;
-	strcpy( params.m_szPrompt, "Choose model:" );
+	V_strcpy_safe( params.m_szPrompt, "Choose model:" );
 
 	params.m_Choices.RemoveAll();
 
@@ -1461,7 +1459,7 @@ void CChoreoView::AssociateModel( void )
 	{
 		char const *modelname = models->GetModelName( i );
 
-		strcpy( text.choice, modelname );
+		V_strcpy_safe( text.choice, modelname );
 
 		if ( !stricmp( a->GetName(), modelname ) )
 		{
@@ -1473,7 +1471,7 @@ void CChoreoView::AssociateModel( void )
 	}
 
 	// Add an extra entry which is "No association"
-	strcpy( text.choice, "No Associated Model" );
+	V_strcpy_safe( text.choice, "No Associated Model" );
 	params.m_Choices.AddToTail( text );
 
 	if ( !ChoiceProperties( &params ) )
@@ -4816,7 +4814,7 @@ void CChoreoView::ProcessLookat( CChoreoScene *scene, CChoreoEvent *event )
 				}
 				value = cos( value );
 				value = acos( value );
-				QAngle angles( 0.0, value * 45 / M_PI, 0.0 );
+				QAngle angles( 0.0, value * 45 / M_PI_F, 0.0 );
 
 				matrix3x4_t matrix;
 				AngleMatrix( model->m_angles, matrix );
@@ -4922,7 +4920,6 @@ bool CChoreoView::GetTarget( CChoreoScene *scene, CChoreoEvent *event, Vector &v
 					Vector delta = orgTarget - orgActor;
 					
 					matrix3x4_t matrix;
-					Vector lookTarget;
 
 					// Rotate around actor's placed forward direction since we look straight down x in faceposer/hlmv
 					AngleMatrix( anglesActor, matrix );
@@ -5117,7 +5114,7 @@ void CChoreoView::ProcessSequence( CChoreoScene *scene, CChoreoEvent *event )
 	{
 		float dt = scene->GetTime() - event->m_flPrevTime;
 		event->m_flPrevTime = scene->GetTime();
-		dt = clamp( dt, 0.0, 0.1 );
+		dt = clamp( dt, 0.0f, 0.1f );
 		cycle = event->m_flPrevCycle + flFrameRate * dt;
 		cycle = cycle - (int)cycle;
 		event->m_flPrevCycle = cycle;
@@ -5436,7 +5433,7 @@ void CChoreoView::PauseThink( void )
 		m_flAutomationTime < m_flAutomationDelay )
 	{
 		char sz[ 256 ];
-		sprintf( sz, "Pause %.2f/%.2f", m_flAutomationTime, m_flAutomationDelay );
+		V_sprintf_safe( sz, "Pause %.2f/%.2f", m_flAutomationTime, m_flAutomationDelay );
 	
 		int textlen = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, sz );
 
@@ -5444,7 +5441,7 @@ void CChoreoView::PauseThink( void )
 		GetScrubHandleRect( rcText, true );
 
 		rcText.left = ( rcText.left + rcText.right ) / 2;
-		rcText.left -= ( textlen * 0.5f );
+		rcText.left -= ( textlen / 2 );
 		rcText.right = rcText.left + textlen + 1;
 
 		rcText.top = rcPauseRect.top;
@@ -5950,7 +5947,7 @@ void CChoreoView::New( void )
 	char scenefile[ 512 ];
 	if ( FacePoser_ShowSaveFileNameDialog( scenefile, sizeof( scenefile ), "scenes", "*.vcd" ) )
 	{
-		Q_DefaultExtension( scenefile, ".vcd", sizeof( scenefile ) );
+		Q_DefaultExtension( scenefile, ".vcd" );
 		
 		m_pScene = new CChoreoScene( this );
 		g_MDLViewer->InitGridSettings();
@@ -5969,13 +5966,13 @@ void CChoreoView::New( void )
 	CActorParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Create Actor" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Create Actor" );
+	params.m_szName[0] = '\0';
 
 	if ( !ActorProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6041,7 +6038,7 @@ void CChoreoView::SaveAs( void )
 	if ( !FacePoser_ShowSaveFileNameDialog( scenefile, sizeof( scenefile ), "scenes", "*.vcd" ) )
 		return;
 
-	Q_DefaultExtension( scenefile, ".vcd", sizeof( scenefile ) );
+	Q_DefaultExtension( scenefile, ".vcd" );
 	
 	Con_Printf( "Saving %s\n", scenefile );
 
@@ -6074,7 +6071,7 @@ void CChoreoView::Load( void )
 		return;
 	}
 
-	Q_DefaultExtension( scenefile, ".vcd", sizeof( scenefile ) );
+	Q_DefaultExtension( scenefile, ".vcd" );
 
 	LoadSceneFromFile( scenefile );
 
@@ -6087,20 +6084,20 @@ void CChoreoView::LoadNext( void )
 		return;
 
 	char fixedupFile[ 512 ];
-	V_FixupPathName( fixedupFile, sizeof( fixedupFile ), GetChoreoFile() );
+	V_FixupPathName( fixedupFile, GetChoreoFile() );
 
 	char relativeFile[ 512 ];
-	filesystem->FullPathToRelativePath( fixedupFile, relativeFile, sizeof( relativeFile ) );
+	filesystem->FullPathToRelativePath_safe( fixedupFile, relativeFile );
 
 	char relativePath[ 512 ];
-	Q_ExtractFilePath( relativeFile, relativePath, sizeof( relativePath ) );
+	V_ExtractFilePath( relativeFile, relativePath );
 
 	if (m_nextFileList.Count() == 0)
 	{
 		// iterate files in the local directory
 		char path[ 512 ];
-		strcpy( path, relativePath );
-		strcat( path, "/*.vcd" );
+		V_strcpy_safe( path, relativePath );
+		V_strcat_safe( path, "/*.vcd" );
 
 		FileFindHandle_t hFindFile;
 		char const *fn = filesystem->FindFirstEx( path, "MOD", &hFindFile );
@@ -6131,14 +6128,14 @@ void CChoreoView::LoadNext( void )
 		if (!stricmp( fileBase, m_nextFileList[i] ))
 		{
 			char fileName[512];
-			strcpy( fileName, relativePath );
+			V_strcpy_safe( fileName, relativePath );
 			if (i < m_nextFileList.Count() - 1)
 			{
-				strcat( fileName, m_nextFileList[i+1] );
+				V_strcat_safe( fileName, m_nextFileList[i+1] );
 			}
 			else
 			{
-				strcat( fileName, m_nextFileList[0] );
+				V_strcat_safe( fileName, m_nextFileList[0] );
 			}
 
 			LoadSceneFromFile( fileName );
@@ -6160,7 +6157,7 @@ void CChoreoView::LoadSceneFromFile( const char *filename )
 	}
 
 	char fn[ 512 ];
-	Q_strncpy( fn, filename, sizeof( fn ) );
+	V_strcpy_safe( fn, filename );
 	if ( m_pScene )
 	{
 		Close();
@@ -6281,10 +6278,10 @@ void CChoreoView::NewChannel( void )
 	CChannelParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Create Channel" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Create Channel" );
+	params.m_szName[0] = '\0';
 	params.m_bShowActors = true;
-	strcpy( params.m_szSelectedActor, "" );
+	params.m_szSelectedActor[0] = '\0';
 	params.m_pScene = m_pScene;
 
 	if ( !ChannelProperties( &params ) )
@@ -6292,7 +6289,7 @@ void CChoreoView::NewChannel( void )
 		return;
 	}
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 	{
 		return;
 	}
@@ -6421,13 +6418,13 @@ void CChoreoView::EditChannel( CChoreoChannel *channel )
 	CChannelParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Edit Channel" );
+	V_strcpy_safe( params.m_szDialogTitle, "Edit Channel" );
 	V_strcpy_safe( params.m_szName, channel->GetName() );
 
 	if ( !ChannelProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6488,13 +6485,13 @@ void CChoreoView::NewActor( void )
 	CActorParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Create Actor" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Create Actor" );
+	V_strcpy_safe( params.m_szName, "" );
 
 	if ( !ActorProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6587,13 +6584,13 @@ void CChoreoView::EditActor( CChoreoActor *actor )
 	CActorParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Edit Actor" );
+	V_strcpy_safe( params.m_szDialogTitle, "Edit Actor" );
 	V_strcpy_safe( params.m_szName, actor->GetName() );
 
 	if ( !ActorProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 		return;
 
 	SetDirty( true );
@@ -6649,7 +6646,7 @@ void CChoreoView::AddEvent( int type, int subtype /*= 0*/, char const *defaultpa
 		Q_strncpy( params.m_szParameters, defaultparameters, sizeof( params.m_szParameters ) );
 	}
 
-	strcpy( params.m_szDialogTitle, "Create Event" );
+	V_strcpy_safe( params.m_szDialogTitle, "Create Event" );
 
 	params.m_nType = type;
 	params.m_pScene = m_pScene;
@@ -6680,8 +6677,8 @@ void CChoreoView::AddEvent( int type, int subtype /*= 0*/, char const *defaultpa
 		params.m_flEndTime = params.m_flStartTime + 0.5f;
 		if ( type == CChoreoEvent::GESTURE && subtype == 1 )
 		{
-			strcpy( params.m_szDialogTitle, "Create <NULL> Gesture" );
-			strcpy( params.m_szName, "NULL" );
+			V_strcpy_safe( params.m_szDialogTitle, "Create <NULL> Gesture" );
+			V_strcpy_safe( params.m_szName, "NULL" );
 		}
 		break;
 	case CChoreoEvent::SPEAK:
@@ -6892,39 +6889,39 @@ void CChoreoView::AddGlobalEvent( CChoreoEvent::EVENTTYPE type )
 	{
 	default:
 		Assert( 0 );
-		strcpy( params.m_szDialogTitle, "???" );
+		V_strcpy_safe( params.m_szDialogTitle, "???" );
 		break;
 	case CChoreoEvent::SECTION:
 		{
-			strcpy( params.m_szDialogTitle, "Add Pause Point" );
+			V_strcpy_safe( params.m_szDialogTitle, "Add Pause Point" );
 		}
 		break;
 	case CChoreoEvent::LOOP:
 		{
-			strcpy( params.m_szDialogTitle, "Add Loop Point" );
+			V_strcpy_safe( params.m_szDialogTitle, "Add Loop Point" );
 		}
 		break;
 	case CChoreoEvent::STOPPOINT:
 		{
-			strcpy( params.m_szDialogTitle, "Add Fire Completion" );
+			V_strcpy_safe( params.m_szDialogTitle, "Add Fire Completion" );
 		}
 		break;
 	}
-	strcpy( params.m_szName, "" );
-	strcpy( params.m_szAction, "" );
+	V_strcpy_safe( params.m_szName, "" );
+	V_strcpy_safe( params.m_szAction, "" );
 
 	params.m_flStartTime = GetTimeValueForMouse( pt.x );
 
 	if ( !GlobalEventProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 	{
 		Con_Printf( "Pause section event must have a valid name\n" );
 		return;
 	}
 
-	if ( strlen( params.m_szAction ) <= 0 )
+	if ( Q_isempty( params.m_szAction ) )
 	{
 		Con_Printf( "No action specified for section pause\n" );
 		return;
@@ -7010,44 +7007,44 @@ void CChoreoView::EditGlobalEvent( CChoreoEvent *event )
 	{
 	default:
 		Assert( 0 );
-		strcpy( params.m_szDialogTitle, "???" );
+		V_strcpy_safe( params.m_szDialogTitle, "???" );
 		break;
 	case CChoreoEvent::SECTION:
 		{
-			strcpy( params.m_szDialogTitle, "Edit Pause Point" );
+			V_strcpy_safe( params.m_szDialogTitle, "Edit Pause Point" );
 			V_strcpy_safe( params.m_szAction, event->GetParameters() );
 		}
 		break;
 	case CChoreoEvent::LOOP:
 		{
-			strcpy( params.m_szDialogTitle, "Edit Loop Point" );
-			strcpy( params.m_szAction, "" );
+			V_strcpy_safe( params.m_szDialogTitle, "Edit Loop Point" );
+			V_strcpy_safe( params.m_szAction, "" );
 			params.m_flLoopTime = (float)atof( event->GetParameters() );
 			params.m_nLoopCount = event->GetLoopCount();
 		}
 		break;
 	case CChoreoEvent::STOPPOINT:
 		{
-			strcpy( params.m_szDialogTitle, "Edit Fire Completion" );
-			strcpy( params.m_szAction, "" );
+			V_strcpy_safe( params.m_szDialogTitle, "Edit Fire Completion" );
+			V_strcpy_safe( params.m_szAction, "" );
 		}
 		break;
 	}
 
-	strcpy( params.m_szName, event->GetName() );
+	V_strcpy_safe( params.m_szName, event->GetName() );
 
 	params.m_flStartTime = event->GetStartTime();
 
 	if ( !GlobalEventProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szName ) <= 0 )
+	if ( Q_isempty( params.m_szName ) )
 	{
 		Con_Printf( "Event %s must have a valid name\n", event->GetName() );
 		return;
 	}
 
-	if ( strlen( params.m_szAction ) <= 0 )
+	if ( Q_isempty( params.m_szAction ) )
 	{
 		Con_Printf( "No action specified for %s\n", event->GetName() );
 		return;
@@ -7172,7 +7169,7 @@ void CChoreoView::EditEvent( CChoreoEvent *event )
 	CEventParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Edit Event" );
+	V_strcpy_safe( params.m_szDialogTitle, "Edit Event" );
 
 	// Copy in current even properties
 	params.m_nType = event->GetType();
@@ -8293,20 +8290,20 @@ bool CChoreoView::CreateAnimationEvent( int mx, int my, char const *animationnam
 
 	// At this point we need to ask the user what type of even to create (gesture or sequence) and just show the approprite dialog
 	CChoiceParams params;
-	strcpy( params.m_szDialogTitle, "Create Animation Event" );
+	V_strcpy_safe( params.m_szDialogTitle, "Create Animation Event" );
 
 	params.m_bPositionDialog = false;
 	params.m_nLeft = 0;
 	params.m_nTop = 0;
-	strcpy( params.m_szPrompt, "Type of event:" );
+	V_strcpy_safe( params.m_szPrompt, "Type of event:" );
 
 	params.m_Choices.RemoveAll();
 
 	params.m_nSelected = 0;
 	ChoiceText text;
-	strcpy( text.choice, "gesture" );
+	V_strcpy_safe( text.choice, "gesture" );
 	params.m_Choices.AddToTail( text );
-	strcpy( text.choice, "sequence" );
+	V_strcpy_safe( text.choice, "sequence" );
 	params.m_Choices.AddToTail( text );
 
 	if ( !ChoiceProperties( &params ) )
@@ -8543,15 +8540,15 @@ void CChoreoView::AddEventRelativeTag( void )
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Event Tag Name" );
-	strcpy( params.m_szPrompt, "Name:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Event Tag Name" );
+	V_strcpy_safe( params.m_szPrompt, "Name:" );
 
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		Con_ErrorPrintf( "Event Tag Name:  No name entered!\n" );
 		return;
@@ -8772,7 +8769,7 @@ void CChoreoView::RedrawStatusArea( CChoreoWidgetDrawHelper& drawHelper, RECT& r
 		char const *mapname = m_pScene->GetMapname();
 		if ( mapname )
 		{
-			sprintf( sz, "Associated .bsp:  %s", mapname[ 0 ] ? mapname : "none" );
+			V_sprintf_safe( sz, "Associated .bsp:  %s", mapname[ 0 ] ? mapname : "none" );
 
 			int len = drawHelper.CalcTextWidth( "Arial", fontsize, fontweight, sz );
 			rcText.left = rcText.right - len - 10;
@@ -8782,7 +8779,7 @@ void CChoreoView::RedrawStatusArea( CChoreoWidgetDrawHelper& drawHelper, RECT& r
 			OffsetRect( &rcText, 0, fontsize + 2 );
 		}
 
-		sprintf( sz, "Scene:  %s", GetChoreoFile() );
+		V_sprintf_safe( sz, "Scene:  %s", GetChoreoFile() );
 
 		int len = drawHelper.CalcTextWidth( "Arial", fontsize, fontweight, sz );
 		rcText.left = rcText.right - len - 10;
@@ -8896,14 +8893,6 @@ void CChoreoView::Redo( void )
 	InvalidateLayout();
 }
 
-static char *CopyString( const char *in )
-{
-	int len = strlen( in );
-	char *n = new char[ len + 1 ];
-	strcpy( n, in );
-	return n;
-}
-
 void CChoreoView::PushUndo( const char *description )
 {
 	Assert( !m_bRedoPending );
@@ -8916,7 +8905,7 @@ void CChoreoView::PushUndo( const char *description )
 	CVUndo *undo = new CVUndo;
 	undo->undo = u;
 	undo->redo = NULL;
-	undo->udescription = CopyString( description );
+	undo->udescription = V_strdup( description );
 	undo->rdescription = NULL;
 	m_UndoStack.AddToTail( undo );
 	m_nUndoLevel++;
@@ -8932,7 +8921,7 @@ void CChoreoView::PushRedo( const char *description )
 	*r = *m_pScene;
 	CVUndo *undo = m_UndoStack[ m_nUndoLevel - 1 ];
 	undo->redo = r;
-	undo->rdescription = CopyString( description );
+	undo->rdescription = V_strdup( description );
 
 	// Always redo here to reflect that someone has made a change
 	redraw();
@@ -9096,7 +9085,7 @@ void CChoreoView::ImportEvents( void )
 	char *fullpath = eventfile;
 	if ( !Q_IsAbsolutePath( eventfile ) )
 	{
-		filesystem->RelativePathToFullPath( eventfile, "GAME", fullpathbuf, sizeof( fullpathbuf ) );
+		filesystem->RelativePathToFullPath_safe( eventfile, "GAME", fullpathbuf );
 		fullpath = fullpathbuf;
 	}
 
@@ -9128,7 +9117,7 @@ void CChoreoView::ExportEvents( void )
 	if ( !FacePoser_ShowSaveFileNameDialog( eventfilename, sizeof( eventfilename ), "scenes", "*.vce" ) )
 		return;
 
-	Q_DefaultExtension( eventfilename, ".vce", sizeof( eventfilename ) );
+	Q_DefaultExtension( eventfilename, ".vce" );
 
 	Con_Printf( "Exporting events to %s\n", eventfilename );
 
@@ -9522,7 +9511,7 @@ void CChoreoView::PositionControls()
 
 void CChoreoView::SetChoreoFile( char const *filename )
 {
-	strcpy( m_szChoreoFile, filename );
+	V_strcpy_safe( m_szChoreoFile, filename );
 	if ( m_szChoreoFile[ 0 ] )
 	{
 		char sz[ 256 ];
@@ -9567,7 +9556,7 @@ void CChoreoView::GetScrubHandleRect( RECT& rcHandle, bool clipped )
 
 		if ( clipped )
 		{
-			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH/2, w2() - SCRUBBER_HANDLE_WIDTH/2 );
+			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH/2.f, w2() - SCRUBBER_HANDLE_WIDTH/2.f );
 		}
 	}
 
@@ -9605,7 +9594,7 @@ void CChoreoView::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper )
 
 	// 
 	char sz[ 32 ];
-	sprintf( sz, "%.3f", m_flScrub );
+	V_sprintf_safe( sz, "%.3f", m_flScrub );
 
 	int len = drawHelper.CalcTextWidth( "Arial", 9, 500, sz );
 
@@ -9873,8 +9862,8 @@ void CChoreoView::OnChangeScale( void )
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Change Zoom" );
-	strcpy( params.m_szPrompt, "New scale (e.g., 2.5x):" );
+	V_strcpy_safe( params.m_szDialogTitle, "Change Zoom" );
+	V_strcpy_safe( params.m_szPrompt, "New scale (e.g., 2.5x):" );
 
 	Q_snprintf( params.m_szInputText, sizeof( params.m_szInputText ), "%.2f", (float)GetTimeZoom( GetToolName() ) / 100.0f );
 
@@ -9931,8 +9920,8 @@ void CChoreoView::OnCheckSequenceLengths( void )
 void CChoreoView::InvalidateTrackLookup_R( CChoreoScene *scene )
 {
 	// No need to undo since this data doesn't matter
-	int c = scene->GetNumEvents();
-	for ( int i = 0; i < c; i++ )
+	intp c = scene->GetNumEvents();
+	for ( intp i = 0; i < c; i++ )
 	{
 		CChoreoEvent *event = scene->GetEvent( i );
 		if ( !event )
@@ -10746,7 +10735,7 @@ bool CChoreoView::ValidateCombinedFileCheckSum( char const *outfilename, char co
 		return false;
 	}
 
-	int i = sorted.FirstInorder();
+	auto i = sorted.FirstInorder();
 	if ( i != sorted.InvalidIndex() )
 	{
 		CChoreoEvent *e = sorted[ i ];
@@ -11204,7 +11193,7 @@ void CChoreoView::OnChangeCloseCaptionToken( CChoreoEvent *e )
 	params.m_bPositionDialog = false;
 	params.m_nLeft = 0;
 	params.m_nTop = 0;
-	// strcpy( params.m_szPrompt, "Choose model:" );
+	// V_strcpy_safe( params.m_szPrompt, "Choose model:" );
 
 	Q_strncpy( params.m_szCCToken, e->GetCloseCaptionToken(), sizeof( params.m_szCCToken ) );
 

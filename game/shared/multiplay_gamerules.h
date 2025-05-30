@@ -262,7 +262,7 @@ protected:
 	void ChangeLevelToMap( const char *pszMap );
 
 	float m_flIntermissionEndTime;
-	static int m_nMapCycleTimeStamp;
+	static time_t m_nMapCycleTimeStamp;
 	static int m_nMapCycleindex;
 	static CUtlVector<char*> m_MapList;
 

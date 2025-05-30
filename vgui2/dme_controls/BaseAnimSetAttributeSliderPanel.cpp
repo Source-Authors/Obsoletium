@@ -31,7 +31,7 @@ using namespace vgui;
 // Enums
 //-----------------------------------------------------------------------------
 #define SLIDER_PIXEL_SPACING 3
-#define RECOMPUTE_PREVIEW_INTERVAL ( 0.5f )
+#define RECOMPUTE_PREVIEW_INTERVAL ( 0.5 )
 #define CIRCULAR_CONTROL_RADIUS 6.0f
 #define FRAC_PER_PIXEL 0.0025f
 
@@ -85,7 +85,7 @@ static void BlendFlexValues( AttributeValue_t *pResult, const AttributeValue_t &
 //-----------------------------------------------------------------------------
 class CPresetSideFilterSlider : public Slider
 {
-	DECLARE_CLASS_SIMPLE( CPresetSideFilterSlider, Slider );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPresetSideFilterSlider, Slider );
 
 public:
 	CPresetSideFilterSlider( CBaseAnimSetAttributeSliderPanel *pParent, const char *panelName );
@@ -95,21 +95,23 @@ public:
 	void		SetPos( float frac );
 
 protected:
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings( IScheme *scheme );
-	virtual void GetTrackRect( int &x, int &y, int &w, int &h );
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
+	void Paint() override;
+	void PaintBackground() override;
+	void ApplySchemeSettings( IScheme *scheme ) override;
+	void GetTrackRect( int &x, int &y, int &w, int &h ) override;
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
 
 private:
-	CBaseAnimSetAttributeSliderPanel	*m_pParent;
+	// dimhotepus: Comment unused field.
+	//CBaseAnimSetAttributeSliderPanel	*m_pParent;
 
 	Color			m_ZeroColor;
 	Color			m_TextColor;
 	Color			m_TextColorFocus;
 	TextImage		*m_pName;
-	float			m_flCurrent;
+	// dimhotepus: Comment unused field.
+	// float			m_flCurrent;
 };
 
 
@@ -117,7 +119,7 @@ private:
 // Constructor, destructor
 //-----------------------------------------------------------------------------
 CPresetSideFilterSlider::CPresetSideFilterSlider( CBaseAnimSetAttributeSliderPanel *parent, const char *panelName ) :
-	BaseClass( (Panel *)parent, panelName ), m_pParent( parent )
+	BaseClass( (Panel *)parent, panelName ) // dimhotepus: Comment unused field. , m_pParent( parent )
 {
 	SetRange( 0, 1000 );
 	SetDragOnRepositionNob( true );
@@ -230,11 +232,11 @@ void CPresetSideFilterSlider::PaintBackground()
 CBaseAnimSetAttributeSliderPanel::CBaseAnimSetAttributeSliderPanel( vgui::Panel *parent, const char *className, CBaseAnimationSetEditor *editor ) :
 	BaseClass( parent, className ),
 	m_flEstimatedValue( 0.0f ),
-	m_ChannelToSliderLookup( 0, 0, ChannelToSliderLookup_t::Less ),
-	m_flRecomputePreviewTime( -1.0f ),
+	m_nFaderChangeFlags( 0 ),
 	m_bRequestedNewPreview( false ),
-	m_flPrevTime( 0.0f ),
-	m_nFaderChangeFlags( 0 )
+	m_ChannelToSliderLookup( 0, 0, ChannelToSliderLookup_t::Less ),
+	m_flRecomputePreviewTime( -1.0 ),
+	m_flPrevTime( 0.0 )
 {
 	m_hEditor = editor;
 
@@ -275,7 +277,7 @@ void CBaseAnimSetAttributeSliderPanel::OnCommand( const char *pCommand )
 	BaseClass::OnCommand( pCommand );
 }
 
-void CBaseAnimSetAttributeSliderPanel::StampValueIntoLogs( CDmElement *control, AnimationControlType_t type, float flValue )
+void CBaseAnimSetAttributeSliderPanel::StampValueIntoLogs( CDmElement *, AnimationControlType_t, float )
 {
 }
 
@@ -352,8 +354,8 @@ void CBaseAnimSetAttributeSliderPanel::OnThink()
 	m_PreviousPreviewFader = fader.name;
 	m_Previous = fader;
 
-	int c = m_SliderList.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_SliderList.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CAttributeSlider *slider = m_SliderList[ i ];
 		slider->EnablePreview( false, false, false );
@@ -403,7 +405,7 @@ void CBaseAnimSetAttributeSliderPanel::OnThink()
 
 		AttributeValue_t current = slider->GetValue();
 
-		int idx = fader.values->Find( name );
+		auto idx = fader.values->Find( name );
 		if ( idx != fader.values->InvalidIndex() )
 		{
 			preview = (*fader.values)[ idx ];
@@ -453,7 +455,7 @@ void CBaseAnimSetAttributeSliderPanel::OnThink()
 
 void CBaseAnimSetAttributeSliderPanel::ChangeAnimationSet( CDmeAnimationSet *newAnimSet )
 {
-	int i;
+	intp i;
 	// Force recomputation
 	m_nActiveControlSetMode = -1;
 
@@ -463,7 +465,7 @@ void CBaseAnimSetAttributeSliderPanel::ChangeAnimationSet( CDmeAnimationSet *new
 	{
 		// See if every slider is the same as before
 		const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
-		int controlCount = controls.Count();
+		intp controlCount = controls.Count();
 		if ( m_SliderList.Count() == controlCount )
 		{
 			rebuild = false;
@@ -499,7 +501,7 @@ void CBaseAnimSetAttributeSliderPanel::ChangeAnimationSet( CDmeAnimationSet *new
 	if ( !rebuild )
 		return;
 
-	int c = m_SliderList.Count();
+	intp c = m_SliderList.Count();
 	for ( i = 0 ; i < c; ++i )
 	{
 		delete m_SliderList[ i ];
@@ -511,7 +513,7 @@ void CBaseAnimSetAttributeSliderPanel::ChangeAnimationSet( CDmeAnimationSet *new
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
 	// Now create sliders for all known controls, nothing visible by default
-	int controlCount = controls.Count();
+	intp controlCount = controls.Count();
 	for ( i = 0 ; i < controlCount; ++i )
 	{
 		CDmElement *control = controls[ i ];
@@ -561,7 +563,7 @@ void CBaseAnimSetAttributeSliderPanel::ChangeAnimationSet( CDmeAnimationSet *new
 
 void CBaseAnimSetAttributeSliderPanel::SetVisibleControlsForSelectionGroup( CUtlSymbolTable& visible )
 {
-	int i, c;
+	intp i, c;
 
 	bool changed = false;
 
@@ -609,8 +611,8 @@ void CBaseAnimSetAttributeSliderPanel::SetVisibleControlsForSelectionGroup( CUtl
 
 void CBaseAnimSetAttributeSliderPanel::ApplyPreset( float flScale, AttributeDict_t& values )
 {
-	int c = m_SliderList.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_SliderList.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CAttributeSlider *slider = m_SliderList[ i ];
 		if ( !slider || !slider->IsVisible() )
@@ -627,7 +629,7 @@ void CBaseAnimSetAttributeSliderPanel::ApplyPreset( float flScale, AttributeDict
 		target.m_pValue[ ANIM_CONTROL_MULTILEVEL ] = 0.5f;
 
 		const char *name = slider->GetName();
-		int idx = name ? values.Find( name ) : values.InvalidIndex();
+		auto idx = name ? values.Find( name ) : values.InvalidIndex();
 		if ( idx != values.InvalidIndex() )
 		{
 			target = values[ idx ];
@@ -661,8 +663,8 @@ bool CBaseAnimSetAttributeSliderPanel::ApplySliderValues( bool bForce )
 
 	CDisableUndoScopeGuard guard;
 
-	int c = m_SliderList.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_SliderList.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CAttributeSlider *pSlider = m_SliderList[ i ];
 		if ( !pSlider->IsVisible() )
@@ -734,8 +736,8 @@ void CBaseAnimSetAttributeSliderPanel::UpdatePreviewSliderTimes()
 
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
-	float curtime = system()->GetFrameTime();
-	float dt = clamp( curtime - m_flPrevTime, 0.0f, 0.1f );
+	double curtime = system()->GetFrameTime();
+	float dt = clamp( curtime - m_flPrevTime, 0.0, 0.1 );
 	m_flPrevTime = curtime;
 
 	dt *= ifm_fader_timescale;
@@ -768,8 +770,8 @@ void CBaseAnimSetAttributeSliderPanel::UpdatePreviewSliderTimes()
 	m_CtrlKeyPreviewSlider = NULL;
 	m_flEstimatedValue = 0.0f;
 
-	int c = m_SliderList.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_SliderList.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CAttributeSlider *slider = m_SliderList[ i ];
 		slider->UpdateTime( dt );
@@ -886,8 +888,8 @@ void CBaseAnimSetAttributeSliderPanel::UpdatePreviewSliderTimes()
 
 bool CBaseAnimSetAttributeSliderPanel::GetAttributeSliderValue( AttributeValue_t *pValue, const char *name )
 {
-	int c = m_SliderList.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_SliderList.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CAttributeSlider *slider = m_SliderList[ i ];
 		if ( Q_stricmp( slider->GetName(), name ) )
@@ -947,7 +949,7 @@ void CBaseAnimSetAttributeSliderPanel::GetActiveTimeSelectionParams( DmeLog_Time
 
 void CBaseAnimSetAttributeSliderPanel::ActivateControlSetInMode( int mode, int otherChannelsMode, int hiddenChannelsMode, CAttributeSlider *whichSlider /*= NULL*/ )
 {
-	int i, c;
+	intp i, c;
 
 	if ( !m_AnimSet.Get() )
 		return;
@@ -1134,7 +1136,7 @@ void CBaseAnimSetAttributeSliderPanel::SetTimeSelectionParametersForRecordingCha
 
 		ChannelToSliderLookup_t search;
 		search.ch = ch;
-		unsigned int idx = m_ChannelToSliderLookup.Find( search );
+		unsigned short idx = m_ChannelToSliderLookup.Find( search );
 		if ( idx != m_ChannelToSliderLookup.InvalidIndex() && fader.values )
 		{
 			ChannelToSliderLookup_t &item = m_ChannelToSliderLookup[ idx ];
@@ -1142,7 +1144,7 @@ void CBaseAnimSetAttributeSliderPanel::SetTimeSelectionParametersForRecordingCha
 			CDmElement *pControl = item.slider;
 			Assert( pControl );
 
-			int faderIndex = fader.values->Find( pControl->GetName() );
+			auto faderIndex = fader.values->Find( pControl->GetName() );
 			if ( faderIndex != fader.values->InvalidIndex() )
 			{
 				pPreset = (*fader.values)[ faderIndex ].m_pAttribute[ item.type ];
@@ -1209,7 +1211,7 @@ void CBaseAnimSetAttributeSliderPanel::MaybeAddPreviewLog( CDmeFilmClip *shot, C
 
 void CBaseAnimSetAttributeSliderPanel::RecomputePreview()
 {
-	float curtime = system()->GetFrameTime();
+	double curtime = system()->GetFrameTime();
 	m_flRecomputePreviewTime = curtime + RECOMPUTE_PREVIEW_INTERVAL;
 	m_bRequestedNewPreview = true;
 }
@@ -1230,16 +1232,8 @@ void CBaseAnimSetAttributeSliderPanel::PerformRecomputePreview()
 	if ( !m_bRequestedNewPreview )
 		return;
 
-#if 0
-	// Tracker 54528:  While this saves recomputing things all of the time, the delay is annoying so 
-	//  we'll turn it off for now
-	float curtime = system()->GetFrameTime();
-	if ( curtime < m_flRecomputePreviewTime )
-		return;
-#endif
-
 	m_bRequestedNewPreview = false;
-	m_flRecomputePreviewTime = -1.0f;
+	m_flRecomputePreviewTime = -1.0;
 	// list of bones/root transforms which are in the control set
 	m_ActiveTransforms.Purge(); 
 	if ( !m_AnimSet.Get() )
@@ -1249,8 +1243,8 @@ void CBaseAnimSetAttributeSliderPanel::PerformRecomputePreview()
 	CDmElement *previewControl = GetLogPreviewControl();
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
-	int c = m_SliderList.Count();
-	int i;
+	intp c = m_SliderList.Count();
+	intp i;
 	for ( i = 0; i < c; ++i )
 	{
 		CAttributeSlider *slider = m_SliderList[ i ];
@@ -1272,8 +1266,8 @@ CDmElement *CBaseAnimSetAttributeSliderPanel::GetElementFromSlider( CAttributeSl
 {
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
-	int c = m_SliderList.Count();
-	int i;
+	intp c = m_SliderList.Count();
+	intp i;
 	for ( i = 0; i < c; ++i )
 	{
 		CAttributeSlider *slider = m_SliderList[ i ];
@@ -1310,8 +1304,8 @@ void CBaseAnimSetAttributeSliderPanel::SetLogPreviewControl( CDmElement *control
 		const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
 		int itemNumber = 0;
-		int nSliders = m_SliderList.Count();
-		for ( int i = 0; i < nSliders; ++i )
+		intp nSliders = m_SliderList.Count();
+		for ( intp i = 0; i < nSliders; ++i )
 		{
 			CAttributeSlider *slider = m_SliderList[ i ];
 			slider->SetIsLogPreviewControl( false );
@@ -1338,7 +1332,7 @@ void CBaseAnimSetAttributeSliderPanel::GetVisibleControls( CUtlVector< VisItem_t
 {
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
-	int i, c;
+	intp i, c;
 	c = m_SliderList.Count();
 	for ( i = 0; i < c; ++i )
 	{
@@ -1359,14 +1353,14 @@ void CBaseAnimSetAttributeSliderPanel::GetVisibleControls( CUtlVector< VisItem_t
 	}
 }
 
-int CBaseAnimSetAttributeSliderPanel::BuildVisibleControlList( CUtlVector< LogPreview_t >& list )
+intp CBaseAnimSetAttributeSliderPanel::BuildVisibleControlList( CUtlVector< LogPreview_t >& list )
 {
 	if ( !m_AnimSet.Get() )
 		return 0;
 
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
-	int i, c;
+	intp i, c;
 	c = m_SliderList.Count();
 	for ( i = 0; i < c; ++i )
 	{
@@ -1384,14 +1378,14 @@ int CBaseAnimSetAttributeSliderPanel::BuildVisibleControlList( CUtlVector< LogPr
 	return list.Count();
 }
 
-int CBaseAnimSetAttributeSliderPanel::BuildFullControlList( CUtlVector< LogPreview_t >& list )
+intp CBaseAnimSetAttributeSliderPanel::BuildFullControlList( CUtlVector< LogPreview_t >& list )
 {
 	if ( !m_AnimSet.Get() )
 		return 0;
 
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
-	int i, c;
+	intp i, c;
 	c = m_SliderList.Count();
 	for ( i = 0; i < c; ++i )
 	{
@@ -1413,13 +1407,13 @@ void SpewLayer( const char *desc, CDmeTypedLogLayer< float > *l )
 {
 	Msg( "%s\n", desc );
 
-	int c = l->GetKeyCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = l->GetKeyCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		DmeTime_t kt = l->GetKeyTime( i );
 		float v = l->GetKeyValue( i );
 
-		Msg( "%d %.3f = %f\n", i, kt.GetSeconds(), v );
+		Msg( "%zd %.3f = %f\n", i, kt.GetSeconds(), v );
 
 		if ( i > 20 )
 			break;
@@ -1436,11 +1430,11 @@ void CBaseAnimSetAttributeSliderPanel::MoveToSlider( CAttributeSlider *pCurrentS
 	// Find current slider index and then move to next / previous one
 	CUtlVector< CAttributeSlider * > visible;
 
-	int c = m_SliderList.Count();
+	intp c = m_SliderList.Count();
 	if ( c <= 1 )
 		return;
 
-	int i;
+	intp i;
 	for ( i = 0; i < c; ++i )
 	{
 		if ( !m_SliderList[ i ]->IsVisible() )
@@ -1458,7 +1452,7 @@ void CBaseAnimSetAttributeSliderPanel::MoveToSlider( CAttributeSlider *pCurrentS
 		if ( visible[ i ] != pCurrentSlider )
 			continue;
 
-		Msg( "Found slider at %d (old %s)\n", i, pCurrentSlider->GetName() );
+		Msg( "Found slider at %zd (old %s)\n", i, pCurrentSlider->GetName() );
 
 		i += nDirection;
 		if ( i < 0 )
@@ -1470,7 +1464,7 @@ void CBaseAnimSetAttributeSliderPanel::MoveToSlider( CAttributeSlider *pCurrentS
 			i = 0;
 		}
 
-		Msg( "Change to slider %d %s\n", i, visible[ i ]->GetName() );
+		Msg( "Change to slider %zd %s\n", i, visible[ i ]->GetName() );
 
 		// m_SliderList[ i ]->RequestFocus();
 		SetLogPreviewControl( visible[ i ]->GetControl() );
@@ -1485,8 +1479,8 @@ void CBaseAnimSetAttributeSliderPanel::OnKBDeselectAll()
 
 void CBaseAnimSetAttributeSliderPanel::ClearSelectedControls()
 {
-	int c = m_SliderList.Count();
-	int i;
+	intp c = m_SliderList.Count();
+	intp i;
 	for ( i = 0; i < c; ++i )
 	{
 		m_SliderList[ i ]->SetSelected( false );
@@ -1510,8 +1504,8 @@ void CBaseAnimSetAttributeSliderPanel::SetControlSelected( CDmElement *control, 
 
 CAttributeSlider *CBaseAnimSetAttributeSliderPanel::FindSliderForControl( CDmElement *control )
 {
-	int c = m_SliderList.Count();
-	int i;
+	intp c = m_SliderList.Count();
+	intp i;
 	for ( i = 0; i < c; ++i )
 	{
 		if ( m_SliderList[ i ]->GetControl() == control )

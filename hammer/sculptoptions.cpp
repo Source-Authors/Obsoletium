@@ -3,6 +3,8 @@
 //
 
 #include <stdafx.h>
+#include "SculptOptions.h"
+
 #include "hammer.h"
 #include "CollisionUtils.h"
 #include "resource.h"
@@ -28,7 +30,6 @@
 #include "../materialsystem/itextureinternal.h"
 #include "pixelwriter.h"
 #include "TextureSystem.h"
-#include "SculptOptions.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -302,7 +303,7 @@ bool CSculptTool::DoPaint( CMapView3D *pView, const Vector2D &vPoint )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 			
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -586,7 +587,6 @@ bool CSculptTool::DoPaintSmoothOneOverExp( const Vector &vNewCenter, Vector &vPa
 							flFactor *= 1.0f / ( m_SpatialData.m_flScalar * 2.0f );
 						}
 
-						Vector vProjectVert;
 						float flProjectDist = DotProduct( vVert, m_SpatialData.m_vPaintAxis ) - flPaintDist;
 						flSmoothDist += ( flProjectDist * flFactor );
 						flWeight += flFactor;
@@ -644,7 +644,7 @@ bool CSculptTool::GetStartingSpot( CMapView3D *pView, const Vector2D &vPoint )
 //-----------------------------------------------------------------------------
 void CSculptTool::DrawDirection( CRender3D *pRender, Vector Direction, Color Towards, Color Away )
 {
-	Vector		ViewPoint, ViewDir;
+	Vector		ViewDir;
 	Vector2D	ViewVert;
 
 	VMatrix  Matrix;
@@ -765,7 +765,7 @@ bool CSculptTool::FindCollisionIntercept( CCamera *pCamera, const Vector2D &vPoi
 			if ( bUseOrigPosition )
 			{
 				CMapDisp	*OrigDisp = NULL;
-				int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+				auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 				if ( index != m_OrigMapDisp.InvalidIndex() )
 				{
@@ -1030,14 +1030,14 @@ bool CSculptPainter::DoSizing( const Vector2D &vPoint )
 
 // CSculptPushOptions dialog
 
-IMPLEMENT_DYNAMIC(CSculptPushOptions, CDialog)
+IMPLEMENT_DYNAMIC(CSculptPushOptions, CBaseDlg)
 
 
 //-----------------------------------------------------------------------------
 // Purpose: constructor
 //-----------------------------------------------------------------------------
 CSculptPushOptions::CSculptPushOptions(CWnd* pParent /*=NULL*/) : 
-	CDialog(CSculptPushOptions::IDD, pParent),
+	CBaseDlg(CSculptPushOptions::IDD, pParent),
 	CSculptPainter()
 {
 	m_OffsetMode = OFFSET_MODE_ABSOLUTE;
@@ -1070,7 +1070,7 @@ BOOL CSculptPushOptions::OnInitDialog( void )
 {
 	char	temp[ 1024 ];
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_OffsetModeControl.InsertString( -1, "Adaptive" );
 	m_OffsetModeControl.InsertString( -1, "Absolute" );
@@ -1079,19 +1079,19 @@ BOOL CSculptPushOptions::OnInitDialog( void )
 	m_OffsetDistanceControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ABSOLUTE ) );
 	m_OffsetAmountControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ADAPTIVE ) ); 
 
-	sprintf( temp, "%g", m_OffsetDistance );
+	V_sprintf_safe( temp, "%g", m_OffsetDistance );
 	m_OffsetDistanceControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_OffsetAmount * 100.0f );
 	m_OffsetAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_SmoothAmount * 100.0f );
 	m_SmoothAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_flFalloffSpot * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_flFalloffSpot * 100.0f );
 	m_FalloffPositionControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_flFalloffEndingValue * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_flFalloffEndingValue * 100.0f );
 	m_FalloffFinalControl.SetWindowText( temp );
 
 	m_NormalModeControl.InsertString( -1, "Brush Center" );
@@ -1133,7 +1133,7 @@ void CSculptPushOptions::OnCancel()
 //-----------------------------------------------------------------------------
 void CSculptPushOptions::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, m_OffsetModeControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, m_OffsetDistanceControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_AMOUNT, m_OffsetAmountControl);
@@ -1145,7 +1145,7 @@ void CSculptPushOptions::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSculptPushOptions, CDialog)
+BEGIN_MESSAGE_MAP(CSculptPushOptions, CBaseDlg)
 	ON_CBN_SELCHANGE(IDC_IDC_SCULPT_PUSH_OPTION_NORMAL_MODE, &CSculptPushOptions::OnCbnSelchangeIdcSculptPushOptionNormalMode)
 	ON_CBN_SELCHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, &CSculptPushOptions::OnCbnSelchangeSculptPushOptionOffsetMode)
 	ON_EN_CHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, &CSculptPushOptions::OnEnChangeSculptPushOptionOffsetDistance)
@@ -1291,7 +1291,7 @@ void CSculptPushOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -1354,7 +1354,7 @@ bool CSculptPushOptions::OnRMouseDown3D( CMapView3D *pView, UINT nFlags, const V
 		//
 		// check for closest solid object
 		//
-		ULONG		ulFace;
+		unsigned	ulFace;
 		CMapClass	*pObject;
 
 		if( ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL ) )
@@ -1524,7 +1524,7 @@ void CSculptPushOptions::DoPaintOperation( CMapView3D *pView, const Vector2D &vP
 			if ( flLengthPercent > m_flFalloffSpot )
 			{
 				flLengthPercent = ( flLengthPercent - m_flFalloffSpot ) / ( 1.0f - m_flFalloffSpot );
-				flLengthPercent = 1.0 - flLengthPercent;
+				flLengthPercent = 1.0f - flLengthPercent;
 				flDistance = ( ( 1.0f - m_flFalloffEndingValue ) * flLengthPercent * flMaxDistance ) + ( m_flFalloffEndingValue * flMaxDistance );
 			}
 			else
@@ -2136,7 +2136,8 @@ void CSculptPushOptions::OnEnChangeSculptPushOptionOffsetDistance()
 	char	temp[ 1024 ];
 
 	m_OffsetDistanceControl.GetWindowText( temp, sizeof( temp ) );
-	m_OffsetDistance = atof( temp );
+	// dimhotepus: atof -> strtof.
+	m_OffsetDistance = strtof( temp, nullptr );
 }
 
 
@@ -2165,7 +2166,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 		m_SmoothAmount = 0.2f;
 	}
 
-	sprintf( t2, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2190,7 +2191,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 		m_OffsetAmount = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2216,7 +2217,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffPosition()
 		m_flFalloffSpot = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_flFalloffSpot * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_flFalloffSpot * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2242,7 +2243,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffFinal()
 		m_flFalloffEndingValue = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_flFalloffEndingValue * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_flFalloffEndingValue * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -2257,14 +2258,14 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffFinal()
 
 // CSculptCarveOptions dialog
 
-IMPLEMENT_DYNAMIC(CSculptCarveOptions, CDialog)
+IMPLEMENT_DYNAMIC(CSculptCarveOptions, CBaseDlg)
 
 
 //-----------------------------------------------------------------------------
 // Purpose: constructor
 //-----------------------------------------------------------------------------
 CSculptCarveOptions::CSculptCarveOptions(CWnd* pParent /*=NULL*/) : 
-	CDialog(CSculptCarveOptions::IDD, pParent),
+	CBaseDlg(CSculptCarveOptions::IDD, pParent),
 	CSculptPainter()
 {
 	m_OffsetMode = OFFSET_MODE_ABSOLUTE;
@@ -2302,7 +2303,7 @@ BOOL CSculptCarveOptions::OnInitDialog( )
 {
 	char	temp[ 1024 ];
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_OffsetModeControl.InsertString( -1, "Adaptive" );
 	m_OffsetModeControl.InsertString( -1, "Absolute" );
@@ -2311,13 +2312,13 @@ BOOL CSculptCarveOptions::OnInitDialog( )
 	m_OffsetDistanceControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ABSOLUTE ) );
 	m_OffsetAmountControl.EnableWindow( ( m_OffsetMode == OFFSET_MODE_ADAPTIVE ) ); 
 
-	sprintf( temp, "%g", m_OffsetDistance );
+	V_sprintf_safe( temp, "%g", m_OffsetDistance );
 	m_OffsetDistanceControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_OffsetAmount * 100.0f );
 	m_OffsetAmountControl.SetWindowText( temp );
 
-	sprintf( temp, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( temp, "%g%%", m_SmoothAmount * 100.0f );
 	m_SmoothAmountControl.SetWindowText( temp );
 
 	m_NormalModeControl.InsertString( -1, "Brush Center" );
@@ -2359,7 +2360,7 @@ void CSculptCarveOptions::OnCancel( )
 //-----------------------------------------------------------------------------
 void CSculptCarveOptions::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, m_OffsetModeControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, m_OffsetDistanceControl);
 	DDX_Control(pDX, IDC_SCULPT_PUSH_OPTION_OFFSET_AMOUNT, m_OffsetAmountControl);
@@ -2370,7 +2371,7 @@ void CSculptCarveOptions::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSculptCarveOptions, CDialog)
+BEGIN_MESSAGE_MAP(CSculptCarveOptions, CBaseDlg)
 	ON_CBN_SELCHANGE(IDC_IDC_SCULPT_PUSH_OPTION_NORMAL_MODE, &CSculptCarveOptions::OnCbnSelchangeIdcSculptPushOptionNormalMode)
 	ON_CBN_SELCHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_MODE, &CSculptCarveOptions::OnCbnSelchangeSculptPushOptionOffsetMode)
 	ON_EN_CHANGE(IDC_SCULPT_PUSH_OPTION_OFFSET_DISTANCE, &CSculptCarveOptions::OnEnChangeSculptPushOptionOffsetDistance)
@@ -2769,7 +2770,7 @@ void CSculptCarveOptions::RenderTool3D( CRender3D *pRender )
 		if ( pDisp )
 		{
 			CMapDisp	*OrigDisp = NULL;
-			int			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
+			auto			index = m_OrigMapDisp.Find( pDisp->GetEditHandle() );
 
 			if ( index != m_OrigMapDisp.InvalidIndex() )
 			{
@@ -2868,7 +2869,7 @@ bool CSculptCarveOptions::OnRMouseDown3D( CMapView3D *pView, UINT nFlags, const 
 		//
 		// check for closest solid object
 		//
-		ULONG		ulFace;
+		unsigned	ulFace;
 		CMapClass	*pObject;
 
 		if( ( ( pObject = pView->NearestObjectAt( vPoint, ulFace ) ) != NULL ) )
@@ -3185,7 +3186,8 @@ void CSculptCarveOptions::OnEnChangeSculptPushOptionOffsetDistance()
 	char	temp[ 1024 ];
 
 	m_OffsetDistanceControl.GetWindowText( temp, sizeof( temp ) );
-	m_OffsetDistance = atof( temp );
+	// dimhotepus: atof -> strtof
+	m_OffsetDistance = strtof( temp, nullptr );
 }
 
 
@@ -3214,7 +3216,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 		m_SmoothAmount = 0.2f;
 	}
 
-	sprintf( t2, "%g%%", m_SmoothAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -3239,7 +3241,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 		m_OffsetAmount = 1.0f;
 	}
 
-	sprintf( t2, "%g%%", m_OffsetAmount * 100.0f );
+	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
 	if ( strcmpi( temp, t2 ) != 0 )
 	{
@@ -3511,13 +3513,14 @@ private:
 
 // CSculptProjectOptions dialog
 
-IMPLEMENT_DYNAMIC(CSculptProjectOptions, CDialog)
+IMPLEMENT_DYNAMIC(CSculptProjectOptions, CBaseDlg)
 
 CSculptProjectOptions::CSculptProjectOptions(CWnd* pParent /*=NULL*/) : 
-	CDialog(CSculptProjectOptions::IDD, pParent),
+	CBaseDlg(CSculptProjectOptions::IDD, pParent),
 	CSculptTool()
 {
 	m_FileDialog = new CFileDialog(TRUE, NULL, NULL, OFN_LONGNAMES | OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST, "Image Files (*.tga)|*.tga||");
+	m_FileDialog.m_ofn.lpstrTitle = "Open Image File";
 	m_FileDialog->m_ofn.lpstrInitialDir = "";
 
 	m_ImagePixels = NULL;
@@ -3562,13 +3565,13 @@ CSculptProjectOptions::~CSculptProjectOptions()
 //-----------------------------------------------------------------------------
 void CSculptProjectOptions::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_PROJECT_SIZE, m_ProjectSizeControl);
 	DDX_Control(pDX, IDC_PROJECT_SIZE_NUM, m_ProjectSizeNumControl);
 }
 
 
-BEGIN_MESSAGE_MAP(CSculptProjectOptions, CDialog)
+BEGIN_MESSAGE_MAP(CSculptProjectOptions, CBaseDlg)
 	ON_BN_CLICKED(IDC_LOAD_IMAGE, &CSculptProjectOptions::OnBnClickedLoadImage)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_PROJECT_SIZE, &CSculptProjectOptions::OnNMCustomdrawProjectSize)
 END_MESSAGE_MAP()
@@ -3900,7 +3903,7 @@ void CSculptProjectOptions::OnNMCustomdrawProjectSize(NMHDR *pNMHDR, LRESULT *pR
 //	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 
 	char	temp[ 128 ];
-	sprintf( temp, "%d", m_ProjectSizeControl.GetPos() * 16 );
+	V_sprintf_safe( temp, "%d", m_ProjectSizeControl.GetPos() * 16 );
 
 	m_ProjectSizeNumControl.SetWindowText( temp );
 

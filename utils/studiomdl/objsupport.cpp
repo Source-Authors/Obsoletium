@@ -5,23 +5,6 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-
-
-//
-// studiomdl.c: generates a studio .mdl file from a .qc script
-// models/<scriptname>.mdl.
-//
-
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
 #include "tier1/utlbuffer.h"
 #include "cmdlib.h"
 #include "scriplib.h"
@@ -99,7 +82,7 @@ const char *FindMtlEntry( const char *pTgaName )
 static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v, int &t, int &n )
 {
 	char	cmd[1024];
-	int nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
+	intp nLen = bufParse.ParseToken( &breakSet, cmd, false );
 	if ( nLen <= 0 )
 		return false;
 
@@ -107,7 +90,7 @@ static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v,
 	n = 0;
 	t = 0;
 
-	char c = *(char*)bufParse.PeekGet();
+	char c = *(const char*)bufParse.PeekGet();
 	bool bHasTexCoord = IN_CHARACTERSET( breakSet, c ) != 0;
 	bool bHasNormal = false;
 	if ( bHasTexCoord )
@@ -116,14 +99,14 @@ static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v,
 		nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
 		Assert( nLen == 1 );
 
-		c = *(char*)bufParse.PeekGet();
+		c = *(const char*)bufParse.PeekGet();
 		if ( !IN_CHARACTERSET( breakSet, c ) )
 		{
 			nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
 			Assert( nLen > 0 );
 			t = atoi( cmd );
 
-			c = *(char*)bufParse.PeekGet();
+			c = *(const char*)bufParse.PeekGet();
 			bHasNormal = IN_CHARACTERSET( breakSet, c ) != 0;
 		}
 		else
@@ -159,11 +142,11 @@ int Load_OBJ( s_source_t *psource )
 		return 0;
 
 	char pFullPath[MAX_PATH];
-	if ( !GetGlobalFilePath( psource->filename, pFullPath, sizeof(pFullPath) ) )
+	if ( !GetGlobalFilePath( psource->filename, pFullPath ) )
 		return 0;
 
 	char pFullDir[MAX_PATH];
-	Q_ExtractFilePath( pFullPath, pFullDir, sizeof(pFullDir) );
+	V_ExtractFilePath( pFullPath, pFullDir );
 
 	if( !g_quiet )
 	{
@@ -173,7 +156,7 @@ int Load_OBJ( s_source_t *psource )
 	g_iLinecount = 0;
 
 	psource->numbones = 1;
-	strcpy( psource->localBone[0].name, "default" );
+	V_strcpy_safe( psource->localBone[0].name, "default" );
 	psource->localBone[0].parent = -1;
 	Assert( psource->m_Animations.Count() == 0 );
     s_sourceanim_t *pSourceAnim = FindOrAddSourceAnim( psource, "BindPose" );
@@ -190,8 +173,6 @@ int Load_OBJ( s_source_t *psource )
 
 	while ( GetLineInput() ) 
 	{
-		Vector tmp;
-
 		if ( strncmp( g_szLine, "v ", 2 ) == 0 )
 		{
 			i = g_numverts++;
@@ -214,7 +195,7 @@ int Load_OBJ( s_source_t *psource )
 		{
 			i = g_numtexcoords++;
 			sscanf( g_szLine, "vt %f %f", &g_texcoord[i].x, &g_texcoord[i].y );
-			g_texcoord[i].y = 1.0 - g_texcoord[i].y;
+			g_texcoord[i].y = 1.0f - g_texcoord[i].y;
 			continue;
 		}
 		
@@ -224,7 +205,7 @@ int Load_OBJ( s_source_t *psource )
 			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
 
 			char pFullMtlLibPath[MAX_PATH];
-			Q_ComposeFileName( pFullDir, cmd, pFullMtlLibPath, sizeof(pFullMtlLibPath) );
+			V_ComposeFileName( pFullDir, cmd, pFullMtlLibPath );
 			if ( g_pFullFileSystem->ReadFile( pFullMtlLibPath, NULL, buf ) )
 			{
 				ParseMtlLib( buf );
@@ -308,7 +289,7 @@ int AppendVTAtoOBJ( s_source_t *psource, char *filename, int frame )
 	Vector tmp;
 	matrix3x4_t m;
 
-	AngleMatrix( RadianEuler( 1.570796, 0, 0 ), m );
+	AngleMatrix( RadianEuler( M_PI_F / 2, 0, 0 ), m );
 
 	if ( !OpenGlobalFile( filename ) )
 		return 0;
@@ -324,8 +305,6 @@ int AppendVTAtoOBJ( s_source_t *psource, char *filename, int frame )
 
 	while ( GetLineInput() ) 
 	{
-		Vector tmp;
-
 		if (strncmp( g_szLine, "v ", 2 ) == 0)
 		{
 			i = g_numverts++;
@@ -399,14 +378,14 @@ int AppendVTAtoOBJ( s_source_t *psource, char *filename, int frame )
 	if ( frame == 0 )
 	{
 		psource->numbones = 1;
-		strcpy( psource->localBone[0].name, "default" );
+		V_strcpy_safe( psource->localBone[0].name, "default" );
 		psource->localBone[0].parent = -1;
 		pSourceAnim->numframes = 1;
 		pSourceAnim->startframe = 0;
 		pSourceAnim->endframe = 0;
 		pSourceAnim->rawanim[0] = (s_bone_t *)kalloc( 1, sizeof( s_bone_t ) );
 		pSourceAnim->rawanim[0][0].pos.Init();
-		pSourceAnim->rawanim[0][0].rot = RadianEuler( 1.570796, 0.0, 0.0 );
+		pSourceAnim->rawanim[0][0].rot = RadianEuler( M_PI_F / 2, 0.0f, 0.0f );
 		Build_Reference( psource, "BindPose" );
 
 		BuildIndividualMeshes( psource );

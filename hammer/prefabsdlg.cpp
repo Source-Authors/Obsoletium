@@ -23,7 +23,7 @@
 // CPrefabsDlg dialog
 
 CPrefabsDlg::CPrefabsDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CPrefabsDlg::IDD, pParent)
+	: CBaseDlg(CPrefabsDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPrefabsDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -33,7 +33,7 @@ CPrefabsDlg::CPrefabsDlg(CWnd* pParent /*=NULL*/)
 
 void CPrefabsDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPrefabsDlg)
 	DDX_Control(pDX, IDC_OBJECTS, m_Objects);
 	DDX_Control(pDX, IDC_OBJECTNOTES, m_ObjectNotes);
@@ -43,7 +43,7 @@ void CPrefabsDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CPrefabsDlg, CDialog)
+BEGIN_MESSAGE_MAP(CPrefabsDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CPrefabsDlg)
 	ON_BN_CLICKED(IDC_ADDLIBRARY, OnAddlibrary)
 	ON_BN_CLICKED(IDC_ADDOBJECT, OnAddobject)
@@ -72,9 +72,10 @@ void CPrefabsDlg::OnAddobject()
 
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT | OFN_FILEMUSTEXIST |
 		OFN_HIDEREADONLY | OFN_LONGNAMES | OFN_NOCHANGEDIR, 
-		"Prefab files (*.map;*.rmf;*.os)|*.map; *.rmf; *.os|"
-		"Game MAP files (*.map)|*.map|"
-		"Worldcraft RMF files (*.rmf)|*.rmf||", this);
+		"Prefab Files (*.map;*.rmf;*.os)|*.map; *.rmf; *.os|"
+		"Game Map Files (*.map)|*.map|"
+		"Worldcraft RMF Files (*.rmf)|*.rmf||", this);
+	dlg.m_ofn.lpstrTitle = "Open Prefab | Game Map | Wordlcraft RMF File";
 
 	if(dlg.DoModal() == IDCANCEL)
 		return;	// aborted
@@ -82,7 +83,7 @@ void CPrefabsDlg::OnAddobject()
 	// add all these files .. 
 	char szDir[MAX_PATH], szFiles[2048];
 	memcpy(szFiles, dlg.m_ofn.lpstrFile, dlg.m_ofn.nMaxFile);
-	strcpy(szDir, dlg.m_ofn.lpstrFile);
+	V_strcpy_safe(szDir, dlg.m_ofn.lpstrFile);
 
 	BOOL bOneFile = FALSE;
 	char *p = szFiles + strlen(szDir) + 1;
@@ -101,7 +102,7 @@ void CPrefabsDlg::OnAddobject()
 	int iItem = m_Objects.GetItemCount();
 	while(1)
 	{
-		strcpy(szFile, p);
+		V_strcpy_safe(szFile, p);
 		if(!szFile[0])
 			break;
 		p += strlen(szFile) + 1;
@@ -284,7 +285,7 @@ void CPrefabsDlg::OnRemoveobject()
 	CPrefabLibrary *pLibrary = GetCurrentLibrary();
 	while(iIndex != -1)
 	{
-		CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(iIndex));
+		CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iIndex)));
 		if(pPrefab)
 		{
 			// delete it
@@ -292,7 +293,7 @@ void CPrefabsDlg::OnRemoveobject()
 			{
 				// do confirmation.
 				if(AfxMessageBox("Are you sure you want to delete these "
-					"items?", MB_YESNO) == IDNO)
+					"items?", MB_YESNO | MB_ICONQUESTION) == IDNO)
 					return;	// nope!
 				m_Objects.SetRedraw(FALSE);	// no redraw while doing this
 			}
@@ -323,14 +324,18 @@ void CPrefabsDlg::OnExportobject()
 	int iIndex = m_Objects.GetNextItem(-1, LVNI_SELECTED);
 	while(iIndex != -1)
 	{
-		CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(iIndex));
+		CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iIndex)));
 		if(pPrefab)
 		{
 			// export it
 			CString strFilename;
 			strFilename = pPrefab->GetName();
 			CFileDialog dlg(FALSE, "map", strFilename, OFN_HIDEREADONLY | 
-				OFN_OVERWRITEPROMPT, "Map files|*.map;*.rmf|", this);
+				OFN_OVERWRITEPROMPT,
+				"Game Map Files (*.map)|*.map|"
+				"Worldcraft RMF Files (*.rmf)|*.rmf||",
+				this);
+			dlg.m_ofn.lpstrTitle = "Open Game Map | Worldcraft RMF File";
 			if(dlg.DoModal() == IDCANCEL)
 				return;	// nevermind
 			strFilename = dlg.GetPathName();
@@ -362,7 +367,7 @@ void CPrefabsDlg::SetCurObject(int iItem)
 	}
 
 	// update data..
-	CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(iCurObject));
+	CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iCurObject)));
 	Assert(pPrefab);
 
 	m_ObjectNotes.SetWindowText(pPrefab->GetNotes());
@@ -394,8 +399,8 @@ CPrefabLibrary *CPrefabsDlg::GetCurrentLibrary(int *piSel)
 	int iSel = m_Libraries.GetCurSel();
 	if(iSel == CB_ERR)
 		return NULL;
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(
-		m_Libraries.GetItemData(iSel));
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(static_cast<DWORD>(
+		m_Libraries.GetItemData(iSel)));
 
 	if(piSel)
 		piSel[0] = iSel;
@@ -410,7 +415,7 @@ CPrefab *CPrefabsDlg::GetCurrentObject(int *piSel)
 	int iSel = iCurObject;
 	if(iSel == -1)
 		return NULL;
-	CPrefab *pPrefab= CPrefab::FindID(m_Objects.GetItemData(iSel));
+	CPrefab *pPrefab= CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iSel)));
 
 	if(piSel)
 		piSel[0] = iSel;
@@ -422,7 +427,7 @@ void CPrefabsDlg::OnSelchangeLibraries()
 {
 	// get last library
 	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(
-		m_Libraries.GetItemData(iCurLibrary));
+		static_cast<DWORD>(m_Libraries.GetItemData(iCurLibrary)));
 
 	// save its index
 	if(bCurLibraryModified)
@@ -458,7 +463,7 @@ static int AskAboutInvalidFilename()
 {
 	return AfxMessageBox("That's not a valid name - some of the characters aren't\n"
 			"acceptable. Try using a name with only A-Z, 0-9, space,\n"
-			"and these characters: $%`-_@~'!(){}^#&", MB_OKCANCEL);
+			"and these characters: $%`-_@~'!(){}^#&", MB_OKCANCEL | MB_ICONERROR);
 }
 
 
@@ -484,12 +489,16 @@ Again:
 
 	pLibrary->SetName(dlg.m_strName);
 	pLibrary->SetNotes(dlg.m_strDescript);
+	// dimhotepus: Save immediately to be able to work with.
+	pLibrary->Save();
 
 	// add to list
 	int iIndex = m_Libraries.AddString(pLibrary->GetName());
 	m_Libraries.SetItemData(iIndex, pLibrary->GetID());
 
 	m_Libraries.SetCurSel(iIndex);
+	// dimhotepus: Add to global list.
+	CPrefabLibrary::AddLibrary(pLibrary);
 	OnSelchangeLibraries();	// to redraw description window
 	bCurLibraryModified = TRUE;
 }
@@ -548,23 +557,30 @@ void CPrefabsDlg::OnRemovelibrary()
 		return;
 	}
 
-	if (AfxMessageBox("Are you sure you want to delete this library from your hard drive?", MB_YESNO) == IDYES)
+	if (AfxMessageBox("Are you sure you want to delete this library from your storage?", MB_YESNO | MB_ICONQUESTION) == IDYES)
 	{
-		pLibrary->DeleteFile();
-		delete pLibrary;
+		// dimhotepus: Only if library file was deleted (ex. Prefabs can't be deleted).
+		if (pLibrary->DeleteFile())
+		{
+			// dimhotepus: Remove from global list.
+			CPrefabLibrary::RemoveLibrary(pLibrary);
 
-		bCurLibraryModified = FALSE;
+			delete pLibrary;
 
-		m_Libraries.DeleteString(iSel);
-		m_Libraries.SetCurSel(0);
-		OnSelchangeLibraries();	// to redraw description window
+			bCurLibraryModified = FALSE;
+
+			m_Libraries.DeleteString(iSel);
+			m_Libraries.SetCurSel(0);
+
+			OnSelchangeLibraries();	// to redraw description window
+		}
 	}
 }
 
 
 BOOL CPrefabsDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	SetCurObject(-1);
 
@@ -602,7 +618,7 @@ void CPrefabsDlg::OnEndlabeleditObjects(NMHDR* pNMHDR, LRESULT* pResult)
 	if(item.pszText == NULL)
 		return;
 
-	CPrefab *pPrefab = CPrefab::FindID(m_Objects.GetItemData(item.iItem));
+	CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(item.iItem)));
 	pPrefab->SetName(item.pszText);
 	m_Objects.SetItemText(item.iItem, 0, item.pszText);
 	bCurLibraryModified = TRUE;
@@ -619,5 +635,5 @@ void CPrefabsDlg::OnClose()
 		pLibrary->Save();
 	}
 	
-	CDialog::OnClose();
+	__super::OnClose();
 }

@@ -86,18 +86,26 @@ extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, void* );
 
 extern void InitTime();
 
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 {
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
-		g_hTier0Instance = hinstDLL;
+		g_hTier0Instance = module;
 
 		InitTime();
+		
+		// dimhotepus: Do not notify on thread creation for performance.
+		DisableThreadLibraryCalls(module);
+	}
+	else if (fdwReason == DLL_PROCESS_DETACH)
+	{
+		// dimhotepus: Cleanup instance.
+		g_hTier0Instance = nullptr;
+	}
 
 #ifdef DEBUG
-		MemDbgDllMain( hinstDLL, fdwReason, lpvReserved );
+	MemDbgDllMain( module, fdwReason, lpvReserved );
 #endif
-	}
 
 	return TRUE;
 }
@@ -194,7 +202,7 @@ static CAssertDisable* IgnoreAssertsNearby( int nRange )
 }
 
 #if defined( _WIN32 )
-se::windows::ui::CDpiWindowBehavior g_dpi_window_behavior;
+se::windows::ui::CDpiWindowBehavior g_dpi_window_behavior{false};
 
 static INT_PTR CALLBACK AssertDialogProc(
   HWND hDlg,                      // handle to dialog box
@@ -223,7 +231,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 			g_dpi_window_behavior.OnCreateWindow(hDlg);
 
 			// dimhotepus: Add launcher icon for Assert dialog.
-			HANDLE hExeIcon = LoadImageW( GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( SRC_IDI_APP_MAIN ), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE );
+			HANDLE hExeIcon = LoadImageW( GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( SRC_IDI_APP_MAIN ), IMAGE_ICON, 0, 0, LR_SHARED );
 			SendMessage( hDlg, WM_SETICON, ICON_BIG, (LPARAM)hExeIcon );
 		
 			// Center the dialog.
@@ -301,20 +309,27 @@ static INT_PTR CALLBACK AssertDialogProc(
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
-			}
 
-			case WM_KEYDOWN:
-			{
-				// Escape?
-				if ( wParam == 2 )
+				// dimhotepus: Explicitly handle missed commands.
+				case IDC_IGNORE_NUMLINES:
+				case IDC_IGNORE_NUMTIMES:
+					return TRUE;
+					
+				// dimhotepus: Explicitly handle ESC.
+				case IDC_ESCAPE_DIALOG:
 				{
 					// Ignore this assert.
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
-			}
 
-			return TRUE;
+				default:
+				{
+					// dimhotepus: Cant use Assert here as recursive assert causes crash.
+					DebuggerBreakIfDebugging();
+					return FALSE;
+				}
+			}
 		}
 
 		case WM_DPICHANGED:
@@ -535,8 +550,8 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 			{ 0,										IDC_IGNORE_ALL,		"Ignore All Asserts"	},
 		};
 
-		_snprintf( text, sizeof( text ), "File: %s\nLine: %i\nExpr: %s\n", pFilename, line, pExpression );
-		text[ sizeof( text ) - 1 ] = 0;
+		_snprintf( text, std::size( text ), "File: %s\nLine: %i\nExpr: %s\n", pFilename, line, pExpression );
+		text[ std::size( text ) - 1 ] = '\0';
 
 		messageboxdata.window = g_SDLWindow;
 		messageboxdata.title = "Assertion Failed";

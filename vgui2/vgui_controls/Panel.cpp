@@ -5,12 +5,20 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "vgui_controls/Panel.h"
 
-#include <cstdio>
-#include <cctype>	// isdigit()
+#include "filesystem.h"
+#include "tier0/vprof.h"
+#include "tier0/icommandline.h"
+#include "tier0/minidump.h"
+#include "tier1/KeyValues.h"
+#include "tier1/UtlSortVector.h"
+#include "tier1/utldict.h"
+#include "tier1/utlbuffer.h"
 #include "tier1/utlvector.h"
-#include "vstdlib/IKeyValuesSystem.h"
+#include "tier1/mempool.h"
 
+#include "vstdlib/IKeyValuesSystem.h"
 #include "materialsystem/imaterial.h"
 
 #include "vgui/IBorder.h"
@@ -21,27 +29,14 @@
 #include "vgui/ISystem.h"
 #include "vgui/ILocalize.h"
 #include "vgui/IVGui.h"
-#include "tier1/KeyValues.h"
 #include "vgui/MouseCode.h"
 
-#include "vgui_controls/Panel.h"
 #include "vgui_controls/BuildGroup.h"
 #include "vgui_controls/Tooltip.h"
 #include "vgui_controls/PHandle.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/MenuItem.h"
-
-#include "UtlSortVector.h"
-
-#include "tier1/utldict.h"
-#include "tier1/utlbuffer.h"
-#include "tier1/mempool.h"
-#include "filesystem.h"
-#include "tier0/icommandline.h"
-#include "tier0/minidump.h"
-
-#include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -66,17 +61,6 @@ const char *g_PinCornerStrings [] =
 COMPILE_TIME_ASSERT( Panel::PIN_LAST == ssize( g_PinCornerStrings ) );
 
 extern int GetBuildModeDialogCount();
-
-static char *CopyString( const char *in )
-{
-	if ( !in )
-		return NULL;
-
-	intp len = V_strlen( in );
-	char *n = new char[ len + 1 ];
-	Q_strncpy( n, in, len  + 1 );
-	return n;
-}
 
 #ifdef STAGING_ONLY
 ConVar tf_strict_mouse_up_events( "tf_strict_mouse_up_events", "0", FCVAR_ARCHIVE, "Only allow Mouse-Release events to happens on panels we also Mouse-Downed in" );
@@ -175,7 +159,7 @@ BoundKey_t::BoundKey_t():
 BoundKey_t::BoundKey_t( const BoundKey_t& src )
 {
 	isbuiltin			= src.isbuiltin;
-	bindingname			= isbuiltin ? src.bindingname : CopyString( src.bindingname );
+	bindingname			= isbuiltin ? src.bindingname : V_strdup( src.bindingname );
 	keycode				= src.keycode;
 	modifiers			= src.modifiers;
 }
@@ -185,7 +169,7 @@ BoundKey_t& BoundKey_t::operator =( const BoundKey_t& src )
 	if ( this == &src )
 		return *this;
 	isbuiltin			= src.isbuiltin;
-	bindingname			= isbuiltin ? src.bindingname : CopyString( src.bindingname );
+	bindingname			= isbuiltin ? src.bindingname : V_strdup( src.bindingname );
 	keycode				= src.keycode;
 	modifiers			= src.modifiers;
 	return *this;
@@ -449,9 +433,8 @@ static void BufPrint( CUtlBuffer& buf, int level, char const *fmt, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( string, sizeof( string ) - 1, fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
-	string[ sizeof( string ) - 1 ] = 0;
 
 	while ( --level >= 0 )
 	{
@@ -538,7 +521,7 @@ void Panel::LoadKeyBindingsForOnePanel( KeyBindingContextHandle_t handle, Panel 
 	char const *filename = g_KBMgr.GetKeyBindingsFile( handle );
 	char const *pathID = g_KBMgr.GetKeyBindingsFilePathID( handle );
 
-	KeyValues *kv = new KeyValues( "keybindings" );
+	KeyValuesAD kv( "keybindings" );
 	if ( kv->LoadFromFile( g_pFullFileSystem, filename, pathID ) )
 	{
 		int c = GetPanelsWithKeyBindingsCount( handle );
@@ -563,10 +546,9 @@ void Panel::LoadKeyBindingsForOnePanel( KeyBindingContextHandle_t handle, Panel 
 				continue;
 			}
 			
-            kbPanel->ParseKeyBindings( subKey );
+			kbPanel->ParseKeyBindings( subKey );
 		}
 	}
-	kv->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -579,7 +561,7 @@ void Panel::ReloadKeyBindings( KeyBindingContextHandle_t handle )
 	char const *filename = g_KBMgr.GetKeyBindingsFile( handle );
 	char const *pathID = g_KBMgr.GetKeyBindingsFilePathID( handle );
 
-	KeyValues *kv = new KeyValues( "keybindings" );
+	KeyValuesAD kv( "keybindings" );
 	if ( kv->LoadFromFile( g_pFullFileSystem, filename, pathID ) )
 	{
 		int c = GetPanelsWithKeyBindingsCount( handle );
@@ -601,10 +583,9 @@ void Panel::ReloadKeyBindings( KeyBindingContextHandle_t handle )
 				continue;
 			}
 			
-            kbPanel->ParseKeyBindings( subKey );
+			kbPanel->ParseKeyBindings( subKey );
 		}
 	}
-	kv->deleteThis();
 }
 #endif // VGUI_USEKEYBINDINGMAPS
 
@@ -768,25 +749,33 @@ Panel::~Panel()
 	_flags.ClearFlag( AUTODELETE_ENABLED );
 	_flags.SetFlag( MARKED_FOR_DELETION );
 
-	// remove panel from any list
-	SetParent((VPANEL)NULL);
-
-	// Stop our children from pointing at us, and delete them if possible
-	while (ipanel()->GetChildCount(GetVPanel()))
+	// dimhotepus: AnimationController destructor runs when ipanel is already unloaded.
+	if (ipanel())
 	{
-		VPANEL child = ipanel()->GetChild(GetVPanel(), 0);
-		if (ipanel()->IsAutoDeleteSet(child))
+		// remove panel from any list
+		SetParent((VPANEL)NULL);
+
+		// Stop our children from pointing at us, and delete them if possible
+		while (ipanel()->GetChildCount(GetVPanel()))
 		{
-			ipanel()->DeletePanel(child);
-		}
-		else
-		{
-			ipanel()->SetParent(child, NULL);
+			VPANEL child = ipanel()->GetChild(GetVPanel(), 0);
+			if (ipanel()->IsAutoDeleteSet(child))
+			{
+				ipanel()->DeletePanel(child);
+			}
+			else
+			{
+				ipanel()->SetParent(child, NULL);
+			}
 		}
 	}
-
-	// delete VPanel
-	ivgui()->FreePanel(_vpanel);
+	
+	// dimhotepus: AnimationController destructor runs when ivgui is already unloaded.
+	if (ivgui())
+	{
+		// delete VPanel
+		ivgui()->FreePanel(_vpanel);
+	}
 	// free our name
 	delete [] _panelName;
 
@@ -2163,7 +2152,7 @@ void Panel::AddKeyBinding( char const *bindingName, int keycode, int modifiers )
 
 	BoundKey_t kb;																	
 	kb.isbuiltin = false;															
-	kb.bindingname = CopyString( bindingName );												
+	kb.bindingname = V_strdup( bindingName );												
 	kb.keycode = keycode;															
 	kb.modifiers = modifiers;														
 
@@ -2451,7 +2440,7 @@ wchar_t const *Panel::KeyCodeToDisplayString( KeyCode code )
 				return wstr;
 			}
 
-			g_pVGuiLocalize->ConvertANSIToUnicode( str, buf, sizeof( buf ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( str, buf );
 			return buf;
 		}
 	}
@@ -3033,7 +3022,7 @@ void Panel::OnCursorMoved(int x, int y)
 		// figure out x and y in parent space
 		int thisX, thisY;
 		ipanel()->GetPos( GetVPanel(), thisX, thisY );
-		CallParentFunction( new KeyValues( "OnCursorMoved", "x", x + thisX, "y", y + thisY ) );
+		CallParentFunction(new KeyValues("OnCursorMoved", "x", x + thisX, "y", y + thisY));
 	}
 }
 
@@ -4676,11 +4665,14 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 			if ( pColorStr[0] == '.' || isdigit( pColorStr[0] ) )
 			{
 				float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
-				sscanf( pColorStr, "%f %f %f %f", &r, &g, &b, &a );
-				clrDest[0] = (unsigned char)r;
-				clrDest[1] = (unsigned char)g;
-				clrDest[2] = (unsigned char)b;
-				clrDest[3] = (unsigned char)a;
+				// dimhotepus: Check all 4 color components are present.
+				if ( sscanf( pColorStr, "%f %f %f %f", &r, &g, &b, &a ) == 4 ) 
+				{
+					clrDest[0] = (unsigned char)r;
+					clrDest[1] = (unsigned char)g;
+					clrDest[2] = (unsigned char)b;
+					clrDest[3] = (unsigned char)a;
+				}
 			}
 			else
 			{
@@ -4763,7 +4755,7 @@ void Panel::GetSettings( KeyValues *outResourceData )
 	}
 	if (m_pTooltips)
 	{
-		if (m_pTooltips->GetText()[0])
+		if (!Q_isempty( m_pTooltips->GetText() ))
 		{
 			outResourceData->SetString("tooltiptext", m_pTooltips->GetText());
 		}
@@ -4970,7 +4962,7 @@ MessageMapItem_t Panel::m_MessageMap[] =
 };
 
 // IMPLEMENT_PANELMAP( Panel, NULL )
-PanelMap_t Panel::m_PanelMap = { Panel::m_MessageMap, ssize(Panel::m_MessageMap), "Panel", NULL, 0 };
+PanelMap_t Panel::m_PanelMap = { Panel::m_MessageMap, static_cast<int>(ssize(Panel::m_MessageMap)), "Panel", NULL, 0 };
 PanelMap_t *Panel::GetPanelMap( void ) { return &m_PanelMap; }
 
 //-----------------------------------------------------------------------------
@@ -6095,20 +6087,20 @@ class CStringProperty : public vgui::IPanelAnimationPropertyConverter
 public:
 	void GetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
-		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		kv->SetString( entry->name(), (char *)data );
+		const void *data = (*entry->m_pfnLookup)( panel );
+		kv->SetString( entry->name(), static_cast<const char *>(data) );
 	}
 	
 	void SetData( Panel *panel, KeyValues *kv, PanelAnimationMapEntry *entry ) override
 	{
-		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		strcpy( (char *)data, kv->GetString( entry->name() ) );
+		void *data = (*entry->m_pfnLookup)( panel );
+		strcpy( static_cast<char *>(data), kv->GetString( entry->name() ) );
 	}
 
 	virtual void InitFromDefault( Panel *panel, PanelAnimationMapEntry *entry ) override
 	{
-		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
-		strcpy( ( char * )data, entry->defaultvalue() );
+		void *data = (*entry->m_pfnLookup)( panel );
+		strcpy( static_cast<char *>(data), entry->defaultvalue() );
 	}
 };
 
@@ -8636,7 +8628,7 @@ void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels
 		if ( pchFilter && pchFilter[ 0 ] != '\0' )
 		{
 			char szBuff[ 128 ];
-			pPanel->GetText( szBuff, sizeof( szBuff ) );
+			pPanel->GetText( szBuff );
 
 			// Prefix
 			if ( nFilterType == 0 )
@@ -8660,7 +8652,7 @@ void VguiPanelGetSortedChildButtonList( Panel *pParentPanel, void *pSortedPanels
 	}
 }
 
-int VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir )
+intp VguiPanelNavigateSortedChildButtonList( void *pSortedPanels, int nDir )
 {
 	CUtlSortVector< SortedPanel_t, CSortedPanelYLess > *pList = reinterpret_cast< CUtlSortVector< SortedPanel_t, CSortedPanelYLess >* >( pSortedPanels );
 

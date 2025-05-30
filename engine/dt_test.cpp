@@ -661,9 +661,10 @@ void RandomlyChangeUtlVectorStruct( DTTestServer *pServer )
 	pServer->m_Sub.m_UtlVectorStruct.SetSize( nElements );
 	for ( int i=0; i < nElements; i++ )
 	{
-		pServer->m_Sub.m_UtlVectorStruct[i].a = rand();
-		pServer->m_Sub.m_UtlVectorStruct[i].b = rand();
-		pServer->m_Sub.m_UtlVectorStruct[i].f = rand();
+		auto &v = pServer->m_Sub.m_UtlVectorStruct[i];
+		v.a = rand();
+		v.b = rand();
+		v.f = rand();
 	}
 }
 

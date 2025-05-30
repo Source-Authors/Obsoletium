@@ -58,7 +58,7 @@ void TE_BeamEntPoint( IRecipientFilter& filter, float delay,
 {
 	beams->CreateBeamEntPoint( nStartEntity, pStart, nEndEntity, pEnd, 
 		modelindex, haloindex, 0.0f, life,  width, endWidth, fadeLength, amplitude,
-		a, 0.1 * (float)speed, startframe, 0.1f * (float)framerate, r, g, b );
+		a, 0.1f * speed, startframe, 0.1f * framerate, r, g, b );
 }
 
 //-----------------------------------------------------------------------------
@@ -69,8 +69,8 @@ void C_TEBeamEntPoint::PostDataUpdate( DataUpdateType_t updateType )
 {
 	beams->CreateBeamEntPoint( m_nStartEntity, &m_vecStartPoint, m_nEndEntity, &m_vecEndPoint, 
 		m_nModelIndex, m_nHaloIndex, 0.0f,
-		m_fLife,  m_fWidth, m_fEndWidth, m_nFadeLength, m_fAmplitude, a, 0.1 * m_nSpeed, 
-		m_nStartFrame, 0.1 * m_nFrameRate, r, g, b );
+		m_fLife,  m_fWidth, m_fEndWidth, m_nFadeLength, m_fAmplitude, a, 0.1f * m_nSpeed, 
+		m_nStartFrame, 0.1f * m_nFrameRate, r, g, b );
 }
 
 IMPLEMENT_CLIENTCLASS_EVENT_DT(C_TEBeamEntPoint, DT_TEBeamEntPoint, CTEBeamEntPoint)

@@ -11,8 +11,12 @@
 #pragma once
 #endif
 
-#include <mxtk/mxWindow.h>
+#include "tier0/basetypes.h"
+#include <mxtk/mxwindow.h>
 #include <mxtk/mxCheckBox.h>
+
+FORWARD_DECLARE_HANDLE(HDC);
+using RECT = struct tagRECT;
 
 #define IDC_INFLUENCE 1000
 

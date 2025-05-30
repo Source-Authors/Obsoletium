@@ -427,7 +427,7 @@ struct CAudioSourceCachedInfoHandle_t
 abstract_class CAudioSource
 {
 public:
-	enum
+	enum AudioSource
 	{
 		AUDIO_SOURCE_UNK = 0,
 		AUDIO_SOURCE_WAV,
@@ -437,7 +437,7 @@ public:
 		AUDIO_SOURCE_MAXTYPE,
 	};
 
-	enum
+	enum AudioStatus
 	{
 		AUDIO_NOT_LOADED = 0,
 		AUDIO_IS_LOADED = 1,
@@ -479,8 +479,8 @@ public:
 	virtual bool				IsLooped( void ) = 0;
 	virtual bool				IsStereoWav( void ) = 0;
 	virtual bool				IsStreaming( void ) = 0;
-	virtual int					GetCacheStatus( void ) = 0;
-	int 						IsCached( void ) { return GetCacheStatus() == AUDIO_IS_LOADED ? true : false; }
+	virtual AudioStatus			GetCacheStatus( void ) = 0;
+	int 						IsCached( void ) { return GetCacheStatus() == AUDIO_IS_LOADED; }
 	virtual void				CacheLoad( void ) = 0;
 	virtual void				CacheUnload( void ) = 0;
 	virtual CSentence			*GetSentence( void ) = 0;

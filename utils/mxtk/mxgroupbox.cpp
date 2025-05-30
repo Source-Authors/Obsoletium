@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxGroupBox.h"
+#include "mxtk/mxgroupbox.h"
 #include <windows.h>
 
 

@@ -6,6 +6,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolClipper.h"
+
 #include "GlobalFunctions.h"
 #include "History.h"
 #include "MapDefs.h"
@@ -19,7 +21,6 @@
 #include "Render3D.h"
 #include "RenderUtils.h"
 #include "StatusBarIDs.h"		// dvs: remove
-#include "ToolClipper.h"
 #include "ToolManager.h"
 #include "vgui/Cursor.h"
 #include "Selection.h"
@@ -28,7 +29,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable:4244 )
 
 
 //=============================================================================
@@ -43,8 +43,11 @@
 //          pClipper - the clipper tool
 //  Output: successful?? (true/false)
 //-----------------------------------------------------------------------------
-BOOL AddToClipList( CMapSolid *pSolid, Clipper3D *pClipper )
+BOOL AddToClipList( CMapClass *mp, DWORD_PTR ctx )
 {
+    CMapSolid *pSolid = reinterpret_cast<CMapSolid *>(mp);
+    Clipper3D *pClipper = reinterpret_cast<Clipper3D *>(ctx);
+
     CClipGroup *pClipGroup = new CClipGroup;
     if( !pClipGroup )
         return false;
@@ -83,6 +86,7 @@ Clipper3D::Clipper3D(void)
     m_ClipPoints[0].Init();
     m_ClipPoints[1].Init();
     m_ClipPointHit = -1;
+    m_vOrgPos.Init();
 
     m_pOrigObjects = NULL;
 
@@ -298,10 +302,10 @@ void Clipper3D::SetClipObjects( const CMapObjectList *pList )
 
         if( pObject->IsMapClass( MAPCLASS_TYPE( CMapSolid ) ) )
         {
-            AddToClipList( ( CMapSolid* )pObject, this );
+            AddToClipList( pObject, DWORD_PTR( this ) );
         }
 
-        pObject->EnumChildren( ENUMMAPCHILDRENPROC( AddToClipList ), DWORD( this ), MAPCLASS_TYPE( CMapSolid ) );
+        pObject->EnumChildren( AddToClipList, DWORD_PTR( this ), MAPCLASS_TYPE( CMapSolid ) );
     }
 
     // the clipping list is not empty anymore
@@ -715,11 +719,7 @@ void Clipper3D::ResetClipResults( void )
     FOR_EACH_OBJ( m_ClipResults, pos )
     {
         CClipGroup *pClipGroup = m_ClipResults.Element(pos);
-
-        if( pClipGroup )
-        {
-            delete pClipGroup;
-        }
+        delete pClipGroup;
     }
 
 	m_ClipResults.RemoveAll();
@@ -912,7 +912,7 @@ bool Clipper3D::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &vP
 	if ( uConstraints & constrainSnap )
 		m_pDocument->Snap(vecWorld,uConstraints);
 
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
 	SetStatusText(SBI_COORDS, szBuf);
 	
 	if (IsTranslating())

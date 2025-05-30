@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxMenuBar.h"
+#include "mxtk/mxmenubar.h"
 #include <windows.h>
 #include <string.h>
 
@@ -51,7 +51,7 @@ mxMenuBar::~mxMenuBar ()
 void
 mxMenuBar::addMenu (const char *item, mxMenu *menu)
 {
-	AppendMenu ((HMENU) getHandle (), MF_POPUP, (UINT) ((mxWidget *) menu)->getHandle (), item);
+	AppendMenu ((HMENU) getHandle (), MF_POPUP, (UINT_PTR) ((mxWidget *) menu)->getHandle (), item);
 }
 
 

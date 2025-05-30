@@ -5,6 +5,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolEntity.h"
+
 #include "History.h"
 #include "MainFrm.h"
 #include "MapDefs.h"
@@ -18,26 +20,27 @@
 #include "Render3D.h"
 #include "StatusBarIDs.h"
 #include "TextureSystem.h"
-#include "ToolEntity.h"
 #include "ToolManager.h"
 #include "hammer.h"
 #include "vgui/Cursor.h"
 #include "Selection.h"
 #include "vstdlib/random.h"
+#include "windows/base_wnd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 
-//#pragma warning(disable:4244)
 
 
 static HCURSOR s_hcurEntity = NULL;
 
 
-class CToolEntityMessageWnd : public CWnd
+class CToolEntityMessageWnd : public CBaseWnd
 {
 	public:
+		// dimhotepus: Init members in ctor.
+		CToolEntityMessageWnd() : m_pToolEntity{nullptr}, m_pView2D{nullptr} {}
 
 		bool Create(void);
 		void PreMenu2D(CToolEntity *pTool, CMapView2D *pView);
@@ -61,7 +64,7 @@ static CToolEntityMessageWnd s_wndToolMessage;
 static const char *g_pszClassName = "ValveEditor_EntityToolWnd";
 
 
-BEGIN_MESSAGE_MAP(CToolEntityMessageWnd, CWnd)
+BEGIN_MESSAGE_MAP(CToolEntityMessageWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CToolMessageWnd)
 	ON_COMMAND(ID_CREATEOBJECT, OnCreateObject)
 	//}}AFX_MSG_MAP
@@ -86,7 +89,7 @@ bool CToolEntityMessageWnd::Create(void)
 		return(false);
 	}
 
-	return(CWnd::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
+	return(__super::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
 }
 
 
@@ -207,7 +210,7 @@ void CToolEntity::RenderTool2D(CRender2D *pRender)
 	//
 	// Draw center rect.
 	//
-	pRender->DrawRectangle( v, v, false, 6.0f );
+	pRender->DrawRectangle( v, v, false, 6 );
 
 	//
 	// Draw crosshair
@@ -398,7 +401,7 @@ bool CToolEntity::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &
 	if ( uConstraints & constrainSnap )
 		m_pDocument->Snap(vecWorld,uConstraints);
 
-	sprintf(szBuf, " @%.0f, %.0f ",  vecWorld[pView->axHorz], vecWorld[pView->axVert] );
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ",  vecWorld[pView->axHorz], vecWorld[pView->axVert] );
 	SetStatusText(SBI_COORDS, szBuf);
 
 	//
@@ -498,7 +501,7 @@ void CToolEntity::OnEscape(void)
 //-----------------------------------------------------------------------------
 bool CToolEntity::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D &vPoint)
 {
-	ULONG ulFace;
+	unsigned ulFace;
 	VMatrix LocalMatrix, LocalMatrixNeg;
 	CMapClass *pObject = pView->NearestObjectAt( vPoint, ulFace, FLAG_OBJECTS_AT_RESOLVE_INSTANCES, &LocalMatrix );
 	Tool3D::OnLMouseDown3D(pView, nFlags, vPoint);
@@ -585,7 +588,7 @@ bool CToolEntity::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D 
 					// They checked "random yaw" on the object bar, so come up with a random yaw.
 					VMatrix vmRotate, vmT1, vmT2;
 					Vector vOrigin;
-					QAngle angRandom( 0, RandomInt( -180, 180 ), 0 );
+					QAngle angRandom( 0, RandomFloat( -180, 180 ), 0 );
 
 					pNewObject->GetOrigin( vOrigin );
 
@@ -685,7 +688,7 @@ void CToolEntity::CreateMapObject(CMapView2D *pView)
 
 		if (pPrefabObject == NULL)
 		{
-			pView->MessageBox("Unable to load prefab", "Error", MB_OK);
+			pView->MessageBox("Unable to load prefab.", "Hammer - Error", MB_OK | MB_ICONERROR);
 			SetEmpty();
 			return;
 		}

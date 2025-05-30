@@ -14,7 +14,7 @@
 #include "vphysics/vehicles.h"
 #include "filesystem_helpers.h"
 #include "bspfile.h"
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -202,13 +202,18 @@ void CVPhysicsParse::ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKe
 		else if ( !Q_stricmp( key, "rollingdrag" ) )
 		{
 			AssertMsg( false, "Solid '%s' rolling drag is not implemented.", pSolid->name );
-			//pSolid->params.rollingDrag = atof(value);
+			//pSolid->params.rollingDrag = strtof(value, nullptr);
 		}
 		else
 		{
 			if ( unknownKeyHandler )
 			{
 				unknownKeyHandler->ParseKeyValue( pSolid, key, value );
+			}
+			else
+			{
+				// dimhotepus: Need to look through data.
+				DWarning( "vphysics", 0, "Unknown solid '%s' configuration key '%s' (%s).\n", pSolid->name, key, value );
 			}
 		}
 	}
@@ -296,6 +301,11 @@ void CVPhysicsParse::ParseRagdollConstraint( constraint_ragdollparams_t *pConstr
 			{
 				unknownKeyHandler->ParseKeyValue( pConstraint, key, value );
 			}
+			else
+			{
+				// dimhotepus: Need to look through data.
+				DWarning( "vphysics", 0, "Unknown ragdoll constraint configuration key '%s' (%s).\n", key, value );
+			}
 		}
 	}
 }
@@ -349,13 +359,18 @@ void CVPhysicsParse::ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKe
 		}
 		else if ( !Q_stricmp( key, "surfaceprop" ) )
 		{
-			Q_strncpy( pFluid->surfaceprop, value, sizeof(pFluid->surfaceprop) );
+			V_strcpy_safe( pFluid->surfaceprop, value );
 		}
 		else
 		{
 			if ( unknownKeyHandler )
 			{
 				unknownKeyHandler->ParseKeyValue( pFluid, key, value );
+			}
+			else
+			{
+				// dimhotepus: Need to look through data.
+				DWarning( "vphysics", 0, "Unknown fluid configuration key '%s' (%s).\n", key, value );
 			}
 		}
 	}
@@ -454,7 +469,8 @@ void CVPhysicsParse::ParseVehicleAxle( vehicle_axleparams_t &axle )
 		}
 		else
 		{
-			AssertMsg( false, "Unknown key '%s' in vehicle axie parser. ", key );
+			// dimhotepus: Need to look through data.
+			DWarning( "vphysics", 0, "Unknown vehicle axie configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -508,7 +524,7 @@ void CVPhysicsParse::ParseVehicleWheel( vehicle_wheelparams_t &wheel )
 		}
 		else
 		{
-			AssertMsg( false, "Unknown key '%s' in vehicle wheel parser. ", key );
+			DWarning( "vphysics", 0, "Unknown vehicle wheel parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -547,7 +563,7 @@ void CVPhysicsParse::ParseVehicleSuspension( vehicle_suspensionparams_t &suspens
 		}
 		else
 		{
-			AssertMsg( false, "Unknown key '%s' in vehicle suspension parser. ", key );
+			DWarning( "vphysics", 0, "Unknown vehicle suspension parser configuration key '%s' (%s).\n", key, value);
 		}
 	}
 }
@@ -598,7 +614,7 @@ void CVPhysicsParse::ParseVehicleBody( vehicle_bodyparams_t &body )
 		}
 		else
 		{
-			AssertMsg( false, "Unknown key '%s' in vehicle body parser. ", key );
+			DWarning( "vphysics", 0, "Unknown vehicle body parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -638,7 +654,7 @@ void CVPhysicsParse::ParseVehicleEngineBoost( vehicle_engineparams_t &engine )
 		}
 		else
 		{
-			AssertMsg( false, "Unknown key '%s' in vehicle engine boost parser. ", key );
+			DWarning( "vphysics", 0, "Unknown vehicle engine boost parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -676,7 +692,10 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 			}
 			else
 			{
-				Assert( 0 );
+				DWarning( "vphysics", 0, "Out of range (%d > max %zd) gear in vehicle configuration parser '%s' (%s).\n",
+					engine.gearCount + 1, ssize(engine.gearRatio), key, value );
+				AssertMsg( 0, "Out of range (%d > max %zd) gear in vehicle configuration parser '%s' (%s).\n",
+					engine.gearCount + 1, ssize(engine.gearRatio), key, value );
 			}
 		}
 		else if ( !Q_stricmp( key, "horsepower" ) )
@@ -725,7 +744,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		}
 		else
 		{
-			AssertMsg( false, "Unknown key '%s' in vehicle engine parser. ", key );
+			DWarning( "vphysics", 0, "Unknown vehicle engine parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -821,7 +840,7 @@ void CVPhysicsParse::ParseVehicleSteering( vehicle_steeringparams_t &steering )
 		}
 		else
 		{
-			AssertMsg( false, "Unknown key '%s' in vehicle steering parser. ", key );
+			DWarning( "vphysics", 0, "Unknown vehicle steering parser configuration key '%s' (%s).\n", key, value );
 		}
 	}
 }
@@ -886,6 +905,10 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 		{
 			pVehicle->wheelsPerAxle = atoi( value );
 		}
+		else
+		{
+			DWarning( "vphysics", 0, "Unknown vehicle parser configuration key '%s' (%s).\n", key, value );
+		}
 	}
 }
 
@@ -935,6 +958,7 @@ void CVPhysicsParse::ParseCustom( void *pCustom, IVPhysicsKeyHandler *unknownKey
 				{
 					unknownKeyHandler->ParseKeyValue( pCustom, key, value );
 				}
+				// dimhotepus: Do not log missed things here as it is expected.
 			}
 		}
 	}

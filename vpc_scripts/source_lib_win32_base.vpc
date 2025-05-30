@@ -24,7 +24,7 @@ $Configuration
 {
 	$General
 	{
-		$TargetName	"$OUTLIBNAME"
+		$TargetName							"$OUTLIBNAME"
 	}
 
 	$Compiler
@@ -35,19 +35,33 @@ $Configuration
 
 	$Compiler [$WIN32]
 	{
-		$EnableEnhancedInstructionSet	"Streaming SIMD Extensions 2 (/arch:SSE2)"
+		$EnableEnhancedInstructionSet		"Streaming SIMD Extensions 2 (/arch:SSE2)"
 	}
 	
 	$PreBuildEvent
 	{
-		$CommandLine		"if EXIST $OUTLIBDIR\$(TargetName).lib ( for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTLIBDIR\$(TargetName).lib$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
-							") else ( if not EXIST $OUTLIBDIR mkdir $OUTLIBDIR )" "\n" \
-							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
-							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE (" "\n" \
-							"    attrib -r $OUTLIBDIR\$(TargetName).lib" "\n" \
-							"    attrib +r $OUTLIBDIR\$(TargetName).lib" "\n" \
+		$CommandLine		"IF EXIST $OUTLIBDIR\$(TargetName).lib (" "\n" \
+							"    FOR /f $QUOTEdelims=$QUOTE %%A IN ('ATTRIB $QUOTE$OUTLIBDIR\$(TargetName).lib$QUOTE') DO SET valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
+							") else ( " "\n" \
+							"    IF NOT EXIST $OUTLIBDIR (" "\n" \
+							"        MKDIR $OUTLIBDIR" "\n" \
+							"        IF ERRORLEVEL 1 (" "\n" \
+							"            ECHO *** ERROR! Unable to mkdir $OUTLIBDIR to place $(TargetName).lib" "\n" \
+							"        )" "\n" \
+							"    )" "\n" \
 							")" "\n" \
-							"$CRCCHECK" "\n" 			
+							"SET valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
+							"IF $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE (" "\n" \
+							"    ATTRIB -r $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"    IF ERRORLEVEL 1 (" "\n" \
+							"        ECHO *** ERROR! Unable to ATTRIB -r $OUTLIBDIR $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"    )" "\n" \
+							"    ATTRIB +r $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"    IF ERRORLEVEL 1 (" "\n" \
+							"        ECHO *** ERROR! Unable to ATTRIB +r $OUTLIBDIR $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"    )" "\n" \
+							")" "\n" \
+							"$CRCCHECK" "\n"
 	}
 
 	$Librarian

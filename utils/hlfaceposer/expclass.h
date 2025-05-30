@@ -11,7 +11,9 @@
 #pragma once
 #endif
 
-#include "utlvector.h"
+#include "tier1/checksum_crc.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlrbtree.h"
 
 class CExpression;
 

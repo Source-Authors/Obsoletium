@@ -56,7 +56,7 @@ public:
 	virtual void	PlayerSetAnimation( PLAYER_ANIM eAnim );
 
 	// Numbered line printf
-	virtual void	Con_NPrintf( int idx, char const* fmt, ... );
+	virtual void	Con_NPrintf( int idx, PRINTF_FORMAT_STRING char const* fmt, ... );
 	
 	// These have separate server vs client impementations
 	virtual void	StartSound( const Vector& origin, int channel, char const* sample, float volume, soundlevel_t soundlevel, int fFlags, int pitch );
@@ -340,13 +340,13 @@ IPhysicsSurfaceProps *CMoveHelperServer::GetSurfaceProps( void )
 //			*pFormat - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CMoveHelperServer::Con_NPrintf( int idx, char const* pFormat, ...)
+void CMoveHelperServer::Con_NPrintf( int idx, PRINTF_FORMAT_STRING char const* pFormat, ...)
 {
 	va_list marker;
 	char msg[8192];
 
 	va_start(marker, pFormat);
-	Q_vsnprintf(msg, sizeof( msg ), pFormat, marker);
+	V_vsprintf_safe(msg, pFormat, marker);
 	va_end(marker);
 	
 	engine->Con_NPrintf( idx, msg );

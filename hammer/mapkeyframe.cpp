@@ -224,7 +224,7 @@ void CMapKeyFrame::GetQuatAngles( Quaternion &outQuat )
 // Purpose: Recalulates timings based on the new position
 // Input  : *pfOrigin - 
 //-----------------------------------------------------------------------------
-void CMapKeyFrame::SetOrigin( Vector& pfOrigin )
+void CMapKeyFrame::SetOrigin( const Vector& pfOrigin )
 {
 	CMapClass::SetOrigin(pfOrigin);
 	m_bRebuildPath = true;
@@ -425,7 +425,7 @@ void CMapKeyFrame::RecalculateTimeFromSpeed( void )
 	if ( ent )
 	{
 		char buf[16];
-		sprintf( buf, "%.2f", newTime );
+		V_sprintf_safe( buf, "%.2f", newTime );
 		ent->SetKeyValue( "NextTime", buf );
 		ent->OnParentKeyChanged( "NextTime", buf );
 	}

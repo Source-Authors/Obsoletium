@@ -52,8 +52,8 @@ struct SaveRestoreRecordHeader_t
 //
 //-----------------------------------------------------------------------------
 
-const int MAX_BLOCK_NAME_LEN = 31;
-const int SIZE_BLOCK_NAME_BUF = 31 + 1;
+constexpr inline int MAX_BLOCK_NAME_LEN = 31;
+constexpr inline int SIZE_BLOCK_NAME_BUF = 31 + 1;
 
 //-------------------------------------
 
@@ -155,7 +155,7 @@ public:
 	
 	virtual void	WriteShort( const short *value, int count = 1 ) = 0;
 	virtual void	WriteInt( const int *value, int count = 1 ) = 0;		// Save an int
-	inline void		WriteInt( const unsigned *value, int count = 1 ) { WriteInt( (int *)value, count );	}
+	inline void		WriteInt( const unsigned *value, int count = 1 ) { WriteInt( (const int *)value, count );	}
 	virtual void	WriteBool( const bool *value, int count = 1 ) = 0;		// Save a bool
 	virtual void	WriteFloat( const float *value, int count = 1 ) = 0;	// Save a float
 	virtual void	WriteData( const char *pdata, int size ) = 0;		// Save a binary data block
@@ -270,8 +270,18 @@ public:
 	virtual int		ReadBool( bool *pValue, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadFloat( float *pValue, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadData( char *pData, int size, int nBytesAvailable ) = 0;
-	virtual void	ReadString( char *pDest, int nSizeDest, int nBytesAvailable ) = 0;			// A null-terminated string
+	virtual void	ReadString( OUT_Z_CAP(nSizeDest) char *pDest, int nSizeDest, int nBytesAvailable ) = 0;			// A null-terminated string
+	template<int nSizeDest>
+	void ReadString( OUT_Z_ARRAY char (&pDest)[nSizeDest], int nBytesAvailable )
+	{
+		ReadString( pDest, nSizeDest, nBytesAvailable );
+	}
 	virtual int		ReadString( string_t *pString, int count = 1, int nBytesAvailable = 0 ) = 0;
+	template<int count>
+	void ReadString( OUT_Z_ARRAY string_t (&pString)[count], int nBytesAvailable = 0 )
+	{
+		ReadString( pString, count, nBytesAvailable );
+	}
 	virtual int		ReadVector( Vector *pValue ) = 0;
 	virtual int		ReadVector( Vector *pValue, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadQuaternion( Quaternion *pValue ) = 0;

@@ -6,7 +6,7 @@
 
 #include "tier1/ilocalize.h"
 
-#include "utlstring.h"
+#include "tier1/utlstring.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: converts an english string to unicode
@@ -37,9 +37,9 @@ int ILocalize::ConvertUnicodeToANSI(const wchar_t *unicode, OUT_Z_BYTECAP(ansiBu
 // Purpose: construct string helper
 //-----------------------------------------------------------------------------
 template < typename T >
-void ConstructStringVArgsInternal_Impl(T *unicodeOutput, int unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, va_list argList)
+void ConstructStringVArgsInternal_Impl(T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, va_list argList)
 {
-	static const int k_cMaxFormatStringArguments = 9; // We only look one character ahead and start at %s1
+	constexpr int k_cMaxFormatStringArguments = 9; // We only look one character ahead and start at %s1
 	Assert( numFormatParameters <= k_cMaxFormatStringArguments );
 
 	// Safety check
@@ -54,7 +54,7 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, int unicodeBufferSizeIn
 		return;
 	}
 
-	intp unicodeBufferSize = unicodeBufferSizeInBytes / sizeof(T);
+	intp unicodeBufferSize = unicodeBufferSizeInBytes / static_cast<intp>(sizeof(T));
 	const T *searchPos = formatString;
 	T *outputPos = unicodeOutput;
 
@@ -132,16 +132,16 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, int unicodeBufferSizeIn
 	}
 
 	// ensure null termination
-	Assert( outputPos - unicodeOutput < (ptrdiff_t)(unicodeBufferSizeInBytes/sizeof(T)) );
+	Assert( outputPos - unicodeOutput < (intp)(unicodeBufferSizeInBytes/sizeof(T)) );
 	*outputPos = L'\0';
 }
 
-void ILocalize::ConstructStringVArgsInternal(char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, int numFormatParameters, va_list argList)
+void ILocalize::ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, intp unicodeBufferSizeInBytes, const char *formatString, int numFormatParameters, va_list argList)
 {
 	ConstructStringVArgsInternal_Impl<char>( unicodeOutput, unicodeBufferSizeInBytes, formatString, numFormatParameters, argList );
 }
 
-void ILocalize::ConstructStringVArgsInternal(wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, int numFormatParameters, va_list argList)
+void ILocalize::ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, intp unicodeBufferSizeInBytes, const wchar_t *formatString, int numFormatParameters, va_list argList)
 {
 	ConstructStringVArgsInternal_Impl<wchar_t>( unicodeOutput, unicodeBufferSizeInBytes, formatString, numFormatParameters, argList );
 }
@@ -165,13 +165,13 @@ const wchar_t *GetTypedKeyValuesString<wchar_t>( KeyValues *pKeyValues, const ch
 }
 
 template < typename T >
-void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, int unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables )
+void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables )
 {
 	T *outputPos = unicodeOutput;
 
 	//assumes we can't have %s10
 	//assume both are 0 terminated?
-	int unicodeBufferSize = unicodeBufferSizeInBytes / sizeof(T);
+	intp unicodeBufferSize = unicodeBufferSizeInBytes / sizeof(T);
 
 	while ( *formatString != '\0' && unicodeBufferSize > 1 )
 	{
@@ -214,7 +214,7 @@ void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, int unicodeBufferS
 					intp paramSize = StringFuncs<T>::Length( value );
 					if (paramSize >= unicodeBufferSize)
 					{
-						paramSize = MAX( 0, unicodeBufferSize - 1 );
+						paramSize = MAX( static_cast<intp>(0), unicodeBufferSize - 1 );
 					}
 
 					StringFuncs<T>::Copy( outputPos, value, paramSize );
@@ -242,12 +242,12 @@ void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, int unicodeBufferS
 	*outputPos = '\0';
 }
 
-void ILocalize::ConstructStringKeyValuesInternal(char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables)
+void ILocalize::ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, intp unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables)
 {
 	ConstructStringKeyValuesInternal_Impl<char>( unicodeOutput, unicodeBufferSizeInBytes, formatString, localizationVariables );
 }
 
-void ILocalize::ConstructStringKeyValuesInternal(wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables)
+void ILocalize::ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, intp unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables)
 {
 	ConstructStringKeyValuesInternal_Impl<wchar_t>( unicodeOutput, unicodeBufferSizeInBytes, formatString, localizationVariables );
 }

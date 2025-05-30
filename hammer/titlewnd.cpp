@@ -6,8 +6,9 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include <commctrl.h>
 #include "TitleWnd.h"
+
+#include <commctrl.h>
 #include "MainFrm.h"
 #include "Resource.h"
 
@@ -19,7 +20,7 @@ CFont CTitleWnd::m_FontNormal;
 CFont CTitleWnd::m_FontActive;
 
 
-BEGIN_MESSAGE_MAP(CTitleWnd, CWnd)
+BEGIN_MESSAGE_MAP(CTitleWnd, CBaseWnd)
 	ON_WM_PAINT()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_LBUTTONDOWN()
@@ -89,14 +90,14 @@ void CTitleWnd::SetTitle(LPCTSTR pszTitle)
 	Assert(pszTitle != NULL);
 	if (pszTitle != NULL)
 	{
-		strcpy(m_szTitle, pszTitle);
+		V_strcpy_safe(m_szTitle, pszTitle);
 		if (::IsWindow(m_hWnd))
 		{
 			CDC *pDC = GetDC();
 			if (pDC != NULL)
 			{
 				pDC->SelectObject(&m_FontActive);
-				CSize TextSize = pDC->GetTextExtent(m_szTitle, strlen(m_szTitle));
+				CSize TextSize = pDC->GetTextExtent(m_szTitle, V_strlen(m_szTitle));
 				SetWindowPos(NULL, 0, 0, TextSize.cx, TextSize.cy, SWP_NOMOVE | SWP_NOZORDER);
 				Invalidate();
 				UpdateWindow();
@@ -128,7 +129,7 @@ void CTitleWnd::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (!m_bMouseOver)
 	{
-		TRACKMOUSEEVENT Track;
+		TRACKMOUSEEVENT Track = {};
 		Track.cbSize = sizeof(Track);
 		Track.dwFlags = TME_HOVER | TME_LEAVE;
 		Track.hwndTrack = m_hWnd;
@@ -169,7 +170,7 @@ void CTitleWnd::OnPaint(void)
 			}
 
 			dc.SetBkMode(TRANSPARENT);
-			dc.TextOut(0, 0, m_szTitle, strlen(m_szTitle));
+			dc.TextOut(0, 0, m_szTitle, V_strlen(m_szTitle));
 			dc.SelectObject(pFontOld);
 		}
 	}

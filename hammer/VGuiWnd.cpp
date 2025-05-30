@@ -8,8 +8,9 @@
 //===========================================================================//
 
 #include "stdafx.h"
+
 #include "vguiwnd.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
@@ -19,9 +20,9 @@
 #include "hammer.h"
 
 
-IMPLEMENT_DYNCREATE(CVGuiPanelWnd, CWnd)
+IMPLEMENT_DYNCREATE(CVGuiPanelWnd, CBaseWnd)
 
-#define REPAINT_TIMER_ID	1042 //random value, hopfully no collisions	
+#define REPAINT_TIMER_ID	1042 //random value, hopefully no collisions
 
 class CBaseMainPanel : public vgui::EditablePanel
 {
@@ -40,13 +41,13 @@ LRESULT CVGuiPanelWnd::WindowProc( UINT message, WPARAM wParam, LPARAM lParam )
 {
 	if ( !WindowProcVGui( message, wParam, lParam ) )
 	{
-		return CWnd::WindowProc( message, wParam, lParam ) ;
+		return __super::WindowProc( message, wParam, lParam ) ;
 	}
 
 	return 1;
 }
 
-BEGIN_MESSAGE_MAP(CVGuiPanelWnd, CWnd)
+BEGIN_MESSAGE_MAP(CVGuiPanelWnd, CBaseWnd)
 END_MESSAGE_MAP()
 
 CVGuiWnd::CVGuiWnd(void)

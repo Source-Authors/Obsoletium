@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: Favorite games list
 //-----------------------------------------------------------------------------
-class CFriendsGames : public CBaseGamesPage
+class CFriendsGames final : public CBaseGamesPage
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CFriendsGames, CBaseGamesPage );
 

@@ -38,7 +38,7 @@ IPhysicsSurfaceProps *physprops = NULL;
 // UNDONE: Split into separate hashes?
 IPhysicsObjectPairHash *g_EntityCollisionHash = NULL;
 
-const char *SURFACEPROP_MANIFEST_FILE = "scripts/surfaceproperties_manifest.txt";
+constexpr inline char SURFACEPROP_MANIFEST_FILE[]{"scripts/surfaceproperties_manifest.txt"};
 
 const objectparams_t g_PhysDefaultObjectParams =
 {
@@ -536,7 +536,7 @@ void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pProps, IF
 
 void PhysParseSurfaceData( IPhysicsSurfaceProps *pProps, IFileSystem *pFileSystem )
 {
-	KeyValues *manifest = new KeyValues( SURFACEPROP_MANIFEST_FILE );
+	KeyValuesAD manifest( SURFACEPROP_MANIFEST_FILE );
 	if ( manifest->LoadFromFile( pFileSystem, SURFACEPROP_MANIFEST_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -556,8 +556,6 @@ void PhysParseSurfaceData( IPhysicsSurfaceProps *pProps, IFileSystem *pFileSyste
 	{
 		Error( "Unable to load manifest file '%s'\n", SURFACEPROP_MANIFEST_FILE );
 	}
-
-	manifest->deleteThis();
 }
 
 void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaultParams )
@@ -917,10 +915,8 @@ void PhysForceClearVelocity( IPhysicsObject *pPhys )
 {
 	IPhysicsFrictionSnapshot *pSnapshot = pPhys->CreateFrictionSnapshot();
 	// clear the velocity of the rigid body
-	Vector vel;
-	AngularImpulse angVel;
-	vel.Init();
-	angVel.Init();
+	Vector vel{0.0f, 0.0f, 0.0f};
+	AngularImpulse angVel{0.0f, 0.0f, 0.0f};
 	pPhys->SetVelocity( &vel, &angVel );
 	// now clear the "strain" stored in the contact points
 	while ( pSnapshot->IsValid() )
@@ -965,14 +961,14 @@ void PhysFrictionEffect( Vector &vecPos, Vector vecVel, float energy, int surfac
 	{
 		// make sparks for metal/concrete scrapes with enough energy
 		if ( psurf->game.material == CHAR_TEX_METAL || psurf->game.material == CHAR_TEX_GRATE )
-		{	
+		{
 			switch ( phit->game.material )
 			{
 			case CHAR_TEX_CONCRETE:
 			case CHAR_TEX_METAL:
 
 				g_pEffects->MetalSparks( vecPos, invVecVel );
-				break;									
+				break;
 			}
 		}
 	}
@@ -995,7 +991,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, float ene
 
 	// volume of scrape is proportional to square of energy (steeper rolloff at low energies)
 	float volume = energy * energy;
-		
+
 	unsigned short soundName = psurf->sounds.scrapeRough;
 	short *soundHandle = &psurf->soundhandles.scrapeRough;
 

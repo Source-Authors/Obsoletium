@@ -55,6 +55,8 @@ CDemoFile::CDemoFile() :
 	m_bAllowHeaderWrite( true ),
 	m_bIsStreamBuffer( false )
 {
+	m_szFileName[0] = '\0';
+	V_memset( &m_DemoHeader, 0x00, sizeof(m_DemoHeader) );
 }
 
 CDemoFile::~CDemoFile()

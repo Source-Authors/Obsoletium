@@ -61,7 +61,7 @@ void CSoundscapeSystem::AddSoundscapeFile( const char *filename )
 {
 	MEM_ALLOC_CREDIT();
 	// Open the soundscape data file, and abort if we can't
-	KeyValues *pKeyValuesData = new KeyValues( filename );
+	KeyValuesAD pKeyValuesData( filename );
 	if ( filesystem->LoadKeyValues( *pKeyValuesData, IFileSystem::TYPE_SOUNDSCAPE, filename, "GAME" ) )
 	{
 		// parse out all of the top level sections and save their names
@@ -70,25 +70,19 @@ void CSoundscapeSystem::AddSoundscapeFile( const char *filename )
 		{
 			if ( pKeys->GetFirstSubKey() )
 			{
-				if ( g_pDeveloper->GetBool() )
+				if ( g_pDeveloper->GetBool() && strstr( pKeys->GetName(), "{" ) )
 				{
-					if ( strstr( pKeys->GetName(), "{" ) )
-					{
-						Msg("Error parsing soundscape file %s after %s\n", filename, m_soundscapeCount>0 ?m_soundscapes.GetStringText( m_soundscapeCount-1 ) : "FIRST" );
-					}
+					Warning("Error parsing soundscape file %s after %s\n",
+						filename,
+						m_soundscapeCount > 0 ? m_soundscapes.GetStringText( m_soundscapeCount-1 ) : "FIRST" );
 				}
-				m_soundscapes.AddString( pKeys->GetName(), m_soundscapeCount );
 
-				if ( IsX360() )
-				{
-					AddSoundscapeSounds( pKeys, m_soundscapeCount );
-				}
+				m_soundscapes.AddString( pKeys->GetName(), m_soundscapeCount );
 				m_soundscapeCount++;
 			}
 			pKeys = pKeys->GetNextKey();
 		}
 	}
-	pKeyValuesData->deleteThis();
 }
 
 CON_COMMAND_F( sv_soundscape_printdebuginfo, "print soundscapes", FCVAR_DEVELOPMENTONLY )
@@ -136,7 +130,7 @@ bool CSoundscapeSystem::Init()
 		mapSoundscapeFilename = UTIL_VarArgs( "scripts/soundscapes_%s.txt", mapname );
 	}
 
-	KeyValues *manifest = new KeyValues( SOUNDSCAPE_MANIFEST_FILE );
+	KeyValuesAD manifest( SOUNDSCAPE_MANIFEST_FILE );
 	if ( filesystem->LoadKeyValues( *manifest, IFileSystem::TYPE_SOUNDSCAPE, SOUNDSCAPE_MANIFEST_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -165,7 +159,7 @@ bool CSoundscapeSystem::Init()
 	{
 		Error( "Unable to load manifest file '%s'\n", SOUNDSCAPE_MANIFEST_FILE );
 	}
-	manifest->deleteThis();
+
 	m_activeIndex = 0;
 
 	return true;

@@ -14,13 +14,9 @@
 // I chose to refer to them as joints to avoid confusion.  Yes they encompass bones and joints,
 // but they use the same names, and the data is actually linked.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
+#include "collisionmodel.h"
 
 #include "vphysics/constraints.h"
-#include "collisionmodel.h"
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
@@ -28,14 +24,14 @@
 #include "studiomdl.h"
 #include "physdll.h"
 #include "phyfile.h"
-#include "utlvector.h"
 #include "vcollide_parse.h"
-#include "tier1/strtools.h"
-#include "tier2/tier2.h"
-#include "KeyValues.h"
 
+#include "tier1/utlvector.h"
+#include "tier1/strtools.h"
+#include "tier1/KeyValues.h"
 #include "tier1/smartptr.h"
 #include "tier2/p4helpers.h"
+#include "tier2/tier2.h"
 
 
 // these functions just wrap atoi/atof and check for NULL
@@ -102,12 +98,14 @@ public:
 	CJointConstraint( void )
 	{
 		m_pJointName = NULL;
+		m_pNext = NULL;
 	}
 
 	CJointConstraint( const char *pName, int axis, jointlimit_t type, float min, float max, float friction )
 		: m_axis(axis), m_jointType(type), m_limitMin(min), m_limitMax(max), m_friction(friction)
 	{
 		m_pJointName = pName;
+		m_pNext = nullptr;
 	}
 
 	const char		*m_pJointName;
@@ -244,8 +242,8 @@ public:
 
 	void AddText( const char *pText )
 	{
-		int len = strlen(pText);
-		int count = m_textCommands.Size();
+		intp len = strlen(pText);
+		intp count = m_textCommands.Count();
 		m_textCommands.AddMultipleToTail( len );
 		memcpy( m_textCommands.Base() + count, pText, len );
 	}
@@ -295,8 +293,8 @@ CJointedModel::CJointedModel( void )
 
 	m_flFrictionTimeIn = 0.0f;
 	m_flFrictionTimeOut = 0.0f;
-	m_iMinAnimatedFriction = 1.0f;
-	m_iMaxAnimatedFriction = 1.0f;
+	m_iMinAnimatedFriction = 1;
+	m_iMaxAnimatedFriction = 1;
 	m_bHasAnimatedFriction = false;
 }
 
@@ -325,7 +323,7 @@ void CJointedModel::SkipBone( int boneIndex )
 
 void CJointedModel::AddMergeCommand( char const *pParent, char const *pChild )
 {
-	int i = m_mergeList.AddToTail();
+	intp i = m_mergeList.AddToTail();
 	m_mergeList[i].pParent = strdup(pParent);
 	m_mergeList[i].pChild = strdup(pChild);
 }
@@ -630,7 +628,7 @@ void CJointedModel::ComputeMass( void )
 	while ( pList )
 	{
 		char* pSurfaceProps = GetSurfaceProp( pList->m_name );
-		int index = physprops->GetSurfaceIndex( pSurfaceProps );
+		intp index = physprops->GetSurfaceIndex( pSurfaceProps );
 		float density, thickness;
 		physprops->GetPhysicsProperties( index, &density, &thickness, NULL, NULL );
 
@@ -1216,15 +1214,13 @@ struct boundingvolume_t
 
 void CreateCollide( CPhysCollisionModel *pBase, CPhysConvex **pElements, int elementCount, const boundingvolume_t &bv )
 {
-	int i;
-
 	if ( !pBase )
 		return;
 
 	// NOTE: Must do this before building collide
 	pBase->m_volume = 0;
 	pBase->m_surfaceArea = 0;
-	for ( i = 0; i < elementCount; i++ )
+	for ( intp i = 0; i < elementCount; i++ )
 	{
 		pBase->m_volume += physcollision->ConvexVolume( pElements[i] );
 		pBase->m_surfaceArea += physcollision->ConvexSurfaceArea( pElements[i] );
@@ -1238,7 +1234,7 @@ void CreateCollide( CPhysCollisionModel *pBase, CPhysConvex **pElements, int ele
 
 	int largest = 0;
 	float minSurfaceArea = -1.0f;
-	for ( i = 0; i < 3; i++ )
+	for ( int i = 0; i < 3; i++ )
 	{
 		if ( size[i] > size[largest] )
 		{
@@ -1285,14 +1281,14 @@ void CreateCollide( CPhysCollisionModel *pBase, CPhysConvex **pElements, int ele
 
 // is this list of verts contained in a slab of epsilon width?  If so, it's probably
 // an error of some kind - we shouldn't be authoring flat or 2d collision models
-bool IsApproximatelyPlanar( Vector **verts, int vertCount, float epsilon )
+bool IsApproximatelyPlanar( Vector **verts, intp vertCount, float epsilon )
 {
 	if ( vertCount < 4 )
 		return true;
 
 	// If we're using an un-welded model, then this may generate a degenerate normal
 	// loop to search for an actual plane
-	int v0 = 1, v1 = 2;
+	intp v0 = 1, v1 = 2;
 	Vector normal;
 	while ( v0 < vertCount && v1 < vertCount )
 	{
@@ -1320,7 +1316,7 @@ bool IsApproximatelyPlanar( Vector **verts, int vertCount, float epsilon )
 	float minDist = DotProduct( normal, *verts[0] );
 	float maxDist = minDist;
 
-	for ( int i = 0; i < vertCount; i++ )
+	for ( intp i = 0; i < vertCount; i++ )
 	{
 		float d = DotProduct( *verts[i], normal );
 		if ( d < minDist )
@@ -1374,13 +1370,13 @@ void BuildSingleConvexForFaceList( s_source_t *pmodel, CUtlVector<convexlist_t> 
 {
 	CUtlVector<int> vertID;
 	vertID.SetCount(pmodel->numvertices);
-	int i;
-	for ( i = 0; i < pmodel->numvertices; i++ )
+
+	for ( int i = 0; i < pmodel->numvertices; i++ )
 	{
 		vertID[i] = -1;
 	}
 
-	for ( i = 0; i < faceList.Count(); i++ )
+	for ( intp i = 0; i < faceList.Count(); i++ )
 	{
 		const s_face_t &globalFace = faceList[i];
 		vertID[globalFace.a] = 1;
@@ -1396,12 +1392,11 @@ void BuildConvexListForFaceList( s_source_t *pmodel, CUtlVector<convexlist_t> &c
 	weldTable.SetCount(pmodel->numvertices);
 	BuildVertWeldTable( weldTable.Base(), pmodel );
 
-	int i;
 	CUtlVector<int> vertID;
 	vertID.SetCount(pmodel->numvertices);
 
 	// mark all verts as max faceid + 1
-	for ( i = 0; i < pmodel->numvertices; i++ )
+	for ( int i = 0; i < pmodel->numvertices; i++ )
 	{
 		// If these verts have been welded to a lower-index vert, mark them
 		// as already processed to avoid making additional convex objects out of them.
@@ -1429,7 +1424,7 @@ void BuildConvexListForFaceList( s_source_t *pmodel, CUtlVector<convexlist_t> &c
 
 		// basically this flood fills ids out to the verts until each island of connected 
 		// verts shares a single id (so new verts got marked)
-		for ( i = 0; i < faceList.Count(); i++ )
+		for ( intp i = 0; i < faceList.Count(); i++ )
 		{
 			s_face_t globalFace = faceList[i];
 			// account for welding
@@ -1438,9 +1433,9 @@ void BuildConvexListForFaceList( s_source_t *pmodel, CUtlVector<convexlist_t> &c
 			globalFace.c = weldTable[globalFace.c];
 
 
-			int newid = min(i, vertID[globalFace.a]);
-			newid = min( newid, vertID[globalFace.b]);
-			newid = min( newid, vertID[globalFace.c]);
+			intp newid = min(i, (intp)vertID[globalFace.a]);
+			newid = min( newid, (intp)vertID[globalFace.b]);
+			newid = min( newid, (intp)vertID[globalFace.c]);
 
 			// mark all verts with the minimum, count the number we had to mark
 			if ( vertID[globalFace.a] != newid )
@@ -1471,7 +1466,7 @@ bool BuildConvexesForLists( CUtlVector<CPhysConvex *> &convexOut, const CUtlVect
 {
 	bool bValid = true;
 	CUtlVector<Vector *> vertsThisConvex;
-	for ( int i = 0; i < convexList.Count(); i++ )
+	for ( intp i = 0; i < convexList.Count(); i++ )
 	{
 		const convexlist_t &elem = convexList[i];
 		vertsThisConvex.RemoveAll();
@@ -1564,14 +1559,14 @@ int ProcessJointedModel( CJointedModel &joints )
 
 		if ( convexOut.Count() > joints.m_maxConvex )
 		{
-			MdlWarning("COSTLY COLLISION MODEL!!!! (%d parts - %d allowed)\n", convexOut.Count(), joints.m_maxConvex );
+			MdlWarning("COSTLY COLLISION MODEL!!!! (%zd parts - %d allowed)\n", convexOut.Count(), joints.m_maxConvex );
 			bValid = false;
 		}
 
 		if ( !bValid && convexOut.Count() )
 		{
 			MdlWarning("Error with convex elements of %s, building single convex!!!!\n", pmodel->filename );
-			for ( int i = 0; i < convexOut.Count(); i++ )
+			for ( intp i = 0; i < convexOut.Count(); i++ )
 			{
 				physcollision->ConvexFree( convexOut[i] );
 			}
@@ -1580,8 +1575,6 @@ int ProcessJointedModel( CJointedModel &joints )
 
 		if ( convexOut.Count() )
 		{
-			int i;
-
 			CPhysCollisionModel *pPhys = InitCollisionModel( joints, pmodel->localBone[boneIndex].name );
 
 			pPhys->m_mass = 1.0;
@@ -1598,7 +1591,7 @@ int ProcessJointedModel( CJointedModel &joints )
 			boundingvolume_t bv;
 			ClearBounds( bv.mins, bv.maxs );
 			int vertCount = 0;
-			for ( i = 0; i < convexList.Count(); i++ )
+			for ( intp i = 0; i < convexList.Count(); i++ )
 			{
 				const convexlist_t &elem = convexList[i];
 				for ( int j = 0; j < elem.numVertIndex; j++ )
@@ -1607,7 +1600,7 @@ int ProcessJointedModel( CJointedModel &joints )
 					vertCount++;
 				}
 			}
-			for ( i = 0; i < convexOut.Count(); i++ )
+			for ( intp i = 0; i < convexOut.Count(); i++ )
 			{
 				// Attach this convex data to this particular bone
 				int globalBoneIndex = joints.m_pModel->boneLocalToGlobal[boneIndex];
@@ -1617,7 +1610,7 @@ int ProcessJointedModel( CJointedModel &joints )
 			CreateCollide( pPhys, convexOut.Base(), convexOut.Count(), bv );
 			if( !g_quiet )
 			{
-				printf("%-24s (%3d verts, %d convex elements) volume: %4.2f\n", pPhys->m_name, vertCount, convexOut.Count(), pPhys->m_volume );
+				printf("%-24s (%3d verts, %zd convex elements) volume: %4.2f\n", pPhys->m_name, vertCount, convexOut.Count(), pPhys->m_volume );
 			}
 			joints.UnlinkCollisionModel( pPhys );
 			joints.AppendCollisionModel( pPhys );
@@ -1725,14 +1718,14 @@ int ProcessSingleBody( CJointedModel &joints )
 
 	if ( convexOut.Count() > joints.m_maxConvex )
 	{
-		MdlWarning("COSTLY COLLISION MODEL!!!! (%d parts - %d allowed)\n", convexOut.Count(), joints.m_maxConvex );
+		MdlWarning("COSTLY COLLISION MODEL!!!! (%zd parts - %d allowed)\n", convexOut.Count(), joints.m_maxConvex );
 		bValid = false;
 	}
 
 	if ( !bValid && convexOut.Count() )
 	{
 		MdlWarning("Error with convex elements of %s, building single convex!!!!\n", pmodel->filename );
-		for ( int i = 0; i < convexOut.Count(); i++ )
+		for ( intp i = 0; i < convexOut.Count(); i++ )
 		{
 			physcollision->ConvexFree( convexOut[i] );
 		}
@@ -1757,7 +1750,7 @@ int ProcessSingleBody( CJointedModel &joints )
 	{
 		if( !g_quiet )
 		{
-			printf("Model has %d convex sub-parts\n", convexOut.Count() );
+			printf("Model has %zd convex sub-parts\n", convexOut.Count() );
 		}
 
 		CPhysCollisionModel *pPhys = new CPhysCollisionModel;
@@ -1765,21 +1758,19 @@ int ProcessSingleBody( CJointedModel &joints )
 
 		boundingvolume_t bv;
 		ClearBounds( bv.mins, bv.maxs );
-		for ( int i = worldspaceVerts.Count()-1; --i >= 0; )
+		for ( intp i = worldspaceVerts.Count()-1; --i >= 0; )
 		{
 			AddPointToBounds( worldspaceVerts[i], bv.mins, bv.maxs );
 		}
 		CreateCollide( pPhys, convexOut.Base(), convexOut.Count(), bv );
 
 		// Init mass, write routine will distribute the total mass
-		pPhys->m_mass = 1.0;
+		pPhys->m_mass = 1.0f;
 		char tmp[512];
-		Q_FileBase( pmodel->filename, tmp, sizeof( tmp ) );
+		V_FileBase( pmodel->filename, tmp );
 
 		// UNDONE: Memory leak
-		char *out = new char[strlen(tmp)+1];
-		strcpy( out, tmp );
-		pPhys->m_name = out;
+		pPhys->m_name = V_strdup(tmp);
 		pPhys->m_parent = NULL;
 
 		joints.AppendCollisionModel( pPhys );
@@ -1824,7 +1815,8 @@ float Safe_atof( const char *pString )
 	if ( !pString )
 		return 0;
 
-	return atof(pString);
+	// dimhotepus: atof -> strtof.
+	return strtof(pString, nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -1947,7 +1939,7 @@ void CCmd_JointMerge( CJointedModel &joints, const char *pParent, const char *pC
 void CCmd_JointRoot( CJointedModel &joints, const char *pBone )
 {
 	// save the root bone name
-	strcpy( joints.m_rootName, pBone );
+	V_strcpy_safe( joints.m_rootName, pBone );
 }
 
 
@@ -1978,7 +1970,7 @@ void ParseCollisionCommands( CJointedModel &joints )
 		if ( !strcmp( token, "}" ) )
 			return;
 
-		strcpy( command, token );
+		V_strcpy_safe( command, token );
 
 		if ( !stricmp( command, "$mass" ) )
 		{
@@ -2233,10 +2225,9 @@ int DoCollisionModel( bool separateJoints )
 
 	V_strcpy_safe( name, token );
 
-	PhysicsDLLPath( "VPHYSICS.DLL" );
+	PhysicsDLLPath( "VPHYSICS" DLL_EXT_STRING );
 
-//	CreateInterfaceFn physicsFactory = GetPhysicsFactory();
-	CreateInterfaceFn physicsFactory = Sys_GetFactory(Sys_LoadModule( "vphysics.dll" ));
+	CreateInterfaceFn physicsFactory = Sys_GetFactory(Sys_LoadModule( "vphysics" DLL_EXT_STRING ));
 	if ( !physicsFactory )
 		return 0;
 
@@ -2527,12 +2518,6 @@ void CollisionModel_Write( long checkSum )
 		char filename[MAX_PATH];
 
 		V_strcpy_safe( filename, gamedir );
-//		if( *g_pPlatformName )
-//		{
-//			strcat( filename, "platform_" );
-//			strcat( filename, g_pPlatformName );
-//			strcat( filename, "/" );	
-//		}
 		V_strcat_safe( filename, "models/" );	
 		V_strcat_safe( filename, outname );	
 
@@ -2544,7 +2529,7 @@ void CollisionModel_Write( long checkSum )
 			printf("Collision model volume %.2f in^3\n", volume );
 		}
 
-		Q_SetExtension( filename, ".phy", sizeof( filename ) );
+		Q_SetExtension( filename, ".phy" );
 		CPlainAutoPtr< CP4File > spFile( g_p4factory->AccessFile( filename ) );
 		spFile->Edit();
 		FILE *fp = fopen( filename, "wb" );
@@ -2696,7 +2681,7 @@ void CollisionModel_Write( long checkSum )
 			{
 				KeyWriteInt( fp, "concave", 1 );
 			}
-			for ( int k = 0; k < g_JointedModel.m_mergeList.Count(); k++ )
+			for ( intp k = 0; k < g_JointedModel.m_mergeList.Count(); k++ )
 			{
 				char buf[512];
 				Q_snprintf( buf, sizeof(buf), "%s,%s", g_JointedModel.m_mergeList[k].pParent, g_JointedModel.m_mergeList[k].pChild );
@@ -2706,9 +2691,9 @@ void CollisionModel_Write( long checkSum )
 			fprintf( fp, "}\n" );
 
 			char terminator = 0;
-			if ( g_JointedModel.m_textCommands.Size() )
+			if ( g_JointedModel.m_textCommands.Count() )
 			{
-				fwrite( g_JointedModel.m_textCommands.Base(), g_JointedModel.m_textCommands.Size(), 1, fp );
+				fwrite( g_JointedModel.m_textCommands.Base(), g_JointedModel.m_textCommands.Count(), 1, fp );
 			}
 			fwrite( &terminator, sizeof(terminator), 1, fp );
 			fclose( fp );

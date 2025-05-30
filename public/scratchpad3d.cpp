@@ -91,7 +91,7 @@ void CScratchPad3D::CCommand_Polygon::Write( IFileSystem* pFileSystem, FileHandl
 	pFileSystem->Write( &count, sizeof(count), fp );
 	
 	if( count )
-		pFileSystem->Write( &m_Verts[0], sizeof(CSPVert)*count, fp );
+		pFileSystem->Write( &m_Verts[0], static_cast<intp>(sizeof(CSPVert))*count, fp );
 }
 
 

@@ -96,9 +96,9 @@ void CDmeGlobalFlexControllerOperator::SetMapping( int globalIndex )
 	m_nFlexControllerIndex = globalIndex;
 	if ( m_gameModel.GetElement() )
 	{
-		if ( (uint)globalIndex >= m_gameModel->NumFlexWeights() )
+		if ( globalIndex >= m_gameModel->NumFlexWeights() )
 		{
-			m_gameModel->SetNumFlexWeights( (uint)( globalIndex + 1 ) );
+			m_gameModel->SetNumFlexWeights( globalIndex + 1 );
 		}
 	}
 }
@@ -166,9 +166,9 @@ int CDmeGlobalFlexControllerOperator::FindGlobalFlexControllerIndex() const
 				{
 					nGlobalFlexControllerIndex = flex->localToGlobal;
 					// Grow the array
-					if ( (uint)flex->localToGlobal >= m_gameModel->NumFlexWeights() )
+					if ( flex->localToGlobal >= m_gameModel->NumFlexWeights() )
 					{
-						m_gameModel->SetNumFlexWeights( (uint)( flex->localToGlobal + 1 ) );
+						m_gameModel->SetNumFlexWeights( flex->localToGlobal + 1 );
 					}
 					break;
 				}
@@ -240,7 +240,7 @@ CDmeGlobalFlexControllerOperator *CDmeGameModel::AddGlobalFlexController( const 
 		op->SetGameModel( this );
 	}
 
-	if ( (uint)globalIndex >= NumFlexWeights() )
+	if ( globalIndex >= NumFlexWeights() )
 	{
 		SetNumFlexWeights( globalIndex + 1 );
 	}
@@ -254,7 +254,7 @@ CDmeGlobalFlexControllerOperator *CDmeGameModel::AddGlobalFlexController( const 
 //-----------------------------------------------------------------------------
 CDmeGlobalFlexControllerOperator *CDmeGameModel::FindGlobalFlexController( int nGlobalIndex )
 {
-	int i, c;
+	intp i, c;
 	c = m_globalFlexControllers.Count();
 	for ( i = 0; i < c; ++i )
 	{
@@ -277,7 +277,7 @@ studiohdr_t* CDmeGameModel::GetStudioHdr() const
 
 // A src bone transform transforms pre-compiled data (.dmx or .smd files, for example)
 // into post-compiled data (.mdl or .ani files)
-bool CDmeGameModel::GetSrcBoneTransforms( matrix3x4_t *pPreTransform, matrix3x4_t *pPostTransform, int nBoneIndex ) const
+bool CDmeGameModel::GetSrcBoneTransforms( matrix3x4_t *pPreTransform, matrix3x4_t *pPostTransform, intp nBoneIndex ) const
 {
 	studiohdr_t *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -301,7 +301,7 @@ bool CDmeGameModel::GetSrcBoneTransforms( matrix3x4_t *pPreTransform, matrix3x4_
 	return false;
 }
 
-bool CDmeGameModel::IsRootTransform( int nBoneIndex ) const
+bool CDmeGameModel::IsRootTransform( intp nBoneIndex ) const
 {
 	studiohdr_t *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -314,20 +314,20 @@ bool CDmeGameModel::IsRootTransform( int nBoneIndex ) const
 	return pBone->parent == -1;
 }
 
-int CDmeGameModel::NumGlobalFlexControllers() const
+intp CDmeGameModel::NumGlobalFlexControllers() const
 {
 	return m_globalFlexControllers.Count();
 }
 
-CDmeGlobalFlexControllerOperator *CDmeGameModel::GetGlobalFlexController( int localIndex )
+CDmeGlobalFlexControllerOperator *CDmeGameModel::GetGlobalFlexController( intp localIndex )
 {
 	return m_globalFlexControllers.Get( localIndex );
 }
 
 void CDmeGameModel::RemoveGlobalFlexController( CDmeGlobalFlexControllerOperator *controller )
 {
-	int c = m_globalFlexControllers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_globalFlexControllers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeGlobalFlexControllerOperator *check = m_globalFlexControllers.Get( i );
 		if ( check == controller )
@@ -340,8 +340,8 @@ void CDmeGameModel::RemoveGlobalFlexController( CDmeGlobalFlexControllerOperator
 
 void CDmeGameModel::AppendGlobalFlexControllerOperators( CUtlVector< IDmeOperator * >& list )
 {
-	int c = m_globalFlexControllers.Count();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = m_globalFlexControllers.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmeOperator *op = m_globalFlexControllers.Get( i );
 		if ( !op )
@@ -419,10 +419,10 @@ static CDmeDag* GetDagForTransform( CDmeTransform *pTransform, CDmeGameModel *pG
 //-----------------------------------------------------------------------------
 // Finds existing dags
 //-----------------------------------------------------------------------------
-void CDmeGameModel::PopulateExistingDagList( CDmeDag** pDags, int nCount )
+void CDmeGameModel::PopulateExistingDagList( CDmeDag** pDags, intp nCount )
 {
-	int nCurrentBoneCount = m_bones.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCurrentBoneCount = m_bones.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( i >= nCurrentBoneCount )
 		{
@@ -440,7 +440,7 @@ void CDmeGameModel::PopulateExistingDagList( CDmeDag** pDags, int nCount )
 //-----------------------------------------------------------------------------
 // Adds bones to the game model
 //-----------------------------------------------------------------------------
-void CDmeGameModel::AddBones( studiohdr_t *pStudioHdr, const char *pBaseName, int nFirstBone, int nCount )
+void CDmeGameModel::AddBones( studiohdr_t *pStudioHdr, const char *pBaseName, intp nFirstBone, intp nCount )
 {
 	if ( nFirstBone + nCount > pStudioHdr->numbones )
 	{
@@ -451,22 +451,22 @@ void CDmeGameModel::AddBones( studiohdr_t *pStudioHdr, const char *pBaseName, in
 
 	// make room for bones
 	CDmeDag** pDags = ( CDmeDag** )_alloca( pStudioHdr->numbones * sizeof(CDmeDag*) );
-	int nDagCount = nFirstBone;
+	intp nDagCount = nFirstBone;
 	PopulateExistingDagList( pDags, nFirstBone );
 
 	char name[ 256 ];
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int bi = i + nFirstBone;
+		intp bi = i + nFirstBone;
 
 		// get parent
 		mstudiobone_t *pBone = pStudioHdr->pBone( bi );
-		int parentIndex = pBone->parent;
+		intp parentIndex = pBone->parent;
 		Assert( parentIndex < nDagCount );
 
 		// build dag hierarchy to match bone hierarchy
 		CDmeDag *pParent = ( parentIndex < 0 ) ? this : pDags[ parentIndex ];
-		Q_snprintf( name, sizeof( name ), "%s_bone %d (%s)", pBaseName, bi, pBone->pszName() );
+		V_sprintf_safe( name, "%s_bone %zd (%s)", pBaseName, bi, pBone->pszName() );
 		CDmeDag *pDag = CreateElement< CDmeDag >( name, GetFileId() );
 		pDags[nDagCount++] = pDag;
 		pParent->AddChild( pDag );
@@ -480,7 +480,7 @@ void CDmeGameModel::AddBones( studiohdr_t *pStudioHdr, const char *pBaseName, in
 }
 
 
-void CDmeGameModel::SetBone( uint index, const Vector& pos, const Quaternion& rot )
+void CDmeGameModel::SetBone( intp index, const Vector& pos, const Quaternion& rot )
 {
 	m_bones[ index ]->SetPosition( pos );
 	m_bones[ index ]->SetOrientation( rot );
@@ -491,22 +491,22 @@ void CDmeGameModel::RemoveAllBones()
 	m_bones.RemoveAll();
 }
 
-uint CDmeGameModel::NumBones() const
+intp CDmeGameModel::NumBones() const
 {
 	return m_bones.Count();
 }
 
-CDmeTransform *CDmeGameModel::GetBone( uint index ) const
+CDmeTransform *CDmeGameModel::GetBone( intp index ) const
 {
 	return m_bones[ index ];
 }
 
-int CDmeGameModel::FindBone( CDmeTransform *pTransform ) const
+intp CDmeGameModel::FindBone( CDmeTransform *pTransform ) const
 {
 	return m_bones.Find( pTransform );
 }
 
-uint CDmeGameModel::NumFlexWeights() const
+intp CDmeGameModel::NumFlexWeights() const
 {
 	return m_flexWeights.Count();
 }
@@ -516,25 +516,25 @@ const CUtlVector< float >& CDmeGameModel::GetFlexWeights() const
 	return m_flexWeights.Get();
 }
 
-void CDmeGameModel::SetNumFlexWeights( uint nFlexWeights )
+void CDmeGameModel::SetNumFlexWeights( intp nFlexWeights )
 {
-	if ( nFlexWeights > (uint)m_flexWeights.Count() )
+	if ( nFlexWeights > m_flexWeights.Count() )
 	{
-		while ( (uint)m_flexWeights.Count() < nFlexWeights )
+		while ( m_flexWeights.Count() < nFlexWeights )
 		{
 			m_flexWeights.AddToTail( 0.0f );
 		}
 	}
 	else
 	{
-		while ( (uint)m_flexWeights.Count() > nFlexWeights )
+		while ( m_flexWeights.Count() > nFlexWeights )
 		{
-			m_flexWeights.Remove( (uint)m_flexWeights.Count() - 1 );
+			m_flexWeights.Remove( m_flexWeights.Count() - 1 );
 		}
 	}
 }
 
-void CDmeGameModel::SetFlexWeights( uint nFlexWeights, const float* flexWeights )
+void CDmeGameModel::SetFlexWeights( intp nFlexWeights, const float* flexWeights )
 {
 	m_flexWeights.CopyArray( flexWeights, nFlexWeights );
 }

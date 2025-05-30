@@ -27,7 +27,12 @@ public:
 	~CSaveGameDialog();
 
 	void Activate() override;
-	static void FindSaveSlot( char *buffer, int bufsize );
+	static void FindSaveSlot( OUT_Z_CAP(bufsize) char *buffer, intp bufsize );
+	template<intp size>
+	static void FindSaveSlot(OUT_Z_ARRAY char (&buffer)[size])
+	{
+		FindSaveSlot( buffer, size );
+	}
 
 protected:
 	void OnCommand( const char *command ) override;

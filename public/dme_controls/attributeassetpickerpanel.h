@@ -27,7 +27,7 @@ class CBaseAssetPickerFrame;
 //-----------------------------------------------------------------------------
 class CAttributeAssetPickerPanel : public CAttributeBasePickerPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeAssetPickerPanel, CAttributeBasePickerPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeAssetPickerPanel, CAttributeBasePickerPanel );
 
 public:
 	CAttributeAssetPickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
@@ -36,22 +36,22 @@ public:
 private:
 	virtual CBaseAssetPickerFrame *CreateAssetPickerFrame() = 0;
 	MESSAGE_FUNC_PARAMS( OnAssetSelected, "AssetSelected", kv );
-	virtual void ShowPickerDialog();
+	void ShowPickerDialog() override;
 };
 
 
 //-----------------------------------------------------------------------------
 // Macro to quickly make new attribute types
 //-----------------------------------------------------------------------------
-#define DECLARE_ATTRIBUTE_ASSET_PICKER( _className )							\
-	class _className : public CAttributeAssetPickerPanel						\
-	{																			\
-		DECLARE_CLASS_SIMPLE( _className, CAttributeAssetPickerPanel );			\
-	public:																		\
-		_className( vgui::Panel *parent, const AttributeWidgetInfo_t &info ) :	\
-			BaseClass( parent, info ) {}										\
-	private:																	\
-		virtual CBaseAssetPickerFrame *CreateAssetPickerFrame();				\
+#define DECLARE_ATTRIBUTE_ASSET_PICKER( _className )								\
+	class _className : public CAttributeAssetPickerPanel							\
+	{																				\
+		DECLARE_CLASS_SIMPLE_OVERRIDE( _className, CAttributeAssetPickerPanel );	\
+	public:																			\
+		_className( vgui::Panel *parent, const AttributeWidgetInfo_t &info ) :		\
+			BaseClass( parent, info ) {}											\
+	private:																		\
+		CBaseAssetPickerFrame *CreateAssetPickerFrame() override;					\
 	}
 
 #define IMPLEMENT_ATTRIBUTE_ASSET_PICKER( _className, _popupTitle, _assetType, _assetExt, _assetSubDir, _assetTextType )	\
@@ -64,21 +64,21 @@ private:
 //-----------------------------------------------------------------------------
 // Macro to quickly make new attribute types
 //-----------------------------------------------------------------------------
-#define DECLARE_ATTRIBUTE_ASSET_PREVIEW_PICKER( _className )					\
-	class _className : public CAttributeAssetPickerPanel						\
-	{																			\
-		DECLARE_CLASS_SIMPLE( _className, CAttributeAssetPickerPanel );			\
-	public:																		\
-		_className( vgui::Panel *parent, const AttributeWidgetInfo_t &info ) :	\
-			BaseClass( parent, info ) {}										\
-	private:																	\
-		virtual CBaseAssetPickerFrame *CreateAssetPickerFrame();					\
+#define DECLARE_ATTRIBUTE_ASSET_PREVIEW_PICKER( _className )						\
+	class _className : public CAttributeAssetPickerPanel							\
+	{																				\
+		DECLARE_CLASS_SIMPLE_OVERRIDE( _className, CAttributeAssetPickerPanel );	\
+	public:																			\
+		_className( vgui::Panel *parent, const AttributeWidgetInfo_t &info ) :		\
+			BaseClass( parent, info ) {}											\
+	private:																		\
+		CBaseAssetPickerFrame *CreateAssetPickerFrame() override;					\
 	}
 
-#define IMPLEMENT_ATTRIBUTE_ASSET_PREVIEW_PICKER( _className, _pickerClassName, _popupTitle )		\
-	CBaseAssetPickerFrame *_className::CreateAssetPickerFrame()					\
-	{																			\
- 		return new _pickerClassName( this, _popupTitle );						\
+#define IMPLEMENT_ATTRIBUTE_ASSET_PREVIEW_PICKER( _className, _pickerClassName, _popupTitle )	\
+	CBaseAssetPickerFrame *_className::CreateAssetPickerFrame()									\
+	{																							\
+ 		return new _pickerClassName( this, _popupTitle );										\
 	}
 
 

@@ -52,10 +52,10 @@ struct KVInfo_t
 	{
 	}
 
-	inline void SetParent( int index )
+	inline void SetParent( intp index )
 	{
 		Assert( index <= 32768 );
-		parentIndex = index;
+		parentIndex = static_cast<short>(index);
 	}
 
 	inline short GetParent() const
@@ -102,7 +102,7 @@ private:
 
 	void Describe( const KVFile_t& file );
 
-	void BuildKVData_R( KeyValues *kv, int parent );
+	void BuildKVData_R( KeyValues *kv, intp parent );
 
 	void WriteStringTable( CUtlBuffer& buf );
 	void WriteData( CUtlBuffer& buf );
@@ -121,7 +121,7 @@ public:
 
 	bool ReadStringTable( int numStrings, CUtlBuffer& buf );
 	
-	inline int Count() const
+	inline intp Count() const
 	{
 		return m_Strings.Count();
 	}
@@ -145,13 +145,13 @@ public:
 
 	KeyValues	*Instance( char const *kvfilename );
 	bool		InstanceInPlace( KeyValues& head, char const *kvfilename );
-	bool		LookupKeyValuesRootKeyName( char const *kvfilename, char *outbuf, size_t bufsize );
+	bool		LookupKeyValuesRootKeyName( char const *kvfilename, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize );
 
 	int			First() const;
 	int			Next( int i ) const;
 	int			InvalidIndex() const;
 
-	void		GetFileName( int index, char *buf, size_t bufsize );
+	void		GetFileName( int index, OUT_Z_CAP(bufsize) char *buf, intp bufsize );
 
 private:
 
@@ -177,7 +177,7 @@ private:
 	bool CreateInPlaceFromData( KeyValues& head, const FileInfo_t& info );
 
 	// Now get the actual files
-	CUtlRBTree< FileInfo_t, unsigned short >	m_Dict;
+	CUtlRBTree< FileInfo_t, int >	m_Dict;
 	CUtlVector< KVInfo_t >		m_Data;
 
 	CRunTimeKeyValuesStringTable		m_StringTable;

@@ -162,7 +162,7 @@ StateSnapshot_t CTransitionTable::CreateStateSnapshot( ShadowStateId_t shadowSta
 	SnapshotDictEntry_t insert;
 
 	CRC32_Init(	&insert.m_nChecksum );
-	CRC32_ProcessBuffer( &insert.m_nChecksum, &shaderState, sizeof(SnapshotShaderState_t) );
+	CRC32_ProcessBuffer( &insert.m_nChecksum, shaderState );
 	CRC32_Final( &insert.m_nChecksum );
 
 	insert.m_nSnapshot = snapshotId;
@@ -177,13 +177,13 @@ StateSnapshot_t CTransitionTable::CreateStateSnapshot( ShadowStateId_t shadowSta
 //-----------------------------------------------------------------------------
 CTransitionTable::ShadowStateId_t CTransitionTable::CreateShadowState( const ShadowState_t &currentState )
 {
-	intp newShaderState = m_ShadowStateList.AddToTail();
+	ShadowStateId_t newShaderState = m_ShadowStateList.AddToTail();
 
 	// Copy our snapshot into the list
 	memcpy( &m_ShadowStateList[newShaderState], &currentState, sizeof(ShadowState_t) );
 
 	// all existing states must transition to the new state
-	intp i;
+	ShadowStateId_t i;
 	for ( i = 0; i < newShaderState; ++i )
 	{
 		// Add a new transition to all existing states
@@ -209,7 +209,7 @@ CTransitionTable::ShadowStateId_t CTransitionTable::CreateShadowState( const Sha
 	ShadowStateDictEntry_t insert;
 
 	CRC32_Init(	&insert.m_nChecksum );
-	CRC32_ProcessBuffer( &insert.m_nChecksum, &m_ShadowStateList[newShaderState], sizeof(ShadowState_t) );
+	CRC32_ProcessBuffer( &insert.m_nChecksum, m_ShadowStateList[newShaderState] );
 	CRC32_Final( &insert.m_nChecksum );
 
 	insert.m_nShadowStateId = newShaderState;
@@ -227,11 +227,11 @@ CTransitionTable::ShadowStateId_t CTransitionTable::FindShadowState( const Shado
 	ShadowStateDictEntry_t find;
 
 	CRC32_Init(	&find.m_nChecksum );
-	CRC32_ProcessBuffer( &find.m_nChecksum, &currentState, sizeof(ShadowState_t) );
+	CRC32_ProcessBuffer( &find.m_nChecksum, currentState );
 	CRC32_Final( &find.m_nChecksum );
 	
-	int nDictCount = m_ShadowStateDict.Count();
-	int i = m_ShadowStateDict.FindLessOrEqual( find );
+	intp nDictCount = m_ShadowStateDict.Count();
+	intp i = m_ShadowStateDict.FindLessOrEqual( find );
 	if ( i < 0 )
 		return (ShadowStateId_t)-1;
 
@@ -271,11 +271,11 @@ StateSnapshot_t CTransitionTable::FindStateSnapshot( ShadowStateId_t id, const S
 	SnapshotDictEntry_t find;
 
 	CRC32_Init(	&find.m_nChecksum );
-	CRC32_ProcessBuffer( &find.m_nChecksum, &temp, sizeof(temp) );
+	CRC32_ProcessBuffer( &find.m_nChecksum, temp );
 	CRC32_Final( &find.m_nChecksum );
 
-	int nDictCount = m_SnapshotDict.Count();
-	int i = m_SnapshotDict.FindLessOrEqual( find );
+	intp nDictCount = m_SnapshotDict.Count();
+	intp i = m_SnapshotDict.FindLessOrEqual( find );
 	if ( i < 0 )
 		return (StateSnapshot_t)-1;
 
@@ -369,7 +369,7 @@ static bool g_SpewTransitions = false;
 		if (g_SpewTransitions)											\
 		{																\
 			char buf[128];												\
-			sprintf( buf, "Apply %s : %d\n", #_d3dState, static_cast<int>(shaderState.m_ ## _state) ); \
+			V_sprintf_safe( buf, "Apply %s : %d\n", #_d3dState, static_cast<int>(shaderState.m_ ## _state) ); \
 			Plat_DebugString(buf);										\
 		}																\
 	}
@@ -380,7 +380,7 @@ static bool g_SpewTransitions = false;
 		if (g_SpewTransitions)											\
 		{																\
 			char buf[128];												\
-			sprintf( buf, "Apply Tex %s (%d): %d\n", #_d3dState, _stage, shaderState.m_TextureStage[_stage].m_ ## _state ); \
+			V_sprintf_safe( buf, "Apply Tex %s (%d): %d\n", #_d3dState, _stage, shaderState.m_TextureStage[_stage].m_ ## _state ); \
 			Plat_DebugString(buf);										\
 		}																\
 	}
@@ -391,7 +391,7 @@ static bool g_SpewTransitions = false;
 		if (g_SpewTransitions)											\
 		{																\
 			char buf[128];												\
-			sprintf( buf, "Apply SamplerSate %s (%d): %d\n", #_d3dState, stage, shaderState.m_SamplerState[_stage].m_ ## _state ); \
+			V_sprintf_safe( buf, "Apply SamplerSate %s (%d): %d\n", #_d3dState, stage, shaderState.m_SamplerState[_stage].m_ ## _state ); \
 			Plat_DebugString(buf);										\
 		}																\
 	}
@@ -547,7 +547,7 @@ void CTransitionTable::ApplySRGBWriteEnable( const ShadowState_t& shaderState  )
 	if (g_SpewTransitions)											
 	{																
 		char buf[128];												
-		sprintf( buf, "Apply %s : %d\n", "D3DRS_SRGBWRITEENABLE", shaderState.m_SRGBWriteEnable );
+		V_sprintf_safe( buf, "Apply %s : %d\n", "D3DRS_SRGBWRITEENABLE", shaderState.m_SRGBWriteEnable );
 		Plat_DebugString(buf);										
 	}																
 #endif
@@ -926,7 +926,7 @@ void ApplyFogMode( const ShadowState_t& state, int arg )
 {
 #ifdef RECORDING
 	char buf[1024];
-	sprintf( buf, "ApplyFogMode( %s )", ShaderFogModeToString( state.m_FogMode ) );
+	V_sprintf_safe( buf, "ApplyFogMode( %s )", ShaderFogModeToString( state.m_FogMode ) );
 	RECORD_DEBUG_STRING( buf );
 #endif
 
@@ -1138,7 +1138,7 @@ int CTransitionTable::CreateNormalTransitions( const ShadowState_t& fromState, c
 	return numOps;
 }
 
-void CTransitionTable::CreateTransitionTableEntry( int to, int from )
+void CTransitionTable::CreateTransitionTableEntry( ShadowStateId_t to, ShadowStateId_t from )
 {
 	// You added or removed a state to the enums but not to the function table lists!
 	COMPILE_TIME_ASSERT( sizeof(s_pRenderFunctionTable) == sizeof(ApplyStateFunc_t) * RENDER_STATE_COUNT );
@@ -1391,7 +1391,7 @@ void CTransitionTable::TakeDefaultStateSnapshot( )
 //-----------------------------------------------------------------------------
 // Applies the transition list
 //-----------------------------------------------------------------------------
-void CTransitionTable::ApplyTransitionList( int snapshot, int nFirstOp, int nOpCount )
+void CTransitionTable::ApplyTransitionList( StateSnapshot_t snapshot, int nFirstOp, int nOpCount )
 {
 	VPROF("CTransitionTable::ApplyTransitionList");
 	// Don't bother if there's nothing to do
@@ -1424,7 +1424,7 @@ void CTransitionTable::ApplyTransitionList( int snapshot, int nFirstOp, int nOpC
 //-----------------------------------------------------------------------------
 // Apply startup snapshot
 //-----------------------------------------------------------------------------
-void CTransitionTable::ApplyTransition( TransitionList_t& list, int snapshot )
+void CTransitionTable::ApplyTransition( TransitionList_t& list, StateSnapshot_t snapshot )
 {
 	VPROF("CTransitionTable::ApplyTransition");
 	if ( g_pShaderDeviceDx8->IsDeactivated() )
@@ -1531,12 +1531,12 @@ StateSnapshot_t CTransitionTable::TakeSnapshot( )
 		shadowStateId = CreateShadowState( currentState );
 
 		// Now create new transition entries
-		for (int to = 0; to < shadowStateId; ++to)
+		for (ShadowStateId_t to = 0; to < shadowStateId; ++to)
 		{
 			CreateTransitionTableEntry( to, shadowStateId );
 		}
 
-		for (int from = 0; from < shadowStateId; ++from)
+		for (ShadowStateId_t from = 0; from < shadowStateId; ++from)
 		{
 			CreateTransitionTableEntry( shadowStateId, from );
 		}

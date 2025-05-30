@@ -1,9 +1,10 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
+
+#include "manifest.h"
+
 #include "vbsp.h"
 #include "map_shared.h"
 #include "fgdlib/fgdlib.h"
-#include "manifest.h"
-#include "windows.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: default constructor
@@ -41,7 +42,7 @@ ChunkFileResult_t CManifest::LoadManifestMapKeyCallback( const char *szKey, cons
 	}
 	else if ( !stricmp( szKey, "File" ) )
 	{
-		strcpy( pManifestMap->m_RelativeMapFileName, szValue );
+		V_strcpy_safe( pManifestMap->m_RelativeMapFileName, szValue );
 	}
 	else if ( !stricmp( szKey, "IsPrimary" ) )
 	{
@@ -271,11 +272,8 @@ epair_t *CManifest::CreateEPair( char *pKey, char *pValue )
 {
 	epair_t *pEPair = new epair_t;
 
-	pEPair->key = new char[ strlen( pKey ) + 1 ];
-	pEPair->value = new char[ strlen( pValue ) + 1 ];
-
-	strcpy( pEPair->key, pKey );
-	strcpy( pEPair->value, pValue );
+	pEPair->key = V_strdup( pKey );
+	pEPair->value = V_strdup( pValue );
 
 	return pEPair;
 }
@@ -308,7 +306,7 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 		{
 			char		FileName[ MAX_PATH ];
 
-			sprintf( FileName, "%s%s", m_InstancePath, m_Maps[ i ]->m_RelativeMapFileName );
+			V_sprintf_safe( FileName, "%s%s", m_InstancePath, m_Maps[ i ]->m_RelativeMapFileName );
 
 			InstanceEntity = &pMapFile->entities[ pMapFile->num_entities ];
 			pMapFile->num_entities++;
@@ -321,7 +319,7 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 			InstanceEntity->epairs = pEPair;
 
 			char temp[ 128 ];
-			sprintf( temp, "%d", GameData::NAME_FIXUP_NONE );
+			V_sprintf_safe( temp, "%d", GameData::NAME_FIXUP_NONE );
 
 			pEPair = CreateEPair( "fixup_style", temp );
 			pEPair->next = InstanceEntity->epairs;
@@ -347,6 +345,12 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 	return true;
 }
 
+#ifdef _WIN32
+// Instead of including Windows.h
+extern "C" __declspec(dllimport) int __stdcall GetUserNameA(const char *lpBuffer,
+														    unsigned long *nSize);
+#endif
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -356,23 +360,18 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 {
 	char		UserName[ MAX_PATH ], FileName[ MAX_PATH ], UserPrefsFileName[ MAX_PATH ];
-	DWORD		UserNameSize;
+	unsigned long		UserNameSize;
 
+	UserName[0] = '\0';
 	UserNameSize = sizeof( UserName );
-	if ( GetUserName( UserName, &UserNameSize ) == 0 )
+	if ( GetUserNameA( UserName, &UserNameSize ) == 0 )
 	{
-		strcpy( UserPrefsFileName, "default" );
+		V_strcpy_safe( UserPrefsFileName, "default" );
 	}
 
-	sprintf( UserPrefsFileName, "\\%s.vmm_prefs", UserName );
-	V_StripExtension( pszFileName, FileName, sizeof( FileName ) );
-	strcat( FileName, UserPrefsFileName );
-
-	FILE *fp = fopen( FileName, "rb" );
-	if ( !fp )
-	{
-		return false;
-	}
+	V_sprintf_safe( UserPrefsFileName, "\\%s.vmm_prefs", UserName );
+	V_StripExtension( pszFileName, FileName );
+	V_strcat_safe( FileName, UserPrefsFileName );
 
 	CChunkFile File;
 	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Read );
@@ -404,14 +403,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 
 	if ( eResult == ChunkFile_Ok )
 	{
-	}
-	else
-	{
-		// no pref message for now
-		//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+		return true;
 	}
 
-	return true;
+	// no pref message for now
+	//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+	return false;
 }
 
 
@@ -421,8 +418,8 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 //-----------------------------------------------------------------------------
 bool CManifest::LoadVMFManifest( const char *pszFileName )
 {
-	V_StripExtension( pszFileName, m_InstancePath, sizeof( m_InstancePath ) );
-	strcat( m_InstancePath, "\\" );
+	V_StripExtension( pszFileName, m_InstancePath );
+	V_strcat_safe( m_InstancePath, "\\" );
 
 	CChunkFile File;
 	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Read );
@@ -451,7 +448,7 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 
 	if ( eResult == ChunkFile_Ok )
 	{
-		int index = g_Maps.AddToTail( new CMapFile() );
+		intp index = g_Maps.AddToTail( new CMapFile() );
 		g_LoadingMap = g_Maps[ index ];
 		if ( g_MainMap == NULL )
 		{

@@ -46,8 +46,8 @@ public:
 		{
 			m_handle = handle;
 			m_name = new char[strlen(name) + 1];
-			m_next = NULL;
 			strcpy(m_name, name);
+			m_next = NULL;
 		}
 
 		~CSharedLibraryItem()

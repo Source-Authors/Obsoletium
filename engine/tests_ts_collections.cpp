@@ -103,7 +103,7 @@ class TSListContainer final : public ITestContainer<T> {
 };
 
 void ClearBuckets() {
-  for (ptrdiff_t i{0}; i < NUM_TEST; ++i) {
+  for (intp i{0}; i < NUM_TEST; ++i) {
     g_pTestBuckets[i].store(0, std::memory_order::memory_order_relaxed);
   }
 }
@@ -138,6 +138,7 @@ void ValidateBuckets() {
 
 template <typename T>
 unsigned PopThreadFunc(void *ctx) {
+  // dimhotepus: Add thread name to aid debugging.
   ThreadSetDebugName("PopTestWork");
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
@@ -172,6 +173,7 @@ unsigned PopThreadFunc(void *ctx) {
 
 template <typename T>
 unsigned PushThreadFunc(void *ctx) {
+  // dimhotepus: Add thread name to aid debugging.
   ThreadSetDebugName("PushTestWork");
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
@@ -303,7 +305,8 @@ template <typename T>
 void PushPopInterleavedTest(ITestContainer<T> &container) {
   Msg("%s test: single thread push/pop, interleaved...\n", container.GetType());
 
-  srand(Plat_MSTime());
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  srand(static_cast<unsigned>(Plat_USTime() % std::numeric_limits<unsigned>::max()));
 
   g_nTested.store(0, std::memory_order::memory_order_relaxed);
 
@@ -314,6 +317,7 @@ void PushPopInterleavedTest(ITestContainer<T> &container) {
 
 template <typename T>
 unsigned PushPopInterleavedTestThreadFunc(void *ctx) {
+  // dimhotepus: Add thread name to aid debugging.
   ThreadSetDebugName("PushPopTestWork");
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
@@ -411,7 +415,8 @@ void MTPushPopPopInterleaved(ITestContainer<T> &container, bool bDistribute) {
   Msg("%s test: multithread interleaved push/pop, %s\n", container.GetType(),
       bDistribute ? "distributed..." : "no affinity...");
 
-  srand(Plat_MSTime());
+  // dimhotepus: ms -> mcs to not overflow in 49.7 days.
+  srand(static_cast<unsigned>(Plat_USTime() % std::numeric_limits<unsigned>::max()));
   TestStart();
 
   for (int i = 0; i < NUM_THREADS; i++) {

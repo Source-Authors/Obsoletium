@@ -170,10 +170,10 @@ void CPropFadeUIPanel::OnTextChanged( KeyValues *data )
 		char buf[256];
 		float flMinArea, flMaxArea;
 
-		m_pMinScreenArea->GetText( buf, 256 );
+		m_pMinScreenArea->GetText( buf );
 		int nReadMin = sscanf( buf, "%f", &flMinArea );
 
-		m_pMaxScreenArea->GetText( buf, 256 );
+		m_pMaxScreenArea->GetText( buf );
 		int nReadMax = sscanf( buf, "%f", &flMaxArea );
 
 		if ( nReadMin && nReadMax )
@@ -380,14 +380,14 @@ void COcclusionUIPanel::OnTextChanged( KeyValues *data )
 		char buf[256];
 		float flMinArea, flMaxArea;
 
-		m_pMinOccluderArea->GetText( buf, 256 );
+		m_pMinOccluderArea->GetText( buf );
 		int nReadMin = sscanf( buf, "%f", &flMinArea );
 		if ( nReadMin )
 		{
 			r_occluderminarea.SetValue( flMinArea );
 		}
 
-		m_pMaxOccludeeArea->GetText( buf, 256 );
+		m_pMaxOccludeeArea->GetText( buf );
 		int nReadMax = sscanf( buf, "%f", &flMaxArea );
 		if ( nReadMax )
 		{

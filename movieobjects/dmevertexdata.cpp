@@ -517,10 +517,10 @@ void CDmeVertexDataBase::CreateJointWeightsAndIndices( int nJointCount, FieldInd
 // Adds a new vertex; creates a new entry in all vertex data fields
 // Returns the vertex index
 //-----------------------------------------------------------------------------
-int CDmeVertexDataBase::AddVertexData( FieldIndex_t nFieldIndex, int nCount )
+intp CDmeVertexDataBase::AddVertexData( FieldIndex_t nFieldIndex, intp nCount )
 {
 	CDmrGenericArray array( m_FieldInfo[nFieldIndex].m_pVertexData );
-	int nDataCount = array.Count();
+	intp nDataCount = array.Count();
 	array.EnsureCount( nDataCount + nCount );
 
 	// DmeMeshDeltaData must have the same number of vertices + indices
@@ -538,14 +538,14 @@ int CDmeVertexDataBase::AddVertexData( FieldIndex_t nFieldIndex, int nCount )
 //-----------------------------------------------------------------------------
 // Sets vertex data
 //-----------------------------------------------------------------------------
-void CDmeVertexDataBase::SetVertexData( FieldIndex_t nFieldIndex, int nFirstVertex, int nCount, DmAttributeType_t valueType, const void *pData )
+void CDmeVertexDataBase::SetVertexData( FieldIndex_t nFieldIndex, intp nFirstVertex, intp nCount, DmAttributeType_t valueType, const void *pData )
 {
 	CDmrGenericArray array( m_FieldInfo[nFieldIndex].m_pVertexData );
 	Assert(	nFirstVertex + nCount <= array.Count() );
 	array.SetMultiple( nFirstVertex, nCount, valueType, pData );
 }
 
-void CDmeVertexDataBase::SetVertexIndices( FieldIndex_t nFieldIndex, int nFirstIndex, int nCount, const int *pIndices )
+void CDmeVertexDataBase::SetVertexIndices( FieldIndex_t nFieldIndex, intp nFirstIndex, intp nCount, const int *pIndices )
 {
 	CDmrArray<int> array( GetIndexData( nFieldIndex ) );
 	Assert(	nFirstIndex + nCount <= array.Count() );
@@ -725,7 +725,7 @@ const CUtlVector<int> &CDmeVertexDataBase::GetVertexIndexData( StandardFields_t 
 //-----------------------------------------------------------------------------
 // Returns an inverse map from vertex data index to vertex index
 //-----------------------------------------------------------------------------
-const CUtlVector< int > &CDmeVertexDataBase::FindVertexIndicesFromDataIndex( FieldIndex_t nFieldIndex, int nDataIndex )
+const CUtlVector< int > &CDmeVertexDataBase::FindVertexIndicesFromDataIndex( FieldIndex_t nFieldIndex, intp nDataIndex )
 {
 	if ( nFieldIndex < 0 )
 		return s_EmptyInt;
@@ -736,14 +736,14 @@ const CUtlVector< int > &CDmeVertexDataBase::FindVertexIndicesFromDataIndex( Fie
 		CDmrArrayConst<int> array( info.m_pIndexData );
 		CDmrGenericArray vertexArray( info.m_pVertexData );
 
-		int nDataCount = vertexArray.Count();
-		int nCount = array.Count();
+		intp nDataCount = vertexArray.Count();
+		intp nCount = array.Count();
 
 		// Clear out the utlvectors
 		info.m_InverseMap.RemoveAll();
 		info.m_InverseMap.SetCount( nDataCount );
 
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			int nIndex = array[ i ];
 			info.m_InverseMap[nIndex].AddToTail( i );
@@ -754,7 +754,7 @@ const CUtlVector< int > &CDmeVertexDataBase::FindVertexIndicesFromDataIndex( Fie
 	return info.m_InverseMap[ nDataIndex ];
 }
 
-const CUtlVector< int > &CDmeVertexDataBase::FindVertexIndicesFromDataIndex( StandardFields_t fieldId, int nDataIndex )
+const CUtlVector< int > &CDmeVertexDataBase::FindVertexIndicesFromDataIndex( StandardFields_t fieldId, intp nDataIndex )
 {
 	// NOTE! Wrinkles don't exist in the base state, therefore we use the index to index
 	// into the TEXCOORD base state fields instead of the wrinkle fields
@@ -803,7 +803,7 @@ bool CDmeVertexDataBase::NeedsTangentData() const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmeVertexDataBase::FieldCount() const
+intp CDmeVertexDataBase::FieldCount() const
 {
 	return m_VertexFormat.Count();
 }
@@ -812,7 +812,7 @@ int CDmeVertexDataBase::FieldCount() const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-const char *CDmeVertexDataBase::FieldName( int i ) const
+const char *CDmeVertexDataBase::FieldName( intp i ) const
 {
 	if ( i < 0 || i >= m_VertexFormat.Count() )
 		return NULL;

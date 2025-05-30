@@ -2782,7 +2782,7 @@ bool CNPC_Combine::CanThrowGrenade( const Vector &vecTarget )
 
 #if 0
 	Vector vecEnemyLKP = GetEnemyLKP();
-	if ( !( GetEnemy()->GetFlags() & FL_ONGROUND ) && GetEnemy()->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z)  )
+	if ( !( GetEnemy()->GetFlags() & FL_ONGROUND ) && GetEnemy()->GetWaterLevel() == WaterLevel::WL_NotInWater && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z)  )
 	{
 		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 		// be grenaded.

@@ -5,11 +5,10 @@
 #define RAYTRACE_H
 
 #include <tier0/platform.h>
+#include <tier1/utlvector.h>
 #include <mathlib/vector.h>
 #include <mathlib/ssemath.h>
 #include <mathlib/lightdesc.h>
-#include <assert.h>
-#include <tier1/utlvector.h>
 #include <mathlib/mathlib.h>
 #include <bspfile.h>
 
@@ -346,7 +345,7 @@ public:
 	void FinishRayStream(RayStream &s);
 
 
-	int MakeLeafNode(int first_tri, int last_tri);
+	intp MakeLeafNode(int first_tri, int last_tri);
 
 
 	float CalculateCostsOfSplit(
@@ -354,10 +353,10 @@ public:
 		Vector MinBound,Vector MaxBound, float &split_value,
 		int &nleft, int &nright, int &nboth);
 		
-	void RefineNode(int node_number,int32 const *tri_list,int ntris,
+	void RefineNode(intp node_number,int32 const *tri_list,intp ntris,
 						 Vector MinBound,Vector MaxBound, int depth);
 	
-	void CalculateTriangleListBounds(int32 const *tris,int ntris,
+	void CalculateTriangleListBounds(int32 const *tris,intp ntris,
 									 Vector &minout, Vector &maxout);
 
 	void AddInfinitePointLight(Vector position,				// light center

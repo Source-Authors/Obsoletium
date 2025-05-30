@@ -51,7 +51,7 @@ public:
 	void PositionDialog( vgui::PHandle dlg, int wide, int tall );
 
 private:
-	static const int MAX_MESSAGE_DIALOGS = 3;
+	static constexpr inline int MAX_MESSAGE_DIALOGS = 3;
 	vgui::DHANDLE< CMessageDialog > m_hMessageDialogs[MAX_MESSAGE_DIALOGS];
 	int							m_iDialogStackTop;
 };
@@ -434,7 +434,6 @@ private:
 
 	// Used for rich presence updates on xbox360
 	bool m_bSinglePlayer;
-	uint m_iGameID;	// matches context value in hl2orange.spa.h
 
 	// background fill transition
 	bool m_bHaveDarkenedBackground;

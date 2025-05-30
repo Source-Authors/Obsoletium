@@ -81,8 +81,18 @@ class IEditorTexture
 		// dvs: Try to remove as many of these as possible:
 		//
 		virtual const char *GetName( void ) const = 0;
-		virtual int GetShortName( char *szShortName ) const = 0;
-		virtual int GetKeywords( char *szKeywords ) const = 0;
+		virtual intp GetShortName( OUT_Z_CAP(nameSize) char *szShortName, intp nameSize ) const = 0;
+		template<intp nameSize>
+		intp GetShortName( OUT_Z_ARRAY char (&szShortName)[nameSize] ) const
+		{
+			return GetShortName( szShortName, nameSize );
+		}
+		virtual intp GetKeywords( OUT_Z_CAP(keywordsSize) char *szKeywords, intp keywordsSize ) const = 0;
+		template<intp keywordsSize>
+		intp GetKeywords( OUT_Z_ARRAY char (&szKeywords)[keywordsSize] ) const
+		{
+			return GetKeywords( szKeywords, keywordsSize );
+		}
 		virtual void Draw(CDC *pDC, RECT &rect, int iFontHeight, int iIconHeight, DrawTexData_t &DrawTexData) = 0;
 		virtual TEXTUREFORMAT GetTextureFormat( void ) const = 0;
 		virtual int GetSurfaceAttributes( void ) const = 0;

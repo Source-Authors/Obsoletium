@@ -29,10 +29,10 @@ public:
 	void Unbind( const char *pButtonName );
 	void UnbindAll();
 
-	int GetBindingCount() const;
+	[[nodiscard]] int GetBindingCount() const;
 	void WriteBindings( CUtlBuffer &buf );
-	const char *ButtonNameForBinding( const char *pBinding );
-	const char *GetBindingForButton( ButtonCode_t code );
+	[[nodiscard]] const char *ButtonNameForBinding( const char *pBinding );
+	[[nodiscard]] const char *GetBindingForButton( ButtonCode_t code );
 
 private:
 	CUtlString m_KeyInfo[ BUTTON_CODE_LAST ];

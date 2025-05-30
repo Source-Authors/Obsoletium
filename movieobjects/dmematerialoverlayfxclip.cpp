@@ -123,8 +123,8 @@ void CDmeMaterialOverlayFXClip::ApplyEffect( DmeTime_t time, Rect_t &currentRect
 	}
 	else
 	{
-		x = clamp( m_nLeft, currentRect.x, currentRect.x + currentRect.width );
-		y = clamp( m_nTop, currentRect.y, currentRect.y + currentRect.height );
+		x = clamp( m_nLeft.Get(), currentRect.x, currentRect.x + currentRect.width );
+		y = clamp( m_nTop.Get(), currentRect.y, currentRect.y + currentRect.height );
 		int x1 = clamp( m_nLeft + m_nWidth, currentRect.x, currentRect.x + currentRect.width );
 		int y1 = clamp( m_nTop + m_nHeight, currentRect.y, currentRect.y + currentRect.height );
 		w = x1 - x;

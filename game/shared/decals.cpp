@@ -191,16 +191,11 @@ void CDecalEmitterSystem::LevelInitPreEntity()
 //-----------------------------------------------------------------------------
 void CDecalEmitterSystem::LoadDecalsFromScript( char const *filename )
 {
-	KeyValues *kv = new KeyValues( filename );
-	Assert( kv );
+	KeyValuesAD kv( filename );
 	if ( kv )
 	{
 		KeyValues *translation = NULL;
-#ifndef _XBOX
 		if ( kv->LoadFromFile( filesystem, filename ) )
-#else
-		if ( kv->LoadFromFile( filesystem, filename, "GAME" ) )
-#endif
 		{
 			KeyValues *p = kv;
 			while ( p )
@@ -227,10 +222,8 @@ void CDecalEmitterSystem::LoadDecalsFromScript( char const *filename )
 							decal.weight = sub->GetFloat();
 
 							// Add to global list
-							intp idx = m_AllDecals.AddToTail( decal );
-
 							// Add index only to local list
-							entry.indices.AddToTail( idx );
+							entry.indices.AddToTail( m_AllDecals.AddToTail( decal ) );
 						}
 
 						// Add entry to main dictionary
@@ -272,8 +265,6 @@ void CDecalEmitterSystem::LoadDecalsFromScript( char const *filename )
 				}
 			}
 		}
-
-		kv->deleteThis();
 	}
 }
 

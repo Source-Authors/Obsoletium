@@ -9,7 +9,7 @@
 #include "RemoteServer.h"
 #include "VarEditDialog.h"
 
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/KeyCode.h>
 
 #include <vgui_controls/ListPanel.h>
@@ -25,7 +25,7 @@ using namespace vgui;
 CVarListPropertyPage::CVarListPropertyPage(vgui::Panel *parent, const char *name) : vgui::PropertyPage(parent, name)
 {
 	m_pRulesList = new ListPanel(this, "RulesList");
-	m_pRulesList->AddColumnHeader(0, "name", "Variable", 256);
+	m_pRulesList->AddColumnHeader(0, "name", "Variable", 256); //-V2017
 	m_pRulesList->AddColumnHeader(1, "value", "Value", 256);
 
 	m_pEditButton = new Button(this, "EditButton", "Edit...");
@@ -51,7 +51,7 @@ bool CVarListPropertyPage::LoadVarList(const char *varfile)
 	m_pRulesList->DeleteAllItems();
 
 	// load list from file
-	KeyValues *dat = new KeyValues("VarList");
+	KeyValuesAD dat("VarList");
 	if (dat->LoadFromFile( g_pFullFileSystem, varfile, NULL))
 	{
 		// enter into list
@@ -62,7 +62,6 @@ bool CVarListPropertyPage::LoadVarList(const char *varfile)
 		bSuccess = true;
 	}
 
-	dat->deleteThis();
 	return bSuccess;
 }
 
@@ -136,7 +135,7 @@ void CVarListPropertyPage::SetVarString(const char *varName, const char *value)
 		// look up the value in the enumeration
 		int iValue = atoi(value);
 		const char *result = rule->FindKey("list", true)->GetString(value, "");
-		rule->SetString("value", result);
+		rule->SetString("value", result); //-V2017
 		rule->SetInt("enum", iValue);
 	}
 	else 

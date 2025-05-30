@@ -203,7 +203,7 @@ Vector CAI_Node::GetPosition(int hull)
 	if (m_eNodeType == NODE_CLIMB) 
 	{
 		// Shift by the length of the hull and some small fudge
-		float  shift  = (0.5*NAI_Hull::Length(hull)) + (NODE_CLIMB_OFFSET);
+		float  shift  = (0.5f*NAI_Hull::Length(hull)) + (NODE_CLIMB_OFFSET);
 
 		Vector offsetDir = Vector(cos(DEG2RAD(m_flYaw)),sin(DEG2RAD(m_flYaw)),0);
 

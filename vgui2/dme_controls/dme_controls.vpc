@@ -16,7 +16,7 @@ $Configuration
 	}
 }
 
-$Project "Dme_controls"
+$Project "dme_controls"
 {
 	$Folder	"Header Files"
 	{

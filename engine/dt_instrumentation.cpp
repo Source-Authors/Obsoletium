@@ -76,8 +76,8 @@ void DTI_Init()
 
 		char dtiFileName[MAX_PATH];
 		char dtiLevelName[MAX_PATH];
-		V_FileBase( engineClient->GetLevelName(), dtiLevelName, ARRAYSIZE( dtiLevelName ) );
-		V_snprintf( dtiFileName, ARRAYSIZE( dtiFileName ), "dti_client_%s_%02d%02d%02d-%02d%02d%02d.csv", 
+		V_FileBase( engineClient->GetLevelName(), dtiLevelName );
+		V_sprintf_safe( dtiFileName, "dti_client_%s_%02d%02d%02d-%02d%02d%02d.csv", 
 					dtiLevelName,
 					systemTime.wYear % 100, systemTime.wMonth, systemTime.wDay,
 					systemTime.wHour, systemTime.wMinute, systemTime.wSecond );

@@ -33,20 +33,20 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeTextPanel : public CBaseAttributePanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeTextPanel, CBaseAttributePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeTextPanel, CBaseAttributePanel );
 
 public:
 	CAttributeTextPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
-	virtual void SetFont( HFont font );
-	virtual void PostConstructor();
-	virtual void Apply();
-	virtual void Refresh();
+	void SetFont( HFont font ) override;
+	void PostConstructor() override;
+	void Apply() override;
+	void Refresh() override;
 
 	// Returns the text type
 	const char *GetTextType();
 
 protected:
-	virtual vgui::Panel *GetDataPanel();
+	vgui::Panel *GetDataPanel() override;
 
 	MESSAGE_FUNC(OnTextChanged, "TextChanged")
 	{

@@ -95,8 +95,8 @@ static int FindGameDataClass( const char *pName )
 	extern GameData *pGD;
 	if( pGD != NULL )
 	{
-		int nCount = pGD->GetClassCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pGD->GetClassCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			GDclass *pc = pGD->GetClass(i);
 			if ( Q_stricmp( pName, pc->GetName() ) == 0 )
@@ -628,8 +628,8 @@ void CObjectBar::LoadEntityItems( void )
 		extern GameData *pGD;
 		if( pGD != NULL )
 		{
-			int nCount = pGD->GetClassCount();
-			for (int i = 0; i < nCount; i++)
+			intp nCount = pGD->GetClassCount();
+			for (intp i = 0; i < nCount; i++)
 			{
 				GDclass *pc = pGD->GetClass(i);
 				if( !pc->IsBaseClass() && !pc->IsSolidClass() )
@@ -659,7 +659,7 @@ void CObjectBar::LoadPrefabItems( void )
 	CUtlVector<CString> suggestions;
 	
 	// get the active library and add the prefabs from it
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) );
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( static_cast<DWORD>( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) ) );
 	
 	POSITION p = ENUM_START;
 	CPrefab *pPrefab = pLibrary->EnumPrefabs( p );

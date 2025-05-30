@@ -17,11 +17,17 @@ $Configuration
 	}
 }
 
-$Project "Pfm2tgas"
+$Project "pfm2tgas"
 {
+	$Folder "Header Files"
+	{
+		$File	"..\common\tools_minidump.h"
+	}
+
 	$Folder "Source Files"
 	{
 		$File	"pfm2tgas.cpp"
+		$File	"..\common\tools_minidump.cpp"
 	}
 	
 	$Folder	"Link Libraries"

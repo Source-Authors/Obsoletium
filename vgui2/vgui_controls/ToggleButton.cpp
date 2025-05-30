@@ -5,11 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui/KeyCode.h>
-
 #include <vgui_controls/ToggleButton.h>
 
-#include <KeyValues.h>
+#include <vgui/KeyCode.h>
+#include <tier1/KeyValues.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

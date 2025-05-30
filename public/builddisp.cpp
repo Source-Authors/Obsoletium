@@ -2452,7 +2452,7 @@ void CCoreDispInfo::DispUVToSurf_TriTLToBR_2( const Vector &vecIntersectPoint,
 void CCoreDispInfo::DispUVToSurf_TriTLToBR( Vector &vecPoint, Vector *pNormal, float *pAlpha, 
 											float flU, float flV, const Vector &vecIntersectPoint )
 {
-	const float TRIEDGE_EPSILON = 0.00001f;
+	constexpr float TRIEDGE_EPSILON = 0.00001f;
 
 	int nWidth = GetWidth();
 	int nHeight = GetHeight();
@@ -2890,8 +2890,6 @@ bool CCoreDispInfo::SurfToBaseFacePlane( Vector const &surfPt, Vector &planePt )
 	{
 		// Get the current displacement triangle-pair bounding-box.
 		CoreDispBBox_t *pBox = &pBBox[iBox];
-		if( !pBox )
-			continue;
 
 		// Check the point against the current displacement bounding-box.
 		if ( !PointInDispBBox( pBox, surfPt ) )

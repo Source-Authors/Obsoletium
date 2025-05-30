@@ -7,18 +7,6 @@
 //
 //===========================================================================//
 
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
-#include <float.h>
-
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
@@ -120,7 +108,7 @@ void processAnimations()
 	int i, j;
 
 	// find global root bone.
-	if ( strlen( rootname ) )
+	if ( !Q_isempty( rootname ) )
 	{
 		g_rootIndex = findGlobalBone( rootname );
 		if (g_rootIndex == -1)
@@ -418,7 +406,7 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 		return;
 	}
 
-	float fFrame = (iStartFrame + iSrcFrame) / 2.0;
+	float fFrame = (iStartFrame + iSrcFrame) / 2.0f;
 	int iMidFrame = (int)fFrame;
 	float s = fFrame - iMidFrame;
 
@@ -535,14 +523,14 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 	else if (v0 < 0.0f)
 	{
 		v0 = 0.0;
-		v1 = p2.Length() * 2.0;
+		v1 = p2.Length() * 2.0f;
 	}
 	else if (v1 < 0.0)
 	{
-		v0 = p2.Length() * 2.0;
+		v0 = p2.Length() * 2.0f;
 		v1 = 0.0;
 	}
-	else if ((v0+v1) > 0.01 && (fabs(v0-v1) / (v0+v1)) < 0.2)
+	else if ((v0+v1) > 0.01f && (fabs(v0-v1) / (v0+v1)) < 0.2f)
 	{
 		// if they're within 10% of each other, assum no acceleration
 		v0 = v1 = p2.Length();
@@ -556,9 +544,9 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 	Vector A, B, C;
 	if (motiontype & STUDIO_QUADRATIC_MOTION)
 	{
-		SolveInverseQuadratic( 0, 0, 0.5, p1.x, 1.0, p2.x, A.x, B.x, C.x );
-		SolveInverseQuadratic( 0, 0, 0.5, p1.y, 1.0, p2.y, A.y, B.y, C.y );
-		SolveInverseQuadratic( 0, 0, 0.5, p1.z, 1.0, p2.z, A.z, B.z, C.z );
+		SolveInverseQuadratic( 0, 0, 0.5f, p1.x, 1.0f, p2.x, A.x, B.x, C.x );
+		SolveInverseQuadratic( 0, 0, 0.5f, p1.y, 1.0f, p2.y, A.y, B.y, C.y );
+		SolveInverseQuadratic( 0, 0, 0.5f, p1.z, 1.0f, p2.z, A.z, B.z, C.z );
 	}
 
 	Vector	adjpos;
@@ -576,7 +564,7 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 		}
 		else
 		{
-			VectorScale( v, v0 * t + 0.5 * (v1 - v0) * t * t, adjpos );
+			VectorScale( v, v0 * t + 0.5f * (v1 - v0) * t * t, adjpos );
 		}
 
 		VectorScale( rot, t, adjangle );
@@ -681,7 +669,7 @@ Vector calcPosition( s_animation_t *panim, int iFrame )
 		{
 			float f = (iFrame - prevframe) / (pmove->endframe - prevframe);
 
-			float d = pmove->v0 * f + 0.5 * (pmove->v1 - pmove->v0) * f * f;
+			float d = pmove->v0 * f + 0.5f * (pmove->v1 - pmove->v0) * f * f;
 
 			vecPos = vecPos + d * pmove->vector;
 			if (iLoops != 0)
@@ -2006,7 +1994,7 @@ void localHierarchy( s_animation_t *panim, char *pBonename, char *pParentname, i
 		MdlError("anim '%s' references unknown bone '%s' in localhierarchy\n", panim->name, pBonename );
 	}
 
-	if (strlen( pParentname ) == 0)
+	if (Q_isempty( pParentname ))
 	{
 		pRule->newparent = -1;
 	}
@@ -2071,7 +2059,7 @@ void makeAngle( s_animation_t *panim, float angle )
 		Vector pos = panim->piecewisemove[panim->numpiecewisekeys-1].pos;
 		if (pos[0] != 0 || pos[1] != 0)
 		{
-			float a = atan2( pos[1], pos[0] ) * (180 / M_PI);
+			float a = RAD2DEG( atan2( pos[1], pos[0] ) );
 			da = angle - a;
 		}
 
@@ -2087,7 +2075,7 @@ void makeAngle( s_animation_t *panim, float angle )
 		Vector pos = panim->sanim[(panim->numframes - 1)][g_rootIndex].pos - panim->sanim[0][g_rootIndex].pos;
 		if (pos[0] != 0 || pos[1] != 0)
 		{
-			float a = atan2( pos[1], pos[0] ) * (180 / M_PI);
+			float a = RAD2DEG( atan2( pos[1], pos[0] ) );
 			da = angle - a;
 		}
 	}
@@ -2313,7 +2301,7 @@ void fixupIKErrors( s_animation_t *panim, s_ikrule_t *pRule )
 				Vector orig;
 				MatrixPosition( boneToWorld[g_ikchain[pRule->chain].link[2].bone], orig );
 
-				Vector pos = (footfall + calcMovement( panim, k + pRule->start, pRule->contact )) * s + orig * (1.0 - s);
+				Vector pos = (footfall + calcMovement( panim, k + pRule->start, pRule->contact )) * s + orig * (1.0f - s);
 
 				//printf("%d (%.1f:%.1f) : %.1f %.1f %1.f\n", k + pRule->start, cycle, s, pos.x, pos.y, pos.z );
 
@@ -2354,7 +2342,7 @@ static void ComputeSideAndScale( const s_flexkey_t &flexKey, s_vertanim_t *pVAni
 		}
 		else 
 		{
-			float t = ( flexKey.split - pVAnim->pos.x ) / (2.0 * flexKey.split);
+			float t = ( flexKey.split - pVAnim->pos.x ) / (2.0f * flexKey.split);
 			*pScale = 3.0f * t * t - 2.0f * t * t * t;
 			// printf( "%.1f : %.2f\n", pSrcAnim->pos.x, *pScale );
 		}
@@ -2380,8 +2368,8 @@ static void ComputeSideAndScale( const s_flexkey_t &flexKey, s_vertanim_t *pVAni
 	if ( flexKey.flexpair != 0)
 	{
 		// paired flexes are full scale but variable side to side
-		*pSide = 1.0 - *pScale;
-		*pScale = 1.0;
+		*pSide = 1.0f - *pScale;
+		*pScale = 1.0f;
 	}
 	else
 	{
@@ -2652,7 +2640,6 @@ void RemapVertexAnimations(void)
 	const char *pAnimationName;
 	s_sourceanim_t *pSourceAnim;
 	s_loddata_t	*pmLodSource;				// original model source
-	Vector		tmp;
 
 	// index by vertex in targets root LOD
 	static int			model_to_vanim_vert_imap[MAXSTUDIOVERTS];		// model vert to vanim vert mapping
@@ -3268,7 +3255,7 @@ void limitIKChainLength( void )
 						// rotate knee into local space
 						Vector tmp;
 						VectorIRotate( ikKneeDir, boneToWorld[ g_ikchain[k].link[0].bone ], tmp );
-						float bend = (((DotProduct( worldThigh - worldKnee, worldFoot - worldKnee ) ) / (l1 * l3)) + 1) / 2.0;
+						float bend = (((DotProduct( worldThigh - worldKnee, worldFoot - worldKnee ) ) / (l1 * l3)) + 1) / 2.0f;
 						kneeDir += tmp * bend;
 						hasKnees = true;
 					}
@@ -3432,14 +3419,14 @@ int RadianEulerCompareEpsilon(const RadianEuler& v1, const RadianEuler& v2, floa
 	for (i=0 ; i<3 ; i++)
 	{
 		// clamp to 2pi
-		float a1 = fmod(v1[i],(float) (2*M_PI));
-		float a2 = fmod(v2[i],(float) (2*M_PI));
+		float a1 = fmod(v1[i],2*M_PI_F);
+		float a2 = fmod(v2[i],2*M_PI_F);
 		float delta =  fabs(a1-a2);
 		
 		// use the smaller angle (359 == 1 degree off)
-		if ( delta > M_PI )
+		if ( delta > M_PI_F )
 		{
-			delta = 2*M_PI - delta;
+			delta = 2*M_PI_F - delta;
 		}
 
 		if (delta > epsilon)
@@ -3451,7 +3438,7 @@ int RadianEulerCompareEpsilon(const RadianEuler& v1, const RadianEuler& v2, floa
 
 bool AnimationDifferent( const Vector& startPos, const RadianEuler& startRot, const Vector& pos, const RadianEuler& rot )
 {
-	if ( !VectorCompareEpsilon( startPos, pos, 0.01 ) )
+	if ( !VectorCompareEpsilon( startPos, pos, 0.01f ) )
 		return true;
 	if ( !RadianEulerCompareEpsilon( startRot, rot, 0.01 ) )
 		return true;
@@ -3663,7 +3650,7 @@ void MakeStaticProp()
 	{
 		s_source_t *psource = g_source[i];
 
-		strcpy( psource->localBone[0].name, "static_prop" );
+		V_strcpy_safe( psource->localBone[0].name, "static_prop" );
 		psource->localBone[0].parent = -1;
 
 		for (k = 1; k < psource->numbones; k++)
@@ -4101,7 +4088,7 @@ void RenameBones( )
 			{
 				if (!stricmp( g_source[i]->localBone[j].name, g_renamedbone[k].from))
 				{
-					strcpy( g_source[i]->localBone[j].name, g_renamedbone[k].to );
+					V_strcpy_safe( g_source[i]->localBone[j].name, g_renamedbone[k].to );
 					break;
 				}
 			}
@@ -4168,7 +4155,7 @@ int BuildGlobalBonetable( )
 		{
 			k = g_numbones;
 			V_strcpy_safe( g_bonetable[k].name, g_importbone[i].name );
-			if ( strlen( g_importbone[i].parent ) == 0 )
+			if ( Q_isempty( g_importbone[i].parent ) )
 			{
 				g_bonetable[k].parent = -1;
 			}
@@ -4363,7 +4350,7 @@ void EnforceHierarchy( )
 		j = findGlobalBone( g_forcedhierarchy[i].parentname );
 		k = findGlobalBone( g_forcedhierarchy[i].childname );
 
-		if (j == -1 && strlen( g_forcedhierarchy[i].parentname ) > 0 )
+		if (j == -1 && !Q_isempty( g_forcedhierarchy[i].parentname ) )
 		{
 			MdlError( "unknown bone: \"%s\" in forced hierarchy\n", g_forcedhierarchy[i].parentname );
 		}
@@ -4380,7 +4367,7 @@ void EnforceHierarchy( )
 		*/
 
 		/*
-		if (strlen(g_forcedhierarchy[i].subparentname) != 0)
+		if (!Q_isempty(g_forcedhierarchy[i].subparentname))
 		{
 			int n, m;
 
@@ -4405,7 +4392,7 @@ void EnforceHierarchy( )
 			g_numbones++;
 
 			// add the bone
-			strcpy( g_bonetable[k].name, g_forcedhierarchy[i].subparentname );
+			V_strcpy_safe( g_bonetable[k].name, g_forcedhierarchy[i].subparentname );
 			g_bonetable[k].parent = j;
 			g_bonetable[k].split = true;
 			g_bonetable[k+1].parent = k;
@@ -5460,7 +5447,7 @@ void SlerpBones(
 			s2 = s * pseqdesc->weight[i];	// blend in based on this animations weights
 			if (s2 > 0.0)
 			{
-				s1 = 1.0 - s2;
+				s1 = 1.0f - s2;
 
 				if (g_bonetable[i].flags & BONE_FIXED_ALIGNMENT)
 				{
@@ -6290,14 +6277,14 @@ static void CalcPoseParameters( void )
 
 					for (int m = 0; m < pseq->groupsize[iPose]; m++)
 					{
-						float f = (m / (float)(pseq->groupsize[iPose] - 1.0));
+						float f = (m / (float)(pseq->groupsize[iPose] - 1.0f));
 						if (iPose == 0)
 						{
-							pseq->param0[m] = pseq->paramstart[iPose] * (1.0 - f) + pseq->paramend[iPose] * f;
+							pseq->param0[m] = pseq->paramstart[iPose] * (1.0f - f) + pseq->paramend[iPose] * f;
 						}
 						else
 						{
-							pseq->param1[m] = pseq->paramstart[iPose] * (1.0 - f) + pseq->paramend[iPose] * f;
+							pseq->param1[m] = pseq->paramstart[iPose] * (1.0f - f) + pseq->paramend[iPose] * f;
 						}
 					}
 				}
@@ -6696,7 +6683,7 @@ static void ProcessIKRules( )
 					matrix3x4_t worldToBone;
 					matrix3x4_t local;
 
-					if (strlen(pRule->bonename) == 0)
+					if (Q_isempty(pRule->bonename))
 					{
 						pRule->bone = -1;
 					}
@@ -6766,7 +6753,7 @@ static void ProcessIKRules( )
 					// pRule->pos = footfall;
 					// pRule->q = RadianEuler( 0, 0, 0 );
 
-					if (strlen(pRule->bonename) == 0)
+					if (Q_isempty(pRule->bonename))
 					{
 						if (pRule->bone != -1)
 						{
@@ -7129,7 +7116,7 @@ static void CompressAnimations( )
 			{
 				if (-minv> maxv)
 				{
-					scale = minv / -32768.0;
+					scale = minv / -32768.0f;
 				}
 				else
 				{
@@ -7138,7 +7125,7 @@ static void CompressAnimations( )
 			}
 			else
 			{
-				scale = 1.0 / 32.0;
+				scale = 1.0f / 32.0f;
 			}
 			switch(k)
 			{
@@ -7423,7 +7410,7 @@ static void CompressSingle( s_animationstream_t *pStream )
 		{
 			if (-minv> maxv)
 			{
-				scale = minv / -32768.0;
+				scale = minv / -32768.0f;
 			}
 			else
 			{
@@ -7811,7 +7798,7 @@ void SetupHitBoxes()
 
 		s_hitboxset *set = &g_hitboxsets[ index ];
 		memset( set, 0, sizeof( *set) );
-		strcpy( set->hitboxsetname, "default" );
+		V_strcpy_safe( set->hitboxsetname, "default" );
 
 		gflags |= STUDIOHDR_FLAGS_AUTOGENERATED_HITBOX;
 

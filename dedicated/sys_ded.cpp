@@ -7,13 +7,13 @@
 #include "console/conproc.h"
 #include "dedicated.h"
 #include "engine_hlds_api.h"
-#include "checksum_md5.h"
 #include "mathlib/mathlib.h"
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
 #include "tier0/vcrmode.h"
 #include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
+#include "tier1/checksum_md5.h"
 #include "tier2/tier2.h"
 #include "idedicatedexports.h"
 #include "vgui/vguihelpers.h"
@@ -35,8 +35,6 @@
 
 #include <direct.h>
 #else
-#define _chdir chdir
-
 #include <unistd.h>
 #endif
 
@@ -480,7 +478,7 @@ int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system) {
   // Figure out the directory the executable is running from and make that be
   // the current working directory.
   char base_dir[MAX_PATH];
-  if (_chdir(GetBaseDirectory(base_dir, command_line))) {
+  if (chdir(GetBaseDirectory(base_dir, command_line))) {
     int rc = errno;
     Error("Unable to change current directory to '%s': %s.\n", base_dir,
           std::generic_category().message(rc).c_str());

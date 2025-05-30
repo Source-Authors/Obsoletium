@@ -5,9 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "basedialogparams.h"
 #include <mxtk/mx.h>
 #include "tier0/dbg.h"
-#include "basedialogparams.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 

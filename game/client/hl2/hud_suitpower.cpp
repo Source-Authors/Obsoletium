@@ -191,11 +191,11 @@ void CHudSuitPower::Paint()
 
 	if (tempString)
 	{
-		surface()->DrawPrintText(tempString, wcslen(tempString));
+		surface()->DrawPrintText(tempString, V_wcslen(tempString));
 	}
 	else
 	{
-		surface()->DrawPrintText(L"AUX POWER", wcslen(L"AUX POWER"));
+		surface()->DrawPrintText(L"AUX POWER", ssize(L"AUX POWER") - 1);
 	}
 
 	if ( m_iActiveSuitDevices )
@@ -211,11 +211,11 @@ void CHudSuitPower::Paint()
 
 			if (tempString)
 			{
-				surface()->DrawPrintText(tempString, wcslen(tempString));
+				surface()->DrawPrintText(tempString, V_wcslen(tempString));
 			}
 			else
 			{
-				surface()->DrawPrintText(L"OXYGEN", wcslen(L"OXYGEN"));
+				surface()->DrawPrintText(L"OXYGEN", ssize(L"OXYGEN") - 1);
 			}
 			ypos += text2_gap;
 		}
@@ -228,11 +228,11 @@ void CHudSuitPower::Paint()
 
 			if (tempString)
 			{
-				surface()->DrawPrintText(tempString, wcslen(tempString));
+				surface()->DrawPrintText(tempString, V_wcslen(tempString));
 			}
 			else
 			{
-				surface()->DrawPrintText(L"FLASHLIGHT", wcslen(L"FLASHLIGHT"));
+				surface()->DrawPrintText(L"FLASHLIGHT", ssize(L"FLASHLIGHT") - 1);
 			}
 			ypos += text2_gap;
 		}
@@ -245,11 +245,11 @@ void CHudSuitPower::Paint()
 
 			if (tempString)
 			{
-				surface()->DrawPrintText(tempString, wcslen(tempString));
+				surface()->DrawPrintText(tempString, V_wcslen(tempString));
 			}
 			else
 			{
-				surface()->DrawPrintText(L"SPRINT", wcslen(L"SPRINT"));
+				surface()->DrawPrintText(L"SPRINT", ssize(L"SPRINT") - 1);
 			}
 			ypos += text2_gap;
 		}

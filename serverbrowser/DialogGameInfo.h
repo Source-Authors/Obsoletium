@@ -20,7 +20,7 @@ struct challenge_s
 //-----------------------------------------------------------------------------
 // Purpose: Dialog for displaying information about a game server
 //-----------------------------------------------------------------------------
-class CDialogGameInfo : public vgui::Frame, public ISteamMatchmakingPlayersResponse, public ISteamMatchmakingPingResponse
+class CDialogGameInfo final : public vgui::Frame, public ISteamMatchmakingPlayersResponse, public ISteamMatchmakingPingResponse
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CDialogGameInfo, vgui::Frame ); 
 

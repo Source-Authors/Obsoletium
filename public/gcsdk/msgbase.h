@@ -232,8 +232,8 @@ protected:
 	//HCONNECTION m_hConnection;		// Connection on which we received the message
 private:
 	// stop people from hurting themselves
-	CMsgBase_t( const CMsgBase_t &rhs ) {};
-	CMsgBase_t &operator=( const CMsgBase_t &rhs ) {};
+	CMsgBase_t( const CMsgBase_t &rhs ) = delete;
+	CMsgBase_t &operator=( const CMsgBase_t &rhs ) = delete;
 
 	bool m_bAlloced;				// Did we allocate this buffer or does someone else own it
 

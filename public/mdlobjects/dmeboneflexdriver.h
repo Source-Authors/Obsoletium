@@ -45,7 +45,7 @@ class CDmeBoneFlexDriver : public CDmeMdlList
 	DEFINE_ELEMENT( CDmeBoneFlexDriver, CDmeMdlList );
 
 public:
-	virtual CDmAttribute *GetListAttr() { return m_eControlList.GetAttribute(); }
+	CDmAttribute *GetListAttr() override { return m_eControlList.GetAttribute(); }
 
 	CDmeBoneFlexDriverControl *FindOrCreateControl( const char *pszControlName );
 
@@ -63,7 +63,7 @@ class CDmeBoneFlexDriverList : public CDmeMdlList
 	DEFINE_ELEMENT( CDmeBoneFlexDriverList, CDmeMdlList );
 
 public:
-	virtual CDmAttribute *GetListAttr() { return m_eBoneFlexDriverList.GetAttribute(); }
+	CDmAttribute *GetListAttr() override { return m_eBoneFlexDriverList.GetAttribute(); }
 
 	CDmeBoneFlexDriver *FindOrCreateBoneFlexDriver( const char *pszBoneName );
 

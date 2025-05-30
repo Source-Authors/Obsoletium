@@ -42,7 +42,11 @@ CMapPath::~CMapPath(void)
 //-----------------------------------------------------------------------------
 CMapPathNode::CMapPathNode(void)
 {
+	pos = vec3_invalid;
+	dwID = 0;
 	bSelected = FALSE;
+	memset(szTargets, 0, sizeof(szTargets));
+	nTargets = -1;
 	szName[0] = 0;
 }
 
@@ -64,7 +68,7 @@ CMapPathNode &CMapPathNode::operator=(const CMapPathNode &src)
 	Q_strncpy( szName, src.szName, sizeof(szName) );
 	bSelected = src.bSelected;
 	kv.RemoveAll();
-	for ( int i=src.kv.GetFirst(); i != src.kv.GetInvalidIndex(); i=src.kv.GetNext( i ) )
+	for ( auto i=src.kv.GetFirst(); i != src.kv.GetInvalidIndex(); i=src.kv.GetNext( i ) )
 	{
 		MDkeyvalue KeyValue = src.kv.GetKeyValue(i);
 		kv.SetValue(KeyValue.szKey, KeyValue.szValue);
@@ -217,7 +221,7 @@ void CMapPath::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 			//
 			WCKeyValues &kv = node.kv;
 			iSize = 0;
-			for ( int z=kv.GetFirst(); z != kv.GetInvalidIndex(); z=kv.GetNext( z ) )
+			for ( auto z=kv.GetFirst(); z != kv.GetInvalidIndex(); z=kv.GetNext( z ) )
 			{
 				++iSize;
 			}
@@ -226,7 +230,7 @@ void CMapPath::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 			//
 			// Write keyvalues.
 			//
-			for (int k = kv.GetFirst(); k != kv.GetInvalidIndex(); k=kv.GetNext( k ) )
+			for (auto k = kv.GetFirst(); k != kv.GetInvalidIndex(); k=kv.GetNext( k ) )
 			{
 				MDkeyvalue &KeyValue = kv.GetKeyValue(k);
 				if (KeyValue.szKey[0] != '\0')
@@ -350,7 +354,7 @@ ResolveNamesAgain:
 		if(iLastNodeIndex != -1)
 		{
 			CMapPathNode &prevNode = m_Nodes[iLastNodeIndex];
-			strcpy(prevNode.szTargets[prevNode.nTargets++], strTemp);
+			V_strcpy_safe(prevNode.szTargets[prevNode.nTargets++], strTemp);
 		}
 
 		++iName;
@@ -378,7 +382,7 @@ ResolveNamesAgain:
 		//
 		CMapPathNode &LastNode = m_Nodes[iMax];
 		GetNodeName(iCurNode, 0, strTemp);
-		strcpy(LastNode.szTargets[LastNode.nTargets], strTemp);
+		V_strcpy_safe(LastNode.szTargets[LastNode.nTargets], strTemp);
 		LastNode.nTargets++;
 	}
 
@@ -422,7 +426,7 @@ SaveAgain:
 
 		// other keyvalues
 		WCKeyValues &kv = node.kv;
-		for (int k = kv.GetFirst(); k != kv.GetInvalidIndex(); k=kv.GetNext( k ) )
+		for (auto k = kv.GetFirst(); k != kv.GetInvalidIndex(); k=kv.GetNext( k ) )
 		{
 			MDkeyvalue &KeyValue = kv.GetKeyValue(k);
 			if (KeyValue.szKey[0] != '\0')
@@ -485,7 +489,7 @@ CMapEntity *CMapPath::CreateEntityForNode(DWORD dwNodeID)
 
 	CMapEntity *pEntity = new CMapEntity;
 
-	for (int k = pNode->kv.GetFirst(); k != pNode->kv.GetInvalidIndex(); k=pNode->kv.GetNext( k ) )
+	for (auto k = pNode->kv.GetFirst(); k != pNode->kv.GetInvalidIndex(); k=pNode->kv.GetNext( k ) )
 	{
 		pEntity->SetKeyValue(pNode->kv.GetKey(k), pNode->kv.GetValue(k));
 	}
@@ -526,7 +530,7 @@ void CMapPath::CopyNodeFromEntity(DWORD dwNodeID, CMapEntity *pEntity)
 	//
 	// Copy all the keys except target and targetname from the entity to the pathnode.
 	//
-	for ( int i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for ( auto i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		if (!strcmp(pEntity->GetKey(i), "target") || !strcmp(pEntity->GetKey(i), "targetname"))
 		{
@@ -562,7 +566,7 @@ CChunkFileResult_t CMapPathNode::LoadKeyCallback(const char *szKey, const char *
 	}
 	else if (!stricmp(szKey, "name"))
 	{
-		strcpy(pNode->szName, szValue);
+		V_strcpy_safe(pNode->szName, szValue);
 	}
 }
 

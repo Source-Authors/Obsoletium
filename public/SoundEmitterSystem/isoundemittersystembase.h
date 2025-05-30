@@ -18,7 +18,7 @@
 #include "appframework/IAppSystem.h"
 
 
-#define SOUNDEMITTERSYSTEM_INTERFACE_VERSION	"VSoundEmitter002"
+constexpr inline char SOUNDEMITTERSYSTEM_INTERFACE_VERSION[]{"VSoundEmitter002"};
 
 #define SOUNDGENDER_MACRO "$gender"
 #define SOUNDGENDER_MACRO_LENGTH 7		// Length of above including $
@@ -223,7 +223,7 @@ public:
 	virtual bool			IsValidIndex( int index ) = 0;
 	virtual int				GetSoundCount( void ) = 0;
 
-	virtual const char		*GetSoundName( int index ) = 0;
+	virtual const char		*GetSoundName( intp index ) = 0;
 	virtual bool			GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false ) = 0;
 
 	virtual const char		*GetWaveName( CUtlSymbol& sym ) = 0;

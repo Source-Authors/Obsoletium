@@ -17,7 +17,7 @@ void CharacterSetBuild(characterset_t *set, const char *source) {
 
   memset(set->set, 0, sizeof(set->set));
 
-  ptrdiff_t i{0};
+  intp i{0};
 
   while (source[i]) {
     set->set[static_cast<unsigned char>(source[i])] = static_cast<char>(1);

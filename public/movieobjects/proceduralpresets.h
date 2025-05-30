@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-enum
+enum DmeProceduralPresetType
 {
 	PROCEDURAL_PRESET_NOT = 0,
 	PROCEDURAL_PRESET_IN_CROSSFADE,

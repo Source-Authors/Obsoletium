@@ -9,7 +9,7 @@
 
 using namespace vgui;
 
-const float BROADCAST_LIST_TIMEOUT = 0.4f;
+constexpr inline float BROADCAST_LIST_TIMEOUT = 0.4f;
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor

@@ -32,7 +32,7 @@ void CDmeTransformList::OnDestruction()
 //-----------------------------------------------------------------------------
 // Sets the transform
 //-----------------------------------------------------------------------------
-void CDmeTransformList::SetTransform( int nIndex, const matrix3x4_t& mat )
+void CDmeTransformList::SetTransform( intp nIndex, const matrix3x4_t& mat )
 {
 	m_Transforms[nIndex]->SetTransform( mat );
 }

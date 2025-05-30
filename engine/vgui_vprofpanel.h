@@ -32,7 +32,7 @@ public:
 	CProfileHierarchyPanel(vgui::Panel *parent, const char *panelName);
 	~CProfileHierarchyPanel();
 
-struct PanelEntry_t
+	struct PanelEntry_t
 	{
 		PanelEntry_t() :
 			label( 0 ),
@@ -57,7 +57,7 @@ struct PanelEntry_t
 
 	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	virtual int AddItem( KeyValues *data, int parentItemIndex, ColumnPanels_t& columnPanels );
+	virtual intp AddItem( KeyValues *data, int parentItemIndex, ColumnPanels_t& columnPanels );
 	virtual void ModifyItem( KeyValues *data, int itemIndex );
 	virtual void SetItemColors( int id, const Color& fg, const Color& bg );
 	virtual void SetItemColumnColors( int id, int col, const Color& fg, const Color& bg );

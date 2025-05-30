@@ -5,13 +5,18 @@
 #ifndef SRC_UTILS_SHADERCOMPILE_D3DXFXC_H_
 #define SRC_UTILS_SHADERCOMPILE_D3DXFXC_H_
 
+#include <memory>
+
 #include "cmdsink.h"
+
+#define kShaderCompilerOutputName "output.txt"
 
 namespace se::shader_compile::fxc_intercept {
 
-bool TryExecuteCommand(
-    const char *pCommand,
-    se::shader_compile::command_sink::IResponse **ppResponse);
+constexpr inline char kShaderArtefactOutputName[]{"shader.o"};
+
+std::unique_ptr<se::shader_compile::command_sink::IResponse> TryExecuteCommand(
+    const char *pCommand);
 
 };  // namespace se::shader_compile::fxc_intercept
 

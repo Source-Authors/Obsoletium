@@ -5,9 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#pragma warning( disable : 4786 )
-
-#pragma warning( disable : 4748 )		// buffer overrun with optimizations off
 // This file has tons of problems with global optimizations. . turn 'em off.
 // NOTE: Would be nice to have a test case for this! - not verified in vs2005
 #pragma optimize( "g", off )
@@ -16,14 +13,9 @@
 #define FILEBUFFER_SIZE ( 4 * 1024 * 1024 )
 
 //#define IGNORE_BONES
-
 #define NVTRISTRIP
-
 #define EMIT_TRILISTS
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <float.h>
 #include "mathlib/mathlib.h"
 #include "cmdlib.h"
 #include "studio.h"
@@ -31,13 +23,12 @@
 #include "HardwareMatrixState.h"
 #include "HardwareVertexCache.h"
 #include "optimize.h"
-#include <malloc.h>
 #include <nvtristrip.h>
 #include "FileBuffer.h"
-#include "tier1/utlvector.h"
 #include "materialsystem/imaterial.h"
-#include "tier1/utllinkedlist.h"
 
+#include "tier1/utlvector.h"
+#include "tier1/utllinkedlist.h"
 #include "tier1/smartptr.h"
 #include "tier2/p4helpers.h"
 
@@ -3176,7 +3167,7 @@ void COptimizedModel::DebugCrap( studiohdr_t *phdr )
 			for( int lodID = 0; lodID < model->numLODs; lodID++ )
 			{
 				char tmp[256];
-				sprintf( tmp, "crap.lod%d", lodID );
+				V_sprintf_safe( tmp, "crap.lod%d", lodID );
 				printf( "writing %s\n", tmp );
 				FILE *fp = fopen( tmp, "w" );
 				if( !fp )
@@ -3240,7 +3231,7 @@ void COptimizedModel::WriteGLViewFile( studiohdr_t *phdr, const char *pFileName,
 			for( int lodID = 0; lodID < model->numLODs; lodID++ )
 			{
 				char tmp[256];
-				sprintf( tmp, "%s.lod%d", pFileName, lodID );
+				V_sprintf_safe( tmp, "%s.lod%d", pFileName, lodID );
 				printf( "writing %s\n", tmp );
 				CPlainAutoPtr< CP4File > spFile( g_p4factory->AccessFile( tmp ) );
 				spFile->Edit();
@@ -3391,35 +3382,35 @@ void COptimizedModel::WriteGLViewFiles( studiohdr_t *pHdr, char const* glViewFil
 		return;
 
 	char tmpFileName[128];
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".mesh" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".mesh" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWMESH, .8f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".stripgroup" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".stripgroup" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWSTRIPGROUP, .8f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".strip" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".strip" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWSTRIP, .8f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".substrip" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".substrip" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWSUBSTRIP, .97f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".flexed" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".flexed" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWFLEXED, .8f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".sw" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".sw" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWSW, .8f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".flexedandsw" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".flexedandsw" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWSW | WRITEGLVIEW_SHOWFLEXED, .8f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".meshprops" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".meshprops" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWMESHPROPS, .8f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".vertnumbones" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".vertnumbones" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWVERTNUMBONES, 1.0f );
-	strcpy( tmpFileName, glViewFileName );
-	strcat( tmpFileName, ".stripnumbones" );
+	V_strcpy_safe( tmpFileName, glViewFileName );
+	V_strcat_safe( tmpFileName, ".stripnumbones" );
 	WriteGLViewFile( pHdr, tmpFileName, WRITEGLVIEW_SHOWSTRIPNUMBONES, 1.0f );
 }
 
@@ -3959,13 +3950,13 @@ void WriteOptimizedFiles( studiohdr_t *phdr, s_bodypart_t *pSrcBodyParts )
 	V_strcpy_safe( filename, gamedir );
 //	if( *g_pPlatformName )
 //	{
-//		strcat( filename, "platform_" );
-//		strcat( filename, g_pPlatformName );
-//		strcat( filename, "/" );	
+//		V_strcat_safe( filename, "platform_" );
+//		V_strcat_safe( filename, g_pPlatformName );
+//		V_strcat_safe( filename, "/" );	
 //	}
 	V_strcat_safe( filename, "models/" );	
 	V_strcat_safe( filename, outname );
-	Q_StripExtension( filename, filename, sizeof( filename ) );
+	Q_StripExtension( filename, filename );
 
 	V_strcpy_safe( tmpFileName, filename );
 	V_strcat_safe( tmpFileName, ".sw.vtx" );

@@ -429,7 +429,7 @@ bool CClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 #ifdef DEDICATED
 	bool bAllowMismatches = false;
 #else
-	bool bAllowMismatches = ( demoplayer && demoplayer->IsPlayingBack() );
+	bool bAllowMismatches = ( demoplayer->IsPlayingBack() );
 #endif // DEDICATED
 
 	if ( !RecvTable_CreateDecoders( serverGameDLL->GetStandardSendProxies(), bAllowMismatches ) ) // create receive table decoders
@@ -577,8 +577,7 @@ void CClientState::ProcessSoundsWithProtoVersion( SVC_Sounds *msg, CUtlVector< S
 	
 	for ( int i = 0; i < msg->m_nNumSounds; i++ )
 	{
-		intp nSound = sounds.AddToTail();
-		SoundInfo_t *pSound = &(sounds[ nSound ]);
+		SoundInfo_t *pSound = &(sounds[ sounds.AddToTail() ]);
 
 		pSound->ReadDelta( pDeltaSound, msg->m_DataIn, nProtoVersion );
 
@@ -916,7 +915,7 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 	void *from = NULL;
 	C_ServerClassInfo *pServerClass = NULL;
 	ClientClass *pClientClass = NULL;
-	ALIGN4 unsigned char data[CEventInfo::MAX_EVENT_DATA] ALIGN4_POST;
+	alignas(4) unsigned char data[CEventInfo::MAX_EVENT_DATA];
 	bf_write toBuf( data, sizeof(data) );
 	CEventInfo *ei = NULL;
 	
@@ -962,6 +961,7 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 		else
 		{
 			Assert( ei );
+			Assert( pClientClass );
 
 			unsigned int buffer_size = PAD_NUMBER( Bits2Bytes( ei->bits ), 4 );
 			bf_read fromBuf( ei->pData, buffer_size );

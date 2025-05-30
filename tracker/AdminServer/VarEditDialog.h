@@ -20,13 +20,13 @@ class CVarEditDialog : public vgui::Frame
 {
 public:
 	CVarEditDialog(vgui::Panel *parent, const char *name);
-	~CVarEditDialog();
+	virtual ~CVarEditDialog();
 
-	void Activate(vgui::Panel *actionSignalTarget, KeyValues *rules);
+	void Activate(vgui::Panel *actionSignalTarget, const KeyValues *rules);
 
 protected:
-	virtual void OnCommand(const char *command);
-	virtual void OnClose();
+	void OnCommand(const char *command) override;
+	void OnClose() override;
 
 	void ApplyChanges();
 

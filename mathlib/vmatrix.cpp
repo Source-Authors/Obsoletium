@@ -235,12 +235,12 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 	// I = identity
 
 	// Setup AI
-	for(i=0; i < 4; i++)
+	for(i=0; i < 4; i++) //-V112
 	{
 		const vec_t *pIn = src[i];
 		pOut = mat[i];
 
-		for(j=0; j < 4; j++)
+		for(j=0; j < 4; j++) //-V112
 		{
 			pOut[j] = pIn[j];
 		}
@@ -259,12 +259,12 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 	// 2. Add a multiple of one row to another.
 	// 3. Interchange two rows.
 
-	for(iRow=0; iRow < 4; iRow++)
+	for(iRow=0; iRow < 4; iRow++) //-V112
 	{
 		// Find the row with the largest element in this column.
 		fLargest = 0.00001f;
 		iLargest = -1;
-		for(iTest=iRow; iTest < 4; iTest++)
+		for(iTest=iRow; iTest < 4; iTest++) //-V112
 		{
 			fTest = (vec_t)FloatMakePositive(mat[rowMap[iTest]][iRow]);
 			if(fTest > fLargest)
@@ -295,7 +295,7 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 		pRow[iRow] = 1.0f; // Preserve accuracy...
 		
 		// Eliminate this element from the other rows using operation 2.
-		for(i=0; i < 4; i++)
+		for(i=0; i < 4; i++) //-V112
 		{
 			if(i == iRow)
 				continue;
@@ -314,12 +314,12 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 	}
 
 	// The inverse is on the right side of AX now (the identity is on the left).
-	for(i=0; i < 4; i++)
+	for(i=0; i < 4; i++) //-V112
 	{
 		const vec_t *pIn = mat[rowMap[i]] + 4;
 		pOut = dst.m[i];
 
-		for(j=0; j < 4; j++)
+		for(j=0; j < 4; j++) //-V112
 		{
 			pOut[j] = pIn[j];
 		}
@@ -359,7 +359,8 @@ void VMatrix::InverseTR( VMatrix &ret ) const
 
 void MatrixInverseTranspose( const VMatrix& src, VMatrix& dst )
 {
-	src.InverseGeneral( dst );
+	[[maybe_unused]] bool ok = src.InverseGeneral( dst );
+	AssertMsg( ok, "Matrix inverse failed.\n" );
 	MatrixTranspose( dst, dst );
 }
 
@@ -471,12 +472,12 @@ static void SetupMatrixAnglesInternal( vec_t (&m)[4][4], const QAngle & vAngles 
 	DirectX::XMVECTOR radians = DirectX::XMVectorMultiply
 	(
 		DirectX::XMLoadFloat3( vAngles.XmBase() ),
-		DirectX::XMVectorReplicate( M_PI_F / 180.f )
+		DirectX::XMVectorReplicate( M_PI_F / 180.f ) //-V2002
 	);
 	DirectX::XMVectorSinCos( &sine, &cosine, radians );
 
-	float sp = DirectX::XMVectorGetX( sine ),   sy = DirectX::XMVectorGetY( sine ),   sr = DirectX::XMVectorGetZ( sine );
-	float cp = DirectX::XMVectorGetX( cosine ), cy = DirectX::XMVectorGetY( cosine ), cr = DirectX::XMVectorGetZ( cosine );
+	float sp = DirectX::XMVectorGetX( sine ),   sy = DirectX::XMVectorGetY( sine ),   sr = DirectX::XMVectorGetZ( sine ); //-V2002
+	float cp = DirectX::XMVectorGetX( cosine ), cy = DirectX::XMVectorGetY( cosine ), cr = DirectX::XMVectorGetZ( cosine ); //-V2002
 
 	// matrix = (YAW * PITCH) * ROLL
 	m[0][0] = cp*cy;
@@ -710,15 +711,15 @@ void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 		dst.XmBase(),
 		DirectX::XMVectorSet
 		(
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
 			),
-			DirectX::XMVectorGetX
+			DirectX::XMVectorGetX //-V2002
 			(
 				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
 			),
@@ -734,7 +735,7 @@ void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 //-----------------------------------------------------------------------------
 void Vector3DMultiplyPositionProjective( const VMatrix& src1, const Vector &src2, Vector& dst )
 {
-	DirectX::XMVECTOR vsrc2 = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( src2.XmBase() ), 1.0f );
+	DirectX::XMVECTOR vsrc2 = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( src2.XmBase() ), 1.0f ); //-V2002
 	DirectX::XMVECTOR vwden = DirectX::XMVectorSum
 	(
 		DirectX::XMVectorMultiply
@@ -751,15 +752,15 @@ void Vector3DMultiplyPositionProjective( const VMatrix& src1, const Vector &src2
 
 	DirectX::XMVECTOR vdest = DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
 		),
@@ -832,7 +833,8 @@ void Vector3DMultiplyTranspose( const VMatrix& src1, const Vector& src2, Vector&
 	// Make sure it works if src2 == dst
 	bool srcEqualsDst = (&src2 == &dst);
 
-	Vector tmp;
+	// dimhotepus: Initialize to invalid vector.
+	Vector tmp{vec3_invalid};
 	const Vector&v = srcEqualsDst ? static_cast<const Vector&>(tmp) : src2;
 
 	if (srcEqualsDst)
@@ -918,7 +920,7 @@ void MatrixBuildTranslation( VMatrix& dst, const Vector &translation )
 //-----------------------------------------------------------------------------
 void MatrixBuildRotationAboutAxis( VMatrix &dst, const Vector &vAxisOfRot, float angleDegrees )
 {
-	MatrixBuildRotationAboutAxis( vAxisOfRot, angleDegrees, const_cast< matrix3x4_t &> ( dst.As3x4() ) );
+	MatrixBuildRotationAboutAxis( vAxisOfRot, angleDegrees, dst.As3x4() );
 	dst[3][0] = 0;
 	dst[3][1] = 0;
 	dst[3][2] = 0;

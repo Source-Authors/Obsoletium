@@ -105,7 +105,8 @@ int SortByWUCount(const void *elem1, const void *elem2) {
 
 void PrepareDistributeWorkHeader(MessageBuffer *pBuf,
                                  unsigned char cSubpacketID) {
-  char cPacketID[2] = {g_DSInfo.m_cPacketID, cSubpacketID};
+  unsigned char cPacketID[2] = {
+      static_cast<unsigned char>(g_DSInfo.m_cPacketID), cSubpacketID};
   pBuf->write(cPacketID, 2);
   pBuf->write(&g_iCurDSInfo, sizeof(g_iCurDSInfo));
 }
@@ -171,7 +172,7 @@ void VMPI_DistributeWork_DisconnectHandler(int procID, const char *pReason) {
 }
 
 uint64 VMPI_GetNumWorkUnitsCompleted(int iProc) {
-  Assert(iProc >= 0 && iProc <= ARRAYSIZE(g_totalWUCountByProcess));
+  Assert(iProc >= 0 && iProc <= ssize(g_totalWUCountByProcess));
   return g_totalWUCountByProcess[iProc];
 }
 
@@ -466,9 +467,9 @@ void DistributeWork_Worker(CDSInfo *pInfo, ProcessWorkUnitFn processFn) {
       VMPI_DispatchNextMessage(300);
 
       Msg("\rThreads status: ");
-      for (int i = 0; i < ARRAYSIZE(g_ThreadWUs); i++) {
+      for (intp i = 0; i < ssize(g_ThreadWUs); i++) {
         if (g_ThreadWUs[i] != ~0ull)
-          Msg("%d: WU %5d  ", i, (int)g_ThreadWUs[i]);
+          Msg("%zd: WU %5d  ", i, (int)g_ThreadWUs[i]);
       }
 
       VMPI_FlushGroupedPackets();
@@ -504,11 +505,10 @@ void DistributeWork_Cancel() {
 double DistributeWork(
     uint64 nWorkUnits,  // how many work units to dole out
     char cPacketID,
-    ProcessWorkUnitFn processFn,  // workers implement this to process a work
-                                  // unit and send results back
-    ReceiveWorkUnitFn
-        receiveFn  // the master implements this to receive a work unit
-) {
+    // workers implement this to process a work unit and send results back
+    ProcessWorkUnitFn processFn,
+    // the master implements this to receive a work unit
+    ReceiveWorkUnitFn receiveFn) {
   ++g_iCurDSInfo;
 
   if (g_iCurDSInfo == 0) {
@@ -577,7 +577,7 @@ double DistributeWork(
                g_nMessagesReceived - nMessagesReceivedStart);
 
   // Mark that the threads aren't working on anything at the moment.
-  for (int i = 0; i < ARRAYSIZE(g_ThreadWUs); i++) g_ThreadWUs[i] = ~0ull;
+  for (intp i = 0; i < ssize(g_ThreadWUs); i++) g_ThreadWUs[i] = ~0ull;
 
   return flTimeSpent;
 }

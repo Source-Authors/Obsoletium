@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "matsys_controls/BaseAssetPicker.h"
+#include "matsys_controls/baseassetpicker.h"
 #include "vgui_controls/Frame.h"
 #include "datamodel/dmehandle.h"
 #include "tier1/utlstring.h"
@@ -30,7 +30,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CSoundPicker : public CBaseAssetPicker
 {
-	DECLARE_CLASS_SIMPLE( CSoundPicker, CBaseAssetPicker );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSoundPicker, CBaseAssetPicker );
 
 public:
 	enum PickType_t
@@ -47,10 +47,10 @@ public:
 	~CSoundPicker();
 
 	// overridden frame functions
-	virtual void Activate();
+	void Activate() override;
 
 	// Forward arrow keys to the list
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	// Sets the current sound choice
 	void SetSelectedSound( PickType_t type, const char *pSoundName );
@@ -75,16 +75,16 @@ private:
 	void OnGameSoundFilterTextChanged( );
 
 	// Derived classes have this called when the previewed asset changes
-	void OnSelectedAssetPicked( const char *pAssetName );
+	void OnSelectedAssetPicked( const char *pAssetName ) override; 
 
 	// Don't play a sound when the next selection is a default selection
-	void OnNextSelectionIsDefault();
+	void OnNextSelectionIsDefault() override;
 
 	// Purpose: builds the gamesound list
 	bool IsGameSoundVisible( int hGameSound );
 
-	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", kv );
-	MESSAGE_FUNC_PARAMS( OnItemSelected, "ItemSelected", kv );
+	MESSAGE_FUNC_PARAMS_OVERRIDE( OnTextChanged, "TextChanged", kv );
+	MESSAGE_FUNC_PARAMS_OVERRIDE( OnItemSelected, "ItemSelected", kv );
 	MESSAGE_FUNC( OnPageChanged, "PageChanged" );
 
 	vgui::TextEntry *m_pGameSoundFilter;
@@ -105,7 +105,7 @@ private:
 //-----------------------------------------------------------------------------
 class CSoundPickerFrame : public CBaseAssetPickerFrame
 {
-	DECLARE_CLASS_SIMPLE( CSoundPickerFrame, CBaseAssetPickerFrame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSoundPickerFrame, CBaseAssetPickerFrame );
 
 public:
 	CSoundPickerFrame( vgui::Panel *pParent, const char *pTitle, int nFlags );
@@ -116,7 +116,7 @@ public:
 	// Pass in optional context keyvalues to be added to any messages sent by the sound picker
 	void DoModal( CSoundPicker::PickType_t initialType, const char *pInitialValue, KeyValues *pContextKeyValues = NULL );
 
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 };
 
 

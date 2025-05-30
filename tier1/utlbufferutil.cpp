@@ -355,7 +355,7 @@ bool Unserialize( CUtlBuffer &buf, VMatrix &dest )
 		return (nRetVal == 16);
 	}
 
-	buf.Get( &dest, sizeof(VMatrix) );
+	buf.Get( dest );
 	return true;
 }
 
@@ -478,16 +478,16 @@ static intp CountBinaryBytes( CUtlBuffer &buf, intp *pEndGet )
 	return nByteCount;
 }
 
-inline static unsigned char HexCharToInt( int c1 )
+inline static constexpr unsigned char HexCharToInt( int c1 )
 {
 	if (( c1 >= '0' ) && ( c1 <= '9' ))
-		return c1 - '0';
+		return static_cast<unsigned char>(c1 - '0');
 
 	if (( c1 >= 'A' ) && ( c1 <= 'F' ))
-		return 10 + c1 - 'A';
+		return static_cast<unsigned char>(10 + c1 - 'A');
 
 	if (( c1 >= 'a' ) && ( c1 <= 'f' ))
-		return 10 + c1 - 'a';
+		return static_cast<unsigned char>(10 + c1 - 'a');
 
 	return 0xFF;
 }

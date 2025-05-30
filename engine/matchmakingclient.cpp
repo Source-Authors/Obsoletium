@@ -86,10 +86,10 @@ void CMatchmaking::HandleSystemLinkReply( netpacket_t *pPacket )
 	systemLinkInfo_s *pResultInfo = (systemLinkInfo_s*)pData;
 	XSESSION_SEARCHRESULT *pResult = &pResultInfo->Result;
 
-	msg.ReadBytes( &pResult->info, sizeof( pResult->info ) );
+	msg.ReadBytes( pResult->info );
 
 	// Don't accept multiple replies from the same host
-	for ( int i = 0; i < m_pSystemLinkResults.Count(); ++i )
+	for ( intp i = 0; i < m_pSystemLinkResults.Count(); ++i )
 	{
 		XSESSION_SEARCHRESULT *pCheck = &((systemLinkInfo_s*)m_pSystemLinkResults[i])->Result;
 		if ( Q_memcmp( &pCheck->info.sessionID, &pResult->info.sessionID, sizeof( pResult->info.sessionID ) ) == 0 )
@@ -108,8 +108,8 @@ void CMatchmaking::HandleSystemLinkReply( netpacket_t *pPacket )
 	m_nTotalTeams					= msg.ReadByte();
 	pResultInfo->gameState			= msg.ReadByte();
 	pResultInfo->gameTime			= msg.ReadByte();
-	msg.ReadBytes( &pResultInfo->szHostName, MAX_PLAYER_NAME_LENGTH );
-	msg.ReadBytes( &pResultInfo->szScenario, MAX_MAP_NAME );
+	msg.ReadBytes( pResultInfo->szHostName );
+	msg.ReadBytes( pResultInfo->szScenario );
 
 	pResult->cProperties			= msg.ReadByte();
 	pResult->cContexts				= msg.ReadByte();
@@ -300,95 +300,6 @@ void CMatchmaking::UpdateSearch()
 //-----------------------------------------------------------------------------
 void CMatchmaking::UpdateQosLookup()
 {
-#if defined( _X360 )
-	// Keep checking for results until the wait time expires
-	if ( GetTime() - m_fWaitTimer < QOSLOOKUP_WAITTIME )
-	{
-		for ( uint i = 0; i < m_pSearchResults->dwSearchResults; ++i )
-		{
-			if ( (m_pQoSResult->axnqosinfo[0].bFlags & XNET_XNQOSINFO_COMPLETE) == 0 )
-				return;
-		}
-	}
-
-	bool bNotifiedGameUI = false;
-	for ( unsigned int i = 0; i < m_pSearchResults->dwSearchResults; ++i )
-	{
-		// Make sure the host is available
-		if ( !(m_pQoSResult->axnqosinfo[i].bFlags & XNET_XNQOSINFO_TARGET_CONTACTED) )
-		{
-			DevMsg( "Result #%d: Host unreachable (!XNET_XNQOSINFO_TARGET_CONTACTED)\n", i );
-			continue;
-		}
-		else if ( (m_pQoSResult->axnqosinfo[i].bFlags & XNET_XNQOSINFO_TARGET_DISABLED) )
-		{
-			DevMsg( "Result #%d: Host disabled (XNET_XNQOSINFO_TARGET_DISABLED)\n", i );
-			continue;
-		}
-		else if ( !(m_pQoSResult->axnqosinfo[i].bFlags & XNET_XNQOSINFO_DATA_RECEIVED) ||
-				  !m_pQoSResult->axnqosinfo[i].cbData ||
-				  !m_pQoSResult->axnqosinfo[i].pbData )
-		{
-			DevMsg( "Result #%d: No data received (!XNET_XNQOSINFO_DATA_RECEIVED)\n", i );
-			continue;
-		}
-
-
-		// Check the ping before we accept this host
-		// unsigned short ping = m_pQoSResult->axnqosinfo[i].wRttMedInMsecs;
-		unsigned short ping = m_pQoSResult->axnqosinfo[i].wRttMinInMsecs;	// Use min ping to suit better for traffic bursts and lossy connections
-		DevMsg( "Result #%d: ping min %d ms, med %d ms\n", i, m_pQoSResult->axnqosinfo[i].wRttMinInMsecs, m_pQoSResult->axnqosinfo[i].wRttMedInMsecs );
-		
-		// On X360 ping calculations are reported between 4 and 5 times bigger
-		// than the actual upstream/downstream latency of the connection to Xbox LIVE
-		const int pingFactor = 5;
-		ping /= pingFactor;
-
-		if ( ping > PING_MAX_RED )
-		{
-			DevMsg( "Result #%d: Host connection too slow, ignoring\n", i );
-			continue;
-		}
-
-		// Determine the QOS quality to show to user
-		int pingDisplayedToUserIcon = -1;
-		if ( ping <= PING_MAX_GREEN )
-		{
-			pingDisplayedToUserIcon = 0;
-		}
-		else if ( ping <= PING_MAX_YELLOW )
-		{
-			pingDisplayedToUserIcon = 1;
-		}
-		else if ( ping <= PING_MAX_RED )
-		{
-			pingDisplayedToUserIcon = 2;
-		}
-
-		// Retrieve the search result
-		XSESSION_SEARCHRESULT &searchResult = m_pSearchResults->pResults[i];
-
-		// The host should have given us some game data
-		hostData_s hostData;
-		Q_memcpy( &hostData, m_pQoSResult->axnqosinfo[i].pbData, sizeof( hostData ) );
-
-		// This host is acceptable.  Get the info and notify gameUI
-		if ( !bNotifiedGameUI )
-		{
-			SessionNotification( SESSION_NOTIFY_SEARCH_COMPLETED );
-			bNotifiedGameUI = true;
-		}
-
-		// Send the host info to GameUI
-		EngineVGui()->SessionSearchResult( i, &hostData, &searchResult, pingDisplayedToUserIcon );
-		DevMsg( "Result #%d: %d open public slots, %d open private slots\n", i, searchResult.dwOpenPublicSlots, searchResult.dwOpenPrivateSlots );
-	}
-
-	if ( !bNotifiedGameUI )
-	{
-		SessionNotification( SESSION_NOTIFY_FAIL_SEARCH );
-	}
-#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -6,8 +6,8 @@
 //
 //=============================================================================//
 
+#include "common.h"
 #include "host.h"
-#include <ctype.h>
 #include "draw.h"
 #include "zone.h"
 #include "sys.h"
@@ -15,8 +15,7 @@
 #include "coordsize.h"
 #include "characterset.h"
 #include "bitbuf.h"
-#include "common.h"
-#include <malloc.h>
+#include "posix_file_stream.h"
 #include "traceinit.h"
 #include "filesystem.h"
 #include "filesystem_engine.h"
@@ -93,22 +92,13 @@ COM_ExplainDisconnection
 */
 void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
-	if ( IsX360() )
-	{
-		g_pMatchmaking->SessionNotification( SESSION_NOTIFY_LOST_SERVER );
-	}
-	else
-	{
-		va_list		argptr;
-		char		string[1024];
+	va_list		argptr;
 
-		va_start (argptr, fmt);
-		Q_vsnprintf(string, sizeof( string ), fmt,argptr);
-		va_end (argptr);
+	va_start (argptr, fmt);
+	V_vsprintf_safe(gszDisconnectReason, fmt, argptr);
+	va_end (argptr);
 
-		Q_strncpy( gszDisconnectReason, string, 256 );
-		gfExtendedError = true;
-	}
+	gfExtendedError = true;
 
 	if ( bPrint )
 	{
@@ -118,10 +108,10 @@ void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt
 			const wchar_t *wpchReason = g_pVGuiLocalize ? g_pVGuiLocalize->Find(gszDisconnectReason) : NULL;
 			if ( wpchReason )
 			{
-				wcsncpy(formatStr, wpchReason, sizeof( formatStr ) / sizeof( wchar_t ) );
+				V_wcscpy_safe( formatStr, wpchReason );
 
 				char conStr[256];
-				g_pVGuiLocalize->ConvertUnicodeToANSI(formatStr, conStr, sizeof( conStr ));
+				g_pVGuiLocalize->ConvertUnicodeToANSI(formatStr, conStr);
 				ConMsg( "%s\n", conStr );
 			}
 			else
@@ -141,7 +131,7 @@ COM_Parse
 Parse a token out of a string
 ==============
 */
-const char *COM_Parse (const char *data)
+const char *COM_Parse ( IN_Z const char *data)
 {
 	unsigned char    c;
 	int             len;
@@ -223,7 +213,7 @@ COM_AddNoise
 Changes n random bits in a data block
 ==============
 */
-void COM_AddNoise( unsigned char *data, int length, int number )
+void COM_AddNoise( INOUT_BYTECAP(number) unsigned char *data, int length, int number )
 {
 	for ( int i = 0; i < number; i++ )
 	{
@@ -255,7 +245,7 @@ COM_Parse_Line
 Parse a line out of a string
 ==============
 */
-const char *COM_ParseLine (const char *data)
+const char *COM_ParseLine ( IN_Z const char *data)
 {
 	com_token[0] = '\0';
 	
@@ -263,7 +253,7 @@ const char *COM_ParseLine (const char *data)
 		return nullptr;
 
 	size_t len = 0;
-	int c = *data;
+	char c = *data;
 
 	// parse a line out of the data
 	do
@@ -302,7 +292,7 @@ COM_TokenWaiting
 Returns 1 if additional data is waiting to be processed on this line
 ==============
 */
-int COM_TokenWaiting( const char *buffer )
+int COM_TokenWaiting( IN_Z const char *buffer )
 {
 	const char *p = buffer;
 	while ( *p && *p!='\n')
@@ -345,7 +335,7 @@ char *va( PRINTF_FORMAT_STRING const char *format, ... )
 	char* outbuf = tmpstr512();
 	va_list argptr;
 	va_start (argptr, format);
-	Q_vsnprintf( outbuf, 512, format, argptr );
+	V_vsnprintf( outbuf, 512, format, argptr );
 	va_end (argptr);
 	return outbuf;
 }
@@ -375,7 +365,7 @@ CL_CheckGameDirectory
 Client side game directory change.
 ==================
 */
-bool COM_CheckGameDirectory( const char *gamedir )
+bool COM_CheckGameDirectory( IN_Z const char *gamedir )
 {
 	// Switch game directories if needed, or abort if it's not good.
 	char szGD[ MAX_OSPATH ];
@@ -387,7 +377,7 @@ bool COM_CheckGameDirectory( const char *gamedir )
 	}
 
 	// Rip out the current gamedir.
-	Q_FileBase( com_gamedir, szGD, sizeof( szGD ) );
+	Q_FileBase( com_gamedir, szGD );
 
 	if ( Q_stricmp( szGD, gamedir ) )
 	{
@@ -423,7 +413,7 @@ int COM_FindFile( const char *filename, FileHandle_t *file )
 //			*file - 
 // Output : int
 //-----------------------------------------------------------------------------
-int COM_OpenFile( const char *filename, FileHandle_t *file )
+int COM_OpenFile(IN_Z const char *filename, FileHandle_t *file )
 {
 	return COM_FindFile( (char *)filename, file );
 }
@@ -435,19 +425,17 @@ COM_WriteFile
 The filename will be prefixed by the current game directory
 ============
 */
-void COM_WriteFile (const char *filename, void *data, int len)
+void COM_WriteFile ( IN_Z const char *filename, IN_BYTECAP(len) void *data, int len)
 {
-	FileHandle_t  handle;
-	
 	intp nameLen = V_strlen( filename ) + 2;
-	char *pName = ( char * )_alloca( nameLen );
+	char *pName = stackallocT( char, nameLen );
 
 	Q_snprintf( pName, nameLen, "%s", filename);
 
-	Q_FixSlashes( pName );
+	V_FixSlashes( pName );
 	COM_CreatePath( pName );
 
-	handle = g_pFileSystem->Open( pName, "wb" );
+	FileHandle_t handle = g_pFileSystem->Open( pName, "wb" );
 	if ( !handle )
 	{
 		Warning ("COM_WriteFile: failed on %s\n", pName);
@@ -465,11 +453,11 @@ COM_CreatePath
 Only used for CopyFile
 ============
 */
-void COM_CreatePath (const char *path)
+void COM_CreatePath (IN_Z const char *path)
 {
 	char temppath[1024];
 	Q_strncpy(temppath, path, sizeof(temppath));
-	Q_StripFilename( temppath );
+	V_StripFilename( temppath );
 
 	Sys_mkdir( temppath );
 }
@@ -482,35 +470,29 @@ COM_CopyFile
 Copies a file from pSourcePath to pDestPath.
 ===========
 */
-bool COM_CopyFile ( const char *pSourcePath, const char *pDestPath )
+bool COM_CopyFile ( IN_Z const char *pSourcePath, IN_Z const char *pDestPath )
 {
-	if ( IsX360() )
-		return false;
-
 	int             remaining, count;
 	char			buf[4096];
-	FileHandle_t in, out;
 
-	in = g_pFileSystem->Open( pSourcePath, "rb" );
-
-	AssertMsg( in, "COM_CopyFile(): Input file failed to open" );
+	FileHandle_t in = g_pFileSystem->Open(pSourcePath, "rb");
+	AssertMsg( in, "COM_CopyFile(): Input file '%s' failed to open", pSourcePath );
 
 	if ( in == FILESYSTEM_INVALID_HANDLE )
 		return false;
 		
 	// create directories up to the cache file
-	COM_CreatePath( pDestPath );     
+	COM_CreatePath( pDestPath );
 
-	out = g_pFileSystem->Open( pDestPath, "wb" );
-
-	AssertMsg( out, "COM_CopyFile(): Output file failed to open" );
+	FileHandle_t out = g_pFileSystem->Open( pDestPath, "wb" );
+	AssertMsg( out, "COM_CopyFile(): Output file '%s' failed to open", pDestPath );
 	
 	if ( out == FILESYSTEM_INVALID_HANDLE )
 	{
 		g_pFileSystem->Close( in );
 		return false;
 	}
-		
+
 	remaining = g_pFileSystem->Size( in );
 	while ( remaining > 0 )
 	{
@@ -528,7 +510,7 @@ bool COM_CopyFile ( const char *pSourcePath, const char *pDestPath )
 	}
 
 	g_pFileSystem->Close( in );
-	g_pFileSystem->Close( out );   
+	g_pFileSystem->Close( out );
 	
 	return true;
 }
@@ -542,11 +524,11 @@ Finds the file in the search path, copies over the name with the full path name.
 This doesn't search in the pak file.
 ===========
 */
-int COM_ExpandFilename( char *filename, int maxlength )
+int COM_ExpandFilename( INOUT_Z_CAP(maxlength) char *filename, int maxlength )
 {
 	char expanded[MAX_OSPATH];
 
-	if ( g_pFileSystem->GetLocalPath( filename, expanded, sizeof(expanded) ) != NULL )
+	if ( g_pFileSystem->GetLocalPath_safe( filename, expanded ) != NULL )
 	{
 		Q_strncpy( filename, expanded, maxlength );
 		return 1;
@@ -567,7 +549,7 @@ COM_FileSize
 Returns the size of the file only.
 ===========
 */
-int COM_FileSize (const char *filename)
+int COM_FileSize (IN_Z const char *filename)
 {
 	return g_pFileSystem->Size(filename);
 }
@@ -593,7 +575,7 @@ Allways appends a 0 byte.
 cache_user_t *loadcache;
 byte    *loadbuf;
 int             loadsize;
-byte *COM_LoadFile (const char *path, int usehunk, int *pLength)
+byte *COM_LoadFile (IN_Z const char *path, int usehunk, int *pLength)
 {
 	FileHandle_t	hFile;
 	byte			*buf = NULL;
@@ -613,18 +595,14 @@ byte *COM_LoadFile (const char *path, int usehunk, int *pLength)
 	}
 
 	// Extract the filename base name for hunk tag
-	Q_FileBase( path, base, sizeof( base ) );
+	Q_FileBase( path, base );
 
 	unsigned bufSize = len + 1;
-	if ( IsX360() )
-	{
-		bufSize = g_pFileSystem->GetOptimalReadSize( hFile, bufSize ); // align to sector
-	}
 
 	switch ( usehunk )
 	{
 	case 1:
-		buf = (byte *)Hunk_AllocName (bufSize, base);
+		buf = Hunk_AllocName<byte>(bufSize, base);
 		break;
 	case 2:
 		AssertMsg( 0, "Temp alloc no longer supported\n" );
@@ -692,12 +670,11 @@ void COM_CopyFileChunk( FileHandle_t dst, FileHandle_t src, int nSize )
 }
 
 // uses malloc if larger than bufsize
-byte *COM_LoadStackFile (const char *path, void *buffer, int bufsize, int& filesize )
+byte *COM_LoadStackFile (IN_Z const char *path, OUT_BYTECAP(bufsize) void *buffer, int bufsize, int& filesize )
 {
-	byte    *buf;
 	loadbuf = (byte *)buffer;
 	loadsize = bufsize;
-	buf = COM_LoadFile (path, 4, &filesize );
+	byte *buf = COM_LoadFile (path, 4, &filesize );
 	return buf;
 }
 
@@ -721,24 +698,22 @@ void COM_Shutdown( void )
 // Input  : *in - 
 // Output : char *CopyString
 //-----------------------------------------------------------------------------
-char *COM_StringCopy(const char *in)
+char *COM_StringCopy(IN_Z const char *in)
 {
-	intp len = Q_strlen(in)+1;
-	char *out = (char *)new char[ len ];
-	Q_strncpy (out, in, len );
-	return out;
+	// dimhotepus: Use V_strdup for clarity.
+	return V_strdup(in);
 }
 
-void COM_StringFree(const char *in)
+void COM_StringFree(IN_Z const char *in)
 {
 	delete [] in;
 }
 
 
-void COM_SetupLogDir( const char *mapname )
+void COM_SetupLogDir( IN_Z const char *mapname )
 {
 	char gameDir[MAX_OSPATH];
-	COM_GetGameDir( gameDir, sizeof( gameDir ) );
+	COM_GetGameDir( gameDir );
 
 	// Blat out the all directories in the LOGDIR path
 	g_pFileSystem->RemoveSearchPath( NULL, "LOGDIR" );
@@ -793,14 +768,14 @@ COM_GetModDirectory - return the final directory in the game dir (i.e "cstrike",
 */
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
+			V_StripLastDir( modDir );
 			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
@@ -819,17 +794,13 @@ This logic needs to match with the gameui/OptionsSubVideo.cpp code
 bool BLoadHDContent( const char *pchModDir, const char *pchBaseDir )
 {
 	char szModSteamInfPath[ 1024 ];
-	V_ComposeFileName( pchModDir, "game_hd.txt", szModSteamInfPath, sizeof( szModSteamInfPath ) );
-	char szFullPath[ 1024 ];
-	V_MakeAbsolutePath( szFullPath, sizeof( szFullPath ), szModSteamInfPath, pchBaseDir );
+	V_ComposeFileName( pchModDir, "game_hd.txt", szModSteamInfPath );
 
-	FILE *fp = fopen( szFullPath, "rb" );
-	if ( fp )
-	{
-		fclose(fp);
-		return true;
-	}
-	return false;
+	char szFullPath[ 1024 ];
+	V_MakeAbsolutePath( szFullPath, szModSteamInfPath, pchBaseDir );
+
+	auto [f, errc] = se::posix::posix_file_stream_factory::open(szFullPath, "rb");
+	return !errc;
 }
 
 
@@ -845,14 +816,13 @@ void COM_InitFilesystem( const char *pFullModPath )
 	CFSSearchPathsInit initInfo;
 
 #ifndef SWDS	
-	if ( IsPC() )
 	{
 		static char language[128];
 		language[0] = 0;
 
 		// There are two language at play here.  The Audio language which is controled by the
 		// properties on the game itself in Steam (at least for now).  And the language Steam is set to.
-        // Under Windows the text in the game is controled by the language Steam is set in, but the audio
+		// Under Windows the text in the game is controled by the language Steam is set in, but the audio
 		// is controled by the language set in the game's properties which we can get from Steam3Client
 
 		// A command line override for audio language has also been added.
@@ -862,14 +832,14 @@ void COM_InitFilesystem( const char *pFullModPath )
 		if ( Steam3Client().SteamApps() )
 		{
 			// use -audiolanguage command line to override audio language, otherwise take language from steam
-			Q_strncpy(language, CommandLine()->ParmValue("-audiolanguage", Steam3Client().SteamApps()->GetCurrentGameLanguage()), sizeof( language ) - 1);
+			V_strcpy_safe(language, CommandLine()->ParmValue("-audiolanguage", Steam3Client().SteamApps()->GetCurrentGameLanguage()));
 		}
 		else
 		{
 			// still allow command line override even when not running steam
 			if (CommandLine()->CheckParm("-audiolanguage"))
 			{
-				Q_strncpy(language, CommandLine()->ParmValue("-audiolanguage", "english"), sizeof( language ) - 1);
+				V_strcpy_safe(language, CommandLine()->ParmValue("-audiolanguage", "english"));
 			}
 		}
 
@@ -893,13 +863,16 @@ void COM_InitFilesystem( const char *pFullModPath )
 	initInfo.m_bMountHDContent = BLoadHDContent( initInfo.m_pDirectoryName, GetBaseDirectory() );
 
 	// Load gameinfo.txt and setup all the search paths, just like the tools do.
-	FileSystem_LoadSearchPaths( initInfo );
-							  
+	if ( FileSystem_LoadSearchPaths( initInfo ) != FS_OK )
+	{
+		Error( "Unable to load search paths from gameinfo.txt\n" );
+	}
+
 	// The mod path becomes com_gamedir.
-	Q_MakeAbsolutePath( com_gamedir, sizeof( com_gamedir ), initInfo.m_ModPath );
-							  	
+	V_MakeAbsolutePath( com_gamedir, initInfo.m_ModPath );
+
 	// Set com_basedir.
-	Q_strncpy ( com_basedir, GetBaseDirectory(), sizeof( com_basedir ) ); // the "root" directory where hl2.exe is
+	V_strcpy_safe ( com_basedir, GetBaseDirectory() ); // the "root" directory where hl2.exe is
 	Q_strlower( com_basedir );
 	Q_FixSlashes( com_basedir );
 	
@@ -1028,11 +1001,11 @@ const char *COM_FormatSeconds( int seconds )
 	
 	if ( hours > 0 )
 	{
-		Q_snprintf( string, sizeof(string), "%2i:%02i:%02i", hours, minutes, seconds );
+		V_sprintf_safe( string, "%2i:%02i:%02i", hours, minutes, seconds );
 	}
 	else
 	{
-		Q_snprintf( string, sizeof(string), "%02i:%02i", minutes, seconds );
+		V_sprintf_safe( string, "%02i:%02i", minutes, seconds );
 	}
 
 	return string;
@@ -1047,19 +1020,8 @@ void COM_LogString( char const *pchFile, char const *pchString )
 		return;
 	}
 
-	FileHandle_t fp;
-	const char *pfilename;
-
-	if ( !pchFile )
-	{
-		pfilename = "hllog.txt";
-	}
-	else
-	{
-		pfilename = pchFile;
-	}
-
-	fp = g_pFileSystem->Open( pfilename, "a+t");
+	const char *pfilename = pchFile ? pchFile : "hllog.txt";
+	FileHandle_t fp = g_pFileSystem->Open( pfilename, "a+t");
 	if (fp)
 	{
 		g_pFileSystem->Write( pchString, strlen( pchString), fp );
@@ -1079,7 +1041,7 @@ void COM_Log( const char *pszFile, PRINTF_FORMAT_STRING const char *fmt, ...) FM
 	char		string[8192];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 
 	COM_LogString( pszFile, string );
@@ -1092,7 +1054,7 @@ void COM_Log( const char *pszFile, PRINTF_FORMAT_STRING const char *fmt, ...) FM
 //			*iCompare - 
 // Output : int
 //-----------------------------------------------------------------------------
-int COM_CompareFileTime(const char *filename1, const char *filename2, int *iCompare)
+int COM_CompareFileTime( IN_Z const char *filename1, IN_Z const char *filename2, int *iCompare)
 {
 	int bRet = 0;
 	if ( iCompare )
@@ -1102,8 +1064,9 @@ int COM_CompareFileTime(const char *filename1, const char *filename2, int *iComp
 
 	if (filename1 && filename2)
 	{
-		long ft1 = g_pFileSystem->GetFileTime( filename1 );
-		long ft2 = g_pFileSystem->GetFileTime( filename2 );
+		// dimhotepus: long -> time_t
+		time_t ft1 = g_pFileSystem->GetFileTime( filename1 );
+		time_t ft2 = g_pFileSystem->GetFileTime( filename2 );
 
 		if ( iCompare )
 		{
@@ -1119,7 +1082,7 @@ int COM_CompareFileTime(const char *filename1, const char *filename2, int *iComp
 // Purpose: 
 // Input  : *szGameDir - 
 //-----------------------------------------------------------------------------
-void COM_GetGameDir(char *szGameDir, int maxlen)
+void COM_GetGameDir(OUT_Z_CAP(maxlen) char *szGameDir, int maxlen)
 {
 	if (!szGameDir) return;
 	Q_strncpy(szGameDir, com_gamedir, maxlen );
@@ -1131,7 +1094,7 @@ void COM_GetGameDir(char *szGameDir, int maxlen)
 //			*token - 
 // Output : char
 //-----------------------------------------------------------------------------
-const char *COM_ParseFile(const char *data, char *token, int maxtoken )
+const char *COM_ParseFile( IN_Z const char *data, OUT_Z_CAP(maxtoken) char *token, intp maxtoken )
 {
 	const char *return_data = COM_Parse(data);
 	Q_strncpy(token, com_token, maxtoken);
@@ -1151,7 +1114,7 @@ void COM_Init ( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool COM_IsValidPath( const char *pszFilename )
+bool COM_IsValidPath(IN_Z const char *pszFilename )
 {
 	if ( !pszFilename )
 	{
@@ -1174,7 +1137,7 @@ bool COM_IsValidPath( const char *pszFilename )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool COM_IsValidLogFilename( const char *pszFilename )
+bool COM_IsValidLogFilename( IN_Z const char *pszFilename )
 {
 	if ( !pszFilename || !pszFilename[0] )
 		return false;
@@ -1203,7 +1166,7 @@ unsigned int COM_GetIdealDestinationCompressionBufferSize_Snappy( unsigned int u
 }
 
 //-----------------------------------------------------------------------------
-void *COM_CompressBuffer_Snappy( const void *source, unsigned int sourceLen, unsigned int *compressedLen, unsigned int maxCompressedLen )
+void *COM_CompressBuffer_Snappy( IN_BYTECAP(sourceLen) const void *source, unsigned int sourceLen, unsigned int *compressedLen, unsigned int maxCompressedLen )
 {
 	Assert( source );
 	Assert( compressedLen );
@@ -1233,7 +1196,7 @@ void *COM_CompressBuffer_Snappy( const void *source, unsigned int sourceLen, uns
 }
 
 //-----------------------------------------------------------------------------
-bool COM_BufferToBufferCompress_Snappy( void *dest, unsigned int *destLen, const void *source, unsigned int sourceLen )
+bool COM_BufferToBufferCompress_Snappy( OUT_BYTECAP(*destLen) void *dest, unsigned int *destLen, IN_BYTECAP(sourceLen) const void *source, unsigned int sourceLen )
 {
 	Assert( dest );
 	Assert( destLen );
@@ -1277,7 +1240,7 @@ unsigned COM_GetIdealDestinationCompressionBufferSize_LZSS( unsigned int uncompr
 }
 
 //-----------------------------------------------------------------------------
-void *COM_CompressBuffer_LZSS( const void *source, unsigned int sourceLen, unsigned int *compressedLen, unsigned int maxCompressedLen )
+void *COM_CompressBuffer_LZSS( IN_BYTECAP(sourceLen) const void *source, unsigned int sourceLen, OUT_BYTECAP(maxCompressedLen) unsigned int *compressedLen, unsigned int maxCompressedLen )
 {
 	Assert( source );
 	Assert( compressedLen );
@@ -1291,15 +1254,15 @@ void *COM_CompressBuffer_LZSS( const void *source, unsigned int sourceLen, unsig
 		return pbOut;
 	}
 
-	if ( pbOut )
-	{
-		free( pbOut );
-	}
+	free( pbOut );
+
+	// dimhotepus: 0 if error.
+	*compressedLen = 0;
 	return NULL;
 }
 
 //-----------------------------------------------------------------------------
-bool COM_BufferToBufferCompress_LZSS( void *dest, unsigned int *destLen, const void *source, unsigned int sourceLen )
+bool COM_BufferToBufferCompress_LZSS( OUT_BYTECAP(*destLen) void *dest, unsigned int *destLen, IN_BYTECAP(sourceLen) const void *source, unsigned int sourceLen )
 {
 	Assert( dest );
 	Assert( destLen );
@@ -1315,7 +1278,7 @@ bool COM_BufferToBufferCompress_LZSS( void *dest, unsigned int *destLen, const v
 }
 
 //-----------------------------------------------------------------------------
-int COM_GetUncompressedSize( const void *compressed, unsigned int compressedLen )
+int COM_GetUncompressedSize( IN_BYTECAP(compressedLen) const void *compressed, unsigned int compressedLen )
 {
 	const lzss_header_t *pHeader = static_cast<const lzss_header_t *>(compressed);
 
@@ -1337,7 +1300,7 @@ int COM_GetUncompressedSize( const void *compressed, unsigned int compressedLen 
 //-----------------------------------------------------------------------------
 // Purpose: Generic buffer decompression from source into dest
 //-----------------------------------------------------------------------------
-bool COM_BufferToBufferDecompress( void *dest, unsigned int *destLen, const void *source, unsigned int sourceLen )
+bool COM_BufferToBufferDecompress( OUT_BYTECAP(*destLen) void *dest, unsigned int *destLen, IN_BYTECAP(sourceLen) const void *source, unsigned int sourceLen )
 {
 	int nDecompressedSize = COM_GetUncompressedSize( source, sourceLen );
 	if ( nDecompressedSize >= 0 )

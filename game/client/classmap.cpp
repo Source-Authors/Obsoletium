@@ -63,7 +63,7 @@ void CClassMap::Add( const char *mapname, const char *classname, int size, DISPA
 
 	if ( map )
 	{
-		int index = m_ClassDict.Find( classname );
+		auto index = m_ClassDict.Find( classname );
 		Assert( index != m_ClassDict.InvalidIndex() );
 		m_ClassDict.RemoveAt( index );
 	}
@@ -77,10 +77,9 @@ void CClassMap::Add( const char *mapname, const char *classname, int size, DISPA
 
 const char *CClassMap::Lookup( const char *classname )
 {
-	unsigned short index;
 	static classentry_t lookup; 
 
-	index = m_ClassDict.Find( classname );
+	auto index = m_ClassDict.Find( classname );
 	if ( index == m_ClassDict.InvalidIndex() )
 		return NULL;
 
@@ -90,10 +89,9 @@ const char *CClassMap::Lookup( const char *classname )
 
 C_BaseEntity *CClassMap::CreateEntity( const char *mapname )
 {
-	int c = m_ClassDict.Count();
-	int i;
+	auto c = m_ClassDict.Count();
 
-	for ( i = 0; i < c; i++ )
+	for ( decltype(m_ClassDict)::IndexType_t i = 0; i < c; i++ )
 	{
 		classentry_t *lookup = &m_ClassDict[ i ];
 		if ( !lookup )
@@ -118,10 +116,9 @@ C_BaseEntity *CClassMap::CreateEntity( const char *mapname )
 
 int CClassMap::GetClassSize( const char *classname )
 {
-	int c = m_ClassDict.Count();
-	int i;
+	auto c = m_ClassDict.Count();
 
-	for ( i = 0; i < c; i++ )
+	for ( decltype(m_ClassDict)::IndexType_t i = 0; i < c; i++)
 	{
 		classentry_t *lookup = &m_ClassDict[ i ];
 		if ( !lookup )

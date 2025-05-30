@@ -18,7 +18,7 @@
 // This is what all shaders include.
 // CBaseShader will become CShader in this file.
 #include "materialsystem/ishaderapi.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterial.h"
 #include "BaseShader.h"

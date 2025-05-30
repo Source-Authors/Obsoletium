@@ -53,15 +53,15 @@ public:
 	void BeginProcessingCommands( int nDeltaTicks );
 	bool DequeueNextCommand( );
 	intp DequeueNextCommand( const char **& ppArgv );
-	intp ArgC() const;
-	const char **ArgV() const;
-	const char *ArgS() const;		// All args that occur after the 0th arg, in string form
-	const char *GetCommandString() const;	// The entire command in string form, including the 0th arg
-	const CCommand& GetCommand() const;
+	[[nodiscard]] intp ArgC() const;
+	[[nodiscard]] const char **ArgV() const;
+	[[nodiscard]] const char *ArgS() const;		// All args that occur after the 0th arg, in string form
+	[[nodiscard]] const char *GetCommandString() const;	// The entire command in string form, including the 0th arg
+	[[nodiscard]] const CCommand& GetCommand() const;
 	void EndProcessingCommands();
 
 	// Are we in the middle of processing commands?
-	bool IsProcessingCommands() const;
+	[[nodiscard]] bool IsProcessingCommands() const;
 
 	// Delays all queued commands to execute at a later time
 	void DelayAllQueuedCommands( int nTickDelay );
@@ -75,16 +75,16 @@ public:
 	// most relevantly, to implement a feature where you stream a file
 	// worth of commands into the buffer, where the file size is too large
 	// to entirely contain in the buffer).
-    CommandHandle_t GetNextCommandHandle();
+    [[nodiscard]] CommandHandle_t GetNextCommandHandle();
 
 	// Specifies a max limit of the args buffer. For unittesting. Size == 0 means use default
 	void LimitArgumentBufferSize( intp nSize );
 
 	void SetWaitEnabled( bool bEnable )		{ m_bWaitEnabled = bEnable; }
-	bool IsWaitEnabled( void ) const		{ return m_bWaitEnabled; }
+	[[nodiscard]] bool IsWaitEnabled( void ) const		{ return m_bWaitEnabled; }
 
-	intp GetArgumentBufferSize() const { return m_nArgSBufferSize; }
-	intp GetMaxArgumentBufferSize() const { return m_nMaxArgSBufferLength; }
+	[[nodiscard]] intp GetArgumentBufferSize() const { return m_nArgSBufferSize; }
+	[[nodiscard]] intp GetMaxArgumentBufferSize() const { return m_nMaxArgSBufferLength; }
 
 private:
 	enum

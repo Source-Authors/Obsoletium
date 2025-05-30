@@ -121,7 +121,8 @@ InitReturnVal_t CInputSystem::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	m_StartupTimeTick = Plat_MSTime();
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	m_StartupTimeTick = Plat_USTime();
 
 
 #if !defined( POSIX )
@@ -275,8 +276,8 @@ void CInputSystem::AttachToWindow( void* hWnd )
 	}
 
 #if defined( PLATFORM_WINDOWS )
-	m_ChainedWndProc = (WNDPROC)GetWindowLongPtrW( (HWND)hWnd, GWLP_WNDPROC );
-	SetWindowLongPtrW( (HWND)hWnd, GWLP_WNDPROC, (LONG_PTR)InputSystemWindowProc );
+	m_ChainedWndProc = (WNDPROC)GetWindowLongPtrW( (HWND)hWnd, GWLP_WNDPROC ); //-V204
+	SetWindowLongPtrW( (HWND)hWnd, GWLP_WNDPROC, (LONG_PTR)InputSystemWindowProc ); //-V221
 #endif
 
 	m_hAttachedHWnd = (HWND)hWnd;
@@ -327,7 +328,7 @@ void CInputSystem::DetachFromWindow( )
 #if defined( PLATFORM_WINDOWS )
 	if ( m_ChainedWndProc )
 	{
-		SetWindowLongPtrW( m_hAttachedHWnd, GWLP_WNDPROC, (LONG_PTR)m_ChainedWndProc );
+		SetWindowLongPtrW( m_hAttachedHWnd, GWLP_WNDPROC, (LONG_PTR)m_ChainedWndProc ); //-V221
 		m_ChainedWndProc = nullptr;
 	}
 #endif
@@ -465,22 +466,14 @@ void CInputSystem::PostEvent( int nType, int nTick, int nData, int nData2, int n
 void CInputSystem::PostButtonPressedEvent( InputEventType_t nType, int nTick, ButtonCode_t scanCode, ButtonCode_t virtualCode )
 {
 	InputState_t &state = m_InputState[ m_bIsPolling ];
-	if ( !state.m_ButtonState.IsBitSet( scanCode ) )
+	if ( !state.m_ButtonState.IsBitSet( to_underlying(scanCode) ) )
 	{
 		// Update button state
-		state.m_ButtonState.Set( scanCode ); 
-		state.m_ButtonPressedTick[ scanCode ] = nTick;
+		state.m_ButtonState.Set( to_underlying(scanCode) ); 
+		state.m_ButtonPressedTick[ to_underlying(scanCode) ] = nTick;
 
 		// Add this event to the app-visible event queue
-		PostEvent( nType, nTick, scanCode, virtualCode );
-
-#if defined( _X360 )
-		// FIXME: Remove! Fake a windows message for vguimatsurface's input handler
-		if ( IsJoystickCode( scanCode ) )
-		{
-			ProcessEvent( WM_XCONTROLLER_KEY, scanCode, 1 );
-		}
-#endif
+		PostEvent( to_underlying(nType), nTick, to_underlying(scanCode), to_underlying(virtualCode) );
 	}
 }
 
@@ -491,22 +484,14 @@ void CInputSystem::PostButtonPressedEvent( InputEventType_t nType, int nTick, Bu
 void CInputSystem::PostButtonReleasedEvent( InputEventType_t nType, int nTick, ButtonCode_t scanCode, ButtonCode_t virtualCode )
 {
 	InputState_t &state = m_InputState[ m_bIsPolling ];
-	if ( state.m_ButtonState.IsBitSet( scanCode ) )
+	if ( state.m_ButtonState.IsBitSet( to_underlying(scanCode) ) )
 	{
 		// Update button state
-		state.m_ButtonState.Clear( scanCode ); 
-		state.m_ButtonReleasedTick[ scanCode ] = nTick;
+		state.m_ButtonState.Clear( to_underlying(scanCode) ); 
+		state.m_ButtonReleasedTick[ to_underlying(scanCode) ] = nTick;
 
 		// Add this event to the app-visible event queue
-		PostEvent( nType, nTick, scanCode, virtualCode );
-
-#if defined( _X360 )
-		// FIXME: Remove! Fake a windows message for vguimatsurface's input handler
-		if ( IsJoystickCode( scanCode ) )
-		{
-			ProcessEvent( WM_XCONTROLLER_KEY, scanCode, 0 );
-		}
-#endif
+		PostEvent( to_underlying(nType), nTick, to_underlying(scanCode), to_underlying(virtualCode) );
 	}
 }
 
@@ -520,7 +505,7 @@ void CInputSystem::ProcessEvent( UINT uMsg, WPARAM wParam, LPARAM lParam )
 	// To prevent subtle input timing bugs, all button events must be fed 
 	// through the window proc once per frame, same as the keyboard and mouse.
 	HWND hWnd = GetFocus();
-	WNDPROC windowProc = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC );
+	WNDPROC windowProc = (WNDPROC)GetWindowLongPtrW(hWnd, GWLP_WNDPROC ); //-V204
 	if ( windowProc )
 	{
 		windowProc( hWnd, uMsg, wParam, lParam );
@@ -873,18 +858,18 @@ void CInputSystem::PollInputState()
 //-----------------------------------------------------------------------------
 int CInputSystem::ComputeSampleTick()
 {
-	// This logic will only fail if the app has been running for 49.7 days
+	// This logic will only fail if the app has been running for 49.7 / 2 days
 	int nSampleTick;
 
-	DWORD nCurrentTick = Plat_MSTime();
+	unsigned long long nCurrentTick = Plat_USTime();
 	if ( nCurrentTick >= m_StartupTimeTick )
 	{
-		nSampleTick = (int)( nCurrentTick - m_StartupTimeTick );
+		nSampleTick = (int)(( nCurrentTick - m_StartupTimeTick ) / 1000);
 	}
 	else
 	{
-		DWORD nDelta = (DWORD)0xFFFFFFFF - m_StartupTimeTick;
-		nSampleTick = (int)( nCurrentTick + nDelta ) + 1;
+		unsigned long long nDelta = std::numeric_limits<unsigned long long>::max() - m_StartupTimeTick;
+		nSampleTick = (int)( ( nCurrentTick + nDelta ) / 1000 ) + 1;
 	}
 	return nSampleTick;
 }
@@ -1002,27 +987,27 @@ int CInputSystem::GetPollTick() const
 	
 bool CInputSystem::IsButtonDown( ButtonCode_t code ) const
 {
-	return m_InputState[INPUT_STATE_CURRENT].m_ButtonState.IsBitSet( code );
+	return m_InputState[to_underlying(INPUT_STATE_CURRENT)].m_ButtonState.IsBitSet( to_underlying(code) );
 }
 
 int CInputSystem::GetAnalogValue( AnalogCode_t code ) const
 {
-	return m_InputState[INPUT_STATE_CURRENT].m_pAnalogValue[code];
+	return m_InputState[to_underlying(INPUT_STATE_CURRENT)].m_pAnalogValue[to_underlying(code)];
 }
 
 int CInputSystem::GetAnalogDelta( AnalogCode_t code ) const
 {
-	return m_InputState[INPUT_STATE_CURRENT].m_pAnalogDelta[code];
+	return m_InputState[to_underlying(INPUT_STATE_CURRENT)].m_pAnalogDelta[to_underlying(code)];
 }
 
 int CInputSystem::GetButtonPressedTick( ButtonCode_t code ) const
 {
-	return m_InputState[INPUT_STATE_CURRENT].m_ButtonPressedTick[code];
+	return m_InputState[to_underlying(INPUT_STATE_CURRENT)].m_ButtonPressedTick[to_underlying(code)];
 }
 
 int CInputSystem::GetButtonReleasedTick( ButtonCode_t code ) const
 {
-	return m_InputState[INPUT_STATE_CURRENT].m_ButtonReleasedTick[code];
+	return m_InputState[to_underlying(INPUT_STATE_CURRENT)].m_ButtonReleasedTick[to_underlying(code)];
 }
 
 
@@ -1031,12 +1016,12 @@ int CInputSystem::GetButtonReleasedTick( ButtonCode_t code ) const
 //-----------------------------------------------------------------------------
 intp CInputSystem::GetEventCount() const
 {
-	return m_InputState[INPUT_STATE_CURRENT].m_Events.Count();
+	return m_InputState[to_underlying(INPUT_STATE_CURRENT)].m_Events.Count();
 }
 
 const InputEvent_t* CInputSystem::GetEventData( ) const
 {
-	return m_InputState[INPUT_STATE_CURRENT].m_Events.Base();
+	return m_InputState[to_underlying(INPUT_STATE_CURRENT)].m_Events.Base();
 }
 
 
@@ -1132,8 +1117,8 @@ int CInputSystem::ButtonMaskFromMouseWParam( WPARAM wParam, ButtonCode_t code, b
 #ifdef _DEBUG
 	if ( code != BUTTON_CODE_INVALID )
 	{
-		int nMsgMask = 1 << ( code - MOUSE_FIRST );
-		int nTestMask = bDown ? nMsgMask : 0;
+		auto nMsgMask = 1 << ( to_underlying(code) - to_underlying(MOUSE_FIRST) );
+		auto nTestMask = bDown ? nMsgMask : 0;
 		Assert( ( nButtonMask & nMsgMask ) == nTestMask );
 	}
 #endif
@@ -1390,13 +1375,13 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				// which returns KEY_ENTER from virtual keys, and KEY_PAD_ENTER from scan codes
 				// Since things like vgui care about virtual keys; we're going to
 				// put both scan codes in the input message
-				ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( wParam );
-				ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( lParam );
+				ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( static_cast<int>(wParam) );
+				ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( static_cast<int>(lParam) );
 				PostButtonPressedEvent( IE_ButtonPressed, m_nLastSampleTick, scanCode, virtualCode );
 
 				// Post ETW events describing key presses to help correlate input events to performance
 				// problems in the game.
-				ETWKeyDown( scanCode, virtualCode, ButtonCodeToString( virtualCode ) );
+				ETWKeyDown( to_underlying(scanCode), to_underlying(virtualCode), ButtonCodeToString( virtualCode ) );
 
 				// Deal with toggles
 				if ( scanCode == KEY_CAPSLOCK || scanCode == KEY_SCROLLLOCK || scanCode == KEY_NUMLOCK )
@@ -1422,8 +1407,8 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_SYSKEYUP:
 		{
 			// Don't handle key ups if the key's already up. This can happen when we alt-tab back to the engine.
-			ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( wParam );
-			ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( lParam );
+			ButtonCode_t virtualCode = ButtonCode_VirtualKeyToButtonCode( static_cast<int>(wParam) );
+			ButtonCode_t scanCode = ButtonCode_ScanCodeToButtonCode( static_cast<int>(lParam) );
 			PostButtonReleasedEvent( IE_ButtonReleased, m_nLastSampleTick, scanCode, virtualCode );
 		}
 		break;
@@ -1431,9 +1416,9 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_MOUSEWHEEL:
 		{
 			ButtonCode_t code = GET_WHEEL_DELTA_WPARAM( wParam ) > 0 ? MOUSE_WHEEL_UP : MOUSE_WHEEL_DOWN;
-			state.m_ButtonPressedTick[ code ] = state.m_ButtonReleasedTick[ code ] = m_nLastSampleTick;
-			PostEvent( IE_ButtonPressed, m_nLastSampleTick, code, code );
-			PostEvent( IE_ButtonReleased, m_nLastSampleTick, code, code );
+			state.m_ButtonPressedTick[ to_underlying(code) ] = state.m_ButtonReleasedTick[ to_underlying(code) ] = m_nLastSampleTick;
+			PostEvent( to_underlying(IE_ButtonPressed), m_nLastSampleTick, to_underlying(code), to_underlying(code) );
+			PostEvent( to_underlying(IE_ButtonReleased), m_nLastSampleTick, to_underlying(code), to_underlying(code) );
 
 			state.m_pAnalogDelta[ MOUSE_WHEEL ] = GET_WHEEL_DELTA_WPARAM( wParam ) / WHEEL_DELTA;
 			state.m_pAnalogValue[ MOUSE_WHEEL ] += state.m_pAnalogDelta[ MOUSE_WHEEL ];

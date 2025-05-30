@@ -40,7 +40,7 @@ void OutputWinding (winding_t *w, FileHandle_t glview)
 
 	CmdLib_FPrintf( glview, "%i\n", w->numpoints);
 	level+=28;
-	light = (level&255)/255.0;
+	light = (level&255)/255.0f;
 	for (i=0 ; i<w->numpoints ; i++)
 	{
 		CmdLib_FPrintf(glview, "%6.3f %6.3f %6.3f %6.3f %6.3f %6.3f\n",
@@ -167,7 +167,7 @@ void WriteGLView (tree_t *tree, char *source)
 	FileHandle_t glview;
 
 	c_glfaces = 0;
-	sprintf (name, "%s%s.gl",outbase, source);
+	V_sprintf_safe (name, "%s%s.gl",outbase, source);
 	Msg("Writing %s\n", name);
 
 	glview = g_pFileSystem->Open( name, "w" );
@@ -186,7 +186,7 @@ void WriteGLViewFaces( tree_t *tree, const char *pName )
 	FileHandle_t glview;
 
 	c_glfaces = 0;
-	sprintf (name, "%s%s.gl", outbase, pName);
+	V_sprintf_safe (name, "%s%s.gl", outbase, pName);
 	Msg("Writing %s\n", name);
 
 	glview = g_pFileSystem->Open( name, "w" );
@@ -204,7 +204,7 @@ void WriteGLViewBrushList( bspbrush_t *pList, const char *pName )
 	char	name[1024];
 	FileHandle_t glview;
 
-	sprintf (name, "%s%s.gl", outbase, pName );
+	V_sprintf_safe (name, "%s%s.gl", outbase, pName );
 	Msg("Writing %s\n", name);
 
 	glview = g_pFileSystem->Open( name, "w" );

@@ -136,7 +136,7 @@ void CSlideshowDisplayScreen::Update( C_SlideshowDisplay *pSlideshowDisplay )
 	if ( m_pSlideshowImages.Count() == 0 )
 	{
 		// Build the list of image panels!
-		for ( int iSlide = 0; iSlide < pSlideshowDisplay->NumMaterials(); ++iSlide )
+		for ( intp iSlide = 0; iSlide < pSlideshowDisplay->NumMaterials(); ++iSlide )
 		{
 			m_pSlideshowImages.AddToTail( SETUP_PANEL( new ImagePanel( this, "SlideshowImage" ) ) );
 

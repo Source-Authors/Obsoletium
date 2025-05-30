@@ -5,14 +5,13 @@
 //=============================================================================//
 
 #include "hammer_mathlib.h"
-#include <string.h>
-#include <Windows.h>
+
+#include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 // provide implementation for mathlib Sys_Error()
-extern void Error(char* fmt, ...);
 extern "C" void Sys_Error( char *error, ... )
 {
 	Error( "%s", error );
@@ -21,11 +20,14 @@ extern "C" void Sys_Error( char *error, ... )
 float V_rint(float f)
 {
 	if (f > 0.0f) {
-		return (float) floor(f + 0.5f);
-	} else if (f < 0.0f) {
-		return (float) ceil(f - 0.5f);
-	} else
-		return 0.0f;
+		return floor(f + 0.5f);
+	}
+
+	if (f < 0.0f) {
+		return ceil(f - 0.5f);
+	}
+
+	return 0.0f;
 }
 
 static int s_BoxFaces[6][3] =
@@ -41,8 +43,8 @@ static int s_BoxFaces[6][3] =
 void polyMake( float x1, float  y1, float x2, float y2, int npoints, float start_ang, Vector *pmPoints )
 {
     int		point;
-    double  angle = start_ang, angle_delta = 360.0 / (double) npoints;
-    double  xrad = (x2-x1) / 2, yrad = (y2-y1) / 2;
+    float  angle = start_ang, angle_delta = 360.0f / npoints;
+    float  xrad = (x2-x1) / 2, yrad = (y2-y1) / 2;
 
 	// make centerpoint for polygon:
     float xCenter = x1 + xrad;
@@ -65,9 +67,10 @@ void polyMake( float x1, float  y1, float x2, float y2, int npoints, float start
 float fixang(float a)
 {
 	if(a < 0.0)
-		return a+360.0;
-	if(a > 359.9)
-		return a-360.0;
+		return a+360.0f;
+
+	if(a > 359.9f)
+		return a-360.0f;
 
 	return a;
 }
@@ -75,16 +78,13 @@ float fixang(float a)
 
 float lineangle(float x1, float y1, float x2, float y2)
 {
-    float x, y;
-	float rvl;
-
-    x = x2 - x1;
-    y = y2 - y1;
+    float x = x2 - x1;
+    float y = y2 - y1;
 
     if(!x && !y)
         return 0.0;
 
-    rvl = RAD2DEG(atan2( y, x ));
+    float rvl = RAD2DEG(atan2( y, x ));
 
     return (rvl);
 }
@@ -166,9 +166,9 @@ void RotateAroundAxis(VMatrix& Matrix, float fDegrees, int nAxis)
 	}
 
 	float fRadians = DEG2RAD(fDegrees);
+	float fSin, fCos;
 
-	float fSin = (float)sin(fRadians);
-	float fCos = (float)cos(fRadians);
+	DirectX::XMScalarSinCos(&fSin, &fCos, fRadians);
 
 	if ( nAxis == 1 )
 		fSin = -fSin;
@@ -289,12 +289,17 @@ bool IsBoxIntersecting( const Vector2D &min1, const Vector2D &max1, const Vector
 
 void NormalizeBox( Vector &mins, Vector &maxs )
 {
-	for (int i=0; i<3; i++ )
+	if ( mins.x > maxs.x)
 	{
-		if ( mins[i] > maxs[i])
-		{
-			V_swap( mins[i], maxs[i] );
-		}
+		V_swap( mins.x, maxs.x );
+	}
+	if ( mins.y > maxs.y)
+	{
+		V_swap( mins.y, maxs.y );
+	}
+	if ( mins.z > maxs.z)
+	{
+		V_swap( mins.z, maxs.z );
 	}
 }
 

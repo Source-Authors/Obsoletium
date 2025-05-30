@@ -24,7 +24,7 @@ extern IFileWriteBinary *g_pFSIOWriteBinary;
 //-----------------------------------------------------------------------------
 // Returns the duration of a wav file
 //-----------------------------------------------------------------------------
-float GetWavSoundDuration( const char *pWavFile );
+[[nodiscard]] float GetWavSoundDuration( const char *pWavFile );
 
 
 #endif // SOUNDUTILS_H

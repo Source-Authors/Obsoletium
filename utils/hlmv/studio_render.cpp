@@ -9,14 +9,7 @@
 // updates:
 // 1-4-99	fixed AdvanceFrame wraping bug
 
-#include <string.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdarg.h>
-
-#include <windows.h> // for OutputDebugString. . has to be a better way!
-
-
+#include "studio_render.h"
 #include "ViewerSettings.h"
 #include "StudioModel.h"
 #include "vphysics/constraints.h"
@@ -28,7 +21,6 @@
 #include "istudiorender.h"
 #include "utldict.h"
 #include "filesystem.h"
-#include "studio_render.h"
 #include "materialsystem/imesh.h"
 #include "bone_setup.h"
 #include "materialsystem/MaterialSystem_Config.h"
@@ -40,8 +32,6 @@
 // FIXME:
 extern ViewerSettings g_viewerSettings;
 int g_dxlevel = 0;
-
-#pragma warning( disable : 4244 ) // double to float
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -441,7 +431,7 @@ void StudioModel::SetUpBones( bool mergeBones )
 			m_prevcycle = 0.0f;
 		}
 
-		float s = 1.0 - ( m_sequencetime / m_blendtime );
+		float s = 1.0f - ( m_sequencetime / m_blendtime );
 		s = 3 * s * s - 2 * s * s * s;
 
 		boneSetup.AccumulatePose( pos, q, m_prevsequence, m_prevcycle, s, GetRealtimeTime(), NULL );
@@ -529,11 +519,11 @@ void StudioModel::SetUpBones( bool mergeBones )
 					float wirecolor[4] = { 1, 1, 0, 1 };
 					if (pTarget->est.latched > 0.0)
 					{
-						wirecolor[1] = 1.0 - pTarget->est.flWeight;
+						wirecolor[1] = 1.0f - pTarget->est.flWeight;
 					}
 					else
 					{
-						wirecolor[0] = 1.0 - pTarget->est.flWeight;
+						wirecolor[0] = 1.0f - pTarget->est.flWeight;
 					}
 
 					float r = max(pTarget->est.radius,1.f);
@@ -1405,10 +1395,10 @@ void StudioModel::DrawHitboxes( )
 
 			float interiorcolor[4];
 			int c = pBBox->group % 8;
-			interiorcolor[0] = hullcolor[c][0] * 0.7;
-			interiorcolor[1] = hullcolor[c][1] * 0.7;
-			interiorcolor[2] = hullcolor[c][2] * 0.7;
-			interiorcolor[3] = hullcolor[c][3] * 0.4;
+			interiorcolor[0] = hullcolor[c][0] * 0.7f;
+			interiorcolor[1] = hullcolor[c][1] * 0.7f;
+			interiorcolor[2] = hullcolor[c][2] * 0.7f;
+			interiorcolor[3] = hullcolor[c][3] * 0.4f;
 
 			drawTransparentBox( pBBox->bbmin, pBBox->bbmax, m_pBoneToWorld[ pBBox->bone ], interiorcolor, hullcolor[ c ] );
 		}
@@ -1801,12 +1791,12 @@ void StudioModel::CalcHeadRotation( Vector pos[], Quaternion q[] )
 	}
 
 	Vector vTargetDir = Vector( 0, 0, 0 );
-	vTargetDir = vForward * (1.0 - flHeadInfluence) + vHead * flHeadInfluence;
+	vTargetDir = vForward * (1.0f - flHeadInfluence) + vHead * flHeadInfluence;
 	VectorNormalize( vTargetDir );
 
-	SetPoseParameter( "head_pitch", 0.0 );
-	SetPoseParameter( "head_yaw", 0.0 );
-	SetPoseParameter( "head_roll", 0.0 );
+	SetPoseParameter( "head_pitch", 0.0f );
+	SetPoseParameter( "head_yaw", 0.0f );
+	SetPoseParameter( "head_roll", 0.0f );
 	SetHeadPosition( attToWorld, vTargetDir, dt );
 
 	// Msg( "yaw %f pitch %f\n", vEyeAngles.y, vEyeAngles.x );
@@ -1936,11 +1926,8 @@ int StudioModel::DrawModel( bool mergeBones )
 	}
 	
 	// These values HAVE to be sent down for LOD to work correctly.
-	Vector viewOrigin, viewRight, viewUp, viewPlaneNormal;
 	g_pStudioRender->SetViewState( vec3_origin, Vector(0, 1, 0), Vector(0, 0, 1), Vector( 1, 0, 0 ) );
 
-	//	g_pStudioRender->SetEyeViewTarget( viewOrigin );
-	
 	SetUpBones( mergeBones );
 
 	SetupLighting( );

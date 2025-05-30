@@ -18,7 +18,7 @@
 typedef size_t ColorCorrectionHandle_t;
 struct ShaderColorCorrectionInfo_t;
 
-#define COLORCORRECTION_INTERFACE_VERSION "COLORCORRECTION_VERSION_1"
+constexpr inline char COLORCORRECTION_INTERFACE_VERSION[]{"COLORCORRECTION_VERSION_1"};
 
 abstract_class IColorCorrectionSystem
 {

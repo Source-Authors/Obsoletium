@@ -39,7 +39,7 @@ struct VRRect_t
 
 // NOTE NOTE NOTE!!!!  If you up this, grep for "NEW_INTERFACE" to see if there is anything
 // waiting to be enabled during an interface revision.
-#define SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION "SourceVirtualReality001"
+constexpr inline char SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION[]{"SourceVirtualReality001"};
 
 //-----------------------------------------------------------------------------
 // The ISourceVirtualReality interface

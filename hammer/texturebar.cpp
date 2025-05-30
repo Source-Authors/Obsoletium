@@ -5,8 +5,9 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "TextureBar.h"
+
+#include "hammer.h"
 #include "ControlBarIDs.h"
 #include "StockSolids.h"
 #include "MainFrm.h"
@@ -51,7 +52,7 @@ void SetDefaultTextureName( const char *szTexName )
 	int length = strlen( szTexName );
 	Assert( length < 128 );
 
-	strcpy( szDefaultTexture, szTexName );
+	V_strcpy_safe( szDefaultTexture, szTexName );
 }
 
 
@@ -142,7 +143,7 @@ void CTextureBar::NotifyGraphicsChanged()
 				const char *p = strstr(pGroup->GetName(), "textures\\");
 				if (p)
 				{
-					p += strlen("textures\\");
+					p += ssize("textures\\") - 1;
 				}
 				else
 				{
@@ -229,7 +230,7 @@ void CTextureBar::UpdateTexture(void)
 		// Make sure the current material is loaded..
 		m_pCurTex->Load();
 		char szBuf[128];
-		sprintf(szBuf, "%dx%d", m_pCurTex->GetWidth(), m_pCurTex->GetHeight());
+		V_sprintf_safe(szBuf, "%dx%d", m_pCurTex->GetWidth(), m_pCurTex->GetHeight());
 		GetDlgItem(IDC_TEXTURESIZE)->SetWindowText(szBuf);
 		m_pCurTex->GetShortName(szDefaultTexture);
 	}

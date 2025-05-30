@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "vgui/VGUI.h"
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/PHandle.h"
@@ -43,7 +43,17 @@ public:
 
 	// Get the current text
 	virtual void GetText(OUT_Z_BYTECAP(bufferLen) char *textOut, int bufferLen);
+	template<int bufferSize>
+	void GetText(OUT_Z_ARRAY char (&buf)[bufferSize]) 
+	{
+		GetText( buf, bufferSize );
+	}
 	virtual void GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *textOut, int bufLenInBytes);
+	template<int bufferSize>
+	void GetText(OUT_Z_ARRAY wchar_t (&buf)[bufferSize]) 
+	{
+		GetText( buf, static_cast<int>(sizeof(wchar_t)) * bufferSize );
+	}
 
 	// Content alignment
 	// Get the size of the content within the label
@@ -108,10 +118,10 @@ public:
 	// Images are drawn from left to right across the label, ordered by index
 	// By default there is a TextImage in position 0 (see GetTextImage()/SetTextImageIndex())
 	virtual intp AddImage(IImage *image, int preOffset);  // Return the index the image was placed in
-	virtual void SetImageAtIndex(int index, IImage *image, int preOffset);	
-	virtual void SetImagePreOffset(int index, int preOffset);  // Set the offset in pixels before the image
-	virtual IImage *GetImageAtIndex(int index);
-	virtual int GetImageCount();
+	virtual void SetImageAtIndex(intp index, IImage *image, int preOffset);	
+	virtual void SetImagePreOffset(intp index, int preOffset);  // Set the offset in pixels before the image
+	virtual IImage *GetImageAtIndex(intp index);
+	virtual intp GetImageCount();
 	virtual void ClearImages();
 	virtual void ResetToSimpleTextImage();
 	// fixes the layout bounds of the image within the label
@@ -123,7 +133,7 @@ public:
 	// Moves where the default text image is within the image array (it starts in position 0)
 	// Setting it to -1 removes it from the image list
 	// Returns the index the default text image was previously in
-	virtual int SetTextImageIndex(int newIndex);
+	virtual intp SetTextImageIndex(intp newIndex);
 
 	// Message handling
 	// outputData - keyName is the name of the attribute requested.
@@ -170,7 +180,7 @@ protected:
 	void OnSizeChanged(int wide, int tall) override;
 
 	// makes sure that the maxIndex will be a valid index
-	virtual void EnsureImageCapacity(int maxIndex);
+	virtual void EnsureImageCapacity(intp maxIndex);
 
 	// editing
 	void ApplySchemeSettings(IScheme *pScheme) override;

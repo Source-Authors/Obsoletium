@@ -409,7 +409,7 @@ void CCrossbowBolt::BubbleThink( void )
 	// Make danger sounds out in front of me, to scare snipers back into their hole
 	CSoundEnt::InsertSound( SOUND_DANGER_SNIPERONLY, GetAbsOrigin() + GetAbsVelocity() * 0.2f, 120, 0.5f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 
-	if ( GetWaterLevel()  == 0 )
+	if ( GetWaterLevel() == WaterLevel::WL_NotInWater )
 		return;
 
 	UTIL_BubbleTrail( GetAbsOrigin() - GetAbsVelocity() * 0.1f, GetAbsOrigin(), 5 );
@@ -667,7 +667,7 @@ void CWeaponCrossbow::FireBolt( void )
 
 	CCrossbowBolt *pBolt = CCrossbowBolt::BoltCreate( vecSrc, angAiming, pOwner );
 
-	if ( pOwner->GetWaterLevel() == 3 )
+	if ( pOwner->GetWaterLevel() == WaterLevel::WL_Eyes )
 	{
 		pBolt->SetAbsVelocity( vecAiming * BOLT_WATER_VELOCITY );
 	}

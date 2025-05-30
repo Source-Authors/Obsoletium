@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-bool CheckMMXTechnology(void);
-bool CheckSSETechnology(void);
-bool CheckSSE2Technology(void);
-bool Check3DNowTechnology(void);
+[[nodiscard]] bool CheckMMXTechnology(void);
+[[nodiscard]] bool CheckSSETechnology(void);
+[[nodiscard]] bool CheckSSE2Technology(void);
+[[nodiscard]] bool Check3DNowTechnology(void);
 

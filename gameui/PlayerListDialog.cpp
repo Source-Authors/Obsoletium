@@ -75,7 +75,7 @@ void CPlayerListDialog::Activate()
 		V_to_chars(szPlayerIndex, i);
 
 		// collate user data then add it to the table
-		KeyValues *data = new KeyValues(szPlayerIndex);
+		KeyValuesAD data(szPlayerIndex);
 		
 		data->SetString("Name", pi.name );
 		data->SetInt("index", i);

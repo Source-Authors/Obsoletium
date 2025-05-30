@@ -201,7 +201,6 @@ float GetWavSoundDuration( const char *pWavFile )
 	}
 
 	int nSampleCount = 0;
-	float flTrueSampleSize = nSampleSize;
 
 	if ( format == WAVE_FORMAT_ADPCM )
 	{
@@ -222,9 +221,6 @@ float GetWavSoundDuration( const char *pWavFile )
 		{
 			nSampleCount += pFormat->wSamplesPerBlock - (((blockSize - blockRem) * 2) / nChannels);
 		}
-
-		flTrueSampleSize = 0.5f;
-
 	}
 	else
 	{

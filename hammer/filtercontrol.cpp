@@ -465,7 +465,7 @@ LRESULT CFilterControl::OnListLeftDragDrop(WPARAM wParam, LPARAM lParam)
 			{
 				CString str;
 				str.Format("Cannot combine the groups because '%s' is a sub-group of '%s'.", pDropGroup->GetName(), pDragGroup->GetName());
-				AfxMessageBox(str);
+				AfxMessageBox(str, MB_ICONERROR);
 				UpdateGroupList();
 				return 0;
 			}
@@ -526,7 +526,7 @@ LRESULT CFilterControl::OnListRightDragDrop(WPARAM wParam, LPARAM lParam)
 		{
 			CString str;
 			str.Format("Cannot move the group because '%s' is a sub-group of '%s'.", pDropGroup->GetName(), pDragGroup->GetName());
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONERROR);
 			return 0;
 		}
 

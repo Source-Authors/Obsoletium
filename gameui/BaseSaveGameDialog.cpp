@@ -14,7 +14,6 @@
 #include "vgui_controls/Button.h"
 #include "tier1/strtools.h"
 #include "tier1/utlbuffer.h"
-#include "filesystem.h"
 #include "qlimits.h"
 
 #include "MouseMessageForwardingPanel.h"
@@ -63,11 +62,11 @@ public:
 	{
 		// set the bitmap to display
 		char tga[_MAX_PATH];
-		Q_strncpy( tga, save.szFileName, sizeof(tga) );
+		V_strcpy_safe( tga, save.szFileName );
 		char *ext = strstr( tga, ".sav" );
 		if ( ext )
 		{
-			strcpy( ext, ".tga" );
+			V_strncpy( ext, ".tga", 5 );
 		}
 
 		// If a TGA file exists then it is a user created savegame
@@ -181,13 +180,13 @@ void CBaseSaveGameDialog::CreateSavedGamesList()
 //-----------------------------------------------------------------------------
 // Purpose: returns the save file name of the selected item
 //-----------------------------------------------------------------------------
-int CBaseSaveGameDialog::GetSelectedItemSaveIndex()
+intp CBaseSaveGameDialog::GetSelectedItemSaveIndex()
 {
 	CSaveGamePanel *panel = dynamic_cast<CSaveGamePanel *>(m_pGameList->GetSelectedPanel());
 	if ( panel )
 	{
 		// find the panel in the list
-		for ( int i = 0; i < m_SaveGames.Count(); i++ )
+		for ( intp i = 0; i < m_SaveGames.Count(); i++ )
 		{
 			if ( i == panel->GetSaveGameListItemID() )
 			{
@@ -291,8 +290,8 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	if ( !pszFileName || !pszShortName )
 		return false;
 
-	Q_strncpy( save.szShortName, pszShortName, sizeof(save.szShortName) );
-	Q_strncpy( save.szFileName, pszFileName, sizeof(save.szFileName) );
+	V_strcpy_safe( save.szShortName, pszShortName );
+	V_strcpy_safe( save.szFileName, pszFileName );
 
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFileName, "rb", "MOD" );
 	if (fh == FILESYSTEM_INVALID_HANDLE)
@@ -306,11 +305,11 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		return false;
 	}
 
-	Q_strncpy( save.szMapName, szMapName, sizeof(save.szMapName) );
+	V_strcpy_safe( save.szMapName, szMapName );
 
 	// Elapsed time is the last 6 characters in comment. (mmm:ss)
 	intp i = strlen( szComment );
-	Q_strncpy( szElapsedTime, "??", sizeof( szElapsedTime ) );
+	V_strcpy_safe( szElapsedTime, "??" );
 	if (i >= 6)
 	{
 		Q_strncpy( szElapsedTime, (char *)&szComment[i - 6], 7 );
@@ -323,11 +322,11 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		// reformat
 		if ( minutes )
 		{
-			Q_snprintf( szElapsedTime, sizeof(szElapsedTime), "%d %s %d seconds", minutes, minutes > 1 ? "minutes" : "minute", seconds );
+			V_sprintf_safe( szElapsedTime, "%d %s %d seconds", minutes, minutes > 1 ? "minutes" : "minute", seconds );
 		}
 		else
 		{
-			Q_snprintf( szElapsedTime, sizeof(szElapsedTime), "%d seconds", seconds );
+			V_sprintf_safe( szElapsedTime, "%d seconds", seconds );
 		}
 
 		// Chop elapsed out of comment.
@@ -356,20 +355,20 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		pszType = "#GameUI_AutoSave";
 	}
 
-	Q_strncpy( save.szType, pszType, sizeof(save.szType) );
-	Q_strncpy( save.szComment, szComment, sizeof(save.szComment) );
-	Q_strncpy( save.szElapsedTime, szElapsedTime, sizeof(save.szElapsedTime) );
+	V_strcpy_safe( save.szType, pszType );
+	V_strcpy_safe( save.szComment, szComment );
+	V_strcpy_safe( save.szElapsedTime, szElapsedTime );
 
 	// Now get file time stamp.
-	long fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
+	time_t fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
 	char szFileTime[32];
-	g_pFullFileSystem->FileTimeToString(szFileTime, sizeof(szFileTime), fileTime);
+	g_pFullFileSystem->FileTimeToString(szFileTime, fileTime);
 	char *newline = strchr(szFileTime, '\n');
 	if (newline)
 	{
 		*newline = '\0';
 	}
-	Q_strncpy( save.szFileTime, szFileTime, sizeof(save.szFileTime) );
+	V_strcpy_safe( save.szFileTime, szFileTime );
 	save.iTimestamp = fileTime;
 	return true;
 }
@@ -637,11 +636,11 @@ void CBaseSaveGameDialog::DeleteSaveGame( const char *fileName )
 
 	// delete the associated tga
 	char tga[_MAX_PATH];
-	Q_strncpy( tga, fileName, sizeof(tga) );
+	V_strcpy_safe( tga, fileName );
 	char *ext = strstr( tga, ".sav" );
 	if ( ext )
 	{
-		strcpy( ext, ".tga" );
+		V_strncpy( ext, ".tga", 5 );
 	}
 	g_pFullFileSystem->RemoveFile( tga, "MOD" );
 }

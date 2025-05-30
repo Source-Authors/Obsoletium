@@ -26,20 +26,20 @@ public:
 	CProcessUtils() : BaseClass( false ), m_hCurrentProcess{PROCESS_HANDLE_INVALID}, m_bInitialized{false} {}
 
 	// Inherited from IAppSystem
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Inherited from IProcessUtils
-	virtual ProcessHandle_t StartProcess( const char *pCommandLine, bool bConnectStdPipes );
-	virtual ProcessHandle_t StartProcess( int argc, const char **argv, bool bConnectStdPipes );
+	ProcessHandle_t StartProcess( const char *pCommandLine, bool bConnectStdPipes ) override;
+	ProcessHandle_t StartProcess( int argc, const char **argv, bool bConnectStdPipes ) override;
 	void CloseProcess( ProcessHandle_t hProcess ) override;
 	void AbortProcess( ProcessHandle_t hProcess ) override;
-	virtual bool IsProcessComplete( ProcessHandle_t hProcess );
-	virtual void WaitUntilProcessCompletes( ProcessHandle_t hProcess );
-	virtual intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
-	virtual ptrdiff_t GetProcessOutputSize( ProcessHandle_t hProcess );
-	virtual ptrdiff_t GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
-	virtual int GetProcessExitCode( ProcessHandle_t hProcess );
+	bool IsProcessComplete( ProcessHandle_t hProcess ) override;
+	void WaitUntilProcessCompletes( ProcessHandle_t hProcess ) override;
+	intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) override;
+	intp GetProcessOutputSize( ProcessHandle_t hProcess ) override;
+	intp GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) override;
+	int GetProcessExitCode( ProcessHandle_t hProcess ) override;
 
 private:
 	struct ProcessInfo_t
@@ -56,7 +56,20 @@ private:
 	};
 
 	// Returns the last error that occurred
-	char *GetErrorString( char *pBuf, int nBufLen );
+	template<intp size>
+	char *GetErrorString( char (&pBuf)[size] )
+	{
+		const std::string error{std::system_category().message( ::GetLastError() )};
+		const size_t index{error.find('\r')};
+		if ( index != std::string::npos )
+		{
+			const std::string substr{error.substr( 0, std::max( index, static_cast<size_t>(1) ) - 1 )};
+			V_strcpy_safe( pBuf, substr.c_str() );
+			return pBuf;
+		}
+		V_strcpy_safe( pBuf, error.c_str() );
+		return pBuf;
+	}
 
 	// creates the process, adds it to the list and writes the windows HANDLE into info.m_hProcess
 	ProcessHandle_t CreateProcess( ProcessInfo_t &info, bool bConnectStdPipes );
@@ -107,25 +120,6 @@ void CProcessUtils::Shutdown()
 	return BaseClass::Shutdown();
 }
 
-
-//-----------------------------------------------------------------------------
-// Returns the last error that occurred
-//-----------------------------------------------------------------------------
-char *CProcessUtils::GetErrorString( char *pBuf, int nBufLen )
-{
-	const std::string error{std::system_category().message( ::GetLastError() )};
-	const size_t index{error.find('\r')};
-	if ( index != std::string::npos )
-	{
-		const std::string substr{error.substr( 0, std::max( index, static_cast<size_t>(1) ) - 1 )};
-		V_strncpy( pBuf, substr.c_str(), nBufLen );
-		return pBuf;
-	}
-	V_strncpy( pBuf, error.c_str(), nBufLen );
-	return pBuf;
-}
-
-
 ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnectStdPipes )
 {
 	STARTUPINFO si;
@@ -151,7 +145,7 @@ ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnect
 	char buf[ 512 ];
 	Warning( "Could not execute the command:\n   %s\n"
 		"Windows gave the error message:\n   \"%s\"\n",
-		info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+		info.m_CommandLine.Get(), GetErrorString( buf ) );
 
 	return PROCESS_HANDLE_INVALID;
 }
@@ -278,7 +272,16 @@ void CProcessUtils::AbortProcess( ProcessHandle_t hProcess )
 		if ( !IsProcessComplete( hProcess ) )
 		{
 			ProcessInfo_t& info = m_Processes[hProcess];
-			TerminateProcess( info.m_hProcess, 1 );
+
+#ifdef _WIN32
+			// dimhotepus: 1 -> Abort on windows exit with error code 3.
+			// See https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/abort
+			TerminateProcess( info.m_hProcess, 3 );  //-V2014
+#else
+			// dimhotepus: 1 -> Abort on POSIX is 128 + signal abort code.
+			// See https://stackoverflow.com/questions/23098695/strange-return-value-134-to-call-gawk-in-a-bash-script
+			exit(128 + SIGABRT);  //-V2014
+#endif
 		}
 		ShutdownProcess( hProcess );
 	}
@@ -328,7 +331,7 @@ intp CProcessUtils::GetActualProcessOutputSize( ProcessHandle_t hProcess )
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
 			"Windows gave the error message:\n   \"%s\"\n",
-			info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
 
@@ -352,7 +355,7 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
 			"Windows gave the error message:\n   \"%s\"\n",
-			info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
 
@@ -362,7 +365,7 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
 			"Windows gave the error message:\n   \"%s\"\n",
-			info.m_CommandLine.Get(), GetErrorString( buf, sizeof(buf) ) );
+			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
 	

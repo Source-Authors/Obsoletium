@@ -11,7 +11,7 @@
 #endif
 
 #include "itoolentity.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "materialsystem/imaterialproxy.h"
 #include "inputsystem/iinputsystem.h"
 

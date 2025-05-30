@@ -17,11 +17,8 @@ mxBitmapButton::mxBitmapButton( mxWindow *parent, int x, int y, int w, int h, in
 
 	SetImage( bitmap );
 
-	HWND wnd = (HWND)getHandle();
-
-	DWORD style = GetWindowLong( wnd, GWL_STYLE );
-	style |= WS_CLIPSIBLINGS;
-	SetWindowLong( wnd, GWL_STYLE, style );
+	// dimhotepus: Use single API to set styles.
+	FacePoser_AddWindowStyle(this, WS_CLIPSIBLINGS);
 }
 
 mxBitmapButton::~mxBitmapButton( void )
@@ -65,7 +62,7 @@ int mxBitmapButton::handleEvent( mxEvent * event )
 			WPARAM wp;
 
 			wp = MAKEWPARAM( getId(), BN_CLICKED );
-			lp = (long)getHandle();
+			lp = (LPARAM)getHandle();
 
 			SendMessage( parent, WM_COMMAND, wp, lp );
 			iret = 1;

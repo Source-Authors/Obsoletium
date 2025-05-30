@@ -15,7 +15,7 @@
 #pragma once
 #endif
 
-#include "interface.h"
+#include "tier1/interface.h"
 #include <materialsystem/IShader.h>
 
 //-----------------------------------------------------------------------------
@@ -88,10 +88,10 @@ public:
 	virtual void Disconnect( bool bIsMaterialSystem ) = 0;
 
 	// Returns the number of shaders defined in this DLL
-	virtual int ShaderCount() const = 0;
+	virtual intp ShaderCount() const = 0;
 
 	// Returns information about each shader defined in this DLL
-	virtual IShader *GetShader( int nShader ) = 0;
+	virtual IShader *GetShader( intp nShader ) = 0;
 };
 
 

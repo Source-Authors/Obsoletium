@@ -199,10 +199,6 @@ SOURCE=..\common\netapi.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\SteamAppStartup.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\sys_common.cpp
 # End Source File
 # Begin Source File
@@ -337,10 +333,6 @@ SOURCE=..\public\tier0\platform.h
 # Begin Source File
 
 SOURCE=..\public\protected_things.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\common\SteamAppStartup.h
 # End Source File
 # Begin Source File
 

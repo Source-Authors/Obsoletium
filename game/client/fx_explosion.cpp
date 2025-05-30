@@ -310,7 +310,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 				pParticle->m_uchStartAlpha	= 255;
 				pParticle->m_uchEndAlpha	= 0;
 				
-				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+				pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 				pParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 			}
 		}
@@ -369,7 +369,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 				pParticle->m_uchStartAlpha	= random->RandomInt( 128, 255 );
 				pParticle->m_uchEndAlpha	= 0;
 				
-				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+				pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 				pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 			}
 		}
@@ -437,7 +437,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 				pParticle->m_uchStartAlpha	= random->RandomInt( 16, 32 );
 				pParticle->m_uchEndAlpha	= 0;
 				
-				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+				pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 				pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 			}
 		}
@@ -503,7 +503,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 			pParticle->m_uchStartAlpha	= 255;
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 		}
 	}
@@ -567,7 +567,7 @@ void C_BaseExplosionEffect::CreateCore( void )
 			pParticle->m_uchStartAlpha	= 255;
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -16.0f, 16.0f );
 		}
 	}
@@ -1169,7 +1169,7 @@ void C_WaterExplosionEffect::CreateDebris( void )
 			pParticle->m_uchStartAlpha	= m_flLuminosity;
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 		}
 	}
@@ -1300,7 +1300,7 @@ void C_WaterExplosionEffect::CreateMisc( void )
 		pParticle->m_uchStartAlpha	= RemapValClamped( i, 7, 0, 255, 32 ) * m_flLuminosity;
 		pParticle->m_uchEndAlpha	= 0;
 		
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -4.0f, 4.0f );
 	}
 }
@@ -1426,7 +1426,7 @@ void C_MegaBombExplosionEffect::CreateCore( void )
 			pParticle->m_uchStartAlpha	= 255;
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -16.0f, 16.0f );
 		}
 	}

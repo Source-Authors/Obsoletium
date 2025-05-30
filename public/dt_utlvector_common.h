@@ -14,11 +14,11 @@
 #include "utlvector.h"
 
 
-typedef void (*EnsureCapacityFn)( void *pVoid, int offsetToUtlVector, int len );
-typedef void (*ResizeUtlVectorFn)( void *pVoid, int offsetToUtlVector, int len );
+typedef void (*EnsureCapacityFn)( void *pVoid, intp offsetToUtlVector, intp len );
+typedef void (*ResizeUtlVectorFn)( void *pVoid, intp offsetToUtlVector, intp len );
 
 template< class T >
-void UtlVector_InitializeAllocatedElements( T *pBase, int count )
+void UtlVector_InitializeAllocatedElements( T *pBase, intp count )
 {
 	memset( reinterpret_cast<void*>( pBase ), 0, count * sizeof( T ) );
 }
@@ -27,7 +27,7 @@ template< class T, class A >
 class UtlVectorTemplate
 {
 public:
-	static void ResizeUtlVector( void *pStruct, int offsetToUtlVector, int len )
+	static void ResizeUtlVector( void *pStruct, intp offsetToUtlVector, intp len )
 	{
 		CUtlVector<T,A> *pVec = (CUtlVector<T,A>*)((char*)pStruct + offsetToUtlVector);
 		if ( pVec->Count() < len )
@@ -38,7 +38,7 @@ public:
 		// Ensure capacity
 		pVec->EnsureCapacity( len );
 
-		int nNumAllocated = pVec->NumAllocated();
+		intp nNumAllocated = pVec->NumAllocated();
 
 		// This is important to do because EnsureCapacity doesn't actually call the constructors
 		// on the elements, but we need them to be initialized, otherwise it'll have out-of-range
@@ -46,13 +46,13 @@ public:
 		UtlVector_InitializeAllocatedElements( pVec->Base() + pVec->Count(), nNumAllocated - pVec->Count() );
 	}
 
-	static void EnsureCapacity( void *pStruct, int offsetToUtlVector, int len )
+	static void EnsureCapacity( void *pStruct, intp offsetToUtlVector, intp len )
 	{
 		CUtlVector<T,A> *pVec = (CUtlVector<T,A>*)((char*)pStruct + offsetToUtlVector);
 
 		pVec->EnsureCapacity( len );
 		
-		int nNumAllocated = pVec->NumAllocated();
+		intp nNumAllocated = pVec->NumAllocated();
 
 		// This is important to do because EnsureCapacity doesn't actually call the constructors
 		// on the elements, but we need them to be initialized, otherwise it'll have out-of-range

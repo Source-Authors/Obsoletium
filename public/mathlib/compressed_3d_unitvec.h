@@ -5,9 +5,10 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#ifndef _3D_UNITVEC_H
-#define _3D_UNITVEC_H
+#ifndef COMPRESSED_3D_UNITVEC_H
+#define COMPRESSED_3D_UNITVEC_H
 
+#include "mathlib/vector.h"
 
 #define UNITVEC_DECLARE_STATICS \
    float cUnitVector::mUVAdjustment[0x2000]; \
@@ -46,7 +47,7 @@ public:
    cUnitVector& operator=( const Vector& vec )
    { packVector( vec ); return *this; }
 
-   operator Vector()
+   [[nodiscard]] operator Vector()
    {
       unpackVector( mTmpVec );
       return mTmpVec;
@@ -156,7 +157,7 @@ public:
 		
          // calculate the amount of normalization required
          mUVAdjustment[idx] = 1.0f / sqrtf( y*y + z*z + x*x );
-         Assert( _finite( mUVAdjustment[idx]));
+         Assert( std::isfinite( mUVAdjustment[idx]));
 
          //cerr << mUVAdjustment[idx] << "\t";
          //if ( xbits == 0 ) cerr << "\n";
@@ -192,7 +193,7 @@ public:
                float ang = vec.dot( vec2 );
                ang = (( fabs( ang ) > 0.99999f ) ? 0 : (float)acos(ang));
 
-               if (( ang > TEST_ANGERROR ) | ( !_finite( ang )))
+               if (( ang > TEST_ANGERROR ) | ( !std::isfinite( ang )))
                {
                   cerr << "error: " << ang << endl;
                   cerr << "orig vec:       " << vec.x << ",\t"
@@ -221,7 +222,7 @@ public:
          float ang =vec.dot( vec2 );
          ang = (( ang > 0.999f ) ? 0 : (float)acos(ang));
 
-         if (( ang > TEST_ANGERROR ) | ( !_finite( ang )))
+         if (( ang > TEST_ANGERROR ) | ( !std::isfinite( ang )))
          {
             cerr << "error: " << ang << endl;
             cerr << "orig vec:       " << vec.x << ",\t"
@@ -248,7 +249,7 @@ public:
          float ang = vec.dot( vec2 );
          ang = (( fabs( ang ) > 0.999f ) ? 0 : (float)acos(ang));
 
-         if (( ang > TEST_ANGERROR ) | ( !_finite( ang )))
+         if (( ang > TEST_ANGERROR ) | ( !std::isfinite( ang )))
          {
             cerr << "error: " << ang << endl;
             cerr << "orig vec:       " << vec.x << ",\t"
@@ -279,6 +280,6 @@ public:
    static Vector mTmpVec;
 };
 
-#endif // _3D_VECTOR_H
+#endif // COMPRESSED_3D_UNITVEC_H
 
 

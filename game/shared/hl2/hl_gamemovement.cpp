@@ -618,7 +618,7 @@ void CHL2GameMovement::FullLadderMove()
 								pressing_forward_or_side && 
 								!moving_along_ladder );
 
-	bool fully_underwater = ( player->GetWaterLevel() == WL_Eyes ) ? true : false;
+	bool fully_underwater = ( player->GetWaterLevel() == WaterLevel::WL_Eyes ) ? true : false;
 
 	// If the user manually pressed use or we're simulating it, then use_dismount will occur
 	bool use_dismount = pressed_use || auto_dismount_use;
@@ -1137,9 +1137,8 @@ bool CHL2GameMovement::CanAccelerate()
 	}
 #endif
 
-	BaseClass::CanAccelerate();
-
-	return true;
+	// dimhotepus: Correct acceleration check, ensure base class applied.
+	return BaseClass::CanAccelerate();
 }
 
 

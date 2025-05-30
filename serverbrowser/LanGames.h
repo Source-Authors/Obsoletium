@@ -16,7 +16,7 @@ class CLanBroadcastMsgHandler;
 //-----------------------------------------------------------------------------
 // Purpose: Favorite games list
 //-----------------------------------------------------------------------------
-class CLanGames : public CBaseGamesPage
+class CLanGames final : public CBaseGamesPage
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CLanGames, CBaseGamesPage );
 

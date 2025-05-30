@@ -133,20 +133,9 @@ CMapView2DBase::CMapView2DBase(void)
 //-----------------------------------------------------------------------------
 CMapView2DBase::~CMapView2DBase(void)
 {
-	if (m_pwndTitle != NULL)
-	{
-		delete m_pwndTitle;
-	}
-
-	if ( m_pCamera )
-	{
-		delete m_pCamera;
-	}
-
-	if ( m_pRender )
-	{
-		delete m_pRender;
-	}
+	delete m_pwndTitle;
+	delete m_pCamera;
+	delete m_pRender;
 }
 
 //-----------------------------------------------------------------------------
@@ -778,7 +767,7 @@ void CMapView2DBase::UpdateStatusBar()
 		return;
 
 	char szBuf[128];
-	sprintf(szBuf, " Zoom: %.2f ", m_fZoom);
+	V_sprintf_safe(szBuf, " Zoom: %.2f ", m_fZoom);
 	SetStatusText(SBI_GRIDZOOM, szBuf);
 }
 
@@ -1712,7 +1701,7 @@ void CMapView2DBase::OnRButtonDown(UINT nFlags, CPoint point)
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapView2DBase::OnTimer(UINT nIDEvent) 
+void CMapView2DBase::OnTimer(UINT_PTR nIDEvent) 
 {
 	if ( nIDEvent == TIMER_SCROLLVIEW )
 	{

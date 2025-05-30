@@ -16,7 +16,7 @@ class IVP_Real_Object;
 
 struct springparams_t;
 
-IPhysicsSpring *CreateSpring( IVP_Environment *pEnvironment, CPhysicsObject *pObjectStart, CPhysicsObject *pObjectEnd, springparams_t *pParams );
+[[nodiscard]] IPhysicsSpring *CreateSpring( IVP_Environment *pEnvironment, CPhysicsObject *pObjectStart, CPhysicsObject *pObjectEnd, springparams_t *pParams );
 
 
 #endif // PHYSICS_SPRING_H

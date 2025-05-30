@@ -4,6 +4,7 @@
 //
 //=============================================================================//
 
+#include "MatSysWin.h"
 #include <mxtk/mx.h>
 #include <mxtk/mxMessageBox.h>
 #include <mxtk/mxTga.h>
@@ -14,7 +15,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include "MatSysWin.h"
 #include "MDLViewer.h"
 #include "StudioModel.h"
 #include "ControlPanel.h"
@@ -197,8 +197,8 @@ void MatSysWindow::Frame( void )
 	static bool recursion_guard = false;
 
 	static double prev = 0.0;
-	double curr = (double) mx::getTickCount () / 1000.0;
-	double dt = ( curr - prev );
+	double curr = Plat_FloatTime();
+	float dt = static_cast<float>( curr - prev );
 	
 	if ( recursion_guard )
 		return;
@@ -206,17 +206,17 @@ void MatSysWindow::Frame( void )
 	recursion_guard = true;
 
 	// clamp to MAX_FPS
-	if ( dt >= 0.0 && dt < MIN_TIMESTEP )
+	if ( dt >= 0.0f && dt < MIN_TIMESTEP )
 	{
-		Sleep( max( 0, (int)( ( MIN_TIMESTEP - dt ) * 1000.0f ) ) );
+		ThreadSleep( max( 0, (int)( ( MIN_TIMESTEP - dt ) * 1000.0f ) ) );
 
 		recursion_guard = false;
 		return;
 	}
 
-	if ( prev != 0.0 )
+	if ( prev != 0.0f )
 	{
-		dt = min( 0.1, dt );
+		dt = min( 0.1f, dt );
 		
 		g_MDLViewer->Think( dt );
 
@@ -279,7 +279,7 @@ int MatSysWindow::handleEvent (mxEvent *event)
 			oldlry = g_viewerSettings.lightrot[1];
 			g_viewerSettings.pause = false;
 
-			float r = 1.0/3.0 * min( w(), h() );
+			float r = 1.0f/3.0f * min( w(), h() );
 
 			float d = sqrt( ( float )( (event->x - w()/2) * (event->x - w()/2) + (event->y - h()/2) * (event->y - h()/2) ) );
 
@@ -302,8 +302,8 @@ int MatSysWindow::handleEvent (mxEvent *event)
 			{
 				if (event->modifiers & mxEvent::KeyShift)
 				{
-					pModel->m_origin[1] = oldty - (float) ((short)event->x - oldx) * 0.1;
-					pModel->m_origin[2] = oldtz + (float) ((short)event->y - oldy) * 0.1;
+					pModel->m_origin[1] = oldty - (float) ((short)event->x - oldx) * 0.1f;
+					pModel->m_origin[2] = oldtz + (float) ((short)event->y - oldy) * 0.1f;
 				}
 				else if (event->modifiers & mxEvent::KeyCtrl)
 				{
@@ -346,8 +346,8 @@ int MatSysWindow::handleEvent (mxEvent *event)
 					}
 					else
 					{
-						float ang1 = (180 / 3.1415) * atan2( oldx - w()/2.0, oldy - h()/2.0 );
-						float ang2 = (180 / 3.1415) * atan2( event->x - w()/2.0, event->y - h()/2.0 );
+						float ang1 = (180 / M_PI_F) * atan2( oldx - w()/2.0f, oldy - h()/2.0f );
+						float ang2 = (180 / M_PI_F) * atan2( event->x - w()/2.0f, event->y - h()/2.0f );
 						oldx = event->x;
 						oldy = event->y;
 						
@@ -363,7 +363,7 @@ int MatSysWindow::handleEvent (mxEvent *event)
 			}
 			else if (event->buttons & mxEvent::MouseRightButton)
 			{
-				pModel->m_origin[0] = oldtx + (float) ((short)event->y - oldy) * 0.1;
+				pModel->m_origin[0] = oldtx + (float) ((short)event->y - oldy) * 0.1f;
 				pModel->m_origin[0] = clamp( pModel->m_origin[0], 8.0f, 1024.0f );
 			}
 			redraw ();

@@ -75,7 +75,7 @@ bool CHttpDownloader::BeginDownload( const char *pURL, const char *pGamePath, vo
 	if ( pGamePath )
 	{
 		m_pThreadState->bSuppressFileWrite = false;
-		V_strcpy( m_pThreadState->gamePath, pGamePath );
+		V_strcpy_safe( m_pThreadState->gamePath, pGamePath );
 
 		// Generate the actual filename to save.  Well, it's not
 		// absolute, but this will work.
@@ -89,7 +89,7 @@ bool CHttpDownloader::BeginDownload( const char *pURL, const char *pGamePath, vo
 	}
 
 	// Cache URL - for debugging
-	V_strcpy( m_szURL, pURL );
+	V_strcpy_safe( m_szURL, pURL );
 
 	// Spawn the download thread
 	extern IDownloadSystem *g_pDownloadSystem;

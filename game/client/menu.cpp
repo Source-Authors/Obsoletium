@@ -231,7 +231,7 @@ void CHudMenu::Paint()
 				{
 					// draw a percentage of the last one
 					Color col = clr;
-					col[3] *= fl;
+					col[3] = static_cast<byte>(col[3] * fl);
 					vgui::surface()->DrawSetTextColor(col);
 					PaintString( &g_szMenuString[ line->startchar ], drawLen, m_hItemFontPulsing, x, y );
 				}
@@ -390,7 +390,7 @@ void CHudMenu::ShowMenu( const char * menuName, int validSlots )
 	// we have the whole string, so we can localise it now
 	char szMenuString[MAX_MENU_STRING];
 	Q_strncpy( szMenuString, ConvertCRtoNL( hudtextmessage->BufferedLocaliseTextString( g_szPrelocalisedMenuString ) ), sizeof( szMenuString ) );
-	g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString, sizeof( g_szMenuString ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString );
 	
 	ProcessText();
 
@@ -460,7 +460,7 @@ void CHudMenu::ShowMenu_KeyValueItems( KeyValues *pKV )
 void CHudMenu::MsgFunc_ShowMenu( bf_read &msg)
 {
 	m_bitsValidSlots = (short)msg.ReadWord();
-	int DisplayTime = msg.ReadChar();
+	char DisplayTime = msg.ReadChar();
 	int NeedMore = msg.ReadByte();
 
 	if ( DisplayTime > 0 )
@@ -476,7 +476,7 @@ void CHudMenu::MsgFunc_ShowMenu( bf_read &msg)
 	if ( m_bitsValidSlots )
 	{
 		char szString[2048];
-		msg.ReadString( szString, sizeof(szString) );
+		msg.ReadString( szString );
 
 		if ( !m_fWaitingForMore ) // this is the start of a new menu
 		{
@@ -495,7 +495,7 @@ void CHudMenu::MsgFunc_ShowMenu( bf_read &msg)
 			// we have the whole string, so we can localise it now
 			char szMenuString[MAX_MENU_STRING];
 			Q_strncpy( szMenuString, ConvertCRtoNL( hudtextmessage->BufferedLocaliseTextString( g_szPrelocalisedMenuString ) ), sizeof( szMenuString ) );
-			g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString, sizeof( g_szMenuString ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( szMenuString, g_szMenuString );
 			
 			ProcessText();
 		}

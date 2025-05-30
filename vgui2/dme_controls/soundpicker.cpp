@@ -4,9 +4,6 @@
 //
 //=============================================================================
 
-#include <windows.h>
-#undef PropertySheet
-
 #include "filesystem.h"
 #include "dme_controls/soundpicker.h"
 #include "tier1/KeyValues.h"
@@ -16,9 +13,9 @@
 #include "vgui_controls/PropertyPage.h"
 #include "dme_controls/filtercombobox.h"
 #include "vgui/ISurface.h"
-#include "vgui/iinput.h"
+#include "vgui/IInput.h"
 #include "dme_controls/dmecontrols.h"
-#include "soundemittersystem/isoundemittersystembase.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "mathlib/mathlib.h"
 
 // FIXME: Move sound code out of the engine + into a library!
@@ -425,7 +422,7 @@ void CSoundPicker::OnItemSelected( KeyValues *kv )
 		const char *pGameSoundName = GetSelectedSoundName();
 		if ( pGameSoundName && bPlaySounds )
 		{
-			int len = V_strlen( pGameSoundName );
+			intp len = V_strlen( pGameSoundName );
 			char *soundname = ( char* )stackalloc( len + 2 );
 			soundname[ 0 ] = '#'; // mark sound to bypass the dsp
 			V_strncpy( soundname + 1, pGameSoundName, len + 1 );
@@ -544,7 +541,7 @@ void CSoundPickerFrame::OnCommand( const char *pCommand )
 		{
 			const char *pSoundName = pPicker->GetSelectedSoundName();
 
-			int len = V_strlen( pSoundName );
+			intp len = V_strlen( pSoundName );
 			char *soundname = ( char* )stackalloc( len + 2 );
 			soundname[ 0 ] = '#'; // mark sound to bypass the dsp
 			V_strncpy( soundname + 1, pSoundName, len + 1 );

@@ -5,7 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "vgui_controls/RichText.h"
+
 #include "vgui_controls/pch_vgui_controls.h"
+
 #include "vgui/ILocalize.h"
 
 // memdbgon must be the last include file in a .cpp file
@@ -189,7 +192,7 @@ RichText::RichText(Panel *parent, const char *panelName) : BaseClass(parent, pan
 	// add a basic format string
 	TFormatStream stream;
 	stream.color = _defaultTextColor;
-	stream.fade.flFadeStartTime = 0.0f;
+	stream.fade.flFadeStartTime = 0.0;
 	stream.fade.flFadeLength = -1.0f;
 	stream.pixelsIndent = 0;
 	stream.textStreamIndex = 0;
@@ -430,8 +433,8 @@ void RichText::SetText(const wchar_t *text)
 	m_FormatStream.RemoveAll();
 	TFormatStream stream;
 	stream.color = GetFgColor();
+	stream.fade.flFadeStartTime = 0.0;
 	stream.fade.flFadeLength = -1.0f;
-	stream.fade.flFadeStartTime = 0.0f;
 	stream.pixelsIndent = 0;
 	stream.textStreamIndex = 0;
 	stream.textClickable = false;
@@ -694,10 +697,10 @@ void RichText::CalculateFade( TRenderState &renderState )
 			const auto &fade = m_FormatStream[renderState.formatStreamIndex].fade;
 			if ( fade.flFadeLength != -1.0f )
 			{
-				float frac = ( fade.flFadeStartTime -  system()->GetCurrentTime() ) / fade.flFadeLength;
+				double frac = ( fade.flFadeStartTime - system()->GetCurrentTime() ) / fade.flFadeLength;
 
-				int alpha = frac * fade.iOriginalAlpha;
-				alpha = clamp( alpha, 0, fade.iOriginalAlpha );
+				int alpha = static_cast<int>(frac * fade.iOriginalAlpha);
+				alpha = clamp( alpha, 0, static_cast<int>(fade.iOriginalAlpha) );
 
 				renderState.textColor.SetColor( renderState.textColor.r(), renderState.textColor.g(), renderState.textColor.b(), alpha );
 			}
@@ -832,7 +835,7 @@ void RichText::Paint()
 
 		// 3.
 		// Calculate the range of text to draw all at once
-		int iLast = m_TextStream.Count() - 1;
+		intp iLast = m_TextStream.Count() - 1;
 		
 		// Stop at the next line break
 		if ( m_LineBreaks.IsValidIndex( lineBreakIndexIndex ) && m_LineBreaks[lineBreakIndexIndex] <= iLast )
@@ -868,7 +871,7 @@ void RichText::Paint()
 		{
 			if ( m_TextStream[i] == '\t' )
 			{
-				int dxTabWidth = 8 * surface()->GetCharacterWidth(hFontCurrent, ' ');
+				int dxTabWidth = 8 * surface()->GetCharacterWidth(hFontCurrent, L' ');
 				dxTabWidth = MAX( 1, dxTabWidth );
 
 				renderState.x = ( dxTabWidth * ( 1 + ( renderState.x / dxTabWidth ) ) );
@@ -1156,10 +1159,9 @@ void RichText::InsertClickableTextStart( const char *pchClickAction )
 	{
 		// add to text stream, based off existing item
 		TFormatStream formatStreamCopy = prevItem;
-		intp iFormatStream = m_FormatStream.AddToTail( formatStreamCopy );
 		
 		// set the new params
-		pFormatStream = &m_FormatStream[iFormatStream];
+		pFormatStream = &m_FormatStream[m_FormatStream.AddToTail( formatStreamCopy )];
 		pFormatStream->textStreamIndex = m_TextStream.Count();
 		pFormatStream->textClickable = true;
 		pFormatStream->m_sClickableTextAction = pchClickAction;
@@ -1463,7 +1465,7 @@ void RichText::LayoutVerticalScrollBarSlider()
 	
 	// calculate how many lines we can fully display
 	int displayLines = tall / (GetLineHeight() + _drawOffsetY);
-	int numLines = m_LineBreaks.Count();
+	intp numLines = m_LineBreaks.Count();
 	
 	if (numLines <= displayLines)
 	{
@@ -2249,14 +2251,13 @@ int RichText::GetStartDrawIndex(int &lineBreakIndexIndex)
 // Input:	offset - index to Start reading from 
 //			bufLen - length of string
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, wchar_t *buf, int bufLenInBytes)
+void RichText::GetText(intp offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, intp bufLenInBytes)
 {
 	if (!buf)
 		return;
 	
-	Assert( bufLenInBytes >= static_cast<int>(sizeof(buf[0])) );
-	int bufLen = bufLenInBytes / sizeof(wchar_t);
-	int i;
+	intp bufLen = bufLenInBytes / sizeof(wchar_t);
+	intp i;
 	for (i = offset; i < (offset + bufLen - 1); i++)
 	{
 		if (i >= m_TextStream.Count())
@@ -2271,10 +2272,10 @@ void RichText::GetText(int offset, wchar_t *buf, int bufLenInBytes)
 //-----------------------------------------------------------------------------
 // Purpose: gets text from the buffer
 //-----------------------------------------------------------------------------
-void RichText::GetText(int offset, char *pch, int bufLenInBytes)
+void RichText::GetText(intp offset, OUT_Z_CAP(bufLenInBytes) char *pch, intp bufLenInBytes)
 {
 	wchar_t rgwchT[4096];
-	GetText(offset, rgwchT, sizeof(rgwchT));
+	GetText(offset, rgwchT);
     Q_UnicodeToUTF8(rgwchT, pch, bufLenInBytes);
 }
 
@@ -2306,7 +2307,7 @@ bool RichText::RequestInfo(KeyValues *outputData)
 	if (!stricmp(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[512];
-		GetText(0, wbuf, sizeof(wbuf));
+		GetText(0, wbuf);
 		outputData->SetWString("text", wbuf);
 		return true;
 	}

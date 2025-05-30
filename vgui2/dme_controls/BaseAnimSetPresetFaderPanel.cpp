@@ -4,7 +4,7 @@
 //
 //=============================================================================
 #include "dme_controls/BaseAnimSetPresetFaderPanel.h"
-#include "dme_controls/DmePresetGroupEditorPanel.h"
+#include "dme_controls/dmepresetgroupeditorpanel.h"
 #include "vgui_controls/InputDialog.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/Slider.h"
@@ -38,7 +38,7 @@ class CPresetSlider;
 //-----------------------------------------------------------------------------
 class CAddPresetDialog : public vgui::BaseInputDialog
 {
-	DECLARE_CLASS_SIMPLE( CAddPresetDialog, vgui::BaseInputDialog );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAddPresetDialog, vgui::BaseInputDialog );
 
 public:
 	CAddPresetDialog( vgui::Panel *parent );
@@ -47,7 +47,7 @@ public:
 
 protected:
 	// command buttons
-	virtual void OnCommand(const char *command);
+	void OnCommand(const char *command) override;
 
 private:
 	vgui::TextEntry		*m_pInput;
@@ -78,8 +78,8 @@ void CAddPresetDialog::DoModal( CDmeAnimationSet *pAnimationSet, KeyValues *pCon
 
 	// Populate the combo box with preset group names
 	CDmrElementArray< CDmePresetGroup > presetGroupList = pAnimationSet->GetPresetGroups();
-	int nCount = presetGroupList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = presetGroupList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroupList[i];
 		if ( pPresetGroup->m_bIsReadOnly )
@@ -156,15 +156,15 @@ void CAddPresetDialog::OnCommand( const char *command )
 //-----------------------------------------------------------------------------
 class CPresetSliderEdgeButton : public Button
 {
-	DECLARE_CLASS_SIMPLE( CPresetSliderEdgeButton, Button );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPresetSliderEdgeButton, Button );
 public:
 	CPresetSliderEdgeButton( CPresetSlider *parent, const char *panelName, const char *text );
 
 private:
-	virtual void OnCursorMoved(int x, int y);
-	virtual void OnMousePressed( vgui::MouseCode code );
-	virtual void OnMouseReleased( vgui::MouseCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
+	void OnCursorMoved(int x, int y) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
+	void OnMouseReleased( vgui::MouseCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
 
 	CPresetSlider	*m_pSlider;
 };
@@ -177,7 +177,7 @@ private:
 //-----------------------------------------------------------------------------
 class CPresetSlider : public Slider
 {
-	DECLARE_CLASS_SIMPLE( CPresetSlider, Slider );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPresetSlider, Slider );
 
 public:
 
@@ -204,20 +204,20 @@ public:
 
 protected:
 
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings( IScheme *scheme );
-	virtual void GetTrackRect( int &x, int &y, int &w, int &h );
-	virtual void PerformLayout();
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnMouseReleased(MouseCode code);
-	virtual void OnKeyCodeTyped( KeyCode code );
-	virtual void OnCursorMoved(int x, int y);
+	void Paint() override;
+	void PaintBackground() override;
+	void ApplySchemeSettings( IScheme *scheme ) override;
+	void GetTrackRect( int &x, int &y, int &w, int &h ) override;
+	void PerformLayout() override;
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
+	void OnMouseReleased(MouseCode code) override;
+	void OnKeyCodeTyped( KeyCode code ) override;
+	void OnCursorMoved(int x, int y) override;
 
 	MESSAGE_FUNC( OnShowContextMenu, "OnShowContextMenu" );
 	MESSAGE_FUNC( OnRename, "OnRename" );
-	MESSAGE_FUNC( OnDelete, "OnDelete" );
+	MESSAGE_FUNC_OVERRIDE( OnDelete, "OnDelete" );
 
 	MESSAGE_FUNC( OnOverwrite, "OnOverwrite" );
 
@@ -239,7 +239,8 @@ private:
 	Color			m_TextColor;
 	Color			m_TextColorFocus;
 	TextImage		*m_pName;
-	float			m_flCurrent;
+	// dimhotepus: Comment unused field.
+	// float			m_flCurrent;
 
 	bool			m_bSuppressCompletion;
 
@@ -404,8 +405,8 @@ void CPresetSlider::SetControlValues( )
 
 	CDmrElementArray< CDmElement > values = m_hSelf->GetControlValues();
 
-	int nControlValueCount = values.Count();
-	for ( int i = 0; i < nControlValueCount; ++i )
+	intp nControlValueCount = values.Count();
+	for ( intp i = 0; i < nControlValueCount; ++i )
 	{
 		CDmElement *v = values[ i ];
 
@@ -690,7 +691,7 @@ void CPresetSlider::OnShowContextMenu()
 	Menu::PlaceContextMenu( this, m_hContextMenu.Get() );
 }
 
-void CPresetSlider::UpdateTickPos( int x, int y )
+void CPresetSlider::UpdateTickPos( int x, [[maybe_unused]] int y )
 {
 	int tx, ty, tw, th;
 	GetTrackRect( tx, ty, tw, th );
@@ -889,7 +890,7 @@ void CPresetSlider::PaintBackground()
 	int cw, ch;
 	m_pName->SetColor( hasFocus ? m_TextColorFocus : m_TextColor );
 	m_pName->GetContentSize( cw, ch );
-	m_pName->SetPos( ( w - cw ) * 0.5f, ( h - ch ) * 0.5f );
+	m_pName->SetPos( ( w - cw ) / 2, ( h - ch ) / 2 );
 	m_pName->Paint();
 }
 
@@ -899,13 +900,13 @@ void CPresetSlider::PaintBackground()
 //-----------------------------------------------------------------------------
 class CSliderListPanel : public PanelListPanel
 {
-	DECLARE_CLASS_SIMPLE( CSliderListPanel, vgui::PanelListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSliderListPanel, vgui::PanelListPanel );
 
 public:
 	CSliderListPanel( CBaseAnimSetPresetFaderPanel *parent, vgui::Panel *pParent, const char *panelName );
 
-	virtual void OnMouseReleased( vgui::MouseCode code );
-	virtual void OnMousePressed( vgui::MouseCode code );
+	void OnMouseReleased( vgui::MouseCode code ) override;
+	void OnMousePressed( vgui::MouseCode code ) override;
 
 private:
 	MESSAGE_FUNC( OnShowContextMenu, "OnShowContextMenu" );
@@ -976,9 +977,9 @@ void CSliderListPanel::OnShowContextMenu()
 //-----------------------------------------------------------------------------
 CBaseAnimSetPresetFaderPanel::CBaseAnimSetPresetFaderPanel( vgui::Panel *parent, const char *className, CBaseAnimationSetEditor *editor ) :
 	BaseClass( parent, className ),
-	m_flLastFrameTime( 0.0f ),
-	m_pSliders( NULL ),
-	m_pWorkspace( NULL )
+	m_pWorkspace( NULL ),
+	m_pSliders( NULL )
+	//m_flLastFrameTime( 0.0f ),
 {
 	m_hEditor = editor;
 
@@ -1240,11 +1241,11 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 	CDmrElementArray< CDmePresetGroup > presetGroups = m_AnimSet->GetPresetGroups();
 	Assert( presetGroups.IsValid() );
 
-	int c = presetGroups.Count();
+	intp c = presetGroups.Count();
 
 	bool bNeedRebuild = false;
 	int slot = 0;
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroups[ i ];
 		Assert( pPresetGroup );
@@ -1253,8 +1254,8 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 
 		CDmrElementArray< CDmePreset > presets = pPresetGroup->GetPresets();
 
-		int cp = presets.Count();
-		for ( int j = 0; j < cp; ++j )
+		intp cp = presets.Count();
+		for ( intp j = 0; j < cp; ++j )
 		{
 			CDmePreset *pPreset = presets[ j ];
 			Assert( pPreset );
@@ -1301,8 +1302,8 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 
 			CDmrElementArray< CDmePreset > presets = pPresetGroup->GetPresets();
 
-			int cp = presets.Count();
-			for ( int j = 0; j < cp; ++j )
+			intp cp = presets.Count();
+			for ( intp j = 0; j < cp; ++j )
 			{
 				CDmePreset *pPreset = presets[ j ];
 				Assert( pPreset );
@@ -1379,8 +1380,8 @@ void CBaseAnimSetPresetFaderPanel::SetPresetFromSliders( CDmePreset *pPreset )
 	const CDmrElementArray< CDmElement > controlList = m_AnimSet->GetControls();
 
 	// Now set values for each known control
-	int numControls = controlList.Count();
-	for ( int i = 0; i < numControls; ++i )
+	intp numControls = controlList.Count();
+	for ( intp i = 0; i < numControls; ++i )
 	{
 		CDmElement *pControl = controlList[ i ];
 
@@ -1498,7 +1499,7 @@ void CBaseAnimSetPresetFaderPanel::OnDeletePreset( CDmePreset *pPreset )
 	ChangeAnimationSet( m_AnimSet );
 }
 
-void CBaseAnimSetPresetFaderPanel::ProceduralPreset_UpdateCrossfade( CDmePreset *pPreset, bool bFadeIn )
+void CBaseAnimSetPresetFaderPanel::ProceduralPreset_UpdateCrossfade( [[maybe_unused]] CDmePreset *pPreset, [[maybe_unused]] bool bFadeIn )
 {
 	// Handled by derived class in SFM
 }

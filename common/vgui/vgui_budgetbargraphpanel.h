@@ -22,8 +22,9 @@ class CBudgetBarGraphPanel : public vgui::Panel
 
 public:
 	CBudgetBarGraphPanel( CBaseBudgetPanel *pParent, const char *pPanelName );
-	~CBudgetBarGraphPanel();
-	virtual void Paint( void );
+	virtual ~CBudgetBarGraphPanel();
+
+	void Paint( void ) override;
 
 private:
 
@@ -31,9 +32,9 @@ private:
 	void DrawPeaks();
 	void DrawAverages();
 	void DrawTimeLines( void );
-	void GetBudgetGroupTopAndBottom( int id, int &top, int &bottom );
-	void DrawBarAtIndex( int id, float percent );
-	void DrawTickAtIndex( int id, float percent, int red, int green, int blue, int alpha );
+	void GetBudgetGroupTopAndBottom( intp id, int &top, int &bottom );
+	void DrawBarAtIndex( intp id, float percent );
+	void DrawTickAtIndex( intp id, float percent, int red, int green, int blue, int alpha );
 
 private:
 	

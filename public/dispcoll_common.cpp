@@ -507,7 +507,7 @@ inline void CDispCollTree::LockCache()
 			Cache();
 			m_hCache = g_DispCollTriCache.CreateResource( this );
 			g_DispCollTriCache.LockResource( m_hCache );
-			//Msg( "Adding 0x%x to cache (actual %d) [%d, %d --> %.2f] %d total, %d unique\n", this, GetCacheMemorySize(), GetTriSize(), m_aEdgePlanes.Count(), (float)m_aEdgePlanes.Count()/(float)GetTriSize(), totals, uniques );
+			//Msg( "Adding 0x%x to cache (actual %zu) [%d, %d --> %.2f] %d total, %d unique\n", this, GetCacheMemorySize(), GetTriSize(), m_aEdgePlanes.Count(), (float)m_aEdgePlanes.Count()/(float)GetTriSize(), totals, uniques );
 		}
 	}
 #else
@@ -1498,19 +1498,21 @@ static int g_nTrees;
 #endif
 CDispCollTree *DispCollTrees_Alloc( int count )
 {
-	CDispCollTree *pTrees = NULL;
 #ifdef ENGINE_DLL
-	pTrees = (CDispCollTree *)Hunk_Alloc( count * sizeof(CDispCollTree), false );
+	CDispCollTree *pTrees = Hunk_Alloc<CDispCollTree>( count, false );
+	if( !pTrees )
+		return NULL;
+
 	g_nTrees = count;
 	for ( int i = 0; i < g_nTrees; i++ )
 	{
 		Construct( pTrees + i );
 	}
 #else
-	pTrees = new CDispCollTree[count];
-#endif
+	CDispCollTree *pTrees = new CDispCollTree[count];
 	if( !pTrees )
 		return NULL;
+#endif
 
 	for ( int i = 0; i < count; i++ )
 	{

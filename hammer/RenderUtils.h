@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "mathlib/vector.h"
 
 class CRender2D;
 

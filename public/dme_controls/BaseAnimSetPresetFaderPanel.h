@@ -55,7 +55,7 @@ struct FaderPreview_t
 //-----------------------------------------------------------------------------
 class CBaseAnimSetPresetFaderPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseAnimSetPresetFaderPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAnimSetPresetFaderPanel, vgui::EditablePanel );
 public:
 	CBaseAnimSetPresetFaderPanel( vgui::Panel *parent, const char *className, CBaseAnimationSetEditor *editor );
 
@@ -72,7 +72,7 @@ public:
 	virtual void	OnOverwritePreset( CDmePreset *pPreset );
 	void	OnDeletePreset( CDmePreset *pPreset );
 
-	virtual void ApplySchemeSettings( vgui::IScheme *scheme );
+	void ApplySchemeSettings( vgui::IScheme *scheme ) override;
 
 	virtual void ProceduralPreset_UpdateCrossfade( CDmePreset *pPreset, bool bFadeIn );
 
@@ -96,7 +96,8 @@ protected:
 	vgui::TextEntry							*m_pFilter;
 	CSliderListPanel						*m_pSliders;
 	CDmeHandle< CDmeAnimationSet >			m_AnimSet;
-	float									m_flLastFrameTime;
+	// dimhotepus: Comment unused field.
+	//float									m_flLastFrameTime;
 	CUtlString								m_Filter;
 	vgui::DHANDLE< vgui::InputDialog >		m_hInputDialog;
 	vgui::DHANDLE< CAddPresetDialog >		m_hAddPresetDialog;

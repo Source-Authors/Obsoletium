@@ -96,7 +96,7 @@ UsedWeaponSlot_t g_bUsedWeaponSlots[MAX_WEAPON_SLOTS][MAX_WEAPON_POSITIONS] = {}
 static WEAPON_FILE_INFO_HANDLE FindWeaponInfoSlot( const char *name )
 {
 	// Complain about duplicately defined metaclass names...
-	unsigned short lookup = m_WeaponInfoDatabase.Find( name );
+	auto lookup = m_WeaponInfoDatabase.Find( name );
 	if ( lookup != m_WeaponInfoDatabase.InvalidIndex() )
 	{
 		return lookup;
@@ -155,7 +155,7 @@ void PrecacheFileWeaponInfoDatabase( IFileSystem *pFilesystem, const unsigned ch
 	if ( m_WeaponInfoDatabase.Count() )
 		return;
 
-	KeyValues::AutoDelete manifest = KeyValues::AutoDelete("weaponscripts");
+	KeyValuesAD manifest("weaponscripts");
 	if ( manifest->LoadFromFile( pFilesystem, "scripts/weapon_manifest.txt", "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL ; sub = sub->GetNextKey() )
@@ -163,7 +163,7 @@ void PrecacheFileWeaponInfoDatabase( IFileSystem *pFilesystem, const unsigned ch
 			if ( !Q_stricmp( sub->GetName(), "file" ) )
 			{
 				char fileBase[512];
-				Q_FileBase( sub->GetString(), fileBase, sizeof(fileBase) );
+				V_FileBase( sub->GetString(), fileBase );
 				WEAPON_FILE_INFO_HANDLE tmp;
 #ifdef CLIENT_DLL
 				if ( ReadWeaponDataFromFileForSlot( pFilesystem, fileBase, &tmp, pICEKey ) )
@@ -240,9 +240,6 @@ KeyValues* ReadEncryptedKVFile( IFileSystem *pFilesystem, const char *szFilename
 			pKV->deleteThis();
 			return NULL;
 		}
-#else
-		pKV->deleteThis();
-		return NULL;
 #endif
 	}
 
@@ -274,7 +271,7 @@ bool ReadWeaponDataFromFileForSlot( IFileSystem* pFilesystem, const char *szWeap
 	char sz[128];
 	Q_snprintf( sz, sizeof( sz ), "scripts/%s", szWeaponName );
 
-	KeyValues::AutoDelete pKV = KeyValues::AutoDelete{ReadEncryptedKVFile( pFilesystem, sz, pICEKey,
+	KeyValuesAD pKV = KeyValuesAD{ReadEncryptedKVFile( pFilesystem, sz, pICEKey,
 #if defined( DOD_DLL )
 		true			// Only read .ctx files!
 #else

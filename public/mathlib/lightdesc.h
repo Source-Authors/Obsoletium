@@ -99,12 +99,12 @@ public:
 
 	/// given a direction relative to the light source position, is this ray within the
 	/// light cone (for spotlights..non spots consider all rays to be within their cone)
-	bool IsDirectionWithinLightCone(const Vector &rdir) const
+	[[nodiscard]] bool IsDirectionWithinLightCone(const Vector &rdir) const
 	{
 		return ((m_Type!=MATERIAL_LIGHT_SPOT) || (rdir.Dot(m_Direction)>=m_PhiDot));
 	}
 
-	float OneOverThetaDotMinusPhiDot() const
+	[[nodiscard]] float OneOverThetaDotMinusPhiDot() const
 	{
 		return OneOver_ThetaDot_Minus_PhiDot;
 	}

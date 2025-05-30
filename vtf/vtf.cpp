@@ -15,7 +15,7 @@
 #include "mathlib/vector.h"
 #include "mathlib/mathlib.h"
 #include "s3tc_decode.h"
-#include "vprof_telemetry.h"
+#include "tier0/vprof_telemetry.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -219,7 +219,7 @@ unsigned short VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
 		case 2:
 			return sizeof( VTFFileHeaderV7_2_t );
 		case 3:
-			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
+			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES; //-V119
 		case VTF_MINOR_VERSION:
 		// dimhotepus: CS-GO backport.
 		case 5:
@@ -231,7 +231,7 @@ unsigned short VTFFileHeaderSize( int nMajorVersion, int nMinorVersion )
 		break;
 	
 	case VTF_X360_MAJOR_VERSION:
-		return sizeof( VTFFileHeaderX360_t ) + sizeof( ResourceEntryInfo ) * MAX_X360_RSRC_DICTIONARY_ENTRIES;
+		return sizeof( VTFFileHeaderX360_t ) + sizeof( ResourceEntryInfo ) * MAX_X360_RSRC_DICTIONARY_ENTRIES; //-V119
 	}
 
 	return 0;
@@ -804,7 +804,7 @@ void *CVTFTexture::SetResourceData( uint32 eType, void const *pData, size_t nNum
 	}
 }
 
-void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) const
+const void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) const
 {
 	Assert( ( eType & RSRCF_MASK ) == 0 );
 	eType &= ~RSRCF_MASK;
@@ -822,22 +822,18 @@ void *CVTFTexture::GetResourceData( uint32 eType, size_t *pDataSize ) const
 			}
 			return rms.m_pData;
 		}
-		else
-		{
-			if ( pDataSize )
-			{
-				*pDataSize = sizeof( pInfo->resData );
-			}
-			return (void *)&pInfo->resData;
-		}
-	}
-	else
-	{
+
 		if ( pDataSize )
-			*pDataSize = 0;
+		{
+			*pDataSize = sizeof( pInfo->resData );
+		}
+		return &pInfo->resData;
 	}
 
-	return NULL;
+	if ( pDataSize )
+		*pDataSize = 0;
+
+	return nullptr;
 }
 
 bool CVTFTexture::HasResourceEntry( uint32 eType ) const
@@ -865,7 +861,7 @@ bool CVTFTexture::ResourceMemorySection::LoadData( CUtlBuffer &buf, CByteswap &b
 {
 	// Read the size
 	int iDataSize = 0;
-	buf.Get( &iDataSize, sizeof( iDataSize ) );
+	buf.Get( iDataSize );
 	byteSwap.SwapBufferToTargetEndian( &iDataSize );
 
 	// Read the actual data
@@ -898,7 +894,7 @@ bool CVTFTexture::ResourceMemorySection::WriteData( CUtlBuffer &buf ) const
 //-----------------------------------------------------------------------------
 bool CVTFTexture::SetupByteSwap( CUtlBuffer &buf )
 {
-	VTFFileBaseHeader_t *header = (VTFFileBaseHeader_t*)buf.PeekGet();
+	const VTFFileBaseHeader_t *header = (const VTFFileBaseHeader_t*)buf.PeekGet();
 
 	if ( header->version[0] == SwapLong( VTF_MAJOR_VERSION ) )
 	{
@@ -930,7 +926,7 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 		#if defined( _X360 ) || defined (POSIX)
 			// read 15 dummy bytes to be properly positioned with 7.2 PC data
 			byte dummy[15];
-			buf.Get( dummy, 15 );
+			buf.Get( dummy );
 		#endif
 	}
 	else if ( header.version[1] == 1 || header.version[1] == 0 )
@@ -941,7 +937,7 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 		#if defined( _X360 ) || defined (POSIX)
 			// read a dummy byte to be properly positioned with 7.0/1 PC data
 			byte dummy;
-			buf.Get( &dummy, 1 );
+			buf.Get( dummy );
 		#endif
 	}
 	else
@@ -1122,19 +1118,6 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 		buf.Get( m_arrResourcesInfo.Base(), m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ) );
 		if ( !buf.IsValid() )
 			return false;
-
-		if ( IsX360() )
-		{
-			// Byte-swap the dictionary data offsets
-			for ( intp k = 0; k < m_arrResourcesInfo.Count(); ++ k )
-			{
-				ResourceEntryInfo &rei = m_arrResourcesInfo[k];
-				if ( ( rei.eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
-				{
-					m_Swap.SwapBufferToTargetEndian( &rei.resData );
-				}
-			}
-		}
 	}
 	else
 	{
@@ -1389,10 +1372,10 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 
 	VTFFileHeader_t header;
 	memset( &header, 0, sizeof( header ) );
-	Q_strncpy( header.fileTypeString, "VTF", 4 );
+	V_strcpy_safe( header.fileTypeString, "VTF" );
 	header.version[0] = VTF_MAJOR_VERSION;
 	header.version[1] = VTF_MINOR_VERSION;
-	size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo );
+	const size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ); //-V119
 	Assert(headerSize <= std::numeric_limits<unsigned>::max());
 	header.headerSize = static_cast<unsigned>(headerSize);
 
@@ -2388,7 +2371,7 @@ void CVTFTexture::GenerateHemisphereMap( unsigned char *pSphereMapBitsRGBA, int 
 //-----------------------------------------------------------------------------
 static void FixCubeMapFacing( unsigned char* pImage, int cubeFaceID, int size, ImageFormat fmt )
 {
-	int retVal;	
+	[[maybe_unused]] int retVal;
 	switch( cubeFaceID )
 	{
 	case CUBEMAP_FACE_RIGHT:	// +x
@@ -2620,20 +2603,18 @@ void CVTFTexture::GenerateMipmaps()
 		{
 			for ( int iFace = 0; iFace < m_nFaceCount; ++iFace )
 			{
-				unsigned char *pSrcLevel = ImageData( iFrame, iFace, nSrcMipLevel );
 				unsigned char *pDstLevel = ImageData( iFrame, iFace, iMipLevel );
 
-				info.m_pSrc = pSrcLevel;
+				info.m_pSrc = ImageData( iFrame, iFace, nSrcMipLevel );
 				info.m_pDest = pDstLevel;
+
 				ComputeMipLevelDimensions( nSrcMipLevel, &info.m_nSrcWidth, &info.m_nSrcHeight, &info.m_nSrcDepth );
-				if( m_Format == IMAGE_FORMAT_RGB323232F )
-				{
-					ImageLoader::ResampleRGB323232F( info );
-				}
-				else
-				{
-					ImageLoader::ResampleRGBA8888( info );
-				}
+
+				[[maybe_unused]] const bool ok = m_Format == IMAGE_FORMAT_RGB323232F
+					? ImageLoader::ResampleRGB323232F( info )
+					: ImageLoader::ResampleRGBA8888( info );
+				AssertMsg(ok, "Unable to resample image of format 0x%x.", m_Format);
+				if (!ok) Warning("Unable to resample image of format 0x%x.", m_Format);
 				if ( Flags() & TEXTUREFLAGS_NORMAL )
 				{
 					ImageLoader::NormalizeNormalMapRGBA8888( pDstLevel, info.m_nDestWidth * info.m_nDestHeight * info.m_nDestDepth );
@@ -2681,8 +2662,6 @@ void CVTFTexture::ComputeReflectivity( )
 		return;
 	}
 
-	Assert( m_Format == IMAGE_FORMAT_RGBA8888 );
-
 	int divisor = 0;
 	m_vecReflectivity.Init( 0.0f, 0.0f, 0.0f );
 	for( int iFrame = 0; iFrame < m_nFrameCount; ++iFrame )
@@ -2694,7 +2673,7 @@ void CVTFTexture::ComputeReflectivity( )
 			int nNumPixels = m_nWidth * m_nHeight * m_nDepth;
 
 			VectorClear( vecFaceReflect );
-			for (int i = 0; i < nNumPixels; ++i, pSrc += 4 )
+			for (int i = 0; i < nNumPixels; ++i, pSrc += 4 ) //-V112
 			{
 				vecFaceReflect[0] += TextureToLinear( pSrc[0] );
 				vecFaceReflect[1] += TextureToLinear( pSrc[1] );
@@ -2722,7 +2701,6 @@ void CVTFTexture::ComputeAlphaFlags()
 		m_Options.flags0 &= ~( VtfProcessingOptions::OPT_MIP_ALPHATEST );
 		return;
 	}
-	Assert( m_Format == IMAGE_FORMAT_RGBA8888 );
 
 	m_nFlags &= ~(TEXTUREFLAGS_EIGHTBITALPHA | TEXTUREFLAGS_ONEBITALPHA);
 	
@@ -2843,11 +2821,11 @@ bool CVTFTexture::ConstructLowResImage()
 	{
 		return true;
 	}
-	Assert( m_Format == IMAGE_FORMAT_RGBA8888 );
+
 	Assert( m_pLowResImageData );
 
 	CUtlMemory<unsigned char> lowResSizeImage;
-	lowResSizeImage.EnsureCapacity( m_nLowResImageWidth * m_nLowResImageHeight * 4 );
+	lowResSizeImage.EnsureCapacity( m_nLowResImageWidth * m_nLowResImageHeight * 4 ); //-V112
 
 	ImageLoader::ResampleInfo_t info;
 	info.m_pSrc = ImageData(0, 0, 0);
@@ -2917,17 +2895,17 @@ void CVTFTexture::SetupTextureEdgeIncrements(
 {
 	// Figure out the coordinates of the verts we're blending.
 	SetupFaceVert( iMipLevel, iFace1Edge, incs->iFace1Start );
-	SetupFaceVert( iMipLevel, (iFace1Edge+1)%4, incs->iFace1End );
+	SetupFaceVert( iMipLevel, (iFace1Edge+1)%4, incs->iFace1End ); //-V112
 
 	if ( bFlipFace2Edge )
 	{
-		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2Start );
+		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2Start ); //-V112
 		SetupFaceVert( iMipLevel, iFace2Edge, incs->iFace2End );
 	}
 	else
 	{
 		SetupFaceVert( iMipLevel, iFace2Edge, incs->iFace2Start );
-		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2End );
+		SetupFaceVert( iMipLevel, (iFace2Edge+1)%4, incs->iFace2End ); //-V112
 	}
 
 	// Figure out the increments from start to end.
@@ -3080,7 +3058,7 @@ void CVTFTexture::BuildCubeMapMatchLists(
 	int nTotalEdgesMatched = 0;
 	for ( int iFace = 0; iFace < 6; iFace++ )
 	{
-		for ( int iEdge=0; iEdge < 4; iEdge++ )
+		for ( int iEdge=0; iEdge < 4; iEdge++ ) //-V112
 		{
 			int i1 = faceVertsList[iFace][iEdge];
 			int i2 = faceVertsList[iFace][(iEdge+1)%4];

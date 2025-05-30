@@ -5,18 +5,19 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/cvartogglecheckbutton.h>
+
 #include "tier1/KeyValues.h"
 
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
-#include <vgui_controls/cvartogglecheckbutton.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 using namespace vgui;
 
-vgui::Panel *Create_CvarToggleCheckButton()
+static vgui::Panel *Create_CvarToggleCheckButton()
 {
 	return new CvarToggleCheckButton< ConVarRef >( NULL, NULL );
 }

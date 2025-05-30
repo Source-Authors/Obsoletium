@@ -91,12 +91,12 @@ const CUtlVector< DmElementHandle_t > &CDmeDag::GetChildren() const
 	return m_Children.Get();
 }
 
-int CDmeDag::GetChildCount() const
+intp CDmeDag::GetChildCount() const
 {
 	return m_Children.Count();
 }
 
-CDmeDag *CDmeDag::GetChild( int i ) const
+CDmeDag *CDmeDag::GetChild( intp i ) const
 {
 	if ( i < 0 || i >= m_Children.Count() )
 		return NULL;
@@ -109,37 +109,37 @@ void CDmeDag::AddChild( CDmeDag* pDag )
 	m_Children.AddToTail( pDag );
 }
 
-void CDmeDag::RemoveChild( int i )
+void CDmeDag::RemoveChild( intp i )
 {
 	m_Children.FastRemove( i );
 }
 
 void CDmeDag::RemoveChild( const CDmeDag *pChild, bool bRecurse )
 {
-	int i = FindChild( pChild );
+	intp i = FindChild( pChild );
 	if ( i >= 0 )
 	{
 		RemoveChild( i );
 	}
 }
 
-int CDmeDag::FindChild( const CDmeDag *pChild ) const
+intp CDmeDag::FindChild( const CDmeDag *pChild ) const
 {
 	return m_Children.Find( pChild->GetHandle() );
 }
 
 // recursive
-int CDmeDag::FindChild( CDmeDag *&pParent, const CDmeDag *pChild )
+intp CDmeDag::FindChild( CDmeDag *&pParent, const CDmeDag *pChild )
 {
-	int index = FindChild( pChild );
+	intp index = FindChild( pChild );
 	if ( index >= 0 )
 	{
 		pParent = this;
 		return index;
 	}
 
-	int nChildren = m_Children.Count();
-	for ( int ci = 0; ci < nChildren; ++ci )
+	intp nChildren = m_Children.Count();
+	for ( intp ci = 0; ci < nChildren; ++ci )
 	{
 		index = m_Children[ ci ]->FindChild( pParent, pChild );
 		if ( index >= 0 )
@@ -150,10 +150,10 @@ int CDmeDag::FindChild( CDmeDag *&pParent, const CDmeDag *pChild )
 	return -1;
 }
 
-int CDmeDag::FindChild( const char *name ) const
+intp CDmeDag::FindChild( const char *name ) const
 {
-	int nChildren = m_Children.Count();
-	for ( int ci = 0; ci < nChildren; ++ci )
+	intp nChildren = m_Children.Count();
+	for ( intp ci = 0; ci < nChildren; ++ci )
 	{
 		if ( V_strcmp( m_Children[ ci ]->GetName(), name ) == 0 )
 			return ci;
@@ -163,7 +163,7 @@ int CDmeDag::FindChild( const char *name ) const
 
 CDmeDag *CDmeDag::FindOrAddChild( const char *name )
 {
-	int i = FindChild( name );
+	intp i = FindChild( name );
 	if ( i >= 0 )
 		return GetChild( i );
 
@@ -178,7 +178,7 @@ CDmeDag *CDmeDag::FindOrAddChild( const char *name )
 //-----------------------------------------------------------------------------
 void CDmeDag::PushDagTransform()
 {
-	int i = s_TransformStack.Push();
+	intp i = s_TransformStack.Push();
 	TransformInfo_t &info = s_TransformStack[i];
 	info.m_pTransform = GetTransform();
 	info.m_bComputedDagToWorld = false;
@@ -216,7 +216,7 @@ void CDmeDag::EngineToDmeMatrix( matrix3x4_t& engineToDme )
 
 void CDmeDag::GetShapeToWorldTransform( matrix3x4_t &mat )
 {
-	int nCount = s_TransformStack.Count();
+	intp nCount = s_TransformStack.Count();
 	if ( nCount == 0 )
 	{
 		if ( !s_bDrawUsingEngineCoordinates )
@@ -237,7 +237,7 @@ void CDmeDag::GetShapeToWorldTransform( matrix3x4_t &mat )
 	}
 
 	// Compute all uncomputed dag to worls
-	int i;
+	intp i;
 	for ( i = 0; i < nCount; ++i )
 	{
 		TransformInfo_t &info = s_TransformStack[i];
@@ -361,8 +361,8 @@ void CDmeDag::Draw( CDmeDrawSettings *pDrawSettings )
 		pShape->Draw( shapeToWorld, pDrawSettings );
 	}
 
-	uint cn = m_Children.Count();
-	for ( uint ci = 0; ci < cn; ++ci )
+	intp cn = m_Children.Count();
+	for ( intp ci = 0; ci < cn; ++ci )
 	{
 		m_Children[ ci ]->Draw( pDrawSettings );
 	}
@@ -394,7 +394,7 @@ void CDmeDag::GetBoundingSphere( Vector &c0, float &r0, const matrix3x4_t &pMat 
 	Vector vTemp;
 	VectorTransform( c0, pMat, vTemp );
 
-	const int nChildren = m_Children.Count();
+	const intp nChildren = m_Children.Count();
 	if ( nChildren > 0 )
 	{
 		Vector c1;	// Child center
@@ -403,7 +403,7 @@ void CDmeDag::GetBoundingSphere( Vector &c0, float &r0, const matrix3x4_t &pMat 
 		Vector v01;	// c1 - c0
 		float l01;	// |v01|
 
-		for ( int i = 0; i < nChildren; ++i )
+		for ( intp i = 0; i < nChildren; ++i )
 		{
 			m_Children[ i ]->GetBoundingSphere( c1, r1, wMat );
 

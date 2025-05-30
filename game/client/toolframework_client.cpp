@@ -208,7 +208,7 @@ CRecordEffectOwner::CRecordEffectOwner( C_BaseEntity *pEntity, bool bIsViewModel
 	m_bToolsEnabled = ToolsEnabled() && clienttools->IsInRecordingMode();
 	if ( m_bToolsEnabled )
 	{
-		KeyValues::AutoDelete msg = KeyValues::AutoDelete( "EffectsOwner" );
+		KeyValuesAD msg( "EffectsOwner" );
 		msg->SetInt( "viewModel", bIsViewModel );
 		ToolFramework_PostToolMessage( pEntity ? pEntity->GetToolHandle() : HTOOLHANDLE_INVALID, msg );
 	}
@@ -218,7 +218,7 @@ CRecordEffectOwner::~CRecordEffectOwner()
 {
 	if ( m_bToolsEnabled )
 	{
-		KeyValues::AutoDelete msg = KeyValues::AutoDelete("EffectsOwner");
+		KeyValuesAD msg("EffectsOwner");
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 	}
 }
@@ -259,7 +259,7 @@ void ToolFramework_RecordMaterialParams( IMaterial *pMaterial )
 	if ( !pEnt || !pEnt->IsToolRecording() )
 		return;
 
-	KeyValues *msg = new KeyValues( "material_proxy_state" );
+	KeyValuesAD msg( "material_proxy_state" );
 	msg->SetString( "mtlName", pMaterial->GetName() );
 	msg->SetString( "groupName", pMaterial->GetTextureGroupName() );
 
@@ -349,6 +349,4 @@ void ToolFramework_RecordMaterialParams( IMaterial *pMaterial )
 
 	Assert( pEnt->GetToolHandle() );
 	ToolFramework_PostToolMessage( pEnt->GetToolHandle(), msg );
-
-	msg->deleteThis();
 }

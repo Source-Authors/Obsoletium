@@ -371,8 +371,7 @@ CWebAPIResponse::CWebAPIResponse()
 //-----------------------------------------------------------------------------
 CWebAPIResponse::~CWebAPIResponse()
 {
-	if ( m_pValues)
-		delete m_pValues;
+	delete m_pValues;
 	m_pValues = NULL;
 }
 
@@ -529,9 +528,7 @@ bool CWebAPIResponse::BEmitParameterEncoding( CUtlBuffer &outputBuffer )
 //-----------------------------------------------------------------------------
 void CWebAPIResponse::Clear()
 {
-	if ( m_pValues )
-		delete m_pValues;
-
+	delete m_pValues;
 	m_pValues = NULL;
 }
 
@@ -690,7 +687,8 @@ void CWebAPIValues::SetName( const char * pchName )
 		while ( pchName[unLen] != 0 )
 		{
 			if ( pchName[unLen] == '\'' || pchName[unLen] == '"' || pchName[unLen] == '&'
-				|| pchName[unLen] == '>' || pchName[unLen] == '>' || pchName[unLen] == ':' )
+				// dimhotepus: Correclt handle <
+				|| pchName[unLen] == '<' || pchName[unLen] == '>' || pchName[unLen] == ':' )
 			{
 				AssertMsg( false, "Shouldn't use any of '\"&<>: in CWebAPIValues node names, you used %s", pchName );
 				break;
@@ -1116,9 +1114,9 @@ CWebAPIValues *CWebAPIValues::FindOrCreateChildObject( const char *pchName )
 //-----------------------------------------------------------------------------
 CWebAPIValues * CWebAPIValues::AddChildObjectToArray()
 {
+	AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 	if ( m_eValueType != k_EWebAPIValueType_NumericArray )
 	{
-		AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 		return NULL;
 	}
 
@@ -1132,9 +1130,9 @@ CWebAPIValues * CWebAPIValues::AddChildObjectToArray()
 //-----------------------------------------------------------------------------
 CWebAPIValues * CWebAPIValues::AddChildArrayToArray( const char * pchArrayElementNames )
 {
+	AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 	if ( m_eValueType != k_EWebAPIValueType_NumericArray )
 	{
-		AssertMsg( m_eValueType == k_EWebAPIValueType_NumericArray, "Can't add array elements to CWebAPIVAlues unless type is of numeric array." );
 		return NULL;
 	}
 

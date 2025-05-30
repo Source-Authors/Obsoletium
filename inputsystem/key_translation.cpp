@@ -6,13 +6,10 @@
 
 
 #if defined( WIN32 ) 
-#if !defined( _X360 )
+#define NOMINMAX
 #include <wtypes.h>
 #include <winuser.h>
 #include "xbox/xboxstubs.h"
-#else
-#include "xbox/xbox_win32stubs.h"
-#endif
 #endif // WIN32
 
 #include "key_translation.h"
@@ -598,7 +595,7 @@ void ButtonCode_InitKeyTranslationTable()
 	// create reverse table engine to virtual
 	for ( int i = 0; i < ssize( s_pVirtualKeyToButtonCode ); i++ )
 	{
-		s_pButtonCodeToVirtual[ s_pVirtualKeyToButtonCode[i] ] = i;
+		s_pButtonCodeToVirtual[ to_underlying(s_pVirtualKeyToButtonCode[i]) ] = i;
 	}
 
 	s_pButtonCodeToVirtual[0] = 0;
@@ -663,7 +660,7 @@ ButtonCode_t ButtonCode_VirtualKeyToButtonCode( int keyCode )
 
 int ButtonCode_ButtonCodeToVirtualKey( ButtonCode_t code )
 {
-	return s_pButtonCodeToVirtual[code];
+	return s_pButtonCodeToVirtual[to_underlying(code)];
 }
 
 ButtonCode_t ButtonCode_XKeyToButtonCode( int nPort, int keyCode )
@@ -678,19 +675,19 @@ ButtonCode_t ButtonCode_XKeyToButtonCode( int nPort, int keyCode )
 	ButtonCode_t code = s_pXKeyTrans[keyCode];
 	if ( IsJoystickButtonCode( code ) )
 	{
-		int nOffset = code - JOYSTICK_FIRST_BUTTON;
+		auto nOffset = to_underlying(code) - to_underlying(JOYSTICK_FIRST_BUTTON);
 		return JOYSTICK_BUTTON( nPort, nOffset );
 	}
 	
 	if ( IsJoystickPOVCode( code ) )
 	{
-		int nOffset = code - JOYSTICK_FIRST_POV_BUTTON;
+		auto nOffset = to_underlying(code) - JOYSTICK_FIRST_POV_BUTTON;
 		return JOYSTICK_POV_BUTTON( nPort, nOffset );
 	}
 	
 	if ( IsJoystickAxisCode( code ) )
 	{
-		int nOffset = code - JOYSTICK_FIRST_AXIS_BUTTON;
+		auto nOffset = to_underlying(code) - JOYSTICK_FIRST_AXIS_BUTTON;
 		return JOYSTICK_AXIS_BUTTON( nPort, nOffset );
 	}
 
@@ -704,16 +701,18 @@ ButtonCode_t ButtonCode_XKeyToButtonCode( int nPort, int keyCode )
 const char *ButtonCode_ButtonCodeToString( ButtonCode_t code, bool bXController )
 {
 #if !defined ( _X360 )
-	if ( bXController && code >= JOYSTICK_FIRST_BUTTON && code <= JOYSTICK_LAST_AXIS_BUTTON )
-		return s_pXControllerButtonCodeNames[ code - JOYSTICK_FIRST_BUTTON ];
+	if ( bXController &&
+		to_underlying(code) >= to_underlying(JOYSTICK_FIRST_BUTTON) &&
+		to_underlying(code) <= to_underlying(JOYSTICK_LAST_AXIS_BUTTON) )
+		return s_pXControllerButtonCodeNames[ to_underlying(code) - to_underlying(JOYSTICK_FIRST_BUTTON) ];
 #endif
 
-	return s_pButtonCodeName[ code ];
+	return s_pButtonCodeName[ to_underlying(code) ];
 }
 
 const char *AnalogCode_AnalogCodeToString( AnalogCode_t code )
 {
-	return s_pAnalogCodeName[ code ];
+	return s_pAnalogCodeName[ to_underlying(code) ];
 }
 
 ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXController )
@@ -735,7 +734,7 @@ ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXControll
 	for ( int i = 0; i < BUTTON_CODE_LAST; ++i )
 	{
 		if ( !Q_stricmp( s_pButtonCodeName[i], pString ) )
-			return (ButtonCode_t)i;
+			return static_cast<ButtonCode_t>(i);
 	}
 
 #if !defined ( _X360 )
@@ -744,7 +743,7 @@ ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXControll
 		for ( int i = 0; i < ssize(s_pXControllerButtonCodeNames); ++i )
 		{
 			if ( !Q_stricmp( s_pXControllerButtonCodeNames[i], pString ) )
-				return (ButtonCode_t)(JOYSTICK_FIRST_BUTTON + i);
+				return static_cast<ButtonCode_t>(JOYSTICK_FIRST_BUTTON + i);
 		}
 	}
 #endif
@@ -770,13 +769,13 @@ ButtonCode_t ButtonCode_SKeyToButtonCode( int nPort, int keyCode )
 
 	if ( IsSteamControllerButtonCode( code ) )
 	{
-		int nOffset = code - STEAMCONTROLLER_FIRST_BUTTON;
+		auto nOffset = to_underlying(code) - STEAMCONTROLLER_FIRST_BUTTON;
 		return STEAMCONTROLLER_BUTTON( nPort, nOffset );
 	}
 
 	if ( IsSteamControllerAxisCode( code ) )
 	{
-		int nOffset = code - STEAMCONTROLLER_FIRST_AXIS_BUTTON;
+		auto nOffset = to_underlying(code) - STEAMCONTROLLER_FIRST_AXIS_BUTTON;
 		return STEAMCONTROLLER_AXIS_BUTTON( nPort, nOffset );
 	}
 
@@ -794,7 +793,7 @@ AnalogCode_t AnalogCode_StringToAnalogCode( const char *pString )
 	for ( int i = 0; i < ANALOG_CODE_LAST; ++i )
 	{
 		if ( !Q_stricmp( s_pAnalogCodeName[i], pString ) )
-			return (AnalogCode_t)i;
+			return static_cast<AnalogCode_t>(i);
 	}
 
 	return ANALOG_CODE_INVALID;

@@ -173,10 +173,10 @@ public:
 			return;
 		}
 
-		KeyValues::AutoDelete kv = KeyValues::AutoDelete("LI");
+		KeyValuesAD kv("LI");
 		kv->SetString( "File", songInfo->shortname.String() );
 		char fn[ 512 ];
-		if ( g_pFullFileSystem->String( songInfo->filename, fn, sizeof( fn ) ) )
+		if ( g_pFullFileSystem->String( songInfo->filename, fn ) )
 		{
 			char artist[ 256 ];
 			char album[ 256 ];
@@ -322,10 +322,10 @@ public:
 			return;
 		}
 
-		KeyValues::AutoDelete kv = KeyValues::AutoDelete("LI");
+		KeyValuesAD kv("LI");
 		kv->SetString( "File", songInfo->shortname.String() );
 		char fn[ 512 ];
-		if ( g_pFullFileSystem->String( songInfo->filename, fn, sizeof( fn ) ) )
+		if ( g_pFullFileSystem->String( songInfo->filename, fn ) )
 		{
 			char artist[ 256 ];
 			char album[ 256 ];
@@ -898,7 +898,7 @@ void CMP3Player::OnRefresh()
 	for ( intp i = 0; i < pcount; ++i )
 	{
 		char fn[ 512 ];
-		if ( g_pFullFileSystem->String( m_PlayListFiles[ i ], fn, sizeof( fn ) ) )
+		if ( g_pFullFileSystem->String( m_PlayListFiles[ i ], fn ) )
 		{
 			// Find index for song
 			intp songIndex = FindSong( fn );
@@ -1182,8 +1182,8 @@ intp CMP3Player::AddSong( char const *relative, intp dirnum )
 		f.filename = g_pFullFileSystem->FindOrAddFileName( relative );
 
 		char shortname[ 256 ];
-		Q_FileBase( relative, shortname, sizeof( shortname ) );
-		Q_SetExtension( shortname, ".mp3", sizeof( shortname ) );
+		V_FileBase( relative, shortname );
+		V_SetExtension( shortname, ".mp3" );
 		f.shortname = shortname;
 		f.flags = ( dirnum == 0 ) ? MP3File_t::FLAG_FROMGAME : MP3File_t::FLAG_FROMFS;
 		f.dirnum = dirnum;
@@ -1195,7 +1195,7 @@ intp CMP3Player::AddSong( char const *relative, intp dirnum )
 	return songIndex;
 }
 
-void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
+void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, intp parentIndex )
 {
 	if ( !current )
 	{
@@ -1209,11 +1209,11 @@ void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
 		MP3Dir_t *sub = current->m_Subdirectories[ i ];
 		Assert( sub );
 		
-		KeyValues *kv = new KeyValues( "TVI" );
+		KeyValuesAD kv( "TVI" );
 		kv->SetString( "Text", sub->m_DirName.String() );
 		kv->SetPtr( "MP3Dir", sub );
 
-		int index = m_pTree->AddItem( kv, parentIndex );
+		intp index = m_pTree->AddItem( kv, parentIndex );
 		m_pTree->SetItemFgColor( index, TREE_TEXT_COLOR );
 
 		// Recurse...
@@ -1226,12 +1226,12 @@ void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, int parentIndex )
 	{
 		MP3File_t *song = &m_Files[ current->m_FilesInDirectory[ i ] ];
 
-		KeyValues *kv = new KeyValues( "TVI" );
+		KeyValuesAD kv( "TVI" );
 
 		kv->SetString( "Text", song->shortname.String() );
 		kv->SetInt( "SongIndex", current->m_FilesInDirectory[ i ] );
 
-		int index = m_pTree->AddItem( kv, parentIndex );
+		intp index = m_pTree->AddItem( kv, parentIndex );
 		m_pTree->SetItemFgColor( index, TREE_TEXT_COLOR );
 	}
 }
@@ -1246,10 +1246,10 @@ void CMP3Player::PopulateTree()
 	m_pTree->RemoveAll();
 
 	// Now populate tree
-	KeyValues *kv = new KeyValues( "TVI" );
+	KeyValuesAD kv( "TVI" );
 	kv->SetString( "Text", "Songs" );
 
-	int rootIndex = m_pTree->AddItem( kv, -1 );
+	intp rootIndex = m_pTree->AddItem( kv, -1 );
 	m_pTree->SetItemFgColor( rootIndex, TREE_TEXT_COLOR );
 
 	intp dircount = m_SoundDirectories.Count();
@@ -1261,10 +1261,10 @@ void CMP3Player::PopulateTree()
 
 		char const *dirname = tree->m_DirName.String();
 
-		kv = new KeyValues( "TVI" );
-		kv->SetString( "Text", dirname );
+		KeyValuesAD kv2( "TVI" );
+		kv2->SetString( "Text", dirname );
 
-		int index = m_pTree->AddItem( kv, rootIndex );
+		intp index = m_pTree->AddItem( kv, rootIndex );
 
 		RecursiveAddToTree( tree, index );
 
@@ -1286,7 +1286,7 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 {
 	outsong[ 0 ] = 0;
 	char fn[ 512 ];
-	if ( !g_pFullFileSystem->String( f.filename, fn, sizeof( fn ) ) )
+	if ( !g_pFullFileSystem->String( f.filename, fn ) )
 	{
 		return;
 	}
@@ -1301,14 +1301,14 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 	// Get temp filename from crc
 	CRC32_t crc;
 	CRC32_Init( &crc );
-	CRC32_ProcessBuffer( &crc, fn, static_cast<int>(V_strlen( fn )) );
+	CRC32_ProcessBuffer( &crc, fn, V_strlen( fn ) );
 	CRC32_Final( &crc );
 
 	char hexname[ 16 ];
-	Q_binarytohex( (const byte *)&crc, sizeof( crc ), hexname, sizeof( hexname ) );
+	V_binarytohex( crc, hexname );
 
 	char hexfilename[ 512 ];
-	Q_snprintf( hexfilename, sizeof( hexfilename ), "sound/_mp3/%s.mp3", hexname );
+	V_sprintf_safe( hexfilename, "sound/_mp3/%s.mp3", hexname );
 
 	Q_FixSlashes( hexfilename );
 
@@ -1368,7 +1368,7 @@ void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ )
 	}
 	else
 	{
-		if ( !g_pFullFileSystem->String( song.playbackfilename, soundname, sizeof( soundname ) ) )
+		if ( !g_pFullFileSystem->String( song.playbackfilename, soundname ) )
 		{
 			return;
 		}
@@ -1846,7 +1846,7 @@ void CMP3Player::RestoreDirectory( KeyValues *dir, SoundDirectory_t *sd )
 					if ( songIndex >= 0 && songIndex < m_Files.Count() )
 					{
 						char fn[ 512 ];
-						if ( g_pFullFileSystem->String( m_Files[ songIndex ].filename, fn, sizeof( fn ) ) )
+						if ( g_pFullFileSystem->String( m_Files[ songIndex ].filename, fn ) )
 						{
 							AddFileToDirectoryTree( sd, fn );
 						}
@@ -1881,7 +1881,7 @@ void CMP3Player::RestoreDirectories( KeyValues *dirs )
 
 bool CMP3Player::RestoreDb( char const *filename )
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "db" );
+	KeyValuesAD kv( "db" );
 	Assert( kv );
 	if ( !kv->LoadFromFile( g_pFullFileSystem, filename, "MOD" ) )
 	{
@@ -1901,12 +1901,12 @@ bool CMP3Player::RestoreDb( char const *filename )
 	return true;
 }
 
-void bpr( int level, CUtlBuffer& buf, char const *fmt, ... )
+static void bpr( int level, CUtlBuffer& buf, PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	char txt[ 4096 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( txt, sizeof( txt ) - 1, fmt, argptr );
+	V_vsprintf_safe( txt, fmt, argptr );
 	va_end( argptr );
 
 	int indent = 2;
@@ -1933,11 +1933,11 @@ void CMP3Player::SaveDbFile( int level, CUtlBuffer& buf, MP3File_t *file, intp f
 		bpr( level + 1, buf, "fromfs 1\n" );
 	}
 
-	bpr( level + 1, buf, "subdirindex %i\n", file->dirnum );
+	bpr( level + 1, buf, "subdirindex %zd\n", file->dirnum );
 
 	bpr( level + 1, buf, "short \"%s\"\n", file->shortname.String() );
 	char fn[ 512 ];
-	if ( g_pFullFileSystem->String( file->filename, fn, sizeof( fn ) ) )
+	if ( g_pFullFileSystem->String( file->filename, fn ) )
 	{
 		bpr( level + 1, buf, "filename \"%s\"\n", fn );
 	}
@@ -1991,7 +1991,7 @@ void CMP3Player::SaveDbDirectory( int level, CUtlBuffer& buf, SoundDirectory_t *
 		bpr( level + 1, buf, "{\n" );
 		for ( intp i = 0; i < c; ++i )
 		{
-			bpr( level + 2, buf, "file %i\n", files[ i ] );
+			bpr( level + 2, buf, "file %zd\n", files[ i ] );
 		}
 		bpr( level + 1, buf, "}\n" );
 	}
@@ -2068,7 +2068,7 @@ void CMP3Player::OnSliderMoved()
 
 void CMP3Player::LoadPlayList( char const *filename )
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "playlist" );
+	KeyValuesAD kv( "playlist" );
 	Assert( kv );
 	if ( !kv->LoadFromFile( g_pFullFileSystem, filename, "MOD" ) )
 	{
@@ -2163,7 +2163,7 @@ void CMP3Player::SavePlayList( char const *filename )
 		{
 			MP3File_t& song = m_Files[ m_PlayList[ i ] ];
 			char fn[ 512 ];
-			if ( g_pFullFileSystem->String( song.filename, fn, sizeof( fn ) ) )
+			if ( g_pFullFileSystem->String( song.filename, fn ) )
 			{
 				char dirname[ 512 ];
 				dirname[0]=0;
@@ -2204,7 +2204,7 @@ void CMP3Player::SetMostRecentPlayList( char const *filename )
 
 void CMP3Player::LoadSettings()
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "settings" );
+	KeyValuesAD kv( "settings" );
 	Assert( kv );
 	if ( !kv->LoadFromFile( g_pFullFileSystem, MP3_SETTINGS_FILE, "MOD" ) )
 	{

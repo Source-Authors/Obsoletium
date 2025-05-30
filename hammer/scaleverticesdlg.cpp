@@ -9,8 +9,8 @@
 //
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "ScaleVerticesDlg.h"
+#include "hammer.h"
 #include "MapDoc.h"
 #include "GlobalFunctions.h"
 
@@ -22,16 +22,18 @@
 
 
 CScaleVerticesDlg::CScaleVerticesDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CScaleVerticesDlg::IDD, pParent)
+	: CBaseDlg(CScaleVerticesDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CScaleVerticesDlg)
 	//}}AFX_DATA_INIT
+	// dimhotepus: Init scale.
+	m_fScale = -1;
 }
 
 
 void CScaleVerticesDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CScaleVerticesDlg)
 	DDX_Control(pDX, IDC_SCALESPIN, m_cScaleSpin);
 	DDX_Control(pDX, IDC_SCALE, m_cScale);
@@ -39,7 +41,7 @@ void CScaleVerticesDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CScaleVerticesDlg, CDialog)
+BEGIN_MESSAGE_MAP(CScaleVerticesDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CScaleVerticesDlg)
 	ON_EN_CHANGE(IDC_SCALE, OnChangeScale)
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SCALESPIN, OnDeltaposScalespin)
@@ -54,7 +56,8 @@ void CScaleVerticesDlg::OnChangeScale()
 {
 	CString str;
 	m_cScale.GetWindowText(str);
-	m_fScale = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fScale = strtof(str, nullptr);
 
 	if (m_fScale <= 0)
 	{
@@ -71,7 +74,8 @@ void CScaleVerticesDlg::OnDeltaposScalespin(NMHDR* pNMHDR, LRESULT* pResult)
 
 	CString str;
 	m_cScale.GetWindowText(str);
-	m_fScale = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fScale = strtof(str, nullptr);
 	m_fScale += 0.1f * float(pNMUpDown->iDelta);
 	if(m_fScale <= 0)
 		m_fScale = 0;
@@ -83,7 +87,7 @@ void CScaleVerticesDlg::OnDeltaposScalespin(NMHDR* pNMHDR, LRESULT* pResult)
 
 BOOL CScaleVerticesDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_cScale.SetWindowText("1.0");
 	m_cScaleSpin.SetRange(UD_MINVAL, UD_MAXVAL);
@@ -93,5 +97,5 @@ BOOL CScaleVerticesDlg::OnInitDialog()
 
 void CScaleVerticesDlg::OnClose() 
 {
-	CDialog::OnClose();
+	__super::OnClose();
 }

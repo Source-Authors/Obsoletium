@@ -382,8 +382,7 @@ void CStudioRender::SetLightingRenderState()
 //-----------------------------------------------------------------------------
 void CStudioRender::AddShadow( IMaterial* pMaterial, void* pProxyData, FlashlightState_t *pFlashlightState, VMatrix *pWorldToTexture, ITexture *pFlashlightDepthTexture )
 {
-	intp i = m_ShadowState.AddToTail();
-	ShadowState_t& state = m_ShadowState[i];
+	ShadowState_t& state = m_ShadowState[m_ShadowState.AddToTail()];
 	state.m_pMaterial = pMaterial;
 	state.m_pProxyData = pProxyData;
 	state.m_pFlashlightState = pFlashlightState;

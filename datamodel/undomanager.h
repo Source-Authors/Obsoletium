@@ -33,7 +33,7 @@ public:
 	~CUndoManager();
 
 	void			Shutdown();
-	void			SetUndoDepth( int nMaxUndoDepth );
+	void			SetUndoDepth( intp nMaxUndoDepth );
 	void			AddUndoElement( IUndoElement *pElement );
 	void			Undo();
 	void			Redo();
@@ -78,7 +78,7 @@ private:
 	CUtlLinkedList< IUndoElement *, int >	m_UndoList;
 	CUtlStack< IUndoElement * >			m_RedoStack;
 	CUtlVector< IDmNotify* >			m_Notifiers;
-	int				m_nMaxUndoDepth;
+	intp			m_nMaxUndoDepth;
 	int				m_nNesting;
 	int				m_nNotifyNesting;
 	CUtlSymbol		m_UndoDesc;

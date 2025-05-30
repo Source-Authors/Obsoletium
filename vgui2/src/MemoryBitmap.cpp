@@ -8,13 +8,10 @@
 
 #if !defined(_STATIC_LINKED) || defined(_VGUI_DLL)
 
-#include <vgui/ISurface.h>
-
 #include "Memorybitmap.h"
-#include "vgui_internal.h"
 
-#include <string.h>
-#include <stdlib.h>
+#include <vgui/ISurface.h>
+#include "vgui_internal.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

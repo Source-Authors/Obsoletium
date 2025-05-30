@@ -87,7 +87,7 @@ public:
 	const CDmaString& operator=( const CDmaString& src );
 
 	// Returns strlen
-	int	Length() const;
+	intp	Length() const;
 };
 
 #endif // DMVAR_H

@@ -44,6 +44,33 @@ enum MaterialVarType_t
 	MATERIAL_VAR_TYPE_MATERIAL,
 };
 
+[[nodiscard]] inline const char* GetMaterialVarTypeDescription(MaterialVarType_t type)
+{
+  switch (type)
+  {
+    case MATERIAL_VAR_TYPE_FLOAT:
+      return "MATERIAL_VAR_TYPE_FLOAT";
+    case MATERIAL_VAR_TYPE_STRING:
+      return "MATERIAL_VAR_TYPE_STRING";
+    case MATERIAL_VAR_TYPE_VECTOR:
+      return "MATERIAL_VAR_TYPE_VECTOR";
+    case MATERIAL_VAR_TYPE_TEXTURE:
+      return "MATERIAL_VAR_TYPE_TEXTURE";
+    case MATERIAL_VAR_TYPE_INT:
+      return "MATERIAL_VAR_TYPE_INT";
+    case MATERIAL_VAR_TYPE_FOURCC:
+      return "MATERIAL_VAR_TYPE_FOURCC";
+    case MATERIAL_VAR_TYPE_UNDEFINED:
+      return "MATERIAL_VAR_TYPE_UNDEFINED";
+    case MATERIAL_VAR_TYPE_MATRIX:
+      return "MATERIAL_VAR_TYPE_MATRIX";
+    case MATERIAL_VAR_TYPE_MATERIAL:
+      return "MATERIAL_VAR_TYPE_MATERIAL";
+    default:
+      return "N/A";
+  }
+}
+
 typedef unsigned short MaterialVarSym_t;
 
 class IMaterialVar

@@ -6,22 +6,20 @@
 #ifndef TOKENLINE_H
 #define TOKENLINE_H
 
-#pragma once
+constexpr inline int MAX_LINE_TOKENS{128};
+constexpr inline int MAX_LINE_CHARS{2048};
 
-#define MAX_LINE_TOKENS		128
-#define MAX_LINE_CHARS		2048
-
-class TokenLine  
+class TokenLine
 {
 
 public:
 	TokenLine();
-	TokenLine( char * string);
+	TokenLine( char * string );
 	virtual ~TokenLine();
 
 	char *	GetRestOfLine(int i);	// returns all chars after token i
-	int		CountToken();			// returns number of token
-	char *	CheckToken(char * parm);// returns token after token parm or ""
+	int		CountToken() const;			// returns number of token
+	char *	CheckToken(const char * parm);// returns token after token parm or ""
 	char *	GetToken(int i);		// returns token i
 	char *	GetLine();				// returns full line
 	bool	SetLine (const char * newLine);	// set new token line and parses it

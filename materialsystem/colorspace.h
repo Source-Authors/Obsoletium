@@ -30,9 +30,6 @@ namespace ColorSpace
 	// convert texture to linear 0..1 value
 	float TextureToLinear( int c );
 
-	// convert texture to linear 0..1 value
-	int LinearToTexture( float f );
-
 	float TexLightToLinear( int c, int exponent );
 
 	// assume 0..4 range
@@ -44,9 +41,6 @@ namespace ColorSpace
 		unsigned char *ret, unsigned char *retBump1,
 		unsigned char *retBump2, unsigned char *retBump3 );
 	
-	// converts 0..1 linear value to screen gamma (0..255)
-	int LinearToScreenGamma( float f );
-
 	FORCEINLINE void LinearToLightmap( unsigned char *pDstRGB, const float *pSrcRGB )
 	{
 		Vector tmpVect;
@@ -203,8 +197,7 @@ namespace ColorSpace
 	inline unsigned short LinearToUnsignedShort( float in, int nFractionalBits )
 	{
 		in = in * ( 1 << nFractionalBits );
-		in = min( in, 65535.f );
-		return max( in, 0.0f );
+		return static_cast<unsigned short>( max( min( in, 65535.f ), 0.0f ) );
 	}
 
 	inline void ClampToHDR( const Vector &in, unsigned short out[3] )

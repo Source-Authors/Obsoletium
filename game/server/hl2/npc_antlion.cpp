@@ -718,8 +718,8 @@ bool CNPC_Antlion::FindChasePosition( const Vector &targetPos, Vector &result )
 	for ( int i = 0; i < NUM_CHASE_POSITION_ATTEMPTS; i++ )
 	{
 		result	= targetPos;
-		result += -runDir * random->RandomInt( 64, 128 );
-		result += vRight * random->RandomInt( -128, 128 );
+		result += -runDir * random->RandomFloat( 64, 128 );
+		result += vRight * random->RandomFloat( -128, 128 );
 		
 		//FIXME: We need to do a more robust search here
 		// Find a ground position and try to get there
@@ -870,7 +870,7 @@ bool CNPC_Antlion::GetPathToSoundFleePoint( int soundType )
 	vecFleeDir = UTIL_YawToVector( flFleeYaw );
 
 	// Move us to the outer radius of the noise (with some randomness)
-	vecFleeGoal = vecSoundPos + vecFleeDir * ( pSound->Volume() + random->RandomInt( 32, 64 ) );
+	vecFleeGoal = vecSoundPos + vecFleeDir * ( pSound->Volume() + random->RandomFloat( 32, 64 ) );
 
 	// Find a route to that position
 	AI_NavGoal_t goal( vecFleeGoal + Vector( 0, 0, 8 ), (Activity) ACT_ANTLION_RUN_AGITATED, 512, AIN_DEF_FLAGS );
@@ -1154,7 +1154,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLION_WALK_FOOTSTEP )
 	{
-		MakeAIFootstepSound( 240.0f );
+		MakeAIFootstepSound( 240 );
 		EmitSound( "NPC_Antlion.Footstep", m_hFootstep, pEvent->eventtime );
 		return;
 	}
@@ -1275,7 +1275,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 	if ( pEvent->event == AE_ANTLION_WORKER_EXPLODE_SCREAM )
 	{
-		if ( GetWaterLevel() < 2 )
+		if ( GetWaterLevel() < WaterLevel::WL_Waist )
 		{
 			EmitSound( "NPC_Antlion.PoisonBurstScream" );
 		}
@@ -2369,7 +2369,7 @@ int CNPC_Antlion::SelectSchedule( void )
 			Vector		soundOrg = m_vecHeardSound;
 
 			//Find all entities within that sphere
-			while ( ( pTarget = gEntList.FindEntityInSphere( pTarget, soundOrg, bugbait_radius.GetInt() ) ) != NULL )
+			while ( ( pTarget = gEntList.FindEntityInSphere( pTarget, soundOrg, bugbait_radius.GetFloat() ) ) != NULL )
 			{
 				CAI_BaseNPC *pNPC = pTarget->MyNPCPointer();
 
@@ -2670,7 +2670,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 		if ( newInfo.GetDamageType() & (DMG_CRUSH|DMG_PHYSGUN) )
 		{
 			PainSound( newInfo );
-			Vector vecForce = ( vecShoveDir * random->RandomInt( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f);
+			Vector vecForce = ( vecShoveDir * random->RandomFloat( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f);
 			CascadePush( vecForce );
 			ApplyAbsVelocityImpulse( vecForce );
 			SetGroundEntity( NULL );
@@ -2697,7 +2697,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 					SetCondition( COND_ANTLION_FLIPPED );
 				}
 
-				Vector vecForce = ( vecShoveDir * random->RandomInt( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f);
+				Vector vecForce = ( vecShoveDir * random->RandomFloat( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f);
 
 				CascadePush( vecForce );
 				ApplyAbsVelocityImpulse( vecForce );
@@ -2713,7 +2713,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 					SetCondition( COND_ANTLION_FLIPPED );
 
 					//Get tossed!
-					ApplyAbsVelocityImpulse( ( vecShoveDir * random->RandomInt( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f) );
+					ApplyAbsVelocityImpulse( ( vecShoveDir * random->RandomFloat( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f) );
 					SetGroundEntity( NULL );
 				}
 			}
@@ -3705,7 +3705,7 @@ void CNPC_Antlion::GatherConditions( void )
 		 IsCurSchedule(SCHED_FALL_TO_GROUND ) == false &&
 		 IsEffectActive( EF_NODRAW ) == false )
 	{
-		if( m_lifeState == LIFE_ALIVE && GetWaterLevel() > 1 )
+		if( m_lifeState == LIFE_ALIVE && GetWaterLevel() > WaterLevel::WL_Feet )
 		{
 			// Start Drowning!
 			SetCondition( COND_ANTLION_IN_WATER );
@@ -4387,7 +4387,7 @@ void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::DoPoisonBurst()
 {
-	if ( GetWaterLevel() < 2 )
+	if ( GetWaterLevel() < WaterLevel::WL_Waist )
 	{
 		CTakeDamageInfo info( this, this, sk_antlion_worker_burst_damage.GetFloat(), DMG_BLAST_SURFACE | ( ANTLION_WORKER_BURST_IS_POISONOUS() ? DMG_POISON : DMG_ACID ) );
 

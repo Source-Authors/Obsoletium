@@ -26,19 +26,36 @@
 // It is hoped that setting this, and using this library will be the common mechanism for
 // allowing link libraries to access tier2 library interfaces
 //-----------------------------------------------------------------------------
-IFileSystem *g_pFullFileSystem = 0;
-IMaterialSystem *materials = 0;
-IMaterialSystem *g_pMaterialSystem = 0;
-IInputSystem *g_pInputSystem = 0;
-INetworkSystem *g_pNetworkSystem = 0;
-IMaterialSystemHardwareConfig *g_pMaterialSystemHardwareConfig = 0;
-IDebugTextureInfo *g_pMaterialSystemDebugTextureInfo = 0;
-IVBAllocTracker *g_VBAllocTracker = 0;
-IColorCorrectionSystem *colorcorrection = 0;
-IP4 *p4 = 0;
-IMdlLib *mdllib = 0;
-IQueuedLoader *g_pQueuedLoader = 0;
+IFileSystem *g_pFullFileSystem = nullptr;
+IMaterialSystem *materials = nullptr;
+IMaterialSystem *g_pMaterialSystem = nullptr;
+IInputSystem *g_pInputSystem = nullptr;
+INetworkSystem *g_pNetworkSystem = nullptr;
+IMaterialSystemHardwareConfig *g_pMaterialSystemHardwareConfig = nullptr;
+IDebugTextureInfo *g_pMaterialSystemDebugTextureInfo = nullptr;
+IVBAllocTracker *g_VBAllocTracker = nullptr;
+IP4 *p4 = nullptr;
+IColorCorrectionSystem *colorcorrection = nullptr;
+IMdlLib *mdllib = nullptr;
+IQueuedLoader *g_pQueuedLoader = nullptr;
 
+namespace
+{
+
+template<typename T>
+T* ConnectLibrary( T **library,
+	CreateInterfaceFn *factory_list, int index,
+	const char *interface_name )
+{
+	if ( !*library )
+	{
+		return (*library = static_cast<T*>(factory_list[index]( interface_name, NULL )));
+	}
+
+	return *library;
+}
+
+}
 
 //-----------------------------------------------------------------------------
 // Call this to connect to all tier 2 libraries.
@@ -47,73 +64,49 @@ IQueuedLoader *g_pQueuedLoader = 0;
 void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 {
 	// Don't connect twice..
-	Assert( !g_pFullFileSystem && !materials && !g_pInputSystem && !g_pNetworkSystem && 
-		!p4 && !mdllib && !g_pMaterialSystemDebugTextureInfo && !g_VBAllocTracker &&
-		!g_pMaterialSystemHardwareConfig && !g_pQueuedLoader );
+	Assert( !g_pFullFileSystem && 
+		!g_pMaterialSystem && !materials &&
+		!g_pInputSystem &&
+		!g_pNetworkSystem && 
+		!g_pMaterialSystemHardwareConfig &&
+		!g_pMaterialSystemDebugTextureInfo && 
+		!g_VBAllocTracker &&
+		!p4 &&
+		!colorcorrection && 
+		!mdllib && 
+		!g_pQueuedLoader );
 
 	for ( int i = 0; i < nFactoryCount; ++i )
 	{
-		if ( !g_pFullFileSystem )
-		{
-			g_pFullFileSystem = ( IFileSystem * )pFactoryList[i]( FILESYSTEM_INTERFACE_VERSION, NULL );
-		}
-		if ( !materials )
-		{
-			g_pMaterialSystem = materials = ( IMaterialSystem * )pFactoryList[i]( MATERIAL_SYSTEM_INTERFACE_VERSION, NULL );
-		}
-		if ( !g_pInputSystem )
-		{
-			g_pInputSystem = ( IInputSystem * )pFactoryList[i]( INPUTSYSTEM_INTERFACE_VERSION, NULL );
-		}
-		if ( !g_pNetworkSystem )
-		{
-			g_pNetworkSystem = ( INetworkSystem * )pFactoryList[i]( NETWORKSYSTEM_INTERFACE_VERSION, NULL );
-		}
-		if ( !g_pMaterialSystemHardwareConfig )
-		{
-			g_pMaterialSystemHardwareConfig = ( IMaterialSystemHardwareConfig * )pFactoryList[i]( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION, NULL );
-		}
-		if ( !g_pMaterialSystemDebugTextureInfo )
-		{
-			g_pMaterialSystemDebugTextureInfo = (IDebugTextureInfo*)pFactoryList[i]( DEBUG_TEXTURE_INFO_VERSION, 0 );
-		}
-		if ( !g_VBAllocTracker )
-		{
-			g_VBAllocTracker = (IVBAllocTracker*)pFactoryList[i]( VB_ALLOC_TRACKER_INTERFACE_VERSION, 0 );
-		}
+		ConnectLibrary(&g_pFullFileSystem, pFactoryList, i, FILESYSTEM_INTERFACE_VERSION);
+		materials = ConnectLibrary(&g_pMaterialSystem, pFactoryList, i, MATERIAL_SYSTEM_INTERFACE_VERSION);
+		ConnectLibrary(&g_pInputSystem, pFactoryList, i, INPUTSYSTEM_INTERFACE_VERSION);
+		ConnectLibrary(&g_pNetworkSystem, pFactoryList, i, NETWORKSYSTEM_INTERFACE_VERSION);
+		ConnectLibrary(&g_pMaterialSystemHardwareConfig, pFactoryList, i, MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION);
+		ConnectLibrary(&g_pMaterialSystemDebugTextureInfo, pFactoryList, i, DEBUG_TEXTURE_INFO_VERSION);
+		ConnectLibrary(&g_VBAllocTracker, pFactoryList, i, VB_ALLOC_TRACKER_INTERFACE_VERSION);
 		// dimhotepus: No perforce
-		/*if ( !p4 )
-		{
-			p4 = ( IP4 * )pFactoryList[i]( P4_INTERFACE_VERSION, NULL );
-		}*/
-		if ( !colorcorrection )
-		{
-			colorcorrection = ( IColorCorrectionSystem * )pFactoryList[i]( COLORCORRECTION_INTERFACE_VERSION, NULL );
-		}
-		if ( !mdllib )
-		{
-			mdllib = ( IMdlLib * )pFactoryList[i]( MDLLIB_INTERFACE_VERSION, NULL );
-		}
-		if ( !g_pQueuedLoader )
-		{
-			g_pQueuedLoader = (IQueuedLoader *)pFactoryList[i]( QUEUEDLOADER_INTERFACE_VERSION, NULL );
-		}
+		// ConnectLibrary(&p4, pFactoryList, i, P4_INTERFACE_VERSION);
+		ConnectLibrary(&colorcorrection, pFactoryList, i, COLORCORRECTION_INTERFACE_VERSION);
+		ConnectLibrary(&mdllib, pFactoryList, i, MDLLIB_INTERFACE_VERSION);
+		ConnectLibrary(&g_pQueuedLoader, pFactoryList, i, QUEUEDLOADER_INTERFACE_VERSION);
 	}
 }
 
 void DisconnectTier2Libraries()
 {
-
-	g_pFullFileSystem = 0;
-	materials = g_pMaterialSystem = 0;
-	g_pMaterialSystemHardwareConfig = 0;
-	g_pMaterialSystemDebugTextureInfo = 0;
-	g_pInputSystem = 0;
-	g_pNetworkSystem = 0;
-	colorcorrection = 0;
-	p4 = 0;
-	mdllib = 0;
-	g_pQueuedLoader = 0;
+	// dimhotepus: In reverse order.
+	g_pQueuedLoader = nullptr;
+	mdllib = nullptr;
+	colorcorrection = nullptr;
+	p4 = nullptr;
+	g_VBAllocTracker = nullptr;
+	g_pMaterialSystemDebugTextureInfo = nullptr;
+	g_pMaterialSystemHardwareConfig = nullptr;
+	g_pNetworkSystem = nullptr;
+	g_pInputSystem = nullptr;
+	materials = g_pMaterialSystem = nullptr;
+	g_pFullFileSystem = nullptr;
 }
 
 

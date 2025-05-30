@@ -79,11 +79,6 @@ void CAnchorDef::Init( HWND hWnd, int dlgItemID, EAnchorHorz eLeftSide, EAnchorV
 	m_AnchorBottom = eBottomSide;
 }
 
-
-CAnchorMgr::CAnchorMgr()
-{
-}
-
 void CAnchorMgr::Init( HWND hParentWnd, CAnchorDef *pAnchors, int nAnchors )
 {
 	m_Anchors.CopyArray( pAnchors, nAnchors );

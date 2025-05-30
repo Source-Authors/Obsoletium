@@ -89,8 +89,8 @@ inline void *MemAlloc_InlineCallocMemset( void *pMem, size_t nCount, size_t nEle
 }
 #endif
 
-#define calloc(c, s)		MemAlloc_InlineCallocMemset(malloc((c)*(s)), c, s)
-#define free(p)				g_pMemAlloc->Free( p )
+#define calloc(c, s)		MemAlloc_InlineCallocMemset(malloc((c)*(s)), c, s) //-V1059
+#define free(p)				g_pMemAlloc->Free( p ) //-V1059
 #define _msize(p)			g_pMemAlloc->GetSize( p )
 #define _expand(p, s)		_expand_NoLongerSupported(p, s)
 #define _aligned_free( p )	MemAlloc_FreeAligned( p )
@@ -99,8 +99,8 @@ inline void *MemAlloc_InlineCallocMemset( void *pMem, size_t nCount, size_t nEle
 // Debug path
 #if defined(USE_MEM_DEBUG)
 
-#define malloc(s)				g_pMemAlloc->Alloc( s, __FILE__, __LINE__)
-#define realloc(p, s)			g_pMemAlloc->Realloc( p, s, __FILE__, __LINE__ )
+#define malloc(s)				g_pMemAlloc->Alloc( s, __FILE__, __LINE__) //-V1059
+#define realloc(p, s)			g_pMemAlloc->Realloc( p, s, __FILE__, __LINE__ ) //-V1059
 #define _aligned_malloc( s, a )	MemAlloc_AllocAligned( s, a, __FILE__, __LINE__ )
 
 #ifdef _malloc_dbg
@@ -114,7 +114,7 @@ inline void *MemAlloc_InlineCallocMemset( void *pMem, size_t nCount, size_t nEle
 #else
 	#undef new
 	#define MEMALL_DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-	#define new MEMALL_DEBUG_NEW
+	#define new MEMALL_DEBUG_NEW //-V1059
 #endif
 #endif
 
@@ -137,7 +137,7 @@ inline char *MemAlloc_StrDup(const char *pString, const char *pFileName, unsigne
 		return nullptr;
 
 	const size_t len = strlen(pString) + 1;
-	if (char* pMemory = (char *)g_pMemAlloc->Alloc(len, pFileName, nLine); pMemory != nullptr)
+	if (char* pMemory = static_cast<char *>(g_pMemAlloc->Alloc(len, pFileName, nLine)); pMemory != nullptr)
 	{
 		return strcpy( pMemory, pString );
 	}
@@ -151,7 +151,7 @@ inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString, const char *pFileName,
 		return nullptr;
 
 	const size_t len = wcslen(pString) + 1;
-	if (wchar_t *pMemory = (wchar_t *)g_pMemAlloc->Alloc(len * sizeof(wchar_t), pFileName, nLine); pMemory != nullptr)
+	if (wchar_t *pMemory = static_cast<wchar_t *>(g_pMemAlloc->Alloc(len * sizeof(wchar_t), pFileName, nLine)); pMemory != nullptr)
 	{
 		return wcscpy( pMemory, pString );
 	}
@@ -165,8 +165,8 @@ inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString, const char *pFileName,
 // --------------------------------------------------------
 // Release path
 
-#define malloc(s)				g_pMemAlloc->Alloc( s )
-#define realloc(p, s)			g_pMemAlloc->Realloc( p, s )
+#define malloc(s)				g_pMemAlloc->Alloc( s ) //-V1059
+#define realloc(p, s)			g_pMemAlloc->Realloc( p, s ) //-V1059
 #define _aligned_malloc( s, a )	MemAlloc_AllocAligned( s, a )
 
 #ifdef _malloc_dbg
@@ -288,9 +288,9 @@ inline void *valve_aligned_malloc_check_oom( size_t size, size_t alignment )
 
 #endif // VALVE_ALLOCS_DEFINED
 
-#define malloc valve_malloc_check_oom
-#define realloc valve_realloc_check_oom
-#define calloc valve_calloc_check_oom
+#define malloc valve_malloc_check_oom //-V1059
+#define realloc valve_realloc_check_oom //-V1059
+#define calloc valve_calloc_check_oom //-V1059
 #define memalign valve_memalign_check_oom
 #define _aligned_malloc valve_aligned_malloc_check_oom
 

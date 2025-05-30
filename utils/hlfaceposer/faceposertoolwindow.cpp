@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "hlfaceposer.h"
 #include "faceposertoolwindow.h"
+#include "hlfaceposer.h"
 #include "utlvector.h"
 #include "tier1/strtools.h"
 #include "MDLViewer.h"
@@ -234,10 +234,10 @@ void IFacePoserToolWindow::LoadPosition( void )
 		visible = true;
 
 		// Just do a simple tiling
-		w = g_MDLViewer->w2() * 0.5;
-		h = g_MDLViewer->h2() * 0.5;
+		w = g_MDLViewer->w2() / 2;
+		h = g_MDLViewer->h2() / 2;
 
-		x = g_MDLViewer->w2() * 0.25f + s_nToolCount * 20;
+		x = g_MDLViewer->w2() / 4 + s_nToolCount * 20;
 		y = s_nToolCount * 20;
 
 		bool translated = TranslateToolPos

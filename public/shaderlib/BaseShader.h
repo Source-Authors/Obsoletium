@@ -18,7 +18,7 @@
 #include "materialsystem/ishaderapi.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "shaderlib/BaseShader.h"
-#include "convar.h"
+#include "tier1/convar.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations

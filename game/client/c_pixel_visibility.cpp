@@ -43,11 +43,7 @@ ConVar r_pixelvisibility_spew( "r_pixelvisibility_spew", "0" );
 
 extern ConVar building_cubemaps;
 
-#ifndef _X360
-const float MIN_PROXY_PIXELS = 5.0f;
-#else
-const float MIN_PROXY_PIXELS = 25.0f;
-#endif
+constexpr inline float MIN_PROXY_PIXELS = 5.0f;
 
 float PixelVisibility_DrawProxy( IMatRenderContext *pRenderContext, OcclusionQueryObjectHandle_t queryHandle, Vector origin, float scale, float proxyAspect, IMaterial *pMaterial, bool screenspace )
 {
@@ -83,7 +79,7 @@ float PixelVisibility_DrawProxy( IMatRenderContext *pRenderContext, OcclusionQue
 	// 
 
 	Vector verts[5];
-	const float sqrt2 = 0.707106781f; // sqrt(2) - keeps all vectors the same length from origin
+	constexpr float sqrt2 = 0.707106781f; // sqrt(2) - keeps all vectors the same length from origin
 	scale *= sqrt2;
 	float scale45x = scale;
 	float scale45y = scale / proxyAspect;
@@ -550,10 +546,11 @@ void CPixelVisibilitySystem::LevelInitPreEntity()
 
 void CPixelVisibilitySystem::LevelShutdownPostEntity()
 {
-	m_pProxyMaterial->DecrementReferenceCount();
-	m_pProxyMaterial = NULL;
+	// dimhotepus: In reverse to creation order.
 	m_pDrawMaterial->DecrementReferenceCount();
 	m_pDrawMaterial = NULL;
+	m_pProxyMaterial->DecrementReferenceCount();
+	m_pProxyMaterial = NULL;
 	DeleteUnusedSets(true);
 	m_setList.Purge();
 	m_queryList.Purge();

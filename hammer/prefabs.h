@@ -11,10 +11,8 @@
 
 
 #include <afxtempl.h>
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
+#include "tier1/strtools.h"
 
 
 class BoundBox;
@@ -66,9 +64,9 @@ public:
 
 	// set info:
 	void SetName(LPCTSTR pszName)
-	{ strcpy(szName, pszName); }
+	{ V_strcpy_safe(szName, pszName); }
 	void SetNotes(LPCTSTR pszNotes)
-	{ strcpy(szNotes, pszNotes); }
+	{ V_strcpy_safe(szNotes, pszNotes); }
 
 	// get info:
 	LPCTSTR GetName() { return szName; }
@@ -130,7 +128,7 @@ class CPrefabLibrary
 {
 public:
 	CPrefabLibrary();
-	~CPrefabLibrary();
+	virtual ~CPrefabLibrary();
 
 	virtual int Load(LPCTSTR pszFilename) = 0;
 	virtual bool DeleteFile(void) = 0;
@@ -141,7 +139,7 @@ public:
 	virtual int SetName(const char *pszName) = 0;
 	void SetNotes(LPCTSTR pszNotes)
 	{
-		strcpy(szNotes, pszNotes);
+		V_strcpy_safe(szNotes, pszNotes);
 	}
 
 	// get info:
@@ -162,6 +160,8 @@ public:
 	static void LoadAllLibraries(void);
 	static void FreeAllLibraries(void);
 	static CPrefabLibrary *FindOpenLibrary(LPCTSTR pszFilename);
+	static void AddLibrary(CPrefabLibrary *pLibrary);
+	static void RemoveLibrary(CPrefabLibrary *pLibrary);
 
 protected:
 

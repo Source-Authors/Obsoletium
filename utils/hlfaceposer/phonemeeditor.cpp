@@ -4,11 +4,8 @@
 //
 // $NoKeywords: $
 //===========================================================================//
-#include <Assert.h>
-#include <stdio.h>
-#include <math.h>
-#include "hlfaceposer.h"
 #include "PhonemeEditor.h"
+#include "hlfaceposer.h"
 #include "PhonemeEditorColors.h"
 #include "snd_audio_source.h"
 #include "snd_wave_source.h"
@@ -29,7 +26,6 @@
 #include "filesystem.h"
 #include "UtlBuffer.h"
 #include "AudioWaveOutput.h"
-#include "StudioModel.h"
 #include "viewerSettings.h"
 #include "ControlPanel.h"
 #include "faceposer_models.h"
@@ -42,6 +38,8 @@
 #include "WaveBrowser.h"
 #include "tier2/p4helpers.h"
 #include "vstdlib/random.h"
+
+#include <mmreg.h>
 
 extern IUniformRandomStream *random;
 
@@ -142,12 +140,12 @@ bool DoesExtractorExistFor( PE_APITYPE type )
 class StdIOReadBinary : public IFileReadBinary
 {
 public:
-	int open( const char *pFileName )
+	intp open( const char *pFileName )
 	{
-		return (int)filesystem->Open( pFileName, "rb" );
+		return (intp)filesystem->Open( pFileName, "rb" );
 	}
 
-	int read( void *pOutput, int size, int file )
+	int read( void *pOutput, int size, intp file )
 	{
 		if ( !file )
 			return 0;
@@ -155,7 +153,7 @@ public:
 		return filesystem->Read( pOutput, size, (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		if ( !file )
 			return;
@@ -163,7 +161,7 @@ public:
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -171,7 +169,7 @@ public:
 		return filesystem->Tell( (FileHandle_t)file );
 	}
 
-	unsigned int size( int file )
+	unsigned int size( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -179,7 +177,7 @@ public:
 		return filesystem->Size( (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		if ( !file )
 			return;
@@ -191,28 +189,28 @@ public:
 class StdIOWriteBinary : public IFileWriteBinary
 {
 public:
-	int create( const char *pFileName )
+	intp create( const char *pFileName )
 	{
 		MakeFileWriteable( pFileName );
-		return (int)filesystem->Open( pFileName, "wb" );
+		return (intp)filesystem->Open( pFileName, "wb" );
 	}
 
-	int write( void *pData, int size, int file )
+	int write( void *pData, int size, intp file )
 	{
 		return filesystem->Write( pData, size, (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		filesystem->Close( (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		return filesystem->Tell( (FileHandle_t)file );
 	}
@@ -416,7 +414,7 @@ void PhonemeEditor::SetupPhonemeEditorColors( void )
 			int bgavg = ( bgr + bgg + bgb ) / 3;
 
 			// Bias toward bg color
-			avg += ( bgavg - avg ) / 2.5;
+			avg += ( bgavg - avg ) * 5 / 2;
 
 			p->gray_color = RGB( avg, avg, avg );
 		}
@@ -459,8 +457,8 @@ void PhonemeEditor::EditWord( CWordTag *pWord, bool positionDialog /*= false*/ )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Edit Word" );
-	strcpy( params.m_szPrompt, "Current Word:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Edit Word" );
+	V_strcpy_safe( params.m_szPrompt, "Current Word:" );
 	V_strcpy_safe( params.m_szInputText, pWord->GetWord() );
 
 	params.m_nLeft = -1;
@@ -527,7 +525,7 @@ void PhonemeEditor::EditPhoneme( CPhonemeTag *pPhoneme, bool positionDialog /*= 
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
 	V_strcpy_safe( params.m_szName, ConvertPhoneme( pPhoneme->GetPhonemeCode() ) );
 
 	params.m_nLeft = -1;
@@ -2010,7 +2008,7 @@ void PhonemeEditor::redraw( void )
 			rcLabel.top = rcLabel.bottom - 10;
 
 			char sz[ 32 ];
-			sprintf( sz, "%.2f", f );
+			V_sprintf_safe( sz, "%.2f", f );
 			int textWidth = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, sz );
 			rcLabel.right = rcLabel.left + textWidth;
 			OffsetRect( &rcLabel, -textWidth / 2, 0 );
@@ -2088,7 +2086,7 @@ void PhonemeEditor::redraw( void )
 	OffsetRect( &rcText, 0, fontsize + 1 );
 
 	drawHelper.DrawColoredText( font, fontsize, fontweight, PEColor( COLOR_PHONEME_TEXT ), rcText,
-		"[ %i ] Words [ %i ] Phonemes / Zoom %i %%", m_Tags.m_Words.Size(), m_Tags.CountPhonemes(), m_nTimeZoom );
+		"[ %zi ] Words [ %zi ] Phonemes / Zoom %i %%", m_Tags.m_Words.Count(), m_Tags.CountPhonemes(), m_nTimeZoom );
 
 	if ( m_pEvent )
 	{
@@ -2105,14 +2103,14 @@ void PhonemeEditor::redraw( void )
 
 
 	char text[ 4096 ];
-	sprintf( text, "Sentence Text:  %s", m_Tags.GetText() );
+	V_sprintf_safe( text, "Sentence Text:  %s", m_Tags.GetText() );
 
 	int halfwidth = ( rc.right - rc.left ) / 2;
 
 	rcText = rc;
 	rcText.left = halfwidth;
 	rcText.top = rcText.bottom + 5;
-	rcText.right = rcText.left + halfwidth * 0.6;
+	rcText.right = rcText.left + halfwidth * 6 / 10;
 
 	drawHelper.CalcTextRect( font, fontsize, fontweight, halfwidth, rcText, text );
 
@@ -2123,9 +2121,9 @@ void PhonemeEditor::redraw( void )
 	if ( cw )
 	{
 		char wordInfo[ 512 ];
-		sprintf( wordInfo, "Word:  %s, start %.2f end %.2f, duration %.2f ms phonemes %i",
+		V_sprintf_safe( wordInfo, "Word:  %s, start %.2f end %.2f, duration %.2f ms phonemes %zi",
 			cw->GetWord(), cw->m_flStartTime, cw->m_flEndTime, 1000.0f * ( cw->m_flEndTime - cw->m_flStartTime ),
-			cw->m_Phonemes.Size() );
+			cw->m_Phonemes.Count() );
 
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, wordInfo );
 
@@ -2141,7 +2139,7 @@ void PhonemeEditor::redraw( void )
 	if ( cp )
 	{
 		char phonemeInfo[ 512 ];
-		sprintf( phonemeInfo, "Phoneme:  %s, start %.2f end %.2f, duration %.2f ms",
+		V_sprintf_safe( phonemeInfo, "Phoneme:  %s, start %.2f end %.2f, duration %.2f ms",
 			ConvertPhoneme( cp->GetPhonemeCode() ), cp->GetStartTime(), cp->GetEndTime(), 1000.0f * ( cp->GetEndTime() - cp->GetStartTime() ) );
 
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, phonemeInfo );
@@ -2157,7 +2155,7 @@ void PhonemeEditor::redraw( void )
 	// Draw playback rate
 	{
 		char sz[ 48 ];
-		sprintf( sz, "Speed: %.2fx", m_flPlaybackRate );
+		V_sprintf_safe( sz, "Speed: %.2fx", m_flPlaybackRate );
 
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, sz);
 		
@@ -2174,7 +2172,7 @@ void PhonemeEditor::redraw( void )
 	if ( m_UndoStack.Size() > 0 )
 	{
 		int length = drawHelper.CalcTextWidth( font, fontsize, fontweight, 
-			"Undo levels:  %i/%i", m_nUndoLevel, m_UndoStack.Size() );
+			"Undo levels:  %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
 
 		rcText = rc;
 		rcText.top = rc.bottom + 60;
@@ -2183,7 +2181,7 @@ void PhonemeEditor::redraw( void )
 		rcText.left = rcText.right - length - 10;
 
 		drawHelper.DrawColoredText( font, fontsize, fontweight, PEColor( COLOR_PHONEME_EXTRACTION_RESULT_SUCCESS ), rcText,
-			"Undo levels:  %i/%i", m_nUndoLevel, m_UndoStack.Size() );
+			"Undo levels:  %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
 	}
 
 	float endfrac = ( m_pWaveFile->GetRunningLength() - starttime ) / ( endtime - starttime );
@@ -2346,7 +2344,7 @@ void PhonemeEditor::SetCurrentWaveFile( const char *wavefile, bool force /*=fals
 	if ( m_pWaveFile )
 	{
 		char fn[ 512 ];
-		Q_snprintf( fn, sizeof( fn ), "%s%s", m_WorkFile.m_szBasePath, m_WorkFile.m_szWorkingFile );
+		V_sprintf_safe( fn, "%s%s", m_WorkFile.m_szBasePath, m_WorkFile.m_szWorkingFile );
 		filesystem->RemoveFile( fn, "GAME" );
 	}
 
@@ -2360,20 +2358,20 @@ void PhonemeEditor::SetCurrentWaveFile( const char *wavefile, bool force /*=fals
 
 	// Try an dload new sound
 	m_pWaveFile = sound->LoadSound( wavefile );
-	Q_strncpy( m_WorkFile.m_szWaveFile, wavefile, sizeof( m_WorkFile.m_szWaveFile ) );
+	V_strcpy_safe( m_WorkFile.m_szWaveFile, wavefile );
 
 	char fullpath[ 512 ];
-	filesystem->RelativePathToFullPath( wavefile, "GAME", fullpath, sizeof( fullpath ) );
-	int len = Q_strlen( fullpath );
-	int charstocopy = len - Q_strlen( wavefile ) + 1;
+	filesystem->RelativePathToFullPath_safe( wavefile, "GAME", fullpath );
+	intp len = Q_strlen( fullpath );
+	intp charstocopy = len - Q_strlen( wavefile ) + 1;
 	m_WorkFile.m_szBasePath[ 0 ] = 0;
 	if ( charstocopy >= 0 )
 	{
 		Q_strncpy( m_WorkFile.m_szBasePath, fullpath, charstocopy );
 		m_WorkFile.m_szBasePath[ charstocopy ] = 0;
 	}
-	Q_StripExtension( wavefile, m_WorkFile.m_szWorkingFile, sizeof( m_WorkFile.m_szWorkingFile ) );
-	Q_strncat( m_WorkFile.m_szWorkingFile, "_work.wav", sizeof( m_WorkFile.m_szWorkingFile ), COPY_ALL_CHARACTERS );
+	Q_StripExtension( wavefile, m_WorkFile.m_szWorkingFile );
+	V_strcat_safe( m_WorkFile.m_szWorkingFile, "_work.wav" );
 
 	Q_FixSlashes( m_WorkFile.m_szWaveFile );
 	Q_FixSlashes( m_WorkFile.m_szWorkingFile );
@@ -3253,8 +3251,8 @@ void PhonemeEditor::EditInsertPhonemeBefore( void )
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szName, "" );
 
 	int iret = PhonemeProperties( &params );
 	SetFocus( (HWND)getHandle() );
@@ -3324,8 +3322,8 @@ void PhonemeEditor::EditInsertPhonemeAfter( void )
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szName, "" );
 
 	int iret = PhonemeProperties( &params );
 	SetFocus( (HWND)getHandle() );
@@ -3387,9 +3385,9 @@ void PhonemeEditor::EditInsertWordBefore( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Insert Word" );
-	strcpy( params.m_szPrompt, "Word:" );
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Insert Word" );
+	V_strcpy_safe( params.m_szPrompt, "Word:" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	params.m_nLeft = -1;
 	params.m_nTop = -1;
@@ -3418,7 +3416,7 @@ void PhonemeEditor::EditInsertWordBefore( void )
 		return;
 	}
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		return;
 	}
@@ -3487,9 +3485,9 @@ void PhonemeEditor::EditInsertWordAfter( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Insert Word" );
-	strcpy( params.m_szPrompt, "Word:" );
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Insert Word" );
+	V_strcpy_safe( params.m_szPrompt, "Word:" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	params.m_nLeft = -1;
 	params.m_nTop = -1;
@@ -3518,7 +3516,7 @@ void PhonemeEditor::EditInsertWordAfter( void )
 		return;
 	}
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		return;
 	}
@@ -3766,7 +3764,7 @@ void PhonemeEditor::SentenceFromString( CSentence& sentence, char const *str )
 				in++;
 			}
 			
-			if ( strlen( word ) > 0 )
+			if ( !Q_isempty( word ) )
 			{
 				CWordTag *w = new CWordTag( (char *)word );
 				Assert( w );
@@ -3781,7 +3779,7 @@ void PhonemeEditor::SentenceFromString( CSentence& sentence, char const *str )
 	}
 	
 	*out = 0;
-	if ( strlen( word ) > 0 )
+	if ( !Q_isempty( word ) )
 	{
 		CWordTag *w = new CWordTag( (char *)word );
 		Assert( w );
@@ -3847,19 +3845,19 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		// Allow user to type in text
 		// Build word string
 		char wordstring[ 1024 ];
-		strcpy( wordstring, "" );
+		V_strcpy_safe( wordstring, "" );
 
 		CInputParams params;
 		memset( &params, 0, sizeof( params ) );
-		strcpy( params.m_szDialogTitle, "Phrase Word List" );
-		strcpy( params.m_szPrompt, "Phrase" );
+		V_strcpy_safe( params.m_szDialogTitle, "Phrase Word List" );
+		V_strcpy_safe( params.m_szPrompt, "Phrase" );
 
-		strcpy( params.m_szInputText, wordstring );
+		V_strcpy_safe( params.m_szInputText, wordstring );
 
 		if ( !InputProperties( &params ) )
 			return;
 
-		if ( strlen( params.m_szInputText ) <= 0 )
+		if ( Q_isempty( params.m_szInputText ) )
 		{
 			Con_ErrorPrintf( "Edit word list:  No words entered!\n" );
 			return;
@@ -3917,8 +3915,8 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 
 	char szCroppedFile[ 512 ];
 	char szBaseFile[ 512 ];
-	Q_StripExtension( m_WorkFile.m_szWaveFile, szBaseFile, sizeof( szBaseFile ) );
-	Q_snprintf( szCroppedFile, sizeof( szCroppedFile ), "%s%s_work1.wav", m_WorkFile.m_szBasePath, szBaseFile );
+	Q_StripExtension( m_WorkFile.m_szWaveFile, szBaseFile );
+	V_sprintf_safe( szCroppedFile, "%s%s_work1.wav", m_WorkFile.m_szBasePath, szBaseFile );
 
 	filesystem->RemoveFile( szCroppedFile, "GAME" );
 
@@ -3948,7 +3946,7 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 	m_TagsExt = m_Tags;
 
 	char filename[ 512 ];
-	Q_snprintf( filename, sizeof( filename ), "%s%s", m_WorkFile.m_szBasePath, szCroppedFile );
+	V_sprintf_safe( filename, "%s%s", m_WorkFile.m_szBasePath, szCroppedFile );
 
 	m_nLastExtractionResult = m_pPhonemeExtractor->Extract( 
 		filename,
@@ -3957,10 +3955,10 @@ void PhonemeEditor::RedoPhonemeExtractionSelected( void )
 		m_InputWords,
 		m_Results );
 
-	if ( m_InputWords.m_Words.Size() != m_Results.m_Words.Size() )
+	if ( m_InputWords.m_Words.Count() != m_Results.m_Words.Count() )
 	{
-		Con_Printf( "Extraction returned %i words, source had %i, try adjusting selection\n",
-			m_Results.m_Words.Size(), m_InputWords.m_Words.Size() );
+		Con_Printf( "Extraction returned %zi words, source had %zi, try adjusting selection\n",
+			m_Results.m_Words.Count(), m_InputWords.m_Words.Count() );
 
 		filesystem->RemoveFile( filename, "GAME" );
 
@@ -4604,7 +4602,7 @@ void PhonemeEditor::OnExport()
 		return;
 	}
 
-	Q_SetExtension( filename, WORD_DATA_EXTENSION, sizeof( filename ) );
+	Q_SetExtension( filename, WORD_DATA_EXTENSION );
 
 	ExportValveDataChunk( filename );
 }
@@ -4616,7 +4614,7 @@ void PhonemeEditor::OnExport()
 void PhonemeEditor::StoreValveDataChunk( IterateOutputRIFF& store )
 {
 	// Buffer and dump data
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	m_Tags.SaveToBuffer( buf );
 
@@ -4645,14 +4643,14 @@ void PhonemeEditor::ExportValveDataChunk( char const *tempfile )
 	else
 	{
 		// Buffer and dump data
-		CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 		m_Tags.SaveToBuffer( buf );
 
 		filesystem->Write( buf.Base(), buf.TellPut(), fh );
 		filesystem->Close(fh);
 
-		Con_Printf( "Exported %i words to %s\n", m_Tags.m_Words.Count(), tempfile );
+		Con_Printf( "Exported %zi words to %s\n", m_Tags.m_Words.Count(), tempfile );
 	}
 }
 
@@ -4687,7 +4685,7 @@ void PhonemeEditor::ImportValveDataChunk( char const *tempfile )
 
 	delete[] buf;
 
-	Con_Printf( "Imported %i words from %s\n", m_TagsExt.m_Words.Count(), tempfile );
+	Con_Printf( "Imported %zi words from %s\n", m_TagsExt.m_Words.Count(), tempfile );
 
 	redraw();
 }
@@ -5032,7 +5030,7 @@ void PhonemeEditor::SeparateWords( void )
 	}
 
 	// Three pixels
-	double time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 6;
+	float time_epsilon = ( 1.0f / GetPixelsPerSecond() ) * 6;
 
 	SetDirty( true );
 
@@ -5098,15 +5096,15 @@ void PhonemeEditor::EditWordList( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Word List" );
-	strcpy( params.m_szPrompt, "Sentence:" );
+	V_strcpy_safe( params.m_szDialogTitle, "Word List" );
+	V_strcpy_safe( params.m_szPrompt, "Sentence:" );
 
-	strcpy( params.m_szInputText, wordstring );
+	V_strcpy_safe( params.m_szInputText, wordstring );
 
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		// Could be foreign language...
 		Warning( "Edit word list:  No words entered!\n" );
@@ -5385,7 +5383,7 @@ void PhonemeEditor::CommitExtracted( void )
 
 	m_nLastExtractionResult		= SR_RESULT_NORESULT;
 
-	if ( !m_TagsExt.m_Words.Size() )
+	if ( !m_TagsExt.m_Words.Count() )
 		return;
 
 	SetDirty( true );
@@ -5637,14 +5635,14 @@ void PhonemeEditor::AddTag( void )
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Event Tag Name" );
-	strcpy( params.m_szPrompt, "Name:" );
-	strcpy( params.m_szInputText, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Event Tag Name" );
+	V_strcpy_safe( params.m_szPrompt, "Name:" );
+	V_strcpy_safe( params.m_szInputText, "" );
 
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( strlen( params.m_szInputText ) <= 0 )
+	if ( Q_isempty( params.m_szInputText ) )
 	{
 		Con_ErrorPrintf( "Event Tag Name:  No name entered!\n" );
 		return;
@@ -6581,10 +6579,6 @@ float PhonemeEditor::GetTimeGapToNextWord( bool forward, CWordTag *currentWord, 
 
 		return ( currentStart - previousEnd );
 	}
-
-	
-	Assert( 0 );
-	return 0.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -6922,8 +6916,8 @@ void PhonemeEditor::EditInsertFirstPhonemeOfWord( void )
 
 	CPhonemeParams params;
 	memset( &params, 0, sizeof( params ) );
-	strcpy( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
-	strcpy( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Phoneme/Viseme Properties" );
+	V_strcpy_safe( params.m_szName, "" );
 
 	params.m_nLeft = -1;
 	params.m_nTop = -1;
@@ -7923,7 +7917,7 @@ void PhonemeEditor::LoadPhonemeConverters()
 
 	// Enumerate modules under bin folder of exe
 	FileFindHandle_t findHandle;
-	const char *pFilename = filesystem->FindFirstEx( "phonemeextractors/*.dll", "EXECUTABLE_PATH", &findHandle );
+	const char *pFilename = filesystem->FindFirstEx( "phonemeextractors/*" DLL_EXT_STRING, "EXECUTABLE_PATH", &findHandle );
 	while( pFilename )
 	{	
 		char fullpath[ 512 ];
@@ -8567,7 +8561,7 @@ void PhonemeEditor::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper )
 
 	// 
 	char sz[ 32 ];
-	sprintf( sz, "%.3f", m_flScrub );
+	V_sprintf_safe( sz, "%.3f", m_flScrub );
 
 	int len = drawHelper.CalcTextWidth( "Arial", 9, 500, sz );
 

@@ -369,10 +369,10 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 		}
 
 		// blast's don't tavel into or out of water
-		if (bInWater && pEntity->GetWaterLevel() == 0)
+		if (bInWater && pEntity->GetWaterLevel() == WaterLevel::WL_NotInWater)
 			continue;
 
-		if (!bInWater && pEntity->GetWaterLevel() == 3)
+		if (!bInWater && pEntity->GetWaterLevel() == WaterLevel::WL_Eyes)
 			continue;
 
 		// Check that the explosion can 'see' this entity.
@@ -449,7 +449,7 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 					// Now, if the interposing object is physics, block some explosion force based on its mass.
 					if( pBlockingEntity->VPhysicsGetObject() )
 					{
-						const float MASS_ABSORB_ALL_DAMAGE = 350.0f;
+						constexpr float MASS_ABSORB_ALL_DAMAGE = 350.0f;
 						float flMass = pBlockingEntity->VPhysicsGetObject()->GetMass();
 						float scale = flMass / MASS_ABSORB_ALL_DAMAGE;
 

@@ -54,37 +54,6 @@ static AnimSetLayout_t g_AnimSetLayout[] =
 	{	CBaseAnimationSetEditor::LAYOUT_HORIZONTAL,		"horizontal",	"#BxAnimSetHorizontalLayout" },
 };
 
-static const char *NameForLayout( CBaseAnimationSetEditor::EAnimSetLayout_t layout, bool menu )
-{
-	int c = ARRAYSIZE( g_AnimSetLayout );
-	for ( int i = 0; i < c; ++i )
-	{
-		const AnimSetLayout_t& data = g_AnimSetLayout[ i ];
-		if ( data.type == layout )
-		{
-			return menu ? data.contextmenulabel : data.shortname;
-		}
-	}
-	Assert( 0 );
-	return menu ? g_AnimSetLayout[ 0 ].contextmenulabel : g_AnimSetLayout[ 0 ].shortname;
-}
-
-static CBaseAnimationSetEditor::EAnimSetLayout_t LayoutForName( const char *name )
-{
-	int c = ARRAYSIZE( g_AnimSetLayout );
-	for ( int i = 0; i < c; ++i )
-	{
-		const AnimSetLayout_t& data = g_AnimSetLayout[ i ];
-		if ( !Q_stricmp( data.shortname, name ) )
-		{
-			return data.type;
-		}
-	}
-
-	Assert( 0 );
-	return CBaseAnimationSetEditor::LAYOUT_SPLIT;
-}
-
 CBaseAnimationSetEditor::CBaseAnimationSetEditor( vgui::Panel *parent, const char *className, bool bShowGroups ) :
 	BaseClass( parent, className ),
 	m_Layout( LAYOUT_SPLIT ),
@@ -374,8 +343,8 @@ CDmeChannel* CBaseAnimationSetEditor::FindImportChannel( CDmeChannel *pChannel, 
 	const char *pTargetName = pTargetElement->GetName();
 	CDmeLog *pTargetLog = pChannel->GetLog();
 
-	int nCount = pChannelsClip->m_Channels.Count();
-	for ( int j = 0; j < nCount; ++j )
+	intp nCount = pChannelsClip->m_Channels.Count();
+	for ( intp j = 0; j < nCount; ++j )
 	{
 		CDmeChannel *pImportChannel = pChannelsClip->m_Channels[j];
 		if ( !pImportChannel )
@@ -549,8 +518,8 @@ void CBaseAnimationSetEditor::FixupChannelsClipTime( CDmeChannel *pChannel, CDme
 {
 	CUtlVector< CDmeChannelsClip* > clips;
 	FindAncestorsReferencingElement( pChannel, clips );
-	int nCount = clips.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = clips.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		FixupChannelsClipTime( clips[i], pLog );
 	}
@@ -622,7 +591,7 @@ void CBaseAnimationSetEditor::ImportAnimation( CDmeChannelsClip *pChannelsClip, 
 	pStatusFrame->SetCloseButtonVisible( false );
 	pStatusFrame->SetOperationColumnHeaderText( "Source Channel" );
 
-	int nSrcCount = pChannelsClip->m_Channels.Count();
+	intp nSrcCount = pChannelsClip->m_Channels.Count();
 	CDmeChannel** ppFoundChannels = (CDmeChannel**)_alloca( nSrcCount * sizeof(CDmeChannel*) );
 	int nFoundCount = 0;
 
@@ -654,7 +623,7 @@ void CBaseAnimationSetEditor::ImportAnimation( CDmeChannelsClip *pChannelsClip, 
 		}
 	}
 
-	for ( int i = 0; i < nSrcCount; ++i )
+	for ( intp i = 0; i < nSrcCount; ++i )
 	{
 		CDmeChannel *pMissingChannel  = pChannelsClip->m_Channels[i];
 
@@ -726,15 +695,15 @@ void CBaseAnimationSetEditor::SelectImportAnimation( CDmeAnimationList *pAnimati
 	SetElementKeyValue( pContextKeyValues, "animationList", pAnimationList );
 	pContextKeyValues->SetInt( "visibleOnly", bVisibleOnly );
 
-	int nCount = pAnimationList->GetAnimationCount();
-	CUtlVector< DmePickerInfo_t > choices( 0, nCount );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pAnimationList->GetAnimationCount();
+	CUtlVector< DmePickerInfo_t > choices( (intp)0, nCount );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeChannelsClip *pAnimation = pAnimationList->GetAnimation( i );
 		if ( !pAnimation )
 			continue;
 
-		int j = choices.AddToTail();
+		intp j = choices.AddToTail();
 		DmePickerInfo_t& info = choices[j];
 		info.m_hElement = pAnimation->GetHandle();
 		info.m_pChoiceString = pAnimation->GetName();
@@ -828,24 +797,24 @@ void CBaseAnimationSetEditor::OnImportAnimation( KeyValues *pParams )
 	char pStartingDir[ MAX_PATH ];
 	if ( !pGameModel )
 	{
-		GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+		GetModContentSubdirectory( "models", pStartingDir );
 	}
 	else
 	{
 		char pModelName[ MAX_PATH ];
 		studiohdr_t *pStudioHdr = pGameModel->GetStudioHdr();
-		Q_StripExtension( pStudioHdr->pszName(), pModelName, sizeof(pModelName) );
+		Q_StripExtension( pStudioHdr->pszName(), pModelName );
 
 		char pRelativePath[ MAX_PATH ];
-		Q_snprintf( pRelativePath, sizeof(pRelativePath), "models/%s/animations/dmx", pModelName );
-		GetModContentSubdirectory( pRelativePath, pStartingDir, sizeof(pStartingDir) );
+		V_sprintf_safe( pRelativePath, "models/%s/animations/dmx", pModelName );
+		GetModContentSubdirectory( pRelativePath, pStartingDir );
 		if ( !g_pFullFileSystem->IsDirectory( pStartingDir ) )
 		{
-			Q_snprintf( pRelativePath, sizeof(pRelativePath), "models/%s", pModelName );
-			GetModContentSubdirectory( pRelativePath, pStartingDir, sizeof(pStartingDir) );
+			V_sprintf_safe( pRelativePath, "models/%s", pModelName );
+			GetModContentSubdirectory( pRelativePath, pStartingDir );
 			if ( !g_pFullFileSystem->IsDirectory( pStartingDir ) )
 			{
-				GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+				GetModContentSubdirectory( "models", pStartingDir );
 			}
 		}
 	}
@@ -869,7 +838,7 @@ void CBaseAnimationSetEditor::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog
 {
 	// Compute starting directory
 	char pStartingDir[ MAX_PATH ];
-	GetModSubdirectory( "scenes", pStartingDir, sizeof(pStartingDir) );
+	GetModSubdirectory( "scenes", pStartingDir );
 
 	Assert( !bOpenFile );
 	pDialog->SetTitle( "Save Facial Animation As", true );

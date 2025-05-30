@@ -21,7 +21,7 @@
 
 
 CEditPrefabDlg::CEditPrefabDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CEditPrefabDlg::IDD, pParent)
+	: CBaseDlg(CEditPrefabDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditPrefabDlg)
 	m_strDescript = _T("");
@@ -36,7 +36,7 @@ CEditPrefabDlg::CEditPrefabDlg(CWnd* pParent /*=NULL*/)
 
 void CEditPrefabDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditPrefabDlg)
 	DDX_Control(pDX, IDC_CREATEIN, m_CreateIn);
 	DDX_Control(pDX, IDC_NAME, m_Name);
@@ -49,7 +49,7 @@ void CEditPrefabDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CEditPrefabDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEditPrefabDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditPrefabDlg)
 	ON_CBN_SELCHANGE(IDC_CREATEIN, OnSelchangeCreatein)
 	//}}AFX_MSG_MAP
@@ -73,7 +73,7 @@ void CEditPrefabDlg::EnableLibrary(BOOL b)
 
 BOOL CEditPrefabDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	if(!m_bEnableLibrary)
 	{
@@ -103,5 +103,5 @@ BOOL CEditPrefabDlg::OnInitDialog()
 
 void CEditPrefabDlg::OnSelchangeCreatein() 
 {
-	m_dwLibraryID = m_CreateIn.GetItemData(m_CreateIn.GetCurSel());	
+	m_dwLibraryID = static_cast<DWORD>(m_CreateIn.GetItemData(m_CreateIn.GetCurSel()));	
 }

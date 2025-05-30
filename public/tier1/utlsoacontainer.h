@@ -207,7 +207,7 @@ public:
 	}
 
 
-	FORCEINLINE void AssertDataType( int nAttrIdx, EAttributeDataType nDataType ) const
+	FORCEINLINE void AssertDataType( [[maybe_unused]] int nAttrIdx, [[maybe_unused]] EAttributeDataType nDataType ) const
 	{
 		Assert( nAttrIdx >= 0 );
 		Assert( nAttrIdx < MAX_SOA_FIELDS );
@@ -234,7 +234,7 @@ public:
 
 	// how much to step to go from the end of one row to the start of the next one. Basically, how
 	// many bytes to add at the end of a row when iterating over the whole 2d array with ++
-	FORCEINLINE size_t RowToRowStep( int nAttrIdx ) const
+	FORCEINLINE size_t RowToRowStep( [[maybe_unused]] int nAttrIdx ) const
 	{
 		return 0;
 	}

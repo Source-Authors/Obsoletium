@@ -606,7 +606,7 @@ public:
 };
 
 
-inline bool IsErrorMaterial( IMaterial *pMat )
+inline bool IsErrorMaterial( const IMaterial *pMat )
 {
 	return !pMat || pMat->IsErrorMaterial();
 }

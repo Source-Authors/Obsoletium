@@ -270,14 +270,14 @@ void CImportKeyValueBase::RecursivelyResolveElement( CDmElement* pElement )
 //-----------------------------------------------------------------------------
 // Main entry point for the unserialization
 //-----------------------------------------------------------------------------
-bool CImportKeyValueBase::Unserialize( CUtlBuffer &buf, const char *pEncodingName, int nEncodingVersion,
-									   const char *pSourceFormatName, int nSourceFormatVersion,
-									   DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot )
+bool CImportKeyValueBase::Unserialize( CUtlBuffer &buf, [[maybe_unused]] const char *pEncodingName, [[maybe_unused]] int nEncodingVersion,
+									   [[maybe_unused]] const char *pSourceFormatName, [[maybe_unused]] int nSourceFormatVersion,
+									   DmFileId_t fileid, [[maybe_unused]] DmConflictResolution_t idConflictResolution, CDmElement **ppRoot )
 {
 	*ppRoot = NULL;
 	m_pFileName = g_pDataModel->GetFileName( fileid );
 
-	KeyValues *kv = new KeyValues( "dmx file" );
+	KeyValuesAD kv( "dmx file" );
 	if ( !kv )
 		return false;
 
@@ -287,6 +287,5 @@ bool CImportKeyValueBase::Unserialize( CUtlBuffer &buf, const char *pEncodingNam
 		*ppRoot = UnserializeFromKeyValues( kv );
 	}
 
-	kv->deleteThis();
 	return bOk;
 }

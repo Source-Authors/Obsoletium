@@ -2,4 +2,4 @@
 
 #define SRC_IDI_APP_MAIN                      101
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "File checksum utility"
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "File Checksum Utility"

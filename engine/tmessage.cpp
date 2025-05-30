@@ -431,7 +431,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 					ConDMsg("Error parsing file!\n" );
 					return;
 				}
-				Q_strcpy( nameHeap + lastNamePos, currentName );
+				V_strcpy( nameHeap + lastNamePos, currentName );
 
 				// Terminate text in-place in the memory file (it's temporary memory that will be deleted)
 				// If the string starts with #, it's a localization string and we don't
@@ -531,7 +531,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 		{
 			gMessageTable[ i ].pClearMessage += nameOffset;
 		}
-		Q_strcpy( pCurrentText, gMessageTable[i].pMessage );	// Copy text over
+		V_strcpy( pCurrentText, gMessageTable[i].pMessage );	// Copy text over
 		gMessageTable[i].pMessage = pCurrentText;
 		pCurrentText += strlen( pCurrentText ) + 1;
 	}

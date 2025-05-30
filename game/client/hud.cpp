@@ -18,13 +18,11 @@
 #include "in_buttons.h"
 #include <vgui_controls/Controls.h>
 #include <vgui/ISurface.h>
-#include <KeyValues.h>
 #include "itextmessage.h"
-#include "mempool.h"
-#include <KeyValues.h>
+#include "tier1/mempool.h"
+#include "tier1/KeyValues.h"
 #include "filesystem.h"
 #include <vgui_controls/AnimationController.h>
-#include <vgui/ISurface.h>
 #include "hud_lcd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -59,7 +57,7 @@ void LoadHudTextures( CUtlDict< CHudTexture *, int >& list, const char *szFilena
 {
 	KeyValues *pTemp, *pTextureSection;
 
-	KeyValues *pKeyValuesData = ReadEncryptedKVFile( filesystem, szFilenameWithoutExtension, pICEKey );
+	KeyValuesAD pKeyValuesData(ReadEncryptedKVFile( filesystem, szFilenameWithoutExtension, pICEKey ));
 	if ( pKeyValuesData )
 	{
 		CUtlVector<HudTextureFileRef> hudTextureFileRefs;
@@ -135,9 +133,6 @@ void LoadHudTextures( CUtlDict< CHudTexture *, int >& list, const char *szFilena
 			}
 		}
 	}
-
-	// Failed for some reason. Delete the Key data and abort.
-	pKeyValuesData->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -415,40 +410,35 @@ void CHud::Init( void )
 
 	m_bHudTexturesLoaded = false;
 
-	KeyValues *kv = new KeyValues( "layout" );
-	if ( kv )
+	KeyValuesAD kv( "layout" );
+	if ( kv && kv->LoadFromFile( filesystem, "scripts/HudLayout.res" ) )
 	{
-		if ( kv->LoadFromFile( filesystem, "scripts/HudLayout.res" ) )
+		intp numelements = m_HudList.Count();
+
+		for ( intp i = 0; i < numelements; i++ )
 		{
-			intp numelements = m_HudList.Count();
+			CHudElement *element = m_HudList[i];
 
-			for ( intp i = 0; i < numelements; i++ )
+			vgui::Panel *pPanel = dynamic_cast<vgui::Panel*>(element);
+			if ( !pPanel )
 			{
-				CHudElement *element = m_HudList[i];
+				Msg( "Non-vgui hud element %s\n", m_HudList[i]->GetName() );
+				continue;
+			}
 
-				vgui::Panel *pPanel = dynamic_cast<vgui::Panel*>(element);
-				if ( !pPanel )
-				{
-					Msg( "Non-vgui hud element %s\n", m_HudList[i]->GetName() );
-					continue;
-				}
+			KeyValues *key = kv->FindKey( pPanel->GetName(), false );
+			if ( !key )
+			{
+				Msg( "Hud element '%s' doesn't have an entry '%s' in scripts/HudLayout.res\n", m_HudList[i]->GetName(), pPanel->GetName() );
+			}
 
-				KeyValues *key = kv->FindKey( pPanel->GetName(), false );
-				if ( !key )
-				{
-					Msg( "Hud element '%s' doesn't have an entry '%s' in scripts/HudLayout.res\n", m_HudList[i]->GetName(), pPanel->GetName() );
-				}
-
-				// Note:  When a panel is parented to the module root, it's "parent" is returned as NULL.
-				if ( !element->IsParentedToClientDLLRootPanel() && 
-					 !pPanel->GetParent() )
-				{
-					DevMsg( "Hud element '%s'/'%s' doesn't have a parent\n", m_HudList[i]->GetName(), pPanel->GetName() );
-				}
+			// Note:  When a panel is parented to the module root, it's "parent" is returned as NULL.
+			if ( !element->IsParentedToClientDLLRootPanel() && 
+					!pPanel->GetParent() )
+			{
+				DevMsg( "Hud element '%s'/'%s' doesn't have a parent\n", m_HudList[i]->GetName(), pPanel->GetName() );
 			}
 		}
-
-		kv->deleteThis();
 	}
 
 	if ( m_bHudTexturesLoaded )
@@ -523,9 +513,8 @@ void CHud::LevelInit( void )
 	}
 
 	// Unhide all render groups
-	size_t iCount = m_RenderGroups.Count();
-	Assert( iCount <= std::numeric_limits<unsigned short>::max() );
-	for ( unsigned short i = 0; i < static_cast<unsigned short>(iCount); i++ )
+	auto iCount = m_RenderGroups.Count();
+	for ( decltype(m_RenderGroups)::IndexType_t i = 0; i < iCount; i++ )
 	{
 		CHudRenderGroup *group = m_RenderGroups[ i ];
 		group->bHidden = false;
@@ -550,19 +539,20 @@ void CHud::LevelShutdown( void )
 //-----------------------------------------------------------------------------
 CHud::~CHud()
 {
-	int c = m_Icons.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	const int iconsCount{m_Icons.Count()};
+	for ( int i = iconsCount - 1; i >= 0; i-- )
 	{
 		CHudTexture *tex = m_Icons[ i ];
 		g_HudTextureMemoryPool.Free( tex );
 	}
 	m_Icons.Purge();
 
-	c = m_RenderGroups.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	// dimhotepus: Use correct indexer type.
+	const unsigned short groupCount{m_RenderGroups.Count()};
+	for ( int i = static_cast<int>(groupCount) - 1; i >= 0; i-- )
 	{
-		CHudRenderGroup *group = m_RenderGroups[ i ];
-		m_RenderGroups.RemoveAt(i);
+		CHudRenderGroup *group = m_RenderGroups[ static_cast<unsigned short>(i) ];
+		m_RenderGroups.RemoveAt( static_cast<unsigned short>(i) );
 		delete group;
 	}
 }
@@ -1002,7 +992,7 @@ void CHud::ProcessInput( bool bActive )
 	}
 }
 
-int CHud::LookupRenderGroupIndexByName( const char *pszGroupName )
+intp CHud::LookupRenderGroupIndexByName( const char *pszGroupName )
 {
 	return m_RenderGroupNames.Find( pszGroupName );
 }
@@ -1017,8 +1007,7 @@ bool CHud::LockRenderGroup( int iGroupIndex, CHudElement *pLocker /* = NULL */ )
 	if ( !DoesRenderGroupExist(iGroupIndex) )
 		return false;
 
-	int iRenderGroup = m_RenderGroups.Find( iGroupIndex );
-
+	auto iRenderGroup = m_RenderGroups.Find( iGroupIndex );
 	Assert( m_RenderGroups.IsValidIndex( iRenderGroup ) );
 
 	CHudRenderGroup *group = m_RenderGroups.Element( iRenderGroup );
@@ -1066,8 +1055,7 @@ bool CHud::UnlockRenderGroup( int iGroupIndex, CHudElement *pLocker /* = NULL */
 	if ( !DoesRenderGroupExist(iGroupIndex) )
 		return false;
 
-	int iRenderGroup = m_RenderGroups.Find( iGroupIndex );
-
+	auto iRenderGroup = m_RenderGroups.Find( iGroupIndex );
 	Assert( m_RenderGroups.IsValidIndex( iRenderGroup ) );
 
 	CHudRenderGroup *group = m_RenderGroups.Element( iRenderGroup );
@@ -1105,8 +1093,7 @@ bool CHud::IsRenderGroupLockedFor( CHudElement *pHudElement, int iGroupIndex )
 	if ( !DoesRenderGroupExist(iGroupIndex) )
 		return false;
 
-	int i = m_RenderGroups.Find( iGroupIndex );
-
+	auto i = m_RenderGroups.Find( iGroupIndex );
 	Assert( m_RenderGroups.IsValidIndex(i) );
 
 	CHudRenderGroup *group = m_RenderGroups.Element(i);

@@ -182,7 +182,7 @@ public:
 		sv.RecalculateTags();
 	}
 
-	virtual bool NET_GetHostnameAsIP( const char *pHostname, char *pOut, int nOutSize )
+	virtual bool NET_GetHostnameAsIP( const char *pHostname, char *pOut, intp nOutSize )
 	{
 		netadr_t adr;
 		if ( !NET_StringToAdr( pHostname, &adr ) )
@@ -261,13 +261,13 @@ public:
 		return steamID.GetAccountID();
 	}
 
-	void Con_NPrintf( int nPos, const char *pFormat, ... )
+	void Con_NPrintf( int nPos, PRINTF_FORMAT_STRING const char *pFormat, ... )
 	{
 		va_list argptr;
 		char szText[4096];
 
 		va_start ( argptr, pFormat );
-		Q_vsnprintf( szText, sizeof( szText ), pFormat, argptr );
+		V_vsprintf_safe( szText, pFormat, argptr );
 		va_end ( argptr );
 
 		::Con_NPrintf( nPos, "%s", szText );

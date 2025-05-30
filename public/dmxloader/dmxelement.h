@@ -102,9 +102,9 @@ public:
 	bool				HasAttribute( const char *pAttributeName ) const;
 	CDmxAttribute		*GetAttribute( const char *pAttributeName );
 	const CDmxAttribute *GetAttribute( const char *pAttributeName ) const;
-	intp					AttributeCount() const;
-	CDmxAttribute		*GetAttribute( int nIndex );
-	const CDmxAttribute *GetAttribute( int nIndex ) const;
+	intp				AttributeCount() const;
+	CDmxAttribute		*GetAttribute( intp nIndex );
+	const CDmxAttribute *GetAttribute( intp nIndex ) const;
 	CUtlSymbol			GetType() const;
 	const char*			GetTypeString() const;
 	const char*			GetName() const;
@@ -130,7 +130,7 @@ public:
 
 	// Set methods
 	CDmxAttribute* SetValue( const char *pAttributeName, const char *pString );
-	CDmxAttribute* SetValue( const char *pAttributeName, void *pBuffer, int nLen );
+	CDmxAttribute* SetValue( const char *pAttributeName, void *pBuffer, intp nLen );
 	template< class T > CDmxAttribute* SetValue( const char *pAttributeName, const T& value );
 
 	// Method to unpack data into a structure
@@ -160,8 +160,8 @@ private:
 	void Resort( ) const;
 
 	// Finds an attribute by name
-	int FindAttribute( const char *pAttributeName ) const;
-	int FindAttribute( CUtlSymbol attributeName ) const;
+	intp FindAttribute( const char *pAttributeName ) const;
+	intp FindAttribute( CUtlSymbol attributeName ) const;
 
 	// Sets the object id
 	void SetId( const DmObjectId_t &id );
@@ -289,7 +289,7 @@ inline CDmxAttribute* CDmxElement::SetValue( const char *pAttributeName, const c
 	return pAttribute;
 }
 
-inline CDmxAttribute* CDmxElement::SetValue( const char *pAttributeName, void *pBuffer, int nLen )
+inline CDmxAttribute* CDmxElement::SetValue( const char *pAttributeName, void *pBuffer, intp nLen )
 {
 	CDmxElementModifyScope modify( this );
 	CDmxAttribute *pAttribute = AddAttribute( pAttributeName );

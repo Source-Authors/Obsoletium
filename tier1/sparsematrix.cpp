@@ -39,7 +39,7 @@ void CSparseMatrix::SetElement( int nRow, int nCol, float flValue )
 	Assert( nCol < m_nNumCols );
 	int nCount = m_rowDescriptors[nRow].m_nNonZeroCount;
 	bool bValueIsZero = ( flValue == 0.0 );
-	int nFirstEntryIndex = m_rowDescriptors[nRow].m_nDataIndex;
+	intp nFirstEntryIndex = m_rowDescriptors[nRow].m_nDataIndex;
 	if ( nCount )
 	{
 		NonZeroValueDescriptor_t *pValue = &( m_entries[nFirstEntryIndex] );

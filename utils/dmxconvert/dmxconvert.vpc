@@ -9,11 +9,25 @@ $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
-$Project "Dmxconvert"
+$Configuration
 {
+	$Linker
+	{
+			$AdditionalDependencies			"$BASE User32.lib" [$WINDOWS]
+	}
+}
+
+$Project "dmxconvert"
+{
+	$Folder	"Header Files"
+	{
+		$File	"..\common\tools_minidump.h"
+	}
+
 	$Folder	"Source Files"
 	{
 		$File	"dmxconvert.cpp"
+		$File	"..\common\tools_minidump.cpp"
 	}
 
 	$Folder	"Link Libraries"

@@ -79,10 +79,10 @@ public:
 	CNewParticleEffect *Create( const char *pszParticleName, ParticleAttachment_t iAttachType, const char *pszAttachmentName );
 	CNewParticleEffect *Create( const char *pszParticleName, ParticleAttachment_t iAttachType, int iAttachmentPoint = INVALID_PARTICLE_ATTACHMENT, Vector vecOriginOffset = vec3_origin );
 	void				AddControlPoint( CNewParticleEffect *pEffect, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, const char *pszAttachmentName = NULL, Vector vecOriginOffset = vec3_origin );
-	void				AddControlPoint( int iEffectIndex, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, int iAttachmentPoint = INVALID_PARTICLE_ATTACHMENT, Vector vecOriginOffset = vec3_origin );
+	void				AddControlPoint( intp iEffectIndex, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, int iAttachmentPoint = INVALID_PARTICLE_ATTACHMENT, Vector vecOriginOffset = vec3_origin );
 
 	inline void			SetControlPointParent( CNewParticleEffect *pEffect, int whichControlPoint, int parentIdx );
-	void				SetControlPointParent( int iEffectIndex, int whichControlPoint, int parentIdx );
+	void				SetControlPointParent( intp iEffectIndex, int whichControlPoint, int parentIdx );
 
 	// Commands
 	void				StopEmission( CNewParticleEffect *pEffect = NULL, bool bWakeOnStop = false, bool bDestroyAsleepSystems = false );
@@ -107,14 +107,14 @@ public:
 	// Debugging
 	void				DebugPrintEffects( void );
 
-	int					FindEffect( const char *pEffectName, int nStart = 0 );
+	intp				FindEffect( const char *pEffectName, intp nStart = 0 );
 	inline CNewParticleEffect *GetParticleEffectFromIdx( int idx );
 
 private:
 	int					GetParticleAttachment( C_BaseEntity *pEntity, const char *pszAttachmentName, const char *pszParticleName );
-	int					FindEffect( CNewParticleEffect *pEffect );
-	void				UpdateParticleEffect( ParticleEffectList_t *pEffect, bool bInitializing = false, int iOnlyThisControlPoint = -1 );
-	void				UpdateControlPoint( ParticleEffectList_t *pEffect, int iPoint, bool bInitializing );
+	intp				FindEffect( CNewParticleEffect *pEffect );
+	void				UpdateParticleEffect( ParticleEffectList_t *pEffect, bool bInitializing = false, intp iOnlyThisControlPoint = -1 );
+	void				UpdateControlPoint( ParticleEffectList_t *pEffect, intp iPoint, bool bInitializing );
 
 private:
 	CBaseEntity *m_pOuter;

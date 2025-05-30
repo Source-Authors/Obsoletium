@@ -52,7 +52,7 @@ RecvProp RecvPropUtlVector(
 	EnsureCapacityFn ensureFn,
 
 	int nMaxElements,	// Max # of elements in the array. Keep this as low as possible.
-	RecvProp pArrayProp	// The definition of the property you're receiving into.
+	const RecvProp& pArrayProp	// The definition of the property you're receiving into.
 						// You can leave all of its parameters at 0 (name, offset, size, etc).
 	);
 

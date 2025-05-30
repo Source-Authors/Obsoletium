@@ -20,7 +20,7 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #ifndef INCLUDED_PAKVIEWER
 #define INCLUDED_PAKVIEWER
@@ -79,7 +79,7 @@ public:
 	~PAKViewer ();
 
 	// MANIPULATORS
-	virtual int handleEvent (mxEvent *event);
+	int handleEvent (mxEvent *event) override;
 	int OnPAKViewer ();
 	int OnLoadModel ();
 	int OnLoadTexture (int pos);

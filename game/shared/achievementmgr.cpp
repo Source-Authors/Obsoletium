@@ -509,20 +509,10 @@ void CAchievementMgr::LevelInitPreEntity()
 	// client and server have map names available in different forms (full path on client, just file base name on server), 
 	// cache it in base file name form here so we don't have to have different code paths each time we access it
 #ifdef CLIENT_DLL	
-	Q_FileBase( engine->GetLevelName(), m_szMap, ARRAYSIZE( m_szMap ) );
+	V_FileBase( engine->GetLevelName(), m_szMap );
 #else
 	Q_strncpy( m_szMap, gpGlobals->mapname.ToCStr(), ARRAYSIZE( m_szMap ) );
 #endif // CLIENT_DLL
-
-	if ( IsX360() )
-	{
-		// need to remove the .360 extension on the end of the map name
-		char *pExt = Q_stristr( m_szMap, ".360" );
-		if ( pExt )
-		{
-			*pExt = '\0';
-		}
-	}
 
 	// look through all achievements, see which ones we want to have listen for events
 	FOR_EACH_MAP( m_mapAchievement, iAchievement )
@@ -692,15 +682,15 @@ void CAchievementMgr::DownloadUserData()
 
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
-			intp dirlen = Q_strlen( modDir );
+			V_StripLastDir( modDir );
+			intp dirlen = V_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}
@@ -803,7 +793,7 @@ void CAchievementMgr::LoadGlobalState()
     // HPE_END
     //=============================================================================
 
-	KeyValues::AutoDelete pKV = KeyValues::AutoDelete("GameState");
+	KeyValuesAD pKV("GameState");
 	if ( pKV->LoadFromFile( filesystem, szFilename, "MOD" ) )
 	{
 		KeyValues *pNode = pKV->GetFirstSubKey();
@@ -1071,7 +1061,7 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 	if ( sv_nostats.GetBool() )
 	{
 		// prevent message spam
-		const float fNotificationCooldown = 60.0f;
+		constexpr float fNotificationCooldown = 60.0f;
 		static float fNextNotification = 0.0f;
 		if (gpGlobals->curtime >= fNextNotification)
 		{
@@ -1136,6 +1126,9 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 //-----------------------------------------------------------------------------
 bool CalcPlayersOnFriendsList( int iMinFriends )
 {
+#ifdef NO_STEAM
+	return false;
+#else
 	// Got message during connection
 	if ( !g_PR )
 		return false;
@@ -1150,12 +1143,8 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 	// determine local player team
 	int iLocalPlayerIndex =  GetLocalPlayerIndex();
 
-#ifndef NO_STEAM
 	if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
 		return false;
-#else
-	return false;
-#endif
 
 	// Loop through the players
 	int iTotalFriends = 0;
@@ -1170,18 +1159,17 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 			if ( !pi.friendsID )
 				continue;
 
-#ifndef NO_STEAM
 			// check and see if they're on the local player's friends list
 			CSteamID steamID( pi.friendsID, 1, GetUniverse(), k_EAccountTypeIndividual );
 			if ( !steamapicontext->SteamFriends()->HasFriend( steamID, /*k_EFriendFlagImmediate*/ 0x04 ) )
 				continue;
-#endif
 
 			iTotalFriends++;
 		}
 	}
 
 	return iTotalFriends >= iMinFriends;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1191,6 +1179,10 @@ bool CalcPlayersOnFriendsList( int iMinFriends )
 //-----------------------------------------------------------------------------
 bool CalcHasNumClanPlayers( int iClanTeammates )
 {
+	// dimhotepus: No Steam.
+#ifdef NO_STEAM
+	return false;
+#else
 	Assert( g_pGameRules && g_pGameRules->IsMultiplayer() );
 
 	// Do a cheap rejection: check teammate count first to see if we even need to bother checking w/Steam
@@ -1198,13 +1190,8 @@ bool CalcHasNumClanPlayers( int iClanTeammates )
 	if ( CalcPlayerCount()-1 < iClanTeammates )
 		return false;
 
-	// dimhotepus: No Steam.
-#ifdef NO_STEAM
-	return false;
-#else
 	if ( !steamapicontext->SteamFriends() || !steamapicontext->SteamUtils() || !g_pGameRules->IsMultiplayer() )
 		return false;
-#endif
 
 	// determine local player team
 	int iLocalPlayerIndex =  GetLocalPlayerIndex();
@@ -1234,6 +1221,7 @@ bool CalcHasNumClanPlayers( int iClanTeammates )
 		}
 	}
 	return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1996,11 +1984,11 @@ CON_COMMAND_F( achievement_test_friend_count, "Counts the # of teammates on loca
 #ifdef NO_STEAM
 	Warning( "Can't count # of friends in the game. No Steam support in this build.\n" );
 	return;
-#endif
-
+#else
 	int iMinFriends = atoi( args[1] );
 	bool bRet = CalcPlayersOnFriendsList( iMinFriends );
 	Msg( "You %s have at least %d friends in the game.\n", bRet ? "do" : "do not", iMinFriends );
+#endif
 }
 
 CON_COMMAND_F( achievement_test_clan_count, "Determines if specified # of teammates belong to same clan w/local player", FCVAR_CHEAT )
@@ -2018,11 +2006,11 @@ CON_COMMAND_F( achievement_test_clan_count, "Determines if specified # of teamma
 #ifdef NO_STEAM
 	Warning( "Can't check # of players who you're in a Steam group with. No Steam support in this build.\n" );
 	return;
-#endif
-
+#else
 	int iClanPlayers = atoi( args[1] );
 	bool bRet = CalcHasNumClanPlayers( iClanPlayers );
 	Msg( "There %s %d players who you're in a Steam group with.\n", bRet ? "are" : "are not", iClanPlayers );
+#endif
 }
 
 CON_COMMAND_F( achievement_mark_dirty, "Mark achievement data as dirty", FCVAR_CHEAT )

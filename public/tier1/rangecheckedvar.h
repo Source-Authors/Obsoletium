@@ -14,7 +14,7 @@
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 #include "mathlib/vector.h"
-#include <float.h>
+#include <cfloat>
 
 
 // Use this to disable range checks within a scope.
@@ -34,12 +34,12 @@ inline void RangeCheck( const T &value, int, int )
 	if ( ThreadInMainThread() && g_bDoRangeChecks )
 	{
 		// Ignore the min/max stuff for now.. just make sure it's not a NAN.
-		Assert( _finite( value ) );
+		Assert( std::isfinite( value ) );
 	}
 #endif
 }
 
-inline void RangeCheck( const Vector &value, int minValue, int maxValue )
+inline void RangeCheck( [[maybe_unused]] const Vector &value, [[maybe_unused]] int minValue, [[maybe_unused]] int maxValue )
 {
 #ifdef _DEBUG
 	RangeCheck( value.x, minValue, maxValue );
@@ -64,7 +64,7 @@ public:
 		*this = value;
 	}
 
-	T GetRaw() const
+	[[nodiscard]] T GetRaw() const
 	{
 		return m_Val;
 	}
@@ -78,7 +78,7 @@ public:
 			m_Val = maxValue;
 	}
 
-	inline operator const T&() const
+	[[nodiscard]] inline operator const T&() const
 	{
 		return m_Val;
 	}

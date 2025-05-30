@@ -631,10 +631,10 @@ enum
 //-----------------------------------------------------------------------------
 // EFFECTS
 //-----------------------------------------------------------------------------
-const int FX_BLOODSPRAY_DROPS	= 0x01;
-const int FX_BLOODSPRAY_GORE	= 0x02;
-const int FX_BLOODSPRAY_CLOUD	= 0x04;
-const int FX_BLOODSPRAY_ALL		= 0xFF;
+constexpr inline int FX_BLOODSPRAY_DROPS	= 0x01;
+constexpr inline int FX_BLOODSPRAY_GORE		= 0x02;
+constexpr inline int FX_BLOODSPRAY_CLOUD	= 0x04;
+constexpr inline int FX_BLOODSPRAY_ALL		= 0xFF;
 
 //-----------------------------------------------------------------------------
 #define MAX_SCREEN_OVERLAYS		10

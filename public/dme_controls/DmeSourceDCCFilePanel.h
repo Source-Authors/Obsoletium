@@ -30,15 +30,15 @@ class CDmeSourceDCCFile;
 //-----------------------------------------------------------------------------
 class CDmeSourceDCCFilePanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeSourceDCCFilePanel, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeSourceDCCFilePanel, EditablePanel );
 
 public:
 	CDmeSourceDCCFilePanel( vgui::Panel *pParent, const char *pPanelName );
 	virtual ~CDmeSourceDCCFilePanel();
 
 	// Inherited from Panel
-	virtual void OnCommand( const char *pCommand );
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
+	void OnCommand( const char *pCommand ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
 	void SetDmeElement( CDmeSourceDCCFile *pSourceDCCFile );
 

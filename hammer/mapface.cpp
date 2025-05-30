@@ -164,7 +164,7 @@ BOOL CMapFace::Fix(void)
 // Purpose: Returns the short texture name in 'pszName'. Places an empty string
 //			in 'pszName' if the face has no texture.
 //-----------------------------------------------------------------------------
-void CMapFace::GetTextureName(char *pszName) const
+void CMapFace::GetTextureName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const
 {
 	Assert(pszName != NULL);
 
@@ -172,7 +172,7 @@ void CMapFace::GetTextureName(char *pszName) const
 	{
 		if (m_pTexture != NULL)
 		{
-			m_pTexture->GetShortName(pszName);
+			m_pTexture->GetShortName(pszName, nameSize);
 		}
 		else
 		{
@@ -1515,7 +1515,7 @@ BOOL CMapFace::CheckFace(CCheckFaceInfo *pInfo)
 				{
 					if (pInfo != NULL)
 					{
-						strcpy(pInfo->szDescription, "face has duplicate plane points");
+						V_strcpy_safe(pInfo->szDescription, "face has duplicate plane points");
 					}
 					return(FALSE);		
 				}
@@ -2624,7 +2624,7 @@ ChunkFileResult_t CMapFace::LoadKeyCallback(const char *szKey, const char *szVal
 	}
 	else if (!stricmp(szKey, "material"))
 	{
-		strcpy(pLoadFace->szTexName, szValue);
+		V_strcpy_safe(pLoadFace->szTexName, szValue);
 	}
 	else if (!stricmp(szKey, "uaxis"))
 	{
@@ -2779,7 +2779,7 @@ ChunkFileResult_t CMapFace::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	if (eResult == ChunkFile_Ok)
 	{
-		sprintf(szBuf, "(%g %g %g) (%g %g %g) (%g %g %g)",
+		V_sprintf_safe(szBuf, "(%g %g %g) (%g %g %g) (%g %g %g)",
 				(double)plane.planepts[0][0], (double)plane.planepts[0][1], (double)plane.planepts[0][2],
 				(double)plane.planepts[1][0], (double)plane.planepts[1][1], (double)plane.planepts[1][2],
 				(double)plane.planepts[2][0], (double)plane.planepts[2][1], (double)plane.planepts[2][2]);
@@ -2790,7 +2790,7 @@ ChunkFileResult_t CMapFace::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	if (eResult == ChunkFile_Ok)
 	{
 		char szTexture[MAX_PATH];
-		strcpy(szTexture, texture.texture);
+		V_strcpy_safe(szTexture, texture.texture);
 		strupr(szTexture);
 
 		eResult = pFile->WriteKeyValue("material", szTexture);
@@ -2798,13 +2798,13 @@ ChunkFileResult_t CMapFace::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 	if (eResult == ChunkFile_Ok)
 	{
-		sprintf(szBuf, "[%g %g %g %g] %g", (double)texture.UAxis[0], (double)texture.UAxis[1], (double)texture.UAxis[2], (double)texture.UAxis[3], (double)texture.scale[0]);
+		V_sprintf_safe(szBuf, "[%g %g %g %g] %g", (double)texture.UAxis[0], (double)texture.UAxis[1], (double)texture.UAxis[2], (double)texture.UAxis[3], (double)texture.scale[0]);
 		eResult = pFile->WriteKeyValue("uaxis", szBuf);
 	}
 
 	if (eResult == ChunkFile_Ok)
 	{
-		sprintf(szBuf, "[%g %g %g %g] %g", (double)texture.VAxis[0], (double)texture.VAxis[1], (double)texture.VAxis[2], (double)texture.VAxis[3], (double)texture.scale[1]);
+		V_sprintf_safe(szBuf, "[%g %g %g %g] %g", (double)texture.VAxis[0], (double)texture.VAxis[1], (double)texture.VAxis[2], (double)texture.VAxis[3], (double)texture.scale[1]);
 		eResult = pFile->WriteKeyValue("vaxis", szBuf);
 	}
 

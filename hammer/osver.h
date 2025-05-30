@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-typedef enum eOSVersion
+enum eOSVersion
 {
     eUninitialized,
     eUnknown,
@@ -13,5 +13,6 @@ typedef enum eOSVersion
     eWinNT,
 };
 
-extern void       initOSVersion();
-extern eOSVersion getOSVersion();
+// dimhotepus: Comment unused things.
+//extern void       initOSVersion();
+//extern eOSVersion getOSVersion();

@@ -3,11 +3,13 @@
 #include "stdafx.h"
 #include "tier0_strtools.h"
 
-
-#define TOLOWERC( x )  (( ( (x) >= 'A' ) && ( (x) <= 'Z' ) )?( (x) + 32 ) : x )
+[[nodiscard]] static constexpr inline int TOLOWERC( int x )
+{
+	return x >= 'A' && x <= 'Z' ? x + 32 : x;
+}
 
 extern "C"
-int	V_tier0_stricmp(const char *s1, const char *s2 )
+[[nodiscard]] int V_tier0_stricmp( IN_Z const char *s1, IN_Z const char *s2 )
 {
 	if (s1 == s2) return 0;
 
@@ -25,7 +27,7 @@ int	V_tier0_stricmp(const char *s1, const char *s2 )
 			{
 				if (!c2)
 				{
-					return c1 - c2;
+					return c1;
 				}
 
 				const int cc1 = TOLOWERC(c1), cc2 = TOLOWERC(c2);
@@ -46,7 +48,7 @@ int	V_tier0_stricmp(const char *s1, const char *s2 )
 			{
 				if (!c2)
 				{
-					return c1 - c2;
+					return c1;
 				}
 
 				const int cc1 = TOLOWERC(c1), cc2 = TOLOWERC(c2);

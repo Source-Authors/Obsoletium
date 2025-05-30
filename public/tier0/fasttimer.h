@@ -16,6 +16,8 @@ PLATFORM_INTERFACE double g_ClockSpeedMicrosecondsMultiplier;
 PLATFORM_INTERFACE double g_ClockSpeedMillisecondsMultiplier;
 PLATFORM_INTERFACE double g_ClockSpeedSecondsMultiplier;
 
+PLATFORM_INTERFACE uint64 g_ClockRtscpOverhead;
+
 class CCycleCount
 {
 friend class CFastTimer;
@@ -28,7 +30,7 @@ public:
 
 	void			Init();		// Set to zero.
 	void			Init( float initTimeMsec );
-	void			Init( double initTimeMsec )		{ Init( (float)initTimeMsec ); }
+	void			Init( double initTimeMsec )		{ Init( static_cast<float>( initTimeMsec ) ); }
 	void			Init( uint64 cycles );
 	bool			IsLessThan( CCycleCount const &other ) const;					// Compare two counts.
 
@@ -119,8 +121,8 @@ inline CTimeScope::~CTimeScope()
 class CTimeAdder
 {
 public:
-				CTimeAdder( CCycleCount *pTotal );
-				~CTimeAdder();
+	explicit CTimeAdder( CCycleCount *pTotal );
+	~CTimeAdder();
 
 	void		End();
 
@@ -218,7 +220,7 @@ private:
 class CAverageTimeMarker
 {
 public:
-	CAverageTimeMarker( CAverageCycleCounter *pCounter );
+	explicit CAverageTimeMarker( CAverageCycleCounter *pCounter );
 	~CAverageTimeMarker();
 	
 private:
@@ -233,7 +235,7 @@ private:
 
 inline CCycleCount::CCycleCount()
 {
-	Init( (uint64)0 );
+	Init( static_cast<uint64>(0) );
 }
 
 inline CCycleCount::CCycleCount( uint64 cycles )
@@ -243,15 +245,15 @@ inline CCycleCount::CCycleCount( uint64 cycles )
 
 inline void CCycleCount::Init()
 {
-	Init( (uint64)0 );
+	Init( static_cast<uint64>(0) );
 }
 
 inline void CCycleCount::Init( float initTimeMsec )
 {
 	if ( g_ClockSpeedMillisecondsMultiplier > 0 )
-		Init( (uint64)(initTimeMsec / g_ClockSpeedMillisecondsMultiplier) );
+		Init( static_cast<uint64>(initTimeMsec / g_ClockSpeedMillisecondsMultiplier) );
 	else
-		Init( (uint64)0 );
+		Init( static_cast<uint64>(0) );
 }
 
 inline void CCycleCount::Init( uint64 cycles )
@@ -261,7 +263,10 @@ inline void CCycleCount::Init( uint64 cycles )
 
 inline void CCycleCount::Sample()
 {
-	m_Int64 = Plat_Rdtsc();
+	// dimhotepus: Adjust by half of measurement overhead as we measure between
+	// 2 points.
+	uint32 coreId;
+	m_Int64 = Plat_Rdtscp(coreId) - (g_ClockRtscpOverhead / 2);
 }
 
 inline CCycleCount& CCycleCount::operator+=( CCycleCount const &other )
@@ -296,7 +301,7 @@ inline bool CCycleCount::IsLessThan(CCycleCount const &other) const
 
 inline unsigned long CCycleCount::GetCycles() const
 {
-	return (unsigned long)m_Int64;
+	return static_cast<unsigned long>(m_Int64);
 }
 
 inline uint64 CCycleCount::GetLongCycles() const
@@ -306,7 +311,7 @@ inline uint64 CCycleCount::GetLongCycles() const
 
 inline unsigned long CCycleCount::GetMicroseconds() const
 {
-	return (unsigned long)((m_Int64 * 1000000) / g_ClockSpeed);
+  return static_cast<unsigned long>(m_Int64 * 1000000 / g_ClockSpeed);
 }
 
 inline uint64 CCycleCount::GetUlMicroseconds() const
@@ -317,31 +322,31 @@ inline uint64 CCycleCount::GetUlMicroseconds() const
 
 inline double CCycleCount::GetMicrosecondsF() const
 {
-	return (double)( m_Int64 * g_ClockSpeedMicrosecondsMultiplier );
+	return static_cast<double>( m_Int64 * g_ClockSpeedMicrosecondsMultiplier );
 }
 
 
 inline void	CCycleCount::SetMicroseconds( unsigned long nMicroseconds )
 {
-	m_Int64 = ((uint64)nMicroseconds * g_ClockSpeed) / 1000000;
+	m_Int64 = static_cast<uint64>(nMicroseconds) * g_ClockSpeed / 1000000;
 }
 
 
 inline unsigned long CCycleCount::GetMilliseconds() const
 {
-	return (unsigned long)((m_Int64 * 1000) / g_ClockSpeed);
+	return static_cast<unsigned long>(m_Int64 * 1000 / g_ClockSpeed);
 }
 
 
 inline double CCycleCount::GetMillisecondsF() const
 {
-	return (double)( m_Int64 * g_ClockSpeedMillisecondsMultiplier );
+	return static_cast<double>( m_Int64 * g_ClockSpeedMillisecondsMultiplier );
 }
 
 
 inline double CCycleCount::GetSeconds() const
 {
-	return (double)( m_Int64 * g_ClockSpeedSecondsMultiplier );
+	return static_cast<double>( m_Int64 * g_ClockSpeedSecondsMultiplier );
 }
 
 
@@ -361,16 +366,6 @@ inline void CFastTimer::End()
 {
 	CCycleCount cnt;
 	cnt.Sample();
-	if ( IsX360() )
-	{
-		// have to handle rollover, hires timer is only accurate to 32 bits
-		// more than one overflow should not have occurred, otherwise caller should use a slower timer
-		if ( (uint64)cnt.m_Int64 <= (uint64)m_Duration.m_Int64 )
-		{
-			// rollover occurred	
-			cnt.m_Int64 += 0x100000000LL;	
-		}
-	}
 
 	m_Duration.m_Int64 = cnt.m_Int64 - m_Duration.m_Int64;
 
@@ -383,16 +378,6 @@ inline CCycleCount CFastTimer::GetDurationInProgress() const
 {
 	CCycleCount cnt;
 	cnt.Sample();
-	if ( IsX360() )
-	{
-		// have to handle rollover, hires timer is only accurate to 32 bits
-		// more than one overflow should not have occurred, otherwise caller should use a slower timer
-		if ( (uint64)cnt.m_Int64 <= (uint64)m_Duration.m_Int64 )
-		{
-			// rollover occurred	
-			cnt.m_Int64 += 0x100000000LL;	
-		}
-	}
 
 	CCycleCount result;
 	result.m_Int64 = cnt.m_Int64 - m_Duration.m_Int64;
@@ -447,7 +432,7 @@ inline unsigned CAverageCycleCounter::GetIters() const
 inline double CAverageCycleCounter::GetAverageMilliseconds() const
 {
 	if ( m_nIters )
-		return (m_Total.GetMillisecondsF() / (double)m_nIters);
+		return (m_Total.GetMillisecondsF() / static_cast<double>(m_nIters));
 	else
 		return 0;
 }
@@ -483,8 +468,8 @@ inline CAverageTimeMarker::~CAverageTimeMarker()
 class CLimitTimer
 {
 public:
-  CLimitTimer() = default;
-	CLimitTimer( uint64 cMicroSecDuration ) { SetLimit( cMicroSecDuration ); }
+	CLimitTimer() = default;
+	explicit CLimitTimer( uint64 cMicroSecDuration ) { SetLimit( cMicroSecDuration ); }
 	void SetLimit( uint64 m_cMicroSecDuration );
 	bool BLimitReached() const;
 
@@ -502,7 +487,7 @@ private:
 //-----------------------------------------------------------------------------
 inline void CLimitTimer::SetLimit( uint64 cMicroSecDuration )
 {
-	uint64 dlCycles = ( ( uint64 ) cMicroSecDuration * g_ClockSpeed ) / ( uint64 ) 1000000L;
+	uint64 dlCycles = static_cast<uint64>( cMicroSecDuration ) * g_ClockSpeed / 1000000ULL;
 	CCycleCount cycleCount;
 	cycleCount.Sample( );
 	m_lCycleLimit = cycleCount.GetLongCycles( ) + dlCycles;
@@ -534,7 +519,7 @@ inline int CLimitTimer::CMicroSecOverage() const
 	if ( lcCycles < m_lCycleLimit )
 		return 0;
 
-	return( ( int ) ( ( lcCycles - m_lCycleLimit ) * ( uint64 ) 1000000L / g_ClockSpeed ) );
+	return static_cast<int>( ( lcCycles - m_lCycleLimit ) * 1000000ULL / g_ClockSpeed );
 }
 
 
@@ -551,7 +536,7 @@ inline uint64 CLimitTimer::CMicroSecLeft() const
 	if ( lcCycles >= m_lCycleLimit )
 		return 0;
 
-	return( ( uint64 ) ( ( m_lCycleLimit - lcCycles ) * ( uint64 ) 1000000L / g_ClockSpeed ) );
+	return static_cast<uint64>( ( m_lCycleLimit - lcCycles ) * 1000000ULL / g_ClockSpeed );
 }
 
 

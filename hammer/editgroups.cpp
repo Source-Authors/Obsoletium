@@ -19,7 +19,7 @@
 static const unsigned int g_uSelChangeMsg = ::RegisterWindowMessage(GROUPLIST_MSG_SEL_CHANGE);
 
 
-BEGIN_MESSAGE_MAP(CEditGroups, CDialog)
+BEGIN_MESSAGE_MAP(CEditGroups, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditGroups)
 	ON_BN_CLICKED(IDC_COLOR, OnColor)
 	ON_EN_CHANGE(IDC_NAME, OnChangeName)
@@ -36,7 +36,7 @@ END_MESSAGE_MAP()
 // Input  : pParent - Parent window.
 //-----------------------------------------------------------------------------
 CEditGroups::CEditGroups(CWnd* pParent /*=NULL*/)
-	: CDialog(CEditGroups::IDD, pParent)
+	: CBaseDlg(CEditGroups::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditGroups)
 		// NOTE: the ClassWizard will add member initialization here
@@ -50,7 +50,7 @@ CEditGroups::CEditGroups(CWnd* pParent /*=NULL*/)
 //-----------------------------------------------------------------------------
 void CEditGroups::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditGroups)
 	DDX_Control(pDX, IDC_NAME, m_cName);
 	//}}AFX_DATA_MAP
@@ -64,9 +64,11 @@ void CEditGroups::DoDataExchange(CDataExchange* pDX)
 //			pGroup - Visgroup to check against.
 // Output : Returns TRUE to continue enumerating.
 //-----------------------------------------------------------------------------
-static BOOL UpdateObjectColor(CMapClass *pObject, CVisGroup *pGroup)
+static BOOL UpdateObjectColor(CMapClass *pObject, DWORD_PTR ctx)
 {
-	pObject->UpdateObjectColor();
+	auto *pGroup = reinterpret_cast<CVisGroup *>(ctx);
+	// dimhotepus: Color object by its vis group color.
+	pObject->SetColorVisGroup(pGroup);
 	return(TRUE);
 }
 
@@ -90,7 +92,7 @@ void CEditGroups::OnColor(void)
 			m_cColorBox.SetColor(dlg.m_cc.rgbResult, TRUE);
 
 			// change all object colors
-			GetActiveWorld()->EnumChildren(ENUMMAPCHILDRENPROC(UpdateObjectColor), DWORD(pGroup));
+			GetActiveWorld()->EnumChildren(UpdateObjectColor, DWORD_PTR(pGroup));
 
 			CMapDoc::GetActiveMapDoc()->UpdateAllViews( MAPVIEW_UPDATE_COLOR );
 		}
@@ -144,9 +146,13 @@ void CEditGroups::OnRemove(void)
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 	if (pDoc != NULL)
 	{
+		// dimhotepus: Do not use pGroup after deletion. ASAN catch.
+		VisGroupState_t state = pGroup->GetVisible();
+
+		// pGroup is deleted here.
 		pDoc->VisGroups_RemoveGroup(pGroup);
 
-		if (pGroup->GetVisible() != VISGROUP_SHOWN)
+		if (state != VISGROUP_SHOWN)
 		{
 			pDoc->VisGroups_UpdateAll();
 			pDoc->UpdateVisibilityAll();
@@ -199,7 +205,7 @@ void CEditGroups::UpdateControlsForVisGroup(CVisGroup *pVisGroup)
 //-----------------------------------------------------------------------------
 BOOL CEditGroups::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_cGroupList.SubclassDlgItem(IDC_GROUPS, this);
 	m_cColorBox.SubclassDlgItem(IDC_COLORBOX, this);
@@ -267,7 +273,7 @@ void CEditGroups::UpdateGroupList()
 void CEditGroups::OnClose(void)
 {
 	GetMainWnd()->GlobalNotify(WM_MAPDOC_CHANGED);
-	CDialog::OnClose();
+	__super::OnClose();
 }
 
 
@@ -278,7 +284,7 @@ void CEditGroups::OnClose(void)
 BOOL CEditGroups::DestroyWindow(void)
 {
 	GetMainWnd()->GlobalNotify(WM_MAPDOC_CHANGED);
-	return(CDialog::DestroyWindow());
+	return(__super::DestroyWindow());
 }
 
 

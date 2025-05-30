@@ -31,7 +31,7 @@ class CDmeSourceSkin;
 //-----------------------------------------------------------------------------
 class CDmeSourceSkinPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeSourceSkinPanel, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeSourceSkinPanel, EditablePanel );
 
 public:
 	CDmeSourceSkinPanel( vgui::Panel *pParent, const char *pPanelName );

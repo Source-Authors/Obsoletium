@@ -5,37 +5,36 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "quakedef.h"
 #include "lightcache.h"
+#include "quakedef.h"
 #include "cmodel_engine.h"
 #include "istudiorender.h"
 #include "studio_internal.h"
 #include "bspfile.h"
 #include "cdll_engine_int.h"
-#include "tier1/mempool.h"
 #include "gl_model_private.h"
 #include "r_local.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
+#include "materialsystem/materialsystem_config.h"
 #include "l_studio.h"
 #include "debugoverlay.h"
 #include "worldsize.h"
 #include "ispatialpartitioninternal.h"
 #include "staticpropmgr.h"
-#include "cmodel_engine.h"
 #include "icliententitylist.h"
 #include "icliententity.h"
 #include "enginetrace.h"
 #include "client.h"
 #include "cl_main.h"
 #include "collisionutils.h"
-#include "tier0/vprof.h"
 #include "filesystem_engine.h"
 #include "mathlib/anorms.h"
 #include "gl_matsysiface.h"
-#include "materialsystem/materialsystem_config.h"
+#include "tier0/vprof.h"
+#include "tier1/mempool.h"
 #include "tier2/tier2.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -73,14 +72,13 @@ static byte g_FrameMissCount = 0;
 static int g_FrameIndex = 0;
 ConVar lightcache_maxmiss("lightcache_maxmiss","2", FCVAR_CHEAT);
 
-#define NUMRANDOMNORMALS	162
-static Vector	s_raddir[NUMRANDOMNORMALS] = {
+static const Vector	s_raddir[] = {
 #include "randomnormals.h"
 };
 
 static ConVar r_lightcache_numambientsamples( "r_lightcache_numambientsamples", "162", FCVAR_CHEAT, 
 											 "number of random directions to fire rays when computing ambient lighting",
-											 true, 1.0f, true, ( float )NUMRANDOMNORMALS );
+											 true, 1.0f, true, static_cast<float>(ssize(s_raddir)) );
 
 ConVar r_ambientlightingonly( 
 	"r_ambientlightingonly", 
@@ -135,10 +133,13 @@ struct LightingStateInfo_t
 {
 	float	m_pIllum[MAXLOCALLIGHTS];
 	bool 	m_LightingStateHasSkylight;
+
 	LightingStateInfo_t()
 	{
-		memset( this, 0, sizeof( *this ) );
+		m_LightingStateHasSkylight = false;
+		Clear();
 	}
+
 	void Clear()
 	{
 		memset( this, 0, sizeof( *this ) );
@@ -151,25 +152,29 @@ struct LightingStateInfo_t
 class CBaseLightCache : public LightingStateInfo_t
 {
 public:
-	CBaseLightCache()
+	CBaseLightCache() : m_LightingOrigin{vec3_invalid}
 	{
-		m_pEnvCubemapTexture = NULL;
-		memset( m_pLightstyles, 0, sizeof( m_pLightstyles ) );
-		m_LightingFlags = 0;
 		m_LastFrameUpdated_LightStyles = -1;
+		m_LastFrameUpdated_DynamicLighting = -1;
+
+		m_LightingFlags = 0;
+		leaf = -1;
+
+		memset( m_pLightstyles, 0, sizeof( m_pLightstyles ) );
+		m_pEnvCubemapTexture = nullptr;
 	}
 
-	bool HasLightStyle() 
+	bool HasLightStyle() const
 	{
 		return ( m_LightingFlags & ( HACKLIGHTCACHEFLAGS_HASSWITCHABLELIGHTSTYLE | HACKLIGHTCACHEFLAGS_HASNONSWITCHABLELIGHTSTYLE ) ) ? true : false;
 	}
 
-	bool HasSwitchableLightStyle() 
+	bool HasSwitchableLightStyle() const
 	{
 		return ( m_LightingFlags & HACKLIGHTCACHEFLAGS_HASSWITCHABLELIGHTSTYLE ) ? true : false;
 	}
 
-	bool HasNonSwitchableLightStyle() 
+	bool HasNonSwitchableLightStyle() const
 	{
 		return ( m_LightingFlags & HACKLIGHTCACHEFLAGS_HASNONSWITCHABLELIGHTSTYLE ) ? true : false;
 	}
@@ -206,7 +211,11 @@ class lightcache_t : public CBaseLightCache
 public:
 	lightcache_t()
 	{
-		m_LastFrameUpdated_DynamicLighting = -1;
+		memset(m_StaticPrecalc_LocalLight, 0, sizeof(m_StaticPrecalc_LocalLight));
+		m_StaticPrecalc_NumLocalLights = 0;
+		next = bucket = USHRT_MAX;
+		lru_prev = lru_next = USHRT_MAX;
+		x = y = z = INT_MIN;
 	}
 
 public:
@@ -245,13 +254,16 @@ public:
 	Vector			mins; // fixme: make these smaller
 	Vector			maxs; // fixme: make these smaller
 
-	bool HasDlights() { return m_DLightActive ? true : false; }
+	bool HasDlights() const { return m_DLightActive ? true : false; }
 	PropLightcache_t()
 	{
+		m_pNextPropLightcache = nullptr;
 		m_Flags = 0;
-		m_SwitchableLightFrame = -1;
 		m_DLightActive = 0;
 		m_DLightMarkFrame = 0;
+		m_SwitchableLightFrame = -1;
+		mins = vec3_invalid;
+		maxs = vec3_invalid;
 	}
 };
 
@@ -290,17 +302,19 @@ static Vector s_Grayscale( 0.299f, 0.587f, 0.114f );
 #define BIT_SET( a, b ) ((a)[(b)>>3] & (1<<((b)&7)))
 
 
-inline unsigned short GetLightCacheIndex( const lightcache_t *pCache )
+inline static unsigned short GetLightCacheIndex( const lightcache_t *pCache )
 {
-	return pCache - lightcache;
+	const intp offset = pCache - lightcache;
+	Assert(offset <= USHRT_MAX);
+	return static_cast<unsigned short>(offset);
 }
 
-inline lightcache_t& GetLightLRUHead()
+inline static lightcache_t& GetLightLRUHead()
 {
 	return lightcache[LIGHT_LRU_HEAD_INDEX];
 }
 
-inline lightcache_t& GetLightLRUTail()
+inline static lightcache_t& GetLightLRUTail()
 {
 	return lightcache[LIGHT_LRU_TAIL_INDEX];
 }
@@ -632,7 +646,7 @@ static void ComputeAmbientFromSphericalSamples( const Vector& start,
 	// find any ambient lights
 	dworldlight_t *pSkylight = FindAmbientLight();
 
-	Vector radcolor[NUMRANDOMNORMALS];
+	Vector radcolor[std::size(s_raddir)];
 	Assert( cached_r_lightcache_numambientsamples <= ssize( radcolor ) );
 
 	// sample world by casting N rays distributed across a sphere
@@ -2098,9 +2112,11 @@ static void BuildStaticLightingCacheLightStyleInfo( PropLightcache_t* pcache, co
 {
 	const byte *pVis = NULL;
 	Assert( pcache->m_LightStyleWorldLights.Count() == 0 );
-	pcache->m_LightingFlags &= ~( HACKLIGHTCACHEFLAGS_HASSWITCHABLELIGHTSTYLE | HACKLIGHTCACHEFLAGS_HASSWITCHABLELIGHTSTYLE );
+	// dimhotepus: Clear non-switchable light style as it is computed later!
+	pcache->m_LightingFlags &= ~( HACKLIGHTCACHEFLAGS_HASSWITCHABLELIGHTSTYLE |
+		HACKLIGHTCACHEFLAGS_HASNONSWITCHABLELIGHTSTYLE );
 	// clear lightstyles
-	memset( pcache->m_pLightstyles, 0, MAX_LIGHTSTYLE_BYTES );
+	memset( pcache->m_pLightstyles, 0, sizeof(pcache->m_pLightstyles) );
 	for ( short i = 0; i < host_state.worldbrush->numworldlights; ++i)
 	{
 		dworldlight_t *wl = &host_state.worldbrush->worldlights[i];

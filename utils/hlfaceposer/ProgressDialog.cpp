@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "resource.h"
 #include "ProgressDialog.h"
+#include "resource.h"
 #include "mxtk/mx.h"
 #include "mdlviewer.h"
 #include "tier1/utlstring.h"

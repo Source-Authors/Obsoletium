@@ -34,7 +34,7 @@ class CountJob : public CJob {
 
     ThreadPause();
 
-    if (sleep_ms_ >= 0) ThreadSleep(sleep_ms_);
+    ThreadSleep(sleep_ms_);
 
     if (should_do_work_) {
       byte memory[1024];
@@ -386,7 +386,7 @@ void RunThreadPoolTests() {
     }
 
     Msg("RunThreadPoolTests:     NO Sleep\n");
-    Test(false, false, run_2_completition, true);
+    Test(&pool, false, false, run_2_completition, true);
 
     Msg("RunThreadPoolTests:     Distribute\n");
     Test(&pool, true, false, run_2_completition, true);

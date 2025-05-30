@@ -458,12 +458,12 @@ void CBasePlayerAnimState::ComputeAimSequence()
 }
 
 
-int CBasePlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
+int CBasePlayerAnimState::CalcSequenceIndex( PRINTF_FORMAT_STRING const char *pBaseName, ... )
 {
 	char szFullName[512];
 	va_list marker;
 	va_start( marker, pBaseName );
-	Q_vsnprintf( szFullName, sizeof( szFullName ), pBaseName, marker );
+	V_vsprintf_safe( szFullName, pBaseName, marker );
 	va_end( marker );
 	int iSequence = GetOuter()->LookupSequence( szFullName );
 	
@@ -934,13 +934,13 @@ float CBasePlayerAnimState::GetOuterXYSpeed() const
 }
 
 // -----------------------------------------------------------------------------
-void CBasePlayerAnimState::AnimStateLog( const char *pMsg, ... )
+void CBasePlayerAnimState::AnimStateLog( PRINTF_FORMAT_STRING const char *pMsg, ... )
 {
 	// Format the string.
 	char str[4096];
 	va_list marker;
 	va_start( marker, pMsg );
-	Q_vsnprintf( str, sizeof( str ), pMsg, marker );
+	V_vsprintf_safe( str, pMsg, marker );
 	va_end( marker );
 
 	// Log it?	
@@ -964,13 +964,13 @@ void CBasePlayerAnimState::AnimStateLog( const char *pMsg, ... )
 
 
 // -----------------------------------------------------------------------------
-void CBasePlayerAnimState::AnimStatePrintf( int iLine, const char *pMsg, ... )
+void CBasePlayerAnimState::AnimStatePrintf( int iLine, PRINTF_FORMAT_STRING const char *pMsg, ... )
 {
 	// Format the string.
 	char str[4096];
 	va_list marker;
 	va_start( marker, pMsg );
-	Q_vsnprintf( str, sizeof( str ), pMsg, marker );
+	V_vsprintf_safe( str, pMsg, marker );
 	va_end( marker );
 
 	// Show it with Con_NPrintf.

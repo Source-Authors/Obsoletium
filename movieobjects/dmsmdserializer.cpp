@@ -240,9 +240,10 @@ static void Chomp( char *pszBuf )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-static void GetLine( CUtlBuffer &utlBuf, char *pszBuf, int nMaxLen )
+template<intp maxSize>
+static void GetLine( CUtlBuffer &utlBuf, char (&pszBuf)[maxSize] )
 {
-	utlBuf.GetLine( pszBuf, nMaxLen );
+	utlBuf.GetLine( pszBuf );
 	Chomp( pszBuf );
 }
 
@@ -367,7 +368,7 @@ bool CDmSmdSerializer::ParserHandleSkeletonLine(
 static CUtlString PathJoin( const char *pszStr1, const char *pszStr2 )
 {
 	char szPath[MAX_PATH];
-	V_ComposeFileName( pszStr1, pszStr2, szPath, sizeof( szPath ) );
+	V_ComposeFileName( pszStr1, pszStr2, szPath );
 	return CUtlString( szPath );
 }
 
@@ -381,7 +382,7 @@ bool CQcData::ParseQc(
 {
 	bool bRetVal = false;
 
-	if ( _access( qcPath.Get(), 04 ) == 0 )
+	if ( access( qcPath.Get(), 04 ) == 0 )
 	{
 		std::string buf;
 		std::ifstream ifs( qcPath.Get() );
@@ -439,7 +440,7 @@ bool CQcData::ParseQc(
 		CUtlString sRelSmdPath;
 
 		bool bJoin = false;
-		for ( int i = 0; i < sPathArray.Count(); ++i )
+		for ( intp i = 0; i < sPathArray.Count(); ++i )
 		{
 			if ( !bJoin && !V_stricmp( sPathArray[i], "models" ) )
 			{
@@ -474,7 +475,7 @@ bool CQcData::GetQcData(
 
 		V_strncpy( szBuf0, smdPath.Get(), ssize( szBuf0 ) );
 		V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
-		if ( _access( szBuf0, 04 ) == 0 )
+		if ( access( szBuf0, 04 ) == 0 )
 			return ParseQc( smdPath, szBuf0 );
 
 		// Remove "_reference" if found
@@ -484,7 +485,7 @@ bool CQcData::GetQcData(
 			*pszRef = '\0';
 
 			V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
-			if ( _access( szBuf0, 04 ) == 0 )
+			if ( access( szBuf0, 04 ) == 0 )
 				return ParseQc( smdPath, szBuf0 );
 		}
 		else
@@ -494,7 +495,7 @@ bool CQcData::GetQcData(
 			V_SetExtension( szBuf0, "", ssize( szBuf0 ) );
 			V_strcat( szBuf0, "_reference", ssize( szBuf0 ) );
 			V_SetExtension( szBuf0, ".qc", ssize( szBuf0 ) );
-			if ( _access( szBuf0, 04 ) == 0 )
+			if ( access( szBuf0, 04 ) == 0 )
 				return ParseQc( smdPath, szBuf0 );
 		}
 
@@ -502,23 +503,22 @@ bool CQcData::GetQcData(
 		V_strncpy( szBuf0, smdPath.Get(), ssize( szBuf0 ) );
 		V_FixSlashes( szBuf0 );
 
-		V_FileBase( szBuf0, szBuf1, ssize( szBuf1 ) );
+		V_FileBase( szBuf0, szBuf1 );
 		CUtlString sFileBase0( "\"" );
 		sFileBase0 += szBuf1;
 		sFileBase0 += "\"";
 
-		V_SetExtension( szBuf1, ".smd", ssize( szBuf1 ) );
+		V_SetExtension( szBuf1, ".smd" );
 		CUtlString sFileBase1( "\"" );
 		sFileBase1 += szBuf1;
 		sFileBase1 += "\"";
 
-		V_ExtractFilePath( szBuf0, szBuf1, ssize( szBuf1 ) );
+		V_ExtractFilePath( szBuf0, szBuf1 );
 		CUtlString sFilePath = szBuf1;
 
 		if ( sFileBase0.Length() > 0 && sFilePath.Length() > 0 )
 		{
 			struct _finddata_t qcFile;
-			long hFile;
 
 			CUtlVector< CUtlString > tokens;
 
@@ -527,7 +527,7 @@ bool CQcData::GetQcData(
 			CUtlString sQcGlob = sFilePath;
 			sQcGlob += "*.qc";
 
-			if ( ( hFile = _findfirst( sQcGlob.Get(), &qcFile ) ) != -1L )
+			if ( intptr_t hFile = _findfirst( sQcGlob.Get(), &qcFile ); hFile != -1L )
 			{
 				/* Find the rest of the .qc files */
 				do {
@@ -572,7 +572,7 @@ bool CQcData::GetQcData(
 class CVertexWeight
 {
 public:
-	int m_nBoneIndex;
+	intp m_nBoneIndex;
 	float m_flWeight;
 
 	CVertexWeight()
@@ -804,7 +804,7 @@ static bool ParserCreateJoint(
 			return false;
 		}
 
-		const int nParentIdIndex = smdJointMap.Find( nParentId );
+		const auto nParentIdIndex = smdJointMap.Find( nParentId );
 
 		if ( !smdJointMap.IsValidIndex( nParentIdIndex ) )
 		{
@@ -893,7 +893,7 @@ static void ParserCreateJoints(
 
 	std::stable_sort( smdJointList.Base(), smdJointList.Base() + smdJointList.Count(), SmdJointLessFunc );
 
-	for ( int i = 0; i < smdJointList.Count(); ++i )
+	for ( intp i = 0; i < smdJointList.Count(); ++i )
 	{
 		CDmSmdSerializer::SmdJoint_t *pSmdJoint = smdJointList[i];
 		pSmdJoint->m_nActualId = i;
@@ -964,7 +964,7 @@ void CDmSmdSerializer::ParserSetJoint(
 //-----------------------------------------------------------------------------
 // Returns -1 if invalid
 //-----------------------------------------------------------------------------
-static int GetActualId( const CDmSmdSerializer::SmdJointMap_t &smdJointMap, int nId )
+static intp GetActualId( const CDmSmdSerializer::SmdJointMap_t &smdJointMap, int nId )
 {
 	const CDmSmdSerializer::SmdJointMap_t::IndexType_t nIdIndex = smdJointMap.Find( nId );
 
@@ -1038,12 +1038,12 @@ static void HandleVertexWeights(
 
 	const float flEps = 1.0e-6;
 
-	uint nTokenEnd = tokens.Count();
+	intp nTokenEnd = tokens.Count();
 	if ( nTokenEnd > 10 )
 	{
 		int nId = -1;
 		float flWeight = 0.0f;
-		for ( uint i = 10; i < nTokenEnd; ++i )
+		for ( intp i = 10; i < nTokenEnd; ++i )
 		{
 			nId = strtol( tokens[ i ].Get(), NULL, 0 );
 			++i;
@@ -1052,11 +1052,11 @@ static void HandleVertexWeights(
 			if ( nId < 0 || flWeight < flEps )
 				continue;
 
-			const int nActualId = GetActualId( smdJointMap, nId );
+			const intp nActualId = GetActualId( smdJointMap, nId );
 
 			if ( nActualId < 0 )
 			{
-				Error( "%s(%d) : triangle error : ignoring unknown joint id(%d) with actual id(%d) for vertex weight\n",
+				Error( "%s(%d) : triangle error : ignoring unknown joint id(%d) with actual id(%zd) for vertex weight\n",
 					pszFilename, nLineNumber, nId, nActualId );
 				continue;
 			}
@@ -1075,7 +1075,7 @@ static void HandleVertexWeights(
 		float flTotalWeight = 0.0f;
 		vertex.m_nWeights = 0;
 
-		for ( size_t i = 0; static_cast<intp>(i) < tmpVertexWeights.Count() && i < std::size( vertex.m_vertexWeights ); ++i )
+		for ( intp i = 0; i < tmpVertexWeights.Count() && i < std::size( vertex.m_vertexWeights ); ++i )
 		{
 			CVertexWeight &vertexWeight( vertex.m_vertexWeights[ i ] );
 			vertexWeight = tmpVertexWeights[i];
@@ -1137,7 +1137,7 @@ static CDmeMesh *CreateDmeMesh(
 
 	if ( pszFilename )
 	{
-		V_FileBase( pszFilename, szFileBase, ssize( szFileBase ) );
+		V_FileBase( pszFilename, szFileBase );
 
 		if ( !Q_isempty( szFileBase ) )
 		{
@@ -1189,7 +1189,7 @@ static CDmeFaceSet *FindOrCreateFaceSet(
 	int nLineNumber )
 {
 	// Could cache in a hashed map or something...
-	for ( int i = 0; i < pDmeMesh->FaceSetCount(); ++i )
+	for ( intp i = 0; i < pDmeMesh->FaceSetCount(); ++i )
 	{
 		CDmeFaceSet *pDmeFaceSet = pDmeMesh->GetFaceSet( i );
 		if ( !pDmeFaceSet )
@@ -1204,7 +1204,7 @@ static CDmeFaceSet *FindOrCreateFaceSet(
 	}
 
 	char szFaceSetName[ MAX_PATH ];
-	V_FileBase( sMaterial.Get(), szFaceSetName, ssize( szFaceSetName ) );
+	V_FileBase( sMaterial.Get(), szFaceSetName );
 
 	CDmeFaceSet *pDmeFaceSet = CreateElement< CDmeFaceSet >( szFaceSetName, pDmeMesh->GetFileId() );
 	Assert( pDmeFaceSet );
@@ -1282,7 +1282,7 @@ static void CreatePolygon(
 
 			pDmeVertexData->SetVertexIndices( nPositionField, nNewVertexIndex, 1, &nPositionIndex );
 
-			const int nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
+			const intp nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
 			pDmeFaceSet->SetIndices( nFaceSetIndex, 1, const_cast< int * >( &nNewVertexIndex ) );
 
 		}
@@ -1310,9 +1310,9 @@ static void CreatePolygon(
 
 	}
 
-	static const int nFaceDelimiter = -1;
-	const int nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
-	pDmeFaceSet->SetIndices( nFaceSetIndex, 1, const_cast< int * >( &nFaceDelimiter ) );
+	static int nFaceDelimiter = -1;
+	const intp nFaceSetIndex = pDmeFaceSet->AddIndices( 1 );
+	pDmeFaceSet->SetIndices( nFaceSetIndex, 1, &nFaceDelimiter );
 
 	triangle.Reset();
 }
@@ -1360,7 +1360,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 
 	if ( pszFilename )
 	{
-		V_FileBase( pszFilename, szAnimationName, ssize( szAnimationName ) );
+		V_FileBase( pszFilename, szAnimationName );
 	}
 	else
 	{
@@ -1412,7 +1412,7 @@ CDmElement *CDmSmdSerializer::ReadSMD(
 
 	while ( utlBuf.IsValid() )
 	{
-		GetLine( utlBuf, szLine, ssize( szLine ) );
+		GetLine( utlBuf, szLine );
 		++nLineNumber;
 
 		const char *pszLine = ParserSkipSpace( szLine );
@@ -1651,7 +1651,7 @@ void CDmSmdSerializer::FixNodeName( CUtlString &sName ) const
 	if ( m_bOptAutoStripPrefix )
 	{
 		// Get the string before the '.'
-		V_FileBase( pszName, szTmpBuf1, ssize( szTmpBuf1 ) );
+		V_FileBase( pszName, szTmpBuf1 );
 		V_strncpy( szTmpBuf0, szTmpBuf1, ssize( szTmpBuf0 ) );
 		pszName = szTmpBuf0;
 	}

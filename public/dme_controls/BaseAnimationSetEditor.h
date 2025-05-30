@@ -18,7 +18,7 @@
 #include "dme_controls/RecordingState.h"
 #include "tier1/utlvector.h"
 #include "movieobjects/dmelog.h"
-#include "vgui_controls/fileopenstatemachine.h"
+#include "vgui_controls/FileOpenStateMachine.h"
 
 
 //-----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class CDmeGameModel;
 //-----------------------------------------------------------------------------
 class CBaseAnimationSetEditor : public vgui::EditablePanel, public vgui::IFileOpenStateMachineClient
 {
-	DECLARE_CLASS_SIMPLE( CBaseAnimationSetEditor, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAnimationSetEditor, vgui::EditablePanel );
 
 public:
 	enum EAnimSetLayout_t
@@ -70,13 +70,13 @@ public:
 
 	// Inherited from IFileOpenStateMachineClient
 public:
-	virtual void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
+	void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
 
 protected:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
-	virtual void PerformLayout();
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
+	void PerformLayout() override;
 	virtual void OnDataChanged();
 
 	MESSAGE_FUNC_PARAMS( OnOpenContextMenu, "OpenContextMenu", params );

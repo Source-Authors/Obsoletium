@@ -997,10 +997,10 @@ void CViewRender::WriteSaveGameScreenshot( const char *pFilename )
 
 float ScaleFOVByWidthRatio( float fovDegrees, float ratio )
 {
-	float halfAngleRadians = fovDegrees * ( 0.5f * M_PI_F / 180.0f );
+	float halfAngleRadians = DEG2RAD( fovDegrees * 0.5f );
 	float t = tanf( halfAngleRadians );
 	t *= ratio;
-	float retDegrees = ( 180.0f / M_PI_F ) * atanf( t );
+	float retDegrees = RAD2DEG( atanf( t ) );
 	return retDegrees * 2.0f;
 }
 
@@ -1349,7 +1349,9 @@ CON_COMMAND( getpos, "dump position and angles to the console" )
 		pCommand2 = "setang_exact";
 	}
 
-	Warning( "%s %f %f %f;", pCommand1, vecOrigin.x, vecOrigin.y, vecOrigin.z );
-	Warning( "%s %f %f %f\n", pCommand2, angles.x, angles.y, angles.z );
+	// dimhotepus: Join two warnings into one as first missed \n and second dumps channel name.
+	Warning( "%s %f %f %f;%s %f %f %f\n",
+		pCommand1, vecOrigin.x, vecOrigin.y, vecOrigin.z,
+		pCommand2, angles.x, angles.y, angles.z );
 }
 

@@ -8,10 +8,11 @@
 // ProcessWnd.h : header file
 //
 
+#include "windows/base_wnd.h"
 /////////////////////////////////////////////////////////////////////////////
 // CProcessWnd window
 
-class CProcessWnd : public CWnd
+class CProcessWnd : public CBaseWnd
 {
 // Construction
 public:
@@ -34,6 +35,7 @@ public:
 	void Clear();
 	void Append(CString str);
 	void GetReady();
+	void GetReady(LPCTSTR pszDocName);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -53,10 +55,10 @@ protected:
 	CButton m_btnCopyAll;
 
 	//{{AFX_MSG(CProcessWnd)
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void CProcessWnd::OnCopyAll();
+	afx_msg void OnCopyAll();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -217,7 +217,7 @@ void CHudHistoryResource::MsgFunc_ItemPickup( bf_read &msg )
 {
 	char szName[1024];
 	
-	msg.ReadString( szName, sizeof(szName) );
+	msg.ReadString( szName );
 
 	// Add the item to the history
 	AddToHistory( HISTSLOT_ITEM, szName );

@@ -1,13 +1,11 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: abstract system dependent functions
-//
-// $NoKeywords: $
-//=============================================================================//
+// Abstract system dependent functions.
+
 #include "sys.h"
-#include <windows.h>
 #include "tier1/strtools.h"
 
+#include "winlite.h"
 
 void Sys_CopyStringToClipboard( const char *pOut )
 {

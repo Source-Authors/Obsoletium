@@ -133,18 +133,16 @@ void ResetEventIndexes( CStudioHdr *pstudiohdr )
 // Purpose: 
 //-----------------------------------------------------------------------------
 
-void SetActivityForSequence( CStudioHdr *pstudiohdr, int i )
+void SetActivityForSequence( CStudioHdr *pstudiohdr, intp i )
 {
-	int iActivityIndex;
-	const char *pszActivityName;
 	mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
 
 	seqdesc.flags |= STUDIO_ACTIVITY;
 
-	pszActivityName = GetSequenceActivityName( pstudiohdr, i );
+	const char *pszActivityName = GetSequenceActivityName(pstudiohdr, i);
 	if ( pszActivityName[0] != '\0' )
 	{
-		iActivityIndex = ActivityList_IndexForName( pszActivityName );
+		int iActivityIndex = ActivityList_IndexForName( pszActivityName );
 		
 		if ( iActivityIndex == -1 )
 		{
@@ -172,15 +170,13 @@ void SetActivityForSequence( CStudioHdr *pstudiohdr, int i )
 
 void IndexModelSequences( CStudioHdr *pstudiohdr )
 {
-	int i;
-
-	if (! pstudiohdr)
+	if (!pstudiohdr)
 		return;
 
 	if (!pstudiohdr->SequencesAvailable())
 		return;
 
-	for ( i = 0 ; i < pstudiohdr->GetNumSeq() ; i++ )
+	for ( intp i = 0 ; i < pstudiohdr->GetNumSeq() ; i++ )
 	{
 		SetActivityForSequence( pstudiohdr, i );
 		SetEventIndexForSequence( pstudiohdr->pSeqdesc( i ) );

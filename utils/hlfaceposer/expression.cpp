@@ -4,9 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+#include "expression.h"
 #include "hlfaceposer.h"
-#include <mxtk/mx.h>
 #include "expressions.h"
+#include <mxtk/mx.h>
 #include "StudioModel.h"
 #include "filesystem.h"
 #include "viewersettings.h"
@@ -52,9 +53,9 @@ CExpression::CExpression( const CExpression& from )
 {
 	int i;
 
-	strcpy( name, from.name );
+	V_strcpy_safe( name, from.name );
 	index = from.index;
-	strcpy( description, from.description );
+	V_strcpy_safe( description, from.description );
 	
 	for ( i = 0; i < MAX_FP_MODELS; i++ )
 	{
@@ -76,7 +77,7 @@ CExpression::CExpression( const CExpression& from )
 
 	m_bDirty = from.m_bDirty;
 
-	strcpy( expressionclass, from.expressionclass );
+	V_strcpy_safe( expressionclass, from.expressionclass );
 
 	memcpy( setting, from.setting, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
 	memcpy( weight, from.weight, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
@@ -258,7 +259,7 @@ const char *CExpression::GetBitmapCheckSum()
 
 	// Create string name out of binary data
 	static char hex[ 9 ];
-	Q_binarytohex( (byte *)&crc, sizeof( crc ), hex, sizeof( hex ) );
+	V_binarytohex( crc, hex );
 	return hex;
 }
 
@@ -299,7 +300,7 @@ const char *CExpression::GetBitmapFilename( int modelindex )
 	*out = 0;
 
 
-	sprintf( filename, "expressions/%s/%s/%s.bmp", modelName, classname, GetBitmapCheckSum() );
+	V_sprintf_safe( filename, "expressions/%s/%s/%s.bmp", modelName, classname, GetBitmapCheckSum() );
 
 	Q_FixSlashes( filename );
 	strlwr( filename );
@@ -467,6 +468,6 @@ CExpClass *CExpression::GetExpressionClass( void )
 //-----------------------------------------------------------------------------
 void CExpression::SetExpressionClass( char const *classname )
 {
-	strcpy( expressionclass, classname );
+	V_strcpy_safe( expressionclass, classname );
 }
 

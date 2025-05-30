@@ -10,9 +10,9 @@
 #pragma once
 #endif
 
-#include <limits.h>
-#include <math.h>
-#include "platform.h"
+#include <climits>
+#include <cmath>
+#include "tier0/platform.h"
 #include "tier0/dbg.h"
 
 
@@ -43,7 +43,7 @@ public:
 	DmeFramerate_t operator*( int i ) const { return DmeFramerate_t( m_num * i, m_den ); }
 	DmeFramerate_t operator/( int i ) const { return DmeFramerate_t( m_num, m_den * i ); }
 
-	unsigned short abs( unsigned short i ) { return i >= 0 ? i : -i; }
+	unsigned int abs( int i ) { return i >= 0 ? i : -i; }
 
 	DmeFramerate_t operator*=( int i ) { Assert( abs( m_num * i ) <= USHRT_MAX ); m_num *= ( unsigned short )i; return *this; }
 	DmeFramerate_t operator/=( int i ) { Assert( abs( m_den * i ) <= USHRT_MAX ); m_den *= ( unsigned short )i; return *this; }

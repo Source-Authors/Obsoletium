@@ -10,11 +10,11 @@
 #pragma once
 #endif
 
-#include "commonmacros.h"
+#include "tier0/commonmacros.h"
 #include "tier1/checksum_crc.h"
 
-#define SCENE_IMAGE_ID			MAKEID( 'V','S','I','F' )
-#define SCENE_IMAGE_VERSION		2
+constexpr inline int SCENE_IMAGE_ID{MAKEID('V', 'S', 'I', 'F')};
+constexpr inline int SCENE_IMAGE_VERSION{2};
 
 // scene summary: cached calcs for commmon startup queries, variable sized
 struct SceneImageSummary_t

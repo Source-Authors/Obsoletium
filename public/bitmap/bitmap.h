@@ -31,12 +31,12 @@ struct Bitmap_t
 	//
 	// Accessors
 	//
-	inline int Width() const { return m_nWidth; }
-	inline int Height() const { return m_nHeight; }
-	inline ImageFormat Format() const { return m_ImageFormat; }
-	inline unsigned char *GetBits() const { return m_pBits; }
-	inline int Stride() const { return m_nStride; }
-	inline bool GetOwnsBuffer() const { return m_bOwnsBuffer; }
+	[[nodiscard]] inline int Width() const { return m_nWidth; }
+	[[nodiscard]] inline int Height() const { return m_nHeight; }
+	[[nodiscard]] inline ImageFormat Format() const { return m_ImageFormat; }
+	[[nodiscard]] inline unsigned char *GetBits() const { return m_pBits; }
+	[[nodiscard]] inline int Stride() const { return m_nStride; }
+	[[nodiscard]] inline bool GetOwnsBuffer() const { return m_bOwnsBuffer; }
 
 	/// Allocate the buffer.  Discards existing data, freeing it if we own it
 	void Init( int nWidth, int nHeight, ImageFormat imageFormat, int nStride = 0 );
@@ -57,14 +57,14 @@ struct Bitmap_t
 	void Clear();
 
 	/// Return true if we have a valid size and buffer
-	bool IsValid() const;
+	[[nodiscard]] bool IsValid() const;
 
 	/// Get pointer to raw pixel data.
-	unsigned char *GetPixel( int x, int y );
-	const unsigned char *GetPixel( int x, int y ) const;
+	[[nodiscard]] unsigned char *GetPixel( int x, int y );
+	[[nodiscard]] const unsigned char *GetPixel( int x, int y ) const;
 
 	/// Get pixel value at specified coordinates
-	Color GetColor( int x, int y ) const;
+	[[nodiscard]] Color GetColor( int x, int y ) const;
 
 	/// Set pixel value at specified coordinates
 	void SetColor( int x, int y, Color c );
@@ -135,7 +135,7 @@ inline const unsigned char *Bitmap_t::GetPixel( int x, int y ) const
 	if ( !m_pBits )
 		return nullptr;
 
-	return m_pBits + (y*m_nStride) + x* m_nPixelSize;
+	return m_pBits + y * m_nStride + x * m_nPixelSize;
 }
 
 

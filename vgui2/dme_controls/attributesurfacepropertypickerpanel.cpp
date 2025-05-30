@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "dme_controls/AttributeSurfacePropertyPickerPanel.h"
+#include "dme_controls/attributesurfacepropertypickerpanel.h"
 #include "dme_controls/AttributeTextEntry.h"
 #include "tier1/KeyValues.h"
 #include "filesystem.h"
@@ -49,7 +49,7 @@ void CAttributeSurfacePropertyPickerPanel::AddSurfacePropertiesToList( PickerLis
 			{
 				for ( KeyValues *pTrav = file; pTrav; pTrav = pTrav->GetNextKey() )
 				{
-					int i = list.AddToTail();
+					intp i = list.AddToTail();
 					list[i].m_pChoiceString = pTrav->GetName();
 					list[i].m_pChoiceValue = pTrav->GetName();
 				}

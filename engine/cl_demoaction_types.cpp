@@ -611,7 +611,7 @@ void CDemoActionPlaySoundStart::FireAction( void )
 	{
 		StartSoundParams_t params;
 		params.staticsound = false;
-		params.soundsource = cl.m_nViewEntity;
+		params.soundsource = static_cast<SoundSource>(cl.m_nViewEntity);
 		params.entchannel = CHAN_AUTO;
 		params.pSfx = pSound;
 		params.origin = vDummyOrigin;

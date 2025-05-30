@@ -96,7 +96,7 @@ static inline void RecordDecal( const Vector &pos, const Vector &start,
 		if ( entity != 0 )
 			return;
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_DECAL );
  		msg->SetString( "name", "TE_Decal" );
@@ -111,8 +111,6 @@ static inline void RecordDecal( const Vector &pos, const Vector &start,
 		msg->SetString( "decalname", effects->Draw_DecalNameFromIndex( index ) );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		
-		msg->deleteThis();
 	}
 }
 

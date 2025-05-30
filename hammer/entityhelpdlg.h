@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "Resource.h"
 
 
@@ -18,7 +19,7 @@ class GDclass;
 class CRichEditCtrlEx;
 
 
-class CEntityHelpDlg : public CDialog
+class CEntityHelpDlg : public CBaseDlg
 {
 	public:
 

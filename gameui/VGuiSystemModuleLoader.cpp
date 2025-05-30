@@ -157,7 +157,6 @@ bool CVGuiSystemModuleLoader::LoadPlatformModules(CreateInterfaceFn *factorylist
 			dllPath = it->GetString("dll");
 		}
 
-
 		// load the module (LoadModule calls GetLocalCopy() under steam)
 		CSysModule *mod = g_pFullFileSystem->LoadModule(dllPath, "EXECUTABLE_PATH");
 		if (!mod)

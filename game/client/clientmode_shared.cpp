@@ -164,17 +164,12 @@ CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 
 	switch (crashtype)
 	{
 		case 0:
-			dummy = *((volatile int *) NULL);
+			dummy = *((volatile int *)nullptr);
 			Msg("Crashed! %d\n", dummy); // keeps dummy from optimizing out
 			break;
 		case 1:
-			*((volatile int *)NULL) = 42;
+			*((volatile int *)nullptr) = 42;
 			break;
-#if defined( _X360 )
-		case 2:
-			XBX_CrashDump(false);
-			break;
-#endif
 		default:
 			Msg("Unknown variety of crash. You have now failed to crash. I hope you're happy.\n");
 			break;
@@ -199,7 +194,7 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 {
 	char panelname[2048]; 
 	
-	msg.ReadString( panelname, sizeof(panelname) );
+	msg.ReadString( panelname );
 
 	bool  bShow = msg.ReadByte()!=0;
 	
@@ -215,16 +210,14 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 
 	if ( count > 0 )
 	{
-		KeyValues *keys = new KeyValues("data");
+		KeyValuesAD keys("data");
 		//Msg( "MsgFunc_VGUIMenu:\n" );
-
+		
+		char name[255], data[255];
 		for ( int i=0; i<count; i++)
 		{
-			char name[255];
-			char data[255];
-
-			msg.ReadString( name, sizeof(name) );
-			msg.ReadString( data, sizeof(data) );
+			msg.ReadString( name );
+			msg.ReadString( data );
 			//Msg( "  %s <- '%s'\n", name, data );
 
 			keys->SetString( name, data );
@@ -239,14 +232,11 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 			if ( Q_strncmp( pszURL, "http://", 7 ) != 0 && Q_strncmp( pszURL, "https://", 8 ) != 0 && Q_stricmp( pszURL, "about:blank" ) != 0 )
 			{
 				Warning( "Blocking MOTD URL '%s'; must begin with 'http://' or 'https://' or be about:blank\n", pszURL );
-				keys->deleteThis();
 				return;
 			}
 		}
 
 		viewport->SetData( keys );
-
-		keys->deleteThis();
 	}
 
 	// is the server telling us to show the scoreboard (at the end of a map)?
@@ -328,7 +318,7 @@ void	ClientModeShared::ComputeVguiResConditions( KeyValues *pkvConditions )
 {
 	if ( UseVR() )
 	{
-		pkvConditions->FindKey( "if_vr", true );
+		(void)pkvConditions->FindKey( "if_vr", true );
 	}
 }
 
@@ -988,11 +978,11 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		{
 			wchar_t wszLocalized[100];
 			wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
-			g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString("name"), wszPlayerName, sizeof(wszPlayerName) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString("name"), wszPlayerName );
 			g_pVGuiLocalize->ConstructString_safe( wszLocalized, g_pVGuiLocalize->Find( "#game_player_joined_game" ), 1, wszPlayerName );
 
 			char szLocalized[100];
-			g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized, sizeof(szLocalized) );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized );
 
 			hudChat->Printf( CHAT_FILTER_JOINLEAVE, "%s", szLocalized );
 		}
@@ -1009,17 +999,17 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		if ( !IsInCommentaryMode() )
 		{
 			wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
-			g_pVGuiLocalize->ConvertANSIToUnicode( pPlayer->GetPlayerName(), wszPlayerName, sizeof(wszPlayerName) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( pPlayer->GetPlayerName(), wszPlayerName );
 
 			wchar_t wszReason[64];
 			const char *pszReason = event->GetString( "reason" );
 			if ( pszReason && ( pszReason[0] == '#' ) && g_pVGuiLocalize->Find( pszReason ) )
 			{
-				V_wcsncpy( wszReason, g_pVGuiLocalize->Find( pszReason ), sizeof( wszReason ) );
+				V_wcscpy_safe( wszReason, g_pVGuiLocalize->Find( pszReason ) );
 			}
 			else
 			{
-				g_pVGuiLocalize->ConvertANSIToUnicode( pszReason, wszReason, sizeof(wszReason) );
+				g_pVGuiLocalize->ConvertANSIToUnicode( pszReason, wszReason );
 			}
 
 			wchar_t wszLocalized[100];
@@ -1033,7 +1023,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			}
 
 			char szLocalized[100];
-			g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized, sizeof(szLocalized) );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized );
 
 			hudChat->Printf( CHAT_FILTER_JOINLEAVE, "%s", szLocalized );
 		}
@@ -1060,7 +1050,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		if ( !bSilent )
 		{
 			wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
-			g_pVGuiLocalize->ConvertANSIToUnicode( pszName, wszPlayerName, sizeof(wszPlayerName) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( pszName, wszPlayerName );
 
 			bool bUsingCustomTeamName = false;
 #ifdef TF_CLIENT_DLL
@@ -1072,11 +1062,11 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			C_Team *pTeam = GetGlobalTeam( team );
 			if ( pTeam )
 			{
-				g_pVGuiLocalize->ConvertANSIToUnicode( pTeam->Get_Name(), wszTeam, sizeof(wszTeam) );
+				g_pVGuiLocalize->ConvertANSIToUnicode( pTeam->Get_Name(), wszTeam );
 			}
 			else
 			{
-				_snwprintf ( wszTeam, sizeof( wszTeam ) / sizeof( wchar_t ), L"%d", team );
+				V_swprintf_safe ( wszTeam, L"%d", team );
 			}
 #endif
 
@@ -1093,7 +1083,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 				}
 
 				char szLocalized[100];
-				g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized, sizeof(szLocalized) );
+				g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized );
 
 				hudChat->Printf( CHAT_FILTER_TEAMCHANGE, "%s", szLocalized );
 			}
@@ -1115,16 +1105,16 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			return;
 
 		wchar_t wszOldName[MAX_PLAYER_NAME_LENGTH];
-		g_pVGuiLocalize->ConvertANSIToUnicode( pszOldName, wszOldName, sizeof(wszOldName) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pszOldName, wszOldName );
 
 		wchar_t wszNewName[MAX_PLAYER_NAME_LENGTH];
-		g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString( "newname" ), wszNewName, sizeof(wszNewName) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString( "newname" ), wszNewName );
 
 		wchar_t wszLocalized[100];
 		g_pVGuiLocalize->ConstructString_safe( wszLocalized, g_pVGuiLocalize->Find( "#game_player_changed_name" ), 2, wszOldName, wszNewName );
 
 		char szLocalized[100];
-		g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized, sizeof(szLocalized) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized );
 
 		hudChat->Printf( CHAT_FILTER_NAMECHANGE, "%s", szLocalized );
 	}
@@ -1178,16 +1168,16 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		if ( !IsInCommentaryMode() )
 		{
 			wchar_t wszCvarName[64];
-			g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString("cvarname"), wszCvarName, sizeof(wszCvarName) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString("cvarname"), wszCvarName );
 
 			wchar_t wszCvarValue[64];
-			g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString("cvarvalue"), wszCvarValue, sizeof(wszCvarValue) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( event->GetString("cvarvalue"), wszCvarValue );
 
 			wchar_t wszLocalized[256];
 			g_pVGuiLocalize->ConstructString_safe( wszLocalized, g_pVGuiLocalize->Find( "#game_server_cvar_changed" ), 2, wszCvarName, wszCvarValue );
 
 			char szLocalized[256];
-			g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized, sizeof(szLocalized) );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalized, szLocalized );
 
 			hudChat->Printf( CHAT_FILTER_SERVERMSG, "%s", szLocalized );
 		}
@@ -1227,7 +1217,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 				if ( g_PR )
 				{
 					wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
-					g_pVGuiLocalize->ConvertANSIToUnicode( g_PR->GetPlayerName( iPlayerIndex ), wszPlayerName, sizeof( wszPlayerName ) );
+					g_pVGuiLocalize->ConvertANSIToUnicode( g_PR->GetPlayerName( iPlayerIndex ), wszPlayerName );
 
 					const wchar_t *pchLocalizedAchievement = ACHIEVEMENT_LOCALIZED_NAME_FROM_STR( pAchievement->GetName() );
 					if ( pchLocalizedAchievement )
@@ -1236,7 +1226,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 						g_pVGuiLocalize->ConstructString_safe( wszLocalizedString, g_pVGuiLocalize->Find( "#Achievement_Earned" ), 2, wszPlayerName, pchLocalizedAchievement );
 
 						char szLocalized[128];
-						g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalizedString, szLocalized, sizeof( szLocalized ) );
+						g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalizedString, szLocalized );
 
 						hudChat->ChatPrintf( iPlayerIndex, CHAT_FILTER_SERVERMSG, "%s", szLocalized );
 					}
@@ -1264,7 +1254,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		if ( g_PR )
 		{
 			wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
-			g_pVGuiLocalize->ConvertANSIToUnicode( g_PR->GetPlayerName( iPlayerIndex ), wszPlayerName, sizeof( wszPlayerName ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( g_PR->GetPlayerName( iPlayerIndex ), wszPlayerName );
 
 			if ( iMethod < 0 || iMethod >= ARRAYSIZE( g_pszItemFoundMethodStrings ) )
 			{
@@ -1275,7 +1265,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			if ( pszLocString )
 			{
 				wchar_t wszItemFound[256];
-				_snwprintf( wszItemFound, ARRAYSIZE( wszItemFound ), L"%ls", g_pVGuiLocalize->Find( pszLocString ) );
+				V_swprintf_safe( wszItemFound, L"%ls", g_pVGuiLocalize->Find( pszLocString ) );
 
 				wchar_t *colorMarker = wcsstr( wszItemFound, L"::" );
 				const CEconItemRarityDefinition* pItemRarity = GetItemSchema()->GetRarityDefinition( pItemDefinition->GetRarity() );
@@ -1359,7 +1349,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 					wszPlayerName, tempName, L"" );
 
 				char szLocalized[256];
-				g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalizedString, szLocalized, sizeof( szLocalized ) );
+				g_pVGuiLocalize->ConvertUnicodeToANSI( wszLocalizedString, szLocalized );
 
 				hudChat->ChatPrintf( iPlayerIndex, CHAT_FILTER_SERVERMSG, "%s", szLocalized );
 			}

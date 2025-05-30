@@ -122,7 +122,7 @@ public:
 
 			pRestore->StartBlock();
 			{
-				pRestore->ReadString( conceptname, sizeof( conceptname ), 0 );
+				pRestore->ReadString( conceptname, 0 );
 
 				pRestore->ReadAll( &history );
 
@@ -575,7 +575,7 @@ int CAI_Expresser::SpeakRawSentence( const char *pszSentence, float delay, float
 			return -1;
 		}
 
-		CPASAttenuationFilter filter( GetOuter(), soundlevel );
+		CPASAttenuationFilter filter( GetOuter(), SNDLVL_TO_ATTN( soundlevel ) );
 		CBaseEntity::EmitSentenceByIndex( filter, GetOuter()->entindex(), CHAN_VOICE, sentenceIndex, volume, soundlevel, 0, GetVoicePitch());
 	}
 	else
@@ -814,7 +814,7 @@ CAI_TimedSemaphore *CAI_Expresser::GetMySpeechSemaphore( CBaseEntity *pNpc )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CAI_Expresser::SpeechMsg( CBaseEntity *pFlex, const char *pszFormat, ... )
+void CAI_Expresser::SpeechMsg( CBaseEntity *pFlex, PRINTF_FORMAT_STRING const char *pszFormat, ... )
 {
 	if ( !DebuggingSpeech() )
 		return;
@@ -822,7 +822,7 @@ void CAI_Expresser::SpeechMsg( CBaseEntity *pFlex, const char *pszFormat, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, pszFormat );
-	Q_vsnprintf( string, sizeof(string), pszFormat, argptr );
+	V_vsprintf_safe( string, pszFormat, argptr );
 	va_end( argptr );
 
 	if ( pFlex->MyNPCPointer() )

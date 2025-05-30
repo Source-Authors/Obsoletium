@@ -29,7 +29,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CPresetPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CPresetPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPresetPickerFrame, vgui::Frame );
 
 public:
 	CPresetPickerFrame( vgui::Panel *pParent, const char *pTitle, bool bAllowMultiSelect = true );
@@ -39,7 +39,7 @@ public:
 	void DoModal( CDmElement *pPresetGroup, bool bSelectAll, KeyValues *pContextKeyValues );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 private:
 	// Refreshes the list of presets

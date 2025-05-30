@@ -11,18 +11,18 @@
 /////////////////////////////////////////////////////////////////////////////
 // CPakDoc document
 
-typedef struct
+struct pakheader_t
 { char magic[4];	// Name of the new WAD format
   long diroffset;   // Position of WAD directory from start of file
   long dirsize;     // Number of entries * 0x40 (64 char)
-} pakheader_t;
+};
 
-typedef struct
+struct pakentry_t
 { char filename[50];       // Name of the file, Unix style, with extension,
                                // 50 chars, padded with '\0'.
   long offset;                 // Position of the entry in PACK file
   long size;                   // Size of the entry in PACK file
-} pakentry_t;
+};
 
 class CPakDoc : public CDocument
 {

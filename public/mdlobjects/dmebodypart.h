@@ -32,7 +32,7 @@ class CDmeBodyPart : public CDmElement
 
 public:
 	// Returns the number of LODs in this body part, can be 0
-	virtual int LODCount() const { return 0; }
+	virtual intp LODCount() const { return 0; }
 
 	// Returns the root LOD. This is the one with the switch metric 0
 	virtual CDmeLOD *GetRootLOD() { return NULL; }

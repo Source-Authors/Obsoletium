@@ -5,11 +5,12 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "Camera.h"
+
+#include <cmath>
+#include <cstdlib>
+#include <cstdio>
+
 #include "hammer_mathlib.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -27,16 +28,17 @@
 #define MAX_PITCH		90.0f
 
 
-static void DBG(PRINTF_FORMAT_STRING const char *fmt, ...)
-{
-    char ach[128];
-    va_list va;
-
-    va_start(va, fmt);
-    vsprintf(ach, fmt, va);
-    va_end(va);
-    OutputDebugString(ach);
-}
+// dimhotepus: Comment unused thing.
+// static void DBG(PRINTF_FORMAT_STRING const char *fmt, ...)
+// {
+//     char ach[128];
+//     va_list va;
+// 
+//     va_start(va, fmt);
+//     V_vsprintf_safe(ach, fmt, va);
+//     va_end(va);
+//     OutputDebugString(ach);
+// }
 
 
 //-----------------------------------------------------------------------------
@@ -351,7 +353,7 @@ void CCamera::BuildProjMatrix()
 	else
 	{
 		// same as D3DXMatrixPerspectiveRH
-		float w = 2 * m_fNearClip * tan( m_fHorizontalFOV * M_PI / 360.0 );
+		float w = 2 * m_fNearClip * tan( m_fHorizontalFOV * M_PI_F / 360.0f );
 		float h = ( w * float(m_nViewHeight) ) / float(m_nViewWidth);
 
 		m[0][0] = 2*m_fNearClip/w;
@@ -681,16 +683,16 @@ void CCamera::WorldToView( const Vector& vWorld, Vector2D &vView )
 
 	// NOTE: The negative sign on y is because wc wants to think about screen
 	// coordinates in a different way than the material system
-	vView.x = 0.5 * (vView3D.x + 1.0) * m_nViewWidth;
-	vView.y = 0.5 * (-vView3D.y + 1.0) * m_nViewHeight;
+	vView.x = 0.5f * (vView3D.x + 1.0f) * m_nViewWidth;
+	vView.y = 0.5f * (-vView3D.y + 1.0f) * m_nViewHeight;
 }
 
 void CCamera::ViewToWorld( const Vector2D &vView, Vector& vWorld)
 {	
 	Vector vView3D;
 
-	vView3D.x = 2.0 * vView.x / m_nViewWidth - 1;
-	vView3D.y = -2.0 * vView.y / m_nViewHeight + 1;
+	vView3D.x = 2.0f * vView.x / m_nViewWidth - 1;
+	vView3D.y = -2.0f * vView.y / m_nViewHeight + 1;
 	vView3D.z = 0;
 
 	Vector3DMultiplyPositionProjective( m_InvViewProjMatrix, vView3D, vWorld );

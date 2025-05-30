@@ -25,9 +25,10 @@ unsigned ThreadStubProcessMD5Requests( void *pParam )
 //-----------------------------------------------------------------------------
 unsigned CFileTracker2::ThreadedProcessMD5Requests()
 {
-	ThreadSetDebugName( "ProcessMD5Requests" );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName( "MD5Calculator" );
 
-	while ( m_bThreadShouldRun )
+	while ( m_bThreadShouldRun.load(std::memory_order_acq_rel) )
 	{
 		StuffToMD5_t stuff;
 
@@ -96,7 +97,7 @@ int CFileTracker2::SubmitThreadedMD5Request( uint8 *pubBuffer, int cubBuffer, in
 		trackedVPKFileFind.m_PackFileID = PackFileID;
 		trackedVPKFileFind.m_nFileFraction = nPackFileFraction;
 
-		int idxTrackedVPKFile = m_treeTrackedVPKFiles.Find( trackedVPKFileFind );
+		auto idxTrackedVPKFile = m_treeTrackedVPKFiles.Find( trackedVPKFileFind );
 		if ( idxTrackedVPKFile != m_treeTrackedVPKFiles.InvalidIndex() )
 		{
 			// dont early out if we have already done the MD5, if the caller wants us
@@ -126,7 +127,7 @@ int CFileTracker2::SubmitThreadedMD5Request( uint8 *pubBuffer, int cubBuffer, in
 	if ( m_hWorkThread == NULL )
 	{
 		Assert( !m_bThreadShouldRun );
-		m_bThreadShouldRun = true;
+		m_bThreadShouldRun.store(true, std::memory_order::memory_order_relaxed);
 		m_hWorkThread = CreateSimpleThread( ThreadStubProcessMD5Requests, this );
 	}
 
@@ -206,7 +207,7 @@ CFileTracker2::CFileTracker2( CBaseFileSystem *pFileSystem ):
 	m_cComputedMD5ForVPKFiles = 0;
 
 #ifdef SUPPORT_PACKED_STORE
-	m_bThreadShouldRun = false;
+	m_bThreadShouldRun.store(false, std::memory_order::memory_order_relaxed);
 	m_hWorkThread = NULL;
 #endif
 }
@@ -222,7 +223,7 @@ CFileTracker2::~CFileTracker2()
 void CFileTracker2::ShutdownAsync()
 {
 #ifdef SUPPORT_PACKED_STORE
-	m_bThreadShouldRun = false;
+	m_bThreadShouldRun.store(false, std::memory_order::memory_order_relaxed);
 	m_threadEventWorkToDo.Set();
 	// wait for it to die
 	if ( m_hWorkThread )
@@ -252,7 +253,7 @@ EFileCRCStatus CFileTracker2::CheckCachedFileHash( const char *pPathID, const ch
 	TrackedFile_t trackedfileFind;
 	trackedfileFind.RebuildFileName( m_stringPool, pRelativeFilename, pPathID, nFileFraction );
 
-	int idx = m_treeAllOpenedFiles.Find( trackedfileFind );
+	auto idx = m_treeAllOpenedFiles.Find( trackedfileFind );
 	if ( idx != m_treeAllOpenedFiles.InvalidIndex() )
 	{
 		TrackedFile_t &trackedfile = m_treeAllOpenedFiles[ idx ];
@@ -423,7 +424,7 @@ void CFileTracker2::AddFileHashForVPKFile( int nPackFileNumber, int nFileFractio
 
 	char szDataFileName[MAX_PATH];
 	VPKHandle.m_nFileNumber = nPackFileNumber;
-	VPKHandle.GetPackFileName( szDataFileName, sizeof(szDataFileName) );
+	VPKHandle.GetPackFileName( szDataFileName );
 	const char *pszFileName = V_GetFileName( szDataFileName );
 
 	TrackedVPKFile_t trackedVPKFile;
@@ -466,7 +467,7 @@ int CFileTracker2::IdxFileFromName( const char *pFilename, const char *pPathID, 
 	trackedfile.RebuildFileName( m_stringPool, pFilename, pPathID, nFileFraction );
 	trackedfile.m_bPackOrVPKFile = bPackOrVPKFile;
 
-	int idxFile = m_treeAllOpenedFiles.Find( trackedfile );
+	auto idxFile = m_treeAllOpenedFiles.Find( trackedfile );
 	if ( idxFile == m_treeAllOpenedFiles.InvalidIndex() )
 	{
 		idxFile = m_treeAllOpenedFiles.Insert( trackedfile );

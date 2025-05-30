@@ -402,7 +402,7 @@ void CStudioRender::AddGlint( CPixelWriter &pixelWriter, float x, float y, const
 		{
 			float fu = ((float)u) - x;
 			float fv = ((float)v) - y;
-			const float offset = 0.25;
+			constexpr float offset = 0.25;
 			float intensity =	GlintGaussSpotCoefficient( fu-offset, fv-offset ) + 
 								GlintGaussSpotCoefficient( fu+offset, fv-offset ) + 
 								5 * GlintGaussSpotCoefficient( fu, fv ) + 

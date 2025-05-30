@@ -150,7 +150,7 @@ public:
 	virtual const studiohdr_t *FindModel( const studiohdr_t *pStudioHdr, void **cache, char const *modelname ) const;
 	virtual const studiohdr_t *FindModel( void *cache ) const;
 	virtual virtualmodel_t *GetVirtualModel( const studiohdr_t *pStudioHdr ) const;
-	virtual byte *GetAnimBlock( const studiohdr_t *pStudioHdr, int iBlock ) const;
+	virtual byte *GetAnimBlock( const studiohdr_t *pStudioHdr, intp iBlock ) const;
 
 	byte *LoadAnimBlock( model_t *model, const studiohdr_t *pStudioHdr, int iBlock, cache_user_t *cache ) const;
 
@@ -562,7 +562,7 @@ virtualmodel_t *CModelInfo::GetVirtualModel( const studiohdr_t *pStudioHdr ) con
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-byte *CModelInfo::GetAnimBlock( const studiohdr_t *pStudioHdr, int nBlock ) const
+byte *CModelInfo::GetAnimBlock( const studiohdr_t *pStudioHdr, intp nBlock ) const
 {
 	MDLHandle_t handle = (MDLHandle_t)(intp)pStudioHdr->virtualModel&0xffff;
 	return g_pMDLCache->GetAnimBlock( handle, nBlock );
@@ -593,7 +593,7 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 	return g_pMDLCache->GetVirtualModelFast( this, (MDLHandle_t)(intp)virtualModel&0xffff );
 }
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
+byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)(intp)virtualModel&0xffff, i );
 }
@@ -608,6 +608,11 @@ const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
 }
 
+// dimhotepus: Add const-correct API.
+studiohdr_t *virtualgroup_t::GetStudioHdr( void )
+{
+	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose:

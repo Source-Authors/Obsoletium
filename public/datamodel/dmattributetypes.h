@@ -151,7 +151,7 @@ inline int NumComponents( DmAttributeType_t type )
 	case AT_COLOR: //rgba
 	case AT_VECTOR4:
 	case AT_QUATERNION:
-		return 4;
+		return 4; //-V112
 
 	case AT_VMATRIX:
 		return 16;
@@ -172,19 +172,19 @@ inline float GetComponent( const T &value, int i )
 	return 0.0f;
 }
 
-template <> inline float GetComponent( const bool &value, int i )
+template <> inline float GetComponent( const bool &value, [[maybe_unused]] int i )
 {
 	Assert( i == 0 );
 	return value ? 1.0f : 0.0f;
 }
 
-template <> inline float GetComponent( const int &value, int i )
+template <> inline float GetComponent( const int &value, [[maybe_unused]] int i )
 {
 	Assert( i == 0 );
 	return float( value );
 }
 
-template <> inline float GetComponent( const float &value, int i )
+template <> inline float GetComponent( const float &value, [[maybe_unused]] int i )
 {
 	Assert( i == 0 );
 	return value;

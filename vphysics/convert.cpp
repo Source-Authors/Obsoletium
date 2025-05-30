@@ -39,11 +39,11 @@ void ConvertBoxToIVP( const Vector &mins, const Vector &maxs, Vector &outmins, V
 	float tmpZ;
 
 	tmpZ = mins.y;
-	outmins.y = -HL2IVP(mins.z);
+	outmins.y = -HL2IVP(mins.z); //-V537
 	outmins.z = HL2IVP(tmpZ);
 	outmins.x = HL2IVP(mins.x);
 	tmpZ = maxs.y;
-	outmaxs.y = -HL2IVP(maxs.z);
+	outmaxs.y = -HL2IVP(maxs.z); //-V537
 	outmaxs.z = HL2IVP(tmpZ);
 	outmaxs.x = HL2IVP(maxs.x);
 

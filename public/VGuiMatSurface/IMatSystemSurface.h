@@ -43,7 +43,7 @@ typedef void (*PlaySoundFunc_t)(const char *pFileName);
 // An extra interface implemented by the material system implementation of vgui::ISurface
 //
 //-----------------------------------------------------------------------------
-#define MAT_SYSTEM_SURFACE_INTERFACE_VERSION "MatSystemSurface008"
+constexpr inline char MAT_SYSTEM_SURFACE_INTERFACE_VERSION[]{"MatSystemSurface009"};
 class IMatSystemSurface : public vgui::ISurface
 {
 public:

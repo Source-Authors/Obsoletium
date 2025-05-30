@@ -30,15 +30,6 @@
 #endif
 
 
-long GetFileSize( FILE *fp )
-{
-	int curPos = ftell( fp );
-	fseek( fp, 0, SEEK_END );
-	long ret = ftell( fp );
-	fseek( fp, curPos, SEEK_SET );
-	return ret;
-}
-
 
 // ------------------------------------------------------------------------------------------------------------------------------------ //
 // VProf record mode. Turn it on to record all the vprof data, then when you're playing back, the engine's budget and vprof panels 
@@ -52,9 +43,15 @@ public:
 	{
 		m_Mode = Mode_None;
 		m_hFile = NULL;
+		m_iLastUniqueNodeID = -1;
+		m_iPlaybackTick = -1;
+		m_iSkipPastHeaderPos = -1;
+		m_iLastTick = -1;
+		m_FileLen = -1;
+		m_bNodesChanged = false;
 		m_nQueuedStarts = 0;
 		m_nQueuedStops = 0;
-		m_iPlaybackTick = -1;
+		m_bPlaybackPaused = false;
 	}
 
 	~CVProfRecorder()
@@ -795,7 +792,7 @@ private:
 
 	const char* PoolString( const char *pStr )
 	{
-		int i = m_PooledStrings.Find( pStr );
+		auto i = m_PooledStrings.Find( pStr );
 		if ( i == m_PooledStrings.InvalidIndex() )
 			i = m_PooledStrings.Insert( pStr, 0 );
 

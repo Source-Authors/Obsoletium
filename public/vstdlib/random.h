@@ -14,7 +14,7 @@
 #include "tier0/threadtools.h"
 #include "tier1/interface.h"
 
-constexpr inline int NTAB{32};
+constexpr inline int NTAB{32}; //-V112
 
 //-----------------------------------------------------------------------------
 // A generator of uniformly distributed random numbers

@@ -708,7 +708,7 @@ void C_HLTVCamera::FireGameEvent( IGameEvent * event)
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode( tmpStr, outputBuf, sizeof(outputBuf) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( tmpStr, outputBuf );
 		}
 
 		internalCenterPrint->Print( ConvertCRtoNL( outputBuf ) );

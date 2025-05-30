@@ -60,7 +60,8 @@ BEGIN_VS_SHADER( Eyes_dx6,
 		// Compute the inverse transpose of the matrix
 		// NOTE: I only have to invert it here because VMatrix is transposed
 		// with respect to what gets returned from GetMatrix.
-		mat.InverseGeneral( invTrans );
+		[[maybe_unused]] bool ok = mat.InverseGeneral( invTrans );
+		AssertMsg( ok, "Matrix inverse failed." );
 		invTrans = invTrans.Transpose();
 
 		// Transform the u and v planes into view space

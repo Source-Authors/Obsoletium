@@ -125,7 +125,7 @@ protected:
 
 	uint64 m_ulVersion;
 private:
-	CUtlMap<int, CSharedObjectTypeCache *> m_mapObjects;
+	CUtlMap<int, CSharedObjectTypeCache *, int> m_mapObjects;
 };
 
 

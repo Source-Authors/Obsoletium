@@ -5,8 +5,8 @@
 #ifndef SE_DEDICATED_CONSOLE_TEXT_CONSOLE_WIN32_H_
 #define SE_DEDICATED_CONSOLE_TEXT_CONSOLE_WIN32_H_
 
-#include <cstddef>  // ptrdiff_t
 #include "textconsole.h"
+#include "tier0/basetypes.h"
 
 #define MAX_CONSOLE_TEXTLEN 256
 #define MAX_BUFFER_LINES 30
@@ -38,16 +38,16 @@ class CTextConsoleWin32 : public CTextConsole {
  protected:
   // CTextConsoleWin32
   void SetColor(WORD);
-  void PrintRaw(const char *pszMsg, ptrdiff_t nChars = -1);
+  void PrintRaw(const char *pszMsg, intp nChars = -1);
 
  private:
   char m_szConsoleText[MAX_CONSOLE_TEXTLEN];  // console text buffer
-  ptrdiff_t m_nConsoleTextLen;                // console textbuffer length
-  ptrdiff_t m_nCursorPosition;  // position in the current input line
+  intp m_nConsoleTextLen;                // console textbuffer length
+  intp m_nCursorPosition;  // position in the current input line
 
   // Saved input data when scrolling back through command history
   char m_szSavedConsoleText[MAX_CONSOLE_TEXTLEN];  // console text buffer
-  ptrdiff_t m_nSavedConsoleTextLen;                // console textbuffer length
+  intp m_nSavedConsoleTextLen;                // console textbuffer length
 
   char m_aszLineBuffer[MAX_BUFFER_LINES]
                       [MAX_CONSOLE_TEXTLEN];  // command buffer last
@@ -56,7 +56,7 @@ class CTextConsoleWin32 : public CTextConsole {
   int m_nBrowseLine;  // current buffer line for up/down arrow
   int m_nTotalLines;  // # of nonempty lines in the buffer
 
-  ptrdiff_t ReceiveNewline();
+  intp ReceiveNewline();
   void ReceiveBackspace();
   void ReceiveTab();
   void ReceiveStandardChar(const char ch);

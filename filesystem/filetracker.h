@@ -178,12 +178,13 @@ private:
 #ifdef SUPPORT_PACKED_STORE
 	CThreadEvent m_threadEventWorkToDo;
 	CThreadEvent m_threadEventWorkCompleted;
-	volatile bool m_bThreadShouldRun;
+	// dimhotepus: volatile bool -> std::atomic_bool
+	std::atomic_bool m_bThreadShouldRun;
 	ThreadHandle_t m_hWorkThread;
 
 	CTSQueue< StuffToMD5_t >				m_PendingJobs;
 	CTSQueue< StuffToMD5_t >				m_CompletedJobs;
-	CUtlLinkedList< SubmittedMd5Job_t >		m_SubmittedJobs;
+	CUtlLinkedList< SubmittedMd5Job_t, int >		m_SubmittedJobs;
 #endif // SUPPORT_PACKED_STORE
 
 	// Stats

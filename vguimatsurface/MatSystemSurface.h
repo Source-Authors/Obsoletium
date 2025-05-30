@@ -23,8 +23,8 @@
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
-#include "utlvector.h"
-#include "utlsymbol.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlsymbol.h"
 #include "materialsystem/MaterialSystemUtil.h"
 #include "tier1/utldict.h"
 #include "tier3/tier3.h"
@@ -93,7 +93,7 @@ public:
 	
 	void DrawLine( int x0, int y0, int x1, int y1 ) override;
 	void DrawTexturedLine( const vgui::Vertex_t &a, const vgui::Vertex_t &b ) override;
-	void DrawPolyLine(int *px, int *py, int numPoints) override;
+	void DrawPolyLine(int *px, int *py, intp numPoints) override;
 	void DrawTexturedPolyLine( const vgui::Vertex_t *p, int n ) override;
 
 	void DrawFilledRect(int x0, int y0, int x1, int y1) override;
@@ -180,9 +180,9 @@ public:
 	int GetFontTallRequested(HFont font) override;
 	int GetFontAscent(HFont font, wchar_t wch) override;
 	bool IsFontAdditive(HFont font)  override;
-	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) override;
+	void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c) override;
 	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) override;
-	int GetCharacterWidth(vgui::HFont font, int ch) override;
+	int GetCharacterWidth(vgui::HFont font, wchar_t ch) override;
 	bool AddCustomFontFile(const char *fontName, const char *fontFileName) override;
 	bool AddBitmapFontFile(const char *fontFileName) override;
 	void SetBitmapFontName( const char *pName, const char *pFontFilename ) override;
@@ -207,7 +207,7 @@ public:
 	//!! these functions Should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
 	intp GetPopupCount() override;
-	vgui::VPANEL GetPopup( int index ) override;
+	vgui::VPANEL GetPopup( intp index ) override;
 	bool ShouldPaintChildPanel(vgui::VPANEL childPanel) override;
 	bool RecreateContext(vgui::VPANEL panel) override;
 	void AddPanel(vgui::VPANEL panel) override;
@@ -529,7 +529,7 @@ private:
 	CUtlVector< TitleEntry >	m_Titles;
 	CUtlVector< CUtlSymbol >	m_CustomFontFileNames;
 	CUtlVector< CUtlSymbol >	m_BitmapFontFileNames;
-	CUtlDict< int, int >		m_BitmapFontFileMapping;
+	CUtlDict< intp, int >		m_BitmapFontFileMapping;
 
 	float	m_flZPos;
 	CUtlDict< vgui::IImage *, unsigned short >	m_FileTypeImages;
@@ -601,7 +601,9 @@ class MatSurfFuncLogger	// rip off of GLMFuncLogger - figure out a way to reunif
 			
 			char modifiedFmt[2000];
 			modifiedFmt[0] = '>';
-			strcpy( modifiedFmt+1, fmt );
+			// dimhotepus: strcpy -> V_strcat_safe
+			modifiedFmt[1] = '\0';
+			V_strcat_safe( modifiedFmt, fmt );
 			
 			va_list	vargs;
 			va_start(vargs, fmt);

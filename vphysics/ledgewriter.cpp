@@ -13,7 +13,7 @@
 #include <ivp_compact_surface.hxx>
 #include <ivp_compact_ledge.hxx>
 
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 #include "ledgewriter.h"
 
 // gets the max vertex index referenced by a compact ledge
@@ -88,7 +88,7 @@ static void BuildVertMap( vertmap_t &out, const Vector *pVerts, int vertexCount,
 // Each IVP_Compact_Triangle and IVP_Compact_Edge occupies an index 
 // 0,1,2,3 is tri, edge, edge, edge (tris and edges are both 16 bytes)
 // So you can just add the index to get_first_triangle to get a pointer 
-inline int EdgeIndex( const IVP_Compact_Ledge *pLedge, const IVP_Compact_Edge *pEdge )
+inline intp EdgeIndex( const IVP_Compact_Ledge *pLedge, const IVP_Compact_Edge *pEdge )
 {
 	return pEdge - (const IVP_Compact_Edge *)pLedge->get_first_triangle();
 }
@@ -165,8 +165,8 @@ void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP_Compac
 		for ( int j = 0; j < 3; j++ )
 		{
 			const IVP_Compact_Edge *pEdge = pTri->get_edge(j);
-			int index = EdgeIndex(pLedge, pEdge);
-			int oppositeIndex = EdgeIndex(pLedge, pEdge->get_opposite());
+			intp index = EdgeIndex(pLedge, pEdge);
+			intp oppositeIndex = EdgeIndex(pLedge, pEdge->get_opposite());
 			if ( !pEdge->get_is_virtual() && edgeMap[oppositeIndex] < 0 )
 			{
 				edgeMap[index] = edgeList.AddToTail(index);
@@ -223,22 +223,22 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	const packedhull_t *pHull = pHullHeader->GetPackedHull(hullIndex);
 	const packedtriangle_t *pPackedTris = pHullHeader->GetPackedTriangles(hullIndex);
 	// write the ledge
-	pLedge->set_offset_ledge_points( (int)((char *)pPointList - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
+	pLedge->set_offset_ledge_points( (int)((const char *)pPointList - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
 	pLedge->set_is_compact( IVP_TRUE );
 	pLedge->set_size(sizeof(IVP_Compact_Ledge) + sizeof(IVP_Compact_Triangle)*pHull->triangleCount);	// <0 indicates a non compact compact ledge 
 	pLedge->n_triangles = pHull->triangleCount;
-	pLedge->has_chilren_flag = isVirtualLedge ? IVP_TRUE : IVP_FALSE;
+	pLedge->has_chilren_flag = static_cast<unsigned>(isVirtualLedge ? IVP_TRUE : IVP_FALSE);
 
 	// Make the offset -pLedge so the result is a NULL ledgetree node - we haven't needed to create one of these as of yet
 	//pLedge->ledgetree_node_offset = -((intp)pLedge);
 
 	// keep track of which triangle edge referenced this edge (so the next one can swap the order and point to the first one)
-	int forwardEdgeIndex[255] = {};
+	intp forwardEdgeIndex[255] = {};
 	for ( int i = 0; i < pHull->edgeCount; i++ )
 	{
 		forwardEdgeIndex[i] = -1;
 	}
-	packededge_t *pPackedEdges = (packededge_t *)(pPackedTris + pHull->triangleCount);
+	const packededge_t *pPackedEdges = (const packededge_t *)(pPackedTris + pHull->triangleCount);
 	IVP_Compact_Triangle *pOut = pLedge->get_first_triangle();
 	// now write the compact triangles and their edges
 	int baseVert = pHull->baseVert;
@@ -246,7 +246,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 	{
 		pOut[i].set_tri_index(i);
 		pOut[i].set_material_index(materialIndex);
-		pOut[i].set_is_virtual( i < pHull->vtriCount ? IVP_TRUE : IVP_FALSE );
+		pOut[i].set_is_virtual( static_cast<unsigned>(i < pHull->vtriCount ? IVP_TRUE : IVP_FALSE) );
 		pOut[i].set_pierce_index(pPackedTris[i].opposite);
 		Assert(pPackedTris[i].opposite<pHull->triangleCount);
 		int edges[3] = {pPackedTris[i].e0, pPackedTris[i].e1, pPackedTris[i].e2};
@@ -258,19 +258,19 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 				// this is the first triangle to use this edge, so it's forward (and the other triangle sharing (opposite edge pointer) is unknown)
 				int startVert = pPackedEdges[edges[j]].v0 + baseVert;
 				pOut[i].c_three_edges[j].set_start_point_index(startVert);
-				pOut[i].c_three_edges[j].set_is_virtual( edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE );
+				pOut[i].c_three_edges[j].set_is_virtual( static_cast<unsigned>(edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE) );
 				forwardEdgeIndex[edges[j]] = EdgeIndex(pLedge, &pOut[i].c_three_edges[j]);
 			}
 			else
 			{
 				// this is the second triangle to use this edge, so it's reversed (and the other triangle sharing is in the forward edge table)
-				int oppositeIndex = forwardEdgeIndex[edges[j]];
+				intp oppositeIndex = forwardEdgeIndex[edges[j]];
 
 				int startVert = pPackedEdges[edges[j]].v1 + baseVert;
 				pOut[i].c_three_edges[j].set_start_point_index(startVert);
-				pOut[i].c_three_edges[j].set_is_virtual( edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE );
+				pOut[i].c_three_edges[j].set_is_virtual( static_cast<unsigned>(edges[j] < pHull->vedgeCount ? IVP_TRUE : IVP_FALSE) );
 				// now build the links between the triangles sharing this edge
-				int thisEdgeIndex = EdgeIndex( pLedge, &pOut[i].c_three_edges[j] );
+				intp thisEdgeIndex = EdgeIndex( pLedge, &pOut[i].c_three_edges[j] );
 				pOut[i].c_three_edges[j].set_opposite_index( oppositeIndex - thisEdgeIndex );
 				pOut[i].c_three_edges[j].get_opposite()->set_opposite_index( thisEdgeIndex - oppositeIndex );
 			}
@@ -296,7 +296,7 @@ static void InitTriangle( IVP_Compact_Triangle *pTri, int index, int materialInd
 void CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( triangleledge_t *pOut, const IVP_Compact_Poly_Point *pPoints, int v0, int v1, int v2, int materialIndex )
 {
 	IVP_Compact_Ledge *pLedge = &pOut->ledge;
-	pLedge->set_offset_ledge_points( (int)((char *)pPoints - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
+	pLedge->set_offset_ledge_points( (int)((const char *)pPoints - (char *)pLedge) ); // byte offset from 'this' to (ledge) point array
 	pLedge->set_is_compact( IVP_TRUE );
 	pLedge->set_size(sizeof(triangleledge_t));	// <0 indicates a non compact compact ledge 
 	pLedge->n_triangles = 2;

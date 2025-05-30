@@ -1188,13 +1188,13 @@ void CBaseEntity::UpdateWaterState()
 bool CBaseEntity::PhysicsCheckWater( void )
 {
 	if (GetMoveParent())
-		return GetWaterLevel() > 1;
+		return GetWaterLevel() > WaterLevel::WL_Feet;
 
 	int cont = GetWaterType();
 
 	// If we're not in water + don't have a current, we're done
 	if ( ( cont & (MASK_WATER | MASK_CURRENT) ) != (MASK_WATER | MASK_CURRENT) )
-		return GetWaterLevel() > 1;
+		return GetWaterLevel() > WaterLevel::WL_Feet;
 
 	// Compute current direction
 	Vector v( 0, 0, 0 );
@@ -1228,7 +1228,7 @@ bool CBaseEntity::PhysicsCheckWater( void )
 	VectorMA (GetBaseVelocity(), 50.0f*GetWaterLevel(), v, newBaseVelocity);
 	SetBaseVelocity( newBaseVelocity );
 	
-	return GetWaterLevel() > 1;
+	return GetWaterLevel() > WaterLevel::WL_Feet;
 }
 
 

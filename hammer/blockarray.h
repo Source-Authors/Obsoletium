@@ -14,12 +14,13 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-template <class T, int nBlockSize, int nMaxBlocks>
+template <class T, short nBlockSize, short nMaxBlocks>
 class BlockArray
 {
 public:
 	BlockArray()
 	{
+		memset(Blocks, 0, sizeof(Blocks));
 		nCount = nBlocks = 0;
 	}
 	~BlockArray()
@@ -27,27 +28,27 @@ public:
 		GetBlocks(0);
 	}
 
-	T& operator[] (int iIndex);
+	T& operator[] (short iIndex);
 	
-	void SetCount(int nObjects);
-	int GetCount() { return nCount; }
+	void SetCount(short nObjects);
+	short GetCount() const { return nCount; }
 
 private:
 	T * Blocks[nMaxBlocks+1];
 	short nCount;
 	short nBlocks;
-	void GetBlocks(int nNewBlocks);
+	void GetBlocks(short nNewBlocks);
 };
 
-template <class T, int nBlockSize, int nMaxBlocks>
+template <class T, short nBlockSize, short nMaxBlocks>
 void BlockArray<T,nBlockSize,nMaxBlocks>::
-	GetBlocks(int nNewBlocks)
+	GetBlocks(short nNewBlocks)
 {
-	for(int i = nBlocks; i < nNewBlocks; i++)
+	for(auto i = nBlocks; i < nNewBlocks; i++)
 	{
 		Blocks[i] = new T[nBlockSize];
 	}
-	for(int i = nNewBlocks; i < nBlocks; i++)
+	for(auto i = nNewBlocks; i < nBlocks; i++)
 	{
 		delete[] Blocks[i];
 	}
@@ -55,17 +56,17 @@ void BlockArray<T,nBlockSize,nMaxBlocks>::
 	nBlocks = nNewBlocks;
 }
 
-template <class T, int nBlockSize, int nMaxBlocks>
+template <class T, short nBlockSize, short nMaxBlocks>
 void BlockArray<T,nBlockSize,nMaxBlocks>::
-	SetCount(int nObjects)
+	SetCount(short nObjects)
 {
 	if(nObjects == nCount)
 		return;
 
 	// find the number of blocks required by nObjects, checking for
 	// integer rounding error
-	int nNewBlocks = (nObjects / nBlockSize);
-	if ((nNewBlocks * nBlockSize) < nObjects)
+	short nNewBlocks = nObjects / nBlockSize;
+	if (nNewBlocks * nBlockSize < nObjects)
 	{
 		nNewBlocks++;
 	}
@@ -75,7 +76,7 @@ void BlockArray<T,nBlockSize,nMaxBlocks>::
 		// Make sure we don't get an overrun.
 		if ( nNewBlocks > ARRAYSIZE( Blocks ) )
 		{
-			Error( "BlockArray< ?, %d, %d > - too many blocks needed.", nBlockSize, nMaxBlocks );
+			Error( "BlockArray< ?, %hd, %hd > - too many blocks needed.", nBlockSize, nMaxBlocks );
 		}
 		
 		GetBlocks(nNewBlocks);
@@ -83,14 +84,14 @@ void BlockArray<T,nBlockSize,nMaxBlocks>::
 	nCount = nObjects;
 }
 
-template <class T, int nBlockSize, int nMaxBlocks>
-T& BlockArray<T,nBlockSize,nMaxBlocks>::operator[] (int iIndex)
+template <class T, short nBlockSize, short nMaxBlocks>
+T& BlockArray<T,nBlockSize,nMaxBlocks>::operator[] (short iIndex)
 {
 	// Cast to unsigned so that this check will reject negative values as
 	// well as overly large values.
 	if((unsigned)iIndex >= (unsigned)nCount)
 	{
-		Error( "BlockArray< %d, %d > - invalid block index.", iIndex, nCount );
+		Error( "BlockArray< %hd, %hd > - invalid block index.", iIndex, nCount );
 		SetCount(iIndex+1);
 	}
 	return Blocks[iIndex / nBlockSize][iIndex % nBlockSize];

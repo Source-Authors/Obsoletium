@@ -4,12 +4,13 @@
 //
 //===========================================================================//
 
-#include <tier0/platform.h>
 #include <tier2/tier2.h>
+#include <tier0/platform.h>
 #include <filesystem_init.h>
 
+namespace {
 
-static CSysModule *g_pFullFileSystemModule = NULL;
+static CSysModule *g_pFullFileSystemModule{nullptr};
 
 void* DefaultCreateInterfaceFn(const char *, int *pReturnCode)
 {
@@ -17,38 +18,49 @@ void* DefaultCreateInterfaceFn(const char *, int *pReturnCode)
 	{
 		*pReturnCode = 0;
 	}
-	return NULL;
+
+	return nullptr;
 }
 
-void InitDefaultFileSystem( void )
+}  // namespace
+
+void InitDefaultFileSystem()
 {
 	AssertMsg( !g_pFullFileSystem, "Already set up the file system" );
 
-	if ( !Sys_LoadInterface( "filesystem_stdio", FILESYSTEM_INTERFACE_VERSION,
-		&g_pFullFileSystemModule, (void**)&g_pFullFileSystem ) )
+	if ( !Sys_LoadInterfaceT( "filesystem_stdio", FILESYSTEM_INTERFACE_VERSION,
+		&g_pFullFileSystemModule, &g_pFullFileSystem ) )
 	{
-		if ( !Sys_LoadInterface( "filesystem_steam", FILESYSTEM_INTERFACE_VERSION,
-			&g_pFullFileSystemModule, (void**)&g_pFullFileSystem ) )
+		if ( !Sys_LoadInterfaceT( "filesystem_steam", FILESYSTEM_INTERFACE_VERSION,
+			&g_pFullFileSystemModule, &g_pFullFileSystem ) )
 		{
-			exit(0);
+			Warning("Unable to find interface '%s' in both filesystem_stdio"
+				DLL_EXT_STRING " and filesystem_steam" DLL_EXT_STRING ".\n",
+				FILESYSTEM_INTERFACE_VERSION);
+			// dimhotepus: Signal error code.
+			exit(1);
 		}
 	}
 
 	if ( !g_pFullFileSystem->Connect( DefaultCreateInterfaceFn ) )
 	{
-		exit(0);
+		Warning("Unable to connect file system interfaces.\n");
+		// dimhotepus: Signal error code.
+		exit(2);
 	}
 
 	if ( g_pFullFileSystem->Init() != INIT_OK )
 	{
-		exit(0);
+		Warning("Unable to init file system interfaces.\n");
+		// dimhotepus: Signal error code.
+		exit(3);
 	}
 
 	g_pFullFileSystem->RemoveAllSearchPaths();
 	g_pFullFileSystem->AddSearchPath( "", "LOCAL", PATH_ADD_TO_HEAD );
 }
 
-void ShutdownDefaultFileSystem(void)
+void ShutdownDefaultFileSystem()
 {
 	AssertMsg( g_pFullFileSystem, "File system not set up" );
 	g_pFullFileSystem->Shutdown();

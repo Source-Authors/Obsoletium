@@ -134,8 +134,8 @@ private:
 
 	void RestoreDamageInflictorState( IPhysicsObject *pInflictor );
 	void RestoreDamageInflictorState( int inflictorStateIndex, float velocityBlend );
-	int AddDamageInflictor( IPhysicsObject *pInflictorPhysics, float otherMass, const Vector &savedVel, const AngularImpulse &savedAngVel, bool addList );
-	int	FindDamageInflictor( IPhysicsObject *pInflictorPhysics );
+	intp AddDamageInflictor( IPhysicsObject *pInflictorPhysics, float otherMass, const Vector &savedVel, const AngularImpulse &savedAngVel, bool addList );
+	intp FindDamageInflictor( IPhysicsObject *pInflictorPhysics );
 
 	// make the call into the entity system
 	void DispatchStartTouch( CBaseEntity *pEntity0, CBaseEntity *pEntity1, const Vector &point, const Vector &normal );

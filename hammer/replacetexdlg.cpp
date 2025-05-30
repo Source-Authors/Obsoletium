@@ -12,8 +12,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "ReplaceTexDlg.h"
+#include "hammer.h"
 #include "MainFrm.h"
 #include "GlobalFunctions.h"
 #include "TextureBrowser.h"
@@ -26,7 +26,7 @@
 
 
 CReplaceTexDlg::CReplaceTexDlg(int nSelected, CWnd* pParent /*=NULL*/)
-	: CDialog(CReplaceTexDlg::IDD, pParent)
+	: CBaseDlg(CReplaceTexDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CReplaceTexDlg)
 	m_iSearchAll = nSelected ? FALSE : TRUE;
@@ -44,7 +44,7 @@ CReplaceTexDlg::CReplaceTexDlg(int nSelected, CWnd* pParent /*=NULL*/)
 
 void CReplaceTexDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CReplaceTexDlg)
 	DDX_Control(pDX, IDC_FIND, m_cFind);
 	DDX_Control(pDX, IDC_REPLACE, m_cReplace);
@@ -61,7 +61,7 @@ void CReplaceTexDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CReplaceTexDlg, CDialog)
+BEGIN_MESSAGE_MAP(CReplaceTexDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CReplaceTexDlg)
 	ON_BN_CLICKED(IDC_BROWSEREPLACE, OnBrowsereplace)
 	ON_BN_CLICKED(IDC_BROWSEFIND, OnBrowsefind)
@@ -77,17 +77,17 @@ END_MESSAGE_MAP()
 void CReplaceTexDlg::BrowseTex(int iEdit)
 {
 	CString strTex;
-	CWnd *pWnd = GetDlgItem(iEdit);
 
+	CWnd *pWnd = GetDlgItem(iEdit);
 	pWnd->GetWindowText(strTex);
 
-	CTextureBrowser *pBrowser = new CTextureBrowser(GetMainWnd());
-	pBrowser->SetUsed(iEdit == IDC_FIND);
-	pBrowser->SetInitialTexture(strTex);
+	CTextureBrowser browser(GetMainWnd());
+	browser.SetUsed(iEdit == IDC_FIND);
+	browser.SetInitialTexture(strTex);
 
-	if (pBrowser->DoModal() == IDOK)
+	if (browser.DoModal() == IDOK)
 	{
-		IEditorTexture *pTex = g_Textures.FindActiveTexture(pBrowser->m_cTextureWindow.szCurTexture);
+		IEditorTexture *pTex = g_Textures.FindActiveTexture(browser.m_cTextureWindow.szCurTexture);
 		char szName[MAX_PATH];
 		if (pTex != NULL)
 		{
@@ -99,8 +99,6 @@ void CReplaceTexDlg::BrowseTex(int iEdit)
 		}
 		pWnd->SetWindowText(szName);
 	}
-
-	delete pBrowser;
 }
 
 void CReplaceTexDlg::OnBrowsereplace() 
@@ -137,7 +135,7 @@ void CReplaceTexDlg::OnUpdateReplace()
 
 BOOL CReplaceTexDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if(!m_nSelected)
 	{

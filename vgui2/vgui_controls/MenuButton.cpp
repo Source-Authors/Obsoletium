@@ -5,16 +5,16 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#define PROTECTED_THINGS_DISABLE
+#include <vgui_controls/MenuButton.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IPanel.h>
 #include <vgui/IInput.h>
 #include <vgui/ISurface.h>
-#include <KeyValues.h>
 #include <vgui/IVGui.h>
 
 #include <vgui_controls/Controls.h>
-#include <vgui_controls/MenuButton.h>
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/TextImage.h>
 
@@ -238,7 +238,11 @@ void MenuButton::OnCursorEntered()
 	// forward the message on to the parent of this menu.
 	KeyValues *msg = new KeyValues ("CursorEnteredMenuButton");
 	// tell the parent this menuitem is the one that was entered so it can open the menu if it wants
-	msg->SetInt("VPanel", GetVPanel());
+#ifdef PLATFORM_64BITS
+    msg->SetPtr("VPanel", (void *)GetVPanel());
+#else
+    msg->SetInt("VPanel", GetVPanel());
+#endif
 	ivgui()->PostMessage(GetVParent(), msg, NULL);
 }
 

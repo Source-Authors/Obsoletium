@@ -49,10 +49,10 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory,
 
 // Sleep time when not focus. Set to 0 to not sleep even if app doesn't have focus.
 // dimhotepus: Reduce default no focus sleep time from 50 to 25 milliseconds.
-ConVar engine_no_focus_sleep( "engine_no_focus_sleep", "25", FCVAR_ARCHIVE, "How much time in milliseconds to sleep", true, 0, true, INT_MAX );
+ConVar engine_no_focus_sleep( "engine_no_focus_sleep", "25", FCVAR_ARCHIVE, "How much time in milliseconds to sleep", true, 0, true, 1000.f );
 
-#define DEFAULT_FPS_MAX	300
-#define DEFAULT_FPS_MAX_S "300"
+#define DEFAULT_FPS_MAX	400
+#define DEFAULT_FPS_MAX_S "400"
 static int s_nDesiredFPSMax = DEFAULT_FPS_MAX;
 static bool s_bFPSMaxDrivenByPowerSavings = false;
 
@@ -67,7 +67,8 @@ static void fps_max_callback( IConVar *var, const char *pOldValue, float flOldVa
 		s_nDesiredFPSMax = ( (ConVar *)var)->GetInt();
 	}
 }
-ConVar fps_max( "fps_max", DEFAULT_FPS_MAX_S, FCVAR_NOT_CONNECTED, "Frame rate limiter, cannot be set while connected to a server.", fps_max_callback );
+// dimhotepus: Restrict fps_max to 30...MAX_FPS range.
+ConVar fps_max( "fps_max", DEFAULT_FPS_MAX_S, FCVAR_NOT_CONNECTED, "Frame rate limiter, cannot be set while connected to a server.", true, 30.0f, true, MAX_FPS, fps_max_callback );
 
 // When set, this ConVar (typically driven from the advanced video settings) will drive fps_max (see above) to
 // half of the refresh rate, if the user hasn't otherwise set fps_max (via console, commandline etc)
@@ -242,7 +243,7 @@ bool CEngine::FilterTime( float dt )
 	// Dedicated's tic_rate regulates server frame rate.  Don't apply fps filter here.
 	// Only do this restriction on the client. Prevents clients from accomplishing certain
 	// hacks by pausing their client for a period of time.
-	if ( IsPC() && !sv.IsDedicated() && !CanCheat() && fps_max.GetFloat() < 30 )
+	if ( !sv.IsDedicated() && !CanCheat() && fps_max.GetFloat() < 30 )
 	{
 		// Don't do anything if fps_max=0 (which means it's unlimited).
 		if ( fps_max.GetFloat() != 0.0f )
@@ -376,7 +377,7 @@ void CEngine::Frame( void )
 		}
 		else
 		{
-			int nSleepMicrosecs = (int) ceilf( clamp( ( m_flMinFrameTime - m_flFrameTime ) * 1000000.f, 1.f, 1000000.f ) );
+			int nSleepMicrosecs = (int) ceilf( clamp( static_cast<float>( m_flMinFrameTime - m_flFrameTime ) * 1000000.f, 1.f, 1000000.f ) );
 			ThreadSleep( (nSleepMicrosecs + 999) / 1000 );
 		}
 	}

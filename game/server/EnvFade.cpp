@@ -72,7 +72,8 @@ void CEnvFade::Spawn( void )
 //-----------------------------------------------------------------------------
 void CEnvFade::InputFade( inputdata_t &inputdata )
 {
-	int fadeFlags = 0;
+	// dimhotepus: int -> short
+	short fadeFlags = 0;
 
 	if ( m_spawnflags & SF_FADE_IN )
 	{

@@ -146,9 +146,9 @@ void CServerReplayContext::ConVarSanityThink()
 
 void CServerReplayContext::UpdateFileserverIPFromHostname( const char *pHostname )
 {
-	if ( !g_pEngine->NET_GetHostnameAsIP( pHostname, m_szFileserverIP, sizeof( m_szFileserverIP ) ) )
+	if ( !g_pEngine->NET_GetHostnameAsIP( pHostname, m_szFileserverIP ) )
 	{
-		V_strcpy( m_szFileserverIP, "0.0.0.0" );
+		V_strcpy_safe( m_szFileserverIP, "0.0.0.0" );
 		Log( "ERROR: Could not resolve fileserver hostname \"%s\" !\n", pHostname );
 		return;
 	}
@@ -158,9 +158,9 @@ void CServerReplayContext::UpdateFileserverIPFromHostname( const char *pHostname
 
 void CServerReplayContext::UpdateFileserverProxyIPFromHostname( const char *pHostname )
 {
-	if ( !g_pEngine->NET_GetHostnameAsIP( pHostname, m_szFileserverProxyIP, sizeof( m_szFileserverProxyIP ) ) )
+	if ( !g_pEngine->NET_GetHostnameAsIP( pHostname, m_szFileserverProxyIP ) )
 	{
-		V_strcpy( m_szFileserverProxyIP, "0.0.0.0" );
+		V_strcpy_safe( m_szFileserverProxyIP, "0.0.0.0" );
 		Log( "ERROR: Could not resolve fileserver proxy hostname \"%s\" !\n", pHostname );
 		return;
 	}
@@ -284,7 +284,7 @@ const char *CServerReplayContext::GetServerSubDirName() const
 void CServerReplayContext::ReportErrorsToUser( wchar_t *pErrorText )
 {
 	char szErrorText[4096];
-	g_pVGuiLocalize->ConvertUnicodeToANSI( pErrorText, szErrorText, sizeof( szErrorText ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( pErrorText, szErrorText );
 
 	static Color s_clrRed( 255, 0, 0 );
 	Warning( "\n-----------------------------------------------\n" );

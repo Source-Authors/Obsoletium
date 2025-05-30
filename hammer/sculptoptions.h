@@ -11,7 +11,11 @@
 #endif
 
 #include "disppaint.h"
-#include "afxwin.h"
+#include "tier1/utlmap.h"
+#include "resource.h"
+#include "windows/base_dlg.h"
+
+#include <afxwin.h>
 
 class CMapView3D;
 class CPaintSculptDlg;
@@ -26,7 +30,7 @@ public:
 
 	virtual bool	BeginPaint( CMapView3D *pView, const Vector2D &vPoint );
 	virtual	bool	Paint( CMapView3D *pView, const Vector2D &vPoint, SpatialPaintData_t &SpatialData );
-	virtual void	RenderTool3D(CRender3D *pRender) = 0;
+	virtual void	RenderTool3D( class CRender3D *pRender) = 0;
 	virtual bool	OnLMouseUp3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint );
 	virtual bool	OnLMouseDown3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint );
 	virtual bool	OnRMouseUp3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint );
@@ -59,7 +63,7 @@ protected:
 	void	DrawDirection( CRender3D *pRender, Vector vDirection, Color Towards, Color Away );
 	void	DuplicateSelectedDisp( );
 	void	PrepareDispForPainting( );
-	bool	FindCollisionIntercept( CCamera *pCamera, const Vector2D &vPoint, bool bUseOrigPosition, Vector &vCollisionPoint, Vector &vCollisionNormal, float &vCollisionIntercept );
+	bool	FindCollisionIntercept( class CCamera *pCamera, const Vector2D &vPoint, bool bUseOrigPosition, Vector &vCollisionPoint, Vector &vCollisionNormal, float &vCollisionIntercept );
 
 private:
 	void	DetermineKeysDown();
@@ -114,7 +118,7 @@ protected:
 	float						m_OrigBrushSize;
 };
 
-class CSculptPushOptions : public CDialog, public CSculptPainter
+class CSculptPushOptions : public CBaseDlg, public CSculptPainter
 {
 	DECLARE_DYNAMIC(CSculptPushOptions)
 
@@ -201,7 +205,7 @@ public:
 };
 
 
-class CSculptCarveOptions : public CDialog, public CSculptPainter
+class CSculptCarveOptions : public CBaseDlg, public CSculptPainter
 {
 	DECLARE_DYNAMIC(CSculptCarveOptions)
 
@@ -313,7 +317,7 @@ class ITextureInternal;
 
 // CSculptProjectOptions dialog
 
-class CSculptProjectOptions : public CDialog, public CSculptTool
+class CSculptProjectOptions : public CBaseDlg, public CSculptTool
 {
 	DECLARE_DYNAMIC(CSculptProjectOptions)
 

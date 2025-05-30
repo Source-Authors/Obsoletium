@@ -1052,7 +1052,7 @@ void R_RedownloadAllLightmaps()
 		}
 	}
 
-	float elapsed = ( float )( Sys_FloatTime() - st ) * 1000.0;
+	double elapsed = ( Sys_FloatTime() - st ) * 1000.0;
 	DevMsg( "R_RedownloadAllLightmaps took %.3f msec!\n", elapsed );
 
 	g_RebuildLightmaps = false;

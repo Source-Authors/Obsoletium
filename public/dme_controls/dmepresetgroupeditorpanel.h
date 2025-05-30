@@ -15,7 +15,7 @@
 #include "tier1/utlvector.h"
 #include "vgui_controls/Frame.h"
 #include "datamodel/dmehandle.h"
-#include "vgui_controls/fileopenstatemachine.h"
+#include "vgui_controls/FileOpenStateMachine.h"
 
 
 //-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CDmePresetGroupEditorPanel : public vgui::EditablePanel, public vgui::IFileOpenStateMachineClient
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetGroupEditorPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetGroupEditorPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -77,9 +77,9 @@ public:
 	MESSAGE_FUNC( OnRemovePreset, "RemovePreset" );
 
 	// Inherited from IFileOpenStateMachineClient
-	virtual void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
+	void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
 
 private:
 	MESSAGE_FUNC_PARAMS( OnOpenContextMenu, "OpenContextMenu", kv );
@@ -149,7 +149,7 @@ private:
 //-----------------------------------------------------------------------------
 class CDmePresetGroupEditorFrame : public vgui::Frame, public IDmNotify
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetGroupEditorFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetGroupEditorFrame, vgui::Frame );
 
 public:
 	CDmePresetGroupEditorFrame( vgui::Panel *pParent, const char *pTitle );
@@ -159,7 +159,7 @@ public:
 	void SetAnimationSet( CDmeAnimationSet *pAnimationSet );
 
 	// Inherited from IDmNotify
-	virtual void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags );
+	void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags ) override;
 
 private:
 	MESSAGE_FUNC( OnPresetsChanged, "PresetsChanged" );
@@ -168,7 +168,7 @@ private:
 	KEYBINDING_FUNC( redo, KEY_Z, vgui::MODIFIER_CONTROL | vgui::MODIFIER_SHIFT, OnRedo, "#redo_help", 0 );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	CDmePresetGroupEditorPanel *m_pEditor;
 	vgui::Button *m_pOkButton;

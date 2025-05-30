@@ -33,7 +33,7 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include <mxtk/mx.h>
 #include <mxtk/mxMessageBox.h>
@@ -820,7 +820,7 @@ void PlaySound( const char *pSoundName, StudioModel *pStudioModel )
 	const char *pSoundFileName = HLMV_TranslateSoundName( pSoundName, pStudioModel );
 
 	char filename[ 256 ];
-	sprintf( filename, "sound/%s", pSoundFileName );
+	V_sprintf_safe( filename, "sound/%s", pSoundFileName );
 	CAudioSource *pAudioSource = g_pSoundSystem->FindOrAddSound( filename );
 	if ( pAudioSource == NULL )
 		return;
@@ -1073,75 +1073,6 @@ MatSysWindow::draw ()
 
 	bInDraw = false;
 }
-
-
-
-/*
-int
-MatSysWindow::loadTexture (const char *filename, int name)
-{
-	if (!filename || !strlen (filename))
-	{
-		if (d_textureNames[name])
-		{
-			glDeleteTextures (1, (const GLuint *) &d_textureNames[name]);
-			d_textureNames[name] = 0;
-
-			if (name == 0)
-				strcpy (g_viewerSettings.backgroundTexFile, "");
-			else
-				strcpy (g_viewerSettings.groundTexFile, "");
-		}
-
-		return 0;
-	}
-
-	mxImage *image = 0;
-
-	char ext[16];
-	strcpy (ext, mx_getextension (filename));
-
-	if (!mx_strcasecmp (ext, ".tga"))
-		image = mxTgaRead (filename);
-	else if (!mx_strcasecmp (ext, ".pcx"))
-		image = mxPcxRead (filename);
-	else if (!mx_strcasecmp (ext, ".bmp"))
-		image = mxBmpRead (filename);
-
-	if (image)
-	{
-		if (name == 0)
-			strcpy (g_viewerSettings.backgroundTexFile, filename);
-		else
-			strcpy (g_viewerSettings.groundTexFile, filename);
-
-		d_textureNames[name] = name + 1;
-
-		if (image->bpp == 8)
-		{
-			mstudiotexture_t texture;
-			texture.width = image->width;
-			texture.height = image->height;
-
-			g_pStudioModel->UploadTexture (&texture, (byte *) image->data, (byte *) image->palette, name + 1);
-		}
-		else
-		{
-			glBindTexture (GL_TEXTURE_2D, d_textureNames[name]);
-			glTexImage2D (GL_TEXTURE_2D, 0, 3, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->data);
-			glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		}
-
-		delete image;
-
-		return name + 1;
-	}
-
-	return 0;
-}
-*/
 
 
 void

@@ -5,22 +5,25 @@
 //===========================================================================//
 
 #include "server_pch.h"
+#include "sv_remoteaccess.h"
+
 #include "iclient.h"
 #include "net.h"
-#include "utlbuffer.h"
-#include "utllinkedlist.h"
 #include "igameserverdata.h"
-#include "sv_remoteaccess.h"
 #include "sv_rcon.h"
 #include "sv_filter.h"
 #include "sys.h"
 #include "vprof_engine.h"
 #include "PlayerState.h"
 #include "sv_log.h"
-#ifndef SWDS
-#include "zip/XZip.h"
-#endif
 #include "cl_main.h"
+
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
+
+#ifndef SWDS
+#include "XZip.h"
+#endif
 
 extern IServerGameDLL	*serverGameDLL;
 
@@ -32,7 +35,7 @@ ConVar sv_rcon_log( "sv_rcon_log", "1", 0, "Enable/disable rcon logging." );
 //-----------------------------------------------------------------------------
 // Host_Stats_f - prints out interesting stats about the server...
 //-----------------------------------------------------------------------------
-void Host_Stats_f (void)
+static void Host_Stats_f (void)
 {
 	char stats[512];
 	g_ServerRemoteAccess.GetStatsString(stats, sizeof(stats));
@@ -48,9 +51,8 @@ CServerRemoteAccess::CServerRemoteAccess()
 {
 	m_iBytesSent = 0;
 	m_iBytesReceived = 0;
-	m_NextListenerID = 0;
+	m_nScreenshotListener = INVALID_LISTENER_ID;
 	m_AdminUIID = INVALID_LISTENER_ID;
-	m_nScreenshotListener = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -69,10 +71,10 @@ ra_listener_id CServerRemoteAccess::GetNextListenerID( bool authConnection, cons
 	return i;
 }
 
-
-bool GetStringHelper( CUtlBuffer & cmd, char *outBuf, int bufSize )
+template<size_t bufSize>
+bool GetStringHelper(CUtlBuffer &cmd, char (&outBuf)[bufSize])
 {
-	outBuf[0] = 0;
+	outBuf[0] = '\0';
 	cmd.GetStringManualCharCount( outBuf, bufSize );
 	if ( !cmd.IsValid() )
 	{
@@ -86,12 +88,12 @@ bool GetStringHelper( CUtlBuffer & cmd, char *outBuf, int bufSize )
 //-----------------------------------------------------------------------------
 // Purpose: handles a request
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, const void *buffer, int bufferSize)
+void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize)
 {
 	m_iBytesReceived += bufferSize;
 	// ConMsg("RemoteAccess: bytes received: %d\n", m_iBytesReceived);
 
-	if ( bufferSize < static_cast<int>(2*sizeof(int)) ) // check that the buffer contains at least the id and type
+	if ( bufferSize < static_cast<intp>(2*sizeof(int)) ) // check that the buffer contains at least the id and type
 	{
 		return;
 	}
@@ -99,7 +101,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 	CUtlBuffer cmd(buffer, bufferSize, CUtlBuffer::READ_ONLY);
 	bool invalidRequest = false;
 
-	while ( invalidRequest == false && (int)cmd.TellGet() < (int)(cmd.Size() - 2 * sizeof(int) ) ) // while there is commands to read
+	while ( invalidRequest == false && cmd.TellGet() < (cmd.Size() - 2 * static_cast<intp>(sizeof(int)) ) ) // while there is commands to read
 	{
 		// parse out the buffer
 		int requestID = cmd.GetInt();
@@ -113,13 +115,13 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					if ( IsAuthenticated(listener) )
 					{
 						char variable[256];
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
 						}
 						RequestValue( listener, requestID, variable);
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
@@ -128,12 +130,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					else
 					{
 						char variable[256];
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
@@ -148,12 +150,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					{
 						char variable[256];
 						char value[256];
-						if ( !GetStringHelper( cmd, variable, sizeof(variable) ) )
+						if ( !GetStringHelper( cmd, variable ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, value, sizeof(value) ) )
+						if ( !GetStringHelper( cmd, value ) )
 						{
 							invalidRequest = true;
 							break;
@@ -163,12 +165,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					else
 					{
 						char command[512];
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -182,7 +184,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					if ( IsAuthenticated(listener) )
 					{
 						char command[512];
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -194,7 +196,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 						{
 							LogCommand( listener, va( "command \"%s\"", command) );
 						}
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -203,12 +205,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					else
 					{
 						char command[512];
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
 						}
-						if ( !GetStringHelper( cmd, command, sizeof(command) ) )
+						if ( !GetStringHelper( cmd, command ) )
 						{
 							invalidRequest = true;
 							break;
@@ -221,13 +223,13 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_AUTH:
 				{
 					char password[512];
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
 					}
 					CheckPassword( pNetworkListener, listener, requestID, password );
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
@@ -268,13 +270,44 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 					CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 					if ( GetConsoleLogFileData( buf ) )
 					{
-						HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
-						void *pMem;
+						HZIP hZip = CreateZip( 0, 1024 * 1024, nullptr );
+						Assert(hZip);
+						if (!hZip)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
+
+						void *pMem = nullptr;
 						unsigned long nLen;
-						ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
-						ZipGetMemory( hZip, &pMem, &nLen );
+						ZRESULT rc = ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut() );
+						Assert(rc == ZR_OK);
+						if (rc != ZR_OK)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
+
+						rc = ZipGetMemory( hZip, &pMem, &nLen );
+						Assert(rc == ZR_OK);
+						if (rc != ZR_OK)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
+
 						SendResponseToClient( listener, SERVERDATA_CONSOLE_LOG_RESPONSE, pMem, nLen );
-						CloseZip( hZip );
+						rc = CloseZip( hZip );
+						Assert(rc == ZR_OK);
+						if (rc != ZR_OK)
+						{
+							LogCommand( listener, "Failed to zip console log!\n" );
+							RespondString( listener, requestID, "Failed to zip console log!\n" );
+							break;
+						}
 					}
 					else
 					{
@@ -289,12 +322,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_VPROF:
 				{
 					char password[25];
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
 					}
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
@@ -311,12 +344,12 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 			case SERVERDATA_REMOVE_VPROF:
 				{
 					char password[25];
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
 					}
-					if ( !GetStringHelper( cmd, password, sizeof(password) ) )
+					if ( !GetStringHelper( cmd, password ) )
 					{
 						invalidRequest = true;
 						break;
@@ -341,7 +374,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 }
 
 // NOTE: This version is used by the server DLL or server plugins
-void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, const void *buffer, int bufferSize )
+void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize )
 {
 	WriteDataRequest( &RCONServer(), listener, buffer, bufferSize );
 }
@@ -353,19 +386,54 @@ void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, const void 
 void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 {
 #ifndef SWDS
-	if ( m_nScreenshotListener < 0 )
+	if ( m_nScreenshotListener == INVALID_LISTENER_ID )
 		return;
 
 	CUtlBuffer buf( 128 * 1024, 0 );
 	if ( g_pFullFileSystem->ReadFile( pFileName, "MOD", buf ) )
 	{
-		HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
-		void *pMem;
-		unsigned long nLen;
-		ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
-		ZipGetMemory( hZip, &pMem, &nLen );
-		SendResponseToClient( m_nScreenshotListener, SERVERDATA_SCREENSHOT_RESPONSE, pMem, nLen );
-		CloseZip( hZip );
+		// dimhotepus: Wrap into cycle to break.
+		do
+		{
+			HZIP hZip = CreateZip( 0, 1024 * 1024, nullptr );
+			Assert(hZip);
+			if (!hZip)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+				break;
+			}
+
+			void *pMem = nullptr;
+			unsigned long nLen;
+			ZRESULT rc = ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut() );
+			Assert(rc == ZR_OK);
+			if (rc != ZR_OK)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+				break;
+			}
+
+			rc = ZipGetMemory( hZip, &pMem, &nLen );
+			Assert(rc == ZR_OK);
+			if (rc != ZR_OK)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+				break;
+			}
+
+			SendResponseToClient( m_nScreenshotListener, SERVERDATA_SCREENSHOT_RESPONSE, pMem, nLen );
+
+			rc = CloseZip( hZip );
+			Assert(rc == ZR_OK);
+			if (rc != ZR_OK)
+			{
+				LogCommand( m_nScreenshotListener, "Failed to zip screenshot!\n" );
+				RespondString( m_nScreenshotListener, 0, "Failed to zip screenshot!\n" );
+			}
+		} while (false);
 	}
 	else
 	{
@@ -373,7 +441,7 @@ void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 		RespondString( m_nScreenshotListener, 0, "Failed to read screenshot!\n" );
 	}
 
-	m_nScreenshotListener = -1;
+	m_nScreenshotListener = INVALID_LISTENER_ID;
 #endif
 }
 
@@ -471,9 +539,9 @@ void CServerRemoteAccess::BadPassword( CRConServer *pNetworkListener, ra_listene
 //-----------------------------------------------------------------------------
 // Purpose: returns the number of bytes read
 //-----------------------------------------------------------------------------
-int CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
+intp CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
 {
-	for( int i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
+	for( auto i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
 	{
 		// copy response into buffer
 		if ( m_ResponsePackets[i].responderID != listener ) // not for us, skip to the next entry
@@ -485,16 +553,16 @@ int CServerRemoteAccess::GetDataResponseSize( ra_listener_id listener )
 	return 0;
 }
 
-int CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, void *buffer, int bufferSize )
+intp CServerRemoteAccess::ReadDataResponse( ra_listener_id listener, IN_BYTECAP(bufferSize) void *buffer, intp bufferSize )
 {
-	for( int i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
+	for( auto i = m_ResponsePackets.Head(); m_ResponsePackets.IsValidIndex(i); i = m_ResponsePackets.Next(i) )
 	{
 		// copy response into buffer
 		if ( m_ResponsePackets[i].responderID != listener ) // not for us, skip to the next entry
 			continue;
 
 		CUtlBuffer &response = m_ResponsePackets[i].packet;
-		int bytesToCopy = response.TellPut();
+		intp bytesToCopy = response.TellPut();
 		Assert(bufferSize >= bytesToCopy);
 		if (bytesToCopy <= bufferSize)
 		{
@@ -748,31 +816,32 @@ const char *CServerRemoteAccess::LookupStringValue(const char *variable)
 void CServerRemoteAccess::GetUserBanList(CUtlBuffer &value)
 {
 	// add user bans
-	int i;
-	for (i = 0; i < g_UserFilters.Count(); i++)
+	for (intp i = 0; i < g_UserFilters.Count(); i++)
 	{
-		value.Printf("%i %s : %.3f min\n", i + 1, GetUserIDString(g_UserFilters[i].userid), g_UserFilters[i].banTime);
+		value.Printf("%zi %s : %.3f min\n", i + 1, GetUserIDString(g_UserFilters[i].userid), g_UserFilters[i].banTime);
 	}
 	
 	unsigned char b[4];
 	// add ip filters
-	for (i = 0; i < g_IPFilters.Count() ; i++)
+	for (intp i = 0; i < g_IPFilters.Count() ; i++)
 	{
 		memcpy( b, &g_IPFilters[i].compare, sizeof(b) );
-		value.Printf("%i %i.%i.%i.%i : %.3f min\n", i + 1 + g_UserFilters.Count(), b[0], b[1], b[2], b[3], g_IPFilters[i].banTime);
+		value.Printf("%zi %hhu.%hhu.%hhu.%hhu : %.3f min\n", i + 1 + g_UserFilters.Count(), b[0], b[1], b[2], b[3], g_IPFilters[i].banTime);
 	}
 
 	value.PutChar(0);
 }
 
-void CServerRemoteAccess::GetStatsString(char *buf, int bufSize)
+void CServerRemoteAccess::GetStatsString(OUT_Z_CAP(bufSize) char *buf, intp bufSize)
 {
 	float avgIn=0,avgOut=0;
 
 	sv.GetNetStats( avgIn, avgOut );
 
-	// format: CPU percent, Bandwidth in, Bandwidth out, uptime, changelevels, framerate, total players
-	_snprintf(buf, bufSize - 1, "%-6.2f %-10.2f %-11.2f %-7i %-12i %-8.2f %-8i %-8i",
+	// format: CPU percent (float), Bandwidth in (float), Bandwidth out (float),
+	// uptime (mins, int), changelevels (int), framerate (float), total players (int),
+	// total connections (int)
+	V_snprintf(buf, bufSize, "%-6.2f %-10.2f %-11.2f %-7i %-12i %-8.2f %-8i %-8i",
 				sv.GetCPUUsage() * 100, 
 				avgIn / 1024.0f,
 				avgOut / 1024.0f,
@@ -781,7 +850,6 @@ void CServerRemoteAccess::GetStatsString(char *buf, int bufSize)
 				1.0/host_frametime, // frame rate
 				sv.GetNumClients() - sv.GetNumProxies(),
 				sv.GetNumConnections());
-	buf[bufSize - 1] = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -839,23 +907,23 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	// search the directory structure.
 	char mapwild[MAX_QPATH];
 	char friendly_com_gamedir[ MAX_OSPATH ];
-	strcpy(mapwild, "maps/*.bsp");
-	Q_strncpy( friendly_com_gamedir, com_gamedir, sizeof(friendly_com_gamedir) );
+	V_strcpy_safe( mapwild, "maps/*.bsp" );
+	V_strcpy_safe( friendly_com_gamedir, com_gamedir );
 	Q_strlower( friendly_com_gamedir );
 	
 	char const *findfn = Sys_FindFirst( mapwild, NULL, 0 );
 	while ( findfn )
 	{
 		char curDir[MAX_PATH];
-		_snprintf(curDir, MAX_PATH, "maps/%s", findfn);
-		g_pFileSystem->GetLocalPath(curDir, curDir, MAX_PATH);
+		V_sprintf_safe(curDir, "maps/%s", findfn);
+		g_pFileSystem->GetLocalPath_safe(curDir, curDir);
 		
 		// limit maps displayed to ones for the mod only
 		if (strstr(curDir, friendly_com_gamedir))
 		{
 			// clean up the map name
 			char mapName[MAX_PATH];
-			strcpy(mapName, findfn);
+			V_strcpy_safe(mapName, findfn);
 			char *extension = strstr(mapName, ".bsp");
 			if (extension)
 			{
@@ -898,7 +966,7 @@ void CServerRemoteAccess::SendMessageToAdminUI( ra_listener_id listenerID, const
 //-----------------------------------------------------------------------------
 // Purpose: Sends a response to the client
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, void *pData, int nDataLen )
+void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, IN_BYTECAP(nDataLen) void *pData, intp nDataLen )
 {
 	// allocate a spot in the list for the response
 	auto i = m_ResponsePackets.AddToTail();
@@ -916,7 +984,7 @@ void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, Serve
 //-----------------------------------------------------------------------------
 // Purpose: sends an opaque blob of data from VProf to a remote rcon listener
 //-----------------------------------------------------------------------------
-void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupData, void *data, int len )
+void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupData, IN_BYTECAP(len) void *data, intp len )
 {
 	Assert( listenerID != m_AdminUIID ); // only RCON clients support this right now
 	SendResponseToClient( listenerID, bGroupData ? SERVERDATA_VPROF_GROUPS : SERVERDATA_VPROF_DATA, data, len );
@@ -927,8 +995,9 @@ void CServerRemoteAccess::SendVProfData( ra_listener_id listenerID, bool bGroupD
 //-----------------------------------------------------------------------------
 extern "C" void NotifyDedicatedServerUI(const char *message)
 {
-	if ( g_ServerRemoteAccess.GetAdminUIID() != INVALID_LISTENER_ID ) // if we have an admin UI actually registered
+	auto &remote = g_ServerRemoteAccess;
+	if ( remote.GetAdminUIID() != INVALID_LISTENER_ID ) // if we have an admin UI actually registered
 	{
-		g_ServerRemoteAccess.SendMessageToAdminUI( g_ServerRemoteAccess.GetAdminUIID(), message);
+		remote.SendMessageToAdminUI( remote.GetAdminUIID(), message);
 	}
 }

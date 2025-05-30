@@ -254,7 +254,7 @@ IceKey::encrypt (
 	    r ^= ice_f (l, &_keysched[i + 1]);
 	}
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) { //-V112
 	    ctext[3 - i] = r & 0xff;
 	    ctext[7 - i] = l & 0xff;
 
@@ -289,7 +289,7 @@ IceKey::decrypt (
 	    r ^= ice_f (l, &_keysched[i - 1]);
 	}
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) { //-V112
 	    ptext[3 - i] = r & 0xff;
 	    ptext[7 - i] = l & 0xff;
 
@@ -323,7 +323,7 @@ IceKey::scheduleBuild (
 		int	k;
 		unsigned long	*curr_sk = &isk->val[j % 3];
 
-		for (k=0; k<4; k++) {
+		for (k=0; k<4; k++) { //-V112
 		    unsigned short	*curr_kb = &kb[(kr + k) & 3];
 		    int	bit = *curr_kb & 1;
 
@@ -348,7 +348,7 @@ IceKey::set (
 	if (_rounds == 8) {
 	    unsigned short	kb[4];
 
-	    for (i=0; i<4; i++)
+	    for (i=0; i<4; i++) //-V112
 		kb[3 - i] = (key[i*2] << 8) | key[i*2 + 1];
 
 	    scheduleBuild (kb, 0, ice_keyrot);
@@ -359,7 +359,7 @@ IceKey::set (
 	    int			j;
 	    unsigned short	kb[4];
 
-	    for (j=0; j<4; j++)
+	    for (j=0; j<4; j++) //-V112
 		kb[3 - j] = (key[i*8 + j*2] << 8) | key[i*8 + j*2 + 1];
 
 	    scheduleBuild (kb, i*8, ice_keyrot);

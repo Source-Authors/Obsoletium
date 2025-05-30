@@ -342,9 +342,8 @@ public:
 			m_pDefaultTexture->DecrementReferenceCount();
 		}
 
-		int c = m_Logos.Count();
-		int i;
-		for ( i = 0; i < c ; i++ )
+		auto c = m_Logos.Count();
+		for ( decltype(c) i = 0; i < c ; i++ )
 		{
 			PlayerLogo *logo = &m_Logos[ i ];
 			if( logo->texture )
@@ -446,9 +445,9 @@ void CPlayerLogoProxy::OnLogoBindInternal( int playerindex )
 	{
 		char crcfilename[ 512 ];
 		char logohex[ 16 ];
-		Q_binarytohex( (byte *)&info.customFiles[0], sizeof( info.customFiles[0] ), logohex, sizeof( logohex ) );
 
-		Q_snprintf( crcfilename, sizeof( crcfilename ), "temp/%s", logohex );
+		V_binarytohex( info.customFiles[0], logohex );
+		V_sprintf_safe( crcfilename, "temp/%s", logohex );
 
 		texture = materials->FindTexture( crcfilename, TEXTURE_GROUP_DECAL, false );
 		if ( texture )

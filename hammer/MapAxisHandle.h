@@ -64,7 +64,7 @@ public:
 	virtual int SerializeMAP(std::fstream &File, BOOL bRMF);
 
 	// Overridden to chain down to our endpoints, which are not children.
-	void SetOrigin(Vector &vecOrigin);
+	void SetOrigin(const Vector &vecOrigin) override;
 
 	// Overridden to chain down to our endpoints, which are not children.
 	virtual SelectionState_t SetSelectionState(SelectionState_t eSelectionState);
@@ -80,7 +80,7 @@ public:
 	virtual bool IsClutter(void) { return true; }
 	virtual bool IsCulledByCordon(const Vector &vecMins, const Vector &vecMaxs) { return false; } // We don't hide unless our parent hides.
 	
-	virtual const char* GetDescription() { return("Axis helper"); }
+	const char* GetDescription() const override { return("Axis helper"); }
 
 	virtual void OnAddToWorld(CMapWorld *pWorld);
 	virtual void OnParentKeyChanged(const char *key, const char *value);

@@ -225,7 +225,7 @@ void FX_AntlionGib( const Vector &origin, const Vector &direction, float scale )
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= random->RandomInt( 4, 16 );
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 4;
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -249,7 +249,7 @@ void FX_AntlionGib( const Vector &origin, const Vector &direction, float scale )
 	sParticle->m_uchEndAlpha	= 0;
 	sParticle->m_uchStartSize	= random->RandomInt( 16, 32 );
 	sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 3;
-	sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	sParticle->m_flRollDelta	= random->RandomFloat( -0.2f, 0.2f );
 
 #else
@@ -287,7 +287,7 @@ void FX_AntlionGib( const Vector &origin, const Vector &direction, float scale )
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= random->RandomInt( 16, 32 );
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2;
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
 	}
 
@@ -315,7 +315,7 @@ void FX_AntlionGib( const Vector &origin, const Vector &direction, float scale )
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= random->RandomInt( 16, 32 );
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize * 2;
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
 	}
 

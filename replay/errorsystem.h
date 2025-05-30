@@ -43,7 +43,7 @@ public:
 #if !defined( DEDICATED )
 	void			OGS_ReportSessionBlockDownloadError( const CHttpDownloader *pDownloader, const CClientRecordingSessionBlock *pBlock,
 														 int nLocalFileSize, int nMaxBlock, const bool *pSizesDiffer,
-														 const bool *pHashFail, uint8 *pLocalHash );
+														 const bool *pHashFail, IN_CAP(localHashSize) uint8 *pLocalHash, int localHashSize );
 	void			OGS_ReportSessioInfoDownloadError( const CHttpDownloader *pDownloader, const char *pErrorToken );
 	void			OGS_ReportGenericError( const char *pGenericErrorToken );
 #endif

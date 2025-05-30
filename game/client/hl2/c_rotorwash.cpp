@@ -298,7 +298,7 @@ void C_RotorWashEmitter::ClientThink( void )
 			pParticle->m_uchStartAlpha	= random->RandomFloat( 16, 32 ) * heightScale;
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -16.0f, 16.0f );
 		}
 	}

@@ -14,27 +14,27 @@
 //-----------------------------------------------------------------------------
 // Purpose: Handles parsing of half-life directory for mod info
 //-----------------------------------------------------------------------------
-class CModList
+class CModList final
 {
 public:
 	CModList();
 
-	int GetIndex( const CGameID &iAppID ) const;
+	intp GetIndex( const CGameID &iAppID ) const;
 	void AddVGUIListener( vgui::VPANEL panel );
 
 	// returns number of mods 
-	int ModCount();
+	intp ModCount() const;
 
 	// returns the full name of the mod, index valid in range [0, ModCount)
-	const char *GetModName( int index );
+	const char *GetModName( intp index ) const;
 
 	// returns mod directory string
-	const char *GetModDir( int index );
+	const char *GetModDir( intp index ) const;
 
-	const CGameID &GetAppID( int index ) const;
+	const CGameID &GetAppID( intp index ) const;
 
 	// returns the mod name for the associated gamedir
-	const char *GetModNameForModDir( const CGameID &iAppID );
+	const char *GetModNameForModDir( const CGameID &iAppID ) const;
 
 private:
 	struct mod_t

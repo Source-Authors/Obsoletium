@@ -5,6 +5,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include <vgui/IVGui.h>
+
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include <vgui/VGUI.h>
 #include <vgui/Dar.h>
@@ -12,29 +14,20 @@
 #include <vgui/IPanel.h>
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
 #include <vgui/IClientPanel.h>
 #include <vgui/IScheme.h>
-#include <KeyValues.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <malloc.h>
+#include <tier1/KeyValues.h>
 #include <tier0/dbg.h>
 #include <tier1/utlhandletable.h>
 #include "vgui_internal.h"
 #include "VPanel.h"
 #include "IMessageListener.h"
 #include "tier3/tier3.h"
-#include "utllinkedlist.h"
-#include "utlpriorityqueue.h"
-#include "utlvector.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/utlpriorityqueue.h"
+#include "tier1/utlvector.h"
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #undef GetCursorPos // protected_things.h defines this, and it makes it so we can't access g_pInput->GetCursorPos.
 
@@ -228,7 +221,8 @@ private:
 	int m_nReentrancyCount;
 
 	CUtlVector< Tick_t * > m_TickSignalVec;
-	CUtlLinkedList< Context_t >	m_Contexts;
+	// dimhotepus: unsigned short -> HContext
+	CUtlLinkedList< Context_t, HContext >	m_Contexts;
 
 	HContext m_hContext;
 	Context_t m_DefaultContext;
@@ -467,8 +461,8 @@ void CVGui::RunFrame()
 
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Ticks", __FUNCTION__ );
 		// directly invoke tick all who asked to be ticked
-		int count = m_TickSignalVec.Count();
-		for (int i = count - 1; i >= 0; i-- )
+		intp count = m_TickSignalVec.Count();
+		for (intp i = count - 1; i >= 0; i-- )
 		{
 			Tick_t *t = m_TickSignalVec[i];
 			if ( t->bMarkDeleted )
@@ -492,7 +486,7 @@ void CVGui::RunFrame()
 		count = m_TickSignalVec.Count();
 
 		// Remove all panels that tried to remove tick in OnTick
-		for (int i = count - 1; i >= 0; i-- )
+		for (intp i = count - 1; i >= 0; i-- )
 		{
 			Tick_t *t = m_TickSignalVec[i];
 			if ( t->bMarkDeleted )
@@ -651,10 +645,8 @@ void CVGui::PanelDeleted(VPanel *focus)
 CVGui::Tick_t* CVGui::CreateNewTick( VPANEL panel, int intervalMilliseconds )
 {
 	// See if it's already in list
-	int count = m_TickSignalVec.Count();
-	for (int i = 0; i < count; i++ )
+	for ( auto *t : m_TickSignalVec )
 	{
-		Tick_t *t = m_TickSignalVec[i];
 		if ( t->panel == (VPanel *)panel )
 		{
 			// Go ahead and update intervals
@@ -677,11 +669,11 @@ CVGui::Tick_t* CVGui::CreateNewTick( VPANEL panel, int intervalMilliseconds )
 
 	if ( !Q_isempty( ((VPanel *)panel)->Client()->GetName() ) )
 	{
-		strncpy( t->panelname, ((VPanel *)panel)->Client()->GetName(), sizeof( t->panelname ) );
+		V_strcpy_safe( t->panelname, ((VPanel *)panel)->Client()->GetName() );
 	}
 	else
 	{
-		strncpy( t->panelname, ((VPanel *)panel)->Client()->GetClassName(), sizeof( t->panelname ) );
+		V_strcpy_safe( t->panelname, ((VPanel *)panel)->Client()->GetClassName() );
 	}
 
 	return t;
@@ -726,9 +718,9 @@ void CVGui::RemoveTickSignal( VPANEL panel )
 	VPanel *search = (VPanel *)panel;
 
 	// remove from tick signal dar
-	int count = m_TickSignalVec.Count();
+	intp count = m_TickSignalVec.Count();
 
-	for (int i = 0; i < count; i++ )
+	for (intp i = 0; i < count; i++ )
 	{
 		Tick_t *tick = m_TickSignalVec[i];
 		if ( tick->panel == search )
@@ -841,16 +833,6 @@ bool CVGui::DispatchMessages()
 					g_pInput->UpdateCursorPosInternal( nXPos, nYPos );
 				}
 			}
-#ifdef _X360
-			else if ( messageItem->_messageTo == 0xFFFFFFFE ) // special tag to always give message to the active key focus
-			{
-				VPanel *vto = (VPanel *) g_pInput->GetCalculatedFocus();
-				if (vto)
-				{
-					vto->SendMessage(params, g_pIVgui->HandleToPanel(messageItem->_from));
-				}
-			}
-#endif
 			else
 			{
 				VPanel *vto = (VPanel *)g_pIVgui->HandleToPanel(messageItem->_messageTo);
@@ -934,20 +916,7 @@ void CVGui::PostMessage(VPANEL target, KeyValues *params, VPANEL from, float del
 	}
 
 	MessageItem_t messageItem;
-	 
-#ifdef _X360
-	// Special coded target that will always send the message to the key focus
-	// this is needed since we might send two messages on a tice, and the first
-	// could change the focus.
-	if( target == (VPANEL) MESSAGE_CURRENT_KEYFOCUS )
-	{
-		messageItem._messageTo = 0xFFFFFFFE;
-	}
-	else
-#endif	
-	{
-		messageItem._messageTo = (target != (VPANEL) MESSAGE_CURSOR_POS ) ? g_pIVgui->PanelToHandle(target) : 0xFFFFFFFF;
-	}
+	messageItem._messageTo = (target != (VPANEL) MESSAGE_CURSOR_POS ) ? g_pIVgui->PanelToHandle(target) : 0xFFFFFFFF;
 	messageItem._params = params;
 	Assert(params->GetName());
 	messageItem._from = g_pIVgui->PanelToHandle(from);
@@ -1074,7 +1043,7 @@ void CVGui::DPrintf(const char* format,...)
 	va_list argList;
 
 	va_start(argList,format);
-	Q_vsnprintf(buf,sizeof( buf ), format,argList);
+	V_vsprintf_safe(buf, format, argList);
 	va_end(argList);
 
 	Plat_DebugString(buf);
@@ -1090,7 +1059,7 @@ void CVGui::DPrintf2(const char* format,...)
 	va_list argList;
 	static int ctr=0;
 
-	Q_snprintf(buf,sizeof( buf ), "%d:",ctr++ );
+	V_sprintf_safe(buf, "%d:", ctr++ );
 
 	va_start(argList,format);
 	Q_vsnprintf(buf+strlen(buf),sizeof( buf )-strlen(buf),format,argList);

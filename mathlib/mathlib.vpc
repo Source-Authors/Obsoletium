@@ -78,4 +78,9 @@ $Project "mathlib"
 		$File	"sse.h"					[$WINDOWS||$POSIX]
 		$File	"3dnow.h"				[$WINDOWS||$LINUX]
 	}
+
+	$Folder "Debugger Visualizers" [$WINDOWS]
+	{
+		$File	"mathlib.natvis"
+	}
 }

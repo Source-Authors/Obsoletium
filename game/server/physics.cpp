@@ -1246,15 +1246,14 @@ typedef void (*EntityCallbackFunction) ( CBaseEntity *pEntity );
 
 void IterateActivePhysicsEntities( EntityCallbackFunction func )
 {
-	int activeCount = physenv->GetActiveObjectCount();
-	IPhysicsObject **pActiveList = NULL;
+	const intp activeCount = physenv->GetActiveObjectCount();
 	if ( activeCount )
 	{
-		pActiveList = (IPhysicsObject **)stackalloc( sizeof(IPhysicsObject *)*activeCount );
+		IPhysicsObject **pActiveList = stackallocT( IPhysicsObject *, activeCount );
 		physenv->GetActiveObjects( pActiveList );
-		for ( int i = 0; i < activeCount; i++ )
+		for ( intp i = 0; i < activeCount; i++ )
 		{
-			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
+			auto *pEntity = static_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
 			if ( pEntity )
 			{
 				func( pEntity );
@@ -1568,23 +1567,21 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	int activeCount = physenv->GetActiveObjectCount();
+	const intp activeCount = physenv->GetActiveObjectCount();
 
-	IPhysicsObject **pActiveList = NULL;
-	CUtlVector<CBaseEntity *> ents;
 	if ( activeCount )
 	{
-		int i;
-
-		pActiveList = (IPhysicsObject **)stackalloc( sizeof(IPhysicsObject *)*activeCount );
+		CUtlVector<CBaseEntity *> ents;
+		IPhysicsObject **pActiveList = stackallocT( IPhysicsObject *, activeCount );
 		physenv->GetActiveObjects( pActiveList );
-		for ( i = 0; i < activeCount; i++ )
+
+		for ( intp i = 0; i < activeCount; i++ )
 		{
-			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
+			auto *pEntity = static_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
 			if ( pEntity )
 			{
-				int index = -1;
-				for ( int j = 0; j < ents.Count(); j++ )
+				intp index = -1;
+				for ( intp j = 0; j < ents.Count(); j++ )
 				{
 					if ( pEntity == ents[j] )
 					{
@@ -1603,23 +1600,23 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 		if ( !ents.Count() )
 			return;
 
-		CUtlVector<float> times;
 		float totalTime = 0.f;
 		g_Collisions.BufferTouchEvents( true );
 		float full = engine->Time();
 		physenv->Simulate( gpGlobals->interval_per_tick );
 		full = engine->Time() - full;
 		float lastTime = full;
-
+		
+		CUtlVector<float> times;
 		times.SetSize( ents.Count() );
 
 
 		// NOTE: This is just a heuristic.  Attempt to estimate cost by putting each object to sleep in turn.
 		//	note that simulation may wake the objects again and some costs scale with sets of objects/constraints/etc
 		//	so these are only generally useful for broad questions, not real metrics!
-		for ( i = 0; i < ents.Count(); i++ )
+		for ( intp i = 0; i < ents.Count(); i++ )
 		{
-			for ( int j = 0; j < i; j++ )
+			for ( intp j = 0; j < i; j++ )
 			{
 				PhysForceEntityToSleep( ents[j], ents[j]->VPhysicsGetObject() );
 			}
@@ -1634,8 +1631,8 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 			lastTime = elapsed;
  		}
 
-		totalTime = MAX( totalTime, 0.001f );
-		for ( i = 0; i < ents.Count(); i++ )
+		totalTime = std::max( totalTime, 0.001f );
+		for ( intp i = 0; i < ents.Count(); i++ )
 		{
 			float fraction = times[i] / totalTime;
 			Msg( "%s (%s): %.3fms (%.3f%%) @ %s\n", ents[i]->GetClassname(), ents[i]->GetDebugName(), fraction * totalTime * 1000.0f, fraction * 100.0f, VecToString(ents[i]->GetAbsOrigin()) );
@@ -1696,7 +1693,6 @@ void PhysFrame( float deltaTime )
 		deltaTime = 0.100f;
 
 	bool bProfile = phys_speeds.GetBool();
-
 	if ( bProfile )
 	{
 		simRealTime = engine->Time();
@@ -1712,16 +1708,15 @@ void PhysFrame( float deltaTime )
 
 	physenv->Simulate( deltaTime );
 
-	int activeCount = physenv->GetActiveObjectCount();
-	IPhysicsObject **pActiveList = NULL;
+	const intp activeCount = physenv->GetActiveObjectCount();
 	if ( activeCount )
 	{
-		pActiveList = (IPhysicsObject **)stackalloc( sizeof(IPhysicsObject *)*activeCount );
+		IPhysicsObject **pActiveList = stackallocT( IPhysicsObject *, activeCount );
 		physenv->GetActiveObjects( pActiveList );
 
-		for ( int i = 0; i < activeCount; i++ )
+		for ( intp i = 0; i < activeCount; i++ )
 		{
-			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
+			auto *pEntity = static_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
 			if ( pEntity )
 			{
 				if ( pEntity->CollisionProp()->DoesVPhysicsInvalidateSurroundingBox() )
@@ -1761,7 +1756,7 @@ void PhysFrame( float deltaTime )
 		g_PhysAverageSimTime += (simRealTime * 0.2F);
 		if ( lastObjectCount != 0 || activeCount != 0 )
 		{
-			Msg( "Physics: %3d objects, %4.1fms / AVG: %4.1fms\n", activeCount, simRealTime * 1000, g_PhysAverageSimTime * 1000 );
+			Msg( "Physics: %3zd objects, %4.1fms / AVG: %4.1fms\n", activeCount, simRealTime * 1000, g_PhysAverageSimTime * 1000 );
 		}
 
 		lastObjectCount = activeCount;
@@ -1860,21 +1855,20 @@ void CCollisionEvent::PreCollision( vcollisionevent_t *pEvent )
 void CCollisionEvent::PostCollision( vcollisionevent_t *pEvent )
 {
 	CallbackContext check(this);
-	bool isShadow[2] = {false,false};
-	int i;
+	bool isShadow[2] = {false, false};
 
-	for ( i = 0; i < 2; i++ )
+	for ( int i = 0; i < 2; i++ )
 	{
 		IPhysicsObject *pObject = pEvent->pObjects[i];
 		if ( pObject )
 		{
-			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pObject->GetGameData());
+			auto *pEntity = reinterpret_cast<CBaseEntity *>(pObject->GetGameData());
 			if ( !pEntity )
 				return;
 
 			// UNDONE: This is here to trap crashes due to NULLing out the game data on delete
 			m_gameEvent.pEntities[i] = pEntity;
-			unsigned int flags = pObject->GetCallbackFlags();
+			unsigned short flags = pObject->GetCallbackFlags();
 			pObject->GetVelocity( &m_gameEvent.postVelocity[i], NULL );
 			if ( flags & CALLBACK_SHADOW_COLLISION )
 			{
@@ -1905,7 +1899,7 @@ void CCollisionEvent::PostCollision( vcollisionevent_t *pEvent )
 		pEvent->isCollision = false;
 	}
 
-	for ( i = 0; i < 2; i++ )
+	for ( int i = 0; i < 2; i++ )
 	{
 		if ( pEvent->isCollision )
 		{
@@ -2227,7 +2221,7 @@ void CCollisionEvent::RestoreDamageInflictorState( IPhysicsObject *pInflictor )
 	if ( !pInflictor )
 		return;
 
-	int index = FindDamageInflictor( pInflictor );
+	intp index = FindDamageInflictor( pInflictor );
 	if ( index >= 0 )
 	{
 		inflictorstate_t &state = m_damageInflictors[index];
@@ -2256,7 +2250,7 @@ void CCollisionEvent::RestoreDamageInflictorState( IPhysicsObject *pInflictor )
 
 bool CCollisionEvent::GetInflictorVelocity( IPhysicsObject *pInflictor, Vector &velocity, AngularImpulse &angVelocity )
 {
-	int index = FindDamageInflictor( pInflictor );
+	intp index = FindDamageInflictor( pInflictor );
 	if ( index >= 0 )
 	{
 		inflictorstate_t &state = m_damageInflictors[index];
@@ -2312,7 +2306,7 @@ void CCollisionEvent::AddDamageEvent( CBaseEntity *pEntity, const CTakeDamageInf
 	if ( event.bRestoreVelocity )
 	{
 		float otherMass = pEntity->VPhysicsGetObject()->GetMass();
-		int inflictorIndex = FindDamageInflictor(pInflictorPhysics);
+		intp inflictorIndex = FindDamageInflictor(pInflictorPhysics);
 		if ( inflictorIndex >= 0 )
 		{
 			// if this is a bigger mass, save that info
@@ -2352,10 +2346,10 @@ void CCollisionEvent::AddRemoveObject(IServerNetworkable *pRemove)
 		m_removeObjects.AddToTail(pRemove);
 	}
 }
-int CCollisionEvent::FindDamageInflictor( IPhysicsObject *pInflictorPhysics )
+intp CCollisionEvent::FindDamageInflictor( IPhysicsObject *pInflictorPhysics )
 {
 	// UNDONE: Linear search?  Probably ok with a low count here
-	for ( int i = m_damageInflictors.Count()-1; i >= 0; --i )
+	for ( intp i = m_damageInflictors.Count()-1; i >= 0; --i )
 	{
 		const inflictorstate_t &state = m_damageInflictors[i];
 		if ( state.pInflictorPhysics == pInflictorPhysics )
@@ -2366,7 +2360,7 @@ int CCollisionEvent::FindDamageInflictor( IPhysicsObject *pInflictorPhysics )
 }
 
 
-int CCollisionEvent::AddDamageInflictor( IPhysicsObject *pInflictorPhysics, float otherMass, const Vector &savedVel, const AngularImpulse &savedAngVel, bool addList )
+intp CCollisionEvent::AddDamageInflictor( IPhysicsObject *pInflictorPhysics, float otherMass, const Vector &savedVel, const AngularImpulse &savedAngVel, bool addList )
 {
 	// NOTE: Save off the state of the object before collision
 	// restore if the impact is a kill
@@ -2393,7 +2387,7 @@ int CCollisionEvent::AddDamageInflictor( IPhysicsObject *pInflictorPhysics, floa
 			int physCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
 			if ( physCount > 1 )
 			{
-				int currentIndex = addIndex;
+				intp currentIndex = addIndex;
 				for ( int i = 0; i < physCount; i++ )
 				{
 					if ( pList[i] != pInflictorPhysics )
@@ -2401,7 +2395,7 @@ int CCollisionEvent::AddDamageInflictor( IPhysicsObject *pInflictorPhysics, floa
 						Vector vel;
 						AngularImpulse angVel;
 						pList[i]->GetVelocity( &vel, &angVel );
-						int next = AddDamageInflictor( pList[i], otherMass, vel, angVel, false );
+						intp next = AddDamageInflictor( pList[i], otherMass, vel, angVel, false );
 						m_damageInflictors[currentIndex].nextIndex = next;
 						currentIndex = next;
 					}
@@ -2711,7 +2705,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 				return;
 
 			pFriction->pObject = pEntity;
-			CPASAttenuationFilter filter( pEntity, params.soundlevel );
+			CPASAttenuationFilter filter( pEntity, SNDLVL_TO_ATTN( params.soundlevel ) );
 			pFriction->patch = CSoundEnvelopeController::GetController().SoundCreate( 
 				filter, pEntity->entindex(), CHAN_BODY, pSoundName, params.soundlevel );
 			CSoundEnvelopeController::GetController().Play( pFriction->patch, params.volume * flVolume, params.pitch );
@@ -2853,7 +2847,8 @@ void CC_AirDensity( const CCommand &args )
 	}
 	else
 	{
-		float density = atof( args[1] );
+		// dimhotepus: atof -> strtof.
+		float density = strtof( args[1], nullptr );
 		physenv->SetAirDensity( density );
 	}
 }

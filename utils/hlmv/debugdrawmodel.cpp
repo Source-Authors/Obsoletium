@@ -5,6 +5,7 @@
 // $NoKeywords: $
 //
 //===========================================================================//
+#include "debugdrawmodel.h"
 #include "istudiorender.h"
 #include "materialsystem/imesh.h"
 #include "mathlib/mathlib.h"

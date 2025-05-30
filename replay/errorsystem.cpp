@@ -97,7 +97,7 @@ void CErrorSystem::AddFormattedErrorFromTokenName( const char *pFormatToken/*=NU
 	wchar_t wszErrorStr[1024];
 	if ( g_pVGuiLocalize )
 	{
-		g_pVGuiLocalize->ConstructString( wszErrorStr, sizeof( wszErrorStr ), pFormatToken, pFormatArgs );
+		g_pVGuiLocalize->ConstructString_safe( wszErrorStr, pFormatToken, pFormatArgs );
 	}
 	else
 	{
@@ -118,7 +118,7 @@ int g_nGenericErrorCounter = 0;
 
 void CErrorSystem::OGS_ReportSessionBlockDownloadError( const CHttpDownloader *pDownloader, const CClientRecordingSessionBlock *pBlock,
 														int nLocalFileSize, int nMaxBlock, const bool *pSizesDiffer,
-														const bool *pHashFail, uint8 *pLocalHash )
+														const bool *pHashFail, IN_CAP(localHashSize) uint8 *pLocalHash, int localHashSize )
 														
 {
 	// Create a download error and queue for upload
@@ -126,7 +126,8 @@ void CErrorSystem::OGS_ReportSessionBlockDownloadError( const CHttpDownloader *p
 	g_pClient->UploadOgsData( pDownloadError, false );
 
 	// Create block download error
-	KeyValues *pBlockDownloadError = new KeyValues( "TF2ReplayBlockDownloadErrors" );
+	// dimhotepus: Do not leak KV.
+	KeyValuesAD pBlockDownloadError ( "TF2ReplayBlockDownloadErrors" );
 	pBlockDownloadError->SetInt( "ErrorCounter", g_nGenericErrorCounter );
 	pBlockDownloadError->SetInt( "NumCurrentDownloads", CSessionBlockDownloader::sm_nNumCurrentDownloads );
 	pBlockDownloadError->SetInt( "MaxBlock", nMaxBlock );
@@ -148,8 +149,8 @@ void CErrorSystem::OGS_ReportSessionBlockDownloadError( const CHttpDownloader *p
 
 		// Include hashes
 		char szRemoteHash[64], szLocalHash[64];
-		V_binarytohex( pBlock->m_aHash, sizeof( pBlock->m_aHash ), szRemoteHash, sizeof( szRemoteHash ) );
-		V_binarytohex( pLocalHash, sizeof( pBlock->m_aHash ), szLocalHash, sizeof( szLocalHash ) );
+		V_binarytohex( pBlock->m_aHash, szRemoteHash );
+		V_binarytohex( pLocalHash, localHashSize, szLocalHash );
 		pBlockDownloadError->SetString( "RemoteHash", szRemoteHash );
 		pBlockDownloadError->SetString( "LocalHash", szLocalHash );
 	}
@@ -168,7 +169,8 @@ void CErrorSystem::OGS_ReportSessioInfoDownloadError( const CHttpDownloader *pDo
 	g_pClient->UploadOgsData( pDownloadError, false );
 	
 	// Create session info download error
-	KeyValues *pSessionInfoDownloadError = new KeyValues( "TF2ReplaySessionInfoDownloadErrors" );
+	// dimhotepus: Do not leak KV.
+	KeyValuesAD pSessionInfoDownloadError( "TF2ReplaySessionInfoDownloadErrors" );
 	pSessionInfoDownloadError->SetInt( "ErrorCounter", g_nGenericErrorCounter++ );
 	pSessionInfoDownloadError->SetString( "SessionInfoDownloadErrorID", pErrorToken );
 	g_pClient->UploadOgsData( pSessionInfoDownloadError, false );
@@ -182,7 +184,8 @@ void CErrorSystem::OGS_ReportSessioInfoDownloadError( const CHttpDownloader *pDo
 // to write out the base error and increment the counter.
 void CErrorSystem::OGS_ReportGenericError( const char *pGenericErrorToken )
 {
-	KeyValues *pGenericError = new KeyValues( "TF2ReplayErrors" );
+	// dimhotepus: Do not leak KV.
+	KeyValuesAD pGenericError( "TF2ReplayErrors" );
 	pGenericError->SetInt( "ErrorCounter", g_nGenericErrorCounter++ );
 	pGenericError->SetString( "ReplayErrorID", pGenericErrorToken );
 
@@ -207,7 +210,7 @@ void CErrorSystem::Think()
 	if ( m_lstErrors.Count() == 0 )
 		return;
 
-	const int nMaxLen = 4096;
+	constexpr intp nMaxLen = 4096;
 	wchar_t wszErrorText[ nMaxLen ] = L"";
 	FOR_EACH_LL( m_lstErrors, i )
 	{
@@ -215,8 +218,8 @@ void CErrorSystem::Think()
 		if ( wcslen( wszErrorText ) + wcslen( pError ) + 1 >= nMaxLen )
 			break;
 
-		wcscat( wszErrorText, pError );
-		wcscat( wszErrorText, L"\n" );
+		V_wcscat_safe( wszErrorText, pError );
+		V_wcscat_safe( wszErrorText, L"\n" );
 	}
 
 	// Report now

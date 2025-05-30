@@ -66,7 +66,7 @@ void CGameConsoleDialog::OnKeyCodeTyped(KeyCode code)
 			{
 				// submit the entry as a console commmand
 				char szCommand[256];
-				Q_strncpy( szCommand, binding, sizeof( szCommand ) );
+				V_strcpy_safe( szCommand, binding );
 				engine->ClientCmd_Unrestricted( szCommand );
 			}
 		}

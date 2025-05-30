@@ -13,11 +13,14 @@ $Configuration
 {
 	$Compiler
 	{
-		// Deprecated MBCS MFC libraries for VS 2013 (nafxcw.lib and nafxcwd.lib) can be downloaded from http://go.microsoft.com/?linkid=9832071
+		$AdditionalIncludeDirectories		"$BASE,.\"
 		$PreprocessorDefinitions			"$BASE;NO_WARN_MBCS_MFC_DEPRECATION"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
 		$PrecompiledHeaderFile				"Debug/QC_Eyes.pch"
 		$EnableC++Exceptions				"Yes (/EHsc)"
+
+		// Advanced
+		$ForceIncludes						"stdafx.h"
 	}
 
 	$Linker
@@ -26,12 +29,16 @@ $Configuration
 	}
 }
 
-$Project "QC_Eyes"
+$Project "qc_eyes"
 {
 	$Folder	"Source Files"
 	{		
 		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
 		
+		$File	"$SRCDIR\common\windows\base_dlg.cpp"
+		$File	"$SRCDIR\common\windows\bitmap_scale.cpp"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.cpp"
+		$File	"..\common\tools_minidump.cpp"
 		$File	"QC_Eyes.cpp"
 		$File	"QC_Eyes.rc"
 		$File	"QC_EyesDlg.cpp"
@@ -49,6 +56,10 @@ $Project "QC_Eyes"
 
 	$Folder	"Header Files"
 	{
+		$File	"$SRCDIR\common\windows\base_dlg.h"
+		$File	"$SRCDIR\common\windows\bitmap_scale.h"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
+		$File	"..\common\tools_minidump.h"
 		$File	"QC_Eyes.h"
 		$File	"QC_EyesDlg.h"
 		$File	"Resource.h"
@@ -57,18 +68,18 @@ $Project "QC_Eyes"
 
 	$Folder	"Resources"
 	{
-		$File	"res\eye_default.bmp"
-		$File	"res\eye_lower_hi.bmp"
-		$File	"res\eye_lower_lo.bmp"
-		$File	"res\eye_lower_mid.bmp"
-		$File	"res\eye_upper_hi.bmp"
-		$File	"res\eye_upper_lo.bmp"
-		$File	"res\eye_upper_mid.bmp"
-		$File	"res\eye_XY_L.bmp"
-		$File	"res\eye_XY_R.bmp"
-		$File	"res\eye_Z_L.bmp"
-		$File	"res\eye_Z_R.bmp"
-		$File	"res\QC_Eyes.ico"
-		$File	"res\QC_Eyes.rc2"
+		$File	"resources\app.ico"
+		$File	"resources\eye_default.bmp"
+		$File	"resources\eye_lower_hi.bmp"
+		$File	"resources\eye_lower_lo.bmp"
+		$File	"resources\eye_lower_mid.bmp"
+		$File	"resources\eye_upper_hi.bmp"
+		$File	"resources\eye_upper_lo.bmp"
+		$File	"resources\eye_upper_mid.bmp"
+		$File	"resources\eye_XY_L.bmp"
+		$File	"resources\eye_XY_R.bmp"
+		$File	"resources\eye_Z_L.bmp"
+		$File	"resources\eye_Z_R.bmp"
+		$File	"resources\QC_Eyes.rc2"
 	}
 }

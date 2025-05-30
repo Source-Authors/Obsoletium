@@ -11,7 +11,7 @@
 #endif
 
 #ifndef INCLUDED_MXWIDGET
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #endif
 
 #include <wchar.h>

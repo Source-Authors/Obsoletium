@@ -26,11 +26,11 @@ public:
 					CRecipientFilter();
 	virtual 		~CRecipientFilter();
 
-	virtual bool	IsReliable( void ) const;
-	virtual bool	IsInitMessage( void ) const;
+	bool	IsReliable( void ) const override;
+	bool	IsInitMessage( void ) const override;
 
-	virtual intp	GetRecipientCount( void ) const;
-	virtual intp	GetRecipientIndex( intp slot ) const;
+	intp	GetRecipientCount( void ) const override;
+	intp	GetRecipientIndex( intp slot ) const override;
 
 public:
 
@@ -164,21 +164,18 @@ public:
 	}
 
 	CPASAttenuationFilter( CBaseEntity *entity, soundlevel_t soundlevel ) :
-		CPASFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()) )
+		CPASAttenuationFilter( entity, SNDLVL_TO_ATTN( soundlevel ) )
 	{
-		Filter( entity->GetSoundEmissionOrigin(), SNDLVL_TO_ATTN( soundlevel ) );
 	}
 
 	CPASAttenuationFilter( CBaseEntity *entity, float attenuation = ATTN_NORM ) :
-		CPASFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()) )
+		CPASAttenuationFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()), attenuation )
 	{
-		Filter( entity->GetSoundEmissionOrigin(), attenuation );
 	}
 
 	CPASAttenuationFilter( const Vector& origin, soundlevel_t soundlevel ) :
-		CPASFilter( origin )
+		CPASAttenuationFilter( origin, SNDLVL_TO_ATTN( soundlevel ) )
 	{
-		Filter( origin, SNDLVL_TO_ATTN( soundlevel ) );
 	}
 
 	CPASAttenuationFilter( const Vector& origin, float attenuation = ATTN_NORM ) :
@@ -188,39 +185,24 @@ public:
 	}
 
 	CPASAttenuationFilter( CBaseEntity *entity, const char *lookupSound ) :
-		CPASFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()) )
+		CPASAttenuationFilter( entity, SNDLVL_TO_ATTN( CBaseEntity::LookupSoundLevel( lookupSound ) ) )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound );
-		float attenuation = SNDLVL_TO_ATTN( level );
-		Filter( entity->GetSoundEmissionOrigin(), attenuation );
 	}
 
 	CPASAttenuationFilter( const Vector& origin, const char *lookupSound ) :
-		CPASFilter( origin )
+		CPASAttenuationFilter( origin, SNDLVL_TO_ATTN( CBaseEntity::LookupSoundLevel( lookupSound ) ) )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound );
-		float attenuation = SNDLVL_TO_ATTN( level );
-		Filter( origin, attenuation );
 	}
 
 	CPASAttenuationFilter( CBaseEntity *entity, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
-		CPASFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()) )
+		CPASAttenuationFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()), lookupSound, handle )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound, handle );
-		float attenuation = SNDLVL_TO_ATTN( level );
-		Filter( entity->GetSoundEmissionOrigin(), attenuation );
 	}
 
 	CPASAttenuationFilter( const Vector& origin, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
-		CPASFilter( origin )
+		CPASAttenuationFilter( origin, SNDLVL_TO_ATTN( CBaseEntity::LookupSoundLevel( lookupSound, handle ) ) )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound, handle );
-		float attenuation = SNDLVL_TO_ATTN( level );
-		Filter( origin, attenuation );
 	}
-
-
-	
 
 public:
 	void Filter( const Vector& origin, float attenuation = ATTN_NORM );

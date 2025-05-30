@@ -49,11 +49,11 @@ void CDmeCombinationInputControl::OnElementUnserialized()
 {
 	BaseClass::OnElementUnserialized();
 
-	int nWrinkleCount = m_WrinkleScales.Count();
-	int nControlCount = m_RawControlNames.Count();
+	intp nWrinkleCount = m_WrinkleScales.Count();
+	intp nControlCount = m_RawControlNames.Count();
 	if ( nWrinkleCount < nControlCount )
 	{
-		for ( int i = nWrinkleCount; i < nControlCount; ++i )
+		for ( intp i = nWrinkleCount; i < nControlCount; ++i )
 		{
 			m_WrinkleScales.AddToTail( 0.0f );
 		}
@@ -71,8 +71,8 @@ void CDmeCombinationInputControl::OnElementUnserialized()
 bool CDmeCombinationInputControl::AddRawControl( const char *pRawControlName )
 {
 	Assert( !strchr( pRawControlName, '_' ) && !strchr( pRawControlName, ' ' ) );
-	int nCount = m_RawControlNames.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_RawControlNames.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pRawControlName, m_RawControlNames[i] ) )
 			return false;
@@ -87,11 +87,11 @@ bool CDmeCombinationInputControl::AddRawControl( const char *pRawControlName )
 //-----------------------------------------------------------------------------
 // Finds a raw control by name
 //-----------------------------------------------------------------------------
-int CDmeCombinationInputControl::FindRawControl( const char *pRawControlName )
+intp CDmeCombinationInputControl::FindRawControl( const char *pRawControlName )
 {
 	Assert( !strchr( pRawControlName, '_' ) && !strchr( pRawControlName, ' ' ) );
-	int nCount = m_RawControlNames.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_RawControlNames.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pRawControlName, m_RawControlNames[i] ) )
 			return i;
@@ -105,7 +105,7 @@ int CDmeCombinationInputControl::FindRawControl( const char *pRawControlName )
 //-----------------------------------------------------------------------------
 bool CDmeCombinationInputControl::RemoveRawControl( const char *pRawControlName )
 {
-	int i = FindRawControl( pRawControlName );
+	intp i = FindRawControl( pRawControlName );
 	if ( i >= 0 )
 	{
 		m_RawControlNames.FastRemove( i );
@@ -126,12 +126,12 @@ void CDmeCombinationInputControl::RemoveAllRawControls()
 //-----------------------------------------------------------------------------
 // Iterates remapped controls
 //-----------------------------------------------------------------------------
-int CDmeCombinationInputControl::RawControlCount() const
+intp CDmeCombinationInputControl::RawControlCount() const
 {
 	return m_RawControlNames.Count();
 }
 
-const char *CDmeCombinationInputControl::RawControlName( int nIndex ) const
+const char *CDmeCombinationInputControl::RawControlName( intp nIndex ) const
 {
 	return m_RawControlNames[ nIndex ];
 }
@@ -170,7 +170,7 @@ void CDmeCombinationInputControl::SetEyelid( bool bEyelid )
 //-----------------------------------------------------------------------------
 void CDmeCombinationInputControl::MoveRawControlUp( const char *pRawControlName )
 {
-	int nIndex = FindRawControl( pRawControlName );
+	intp nIndex = FindRawControl( pRawControlName );
 	if ( nIndex > 0 )
 	{
 		m_RawControlNames.Swap( nIndex, nIndex - 1 );
@@ -180,8 +180,8 @@ void CDmeCombinationInputControl::MoveRawControlUp( const char *pRawControlName 
 
 void CDmeCombinationInputControl::MoveRawControlDown( const char *pRawControlName )
 {
-	int nIndex = FindRawControl( pRawControlName );
-	int nLastIndex = m_RawControlNames.Count() - 1;
+	intp nIndex = FindRawControl( pRawControlName );
+	intp nLastIndex = m_RawControlNames.Count() - 1;
 	if ( nIndex >= 0 && nIndex < nLastIndex )
 	{
 		m_RawControlNames.Swap( nIndex, nIndex + 1 );
@@ -195,11 +195,11 @@ void CDmeCombinationInputControl::MoveRawControlDown( const char *pRawControlNam
 //-----------------------------------------------------------------------------
 float CDmeCombinationInputControl::WrinkleScale( const char *pRawControlName )
 {
-	int nIndex = FindRawControl( pRawControlName );
+	intp nIndex = FindRawControl( pRawControlName );
 	return WrinkleScale( nIndex );
 }
 
-float CDmeCombinationInputControl::WrinkleScale( int nIndex )
+float CDmeCombinationInputControl::WrinkleScale( intp nIndex )
 {
 	if ( nIndex < 0 || ( nIndex >= m_WrinkleScales.Count() ) )
 		return 0.0f;
@@ -208,7 +208,7 @@ float CDmeCombinationInputControl::WrinkleScale( int nIndex )
 
 void CDmeCombinationInputControl::SetWrinkleScale( const char *pRawControlName, float flWrinkleScale )
 {
-	int nIndex = FindRawControl( pRawControlName );
+	intp nIndex = FindRawControl( pRawControlName );
 	if ( nIndex < 0 || ( nIndex >= m_WrinkleScales.Count() ) )
 		return;
 	m_WrinkleScales.Set( nIndex, flWrinkleScale );
@@ -291,8 +291,8 @@ void CDmeCombinationDominationRule::OnAttributeChanged( CDmAttribute *pAttribute
 //-----------------------------------------------------------------------------
 bool CDmeCombinationDominationRule::HasString( const char *pString, const CDmaStringArray& attr )
 {
-	int nCount = attr.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = attr.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pString, attr[i] ) )
 			return true;
@@ -356,22 +356,22 @@ void CDmeCombinationDominationRule::RemoveAllSuppressed()
 //-----------------------------------------------------------------------------
 // Iteration
 //-----------------------------------------------------------------------------
-int CDmeCombinationDominationRule::DominatorCount() const
+intp CDmeCombinationDominationRule::DominatorCount() const
 {
 	return m_Dominators.Count();
 }
 
-const char *CDmeCombinationDominationRule::GetDominator( int i ) const
+const char *CDmeCombinationDominationRule::GetDominator( intp i ) const
 {
 	return m_Dominators[i];
 }
 
-int CDmeCombinationDominationRule::SuppressedCount() const
+intp CDmeCombinationDominationRule::SuppressedCount() const
 {
 	return m_Suppressed.Count();
 }
 
-const char *CDmeCombinationDominationRule::GetSuppressed( int i ) const
+const char *CDmeCombinationDominationRule::GetSuppressed( intp i ) const
 {
 	return m_Suppressed[i];
 }
@@ -382,8 +382,8 @@ const char *CDmeCombinationDominationRule::GetSuppressed( int i ) const
 //-----------------------------------------------------------------------------
 bool CDmeCombinationDominationRule::HasDominatorControl( const char *pDominatorControl ) const
 {
-	int nCount = DominatorCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = DominatorCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( GetDominator(i), pDominatorControl ) )
 			return true;
@@ -393,8 +393,8 @@ bool CDmeCombinationDominationRule::HasDominatorControl( const char *pDominatorC
 
 bool CDmeCombinationDominationRule::HasSuppressedControl( const char *pSuppressedControl ) const
 {
-	int nCount = SuppressedCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = SuppressedCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( GetSuppressed(i), pSuppressedControl ) )
 			return true;
@@ -422,7 +422,7 @@ void CDmeCombinationOperator::OnConstruction()
 	m_Dominators.Init( this, "dominators", FATTRIB_HAS_CALLBACK | FATTRIB_HAS_ARRAY_CALLBACK );
 
 	m_Targets.Init( this, "targets" );
-	m_flLastLaggedComputationTime = FLT_MIN;
+	m_flLastLaggedComputationTime = DBL_MIN;
 }
 
 void CDmeCombinationOperator::OnDestruction()
@@ -450,9 +450,9 @@ void CDmeCombinationOperator::OnElementUnserialized()
 	BaseClass::OnElementUnserialized();
 
 	// Mark all of the input as not being in their default state since we read it from a file
-	int nCount = m_InputControls.Count();
+	intp nCount = m_InputControls.Count();
 	m_IsDefaultValue.SetCount( nCount );
-	for ( int i = 0; i < nCount; ++i ) 
+	for ( intp i = 0; i < nCount; ++i ) 
 	{
 		m_IsDefaultValue[i] = false;
 	}
@@ -465,8 +465,8 @@ void CDmeCombinationOperator::OnElementUnserialized()
 ControlIndex_t CDmeCombinationOperator::FindOrCreateControl( const char *pControlName, bool bStereo, bool bAutoAddRawControl )
 {
 	Assert( !strchr( pControlName, '_' ) && !strchr( pControlName, ' ' ) );
-	int nCount = m_InputControls.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_InputControls.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !m_InputControls[i] )
 			continue;
@@ -500,8 +500,8 @@ ControlIndex_t CDmeCombinationOperator::FindOrCreateControl( const char *pContro
 //-----------------------------------------------------------------------------
 ControlIndex_t CDmeCombinationOperator::FindControlIndex( const char *pControlName )
 {
-	int nCount = m_InputControls.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_InputControls.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !m_InputControls[i] )
 			continue;
@@ -537,8 +537,8 @@ void CDmeCombinationOperator::RemoveControl( const char *pControlName )
 
 void CDmeCombinationOperator::RemoveAllControls()
 {
-	int nCount = m_InputControls.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_InputControls.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCombinationInputControl *pInputControl = m_InputControls[i];
 		m_InputControls.Set( i, NULL );
@@ -626,8 +626,8 @@ void CDmeCombinationOperator::RemoveAllRawControls( ControlIndex_t nControl )
 	Assert( pInputControl );
 	pInputControl->RemoveAllRawControls( );
 
-	int nCount = m_InputControls.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_InputControls.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		UpdateDefaultValue( i );
 	}
@@ -639,21 +639,21 @@ void CDmeCombinationOperator::RemoveAllRawControls( ControlIndex_t nControl )
 //-----------------------------------------------------------------------------
 // Iterates remapped controls
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::GetRawControlCount( ControlIndex_t nControl ) const
+intp CDmeCombinationOperator::GetRawControlCount( ControlIndex_t nControl ) const
 {
 	CDmeCombinationInputControl *pInputControl = m_InputControls[nControl];
 	Assert( pInputControl );
 	return pInputControl->RawControlCount();
 }
 
-const char *CDmeCombinationOperator::GetRawControlName( ControlIndex_t nControl, int nIndex ) const
+const char *CDmeCombinationOperator::GetRawControlName( ControlIndex_t nControl, intp nIndex ) const
 {
 	CDmeCombinationInputControl *pInputControl = m_InputControls[nControl];
 	Assert( pInputControl );
 	return pInputControl->RawControlName( nIndex );
 }
 
-float CDmeCombinationOperator::GetRawControlWrinkleScale( ControlIndex_t nControl, int nIndex ) const
+float CDmeCombinationOperator::GetRawControlWrinkleScale( ControlIndex_t nControl, intp nIndex ) const
 {
 	CDmeCombinationInputControl *pInputControl = m_InputControls[nControl];
 	Assert( pInputControl );
@@ -693,17 +693,17 @@ float CDmeCombinationOperator::GetControlBaseValue( ControlIndex_t nControl ) co
 //-----------------------------------------------------------------------------
 // Iterates a global list of output controls
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::GetRawControlCount( ) const
+intp CDmeCombinationOperator::GetRawControlCount( ) const
 {
 	return m_RawControlInfo.Count();
 }
 
-const char *CDmeCombinationOperator::GetRawControlName( int nIndex ) const
+const char *CDmeCombinationOperator::GetRawControlName( intp nIndex ) const
 {
 	return m_RawControlInfo[nIndex].m_Name;
 }
 
-float CDmeCombinationOperator::GetRawControlWrinkleScale( int nIndex ) const
+float CDmeCombinationOperator::GetRawControlWrinkleScale( intp nIndex ) const
 {
 	return m_RawControlInfo[nIndex].m_flWrinkleScale;
 }
@@ -726,8 +726,7 @@ void CDmeCombinationOperator::SetWrinkleScale( ControlIndex_t nControl, const ch
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::MoveControlUp( const char *pControlName )
 {
-
-	int nIndex = FindControlIndex( pControlName );
+	intp nIndex = FindControlIndex( pControlName );
 	if ( nIndex > 0 )
 	{
 		m_InputControls.Swap( nIndex, nIndex - 1 );
@@ -745,8 +744,8 @@ void CDmeCombinationOperator::MoveControlUp( const char *pControlName )
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::MoveControlDown( const char *pControlName )
 {
-	int nIndex = FindControlIndex( pControlName );
-	int nLastIndex = m_InputControls.Count() - 1;
+	intp nIndex = FindControlIndex( pControlName );
+	intp nLastIndex = m_InputControls.Count() - 1;
 	if ( nIndex >= 0 && nIndex < nLastIndex )
 	{
 		m_InputControls.Swap( nIndex, nIndex + 1 );
@@ -764,8 +763,8 @@ void CDmeCombinationOperator::MoveControlDown( const char *pControlName )
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::MoveControlBefore( const char *pDragControlName, const char *pDropControlName )
 {
-	int pDragIndex( FindControlIndex( pDragControlName ) );
-	int pDropIndex( FindControlIndex( pDropControlName ) );
+	intp pDragIndex( FindControlIndex( pDragControlName ) );
+	intp pDropIndex( FindControlIndex( pDropControlName ) );
 
 	// Have to copy because InsertAfter may reallocate memory before doing the copy and therefore might be referencing garabage
 	CDmeCombinationInputControl *inputControlCopy( m_InputControls[ pDragIndex ] );
@@ -798,8 +797,8 @@ void CDmeCombinationOperator::MoveControlBefore( const char *pDragControlName, c
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::MoveControlAfter( const char *pDragControlName, const char *pDropControlName )
 {
-	int nDragIndex = FindControlIndex( pDragControlName );
-	int nDropIndex = FindControlIndex( pDropControlName );
+	intp nDragIndex = FindControlIndex( pDragControlName );
+	intp nDropIndex = FindControlIndex( pDropControlName );
 
 	// Have to copy because InsertAfter may reallocate memory before doing the copy and therefore might be referencing garabage
 	CDmeCombinationInputControl *inputControlCopy( m_InputControls[ nDragIndex ] );
@@ -858,7 +857,7 @@ bool CDmeCombinationOperator::IsStereoControl( ControlIndex_t nControlIndex ) co
 	return m_InputControls[nControlIndex]->IsStereo();
 }
 
-bool CDmeCombinationOperator::IsStereoRawControl( int nIndex ) const
+bool CDmeCombinationOperator::IsStereoRawControl( intp nIndex ) const
 {
 	return IsStereoControl( m_RawControlInfo[nIndex].m_InputControl );
 }
@@ -873,7 +872,7 @@ bool CDmeCombinationOperator::IsEyelidControl( ControlIndex_t nControlIndex ) co
 	return m_InputControls[nControlIndex]->IsEyelid();
 }
 
-bool CDmeCombinationOperator::IsEyelidRawControl( int nIndex ) const
+bool CDmeCombinationOperator::IsEyelidRawControl( intp nIndex ) const
 {
 	return IsEyelidControl( m_RawControlInfo[nIndex].m_InputControl );
 }
@@ -963,7 +962,7 @@ bool CDmeCombinationOperator::IsMultiControl( ControlIndex_t nControlIndex ) con
 //-----------------------------------------------------------------------------
 // Iterates controls
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::GetControlCount() const
+intp CDmeCombinationOperator::GetControlCount() const
 {
 	return m_InputControls.Count();
 }
@@ -988,8 +987,8 @@ bool CDmeCombinationOperator::HasRawControl( const char *pRawControlName ) const
 //-----------------------------------------------------------------------------
 CDmeCombinationOperator::RawControlIndex_t CDmeCombinationOperator::FindRawControlIndex( const char *pControlName, bool bIgnoreDefaultControls ) const
 {
-	int nRawControlCount = m_RawControlInfo.Count();
-	for ( int i = 0; i < nRawControlCount; ++i )
+	intp nRawControlCount = m_RawControlInfo.Count();
+	for ( intp i = 0; i < nRawControlCount; ++i )
 	{
 		if ( bIgnoreDefaultControls && m_RawControlInfo[i].m_bIsDefaultControl )
 			continue;
@@ -1020,9 +1019,9 @@ bool CDmeCombinationOperator::IsRawControlStereo( const char *pRawControlName )
 //-----------------------------------------------------------------------------
 bool CDmeCombinationOperator::IsDeltaStateStereo( const char *pDeltaStateName )
 {
-	int *pTemp = (int*)_alloca( m_RawControlInfo.Count() * sizeof(int) );
-	int nCount = ParseDeltaName( pDeltaStateName, pTemp );
-	for ( int i = 0; i < nCount; ++i )
+	intp *pTemp = (intp*)_alloca( m_RawControlInfo.Count() * sizeof(intp) );
+	intp nCount = ParseDeltaName( pDeltaStateName, pTemp );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCombinationInputControl *pInputControl = m_InputControls[ m_RawControlInfo[ pTemp[i] ].m_InputControl ];
 		if ( pInputControl->IsStereo() )
@@ -1037,15 +1036,15 @@ bool CDmeCombinationOperator::IsDeltaStateStereo( const char *pDeltaStateName )
 //-----------------------------------------------------------------------------
 bool CDmeCombinationOperator::DoesTargetContainDeltaState( const char *pSearchName )
 {
-	int nTargetCount = m_Targets.Count();
-	for ( int i = 0; i < nTargetCount; ++i )
+	intp nTargetCount = m_Targets.Count();
+	for ( intp i = 0; i < nTargetCount; ++i )
 	{
 		const CDmrElementArray<> deltaArray( m_Targets[i], "deltaStates" );
 		if ( !deltaArray.IsValid() )
 			continue;
 
-		int nDeltaCount = deltaArray.Count();
-		for ( int j = 0; j < nDeltaCount; ++j )
+		intp nDeltaCount = deltaArray.Count();
+		for ( intp j = 0; j < nDeltaCount; ++j )
 		{
 			if ( !deltaArray[j] )
 				continue;
@@ -1084,20 +1083,19 @@ void CDmeCombinationOperator::RebuildRawControlList()
 {
 	m_RawControlInfo.RemoveAll();
 
-	int nControlCount = m_InputControls.Count();
-	for ( int i = 0; i < nControlCount; ++i )
+	intp nControlCount = m_InputControls.Count();
+	for ( intp i = 0; i < nControlCount; ++i )
 	{
 		CDmeCombinationInputControl *pInputControl = m_InputControls[i];
 		Assert( pInputControl );
-		int nRemapCount = pInputControl->RawControlCount();
+		intp nRemapCount = pInputControl->RawControlCount();
 
 		const bool bIsEyelid = pInputControl->IsEyelid();
 
 		float flStep = ( nRemapCount > 2 ) ? 1.0f / ( nRemapCount - 1 ) : 0.0f;
-		for ( int j = 0; j < nRemapCount; ++j )
+		for ( intp j = 0; j < nRemapCount; ++j )
 		{
-			intp k = m_RawControlInfo.AddToTail( );
-			RawControlInfo_t &info = m_RawControlInfo[k];
+			RawControlInfo_t &info = m_RawControlInfo[m_RawControlInfo.AddToTail( )];
 			
 			info.m_Name = pInputControl->RawControlName( j );
 			info.m_InputControl = i;
@@ -1165,22 +1163,22 @@ void CDmeCombinationOperator::RebuildRawControlList()
 void CDmeCombinationOperator::RebuildDominatorInfo()
 {
 	m_DominatorInfo.RemoveAll();
-	int nCount = m_Dominators.Count();
-	int *pDominators = (int*)_alloca( m_RawControlInfo.Count() * sizeof(int) );
-	int *pSuppressed = (int*)_alloca( m_RawControlInfo.Count() * sizeof(int) );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Dominators.Count();
+	intp *pDominators = (intp*)_alloca( m_RawControlInfo.Count() * sizeof(intp) );
+	intp *pSuppressed = (intp*)_alloca( m_RawControlInfo.Count() * sizeof(intp) );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCombinationDominationRule *pRule = m_Dominators[i];
 		bool bRuleOk = true;
 
-		int nDominatorCount = pRule->DominatorCount();
-		int nSuppressedCount = pRule->SuppressedCount();
+		intp nDominatorCount = pRule->DominatorCount();
+		intp nSuppressedCount = pRule->SuppressedCount();
 		if ( ( nDominatorCount == 0 ) || ( nSuppressedCount == 0 ) )
 			continue;
 
-		for ( int j = 0; j < nDominatorCount; ++j )
+		for ( intp j = 0; j < nDominatorCount; ++j )
 		{
-			int nControlIndex = FindRawControlIndex( pRule->GetDominator(j) );
+			intp nControlIndex = FindRawControlIndex( pRule->GetDominator(j) );
 			if ( nControlIndex < 0 )
 			{
 				bRuleOk = false;
@@ -1189,9 +1187,9 @@ void CDmeCombinationOperator::RebuildDominatorInfo()
 			pDominators[j] = nControlIndex;
 		}
 
-		for ( int j = 0; j < nSuppressedCount; ++j )
+		for ( intp j = 0; j < nSuppressedCount; ++j )
 		{
-			int nControlIndex = FindRawControlIndex( pRule->GetSuppressed(j) );
+			intp nControlIndex = FindRawControlIndex( pRule->GetSuppressed(j) );
 			if ( nControlIndex < 0 )
 			{
 				bRuleOk = false;
@@ -1236,14 +1234,14 @@ CDmeCombinationDominationRule *CDmeCombinationOperator::AddDominationRule( CDmeC
 //-----------------------------------------------------------------------------
 // Adds a dominator. Dominators are specified using raw control names
 //-----------------------------------------------------------------------------
-CDmeCombinationDominationRule *CDmeCombinationOperator::AddDominationRule( int nDominatorCount, const char **ppDominatorControlNames, int nSuppressedCount, const char **ppSuppressedControlNames )
+CDmeCombinationDominationRule *CDmeCombinationOperator::AddDominationRule( intp nDominatorCount, const char **ppDominatorControlNames, intp nSuppressedCount, const char **ppSuppressedControlNames )
 {
 	CDmeCombinationDominationRule *pDominationRule = AddDominationRule();
-	for ( int i = 0; i < nDominatorCount; ++i )
+	for ( intp i = 0; i < nDominatorCount; ++i )
 	{
 		pDominationRule->AddDominator( ppDominatorControlNames[i] );
 	}
-	for ( int i = 0; i < nSuppressedCount; ++i )
+	for ( intp i = 0; i < nSuppressedCount; ++i )
 	{
 		pDominationRule->AddSuppressed( ppSuppressedControlNames[i] );
 	}
@@ -1263,7 +1261,7 @@ CDmeCombinationDominationRule *CDmeCombinationOperator::AddDominationRule( const
 //-----------------------------------------------------------------------------
 // Removes a domination rule
 //-----------------------------------------------------------------------------
-void CDmeCombinationOperator::RemoveDominationRule( int nIndex )
+void CDmeCombinationOperator::RemoveDominationRule( intp nIndex )
 {
 	CDmeCombinationDominationRule *pRule = m_Dominators[nIndex];
 	m_Dominators.Remove( nIndex );
@@ -1272,8 +1270,8 @@ void CDmeCombinationOperator::RemoveDominationRule( int nIndex )
 
 void CDmeCombinationOperator::RemoveDominationRule( CDmeCombinationDominationRule *pRule )
 {
-	int nCount = m_Dominators.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Dominators.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Dominators[i] == pRule )
 		{
@@ -1285,8 +1283,8 @@ void CDmeCombinationOperator::RemoveDominationRule( CDmeCombinationDominationRul
 
 void CDmeCombinationOperator::RemoveAllDominationRules()
 {
-	int nCount = m_Dominators.Count();
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = m_Dominators.Count();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		RemoveDominationRule( i );
 	}
@@ -1296,12 +1294,12 @@ void CDmeCombinationOperator::RemoveAllDominationRules()
 //-----------------------------------------------------------------------------
 // Iteration
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::DominationRuleCount() const
+intp CDmeCombinationOperator::DominationRuleCount() const
 {
 	return m_Dominators.Count();
 }
 
-CDmeCombinationDominationRule *CDmeCombinationOperator::GetDominationRule( int i )
+CDmeCombinationDominationRule *CDmeCombinationOperator::GetDominationRule( intp i )
 {
 	return m_Dominators[i];
 }
@@ -1310,10 +1308,10 @@ CDmeCombinationDominationRule *CDmeCombinationOperator::GetDominationRule( int i
 //-----------------------------------------------------------------------------
 // Finds a domination rule
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::FindDominationRule( CDmeCombinationDominationRule *pRule )
+intp CDmeCombinationOperator::FindDominationRule( CDmeCombinationDominationRule *pRule )
 {
-	int nCount = m_Dominators.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_Dominators.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_Dominators[i] == pRule )
 			return i;
@@ -1327,7 +1325,7 @@ int CDmeCombinationOperator::FindDominationRule( CDmeCombinationDominationRule *
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::MoveDominationRuleUp( CDmeCombinationDominationRule* pRule )
 {
-	int nIndex = FindDominationRule( pRule );
+	intp nIndex = FindDominationRule( pRule );
 	if ( nIndex > 0 )
 	{
 		m_Dominators.Swap( nIndex, nIndex - 1 );
@@ -1337,7 +1335,7 @@ void CDmeCombinationOperator::MoveDominationRuleUp( CDmeCombinationDominationRul
 
 void CDmeCombinationOperator::MoveDominationRuleDown( CDmeCombinationDominationRule* pRule )
 {
-	int nIndex = FindDominationRule( pRule );
+	intp nIndex = FindDominationRule( pRule );
 	if ( nIndex >= 0 && nIndex < m_Dominators.Count() - 1 )
 	{
 		m_Dominators.Swap( nIndex, nIndex + 1 );
@@ -1358,11 +1356,11 @@ void CDmeCombinationOperator::AttachChannelToControlValue( ControlIndex_t nContr
 //-----------------------------------------------------------------------------
 // Determines the weighting of input controls based on the deltaState name
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::FindDeltaStateIndex( CDmAttribute *pDeltaArray, const char *pDeltaStateName )
+intp CDmeCombinationOperator::FindDeltaStateIndex( CDmAttribute *pDeltaArray, const char *pDeltaStateName )
 {
 	const CDmrElementArray<> deltas( pDeltaArray );
-	int nDeltaArrayCount = deltas.Count();
-	for ( int i = 0; i < nDeltaArrayCount; ++i )
+	intp nDeltaArrayCount = deltas.Count();
+	for ( intp i = 0; i < nDeltaArrayCount; ++i )
 	{
 		CDmElement *pDeltaElement = deltas[i];
 		if ( pDeltaElement && !Q_stricmp( pDeltaElement->GetName(), pDeltaStateName ) )
@@ -1376,12 +1374,12 @@ int CDmeCombinationOperator::FindDeltaStateIndex( CDmAttribute *pDeltaArray, con
 //-----------------------------------------------------------------------------
 // Determines which combination to use based on the deltaState name
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::ParseDeltaName(const char *pDeltaStateName, int *pControlIndices )
+intp CDmeCombinationOperator::ParseDeltaName(const char *pDeltaStateName, intp *pControlIndices )
 {
 	char pBuf[512];
-	Q_strncpy( pBuf, pDeltaStateName, sizeof(pBuf) );
+	V_strcpy_safe( pBuf, pDeltaStateName );
 
-	int nComboCount = 0;
+	intp nComboCount = 0;
 	char *pEnd;
 	for ( char *pName = pBuf; *pName; pName = pEnd )
 	{
@@ -1397,7 +1395,7 @@ int CDmeCombinationOperator::ParseDeltaName(const char *pDeltaStateName, int *pC
 			++pEnd;
 		}
 
-		int nControlIndex = FindRawControlIndex( pName );
+		intp nControlIndex = FindRawControlIndex( pName );
 		if ( nControlIndex < 0 )
 			return 0;
 
@@ -1416,14 +1414,14 @@ void CDmeCombinationOperator::FindDominators( CombinationOperation_t& op )
 	// Dominators are sets of inputs, which, when set to 1, will 
 	// supress another set of inputs. Only combinations which contain *all*
 	// dominators will suppress any combinatation that contains *all* suppressors
-	int nDominatorCount = m_DominatorInfo.Count();
-	for ( int i = 0; i < nDominatorCount; ++i )
+	intp nDominatorCount = m_DominatorInfo.Count();
+	for ( intp i = 0; i < nDominatorCount; ++i )
 	{
 		DominatorInfo_t &info = m_DominatorInfo[i];
 
 		// Look for suppressor indices in the control indices list
-		int nCount = info.m_SuppressedIndices.Count();
-		int j;
+		intp nCount = info.m_SuppressedIndices.Count();
+		intp j;
 		for ( j = 0; j < nCount; ++j )
 		{
 			if ( op.m_ControlIndices.Find( info.m_SuppressedIndices[j] ) < 0 )
@@ -1483,15 +1481,15 @@ void CDmeCombinationOperator::ComputeCombinationInfo( intp nIndex )
 	info.m_hDestAttribute[COMBO_CONTROL_NORMAL] = weights.GetAttribute()->GetHandle();
 	info.m_hDestAttribute[COMBO_CONTROL_LAGGED] = weightsLagged.IsValid() ? weightsLagged.GetAttribute()->GetHandle() : DMATTRIBUTE_HANDLE_INVALID;
 
-	int *pTemp = (int*)_alloca( m_RawControlInfo.Count() * sizeof(int) );
-	int nDeltaCount = deltas.Count();
-	for ( int i = 0; i < nDeltaCount; ++i )
+	intp *pTemp = (intp*)_alloca( m_RawControlInfo.Count() * sizeof(intp) );
+	intp nDeltaCount = deltas.Count();
+	for ( intp i = 0; i < nDeltaCount; ++i )
 	{
 		CDmElement *pDeltaElement = deltas[i];
 		if ( !pDeltaElement )
 			continue;
 
-		int nControlCount = ParseDeltaName( pDeltaElement->GetName(), pTemp );
+		intp nControlCount = ParseDeltaName( pDeltaElement->GetName(), pTemp );
 		if ( nControlCount == 0 )
 			continue;
 
@@ -1511,8 +1509,8 @@ void CDmeCombinationOperator::ComputeCombinationInfo( intp nIndex )
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::ComputeCombinationInfo()
 {
-	int nTargetCount = m_Targets.Count();
-	for ( int i = 0; i < nTargetCount; ++i )
+	intp nTargetCount = m_Targets.Count();
+	for ( intp i = 0; i < nTargetCount; ++i )
 	{
 		ComputeCombinationInfo( i );
 	}
@@ -1522,13 +1520,13 @@ void CDmeCombinationOperator::ComputeCombinationInfo()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CDmeCombinationOperator::CleanUpCombinationInfo( int nIndex )
+void CDmeCombinationOperator::CleanUpCombinationInfo( intp nIndex )
 {
 	if ( nIndex >= m_CombinationInfo.Count() )
 		return;
 
 	CombinationInfo_t &info = m_CombinationInfo[ nIndex ];
-	for ( int i = 0; i < COMBO_CONTROL_TYPE_COUNT; ++i )
+	for ( intp i = 0; i < COMBO_CONTROL_TYPE_COUNT; ++i )
 	{
 		info.m_hDestAttribute[i] = DMATTRIBUTE_HANDLE_INVALID;
 	}
@@ -1538,8 +1536,8 @@ void CDmeCombinationOperator::CleanUpCombinationInfo( int nIndex )
 
 void CDmeCombinationOperator::CleanUpCombinationInfo( )
 {
-	int nCount = m_CombinationInfo.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_CombinationInfo.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CleanUpCombinationInfo( i );
 	}
@@ -1586,8 +1584,8 @@ void CDmeCombinationOperator::AddTarget( CDmeDag *pDag )
 	CDmeShape *pShape = pDag->GetShape();
 	AddTarget( pShape );
 	
-	int nChildCount = pDag->GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pDag->GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeDag *pChild = pDag->GetChild(i);
 
@@ -1670,18 +1668,18 @@ void CDmeCombinationOperator::ComputeLaggedInputValues()
 	if ( !m_bSpecifyingLaggedData )
 		return;
 
-	float t = Plat_FloatTime();
-	if ( m_flLastLaggedComputationTime == FLT_MIN )
+	double t = Plat_FloatTime();
+	if ( m_flLastLaggedComputationTime == DBL_MIN )
 	{
 		m_flLastLaggedComputationTime = t;
 	}
 
-	float dt = t - m_flLastLaggedComputationTime;
+	float dt = static_cast<float>(t - m_flLastLaggedComputationTime);
 	m_flLastLaggedComputationTime = t;
-	float flFactor = ExponentialDecay( 0.8, 0.033, dt );
+	float flFactor = ExponentialDecay( 0.8f, 0.033f, dt );
 
-	int nCount = m_ControlValues[COMBO_CONTROL_NORMAL].Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ControlValues[COMBO_CONTROL_NORMAL].Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		Vector vecLerp;
 		VectorLerp( m_ControlValues[COMBO_CONTROL_NORMAL][i], m_ControlValues[COMBO_CONTROL_LAGGED][i], flFactor, vecLerp );
@@ -1697,8 +1695,8 @@ void CDmeCombinationOperator::Operate()
 {
 	ComputeLaggedInputValues();
 
-	int nCount = m_CombinationInfo.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_CombinationInfo.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CombinationInfo_t &info = m_CombinationInfo[i];
 
@@ -1714,15 +1712,15 @@ void CDmeCombinationOperator::Operate()
 			CDmrArray< Vector2D > vec2D( pAttribute );
 
 			CombinationControlType_t useType = m_bSpecifyingLaggedData ? type : COMBO_CONTROL_NORMAL;
-			int nOutputCount = info.m_Outputs.Count();
-			for ( int j = 0; j < nOutputCount; ++j )
+			intp nOutputCount = info.m_Outputs.Count();
+			for ( intp j = 0; j < nOutputCount; ++j )
 			{
 				CombinationOperation_t &op = info.m_Outputs[j];
 
 				// Compute the core combination
 				Vector2D vecValue( 1.0f, 1.0f );
-				int nCombinationCount = op.m_ControlIndices.Count();
-				for ( int k = 0; k < nCombinationCount; ++k )
+				intp nCombinationCount = op.m_ControlIndices.Count();
+				for ( intp k = 0; k < nCombinationCount; ++k )
 				{
 					Vector2D v;
 					ComputeInternalControlValue( op.m_ControlIndices[k], useType, v );
@@ -1731,14 +1729,14 @@ void CDmeCombinationOperator::Operate()
 
 
 				// Compute the dominators
-				int nDominatorCount = op.m_DominatorIndices.Count();
-				for ( int k = 0; k < nDominatorCount; ++k )
+				intp nDominatorCount = op.m_DominatorIndices.Count();
+				for ( intp k = 0; k < nDominatorCount; ++k )
 				{
-					const CUtlVector< int > &dominantIndices = m_DominatorInfo[ op.m_DominatorIndices[k] ].m_DominantIndices;
-					int nDominantCount = dominantIndices.Count();
+					const CUtlVector< UtlHashFastHandle_t > &dominantIndices = m_DominatorInfo[ op.m_DominatorIndices[k] ].m_DominantIndices;
+					intp nDominantCount = dominantIndices.Count();
 
 					Vector2D suppressor( -1.0f, -1.0f );
-					for ( int l = 0; l < nDominantCount; ++l )
+					for ( intp l = 0; l < nDominantCount; ++l )
 					{
 						Vector2D v;
 						ComputeInternalControlValue( dominantIndices[l], useType, v );
@@ -1765,8 +1763,8 @@ void CDmeCombinationOperator::GetInputAttributes( CUtlVector< CDmAttribute * > &
 
 void CDmeCombinationOperator::GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs )
 {
-	int nCount = m_CombinationInfo.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_CombinationInfo.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CombinationInfo_t &info = m_CombinationInfo[i];
 		for ( int j = 0; j < COMBO_CONTROL_TYPE_COUNT; ++j )
@@ -1787,45 +1785,45 @@ void CDmeCombinationOperator::GetOutputAttributes( CUtlVector< CDmAttribute * > 
 //-----------------------------------------------------------------------------
 // Used by studiomdl to discover the various combination rules
 //-----------------------------------------------------------------------------
-int CDmeCombinationOperator::GetOperationTargetCount() const
+intp CDmeCombinationOperator::GetOperationTargetCount() const
 {
 	return m_Targets.Count();
 }
 
-CDmElement *CDmeCombinationOperator::GetOperationTarget( int nTargetIndex )
+CDmElement *CDmeCombinationOperator::GetOperationTarget( intp nTargetIndex )
 {
 	return m_Targets[ nTargetIndex ];
 }
 
-int CDmeCombinationOperator::GetOperationCount( int nTargetIndex ) const
+intp CDmeCombinationOperator::GetOperationCount( intp nTargetIndex ) const
 {
 	return m_CombinationInfo[ nTargetIndex ].m_Outputs.Count();
 }
 
-CDmElement *CDmeCombinationOperator::GetOperationDeltaState( int nTargetIndex, int nOpIndex )
+CDmElement *CDmeCombinationOperator::GetOperationDeltaState( intp nTargetIndex, intp nOpIndex )
 {
 	CDmElement *pElement = GetOperationTarget( nTargetIndex );
 	const CDmrElementArray<> deltaArray( pElement, "deltaStates" );
 	if ( !deltaArray.IsValid() )
 		return NULL;
 
-	int nDeltaStateIndex = m_CombinationInfo[ nTargetIndex ].m_Outputs[ nOpIndex ].m_nDeltaStateIndex;
+	intp nDeltaStateIndex = m_CombinationInfo[ nTargetIndex ].m_Outputs[ nOpIndex ].m_nDeltaStateIndex;
 	return deltaArray[ nDeltaStateIndex ];
 }
 
-const CUtlVector< int > &CDmeCombinationOperator::GetOperationControls( int nTargetIndex, int nOpIndex ) const
+const CUtlVector< UtlHashFastHandle_t > &CDmeCombinationOperator::GetOperationControls( intp nTargetIndex, intp nOpIndex ) const
 {
 	return m_CombinationInfo[ nTargetIndex ].m_Outputs[ nOpIndex ].m_ControlIndices;
 }
 
-int CDmeCombinationOperator::GetOperationDominatorCount( int nTargetIndex, int nOpIndex ) const
+intp CDmeCombinationOperator::GetOperationDominatorCount( intp nTargetIndex, intp nOpIndex ) const
 {
 	return m_CombinationInfo[ nTargetIndex ].m_Outputs[ nOpIndex ].m_DominatorIndices.Count();
 }
 
-const CUtlVector< int > &CDmeCombinationOperator::GetOperationDominator( int nTargetIndex, int nOpIndex, int nDominatorIndex ) const
+const CUtlVector< UtlHashFastHandle_t > &CDmeCombinationOperator::GetOperationDominator( intp nTargetIndex, intp nOpIndex, intp nDominatorIndex ) const
 {
-	int nIndex = m_CombinationInfo[ nTargetIndex ].m_Outputs[ nOpIndex ].m_DominatorIndices[ nDominatorIndex ];
+	UtlHashFastHandle_t nIndex = m_CombinationInfo[ nTargetIndex ].m_Outputs[ nOpIndex ].m_DominatorIndices[ nDominatorIndex ];
 	return m_DominatorInfo[ nIndex ].m_DominantIndices;
 }
 
@@ -1835,7 +1833,7 @@ void CDmeCombinationOperator::CopyControls( CDmeCombinationOperator *pSrc )
 	RemoveAllControls();
 
 	// Copy The Source Controls
-	for ( int i = 0; i < pSrc->m_InputControls.Count(); ++i )
+	for ( intp i = 0; i < pSrc->m_InputControls.Count(); ++i )
 	{
 		CDmeCombinationInputControl *pSrcInput = pSrc->m_InputControls[ i ];
 		if ( pSrcInput )
@@ -1860,7 +1858,7 @@ void CDmeCombinationOperator::CopyControls( CDmeCombinationOperator *pSrc )
 	m_Dominators.Purge();
 
 	// Copy The Source Controls
-	for ( int i = 0; i < pSrc->m_Dominators.Count(); ++i )
+	for ( intp i = 0; i < pSrc->m_Dominators.Count(); ++i )
 	{
 		CDmeCombinationDominationRule *pSrcDom = pSrc->m_Dominators[ i ];
 		if ( pSrcDom )
@@ -1885,8 +1883,8 @@ void CDmeCombinationOperator::GenerateWrinkleDeltas( CDmeShape *pShape, bool bOv
 	CDmeVertexData *pBindState = pMesh ? pMesh->FindBaseState( "bind" ) : NULL;
 	if ( pBindState )
 	{
-		int nRawControlCount = m_RawControlInfo.Count();
-		for ( int i = 0; i < nRawControlCount; ++i )
+		intp nRawControlCount = m_RawControlInfo.Count();
+		for ( intp i = 0; i < nRawControlCount; ++i )
 		{
 			CDmeVertexDeltaData* pDelta = pMesh->FindDeltaState( m_RawControlInfo[i].m_Name );
 			if ( pDelta )
@@ -1899,8 +1897,8 @@ void CDmeCombinationOperator::GenerateWrinkleDeltas( CDmeShape *pShape, bool bOv
 
 void CDmeCombinationOperator::GenerateWrinkleDeltas( bool bOverwrite /* = true */ )
 {
-	int nTargetCount = m_Targets.Count();
-	for ( int i = 0; i < nTargetCount; ++i )
+	intp nTargetCount = m_Targets.Count();
+	for ( intp i = 0; i < nTargetCount; ++i )
 	{
 		GenerateWrinkleDeltas( CastElement< CDmeShape >( m_Targets[i] ), bOverwrite );
 	}
@@ -1923,8 +1921,8 @@ void CDmeCombinationOperator::RemoveAllTargets()
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::SetToDefault()
 {
-	const int nControlsCount = m_InputControls.Count();
-	for ( int i = 0; i < nControlsCount; ++i )
+	const intp nControlsCount = m_InputControls.Count();
+	for ( intp i = 0; i < nControlsCount; ++i )
 	{
 		m_IsDefaultValue[ i ] = true;
 		UpdateDefaultValue( i );
@@ -1937,8 +1935,8 @@ void CDmeCombinationOperator::SetToDefault()
 //-----------------------------------------------------------------------------
 void CDmeCombinationOperator::SetToBase()
 {
-	const int nControlsCount = m_InputControls.Count();
-	for ( int i = 0; i < nControlsCount; ++i )
+	const intp nControlsCount = m_InputControls.Count();
+	for ( intp i = 0; i < nControlsCount; ++i )
 	{
 		const float flBaseValue = GetControlBaseValue( i );
 		for ( int j = 0; j < COMBO_CONTROL_TYPE_COUNT; ++j )
@@ -1959,8 +1957,8 @@ void CDmeCombinationOperator::Purge()
 {
 	bool bDelete = true;
 
-	const int nTargetCount = m_Targets.Count();
-	for ( int i = 0; i < nTargetCount; ++i )
+	const intp nTargetCount = m_Targets.Count();
+	for ( intp i = 0; i < nTargetCount; ++i )
 	{
 		CDmElement *pSource = m_Targets[ i ];
 		if ( !pSource )
@@ -1970,20 +1968,20 @@ void CDmeCombinationOperator::Purge()
 		if ( !deltas.IsValid() )
 			continue;
 
-		const int nDeltaCount = deltas.Count();
+		const intp nDeltaCount = deltas.Count();
 
 		do
 		{
 			bDelete = false;
 
-			const int nControlCount = GetControlCount();
-			for ( int j = 0; j < nControlCount; ++j )
+			const intp nControlCount = GetControlCount();
+			for ( intp j = 0; j < nControlCount; ++j )
 			{
 				bDelete = true;
-				const int nRawControlCount = GetRawControlCount( j );
-				for ( int k = 0; bDelete && k < nRawControlCount; ++k )
+				const intp nRawControlCount = GetRawControlCount( j );
+				for ( intp k = 0; bDelete && k < nRawControlCount; ++k )
 				{
-					for ( int l = 0; l < nDeltaCount; ++l )
+					for ( intp l = 0; l < nDeltaCount; ++l )
 					{
 						if ( !Q_strcmp( GetRawControlName( j, k ), deltas[ l ]->GetName() ) )
 						{
@@ -2006,14 +2004,14 @@ void CDmeCombinationOperator::Purge()
 	{
 		bDelete = false;
 
-		const int nDomCount = DominationRuleCount();
-		for ( int i = 0; i < nDomCount; ++i )
+		const intp nDomCount = DominationRuleCount();
+		for ( intp i = 0; i < nDomCount; ++i )
 		{
 			bDelete = true;
 			CDmeCombinationDominationRule *pDom = GetDominationRule( i );
 
-			const int nDCount = pDom->DominatorCount();
-			for ( int j = 0; j < nDCount; ++j )
+			const intp nDCount = pDom->DominatorCount();
+			for ( intp j = 0; j < nDCount; ++j )
 			{
 				if ( HasRawControl( pDom->GetDominator( j ) ) )
 				{
@@ -2024,8 +2022,8 @@ void CDmeCombinationOperator::Purge()
 
 			if ( !bDelete )
 			{
-				const int nSCount = pDom->SuppressedCount();
-				for ( int j = 0; j < nSCount; ++j )
+				const intp nSCount = pDom->SuppressedCount();
+				for ( intp j = 0; j < nSCount; ++j )
 				{
 					if ( HasRawControl( pDom->GetSuppressed( j ) ) )
 					{
@@ -2061,8 +2059,8 @@ void CreateLaggedVertexAnimation( CDmeChannelsClip *pClip, int nSamplesPerSec )
 	if ( !pClip )
 		return;
 
-	int nChannelCount = pClip->m_Channels.Count();
-	for ( int i = 0; i < nChannelCount; ++i )
+	intp nChannelCount = pClip->m_Channels.Count();
+	for ( intp i = 0; i < nChannelCount; ++i )
 	{
 		CDmeChannel *pChannel = pClip->m_Channels[i];
 		CDmElement *pDest = pChannel->GetToElement();
@@ -2135,7 +2133,7 @@ void CDmeMayaCombinationOperator::AddDeltaState( const char *pDeltaStateName )
 
 void CDmeMayaCombinationOperator::RemoveDeltaState( const char *pDeltaStateName )
 {
-	int nIndex = FindDeltaState( pDeltaStateName );
+	intp nIndex = FindDeltaState( pDeltaStateName );
 	if ( nIndex >= 0 )
 	{
 		m_DeltaStates.Remove( nIndex );
@@ -2157,10 +2155,10 @@ void CDmeMayaCombinationOperator::RemoveAllDeltaStates()
 	ComputeCombinationInfo( 0 );
 }
 
-int CDmeMayaCombinationOperator::FindDeltaState( const char *pDeltaStateName )
+intp CDmeMayaCombinationOperator::FindDeltaState( const char *pDeltaStateName )
 {
-	int nCount = m_DeltaStates.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_DeltaStates.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pDeltaStateName, m_DeltaStates[i]->GetName() ) )
 			return i;
@@ -2168,17 +2166,17 @@ int CDmeMayaCombinationOperator::FindDeltaState( const char *pDeltaStateName )
 	return -1;
 }
 
-int CDmeMayaCombinationOperator::DeltaStateCount() const
+intp CDmeMayaCombinationOperator::DeltaStateCount() const
 {
 	return m_DeltaStates.Count();
 }
 
-const char *CDmeMayaCombinationOperator::GetDeltaState( int nIndex ) const
+const char *CDmeMayaCombinationOperator::GetDeltaState( intp nIndex ) const
 {
 	return m_DeltaStates[nIndex]->GetName();
 }
 
-const Vector2D& CDmeMayaCombinationOperator::GetDeltaStateWeight( int nIndex, CombinationControlType_t type ) const
+const Vector2D& CDmeMayaCombinationOperator::GetDeltaStateWeight( intp nIndex, CombinationControlType_t type ) const
 {
 	return m_DeltaStateWeights[type][nIndex];
 }

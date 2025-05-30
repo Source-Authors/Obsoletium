@@ -60,6 +60,10 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 	case IMAGE_FORMAT_RGBA8888:
 		dstFormat = IMAGE_FORMAT_BGRA8888;
 		break;
+
+		// dimhotepus: Just to honor Clang -Wswitch warning.
+	default:
+		break;
 	}
 	
 	TGAHeader_t header = {};
@@ -106,7 +110,7 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 	buffer.PutChar( header.pixel_size );
 	buffer.PutChar( header.attributes );
 
-	int nSizeInBytes = width * height * ImageLoader::SizeInBytes( dstFormat );
+	const int nSizeInBytes = width * height * ImageLoader::SizeInBytes( dstFormat );
 	buffer.EnsureCapacity( buffer.TellPut() + nSizeInBytes );
 	unsigned char *pDst = (unsigned char*)buffer.PeekPut();
 
@@ -225,14 +229,13 @@ bool WriteTGAFile( const char *fileName, int width, int height, enum ImageFormat
 	// Write out image data
 	if ( bMustConvert )
 	{
-		uint8 *pLineBuf = new uint8[ nBytesPerPixel * width ];
+		auto pLineBuf = std::make_unique<uint8[]>( nBytesPerPixel * width );
 		while( height-- )
 		{
-			ImageLoader::ConvertImageFormat( srcData, srcFormat, pLineBuf, dstFormat, width, 1 );
-			fp.Write( pLineBuf, nBytesPerPixel * width );
+			ImageLoader::ConvertImageFormat( srcData, srcFormat, pLineBuf.get(), dstFormat, width, 1 );
+			fp.Write( pLineBuf.get(), nBytesPerPixel * width );
 			srcData += nStride;
 		}
-		delete[] pLineBuf;
 	}
 	else
 	{
@@ -254,8 +257,7 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 	{
 		return false;
 	}
-	FileHandle_t fp;
-	fp = g_pFullFileSystem->Open( fileName, "r+b" );
+	FileHandle_t fp = g_pFullFileSystem->Open( fileName, "r+b" );
 
 	//
 	// Read in the targa header
@@ -281,12 +283,16 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 		nPixelSize = 8;
 		break;
 	default:
+		// dimhotepus: Do not leak file.
+		g_pFullFileSystem->Close( fp );
 		return false;
 	}
 
 	// Verify src data matches the targa we're going to write into
 	if ( nPixelSize != tgaHeader.pixel_size )
 	{
+		// dimhotepus: Do not leak file.
+		g_pFullFileSystem->Close( fp );
 		Warning( "TGA doesn't match source data.\n" );
 		return false;
 	}

@@ -100,7 +100,7 @@ void C_MortarShell::AddRisingParticles( float flPerc )
 		
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 
 		int alpha = 255 * flPerc;
 
@@ -150,7 +150,7 @@ void C_MortarShell::AddExplodingParticles( float flPerc )
 		
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 
 		int alpha = 255 * flPerc;
 

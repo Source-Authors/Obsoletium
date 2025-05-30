@@ -21,7 +21,7 @@ class CMapGroup : public CMapClass
 		
 		CMapGroup() : m_vecLogicalPosition(COORD_NOTINIT, COORD_NOTINIT) {}
 
-		const char* GetDescription(void);
+		const char* GetDescription(void) const override;
 
 		virtual CMapClass *Copy(bool bUpdateDependencies);
 		virtual CMapClass *CopyFrom(CMapClass *pFrom, bool bUpdateDependencies);
@@ -43,8 +43,8 @@ class CMapGroup : public CMapClass
 		//
 		// Serialization.
 		//
-		ChunkFileResult_t LoadVMF(CChunkFile *pFile);
-		ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+		[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
  		Vector2D m_vecLogicalPosition;	// Position in logical space
 };

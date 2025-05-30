@@ -90,7 +90,7 @@ private:
 	int				m_nCurReplayIndex;
 	bool			m_bInStartPlayback;
 	bool			m_bStopCommandEncountered;	// We only want to handle OnStopCommand() once per playback
-	float			m_flStartRenderTime;
+	double			m_flStartRenderTime;
 	bool			m_bFullSignonStateReached;
 };
 

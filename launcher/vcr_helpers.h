@@ -17,7 +17,7 @@ struct VCRHelpers : public IVCRHelpers {
 };
 
 [[nodiscard]] std::tuple<VCRHelpers, int> CreateVcrHelpers(
-    ICommandLine *command_line);
+    const ICommandLine *command_line);
 
 }  // namespace se::launcher
 

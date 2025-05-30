@@ -264,20 +264,16 @@ ConCommandBase *ConCommandBase::GetNext( void )
 //-----------------------------------------------------------------------------
 char *ConCommandBase::CopyString( const char *from )
 {
-	ptrdiff_t	len;
-	char	*to;
-
-	len = V_strlen( from );
+	intp len = V_strlen( from );
 	if ( len <= 0 )
 	{
-		to = new char[1];
-		to[0] = 0;
+		char *to = new char[1];
+		to[0] = '\0';
+		return to;
 	}
-	else
-	{
-		to = new char[len+1];
-		Q_strncpy( to, from, len+1 );
-	}
+
+	char *to = new char[len+1];
+	V_strncpy( to, from, len+1 );
 	return to;
 }
 
@@ -847,8 +843,7 @@ void ConVar::ChangeStringValue( const char *tempVal, float flOldValue )
 bool ConVar::ClampValue( float& value )
 {
 	// Competitive /should/ be more restrictive, so do it first.
-  // dimhotepus: Comment till shader_dx9 is fixed.
-	/*if ( m_bCompetitiveRestrictions )
+	if ( m_bCompetitiveRestrictions )
 	{
 		if ( m_bHasCompMin && ( value < m_fCompMinVal ) )
 		{
@@ -871,7 +866,7 @@ bool ConVar::ClampValue( float& value )
 				return true;
 			}
 		}
-	}*/
+	}
 
 	if ( m_bHasMin && ( value < m_fMinVal ) )
 	{
@@ -996,13 +991,12 @@ void ConVar::Create( const char *pName, const char *pDefaultValue, int flags /*=
 	m_bHasMax = bMax;
 	m_fMaxVal = fMax;
 
-	// dimhotepus: Comment till shader_dx9 is fixed.
-	/*m_bHasCompMin = bCompMin;
+	m_bHasCompMin = bCompMin;
 	m_fCompMinVal = fCompMin;
 	m_bHasCompMax = bCompMax;
 	m_fCompMaxVal = fCompMax;
 
-	m_bCompetitiveRestrictions = false;*/
+	m_bCompetitiveRestrictions = false;
 	
 	m_fnChangeCallback = callback;
 
@@ -1023,7 +1017,7 @@ void ConVar::Create( const char *pName, const char *pDefaultValue, int flags /*=
 //-----------------------------------------------------------------------------
 void ConVar::SetValue(const char *value)
 {
-	ConVar *var = ( ConVar * )m_pParent;
+	ConVar *var = m_pParent;
 	var->InternalSetValue( value );
 }
 
@@ -1033,7 +1027,7 @@ void ConVar::SetValue(const char *value)
 //-----------------------------------------------------------------------------
 void ConVar::SetValue( float value )
 {
-	ConVar *var = ( ConVar * )m_pParent;
+	ConVar *var = m_pParent;
 	var->InternalSetFloatValue( value );
 }
 
@@ -1043,7 +1037,7 @@ void ConVar::SetValue( float value )
 //-----------------------------------------------------------------------------
 void ConVar::SetValue( int value )
 {
-	ConVar *var = ( ConVar * )m_pParent;
+	ConVar *var = m_pParent;
 	var->InternalSetIntValue( value );
 }
 
@@ -1053,7 +1047,7 @@ void ConVar::SetValue( int value )
 void ConVar::Revert( void )
 {
 	// Force default value again
-	ConVar *var = ( ConVar * )m_pParent;
+	ConVar *var = m_pParent;
 	var->SetValue( var->m_pszDefaultValue );
 }
 
@@ -1083,59 +1077,58 @@ bool ConVar::GetMax( float& maxVal ) const
 // Input  : minVal - 
 // Output : true if there is a min set
 //-----------------------------------------------------------------------------
-// dimhotepus: Comment till shader_dx9 is fixed.
-//bool ConVar::GetCompMin( float& minVal ) const
-//{
-//	minVal = m_pParent->m_fCompMinVal;
-//	return m_pParent->m_bHasCompMin;
-//}
-//
-////-----------------------------------------------------------------------------
-//// Purpose: 
-//// Input  : maxVal - 
-////-----------------------------------------------------------------------------
-//bool ConVar::GetCompMax( float& maxVal ) const
-//{
-//	maxVal = m_pParent->m_fCompMaxVal;
-//	return m_pParent->m_bHasCompMax;
-//}
-//
-////-----------------------------------------------------------------------------
-//// Purpose: Sets that competitive mode is enabled for this var, and then 
-//// attempts to clamp to competitive values. 
-//// Input  : maxVal - 
-//// Output : true if the value was successfully updated, otherwise false.
-////-----------------------------------------------------------------------------
-//bool ConVar::SetCompetitiveMode( bool bCompetitive )
-//{
-//	// Should only do this for competitive restricted things.
-//	Assert( IsCompetitiveRestricted() );
-//
-//	ConVar* var = m_pParent;
-//
-//	var->m_bCompetitiveRestrictions = true;
-//	float fDefaultAsFloat = 0.0f;
-//
-//	bool bRequiresClamp = ( var->m_bHasCompMin && var->m_fCompMinVal > var->m_fValue )
-//					   || ( var->m_bHasCompMax && var->m_fCompMaxVal < var->m_fValue );
-//	bool bForceToDefault = !var->m_bHasCompMin && !var->m_bHasCompMax 
-//		               && ( fabs( var->m_fValue - ( fDefaultAsFloat = V_atof( var->m_pszDefaultValue ) ) ) > 0.00001f );
-//
-//	if ( bRequiresClamp )
-//		var->InternalSetFloatValue( var->m_fValue, true );
-//	else if ( bForceToDefault )
-//	{
-//		STAGING_ONLY_EXEC( Msg( "Changing Convar: %s ( cur: %.2f ) to %.2f -> ", GetName(), var->m_fValue, fDefaultAsFloat ) );
-//		var->InternalSetFloatValue( fDefaultAsFloat, true );
-//		STAGING_ONLY_EXEC( Msg( "%.2f\n", var->m_fValue ) );
-//	}
-//
-//	// The clamping should've worked, so if it didn't--need to understand why.
-//	Assert( !bRequiresClamp || IsFlagSet( FCVAR_MATERIAL_THREAD_MASK ) || ( ( !var->m_bHasCompMin || var->m_fCompMinVal <= var->m_fValue ) 
-//							  && ( !var->m_bHasCompMax || var->m_fCompMaxVal >= var->m_fValue ) ) );
-//	Assert( !bForceToDefault || IsFlagSet( FCVAR_MATERIAL_THREAD_MASK ) || ( var->m_fValue == fDefaultAsFloat ) );
-//	return true;
-//}
+bool ConVar::GetCompMin( float& minVal ) const
+{
+	minVal = m_pParent->m_fCompMinVal;
+	return m_pParent->m_bHasCompMin;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : maxVal - 
+//-----------------------------------------------------------------------------
+bool ConVar::GetCompMax( float& maxVal ) const
+{
+	maxVal = m_pParent->m_fCompMaxVal;
+	return m_pParent->m_bHasCompMax;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Sets that competitive mode is enabled for this var, and then 
+// attempts to clamp to competitive values. 
+// Input  : maxVal - 
+// Output : true if the value was successfully updated, otherwise false.
+//-----------------------------------------------------------------------------
+bool ConVar::SetCompetitiveMode( [[maybe_unused]] bool bCompetitive )
+{
+	// Should only do this for competitive restricted things.
+	Assert( IsCompetitiveRestricted() );
+
+	ConVar* var = m_pParent;
+
+	var->m_bCompetitiveRestrictions = true;
+	float fDefaultAsFloat = 0.0f;
+
+	bool bRequiresClamp = ( var->m_bHasCompMin && var->m_fCompMinVal > var->m_fValue )
+					   || ( var->m_bHasCompMax && var->m_fCompMaxVal < var->m_fValue );
+	bool bForceToDefault = !var->m_bHasCompMin && !var->m_bHasCompMax 
+		               && ( fabs( var->m_fValue - ( fDefaultAsFloat = V_atof( var->m_pszDefaultValue ) ) ) > 0.00001f );
+
+	if ( bRequiresClamp )
+		var->InternalSetFloatValue( var->m_fValue, true );
+	else if ( bForceToDefault )
+	{
+		STAGING_ONLY_EXEC( Msg( "Changing Convar: %s ( cur: %.2f ) to %.2f -> ", GetName(), var->m_fValue, fDefaultAsFloat ) );
+		var->InternalSetFloatValue( fDefaultAsFloat, true );
+		STAGING_ONLY_EXEC( Msg( "%.2f\n", var->m_fValue ) );
+	}
+
+	// The clamping should've worked, so if it didn't--need to understand why.
+	Assert( !bRequiresClamp || IsFlagSet( FCVAR_MATERIAL_THREAD_MASK ) || ( ( !var->m_bHasCompMin || var->m_fCompMinVal <= var->m_fValue ) 
+							  && ( !var->m_bHasCompMax || var->m_fCompMaxVal >= var->m_fValue ) ) );
+	Assert( !bForceToDefault || IsFlagSet( FCVAR_MATERIAL_THREAD_MASK ) || ( var->m_fValue == fDefaultAsFloat ) );
+	return true;
+}
 
 
 
@@ -1197,7 +1190,7 @@ void ConVarRef::Init( const char *pName, bool bIgnoreMissing )
 		{
 			if ( !bIgnoreMissing )
 			{
-				Warning( "ConVarRef %s doesn't point to an existing ConVar\n", pName );
+				Warning( "ConVarRef %s doesn't point to an existing ConVar.\n", pName );
 			}
 			bFirst = false;
 		}
@@ -1349,11 +1342,13 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 
 		if ( bMin )
 		{
-			ConMsg( " min. %f", fMin );
+			// dimhotepus: Drop trailing zeros.
+			ConMsg( " min. %g", fMin );
 		}
 		if ( bMax )
 		{
-			ConMsg( " max. %f", fMax );
+			// dimhotepus: Drop trailing zeros.
+			ConMsg( " max. %g", fMax );
 		}
 
 		ConMsg( "\n" );

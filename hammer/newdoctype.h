@@ -14,10 +14,12 @@
 // NewDocType.h : header file
 //
 
+#include "windows/base_dlg.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CNewDocType dialog
 
-class CNewDocType : public CDialog
+class CNewDocType : public CBaseDlg
 {
 // Construction
 public:

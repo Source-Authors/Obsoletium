@@ -53,8 +53,8 @@ struct decal_t
 	// We could put these into a separate array and reference them
 	// by index to reduce memory costs of this...
 
-	int			m_iSortTree;			// MaterialSort tree id
-	int			m_iSortMaterial;		// MaterialSort id.
+	intp		m_iSortTree;			// MaterialSort tree id
+	intp		m_iSortMaterial;		// MaterialSort id.
 };
 
 

@@ -16,15 +16,18 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories		"$BASE;..\common"
 		$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE"
+		// dimhotepus: Enable exceptions as we use them in a single place
+		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 
 	$Linker
 	{
 		$AdditionalDependencies				"$BASE odbc32.lib odbccp32.lib"
+		$EnableLargeAddresses				"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)" [$WIN32]
 	}
 }
 
-$Project "Vtex_launcher"
+$Project "vtex_launcher"
 {
 	$Folder	"Source Files"
 	{

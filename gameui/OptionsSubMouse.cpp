@@ -200,7 +200,7 @@ void COptionsSubMouse::OnTextChanged(Panel *panel)
     if ( panel == m_pMouseSensitivityLabel )
     {
         char buf[64];
-        m_pMouseSensitivityLabel->GetText(buf, 64);
+        m_pMouseSensitivityLabel->GetText(buf);
 
         float fValue;
 		int numParsed = sscanf(buf, "%f", &fValue);
@@ -215,7 +215,7 @@ void COptionsSubMouse::OnTextChanged(Panel *panel)
 	if ( panel == m_pMouseAccelExponentLabel )
 	{
 		char buf[64];
-		m_pMouseAccelExponentLabel->GetText(buf, 64);
+		m_pMouseAccelExponentLabel->GetText(buf);
 		
 		// dimhotepus: atof -> strtof
 		float fValue = strtof(buf, nullptr);

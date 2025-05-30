@@ -82,9 +82,7 @@ bool CRC_File(CRC32_t *crcvalue, const char *pszFileName)
 	byte chunk[1024];
 	int nBytesRead;
 	
-	int nSize;
-
-	nSize = COM_OpenFile(pszFileName, &fp);
+	int nSize = COM_OpenFile(pszFileName, &fp);
 	if ( !fp || ( nSize == -1 ) )
 		return FALSE;
 
@@ -106,8 +104,6 @@ bool CRC_File(CRC32_t *crcvalue, const char *pszFileName)
 		// We we are end of file, break loop and return
 		if ( g_pFileSystem->EndOfFile( fp ) )
 		{
-			g_pFileSystem->Close( fp );
-			fp = 0;
 			break;
 		}
 		// If there was a disk error, indicate failure.
@@ -328,7 +324,7 @@ bool MD5_Hash_File(unsigned char digest[16], const char *pszFileName, bool bSeed
 	if (bSeed)
 	{
 		// Seed the hash with the seed value
-		MD5Update( &ctx, (const unsigned char *)&seed[0], 16 );
+		MD5Update( &ctx, seed, 16 );
 	}
 
 	// Now read in 1K chunks
@@ -386,7 +382,7 @@ bool MD5_Hash_Buffer( unsigned char pDigest[16], const unsigned char *pBuffer, i
 	if ( bSeed )
 	{
 		// Seed the hash with the seed value
-		MD5Update( &ctx, (const unsigned char *)&seed[0], 16 );
+		MD5Update( &ctx, &seed[0], 16 );
 	}
 
 	// Now read in 1024 chunks

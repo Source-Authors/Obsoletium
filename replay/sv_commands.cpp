@@ -90,7 +90,7 @@ void PrintSessionInfo( const char *pFilename )
 	}
 
 	char szDigestStr[33];
-	V_binarytohex( header.m_aHash, sizeof( header.m_aHash ), szDigestStr, sizeof( szDigestStr ) );
+	V_binarytohex( header.m_aHash, szDigestStr );
 
 	Msg( "\n\theader:\n" );
 	Msg( "\n" );
@@ -172,7 +172,7 @@ void PrintSessionInfo( const char *pFilename )
 				break;
 			}
 
-			V_binarytohex( DummyBlock.m_aHash, sizeof( DummyBlock.m_aHash ), szDigestStr, sizeof( szDigestStr ) );
+			V_binarytohex( DummyBlock.m_aHash, szDigestStr );
 
 			Msg( "\t   %5i", DummyBlock.m_iReconstruction );
 			Msg( "%20s", CBaseRecordingSessionBlock::GetRemoteStatusStringSafe( (CBaseRecordingSessionBlock::RemoteStatus_t)DummyBlock.m_uRemoteStatus ) );

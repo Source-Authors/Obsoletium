@@ -755,12 +755,12 @@ void CMapStudioModel::SetAngles(QAngle &Angles)
 	if (pEntity != NULL)
 	{
 		char szValue[80];
-		sprintf(szValue, "%g %g %g", m_Angles[0], m_Angles[1], m_Angles[2]);
+		V_sprintf_safe(szValue, "%g %g %g", m_Angles[0], m_Angles[1], m_Angles[2]);
 		pEntity->NotifyChildKeyChanged(this, "angles", szValue);
 
 		if (m_bPitchSet)
 		{
-			sprintf(szValue, "%g", m_flPitch);
+			V_sprintf_safe(szValue, "%g", m_flPitch);
 			pEntity->NotifyChildKeyChanged(this, "pitch", szValue);
 		}
 	}
@@ -864,11 +864,14 @@ int CMapStudioModel::GetSequenceCount(void)
 // Input  : nIndex - 
 //			szName - 
 //-----------------------------------------------------------------------------
-void CMapStudioModel::GetSequenceName(int nIndex, char *szName)
+void CMapStudioModel::GetSequenceName(int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize)
 {
+	if (nameSize > 0)
+		szName[0] = '\0';
+
 	if (m_pStudioModel)
 	{
-		m_pStudioModel->GetSequenceName(nIndex, szName);
+		m_pStudioModel->GetSequenceName(nIndex, szName, nameSize);
 	}
 }
 

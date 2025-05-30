@@ -90,7 +90,7 @@ public:
 
 	int			ObjectsAt( const Vector2D &point, HitInfo_t *pObjects, int nMaxObjects, unsigned int nFlags = 0 );
 
-	CMapClass	*NearestObjectAt( const Vector2D &point, ULONG &ulFace, unsigned int nFlags = 0, VMatrix *pLocalMatrix = NULL );
+	CMapClass	*NearestObjectAt( const Vector2D &point, unsigned int &ulFace, unsigned int nFlags = 0, VMatrix *pLocalMatrix = NULL );
 		
 	void RenderPreloadObject(CMapAtom *pObject);
 

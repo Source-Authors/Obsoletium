@@ -46,7 +46,7 @@ public:
 	void Reset( int stackLevel, CUtlSymbol symName );
 
 	// Hit an error, report it and the parsing stack for context
-	void ReportError( const char *pError, ... );
+	void ReportError( PRINTF_FORMAT_STRING const char *pError, ... );
 
 	static CUtlSymbolTable& GetSymbolTable() { return m_ErrorSymbolTable; }
 
@@ -153,13 +153,13 @@ void CDmxKeyValues2ErrorStack::Reset( int stackLevel, CUtlSymbol symName )
 //-----------------------------------------------------------------------------
 // Hit an error, report it and the parsing stack for context
 //-----------------------------------------------------------------------------
-void CDmxKeyValues2ErrorStack::ReportError( const char *pFmt, ... )
+void CDmxKeyValues2ErrorStack::ReportError( PRINTF_FORMAT_STRING const char *pFmt, ... )
 {
 	char temp[2048];
 
 	va_list args;
 	va_start( args, pFmt );
-	Q_vsnprintf( temp, sizeof( temp ), pFmt, args );
+	V_vsprintf_safe( temp, pFmt, args );
 	va_end( args );
 
 	Warning( "%s(%d) : %s\n", m_pFilename, m_nFileLine, temp );
@@ -493,11 +493,11 @@ private:
 	bool UnserializeElement( CUtlBuffer &buf, DmxElementDictHandle_t *pHandle );
 
 	// Methods related to serialization
-	void SerializeArrayAttribute( CUtlBuffer& buf, CDmxAttribute *pAttribute );
-	void SerializeElementAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute );
-	void SerializeElementArrayAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute );
-	bool SerializeAttributes( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxElement *pElement );
-	bool SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxElement *pElement, bool bWriteDelimiters = true );
+	[[nodiscard]] bool SerializeArrayAttribute( CUtlBuffer& buf, CDmxAttribute *pAttribute );
+	[[nodiscard]] bool SerializeElementAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute );
+	[[nodiscard]] bool SerializeElementArrayAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute );
+	[[nodiscard]] bool SerializeAttributes( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxElement *pElement );
+	[[nodiscard]] bool SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxElement *pElement, bool bWriteDelimiters = true );
 
 	// For unserialization
 	CDmxElementDictionary m_ElementDict;
@@ -508,15 +508,16 @@ private:
 //-----------------------------------------------------------------------------
 // Serializes a single element attribute
 //-----------------------------------------------------------------------------
-void CDmxSerializerKeyValues2::SerializeElementAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute )
+bool CDmxSerializerKeyValues2::SerializeElementAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute )
 {
+	bool ok = true;
 	CDmxElement *pElement = pAttribute->GetValue< CDmxElement* >();
 	if ( dict.ShouldInlineElement( pElement ) )
 	{
 		if ( pElement )
 		{
 			buf.Printf( "\"%s\"\n{\n", pElement->GetTypeString() );
-			SaveElement( buf, dict, pElement, false );
+			ok = SaveElement( buf, dict, pElement, false );
 			buf.Printf( "}\n" );
 		}
 	}
@@ -525,23 +526,25 @@ void CDmxSerializerKeyValues2::SerializeElementAttribute( CUtlBuffer& buf, CDmxS
 		buf.Printf( "\"%s\" \"", g_pAttributeTypeName[ AT_ELEMENT ] );
 		if ( pElement )
 		{
-			::Serialize( buf, pElement->GetId() );
+			ok = ::Serialize( buf, pElement->GetId() );
 		}
 		buf.PutChar( '\"' );
 	}
+	return ok;
 }
 
 
 //-----------------------------------------------------------------------------
 // Serializes an array element attribute
 //-----------------------------------------------------------------------------
-void CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute )
+bool CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxAttribute *pAttribute )
 {
 	const CUtlVector<CDmxElement*> &array = pAttribute->GetArray< CDmxElement* >();
 
 	buf.Printf( "\n[\n" );
 	buf.PushTab();
 
+	bool ok = true;
 	intp nCount = array.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
@@ -551,7 +554,8 @@ void CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, 
 			buf.Printf( "\"%s\"\n{\n", pElement->GetTypeString() );
 			if ( pElement )
 			{
-				SaveElement( buf, dict, pElement, false );
+				// dimhotepus: Always serialize.
+				ok = SaveElement( buf, dict, pElement, false ) && ok;
 			}
 			buf.PutChar( '}' );
 		}
@@ -561,7 +565,8 @@ void CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, 
 			buf.Printf( "\"%s\" \"", pAttributeType );
 			if ( pElement )
 			{
-				::Serialize( buf, pElement->GetId() );
+				// dimhotepus: Always serialize.
+				ok = ::Serialize( buf, pElement->GetId() ) && ok;
 			}
 			buf.PutChar( '\"' );
 		}
@@ -575,20 +580,23 @@ void CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, 
 
 	buf.PopTab();
 	buf.Printf( "]" );
+
+	return ok;
 }
 
 
 //-----------------------------------------------------------------------------
 // Serializes array attributes
 //-----------------------------------------------------------------------------
-void CDmxSerializerKeyValues2::SerializeArrayAttribute( CUtlBuffer& buf, CDmxAttribute *pAttribute )
+bool CDmxSerializerKeyValues2::SerializeArrayAttribute( CUtlBuffer& buf, CDmxAttribute *pAttribute )
 {
-	int nCount = pAttribute->GetArrayCount();
+	intp nCount = pAttribute->GetArrayCount();
 
 	buf.PutString( "\n[\n" );
 	buf.PushTab();
 
-	for ( int i = 0; i < nCount; ++i )
+	bool ok = true;
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pAttribute->GetType() != AT_STRING_ARRAY )
 		{
@@ -596,7 +604,8 @@ void CDmxSerializerKeyValues2::SerializeArrayAttribute( CUtlBuffer& buf, CDmxAtt
 			buf.PushTab();
 		}
 
-		pAttribute->SerializeElement( i, buf );
+		// dimhotepus: Always serialize.
+		ok = pAttribute->SerializeElement( i, buf ) && ok;
 
 		if ( pAttribute->GetType() != AT_STRING_ARRAY )
 		{
@@ -612,6 +621,8 @@ void CDmxSerializerKeyValues2::SerializeArrayAttribute( CUtlBuffer& buf, CDmxAtt
 	}
 	buf.PopTab();
 	buf.PutChar( ']' );
+
+	return ok;
 }
 
 
@@ -629,9 +640,9 @@ static int SortAttributeByName(const void *p1, const void *p2 )
 
 bool CDmxSerializerKeyValues2::SerializeAttributes( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxElement *pElement )
 {
-	int nCount = pElement->AttributeCount();
-	CDmxAttribute **ppAttributes = (CDmxAttribute**)stackalloc( nCount * sizeof(CDmxAttribute*) );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pElement->AttributeCount();
+	CDmxAttribute **ppAttributes = stackallocT( CDmxAttribute*, nCount );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		ppAttributes[i] = pElement->GetAttribute( i );
 	}
@@ -639,7 +650,9 @@ bool CDmxSerializerKeyValues2::SerializeAttributes( CUtlBuffer& buf, CDmxSeriali
 	// Sort by name
 	qsort( ppAttributes, nCount, sizeof(CDmxAttribute*), SortAttributeByName );
 
-	for ( int i = 0; i < nCount; ++i )
+	bool ok = true;
+
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = ppAttributes[ i ];
 
@@ -660,7 +673,8 @@ bool CDmxSerializerKeyValues2::SerializeAttributes( CUtlBuffer& buf, CDmxSeriali
 		default:
 			if ( nAttrType >= AT_FIRST_ARRAY_TYPE )
 			{
-				SerializeArrayAttribute( buf, pAttribute );
+				// dimhotepus: Always serialize.
+				ok = SerializeArrayAttribute( buf, pAttribute ) && ok;
 			}
 			else
 			{
@@ -671,7 +685,8 @@ bool CDmxSerializerKeyValues2::SerializeAttributes( CUtlBuffer& buf, CDmxSeriali
 
 				buf.PutChar( '\"' );
 				buf.PushTab();
-				pAttribute->Serialize( buf );
+				// dimhotepus: Always serialize.
+				ok = pAttribute->Serialize( buf ) && ok;
 				buf.PopTab();
 				buf.PutChar( '\"' );
 			}
@@ -683,18 +698,19 @@ bool CDmxSerializerKeyValues2::SerializeAttributes( CUtlBuffer& buf, CDmxSeriali
 			break;
 
 		case AT_ELEMENT:
-			SerializeElementAttribute( buf, dict, pAttribute );
+			// dimhotepus: Always serialize.
+			ok = SerializeElementAttribute( buf, dict, pAttribute ) && ok;
 			break;
 
 		case AT_ELEMENT_ARRAY:
-			SerializeElementArrayAttribute( buf, dict, pAttribute );
+			ok = SerializeElementArrayAttribute( buf, dict, pAttribute ) && ok;
 			break;
 		}
 
 		buf.PutChar( '\n' );
 	}
 
-	return true;
+	return ok;
 }
 
 bool CDmxSerializerKeyValues2::SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary &dict, CDmxElement *pElement, bool bWriteDelimiters )
@@ -708,17 +724,20 @@ bool CDmxSerializerKeyValues2::SaveElement( CUtlBuffer& buf, CDmxSerializationDi
 	// explicitly serialize id, now that it's no longer an attribute
 	buf.Printf( "\"id\" \"%s\" ", g_pAttributeTypeName[ AT_OBJECTID ] );
 	buf.PutChar( '\"' );
-	::Serialize( buf, pElement->GetId() );
+	// dimhotepus: Honor serialize results.
+	bool ok = ::Serialize( buf, pElement->GetId() );
 	buf.PutString( "\"\n" );
 
-	SerializeAttributes( buf, dict, pElement );
+	// dimhotepus: Always serialize.
+	ok = SerializeAttributes( buf, dict, pElement ) && ok;
 
 	buf.PopTab();
 	if ( bWriteDelimiters )
 	{
 		buf.Printf( "}\n" );
 	}
-	return true;
+	// dimhotepus: Honor serialize results.
+	return ok;
 }
 
 bool CDmxSerializerKeyValues2::Serialize( CUtlBuffer &outBuf, CDmxElement *pRoot, const char *pFormatName )
@@ -732,18 +751,21 @@ bool CDmxSerializerKeyValues2::Serialize( CUtlBuffer &outBuf, CDmxElement *pRoot
 	CDmxSerializationDictionary dict;
 	dict.BuildElementList( pRoot, bFlatMode );
 
+	bool ok = true;
+
 	// Save elements to buffer
 	DmxSerializationHandle_t i;
 	for ( i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
 	{
-		SaveElement( outBuf, dict, dict.GetRootElement( i ) );
+		// dimhotepus: Always serialize.
+		ok = SaveElement( outBuf, dict, dict.GetRootElement( i ) ) && ok;
 		outBuf.PutChar( '\n' );
 	}
 
 	SetSerializationDelimiter( NULL );
 	SetSerializationArrayDelimiter( NULL );
 
-	return true;
+	return ok;
 }
 
 
@@ -753,8 +775,8 @@ bool CDmxSerializerKeyValues2::Serialize( CUtlBuffer &outBuf, CDmxElement *pRoot
 void CDmxSerializerKeyValues2::EatWhitespacesAndComments( CUtlBuffer &buf )
 {
 	// eating white spaces and remarks loop
-	int nMaxPut = buf.TellMaxPut() - buf.TellGet();
-	int nOffset = 0;
+	intp nMaxPut = buf.TellMaxPut() - buf.TellGet();
+	intp nOffset = 0;
 	while ( nOffset < nMaxPut )	
 	{
 		// Eat whitespaces, keep track of line count
@@ -809,7 +831,7 @@ CDmxSerializerKeyValues2::TokenType_t CDmxSerializerKeyValues2::ReadToken( CUtlB
 		return TOKEN_EOF;
 
 	// Compute token length and type
-	int nLength = 0;
+	intp nLength = 0;
 	TokenType_t t = TOKEN_INVALID;
 	char c = *((const char *)buf.PeekGet());
 	switch( c )
@@ -864,7 +886,7 @@ CDmxSerializerKeyValues2::TokenType_t CDmxSerializerKeyValues2::ReadToken( CUtlB
 
 	// Count the number of crs in the token + update the current line
 	const char *pMem = token.Base<const char>();
-	for ( int i = 0; i < nLength; ++i )
+	for ( intp i = 0; i < nLength; ++i )
 	{
 		if ( pMem[i] == '\n' )
 		{
@@ -983,7 +1005,7 @@ bool CDmxSerializerKeyValues2::UnserializeElementArrayAttribute( CUtlBuffer &buf
 
 		// Get the element type out
 		pConv = GetCStringCharConversion();
-		int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+		intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 		char *pElementType = (char*)stackalloc( nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pElementType, nLength );
 
@@ -1041,7 +1063,7 @@ bool CDmxSerializerKeyValues2::UnserializeAttributeValueFromToken( CDmxAttribute
 	// which is not really friendly toward delimiters, so we must pass in
 	// non-delimited buffers. Sucky. There must be a better way of doing this
 	const char *pBuf = tokenBuf.Base<const char>();
-	int nLength = tokenBuf.TellMaxPut();
+	intp nLength = tokenBuf.TellMaxPut();
 	char *pTemp = (char*)stackalloc( nLength + 1 );
 
 	bool bIsString = ( type == AT_STRING ) || ( type == AT_STRING_ARRAY );
@@ -1173,7 +1195,7 @@ bool CDmxSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 	if ( ( nAttrType == AT_OBJECTID ) && !Q_strnicmp( pAttributeName, "id", 3 ) )
 	{
 		CUtlCharConversion *pConv = GetCStringCharConversion();
-		int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+		intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 		char *pElementId = (char*)stackalloc( nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pElementId, nLength );
 
@@ -1207,7 +1229,7 @@ bool CDmxSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 		{
 			// Get the attribute value out
 			CUtlCharConversion *pConv = GetCStringCharConversion();
-			int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+			intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 			char *pAttributeValue = (char*)stackalloc( nLength * sizeof(char) );
 			tokenBuf.GetDelimitedString( pConv, pAttributeValue, nLength );
 
@@ -1252,7 +1274,7 @@ bool CDmxSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, const char *
 	TokenType_t token;
 	CUtlBuffer tokenBuf;
 	CUtlCharConversion *pConv;
-	int nLength;
+	intp nLength;
 
 	// Then we expect a '{'
 	token = ReadToken( buf, tokenBuf );
@@ -1370,7 +1392,7 @@ bool CDmxSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, DmxElementDi
 	}
 
 	pConv = GetCStringCharConversion();
-	int nLength = tokenBuf.PeekDelimitedStringLength( pConv );
+	intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
 	char *pTypeName = (char*)stackalloc( nLength * sizeof(char) );
 	tokenBuf.GetDelimitedString( pConv, pTypeName, nLength );
 

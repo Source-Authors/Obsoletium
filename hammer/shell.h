@@ -18,8 +18,8 @@ class CShell
 {
 	public:
 
-		CShell(void);
-		~CShell(void);
+		CShell();
+		~CShell() = default;
 
 		void SetDocument(CMapDoc *pDoc);
 		bool RunCommand(const char *pszCommand);

@@ -975,7 +975,7 @@ void CBaseServerVehicle::CacheEntryExitPoints( void )
 void CBaseServerVehicle::ParseEntryExitAnims( void )
 {
 	// Try and find the right animation to play in the model's keyvalues
-	KeyValues *modelKeyValues = new KeyValues("");
+	KeyValuesAD modelKeyValues("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( m_pVehicle->GetModel() ), modelinfo->GetModelKeyValueText( m_pVehicle->GetModel() ) ) )
 	{
 		// Do we have an entry section?
@@ -1016,8 +1016,6 @@ void CBaseServerVehicle::ParseEntryExitAnims( void )
 			ParseNPCRoles( pkvPassengerList );
 		}
 	}
-
-	modelKeyValues->deleteThis();
 
 	// Determine the entry and exit points for the 
 	CacheEntryExitPoints();

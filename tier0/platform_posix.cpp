@@ -138,7 +138,8 @@ static void InitTimeSystem( void )
 				if ( pEnv && ( ( pEnv[0] > '9' ) || ( pEnv[0] < '0' ) ) )
 					return;									// leave rdtsc disabled
 				// the variable holds the number of ticks per microsecond
-				s_flRDTSCToMicroSeconds = atof( pEnv );
+				// dimhotepus: atof -> strtof.
+				s_flRDTSCToMicroSeconds = strtof( pEnv, nullptr );
 				// sanity check
 				if ( s_flRDTSCToMicroSeconds > 1.0 )
 				{
@@ -512,8 +513,8 @@ void Plat_DebugString( const char * psz )
 static char g_CmdLine[ 2048 ];
 PLATFORM_INTERFACE void Plat_SetCommandLine( const char *cmdLine )
 {
-	strncpy( g_CmdLine, cmdLine, sizeof(g_CmdLine) );
-	g_CmdLine[ sizeof(g_CmdLine) -1 ] = 0;
+	strncpy( g_CmdLine, cmdLine, std::size(g_CmdLine) );
+	g_CmdLine[ std::size(g_CmdLine) -1 ] = '\0';
 }
 
 PLATFORM_INTERFACE const tchar *Plat_GetCommandLine()
@@ -1063,9 +1064,8 @@ void DumpMemoryLog( int nThresh )
 
 	std::sort( memList.begin(), memList.end(), SortLessFunc );
 	
-	for( int i = 0; i < memList.size(); i++ )
+	for( auto *p : memList )
 	{
-		CLinuxMallocContext *p = memList[i];
 		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
 		Msg( "Context cursize=%d nallocs=%d maxsize=%d total_allocs=%d\n", p->m_nCurrentAllocSize, p->m_nNumAllocsInUse, p->m_nMaximumSize, p->m_TotalNumAllocs );
 		Msg("  stack\n" );
@@ -1097,9 +1097,8 @@ void DumpChangedMemory( int nThresh )
 	}
 
 	std::sort( memList.begin(), memList.end(), SortLessFunc );
-	for( int i = 0; i < memList.size(); i++ )
+	for( auto *p : memList )
 	{
-		CLinuxMallocContext *p = memList[i];
 		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
 		Msg( "Context cursize=%d lastsize=%d nallocs=%d maxsize=%d total_allocs=%d\n", p->m_nCurrentAllocSize, p->m_nLastAllocSize, p->m_nNumAllocsInUse, p->m_nMaximumSize, p->m_TotalNumAllocs );
 		Msg("  stack\n" );

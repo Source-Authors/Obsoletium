@@ -15,17 +15,14 @@
 // NOTE: This has to be the last file included
 #include "tier0/memdbgon.h"
 
-//static float			texLightToLinear[256];	// texlight (0..255) to linear (0..4)
 static float			textureToLinear[256];	// texture (0..255) to linear (0..1)
-static int				linearToTexture[1024];	// linear (0..1) to texture (0..255)
-static int				linearToScreen[1024];	// linear (0..1) to gamma corrected vertex light (0..255)
 float					g_LinearToVertex[4096];	// linear (0..4) to screen corrected vertex space (0..1?)
 static int				linearToLightmap[4096];	// linear (0..4) to screen corrected texture value (0..255)
 
 void ColorSpace::SetGamma( float screenGamma, float texGamma, 
 						   float overbright, bool allowCheats, bool linearFrameBuffer )
 {
-	int		i, inf;
+	int		i;
 	float	g1, g3;
 	float	g;
 	float	brightness = 0.0f; // This used to be configurable. . hardcode to 0.0
@@ -68,57 +65,12 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 		g3 = 0.125f - (brightness * brightness) * 0.075f;
 	}
 
-	for (i=0 ; i<1024 ; i++)
-	{
-		float f;
-
-		f = i / 1023.0f;
-
-		// scale up
-		if (brightness > 1.0f)
-			f = f * brightness;
-
-		// shift up
-		if (f <= g3)
-			f = (f / g3) * 0.125f;
-		else 
-			f = 0.125f + ((f - g3) / (1.0f - g3)) * 0.875f;
-
-		// convert linear space to desired gamma space
-		inf = ( int )( 255 * powf ( f, g ) );
-
-		if (inf < 0)
-			inf = 0;
-		if (inf > 255)
-			inf = 255;
-		linearToScreen[i] = inf;
-	}
-
 	for (i=0 ; i<256 ; i++)
 	{
 		// convert from nonlinear texture space (0..255) to linear space (0..1)
 		textureToLinear[i] =  powf( i / 255.0f, texGamma );
 	}
 
-	for (i=0 ; i<1024 ; i++)
-	{
-		// convert from linear space (0..1) to nonlinear texture space (0..255)
-		linearToTexture[i] =  ( int )( powf( i / 1023.0f, 1.0f / texGamma ) * 255 );
-	}
-
-#if 0
-	for (i=0 ; i<256 ; i++)
-	{
-		float f;
-
-		// convert from nonlinear lightmap space (0..255) to linear space (0..4)
-		f =  ( float )( (i / 255.0f) * sqrt( 4 ) );
-		f = f * f;
-
-		texLightToLinear[i] = f;
-	}
-#endif
-	
 	float f, overbrightFactor;
 	
 	// Can't do overbright without texcombine
@@ -167,25 +119,11 @@ float ColorSpace::TextureToLinear( int c )
 	return textureToLinear[c];
 }
 
-// convert texture to linear 0..1 value
-int ColorSpace::LinearToTexture( float f )
-{
-	int i = ( int )( f * 1023.0f );	// assume 0..1 range
-	return linearToTexture[ std::clamp(i, 0, 1023) ];
-}
-
 float ColorSpace::TexLightToLinear( int c, int exponent )
 {
 //	return texLightToLinear[ c ];
 	// optimize me
 	return ( float )c * powf( 2.0f, exponent ) * ( 1.0f / 255.0f );
-}
-
-// converts 0..1 linear value to screen gamma (0..255)
-int ColorSpace::LinearToScreenGamma( float f )
-{
-	int i = ( int )( f * 1023.0f );	// assume 0..1 range
-	return linearToScreen[ std::clamp( i, 0, 1023 ) ];
 }
 
 uint16 ColorSpace::LinearFloatToCorrectedShort( float in )

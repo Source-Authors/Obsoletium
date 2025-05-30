@@ -128,7 +128,7 @@ void CActBusyAnimData::LevelShutdownPostEntity( void )
 //-----------------------------------------------------------------------------
 void CActBusyAnimData::ParseAnimDataFile( void )
 {
-	KeyValues *pKVAnimData = new KeyValues( "ActBusyAnimDatafile" );
+	KeyValuesAD pKVAnimData( "ActBusyAnimDatafile" );
 	if ( pKVAnimData->LoadFromFile( filesystem, "scripts/actbusy.txt" ) )
 	{
 		// Now try and parse out each act busy anim
@@ -146,7 +146,6 @@ void CActBusyAnimData::ParseAnimDataFile( void )
 			pKVAnim = pKVAnim->GetNextKey();
 		}
 	}
-	pKVAnimData->deleteThis();
 }	
 
 //-----------------------------------------------------------------------------

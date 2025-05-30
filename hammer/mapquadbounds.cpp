@@ -118,19 +118,19 @@ void CMapQuadBounds::PresaveWorld(void)
 		} 
 
 		static char buf[64];
-		sprintf( buf, "%g %g %g", (double)m_vLowerLeft[0], (double)m_vLowerLeft[1], (double)m_vLowerLeft[2] );
+		V_sprintf_safe( buf, "%g %g %g", (double)m_vLowerLeft[0], (double)m_vLowerLeft[1], (double)m_vLowerLeft[2] );
 		pMapEntity->SetKeyValue( "lowerleft", buf );
 
-		sprintf( buf, "%g %g %g", (double)m_vUpperLeft[0], (double)m_vUpperLeft[1], (double)m_vUpperLeft[2] );
+		V_sprintf_safe( buf, "%g %g %g", (double)m_vUpperLeft[0], (double)m_vUpperLeft[1], (double)m_vUpperLeft[2] );
 		pMapEntity->SetKeyValue( "upperleft", buf );
 
-		sprintf( buf, "%g %g %g", (double)m_vLowerRight[0], (double)m_vLowerRight[1], (double)m_vLowerRight[2] );
+		V_sprintf_safe( buf, "%g %g %g", (double)m_vLowerRight[0], (double)m_vLowerRight[1], (double)m_vLowerRight[2] );
 		pMapEntity->SetKeyValue( "lowerright", buf );
 
-		sprintf( buf, "%g %g %g", (double)m_vUpperRight[0], (double)m_vUpperRight[1], (double)m_vUpperRight[2] );
+		V_sprintf_safe( buf, "%g %g %g", (double)m_vUpperRight[0], (double)m_vUpperRight[1], (double)m_vUpperRight[2] );
 		pMapEntity->SetKeyValue( "upperright", buf );
 
-		sprintf( buf, "%i", m_nError);
+		V_sprintf_safe( buf, "%i", m_nError);
 		pMapEntity->SetKeyValue( "error", buf );
 
 	}

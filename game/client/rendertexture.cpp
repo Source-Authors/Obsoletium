@@ -235,7 +235,7 @@ ITexture *GetTeenyTexture( int which )
 	if ( !s_TeenyTextures[which] )
 	{
 		char nbuf[20];
-		sprintf( nbuf, "_rt_TeenyFB%d", which );
+		V_sprintf_safe( nbuf, "_rt_TeenyFB%d", which );
 		s_TeenyTextures[which].Init( materials->FindTexture( nbuf, TEXTURE_GROUP_RENDER_TARGET ) );
 		Assert( !IsErrorTexture( s_TeenyTextures[which] ) );
 		AddReleaseFunc();

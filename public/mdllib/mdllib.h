@@ -25,7 +25,7 @@ abstract_class IMdlStripInfo;
 //-----------------------------------------------------------------------------
 // Purpose: Interface to accessing model data operations
 //-----------------------------------------------------------------------------
-#define MDLLIB_INTERFACE_VERSION		"VMDLLIB001"
+constexpr inline char MDLLIB_INTERFACE_VERSION[]{"VMDLLIB001"};
 
 abstract_class IMdlLib : public IAppSystem
 {

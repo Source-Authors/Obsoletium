@@ -260,11 +260,11 @@ void CVTFPreviewPanel::PaintVolumeTexture( void )
 //-----------------------------------------------------------------------------
 void CVTFPreviewPanel::PaintCubeTexture( void )
 {
-	float flNewTime = Plat_FloatTime();
+	double flNewTime = Plat_FloatTime();
 
 	// Circle the camera around the origin
 	VMatrix rot;
-	MatrixBuildRotateZ( rot, ROTATION_SPEED * (flNewTime - m_flLastRotationTime ) );
+	MatrixBuildRotateZ( rot, ROTATION_SPEED * static_cast<float>(flNewTime - m_flLastRotationTime ) );
 	Vector vecTemp;
 	Vector3DMultiply( rot, m_vecCameraDirection, vecTemp );
 	m_vecCameraDirection = vecTemp;

@@ -17,7 +17,7 @@
 
 
 #ifndef INCLUDED_MXWINDOW
-#include "mxtk/mxWindow.h"
+#include "mxtk/mxwindow.h"
 #endif
 
 
@@ -48,7 +48,7 @@ public:
 	void setDrawFunc (void (*func) (void));
 
 	// STATIC MANIPULATORS
-	static void setFormat (int mode, int colorBits, int depthBits);
+	static void setFormat (int mode, unsigned char colorBits, unsigned char depthBits);
 
 private:
 	// NOT IMPLEMENTED

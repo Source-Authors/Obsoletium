@@ -40,11 +40,15 @@ void CTGAPreviewPanel::SetTGA( const char *pFullPath )
 	CUtlBuffer buf;
 	if ( !g_pFullFileSystem->ReadFile( pFullPath, NULL, buf ) )
 	{
-		Warning( "Can't open TGA file: %s\n", pFullPath );
+		Warning( "Can't open TGA file: '%s'.\n", pFullPath );
 		return;
 	}
 
-	TGALoader::GetInfo( buf, &nWidth, &nHeight, &format, &flGamma );
+	if ( !TGALoader::GetInfo( buf, &nWidth, &nHeight, &format, &flGamma ) )
+	{
+		Warning( "TGA file '%s' is broken or not in supported format.\n", pFullPath );
+		return;
+	}
 
 	Shutdown();
 	Init( nWidth, nHeight, true );

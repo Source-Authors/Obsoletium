@@ -350,10 +350,10 @@ const char *CModelPanel::GetModelName( void )
 	if ( UseHWMorphModels() )
 	{
 		// do we have a valid HWM model filename
-		if ( m_pModelInfo->m_pszModelName_HWM && ( !Q_isempty( m_pModelInfo->m_pszModelName_HWM ) ) )
+		if ( !Q_isempty( m_pModelInfo->m_pszModelName_HWM ) )
 		{
 			// does the file exist
-			model_t *pModel = (model_t *)engine->LoadModel( m_pModelInfo->m_pszModelName_HWM );
+			const model_t *pModel = engine->LoadModel( m_pModelInfo->m_pszModelName_HWM );
 			if ( pModel )
 			{
 				return m_pModelInfo->m_pszModelName_HWM;

@@ -334,7 +334,7 @@ void CNPC_MissileDefense::Gib(void)
 		g_pEffects->Sparks(sparkPos);
 	}
 	// Smoke
-	UTIL_Smoke(GetAbsOrigin(), random->RandomInt(10, 15), 10);
+	UTIL_Smoke(GetAbsOrigin(), random->RandomFloat(10, 15), 10);
 
 	// Light
 	CBroadcastRecipientFilter filter;

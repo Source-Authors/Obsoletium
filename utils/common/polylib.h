@@ -60,7 +60,7 @@ winding_t	*BaseWindingForPlane (const Vector &normal, vec_t dist);
 void	CheckWinding (winding_t *w);
 void	WindingPlane (winding_t *w, Vector &normal, vec_t *dist);
 void	RemoveColinearPoints (winding_t *w);
-int		WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist);
+SideType	WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist);
 void	FreeWinding (winding_t *w);
 void	WindingBounds (winding_t *w, Vector &mins, Vector &maxs);
 

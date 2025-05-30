@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include "checksum_crc.h"
+#include "tier1/checksum_crc.h"
 
 #include "tier0/basetypes.h"
 #include "tier0/platform.h"
@@ -100,12 +100,12 @@ CRC32_t	CRC32_GetTableEntry( unsigned int slot )
 	return pulCRCTable[(unsigned char)slot];
 }
 
-void CRC32_ProcessBuffer(CRC32_t *pulCRC, const void *pBuffer, int nBuffer)
+void CRC32_ProcessBuffer(CRC32_t *pulCRC, IN_BYTECAP(nBuffer) const void *pBuffer, intp nBuffer)
 {
 	CRC32_t ulCrc = *pulCRC;
 	unsigned char *pb = (unsigned char *)pBuffer;
     unsigned int nFront;
-    int nMain;
+    intp nMain;
 
 JustAfew:
 
@@ -113,12 +113,15 @@ JustAfew:
     {
     case 7:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 6:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 5:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 4:
         ulCrc ^= LittleLong( *(CRC32_t *)pb );
@@ -131,12 +134,15 @@ JustAfew:
 
     case 3:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 2:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 1:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
 
     case 0:
 		*pulCRC = ulCrc;
@@ -155,8 +161,10 @@ JustAfew:
     {
     case 3:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
     case 2:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
+        [[fallthrough]];
     case 1:
         ulCrc  = pulCRCTable[*pb++ ^ (unsigned char)ulCrc] ^ (ulCrc >> 8);
     }

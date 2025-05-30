@@ -118,10 +118,8 @@ public:
 	virtual bool DeleteImage( const char *pImageName ) = 0;
 };
 
-#define VGUI_SCHEME_INTERFACE_VERSION "VGUI_Scheme010"
-
-
 } // namespace vgui
 
+constexpr inline char VGUI_SCHEME_INTERFACE_VERSION[]{"VGUI_Scheme011"};
 
 #endif // ISCHEME_H

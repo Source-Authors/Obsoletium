@@ -16,18 +16,13 @@ static CUtlDict<int,int> *g_RTDict = 0;
 char* AllocateStringHelper2( const char *pFormat, va_list marker )
 {
 	char str[512];
-	_vsnprintf( str, sizeof( str ), pFormat, marker );
-	str[ std::size(str) - 1 ] = 0;
+	V_vsprintf_safe( str, pFormat, marker );
 	
-	size_t len = strlen( str ) + 1;
-	char *pRet = new char[len];
-	memcpy( pRet, str, len );
-
-	return pRet;
+	return V_strdup( str );
 }
 
 
-char* AllocateStringHelper( const char *pFormat, ... )
+char* AllocateStringHelper( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list marker;
 	va_start( marker, pFormat );
@@ -38,7 +33,7 @@ char* AllocateStringHelper( const char *pFormat, ... )
 }
 
 
-char* AllocateUniqueDataTableName( bool bSendTable, const char *pFormat, ... )
+char* AllocateUniqueDataTableName( bool bSendTable, PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	// Setup the string.
 	va_list marker;

@@ -46,15 +46,11 @@
 #include "tier1/utlstring.h"
 #include "tier1/UtlSortVector.h"
 #include "tier1/utldict.h"
-#include "basefilesystem.h"
 #include "tier0/icommandline.h"
 #include "vstdlib/jobthread.h"
 #include "filesystem/IQueuedLoader.h"
 #include "tier2/tier2.h"
-#include "characterset.h"
-#if !defined( _X360 )
-#include "xbox/xboxstubs.h"
-#endif
+#include "tier1/characterset.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -94,8 +90,8 @@ struct FileJob_t
 	unsigned int			m_nStartOffset;
 	LoaderPriority_t		m_Priority;
 
-	unsigned int			m_SubmitTime;
-	unsigned int			m_FinishTime;
+	unsigned long long		m_SubmitTime;
+	unsigned long long		m_FinishTime;
 	int						m_SubmitTag;
 	int						m_nActualBytesRead;
 	LoaderError_t			m_LoaderError;
@@ -123,10 +119,6 @@ class CQueuedLoader : public CTier2AppSystem< IQueuedLoader >
 public:
 	CQueuedLoader();
 	virtual ~CQueuedLoader();
-
-	// Inherited from IAppSystem
-	virtual InitReturnVal_t				Init();
-	virtual void						Shutdown();
 
 	// IQueuedLoader
 	virtual void						InstallLoader( ResourcePreload_t type, IResourcePreload *pLoader );
@@ -198,8 +190,8 @@ private:
 	bool								m_bDoProgress;
 	bool								m_bSameMap;
 	int									m_nSubmitCount;
-	unsigned int						m_StartTime;
-	unsigned int						m_EndTime;
+	unsigned long long					m_StartTime;
+	unsigned long long					m_EndTime;
 	char								m_szMapNameToCompareSame[MAX_PATH];
 
 	DynamicResourceCallback_t			m_pfnDynamicCallback;
@@ -402,7 +394,7 @@ void CQueuedLoader::BuildMaterialResources( IResourcePreload *pLoader, ResourceL
 				// same cubemap material base already processed, skip it
 				continue;
 			}
-			V_strncpy( szLastFilename, pFilename, sizeof( szLastFilename ) );		
+			V_strcpy_safe( szLastFilename, pFilename );
 
 			strcat( pFilename, ".vmt" );
 			FileNameHandle_t hFilename = g_QueuedLoader.FindFilename( pFilename );
@@ -521,7 +513,8 @@ void IOComputationJob( FileJob_t *pFileJob, void *pData, int nSize, LoaderError_
 
 	// mark as completed
 	pFileJob->m_bFinished = true;
-	pFileJob->m_FinishTime = Plat_MSTime();
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	pFileJob->m_FinishTime = Plat_USTime();
 	pFileJob->m_ThreadId = ThreadGetCurrentId();
 
 	if ( pFileJob->m_Priority == LOADERPRIORITY_DURINGPRELOAD )
@@ -678,13 +671,6 @@ bool CQueuedLoader::CResourceNameLessFunc::Less( const FileNameHandle_t &hFilena
 int CQueuedLoader::CFileJobsLessFunc::GetLayoutOrderForFilename( const char *pFilename )
 {
 	bool bIsLocalizedZip = false;
-	if ( XBX_IsLocalized() )
-	{
-		if ( V_stristr( pFilename, "\\zip" ) && V_stristr( pFilename, XBX_GetLanguageString() ) )
-		{
-			bIsLocalizedZip = true;
-		}
-	}
 
 	int order;
 	if ( V_stristr( pFilename, "\\maps\\" ) )
@@ -819,7 +805,8 @@ void CQueuedLoader::SubmitPendingJobs()
 		FileJob_t *pFileJob = sortedFiles[i];
 		
 		pFileJob->m_SubmitTag = m_nSubmitCount;
-		pFileJob->m_SubmitTime = Plat_MSTime();
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		pFileJob->m_SubmitTime = Plat_USTime();
 
 		m_SubmittedJobs.AddToTail( pFileJob );
 
@@ -903,12 +890,12 @@ bool CQueuedLoader::AddJob( const LoaderJob_t *pLoaderJob )
 	bool bFileIsFromBSP;
 	bool bExists = false;
 
-	char *pFullPath;
+	const char *pFullPath;
 	char szFullPath[MAX_PATH];
 	if ( V_IsAbsolutePath( pLoaderJob->m_pFilename ) )
 	{
 		// an absolute path is trusted, take as is
-		pFullPath = (char *)pLoaderJob->m_pFilename;
+		pFullPath = pLoaderJob->m_pFilename;
 		bFileIsFromBSP = V_stristr( pFullPath, ".bsp" ) != NULL;
 		bExists = true;
 	}
@@ -919,7 +906,7 @@ bool CQueuedLoader::AddJob( const LoaderJob_t *pLoaderJob )
 		PathTypeFilter_t pathFilter = FILTER_NONE;
 
 		PathTypeQuery_t pathType;
-		g_pFullFileSystem->RelativePathToFullPath( pLoaderJob->m_pFilename, pLoaderJob->m_pPathID, szFullPath, sizeof( szFullPath ), pathFilter, &pathType );
+		g_pFullFileSystem->RelativePathToFullPath_safe( pLoaderJob->m_pFilename, pLoaderJob->m_pPathID, szFullPath, pathFilter, &pathType );
 		bExists = V_IsAbsolutePath( szFullPath );
 		pFullPath = szFullPath;
 		bFileIsFromBSP = ( (pathType & PATH_IS_MAPPACKFILE) != 0 );
@@ -1198,7 +1185,7 @@ void CQueuedLoader::PurgeQueue()
 }
 
 //-----------------------------------------------------------------------------
-// Spew info abut queued load
+// Spew info about queued load
 //-----------------------------------------------------------------------------
 void CQueuedLoader::SpewInfo()
 {
@@ -1216,7 +1203,8 @@ void CQueuedLoader::SpewInfo()
 		{
 			FileJob_t *pFileJob = m_SubmittedJobs[iIndex];	
 
-			int asyncDuration = -1;
+			// dimhotepus: Use mcs as ms overflows in 49.7 days.
+			auto asyncDuration = std::numeric_limits<unsigned long long>::max();
 			if ( pFileJob->m_FinishTime )
 			{
 				asyncDuration = pFileJob->m_FinishTime - pFileJob->m_SubmitTime;
@@ -1243,7 +1231,7 @@ void CQueuedLoader::SpewInfo()
 			const char *pAnonymousStatus = "";
 			if ( !pFileJob->m_pCallback )
 			{
-				V_snprintf( szAnonymousString, sizeof( szAnonymousString ), "(%s) ", pFileJob->m_bClaimed ? "Claimed" : "Unclaimed" );
+				V_sprintf_safe( szAnonymousString, "(%s) ", pFileJob->m_bClaimed ? "Claimed" : "Unclaimed" );
 				pAnonymousStatus = szAnonymousString;
 			
 				if ( pFileJob->m_bClaimed )
@@ -1257,9 +1245,9 @@ void CQueuedLoader::SpewInfo()
 			}
 
 			char szFilename[MAX_PATH];
-			Msg( "Submit:%5dms AsyncDuration:%5dms Tag:%d Thread:%8.8x Size:%7d %s%s\n", 
-					pFileJob->m_SubmitTime - m_StartTime, 
-					asyncDuration, 
+			Msg( "Submit:%5llums AsyncDuration:%5lldms Tag:%d Thread:%8.8x Size:%7d %s%s\n", 
+					(pFileJob->m_SubmitTime - m_StartTime) / 1000, 
+					static_cast<long long>(asyncDuration != std::numeric_limits<unsigned long long>::max() ? asyncDuration / 1000 : -1), 
 					pFileJob->m_SubmitTag,
 					pFileJob->m_ThreadId,
 					pFileJob->m_nActualBytesRead,
@@ -1280,30 +1268,8 @@ void CQueuedLoader::SpewInfo()
 	Msg( "  Total Anonymous Unclaimed: %d\n", totalUnclaimed );
 	if ( m_EndTime )
 	{
-		Msg( "Queuing Duration: %dms\n", m_EndTime - m_StartTime );
+		Msg( "Queuing Duration: %llums\n", (m_EndTime - m_StartTime) / 1000 );
 	}
-}
-
-//-----------------------------------------------------------------------------
-// Initialization
-//-----------------------------------------------------------------------------
-InitReturnVal_t CQueuedLoader::Init()
-{
-	InitReturnVal_t nRetVal = BaseClass::Init();
-	if ( nRetVal != INIT_OK )
-	{
-		return nRetVal;
-	}
-
-	return INIT_OK; 
-}
-
-//-----------------------------------------------------------------------------
-// Shutdown
-//-----------------------------------------------------------------------------
-void CQueuedLoader::Shutdown()
-{
-	BaseClass::Shutdown();
 }
 
 //-----------------------------------------------------------------------------
@@ -1514,7 +1480,7 @@ void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{
-		int nTokenSize = resourceList.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+		intp nTokenSize = resourceList.ParseToken( &breakSet, szToken );
 		if ( nTokenSize <= 0 )
 		{
 			break;
@@ -1550,148 +1516,7 @@ void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 //-----------------------------------------------------------------------------
 bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, bool bOptimizeMapReload )
 {
-	if ( IsPC() )
-	{
-		return false;
-	}
-
-	if ( CommandLine()->FindParm( "-noqueuedload" ) || ( g_pFullFileSystem->GetDVDMode() != DVDMODE_STRICT ) )
-	{
-		return false;
-	}
-
-	if ( m_bStarted )
-	{
-		// already started, shouldn't be started more than once
-		Assert( 0 );
-		return true;
-	}
-
-	COM_TimestampedLog( "CQueuedLoader::BeginMapLoading" );
-
-	// set the IO throttle markers based on available memory
-	// these safety watermarks throttle the i/o from flooding memory, when the cores cannot keep up
-	// the delta must be larger than any single operation, otherwise deadlock
-	// markers that are too close will cause excessive suspension
-	size_t usedMemory, freeMemory;
-	MemAlloc_GlobalMemoryStatus( &usedMemory, &freeMemory );
-	if ( freeMemory >= 64*1024*1024 )
-	{
-		// lots of available memory, can afford to have let the i/o get ahead
-		g_nHighIOSuspensionMark = 10*1024*1024;
-		g_nLowIOSuspensionMark = 2*1024*1024;
-	}
-	else
-	{
-		// low memory, suspend the i/o more frequently 
-		g_nHighIOSuspensionMark = 5*1024*1024;
-		g_nLowIOSuspensionMark = 1*1024*1024;
-	}
-
-	if ( GetSpewDetail() )
-	{
-		Msg( "QueuedLoader: Suspend I/O at [%.2f,%.2f] MiB\n", (float)g_nLowIOSuspensionMark/(1024.0f*1024.0f), (float)g_nHighIOSuspensionMark/(1024.0f*1024.0f) );
-	}
-
-	m_bStarted = true;
-	m_bDynamic = false;
-	m_bLoadForHDR = bLoadForHDR;
-
-	// map pak will be accessed asynchronously throughout loading and into game frame
-	g_pFullFileSystem->BeginMapAccess();
-
-	// remove any prior stale entries
-	CleanQueue();
-	Assert( m_SubmittedJobs.Count() == 0 && g_nActiveJobs == 0 && g_nQueuedJobs == 0 );
-
-	m_bActive = true;
-	m_nSubmitCount = 0;
-	m_StartTime = Plat_MSTime();
-	m_EndTime = 0;
-	m_bCanBatch = false;
-	m_bBatching = false;
-	m_bDoProgress = false;
-
-	g_nIOMemory = 0;
-	g_nAnonymousIOMemory = 0;
-	g_nIOMemoryPeak = 0;
-	g_nAnonymousIOMemoryPeak = 0;
-
-	m_bSameMap = bOptimizeMapReload && ( V_stricmp( pMapName, m_szMapNameToCompareSame ) == 0 );
-	if ( m_bSameMap )
-	{
-		// Data will persist (so reloading a map is v. fast)
-	}
-	else
-	{
-		// Full load of the new map's data
-		V_strncpy( m_szMapNameToCompareSame, pMapName, sizeof( m_szMapNameToCompareSame ) );
-	}	
-
-	m_pProgress->BeginProgress();
-	m_pProgress->UpdateProgress( PROGRESS_START );
-
-	// load this map's resource list before any other i/o
-	char szBaseName[MAX_PATH];
-	char szFilename[MAX_PATH];
-	V_FileBase( pMapName, szBaseName, sizeof( szBaseName ) );
-	V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s%s.lst", szBaseName, GetPlatformExt() );
-
-	MEM_ALLOC_CREDIT();
-
-	CUtlBuffer resListBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
-	if ( !g_pFullFileSystem->ReadFile( szFilename, "GAME", resListBuffer, 0, 0 ) )
-	{
-		// very bad, a valid reslist is critical
-		DevWarning( "QueuedLoader: Failed to get reslist '%s', Non-Optimal Loading.\n", szFilename );
-		m_bActive = false;
-		return false;
-	}
-
-	if ( XBX_IsLocalized() )
-	{
-		// find optional localized reslist fixup
-		V_snprintf( szFilename, sizeof( szFilename ), "reslists_xbox/%s%s.lst", XBX_GetLanguageString(), GetPlatformExt() );
-		CUtlBuffer localizedBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
-		if ( g_pFullFileSystem->ReadFile( szFilename, "GAME", localizedBuffer, 0, 0 ) )
-		{
-			// append it
-			resListBuffer.EnsureCapacity( resListBuffer.TellPut() + localizedBuffer.TellPut() );
-			resListBuffer.Put( localizedBuffer.PeekGet(), localizedBuffer.TellPut() );
-		}
-	}
-
-	m_pProgress->UpdateProgress( PROGRESS_GOTRESLIST );
-
-	// due to its size, the bsp load is a lengthy i/o operation
-	// this causes a non-batched async i/o operation to commence immediately
-	if ( !m_pLoaders[RESOURCEPRELOAD_MODEL]->CreateResource( pMapName ) )
-	{
-		// very bad, a valid bsp is critical
-		DevWarning( "QueuedLoader: Failed to mount BSP '%s', Non-Optimal Loading.\n", pMapName );
-		m_bActive = false;
-		return false;
-	}
-
-	// parse the raw resource list into loader specific dictionaries
-	ParseResourceList( resListBuffer );
-		
-	// run the distributed precache loaders, generating a batch of i/o requests
-	GetJobRequests();
-
-	// event each loader to discard dead resources
-	PurgeUnreferencedResources();
-
-	// sort and start async fulfilling the i/o requests
-	// waits for all "must complete" jobs to finish
-	SubmitBatchedJobsAndWait();
-
-	// progress is only relevant during preload
-	// normal load process takes over any progress bar
-	// disable progress tracking to prevent any late queued operation from updating
-	m_pProgress->EndProgress();
-
-	return m_bActive;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1699,75 +1524,6 @@ bool CQueuedLoader::BeginMapLoading( const char *pMapName, bool bLoadForHDR, boo
 //-----------------------------------------------------------------------------
 void CQueuedLoader::EndMapLoading( bool bAbort )
 {
-	if ( !m_bStarted )
-	{
-		// already stopped or never started
-		return;
-	}
-
-	/////////////////////////////////////////////////////
-	// TBD: Cannot abort!!!! feature has not been done //
-	/////////////////////////////////////////////////////
-	bAbort = false;
-
-	if ( m_bActive )
-	{
-		if ( bAbort )
-		{
-			PurgeQueue();
-		}
-		else
-		{
-			// finish all outstanding priority jobs
-			SubmitPendingJobs();
-			while ( g_nHighPriorityJobs != 0 || g_nJobsToFinishBeforePlay != 0 )
-			{
-				// yield some time
-				g_pThreadPool->Yield( MAIN_THREAD_YIELD_TIME );
-			}
-		}
-
-		m_EndTime = Plat_MSTime();
-		m_bActive = false;
-
-		// transmit the end map event
-		for ( int i = RESOURCEPRELOAD_UNKNOWN+1; i < RESOURCEPRELOAD_COUNT; i++ )
-		{
-			if ( m_pLoaders[i] )
-			{
-				m_pLoaders[i]->OnEndMapLoading( bAbort );
-			}
-		}
-
-		// free any unclaimed anonymous buffers
-		auto iIndex = m_AnonymousJobs.First();
-		while ( iIndex != m_AnonymousJobs.InvalidIndex() )
-		{
-			FileJob_t *pFileJob = m_AnonymousJobs[iIndex];	
-			if ( pFileJob->m_bFreeTargetAfterIO && pFileJob->m_pTargetData )
-			{
-				g_pFullFileSystem->FreeOptimalReadBuffer( pFileJob->m_pTargetData );
-				pFileJob->m_pTargetData = NULL;
-			}
-			g_nAnonymousIOMemory -= pFileJob->m_nActualBytesRead;
-			iIndex = m_AnonymousJobs.Next( iIndex );
-		}
-		m_AnonymousJobs.Purge();
-
-		if ( g_nIOMemory || g_nAnonymousIOMemory )
-		{
-			// expected to be zero, otherwise logic flaw
-			DevWarning( "CQueuedLoader: Unclaimed I/O memory: total:%d anonymous:%d\n", (int)g_nIOMemory, (int)g_nAnonymousIOMemory );
-			g_nIOMemory = 0;
-			g_nAnonymousIOMemory = 0;
-		}
-
-		// no longer needed
-		m_AdditionalResources.RemoveAll();
-	}
-
-	g_pFullFileSystem->EndMapAccess();
-	m_bStarted = false;
 }
 
 //-----------------------------------------------------------------------------

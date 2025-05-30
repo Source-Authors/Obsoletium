@@ -787,7 +787,8 @@ void CLightingPreviewThread::SendVectorMatrixAsRendering( CSIMDVectorMatrix cons
 // master side of lighting preview
 unsigned LightingPreviewThreadFN( void *thread_start_arg )
 {
-	CLightingPreviewThread LPreviewObject;
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("LightingPreview");
 	ThreadSetPriority( -2 );								// low
 	LPreviewObject.Run();
 	return 0;
@@ -821,12 +822,13 @@ void HandleLightingPreview( void )
 				if ( g_pLPreviewOutputBitmap && (g_pLPreviewOutputBitmap->Width() > 10) )
 				{
 					SignalUpdate( EVTYPE_BITMAP_RECEIVED_FROM_LPREVIEW );
-					CLightingPreviewResultsWindow *w=GetMainWnd()->m_pLightingPreviewOutputWindow;
+
+					auto *&w = GetMainWnd()->m_pLightingPreviewOutputWindow;
 					if ( !GetMainWnd()->m_bLightingPreviewOutputWindowShowing )
 					{
 						w = new CLightingPreviewResultsWindow;
-						GetMainWnd()->m_pLightingPreviewOutputWindow = w;
-						w->Create( GetMainWnd() );
+						w->Create( GetMainWnd(), GetMainWnd()->GetTitle() );
+
 						GetMainWnd()->m_bLightingPreviewOutputWindowShowing = true;
 					}
 					if (! w->IsWindowVisible() )

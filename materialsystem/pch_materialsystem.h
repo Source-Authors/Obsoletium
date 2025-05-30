@@ -11,13 +11,12 @@
 #pragma once
 #endif
 
-#if defined( _WIN32 ) && !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN 1
-#include "windows.h"
+#if defined( _WIN32 )
+#include "winlite.h"
 #endif
 
 #include <malloc.h>
-#include <string.h>
+#include <cstring>
 #include "crtmemdebug.h"
 
 #include "tier0/platform.h"
@@ -34,8 +33,8 @@
 #include "tier0/icommandline.h"
 #include "mathlib/vmatrix.h"
 #include "icvar.h"
-#include "KeyValues.h"
-#include "convar.h"
+#include "tier1/KeyValues.h"
+#include "tier1/convar.h"
 
 #include "tier2/tier2.h"
 #include "bitmap/imageformat.h"

@@ -12,8 +12,9 @@
 
 
 #ifndef INCLUDED_MXWINDOW
-#include <mxtk/mxWindow.h>
+#include <mxtk/mxwindow.h>
 #endif
+
 #include <mxtk/mx.h>
 #include "mxLineEdit2.h"
 #include "mathlib/vector.h"
@@ -33,7 +34,7 @@ public:
 	void OnTabSelected();
 	void OnTabUnselected();
 	
-	virtual int handleEvent( mxEvent *event );
+	int handleEvent( mxEvent *event ) override;
 
 
 private:

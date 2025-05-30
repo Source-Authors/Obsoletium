@@ -35,9 +35,10 @@ const DmElementHandle_t DMELEMENT_HANDLE_INVALID;
 
 #else // PERFORM_HANDLE_TYPECHECKING
 
-enum DmElementHandle_t
+// dimhotepus: Make int.
+enum DmElementHandle_t : int
 {
-	DMELEMENT_HANDLE_INVALID = 0xffffffff
+	DMELEMENT_HANDLE_INVALID = -1
 };
 
 #endif // PERFORM_HANDLE_TYPECHECKING

@@ -15,7 +15,7 @@
 
 inline void cpuid(unsigned int regs[4], unsigned int function)
 {
-	int CPUInfo[4] = { -1 };
+	int CPUInfo[4] = { -1, -1, -1, -1 };
 #if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
 	__cpuid(function, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 #else
@@ -137,8 +137,11 @@ public:
 
 	ia32detect ()
 	{
+		memset(&version, 0, sizeof(version));
+		memset(&misc, 0, sizeof(misc));
+		memset(&feature, 0, sizeof(feature));
 
-        cache = 0;
+		cache = 0;
 		uint32 m = init0();
 
 		uint32 *d = new uint32[m * 4];
@@ -178,7 +181,7 @@ public:
         }
 	}
 
-	const tstring version_text () const
+	tstring version_text () const
 	{
 		tchar b[128];
 
@@ -203,7 +206,7 @@ protected:
 		return text[version.Type];
 	}
 
-	const tstring brand_text () const
+	tstring brand_text () const
 	{
 		static const tchar *text[] =
 		{
@@ -298,9 +301,11 @@ private:
 
 		m = 0;
 
-		for (byte ci3 = 1U; ci3 > 0; ci3++)
+		for (byte ci3 = 1U; ci3 < std::numeric_limits<byte>::max(); ci3++)
 			if (c[ci3])
 				cache[m++] = ci3;
+
+		if (c[255]) cache[m++] = 255;
 
 		cache[m] = 0;
 	}

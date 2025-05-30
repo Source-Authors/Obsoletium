@@ -8,8 +8,8 @@
 #include "materialsystem_global.h"
 #include "shaderapi/ishaderapi.h"
 #include "texturemanager.h"
-#include "utlvector.h"
-#include "generichash.h"
+#include "tier1/utlvector.h"
+#include "tier1/generichash.h"
 #include "filesystem.h"
 #include "filesystem/IQueuedLoader.h"
 #include "Color.h"
@@ -75,7 +75,7 @@ ColorCorrectionLookup_t::~ColorCorrectionLookup_t( )
 void ColorCorrectionLookup_t::AllocTexture()
 {
 	char name[64];
-	sprintf( name, "ColorCorrection - %zu", m_Handle );
+	V_sprintf_safe( name, "ColorCorrection - %zu", m_Handle );
 
 	m_pColorCorrectionTexture = ITextureInternal::CreateProceduralTexture( name, TEXTURE_GROUP_OTHER,
 		COLOR_CORRECTION_TEXTURE_SIZE, COLOR_CORRECTION_TEXTURE_SIZE, COLOR_CORRECTION_TEXTURE_SIZE, IMAGE_FORMAT_BGRX8888,

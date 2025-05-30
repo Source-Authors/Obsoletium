@@ -737,7 +737,7 @@ SendProp SendPropArray3(
 	int offset,
 	int sizeofVar,
 	int elements,
-	SendProp pArrayProp,
+	const SendProp &pArrayProp,
 	SendTableProxyFn varProxy=SendProxy_DataTableToDataTable
 	);
 

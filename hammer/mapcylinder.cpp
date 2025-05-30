@@ -124,22 +124,22 @@ CMapCylinder::CMapCylinder(const char *pszStartKey, const char *pszStartValueKey
 {	
 	Initialize();
 
-	strcpy(m_szStartKey, pszStartKey);
-	strcpy(m_szStartValueKey, pszStartValueKey);
+	V_strcpy_safe(m_szStartKey, pszStartKey);
+	V_strcpy_safe(m_szStartValueKey, pszStartValueKey);
 
 	if ( pszStartRadiusKey != NULL )
 	{
-		strcpy(m_szStartRadiusKey, pszStartRadiusKey);
+		V_strcpy_safe(m_szStartRadiusKey, pszStartRadiusKey);
 	}
 
 	if ((pszEndKey != NULL) && (pszEndValueKey != NULL))
 	{
-		strcpy(m_szEndKey, pszEndKey);
-		strcpy(m_szEndValueKey, pszEndValueKey);
+		V_strcpy_safe(m_szEndKey, pszEndKey);
+		V_strcpy_safe(m_szEndValueKey, pszEndValueKey);
 
 		if ( pszEndRadiusKey != NULL )
 		{
-			strcpy(m_szEndRadiusKey, pszEndRadiusKey);
+			V_strcpy_safe(m_szEndRadiusKey, pszEndRadiusKey);
 		}
 	}
 }
@@ -281,13 +281,13 @@ CMapClass *CMapCylinder::CopyFrom(CMapClass *pObject, bool bUpdateDependencies)
 		m_flStartRadius = pFrom->m_flStartRadius;
 		m_flEndRadius = pFrom->m_flEndRadius;
 
-		strcpy(m_szStartValueKey, pFrom->m_szStartValueKey);
-		strcpy(m_szStartKey, pFrom->m_szStartKey);
-		strcpy(m_szStartRadiusKey, pFrom->m_szStartRadiusKey);
+		V_strcpy_safe(m_szStartValueKey, pFrom->m_szStartValueKey);
+		V_strcpy_safe(m_szStartKey, pFrom->m_szStartKey);
+		V_strcpy_safe(m_szStartRadiusKey, pFrom->m_szStartRadiusKey);
 
-		strcpy(m_szEndValueKey, pFrom->m_szEndValueKey);
-		strcpy(m_szEndKey, pFrom->m_szEndKey);
-		strcpy(m_szEndRadiusKey, pFrom->m_szEndRadiusKey);
+		V_strcpy_safe(m_szEndValueKey, pFrom->m_szEndValueKey);
+		V_strcpy_safe(m_szEndKey, pFrom->m_szEndKey);
+		V_strcpy_safe(m_szEndRadiusKey, pFrom->m_szEndRadiusKey);
 	}
 
 	return(this);

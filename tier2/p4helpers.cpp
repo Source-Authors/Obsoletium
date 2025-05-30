@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "p4helpers.h"
+#include "tier2/p4helpers.h"
 #include "tier2/tier2.h"
 // dimhotepus: No perforce
 // #include "p4lib/ip4.h"
@@ -112,7 +112,7 @@ bool CP4File::SetFileType( [[maybe_unused]] const CUtlString& desiredFileType)
 //////////////////////////////////////////////////////////////////////////
 
 
-CP4Factory::CP4Factory()
+CP4Factory::CP4Factory() : m_bDummyMode{false}
 {
 }
 

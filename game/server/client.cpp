@@ -170,24 +170,25 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	{
 		if ( args.ArgC() >= 2 )
 		{
-			p = (char *)args.ArgS();
+			V_strcpy_safe( szTemp, args.ArgS() );
 		}
 		else
 		{
 			// say with a blank message, nothing to do
 			return;
 		}
+		p = szTemp;
 	}
 	else  // Raw text, need to prepend argv[0]
 	{
 		if ( args.ArgC() >= 2 )
 		{
-			Q_snprintf( szTemp,sizeof(szTemp), "%s %s", ( char * )pcmd, (char *)args.ArgS() );
+			V_sprintf_safe( szTemp, "%s %s", pcmd, args.ArgS() );
 		}
 		else
 		{
 			// Just a one word command, use the first word...sigh
-			Q_snprintf( szTemp,sizeof(szTemp), "%s", ( char * )pcmd );
+			V_sprintf_safe( szTemp, "%s", pcmd );
 		}
 		p = szTemp;
 	}
@@ -239,24 +240,24 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	{
 		if ( pszLocation && pszLocation[0] != '\0' )
 		{
-			Q_snprintf( text, sizeof(text), "%s %s @ %s: ", pszPrefix, pszPlayerName, pszLocation );
+			V_sprintf_safe( text, "%s %s @ %s: ", pszPrefix, pszPlayerName, pszLocation );
 		}
 		else
 		{
-			Q_snprintf( text, sizeof(text), "%s %s: ", pszPrefix, pszPlayerName );
+			V_sprintf_safe( text, "%s %s: ", pszPrefix, pszPlayerName );
 		}
 	}
 	else
 	{
-		Q_snprintf( text, sizeof(text), "%s: ", pszPlayerName );
+		V_sprintf_safe( text, "%s: ", pszPlayerName );
 	}
 
 	j = sizeof(text) - 2 - V_strlen(text);  // -2 for /n and null terminator
 	if ( V_strlen(p) > j )
 		p[j] = 0;
 
-	Q_strncat( text, p, sizeof( text ), COPY_ALL_CHARACTERS );
-	Q_strncat( text, "\n", sizeof( text ), COPY_ALL_CHARACTERS );
+	V_strcat_safe( text, p );
+	V_strcat_safe( text, "\n" );
  
 	// loop through all players
 	// Start with the first player.
@@ -866,7 +867,7 @@ CON_COMMAND( give, "Give item to player.\n\tArguments: <item_name>" )
 		&& args.ArgC() >= 2 )
 	{
 		char item_to_give[ 256 ];
-		Q_strncpy( item_to_give, args[1], sizeof( item_to_give ) );
+		V_strcpy_safe( item_to_give, args[1] );
 		Q_strlower( item_to_give );
 
 		// Don't allow regular users to create point_servercommand entities for the same reason as blocking ent_fire
@@ -931,7 +932,7 @@ void CC_Player_SetModel( const CCommand &args )
 	if ( pPlayer && args.ArgC() == 2)
 	{
 		static char szName[256];
-		Q_snprintf( szName, sizeof( szName ), "models/%s.mdl", args[1] );
+		V_sprintf_safe( szName, "models/%s.mdl", args[1] );
 		pPlayer->SetModel( szName );
 		UTIL_SetSize(pPlayer, VEC_HULL_MIN, VEC_HULL_MAX);
 	}
@@ -958,11 +959,12 @@ void CC_Player_TestDispatchEffect( const CCommand &args )
 	float flDistance = 1024;
 	if ( args.ArgC() >= 3 )
 	{
-		flDistance = atoi( args[ 2 ] );
+		// dimhotepus: Expects float so atoi -> strtof
+		flDistance = strtof( args[ 2 ], nullptr );
 	}
 
 	// Optional flags
-	float flags = 0;
+	int flags = 0;
 	if ( args.ArgC() >= 4 )
 	{
 		flags = atoi( args[ 3 ] );
@@ -1011,7 +1013,7 @@ void CC_Player_TestDispatchEffect( const CCommand &args )
 	data.m_fFlags = flags;
 	data.m_flMagnitude = magnitude;
 	data.m_flScale = scale;
-	DispatchEffect( (char *)args[1], data );
+	DispatchEffect( args[1], data );
 }
 
 static ConCommand test_dispatcheffect("test_dispatcheffect", CC_Player_TestDispatchEffect, "Test a clientside dispatch effect.\n\tUsage: test_dispatcheffect <effect name> <distance away> <flags> <magnitude> <scale>\n\tDefaults are: <distance 1024> <flags 0> <magnitude 0> <scale 0>\n", FCVAR_CHEAT);
@@ -1112,8 +1114,7 @@ static bool TestEntityPosition ( CBasePlayer *pPlayer )
 //------------------------------------------------------------------------------
 static int FindPassableSpace( CBasePlayer *pPlayer, const Vector& direction, float step, Vector& oldorigin )
 {
-	int i;
-	for ( i = 0; i < 100; i++ )
+	for ( int i = 0; i < 100; i++ )
 	{
 		Vector origin = pPlayer->GetAbsOrigin();
 		VectorMA( origin, step, direction, origin );

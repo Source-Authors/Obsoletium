@@ -9426,7 +9426,7 @@ void DSP_DEBUGReloadPresetFile( void )
 	dsp_spatial.SetValue( ispatial );
 	//dsp_automatic.SetValue( iautomatic );
 
-	int nSpecialDSPNum = 0;
+	intp nSpecialDSPNum = 0;
 	for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 	{
 		paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );

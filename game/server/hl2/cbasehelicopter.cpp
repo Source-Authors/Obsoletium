@@ -451,7 +451,7 @@ bool CBaseHelicopter::DoWashPush( washentity_t *pWash, const Vector &vecWashOrig
 
 	
 	float flPushTime = (gpGlobals->curtime - pWash->flWashStartTime);
-	flPushTime = clamp( flPushTime, 0, BASECHOPPER_WASH_RAMP_TIME );
+	flPushTime = clamp( flPushTime, 0.f, BASECHOPPER_WASH_RAMP_TIME );
 	float flWashAmount = RemapVal( flPushTime, 0, BASECHOPPER_WASH_RAMP_TIME, BASECHOPPER_WASH_PUSH_MIN, BASECHOPPER_WASH_PUSH_MAX );
 
 	if ( pShooter )
@@ -1182,7 +1182,7 @@ void CBaseHelicopter::UpdateRotorSoundPitch( int iPitch )
 	if (m_pRotorSound)
 	{
 		CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
-		controller.SoundChangePitch( m_pRotorSound, iPitch, 0.1 );
+		controller.SoundChangePitch( m_pRotorSound, iPitch, 0.1f );
 		UpdateRotorWashVolume();
 	}
 }

@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
@@ -32,23 +32,23 @@ class CGraphPanel : public vgui::PropertyPage, public IServerDataResponse
 	DECLARE_CLASS_SIMPLE( CGraphPanel, vgui::PropertyPage );
 public:
 	CGraphPanel(vgui::Panel *parent, const char *name);
-	~CGraphPanel();
+	virtual ~CGraphPanel();
 
 	// property page handlers
-	virtual void OnPageShow();
-	virtual void OnPageHide();
+	void OnPageShow() override;
+	void OnPageHide() override;
 
 	void PerformLayout();
 
 protected:
 	// callback for receiving server data
-	virtual void OnServerDataResponse(const char *value, const char *response);
+	void OnServerDataResponse(const char *value, const char *response) override;
 
 	// called every frame to update stats page
-	virtual void OnTick();
+	void OnTick() override;
 
 private:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	typedef enum { SECONDS, MINUTES, HOURS } intervals;
 	struct Points_t
@@ -69,7 +69,7 @@ private:
 		CGraphsImage();
 		using Image::DrawLine;
 		using Image::SetPos;
-		bool AddPoint(Points_t p);
+		bool AddPoint(const Points_t &p);
 		void RemovePoints() { points.RemoveAll(); }
 		void SaveSize(int x1,int y1) { x=x1;y=y1; SetSize(x1,y1);}
 
@@ -97,8 +97,8 @@ private:
 
 	private:
 
-		void AvgPoint(Points_t p);
-		void CheckBounds(Points_t p);
+		void AvgPoint(const Points_t &p);
+		void CheckBounds(const Points_t &p);
 
 		CUtlVector<Points_t> points;
 		
@@ -106,7 +106,7 @@ private:
 		float maxIn,minIn,maxOut,minOut; // max and min bandwidths
 		float maxFPS,minFPS;
 		float minPing,maxPing;
-		float maxPlayers,minPlayers;
+		int maxPlayers,minPlayers;
 
 		bool cpu,fps,net_i,ping,net_o,players;
 		intervals timeBetween;
@@ -125,7 +125,7 @@ private:
 	friend CGraphsImage; // so it can use the intervals enum
 
 	vgui::Label *GetLabel(const char *name);
-	void SetAxisLabels(Color c,char *max,char *mid,char *min);
+	void SetAxisLabels(Color c,const char *max,const char *mid,const char *min);
 
 	// msg handlers 
 	MESSAGE_FUNC( OnCheckButton, "CheckButtonChecked" );
@@ -148,7 +148,8 @@ private:
 	vgui::ComboBox *m_pTimeCombo;
 	vgui::ComboBox *m_pVertCombo;
 
-	float m_flNextStatsUpdateTime;
+	// dimhotepus: float -> double.
+	double m_flNextStatsUpdateTime;
 };
 
 #endif // GRAPHPANEL_H

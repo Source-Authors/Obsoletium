@@ -5,11 +5,13 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/PropertyDialog.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 
 #include <vgui_controls/Button.h>
-#include <vgui_controls/PropertyDialog.h>
 #include <vgui_controls/PropertySheet.h>
 
 // memdbgon must be the last include file in a .cpp file!!!

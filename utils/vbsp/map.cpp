@@ -15,11 +15,13 @@
 #include "materialsub.h"
 #include "fgdlib/fgdlib.h"
 #include "manifest.h"
+#include "bspflags.h"
 
 #ifdef VSVMFIO
 #include "VmfImport.h"
 #endif // VSVMFIO
 
+#include "tier0/memdbgon.h"
 
 // undefine to make plane finding use linear sort
 #define	USE_HASHING
@@ -829,7 +831,7 @@ ChunkFileResult_t LoadDispDistancesKeyCallback(const char *szKey, const char *sz
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -839,7 +841,8 @@ ChunkFileResult_t LoadDispDistancesKeyCallback(const char *szKey, const char *sz
 
 		while (pszNext != NULL)
 		{
-			pMapDispInfo->dispDists[nIndex] = (float)atof(pszNext);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->dispDists[nIndex] = strtof(pszNext, nullptr);
 			pszNext = strtok(NULL, " ");
 			nIndex++;
 		}
@@ -977,7 +980,7 @@ ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szVa
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -990,9 +993,10 @@ ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szVa
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->vectorDisps[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->vectorDisps[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->vectorDisps[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->vectorDisps[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->vectorDisps[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->vectorDisps[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1031,7 +1035,7 @@ ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szVa
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -1044,9 +1048,10 @@ ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szVa
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->vectorOffsets[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->vectorOffsets[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->vectorOffsets[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->vectorOffsets[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->vectorOffsets[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->vectorOffsets[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1072,7 +1077,7 @@ ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -1085,9 +1090,10 @@ ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			pMapDispInfo->m_offsetNormals[nIndex][0] = (float)atof(pszNext0);
-			pMapDispInfo->m_offsetNormals[nIndex][1] = (float)atof(pszNext1);
-			pMapDispInfo->m_offsetNormals[nIndex][2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->m_offsetNormals[nIndex][0] = strtof(pszNext0, nullptr);
+			pMapDispInfo->m_offsetNormals[nIndex][1] = strtof(pszNext1, nullptr);
+			pMapDispInfo->m_offsetNormals[nIndex][2] = strtof(pszNext2, nullptr);
 
 			pszNext0 = strtok(NULL, " ");
 			pszNext1 = strtok(NULL, " ");
@@ -1127,7 +1133,7 @@ ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szVal
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pMapDispInfo->power) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -1138,7 +1144,8 @@ ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szVal
 
 		while (pszNext0 != NULL)
 		{
-			pMapDispInfo->alphaValues[nIndex] = (float)atof(pszNext0);
+			// dimhotepus: atof -> strtof.
+			pMapDispInfo->alphaValues[nIndex] = strtof(pszNext0, nullptr);
 			pszNext0 = strtok(NULL, " ");
 			nIndex++;
 		}
@@ -1161,7 +1168,7 @@ ChunkFileResult_t LoadDispTriangleTagsKeyCallback(const char *szKey, const char 
 	if ( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pMapDispInfo->power );
 		int nRow = atoi( &szKey[3] );
@@ -1238,12 +1245,11 @@ int CMapFile::SideIDToIndex( int brushSideID )
 //-----------------------------------------------------------------------------
 void ConvertSideList( entity_t *mapent, char *key )
 {
-	char *pszSideList = ValueForKey( mapent, key );
+	const char *pszSideList = ValueForKey( mapent, key );
 
 	if (pszSideList)
 	{
-		char *pszTmpList = ( char* )_alloca( strlen( pszSideList ) + 1 );
-		strcpy( pszTmpList, pszSideList );
+		V_strdup_stack( pszSideList, pszTmpList );
 
 		bool bFirst = true;
 		char szNewValue[1024];
@@ -1263,7 +1269,7 @@ void ConvertSideList( entity_t *mapent, char *key )
 				{
 					if (!bFirst)
 					{
-						strcat( szNewValue, " " );
+						V_strcat_safe( szNewValue, " " );
 					}
 					else
 					{
@@ -1271,8 +1277,9 @@ void ConvertSideList( entity_t *mapent, char *key )
 					}
 
 					char szIndex[15];
-					itoa( nIndex, szIndex, 10 );
-					strcat( szNewValue, szIndex );
+					// dimhotepus: itoa -> V_to_chars.
+					V_to_chars( szIndex, nIndex, 10 );
+					V_strcat_safe( szNewValue, szIndex );
 				}
 			}
 		} while ( ( pszScan = strtok( NULL, " " ) ) );
@@ -1286,10 +1293,12 @@ void ConvertSideList( entity_t *mapent, char *key )
 ChunkFileResult_t HandleNoDynamicShadowsEnt( entity_t *pMapEnt )
 {
 	// Get the list of the sides.
-	char *pSideList = ValueForKey( pMapEnt, "sides" );
+	const char *pSideList = ValueForKey( pMapEnt, "sides" );
+	// dimhotepus: Create a copy as strtok accepts non-const
+	char *sideList = V_strdup( pSideList );
 
 	// Parse the side list.
-	char *pScan = strtok( pSideList, " " );
+	char *pScan = strtok( sideList, " " );
 	if( pScan )
 	{
 		do
@@ -1302,6 +1311,8 @@ ChunkFileResult_t HandleNoDynamicShadowsEnt( entity_t *pMapEnt )
 			}
 		} while( ( pScan = strtok( NULL, " " ) ) );
 	}
+
+	delete[] sideList;
 	
 	// Clear out this entity.
 	pMapEnt->epairs = NULL;
@@ -1326,7 +1337,7 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 			Error( "Overlay Material Name (%s) > OVERLAY_MAP_STRLEN (%d)", pMaterialName, OVERLAY_MAP_STRLEN );
 			return ChunkFile_Fail;
 		}
-		strcpy( pOverlay->szMaterialName, pMaterialName );	
+		V_strcpy_safe( pOverlay->szMaterialName, pMaterialName );	
 	}
 	else if ( !stricmp( szKey, "StartU") )
 	{
@@ -1379,8 +1390,9 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 	else if ( !stricmp( szKey, "sides" ) )
 	{
 		const char *pSideList = szValue;
-		char *pTmpList = ( char* )_alloca( strlen( pSideList ) + 1 );
-		strcpy( pTmpList, pSideList );
+
+		V_strdup_stack( pSideList, pTmpList );
+
 		const char *pScan = strtok( pTmpList, " " );
 		if ( !pScan )
 			return ChunkFile_Fail;
@@ -1403,10 +1415,8 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 
 static ChunkFileResult_t LoadOverlayDataTransitionCallback( CChunkFile *pFile, int nParam )
 {
-	int iOverlay = g_aMapWaterOverlays.AddToTail();
+	intp iOverlay = g_aMapWaterOverlays.AddToTail();
 	mapoverlay_t *pOverlay = &g_aMapWaterOverlays[iOverlay];
-	if ( !pOverlay )
-		return ChunkFile_Fail;
 
 	pOverlay->nId = ( MAX_MAP_OVERLAYS + 1 ) + g_aMapWaterOverlays.Count() - 1;
 	pOverlay->m_nRenderOrder = 0;
@@ -1618,8 +1628,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
 			if( ( g_nDXLevel == 0 ) || ( g_nDXLevel >= 70 ) )
 			{
 				const char *pSideListStr = ValueForKey( mapent, "sides" );
-				int size;
-				size = IntForKey( mapent, "cubemapsize" );
+				int size = IntForKey( mapent, "cubemapsize" );
 				Cubemap_InsertSample( mapent->origin, size );
 				Cubemap_SaveBrushSides( pSideListStr );
 			}
@@ -1693,7 +1702,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
 			mapent->areaportalnum = c_areaportals;
 
 			// set the portal number as "portalnumber"
-			sprintf (str, "%i", c_areaportals);
+			V_sprintf_safe (str, "%i", c_areaportals);
 			SetKeyValue (mapent, "portalnumber", str);
 
 			MoveBrushesToWorld (mapent);
@@ -1857,12 +1866,13 @@ static GameData	GD;
 // Input  : pFilename - the absolute name of the file to read
 // Output : returns the KeyValues of the file, NULL if the file could not be read.
 //-----------------------------------------------------------------------------
-static KeyValues *ReadKeyValuesFile( const char *pFilename )
+static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 {
 	// Read in the gameinfo.txt file and null-terminate it.
 	FILE *fp = fopen( pFilename, "rb" );
 	if ( !fp )
-		return NULL;
+		return KeyValuesAD{nullptr};
+
 	CUtlVector<char> buf;
 	fseek( fp, 0, SEEK_END );
 	buf.SetSize( ftell( fp ) + 1 );
@@ -1871,11 +1881,10 @@ static KeyValues *ReadKeyValuesFile( const char *pFilename )
 	fclose( fp );
 	buf[buf.Count()-1] = 0;
 
-	KeyValues *kv = new KeyValues( "" );
+	KeyValuesAD kv( "" );
 	if ( !kv->LoadFromBuffer( pFilename, buf.Base() ) )
 	{
-		kv->deleteThis();
-		return NULL;
+		return KeyValuesAD{nullptr};
 	}
 
 	return kv;
@@ -1888,7 +1897,7 @@ static KeyValues *ReadKeyValuesFile( const char *pFilename )
 //-----------------------------------------------------------------------------
 void CMapFile::SetInstancePath( const char *pszInstancePath )
 {
-	strcpy( m_InstancePath, pszInstancePath );
+	V_strcpy_safe( m_InstancePath, pszInstancePath );
 	V_strlower( m_InstancePath );
 	V_FixSlashes( m_InstancePath );
 }
@@ -1901,21 +1910,21 @@ void CMapFile::SetInstancePath( const char *pszInstancePath )
 // Output : Returns true if it was able to locate the file
 //			pszOutFileName - the full path to the file name if located
 //-----------------------------------------------------------------------------
-bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, char *pszOutFileName )
+bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_CAP(outFileNameSize) char *pszOutFileName, intp outFileNameSize )
 {
 	char		szInstanceFileNameFixed[ MAX_PATH ];
 	const char *pszMapPath = "\\maps\\";
 
-	strcpy( szInstanceFileNameFixed, pszInstanceFileName );
-	V_SetExtension( szInstanceFileNameFixed, ".vmf", sizeof( szInstanceFileNameFixed ) );
+	V_strcpy_safe( szInstanceFileNameFixed, pszInstanceFileName );
+	V_SetExtension( szInstanceFileNameFixed, ".vmf" );
 	V_FixSlashes( szInstanceFileNameFixed );
 
 	// first, try to find a relative location based upon the Base file name
-	strcpy( pszOutFileName, pszBaseFileName );
+	V_strncpy( pszOutFileName, pszBaseFileName, outFileNameSize );
 	V_StripFilename( pszOutFileName );
 
-	strcat( pszOutFileName, "\\" );
-	strcat( pszOutFileName, szInstanceFileNameFixed );
+	V_strcat( pszOutFileName, "\\", outFileNameSize );
+	V_strcat( pszOutFileName, szInstanceFileNameFixed, outFileNameSize );
 
 	if ( g_pFullFileSystem->FileExists( pszOutFileName ) )
 	{
@@ -1923,19 +1932,19 @@ bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstan
 	}
 
 	// second, try to find the master 'maps' directory and make it relative from that
-	strcpy( pszOutFileName, pszBaseFileName );
+	V_strncpy( pszOutFileName, pszBaseFileName, outFileNameSize );
 	V_StripFilename( pszOutFileName );
 	V_RemoveDotSlashes( pszOutFileName );
 	V_FixDoubleSlashes( pszOutFileName );
 	V_strlower( pszOutFileName );
-	strcat( pszOutFileName, "\\" );
+	V_strcat( pszOutFileName, "\\", outFileNameSize );
 
 	char *pos = strstr( pszOutFileName, pszMapPath );
 	if ( pos )
 	{
 		pos += strlen( pszMapPath );
 		*pos = 0;
-		strcat( pszOutFileName, szInstanceFileNameFixed );
+		V_strcat( pszOutFileName, szInstanceFileNameFixed, outFileNameSize );
 
 		if ( g_pFullFileSystem->FileExists( pszOutFileName ) )
 		{
@@ -1945,13 +1954,13 @@ bool CMapFile::DeterminePath( const char *pszBaseFileName, const char *pszInstan
 
 	if ( m_InstancePath[ 0 ] != 0 )
 	{
-		sprintf( szInstanceFileNameFixed, "%s%s", m_InstancePath, pszInstanceFileName );
+		V_sprintf_safe( szInstanceFileNameFixed, "%s%s", m_InstancePath, pszInstanceFileName );
 
 		if ( g_pFullFileSystem->FileExists( szInstanceFileNameFixed, "GAME" ) )
 		{
 			char FullPath[ MAX_PATH ];
-			g_pFullFileSystem->RelativePathToFullPath( szInstanceFileNameFixed, "GAME", FullPath, sizeof( FullPath ) );
-			strcpy( pszOutFileName, FullPath );
+			g_pFullFileSystem->RelativePathToFullPath_safe( szInstanceFileNameFixed, "GAME", FullPath );
+			V_strncpy( pszOutFileName, FullPath, outFileNameSize );
 
 			return true;
 		}
@@ -1979,11 +1988,12 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 
 	char	GameInfoPath[ MAX_PATH ];
 
-	g_pFullFileSystem->RelativePathToFullPath( "gameinfo.txt", "MOD", GameInfoPath, sizeof( GameInfoPath ) );
-	KeyValues *GameInfoKV = ReadKeyValuesFile( GameInfoPath );
+	g_pFullFileSystem->RelativePathToFullPath_safe( "gameinfo.txt", "MOD", GameInfoPath );
+	// dimhotepus: Use RAII to not leak KeyValues.
+	KeyValuesAD GameInfoKV = ReadKeyValuesFile( GameInfoPath );
 	if ( !GameInfoKV )
 	{
-		Msg( "Could not locate gameinfo.txt for Instance Remapping at %s\n", GameInfoPath );
+		Msg( "Could not locate gameinfo.txt for Instance Remapping at '%s'.\n", GameInfoPath );
 		return;
 	}
 
@@ -1996,16 +2006,16 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	const char *GameDataFile = GameInfoKV->GetString( "GameData", NULL );
 	if ( !GameDataFile )
 	{
-		Msg( "Could not locate 'GameData' key in %s\n", GameInfoPath );
+		Msg( "Could not locate 'GameData' key in '%s'.\n", GameInfoPath );
 		return;
 	}
 
 	char	FDGPath[ MAX_PATH ];
-	if ( !g_pFullFileSystem->RelativePathToFullPath( GameDataFile, "EXECUTABLE_PATH", FDGPath, sizeof( FDGPath ) ) )
+	if ( !g_pFullFileSystem->RelativePathToFullPath_safe( GameDataFile, "EXECUTABLE_PATH", FDGPath ) )
 	{
-		if ( !g_pFullFileSystem->RelativePathToFullPath( GameDataFile, NULL, FDGPath, sizeof( FDGPath ) ) )
+		if ( !g_pFullFileSystem->RelativePathToFullPath_safe( GameDataFile, NULL, FDGPath ) )
 		{
-			Msg( "Could not locate GameData file %s\n", GameDataFile );
+			Msg( "Could not locate GameData file '%s'.\n", GameDataFile );
 		}
 	}
 
@@ -2015,10 +2025,10 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	// automatically done in this processing.
 	for ( int i = 0; i < num_entities; i++ )
 	{
-		char *pEntity = ValueForKey( &entities[ i ], "classname" );
+		const char *pEntity = ValueForKey( &entities[ i ], "classname" );
 		if ( !strcmp( pEntity, "func_instance" ) )
 		{
-			char *pInstanceFile = ValueForKey( &entities[ i ], "file" );
+			const char *pInstanceFile = ValueForKey( &entities[ i ], "file" );
 			if ( pInstanceFile[ 0 ] )
 			{
 				char	InstancePath[ MAX_PATH ];
@@ -2038,7 +2048,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 				{
 					Color red( 255, 0, 0, 255 );
 
-					ColorSpewMessage( SPEW_ERROR, &red, "Could not open instance file %s\n", pInstanceFile );
+					ColorSpewMessage( SPEW_ERROR, &red, "Could not open instance file '%s'.\n", pInstanceFile );
 				}
 			}
 
@@ -2281,14 +2291,14 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 	char	Value[ MAX_KEYVALUE_LEN ], NewValue[ MAX_KEYVALUE_LEN ];
 	bool	Overwritten = false;
 
-	strcpy( NewValue, pPair->value );
+	V_strcpy_safe( NewValue, pPair->value );
 	for ( epair_t *epInstance = pInstanceEntity->epairs; epInstance != NULL; epInstance = epInstance->next )
 	{
-		if ( strnicmp( epInstance->key, INSTANCE_VARIABLE_KEY, strlen( INSTANCE_VARIABLE_KEY ) ) == 0 )
+		if ( strnicmp( epInstance->key, INSTANCE_VARIABLE_KEY, ssize( INSTANCE_VARIABLE_KEY ) - 1 ) == 0 )
 		{
 			char InstanceVariable[ MAX_KEYVALUE_LEN ];
 
-			strcpy( InstanceVariable, epInstance->value );
+			V_strcpy_safe( InstanceVariable, epInstance->value );
 
 			char *ValuePos = strchr( InstanceVariable, ' ' );
 			if ( !ValuePos )
@@ -2298,8 +2308,8 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 			*ValuePos = 0;
 			ValuePos++;
 
-			strcpy( Value, NewValue );
-			if ( !V_StrSubst( Value, InstanceVariable, ValuePos, NewValue, sizeof( NewValue ), false ) )
+			V_strcpy_safe( Value, NewValue );
+			if ( !V_StrSubst( Value, InstanceVariable, ValuePos, NewValue, false ) )
 			{
 				Overwritten = true;
 				break;
@@ -2333,24 +2343,24 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 	entity_t				*WorldspawnEnt = NULL;
 	GameData::TNameFixup	FixupStyle;
 
-	char *pTargetName = ValueForKey( pInstanceEntity, "targetname" );
-	char *pName = ValueForKey( pInstanceEntity, "name" );
+	const char *pTargetName = ValueForKey( pInstanceEntity, "targetname" );
+	const char *pName = ValueForKey( pInstanceEntity, "name" );
 	if ( pTargetName[ 0 ] )
 	{
-		sprintf( NameFixup, "%s", pTargetName );
+		V_sprintf_safe( NameFixup, "%s", pTargetName );
 	}
 	else if ( pName[ 0 ] )
 	{
-		sprintf( NameFixup, "%s", pName );
+		V_sprintf_safe( NameFixup, "%s", pName );
 	}
 	else
 	{
-		sprintf( NameFixup, "InstanceAuto%d", m_InstanceCount );
+		V_sprintf_safe( NameFixup, "InstanceAuto%d", m_InstanceCount );
 	}
 
 	for( int i = 0; i < num_entities; i++ )
 	{
-		char *pID = ValueForKey( &entities[ i ], "hammerid" );
+		const char *pID = ValueForKey( &entities[ i ], "hammerid" );
 		if ( pID[ 0 ] )
 		{
 			int value = atoi( pID );
@@ -2370,17 +2380,17 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 		entity_t *entity = &entities[ num_entities + i ];
 		entity->firstbrush += ( nummapbrushes - Instance->nummapbrushes );
 
-		char *pID = ValueForKey( entity, "hammerid" );
+		const char *pID = ValueForKey( entity, "hammerid" );
 		if ( pID[ 0 ] )
 		{
 			int value = atoi( pID );
 			value += max_entity_id;
-			sprintf( temp, "%d", value );
+			V_sprintf_safe( temp, "%d", value );
 
 			SetKeyValue( entity, "hammerid", temp );
 		}
 
-		char *pEntity = ValueForKey( entity, "classname" );
+		const char *pEntity = ValueForKey( entity, "classname" );
 		if ( strcmpi( pEntity, "worldspawn" ) == 0 )
 		{
 			WorldspawnEnt = entity;
@@ -2403,10 +2413,10 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 			GDclass *EntClass = GD.BeginInstanceRemap( pEntity, NameFixup, InstanceOrigin, InstanceAngle );
 			if ( EntClass )
 			{
-				for( int i = 0; i < EntClass->GetVariableCount(); i++ )
+				for( intp i = 0; i < EntClass->GetVariableCount(); i++ )
 				{
 					GDinputvariable *EntVar = EntClass->GetVariableAt( i );
-					char *pValue = ValueForKey( entity, ( char * )EntVar->GetName() );
+					const char *pValue = ValueForKey( entity, ( char * )EntVar->GetName() );
 					if ( GD.RemapKeyValue( EntVar->GetName(), pValue, temp, FixupStyle ) )
 					{
 #ifdef MERGE_INSTANCE_DEBUG_INFO
@@ -2469,7 +2479,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 		int		extraLen = 0;
 
 		oldValue = Connection->m_Pair->value;
-		strcpy( origValue, oldValue );
+		V_strcpy_safe( origValue, oldValue );
 		char *pos = strchr( origValue, ',' );
 		if ( pos )
 		{	// null terminate the first field
@@ -2479,12 +2489,13 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 
 		if ( GD.RemapNameField( origValue, temp, FixupStyle ) )
 		{
-			newValue = new char [ strlen( temp ) + extraLen + 1 ];
-			strcpy( newValue, temp );
+			intp sizeValue = strlen( temp ) + extraLen + 1;
+			newValue = new char [ sizeValue ];
+			V_strncpy( newValue, temp, sizeValue );
 			if ( pos )
 			{
-				strcat( newValue, "," );
-				strcat( newValue, pos + 1 );
+				V_strncat( newValue, ",", sizeValue );
+				V_strncat( newValue, pos + 1, sizeValue );
 			}
 
 			Connection->m_Pair->value = newValue;
@@ -2494,9 +2505,13 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 
 	num_entities += Instance->num_entities;
 
-	MoveBrushesToWorldGeneral( WorldspawnEnt );
-	WorldspawnEnt->numbrushes = 0;
-	WorldspawnEnt->epairs = NULL;
+	// dimhotepus: Ensure no null dereference.
+	if ( WorldspawnEnt )
+	{
+		MoveBrushesToWorldGeneral( WorldspawnEnt );
+		WorldspawnEnt->numbrushes = 0;
+		WorldspawnEnt->epairs = NULL;
+	}
 }
 
 
@@ -2568,7 +2583,7 @@ bool LoadMapFile( const char *pszFileName )
 		//
 		if (eResult == ChunkFile_Ok)
 		{
-			int index = g_Maps.AddToTail( new CMapFile() );
+			intp index = g_Maps.AddToTail( new CMapFile() );
 			g_LoadingMap = g_Maps[ index ];
 			if ( g_MainMap == NULL )
 			{
@@ -2768,7 +2783,8 @@ ChunkFileResult_t CMapFile::LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSid
         
 				// save the td off in case there is an origin brush and we
 				// have to recalculate the texinfo
-				if (nummapbrushsides == MAX_MAP_BRUSHSIDES)
+				// dimhotepus: Notify if map brush sides overflow.
+				if (nummapbrushsides >= MAX_MAP_BRUSHSIDES)
 					g_MapError.ReportError ("MAX_MAP_BRUSHSIDES");
 				side_brushtextures[nummapbrushsides] = pSideInfo->td;
 				nummapbrushsides++;
@@ -2825,7 +2841,7 @@ ChunkFileResult_t LoadSideKeyCallback(const char *szKey, const char *szValue, Lo
 			szValue = ReplaceMaterialName( szValue );
 		}
 
-		strcpy(pSideInfo->td.name, szValue);
+		V_strcpy_safe(pSideInfo->td.name, szValue);
 		g_MapError.TextureState(szValue);
 
 		// Find default flags and values for this material.
@@ -2854,7 +2870,8 @@ ChunkFileResult_t LoadSideKeyCallback(const char *szKey, const char *szValue, Lo
 	}
 	else if (!stricmp(szKey, "lightmapscale"))
 	{
-		pSideInfo->td.lightmapWorldUnitsPerLuxel = atoi(szValue);
+		// dimhotepus: atof -> strtof.
+		pSideInfo->td.lightmapWorldUnitsPerLuxel = strtof(szValue, nullptr);
 		if (pSideInfo->td.lightmapWorldUnitsPerLuxel == 0.0f)
 		{
 			g_MapError.ReportWarning("luxel size of 0");
@@ -2920,11 +2937,8 @@ ChunkFileResult_t CMapFile::LoadConnectionsKeyCallback(const char *szKey, const 
 	//
 	epair_t *pOutput = new epair_t;
 
-	pOutput->key = new char [strlen(szKey) + 1];
-	pOutput->value = new char [strlen(szValue) + 1];
-
-	strcpy(pOutput->key, szKey);
-	strcpy(pOutput->value, szValue);
+	pOutput->key = V_strdup(szKey);
+	pOutput->value = V_strdup(szValue);
 
 	m_ConnectionPairs = new CConnectionPairs( pOutput, m_ConnectionPairs );
 	
@@ -3056,7 +3070,7 @@ ChunkFileResult_t CMapFile::LoadSolidCallback(CChunkFile *pFile, LoadEntity_t *p
 			VectorAdd (b->mins, b->maxs, origin);
 			VectorScale (origin, 0.5, origin);
 
-			sprintf (string, "%i %i %i", (int)origin[0], (int)origin[1], (int)origin[2]);
+			V_sprintf_safe (string, "%i %i %i", (int)origin[0], (int)origin[1], (int)origin[2]);
 			SetKeyValue (&entities[b->entitynum], "origin", string);
 
 			VectorCopy (origin, entities[b->entitynum].origin);
@@ -3229,11 +3243,13 @@ mapdispinfo_t *ParseDispInfoChunk( void )
 
             if( i == 0 )
             {
-                pMapDispInfo->uAxis[j] = atof( token );
+                // dimhotepus: atof -> strtof.
+                pMapDispInfo->uAxis[j] = strtof( token, nullptr );
             }
             else
             {
-                pMapDispInfo->vAxis[j] = atof( token );
+                // dimhotepus: atof -> strtof.
+                pMapDispInfo->vAxis[j] = strtof( token, nullptr );
             }
         }
 
@@ -3246,7 +3262,8 @@ mapdispinfo_t *ParseDispInfoChunk( void )
    	if( g_nMapFileVersion < 350 )
 	{
 		GetToken( false );
-		pMapDispInfo->maxDispDist = atof( token );
+		// dimhotepus: atof -> strtof.
+		pMapDispInfo->maxDispDist = strtof( token, nullptr );
 	}
 
     // minimum tesselation value
@@ -3255,39 +3272,48 @@ mapdispinfo_t *ParseDispInfoChunk( void )
 
     // light smoothing angle
     GetToken( false );
-    pMapDispInfo->smoothingAngle = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->smoothingAngle = strtof(token, nullptr);
 
     //
     // get the displacement info displacement normals
     //
     GetToken( true );
-    pMapDispInfo->vectorDisps[0][0] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->vectorDisps[0][0] = strtof(token, nullptr);
     GetToken( false );
-    pMapDispInfo->vectorDisps[0][1] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->vectorDisps[0][1] = strtof(token, nullptr);
     GetToken( false );
-    pMapDispInfo->vectorDisps[0][2] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->vectorDisps[0][2] = strtof(token, nullptr);
 
     vertCount = ( ( ( 1 << pMapDispInfo->power ) + 1 ) * ( ( 1 << pMapDispInfo->power ) + 1 ) );
     for( i = 1; i < vertCount; i++ )
     {
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][0] = atof( token );
+        // dimhotepus: atof -> strtof.
+        pMapDispInfo->vectorDisps[i][0] = strtof( token, nullptr );
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][1] = atof( token );
+        // dimhotepus: atof -> strtof.
+        pMapDispInfo->vectorDisps[i][1] = strtof( token, nullptr );
         GetToken( false );
-        pMapDispInfo->vectorDisps[i][2] = atof( token );
+        // dimhotepus: atof -> strtof.
+        pMapDispInfo->vectorDisps[i][2] = strtof(token, nullptr);
     }
 
     //
     // get the displacement info displacement values
     //
     GetToken( true );
-    pMapDispInfo->dispDists[0] = atof( token );
+    // dimhotepus: atof -> strtof.
+    pMapDispInfo->dispDists[0] = strtof(token, nullptr);
 
     for( i = 1; i < vertCount; i++ )
     {
         GetToken( false );
-        pMapDispInfo->dispDists[i] = atof( token );
+        // dimhotepus: atof -> strtof.
+		pMapDispInfo->dispDists[i] = strtof( token, nullptr );
     }
 
     //

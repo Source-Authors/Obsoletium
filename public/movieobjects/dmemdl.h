@@ -44,7 +44,7 @@ class CDmeMDL : public CDmeShape
 	DEFINE_ELEMENT( CDmeMDL, CDmeShape );
 
 public:
-	virtual void Draw( const matrix3x4_t& shapeToWorld, CDmeDrawSettings *pDrawSettings = NULL );
+	void Draw( const matrix3x4_t& shapeToWorld, CDmeDrawSettings *pDrawSettings = NULL ) override;
 
 	void DrawInEngine( bool bDrawInEngine );
 	bool IsDrawingInEngine() const;
@@ -52,7 +52,7 @@ public:
 	void SetMDL( MDLHandle_t handle );
 	MDLHandle_t GetMDL( ) const;
 	float GetRadius() const; // NOTE: This radius is one that is centered at the origin
-	void GetBoundingSphere( Vector &vecCenter, float &flRadius ) const;
+	void GetBoundingSphere( Vector &vecCenter, float &flRadius ) const override;
 	void GetBoundingBox( Vector *pMins, Vector *pMaxs ) const;
 
 	// Computes bone-to-world transforms

@@ -22,7 +22,7 @@
 */
 
 #if !defined(_MINIMUM_BUILD_)
-#include "checksum_sha1.h"
+#include "tier1/checksum_sha1.h"
 #include <cstring>
 #else
 //
@@ -254,7 +254,7 @@ void CSHA1::Final()
 
 #if !defined(_MINIMUM_BUILD_)
 // Get the final hash as a pre-formatted string
-void CSHA1::ReportHash(char *szReport, unsigned char uReportType)
+void CSHA1::ReportHash(char *szReport, std::ptrdiff_t nReportSize, unsigned char uReportType)
 {
 	unsigned char i = 0;
 	char szTemp[12];
@@ -263,27 +263,27 @@ void CSHA1::ReportHash(char *szReport, unsigned char uReportType)
 
 	if(uReportType == REPORT_HEX)
 	{
-		sprintf(szTemp, "%02X", m_digest[0]);
-		strcat(szReport, szTemp);
+		V_sprintf_safe(szTemp, "%02X", m_digest[0]);
+		V_strncat(szReport, szTemp, nReportSize);
 
 		for(i = 1; i < k_cubHash; i++)
 		{
-			sprintf(szTemp, " %02X", m_digest[i]);
-			strcat(szReport, szTemp);
+			V_sprintf_safe(szTemp, " %02X", m_digest[i]);
+			V_strncat(szReport, szTemp, nReportSize);
 		}
 	}
 	else if(uReportType == REPORT_DIGIT)
 	{
 		V_to_chars(szTemp, m_digest[0]);
-		strcat(szReport, szTemp);
+		V_strncat(szReport, szTemp, nReportSize);
 
 		for(i = 1; i < k_cubHash; i++)
 		{
-			sprintf(szTemp, " %hhu", m_digest[i]);
-			strcat(szReport, szTemp);
+			V_sprintf_safe(szTemp, " %hhu", m_digest[i]);
+			V_strncat(szReport, szTemp, nReportSize);
 		}
 	}
-	else strcpy(szReport, "Error: Unknown report type!");
+	else V_strncpy(szReport, "Error: Unknown report type!", nReportSize);
 }
 #endif // _MINIMUM_BUILD_
 

@@ -8,21 +8,22 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "TorusDlg.h"
 #include "hammer.h"
 #include "hammer_mathlib.h"
-#include "TorusDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
+constexpr inline size_t ARC_MAX_POINTS{4096};
 
-static LPCTSTR pszSection = "Torus";
+constexpr inline TCHAR pszSection[]{TEXT("Torus")};
 
 void MakeArcCenterRadius(float xCenter, float yCenter, float xrad, float yrad, int npoints, float start_ang, float fArc, float points[][2]);
 void MakeArc(float x1, float y1, float x2, float y2, int npoints, float start_ang, float fArc, float points[][2]);
 
 CTorusDlg::CTorusDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
-	: CDialog(CTorusDlg::IDD, pParent)
+	: CBaseDlg(CTorusDlg::IDD, pParent)
 {
 	bmins = boxmins;
 	bmaxs = boxmaxs;
@@ -43,16 +44,20 @@ CTorusDlg::CTorusDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
 	CString str;
 	m_iWallWidth = AfxGetApp()->GetProfileInt(pszSection, "Wall Width", 32);
 	str = AfxGetApp()->GetProfileString(pszSection, "Arc_", "360");
-	m_fArc = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fArc = strtof(str, nullptr);
 	m_iSides = AfxGetApp()->GetProfileInt(pszSection, "Sides", 16);
 	str = AfxGetApp()->GetProfileString(pszSection, "Start Angle_", "0");
-	m_fAngle = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fAngle = strtof(str, nullptr);
 
 	str = AfxGetApp()->GetProfileString(pszSection, "Rotation Arc_", "360");
-	m_fRotationArc = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fRotationArc = strtof(str, nullptr);
 	m_iRotationSides = AfxGetApp()->GetProfileInt(pszSection, "Rotation Sides", 16);
 	str = AfxGetApp()->GetProfileString(pszSection, "Rotation Start Angle_", "0");
-	m_fRotationAngle = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fRotationAngle = strtof(str, nullptr);
 	
 	m_iAddHeight = AfxGetApp()->GetProfileInt(pszSection, "Add Height", 0);
 
@@ -87,7 +92,7 @@ void CTorusDlg::SaveValues()
 
 void CTorusDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CTorusDlg)
 	DDX_Control(pDX, IDC_ANGLESPIN, m_cStartAngleSpin);
 	DDX_Control(pDX, IDC_WALLWIDTHSPIN, m_cWallWidthSpin);
@@ -128,7 +133,7 @@ void CTorusDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CTorusDlg, CDialog)
+BEGIN_MESSAGE_MAP(CTorusDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CTorusDlg)
 	ON_EN_CHANGE(IDC_ARC, OnChangeArc)
 	ON_EN_CHANGE(IDC_ROTATION_ARC, OnChangeTorusArc)
@@ -178,7 +183,7 @@ void CTorusDlg::OnUpdateWallwidth()
 
 BOOL CTorusDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	m_cArcSpin.SetRange(8, 360);
 	m_cSidesSpin.SetRange(3, 100);
@@ -199,7 +204,7 @@ void CTorusDlg::OnPaint()
 	CBrush black(RGB(0,0,0));
 	CBrush grey(RGB(128,128,128));
 
-	// Do not call CDialog::OnPaint() for painting messages
+	// Do not call __super::OnPaint() for painting messages
 	CRect rcPreview;
 	m_cPreview.GetWindowRect(&rcPreview);
 	ScreenToClient(&rcPreview);
@@ -376,7 +381,7 @@ void CTorusDlg::DrawTorusCrossSection(CDC* pDC )
 	//  set the inner poinst to the center point of the box
 	//  and turn off the CreateSouthFace flag
 		
-	Vector points[4];	
+	Vector points[4] = {};	
 	for (i = 0; i < iSides; i++)
 	{
 		int iNextPoint = i+1;
@@ -444,7 +449,7 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 	pt.x = rcItem.left + rcItem.Width()  / 2;
 	pt.y = rcItem.top  + rcItem.Height() / 2;
 
-	if (bmaxs[0] - bmins[0])
+	if (bmaxs[0] != bmins[0])
 	{
 		fScaleX = rcItem.Width() /(bmaxs[0] - bmins[0]);
 	}
@@ -453,7 +458,7 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 		fScaleX = 1.0f;
 	}
 	
-	if (bmaxs[1] - bmins[1])
+	if (bmaxs[1] != bmins[1])
 	{
 		fScaleY = rcItem.Height() /(bmaxs[1] - bmins[1]);
 	}
@@ -492,7 +497,7 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 	Vector vecCenter;
 	VectorLerp( bmins, bmaxs, 0.5f, vecCenter );
 	
-	Vector points[4];	
+	Vector points[4] = {};
 	for (i = 0; i < iSides; i++)
 	{
 		int iNextPoint = i+1;

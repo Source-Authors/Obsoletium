@@ -16,7 +16,7 @@
 #include "vtf/vtf.h"
 #include "pixelwriter.h"
 #include "tier3/tier3.h"
-#include "platform.h"
+#include "tier0/platform.h"
 #include "bink_material.h"
 
 #include "bink/include/bink.h"
@@ -241,7 +241,9 @@ bool CBinkMaterial::HasAudio()
 
 bool CBinkMaterial::SetVolume( float fVolume )
 {
-	clamp( fVolume, 0.0f, 1.0f );
+	
+	// dimhotepus: Fix clamping.
+	fVolume = clamp( fVolume, 0.0f, 1.0f );
 
 	m_CurrentVolume = fVolume;
 
@@ -667,8 +669,9 @@ bool CBinkMaterial::SetTime( float flTime )
 	AssertExitF( flTime >= 0 && flTime < m_QTMovieDurationinSec );
 
 	float newTime = ( flTime * m_QTMovieFrameRate.GetUnitsPerSecond() + 0.5f) ;
-
-	clamp( newTime,  m_MovieFirstFrameTime, m_QTMovieDuration ); 
+	
+	// dimhotepus: Fix clamping.
+	newTime = clamp( newTime, (float)m_MovieFirstFrameTime, m_QTMovieDuration ); 
 
 	// Are we paused?
 	if ( m_bMoviePaused )

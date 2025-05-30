@@ -16,7 +16,7 @@
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Label.h>
 #include <vgui_controls/Button.h>
@@ -56,7 +56,7 @@ CBanPanel::CBanPanel(vgui::Panel *parent, const char *name) : PropertyPage(paren
 	m_pBanContextMenu = new CBanContextMenu(this);
 	m_pBanContextMenu->SetVisible(false);
 
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 	m_bPageViewed = false;
 
 	LoadControlSettings("Admin/BanPanel.res", "PLATFORM");
@@ -80,7 +80,7 @@ void CBanPanel::OnPageShow()
 	{
 		m_bPageViewed = true;
 		// force update on first page view
-		m_flUpdateTime = 0.0f;
+		m_flUpdateTime = 0.0;
 	}
 }
 
@@ -90,8 +90,8 @@ void CBanPanel::OnPageShow()
 void CBanPanel::OnResetData()
 {
 	RemoteServer().RequestValue(this, "banlist");
-	// update once every 5 minutes
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 5.0f);
+	// update once every 1 minute
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -131,9 +131,12 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 		int item = 0;
 		float banTime = 0.0f;
 		char id[64] = { 0 };
-		while (3 == sscanf(response, "%i %s : %f min\n", &item, id, &banTime))
+		// dimhotepus: Ensure id does not overflow.
+		while (3 == sscanf(response, "%i %63s : %f min\n", &item, id, &banTime))
 		{
-			KeyValues *ban = new KeyValues("ban");
+			id[std::size(id) - 1] = '\0';
+
+			KeyValuesAD ban("ban");
 
 			// determine type
 			if (IsIPAddress(id))
@@ -161,9 +164,10 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 			m_pBanListPanel->AddItem(ban, 0, false, false);
 
 			// move to the next item
-			response = (const char *)strchr(response, '\n');
+			response = strchr(response, '\n');
 			if (!response)
 				break;
+
 			response++;
 		}
 	}
@@ -234,13 +238,13 @@ void CBanPanel::RemoveBan()
 	{
 		// build the message
 		wchar_t id[256];
-		g_pVGuiLocalize->ConvertANSIToUnicode(kv->GetString("id"), id, sizeof(id));
+		g_pVGuiLocalize->ConvertANSIToUnicode(kv->GetString("id"), id);
 		wchar_t message[256];
-		g_pVGuiLocalize->ConstructString(message, sizeof(message), g_pVGuiLocalize->Find("#Ban_Remove_Msg"), 1, id);
+		g_pVGuiLocalize->ConstructString_safe(message, g_pVGuiLocalize->Find("#Ban_Remove_Msg"), 1, id);
 
 		// activate the confirmation dialog
 		QueryBox *box = new QueryBox(g_pVGuiLocalize->Find("#Ban_Title_Remove"), message);
-		box->SetOKCommand(new KeyValues("removebanbyid", "id", kv->GetString("id")));
+		box->SetOKCommand(new KeyValues("removebanbyid", "id", kv->GetString("id"))); //-V2017
 		box->AddActionSignalTarget(this);
 		box->DoModal();
 	}
@@ -260,7 +264,7 @@ void CBanPanel::ChangeBan()
 	{	
 		char timeText[20];
 		float time = kv->GetFloat("time");
-		_snprintf(timeText, sizeof(timeText), "%0.2f", time);
+		V_sprintf_safe(timeText, "%0.2f", time);
 
 		// open a dialog asking them what time to change the ban lenght to
 		CDialogCvarChange *box = new CDialogCvarChange(this);
@@ -281,7 +285,7 @@ void CBanPanel::RemoveBanByID(const char *id)
 
 	// send down the command
 	char cmd[512];
-	_snprintf(cmd, sizeof(cmd) -1, "%s %s\n", IsIPAddress(id) ? "removeip" : "removeid", id);
+	V_sprintf_safe(cmd, "%s %s\n", IsIPAddress(id) ? "removeip" : "removeid", id);
 	RemoteServer().SendCommand(cmd);
 
 	// force the file to be written
@@ -308,7 +312,8 @@ void CBanPanel::ChangeBanTimeByID(const char *id, const char *newtime)
 		return;
 
 	// if the newtime string is not valid, then set it to 0 (permanent ban)
-	if (!newtime || atof(newtime) < 0.001)
+	// dimhotepus: atof -> strtof
+	if (!newtime || strtof(newtime, nullptr) < 0.001)
 	{
 		newtime = "0";
 	}
@@ -386,7 +391,7 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 	// we don't use filesystem() here becuase we want to let the user pick
 	// a file from anywhere on their filesystem... so we use stdio
 	FILE *f = fopen(fullpath,"rb");
-	while (!feof(f) && fgets(line, 255, f))
+	while (f && !feof(f) && fgets(line, 255, f))
 	{	
 		// parse each line of the config file adding the ban
 		tok.SetLine(line);
@@ -409,7 +414,7 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 //-----------------------------------------------------------------------------
 // Purpose: returns true if the id string is an IP address, false if it's a WON or STEAM ID
 //-----------------------------------------------------------------------------
-bool CBanPanel::IsIPAddress(const char *id)
+[[nodiscard]] bool CBanPanel::IsIPAddress(const char *id)
 {
 	int s1, s2, s3, s4;
 	return (4 == sscanf(id, "%d.%d.%d.%d", &s1, &s2, &s3, &s4));

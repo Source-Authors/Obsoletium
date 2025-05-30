@@ -64,7 +64,17 @@ void		Replay_MsgBox( const wchar_t *pText );
 const char	*Replay_GetBaseDir();	// Returns the replays base dir - eg, "/home/user/<...>/replays/"
 const char *Replay_GetDownloadURLPath();
 const char *Replay_GetDownloadURL();
-void		Replay_CrackURL( const char *pURL, char *pBaseURLOut, char *pURLPathOut );
+void		Replay_CrackURL( IN_Z const char *pURL,
+	OUT_Z_CAP(baseOutSize) char *pBaseURLOut, intp baseOutSize,
+	OUT_Z_CAP(pathOutSize) char *pURLPathOut, intp pathOutSize );
+template<intp baseOutSize, intp pathOutSize>
+void		Replay_CrackURL( IN_Z const char *pURL,
+	OUT_Z_ARRAY char (&pBaseURLOut)[baseOutSize],
+	OUT_Z_ARRAY char (&pURLPathOut)[pathOutSize] )
+{
+	Replay_CrackURL( pURL, pBaseURLOut, baseOutSize, pURLPathOut, pathOutSize );
+}
+
 #ifndef DEDICATED
 void		Replay_HudMsg( const char *pText, const char *pSound = NULL, bool bUrgent = false );
 #endif

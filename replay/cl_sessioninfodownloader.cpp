@@ -233,7 +233,7 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 								for ( int i = iStartBlock; i < header.m_nNumBlocks; ++i )
 								{
 									// Attempt to read the current block from the buffer
-									buf.Get( &DummyBlock, sizeof( DummyBlock ) );
+									buf.Get( DummyBlock );
 									if ( !buf.IsValid() )
 									{
 										m_nError = ERROR_BLOCK_READ_FAILED;
@@ -289,7 +289,7 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 											pSession->m_strName.Get(), pNewBlock->m_iReconstruction,
 											BLOCK_FILE_EXTENSION
 										);
-										V_strcpy( pNewBlock->m_szFullFilename, pFullFilename );
+										V_strcpy_safe( pNewBlock->m_szFullFilename, pFullFilename );
 										pNewBlock->m_hSession = pSession->GetHandle();
 
 										// Add to session block manager
@@ -389,7 +389,8 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 		const char *pErrorToken = GetErrorString( m_nError, m_nHttpError );
 		if ( m_nError == ERROR_DOWNLOAD_FAILED )
 		{
-			KeyValues *pParams = new KeyValues( "args", "url", pDownloader->GetURL() );
+			// dimhotepus: Fix KeyValues leak.
+			KeyValuesAD pParams( new KeyValues( "args", "url", pDownloader->GetURL() ) );
 			CL_GetErrorSystem()->AddFormattedErrorFromTokenName( pErrorToken, pParams );
 		}
 		else

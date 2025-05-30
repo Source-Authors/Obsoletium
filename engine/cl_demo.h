@@ -18,6 +18,7 @@ struct DemoCommandQueue
 	DemoCommandQueue()
 	{
 		tick = 0;
+		filepos = -1;
 	}
 	int				tick;
 	democmdinfo_t	info;
@@ -30,7 +31,7 @@ struct DemoCommandQueue
 // beyond their intended size. This can lead to overflows and out-of-memory
 // errors, and it can waste memory because some of these data structures
 // never release their memory after hitting a high-water mark.
-const unsigned nMaxConsecutiveSkipPackets = 100;
+constexpr inline unsigned nMaxConsecutiveSkipPackets = 100;
 
 class CDemoPlayer : public IDemoPlayer
 {

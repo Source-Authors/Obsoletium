@@ -10,7 +10,7 @@
 #ifndef UTLSTACK_H
 #define UTLSTACK_H
 
-#include <string.h>
+#include <cstring>
 #include "utlmemory.h"
 #include "tier0/dbg.h"
 

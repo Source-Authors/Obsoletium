@@ -26,7 +26,7 @@ extern IMaterialSystem	*materials;
 #include "video/ivideoservices.h"
 #include "videosubsystem.h"
 
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "tier1/KeyValues.h"
 #include "tier0/platform.h"
 

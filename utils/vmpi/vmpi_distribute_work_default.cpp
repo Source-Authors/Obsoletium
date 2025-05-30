@@ -180,7 +180,7 @@ static bool CompareSoonestWorkUnitSets( CPartitionInfo::PartitionWUs * const &x,
 
 
 
-class CDistributor_DefaultMaster : public IWorkUnitDistributorMaster
+class CDistributor_DefaultMaster final : public IWorkUnitDistributorMaster
 {
 public:
 	virtual void Release()
@@ -351,7 +351,7 @@ public:
 			Warning( "\n\n-mpi_NoScheduler found: Warning - this should only be used for testing and with 1 worker!\n\n" );
 			vlkup.ExpandWindow( m_pInfo->m_nWorkUnits );
 			CPartitionInfo *pPartition = AddPartition( iWorker );
-			for ( int i=0; i < m_pInfo->m_nWorkUnits; i++ )
+			for ( WUIndexType i=0; i < m_pInfo->m_nWorkUnits; i++ )
 			{
 				CWorkUnitInfo info;
 				info.m_iWorkUnit = i;
@@ -496,7 +496,7 @@ public:
 		VMPI_SendData( mb.data, mb.getLen(), iWorker );
 	}
 
-	virtual bool HandlePacket( MessageBuffer *pBuf, int iSource, bool bIgnoreContents )
+	virtual bool HandlePacket( [[maybe_unused]] MessageBuffer *pBuf, [[maybe_unused]] int iSource, [[maybe_unused]] bool bIgnoreContents )
 	{
 		return false;
 	}
@@ -512,7 +512,7 @@ private:
 
 
 
-class CDistributor_DefaultWorker : public IWorkUnitDistributorWorker
+class CDistributor_DefaultWorker final : public IWorkUnitDistributorWorker
 {
 public:
 	virtual void Release()
@@ -542,7 +542,7 @@ public:
 		}
 	}
 
-	virtual void NoteLocalWorkUnitCompleted( WUIndexType iWU )
+	virtual void NoteLocalWorkUnitCompleted( WUIndexType )
 	{
 	}
 

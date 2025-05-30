@@ -8,10 +8,12 @@
 // NewKeyValue.h : header file
 //
 
+#include "windows/base_dlg.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CNewKeyValue dialog
 
-class CNewKeyValue : public CDialog
+class CNewKeyValue : public CBaseDlg
 {
 // Construction
 public:

@@ -99,31 +99,26 @@ const char *CCreateMultiplayerGameGameplayPage::GetHostName()
 //-----------------------------------------------------------------------------
 const char *CCreateMultiplayerGameGameplayPage::GetValue(const char *cvarName, const char *defaultValue)
 {
+	static char buf[128];
+
 	for (mpcontrol_t *mp = m_pList; mp != NULL; mp = mp->next)
 	{
 		Panel *control = mp->pControl;
 		if (control && !stricmp(mp->GetName(), cvarName))
 		{
-			KeyValues *data = new KeyValues("GetText");
-			static char buf[128];
+			KeyValuesAD data("GetText");
 			if (control && control->RequestInfo(data))
 			{
-				strncpy(buf, data->GetString("text", defaultValue), sizeof(buf) - 1);
+				V_strcpy_safe(buf, data->GetString("text", defaultValue));
 			}
 			else
 			{
 				// no value found, copy in default text
-				strncpy(buf, defaultValue, sizeof(buf) - 1);
+				V_strcpy_safe(buf, defaultValue);
 			}
 
-			// ensure null termination of string
-			buf[sizeof(buf) - 1] = 0;
-
-			// free
-			data->deleteThis();
 			return buf;
 		}
-
 	}
 
 	return defaultValue;
@@ -315,17 +310,17 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 			break;
 		case O_NUMBER:
 			pEdit = ( TextEntry * )pList->pControl;
-			pEdit->GetText( strValue, sizeof( strValue ) );
+			pEdit->GetText( strValue );
 			Q_snprintf( szValue, sizeof( szValue ), "%s", strValue );
 			break;
 		case O_STRING:
 			pEdit = ( TextEntry * )pList->pControl;
-			pEdit->GetText( strValue, sizeof( strValue ) );
+			pEdit->GetText( strValue );
 			Q_snprintf( szValue, sizeof( szValue ), "%s", strValue );
 			break;
 		case O_LIST:
 			pCombo = ( ComboBox *)pList->pControl;
-			pCombo->GetText( w_szStrValue, sizeof( w_szStrValue ) / sizeof( wchar_t ) );
+			pCombo->GetText( w_szStrValue );
 			
 			pItem = pObj->pListItems;
 
@@ -348,7 +343,7 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 				else
 				{
 					// Just convert what we have to Unicode
-					g_pVGuiLocalize->ConvertANSIToUnicode( pItem->szItemText, w_szStrTemp, sizeof( w_szStrTemp ) );
+					g_pVGuiLocalize->ConvertANSIToUnicode( pItem->szItemText, w_szStrTemp );
 				}
 
 				if ( _wcsicmp( w_szStrTemp, w_szStrValue ) == 0 )

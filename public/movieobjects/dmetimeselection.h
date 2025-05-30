@@ -54,7 +54,7 @@ public:
 	RecordingState_t	GetRecordingState() const;
 
 private:
-	CDmeTimeSelection & operator =( const CDmeTimeSelection& src );
+	CDmeTimeSelection & operator =( const CDmeTimeSelection& src ) = delete;
 
 	void				ConvertToRelative( DmeTime_t time );
 	void				ConvertToAbsolute( DmeTime_t time );
@@ -66,7 +66,8 @@ private:
 	CDmaVar< int > m_hold[ 2 ];
 	CDmaVar< int > m_nFalloffInterpolatorType[ 2 ];
 	CDmaVar< float > m_threshold;
-	CDmaVar< int > m_nRecordingState;
+	// dimhotepus: int -> RecordingState_t
+	CDmaVar< RecordingState_t > m_nRecordingState;
 };
 
 #endif // DMETIMESELECTION_H

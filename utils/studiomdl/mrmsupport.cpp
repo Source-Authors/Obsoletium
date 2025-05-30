@@ -5,30 +5,11 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-
-
-//
-// studiomdl.c: generates a studio .mdl file from a .qc script
-// models/<scriptname>.mdl.
-//
-
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
-
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
 #include "studio.h"
 #include "studiomdl.h"
-//#include "..\..\dlls\activity.h"
 
 bool IsEnd( char const* pLine )
 {
@@ -93,7 +74,7 @@ int SortAndBalanceBones( int iCount, int iMaxCount, int bones[], float weights[]
 	{
 		// missing weights?, go ahead and evenly share?
 		// FIXME: shouldn't this error out?
-		t = 1.0 / iCount;
+		t = 1.0f / iCount;
 
 		for (i = 0; i < iCount; i++)
 		{
@@ -103,7 +84,7 @@ int SortAndBalanceBones( int iCount, int iMaxCount, int bones[], float weights[]
 	else
 	{
 		// scale to sum to 1.0
-		t = 1.0 / t;
+		t = 1.0f / t;
 
 		for (i = 0; i < iCount; i++)
 		{
@@ -193,7 +174,7 @@ void Grab_Facelist( s_source_t *psource )
 			if (IsEnd(g_szLine)) 
 				return;
 
-			if (sscanf( g_szLine, "%d %d %d %d",
+			if (sscanf( g_szLine, "%d %lu %lu %lu",
 				&j, 
 				&f.a, &f.b, &f.c) == 4)
 			{
@@ -272,7 +253,7 @@ void Grab_Texcoordlist( s_source_t *psource )
 				&j, 
 				&t[0], &t[1]) == 3)
 			{
-				t[1] = 1.0 - t[1];
+				t[1] = 1.0f - t[1];
 				g_texcoord[j][0] = t[0];
 				g_texcoord[j][1] = t[1];
 			}
@@ -344,7 +325,7 @@ void Grab_Faceattriblist( s_source_t *psource )
 			if (IsEnd(g_szLine)) 
 				return;
 
-			if (sscanf( g_szLine, "%d %d %d %d %d %d %d %d %d",
+			if (sscanf( g_szLine, "%d %d %d %lu %lu %lu %lu %lu %lu",
 				&j, 
 				&material,
 				&smooth,
@@ -535,24 +516,18 @@ static void BuildUniqueVertexList( s_source_t *pSource, const int *pDesiredToVLi
 //-----------------------------------------------------------------------------
 // sort new vertices by materials, last used
 //-----------------------------------------------------------------------------
-static int vlistCompare( const void *elem1, const void *elem2 )
-{
-	v_unify_t *u1 = &v_listdata[*(int *)elem1];
-	v_unify_t *u2 = &v_listdata[*(int *)elem2];
+static bool vlistCompare( const int elem1, const int elem2 ) {
+	RESTRICT v_unify_t *u1 = &v_listdata[elem1];
+	RESTRICT v_unify_t *u2 = &v_listdata[elem2];
 
 	// sort by material
 	if (u1->m < u2->m)
-		return -1;
+		return true;
 	if (u1->m > u2->m)
-		return 1;
+		return false;
 
 	// sort by last used
-	if (u1->lastref < u2->lastref)
-		return -1;
-	if (u1->lastref > u2->lastref)
-		return 1;
-
-	return 0;
+	return u1->lastref < u2->lastref;
 }
 
 static void SortVerticesByMaterial( int *pDesiredToVList, int *pVListToDesired )
@@ -561,7 +536,7 @@ static void SortVerticesByMaterial( int *pDesiredToVList, int *pVListToDesired )
 	{
 		pDesiredToVList[i] = i;
 	}
-	qsort( pDesiredToVList, numvlist, sizeof( int ), vlistCompare );
+	std::sort( pDesiredToVList, pDesiredToVList + numvlist, vlistCompare );
 	for ( int i = 0; i < numvlist; i++ )
 	{
 		pVListToDesired[ pDesiredToVList[i] ] = i;
@@ -572,24 +547,16 @@ static void SortVerticesByMaterial( int *pDesiredToVList, int *pVListToDesired )
 //-----------------------------------------------------------------------------
 // sort new faces by materials, last used
 //-----------------------------------------------------------------------------
-static int faceCompare( const void *elem1, const void *elem2 )
+static bool faceCompare( const int i1, const int i2 )
 {
-	int i1 = *(int *)elem1;
-	int i2 = *(int *)elem2;
-
 	// sort by material
 	if (g_face[i1].material < g_face[i2].material)
-		return -1;
+		return true;
 	if (g_face[i1].material > g_face[i2].material)
-		return 1;
+		return false;
 
 	// sort by original usage
-	if (i1 < i2)
-		return -1;
-	if (i1 > i2)
-		return 1;
-
-	return 0;
+	return i1 < i2;
 }
 
 static void SortFacesByMaterial( int *pDesiredToSrcFace )
@@ -599,7 +566,7 @@ static void SortFacesByMaterial( int *pDesiredToSrcFace )
 	{
 		pDesiredToSrcFace[i] = i;
 	}
-	qsort( pDesiredToSrcFace, g_numfaces, sizeof( int ), faceCompare );
+	std::sort( pDesiredToSrcFace, pDesiredToSrcFace + g_numfaces, faceCompare );
 }
 
 

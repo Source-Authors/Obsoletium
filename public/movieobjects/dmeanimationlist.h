@@ -30,9 +30,9 @@ class CDmeAnimationList : public CDmElement
 	DEFINE_ELEMENT( CDmeAnimationList, CDmElement );
 
 public:
-	int GetAnimationCount() const;
-	CDmeChannelsClip *GetAnimation( int nIndex );
-	int FindAnimation( const char *pAnimName );
+	intp GetAnimationCount() const;
+	CDmeChannelsClip *GetAnimation( intp nIndex );
+	intp FindAnimation( const char *pAnimName ) const;
 	void SetAnimation( intp nIndex, CDmeChannelsClip *pAnimation );
 	intp AddAnimation( CDmeChannelsClip *pAnimation );
 	void RemoveAnimation( intp nIndex );
@@ -45,12 +45,12 @@ private:
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline int CDmeAnimationList::GetAnimationCount() const
+inline intp CDmeAnimationList::GetAnimationCount() const
 {
 	return m_Animations.Count();
 }
 
-inline CDmeChannelsClip *CDmeAnimationList::GetAnimation( int nIndex )
+inline CDmeChannelsClip *CDmeAnimationList::GetAnimation( intp nIndex )
 {
 	return m_Animations[nIndex];
 }

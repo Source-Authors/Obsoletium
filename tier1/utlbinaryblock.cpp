@@ -80,7 +80,7 @@ void CUtlBinaryBlock::Set( const void *pValue, intp nLen )
 
 	SetLength( nLen );
 
-	if ( m_nActualLength )
+	if ( pValue && m_nActualLength )
 	{
 		if ( ( ( const char * )m_Memory.Base() ) >= ( ( const char * )pValue ) + nLen ||
 			 ( ( const char * )m_Memory.Base() ) + m_nActualLength <= ( ( const char * )pValue ) )

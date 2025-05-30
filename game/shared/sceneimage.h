@@ -11,12 +11,14 @@
 #pragma once
 #endif
 
+#include "tier0/platform.h"
+
 class ISceneTokenProcessor;
 
 class ISceneCompileStatus
 {
 public:
-	virtual void UpdateStatus( char const *pchSceneName, bool bQuiet, int nIndex, int nCount ) = 0;
+	virtual void UpdateStatus( char const *pchSceneName, bool bQuiet, intp nIndex, intp nCount ) = 0;
 };
 
 class CUtlBuffer;

@@ -14,6 +14,7 @@
 #include "utlvector.h"
 #include "mxBitmapTools.h"
 #include "hlfaceposer.h"
+#include "studio.h"
 
 #define GLOBAL_STUDIO_FLEX_CONTROL_COUNT ( MAXSTUDIOFLEXCTRL * 4 )
 

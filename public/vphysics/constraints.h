@@ -13,6 +13,7 @@
 
 #include "vphysics_interface.h"
 #include "mathlib/mathlib.h"
+#include "tier0/platform.h"
 
 // constraint groups
 struct constraint_groupparams_t
@@ -297,7 +298,7 @@ struct constraint_lengthparams_t
 	}
 };
 
-class IPhysicsConstraint
+abstract_class IPhysicsConstraint
 {
 public:
 	virtual ~IPhysicsConstraint( void ) {}
@@ -313,28 +314,28 @@ public:
 	virtual void *GetGameData( void ) const = 0;
 
 	// Get the parent/referenced object
-	virtual IPhysicsObject *GetReferenceObject( void ) const = 0;
+	[[nodiscard]] virtual IPhysicsObject *GetReferenceObject( void ) const = 0;
 
 	// Get the attached object
-	virtual IPhysicsObject *GetAttachedObject( void ) const = 0;
+	[[nodiscard]] virtual IPhysicsObject *GetAttachedObject( void ) const = 0;
 
 	virtual void			SetLinearMotor( float speed, float maxLinearImpulse ) = 0;
 	virtual void			SetAngularMotor( float rotSpeed, float maxAngularImpulse ) = 0;
 
 	virtual void			UpdateRagdollTransforms( const matrix3x4_t &constraintToReference, const matrix3x4_t &constraintToAttached ) = 0;
-	virtual bool			GetConstraintTransform( matrix3x4_t *pConstraintToReference, matrix3x4_t *pConstraintToAttached ) const = 0;
-	virtual bool			GetConstraintParams( constraint_breakableparams_t *pParams ) const = 0;
+	[[nodiscard]] virtual bool			GetConstraintTransform( matrix3x4_t *pConstraintToReference, matrix3x4_t *pConstraintToAttached ) const = 0;
+	[[nodiscard]] virtual bool			GetConstraintParams( constraint_breakableparams_t *pParams ) const = 0;
 
 	virtual void			OutputDebugInfo() = 0;
 };
 
 
-class IPhysicsConstraintGroup
+abstract_class IPhysicsConstraintGroup
 {
 public:
 	virtual ~IPhysicsConstraintGroup( void ) {}
 	virtual void Activate() = 0;
-	virtual bool IsInErrorState() = 0;
+	[[nodiscard]] virtual bool IsInErrorState() = 0;
 	virtual void ClearErrorState() = 0;
 	virtual void GetErrorParams( constraint_groupparams_t *pParams ) = 0;
 	virtual void SetErrorParams( const constraint_groupparams_t &params ) = 0;

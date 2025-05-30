@@ -131,9 +131,8 @@ public:
 
 };
 
-#define VGUI_PANEL_INTERFACE_VERSION "VGUI_Panel009"
-
 } // namespace vgui
 
+constexpr inline char VGUI_PANEL_INTERFACE_VERSION[]{"VGUI_Panel009"};
 
 #endif // IPANEL_H

@@ -54,7 +54,7 @@ public:
 	bool					IsLooped( void ) override;
 	bool					IsStereoWav( void ) override;
 	bool					IsStreaming( void ) override;
-	int						GetCacheStatus( void ) override;
+	CAudioSource::AudioStatus			GetCacheStatus( void ) override;
 	int						ConvertLoopedPosition( int samplePosition );
 	void					CacheLoad( void ) override;
 	void					CacheUnload( void ) override;
@@ -79,7 +79,7 @@ public:
 	void			SetSentenceWord( bool bIsWord ) override { m_bIsSentenceWord = bIsWord; }
 	bool			IsSentenceWord() override { return m_bIsSentenceWord; }
 
-	int				GetLoopingInfo( int *pLoopBlock, int *pNumLeadingSamples, int *pNumTrailingSamples );
+	int				GetLoopingInfo();
 
 	int				SampleToStreamPosition( int ) override { return 0; }
 	int				StreamToSamplePosition( int ) override { return 0; }
@@ -134,12 +134,6 @@ protected:
 	// compressed formats alter definition of m_sampleCount 
 	// used to spare expensive calcs by decoders
 	int				m_numDecodedSamples;
-
-	// additional data needed by xma decoder to for looping
-	unsigned short	m_loopBlock;			// the block the loop occurs in
-	unsigned short	m_numLeadingSamples;	// number of leader samples in the loop block to discard
-	unsigned short	m_numTrailingSamples;	// number of trailing samples in the final block to discard
-	unsigned short	unused;
 
 	unsigned int	m_bNoSentence : 1;
 	unsigned int	m_bIsPlayOnce : 1;

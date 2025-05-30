@@ -338,7 +338,7 @@ void CFlare::FlareThink( void )
 	}
 	
 	//Act differently underwater
-	if ( GetWaterLevel() > 1 )
+	if ( GetWaterLevel() > WaterLevel::WL_Feet )
 	{
 		UTIL_Bubbles( GetAbsOrigin() + Vector( -2, -2, -2 ), GetAbsOrigin() + Vector( 2, 2, 2 ), 1 );
 		m_bSmoke = false;
@@ -379,7 +379,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 	if ( !pOther->IsSolid() )
 		return;
 
-	if ( ( m_nBounces < 10 ) && ( GetWaterLevel() < 1 ) )
+	if ( ( m_nBounces < 10 ) && ( GetWaterLevel() < WaterLevel::WL_Feet ) )
 	{
 		// Throw some real chunks here
 		g_pEffects->Sparks( GetAbsOrigin() );

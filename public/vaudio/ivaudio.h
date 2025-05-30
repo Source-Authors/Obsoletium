@@ -11,7 +11,9 @@
 #pragma once
 #endif
 
-class IAudioStreamEvent
+#include "tier0/platform.h"
+
+abstract_class IAudioStreamEvent
 {
 public:
 	// called by the stream to request more data
@@ -24,7 +26,7 @@ public:
 };
 
 
-class IAudioStream
+abstract_class IAudioStream
 {
 public:
 	virtual ~IAudioStream() {}
@@ -50,8 +52,8 @@ public:
 };
 
 // dimhotepus: Increment version.
-#define VAUDIO_INTERFACE_VERSION		"VAudio003"
-class IVAudio
+constexpr inline char VAUDIO_INTERFACE_VERSION[]{"VAudio003"};
+abstract_class IVAudio
 {
 public:
 	virtual ~IVAudio() {}

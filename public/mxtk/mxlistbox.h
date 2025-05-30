@@ -17,7 +17,7 @@
 
 
 #ifndef INCLUDED_MxWIDGET
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #endif
 
 

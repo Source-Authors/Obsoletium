@@ -342,7 +342,7 @@ void CBaseGrenade::DangerSoundThink( void )
 
 	SetNextThink( gpGlobals->curtime + 0.2F );
 
-	if (GetWaterLevel() != 0)
+	if (GetWaterLevel() != WaterLevel::WL_NotInWater)
 	{
 		SetAbsVelocity( GetAbsVelocity() * 0.5F );
 	}
@@ -476,7 +476,7 @@ void CBaseGrenade ::TumbleThink( void )
 		SetThink( &CBaseGrenade::Detonate );
 	}
 
-	if (GetWaterLevel() != 0)
+	if (GetWaterLevel() != WaterLevel::WL_NotInWater)
 	{
 		SetAbsVelocity( GetAbsVelocity() * 0.5 );
 		m_flPlaybackRate = 0.2;

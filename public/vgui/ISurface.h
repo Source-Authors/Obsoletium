@@ -143,7 +143,7 @@ public:
 	virtual void DrawOutlinedRect(int x0, int y0, int x1, int y1) = 0;
 
 	virtual void DrawLine(int x0, int y0, int x1, int y1) = 0;
-	virtual void DrawPolyLine(int *px, int *py, int numPoints) = 0;
+	virtual void DrawPolyLine(int *px, int *py, intp numPoints) = 0;
 
 	virtual void DrawSetTextFont(HFont font) = 0;
 	virtual void DrawSetTextColor(int r, int g, int b, int a) = 0;
@@ -265,8 +265,8 @@ public:
 	virtual int GetFontTallRequested(HFont font) = 0;
 	virtual int GetFontAscent(HFont font, wchar_t wch) = 0;
 	virtual bool IsFontAdditive(HFont font) = 0;
-	virtual void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) = 0;
-	virtual int GetCharacterWidth(HFont font, int ch) = 0;
+	virtual void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c) = 0;
+	virtual int GetCharacterWidth(HFont font, wchar_t ch) = 0;
 	virtual void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) = 0;
 
 	// notify icons?!?
@@ -279,7 +279,7 @@ public:
 	//!! these functions should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
 	virtual ptrdiff_t GetPopupCount() = 0;
-	virtual VPANEL GetPopup(int index) = 0;
+	virtual VPANEL GetPopup(intp index) = 0;
 	virtual bool ShouldPaintChildPanel(VPANEL childPanel) = 0;
 	virtual bool RecreateContext(VPANEL panel) = 0;
 	virtual void AddPanel(VPANEL panel) = 0;
@@ -409,6 +409,6 @@ public:
 
 }
 
-#define VGUI_SURFACE_INTERFACE_VERSION "VGUI_Surface030"
+constexpr inline char VGUI_SURFACE_INTERFACE_VERSION[]{"VGUI_Surface030"};
 
 #endif // ISURFACE_H

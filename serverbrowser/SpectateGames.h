@@ -16,19 +16,19 @@
 //-----------------------------------------------------------------------------
 // Purpose: Spectator games list
 //-----------------------------------------------------------------------------
-class CSpectateGames : public CInternetGames
+class CSpectateGames final : public CInternetGames
 {
 public:
 	CSpectateGames(vgui::Panel *parent);
 
 	// property page handlers
-	virtual void OnPageShow();
+	void OnPageShow() override;
 
-	virtual bool CheckTagFilter( gameserveritem_t &server );
+	bool CheckTagFilter( gameserveritem_t &server ) override;
 
 protected:
 	// filters by spectator games
-	virtual void GetNewServerList();
+	void GetNewServerList() override;
 
 private:
 	typedef CInternetGames BaseClass;

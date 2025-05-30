@@ -4,9 +4,9 @@
 //
 //=============================================================================//
 
-#include <stdlib.h>
-#include <ctype.h>
-#include "utlbuffer.h"
+#include "UnicodeFileHelpers.h"
+
+#include "tier1/utlbuffer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -27,7 +27,7 @@ ucs2 *AdvanceOverWhitespace(ucs2 *Start)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-ucs2 *ReadUnicodeToken(ucs2 *start, ucs2 *token, int tokenBufferSize, bool &quoted)
+ucs2 *ReadUnicodeToken(ucs2 *start, OUT_CAP(tokenBufferSize) ucs2 *token, intp tokenBufferSize, bool &quoted)
 {
 	// skip over any whitespace
 	start = AdvanceOverWhitespace(start);
@@ -45,7 +45,7 @@ ucs2 *ReadUnicodeToken(ucs2 *start, ucs2 *token, int tokenBufferSize, bool &quot
 		quoted = true;
 		// copy out the string until we hit an end quote
 		start++;
-		int count = 0;
+		intp count = 0;
 		while (*start && *start != '\"' && count < tokenBufferSize-1)
 		{
 			// check for special characters
@@ -77,7 +77,7 @@ ucs2 *ReadUnicodeToken(ucs2 *start, ucs2 *token, int tokenBufferSize, bool &quot
 	else
 	{
 		// copy out the string until we hit a whitespace
-		int count = 0;
+		intp count = 0;
 		while (*start && !iswspace(*start) && count < tokenBufferSize-1)
 		{
 			// no checking for special characters if it's not a quoted string
@@ -96,7 +96,7 @@ ucs2 *ReadUnicodeToken(ucs2 *start, ucs2 *token, int tokenBufferSize, bool &quot
 //-----------------------------------------------------------------------------
 // Purpose: Same as above but no translation of \n
 //-----------------------------------------------------------------------------
-ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, ucs2 *token, int tokenBufferSize, bool &quoted)
+ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, OUT_CAP(tokenBufferSize) ucs2 *token, intp tokenBufferSize, bool &quoted)
 {
 	// skip over any whitespace
 	start = AdvanceOverWhitespace(start);
@@ -114,7 +114,7 @@ ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, ucs2 *token, int tokenBufferSize, b
 		quoted = true;
 		// copy out the string until we hit an end quote
 		start++;
-		int count = 0;
+		intp count = 0;
 		while (*start && *start != '\"' && count < tokenBufferSize-1)
 		{
 			// check for special characters
@@ -149,7 +149,7 @@ ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, ucs2 *token, int tokenBufferSize, b
 	else
 	{
 		// copy out the string until we hit a whitespace
-		int count = 0;
+		intp count = 0;
 		while (*start && !iswspace(*start) && count < tokenBufferSize-1)
 		{
 			// no checking for special characters if it's not a quoted string

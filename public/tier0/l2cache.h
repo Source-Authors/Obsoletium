@@ -29,12 +29,11 @@ public:
 
 private:
 
-	int								m_nID;
-
 	P4Event_BSQ_cache_reference		*m_pL2CacheEvent;
 	int64							m_i64Start;
 	int64							m_i64End;
 	int								m_iL2CacheMissCount;
+	int								m_nID;
 };
 
 #endif   // TIER0_CL2CACHE_H_

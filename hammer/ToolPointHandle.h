@@ -25,7 +25,7 @@ public:
 	CToolPointHandle(void);
 	void Attach(CMapPointHandle *pPoint);
 
-	void CenterOnParent(CMapView *pView);
+	void CenterOnParent(class CMapView *pView);
 
 	//
 	// CBaseTool implementation.

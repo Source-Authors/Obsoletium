@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: Basic right-click context menu for servers
 //-----------------------------------------------------------------------------
-class CServerContextMenu : public vgui::Menu
+class CServerContextMenu final : public vgui::Menu
 {
 public:
 	CServerContextMenu(vgui::Panel *parent);

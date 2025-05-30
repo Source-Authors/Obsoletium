@@ -30,12 +30,14 @@ void FloatBitMap_t::InitializeWithRandomPixelsFromAnotherFloatBM(FloatBitMap_t c
 		}
 }
 
+static constexpr float kernel[] = {.05f, .25f, .4f, .25f, .05f};
 
-FloatBitMap_t *FloatBitMap_t::QuarterSizeWithGaussian(void) const
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeWithGaussian() const
 {
-	// generate a new bitmap half on each axis, using a separable gaussian. 
-	static float kernel[]={.05f,.25f,.4f,.25f,.05f};
+	// generate a new bitmap half on each axis, using a separable gaussian.
 	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
+	if (!newbm)
+		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 	
 	for(int y=0;y<Height/2;y++)
 		for(int x=0;x<Width/2;x++)
@@ -65,8 +67,13 @@ FloatBitMap_t *FloatBitMap_t::QuarterSizeWithGaussian(void) const
 FloatImagePyramid_t::FloatImagePyramid_t(FloatBitMap_t const &src, [[maybe_unused]] ImagePyramidMode_t mode)
 {
 	memset(m_pLevels,0,sizeof(m_pLevels));
-	m_nLevels=1;
-	m_pLevels[0]=new FloatBitMap_t(&src);
+
+	m_nLevels = 1;
+
+	m_pLevels[0] = new FloatBitMap_t(&src);
+	if ( !m_pLevels[0] )
+		Error( "Unable to allocate new bitmap %dx%d to copy to.\n", src.Width, src.Height );
+
 	ReconstructLowerResolutionLevels(0);
 }
 
@@ -89,19 +96,27 @@ float & FloatImagePyramid_t::Pixel(int x, int y, int component, int level) const
 	return m_pLevels[level]->Pixel(x,y,component);
 }
 
-void FloatImagePyramid_t::WriteTGAs(char const *basename) const
+bool FloatImagePyramid_t::WriteTGAs(char const *basename) const
 {
+	char bname_out[1024];
+
+	bool ok = true;
 	for(int l=0;l<m_nLevels;l++)
 	{
-		char bname_out[1024];
-		Q_snprintf(bname_out,sizeof(bname_out),"%s_%02d.tga",basename,l);
-		m_pLevels[l]->WriteTGAFile(bname_out);
+		V_sprintf_safe(bname_out,"%s_%02d.tga",basename,l);
+		if ( !m_pLevels[l]->WriteTGAFile(bname_out) )
+		{
+			ok = false;
+			fprintf(stderr, "Unable to write #%d bitmap to TGA '%s'.\n", l, bname_out);
+		}
 	}
+
+	return ok;
 
 }
 
 
-FloatImagePyramid_t::~FloatImagePyramid_t(void)
+FloatImagePyramid_t::~FloatImagePyramid_t()
 {
 	for(int l=0;l<m_nLevels;l++)
 		delete m_pLevels[l];

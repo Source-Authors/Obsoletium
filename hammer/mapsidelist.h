@@ -69,7 +69,7 @@ class CMapSideList : public CMapHelper
 		//
 		virtual void CalcBounds(BOOL bFullUpdate = FALSE);
 
-		virtual const char* GetDescription(void) { return "Side list helper"; }
+		const char* GetDescription(void) const override { return "Side list helper"; }
 
 		//
 		// Serialization.

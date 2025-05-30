@@ -153,6 +153,9 @@ $Project "gcsdk"
 					$Compiler 
 					{
 						$Create/UsePrecompiledHeader	"Not Using Precompiled Headers"
+						// dimhotepus: Disable warnings in generated code which we can't control
+						// 4125 decimal digit terminates octal escape sequence
+						$DisableSpecificWarnings	"$BASE;4125"
 					}
 				}
 			}

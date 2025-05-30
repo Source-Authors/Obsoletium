@@ -6,6 +6,8 @@
 #include <sal.h>
 #include <objbase.h>
 
+#include "tier0/commonmacros.h"
+
 using HRESULT = _Return_type_success_(return >= 0) long;
 
 extern "C" {
@@ -22,7 +24,7 @@ namespace se::common::windows {
 class ScopedCom {
  public:
   explicit ScopedCom(COINIT com_type) noexcept
-      : errc_{CoInitializeEx(nullptr, com_type)} {}
+      : errc_{CoInitializeEx(nullptr, to_underlying(com_type))} {}
 
   ScopedCom(const ScopedCom &) = delete;
   ScopedCom(ScopedCom &&) = delete;

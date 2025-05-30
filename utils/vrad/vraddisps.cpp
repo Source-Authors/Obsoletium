@@ -41,10 +41,10 @@ public:
 	}
 
 	// ISpatialLeafEnumerator
-	bool EnumerateLeaf( int ndxLeaf, int context ); 
+	bool EnumerateLeaf( int ndxLeaf, intp context ); 
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, int context );
+	bool FASTCALL EnumerateElement( int userId, intp context );
 
 public:
 
@@ -61,10 +61,10 @@ class CBSPDispRayEnumerator : public ISpatialLeafEnumerator, public IBSPTreeData
 {
 public:
 	// ISpatialLeafEnumerator
-	bool EnumerateLeaf( int ndxLeaf, int context );
+	bool EnumerateLeaf( int ndxLeaf, intp context );
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, int context );
+	bool FASTCALL EnumerateElement( int userId, intp context );
 };
 
 //=============================================================================
@@ -127,12 +127,12 @@ public:
 	//
 	// Enumeration Methods
 	//
-	bool DispRay_EnumerateLeaf( int ndxLeaf, int context );
-	bool DispRay_EnumerateElement( int userId, int context );
+	bool DispRay_EnumerateLeaf( int ndxLeaf, intp context );
+	bool DispRay_EnumerateElement( int userId, intp context );
 	bool DispRayDistance_EnumerateElement( int userId, CBSPDispRayDistanceEnumerator* pEnum );
 
-	bool DispFaceList_EnumerateLeaf( int ndxLeaf, int context );
-	bool DispFaceList_EnumerateElement( int userId, int context );
+	bool DispFaceList_EnumerateLeaf( int ndxLeaf, intp context );
+	bool DispFaceList_EnumerateElement( int userId, intp context );
 
 private:
 
@@ -215,13 +215,13 @@ IVRadDispMgr *StaticDispMgr( void )
 // Displacement/Face List
 //
 // ISpatialLeafEnumerator
-bool CBSPDispFaceListEnumerator::EnumerateLeaf( int ndxLeaf, int context ) 
+bool CBSPDispFaceListEnumerator::EnumerateLeaf( int ndxLeaf, intp context ) 
 { 
 	return s_DispMgr.DispFaceList_EnumerateLeaf( ndxLeaf, context );
 }
 
 // IBSPTreeDataEnumerator
-bool FASTCALL CBSPDispFaceListEnumerator::EnumerateElement( int userId, int context )
+bool FASTCALL CBSPDispFaceListEnumerator::EnumerateElement( int userId, intp context )
 {
 	return s_DispMgr.DispFaceList_EnumerateElement( userId, context );
 }
@@ -231,12 +231,12 @@ bool FASTCALL CBSPDispFaceListEnumerator::EnumerateElement( int userId, int cont
 //
 // RayEnumerator
 //
-bool CBSPDispRayEnumerator::EnumerateLeaf( int ndxLeaf, int context )
+bool CBSPDispRayEnumerator::EnumerateLeaf( int ndxLeaf, intp context )
 {
 	return s_DispMgr.DispRay_EnumerateLeaf( ndxLeaf, context );
 }
 
-bool FASTCALL CBSPDispRayEnumerator::EnumerateElement( int userId, int context )
+bool FASTCALL CBSPDispRayEnumerator::EnumerateElement( int userId, intp context )
 {
 	return s_DispMgr.DispRay_EnumerateElement( userId, context );
 }
@@ -249,10 +249,11 @@ bool FASTCALL CBSPDispRayEnumerator::EnumerateElement( int userId, int context )
 class CBSPDispRayDistanceEnumerator : public IBSPTreeDataEnumerator
 {
 public:
-	CBSPDispRayDistanceEnumerator() : m_Distance(1.0f), m_pSurface(0) {}
+	CBSPDispRayDistanceEnumerator() : m_Distance(1.0f), m_pSurface(nullptr),
+		m_pDispTested{nullptr}, m_pRay{nullptr} {}
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, int context )
+	bool FASTCALL EnumerateElement( int userId, intp context )
 	{
 		return s_DispMgr.DispRayDistance_EnumerateElement( userId, this );
 	}
@@ -271,6 +272,8 @@ public:
 CVRadDispMgr::CVRadDispMgr()
 {
 	m_pBSPTreeData = CreateBSPTreeData();
+	sampleCount = -1;
+	m_pSamplePos = nullptr;
 }
 
 
@@ -330,7 +333,7 @@ void CVRadDispMgr::Init( void )
 void CVRadDispMgr::Shutdown( void )
 {
 	// remove all displacements from the tree
-	for( int ndxDisp = m_DispTrees.Size(); ndxDisp >= 0; ndxDisp-- )
+	for( int ndxDisp = m_DispTrees.Count(); ndxDisp >= 0; ndxDisp-- )
 	{
 		RemoveDispFromTree( ndxDisp );
 	}
@@ -436,7 +439,7 @@ void CVRadDispMgr::UnserializeDisps( void )
 			return;
 		}
 
-		int nIndex = builderDisps.AddToTail();
+		intp nIndex = builderDisps.AddToTail();
 		pDisp->SetListIndex( nIndex );
 		builderDisps[nIndex] = pDisp;
 	}
@@ -471,13 +474,15 @@ void CVRadDispMgr::UnserializeDisps( void )
 	//
 	// create the displacement collision tree and add it to the bsp tree
 	//
-	CVRADDispColl *pDispTrees = new CVRADDispColl[g_dispinfo.Count()];
+	const intp count = g_dispinfo.Count();
+
+	auto *pDispTrees = new CVRADDispColl[count];
 	if( !pDispTrees )
 		return;
 
-	m_DispTrees.AddMultipleToTail( g_dispinfo.Count() );
+	m_DispTrees.AddMultipleToTail( count );
 
-	for( int iDisp = 0; iDisp < g_dispinfo.Count(); iDisp++ )
+	for( intp iDisp = 0; iDisp < count; iDisp++ )
 	{
 		pDispTrees[iDisp].Create( builderDisps[iDisp] );
 
@@ -501,7 +506,7 @@ void CVRadDispMgr::MakePatches( void )
 	float flTotalArea = 0.0f;
 
 	// Create patches for all of the displacements.
-	int nTreeCount = m_DispTrees.Size();
+	int nTreeCount = m_DispTrees.Count();
 	for( int iTree = 0; iTree < nTreeCount; ++iTree )
 	{
 		// Get the current displacement collision tree.
@@ -538,12 +543,12 @@ void CVRadDispMgr::SubdividePatch( int iPatch )
 //-----------------------------------------------------------------------------
 void CVRadDispMgr::StartRayTest( DispTested_t &dispTested )
 {
-	if( m_DispTrees.Size() > 0 )
+	if( m_DispTrees.Count() > 0 )
 	{
 		if( dispTested.m_pTested == 0 )
 		{
-			dispTested.m_pTested = new int[m_DispTrees.Size()];
-			memset( dispTested.m_pTested, 0, m_DispTrees.Size() * sizeof( int ) );
+			dispTested.m_pTested = new int[m_DispTrees.Count()];
+			memset( dispTested.m_pTested, 0, m_DispTrees.Count() * sizeof( int ) );
 			dispTested.m_Enum = 0;
 		}
 		++dispTested.m_Enum;
@@ -614,7 +619,7 @@ void CVRadDispMgr::ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &r
 
 void CVRadDispMgr::AddPolysForRayTrace( void )
 {
-	int nTreeCount = m_DispTrees.Size();
+	int nTreeCount = m_DispTrees.Count();
 	for( int iTree = 0; iTree < nTreeCount; ++iTree )
 	{
 		// Get the current displacement collision tree.
@@ -669,7 +674,7 @@ void CVRadDispMgr::GetDispSurf( int ndxFace, CVRADDispColl **ppDispTree )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CVRadDispMgr::DispRay_EnumerateLeaf( int ndxLeaf, int context )
+bool CVRadDispMgr::DispRay_EnumerateLeaf( int ndxLeaf, intp context )
 {
 	return m_pBSPTreeData->EnumerateElementsInLeaf( ndxLeaf, &m_EnumDispRay, context );
 }
@@ -677,7 +682,7 @@ bool CVRadDispMgr::DispRay_EnumerateLeaf( int ndxLeaf, int context )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CVRadDispMgr::DispRay_EnumerateElement( int userId, int context )
+bool CVRadDispMgr::DispRay_EnumerateElement( int userId, intp context )
 {
 	DispCollTree_t &dispTree = m_DispTrees[userId];
 	EnumContext_t *pCtx = ( EnumContext_t* )context;
@@ -755,7 +760,7 @@ bool CVRadDispMgr::DispRayDistance_EnumerateElement( int userId, CBSPDispRayDist
 /*
 float CVRadDispMgr::ClipRayToDisp( Ray_t const &ray, int dispinfo )
 {
-	assert( m_DispTrees.IsValidIndex(dispinfo) );
+	Assert( m_DispTrees.IsValidIndex(dispinfo) );
 
 	RayDispOutput_t output;
 	if (!m_DispTrees[dispinfo].m_pDispTree->AABBTree_Ray( ray, output ))
@@ -766,7 +771,7 @@ float CVRadDispMgr::ClipRayToDisp( Ray_t const &ray, int dispinfo )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CVRadDispMgr::DispFaceList_EnumerateLeaf( int ndxLeaf, int context )
+bool CVRadDispMgr::DispFaceList_EnumerateLeaf( int ndxLeaf, intp context )
 {
 	//
 	// add the faces found in this leaf to the face list
@@ -778,8 +783,8 @@ bool CVRadDispMgr::DispFaceList_EnumerateLeaf( int ndxLeaf, int context )
 		int ndxLeafFace = pLeaf->firstleafface + ndxFace;
 
 		// check to see if the face already lives in the list
-		int ndx;
-		int size = m_EnumDispFaceList.m_FaceList.Size();
+		intp ndx;
+		intp size = m_EnumDispFaceList.m_FaceList.Count();
 		for( ndx = 0; ndx < size; ndx++ )
 		{
 			if( m_EnumDispFaceList.m_FaceList[ndx] == ndxLeafFace )
@@ -788,7 +793,7 @@ bool CVRadDispMgr::DispFaceList_EnumerateLeaf( int ndxLeaf, int context )
 
 		if( ndx == size )
 		{
-			int ndxList = m_EnumDispFaceList.m_FaceList.AddToTail();
+			intp ndxList = m_EnumDispFaceList.m_FaceList.AddToTail();
 			m_EnumDispFaceList.m_FaceList[ndxList] = ndxLeafFace;
 		}
 	}
@@ -799,7 +804,7 @@ bool CVRadDispMgr::DispFaceList_EnumerateLeaf( int ndxLeaf, int context )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CVRadDispMgr::DispFaceList_EnumerateElement( int userId, int context )
+bool CVRadDispMgr::DispFaceList_EnumerateElement( int userId, intp context )
 {
 	DispCollTree_t &dispTree = m_DispTrees[userId];
 	CVRADDispColl  *pDispTree = dispTree.m_pDispTree;
@@ -807,8 +812,8 @@ bool CVRadDispMgr::DispFaceList_EnumerateElement( int userId, int context )
 		return false;
 
 	// check to see if the displacement already lives in the list
-	int ndx;
-	int size = m_EnumDispFaceList.m_DispList.Size();
+	intp ndx;
+	intp size = m_EnumDispFaceList.m_DispList.Count();
 	for( ndx = 0; ndx < size; ndx++ )
 	{
 		if( m_EnumDispFaceList.m_DispList[ndx] == pDispTree )
@@ -817,7 +822,7 @@ bool CVRadDispMgr::DispFaceList_EnumerateElement( int userId, int context )
 
 	if( ndx == size )
 	{
-		int ndxList = m_EnumDispFaceList.m_DispList.AddToTail();
+		intp ndxList = m_EnumDispFaceList.m_DispList.AddToTail();
 		m_EnumDispFaceList.m_DispList[ndxList] = pDispTree;
 	}
 
@@ -1130,7 +1135,10 @@ void AddPatchLightToRadial( Vector const &patchOrigin, Vector const &patchNormal
 		texinfo_t *pTexinfo = &texinfo[g_pFaces[pRadial->facenum].texinfo];
 		Vector vecTexU, vecTexV;
 		PreGetBumpNormalsForDisp( pTexinfo, vecTexU, vecTexV, normals[0] );
-		GetBumpNormals( vecTexU, vecTexV, normals[0], normals[0], &normals[1] ); 
+
+		Vector bumpNormals[NUM_BUMP_VECTS];
+		GetBumpNormals( vecTexU, vecTexV, normals[0], normals[0], bumpNormals );
+		memcpy( &normals[1], bumpNormals, sizeof(bumpNormals) );
 
 		if( bNeighborBump )
 		{
@@ -1550,7 +1558,8 @@ void CVRadDispMgr::EndTimer( void )
 	CCycleCount duration = m_Timer.GetDuration();
 	double seconds = duration.GetSeconds();
 
-	Msg( "Done<%1.4lf sec>\n", seconds );
+	Msg( "done (%1.4lfs)", seconds );
+	Msg( "\n" );
 }
 
 

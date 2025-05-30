@@ -93,7 +93,7 @@ public:
 
 
 	// Add an element to the the bucket specified by sortID
-	void AddElement( int sortID, Element_t elem )
+	void AddElement( short sortID, Element_t elem )
 	{
 		// Allocate an element to stick this in.
 		unsigned short elemID = m_Elements.Alloc( true );

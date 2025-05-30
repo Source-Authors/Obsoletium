@@ -76,16 +76,16 @@ SCRIPT_LOADED_CALLBACK SetScriptLoadedCallback( SCRIPT_LOADED_CALLBACK pfnNewScr
 AddScriptToStack
 ==============
 */
-void AddScriptToStack (char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_ABSOLUTE_PATH)
+void AddScriptToStack (const char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_ABSOLUTE_PATH)
 {
 	script++;
 	if (script == &scriptstack[MAX_INCLUDES])
 		Error ("script file exceeded MAX_INCLUDES");
 	
 	if ( pathMode == SCRIPT_USE_RELATIVE_PATH )
-		Q_strncpy( script->filename, filename, sizeof( script->filename ) );
+		V_strcpy_safe( script->filename, filename );
 	else
-		Q_strncpy (script->filename, ExpandPath (filename), sizeof( script->filename ) );
+		V_strcpy_safe( script->filename, ExpandPath (filename) );
 
 	int size = LoadFile (script->filename, (void **)&script->buffer);
 
@@ -132,7 +132,7 @@ void DefineMacro( char *macroname )
 	script_t	*pmacro = (script_t *)malloc( sizeof( script_t ) );
 	if (!pmacro) Error("Out of memory in DefineMacro for %s", macroname);
 
-	strcpy( pmacro->filename, macroname );
+	V_strcpy_safe(pmacro->filename, macroname);
 	pmacro->line = script->line;
 	pmacro->nummacroparams = 0;
 
@@ -151,7 +151,7 @@ void DefineMacro( char *macroname )
 
 		pmacro->macroparam[pmacro->nummacroparams++] = mp;
 
-		strcpy( mp, token );
+		V_strncpy( mp, token, ssize(pmacro->macrobuffer) );
 		mp += strlen( token ) + 1;
 
 		if (mp >= pmacro->macrobuffer + sizeof( pmacro->macrobuffer ))
@@ -184,7 +184,7 @@ void DefineMacro( char *macroname )
 		}
 	}
 
-	ptrdiff_t size = (cp - script->script_p);
+	intp size = (cp - script->script_p);
 
 	pmacro->buffer = (char *)malloc( size + 1);
 	if (!pmacro->buffer) Error("Out of memory in macro buffer");
@@ -263,9 +263,9 @@ bool AddMacroToStack( char *macroname )
 	}
 
 	script = pnext;
-	strcpy( script->filename, pmacro->filename );
+	V_strcpy_safe( script->filename, pmacro->filename );
 
-	ptrdiff_t size = pmacro->end_p - pmacro->buffer;
+	intp size = pmacro->end_p - pmacro->buffer;
 	script->buffer = (char *)malloc( size + 1 );
 	if (!script->buffer) return false;
 	memcpy( script->buffer, pmacro->buffer, size );
@@ -358,7 +358,7 @@ bool ExpandVariableToken( char *&token_p )
 
 		// lookup macro parameter
 
-		int index;
+		intp index;
 		for (index = 0; index < g_definevariable.Count(); index++)
 		{
 			if (Q_strnicmp( g_definevariable[index].param, tp, len ) == 0)
@@ -395,13 +395,13 @@ bool ExpandVariableToken( char *&token_p )
 ParseFromMemory
 ==============
 */
-void ParseFromMemory (char *buffer, int size)
+void ParseFromMemory (char *buffer, intp size)
 {
 	script = scriptstack;
 	script++;
 	if (script == &scriptstack[MAX_INCLUDES])
 		Error ("script file exceeded MAX_INCLUDES");
-	strcpy (script->filename, "memory buffer" );
+	V_strcpy_safe (script->filename, "memory buffer" );
 
 	script->buffer = buffer;
 	script->line = 1;
@@ -428,7 +428,7 @@ void PushMemoryScript( char *pszBuffer, const int nSize )
 	{
 		Error ( "script file exceeded MAX_INCLUDES" );
 	}
-	strcpy (script->filename, "memory buffer" );
+	V_strcpy_safe (script->filename, "memory buffer" );
 
 	script->buffer = pszBuffer;
 	script->line = 1;
@@ -525,7 +525,7 @@ static void FindFileAbsoluteList( CUtlVector< CUtlString > &outAbsolutePathNames
 
 	for ( const char *pszFoundFile = g_pFullFileSystem->FindFirst( pszFindName, &hFile ); pszFoundFile && hFile != FILESYSTEM_INVALID_FIND_HANDLE; pszFoundFile = g_pFullFileSystem->FindNext( hFile ) )
 	{
-		V_ComposeFileName( szPath, pszFoundFile, szResult, sizeof( szResult ) );
+		V_ComposeFileName( szPath, pszFoundFile, szResult );
 		outAbsolutePathNames.AddToTail( szResult );
 	}
 
@@ -708,7 +708,7 @@ skipspace:
 
 		if ( CmdLib_ExpandWithBasePaths( expandedPathList, token ) > 0 )
 		{
-			for ( int i = 0; i < expandedPathList.Count(); ++i )
+			for ( intp i = 0; i < expandedPathList.Count(); ++i )
 			{
 				CUtlVector< CUtlString > findFileList;
 				FindFileAbsoluteList( findFileList, expandedPathList[i].String() );
@@ -718,7 +718,7 @@ skipspace:
 					bFallbackToToken = false;
 
 					// Only add the first set of glob matches from the first base path
-					for ( int j = 0; j < findFileList.Count(); ++j )
+					for ( intp j = 0; j < findFileList.Count(); ++j )
 					{
 						AddScriptToStack( const_cast< char * >( findFileList[j].String() ) );
 					}
@@ -930,14 +930,14 @@ qboolean GetTokenizerStatus( char **pFilename, int *pLine )
 }
 
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
 #include <sys/utime.h>
 #endif
-#include <time.h>
+#include <ctime>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -948,15 +948,15 @@ class CScriptLib final : public IScriptLib
 public:
 	bool ReadFileToBuffer( const char *pSourceName, CUtlBuffer &buffer, bool bText = false, bool bNoOpenFailureWarning = false ) override;
 	bool WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer, DiskWriteMode_t writeMode ) override;
-	int	FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList ) override;
-	char *MakeTemporaryFilename( char const *pchModPath, char *pPath, int pathSize ) override;
+	intp FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList ) override;
+	char *MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize ) override;
 	void DeleteTemporaryFiles( const char *pFileMask ) override;
 	int CompareFileTime( const char *pFilenameA, const char *pFilenameB ) override;
 	bool DoesFileExist( const char *pFilename ) override;
 
 private:
 
-	int GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList );
+	intp GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList );
 	void RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector< CUtlString > &dirList );
 };
 
@@ -1013,7 +1013,7 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 
 	// create path
 	// prime and skip to first seperator
-	strcpy( dirPath, pTargetName );
+	V_strcpy_safe( dirPath, pTargetName );
 	ptr = strchr( dirPath, '\\' );
 	while ( ptr )
 	{		
@@ -1021,7 +1021,7 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 		if ( ptr )
 		{
 			*ptr = '\0';
-			if ( _mkdir( dirPath ) ) return false;
+			if ( _mkdir( dirPath ) && errno != EEXIST ) return false;
 			*ptr = '\\';
 		}
 	}
@@ -1052,8 +1052,8 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 //-----------------------------------------------------------------------------
 int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB )
 {
-	int timeA = g_pFullFileSystem->GetFileTime( (char *)pFilenameA );
-	int timeB = g_pFullFileSystem->GetFileTime( (char *)pFilenameB );
+	time_t timeA = g_pFullFileSystem->GetFileTime( pFilenameA );
+	time_t timeB = g_pFullFileSystem->GetFileTime( pFilenameB );
 
 	if ( timeA == -1)
 	{
@@ -1066,11 +1066,11 @@ int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB 
 		timeB = 0;
 	}
 
-	if ( (unsigned int)timeA < (unsigned int)timeB )
+	if ( (uintp)timeA < (uintp)timeB )
 	{
 		return -1;
 	}
-	else if ( (unsigned int)timeA > (unsigned int)timeB )
+	else if ( (uintp)timeA > (uintp)timeB )
 	{
 		return 1;
 	}
@@ -1081,16 +1081,18 @@ int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB 
 //-----------------------------------------------------------------------------
 // Make a temporary filename
 //-----------------------------------------------------------------------------
-char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, int pathSize )
+char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize )
 {
 	char *pBuffer = _tempnam( pchModPath, "mgd_" );
 	if ( pBuffer[0] == '\\' )
 	{
 		pBuffer++;
 	}
-	if ( pBuffer[strlen( pBuffer )-1] == '.' )
+	auto len = V_strlen( pBuffer )-1;
+
+	if ( pBuffer[len] == '.' )
 	{
-		pBuffer[strlen( pBuffer )-1] = '\0';
+		pBuffer[len] = '\0';
 	}
 	V_snprintf( pPath, pathSize, "%s.tmp", pBuffer );
 
@@ -1104,7 +1106,6 @@ char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, in
 //-----------------------------------------------------------------------------
 void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 {
-#if !defined( _X360 )
 	const char *pEnv = getenv( "temp" );
 	if ( !pEnv )
 	{
@@ -1114,26 +1115,26 @@ void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 	if ( pEnv )
 	{
 		char tempPath[MAX_PATH];
-		strcpy( tempPath, pEnv );
-		V_AppendSlash( tempPath, sizeof( tempPath ) );
-		strcat( tempPath, pFileMask );
+		V_strcpy_safe( tempPath, pEnv );
+		V_AppendSlash( tempPath );
+		V_strcat_safe( tempPath, pFileMask );
 
 		CUtlVector<fileList_t> fileList;
 		FindFiles( tempPath, false, fileList );
-		for ( int i=0; i<fileList.Count(); i++ )
+		for ( auto &l : fileList )
 		{
-			_unlink( fileList[i].fileName.String() );
+			if (unlink(l.fileName.String())) {
+				Warning("Unable to remove temp file '%s': %s.\n", l.fileName.String(),
+						std::generic_category().message(errno).c_str());
+			}
 		}
 	}
-#else
-	AssertOnce( !"CScriptLib::DeleteTemporaryFiles:  Not avail on 360\n" );
-#endif
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Get list of files from current path that match pattern
 //-----------------------------------------------------------------------------
-int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList )
+intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVector< fileList_t > &fileList )
 {
 	char	sourcePath[MAX_PATH];
 	char	fullPath[MAX_PATH];
@@ -1141,11 +1142,11 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 
 	fileList.Purge();
 
-	strcpy( sourcePath, pDirPath );
+	V_strcpy_safe( sourcePath, pDirPath );
 	intp len = V_strlen( sourcePath );
 	if ( !len )
 	{
-		strcpy( sourcePath, ".\\" );
+		V_strcpy_safe( sourcePath, ".\\" );
 	}
 	else if ( sourcePath[len-1] != '\\' )
 	{
@@ -1153,18 +1154,18 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 		sourcePath[len+1] = '\0';
 	}
 
-	strcpy( fullPath, sourcePath );
+	V_strcpy_safe( fullPath, sourcePath );
 	if ( pPattern[0] == '\\' && pPattern[1] == '\0' )
 	{
 		// find directories only
 		bFindDirs = true;
-		strcat( fullPath, "*" );
+		V_strcat_safe( fullPath, "*" );
 	}
 	else
 	{
 		// find files, use provided pattern
 		bFindDirs = false;
-		strcat( fullPath, pPattern );
+		V_strcat_safe( fullPath, pPattern );
 	}
 
 #ifdef WIN32
@@ -1198,8 +1199,8 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 			continue;
 
 		char fileName[MAX_PATH];
-		strcpy( fileName, sourcePath );
-		strcat( fileName, findData.name );
+		V_strcpy_safe( fileName, sourcePath );
+		V_strcat_safe( fileName, findData.name );
 
 		intp j = fileList.AddToTail();
 		fileList[j].fileName.Set( fileName );
@@ -1240,8 +1241,8 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 			continue;
 
 		char fileName[MAX_PATH];
-		strcpy( fileName, sourcePath );
-		strcat( fileName, findData.cFileName );
+		V_strcpy_safe( fileName, sourcePath );
+		V_strcat_safe( fileName, findData.cFileName );
 
 		intp j = fileList.AddToTail();
 		fileList[j].fileName.Set( fileName );
@@ -1274,45 +1275,43 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 {
 	// recurse from source directory, get directories only
 	CUtlVector< fileList_t > fileList;
-	int dirCount = GetFileList( pDirPath, "\\", fileList );
+	intp dirCount = GetFileList( pDirPath, "\\", fileList );
 	if ( !dirCount )
 	{
 		// add directory name to search tree
-		intp j = dirList.AddToTail();
-		dirList[j].Set( pDirPath );
+		dirList[dirList.AddToTail()].Set( pDirPath );
 		return;
 	}
 
-	for ( int i=0; i<dirCount; i++ )
+	for ( intp i=0; i<dirCount; i++ )
 	{
 		// form new path name, recurse into
 		RecurseFileTree_r( fileList[i].fileName.String(), depth+1, dirList );
 	}
 
-	intp j = dirList.AddToTail();
-	dirList[j].Set( pDirPath );
+	dirList[dirList.AddToTail()].Set( pDirPath );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Generate a list of file matching mask
 //-----------------------------------------------------------------------------
-int CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList )
+intp CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList )
 {
 	char	dirPath[MAX_PATH];
 	char	pattern[MAX_PATH];
 	char	extension[MAX_PATH];
 
 	// get path only
-	strcpy( dirPath, pFileMask );
+	V_strcpy_safe( dirPath, pFileMask );
 	V_StripFilename( dirPath );
 
 	// get pattern only
-	V_FileBase( pFileMask, pattern, sizeof( pattern ) );
-	V_ExtractFileExtension( pFileMask, extension, sizeof( extension ) );
+	V_FileBase( pFileMask, pattern );
+	V_ExtractFileExtension( pFileMask, extension );
 	if ( extension[0] )
 	{
-		strcat( pattern, "." );
-		strcat( pattern, extension );
+		V_strcat_safe( pattern, "." );
+		V_strcat_safe( pattern, extension );
 	}
 
 	if ( !bRecurse )

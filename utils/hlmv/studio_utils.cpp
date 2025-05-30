@@ -9,10 +9,6 @@
 // 1-4-99	fixed file texture load and file read bug
 
 ////////////////////////////////////////////////////////////////////////
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <malloc.h>
 #include "StudioModel.h"
 #include "vphysics/constraints.h"
 #include "physmesh.h"
@@ -30,9 +26,6 @@
 
 extern char g_appTitle[];
 Vector *StudioModel::m_AmbientLightColors;
-
-#pragma warning( disable : 4244 ) // double to float
-
 
 static StudioModel g_studioModel;
 static StudioModel *g_pActiveModel;
@@ -129,7 +122,7 @@ void StudioModel::operator delete( void *pMem )
 {
 #ifdef _DEBUG
 	// set the memory to a known value
-	int size = _msize( pMem );
+	size_t size = _msize( pMem );
 	memset( pMem, 0xcd, size );
 #endif
 
@@ -148,7 +141,7 @@ void StudioModel::operator delete( void *pMem, int nBlockUse, const char *pFileN
 {
 #ifdef _DEBUG
 	// set the memory to a known value
-	int size = _msize( pMem );
+	size_t size = _msize( pMem );
 	memset( pMem, 0xcd, size );
 #endif
 	// get the engine to free the memory
@@ -166,13 +159,9 @@ bool StudioModel::LoadModel( const char *pModelName )
 	if (m_pModelName != pModelName)
 	{
 		// Copy over the model name; we'll need it later...
-		if (m_pModelName)
-		{
 			delete[] m_pModelName;
+		m_pModelName = V_strdup( pModelName );
 		}
-		m_pModelName = new char[Q_strlen(pModelName) + 1];
-		strcpy( m_pModelName, pModelName );
-	}
 
 	m_MDLHandle = g_pMDLCache->FindMDL( pModelName );
 
@@ -200,14 +189,14 @@ bool StudioModel::LoadModel( const char *pModelName )
 		if ( !pSrcSet )
 			continue;
 
-		int j = m_HitboxSets.AddToTail();
+		intp j = m_HitboxSets.AddToTail();
 		HitboxSet_t &set = m_HitboxSets[j];
 		set.m_Name = pSrcSet->pszName();
 
 		for ( i = 0; i < pSrcSet->numhitboxes; ++i )
 		{
 			mstudiobbox_t *pHit = pSrcSet->pHitbox(i);
-			int nIndex = set.m_Hitboxes.AddToTail( );
+			auto nIndex = set.m_Hitboxes.AddToTail( );
 			HitboxInfo_t &hitbox = set.m_Hitboxes[nIndex];
 
 			hitbox.m_Name = pHit->pszHitboxName();
@@ -674,11 +663,11 @@ void StudioModel::GetSequenceInfo( int iSequence, float *pflFrameRate, float *pf
 
 	if (t > 0)
 	{
-		*pflFrameRate = 1.0 / t;
+		*pflFrameRate = 1.0f / t;
 	}
 	else
 	{
-		*pflFrameRate = 1.0;
+		*pflFrameRate = 1.0f;
 	}
 	*pflGroundSpeed = GetGroundSpeed( iSequence );
 }
@@ -769,9 +758,9 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 		return;
 
   	// assume that changes < -0.5 are loops....
-  	if (m_cycle - prevcycle[0] < -0.5)
+  	if (m_cycle - prevcycle[0] < -0.5f)
   	{
-  		prevcycle[0] = prevcycle[0] - 1.0;
+  		prevcycle[0] = prevcycle[0] - 1.0f;
   	}
 
 	Studio_SeqMovement( pStudioHdr, m_sequence, prevcycle[0], m_cycle, m_poseparameter, vecPos, vecAngles );
@@ -783,9 +772,9 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 		Vector vecTmp;
 		QAngle angTmp;
 
-  		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5)
+  		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5f)
   		{
-  			prevcycle[i+1] = prevcycle[i+1] - 1.0;
+  			prevcycle[i+1] = prevcycle[i+1] - 1.0f;
   		}
 
 		if (m_Layer[i].m_weight > 0.0)
@@ -794,7 +783,7 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 			angTmp.Init();
 			if (Studio_SeqMovement( pStudioHdr, m_Layer[i].m_sequence, prevcycle[i+1], m_Layer[i].m_cycle, m_poseparameter, vecTmp, angTmp ))
 			{
-				vecPos = vecPos * ( 1.0 - m_Layer[i].m_weight ) + vecTmp * m_Layer[i].m_weight;
+				vecPos = vecPos * ( 1.0f - m_Layer[i].m_weight ) + vecTmp * m_Layer[i].m_weight;
 			}
 		}
 		prevcycle[i+1] = m_Layer[i].m_cycle;
@@ -1083,15 +1072,13 @@ void StudioModel::scaleMeshes (float scale)
 	for (i = 0; i < pStudioHdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( i );
-		Vector tmp;
+		Vector tmpmin = seqdesc.bbmin;
+		VectorScale( tmpmin, scale, tmpmin );
+		seqdesc.bbmin = tmpmin;
 
-		tmp = seqdesc.bbmin;
-		VectorScale( tmp, scale, tmp );
-		seqdesc.bbmin = tmp;
-
-		tmp = seqdesc.bbmax;
-		VectorScale( tmp, scale, tmp );
-		seqdesc.bbmax = tmp;
+		tmpmin = seqdesc.bbmax;
+		VectorScale( tmpmin, scale, tmpmin );
+		seqdesc.bbmax = tmpmin;
 
 	}
 
@@ -1208,17 +1195,25 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)virtualModel );
 }
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
+byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)virtualModel, i );
 }
 
-int studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
+intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
 	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)virtualModel, pOut );
 }
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
-	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)cache );
+	Assert((intp)cache <= 0xFFFF);
+	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+}
+
+// dimhotepus: Add const-correct API.
+studiohdr_t *virtualgroup_t::GetStudioHdr( void )
+{
+	Assert((intp)cache <= 0xFFFF);
+	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
 }

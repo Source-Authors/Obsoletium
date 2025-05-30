@@ -7,7 +7,7 @@
 $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 $Macro SDL3SRCDIR	"$SRCDIR\thirdparty\SDL"
-$Macro SDL3OUTDIR	"$SDL3SRCDIR\out\Release"
+$Macro SDL3OUTDIR	"$SDL3SRCDIR\out"
 
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 

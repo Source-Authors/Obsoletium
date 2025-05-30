@@ -6,8 +6,8 @@
 
 #include "dme_controls/dmelogeditpanel.h"
 #include "movieobjects/dmelog.h"
-#include "vgui_controls/button.h"
-#include "vgui_controls/combobox.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ComboBox.h"
 #include "tier1/KeyValues.h"
 
 using namespace vgui;
@@ -66,7 +66,7 @@ float CDmeLogEditPanel::ValueToNormalized( float flNormalized )
 //-----------------------------------------------------------------------------
 // Control points + values...
 //-----------------------------------------------------------------------------
-int CDmeLogEditPanel::FindOrAddControlPoint( float flIn, float flTolerance, float flOut )
+intp CDmeLogEditPanel::FindOrAddControlPoint( float flIn, float flTolerance, float flOut )
 {
 	Assert( m_hLog.Get() );
 	DmeTime_t time = NormalizedToTime( flIn );
@@ -133,7 +133,7 @@ int CDmeLogEditPanel::FindOrAddControlPoint( float flIn, float flTolerance, floa
 //-----------------------------------------------------------------------------
 // Finds a control point within tolerance
 //-----------------------------------------------------------------------------
-int CDmeLogEditPanel::FindControlPoint( float flIn, float flTolerance )
+intp CDmeLogEditPanel::FindControlPoint( float flIn, float flTolerance )
 {
 	Assert( m_hLog.Get() );
 	DmeTime_t time = NormalizedToTime( flIn ); 
@@ -145,7 +145,7 @@ int CDmeLogEditPanel::FindControlPoint( float flIn, float flTolerance )
 //-----------------------------------------------------------------------------
 // Modifies an existing control point
 //-----------------------------------------------------------------------------
-int CDmeLogEditPanel::ModifyControlPoint( int nPoint, float flIn, float flOut )
+intp CDmeLogEditPanel::ModifyControlPoint( intp nPoint, float flIn, float flOut )
 {
 	Assert( m_hLog.Get() );
 	DmeTime_t time = NormalizedToTime( flIn ); 
@@ -216,7 +216,7 @@ int CDmeLogEditPanel::ModifyControlPoint( int nPoint, float flIn, float flOut )
 //-----------------------------------------------------------------------------
 // Removes a single control point
 //-----------------------------------------------------------------------------
-void CDmeLogEditPanel::RemoveControlPoint( int nPoint )
+void CDmeLogEditPanel::RemoveControlPoint( intp nPoint )
 {
 	Assert( m_hLog.Get() );
 	m_hLog->RemoveKey( nPoint );
@@ -278,7 +278,7 @@ float CDmeLogEditPanel::GetValue( float flIn )
 	return ValueToNormalized( flValue );
 }
 
-int CDmeLogEditPanel::ControlPointCount()
+intp CDmeLogEditPanel::ControlPointCount()
 {
 	Assert( m_hLog.Get() );
 	return m_hLog->GetKeyCount( );
@@ -288,7 +288,7 @@ int CDmeLogEditPanel::ControlPointCount()
 //-----------------------------------------------------------------------------
 // Gets a particular control point's value
 //-----------------------------------------------------------------------------
-void CDmeLogEditPanel::GetControlPoint( int nPoint, float *pIn, float *pOut )
+void CDmeLogEditPanel::GetControlPoint( intp nPoint, float *pIn, float *pOut )
 {
 	Assert( m_hLog.Get() );
 	DmeTime_t time = m_hLog->GetKeyTime( nPoint );

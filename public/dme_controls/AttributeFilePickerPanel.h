@@ -33,7 +33,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeFilePickerPanel : public CAttributeBasePickerPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeFilePickerPanel, CAttributeBasePickerPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeFilePickerPanel, CAttributeBasePickerPanel );
 
 public:
 	CAttributeFilePickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
@@ -41,7 +41,7 @@ public:
 
 private:
 	MESSAGE_FUNC_CHARPTR( OnFileSelected, "FileSelected", fullpath );
-	virtual void ShowPickerDialog();
+	void ShowPickerDialog() override;
 	virtual void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog ) = 0;
 };
 
@@ -49,15 +49,15 @@ private:
 //-----------------------------------------------------------------------------
 // Macro to quickly make new attribute types
 //-----------------------------------------------------------------------------
-#define DECLARE_ATTRIBUTE_FILE_PICKER( _className )							\
-	class _className : public CAttributeFilePickerPanel						\
+#define DECLARE_ATTRIBUTE_FILE_PICKER( _className )								\
+	class _className : public CAttributeFilePickerPanel							\
 	{																			\
-		DECLARE_CLASS_SIMPLE( _className, CAttributeFilePickerPanel );			\
+		DECLARE_CLASS_SIMPLE_OVERRIDE( _className, CAttributeFilePickerPanel );	\
 	public:																		\
 		_className( vgui::Panel *parent, const AttributeWidgetInfo_t &info ) :	\
 			BaseClass( parent, info ) {}										\
 	private:																	\
-		virtual void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog );		\
+		void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog ) override;		\
 	}
 
 #define IMPLEMENT_ATTRIBUTE_FILE_PICKER( _className, _popupTitle, _assetType, _assetExt )	\

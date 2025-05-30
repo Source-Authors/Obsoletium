@@ -15,6 +15,7 @@
 #include "pacifier.h"
 #include "disp_ivp.h"
 #include "builddisp.h"
+#include "bspflags.h"
 #include "mathlib/vector.h"
 
 // map displacement info -- runs parallel to the dispinfos struct
@@ -144,7 +145,7 @@ int GetDispInfoEntityNum( mapdispinfo_t *pDisp )
 
 // Setup a CCoreDispInfo given a mapdispinfo_t.
 // If pFace is non-NULL, then lightmap texture coordinates will be generated.
-void DispMapToCoreDispInfo( mapdispinfo_t *pMapDisp, CCoreDispInfo *pCoreDispInfo, dface_t *pFace, int *pSwappedTexInfos )
+void DispMapToCoreDispInfo( mapdispinfo_t *pMapDisp, CCoreDispInfo *pCoreDispInfo, dface_t *pFace, intp *pSwappedTexInfos )
 {
 	winding_t *pWinding = pMapDisp->face.originalface->winding;
 
@@ -535,7 +536,7 @@ void EmitDispLMAlphaAndNeighbors()
 			return;
 		}
 
-		int nIndex = g_CoreDispInfos.AddToTail();
+		intp nIndex = g_CoreDispInfos.AddToTail();
 		pDisp->SetListIndex( nIndex );
 		g_CoreDispInfos[nIndex] = pDisp;
 	}
@@ -547,8 +548,8 @@ void EmitDispLMAlphaAndNeighbors()
 
 	faces.SetSize( nummapdispinfo );
 
-	int nMemSize = texinfo.Count() * sizeof(int);
-	int *pSwappedTexInfos = (int*)stackalloc( nMemSize );
+	int nMemSize = texinfo.Count() * sizeof(intp);
+	intp *pSwappedTexInfos = (intp*)stackalloc( nMemSize );
 	memset( pSwappedTexInfos, 0xFF, nMemSize );
 	for( i = 0; i < numfaces; i++ )
 	{
@@ -595,7 +596,7 @@ void EmitDispLMAlphaAndNeighbors()
 		CalculateLightmapSamplePositions( pCoreDispInfo, pFace, g_DispLightmapSamplePositions );
 	}
 
-	StartPacifier( "Displacement Alpha : ");
+	StartPacifier( "Displacement Alpha: ");
 
 	// Build lightmap alphas.
 	int dispCount = 0;	// How many we've processed.
@@ -626,7 +627,7 @@ void DispGetFaceInfo( mapbrush_t *pBrush )
 	// we don't support displacement on entities at the moment!!
 	if( pBrush->entitynum != 0 )
 	{
-		char* pszEntityName = ValueForKey( &g_LoadingMap->entities[pBrush->entitynum], "classname" );
+		const char* pszEntityName = ValueForKey( &g_LoadingMap->entities[pBrush->entitynum], "classname" );
 		Error( "Error: displacement found on a(n) %s entity - not supported (entity %d, brush %d)\n", pszEntityName, pBrush->entitynum, pBrush->brushnum );
 	}
 

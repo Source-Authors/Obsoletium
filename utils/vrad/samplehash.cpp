@@ -29,9 +29,9 @@ bool SampleData_CompareFunc( SampleData_t const &src1, SampleData_t const &src2 
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-unsigned int SampleData_KeyFunc( SampleData_t const &src )
+uintp SampleData_KeyFunc( SampleData_t const &src )
 {
-	return ( src.x + src.y + src.z );
+	return ( (uintp)src.x + src.y + src.z );
 }
 
 
@@ -133,7 +133,7 @@ bool PatchSampleData_CompareFunc( PatchSampleData_t const &src1, PatchSampleData
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-unsigned int PatchSampleData_KeyFunc( PatchSampleData_t const &src )
+uintp PatchSampleData_KeyFunc( PatchSampleData_t const &src )
 {
 	return ( src.x + src.y + src.z );
 }
@@ -206,7 +206,7 @@ void PatchSampleData_AddSample( CPatch *pPatch, int ndxPatch )
 				UtlHashHandle_t handle = g_PatchSampleHashTable.Find( iteratePatch );
 				if( handle == g_PatchSampleHashTable.InvalidHandle() )
 				{
-					UtlHashHandle_t handle = g_PatchSampleHashTable.AllocEntryFromKey( iteratePatch );
+					handle = g_PatchSampleHashTable.AllocEntryFromKey( iteratePatch );
 
 					PatchSampleData_t *pPatchData = &g_PatchSampleHashTable.Element( handle );
 					pPatchData->x = iteratePatch.x;

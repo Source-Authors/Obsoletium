@@ -8,7 +8,7 @@
 	#undef PROTECTED_THINGS_ENABLE
 #endif
 
-#include "platform.h"
+#include "tier0/platform.h"
 
 // HACK: Need ShellExecute for PSD updates
 #ifdef IS_WINDOWS_PC
@@ -20,8 +20,8 @@
 #include "materialsystem_global.h"
 #include "shaderapi/ishaderapi.h"
 #include "itextureinternal.h"
-#include "utlsymbol.h"
-#include "time.h"
+#include "tier1/utlsymbol.h"
+#include <malloc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "bitmap/imageformat.h"
@@ -31,24 +31,20 @@
 #include "direct.h"
 #endif
 #include "colorspace.h"
-#include "string.h"
-#include <malloc.h>
-#include <stdlib.h>
-#include "utlmemory.h"
+#include "tier1/utlmemory.h"
 #include "IHardwareConfigInternal.h"
 #include "filesystem.h"
 #include "tier1/strtools.h"
 #include "vtf/vtf.h"
 #include "materialsystem/materialsystem_config.h"
-#include "mempool.h"
+#include "tier1/mempool.h"
 #include "texturemanager.h"
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 #include "pixelwriter.h"
 #include "tier1/callqueue.h"
 #include "tier1/UtlStringMap.h"
 #include "filesystem/IQueuedLoader.h"
 #include "tier2/fileutils.h"
-#include "filesystem.h"
 #include "tier2/p4helpers.h"
 #include "tier2/tier2.h"
 // dimhotepus: Exclude ip4.
@@ -289,7 +285,7 @@ public:
 	// Returns:
 	//		pointer to the resource data, or NULL. Note that the data from this pointer can disappear when
 	// the texture goes away - you want to copy this data!
-	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const;
+	virtual const void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const;
 
 	virtual intp GetApproximateVidMemBytes( void ) const;
 
@@ -324,7 +320,7 @@ public:
 
 	virtual void ForceLODOverride( int iNumLodsOverrideUpOrDown );
 
-	void GetFilename( char *pOut, int maxLen ) const;
+	void GetFilename( OUT_Z_CAP(maxLen) char *pOut, intp maxLen ) const;
 	virtual void ReloadFilesInList( IFileList *pFilesToReload );
 
 	// Save texture to a file.
@@ -657,7 +653,7 @@ public:
 	// Returns:
 	//		pointer to the resource data, or NULL. Note that the data from this pointer can disappear when
 	// the texture goes away - you want to copy this data!
-	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const { return NULL; }
+	virtual const void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const { return NULL; }
 
 	virtual intp GetApproximateVidMemBytes( void ) const { return 32; }
 
@@ -2845,31 +2841,29 @@ void CTexture::LoadLowResTexture( IVTFTexture *pTexture )
 	Assert( retVal );
 }
 
-void *CTexture::GetResourceData( uint32 eDataType, size_t *pnumBytes ) const
+const void *CTexture::GetResourceData( uint32 eDataType, size_t *pnumBytes ) const
 {
-	for ( DataChunk const *pDataChunk = m_arrDataChunks.Base(),
-		  *pDataChunkEnd = pDataChunk + m_arrDataChunks.Count();
-		  pDataChunk < pDataChunkEnd; ++pDataChunk )
+	for ( const auto &pDataChunk : m_arrDataChunks )
 	{
-		if ( ( pDataChunk->m_eType & ~RSRCF_MASK ) == eDataType )
+		if ( ( pDataChunk.m_eType & ~RSRCF_MASK ) == eDataType )
 		{
-			if ( ( pDataChunk->m_eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
+			if ( ( pDataChunk.m_eType & RSRCF_HAS_NO_DATA_CHUNK ) == 0 )
 			{
 				if ( pnumBytes)
-					*pnumBytes = pDataChunk->m_numBytes;
-				return pDataChunk->m_pvData;
+					*pnumBytes = pDataChunk.m_numBytes;
+				return pDataChunk.m_pvData;
 			}
-			else
-			{
-				if ( pnumBytes )
-					*pnumBytes = sizeof( pDataChunk->m_numBytes );
 
-				return ( void *)( &pDataChunk->m_numBytes );
-			}
+			if ( pnumBytes )
+				*pnumBytes = sizeof( pDataChunk.m_numBytes );
+
+			return &pDataChunk.m_numBytes;
 		}
 	}
+
 	if ( pnumBytes )
 		pnumBytes = 0;
+
 	return NULL;
 }
 
@@ -3153,19 +3147,18 @@ bool CTexture::ConvertToActualFormat( IVTFTexture *pVTFTexture )
 	return bConverted;
 }
 
-void CTexture::GetFilename( char *pOut, int maxLen ) const
+void CTexture::GetFilename( OUT_Z_CAP(maxLen) char *pOut, intp maxLen ) const
 {
 	const char *pName = m_Name.String();
 	bool bIsUNCName = ( pName[0] == '/' && pName[1] == '/' && pName[2] != '/' );
 
 	if ( !bIsUNCName )
 	{
-		Q_snprintf( pOut, maxLen, 
-			"materials/%s" TEXTURE_FNAME_EXTENSION, pName );
+		V_snprintf( pOut, maxLen, "materials/%s" TEXTURE_FNAME_EXTENSION, pName );
 	}
 	else
 	{
-		Q_snprintf( pOut, maxLen, "%s" TEXTURE_FNAME_EXTENSION, pName );
+		V_snprintf( pOut, maxLen, "%s" TEXTURE_FNAME_EXTENSION, pName );
 	}
 }
 
@@ -3292,7 +3285,7 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 					dc.m_eType &= ~RSRCF_MASK;
 
 					size_t numBytes;
-					if ( void *pvData = pVTFTexture->GetResourceData( dc.m_eType, &numBytes ) )
+					if ( const void *pvData = pVTFTexture->GetResourceData( dc.m_eType, &numBytes ) )
 					{
 						Assert( numBytes >= sizeof( uint32 ) );
 						if ( numBytes == sizeof( dc.m_numBytes ) )
@@ -4229,7 +4222,7 @@ int ComputeActualMipCount( const TexDimensions_t& actualDims, unsigned int nFlag
 	}
 
 	// Unless ALLMIPS is set, we stop mips at 32x32
-	const int nMaxMipSize = 32;
+	constexpr int nMaxMipSize = 32;
 	// Clamp border textures on Posix to fix L4D2 flashlight cookie issue
 #ifdef DX_TO_GL_ABSTRACTION
 	if ( ( false && !g_bForceTextureAllMips && !( nFlags & TEXTUREFLAGS_ALL_MIPS ) ) || ( true && ( nFlags & TEXTUREFLAGS_BORDER ) ) )
@@ -4574,12 +4567,15 @@ void FreeOptimalReadBuffer( int nMaxSize )
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef IS_WINDOWS_PC
-static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char const *szNewValue )
+static bool SetBufferValue( INOUT_Z_CAP(nTxtFileBufferSize) char *chTxtFileBuffer,
+	size_t nTxtFileBufferSize,
+	IN_Z char const *szLookupKey,
+	IN_Z char const *szNewValue )
 {
 	bool bResult = false;
 	
-	size_t lenTmp = strlen( szNewValue );
 	size_t nTxtFileBufferLen = strlen( chTxtFileBuffer );
+	size_t lenTmp = strlen( szNewValue );
 	
 	for ( char *pch = chTxtFileBuffer;
 		( NULL != ( pch = strstr( pch, szLookupKey ) ) );
@@ -4610,11 +4606,13 @@ static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char
 	if ( !bResult )
 	{
 		char *pchAdd = chTxtFileBuffer + nTxtFileBufferLen;
-		strcpy( pchAdd + strlen( pchAdd ), "\n" );
-		strcpy( pchAdd + strlen( pchAdd ), szLookupKey );
-		strcpy( pchAdd + strlen( pchAdd ), " " );
-		strcpy( pchAdd + strlen( pchAdd ), szNewValue );
-		strcpy( pchAdd + strlen( pchAdd ), "\n" );
+		const intp bufferSize = nTxtFileBufferSize - strlen(pchAdd);
+		// dimhotepus: strcpy + strlen -> V_strcat.
+		V_strcat( pchAdd, "\n", bufferSize );
+		V_strcat( pchAdd, szLookupKey, bufferSize );
+		V_strcat( pchAdd, " ", bufferSize );
+		V_strcat( pchAdd, szNewValue, bufferSize );
+		V_strcat( pchAdd, "\n", bufferSize );
 		bResult = true;
 	}
 
@@ -4624,7 +4622,8 @@ static bool SetBufferValue( char *chTxtFileBuffer, char const *szLookupKey, char
 // Replaces the first occurrence of "szFindData" with "szNewData"
 // Returns the remaining buffer past the replaced data or NULL if
 // no replacement occurred.
-static char * BufferReplace( char *buf, char const *szFindData, char const *szNewData )
+template<intp bufSize>
+static char * BufferReplace( char (&buf)[bufSize], char const *szFindData, char const *szNewData )
 {
 	size_t len = strlen( buf ), lFind = strlen( szFindData ), lNew = strlen( szNewData );
 	if ( char *pBegin = strstr( buf, szFindData ) )
@@ -4678,7 +4677,7 @@ CP4Requirement::CP4Requirement() :
 
 	if ( !p4 )
 	{
-		Warning( "Can't load p4lib.dll\n" );
+		Warning( "Can't load p4lib" DLL_EXT_STRING ".\n" );
 	}
 }
 
@@ -4764,30 +4763,32 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 
 			// We have the texture and path to its content
 			char chResolveName[ MAX_PATH ] = {0}, chResolveNameArg[ MAX_PATH ] = {0};
-			Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s" TEXTURE_FNAME_EXTENSION, szTx );
+			V_sprintf_safe( chResolveNameArg, "materials/%s" TEXTURE_FNAME_EXTENSION, szTx );
 			char *szTextureContentPath;
 			if ( !mat_texture_list_content_path.GetString()[0] )
 			{
-				szTextureContentPath = const_cast< char * >( g_pFullFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 ) );
-
-				if ( !szTextureContentPath )
+				const char *contentPath = g_pFullFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
+				if ( !contentPath )
 				{
 					Warning( " mat_texture_list_txlod_sync save - texture '%s' is not loaded from file system.\n", szTx );
 					continue;
 				}
-				if ( !BufferReplace( szTextureContentPath, "\\game\\", "\\content\\" ) ||
-					 !BufferReplace( szTextureContentPath, "\\materials\\", "\\materialsrc\\" ) )
+
+				if ( !BufferReplace( chResolveName, "\\game\\", "\\content\\" ) ||
+					 !BufferReplace( chResolveName, "\\materials\\", "\\materialsrc\\" ) )
 				{
 					Warning( " mat_texture_list_txlod_sync save - texture '%s' cannot be mapped to content directory.\n", szTx );
 					continue;
 				}
+
+				szTextureContentPath = chResolveName;
 			}
 			else
 			{
-				V_strncpy( chResolveName, mat_texture_list_content_path.GetString(), MAX_PATH );
-				V_strncat( chResolveName, "/", MAX_PATH );
-				V_strncat( chResolveName, szTx, MAX_PATH );
-				V_strncat( chResolveName, TEXTURE_FNAME_EXTENSION, MAX_PATH );
+				V_strcpy_safe( chResolveName, mat_texture_list_content_path.GetString() );
+				V_strcat_safe( chResolveName, "/" );
+				V_strcat_safe( chResolveName, szTx );
+				V_strcat_safe( chResolveName, TEXTURE_FNAME_EXTENSION );
 
 				szTextureContentPath = chResolveName;
 			}
@@ -4796,22 +4797,22 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 			// 1. look for TGA - if found, get the txt file (if txt file missing, create one)
 			// 2. otherwise look for PSD - affecting psdinfo
 			// 3. else error
-			char *pExtPut = szTextureContentPath + strlen( szTextureContentPath ) - strlen( TEXTURE_FNAME_EXTENSION ); // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
+			char *pExtPut = szTextureContentPath + strlen( szTextureContentPath ) - ssize( TEXTURE_FNAME_EXTENSION ) + 1; // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
 			
 			// 1.tga
-			sprintf( pExtPut, ".tga" );
+			V_strcpy( pExtPut, ".tga" );
 			if ( g_pFullFileSystem->FileExists( szTextureContentPath ) )
 			{
 				// Have tga - pump in the txt file
-				sprintf( pExtPut, ".txt" );
+				V_strcpy( pExtPut, ".txt" );
 				
 				CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				g_pFullFileSystem->ReadFile( szTextureContentPath, 0, bufTxtFileBuffer );
 				for ( int kCh = 0; kCh < 1024; ++kCh ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxwidth", chMaxWidth );
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxheight", chMaxHeight );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "maxwidth", chMaxWidth );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "maxheight", chMaxHeight );
 				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
@@ -4834,13 +4835,13 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 			}
 
 			// 2.psd
-			sprintf( pExtPut, ".psd" );
+			V_strcpy( pExtPut, ".psd" );
 			if ( g_pFullFileSystem->FileExists( szTextureContentPath ) )
 			{
 				char chCommand[MAX_PATH];
 				char szTxtFileName[MAX_PATH] = {0};
-				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName, sizeof( szTxtFileName ) );
-				sprintf( chCommand, "/C psdinfo \"%s\" > \"%s\"", szTextureContentPath, szTxtFileName);
+				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName );
+				V_sprintf_safe( chCommand, "/C psdinfo \"%s\" > \"%s\"", szTextureContentPath, szTxtFileName);
 				ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
 				ThreadSleep( 200 );
 
@@ -4849,8 +4850,8 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 				for ( int kCh = 0; kCh < 1024; ++ kCh ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxwidth", chMaxWidth );
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), "maxheight", chMaxHeight );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "maxwidth", chMaxWidth );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(),	"maxheight", chMaxHeight );
 				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
@@ -4860,7 +4861,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 					g_p4factory->SetOpenFileChangeList( "Texture LOD Autocheckout" );
 					CP4AutoEditFile autop4_edit( szTextureContentPath );
 
-					sprintf( chCommand, "/C psdinfo -write \"%s\" < \"%s\"", szTextureContentPath, szTxtFileName );
+					V_sprintf_safe( chCommand, "/C psdinfo -write \"%s\" < \"%s\"", szTextureContentPath, szTxtFileName );
 					ThreadSleep( 200 );
 					ShellExecute( NULL, NULL, "cmd.exe", chCommand, NULL, SW_HIDE );
 					ThreadSleep( 200 );
@@ -4878,7 +4879,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 			}
 
 			// 3. - error
-			sprintf( pExtPut, "" );
+			pExtPut[0] = '\0';
 			{
 				Warning( " '%s' : doesn't specify a valid TGA or PSD file!\n", szTextureContentPath );
 				continue;

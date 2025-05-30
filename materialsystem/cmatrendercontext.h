@@ -142,7 +142,7 @@ public:
 	// Inherited from IMaterialSystemInternal
 	int										GetLightmapPage( void );
 
-	virtual void *							LockRenderData( int nSizeInBytes );
+	virtual void *							LockRenderData( intp nSizeInBytes );
 	virtual void							UnlockRenderData( void *pData );
 	virtual void							AddRefRenderData();
 	virtual void							ReleaseRenderData();

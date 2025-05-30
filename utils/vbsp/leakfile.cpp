@@ -45,7 +45,7 @@ void LeakFile (tree_t *tree)
 	//
 	// write the points to the file
 	//
-	sprintf (filename, "%s.lin", source);
+	V_sprintf_safe (filename, "%s.lin", source);
 	linefile = fopen (filename, "w");
 	if (!linefile)
 		Error ("Couldn't open %s\n", filename);
@@ -72,6 +72,8 @@ void LeakFile (tree_t *tree)
 			}
 		}
 		node = nextnode;
+		Assert(node);
+		Assert(nextportal);
 		WindingCenter (nextportal->winding, mid);
 		fprintf (linefile, "%f %f %f\n", mid[0], mid[1], mid[2]);
 		count++;
@@ -110,7 +112,7 @@ void AreaportalLeakFile( tree_t *tree, portal_t *pStartPortal, portal_t *pEndPor
 	//
 	// write the points to the file
 	//
-	sprintf (filename, "%s.lin", source);
+	V_sprintf_safe (filename, "%s.lin", source);
 	linefile = fopen (filename, "w");
 	if (!linefile)
 		Error ("Couldn't open %s\n", filename);

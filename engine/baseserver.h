@@ -242,8 +242,8 @@ protected:
 	uint32		m_LastRandomNonce;
 	float		m_flLastRandomNumberGenerationTime;
 	float		m_fCPUPercent;
-	float		m_fStartTime;
-	float		m_fLastCPUCheckTime;
+	double		m_fStartTime;
+	double		m_fLastCPUCheckTime;
 
 	// This is only used for Steam's master server updater to refer to this server uniquely.
 	bool		m_bRestartOnLevelChange;

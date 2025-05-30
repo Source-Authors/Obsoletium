@@ -25,7 +25,7 @@
 //-----------------------------------------------------------------------------
 // Interface
 //-----------------------------------------------------------------------------
-class IDmSerializers : public IAppSystem
+abstract_class IDmSerializers : public IAppSystem
 {
 };
 
@@ -33,7 +33,7 @@ class IDmSerializers : public IAppSystem
 //-----------------------------------------------------------------------------
 // Used only by applications to hook in DmSerializers
 //-----------------------------------------------------------------------------
-#define DMSERIALIZERS_INTERFACE_VERSION		"VDmSerializers001"
+constexpr inline char DMSERIALIZERS_INTERFACE_VERSION[]{"VDmSerializers001"};
 
 
 //-----------------------------------------------------------------------------

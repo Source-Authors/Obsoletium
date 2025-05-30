@@ -13,6 +13,7 @@
 #include "coordsize.h"
 #include "vstdlib/random.h"
 #include "bsptreedata.h"
+#include "bspflags.h"
 #include "messbuf.h"
 #include "vmpi.h"
 #include "vmpi_distribute_work.h"
@@ -27,31 +28,6 @@ static TableVector g_BoxDirections[6] =
 	{  0,  0, -1 }, 
 };
 
-
-
-static void ComputeAmbientFromSurface( dface_t *surfID, dworldlight_t* pSkylight, 
-									   Vector& radcolor )
-{
-	if ( !surfID )
-		return;
-
-	texinfo_t *pTexInfo = &texinfo[surfID->texinfo];
-
-	// If we hit the sky, use the sky ambient
-	if ( pTexInfo->flags & SURF_SKY )
-	{
-		if ( pSkylight )
-		{
-			// add in sky ambient
-			VectorCopy( pSkylight->intensity, radcolor );
-		}
-	}
-	else
-	{
-		Vector reflectivity = dtexdata[pTexInfo->texdata].reflectivity;
-		VectorMultiply( radcolor, reflectivity, radcolor );
-	}
-}
 
 
 // TODO: it's CRAZY how much lighting code we share with the engine. It should all be shared code.
@@ -148,7 +124,7 @@ void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStart, Vect
 
 		// Now that we've got a ray, see what surface we've hit
 		Vector lightStyleColors[MAX_LIGHTSTYLES];
-		lightStyleColors[0].Init();	// We only care about light style 0 here.
+		lightStyleColors[0] = Vector{0, 0, 0};	// We only care about light style 0 here.
 		CalcRayAmbientLighting( iThread, vStart, vEnd, tanTheta, lightStyleColors );
 	
 		radcolor[i] = lightStyleColors[0];
@@ -292,7 +268,7 @@ void GetLeafBoundaryPlanes( CUtlVector<dplane_t> &list, int leafIndex )
 		else
 		{
 			// back side
-			int plane = list.AddToTail();
+			intp plane = list.AddToTail();
 			list[plane].dist = -pNodePlane->dist;
 			list[plane].normal = -pNodePlane->normal;
 			list[plane].type = pNodePlane->type;
@@ -315,7 +291,7 @@ void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &samplePos
 {
 	const int MAX_SAMPLES = 16;
 
-	int index = list.AddToTail();
+	intp index = list.AddToTail();
 	list[index].pos = samplePosition;
 	for ( int i = 0; i < 6; i++ )
 	{
@@ -463,7 +439,7 @@ float AABBDistance( const Vector &mins0, const Vector &maxs0, const Vector &mins
 class CLeafList : public ISpatialLeafEnumerator
 {
 public:
-	virtual bool EnumerateLeaf( int leaf, int context )
+	virtual bool EnumerateLeaf( int leaf, intp context )
 	{
 		m_list.AddToTail(leaf);
 		return true;
@@ -570,7 +546,7 @@ static void ThreadComputeLeafAmbient( int iThread, void *pUserData )
 	CUtlVector<ambientsample_t> list;
 	while (1)
 	{
-		int leafID = GetThreadWork ();
+		int leafID = GetThreadWork();
 		if (leafID == -1)
 			break;
 		list.RemoveAll();
@@ -654,7 +630,7 @@ void ComputePerLeafAmbientLighting()
 	}
 
 	// now write out the data
-	Msg("Writing leaf ambient...");
+	Msg("Writing leaf ambient...\n");
 	g_pLeafAmbientIndex->RemoveAll();
 	g_pLeafAmbientLighting->RemoveAll();
 	g_pLeafAmbientIndex->SetCount( numleafs );
@@ -671,36 +647,37 @@ void ComputePerLeafAmbientLighting()
 		{
 			g_pLeafAmbientIndex->Element(leafID).firstAmbientSample = g_pLeafAmbientLighting->Count();
 			// compute the samples in disk format.  Encode the positions in 8-bits using leaf bounds fractions
-			for ( int i = 0; i < list.Count(); i++ )
+			for ( auto &as : list )
 			{
-				int outIndex = g_pLeafAmbientLighting->AddToTail();
+				intp outIndex = g_pLeafAmbientLighting->AddToTail();
 				dleafambientlighting_t &light = g_pLeafAmbientLighting->Element(outIndex);
 
-				light.x = Fixed8Fraction( list[i].pos.x, dleafs[leafID].mins[0], dleafs[leafID].maxs[0] );
-				light.y = Fixed8Fraction( list[i].pos.y, dleafs[leafID].mins[1], dleafs[leafID].maxs[1] );
-				light.z = Fixed8Fraction( list[i].pos.z, dleafs[leafID].mins[2], dleafs[leafID].maxs[2] );
+				light.x = Fixed8Fraction( as.pos.x, dleafs[leafID].mins[0], dleafs[leafID].maxs[0] );
+				light.y = Fixed8Fraction( as.pos.y, dleafs[leafID].mins[1], dleafs[leafID].maxs[1] );
+				light.z = Fixed8Fraction( as.pos.z, dleafs[leafID].mins[2], dleafs[leafID].maxs[2] );
 				light.pad = 0;
 				for ( int side = 0; side < 6; side++ )
 				{
-					VectorToColorRGBExp32( list[i].cube[side], light.cube.m_Color[side] );
+					VectorToColorRGBExp32( as.cube[side], light.cube.m_Color[side] );
 				}
 			}
 		}
 	}
 	for ( int i = 0; i < numleafs; i++ )
 	{
+		auto &index = g_pLeafAmbientIndex->Element(i);
 		// UNDONE: Do this dynamically in the engine instead.  This will allow us to sample across leaf
 		// boundaries always which should improve the quality of lighting in general
-		if ( g_pLeafAmbientIndex->Element(i).ambientSampleCount == 0 )
+		if ( index.ambientSampleCount == 0 )
 		{
 			if ( !(dleafs[i].contents & CONTENTS_SOLID) )
 			{
 				Msg("Bad leaf ambient for leaf %d\n", i );
 			}
 
-			int refLeaf = NearestNeighborWithLight(i);
-			g_pLeafAmbientIndex->Element(i).ambientSampleCount = 0;
-			g_pLeafAmbientIndex->Element(i).firstAmbientSample = refLeaf;
+			const int refLeaf = NearestNeighborWithLight(i);
+			index.ambientSampleCount = 0;
+			index.firstAmbientSample = refLeaf;
 		}
 	}
 	Msg("done\n");

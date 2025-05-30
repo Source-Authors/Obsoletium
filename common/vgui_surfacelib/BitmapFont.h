@@ -28,7 +28,7 @@ public:
 	virtual bool IsEqualTo(const char *windowsFontName, float scalex, float scaley, int flags);
 
 	// gets the abc widths for a character
-	void GetCharABCWidths(int ch, int &a, int &b, int &c) override;
+	void GetCharABCWidths(wchar_t ch, int &a, int &b, int &c) override;
 
 	// writes the char into the specified 32bpp texture. We're overloading this because
 	// we derive off font_t, and the implementation there doesn't work for bitmap fonts.
@@ -38,7 +38,7 @@ public:
 	virtual void GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA, float &abcC );
 
 	// gets the texture coords in the compiled texture page
-	void GetCharCoords( int ch, float *left, float *top, float *right, float *bottom );
+	void GetCharCoords( wchar_t ch, float *left, float *top, float *right, float *bottom );
 
 	// sets the scale of the font.
 	void SetScale( float sx, float sy );

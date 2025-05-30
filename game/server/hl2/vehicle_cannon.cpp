@@ -446,7 +446,7 @@ void CPropCannon::DriveCannon( int iDriverButtons, int iButtonsPressed )
 		}
 	}
 
-	float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0, 1 );
+	float flSpeedPercentage = clamp( fabs(m_flTurn) / m_flMaxTurnSpeed, 0.f, 1.f );
 	vbs_sound_update_t params;
 	params.Defaults();
 	params.bThrottleDown = (m_iTurning != CANNON_TURNING_NOT);
@@ -478,7 +478,7 @@ void CPropCannon::RunCraneMovement( float flTime )
 	if ( m_flExtensionRate )
 	{
 		// Extend / Retract the crane
-		m_flExtension = clamp( m_flExtension + (m_flExtensionRate * 10 * flTime), 0, 2 );
+		m_flExtension = clamp( m_flExtension + (m_flExtensionRate * 10.f * flTime), 0.f, 2.f );
 		SetPoseParameter( "armextensionpose", m_flExtension );
 		StudioFrameAdvance();
 	}

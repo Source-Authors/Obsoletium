@@ -6,11 +6,13 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "mapdoc.h"
+#include "resource.h"
 
 // MapDiffDlg dialog
 
-class CMapDiffDlg : public CDialog
+class CMapDiffDlg : public CBaseDlg
 {
 public:
 	static void MapDiff(CWnd *pwndParent, CMapDoc *p_CurrentMap);

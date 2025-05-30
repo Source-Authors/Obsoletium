@@ -39,7 +39,7 @@ void CDmeHitbox::OnDestruction()
 //-----------------------------------------------------------------------------
 // Rendering method for the dag
 //-----------------------------------------------------------------------------
-void CDmeHitbox::Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSettings /* = NULL */ )
+void CDmeHitbox::Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings * /* = NULL */ )
 {
 	Vector vecOrigin;
 	QAngle angles;

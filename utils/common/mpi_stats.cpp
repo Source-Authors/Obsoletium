@@ -6,16 +6,18 @@
 //=============================================================================//
 
 // Nasty headers!
+#include "mpi_stats.h"
+
 #include "MySqlDatabase.h"
 #include "tier1/strtools.h"
 #include "vmpi.h"
 #include "vmpi_dispatch.h"
-#include "mpi_stats.h"
 #include "cmdlib.h"
 #include "imysqlwrapper.h"
 #include "threadhelpers.h"
 #include "vmpi_tools_shared.h"
 #include "tier0/icommandline.h"
+#include "winlite.h"
 
 /*
 
@@ -96,7 +98,7 @@ create table text_messages (
 drop table graph_entry;
 create table graph_entry (
 	JobWorkerID				INTEGER UNSIGNED NOT NULL,					index id( JobWorkerID ),
-	MSSinceJobStart			INTEGER UNSIGNED NOT NULL,
+	MSSinceJobStart			BIGINT UNSIGNED NOT NULL,
 	BytesSent				INTEGER UNSIGNED NOT NULL,
 	BytesReceived			INTEGER UNSIGNED NOT NULL
 	);
@@ -115,7 +117,8 @@ int		g_nWorkersConnected = 0;
 int		g_nWorkersDisconnected = 0;
 
 
-DWORD	g_StatsStartTime;
+// dimhotepus: DWORD -> ULONGLONG
+ULONGLONG	g_StatsStartTime;
 
 CMySqlDatabase	*g_pDB = NULL;
 
@@ -133,7 +136,6 @@ unsigned long	g_CurrentMessageIndex = 0;
 
 
 HANDLE	g_hPerfThread = NULL;
-DWORD	g_PerfThreadID = 0xFEFEFEFE;
 HANDLE	g_hPerfThreadExitEvent = NULL;
 
 // These are set by the app and they go into the database.
@@ -152,7 +154,7 @@ friend class CMySQL;
 
 public:
 	// This is like a sprintf, but it will grow the string as necessary.
-	void Format( const char *pFormat, ... );
+	void Format( PRINTF_FORMAT_STRING const char *pFormat, ... );
 
 	int Execute( IMySQL *pDB );
 
@@ -161,18 +163,18 @@ private:
 };
 
 
-void CMySQLQuery::Format( const char *pFormat, ... )
+void CMySQLQuery::Format( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	#define QUERYTEXT_GROWSIZE	1024
 
-	// This keeps growing the buffer and calling _vsnprintf until the buffer is 
+	// This keeps growing the buffer and calling V_vsnprintf until the buffer is 
 	// large enough to hold all the data.
 	m_QueryText.SetSize( QUERYTEXT_GROWSIZE );
 	while ( 1 )
 	{
 		va_list marker;
 		va_start( marker, pFormat );
-		int ret = _vsnprintf( m_QueryText.Base(), m_QueryText.Count(), pFormat, marker );
+		int ret = V_vsnprintf( m_QueryText.Base(), m_QueryText.Count(), pFormat, marker );
 		va_end( marker );
 
 		if ( ret < 0 )
@@ -295,8 +297,8 @@ public:
 		query.Execute( g_pSQL  );
 
 		// Now set RunningTimeMS.
-		unsigned long runningTimeMS = GetTickCount() - g_StatsStartTime;
-		query.Format( "update job_master_start set RunningTimeMS=%lu where JobID=%lu", runningTimeMS, g_JobPrimaryID );
+		ULONGLONG runningTimeMS = GetTickCount64() - g_StatsStartTime;
+		query.Format( "update job_master_start set RunningTimeMS=%lu where JobID=%llu", runningTimeMS, g_JobPrimaryID );
 		query.Execute( g_pSQL );
 		return 1;
 	}
@@ -305,13 +307,13 @@ public:
 
 void UpdateJobWorkerRunningTime()
 {
-	unsigned long runningTimeMS = GetTickCount() - g_StatsStartTime;
+	ULONGLONG runningTimeMS = GetTickCount64() - g_StatsStartTime;
 	
 	char curStage[256];
 	VMPI_GetCurrentStage( curStage, sizeof( curStage ) );
 	
 	CMySQLQuery query;
-	query.Format( "update job_worker_start set RunningTimeMS=%lu, CurrentStage=\"%s\", "
+	query.Format( "update job_worker_start set RunningTimeMS=%llu, CurrentStage=\"%s\", "
 		"Thread0WU=%d, Thread1WU=%d, Thread2WU=%d, Thread3WU=%d where JobWorkerID=%lu", 
 		runningTimeMS, 
 		curStage,
@@ -328,7 +330,7 @@ class CSQLDBCommand_GraphEntry : public CSQLDBCommandBase
 {
 public:
 	
-				CSQLDBCommand_GraphEntry( DWORD msTime, DWORD nBytesSent, DWORD nBytesReceived )
+				CSQLDBCommand_GraphEntry( ULONGLONG msTime, DWORD nBytesSent, DWORD nBytesReceived )
 				{
 					m_msTime = msTime;
 					m_nBytesSent = nBytesSent;
@@ -339,7 +341,7 @@ public:
 	{
 		CMySQLQuery query;
 		query.Format(	"insert into graph_entry (JobWorkerID, MSSinceJobStart, BytesSent, BytesReceived) "
-						"values ( %lu, %lu, %lu, %lu )", 
+						"values ( %lu, %llu, %lu, %lu )", 
 			g_JobWorkerID, 
 			m_msTime, 
 			m_nBytesSent, 
@@ -355,7 +357,7 @@ public:
 
 	DWORD m_nBytesSent;
 	DWORD m_nBytesReceived;
-	DWORD m_msTime;
+	ULONGLONG m_msTime;
 };
 
 
@@ -429,7 +431,7 @@ void PerfThread_SendSpewText()
 				if ( bFirst )
 				{
 					char msg[512];
-					V_snprintf( msg, sizeof( msg ), "%s not enabled", VMPI_GetParamString( mpi_Stats_TextOutput ) );
+					V_snprintf( msg, sizeof( msg ), "%s not enabled", VMPI_GetParamString( EVMPICmdLineParam::mpi_Stats_TextOutput ) );
 					bFirst = false;
 					g_pDB->AddCommandToQueue( new CSQLDBCommand_TextMessage( msg ), NULL );
 				}
@@ -442,7 +444,7 @@ void PerfThread_SendSpewText()
 }
 
 
-void PerfThread_AddGraphEntry( DWORD startTicks, DWORD &lastSent, DWORD &lastReceived )
+void PerfThread_AddGraphEntry( ULONGLONG startTicks, DWORD &lastSent, DWORD &lastReceived )
 {
 	// Send the graph entry with data transmission info.
 	DWORD curSent = g_nBytesSent + g_nMulticastBytesSent;
@@ -450,7 +452,7 @@ void PerfThread_AddGraphEntry( DWORD startTicks, DWORD &lastSent, DWORD &lastRec
 
 	g_pDB->AddCommandToQueue( 
 		new CSQLDBCommand_GraphEntry( 
-			GetTickCount() - startTicks,
+			GetTickCount64() - startTicks,
 			curSent - lastSent, 
 			curReceived - lastReceived ), 
 		NULL );
@@ -461,11 +463,14 @@ void PerfThread_AddGraphEntry( DWORD startTicks, DWORD &lastSent, DWORD &lastRec
 
 
 // This function adds a graph_entry into the database periodically.
-DWORD WINAPI PerfThreadFn( LPVOID pParameter )
+unsigned WINAPI PerfThreadFn( void* pParameter )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("VmpiPerfStats");
+
 	DWORD lastSent = 0;
 	DWORD lastReceived = 0;
-	DWORD startTicks = GetTickCount();
+	ULONGLONG startTicks = GetTickCount64();
 
 	while ( WaitForSingleObject( g_hPerfThreadExitEvent, 1000 ) != WAIT_OBJECT_0 )
 	{
@@ -527,7 +532,7 @@ bool LoadMySQLWrapper(
 	UnloadMySQLWrapper();
 
 	// Load the DLL and the interface.
-	if ( !Sys_LoadInterface( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &g_hMySQLDLL, (void**)&g_pSQL ) )
+	if ( !Sys_LoadInterfaceT( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &g_hMySQLDLL, &g_pSQL ) )
 		return false;
 
 	// Try to init the database.
@@ -554,7 +559,7 @@ bool VMPI_Stats_Init_Master(
 	
 	// Connect the database.
 	g_pDB = new CMySqlDatabase;
-	if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) )
+	if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) ) //-V668
 	{
 		delete g_pDB;
 		g_pDB = NULL;
@@ -565,7 +570,7 @@ bool VMPI_Stats_Init_Master(
 	GetComputerName( g_MachineName, &size );
 
 	// Create the job_master_start row.
-	Q_FileBase( pBSPFilename, g_BSPFilename, sizeof( g_BSPFilename ) );
+	Q_FileBase( pBSPFilename, g_BSPFilename );
 
 	g_JobPrimaryID = 0;
 	CMySQLQuery query;
@@ -590,7 +595,7 @@ bool VMPI_Stats_Init_Master(
 
 bool VMPI_Stats_Init_Worker( const char *pHostName, const char *pDBName, const char *pUserName, unsigned long DBJobID )
 {
-	g_StatsStartTime = GetTickCount();
+	g_StatsStartTime = GetTickCount64();
 	
 	// If pDBServerName is null, then we're the master and we just want to make the job_worker_start entry.
 	if ( pHostName )
@@ -599,7 +604,7 @@ bool VMPI_Stats_Init_Worker( const char *pHostName, const char *pDBName, const c
 		
 		// Connect the database.
 		g_pDB = new CMySqlDatabase;
-		if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) )
+		if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) ) //-V668
 		{
 			delete g_pDB;
 			g_pDB = NULL;
@@ -630,15 +635,15 @@ bool VMPI_Stats_Init_Worker( const char *pHostName, const char *pDBName, const c
 
 	// Now create a thread that samples perf data and stores it in the database.
 	g_hPerfThreadExitEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
-	g_hPerfThread = CreateThread(
-		NULL,
+	g_hPerfThread = reinterpret_cast<HANDLE>(_beginthreadex(
+		nullptr,
 		0,
 		PerfThreadFn,
-		NULL,
+		nullptr,
 		0,
-		&g_PerfThreadID );
+		nullptr ));
 
-	return true;	
+	return true;
 }
 
 
@@ -664,8 +669,8 @@ void VMPI_Stats_Term()
 	}
 
 	// Wait for up to a second for the DB to finish writing its data.
-	DWORD startTime = GetTickCount();
-	while ( GetTickCount() - startTime < 1000 )
+	ULONGLONG startTime = GetTickCount64();
+	while ( GetTickCount64() - startTime < 1000 )
 	{
 		if ( g_pDB->QueriesInOutQueue() == 0 )
 			break;
@@ -706,7 +711,7 @@ void GetDBInfo( const char *pDBInfoFilename, CDBInfo *pInfo )
 	// Look for the info file in the same directory as the exe.
 	char dbInfoFilename[512];
 	Q_strncpy( dbInfoFilename, baseExeFilename, sizeof( dbInfoFilename ) );
-	Q_StripFilename( dbInfoFilename );
+	V_StripFilename( dbInfoFilename );
 
 	if ( dbInfoFilename[0] == 0 )
 		Q_strncpy( dbInfoFilename, ".", sizeof( dbInfoFilename ) );
@@ -765,7 +770,7 @@ void RunJobWatchApp( char *pCmdLine )
 				&si,
 				&pi ) )
 			{
-				Warning( "%s - error launching '%s'\n", VMPI_GetParamString( mpi_Job_Watch ), pCmdLine );
+				Warning( "%s - error launching '%s'\n", VMPI_GetParamString( EVMPICmdLineParam::mpi_Job_Watch ), pCmdLine );
 			}
 		}
 	}
@@ -778,7 +783,7 @@ void StatsDB_InitStatsDatabase(
 	const char *pDBInfoFilename )
 {
 	// Did they disable the stats database?
-	if ( !g_bMPI_Stats && !VMPI_IsParamUsed( mpi_Job_Watch ) )
+	if ( !g_bMPI_Stats && !VMPI_IsParamUsed( EVMPICmdLineParam::mpi_Job_Watch ) )
 		return;
 
 	unsigned long jobPrimaryID;
@@ -802,7 +807,7 @@ void StatsDB_InitStatsDatabase(
 		
 		Msg( "\nTo watch this job, run this command line:\n%s\n\n", cmdLine );
 		
-		if ( VMPI_IsParamUsed( mpi_Job_Watch ) )
+		if ( VMPI_IsParamUsed( EVMPICmdLineParam::mpi_Job_Watch ) )
 		{
 			// Convenience thing to automatically launch the job watch for this job.
 			RunJobWatchApp( cmdLine );
@@ -815,13 +820,13 @@ void StatsDB_InitStatsDatabase(
 	{
 		// Wait to get DB info so we can connect to the MySQL database.
 		CDBInfo dbInfo;
-		unsigned long jobPrimaryID;
-		RecvDBInfo( &dbInfo, &jobPrimaryID );
+		unsigned long dbJobID;
+		RecvDBInfo( &dbInfo, &dbJobID );
 		
 		if ( dbInfo.m_HostName[0] != 0 )
 		{
-			if ( !VMPI_Stats_Init_Worker( dbInfo.m_HostName, dbInfo.m_DBName, dbInfo.m_UserName, jobPrimaryID ) )
-				Error( "VMPI_Stats_Init_Worker( %s, %s, %s, %d ) failed.\n", dbInfo.m_HostName, dbInfo.m_DBName, dbInfo.m_UserName, jobPrimaryID );
+			if ( !VMPI_Stats_Init_Worker( dbInfo.m_HostName, dbInfo.m_DBName, dbInfo.m_UserName, dbJobID ) )
+				Error( "VMPI_Stats_Init_Worker( %s, %s, %s, %lu ) failed.\n", dbInfo.m_HostName, dbInfo.m_DBName, dbInfo.m_UserName, dbJobID );
 		}
 	}
 }

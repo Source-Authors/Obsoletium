@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/TextEntry.h>
 
-#include <ctype.h>
-#include <stdio.h>
-#include <utlvector.h>
+#include <tier1/KeyValues.h>
+#include <tier1/utlvector.h>
 
 #include <vgui/Cursor.h>
 #include <vgui/IInput.h>
@@ -17,14 +17,13 @@
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IPanel.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/ScrollBar.h>
-#include <vgui_controls/TextEntry.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/MenuItem.h>
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
@@ -262,15 +261,15 @@ void TextEntry::SetText(const char *text)
 	if ( len < 1023 )
 	{
 		wchar_t unicode[ 1024 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, sizeof( unicode ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode );
 		SetText( unicode );
 	}
 	else
 	{
 		size_t lenUnicode = ( len * sizeof( wchar_t ) + 4 );
 		wchar_t *unicode = ( wchar_t * ) malloc( lenUnicode );
-			g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, lenUnicode );
-			SetText( unicode );
+		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, lenUnicode );
+		SetText( unicode );
 		free( unicode );
 	}
 }
@@ -657,7 +656,7 @@ void TextEntry::PaintBackground()
 
 	m_nLangInset = 0;
 
-	int langlen = 0;
+	intp langlen = 0;
 	wchar_t shortcode[ 5 ];
 	shortcode[ 0 ] = L'\0';
 
@@ -670,7 +669,7 @@ void TextEntry::PaintBackground()
 		{
 			m_nLangInset = 0;
 			langlen = wcslen( shortcode );
-			for ( int i = 0; i < langlen; ++i )
+			for ( intp i = 0; i < langlen; ++i )
 			{
 				m_nLangInset += getCharWidth( _smallfont, shortcode[ i ] );
 			}
@@ -704,7 +703,7 @@ void TextEntry::PaintBackground()
 	int startIndex = GetStartDrawIndex(lineBreakIndexIndex);
 	int remembery = y;
 
-	int oldEnd = m_TextStream.Count();
+	intp oldEnd = m_TextStream.Count();
 	int oldCursorPos = _cursorPos;
 	int nCompStart = -1;
 	int nCompEnd = -1;
@@ -733,7 +732,7 @@ void TextEntry::PaintBackground()
 	// draw text with an elipsis
 	if ( (!_multiline) && (!_horizScrollingAllowed) )
 	{	
-		int endIndex = m_TextStream.Count();
+		intp endIndex = m_TextStream.Count();
 		// In editable windows only do the ellipsis if we don't have focus.
 		// In non editable windows do it all the time.
 		if ( (!HasFocus() && (IsEditable())) || (!IsEditable()) )
@@ -771,7 +770,7 @@ void TextEntry::PaintBackground()
 			}
 		}
 		// draw the text
-		int i;
+		intp i;
 		for (i = startIndex; i < endIndex; i++)
 		{
 			wchar_t ch = m_TextStream[i];
@@ -828,7 +827,7 @@ void TextEntry::PaintBackground()
 	else
 	{
 		// draw the text
-		for ( int i = startIndex; i < m_TextStream.Count(); i++)
+		for ( intp i = startIndex; i < m_TextStream.Count(); i++)
 		{
 			wchar_t ch = m_TextStream[i];
 			if (_hideText)
@@ -1118,7 +1117,7 @@ void TextEntry::LayoutVerticalScrollBarSlider()
 		
 		// calculate how many lines we can fully display
 		int displayLines = tall / (surface()->GetFontTall(_font) + DRAW_OFFSET_Y);
-		int numLines = m_LineBreaks.Count();
+		intp numLines = m_LineBreaks.Count();
 		
 		if (numLines <= displayLines)
 		{
@@ -1253,7 +1252,7 @@ const wchar_t *UnlocalizeUnicode( wchar_t *unicode )
 	if ( *unicode == L'#' )
 	{
 		char lookup[ 512 ];
-		g_pVGuiLocalize->ConvertUnicodeToANSI( unicode + 1, lookup, sizeof( lookup ) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( unicode + 1, lookup );
 		return g_pVGuiLocalize->Find( lookup );
 	}
 	return unicode;
@@ -2107,7 +2106,7 @@ void TextEntry::OnCreateDragData( KeyValues *msg )
 	BaseClass::OnCreateDragData( msg );
 
 	char txt[ 256 ];
-	GetText( txt, sizeof( txt ) );
+	GetText( txt );
 
 	int r0, r1;
 	if ( GetSelectedRange( r0, r1 ) && r0 != r1 )
@@ -2405,7 +2404,7 @@ void TextEntry::MoveCursor(int line, int pixelsAcross)
 	int x = DRAW_OFFSET_X, y = yStart;
 	int lineBreakIndexIndex = 0;
 	_pixelsIndent = 0;
-	int i;
+	intp i;
 	for ( i = 0; i < m_TextStream.Count(); i++)
 	{
 		wchar_t ch = m_TextStream[i];
@@ -2517,7 +2516,7 @@ void TextEntry::ScrollLeftForResize()
     while (_currentStartIndex > 0)     // go until we hit leftmost
     {
         _currentStartIndex--;
-		int nVal = _currentStartIndex;
+		intp nVal = _currentStartIndex;
 
         // check if the cursor is now off the screen
         if (IsCursorOffRightSideOfWindow(_cursorPos))
@@ -2723,7 +2722,7 @@ int TextEntry::GetCurrentLineStart()
 	if (!_multiline)			// quick out for non multline buffers
 		return _currentStartIndex;
 	
-	int i;
+	intp i;
 	if (IsLineBreak(_cursorPos))
 	{
 		for (i = 0; i < m_LineBreaks.Count(); ++i )
@@ -2783,7 +2782,7 @@ void TextEntry::GotoEndOfLine()
 //-----------------------------------------------------------------------------
 int TextEntry::GetCurrentLineEnd()
 {
-	int i;
+	intp i;
 	if (IsLineBreak(_cursorPos)	)
 	{
 		for ( i = 0; i < m_LineBreaks.Count()-1; ++i )
@@ -3033,7 +3032,7 @@ void TextEntry::InsertString(const char *text)
 
 	// straight convert the ansi to unicode and insert
 	wchar_t unicode[1024];
-	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode, sizeof(unicode));
+	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode);
 	InsertString(unicode);
 }
 
@@ -3402,7 +3401,8 @@ void TextEntry::Paste()
 				if (GetVParent() && ipanel()->GetCurrentKeyFocus(GetVParent()) != GetVPanel())
 				{
 					bHaveMovedFocusAwayFromCurrentEntry = true;
-					ipanel()->SendMessage(ipanel()->GetCurrentKeyFocus(GetVParent()), new KeyValues("DoPaste"), GetVPanel());
+					// dimhotepus: Do not leak KeyValues.
+					ipanel()->SendMessage(ipanel()->GetCurrentKeyFocus(GetVParent()), KeyValuesAD("DoPaste"), GetVPanel());
 				}
 				break;
 			}
@@ -3456,10 +3456,10 @@ void TextEntry::SaveUndoState()
 //-----------------------------------------------------------------------------
 int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 {
-	int startIndex = 0;
+	intp startIndex = 0;
 	
-	int numLines = m_LineBreaks.Count();
-	int startLine = 0;
+	intp numLines = m_LineBreaks.Count();
+	intp startLine = 0;
 	
 	// determine the Start point from the scroll bar
 	// do this only if we are not selecting text in the window with the mouse
@@ -3515,7 +3515,7 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 			{
 				done = true;
 				int x = DRAW_OFFSET_X;
-				for (int i = _currentStartIndex; i < m_TextStream.Count(); i++)
+				for (intp i = _currentStartIndex; i < m_TextStream.Count(); i++)
 				{
 					done = false;
 					wchar_t ch = m_TextStream[i];			
@@ -3577,8 +3577,8 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 // helper accessors for common gets
 float TextEntry::GetValueAsFloat()
 {
-	int nTextLength = GetTextLength() + 1;
-	char* txt = ( char* )_alloca( nTextLength * sizeof( char ) );
+	intp nTextLength = GetTextLength() + 1;
+	char* txt = stackallocT( char, nTextLength );
 	GetText( txt, nTextLength );
 
 	return V_atof( txt );
@@ -3586,8 +3586,8 @@ float TextEntry::GetValueAsFloat()
 
 int TextEntry::GetValueAsInt()
 {
-	int nTextLength = GetTextLength() + 1;
-	char* txt = ( char* )_alloca( nTextLength * sizeof( char ) );
+	intp nTextLength = GetTextLength() + 1;
+	char* txt = stackallocT( char, nTextLength );
 	GetText( txt, nTextLength );
 
 	return V_atoi( txt );
@@ -3598,20 +3598,20 @@ int TextEntry::GetValueAsInt()
 // Input:	offset - index to Start reading from 
 //			bufLenInBytes - length of string
 //-----------------------------------------------------------------------------
-void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInBytes)
+void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, intp bufLenInBytes)
 {
-	Assert(bufLenInBytes >= static_cast<int>(sizeof(buf[0])));
+	Assert(bufLenInBytes >= static_cast<intp>(sizeof(buf[0])));
 	if (m_TextStream.Count())
 	{
 		// temporarily null terminate the text stream so we can use the conversion function
-		intp nullTerminatorIndex = m_TextStream.AddToTail((wchar_t)0);
+		intp nullTerminatorIndex = m_TextStream.AddToTail(L'\0');
 		g_pVGuiLocalize->ConvertUnicodeToANSI(m_TextStream.Base(), buf, bufLenInBytes);
 		m_TextStream.FastRemove(nullTerminatorIndex);
 	}
 	else
 	{
 		// no characters in the stream
-		buf[0] = 0;
+		buf[0] = '\0';
 	}
 }
 
@@ -3620,37 +3620,37 @@ void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) char *buf, int bufLenInByte
 // Input:	offset - index to Start reading from 
 //			bufLen - length of string
 //-----------------------------------------------------------------------------
-void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *wbuf, int bufLenInBytes)
+void TextEntry::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *wbuf, intp bufLenInBytes)
 {
-	Assert(bufLenInBytes >= static_cast<int>(sizeof(wbuf[0])));
-	int len = m_TextStream.Count();
+	Assert(bufLenInBytes >= static_cast<intp>(sizeof(wbuf[0])));
+	intp len = m_TextStream.Count();
 	if (m_TextStream.Count())
 	{
-		int terminator = min(len, (bufLenInBytes / (int)sizeof(wchar_t)) - 1);
+		intp terminator = min(len, (bufLenInBytes / (intp)sizeof(wchar_t)) - 1);
 		wcsncpy(wbuf, m_TextStream.Base(), terminator);
-		wbuf[terminator] = 0;
+		wbuf[terminator] = L'\0';
 	}
 	else
 	{
-		wbuf[0] = 0;
+		wbuf[0] = L'\0';
 	}
 }
 
-void TextEntry::GetTextRange( wchar_t *buf, int from, int numchars )
+void TextEntry::GetTextRange( wchar_t *buf, intp from, intp numchars )
 {
-	int len = m_TextStream.Count();
-	int cpChars = max( 0, min( numchars, len - from ) );
+	intp len = m_TextStream.Count();
+	intp cpChars = max( (intp)0, min( numchars, len - from ) );
 	
-	wcsncpy( buf, m_TextStream.Base() + max( 0, min( len, from ) ), cpChars );
+	wcsncpy( buf, m_TextStream.Base() + max( (intp)0, min( len, from ) ), cpChars );
 	buf[ cpChars ] = 0;
 }
 
-void TextEntry::GetTextRange( char *buf, int from, int numchars )
+void TextEntry::GetTextRange( char *buf, intp from, intp numchars )
 {
-	int len = m_TextStream.Count();
-	int cpChars = max( 0, min( numchars, len - from ) );
+	intp len = m_TextStream.Count();
+	intp cpChars = max( (intp)0, min( numchars, len - from ) );
 
-	g_pVGuiLocalize->ConvertUnicodeToANSI( m_TextStream.Base() + max( 0, min( len, from ) ), buf, cpChars + 1 );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( m_TextStream.Base() + max( (intp)0, min( len, from ) ), buf, cpChars + 1 );
 	buf[ cpChars ] = 0;
 }
 
@@ -3691,14 +3691,14 @@ bool TextEntry::RequestInfo(KeyValues *outputData)
 	if (!stricmp(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[256];
-		GetText(wbuf, 255);
+		GetText(wbuf);
 		outputData->SetWString("text", wbuf);
 		return true;
 	}
 	else if (!stricmp(outputData->GetName(), "GetState"))
 	{
 		char buf[64];
-		GetText(buf, sizeof(buf));
+		GetText(buf);
 		outputData->SetInt("state", atoi(buf));
 		return true;
 	}
@@ -3767,7 +3767,7 @@ const char *TextEntry::GetDescription()
 //-----------------------------------------------------------------------------
 // Purpose: Get the number of lines in the window
 //-----------------------------------------------------------------------------
-int TextEntry::GetNumLines()
+intp TextEntry::GetNumLines()
 {
 	return m_LineBreaks.Count();
 }
@@ -3833,7 +3833,7 @@ void TextEntry::SetToFullWidth()
 	int wide = 2*DRAW_OFFSET_X; // buffer on left and right end of text.
 	
 	// loop through all the characters and sum their widths	
-	for (int i = 0; i < m_TextStream.Count(); ++i)
+	for (intp i = 0; i < m_TextStream.Count(); ++i)
 	{
 		wide += getCharWidth(_font, m_TextStream[i]);	
 	}
@@ -4037,10 +4037,9 @@ void TextEntry::ShowIMECandidates()
 		input()->GetCandidate( i, unicode, sizeof( unicode ) );
 
 		wchar_t label[ 64 ];
-		_snwprintf( label, sizeof( label ) / sizeof( wchar_t ) - 1, L"%i %s", i - pageStart + startAtOne, unicode );
-		label[ sizeof( label ) / sizeof( wchar_t ) - 1 ] = L'\0';
+		V_swprintf_safe( label, L"%i %s", i - pageStart + startAtOne, unicode );
 
-		int id = m_pIMECandidates->AddMenuItem( "Candidate", label, (KeyValues *)NULL, this );
+		intp id = m_pIMECandidates->AddMenuItem( "Candidate", label, (KeyValues *)NULL, this );
 		if ( isSelected )
 		{
 			m_pIMECandidates->SetCurrentlyHighlightedItem( id );
@@ -4167,8 +4166,7 @@ void TextEntry::UpdateIMECandidates()
 		input()->GetCandidate( i, unicode, sizeof( unicode ) );
 
 		wchar_t label[ 64 ];
-		_snwprintf( label, sizeof( label ) / sizeof( wchar_t ) - 1, L"%i %s", i - pageStart + startAtOne, unicode );
-		label[ sizeof( label ) / sizeof( wchar_t ) - 1 ] = L'\0';
+		V_swprintf_safe( label, L"%i %s", i - pageStart + startAtOne, unicode );
 		item->SetText( label );
 		if ( isSelected )
 		{
@@ -4281,7 +4279,7 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 	}
 }
 
-int TextEntry::GetTextLength() const
+intp TextEntry::GetTextLength() const
 {
 	return m_TextStream.Count();
 }

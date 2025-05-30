@@ -159,7 +159,8 @@ private:
 	//some calls need to know what state the material would be in right now if the queue had completed.
 	float m_fAlphaModulationOnQueueCompletion;
 	Vector m_vColorModulationOnQueueCompletion;
-	int m_nReferenceCount; // Only ever accessed from the main thread.
+	// dimhotepus: May be accessed not by main thread, need to be thread-safe.
+	CInterlockedInt m_nReferenceCount;
 };
 
 

@@ -12,6 +12,7 @@
 #endif
 
 #include <cstdio>
+#include "tier0/basetypes.h"
 
 enum NormalDecodeMode_t
 {
@@ -170,9 +171,9 @@ struct RGBA8888_t
 	unsigned char g;		//  order of the output ARGB or BGRA, etc...
 	unsigned char b;		//  Last one is MSB, 1st is LSB.
 	unsigned char a;
-	inline RGBA8888_t& operator=( const BGRA8888_t& in );
-	inline RGBA8888_t& operator=( const RGB888_t& in );
-	inline RGBA8888_t& operator=( const BGRX8888_t& in );
+	inline RGBA8888_t& operator=( BGRA8888_t in );
+	inline RGBA8888_t& operator=( RGB888_t in );
+	inline RGBA8888_t& operator=( BGRX8888_t in );
 };
 
 struct RGB888_t
@@ -180,18 +181,18 @@ struct RGB888_t
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
-	inline RGB888_t& operator=( const BGRA8888_t& in )
+	inline RGB888_t& operator=( BGRA8888_t in )
 	{
 		r = in.r;
 		g = in.g;
 		b = in.b;
 		return *this;
 	}
-	inline bool operator==( const RGB888_t& in ) const
+	[[nodiscard]] inline bool operator==( const RGB888_t& in ) const
 	{
 		return ( r == in.r ) && ( g == in.g ) && ( b == in.b );
 	}
-	inline bool operator!=( const RGB888_t& in ) const
+	[[nodiscard]] inline bool operator!=( const RGB888_t& in ) const
 	{
 		return ( r != in.r ) || ( g != in.g ) || ( b != in.b );
 	}
@@ -202,7 +203,7 @@ struct BGR888_t
 	unsigned char b;
 	unsigned char g;
 	unsigned char r;
-	inline BGR888_t& operator=( const BGRA8888_t& in )
+	inline BGR888_t& operator=( BGRA8888_t in )
 	{
 		r = in.r;
 		g = in.g;
@@ -216,7 +217,7 @@ struct BGR565_t
 	unsigned short b : 5;		// order of names changes
 	unsigned short g : 6;		//  byte order of output to 32 bit
 	unsigned short r : 5;
-	inline BGR565_t& operator=( const BGRA8888_t& in )
+	inline BGR565_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 3;
 		g = in.g >> 2;
@@ -238,7 +239,7 @@ struct BGRA5551_t
 	unsigned short g : 5;		//  byte order of output to 32 bit
 	unsigned short r : 5;
 	unsigned short a : 1;
-	inline BGRA5551_t& operator=( const BGRA8888_t& in )
+	inline BGRA5551_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 3;
 		g = in.g >> 3;
@@ -254,7 +255,7 @@ struct BGRA4444_t
 	unsigned short g : 4;		//  byte order of output to 32 bit
 	unsigned short r : 4;
 	unsigned short a : 4;
-	inline BGRA4444_t& operator=( const BGRA8888_t& in )
+	inline BGRA4444_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 4;
 		g = in.g >> 4;
@@ -270,7 +271,7 @@ struct RGBX5551_t
 	unsigned short g : 5;
 	unsigned short b : 5;
 	unsigned short x : 1;
-	inline RGBX5551_t& operator=( const BGRA8888_t& in )
+	inline RGBX5551_t& operator=( BGRA8888_t in )
 	{
 		r = in.r >> 3;
 		g = in.g >> 3;
@@ -283,7 +284,7 @@ struct RGBX5551_t
 //-----------------------------------------------------------------------------
 // Conversion assignments
 //-----------------------------------------------------------------------------
-RGBA8888_t& RGBA8888_t::operator=( const BGRA8888_t& in )
+RGBA8888_t& RGBA8888_t::operator=( BGRA8888_t in )
 {
 	r = in.r;
 	g = in.g;
@@ -292,7 +293,7 @@ RGBA8888_t& RGBA8888_t::operator=( const BGRA8888_t& in )
 	return *this;
 }
 
-RGBA8888_t& RGBA8888_t::operator=( const RGB888_t& in )
+RGBA8888_t& RGBA8888_t::operator=( RGB888_t in )
 {
 	r = in.r;
 	g = in.g;
@@ -301,7 +302,7 @@ RGBA8888_t& RGBA8888_t::operator=( const RGB888_t& in )
 	return *this;
 }
 
-RGBA8888_t& RGBA8888_t::operator=( const BGRX8888_t& in )
+RGBA8888_t& RGBA8888_t::operator=( BGRX8888_t in )
 {
 	r = in.r;
 	g = in.g;
@@ -338,14 +339,15 @@ struct ImageFormatInfo_t
 namespace ImageLoader
 {
 
-	bool GetInfo( const char *fileName, int *width, int *height, ImageFormat *imageFormat, float *sourceGamma );
-	ptrdiff_t  GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap );
-	ptrdiff_t  GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels );
+	[[nodiscard]] bool GetInfo( const char *fileName, int *width, int *height, ImageFormat *imageFormat, float *sourceGamma );
+	[[nodiscard]] intp  GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap );
+	[[nodiscard]] intp  GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, int skipMipLevels );
 	void GetMipMapLevelDimensions( int *width, int *height, int skipMipLevels );
-	int  GetNumMipMapLevels( int width, int height, int depth = 1 );
-	bool Load( unsigned char *imageData, const char *fileName, int width, int height, ImageFormat imageFormat, float targetGamma, bool mipmap );
-	bool Load( unsigned char *imageData, FILE *fp, int width, int height, 
-			   ImageFormat imageFormat, float targetGamma, bool mipmap );
+	[[nodiscard]] int  GetNumMipMapLevels( int width, int height, int depth = 1 );
+	[[nodiscard]] bool Load( unsigned char *imageData, const char *fileName, int width,
+		int height, ImageFormat imageFormat, float targetGamma, bool mipmap );
+	[[nodiscard]] bool Load( unsigned char *imageData, FILE *fp, int width, int height, 
+		ImageFormat imageFormat, float targetGamma, bool mipmap );
 
 	// convert from any image format to any other image format.
 	// return false if the conversion cannot be performed.
@@ -356,17 +358,17 @@ namespace ImageLoader
 							 int width, int height, int srcStride = 0, int dstStride = 0 );
 
 	// must be used in conjunction with ConvertImageFormat() to pre-swap and post-swap
-	void PreConvertSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
-	void PostConvertSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
-	void ByteSwapImageData( unsigned char *pImageData, ptrdiff_t nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
-	bool IsFormatValidForConversion( ImageFormat fmt );
+	void PreConvertSwapImageData( unsigned char *pImageData, intp nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void PostConvertSwapImageData( unsigned char *pImageData, intp nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	void ByteSwapImageData( unsigned char *pImageData, intp nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
+	[[nodiscard]] bool IsFormatValidForConversion( ImageFormat fmt );
 
 	//-----------------------------------------------------------------------------
 	// convert back and forth from D3D format to ImageFormat, regardless of
 	// whether it's supported or not
 	//-----------------------------------------------------------------------------
-	ImageFormat D3DFormatToImageFormat( D3DFORMAT format );
-	D3DFORMAT ImageFormatToD3DFormat( ImageFormat format );
+	[[nodiscard]] ImageFormat D3DFormatToImageFormat( D3DFORMAT format );
+	[[nodiscard]] D3DFORMAT ImageFormatToD3DFormat( ImageFormat format );
 
 	// Flags for ResampleRGBA8888
 	enum
@@ -422,9 +424,9 @@ namespace ImageLoader
 		int m_nFlags;
 	};
 
-	bool ResampleRGBA8888( const ResampleInfo_t &info );
-	bool ResampleRGBA16161616( const ResampleInfo_t &info );
-	bool ResampleRGB323232F( const ResampleInfo_t &info );
+	[[nodiscard]] bool ResampleRGBA8888( const ResampleInfo_t &info );
+	[[nodiscard]] bool ResampleRGBA16161616( const ResampleInfo_t &info );
+	[[nodiscard]] bool ResampleRGB323232F( const ResampleInfo_t &info );
 
 	void ConvertNormalMapRGBA8888ToDUDVMapUVLX8888( const unsigned char *src, int width, int height,
 													unsigned char *dst_ );
@@ -474,26 +476,28 @@ namespace ImageLoader
 	//-----------------------------------------------------------------------------
 	// operations on square images (src and dst can be the same)
 	//-----------------------------------------------------------------------------
-	bool RotateImageLeft( const unsigned char *src, unsigned char *dst, 
-						  int widthHeight, ImageFormat imageFormat );
-	bool RotateImage180( const unsigned char *src, unsigned char *dst, 
-						 int widthHeight, ImageFormat imageFormat );
-	bool FlipImageVertically( void *pSrc, void *pDst, int nWidth, int nHeight, ImageFormat imageFormat, int nDstStride = 0 );
-	bool FlipImageHorizontally( void *pSrc, void *pDst, int nWidth, int nHeight, ImageFormat imageFormat, int nDstStride = 0 );
-	bool SwapAxes( unsigned char *src, 
-				   int widthHeight, ImageFormat imageFormat );
+	[[nodiscard]] bool RotateImageLeft( const unsigned char *src, unsigned char *dst, 
+		int widthHeight, ImageFormat imageFormat );
+	[[nodiscard]] bool RotateImage180( const unsigned char *src, unsigned char *dst, 
+		int widthHeight, ImageFormat imageFormat );
+	[[nodiscard]] bool FlipImageVertically( void *pSrc, void *pDst, int nWidth,
+		int nHeight, ImageFormat imageFormat, int nDstStride = 0 );
+	[[nodiscard]] bool FlipImageHorizontally( void *pSrc, void *pDst, int nWidth,
+		int nHeight, ImageFormat imageFormat, int nDstStride = 0 );
+	[[nodiscard]] bool SwapAxes( unsigned char *src, 
+		int widthHeight, ImageFormat imageFormat );
 
 
 	//-----------------------------------------------------------------------------
 	// Returns info about each image format
 	//-----------------------------------------------------------------------------
-	ImageFormatInfo_t const& ImageFormatInfo( ImageFormat fmt );
+	[[nodiscard]] ImageFormatInfo_t const& ImageFormatInfo( ImageFormat fmt );
 
 
 	//-----------------------------------------------------------------------------
 	// Gets the name of the image format
 	//-----------------------------------------------------------------------------
-	inline char const* GetName( ImageFormat fmt )
+	[[nodiscard]] inline char const* GetName( ImageFormat fmt )
 	{
 		return ImageFormatInfo(fmt).m_pName;
 	}
@@ -502,7 +506,7 @@ namespace ImageLoader
 	//-----------------------------------------------------------------------------
 	// Gets the size of the image format in bytes
 	//-----------------------------------------------------------------------------
-	inline int SizeInBytes( ImageFormat fmt )
+	[[nodiscard]] inline int SizeInBytes( ImageFormat fmt )
 	{
 		return ImageFormatInfo(fmt).m_NumBytes;
 	}
@@ -510,7 +514,7 @@ namespace ImageLoader
 	//-----------------------------------------------------------------------------
 	// Does the image format support transparency?
 	//-----------------------------------------------------------------------------
-	inline bool IsTransparent( ImageFormat fmt )
+	[[nodiscard]] inline bool IsTransparent( ImageFormat fmt )
 	{
 		return ImageFormatInfo(fmt).m_NumAlphaBits > 0;
 	}
@@ -519,7 +523,7 @@ namespace ImageLoader
 	//-----------------------------------------------------------------------------
 	// Is the image format compressed?
 	//-----------------------------------------------------------------------------
-	inline bool IsCompressed( ImageFormat fmt )
+	[[nodiscard]] inline bool IsCompressed( ImageFormat fmt )
 	{
 		return ImageFormatInfo(fmt).m_IsCompressed;
 	}
@@ -527,13 +531,13 @@ namespace ImageLoader
 	//-----------------------------------------------------------------------------
 	// Is any channel > 8 bits?
 	//-----------------------------------------------------------------------------
-	inline bool HasChannelLargerThan8Bits( ImageFormat fmt )
+	[[nodiscard]] inline bool HasChannelLargerThan8Bits( ImageFormat fmt )
 	{
 		ImageFormatInfo_t info = ImageFormatInfo(fmt);
 		return ( info.m_NumRedBits > 8 || info.m_NumGreeBits > 8 || info.m_NumBlueBits > 8 || info.m_NumAlphaBits > 8 );
 	}
 
-	inline bool IsRuntimeCompressed( ImageFormat fmt )
+	[[nodiscard]] inline bool IsRuntimeCompressed( ImageFormat fmt )
 	{
 		return ( fmt == IMAGE_FORMAT_DXT1_RUNTIME ) || ( fmt == IMAGE_FORMAT_DXT5_RUNTIME );
 	}

@@ -20,14 +20,14 @@ class CBudgetHistoryPanel : public vgui::Panel
 
 public:
 	CBudgetHistoryPanel( CBaseBudgetPanel *pParent, const char *pPanelName );
-	~CBudgetHistoryPanel();
+	virtual ~CBudgetHistoryPanel();
 	void SetData( double *pData, intp numCategories, int numItems, int offsetIntoData );
 	void SetRange( float fMin, float fMax );
 
 
 protected:
 
-	void Paint();
+	void Paint() override;
 
 private:
 

@@ -43,8 +43,6 @@ class CTrackEntry
 		inline int GetSize(void) { return(m_nDataSize); }
 
 		void OnRemoveVisGroup(CVisGroup *pGroup);
-
-		bool m_bAutoDestruct;
 	
 	protected:
 
@@ -77,6 +75,10 @@ class CTrackEntry
 
 		bool m_bKeptChildren;
 		bool m_bUndone;						// Set to true after this entry is undone.
+
+	public:
+		// dimhotepus: Moved to the end for reducing track size 24 -> 20.
+		bool m_bAutoDestruct;
 };
 
 
@@ -96,7 +98,7 @@ public:
 
 	void Undo();
 
-	void SetName(LPCTSTR pszName) { if(pszName) strcpy(szName, pszName); }
+	void SetName(LPCTSTR pszName) { if(pszName) V_strcpy_safe(szName, pszName); }
 
 	void OnRemoveVisGroup(CVisGroup *pGroup);
 

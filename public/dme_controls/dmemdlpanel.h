@@ -23,7 +23,7 @@ class CDmeMDLMakefile;
 //-----------------------------------------------------------------------------
 class CDmeMDLPanel : public CMDLPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeMDLPanel, CMDLPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeMDLPanel, CMDLPanel );
 
 public:
 	// constructor, destructor

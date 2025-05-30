@@ -5,7 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#define PROTECTED_THINGS_DISABLE
+#include <vgui_controls/ScrollBarSlider.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IBorder.h>
 #include <vgui/IInput.h>
@@ -13,9 +15,7 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/MouseCode.h>
-#include <KeyValues.h>
 
-#include <vgui_controls/ScrollBarSlider.h>
 #include <vgui_controls/Controls.h>
 
 #include <math.h>

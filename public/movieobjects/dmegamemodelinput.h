@@ -24,10 +24,10 @@ class CDmeGameModelInput : public CDmeInput
 	DEFINE_ELEMENT( CDmeGameModelInput, CDmeInput );
 
 public:
-	virtual bool IsDirty(); // ie needs to operate
-	virtual void Operate();
+	bool IsDirty() override; // ie needs to operate
+	void Operate() override;
 
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 public:
 	void AddBone( const Vector& pos, const Quaternion& rot );
@@ -65,10 +65,10 @@ class CDmeGameSpriteInput : public CDmeInput
 	DEFINE_ELEMENT( CDmeGameSpriteInput, CDmeInput );
 
 public:
-	virtual bool IsDirty(); // ie needs to operate
-	virtual void Operate();
+	bool IsDirty() override; // ie needs to operate
+	void Operate() override;
 
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 public:
 	void SetState( bool bVisible, float nFrame, int nRenderMode, int nRenderFX, float flRenderScale, float flProxyRadius, const Vector &pos, const Quaternion &rot, const Color &color );
@@ -92,10 +92,10 @@ class CDmeGameCameraInput : public CDmeInput
 	DEFINE_ELEMENT( CDmeGameCameraInput, CDmeInput );
 
 public:
-	virtual bool IsDirty(); // ie needs to operate
-	virtual void Operate();
+	bool IsDirty() override; // ie needs to operate
+	void Operate() override;
 
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 public:
 	void SetPosition( const Vector& pos );

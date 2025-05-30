@@ -8,10 +8,8 @@
 #define EDITGAMECLASS_H
 #pragma once
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
+
 #include "BlockArray.h"
 #include "fgdlib/fgdlib.h"
 #include "fgdlib/WCKeyValues.h"
@@ -39,17 +37,17 @@ class CEditGameClass
 		CEditGameClass(void);
 		~CEditGameClass(void);
 
-		inline bool IsClass(const char *pszClass = NULL);
+		inline bool IsClass(const char *pszClass = NULL) const;
 		inline GDclass *GetClass(void) { return(m_pClass); }
 		inline void SetClass(GDclass *pClass) { m_pClass = pClass; }
-		inline const char* GetClassName(void) { return(m_szClass); }
-		inline bool IsKeyFrameClass(void) { return((m_pClass != NULL) && (m_pClass->IsKeyFrameClass())); }
-		inline bool IsMoveClass(void) { return((m_pClass != NULL) && (m_pClass->IsMoveClass())); }
-		inline bool IsPointClass(void) { return((m_pClass != NULL) && (m_pClass->IsPointClass())); }
-		inline bool IsNPCClass(void) { return((m_pClass != NULL) && (m_pClass->IsNPCClass())); }
-		inline bool IsFilterClass(void) { return((m_pClass != NULL) && (m_pClass->IsFilterClass())); }
-		inline bool IsSolidClass(void) { return((m_pClass != NULL) && (m_pClass->IsSolidClass())); }
-		inline bool IsNodeClass(void) { return((m_pClass != NULL) && (m_pClass->IsNodeClass())); }
+		inline const char* GetClassName(void) const { return(m_szClass); }
+		inline bool IsKeyFrameClass(void) const { return((m_pClass != NULL) && (m_pClass->IsKeyFrameClass())); }
+		inline bool IsMoveClass(void) const { return((m_pClass != NULL) && (m_pClass->IsMoveClass())); }
+		inline bool IsPointClass(void) const { return((m_pClass != NULL) && (m_pClass->IsPointClass())); }
+		inline bool IsNPCClass(void) const { return((m_pClass != NULL) && (m_pClass->IsNPCClass())); }
+		inline bool IsFilterClass(void) const { return((m_pClass != NULL) && (m_pClass->IsFilterClass())); }
+		inline bool IsSolidClass(void) const { return((m_pClass != NULL) && (m_pClass->IsSolidClass())); }
+		inline bool IsNodeClass(void) const { return((m_pClass != NULL) && (m_pClass->IsNodeClass())); }
 		static inline bool IsNodeClass(const char *pszClassName) { return GDclass::IsNodeClass(pszClassName); }
 
 		//
@@ -72,8 +70,8 @@ class CEditGameClass
 		//
 		// Interface to spawnflags.
 		//
-		bool GetSpawnFlag(unsigned long nFlag);
-		unsigned long GetSpawnFlags(void);
+		bool GetSpawnFlag(unsigned long nFlag) const;
+		unsigned long GetSpawnFlags(void) const;
 		void SetSpawnFlag(unsigned long nFlag, bool bSet);
 		void SetSpawnFlags(unsigned long nFlags);
 
@@ -106,10 +104,10 @@ class CEditGameClass
 		//
 		// Serialization functions.
 		//
-		static ChunkFileResult_t LoadConnectionsCallback(CChunkFile *pFile, CEditGameClass *pEditGameClass);
-		static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CEditGameClass *pEditGameClass);
+		[[nodiscard]] static ChunkFileResult_t LoadConnectionsCallback(CChunkFile *pFile, CEditGameClass *pEditGameClass);
+		[[nodiscard]] static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CEditGameClass *pEditGameClass);
 
-		ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
 		int SerializeRMF(std::fstream&, BOOL);
 		int SerializeMAP(std::fstream&, BOOL);
@@ -193,7 +191,7 @@ const char *CEditGameClass::GetComments(void)
 // Input  : NULL - 
 // Output : inline bool
 //-----------------------------------------------------------------------------
-inline bool CEditGameClass::IsClass(const char *pszClass)
+inline bool CEditGameClass::IsClass(const char *pszClass) const
 {
 	if (pszClass == NULL)
 	{

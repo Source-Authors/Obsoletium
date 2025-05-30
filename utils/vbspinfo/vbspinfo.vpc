@@ -23,33 +23,38 @@ $Configuration
 	}
 }
 
-$Project "Vbspinfo"
+$Project "vbspinfo"
 {
 	$Folder	"Source Files"
 	{
 		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
 		
-		$File	"..\common\tools_minidump.cpp"
 		$File	"..\common\bsplib.cpp"
 		$File	"..\common\cmdlib.cpp"
+		$File	"..\common\filesystem_tools.cpp"
+		$File	"..\common\scriplib.cpp"
+		$File	"..\common\tools_minidump.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"..\common\filesystem_tools.cpp"
-		$File	"$SRCDIR\public\iscratchpad3d.h"
 		$File	"$SRCDIR\public\lumpfiles.cpp"
 		$File	"$SRCDIR\public\scratchpad3d.cpp"
-		$File	"..\common\scriplib.cpp"
-		$File	"vbspinfo.cpp"
 		$File	"$SRCDIR\public\zip_utils.cpp"
+		$File	"vbspinfo.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
 		$File	"..\common\bsplib.h"
-		$File	"$SRCDIR\public\tier1\characterset.h"
-		$File	"$SRCDIR\public\tier1\checksum_crc.h"
+		$File	"..\common\cmdlib.h"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\scriplib.h"
+		$File	"..\common\tools_minidump.h"
+
 		$File	"$SRCDIR\public\filesystem_helpers.h"
+		$File	"$SRCDIR\public\filesystem_init.h"
 		$File	"$SRCDIR\public\lumpfiles.h"
+		$File	"$SRCDIR\public\iscratchpad3d.h"
+		$File	"$SRCDIR\public\zip_utils.h"
 	}
 
 	$Folder	"Link Libraries"

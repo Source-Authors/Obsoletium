@@ -26,6 +26,6 @@ struct CPhonemeParams : public CBaseDialogParams
 };
 
 // Display/create actor info
-int PhonemeProperties( CPhonemeParams *params );
+intp PhonemeProperties( CPhonemeParams *params );
 
 #endif // PHONEMEPROPERTIES_H

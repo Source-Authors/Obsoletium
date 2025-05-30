@@ -7,6 +7,7 @@
 //===========================================================================//
 #define DISABLE_PROTECTED_THINGS
 #include "locald3dtypes.h"
+#include <comdef.h>
 
 #include "shaderdevicedx8.h"
 #include "shaderapi/ishaderutil.h"
@@ -77,10 +78,60 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceMgrDx8, IShaderDeviceMgr,
 IDirect3DDevice *g_pD3DDevice = NULL;
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
+#define NOD3D9EX_CMD_OPTION "-nod3d9ex"
+
 // HACK: need to pass knowledge of D3D9Ex usage into callers of D3D Create* methods
 // so they do not try to specify D3DPOOL_MANAGED, which is unsupported in D3D9Ex
 bool g_ShaderDeviceUsingD3D9Ex = false;
 static ConVar mat_supports_d3d9ex( "mat_supports_d3d9ex", "0", FCVAR_HIDDEN );
+static std::atomic_bool g_allow_set_mat_disable_d3d9ex = false;
+
+class ScopedAllowSetMatDisableD3D9Ex
+{
+public:
+	explicit ScopedAllowSetMatDisableD3D9Ex(bool new_value) noexcept
+		: m_old_value{g_allow_set_mat_disable_d3d9ex.exchange(new_value)}
+	{
+	}
+
+	ScopedAllowSetMatDisableD3D9Ex(ScopedAllowSetMatDisableD3D9Ex&) = delete;
+	ScopedAllowSetMatDisableD3D9Ex(ScopedAllowSetMatDisableD3D9Ex&&) = delete;
+	ScopedAllowSetMatDisableD3D9Ex& operator=(ScopedAllowSetMatDisableD3D9Ex&) = delete;
+	ScopedAllowSetMatDisableD3D9Ex& operator=(ScopedAllowSetMatDisableD3D9Ex&&) = delete;
+
+	~ScopedAllowSetMatDisableD3D9Ex() noexcept
+	{
+		g_allow_set_mat_disable_d3d9ex.exchange(m_old_value);
+	}
+
+private:
+	const bool m_old_value;
+};
+
+// dimhotepus: Remove archive. Problem is convar read later than DirectX device created, so it is meaningless to set.
+static ConVar mat_disable_d3d9ex( "mat_disable_d3d9ex", "0", 0,
+	"Read-only. Use " NOD3D9EX_CMD_OPTION " command line arg.\n"
+	"Disables Windows Aero DirectX extensions (may positively or negatively "
+	"affect performance depending on video drivers)",
+	true, 0, true, 1,
+	[](IConVar *var, const char *, float old_value) {
+	auto *convar = static_cast<ConVar*>(var);
+
+	// dimhotepus: User tries to change mat_disable_d3d9ex.
+	if (!g_allow_set_mat_disable_d3d9ex && convar->GetFloat() != old_value)
+	{
+		Warning("%s is read-only. Use " NOD3D9EX_CMD_OPTION " command line arg to disable Windows Aero DirectX extensions.\n", var->GetName() );
+
+		const ScopedAllowSetMatDisableD3D9Ex scoped_allow_set_mat_disable_d3d9ex{true};
+		convar->SetValue(old_value);
+	}
+});
+static ConVar mat_disable_d3d9ex_hidden("mat_disable_d3d9ex_hidden", "0", FCVAR_HIDDEN, "Hidden mat_disable_d3d9ex", [](IConVar* var, const char*, float old_value) {
+	auto *convar = static_cast<ConVar*>(var);
+	
+	const ScopedAllowSetMatDisableD3D9Ex scoped_allow_set_mat_disable_d3d9ex{true};
+	mat_disable_d3d9ex.SetValue(convar->GetFloat());
+});
 #endif
 
 // hook into mat_forcedynamic from the engine.
@@ -140,7 +191,8 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	m_pD3D = NULL;
 
 	// Attempt to create a D3D9Ex device (Windows Vista and later) if possible
-	bool bD3D9ExForceDisable = ( CommandLine()->FindParm( "-nod3d9ex" ) != 0 ) ||
+	bool bD3D9ExForceDisable = mat_disable_d3d9ex.GetInt() == 1 ||
+								( CommandLine()->FindParm( NOD3D9EX_CMD_OPTION ) != 0 ) ||
 								( CommandLine()->ParmValue( "-dxlevel", 95 ) < 90 );
 
 	IDirect3D9Ex *pD3D9Ex = NULL;
@@ -166,6 +218,13 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	{
 		g_ShaderDeviceUsingD3D9Ex = false;
 		m_pD3D = Direct3DCreate9( D3D_SDK_VERSION );
+	}
+	
+	// dimhotepus: When command line option is passed, it should apply to mat_disable_d3d9ex
+	// as later signals D3D9Ex state to user.  mat_disable_d3d9ex should be readonly for user.
+	if ( CommandLine()->FindParm( NOD3D9EX_CMD_OPTION ) && !mat_disable_d3d9ex.GetInt() )
+	{
+		mat_disable_d3d9ex_hidden.SetValue( g_ShaderDeviceUsingD3D9Ex ? 0 : 1 );
 	}
 	
 	mat_supports_d3d9ex.SetValue( bD3D9ExAvailable ? 1 : 0 );
@@ -205,7 +264,7 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	// FIXME: Want this to be here, but we can't because Steam
 	// hasn't had it's application ID set up yet.
 	// dimhotepus: Init adapters immediately.
-  InitAdapterInfo();
+	InitAdapterInfo();
 	return true;
 }
 
@@ -304,8 +363,7 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 	unsigned nCount = m_pD3D->GetAdapterCount( );
 	for( unsigned i = 0; i < nCount; ++i )
 	{
-		intp j = m_Adapters.AddToTail();
-		AdapterInfo_t &info = m_Adapters[j];
+		AdapterInfo_t &info = m_Adapters[m_Adapters.AddToTail()];
 
 #ifdef _DEBUG
 		memset( &info.m_ActualCaps, 0xDD, sizeof(info.m_ActualCaps) );
@@ -324,7 +382,7 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 		const char *pShaderParam = CommandLine()->ParmValue( "-shader" );
 		if ( pShaderParam )
 		{
-			Q_strncpy( info.m_ActualCaps.m_pShaderDLL, pShaderParam, sizeof( info.m_ActualCaps.m_pShaderDLL ) );
+			V_strcpy_safe( info.m_ActualCaps.m_pShaderDLL, pShaderParam );
 		}
 	}
 }
@@ -363,22 +421,14 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 		pCaps->m_NullTextureFormat = IMAGE_FORMAT_RGB565;
 	}
 
-#if defined( _X360 )
-	pCaps->m_ShadowDepthTextureFormat = ReverseDepthOnX360() ? IMAGE_FORMAT_X360_DST24F : IMAGE_FORMAT_X360_DST24;
-	pCaps->m_bSupportsShadowDepthTextures = true;
-	pCaps->m_bSupportsFetch4 = false;
-	return;
-#elif defined ( DX_TO_GL_ABSTRACTION )
+#if defined ( DX_TO_GL_ABSTRACTION )
 	// We may want to only do this on the higher-end Mac SKUs, since it's not free...
 	pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST16; // This format shunts us down the right shader combo path
-
 	pCaps->m_bSupportsShadowDepthTextures = true;
-
 	pCaps->m_bSupportsFetch4 = false;
 	return;
 #endif
 
-	if ( IsPC() || !IsX360() )
 	{
 		bool bToolsMode = IsWindows() && ( CommandLine()->CheckParm( "-tools" ) != NULL );
 		bool bFound16Bit = false;
@@ -483,16 +533,6 @@ void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *p
 
 	if ( pCaps->m_nDXSupportLevel < 90 )
 		return;
-
-#ifdef _X360
-	{
-		pCaps->m_bSupportsAlphaToCoverage	 = true;
-		pCaps->m_AlphaToCoverageEnableValue	 = TRUE;
-		pCaps->m_AlphaToCoverageDisableValue = FALSE;
-		pCaps->m_AlphaToCoverageState		 = D3DRS_ALPHATOMASKENABLE;
-		return;
-	}
-#endif // _X360
 
 	if ( pCaps->m_VendorID == VENDORID_NVIDIA )
 	{
@@ -843,11 +883,6 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	pCaps->m_ZBiasAndSlopeScaledDepthBiasSupported =
 		( ( caps.RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) != 0 ) &&
 		( ( caps.RasterCaps & D3DPRASTERCAPS_SLOPESCALEDEPTHBIAS ) != 0 );
-	if ( IsX360() )
-	{
-		// driver lies, force it
-		pCaps->m_ZBiasAndSlopeScaledDepthBiasSupported = true;
-	}
 
 	// Spheremapping supported?
 	pCaps->m_bSupportsSpheremapping = (caps.VertexProcessingCaps & D3DVTXPCAPS_TEXGEN_SPHEREMAP) != 0;
@@ -880,7 +915,6 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 #endif
 	
 	// Query for SRGB support as needed for our DX 9 stuff
-	if ( IsPC() || !IsX360() )
 	{
 		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
 
@@ -888,11 +922,6 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		{
 			pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
 		}
-	}
-	else
-	{
-		// 360 does support it, but is queried in the wrong manner, so force it
-		pCaps->m_SupportsSRGB = true;
 	}
 
 	if ( CommandLine()->CheckParm( "-nosrgb" ) )
@@ -908,8 +937,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		pCaps->m_bSupportsVertexTextures = false;
 	}
 
-	// FIXME: vs30 has a fixed setting here at 4.
-	// Future hardware will need some other way of computing this.
+	// Up t0 4 vertex textures supported (D3DVERTEXTEXTURESAMPLER0..3).
 	pCaps->m_nVertexTextureCount = pCaps->m_bSupportsVertexTextures ? 4 : 0;
 
 	// FIXME: How do I actually compute this?
@@ -1146,12 +1174,6 @@ void CShaderDeviceMgrDx8::ComputeDXSupportLevel( HardwareCaps_t &caps )
 
 	// FIXME: Improve this!! There should be a whole list of features
 	// we require in order to be considered a DX7 board, DX8 board, etc.
-
-	if ( IsX360() )
-	{
-		caps.m_nMaxDXSupportLevel = 98;
-		return;
-	}
 
 	bool bIsOpenGL = IsOpenGL();
 
@@ -1576,9 +1598,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 
 	m_PresentParameters.Windowed = info.m_bWindowed;
 	m_PresentParameters.SwapEffect = info.m_bUsingMultipleWindows ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
-
-	// for 360, we want to create it ourselves for hierarchical z support
-	m_PresentParameters.EnableAutoDepthStencil = IsX360() ? FALSE : TRUE; 
+	m_PresentParameters.EnableAutoDepthStencil = TRUE;
 
 	// What back-buffer format should we use?
 	ImageFormat backBufferFormat = FindNearestSupportedBackBufferFormat( nAdapter,
@@ -1591,11 +1611,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		// always stencil for dx9/hdr
 		m_bUsingStencil = true;
 	}
-#if defined( _X360 )
-	D3DFORMAT nDepthFormat = ReverseDepthOnX360() ? D3DFMT_D24FS8 : D3DFMT_D24S8;
-#else
 	D3DFORMAT nDepthFormat = m_bUsingStencil ? D3DFMT_D24S8 : D3DFMT_D24X8;
-#endif
 	m_PresentParameters.AutoDepthStencilFormat = FindNearestSupportedDepthFormat( 
 		nAdapter, m_AdapterFormat, backBufferFormat, nDepthFormat );
 	m_PresentParameters.hDeviceWindow = (VD3DHWND)hWnd;
@@ -1606,33 +1622,24 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	case D3DFMT_D24S8:
 		m_iStencilBufferBits = 8;
 		break;
-#if defined( _X360 )
-	case D3DFMT_D24FS8:
-		m_iStencilBufferBits = 8;
-		break;
-#else
 	case D3DFMT_D24X4S4:
 		m_iStencilBufferBits = 4;
 		break;
 	case D3DFMT_D15S1:
 		m_iStencilBufferBits = 1;
 		break;
-#endif
 	default:
 		m_iStencilBufferBits = 0;
 		m_bUsingStencil = false; //couldn't acquire a stencil buffer
 	};
 
-	if ( IsX360() || !info.m_bWindowed )
+	if ( !info.m_bWindowed )
 	{
 		bool useDefault = ( info.m_DisplayMode.m_nWidth == 0 ) || ( info.m_DisplayMode.m_nHeight == 0 );
 		m_PresentParameters.BackBufferCount = 1;
 		m_PresentParameters.BackBufferWidth = useDefault ? mode.m_nWidth : info.m_DisplayMode.m_nWidth;
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
-#if defined( _X360 )
-		m_PresentParameters.FrontBufferFormat = D3DFMT_LE_X8R8G8B8;
-#endif
 		if ( !info.m_bWaitForVSync || CommandLine()->FindParm( "-forcenovsync" ) )
 		{
 			m_PresentParameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -1645,40 +1652,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		m_PresentParameters.FullScreen_RefreshRateInHz = info.m_DisplayMode.m_nRefreshRateDenominator ? 
 			info.m_DisplayMode.m_nRefreshRateNumerator / info.m_DisplayMode.m_nRefreshRateDenominator : D3DPRESENT_RATE_DEFAULT;
 
-#if defined( _X360 )
-		XVIDEO_MODE videoMode;
-		XGetVideoMode( &videoMode );
-
-		// want 30 for 60Hz, and 25 for 50Hz (PAL)
-		int nNewFpsMax = ( ( int )( videoMode.RefreshRate + 0.5f ) ) >> 1;
-		// slam to either 30 or 25 so that we don't end up with any other cases.
-		if( nNewFpsMax < 26 )
-		{
-			nNewFpsMax = 25;
-		}
-		else
-		{
-			nNewFpsMax = 30;
-		}
-		DevMsg( "*******Monitor refresh is %f, setting fps_max to %d*********\n", videoMode.RefreshRate, nNewFpsMax );
-		ConVarRef fps_max( "fps_max" );
-		fps_max.SetValue( nNewFpsMax );
-
-		// setup hardware scaling - should be native 720p upsampling to 1080i
-		if ( info.m_bScaleToOutputResolution )
-		{
-			m_PresentParameters.VideoScalerParameters.ScalerSourceRect.x2 = m_PresentParameters.BackBufferWidth;
-			m_PresentParameters.VideoScalerParameters.ScalerSourceRect.y2 = m_PresentParameters.BackBufferHeight;
-			m_PresentParameters.VideoScalerParameters.ScaledOutputWidth = videoMode.dwDisplayWidth;
-			m_PresentParameters.VideoScalerParameters.ScaledOutputHeight = videoMode.dwDisplayHeight;
-			DevMsg( "VIDEO SCALING: scaling from %dx%d to %dx%d\n", ( int )m_PresentParameters.BackBufferWidth, ( int )m_PresentParameters.BackBufferHeight,
-				( int )videoMode.dwDisplayWidth, ( int )videoMode.dwDisplayHeight );
-		}
-		else
-		{
-			DevMsg( "VIDEO SCALING: No scaling: %dx%d\n", ( int )m_PresentParameters.BackBufferWidth, ( int )m_PresentParameters.BackBufferHeight );
-		}
-#endif
 	}
 	else
 	{
@@ -1955,7 +1928,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_ON\n" );
 		break;
 	case COMPRESSED_TEXTURES_OFF:
-		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_ON\n" );
+		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_OFF\n" );
 		break;
 	case COMPRESSED_TEXTURES_NOT_INITIALIZED:
 		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_NOT_INITIALIZED\n" );
@@ -2172,9 +2145,6 @@ IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAd
 
 	if ( !FAILED( hr ) && pD3DDevice )
 		return pD3DDevice;
-
-	if ( !IsPC() )
-		return NULL;
 
 	// try again, other applications may be taking their time
 	ThreadSleep( 1000 );
@@ -2954,12 +2924,15 @@ void CShaderDeviceDx8::Present()
 	// need to flush the dynamic buffer
 	g_pShaderAPI->FlushBufferedPrimitives();
 
+	HRESULT hr = S_OK;
 	if ( !IsDeactivated() )
 	{
-		Dx9Device()->EndScene();
-	}
+		hr = Dx9Device()->EndScene();
 
-	HRESULT hr = S_OK;
+		AssertMsg(SUCCEEDED(hr),
+			"Dx9Device()->EndScene() failed w/e '%s'.",
+			_com_error{hr}.ErrorMessage());
+	}
 
 	// if we're in queued mode, don't present if the device is already lost
 	bool bValidPresent = true;
@@ -2985,13 +2958,9 @@ void CShaderDeviceDx8::Present()
 	}
 
 	// If we're not iconified, try to present (without this check, we can flicker when Alt-Tabbed away)
-#ifdef _WIN32
-	if ( IsX360() || (IsIconic( ( HWND )m_hWnd ) == 0 && bValidPresent) )
-#else
-	if ( IsX360() || (IsIconic( (VD3DHWND)m_hWnd ) == 0 && bValidPresent) )
-#endif
+	if ( IsIconic( (VD3DHWND)m_hWnd ) == FALSE && bValidPresent )
 	{
-		if ( IsPC() && ( m_IsResizing || ( m_ViewHWnd != (VD3DHWND)m_hWnd ) ) )
+		if ( m_IsResizing || ( m_ViewHWnd != (VD3DHWND)m_hWnd ) )
 		{
 			RECT destRect;
 			#ifndef DX_TO_GL_ABSTRACTION
@@ -3052,13 +3021,6 @@ void CShaderDeviceDx8::Present()
 		CheckDeviceLost( m_bOtherAppInitializing );
 	}
 
-	if ( IsX360() )
-	{
-		// according to docs  - "Mandatory Reset of GPU Registers"
-		// 360 must force the cached state to be dirty after any present()
-		g_pShaderAPI->ResetRenderState( false );
-	}
-
 #ifdef RECORD_KEYFRAMES
 	static int frame = 0;
 	++frame;
@@ -3082,7 +3044,11 @@ void CShaderDeviceDx8::Present()
 		}
 #endif
 
-		Dx9Device()->BeginScene();
+		hr = Dx9Device()->BeginScene();
+		
+		AssertMsg(SUCCEEDED(hr),
+			"Dx9Device()->BeginScene() failed w/e '%s'.",
+			_com_error{hr}.ErrorMessage());
 	}
 }
 

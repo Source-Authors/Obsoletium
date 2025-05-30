@@ -177,7 +177,7 @@ void CTextureBudgetPanel::SendConfigDataToBase()
 	// Copy all the cvars in.
 	data.m_flBottomOfHistoryFraction = texture_budget_panel_bottom_of_history_fraction.GetFloat();
 
-	data.m_flBarGraphRange = (m_MaxValue * 4) / 3;
+	data.m_flBarGraphRange = m_MaxValue * 4 / 3;
 	data.m_flTimeLabelInterval = data.m_flBarGraphRange / 4;
 	data.m_nLinesPerTimeLabel = 4;
 
@@ -261,18 +261,18 @@ void CTextureBudgetPanel::SnapshotTextureHistory()
 		if ( pProf->GetCounterGroup( i ) == GetCurrentCounterGroup() )
 		{
 			// The counters are in bytes and the panel is all in kilobytes.
-			int value = pProf->GetCounterValue( i ) / 1024;
+			uintp value = pProf->GetCounterValue( i ) / 1024;
 			
 			m_SumOfValues += value;
 			m_MaxValue = max( m_MaxValue, value );
 		}
 	}
 	
-	showbudget_texture_global_sum.SetValue( m_SumOfValues );
+	showbudget_texture_global_sum.SetValue( static_cast<float>(m_SumOfValues) );
 	
 	// Send new config data if the range has expanded.
 	bool bForceSendConfigData = false;
-	if ( (float)m_MaxValue > GetConfigData().m_flBarGraphRange || m_SumOfValues > GetConfigData().m_flHistoryRange )
+	if ( m_MaxValue > GetConfigData().m_flBarGraphRange || m_SumOfValues > GetConfigData().m_flHistoryRange )
 	{
 		bForceSendConfigData = true;
 	}
@@ -310,7 +310,7 @@ void CTextureBudgetPanel::SnapshotTextureHistory()
 		if ( pProf->GetCounterGroup( i ) == GetCurrentCounterGroup() )
 		{
 			// The counters are in bytes and the panel is all in kilobytes.
-			int value = pProf->GetCounterValue( i ) / 1024;
+			uintp value = pProf->GetCounterValue( i ) / 1024;
 			m_BudgetGroupTimes[groupID].m_Time[m_BudgetHistoryOffset] = value;
 			++groupID;
 		}
@@ -362,9 +362,7 @@ void CTextureBudgetPanel::DumpGlobalTextureStats( const CCommand &args )
 			const char *pGroupName = g_VProfCurrentProfile.GetCounterName( i );
 
 			// The counters are in bytes and the panel is all in kilobytes.
-//			int value = pProf->GetCounterValue( i ) / 1024;
-
-			Warning( "%s: %d\n", pGroupName,  ( int )g_VProfCurrentProfile.GetCounterValue( i ) );
+			Warning( "%s: %zu\n", pGroupName, g_VProfCurrentProfile.GetCounterValue( i ) );
 		}
 	}
 }

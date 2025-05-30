@@ -11,6 +11,7 @@
 #endif
 
 #include "mxBitmapTools.h"
+#include "mxtk/mxwindow.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 

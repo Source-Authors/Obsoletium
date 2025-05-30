@@ -124,8 +124,8 @@ void CStudioRender::R_GatherStats( studiomeshgroup_t *pGroup, CMeshBuilder &Mesh
 		}
 	}
 
-	const float UNIFORM_SCREEN_WIDTH = 1600.0f;
-	const float UNIFORM_SCREEN_HEIGHT = 1200.0f;
+	constexpr float UNIFORM_SCREEN_WIDTH = 1600.0f;
+	constexpr float UNIFORM_SCREEN_HEIGHT = 1200.0f;
 	
 	for (int j = 0; j < pGroup->m_NumStrips; ++j)
 	{

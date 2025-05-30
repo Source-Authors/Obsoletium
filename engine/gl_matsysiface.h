@@ -46,7 +46,6 @@ void MaterialSystem_CreateSortinfo( void );
 
 void InitMaterialSystem( void );
 void ShutdownMaterialSystem( void );
-void InitStartupScreen();
 void UpdateMaterialSystemConfig( void );
 bool MaterialConfigLightingChanged();
 void ClearMaterialConfigLightingChanged();
@@ -78,17 +77,17 @@ extern CUtlVector<IMesh *> g_WorldStaticMeshes;
 
 struct materiallist_t
 {
-	short			nextBlock;
-	short			count;
+	intp			nextBlock;
+	intp			count;
 	msurface2_t		*pSurfaces[15];
 };
 
 struct surfacesortgroup_t
 {
-	short			listHead;
-	short			listTail;
+	intp			listHead;
+	intp			listTail;
+	intp			groupListIndex;
 	unsigned short	vertexCount;
-	short			groupListIndex;
 	unsigned short	vertexCountNoDetail;
 	unsigned short	indexCountNoDetail;
 	unsigned short	triangleCount;
@@ -99,7 +98,7 @@ struct surfacesortgroup_t
 class CMSurfaceSortList
 {
 public:
-	void Init( int maxSortIDs, int minMaterialLists );
+	void Init( int maxSortIDs, intp minMaterialLists );
 	void Shutdown();
 	void Reset();
 	void AddSurfaceToTail( msurface2_t *pSurface, int nSortGroup, int sortID );
@@ -122,7 +121,7 @@ public:
 		return m_sortGroupLists[nSortGroup];
 	}
 
-	inline const materiallist_t &GetSurfaceBlock(short index) const
+	inline const materiallist_t &GetSurfaceBlock(intp index) const
 	{
 		return m_list[index];
 	}
@@ -135,9 +134,9 @@ public:
 	void EnsureMaxSortIDs( int newMaxSortIDs );
 private:
 	void InitGroup( surfacesortgroup_t *pGrup );
-	bool IsGroupUsed( int groupIndex ) const { return (m_groupUsed[ (groupIndex>>3) ] & (1<<(groupIndex&7))) != 0; }
-	inline void MarkGroupUsed( int groupIndex ) { m_groupUsed[groupIndex>>3] |= (1<<(groupIndex&7)); }
-	inline void MarkGroupNotUsed( int groupIndex ) { m_groupUsed[groupIndex>>3] &= ~(1<<(groupIndex&7)); }
+	bool IsGroupUsed( intp groupIndex ) const { return (m_groupUsed[ (groupIndex>>3) ] & (1<<(groupIndex&7))) != 0; }
+	inline void MarkGroupUsed( intp groupIndex ) { m_groupUsed[groupIndex>>3] |= (1<<(groupIndex&7)); }
+	inline void MarkGroupNotUsed( intp groupIndex ) { m_groupUsed[groupIndex>>3] &= ~(1<<(groupIndex&7)); }
 
 	CUtlVector<materiallist_t>			m_list;
 	CUtlVector<surfacesortgroup_t>		m_groups;		// one per sortID per MAT_SORT_GROUP, sparse
@@ -152,10 +151,10 @@ private:
 
 #define MSL_FOREACH_SURFACE_IN_GROUP_BEGIN( _sortList, _group, _pSurface )	\
 	{																				\
-		for ( short _blockIndex = (_group).listHead; _blockIndex != -1; _blockIndex = (_sortList).GetSurfaceBlock(_blockIndex).nextBlock )	\
+		for ( intp _blockIndex = (_group).listHead; _blockIndex != -1; _blockIndex = (_sortList).GetSurfaceBlock(_blockIndex).nextBlock )	\
 		{																			\
 			const materiallist_t *_pList = &(_sortList).GetSurfaceBlock(_blockIndex); \
-			for ( int _index = 0; _index < _pList->count; ++_index )				\
+			for ( intp _index = 0; _index < _pList->count; ++_index )				\
 			{																		\
 				SurfaceHandle_t _pSurface = _pList->pSurfaces[_index];
 

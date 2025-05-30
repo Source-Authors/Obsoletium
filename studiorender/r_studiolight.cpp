@@ -204,10 +204,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTable, ( const LightDe
 		float ratio = light[0].falloff * CWorldLightAngleWrapper<LightType1>::WorldLightAngle( &pLightDesc[0], pLightDesc[0].m_Direction, normal, light[0].delta );
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[0].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[0].m_Color * ratio;
 		}
 	}
 
@@ -216,10 +213,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTable, ( const LightDe
 		float ratio = light[1].falloff * CWorldLightAngleWrapper<LightType2>::WorldLightAngle( &pLightDesc[1], pLightDesc[1].m_Direction, normal, light[1].delta );
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[1].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[1].m_Color * ratio;
 		}
 	}
 
@@ -228,10 +222,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTable, ( const LightDe
 		float ratio = light[2].falloff * CWorldLightAngleWrapper<LightType3>::WorldLightAngle( &pLightDesc[2], pLightDesc[2].m_Direction, normal, light[2].delta );
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[2].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[2].m_Color * ratio;
 		}
 	}
 
@@ -240,10 +231,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTable, ( const LightDe
 		float ratio = light[3].falloff * CWorldLightAngleWrapper<LightType4>::WorldLightAngle( &pLightDesc[3], pLightDesc[3].m_Direction, normal, light[3].delta );
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[3].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[3].m_Color * ratio;
 		}
 	}
 }
@@ -273,10 +261,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTableConstDirectional,
 				pLightDesc[0].m_Direction, normal, light[0].delta, flDirectionalConstant );
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[0].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[0].m_Color * ratio;
 		}
 	}
 
@@ -288,10 +273,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTableConstDirectional,
 
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[1].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[1].m_Color * ratio;
 		}
 	}
 
@@ -303,10 +285,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTableConstDirectional,
 
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[2].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[2].m_Color * ratio;
 		}
 	}
 
@@ -318,10 +297,7 @@ TEMPLATE_FUNCTION_TABLE( void, R_LightEffectsWorldFunctionTableConstDirectional,
 
 		if (ratio > 0)
 		{
-			const float* pColor = (float*)&pLightDesc[3].m_Color;
-			dest[0] += pColor[0] * ratio;
-			dest[1] += pColor[1] * ratio;
-			dest[2] += pColor[2] * ratio;
+			dest += pLightDesc[3].m_Color * ratio;
 		}
 	}
 }

@@ -434,9 +434,9 @@ bool CEntityReportPanel::DrawEntry( int row, int col, int rowheight, int colwidt
 		char	text[256];
 		wchar_t unicode[ 256 ];
 
-		Q_snprintf( text, sizeof(text), "(%i) %s", entityIdx, pClientClass->m_pNetworkName );
+		V_sprintf_safe( text, "(%i) %s", entityIdx, pClientClass->m_pNetworkName );
 		
-		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, sizeof( unicode ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode );
 
 		DrawColoredText( m_hFont, left + col * colwidth, top + row * rowheight, r, g, b, a, unicode );
 
@@ -491,7 +491,7 @@ bool CEntityReportPanel::DrawEntry( int row, int col, int rowheight, int colwidt
 
 		wchar_t unicode[ 256 ];
 		g_pVGuiLocalize->ConvertANSIToUnicode( ( effectactive && entry->deletedclientclass ) ? 
-			  entry->deletedclientclass->m_pNetworkName : "unused", unicode, sizeof( unicode ) );
+			  entry->deletedclientclass->m_pNetworkName : "unused", unicode );
 
 		DrawColoredText( m_hFont, left + col * colwidth, top + row * rowheight, r, g, b, a, 
 			L"(%i) %s", i, unicode );

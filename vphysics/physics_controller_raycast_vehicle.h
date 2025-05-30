@@ -33,9 +33,9 @@ public:
 
     void update_wheel_positions( void ) override;
 
-	IPhysicsObject *GetWheel( int index );
+	[[nodiscard]] IPhysicsObject *GetWheel( int index );
 
-	const char *get_controller_name() override { return "sys:vehicle"; }
+	[[nodiscard]] const char *get_controller_name() override { return "sys:vehicle"; }
 protected:
 
 	void InitCarSystemWheels( const IVP_Template_Car_System *pCarSystem );

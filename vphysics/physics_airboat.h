@@ -130,14 +130,14 @@ public:
     void update_wheel_positions( void ) override {}
 	void SetWheelFriction( int iWheel, float flFriction );
 
-	IPhysicsObject *GetWheel( int index );
+	[[nodiscard]] IPhysicsObject *GetWheel(int index);
 
-	const char *get_controller_name() override { return "sys:airboat"; }
+	[[nodiscard]] const char *get_controller_name() override { return "sys:airboat"; }
 
 protected:
 
 	void InitAirboat( const IVP_Template_Car_System *pCarSystem );
-	float GetWaterDepth( Ray_t *pGameRay, IPhysicsObject *pPhysAirboat );
+	[[nodiscard]] float GetWaterDepth( Ray_t *pGameRay, IPhysicsObject *pPhysAirboat );
 
 	// Purpose: Deconstructor
 	void PerformFrictionNotification( float flEliminatedEnergy, float dt, int nSurfaceProp, IPhysicsCollisionData *pCollisionData );
@@ -164,7 +164,7 @@ public:
     void							change_stabilizer_constant(IVP_POS_AXIS pos, IVP_FLOAT stabi_constant) override;				// [Newton/meter]
 	void							change_fast_turn_factor( IVP_FLOAT fast_turn_factor_ ) override;								// not implemented for raycasts
     void							change_wheel_torque(IVP_POS_WHEEL pos, IVP_FLOAT torque) override;
-	IVP_FLOAT						get_wheel_torque(IVP_POS_WHEEL wheel_nr);
+	[[nodiscard]] IVP_FLOAT			get_wheel_torque(IVP_POS_WHEEL wheel_nr);
     
 	void							update_throttle( [[maybe_unused]] IVP_FLOAT flThrottle ) override;
 
@@ -177,10 +177,10 @@ public:
 	void							set_powerslide( [[maybe_unused]] float frontAccel, [[maybe_unused]] float rearAccel ) override	{}
 
     // Car Info
-    IVP_DOUBLE						get_body_speed(IVP_COORDINATE_INDEX idx_z = IVP_INDEX_Z) override;							// km/h in 'z' direction
-    IVP_DOUBLE						get_wheel_angular_velocity(IVP_POS_WHEEL) override;
-    IVP_DOUBLE						get_orig_front_wheel_distance() override;
-    IVP_DOUBLE						get_orig_axles_distance() override;
+    [[nodiscard]] IVP_DOUBLE		get_body_speed(IVP_COORDINATE_INDEX idx_z = IVP_INDEX_Z) override;							// km/h in 'z' direction
+    [[nodiscard]] IVP_DOUBLE		get_wheel_angular_velocity(IVP_POS_WHEEL) override;
+    [[nodiscard]] IVP_DOUBLE		get_orig_front_wheel_distance() override;
+    [[nodiscard]] IVP_DOUBLE		get_orig_axles_distance() override;
 	void							get_skid_info( IVP_Wheel_Skid_Info *array_of_skid_info_out) override;
     
     void							get_wheel_position(IVP_U_Point *position_ws_out, IVP_U_Quat *direction_ws_out);
@@ -191,12 +191,12 @@ public:
 	//
 	// Booster (the airboat has no booster). 
 	//
-	virtual bool IsBoosting(void) { return false; }
-    void					set_booster_acceleration( [[maybe_unused]] IVP_FLOAT acceleration) override {}
-    void					activate_booster( [[maybe_unused]] IVP_FLOAT thrust, [[maybe_unused]] IVP_FLOAT duration, [[maybe_unused]] IVP_FLOAT delay) override {}
-    void					update_booster( [[maybe_unused]] IVP_FLOAT delta_time) override {}
-	IVP_FLOAT				get_booster_delay() override { return 0; }
-	IVP_FLOAT				get_booster_time_to_go() override { return 0; }
+    [[nodiscard]] virtual bool IsBoosting(void) { return false; }
+    void				            set_booster_acceleration( [[maybe_unused]] IVP_FLOAT acceleration) override {}
+    void				            activate_booster( [[maybe_unused]] IVP_FLOAT thrust, [[maybe_unused]] IVP_FLOAT duration, [[maybe_unused]] IVP_FLOAT delay) override {}
+    void				            update_booster( [[maybe_unused]] IVP_FLOAT delta_time) override {}
+	[[nodiscard]] IVP_FLOAT			get_booster_delay() override { return 0; }
+	[[nodiscard]] IVP_FLOAT			get_booster_time_to_go() override { return 0; }
     
 	// Debug
 	void							SetCarSystemDebugData( const IVP_CarSystemDebugData_t &carSystemDebugData ) override;
@@ -257,14 +257,14 @@ protected:
     
 protected:
 
-    IVP_Raycast_Airboat_Wheel		*get_wheel( IVP_POS_WHEEL i );
-    IVP_Raycast_Airboat_Axle		*get_axle( IVP_POS_AXIS i );
-							
+    [[nodiscard]] IVP_Raycast_Airboat_Wheel		*get_wheel( IVP_POS_WHEEL i );
+    [[nodiscard]] IVP_Raycast_Airboat_Axle		*get_axle( IVP_POS_AXIS i );
+
     void			core_is_going_to_be_deleted_event( IVP_Core * ) override;
-    IVP_U_Vector<IVP_Core>  *get_associated_controlled_cores( void ) override;
-    
+    [[nodiscard]] IVP_U_Vector<IVP_Core>  *get_associated_controlled_cores( void ) override;
+
     void                    do_simulation_controller(IVP_Event_Sim *,IVP_U_Vector<IVP_Core> *core_list) override;
-    IVP_CONTROLLER_PRIORITY get_controller_priority() override;
+    [[nodiscard]] IVP_CONTROLLER_PRIORITY  get_controller_priority() override;
 
 private:
 
@@ -276,7 +276,7 @@ private:
 
 	// Raycasts for simulation.
 	void							PreRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplates, const IVP_U_Matrix *m_world_f_core, IVP_Raycast_Airboat_Impact *pImpacts );	
-	bool							PostRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplates, const IVP_U_Matrix *matWorldFromCore, IVP_Raycast_Airboat_Impact *pImpacts );
+	[[nodiscard]] bool				PostRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplates, const IVP_U_Matrix *matWorldFromCore, IVP_Raycast_Airboat_Impact *pImpacts );
 
 	// Simulation.
 	void							DoSimulationPontoons( IVP_Raycast_Airboat_Impact *pImpacts, IVP_Event_Sim *pEventSim );
@@ -289,10 +289,10 @@ private:
 	void							DoSimulationKeepUprightRoll( IVP_Raycast_Airboat_Impact *pImpacts, IVP_Event_Sim *pEventSim );
 	void							DoSimulationGravity( IVP_Event_Sim *pEventSim );
 
-	int								CountSurfaceContactPoints( IVP_Raycast_Airboat_Impact *pImpacts );
+	[[nodiscard]] int				CountSurfaceContactPoints( IVP_Raycast_Airboat_Impact *pImpacts );
 	void							UpdateAirborneState( IVP_Raycast_Airboat_Impact *pImpacts, IVP_Event_Sim *pEventSim );
 
-	float							ComputeFrontPontoonWaveNoise( int nPontoonIndex, float flSpeedRatio );
+	[[nodiscard]] float				ComputeFrontPontoonWaveNoise( int nPontoonIndex, float flSpeedRatio );
 
 	void							CalcImpactPosition( IVP_Ray_Solver_Template *pRaySolver, IVP_Raycast_Airboat_Wheel *pPontoonPoint,
 													    IVP_Raycast_Airboat_Impact *pImpacts );

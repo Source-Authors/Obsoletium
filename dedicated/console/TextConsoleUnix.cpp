@@ -170,7 +170,8 @@ static void *editline_threadproc(void *arg) {
   History *myhistory;
   FILE *tty = (FILE *)arg;
 
-  ThreadSetDebugName("libedit");
+  // dimhotepus: Add thread name to aid debugging.
+  ThreadSetDebugName("TTYHistory");
 
   // Set up state
   el = el_init("srcds_linux", stdin, tty, stderr);

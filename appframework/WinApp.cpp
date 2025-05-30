@@ -10,7 +10,7 @@
 #include "appframework/AppFramework.h"
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "filesystem.h"
 #include "appframework/IAppSystemGroup.h"
 #include "filesystem_init.h"
@@ -137,7 +137,7 @@ bool CSteamApplication::Create()
 	m_pFileSystem = AddSystem<IFileSystem>( fileSystemModule, FILESYSTEM_INTERFACE_VERSION );
 	if ( !m_pFileSystem )
 	{
-		Error( "Unable to load %s from %s", FILESYSTEM_INTERFACE_VERSION, pFileSystemDLL );
+		Error( "Unable to load '%s' from '%s'.\n", FILESYSTEM_INTERFACE_VERSION, pFileSystemDLL );
 	}
 
 	return true;

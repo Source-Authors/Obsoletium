@@ -12,32 +12,21 @@
 #include "iscratchpad3d.h"
 #include "csg.h"
 #include "fmtstr.h"
-
-int		c_active_portals;
-int		c_peak_portals;
-int		c_boundary;
-int		c_boundary_sides;
+#include "bspflags.h"
 
 /*
 ===========
 AllocPortal
 ===========
 */
-portal_t *AllocPortal (void)
+portal_t *AllocPortal ()
 {
-	static int s_PortalCount = 0;
+	static int portalCount = 0;
 
-	portal_t	*p;
-	
-	if (numthreads == 1)
-		c_active_portals++;
-	if (c_active_portals > c_peak_portals)
-		c_peak_portals = c_active_portals;
-	
-	p = (portal_t*)malloc (sizeof(portal_t));
-	memset (p, 0, sizeof(portal_t));
-	p->id = s_PortalCount;
-	++s_PortalCount;
+	auto *p = static_cast<portal_t*>(calloc (1, sizeof(portal_t)));
+	if (!p) return nullptr;
+
+	p->id = portalCount++;
 
 	return p;
 }
@@ -46,8 +35,7 @@ void FreePortal (portal_t *p)
 {
 	if (p->winding)
 		FreeWinding (p->winding);
-	if (numthreads == 1)
-		c_active_portals--;
+
 	free (p);
 }
 
@@ -264,7 +252,7 @@ bspbrush_t *AreaportalBrushForNode( node_t *node )
 	{
 		b = b->next;
 	}
-	Assert( b->original->entitynum != 0 );
+	Assert( !b || b->original->entitynum != 0 );
 	return b;
 }
 
@@ -745,7 +733,6 @@ qboolean FloodEntities (tree_t *tree)
 {
 	int		i;
 	Vector	origin;
-	char	*cl;
 	qboolean	inside;
 	node_t *headnode;
 
@@ -760,7 +747,7 @@ qboolean FloodEntities (tree_t *tree)
 		if (VectorCompare(origin, vec3_origin))
 			continue;
 
-		cl = ValueForKey (&entities[i], "classname");
+		const char* cl = ValueForKey (&entities[i], "classname");
 
 		origin[2] += 1;	// so objects on floor are ok
 
@@ -1211,7 +1198,7 @@ void EmitClipPortalGeometry( node_t *pHeadNode, portal_t *pPortal, int iSrcArea,
 		portals );
 
 	CUtlVector<Vector> points;
-	for( int iPortal=0; iPortal < portals.Size(); iPortal++ )
+	for( int iPortal=0; iPortal < portals.Count(); iPortal++ )
 	{
 		portal_t *pPointPortal = portals[iPortal];
 		winding_t *pWinding = pPointPortal->winding;
@@ -1236,7 +1223,7 @@ void EmitClipPortalGeometry( node_t *pHeadNode, portal_t *pPortal, int iSrcArea,
 
 	int i;
 	CUtlVector<Vector2D> points2D;
-	for( i=0; i < points.Size(); i++ )
+	for( i=0; i < points.Count(); i++ )
 	{
 		Vector vTest = mTransform * points[i];
 		points2D.AddToTail( Vector2D( vTest.y, vTest.z ) );
@@ -1244,7 +1231,7 @@ void EmitClipPortalGeometry( node_t *pHeadNode, portal_t *pPortal, int iSrcArea,
 
 	// Build the hull.
 	int indices[512];
-	int nIndices = Convex2D( points2D.Base(), points2D.Size(), indices, 512 );
+	int nIndices = Convex2D( points2D.Base(), points2D.Count(), indices, 512 );
 
 	// Output the hull.
 	dp->m_FirstClipPortalVert = g_nClipPortalVerts;
@@ -1371,13 +1358,13 @@ Mark each leaf with an area, bounded by CONTENTS_AREAPORTAL
 */
 void FloodAreas (tree_t *tree)
 {
-	int start = Plat_FloatTime();
+	double start = Plat_FloatTime();
 	qprintf ("--- FloodAreas ---\n");
-	Msg("Processing areas...");
+	Msg("\nProcessing areas...");
 	FindAreas_r (tree->headnode);
 	SetAreaPortalAreas_r (tree, tree->headnode);
 	qprintf ("%5i areas\n", c_areas);
-	Msg("done (%d)\n", (int)(Plat_FloatTime() - start) );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 }
 
 //======================================================

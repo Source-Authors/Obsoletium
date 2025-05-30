@@ -429,7 +429,7 @@ void DiffPrint( bool bServer, int nCommandNumber, char const *fmt, ... )
 	va_list		argptr;
 	char		string[1024];
 	va_start (argptr,fmt);
-	int len = Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+	int len = V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 
 	if ( g_pDiffMgr )
@@ -490,7 +490,7 @@ void CGameMovement::DiffPrint( char const *fmt, ... )
 	va_list		argptr;
 	char		string[1024];
 	va_start (argptr,fmt);
-	Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 
 	::DiffPrint( CBaseEntity::IsServer(), player->CurrentCommandNumber(), "%s", string );
@@ -592,7 +592,7 @@ void DrawDispCollPlane( CBaseTrace *pTrace )
 //-----------------------------------------------------------------------------
 CGameMovement::CGameMovement( void )
 {
-	m_nOldWaterLevel	= WL_NotInWater;
+	m_nOldWaterLevel	= WaterLevel::WL_NotInWater;
 	m_flWaterEntryTime	= 0;
 	m_nOnLadder			= 0;
 
@@ -825,7 +825,7 @@ void CGameMovement::PlantFootprint( surfacedata_t *psurface )
 			UTIL_TraceLine( hipOrigin, hipOrigin + Vector(0, 0, -COORD_EXTENT * 1.74), 
 							MASK_SOLID_BRUSHONLY, edict(), COLLISION_GROUP_NONE, &tr);
 
-			unsigned char mType = TEXTURETYPE_Find( &tr );
+			unsigned short mType = TEXTURETYPE_Find( &tr );
 
 			// Splat a decal
 			CPVSFilter filter( tr.endpos );
@@ -1970,7 +1970,7 @@ void CGameMovement::WalkMove( void )
 	}
 
 	// Don't walk up stairs if not on ground.
-	if ( oldground == NULL && player->GetWaterLevel()  == 0 )
+	if ( oldground == NULL && player->GetWaterLevel() == WaterLevel::WL_NotInWater )
 	{
 		// Now pull the base velocity back out.   Base velocity is set if you are on a moving object, like a conveyor (or maybe another monster?)
 		VectorSubtract( mv->m_vecVelocity, player->GetBaseVelocity(), mv->m_vecVelocity );
@@ -2015,14 +2015,14 @@ void CGameMovement::FullWalkMove( )
 
 	// If we are swimming in the water, see if we are nudging against a place we can jump up out
 	//  of, and, if so, start out jump.  Otherwise, if we are not moving up, then reset jump timer to 0
-	if ( player->GetWaterLevel() >= WL_Waist ) 
+	if ( player->GetWaterLevel() >= WaterLevel::WL_Waist ) 
 	{
-		if ( player->GetWaterLevel() == WL_Waist )
+		if ( player->GetWaterLevel() == WaterLevel::WL_Waist )
 		{
 			CheckWaterJump();
 		}
 
-			// If we are falling again, then we must not trying to jump out of water any more.
+		// If we are falling again, then we must not trying to jump out of water any more.
 		if ( mv->m_vecVelocity[2] < 0 && 
 			 player->m_flWaterJumpTime )
 		{
@@ -2104,8 +2104,8 @@ void CGameMovement::FullWalkMove( )
 		CheckFalling();
 	}
 
-	if  ( ( m_nOldWaterLevel == WL_NotInWater && player->GetWaterLevel() != WL_NotInWater ) ||
-		  ( m_nOldWaterLevel != WL_NotInWater && player->GetWaterLevel() == WL_NotInWater ) )
+	if  ( ( m_nOldWaterLevel == WaterLevel::WL_NotInWater && player->GetWaterLevel() != WaterLevel::WL_NotInWater ) ||
+		  ( m_nOldWaterLevel != WaterLevel::WL_NotInWater && player->GetWaterLevel() == WaterLevel::WL_NotInWater ) )
 	{
 		PlaySwimSound();
 #if !defined( CLIENT_DLL )
@@ -2345,7 +2345,7 @@ bool CGameMovement::CheckJumpButton( void )
 	}
 
 	// If we are in the water most of the way...
-	if ( player->GetWaterLevel() >= 2 )
+	if ( player->GetWaterLevel() >= WaterLevel::WL_Waist )
 	{	
 		// swimming, not jumping
 		SetGroundEntity( NULL );
@@ -3438,7 +3438,7 @@ int CGameMovement::CheckStuck( void )
 //-----------------------------------------------------------------------------
 bool CGameMovement::InWater( void )
 {
-	return ( player->GetWaterLevel() > WL_Feet );
+	return ( player->GetWaterLevel() > WaterLevel::WL_Feet );
 }
 
 
@@ -3555,12 +3555,12 @@ bool CGameMovement::CheckWater( void )
 	}
 
 	// if we just transitioned from not in water to in water, record the time it happened
-	if ( ( WL_NotInWater == m_nOldWaterLevel ) && ( player->GetWaterLevel() >  WL_NotInWater ) )
+	if ( ( WaterLevel::WL_NotInWater == m_nOldWaterLevel ) && ( player->GetWaterLevel() > WaterLevel::WL_NotInWater ) )
 	{
 		m_flWaterEntryTime = gpGlobals->curtime;
 	}
 
-	return ( player->GetWaterLevel() > WL_Feet );
+	return ( player->GetWaterLevel() > WaterLevel::WL_Feet );
 }
 
 void CGameMovement::SetGroundEntity( trace_t *pm )
@@ -3882,7 +3882,7 @@ void CGameMovement::CheckFalling( void )
 		bool bAlive = true;
 		float fvol = 0.5;
 
-		if ( player->GetWaterLevel() > 0 )
+		if ( player->GetWaterLevel() > WaterLevel::WL_NotInWater )
 		{
 			// They landed in water.
 		}

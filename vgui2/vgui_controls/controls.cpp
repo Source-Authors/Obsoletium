@@ -6,7 +6,8 @@
 //===========================================================================//
 
 #include <vgui_controls/Controls.h>
-#include <locale.h>
+
+#include <clocale>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -38,10 +39,9 @@ bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *, int )
 		Error( "Must include memoverride.cpp in your project." );
 #endif
 	}
-#endif	
+#endif
 	// keep a record of this module name
-	strncpy(g_szControlsModuleName, moduleName, sizeof(g_szControlsModuleName));
-	g_szControlsModuleName[sizeof(g_szControlsModuleName) - 1] = 0;
+	V_strcpy_safe(g_szControlsModuleName, moduleName);
 
 	// initialize our locale (must be done for every vgui dll/exe)
 	// "" makes it use the default locale, required to make iswprint() work correctly in different languages

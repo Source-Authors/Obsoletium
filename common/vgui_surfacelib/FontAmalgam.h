@@ -13,7 +13,7 @@
 
 #include "vguifont.h"
 #include "BitmapFont.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: object that holds a set of fonts in specified ranges

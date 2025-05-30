@@ -40,7 +40,7 @@ $Project "bitmap"
 
 $Project "Browser"
 {
-	"Tracker\Browser\Browser.vpc" [$WINDOWS]
+	"tracker\Browser\Browser.vpc" [$WINDOWS]
 }
 
 $Project "bsppack"
@@ -82,11 +82,6 @@ $Project "bugreporter_filequeue"
 $Project "captioncompiler"
 {
 	"utils\captioncompiler\captioncompiler.vpc" [$WINDOWS]
-}
-
-$Project "cardstats"
-{
-	"utils\videocardstats\cardstats.vpc" [$WINDOWS]
 }
 
 $Project "choreoobjects"
@@ -245,9 +240,9 @@ $Project "fgdlib"
 	"fgdlib\fgdlib.vpc" [$WINDOWS]
 }
 
-$Project "FileSystemOpenDialog"
+$Project "filesystemopendialog"
 {
-	"utils\FileSystemOpenDialog\FileSystemOpenDialog.vpc" [$WINDOWS]
+	"utils\FileSystemOpenDialog\filesystemopendialog.vpc" [$WINDOWS]
 }
 
 $Project "filesystem_stdio"
@@ -791,14 +786,14 @@ $Project "SDKLauncher"
 	"sdklauncher\SDKLauncher.vpc" [$WINDOWS]
 }
 
-$Project "ServerBrowser"
+$Project "serverbrowser"
 {
 	"serverbrowser\ServerBrowser.vpc" [$WINDOWS||$POSIX]
 }
 
 $Project "ServerMonitor"
 {
-	"Tracker\ServerMonitor\ServerMonitor.vpc" [$WINDOWS]
+	"tracker\ServerMonitor\ServerMonitor.vpc" [$WINDOWS]
 }
 
 $Project "serverplugin_empty"
@@ -943,7 +938,7 @@ $Project "splitskybox"
 
 $Project "sqldb_mysql"
 {
-	"Tracker\sqldb_mysql\sqldb_mysql.vpc" [$WINDOWS]
+	"tracker\sqldb_mysql\sqldb_mysql.vpc" [$WINDOWS]
 }
 
 $Project "sqlwrapper"
@@ -1129,11 +1124,6 @@ $Project "unittest"
 $Project "unusedcontent"
 {
 	"utils\unusedcontent\unusedcontent.vpc" [$WINDOWS]
-}
-
-$Project "valvelib"
-{
-	"utils\valvelib\valvelib.vpc" [$WINDOWS]
 }
 
 $Project "video_services"
@@ -1574,7 +1564,7 @@ $Project "vtaexp"
 
 $Project "vtex_dll"
 {
-	"utils\vtex\vtex_dll.vpc" [ $WINDOWS || $POSIX ]
+	"utils\vtex_dll\vtex_dll.vpc" [$WINDOWS || $POSIX]
 }
 
 $Project "vtex_launcher"

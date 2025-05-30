@@ -62,11 +62,13 @@ CMapClass *CMapAlignedBox::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 
 			if (nParam < 3)
 			{
-				Mins[nParam] = atof(pszParam);
+				// dimhoteous: atof -> strtof.
+				Mins[nParam] = strtof(pszParam, nullptr);
 			}
 			else if (nParam < 6)
 			{
-				Maxs[nParam % 3] = atof(pszParam);
+				// dimhoteous: atof -> strtof.
+				Maxs[nParam % 3] = strtof(pszParam, nullptr);
 			}
 			else
 			{
@@ -96,8 +98,11 @@ CMapClass *CMapAlignedBox::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 //-----------------------------------------------------------------------------
 CMapAlignedBox::CMapAlignedBox(void)
 {
-	m_bUseKeyName = false;
 	m_bWireframe = false;
+	m_bUseKeyName = false;
+
+	m_MinsKeyName[0] = '\0';
+	m_MaxsKeyName[0] = '\0';
 
 	m_Mins.Init();
 	m_Maxs.Init();
@@ -129,11 +134,8 @@ CMapAlignedBox::CMapAlignedBox(const char *pMinsKeyName, const char *pMaxsKeyNam
 	m_bUseKeyName = true;
 	m_bWireframe = false;
 	
-	strncpy(m_MinsKeyName, pMinsKeyName, sizeof(m_MinsKeyName)-1);
-	strncpy(m_MaxsKeyName, pMaxsKeyName, sizeof(m_MaxsKeyName)-1);
-
-	m_MinsKeyName[sizeof(m_MinsKeyName)-1] = 0;
-	m_MaxsKeyName[sizeof(m_MaxsKeyName)-1] = 0;
+	V_strcpy_safe(m_MinsKeyName, pMinsKeyName);
+	V_strcpy_safe(m_MaxsKeyName, pMaxsKeyName);
 }
 
 
@@ -194,10 +196,8 @@ CMapClass *CMapAlignedBox::CopyFrom(CMapClass *pObject, bool bUpdateDependencies
 	m_bUseKeyName = pFrom->m_bUseKeyName;
 	m_bWireframe = pFrom->m_bWireframe;
 
-	strncpy(m_MinsKeyName, pFrom->m_MinsKeyName, sizeof(m_MinsKeyName)-1);
-	strncpy(m_MaxsKeyName, pFrom->m_MaxsKeyName, sizeof(m_MaxsKeyName)-1);
-	m_MinsKeyName[sizeof(pFrom->m_MinsKeyName)-1] = 0;
-	m_MaxsKeyName[sizeof(pFrom->m_MaxsKeyName)-1] = 0;
+	V_strcpy_safe(m_MinsKeyName, pFrom->m_MinsKeyName);
+	V_strcpy_safe(m_MaxsKeyName, pFrom->m_MaxsKeyName);
 
 	m_Mins = pFrom->m_Mins;
 	m_Maxs = pFrom->m_Maxs;

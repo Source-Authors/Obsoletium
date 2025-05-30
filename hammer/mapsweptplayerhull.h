@@ -59,7 +59,7 @@ public:
 	virtual int SerializeMAP(std::fstream &File, BOOL bRMF);
 
 	// Overridden to chain down to our endpoints, which are not children.
-	void SetOrigin(Vector &vecOrigin);
+	void SetOrigin(const Vector &vecOrigin) override;
 
 	// Overridden to chain down to our endpoints, which are not children.
 	virtual SelectionState_t SetSelectionState(SelectionState_t eSelectionState);
@@ -74,7 +74,7 @@ public:
 	virtual bool IsVisualElement(void) { return true; }
 	virtual bool IsClutter(void) { return false; }
 	
-	virtual const char* GetDescription() { return("Swept player hull helper"); }
+	const char* GetDescription() const override { return("Swept player hull helper"); }
 
 	virtual void OnAddToWorld(CMapWorld *pWorld);
 	virtual void OnParentKeyChanged(const char *key, const char *value);

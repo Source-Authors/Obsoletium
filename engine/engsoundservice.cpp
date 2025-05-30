@@ -48,7 +48,7 @@ public:
 
 	virtual void *LevelAlloc( unsigned nBytes, const char *pszTag )
 	{
-		return Hunk_AllocName(nBytes, pszTag);
+		return Hunk_AllocName<byte>(nBytes, pszTag);
 	}
 
 	virtual void OnExtraUpdate()
@@ -222,7 +222,7 @@ public:
 							break;
 
 						char manifest_file[ 512 ];
-						Q_snprintf( manifest_file, sizeof( manifest_file ), "%s/%s.manifest", AUDIOSOURCE_CACHE_ROOTDIR, com_token );
+						V_sprintf_safe( manifest_file, "%s/%s.manifest", AUDIOSOURCE_CACHE_ROOTDIR, com_token );
 
 						if ( g_pFileSystem->FileExists( manifest_file, "MOD" ) )
 						{
@@ -339,7 +339,7 @@ public:
 		{
 			wchar_t constructed[ 1024 ];
 			wchar_t file[ 256 ];
-			g_pVGuiLocalize->ConvertANSIToUnicode( cachefile, file, sizeof( file ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( cachefile, file );
 
 			g_pVGuiLocalize->ConstructString_safe( 
 				constructed, 
@@ -383,11 +383,6 @@ public:
 			return "";
 
 		return table->GetString( index );
-	}
-
-	virtual bool ShouldSuppressNonUISounds()
-	{
-		return EngineVGui()->IsGameUIVisible() || IsGamePaused();
 	}
 
 	virtual char const *GetUILanguage()
@@ -477,10 +472,10 @@ private:
 	{
 		VPROF("OnSoundStarted");
 
-		if ( IsX360() || !toolframework->IsToolRecording() || params.suppressrecording )
+		if ( !toolframework->IsToolRecording() || params.suppressrecording )
 			return;
 
-		KeyValues *msg = new KeyValues( "StartSound" );
+		KeyValuesAD msg( "StartSound" );
 		msg->SetInt( "guid", guid );
 		msg->SetFloat( "time", cl.GetTime() );
 		msg->SetInt( "staticsound", params.staticsound ? 1 : 0 );
@@ -504,8 +499,6 @@ private:
 		msg->SetInt( "speakerentity", params.speakerentity );
 
 		toolframework->PostMessage( msg );
-
-		msg->deleteThis();
 	}
 
 	virtual void OnSoundStopped( int guid, int soundsource, int channel, char const *soundname )
@@ -518,10 +511,10 @@ private:
 
 		VPROF("OnSoundStopped");
 
-		if ( IsX360() || !toolframework->IsToolRecording() )
+		if ( !toolframework->IsToolRecording() )
 			return;
 
-		KeyValues *msg = new KeyValues( "StopSound" );
+		KeyValuesAD msg( "StopSound" );
 		msg->SetInt( "guid", guid );
 		msg->SetFloat( "time", cl.GetTime() );
 		msg->SetInt( "soundsource", soundsource );
@@ -529,8 +522,6 @@ private:
 		msg->SetString( "soundname", soundname );
 
 		toolframework->PostMessage( msg );
-
-		msg->deleteThis();
 	}
 };
 

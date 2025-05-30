@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+﻿// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -18,7 +18,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
+#pragma code_page(65001)  // Unicode (UTF-8)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -48,7 +48,7 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
     "#ifdef _WIN32\r\n"
     "LANGUAGE 9, 1\r\n"
-    "#pragma code_page(1252)\r\n"
+    "#pragma code_page(65001)\r\n"
     "#endif //_WIN32\r\n"
     "#include ""res\\QC_Eyes.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
     "#include ""afxres.rc""         // Standard components\r\n"
@@ -57,16 +57,6 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\QC_Eyes.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -78,7 +68,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION |
     WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "QC Eyes"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "Segoe UI", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_REFERENCE_FILENAME,87,24,93,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_EXPRESSIONS_FILENAME,87,42,93,14,ES_AUTOHSCROLL
@@ -176,44 +166,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904B0"
-        BEGIN
-            VALUE "FileDescription", "QC_Eyes MFC Application"
-            VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "QC_Eyes"
-            VALUE "LegalCopyright", "Copyright (C) 2005"
-            VALUE "OriginalFilename", "QC_Eyes.EXE"
-            VALUE "ProductName", "QC_Eyes Application"
-            VALUE "ProductVersion", "1, 0, 0, 1"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // DESIGNINFO
 //
 
@@ -236,17 +188,17 @@ END
 // Bitmap
 //
 
-IDB_EYE_DEFAULT         BITMAP                  "res\\eye_default.bmp"
-IDB_EYE_LOWER_HI        BITMAP                  "res\\eye_lower_hi.bmp"
-IDB_EYE_LOWER_LO        BITMAP                  "res\\eye_lower_lo.bmp"
-IDB_EYE_LOWER_MID       BITMAP                  "res\\eye_lower_mid.bmp"
-IDB_EYE_UPPER_HI        BITMAP                  "res\\eye_upper_hi.bmp"
-IDB_EYE_UPPER_LO        BITMAP                  "res\\eye_upper_lo.bmp"
-IDB_EYE_UPPER_MID       BITMAP                  "res\\eye_upper_mid.bmp"
-IDB_EYE_XY_L            BITMAP                  "res\\eye_xy_l.bmp"
-IDB_EYE_XY_R            BITMAP                  "res\\eye_xy_r.bmp"
-IDB_EYE_Z_L             BITMAP                  "res\\eye_z_l.bmp"
-IDB_EYE_Z_R             BITMAP                  "res\\eye_z_r.bmp"
+IDB_EYE_DEFAULT         BITMAP                  "resources\\eye_default.bmp"
+IDB_EYE_LOWER_HI        BITMAP                  "resources\\eye_lower_hi.bmp"
+IDB_EYE_LOWER_LO        BITMAP                  "resources\\eye_lower_lo.bmp"
+IDB_EYE_LOWER_MID       BITMAP                  "resources\\eye_lower_mid.bmp"
+IDB_EYE_UPPER_HI        BITMAP                  "resources\\eye_upper_hi.bmp"
+IDB_EYE_UPPER_LO        BITMAP                  "resources\\eye_upper_lo.bmp"
+IDB_EYE_UPPER_MID       BITMAP                  "resources\\eye_upper_mid.bmp"
+IDB_EYE_XY_L            BITMAP                  "resources\\eye_xy_l.bmp"
+IDB_EYE_XY_R            BITMAP                  "resources\\eye_xy_r.bmp"
+IDB_EYE_Z_L             BITMAP                  "resources\\eye_z_l.bmp"
+IDB_EYE_Z_R             BITMAP                  "resources\\eye_z_r.bmp"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -265,9 +217,9 @@ IDB_EYE_Z_R             BITMAP                  "res\\eye_z_r.bmp"
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
 LANGUAGE 9, 1
-#pragma code_page(1252)
+#pragma code_page(65001)  // Unicode (UTF-8)
 #endif //_WIN32
-#include "res\QC_Eyes.rc2"  // non-Microsoft Visual C++ edited resources
+#include "resources\QC_Eyes.rc2"  // non-Microsoft Visual C++ edited resources
 #include "afxres.rc"         // Standard components
 #endif
 

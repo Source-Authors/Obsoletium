@@ -45,15 +45,15 @@ struct DmeCameraParams_t
 
 	DmeCameraParams_t( const char *pszName ) : fov( 90.0f )
 	{
-		Q_strncpy( name, pszName ? pszName : "", sizeof( name ) );
+		V_strcpy_safe( name, pszName ? pszName : "" );
 		origin.Init();
 		angles.Init();
 	}
 
 	DmeCameraParams_t( const char *pszName, const Vector &org, const QAngle &ang ) :
-		fov( 90.0f ), origin( org ), angles( ang )
+		origin( org ), angles( ang ), fov( 90.0f )
 	{
-		Q_strncpy( name, pszName ? pszName : "", sizeof( name ) );
+		V_strcpy_safe( name, pszName ? pszName : "" );
 	}
 
 	char	name[ 128 ];

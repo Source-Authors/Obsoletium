@@ -45,11 +45,11 @@ void CFontAmalgam::SetName(const char *name)
 //-----------------------------------------------------------------------------
 void CFontAmalgam::AddFont(font_t *font, int lowRange, int highRange)
 {
-	intp i = m_Fonts.AddToTail();
+	auto &vfont = m_Fonts[m_Fonts.AddToTail()];
 
-	m_Fonts[i].font = font;
-	m_Fonts[i].lowRange = lowRange;
-	m_Fonts[i].highRange = highRange;
+	vfont.font = font;
+	vfont.lowRange = lowRange;
+	vfont.highRange = highRange;
 
 	m_iMaxHeight = max(font->GetHeight(), m_iMaxHeight);
 	m_iMaxWidth = max(font->GetMaxCharWidth(), m_iMaxWidth);

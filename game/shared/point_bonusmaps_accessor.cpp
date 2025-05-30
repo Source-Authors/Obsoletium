@@ -57,10 +57,10 @@ void CPointBonusMapsAccessor::Activate( void )
 {
 	BaseClass::Activate();
 
-	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+	CreateInterfaceFnT<IGameUI> gameUIFactory = g_GameUI.GetFactoryT<IGameUI>();
 	if ( gameUIFactory )
 	{
-		m_pGameUI = (IGameUI *) gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
+		m_pGameUI = gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
 	}
 }
 
@@ -97,10 +97,10 @@ void CPointBonusMapsAccessor::InputSave( inputdata_t& inputdata )
 
 void BonusMapChallengeUpdate( const char *pchFileName, const char *pchMapName, const char *pchChallengeName, int iBest )
 {
-	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+	CreateInterfaceFnT<IGameUI> gameUIFactory = g_GameUI.GetFactoryT<IGameUI>();
 	if ( gameUIFactory )
 	{
-		IGameUI *pGameUI = (IGameUI *) gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
+		IGameUI *pGameUI = gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
 		if ( pGameUI )
 		{
 			pGameUI->BonusMapChallengeUpdate( pchFileName, pchMapName, pchChallengeName, iBest );
@@ -120,25 +120,29 @@ void BonusMapChallengeUpdate( const char *pchFileName, const char *pchMapName, c
 	}
 }
 
-void BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName )
+void BonusMapChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,
+	OUT_Z_CAP(mapSize) char *pchMapName, intp mapSize,
+	OUT_Z_CAP(challengeSize) char *pchChallengeName, intp challengeSize )
 {
-	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+	CreateInterfaceFnT<IGameUI> gameUIFactory = g_GameUI.GetFactoryT<IGameUI>();
 	if ( gameUIFactory )
 	{
-		IGameUI *pGameUI = (IGameUI *) gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
+		IGameUI *pGameUI = gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
 		if ( pGameUI )
 		{
-			pGameUI->BonusMapChallengeNames( pchFileName, pchMapName, pchChallengeName );
-		}	
+			pGameUI->BonusMapChallengeNames( pchFileName, fileSize,
+				pchMapName, mapSize,
+				pchChallengeName, challengeSize );
+		}
 	}
 }
 
 void BonusMapChallengeObjectives( int &iBronze, int &iSilver, int &iGold )
 {
-	CreateInterfaceFn gameUIFactory = g_GameUI.GetFactory();
+	CreateInterfaceFnT<IGameUI> gameUIFactory = g_GameUI.GetFactoryT<IGameUI>();
 	if ( gameUIFactory )
 	{
-		IGameUI *pGameUI = (IGameUI *) gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
+		IGameUI *pGameUI = gameUIFactory(GAMEUI_INTERFACE_VERSION, NULL );
 		if ( pGameUI )
 		{
 			pGameUI->BonusMapChallengeObjectives( iBronze, iSilver, iGold );

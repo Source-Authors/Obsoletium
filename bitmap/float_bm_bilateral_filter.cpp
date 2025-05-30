@@ -30,6 +30,9 @@ struct TBFCalculationContext
 
 static unsigned TBFCalculationThreadFN( void *ctx1 )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("TileBillFilter");
+
 	auto *ctx = static_cast<TBFCalculationContext *>(ctx1);
 	for(int y=ctx->min_y; y <= ctx->max_y; y++)
 	{

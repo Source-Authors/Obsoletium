@@ -107,8 +107,7 @@ void BasicGameStats_t::SaveToBuffer( CUtlBuffer& buf )
 
 	m_Summary.SaveToBuffer( buf );
 
-	size_t c = m_MapTotals.Count();
-	buf.PutInt( c );
+	buf.PutInt( m_MapTotals.Count() );
 	for ( auto i = m_MapTotals.First(); i != m_MapTotals.InvalidIndex(); i = m_MapTotals.Next( i ) )
 	{
 		char const *name = m_MapTotals.GetElementName( i );

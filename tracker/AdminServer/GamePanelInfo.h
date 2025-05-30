@@ -11,9 +11,7 @@
 #pragma once
 #endif
 
-//#include <string.h>
-
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
@@ -51,7 +49,7 @@ class CGamePanelInfo : public vgui::Frame, public IManageServer
 	DECLARE_CLASS_SIMPLE( CGamePanelInfo, vgui::Frame ); 
 public:
 	CGamePanelInfo(vgui::Panel *parent, const char *name, const char *mod);
-	~CGamePanelInfo();
+	virtual ~CGamePanelInfo();
 
 	// IManageServer interface extras
 	void ShowPage() { Activate(); }
@@ -69,11 +67,11 @@ protected:
 	void SetNewTitle(bool connectionFailed, const char *additional_text); // sets the windows title
 
 	// vgui overrides
-	virtual void OnTick();
-	virtual void OnClose();
-	virtual void PerformLayout();
-	virtual void ActivateBuildMode();
-	virtual void OnCommand(const char *command);
+	void OnTick() override;
+	void OnClose() override;
+	void PerformLayout() override;
+	void ActivateBuildMode() override;
+	void OnCommand(const char *command) override;
 
 private:
 	// methods

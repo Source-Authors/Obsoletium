@@ -310,7 +310,7 @@ void CVoiceStatus::UpdateSpeakerStatus(int entindex, bool bTalking)
 	{
 		if ( bTalking )
 		{
-			const float AboveThresholdMinDuration = 0.5f;
+			constexpr float AboveThresholdMinDuration = 0.5f;
 			m_bAboveThresholdTimer.Start( AboveThresholdMinDuration );
 		}
 	}

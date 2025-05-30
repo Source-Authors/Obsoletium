@@ -50,3 +50,18 @@
 [submodule "thirdparty/speex"]
 	path = thirdparty/speex
 	url = git@github.com:Source-Authors/speex.git
+[submodule "thirdparty/zip-utils"]
+	path = thirdparty/zip-utils
+	url = git@github.com:Source-Authors/zip-utils.git
+[submodule "thirdparty/speedtree"]
+	path = thirdparty/speedtree
+	url = git@github.com:Source-Authors/SpeedTree.git
+[submodule "thirdparty/nvtristrip"]
+	path = thirdparty/nvtristrip
+	url = git@github.com:Source-Authors/NvTriStrip.git
+[submodule "thirdparty/7zip"]
+	path = thirdparty/7zip
+	url = git@github.com:Source-Authors/7zip.git
+[submodule "thirdparty/lua"]
+	path = thirdparty/lua
+	url = git@github.com:Source-Authors/Lua.git

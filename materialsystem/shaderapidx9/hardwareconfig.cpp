@@ -193,7 +193,7 @@ void CHardwareConfig::SetHDREnabled( bool bEnable )
 //-----------------------------------------------------------------------------
 void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, const HardwareCaps_t &actualCaps )
 {
-	if ( !IsPC() || nDxLevel >= 100 )
+	if ( nDxLevel >= 100 )
 		return;
 
 	pCaps->m_nDXSupportLevel = nDxLevel;
@@ -640,11 +640,7 @@ void CHardwareConfig::SetupHardwareCaps( int nDXLevel, const HardwareCaps_t &act
 	memcpy( &m_UnOverriddenCaps, &actualCaps, sizeof(HardwareCaps_t) );
 
 	// Don't bother with fallbacks for DX10 or consoles
-#ifdef DX_TO_GL_ABSTRACTION
 	if ( nDXLevel >= 100 )
-#else
-	if ( !( IsPC() || IsPosix() ) || ( nDXLevel >= 100 ) )
-#endif
 		return;
 
 	// Slam the support level to what we were requested
@@ -857,7 +853,6 @@ int CHardwareConfig::GetShadowFilterMode() const
 	{
 		case IMAGE_FORMAT_NV_DST16:
 		case IMAGE_FORMAT_NV_DST24:
-
 			return NVIDIA_PCF_POISSON;							// NVIDIA hardware bilinear PCF
 
 		case IMAGE_FORMAT_ATI_DST16:
@@ -877,12 +872,6 @@ static ConVar r_shader_srgb( "r_shader_srgb", "0", FCVAR_ALLOWED_IN_COMPETITIVE,
 
 int CHardwareConfig::NeedsShaderSRGBConversion() const
 {
-	if ( IsX360() )
-	{
-		// 360 always now uses a permanent hw solution
-		return false;
-	}
-
 	int cValue = r_shader_srgb.GetInt();
 	switch( cValue )
 	{
@@ -900,7 +889,7 @@ int CHardwareConfig::NeedsShaderSRGBConversion() const
 bool CHardwareConfig::UsesSRGBCorrectBlending() const
 {
 	int cValue = r_shader_srgb.GetInt();
-	return ( cValue == 0 ) && ( ( m_Caps.m_bDX10Blending ) || IsX360() );
+	return cValue == 0 && m_Caps.m_bDX10Blending;
 }
 
 static ConVar mat_disablehwmorph( "mat_disablehwmorph", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Disables HW morphing for particular mods" );
@@ -1068,7 +1057,6 @@ bool CHardwareConfig::UseFastClipping() const
 {
 	// rbarris broke this up for easier view of outcome in debugger
 	bool fastclip = mat_fastclip.GetBool();
-	
 	bool result = m_Caps.m_UseFastClipping || fastclip;
 	
 	return result;
@@ -1081,8 +1069,7 @@ int CHardwareConfig::MaxTextureDepth() const
 
 int CHardwareConfig::GetDXSupportLevel() const
 {
-  const int shaderDxLevel = ShaderUtil()->GetConfig().dxSupportLevel;
-
+	const int shaderDxLevel = ShaderUtil()->GetConfig().dxSupportLevel;
 	if ( shaderDxLevel != 0 )
 	{
 		return min( shaderDxLevel, m_Caps.m_nDXSupportLevel );
@@ -1093,29 +1080,17 @@ int CHardwareConfig::GetDXSupportLevel() const
 
 const char *CHardwareConfig::GetShaderDLLName() const
 {
-	return ( m_Caps.m_pShaderDLL[0] ) ? m_Caps.m_pShaderDLL : "DEFAULT";
+	return !Q_isempty(m_Caps.m_pShaderDLL) ? m_Caps.m_pShaderDLL : "DEFAULT";
 }
 
 bool CHardwareConfig::ReadPixelsFromFrontBuffer() const
 {
-	if ( IsX360() )
-	{
-		// future proof safety, not allowing the front read path
-		return false;
-	}
-
 	// GR - in DX 9.0a can blit from MSAA back buffer
 	return false;
 }
 
 bool CHardwareConfig::PreferDynamicTextures() const
 {
-	if ( IsX360() )
-	{
-		// future proof safety, not allowing these
-		return false;
-	}
-
 	return m_Caps.m_PreferDynamicTextures;
 }
 
@@ -1138,10 +1113,8 @@ bool CHardwareConfig::SupportsHDRMode( HDRType_t nHDRType ) const
 
 		case HDR_TYPE_FLOAT:
 			return ( m_Caps.m_MaxHDRType == HDR_TYPE_FLOAT );
-			
 	}
 	return false;
-
 }
 
 bool CHardwareConfig::HasProjectedBumpEnv() const
@@ -1213,8 +1186,6 @@ bool CHardwareConfig::SupportsGLMixedSizeTargets() const
 bool CHardwareConfig::IsAAEnabled() const
 {
 	return g_pShaderDevice ? g_pShaderDevice->IsAAEnabled() : false;
-//	bool bAntialiasing = ( m_PresentParameters.MultiSampleType != D3DMULTISAMPLE_NONE );
-//	return bAntialiasing;
 }
 
 int CHardwareConfig::GetVertexTextureCount() const
@@ -1229,31 +1200,12 @@ int CHardwareConfig::GetMaxVertexTextureDimension() const
 
 HDRType_t CHardwareConfig::GetHDRType() const
 {
-	bool enabled = m_bHDREnabled;
-	int dxlev = GetDXSupportLevel();
-	int dxsupp = dxlev >= 90;
-	HDRType_t caps_hdr = m_Caps.m_HDRType;
-	HDRType_t result = HDR_TYPE_NONE;
-	
-	//printf("\nCHardwareConfig::GetHDRType...");
-	if (enabled)
+	if (m_bHDREnabled && GetDXSupportLevel() >= 90)
 	{
-		//printf("-> enabled...");
-		if (dxsupp)
-		{
-			//printf("-> supported...");
-			result = caps_hdr;
-		}
+		return m_Caps.m_HDRType;
 	}
 	
-	//printf("-> result is %d.\n", result);
-	return result;
-
-/*
-	if ( m_bHDREnabled && ( GetDXSupportLevel() >= 90 ) )
-		return m_Caps.m_HDRType;
 	return HDR_TYPE_NONE;
-*/
 }
 
 HDRType_t CHardwareConfig::GetHardwareHDRType() const
@@ -1263,7 +1215,7 @@ HDRType_t CHardwareConfig::GetHardwareHDRType() const
 
 bool CHardwareConfig::SupportsStreamOffset() const
 {
-	return ( (GetDXSupportLevel() >= 90) && m_Caps.m_bSupportsStreamOffset );
+	return GetDXSupportLevel() >= 90 && m_Caps.m_bSupportsStreamOffset;
 }
 
 int CHardwareConfig::StencilBufferBits() const
@@ -1286,9 +1238,9 @@ int CHardwareConfig::GetActualTextureStageCount() const
 	return m_ActualCaps.m_NumTextureStages;
 }
 
-const char *CHardwareConfig::GetHWSpecificShaderDLLName()	const
+const char *CHardwareConfig::GetHWSpecificShaderDLLName() const
 {
-	return m_Caps.m_pShaderDLL[0] ? m_Caps.m_pShaderDLL : NULL;
+	return m_Caps.m_pShaderDLL[0] ? m_Caps.m_pShaderDLL : nullptr;
 }
 
 bool CHardwareConfig::SupportsMipmapping() const

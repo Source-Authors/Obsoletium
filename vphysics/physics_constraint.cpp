@@ -297,6 +297,12 @@ enum vphysics_save_constrainttypes_t
 	CONSTRAINT_LENGTH,
 };
 
+// dimhotepus: x64 support.
+#ifdef PLATFORM_64BITS
+// Ensure packing on x64 and x86 is same.
+#pragma pack(push, 4)
+#endif
+
 struct vphysics_save_cphysicsconstraint_t
 {
 	int constraintType;
@@ -305,6 +311,11 @@ struct vphysics_save_cphysicsconstraint_t
 	CPhysicsObject *pObjAttached;
 	DECLARE_SIMPLE_DATADESC();
 };
+
+#ifdef PLATFORM_64BITS
+// Ensure packing on x64 and x86 is same.
+#pragma pack(pop)
+#endif
 
 BEGIN_SIMPLE_DATADESC( vphysics_save_cphysicsconstraint_t )
 	DEFINE_FIELD( constraintType,		FIELD_INTEGER ),
@@ -475,7 +486,7 @@ public:
 
 	hk_Constraint *CreateBreakableConstraint( hk_Constraint *pRealConstraint, hk_Local_Constraint_System *pLcs, const constraint_breakableparams_t &constraint )
 	{
-		m_isBreakable = true;
+		m_isBreakable = 1;
 		hk_Breakable_Constraint_BP bp;
 		bp.m_real_constraint = pRealConstraint;
 		float forceLimit = ConvertDistanceToIVP( constraint.forceLimit );
@@ -561,7 +572,7 @@ CPhysicsConstraint::CPhysicsConstraint( CPhysicsObject *pReferenceObject, CPhysi
 	m_HkConstraint = NULL;
 	m_HkLCS = NULL;
 	m_constraintType = CONSTRAINT_UNKNOWN;
-	m_isBreakable = false;
+	m_isBreakable = 0;
 
 	if ( pReferenceObject && pAttachedObject )
 	{
@@ -681,7 +692,7 @@ void CPhysicsConstraint::InitRagdoll( IVP_Environment *pEnvironment, CPhysicsCon
 
 	hk_Ragdoll_Constraint_BP_Builder r_builder;
 	r_builder.initialize_from_limited_ball_socket_bp( &ballsocketBP, ref, att );
-	hk_Ragdoll_Constraint_BP *bp = (hk_Ragdoll_Constraint_BP  *)r_builder.get_blueprint();  // get non const bp
+	hk_Ragdoll_Constraint_BP *bp = r_builder.get_blueprint();
 	
 	int revAxisMapHK[3];
 	revAxisMapHK[bp->m_axisMap[0]] = 0;

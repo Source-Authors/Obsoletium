@@ -15,11 +15,12 @@
 #define EDITGAMECONFIGS_H
 #pragma once
 
+#include "windows/base_dlg.h"
 #include "Options.h"
 #include "Resource.h"
 
 
-class CEditGameConfigs : public CDialog
+class CEditGameConfigs : public CBaseDlg
 {
 // Construction
 public:

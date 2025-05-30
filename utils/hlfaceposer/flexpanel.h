@@ -11,7 +11,7 @@
 #endif
 
 #ifndef INCLUDED_MXWINDOW
-#include <mxtk/mxWindow.h>
+#include <mxtk/mxwindow.h>
 #endif
 
 #define IDC_FLEX					7001

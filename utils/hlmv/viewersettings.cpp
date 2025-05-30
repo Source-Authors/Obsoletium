@@ -20,14 +20,11 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include "ViewerSettings.h"
 #include "studiomodel.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "windows.h"
+#include "winlite.h"
 
 
 ViewerSettings g_viewerSettings;
@@ -49,7 +46,7 @@ void InitViewerSettings ( const char *subkey )
 		g_viewerSettings.faceposerToolsDriveMouth = save.faceposerToolsDriveMouth;
 	}
 
-	strcpy( g_viewerSettings.registrysubkey, subkey );
+	V_strcpy_safe( g_viewerSettings.registrysubkey, subkey );
 
 	g_pStudioModel->m_angles.Init( -90.0f, 0.0f, 0.0f );
 	g_pStudioModel->m_origin.Init( 0.0f, 0.0f, 50.0f );
@@ -180,7 +177,7 @@ bool RegWriteVector( HKEY hKey, const char *szSubKey, Vector& value )
 	char szBuff[128];       // Temp. buffer
 	DWORD dwSize;           // Size of element data
 
-	sprintf( szBuff, "(%f %f %f)", value[0], value[1], value[2] );
+	V_sprintf_safe( szBuff, "(%f %f %f)", value[0], value[1], value[2] );
 	dwSize = strlen( szBuff );
 
 	lResult = RegSetValueEx(
@@ -209,7 +206,7 @@ bool RegWriteColor( HKEY hKey, const char *szSubKey, float value[4] )
 {
 	LONG lResult;           // Registry function result code
 	char szBuff[128];       // Temp. buffer
-	DWORD dwSize;           // Size of element data
+	V_sprintf_safe( szBuff, "(%f %f %f %f)", value[0], value[1], value[2], value[3] );
 
 	sprintf( szBuff, "(%f %f %f %f)", value[0], value[1], value[2], value[3] );
 	dwSize = strlen( szBuff );
@@ -339,7 +336,7 @@ bool RegWriteFloat( HKEY hKey, const char *szSubKey, float value )
 	char szBuff[128];       // Temp. buffer
 	DWORD dwSize;           // Size of element data
 
-	sprintf( szBuff, "%f", value );
+	V_sprintf_safe( szBuff, "%f", value );
 	dwSize = strlen( szBuff );
 
 	lResult = RegSetValueEx(
@@ -415,12 +412,11 @@ bool RegWriteString( HKEY hKey, const char *szSubKey, char *string )
 
 LONG RegViewerSettingsKey( const char *filename, PHKEY phKey, LPDWORD lpdwDisposition )
 {
-	if (strlen( filename ) == 0)
+	if (Q_isempty( filename ))
 		return ERROR_KEY_DELETED;
 	
 	char szFileName[1024];
-
-	strcpy( szFileName, filename );
+	V_strcpy_safe( szFileName, filename );
 
 	// strip out bogus characters
 	for (char *cp = szFileName; *cp; cp++)
@@ -430,8 +426,7 @@ LONG RegViewerSettingsKey( const char *filename, PHKEY phKey, LPDWORD lpdwDispos
 	}
 
 	char szModelKey[1024];
-
-	sprintf( szModelKey, "Software\\Valve\\%s\\%s", g_viewerSettings.registrysubkey, szFileName );
+	V_sprintf_safe( szModelKey, "Software\\Valve\\%s\\%s", g_viewerSettings.registrysubkey, szFileName );
 
 	return RegCreateKeyEx(
 		HKEY_CURRENT_USER,	// handle of open key 
@@ -449,8 +444,7 @@ LONG RegViewerSettingsKey( const char *filename, PHKEY phKey, LPDWORD lpdwDispos
 LONG RegViewerRootKey( PHKEY phKey, LPDWORD lpdwDisposition )
 {
 	char szRootKey[1024];
-
-	sprintf( szRootKey, "Software\\Valve\\%s", g_viewerSettings.registrysubkey );
+	V_sprintf_safe( szRootKey, "Software\\Valve\\%s", g_viewerSettings.registrysubkey );
 
 	return RegCreateKeyEx(
 		HKEY_CURRENT_USER,	// handle of open key 
@@ -588,7 +582,7 @@ bool LoadViewerSettings (const char *filename, StudioModel *pModel )
 	char merge_buffer[32];
 	for ( int i = 0; i < HLMV_MAX_MERGED_MODELS; i++ )
 	{
-		Q_snprintf( merge_buffer, sizeof( merge_buffer ), "merge%d", i + 1 );
+		V_sprintf_safe( merge_buffer, "merge%d", i + 1 );
 		RegReadString( hModelKey, merge_buffer, g_viewerSettings.mergeModelFile[i], sizeof( g_viewerSettings.mergeModelFile[i] ) );
 	}
 	
@@ -675,7 +669,7 @@ bool SaveViewerSettings (const char *filename, StudioModel *pModel )
 	char merge_buffer[32];
 	for ( int i = 0; i < HLMV_MAX_MERGED_MODELS; i++ )
 	{
-		Q_snprintf( merge_buffer, sizeof( merge_buffer ), "merge%d", i + 1 );
+		V_sprintf_safe( merge_buffer, "merge%d", i + 1 );
 		RegWriteString( hModelKey, merge_buffer, g_viewerSettings.mergeModelFile[i] );
 	}
 

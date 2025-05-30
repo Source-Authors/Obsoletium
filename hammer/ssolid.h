@@ -15,6 +15,7 @@
 #pragma once
 #endif
 
+#include "blockarray.h"
 
 #include "MapFace.h"
 
@@ -163,8 +164,8 @@ class CSSolid
 		// attached map solid:
 		CMapSolid *m_pMapSolid;
 
-		inline int GetFaceCount(void) { return(m_nFaces); }
-		inline CSSFace *GetFace(int nFace) { Assert(nFace < m_nFaces); return(&m_Faces[nFace]); }
+		inline short GetFaceCount(void) const { return(m_nFaces); }
+		inline CSSFace *GetFace(short nFace) { Assert(nFace < m_nFaces); return(&m_Faces[nFace]); }
 
 		BOOL GetHandleInfo(SSHANDLEINFO * pInfo, SSHANDLE id);
 		PVOID GetHandleData(SSHANDLE id);
@@ -192,7 +193,7 @@ class CSSolid
 		void AssignFace(CSSEdge* pEdge, SSHANDLE hFace, BOOL = FALSE);
 
 		// delete face/edge/vertex:
-		void DeleteFace(int);
+		void DeleteFace(short);
 		void DeleteVertex(int);
 		void DeleteEdge(int);
 		
@@ -232,7 +233,7 @@ class CSSolid
 		int m_nEdges;		// number of unique edges
 		BlockArray<CSSEdge, 16, 32> m_Edges;	// edges
 
-		int m_nFaces;		// number of faces
+		short m_nFaces;		// number of faces
 		BlockArray<CSSFace, 16, 10> m_Faces;	// faces
 
 		SSHANDLE m_curid;

@@ -1325,7 +1325,8 @@ void CFaceEditDispPage::UpdateElevation( CMapDisp *pDisp )
 	//
 	CString strElevation;
 	GetDlgItemText( ID_DISP_ELEVATION, strElevation );
-	int elevation = atof( strElevation );
+	// dimhotepus: atof -> strtof.
+	float elevation = strtof( strElevation, nullptr );
 
 	// check for change and set new elevation if need be
 	if( elevation != pDisp->GetElevation() )
@@ -1368,7 +1369,8 @@ void CFaceEditDispPage::OnSpinUpDown( NMHDR *pNMHDR, LRESULT *pResult )
 			CEdit *pEdit = ( CEdit* )GetDlgItem( ID_DISP_ELEVATION );
 			CString strElevation;
 			pEdit->GetWindowText( strElevation );
-			float elevation = atof( strElevation );
+			// dimhotepus: atof -> strtof
+			float elevation = strtof( strElevation, nullptr );
 			elevation += 0.5f * ( -pNMUpDown->iDelta );
 			strElevation.Format( "%4.2f", elevation );
 			pEdit->SetWindowText( strElevation );
@@ -1391,7 +1393,8 @@ void CFaceEditDispPage::UpdateScale( CMapDisp *pDisp )
 	//
 	CString strScale;
 	GetDlgItemText( ID_DISP_SCALE, strScale );
-	float scale = atof( strScale );
+	// dimhotepus: atof -> strtof
+	float scale = strtof( strScale, nullptr );
 
 	// check for change and set new scale if need be
 	if( scale != pDisp->GetScale() )
@@ -1500,7 +1503,7 @@ BOOL CFaceEditDispPage::OnSetActive( void )
 	// set the selection as the tool to use!!!
 	OnButtonSelect();
 
-	return CPropertyPage::OnSetActive();
+	return __super::OnSetActive();
 }
 
 
@@ -1521,7 +1524,7 @@ BOOL CFaceEditDispPage::PreTranslateMessage( MSG *pMsg )
 	HACCEL hAccel = GetMainWnd()->GetAccelTable();
 	if( !(hAccel && ::TranslateAccelerator( GetMainWnd()->m_hWnd, hAccel, pMsg ) ) )
 	{
-		return CPropertyPage::PreTranslateMessage( pMsg );
+          return __super::PreTranslateMessage(pMsg);
 	}
 	else
 	{

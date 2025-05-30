@@ -13,8 +13,8 @@
 
 #include "tier1/interface.h"
 #include "materialsystem/imaterial.h"
-#include <float.h>
-#include <string.h>
+#include <cfloat>
+#include <cstring>
 #include "tier0/dbg.h"
 #include "tier2/meshutils.h"
 #include "mathlib/mathlib.h"

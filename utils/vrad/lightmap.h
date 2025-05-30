@@ -15,8 +15,11 @@
 #define LIGHTMAP_H
 #pragma once
 
+#include <atomic>
+#include "mathlib/ssemath.h"
 #include "mathlib/bumpvects.h"
 #include "bsplib.h"
+#include "polylib.h"
 
 typedef struct
 {
@@ -32,7 +35,7 @@ extern edgeshare_t	edgeshare[MAX_MAP_EDGES];
 
 // This is incremented each time BuildFaceLights and FinalLightFace
 // are called. It's used for a status bar in WorldCraft.
-extern int g_iCurFace;
+extern std::atomic_int g_iCurFace;
 
 extern int vertexref[MAX_MAP_VERTS];
 extern int *vertexface[MAX_MAP_VERTS];
@@ -72,7 +75,7 @@ struct facelight_t
 	// irregularly shaped light sample data, clipped by face and luxel grid
 	int			numsamples;
 	sample_t	*sample;			
-	LightingValue_t *light[MAXLIGHTMAPS][NUM_BUMP_VECTS+1];	// result of direct illumination, indexed by sample
+	struct LightingValue_t *light[MAXLIGHTMAPS][NUM_BUMP_VECTS+1];	// result of direct illumination, indexed by sample
 
 	// regularly spaced lightmap grid
 	int			numluxels;			
@@ -81,8 +84,8 @@ struct facelight_t
 	float		worldAreaPerLuxel;
 };
 
-extern directlight_t	*activelights;
-extern directlight_t	*freelights;
+extern struct directlight_t	*activelights;
+extern struct directlight_t	*freelights;
 
 extern facelight_t		facelight[MAX_MAP_FACES];
 extern int				numdlights;

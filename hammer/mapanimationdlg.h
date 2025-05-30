@@ -24,7 +24,7 @@ public:
     bool Create( CWnd *pParentWnd );
 
 	void RunFrame( void );
-	void SelectionChanged( CMapObjectList &NewSelList);
+	void SelectionChanged( const CMapObjectList &NewSelList );
 
 protected:
 
@@ -51,9 +51,9 @@ protected:
 
 	bool m_bPlaying;
 	bool m_bEnabled;
-	float m_flAnimationDuration;
-	float m_flAnimationStart;
-	float m_flAnimTime;
+	double m_flAnimationDuration;
+	double m_flAnimationStart;
+	double m_flAnimTime;
 
 	DECLARE_MESSAGE_MAP()
 };

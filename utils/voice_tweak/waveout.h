@@ -1,19 +1,10 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef WAVEOUT_H
-#define WAVEOUT_H
-#pragma once
-
+#ifndef SE_UTILS_VOICE_TWEAK_WAVEOUT_H_
+#define SE_UTILS_VOICE_TWEAK_WAVEOUT_H_
 
 #include "iwaveout.h"
 
+IWaveOut* CreateWaveOut(unsigned long sampleRate);
 
-IWaveOut* CreateWaveOut(int sampleRate);
-
-
-#endif // WAVEOUT_H
+#endif  // !SE_UTILS_VOICE_TWEAK_WAVEOUT_H_

@@ -144,13 +144,15 @@ static ConCommand vprof_child		("vprof_child",		  IN_VProfChild);
 //-----------------------------------------------------------------------------
 CVProfGraphPanel::CVProfGraphPanel( vgui::VPANEL parent ) : BaseClass( NULL, "CVProfGraphPanel" )
 {
+	m_Components = nullptr;
+
 	SetParent( parent ); 
 	SetSize( videomode->GetModeStereoWidth(), videomode->GetModeStereoHeight() );
 	SetPos( 0, 0 );
 	SetVisible( false );
 	SetCursor( null );
 
-	m_hFont = 0;
+	m_hFont = vgui::INVALID_FONT;
 
 	SetFgColor( Color( 0, 0, 0, 255 ) );
 	SetPaintBackgroundEnabled( false );

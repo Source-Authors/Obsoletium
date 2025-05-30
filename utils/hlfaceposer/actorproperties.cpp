@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "resource.h"
 #include "ActorProperties.h"
+#include "resource.h"
 #include "ChoreoView.h"
 #include "choreoactor.h"
 #include "mdlviewer.h"
@@ -62,11 +62,11 @@ static BOOL CALLBACK ActorPropertiesDialogProc( HWND hwndDlg, UINT uMsg, WPARAM 
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int ActorProperties( CActorParams *params )
+intp ActorProperties( CActorParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_ACTORPROPERTIES ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)ActorPropertiesDialogProc );

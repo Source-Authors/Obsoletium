@@ -14,7 +14,6 @@
 #include "utlvector.h"
 
 
-#pragma warning( disable: 4355 )
 
 // Flags for the SetSuggestions call.
 #define SETSUGGESTIONS_SELECTFIRST		0x0001	// Select the first item in the list.

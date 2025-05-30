@@ -29,7 +29,7 @@ class CSequencePickerFrame;
 //-----------------------------------------------------------------------------
 class CAttributeSequencePickerPanel : public CAttributeBasePickerPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeSequencePickerPanel, CAttributeBasePickerPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeSequencePickerPanel, CAttributeBasePickerPanel );
 
 public:
 	CAttributeSequencePickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
@@ -38,7 +38,7 @@ public:
 private:
 	MESSAGE_FUNC_PARAMS( OnMDLSelected, "AssetSelected", kv );
 	MESSAGE_FUNC_PARAMS( OnSequenceSelected, "SequenceSelected", kv );
-	virtual void ShowPickerDialog();
+	void ShowPickerDialog() override;
 	void ShowSequencePickerDialog( const char *pMDLName );
 };
 

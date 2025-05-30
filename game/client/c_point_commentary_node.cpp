@@ -441,15 +441,17 @@ void CHudCommentary::Paint()
 	// Draw the speaker names
 	// Get our scheme and font information
 	vgui::HScheme scheme = vgui::scheme()->GetScheme( "ClientScheme" );
-	vgui::HFont hFont = vgui::scheme()->GetIScheme(scheme)->GetFont( "CommentaryDefault" );
+	// dimhotepus: Make font proportional as TF2 does.
+	vgui::HFont hFont = vgui::scheme()->GetIScheme(scheme)->GetFont( "CommentaryDefault", true );
 	if ( !hFont )
 	{
-		hFont = vgui::scheme()->GetIScheme(scheme)->GetFont( "Default" );
+		// dimhotepus: Make font proportional as TF2 does.
+		hFont = vgui::scheme()->GetIScheme(scheme)->GetFont( "Default", true );
 	}
 	vgui::surface()->DrawSetTextFont( hFont );
 	vgui::surface()->DrawSetTextColor( clr ); 
 	vgui::surface()->DrawSetTextPos( m_iSpeakersX, m_iSpeakersY );
-	vgui::surface()->DrawPrintText( m_szSpeakers, wcslen(m_szSpeakers) );
+	vgui::surface()->DrawPrintText( m_szSpeakers, V_wcslen(m_szSpeakers) );
 
 	if ( COMMENTARY_BUTTONS & IN_ATTACK )
 	{
@@ -461,7 +463,7 @@ void CHudCommentary::Paint()
 		{
 			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal, sizeof( wzFinal ) );
 			vgui::surface()->DrawSetTextPos( m_iSpeakersX, iY );
-			vgui::surface()->DrawPrintText( wzFinal, wcslen(wzFinal) );
+			vgui::surface()->DrawPrintText( wzFinal, V_wcslen(wzFinal) );
 		}
 
 		pszText = g_pVGuiLocalize->Find( "#Commentary_SecondaryAttack" );
@@ -471,7 +473,7 @@ void CHudCommentary::Paint()
 			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal, sizeof( wzFinal ) );
 			vgui::surface()->GetTextSize( hFont, wzFinal, w, h );
 			vgui::surface()->DrawSetTextPos( m_iBarX + m_iBarWide - w, iY );
-			vgui::surface()->DrawPrintText( wzFinal, wcslen(wzFinal) );
+			vgui::surface()->DrawPrintText( wzFinal, V_wcslen(wzFinal) );
 		}
 	}
 
@@ -480,7 +482,7 @@ void CHudCommentary::Paint()
 	int iCountWide, iCountTall;
 	vgui::surface()->GetTextSize( hFont, m_szCount, iCountWide, iCountTall );
 	vgui::surface()->DrawSetTextPos( wide - m_iCountXFR - iCountWide, m_iCountY );
-	vgui::surface()->DrawPrintText( m_szCount, wcslen(m_szCount) );
+	vgui::surface()->DrawPrintText( m_szCount, V_wcslen(m_szCount) );
 
 	// Draw the icon
  	vgui::surface()->DrawSetColor( Color(255,170,0,GetAlpha()) );
@@ -525,7 +527,7 @@ void CHudCommentary::StartCommentary( C_PointCommentaryNode *pNode, char *pszSpe
 	m_flStartTime = flStartTime;
 	m_flEndTime = flEndTime;
 	m_bHiding = false;
-	g_pVGuiLocalize->ConvertANSIToUnicode( pszSpeakers, m_szSpeakers, sizeof(m_szSpeakers) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( pszSpeakers, m_szSpeakers );
 
 	// Don't draw the element itself if closecaptions are on (and captions are always on in non-english mode)
 	ConVarRef pCVar( "closecaption" );
@@ -541,7 +543,7 @@ void CHudCommentary::StartCommentary( C_PointCommentaryNode *pNode, char *pszSpe
 
 	char sz[MAX_COUNT_STRING];
 	Q_snprintf( sz, sizeof(sz), "%d \\ %d", iNode, iNodeMax );
-	g_pVGuiLocalize->ConvertANSIToUnicode( sz, m_szCount, sizeof(m_szCount) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( sz, m_szCount );
 
 	// If the commentary just started, play the commentary fade in.
 	if ( fabs(flStartTime - gpGlobals->curtime) < 1.0 )

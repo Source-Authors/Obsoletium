@@ -40,7 +40,7 @@ bool VGui_InitDmeInterfacesList( const char *moduleName, CreateInterfaceFn *fact
 // the appropriate header file for each is listed above the item
 //-----------------------------------------------------------------------------
 
-// #include "soundemittersystem/isoundemittersystembase.h"
+// #include "SoundEmitterSystem/isoundemittersystembase.h"
 ISoundEmitterSystemBase *SoundEmitterSystem();
 
 // #include "toolsframework/ienginetool.h"
@@ -49,7 +49,7 @@ IEngineTool *EngineTool();
 // #include "vphysics_interface.h"
 IPhysicsCollision *PhysicsCollision();
 
-// #include "dme_controls/INotifyUI.h"
+// #include "dme_controls/inotifyui.h"
 IElementPropertiesChoices *ElementPropertiesChoices();
 void SetElementPropertiesChoices( IElementPropertiesChoices *pChoices );
 

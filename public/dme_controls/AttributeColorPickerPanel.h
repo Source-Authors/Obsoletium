@@ -32,16 +32,16 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeColorPickerPanel : public CAttributeTextPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeColorPickerPanel, CAttributeTextPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeColorPickerPanel, CAttributeTextPanel );
 
 public:
 	CAttributeColorPickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
 
 	// Inherited from Panel
-	virtual void	OnCommand( const char *cmd );
-	virtual void	PerformLayout();
-	virtual void	Refresh();
-	virtual void	ApplySchemeSettings(IScheme *pScheme);
+	void	OnCommand( const char *cmd ) override;
+	void	PerformLayout() override;
+	void	Refresh() override;
+	void	ApplySchemeSettings(IScheme *pScheme) override;
 
 private:
 	MESSAGE_FUNC_PARAMS( OnPreview, "ColorPickerPreview", data );

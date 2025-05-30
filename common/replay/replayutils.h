@@ -8,10 +8,16 @@
 #pragma once
 #endif
 
-#include "utlstring.h"
+#include "tier1/utlstring.h"
 
-void Replay_GetFirstAvailableFilename( char *pDst, intp nDstLen, const char *pIdealFilename, const char *pExt,
+void Replay_GetFirstAvailableFilename( OUT_Z_CAP(nDstLen) char *pDst, intp nDstLen, const char *pIdealFilename, const char *pExt,
 									   const char *pFilePath, intp nStartIndex );
+template<intp destSize>
+void Replay_GetFirstAvailableFilename( OUT_Z_ARRAY char (&pDst)[destSize], const char *pIdealFilename, const char *pExt,
+									   const char *pFilePath, intp nStartIndex )
+{
+  Replay_GetFirstAvailableFilename( pDst, destSize, pIdealFilename, pExt, pFilePath, nStartIndex );
+}
 
 void Replay_ConstructReplayFilenameString( CUtlString &strOut, const char *pReplaySubDir, const char *pFilename, const char *pGameDir );
 
@@ -39,5 +45,11 @@ const char *Replay_GetGameDir();
 // Get a name of the format "<map>: <current date & time>" - used for replays and takes.
 //----------------------------------------------------------------------------------------
 void Replay_GetAutoName( OUT_Z_BYTECAP(nDestSizeInBytes) wchar_t *pDest, int nDestSizeInBytes, const char *pMapName );
+
+template<int destSize>
+void Replay_GetAutoName( OUT_Z_ARRAY wchar_t (&pDest)[destSize], const char *pMapName )
+{
+	Replay_GetAutoName( pDest, destSize, pMapName );
+}
 
 #endif // REPLAY_H

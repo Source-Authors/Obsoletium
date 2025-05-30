@@ -80,10 +80,10 @@ public:
 	T * Detach( void )							{ T * p( m_p ); m_p = nullptr; return p; }
 
 public:
-	bool IsValid( void ) const					{ return m_p != nullptr; }
-	T * Get( void ) const						{ return m_p; }
-	T * operator -> ( void ) const				{ return Get(); }
-	T & operator *  ( void ) const				{ return *Get(); }
+	[[nodiscard]] bool IsValid( void ) const					{ return m_p != nullptr; }
+	[[nodiscard]] T * Get( void ) const						{ return m_p; }
+	[[nodiscard]] T * operator -> ( void ) const				{ return Get(); }
+	[[nodiscard]] T & operator *  ( void ) const				{ return *Get(); }
 
 private:
 	T * m_p;
@@ -133,12 +133,12 @@ public:
 
 	T*				operator=( T *pObj );
 	void			operator=( const CSmartPtr<T,RefCountAccessor> &other );
-	const T*		operator->() const;
-	T*				operator->();
-	bool			operator!() const;
-	bool			operator==( const T *pOther ) const;
-	bool			IsValid() const; // Tells if the pointer is valid.
-	T*				GetObject() const; // Get temporary object pointer, don't store it for later reuse!
+	[[nodiscard]] const T*		operator->() const;
+	[[nodiscard]] T*				operator->();
+	[[nodiscard]] bool			operator!() const;
+	[[nodiscard]] bool			operator==( const T *pOther ) const;
+	[[nodiscard]] bool			IsValid() const; // Tells if the pointer is valid.
+	[[nodiscard]] T*				GetObject() const; // Get temporary object pointer, don't store it for later reuse!
 	void			MarkDeleted();
 
 private:
@@ -268,7 +268,7 @@ private:	// forbid copying
 	CAutoPushPop & operator = ( CAutoPushPop const &x );
 
 public:
-	T & Get() { return m_rVar; }
+	[[nodiscard]] T & Get() { return m_rVar; }
 
 private:
 	T &m_rVar;

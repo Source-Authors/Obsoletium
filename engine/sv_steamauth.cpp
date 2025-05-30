@@ -112,17 +112,23 @@ CSteam3Server::CSteam3Server()
 	m_CallbackGSPolicyResponse( this, &CSteam3Server::OnGSPolicyResponse )
 #endif
 {
-	m_bHasActivePlayers = false;
-	m_bLogOnResult = false;
 	m_eServerMode = eServerModeInvalid;
 	m_eServerType = eServerTypeNormal;
-    m_bWantsSecure = false;		// default to insecure currently, this may change
-    m_bInitialized = false;
-	m_bWantsPersistentAccountLogon = false;
-	m_bLogOnFinished = false;
+
 	m_bMasterServerUpdaterSharingGameSocket = false;
-	m_steamIDLanOnly.InstancedSet( 0,0, k_EUniversePublic, k_EAccountTypeInvalid );
+	m_bLogOnFinished = false;
+	m_bLoggedOn = false;
+	m_bLogOnResult = false;
+	m_bHasActivePlayers = false;
 	m_SteamIDGS.InstancedSet( 1, 0, k_EUniverseInvalid, k_EAccountTypeInvalid );
+	m_steamIDLanOnly.InstancedSet( 0,0, k_EUniversePublic, k_EAccountTypeInvalid );
+	m_bActive = false;
+	m_bWantsSecure = false;		// default to insecure currently, this may change
+	m_bInitialized = false;
+	m_bWantsPersistentAccountLogon = false;
+
+	m_unIP = std::numeric_limits<uint32>::max();
+	m_usPort = std::numeric_limits<uint16>::max();
 	m_QueryPort = 0;
 }
 
@@ -193,7 +199,7 @@ void CSteam3Server::Activate( EServerType serverType )
 	m_eServerType = serverType;
 
 	char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	Q_FileBase( com_gamedir, gamedir );
 
 	// Figure out the game port. If we're doing a SrcTV relay, then ignore the NS_SERVER port and don't tell Steam that we have a game server.
 	uint16 usGamePort = 0;
@@ -606,7 +612,7 @@ void CSteam3Server::OnValidateAuthTicketResponse( ValidateAuthTicketResponse_t *
 	else
 	{
 		char msg[ 512 ];
-		sprintf( msg, "\"%s<%i><%s><>\" STEAM USERID validated\n", client->GetClientName(), client->GetUserID(), client->GetNetworkIDString() );
+		V_sprintf_safe( msg, "\"%s<%i><%s><>\" STEAM USERID validated\n", client->GetClientName(), client->GetUserID(), client->GetNetworkIDString() );
 
 		DevMsg( "%s", msg );
 		g_Log.Printf( "%s", msg );

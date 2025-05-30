@@ -38,7 +38,7 @@ public:
 	void Close();
 
 	// Is the file open?
-	bool IsOpen() const;
+	[[nodiscard]] bool IsOpen() const;
 
 private:
 	// error flags
@@ -58,7 +58,7 @@ private:
 	// Reads bytes from the file; fixes up maxput if necessary and null terminates
 	intp ReadBytesFromFile( intp nBytesToRead, intp nReadOffset );
 
-	FileHandle_t OpenFile( const char *pFileName, const char *pPath );
+	[[nodiscard]] FileHandle_t OpenFile( const char *pFileName, const char *pPath );
 
 	FileHandle_t m_hFileHandle;
 

@@ -48,6 +48,8 @@ constexpr unsigned kMinimumDelayMs = 300;
 
 constexpr int nMaxCPUs = 128;
 
+extern int64 QueryCurrentCpuFrequency();
+
 namespace {
 
 struct CPUMonitoringStarter {
@@ -56,37 +58,6 @@ struct CPUMonitoringStarter {
     if (kDelayMsWhenDisabled) SetCPUMonitoringInterval(0);
   }
 } s_CPUMonitoringStarter;
-
-int64 GetFrequency()
-{
-	LARGE_INTEGER waitTime, startCount, curCount;
-	CCycleCount start, end;
-
-	// Take 1/128 of a second for the measurement.
-	QueryPerformanceFrequency( &waitTime );
-	int scale = 7;
-	waitTime.QuadPart >>= scale;
-
-	QueryPerformanceCounter( &startCount );
-	start.Sample();
-	do
-	{
-		QueryPerformanceCounter( &curCount );
-	}
-	while ( curCount.QuadPart - startCount.QuadPart < waitTime.QuadPart );
-	end.Sample();
-
-	int64 freq = (end.m_Int64 - start.m_Int64) << scale;
-	if ( freq == 0 )
-	{
-		// Steam was seeing Divide-by-zero crashes on some Windows machines due to
-		// WIN64_AMD_DUALCORE_TIMER_WORKAROUND that can cause rdtsc to effectively
-		// stop. Staging doesn't have the workaround but I'm checking in the fix
-		// anyway. Return a plausible speed and get on with our day.
-		freq = 2000000000;
-	}
-	return freq;
-}
 
 // This semaphore is used to release all of the measurement threads simultaneously.
 HANDLE g_releaseSemaphore;
@@ -103,7 +74,7 @@ int64 GetSampledFrequency( unsigned iterations )
 	int64 maxFrequency = 0;
 	for ( unsigned i = 0; i < iterations; ++i )
 	{
-		int64 frequency = GetFrequency();
+		int64 frequency = QueryCurrentCpuFrequency();
 		if ( frequency > maxFrequency )
 			maxFrequency = frequency;
 	}
@@ -115,11 +86,12 @@ int64 GetSampledFrequency( unsigned iterations )
 int64 s_frequencies[ nMaxCPUs ];
 
 // Measurement thread, designed to be one per core.
-DWORD WINAPI MeasureThread( LPVOID vThreadNum )
+unsigned __stdcall MeasureThread( void* vThreadNum )
 {
-	ThreadSetDebugName( "CPUMonitoringMeasureThread" );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName( "CPUBurnMonitor" );
 
-	ptrdiff_t threadNum = reinterpret_cast<ptrdiff_t>(vThreadNum);
+	intp threadNum = reinterpret_cast<intp>(vThreadNum);
 
 	for ( ; ; )
 	{
@@ -152,9 +124,10 @@ typedef struct _PROCESSOR_POWER_INFORMATION {
 } PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
 
 // Master control thread to periodically wake the measurement threads.
-DWORD WINAPI HeartbeatThread( LPVOID )
+unsigned __stdcall HeartbeatThread( void* )
 {
-	ThreadSetDebugName( "CPUMonitoringHeartbeatThread" );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName( "CPUBurnHeartbeat" );
 	// Arbitrary/hacky time to wait for results to become available.
 	ThreadSleep( kFirstIntervalMs );
 
@@ -212,7 +185,7 @@ DWORD WINAPI HeartbeatThread( LPVOID )
 				// Read and write all the state that is shared with the main thread while holding the lock.
 				AUTO_LOCK( s_lock );
 				float freqPercentage = maxActualFreq / (MaxCurrentMHz * 1e-5f);
-				const float kFudgeFactor = 1.03f;	// Make results match reality better
+				constexpr float kFudgeFactor = 1.03f;	// Make results match reality better
 				s_results.m_timeStamp = Plat_FloatTime();
 				s_results.m_GHz = maxActualFreq * kFudgeFactor;
 				s_results.m_percentage = freqPercentage * kFudgeFactor;
@@ -284,7 +257,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		// ensure that they will run promptly on a specific CPU.
 		for ( int i = 0; i < g_numCPUs; ++i )
 		{
-			HANDLE thread = CreateThread( NULL, 0x10000, MeasureThread, (void*)static_cast<ptrdiff_t>(i), 0, NULL );
+			HANDLE thread = (HANDLE)_beginthreadex( NULL, 0x10000, MeasureThread, (void*)static_cast<intp>(i), 0, NULL );
 			if (thread)
 			{
 				SetThreadAffinityMask( thread, static_cast<size_t>(1u) << i );
@@ -293,7 +266,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		}
 
 		// Create the thread which tells the measurement threads to wake up periodically
-		CreateThread( NULL, 0x10000, HeartbeatThread, NULL, 0, NULL );
+		_beginthreadex( NULL, 0x10000, HeartbeatThread, NULL, 0, NULL );
 	}
 
 	AUTO_LOCK( s_lock );

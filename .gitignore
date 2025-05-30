@@ -417,6 +417,12 @@ devtools/bin/vpc.pdb
 *.idb
 *.lib
 
+# PVS-Studio intermediate artefacts
+*.PVS-Studio.cfg
+*.PVS-Studio.cmd
+*.PVS-Studio.i
+*.PVS-Studio.preprocess.cmd
+
 # Resource scripts intermediate
 RC[a-z0-9]*
 *.res
@@ -434,3 +440,16 @@ thirdparty/**/out/
 # CMake
 out/
 CMakeFiles/
+
+# Shader compiler
+materialsystem/stdshaders/fxctmp9_tmp
+materialsystem/stdshaders/shaders
+materialsystem/stdshaders/vshtmp9_tmp
+materialsystem/stdshaders/filelist.txt
+materialsystem/stdshaders/filelistgen.txt
+materialsystem/stdshaders/inclist.txt
+materialsystem/stdshaders/filestocopy.txt
+materialsystem/stdshaders/uniquefilestocopy.txt
+materialsystem/stdshaders/vcslist.txt
+materialsystem/stdshaders/makefile.stdshader_dx9_*
+materialsystem/stdshaders/NIL

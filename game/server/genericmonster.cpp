@@ -340,7 +340,7 @@ bool CNPC_Furniture::CreateVPhysics( void )
 
 	if ( !m_BoneFollowerManager.GetNumBoneFollowers() )
 	{
-		KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+		KeyValuesAD modelKeyValues("");
 		if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 		{
 			// Do we have a bone follower section?

@@ -58,7 +58,7 @@ public:
 	void ColorPrint( const Color& clr, const char *pMessage ) override;
 	void Print( const char *pMessage ) override;
 	void DPrint( const char *pMessage ) override;
-	virtual void GetConsoleText( char *pchText, size_t bufSize ) const;
+	virtual void GetConsoleText( char *pchText, intp bufSize ) const;
 
 	// clears the console
 	void Clear();
@@ -121,7 +121,7 @@ protected:
 	Color m_PrintColor;
 	Color m_DPrintColor;
 
-	int m_iNextCompletion;		// the completion that we'll next go to
+	intp m_iNextCompletion;		// the completion that we'll next go to
 	char m_szPartialText[256];
 	char m_szPreviousPartialText[256];
 	bool m_bAutoCompleteMode;	// true if the user is currently tabbing through completion options

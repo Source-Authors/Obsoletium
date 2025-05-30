@@ -5,17 +5,12 @@
 // $NoKeywords: $
 //=============================================================================//
 
-
-#if !defined( _X360 )
 #define OEMRESOURCE
 #include "winlite.h"
 #include <shellapi.h>
 #include <Shlwapi.h>
 #include <ShlObj.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+
 #include <sys/stat.h>
 
 
@@ -33,7 +28,7 @@
 
 #include <vgui/VGUI.h>
 #include <vgui/ISystem.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include "tier0/vcrmode.h"
@@ -42,7 +37,6 @@
 #include "vgui_internal.h"
 #include "filesystem_helpers.h"
 #include "vgui_key_translation.h"
-#include "filesystem.h"
 
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
@@ -163,11 +157,11 @@ public:
 
 	virtual void ShellExecute(const char *command, const char *file);
 
-	virtual int GetClipboardTextCount();
-	virtual void SetClipboardText(const char *text, int textLen);
-	virtual void SetClipboardText(const wchar_t *text, int textLen);
-	virtual int GetClipboardText(int offset, char *buf, int bufLen);
-	virtual int GetClipboardText(int offset, wchar_t *buf, int bufLen);
+	virtual intp GetClipboardTextCount();
+	virtual void SetClipboardText(const char *text, intp textLen);
+	virtual void SetClipboardText(const wchar_t *text, intp textLen);
+	virtual intp GetClipboardText(int offset, char *buf, intp bufLen);
+	virtual intp GetClipboardText(int offset, wchar_t *buf, intp bufLen);
 
 	virtual void SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 );
 
@@ -274,7 +268,7 @@ void CSystem::RunFrame()
 		// allow a little slack for jittery mice, don't reset until it's moved more than fifty pixels
 		if (abs((x + y) - (m_iStaticMouseOldX + m_iStaticMouseOldY)) > 50)
 		{
-			m_StaticLastComputerUseTime = GetTimeMillis() / 1000.0;
+			m_StaticLastComputerUseTime = GetCurrentTime();
 			m_iStaticMouseOldX = x;
 			m_iStaticMouseOldY = y;
 		}
@@ -363,7 +357,7 @@ void CSystem::SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 )
 #endif
 }
 
-void CSystem::SetClipboardText(const char *text, int textLen)
+void CSystem::SetClipboardText(const char *text, intp textLen)
 {
 #ifndef _X360
 	if (!text)
@@ -398,7 +392,7 @@ void CSystem::SetClipboardText(const char *text, int textLen)
 //-----------------------------------------------------------------------------
 // Purpose: Puts unicode text into the clipboard
 //-----------------------------------------------------------------------------
-void CSystem::SetClipboardText(const wchar_t *text, int textLen)
+void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 {
 #ifndef _X360
 	if (!text)
@@ -431,10 +425,10 @@ void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 #endif
 }
 
-int CSystem::GetClipboardTextCount()
+intp CSystem::GetClipboardTextCount()
 {
 #ifndef _X360
-	int count = 0;
+	size_t count = 0;
 	
 	if ( VCRGetMode() != VCR_Playback )
 	{
@@ -457,10 +451,10 @@ int CSystem::GetClipboardTextCount()
 #endif
 }
 
-int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
+intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
 {
 #ifndef _X360
-	int count = 0;
+	size_t count = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
 		if (OpenClipboard(GetDesktopWindow()))
@@ -468,17 +462,17 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				int len = GlobalSize(hmem);
-				count = len - offset;
-				if (count <= 0)
+				size_t len = GlobalSize(hmem);
+				if (len <= offset)
 				{
 					count = 0;
 				}
 				else
 				{
-					if (bufLen < count)
+					count = len - offset;
+					if (static_cast<size_t>(bufLen) < count)
 					{
-						count = bufLen;
+						count = static_cast<size_t>(bufLen);
 					}
 					void *ptr = GlobalLock(hmem);
 					if (ptr)
@@ -504,10 +498,10 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 //-----------------------------------------------------------------------------
 // Purpose: Retrieves unicode text from the clipboard
 //-----------------------------------------------------------------------------
-int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
+intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
 {
 #ifndef _X360
-	int retVal = 0;
+	intp retVal = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
 		if (OpenClipboard( GetDesktopWindow() ) )
@@ -515,10 +509,10 @@ int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				int len = GlobalSize(hmem);
-				int count = len - offset;
-				if (count > 0)
+				size_t len = GlobalSize(hmem);
+				if (len > offset)
 				{
+					intp count = len - offset;
 					if (bufLen < count)
 					{
 						count = bufLen;
@@ -577,15 +571,14 @@ static bool staticSplitRegistryKey(const char *key, char *key0, char *key1)
 		return false;
 	}
 	
-	vgui_strcpy(key0,Start+1,key);
-	vgui_strcpy(key1,(len-Start)+1,key+Start);
+	V_strncpy(key0, key, Start + 1);
+	V_strncpy(key1, key+Start, (len-Start)+1);
 
 	return true;
 }
 
 bool CSystem::SetRegistryString(const char *key, const char *value)
 {
-#ifndef _X360
 	HKEY hKey;
 
 	HKEY hSlot = HKEY_CURRENT_USER;
@@ -618,14 +611,12 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 
 	return false;
 }
 
 bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 {
-#ifndef _X360
 	if (!value)
 		return false;
 	value[0] = 0;
@@ -663,14 +654,12 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 
 	return false;
 }
 
 bool CSystem::SetRegistryInteger(const char *key, int value)
 {
-#ifndef _X360
 	HKEY hKey;
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
@@ -702,13 +691,11 @@ bool CSystem::SetRegistryInteger(const char *key, int value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 	return false;
 }
 
 bool CSystem::GetRegistryInteger(const char *key, int &value)
 {
-#ifndef _X360
 	HKEY hKey;
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
@@ -741,7 +728,6 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 	}
 
 	VCRHook_RegCloseKey(hKey);
-#endif
 	return false;
 }
 
@@ -750,7 +736,6 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 //-----------------------------------------------------------------------------
 bool CSystem::DeleteRegistryKey(const char *key)
 {
-#ifndef _X360
 	HKEY hSlot = HKEY_CURRENT_USER;
 	if (!strncmp(key, "HKEY_LOCAL_MACHINE", 18))
 	{
@@ -767,7 +752,6 @@ bool CSystem::DeleteRegistryKey(const char *key)
 	{
 		return true;
 	}
-#endif
 	return false;
 }
 
@@ -800,7 +784,7 @@ double CSystem::GetTimeSinceLastUse()
 {
 	if (m_bStaticWatchForComputerUse)
 	{
-		return (GetTimeMillis() / 1000.0) - m_StaticLastComputerUseTime;
+		return GetCurrentTime() - m_StaticLastComputerUseTime;
 	}
 
 	return 0.0f;
@@ -824,7 +808,7 @@ int CSystem::GetAvailableDrives(char *buf, int bufLen)
 double CSystem::GetFreeDiskSpace(const char *path)
 {
 	char buf[_MAX_PATH];
-	strcpy(buf, path);
+	V_strcpy_safe(buf, path);
 	// strip of to first slash (to make it look like 'x:\')
 	char *slash = strstr(buf, "\\");
 	if (slash)
@@ -870,12 +854,19 @@ void CSystem::SetUserConfigFile(const char *fileName, const char *pathName)
 		m_pUserConfigData = new KeyValues("UserConfigData");
 	}
 
-	strncpy(m_szFileName, fileName, sizeof(m_szFileName) - 1);
-	strncpy(m_szPathID, pathName, sizeof(m_szPathID) - 1);
+	V_strcpy_safe(m_szFileName, fileName);
+	V_strcpy_safe(m_szPathID, pathName);
 
 	// open
 	m_pUserConfigData->UsesEscapeSequences( true ); // VGUI may use this
-	m_pUserConfigData->LoadFromFile(g_pFullFileSystem, m_szFileName, m_szPathID);
+	if ( !m_pUserConfigData->LoadFromFile(g_pFullFileSystem, m_szFileName, m_szPathID) )
+	{
+		// dimhotepus: Handle load failure and clean KVs.
+		Warning( "Unable to load user config from '%s'.\n", m_szFileName );
+
+		m_pUserConfigData->deleteThis();
+		m_pUserConfigData = nullptr;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -914,8 +905,7 @@ bool CSystem::GetCommandLineParamValue(const char *paramName, char *value, int v
 	char token[512];
 	ParseFile(loc, token, NULL);
 
-	strncpy(value, token, valueBufferSize - 1);
-	value[valueBufferSize - 1] = 0;
+	V_strncpy(value, token, valueBufferSize);
 	
 	return true;
 }
@@ -980,7 +970,7 @@ bool CSystem::CreateShortcut(const char *linkFileName, const char *targetPath, c
 #ifndef _X360
 	bool bSuccess = false;
 	char temp[MAX_PATH];
-	strcpy(temp, linkFileName);
+	V_strcpy_safe(temp, linkFileName);
 
 	// make sure it doesn't already exist
 	struct _stat statBuf;
@@ -1034,7 +1024,7 @@ bool CSystem::GetShortcutTarget(const char *linkFileName, char *targetPath, char
 {
 #ifndef _X360
 	char temp[MAX_PATH];
-	strcpy(temp, linkFileName);
+	V_strcpy_safe(temp, linkFileName);
 	strlwr(temp);
 
 	targetPath[0] = 0;
@@ -1084,7 +1074,7 @@ bool CSystem::ModifyShortcutTarget(const char *linkFileName, const char *targetP
 #ifndef _X360
 	bool bSuccess = false;
 	char temp[MAX_PATH];
-	strcpy(temp, linkFileName);
+	V_strcpy_safe(temp, linkFileName);
 	strlwr(temp);
 
 	// Create the ShellLink object

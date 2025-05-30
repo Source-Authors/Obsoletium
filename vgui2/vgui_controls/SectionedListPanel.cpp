@@ -5,17 +5,18 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include <vgui_controls/SectionedListPanel.h>
+
+#include <tier1/KeyValues.h>
+#include "tier1/utlvector.h"
 
 #include <vgui/IInput.h>
 #include <vgui/IPanel.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 
-#include <vgui_controls/SectionedListPanel.h>
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Label.h>
@@ -23,7 +24,6 @@
 #include <vgui_controls/TextImage.h>
 #include <vgui_controls/ImageList.h>
 
-#include "utlvector.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -324,7 +324,7 @@ public:
 					}				
 				}
 
-				{for ( int i = GetImageCount(); i < colCount; i++ ) // make sure we have enough image slots
+				{for ( intp i = GetImageCount(); i < colCount; i++ ) // make sure we have enough image slots
 				{
 					AddImage( NULL, 0 );
 				}}
@@ -811,7 +811,7 @@ void SectionedListPanel::ReSortList()
 {
     m_SortedItems.RemoveAll();
 
-	int sectionStart = 0;
+	intp sectionStart = 0;
 	// layout the buttons
 	for (intp sectionIndex = 0; sectionIndex < m_Sections.Count(); sectionIndex++)
 	{
@@ -819,14 +819,14 @@ void SectionedListPanel::ReSortList()
 		sectionStart = m_SortedItems.Count();
 
 		// find all the items in this section
-		for( int i = m_Items.Head(); i != m_Items.InvalidIndex(); i = m_Items.Next( i ) )
+		for( auto i = m_Items.Head(); i != m_Items.InvalidIndex(); i = m_Items.Next( i ) )
 		{
 			if (m_Items[i]->GetSectionID() == m_Sections[sectionIndex].m_iID)
 			{
 				// insert the items sorted
 				if (section.m_pSortFunc)
 				{
-					int insertionPoint = sectionStart;
+					intp insertionPoint = sectionStart;
 					for (;insertionPoint < m_SortedItems.Count(); insertionPoint++)
 					{
 						if (section.m_pSortFunc(this, i, m_SortedItems[insertionPoint]->GetID()))
@@ -1180,12 +1180,12 @@ void SectionedListPanel::AddSection(int sectionID, const wchar_t *name, SectionS
 void SectionedListPanel::AddSection(int sectionID, SectionedListPanelHeader *header, SectionSortFunc_t sortFunc)
 {
 	header = SETUP_PANEL( header );
-	intp index = m_Sections.AddToTail();
-	m_Sections[index].m_iID = sectionID;
-	m_Sections[index].m_pHeader = header;
-	m_Sections[index].m_pSortFunc = sortFunc;
-	m_Sections[index].m_bAlwaysVisible = false;
-	m_Sections[index].m_iMinimumHeight = 0;
+	auto &section = m_Sections[m_Sections.AddToTail()];
+	section.m_iID = sectionID;
+	section.m_pHeader = header;
+	section.m_pSortFunc = sortFunc;
+	section.m_bAlwaysVisible = false;
+	section.m_iMinimumHeight = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1219,7 +1219,7 @@ bool SectionedListPanel::AddColumnToSection(int sectionID, const char *columnNam
 	wchar_t *pwtext = g_pVGuiLocalize->Find(columnText);
 	if (!pwtext)
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode(columnText, wtext, sizeof(wtext));
+		g_pVGuiLocalize->ConvertANSIToUnicode(columnText, wtext);
 		pwtext = wtext;
 	}
 	return AddColumnToSection(sectionID, columnName, pwtext, columnFlags, width, fallbackFont );
@@ -1766,7 +1766,7 @@ void SectionedListPanel::OnKeyCodePressed( KeyCode code )
         int lastValidItem = itemID;
         int secID = m_Items[itemID]->GetSectionID();
         int i=0;
-		int row = m_SortedItems.Find(m_Items[itemID]);
+		intp row = m_SortedItems.Find(m_Items[itemID]);
 
 		while ( i < rowsperpage )
         {
@@ -1804,7 +1804,7 @@ void SectionedListPanel::OnKeyCodePressed( KeyCode code )
         int lastValidItem = itemID;
         int secID = m_Items[itemID]->GetSectionID();
         int i=0;
-		int row = m_SortedItems.Find(m_Items[itemID]);
+		intp row = m_SortedItems.Find(m_Items[itemID]);
         while ( i < rowsperpage )
         {
 			if ( m_SortedItems.IsValidIndex(--row) )
@@ -2233,13 +2233,13 @@ HFont SectionedListPanel::GetColumnFallbackFontBySection( int sectionID, int col
 //-----------------------------------------------------------------------------
 Color *SectionedListPanel::GetColorOverrideForCell( int sectionID, int itemID, int columnID )
 {
-	FOR_EACH_VEC( m_ColorOverrides, i )
+	for (auto &color : m_ColorOverrides)
 	{
-		if ( ( m_ColorOverrides[i].m_SectionID == sectionID ) && 
-			 ( m_ColorOverrides[i].m_ItemID == itemID ) && 
-			 ( m_ColorOverrides[i].m_ColumnID == columnID ) )
+		if ( ( color.m_SectionID == sectionID ) && 
+			 ( color.m_ItemID == itemID ) && 
+			 ( color.m_ColumnID == columnID ) )
 		{
-			return &(m_ColorOverrides[i].m_clrOverride);
+			return &(color.m_clrOverride);
 		}
 	}
 
@@ -2252,20 +2252,20 @@ Color *SectionedListPanel::GetColorOverrideForCell( int sectionID, int itemID, i
 void SectionedListPanel::SetColorOverrideForCell( int sectionID, int itemID, int columnID, Color clrOverride )
 {
 	// is this value already in the override list?
-	FOR_EACH_VEC( m_ColorOverrides, i )
+	for (auto &color : m_ColorOverrides)
 	{
-		if ( ( m_ColorOverrides[i].m_SectionID == sectionID ) &&
-			( m_ColorOverrides[i].m_ItemID == itemID ) &&
-			( m_ColorOverrides[i].m_ColumnID == columnID ) )
+		if ( ( color.m_SectionID == sectionID ) &&
+			( color.m_ItemID == itemID ) &&
+			( color.m_ColumnID == columnID ) )
 		{
-			m_ColorOverrides[i].m_clrOverride = clrOverride;
+			color.m_clrOverride = clrOverride;
 			return;
 		}
 	}
 
-	intp iIndex = m_ColorOverrides.AddToTail();
-	m_ColorOverrides[iIndex].m_SectionID = sectionID;
-	m_ColorOverrides[iIndex].m_ItemID = itemID;
-	m_ColorOverrides[iIndex].m_ColumnID = columnID;
-	m_ColorOverrides[iIndex].m_clrOverride = clrOverride;
+	auto &color = m_ColorOverrides[m_ColorOverrides.AddToTail()];
+	color.m_SectionID = sectionID;
+	color.m_ItemID = itemID;
+	color.m_ColumnID = columnID;
+	color.m_clrOverride = clrOverride;
 }

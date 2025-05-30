@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxTab.h"
+#include "mxtk/mxtab.h"
 #include <windows.h>
 #include <commctrl.h>
 
@@ -45,8 +45,10 @@ void mxTab_resizeChild (HWND hwnd)
 
 			TabCtrl_GetItemRect (hwnd, index, &rc2);
 
-			int ex = GetSystemMetrics (SM_CXEDGE);
-			int ey = GetSystemMetrics (SM_CYEDGE);
+			// dimhotepus: Support DPI.
+			unsigned dpi = GetDpiForWindow(hwnd);
+			int ex = GetSystemMetricsForDpi (SM_CXEDGE, dpi);
+			int ey = GetSystemMetricsForDpi (SM_CYEDGE, dpi);
 			rc.top += (rc2.bottom - rc2.top) + 3 * ey;
 			rc.left += 2 * ex;
 			rc.right -= 2 * ex;
@@ -72,10 +74,10 @@ mxTab::mxTab (mxWindow *parent, int x, int y, int w, int h, int id)
 
 	void *handle = (void *) CreateWindowEx (0, WC_TABCONTROL, "", dwStyle,
 				x, y, w, h, hwndParent,
-				(HMENU) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 
 	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
-	SetWindowLong ((HWND) handle, GWL_USERDATA, (LONG) this);
+	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this);
 
 	setHandle (handle);
 	setType (MX_TAB);

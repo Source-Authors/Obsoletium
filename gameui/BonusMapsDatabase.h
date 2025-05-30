@@ -105,9 +105,9 @@ public:
 	void RefreshMapData( void );
 
 	int BonusCount( void );
-	BonusMapDescription_t * GetBonusData( int iIndex ) { return &(m_BonusMaps[ iIndex ]); }
-	int InvalidIndex( void ) { return m_BonusMaps.InvalidIndex(); }
-	bool IsValidIndex( int iIndex ) { return m_BonusMaps.IsValidIndex( iIndex ); }
+	BonusMapDescription_t * GetBonusData( intp iIndex ) { return &(m_BonusMaps[ iIndex ]); }
+	intp InvalidIndex( void ) { return m_BonusMaps.InvalidIndex(); }
+	bool IsValidIndex( intp iIndex ) { return m_BonusMaps.IsValidIndex( iIndex ); }
 
 	bool GetBlink( void );
 	void SetBlink( bool bState );
@@ -115,9 +115,11 @@ public:
 	bool BonusesUnlocked( void );
 
 	void SetCurrentChallengeNames( const char *pchFileName, const char *pchMapName, const char *pchChallengeName );
-	void GetCurrentChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName );
+	void GetCurrentChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,
+		OUT_Z_CAP(mapSize) char *pchMapName, intp mapSize,
+		OUT_Z_CAP(challengeSize) char *pchChallengeName, intp challengeSize ) const;
 	void SetCurrentChallengeObjectives( int iBronze, int iSilver, int iGold );
-	void GetCurrentChallengeObjectives( int &iBronze, int &iSilver, int &iGold );
+	void GetCurrentChallengeObjectives( int &iBronze, int &iSilver, int &iGold ) const;
 
 	bool SetBooleanStatus( const char *pchName, const char *pchFileName, const char *pchMapName, bool bValue );
 	bool SetBooleanStatus( const char *pchName, int iIndex, bool bValue );

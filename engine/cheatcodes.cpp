@@ -49,22 +49,21 @@ void ClearCheatCommands( void )
 
 void ReadCheatCommandsFromFile( const char *pchFileName )
 {
-	KeyValues *pCheatCodeKeys = new KeyValues( "cheat_codes" );
-	pCheatCodeKeys->LoadFromFile( g_pFullFileSystem, pchFileName, NULL );
+	KeyValuesAD pCheatCodeKeys( "cheat_codes" );
+	// dimhotepus: Early exit if load failed.
+	if ( !pCheatCodeKeys->LoadFromFile( g_pFullFileSystem, pchFileName, NULL ) )
+		return;
 
-	KeyValues *pKey = NULL;
-	for ( pKey = pCheatCodeKeys->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
+	for ( auto *pKey = pCheatCodeKeys->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 	{
-		auto iCheat = s_CheatCodeCommands.AddToTail();
-		CheatCodeData_t *pNewCheatCode = &(s_CheatCodeCommands[ iCheat ]);
+		CheatCodeData_t *pNewCheatCode = &(s_CheatCodeCommands[ s_CheatCodeCommands.AddToTail() ]);
 
-		Q_strncpy( pNewCheatCode->szName, pKey->GetName(), CHEAT_NAME_MAX_LEN );	// Get the name
+		V_strcpy_safe( pNewCheatCode->szName, pKey->GetName() );	// Get the name
 		pNewCheatCode->bDevOnly = ( pKey->GetInt( "dev", 0 ) != 0 );				// Get developer only flag
 		pNewCheatCode->iCodeLength = 0;												// Start at zero code elements
-		Q_strncpy( pNewCheatCode->szCommand, pKey->GetString( "command", "echo \"Cheat code has no command!\"" ), CHEAT_COMMAND_MAX_LEN );
+		V_strcpy_safe( pNewCheatCode->szCommand, pKey->GetString( "command", "echo \"Cheat code has no command!\"" ) );
 
-		KeyValues *pSubKey = NULL;
-		for ( pSubKey = pKey->GetFirstSubKey(); pSubKey; pSubKey = pSubKey->GetNextKey() )
+		for ( auto *pSubKey = pKey->GetFirstSubKey(); pSubKey; pSubKey = pSubKey->GetNextKey() )
 		{
 			const char *pchType = pSubKey->GetName();
 			if ( Q_strcmp( pchType, "code" ) == 0 )

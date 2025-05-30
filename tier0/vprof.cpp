@@ -41,12 +41,14 @@ CVProfile g_VProfCurrentProfile;
 int CVProfNode::s_iCurrentUniqueNodeID = 0;
 
 CVProfNode::~CVProfNode()
-{
 #if !defined( _WIN32 ) && !defined( POSIX )
+{
 	delete m_pChild;
 	delete m_pSibling;
-#endif
 }
+#else
+    = default;
+#endif
 
 CVProfNode *CVProfNode::GetSubNode( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, int budgetFlags )
 {
@@ -348,14 +350,13 @@ void CVProfile::SumTimes( CVProfNode *pNode, int budgetGroupID )
 		{
 			double timeLessChildren = pNode->GetTotalTimeLessChildren();
 			
-			g_TimesLessChildren.emplace( pNode, timeLessChildren );
+			g_TimesLessChildren.try_emplace( pNode, timeLessChildren );
 			
-			map<const tchar *, size_t>::iterator iter;
-			iter = g_TimeSumsMap.find( pNode->GetName() ); // intenionally using address of string rather than string compare (toml 01-27-03)
+			auto iter = g_TimeSumsMap.find( pNode->GetName() ); // intenionally using address of string rather than string compare (toml 01-27-03)
 			if ( iter == g_TimeSumsMap.end() )
 			{
 				TimeSums_t timeSums = { pNode->GetName(), pNode->GetTotalCalls(), pNode->GetTotalTime(), timeLessChildren, pNode->GetPeakTime() };
-				g_TimeSumsMap.emplace( pNode->GetName(), g_TimeSums.size() );
+				g_TimeSumsMap.try_emplace( pNode->GetName(), g_TimeSums.size() );
 				g_TimeSums.push_back( timeSums );
 			}
 			else
@@ -514,33 +515,36 @@ void CVProfile::DumpNodes( CVProfNode *pNode, int indent, bool bAverageAndCountO
 	}
 }
 
-static void DumpSorted( CVProfile::StreamOut_t outputStream, const tchar *pszHeading, double totalTime, bool (*pfnSort)( const TimeSums_t &, const TimeSums_t & ), int maxLen = 999999 )
+template<typename FSort>
+static void DumpSorted( CVProfile::StreamOut_t outputStream, const tchar *pszHeading, double totalTime, FSort sortFn, size_t maxLen = 999999 )
 {
-	unsigned i;
-	vector<TimeSums_t> sortedSums;
-	sortedSums = g_TimeSums;
-	sort( sortedSums.begin(), sortedSums.end(), pfnSort );
+	vector<TimeSums_t> sortedSums{g_TimeSums};
+	sort( sortedSums.begin(), sortedSums.end(), sortFn );
 
 	outputStream( _T("%s\n"), pszHeading);
     outputStream( _T("  Scope                                                      Calls Calls/Frame  Time+Child    Pct        Time    Pct   Avg/Frame    Avg/Call Avg-NoChild        Peak\n"));
     outputStream( _T("  ---------------------------------------------------- ----------- ----------- ----------- ------ ----------- ------ ----------- ----------- ----------- -----------\n"));
-    for ( i = 0; i < sortedSums.size() && i < (unsigned)maxLen; i++ )
+
+	size_t i{0};
+	for ( const auto &sum : sortedSums )
     {
-		double avg = ( sortedSums[i].calls ) ? sortedSums[i].time / (double)sortedSums[i].calls : 0.0;
-		double avgLessChildren = ( sortedSums[i].calls ) ? sortedSums[i].timeLessChildren / (double)sortedSums[i].calls : 0.0;
+		if ( i >= maxLen ) break;
+
+		double avg = sum.calls ? sum.time / (double)sum.calls : 0.0;
+		double avgLessChildren = sum.calls ? sum.timeLessChildren / (double)sum.calls : 0.0;
 		
         outputStream( _T("  %52.52s%12d%12.3f%12.3f%7.2f%12.3f%7.2f%12.3f%12.3f%12.3f%12.3f\n"), 
-             sortedSums[i].pszProfileScope,
-             sortedSums[i].calls,
-			 (float)sortedSums[i].calls / (float)g_TotalFrames,
-			 sortedSums[i].time,
-			 min( ( sortedSums[i].time / totalTime ) * 100.0, 100.0 ),
-			 sortedSums[i].timeLessChildren,
-			 min( ( sortedSums[i].timeLessChildren / totalTime ) * 100.0, 100.0 ),
-			 sortedSums[i].time / (float)g_TotalFrames,
+             sum.pszProfileScope,
+             sum.calls,
+			 (double)sum.calls / (double)g_TotalFrames,
+			 sum.time,
+			 min( ( sum.time / totalTime ) * 100.0, 100.0 ),
+			 sum.timeLessChildren,
+			 min( ( sum.timeLessChildren / totalTime ) * 100.0, 100.0 ),
+			 sum.time / (double)g_TotalFrames,
 			 avg,
 			 avgLessChildren,
-			 sortedSums[i].peak );
+			 sum.peak );
 	}
 }
 
@@ -656,22 +660,34 @@ void CVProfile::OutputReport( int type, const tchar *pszStartNode, int budgetGro
 //=============================================================================
 
 CVProfile::CVProfile() 
- :	m_enabled( 0 ),
+ :	
+#ifdef VPROF_VTUNE_GROUP
+	m_bVTuneGroupEnabled{ false },
+	m_nVTuneGroupID{ -1 },
+	m_GroupIDStackDepth{ 1 },
+#endif
+	m_enabled( 0 ),
 	m_fAtRoot( true ),
 	m_pCurNode( nullptr ),
 	m_Root( _T("Root"), 0, NULL, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, 0 ),
  	m_nFrames( 0 ),
+ 	m_ProfileDetailLevel( 0 ),
  	m_pausedEnabledDepth( 0 ),
+ 	m_pBudgetGroups( nullptr ),
+ 	m_nBudgetGroupNamesAllocated( 0 ),
+ 	m_nBudgetGroupNames( 0 ),
+	m_pNumBudgetGroupsChangedCallBack( nullptr ),
+	m_bPMEInit( false ),
+	m_bPMEEnabled( false ),
+	m_NumCounters( 0 ),
+	m_TargetThreadId( ThreadGetCurrentId() ),
 	m_pOutputStream( Msg )
 {
 	m_pCurNode = &m_Root;
 
 #ifdef VPROF_VTUNE_GROUP
-	m_GroupIDStackDepth = 1;
-	m_GroupIDStack[0] = 0; // VPROF_BUDGETGROUP_OTHER_UNACCOUNTED
+	memset(m_GroupIDStack, 0, sizeof(m_GroupIDStack));
 #endif
-
-	m_TargetThreadId = ThreadGetCurrentId();
 	
 	// Go ahead and allocate 32 slots for budget group names
 	MEM_ALLOC_CREDIT();
@@ -714,8 +730,9 @@ CVProfile::CVProfile()
 	BudgetGroupNameToBudgetGroupID( VPROF_BUDGETGROUP_REPLAY,					BUDGETFLAG_SERVER );
 //	BudgetGroupNameToBudgetGroupID( VPROF_BUDGETGROUP_DISP_HULLTRACES );
 
-	m_bPMEInit = false;
-	m_bPMEEnabled = false;
+	memset( m_Counters, 0, sizeof(m_Counters) );
+	memset( m_CounterGroups, 0, sizeof(m_CounterGroups) );
+	memset( m_CounterNames, 0, sizeof(m_CounterNames) );
 }
 
 
@@ -747,28 +764,25 @@ void CVProfile::FreeNodes_R( CVProfNode *pNode )
 
 void CVProfile::Term()
 {
-	int i;
-	for( i = 0; i < m_nBudgetGroupNames; i++ )
+	for( int i = 0; i < m_nBudgetGroupNames; i++ )
 	{
 		delete [] m_pBudgetGroups[i].m_pName;
 	}
 	delete[] m_pBudgetGroups;
-	m_nBudgetGroupNames = m_nBudgetGroupNamesAllocated = 0;
-	m_pBudgetGroups = NULL;
 
-	int n;
-	for( n = 0; n < m_NumCounters; n++ )
+	m_nBudgetGroupNames = m_nBudgetGroupNamesAllocated = 0;
+	m_pBudgetGroups = nullptr;
+
+	for( int n = 0; n < m_NumCounters; n++ )
 	{
 		delete [] m_CounterNames[n];
-		m_CounterNames[n] = NULL;
+		m_CounterNames[n] = nullptr;
 	}
+
 	m_NumCounters = 0;
 
 	// Free the nodes.
-	if ( GetRoot() )
-	{
-		FreeNodes_R( GetRoot() );
-	}
+	FreeNodes_R( GetRoot() );
 }
 
 
@@ -882,12 +896,12 @@ void CVProfile::HideBudgetGroup( int budgetGroupID, bool bHide )
 	}
 }
 
-intp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup )
+uintp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup )
 {	
 	Assert( m_NumCounters+1 < MAXCOUNTERS );
 	if ( m_NumCounters + 1 >= MAXCOUNTERS || !InTargetThread() )
 	{
-		static intp dummy;
+		static uintp dummy;
 		return &dummy;
 	}
 	int i;
@@ -905,17 +919,16 @@ intp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounte
 	tchar *pNewName = new tchar[_tcslen( pName ) + 1];
 	_tcscpy( pNewName, pName );
 	m_Counters[m_NumCounters] = 0;
-	m_CounterGroups[m_NumCounters] = (char)eCounterGroup;
+	m_CounterGroups[m_NumCounters] = static_cast<char>(to_underlying(eCounterGroup));
 	m_CounterNames[m_NumCounters++] = pNewName;
 	return &m_Counters[m_NumCounters-1];
 }
 
 void CVProfile::ResetCounters( CounterGroup_t eCounterGroup )
 {
-	int i;
-	for( i = 0; i < m_NumCounters; i++ )
+	for( int i = 0; i < m_NumCounters; i++ )
 	{
-		if ( m_CounterGroups[i] == eCounterGroup )
+		if ( m_CounterGroups[i] == to_underlying(eCounterGroup) )
 			m_Counters[i] = 0;
 	}
 }
@@ -931,13 +944,13 @@ const tchar *CVProfile::GetCounterName( int index ) const
 	return m_CounterNames[index];
 }
 
-intp CVProfile::GetCounterValue( int index ) const
+uintp CVProfile::GetCounterValue( int index ) const
 {
 	Assert( index >= 0 && index < m_NumCounters );
 	return m_Counters[index];
 }
 
-const tchar *CVProfile::GetCounterNameAndValue( int index, intp &val ) const
+const tchar *CVProfile::GetCounterNameAndValue( int index, uintp &val ) const
 {
 	Assert( index >= 0 && index < m_NumCounters );
 	val = m_Counters[index];
@@ -956,7 +969,7 @@ CounterGroup_t CVProfile::GetCounterGroup( int index ) const
 #error the below is presumably broken on 64 bit
 #endif // _WIN64
 
-const int k_cSTLMapAllocOffset = 4;
+constexpr inline int k_cSTLMapAllocOffset = 4;
 #define GET_INTERNAL_MAP_ALLOC_PTR( pMap ) \
 	( * ( (void **) ( ( ( byte * ) ( pMap ) ) + k_cSTLMapAllocOffset ) ) )
 //-----------------------------------------------------------------------------
@@ -1024,7 +1037,7 @@ void TelemetryThreadSetDebugName( ThreadId_t id, const char *pszName )
 
 	pThreadNameInfo->ThreadID = id;
 	strncpy( pThreadNameInfo->szName, pszName, std::size( pThreadNameInfo->szName ) );
-	pThreadNameInfo->szName[ std::size( pThreadNameInfo->szName ) - 1 ] = 0;
+	pThreadNameInfo->szName[ std::size( pThreadNameInfo->szName ) - 1 ] = '\0';
 	g_ThreadNamesList.Push( pThreadNameInfo );
 
 	g_bThreadNameArrayChanged = true;
@@ -1133,7 +1146,7 @@ static bool TelemetryInitialize()
 
 	char szBuildInfo[ 2048 ];
 	_snprintf( szBuildInfo, std::size( szBuildInfo ), "%s: %s", __DATE__ __TIME__, Plat_GetCommandLineA() );
-	szBuildInfo[ std::size( szBuildInfo ) - 1 ] = 0;
+	szBuildInfo[ std::size( szBuildInfo ) - 1 ] = '\0';
 
 	TmU32 TmOpenFlags = TMOF_DEFAULT | TMOF_MINIMAL_CONTEXT_SWITCHES;
 	/* TmOpenFlags |= TMOF_DISABLE_CONTEXT_SWITCHES | TMOF_INIT_NETWORKING*/
@@ -1212,10 +1225,14 @@ static void TelemetryPlots()
 	{
 		if( g_VProfCurrentProfile.GetCounterGroup( i ) == COUNTER_GROUP_TELEMETRY )
 		{
-			int val;
+			uintp val;
 			const char *name = g_VProfCurrentProfile.GetCounterNameAndValue( i, val );
 
-			tmPlotI32( TELEMETRY_LEVEL1, TMPT_INTEGER, 0, val, name );
+#ifdef PLATFORM_64BITS
+			tmPlotU64( TELEMETRY_LEVEL1, TMPT_INTEGER, 0, val, name );
+#else
+			tmPlotU32( TELEMETRY_LEVEL1, TMPT_INTEGER, 0, val, name );
+#endif
 		}
 	}
 

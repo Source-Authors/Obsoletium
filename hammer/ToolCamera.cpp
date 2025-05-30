@@ -24,7 +24,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#pragma warning(disable:4244)
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -84,10 +83,10 @@ void Camera3D::EnsureMaxCameras()
 {
 	int nMax = max( Options.general.nMaxCameras, 1 );
 	
-	int nToRemove = Cameras.Count() - nMax;
+	intp nToRemove = Cameras.Count() - nMax;
 	if ( nToRemove > 0 )
 	{
-		m_iActiveCamera = max( m_iActiveCamera - nToRemove, 0 );
+		m_iActiveCamera = max( m_iActiveCamera - nToRemove, static_cast<intp>(0) );
 		
 		while ( nToRemove-- )
 			Cameras.Remove( 0 );
@@ -137,7 +136,7 @@ bool Camera3D::UpdateTranslation(const Vector &vUpdate, UINT uFlags)
 
 	if(uFlags & constrainMoveAll)
 	{
-		m_MoveCamera.position[(m_nMovePositionIndex+1)%2] = vNewPos + vCamDelta;
+		m_MoveCamera.position[(m_nMovePositionIndex+1)%std::size(m_MoveCamera.position)] = vNewPos + vCamDelta;
 	}
 
  	m_pDocument->UpdateAllViews( MAPVIEW_UPDATE_TOOL );
@@ -606,7 +605,10 @@ bool Camera3D::OnLMouseDown2D(CMapView2D *pView, UINT nFlags, const Vector2D &vP
 			m_iActiveCamera = LOWORD(dwHit)-1;
 			m_MoveCamera = Cameras[m_iActiveCamera];
 			m_nMovePositionIndex = HIWORD(dwHit);
-			m_vOrgPos = m_MoveCamera.position[m_nMovePositionIndex];
+
+			Assert(m_nMovePositionIndex < std::size(m_MoveCamera.position));
+
+			m_vOrgPos = m_MoveCamera.position[m_nMovePositionIndex % std::size(m_MoveCamera.position)];
 			StartTranslation( pView, vPoint );
 		}
 	}
@@ -685,7 +687,7 @@ bool Camera3D::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &vPo
 
 	m_pDocument->Snap(vecWorld,uConstraints);
 
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert] );
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert] );
 	SetStatusText(SBI_COORDS, szBuf);
 	
 	if (IsTranslating())

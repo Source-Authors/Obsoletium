@@ -14,10 +14,11 @@
 
 
 #include "iincremental.h"
-#include "utllinkedlist.h"
-#include "utlvector.h"
-#include "utlbuffer.h"
-#include "vrad.h"
+#include "threads.h"
+#include "bspfile.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlbuffer.h"
 
 
 #define INCREMENTALFILE_VERSION	31241
@@ -36,6 +37,8 @@ public:
 class CLightFace
 {
 public:
+	CLightFace() : m_FaceIndex{0}, m_LightFacesIndex{0}, m_pLight{nullptr} {}
+
 	unsigned short				m_FaceIndex;		// global face index
 	unsigned short				m_LightFacesIndex;	// index into CIncLight::m_LightFaces.
 
@@ -48,18 +51,25 @@ public:
 };
 
 
+typedef struct _RTL_CRITICAL_SECTION RTL_CRITICAL_SECTION;
+typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
+
+
 class CIncLight
 {
 public:
 					CIncLight();
 					~CIncLight();
 
+	CIncLight(const CIncLight &) = delete;
+	CIncLight& operator=(const CIncLight &) = delete;
+
 	CLightFace*		FindOrCreateLightFace( int iFace, int lmSize, bool *bNew=NULL );
 
 
 public:
 
-	CRITICAL_SECTION	m_CS;
+	CRITICAL_SECTION	*m_pCS;
 
 	// This is the light for which m_LightFaces was built.
 	dworldlight_t	m_Light;

@@ -162,10 +162,8 @@ void CViewAngleAnimation::Spawn( void )
 
 void CViewAngleAnimation::DeleteKeyFrames()
 {
-	int i, c;
-
-	c = m_KeyFrames.Count();
-	for ( i = c - 1; i >= 0 ; --i )
+	intp c = m_KeyFrames.Count();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		delete m_KeyFrames[ i ];
 	}
@@ -177,12 +175,10 @@ void CViewAngleAnimation::LoadViewAnimFile( const char *pKeyFrameFileName )
 	DeleteKeyFrames();
 
 	// load keyvalues from this file and stuff them in as keyframes
-	KeyValues *pData = new KeyValues( pKeyFrameFileName );
-
-	if ( false == pData->LoadFromFile( filesystem, pKeyFrameFileName, "GAME" ) )
+	KeyValuesAD pData( pKeyFrameFileName );
+	if ( !pData->LoadFromFile( filesystem, pKeyFrameFileName, "GAME" ) )
 	{
 		Warning( "CViewAngleAnimation::LoadViewAnimFile failed to load script %s\n", pKeyFrameFileName );
-		pData->deleteThis();
 		return;
 	}
 
@@ -208,37 +204,30 @@ void CViewAngleAnimation::LoadViewAnimFile( const char *pKeyFrameFileName )
 
 		pKey = pKey->GetNextKey();
 	}
-
-	pData->deleteThis();
 }
 
 void CViewAngleAnimation::SaveAsAnimFile( const char *pKeyFrameFileName )
 {
 	// save all of our keyframes into the file
-	KeyValues *pData = new KeyValues( pKeyFrameFileName );
-
+	KeyValuesAD pData( pKeyFrameFileName );
 	pData->SetInt( "flags", m_iFlags );
 
-	KeyValues *pKey = new KeyValues( "keyframe" );
-	int i;
-	int c = m_KeyFrames.Count();
 	char buf[64];
-	for ( i=0;i<c;i++ )
+	for ( auto *kf : m_KeyFrames )
 	{
-		pKey = pData->CreateNewKey();
+		KeyValues *pKey = pData->CreateNewKey();
 
-		Q_snprintf( buf, sizeof(buf), "%f %f %f",
-			m_KeyFrames[i]->m_vecAngles[0],
-			m_KeyFrames[i]->m_vecAngles[1],
-			m_KeyFrames[i]->m_vecAngles[2] );
+		V_sprintf_safe( buf, "%f %f %f",
+			kf->m_vecAngles[0],
+			kf->m_vecAngles[1],
+			kf->m_vecAngles[2] );
 
 		pKey->SetString( "angles", buf );
-		pKey->SetFloat( "time", m_KeyFrames[i]->m_flTime );
-		pKey->SetInt( "flags", m_KeyFrames[i]->m_iFlags );
+		pKey->SetFloat( "time", kf->m_flTime );
+		pKey->SetInt( "flags", kf->m_iFlags );
 	}
 
 	pData->SaveToFile( filesystem, pKeyFrameFileName, NULL );
-	pData->deleteThis();
 }
 
 void CViewAngleAnimation::AddKeyFrame( CViewAngleKeyFrame *pKeyFrame )
@@ -283,8 +272,7 @@ void CViewAngleAnimation::ClientThink()
 		flCurrentTime = 0.001;
 
 	// find two nearest points
-	int i, c;
-	c = m_KeyFrames.Count();
+	intp i, c = m_KeyFrames.Count();
 	float flTime = 0;
 	for ( i=0;i<c;i++ )
 	{

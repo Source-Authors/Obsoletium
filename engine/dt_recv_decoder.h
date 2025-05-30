@@ -29,11 +29,11 @@ class CClientSendProp
 {
 public:
 
-				CClientSendProp();
-				~CClientSendProp();
+	CClientSendProp() : m_pTableName{nullptr} {}
+	~CClientSendProp();
 
-	const char*	GetTableName()				{ return m_pTableName; }
-	void		SetTableName( char *pName )	{ m_pTableName = pName; }
+	const char*	GetTableName() const		{ return m_pTableName; }
+	void		SetTableName( const char *pName );
 		
 
 private:

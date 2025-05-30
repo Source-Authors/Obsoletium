@@ -176,7 +176,8 @@ BOOL WriteText(LPCTSTR szText) {
 }
 
 unsigned __stdcall RemoteConsoleThread(void *ctx) {
-  ThreadSetDebugName("RemoteConReader");
+  // dimhotepus: Add thread name to aid debugging.
+  ThreadSetDebugName("RemoteConRead");
 
   se::dedicated::ISystem *system = static_cast<se::dedicated::ISystem *>(ctx);
   Assert(system);

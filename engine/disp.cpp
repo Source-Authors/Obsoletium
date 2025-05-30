@@ -215,7 +215,7 @@ void CDispInfo::TestAddDecalTri( int iIndexStart, unsigned short decalHandle, CD
 		//if( )
 		{
 			char buffer[256];
-			sprintf(buffer, "Verts: 3:%i 4+:%i (%i)\n",three, total, sizeof(CDecalVert));
+			V_sprintf_safe(buffer, "Verts: 3:%i 4+:%i (%i)\n",three, total, sizeof(CDecalVert));
 			Msg(buffer);
 		}
 		*/
@@ -849,7 +849,11 @@ void CDispInfo::AddSingleDynamicAlphaLight( dlight_t& dl )
 class CDecalNodeSetupCache
 {
 public:
-	CDecalNodeSetupCache() : m_CurrentCacheIndex(0) {}
+	CDecalNodeSetupCache() : m_CurrentCacheIndex(0)
+	{
+		memset(m_ProjectedVert, 0, sizeof(m_ProjectedVert));
+		memset(m_CacheIndex, 0, sizeof(m_CacheIndex));
+	}
 
 	Vector	m_ProjectedVert[MAX_DISPVERTS];
 	int		m_CacheIndex[MAX_DISPVERTS];

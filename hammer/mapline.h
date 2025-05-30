@@ -56,7 +56,7 @@ class CMapLine : public CMapHelper
 
 		virtual CMapClass *PrepareSelection(SelectMode_t eSelectMode);
 		
-		const char* GetDescription() { return("Line helper"); }
+		const char* GetDescription() const override { return("Line helper"); }
 
 		void OnAddToWorld(CMapWorld *pWorld);
 		void OnNotifyDependent(CMapClass *pObject, Notify_Dependent_t eNotifyType);

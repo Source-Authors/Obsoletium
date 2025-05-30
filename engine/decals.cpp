@@ -63,16 +63,8 @@ IMaterial *Draw_DecalMaterial( int index )
 	if ( slot < 0 || slot >= (int)g_DecalDictionary.MaxElement() )
 		return NULL;
 
-	DecalEntry * entry = &g_DecalDictionary[slot];
-	
-	if ( entry )
-	{
-		return entry->material;
-	}
-	else
-	{
-		return NULL;
-	}
+	DecalEntry &entry = g_DecalDictionary[slot];
+	return entry.material;
 }
 
 #ifndef SWDS
@@ -118,7 +110,7 @@ int Draw_DecalIndexFromName( char *name, bool *found )
 	Assert( found );
 
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( name );
-	int lookup = g_DecalDictionary.Find( fnHandle );
+	auto lookup = g_DecalDictionary.Find( fnHandle );
 	if ( lookup == g_DecalDictionary.InvalidIndex() )
 	{
 		if ( found )

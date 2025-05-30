@@ -27,7 +27,6 @@ $Project "tier1"
 	$Folder	"Source Files"
 	{
 		$File	"bitbuf.cpp"
-		$File	"newbitbuf.cpp"
 		$File	"byteswap.cpp"
 		$File	"characterset.cpp"
 		$File	"checksum_crc.cpp"
@@ -83,9 +82,9 @@ $Project "tier1"
 	// Encoding support requires the full lzma project
 	$Folder "LZMA Decompression Support"
 	{
-		$File	"$SRCDIR\utils\lzma\C\LzmaDec.h"
-		$File	"$SRCDIR\utils\lzma\C\LzmaDec.c"
-		$File	"$SRCDIR\utils\lzma\C\7zTypes.h"
+		$File	"$SRCDIR\thirdparty\7zip\C\LzmaDec.h"
+		$File	"$SRCDIR\thirdparty\7zip\C\LzmaDec.c"
+		$File	"$SRCDIR\thirdparty\7zip\C\7zTypes.h"
 	}
 
 	$Folder	"Header Files"
@@ -153,5 +152,10 @@ $Project "tier1"
 		$File	"$SRCDIR\public\tier1\utlvector.h"
 		$File	"$SRCDIR\public\tier1\utlbinaryblock.h"
 		$File	"$SRCDIR\common\xbox\xboxstubs.h"				[$WINDOWS]
+	}
+
+	$Folder "Debugger Visualizers" [$WINDOWS]
+	{
+		$File	"tier1.natvis"
 	}
 }

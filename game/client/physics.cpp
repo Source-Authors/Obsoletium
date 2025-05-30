@@ -432,24 +432,24 @@ void CPhysicsSystem::PhysicsSimulate()
 
 	if ( physenv )
 	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, physenv->GetActiveObjectCount() );
+		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %zd", __FUNCTION__, physenv->GetActiveObjectCount() );
 
 		g_Collisions.BufferTouchEvents( true );
+
 #ifdef _DEBUG
 		physenv->DebugCheckContacts();
 #endif
 		physenv->Simulate( frametime * cl_phys_timescale.GetFloat() );
 
-		int activeCount = physenv->GetActiveObjectCount();
-		IPhysicsObject **pActiveList = NULL;
+		const intp activeCount = physenv->GetActiveObjectCount();
 		if ( activeCount )
 		{
-			pActiveList = (IPhysicsObject **)stackalloc( sizeof(IPhysicsObject *)*activeCount );
+			IPhysicsObject **pActiveList = stackallocT( IPhysicsObject *, activeCount );
 			physenv->GetActiveObjects( pActiveList );
 
-			for ( int i = 0; i < activeCount; i++ )
+			for ( intp i = 0; i < activeCount; i++ )
 			{
-				C_BaseEntity *pEntity = reinterpret_cast<C_BaseEntity *>(pActiveList[i]->GetGameData());
+				auto *pEntity = static_cast<C_BaseEntity *>(pActiveList[i]->GetGameData());
 				if ( pEntity )
 				{
 					if ( pEntity->CollisionProp()->DoesVPhysicsInvalidateSurroundingBox() )
@@ -895,7 +895,7 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 //-----------------------------------------------------------------------------
 void CCollisionEvent::UpdateFluidEvents( void )
 {
-	for ( int i = m_fluidEvents.Count()-1; i >= 0; --i )
+	for ( intp i = m_fluidEvents.Count()-1; i >= 0; --i )
 	{
 		if ( (gpGlobals->curtime - m_fluidEvents[i].impactTime) > FLUID_TIME_MAX )
 		{
@@ -911,7 +911,7 @@ void CCollisionEvent::UpdateFluidEvents( void )
 //-----------------------------------------------------------------------------
 float CCollisionEvent::DeltaTimeSinceLastFluid( CBaseEntity *pEntity )
 {
-	for ( int i = m_fluidEvents.Count()-1; i >= 0; --i )
+	for ( intp i = m_fluidEvents.Count()-1; i >= 0; --i )
 	{
 		if ( m_fluidEvents[i].hEntity.Get() == pEntity )
 		{
@@ -990,7 +990,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 				return;
 
 			pFriction->pObject = pEntity;
-			CPASAttenuationFilter filter( pEntity, params.soundlevel );
+			CPASAttenuationFilter filter( pEntity, SNDLVL_TO_ATTN( params.soundlevel ) );
 			int entindex = pEntity->entindex();
 
 			// clientside created entites doesn't have a valid entindex, let 'world' play the sound for them

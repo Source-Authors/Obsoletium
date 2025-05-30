@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-#include "mathlib/mathlib.h"
+#include "mathlib/vector.h"
 
 constexpr inline float OO_SQRT_2{0.70710676908493042f};
 constexpr inline float OO_SQRT_3{0.57735025882720947f};

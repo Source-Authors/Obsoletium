@@ -188,7 +188,6 @@ class MM_Heartbeat;
 class MM_ClientInfo;
 class MM_JoinResponse;
 class MM_RegisterResponse;
-class MM_Migrate;
 class MM_Mutelist;
 class MM_Checkpoint;
 
@@ -201,7 +200,6 @@ public:
 	PROCESS_MM_MESSAGE( ClientInfo ) = 0;
 	PROCESS_MM_MESSAGE( JoinResponse ) = 0;
 	PROCESS_MM_MESSAGE( RegisterResponse ) = 0;
-	PROCESS_MM_MESSAGE( Migrate ) = 0;
 	PROCESS_MM_MESSAGE( Mutelist ) = 0;
 	PROCESS_MM_MESSAGE( Checkpoint) = 0;
 };

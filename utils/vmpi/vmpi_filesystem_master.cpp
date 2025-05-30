@@ -91,7 +91,7 @@ RETRY:;
 // ------------------------------------------------------------------------------------------------------------------------
 // //
 
-class CVMPIFile_PassThru : public IVMPIFile {
+class CVMPIFile_PassThru final : public IVMPIFile {
  public:
   CVMPIFile_PassThru(IBaseFileSystem *pPassThru, FileHandle_t fp) {
     m_pPassThru = pPassThru;
@@ -151,12 +151,12 @@ class CTransmitRateMgr {
 
  private:
   struct CMachineRecord {
-    unsigned long m_UniqueID;
+    uintp m_UniqueID;
     double m_flLastTime;
   };
   CUtlVector<CMachineRecord> m_MachineRecords;
 
-  unsigned long m_UniqueID;
+  uintp m_UniqueID;
   double m_flLastBroadcastTime;
   double m_nMicrosecondsPerByte;
   ISocket *m_pSocket;
@@ -192,11 +192,10 @@ void CTransmitRateMgr::ReadPackets() {
     int len = m_pSocket->RecvFrom(data, sizeof(data), &ipFrom);
     if (len == -1) break;
 
-    if (len == sizeof(s_cTransmitRateMgrPacket) + sizeof(unsigned long) &&
+    if (len == sizeof(s_cTransmitRateMgrPacket) + sizeof(uintp) &&
         memcmp(data, s_cTransmitRateMgrPacket,
                sizeof(s_cTransmitRateMgrPacket)) == 0) {
-      unsigned long id =
-          *((unsigned long *)&data[sizeof(s_cTransmitRateMgrPacket)]);
+      uintp id = *((uintp *)&data[sizeof(s_cTransmitRateMgrPacket)]);
       if (id == m_UniqueID) continue;
 
       intp i;
@@ -239,9 +238,9 @@ void CTransmitRateMgr::BroadcastPresence() {
 
   m_flLastBroadcastTime = flCurTime;
 
-  char cData[sizeof(s_cTransmitRateMgrPacket) + sizeof(unsigned long)];
+  char cData[sizeof(s_cTransmitRateMgrPacket) + sizeof(uintp)];
   memcpy(cData, s_cTransmitRateMgrPacket, sizeof(s_cTransmitRateMgrPacket));
-  *((unsigned long *)&cData[sizeof(s_cTransmitRateMgrPacket)]) = m_UniqueID;
+  *((uintp *)&cData[sizeof(s_cTransmitRateMgrPacket)]) = m_UniqueID;
 
   m_pSocket->Broadcast(cData, sizeof(cData),
                        VMPI_MASTER_FILESYSTEM_BROADCAST_PORT);
@@ -495,10 +494,12 @@ class CMasterMulticastThread {
   // Events used to communicate with our thread.
   HANDLE m_hTermEvent;
 
+  // dimhotepus: volatile int -> atomic_int
   // The thread walks through this as it spews chunks of data.
-  volatile int m_iCurFile;  // Index into m_Files.
-  volatile int
-      m_iCurActiveChunk;  // Current index into CMulticastFile::m_ActiveChunks.
+  std::atomic_int m_iCurFile;  // Index into m_Files.
+  // dimhotepus: volatile int -> atomic_int
+  // // Current index into CMulticastFile::m_ActiveChunks.
+  std::atomic_int m_iCurActiveChunk;
 
   CUtlLinkedList<char *, int> m_WarningSuppressions;
 };
@@ -809,6 +810,9 @@ void CMasterMulticastThread::CreateVirtualFile(const char *pFilename,
 }
 
 DWORD WINAPI CMasterMulticastThread::StaticMulticastThread(LPVOID pParameter) {
+  // dimhotepus: Add thread name to aid debugging.
+  ThreadSetDebugName("VmpiMstMulticast");
+
   return ((CMasterMulticastThread *)pParameter)->MulticastThread();
 }
 
@@ -1012,8 +1016,7 @@ DWORD CMasterMulticastThread::MulticastThread() {
 
     int nBytesSent = 0;
 
-    bool bSuccess;
-    bSuccess = Thread_SendFileChunk_Multicast(&nBytesSent);
+    bool bSuccess = Thread_SendFileChunk_Multicast(&nBytesSent);
 
     g_nMulticastBytesSent += (int)nBytesSent;
 
@@ -1105,9 +1108,7 @@ bool CMasterMulticastThread::FindWarningSuppression(const char *pFilename) {
 }
 
 void CMasterMulticastThread::AddWarningSuppression(const char *pFilename) {
-  char *pBlah = new char[strlen(pFilename) + 1];
-  strcpy(pBlah, pFilename);
-  m_WarningSuppressions.AddToTail(pBlah);
+  m_WarningSuppressions.AddToTail(V_strdup(pFilename));
 }
 
 int CMasterMulticastThread::FindOrAddFile(const char *pFilename,
@@ -1173,11 +1174,11 @@ int CMasterMulticastThread::FinishFileSetup(CMulticastFile *pFile,
 
   // Get this file in the queue.
   if (!bFileAlreadyExisted) {
-    pFile->m_Filename.SetSize(strlen(pFilename) + 1);
-    strcpy(pFile->m_Filename.Base(), pFilename);
+    pFile->m_Filename.SetSize(V_strlen(pFilename) + 1);
+    V_strncpy(pFile->m_Filename.Base(), pFilename, pFile->m_Filename.Count());
 
-    pFile->m_PathID.SetSize(strlen(pPathID) + 1);
-    strcpy(pFile->m_PathID.Base(), pPathID);
+    pFile->m_PathID.SetSize(V_strlen(pPathID) + 1);
+    V_strncpy(pFile->m_PathID.Base(), pPathID, pFile->m_PathID.Count());
 
     pFile->m_nCycles = 0;
 

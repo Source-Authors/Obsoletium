@@ -5,6 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/PropertySheet.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui/IBorder.h>
 #include <vgui/IInput.h>
 #include <vgui/IPanel.h>
@@ -12,13 +16,12 @@
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 #include <vgui/ISurface.h>
+
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Label.h>
-#include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/ComboBox.h>
 #include <vgui_controls/Panel.h>
 #include <vgui_controls/ToolWindow.h>
@@ -302,7 +305,7 @@ public:
 		msg->SetPtr( "propertypage", m_pPage );
 		msg->SetPtr( "propertysheet", m_pParent );
 		char sz[ 256 ];
-		GetText( sz, sizeof( sz ) );
+		GetText( sz );
 		msg->SetString( "tabname", sz  );
 		msg->SetString( "text", sz );
 	}
@@ -712,9 +715,10 @@ void PropertySheet::SetTabWidth(int pixels)
 void PropertySheet::ResetAllData()
 {
 	// iterate all the dialogs resetting them
-	for (int i = 0; i < m_Pages.Count(); i++)
+	for (intp i = 0; i < m_Pages.Count(); i++)
 	{
-		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), new KeyValues("ResetData"), GetVPanel());
+		// dimhotepus: Do not leak KeyValues.
+		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), KeyValuesAD("ResetData"), GetVPanel());
 	}
 }
 
@@ -724,9 +728,10 @@ void PropertySheet::ResetAllData()
 void PropertySheet::ApplyChanges()
 {
 	// iterate all the dialogs resetting them
-	for (int i = 0; i < m_Pages.Count(); i++)
+	for (intp i = 0; i < m_Pages.Count(); i++)
 	{
-		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), new KeyValues("ApplyChanges"), GetVPanel());
+		// dimhotepus: Do not leak KeyValues.
+		ipanel()->SendMessage(m_Pages[i].page->GetVPanel(), KeyValuesAD("ApplyChanges"), GetVPanel());
 	}
 }
 
@@ -1127,7 +1132,7 @@ void PropertySheet::SetPageEnabled(const char *title, bool state)
 		if (_showTabs)
 		{
 			char tmp[50];
-			m_PageTabs[i]->GetText(tmp,50);
+			m_PageTabs[i]->GetText(tmp);
 			if (!strnicmp(title,tmp,strlen(tmp)))
 			{	
 				m_PageTabs[i]->SetEnabled(state);
@@ -1442,7 +1447,7 @@ void PropertySheet::OnTextChanged(Panel *panel,const wchar_t *wszText)
 		for(int i = 0 ; i < m_PageTabs.Count() ; i++ )
 		{
 			tabText[0] = 0;
-			m_PageTabs[i]->GetText(tabText,30);
+			m_PageTabs[i]->GetText(tabText);
 			if ( !wcsicmp(wszText,tabText) )
 			{
 				ChangeActiveTab(i);

@@ -61,7 +61,7 @@ CMapSideList::CMapSideList(void)
 //-----------------------------------------------------------------------------
 CMapSideList::CMapSideList(char const *pszKeyName)
 {
-	strcpy( m_szKeyName, pszKeyName );
+	V_strcpy_safe( m_szKeyName, pszKeyName );
 }
 
 
@@ -202,7 +202,7 @@ CMapClass *CMapSideList::CopyFrom(CMapClass *pOther, bool bUpdateDependencies)
 
 	CMapClass::CopyFrom(pOther, bUpdateDependencies);
 
-	strcpy(m_szKeyName, pFrom->m_szKeyName);
+	V_strcpy_safe(m_szKeyName, pFrom->m_szKeyName);
 	m_Faces = pFrom->m_Faces;
 
 	if (bUpdateDependencies)
@@ -312,7 +312,7 @@ void CMapSideList::OnPaste(CMapClass *pCopyObject, CMapWorld *pSourceWorld, CMap
 	if (pszValue != NULL)
 	{
 		char szVal[KEYVALUE_MAX_VALUE_LENGTH];
-		strcpy(szVal, pszValue);
+		V_strcpy_safe(szVal, pszValue);
 
 		char *psz = strtok(szVal, " ");
 		while (psz != NULL)

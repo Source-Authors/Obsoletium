@@ -1113,7 +1113,7 @@ void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, int nListSize )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int IsCorner( CVertIndex const &index, int sideLength )
+bool IsCorner( CVertIndex const &index, int sideLength )
 {
 	if ( index.x == 0 )
 	{

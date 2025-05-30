@@ -33,9 +33,8 @@ BoundBox::BoundBox(void)
 }
 
 BoundBox::BoundBox(const Vector &mins, const Vector &maxs)
+	: bmins{mins}, bmaxs{maxs}
 {
-	bmins = mins;
-	bmaxs = maxs;
 }
 
 //-----------------------------------------------------------------------------

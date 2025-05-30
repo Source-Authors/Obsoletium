@@ -5,19 +5,19 @@
 // NetAdr.cpp: implementation of the CNetAdr class.
 //
 //===========================================================================//
-#include "netadr.h"
+#include "tier1/netadr.h"
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_WIN32 )
 #include "winlite.h"
 #endif
 
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined(_WIN32)
 #include <winsock.h>
 typedef int socklen_t;
-#elif !defined( _X360 )
+#elif defined(POSIX)
 #include <netinet/in.h> // ntohs()
 #include <netdb.h>		// gethostbyname()
 #include <sys/socket.h>	// getsockname()
@@ -117,9 +117,8 @@ const char * netadr_t::ToString( bool onlyBase ) const
 	return s[useSlot];
 }
 
-void netadr_t::ToString( char *pchBuffer, uint32 unBufferSize, bool onlyBase ) const
+void netadr_t::ToString( char *pchBuffer, size_t unBufferSize, bool onlyBase ) const
 {
-
 	if (type == NA_LOOPBACK)
 	{
 		V_strncpy( pchBuffer, "loopback", unBufferSize );
@@ -202,44 +201,42 @@ unsigned int netadr_t::GetIPHostByteOrder() const
 	return BigDWord( GetIPNetworkByteOrder() );
 }
 
-void netadr_t::ToSockadr (struct sockaddr * s) const
+void netadr_t::ToSockadr (sockaddr * s) const
 {
-	Q_memset ( s, 0, sizeof(struct sockaddr));
+	Q_memset ( s, 0, sizeof(sockaddr));
 
 	if (type == NA_BROADCAST)
 	{
-		((struct sockaddr_in*)s)->sin_family = AF_INET;
-		((struct sockaddr_in*)s)->sin_port = port;
-		((struct sockaddr_in*)s)->sin_addr.s_addr = INADDR_BROADCAST;
+		((sockaddr_in*)s)->sin_family = AF_INET;
+		((sockaddr_in*)s)->sin_port = port;
+		((sockaddr_in*)s)->sin_addr.s_addr = INADDR_BROADCAST;
 	}
 	else if (type == NA_IP)
 	{
-		((struct sockaddr_in*)s)->sin_family = AF_INET;
-		((struct sockaddr_in*)s)->sin_addr.s_addr = *(int *)&ip;
-		((struct sockaddr_in*)s)->sin_port = port;
+		((sockaddr_in*)s)->sin_family = AF_INET;
+		((sockaddr_in*)s)->sin_addr.s_addr = *(int *)&ip;
+		((sockaddr_in*)s)->sin_port = port;
 	}
 	else if (type == NA_LOOPBACK )
 	{
-		((struct sockaddr_in*)s)->sin_family = AF_INET;
-		((struct sockaddr_in*)s)->sin_port = port;
-		((struct sockaddr_in*)s)->sin_addr.s_addr = INADDR_LOOPBACK ;
+		((sockaddr_in*)s)->sin_family = AF_INET;
+		((sockaddr_in*)s)->sin_port = port;
+		((sockaddr_in*)s)->sin_addr.s_addr = INADDR_LOOPBACK;
 	}
 }
 
-bool netadr_t::SetFromSockadr(const struct sockaddr * s)
+bool netadr_t::SetFromSockadr(const sockaddr * s)
 {
 	if (s->sa_family == AF_INET)
 	{
 		type = NA_IP;
-		*(int *)&ip = ((struct sockaddr_in *)s)->sin_addr.s_addr;
-		port = ((struct sockaddr_in *)s)->sin_port;
+		*(int *)&ip = ((sockaddr_in *)s)->sin_addr.s_addr;
+		port = ((sockaddr_in *)s)->sin_port;
 		return true;
 	}
-	else
-	{
-		Clear();
-		return false;
-	}
+
+	Clear();
+	return false;
 }
 
 bool netadr_t::IsValid() const
@@ -306,18 +303,15 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 			|| n5 < 0 || n5 > 65535
 		)
 			return false;
-		SetIP( n1, n2, n3, n4 );
-		SetPort( ( uint16 ) n5 );
+
+		// dimhotepus: Safe to cast as checked above.
+		SetIP( static_cast<uint8>(n1), static_cast<uint8>(n2), static_cast<uint8>(n3), static_cast<uint8>(n4) );
+		SetPort( static_cast<uint16>(n5) );
 		return true;
 	}
 
 	if ( bUseDNS )
 	{
-// X360TBD:
-	// dgoodenough - since this is skipped on X360, seems reasonable to skip as well on PS3
-	// PS3_BUILDFIX
-	// FIXME - Leap of faith, this works without asserting on X360, so I assume it will on PS3
-#if !defined( _X360 ) && !defined( _PS3 )
 		// Null out the colon if there is one
 		char *pchColon = strchr( address, ':' );
 		if ( pchColon )
@@ -335,13 +329,19 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 		// Set Port to whatever was specified after the colon
 		if ( pchColon )
 		{
-			SetPort( V_atoi( ++pchColon ) );
+			const int parsedPort = V_atoi( ++pchColon );
+			// dimhotepus: Check port is valid.
+			if (parsedPort >= static_cast<int>(std::numeric_limits<unsigned short>::min()) &&
+				parsedPort <= static_cast<int>(std::numeric_limits<unsigned short>::max()))
+			{
+				SetPort( static_cast<unsigned short>(parsedPort) );
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return true;
-#else
-		Assert( 0 );
-		return false;
-#endif
 	}
 
 	return false;
@@ -357,22 +357,17 @@ bool netadr_t::operator<(const netadr_t &netadr) const
 }
 
 
-void netadr_t::SetFromSocket( socket_handle hSocket )
+bool netadr_t::SetFromSocket( socket_handle hSocket )
 {	
-	// dgoodenough - since this is skipped on X360, seems reasonable to skip as well on PS3
-	// PS3_BUILDFIX
-	// FIXME - Leap of faith, this works without asserting on X360, so I assume it will on PS3
-#if !defined( _X360 ) && !defined( _PS3 )
 	Clear();
 	type = NA_IP;
 
-	struct sockaddr address;
+	sockaddr address;
 	socklen_t namelen = sizeof(address);
 	if ( getsockname( hSocket, &address, &namelen) == 0 )
 	{
-		SetFromSockadr( &address );
+		return SetFromSockadr( &address );
 	}
-#else
-	Assert(0);
-#endif
+
+	return false;
 }

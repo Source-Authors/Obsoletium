@@ -9,8 +9,8 @@
 #define GDVAR_H
 #pragma once
 
-#include <utlvector.h>
-#include <TokenReader.h> // dvs: for MAX_STRING. Fix.
+#include "tier1/utlvector.h"
+#include "tier1/tokenreader.h" // dvs: for MAX_STRING. Fix.
 
 
 class MDkeyvalue;
@@ -59,13 +59,13 @@ enum GDIV_TYPE
 // Defines an element in a choices/flags list. Choices values are strings;
 // flags values are integers, hence the iValue and szValue members.
 //-----------------------------------------------------------------------------
-typedef struct
+struct GDIVITEM
 {
 	unsigned long iValue;		// Bitflag value for ivFlags
 	char szValue[MAX_STRING];	// String value for ivChoices
 	char szCaption[MAX_STRING];	// Name of this choice
 	BOOL bDefault;				// Flag set by default?
-} GDIVITEM;
+};
 
 
 class GDinputvariable
@@ -79,37 +79,39 @@ class GDinputvariable
 		BOOL InitFromTokens(TokenReader& tr);
 		
 		// functions:
-		inline const char *GetName() { return m_szName; }
-		inline const char *GetLongName(void) { return m_szLongName; }
-		inline const char *GetDescription(void);
+		inline const char *GetName() const { return m_szName; }
+		inline const char *GetLongName(void) const { return m_szLongName; }
+		inline const char *GetDescription(void) const;
 
-		inline int GetFlagCount() { return m_Items.Count(); }
-		inline int GetFlagMask(int nFlag);
-		inline const char *GetFlagCaption(int nFlag);
+		inline intp GetFlagCount() const { return m_Items.Count(); }
+		inline int GetFlagMask(intp nFlag) const;
+		inline const char *GetFlagCaption(intp nFlag) const;
 		
-		inline int GetChoiceCount() { return m_Items.Count(); }
-		inline const char *GetChoiceCaption(int nChoice);
+		inline intp GetChoiceCount() const { return m_Items.Count(); } //-V524
+		inline const char *GetChoiceCaption(intp nChoice) const;
 
-		inline GDIV_TYPE GetType() { return m_eType; }
-		const char *GetTypeText(void);
+		inline GDIV_TYPE GetType() const { return m_eType; }
+		const char *GetTypeText(void) const;
 		
-		inline void GetDefault(int *pnStore)
-		{ 
-			pnStore[0] = m_nDefault; 
+		inline void GetDefault(int *pnStore, intp storeLen) const
+		{
+			// dimhotepus: Ensure buffer has room.
+			if (storeLen > 0)
+				pnStore[0] = m_nDefault;
 		}
 
-		inline void GetDefault(char *pszStore)
+		inline void GetDefault(char *pszStore, intp storeLen) const
 		{ 
-			strcpy(pszStore, m_szDefault); 
+			V_strncpy(pszStore, m_szDefault, storeLen); 
 		}
 		
-		GDIV_TYPE GetTypeFromToken(const char *pszToken);
-		trtoken_t GetStoreAsFromType(GDIV_TYPE eType);
+		GDIV_TYPE GetTypeFromToken(const char *pszToken) const;
+		trtoken_t GetStoreAsFromType(GDIV_TYPE eType) const;
 
-		const char *ItemStringForValue(const char *szValue);
-		const char *ItemValueForString(const char *szString);
+		const char *ItemStringForValue(const char *szValue) const;
+		const char *ItemValueForString(const char *szString) const;
 
-		BOOL IsFlagSet(unsigned int);
+		BOOL IsFlagSet(unsigned int) const;
 		void SetFlag(unsigned int, BOOL bSet);
 
 		void ResetDefaults();
@@ -117,8 +119,8 @@ class GDinputvariable
 		void ToKeyValue(MDkeyvalue* pkv);
 		void FromKeyValue(MDkeyvalue* pkv);
 
-		inline bool IsReportable(void);
-		inline bool IsReadOnly(void);
+		inline bool IsReportable(void) const;
+		inline bool IsReadOnly(void) const;
 
 		GDinputvariable &operator =(GDinputvariable &Other);
 		void Merge(GDinputvariable &Other);
@@ -130,7 +132,7 @@ class GDinputvariable
 		// for choices/flags:
 		CUtlVector<GDIVITEM> m_Items;
 
-		static char *m_pszEmpty;
+		static const char *m_pszEmpty;
 
 		char m_szName[MAX_IDENT];
 		char m_szLongName[MAX_STRING];
@@ -154,7 +156,7 @@ class GDinputvariable
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::GetDescription(void)
+const char *GDinputvariable::GetDescription(void) const
 {
 	if (m_pszDescription != NULL)
 	{	
@@ -169,7 +171,7 @@ const char *GDinputvariable::GetDescription(void)
 // Purpose: Returns whether or not this variable is read only. Read only variables
 //			cannot be edited in the Entity Properties dialog.
 //-----------------------------------------------------------------------------
-bool GDinputvariable::IsReadOnly(void)
+bool GDinputvariable::IsReadOnly(void) const
 {
 	return(m_bReadOnly);
 }
@@ -179,7 +181,7 @@ bool GDinputvariable::IsReadOnly(void)
 // Purpose: Returns whether or not this variable should be displayed in the Entity
 //			Report dialog.
 //-----------------------------------------------------------------------------
-bool GDinputvariable::IsReportable(void)
+bool GDinputvariable::IsReportable(void) const
 {
 	return(m_bReportable);
 }
@@ -189,7 +191,7 @@ bool GDinputvariable::IsReportable(void)
 // Returns the flag mask (eg 4096) for the flag at the given index. The
 // array is packed, so it isn't just 1 >> nFlag.
 //-----------------------------------------------------------------------------
-int GDinputvariable::GetFlagMask(int nFlag)
+int GDinputvariable::GetFlagMask(intp nFlag) const
 {
 	Assert(m_eType == ivFlags);
 	return m_Items.Element(nFlag).iValue;
@@ -199,7 +201,7 @@ int GDinputvariable::GetFlagMask(int nFlag)
 //-----------------------------------------------------------------------------
 // Returns the caption text (eg "Only break on trigger") for the flag at the given index.
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::GetFlagCaption(int nFlag)
+const char *GDinputvariable::GetFlagCaption(intp nFlag) const
 {
 	Assert(m_eType == ivFlags);
 	return m_Items.Element(nFlag).szCaption;
@@ -209,7 +211,7 @@ const char *GDinputvariable::GetFlagCaption(int nFlag)
 //-----------------------------------------------------------------------------
 // Returns the caption text (eg "Yes") for the choice at the given index.
 //-----------------------------------------------------------------------------
-const char *GDinputvariable::GetChoiceCaption(int nChoice)
+const char *GDinputvariable::GetChoiceCaption(intp nChoice) const
 {
 	Assert(m_eType == ivChoices);
 	return m_Items.Element(nChoice).szCaption;

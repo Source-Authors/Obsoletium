@@ -17,7 +17,7 @@ struct MapError;
 class CMapClass;
 
 
-class CMapCheckDlg : public CDialog
+class CMapCheckDlg : public CBaseDlg
 {
 public:
 

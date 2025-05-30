@@ -1166,7 +1166,7 @@ bool CTeamplayRoundBasedRules::CheckTimeLimit( bool bAllowEnd /*= true*/ )
 	{
 		// If there's less than 5 minutes to go, just switch now. This avoids the problem
 		// of sudden death modes starting shortly after a new round starts.
-		const int iMinTime = 5;
+		constexpr inline int iMinTime = 5;
 		bool bSwitchDueToTime = ( mp_timelimit.GetInt() > iMinTime && GetTimeLeft() < (iMinTime * 60) );
 
 		if ( IsInTournamentMode() == true  )

@@ -227,7 +227,7 @@ public:
 			void			SetInstanceRendering( InstanceRenderingState_t State );
 
 			void			SetInstanceRendering( bool InstanceRendering ) { m_bInstanceRendering = InstanceRendering; }
-	virtual	void			PushInstanceData( CMapInstance *pInstanceClass, Vector &InstanceOrigin, QAngle &InstanceAngles );
+	virtual	void			PushInstanceData( CMapInstance *pInstanceClass, const Vector &InstanceOrigin, const QAngle &InstanceAngles );
 	virtual	void			PopInstanceData( void );
 			bool			GetInstanceRendering( void ) { return m_bInstanceRendering; }
 			CMapInstance	*GetInstanceClass( void ) { return m_CurrentInstanceState.m_pInstanceClass; }
@@ -243,14 +243,15 @@ protected:
 	bool GetRequiredMaterial( const char *pName, IMaterial* &pMaterial );
 	void UpdateStudioRenderConfig( bool bFlat, bool bWireframe );
 	// client space helper functions:
-	void DrawFilledRect( Vector2D& pt1, Vector2D& pt2, unsigned char *pColor, bool bBorder );
+	void DrawFilledRect( const Vector2D& pt1, const Vector2D& pt2, unsigned char *pColor, bool bBorder );
 	void DrawCross( Vector2D& pt1, Vector2D& pt2, unsigned char *pColor );
 	void DrawCircle( Vector2D &vCenter, float fRadius, int nSegments, unsigned char *pColor );
 	void DrawRect( Vector2D& pt1, Vector2D& pt2, unsigned char *pColor );
 
 protected:
 	CMapView		*m_pView;
-	unsigned long	m_DefaultFont;
+	// dimhotepus: x86-64 port.
+	uintp			m_DefaultFont;
 	bool			m_bIsClientSpace;
 
 	bool					m_bIsLocalTransform;
@@ -308,7 +309,7 @@ protected:
 #endif // STENCIL_AS_CALLS
 	int										m_nNumInstancesRendered;	// number of instances rendered that impacted the stencil buffer
 	CUtlVector< InstanceRenderingState_t >	m_InstanceRenderingState;	// the instance rendering state stack
-
+	bool									m_bRenderModeLightPreviewRaytracedMaterialsReferenced;
 };
 
 #endif // RENDER_H

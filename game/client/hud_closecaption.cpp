@@ -31,19 +31,19 @@
 extern ISoundEmitterSystemBase *soundemitterbase;
 
 // Marked as FCVAR_USERINFO so that the server can cull CC messages before networking them down to us!!!
-ConVar closecaption( "closecaption", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX | FCVAR_USERINFO, "Enable close captioning." );
+ConVar closecaption( "closecaption", "0", FCVAR_ARCHIVE | FCVAR_USERINFO, "Enable close captioning." );
 extern ConVar cc_lang;
 static ConVar cc_linger_time( "cc_linger_time", "1.0", FCVAR_ARCHIVE, "Close caption linger time." );
 static ConVar cc_predisplay_time( "cc_predisplay_time", "0.25", FCVAR_ARCHIVE, "Close caption delay before showing caption." );
 static ConVar cc_captiontrace( "cc_captiontrace", "1", 0, "Show missing closecaptions (0 = no, 1 = devconsole, 2 = show in hud)" );
-static ConVar cc_subtitles( "cc_subtitles", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "If set, don't show sound effect captions, just voice overs (i.e., won't help hearing impaired players)." );
+static ConVar cc_subtitles( "cc_subtitles", "0", FCVAR_ARCHIVE, "If set, don't show sound effect captions, just voice overs (i.e., won't help hearing impaired players)." );
 ConVar english( "english", "1", FCVAR_USERINFO, "If set to 1, running the english language set of assets." );
 static ConVar cc_smallfontlength( "cc_smallfontlength", "300", 0, "If text stream is this long, force usage of small font size." );
 
 #define	MAX_CAPTION_CHARACTERS		4096
 
-#define CAPTION_PAN_FADE_TIME		0.5			// The time it takes for a line to fade while panning over a large entry
-#define CAPTION_PAN_SLIDE_TIME		0.5			// The time it takes for a line to slide on while panning over a large entry
+#define CAPTION_PAN_FADE_TIME		0.5f			// The time it takes for a line to fade while panning over a large entry
+#define CAPTION_PAN_SLIDE_TIME		0.5f			// The time it takes for a line to slide on while panning over a large entry
 
 
 // A work unit is a pre-processed chunk of CC text to display
@@ -93,7 +93,7 @@ public:
 	void Dump()
 	{
 		char buf[ 2048 ];
-		g_pVGuiLocalize->ConvertUnicodeToANSI( GetStream(), buf, sizeof( buf ) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( GetStream(), buf );
 
 		Msg( "x = %i, y = %i, w = %i h = %i text %s\n", m_nX, m_nY, m_nWidth, m_nHeight, buf );
 	}
@@ -198,11 +198,8 @@ void CCloseCaptionWorkUnit::SetStream( const wchar_t *stream )
 	delete[] m_pszStream;
 	m_pszStream = NULL;
 
-	int len = wcslen( stream );
-	Assert( len < 4096 );
-	m_pszStream = new wchar_t[ len + 1 ];
-	wcsncpy( m_pszStream, stream, len );
-	m_pszStream[ len ] = L'\0';
+	Assert( V_wcslen( stream ) < 4096 );
+	m_pszStream = V_wcsdup( m_pszStream );
 }
 
 const wchar_t *CCloseCaptionWorkUnit::GetStream() const
@@ -593,8 +590,8 @@ public:
 		DataCacheStatus_t status;
 		DataCacheLimits_t limits;
 		GetCacheSection()->GetStatus( &status, &limits );
-		int bytesUsed = status.nBytes;
-		int bytesTotal = limits.nMaxBytes;
+		size_t bytesUsed = status.nBytes;
+		size_t bytesTotal = limits.nMaxBytes;
 
 		float percent = 100.0f * (float)bytesUsed / (float)bytesTotal;
 
@@ -637,7 +634,7 @@ public:
 
 		CUtlRBTree< AsyncCaption_t::BlockInfo_t, unsigned short >& requested = m_Db[ fileIndex ].m_RequestedBlocks;
 
-		int idx = requested.Find( search );
+		auto idx = requested.Find( search );
 		if ( idx == requested.InvalidIndex() )
 		{
 			entry = false;
@@ -668,7 +665,7 @@ public:
 
 		CUtlRBTree< AsyncCaption_t::BlockInfo_t, unsigned short >& requested = m_Db[ dbFileIndex ].m_RequestedBlocks;
 
-		int idx = FindOrAddBlock( dbFileIndex, blockNum );
+		auto idx = FindOrAddBlock( dbFileIndex, blockNum );
 		if ( idx == requested.InvalidIndex() )
 		{
 			Assert( 0 );
@@ -731,7 +728,7 @@ public:
 	// Purpose: Touch the cache or load the scene into the cache for the first time
 	// Input  : *filename - 
 	//-----------------------------------------------------------------------------
-	int FindOrAddBlock( int dbFileIndex, int blockNum )
+	unsigned short FindOrAddBlock( int dbFileIndex, int blockNum )
 	{
 		const char *dbname = m_Db[ dbFileIndex ].m_DataBaseFile.String();
 
@@ -741,7 +738,7 @@ public:
 		search.blocknum = blockNum;
 		search.fileindex = dbFileIndex;
 
-		int idx = requested.Find( search );
+		auto idx = requested.Find( search );
 		if ( idx != requested.InvalidIndex() )
 		{
 			// Move it to head of LRU
@@ -779,12 +776,12 @@ public:
 
 	void Clear()
 	{
-		for ( int file = 0; file < m_Db.Count(); ++file )
+		for ( intp file = 0; file < m_Db.Count(); ++file )
 		{
 			CUtlRBTree< AsyncCaption_t::BlockInfo_t, unsigned short >& requested = m_Db[ file ].m_RequestedBlocks;
 
-			int c = requested.Count();
-			for ( int i = 0; i  < c; ++i )
+			auto c = requested.Count();
+			for ( std::remove_reference_t<decltype(requested)>::IndexType_t i = 0; i  < c; ++i )
 			{
 				memhandle_t dat = requested[ i ].handle;
 				CacheRemove( dat );
@@ -1590,18 +1587,11 @@ void CHudCloseCaption::CreateFonts( void )
 {
 	vgui::IScheme *pScheme = vgui::scheme()->GetIScheme( GetScheme() );
 
-	m_hFonts[CCFONT_NORMAL] = pScheme->GetFont( "CloseCaption_Normal" );
-
-	if ( IsPC() )
-	{
-		m_hFonts[CCFONT_BOLD] = pScheme->GetFont( "CloseCaption_Bold" );
-		m_hFonts[CCFONT_ITALIC] = pScheme->GetFont( "CloseCaption_Italic" );
-		m_hFonts[CCFONT_ITALICBOLD] = pScheme->GetFont( "CloseCaption_BoldItalic" );
-	}
-	else
-	{
-		m_hFonts[CCFONT_SMALL] = pScheme->GetFont( "CloseCaption_Small" );
-	}
+	// dimhotepus: Make proportional to align with 2K+ screens.
+	m_hFonts[CCFONT_NORMAL] = pScheme->GetFont( "CloseCaption_Normal", true );
+	m_hFonts[CCFONT_BOLD] = pScheme->GetFont( "CloseCaption_Bold", true );
+	m_hFonts[CCFONT_ITALIC] = pScheme->GetFont( "CloseCaption_Italic", true );
+	m_hFonts[CCFONT_ITALICBOLD] = pScheme->GetFont( "CloseCaption_BoldItalic", true );
 
 	m_nLineHeight = MAX( 6, vgui::surface()->GetFontTall( m_hFonts[ CCFONT_NORMAL ] ) );
 }
@@ -1710,7 +1700,6 @@ void CHudCloseCaption::ComputeStreamWork( int available_width, CCloseCaptionItem
 	WorkUnitParams params;
 
 	const wchar_t *curpos = item->GetStream();
-	int streamlen = wcslen( curpos );
 	CUtlVector< Color > colorStack;
 
 	const wchar_t *most_recent_space = NULL;
@@ -1786,15 +1775,8 @@ void CHudCloseCaption::ComputeStreamWork( int available_width, CCloseCaptionItem
 			continue;
 		}
 
-		int font;
-		if ( IsPC() )
-		{
-			font = params.GetFontNumber();
-		}
-		else
-		{
-			font = streamlen >= cc_smallfontlength.GetInt() ? CCFONT_SMALL : CCFONT_NORMAL;
-		}
+		int font = params.GetFontNumber();
+
 		vgui::HFont useF = m_hFonts[font];
 		params.font = useF;
 
@@ -1916,8 +1898,7 @@ void CHudCloseCaption::DrawStream( wrect_t &rcText, wrect_t &rcWindow, CCloseCap
 		}
 
 		Color useColor = wu->GetColor();
-
-		useColor[ 3 ] *= flLineAlpha;
+		useColor[ 3 ] = static_cast<byte>(useColor[ 3 ] * flLineAlpha);
 
 		if ( !item->IsValid() )
 		{
@@ -1930,7 +1911,7 @@ void CHudCloseCaption::DrawStream( wrect_t &rcText, wrect_t &rcWindow, CCloseCap
 		vgui::surface()->DrawSetTextFont( useF );
 		vgui::surface()->DrawSetTextPos( rcOut.left, rcOut.top );
 		vgui::surface()->DrawSetTextColor( useColor );
-		vgui::surface()->DrawPrintText( wu->GetStream(), wcslen( wu->GetStream() ) );
+		vgui::surface()->DrawPrintText( wu->GetStream(), V_wcslen( wu->GetStream() ) );
 	}
 }
 
@@ -2054,13 +2035,13 @@ public:
 		}
 	}
 
-	bool GetStream( OUT_Z_BYTECAP(bufSizeInBytes) wchar_t *buf, int bufSizeInBytes )
+	bool GetStream( OUT_Z_BYTECAP(bufSizeInBytes) wchar_t *buf, intp bufSizeInBytes )
 	{
-		Assert( bufSizeInBytes >= static_cast<int>(sizeof(buf[0])) );
+		Assert( bufSizeInBytes >= static_cast<intp>(sizeof(buf[0])) );
 		buf[ 0 ] = L'\0';
 
-		int c = m_Tokens.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = m_Tokens.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			caption_t *caption = m_Tokens[ i ];
 			if ( caption->stream == NULL )
@@ -2069,21 +2050,21 @@ public:
 			}
 		}
 
-		unsigned int curlen = 0;
-		unsigned int maxlen = bufSizeInBytes / sizeof( wchar_t );
+		intp curlen = 0;
+		const intp maxlen = bufSizeInBytes / static_cast<intp>(sizeof(wchar_t));
 
 		// Compose full stream from tokens
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
 			caption_t *caption = m_Tokens[ i ];
-			int len = wcslen( caption->stream ) + 1;
+			intp len = wcslen( caption->stream ) + 1;
 			if ( curlen + len >= maxlen )
 				break;
 
-			wcscat( buf, caption->stream );
+			V_wcscat( buf, caption->stream, maxlen );
 			if ( i < c - 1 ) 
 			{
-				wcscat( buf, L" " );
+				V_wcscat( buf, L" ", maxlen );
 			}
 
 			curlen += len;
@@ -2092,19 +2073,25 @@ public:
 		return true;
 	}
 
-	bool					IsStream() const
+	template<intp bufferSize>
+	bool GetStream( OUT_Z_ARRAY wchar_t (&buf)[bufferSize] )
+	{
+		return GetStream( buf, bufferSize * static_cast<intp>(sizeof(wchar_t)) );
+	}
+
+	bool IsStream() const
 	{
 		return m_bIsStream;
 	}
 
-	void					SetIsStream( bool state )
+	void SetIsStream( bool state )
 	{
 		m_bIsStream = state;
 	}
 
-	void	AddRandomToken( CUtlVector< AsyncCaption_t >& directories )
+	void AddRandomToken( CUtlVector< AsyncCaption_t >& directories )
 	{
-		int dc = directories.Count();
+		intp dc = directories.Count();
 		int fileindex = RandomInt( 0, dc - 1 );
 
 		int c = directories[ fileindex ].m_CaptionDirectory.Count();
@@ -2130,9 +2117,9 @@ public:
 		CaptionLookup_t search;
 		search.SetHash( token );
 
-		int idx = -1;
-		int i;
-		int dc = directories.Count();
+		intp idx = -1;
+		intp i;
+		intp dc = directories.Count();
 		for ( i = 0; i < dc; ++i )
 		{
             idx = directories[ i ].m_CaptionDirectory.Find( search );
@@ -2237,9 +2224,7 @@ private:
 			if ( !in )
 				return;
 
-			int len = wcslen( in );
-			stream = new wchar_t[ len + 1 ];
-			wcsncpy( stream, in, len + 1 );
+			stream = V_wcsdup( in );
 		}
 			
 		char		*token;
@@ -2253,23 +2238,22 @@ private:
 
 void CHudCloseCaption::ProcessAsyncWork()
 {
-	int i;
-	for( i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
+	for( auto i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
 	{
 		// check for data arrival
 		CAsyncCaption *item = m_AsyncWork[ i ];
 		item->ProcessAsyncWork( this, m_AsyncCaptions );
 	}
 	// Now operate on any new data which arrived
-	for( i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex();  )
+	for( auto i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex();  )
 	{
-		int n = m_AsyncWork.Next( i );
+		auto n = m_AsyncWork.Next( i );
 
 		CAsyncCaption *item = m_AsyncWork[ i ];
 		wchar_t stream[ MAX_CAPTION_CHARACTERS ];
 
 		// If we get to the first item with pending async work, stop processing
-		if ( !item->GetStream( stream, sizeof( stream ) ) )
+		if ( !item->GetStream( stream ) )
 		{
 			break;
 		}
@@ -2299,7 +2283,7 @@ void CHudCloseCaption::ProcessAsyncWork()
 
 void CHudCloseCaption::ClearAsyncWork()
 {
-	for ( int i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
+	for ( auto i = m_AsyncWork.Head(); i != m_AsyncWork.InvalidIndex(); i = m_AsyncWork.Next( i ) )
 	{
         CAsyncCaption *item = m_AsyncWork[ i ];
 		delete item;
@@ -2492,7 +2476,7 @@ void CHudCloseCaption::_ProcessCaption( const wchar_t *caption, const char *toke
 void CHudCloseCaption::MsgFunc_CloseCaption(bf_read &msg)
 {
 	char tokenname[ 512 ];
-	msg.ReadString( tokenname, sizeof( tokenname ) );
+	msg.ReadString( tokenname );
 	float duration = msg.ReadShort() * 0.1f;
 	byte flagbyte = msg.ReadByte();
 	bool warnonmissing = flagbyte & CLOSE_CAPTION_WARNIFMISSING ? true : false;
@@ -2829,7 +2813,7 @@ void CHudCloseCaption::FindSound( char const *pchANSI )
 
 		Q_memset( block, 0, data.m_Header.blocksize );
 		CaptionDictionary_t &dict = data.m_CaptionDirectory;
-		for ( int j = 0; j < dict.Count(); ++j )
+		for ( intp j = 0; j < dict.Count(); ++j )
 		{
 			CaptionLookup_t &lu = dict[ j ];
 

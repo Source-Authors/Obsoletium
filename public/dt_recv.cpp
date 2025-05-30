@@ -142,19 +142,28 @@ CStandardRecvProxies g_StandardRecvProxies;
 // ---------------------------------------------------------------------- //
 RecvProp::RecvProp()
 {
-	m_pExtraData = NULL;
-	m_pVarName = NULL;
-	m_Offset = 0;
+	m_pVarName = nullptr;
 	m_RecvType = DPT_Int;
 	m_Flags = 0;
-	m_ProxyFn = NULL;
-	m_DataTableProxyFn = NULL;
-	m_pDataTable = NULL;
-	m_nElements = 1;
-	m_ElementStride = -1;
-	m_pArrayProp = NULL;
-	m_ArrayLengthProxy = NULL;
+	m_StringBufferSize = 0;
+	
 	m_bInsideArray = false;
+
+	m_pExtraData = nullptr;
+
+	m_pArrayProp = nullptr;
+	m_ArrayLengthProxy = nullptr;
+
+	m_ProxyFn = nullptr;
+	m_DataTableProxyFn = nullptr;
+	
+	m_pDataTable = nullptr;
+	m_Offset = 0;
+	
+	m_ElementStride = -1;
+	m_nElements = 1;
+
+	m_pParentArrayPropName = nullptr;
 }
 
 // ---------------------------------------------------------------------- //
@@ -388,7 +397,7 @@ RecvProp RecvPropArray3(
 	int offset,
 	int sizeofVar,
 	int elements,
-	RecvProp pArrayProp,
+	const RecvProp& pArrayProp,
 	DataTableRecvVarProxyFn varProxy						
 	)
 {

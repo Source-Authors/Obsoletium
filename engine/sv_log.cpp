@@ -7,9 +7,8 @@
 //=============================================================================//
 
 #include "server_pch.h"
-#include <time.h>
-#include "server.h"
 #include "sv_log.h"
+#include "server.h"
 #include "filesystem.h"
 #include "filesystem_engine.h"
 #include "tier0/vcrmode.h"
@@ -18,6 +17,7 @@
 #include <proto_oob.h>
 #include "GameEventManager.h"
 #include "netadr.h"
+#include "posix_file_stream.h"
 #include "zlib/zlib.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -469,7 +469,7 @@ void CLog::Printf( const char *fmt, ... )
 	}
 
 	va_start ( argptr, fmt );
-	Q_vsnprintf ( string, sizeof( string ), fmt, argptr );
+	V_vsprintf_safe ( string, fmt, argptr );
 	va_end   ( argptr );
 
 	Print( string );
@@ -540,7 +540,7 @@ void CLog::FireGameEvent( IGameEvent *event )
 
 	if ( Q_strcmp(name, "server_spawn") == 0 )
 	{
-		Printf( "Started map \"%s\" (CRC \"%s\")\n", sv.GetMapName(), MD5_Print( sv.worldmapMD5.bits, MD5_DIGEST_LENGTH ) );
+		Printf( "Started map \"%s\" (CRC \"%s\")\n", sv.GetMapName(), MD5_Print( sv.worldmapMD5.bits ) );
 	}
 
 	else if ( Q_strcmp(name, "server_shutdown") == 0 )
@@ -713,49 +713,52 @@ static bool CreateTempFilename( TempFilename_t &info, const char *filenameBase, 
 // Gzip Filename to Filename.gz.
 static bool gzip_file_compress( const CUtlString &Filename )
 {
-	bool bRet = false;
-
 	// Try to find a unique temp filename.
 	TempFilename_t info;
-	bRet = CreateTempFilename( info, Filename, "log.gz", true );
+	bool bRet = CreateTempFilename( info, Filename, "log.gz", true );
 	if ( !bRet )
 		return false;
 
-	Msg( "Compressing %s to %s...\n", Filename.Get(), info.Filename.Get() );
+	Msg( "Compressing '%s' to '%s'...\n", Filename.Get(), info.Filename.Get() );
 
-	FILE *in = fopen( Filename, "rb" );
-	if ( in )
+	auto [in, errc] = se::posix::posix_file_stream_factory::open( Filename.Get(), "rb" );
+	if ( !errc )
 	{
+		char buf[ 16384 ];
 		for (;;)
 		{
-			char buf[ 16384 ];
-			size_t len = fread( buf, 1, sizeof( buf ), in );
-			if ( ferror( in ) )
+			size_t len;
+			std::tie(len, errc) = in.read( buf, sizeof( buf ), 1, sizeof( buf ) );
+			if ( errc )
 			{
-				Msg( "%s: fread failed.\n", __FUNCTION__ );
+				Warning( "Failed to read from '%s': %s.\n", Filename.Get(), errc.message().c_str() );
 				break;
 			}
+
 			if (len == 0)
 			{
 				bRet = true;
 				break;
 			}
 
-			if ( (size_t)gzwrite( info.fh.gzfile, buf, len ) != len )
+			if ( (size_t)gzwrite( info.fh.gzfile, buf, static_cast<unsigned>(len) ) != len )
 			{
-				Msg( "%s: gzwrite failed.\n", __FUNCTION__ );
+				Warning( "Failed to gzwrite from '%s'.\n", Filename.Get() );
 				break;
 			}
 		}
-
-		if ( gzclose( info.fh.gzfile ) != Z_OK )
-		{
-			Msg( "%s: gzclose failed.\n", __FUNCTION__ );
-			bRet = false;
-		}
-
-		fclose( in );
 	}
+	else
+	{
+		Warning( "Unable to open '%s' for reading: %s.\n", Filename.Get(), errc.message().c_str() );
+	}
+
+	if ( gzclose( info.fh.gzfile ) != Z_OK )
+	{
+		Warning( "Failed to gzclose on '%s'.\n", Filename.Get() );
+		bRet = false;
+	}
+
 
 	return bRet;
 }

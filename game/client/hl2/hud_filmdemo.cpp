@@ -114,7 +114,7 @@ void CHudFilmDemo::Paint()
 			iLength += vgui::surface()->GetCharacterWidth( hFont, *wch );
 		}
 		vgui::surface()->DrawSetTextPos( floor(wide * 0.25) - (iLength / 2), m_iLeftY );
-		vgui::surface()->DrawPrintText( tempString, wcslen(tempString) );
+		vgui::surface()->DrawPrintText( tempString, V_wcslen(tempString) );
 	}
 
  	tempString = g_pVGuiLocalize->Find( m_pRightStringID );
@@ -126,7 +126,7 @@ void CHudFilmDemo::Paint()
 			iLength += vgui::surface()->GetCharacterWidth( hFont, *wch );
 		}
  		vgui::surface()->DrawSetTextPos( ceil(wide * 0.75) - (iLength / 2), m_iRightY );
-		vgui::surface()->DrawPrintText( tempString, wcslen(tempString) );
+		vgui::surface()->DrawPrintText( tempString, V_wcslen(tempString) );
 	}
 }
 
@@ -160,12 +160,12 @@ void CHudFilmDemo::SetFilmDemoActive( bool bActive )
 
 void CHudFilmDemo::SetLeftStringID( const char *id )
 {
-	Q_strcpy( m_pLeftStringID, id );
+	V_strcpy_safe( m_pLeftStringID, id );
 }
 
 void CHudFilmDemo::SetRightStringID( const char *id )
 {
-	Q_strcpy( m_pRightStringID, id );
+	V_strcpy_safe( m_pRightStringID, id );
 }
 
 void EnableHUDFilmDemo( bool bEnable, const char *left_string_id, const char *right_string_id )

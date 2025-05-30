@@ -249,7 +249,7 @@ void CEditGameClass::Upstream_FixBad()
 void CEditGameClass::SetClass(LPCTSTR pszClass, bool bLoading)
 {
 	extern GameData *pGD;
-	strcpy(m_szClass, pszClass);
+	V_strcpy_safe(m_szClass, pszClass);
 
 	StripEdgeWhiteSpace(m_szClass);
 
@@ -268,13 +268,13 @@ void CEditGameClass::SetClass(LPCTSTR pszClass, bool bLoading)
 CEditGameClass *CEditGameClass::CopyFrom(CEditGameClass *pFrom)
 {
 	m_pClass = pFrom->m_pClass;
-	strcpy( m_szClass, pFrom->m_szClass );
+	V_strcpy_safe( m_szClass, pFrom->m_szClass );
 
 	//
 	// Copy all the keys.
 	//
 	m_KeyValues.RemoveAll();
-	for ( int i=pFrom->GetFirstKeyValue(); i != pFrom->GetInvalidKeyValue(); i=pFrom->GetNextKeyValue( i ) )
+	for ( auto i=pFrom->GetFirstKeyValue(); i != pFrom->GetInvalidKeyValue(); i=pFrom->GetNextKeyValue( i ) )
 	{
 		m_KeyValues.SetValue(pFrom->GetKey(i), pFrom->GetKeyValue(i));
 	}
@@ -355,7 +355,9 @@ void CEditGameClass::GetAngles(QAngle &vecAngles)
 	const char *pszAngles = GetKeyValue("angles");
 	if (pszAngles != NULL)
 	{
-		sscanf(pszAngles, "%f %f %f", &vecAngles[PITCH], &vecAngles[YAW], &vecAngles[ROLL]);
+		[[maybe_unused]] const int scanned =
+			sscanf(pszAngles, "%f %f %f", &vecAngles[PITCH], &vecAngles[YAW], &vecAngles[ROLL]);
+		Assert(scanned == 3);
 	}
 }
 
@@ -430,7 +432,7 @@ ChunkFileResult_t CEditGameClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInf
 	//
 	// Consider all the keyvalues in this object for serialization.
 	//
-	for ( int z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
+	for ( auto z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
 	{
 		MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(z);
 
@@ -518,9 +520,10 @@ ChunkFileResult_t CEditGameClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInf
 				CEntityConnection *pConnection = Connections_Get(i);
 				if (pConnection != NULL)
 				{
-					char szTemp[512];
+					// dimhotepus: 512 -> 1024
+					char szTemp[1024];
 
-					sprintf(szTemp, "%s,%s,%s,%g,%d", pConnection->GetTargetName(), pConnection->GetInputName(), pConnection->GetParam(), pConnection->GetDelay(), pConnection->GetTimesToFire());
+					V_sprintf_safe(szTemp, "%s,%s,%s,%g,%d", pConnection->GetTargetName(), pConnection->GetInputName(), pConnection->GetParam(), pConnection->GetDelay(), pConnection->GetTimesToFire());
 					eResult = pFile->WriteKeyValue(pConnection->GetOutputName(), szTemp);
 
 					if (eResult != ChunkFile_Ok)
@@ -622,7 +625,7 @@ ChunkFileResult_t CEditGameClass::LoadConnectionsCallback(CChunkFile *pFile, CEd
 //-----------------------------------------------------------------------------
 // Purpose: Returns all the spawnflags.
 //-----------------------------------------------------------------------------
-unsigned long CEditGameClass::GetSpawnFlags(void)
+unsigned long CEditGameClass::GetSpawnFlags(void) const
 {
 	LPCTSTR pszVal = GetKeyValue("spawnflags");
 	if (pszVal == NULL)
@@ -631,7 +634,9 @@ unsigned long CEditGameClass::GetSpawnFlags(void)
 	}
 
 	unsigned long val = 0;
-	sscanf( pszVal, "%lu", &val );
+	[[maybe_unused]] const int scanned = sscanf( pszVal, "%lu", &val );
+	Assert(scanned == 1);
+
 	return val;
 }
 
@@ -639,7 +644,7 @@ unsigned long CEditGameClass::GetSpawnFlags(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns true if a given spawnflag (or flags) is set, false if not.
 //-----------------------------------------------------------------------------
-bool CEditGameClass::GetSpawnFlag(unsigned long nFlags)
+bool CEditGameClass::GetSpawnFlag(unsigned long nFlags) const
 {
 	unsigned long nSpawnFlags = GetSpawnFlags();
 	return((nSpawnFlags & nFlags) != 0);

@@ -13,7 +13,7 @@
 #endif
 
 #include <vgui_controls/Panel.h>
-#include <utlvector.h>
+#include <tier1/utlvector.h>
 
 namespace vgui
 {
@@ -41,7 +41,11 @@ protected:
 	void PerformLayout() override;
 	void Paint() override;
 	MESSAGE_FUNC( OnMenuClose, "MenuClose" );
+#ifdef PLATFORM_64BITS
+	MESSAGE_FUNC_PTR( OnCursorEnteredMenuButton, "CursorEnteredMenuButton", VPanel);
+#else
 	MESSAGE_FUNC_INT( OnCursorEnteredMenuButton, "CursorEnteredMenuButton", VPanel);
+#endif
 
 private:
 	CUtlVector<MenuButton *> m_pMenuButtons;

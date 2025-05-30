@@ -131,8 +131,8 @@ protected:
 
 #ifdef VPROF_ENABLED
 	int m_nVProfFrame;
-	intp	*m_pFrameCounter;
-	intp	*m_pGlobalCounter;
+	uintp	*m_pFrameCounter;
+	uintp	*m_pGlobalCounter;
 #endif
 
 #ifdef _DEBUG
@@ -2186,7 +2186,7 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 
 	char tempbuf[256];
 	char* temp = tempbuf;
-	sprintf( tempbuf,"\nVerts: (Vertex Format %llx)\n", fmt);
+	V_sprintf_safe( tempbuf,"\nVerts: (Vertex Format %llx)\n", fmt);
 	Plat_DebugString(tempbuf);
 
 	CVertexBufferBase::PrintVertexFormat( fmt );
@@ -2220,7 +2220,7 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		if ( fmt & VERTEX_BONE_INDEX )
 		{
 			unsigned char *pIndex = BoneIndex( desc, i );
-			temp += sprintf( temp, "BI %d %d %d %d ", ( int )pIndex[0], ( int )pIndex[1], ( int )pIndex[2], ( int )pIndex[3] );
+			temp += sprintf( temp, "BI %hhu %hhu %hhu %hhu ", pIndex[0], pIndex[1], pIndex[2], pIndex[3] );
 			Assert( pIndex[0] < 16 );
 			Assert( pIndex[1] < 16 );
 			Assert( pIndex[2] < 16 );
@@ -2269,11 +2269,11 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		temp = tempbuf;
 	}
 
-	sprintf( tempbuf,"\nIndices: %d\n", nIndexCount );
+	V_sprintf_safe( tempbuf,"\nIndices: %d\n", nIndexCount );
 	Plat_DebugString(tempbuf);
 	for ( i = 0; i < nIndexCount; ++i )
 	{
-		temp += sprintf( temp, "%d ", ( int )desc.m_pIndices[i] );
+		temp += sprintf( temp, "%hu ", desc.m_pIndices[i] );
 		if ((i & 0x0F) == 0x0F)
 		{
 			sprintf( temp, "\n" );
@@ -3451,17 +3451,7 @@ void CMeshDX8::RenderPass()
 
 					numPrimitives );// Number of primitives to render. The number of vertices used is a function of the primitive count and the primitive type.
 			}
-		}
 	}
-
-	if ( g_pLastVertex )
-	{
-		g_pLastVertex->MarkUsedInRendering();
-	}
-
-	if( g_pLastIndex )
-	{
-		g_pLastIndex->MarkUsedInRendering();
 	}
 }
 
@@ -4717,9 +4707,9 @@ void CBufferedMeshDX8::LockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& 
 		if (DebugTrace())
 		{
 			if (m_ExtraIndices == 3)
-				sprintf(buf,"Link Index: %d %d\n", m_LastIndex, m_LastIndex);
+				V_sprintf_safe(buf,"Link Index: %d %d\n", m_LastIndex, m_LastIndex);
 			else
-				sprintf(buf,"Link Index: %d\n", m_LastIndex);
+				V_sprintf_safe(buf,"Link Index: %d\n", m_LastIndex);
 			Plat_DebugString(buf);
 		}
 		*desc.m_pIndices++ = m_LastIndex;
@@ -4767,7 +4757,7 @@ void CBufferedMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t
 			if (DebugTrace())
 			{
 				char buf[32];
-				sprintf(buf,"Link Index: %d\n", *desc.m_pIndices);
+				V_sprintf_safe(buf,"Link Index: %d\n", *desc.m_pIndices);
 				Plat_DebugString(buf);
 			}
 		}
@@ -4970,9 +4960,6 @@ void CMeshMgr::DestroyDynamicIndexBuffer()
 //-----------------------------------------------------------------------------
 void CMeshMgr::CreateVertexIDBuffer()
 {
-	if ( IsX360() )
-		return;
-
 	DestroyVertexIDBuffer();
 
 	// Track mesh allocations
@@ -5200,8 +5187,7 @@ void CMeshMgr::CopyStaticMeshIndexBufferToTempMeshIndexBuffer( CTempMeshDX8 *pDs
 	CIndexBuffer *srcIndexBuffer = pSrcIndexMesh->GetIndexBuffer();
 	int dummy = 0;
 	unsigned short *srcIndexArray = srcIndexBuffer->Lock( false, nIndexCount, dummy, 0 );
-	int i;
-	for( i = 0; i < nIndexCount; i++ )
+	for( int i = 0; i < nIndexCount; i++ )
 	{
 		dstMeshBuilder.Index( srcIndexArray[i] );
 		dstMeshBuilder.AdvanceIndex();

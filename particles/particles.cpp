@@ -131,14 +131,14 @@ public:
 
 	CParticleSystemDefinition* AddParticleSystem( CDmxElement *pParticleSystem );
 	intp Count() const;
-	intp NameCount() const;
+	UtlSymId_t NameCount() const;
 	CParticleSystemDefinition* GetParticleSystem( intp i );
 	ParticleSystemHandle_t FindParticleSystemHandle( const char *pName );
 	CParticleSystemDefinition* FindParticleSystem( ParticleSystemHandle_t h );
 	CParticleSystemDefinition* FindParticleSystem( const char *pName );
 	CParticleSystemDefinition* FindParticleSystem( const DmObjectId_t &id );
 	
-	CParticleSystemDefinition* operator[]( intp idx )
+	CParticleSystemDefinition* operator[]( UtlSymId_t idx )
 	{
 		return m_ParticleNameMap[ idx ];
 	}
@@ -229,7 +229,7 @@ CParticleSystemDefinition* CParticleSystemDictionary::AddParticleSystem( CDmxEle
 	return pDef;
 }
 
-intp CParticleSystemDictionary::NameCount() const
+UtlSymId_t CParticleSystemDictionary::NameCount() const
 {
 	return m_ParticleNameMap.GetNumStrings();
 }
@@ -1021,9 +1021,10 @@ void CParticleCollection::Init( CParticleSystemDefinition *pDef, float flDelay, 
 	}
 	else
 	{
-		m_nRandomSeed = (intp)this;
+		m_nRandomSeed = static_cast<int>(reinterpret_cast<intp>(this));
 #ifndef _DEBUG
-		m_nRandomSeed += Plat_MSTime();
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		m_nRandomSeed += static_cast<int>((Plat_USTime() / 1000) % std::numeric_limits<int>::max());
 #endif
 	}
 
@@ -2888,7 +2889,7 @@ public:
 	virtual void TraceLine( const Vector& vecAbsStart,
 							const Vector& vecAbsEnd, unsigned int mask, 
 							const class IHandleEntity *ignore,
-							int collisionGroup, CBaseTrace *ptr )
+							[[maybe_unused]] int collisionGroup, CBaseTrace *ptr )
 	{
 		ptr->fraction = 1.0;								// no hit
 	}
@@ -2897,7 +2898,7 @@ public:
 		CParticleCollection *pParticles,
 		int nControlPointNumber, 
 		int nNumPtsOut,
-		float flBBoxScale,
+		[[maybe_unused]] float flBBoxScale,
 		int nNumTrysToGetAPointInsideTheModel,
 		Vector *pPntsOut,
 		Vector vecDirectionBias,
@@ -3033,8 +3034,8 @@ void CParticleSystemMgr::UncacheAllParticleSystems()
 		m_pParticleSystemDictionary->GetParticleSystem( i )->Uncache();
 	}
 
-	nCount = m_pParticleSystemDictionary->NameCount();
-	for ( ParticleSystemHandle_t h = 0; h < nCount; ++h )
+	UtlSymId_t nNameCount  = m_pParticleSystemDictionary->NameCount();
+	for ( ParticleSystemHandle_t h = 0; h < nNameCount; ++h )
 	{
 		m_pParticleSystemDictionary->FindParticleSystem( h )->Uncache();
 	}
@@ -3435,7 +3436,7 @@ const char *CParticleSystemMgr::GetParticleSystemNameFromIndex( ParticleSystemHa
 	return pDef ? pDef->GetName() : "Unknown";
 }
 
-intp CParticleSystemMgr::GetParticleSystemCount( void )
+UtlSymId_t CParticleSystemMgr::GetParticleSystemCount( void )
 {
 	return m_pParticleSystemDictionary->NameCount();
 }
@@ -3471,8 +3472,8 @@ CParticleCollection *CParticleSystemMgr::CreateParticleCollection( const DmObjec
 	if ( !pDef )
 	{
 		char pBuf[256];
-		UniqueIdToString( id, pBuf, sizeof(pBuf) );
-		Warning( "Attempted to create unknown particle system id %s\n", pBuf );
+		Warning( "Attempted to create unknown particle system id %s\n",
+                        UniqueIdToString(id, pBuf) ? pBuf : "N/A" );
 		return NULL;
 	}
 
@@ -3652,8 +3653,7 @@ void CParticleSystemMgr::BuildBatchList( intp iRenderCache, IMatRenderContext *p
 	int nRemainingVertices = nMaxVertices;
 	int nRemainingIndices = nMaxIndices;
 
-	intp i = batches.AddToTail();
-	Batch_t* pBatch = &batches[i];
+	Batch_t* pBatch = &batches[batches.AddToTail()];
 	pBatch->m_nVertCount = 0;
 	pBatch->m_nIndexCount = 0;
 
@@ -3717,7 +3717,7 @@ void CParticleSystemMgr::DumpProfileInformation( void )
 	FileHandle_t fh = g_pFullFileSystem->Open( "particle_profile.csv", "w" );
 	g_pFullFileSystem->FPrintf( fh, "numframes,%d\n", m_nNumFramesMeasured );
 	g_pFullFileSystem->FPrintf( fh, "name, total time, max time, max particles, allocated particles\n");
-	for( int i=0; i < m_pParticleSystemDictionary->NameCount(); i++ )
+	for( UtlSymId_t i=0; i < m_pParticleSystemDictionary->NameCount(); i++ )
 	{
 		CParticleSystemDefinition *p = ( *m_pParticleSystemDictionary )[ i ];
 		if ( p->m_nMaximumActiveParticles )
@@ -3739,14 +3739,14 @@ void CParticleSystemMgr::DumpProfileInformation( void )
 #endif
 }
 
-void CParticleSystemMgr::CommitProfileInformation( bool bCommit )
+void CParticleSystemMgr::CommitProfileInformation( [[maybe_unused]] bool bCommit )
 {
 #if MEASURE_PARTICLE_PERF
 	if ( 1 )
 	{
 		if ( bCommit )
 			m_nNumFramesMeasured++;
-		for( int i=0; i < m_pParticleSystemDictionary->NameCount(); i++ )
+		for( UtlSymId_t i=0; i < m_pParticleSystemDictionary->NameCount(); i++ )
 		{
 			CParticleSystemDefinition *p = ( *m_pParticleSystemDictionary )[ i ];
 			if ( bCommit )
@@ -3852,7 +3852,7 @@ void IParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 	CParticleCollection *pParticles,
 	int nControlPointNumber, 
 	int nNumPtsOut,
-	float flBBoxScale,
+	[[maybe_unused]] float flBBoxScale,
 	int nNumTrysToGetAPointInsideTheModel,
 	Vector *pPntsOut,
 	Vector vecDirectionalBias,

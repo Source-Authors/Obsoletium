@@ -19,7 +19,7 @@ class CBaseGamesPage;
 // Purpose: Acts like a regular ListPanel but forwards enter key presses
 // to its outer control.
 //-----------------------------------------------------------------------------
-class CGameListPanel : public vgui::ListPanel
+class CGameListPanel final : public vgui::ListPanel
 {
 public:
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameListPanel, vgui::ListPanel );
@@ -32,7 +32,7 @@ private:
 	CBaseGamesPage *m_pOuter;
 };
 
-class CQuickListMapServerList : public CUtlVector< int >
+class CQuickListMapServerList final : public CUtlVector< int >
 {
 public:
 	CQuickListMapServerList() : CUtlVector< int >( 1, 0 )
@@ -52,7 +52,7 @@ public:
 };
 
 
-class CCheckBoxWithStatus : public vgui::CheckButton
+class CCheckBoxWithStatus final : public vgui::CheckButton
 {
 public:
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CCheckBoxWithStatus, vgui::CheckButton );
@@ -113,7 +113,7 @@ public:
 	};
 
 	CBaseGamesPage( vgui::Panel *parent, const char *name, EPageType eType, const char *pCustomResFilename=NULL);
-	~CBaseGamesPage();
+	virtual ~CBaseGamesPage();
 
 	void PerformLayout() override;
 	void ApplySchemeSettings(vgui::IScheme *pScheme) override;
@@ -122,7 +122,7 @@ public:
 	gameserveritem_t *GetServer(uintp serverID) override;
 	const char *GetConnectCode() override;
 
-	uint32 GetServerFilters( MatchMakingKeyValuePair_t **pFilters );
+	intp GetServerFilters( MatchMakingKeyValuePair_t **pFilters );
 
 	virtual void SetRefreshing(bool state);
 

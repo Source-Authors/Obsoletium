@@ -12,18 +12,13 @@ $Include "$SRCDIR\vpc_scripts\source_exe_base.vpc"
 
 $Configuration
 {
-	$Compiler
+	$Linker [$WINDOWS]
 	{
-		$AdditionalOptions					"$BASE /EHa"
-	}
-
-	$Linker [$WIN32]
-	{
-		$EnableLargeAddresses				"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"
+		$AdditionalDependencies				"$BASE User32.lib Wsock32.lib"
 	}
 }
 
-$Project "Hammer_launcher"
+$Project "hammer_launcher"
 {
 	$Folder	"Source Files"
 	{
@@ -31,11 +26,6 @@ $Project "Hammer_launcher"
 		$File	"main.cpp"
 	}
 
-	$Folder "Resources"
-	{
-		$File	"hammer_launcher.rc"
-	}
-	
 	$Folder	"Link Libraries"
 	{
 		$Lib appframework

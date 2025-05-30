@@ -4,7 +4,6 @@
 // Used by QC_Eyes.rc
 //
 #define IDD_QC_EYES_DIALOG              102
-#define IDR_MAINFRAME                   128
 #define IDB_EYE_DEFAULT                 150
 #define IDB_EYE_LOWER_HI                151
 #define IDB_EYE_LOWER_LO                152
@@ -65,6 +64,10 @@
 #define IDC_LOWER_LEFT_LID_RAISED_LABEL 1046
 #define IDC_LOWER_LEFT_LID_NEUTRAL_LABEL 1047
 #define IDC_LOWER_LEFT_LID_LOWERED_LABEL 1048
+
+
+#define SRC_IDI_APP_MAIN 101
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Valve Model Eyes Editor"
 
 // Next default values for new objects
 // 

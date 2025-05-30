@@ -214,7 +214,7 @@ public:
 // Interface to allow the particle system to call back into the client
 //-----------------------------------------------------------------------------
 
-#define PARTICLE_SYSTEM_QUERY_INTERFACE_VERSION "VParticleSystemQuery001"
+constexpr inline char PARTICLE_SYSTEM_QUERY_INTERFACE_VERSION[]{"VParticleSystemQuery001"};
 
 class IParticleSystemQuery : public IAppSystem
 {
@@ -296,7 +296,7 @@ public:
 // separate particle system .libs
 //
 //-----------------------------------------------------------------------------
-typedef intp ParticleSystemHandle_t;
+typedef UtlSymId_t ParticleSystemHandle_t;
 
 class CParticleSystemMgr
 {
@@ -344,7 +344,8 @@ public:
 	const char *GetParticleSystemNameFromIndex( ParticleSystemHandle_t iIndex );
 
 	// Return the number of particle systems in our dictionary
-	intp GetParticleSystemCount( void );
+	// dimhotepus: intp -> UtlSymId_t
+	UtlSymId_t GetParticleSystemCount( void );
 
 	// call to get available particle operator definitions
 	// NOTE: FUNCTION_CHILDREN will return a faked one, for ease of writing the editor
@@ -513,7 +514,7 @@ enum ParticleOperatorId_t
 //-----------------------------------------------------------------------------
 // Class factory for particle operators
 //-----------------------------------------------------------------------------
-class IParticleOperatorDefinition
+abstract_class IParticleOperatorDefinition
 {
 public:
 	virtual const char *GetName() const = 0;
@@ -589,13 +590,13 @@ public:
 	}
 
 	// a particle simulator does this
-	virtual void Operate( CParticleCollection *pParticles, float flOpStrength, void *pContext ) const
+	virtual void Operate( [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] float flOpStrength, [[maybe_unused]] void *pContext ) const
 	{
 	}
 
 	// a renderer overrides this
-	virtual void Render( IMatRenderContext *pRenderContext, 
-						 CParticleCollection *pParticles, void *pContext ) const
+	virtual void Render( [[maybe_unused]] IMatRenderContext *pRenderContext, 
+						 [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] void *pContext ) const
 	{
 	}
 
@@ -604,12 +605,12 @@ public:
 		return true;
 	}
 
-	virtual void RenderUnsorted( CParticleCollection *pParticles, void *pContext, IMatRenderContext *pRenderContext, CMeshBuilder &meshBuilder, int nVertexOffset, int nFirstParticle, int nParticleCount ) const
+	virtual void RenderUnsorted( [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] void *pContext, [[maybe_unused]] IMatRenderContext *pRenderContext, [[maybe_unused]] CMeshBuilder &meshBuilder, [[maybe_unused]] int nVertexOffset, [[maybe_unused]] int nFirstParticle, [[maybe_unused]] int nParticleCount ) const
 	{
 	}
 
 	// Returns the number of verts + indices to render
-	virtual int GetParticlesToRender( CParticleCollection *pParticles, void *pContext, int nFirstParticle, int nRemainingVertices, int nRemainingIndices, int *pVertsUsed, int *pIndicesUsed ) const
+	virtual int GetParticlesToRender( [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] void *pContext, [[maybe_unused]] int nFirstParticle, [[maybe_unused]] int nRemainingVertices, [[maybe_unused]] int nRemainingIndices, int *pVertsUsed, int *pIndicesUsed ) const
 	{
 		*pVertsUsed = 0;
 		*pIndicesUsed = 0;
@@ -618,23 +619,23 @@ public:
 
 
 	// emitters over-ride this. Return a mask of what fields you initted
-	virtual uint32 Emit( CParticleCollection *pParticles, float flOpCurStrength,
-						 void *pContext ) const
+	virtual uint32 Emit( CParticleCollection *, float,
+						 void * ) const
 	{
 		return 0;
 	}
 
 	// emitters over-ride this. 
-	virtual void StopEmission( CParticleCollection *pParticles, void *pContext, bool bInfiniteOnly = false ) const
+	virtual void StopEmission( CParticleCollection *, void *, [[maybe_unused]] bool bInfiniteOnly = false ) const
 	{
 	}
-	virtual void StartEmission( CParticleCollection *pParticles, void *pContext, bool bInfiniteOnly = false ) const
+	virtual void StartEmission( CParticleCollection *, void *, [[maybe_unused]] bool bInfiniteOnly = false ) const
 	{
 	}
-	virtual void Restart( CParticleCollection *pParticles, void *pContext ) {}
+	virtual void Restart( CParticleCollection *, void * ) {}
 
 	// initters over-ride this
-	virtual void InitParticleSystem( CParticleCollection *pParticles, void *pContext ) const
+	virtual void InitParticleSystem( CParticleCollection *, void * ) const
 	{
 	}
 
@@ -687,7 +688,7 @@ public:
 	}
 
 	// particle-initters over-ride this
-	virtual void InitNewParticlesScalar( CParticleCollection *pParticles, int nFirstParticle, int n_particles, int attribute_write_mask, void *pContext ) const
+	virtual void InitNewParticlesScalar( CParticleCollection *pParticles, int nFirstParticle, int n_particles, [[maybe_unused]] int attribute_write_mask, void *pContext ) const
 	{
 	}
 

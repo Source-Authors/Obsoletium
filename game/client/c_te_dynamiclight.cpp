@@ -100,7 +100,7 @@ void TE_DynamicLight( IRecipientFilter& filter, float delay,
 	{
 		Color clr( r, g, b, 255 );
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_DYNAMIC_LIGHT );
  		msg->SetString( "name", "TE_DynamicLight" );
@@ -116,7 +116,6 @@ void TE_DynamicLight( IRecipientFilter& filter, float delay,
  		msg->SetInt( "lightindex", nLightIndex );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

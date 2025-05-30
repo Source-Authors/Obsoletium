@@ -5,14 +5,16 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/MenuItem.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui/IScheme.h>
 #include <vgui/IVGui.h>
 #include "vgui/ISurface.h"
-#include <KeyValues.h>
 
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Menu.h>
-#include <vgui_controls/MenuItem.h>
 #include <vgui_controls/TextImage.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -587,7 +589,7 @@ void MenuItem::SetCurrentKeyBinding( char const *keyName )
 	else
 	{
 		char curtext[ 256 ];
-		m_pCurrentKeyBinding->GetText( curtext, sizeof( curtext ) );
+		m_pCurrentKeyBinding->GetText( curtext );
 		if ( !Q_strcmp( curtext, keyName ) )
 			return;
 

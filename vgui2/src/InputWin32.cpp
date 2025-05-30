@@ -5,24 +5,23 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include <vgui/IInputInternal.h>
+
 #if defined( WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 #include <imm.h>
 #define DO_IME
 #endif
 
-#include <string.h>
-
 #include "vgui_internal.h"
 #include "VPanel.h"
-#include "utlvector.h"
-#include <KeyValues.h>
+#include "tier1/utlvector.h"
+#include "tier1/KeyValues.h"
 #include "tier0/vcrmode.h"
 
 #include <vgui/VGUI.h>
 #include <vgui/ISystem.h>
 #include <vgui/IClientPanel.h>
-#include <vgui/IInputInternal.h>
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
@@ -31,12 +30,8 @@
 #include "vgui/Cursor.h"
 #include <vgui/keyrepeat.h>
 
-#include "utllinkedlist.h"
+#include "tier1/utllinkedlist.h"
 #include "tier0/icommandline.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 /* 
 > Subject: RE: l4d2 & motd 
@@ -618,8 +613,8 @@ void CInputSystem::RunFrame()
 			// send a message to the window saying that it's losing focus
 			{
 				MEM_ALLOC_CREDIT();
-				KeyValues *pMessage = new KeyValues( "KillFocus" );
-				KeyValues::AutoDelete autodelete_pMessage( pMessage );
+				// dimhotepus: Do not leak KeyValues.
+				KeyValuesAD pMessage( "KillFocus" );
 				pMessage->SetPtr( "newPanel", wantedKeyFocus );
 				pContext->_keyFocus->SendMessage( pMessage, 0 );
 			}
@@ -651,8 +646,8 @@ void CInputSystem::RunFrame()
 			// send a message to the window saying that it's gaining focus
 			{
 				MEM_ALLOC_CREDIT();
-				KeyValues *pMsg = new KeyValues("SetFocus");
-				KeyValues::AutoDelete autodelete_pMsg( pMsg );
+				// dimhotepus: Do not leak KeyValues.
+				KeyValuesAD pMsg("SetFocus");
 				wantedKeyFocus->SendMessage( pMsg, 0 );
 			}
 			wantedKeyFocus->Client()->Repaint();
@@ -708,7 +703,7 @@ VPanel *CInputSystem::CalculateNewKeyFocus()
 	if ( g_pSurface->GetPopupCount() > 0 )
 	{
 		// find the highest-level window that is both visible and a popup
-		int nIndex = g_pSurface->GetPopupCount();
+		intp nIndex = g_pSurface->GetPopupCount();
 
 		while ( nIndex )
 		{			
@@ -941,7 +936,7 @@ VPanel *CInputSystem::GetMouseFocusIgnoringModalSubtree()
 		{
 			// faster version of code below
 			// checks through each popup in order, top to bottom windows
-			for (int i = g_pSurface->GetPopupCount() - 1; i >= 0; i--)
+			for (intp i = g_pSurface->GetPopupCount() - 1; i >= 0; i--)
 			{
 				VPanel *popup = (VPanel *)g_pSurface->GetPopup(i);
 				VPanel *panel = popup;
@@ -1002,8 +997,8 @@ void CInputSystem::UpdateMouseFocus(int x, int y)
 	{
 		// faster version of code below
 		// checks through each popup in order, top to bottom windows
-		int c = g_pSurface->GetPopupCount();
-		for (int i = c - 1; i >= 0; i--)
+		intp c = g_pSurface->GetPopupCount();
+		for (intp i = c - 1; i >= 0; i--)
 		{
 			VPanel *popup = (VPanel *)g_pSurface->GetPopup(i);
 			VPanel *panel = popup;
@@ -1548,7 +1543,7 @@ bool CInputSystem::InternalMousePressed(MouseCode code)
 				if ( code == MOUSE_WHEEL_DOWN || code == MOUSE_WHEEL_UP )
 					return true;
 
-				g_pIVgui->PostMessage( ( VPANEL )pContext->m_pUnhandledMouseClickListener, new KeyValues( "UnhandledMouseClick", "code", code ), NULL );
+				g_pIVgui->PostMessage((VPANEL)pContext->m_pUnhandledMouseClickListener, new KeyValues( "UnhandledMouseClick", "code", code ), NULL);
 				pTargetPanel = pContext->m_pUnhandledMouseClickListener;
 				bFilter = true;
 			}
@@ -2122,7 +2117,7 @@ void CInputSystem::OnChangeIME( bool forward )
 
 		GetKeyboardLayoutList( numKBs, list );
 
-		int oldKb = 0;
+		intp oldKb = 0;
 		CUtlVector< HKL >	selections;
 
 		for ( int i = 0; i < numKBs; ++i )

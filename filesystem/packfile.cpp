@@ -114,7 +114,8 @@ int CZipPackFileHandle::Seek( int nOffset, int nWhence )
 //-----------------------------------------------------------------------------
 CFileHandle *CZipPackFile::OpenFile( const char *pFileName, const char *pOptions )
 {
-	int nIndex, nOriginalSize, nCompressedSize;
+	int nOriginalSize, nCompressedSize;
+	intp nIndex;
 	int64 nPosition;
 	unsigned short nCompressionMethod;
 
@@ -209,7 +210,7 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 		if ( pPreloadEntry )
 		{
 			// convert the absolute pack file position to a local file position
-			int nLocalOffset = nOffset - m_PackFiles[nEntryIndex].m_nPosition;
+			intp nLocalOffset = nOffset - m_PackFiles[nEntryIndex].m_nPosition;
 			byte *pPreloadData = (byte*)m_pPreloadData + pPreloadEntry->DataOffset;
 
 			if ( CLZMA::IsCompressed( pPreloadData ) )
@@ -228,14 +229,16 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 					if ( nLocalOffset == 0 && nDestBytes >= (int)actualSize && nBytes == (int)actualSize )
 					{
 						// uncompress directly into caller's buffer
-						CLZMA::Uncompress( (unsigned char *)pPreloadData, (unsigned char *)pBuffer );
+						// dimhotepus: Add out size to prevent overflows.
+						CLZMA::Uncompress( pPreloadData, pBuffer, nDestBytes );
 						return nBytes;
 					}
 
 					// uncompress into temporary memory
 					CUtlMemory< byte > tempMemory;
 					tempMemory.EnsureCapacity( actualSize );
-					CLZMA::Uncompress( pPreloadData, tempMemory.Base() );
+					// dimhotepus: Add out size to prevent overflows.
+					CLZMA::Uncompress( pPreloadData, tempMemory.Base(), actualSize );
 					// copy only what caller expects
 					V_memcpy( pBuffer, tempMemory.Base() + nLocalOffset, nBytes );
 					return nBytes;
@@ -303,7 +306,7 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 //-----------------------------------------------------------------------------
 //	Gets size, position, and index for a file in the pack.
 //-----------------------------------------------------------------------------
-bool CZipPackFile::GetFileInfo( const char *pFileName, int &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod )
+bool CZipPackFile::GetFileInfo( const char *pFileName, intp &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod )
 {
 	char szCleanName[MAX_FILEPATH];
 	Q_strncpy( szCleanName, pFileName, sizeof( szCleanName ) );
@@ -326,7 +329,7 @@ bool CZipPackFile::GetFileInfo( const char *pFileName, int &nBaseIndex, int64 &n
 
 	lookup.m_HashName = HashStringCaselessConventional( szFixedName );
 
-	int idx = m_PackFiles.Find( lookup );
+	intp idx = m_PackFiles.Find( lookup );
 	if ( -1 != idx  )
 	{
 		nFileOffset = m_PackFiles[idx].m_nPosition;
@@ -340,7 +343,7 @@ bool CZipPackFile::GetFileInfo( const char *pFileName, int &nBaseIndex, int64 &n
 	return false;
 }
 
-bool CZipPackFile::IndexToFilename( int nIndex, char *pBuffer, int nBufferSize )
+bool CZipPackFile::IndexToFilename( intp nIndex, char *pBuffer, intp nBufferSize )
 {
 	AssertMsg( nIndex >= 0 && nIndex < m_PackFiles.Count(), "Out of bounds vector access in IndexToFilename" );
 	if ( nIndex >= 0 )
@@ -359,7 +362,8 @@ bool CZipPackFile::IndexToFilename( int nIndex, char *pBuffer, int nBufferSize )
 //-----------------------------------------------------------------------------
 bool CZipPackFile::ContainsFile( const char *pFileName )
 {
-	int nIndex, nOriginalSize, nCompressedSize;
+	int nOriginalSize, nCompressedSize;
+	intp nIndex;
 	int64 nOffset;
 	unsigned short nCompressionMethod;
 	bool bFound = GetFileInfo( pFileName, nIndex, nOffset, nOriginalSize, nCompressedSize, nCompressionMethod );
@@ -386,7 +390,7 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 	//
 	// Parse the wildcard string into a base and extension used for string comparisons
 	//
-	V_strncpy( szWildCard, pRawWildCard, sizeof( szWildCard ) );
+	V_strcpy_safe( szWildCard, pRawWildCard );
 	V_FixSlashes( szWildCard, '/' );
 	V_RemoveDotSlashes( szWildCard, '/', /* bRemoveDoubleSlashes */ true );
 
@@ -394,16 +398,16 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 	size_t nLenWildCard = V_strlen( szWildCard );
 	if ( nLenWildCard && szWildCard[ nLenWildCard - 1 ] == '/' )
 	{
-		V_strncpy( szWildCardPath, szWildCard, sizeof( szWildCardPath ) );
+		V_strcpy_safe( szWildCardPath, szWildCard );
 	}
 	else
 	{
-		V_ExtractFilePath( szWildCard, szWildCardPath, sizeof( szWildCardPath ) );
+		V_ExtractFilePath( szWildCard, szWildCardPath );
 	}
 
-	V_FileBase( szWildCard, szWildCardBase, sizeof( szWildCardBase ) );
+	V_FileBase( szWildCard, szWildCardBase );
 	bool bWildcardHasExt = !!V_strrchr( szWildCard, '.' );
-	V_ExtractFileExtension( szWildCard, szWildCardExt, sizeof( szWildCardExt ) );
+	V_ExtractFileExtension( szWildCard, szWildCardExt );
 
 	// From the pattern, we now have the directory path up to the file pattern, the filename base, and the filename
 	// extension.
@@ -469,7 +473,7 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 			}
 			else
 			{
-				V_strncpy( szCandidateBaseName, szCandidateName + nLenWildcardPath, sizeof( szCandidateBaseName ) );
+				V_strcpy_safe( szCandidateBaseName, szCandidateName + nLenWildcardPath );
 			}
 
 			char *pExt = strchr( szCandidateBaseName, '.' );
@@ -541,25 +545,11 @@ void CZipPackFile::SetupPreloadData()
 	MEM_ALLOC_CREDIT_( "xZip" );
 
 	void *pPreload;
-#if defined ( _X360 )
-	if ( m_pSection )
-	{
-		pPreload = (byte*)m_pSection + m_nPreloadSectionOffset;
-	}
-	else
-#endif
 	{
 		pPreload = malloc( m_nPreloadSectionSize );
 		if ( !pPreload )
 		{
 			return;
-		}
-
-		if ( IsX360() )
-		{
-			// 360 XZips are always dvd aligned
-			Assert( ( m_nPreloadSectionSize % XBOX_DVD_SECTORSIZE ) == 0 );
-			Assert( ( m_nPreloadSectionOffset % XBOX_DVD_SECTORSIZE ) == 0 );
 		}
 
 		// preload data is loaded as a single unbuffered i/o operation
@@ -587,15 +577,7 @@ void CZipPackFile::DiscardPreloadData()
 		return;
 	}
 
-#if defined ( _X360 )
-	// a section is an alias, the header becomes an alias, not owned memory
-	if ( !m_pSection )
-	{
-		free( m_pPreloadHeader );
-	}
-#else
 	free( m_pPreloadHeader );
-#endif
 	m_pPreloadHeader = NULL;
 }
 
@@ -682,16 +664,6 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	}
 	else
 	{
-		if ( IsX360() )
-		{
-			// all 360 zip files are expected to have preload sections
-			// only during development, maps are allowed to lack them, due to auto-conversion
-			if ( !m_bIsMapPath || g_pFullFileSystem->GetDVDMode() == DVDMODE_STRICT )
-			{
-				Warning( "ZipFile '%s' missing preload section\n", m_ZipName.String() );
-			}
-		}
-
 		// No preload section, reset buffer pointer
 		zipDirBuff.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 	}
@@ -772,10 +744,6 @@ CZipPackFile::CZipPackFile( CBaseFileSystem* fs, [[maybe_unused]] void *pSection
 	m_pPreloadRemapTable = NULL;
 	m_nPreloadSectionOffset = 0;
 	m_nPreloadSectionSize = 0;
-
-#if defined( _X360 )
-	m_pSection = pSection;
-#endif
 }
 
 CZipPackFile::~CZipPackFile()

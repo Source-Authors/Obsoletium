@@ -57,7 +57,7 @@
 #define BACKFACE_EPSILON	-0.01f
 
 #define BRUSHMODEL_DECAL_SORT_GROUP		MAX_MAT_SORT_GROUPS
-const int MAX_VERTEX_FORMAT_CHANGES = 128;
+constexpr inline int MAX_VERTEX_FORMAT_CHANGES = 128;
 int g_MaxLeavesVisible = 512;
 
 //-----------------------------------------------------------------------------
@@ -102,8 +102,9 @@ struct FogVolumeInfo_t : public FogState_t
 //-----------------------------------------------------------------------------
 struct CachedConvars_t
 {
-	bool	m_bDrawWorld;
+	// dimhotepus: Reorder to reduce memory footprint.
 	int		m_nDrawLeaf;
+	bool	m_bDrawWorld;
 	bool	m_bDrawFuncDetail;
 };
 
@@ -839,7 +840,7 @@ void Shader_DrawChainsStatic( const CMSurfaceSortList &sortList, int nSortGroup,
 		IMesh *pLastMesh = NULL;
 #endif
 		int indexCount = 0;
-		int meshIndex = -1;
+		intp meshIndex = -1;
 
 		for ( ; listIndex < count; listIndex++ )
 		{
@@ -1100,7 +1101,7 @@ void DrawSurfaceID( SurfaceHandle_t surfID, const Vector &vecCentroid )
 
 void DrawSurfaceIDAsInt( SurfaceHandle_t surfID, const Vector &vecCentroid )
 {
-	int nInt = (msurface2_t*)surfID - host_state.worldbrush->surfaces2;
+	intp nInt = (msurface2_t*)surfID - host_state.worldbrush->surfaces2;
 	char buf[16];
 	V_to_chars( buf, nInt );
 	CDebugOverlay::AddTextOverlay( vecCentroid, 0, buf );
@@ -1582,7 +1583,6 @@ void Shader_DrawDispChain( int nSortGroup, const CMSurfaceSortList &list, unsign
 	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
 	int count = 0;
-	msurface2_t **pList;
 	MSL_FOREACH_GROUP_BEGIN( list, nSortGroup, group )
 	{
 		count += group.surfaceCount;
@@ -1591,8 +1591,8 @@ void Shader_DrawDispChain( int nSortGroup, const CMSurfaceSortList &list, unsign
 
 	if (count)
 	{
-		pList = (msurface2_t **)stackalloc( count * sizeof(msurface2_t *));
-		int i = 0;
+		msurface2_t **pList = stackallocT( msurface2_t *, count );
+		intp i = 0;
 		MSL_FOREACH_GROUP_BEGIN( list, nSortGroup, group )
 		{
 			MSL_FOREACH_SURFACE_IN_GROUP_BEGIN(list,group,surfID)
@@ -1623,7 +1623,7 @@ static void Shader_BuildDynamicLightmaps( CWorldRenderList *pRenderList )
 #if 0
 		int updateStart = g_LightmapUpdateList.Count();
 #endif
-		for ( int i = pRenderList->m_DlightSurfaces[nSortGroup].Count()-1; i >= 0; --i )
+		for ( intp i = pRenderList->m_DlightSurfaces[nSortGroup].Count()-1; i >= 0; --i )
 		{
 			LightmapUpdateInfo_t tmp;
 			tmp.m_SurfHandle = pRenderList->m_DlightSurfaces[nSortGroup].Element(i);
@@ -1721,8 +1721,8 @@ void ResetWorldRenderList( CWorldRenderList *pRenderList )
 void Shader_WorldBegin( CWorldRenderList *pRenderList )
 {
 	// Cache the convars so we don't keep accessing them...
-	s_ShaderConvars.m_bDrawWorld = r_drawworld.GetBool();
 	s_ShaderConvars.m_nDrawLeaf = r_drawleaf.GetInt();
+	s_ShaderConvars.m_bDrawWorld = r_drawworld.GetBool();
 	s_ShaderConvars.m_bDrawFuncDetail = r_drawfuncdetail.GetBool();
 
 	ResetWorldRenderList( pRenderList );
@@ -1742,9 +1742,9 @@ void Shader_WorldBegin( CWorldRenderList *pRenderList )
 //-----------------------------------------------------------------------------
 // Performs the z-fill
 //-----------------------------------------------------------------------------
-static void Shader_WorldZFillSurfChain( const CMSurfaceSortList &sortList, const surfacesortgroup_t &group, CMeshBuilder &meshBuilder, int &nStartVertIn, unsigned int includeFlags )
+static void Shader_WorldZFillSurfChain( const CMSurfaceSortList &sortList, const surfacesortgroup_t &group, CMeshBuilder &meshBuilder, intp &nStartVertIn, unsigned int includeFlags )
 {
-	int nStartVert = nStartVertIn;
+	intp nStartVert = nStartVertIn;
 	mvertex_t *pWorldVerts = host_state.worldbrush->vertexes;
 
 	MSL_FOREACH_SURFACE_IN_GROUP_BEGIN(sortList, group, nSurfID)
@@ -1841,7 +1841,7 @@ static void Shader_WorldZFillSurfChain( const CMSurfaceSortList &sortList, const
 	nStartVertIn = nStartVert;
 }
 
-static const int s_DrawWorldListsToSortGroup[MAX_MAT_SORT_GROUPS] = 
+static constexpr int s_DrawWorldListsToSortGroup[MAX_MAT_SORT_GROUPS] = 
 {
 	MAT_SORT_GROUP_STRICTLY_ABOVEWATER,
 	MAT_SORT_GROUP_STRICTLY_UNDERWATER,
@@ -1929,7 +1929,7 @@ static void Shader_WorldShadowDepthFill( CWorldRenderList *pRenderList, unsigned
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nBatchVertexCount, nBatchIndexCount );
 
-	int nStartVert = 0;
+	intp nStartVert = 0;
 	for ( g = 0; g < MAX_MAT_SORT_GROUPS; ++g )
 	{
 		if ( ( flags & ( 1 << g ) ) == 0 )
@@ -2063,7 +2063,7 @@ static void Shader_WorldZFill( CWorldRenderList *pRenderList, unsigned long flag
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nBatchVertexCount, nBatchIndexCount );
 
-	int nStartVert = 0;
+	intp nStartVert = 0;
 	for ( g = 0; g < MAX_MAT_SORT_GROUPS; ++g )
 	{
 		if ( ( flags & ( 1 << g ) ) == 0 )
@@ -2191,7 +2191,7 @@ static void Shader_WorldEnd( CWorldRenderList *pRenderList, unsigned long flags,
 		AddProjectedTextureDecalsToList( pRenderList, nSortGroup );
 
 		// Adds shadows to render lists
-		for ( int j = pRenderList->m_ShadowHandles[nSortGroup].Count()-1; j >= 0; --j )
+		for ( intp j = pRenderList->m_ShadowHandles[nSortGroup].Count()-1; j >= 0; --j )
 		{
 			g_pShadowMgr->AddShadowsOnSurfaceToRenderList( pRenderList->m_ShadowHandles[nSortGroup].Element(j) );
 		}
@@ -2307,7 +2307,7 @@ void Shader_DrawTranslucentSurfaces( IWorldRenderList *pRenderListIn, int sortIn
 		pRenderList->m_AlphaSortList.GetSurfaceListForGroup( surfaceList, group );
 
 		// Interate in back-to-front order
-		for ( int listIndex = surfaceList.Count(); --listIndex >= 0; )
+		for ( intp listIndex = surfaceList.Count(); --listIndex >= 0; )
 		{
 			SurfaceHandle_t surfID = surfaceList[listIndex];
 			pRenderContext->Bind( MSurf_TexInfo( surfID )->material );
@@ -3598,10 +3598,10 @@ void Shader_BrushSurface( SurfaceHandle_t surfID, model_t *model, IClientEntity 
 
 
 // UNDONE: These are really guesses.  Do we ever exceed these limits?
-const int MAX_TRANS_NODES = 256;
-const int MAX_TRANS_DECALS = 256;
-const int MAX_TRANS_BATCHES = 1024;
-const int MAX_TRANS_SURFACES = 1024;
+constexpr inline int MAX_TRANS_NODES = 256;
+constexpr inline int MAX_TRANS_DECALS = 256;
+constexpr inline int MAX_TRANS_BATCHES = 1024;
+constexpr inline int MAX_TRANS_SURFACES = 1024;
 
 class CBrushBatchRender
 {
@@ -3612,7 +3612,8 @@ public:
 	struct brushrendersurface_t
 	{
 		short	surfaceIndex;
-		short	planeIndex;
+		// dimhotepus: short -> intp.
+		intp	planeIndex;
 	};
 
 	// a batch is a list of surfaces with the same material - they can be drawn with one call to the materialsystem
@@ -3666,7 +3667,8 @@ public:
 	{
 		SurfaceHandle_t surfID;
 		short	surfaceIndex;
-		short	planeIndex;
+		// dimhotepus: short -> intp.
+		intp	planeIndex;
 	};
 	
 	// These are the compact structs produced for translucent brush models.  These structs contain

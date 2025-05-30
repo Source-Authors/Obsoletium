@@ -104,7 +104,7 @@ static inline void RecordBloodSprite( const Vector &start, const Vector &directi
 		const char *pSprayModelName = pSprayModel ? modelinfo->GetModelName( pSprayModel ) : "";
 		const char *pDropModelName = pDropModel ? modelinfo->GetModelName( pDropModel ) : "";
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_BLOOD_SPRITE );
  		msg->SetString( "name", "TE_BloodSprite" );
@@ -121,7 +121,6 @@ static inline void RecordBloodSprite( const Vector &start, const Vector &directi
 		msg->SetInt( "size", size );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

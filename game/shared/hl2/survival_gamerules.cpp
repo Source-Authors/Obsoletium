@@ -228,7 +228,7 @@ void CHalfLife2Survival::ParseSurvivalAmmo( KeyValues *pSubKey )
 		{
 			CSurvivalAmmo ammo;
 
-			Q_strcpy( ammo.m_szAmmoName, pAmmoKey->GetName() );
+			V_strcpy_safe( ammo.m_szAmmoName, pAmmoKey->GetName() );
 			ammo.m_iAmount = pAmmoKey->GetInt();
 
 			m_SurvivalSettings.m_Ammo.AddToTail( ammo );
@@ -243,7 +243,7 @@ void CHalfLife2Survival::ReadSurvivalScriptFile( void )
 	char szFullName[512];
 	Q_snprintf( szFullName, sizeof( szFullName ), "maps/%s_survival.txt", STRING(gpGlobals->mapname) );
 
-	KeyValues *pkvFile = new KeyValues( "Survival" );
+	KeyValuesAD pkvFile( "Survival" );
 	if ( pkvFile->LoadFromFile( filesystem, szFullName, "MOD" ) )
 	{
 		ParseSurvivalSettings( pkvFile->FindKey( "settings" ) );

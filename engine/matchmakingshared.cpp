@@ -302,7 +302,6 @@ void CMatchmaking::ConnectionStart( INetChannel *chan )
 	REGISTER_MM_MSG( JoinResponse );
 	REGISTER_MM_MSG( ClientInfo );
 	REGISTER_MM_MSG( RegisterResponse );
-	REGISTER_MM_MSG( Migrate );
 	REGISTER_MM_MSG( Mutelist );
 	REGISTER_MM_MSG( Checkpoint );
 	REGISTER_MM_MSG( Heartbeat );
@@ -429,7 +428,7 @@ INetChannel *CMatchmaking::FindChannel( const unsigned int ip )
 {
 	INetChannel *pChannel = NULL;
 
-	int idx = m_Channels.Find( ip );
+	auto idx = m_Channels.Find( ip );
 	if ( idx != m_Channels.InvalidIndex() )
 	{
 		pChannel = m_Channels.Element( idx );
@@ -2309,7 +2308,7 @@ void CMatchmaking::SetPreventFullServerStartup( bool bState, char const *fmt, ..
 	char desc[ 256 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( desc, sizeof( desc ), fmt, argptr );
+	V_vsprintf_safe( desc, fmt, argptr );
 	va_end( argptr );
 
 	DevMsg( 1, "Setting state from prevent %s to prevent %s:  %s",

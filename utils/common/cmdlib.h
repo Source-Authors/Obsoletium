@@ -37,6 +37,14 @@ extern IBaseFileSystem *g_pFileSystem;
 void CmdLib_InitFileSystem(const char *pFilename, int maxMemoryUsage = 0);
 void CmdLib_TermFileSystem();  // GracefulExit calls this.
 
+class ScopedFileSystem {
+ public:
+  explicit ScopedFileSystem(const char *fileName, int maxMemoryUsage = 0) noexcept {
+    CmdLib_InitFileSystem(fileName, maxMemoryUsage);
+  }
+  ~ScopedFileSystem() noexcept { CmdLib_TermFileSystem(); }
+};
+
 CreateInterfaceFn CmdLib_GetFileSystemFactory();
 
 // the dec offsetof macro doesnt work very well...
@@ -46,13 +54,15 @@ CreateInterfaceFn CmdLib_GetFileSystemFactory();
 extern int myargc;
 extern char **myargv;
 
-int Q_filelength(FileHandle_t f);
+// dimhotepus: int -> unsigned for file length.
+unsigned Q_filelength(FileHandle_t f);
 time_t FileTime(char *path);
 
 void Q_mkdir(char *path);
 
 char *ExpandArg(char *path);   // expand relative to CWD
-char *ExpandPath(char *path);  // expand relative to gamedir
+// dimhotepus: Make const version.
+const char *ExpandPath(const char *path);  // expand relative to gamedir
 
 char *ExpandPathAndArchive(char *path);
 
@@ -90,7 +100,7 @@ typedef void (*SpewHookFn)(const char *);
 void InstallExtraSpewHook(SpewHookFn pFn);
 
 // Install allocation hooks so we error out if an allocation can't happen.
-void InstallAllocationFunctions();
+inline void InstallAllocationFunctions() {}
 
 // This shuts down mgrs that use threads gracefully.  If you just call exit(),
 // the threads can get in a state where you can't tell if they are shutdown or

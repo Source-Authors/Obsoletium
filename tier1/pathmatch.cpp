@@ -484,7 +484,7 @@ static bool Descend( char *pPath, size_t nStartIdx, bool bAllowBasenameMismatch,
 typedef std::map<std::string, std::pair<std::string, time_t> > resultCache_t;
 typedef std::map<std::string, std::pair<std::string, time_t> >::iterator resultCacheItr_t;
 static resultCache_t resultCache;
-static const int k_cMaxCacheLifetimeSeconds = 2;
+static constexpr inline int k_cMaxCacheLifetimeSeconds = 2;
 #endif // DO_PATHMATCH_CACHE
 
 PathMod_t pathmatch( const char *pszIn, char **ppszOut, bool bAllowBasenameMismatch, char *pszOutBuf, size_t OutBufLen )
@@ -681,7 +681,8 @@ void usage()
     //puts("options:");
     //puts("\t");
 
-    exit(-1);
+	// dimhotepus: -1 -> EINVAL
+    exit(EINVAL);
 }
 
 void test( const char *pszFile, bool bAllowBasenameMismatch )

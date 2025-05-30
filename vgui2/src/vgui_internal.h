@@ -13,7 +13,7 @@
 #endif
 
 #include <vgui/VGUI.h>
-#include "interface.h"
+#include "tier1/interface.h"
 #include "tier3/tier3.h"
 #include "xbox/xboxstubs.h"
 

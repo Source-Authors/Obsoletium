@@ -158,13 +158,8 @@ bool CCloseCaptionWorkUnit::GetItalic() const
 void CCloseCaptionWorkUnit::SetStream( const wchar_t *stream )
 {
 	delete[] m_pszStream;
-	m_pszStream = NULL;
-
-	int len = wcslen( stream );
-	Assert( len < 4096 );
-	m_pszStream = new wchar_t[ len + 1 ];
-	wcsncpy( m_pszStream, stream, len );
-	m_pszStream[ len ] = L'\0';
+	Assert( V_wcslen( stream ) < 4096 );
+	m_pszStream = V_wcsdup( stream );
 }
 
 const wchar_t *CCloseCaptionWorkUnit::GetStream() const
@@ -271,12 +266,12 @@ public:
 		m_Work.AddToTail( unit );
 	}
 
-	int		GetNumWorkUnits() const
+	intp	GetNumWorkUnits() const
 	{
 		return m_Work.Count();
 	}
 
-	CCloseCaptionWorkUnit *GetWorkUnit( int index )
+	CCloseCaptionWorkUnit *GetWorkUnit( intp index )
 	{
 		Assert( index >= 0 && index < m_Work.Count() );
 
@@ -399,8 +394,8 @@ CloseCaptionTool::~CloseCaptionTool( void )
 //-----------------------------------------------------------------------------
 void CloseCaptionTool::Think( float dt )
 {
-	int c = m_Items.Count();
-	int i;
+	intp c = m_Items.Count();
+	intp i;
 
 	// Pass one decay all timers
 	for ( i = 0 ; i < c ; ++i )
@@ -488,9 +483,9 @@ void CloseCaptionTool::redraw()
 	int avail_width = rcText.right - rcText.left;
 
 	int totalheight = 0;
-	int i;
+	intp i;
 	CUtlVector< VisibleStreamItem > visibleitems;
-	int c = m_Items.Count();
+	intp c = m_Items.Count();
 	for  ( i = 0; i < c; i++ )
 	{
 		CCloseCaptionItem *item = m_Items[ i ];
@@ -925,8 +920,8 @@ void CloseCaptionTool::ComputeStreamWork( CChoreoWidgetDrawHelper &helper, int a
 
 void CloseCaptionTool::	DumpWork( CCloseCaptionItem *item )
 {
-	int c = item->GetNumWorkUnits();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = item->GetNumWorkUnits();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CCloseCaptionWorkUnit *wu = item->GetWorkUnit( i );
 		wu->Dump();
@@ -935,12 +930,12 @@ void CloseCaptionTool::	DumpWork( CCloseCaptionItem *item )
 
 void CloseCaptionTool::DrawStream( CChoreoWidgetDrawHelper &helper, RECT &rcText, CCloseCaptionItem *item )
 {
-	int c = item->GetNumWorkUnits();
+	intp c = item->GetNumWorkUnits();
 
 	RECT rcOut;
 	rcOut.left = rcText.left;
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		int x = 0;
 		int y = 0;

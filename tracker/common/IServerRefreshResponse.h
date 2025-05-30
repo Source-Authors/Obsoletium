@@ -11,12 +11,14 @@
 #pragma once
 #endif
 
+#include "tier1/interface.h"
+
 struct serveritem_t;
 
 //-----------------------------------------------------------------------------
 // Purpose: Callback interface for server updates
 //-----------------------------------------------------------------------------
-class IServerRefreshResponse
+abstract_class IServerRefreshResponse
 {
 public:
 	// called when the server has successfully responded

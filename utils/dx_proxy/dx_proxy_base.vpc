@@ -37,7 +37,7 @@ $Configuration	"Release"
 	
 	$Linker
 	{
-		$IgnoreSpecificLibrary		"libcpd.lib libcmtd.lib;"
+		$IgnoreSpecificLibrary		"libcpd.lib; libcmtd.lib;"
 	}
 }
 
@@ -45,15 +45,16 @@ $Configuration
 {
 	$General
 	{
-			$AdditionalProjectDependencies                  "$BASE;vstdlib;tier1;tier0"
+			$AdditionalProjectDependencies			"$BASE;vstdlib;tier1;tier0"
 	}
 
 	$Compiler
 	{
-		$PreprocessorDefinitions	"$BASE;DX_PROXY_EXPORTS;$DX_SDK_VER"
-		$EnableC++Exceptions		"Yes (/EHsc)"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\dx9sdk\include"
+		$PreprocessorDefinitions			"$BASE;DX_PROXY_EXPORTS;$DX_SDK_VER"
+		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
-
+	
 	$Linker
 	{
 		$AdditionalDependencies				"$BASE D3DCompiler.lib"
@@ -82,5 +83,11 @@ $Project "dx_proxy ($DX_SDK_VER)"
 		$File	"dxincludeimpl.h"
 		$File	"filememcache.h"
 		$File	"resource.h"
+	}
+
+	$Folder	"Link Libraries"
+	{
+		$Libexternal		"$SRCDIR\dx9sdk\lib\d3dx9"		[$WIN32]
+		$Libexternal		"$SRCDIR\dx9sdk\lib\x64\d3dx9"	[$WIN64]
 	}
 }

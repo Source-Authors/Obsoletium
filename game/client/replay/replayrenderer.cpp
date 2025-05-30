@@ -606,7 +606,7 @@ void CReplayRenderer::SetupDOFMatrixSkewView( const Vector &pos, const QAngle &a
 	if ( IsAntialiasingEnabled() && !IsDepthOfFieldEnabled() && !m_bForceCheapDoF )		// AA jitter but no DoF
 	{
 		Vector2D vAAJitter = m_pJitterTable[nSample % m_nNumJitterSamples];
-		const float fHalfPixelRadius = 0.65;
+		constexpr float fHalfPixelRadius = 0.65;
 		viewSetup.m_flOffCenterBottom += (vAAJitter.y / (float) viewSetup.height) * fHalfPixelRadius;
 		viewSetup.m_flOffCenterTop    += (vAAJitter.y / (float) viewSetup.height) * fHalfPixelRadius;
 		viewSetup.m_flOffCenterLeft   += (vAAJitter.x / (float) viewSetup.width)  * fHalfPixelRadius;
@@ -619,7 +619,7 @@ void CReplayRenderer::SetupDOFMatrixSkewView( const Vector &pos, const QAngle &a
 	if ( IsDepthOfFieldEnabled() || m_bForceCheapDoF )											// DoF (independent of AA jitter)
 	{
 		// Try to match the amount of blurriness from legacy fulcrum method
-		const float flDoFHack = 0.0008f;
+		constexpr float flDoFHack = 0.0008f;
 		Vector2D vDoFJitter = DepthOfFieldJitter( nSample ) * pCamera->GetAperture() * flDoFHack;
 
 		float fov43 = pCamera->GetFOVx();
@@ -639,7 +639,7 @@ void CReplayRenderer::SetupDOFMatrixSkewView( const Vector &pos, const QAngle &a
 		if ( !m_bForceCheapDoF )
 		{
 			Vector2D vAAJitter = g_vJitterTable32[nSample % 32];										// Jitter in addition to DoF offset
-			const float fHalfPixelRadius = 0.6f;
+			constexpr float fHalfPixelRadius = 0.6f;
 			viewSetup.m_flOffCenterBottom += (vAAJitter.y / (float) viewSetup.height) * fHalfPixelRadius;
 			viewSetup.m_flOffCenterTop    += (vAAJitter.y / (float) viewSetup.height) * fHalfPixelRadius;
 			viewSetup.m_flOffCenterLeft   += (vAAJitter.x / (float) viewSetup.width)  * fHalfPixelRadius;

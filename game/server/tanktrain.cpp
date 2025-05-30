@@ -300,8 +300,8 @@ void CTankTrainAI::SoundEngineStart( void )
 	{
 		controller.Play( m_soundEngine, 0.5, 90 );
 		controller.CommandClear( m_soundEngine );
-		controller.CommandAdd( m_soundEngine, 0, SOUNDCTRL_CHANGE_PITCH, 1.5, random->RandomInt(130, 145) );
-		controller.CommandAdd( m_soundEngine, 1.5, SOUNDCTRL_CHANGE_PITCH, 2, random->RandomInt(105, 115) );
+		controller.CommandAdd( m_soundEngine, 0, SOUNDCTRL_CHANGE_PITCH, 1.5, random->RandomFloat(130, 145) );
+		controller.CommandAdd( m_soundEngine, 1.5, SOUNDCTRL_CHANGE_PITCH, 2, random->RandomFloat(105, 115) );
 	}
 	
 	m_soundPlaying = true;
@@ -380,7 +380,7 @@ void CTankTrainAI::Activate( void )
 
 		if ( m_movementSoundName != NULL_STRING )
 		{
-			CPASAttenuationFilter filter( this, ATTN_NORM * 0.5 );
+			CPASAttenuationFilter filter( this, ATTN_NORM * 0.5f );
 			m_soundTreads = controller.SoundCreate( filter, pTrain->entindex(), CHAN_STATIC, STRING(m_movementSoundName), ATTN_NORM*0.5 );
 		}
 		if ( m_engineSoundName != NULL_STRING )

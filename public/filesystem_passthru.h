@@ -55,7 +55,8 @@ public:
 	bool			FileExists( const char *pFileName, const char *pPathID ) override							{ return m_pBaseFileSystemPassThru->FileExists( pFileName, pPathID ); }
 	bool			IsFileWritable( char const *pFileName, const char *pPathID ) override						{ return m_pBaseFileSystemPassThru->IsFileWritable( pFileName, pPathID ); }
 	bool			SetFileWritable( char const *pFileName, bool writable, const char *pPathID ) override		{ return m_pBaseFileSystemPassThru->SetFileWritable( pFileName, writable, pPathID ); }
-	long			GetFileTime( const char *pFileName, const char *pPathID ) override							{ return m_pBaseFileSystemPassThru->GetFileTime( pFileName, pPathID ); }
+	// dimhotepus: long -> time_t
+	time_t			GetFileTime( const char *pFileName, const char *pPathID ) override							{ return m_pBaseFileSystemPassThru->GetFileTime( pFileName, pPathID ); }
 	bool			ReadFile( const char *pFileName, const char *pPath, CUtlBuffer &buf, int nMaxBytes = 0, int nStartingByte = 0, FSAllocFunc_t pfnAlloc = nullptr ) override { return m_pBaseFileSystemPassThru->ReadFile( pFileName, pPath, buf, nMaxBytes, nStartingByte, pfnAlloc  ); }
 	bool			WriteFile( const char *pFileName, const char *pPath, CUtlBuffer &buf ) override				{  return m_pBaseFileSystemPassThru->WriteFile( pFileName, pPath, buf ); }
 	bool			UnzipFile( const char *pFileName, const char *pPath, const char *pDestination ) override	{  return m_pBaseFileSystemPassThru->UnzipFile( pFileName, pPath, pDestination ); }
@@ -108,7 +109,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	bool			RenameFile( char const *pOldPath, char const *pNewPath, const char *pathID )		override { return m_pFileSystemPassThru->RenameFile( pOldPath, pNewPath, pathID ); }
 	void			CreateDirHierarchy( const char *path, const char *pathID )							override { m_pFileSystemPassThru->CreateDirHierarchy( path, pathID ); }
 	bool			IsDirectory( const char *pFileName, const char *pathID )							override { return m_pFileSystemPassThru->IsDirectory( pFileName, pathID ); }
-	void			FileTimeToString( char* pStrip, int maxCharsIncludingTerminator, long fileTime )	override { m_pFileSystemPassThru->FileTimeToString( pStrip, maxCharsIncludingTerminator, fileTime ); }
+	void			FileTimeToString( char* pStrip, intp maxCharsIncludingTerminator, time_t fileTime )	override { m_pFileSystemPassThru->FileTimeToString( pStrip, maxCharsIncludingTerminator, fileTime ); }
 	void			SetBufferSize( FileHandle_t file, unsigned nBytes )									override { m_pFileSystemPassThru->SetBufferSize( file, nBytes  ); }
 	bool			IsOk( FileHandle_t file )															override { return m_pFileSystemPassThru->IsOk( file ); }
 	bool			EndOfFile( FileHandle_t file )														override { return m_pFileSystemPassThru->EndOfFile( file ); }
@@ -116,19 +117,19 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	int				FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... ) override { 
 		char str[8192];
 		va_list marker;
-		va_start( marker, pFormat );
+		va_start( marker, pFormat ); //-V2018 //-V2019
 		_vsnprintf( str, sizeof( str ), pFormat, marker );
 		va_end( marker );
 		return m_pFileSystemPassThru->FPrintf( file, "%s", str );
 	}
 	CSysModule 		*LoadModule( const char *pFileName, const char *pPathID, bool bValidatedDllOnly )	override { return m_pFileSystemPassThru->LoadModule( pFileName, pPathID, bValidatedDllOnly ); }
 	void			UnloadModule( CSysModule *pModule )													override { m_pFileSystemPassThru->UnloadModule( pModule ); }
-	const char		*FindFirst( const char *pWildCard, FileFindHandle_t *pHandle )						override { return m_pFileSystemPassThru->FindFirst( pWildCard, pHandle ); }
+	const char		*FindFirst( const char *pWildCard, FileFindHandle_t *pHandle )						override { return m_pFileSystemPassThru->FindFirst( pWildCard, pHandle ); } //-V2001
 	const char		*FindNext( FileFindHandle_t handle )												override { return m_pFileSystemPassThru->FindNext( handle ); }
 	bool			FindIsDirectory( FileFindHandle_t handle )											override { return m_pFileSystemPassThru->FindIsDirectory( handle ); }
 	void			FindClose( FileFindHandle_t handle )												override { m_pFileSystemPassThru->FindClose( handle ); }
 	const char		*GetLocalPath( const char *pFileName, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )	override { return m_pFileSystemPassThru->GetLocalPath( pFileName, pDest, maxLenInChars ); }
-	bool			FullPathToRelativePath( const char *pFullpath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )		override { return m_pFileSystemPassThru->FullPathToRelativePath( pFullpath, pDest, maxLenInChars ); }
+	bool			FullPathToRelativePath( const char *pFullpath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )		override { return m_pFileSystemPassThru->FullPathToRelativePath( pFullpath, pDest, maxLenInChars ); } //-V2001
 	bool			GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) override { return m_pFileSystemPassThru->GetCaseCorrectFullPath_Ptr( pFullPath, pDest, maxLenInChars ); }
 	bool			GetCurrentDirectory( char* pDirectory, int maxlen )									override { return m_pFileSystemPassThru->GetCurrentDirectory( pDirectory, maxlen ); }
 	void			PrintOpenedFiles( void )															override { m_pFileSystemPassThru->PrintOpenedFiles(); }
@@ -160,7 +161,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	void			GetLocalCopy( const char *pFileName )												override { m_pFileSystemPassThru->GetLocalCopy( pFileName ); }
 	FileNameHandle_t	FindOrAddFileName( char const *pFileName )										override { return m_pFileSystemPassThru->FindOrAddFileName( pFileName ); }
 	FileNameHandle_t	FindFileName( char const *pFileName )											override { return m_pFileSystemPassThru->FindFileName( pFileName ); }
-	bool				String( const FileNameHandle_t& handle, char *buf, int buflen )					override { return m_pFileSystemPassThru->String( handle, buf, buflen ); }
+	bool				String( const FileNameHandle_t& handle, char *buf, intp buflen )				override { return m_pFileSystemPassThru->String( handle, buf, buflen ); }
 	virtual bool			IsOk2( FileHandle_t file )															{ return IsOk(file); }
 	void			RemoveSearchPaths( const char *szPathID )											override { m_pFileSystemPassThru->RemoveSearchPaths( szPathID ); }
 	bool			IsSteam() const																		override { return m_pFileSystemPassThru->IsSteam(); }
@@ -172,7 +173,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 		FileFindHandle_t *pHandle
 		)																										override { return m_pFileSystemPassThru->FindFirstEx( pWildCard, pPathID, pHandle ); }
 	void			MarkPathIDByRequestOnly( const char *pPathID, bool bRequestOnly )					override { m_pFileSystemPassThru->MarkPathIDByRequestOnly( pPathID, bRequestOnly ); }
-	bool			AddPackFile( const char *fullpath, const char *pathID )								override { return m_pFileSystemPassThru->AddPackFile( fullpath, pathID ); }
+	bool			AddPackFile( const char *fullPath, const char *pathID )								override { return m_pFileSystemPassThru->AddPackFile( fullPath, pathID ); }
 	FSAsyncStatus_t	AsyncAppend(const char *pFileName, const void *pSrc, int nSrcBytes, bool bFreeMemory, FSAsyncControl_t *pControl ) override { return m_pFileSystemPassThru->AsyncAppend( pFileName, pSrc, nSrcBytes, bFreeMemory, pControl); }
 	FSAsyncStatus_t	AsyncWrite(const char *pFileName, const void *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend, FSAsyncControl_t *pControl ) override { return m_pFileSystemPassThru->AsyncWrite( pFileName, pSrc, nSrcBytes, bFreeMemory, bAppend, pControl); }
 	FSAsyncStatus_t	AsyncWriteFile(const char *pFileName, const CUtlBuffer *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend, FSAsyncControl_t *pControl ) override { return m_pFileSystemPassThru->AsyncWriteFile( pFileName, pSrc, nSrcBytes, bFreeMemory, bAppend, pControl); }
@@ -183,7 +184,7 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	bool			AsyncSuspend()																		override { return m_pFileSystemPassThru->AsyncSuspend(); }
 	bool			AsyncResume()																		override { return m_pFileSystemPassThru->AsyncResume(); }
 	const char		*RelativePathToFullPath( const char *pFileName, const char *pPathID, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars, PathTypeFilter_t pathFilter = FILTER_NONE, PathTypeQuery_t *pPathType = nullptr ) override { return m_pFileSystemPassThru->RelativePathToFullPath( pFileName, pPathID, pDest, maxLenInChars, pathFilter, pPathType ); }
-	int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars )	override { return m_pFileSystemPassThru->GetSearchPath( pathID, bGetPackFiles, pDest, maxLenInChars ); }
+	int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars )	override { return m_pFileSystemPassThru->GetSearchPath( pathID, bGetPackFiles, pDest, maxLenInChars ); }
 
 	FileHandle_t	OpenEx( const char *pFileName, const char *pOptions, unsigned flags = 0, const char *pathID = nullptr, char **ppszResolvedFilename = nullptr ) override { return m_pFileSystemPassThru->OpenEx( pFileName, pOptions, flags, pathID, ppszResolvedFilename );}
 	int				ReadEx( void* pOutput, int destSize, int size, FileHandle_t file )					override { return m_pFileSystemPassThru->ReadEx( pOutput, destSize, size, file ); }
@@ -218,7 +219,8 @@ SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 	bool			ReadToBuffer( FileHandle_t hFile, CUtlBuffer &buf, int nMaxBytes = 0, FSAllocFunc_t pfnAlloc = nullptr ) override { return m_pFileSystemPassThru->ReadToBuffer( hFile, buf, nMaxBytes, pfnAlloc ); }
 	bool			FullPathToRelativePathEx( const char *pFullPath, const char *pPathId, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) override { return m_pFileSystemPassThru->FullPathToRelativePathEx( pFullPath, pPathId, pDest, maxLenInChars ); }
 	int				GetPathIndex( const FileNameHandle_t &handle ) override { return m_pFileSystemPassThru->GetPathIndex( handle ); }
-	long			GetPathTime( const char *pPath, const char *pPathID ) override { return m_pFileSystemPassThru->GetPathTime( pPath, pPathID ); }
+	// dimhotepus: long -> time_t
+	time_t			GetPathTime( const char *pPath, const char *pPathID ) override { return m_pFileSystemPassThru->GetPathTime( pPath, pPathID ); }
 
 	DVDMode_t		GetDVDMode() override { return m_pFileSystemPassThru->GetDVDMode(); }
 

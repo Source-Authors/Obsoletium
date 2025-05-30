@@ -6,14 +6,14 @@
 //
 //=============================================================================//
 
-#include "dme_controls/elementpropertiestree.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "tier1/KeyValues.h"
 #include "datamodel/dmelement.h"
 
 #include "vgui/IInput.h"
 #include "vgui/ISurface.h"
 #include "vgui/ISystem.h"
-#include "vgui/IVgui.h"
+#include "vgui/IVGui.h"
 #include "vgui/Cursor.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/ComboBox.h"
@@ -26,9 +26,9 @@
 #include "vgui_controls/ScrollBar.h"
 #include "movieobjects/dmeeditortypedictionary.h"
 #include "dme_controls/AttributeTextPanel.h"
-#include "dme_controls/DmePanel.h"
+#include "dme_controls/dmepanel.h"
 #include "dme_controls/dmecontrols_utils.h"
-#include "tier1/ConVar.h"
+#include "tier1/convar.h"
 #include "tier2/fileutils.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -50,26 +50,26 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CElementTree : public TreeView
 {
-	DECLARE_CLASS_SIMPLE( CElementTree, TreeView );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CElementTree, TreeView );
 public:
 	CElementTree( CElementPropertiesTreeInternal *parent, const char *panelName );
 	~CElementTree();
 
-	virtual void OnCommand( const char *cmd );
-	virtual void ApplySchemeSettings( IScheme *pScheme );
-	virtual void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false );
-	virtual void GenerateChildrenOfNode(int itemIndex);
+	void OnCommand( const char *cmd ) override;
+	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false ) override;
+	void GenerateChildrenOfNode(int itemIndex) override;
 	// override to open a custom context menu on a node being selected and right-clicked
-	virtual void GenerateContextMenu( int itemIndex, int x, int y );
+	void GenerateContextMenu( int itemIndex, int x, int y ) override;
 
-	virtual void GenerateDragDataForItem( int itemIndex, KeyValues *msg );
+	void GenerateDragDataForItem( int itemIndex, KeyValues *msg ) override;
 
-	virtual void OnLabelChanged( int itemIndex, const char *oldString, const char *newString );
+	void OnLabelChanged( int itemIndex, const char *oldString, const char *newString ) override;
 
-	virtual bool IsItemDroppable( int m_ItemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void OnItemDropped( int m_ItemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist );
-	virtual HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist );
+	bool IsItemDroppable( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void OnItemDropped( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
+	HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
 
 	ScrollBar	*GetScrollBar();
 
@@ -206,7 +206,7 @@ CElementTreeViewListControl::CElementTreeViewListControl( Panel *pParent, const 
 
 int CElementTreeViewListControl::AddItem( KeyValues *data, bool allowLabelEditing, int parentItemIndex, CUtlVector< vgui::Panel * >& columnPanels )
 {
-	int itemIndex = GetTree()->AddItem( data, parentItemIndex );
+	intp itemIndex = GetTree()->AddItem( data, parentItemIndex );
 	if ( allowLabelEditing )
 	{
 		GetTree()->SetLabelEditingAllowed( itemIndex, allowLabelEditing );
@@ -230,8 +230,8 @@ int CElementTreeViewListControl::AddItem( KeyValues *data, bool allowLabelEditin
 
 	info.SetList( columnPanels );
 
-	int c = columnPanels.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = columnPanels.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( columnPanels[ i ] )
 		{
@@ -256,8 +256,8 @@ void CElementTreeViewListControl::RemoveItem_R( int nItemIndex )
 	if ( idx != m_Panels.InvalidIndex() )
 	{
 		ColumnPanels_t& info = m_Panels[ idx ];
-		int nCount = info.m_Columns.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = info.m_Columns.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			if ( info.m_Columns[i] )
 			{
@@ -309,9 +309,8 @@ void CElementTreeViewListControl::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 // Purpose: Handle mouse drag resize of tree column (hack)
 //-----------------------------------------------------------------------------
-void CElementTreeViewListControl::OnCursorMoved(int x, int y)
+void CElementTreeViewListControl::OnCursorMoved(int x, [[maybe_unused]] int y)
 {
-
 	if ( ( x > m_iTreeColumnWidth - 12 ) &&
 		 ( x < m_iTreeColumnWidth + 12 ) )
 	{
@@ -376,7 +375,7 @@ void CElementTreeViewListControl::OnMouseDoublePressed( MouseCode code )
 
 void CElementTreeViewListControl::ResizeTreeToExpandedWidth()
 {
-	int rows = GetNumRows();
+	intp rows = GetNumRows();
 	int vbarTop, nItemsVisible;
 	bool hbarVisible = false;
 	GetTree()->GetVBarInfo( vbarTop, nItemsVisible, hbarVisible );
@@ -433,27 +432,21 @@ void CElementTreeViewListControl::PostChildPaint()
 
 	if ( m_bDrawGrid )
 	{
-		int numColumns = GetNumColumns();
-		int rows = GetNumRows();
+		intp numColumns = GetNumColumns();
+		intp rows = GetNumRows();
 
 		int vbarTop, nItemsVisible;
 		bool hbarVisible = false;
 		GetTree()->GetVBarInfo( vbarTop, nItemsVisible, hbarVisible );
-
-		int vBarWidth = 0;
-		if ( nItemsVisible <= rows )
-		{
-			vBarWidth = 21;
-		}
 
 		if ( hbarVisible )
 		{
 			--nItemsVisible;
 		}
 
-		for ( int col = 0; col < numColumns; ++col )
+		for ( intp col = 0; col < numColumns; ++col )
 		{
-			for ( int row = 0; row < rows; ++row )
+			for ( intp row = 0; row < rows; ++row )
 			{
 				GetGridElementBounds( col, row, left, top, right, bottom );
 				if (col == 0)
@@ -509,10 +502,10 @@ void CElementTreeViewListControl::PerformLayout()
 
 	int numColumns = GetNumColumns();
 	// Now position column panels into the correct spot
-	int rows = GetNumRows();
+	intp rows = GetNumRows();
 	int visItemCount = 0;
 
-	for ( int row = 0; row < rows; ++row )
+	for ( intp row = 0; row < rows; ++row )
 	{
 		int tvi = GetTreeItemAtRow( row );
 
@@ -567,8 +560,8 @@ void CElementTreeViewListControl::HideAll()
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		int c = info.m_Columns.Count();
-		for ( int j = 0 ; j < c; ++j )
+		intp c = info.m_Columns.Count();
+		for ( intp j = 0 ; j < c; ++j )
 		{
 			Panel *panel = info.m_Columns[ j ];
 			if ( !panel )
@@ -587,8 +580,8 @@ void CElementTreeViewListControl::RemoveAll()
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		int c = info.m_Columns.Count();
-		for ( int j = 0 ; j < c; ++j )
+		intp c = info.m_Columns.Count();
+		for ( intp j = 0 ; j < c; ++j )
 		{
 			delete info.m_Columns[ j ];
 		}
@@ -628,8 +621,8 @@ void CElementTreeViewListControl::SetFont( HFont font )
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		int c = info.m_Columns.Count();
-		for ( int j = 0 ; j < c; ++j )
+		intp c = info.m_Columns.Count();
+		for ( intp j = 0 ; j < c; ++j )
 		{
 			Panel *panel = info.m_Columns[ j ];
 			if ( !panel )
@@ -682,12 +675,12 @@ KeyValues *CElementTreeViewListControl::GetItemData(int itemIndex)
 
 class CHistoryMenuButton : public MenuButton
 {
-DECLARE_CLASS_SIMPLE( CHistoryMenuButton, MenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHistoryMenuButton, MenuButton );
 public:
 	CHistoryMenuButton( Panel *parent, const char *panelName, const char *text, CElementPropertiesTreeInternal *tree, int whichMenu );
 
-	virtual void OnShowMenu( Menu *menu );
-	virtual int	 OnCheckMenuItemCount();
+	void OnShowMenu( Menu *menu ) override;
+	intp OnCheckMenuItemCount() override;
 
 
 private:
@@ -701,7 +694,7 @@ CHistoryMenuButton::CHistoryMenuButton( Panel *parent, const char *panelName, co
 	Assert( m_pPropertiesTreeInternal );
 }
 
-int CHistoryMenuButton::OnCheckMenuItemCount()
+intp CHistoryMenuButton::OnCheckMenuItemCount()
 {
 	Assert( m_pPropertiesTreeInternal );
 	if ( !m_pPropertiesTreeInternal )
@@ -721,13 +714,13 @@ void CHistoryMenuButton::OnShowMenu( Menu *menu )
 
 class CSearchComboBox : public ComboBox
 {
-	DECLARE_CLASS_SIMPLE( CSearchComboBox, ComboBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSearchComboBox, ComboBox );
 public:
 
 	CSearchComboBox( CElementPropertiesTreeInternal *tree, vgui::Panel *parent, const char *panelName, int numLines, bool allowEdit );
 
-	virtual void OnMenuItemSelected();
-	virtual void OnShowMenu(Menu *menu);
+	void OnMenuItemSelected() override;
+	void OnShowMenu(Menu *menu) override;
 
 private:
 
@@ -770,17 +763,17 @@ void CSearchComboBox::OnMenuItemSelected()
 
 class CPropertiesTreeToolbar : public Panel
 {
-	DECLARE_CLASS_SIMPLE( CPropertiesTreeToolbar, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPropertiesTreeToolbar, Panel );
 public:
 	CPropertiesTreeToolbar( vgui::Panel *parent, const char *panelName, CElementPropertiesTreeInternal *tree );
 
-	virtual void ApplySchemeSettings( IScheme *scheme );
+	void ApplySchemeSettings( IScheme *scheme ) override;
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	MESSAGE_FUNC( OnTextNewLine, "TextNewLine" );
 
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 	void			UpdateButtonState();
 private:
@@ -802,14 +795,14 @@ CPropertiesTreeToolbar::CPropertiesTreeToolbar( vgui::Panel *parent, const char 
 	SetPaintBackgroundEnabled( false );
 
 	m_pBack = new CHistoryMenuButton( this, "Nav_Back", "#Dme_NavBack", tree, CElementPropertiesTreeInternal::DME_PROPERTIESTREE_MENU_BACKWARD );
-	m_pBack->SetCommand( new KeyValues( "OnNavigateBack", "item", -1 ) );
+	m_pBack->SetCommand( new KeyValues( "OnNavigateBack", "item", (intp)-1 ) );
 	m_pBack->AddActionSignalTarget( parent );
 	m_pBack->SetDropMenuButtonStyle( true );
 
 	m_pBack->SetMenu( new Menu( this, "Nav_BackMenu" ) );
 
 	m_pFwd = new CHistoryMenuButton( this, "Nav_Forward", "#Dme_NavForward", tree, CElementPropertiesTreeInternal::DME_PROPERTIESTREE_MENU_FORWARD );
-	m_pFwd->SetCommand( new KeyValues( "OnNavigateForward", "item", -1 ) );
+	m_pFwd->SetCommand( new KeyValues( "OnNavigateForward", "item", (intp)-1 ) );
 	m_pFwd->AddActionSignalTarget( parent );
 	m_pFwd->SetDropMenuButtonStyle( true );
 	m_pFwd->SetMenu( new Menu( this, "Nav_FwdMenu" ) );	
@@ -939,9 +932,10 @@ void CPropertiesTreeToolbar::PerformLayout()
 CElementPropertiesTreeInternal::CElementPropertiesTreeInternal( 
 	vgui::Panel *parent, IDmNotify *pNotify, CDmElement *pObject, bool autoApply /* = true */, CDmeEditorTypeDictionary *pDict /* = NULL */ ) :
 	BaseClass( parent, "ElementPropertiesTree" ),
-	m_pNotify( pNotify ),
 	m_hTypeDictionary( pDict ),
-	m_bAutoApply( autoApply ), m_bShowMemoryUsage( false )
+	m_pNotify( pNotify ),
+	m_bAutoApply( autoApply ),
+	m_bShowMemoryUsage( false )
 {
 	m_hObject = pObject;
 	m_bSuppressHistoryUpdates = false;
@@ -1047,8 +1041,8 @@ void CElementPropertiesTreeInternal::ApplyChanges()
 	if ( !m_hObject.Get() )
 		return;
 
-	int nCount = m_AttributeWidgets.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_AttributeWidgets.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		attributewidgetfactorylist->ApplyChanges( m_AttributeWidgets[i].m_pValueWidget, this );
 	}
@@ -1077,8 +1071,8 @@ void CElementPropertiesTreeInternal::Refresh( RefreshType_t rebuild /* = false *
 	{
 		RefreshTreeItemState( m_pTree->GetTree()->GetRootItemIndex() );
 	}
-	int nCount = m_AttributeWidgets.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_AttributeWidgets.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		attributewidgetfactorylist->Refresh( m_AttributeWidgets[i].m_pValueWidget, this );
 	}
@@ -1098,15 +1092,15 @@ void CElementPropertiesTreeInternal::OnRename()
 
 void CElementPropertiesTreeInternal::OnCopy()
 {
-	CUtlVector< int > selected;
+	CUtlVector< intp > selected;
 	m_pTree->GetTree()->GetSelectedItems( selected ) ;
-	int c = selected.Count();
+	intp c = selected.Count();
 	if ( c <= 0 )
 		return;
 
 	// add in reverse order, since selection[0] is the last item selected
 	CUtlVector< KeyValues * > list;
-	for ( int i = c - 1; i >= 0; --i )
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		KeyValues *data = new KeyValues( "Clipboard" );
 		m_pTree->GetTree()->GenerateDragDataForItem( selected[ i ], data );
@@ -1139,8 +1133,8 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 	bool bFound = false;
 
 	int itemIndex = m_pTree->GetTree()->GetRootItemIndex();
-	int nPathItems = path.Count();
-	for ( int i = 0; i < nPathItems; ++i )
+	intp nPathItems = path.Count();
+	for ( intp i = 0; i < nPathItems; ++i )
 	{
 		const TreeItem_t &childTreeItem = path[ i ];
 
@@ -1191,9 +1185,9 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 
 void CElementPropertiesTreeInternal::OnPaste_( bool reference )
 {
-	CUtlVector< int > selected;
+	CUtlVector< intp > selected;
 	m_pTree->GetTree()->GetSelectedItems( selected ) ;
-	int c = selected.Count();
+	intp c = selected.Count();
 	if ( !c )
 		return;
 
@@ -1234,7 +1228,7 @@ void CElementPropertiesTreeInternal::OnPaste_( bool reference )
 		CElementTreeUndoScopeGuard guard( NOTIFY_SETDIRTYFLAG, m_pNotify, reference ? "Paste Reference" : "Paste" );
 
 		CDmrElementArray<> array( pAttribute );
-		int nArrayIndex = isArrayElement ? itemData->GetInt( "arrayIndex" ) + 1 : array.Count();
+		intp nArrayIndex = isArrayElement ? itemData->GetInt( "arrayIndex" ) + 1 : array.Count();
 		DropItemsIntoArray( array, msglist, list, nArrayIndex, reference ? DO_LINK : DO_COPY );
 	}
 	// Pasting onto an element attribute
@@ -1300,7 +1294,7 @@ void CElementPropertiesTreeInternal::OnDeleteSelected()
 {
 	CUtlVector< KeyValues * > selection;
 	m_pTree->GetTree()->GetSelectedItemData( selection );
-	int nSelected = selection.Count();
+	intp nSelected = selection.Count();
 	if ( !nSelected )
 		return;
 
@@ -1308,7 +1302,7 @@ void CElementPropertiesTreeInternal::OnDeleteSelected()
 	{
 		CElementTreeUndoScopeGuard guard( NOTIFY_SETDIRTYFLAG, m_pNotify, "Delete Elements" );
 
-		for ( int si = 0; si < nSelected; ++si )
+		for ( intp si = 0; si < nSelected; ++si )
 		{
 			KeyValues *item = selection[ si ];
 			Assert( item );
@@ -1333,7 +1327,7 @@ void CElementPropertiesTreeInternal::OnDeleteSelected()
 			else if ( attrType == AT_ELEMENT_ARRAY )
 			{
 				const CDmrElementArray<> array( pAttr );
-				int n = array.Count();
+				intp n = array.Count();
 				int index = item->GetInt( "arrayIndex", -1 );
 				if ( index >= 0 )
 				{
@@ -1342,7 +1336,7 @@ void CElementPropertiesTreeInternal::OnDeleteSelected()
 				}
 				else
 				{
-					for ( int i = 0; i < n; ++i )
+					for ( intp i = 0; i < n; ++i )
 					{
 						CDmElement *pElement = array[ i ];
 						RemoveAllReferencesToElement( pElement );
@@ -1370,13 +1364,13 @@ void CElementPropertiesTreeInternal::OnClear()
 	bool bNeedRefresh = false;
 	CUtlVector< KeyValues * > data;
 	m_pTree->GetTree()->GetSelectedItemData( data );
-	int c = data.Count();
+	intp c = data.Count();
 	if ( !c )
 		return;
 
 	CElementTreeNotifyScopeGuard notify( "CElementPropertiesTreeInternal::OnClear", NOTIFY_SETDIRTYFLAG, m_pNotify );
 
-	for ( int i = 0; i  < c; ++i )
+	for ( intp i = 0; i  < c; ++i )
 	{
 		KeyValues *item = data[ i ];
 		Assert( item );
@@ -1592,9 +1586,8 @@ bool CElementPropertiesTreeInternal::OnRemoveFromData( KeyValues *item )
 bool CElementPropertiesTreeInternal::OnRemoveFromData( CUtlVector< KeyValues * >& list )
 {
 	CSortedElementData sorted;
-	int i;
-	int c = list.Count();
-	for ( i = 0 ; i < c; ++i )
+	intp c = list.Count();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		KeyValues *item = list[ i ];
 		//Check to see if this attribute refers to an element
@@ -1609,12 +1602,12 @@ bool CElementPropertiesTreeInternal::OnRemoveFromData( CUtlVector< KeyValues * >
 	bool bRefreshRequired = false;
 
 	// Now walk the data in reverse order
-	for ( i = sorted.m_Sorted.FirstInorder(); i != sorted.m_Sorted.InvalidIndex(); i = sorted.m_Sorted.NextInorder( i ) )
+	for ( auto i = sorted.m_Sorted.FirstInorder(); i != sorted.m_Sorted.InvalidIndex(); i = sorted.m_Sorted.NextInorder( i ) )
 	{
 		OwnerAttribute_t& entry = sorted.m_Sorted[ i ];
 
 		// Walk it backward by array index...
-		for ( int j = entry.sortedData.LastInorder(); j != entry.sortedData.InvalidIndex(); j = entry.sortedData.PrevInorder( j ) )
+		for ( auto j = entry.sortedData.LastInorder(); j != entry.sortedData.InvalidIndex(); j = entry.sortedData.PrevInorder( j ) )
 		{
 			KeyValues *item = entry.sortedData[ j ];
 			bRefreshRequired = OnRemoveFromData( item ) || bRefreshRequired;
@@ -1660,10 +1653,10 @@ void CElementPropertiesTreeInternal::OnSortByName()
 	CUtlVector< KeyValues * > list;
 	m_pTree->GetTree()->GetSelectedItemData( list );
 
-	int c = list.Count();
+	intp c = list.Count();
 
 	bool bRefreshNeeded = false;
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		KeyValues *item = list[ i ];
 
@@ -1675,13 +1668,13 @@ void CElementPropertiesTreeInternal::OnSortByName()
 		if ( !elementArray.IsValid() )
 			continue;
 
-		int nCount = elementArray.Count();
+		intp nCount = elementArray.Count();
 		if ( nCount == 0 )
 			continue;
 
 		bRefreshNeeded = true;
 		CDmElement **pArray = ( CDmElement** )_alloca( nCount * sizeof( CDmElement* ) );
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			pArray[i] = elementArray[i];
 		}
@@ -1691,7 +1684,7 @@ void CElementPropertiesTreeInternal::OnSortByName()
 		elementArray.RemoveAll();
 		elementArray.AddMultipleToTail( nCount );
 
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			elementArray.Set( i, pArray[i] );
 		}
@@ -1750,13 +1743,18 @@ void CElementPropertiesTreeInternal::OnShowSearchResults()
 	PostActionSignal( kv );
 }
 
+// dimhotepus: x86-64 support.
+#ifndef PLATFORM_64BITS
 void CElementPropertiesTreeInternal::OnNavBack( int item )
+#else
+void CElementPropertiesTreeInternal::OnNavBack( uint64 item )
+#endif
 {
-	int c = m_hHistory.Count();
+	intp c = m_hHistory.Count();
 	if ( c <= 1 )
 		return;
 
-	if ( item == -1 )
+	if ( item == std::numeric_limits<uint64>::max() )
 	{
 		if ( m_nCurrentHistoryPosition >= c - 1 )
 			return;
@@ -1772,13 +1770,18 @@ void CElementPropertiesTreeInternal::OnNavBack( int item )
 	UpdateButtonState();
 }
 
+// dimhotepus: x86-64 support.
+#ifndef PLATFORM_64BITS
 void CElementPropertiesTreeInternal::OnNavForward( int item )
+#else
+void CElementPropertiesTreeInternal::OnNavForward( uint64 item )
+#endif
 {
-	int c = m_hHistory.Count();
+	intp c = m_hHistory.Count();
 	if ( c <= 0 )
 		return;
 
-	if ( item == -1 )
+	if ( item == std::numeric_limits<uint64>::max() )
 	{
 		if ( m_nCurrentHistoryPosition <= 0 )
 			return;
@@ -1803,8 +1806,8 @@ bool CElementPropertiesTreeInternal::BuildExpansionListToFindElement_R(
 	CDmElement *owner, 
 	CDmElement *element, 
 	const char *attributeName, 
-	int arrayIndex, 
-	CUtlVector< int >& expandIndices
+	intp arrayIndex, 
+	CUtlVector< intp >& expandIndices
 	)
 {
 	if ( !element )
@@ -1851,8 +1854,8 @@ bool CElementPropertiesTreeInternal::BuildExpansionListToFindElement_R(
 		{
 			// Walk child objects
 			const CDmrElementArray<CDmElement> elementArray( attribute );
-			int c = elementArray.Count();
-			for ( int i = 0; i < c; ++i )
+			intp c = elementArray.Count();
+			for ( intp i = 0; i < c; ++i )
 			{
 				if ( !BuildExpansionListToFindElement_R( visited, depth + 1, sr, element, elementArray[ i ], attributeName, i, expandIndices ) )
 				{
@@ -1923,8 +1926,8 @@ void CElementPropertiesTreeInternal::FindMatchingElements_R( CUtlRBTree< CDmElem
 		{
 			// Walk child objects
 			const CDmrElementArray<CDmElement> elementArray( attribute );
-			int c = elementArray.Count();
-			for ( int i = 0; i < c; ++i )
+			intp c = elementArray.Count();
+			for ( intp i = 0; i < c; ++i )
 			{
 				FindMatchingElements_R( visited, searchstr, elementArray[ i ], list );
 			}
@@ -1974,7 +1977,7 @@ void CElementPropertiesTreeInternal::NavigateToSearchResult()
 
 // 	SetObject( m_SearchResultsRoot.Get() );
 
-	CUtlVector< int > expandIndices;
+	CUtlVector< intp > expandIndices;
 	CUtlRBTree< CDmElement *, int > visited( 0, 0, DefLessFunc( CDmElement * ) );
 
 	BuildExpansionListToFindElement_R( 
@@ -1994,10 +1997,10 @@ void CElementPropertiesTreeInternal::NavigateToSearchResult()
 
 	// NOTE: Updating the tree could have changed the root item index
 	int nIndex = m_pTree->GetTree()->GetRootItemIndex();
-	int c = expandIndices.Count();
-	for ( int i = c - 2; i >= 0 ; --i )
+	intp c = expandIndices.Count();
+	for ( intp i = c - 2; i >= 0 ; --i )
 	{
-		int idx = expandIndices[ i ];
+		intp idx = expandIndices[ i ];
 
 		// Expand the item
 		m_pTree->ExpandItem( nIndex, true );
@@ -2022,7 +2025,7 @@ void CElementPropertiesTreeInternal::NavigateToSearchResult()
 
 	m_pTree->ResizeTreeToExpandedWidth();
 
-	DevMsg( "Displaying search result %d of %d\n", m_nCurrentSearchResult + 1, m_SearchResults.Count() );
+	DevMsg( "Displaying search result %zd of %zd\n", m_nCurrentSearchResult + 1, m_SearchResults.Count() );
 }
 
 void CElementPropertiesTreeInternal::OnNavSearch( const char *text )
@@ -2051,10 +2054,10 @@ void CElementPropertiesTreeInternal::OnNavSearch( const char *text )
 		{
 			CDisableUndoScopeGuard guard;
 			
-			int c = m_SearchResults.Count();
+			intp c = m_SearchResults.Count();
 
 			char sz[ 512 ];
-			Q_snprintf( sz, sizeof( sz ), "Search Results [%d] for '%s'", c, m_szSearchStr );
+			Q_snprintf( sz, sizeof( sz ), "Search Results [%zd] for '%s'", c, m_szSearchStr );
 
 			m_SearchResultsRoot->SetName( sz );
 
@@ -2091,16 +2094,16 @@ void CElementPropertiesTreeInternal::OnNavSearch( const char *text )
 		return;
 	}
 
-	m_nCurrentSearchResult = clamp( m_nCurrentSearchResult, 0, m_SearchResults.Count() - 1 );
+	m_nCurrentSearchResult = clamp( m_nCurrentSearchResult, (intp)0, m_SearchResults.Count() - 1 );
 
 	NavigateToSearchResult();
 
 	UpdateButtonState();
 }
 
-int CElementPropertiesTreeInternal::GetHistoryMenuItemCount( int whichMenu )
+intp CElementPropertiesTreeInternal::GetHistoryMenuItemCount( int whichMenu )
 {
-	int c = m_hHistory.Count();
+	intp c = m_hHistory.Count();
 	if ( !c )
 		return 0;
 
@@ -2138,7 +2141,7 @@ void CElementPropertiesTreeInternal::PopulateHistoryMenu( int whichMenu, Menu *m
 {
 	ValidateHistory();
 
-	int c = m_hHistory.Count();
+	intp c = m_hHistory.Count();
 
 	if ( m_nCurrentHistoryPosition == -1 )
 	{
@@ -2153,7 +2156,7 @@ void CElementPropertiesTreeInternal::PopulateHistoryMenu( int whichMenu, Menu *m
 		break;
 	case DME_PROPERTIESTREE_MENU_BACKWARD:
 		{
-			for ( int i = m_nCurrentHistoryPosition + 1; i < c; ++i )
+			for ( intp i = m_nCurrentHistoryPosition + 1; i < c; ++i )
 			{
 				CDmElement *element = m_hHistory[ i ].Get();
 				char sz[ 256 ];
@@ -2164,7 +2167,7 @@ void CElementPropertiesTreeInternal::PopulateHistoryMenu( int whichMenu, Menu *m
 		break;
 	case DME_PROPERTIESTREE_MENU_FORWARD:
 		{
-			for ( int i = 0 ; i < m_nCurrentHistoryPosition; ++i )
+			for ( intp i = 0 ; i < m_nCurrentHistoryPosition; ++i )
 			{
 				CDmElement *element = m_hHistory[ m_nCurrentHistoryPosition - i - 1 ].Get();
 				char sz[ 256 ];
@@ -2175,8 +2178,8 @@ void CElementPropertiesTreeInternal::PopulateHistoryMenu( int whichMenu, Menu *m
 		break;
 	case DME_PROPERTIESTREE_MENU_SEARCHHSITORY:
 		{
-			int c = m_SearchHistory.Count();
-			for ( int i = 0; i < c; ++i )
+			intp c = m_SearchHistory.Count();
+			for ( intp i = 0; i < c; ++i )
 			{
 				CUtlString& str = m_SearchHistory[ i ];
                 menu->AddMenuItem( "search", str.Get(), new KeyValues( "OnNavSearch", "text", str.Get() ), this );
@@ -2191,8 +2194,8 @@ void CElementPropertiesTreeInternal::AddToSearchHistory( const char *str )
 	CUtlString historyString;
 	historyString = str;
 
-	int c = m_SearchHistory.Count();
-	for ( int i = c - 1; i >= 0; --i )
+	intp c = m_SearchHistory.Count();
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		CUtlString& entry = m_SearchHistory[ i ];
 		if ( entry == historyString )
@@ -2248,8 +2251,8 @@ void CElementPropertiesTreeInternal::AddToHistory( CDmElement *element )
 
 void CElementPropertiesTreeInternal::ValidateHistory()
 {
-	int i;
-	int c = m_hHistory.Count();
+	intp i;
+	intp c = m_hHistory.Count();
 	for ( i = c - 1 ; i >= 0; --i )
 	{
 		if ( !m_hHistory[ i ].Get() )
@@ -2265,8 +2268,8 @@ void CElementPropertiesTreeInternal::ValidateHistory()
 
 void CElementPropertiesTreeInternal::SpewHistory()
 {
-	int i;
-	int c = m_hHistory.Count();
+	intp i;
+	intp c = m_hHistory.Count();
 	for ( i = 0 ; i < c; ++i )
 	{
 		CDmElement *element = m_hHistory[ i ].Get();
@@ -2274,7 +2277,7 @@ void CElementPropertiesTreeInternal::SpewHistory()
 		if ( !element )
 			continue;
 
-		Msg( "%s:  [%02d] %s <%s>\n",
+		Msg( "%s:  [%02zd] %s <%s>\n",
 			( ( i < m_nCurrentHistoryPosition ) ? "Fwd" : ( i == m_nCurrentHistoryPosition ? "Current" : "Backward" ) ),
 			i, 
 			element->GetName(), 
@@ -2475,8 +2478,8 @@ void CElementPropertiesTreeInternal::OnCommand( const char *cmd )
 	if ( !data.Count()  )
 		return;
 
-	int c = data.Count();
-	for ( int i = 0; i  < c; ++i )
+	intp c = data.Count();
+	for ( intp i = 0; i  < c; ++i )
 	{
 		KeyValues *item = data[ i ];
 		Assert( item );
@@ -2520,7 +2523,7 @@ void CElementPropertiesTreeInternal::OnAddItem()
 {
 	CUtlVector< KeyValues * > data;
 	m_pTree->GetTree()->GetSelectedItemData( data );
-	int c = data.Count();
+	intp c = data.Count();
 	if ( c == 0 )
 		return;
 
@@ -2528,7 +2531,7 @@ void CElementPropertiesTreeInternal::OnAddItem()
 	{
 		CElementTreeUndoScopeGuard guard( NOTIFY_SETDIRTYFLAG, m_pNotify, "Add Item(s)" );
 
-		for ( int i = 0; i  < c; ++i )
+		for ( intp i = 0; i  < c; ++i )
 		{
 			KeyValues *item = data[ i ];
 			Assert( item );
@@ -2607,8 +2610,8 @@ void CElementPropertiesTreeInternal::OnSetShared( KeyValues *params )
 
 	CUtlVector< KeyValues* > selected;
 	m_pTree->GetTree()->GetSelectedItemData( selected );
-	int nSelected = selected.Count();
-	for ( int i = 0; i < nSelected; ++i )
+	intp nSelected = selected.Count();
+	for ( intp i = 0; i < nSelected; ++i )
 	{
 		KeyValues *kv = selected[ i ];
 		CDmElement *pElement = GetElementKeyValue<CDmElement>( kv, "dmeelement" );
@@ -2628,8 +2631,8 @@ void CElementPropertiesTreeInternal::OnSetShared( KeyValues *params )
 			continue; // value attribute, value array item, or value array
 
 		// element array attribute
-		int nCount = array.Count();
-		for ( int j = 0; j < nCount; ++j )
+		intp nCount = array.Count();
+		for ( intp j = 0; j < nCount; ++j )
 		{
 			CDmElement *pElement = array[ j ];
 			if ( !pElement )
@@ -2649,14 +2652,14 @@ void CElementPropertiesTreeInternal::OnChangeFile( KeyValues *params )
 
 	CUtlVector< KeyValues * > data;
 	m_pTree->GetTree()->GetSelectedItemData( data );
-	int nSelected = data.Count();
+	intp nSelected = data.Count();
 	if ( !nSelected )
 		return;
 
 	CElementTreeNotifyScopeGuard notify( "CElementPropertiesTreeInternal::OnChangeFile", NOTIFY_SETDIRTYFLAG, m_pNotify );
 
 	bool bRefreshRequired = false;
-	for ( int i = 0; i < nSelected; ++i )
+	for ( intp i = 0; i < nSelected; ++i )
 	{
 		KeyValues *item = data[ i ];
 		Assert( item );
@@ -2690,7 +2693,7 @@ void CElementPropertiesTreeInternal::OnShowFileDialog( KeyValues *params )
 	FileOpenDialog *pDialog = new FileOpenDialog( this, pTitle, bOpenOnly, pContext->MakeCopy() );
 
 	char pStartingDir[ MAX_PATH ];
-	GetModSubdirectory( NULL, pStartingDir, sizeof( pStartingDir ) );
+	GetModSubdirectory( NULL, pStartingDir );
 	Q_StripTrailingSlash( pStartingDir );
 
 	pDialog->SetStartDirectoryContext( pTitle, pStartingDir );
@@ -2753,7 +2756,7 @@ void CElementPropertiesTreeInternal::OnExportElement( const char *pFullPath, Key
 
 	CUtlVector< KeyValues * > selection;
 	m_pTree->GetTree()->GetSelectedItemData( selection );
-	int nSelected = selection.Count();
+	intp nSelected = selection.Count();
 	if ( nSelected <= 1 )
 	{
 		pRoot = GetElementKeyValue<CDmElement>( pContext, "element" );
@@ -2768,7 +2771,7 @@ void CElementPropertiesTreeInternal::OnExportElement( const char *pFullPath, Key
 		pRoot = CreateElement< CDmElement >( pFullPath, fileid );
 		CDmrElementArray<> children( pRoot, "children", true );
 
-		for ( int si = 0; si < nSelected; ++si )
+		for ( intp si = 0; si < nSelected; ++si )
 		{
 			KeyValues *item = selection[ si ];
 			Assert( item );
@@ -2790,7 +2793,7 @@ void CElementPropertiesTreeInternal::OnExportElement( const char *pFullPath, Key
 			else if ( attrType == AT_ELEMENT_ARRAY )
 			{
 				const CDmrElementArray<> arrayAttr( pAttr );
-				int n = arrayAttr.Count();
+				intp n = arrayAttr.Count();
 				int index = item->GetInt( "arrayIndex", -1 );
 				if ( index >= 0 )
 				{
@@ -2798,7 +2801,7 @@ void CElementPropertiesTreeInternal::OnExportElement( const char *pFullPath, Key
 				}
 				else
 				{
-					for ( int i = 0; i < n; ++i )
+					for ( intp i = 0; i < n; ++i )
 					{
 						children.AddToTail( arrayAttr[ i ] );
 					}
@@ -2939,7 +2942,7 @@ struct DataModelFilenameArray
 	}
 };
 
-void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, int y )
+void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y )
 {
 	KeyValues *data = m_pTree->GetItemData( itemIndex );
 	if ( !data )
@@ -2957,7 +2960,7 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, 
 	m_hContextMenu = new Menu( this, "ActionMenu" );
 	m_hContextMenu->SetFont( m_pTree->GetTree()->GetFont() );
 	Menu::PlaceContextMenu( this, m_hContextMenu.Get() );
-	int id;
+	intp id;
 
 	// ----------------------------------------------------
 	// What have we clicked on?
@@ -3035,7 +3038,7 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, 
 	pasteSpecial->SetItemEnabled( id, false );
 
 	// clear or remove
-	int removeItemID;
+	intp removeItemID;
 	if ( bIsArrayAttribute && !bIsArrayAttributeEmpty )
 	{
 		removeItemID = m_hContextMenu->AddMenuItem( "#DmeElementPropertiesClear", new KeyValues( "OnRemove" ), this );
@@ -3137,8 +3140,8 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, 
 		m_pTree->GetTree()->GetSelectedItemData( selected );
 		int nElements = 0;
 		int nShared = 0;
-		int nSelected = selected.Count();
-		for ( int i = 0; i < nSelected; ++i )
+		intp nSelected = selected.Count();
+		for ( intp i = 0; i < nSelected; ++i )
 		{
 			KeyValues *kv = selected[ i ];
 			CDmElement *pElement = GetElementKeyValue<CDmElement>( kv, "dmeelement" );
@@ -3162,8 +3165,8 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, 
 				continue; // value attribute, value array item, or value array
 
 			// element array attribute
-			int nCount = array.Count();
-			for ( int j = 0; j < nCount; ++j )
+			intp nCount = array.Count();
+			for ( intp j = 0; j < nCount; ++j )
 			{
 				CDmElement *pElement = array[ j ];
 				if ( !pElement )
@@ -3244,7 +3247,8 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, 
 		}
 
 		char filename[ MAX_PATH ];
-		V_GenerateUniqueName( filename, sizeof( filename ), "unnamed", DataModelFilenameArray() );
+		[[maybe_unused]] const bool ok = V_GenerateUniqueName( filename, "unnamed", DataModelFilenameArray() );
+		AssertMsg(ok, "Unable to create unique name for file.");
 
 		menu->AddMenuItem( "<new file>", new KeyValues( "OnChangeFile", "filename", filename ), this );
 	}
@@ -3379,9 +3383,9 @@ struct ArrayItem_t
 	int m_nIndex;
 };
 
-void CElementPropertiesTreeInternal::DropItemsIntoArray( CDmrElementArray<> &array, CUtlVector< KeyValues* > &msglist, CUtlVector< CDmElement* > &list, int nArrayIndex, DropOperation_t op )
+void CElementPropertiesTreeInternal::DropItemsIntoArray( CDmrElementArray<> &array, CUtlVector< KeyValues* > &msglist, CUtlVector< CDmElement* > &list, intp nArrayIndex, DropOperation_t op )
 {
-	int nElements = list.Count();
+	intp nElements = list.Count();
 	if ( op == DO_COPY )
 	{
 		CUtlVector< CDmElement* > copylist;
@@ -3395,8 +3399,8 @@ void CElementPropertiesTreeInternal::DropItemsIntoArray( CDmrElementArray<> &arr
 		CUtlRBTree< ArrayItem_t > arrayItemSorter( 0, msglist.Count(), ArrayItem_t::LessFunc );
 
 		// sort all element array items and set element attributes to NULL
-		int nMsgs = msglist.Count();
-		for ( int i = 0; i < nMsgs; ++i )
+		intp nMsgs = msglist.Count();
+		for ( intp i = 0; i < nMsgs; ++i )
 		{
 			KeyValues *itemData = msglist[ i ];
 
@@ -3426,7 +3430,7 @@ void CElementPropertiesTreeInternal::DropItemsIntoArray( CDmrElementArray<> &arr
 		}
 
 		// walk through all array items, back to front, so that removing won't mess up the indices
-		for ( int i = arrayItemSorter.LastInorder(); i != arrayItemSorter.InvalidIndex(); i = arrayItemSorter.PrevInorder( i ) )
+		for ( auto i = arrayItemSorter.LastInorder(); i != arrayItemSorter.InvalidIndex(); i = arrayItemSorter.PrevInorder( i ) )
 		{
 			ArrayItem_t &arrayItem = arrayItemSorter[ i ];
 
@@ -3440,7 +3444,7 @@ void CElementPropertiesTreeInternal::DropItemsIntoArray( CDmrElementArray<> &arr
 		}
 	}
 
-	int base = array.InsertMultipleBefore( nArrayIndex, nElements );
+	intp base = array.InsertMultipleBefore( nArrayIndex, nElements );
 	//			array.SetMultiple( base, nElements, list.Base() );
 	for ( int i = 0; i < nElements; ++i )
 	{
@@ -3477,8 +3481,8 @@ CElementPropertiesTreeInternal::DropOperation_t CElementPropertiesTreeInternal::
 		return DO_LINK; // dropping to a non-array attribute
 
 	DropOperation_t op = DO_UNKNOWN;
-	int nMsgs = msglist.Count();
-	for ( int i = 0; i < nMsgs; ++i )
+	intp nMsgs = msglist.Count();
+	for ( intp i = 0; i < nMsgs; ++i )
 	{
 		KeyValues *pMsg = msglist[ i ];
 		if ( !pMsg || !GetElementKeyValue< CDmElement >( pMsg , "dmeelement" ) )
@@ -3587,8 +3591,8 @@ void CElementPropertiesTreeInternal::OnItemDropped( int itemIndex, CUtlVector< K
 
 			if ( op == DO_MOVE )
 			{
-				int c = msglist.Count();
-				for ( int i = 0; i < c; ++i )
+				intp c = msglist.Count();
+				for ( intp i = 0; i < c; ++i )
 				{	
 					KeyValues *data = msglist[ i ];
 					CDmElement *e = GetElementKeyValue<CDmElement>( data, "dmeelement" );
@@ -3651,8 +3655,8 @@ void CElementPropertiesTreeInternal::OnItemDropped( int itemIndex, CUtlVector< K
 	{
 		if ( isArrayElement || attType == AT_ELEMENT_ARRAY )
 		{
-			int nElements = list.Count();
-			for ( int i = 0; i < nElements; ++i )
+			intp nElements = list.Count();
+			for ( intp i = 0; i < nElements; ++i )
 			{
 				int nChildren = m_pTree->GetTree()->GetNumChildren( itemIndex );
 				for ( int ci = 0; ci < nChildren; ++ci )
@@ -4093,7 +4097,7 @@ void CElementPropertiesTreeInternal::SetTreeEntryDimState(  )
 //-----------------------------------------------------------------------------
 // Adds a single entry into the tree
 //-----------------------------------------------------------------------------
-void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, int nArrayIndex, AttributeWidgets_t &widgets )
+void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, intp nArrayIndex, AttributeWidgets_t &widgets )
 {
 	char pText[ 512 ];
 	bool bEditableLabel = false;
@@ -4194,7 +4198,7 @@ void CElementPropertiesTreeInternal::SetupWidgetInfo( AttributeWidgetInfo_t *pIn
 //-----------------------------------------------------------------------------
 // Adds a single editable attributes of the element to the tree
 //-----------------------------------------------------------------------------
-void CElementPropertiesTreeInternal::InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, int nArrayIndex )
+void CElementPropertiesTreeInternal::InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex )
 {
 	const char *attributeName = pAttribute->GetName();
 	NOTE_UNUSED( attributeName );
@@ -4313,8 +4317,8 @@ void CElementPropertiesTreeInternal::InsertAttributeArrayMembers( int parentNode
 
 	// Iterate over each element and create a widget and tree entry for it
 	CDmrGenericArray array( pAttribute );
-	int c = array.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = array.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		InsertSingleAttribute( parentNodeIndex, obj, pAttribute, i );
 	}
@@ -4464,12 +4468,10 @@ IMPLEMENT_DMEPANEL_FACTORY( CDmeElementPanel, DmElement, "DmeElementDefault", "D
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4355)
 CDmeElementPanel::CDmeElementPanel( vgui::Panel *pParent, const char *pPanelName ) :
 	BaseClass( pParent, this, NULL )
 {
 }
-#pragma warning (default:4355)
 
 
 //-----------------------------------------------------------------------------

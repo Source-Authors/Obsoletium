@@ -26,8 +26,6 @@ using namespace vgui;
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-KeyValues *g_pPreloadedAchievementItemLayout = NULL;
-
 #define NUM_COMBO_BOX_LINES_DEFAULT	10
 #define NUM_COMBO_BOX_LINES_MAX		16
 
@@ -232,7 +230,7 @@ void CAchievementsDialog_XBox::PerformLayout( void )
 		wchar_t wzTotal[8];
 		V_snwprintf( wzActiveItem, ssize( wzActiveItem ), L"%d", m_Menu.GetActiveItemIndex()+1 );
 		V_snwprintf( wzTotal, ssize( wzTotal ), L"%d", m_nTotalAchievements );
-		g_pVGuiLocalize->ConstructString( wszNumbering, sizeof( wszNumbering ), wzNumberingFmt, 2, wzActiveItem, wzTotal );
+		g_pVGuiLocalize->ConstructString_safe( wszNumbering, wzNumberingFmt, 2, wzActiveItem, wzTotal );
 		m_pNumbering->SetText( wszNumbering );
 		m_pNumbering->SetWide( GetWide() );
 	}
@@ -865,30 +863,24 @@ void CAchievementsDialog::CreateOrUpdateComboItems( bool bCreate )
 	for ( int i=0;i<m_iNumAchievementGroups;i++ )
 	{
 		char buf[128];
-
-		Q_snprintf( buf, sizeof(buf), "#Achievement_Group_%d", m_AchievementGroups[i].m_iMinRange );
+		V_sprintf_safe( buf, "#Achievement_Group_%d", m_AchievementGroups[i].m_iMinRange );
 
 		const wchar_t *wzGroupName = g_pVGuiLocalize->Find( buf );
-
 		if ( !wzGroupName )
 		{
 			wzGroupName = L"Need Title ( %s1 of %s2 )";
 		}
 
+		wchar_t wzNumUnlocked[8];
+		V_snwprintf( wzNumUnlocked, ssize( wzNumUnlocked ), L"%d", m_AchievementGroups[i].m_iNumUnlocked );
+
+		wchar_t wzNumAchievements[8];
+		V_snwprintf( wzNumAchievements, ssize( wzNumAchievements ), L"%d", m_AchievementGroups[i].m_iNumAchievements );
+
 		wchar_t wzGroupTitle[128];
+		g_pVGuiLocalize->ConstructString_safe( wzGroupTitle, wzGroupName, 2, wzNumUnlocked, wzNumAchievements );
 
-		if ( wzGroupName )
-		{
-			wchar_t wzNumUnlocked[8];
-			V_snwprintf( wzNumUnlocked, ssize( wzNumUnlocked ), L"%d", m_AchievementGroups[i].m_iNumUnlocked );
-
-			wchar_t wzNumAchievements[8];
-			V_snwprintf( wzNumAchievements, ssize( wzNumAchievements ), L"%d", m_AchievementGroups[i].m_iNumAchievements );
-
-			g_pVGuiLocalize->ConstructString( wzGroupTitle, sizeof( wzGroupTitle ), wzGroupName, 2, wzNumUnlocked, wzNumAchievements );
-		}
-
-		KeyValues *pKV = new KeyValues( "grp" );
+		KeyValuesAD pKV( "grp" );
 		pKV->SetInt( "minrange", m_AchievementGroups[i].m_iMinRange );
 		pKV->SetInt( "maxrange", m_AchievementGroups[i].m_iMaxRange );
 
@@ -1015,15 +1007,25 @@ void CAchievementDialogItemPanel::SetAchievementInfo( IAchievement* pAchievement
 	m_iSourceAchievementIndex = pAchievement->GetAchievementID();
 }
 
-const char g_controlResourceName[] = "resource/ui/AchievementItem.res";
+constexpr inline char g_controlResourceName[] = "resource/ui/AchievementItem.res";
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CAchievementDialogItemPanel::PreloadResourceFile( void )
+KeyValues *CAchievementDialogItemPanel::PreloadResourceFile( void )
 {
-	g_pPreloadedAchievementItemLayout = new KeyValues(g_controlResourceName);
-	g_pPreloadedAchievementItemLayout->LoadFromFile(g_pFullFileSystem, g_controlResourceName);
+	static KeyValuesAD preloadKvLayout(g_controlResourceName);
+	static std::once_flag loadOnce;
+
+	std::call_once(loadOnce, [](KeyValues *kv)
+	{
+		if ( !kv->LoadFromFile(g_pFullFileSystem, g_controlResourceName) )
+		{
+			Warning( "Unable to preload achievements layout from '%s'.\n", g_controlResourceName );
+		}
+	}, preloadKvLayout);
+
+	return preloadKvLayout;
 }
 
 //-----------------------------------------------------------------------------
@@ -1032,12 +1034,7 @@ void CAchievementDialogItemPanel::PreloadResourceFile( void )
 //-----------------------------------------------------------------------------
 void CAchievementDialogItemPanel::ApplySchemeSettings( IScheme* pScheme )
 {
-	if ( !g_pPreloadedAchievementItemLayout )
-	{
-		PreloadResourceFile();
-	}
-
-	LoadControlSettings( g_controlResourceName, NULL, g_pPreloadedAchievementItemLayout );
+	LoadControlSettings( g_controlResourceName, NULL, PreloadResourceFile() );
 
 	m_pSchemeSettings = pScheme;
 	

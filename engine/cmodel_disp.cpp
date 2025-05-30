@@ -73,7 +73,7 @@ public:
 			return;
 		m_firstIndex[index] = m_dispList.Count();
 		m_leafCount[index] = 0;
-		const int MAX_NODES = 1024;
+		constexpr int MAX_NODES = 1024;
 		int nodeList[MAX_NODES];
 		int listRead = 0;
 		int listWrite = 1;
@@ -200,7 +200,7 @@ void CM_DispTreeLeafnum( CCollisionBSPData *pBSPData )
 		leafBuilder.BuildLeafListForDisplacement( i );
 	}
 	int count = leafBuilder.GetDispListCount();
-	pBSPData->map_dispList.Attach( count, (unsigned short*)Hunk_Alloc( sizeof(unsigned short) * count, false ) );
+	pBSPData->map_dispList.Attach( count, Hunk_Alloc<unsigned short>( count, false ) );
 	leafBuilder.WriteLeafList( pBSPData->map_dispList.Base() );
 }
 

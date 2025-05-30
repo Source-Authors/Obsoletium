@@ -30,12 +30,12 @@ public:
 	bool Create( CCoreDispInfo *pDisp );
 
 	// Patches.
-	bool InitPatch( int iPatch, int iParentPatch, int iChild, Vector *pPoints, int *pIndices, float &flArea );
-	bool InitParentPatch( int iPatch, Vector *pPoints, float &flArea );
+	bool InitPatch( intp iPatch, intp iParentPatch, int iChild, Vector (&pPoints)[3], int (&pIndices)[3], float &flArea );
+	bool InitParentPatch( intp iPatch, Vector *pPoints, float &flArea );
 	float CreateParentPatches( void );
-	void CreateChildPatches( int iParentPatch, int nLevel );
-	void CreateChildPatchesFromRoot( int iParentPatch, int *pChildPatch );
-	void CreateChildPatchesSub( int iParentPatch );
+	void CreateChildPatches( intp iParentPatch, int nLevel );
+	void CreateChildPatchesFromRoot( intp iParentPatch, intp (&pChildPatch)[2] );
+	void CreateChildPatchesSub( intp iParentPatch );
 
 	// Operations Functions
 	void BaseFacePlaneToDispUV( Vector const &vecPlanePt, Vector2D &dispUV );

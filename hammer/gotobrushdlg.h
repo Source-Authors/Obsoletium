@@ -10,8 +10,9 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 
-class CGotoBrushDlg : public CDialog
+class CGotoBrushDlg : public CBaseDlg
 {
 // Construction
 public:

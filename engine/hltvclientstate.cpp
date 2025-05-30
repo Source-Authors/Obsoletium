@@ -61,9 +61,11 @@ static	ConVar tv_timeout( "tv_timeout", "30", 0, "SourceTV connection timeout in
 
 CHLTVClientState::CHLTVClientState()
 {
-	m_pNewClientFrame = NULL;
-	m_pCurrentClientFrame = NULL;
+	m_pNewClientFrame = nullptr;
+	m_pCurrentClientFrame = nullptr;
 	m_bSaveMemory = false;
+	m_fNextSendUpdateTime = -1;
+	m_pHLTV = nullptr;
 }
 
 CHLTVClientState::~CHLTVClientState()
@@ -530,10 +532,13 @@ bool CHLTVClientState::ProcessGameEvent( SVC_GameEvent *msg )
 
 		if ( Q_strcmp( pszName, "hltv_status" ) == 0 )
 		{
-			m_pHLTV->m_nGlobalSlots = event->GetInt("slots");;
+			m_pHLTV->m_nGlobalSlots = event->GetInt("slots");
 			m_pHLTV->m_nGlobalProxies = event->GetInt("proxies");
 			m_pHLTV->m_nGlobalClients = event->GetInt("clients");
-			m_pHLTV->m_RootServer.SetFromString( event->GetString("master") );
+			if ( !m_pHLTV->m_RootServer.SetFromString( event->GetString("master") ) )
+			{
+				Warning("hltv_status event master server address %s is invalid.\n", event->GetString("master"));
+			}
 			bDontForward = true;
 		}
 		else if ( Q_strcmp( pszName, "hltv_title" ) == 0 )

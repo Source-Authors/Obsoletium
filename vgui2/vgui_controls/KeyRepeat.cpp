@@ -5,8 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "vgui_controls/pch_vgui_controls.h"
 #include <vgui_controls/KeyRepeat.h>
+
+#include "vgui_controls/pch_vgui_controls.h"
 
 // memdbgon must be the last include file in a .cpp file
 #include "tier0/memdbgon.h"
@@ -90,7 +91,7 @@ vgui::KeyCode CKeyRepeatHandler::KeyRepeated( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CKeyRepeatHandler::SetKeyRepeatTime( vgui::KeyCode code, float flRepeat )
+void CKeyRepeatHandler::SetKeyRepeatTime( vgui::KeyCode code, double flRepeat )
 {
 	int iIndex = GetIndexForCode(code);
 	Assert( iIndex != -1 );

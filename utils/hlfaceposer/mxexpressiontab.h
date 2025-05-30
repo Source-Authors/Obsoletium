@@ -21,7 +21,7 @@ public:
 	}
 
 	virtual void	ShowRightClickMenu( int mx, int my );
-	virtual int		getSelectedIndex () const;
+	virtual intp	getSelectedIndex () const;
 };
 
 extern mxExpressionTab	*g_pExpressionClass;

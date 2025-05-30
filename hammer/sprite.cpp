@@ -6,8 +6,9 @@
 //===========================================================================//
 
 #include "stdafx.h"
-#include "const.h"
 #include "Sprite.h"
+
+#include "const.h"
 #include "Material.h"			// FIXME: we need to work only with IEditorTexture!
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialsystem.h"
@@ -97,23 +98,19 @@ CSpriteModel *CSpriteCache::CreateSprite(const char *pszSpritePath)
 bool CSpriteCache::AddSprite(CSpriteModel *pSprite, const char *pszSpritePath)
 {
 	//
-	// Copy the sprite pointer.
-	//
-	m_Cache[m_nItems].pSprite = pSprite;
-
-	//
 	// Allocate space for and copy the model path.
 	//
-	m_Cache[m_nItems].pszPath = new char [strlen(pszSpritePath) + 1];
-	if (m_Cache[m_nItems].pszPath != NULL)
-	{
-		strcpy(m_Cache[m_nItems].pszPath, pszSpritePath);
-	}
-	else
+	m_Cache[m_nItems].pszPath = V_strdup( pszSpritePath );
+	if (m_Cache[m_nItems].pszPath == NULL)
 	{
 		return(false);
 	}
 
+	//
+	// Copy the sprite pointer.
+	//
+	// dimhotepus: Do it after path is copied as latter may fail.
+	m_Cache[m_nItems].pSprite = pSprite;
 	m_Cache[m_nItems].nRefCount = 1;
 
 	m_nItems++;
@@ -190,6 +187,10 @@ void CSpriteCache::Release(CSpriteModel *pSprite)
 CSpriteModel::CSpriteModel(void) : 
 	m_pMaterial(0), m_NumFrames(-1), m_fScale(1.0), m_Origin(0,0,0), m_UL(0,0), m_LR(0,0), m_TexUL(0,1), m_TexLR(1,0), m_bInvert(false)
 {
+	// dimhotepus: Member init in ctor.
+	m_pMaterial = nullptr;
+	m_pFrameVar = nullptr;
+	m_pRenderModeVar = nullptr;
 }
 
 
@@ -325,9 +326,8 @@ void CSpriteModel::GetSpriteAxes(QAngle& Angles, int type, Vector& forward, Vect
 			// generate the sprite's axes, parallel to the viewplane, but rotated in
 			// that plane around the center according to the sprite entity's roll
 			// angle. So vpn stays the same, but vright and vup rotate
-			angle = Angles[ROLL] * (M_PI*2 / 360);
-			sr = sin(angle);
-			cr = cos(angle);
+			angle = DEG2RAD( Angles[ROLL] );
+			DirectX::XMScalarSinCos(&sr, &cr, angle);
 
 			for (i=0 ; i<3 ; i++)
 			{

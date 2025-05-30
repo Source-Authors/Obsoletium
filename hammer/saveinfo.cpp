@@ -6,8 +6,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "MapClass.h"
 #include "SaveInfo.h"
+
+#include "MapClass.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

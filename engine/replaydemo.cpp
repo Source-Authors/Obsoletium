@@ -44,12 +44,17 @@ static ConVar *replay_record_voice = NULL;
 
 CReplayDemoRecorder::CReplayDemoRecorder( CReplayServer* pServer )
 {
+	m_szDumpFilename[0] = '\0';
 	m_bIsRecording = false;
+	m_bWrittenFirstFullUpdate = false;
+	m_nFrameCount = -1;
+	m_nStartTick = -1;
+	m_SequenceInfo = -1;
+	m_nDeltaTick = -1;
+	m_nSignonTick = -1;
 
 	Assert( pServer );
 	m_pReplayServer = pServer;
-
-	m_nStartTick = -1;
 }
 
 CReplayDemoRecorder::~CReplayDemoRecorder()
@@ -79,7 +84,7 @@ const char *CReplayDemoRecorder::GetDemoFilename()
 {
 	static char s_szDemoFilename[ MAX_OSPATH ];
 	const char *pFilename = replay->m_DemoRecorder.GetRecordingFilename();		Assert( pFilename && pFilename[0] );
-	V_strcpy( s_szDemoFilename, pFilename );
+	V_strcpy_safe( s_szDemoFilename, pFilename );
 	return s_szDemoFilename;
 }
 
@@ -114,7 +119,7 @@ void CReplayDemoRecorder::StartRecording( const char *pFilename, bool bContinuou
 
 	char szGameDir[MAX_OSPATH];
 	Q_strncpy(szGameDir, com_gamedir, sizeof( szGameDir ) );
-	Q_FileBase ( szGameDir, dh->gamedirectory, sizeof( dh->gamedirectory ) );
+	Q_FileBase ( szGameDir, dh->gamedirectory );
 
 	Q_strncpy( dh->servername, host_name.GetString(), sizeof( dh->servername ) );
 

@@ -11,7 +11,7 @@
 #include "vgui_controls/Button.h"
 #include "vgui_controls/FileOpenDialog.h"
 #include "dme_controls/AttributeTextEntry.h"
-#include "matsys_controls/MDLPicker.h"
+#include "matsys_controls/mdlpicker.h"
 #include "matsys_controls/sequencepicker.h"
 #include "tier1/KeyValues.h"
 

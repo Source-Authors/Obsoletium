@@ -16,42 +16,42 @@
 	#if defined( printf )
 		#undef printf
 	#endif
-	#define printf				printf__HEY_YOU__USE_VSTDLIB
+	#define printf				printf__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( wprintf )
 		#undef wprintf
 	#endif
-	#define wprintf				wprintf__HEY_YOU__USE_VSTDLIB
+	#define wprintf				wprintf__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( strcmp )
 		#undef strcmp
 	#endif
-	#define strcmp				strcmp__HEY_YOU__USE_VSTDLIB
+	#define strcmp				strcmp__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( wcscmp )
 		#undef wcscmp
 	#endif
-	#define wcscmp				wcscmp__HEY_YOU__USE_VSTDLIB
+	#define wcscmp				wcscmp__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( strncpy )
 		#undef strncpy
 	#endif
-	#define strncpy				strncpy__HEY_YOU__USE_VSTDLIB
+	#define strncpy				strncpy__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( wcsncpy )
 		#undef wcsncpy
 	#endif
-	#define wcsncpy				wcsncpy__HEY_YOU__USE_VSTDLIB
+	#define wcsncpy				wcsncpy__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( strlen )
 		#undef strlen
 	#endif
-	#define strlen				strlen__HEY_YOU__USE_VSTDLIB
+	#define strlen				strlen__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( wcslen )
 		#undef wcslen
 	#endif
-	#define wcslen				wcslen__HEY_YOU__USE_VSTDLIB
+	#define wcslen				wcslen__HEY_YOU__USE_VSTDLIB //-V1059
 	
 	#if defined( Q_strlen )
 		#undef Q_strlen
@@ -71,22 +71,22 @@
 	#if defined( sprintf )
 		#undef sprintf
 	#endif
-	#define sprintf				sprintf__HEY_YOU__USE_VSTDLIB
+	#define sprintf				sprintf__HEY_YOU__USE_VSTDLIB //-V1059
 
 	#if defined( swprintf )
 		#undef swprintf
 	#endif
-	#define swprintf			swprintf__HEY_YOU__USE_VSTDLIB
+	#define swprintf			swprintf__HEY_YOU__USE_VSTDLIB //-V1059
 
 	#if defined( vsprintf )
 		#undef vsprintf
 	#endif
-	#define vsprintf			vsprintf__HEY_YOU__USE_VSTDLIB
+	#define vsprintf			vsprintf__HEY_YOU__USE_VSTDLIB //-V1059
 
 	#if defined( vswprintf )
 		#undef vswprintf
 	#endif
-	#define vswprintf			vswprintf__HEY_YOU__USE_VSTDLIB
+	#define vswprintf			vswprintf__HEY_YOU__USE_VSTDLIB //-V1059
 
 	#if defined( _vsnprintf )
 		#undef _vsnprintf
@@ -101,22 +101,22 @@
 	#if defined( strcat )
 		#undef strcat
 	#endif
-	#define strcat				strcat__HEY_YOU__USE_VSTDLIB
+	#define strcat				strcat__HEY_YOU__USE_VSTDLIB //-V1059
 
 	#if defined( wcscat )
 		#undef wcscat
 	#endif
-	#define wcscat				wcscat__HEY_YOU__USE_VSTDLIB
+	#define wcscat				wcscat__HEY_YOU__USE_VSTDLIB //-V1059
 
 	#if defined( strncat )
 		#undef strncat
 	#endif
-	#define strncat				strncat__HEY_YOU__USE_VSTDLIB
+	#define strncat				strncat__HEY_YOU__USE_VSTDLIB //-V1059
 
 	#if defined( wcsncat )
 		#undef wcsncat
 	#endif
-	#define wcsncat				wcsncat__HEY_YOU__USE_VSTDLIB
+	#define wcsncat				wcsncat__HEY_YOU__USE_VSTDLIB //-V1059
 
 #endif
 
@@ -136,7 +136,7 @@
 	#if defined( clock )
 		#undef clock
 	#endif
-	#define time				time__USE_VCR_MODE
+	#define time				time__USE_VCR_MODE //-V1059
 	
 	
 	#if defined( recvfrom )

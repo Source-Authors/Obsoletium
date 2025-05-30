@@ -16,8 +16,6 @@
 #include <shellapi.h>
 #include <mmsystem.h>
 #include <oleidl.h>
-#include <stdio.h>
-#include <basetypes.h>
 
 #include <vgui/VGUI.h>
 #include <vgui/Dar.h>
@@ -29,21 +27,21 @@
 #include <vgui/ILocalize.h>
 #include <vgui/IHTML.h>
 #include <vgui/IVGui.h>
-#include <vgui/IPanel.h>
 #include <vgui/IScheme.h>
 
 #include <vgui/Cursor.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 
 #include "vgui_internal.h"
 #include "bitmap.h"
 #include "VPanel.h"
 
-#include "utlvector.h"
-#include "utlsymbol.h"
+#include <tier1/KeyValues.h>
+#include "tier1/utlvector.h"
+#include "tier1/utlsymbol.h"
 #include "tier1/utldict.h"
+#include "tier0/basetypes.h"
 
 #include "filesystem.h"
 #include "qlimits.h"
@@ -140,7 +138,7 @@ public:
 	void DrawFilledRectArray( IntRect *pRects, int numRects ) override;
 	void DrawOutlinedRect(int x0, int y0, int x1, int y1) override;
 	void DrawLine(int x0, int y0, int x1, int y1) override;
-	void DrawPolyLine(int *px, int *py, int numPoints) override;
+	void DrawPolyLine(int *px, int *py, intp numPoints) override;
 	void DrawSetTextFont(HFont font) override;
 	void DrawSetTextColor(int r, int g, int b, int a) override;
 	void DrawSetTextColor(Color col) override;
@@ -188,7 +186,7 @@ public:
 	void SetTopLevelFocus(VPANEL panel) override;
 
 	intp GetPopupCount() override;
-	VPANEL GetPopup(int index) override;
+	VPANEL GetPopup(intp index) override;
 	void AddPanel(VPANEL panel) override;
 	void ReleasePanel(VPANEL panel) override;
 	void CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIcon, bool disabled, bool mouseInput, bool kbInput ) override;
@@ -227,8 +225,8 @@ public:
 	int GetFontTall(HFont font) override;
 	int GetFontTallRequested(HFont font) override;
 	int GetFontAscent(HFont font, wchar_t wch) override;
-	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c) override;
-	int GetCharacterWidth(HFont font, int ch) override;
+	void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c) override;
+	int GetCharacterWidth(HFont font, wchar_t ch) override;
 	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) override;
 	bool AddCustomFontFile(const char *fontName, const char *fontFileName) override;
 	bool AddBitmapFontFile(const char *fontFileName) override;
@@ -622,8 +620,11 @@ private:
 			if (storage.tymed == TYMED_HGLOBAL)
 			{
 				const char *buf = (const char *)GlobalLock(storage.hGlobal);
-				dragData = new KeyValues("DragDrop", "type", "text", "text", buf);
-				GlobalUnlock(storage.hGlobal);
+				if (buf)
+				{
+					dragData = new KeyValues("DragDrop", "type", "text", "text", buf);
+					GlobalUnlock(storage.hGlobal);
+				}
 			}
 
 			ReleaseStgMedium(&storage);
@@ -639,15 +640,18 @@ private:
 
 				// parse out the file list
 				HDROP hdrop = (HDROP)GlobalLock(storage.hGlobal);
-				char namebuf[32], buf[512];
-				int count = DragQueryFile(hdrop, 0xFFFFFFFF, buf, 511);
-				for (int i = 0; i < count; i++)
+				if (hdrop)
 				{
-					V_to_chars(namebuf, i);
-					DragQueryFile(hdrop, i, buf, 511);
-					fileList->SetString(namebuf, buf);
+					char namebuf[32], buf[512];
+					int count = DragQueryFile(hdrop, 0xFFFFFFFF, buf, 511);
+					for (int i = 0; i < count; i++)
+					{
+						V_to_chars(namebuf, i);
+						DragQueryFile(hdrop, i, buf, 511);
+						fileList->SetString(namebuf, buf);
+					}
+					GlobalUnlock(storage.hGlobal);
 				}
-				GlobalUnlock(storage.hGlobal);
 			}
 		}
 
@@ -665,7 +669,7 @@ bool CWin32Surface::TextureLessFunc(const Texture &lhs, const Texture &rhs)
 Texture *CWin32Surface::GetTextureById(int id)
 {
 	Texture findTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int index = m_VGuiSurfaceTextures.Find(findTex);
+	auto index = m_VGuiSurfaceTextures.Find(findTex);
 	if (m_VGuiSurfaceTextures.IsValidIndex(index))
 	{
 		return &m_VGuiSurfaceTextures[index];
@@ -677,7 +681,7 @@ Texture *CWin32Surface::GetTextureById(int id)
 Texture *CWin32Surface::AllocTextureForId(int id)
 {
 	Texture newTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int index = m_VGuiSurfaceTextures.Insert(newTex);
+	auto index = m_VGuiSurfaceTextures.Insert(newTex);
 	return &m_VGuiSurfaceTextures[index];
 }
 
@@ -1275,8 +1279,8 @@ void CWin32Surface::SetNotifyIcon(VPANEL context, HTexture iconID, VPANEL panelT
 
 	if (iconID && !success)
 	{
-		DWORD err = GetLastError();
-		Msg("error: SetNotifyIcon(%d) failed\n", err);
+		Msg("Shell_NotifyIcon(%ul) failed: %s.\n",
+			dwMessage, std::system_category().message(::GetLastError()).c_str());
 	}
 }
 
@@ -1354,20 +1358,19 @@ void CWin32Surface::DrawLine(int x0,int y0,int x1,int y1)
 }
 
 
-void CWin32Surface::DrawPolyLine(int *px, int *py, int numPoints)
+void CWin32Surface::DrawPolyLine(int *px, int *py, intp numPoints)
 {
-	POINT *pt;
-	
-	pt = (POINT *)malloc(sizeof(POINT) * numPoints);
+	POINT *pt = (POINT *)malloc(sizeof(POINT) * numPoints);
 	if(pt) 
 	{
-		for(int i=0;i<numPoints;i++)
+		for(intp i=0;i<numPoints;i++)
 		{
 			pt[i].x= px[i];
 			pt[i].y= py[i];
 		}
 
-		Polyline(PLAT(_currentContextPanel)->hdc, pt , numPoints);
+		Assert(numPoints <= INT_MAX);
+		Polyline(PLAT(_currentContextPanel)->hdc, pt , static_cast<int>(numPoints));
 		free(pt);
 	}
 }
@@ -1510,7 +1513,7 @@ bool CWin32Surface::DeleteTextureByID(int id)
 #endif
 
 	Texture findTex = {id, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int index = m_VGuiSurfaceTextures.Find(findTex);
+	auto index = m_VGuiSurfaceTextures.Find(findTex);
 	if (m_VGuiSurfaceTextures.IsValidIndex(index))
 	{
 		Texture *texture = &m_VGuiSurfaceTextures[index];
@@ -1572,7 +1575,8 @@ void CWin32Surface::DrawSetTexture(int id)
 	m_pCurrentTexture = texture;
 }
 
-HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, int bpp, void **dib);
+// dimhotepus: bpp int -> unsigned short.
+HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, unsigned short bpp, void **dib);
 //-----------------------------------------------------------------------------
 // Purpose: maps a texture from memory to an id, and uploads it into the engine
 //-----------------------------------------------------------------------------
@@ -1646,7 +1650,7 @@ bool CWin32Surface::DrawGetTextureFile(int id, char *filename, int maxlen )
 
 int	  CWin32Surface::DrawGetTextureId( char const *filename )
 {
-	int i = m_VGuiSurfaceTextures.FirstInorder();
+	auto i = m_VGuiSurfaceTextures.FirstInorder();
 	while ( i != m_VGuiSurfaceTextures.InvalidIndex() )
 	{
 		Texture *texture = &m_VGuiSurfaceTextures[i];
@@ -1783,7 +1787,7 @@ typedef struct
 } tga_header_t;
 #pragma pack()
 
-HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, int bpp, void **dib)
+HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, unsigned short bpp, void **dib)
 {
 	BITMAPINFOHEADER bitmapInfoHeader;
 	memset(&bitmapInfoHeader, 0, sizeof(bitmapInfoHeader));
@@ -1810,7 +1814,7 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 {
 	// try load the tga
 	char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s.bmp", filename);
+	V_sprintf_safe(buf, "%s.bmp", filename);
 
 	FileHandle_t file = g_pFullFileSystem->Open(buf, "rb", NULL);
 	if (!file)
@@ -1899,7 +1903,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 
 	// try load the tga
 	char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s.tga", filename);
+	V_sprintf_safe(buf, "%s.tga", filename);
 
 	FileHandle_t file = g_pFullFileSystem->Open(buf, "rb", NULL);
 	if (!file)
@@ -2377,7 +2381,7 @@ intp CWin32Surface::GetPopupCount()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-VPANEL CWin32Surface::GetPopup(int index)
+VPANEL CWin32Surface::GetPopup(intp index)
 {
 	return _popupList[index];
 }
@@ -2545,7 +2549,7 @@ void CWin32Surface::ReleasePanel(VPANEL panel)
 		SetPanelVisible(panel, false);
 
 		// free all the windows/bitmap/DC handles we are using
-		::SetWindowLongPtr(plat->hwnd, GWLP_USERDATA, (LONG_PTR)-1);
+		::SetWindowLongPtr(plat->hwnd, GWLP_USERDATA, (LONG_PTR)INVALID_PANEL);
 		::SetWindowPos(plat->hwnd, HWND_BOTTOM, 0, 0, 1, 1, SWP_NOREDRAW|SWP_HIDEWINDOW);
 
 		// free the window context
@@ -3200,7 +3204,7 @@ bool CWin32Surface::IsFontAdditive(HFont font)
 //-----------------------------------------------------------------------------
 // Purpose: returns the abc widths of a single character
 //-----------------------------------------------------------------------------
-void CWin32Surface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
+void CWin32Surface::GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c)
 {
 	FontManager().GetCharABCwide(font, ch, a, b, c);
 }
@@ -3208,7 +3212,7 @@ void CWin32Surface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
 //-----------------------------------------------------------------------------
 // Purpose: returns the pixel width of a single character
 //-----------------------------------------------------------------------------
-int CWin32Surface::GetCharacterWidth(HFont font, int ch)
+int CWin32Surface::GetCharacterWidth(HFont font, wchar_t ch)
 {
 	return FontManager().GetCharacterWidth(font, ch);
 }
@@ -3227,7 +3231,7 @@ void CWin32Surface::GetTextSize(HFont font, const wchar_t *text, int &wide, int 
 bool CWin32Surface::AddCustomFontFile(const char *, const char *fontFileName)
 {
 	char fullPath[ MAX_PATH ];
-	g_pFullFileSystem->GetLocalPath(fontFileName, fullPath, sizeof( fullPath ));
+	g_pFullFileSystem->GetLocalPath_safe(fontFileName, fullPath);
 	m_CustomFontFileNames.AddToTail(fontFileName);
 	return (::AddFontResource(fullPath) > 0);
 }
@@ -3326,7 +3330,7 @@ void CWin32Surface::GetAbsoluteWindowBounds(int &x, int &y, int &wide, int &tall
 void CWin32Surface::PlaySound(const char *fileName)
 {
 	char localPath[MAX_PATH];
-	if (!g_pFullFileSystem->GetLocalPath(fileName, localPath, sizeof(localPath)))
+	if (!g_pFullFileSystem->GetLocalPath_safe(fileName, localPath))
 		return;
 
 	g_pFullFileSystem->GetLocalCopy(localPath);
@@ -3480,13 +3484,13 @@ IImage *CWin32Surface::GetIconImageForFullPath( char const *pFullPath )
 		if ( info.szTypeName[ 0 ] != 0 )
 		{
 			char ext[ 32 ];
-			Q_ExtractFileExtension( pFullPath, ext, sizeof( ext ) );
+			V_ExtractFileExtension( pFullPath, ext );
 
 			char lookup[ 512 ];
-			Q_snprintf( lookup, sizeof( lookup ), "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
+			V_sprintf_safe( lookup, "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
 
 			// Now check the dictionary
-			unsigned short idx = m_FileTypeImages.Find( lookup );
+			auto idx = m_FileTypeImages.Find( lookup );
 			if ( idx == m_FileTypeImages.InvalidIndex() )
 			{
 				newIcon = new CIconImage( info.hIcon );
@@ -3696,7 +3700,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 
 	if (staticSurfaceAvailable)
 	{
-		panel = g_pIVgui->HandleToPanel(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
+		panel = g_pIVgui->HandleToPanel(static_cast<HPanel>(::GetWindowLongPtr(hwnd, GWLP_USERDATA)));
 
 		if (panel)
 		{
@@ -3719,7 +3723,8 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		// so all necessary shutdown functions need to occur now
 		if (g_pSurface->GetEmbeddedPanel())
 		{
-			g_pIPanel->SendMessage(g_pSurface->GetEmbeddedPanel(), new KeyValues("WindowsEndSession"), NULL);
+			// dimhotepus: Do not leak KeyValues.
+			g_pIPanel->SendMessage(g_pSurface->GetEmbeddedPanel(), KeyValuesAD("WindowsEndSession"), NULL);
 		}
 		return 0;
 	}
@@ -3907,7 +3912,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		{
-			int code = wparam;
+			int code = static_cast<int>(wparam);
 			g_iPreviousKeyCode = KeyCode_VirtualKeyToVGUI( code );
 			bool bRepeating = ( lparam & ( 1<<30 ) ) != 0;
 			if ( !bRepeating )
@@ -3950,14 +3955,14 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		case WM_SYSCHAR:
 		case WM_CHAR:
 		{
-			int unichar = wparam;
+			int unichar = static_cast<int>(wparam);
 			g_pInput->InternalKeyTyped(unichar);
 			break;
 		}
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
-			KeyCode code = KeyCode_VirtualKeyToVGUI( wparam );
+			KeyCode code = KeyCode_VirtualKeyToVGUI( static_cast<int>(wparam) );
 			g_pInput->SetKeyCodeState( code, BUTTON_RELEASED );
 			g_pInput->InternalKeyCodeReleased( code );
 			break;

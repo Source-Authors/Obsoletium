@@ -34,13 +34,13 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CBaseAnimSetControlGroupPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseAnimSetControlGroupPanel, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAnimSetControlGroupPanel, EditablePanel );
 public:
 	CBaseAnimSetControlGroupPanel( vgui::Panel *parent, char const *className, CBaseAnimationSetEditor *editor );
 	virtual ~CBaseAnimSetControlGroupPanel();
 
 	void ChangeAnimationSet( CDmeAnimationSet *newAnimSet );
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 protected:
 

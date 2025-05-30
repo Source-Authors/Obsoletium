@@ -59,8 +59,8 @@ public:
 	static void PreloadWorld( void );
 	static int GetBadSolidCount( void );
 	virtual void PostloadWorld(CMapWorld *pWorld);
-	ChunkFileResult_t LoadVMF( CChunkFile *pFile, bool &bValid );
-	ChunkFileResult_t SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
+	[[nodiscard]] ChunkFileResult_t LoadVMF( CChunkFile *pFile, bool &bValid );
+	[[nodiscard]] ChunkFileResult_t SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
 	int SerializeRMF( std::fstream &, BOOL );
 	int SerializeMAP( std::fstream &, BOOL );
 
@@ -96,7 +96,7 @@ public:
 	// solid info
 	//
 	size_t GetSize();
-	const char* GetDescription();
+	const char* GetDescription() const override;
 	inline bool IsValid( void ) { return( m_bValid ); }
 	inline void SetValid( bool bValid ) { m_bValid = bValid; }
 	void SetTexture( LPCTSTR pszTex, int iFace = -1 );
@@ -168,8 +168,8 @@ protected:
 	//
 	// Serialization.
 	//
-	static ChunkFileResult_t LoadSideCallback(CChunkFile *pFile, CMapSolid *pSolid);
-	ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
+	[[nodiscard]] static ChunkFileResult_t LoadSideCallback(CChunkFile *pFile, CMapSolid *pSolid);
+	[[nodiscard]] ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
 	static int g_nBadSolidCount;
 
 	CSolidFaces Faces;					// The list of faces on this solid.	

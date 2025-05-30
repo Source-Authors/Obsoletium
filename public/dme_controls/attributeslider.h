@@ -37,21 +37,21 @@ class CSubRectImage;
 // if we move from control to control in the preset or here, we need to be able to decay into/out of the various individual sliders
 class CAttributeSlider : public EditablePanel 
 {
-	DECLARE_CLASS_SIMPLE( CAttributeSlider, EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeSlider, EditablePanel );
 
 	// Overridden methods of EditablePanel
 public:
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings( IScheme *scheme );
-	virtual void PerformLayout();
-	virtual void OnCursorMoved(int x, int y);
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnMouseReleased(MouseCode code);
-	virtual void OnCursorEntered();
-	virtual void OnCursorExited();
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void Paint() override;
+	void PaintBackground() override;
+	void ApplySchemeSettings( IScheme *scheme ) override;
+	void PerformLayout() override;
+	void OnCursorMoved(int x, int y) override;
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
+	void OnMouseReleased(MouseCode code) override;
+	void OnCursorEntered() override;
+	void OnCursorExited() override;
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 	// Other public methods
 public:

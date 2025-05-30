@@ -17,14 +17,10 @@
 #include "tier1/strtools.h"
 #include "mathlib/vector.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-const int MAX_COMMAND_BUFFER = 2048;
+constexpr inline int MAX_COMMAND_BUFFER = 2048;
 //-----------------------------------------------------------------------------
 // Purpose: Sends a command to the editor (if running) to begin an editing session
 //			of a given map.
@@ -193,7 +189,7 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 		//
 
 		COPYDATASTRUCT CopyData;
-		CopyData.cbData = strlen(pszCommand) + 1;
+		CopyData.cbData = static_cast<DWORD>(strlen(pszCommand) + 1);
 		CopyData.dwData = 0;
 		CopyData.lpData = (void *)pszCommand;
 		

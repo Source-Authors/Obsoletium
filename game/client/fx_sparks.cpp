@@ -381,8 +381,8 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	sParticle.m_uchEndAlpha	= 255;
 	sParticle.m_uchStartSize	= nMagnitude * random->RandomInt( 4, 8 );
 	sParticle.m_uchEndSize		= 0;
-	sParticle.m_flRoll			= random->RandomInt( 0, 360 );
-	sParticle.m_flRollDelta	= 0.0f;
+	sParticle.m_flRoll			= random->RandomFloat( 0, 360 );
+	sParticle.m_flRollDelta		= 0.0f;
 
 	AddSimpleParticle( &sParticle, ParticleMgr()->GetPMaterial( "effects/yellowflare" ) );
 
@@ -517,7 +517,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	sParticle->m_uchEndAlpha	= 0;
 	sParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 4, 8 ));
 	sParticle->m_uchEndSize		= static_cast<byte>(sParticle->m_uchStartSize*4);
-	sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	sParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 
 	//
@@ -764,7 +764,7 @@ void FX_Sparks( const Vector &pos, int nMagnitude, int nTrailLength, const Vecto
 	// Big sparks.
 	//
 	Vector	dir;
-	int		numSparks = nMagnitude * nMagnitude * random->RandomFloat( 2, 4 );
+	int		numSparks = nMagnitude * nMagnitude * random->RandomInt( 2, 4 );
 
 	int i;
 	TrailParticle	*pParticle;
@@ -1036,7 +1036,7 @@ void FX_MicroExplosion( Vector &position, Vector &normal )
 		sParticle->m_uchEndAlpha	= 0;
 		sParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 12, 16 ));
 		sParticle->m_uchEndSize		= sParticle->m_uchStartSize;
-		sParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		sParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 	}
 }
@@ -1234,7 +1234,7 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 		dir[0] = normal[0] + random->RandomFloat( -0.8f, 0.8f );
 		dir[1] = normal[1] + random->RandomFloat( -0.8f, 0.8f );
 		dir[2] = normal[2] + random->RandomFloat( -0.8f, 0.8f );
-		pParticle->m_vecVelocity = dir * random->RandomFloat( 2.0f, 24.0f )*(i+1);
+		pParticle->m_vecVelocity	= dir * random->RandomFloat( 2.0f, 24.0f )*(static_cast<float>(i)+1);
 		pParticle->m_uchStartAlpha	= 160;
 		pParticle->m_uchEndAlpha	= 0;
 		pParticle->m_flRoll			= random->RandomFloat( 180, 360 );

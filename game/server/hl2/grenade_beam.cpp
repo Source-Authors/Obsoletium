@@ -259,7 +259,7 @@ void CGrenadeBeam::GrenadeBeamTouch( CBaseEntity *pOther )
 	}
 	else 
 	{
-		UTIL_Smoke(GetAbsOrigin(), random->RandomInt(5, 10), 10);
+		UTIL_Smoke(GetAbsOrigin(), random->RandomFloat(5, 10), 10);
 	}
 
 	// --------------------------------------------

@@ -7,108 +7,49 @@
 $MacroRequired "PLATSUBDIR"
 
 $Macro SRCDIR		".."
-$Macro OUTBINDIR	"$SRCDIR\..\game"
-$Macro OUTBINDIRX64	"$SRCDIR\..\game"
+$Macro OUTAPPBINDIR	"$SRCDIR\..\game"
+$Macro OUTBINDIR	"$OUTAPPBINDIR"
 
-// Must be built explicitly as "default" in order to build a compliant submittable Disc.
-// Renames will not work.
-$Macro OUTBINNAME	"default"
-$Macro OUTBINNAME	"hl2_osx" [$OSXALL]
-$Macro OUTBINNAME	"hl2_linux" [$LINUXALL]
+$Macro OUTBINNAME	"hl2"			[$WIN32]
+$Macro OUTBINNAME	"hl2_win64"		[$WIN64]
+$Macro OUTBINNAME	"hl2_osx"		[$OSXALL]
+$Macro OUTBINNAME	"hl2_linux"		[$LINUXALL]
 
 $Include "$SRCDIR\vpc_scripts\source_exe_base.vpc"
 $Include "$SRCDIR\tier0\tier0_exclude.vpc"
-$Include "$SRCDIR\tier1\tier1_exclude.vpc" [$WINDOWS]
-$Include "$SRCDIR\vstdlib\vstdlib_exclude.vpc" [$WINDOWS]
+$Include "$SRCDIR\tier1\tier1_exclude.vpc"		[$WINDOWS]
+$Include "$SRCDIR\vstdlib\vstdlib_exclude.vpc"	[$WINDOWS]
 
 $Configuration
 {
-	$General
-	{
-		$AdditionalProjectDependencies "$BASE;newdat" [$WINDOWS && !$ANALYZE]
-	}
-
 	$Linker [$WINDOWS]
 	{
 		$AdditionalDependencies				"$BASE User32.lib"
 	}
 
-	$ManifestTool
+	$PostBuildEvent [$WINDOWS && !$ANALYZE]
 	{
-		// Input And Output
-		$AdditionalManifestFiles			"$BASE;$SRCDIR\build\win\manifests\dpi-aware.manifest;$SRCDIR\build\win\manifests\ultra-high-scroll-resolution.manifest;$SRCDIR\build\win\manifests\utf-8-code-page.manifest;$SRCDIR\out\manifests\enable-visual-styles.manifest" [!$SOURCESDK]
-	}
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTAPPBINDIR$QUOTE MKDIR $QUOTE$OUTAPPBINDIR$QUOTE" "\n" 
+		$CommandLine		"COPY $QUOTE$(TargetDir)$(TargetFileName)$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetFileName)$QUOTE >nul" "\n" \
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							// "SignTool sign /f $QUOTE$(SolutionDir)devtools\certificates\dev\local-dev-app-sign.pfx$QUOTE /p $QUOTEK)(#JF*56U8$RJO_)P#6NJP762OKAE$QUOTE /fd SHA512 /td SHA512 /tr http://timestamp.sectigo.com $QUOTE$OUTAPPBINDIR\$(TargetFileName)$QUOTE" "\n" \
+							// "IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF NOT $QUOTE$(TargetFileName)$QUOTE == $QUOTEnewdat.exe$QUOTE (" "\n" \
+							"    $QUOTE$OUTAPPBINDIR\bin$PLATSUBDIR\newdat$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetFileName)$QUOTE" "\n" \
+							"    IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							")" "\n" \
 
-	$Resources
-	{
-		// General
-		$PreprocessorDefinitions				"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEhl2\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEhl2.exe\$QUOTE"
-	}
-
-	$PreBuildEvent [$WIN32]
-	{
-		$CommandLine		"if EXIST $OUTBINDIR\hl2.exe for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIR\hl2.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
-							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
-							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$QUOTE$(TargetFileName)" "\n" \
-							"$CRCCHECK"
-	}
-
-	$PreBuildEvent [$WIN64]
-	{
-		$CommandLine		"if EXIST $OUTBINDIRX64\hl2_win64.exe for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIRX64\hl2_win64.exe$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
-							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
-							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$QUOTE$(TargetFileName)" "\n" \
-							"$CRCCHECK"
-	}
-
-	$PostBuildEvent	[$WIN32 && !$ANALYZE]
-	{
-		// Note that the PDB must be checked in with the name it is linked as or else the debugger
-		// will not be able to find it. That's why it is checked in as default.pdb.
-		// override with specific behavior
-		$CommandLine				"IF NOT EXIST $OUTBINDIR MKDIR $OUTBINDIR" "\n"				\
-									"COPY $(TargetPath) $OUTBINDIR\hl2.exe" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $(IntDir)\default.pdb $OUTBINDIR\default.pdb" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIR\hl2.map" "\n" \
-									"$OUTBINDIR\bin\newdat $OUTBINDIR\hl2.exe" "\n"					\
-									"COPY $(SolutionDir)LICENSE $OUTBINDIR\LICENSE" "\n"			\
-									"GOTO BuildEventOK" "\n" \
-									":BuildEventFailed" "\n" \
-									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-									"DEL /Q $(TargetPath)" "\n" \
-									"EXIT 1" "\n" \
-									":BuildEventOK" "\n"
-	}
-
-	$PostBuildEvent	[$WIN64 && !$ANALYZE]
-	{
-		// Note that the PDB must be checked in with the name it is linked as or else the debugger
-		// will not be able to find it. That's why it is checked in as default.pdb.
-		// override with specific behavior
-		$CommandLine				"IF NOT EXIST $OUTBINDIRX64 MKDIR $OUTBINDIRX64" "\n"				\
-									"COPY $(TargetPath) $OUTBINDIRX64\hl2_win64.exe" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"COPY $(IntDir)\default.pdb $OUTBINDIRX64\default.pdb" "\n"					\
-									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-									"IF EXIST $(TargetDir)$(TargetName).map COPY $(TargetDir)$(TargetName).map $OUTBINDIRX64\hl2_win64.map" "\n" \
-									"$OUTBINDIRX64\bin\x64\newdat $OUTBINDIRX64\hl2_win64.exe" "\n"					\
-									"COPY $(SolutionDir)LICENSE $OUTBINDIRX64\LICENSE" "\n"			\
-									"GOTO BuildEventOK" "\n" \
-									":BuildEventFailed" "\n" \
-									"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-									"DEL /Q $(TargetPath)" "\n" \
-									"EXIT 1" "\n" \
-									":BuildEventOK" "\n"
-	}
-}
-
-$Project
-{
-	$Folder	"Link Libraries"
-	{
-		-$Lib tier0 [$WINDOWS]
+							"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetName).map$QUOTE >nul" "\n"
+		$CommandLine		"$BASE"	"COPY $QUOTE$(IntDir)$(TargetName).pdb$QUOTE $QUOTE$OUTAPPBINDIR\$(TargetName).pdb$QUOTE >nul" "\n" \
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"GOTO BuildEventOK" "\n" \
+							":BuildEventFailed" "\n" \
+							"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! $(TargetFileName) is probably running. ***" "\n" \
+							"DEL /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
+							"EXIT 1" "\n" \
+							":BuildEventOK" "\n"
+		$Description		"Publishing $(TargetFileName) to $OUTAPPBINDIR"
+		$ExcludedFromBuild	"No"
 	}
 }
 
@@ -120,15 +61,20 @@ $Project "launcher_main"
 		$File	"main_posix.cpp" [$OSXALL || $LINUXALL]
 	}
 
-	$Folder "Header Files" [$WINDOWS]
+	$Folder "Header Files"
 	{
 		$File	"$SRCDIR\common\scoped_dll.h"
-		$File	"$SRCDIR\common\scoped_process_error_mode.h"
+		$File	"$SRCDIR\common\scoped_process_error_mode.h" [$WINDOWS]
 	}
 
 	$Folder "Resources" [$WINDOWS]
 	{
 		$File	"resources\app.ico"
 		$File	"$SRCDIR\out\manifests\enable-visual-styles.manifest"
+	}
+	
+	$Folder	"Link Libraries"
+	{
+		-$Lib tier0 [$WINDOWS]
 	}
 }

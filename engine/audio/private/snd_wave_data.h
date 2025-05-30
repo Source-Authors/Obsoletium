@@ -32,7 +32,7 @@ abstract_class IWaveStreamSource
 public:
 	virtual int		UpdateLoopingSamplePosition( int samplePosition ) = 0;
 	virtual void	UpdateSamples( char *pData, int sampleCount ) = 0;
-	virtual int		GetLoopingInfo( int *pLoopBlock, int *pNumLeadingSamples, int *pNumTrailingSamples ) = 0;
+	virtual int		GetLoopingInfo() = 0;
 };
 
 class IFileReadBinary;

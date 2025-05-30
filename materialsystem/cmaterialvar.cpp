@@ -7,19 +7,17 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/itexture.h"
-#include <string.h>
 #include "materialsystem_global.h"
-#include <stdlib.h>
 #include "shaderapi/ishaderapi.h"
 #include "imaterialinternal.h"
-#include "utlsymbol.h"
-#include "mempool.h"
 #include "itextureinternal.h"
-#include "tier0/dbg.h"
-#include "tier1/callqueue.h"
-#include "mathlib/vmatrix.h"
-#include "tier1/strtools.h"
 #include "texturemanager.h"
+#include "tier0/dbg.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/mempool.h"
+#include "tier1/callqueue.h"
+#include "tier1/strtools.h"
+#include "mathlib/vmatrix.h"
 
 #define MATERIALVAR_CHAR_BUF_SIZE 512
 
@@ -754,7 +752,8 @@ const char *CMaterialVar::GetStringValue( void ) const
 		return "<UNDEFINED>";
 
 	default:
-		Warning( "CMaterialVar::GetStringValue: Unknown material var type\n" );
+		Warning( "CMaterialVar::GetStringValue: Unknown material var type \"%s\".\n", 
+				GetMaterialVarTypeDescription(static_cast<MaterialVarType_t>(m_Type)) );
 		return "";
 	}
 }
@@ -850,8 +849,8 @@ void CMaterialVar::GetFourCCValue( FourCC *type, void **ppData )
 		static int bitchCount;
 		if( bitchCount < 10 )
 		{
-			Warning( "CMaterialVar::GetVecValue: trying to get a vec value for %s which is of type %d\n",
-				GetName(), ( int )m_Type );
+			Warning( "CMaterialVar::GetVecValue: trying to get a vec value for %s which is of type \"%s\".\n",
+				GetName(), GetMaterialVarTypeDescription(static_cast<MaterialVarType_t>(m_Type)) );
 			bitchCount++;
 		}
 	}
@@ -907,9 +906,11 @@ ITexture *CMaterialVar::GetTextureValue( void )
 		static int bitchCount = 0;
 		if( bitchCount < 10 )
 		{
-			Warning( "Requesting texture value from var \"%s\" which is "
-					  "not a texture value (material: %s)\n", GetName(),
-						m_pMaterial ? m_pMaterial->GetName() : "NULL material" );
+			Warning( "Requesting texture value from var \"%s\" of type \"%s\" which is "
+					"not a texture value (material: %s)\n",
+					GetName(),
+					GetMaterialVarTypeDescription(static_cast<MaterialVarType_t>(m_Type)),
+					m_pMaterial ? m_pMaterial->GetName() : "NULL material" );
 			bitchCount++;
 		}
 	}
@@ -1047,9 +1048,11 @@ IMaterial *CMaterialVar::GetMaterialValue( void )
 		static int bitchCount = 0;
 		if( bitchCount < 10 )
 		{
-			Warning( "Requesting material value from var \"%s\" which is "
-					  "not a material value (material: %s)\n", GetName(),
-						m_pMaterial ? m_pMaterial->GetName() : "NULL material" );
+			Warning( "Requesting material value from var \"%s\" of type \"%s\" which is "
+					"not a material value (material: %s)\n",
+					GetName(),
+					GetMaterialVarTypeDescription(static_cast<MaterialVarType_t>(m_Type)),
+					m_pMaterial ? m_pMaterial->GetName() : "NULL material" );
 			bitchCount++;
 		}
 	}
@@ -1161,8 +1164,8 @@ void CMaterialVar::GetLinearVecValue( float *pVal, int numComps ) const
 		break;
 
 	default:
-		Warning( "CMaterialVar::GetVecValue: trying to get a vec value for %s which is of type %d\n",
-			GetName(), ( int )m_Type );
+		Warning( "CMaterialVar::GetVecValue: trying to get a vec value for \"%s\" which is of type \"%s\".\n",
+			GetName(), GetMaterialVarTypeDescription(static_cast<MaterialVarType_t>(m_Type)) );
 		break;
 	}
 }

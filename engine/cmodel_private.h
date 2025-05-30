@@ -107,7 +107,8 @@ struct cbrush_t
 	unsigned short	firstbrushside;
 
 	inline int GetBox() const { return firstbrushside; }
-	inline void SetBox( int boxID )
+	// dimhotepus: int -> unsigned short
+	inline void SetBox( unsigned short boxID )
 	{
 		numsides = NUMSIDES_BOXBRUSH;
 		firstbrushside = boxID;
@@ -296,7 +297,7 @@ protected:
 };
 #include "tier0/memdbgoff.h"
 
-const int SURFACE_INDEX_INVALID = 0xFFFF;
+constexpr inline int SURFACE_INDEX_INVALID = 0xFFFF;
 
 //=============================================================================
 //

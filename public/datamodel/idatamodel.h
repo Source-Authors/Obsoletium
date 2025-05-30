@@ -130,7 +130,7 @@ public:
 //-----------------------------------------------------------------------------
 // Used only by aplpications to hook in the element framework
 //-----------------------------------------------------------------------------
-#define VDMELEMENTFRAMEWORK_VERSION	"VDmElementFrameworkVersion001"
+constexpr inline char VDMELEMENTFRAMEWORK_VERSION[]{"VDmElementFrameworkVersion001"};
 
 
 //-----------------------------------------------------------------------------
@@ -155,7 +155,7 @@ public:
 //-----------------------------------------------------------------------------
 // Class factory methods: 
 //-----------------------------------------------------------------------------
-class IDmElementFactory
+abstract_class IDmElementFactory
 {
 public:
 	// Creation, destruction
@@ -177,7 +177,7 @@ enum DmConflictResolution_t
 
 // convert files to elements and back
 // current file encodings supported: binary, xml, xml_flat, keyvalues2, keyvalues2_flat, keyvalues (vmf/vmt/actbusy), text? (qc/obj)
-class IDmSerializer
+abstract_class IDmSerializer
 {
 public:
 	virtual const char *GetName() const = 0;
@@ -199,7 +199,7 @@ public:
 // convert legacy elements to non-legacy elements
 // legacy formats include: sfm_vN, binary_vN, keyvalues2_v1, keyvalues2_flat_v1, xml, xml_flat
 //   where N is a version number (1..9 for sfm, 1..2 for binary)
-class IDmLegacyUpdater
+abstract_class IDmLegacyUpdater
 {
 public:
 	virtual const char *GetName() const = 0;
@@ -211,7 +211,7 @@ public:
 
 // converts old elements to new elements
 // current formats include: sfm session, animset presets, particle definitions, exported maya character, etc.
-class IDmFormatUpdater
+abstract_class IDmFormatUpdater
 {
 public:
 	virtual const char *GetName() const = 0;
@@ -227,7 +227,7 @@ public:
 //-----------------------------------------------------------------------------
 // Interface for callbacks to supply element types for specific keys inside keyvalues files
 //-----------------------------------------------------------------------------
-class IElementForKeyValueCallback
+abstract_class IElementForKeyValueCallback
 {
 public:
 	virtual const char *GetElementForKeyValue( const char *pszKeyName, int iNestingLevel ) = 0;
@@ -331,7 +331,7 @@ enum TraversalDepth_t
 //-----------------------------------------------------------------------------
 // Main interface for creation of all IDmeElements: 
 //-----------------------------------------------------------------------------
-class IDataModel : public IAppSystem
+abstract_class IDataModel : public IAppSystem
 {
 public:	
 	// Installs factories used to instance elements
@@ -368,12 +368,12 @@ public:
 	virtual const char*		GetFormatExtension( const char *pFormatName ) = 0;
 	virtual const char*		GetFormatDescription( const char *pFormatName ) = 0;
 	virtual intp			GetFormatCount() const = 0;
-	virtual const char *	GetFormatName( int i ) const = 0;
+	virtual const char *	GetFormatName( intp i ) const = 0;
 	virtual const char *	GetDefaultEncoding( const char *pFormatName ) = 0;
 
 	// file encoding methods
 	virtual intp			GetEncodingCount() const = 0;
-	virtual const char *	GetEncodingName( int i ) const = 0;
+	virtual const char *	GetEncodingName( intp i ) const = 0;
 	virtual bool			IsEncodingBinary( const char *pEncodingName ) const = 0;
 	virtual bool			DoesEncodingStoreVersionInFile( const char *pEncodingName ) const = 0;
 
@@ -423,15 +423,15 @@ public:
 	virtual const char *	GetString( UtlSymId_t sym ) const = 0;
 
 	// Returns the total number of elements allocated at the moment
-	virtual int				GetMaxNumberOfElements() = 0;
-	virtual int				GetElementsAllocatedSoFar() = 0;
-	virtual int				GetAllocatedAttributeCount() = 0;
-	virtual int				GetAllocatedElementCount() = 0;
+	virtual intp			GetMaxNumberOfElements() const = 0;
+	virtual intp			GetElementsAllocatedSoFar() const = 0;
+	virtual intp			GetAllocatedAttributeCount() const = 0;
+	virtual intp			GetAllocatedElementCount() const = 0;
 	virtual DmElementHandle_t	FirstAllocatedElement() = 0;
 	virtual DmElementHandle_t	NextAllocatedElement( DmElementHandle_t it ) = 0;
 
 	// estimate memory usage
-	virtual int				EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth ) = 0;
+	virtual intp			EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth ) = 0;
 
 	// Undo/Redo support
 	virtual void			SetUndoEnabled( bool enable ) = 0;
@@ -472,8 +472,8 @@ public:
 	virtual bool			IsAttributeHandleValid( DmAttributeHandle_t h ) const = 0;
 
 	// file id reference methods
-	virtual int					NumFileIds() = 0;
-	virtual DmFileId_t			GetFileId( int i ) = 0;
+	virtual int					NumFileIds() const = 0;
+	virtual DmFileId_t			GetFileId( int i ) const = 0;
 	virtual DmFileId_t			FindOrCreateFileId( const char *pFilename ) = 0;
 	virtual void				RemoveFileId( DmFileId_t fileid ) = 0;
 	virtual DmFileId_t			GetFileId( const char *pFilename ) = 0;
@@ -483,10 +483,10 @@ public:
 	virtual void				SetFileFormat( DmFileId_t fileid, const char *pFormat ) = 0;
 	virtual DmElementHandle_t	GetFileRoot( DmFileId_t fileid ) = 0;
 	virtual void				SetFileRoot( DmFileId_t fileid, DmElementHandle_t hRoot ) = 0;
-	virtual bool				IsFileLoaded( DmFileId_t fileid ) = 0;
+	virtual bool				IsFileLoaded( DmFileId_t fileid ) const = 0;
 	virtual void				MarkFileLoaded( DmFileId_t fileid ) = 0;
 	virtual void				UnloadFile( DmFileId_t fileid ) = 0;
-	virtual int					NumElementsInFile( DmFileId_t fileid ) = 0;
+	virtual intp				NumElementsInFile( DmFileId_t fileid ) const = 0;
 
 	virtual void				DontAutoDelete( DmElementHandle_t hElement ) = 0;
 
@@ -512,7 +512,7 @@ public:
 	virtual bool HasElementFactory( const char *pElementType ) const = 0;
 
 	// Call before you make any undo records
-	virtual void SetUndoDepth( int nSize ) = 0;
+	virtual void SetUndoDepth( intp nSize ) = 0;
 
 	// Displats memory stats to the console
 	virtual void DisplayMemoryStats() = 0;
@@ -522,7 +522,7 @@ public:
 //-----------------------------------------------------------------------------
 // Used only by applications to hook in the data model
 //-----------------------------------------------------------------------------
-#define VDATAMODEL_INTERFACE_VERSION	"VDataModelVersion001"
+constexpr inline char VDATAMODEL_INTERFACE_VERSION[]{"VDataModelVersion001"};
 
 
 //-----------------------------------------------------------------------------

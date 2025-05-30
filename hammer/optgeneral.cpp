@@ -106,7 +106,7 @@ void PASCAL DDV_AutosaveTimer(CDataExchange *pDX, int value)
 //-----------------------------------------------------------------------------
 void COPTGeneral::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COPTGeneral)
 	DDX_Control(pDX, IDC_LOADWINPOSITIONS, m_cLoadWinPos);
 	DDX_Control(pDX, IDC_INDEPENDENTWINDOWS, m_cIndependentWin);
@@ -159,7 +159,7 @@ BOOL COPTGeneral::OnInitDialog(void)
 	m_iMaxAutosaveSpace = Options.general.iMaxAutosaveSpace;
 	m_iTimeBetweenSaves = Options.general.iTimeBetweenSaves;	
 	
-	CPropertyPage::OnInitDialog();
+	__super::OnInitDialog();
 
    	m_cEnableAutosave.SetCheck( Options.general.bEnableAutosave );
 
@@ -208,7 +208,7 @@ BOOL COPTGeneral::OnApply(void)
 	
 	if ( strcmp( Options.general.szAutosaveDir, str ) )
 	{
-		strcpy( Options.general.szAutosaveDir, str );
+		V_strcpy_safe( Options.general.szAutosaveDir, str );
 		bResetTimer = TRUE;
 	}
 
@@ -230,7 +230,7 @@ BOOL COPTGeneral::OnApply(void)
 		}
 	}
 
-	return(CPropertyPage::OnApply());
+	return(__super::OnApply());
 }
 
 

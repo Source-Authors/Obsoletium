@@ -218,8 +218,12 @@ void CMatLightmaps::CleanupLightmaps()
          {
             char szPFMFileName[MAX_PATH];
 
-            sprintf(szPFMFileName, "Lightmap-Page-%d.pfm", lightmap);
-            m_pLightmapDataPtrArray[lightmap]->WritePFM(szPFMFileName);
+            V_sprintf_safe(szPFMFileName, "Lightmap-Page-%d.pfm", lightmap);
+            if (!m_pLightmapDataPtrArray[lightmap]->WritePFM(szPFMFileName))
+            {
+				// dimhotepus: Dump warning.
+                Warning("Failed to write #%d ligtmap to PFM '%s'.\n", lightmap, szPFMFileName);
+            }
          }
       }
    }
@@ -275,8 +279,7 @@ void CMatLightmaps::BeginLightmapAllocation()
 	CleanupLightmaps();
 
 	m_ImagePackers.RemoveAll();
-	intp i = m_ImagePackers.AddToTail();
-	m_ImagePackers[i].Reset( 0, GetMaxLightmapPageWidth(), GetMaxLightmapPageHeight() );
+	m_ImagePackers[m_ImagePackers.AddToTail()].Reset( 0, GetMaxLightmapPageWidth(), GetMaxLightmapPageHeight() );
 
 	SetCurrentMaterialInternal(0);
 	m_currentWhiteLightmapMaterial = 0;

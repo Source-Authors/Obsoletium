@@ -27,7 +27,7 @@ CModList::CModList()
 //-----------------------------------------------------------------------------
 // Purpose: returns number of mods 
 //-----------------------------------------------------------------------------
-int CModList::ModCount()
+intp CModList::ModCount() const
 {
 	return m_ModList.Count();
 }
@@ -35,7 +35,7 @@ int CModList::ModCount()
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-const char *CModList::GetModName(int index)
+const char *CModList::GetModName(intp index) const
 {
 	return m_ModList[index].description;
 }
@@ -43,7 +43,7 @@ const char *CModList::GetModName(int index)
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-const char *CModList::GetModDir(int index)
+const char *CModList::GetModDir(intp index) const
 {
 	return m_ModList[index].gamedir;
 }
@@ -52,7 +52,7 @@ const char *CModList::GetModDir(int index)
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-const CGameID &CModList::GetAppID(int index) const
+const CGameID &CModList::GetAppID(intp index) const
 {
 	return m_ModList[index].m_GameID;
 }
@@ -61,7 +61,7 @@ const CGameID &CModList::GetAppID(int index) const
 //-----------------------------------------------------------------------------
 // Purpose: get the modlist index for this app id
 //-----------------------------------------------------------------------------
-int CModList::GetIndex( const CGameID &iAppID ) const
+intp CModList::GetIndex( const CGameID &iAppID ) const
 {
 	mod_t mod;
 	mod.m_GameID = iAppID;
@@ -72,9 +72,9 @@ int CModList::GetIndex( const CGameID &iAppID ) const
 //-----------------------------------------------------------------------------
 // Purpose: returns the mod name for the associated gamedir
 //-----------------------------------------------------------------------------
-const char *CModList::GetModNameForModDir( const CGameID &gameID )
+const char *CModList::GetModNameForModDir( const CGameID &gameID ) const
 {
-	int iApp = GetIndex( gameID );
+	intp iApp = GetIndex( gameID );
 	if ( iApp != m_ModList.InvalidIndex() )
 	{
 		return m_ModList[iApp].description;

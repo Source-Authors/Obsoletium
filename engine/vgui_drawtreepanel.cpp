@@ -227,14 +227,16 @@ public:
 		{
 			if ( g_DrawTreeSelectedPanel )
 			{
-				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, new KeyValues("Command", "command", "performlayout"), GetVPanel() );
+				// dimhotepus: Fix KeyValues leak.
+				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, KeyValuesAD( new KeyValues("Command", "command", "performlayout") ), GetVPanel() );
 			}
 		}
 		else if ( !Q_stricmp( command, "reloadscheme" ) )
 		{
 			if ( g_DrawTreeSelectedPanel )
 			{
-				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, new KeyValues("Command", "command", "reloadscheme"), GetVPanel() );
+				// dimhotepus: Fix KeyValues leak.
+				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, KeyValuesAD( new KeyValues("Command", "command", "reloadscheme") ), GetVPanel() );
 			}
 		}
 		else
@@ -259,7 +261,7 @@ public:
 		}
 		else
 		{
-			CUtlVector< int > list;
+			CUtlVector< intp > list;
 			m_pTree->GetSelectedItems( list );
 
 			Assert( list.Count() == 1 );
@@ -377,13 +379,12 @@ void VGui_RecursivePrintTree(
 
 	char str[1024];
 	if ( vgui_drawtree_panelptr.GetInt() )
-		Q_snprintf( str, sizeof( str ), "%s - [0x%x]", name, current );
+		Q_snprintf( str, sizeof( str ), "%s - [0x%llux]", name, current );
 	else if (vgui_drawtree_panelalpha.GetInt() )
 	{
-		KeyValues *kv = new KeyValues("alpha");
+		KeyValuesAD kv("alpha");
 		vgui::ipanel()->RequestInfo(current, kv);
 		Q_snprintf( str, sizeof( str ), "%s - [%d]", name, kv->GetInt("alpha") );
-		kv->deleteThis();
 	}
 	else
 		Q_snprintf( str, sizeof( str ), "%s", name );
@@ -553,16 +554,13 @@ void VGui_DrawHierarchy( void )
 	g_pDrawTreeFrame->SetVisible( true );
 
 	// Now reconstruct the tree control.
-	KeyValues *pRoot = new KeyValues("");
+	KeyValuesAD pRoot("");
 	pRoot->SetString( "Text", "<shouldn't see this>" );
 	
 	VGui_FillKeyValues( pRoot );
 
 	// Now incrementally update the tree control so we can preserve which nodes are open.
 	IncrementalUpdateTree( g_pDrawTreeFrame->m_pTree, pRoot );
-
-	// Delete the keyvalues.
-	pRoot->deleteThis();
 }
 
 

@@ -66,14 +66,20 @@ class CMapStudioModel : public CMapHelper
 		
 		bool ShouldRenderLast();
 
-		const char* GetDescription() { return("Studio model"); }
+		const char* GetDescription() const override { return("Studio model"); }
 
 		int GetFrame(void);
 		void SetFrame(int nFrame);
 
 		int GetSequence(void);
 		int GetSequenceCount(void);
-		void GetSequenceName(int nIndex, char *szName);
+		void GetSequenceName(int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize);
+		template<intp nameSize>
+		void GetSequenceName(int nIndex, OUT_Z_ARRAY char (&szName)[nameSize])
+		{
+			GetSequenceName(nIndex, szName, nameSize);
+		}
+		
 		void SetSequence(int nIndex);
 		
 		// Returns the index of the sequence (does a case-insensitive search).

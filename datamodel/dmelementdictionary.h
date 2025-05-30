@@ -171,7 +171,7 @@ public:
 	DmElementDictHandle_t Find( CDmElement *pElement );
 
 	// How many root elements do we have?
-	int RootElementCount() const;
+	intp RootElementCount() const;
 
 private:
 	struct ElementInfo_t

@@ -158,9 +158,9 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	// We will lock some of the flashlight params if player is on a ladder, to prevent oscillations due to the trace-rays
 	bool bPlayerOnLadder = ( C_BasePlayer::GetLocalPlayer()->GetMoveType() == MOVETYPE_LADDER );
 
-	const float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
-	const float flDistCutoff = 128.0f;
-	const float flDistDrag = 0.2;
+	constexpr float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
+	constexpr float flDistCutoff = 128.0f;
+	constexpr float flDistDrag = 0.2;
 
 	CTraceFilterSkipPlayerAndViewModel traceFilter;
 	float flOffsetY = r_flashlightoffsety.GetFloat();
@@ -368,13 +368,12 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 #ifndef NO_TOOLFRAMEWORK
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "FlashlightState" );
+		KeyValuesAD msg( "FlashlightState" );
 		msg->SetFloat( "time", gpGlobals->curtime );
 		msg->SetInt( "entindex", m_nEntIndex );
 		msg->SetInt( "flashlightHandle", m_FlashlightHandle );
 		msg->SetPtr( "flashlightState", &state );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 #endif
 }
@@ -455,13 +454,12 @@ void CFlashlightEffect::LightOffNew()
 #ifndef NO_TOOLFRAMEWORK
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "FlashlightState" );
+		KeyValuesAD msg( "FlashlightState" );
 		msg->SetFloat( "time", gpGlobals->curtime );
 		msg->SetInt( "entindex", m_nEntIndex );
 		msg->SetInt( "flashlightHandle", m_FlashlightHandle );
 		msg->SetPtr( "flashlightState", NULL );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 #endif
 

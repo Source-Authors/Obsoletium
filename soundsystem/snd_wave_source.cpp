@@ -5,20 +5,18 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <windows.h>
+#include "soundsystem/snd_audio_source.h"
+
+#include "tier1/utlbuffer.h"
 #include "tier2/riff.h"
 #include "snd_wave_source.h"
 #include "snd_wave_mixer_private.h"
-#include "soundsystem/snd_audio_source.h"
-#include <mmsystem.h>		// wave format
-#include <mmreg.h>			// adpcm format
 #include "soundsystem.h"
 #include "filesystem.h"
-#include "tier1/utlbuffer.h"
 
+#include "winlite.h"
+#include <mmsystem.h>		// wave format
+#include <mmreg.h>			// adpcm format
 
 //-----------------------------------------------------------------------------
 // Purpose: Implements the RIFF i/o interface on stdio
@@ -26,12 +24,12 @@
 class StdIOReadBinary : public IFileReadBinary
 {
 public:
-	int open( const char *pFileName )
+	intp open( const char *pFileName )
 	{
-		return (int)g_pFullFileSystem->Open( pFileName, "rb", "GAME" );
+		return (intp)g_pFullFileSystem->Open( pFileName, "rb", "GAME" );
 	}
 
-	int read( void *pOutput, int size, int file )
+	int read( void *pOutput, int size, intp file )
 	{
 		if ( !file )
 			return 0;
@@ -39,7 +37,7 @@ public:
 		return g_pFullFileSystem->Read( pOutput, size, (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		if ( !file )
 			return;
@@ -47,7 +45,7 @@ public:
 		g_pFullFileSystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -55,7 +53,7 @@ public:
 		return g_pFullFileSystem->Tell( (FileHandle_t)file );
 	}
 
-	unsigned int size( int file )
+	unsigned int size( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -63,7 +61,7 @@ public:
 		return g_pFullFileSystem->Size( (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		if ( !file )
 			return;
@@ -74,7 +72,6 @@ public:
 
 static StdIOReadBinary io;
 
-#define RIFF_WAVE			MAKEID('W','A','V','E')
 #define WAVE_FMT			MAKEID('f','m','t',' ')
 #define WAVE_DATA			MAKEID('d','a','t','a')
 #define WAVE_FACT			MAKEID('f','a','c','t')
@@ -215,7 +212,7 @@ void CAudioSourceWave::ConvertSamples( char *pData, int sampleCount )
 //-----------------------------------------------------------------------------
 void CAudioSourceWave::ParseSentence( IterateRIFF &walk )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.EnsureCapacity( walk.ChunkSize() );
 	walk.ChunkRead( buf.Base() );

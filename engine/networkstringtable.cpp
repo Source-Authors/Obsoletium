@@ -7,16 +7,16 @@
 #include "host.h"
 #include "sysexternal.h"
 #include "networkstringtable.h"
-#include "utlbuffer.h"
-#include "bitbuf.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/bitbuf.h"
 #include "netmessages.h"
 #include "net.h"
 #include "filesystem_engine.h"
 #include "baseclient.h"
 #include "vprof.h"
-#include <tier1/utlstring.h>
-#include <tier1/utlhashtable.h>
-#include <tier0/etwprof.h>
+#include "tier1/utlstring.h"
+#include "tier1/utlhashtable.h"
+#include "tier0/etwprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -67,7 +67,7 @@ static int GetBestPreviousString( CUtlVector< StringHistoryEntry >& history, cha
 	return bestindex;
 }
 
-bool CNetworkStringTable_LessFunc( FileNameHandle_t const &a, FileNameHandle_t const &b )
+static bool CNetworkStringTable_LessFunc( FileNameHandle_t const &a, FileNameHandle_t const &b )
 {
 	return a < b;
 }
@@ -88,35 +88,35 @@ public:
 		Purge();
 	}
 
-	unsigned int Count()
+	unsigned int Count() override
 	{
 		return m_Items.Count();
 	}
 
-	void Purge()
+	void Purge() override
 	{
 		m_Items.Purge();
 	}
 
-	const char *String( int index )
+	const char *String( int index ) override
 	{
 		char* pString = tmpstr512();
 		g_pFileSystem->String( m_Items.Key( index ), pString, 512 );
 		return pString;
 	}
 
-	bool IsValidIndex( int index )
+	bool IsValidIndex( int index ) override
 	{
 		return m_Items.IsValidIndex( index );
 	}
 
-	int Insert( const char *pString )
+	int Insert( const char *pString ) override
 	{
 		FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( pString );
 		return m_Items.Insert( fnHandle );
 	}
 
-	int Find( const char *pString )
+	int Find( const char *pString ) override
 	{
 		FileNameHandle_t fnHandle = g_pFileSystem->FindFileName( pString );
 		if ( !fnHandle )
@@ -124,18 +124,18 @@ public:
 		return m_Items.Find( fnHandle );
 	}
 
-	CNetworkStringTableItem	&Element( int index )
+	CNetworkStringTableItem	&Element( int index ) override
 	{
 		return m_Items.Element( index );
 	}
 
-	const CNetworkStringTableItem &Element( int index ) const
+	const CNetworkStringTableItem &Element( int index ) const override
 	{
 		return m_Items.Element( index );
 	}
 
 private:
-	CUtlMap< FileNameHandle_t, CNetworkStringTableItem > m_Items;
+	CUtlMap< FileNameHandle_t, CNetworkStringTableItem, int > m_Items;
 };
 
 //-----------------------------------------------------------------------------
@@ -152,42 +152,42 @@ public:
 	{ 
 	}
 
-	unsigned int Count()
+	unsigned int Count() override
 	{
 		return m_Lookup.Count();
 	}
 
-	void Purge()
+	void Purge() override
 	{
 		m_Lookup.Purge();
 	}
 
-	const char *String( int index )
+	const char *String( int index ) override
 	{
 		return m_Lookup.Key( index ).Get();
 	}
 
-	bool IsValidIndex( int index )
+	bool IsValidIndex( int index ) override
 	{
 		return m_Lookup.IsValidHandle( index );
 	}
 
-	int Insert( const char *pString )
+	int Insert( const char *pString ) override
 	{
 		return m_Lookup.Insert( pString );
 	}
 
-	int Find( const char *pString )
+	int Find( const char *pString ) override
 	{
 		return pString ? m_Lookup.Find( pString ) : m_Lookup.InvalidHandle();
 	}
 
-	CNetworkStringTableItem	&Element( int index )
+	CNetworkStringTableItem	&Element( int index ) override
 	{
 		return m_Lookup.Element( index );
 	}
 
-	const CNetworkStringTableItem &Element( int index ) const
+	const CNetworkStringTableItem &Element( int index ) const override
 	{
 		return m_Lookup.Element( index );
 	}
@@ -651,12 +651,12 @@ void CNetworkStringTable::ParseUpdate( bf_read &buf, int entries )
 					            entryIndex, GetTableName() );
 				}
 				Q_strncpy( entry, history[ index ].string, Min( sizeof( entry ), (size_t)bytestocopy + 1 ) );
-				buf.ReadString( substr, sizeof(substr) );
+				buf.ReadString( substr );
 				Q_strncat( entry, substr, sizeof(entry), COPY_ALL_CHARACTERS );
 			}
 			else
 			{
-				buf.ReadString( entry, sizeof( entry ) );
+				buf.ReadString( entry );
 			}
 
 			pEntry = entry;
@@ -1093,7 +1093,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 	{
 		char stringname[4096];
 		
-		buf.ReadString( stringname, sizeof( stringname ) );
+		buf.ReadString( stringname );
 
 		if ( buf.ReadOneBit() == 1 )
 		{
@@ -1123,7 +1123,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 		{
 			char stringname[4096];
 
-			buf.ReadString( stringname, sizeof( stringname ) );
+			buf.ReadString( stringname );
 
 			if ( buf.ReadOneBit() == 1 )
 			{
@@ -1485,7 +1485,7 @@ bool CNetworkStringTableContainer::ReadStringTables( bf_read& buf )
 	for ( int i = 0 ; i < numTables; i++ )
 	{
 		char tablename[ 256 ];
-		buf.ReadString( tablename, sizeof( tablename ) );
+		buf.ReadString( tablename );
 
 		// Find this table by name
 		CNetworkStringTable *table = (CNetworkStringTable*)FindTable( tablename );
@@ -1517,21 +1517,16 @@ void CNetworkStringTableContainer::WriteUpdateMessage( CBaseClient *client, int 
 	char buffer[NET_MAX_PAYLOAD];
 
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		if ( !table )
-			continue;
-
-		if ( !table->ChangedSinceTick( tick_ack ) )
+		if ( !t->ChangedSinceTick( tick_ack ) )
 			continue;
 
 		SVC_UpdateStringTable msg;
 
 		msg.m_DataOut.StartWriting( buffer, NET_MAX_PAYLOAD );
-		msg.m_nTableID = table->GetTableId();
-		msg.m_nChangedEntries = table->WriteUpdate( client, msg.m_DataOut, tick_ack );
+		msg.m_nTableID = t->GetTableId();
+		msg.m_nChangedEntries = t->WriteUpdate( client, msg.m_DataOut, tick_ack );
 
 		Assert( msg.m_nChangedEntries > 0 ); // don't send unnecessary empty updates
 
@@ -1540,7 +1535,7 @@ void CNetworkStringTableContainer::WriteUpdateMessage( CBaseClient *client, int 
 		if ( client &&
 			 client->IsTracing() )
 		{
-			client->TraceNetworkData( buf, "StringTable %s", table->GetTableName() );
+			client->TraceNetworkData( buf, "StringTable %s", t->GetTableName() );
 		}
 	}
 }
@@ -1555,16 +1550,12 @@ void CNetworkStringTableContainer::DirectUpdate( int tick_ack )
 	VPROF_BUDGET( "CNetworkStringTableContainer::DirectUpdate", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-		
-		if ( !table->ChangedSinceTick( tick_ack ) )
+		if ( !t->ChangedSinceTick( tick_ack ) )
 			continue;
 
-		table->UpdateMirrorTable( tick_ack );
+		t->UpdateMirrorTable( tick_ack );
 	}
 }
 
@@ -1579,13 +1570,9 @@ void CNetworkStringTableContainer::EnableRollback( bool bState )
 
 void CNetworkStringTableContainer::RestoreTick( int tick )
 {
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-
-		table->RestoreTick( tick );
+		t->RestoreTick( tick );
 	}
 }
 
@@ -1594,16 +1581,12 @@ void CNetworkStringTableContainer::RestoreTick( int tick )
 void CNetworkStringTableContainer::TriggerCallbacks( int tick_ack )
 {
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-
-		if ( !table->ChangedSinceTick( tick_ack ) )
+		if ( !t->ChangedSinceTick( tick_ack ) )
 			continue;
 
-		table->TriggerCallbacks( tick_ack );
+		t->TriggerCallbacks( tick_ack );
 	}
 }
 
@@ -1614,13 +1597,9 @@ void CNetworkStringTableContainer::SetTick( int tick_count)
 	m_nTickCount = tick_count;
 
 	// Determine if an update is needed
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		CNetworkStringTable *table = (CNetworkStringTable*) GetTable( i );
-
-		Assert( table );
-
-		table->SetTick( tick_count );
+		t->SetTick( tick_count );
 	}
 }
 
@@ -1642,8 +1621,8 @@ void CNetworkStringTableContainer::RemoveAllTables( void )
 //-----------------------------------------------------------------------------
 void CNetworkStringTableContainer::Dump( void )
 {
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto &t : m_Tables )
 	{
-		m_Tables[ i ]->Dump();
+		t->Dump();
 	}
 }

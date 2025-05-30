@@ -9,7 +9,8 @@
 #ifndef _GAMEPALETTE_H
 #define _GAMEPALETTE_H
 
-#include <d3drmdef.h>
+// dimhotepus: Unused, comment.
+// #include <d3drmdef.h>
 
 class CGamePalette
 {
@@ -24,8 +25,9 @@ public:
 
 	operator LOGPALETTE*()
 	{ return pPalette; }
-	operator D3DRMPALETTEENTRY*()
-	{ return (D3DRMPALETTEENTRY*) pPalette->palPalEntry; }
+	// dimhotepus: Unused, comment.
+	// operator D3DRMPALETTEENTRY*()
+	//{ return (D3DRMPALETTEENTRY*) pPalette->palPalEntry; }
 	operator CPalette*()
 	{ return &GDIPalette; }
 

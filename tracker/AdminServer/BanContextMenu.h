@@ -20,7 +20,7 @@ class CBanContextMenu : public vgui::Menu
 {
 public:
 	CBanContextMenu(vgui::Panel *parent);
-	~CBanContextMenu();
+	virtual ~CBanContextMenu();
 
 	// call this to activate the menu
 	void ShowMenu(vgui::Panel *target, unsigned int banID);

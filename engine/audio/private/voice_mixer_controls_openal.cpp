@@ -224,9 +224,7 @@ bool CMixerControls::SetValue_Float(Control iControl, float value)
 			// set volume
 			size = sizeof(float);
 			err = AudioDeviceSetProperty(defaultInputDevice, 0, channels[0], true, kAudioDevicePropertyVolumeScalar, size, &theVolume);
-			//AssertMsg1( noErr==err, "error setting volume of channel %d\n",(int)channels[0]);
 			err = AudioDeviceSetProperty(defaultInputDevice, 0, channels[1], true, kAudioDevicePropertyVolumeScalar, size, &theVolume);
-			//AssertMsg1( noErr==err, "error setting volume of channel %d\n",(int)channels[1]);
 			
 			return err == noErr;
 			

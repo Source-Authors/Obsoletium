@@ -23,32 +23,35 @@ class CServerInfoPanel : public CVarListPropertyPage
 {
 public:
 	CServerInfoPanel(vgui::Panel *parent, const char *name);
-	~CServerInfoPanel();
+	virtual ~CServerInfoPanel();
 
 	// gets the current hostname
 	const char *GetHostname();
 
 	// Called when page is loaded.  Data should be reloaded from document into controls.
-	virtual void OnResetData();
+	void OnResetData() override;
 
 protected:
 	// vgui overrides
-	virtual void OnThink();
+	void OnThink() override;
 
 	// special editing of map cycle list
-	virtual void OnEditVariable(KeyValues *rule);
+	void OnEditVariable(KeyValues *rule) override;
 
 	// handles responses from the server
-	virtual void OnServerDataResponse(const char *value, const char *response);
+	void OnServerDataResponse(const char *value, const char *response) override;
 
 private:
 	void UpdateMapCycleValue();
 
 	float m_flUpdateTime;
 	int m_iPlayerCount, m_iMaxPlayers;
-	float m_flLastUptimeReceiveTime;
-	long m_iLastUptimeReceived;
-	long m_iLastUptimeDisplayed;
+	// dimhotepus: float -> double
+	double m_flLastUptimeReceiveTime;
+	// dimhotepus: long -> double
+	double m_iLastUptimeReceived;
+	// dimhotepus: long -> double
+	double m_iLastUptimeDisplayed;
 
 	bool m_bMapListRetrieved;
 

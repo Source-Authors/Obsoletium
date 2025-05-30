@@ -78,7 +78,7 @@ bool CToolMaterial::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 
 	bool bShift = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
 
-	ULONG ulFace;
+	unsigned ulFace;
 	CMapClass *pObject = pView->NearestObjectAt( vPoint, ulFace);
 
 	if ((pObject != NULL) && (pObject->IsMapClass(MAPCLASS_TYPE(CMapSolid))))
@@ -119,7 +119,7 @@ bool CToolMaterial::OnRMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 	BOOL bShift = ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
 	BOOL bEdgeAlign = ((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
 	
-	ULONG ulFace;
+	unsigned ulFace;
 	CMapClass *pObject = pView->NearestObjectAt( vPoint, ulFace);
 
 	if (pObject != NULL)

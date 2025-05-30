@@ -37,8 +37,8 @@ void CDmeBodyGroupList::OnDestruction()
 //-----------------------------------------------------------------------------
 CDmeBodyGroup *CDmeBodyGroupList::FindBodyGroup( const char *pName )
 {
-	int nCount = m_BodyGroups.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_BodyGroups.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pName, m_BodyGroups[i]->GetName() ) )
 			return m_BodyGroups[i];
@@ -65,8 +65,8 @@ CDmeLODList *CDmeBodyGroupList::GetMainBodyPart()
 	if ( pLODList )
 		return pLODList;
 
-	const int nBodypartCount = pMainBodyGroup->m_BodyParts.Count();
-	for ( int i = 0; i < nBodypartCount; ++i )
+	const intp nBodypartCount = pMainBodyGroup->m_BodyParts.Count();
+	for ( intp i = 0; i < nBodypartCount; ++i )
 	{
 		pLODList = CastElement< CDmeLODList >( pMainBodyGroup->m_BodyParts[ i ] );
 		if ( pLODList && pLODList->m_LODs.Count() > 0 )

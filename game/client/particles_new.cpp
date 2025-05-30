@@ -75,7 +75,7 @@ void CNewParticleEffect::Construct()
 		state.m_pName = GetName();
 		state.m_nOwner = m_hOwner.Get() ? m_hOwner->entindex() : -1;
 
-		KeyValues *msg = new KeyValues( "ParticleSystem_Create" );
+		KeyValuesAD msg( "ParticleSystem_Create" );
 		msg->SetPtr( "state", &state );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 	}
@@ -89,7 +89,7 @@ CNewParticleEffect::~CNewParticleEffect(void)
 		state.m_nParticleSystemId = gpGlobals->curtime;
 		state.m_flTime = gpGlobals->curtime;
 
-		KeyValues *msg = new KeyValues( "ParticleSystem_Destroy" );
+		KeyValuesAD msg( "ParticleSystem_Destroy" );
 		msg->SetPtr( "state", &state );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
@@ -175,7 +175,7 @@ void CNewParticleEffect::StopEmission( bool bInfiniteOnly, bool bRemoveAllPartic
 {
 	if ( m_nToolParticleEffectId != TOOLPARTICLESYSTEMID_INVALID && clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "ParticleSystem_StopEmission" );
+		KeyValuesAD msg( "ParticleSystem_StopEmission" );
 
 		static ParticleSystemStopEmissionState_t state;
 		state.m_nParticleSystemId = GetToolParticleEffectId();
@@ -207,7 +207,7 @@ void CNewParticleEffect::SetControlPointEntity( int nWhichPoint, CBaseEntity *pE
 		state.m_nControlPoint = nWhichPoint;
 		state.m_nObject = pEntity ? pEntity->entindex() : -1;
 
-		KeyValues *msg = new KeyValues( "ParticleSystem_SetControlPointObject" );
+		KeyValuesAD msg( "ParticleSystem_SetControlPointObject" );
 		msg->SetPtr( "state", &state );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 	}
@@ -232,7 +232,7 @@ void CNewParticleEffect::SetControlPoint( int nWhichPoint, const Vector &v )
 		state.m_nControlPoint = nWhichPoint;
 		state.m_vecPosition = v;
 
-		KeyValues *msg = new KeyValues( "ParticleSystem_SetControlPointPosition" );
+		KeyValuesAD msg( "ParticleSystem_SetControlPointPosition" );
 		msg->SetPtr( "state", &state );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 	}
@@ -255,7 +255,7 @@ void CNewParticleEffect::RecordControlPointOrientation( int nWhichPoint )
 		state.m_nControlPoint = nWhichPoint;
 		AngleQuaternion( angles, state.m_qOrientation );
 
-		KeyValues *msg = new KeyValues( "ParticleSystem_SetControlPointOrientation" );
+		KeyValuesAD msg( "ParticleSystem_SetControlPointOrientation" );
 		msg->SetPtr( "state", &state );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 	}

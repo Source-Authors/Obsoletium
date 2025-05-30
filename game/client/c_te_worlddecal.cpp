@@ -79,7 +79,7 @@ static inline void RecordWorldDecal( const Vector *pos, int index )
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_WORLD_DECAL );
  		msg->SetString( "name", "TE_WorldDecal" );
@@ -90,7 +90,6 @@ static inline void RecordWorldDecal( const Vector *pos, int index )
 		msg->SetString( "decalname", effects->Draw_DecalNameFromIndex( index ) );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

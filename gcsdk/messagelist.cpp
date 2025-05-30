@@ -144,6 +144,7 @@ bool CMessageList::BInit(  )
 			}
 			else
 			{
+				Assert( nIndex <= std::numeric_limits<short>::max() );
 				m_vecMessageInfoBuckets[nBucket][nSlot] = (short) nIndex;
 			}
 		}

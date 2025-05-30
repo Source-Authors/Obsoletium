@@ -113,7 +113,7 @@ struct NetworkMessageReceivedEvent_t : public NetworkEvent_t
 //-----------------------------------------------------------------------------
 // Main interface for low-level networking (packet sending). This is a low-level interface
 //-----------------------------------------------------------------------------
-#define NETWORKSYSTEM_INTERFACE_VERSION	"NetworkSystemVersion001"
+constexpr inline char NETWORKSYSTEM_INTERFACE_VERSION[]{"NetworkSystemVersion001"};
 abstract_class INetworkSystem : public IAppSystem
 {
 public:

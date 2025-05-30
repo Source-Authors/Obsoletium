@@ -17,7 +17,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 
 //-----------------------------------------------------------------------------
@@ -25,8 +24,13 @@
 //-----------------------------------------------------------------------------
 Tool3D::Tool3D(void)
 {
-	m_vPlaneNormal.Init();
+	// dimhotepus: Init members in ctor.
 	m_vPlaneOrigin.Init();
+	m_vPlaneNormal.Init();
+	m_vPlaneHorz.Init();
+	m_vPlaneVert.Init();
+	m_vTranslation.Init();
+	m_vTranslationStart.Init();
 	m_bIsTranslating = false;
 
 	for ( int i=0;i<2; i++ )

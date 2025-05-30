@@ -55,7 +55,7 @@ public:
 	// Purpose: Hook the map parse errors and report brush/ent/texture state
 	// Input  : *pErrorString - 
 	//-----------------------------------------------------------------------------
-	void ReportError( const char *pErrorString )
+	[[noreturn]] void ReportError( const char *pErrorString )
 	{
 		Error( "Brush %i: %s\nSide %i\nTexture: %s\n", m_brushID, pErrorString, m_sideIndex, m_textureName );
 	}
@@ -66,7 +66,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void ReportWarning( const char *pWarningString )
 	{
-		printf( "Brush %i, Side %i: %s\n", m_brushID, m_sideIndex, pWarningString );
+		Warning( "Brush %i, Side %i: %s\n", m_brushID, m_sideIndex, pWarningString );
 	}
 
 private:

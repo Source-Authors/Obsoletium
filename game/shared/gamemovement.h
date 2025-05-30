@@ -68,7 +68,7 @@ protected:
 	// Input/Output for this movement
 	CMoveData		*mv;
 	
-	int				m_nOldWaterLevel;
+	WaterLevel		m_nOldWaterLevel;
 	float			m_flWaterEntryTime;
 	int				m_nOnLadder;
 

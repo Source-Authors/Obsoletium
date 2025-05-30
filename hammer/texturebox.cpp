@@ -7,9 +7,10 @@
 //=============================================================================
 
 #include "stdafx.h"
+#include "TextureBox.h"
+
 #include "GameConfig.h"
 #include "IEditorTexture.h"
-#include "TextureBox.h"
 #include "TextureSystem.h"
 #include "hammer.h"
 
@@ -69,9 +70,6 @@ void CTextureBox::DeleteItem(LPDELETEITEMSTRUCT lpDeleteItemStruct)
 //-----------------------------------------------------------------------------
 void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct) 
 {
-//	if(!pGD)
-//		return;
-
 	CDC dc;
 	dc.Attach(lpDrawItemStruct->hDC);
 	dc.SaveDC();
@@ -140,8 +138,8 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				dc.TextOut(r2.right + 4, r2.top + 4, szName, iLen);
 				
 				// draw size
-				sprintf(szName, "%dx%d", pTex->GetWidth(), pTex->GetHeight());
-				dc.TextOut(r2.right + 4, r2.top + 4 + iFontHeight, szName, strlen(szName));
+				V_sprintf_safe(szName, "%dx%d", pTex->GetWidth(), pTex->GetHeight());
+				dc.TextOut(r2.right + 4, r2.top + 4 + iFontHeight, szName, V_strlen(szName));
 			}
 			// if it's < 32, we're drawing the item in the "closed"
 			//	combo box, so just draw the name of the texture
@@ -435,11 +433,10 @@ LRESULT CTextureBox::OnSelectString(WPARAM wParam, LPARAM lParam)
 {
 	LPCTSTR pszSelect = LPCTSTR(lParam);
 	int nCount = GetCount();
-	IEditorTexture *pTex;
-
-	for(int i = wParam + 1; i < nCount; i++)
+	// dimhotepus: wParam is int here per https://learn.microsoft.com/en-us/windows/win32/controls/cb-selectstring spec.
+	for(int i = static_cast<int>(wParam) + 1; i < nCount; i++)
 	{
-		pTex = (IEditorTexture *)GetItemDataPtr(i);
+		IEditorTexture *pTex = (IEditorTexture *)GetItemDataPtr(i);
 		if (pTex != NULL)
 		{
 			char szName[MAX_PATH];

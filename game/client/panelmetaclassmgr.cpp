@@ -9,11 +9,10 @@
 //=============================================================================//
 #include "cbase.h"
 #include "panelmetaclassmgr.h"
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
+#include "tier1/utldict.h"
 #include <vgui_controls/Panel.h>
-#include "utldict.h"
 #include "filesystem.h"
-#include <KeyValues.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -91,8 +90,7 @@ bool ParseCoord( KeyValues *pValues, const char* pFieldName, int& x, int& y )
 		return false;
 
 	// Try and scan them in
-	int scanned;
-	scanned = sscanf( pCoordString, "%i %i", &x, &y );
+	int scanned = sscanf( pCoordString, "%i %i", &x, &y );
 	if ( scanned != 2 )
 	{
 		Warning( "Couldn't scan 2d coordinate values from %s\n", pCoordString );
@@ -195,8 +193,8 @@ private:
 
 	// various parsing helper methods
 	bool ParseSingleMetaClass( const char* pFileName, const char* pInstanceName,
-		KeyValues* pMetaClass, int keyValueIndex );
-	bool ParseMetaClassList( const char* pFileName, KeyValues* pKeyValues, int keyValueIndex );
+		KeyValues* pMetaClass, unsigned short keyValueIndex );
+	bool ParseMetaClassList( const char* pFileName, KeyValues* pKeyValues, unsigned short keyValueIndex );
 
 	// No copy constructor
 	CPanelMetaClassMgrImp( const CPanelMetaClassMgrImp & );
@@ -233,6 +231,13 @@ CPanelMetaClassMgrImp::CPanelMetaClassMgrImp() : m_PanelTypeDict( true, 0, 32 )
 
 CPanelMetaClassMgrImp::~CPanelMetaClassMgrImp()
 {
+	// dimhotepus: Fix KeyValues leak.
+	while (m_MetaClassKeyValues.Count() > 0) {
+		if (m_MetaClassKeyValues[0])
+			m_MetaClassKeyValues[0]->deleteThis();
+
+		m_MetaClassKeyValues.RemoveAt(0);
+	}
 }
 
 
@@ -259,7 +264,7 @@ void CPanelMetaClassMgrImp::InstallPanelType( const char* pPanelName, IPanelFact
 // Parse a single metaclass
 //-----------------------------------------------------------------------------
 bool CPanelMetaClassMgrImp::ParseSingleMetaClass( const char* pFileName,
-	const char* pMetaClassName, KeyValues* pMetaClassValues, int keyValueIndex )
+	const char* pMetaClassName, KeyValues* pMetaClassValues, unsigned short keyValueIndex )
 {
 	// Complain about duplicately defined metaclass names...
 	if ( m_MetaClassDict.Find( pMetaClassName ) != m_MetaClassDict.InvalidIndex() )
@@ -276,7 +281,7 @@ bool CPanelMetaClassMgrImp::ParseSingleMetaClass( const char* pFileName,
 		return false;
 	}
 
-	unsigned short i = m_PanelTypeDict.Find( pPanelType );
+	auto i = m_PanelTypeDict.Find( pPanelType );
 	if (i == m_PanelTypeDict.InvalidIndex())
 	{
 		Warning( "Type %s of meta class %s undefined!\n", pPanelType, pMetaClassName );
@@ -299,7 +304,7 @@ bool CPanelMetaClassMgrImp::ParseSingleMetaClass( const char* pFileName,
 // Parse the metaclass list
 //-----------------------------------------------------------------------------
 bool CPanelMetaClassMgrImp::ParseMetaClassList( const char* pFileName, 
-												  KeyValues* pKeyValues, int keyValueIdx )
+												  KeyValues* pKeyValues, unsigned short keyValueIdx )
 {
 	// Iterate over all metaclasses...
 	KeyValues* pIter = pKeyValues->GetFirstSubKey();
@@ -332,7 +337,7 @@ void CPanelMetaClassMgrImp::LoadMetaClassDefinitionFile( const char *pFileName )
 		auto j = m_MetaClassDict.First();
 		while ( j != m_MetaClassDict.InvalidIndex() )
 		{
-			unsigned short next = m_MetaClassDict.Next(j);
+			auto next = m_MetaClassDict.Next(j);
 			if ( m_MetaClassDict[j].m_KeyValueIndex == i)
 			{
 				m_MetaClassDict.RemoveAt(j);
@@ -347,7 +352,7 @@ void CPanelMetaClassMgrImp::LoadMetaClassDefinitionFile( const char *pFileName )
 
 	// Create a new keyvalues entry
 	KeyValues* pKeyValues = new KeyValues(pFileName);
-	int idx = m_MetaClassKeyValues.Insert( pFileName, pKeyValues );
+	auto idx = m_MetaClassKeyValues.Insert( pFileName, pKeyValues );
 
 	// Read in all metaclass definitions...
 
@@ -401,7 +406,7 @@ vgui::Panel *CPanelMetaClassMgrImp::CreatePanelMetaClass( const char* pMetaClass
 	int sortorder, void *pInitData, vgui::Panel *pParent, const char *pChainName )
 {
 	// Search for the metaclass name
-	int i = m_MetaClassDict.Find( pMetaClassName );
+	auto i = m_MetaClassDict.Find( pMetaClassName );
 	if (i == m_MetaClassDict.InvalidIndex())
 		return NULL; 
 

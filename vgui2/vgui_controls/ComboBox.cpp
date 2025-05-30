@@ -5,7 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#define PROTECTED_THINGS_DISABLE
+#include "vgui_controls/ComboBox.h"
+
+#include "tier1/KeyValues.h"
 
 #include "vgui/Cursor.h"
 #include "vgui/IInput.h"
@@ -13,14 +15,10 @@
 #include "vgui/IScheme.h"
 #include "vgui/ISurface.h"
 #include "vgui/IPanel.h"
-#include "KeyValues.h"
 
-#include "vgui_controls/ComboBox.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/MenuItem.h"
 #include "vgui_controls/TextImage.h"
-
-#include <ctype.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -150,7 +148,7 @@ int ComboBox::AddItem(const wchar_t *itemText, const KeyValues *userData)
 	kv->SetWString("text", itemText);
 	// get an ansi version for the menuitem name
 	char ansi[128];
-	g_pVGuiLocalize->ConvertUnicodeToANSI(itemText, ansi, sizeof(ansi));
+	g_pVGuiLocalize->ConvertUnicodeToANSI(itemText, ansi);
 	return m_pDropDown->AddMenuItem(ansi, kv, this, userData);
 }
 
@@ -286,7 +284,7 @@ void ComboBox::SilentActivateItem(int itemID)
 
 	// Now manually call our set text, with a wrapper to ensure we don't send the Text Changed message
 	wchar_t name[ 256 ];
-	GetItemText( itemID, name, sizeof( name ) );
+	GetItemText( itemID, name );
 
 	m_bPreventTextChangeMessage = true;
 	OnSetText( name );
@@ -396,12 +394,12 @@ KeyValues *ComboBox::GetItemUserData(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-void ComboBox::GetItemText( int itemID, wchar_t *text, int bufLenInBytes )
+void ComboBox::GetItemText( int itemID, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *text, int bufLenInBytes )
 {
 	m_pDropDown->GetItemText( itemID, text, bufLenInBytes );
 }
 
-void ComboBox::GetItemText( int itemID, char *text, int bufLenInBytes )
+void ComboBox::GetItemText( int itemID, OUT_Z_BYTECAP(bufLenInBytes) char *text, int bufLenInBytes )
 {
 	m_pDropDown->GetItemText( itemID, text, bufLenInBytes );
 }
@@ -526,7 +524,7 @@ void ComboBox::OnSetText(const wchar_t *newtext)
 	if (*text == '#')
 	{
 		char cbuf[255];
-		g_pVGuiLocalize->ConvertUnicodeToANSI(text, cbuf, 255);
+		g_pVGuiLocalize->ConvertUnicodeToANSI(text, cbuf);
 
 		// try lookup in localization tables
 		StringIndex_t unlocalizedTextSymbol = g_pVGuiLocalize->FindIndex(cbuf + 1);
@@ -539,7 +537,7 @@ void ComboBox::OnSetText(const wchar_t *newtext)
 	}
 
 	wchar_t wbuf[255];
-	GetText(wbuf, 254);
+	GetText(wbuf);
 	
 	if ( wcscmp(wbuf, text) )
 	{
@@ -653,12 +651,12 @@ void ComboBox::DoClick()
 	int itemToSelect = -1;
 	int i;
 	wchar_t comboBoxContents[255];
-	GetText(comboBoxContents, 255);
+	GetText(comboBoxContents);
 	for ( i = 0 ; i < m_pDropDown->GetItemCount() ; i++ )
 	{
 		wchar_t menuItemName[255];
 		int menuID = m_pDropDown->GetMenuID(i);
-		m_pDropDown->GetMenuItem(menuID)->GetText(menuItemName, 255);
+		m_pDropDown->GetMenuItem(menuID)->GetText(menuItemName);
 		if (!wcscmp(menuItemName, comboBoxContents))
 		{
 			itemToSelect = i;
@@ -731,44 +729,6 @@ void ComboBox::OnCursorExited()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifdef _X360
-void ComboBox::OnMenuItemSelected()
-{
-	m_bHighlight = true;
-	// For editable cbs, fill in the text field from whatever is chosen from the dropdown...
-
-	//=============================================================================
-	// HPE_BEGIN:
-	// [pfreese] The text for the combo box should be updated regardless of its
-	// editable state, and in any case, the member variable below was never 
-	// correctly initialized.
-	//=============================================================================
-	
-	// if ( m_bAllowEdit )
-	
-	//=============================================================================
-	// HPE_END
-	//=============================================================================
-	{
-		int idx = GetActiveItem();
-		if ( idx >= 0 )
-		{
-			wchar_t name[ 256 ];
-			GetItemText( idx, name, sizeof( name ) );
-
-			OnSetText( name );
-		}
-	}
-
-	Repaint();
-
-	// go to the next control
-	if(!NavigateDown())
-	{
-		NavigateUp();
-	}
-}
-#else
 void ComboBox::OnMenuItemSelected()
 {
 	m_bHighlight = true;
@@ -779,7 +739,7 @@ void ComboBox::OnMenuItemSelected()
 		if ( idx >= 0 )
 		{
 			wchar_t name[ 256 ];
-			GetItemText( idx, name, sizeof( name ) );
+			GetItemText( idx, name );
 
 			OnSetText( name );
 		}
@@ -787,7 +747,6 @@ void ComboBox::OnMenuItemSelected()
 
 	Repaint();
 }
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -961,9 +920,9 @@ void ComboBox::SelectMenuItem(int itemToSelect)
 		wchar_t menuItemName[255];
 
 		int menuID = m_pDropDown->GetMenuID(itemToSelect);
-		m_pDropDown->GetMenuItem(menuID)->GetText(menuItemName, 254);
+		m_pDropDown->GetMenuItem(menuID)->GetText(menuItemName);
 		OnSetText(menuItemName);
-		SelectAllText(false);		
+		SelectAllText(false);
 	}
 }
 
@@ -978,11 +937,11 @@ void ComboBox::MoveAlongMenuItemList(int direction)
 	int i;
 
 	wchar_t comboBoxContents[255];
-	GetText(comboBoxContents, 254);
+	GetText(comboBoxContents);
 	for ( i = 0 ; i < m_pDropDown->GetItemCount() ; i++ )
 	{
 		int menuID = m_pDropDown->GetMenuID(i);
-		m_pDropDown->GetMenuItem(menuID)->GetText(menuItemName, 254);
+		m_pDropDown->GetMenuItem(menuID)->GetText(menuItemName);
 
 		if ( !wcscmp(menuItemName, comboBoxContents) )
 		{

@@ -53,8 +53,8 @@ private:
 
 	vgui::Label *m_pModeLabel;	
 	int m_LastCounterGroup;
-	int m_MaxValue;
-	int m_SumOfValues;
+	uintp m_MaxValue;
+	uintp m_SumOfValues;
 };
 
 #endif // VPROF_ENABLED

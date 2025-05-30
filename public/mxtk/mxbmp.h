@@ -17,12 +17,12 @@
 
 
 #ifndef INCLUDED_MXIMAGE
-#include "mxtk/mxImage.h"
+#include "mxtk/mximage.h"
 #endif
 
 
 #ifdef WIN32
-#include <pshpack2.h>
+#pragma pack(push, 2)
 #endif
 
 typedef struct
@@ -58,7 +58,7 @@ typedef struct
 } mxBitmapRGBQuad; 
 
 #ifdef WIN32
-#include <poppack.h>
+#pragma pack(pop)
 #endif
 
 

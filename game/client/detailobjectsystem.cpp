@@ -223,7 +223,8 @@ public:
 	// IHandleEntity stubs.
 public:
 	virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
-	virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); exit(12); }
+	// dimhotepus: 12 -> ENOTSUP
+	virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); exit(ENOTSUP); }
 
 	//---------------------------------
 	struct LightStyleInfo_t
@@ -273,6 +274,10 @@ struct DetailPropSpriteDict_t
 	Vector2D	m_TexUL;	// Texcoords of upper left
 	Vector2D	m_TexLR;	// Texcoords of lower left
 };
+
+// dimhotepus: Verify local and BSP definitions match.
+static_assert(sizeof(DetailSpriteDictLump_t) == sizeof(DetailPropSpriteDict_t));
+static_assert(alignof(DetailSpriteDictLump_t) == alignof(DetailPropSpriteDict_t));
 
 struct FastSpriteX4_t
 {
@@ -640,7 +645,8 @@ ClientShadowHandle_t CDetailModel::GetShadowHandle() const
 ClientRenderHandle_t& CDetailModel::RenderHandle()
 {
 	AssertMsg( 0, "CDetailModel has no render handle" );
-	exit(23);
+	// dimhotepus: 23 -> ENOTSUP
+	exit(ENOTSUP);
 }	
 
 
@@ -1588,7 +1594,7 @@ void CDetailObjectSystem::UnserializeModelDict( CUtlBuffer& buf )
 	while ( --count >= 0 )
 	{
 		DetailObjectDictLump_t lump;
-		buf.Get( &lump, sizeof(DetailObjectDictLump_t) );
+		buf.Get( lump );
 		
 		DetailModelDict_t dict;
 		dict.m_pModel = (model_t *)engine->LoadModel( lump.m_Name, true );
@@ -1612,7 +1618,7 @@ void CDetailObjectSystem::UnserializeDetailSprites( CUtlBuffer& buf )
 	while ( --count >= 0 )
 	{
 		intp i = m_DetailSpriteDict.AddToTail();
-		buf.Get( &m_DetailSpriteDict[i], sizeof(DetailSpriteDictLump_t) );
+		buf.Get( m_DetailSpriteDict[i] );
 		intp flipi = m_DetailSpriteDictFlipped.AddToTail();
 		m_DetailSpriteDictFlipped[flipi] = m_DetailSpriteDict[i];
 		::V_swap( m_DetailSpriteDictFlipped[flipi].m_TexUL.x, m_DetailSpriteDictFlipped[flipi].m_TexLR.x );
@@ -1627,7 +1633,7 @@ void CDetailObjectSystem::UnserializeModelLighting( CUtlBuffer& buf )
 	while ( --count >= 0 )
 	{
 		intp i = m_DetailLighting.AddToTail();
-		buf.Get( &m_DetailLighting[i], sizeof(DetailPropLightstylesLump_t) );
+		buf.Get( m_DetailLighting[i] );
 	}
 }
 
@@ -1672,7 +1678,7 @@ void CDetailObjectSystem::ScanForCounts( CUtlBuffer& buf,
 	while ( --count >= 0 )
 	{
 		DetailObjectLump_t lump;
-		buf.Get( &lump, sizeof(DetailObjectLump_t) );
+		buf.Get( lump );
 		
 		// We rely on the fact that details objects are sorted by leaf in the
 		// bsp file for this
@@ -1770,7 +1776,7 @@ void CDetailObjectSystem::UnserializeModels( CUtlBuffer& buf )
 	{
 		bFlipped = !bFlipped;
 		DetailObjectLump_t lump;
-		buf.Get( &lump, sizeof(DetailObjectLump_t) );
+		buf.Get( lump );
 		
 		// We rely on the fact that details objects are sorted by leaf in the
 		// bsp file for this

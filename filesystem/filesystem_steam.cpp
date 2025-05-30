@@ -504,7 +504,7 @@ FILE *CFileSystem_Steam::FS_fopen( const char *filenameT, const char *options, u
 {
 	char filename[MAX_PATH];
 
-	FixUpPath ( filenameT, filename, sizeof( filename ) );
+	FixUpPath ( filenameT, filename );
 
 	// make sure the file is immediately available
 	if (m_bAssertFilesImmediatelyAvailable && !m_bCurrentlyLoading)

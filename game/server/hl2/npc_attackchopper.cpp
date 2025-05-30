@@ -118,10 +118,10 @@ static const char *s_pChunkModelName[CHOPPER_MAX_CHUNKS] =
 
 #define CHOPPER_SLOW_BOMB_SPEED	250
 
-#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED	250
+#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED	250.f
 #define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_SQ	(CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED * CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED)
 
-#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2	450
+#define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2	450.f
 #define CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2_SQ	(CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2 * CHOPPER_BULLRUSH_SLOW_SHOOT_SPEED_2)
 
 // CVars
@@ -3454,7 +3454,7 @@ void CNPC_AttackHelicopter::DropCorpse( int nDamage )
 	m_flLastCorpseFall = gpGlobals->curtime + 3.0f;
 
 	// Spawn a ragdoll combine guard
-	float forceScale = nDamage * 75 * 4;
+	float forceScale = nDamage * 75.f * 4;
 	Vector vecForceVector = RandomVector(-1,1);
 	vecForceVector.z = 0.5f;
 	vecForceVector *= forceScale;
@@ -3926,7 +3926,7 @@ void CNPC_AttackHelicopter::ComputeVelocity( const Vector &vecTargetPosition,
 			// Strongly constrain to an n unit pipe around the current path
 			// by damping out all impulse forces that would push us further from the pipe
 			float flAmount = (flDistFromPath - flMaxDistFromSegment) / 200.0f;
-			flAmount = clamp( flAmount, 0, 1 );
+			flAmount = clamp( flAmount, 0.f, 1.f );
 			VectorMA( *pVecAccel, flAmount * 200.0f, vecDelta, *pVecAccel );
 		}
 	}
@@ -4038,8 +4038,8 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 		goalPitch *= 0.75f;
 
 		// clamp goal orientations
-		goalPitch = clamp( goalPitch, -30, 45 );
-		goalRoll = clamp( goalRoll, -45, 45 );
+		goalPitch = clamp( goalPitch, -30.f, 45.f );
+		goalRoll = clamp( goalRoll, -45.f, 45.f );
 
 		// calc angular accel needed to hit goal pitch in dt time.
 		float dt = 0.6;
@@ -4047,10 +4047,10 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 		goalAngAccel.y = 2.0f * (AngleDiff( goalYaw, AngleNormalize( GetAbsAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
 		goalAngAccel.z = 2.0f * (AngleDiff( goalRoll, AngleNormalize( GetAbsAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
-		goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
-		//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );
-		goalAngAccel.y = clamp( goalAngAccel.y, -120, 120 );
-		goalAngAccel.z = clamp( goalAngAccel.z, -300, 300 );
+		goalAngAccel.x = clamp( goalAngAccel.x, -300.f, 300.f );
+		//goalAngAccel.y = clamp( goalAngAccel.y, -60.f, 60.f );
+		goalAngAccel.y = clamp( goalAngAccel.y, -120.f, 120.f );
+		goalAngAccel.z = clamp( goalAngAccel.z, -300.f, 300.f );
 	}
 	else
 	{
@@ -4066,9 +4066,9 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 	angAccelAccel.y = (goalAngAccel.y - m_vecAngAcceleration.y) / dt;
 	angAccelAccel.z = (goalAngAccel.z - m_vecAngAcceleration.z) / dt;
 
-	angAccelAccel.x = clamp( angAccelAccel.x, -1000, 1000 );
-	angAccelAccel.y = clamp( angAccelAccel.y, -1000, 1000 );
-	angAccelAccel.z = clamp( angAccelAccel.z, -1000, 1000 );
+	angAccelAccel.x = clamp( angAccelAccel.x, -1000.f, 1000.f );
+	angAccelAccel.y = clamp( angAccelAccel.y, -1000.f, 1000.f );
+	angAccelAccel.z = clamp( angAccelAccel.z, -1000.f, 1000.f );
 
 	// DevMsg( "pitch %6.1f (%6.1f:%6.1f)  ", goalPitch, GetLocalAngles().x, m_vecAngVelocity.x );
 	// DevMsg( "roll %6.1f (%6.1f:%6.1f) : ", goalRoll, GetLocalAngles().z, m_vecAngVelocity.z );
@@ -4078,8 +4078,8 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 	m_vecAngAcceleration += angAccelAccel * 0.1;
 
 	QAngle angVel = GetLocalAngularVelocity();
-	angVel += m_vecAngAcceleration * 0.1;
-	angVel.y = clamp( angVel.y, -120, 120 );
+	angVel += m_vecAngAcceleration * 0.1f;
+	angVel.y = clamp( angVel.y, -120.f, 120.f );
 
 	// Fix up pitch and yaw to tend toward small values
 	if ( m_lifeState == LIFE_DYING && GetCrashPoint() == NULL )
@@ -4092,7 +4092,7 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 
 	SetLocalAngularVelocity( angVel );
 
-	float flAmt = clamp( angVel.y, -30, 30 ); 
+	float flAmt = clamp( angVel.y, -30.f, 30.f ); 
 	float flRudderPose = RemapVal( flAmt, -30, 30, 45, -45 );
 	SetPoseParameter( "rudder", flRudderPose );
 }
@@ -4336,7 +4336,7 @@ float CNPC_AttackHelicopter::ComputeBullrushLeadingDistance( float flSpeed, floa
 		return 0.0f;
 
 	case BULLRUSH_MODE_DROP_BOMBS_FIXED_SPEED:
-		return m_bRushForward ? 7000 : -7000;
+		return m_bRushForward ? 7000.f : -7000.f;
 
 	case BULLRUSH_MODE_MEGA_BOMB:
 		return m_bRushForward ? CHOPPER_BULLRUSH_MODE_DISTANCE : -CHOPPER_BULLRUSH_MODE_DISTANCE;
@@ -5271,7 +5271,7 @@ void CGrenadeHelicopter::PhysicsSimulate( void )
 
 	if (!m_bActivated && (GetMoveType() != MOVETYPE_VPHYSICS))
 	{
-		if ( GetWaterLevel() > 1 )
+		if ( GetWaterLevel() > WaterLevel::WL_Feet )
 		{
 			SetAbsVelocity( vec3_origin );
 			SetMoveType( MOVETYPE_NONE );
@@ -5373,7 +5373,7 @@ void CGrenadeHelicopter::DoExplosion( const Vector &vecOrigin, const Vector &vec
 	CEffectData data;
 
 	// If we're under water do a water explosion
-	if ( GetWaterLevel() != 0 && (GetWaterType() & CONTENTS_WATER) )
+	if ( GetWaterLevel() != WaterLevel::WL_NotInWater && (GetWaterType() & CONTENTS_WATER) )
 	{
 		data.m_vOrigin = WorldSpaceCenter();
 		data.m_flMagnitude = 128;

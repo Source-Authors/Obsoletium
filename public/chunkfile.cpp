@@ -32,16 +32,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <fcntl.h>
-#ifdef _WIN32
-#include <io.h>
-#endif
-#include <math.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "chunkfile.h"
+
 #include "mathlib/vector.h"
 #include "mathlib/vector4d.h"
 #include "tier1/strtools.h"
@@ -66,10 +58,10 @@ CChunkHandlerMap::CChunkHandlerMap(void)
 //-----------------------------------------------------------------------------
 CChunkHandlerMap::~CChunkHandlerMap(void)
 {
-	ChunkHandlerInfoNode_t *pNode = m_pHandlers;
+	auto *pNode = m_pHandlers;
 	while (pNode != NULL)
 	{
-		ChunkHandlerInfoNode_t *pPrev = pNode;
+		auto *pPrev = pNode;
 		pNode = pNode->pNext;
 
 		delete pPrev;
@@ -85,9 +77,9 @@ CChunkHandlerMap::~CChunkHandlerMap(void)
 //-----------------------------------------------------------------------------
 void CChunkHandlerMap::AddHandler(const char *pszChunkName, ChunkHandler_t pfnHandler, void *pData)
 {
-	ChunkHandlerInfoNode_t *pNew = new ChunkHandlerInfoNode_t;
+	auto *pNew = new ChunkHandlerInfoNode_t;
 
-	Q_strncpy(pNew->Handler.szChunkName, pszChunkName, sizeof( pNew->Handler.szChunkName ));
+	V_strcpy_safe(pNew->Handler.szChunkName, pszChunkName);
 	pNew->Handler.pfnHandler = pfnHandler;
 	pNew->Handler.pData = pData;
 	pNew->pNext = NULL;
@@ -98,7 +90,7 @@ void CChunkHandlerMap::AddHandler(const char *pszChunkName, ChunkHandler_t pfnHa
 	}
 	else
 	{
-		ChunkHandlerInfoNode_t *pNode = m_pHandlers;
+		auto *pNode = m_pHandlers;
 		while (pNode->pNext != NULL)
 		{
 			pNode = pNode->pNext;
@@ -141,7 +133,7 @@ ChunkErrorHandler_t CChunkHandlerMap::GetErrorHandler(void **ppData)
 //-----------------------------------------------------------------------------
 ChunkHandler_t CChunkHandlerMap::GetHandler(const char *pszChunkName, void **ppData)
 {
-	ChunkHandlerInfoNode_t *pNode = m_pHandlers;
+	auto *pNode = m_pHandlers;
 	while (pNode != NULL)
 	{
 		if (!stricmp(pNode->Handler.szChunkName, pszChunkName))
@@ -153,7 +145,7 @@ ChunkHandler_t CChunkHandlerMap::GetHandler(const char *pszChunkName, void **ppD
 		pNode = pNode->pNext;
 	}
 
-	return(false);
+	return nullptr;
 }
 
 
@@ -201,7 +193,7 @@ ChunkFileResult_t CChunkFile::BeginChunk(const char *pszChunkName)
 	// Write the chunk name and open curly.
 	//
 	char szBuf[MAX_KEYVALUE_LEN];
-	Q_snprintf(szBuf, sizeof( szBuf ), "%s\r\n%s{", pszChunkName, m_szIndent);
+	V_sprintf_safe(szBuf, "%s\r\n%s{", pszChunkName, m_szIndent);
 	ChunkFileResult_t eResult = WriteLine(szBuf);
 
 	//
@@ -210,7 +202,7 @@ ChunkFileResult_t CChunkFile::BeginChunk(const char *pszChunkName)
 	if (eResult == ChunkFile_Ok)
 	{
 		m_nCurrentDepth++;
-		BuildIndentString(m_szIndent, m_nCurrentDepth);
+		BuildIndentString(m_szIndent, ssize(m_szIndent), m_nCurrentDepth);
 	}
 
 	return(eResult);
@@ -220,10 +212,13 @@ ChunkFileResult_t CChunkFile::BeginChunk(const char *pszChunkName)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CChunkFile::BuildIndentString(char *pszDest, int nDepth)
+void CChunkFile::BuildIndentString(char *pszDest, intp destLen, intp nDepth)
 {
 	if (nDepth >= 0)
 	{
+		// dimhotepus: Prevent overflow.
+		nDepth = min(destLen - 1, nDepth);
+
 		for (int i = 0; i < nDepth; i++)
 		{
 			pszDest[i] = '\t';
@@ -259,12 +254,11 @@ ChunkFileResult_t CChunkFile::EndChunk(void)
 	if (m_nCurrentDepth > 0)
 	{
 		m_nCurrentDepth--;
-		BuildIndentString(m_szIndent, m_nCurrentDepth);
+		BuildIndentString(m_szIndent, ssize(m_szIndent), m_nCurrentDepth);
 	}
 
-	WriteLine("}");
-
-	return(ChunkFile_Ok);
+	// dimhotepus: Check result.
+	return WriteLine("}");
 }
 
 
@@ -375,7 +369,7 @@ ChunkFileResult_t CChunkFile::HandleChunk(const char *szChunkName)
 				char szKey[MAX_KEYVALUE_LEN];
 				char szValue[MAX_KEYVALUE_LEN];
 
-				while ((eResult = ReadNext(szKey, szValue, sizeof(szValue), eChunkType)) == ChunkFile_Ok)
+				while ((eResult = ReadNext(szKey, szValue, eChunkType)) == ChunkFile_Ok)
 				{
 					if (eChunkType == ChunkType_Chunk)
 					{
@@ -480,10 +474,15 @@ void CChunkFile::PushHandlers(CChunkHandlerMap *pHandlerMap)
 //			eChunkType - ChunkType_Key or ChunkType_Chunk.
 // Output : Returns ChunkFile_Ok on success, an error code if a parsing error occurs.
 //-----------------------------------------------------------------------------
-ChunkFileResult_t CChunkFile::ReadNext(char *szName, char *szValue, int nValueSize, ChunkType_t &eChunkType)
+ChunkFileResult_t CChunkFile::ReadNext(OUT_Z_CAP(nNameSize) char *szName, intp nNameSize,
+	OUT_Z_CAP(nValueSize) char *szValue, intp nValueSize, ChunkType_t &eChunkType)
 {
+	// dimhotepus: Always zero-terminate.
+	if (nValueSize > 0)
+		szValue[0] = '\0';
+
 	// HACK: pass in buffer sizes?
-	trtoken_t eTokenType = m_TokenReader.NextToken(szName, MAX_KEYVALUE_LEN);
+	trtoken_t eTokenType = m_TokenReader.NextToken(szName, nNameSize);
 
 	if (eTokenType != TOKENEOF)
 	{
@@ -498,7 +497,7 @@ ChunkFileResult_t CChunkFile::ReadNext(char *szName, char *szValue, int nValueSi
 				//
 				// Read the next token to determine what we have.
 				//
-				eNextTokenType = m_TokenReader.NextToken(szNext, sizeof(szNext));
+				eNextTokenType = m_TokenReader.NextToken(szNext);
 
 				switch (eNextTokenType)
 				{
@@ -599,7 +598,7 @@ ChunkFileResult_t CChunkFile::ReadChunk(KeyHandler_t pfnKeyHandler, void *pData)
 		char szValue[MAX_KEYVALUE_LEN];
 		ChunkType_t eChunkType;
 
-		eResult = ReadNext(szName, szValue, sizeof(szValue), eChunkType);
+		eResult = ReadNext(szName, szValue, eChunkType);
 
 		if (eResult == ChunkFile_Ok)
 		{
@@ -671,7 +670,8 @@ bool CChunkFile::ReadKeyValueBool(const char *pszValue, bool &bBool)
 //-----------------------------------------------------------------------------
 bool CChunkFile::ReadKeyValueFloat(const char *pszValue, float &flFloat)
 {
-	flFloat = (float)atof(pszValue);
+	// dimhotepus: atof -> strtof.
+	flFloat = strtof(pszValue, nullptr);
 	return(true);
 }
 
@@ -707,9 +707,14 @@ bool CChunkFile::ReadKeyValueColor(const char *pszValue, unsigned char &chRed, u
 		
 		if (sscanf(pszValue, "%d %d %d", &r, &g, &b) == 3)
 		{
-			chRed = r;
-			chGreen = g;
-			chBlue = b;
+			// dimhotepus: Check color range.
+			Assert(r >= 0 && r <= std::numeric_limits<unsigned char>::max());
+			Assert(g >= 0 && g <= std::numeric_limits<unsigned char>::max());
+			Assert(b >= 0 && b <= std::numeric_limits<unsigned char>::max());
+
+			chRed = static_cast<unsigned char>(r);
+			chGreen = static_cast<unsigned char>(g);
+			chBlue = static_cast<unsigned char>(b);
 
 			return(true);
 		}
@@ -977,8 +982,8 @@ ChunkFileResult_t CChunkFile::WriteLine(const char *pszLine)
 		//
 		// Write the string.
 		//
-		int nLen = strlen(pszLine);
-		int nWritten = fwrite(pszLine, 1, nLen, m_hFile);
+		size_t nLen = strlen(pszLine);
+		size_t nWritten = fwrite(pszLine, 1, nLen, m_hFile);
 		if (nWritten != nLen)
 		{
 			return(ChunkFile_Fail);

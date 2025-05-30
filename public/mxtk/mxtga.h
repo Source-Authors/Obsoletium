@@ -17,7 +17,7 @@
 
 
 #ifndef INCLUDED_MXIMAGE
-#include "mxtk/mxImage.h"
+#include "mxtk/mximage.h"
 #endif
 
 

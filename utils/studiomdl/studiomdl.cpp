@@ -1,36 +1,25 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Command-line tool used to compile models from intermediate formats exported
+// from modeling packages to the binary .mdl format that is read by the Source
+// engine.
 //
-// $NoKeywords: $
-//
-//===========================================================================//
-
-
+// See
+// https://developer.valvesoftware.com/wiki/StudioMDL_(Source)
+// https://developer.valvesoftware.com/wiki/QC
 //
 // studiomdl.c: generates a studio .mdl file from a .qc script
 // models/<scriptname>.mdl.
-//
 
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-#include <windows.h>
+#include "winlite.h"
 #undef GetCurrentDirectory
 
 #include <Shlwapi.h> // PathCanonicalize
 #pragma comment( lib, "shlwapi" )
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <math.h>
 #include <direct.h>
 #include "istudiorender.h"
 #include "filesystem_tools.h"
-#include "tier2/fileutils.h"
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
@@ -41,18 +30,19 @@
 #include "optimize.h"
 #include "byteswap.h"
 #include "studiobyteswap.h"
-#include "tier1/strtools.h"
 #include "bspflags.h"
-#include "tier0/icommandline.h"
-#include "utldict.h"
-#include "tier1/utlsortvector.h"
 #include "bitvec.h"
 #include "appframework/appframework.h"
 #include "datamodel/idatamodel.h"
 #include "materialsystem/materialsystem_config.h"
 #include "vstdlib/cvar.h"
+#include "tier0/icommandline.h"
 #include "tier1/tier1.h"
+#include "tier1/utlsortvector.h"
+#include "tier1/utldict.h"
+#include "tier1/strtools.h"
 #include "tier2/tier2.h"
+#include "tier2/fileutils.h"
 #include "tier3/tier3.h"
 #include "datamodel/dmelementfactoryhelper.h"
 #include "mdlobjects/dmeboneflexdriver.h"
@@ -62,10 +52,13 @@
 #include "movieobjects/dmecombinationoperator.h"
 #include "dmserializers/idmserializers.h"
 #include "tier2/p4helpers.h"
-#include "p4lib/ip4.h"
+// dimhotepus: No P4
+//#include "p4lib/ip4.h"
 #include "mdllib/mdllib.h"
 #include "perfstats.h"
 #include "worldsize.h"
+
+#include "tier0/memdbgon.h"
 
 bool g_collapse_bones = false;
 bool g_collapse_bones_aggressive = false;
@@ -196,7 +189,7 @@ void EnsureDependencyFileCheckedIn( const char *pFileName )
 		return;
 
 	char pFullPath[MAX_PATH];
-	if ( !GetGlobalFilePath( pFileName, pFullPath, sizeof(pFullPath) ) )
+	if ( !GetGlobalFilePath( pFileName, pFullPath ) )
 	{
 		MdlWarning( "Model dependency file '%s' is missing.\n", pFileName );
 		return;
@@ -234,7 +227,7 @@ void CreateMakefile_OutputMakefile( void )
 //	}
 	V_strcat_safe( mdlname, "models/" );	
 	V_strcat_safe( mdlname, outname );
-	Q_StripExtension( mdlname, mdlname, sizeof( mdlname ) );
+	Q_StripExtension( mdlname, mdlname );
 	V_strcat_safe( mdlname, ".mdl" );
 	Q_FixSlashes( mdlname );
 
@@ -247,7 +240,7 @@ void CreateMakefile_OutputMakefile( void )
 	fprintf( fp, "\n" );
 	char mkdirpath[MAX_PATH];
 	V_strcpy_safe( mkdirpath, mdlname );
-	Q_StripFilename( mkdirpath );
+	V_StripFilename( mkdirpath );
 	fprintf( fp, "\tmkdir \"%s\"\n", mkdirpath );
 	fprintf( fp, "\t%s -quiet %s\n\n", CommandLine()->GetParm( 0 ), fullpath );
 	fclose( fp );
@@ -259,7 +252,7 @@ void CreateMakefile_OutputMakefile( void )
 
 static bool g_bFirstWarning = true;
 
-void TokenError( const char *fmt, ... )
+[[noreturn]] void TokenError( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	static char output[1024];
 	va_list		args;
@@ -270,21 +263,20 @@ void TokenError( const char *fmt, ... )
 	if (GetTokenizerStatus( &pFilename, &iLineNumber ))
 	{
 		va_start( args, fmt );
-		vsprintf( output, fmt, args );
+		V_vsprintf_safe( output, fmt, args );
 
 		MdlError( "%s(%d): - %s", pFilename, iLineNumber, output );
 	}
 	else
 	{
 		va_start( args, fmt );
-		vsprintf( output, fmt, args );
+		V_vsprintf_safe( output, fmt, args );
 		MdlError( "%s", output );
 	}
 }
 
-void MdlError( const char *fmt, ... )
+[[noreturn]] void MdlError( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
-	static char output[1024];
 	static char *knownExtensions[] = {".mdl", ".ani", ".phy", ".sw.vtx", ".dx80.vtx", ".dx90.vtx", ".vvd"};
 	char		fileName[MAX_PATH];
 	char		baseName[MAX_PATH];
@@ -295,15 +287,15 @@ void MdlError( const char *fmt, ... )
 	{
 		if (g_bFirstWarning)
 		{
-			printf("%s :\n", fullpath );
+			fprintf(stderr, "%s :\n", fullpath );
 			g_bFirstWarning = false;
 		}
-		printf("\t");
+		fprintf(stderr, "\t");
 	}
 
-	printf("ERROR: ");
+	fprintf(stderr, "ERROR: ");
 	va_start( args, fmt );
-	vprintf( fmt, args );
+	vfprintf( stderr, fmt, args );
 
 	// delete premature files
 	// unforunately, content is built without verification
@@ -311,18 +303,18 @@ void MdlError( const char *fmt, ... )
 	if (g_bHasModelName)
 	{
 		// undescriptive errors in batch processes could be anonymous
-		printf("ERROR: Aborted Processing on '%s'\n", outname);
+		fprintf(stderr, "ERROR: Aborted Processing on '%s'\n", outname);
 
 		V_strcpy_safe( fileName, gamedir );
 		V_strcat_safe( fileName, "models/" );	
 		V_strcat_safe( fileName, outname );
-		Q_FixSlashes( fileName );
-		Q_StripExtension( fileName, baseName, sizeof( baseName ) );
+		V_FixSlashes( fileName );
+		V_StripExtension( fileName, baseName );
 
-		for (int i=0; i<ARRAYSIZE(knownExtensions); i++)
+		for (const auto *ext : knownExtensions)
 		{
-			V_strcpy_safe( fileName, baseName);
-			V_strcat_safe( fileName, knownExtensions[i] );
+			V_strcpy_safe( fileName, baseName );
+			V_strcat_safe( fileName, ext );
 
 			// really need filesystem concept here
 //			g_pFileSystem->RemoveFile( fileName );
@@ -334,10 +326,9 @@ void MdlError( const char *fmt, ... )
 }
 
 
-void MdlWarning( const char *fmt, ... )
+void MdlWarning( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
-	static char output[1024];
 
 	if (g_bNoWarnings || g_maxWarnings == 0)
 		return;
@@ -348,17 +339,17 @@ void MdlWarning( const char *fmt, ... )
 	{
 		if (g_bFirstWarning)
 		{
-			printf("%s :\n", fullpath );
+			fprintf(stderr, "%s :\n", fullpath );
 			g_bFirstWarning = false;
 		}
-		printf("\t");
+		fprintf(stderr, "\t");
 	}
 
 	Assert( 0 );
 
-	printf("WARNING: ");
+	fprintf(stderr, "WARNING: ");
 	va_start( args, fmt );
-	vprintf( fmt, args );
+	vfprintf( stderr, fmt, args );
 
 	if (g_maxWarnings > 0)
 		g_maxWarnings--;
@@ -367,9 +358,9 @@ void MdlWarning( const char *fmt, ... )
 	{
 		if (g_quiet)
 		{
-			printf("\t");
+			fprintf(stderr, "\t");
 		}
-		printf("suppressing further warnings...\n");
+		fprintf(stderr, "suppressing further warnings...\n");
 	}
 
 	RestoreConsoleTextColor( old );
@@ -478,19 +469,22 @@ void MdlExceptionFilter( unsigned long code )
 =================
 */
 
-int k_memtotal;
-void *kalloc( int num, int size )
+intp k_memtotal;
+void *kalloc( intp num, intp size )
 {
 	// printf( "calloc( %d, %d )\n", num, size );
 	// printf( "%d ", num * size );
-	int nMemSize = num * size;
+	intp nMemSize = num * size;
 	k_memtotal += nMemSize;
 
 	// ensure memory alignment on maximum of ALIGN
 	nMemSize += 511;
+
 	void *ptr = malloc( nMemSize );
+	if (!ptr) return nullptr;
+
 	memset( ptr, 0, nMemSize );
-	ptr = (byte *)((int)((byte *)ptr + 511) & ~511);
+	ptr = (byte *)((intp)((byte *)ptr + 511) & ~511);
 	return ptr;
 }
 
@@ -890,8 +884,8 @@ int LookupTexture( const char *pTextureName, bool bRelativePath )
 	char pTextureNoExt[MAX_PATH];
 	char pTextureBase[MAX_PATH];
 	char pTextureBase2[MAX_PATH];
-	Q_StripExtension( pTextureName, pTextureNoExt, sizeof(pTextureNoExt) );
-	Q_FileBase( pTextureName, pTextureBase, sizeof(pTextureBase) );
+	Q_StripExtension( pTextureName, pTextureNoExt );
+	Q_FileBase( pTextureName, pTextureBase );
 
 	int nFlags = bRelativePath ? RELATIVE_TEXTURE_PATH_SPECIFIED : 0;
 	int i;
@@ -913,7 +907,7 @@ int LookupTexture( const char *pTextureName, bool bRelativePath )
 		}
 
 		// Comparing non-relative vs relative
-		Q_FileBase( g_texture[i].name, pTextureBase2, sizeof(pTextureBase2) );
+		Q_FileBase( g_texture[i].name, pTextureBase2 );
 		if ( !Q_stricmp( pTextureNoExt, pTextureBase2 ) )
 			return i;
 	}
@@ -1018,11 +1012,11 @@ void SetSkinValues( )
 		V_strcpy_safe( szName, fullpath );
 		while (szName[0] != '\0' && strnicmp( "models", szName, 6 ) != 0)
 		{
-			strcpy( &szName[0], &szName[1] );
+			V_strcpy_safe( szName, &szName[1] );
 		}
 		if (szName[0] != '\0')
 		{
-			Q_StripFilename( szName );
+			V_StripFilename( szName );
 			V_strcat_safe( szName, "/" );
 		}
 		else
@@ -1035,7 +1029,7 @@ void SetSkinValues( )
 //			}
 			V_strcpy_safe( szName, "models/" );	
 			V_strcat_safe( szName, outname );
-			Q_StripExtension( szName, szName, sizeof( szName ) );
+			V_StripExtension( szName, szName );
 			V_strcat_safe( szName, "/" );
 		}
 		cdtextures[0] = strdup( szName );
@@ -1045,7 +1039,7 @@ void SetSkinValues( )
 	for (i = 0; i < g_numtextures; i++)
 	{
 		char szName[256];
-		Q_StripExtension( g_texture[i].name, szName, sizeof( szName ) );
+		Q_StripExtension( g_texture[i].name, szName );
 		Q_strncpy( g_texture[i].name, szName, sizeof( g_texture[i].name ) );
 	}
 
@@ -1119,7 +1113,6 @@ int		g_iLinecount;
 void Build_Reference( s_source_t *pSource, const char *pAnimName )
 {
 	int		i, parent;
-	Vector	angle;
 
 	s_sourceanim_t *pReferenceAnim = FindSourceAnim( pSource, pAnimName );
 	for (i = 0; i < pSource->numbones; i++)
@@ -1182,7 +1175,7 @@ int Grab_Nodes( s_node_t *pnodes )
 		{
 			// check for duplicated bones
 			/*
-			if (strlen(pnodes[index].name) != 0)
+			if (!Q_isempty(pnodes[index].name))
 			{
 				MdlError( "bone \"%s\" exists more than once\n", name );
 			}
@@ -1263,7 +1256,7 @@ void Cmd_Eyeposition (void)
 void Cmd_MaxEyeDeflection()
 {
 	GetToken( false );
-	g_flMaxEyeDeflection = cosf( verify_atof( token ) * M_PI / 180.0f );
+	g_flMaxEyeDeflection = cosf( DEG2RAD( verify_atof( token ) ) );
 }
 
 
@@ -2751,7 +2744,7 @@ static s_source_t *FindCachedSource( const char* name, const char* xext )
 				return g_source[i];
 		}
 		/*
-		sprintf (g_szFilename, "%s%s.vta", cddir[numdirs], name );
+		V_sprintf_safe (g_szFilename, "%s%s.vta", cddir[numdirs], name );
 		for (i = 0; i < g_numsources; i++)
 		{
 			if (stricmp( g_szFilename, g_source[i]->filename ) == 0)
@@ -2780,7 +2773,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 	int result = false;
 
 	V_strncpy( pTempName, name, namelen );
-	Q_ExtractFileExtension( pTempName, xext, sizeof( xext ) );
+	V_ExtractFileExtension( pTempName, xext );
 
 	if (xext[0] == '\0')
 	{
@@ -2788,7 +2781,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 	}
 	else
 	{
-		Q_StripExtension( pTempName, pTempName, namelen );
+		V_StripExtension( pTempName, pTempName, namelen );
 	}
 
 	s_source_t* pSource = FindCachedSource( pTempName, xext );
@@ -2809,7 +2802,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 		g_source[g_numsources]->isActiveModel = true;
 	}
 
-	char const * load_extensions[] = { "vrm", "smd", "sma", "phys", "vta", "obj", "dmx", "xml" };
+	constexpr char const * load_extensions[] = { "vrm", "smd", "sma", "phys", "vta", "obj", "dmx", "xml" };
 	int ( *load_procs[] )( s_source_t * ) = { Load_VRM, Load_SMD, Load_SMD, Load_SMD, Load_VTA, Load_OBJ, Load_DMX, Load_DMX };
 
 	Assert( ARRAYSIZE(load_extensions) == ARRAYSIZE(load_procs) );
@@ -2817,7 +2810,7 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 	{
 		if ( ( !result && xext[0] == '\0' ) || Q_stricmp( xext, load_extensions[kk] ) == 0)
 		{
-			Q_snprintf( g_szFilename, sizeof(g_szFilename), "%s%s.%s", cddir[numdirs], pTempName, load_extensions[kk] );
+			V_sprintf_safe( g_szFilename, "%s%s.%s", cddir[numdirs], pTempName, load_extensions[kk] );
 			V_strcpy_safe( g_source[g_numsources]->filename, g_szFilename );
 			result = (load_procs[kk])( g_source[g_numsources] );
 			
@@ -4809,7 +4802,7 @@ void Option_Eyeball( s_model_t *pmodel )
 
 	// diameter
 	GetToken (false);
-	eyeball->radius = verify_atof (token) / 2.0;
+	eyeball->radius = verify_atof (token) / 2.0f;
 
 	// Z angle offset
 	GetToken (false);
@@ -4820,7 +4813,7 @@ void Option_Eyeball( s_model_t *pmodel )
 
 	// pupil scale
 	GetToken (false);
-	eyeball->iris_scale = 1.0 / verify_atof( token );
+	eyeball->iris_scale = 1.0f / verify_atof( token );
 	
 	VectorCopy( tmp, eyeball->org );
 
@@ -4966,10 +4959,10 @@ void Option_Flex( char *name, char *vtafile, int imodel, float pairsplit )
 	if (pairsplit != 0)
 	{
 		char mod[256];
-		sprintf( mod, "%sR", name );
+		V_sprintf_safe( mod, "%sR", name );
 		flexdesc = Add_Flexdesc( mod );
 
-		sprintf( mod, "%sL", name );
+		V_sprintf_safe( mod, "%sL", name );
 		flexpair = Add_Flexdesc( mod );
 	}
 	else
@@ -5036,7 +5029,7 @@ void Option_Flex( char *name, char *vtafile, int imodel, float pairsplit )
 	g_flexkey[g_numflexkeys].source = pSource;
 	if ( pSource->m_Animations.Count() )
 	{
-		Q_strncpy( g_flexkey[g_numflexkeys].animationname, pSource->m_Animations[0].animationname, sizeof( g_flexkey[g_numflexkeys].animationname ) );
+		V_strcpy_safe( g_flexkey[g_numflexkeys].animationname, pSource->m_Animations[0].animationname );
 	}
 	else
 	{
@@ -5278,7 +5271,7 @@ void Option_Eyelid( int imodel )
 	g_flexkey[g_numflexkeys+0].decay = 0.0;
 	if ( pSource->m_Animations.Count() > 0 )
 	{
-		Q_strncpy( g_flexkey[g_numflexkeys+0].animationname, pSource->m_Animations[0].animationname, sizeof(g_flexkey[g_numflexkeys+0].animationname) );
+		V_strcpy_safe( g_flexkey[g_numflexkeys+0].animationname, pSource->m_Animations[0].animationname );
 	}
 	else
 	{
@@ -5286,7 +5279,7 @@ void Option_Eyelid( int imodel )
 	}
 
 	g_flexkey[g_numflexkeys+1].source = g_flexkey[g_numflexkeys+0].source;
-	Q_strncpy( g_flexkey[g_numflexkeys+1].animationname, g_flexkey[g_numflexkeys+0].animationname, sizeof(g_flexkey[g_numflexkeys+1].animationname) );
+	V_strcpy_safe( g_flexkey[g_numflexkeys+1].animationname, g_flexkey[g_numflexkeys+0].animationname );
 	g_flexkey[g_numflexkeys+1].frame = neutralframe;
 	g_flexkey[g_numflexkeys+1].flexdesc = basedesc;
 	g_flexkey[g_numflexkeys+1].imodel = imodel;
@@ -6077,7 +6070,7 @@ void Cmd_IKChain( )
 		else if (stricmp( "pad", token ) == 0)
 		{
 			GetToken(false);
-			g_ikchain[g_numikchains].radius = verify_atof( token ) / 2.0;
+			g_ikchain[g_numikchains].radius = verify_atof( token ) / 2.0f;
 		}
 		else if (stricmp( "floor", token ) == 0)
 		{
@@ -6182,21 +6175,6 @@ void Cmd_Controller (void)
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-
-// Debugging function that enumerate all a models bones to stdout.
-static void SpewBones()
-{
-	MdlWarning("g_numbones %i\n",g_numbones);
-
-	for ( int i = g_numbones; --i >= 0; )
-	{
-		printf("%s\n",g_bonetable[i].name);
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -7656,7 +7634,7 @@ bool ParseJiggleAngleConstraint( s_jigglebone_t *jiggleInfo )
 		return false;
 	}
 	
-	jiggleInfo->data.angleLimit = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.angleLimit = DEG2RAD( verify_atof( token ) );
 	
 	return true;
 }
@@ -7673,7 +7651,7 @@ bool ParseJiggleYawConstraint( s_jigglebone_t *jiggleInfo )
 		return false;	
 	}
 
-	jiggleInfo->data.minYaw = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.minYaw = DEG2RAD( verify_atof(token) );
 
 	if ( !GetToken( false ) )
 	{
@@ -7681,7 +7659,7 @@ bool ParseJiggleYawConstraint( s_jigglebone_t *jiggleInfo )
 		return false;
 	}
 
-	jiggleInfo->data.maxYaw = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.maxYaw = DEG2RAD( verify_atof( token ) );
 	
 	return true;
 }
@@ -7698,7 +7676,7 @@ bool ParseJigglePitchConstraint( s_jigglebone_t *jiggleInfo )
 		return false;	
 	}
 
-	jiggleInfo->data.minPitch = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.minPitch = DEG2RAD( verify_atof( token ) );
 
 	if ( !GetToken( false ) )
 	{
@@ -7706,7 +7684,7 @@ bool ParseJigglePitchConstraint( s_jigglebone_t *jiggleInfo )
 		return false;
 	}
 
-	jiggleInfo->data.maxPitch = verify_atof( token ) * M_PI / 180.0f;
+	jiggleInfo->data.maxPitch = DEG2RAD( verify_atof( token ) );
 
 	return true;
 }
@@ -8346,19 +8324,19 @@ void Grab_Vertexanimation( s_source_t *psource, const char *pAnimName )
 	MdlError( "unexpected EOF: %s\n", psource->filename );
 }
 
-bool GetGlobalFilePath( const char *pSrc, char *pFullPath, int nMaxLen )
+bool GetGlobalFilePath( const char *pSrc, char *pFullPath, intp nMaxLen )
 {
 	char	pFileName[1024];
-	Q_strncpy( pFileName, ExpandPath( (char*)pSrc ), sizeof(pFileName) );
+	V_strcpy_safe( pFileName, ExpandPath( pSrc ) );
 
 	// This is kinda gross. . . doing the same work in cmdlib on SafeOpenRead.
-	int nPathLength;
+	intp nPathLength;
 	if( CmdLib_HasBasePath( pFileName, nPathLength ) )
 	{
 		char tmp[1024];
-		int i;
+		intp i;
 
-		int nNumBasePaths = CmdLib_GetNumBasePaths();
+		intp nNumBasePaths = CmdLib_GetNumBasePaths();
 		for( i = 0; i < nNumBasePaths; i++ )
 		{
 			V_strcpy_safe( tmp, CmdLib_GetBasePath( i ) );
@@ -8680,7 +8658,7 @@ void Grab_QuatInterpBones( )
 
 				if (i == 4)
 				{
-					pAxis->percentage = distance / 100.0;
+					pAxis->percentage = distance / 100.0f;
 					pAxis->size = size;
 				}
 				else
@@ -8714,9 +8692,7 @@ void Grab_QuatInterpBones( )
 				Vector pos;
 				RadianEuler ang;
 
-				QAngle rot;
-				int j;
-				i = sscanf( g_szLine, "<trigger> %f %f %f %f %f %f %f %f %f %f", 
+				int j = sscanf( g_szLine, "<trigger> %f %f %f %f %f %f %f %f %f %f", 
 					&tolerance,
 					&trigger.x, &trigger.y, &trigger.z,
 					&ang.x, &ang.y, &ang.z,
@@ -8805,7 +8781,7 @@ void Load_ProceduralBones( )
 	g_iLinecount = 0;
 
 	char ext[32];
-	Q_ExtractFileExtension( filename, ext, sizeof( ext ) );
+	V_ExtractFileExtension( filename, ext );
 
 	if (stricmp( ext, "vrd") == 0)
 	{
@@ -9170,13 +9146,13 @@ bool GenerateModelName( CDmeMDLMakefile *pMDLMakeFile )
 	// NOTE: Model name is relative to the 'models' directory
 	char pOutputFullPath[MAX_PATH];
 	pMDLMakeFile->GetOutputName( pOutputFullPath, sizeof(pOutputFullPath) );
-	Q_SetExtension( pOutputFullPath, ".mdl", sizeof( pOutputFullPath) );
+	V_SetExtension( pOutputFullPath, ".mdl" );
 
 	char pModelSubDir[MAX_PATH];
-	GetModSubdirectory( "models", pModelSubDir, sizeof(pModelSubDir) );
+	GetModSubdirectory( "models", pModelSubDir );
 
 	char pRelativePath[MAX_PATH];
-	if ( !Q_MakeRelativePath( pOutputFullPath, pModelSubDir, pRelativePath, sizeof(pRelativePath) ) )
+	if ( !V_MakeRelativePath( pOutputFullPath, pModelSubDir, pRelativePath ) )
 	{
 		MdlError( "Makefile \"%s\" doesn't lie under the correct vproject \"%s\"!\n",
 			pOutputFullPath, pModelSubDir );
@@ -9488,10 +9464,10 @@ class CStudioMDLApp : public CDefaultAppSystemGroup< CSteamAppSystemGroup >
 
 public:
 	// Methods of IApplication
-	virtual bool Create();
-	virtual bool PreInit( );
-	virtual int Main();
-	virtual void PostShutdown();
+	bool Create() override;
+	bool PreInit() override;
+	int Main() override;
+	void PostShutdown() override;
 
 private:
 	int Main_StripModel();
@@ -9513,7 +9489,7 @@ static bool CStudioMDLApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsStea
 
 	if ( pProcessFileName )
 	{
-		Q_MakeAbsolutePath( pchPathBuffer, nBufferLength, pProcessFileName );
+		V_MakeAbsolutePath( pchPathBuffer, nBufferLength, pProcessFileName );
 
 		if ( pbBubbleDirectories )
 			*pbBubbleDirectories = true;
@@ -9526,11 +9502,18 @@ static bool CStudioMDLApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsStea
 
 int main( int argc, char **argv )
 {
-	SetSuggestGameInfoDirFn( CStudioMDLApp_SuggestGameInfoDirFn );
+	CommandLine()->CreateCmdLine(argc, argv);
 
-	CStudioMDLApp s_ApplicationObject;
-	CSteamApplication s_SteamApplicationObject( &s_ApplicationObject );
-	return AppMain( argc, argv, &s_SteamApplicationObject );
+	const ScopedSuggestGameInfoDir scoped_sugest_game_info_dir( CStudioMDLApp_SuggestGameInfoDirFn );
+
+	InstallSpewFunction();
+	
+	// override the default spew function
+	const ScopedSpewOutputFunc scoped_spew_output{ MdlSpewOutputFunc };
+
+	CStudioMDLApp app;
+	CSteamApplication steam_app( &app );
+	return AppMain( argc, argv, &steam_app );
 }
 
 
@@ -9539,11 +9522,7 @@ int main( int argc, char **argv )
 //-----------------------------------------------------------------------------
 bool CStudioMDLApp::Create()
 {
-	InstallSpewFunction();
-	// override the default spew function
-	SpewOutputFunc( MdlSpewOutputFunc );
-
- 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
+ 	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
 
 #ifndef _DEBUG
 	SetUnhandledExceptionFilter( VExceptionFilter );
@@ -9579,12 +9558,13 @@ bool CStudioMDLApp::Create()
 	AppModule_t	studioDataCacheModule = LoadModule( Sys_GetFactoryThis() );
 	AddSystem( studioDataCacheModule, STUDIO_DATA_CACHE_INTERFACE_VERSION );
 
+	// dimhotepus: No P4 support
 	// Add the P4 module separately so that if it is absent (say in the SDK) then the other system will initialize properly
-	if ( !CommandLine()->FindParm( "-nop4" ) )
-	{
-		AppModule_t p4Module = LoadModule( "p4lib.dll" );
-		AddSystem( p4Module, P4_INTERFACE_VERSION );
-	}
+	//if ( !CommandLine()->FindParm( "-nop4" ) )
+	//{
+	//	AppModule_t p4Module = LoadModule( "p4lib.dll" );
+	//	AddSystem( p4Module, P4_INTERFACE_VERSION );
+	//}
 
 	bool bOk = AddSystems( appSystems );
 	if ( !bOk )
@@ -9650,9 +9630,9 @@ bool CStudioMDLApp::ParseArguments()
 	tag_reversed = 0;
 	tag_normals = 0;
 
-	normal_blend = cos( DEG2RAD( 2.0 ));
+	normal_blend = cos( DEG2RAD( 2.0f ));
 
-	g_gamma = 2.2;
+	g_gamma = 2.2f;
 
 	g_staticprop = false;
 	g_centerstaticprop = false;
@@ -9798,19 +9778,6 @@ bool CStudioMDLApp::ParseArguments()
 			continue;
 		}
 
-		if (!Q_stricmp( pArgv, "-x360"))
-		{
-			StudioByteSwap::ActivateByteSwapping( true ); // Set target to big endian
-			g_bX360  = true;
-			continue;
-		}
-
-		if (!Q_stricmp( pArgv, "-nox360"))
-		{
-			g_bX360  = false;
-			continue;
-		}
-
 		if ( !Q_stricmp( pArgv, "-nowarnings" ) )
 		{
 			g_bNoWarnings = true;
@@ -9887,16 +9854,16 @@ bool CStudioMDLApp::ParseArguments()
 	}
 	
 	const char *pArgv = CommandLine()->GetParm( i );
-	Q_strncpy( g_path, pArgv, sizeof(g_path) );
+	V_strcpy_safe( g_path, pArgv );
 	if ( Q_IsAbsolutePath( g_path ) )
 	{
 		// Set the working directory to be the path of the qc file
 		// so the relative-file fopen code works
 		char pQCDir[MAX_PATH];
-		Q_ExtractFilePath( g_path, pQCDir, sizeof(pQCDir) );
+		V_ExtractFilePath( g_path, pQCDir );
 		_chdir( pQCDir );
 	}
-	Q_StripExtension( pArgv, outname, sizeof( outname ) );
+	Q_StripExtension( pArgv, outname );
 	return true;
 }
 
@@ -9926,7 +9893,7 @@ void AddContentPaths( )
 
 	// get a copy of the game search paths
 	char paths[1024];
-	g_pFullFileSystem->GetSearchPath( "GAME", false, paths, sizeof( paths ) );
+	g_pFullFileSystem->GetSearchPath_safe( "GAME", false, paths );
 	if (!g_quiet)
 		printf("all paths:%s\n", paths );
 
@@ -10048,8 +10015,8 @@ int CStudioMDLApp::Main()
 		}
 	};
 
-	Q_FileBase( g_path, g_path, sizeof( g_path ) );
-	Q_DefaultExtension( g_path, pMDLMakeFile ? ".dmx" : ".qc", sizeof( g_path ) );
+	Q_FileBase( g_path, g_path );
+	Q_DefaultExtension( g_path, pMDLMakeFile ? ".dmx" : ".qc");
 	if (!g_quiet)
 	{
 		printf( "Working on \"%s\"\n", g_path );
@@ -10229,7 +10196,7 @@ int CStudioMDLApp::Main_StripVhv()
 		return 1;
 	}
 
-	Q_StripExtension( g_path, g_path, sizeof( g_path ) );
+	Q_StripExtension( g_path, g_path );
 	char *pExt = g_path + strlen( g_path );
 	*pExt = 0;
 
@@ -10296,7 +10263,7 @@ int CStudioMDLApp::Main_MakeVsi()
 		return 1;
 	}
 
-	Q_StripExtension( g_path, g_path, sizeof( g_path ) );
+	Q_StripExtension( g_path, g_path );
 	char *pExt = g_path + strlen( g_path );
 	*pExt = 0;
 
@@ -10343,7 +10310,7 @@ int CStudioMDLApp::Main_MakeVsi()
 	//
 
 	// Save remapping data using "P4 edit -> save -> P4 add"  approach
-	sprintf( pExt, ".vsi" );
+	V_strcpy( pExt, ".vsi" );
 	CP4AutoEditAddFile _auto_edit_vsi( g_path );
 	
 	if ( !WriteFileToDisk( g_path, NULL, bufMappingTable ) )
@@ -10372,7 +10339,7 @@ int CStudioMDLApp::Main_StripModel()
 		return 1;
 	}
 
-	Q_FileBase( g_path, g_path, sizeof( g_path ) );
+	Q_FileBase( g_path, g_path );
 	char *pExt = g_path + strlen( g_path );
 	*pExt = 0;
 
@@ -10413,7 +10380,7 @@ int CStudioMDLApp::Main_StripModel()
 	//
 
 	// Save mdl
-	sprintf( pExt, ".mdl.strip" );
+	V_strcpy( pExt, ".mdl.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufMDL ) )
 	{
 		printf( "ERROR: Failed to save '%s'!\n", g_path );
@@ -10421,7 +10388,7 @@ int CStudioMDLApp::Main_StripModel()
 	}
 
 	// Save vvd
-	sprintf( pExt, ".vvd.strip" );
+	V_strcpy( pExt, ".vvd.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufVVD ) )
 	{
 		printf( "ERROR: Failed to save '%s'!\n", g_path );
@@ -10429,7 +10396,7 @@ int CStudioMDLApp::Main_StripModel()
 	}
 
 	// Save vtx
-	sprintf( pExt, ".vtx.strip" );
+	V_strcpy( pExt, ".vtx.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufVTX ) )
 	{
 		printf( "ERROR: Failed to save '%s'!\n", g_path );
@@ -10437,7 +10404,7 @@ int CStudioMDLApp::Main_StripModel()
 	}
 
 	// Save remapping data
-	sprintf( pExt, ".info.strip" );
+	V_strcpy( pExt, ".info.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufMappingTable ) )
 	{
 		printf( "ERROR: Failed to save '%s'!\n", g_path );

@@ -62,28 +62,18 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\vkeyedit.ico"
-IDR_VKEYEDTYPE          ICON    DISCARDABLE     "res\\vkeyeditDoc.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Bitmap
 //
 
-IDR_MAINFRAME           BITMAP  MOVEABLE PURE   "res\\Toolbar.bmp"
+SRC_IDI_APP_MAIN           BITMAP  MOVEABLE PURE   "resources\\Toolbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Toolbar
 //
 
-IDR_MAINFRAME TOOLBAR DISCARDABLE  16, 15
-BEGIN
+SRC_IDI_APP_MAIN TOOLBAR DISCARDABLE 16,
+    15 BEGIN
     BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
     BUTTON      ID_FILE_SAVE
@@ -103,7 +93,7 @@ END
 // Menu
 //
 
-IDR_MAINFRAME MENU PRELOAD DISCARDABLE 
+SRC_IDI_APP_MAIN MENU PRELOAD DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -145,7 +135,7 @@ END
 // Accelerator
 //
 
-IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
+SRC_IDI_APP_MAIN ACCELERATORS PRELOAD MOVEABLE PURE 
 BEGIN
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
@@ -172,62 +162,15 @@ END
 IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About vKeyEdit"
-FONT 8, "MS Sans Serif"
+FONT 8, "Segoe UI"
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    ICON            SRC_IDI_APP_MAIN,IDC_STATIC,11,17,20,20
     LTEXT           "vKeyEdit Version 1.0",IDC_STATIC,40,10,119,8,
                     SS_NOPREFIX
-    LTEXT           "Copyright Valve Software (C) 2004",IDC_STATIC,40,25,119,
+    LTEXT           "Copyright Valve Software (C) 2004-2025",IDC_STATIC,40,25,125,
                     8
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
 END
-
-
-#ifndef _MAC
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904b0"
-        BEGIN
-            VALUE "Comments", "\0"
-            VALUE "CompanyName", "Valve Software\0"
-            VALUE "FileDescription", "vkeyedit MFC Application\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "vKeyEdit\0"
-            VALUE "LegalCopyright", "Copyright (C) 2004\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "vkeyedit.EXE\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "vKeyEdit Application\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
-            VALUE "SpecialBuild", "\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -255,7 +198,7 @@ END
 
 STRINGTABLE PRELOAD DISCARDABLE 
 BEGIN
-    IDR_MAINFRAME           "vKeyEdit\n\nvKeyEd\n\n\nVkeyedit.Document\nVkeyed Document"
+    SRC_IDI_APP_MAIN           "vKeyEdit\n\nvKeyEd\n\n\nVkeyedit.Document\nVkeyed Document"
 END
 
 STRINGTABLE PRELOAD DISCARDABLE 
@@ -278,6 +221,7 @@ STRINGTABLE DISCARDABLE
 BEGIN
     ID_FILE_NEW             "Create a new document\nNew"
     ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_OPEN_TITLE      "Open KeyValues File"
     ID_FILE_CLOSE           "Close the active document\nClose"
     ID_FILE_SAVE            "Save the active document\nSave"
     ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
@@ -387,7 +331,7 @@ END
 LANGUAGE 9, 1
 #pragma code_page(1252)
 #endif //_WIN32
-#include "res\vkeyedit.rc2"  // non-Microsoft Visual C++ edited resources
+#include "resources\vkeyedit.rc2"  // non-Microsoft Visual C++ edited resources
 #include "afxres.rc"         // Standard components
 #include "afxprint.rc"       // printing/print preview resources
 #endif

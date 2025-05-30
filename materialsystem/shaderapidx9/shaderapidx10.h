@@ -13,6 +13,7 @@
 #pragma once
 #endif
 
+#define NOMINMAX
 #include <d3d10.h>
 
 #include "shaderapibase.h"

@@ -28,7 +28,8 @@
 //-----------------------------------------------------------------------------
 // DLL-exported methods for particular kinds of memory
 //-----------------------------------------------------------------------------
-MEM_INTERFACE void *MemAllocScratch( int nMemSize );
+// dimhotepus: int -> size_t.
+MEM_INTERFACE void *MemAllocScratch( size_t nMemSize );
 MEM_INTERFACE void MemFreeScratch();
 MEM_INTERFACE void MemAllocOOMError( size_t nSize );
 

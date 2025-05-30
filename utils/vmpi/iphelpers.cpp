@@ -5,6 +5,7 @@
 #include "iphelpers.h"
 
 #include <cassert>
+#define NOMINMAX
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
@@ -13,16 +14,10 @@
 #include "tier1/utlvector.h"
 #include "tier1/strtools.h"
 
-// This automatically calls WSAStartup for the app at startup.
-class CIPStarter {
- public:
-  CIPStarter() {
-    WSADATA wsaData;
-    WSAStartup(WINSOCK_VERSION, &wsaData);
-  }
-};
+#include "windows/scoped_winsock.h"
 
-static CIPStarter g_Starter;
+// This automatically calls WSAStartup for the app at startup.
+static se::common::windows::ScopedWinsock g_scoped_winsock{WINSOCK_VERSION};
 
 unsigned long SampleMilliseconds() {
   CCycleCount cnt;
@@ -31,11 +26,11 @@ unsigned long SampleMilliseconds() {
 }
 
 CChunkWalker::CChunkWalker(void const *const *chunks,
-                           const ptrdiff_t *chunk_sizes,
-                           ptrdiff_t chunk_count) {
+                           const intp *chunk_sizes,
+                           intp chunk_count) {
   m_TotalLength = 0;
 
-  for (ptrdiff_t i = 0; i < chunk_count; i++) m_TotalLength += chunk_sizes[i];
+  for (intp i = 0; i < chunk_count; i++) m_TotalLength += chunk_sizes[i];
 
   m_iCurChunk = 0;
   m_iCurChunkPos = 0;
@@ -44,17 +39,17 @@ CChunkWalker::CChunkWalker(void const *const *chunks,
   m_nChunks = chunk_count;
 }
 
-ptrdiff_t CChunkWalker::GetTotalLength() const { return m_TotalLength; }
+intp CChunkWalker::GetTotalLength() const { return m_TotalLength; }
 
-void CChunkWalker::CopyTo(void *out, ptrdiff_t nBytes) {
+void CChunkWalker::CopyTo(void *out, intp nBytes) {
   unsigned char *pOutPos = (unsigned char *)out;
 
-  ptrdiff_t nBytesLeft = nBytes;
+  intp nBytesLeft = nBytes;
   while (nBytesLeft > 0) {
-    ptrdiff_t toCopy = nBytesLeft;
-    ptrdiff_t curChunkLen = m_pChunkLengths[m_iCurChunk];
+    intp toCopy = nBytesLeft;
+    intp curChunkLen = m_pChunkLengths[m_iCurChunk];
 
-    ptrdiff_t amtLeft = curChunkLen - m_iCurChunkPos;
+    intp amtLeft = curChunkLen - m_iCurChunkPos;
     if (nBytesLeft > amtLeft) {
       toCopy = amtLeft;
     }
@@ -68,14 +63,14 @@ void CChunkWalker::CopyTo(void *out, ptrdiff_t nBytes) {
 
     // Slide up to the next chunk if we're done with the one we're on.
     m_iCurChunkPos += toCopy;
-    assert(m_iCurChunkPos <= curChunkLen);
+    Assert(m_iCurChunkPos <= curChunkLen);
 
     if (m_iCurChunkPos == curChunkLen) {
       ++m_iCurChunk;
 
       m_iCurChunkPos = 0;
 
-      assert(m_iCurChunk != m_nChunks || nBytesLeft == 0);
+      Assert(m_iCurChunk != m_nChunks || nBytesLeft == 0);
     }
   }
 }
@@ -203,7 +198,7 @@ class IpV4Socket final : public ISocket {
     DWORD val = 1;
     status = ioctlsocket(sock, FIONBIO, &val);
     if (status != 0) {
-      assert(false);
+      Assert(false);
       closesocket(sock);
       return false;
     }
@@ -267,14 +262,14 @@ class IpV4Socket final : public ISocket {
 
   virtual bool Broadcast(const void *pData, const int len,
                          const unsigned short port) {
-    assert(m_Socket != INVALID_SOCKET);
+    Assert(m_Socket != INVALID_SOCKET);
 
     // Make sure we're setup to broadcast.
     if (!m_bSetupToBroadcast) {
       BOOL bBroadcast = true;
       if (setsockopt(m_Socket, SOL_SOCKET, SO_BROADCAST, (char *)&bBroadcast,
                      sizeof(bBroadcast)) != 0) {
-        assert(false);
+        Assert(false);
         return false;
       }
 
@@ -305,7 +300,7 @@ class IpV4Socket final : public ISocket {
       nTotalBytes += pChunkLengths[i];
     }
 
-    assert(m_Socket != INVALID_SOCKET);
+    Assert(m_Socket != INVALID_SOCKET);
 
     // Translate the address.
     sockaddr_in addr;
@@ -319,7 +314,7 @@ class IpV4Socket final : public ISocket {
   }
 
   virtual int RecvFrom(void *pData, int maxDataLen, IpV4 *pFrom) {
-    assert(m_Socket != INVALID_SOCKET);
+    Assert(m_Socket != INVALID_SOCKET);
 
     fd_set readSet = {};
     readSet.fd_count = 1;
@@ -402,8 +397,8 @@ bool ConvertStringToIPAddr(const char *pStr, IpV4 *pOut) {
   const char *pColon = strchr(pStr, ':');
   if (pColon) {
     intp toCopy = pColon - pStr;
-    if (toCopy < 2 || toCopy > sizeof(ipStr) - 1) {
-      assert(false);
+    if (toCopy < 2 || toCopy > ssize(ipStr) - 1) {
+      Assert(false);
       return false;
     }
 
@@ -421,7 +416,7 @@ bool ConvertStringToIPAddr(const char *pStr, IpV4 *pOut) {
     const int read{
         sscanf(ipStr, "%hhu.%hhu.%hhu.%hhu", &ip[0], &ip[1], &ip[2], &ip[3])};
     if (read != 4) {
-      assert(false);
+      Assert(false);
       return false;
     }
 

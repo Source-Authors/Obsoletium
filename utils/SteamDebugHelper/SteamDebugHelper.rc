@@ -61,23 +61,14 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDR_MAINFRAME           ICON    DISCARDABLE     "res\\SteamDebugHelper.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Dialog
 //
 
 IDD_STEAMDEBUGHELPER_DIALOG DIALOGEX 0, 0, 220, 166
 STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
-CAPTION "SteamDebugHelper - No File"
-FONT 8, "MS Sans Serif"
+CAPTION "Steam Debug Helper - No File"
+FONT 8, "Segoe UI"
 BEGIN
     DEFPUSHBUTTON   "&Setup For Debugging",ID_SETUP_FOR_DEBUGGING,40,19,139,
                     14,WS_DISABLED
@@ -92,50 +83,6 @@ BEGIN
     GROUPBOX        "Debug",IDC_STATIC,7,7,206,54
     GROUPBOX        "Setup",IDC_STATIC,7,65,206,72
 END
-
-
-#ifndef _MAC
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904B0"
-        BEGIN
-            VALUE "CompanyName", "\0"
-            VALUE "FileDescription", "SteamDebugHelper MFC Application\0"
-            VALUE "FileVersion", "1, 0, 0, 1\0"
-            VALUE "InternalName", "SteamDebugHelper\0"
-            VALUE "LegalCopyright", "Copyright (C) 2004\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "SteamDebugHelper.EXE\0"
-            VALUE "ProductName", "SteamDebugHelper Application\0"
-            VALUE "ProductVersion", "1, 0, 0, 1\0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1200
-    END
-END
-
-#endif    // !_MAC
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -175,7 +122,7 @@ END
 LANGUAGE 9, 1
 #pragma code_page(1252)
 #endif //_WIN32
-#include "res\SteamDebugHelper.rc2"  // non-Microsoft Visual C++ edited resources
+#include "resources\SteamDebugHelper.rc2"  // non-Microsoft Visual C++ edited resources
 #include "afxres.rc"         // Standard components
 #endif
 

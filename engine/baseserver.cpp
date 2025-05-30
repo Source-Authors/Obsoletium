@@ -97,56 +97,55 @@ static void ServerTagsCleanUp( void )
 {
 	CUtlVector<char*> TagList;
 	ConVarRef sv_tags( "sv_tags" );
-	if ( sv_tags.IsValid() )
+	if ( !sv_tags.IsValid() ) return;
+
+	char tmptags[MAX_TAG_STRING_LENGTH];
+	tmptags[0] = '\0';
+
+	V_SplitString( sv_tags.GetString(), ",", TagList );
+
+	// make a pass on the tags to eliminate preceding whitespace and empty tags
+	for ( intp i = 0; i < TagList.Count(); i++ )
 	{
-		int i;
-		char tmptags[MAX_TAG_STRING_LENGTH];
-		tmptags[0] = '\0';
-
-		V_SplitString( sv_tags.GetString(), ",", TagList );
-
-		// make a pass on the tags to eliminate preceding whitespace and empty tags
-		for ( i = 0; i < TagList.Count(); i++ )
+		if ( i > 0 )
 		{
-			if ( i > 0 )
-			{
-				Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
-			}
-
-			char *pChar = TagList[i];
-			while ( *pChar && *pChar == ' ' )
-			{
-				pChar++;
-			}
-
-			// make sure we don't have an empty string (all spaces or ,,)
-			if ( *pChar )
-			{
-				Q_strncat( tmptags, pChar, MAX_TAG_STRING_LENGTH );
-			}
+			V_strcat_safe( tmptags, "," );
 		}
 
-		// reset our lists and sort the tags
-		TagList.PurgeAndDeleteElementsArray();
-		V_SplitString( tmptags, ",", TagList );
-		TagList.Sort( SortServerTags );
-		tmptags[0] = '\0';
-
-		// create our new, sorted list of tags
-		for ( i = 0; i < TagList.Count(); i++ )
+		char *pChar = TagList[i];
+		while ( *pChar && *pChar == ' ' )
 		{
-			if ( i > 0 )
-			{
-				Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
-			}
-
-			Q_strncat( tmptags, TagList[i], MAX_TAG_STRING_LENGTH );
+			pChar++;
 		}
 
-		// set our convar and purge our list
-		sv_tags.SetValue( tmptags );
-		TagList.PurgeAndDeleteElementsArray();
+		// make sure we don't have an empty string (all spaces or ,,)
+		if ( *pChar )
+		{
+			V_strcat_safe( tmptags, pChar );
+		}
 	}
+
+	// reset our lists and sort the tags
+	TagList.PurgeAndDeleteElementsArray();
+
+	V_SplitString( tmptags, ",", TagList );
+	TagList.Sort( SortServerTags );
+	tmptags[0] = '\0';
+
+	// create our new, sorted list of tags
+	for ( intp i = 0; i < TagList.Count(); i++ )
+	{
+		if ( i > 0 )
+		{
+			V_strcat_safe( tmptags, "," );
+		}
+
+		V_strcat_safe( tmptags, TagList[i] );
+	}
+
+	// set our convar and purge our list
+	sv_tags.SetValue( tmptags );
+	TagList.PurgeAndDeleteElementsArray();
 }
 
 static void SvTagsChangeCallback( IConVar *pConVar, const char *pOldValue, float flOldValue )
@@ -250,51 +249,54 @@ static void ServerNotifyVarChangeCallback( IConVar *pConVar, const char *pOldVal
 
 CBaseServer::CBaseServer() 
 {
-	// Just get a unique ID to talk to the steam master server updater.
-	m_bRestartOnLevelChange = false;
-	
-	m_StringTables = NULL;
-	m_pInstanceBaselineTable = NULL;
-	m_pLightStyleTable = NULL;
-	m_pUserInfoTable = NULL;
-	m_pServerStartupTable = NULL;
-	m_pDownloadableFileTable = NULL;
-
-	m_fLastCPUCheckTime = 0;
-	m_fStartTime = 0;
-	m_fCPUPercent = 0;
+	m_State = ss_dead;
 	m_Socket = NS_SERVER;
 	m_nTickCount = 0;
-	
-	m_szMapname[0] = 0;
-	m_szSkyname[0] = 0;
-	m_Password[0] = 0;
-	V_memset( worldmapMD5.bits, 0, MD5_DIGEST_LENGTH );
+	m_bSimulatingTicks = false;
+	m_szMapname[0] = '\0';
+	m_szMapFilename[0] = '\0';
+	m_szSkyname[0] = '\0';
+	m_Password[0] = '\0';
 
-	serverclasses = serverclassbits = 0;
-	m_nMaxclients = m_nSpawnCount = 0;
-	m_flTickInterval = 0.03;
-	m_nUserid = 0;
-	m_nNumConnections = 0;
-	m_bIsDedicated = false;
-	m_fCPUPercent = 0;
-	m_fStartTime = 0;
-	m_fLastCPUCheckTime = 0;
+	V_memset( worldmapMD5.bits, 0, sizeof(worldmapMD5.bits) );
 	
-	m_bMasterServerRulesDirty = true;
-	m_flLastMasterServerUpdateTime = 0;
+	m_StringTables = nullptr;
+
+	m_pInstanceBaselineTable = nullptr;
+	m_pLightStyleTable = nullptr;
+	m_pUserInfoTable = nullptr;
+	m_pServerStartupTable = nullptr;
+	m_pDownloadableFileTable = nullptr;
+	
+	serverclasses = serverclassbits = 0;
+	
+	m_nUserid = 0;
+
+	m_nMaxclients = m_nSpawnCount = 0;
+	m_flTickInterval = 0.03f;
+	
+	m_bIsDedicated = false;
+
 	m_CurrentRandomNonce = 0;
 	m_LastRandomNonce = 0;
 	m_flLastRandomNumberGenerationTime = -3.0f; // force it to calc first frame
+	m_fCPUPercent = 0;
+	m_fStartTime = 0;
+	m_fLastCPUCheckTime = 0;
+
+	// Just get a unique ID to talk to the steam master server updater.
+	m_bRestartOnLevelChange = false;
+	
+	m_bMasterServerRulesDirty = true;
+	m_flLastMasterServerUpdateTime = 0;
+
+	m_nNumConnections = 0;
 
 	m_bReportNewFakeClients = true;
 	m_flPausedTimeEnd = -1.f;
 }
 
-CBaseServer::~CBaseServer()
-{
-
-}
+CBaseServer::~CBaseServer() = default;
 
 /*
 ================
@@ -317,7 +319,7 @@ bool CBaseServer::CheckChallengeNr( netadr_t &adr, int nChallengeValue )
 	uint64 challenge = ((uint64)adr.GetIPNetworkByteOrder() << 32) + m_CurrentRandomNonce;
 	CRC32_t hash;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	if ( (int)hash == nChallengeValue )
 		return true;
@@ -327,7 +329,7 @@ bool CBaseServer::CheckChallengeNr( netadr_t &adr, int nChallengeValue )
 	challenge += m_LastRandomNonce;
 	hash = 0;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	if ( (int)hash == nChallengeValue )
 		return true;
@@ -588,7 +590,7 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 		// StartSteamValidation() above initialized the clients networkid
 	}
 
-	if ( netchan && !netchan->IsLoopback() )
+	if ( !netchan->IsLoopback() )
 		ConMsg("Client \"%s\" connected (%s).\n", client->GetClientName(), netchan->GetAddress() );
 
 	return client;
@@ -709,9 +711,9 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				if ( !s_connectRateChecker.CheckIP( packet->from ) )
 					return false;
 
-				msg.ReadString( name, sizeof(name) );
-				msg.ReadString( password, sizeof(password) );
-				msg.ReadString( productVersion, sizeof(productVersion) );
+				msg.ReadString( name );
+				msg.ReadString( password );
+				msg.ReadString( productVersion );
 				
 //				bool bClientPlugins = ( msg.ReadByte() > 0 );
 
@@ -744,7 +746,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				if ( authProtocol == PROTOCOL_STEAM )
 				{
 					int keyLen = msg.ReadShort();
-					if ( keyLen < 0 || keyLen > static_cast<int>(sizeof(cdkey)) )
+					if ( keyLen < 0 || keyLen > static_cast<intp>(sizeof(cdkey)) )
 					{
 						RejectConnection( packet->from, clientChallenge, "#GameUI_ServerRejectBadSteamKey" );
 						break;
@@ -755,7 +757,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				}
 				else
 				{
-					msg.ReadString( cdkey, sizeof(cdkey) );
+					msg.ReadString( cdkey );
 					ConnectClient( packet->from, protocol, challengeNr, clientChallenge, authProtocol, name, password, cdkey, strlen(cdkey) );
 				}
 			}
@@ -934,7 +936,7 @@ void CBaseServer::UserInfoChanged( int nClientIndex )
 void CBaseServer::FillServerInfo(SVC_ServerInfo &serverinfo)
 {
 	static char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	V_FileBase( com_gamedir, gamedir );
 
 	serverinfo.m_nProtocol		= PROTOCOL_VERSION;
 	serverinfo.m_nServerCount	= GetSpawnCount();
@@ -944,12 +946,14 @@ void CBaseServer::FillServerInfo(SVC_ServerInfo &serverinfo)
 	serverinfo.m_bIsDedicated	= IsDedicated();
 #ifdef _WIN32
 	serverinfo.m_cOS			= 'W';
+#elif defined(OSX)
+	serverinfo.m_cOS			= 'O';
 #else
 	serverinfo.m_cOS			= 'L';
 #endif
 
 	// HACK to signal that the server is "new"
-	serverinfo.m_cOS = tolower( serverinfo.m_cOS );
+	serverinfo.m_cOS = static_cast<char>(tolower( serverinfo.m_cOS ));
 
 	serverinfo.m_fTickInterval	= GetTickInterval();
 	serverinfo.m_szGameDir		= gamedir;
@@ -1065,7 +1069,7 @@ int CBaseServer::GetChallengeNr (netadr_t &adr)
 	uint64 challenge = ((uint64)adr.GetIPNetworkByteOrder() << 32) + m_CurrentRandomNonce;
 	CRC32_t hash;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	return (int)hash;
 }
@@ -1101,7 +1105,7 @@ void CBaseServer::CalculateCPUUsage( void )
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-	float curtime = Sys_FloatTime();
+	double curtime = Plat_FloatTime();
 
 	if ( m_fStartTime == 0 )
 	// record when we started
@@ -1113,7 +1117,7 @@ void CBaseServer::CalculateCPUUsage( void )
 	// only do this every 1 second
 	{
 #if defined ( _WIN32 ) 
-		static float lastAvg=0;
+		static double lastAvg=0;
 		static __int64 lastTotalTime=0,lastNow=0;
 
 		HANDLE handle;
@@ -1150,7 +1154,7 @@ void CBaseServer::CalculateCPUUsage( void )
 		}
 #elif defined ( POSIX )
 		static struct rusage s_lastUsage;
-		static float s_lastAvg = 0;
+		static double s_lastAvg = 0;
 		struct rusage currentUsage;
 
 		if ( getrusage( RUSAGE_SELF, &currentUsage ) == 0 )
@@ -1856,9 +1860,6 @@ void CBaseServer::UpdateMasterServerRules()
 			continue;
 
 		ConVar *pConVar = static_cast< ConVar* >( var );
-		if ( !pConVar )
-			continue;
-
 		SetMasterServerKeyValue( pUpdater, pConVar );
 	}
 
@@ -2136,7 +2137,7 @@ void CBaseServer::BroadcastPrintf (const char *fmt, ...)
 	char		string[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe (string, fmt, argptr);
 	va_end (argptr);
 
 	SVC_Print print( string );
@@ -2290,7 +2291,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 	if ( sorted.Count() <= 0 )
 		return;
 
-	for ( int i = sorted.FirstInorder(); 
+	for ( auto i = sorted.FirstInorder(); 
 		i != sorted.InvalidIndex(); 
 		i = sorted.NextInorder( i ) )
 	{
@@ -2397,7 +2398,7 @@ void CBaseServer::RecalculateTags( void )
 	// Games without this interface will have no tagged cvars besides "increased_maxplayers"
 	if ( serverGameTags )
 	{
-		KeyValues *pKV = new KeyValues( "GameTags" );
+		KeyValuesAD pKV( "GameTags" );
 
 		serverGameTags->GetTaggedConVarList( pKV );
 
@@ -2421,8 +2422,6 @@ void CBaseServer::RecalculateTags( void )
 
 			p = p->GetNextKey();
 		}
-
-		pKV->deleteThis();
 	}
 
 	// Check maxplayers
@@ -2466,10 +2465,10 @@ void CBaseServer::AddTag( const char *pszTag )
 {
 	CUtlVector<char*> TagList;
 	V_SplitString( sv_tags.GetString(), ",", TagList );
-	for ( int i = 0; i < TagList.Count(); i++ )
+	for ( const char *tag : TagList )
 	{
 		// Already in the tag list?
-		if ( !Q_stricmp(TagList[i],pszTag) )
+		if ( !Q_stricmp(tag,pszTag) )
 			return;
 	}
 	TagList.PurgeAndDeleteElementsArray();
@@ -2477,9 +2476,9 @@ void CBaseServer::AddTag( const char *pszTag )
 	// Append it
 	char tmptags[MAX_TAG_STRING_LENGTH];
 	tmptags[0] = '\0';
-	Q_strncpy( tmptags, pszTag, MAX_TAG_STRING_LENGTH );
-	Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
-	Q_strncat( tmptags, sv_tags.GetString(), MAX_TAG_STRING_LENGTH );
+	V_strcpy_safe( tmptags, pszTag );
+	V_strcat_safe( tmptags, "," );
+	V_strcat_safe( tmptags, sv_tags.GetString() );
 	sv_tags.SetValue( tmptags );
 }
 
@@ -2494,17 +2493,18 @@ void CBaseServer::RemoveTag( const char *pszTag )
 
 	char tmptags[MAX_TAG_STRING_LENGTH];
 	tmptags[0] = '\0';
+	
+	bool bFoundIt = false;
 
 	CUtlVector<char*> TagList;
-	bool bFoundIt = false;
 	V_SplitString( sv_tags.GetString(), ",", TagList );
-	for ( int i = 0; i < TagList.Count(); i++ )
+	for ( const char *tag : TagList )
 	{
 		// Keep any tags other than the specified one
-		if ( Q_stricmp(TagList[i],pszTag) )
+		if ( Q_stricmp(tag,pszTag) )
 		{
-			Q_strncat( tmptags, TagList[i], MAX_TAG_STRING_LENGTH );
-			Q_strncat( tmptags, ",", MAX_TAG_STRING_LENGTH );
+			V_strcat_safe( tmptags, tag );
+			V_strcat_safe( tmptags, "," );
 		}
 		else
 		{

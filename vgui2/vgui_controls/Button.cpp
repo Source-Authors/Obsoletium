@@ -5,8 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
-#include <utlsymbol.h>
+#include <vgui_controls/Button.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IBorder.h>
 #include <vgui/IInput.h>
@@ -16,9 +17,7 @@
 #include <vgui/IVGui.h>
 #include <vgui/MouseCode.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 
-#include <vgui_controls/Button.h>
 #include <vgui_controls/FocusNavGroup.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -406,10 +405,10 @@ Color Button::GetButtonFgColor()
 
 	if ( _buttonFlags.IsFlagSet( BLINK ) )
 	{
-		cBlendedColor[ 0 ] = (float)cBlendedColor[ 0 ] * fBlink + (float)_blinkFgColor[ 0 ] * ( 1.0f - fBlink );
-		cBlendedColor[ 1 ] = (float)cBlendedColor[ 1 ] * fBlink + (float)_blinkFgColor[ 1 ] * ( 1.0f - fBlink );
-		cBlendedColor[ 2 ] = (float)cBlendedColor[ 2 ] * fBlink + (float)_blinkFgColor[ 2 ] * ( 1.0f - fBlink );
-		cBlendedColor[ 3 ] = (float)cBlendedColor[ 3 ] * fBlink + (float)_blinkFgColor[ 3 ] * ( 1.0f - fBlink );
+		cBlendedColor[ 0 ] = static_cast<unsigned char>((float)cBlendedColor[ 0 ] * fBlink + (float)_blinkFgColor[ 0 ] * ( 1.0f - fBlink ));
+		cBlendedColor[ 1 ] = static_cast<unsigned char>((float)cBlendedColor[ 1 ] * fBlink + (float)_blinkFgColor[ 1 ] * ( 1.0f - fBlink ));
+		cBlendedColor[ 2 ] = static_cast<unsigned char>((float)cBlendedColor[ 2 ] * fBlink + (float)_blinkFgColor[ 2 ] * ( 1.0f - fBlink ));
+		cBlendedColor[ 3 ] = static_cast<unsigned char>((float)cBlendedColor[ 3 ] * fBlink + (float)_blinkFgColor[ 3 ] * ( 1.0f - fBlink ));
 	}
 
 	return cBlendedColor;

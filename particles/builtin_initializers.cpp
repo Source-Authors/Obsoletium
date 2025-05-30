@@ -171,7 +171,7 @@ void C_INIT_CreateOnModel::InitNewParticlesScalar(
 		Vector vecPnts[100];								// minimize stack usage
 		Vector vecUVW[100];
 		int nHitBoxIndex[100];
-		int nToDo = min( ssize( vecPnts ), (ptrdiff_t)nParticleCount );
+		int nToDo = min( ssize( vecPnts ), (intp)nParticleCount );
 
 		Assert( m_nControlPointNumber <= pParticles->GetHighestControlPoint() );
 
@@ -215,7 +215,7 @@ void C_INIT_CreateOnModel::InitNewParticlesScalar(
 }
 		
 
-static inline void RandomPointOnUnitSphere( int nRandContext, FourVectors &out )
+[[maybe_unused]] static inline void RandomPointOnUnitSphere( int nRandContext, FourVectors &out )
 {
 	// generate 4 random points on the unit sphere. uses Marsaglia (1972) method from
 	// https://mathworld.wolfram.com/SpherePointPicking.html
@@ -2275,7 +2275,8 @@ void C_INIT_CreationNoise::InitNewParticlesScalar(
 	float Offset = m_flOffset;
 	CoordBase = Vector ( (*pCreationTime + Offset), (*pCreationTime + Offset), (*pCreationTime + Offset) );
 	CoordBase *= CoordScale;
-	CoordWorldTime = Vector( (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale) );
+	// dimhotepus: ms -> mcs to prevent overflow in 49.7 days.
+	CoordWorldTime = Vector( (Plat_USTime() / 1000 * m_flWorldTimeScale), (Plat_USTime() / 1000 * m_flWorldTimeScale), (Plat_USTime() / 1000 * m_flWorldTimeScale) );
 	CoordBase += CoordWorldTime;
 
 	for( ; nParticleCount--; start_p++ )

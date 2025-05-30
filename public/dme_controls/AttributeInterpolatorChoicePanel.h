@@ -34,15 +34,15 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeInterpolatorChoicePanel : public CBaseAttributeDoubleChoicePanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeInterpolatorChoicePanel, CBaseAttributeDoubleChoicePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeInterpolatorChoicePanel, CBaseAttributeDoubleChoicePanel );
 
 public:
 	CAttributeInterpolatorChoicePanel( vgui::Panel *parent,	const AttributeWidgetInfo_t &info );
 
 private:
-	virtual void PopulateComboBoxes( vgui::ComboBox *pComboBox[2] );
-	virtual void SetAttributeFromComboBoxes( vgui::ComboBox *pComboBox[2], KeyValues *pKeyValues[ 2 ] );
-	virtual void SetComboBoxesFromAttribute( vgui::ComboBox *pComboBox[2] );
+	void PopulateComboBoxes( vgui::ComboBox *pComboBox[2] ) override;
+	void SetAttributeFromComboBoxes( vgui::ComboBox *pComboBox[2], KeyValues *pKeyValues[ 2 ] ) override;
+	void SetComboBoxesFromAttribute( vgui::ComboBox *pComboBox[2] ) override;
 };
 
 

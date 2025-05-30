@@ -122,7 +122,7 @@ void CAutoSelComboBox::OnUpdateText(void)
 		}
 	}
 
-	strcpy(m_szLastText, szTypedText);
+	V_strcpy_safe(m_szLastText, szTypedText);
 
 	if (nNewSel != m_nLastSel)
 	{

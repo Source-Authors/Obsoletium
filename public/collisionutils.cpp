@@ -1997,6 +1997,7 @@ QuadBarycentricRetval_t PointInQuadToBarycentric( const Vector &v1, const Vector
 	//
 	if( FloatMakePositive( axisU[0][projAxes[0]] ) < FloatMakePositive( axisU[0][projAxes[1]] ) )
 	{
+		// dimhotepus: Correct, int here as we use it for indexed :(
 		int tmp = projAxes[0];
 		projAxes[0] = projAxes[1];
 		projAxes[1] = tmp;

@@ -39,7 +39,7 @@
 
 #define SF_COMBINE_BALL_BOUNCING_IN_SPAWNER		0x10000
 
-#define	MAX_COMBINEBALL_RADIUS	12
+#define	MAX_COMBINEBALL_RADIUS	12.f
 
 ConVar	sk_npc_dmg_combineball( "sk_npc_dmg_combineball","15", FCVAR_REPLICATED);
 ConVar	sk_combineball_guidefactor( "sk_combineball_guidefactor","0.5", FCVAR_REPLICATED);
@@ -314,7 +314,7 @@ bool CPropCombineBall::IsInField() const
 //-----------------------------------------------------------------------------
 void CPropCombineBall::SetRadius( float flRadius )
 {
-	m_flRadius = clamp( flRadius, 1, MAX_COMBINEBALL_RADIUS );
+	m_flRadius = clamp( flRadius, 1.f, MAX_COMBINEBALL_RADIUS );
 }
 
 //-----------------------------------------------------------------------------

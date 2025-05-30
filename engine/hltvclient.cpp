@@ -226,7 +226,7 @@ bool CHLTVClient::ExecuteStringCommand( const char *pCommandString )
 	{
 		int		slots, proxies,	clients;
 		char	gd[MAX_OSPATH];
-		Q_FileBase( com_gamedir, gd, sizeof( gd ) );
+		Q_FileBase( com_gamedir, gd );
 		
 		if ( m_pHLTV->IsMasterProxy() )
 		{

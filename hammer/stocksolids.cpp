@@ -5,8 +5,9 @@
 //=============================================================================
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "StockSolids.h"
+
+#include "hammer.h"
 #include "hammer_mathlib.h"
 #include "MapSolid.h"
 
@@ -15,7 +16,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 //Vector pmPoints[64];
 
@@ -109,7 +109,7 @@ void StockSolid::AddDataField(STSDF_TYPE type, const char *pszName, int iRangeLo
 
 	field.type = type;
 	field.flags = 0;
-	strcpy(field.szName, pszName);
+	V_strcpy_safe(field.szName, pszName);
 
 	if(iRangeLower != -1)
 	{
@@ -589,7 +589,7 @@ void StockSphere::CreateMapSolid(CMapSolid *pSolid, TextureAlignment_t eTextureA
 	int nSides = GetFieldData(fieldSideCount);
 
 	float fAngle = 0;
-	float fAngleStep = 180.0 / nSides;
+	float fAngleStep = 180.0f / nSides;
 
 	//
 	// Build the sphere by building slices at constant angular intervals.
@@ -615,24 +615,28 @@ void StockSphere::CreateMapSolid(CMapSolid *pSolid, TextureAlignment_t eTextureA
 		// Make the upper polygon.
 		//
 		Vector TopPoints[64];
-		float fUpperWidth = fWidth * sin(DEG2RAD(fAngle));
-		float fUpperDepth = fDepth * sin(DEG2RAD(fAngle));
+		float fSinAngle, fCosAngle;
+		DirectX::XMScalarSinCos(&fSinAngle, &fCosAngle, DEG2RAD(fAngle));
+		float fUpperWidth = fWidth * fSinAngle;
+		float fUpperDepth = fDepth * fSinAngle;
 		polyMake(origin[0] - fUpperWidth, origin[1] - fUpperDepth, origin[0] + fUpperWidth, origin[1] + fUpperDepth, nSides, 0, TopPoints);
 
 		//
 		// Make the lower polygon.
 		//
 		Vector BottomPoints[64];
-		float fLowerWidth = fWidth * sin(DEG2RAD(fAngle1));
-		float fLowerDepth = fDepth * sin(DEG2RAD(fAngle1));
+		float fSinAngle1, fCosAngle1;
+		DirectX::XMScalarSinCos(&fSinAngle1, &fCosAngle1, DEG2RAD(fAngle1));
+		float fLowerWidth = fWidth * fSinAngle1;
+		float fLowerDepth = fDepth * fSinAngle1;
 		polyMake(origin[0] - fLowerWidth, origin[1] - fLowerDepth, origin[0] + fLowerWidth, origin[1] + fLowerDepth, nSides, 0, BottomPoints);
 
 		//
 		// Build the faces that connect the upper and lower polygons.
 		//
 		Vector Points[4];
-		float fUpperHeight = origin[2] + fHeight * cos(DEG2RAD(fAngle));
-		float fLowerHeight = origin[2] + fHeight * cos(DEG2RAD(fAngle1));
+		float fUpperHeight = origin[2] + fHeight * fCosAngle;
+		float fLowerHeight = origin[2] + fHeight * fCosAngle1;
 
 		for (int i = 0; i < nSides; i++)
 		{

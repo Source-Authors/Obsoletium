@@ -61,10 +61,20 @@ public:
 	void DoModal( bool bUnused = false );
 
 	// Get the directory this is currently in
-	void GetCurrentDirectory( char *buf, int bufSize );
+	void GetCurrentDirectory( char *buf, intp bufSize );
+	template<intp bufferSize>
+	void GetCurrentDirectory( char (&buffer)[bufferSize] )
+	{
+		GetCurrentDirectory( buffer, bufferSize );
+	}
 
 	// Get the last selected file name
-	void GetSelectedFileName( char *buf, int bufSize );
+	void GetSelectedFileName( char *buf, intp bufSize );
+	template<intp bufferSize>
+	void GetSelectedFileName( char (&buffer)[bufferSize] )
+	{
+		GetSelectedFileName( buffer, bufferSize );
+	}
 
 	/*
 		messages sent:
@@ -119,7 +129,13 @@ private:
 	bool ExtensionMatchesFilter( const char *pExt );
 
 	// Choose the first non *.* filter in the filter list
-	void ChooseExtension( char *pExt, int nBufLen );
+	void ChooseExtension( OUT_Z_CAP(nBufLen) char *pExt, intp nBufLen );
+
+	template<intp bufferSize>
+	void ChooseExtension( OUT_Z_ARRAY char (&pExt)[bufferSize] )
+	{
+		ChooseExtension( pExt, bufferSize );
+	}
 
 	// Saves the file to the start dir context
 	void SaveFileToStartDirContext( const char *pFullPath );

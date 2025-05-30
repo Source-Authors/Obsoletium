@@ -68,13 +68,13 @@ public:
 class CDmaBinaryBlock : public CDmaVar< CUtlBinaryBlock >
 {
 public:
-	void Get( void *pValue, int nMaxLen ) const;
-	void Set( const void *pValue, int nLen );
+	void Get( void *pValue, intp nMaxLen ) const;
+	void Set( const void *pValue, intp nLen );
 	const void *Get() const;
-	const unsigned char& operator[]( int i ) const;
+	const unsigned char& operator[]( intp i ) const;
 
 	// Returns buffer length
-	int	Length() const;
+	intp	Length() const;
 };
 
 
@@ -206,8 +206,8 @@ public:
 	const T& operator[]( intp i ) const;
 	const T& Element( intp i ) const;
 	const T& Get( intp i ) const;
-	const void*	GetUntyped( int i ) const;
-	bool	IsValidIndex( intp i ) const;
+	const void*	GetUntyped( intp i ) const;
+	bool		IsValidIndex( intp i ) const;
 	intp		InvalidIndex( void ) const;
 
 	// Search
@@ -235,7 +235,7 @@ public:
 	intp		InsertBefore( intp elem, const T& src );
 	intp		AddMultipleToTail( intp num );
 	intp		InsertMultipleBefore( intp elem, intp num );
-	void	EnsureCount( intp num );
+	void		EnsureCount( intp num );
 
 	// Element Modification
 	void	Set( intp i, const T& value );
@@ -276,13 +276,13 @@ template< class BaseClass >
 class CDmaStringArrayConstBase : public BaseClass
 {
 public:
-	const char *operator[]( int i ) const;
-	const char *Element( int i ) const;
-	const char *Get( int i ) const;
+	const char *operator[]( intp i ) const;
+	const char *Element( intp i ) const;
+	const char *Get( intp i ) const;
 	const CUtlVector< CUtlString > &Get() const;
 
 	// Returns strlen of element i
-	int	Length( int i ) const;
+	intp	Length( intp i ) const;
 };
 
 template< class B >
@@ -963,22 +963,22 @@ inline void CDmaColor::SetAlpha( int a )
 
 inline unsigned char CDmaColor::r() const
 {
-	return (unsigned char)Value().r();
+	return Value().r();
 }
 
 inline unsigned char CDmaColor::g() const
 {
-	return (unsigned char)Value().g();
+	return Value().g();
 }
 
 inline unsigned char CDmaColor::b() const
 {
-	return (unsigned char)Value().b();
+	return Value().b();
 }
 
 inline unsigned char CDmaColor::a() const
 {
-	return (unsigned char)Value().a();
+	return Value().a();
 }
 
 inline const unsigned char &CDmaColor::operator[](int index) const
@@ -1002,7 +1002,10 @@ inline void CDmaColor::SetRawColor( int color )
 inline void CDmaObjectId::CreateObjectId( )
 { 
 	DmObjectId_t id;
-	CreateUniqueId( &id );
+	if ( !CreateUniqueId( &id ) )
+	{
+		Warning( "Unable to create ID for DMA object 0x%p.", this );
+	}
 	m_pAttribute->SetValue( id );
 }
 
@@ -1064,7 +1067,7 @@ inline void CDmaString::Set( const char *pValue )
 }
 
 // Returns strlen
-inline int CDmaString::Length() const
+inline intp CDmaString::Length() const
 {
 	return Value().Length();
 }
@@ -1087,12 +1090,12 @@ inline const CDmaString& CDmaString::operator=( const CDmaString& src )
 // Inline methods for CDmaBinaryBlock
 //
 //-----------------------------------------------------------------------------
-inline void CDmaBinaryBlock::Get( void *pValue, int nMaxLen ) const
+inline void CDmaBinaryBlock::Get( void *pValue, intp nMaxLen ) const
 {
 	Value().Get( pValue, nMaxLen );
 }
 
-inline void CDmaBinaryBlock::Set( const void *pValue, int nLen )
+inline void CDmaBinaryBlock::Set( const void *pValue, intp nLen )
 {
 	CUtlBinaryBlock block( pValue, nLen );
 	m_pAttribute->SetValue( block );
@@ -1103,12 +1106,12 @@ inline const void *CDmaBinaryBlock::Get() const
 	return Value().Get();
 }
 
-inline const unsigned char& CDmaBinaryBlock::operator[]( int i ) const
+inline const unsigned char& CDmaBinaryBlock::operator[]( intp i ) const
 {
 	return Value()[i];
 }
 
-inline int CDmaBinaryBlock::Length() const
+inline intp CDmaBinaryBlock::Length() const
 {
 	return Value().Length();
 }
@@ -1225,7 +1228,7 @@ inline const T& CDmaArrayConstBase<T,B>::Get( intp i ) const //-V524
 }
 
 template< class T, class B >
-const void* CDmaArrayConstBase<T,B>::GetUntyped( int i ) const
+const void* CDmaArrayConstBase<T,B>::GetUntyped( intp i ) const
 {
 	return &( this->Value()[ i ] );
 }
@@ -1289,19 +1292,19 @@ inline const CDmAttribute *CDmaArrayBase<T,B>::GetAttribute() const
 //
 //-----------------------------------------------------------------------------
 template< class B >
-inline const char *CDmaStringArrayConstBase<B>::operator[]( int i ) const
+inline const char *CDmaStringArrayConstBase<B>::operator[]( intp i ) const
 {
 	return this->Value()[ i ].Get();
 }
 
 template< class B >
-inline const char *CDmaStringArrayConstBase<B>::Element( int i ) const
+inline const char *CDmaStringArrayConstBase<B>::Element( intp i ) const
 {
 	return this->Value()[ i ].Get();
 }
 
 template< class B >
-inline const char *CDmaStringArrayConstBase<B>::Get( int i ) const //-V524
+inline const char *CDmaStringArrayConstBase<B>::Get( intp i ) const //-V524
 {
 	return this->Value()[ i ].Get();
 }
@@ -1314,7 +1317,7 @@ inline const CUtlVector< CUtlString > &CDmaStringArrayConstBase<B>::Get() const
 
 // Returns strlen of element i
 template< class B >
-inline int CDmaStringArrayConstBase<B>::Length( int i ) const
+inline intp CDmaStringArrayConstBase<B>::Length( intp i ) const
 {
 	return this->Value()[i].Length();
 }

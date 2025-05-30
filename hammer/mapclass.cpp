@@ -59,7 +59,7 @@ CMapClassManager::~CMapClassManager(void)
 //-----------------------------------------------------------------------------
 CMapClass *CMapClassManager::CreateObject(MAPCLASSTYPE Type)
 {
-	unsigned uLen = strlen(Type)+1;
+	size_t uLen = strlen(Type)+1;
 	for (int i = s_Classes.Count() - 1; i >= 0; i--)
 	{
 		MCMSTRUCT &mcms = s_Classes[i];
@@ -134,7 +134,7 @@ CMapClass::~CMapClass(void)
 									"Please tell a programmer.\n"
 									"Click Yes to write a minidump and continue.\n"
 									"Click No to ignore.", 
-						MB_YESNO );
+						MB_YESNO | MB_ICONINFORMATION );
 		
 		if ( ret == IDYES )
 		{
@@ -865,7 +865,7 @@ CMapClass *CMapClass::PrepareSelection(SelectMode_t eSelectMode)
 //			Type - Unless NULL, only objects of the given type will be enumerated.
 // Output : Returns FALSE if the enumeration was terminated early, TRUE if it completed.
 //-----------------------------------------------------------------------------
-BOOL CMapClass::EnumChildren(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPCLASSTYPE Type)
+BOOL CMapClass::EnumChildren(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type)
 {
 	FOR_EACH_OBJ( m_Children, pos )
 	{
@@ -897,7 +897,7 @@ BOOL CMapClass::EnumChildren(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPC
 //			Type - Unless NULL, only objects of the given type will be enumerated.
 // Output : Returns FALSE if the enumeration was terminated early, TRUE if it completed.
 //-----------------------------------------------------------------------------
-BOOL CMapClass::EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPCLASSTYPE Type)
+BOOL CMapClass::EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type)
 {
 	FOR_EACH_OBJ( m_Children, pos )
 	{
@@ -1459,20 +1459,17 @@ ChunkFileResult_t CMapClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	// Save the visgroup IDs, if any.
 	//
-	if (m_VisGroups.Count())
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok && m_VisGroups.Count())
 	{
-		if ((eResult == ChunkFile_Ok) && m_VisGroups.Count())
+		for (auto *pVisGroup : m_VisGroups)
 		{
-			for (int i = 0; i < m_VisGroups.Count(); i++)
+			if ( !pVisGroup->IsAutoVisGroup() )
 			{
-				CVisGroup *pVisGroup = m_VisGroups.Element(i);
-				if ( !pVisGroup->IsAutoVisGroup() )
+				eResult = pFile->WriteKeyValueInt("visgroupid", pVisGroup->GetID());
+				if (eResult != ChunkFile_Ok)
 				{
-					eResult = pFile->WriteKeyValueInt("visgroupid", pVisGroup->GetID());
-					if (eResult != ChunkFile_Ok)
-					{
-						break;
-					}
+					break;
 				}
 			}
 		}
@@ -1495,7 +1492,7 @@ ChunkFileResult_t CMapClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	CEditGameClass *pEdit = dynamic_cast <CEditGameClass *> (this);
 	if (pEdit != NULL)
 	{
-		if ((eResult == ChunkFile_Ok) && (strlen(pEdit->GetComments()) > 0))
+		if ((eResult == ChunkFile_Ok) && (!Q_isempty(pEdit->GetComments())))
 		{
 			eResult = pFile->WriteKeyValue("comments", pEdit->GetComments());
 		}
@@ -1642,7 +1639,7 @@ void CMapClass::SetEditorKeyValue(const char *szKey, const char *szValue)
 //			FIXME: Should our children necessarily have the same origin as us?
 //				   Seems like we should translate our children by our origin delta
 //-----------------------------------------------------------------------------
-void CMapClass::SetOrigin( Vector &origin )
+void CMapClass::SetOrigin( const Vector &origin )
 {
 	CMapPoint::SetOrigin( origin );
  

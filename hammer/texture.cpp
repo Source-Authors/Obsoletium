@@ -35,10 +35,7 @@ CTexture::CTexture( void )
 //-----------------------------------------------------------------------------
 CTexture::~CTexture( void )
 {
-	if ( m_pImageData != NULL )
-	{
-		delete [] m_pImageData;
-	}
+	delete [] m_pImageData;
 }
 
 
@@ -178,14 +175,14 @@ int CTexture::GetImageDataRGBA( void *pData )
 // Input  : pszKeywords - Buffer to receive keywords, NULL to query string length.
 // Output : Returns the number of characters in the keyword string.
 //-----------------------------------------------------------------------------
-int CTexture::GetKeywords(char *pszKeywords) const
+intp CTexture::GetKeywords(OUT_Z_CAP(keywordsSize) char *pszKeywords, intp keywordsSize) const
 {
 	if (pszKeywords != NULL)
 	{
 		*pszKeywords = '\0';
 	}
 
-	return(0);
+	return 0;
 }
 
 
@@ -194,14 +191,14 @@ int CTexture::GetKeywords(char *pszKeywords) const
 // Input  : *pszName - 
 // Output : 
 //-----------------------------------------------------------------------------
-int CTexture::GetShortName(char *pszName) const
+intp CTexture::GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const
 {
 	if (pszName != NULL)
 	{
-		strcpy(pszName, m_szName);
+		V_strncpy(pszName, m_szName, nameSize);
 	}
 
-	return(strlen(m_szName));
+	return V_strlen(m_szName);
 }
 
 

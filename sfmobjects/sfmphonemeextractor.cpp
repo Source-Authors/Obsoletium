@@ -4,9 +4,9 @@
 //
 //=============================================================================
 
-#include "sfmobjects/SFMPhonemeExtractor.h"
+#include "sfmobjects/sfmphonemeextractor.h"
 #include "tier2/riff.h"
-#include "PhonemeConverter.h"
+#include "phonemeconverter.h"
 #include "filesystem.h"
 #include "tier1/utlbuffer.h"
 #include "sentence.h"
@@ -20,7 +20,7 @@
 #include "tier2/soundutils.h"
 #include "tier1/utldict.h"
 
-#include <windows.h>  // WAVEFORMATEX, WAVEFORMAT and ADPCM WAVEFORMAT!!!
+#include "winlite.h"  // WAVEFORMATEX, WAVEFORMAT and ADPCM WAVEFORMAT!!!
 #include <mmreg.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -61,16 +61,16 @@ public:
 	// Inherited from ISFMPhonemeExtractor
 	virtual bool Init();
 	virtual void Shutdown();
-	virtual int GetAPICount();
-	virtual void GetAPIInfo( int index, CUtlString* pPrintName, PE_APITYPE *pAPIType );
+	virtual intp GetAPICount();
+	virtual void GetAPIInfo( intp index, CUtlString* pPrintName, PE_APITYPE *pAPIType );
 	virtual void Extract( const PE_APITYPE& apiType, ExtractDesc_t& info, bool bWritePhonemesToWavFiles );
 	virtual void ReApply( ExtractDesc_t& info );
 	virtual bool GetSentence( CDmeGameSound *gameSound, CSentence& sentence );
 
 private:
-	int FindExtractor( PE_APITYPE type );
+	intp FindExtractor( PE_APITYPE type );
 	bool GetWaveFormat( const char *filename, CUtlBuffer* pFormat, int *pDataSize, CSentence& sentence, bool &bGotSentence );
-	void LogPhonemes( int nItemIndex, ExtractDesc_t& info ); 
+	void LogPhonemes( intp nItemIndex, ExtractDesc_t& info ); 
 	void ClearInterstitialSpaces( CDmeChannelsClip *pChannelsClip, CUtlDict< LogPreview_t *, int >& controlLookup, ExtractDesc_t& info );
 
 	void StampControlValueLogs( CDmePreset *preset, DmeTime_t tHeadPosition, float flIntensity, CUtlDict< LogPreview_t *, int > &controlLookup );
@@ -81,7 +81,8 @@ private:
 	void BuildPhonemeToPresetMapping( const CUtlVector< CBasePhonemeTag * > &stream, CDmeAnimationSet *pSet, CDmePresetGroup * pPresetGroup, CUtlDict< CDmePreset *, unsigned short > &phonemeToPresetDict );
 
 	CUtlVector< Extractor >	m_Extractors;
-	int m_nCurrentExtractor;
+	// dimhotepus: Comment unused field.
+	// int m_nCurrentExtractor;
 };
 
 
@@ -95,7 +96,7 @@ ISFMPhonemeExtractor *sfm_phonemeextractor = &g_ExtractorSingleton;
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CSFMPhonemeExtractor::CSFMPhonemeExtractor() : m_nCurrentExtractor( -1 )
+CSFMPhonemeExtractor::CSFMPhonemeExtractor() // dimhotepus: Comment unused field. : m_nCurrentExtractor( -1 )
 {
 }
 
@@ -107,11 +108,11 @@ bool CSFMPhonemeExtractor::Init()
 {
 	// Enumerate modules under bin folder of exe
 	FileFindHandle_t findHandle;
-	const char *pFilename = g_pFullFileSystem->FindFirstEx( "phonemeextractors/*.dll", "EXECUTABLE_PATH", &findHandle );
+	const char *pFilename = g_pFullFileSystem->FindFirstEx( "phonemeextractors/*" DLL_EXT_STRING, "EXECUTABLE_PATH", &findHandle );
 	while( pFilename )
 	{	
 		char fullpath[ 512 ];
-		Q_snprintf( fullpath, sizeof( fullpath ), "phonemeextractors/%s", pFilename );
+		V_sprintf_safe( fullpath, "phonemeextractors/%s", pFilename );
 
 		// Msg( "Loading extractor from %s\n", fullpath );
 
@@ -123,14 +124,14 @@ bool CSFMPhonemeExtractor::Init()
 			continue;
 		}
 
-		CreateInterfaceFn factory = Sys_GetFactory( e.module );
+		CreateInterfaceFnT<IPhonemeExtractor> factory = Sys_GetFactory<IPhonemeExtractor>( e.module );
 		if ( !factory )
 		{
 			pFilename = g_pFullFileSystem->FindNext( findHandle );
 			continue;
 		}
 
-		e.extractor = ( IPhonemeExtractor * )factory( VPHONEME_EXTRACTOR_INTERFACE, NULL );
+		e.extractor = factory( VPHONEME_EXTRACTOR_INTERFACE, NULL );
 		if ( !e.extractor )
 		{
 			Warning( "Unable to get IPhonemeExtractor interface version %s from %s\n", VPHONEME_EXTRACTOR_INTERFACE, fullpath );
@@ -150,8 +151,8 @@ bool CSFMPhonemeExtractor::Init()
 
 void CSFMPhonemeExtractor::Shutdown()
 {
-	int c = m_Extractors.Count();
-	for ( int i = c - 1; i >= 0; i-- )
+	intp c = m_Extractors.Count();
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		Extractor *e = &m_Extractors[ i ];
 		g_pFullFileSystem->UnloadModule( e->module );
@@ -164,9 +165,9 @@ void CSFMPhonemeExtractor::Shutdown()
 //-----------------------------------------------------------------------------
 // Finds an extractor of a particular type
 //-----------------------------------------------------------------------------
-int CSFMPhonemeExtractor::FindExtractor( PE_APITYPE type )
+intp CSFMPhonemeExtractor::FindExtractor( PE_APITYPE type )
 {
-	for ( int i=0; i < m_Extractors.Count(); i++ )
+	for ( intp i=0; i < m_Extractors.Count(); i++ )
 	{
 		if ( m_Extractors[i].apitype == type )
 			return i;
@@ -178,12 +179,12 @@ int CSFMPhonemeExtractor::FindExtractor( PE_APITYPE type )
 //-----------------------------------------------------------------------------
 // Iterates over extractors
 //-----------------------------------------------------------------------------
-int CSFMPhonemeExtractor::GetAPICount()
+intp CSFMPhonemeExtractor::GetAPICount()
 {
 	return m_Extractors.Count();
 }
 
-void CSFMPhonemeExtractor::GetAPIInfo( int index, CUtlString* pPrintName, PE_APITYPE *pAPIType )
+void CSFMPhonemeExtractor::GetAPIInfo( intp index, CUtlString* pPrintName, PE_APITYPE *pAPIType )
 {
 	Assert( pPrintName );
 	Assert( pAPIType );
@@ -193,7 +194,7 @@ void CSFMPhonemeExtractor::GetAPIInfo( int index, CUtlString* pPrintName, PE_API
 
 static void ParseSentence( CSentence& sentence, IterateRIFF &walk )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.EnsureCapacity( walk.ChunkSize() );
 	walk.ChunkRead( buf.Base() );
@@ -258,11 +259,11 @@ bool CSFMPhonemeExtractor::GetSentence( CDmeGameSound *gameSound, CSentence& sen
 
 	char soundname[ 512 ];
 	// Note, calling PSkipSoundChars to remove any decorator characters used by the engine!!!
-	Q_snprintf( soundname, sizeof( soundname ), "sound/%s", PSkipSoundChars( filename ) );
-	Q_FixSlashes( soundname );
+	V_sprintf_safe( soundname, "sound/%s", PSkipSoundChars( filename ) );
+	V_FixSlashes( soundname );
 
 	char fullpath[ 512 ];
-	g_pFullFileSystem->RelativePathToFullPath( soundname, "GAME", fullpath, sizeof( fullpath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( soundname, "GAME", fullpath );
 
 	// Get sound file metrics of interest
 	CUtlBuffer buf;
@@ -276,13 +277,13 @@ bool CSFMPhonemeExtractor::GetSentence( CDmeGameSound *gameSound, CSentence& sen
 
 static void BuildPhonemeStream( CSentence& in, CUtlVector< CBasePhonemeTag * >& list )
 {
-	for ( int i = 0; i < in.m_Words.Count(); ++i )
+	for ( intp i = 0; i < in.m_Words.Count(); ++i )
 	{
 		CWordTag *w = in.m_Words[ i ];
 		if ( !w )
 			continue;
 
-		for ( int j = 0; j < w->m_Phonemes.Count(); ++j )
+		for ( intp j = 0; j < w->m_Phonemes.Count(); ++j )
 		{
 			CPhonemeTag *ph = w->m_Phonemes[ j ];
 			if ( !ph )
@@ -295,7 +296,7 @@ static void BuildPhonemeStream( CSentence& in, CUtlVector< CBasePhonemeTag * >& 
 
 	if ( !in.m_Words.Count() && in.m_RunTimePhonemes.Count() )
 	{
-		for ( int i = 0 ; i < in.m_RunTimePhonemes.Count(); ++i )
+		for ( intp i = 0 ; i < in.m_RunTimePhonemes.Count(); ++i )
 		{
 			CBasePhonemeTag *newTag = new CBasePhonemeTag( *in.m_RunTimePhonemes[ i ] );
 			list.AddToTail( newTag );
@@ -310,7 +311,7 @@ static void BuildPhonemeStream( CSentence& in, CUtlVector< CBasePhonemeTag * >& 
 static void StoreValveDataChunk( CSentence& sentence, IterateOutputRIFF& store )
 {
 	// Buffer and dump data
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	sentence.SaveToBuffer( buf );
 
@@ -322,8 +323,8 @@ static bool SaveSentenceToWavFile( const char *pWavFile, CSentence& sentence )
 {
 	char pTempFile[ 512 ];
 
-	Q_StripExtension( pWavFile, pTempFile, sizeof( pTempFile ) );
-	Q_DefaultExtension( pTempFile, ".tmp", sizeof( pTempFile ) );
+	Q_StripExtension( pWavFile, pTempFile );
+	Q_DefaultExtension( pTempFile, ".tmp" );
 
 	if ( g_pFullFileSystem->FileExists( pTempFile, "GAME" ) )
 	{
@@ -404,13 +405,13 @@ void CSFMPhonemeExtractor::Extract( const PE_APITYPE& apiType, ExtractDesc_t& in
 	if ( !info.m_pSet )
 		return;
 
-	int iExtractor = FindExtractor( apiType );
+	intp iExtractor = FindExtractor( apiType );
 	if ( iExtractor == -1 )
 		return;
 
 	Extractor& extractor = m_Extractors[ iExtractor ];
 
-	int nWorkItem;
+	intp nWorkItem;
 	for ( nWorkItem = 0; nWorkItem < info.m_WorkList.Count(); ++nWorkItem )
 	{
 		CExtractInfo& workItem = info.m_WorkList[ nWorkItem ];
@@ -427,11 +428,11 @@ void CSFMPhonemeExtractor::Extract( const PE_APITYPE& apiType, ExtractDesc_t& in
 
 		char pSoundName[ 512 ];
 		// Note, calling PSkipSoundChars to remove any decorator characters used by the engine!!!
-		Q_snprintf( pSoundName, sizeof( pSoundName ), "sound/%s", PSkipSoundChars( pFileName ) );
-		Q_FixSlashes( pSoundName );
+		V_sprintf_safe( pSoundName, "sound/%s", PSkipSoundChars( pFileName ) );
+		V_FixSlashes( pSoundName );
 
 		char pFullPath[ 512 ];
-		g_pFullFileSystem->RelativePathToFullPath( pSoundName, "GAME", pFullPath, sizeof( pFullPath ) );
+		g_pFullFileSystem->RelativePathToFullPath_safe( pSoundName, "GAME", pFullPath );
 
 		// Get sound file metrics of interest
 		CUtlBuffer buf;
@@ -454,7 +455,7 @@ void CSFMPhonemeExtractor::Extract( const PE_APITYPE& apiType, ExtractDesc_t& in
 		int nChannels = format->nChannels;
 		int nSampleCount = nDataSize / ( nBitsPerSample >> 3 );
 
-		float flTrueSampleSize = ( nBitsPerSample * nChannels ) >> 3;
+		float flTrueSampleSize = static_cast<float>(( nBitsPerSample * nChannels ) >> 3);
 		if ( format->wFormatTag == WAVE_FORMAT_ADPCM )
 		{
 			nBitsPerSample = 16;
@@ -497,9 +498,9 @@ void CSFMPhonemeExtractor::Extract( const PE_APITYPE& apiType, ExtractDesc_t& in
 
 			float bytespersecond = flSampleRate * flTrueSampleSize;
 
-			int i;
+			intp i;
 			// Now convert byte offsets to times
-			for ( i = 0; i < out.m_Words.Size(); i++ )
+			for ( i = 0; i < out.m_Words.Count(); i++ )
 			{
 				CWordTag *tag = out.m_Words[ i ];
 				Assert( tag );
@@ -509,7 +510,7 @@ void CSFMPhonemeExtractor::Extract( const PE_APITYPE& apiType, ExtractDesc_t& in
 				tag->m_flStartTime = ( float )(tag->m_uiStartByte ) / bytespersecond;
 				tag->m_flEndTime = ( float )(tag->m_uiEndByte ) / bytespersecond;
 
-				for ( int j = 0; j < tag->m_Phonemes.Size(); j++ )
+				for ( intp j = 0; j < tag->m_Phonemes.Count(); j++ )
 				{
 					CPhonemeTag *ptag = tag->m_Phonemes[ j ];
 					Assert( ptag );
@@ -560,9 +561,8 @@ static bool UniquePhonemeLessFunc( CBasePhonemeTag * const & lhs, CBasePhonemeTa
 void CSFMPhonemeExtractor::BuildPhonemeToPresetMapping( const CUtlVector< CBasePhonemeTag * > &stream, 
 													   CDmeAnimationSet *pSet, CDmePresetGroup *pPresetGroup, CUtlDict< CDmePreset *, unsigned short > &phonemeToPresetDict )
 {
-	int i;
 	CUtlRBTree< CBasePhonemeTag * > uniquePhonemes( 0, 0, UniquePhonemeLessFunc );
-	for ( i = 0; i < stream.Count(); ++i )
+	for ( intp i = 0; i < stream.Count(); ++i )
 	{
 		CBasePhonemeTag *tag = stream[ i ];
 		if ( uniquePhonemes.Find( tag ) == uniquePhonemes.InvalidIndex() )
@@ -571,21 +571,21 @@ void CSFMPhonemeExtractor::BuildPhonemeToPresetMapping( const CUtlVector< CBaseP
 		}
 	}
 
-	for ( i = uniquePhonemes.FirstInorder(); i != uniquePhonemes.InvalidIndex(); i = uniquePhonemes.NextInorder( i ) )
+	for ( auto i = uniquePhonemes.FirstInorder(); i != uniquePhonemes.InvalidIndex(); i = uniquePhonemes.NextInorder( i ) )
 	{
 		CBasePhonemeTag *tag = uniquePhonemes[ i ];
 		// Convert phoneme code to text
 		char ph[ 32 ];
-		Q_strncpy( ph, ConvertPhoneme( tag->GetPhonemeCode() ), sizeof( ph ) );
+		V_strcpy_safe( ph, ConvertPhoneme( tag->GetPhonemeCode() ) );
 
 		char remappedph[ 32 ];
 		// By default we search for a preset name p_xxx where xxx is the phoneme string
-		Q_snprintf( remappedph, sizeof( remappedph ), "p_%s", ph );
+		V_sprintf_safe( remappedph, "p_%s", ph );
 		// Now find the preset in the animation set converter
 		CDmePhonemeMapping *mapping = pSet->FindMapping( ph );
 		if ( mapping )
 		{
-			Q_strncpy( remappedph, mapping->GetValueString( "preset" ), sizeof( remappedph ) );
+			V_strcpy_safe( remappedph, mapping->GetValueString( "preset" ) );
 		}
 
 		// Now look up the preset, if it exists
@@ -614,7 +614,7 @@ CDmeChannelsClip* CSFMPhonemeExtractor::FindFacialChannelsClip( const CUtlVector
 {
 	CDmeChannelsClip *pChannelsClip = NULL;
 
-	int i;
+	intp i;
 	for ( i = list.Count() - 1; i >= 0; --i )
 	{
 		const LogPreview_t &lp = list[i];
@@ -647,7 +647,7 @@ CDmeChannelsClip* CSFMPhonemeExtractor::FindFacialChannelsClip( const CUtlVector
 //-----------------------------------------------------------------------------
 void CSFMPhonemeExtractor::BuildPhonemeLogList( CUtlVector< LogPreview_t > &list, CUtlVector< CDmeLog * > &logs )
 {
-	for ( int i = 0; i < list.Count(); ++i )
+	for ( intp i = 0; i < list.Count(); ++i )
 	{
 		LogPreview_t& p = list[ i ];
 
@@ -673,7 +673,7 @@ void CSFMPhonemeExtractor::BuildPhonemeLogList( CUtlVector< LogPreview_t > &list
 void CSFMPhonemeExtractor::WriteDefaultValuesIntoLogLayers( DmeTime_t tHeadPosition, const CUtlDict< LogPreview_t *, int > &controlLookup )
 {
 	// Write a zero into all relevant log layers
-	for ( int j = controlLookup.First(); j != controlLookup.InvalidIndex(); j = controlLookup.Next( j ) )
+	for ( auto j = controlLookup.First(); j != controlLookup.InvalidIndex(); j = controlLookup.Next( j ) )
 	{
 		LogPreview_t* lp = controlLookup[ j ];
 
@@ -707,7 +707,7 @@ void CSFMPhonemeExtractor::WriteDefaultValuesIntoLogLayers( DmeTime_t tHeadPosit
 void CSFMPhonemeExtractor::WriteCurrentValuesIntoLogLayers( DmeTime_t tHeadPosition, const CUtlDict< LogPreview_t *, int > &controlLookup )
 {
 	// Write a zero into all relevant log layers
-	for ( int j = controlLookup.First(); j != controlLookup.InvalidIndex(); j = controlLookup.Next( j ) )
+	for ( auto j = controlLookup.First(); j != controlLookup.InvalidIndex(); j = controlLookup.Next( j ) )
 	{
 		LogPreview_t* lp = controlLookup[ j ];
 
@@ -740,7 +740,7 @@ void CSFMPhonemeExtractor::StampControlValueLogs( CDmePreset *preset, DmeTime_t 
 {
 	// Now walk the logs required by the preset
 	const CDmrElementArray< CDmElement > &controlValues = preset->GetControlValues( );
-	for ( int j = 0; j < controlValues.Count(); ++j )
+	for ( intp j = 0; j < controlValues.Count(); ++j )
 	{
 		// This control contains the preset value
 		CDmElement *presetControl = controlValues[ j ];
@@ -809,7 +809,7 @@ void CSFMPhonemeExtractor::ClearInterstitialSpaces( CDmeChannelsClip *pChannelsC
 	DmeTime_t tMinTime( DMETIME_MAXTIME );
 	DmeTime_t tMaxTime( DMETIME_MINTIME );
 
-	int i;
+	intp i;
 	// Walk work items and figure out time bounds
 	for ( i = 0; i < info.m_WorkList.Count(); ++i )
 	{
@@ -839,7 +839,7 @@ void CSFMPhonemeExtractor::ClearInterstitialSpaces( CDmeChannelsClip *pChannelsC
 		// Find a scale + offset which transforms data in media space of the sound [namely, the phonemes]
 		// into the media space of the channels [the logs that drive the facial animation]
 		DmeTime_t tEndDuration = tChannelMediaEndTime - tChannelMediaStartTime;
-		double flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
+		float flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
 		DmeTime_t tOffset = tChannelMediaStartTime;
 
 		DmeTime_t tChannelRelativeStartTime( tStartTime * flScale );
@@ -878,9 +878,9 @@ void CSFMPhonemeExtractor::ClearInterstitialSpaces( CDmeChannelsClip *pChannelsC
 			WriteDefaultValuesIntoLogLayers( tMaxTime, controlLookup );
 
 			// Now discard all keys > tMinTime and < tMaxTime
-			for ( int j = layer->GetKeyCount() - 1; j >= 0; --j )
+			for ( intp j = layer->GetKeyCount() - 1; j >= 0; --j )
 			{
-				DmeTime_t &t = layer->GetKeyTime( j );
+				DmeTime_t t = layer->GetKeyTime( j );
 				if ( t <= tMinTime )
 					continue;
 				if ( t >= tMaxTime )
@@ -915,7 +915,7 @@ void AddAnimSetBookmarkAtSoundMediaTime( const char *pName, DmeTime_t tStart, Dm
 //-----------------------------------------------------------------------------
 // Main entry point for generating phoneme logs 
 //-----------------------------------------------------------------------------
-void CSFMPhonemeExtractor::LogPhonemes( int nItemIndex,	ExtractDesc_t& info )
+void CSFMPhonemeExtractor::LogPhonemes( intp nItemIndex,	ExtractDesc_t& info )
 {
 	CExtractInfo &item = info.m_WorkList[ nItemIndex ];
 
@@ -945,7 +945,7 @@ void CSFMPhonemeExtractor::LogPhonemes( int nItemIndex,	ExtractDesc_t& info )
 		return;
 
 	// Build a fast lookup of the visible sliders
-	int i;
+	intp i;
 	CUtlDict< LogPreview_t *, int > controlLookup;
 	for ( i = 0; i < info.m_ControlList.Count(); ++i )
 	{
@@ -992,7 +992,7 @@ void CSFMPhonemeExtractor::LogPhonemes( int nItemIndex,	ExtractDesc_t& info )
 	// Find a scale + offset which transforms data in media space of the sound [namely, the phonemes]
 	// into the media space of the channels [the logs that drive the facial animation]
 	DmeTime_t tEndDuration = tChannelMediaEndTime - tChannelMediaStartTime;
-	double flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
+	float flScale = ( item.m_flDuration != 0.0f ) ? tEndDuration.GetSeconds() / item.m_flDuration : 0.0f;
 	DmeTime_t tOffset = tChannelMediaStartTime;
 
 	CUtlVector< CDmeLog * > logs;
@@ -1005,7 +1005,7 @@ void CSFMPhonemeExtractor::LogPhonemes( int nItemIndex,	ExtractDesc_t& info )
 	}
 
 	// Iterate over the entire range of the sound
-	double flStartSoundTime = max( 0, tStartTime.GetSeconds() );
+	double flStartSoundTime = max( 0.f, tStartTime.GetSeconds() );
 	double flEndSoundTime = min( item.m_flDuration, tEndTime.GetSeconds() );
 
 	// Stamp keys right before and after the sound so as to 
@@ -1046,7 +1046,7 @@ void CSFMPhonemeExtractor::LogPhonemes( int nItemIndex,	ExtractDesc_t& info )
 			DmeTime_t tStart = DmeTime_t( p->GetStartTime() );
 			DmeTime_t tEnd   = DmeTime_t( p->GetEndTime() );
 
-			int idx = phonemeToPresetDict.Find( ConvertPhoneme( p->GetPhonemeCode() ) );
+			unsigned short idx = phonemeToPresetDict.Find( ConvertPhoneme( p->GetPhonemeCode() ) );
 			if ( idx == phonemeToPresetDict.InvalidIndex() )
 				continue;
 
@@ -1151,7 +1151,7 @@ void CSFMPhonemeExtractor::LogPhonemes( int nItemIndex,	ExtractDesc_t& info )
 				float flIntensity = ( t2 - t1 );
 				Assert( fabs( flI - flIntensity ) < 0.000001f );
 
-				int idx = phonemeToPresetDict.Find( ConvertPhoneme( p->GetPhonemeCode() ) );
+				unsigned short idx = phonemeToPresetDict.Find( ConvertPhoneme( p->GetPhonemeCode() ) );
 				if ( idx == phonemeToPresetDict.InvalidIndex() )
 					continue;
 
@@ -1178,7 +1178,7 @@ void CSFMPhonemeExtractor::ReApply( ExtractDesc_t& info )
 		info.m_pSet->GetBookmarks().RemoveAll();
 	}
 
-	for ( int nWorkItem = 0; nWorkItem < info.m_WorkList.Count(); ++nWorkItem )
+	for ( intp nWorkItem = 0; nWorkItem < info.m_WorkList.Count(); ++nWorkItem )
 	{
 		LogPhonemes( nWorkItem, info );
 	}

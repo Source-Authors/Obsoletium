@@ -9,7 +9,7 @@
 //=============================================================================//
 
 #include "dme_controls/BaseAttributePanel.h"
-#include "dme_controls/attributewidgetfactory.h"
+#include "dme_controls/AttributeWidgetFactory.h"
 #include "tier1/KeyValues.h"
 #include "vgui_controls/Label.h"
 #include "movieobjects/dmeeditortypedictionary.h"
@@ -36,8 +36,8 @@ CBaseAttributePanel::CBaseAttributePanel( vgui::Panel *parent, const AttributeWi
 	m_hObject( info.m_pElement ),
 	m_hEditorInfo( info.m_pEditorInfo ),
 	m_hEditorTypeDict( info.m_pEditorTypeDictionary ),
-	m_pNotify( info.m_pNotify ),
 	m_nArrayIndex( info.m_nArrayIndex ),
+	m_pNotify( info.m_pNotify ),
 	m_ColumnSize( 0, 0, ColInfoLessFunc )
 {
 	Assert( info.m_pElement );
@@ -135,7 +135,7 @@ bool CBaseAttributePanel::HasAttribute() const
 //-----------------------------------------------------------------------------
 // Returns the attribute array count
 //-----------------------------------------------------------------------------
-int CBaseAttributePanel::GetAttributeArrayCount() const
+intp CBaseAttributePanel::GetAttributeArrayCount() const
 {
 	CDmrGenericArrayConst array( GetPanelElement(), m_szAttributeName );
 	return array.IsValid() ? array.Count() : -1;
@@ -301,7 +301,7 @@ void CBaseAttributePanel::PerformLayout()
 		}
 	}
 	
-	int c = vispanels.Count();
+	intp c = vispanels.Count();
 
 	Assert( c >= 0 );
 	if ( c == 0 )
@@ -316,7 +316,7 @@ void CBaseAttributePanel::PerformLayout()
 	int y = 0;
 	w-= 2;
 
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		Panel *panel = vispanels[ i ];
 		int width = GetSizeForColumn( panel );

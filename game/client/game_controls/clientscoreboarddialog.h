@@ -115,7 +115,7 @@ protected:
 	CPanelAnimationVarAliasType( int, m_iPingWidth, "ping_width", "23", "proportional_int" );
 
 private:
-	int			m_iPlayerIndexSymbol;
+	HKeySymbol	m_iPlayerIndexSymbol;
 	int			m_iDesiredHeight;
 	IViewPort	*m_pViewPort;
 	ButtonCode_t m_nCloseKey;

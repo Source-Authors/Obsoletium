@@ -5,10 +5,9 @@
 //===========================================================================//
 
 #include "cbase.h"
-#include <windows.h>
+#include "wavebrowser.h"
 #include "resource.h"
 #include "wavefile.h"
-#include "wavebrowser.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "ifaceposersound.h"
 #include "snd_wave_source.h"
@@ -21,6 +20,8 @@
 #include "UtlBuffer.h"
 #include "ChoreoEvent.h"
 
+#include "winlite.h"
+
 CWaveBrowser	*g_pWaveBrowser = NULL;
 
 //-----------------------------------------------------------------------------
@@ -29,12 +30,12 @@ CWaveBrowser	*g_pWaveBrowser = NULL;
 class StdIOReadBinary : public IFileReadBinary
 {
 public:
-	int open( const char *pFileName )
+	intp open( const char *pFileName )
 	{
-		return (int)filesystem->Open( pFileName, "rb" );
+		return (intp)filesystem->Open( pFileName, "rb" );
 	}
 
-	int read( void *pOutput, int size, int file )
+	int read( void *pOutput, int size, intp file )
 	{
 		if ( !file )
 			return 0;
@@ -42,7 +43,7 @@ public:
 		return filesystem->Read( pOutput, size, (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		if ( !file )
 			return;
@@ -50,7 +51,7 @@ public:
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -58,7 +59,7 @@ public:
 		return filesystem->Tell( (FileHandle_t)file );
 	}
 
-	unsigned int size( int file )
+	unsigned int size( intp file )
 	{
 		if ( !file )
 			return 0;
@@ -66,7 +67,7 @@ public:
 		return filesystem->Size( (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		if ( !file )
 			return;
@@ -78,27 +79,27 @@ public:
 class StdIOWriteBinary : public IFileWriteBinary
 {
 public:
-	int create( const char *pFileName )
+	intp create( const char *pFileName )
 	{
-		return (int)filesystem->Open( pFileName, "wb" );
+		return (intp)filesystem->Open( pFileName, "wb" );
 	}
 
-	int write( void *pData, int size, int file )
+	int write( void *pData, int size, intp file )
 	{
 		return filesystem->Write( pData, size, (FileHandle_t)file );
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
 		filesystem->Close( (FileHandle_t)file );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
 		filesystem->Seek( (FileHandle_t)file, pos, FILESYSTEM_SEEK_HEAD );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
 		return filesystem->Tell( (FileHandle_t)file );
 	}
@@ -107,7 +108,6 @@ public:
 static StdIOReadBinary io_in;
 static StdIOWriteBinary io_out;
 
-#define RIFF_WAVE			MAKEID('W','A','V','E')
 #define WAVE_FMT			MAKEID('f','m','t',' ')
 #define WAVE_DATA			MAKEID('d','a','t','a')
 #define WAVE_FACT			MAKEID('f','a','c','t')
@@ -119,7 +119,7 @@ static StdIOWriteBinary io_out;
 //-----------------------------------------------------------------------------
 static void SceneManager_ParseSentence( CSentence& sentence, IterateRIFF &walk )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.EnsureCapacity( walk.ChunkSize() );
 	walk.ChunkRead( buf.Base() );
@@ -217,7 +217,7 @@ public:
 	void	FindOrAddSubdirectory( char const *subdir )
 	{
 		FileTreePath fp;
-		Q_strcpy( fp.path, subdir );
+		V_strcpy_safe( fp.path, subdir );
 
 		if ( m_Paths.Find( fp ) != m_Paths.InvalidIndex() )
 			return;
@@ -281,13 +281,13 @@ public:
 			cur = FindOrAddChildItem( cur, check );
 		}
 
-		setUserData( cur, (void *)pathId );
+		setUserData( cur, (void *)(intp)pathId );
 	}
 
 	char const *GetSelectedPath( void )
 	{
 		mxTreeViewItem *tvi = getSelectedItem();
-		unsigned int id = (unsigned int)getUserData( tvi );
+		int id = (int)(intp)getUserData( tvi );
 
 		if ( id < 0 || id >= m_Paths.Count() )
 		{
@@ -299,8 +299,7 @@ public:
 
 	void	PopulateTree()
 	{
-		int i;
-		for  ( i = m_Paths.FirstInorder(); i != m_Paths.InvalidIndex(); i = m_Paths.NextInorder( i ) )
+		for  ( int i = m_Paths.FirstInorder(); i != m_Paths.InvalidIndex(); i = m_Paths.NextInorder( i ) )
 		{
 			_PopulateTree( i, m_Paths[ i ].path );
 		}
@@ -698,16 +697,16 @@ static bool NameLessFunc( CWaveFile *const& name1, CWaveFile *const& name2 )
 	return false;
 }
 
-#define SOUND_PREFIX_LEN	6
+constexpr inline intp SOUND_PREFIX_LEN{ssize("sound") - 1};
+
 //-----------------------------------------------------------------------------
 // Finds all .wav files in a particular directory
 //-----------------------------------------------------------------------------
 bool CWaveBrowser::LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName, int nDirectoryNameLen )
 {
-	Assert( Q_strnicmp( pDirectoryName, "sound", 5 ) == 0 );
+	Assert( Q_strnicmp( pDirectoryName, "sound", SOUND_PREFIX_LEN ) == 0 );
 
-	char *pWildCard;
-	pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
+	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
 	Q_snprintf( pWildCard, nDirectoryNameLen + 7, "%s/*.wav", pDirectoryName );
 
 	if ( !filesystem )
@@ -723,7 +722,7 @@ bool CWaveBrowser::LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& sound
 		{
 			// Strip off the 'sound/' part of the name.
 			char *pFileNameWithPath;
-			int nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
+			intp nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
 			pFileNameWithPath = (char *)stackalloc( nAllocSize );
 			Q_snprintf(	pFileNameWithPath, nAllocSize, "%s/%s", &pDirectoryName[SOUND_PREFIX_LEN], pFileName ); 
 			Q_strnlwr( pFileNameWithPath, nAllocSize );

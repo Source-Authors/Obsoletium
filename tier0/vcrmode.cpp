@@ -7,33 +7,28 @@
 #include <winsock.h>
 #endif
 
+#include <atomic>
 #include <ctime>
+
 #include "tier0/threadtools.h"
 #include "tier0/vcrmode.h"
 #include "tier0/dbg.h"
 
 // FIXME: We totally have a bad tier dependency here
 #include "inputsystem/InputEnums.h"
-												
+
 #ifndef NO_VCR
 
-#define PvRealloc realloc
 #define PvAlloc malloc
 
-											
-												
 #define VCR_RuntimeAssert(x)	VCR_RuntimeAssertFn(x, #x)
 
-double g_flLastVCRFloatTimeValue;												
+static IVCRHelpers	*g_pHelpers = nullptr;
 
-bool		g_bExpectingWindowProcCalls = false;
-
-IVCRHelpers	*g_pHelpers = 0;
-
-FILE		*g_pVCRFile = NULL;
-VCRMode_t	g_VCRMode = VCR_Disabled;
-VCRMode_t	g_OldVCRMode = VCR_Invalid;		// Stored temporarily between SetEnabled(0)/SetEnabled(1) blocks.
-int			g_iCurEvent = 0;
+static FILE				*g_pVCRFile = nullptr;
+VCRMode_t				g_VCRMode = VCR_Disabled;
+static VCRMode_t		g_OldVCRMode = VCR_Invalid;		// Stored temporarily between SetEnabled(0)/SetEnabled(1) blocks.
+static std::atomic_int	g_iCurEvent = 0;
 
 size_t			g_CurFilePos = 0;				// So it knows when we're done playing back.
 size_t			g_FileLen = 0;					
@@ -75,7 +70,7 @@ CThreadMutex g_DebugFileMutex;
 void VCR_Debug( const char *pMsg, ... )
 {
 	va_list marker;
-	va_start( marker, pMsg );
+	va_start( marker, pMsg ); //-V2018 //-V2019
 
 	{
 		AUTO_LOCK(g_DebugFileMutex);
@@ -230,8 +225,8 @@ static void VCR_Error( const char *pFormat, ... )
 
 	char str[256];
 	va_list marker;
-	va_start( marker, pFormat );
-	_vsnprintf( str, sizeof( str ), pFormat, marker );
+	va_start( marker, pFormat ); //-V2018 //-V2019
+	vsnprintf( str, sizeof( str ), pFormat, marker );
 	va_end( marker );
 
 	g_pHelpers->ErrorMessage( str );
@@ -343,7 +338,7 @@ static void VCR_WriteEvent( VCREvent event )
 
 static void VCR_IncrementEvent()
 {
-	++g_iCurEvent;
+	g_iCurEvent.fetch_add(1, std::memory_order::memory_order_relaxed);
 }
 
 static void VCR_Event(VCREvent type)
@@ -476,12 +471,12 @@ static void VCR_End()
 	if ( g_VCRMode == VCR_Playback )
 	{
 		// It's going to get screwy now, especially if we have threads, so just exit.
-		#ifdef _DEBUG
-			if ( IsDebuggerPresent() )
-				DebuggerBreak();
-		#endif
+#ifdef _DEBUG
+		DebuggerBreakIfDebugging();
+#endif
 
-		ExitProcess( 1 );
+		// dimhotepus: 1 -> EINVAL.
+		exit( EINVAL );  //-V2014
 	}
 
 	g_VCRMode = VCR_Disabled;
@@ -568,7 +563,6 @@ static double VCR_Hook_Sys_FloatTime(double time)
 	else if(g_VCRMode == VCR_Playback)
 	{
 		VCR_Read(&time, sizeof(time));
-		g_flLastVCRFloatTimeValue = time;
 	}
 
 	return time;
@@ -925,7 +919,9 @@ static void VCR_Hook_Cmd_Exec(char **f)
 		else
 		{
 			*f = (char*)PvAlloc(len);
-			VCR_Read(*f, len);
+			// dimhotepus: Do not read if alloc fails.
+			if (*f)
+				VCR_Read(*f, len);
 		}
 	}
 	else if(g_VCRMode == VCR_Record)

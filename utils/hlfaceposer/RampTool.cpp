@@ -5,9 +5,8 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdio.h>
-#include "hlfaceposer.h"
 #include "RampTool.h"
+#include "hlfaceposer.h"
 #include "mdlviewer.h"
 #include "choreowidgetdrawhelper.h"
 #include "TimelineItem.h"
@@ -192,7 +191,7 @@ void RampTool::GetScrubHandleRect( RECT& rcHandle, float scrub, bool clipped )
 
 		if  ( clipped )
 		{
-			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH / 2, w2() - SCRUBBER_HANDLE_WIDTH / 2 );
+			pixel = clamp( pixel, SCRUBBER_HANDLE_WIDTH / 2.f, w2() - SCRUBBER_HANDLE_WIDTH / 2.f );
 		}
 	}
 
@@ -222,7 +221,7 @@ void RampTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT& rcHan
 
 	// 
 	char sz[ 32 ];
-	sprintf( sz, "%.3f", scrub );
+	V_sprintf_safe( sz, "%.3f", scrub );
 
 	CChoreoEvent *ev = GetSafeEvent();
 	if ( ev )
@@ -234,7 +233,7 @@ void RampTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT& rcHan
 		float dt = ed - st;
 		if ( dt > 0.0f )
 		{
-			sprintf( sz, "%.3f", st + scrub );
+			V_sprintf_safe( sz, "%.3f", st + scrub );
 		}
 	}
 
@@ -427,7 +426,7 @@ void RampTool::redraw()
 			OffsetRect( &rcUndo, 0, 2 );
 
 			drawHelper.DrawColoredText( "Small Fonts", 8, FW_NORMAL, RGB( 0, 100, 0 ), rcUndo,
-				"Undo:  %i/%i", current, total );
+				"Undo:  %zi/%zi", current, total );
 		}
 
 		rcText.left += 60;
@@ -1348,7 +1347,7 @@ void RampTool::DrawTimeLine( CChoreoWidgetDrawHelper& drawHelper, RECT& rc, floa
 			}
 
 			char sz[ 32 ];
-			sprintf( sz, "%.2f", f );
+			V_sprintf_safe( sz, "%.2f", f );
 
 			int textWidth = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, sz );
 
@@ -1711,10 +1710,10 @@ void RampTool::OnChangeScale( void )
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Change Zoom" );
-	strcpy( params.m_szPrompt, "New scale (e.g., 2.5x):" );
+	V_strcpy_safe( params.m_szDialogTitle, "Change Zoom" );
+	V_strcpy_safe( params.m_szPrompt, "New scale (e.g., 2.5x):" );
 
-	Q_snprintf( params.m_szInputText, sizeof( params.m_szInputText ), "%.2f", (float)g_pChoreoView->GetTimeZoom( GetToolName() ) / 100.0f );
+	V_sprintf_safe( params.m_szInputText, "%.2f", (float)g_pChoreoView->GetTimeZoom( GetToolName() ) / 100.0f );
 
 	if ( !InputProperties( &params ) )
 		return;
@@ -1845,7 +1844,7 @@ void RampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSamples
 
 		i0 = e->GetIntensity( time10hz + e->GetStartTime() );
 		i1 = i0;
-		time10hz = starttime + 0.1;
+		time10hz = starttime + 0.1f;
 		i2 = e->GetIntensity( time10hz + e->GetStartTime() );;
 		
 		for ( float t = starttime-timestepperpixel; t <= stoptime; t += timestepperpixel )
@@ -1881,8 +1880,8 @@ void RampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSamples
 			{
 				// Draw segment
 				drawHelper.DrawColoredLine( shadowColor, PS_SOLID, 1,
-					prevx, clamp( bottom - prev_value * height, top, bottom ),
-					x, clamp( bottom - value * height, top, bottom ) );
+					prevx, clamp( static_cast<int>(bottom - prev_value * height), top, bottom ),
+					x, clamp( static_cast<int>(bottom - value * height), top, bottom ) );
 			}
 
 			prev_t = t;
@@ -1954,7 +1953,7 @@ void RampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSamples
 		Q_snprintf( sz, sizeof( sz ), "%s", Interpolator_NameForCurveType( start->GetCurveType(), true ) );
 		RECT rc;
 		int fontSize = 9;
-		rc.top = clamp( y + 5, rcSamples.top + 2, rcSamples.bottom - 2 - fontSize );
+		rc.top = clamp( static_cast<long>(y) + 5, rcSamples.top + 2, rcSamples.bottom - 2 - fontSize );
 		rc.bottom = rc.top + fontSize + 1;
 		rc.left = x - 75;
 		rc.right = x + 175;

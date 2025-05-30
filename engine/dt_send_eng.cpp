@@ -35,30 +35,33 @@ extern bool Sendprop_UsingDebugWatch();
 class CPropCullStack : public CDatatableStack
 {
 public:
-						CPropCullStack( 
-							CSendTablePrecalc *pPrecalc, 
-							int iClient, 
-							const CSendProxyRecipients *pOldStateProxies,
-							const int nOldStateProxies, 
-							const CSendProxyRecipients *pNewStateProxies,
-							const int nNewStateProxies
-							) :
-							
-							CDatatableStack( pPrecalc, (unsigned char*)1, -1 ),
-							m_pOldStateProxies( pOldStateProxies ),
-							m_nOldStateProxies( nOldStateProxies ),
-							m_pNewStateProxies( pNewStateProxies ),
-							m_nNewStateProxies( nNewStateProxies )
-						{
-							m_pPrecalc = pPrecalc;
-							m_iClient = iClient;
-						}
+	CPropCullStack( 
+		CSendTablePrecalc *pPrecalc, 
+		int iClient, 
+		const CSendProxyRecipients *pOldStateProxies,
+		const int nOldStateProxies, 
+		const CSendProxyRecipients *pNewStateProxies,
+		const int nNewStateProxies
+		) :	CDatatableStack( pPrecalc, (unsigned char*)1, -1 ),
+		m_pPrecalc(pPrecalc),
+		m_iClient(iClient),
+		m_pOldStateProxies( pOldStateProxies ),
+		m_nOldStateProxies( nOldStateProxies ),
+		m_pNewStateProxies( pNewStateProxies ),
+		m_nNewStateProxies( nNewStateProxies ),
+		m_pOutProps( nullptr ),
+		m_nMaxOutProps( -1 ),
+		m_nOutProps( 0 )
+	{
+		memset(m_NewProxyProps, 0, sizeof(m_NewProxyProps));
+		m_nNewProxyProps = 0;
+	}
 
 	inline unsigned char*	CallPropProxy( CSendNode *pNode, int iProp, unsigned char *pStructBase )
 	{
 		if ( pNode->GetDataTableProxyIndex() == DATATABLE_PROXY_INDEX_NOPROXY )
 		{
-			return (unsigned char*)1;
+			return (unsigned char*)(uintp)1;
 		}
 		else
 		{
@@ -100,7 +103,7 @@ public:
 				}
 			}
 
-			return (unsigned char*)bCur;
+			return (unsigned char*)(uintp)bCur;
 		}
 	}
 
@@ -787,10 +790,10 @@ int SendTable_GetNumFlatProps( SendTable *pSendTable )
 
 CRC32_t SendTable_CRCTable( CRC32_t &crc, SendTable *pTable )
 {
-	CRC32_ProcessBuffer( &crc, (void *)pTable->m_pNetTableName, Q_strlen( pTable->m_pNetTableName) );
+	CRC32_ProcessBuffer( &crc, pTable->m_pNetTableName, Q_strlen( pTable->m_pNetTableName) );
 
 	int nProps = LittleLong( pTable->m_nProps );
-	CRC32_ProcessBuffer( &crc, (void *)&nProps, sizeof( pTable->m_nProps ) );
+	CRC32_ProcessBuffer( &crc, nProps );
 
 	// Send each property.
 	for ( int iProp=0; iProp < pTable->m_nProps; iProp++ )
@@ -798,39 +801,39 @@ CRC32_t SendTable_CRCTable( CRC32_t &crc, SendTable *pTable )
 		const SendProp *pProp = &pTable->m_pProps[iProp];
 
 		int type = LittleLong( pProp->m_Type );
-		CRC32_ProcessBuffer( &crc, (void *)&type, sizeof( type ) );
-		CRC32_ProcessBuffer( &crc, (void *)pProp->GetName() , Q_strlen( pProp->GetName() ) );
+		CRC32_ProcessBuffer( &crc, type );
+		CRC32_ProcessBuffer( &crc, pProp->GetName() , Q_strlen( pProp->GetName() ) );
 
 		int flags = LittleLong( pProp->GetFlags() );
-		CRC32_ProcessBuffer( &crc, (void *)&flags, sizeof( flags ) );
+		CRC32_ProcessBuffer( &crc, flags );
 
 		if( pProp->m_Type == DPT_DataTable )
 		{
-			CRC32_ProcessBuffer( &crc, (void *)pProp->GetDataTable()->m_pNetTableName, Q_strlen( pProp->GetDataTable()->m_pNetTableName ) );
+			CRC32_ProcessBuffer( &crc, pProp->GetDataTable()->m_pNetTableName, Q_strlen( pProp->GetDataTable()->m_pNetTableName ) );
 		}
 		else
 		{
 			if ( pProp->IsExcludeProp() )
 			{
-				CRC32_ProcessBuffer( &crc, (void *)pProp->GetExcludeDTName(), Q_strlen( pProp->GetExcludeDTName() ) );
+				CRC32_ProcessBuffer( &crc, pProp->GetExcludeDTName(), Q_strlen( pProp->GetExcludeDTName() ) );
 			}
 			else if ( pProp->GetType() == DPT_Array )
 			{
 				int numelements = LittleLong( pProp->GetNumElements() );
-				CRC32_ProcessBuffer( &crc, (void *)&numelements, sizeof( numelements ) );
+				CRC32_ProcessBuffer( &crc, numelements );
 			}
 			else
 			{	
 				float lowvalue;
 				LittleFloat( &lowvalue, &pProp->m_fLowValue );
-				CRC32_ProcessBuffer( &crc, (void *)&lowvalue, sizeof( lowvalue ) );
+				CRC32_ProcessBuffer( &crc, lowvalue );
 
 				float highvalue;
 				LittleFloat( &highvalue, &pProp->m_fHighValue );
-				CRC32_ProcessBuffer( &crc, (void *)&highvalue, sizeof( highvalue ) );
+				CRC32_ProcessBuffer( &crc, highvalue );
 
 				int	bits = LittleLong( pProp->m_nBits );
-				CRC32_ProcessBuffer( &crc, (void *)&bits, sizeof( bits ) );
+				CRC32_ProcessBuffer( &crc, bits );
 			}
 		}
 	}

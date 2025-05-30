@@ -140,7 +140,7 @@ void CContentControlDialog::Explain( char const *fmt, ... )
 	char		text[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (text, sizeof(text), fmt, argptr);
+	V_vsprintf_safe (text, fmt, argptr);
 	va_end (argptr);
 
 	m_pExplain->SetText( text );
@@ -159,8 +159,8 @@ void CContentControlDialog::OnCommand( const char *command )
 		char pw1[ 256 ];
 		char pw2[ 256 ];
 
-		m_pPassword->GetText( pw1, 256 );
-		m_pPassword2->GetText( pw2, 256 );
+		m_pPassword->GetText( pw1 );
+		m_pPassword2->GetText( pw2 );
 
         // Get text and check
 //        bool enabled = PasswordEnabled(); //( m_szGorePW[0]!=0 ) ? true : false;
@@ -243,11 +243,11 @@ void CContentControlDialog::HashPassword(const char *newPW, char *hashBuffer, in
 	MD5Context_t ctx;
 
 	MD5Init( &ctx );
-	MD5Update( &ctx, (unsigned char const *)newPW, strlen( newPW ) );
+	MD5Update( &ctx, newPW, strlen( newPW ) );
 	MD5Final( md5_hash, &ctx );
 
 	char hex[ 128 ];
-	Q_binarytohex( md5_hash, sizeof( md5_hash ), hex, sizeof( hex ) );
+	V_binarytohex( md5_hash, hex );
 
 //	char digestedPW[ 128 ];
 	Q_strncpy( hashBuffer, hex, maxlen );
@@ -267,11 +267,11 @@ bool CContentControlDialog::CheckPassword( char const *oldPW, char const *newPW,
 	MD5Context_t ctx;
 
 	MD5Init( &ctx );
-	MD5Update( &ctx, (unsigned char const *)(LPCSTR)newPW, strlen( newPW ) );
+	MD5Update( &ctx, newPW, strlen( newPW ) );
 	MD5Final( md5_hash, &ctx );
 
 	char hex[ 128 ];
-	Q_binarytohex( md5_hash, sizeof( md5_hash ), hex, sizeof( hex ) );
+	V_binarytohex( md5_hash, hex );
 
 	Q_strncpy( digestedPW, hex, sizeof( digestedPW ) );
 */

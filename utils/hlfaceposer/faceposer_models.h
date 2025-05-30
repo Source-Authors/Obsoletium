@@ -12,8 +12,12 @@
 #endif
 
 class StudioModel;
+class CStudioHdr;
 
 #include "mxbitmaptools.h"
+#include "tier0/platform.h"
+#include "tier1/utlrbtree.h"
+#include "tier1/utlvector.h"
 
 typedef unsigned int CRC32_t;
 

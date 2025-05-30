@@ -44,7 +44,7 @@ private:
 	void BuildMapsList( void );
 
 	void CreateBonusMapsList();
-	int GetSelectedItemBonusMapIndex();
+	intp GetSelectedItemBonusMapIndex();
 
 	void RefreshDialog( BonusMapDescription_t *pMap );
 	void RefreshMedalDisplay( BonusMapDescription_t *pMap );

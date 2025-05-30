@@ -1,17 +1,9 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-// FileSystemOpenDlg.cpp : implementation file
-//
+// Copyright Valve Corporation, All rights reserved.
 
 #include "stdafx.h"
 #include "FileSystemOpenDlg.h"
-#include "libjpeg-turbo/jpeglib.h"
-#include "utldict.h"
+#include "libjpeg-turbo/src/jpeglib.h"
+#include "tier1/utldict.h"
 #include "resource.h"
 #include "ifilesystemopendialog.h"
 
@@ -29,11 +21,6 @@ CFileInfo::CFileInfo()
 }
 
 
-CFileInfo::~CFileInfo()
-{
-}
-
-
 /////////////////////////////////////////////////////////////////////////////
 // This caches the thumbnail bitmaps we generate to speed up browsing.
 /////////////////////////////////////////////////////////////////////////////
@@ -44,10 +31,15 @@ public:
 	CBitmapCache()
 	{
 		m_CurMemoryUsage = 0;
+		// dimhotepus: x86-64 uses x2 cache
+#ifdef PLATFORM_64BITS
+		m_MaxMemoryUsage = 1024 * 1024 * 6 * 2;
+#else
 		m_MaxMemoryUsage = 1024 * 1024 * 6;
+#endif
 	}
 
-	void AddToCache( CBitmap *pBitmap, const char *pName, int memoryUsage, bool bLock )
+	void AddToCache( CBitmap *pBitmap, const char *pName, intp memoryUsage, bool bLock )
 	{
 		Assert( m_Bitmaps.Find( pName ) == -1 );
 		m_CurMemoryUsage += memoryUsage;
@@ -63,16 +55,13 @@ public:
 
 	CBitmap* Find( const char *pName )
 	{
-		int i = m_Bitmaps.Find( pName );
-		if ( i == -1 )
-			return NULL;
-		else
-			return m_Bitmaps[i].m_pBitmap;
+		const auto i = m_Bitmaps.Find( pName );
+		return i != -1 ? m_Bitmaps[i].m_pBitmap : NULL;
 	}
 
 	void UnlockAll()
 	{
-		for ( int i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
+		for ( auto i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
 		{
 			m_Bitmaps[i].m_bLocked = false;
 		}
@@ -85,8 +74,7 @@ private:
 		while ( m_CurMemoryUsage > m_MaxMemoryUsage )
 		{
 			// Free something.
-			bool bFreed = false;
-			for ( int i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
+			for ( auto i=m_Bitmaps.First(); i != m_Bitmaps.InvalidIndex(); i=m_Bitmaps.Next( i ) )
 			{
 				if ( !m_Bitmaps[i].m_bLocked )
 				{
@@ -96,26 +84,21 @@ private:
 					break;
 				}
 			}
-			
-			// Nothing left to free?			
-			if ( !bFreed )
-				return;
 		}
 	}
 
 private:
 
-	class CBitmapCacheEntry
+	struct CBitmapCacheEntry
 	{
-	public:
 		CBitmap *m_pBitmap;
-		int m_MemoryUsage;
+		intp m_MemoryUsage;
 		bool m_bLocked;
 	};
 	
 	CUtlDict<CBitmapCacheEntry,int> m_Bitmaps;
-	int m_CurMemoryUsage;
-	int m_MaxMemoryUsage;
+	intp m_CurMemoryUsage;
+	intp m_MaxMemoryUsage;
 };
 
 CBitmapCache g_BitmapCache;
@@ -144,7 +127,7 @@ CFileSystemOpenDlg::CFileSystemOpenDlg(CreateInterfaceFn factory, CWnd* pParent 
 
 void CFileSystemOpenDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CBaseDlg::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CFileSystemOpenDlg)
 	DDX_Control(pDX, IDC_FILENAME_LABEL, m_FilenameLabel);
 	DDX_Control(pDX, IDC_FILENAME, m_FilenameControl);
@@ -219,7 +202,7 @@ void CFileSystemOpenDlg::SetInitialDir( const char *pDir, const char *pPathID )
 	if ( pPathID )
 		m_PathIDString = pPathID;
 	else
-		m_PathIDString = "";
+		m_PathIDString.Empty();
 }
 
 CString CFileSystemOpenDlg::GetFilename() const
@@ -230,56 +213,58 @@ CString CFileSystemOpenDlg::GetFilename() const
 
 BOOL CFileSystemOpenDlg::OnInitDialog() 
 {
-	CBaseDlg::OnInitDialog();
+	BOOL rc = __super::OnInitDialog();
+	if (rc)
+	{	
+		// Setup our anchor list.
+		AddAnchor( IDC_FILE_LIST, 2, 2 );
+		AddAnchor( IDC_FILE_LIST, 3, 3 );
 	
-	// Setup our anchor list.
-	AddAnchor( IDC_FILE_LIST, 2, 2 );
-	AddAnchor( IDC_FILE_LIST, 3, 3 );
+		AddAnchor( IDC_FILENAME, 1, 3 );
+		AddAnchor( IDC_FILENAME, 3, 3 );
+		AddAnchor( IDC_FILENAME, 2, 2 );
+
+		AddAnchor( IDC_FILENAME_LABEL, 0, 0 );
+		AddAnchor( IDC_FILENAME_LABEL, 2, 0 );
+		AddAnchor( IDC_FILENAME_LABEL, 1, 3 );
+		AddAnchor( IDC_FILENAME_LABEL, 3, 3 );
+
+		AddAnchor( IDOK, 0, 2 );
+		AddAnchor( IDOK, 2, 2 );
+		AddAnchor( IDOK, 1, 3 );
+		AddAnchor( IDOK, 3, 3 );
 	
-	AddAnchor( IDC_FILENAME, 1, 3 );
-	AddAnchor( IDC_FILENAME, 3, 3 );
-	AddAnchor( IDC_FILENAME, 2, 2 );
+		AddAnchor( IDCANCEL, 0, 2 );
+		AddAnchor( IDCANCEL, 2, 2 );
+		AddAnchor( IDCANCEL, 1, 3 );
+		AddAnchor( IDCANCEL, 3, 3 );
 
-	AddAnchor( IDC_FILENAME_LABEL, 0, 0 );
-	AddAnchor( IDC_FILENAME_LABEL, 2, 0 );
-	AddAnchor( IDC_FILENAME_LABEL, 1, 3 );
-	AddAnchor( IDC_FILENAME_LABEL, 3, 3 );
+		AddAnchor( IDC_LOOKIN, 2, 2 );
 
-	AddAnchor( IDOK, 0, 2 );
-	AddAnchor( IDOK, 2, 2 );
-	AddAnchor( IDOK, 1, 3 );
-	AddAnchor( IDOK, 3, 3 );
+		AddAnchor( IDC_UP_BUTTON, 0, 2 );
+		AddAnchor( IDC_UP_BUTTON, 2, 2 );
+
+
+		// Setup our image list.
+		m_ImageList.Create( PREVIEW_IMAGE_SIZE, PREVIEW_IMAGE_SIZE, ILC_COLOR32, 0, 512 );
 	
-	AddAnchor( IDCANCEL, 0, 2 );
-	AddAnchor( IDCANCEL, 2, 2 );
-	AddAnchor( IDCANCEL, 1, 3 );
-	AddAnchor( IDCANCEL, 3, 3 );
+		m_BitmapFolder.LoadBitmap( IDB_LABEL_FOLDER );
+		m_iLabel_Folder = m_ImageList.Add( &m_BitmapFolder, (CBitmap*)NULL );
 
-	AddAnchor( IDC_LOOKIN, 2, 2 );
+		m_BitmapMdl.LoadBitmap( IDB_LABEL_MDL );
+		m_iLabel_Mdl = m_ImageList.Add( &m_BitmapMdl, (CBitmap*)NULL );
 
-	AddAnchor( IDC_UP_BUTTON, 0, 2 );
-	AddAnchor( IDC_UP_BUTTON, 2, 2 );
+		m_BitmapFile.LoadBitmap( IDB_LABEL_FILE );
+		m_iLabel_File = m_ImageList.Add( &m_BitmapFile, (CBitmap*)NULL );
 
+		m_FileList.SetImageList( &m_ImageList, LVSIL_NORMAL );
 
-	// Setup our image list.
-	m_ImageList.Create( PREVIEW_IMAGE_SIZE, PREVIEW_IMAGE_SIZE, ILC_COLOR32, 0, 512 );
+		// Populate the list with the contents of our current directory.
+		PopulateListControl();
+	}
 	
-	m_BitmapFolder.LoadBitmap( IDB_LABEL_FOLDER );
-	m_iLabel_Folder = m_ImageList.Add( &m_BitmapFolder, (CBitmap*)NULL );
-
-	m_BitmapMdl.LoadBitmap( IDB_LABEL_MDL );
-	m_iLabel_Mdl = m_ImageList.Add( &m_BitmapMdl, (CBitmap*)NULL );
-
-	m_BitmapFile.LoadBitmap( IDB_LABEL_FILE );
-	m_iLabel_File = m_ImageList.Add( &m_BitmapFile, (CBitmap*)NULL );
-
-	m_FileList.SetImageList( &m_ImageList, LVSIL_NORMAL );
-
-	// Populate the list with the contents of our current directory.
-	PopulateListControl();
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return rc;  // return TRUE unless you set the focus to a control
+	            // EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CFileSystemOpenDlg::GetEntries( const char *pMask, CUtlVector<CString> &entries, GetEntriesMode_t mode )
@@ -312,6 +297,8 @@ class CJpegSourceMgr : public jpeg_source_mgr
 public:
 	CJpegSourceMgr()
 	{
+		memset(m_JmpBuf, 0, sizeof(m_JmpBuf));
+
 		this->init_source = &CJpegSourceMgr::imp_init_source;
 		this->fill_input_buffer = &CJpegSourceMgr::imp_fill_input_buffer;
 		this->skip_input_data = &CJpegSourceMgr::imp_skip_input_data;
@@ -455,8 +442,8 @@ void DownsampleRGBToRGBAImage(
 	int destWidth,
 	int destHeight )
 {
-	int srcPixelSize = 3;
-	int destPixelSize = 4;
+	constexpr int srcPixelSize = 3;
+	constexpr int destPixelSize = 4;
 	destData.SetSize( destWidth * destHeight * destPixelSize );
 	memset( destData.Base(), 0xFF, destWidth * destHeight * destPixelSize );
 
@@ -532,9 +519,10 @@ int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bI
 	if ( bIsDir )
 		return m_iLabel_Folder;
 
-	CString extension = name.Right( 4 );
+	// dimhotepus: Honor .jpeg.
+	CString extension = name.Right( 5 );
 	extension.MakeLower();
-	if ( extension == ".jpg" || extension == ".jpeg" )
+	if ( extension.Right( 4 ) == ".jpg" || extension == ".jpeg" )
 	{
 		pInfo->m_pBitmap = SetupJpegLabel( m_pFileSystem, m_CurrentDir + "\\" + name, PREVIEW_IMAGE_SIZE, GetPathID() );
 		if ( pInfo->m_pBitmap )
@@ -554,11 +542,12 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 	CUtlDict<int,int> jpgFiles;
 	for ( int i=0; i < files.Count(); i++ )
 	{
-		CString extension = files[i].Right( 4 );
+		// dimhotepus: Honor .jpeg.
+		CString extension = files[i].Right( 5 );
 		extension.MakeLower();
-		if ( extension == ".jpg" || extension == ".jpeg" )
+		if ( extension.Right( 4 ) == ".jpg" || extension == ".jpeg" )
 		{
-			CString base = files[i].Left( files[i].GetLength() - 4 );
+			CString base = files[i].Left( files[i].GetLength() - (extension == ".jpg" ? 4 : 5) );
 			jpgFiles.Insert( base, 1 );
 		}
 	}
@@ -566,11 +555,11 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 	// Now look for all mdls and remove them if they have a jpg.
 	for ( int i=0; i < files.Count(); i++ )
 	{
-		CString extension = files[i].Right( 4 );
+		CString extension = files[i].Right( 4 ); //-V112
 		extension.MakeLower();
 		if ( extension == ".mdl" )
 		{
-			CString base = files[i].Left( files[i].GetLength() - 4 );
+			CString base = files[i].Left( files[i].GetLength() - 4 ); //-V112
 			if ( jpgFiles.Find( base ) != -1 )
 			{
 				files.Remove( i );
@@ -595,10 +584,10 @@ int CALLBACK FileListSortCallback( LPARAM lParam1, LPARAM lParam2, LPARAM lParam
 
 void RemoveDuplicates( CUtlVector<CString> &files )
 {
-	CUtlDict<int,int> uniqueFilenames;
-	for ( int i=0; i < files.Count(); i++ )
+	CUtlDict<intp,intp> uniqueFilenames;
+	for ( intp i=0; i < files.Count(); i++ )
 	{
-		int iPreviousIndex = uniqueFilenames.Find( files[i] );
+		intp iPreviousIndex = uniqueFilenames.Find( files[i] );
 		if ( iPreviousIndex == -1 )
 		{
 			uniqueFilenames.Insert( files[i], i );
@@ -610,7 +599,7 @@ void RemoveDuplicates( CUtlVector<CString> &files )
 		}
 	}
 }	
-		
+
 
 void CFileSystemOpenDlg::PopulateListControl()
 {
@@ -682,12 +671,12 @@ void CFileSystemOpenDlg::AddFileMask( const char *pMask )
 
 BOOL CFileSystemOpenDlg::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
 {
-	return CBaseDlg::Create(IDD, pParentWnd);
+	return __super::Create(IDD, pParentWnd);
 }
 
 int CFileSystemOpenDlg::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
-	if (CBaseDlg::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	return 0;
@@ -745,7 +734,7 @@ void CFileSystemOpenDlg::AddAnchor( int iDlgItem, int iSide, int iParentSide )
 
 void CFileSystemOpenDlg::OnSize(UINT nType, int cx, int cy) 
 {
-	CBaseDlg::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 	
 	for ( int i=0; i < m_Anchors.Count(); i++ )
 		ProcessAnchor( &m_Anchors[i] );	
@@ -788,13 +777,14 @@ void CFileSystemOpenDlg::OnUpButton()
 {
 	char str[MAX_PATH];
 	V_strcpy_safe( str, m_CurrentDir );
-	Q_StripLastDir( str, sizeof( str ) );
+	V_StripLastDir( str );
 
-	if ( str[0] == 0 )
+	if ( Q_isempty( str ) )
 		V_strcpy_safe( str, "." );
 	
-	if ( str[strlen(str)-1] == '\\' || str[strlen(str)-1] == '/' )
-		str[strlen(str)-1] = 0;
+	size_t len = strlen(str);
+	if ( len > 0 && ( str[len-1] == '\\' || str[len-1] == '/' ) )
+		str[len-1] = 0;
 
 	m_CurrentDir = str;
 	PopulateListControl();
@@ -825,10 +815,7 @@ void CFileSystemOpenDlg::SetFilterMdlAndJpgFiles( bool bFilter )
 
 const char* CFileSystemOpenDlg::GetPathID()
 {
-	if ( m_PathIDString == "" )
-		return NULL;
-	else
-		return (const char*)m_PathIDString;
+	return m_PathIDString.IsEmpty() ? nullptr : m_PathIDString.GetString();
 }
 
 
@@ -849,7 +836,7 @@ public:
 		m_bLastModalWasWindowsDialog = false;
 	}
 
-	virtual void Release()
+	void Release() override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		delete m_pDialog;
@@ -857,7 +844,7 @@ public:
 	}
 
 	// You must call this first to set the hwnd.
-	virtual void Init( CreateInterfaceFn factory, void *parentHwnd )
+	void Init( CreateInterfaceFn factory, void *parentHwnd ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( !m_pDialog );
@@ -866,28 +853,28 @@ public:
 		m_pDialog = new CFileSystemOpenDlg( factory, CWnd::FromHandle( m_hParentWnd ) );
 	}
 
-	virtual void AddFileMask( const char *pMask )
+	void AddFileMask( const char *pMask ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
 		m_pDialog->AddFileMask( pMask );
 	}
 
-	virtual void SetInitialDir( const char *pDir, const char *pPathID )
+	void SetInitialDir( const char *pDir, const char *pPathID ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
 		m_pDialog->SetInitialDir( pDir, pPathID );
 	}
 
-	virtual void SetFilterMdlAndJpgFiles( bool bFilter )
+	void SetFilterMdlAndJpgFiles( bool bFilter ) override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
 		m_pDialog->SetFilterMdlAndJpgFiles( bFilter );
 	}
 
-	virtual void GetFilename( char *pOut, int outLen ) const
+	void GetFilename( char *pOut, intp outLen ) const override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
@@ -902,7 +889,7 @@ public:
 		}
 	}
 
-	virtual bool DoModal()
+	bool DoModal() override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		Assert( m_pDialog );
@@ -911,7 +898,7 @@ public:
 		return m_pDialog->DoModal() == IDOK;
 	}
 
-	virtual bool DoModal_WindowsDialog()
+	bool DoModal_WindowsDialog() override
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -930,7 +917,7 @@ public:
 		}
 
 		char pFileNameBuf[MAX_PATH];
-		const char *pFileName = m_pDialog->m_pFileSystem->RelativePathToFullPath( m_pDialog->m_CurrentDir, m_pDialog->m_PathIDString, pFileNameBuf, MAX_PATH );
+		const char *pFileName = m_pDialog->m_pFileSystem->RelativePathToFullPath_safe( m_pDialog->m_CurrentDir, m_pDialog->m_PathIDString, pFileNameBuf );
 		V_strcat_safe( pFileNameBuf, "\\" );
 	
 		// Build the list of file filters.
@@ -942,7 +929,7 @@ public:
 		else
 		{
 			filters[0] = 0;
-			for ( int i=0; i < m_pDialog->m_FileMasks.Count(); i++ )
+			for ( intp i=0; i < m_pDialog->m_FileMasks.Count(); i++ )
 			{
 				if ( i > 0 )
 					V_strcat_safe( filters, "|" );
@@ -972,7 +959,7 @@ public:
 		while ( dlg.DoModal() == IDOK )
 		{
 			// Make sure we can make this into a relative path.
-			if ( m_pDialog->m_pFileSystem->FullPathToRelativePath( dlg.GetPathName(), m_RelativeFilename, sizeof( m_RelativeFilename ) ) )
+			if ( m_pDialog->m_pFileSystem->FullPathToRelativePath_safe( dlg.GetPathName(), m_RelativeFilename ) )
 			{
 				// Replace .jpg or .jpeg extension with .mdl?
 				char *pEnd = m_RelativeFilename;

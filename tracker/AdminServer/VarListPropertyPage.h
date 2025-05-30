@@ -11,10 +11,10 @@
 #pragma once
 #endif
 
-#include <KeyValues.h>
-#include <vgui_controls/PropertyPage.h>
+#include "tier1/KeyValues.h"
+#include "tier1/utlvector.h"
 
-#include "utlvector.h"
+#include <vgui_controls/PropertyPage.h>
 #include "RemoteServer.h"
 
 //-----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class CVarListPropertyPage : public vgui::PropertyPage, public IServerDataRespon
 	DECLARE_CLASS_SIMPLE( CVarListPropertyPage, vgui::PropertyPage );
 public:
 	CVarListPropertyPage(vgui::Panel *parent, const char *name);
-	~CVarListPropertyPage();
+	virtual ~CVarListPropertyPage();
 
 	// loads the var list description from the specified file
 	bool LoadVarList(const char *varfile);
@@ -51,8 +51,8 @@ protected:
 	virtual void OnServerDataResponse(const char *value, const char *response);
 
 	// vgui overrides
-	virtual void PerformLayout();
-	virtual void OnKeyCodeTyped(vgui::KeyCode code);
+	void PerformLayout() override;
+	void OnKeyCodeTyped(vgui::KeyCode code) override;
 	MESSAGE_FUNC_CHARPTR( OnVarChanged, "VarChanged", var );
 
 private:

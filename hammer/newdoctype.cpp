@@ -20,7 +20,7 @@
 
 
 CNewDocType::CNewDocType(CWnd* pParent /*=NULL*/)
-	: CDialog(CNewDocType::IDD, pParent)
+	: CBaseDlg(CNewDocType::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CNewDocType)
 	m_iNewType = -1;
@@ -30,14 +30,14 @@ CNewDocType::CNewDocType(CWnd* pParent /*=NULL*/)
 
 void CNewDocType::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CNewDocType)
 	DDX_Radio(pDX, IDC_NEWTYPE, m_iNewType);
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CNewDocType, CDialog)
+BEGIN_MESSAGE_MAP(CNewDocType, CBaseDlg)
 	//{{AFX_MSG_MAP(CNewDocType)
 		// NOTE: the ClassWizard will add message map macros here
 	//}}AFX_MSG_MAP

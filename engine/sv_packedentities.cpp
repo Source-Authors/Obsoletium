@@ -601,8 +601,8 @@ void SV_ComputeClassInfosCRC( CRC32_t* crc )
 
 	for ( ServerClass *pClass=pClasses; pClass; pClass=pClass->m_pNext )
 	{
-		CRC32_ProcessBuffer( crc, (void *)pClass->m_pNetworkName, Q_strlen( pClass->m_pNetworkName ) );
-		CRC32_ProcessBuffer( crc, (void *)pClass->m_pTable->GetName(), Q_strlen(pClass->m_pTable->GetName() ) );
+		CRC32_ProcessBuffer( crc, pClass->m_pNetworkName, Q_strlen( pClass->m_pNetworkName ) );
+		CRC32_ProcessBuffer( crc, pClass->m_pTable->GetName(), Q_strlen(pClass->m_pTable->GetName() ) );
 	}
 }
 

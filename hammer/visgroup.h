@@ -9,9 +9,10 @@
 #pragma once
 
 
-#include "BaseTypes.h"
-#include "utlvector.h"
+#include "tier0/basetypes.h"
+#include "tier1/utlvector.h"
 
+#include "Color.h"
 
 class CChunkFile;
 class CSaveInfo;
@@ -38,10 +39,10 @@ class CVisGroup
 
 		CVisGroup(void);
 
-		inline unsigned int GetID(void) { return(m_dwID); }
+		inline unsigned int GetID(void) const { return(m_dwID); }
 		inline void SetID(unsigned int dwID) { m_dwID = dwID; }
 
-		inline const char *GetName(void)
+		inline const char *GetName(void) const
 		{
 			return(m_szName);
 		}
@@ -50,32 +51,32 @@ class CVisGroup
 		{
 			if (pszName != NULL)
 			{
-				strncpy(m_szName, pszName, sizeof(m_szName));
+				V_strcpy_safe(m_szName, pszName);
 			}
 		}
 
-		inline color32 GetColor(void);
+		inline color32 GetColor(void) const;
 		inline void SetColor(color32 rgbColor);
 		inline void SetColor(unsigned char red, unsigned char green, unsigned char blue);
 
-		inline CVisGroup *GetParent(void);
+		inline CVisGroup *GetParent(void) const;
 		inline void SetParent(CVisGroup *pNewParent);
 
-		inline int GetChildCount(void);
-		inline CVisGroup *GetChild(int nIndex);
+		inline intp GetChildCount(void) const;
+		inline CVisGroup *GetChild(intp nIndex) const;
 
 		void AddChild(CVisGroup *pChild);
 		void RemoveChild(CVisGroup *pChild);
 
-		bool FindDescendent(CVisGroup *pGroup);
+		bool FindDescendent(CVisGroup *pGroup) const;
 
 		void MoveUp(CVisGroup *pChild);
 		void MoveDown(CVisGroup *pChild);
 
-		bool CanMoveUp(CVisGroup *pChild);
-		bool CanMoveDown(CVisGroup *pChild);
+		bool CanMoveUp(CVisGroup *pChild) const;
+		bool CanMoveDown(CVisGroup *pChild) const;
 
-		VisGroupState_t GetVisible(void);
+		VisGroupState_t GetVisible(void) const;
 		void VisGroups_UpdateParent( VisGroupState_t state );
 		inline void SetVisible(VisGroupState_t  eVisible) { m_eVisible = eVisible; }
 
@@ -85,15 +86,15 @@ class CVisGroup
 		//
 		// Serialization.
 		//
-		ChunkFileResult_t LoadVMF(CChunkFile *pFile, CMapDoc *pDoc);
-		ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
-		static ChunkFileResult_t LoadVisGroupCallback(CChunkFile *pFile, LoadVisGroupData_t *pLoadData);
-		static ChunkFileResult_t LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		static [[nodiscard]] ChunkFileResult_t LoadVisGroupCallback(CChunkFile *pFile, LoadVisGroupData_t *pLoadData);
+		static [[nodiscard]] ChunkFileResult_t LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *pDoc);
 
 		static bool IsConvertingOldVisGroups();
 
-		bool IsAutoVisGroup(void);
+		bool IsAutoVisGroup(void) const;
 		void SetAuto( bool bAuto );
 
 	protected:
@@ -103,7 +104,7 @@ class CVisGroup
 
 		bool m_bIsAuto;
 
-		static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CVisGroup *pGroup);
+		static [[nodiscard]] ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CVisGroup *pGroup);
 
 		static bool s_bShowAll;
 		static bool s_bIsConvertingOldVisGroups;
@@ -119,7 +120,7 @@ class CVisGroup
 //-----------------------------------------------------------------------------
 // Purpose: Returns the render color of this visgroup.
 //-----------------------------------------------------------------------------
-inline color32 CVisGroup::GetColor(void)
+inline color32 CVisGroup::GetColor(void) const
 {
 	return m_rgbColor;
 }
@@ -149,7 +150,7 @@ inline void CVisGroup::SetColor(unsigned char red, unsigned char green, unsigned
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of visgroups that are children of this visgroup.
 //-----------------------------------------------------------------------------
-inline int CVisGroup::GetChildCount(void)
+inline intp CVisGroup::GetChildCount(void) const
 {
 	return m_Children.Count();
 }
@@ -158,7 +159,7 @@ inline int CVisGroup::GetChildCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the given child visgroup.
 //-----------------------------------------------------------------------------
-inline CVisGroup *CVisGroup::GetChild(int nIndex)
+inline CVisGroup *CVisGroup::GetChild(intp nIndex) const
 {
 	return m_Children.Element(nIndex);
 }
@@ -167,7 +168,7 @@ inline CVisGroup *CVisGroup::GetChild(int nIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Returns this visgroup's parent in the hierarchy.
 //-----------------------------------------------------------------------------
-inline CVisGroup *CVisGroup::GetParent(void)
+inline CVisGroup *CVisGroup::GetParent(void) const
 {
 	return m_pParent;
 }
@@ -189,12 +190,19 @@ class CVisGroupList
 {
 public:
 
-	inline int AddToTail(CVisGroup *pVisGroup);
-	inline int Count(void);
-	inline CVisGroup *Element(int nElement);
-	inline int Find(CVisGroup *pVisGroup);
-	inline void FastRemove(int nElement);
+	inline intp AddToTail(CVisGroup *pVisGroup);
+	inline intp Count(void) const;
+	inline CVisGroup *Element(intp nElement);
+	inline intp Find(CVisGroup *pVisGroup) const;
+	inline void FastRemove(intp nElement);
 	inline void RemoveAll(void);
+
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	CUtlVector<CVisGroup *>::iterator begin()						{ return m_List.Base(); }
+	CUtlVector<CVisGroup *>::const_iterator begin() const			{ return m_List.Base(); }
+	CUtlVector<CVisGroup *>::iterator end()							{ return m_List.Base() + m_List.Count(); }
+	CUtlVector<CVisGroup *>::const_iterator end() const				{ return m_List.Base() + m_List.Count(); }
 
 private:
 
@@ -202,31 +210,31 @@ private:
 };
 
 
-int CVisGroupList::AddToTail(CVisGroup *pVisGroup)
+intp CVisGroupList::AddToTail(CVisGroup *pVisGroup)
 {
 	return m_List.AddToTail(pVisGroup);
 }
 
 
-int CVisGroupList::Count(void)
+intp CVisGroupList::Count(void) const
 {
 	return m_List.Count();
 }
 
 
-CVisGroup *CVisGroupList::Element(int nElement)
+CVisGroup *CVisGroupList::Element(intp nElement)
 {
 	return m_List.Element(nElement);
 }
 
 
-int CVisGroupList::Find(CVisGroup *pVisGroup)
+intp CVisGroupList::Find(CVisGroup *pVisGroup) const
 {
 	return m_List.Find(pVisGroup);
 }
 
 
-inline void CVisGroupList::FastRemove(int nElement)
+inline void CVisGroupList::FastRemove(intp nElement)
 {
 	m_List.FastRemove(nElement);
 }

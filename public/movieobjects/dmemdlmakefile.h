@@ -29,7 +29,7 @@ class CDmeSourceSkin : public CDmeSource
 
 public:
 	// These can be built from DCC makefiles
-	virtual const char **GetSourceMakefileTypes();
+	const char **GetSourceMakefileTypes() override;
 
 	CDmaString m_SkinName;
 	CDmaVar<bool> m_bFlipTriangles;
@@ -46,9 +46,7 @@ class CDmeSourceCollisionModel : public CDmeSource
 
 public:
 	// These can be built from DCC makefiles
-	virtual const char **GetSourceMakefileTypes();
-
-private:
+	const char **GetSourceMakefileTypes() override;
 };
 
 
@@ -61,12 +59,10 @@ class CDmeSourceAnimation : public CDmeSource
 
 public:
 	// These can be built from DCC makefiles
-	virtual const char **GetSourceMakefileTypes();
+	const char **GetSourceMakefileTypes() override;
 
 	CDmaString m_AnimationName;
 	CDmaString m_SourceAnimationName;	// Name in the source file
-
-private:
 };
 
 
@@ -83,15 +79,15 @@ public:
 	void RemoveAnimation( const char *pFullPath );
 	void RemoveAllAnimations( );
 
-	virtual DmeMakefileType_t *GetMakefileType();
-	virtual DmeMakefileType_t* GetSourceTypes();
-	virtual void GetOutputs( CUtlVector<CUtlString> &fullPaths );
+	DmeMakefileType_t *GetMakefileType() override;
+	DmeMakefileType_t* GetSourceTypes() override;
+	void GetOutputs( CUtlVector<CUtlString> &fullPaths ) override;
 
 private:
 	// Inherited classes should re-implement these methods
-	virtual CDmElement *CreateOutputElement( );
-	virtual void DestroyOutputElement( CDmElement *pOutput );
-	virtual const char *GetOutputDirectoryID() { return "makefilegamedir:.."; }
+	CDmElement *CreateOutputElement( ) override;
+	void DestroyOutputElement( CDmElement *pOutput ) override;
+	const char *GetOutputDirectoryID() override { return "makefilegamedir:.."; }
 
 	CDmeHandle< CDmeMDL > m_hMDL;
 	bool m_bFlushMDL;

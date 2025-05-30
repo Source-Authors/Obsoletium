@@ -16,12 +16,12 @@
 // wouldn't have to include these if it weren't for inlines.
 #include "materialsystem/imaterial.h"
 #include "mathlib/mathlib.h"
-#include "utllinkedlist.h"
-#include "utlvector.h"
 #include "tier1/utllinkedlist.h"
+#include "tier1/utlvector.h"
 #include "flexrenderdata.h"
 #include "mathlib/compressed_vector.h"
 #include "r_studiolight.h"
+
 #if defined( _WIN32 ) && !defined( _X360 )
 #include <xmmintrin.h>
 #endif
@@ -523,7 +523,7 @@ private:
 	void			AddTriangleToDecal( DecalBuildInfo_t& build, int i1, int i2, int i3, int gi1, int gi2, int gi3 );
 	void			AddDecalToMesh( DecalBuildInfo_t& build );
 	int				GetDecalMaterial( DecalLod_t& decalLod, IMaterial* pDecalMaterial );
-	int				AddDecalToMaterialList( DecalMaterial_t* pMaterial );
+	unsigned short			AddDecalToMaterialList( DecalMaterial_t* pMaterial );
 
 	// Total number of meshes we have to deal with
 	int ComputeTotalMeshCount( int iRootLOD, int iMaxLOD, int body ) const;

@@ -275,7 +275,7 @@ void CDemoEditorPanel::PopulateActionList()
 		CBaseDemoAction *action = demoaction->GetAction( i );
 		Assert( action );
 
-		KeyValues *item = new KeyValues( "data", "actionname", action->GetActionName() );
+		KeyValuesAD item( new KeyValues( "data", "actionname", action->GetActionName() ) );
 		item->SetString( "actiontype", CBaseDemoAction::NameForType( action->GetType() ) );
 		switch ( action->GetTimingType() )
 		{

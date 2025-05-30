@@ -69,13 +69,27 @@ public:
 
 };
 
-int EventProperties( CEventParams *params );
+FORWARD_DECLARE_HANDLE(HWND);
+FORWARD_DECLARE_HANDLE(HDC);
+using RECT = struct tagRECT;
+using WPARAM = uintp;
+
+#ifdef PLATFORM_64BITS
+using LPARAM = intp;
+#else
+using LPARAM = long;
+#endif
+
+extern "C" __declspec(dllimport) HWND
+__stdcall GetDlgItem(HWND hDlg, int nIDDlgItem);
+
+intp EventProperties( CEventParams *params );
 
 class CBaseEventPropertiesDialog
 {
 public:
 	virtual void		InitDialog( HWND hwndDlg ) = 0;
-	virtual BOOL		HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam ) = 0;
+	virtual BOOL		HandleMessage( HWND hwndDlg, unsigned uMsg, WPARAM wParam, LPARAM lParam ) = 0;
 	virtual void		SetTitle() = 0;
 
 	HWND		GetControl( int id ) { return GetDlgItem( m_hDialog, id ); }
@@ -84,7 +98,7 @@ public:
 	virtual void		InitControlData( CEventParams *params );
 
 protected:
-	virtual BOOL InternalHandleMessage( CEventParams *params, HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam, bool& handled );
+	virtual BOOL InternalHandleMessage( CEventParams *params, HWND hwndDlg, unsigned uMsg, WPARAM wParam, LPARAM lParam, bool& handled );
 
 	void		SetDialogTitle( CEventParams *params, char const *eventname, char const *desc );
 
