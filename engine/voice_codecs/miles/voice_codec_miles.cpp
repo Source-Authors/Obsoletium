@@ -8,7 +8,7 @@
 
 #include "tier0/platform.h"
 #include "iframeencoder.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "milesbase.h"
 #include "tier0/dbg.h"
 

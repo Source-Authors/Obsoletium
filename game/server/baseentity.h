@@ -754,7 +754,7 @@ public:
 	virtual void Think( void ) { if (m_pfnThink) (this->*m_pfnThink)();};
 
 	// Think functions with contexts
-	int		RegisterThinkContext( const char *szContext );
+	intp	RegisterThinkContext( const char *szContext );
 	BASEPTR	ThinkSet( BASEPTR func, float flNextThinkTime = 0, const char *szContext = NULL );
 	void	SetNextThink( float nextThinkTime, const char *szContext = NULL );
 	float	GetNextThink( const char *szContext = NULL );
@@ -834,7 +834,7 @@ protected:
 		THINK_FIRE_BASE_ONLY,
 		THINK_FIRE_ALL_BUT_BASE,
 	};
-	int		GetIndexForThinkContext( const char *pszContext );
+	intp	GetIndexForThinkContext( const char *pszContext );
 	CUtlVector< thinkfunc_t >	m_aThinkFunctions;
 
 #ifdef _DEBUG
@@ -1770,17 +1770,17 @@ public:
 
 
 	// For debugging shared code
-	static bool						IsServer( void )
+	static constexpr bool						IsServer( void )
 	{
 		return true;
 	}
 
-	static bool						IsClient( void )
+	static constexpr bool						IsClient( void )
 	{
 		return false;
 	}
 
-	static char const				*GetDLLType( void )
+	static constexpr char const				*GetDLLType( void )
 	{
 		return "server";
 	}

@@ -46,8 +46,9 @@ private:
 	struct TextLine
 	{
 		char		m_szText[ 512 ];
+		// dimhotepus: Move up and make double to not overflow in ~49.7 days.
+		double		curtime;
 		COLORREF	rgb;
-		float		curtime;
 	};
 
 	TextLine		m_rgTextLines[ MAX_TEXT_LINES ];

@@ -384,7 +384,7 @@ RecvProp RecvPropArray3(
 	int offset,
 	int sizeofVar,
 	int elements,
-	RecvProp pArrayProp,
+	const RecvProp& pArrayProp,
 	DataTableRecvVarProxyFn varProxy=DataTableRecvProxy_StaticDataTable
 	);
 

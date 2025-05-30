@@ -10,7 +10,7 @@
 #pragma once
 
 
-#include "interface.h"
+#include "tier1/interface.h"
 
 
 #define BYTES_PER_SAMPLE	2

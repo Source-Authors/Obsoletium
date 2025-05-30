@@ -120,7 +120,7 @@ bool CDmSerializerKeyValues::SerializeAttributes( CUtlBuffer& buf, CDmElement *p
 {
 	// Collect the attributes to be written
 	CDmAttribute **ppAttributes = ( CDmAttribute** )_alloca( pElement->AttributeCount() * sizeof( CDmAttribute* ) );
-	int nAttributes = 0;
+	intp nAttributes = 0;
 	for ( CDmAttribute *pAttribute = pElement->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 	{
 		if ( pAttribute->IsFlagSet( FATTRIB_DONTSAVE | FATTRIB_STANDARD ) )
@@ -130,7 +130,7 @@ bool CDmSerializerKeyValues::SerializeAttributes( CUtlBuffer& buf, CDmElement *p
 	}
 
 	// Now write them all out in reverse order, since FirstAttribute is actually the *last* attribute for perf reasons
-	for ( int i = nAttributes - 1; i >= 0; --i )
+	for ( intp i = nAttributes - 1; i >= 0; --i )
 	{
 		CDmAttribute *pAttribute = ppAttributes[ i ];
 		Assert( pAttribute );
@@ -138,7 +138,7 @@ bool CDmSerializerKeyValues::SerializeAttributes( CUtlBuffer& buf, CDmElement *p
 		const char *pName = pAttribute->GetName();
 
 		// Rename "_type", "_name", or "_id" fields, since they are special fields
-		for ( int iAttr = 0; s_pAttributeRemap[i].m_pKeyValuesName; ++i )
+		for ( intp iAttr = 0; s_pAttributeRemap[i].m_pKeyValuesName; ++i )
 		{
 			if ( !Q_stricmp( pName, s_pAttributeRemap[iAttr].m_pDmeName ) )
 			{
@@ -304,7 +304,7 @@ void CDmSerializerKeyValues::UnserializeAttribute( CDmElement *pElement, KeyValu
 	pLowerName.ToLower();
 
 	// Rename "type", "name", or "id" fields, since they are special fields
-	for ( int i = 0; s_pAttributeRemap[i].m_pKeyValuesName; ++i )
+	for ( intp i = 0; s_pAttributeRemap[i].m_pKeyValuesName; ++i )
 	{
 		if ( !Q_stricmp( pLowerName, s_pAttributeRemap[i].m_pKeyValuesName ) )
 		{
@@ -445,7 +445,7 @@ bool CDmSerializerKeyValues::Unserialize( CUtlBuffer &buf, const char *pEncoding
 
 	*ppRoot = NULL;
 
-	KeyValues *kv = new KeyValues( "keyvalues file" );
+	KeyValuesAD kv( "keyvalues file" );
 	if ( !kv )
 		return false;
 
@@ -461,6 +461,5 @@ bool CDmSerializerKeyValues::Unserialize( CUtlBuffer &buf, const char *pEncoding
 
 	m_fileid = DMFILEID_INVALID;
 
-	kv->deleteThis();
 	return bOk;
 }

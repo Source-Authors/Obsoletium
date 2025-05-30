@@ -17,11 +17,11 @@
 
 
 #ifndef INCLUDED_MXWIDGET
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #endif
 
 #ifndef INCLUDED_MXEVENT
-#include "mxtk/mxEvent.h"
+#include "mxtk/mxevent.h"
 #endif
 
 

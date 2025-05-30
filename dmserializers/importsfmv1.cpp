@@ -176,7 +176,7 @@ void CImportSFMV1::ConvertTimeAttribute( CDmElement *pElementInternal, const cha
 	}
 #endif
 
-	pNewAttr->SetValue< int >( floor( time * 10000 + 0.5f ) );
+	pNewAttr->SetValue< int >( static_cast<int>(floor( time * 10000 + 0.5f )) );
 }
 
 //-----------------------------------------------------------------------------

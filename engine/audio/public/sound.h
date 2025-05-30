@@ -9,18 +9,19 @@
 #pragma once
 #endif
 
-#include "basetypes.h"
-#include "datamap.h"
-#include "mathlib/vector.h"
-#include "mathlib/mathlib.h"
+#include "tier0/basetypes.h"
 #include "tier1/strtools.h"
+#include "tier1/utlvector.h"
+#include "mathlib/mathlib.h"
+#include "mathlib/vector.h"
+
+#include "datamap.h"
 #include "soundflags.h"
-#include "utlvector.h"
 #include "engine/SndInfo.h"
 
-#define MAX_SFX  2048
+constexpr inline intp MAX_SFX{2048};
 
-#define AUDIOSOURCE_CACHE_ROOTDIR	"maps/soundcache"
+constexpr inline char AUDIOSOURCE_CACHE_ROOTDIR[]{"maps/soundcache"};
 
 class CSfxTable;
 enum soundlevel_t;
@@ -49,7 +50,7 @@ struct StartSoundParams_t
 	StartSoundParams_t() :
 		staticsound( false ),
 		userdata( 0 ),
-		soundsource( 0 ), 
+		soundsource( SoundSource::SOUND_FROM_WORLD ), 
 		entchannel( CHAN_AUTO ), 
 		pSfx( 0 ), 
 		bUpdatePositions( true ),
@@ -70,7 +71,7 @@ struct StartSoundParams_t
 
 	bool			staticsound;
 	int				userdata;
-    int				soundsource;
+	SoundSource		soundsource;
 	int				entchannel;
 	CSfxTable		*pSfx;
 	Vector			origin; 
@@ -119,7 +120,7 @@ void S_ReloadFilesInList( IFileList *pFilesToReload );
 vec_t S_GetNominalClipDist();
 
 extern bool TestSoundChar(const char *pch, char c);
-extern char *PSkipSoundChars(const char *pch);
+extern const char *PSkipSoundChars(const char *pch);
 
 #include "soundchars.h"
 

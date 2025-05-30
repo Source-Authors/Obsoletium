@@ -21,7 +21,7 @@
 
 
 CMapErrorsDlg::CMapErrorsDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CMapErrorsDlg::IDD, pParent)
+	: CBaseDlg(CMapErrorsDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CMapErrorsDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -31,14 +31,14 @@ CMapErrorsDlg::CMapErrorsDlg(CWnd* pParent /*=NULL*/)
 
 void CMapErrorsDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMapErrorsDlg)
 	DDX_Control(pDX, IDC_ERRORS, m_cErrors);
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CMapErrorsDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMapErrorsDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CMapErrorsDlg)
 	ON_BN_CLICKED(IDC_CLEAR, OnClear)
 	ON_LBN_DBLCLK(IDC_ERRORS, OnDblclkErrors)
@@ -63,7 +63,7 @@ void CMapErrorsDlg::OnView()
 
 BOOL CMapErrorsDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// fill list with errors
 	error3d * pError = Enum3dErrors(TRUE);

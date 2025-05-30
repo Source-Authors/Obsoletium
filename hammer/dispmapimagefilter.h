@@ -15,6 +15,8 @@
 #define DISPMAPIMAGEFILTER_H
 #pragma once
 
+#include "mathlib/vector.h"
+
 class CChunkFile;
 class CMapDisp;
 enum ChunkFileResult_t;
@@ -102,14 +104,14 @@ public:
 	CDispMapImageFilter();
 	~CDispMapImageFilter();
 
-	ChunkFileResult_t LoadFilter( CChunkFile *pFile ); 
+	[[nodiscard]] ChunkFileResult_t LoadFilter( CChunkFile *pFile ); 
 
 private:
 
 	static int GetFilterType( CString type );
-	static ChunkFileResult_t LoadFilterKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
-	static ChunkFileResult_t LoadImageCallback( CChunkFile *pFile, CDispMapImageFilter *pFilter );
-	static ChunkFileResult_t LoadImageKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
+	[[nodiscard]] static ChunkFileResult_t LoadFilterKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
+	[[nodiscard]] static ChunkFileResult_t LoadImageCallback( CChunkFile *pFile, CDispMapImageFilter *pFilter );
+	[[nodiscard]] static ChunkFileResult_t LoadImageKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
 	static void ValidHeight( int height );
 	static void ValidWidth( int width );
 };
@@ -289,6 +291,7 @@ inline void CDispMapImageFilterManager::SetActiveFilter( int ndx )
 //-----------------------------------------------------------------------------
 inline CDispMapImageFilter *CDispMapImageFilterManager::GetActiveFilter( void )
 {
+	Assert(m_ActiveFilter >= 0 && m_ActiveFilter < m_FilterCount);
 	return m_pFilterList[m_ActiveFilter];
 }
 

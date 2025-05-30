@@ -800,11 +800,10 @@ int CEngineTrace::GetLeafContainingPoint( const Vector &vPos )
 class CBrushConvexInfo : public IConvexInfo
 {
 public:
-	CBrushConvexInfo()
+	CBrushConvexInfo() : m_pBSPData{GetCollisionBSPData()}
 	{
-		m_pBSPData = GetCollisionBSPData();
 	}
-	virtual unsigned int GetContents( int convexGameData )
+	unsigned int GetContents( int convexGameData ) override
 	{
 		return m_pBSPData->map_brushes[convexGameData].contents;
 	}
@@ -1770,13 +1769,15 @@ void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter 
 		IHandleEntity *pHandleEntity = enumerator.m_EntityHandles[i];
 		HandleEntityToCollideable( pHandleEntity, &pCollideable, &pDebugName );
 
+#ifdef _DEBUG
 		// Check for error condition
-		if ( IsPC() && IsDebug() && !IsSolid( pCollideable->GetSolid(), pCollideable->GetSolidFlags() ) )
+		if ( !IsSolid( pCollideable->GetSolid(), pCollideable->GetSolidFlags() ) )
 		{
 			Assert( 0 );
 			Msg( "%s in solid list (not solid)\n", pDebugName );
 			continue;
 		}
+#endif
 
 		if ( !StaticPropMgr()->IsStaticProp( pHandleEntity ) )
 		{

@@ -60,7 +60,7 @@ static bool SaveTgaAndAddToP4( unsigned char *pImage, ImageFormat imageFormat, i
 
 	// async write to disk (this will take ownership of the memory)
 	char szDirName[ _MAX_PATH ];
-	strcpy( szDirName, szDestFilename );
+	V_strcpy_safe( szDirName, szDestFilename );
 	V_StripFilename( szDirName );
 	g_pFullFileSystem->CreateDirHierarchy( szDirName, "" );
 	g_pFullFileSystem->AsyncWrite( szDestFilename, buffer.Base(), buffer.TellPut(), true );
@@ -73,18 +73,6 @@ static bool SaveTgaAndAddToP4( unsigned char *pImage, ImageFormat imageFormat, i
 // MDL Picker
 //
 //-----------------------------------------------------------------------------
-
-
-//-----------------------------------------------------------------------------
-// Sort by MDL name
-//-----------------------------------------------------------------------------
-static int __cdecl MDLBrowserSortFunc( vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
-{
-	const char *string1 = item1.kv->GetString("mdl");
-	const char *string2 = item2.kv->GetString("mdl");
-	return stricmp( string1, string2 );
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -404,7 +392,7 @@ void CMDLPicker::OnCommand( const char *pCommand )
 		Label	*m_pOutputDirectory;
 		char	temp[ MAX_PATH ];
 		m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
+		m_pOutputDirectory->GetText( temp );
 
 		m_hDirectorySelectDialog->MakeReadyForUse();
 		m_hDirectorySelectDialog->SetStartDirectory( temp );
@@ -459,10 +447,10 @@ void CMDLPicker::OnCommand( const char *pCommand )
 					Label		*m_pOutputDirectory;
 
 					m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-					m_pOutputDirectory->GetText( szBathPath, sizeof( szBathPath ) );
+					m_pOutputDirectory->GetText( szBathPath );
 
 					char szPathedFileName[ _MAX_PATH ];
-					sprintf( szPathedFileName, "%s%s", szBathPath, pSelectedAsset );
+					V_sprintf_safe( szPathedFileName, "%s%s", szBathPath, pSelectedAsset );
 
 					Label		*m_pResults = ( Label * )m_pScreenCapsPage->FindChildByName( "CaptureResults" );
 					if ( RestoreCaps( szPathedFileName ) )
@@ -601,8 +589,8 @@ const char *CMDLPicker::CaptureModel( int nModIndex, const char *AssetName, cons
 	}
 
 	static char szPathedFileName[ _MAX_PATH ];
-	sprintf( szPathedFileName, "%s%s", OutputPath, AssetName );
-	V_SetExtension( szPathedFileName, ".tga", sizeof( szPathedFileName ) );
+	V_sprintf_safe( szPathedFileName, "%s%s", OutputPath, AssetName );
+	V_SetExtension( szPathedFileName, ".tga" );
 
 	bool bResult = SaveTgaAndAddToP4( pImageBlack, IMAGE_FORMAT_BGRA8888, Width, Height, szPathedFileName );
 
@@ -633,13 +621,13 @@ void CMDLPicker::CaptureScreenCaps( void )
 	Label		*m_pOutputDirectory;
 
 	m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-	m_pOutputDirectory->GetText( szBathPath, sizeof( szBathPath ) );
+	m_pOutputDirectory->GetText( szBathPath );
 
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "WidthText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	width = atoi( temp );
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "HeightText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	height = atoi( temp );
 
 	int		PanelX, PanelY, PanelWidth, PanelHeight;
@@ -692,7 +680,7 @@ void CMDLPicker::CaptureScreenCaps( void )
 
 	Label		*m_pResults;
 
-	sprintf( temp, "Captured %d items", nNumItems );
+	V_sprintf_safe( temp, "Captured %d items", nNumItems );
 	m_pResults = ( Label * )m_pScreenCapsPage->FindChildByName( "CaptureResults" );
 	m_pResults->SetText( temp );
 }
@@ -720,15 +708,15 @@ void CMDLPicker::WriteBackbackVMTFiles( const char *pAssetName )
 		return;
 
 	char pStrippedAssetName[ MAX_PATH ];
-	V_StripExtension( pAssetName, pStrippedAssetName, sizeof( pStrippedAssetName ) );
+	V_StripExtension( pAssetName, pStrippedAssetName );
 	V_strcat_safe( pStrippedAssetName, GetOutputFileSuffix().Get() );
 
 	char pVMTFilename[ MAX_PATH ];
-	Q_snprintf( pVMTFilename, sizeof( pVMTFilename ), "%s\\materials\\backpack\\%s.vmt", pVProject, pStrippedAssetName );
+	V_sprintf_safe( pVMTFilename, "%s\\materials\\backpack\\%s.vmt", pVProject, pStrippedAssetName );
 	Q_FixSlashes( pVMTFilename );
 
 	char pBaseTextureName[ MAX_PATH ];
-	Q_snprintf( pBaseTextureName, sizeof( pBaseTextureName ), "backpack\\%s", pStrippedAssetName );
+	V_sprintf_safe( pBaseTextureName, "backpack\\%s", pStrippedAssetName );
 	Q_FixSlashes( pBaseTextureName );
 	
 	{
@@ -749,11 +737,11 @@ void CMDLPicker::WriteBackbackVMTFiles( const char *pAssetName )
 	}
 
 	// now write the _large version
-	Q_snprintf( pVMTFilename, sizeof( pVMTFilename ), "%s\\materials\\backpack\\%s_large", pVProject, pStrippedAssetName );
-	V_SetExtension( pVMTFilename, ".vmt", sizeof( pVMTFilename ) );
+	V_sprintf_safe( pVMTFilename, "%s\\materials\\backpack\\%s_large", pVProject, pStrippedAssetName );
+	V_SetExtension( pVMTFilename, ".vmt" );
 	Q_FixSlashes( pVMTFilename );
 
-	Q_snprintf( pBaseTextureName, sizeof( pBaseTextureName ), "backpack\\%s_large", pStrippedAssetName );
+	V_sprintf_safe( pBaseTextureName, "backpack\\%s_large", pStrippedAssetName );
 	Q_FixSlashes( pBaseTextureName );
 
 	{
@@ -782,9 +770,6 @@ void *VTexFilesystemFactory( const char *pName, int *pReturnCode )
 
 void* MdlPickerFSFactory( const char *pName, int *pReturnCode )
 {
-	if ( IsX360() )
-		return NULL;
-
 	if ( Q_stricmp( pName, FILESYSTEM_INTERFACE_VERSION ) == 0 )
 		return g_pFullFileSystem;
 
@@ -848,7 +833,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	// set the P4 changelist label to refer to this set of icons
 	char pChangelistLabel[ MAX_PATH ];
 	V_strcpy_safe( pChangelistLabel, pSelectedAsset );
-	V_FileBase( pChangelistLabel, pChangelistLabel, sizeof( pChangelistLabel ) );
+	V_FileBase( pChangelistLabel, pChangelistLabel );
 	V_strcat_safe( pChangelistLabel, " Auto Checkout", sizeof( pChangelistLabel ) );
 	g_p4factory->SetOpenFileChangeList( pChangelistLabel );
 
@@ -881,7 +866,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 
 	char pLargeAssetName[ MAX_PATH ];
 	V_strcpy_safe( pLargeAssetName, pSelectedAsset );
-	V_StripExtension( pLargeAssetName, pLargeAssetName, ssize( pLargeAssetName ) );
+	V_StripExtension( pLargeAssetName, pLargeAssetName );
 
 	CUtlString strExtention = GetOutputFileSuffix();
 	strExtention += "_large.mdl";
@@ -889,8 +874,8 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	V_strcat_safe( pLargeAssetName, strExtention.String() );
 
 	char pOutputPath[ MAX_PATH ];
-	Q_snprintf( pOutputPath, sizeof( pOutputPath ), "%s\\%s\\materialsrc\\backpack\\", pVContent, pVMod );
-	Q_FixSlashes( pOutputPath );
+	V_sprintf_safe( pOutputPath, "%s\\%s\\materialsrc\\backpack\\", pVContent, pVMod );
+	V_FixSlashes( pOutputPath );
 
 	int nModIndex = pItemKeyValues->GetInt( "modIndex" );
 	const char *pLargeTGAName = CaptureModel( nModIndex, pLargeAssetName, pOutputPath, width, height, NewPanelColor, true );
@@ -900,7 +885,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	// write corresponding .txt file with vtex options
 	char pVTexOptionsFileName[ MAX_PATH ];
 	V_strcpy_safe( pVTexOptionsFileName, pLargeTGAName );
-	V_SetExtension( pVTexOptionsFileName, ".txt", sizeof( pVTexOptionsFileName ) );
+	V_SetExtension( pVTexOptionsFileName, ".txt" );
 
 	{
 		CP4AutoEditAddFile autop4( pVTexOptionsFileName );
@@ -925,7 +910,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	if ( pBackpack )
 	{
 		Q_strncat( pOutputPathGame, pBackpack, sizeof( pOutputPathGame ) );
-		Q_StripFilename( pOutputPathGame );
+		V_StripFilename( pOutputPathGame );
 	}
 	Q_FixSlashes( pOutputPathGame );
 
@@ -945,10 +930,11 @@ void CMDLPicker::GenerateBackpackIcons( void )
 
 	// Generale small TGA name, by removing the "large" part
 	char pSmallTGAName[ MAX_PATH ];
-	strcpy( pSmallTGAName, pLargeTGAName );
+	V_strcpy_safe( pSmallTGAName, pLargeTGAName );
 	char *_large = Q_stristr( pSmallTGAName, "_large");
 	Assert(_large);
-	strcpy(_large, _large+6);
+	// dimhotepus: Simple zero-terminate.
+	*_large = '\0';
 
 	// Load up the large icon
 	int nCheckWidth, nCheckHeight;
@@ -980,7 +966,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	// which essentially just point-samples the image.
 	//
 	CUtlMemory<unsigned char> smallTGAImageData;
-	const int kSmallSize = 128;
+	constexpr int kSmallSize = 128;
 	smallTGAImageData.EnsureCapacity(kSmallSize*kSmallSize*4);
 	ImageLoader::ResampleInfo_t resampleInfo;
 	resampleInfo.m_nSrcWidth = width;
@@ -1014,7 +1000,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 
 	// write corresponding .txt file with vtex options
 	V_strcpy_safe( pVTexOptionsFileName, pSmallTGAName );
-	V_SetExtension( pVTexOptionsFileName, ".txt", sizeof( pVTexOptionsFileName ) );
+	V_SetExtension( pVTexOptionsFileName, ".txt" );
 
 	{
 		CP4AutoEditAddFile autop4( pVTexOptionsFileName );
@@ -1055,7 +1041,7 @@ CUtlString CMDLPicker::GetOutputFileSuffix()
 	TextEntry *pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "SuffixText" );
 	if ( pTempValue )
 	{
-		pTempValue->GetText( temp, sizeof( temp ) );
+		pTempValue->GetText( temp );
 	}
 	return temp;
 }
@@ -1068,35 +1054,36 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 {
 	char	temp[ _MAX_PATH ];
 
-	KeyValues *CaptureData = new KeyValues( "ScreenCaps" );
+	// dimhotepus: Do RAII.
+	KeyValuesAD CaptureData( "ScreenCaps" );
 
 	Vector	vecPos;
 	QAngle	angDir;
 	m_pMDLPreview->GetCameraPositionAndAngles( vecPos, angDir );
-	sprintf( temp, "%g %g %g", vecPos.x, vecPos.y, vecPos.z );
+	V_sprintf_safe( temp, "%g %g %g", vecPos.x, vecPos.y, vecPos.z );
 	CaptureData->SetString( "CameraPosition", temp );
-	sprintf( temp, "%g %g %g", angDir.x, angDir.y, angDir.z );
+	V_sprintf_safe( temp, "%g %g %g", angDir.x, angDir.y, angDir.z );
 	CaptureData->SetString( "CameraAngles", temp );
 
 	Vector	vecOffset;
 	m_pMDLPreview->GetCameraOffset( vecOffset );
-	sprintf( temp, "%g %g %g", vecOffset.x, vecOffset.y, vecOffset.z );
+	V_sprintf_safe( temp, "%g %g %g", vecOffset.x, vecOffset.y, vecOffset.z );
 	CaptureData->SetString( "CameraOffset", temp );
 
 	CColorPickerButton *m_pBackgroundColor;
 	m_pBackgroundColor = ( CColorPickerButton * )m_pScreenCapsPage->FindChildByName( "BackgroundColor" );
 	Color	color = m_pBackgroundColor->GetColor();
 
-	sprintf( temp, "%d %d %d %d", color.r(), color.g(), color.b(), color.a() );
+	V_sprintf_safe( temp, "%hhu %hhu %hhu %hhu", color.r(), color.g(), color.b(), color.a() );
 	CaptureData->SetString( "BackgroundColor", temp );
 
 	TextEntry	*pTempValue;
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "WidthText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	CaptureData->SetString( "Width", temp );
 
 	pTempValue = ( TextEntry * )m_pScreenCapsPage->FindChildByName( "HeightText" );
-	pTempValue->GetText( temp, sizeof( temp ) );
+	pTempValue->GetText( temp );
 	CaptureData->SetString( "Height", temp );
 
 	vgui::CheckButton *pToggle;
@@ -1120,22 +1107,22 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 		if ( m_hSelectedMDL[ i ] != MDLHANDLE_INVALID )
 		{
 			const char *MergedModelName = vgui::MDLCache()->GetModelName( m_hSelectedMDL[ i ] );
-			sprintf( temp, "Merged_%d", i );
+			V_sprintf_safe( temp, "Merged_%d", i );
 			CaptureData->SetString( temp, MergedModelName );
 		}
 	}
 
 	if ( szFileName != NULL )
 	{
-		strcpy( temp, szFileName );
-		V_SetExtension( temp, ".cfg", sizeof( temp ) );
+		V_strcpy_safe( temp, szFileName );
+		V_SetExtension( temp, ".cfg" );
 	}
 	else
 	{
-		Label	*m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
+		Label *m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
+		m_pOutputDirectory->GetText( temp );
 
-		strcat( temp, "ScreenCaps.cfg" );
+		V_strcat_safe( temp, "ScreenCaps.cfg" );
 	}
 
 	CaptureData->SaveToFile( g_pFullFileSystem, temp );
@@ -1152,18 +1139,18 @@ bool CMDLPicker::RestoreCaps( const char *szFileName )
 
 	if ( szFileName != NULL )
 	{
-		strcpy( temp, szFileName );
-		V_SetExtension( temp, ".cfg", sizeof( temp ) );
+		V_strcpy_safe( temp, szFileName );
+		V_SetExtension( temp, ".cfg" );
 	}
 	else
 	{
-		Label	*m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
-		m_pOutputDirectory->GetText( temp, sizeof( temp ) );
-		strcat( temp, "ScreenCaps.cfg" );
+		Label *m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
+		m_pOutputDirectory->GetText( temp );
+		V_strcat_safe( temp, "ScreenCaps.cfg" );
 	}
 
-	KeyValues *CaptureData = new KeyValues( "ScreenCaps" );
-
+	// dimhotepus: Do not leak KeyValues.
+	KeyValuesAD CaptureData( "ScreenCaps" );
 	if ( !CaptureData->LoadFromFile( g_pFullFileSystem, temp ) )
 	{
 		return false;
@@ -1211,7 +1198,7 @@ bool CMDLPicker::RestoreCaps( const char *szFileName )
 
 	for( int i = 1; i < MAX_SELECTED_MODELS; i++ )
 	{
-		sprintf( temp, "Merged_%d", i );
+		V_sprintf_safe( temp, "Merged_%d", i );
 		const char *MergedModelName = CaptureData->GetString( temp, NULL );
 		if ( MergedModelName )
 		{
@@ -1256,10 +1243,10 @@ void CMDLPicker::RefreshActivitiesAndSequencesList()
 				// Multiple sequences can have the same activity name; only add unique activity names
 				if ( activityNames.Find( pActivityName ) == activityNames.InvalidIndex() )
 				{
-					KeyValues *pkv = new KeyValues("node", "activity", pActivityName );
+					KeyValuesAD pkv( new KeyValues("node", "activity", pActivityName ) );
 					int nItemID = m_pActivitiesList->AddItem( pkv, 0, false, false );
 
-					KeyValues *pDrag = new KeyValues( "drag", "text", pActivityName );
+					KeyValuesAD pDrag( new KeyValues( "drag", "text", pActivityName ) );
 					pDrag->SetString( "texttype", "activityName" );
 					pDrag->SetString( "mdl", vgui::MDLCache()->GetModelName( m_hSelectedMDL[ 0 ] ) );
 					m_pActivitiesList->SetItemDragData( nItemID, pDrag );
@@ -1271,10 +1258,10 @@ void CMDLPicker::RefreshActivitiesAndSequencesList()
 			const char *pSequenceName = hdr->pSeqdesc(j).pszLabel();
 			if ( pSequenceName && pSequenceName[0] )
 			{
-				KeyValues *pkv = new KeyValues("node", "sequence", pSequenceName);
+				KeyValuesAD pkv( new KeyValues("node", "sequence", pSequenceName) );
 				int nItemID = m_pSequencesList->AddItem( pkv, 0, false, false );
 
-				KeyValues *pDrag = new KeyValues( "drag", "text", pSequenceName );
+				KeyValuesAD pDrag( new KeyValues( "drag", "text", pSequenceName ) );
 				pDrag->SetString( "texttype", "sequenceName" );
 				pDrag->SetString( "mdl", vgui::MDLCache()->GetModelName( m_hSelectedMDL[ 0 ] ) );
 				m_pSequencesList->SetItemDragData( nItemID, pDrag );
@@ -1627,8 +1614,8 @@ int CMDLPicker::UpdateSkinsList()
 			for ( int i = 0; i < nNumSkins; i++ )
 			{
 				char skinText[25] = "";
-				sprintf( skinText, "skin%i", i );
-				KeyValues *pkv = new KeyValues("node", "skin", skinText );
+				V_sprintf_safe( skinText, "skin%i", i );
+				KeyValuesAD pkv( new KeyValues("node", "skin", skinText ) );
 				m_pSkinsList->AddItem( pkv, 0, false, false );
 			}
 		}
@@ -1724,7 +1711,7 @@ int CMDLPicker::UpdatePropDataList( const char* pszPropData, bool &bIsStatic )
 				}
 				bIsStatic &= true;
 			}
-			KeyValues *pkv = new KeyValues("node", "key", keyText, "value", valueText );
+			KeyValuesAD pkv( new KeyValues("node", "key", keyText, "value", valueText ) );
 			m_pPropDataList->AddItem( pkv, 0, false, false );
 			Q_memset( keyText, 0, 255 );
 			Q_memset( valueText, 0, 255 );
@@ -1736,7 +1723,7 @@ int CMDLPicker::UpdatePropDataList( const char* pszPropData, bool &bIsStatic )
 				return iCount;
 			}
 			beginChunk++;
-			endChunk = strchr( beginChunk, '\"' );		
+			endChunk = strchr( beginChunk, '\"' );
 		}
 	}
 	return iCount;

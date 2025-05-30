@@ -4,11 +4,14 @@
 //
 //=============================================================================//
 
-class CRunMap : public CDialog
+#include "resource.h"
+#include "windows/base_dlg.h"
+
+class CRunMap : public CBaseDlg
 {
 // Construction
 public:
-	CRunMap(CWnd* pParent = NULL);   // standard constructor
+	CRunMap(const CString& mapName, CWnd* pParent = NULL);   // standard constructor
 	void SaveToIni();
 
 // Dialog Data
@@ -22,6 +25,8 @@ public:
 	BOOL	m_bHDRLight;
 	//}}AFX_DATA
 
+	// dimhotepus: Add map name.
+	CString m_strMapName;
 	BOOL m_bSwitchMode;
 
 // Overrides

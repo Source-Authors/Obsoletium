@@ -9,8 +9,8 @@
 //
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "RunMapExpertDlg.h"
+#include "hammer.h"
 #include "RunMapCfgDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -19,11 +19,13 @@
 /////////////////////////////////////////////////////////////////////////////
 // CRunMapExpertDlg dialog
 
-CRunMapExpertDlg::CRunMapExpertDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CRunMapExpertDlg::IDD, pParent)
+CRunMapExpertDlg::CRunMapExpertDlg(const CString& mapName, CWnd* pParent /*=NULL*/)
+	: CBaseDlg(CRunMapExpertDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CRunMapExpertDlg)
 	//}}AFX_DATA_INIT
+
+	m_strMapName = mapName;
 
 	m_pActiveSequence = NULL;
 	m_bNoUpdateCmd = FALSE;
@@ -33,7 +35,7 @@ CRunMapExpertDlg::CRunMapExpertDlg(CWnd* pParent /*=NULL*/)
 
 void CRunMapExpertDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CRunMapExpertDlg)
 	DDX_Control(pDX, IDC_USEPROCESSWND, m_cUseProcessWnd);
 	DDX_Control(pDX, IDC_CONFIGURATIONS, m_cCmdSequences);
@@ -80,7 +82,7 @@ enum
 };
 
 
-BEGIN_MESSAGE_MAP(CRunMapExpertDlg, CDialog)
+BEGIN_MESSAGE_MAP(CRunMapExpertDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CRunMapExpertDlg)
 	ON_BN_CLICKED(IDC_BROWSECOMMAND, OnBrowsecommand)
 	ON_LBN_SELCHANGE(IDC_COMMANDLIST, OnSelchangeCommandlist)
@@ -119,6 +121,8 @@ BOOL CRunMapExpertDlg::HandleInsertCommand(UINT nID)
 		CFileDialog dlg(TRUE, "exe", NULL, OFN_HIDEREADONLY | 
 			OFN_FILEMUSTEXIST |	OFN_NOCHANGEDIR, 
 			"Executable Files|*.exe||", this);
+		dlg.m_ofn.lpstrTitle = "Open Executable File";
+
 		if(dlg.DoModal() == IDCANCEL)
 			return TRUE;
 		m_cCommand.SetWindowText(dlg.m_ofn.lpstrFile);
@@ -527,22 +531,22 @@ void CRunMapExpertDlg::InitSequenceList()
 	m_cCmdSequences.ResetContent();
 
 	// add the configurations into the list ..
-	int iSize = pApp->m_CmdSequences.GetSize();
+	intp iSize = pApp->m_CmdSequences.GetSize();
 
 	if(iSize == 0)
 	{
 		// add a default configuration
 		CCommandSequence *pSeq = new CCommandSequence;
-		strcpy(pSeq->m_szName, "Default");
+		V_strcpy_safe(pSeq->m_szName, "Default");
 		((CHammer*)AfxGetApp())->m_CmdSequences.Add(pSeq);
 		iSize = 1;
 	}
 
-	for(int i = 0; i < iSize; i++)
+	for(intp i = 0; i < iSize; i++)
 	{
 		CCommandSequence *pSeq = pApp->m_CmdSequences[i];
 		int iIndex = m_cCmdSequences.AddString(pSeq->m_szName);
-		m_cCmdSequences.SetItemDataPtr(iIndex, PVOID(pSeq));
+		m_cCmdSequences.SetItemDataPtr(iIndex, pSeq);
 	}
 	
 	m_pActiveSequence = NULL;
@@ -552,7 +556,13 @@ void CRunMapExpertDlg::InitSequenceList()
 
 BOOL CRunMapExpertDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
+
+	CString title;
+	GetWindowText(title);
+	// dimhotepus: Add map name to title.
+	title.AppendFormat(" - [%s]", m_strMapName.GetString());
+	SetWindowText(title);
 	
 	int iSequence = AfxGetApp()->GetProfileInt("RunMapExpert", 
 		"LastSequence", 0);
@@ -573,7 +583,7 @@ void CRunMapExpertDlg::OnOK()
 	
 	pApp->SaveSequences();
 
-	CDialog::OnOK();
+	__super::OnOK();
 }
 
 void CRunMapExpertDlg::SaveCommandsToSequence()
@@ -649,5 +659,5 @@ void CRunMapExpertDlg::OnCancel()
 	CHammer *pApp = (CHammer*) AfxGetApp();
 	pApp->SaveSequences();
 
-	CDialog::OnCancel();
+	__super::OnCancel();
 }

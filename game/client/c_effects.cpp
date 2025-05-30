@@ -231,9 +231,9 @@ static ConVar r_SnowRayEnable( "r_SnowRayEnable", "1", FCVAR_CHEAT, "Snow." );
 
 void DrawPrecipitation()
 {
-	for ( int i=0; i < g_Precipitations.Count(); i++ )
+	for ( auto *p : g_Precipitations )
 	{
-		g_Precipitations[i]->Render();
+		p->Render();
 	}
 }
 
@@ -435,10 +435,10 @@ void CClient_Precipitation::Simulate( float dt )
 	EmitParticles( dt );
 
 	// Simulate all the particles.
-	int iNext;
+	unsigned short iNext;
 	if ( m_nPrecipType == PRECIPITATION_TYPE_RAIN )
 	{
-		for ( int i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
+		for ( auto i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
 		{
 			iNext = m_Particles.Next( i );
 			if ( !SimulateRain( &m_Particles[i], dt ) )
@@ -447,7 +447,7 @@ void CClient_Precipitation::Simulate( float dt )
 	}
 	else if ( m_nPrecipType == PRECIPITATION_TYPE_SNOW )
 	{
-		for ( int i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
+		for ( auto i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=iNext )
 		{
 			iNext = m_Particles.Next( i );
 			if ( !SimulateSnow( &m_Particles[i], dt ) )
@@ -458,7 +458,7 @@ void CClient_Precipitation::Simulate( float dt )
 	if ( r_RainProfile.GetInt() )
 	{
 		timer.End();
-		engine->Con_NPrintf( 15, "Rain simulation: %du (%d tracers)", timer.GetDuration().GetMicroseconds(), m_Particles.Count() );
+		engine->Con_NPrintf( 15, "Rain simulation: %lu (%zd tracers)", timer.GetDuration().GetMicroseconds(), m_Particles.Count() );
 	}
 }
 
@@ -501,7 +501,7 @@ inline void CClient_Precipitation::RenderParticle( CPrecipitationParticle* pPart
 
 		if ( pParticle->m_Mass > 1.0f )
 		{
-			SinCos( gpGlobals->curtime * M_PI * (1+pParticle->m_Mass * 0.1f) + 
+			SinCos( gpGlobals->curtime * M_PI_F * (1+pParticle->m_Mass * 0.1f) + 
 					pParticle->m_Mass * 5.0f, &s , &c );
 
 			// only spiral particles with a mass > 1, so some fall straight down
@@ -602,7 +602,7 @@ void CClient_Precipitation::Render()
 		CMeshBuilder mb;
 		mb.Begin( pMesh, MATERIAL_QUADS, m_Particles.Count() );
 
-		for ( int i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=m_Particles.Next( i ) )
+		for ( auto i=m_Particles.Head(); i != m_Particles.InvalidIndex(); i=m_Particles.Next( i ) )
 		{
 			CPrecipitationParticle *p = &m_Particles[i];
 			RenderParticle( p, mb );
@@ -727,8 +727,7 @@ inline float CClient_Precipitation::GetRemainingLifetime( CPrecipitationParticle
 
 inline CPrecipitationParticle* CClient_Precipitation::CreateParticle()
 {
-	int i = m_Particles.AddToTail();
-	CPrecipitationParticle* pParticle = &m_Particles[i];
+	CPrecipitationParticle* pParticle = &m_Particles[m_Particles.AddToTail()];
 
 	pParticle->m_SpawnTime = gpGlobals->curtime;
 	pParticle->m_Ramp = m_InitialRamp;
@@ -824,7 +823,7 @@ float AshDebrisEffect::UpdateRoll( SimpleParticle *pParticle, float timeDelta )
 	if ( pParticle->m_iFlags & ASH_PARTICLE_NOISE )
 	{
 		Vector vTempEntVel = pParticle->m_vecVelocity;
-		float fastFreq = gpGlobals->curtime * 1.5;
+		float fastFreq = gpGlobals->curtime * 1.5f;
 
 		float s, c;
 		SinCos( fastFreq, &s, &c );
@@ -997,7 +996,7 @@ void CClient_Precipitation::CreateAshParticle( void )
 
 			pParticle->m_uchStartAlpha	= 255;
 
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -0.15f, 0.15f );
 
 			pParticle->m_iFlags			= SIMPLE_PARTICLE_FLAG_WINDBLOWN;
@@ -1019,8 +1018,8 @@ void CClient_Precipitation::CreateRainOrSnowParticle( Vector vSpawnPosition, Vec
 	VectorCopy( vVelocity, p->m_Velocity );
 	p->m_Pos = vSpawnPosition;
 
-	p->m_Velocity[ 0 ] += random->RandomFloat(-r_RainSideVel.GetInt(), r_RainSideVel.GetInt());
-	p->m_Velocity[ 1 ] += random->RandomFloat(-r_RainSideVel.GetInt(), r_RainSideVel.GetInt());
+	p->m_Velocity[ 0 ] += random->RandomFloat(-r_RainSideVel.GetFloat(), r_RainSideVel.GetFloat());
+	p->m_Velocity[ 1 ] += random->RandomFloat(-r_RainSideVel.GetFloat(), r_RainSideVel.GetFloat());
 
 	p->m_Mass = random->RandomFloat( 0.5, 1.5 );
 }
@@ -1106,7 +1105,7 @@ void CClient_Precipitation::ComputeWindVector( )
 
 	// Randomize the wind angle and speed slightly to get us a little variation
 	windangle[1] = windangle[1] + random->RandomFloat( -10, 10 );
-	float windspeed = cl_windspeed.GetFloat() * (1.0 + random->RandomFloat( -0.2, 0.2 ));
+	float windspeed = cl_windspeed.GetFloat() * (1.0f + random->RandomFloat( -0.2f, 0.2f ));
 
 	AngleVectors( windangle, &s_WindVector );
 	VectorScale( s_WindVector, windspeed, s_WindVector );
@@ -1504,7 +1503,8 @@ END_RECV_TABLE()
 
 Vector Color32ToVector( const color32 &color )
 {
-	return Vector( color.r * (1.0/255.0f), color.g * (1.0/255.0f), color.b * (1.0/255.0f) );
+	constexpr float factor = 1.0f/255.0f;
+	return Vector( color.r * factor, color.g * factor, color.b * factor );
 }
 
 int	C_QuadraticBeam::DrawModel( int )
@@ -1623,9 +1623,9 @@ private:
 	void CreateInsideVolumeSnowParticles( float flCurrentTime, float flRadius, const Vector &vecEyePos, const Vector &vecForward, float flZoomScale );
 	void CreateSnowParticlesSphere( float flRadius );
 	void CreateSnowParticlesRay( float flRadius, const Vector &vecEyePos, const Vector &vecForward );
-	void CreateSnowFallParticle( const Vector &vecParticleSpawn, int iBBox );
+	void CreateSnowFallParticle( const Vector &vecParticleSpawn, intp iBBox );
 
-	int StandingInSnowVolume( Vector &vecPoint );
+	intp StandingInSnowVolume( Vector &vecPoint );
 	void FindSnowVolumes( Vector &vecCenter, float flRadius, Vector &vecEyePos, Vector &vecForward );
 
 	void UpdateBounds( const Vector &vecSnowMin, const Vector &vecSnowMax );
@@ -1646,8 +1646,8 @@ private:
 	Vector							m_vecMin;
 	Vector							m_vecMax;
 
-	int								m_nActiveSnowCount;
-	int								m_aActiveSnow[MAX_SNOW_LIST];
+	intp							m_nActiveSnowCount;
+	intp							m_aActiveSnow[MAX_SNOW_LIST];
 
 	bool							m_bRayParticles;
 
@@ -1797,12 +1797,12 @@ void CSnowFallManager::UpdateBounds( const Vector &vecSnowMin, const Vector &vec
 // Input  : &vecPoint - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CSnowFallManager::StandingInSnowVolume( Vector &vecPoint )
+intp CSnowFallManager::StandingInSnowVolume( Vector &vecPoint )
 {
 	trace_t traceSnow;
 
-	int nSnowCount = m_aSnow.Count();
-	int iSnow = 0;
+	intp nSnowCount = m_aSnow.Count();
+	intp iSnow = 0;
 	for ( iSnow = 0; iSnow < nSnowCount; ++iSnow )
 	{
 		UTIL_TraceModel( vecPoint, vecPoint, vec3_origin, vec3_origin, static_cast<C_BaseEntity*>( m_aSnow[iSnow].m_pEntity ), COLLISION_GROUP_NONE, &traceSnow );
@@ -1824,8 +1824,8 @@ void CSnowFallManager::FindSnowVolumes( Vector &vecCenter, float flRadius, Vecto
 	m_nActiveSnowCount = 0;
 	m_bRayParticles = false;
 
-	int nSnowCount = m_aSnow.Count();
-	int iSnow = 0;
+	intp nSnowCount = m_aSnow.Count();
+	intp iSnow = 0;
 	for ( iSnow = 0; iSnow < nSnowCount; ++iSnow )
 	{
 		// Check to see if the volume is in the PVS.
@@ -1932,7 +1932,7 @@ void CSnowFallManager::CreateSnowFall( void )
 		Vector vecTraceStart;
 		VectorCopy( pPlayer->EyePosition(), vecTraceStart );
 
-		int iSnowVolume = StandingInSnowVolume( vecTraceStart );
+		intp iSnowVolume = StandingInSnowVolume( vecTraceStart );
 		if ( iSnowVolume != -1 )
 		{
 			m_flSnowRadius = r_SnowInsideRadius.GetFloat() + ( flSpeed * 0.5f );
@@ -2158,7 +2158,7 @@ void CSnowFallManager::CreateSnowParticlesRay( float flRadius, const Vector &vec
 	CreateSnowFallParticle( vecParticleSpawn, m_aActiveSnow[iSnow] );
 }
 
-void CSnowFallManager::CreateSnowFallParticle( const Vector &vecParticleSpawn, int iSnow )
+void CSnowFallManager::CreateSnowFallParticle( const Vector &vecParticleSpawn, intp iSnow )
 {	
 	SimpleParticle *pParticle = ( SimpleParticle* )m_pSnowFallEmitter->AddParticle( sizeof( SimpleParticle ), m_aSnow[iSnow].m_hMaterial, vecParticleSpawn );
 	if ( pParticle == NULL )
@@ -2183,7 +2183,7 @@ void CSnowFallManager::CreateSnowFallParticle( const Vector &vecParticleSpawn, i
 	pParticle->m_uchStartAlpha	= r_SnowStartAlpha.GetInt();
 	pParticle->m_uchEndAlpha	= r_SnowEndAlpha.GetInt();
 
-	pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+	pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 	pParticle->m_flRollDelta	= random->RandomFloat( -0.15f, 0.15f );
 
 	pParticle->m_iFlags			= SIMPLE_PARTICLE_FLAG_WINDBLOWN;

@@ -23,7 +23,7 @@ CServerInfoPanel::CServerInfoPanel(vgui::Panel *parent, const char *name) : CVar
 	LoadControlSettings("Admin/GamePanelInfo.res", "PLATFORM");
 	LoadVarList("Admin/MainServerConfig.vdf");
 	m_iLastUptimeDisplayed = 0;
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 	m_bMapListRetrieved = false;
 	RemoteServer().AddServerMessageHandler(this, "UpdatePlayers");
 	RemoteServer().AddServerMessageHandler(this, "UpdateMap");
@@ -56,12 +56,13 @@ void CServerInfoPanel::OnThink()
 	}
 
 	// check uptime count
-	int time = m_iLastUptimeReceived + (int)(vgui::system()->GetFrameTime() - m_flLastUptimeReceiveTime);
+	double time = m_iLastUptimeReceived + (vgui::system()->GetFrameTime() - m_flLastUptimeReceiveTime);
 	if (time != m_iLastUptimeDisplayed)
 	{
 		m_iLastUptimeDisplayed = time;
 		char timeText[64];
-		_snprintf(timeText, sizeof(timeText), "%0.1i:%0.2i:%0.2i:%0.2i", (time / 3600) / 24, (time / 3600), (time / 60) % 60, time % 60);
+		V_sprintf_safe(timeText, "%0.1i:%0.2i:%0.2i:%0.2i",
+			(time / 3600) / 24, (time / 3600), static_cast<int>(time / 60) % 60, static_cast<int>(time) % 60);
 		SetControlString("UpTimeText", timeText);
 	}
 }
@@ -89,7 +90,7 @@ void CServerInfoPanel::OnResetData()
 	RemoteServer().RequestValue(this, "ipaddress");
 
 	// update once every minute
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 1.0f);
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,7 +111,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 		buf[0] = 0;
 		if (m_iMaxPlayers > 0)
 		{
-			sprintf(buf, "%d / %d", m_iPlayerCount, m_iMaxPlayers);
+			V_sprintf_safe(buf, "%d / %d", m_iPlayerCount, m_iMaxPlayers);
 		}
 		SetControlString("PlayersText", buf);
 	}
@@ -125,7 +126,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 	else if (!stricmp(value, "UpdateMap") || !stricmp(value, "UpdatePlayers"))
 	{
 		// server has indicated a change, force an update
-		m_flUpdateTime = 0.0f;
+		m_flUpdateTime = 0.0;
 	}
 	else if (!stricmp(value, "maplist"))
 	{
@@ -139,7 +140,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 	{
 		// record uptime for extrapolation
 		m_iLastUptimeReceived = atoi(response);
-		m_flLastUptimeReceiveTime = (float)system()->GetFrameTime();
+		m_flLastUptimeReceiveTime = system()->GetFrameTime();
 	}
 	else if (!stricmp(value, "ipaddress"))
 	{
@@ -216,9 +217,9 @@ void CServerInfoPanel::UpdateMapCycleValue()
 		{
 			if (needComma)
 			{
-				strcat(nextMaps, ", ");
+				V_strcat_safe(nextMaps, ", ");
 			}
-			strcat(nextMaps, m_MapCycle[point].String());
+			V_strcat_safe(nextMaps, m_MapCycle[point].String());
 			needComma = true;
 		}
 	}
@@ -226,9 +227,9 @@ void CServerInfoPanel::UpdateMapCycleValue()
 	// add some elipses to show there is more maps
 	if (needComma)
 	{
-		strcat(nextMaps, ", ");
+		V_strcat_safe(nextMaps, ", ");
 	}
-	strcat(nextMaps, "...");
+	V_strcat_safe(nextMaps, "...");
 
 	// show in varlist
 	SetVarString("mapcycle", nextMaps);
@@ -253,8 +254,8 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 		}
 
 		// pull out the map name
-		const char *end = strstr(parse, "\n");
-		const char *end2 = strstr(parse, "\r");
+		const char *end = strchr(parse, '\n');
+		const char *end2 = strchr(parse, '\r');
 		if (end && end2 && end2 < end)
 		{
 			end = end2;
@@ -264,21 +265,20 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 
 		char customString[64];
 		intp nameSize = end - parse;
-		if (nameSize >= sizeof(customString))
+		if (nameSize >= ssize(customString))
 		{
-			nameSize = sizeof(customString) - 1;
+			nameSize = ssize(customString) - 1;
 		}
 
 		// copy in the name
-		strncpy(customString, parse, nameSize);
-		customString[nameSize] = 0;
+		// dimhotepus: Use V_strncpy
+		V_strncpy(customString, parse, nameSize);
 		parse = end;
 
 		// add to the list string that aren't comments
 		if (nameSize > 0 && !(customString[0] == '/' && customString[1] == '/'))
 		{
-			intp i = mapArray.AddToTail();
-			mapArray[i] = customString;
+			mapArray[mapArray.AddToTail()] = customString;
 		}
 	}
 }

@@ -18,7 +18,7 @@ void VCRHelpers::ErrorMessage(const char* message) {
 
 void* VCRHelpers::GetMainWindow() { return nullptr; }
 
-std::tuple<VCRHelpers, int> CreateVcrHelpers(ICommandLine* command_line) {
+std::tuple<VCRHelpers, int> CreateVcrHelpers(const ICommandLine* command_line) {
   const char* vcr_file_path;
   VCRHelpers vcr_helpers;
 

@@ -14,10 +14,12 @@
 // EditPathDlg.h : header file
 //
 
+#include "windows/base_dlg.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CEditPathDlg dialog
 
-class CEditPathDlg : public CDialog
+class CEditPathDlg : public CBaseDlg
 {
 // Construction
 public:

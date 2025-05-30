@@ -41,9 +41,12 @@ CHistory *GetHistory(void)
 CHistory::CHistory(void)
 {
 	static BOOL bFirst = TRUE;	// fake history is always first
-	Opposite = NULL;
 	CurTrack = NULL;
+	m_pDoc = NULL;
+	Opposite = NULL;
+	bUndo = FALSE;
 	bPaused = bFirst ? 2 : FALSE;	// if 2, never unpaused
+	uDataSize = 0;
 	bFirst = FALSE;
 	m_bActive = TRUE;
 }

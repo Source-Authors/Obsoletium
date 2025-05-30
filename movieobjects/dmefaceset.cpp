@@ -46,14 +46,14 @@ void CDmeFaceSet::SetMaterial( CDmeMaterial *pMaterial )
 	m_material = pMaterial;
 }
 
-int CDmeFaceSet::AddIndices( int nCount )
+intp CDmeFaceSet::AddIndices( intp nCount )
 {
-	int nCurrentCount = m_indices.Count();
+	intp nCurrentCount = m_indices.Count();
 	m_indices.EnsureCount( nCount + nCurrentCount );
 	return nCurrentCount;
 }
 
-void CDmeFaceSet::SetIndices( int nFirstIndex, int nCount, int *pIndices )
+void CDmeFaceSet::SetIndices( intp nFirstIndex, intp nCount, int *pIndices )
 {
 	m_indices.SetMultiple( nFirstIndex, nCount, pIndices );
 }
@@ -62,7 +62,7 @@ void CDmeFaceSet::SetIndices( int nFirstIndex, int nCount, int *pIndices )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void CDmeFaceSet::SetIndex( int i, int nValue )
+void CDmeFaceSet::SetIndex( intp i, int nValue )
 {
 	m_indices.Set( i, nValue );
 }
@@ -71,10 +71,10 @@ void CDmeFaceSet::SetIndex( int i, int nValue )
 //-----------------------------------------------------------------------------
 // Returns the number of triangulated indices
 //-----------------------------------------------------------------------------
-int CDmeFaceSet::GetNextPolygonVertexCount( int nFirstIndex ) const
+intp CDmeFaceSet::GetNextPolygonVertexCount( intp nFirstIndex ) const
 {
-	int nCurrIndex = nFirstIndex;
-	int nTotalCount = m_indices.Count();
+	intp nCurrIndex = nFirstIndex;
+	intp nTotalCount = m_indices.Count();
 	while( nCurrIndex < nTotalCount )
 	{
 		if ( m_indices[nCurrIndex] == -1 )
@@ -89,12 +89,12 @@ int CDmeFaceSet::GetNextPolygonVertexCount( int nFirstIndex ) const
 //-----------------------------------------------------------------------------
 // Returns the number of triangulated indices total
 //-----------------------------------------------------------------------------
-int CDmeFaceSet::GetTriangulatedIndexCount() const
+intp CDmeFaceSet::GetTriangulatedIndexCount() const
 {
-	int nIndexCount = 0;
-	int nVertexCount = 0;
-	int nTotalCount = m_indices.Count();
-	for ( int nCurrIndex = 0; nCurrIndex < nTotalCount; ++nCurrIndex )
+	intp nIndexCount = 0;
+	intp nVertexCount = 0;
+	intp nTotalCount = m_indices.Count();
+	for ( intp nCurrIndex = 0; nCurrIndex < nTotalCount; ++nCurrIndex )
 	{
 		if ( m_indices[nCurrIndex] == -1 )
 		{
@@ -121,13 +121,13 @@ int CDmeFaceSet::GetTriangulatedIndexCount() const
 //-----------------------------------------------------------------------------
 // Returns the number of indices total
 //-----------------------------------------------------------------------------
-int CDmeFaceSet::GetIndexCount() const
+intp CDmeFaceSet::GetIndexCount() const
 {
-	int nIndexCount = 0;
-	int nVertexCount = 0;
-	int nTotalCount = m_indices.Count();
+	intp nIndexCount = 0;
+	intp nVertexCount = 0;
+	intp nTotalCount = m_indices.Count();
 
-	for ( int nCurrIndex = 0; nCurrIndex < nTotalCount; ++nCurrIndex )
+	for ( intp nCurrIndex = 0; nCurrIndex < nTotalCount; ++nCurrIndex )
 	{
 		if ( m_indices[nCurrIndex] == -1 )
 		{
@@ -148,7 +148,7 @@ int CDmeFaceSet::GetIndexCount() const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void CDmeFaceSet::RemoveMultiple( int elem, int num )
+void CDmeFaceSet::RemoveMultiple( intp elem, intp num )
 {
 	m_indices.RemoveMultiple( elem, num );
 }
@@ -157,13 +157,13 @@ void CDmeFaceSet::RemoveMultiple( int elem, int num )
 //-----------------------------------------------------------------------------
 // Returns the number of faces in the face set
 //-----------------------------------------------------------------------------
-int CDmeFaceSet::GetFaceCount() const
+intp CDmeFaceSet::GetFaceCount() const
 {
-	int nFaceCount = 0;
-	int nVertexCount = 0;
+	intp nFaceCount = 0;
+	intp nVertexCount = 0;
 
-	const int nIndexCount = NumIndices();
-	for ( int i = 0; i < nIndexCount; ++i )
+	const intp nIndexCount = NumIndices();
+	for ( intp i = 0; i < nIndexCount; ++i )
 	{
 		if ( GetIndex( i ) < 0 )
 		{

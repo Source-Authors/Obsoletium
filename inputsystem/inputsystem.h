@@ -377,7 +377,7 @@ public:
 	// Current action set
 	GameActionSet_t m_currentActionSet[STEAM_CONTROLLER_MAX_COUNT];
 
-	DWORD m_StartupTimeTick;
+	unsigned long long m_StartupTimeTick;
 	int m_nLastPollTick;
 	int m_nLastSampleTick;
 	int m_nPollCount;

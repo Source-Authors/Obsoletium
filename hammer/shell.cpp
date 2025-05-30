@@ -6,10 +6,10 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "Shell.h"
 #include "MainFrm.h"
 #include "MapDoc.h"
 #include "MapEntity.h"
-#include "Shell.h"
 #include "hammer.h"
 #include "filesystem_helpers.h"
 
@@ -60,14 +60,6 @@ ShellDispatchTable_t CShell::m_DispatchTable[] =
 CShell::CShell(void)
 {
 	m_pDoc = NULL;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Destructor.
-//-----------------------------------------------------------------------------
-CShell::~CShell(void)
-{
 }
 
 
@@ -124,14 +116,21 @@ bool CShell::DoVersionCheck(const char *pszArguments)
 	if (m_pDoc != NULL)
 	{
 		char szEngineMapPath[MAX_PATH];
+		szEngineMapPath[0] = '\0';
+
 		int nEngineMapVersion;
 
-		if (sscanf(pszArguments, "%s %d", szEngineMapPath, &nEngineMapVersion) == 2)
+		if (sscanf(pszArguments, "%259s %d", szEngineMapPath, &nEngineMapVersion) == 2)
 		{
+			szEngineMapPath[ssize(szEngineMapPath) - 1] = '\0';
 			char szEngineMapName[MAX_PATH];
+			szEngineMapName[0] = '\0';
+
 			_splitpath(szEngineMapPath, NULL, NULL, szEngineMapName, NULL);
 
 			char szDocName[MAX_PATH];
+			szDocName[0] = '\0';
+
 			_splitpath(m_pDoc->GetPathName(), NULL, NULL, szDocName, NULL);
 
 			int nDocVersion = m_pDoc->GetDocVersion();
@@ -183,8 +182,9 @@ bool CShell::EntityCreate(const char *pszCommand, const char *pszArguments)
 		float z;
 		char szClassName[MAX_PATH];
 
-		if (sscanf(pszArguments, "%s %f %f %f", szClassName, &x, &y, &z) == 4)
+		if (sscanf(pszArguments, "%259s %f %f %f", szClassName, &x, &y, &z) == 4)
 		{
+			szClassName[ssize(szClassName) - 1] = '\0';
 			bool bCreated = (m_pDoc->CreateEntity(szClassName, x, y, z) != NULL);
 			return(bCreated);
 		}
@@ -209,8 +209,9 @@ bool CShell::EntityDelete(const char *pszCommand, const char *pszArguments)
 		float z;
 		char szClassName[MAX_PATH];
 
-		if (sscanf(pszArguments, "%s %f %f %f", szClassName, &x, &y, &z) == 4)
+		if (sscanf(pszArguments, "%259s %f %f %f", szClassName, &x, &y, &z) == 4)
 		{
+			szClassName[ssize(szClassName) - 1] = '\0';
 			bool bDeleted = m_pDoc->DeleteEntity(szClassName, x, y, z);
 			return(bDeleted);
 		}
@@ -253,15 +254,17 @@ bool CShell::EntityRotateIncremental(const char *pszCommand, const char *pszArgu
 		}
 		if ( arg == NUM_ROTATE_INCREMENTAL_ARGS )
 		{
-			x = atof(szArgs[1]);
-			y = atof(szArgs[2]);
-			z = atof(szArgs[3]);
+			// dimhotepus: atof -> strtof.
+			x = strtof(szArgs[1], nullptr);
+			y = strtof(szArgs[2], nullptr);
+			z = strtof(szArgs[3], nullptr);
 			CMapEntity *pEntity = m_pDoc->FindEntity(szArgs[0], x, y, z);
 			if (pEntity != NULL)
 			{
-				rotation.x = atof(szArgs[4]);
-				rotation.y = atof(szArgs[5]);
-				rotation.z = atof(szArgs[6]);
+				// dimhotepus: atof -> strtof.
+				rotation.x = strtof(szArgs[4], nullptr);
+				rotation.y = strtof(szArgs[5], nullptr);
+				rotation.z = strtof(szArgs[6], nullptr);
 				RotateMapEntity( pEntity, rotation );
 				return true;
 			}
@@ -300,16 +303,20 @@ bool CShell::EntitySetKeyValue(const char *pszCommand, const char *pszArguments)
 		}
 		if ( arg == NUM_KEY_VALUE_ARGS )
 		{
-			x = atof(szArgs[1]);
-			y = atof(szArgs[2]);
-			z = atof(szArgs[3]);
+			// dimhotepus: atof -> strtof.
+			x = strtof(szArgs[1], nullptr);
+			y = strtof(szArgs[2], nullptr);
+			z = strtof(szArgs[3], nullptr);
 			CMapEntity *pEntity = m_pDoc->FindEntity(szArgs[0], x, y, z);
 			if (pEntity != NULL)
 			{
 				if ( !Q_stricmp( szArgs[4], "origin" ) )
 				{
 					Vector origin;
-					sscanf(szArgs[5], "%f %f %f", &origin[0], &origin[1], &origin[2]);
+					[[maybe_unused]] const int scanned =
+						sscanf(szArgs[5], "%f %f %f", &origin[0], &origin[1], &origin[2]);
+					Assert(scanned == 3);
+
 					Vector oldOrigin;
 					pEntity->GetOrigin( oldOrigin );
 					pEntity->TransMove(origin - oldOrigin);
@@ -317,7 +324,9 @@ bool CShell::EntitySetKeyValue(const char *pszCommand, const char *pszArguments)
 				else if ( pEntity->IsSolidClass() && !Q_stricmp( szArgs[4], "angles" ) )
 				{
 					QAngle angles;
-					sscanf(szArgs[5], "%f %f %f", &angles[0], &angles[1], &angles[2]);
+					[[maybe_unused]] const int scanned =
+						sscanf(szArgs[5], "%f %f %f", &angles[0], &angles[1], &angles[2]);
+					Assert(scanned == 3);
 					
 					// build a relative transform from the previous state to the current state
 					// NOTE: This only works once since solid classes destructively modify transform info (GetAngles always returns identity)
@@ -361,8 +370,9 @@ bool CShell::NodeCreate(const char *pszCommand, const char *pszArguments)
 		int nID;
 		char szClassName[MAX_PATH];
 
-		if (sscanf(pszArguments, "%s %d %f %f %f", szClassName, &nID, &x, &y, &z) == 5)
+		if (sscanf(pszArguments, "%259s %d %f %f %f", szClassName, &nID, &x, &y, &z) == 5)
 		{
+			szClassName[ssize(szClassName) - 1] = '\0';
 			m_pDoc->SetNextNodeID(nID);
 			m_pDoc->CreateEntity(szClassName, x, y, z);
 
@@ -387,12 +397,13 @@ bool CShell::NodeDelete(const char *pszCommand, const char *pszArguments)
 	if ((m_pDoc != NULL) && m_pDoc->IsShellSessionActive())
 	{
 		char szID[80];
-		if (sscanf(pszArguments, "%s", szID) == 1)
+		if (sscanf(pszArguments, "%79s", szID) == 1)
 		{
+			szID[ssize(szID) - 1] = '\0';
 			CMapEntityList Found;
 			if (m_pDoc->FindEntitiesByKeyValue(Found, "nodeid", szID, false))
 			{
-                FOR_EACH_OBJ( Found, pos )
+				FOR_EACH_OBJ( Found, pos )
 				{
 					CMapEntity *pEntity = Found.Element(pos);
 					m_pDoc->DeleteObject(pEntity);
@@ -419,8 +430,11 @@ bool CShell::NodeLinkCreate(const char *pszCommand, const char *pszArguments)
 		char szIDStart[80];
 		char szIDEnd[80];
 
-		if (sscanf(pszArguments, "%s %s", szIDStart, szIDEnd) == 2)
+		if (sscanf(pszArguments, "%79s %79s", szIDStart, szIDEnd) == 2)
 		{
+			szIDStart[ssize(szIDStart) - 1] = '\0';
+			szIDEnd[ssize(szIDEnd) - 1] = '\0';
+
 			//
 			// It doesn't matter where we place it because it will move to the midpoint of the
 			// start and end entities.
@@ -453,10 +467,16 @@ bool CShell::NodeLinkDelete(const char *pszCommand, const char *pszArguments)
 	if ((m_pDoc != NULL) && m_pDoc->IsShellSessionActive())
 	{
 		char szIDStart[80];
-		char szIDEnd[80];
+		szIDStart[0] = '\0';
 
-		if (sscanf(pszArguments, "%s %s", szIDStart, szIDEnd) == 2)
+		char szIDEnd[80];
+		szIDEnd[0] = '\0';
+
+		if (sscanf(pszArguments, "%79s %79s", szIDStart, szIDEnd) == 2)
 		{
+			szIDStart[ssize(szIDStart) - 1] = '\0';
+			szIDEnd[ssize(szIDEnd) - 1] = '\0';
+
 			//
 			// Look for info_node_link entities with the appropriate start/end keys.
 			//

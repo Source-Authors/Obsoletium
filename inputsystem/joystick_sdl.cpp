@@ -116,7 +116,7 @@ void joy_gamecontroller_config_changed_f( IConVar *var, const char *pOldValue, f
 //-----------------------------------------------------------------------------
 // Handle the events coming from the GameController SDL subsystem.
 //-----------------------------------------------------------------------------
-bool SDLCALL JoystickSDLWatcher( void *userInfo, SDL_Event *event )
+bool SDLCALL JoystickSDLWatcher( void *userInfo, SDL_Event *event ) //-V2009
 {
 	CInputSystem *pInputSystem = (CInputSystem *)userInfo;
 	Assert(pInputSystem != NULL);
@@ -451,7 +451,7 @@ void CInputSystem::JoystickAxisMotion( unsigned joystickId, uint8 axis, int16 va
 	if ( buttonCode != BUTTON_CODE_NONE )
 	{
 		int pressThreshold = static_cast<int>(joy_axisbutton_threshold.GetFloat() * 32767);
-		int keyIndex = buttonCode - KEY_XBUTTON_LTRIGGER;
+		auto keyIndex = to_underlying(buttonCode) - to_underlying(KEY_XBUTTON_LTRIGGER);
 		Assert( keyIndex < ssize( m_appXKeys[0] ) && keyIndex >= 0 );
 
 		appKey_t &key = m_appXKeys[0][keyIndex];
@@ -477,11 +477,11 @@ void CInputSystem::JoystickAxisMotion( unsigned joystickId, uint8 axis, int16 va
 	}
 
 	InputState_t& state = m_InputState[ m_bIsPolling ];
-	state.m_pAnalogDelta[ code ] = value - state.m_pAnalogValue[ code ];
-	state.m_pAnalogValue[ code ] = value;
-	if ( state.m_pAnalogDelta[ code ] != 0 )
+	state.m_pAnalogDelta[ to_underlying(code) ] = value - state.m_pAnalogValue[ to_underlying(code) ];
+	state.m_pAnalogValue[ to_underlying(code) ] = value;
+	if ( state.m_pAnalogDelta[ to_underlying(code) ] != 0 )
 	{
-		PostEvent(IE_AnalogValueChanged, m_nLastSampleTick, code, value, 0);
+		PostEvent(to_underlying(IE_AnalogValueChanged), m_nLastSampleTick, to_underlying(code), value, 0);
 	}
 }
 
@@ -585,7 +585,7 @@ ButtonCode_t ControllerButtonToButtonCode( SDL_GamepadButton button )
 		case SDL_GAMEPAD_BUTTON_EAST: // KEY_XBUTTON_B
 		case SDL_GAMEPAD_BUTTON_WEST: // KEY_XBUTTON_X
 		case SDL_GAMEPAD_BUTTON_NORTH: // KEY_XBUTTON_Y
-			return JOYSTICK_BUTTON(0, button);
+			return JOYSTICK_BUTTON(0, to_underlying(button));
 
 		case SDL_GAMEPAD_BUTTON_BACK:
 			return KEY_XBUTTON_BACK;

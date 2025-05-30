@@ -11,9 +11,9 @@
 #endif
 
 #include "mxtk/mxListView.h"
-#include "commctrl.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
 #include "faceposertoolwindow.h"
+#include <commctrl.h>
 
 class CWaveFile;
 class CWaveList;

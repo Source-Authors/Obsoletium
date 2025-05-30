@@ -506,7 +506,7 @@ int CAI_BehaviorBase::RestoreBehaviors(IRestore &restore, CAI_BehaviorBase **ppB
 			for ( int i = 0; i < nToRestore; i++ )
 			{
 				restore.StartBlock();
-				restore.ReadString( szClassNameCurrent, sizeof( szClassNameCurrent ), 0 );
+				restore.ReadString( szClassNameCurrent, 0 );
 				bool bIsCurrent;
 				restore.ReadBool( &bIsCurrent );
 

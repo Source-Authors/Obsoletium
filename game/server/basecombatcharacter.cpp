@@ -353,8 +353,7 @@ bool CBaseCombatCharacter::FVisible( CBaseEntity *pEntity, int traceMask, CBaseE
 		cacheEntry.pEntity2 = this;
 	}
 
-	int iCache = g_VisibilityCache.Find( cacheEntry );
-
+	auto iCache = g_VisibilityCache.Find( cacheEntry );
 	if ( iCache != g_VisibilityCache.InvalidIndex() )
 	{
 		if ( gpGlobals->curtime - g_VisibilityCache[iCache].time < VIS_CACHE_ENTRY_LIFE )
@@ -424,7 +423,7 @@ void CBaseCombatCharacter::ResetVisibilityCache( CBaseCombatCharacter *pBCC )
 		return;
 	}
 
-	int i = g_VisibilityCache.FirstInorder();
+	auto i = g_VisibilityCache.FirstInorder();
 	CUtlVector<unsigned short> removals;
 	while ( i != g_VisibilityCache.InvalidIndex() )
 	{
@@ -435,9 +434,9 @@ void CBaseCombatCharacter::ResetVisibilityCache( CBaseCombatCharacter *pBCC )
 		i = g_VisibilityCache.NextInorder( i );
 	}
 
-	for ( i = 0; i < removals.Count(); i++ )
+	for ( auto r : removals )
 	{
-		g_VisibilityCache.RemoveAt( removals[i] );
+		g_VisibilityCache.RemoveAt( r );
 	}
 }
 
@@ -1093,7 +1092,7 @@ CBaseEntity *CBaseCombatCharacter::CheckTraceHullAttack( float flDist, const Vec
 	// The ideal place to start the trace is in the center of the attacker's bounding box.
 	// however, we need to make sure there's enough clearance. Some of the smaller monsters aren't 
 	// as big as the hull we try to trace with. (SJB)
-	float flVerticalOffset = WorldAlignSize().z * 0.5;
+	float flVerticalOffset = WorldAlignSize().z * 0.5f;
 
 	if( flVerticalOffset < maxs.z )
 	{
@@ -2376,7 +2375,7 @@ int CBaseCombatCharacter::OnTakeDamage( const CTakeDamageInfo &info )
 	if ( info.GetDamageType() & DMG_SHOCK )
 	{
 		g_pEffects->Sparks( info.GetDamagePosition(), 2, 2 );
-		UTIL_Smoke( info.GetDamagePosition(), random->RandomInt( 10, 15 ), 10 );
+		UTIL_Smoke( info.GetDamagePosition(), random->RandomFloat( 10, 15 ), 10 );
 	}
 
 	// track damage history

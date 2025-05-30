@@ -5,11 +5,12 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <ctype.h>
+#include <vgui_controls/ListViewPanel.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/MouseCode.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include <vgui/IInput.h>
@@ -22,7 +23,6 @@
 #include <vgui_controls/ImagePanel.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/TextImage.h>
-#include <vgui_controls/ListViewPanel.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -302,8 +302,8 @@ void ListViewPanel::ScrollToItem(int itemID)
 	int maxColVisible = wide / maxWidth;
 	int itemsPerCol = GetItemsPerColumn();
 
-	int itemIndex = m_SortedItems.Find(itemID);
-	int desiredCol = itemIndex / itemsPerCol;
+	intp itemIndex = m_SortedItems.Find(itemID);
+	intp desiredCol = itemIndex / itemsPerCol;
 	if (desiredCol < val || desiredCol >= (val + maxColVisible) )
 	{
 		m_hbar->SetValue(desiredCol);
@@ -747,8 +747,8 @@ void ListViewPanel::OnShiftSelect(int itemID)
 	}
 
 	// find out if the just pressed item is "earlier" or is the 'last selected item' 
-	int lowerPos = -1, upperPos = -1;
-	int i;
+	intp lowerPos = -1, upperPos = -1;
+	intp i;
 	for ( i = 0 ; i < m_SortedItems.Count() ; i++ )
 	{
 		if ( m_SortedItems[i] == itemID )
@@ -901,7 +901,7 @@ void ListViewPanel::OnKeyCodeTyped( KeyCode code )
 
 		case KEY_UP:
 		{
-			int itemPos = m_SortedItems.Find( m_LastSelectedItemID );
+			intp itemPos = m_SortedItems.Find( m_LastSelectedItemID );
 			itemPos--;
 			if (itemPos < 0)
 				itemPos = 0;
@@ -912,7 +912,7 @@ void ListViewPanel::OnKeyCodeTyped( KeyCode code )
 		
 		case KEY_DOWN:
 		{
-			int itemPos = m_SortedItems.Find( m_LastSelectedItemID );
+			intp itemPos = m_SortedItems.Find( m_LastSelectedItemID );
 			itemPos++;
 			if (itemPos >= m_DataItems.Count())
 				itemPos = m_DataItems.Count() - 1;
@@ -923,7 +923,7 @@ void ListViewPanel::OnKeyCodeTyped( KeyCode code )
 
 		case KEY_LEFT:
 		{
-			int itemPos = m_SortedItems.Find( m_LastSelectedItemID );
+			intp itemPos = m_SortedItems.Find( m_LastSelectedItemID );
 			itemPos -= GetItemsPerColumn();
 			if (itemPos < 0)
 			{
@@ -935,7 +935,7 @@ void ListViewPanel::OnKeyCodeTyped( KeyCode code )
 
 		case KEY_RIGHT:
 		{
-			int itemPos = m_SortedItems.Find( m_LastSelectedItemID );
+			intp itemPos = m_SortedItems.Find( m_LastSelectedItemID );
 			itemPos += GetItemsPerColumn();
 			if (itemPos >= m_SortedItems.Count())
 			{
@@ -958,7 +958,7 @@ void ListViewPanel::OnKeyCodeTyped( KeyCode code )
 			int maxColVisible = wide / maxWidth;
 			int delta = maxColVisible * GetItemsPerColumn();
 
-			int itemPos = m_SortedItems.Find( m_LastSelectedItemID );
+			intp itemPos = m_SortedItems.Find( m_LastSelectedItemID );
 			itemPos -= delta;
 			if (itemPos < 0)
 			{
@@ -981,7 +981,7 @@ void ListViewPanel::OnKeyCodeTyped( KeyCode code )
 			int maxColVisible = wide / maxWidth;
 			int delta = maxColVisible * GetItemsPerColumn();
 
-			int itemPos = m_SortedItems.Find( m_LastSelectedItemID );
+			intp itemPos = m_SortedItems.Find( m_LastSelectedItemID );
 			itemPos += delta;
 			if (itemPos >= m_SortedItems.Count())
 			{
@@ -1011,10 +1011,10 @@ void ListViewPanel::OnKeyTyped(wchar_t unichar)
 		uniString[1] = 0;
 
 		char buf[2];
-		g_pVGuiLocalize->ConvertUnicodeToANSI(uniString, buf, sizeof(buf));
+		g_pVGuiLocalize->ConvertUnicodeToANSI(uniString, buf);
 
-		int i; 
-		int itemPos = m_SortedItems.Find(m_LastSelectedItemID);
+		intp i; 
+		intp itemPos = m_SortedItems.Find(m_LastSelectedItemID);
 		if ( m_SortedItems.IsValidIndex(itemPos))
 		{
 			itemPos++;

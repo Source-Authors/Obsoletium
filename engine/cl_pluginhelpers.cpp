@@ -190,8 +190,8 @@ void CPluginGameUIDialog::OnCommand( const char *cmd )
 
 			char userCMD[ 512 ];
 			char entryText[ 255 ];
-			m_Entry->GetText( entryText, sizeof(entryText) );
-			Q_snprintf( userCMD, sizeof(userCMD), "%s %s\n", m_szEntryCommand, entryText );
+			m_Entry->GetText( entryText );
+			V_sprintf_safe( userCMD, "%s %s\n", m_szEntryCommand, entryText );
 			
 			// Only let them run commands marked with FCVAR_CLIENTCMD_CAN_EXECUTE.
 			Cbuf_AddTextWithMarkers( eCmdExecutionMarker_Enable_FCVAR_CLIENTCMD_CAN_EXECUTE, userCMD, eCmdExecutionMarker_Disable_FCVAR_CLIENTCMD_CAN_EXECUTE );

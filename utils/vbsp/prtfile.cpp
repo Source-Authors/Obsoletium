@@ -8,6 +8,8 @@
 
 #include "vbsp.h"
 #include "collisionutils.h"
+#include "bspflags.h"
+
 /*
 ==============================================================================
 
@@ -233,7 +235,7 @@ void NumberLeafs( const CUtlVector<node_t *> &leaves )
 	for ( int i = 0; i < g_VisClusters.Count(); i++ )
 	{
 		char name[256];
-		sprintf(name, "u:\\main\\game\\ep2\\maps\\vis_%02d.gl", i );
+		V_sprintf_safe(name, "u:\\main\\game\\ep2\\maps\\vis_%02d.gl", i );
 		FileHandle_t fp = g_pFileSystem->Open( name, "w" );
 		Msg("Writing %s\n", name );
 		for ( bspbrush_t *pBrush = g_VisClusters[i].pBrushes; pBrush; pBrush = pBrush->next )
@@ -324,12 +326,12 @@ void WritePortalFile (tree_t *tree)
 {
 	char	filename[1024];
 	node_t *headnode;
-	int start = Plat_FloatTime();
+	double start = Plat_FloatTime();
 
 	qprintf ("--- WritePortalFile ---\n");
 
-	sprintf (filename, "%s.prt", source);
-	Msg ("writing %s...", filename);
+	V_sprintf_safe (filename, "%s.prt", source);
+	Msg ("writing %s...\n", filename);
 
 	headnode = tree->headnode;
 
@@ -340,7 +342,7 @@ void WritePortalFile (tree_t *tree)
 
 // set the cluster field in every leaf and count the total number of portals
 	num_visclusters = 0;
-	Msg("Building visibility clusters...\n");
+	Msg("Building visibility clusters...");
 	CUtlVector<node_t *> leaves;
 	BuildVisLeafList_r( headnode, leaves );
 
@@ -369,6 +371,7 @@ void WritePortalFile (tree_t *tree)
 	clusterleaf = 1;
 	SaveClusters_r (headnode);
 
-	Msg("done (%d)\n", (int)(Plat_FloatTime() - start) );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
+	Msg("\n");
 }
 

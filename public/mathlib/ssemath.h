@@ -55,15 +55,15 @@ struct alignas(16) intx4 : public CAlignedNewDelete<16>
 {
 	int32 m_i32[4];
 
-	inline int & operator[](int which)
+	inline int & operator[](int which) //-V302
 	{
-		Assert( which >= 0 && which < 4 );
+		Assert( which >= 0 && which < 4 ); //-V112
 		return m_i32[which];
 	}
 
-	inline const int & operator[](int which) const
+	inline const int & operator[](int which) const //-V302
 	{
-		Assert( which >= 0 && which < 4 );
+		Assert( which >= 0 && which < 4 ); //-V112
 		return m_i32[which];
 	}
 
@@ -1037,7 +1037,7 @@ FORCEINLINE fltx4 XM_CALLCONV LoadUnalignedSIMD( const void *pSIMD )
 }
 
 [[nodiscard]]
-FORCEINLINE fltx4 XM_CALLCONV LoadUnaligned3SIMD( const void *pSIMD )
+FORCEINLINE fltx4 XM_CALLCONV LoadUnaligned3SIMD( const void *pSIMD ) //-V524
 {
 	return _mm_loadu_ps( reinterpret_cast<const float *>( pSIMD ) );
 }
@@ -1047,27 +1047,27 @@ FORCEINLINE fltx4 XM_CALLCONV LoadUnaligned3SIMD( const void *pSIMD )
 /// replicate a single 32 bit integer value to all 4 components of an m128
 [[nodiscard]]
 FORCEINLINE fltx4 XM_CALLCONV ReplicateIX4(uint32_t i) {
-	return DirectX::XMVectorReplicateInt( i );
+	return DirectX::XMVectorReplicateInt( i ); //-V2002
 }
 
 
 [[nodiscard]]
 FORCEINLINE fltx4 XM_CALLCONV ReplicateX4(float flValue) {
-	return DirectX::XMVectorReplicate( flValue );
+	return DirectX::XMVectorReplicate( flValue ); //-V2002
 }
 
 // Performance loss. Use with care.
 [[nodiscard]]
 FORCEINLINE float XM_CALLCONV SubFloat( const fltx4& a, size_t idx )
 {
-	return DirectX::XMVectorGetByIndex( a, idx );
+	return DirectX::XMVectorGetByIndex( a, idx ); //-V2002
 }
 
 // Performance loss. Use with care.
 [[nodiscard]]
 FORCEINLINE float& XM_CALLCONV SubFloat( fltx4 & a, size_t idx )
 {
-	Assert( idx < 4 );
+	Assert( idx < 4 ); //-V112
 
 	return (reinterpret_cast<float *>(&a))[idx];
 }
@@ -1082,14 +1082,14 @@ FORCEINLINE uint32 XM_CALLCONV SubFloatConvertToInt( DirectX::FXMVECTOR a, size_
 [[nodiscard]]
 FORCEINLINE uint32 XM_CALLCONV SubInt( const fltx4& a, size_t idx )
 {
-	return DirectX::XMVectorGetIntByIndex( a, idx );
+	return DirectX::XMVectorGetIntByIndex( a, idx ); //-V2002
 }
 
 // Performance loss. Use with care.
 [[nodiscard]]
 FORCEINLINE uint32& XM_CALLCONV SubInt( fltx4 & a, size_t idx )
 {
-	Assert( idx < 4 );
+	Assert( idx < 4 ); //-V112
 
 	return (reinterpret_cast<uint32 *>(&a))[idx];
 }
@@ -1215,7 +1215,7 @@ FORCEINLINE fltx4 XM_CALLCONV RotateRight( DirectX::FXMVECTOR a )
 
 // a b c d -> c d a b
 [[nodiscard]]
-FORCEINLINE fltx4 XM_CALLCONV RotateRight2( DirectX::FXMVECTOR a )
+FORCEINLINE fltx4 XM_CALLCONV RotateRight2( DirectX::FXMVECTOR a ) //-V524
 {
 	return DirectX::XMVectorSwizzle<
 		DirectX::XM_SWIZZLE_Z,
@@ -1704,13 +1704,13 @@ public:
 	}
 
 	[[nodiscard]]
-	FORCEINLINE fltx4 const & XM_CALLCONV operator[](int idx) const
+	FORCEINLINE fltx4 const & XM_CALLCONV operator[](int idx) const //-V302
 	{
 		return *((&x)+idx);
 	}
 	
 	[[nodiscard]]
-	FORCEINLINE fltx4 & XM_CALLCONV operator[](int idx)
+	FORCEINLINE fltx4 & XM_CALLCONV operator[](int idx) //-V302
 	{
 		return *((&x)+idx);
 	}
@@ -2408,13 +2408,13 @@ FORCEINLINE fltx4 XM_CALLCONV InvRSquared( DirectX::FXMVECTOR v )
 [[nodiscard]]
 FORCEINLINE vec_t XM_CALLCONV InvRSquared( Vector v )
 {
-	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat3( v.XmBase() ) ) );
+	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat3( v.XmBase() ) ) ); //-V2002
 }
 
 [[nodiscard]]
 FORCEINLINE vec_t XM_CALLCONV InvRSquared( VectorAligned v )
 {
-	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat4A( v.XmBase() ) ) );
+	return DirectX::XMVectorGetX( InvRSquared( DirectX::XMLoadFloat4A( v.XmBase() ) ) ); //-V2002
 }
 
 inline void XM_CALLCONV VectorNegate( DirectX::XMFLOAT4 *v )

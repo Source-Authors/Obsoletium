@@ -66,7 +66,7 @@ private:
 
 	HFONT m_hFonts[ 4 ];  // normal, italic, bold, bold + italic
 
-	int									m_nLastItemCount;
+	intp								m_nLastItemCount;
 };
 
 extern CloseCaptionTool	*g_pCloseCaptionTool;

@@ -318,7 +318,7 @@ void WheelDustCallback( const CEffectData &data )
 		pParticle->m_uchEndAlpha	= 0;
 		pParticle->m_uchStartSize	= random->RandomInt( 16, 24 ) * data.m_flScale;
 		pParticle->m_uchEndSize		= random->RandomInt( 32, 48 ) * data.m_flScale;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -2.0f, 2.0f );
 	}
 }

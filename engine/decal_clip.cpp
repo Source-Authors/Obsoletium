@@ -111,7 +111,7 @@ static inline int SHClip( CDecalVert *pDecalClipVerts, int vertCount, CDecalVert
 	return outCount;
 }
 
-const float DECAL_CLIP_EPSILON = 0.01f;
+constexpr float DECAL_CLIP_EPSILON = 0.01f;
 
 CDecalVert* R_DoDecalSHClip( CDecalVert *pInVerts, CDecalVert *pOutVerts, decal_t *pDecal, int nStartVerts, const Vector &vecNormal )
 {
@@ -141,7 +141,7 @@ CDecalVert* R_DoDecalSHClip( CDecalVert *pInVerts, CDecalVert *pOutVerts, decal_
 	{
 		VectorMA( pOutVerts[i].m_vPos, OVERLAY_AVOID_FLICKER_NORMAL_OFFSET, vecNormal, pOutVerts[i].m_vPos );
 	}
-	if ( outCount && pDecal->material->InMaterialPage() )
+	if ( pDecal->material->InMaterialPage() )
 	{
 		float offset[2], scale[2];
 		pDecal->material->GetMaterialOffset( offset );

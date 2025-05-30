@@ -165,64 +165,69 @@ void CCreateMultiplayerGameServerPage::OnApplyChanges()
 //-----------------------------------------------------------------------------
 void CCreateMultiplayerGameServerPage::LoadMaps( const char *pszPathID )
 {
-	FileFindHandle_t findHandle = NULL;
-
 	KeyValues *hiddenMaps = ModInfo().GetHiddenMaps();
-
+	
+	FileFindHandle_t findHandle = NULL;
+	char mapname[256];
+	bool firstTime = true;
 	const char *pszFilename = g_pFullFileSystem->FindFirstEx( "maps/*.bsp", pszPathID, &findHandle );
 	while ( pszFilename )
 	{
-		char mapname[256];
-		char *ext, *str;
+		if (!firstTime)
+		{
+			// get the next file (except first time when already has file).
+			pszFilename = g_pFullFileSystem->FindNext( findHandle );
+			if (!pszFilename) break;
+		}
+		else 
+		{
+			firstTime = false;
+		}
 
 		// FindFirst ignores the pszPathID, so check it here
 		// TODO: this doesn't find maps in fallback dirs
-		_snprintf( mapname, sizeof(mapname), "maps/%s", pszFilename );
+		V_sprintf_safe( mapname, "maps/%s", pszFilename );
 		if ( !g_pFullFileSystem->FileExists( mapname, pszPathID ) )
 		{
-			goto nextFile;
+			continue;
 		}
 
 		// remove the text 'maps/' and '.bsp' from the file name to get the map name
 		
-		str = Q_strstr( pszFilename, "maps" );
+		char *str = Q_strstr(pszFilename, "maps");
 		if ( str )
 		{
-			strncpy( mapname, str + 5, sizeof(mapname) - 1 );	// maps + \\ = 5
+			V_strcpy_safe( mapname, str + 5 );	// maps + \\ = 5
 		}
 		else
 		{
-			strncpy( mapname, pszFilename, sizeof(mapname) - 1 );
+			V_strcpy_safe( mapname, pszFilename );
 		}
-		ext = Q_strstr( mapname, ".bsp" );
+
+		char *ext = Q_strstr( mapname, ".bsp" );
 		if ( ext )
 		{
-			*ext = 0;
+			continue;
 		}
 
 		//!! hack: strip out single player HL maps
 		// this needs to be specified in a seperate file
-		if ( !stricmp( ModInfo().GetGameName(), "Half-Life" ) && ( mapname[0] == 'c' || mapname[0] == 't') && mapname[2] == 'a' && mapname[1] >= '0' && mapname[1] <= '5' )
+		if ( !stricmp( ModInfo().GetGameName(), "Half-Life" ) &&
+			( mapname[0] == 'c' || mapname[0] == 't') && mapname[2] == 'a' && mapname[1] >= '0' && mapname[1] <= '5' )
 		{
-			goto nextFile;
+			continue;
 		}
 
 		// strip out maps that shouldn't be displayed
-		if ( hiddenMaps )
+		if ( hiddenMaps && hiddenMaps->GetInt( mapname, 0 ) )
 		{
-			if ( hiddenMaps->GetInt( mapname, 0 ) )
-			{
-				goto nextFile;
-			}
+			continue;
 		}
 
 		// add to the map list
-		m_pMapList->AddItem( mapname, new KeyValues( "data", "mapname", mapname ) );
-
-		// get the next file
-	nextFile:
-		pszFilename = g_pFullFileSystem->FindNext( findHandle );
+		m_pMapList->AddItem( mapname, KeyValuesAD(new KeyValues( "data", "mapname", mapname )) );
 	}
+
 	g_pFullFileSystem->FindClose( findHandle );
 }
 
@@ -237,7 +242,7 @@ void CCreateMultiplayerGameServerPage::LoadMapList()
 	m_pMapList->DeleteAllItems();
 
 	// add special "name" to represent loading a randomly selected map
-	m_pMapList->AddItem( RANDOM_MAP, new KeyValues( "data", "mapname", RANDOM_MAP ) );
+	m_pMapList->AddItem( RANDOM_MAP, KeyValuesAD(new KeyValues( "data", "mapname", RANDOM_MAP )) );
 
 	// Load the GameDir maps
 	LoadMaps( "GAME" ); 

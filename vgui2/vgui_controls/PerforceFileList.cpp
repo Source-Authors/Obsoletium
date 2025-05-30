@@ -6,15 +6,18 @@
 //===========================================================================//
 
 #include <vgui_controls/PerforceFileList.h>
+
+#include "filesystem.h"
+#include "tier1/KeyValues.h"
+// dimhotepus: No perforce
+// #include "p4lib/ip4.h"
+#include "tier2/tier2.h"
+
 #include <vgui_controls/ListPanel.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/ImageList.h>
-#include "tier1/KeyValues.h"
+
 #include <vgui/ISurface.h>
-#include "filesystem.h"
-// dimhotepus: No perforce
-//#include "p4lib/ip4.h"
-#include "tier2/tier2.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -137,7 +140,7 @@ PerforceFileList::PerforceFileList( Panel *pParent, const char *pPanelName ) :
 	m_bShowDeletedFiles = false;
 
 	// list panel
-	for ( intp i = 0; i < static_cast<intp>(std::size( g_ColInfo )); ++i )
+	for ( int i = 0; i < ssize( g_ColInfo ); ++i )
 	{
 		const ColumnInfo_t& info = g_ColInfo[ i ];
 
@@ -201,7 +204,7 @@ void PerforceFileList::ShowDeletedFiles( bool bShowDeletedFiles )
 void PerforceFileList::AddItemToDirectoryList( const char *pFullPath, int nItemID, bool bIsDirectory )
 {
 	char pDirectoryBuf[MAX_PATH];
-	Q_ExtractFilePath( pFullPath, pDirectoryBuf, sizeof(pDirectoryBuf) );
+	V_ExtractFilePath( pFullPath, pDirectoryBuf );
 	Q_StripTrailingSlash( pDirectoryBuf ); 
 	pFullPath = pDirectoryBuf;
 
@@ -236,7 +239,7 @@ int PerforceFileList::AddFileToFileList( const char *pFullPath, bool bExistsOnDi
 	bool bIsFileWriteable = bExistsOnDisk ? g_pFullFileSystem->IsFileWritable( pFullPath, NULL ) : true;
 
 	// add the file to the list
-	KeyValues *kv = new KeyValues("item");
+	KeyValuesAD kv("item");
 
 	const char *pRelativePath = Q_UnqualifiedFileName( pFullPath );
 	kv->SetString( "text", pRelativePath );
@@ -265,7 +268,6 @@ int PerforceFileList::AddFileToFileList( const char *pFullPath, bool bExistsOnDi
 	kv->SetString( "attributes", bIsFileWriteable ? "" : "R" );
 
 	int nItemID = AddItem( kv, 0, false, false );
-	kv->deleteThis();
 
 	AddItemToDirectoryList( pFullPath, nItemID, false );
 	return nItemID;
@@ -277,7 +279,7 @@ int PerforceFileList::AddFileToFileList( const char *pFullPath, bool bExistsOnDi
 //-----------------------------------------------------------------------------
 int PerforceFileList::AddDirectoryToFileList( const char *pFullPath, bool bExistsOnDisk )
 {
-	KeyValues *kv = new KeyValues("item");
+	KeyValuesAD kv("item");
 
 	const char *pRelativePath = Q_UnqualifiedFileName( pFullPath );
 	kv->SetString( "text", pRelativePath );
@@ -297,7 +299,6 @@ int PerforceFileList::AddDirectoryToFileList( const char *pFullPath, bool bExist
 	kv->SetString( "attributes", "D" );
 
 	int nItemID = AddItem(kv, 0, false, false);
-	kv->deleteThis();
 
 	AddItemToDirectoryList( pFullPath, nItemID, true );
 	return nItemID;
@@ -378,9 +379,9 @@ void PerforceFileList::RemoveAllFiles()
 //-----------------------------------------------------------------------------
 // Finds a file in the p4 list
 //-----------------------------------------------------------------------------
-static P4File_t *FindFileInPerforceList( const char *pFileName, CUtlVector<P4File_t> &fileList, bool *pFound )
-{
-  // dimhotepus: No perforce
+// dimhotepus: No perforce
+//static P4File_t *FindFileInPerforceList( const char *pFileName, CUtlVector<P4File_t> &fileList, bool *pFound )
+//{
 	//int nCount = fileList.Count();
 	/*for ( int i = 0; i < nCount; ++i )
 	{
@@ -394,8 +395,8 @@ static P4File_t *FindFileInPerforceList( const char *pFileName, CUtlVector<P4Fil
 			return &fileList[i];
 		}*/
 	//}
-	return NULL;
-}
+//	return NULL;
+//}
 
 
 //-----------------------------------------------------------------------------

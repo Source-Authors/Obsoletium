@@ -6,9 +6,11 @@
 //=============================================================================//
 
 #include "vgui_controls/ControllerMap.h"
+
+#include "tier1/KeyValues.h"
+
 #include "vgui/ISurface.h"
 #include "vgui/KeyCode.h"
-#include "KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -73,7 +75,7 @@ int StringToButtonCode( const char *name )
 //-----------------------------------------------------------------------------
 void CControllerMap::OnKeyCodeTyped( vgui::KeyCode code )
 {
-	int idx = m_buttonMap.Find( code );
+	auto idx = m_buttonMap.Find( code );
 	if ( idx != m_buttonMap.InvalidIndex() )
 	{
 		GetParent()->OnCommand( m_buttonMap[idx].cmd.String() );

@@ -5,10 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "vgui/keyrepeat.h"
+
 #include "inputsystem/InputEnums.h"
 
 #include "vgui/KeyCode.h"
-#include "vgui/keyrepeat.h"
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file
@@ -67,9 +68,9 @@ static int GetIndexForCode( vgui::KeyCode code )
 CKeyRepeatHandler::CKeyRepeatHandler()
 {
 	Reset();
-	for ( int i = 0; i < FM_NUM_KEYREPEAT_ALIASES; i++ )
+	for ( auto &t : m_flRepeatTimes )
 	{
-		m_flRepeatTimes[i] = 0.16f;
+		t = 0.16;
 	}
 }
 
@@ -144,7 +145,7 @@ vgui::KeyCode CKeyRepeatHandler::KeyRepeated( void )
 	if ( !m_bHaveKeyDown )
 		return BUTTON_CODE_NONE;
 
-	float currentTime = Plat_FloatTime();
+	double currentTime = Plat_FloatTime();
 
 	for ( int j = 0; j < MAX_JOYSTICKS; j++ )
 	{
@@ -169,7 +170,7 @@ vgui::KeyCode CKeyRepeatHandler::KeyRepeated( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CKeyRepeatHandler::SetKeyRepeatTime( vgui::KeyCode code, float flRepeat )
+void CKeyRepeatHandler::SetKeyRepeatTime( vgui::KeyCode code, double flRepeat )
 {
 	int iIndex = GetIndexForCode(code);
 	Assert( iIndex != -1 );

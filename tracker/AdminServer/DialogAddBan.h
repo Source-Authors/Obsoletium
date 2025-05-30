@@ -24,7 +24,7 @@ class CDialogAddBan : public vgui::Frame
 	DECLARE_CLASS_SIMPLE( CDialogAddBan, vgui::Frame ); 
 public:
 	CDialogAddBan(vgui::Panel *parent);
-	~CDialogAddBan();
+	virtual ~CDialogAddBan();
 
 	// initializes the dialog and brings it to the foreground
 	void Activate(const char *type,const char *player, const char *authid);
@@ -48,9 +48,9 @@ public:
 	bool IsIPCheck();
 
 private:
-	virtual void PerformLayout();
-	virtual void OnCommand(const char *command);
-	virtual void OnClose();
+	void PerformLayout() override;
+	void OnCommand(const char *command) override;
+	void OnClose() override;
 	MESSAGE_FUNC_PTR( OnButtonToggled, "RadioButtonChecked", panel );
 
 	vgui::TextEntry *m_pTimeTextEntry;

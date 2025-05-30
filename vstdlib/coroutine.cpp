@@ -20,7 +20,7 @@
 //#include "pch_vstdlib.h"
 #if defined(_DEBUG)
 // Verify that something is false
-#define DbgVerifyNot(x) Assert(!x)
+#define DbgVerifyNot(x) Assert(!(x))
 #else
 #define DbgVerifyNot(x) x
 #endif
@@ -73,15 +73,10 @@ void OutputDebugStringA( const char *pchMsg ) { fprintf( stderr, pchMsg ); fflus
 extern "C" NORETURN void Coroutine_LongJmp_Unchecked( jmp_buf buffer, int nResult );
 #define Coroutine_longjmp Coroutine_LongJmp_Unchecked
 
-#ifdef  _WIN64
-#define Q_offsetof(s,m)   (size_t)( (ptrdiff_t)&reinterpret_cast<const volatile char&>((((s *)0)->m)) )
-#else
-#define Q_offsetof(s,m)   (size_t)&reinterpret_cast<const volatile char&>((((s *)0)->m))
-#endif
 #define SIZEOF_MEMBER( className, memberName ) sizeof( ((className*)nullptr)->memberName )
 
 
-#define Validate_Jump_Buffer( _Member ) COMPILE_TIME_ASSERT( (Q_offsetof( _JUMP_BUFFER, _Member ) == Q_offsetof( _Duplicate_JUMP_BUFFER, _Member )) && (SIZEOF_MEMBER( _JUMP_BUFFER, _Member ) == SIZEOF_MEMBER( _Duplicate_JUMP_BUFFER, _Member )) )
+#define Validate_Jump_Buffer( _Member ) COMPILE_TIME_ASSERT( (offsetof( _JUMP_BUFFER, _Member ) == offsetof( _Duplicate_JUMP_BUFFER, _Member )) && (SIZEOF_MEMBER( _JUMP_BUFFER, _Member ) == SIZEOF_MEMBER( _Duplicate_JUMP_BUFFER, _Member )) )
 
 	//validate that the structure in assembly matches what the crt setjmp thinks it is
 #	if defined( PLATFORM_64BITS )
@@ -188,10 +183,10 @@ extern "C" NORETURN void Coroutine_LongJmp_Unchecked( jmp_buf buffer, int nResul
 
 
 // return values from setjmp()
-static const int k_iSetJmpStateSaved = 0x00;
-static const int k_iSetJmpContinue	= 0x01;
-static const int k_iSetJmpDone		= 0x02;
-static const int k_iSetJmpDbgBreak	= 0x03;
+static constexpr inline int k_iSetJmpStateSaved = 0x00;
+static constexpr inline int k_iSetJmpContinue	= 0x01;
+static constexpr inline int k_iSetJmpDone		= 0x02;
+static constexpr inline int k_iSetJmpDbgBreak	= 0x03;
 
 // distance up the stack that coroutine functions stacks' start
 #ifdef _PS3
@@ -199,8 +194,8 @@ static const int k_iSetJmpDbgBreak	= 0x03;
 static const int k_cubCoroutineStackGap = (3 * 1024);	
 static const int k_cubCoroutineStackGapSmall = 64;	
 #else
-static const int k_cubCoroutineStackGap = (64 * 1024);	
-static const int k_cubCoroutineStackGapSmall = 64;	
+static constexpr inline int k_cubCoroutineStackGap = (64 * 1024);	
+static constexpr inline int k_cubCoroutineStackGapSmall = 64;	
 #endif
 
 // Warning size for allocated stacks
@@ -270,6 +265,7 @@ public:
 		m_hCoroutine = -1;
 #endif
 #ifdef _M_X64
+		memset( m_rgubRegisters, 0, sizeof(m_rgubRegisters) );
 		m_nAlignmentBytes = CalcAlignOffset( m_rgubRegisters );
 #endif	
 #if defined( VPROF_ENABLED )
@@ -454,7 +450,7 @@ public:
 	byte *m_pStackHigh;		// position of initial entry to the coroutine (stack ptr before continue is ran)
 	byte *m_pStackLow;		// low point on the stack we plan on saving (stack ptr when we yield)
 	byte *m_pSavedStack;	// pointer to the saved stack (allocated on heap)
-	ptrdiff_t m_cubSavedStack;	// amount of data on stack
+	intp m_cubSavedStack;	// amount of data on stack
 	const char *m_pchName;
 	int m_iJumpCode;
 	const char *m_pchDebugMsg;
@@ -712,7 +708,7 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 				if ( coroutine.m_pStackLow < pStackSavePoint )
 				{
 					// push ourselves down
-					ptrdiff_t cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
+					intp cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
 					volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
 					pvStackGap[ cubPush-1 ] = 0xF;
 					CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
@@ -951,7 +947,7 @@ void Coroutine_YieldToMain()
 		GetStackPtr( pStackPtr );
 		if ( pStackPtr >= (coroutinePrev.m_pStackHigh - coroutinePrev.m_cubSavedStack) && ( pStackPtr - 2048 ) <= coroutinePrev.m_pStackHigh )
 		{
-			ptrdiff_t cubPush = coroutinePrev.m_cubSavedStack + 512;
+			intp cubPush = coroutinePrev.m_cubSavedStack + 512;
 			volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
 			pvStackGap[ cubPush - 1 ] = 0xF;
 			CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );

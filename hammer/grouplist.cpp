@@ -95,7 +95,7 @@ void CGroupList::AddVisGroupRecursive(CVisGroup *pVisGroup, HTREEITEM hItemParen
 	HTREEITEM hItem = InsertItem(pVisGroup->GetName(), hItemParent, TVI_LAST);
 	if (hItem != NULL)
 	{
-		SetItemData(hItem, (DWORD)pVisGroup);
+		SetItemData(hItem, (DWORD_PTR)pVisGroup);
 
 		// Add the item to our flattened list.
 //		VisGroupTreeItem_t item;
@@ -282,7 +282,7 @@ CVisGroup *CGroupList::GetSelectedVisGroup(void)
 //-----------------------------------------------------------------------------
 void CGroupList::OnLButtonDown(UINT nFlags, CPoint point) 
 {
-	unsigned int uFlags;
+	unsigned int uFlags = 0;
 	HTREEITEM hItemHit = HitTest(point, &uFlags);
 	if (hItemHit != NULL)
 	{
@@ -310,7 +310,7 @@ void CGroupList::OnLButtonUp(UINT nFlags, CPoint point)
 
 	if (!m_hDragItem)
 	{
-		unsigned int uFlags;
+		unsigned int uFlags = 0;
 		HTREEITEM hItemHit = HitTest(point, &uFlags);
 		if (hItemHit != NULL)
 		{
@@ -357,7 +357,7 @@ void CGroupList::OnLButtonUp(UINT nFlags, CPoint point)
 //-----------------------------------------------------------------------------
 void CGroupList::OnLButtonDblClk(UINT nFlags, CPoint point) 
 {
-	unsigned int uFlags;
+	unsigned int uFlags = 0;
 	HTREEITEM hItemHit = HitTest(point, &uFlags);
 	if (hItemHit != NULL)
 	{
@@ -581,7 +581,7 @@ void CGroupList::Drop(DropType_t eDropType, UINT nFlags, CPoint point)
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CGroupList::OnTimer(UINT nIDEvent) 
+void CGroupList::OnTimer(UINT_PTR nIDEvent) 
 {
 	//DBG("OnTimer\n");
 	switch (nIDEvent)

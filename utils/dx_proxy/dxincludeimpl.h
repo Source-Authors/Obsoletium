@@ -30,6 +30,8 @@ class D3DIncludeImpl : public ID3DInclude {
   }
 
   STDMETHOD(Close)(THIS_ LPCVOID pData) override {
+    if (!pData) return E_POINTER;
+
     if (CachedFileData *data = CachedFileData::GetByDataPtr(pData)) {
       data->Release();
     }

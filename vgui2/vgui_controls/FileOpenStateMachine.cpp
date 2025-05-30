@@ -6,16 +6,18 @@
 //=============================================================================
 
 #include "vgui_controls/FileOpenStateMachine.h"
+
+#include "filesystem.h"
+#include "tier0/icommandline.h"
 #include "tier1/KeyValues.h"
+// dimhotepus: No perforce
+// #include "p4lib/ip4.h"
+#include "tier2/tier2.h"
+
 #include "vgui_controls/FileOpenDialog.h"
 #include "vgui_controls/MessageBox.h"
 #include "vgui_controls/perforcefilelistframe.h"
 #include "vgui_controls/savedocumentquery.h"
-#include "filesystem.h"
-// dimhotepus: No perforce
-// #include "p4lib/ip4.h"
-#include "tier2/tier2.h"
-#include "tier0/icommandline.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

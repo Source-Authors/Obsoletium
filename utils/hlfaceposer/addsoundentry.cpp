@@ -4,9 +4,9 @@
 //
 //=============================================================================//
 #include "cbase.h"
+#include "AddSoundEntry.h"
 #include "mxtk/mx.h"
 #include "resource.h"
-#include "AddSoundEntry.h"
 #include "mdlviewer.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "filesystem.h"
@@ -149,11 +149,11 @@ static BOOL CALLBACK AddSoundPropertiesDialogProc( HWND hwndDlg, UINT uMsg, WPAR
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int AddSound( CAddSoundParams *params, HWND parent )
+intp AddSound( CAddSoundParams *params, HWND parent )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_ADDSOUNDENTRY ),
 		parent,
 		(DLGPROC)AddSoundPropertiesDialogProc );

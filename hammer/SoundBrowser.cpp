@@ -5,9 +5,11 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "SoundBrowser.h"
-#include "mmsystem.h"
+
+#include "hammer.h"
+
+#include <mmsystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -21,7 +23,7 @@ int CSoundBrowser::m_nFilterHistory;
 
 
 CSoundBrowser::CSoundBrowser( const char *pCurrentSoundName, CWnd* pParent /*=NULL*/ )
-	: CDialog(CSoundBrowser::IDD, pParent)
+	: CBaseDlg(CSoundBrowser::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CSoundBrowser)
 	m_Autoplay = FALSE;
@@ -47,7 +49,7 @@ void CSoundBrowser::SaveValues()
 
 void CSoundBrowser::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CSoundBrowser)
 	DDX_Control(pDX, IDC_SOUND_LIST, m_SoundList);
 	DDX_Text(pDX, IDC_SOUNDNAME_SELECTED, m_SoundNameSelected);
@@ -59,7 +61,7 @@ void CSoundBrowser::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSoundBrowser, CDialog)
+BEGIN_MESSAGE_MAP(CSoundBrowser, CBaseDlg)
 	//{{AFX_MSG_MAP(CSoundBrowser)
 	ON_WM_CLOSE()
 	ON_CBN_EDITCHANGE(IDC_SOUND_FILTER, OnChangeFilter)
@@ -81,7 +83,7 @@ END_MESSAGE_MAP()
 
 BOOL CSoundBrowser::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_cFilter.SubclassDlgItem(IDC_SOUND_FILTER, this);
 	for ( int i = 0; i < m_nFilterHistory; ++i )
@@ -100,7 +102,7 @@ BOOL CSoundBrowser::OnInitDialog()
 	{
 		m_SoundList.SetCurSel( nIndex );
 		m_nSelectedSoundIndex = nIndex;
-		int nSoundIndex = m_SoundList.GetItemData(nIndex);
+		int nSoundIndex = static_cast<int>(m_SoundList.GetItemData(nIndex));
 		m_SoundFile = g_Sounds.SoundFile( GetSoundType(), nSoundIndex ); 
 		m_SoundSource = g_Sounds.SoundSourceFile( GetSoundType(), nSoundIndex ); 
 		UpdateData( FALSE );
@@ -114,7 +116,7 @@ BOOL CSoundBrowser::OnInitDialog()
 void CSoundBrowser::OnClose(void)
 {
 	Shutdown();
-	CDialog::OnClose();
+	__super::OnClose();
 }
 
 
@@ -183,9 +185,10 @@ void CSoundBrowser::PopulateSoundList()
 		if ( ShowSoundInList( pSoundName ) )
 		{
 			CString str;
-			str.Format( _T(pSoundName) );
+			// dimhotepus: Fix missing string format spec vulnerability.
+			str.Format( "%s", pSoundName );
 			int nIndex = m_SoundList.AddString( str );
-			m_SoundList.SetItemDataPtr( nIndex, (PVOID)i );
+			m_SoundList.SetItemDataPtr( nIndex, (PVOID)(ptrdiff_t)i );
 		}
 	}
 
@@ -218,7 +221,7 @@ void CSoundBrowser::CopySoundNameToSelected()
 	int nIndex = m_SoundList.GetCurSel();
 	if ( nIndex != LB_ERR )
 	{
-		int nSoundIndex = m_SoundList.GetItemData(nIndex);
+		int nSoundIndex = static_cast<int>(m_SoundList.GetItemData(nIndex));
 		m_SoundNameSelected = g_Sounds.SoundName( GetSoundType(), nSoundIndex );
 		m_SoundFile = g_Sounds.SoundFile( GetSoundType(), nSoundIndex ); 
 		m_SoundSource = g_Sounds.SoundSourceFile( GetSoundType(), nSoundIndex ); 
@@ -249,7 +252,7 @@ void CSoundBrowser::OnFilterChanged( const char *pFilter )
 // Purpose: Timer used to control updates when the filter terms change.
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CSoundBrowser::OnTimer(UINT nIDEvent) 
+void CSoundBrowser::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (!m_bFilterChanged)
 		return;
@@ -266,7 +269,7 @@ void CSoundBrowser::OnTimer(UINT nIDEvent)
 		SetTimer(nIDEvent, 500, NULL);
 	}
 
-	CDialog::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 }
 
 //-----------------------------------------------------------------------------
@@ -357,9 +360,9 @@ void CSoundBrowser::OnRefreshSounds()
 	SetWindowText( oldTitle );
 }
 
-int CSoundBrowser::DoModal() 
+INT_PTR CSoundBrowser::DoModal() 
 {	
-	int nRet = CDialog::DoModal();
+	INT_PTR nRet = __super::DoModal();
 	Shutdown();
 	return nRet;
 }

@@ -57,21 +57,24 @@ using BitBufErrorHandler = void (*)(BitBufErrorType errorType, const char *pDebu
 
 #if defined( _DEBUG )
 	extern void InternalBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugName );
-	#define CallErrorHandler( errorType, pDebugName ) InternalBitBufErrorHandler( errorType, pDebugName )
+	inline void CallErrorHandler( BitBufErrorType errorType, const char *pDebugName )
+	{
+		InternalBitBufErrorHandler( errorType, pDebugName );
+	}
 #else
 	#define CallErrorHandler( errorType, pDebugName )
 #endif
 
 
 // Use this to install the error handler. Call with NULL to uninstall your error handler.
-void SetBitBufErrorHandler( BitBufErrorHandler fn );
+BitBufErrorHandler SetBitBufErrorHandler( BitBufErrorHandler fn );
 
 
 //-----------------------------------------------------------------------------
 // Helpers.
 //-----------------------------------------------------------------------------
 
-constexpr inline intp BitByte( intp bits )
+[[nodiscard]] constexpr inline intp BitByte( intp bits )
 {
 	// return PAD_NUMBER( bits, 8 ) >> 3;
 	return (bits + CHAR_BIT - 1) >> 3;
@@ -106,24 +109,24 @@ namespace bitbuf
 	//        >> encode >>
 	//        << decode <<
 
-	constexpr inline uint32 ZigZagEncode32(int32 n) 
+	[[nodiscard]] constexpr inline uint32 ZigZagEncode32(int32 n) 
 	{
 		// Note:  the right-shift must be arithmetic
 		return(n << 1) ^ (n >> 31);
 	}
 
-	constexpr inline int32 ZigZagDecode32(uint32 n) 
+	[[nodiscard]] constexpr inline int32 ZigZagDecode32(uint32 n) 
 	{
 		return(n >> 1) ^ -static_cast<int32>(n & 1);
 	}
 
-	constexpr inline uint64 ZigZagEncode64(int64 n) 
+	[[nodiscard]] constexpr inline uint64 ZigZagEncode64(int64 n) 
 	{
 		// Note:  the right-shift must be arithmetic
 		return(n << 1) ^ (n >> 63);
 	}
 
-	constexpr inline int64 ZigZagDecode64(uint64 n) 
+	[[nodiscard]] constexpr inline int64 ZigZagDecode64(uint64 n) 
 	{
 		return(n >> 1) ^ -static_cast<int64>(n & 1);
 	}
@@ -155,14 +158,14 @@ public:
 	void			Reset();
 
 	// Get the base pointer.
-	unsigned char*	GetBasePointer() { return (unsigned char*) m_pData; }
+	[[nodiscard]] unsigned char*	GetBasePointer() { return (unsigned char*) m_pData; }
 
 	// Enable or disable assertion on overflow. 99% of the time, it's a bug that we need to catch,
 	// but there may be the occasional buffer that is allowed to overflow gracefully.
 	void			SetAssertOnOverflow( bool bAssert );
 
 	// This can be set to assign a name that gets output if the buffer overflows.
-	const char*		GetDebugName();
+	[[nodiscard]] const char*		GetDebugName() const;
 	void			SetDebugName( const char *pDebugName );
 
 
@@ -237,24 +240,24 @@ public:
 public:
 
 	// How many bytes are filled in?
-	intp				GetNumBytesWritten() const;
-	intp				GetNumBitsWritten() const;
-	intp				GetMaxNumBits() const;
-	intp				GetNumBitsLeft() const;
-	intp				GetNumBytesLeft() const;
-	unsigned char*	GetData();
-	const unsigned char*	GetData() const;
+	[[nodiscard]] intp				GetNumBytesWritten() const;
+	[[nodiscard]] intp				GetNumBitsWritten() const;
+	[[nodiscard]] intp				GetMaxNumBits() const;
+	[[nodiscard]] intp				GetNumBitsLeft() const;
+	[[nodiscard]] intp				GetNumBytesLeft() const;
+	[[nodiscard]] unsigned char*	GetData();
+	[[nodiscard]] const unsigned char*	GetData() const;
 
 	// Has the buffer overflowed?
-	bool			CheckForOverflow(intp nBits);
-	inline bool		IsOverflowed() const {return m_bOverflow;}
+	[[nodiscard]] bool			CheckForOverflow(intp nBits);
+	[[nodiscard]] inline bool		IsOverflowed() const {return m_bOverflow;}
 
 	void			SetOverflowFlag();
 
 
 public:
 	// The current buffer.
-	unsigned long* RESTRICT m_pData;
+	uint32* RESTRICT	m_pData;
 	intp				m_nDataBytes;
 	intp				m_nDataBits;
 	
@@ -341,7 +344,7 @@ BITBUF_INLINE void bf_write::WriteOneBitNoCheck(int nValue)
 	else
 		m_pData[m_iCurBit >> 5] &= ~(1u << (m_iCurBit & 31));
 #else
-	extern unsigned long g_LittleBits[32];
+	extern unsigned g_LittleBits[32];
 	if(nValue)
 		m_pData[m_iCurBit >> 5] |= g_LittleBits[m_iCurBit & 31];
 	else
@@ -378,7 +381,7 @@ inline void	bf_write::WriteOneBitAt( int iBit, int nValue )
 	else
 		m_pData[iBit >> 5] &= ~(1u << (iBit & 31));
 #else
-	extern unsigned long g_LittleBits[32];
+	extern unsigned g_LittleBits[32];
 	if(nValue)
 		m_pData[iBit >> 5] |= g_LittleBits[iBit & 31];
 	else
@@ -386,13 +389,13 @@ inline void	bf_write::WriteOneBitAt( int iBit, int nValue )
 #endif
 }
 
-BITBUF_INLINE void bf_write::WriteUBitLong( unsigned int curData, int numbits, bool bCheckRange )
+BITBUF_INLINE void bf_write::WriteUBitLong( unsigned int curData, int numbits, [[maybe_unused]] bool bCheckRange )
 {
 #ifdef _DEBUG
 	// Make sure it doesn't overflow.
 	if ( bCheckRange && numbits < 32 )
 	{
-		if ( curData >= (unsigned long)(1 << numbits) )
+		if ( curData >= (1u << numbits) )
 		{
 			CallErrorHandler( BITBUFERROR_VALUE_OUT_OF_RANGE, GetDebugName() );
 		}
@@ -413,21 +416,21 @@ BITBUF_INLINE void bf_write::WriteUBitLong( unsigned int curData, int numbits, b
 	m_iCurBit += numbits;
 
 	// Mask in a dword.
-	Assert( (iDWord*4 + sizeof(long)) <= (size_t)m_nDataBytes );
-	unsigned long * RESTRICT pOut = &m_pData[iDWord];
+	Assert( (iDWord*4 + sizeof(uint32)) <= (size_t)m_nDataBytes );
+	uint32 * RESTRICT pOut = &m_pData[iDWord];
 
 	// Rotate data into dword alignment
 	curData = (curData << iCurBitMasked) | (curData >> (32 - iCurBitMasked));
 
 	// Calculate bitmasks for first and second word
-	unsigned int temp = 1 << (numbits-1);
-	unsigned int mask1 = (temp*2-1) << iCurBitMasked;
-	unsigned int mask2 = (temp-1) >> (31 - iCurBitMasked);
+	unsigned temp = 1 << (numbits-1);
+	unsigned mask1 = (temp*2-1) << iCurBitMasked;
+	unsigned mask2 = (temp-1) >> (31 - iCurBitMasked);
 	
 	// Only look beyond current word if necessary (avoid access violation)
 	int i = mask2 & 1;
-	unsigned long dword1 = LoadLittleDWord( pOut, 0 );
-	unsigned long dword2 = LoadLittleDWord( pOut, i );
+	unsigned dword1 = LoadLittleDWord( pOut, 0 );
+	unsigned dword2 = LoadLittleDWord( pOut, i );
 	
 	// Drop bits into place
 	dword1 ^= ( mask1 & ( curData ^ dword1 ) );
@@ -464,13 +467,11 @@ BITBUF_INLINE void bf_write::WriteUBitVar( unsigned int data )
 // write raw IEEE float bits in little endian form
 BITBUF_INLINE void bf_write::WriteBitFloat(float val)
 {
-	long intVal;
+	static_assert(sizeof(int32) == sizeof(float));
+	static_assert(alignof(int32) == alignof(float));
 
-	Assert(sizeof(long) == sizeof(float));
-	Assert(sizeof(float) == 4);
-
-	intVal = *((long*)&val);
-	WriteUBitLong( intVal, 32 );
+	int32 intVal = *((int32*)&val);
+	WriteUBitLong( intVal, CHAR_BIT * sizeof(int32) );
 }
 
 //-----------------------------------------------------------------------------
@@ -516,7 +517,7 @@ public:
 	void			SetAssertOnOverflow( bool bAssert );
 
 	// This can be set to assign a name that gets output if the buffer overflows.
-	const char*		GetDebugName() const { return m_pDebugName; }
+	[[nodiscard]] const char*		GetDebugName() const { return m_pDebugName; }
 	void			SetDebugName( const char *pName );
 
 	void			ExciseBits( intp startbit, intp bitstoremove );
@@ -526,28 +527,28 @@ public:
 public:
 	
 	// Returns 0 or 1.
-	int				ReadOneBit();
+	[[nodiscard]] int				ReadOneBit();
 
 
 protected:
 
-	unsigned int	CheckReadUBitLong(int numbits);		// For debugging.
-	int				ReadOneBitNoCheck();				// Faster version, doesn't check bounds and is inlined.
-	bool			CheckForOverflow(intp nBits);
+	[[nodiscard]] unsigned int	CheckReadUBitLong(int numbits);		// For debugging.
+	[[nodiscard]] int			ReadOneBitNoCheck();				// Faster version, doesn't check bounds and is inlined.
+	[[nodiscard]] bool			CheckForOverflow(intp nBits);
 
 
 public:
 
 	// Get the base pointer.
-	const unsigned char*	GetBasePointer() const { return m_pData; }
+	[[nodiscard]] const unsigned char*	GetBasePointer() const { return m_pData; }
 
-	BITBUF_INLINE intp TotalBytesAvailable( void ) const
+	[[nodiscard]] BITBUF_INLINE intp TotalBytesAvailable( void ) const
 	{
 		return m_nDataBytes;
 	}
 
 	// Read a list of bits in.
-	void            ReadBits(void *pOut, int nBits);
+	void            ReadBits(void *pOut, intp nBits);
 	// Read a list of bits in, but don't overrun the destination buffer.
 	// Returns the number of bits read into the buffer. The remaining
 	// bits are skipped over.
@@ -562,50 +563,63 @@ public:
 		return ReadBitsClamped_ptr( pOut, N * sizeof(T), nBits );
 	}
 	
-	float			ReadBitAngle( int numbits );
+	[[nodiscard]] float			ReadBitAngle( int numbits );
 
-	unsigned int	ReadUBitLong( int numbits );
-	unsigned int	ReadUBitLongNoInline( int numbits );
-	unsigned int	PeekUBitLong( int numbits );
-	int				ReadSBitLong( int numbits );
+	[[nodiscard]] unsigned int	ReadUBitLong( int numbits );
+	[[nodiscard]] unsigned int	ReadUBitLongNoInline( int numbits );
+	[[nodiscard]] unsigned int	PeekUBitLong( int numbits );
+	[[nodiscard]] int			ReadSBitLong( int numbits );
 
 	// reads an unsigned integer with variable bit length
-	unsigned int	ReadUBitVar();
-	unsigned int	ReadUBitVarInternal( int encodingType );
+	[[nodiscard]] unsigned int	ReadUBitVar();
+	[[nodiscard]] unsigned int	ReadUBitVarInternal( int encodingType );
 
 	// reads a varint encoded integer
-	uint32			ReadVarInt32();
-	uint64			ReadVarInt64();
-	int32			ReadSignedVarInt32();
-	int64			ReadSignedVarInt64();
+	[[nodiscard]] uint32		ReadVarInt32();
+	[[nodiscard]] uint64		ReadVarInt64();
+	[[nodiscard]] int32			ReadSignedVarInt32();
+	[[nodiscard]] int64			ReadSignedVarInt64();
 
 	// You can read signed or unsigned data with this, just cast to 
 	// a signed int if necessary.
-	unsigned int	ReadBitLong(int numbits, bool bSigned);
+	[[nodiscard]] unsigned int	ReadBitLong(int numbits, bool bSigned);
 
-	float			ReadBitCoord();
-	float			ReadBitCoordMP( bool bIntegral, bool bLowPrecision );
-	float			ReadBitFloat();
-	float			ReadBitNormal();
+	[[nodiscard]] float			ReadBitCoord();
+	[[nodiscard]] float			ReadBitCoordMP( bool bIntegral, bool bLowPrecision );
+	[[nodiscard]] float			ReadBitFloat();
+	[[nodiscard]] float			ReadBitNormal();
 	void			ReadBitVec3Coord( Vector& fa );
 	void			ReadBitVec3Normal( Vector& fa );
 	void			ReadBitAngles( QAngle& fa );
 
 	// Faster for comparisons but do not fully decode float values
-	unsigned int	ReadBitCoordBits();
-	unsigned int	ReadBitCoordMPBits( bool bIntegral, bool bLowPrecision );
+	[[nodiscard]] unsigned int	ReadBitCoordBits();
+	[[nodiscard]] unsigned int	ReadBitCoordMPBits( bool bIntegral, bool bLowPrecision );
 
 // Byte functions (these still read data in bit-by-bit).
 public:
 	
-	BITBUF_INLINE int	ReadChar() { return (char)ReadUBitLong(8); }
-	BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
-	BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
-	BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }
-	BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
-	int64			ReadLongLong();
-	float			ReadFloat();
-	bool			ReadBytes(void *pOut, int nBytes);
+	[[nodiscard]] BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(8); }
+	[[nodiscard]] BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
+	[[nodiscard]] BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
+	[[nodiscard]] BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }
+	[[nodiscard]] BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
+	[[nodiscard]] int64			ReadLongLong();
+	[[nodiscard]] float			ReadFloat();
+
+	bool			ReadBytes( OUT_CAP(nBytes) void *pOut, intp nBytes);
+	// dimhotepus: Bounds-safe interface.
+	template<typename T, intp nBytes>
+	bool			ReadBytes( T (&pOut)[nBytes] )
+	{
+		return ReadBytes( pOut, nBytes );
+	}
+	// dimhotepus: Bounds-safe interface.
+	template<typename T, intp nBytes = sizeof(T)>
+	std::enable_if_t<!std::is_pointer_v<T>, bool>	ReadBytes( T &pOut )
+	{
+		return ReadBytes( &pOut, nBytes );
+	}
 
 	// Returns false if bufLen isn't large enough to hold the
 	// string in the buffer.
@@ -620,27 +634,34 @@ public:
 	// pOutNumChars is set to the number of characters left in pStr when the routine is 
 	// complete (this will never exceed bufLen-1).
 	//
-	bool			ReadString( char *pStr, int bufLen, bool bLine=false, int *pOutNumChars=NULL );
+	bool			ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine=false, intp *pOutNumChars=NULL );
+
+	// dimhotepus: Bounds-safe interface.
+	template<intp bufLen>
+	bool			ReadString( OUT_Z_ARRAY char (&pStr)[bufLen] )
+	{
+		return ReadString( pStr, bufLen, false, nullptr );
+	}
 
 	// Reads a string and allocates memory for it. If the string in the buffer
 	// is > 2048 bytes, then pOverflow is set to true (if it's not NULL).
-	char*			ReadAndAllocateString( bool *pOverflow = 0 );
+	[[nodiscard]] char*			ReadAndAllocateString( bool *pOverflow = 0 );
 
 	// Returns nonzero if any bits differ
-	int				CompareBits( bf_read * RESTRICT other, int bits );
-	int				CompareBitsAt( int offset, bf_read * RESTRICT other, int otherOffset, int bits ) RESTRICT;
+	[[nodiscard]] int			CompareBits( bf_read * RESTRICT other, int bits );
+	[[nodiscard]] int			CompareBitsAt( int offset, bf_read * RESTRICT other, int otherOffset, int bits ) RESTRICT;
 
 // Status.
 public:
-	intp				GetNumBytesLeft() const;
-	intp				GetNumBytesRead();
-	intp				GetNumBitsLeft() const;
-	intp				GetNumBitsRead() const;
+	[[nodiscard]] intp				GetNumBytesLeft() const;
+	[[nodiscard]] intp				GetNumBytesRead();
+	[[nodiscard]] intp				GetNumBitsLeft() const;
+	[[nodiscard]] intp				GetNumBitsRead() const;
 
 	// Has the buffer overflowed?
-	inline bool		IsOverflowed() const {return m_bOverflow;}
+	[[nodiscard]] inline bool		IsOverflowed() const {return m_bOverflow;}
 
-	inline bool		Seek(intp iBit);					// Seek to a specific bit.
+	inline bool		Seek(intp iBit);				// Seek to a specific bit.
 	inline bool		SeekRelative(intp iBitDelta);	// Seek to an offset from the current position.
 
 	// Called when the buffer is overflowed.
@@ -727,7 +748,7 @@ inline bool bf_read::CheckForOverflow(intp nBits)
 inline int bf_read::ReadOneBitNoCheck()
 {
 #if VALVE_LITTLE_ENDIAN
-	unsigned int value = ((unsigned long * RESTRICT)m_pData)[m_iCurBit >> 5] >> (m_iCurBit & 31);
+	unsigned int value = ((unsigned * RESTRICT)m_pData)[m_iCurBit >> 5] >> (m_iCurBit & 31);
 #else
 	unsigned char value = m_pData[m_iCurBit >> 3] >> (m_iCurBit & 7);
 #endif
@@ -748,7 +769,9 @@ inline int bf_read::ReadOneBit()
 
 inline float bf_read::ReadBitFloat()
 {
-	union { uint32 u; float f; } c = { ReadUBitLong(32) };
+	static_assert(alignof(uint32) == alignof(float));
+	static_assert(sizeof(uint32) == sizeof(float));
+	union { uint32 u; float f; } c = { ReadUBitLong(CHAR_BIT * sizeof(float)) };
 	return c.f;
 }
 
@@ -786,12 +809,12 @@ BITBUF_INLINE unsigned int bf_read::ReadUBitLong( int numbits )
 #if __i386__
 	unsigned int bitmask = (2 << (numbits-1)) - 1;
 #else
-	extern unsigned long g_ExtraMasks[33];
-	unsigned int bitmask = g_ExtraMasks[numbits];
+	extern unsigned g_ExtraMasks[33];
+	unsigned bitmask = g_ExtraMasks[numbits];
 #endif
 
-	unsigned int dw1 = LoadLittleDWord( (unsigned long* RESTRICT)m_pData, iWordOffset1 ) >> iStartBit;
-	unsigned int dw2 = LoadLittleDWord( (unsigned long* RESTRICT)m_pData, iWordOffset2 ) << (32 - iStartBit);
+	unsigned dw1 = LoadLittleDWord( (const unsigned* RESTRICT)m_pData, iWordOffset1 ) >> iStartBit;
+	unsigned dw2 = LoadLittleDWord( (const unsigned* RESTRICT)m_pData, iWordOffset2 ) << (32 - iStartBit);
 
 	return (dw1 | dw2) & bitmask;
 }

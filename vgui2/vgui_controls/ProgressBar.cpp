@@ -5,16 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <math.h>
-#include <stdio.h>
-
 #include <vgui_controls/ProgressBar.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui_controls/Controls.h>
 
 #include <vgui/ILocalize.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
-#include <KeyValues.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -203,7 +202,7 @@ void ProgressBar::ApplySchemeSettings(IScheme *pScheme)
 //-----------------------------------------------------------------------------
 // Purpose: utility function for calculating a time remaining string
 //-----------------------------------------------------------------------------
-bool ProgressBar::ConstructTimeRemainingString(wchar_t *output, int outputBufferSizeInBytes, float startTime, float currentTime, float currentProgress, float lastProgressUpdateTime, bool addRemainingSuffix)
+bool ProgressBar::ConstructTimeRemainingString(OUT_Z_BYTECAP(outputBufferSizeInBytes) wchar_t *output, intp outputBufferSizeInBytes, float startTime, float currentTime, float currentProgress, float lastProgressUpdateTime, bool addRemainingSuffix)
 {
 	Assert(lastProgressUpdateTime <= currentTime);
 	output[0] = 0;
@@ -245,9 +244,9 @@ bool ProgressBar::ConstructTimeRemainingString(wchar_t *output, int outputBuffer
 		V_to_chars(minutesBuf, minutesRemaining);
 
 		wchar_t unicodeMinutes[16];
-		g_pVGuiLocalize->ConvertANSIToUnicode(minutesBuf, unicodeMinutes, sizeof( unicodeMinutes ));
+		g_pVGuiLocalize->ConvertANSIToUnicode(minutesBuf, unicodeMinutes);
 		wchar_t unicodeSeconds[16];
-		g_pVGuiLocalize->ConvertANSIToUnicode(secondsBuf, unicodeSeconds, sizeof( unicodeSeconds ));
+		g_pVGuiLocalize->ConvertANSIToUnicode(secondsBuf, unicodeSeconds);
 
 		const char *unlocalizedString = "#vgui_TimeLeftMinutesSeconds";
 		if (minutesRemaining == 1 && secondsRemaining == 1)
@@ -275,7 +274,7 @@ bool ProgressBar::ConstructTimeRemainingString(wchar_t *output, int outputBuffer
 	else if (secondsRemaining > 0)
 	{
 		wchar_t unicodeSeconds[16];
-		g_pVGuiLocalize->ConvertANSIToUnicode(secondsBuf, unicodeSeconds, sizeof( unicodeSeconds ));
+		g_pVGuiLocalize->ConvertANSIToUnicode(secondsBuf, unicodeSeconds);
 
 		const char *unlocalizedString = "#vgui_TimeLeftSeconds";
 		if (secondsRemaining == 1)
@@ -339,8 +338,8 @@ void ProgressBar::ApplySettings(KeyValues *inResourceData)
 	const char *dialogVar = inResourceData->GetString("variable", "");
 	if (dialogVar && *dialogVar)
 	{
-		m_pszDialogVar = new char[strlen(dialogVar) + 1];
-		strcpy(m_pszDialogVar, dialogVar);
+		delete[] m_pszDialogVar;
+		m_pszDialogVar = V_strdup( dialogVar );
 	}
 
 	BaseClass::ApplySettings(inResourceData);
@@ -366,7 +365,7 @@ void ProgressBar::GetSettings(KeyValues *outResourceData)
 const char *ProgressBar::GetDescription( void )
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, string progress, string variable", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, string progress, string variable", BaseClass::GetDescription());
 	return buf;
 }
 

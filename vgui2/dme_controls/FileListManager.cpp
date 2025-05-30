@@ -6,23 +6,24 @@
 //
 //=============================================================================//
 
-#include "dme_controls/filelistmanager.h"
+#include "dme_controls/FileListManager.h"
 #include "vgui_controls/FileOpenDialog.h"
-#include "vgui_controls/menu.h"
-#include "vgui_controls/messagebox.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/MessageBox.h"
 #include "datamodel/idatamodel.h"
 #include "datamodel/dmelement.h"
 #include "datamodel/dmattribute.h"
 #include "datamodel/dmattributevar.h"
 #include "vgui/ISurface.h"
 #include <vgui/IInput.h>
-#include "vgui/mousecode.h"
+#include "vgui/MouseCode.h"
 #include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
 #include "tier2/tier2.h"
-#include "p4lib/ip4.h"
+// dimhotepus: Drop Perforce support.
+// #include "p4lib/ip4.h"
 #include "filesystem.h"
-#include "dme_controls/INotifyUI.h"
+#include "dme_controls/inotifyui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -199,9 +200,9 @@ void CFileListManager::OnMousePressed( vgui::MouseCode code )
 	BaseClass::OnMousePressed( code );
 }
 
-int AddMenuItemHelper( vgui::Menu *pMenu, const char *pItemName, const char *pKVName, vgui::Panel *pTarget, bool bEnabled )
+intp AddMenuItemHelper( vgui::Menu *pMenu, const char *pItemName, const char *pKVName, vgui::Panel *pTarget, bool bEnabled )
 {
-	int id = pMenu->AddMenuItem( pItemName, new KeyValues( pKVName ), pTarget );
+	intp id = pMenu->AddMenuItem( pItemName, new KeyValues( pKVName ), pTarget );
 	pMenu->SetItemEnabled( id, bEnabled );
 	return id;
 }
@@ -223,7 +224,8 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 	}
 	else
 	{
-		bool bP4Connected = p4->IsConnectedToServer();
+		// dimhotepus: Drop Perforce support.
+		// bool bP4Connected = p4->IsConnectedToServer();
 
 		int nSelected = GetSelectedItemsCount();
 		int nLoaded = 0;
@@ -246,17 +248,18 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 				++nOnDisk;
 			}
 
-			if ( bP4Connected )
-			{
-				if ( p4->IsFileInPerforce( pFilename ) )
-				{
-					++nInPerforce;
-					if ( p4->GetFileState( pFilename ) != P4FILE_UNOPENED )
-					{
-						++nOpenForEdit;
-					}
-				}
-			}
+			// dimhotepus: Drop Perforce support.
+			// if ( bP4Connected )
+			// {
+			// 	if ( p4->IsFileInPerforce( pFilename ) )
+			// 	{
+			// 		++nInPerforce;
+			// 		if ( p4->GetFileState( pFilename ) != P4FILE_UNOPENED )
+			// 		{
+			// 			++nOpenForEdit;
+			// 		}
+			// 	}
+			// }
 		}
 
 		AddMenuItemHelper( m_hContextMenu, "Load", "load", this, nLoaded < nSelected && nOnDisk > 0 );
@@ -270,7 +273,7 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 	vgui::Menu::PlaceContextMenu( this, m_hContextMenu.Get() );
 }
 
-void CFileListManager::OnLoadFiles( KeyValues *pParams )
+void CFileListManager::OnLoadFiles( KeyValues * )
 {
 	CNotifyScopeGuard notify( "CFileListManager::OnLoadFiles", NOTIFY_SOURCE_FILE_LIST_MANAGER, NOTIFY_SETDIRTYFLAG );
 
@@ -288,7 +291,7 @@ void CFileListManager::OnLoadFiles( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnUnloadFiles( KeyValues *pParams )
+void CFileListManager::OnUnloadFiles( KeyValues * )
 {
 	CNotifyScopeGuard notify( "CFileListManager::OnUnloadFiles", NOTIFY_SOURCE_FILE_LIST_MANAGER, NOTIFY_SETDIRTYFLAG );
 
@@ -306,7 +309,7 @@ void CFileListManager::OnUnloadFiles( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnSaveFiles( KeyValues *pParams )
+void CFileListManager::OnSaveFiles( KeyValues * )
 {
 	int nSelected = GetSelectedItemsCount();
 	for ( int i = 0; i < nSelected; ++i )
@@ -334,7 +337,7 @@ void CFileListManager::OnSaveFiles( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnOpenFile( KeyValues *pParams )
+void CFileListManager::OnOpenFile( KeyValues * )
 {
 	KeyValues *pContextKeyValues = new KeyValues( "OnOpen" );
 	vgui::FileOpenDialog *pFileOpenDialog = new vgui::FileOpenDialog( this, "Save .dmx File As", false, pContextKeyValues );
@@ -344,7 +347,7 @@ void CFileListManager::OnOpenFile( KeyValues *pParams )
 	pFileOpenDialog->DoModal( false );
 }
 
-void CFileListManager::OnSaveFileAs( KeyValues *pParams )
+void CFileListManager::OnSaveFileAs( KeyValues * )
 {
 	int nSelected = GetSelectedItemsCount();
 	Assert( nSelected == 1 );
@@ -417,9 +420,9 @@ void CFileListManager::OnFileSelected( KeyValues *pParams )
 	}
 }
 
-void CFileListManager::OnAddToPerforce( KeyValues *pParams )
+void CFileListManager::OnAddToPerforce( KeyValues * )
 {
-	int nFileCount = 0;
+	//int nFileCount = 0;
 	int nSelected = GetSelectedItemsCount();
 	const char **ppFileNames = ( const char** )_alloca( nSelected * sizeof( char* ) );
 	for ( int i = 0; i < nSelected; ++i )
@@ -431,14 +434,15 @@ void CFileListManager::OnAddToPerforce( KeyValues *pParams )
 		if ( !pFilename )
 			continue;
 
-		++nFileCount;
+		//++nFileCount;
 		ppFileNames[ i ] = pFilename;
 	}
 
-	bool bSuccess = p4->OpenFilesForAdd( nFileCount, ppFileNames );
+	bool bSuccess = false; // p4->OpenFilesForAdd( nFileCount, ppFileNames );
 	if ( !bSuccess )
 	{
-		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", p4->GetLastError(), GetParent() );
+		// dimhotepus: Drop Perforce support.
+		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", "No Perforce Support" /*p4->GetLastError()*/, GetParent() );
 		pError->SetSmallCaption( true );
 		pError->DoModal();
 	}
@@ -446,9 +450,9 @@ void CFileListManager::OnAddToPerforce( KeyValues *pParams )
 	Refresh();
 }
 
-void CFileListManager::OnOpenForEdit( KeyValues *pParams )
+void CFileListManager::OnOpenForEdit( KeyValues * )
 {
-	int nFileCount = 0;
+	//int nFileCount = 0;
 	int nSelected = GetSelectedItemsCount();
 	const char **ppFileNames = ( const char** )_alloca( nSelected * sizeof( char* ) );
 	for ( int i = 0; i < nSelected; ++i )
@@ -460,14 +464,16 @@ void CFileListManager::OnOpenForEdit( KeyValues *pParams )
 		if ( !pFilename )
 			continue;
 
-		++nFileCount;
+		//++nFileCount;
 		ppFileNames[ i ] = pFilename;
 	}
-
-	bool bSuccess = p4->OpenFilesForEdit( nFileCount, ppFileNames );
+	
+	// dimhotepus: Drop Perforce support.
+	bool bSuccess = false; // p4->OpenFilesForEdit( nFileCount, ppFileNames );
 	if ( !bSuccess )
 	{
-		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", p4->GetLastError(), GetParent() );
+		// dimhotepus: Drop Perforce support.
+		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", "No Perforce Support" /*p4->GetLastError()*/, GetParent() );
 		pError->SetSmallCaption( true );
 		pError->DoModal();
 	}
@@ -533,7 +539,8 @@ void CFileListManager::Refresh()
 	m_bRefreshRequired = false;
 	RemoveAll();
 
-	const bool bP4Connected = p4 ? p4->IsConnectedToServer() : false;
+	// dimhotepus: Drop Perforce support.
+	const bool bP4Connected = /* p4 ? p4->IsConnectedToServer() :*/ false;
 
 	int nFiles = g_pDataModel->NumFileIds();
 	for ( int i = 0; i < nFiles; ++i )
@@ -546,11 +553,12 @@ void CFileListManager::Refresh()
 		bool bLoaded = g_pDataModel->IsFileLoaded( fileid );
 		int nElements = g_pDataModel->NumElementsInFile( fileid );
 		bool bChanged = false; // TODO - find out for real
-		bool bInPerforce = bP4Connected && p4->IsFileInPerforce( pFileName );
-		bool bOpenForEdit = bInPerforce && p4->GetFileState( pFileName ) != P4FILE_UNOPENED;
+		// dimhotepus: Drop Perforce support.
+		bool bInPerforce = bP4Connected && false; // p4->IsFileInPerforce( pFileName );
+		bool bOpenForEdit = bInPerforce && false; // p4->GetFileState( pFileName ) != P4FILE_UNOPENED;
 
 		char path[ 256 ];
-		V_ExtractFilePath( pFileName, path, sizeof( path ) );
+		V_ExtractFilePath( pFileName, path );
 
 		AddItem( fileid, V_UnqualifiedFileName( pFileName ), path, bLoaded, nElements, bChanged, bInPerforce, bOpenForEdit );
 	}

@@ -15,8 +15,9 @@
 #define MAPINFODLG_H
 #pragma once
 
+#include "windows/base_dlg.h"
 
-class CMapInfoDlg : public CDialog
+class CMapInfoDlg : public CBaseDlg
 {
 	// Construction
 	public:

@@ -23,17 +23,17 @@ public:
 	CVarBitVecSaveRestoreOps() = default;
 
 	// save data type interface
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
 	{
-		BITSTRING *pBitString = (BITSTRING *)fieldInfo.pField;
+		auto *pBitString = (BITSTRING *)fieldInfo.pField;
 		int numBits = pBitString->GetNumBits();
 		pSave->WriteInt( &numBits );
 		pSave->WriteInt( pBitString->Base(), pBitString->GetNumDWords() );
 	}
 	
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
-		BITSTRING *pBitString = (BITSTRING *)fieldInfo.pField;
+		auto *pBitString = (BITSTRING *)fieldInfo.pField;
 		int numBits = pRestore->ReadInt();
 		if ( !pBitString->IsFixedSize() )
 			pBitString->Resize( numBits );
@@ -54,15 +54,15 @@ public:
 		}
 	}
 	
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		BITSTRING *pBitString = (BITSTRING *)fieldInfo.pField;
+		auto *pBitString = (BITSTRING *)fieldInfo.pField;
 		pBitString->ClearAll();
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		BITSTRING *pBitString = (BITSTRING *)fieldInfo.pField;
+		auto *pBitString = (BITSTRING *)fieldInfo.pField;
 		return pBitString->IsAllClear();
 	}
 };

@@ -160,17 +160,17 @@ void Bitmap_t::SetColor( int x, int y, Color c )
 	switch ( m_ImageFormat )
 	{
 		case IMAGE_FORMAT_RGBA8888:
-			ptr[0] = static_cast<byte>(c.r());
-			ptr[1] = static_cast<byte>(c.g());
-			ptr[2] = static_cast<byte>(c.b());
-			ptr[3] = static_cast<byte>(c.a());
+			ptr[0] = c.r();
+			ptr[1] = c.g();
+			ptr[2] = c.b();
+			ptr[3] = c.a();
 			break;
 
 		case IMAGE_FORMAT_ABGR8888:
-			ptr[0] = static_cast<byte>(c.a());
-			ptr[1] = static_cast<byte>(c.b());
-			ptr[2] = static_cast<byte>(c.g());
-			ptr[3] = static_cast<byte>(c.r());
+			ptr[0] = c.a();
+			ptr[1] = c.b();
+			ptr[2] = c.g();
+			ptr[3] = c.r();
 			break;
 
 		default:

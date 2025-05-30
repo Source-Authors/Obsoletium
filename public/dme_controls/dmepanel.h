@@ -13,7 +13,7 @@
 
 
 #include "tier0/basetypes.h"
-#include "tier1/utlstringmap.h"
+#include "tier1/UtlStringMap.h"
 #include "vgui_controls/EditablePanel.h"
 #include "datamodel/dmelement.h"
 #include "datamodel/dmehandle.h"
@@ -46,15 +46,15 @@ DECLARE_POINTER_HANDLE( DmeFactoryHandle_t );
 //-----------------------------------------------------------------------------
 class CDmePanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmePanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
 	CDmePanel( vgui::Panel *pParent, const char *pPanelName, bool bComboBoxVisible = true );
 	virtual ~CDmePanel();
 
-	virtual void PerformLayout();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void PerformLayout() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	void SetDmeElement( CDmElement *pDmeElement, bool bForce = false, const char *pPanelName = NULL );
 
@@ -62,8 +62,8 @@ public:
 	void SetEditor( const char *pEditorName );
 
 	// Drag/drop
-	bool IsDroppable( CUtlVector< KeyValues * >& msglist );
-	void OnPanelDropped( CUtlVector< KeyValues * >& msglist );
+	bool IsDroppable( CUtlVector< KeyValues * >& msglist ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msglist ) override;
 
 	// Refreshes the current panel owing to external change
 	// Values only means no topological change

@@ -3,7 +3,7 @@
 // Purpose: 
 //
 //===========================================================================//
-#include "interface.h"
+#include "tier1/interface.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"
@@ -24,10 +24,9 @@
 
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-#include "tier1/strtools.h"
 #include "tier0/icommandline.h"
-#include "tier0/dbg.h"
 #include "tier0/threadtools.h"
+#include "tier1/strtools.h"
 
 #ifdef _WIN32
 #include <direct.h> // getcwd
@@ -133,7 +132,7 @@ void *GetModuleHandle(const char *name)
 //-----------------------------------------------------------------------------
 static void *Sys_GetProcAddress( const char *pModuleName, const char *pName )
 {
-  HMODULE hModule = (HMODULE)GetModuleHandle(pModuleName);
+	HMODULE hModule = (HMODULE)GetModuleHandle(pModuleName);
 #ifdef WIN32
 	return hModule ? (void *)GetProcAddress( hModule, pName ) : nullptr;
 #else
@@ -176,6 +175,8 @@ static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 
 unsigned ThreadedLoadLibraryFunc( void *pParam )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("ModuleLoader");
 	ThreadedLoadLibaryContext_t *pContext = (ThreadedLoadLibaryContext_t*)pParam;
 	pContext->m_hLibrary = InternalLoadLibrary( pContext->m_pLibraryName, SYS_NOFLAGS );
 	return 0;
@@ -191,21 +192,10 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 	const char *pDllStringExtension = V_GetFileExtension( DLL_EXT_STRING );
 	const char *pModuleExtension = pDllStringExtension ? ( pDllStringExtension - 1 ) : DLL_EXT_STRING;
 
-	Q_strncpy( str, pLibraryName, sizeof(str) );
+	V_strcpy_safe( str, pLibraryName );
 
-	if ( IsX360() )
-	{
-		// old, probably busted, behavior for xbox
-		if ( !Q_stristr( str, pModuleExtension ) )
-		{
-			V_SetExtension( str, pModuleExtension, sizeof(str) );
-		}
-	}
-	else
-	{
-		// always force the final extension to be .dll
-		V_SetExtension( str, pModuleExtension, sizeof(str) );
-	}
+	// always force the final extension to be .dll
+	V_SetExtension( str, pModuleExtension );
 
 	Q_FixSlashes( str );
 
@@ -272,7 +262,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 		if ( !_getcwd( szCwd, sizeof( szCwd ) ) )
 		{
 			const auto error = std::generic_category().message(errno);
-			Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
+			Warning( "Failed to load %s: %s\n", pModuleName, error.c_str() );
 			return nullptr;
 		}
 
@@ -311,9 +301,9 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 			// So you can see what the error is in the debugger...
 #if defined( _WIN32 ) && !defined( _X360 )
 			const auto error = std::system_category().message(::GetLastError());
-			Msg( "Failed to load %s: %s\n", pModuleName, error.c_str() );
+			Warning( "Failed to load %s: %s\n", pModuleName, error.c_str() );
 #else
-			Msg( "Failed to load %s: %s\n", pModuleName, dlerror() );
+			Warning( "Failed to load %s: %s\n", pModuleName, dlerror() );
 #endif // _WIN32
 		}
 #endif // DEBUG
@@ -393,11 +383,14 @@ void Sys_UnloadModule( CSysModule *pModule )
 CreateInterfaceFn Sys_GetFactory( CSysModule *pModule )
 {
 	if ( !pModule )
-		return NULL;
+		return nullptr;
 
 	HMODULE	hDLL = reinterpret_cast<HMODULE>(pModule);
 #ifdef _WIN32
+	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
 	return reinterpret_cast<CreateInterfaceFn>(GetProcAddress( hDLL, CREATEINTERFACE_PROCNAME ));
+	SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 #elif defined(POSIX)
 	// Linux gives this error:
 	//../public/interface.cpp: In function `IBaseInterface *(*Sys_GetFactory
@@ -456,7 +449,7 @@ bool Sys_LoadInterface(
 		return false;
 	}
 
-	*pOutInterface = fn( pInterfaceVersionName, NULL );
+	*pOutInterface = fn( pInterfaceVersionName, nullptr );
 	if ( !( *pOutInterface ) )
 	{
 		Sys_UnloadModule( pMod );

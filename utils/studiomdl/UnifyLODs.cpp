@@ -5,11 +5,12 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <cfloat>
+
 #include <sys/stat.h>
-#include <math.h>
-#include <float.h>
 
 #include "cmdlib.h"
 #include "scriplib.h"
@@ -282,10 +283,9 @@ s_source_t* GetModelLODSource( const char *pModelName,
 								const LodScriptData_t& scriptLOD, bool* pFound )
 {
 	// When doing LOD replacement, ignore all path + extension information
-	char* pTempBuf = (char*)_alloca( Q_strlen(pModelName) + 1 );
+	V_strdup_stack( pModelName, pTempBuf );
 
 	// Strip off extensions for the source...
-	strcpy( pTempBuf, pModelName ); 
 	char* pDot = strrchr( pTempBuf, '.' );
 	if (pDot)
 	{

@@ -56,7 +56,7 @@ int CUserMessages::LookupUserMessage( const char *name )
 //-----------------------------------------------------------------------------
 int CUserMessages::GetUserMessageSize( int index )
 {
-	if ( index < 0 || index >= (int)m_UserMessages.Count() )
+	if ( index < 0 || index >= m_UserMessages.Count() )
 	{
 		Error( "CUserMessages::GetUserMessageSize( %i ) out of range!!!\n", index );
 	}
@@ -72,7 +72,7 @@ int CUserMessages::GetUserMessageSize( int index )
 //-----------------------------------------------------------------------------
 const char *CUserMessages::GetUserMessageName( int index )
 {
-	if ( index < 0 || index >= (int)m_UserMessages.Count() )
+	if ( index < 0 || index >= m_UserMessages.Count() )
 	{
 		Error( "CUserMessages::GetUserMessageSize( %i ) out of range!!!\n", index );
 	}
@@ -148,9 +148,9 @@ void CUserMessages::HookMessage( const char *name, pfnUserMsgHook hook )
 bool CUserMessages::DispatchUserMessage( int msg_type, bf_read &msg_data )
 {
 #if defined( CLIENT_DLL )
-	if ( msg_type < 0 || msg_type >= (int)m_UserMessages.Count() )
+	if ( msg_type < 0 || msg_type >= m_UserMessages.Count() )
 	{
-		DevMsg( "CUserMessages::DispatchUserMessage:  Bogus msg type %i (max == %zu)\n", msg_type, m_UserMessages.Count() );
+		DevMsg( "CUserMessages::DispatchUserMessage:  Bogus msg type %i (max == %d)\n", msg_type, m_UserMessages.Count() );
 		Assert( 0 );
 		return false;
 	}

@@ -1,184 +1,210 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-#include <stdlib.h>
-#include <stdio.h>
-#include "UtlBuffer.h"
+// Copyright Valve Corporation, All rights reserved.
+//
+// Command line utility that splits a composite .PFM Skybox into separate .PFM
+// images.
+//
+// See https://developer.valvesoftware.com/wiki/Splitskybox
+
 #include "filesystem.h"
 #include "filesystem_tools.h"
-#include "tier1/strtools.h"
-#include "tier0/icommandline.h"
 #include "cmdlib.h"
 
-void Usage( void )
-{
-	printf( "Usage: splitskybox blah.pfm\n" );
-	exit( -1 );
+#include "bitmap/float_bm.h"
+
+#include "tier1/utlbuffer.h"
+#include "tier1/strtools.h"
+#include "tier0/icommandline.h"
+
+#include "posix_file_stream.h"
+#include "tools_minidump.h"
+
+#include <memory>
+
+#include "tier0/memdbgon.h"
+
+namespace {
+
+[[noreturn]] void Usage() {
+  printf("Usage: splitskybox blah.pfm\n");
+
+  exit(EINVAL);
 }
 
-static int ReadIntFromUtlBuffer( CUtlBuffer &buf )
-{
-	int val = 0;
-	int c;
-	while( 1 )
-	{
-		c = buf.GetChar();
-		if( c >= '0' && c <= '9' )
-		{
-			val = val * 10 + ( c - '0' );
-		}
-		else
-		{
-			return val;
-		}
-	}
+int ReadIntFromUtlBuffer(CUtlBuffer &buffer) {
+  int val = 0;
+
+  while (1) {
+    char c = buffer.GetChar();
+
+    if (c >= '0' && c <= '9') {
+      val = val * 10 + (c - '0');
+    } else {
+      return val;
+    }
+  }
 }
 
-//-----------------------------------------------------------------------------
 // Loads a file into a UTLBuffer
-//-----------------------------------------------------------------------------
-static bool LoadFile( const char *pFileName, CUtlBuffer &buf, bool bFailOnError )
-{
-	FILE *fp = fopen( pFileName, "rb" );
-	if (!fp)
-	{
-		if (!bFailOnError)
-			return false;
+bool LoadFile(const char *file_path, CUtlBuffer &buf) {
+  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "rb");
+  if (errc) {
+    Warning("Unable to open '%s': %s.\n", file_path, errc.message().c_str());
+    return false;
+  }
 
-		Error( "Can't open: \"%s\"\n", pFileName );
-	}
+  int64_t size;
+  std::tie(size, errc) = f.size();
+  if (errc || size > std::numeric_limits<intp>::max()) {
+    Warning("Unable to get size of '%s': %s.\n", file_path,
+            errc.message().c_str());
+    return false;
+  }
 
-	fseek( fp, 0, SEEK_END );
-	int nFileLength = ftell( fp );
-	fseek( fp, 0, SEEK_SET );
+  const intp correct_size{static_cast<intp>(size)};
+  buf.EnsureCapacity(correct_size);
 
-	buf.EnsureCapacity( nFileLength );
-	fread( buf.Base(), 1, nFileLength, fp );
-	fclose( fp );
-	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nFileLength );
-	return true;
+  std::tie(std::ignore, errc) =
+      f.read(buf.Base(), correct_size, 1, correct_size);
+  if (errc) {
+    Warning("Unable to read '%s': %s.\n", file_path, errc.message().c_str());
+    return false;
+  }
+
+  buf.SeekPut(CUtlBuffer::SEEK_HEAD, correct_size);
+
+  return true;
 }
 
-static bool PFMRead( CUtlBuffer &fileBuffer, int &nWidth, int &nHeight, float **ppImage )
-{
-	fileBuffer.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
-	if( fileBuffer.GetChar() != 'P' )
-	{
-		Assert( 0 );
-		return false;
-	}
-	if( fileBuffer.GetChar() != 'F' )
-	{
-		Assert( 0 );
-		return false;
-	}
-	if( fileBuffer.GetChar() != 0xa )
-	{
-		Assert( 0 );
-		return false;
-	}
-	nWidth = ReadIntFromUtlBuffer( fileBuffer );
-	nHeight = ReadIntFromUtlBuffer( fileBuffer );
+[[nodiscard]] bool PFMRead(const char *file_path, CUtlBuffer &fileBuffer,
+                           int &nWidth, int &nHeight, float **ppImage) {
+  fileBuffer.SeekGet(CUtlBuffer::SEEK_HEAD, 0);
+  if (fileBuffer.GetChar() != 'P' || fileBuffer.GetChar() != 'F' ||
+      fileBuffer.GetChar() != 0xa) {
+    Warning("'%s' is not PFM. Expected PF<new_line> signature.\n", file_path);
+    return false;
+  }
 
-	// eat crap until the next newline
-	while( fileBuffer.GetChar() != 0xa )
-	{
-	}
+  nWidth = ReadIntFromUtlBuffer(fileBuffer);
+  nHeight = ReadIntFromUtlBuffer(fileBuffer);
 
-	*ppImage = new float[nWidth * nHeight * 3];
+  // eat crap until the next newline
+  while (fileBuffer.GetChar() != 0xa) {
+  }
 
-	int y;
-	for( y = nHeight-1; y >= 0; y-- )
-	{
-		fileBuffer.Get( *ppImage + nWidth * y * 3, nWidth * 3 * sizeof( float ) );
-	}
-	return true;
+  *ppImage = new float[nWidth * nHeight * 3];
+
+  for (int y = nHeight - 1; y >= 0; y--) {
+    fileBuffer.Get(*ppImage + nWidth * y * 3, nWidth * 3u * sizeof(float));
+  }
+
+  return true;
 }
 
-static void PFMWrite( float *pFloatImage, const char *pFilename, int width, int height )
-{
-	printf( "filename: %s\n", pFilename );
-	FileHandle_t fp;
-	fp = g_pFullFileSystem->Open( pFilename, "wb" );
-	if( fp == FILESYSTEM_INVALID_HANDLE )
-	{
-		fprintf( stderr, "error opening \"%s\"\n", pFilename );
-		exit( -1 );
-	}
-	g_pFullFileSystem->FPrintf( fp, "PF\n%d %d\n-1.000000\n", width, height );
-	int i;
-	for( i = height-1; i >= 0; i-- )
-//	for( i = 0; i < height; i++ )
-	{
-		float *pRow = &pFloatImage[3 * width * i];
-		g_pFullFileSystem->Write( pRow, width * sizeof( float ) * 3, fp );
-	}
-	g_pFullFileSystem->Close( fp );
+[[nodiscard]] bool WriteSubRect(int src_width, int src_height,
+                                const float *src_image, int src_offset_x,
+                                int src_offset_y, int dst_width, int dst_height,
+                                const char *src_file_name,
+                                const char *dst_file_extension,
+                                std::unique_ptr<float[]> &dst_image) {
+  for (int y = 0; y < dst_height; y++) {
+    for (int x = 0; x < dst_width; x++) {
+      const intp src_offset =
+          ((static_cast<intp>(src_offset_x) + x) +
+           (src_offset_y + y) * static_cast<intp>(src_width)) *
+          3;
+      const intp dst_offset = (static_cast<intp>(x) + (dst_width * y)) * 3;
+
+      dst_image[dst_offset + 0] = src_image[src_offset + 0];
+      dst_image[dst_offset + 1] = src_image[src_offset + 1];
+      dst_image[dst_offset + 2] = src_image[src_offset + 2];
+    }
+  }
+
+  char dstFileName[MAX_PATH];
+  V_strcpy_safe(dstFileName, src_file_name);
+  V_StripExtension(src_file_name, dstFileName);
+  V_strcat_safe(dstFileName, dst_file_extension);
+  V_strcat_safe(dstFileName, ".pfm");
+
+  if (!PFMWrite(dst_image.get(), dstFileName, dst_width, dst_height)) {
+    Warning("Unable to write PFM to '%s'.\n", dstFileName);
+    return false;
+  }
+
+  return true;
 }
 
-void WriteSubRect( int nSrcWidth, int nSrcHeight, const float *pSrcImage, 
-				  int nSrcOffsetX, int nSrcOffsetY, int nDstWidth, int nDstHeight, 
-				  const char *pSrcFileName, const char *pDstFileNameExtension )
-{
-	float *pDstImage = new float[nDstWidth * nDstHeight * 3];
+}  // namespace
 
-	int x, y;
-	for( y = 0; y < nDstHeight; y++ )
-	{
-		for( x = 0; x < nDstWidth; x++ )
-		{
-			pDstImage[(x+(nDstWidth*y))*3+0] = pSrcImage[((nSrcOffsetX+x)+(nSrcOffsetY+y)*nSrcWidth)*3+0];
-			pDstImage[(x+(nDstWidth*y))*3+1] = pSrcImage[((nSrcOffsetX+x)+(nSrcOffsetY+y)*nSrcWidth)*3+1];
-			pDstImage[(x+(nDstWidth*y))*3+2] = pSrcImage[((nSrcOffsetX+x)+(nSrcOffsetY+y)*nSrcWidth)*3+2];
-		}
-	}
+int main(int argc, char **argv) {
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps;
 
-	char dstFileName[MAX_PATH];
-	Q_strcpy( dstFileName, pSrcFileName );
-	Q_StripExtension( pSrcFileName, dstFileName, MAX_PATH );
-	Q_strcat( dstFileName, pDstFileNameExtension, sizeof(dstFileName) );
-	Q_strcat( dstFileName, ".pfm", sizeof(dstFileName) );
+  CommandLine()->CreateCmdLine(argc, argv);
 
-	PFMWrite( pDstImage, dstFileName, nDstWidth, nDstHeight );
+#ifdef PLATFORM_64BITS
+  Msg("\nValve Software - splitskybox [64 bit] (%s)\n", __DATE__);
+#else
+  Msg("\nValve Software - splitskybox (%s)\n", __DATE__);
+#endif
 
-	delete [] pDstImage;
+  if (argc != 2) Usage();
+
+  const ScopedFileSystem scoped_file_system{argv[argc - 1]};
+
+  // Expand the path so that it can run correctly from a shortcut.
+  char source[1024];
+  V_strcpy_safe(source, ExpandPath(argv[1]));
+
+  CUtlBuffer src_data;
+  if (!LoadFile(argv[1], src_data)) return EIO;
+
+  float *src_image = nullptr;
+  int src_width, src_height;
+  if (!PFMRead(argv[1], src_data, src_width, src_height, &src_image)) {
+    return EIO;
+  }
+
+  const int dst_width = src_width / 4;
+  const int dst_height = src_height / 3;
+
+  Assert(dst_width == dst_height);
+
+  // dimhotepus: Allocate dst_image buffer once to speed up.
+  std::unique_ptr<float[]> dst_image = std::make_unique<float[]>(
+      static_cast<size_t>(dst_width) * dst_height * 3);
+
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 0,
+                    dst_height * 1, dst_width, dst_height, argv[1], "ft",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 1,
+                    dst_height * 1, dst_width, dst_height, argv[1], "lf",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 2,
+                    dst_height * 1, dst_width, dst_height, argv[1], "bk",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 3,
+                    dst_height * 1, dst_width, dst_height, argv[1], "rt",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 3,
+                    dst_height * 0, dst_width, dst_height, argv[1], "up",
+                    dst_image)) {
+    return EIO;
+  }
+  if (!WriteSubRect(src_width, src_height, src_image, dst_width * 3,
+                    dst_height * 2, dst_width, dst_height, argv[1], "dn",
+                    dst_image)) {
+    return EIO;
+  }
+
+  return 0;
 }
-
-int main( int argc, char **argv )
-{
-	CommandLine()->CreateCmdLine( argc, argv );
-	if( argc != 2 )
-	{
-		Usage();
-	}
-	CmdLib_InitFileSystem( argv[ argc-1 ] );
-	CUtlBuffer srcFileData;
-
-	// Expand the path so that it can run correctly from a shortcut
-	char		source[1024];
-	strcpy (source, ExpandPath(argv[1]));
-
-	LoadFile( argv[1], srcFileData, true );
-
-	float *pSrcImage = NULL;
-	int nSrcWidth, nSrcHeight;
-	if( !PFMRead( srcFileData, nSrcWidth, nSrcHeight, &pSrcImage ) )
-	{
-		printf( "Couldn't read %s\n", argv[1] );
-	}
-
-	int nDstWidth = nSrcWidth / 4;
-	int nDstHeight = nSrcHeight / 3;
-	Assert( nDstWidth == nDstHeight );
-
-	WriteSubRect( nSrcWidth, nSrcHeight, pSrcImage, nDstWidth * 0, nDstHeight * 1, nDstWidth, nDstHeight, argv[1], "ft" );
-	WriteSubRect( nSrcWidth, nSrcHeight, pSrcImage, nDstWidth * 1, nDstHeight * 1, nDstWidth, nDstHeight, argv[1], "lf" );
-	WriteSubRect( nSrcWidth, nSrcHeight, pSrcImage, nDstWidth * 2, nDstHeight * 1, nDstWidth, nDstHeight, argv[1], "bk" );
-	WriteSubRect( nSrcWidth, nSrcHeight, pSrcImage, nDstWidth * 3, nDstHeight * 1, nDstWidth, nDstHeight, argv[1], "rt" );
-	WriteSubRect( nSrcWidth, nSrcHeight, pSrcImage, nDstWidth * 3, nDstHeight * 0, nDstWidth, nDstHeight, argv[1], "up" );
-	WriteSubRect( nSrcWidth, nSrcHeight, pSrcImage, nDstWidth * 3, nDstHeight * 2, nDstWidth, nDstHeight, argv[1], "dn" );
-
-	CmdLib_Cleanup();
-	CmdLib_Exit( 1 );
-
-	return 0;
-}
-

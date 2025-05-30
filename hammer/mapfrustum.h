@@ -54,7 +54,7 @@ public:
 	virtual bool IsClutter(void) { return true; }
 	virtual bool IsCulledByCordon(const Vector &vecMins, const Vector &vecMaxs) { return false; } // We don't hide unless our parent hides.
 
-	const char* GetDescription() { return("Frustum helper"); }
+	const char* GetDescription() const override { return("Frustum helper"); }
 
 	void OnParentKeyChanged( const char* key, const char* value );
 	bool ShouldRenderLast(void) { return(true); }

@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 //
-// Remote HLSL shaders compiler client
+// Remote HLSL shaders compiler client.
 
 #include "winlite.h"
 #include "com_ptr.h"
@@ -13,9 +13,12 @@
 
 #include <atomic>
 #include <cassert>
+#include <chrono>
 #include <system_error>
 #include <thread>
 #include <vector>
+
+#include "tier0/memdbgon.h"
 
 namespace {
 

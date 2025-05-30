@@ -17,7 +17,7 @@
 
 
 #ifndef INCLUDED_MXWIDGET
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #endif
 
 class mxWindow;
@@ -26,7 +26,13 @@ class mxWindow;
 
 typedef void *mxTreeViewItem;
 
-//typedef int __stdcall (*TreeSortFunc)(long lParam1, long lParam2, long lParamSort);
+#if defined(_WIN64)
+typedef __int64 LONG_PTR, *PLONG_PTR;
+#else
+typedef _W64 long LONG_PTR, *PLONG_PTR;
+#endif
+
+typedef int (__stdcall *TreeSortFunc)(LONG_PTR lParam1, LONG_PTR lParam2, LONG_PTR lParamSort);
 
 class mxTreeView_i;
 class mxTreeView : public mxWidget
@@ -50,8 +56,7 @@ public:
 	void setImages(mxTreeViewItem *item, int imagenormal, int imageselected );
 	void moveItemDown( mxTreeViewItem *item );
 
-	void sortTree( mxTreeViewItem *parent, bool recurse, 
-		void *func, int parameter );
+	void sortTree( mxTreeViewItem *parent, bool recurse, TreeSortFunc func, int parameter );
 
 	void scrollTo( mxTreeViewItem *item );
 

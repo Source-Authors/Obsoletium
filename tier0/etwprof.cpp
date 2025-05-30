@@ -124,7 +124,7 @@ void ETWMarkPrintf( PRINTF_FORMAT_STRING const char *pMessage, ... ) FMTFUNCTION
 
 	char buffer[1000];
 	va_list args;
-	va_start( args, pMessage );
+	va_start( args, pMessage ); //-V2018 //-V2019
 	vsprintf_s( buffer, pMessage, args );
 	va_end( args );
 
@@ -185,7 +185,7 @@ void ETWMark2S( const char *pMessage, const char* data1, const char* data2 )
 // if we start emitting marks on multiple threads. Using __declspec(thread)
 // has some problems on Windows XP, but since these ETW functions only work
 // on Vista+ that doesn't matter.
-static __declspec( thread ) int s_nDepth;
+static thread_local int s_nDepth;
 
 int64 ETWBegin( const char *pMessage )
 {

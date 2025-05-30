@@ -24,7 +24,7 @@ public:
 	~KeyValuesJSONParser() = default;
 
 	/// Parse the whole string.  If there's a problem, returns NULL and sets m_nLine,m_szErrMsg with more info. 
-	KeyValues *ParseFile();
+	[[nodiscard]] KeyValues *ParseFile();
 
 	/// Error message is returned here, if there is one.
 	char m_szErrMsg[ 1024 ];
@@ -34,9 +34,9 @@ public:
 
 private:
 
-	bool ParseObject( KeyValues *pObject );
-	bool ParseArray( KeyValues *pArray );
-	bool ParseValue( KeyValues *pValue );
+	[[nodiscard]] bool ParseObject( KeyValues *pObject );
+	[[nodiscard]] bool ParseArray( KeyValues *pArray );
+	[[nodiscard]] bool ParseValue( KeyValues *pValue );
 	void Init( const char *pszText, intp cbSize );
 
 	const char *m_cur;
@@ -60,7 +60,7 @@ private:
 	void NextToken();
 	void ParseNumberToken();
 	void ParseStringToken();
-	const char *GetTokenDebugText();
+	[[nodiscard]] const char *GetTokenDebugText();
 };
 
 #ifdef _DEBUG

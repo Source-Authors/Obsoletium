@@ -756,7 +756,8 @@ uint32 C_OP_NoiseEmitter::Emit( CParticleCollection *pParticles, float flCurStre
 	Coord = Vector ( (pParticles->m_flCurTime + Offset), (pParticles->m_flCurTime + Offset), (pParticles->m_flCurTime + Offset) );
 	Coord *= CoordScale;
 
-	CoordWorldTime = Vector( (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale), (Plat_MSTime() * m_flWorldTimeScale) );
+	// dimhotepus: ms -> mcs to prevent overflow in 49.7 days.
+	CoordWorldTime = Vector( (Plat_USTime() / 1000 * m_flWorldTimeScale), (Plat_USTime() / 1000 * m_flWorldTimeScale), (Plat_USTime() / 1000 * m_flWorldTimeScale) );
 	Coord += CoordWorldTime;
 
 	fltx4 flNoise128;

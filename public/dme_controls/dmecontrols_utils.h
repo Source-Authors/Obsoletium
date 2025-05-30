@@ -44,9 +44,23 @@ inline void AddStandardElementKeys( KeyValues *pKeyValues, CDmElement *pElement 
 
 	if ( pElement )
 	{
+		// dimhotepus: Handle uuid to string failure (should not happen).
 		char buf[ 256 ];
-		UniqueIdToString( pElement->GetId(), buf, sizeof( buf ) );
-		pKeyValues->SetString( "text", buf );
+		if ( UniqueIdToString( pElement->GetId(), buf ) ) 
+		{
+			pKeyValues->SetString( "text", buf );
+		}
+		else
+		{
+			AssertMsg( "Unable to convert ID to string for '%s' element.", pElement->GetName() );
+
+			// dimhotepus: Send invalid ID when unable to convert real one.
+			UniqueId_t invalid;
+			InvalidateUniqueId( &invalid );
+
+			pKeyValues->SetString( "text", UniqueIdToString( invalid, buf ) ? buf : "\0" );
+		}
+
 		pKeyValues->SetString( "type", pElement->GetTypeString() );
 	}
 }
@@ -99,8 +113,8 @@ inline DmAttributeType_t ElementTree_GetAttributeType( KeyValues *itemData )
 
 inline bool ElementTree_GetDroppableItems( CUtlVector< KeyValues * >& msglist, const char *elementType, CUtlVector< CDmElement * >& list )
 {
-	int c = msglist.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = msglist.Count();
+	for ( intp i = 0; i < c; ++i )
 	{	
 		KeyValues *data = msglist[ i ];
 
@@ -124,8 +138,8 @@ inline bool ElementTree_GetDroppableItems( CUtlVector< KeyValues * >& msglist, c
 inline void ElementTree_RemoveListFromArray( CDmAttribute *pArrayAttribute, CUtlVector< CDmElement * >& list )
 {
 	CDmrElementArray<> array( pArrayAttribute );
-	int c = array.Count();
-	for ( int i = c - 1 ; i >= 0 ; --i )
+	intp c = array.Count();
+	for ( intp i = c - 1 ; i >= 0 ; --i )
 	{
 		CDmElement *element = array[ i ];
 		if ( list.Find( element ) != list.InvalidIndex() )

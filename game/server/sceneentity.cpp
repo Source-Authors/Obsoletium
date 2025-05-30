@@ -182,13 +182,13 @@ END_DATADESC()
 //			... - 
 // Output : static void
 //-----------------------------------------------------------------------------
-void LocalScene_Printf( const char *pFormat, ... )
+void LocalScene_Printf( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list marker;
 	char msg[8192];
 
 	va_start(marker, pFormat);
-	Q_vsnprintf(msg, sizeof(msg), pFormat, marker);
+	V_vsprintf_safe(msg, pFormat, marker);
 	va_end(marker);	
 
 	Scene_Printf( "%s", msg );
@@ -231,14 +231,14 @@ void FreeSceneFileMemory( void *buffer )
 class CChoreoStringPool : public IChoreoStringPool
 {
 public:
-	short FindOrAddString( const char *pString )
+	short FindOrAddString( const char *pString ) override
 	{
 		// huh?, no compilation at run time, only fetches
 		Assert( 0 );
 		return -1;
 	}
 
-	bool GetString( short stringId, char *buff, int buffSize )
+	bool GetString( short stringId, char *buff, intp buffSize ) override
 	{
 		// fetch from compiled pool
 		const char *pString = scenefilecache->GetSceneString( stringId );
@@ -519,7 +519,7 @@ public:
 	bool					m_bBreakOnNonIdle;
 
 public:
-	virtual CBaseFlex		*FindNamedActor( int index );
+	virtual CBaseFlex		*FindNamedActor( intp index );
 	virtual CBaseFlex		*FindNamedActor( CChoreoActor *pChoreoActor );
 	virtual CBaseFlex		*FindNamedActor( const char *name );
 	virtual CBaseEntity		*FindNamedEntity( const char *name, CBaseEntity *pActor = NULL, bool bBaseFlexOnly = false, bool bUseClear = false );
@@ -1093,7 +1093,7 @@ void CSceneEntity::OnRestore()
 
 	m_bSceneMissing = false;
 
-	int i;
+	intp i;
 	for ( i = 0 ; i < m_pScene->GetNumActors(); i++ )
 	{
 		CBaseFlex *pTestActor = FindNamedActor( i );
@@ -1971,7 +1971,7 @@ bool CSceneEntity::InvolvesActor( CBaseEntity *pActor )
  	if ( !m_pScene )
 		return false;	
 
-	int i;
+	intp i;
 	for ( i = 0 ; i < m_pScene->GetNumActors(); i++ )
 	{
 		CBaseFlex *pTestActor = FindNamedActor( i );
@@ -2177,7 +2177,7 @@ void CSceneEntity::InputInterjectResponse( inputdata_t &inputdata )
 
 	CUtlVector<CAI_BaseActor *> candidates;
 
-	for ( int i = 0 ; i < m_pScene->GetNumActors(); i++ )
+	for ( intp i = 0 ; i < m_pScene->GetNumActors(); i++ )
 	{
 		CBaseFlex *pTestActor = FindNamedActor( i );
 		if ( !pTestActor )
@@ -2252,7 +2252,7 @@ bool CSceneEntity::CheckActors()
 	if ( !m_pScene )
 		return false;
 
-	int i;
+	intp i;
 	for ( i = 0 ; i < m_pScene->GetNumActors(); i++ )
 	{
 		CBaseFlex *pTestActor = FindNamedActor( i );
@@ -2703,7 +2703,7 @@ void CSceneEntity::PitchShiftPlayback( float fPitch )
 	if ( !m_pScene )
 		return;
 
-	for ( int iActor = 0 ; iActor < m_pScene->GetNumActors(); ++iActor )
+	for ( intp iActor = 0 ; iActor < m_pScene->GetNumActors(); ++iActor )
 	{
 		CBaseFlex *pTestActor = FindNamedActor( iActor );
 
@@ -2743,7 +2743,7 @@ void CSceneEntity::QueueResumePlayback( void )
 		// HACKHACK: For now, get the first target, and see if we can find a response for him
 		if ( !bStartedScene )
 		{
-			CBaseFlex *pActor = FindNamedActor( 0 );
+			CBaseFlex *pActor = FindNamedActor( static_cast<intp>(0) );
 			if ( pActor )
 			{
 				CAI_BaseActor *pBaseActor = dynamic_cast<CAI_BaseActor*>(pActor);
@@ -3359,7 +3359,7 @@ void CSceneEntity::UnloadScene( void )
 	{
 		ClearSceneEvents( m_pScene, false );
 
-		for ( int i = 0 ; i < m_pScene->GetNumActors(); i++ )
+		for ( intp i = 0 ; i < m_pScene->GetNumActors(); i++ )
 		{
 			CBaseFlex *pTestActor = FindNamedActor( i );
 
@@ -3452,7 +3452,7 @@ bool CSceneEntity::CheckEvent( float currenttime, CChoreoScene *scene, CChoreoEv
 // Output : CBaseFlex
 //-----------------------------------------------------------------------------
 
-CBaseFlex *CSceneEntity::FindNamedActor( int index )
+CBaseFlex *CSceneEntity::FindNamedActor( intp index )
 {
 	if (m_hActorList.Count() == 0)
 	{
@@ -3462,7 +3462,8 @@ CBaseFlex *CSceneEntity::FindNamedActor( int index )
 
 	if ( !m_hActorList.IsValidIndex( index ) )
 	{
-		DevWarning( "Scene %s has %d actors, but scene entity only has %zd actors\n", m_pScene->GetFilename(), m_pScene->GetNumActors(), m_hActorList.Count() );
+		DevWarning( "Scene %s has %zd actors, but scene entity only has %zd actors\n",
+			m_pScene->GetFilename(), m_pScene->GetNumActors(), m_hActorList.Count() );
 		return NULL;
 	}
 
@@ -3513,7 +3514,6 @@ CBaseFlex *CSceneEntity::FindNamedActor( CChoreoActor *pChoreoActor )
 CBaseFlex *CSceneEntity::FindNamedActor( const char *name )
 {
 	CBaseEntity *entity = FindNamedEntity( name, NULL, true );
-
 	if ( !entity )
 	{
 		// Couldn't find actor!
@@ -3939,7 +3939,7 @@ void CSceneEntity::ClearSceneEvents( CChoreoScene *scene, bool canceled )
 
 	LocalScene_Printf( "%s : %8.2f:  clearing events\n", STRING( m_iszSceneFile ), m_flCurrentTime );
 
-	int i;
+	intp i;
 	for ( i = 0 ; i < m_pScene->GetNumActors(); i++ )
 	{
 		CBaseFlex *pActor = FindNamedActor( i );
@@ -3988,7 +3988,7 @@ void CSceneEntity::ClearSchedules( CChoreoScene *scene )
 	if ( !m_pScene )
 		return;
 
-	int i;
+	intp i;
 	for ( i = 0 ; i < m_pScene->GetNumActors(); i++ )
 	{
 		CBaseFlex *pActor = FindNamedActor( i );
@@ -4242,8 +4242,8 @@ void CSceneEntity::OnSceneFinished( bool canceled, bool fireoutput )
 	LocalScene_Printf( "%s : %8.2f:  finished\n", STRING( m_iszSceneFile ), m_flCurrentTime );
 
 	// Notify any listeners
-	int c = m_hNotifySceneCompletion.Count();
-	int i;
+	intp c = m_hNotifySceneCompletion.Count();
+	intp i;
 	for ( i = 0; i < c; i++ )
 	{
 		CSceneEntity *ent = m_hNotifySceneCompletion[ i ].Get();
@@ -4609,16 +4609,7 @@ void PrecacheInstancedScene( char const *pszScene )
 
 	// verify existence, cache is pre-populated, should be there
 	SceneCachedData_t sceneData;
-	if ( !scenefilecache->GetSceneCachedData( pszScene, &sceneData ) )
-	{
-		// Scenes are sloppy and don't always exist.
-		// A scene that is not in the pre-built cache image, but on disk, is a true error.
-		if ( developer.GetInt() && ( IsX360() && ( g_pFullFileSystem->GetDVDMode() != DVDMODE_STRICT ) && g_pFullFileSystem->FileExists( pszScene, "GAME" ) ) )
-		{
-			Warning( "PrecacheInstancedScene: Missing scene '%s' from scene image cache.\nRebuild scene image cache!\n", pszScene );
-		}
-	}
-	else
+	if ( scenefilecache->GetSceneCachedData( pszScene, &sceneData ) )
 	{
 		for ( int i = 0; i < sceneData.numSounds; ++i )
 		{

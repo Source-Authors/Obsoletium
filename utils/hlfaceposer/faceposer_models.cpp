@@ -5,9 +5,9 @@
 // $NoKeywords: $
 //
 //=============================================================================//
+#include "faceposer_models.h"
 #include "hlfaceposer.h"
 #include "StudioModel.h"
-#include "faceposer_models.h"
 #include "filesystem.h"
 #include "ifaceposerworkspace.h"
 #include <mxtk/mx.h>
@@ -17,13 +17,12 @@
 #include "checksum_crc.h"
 #include "ViewerSettings.h"
 #include "matsyswin.h"
-#include "KeyValues.h"
-#include "utlbuffer.h" 
 #include "expression.h"
 #include "ProgressDialog.h"
 #include "tier1/UtlString.h"
 #include "tier1/FmtStr.h"
 #include "tier1/KeyValues.h"
+#include "tier1/utlbuffer.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -36,13 +35,13 @@ IFaceposerModels::CFacePoserModel::CFacePoserModel( char const *modelfile, Studi
 	m_pModel = model;
 	m_szActorName[ 0 ] = 0;
 	m_szShortName[ 0 ] = 0;
-	strcpy( m_szModelFileName, modelfile );
+	V_strcpy_safe( m_szModelFileName, modelfile );
 	Q_FixSlashes( m_szModelFileName );
 
 	CStudioHdr *hdr = model->GetStudioHdr();
 	if ( hdr )
 	{	
-		Q_StripExtension( hdr->pszName(), m_szShortName, sizeof( m_szShortName ) );
+		Q_StripExtension( hdr->pszName(), m_szShortName );
 	}
 
 	m_bVisibileIn3DView = false;
@@ -124,9 +123,9 @@ const char *IFaceposerModels::CFacePoserModel::GetBitmapChecksum( int sequence )
 	static char filename[ 512 ];
 
 	char hex[ 16 ];
-	Q_binarytohex( (byte *)&crc, sizeof( crc ), hex, sizeof( hex ) );
+	V_binarytohex( crc, hex );
 
-	Q_snprintf( filename, sizeof( filename ), "%s", hex );
+	V_sprintf_safe( filename, "%s", hex );
 	return filename;
 }
 
@@ -316,7 +315,7 @@ void IFaceposerModels::CFacePoserModel::CreateNewBitmap( char const *pchBitmapFi
 		Vector size;
 		VectorSubtract( hdr->hull_max(), hdr->hull_min(), size );
 
-		float eyeheight = hdr->hull_min().z + 0.9 * size.z;
+		float eyeheight = hdr->hull_min().z + 0.9f * size.z;
 		//	float width = ( size.x + size.y ) / 2.0f;
 
 		model->m_origin.x = size.z * .6f;
@@ -380,7 +379,7 @@ void IFaceposerModels::CFacePoserModel::CreateNewBitmap( char const *pchBitmapFi
 		if ( size.z > maxdim )
 			maxdim = size.z;
 
-		float midpoint = mins.z + 0.5 * size.z;
+		float midpoint = mins.z + 0.5f * size.z;
 
 		model->m_origin.x = 3 * maxdim;
 		model->m_origin.z += midpoint;
@@ -510,7 +509,7 @@ void IFaceposerModels::CFacePoserModel::ReconcileAnimationBitmaps()
 	for ( int i = 0 ; i < workList.Count(); ++i )
 	{
 		char testname[ 256 ];
-		Q_StripExtension( workList[ i ].String(), testname, sizeof( testname ) );
+		Q_StripExtension( workList[ i ].String(), testname );
 
 		g_pProgressDialog->UpdateText( "%s", testname );
 		g_pProgressDialog->Update( (float)i / (float)workList.Count() );
@@ -523,7 +522,7 @@ void IFaceposerModels::CFacePoserModel::ReconcileAnimationBitmaps()
 			Q_snprintf( testname, sizeof( testname ), "expressions/%s/animation/%s", GetShortModelName(), fn );
 
 			char fullpath[ 512 ];
-			filesystem->RelativePathToFullPath( testname, "MOD", fullpath, sizeof( fullpath ) );
+			filesystem->RelativePathToFullPath_safe( testname, "MOD", fullpath );
 			// Delete it
 			Con_ErrorPrintf( "Removing unused bitmap file %s\n", 
 				fullpath );
@@ -596,7 +595,7 @@ void IFaceposerModels::CFacePoserModel::RecreateAnimationBitmap( int sequence, b
 	if ( filesystem->FileExists( filename ) )
 	{
 		char fullpath[ 512 ];
-		filesystem->RelativePathToFullPath( filename, "MOD", fullpath, sizeof( fullpath ) );
+		filesystem->RelativePathToFullPath_safe( filename, "MOD", fullpath );
 		_unlink( fullpath );
 	}
 

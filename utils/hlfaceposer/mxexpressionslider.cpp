@@ -4,13 +4,12 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
-#include <windows.h>
 #include "mxExpressionSlider.h"
 #include "expressiontool.h"
 #include "mathlib/mathlib.h"
 #include "hlfaceposer.h"
 #include "choreowidgetdrawhelper.h"
+#include "winlite.h"
 
 mxExpressionSlider::mxExpressionSlider (mxWindow *parent, int x, int y, int w, int h, int id )
  : mxWindow( parent, x, y, w, h )
@@ -102,17 +101,17 @@ void mxExpressionSlider::setValue( int barnum, float value )
 		if (m_flSetting[ 0 ] < m_flSetting[ 1 ])
 		{
 			m_flCurrent[ 0 ] = m_flSetting[ 1 ];
-			m_flCurrent[ 1 ] = 1.0 - (m_flSetting[ 0 ] / m_flSetting[ 1 ]) * 0.5;
+			m_flCurrent[ 1 ] = 1.0f - (m_flSetting[ 0 ] / m_flSetting[ 1 ]) * 0.5f;
 		}
 		else if (m_flSetting[ 0 ] > m_flSetting[ 1 ])
 		{
 			m_flCurrent[ 0 ] = m_flSetting[ 0 ];
-			m_flCurrent[ 1 ] = (m_flSetting[ 1 ] / m_flSetting[ 0 ]) * 0.5;
+			m_flCurrent[ 1 ] = (m_flSetting[ 1 ] / m_flSetting[ 0 ]) * 0.5f;
 		}
 		else
 		{
 			m_flCurrent[ 0 ] = m_flSetting[ 0 ];
-			m_flCurrent[ 1 ] = 0.5;
+			m_flCurrent[ 1 ] = 0.5f;
 		}
 	}
 	else
@@ -158,18 +157,18 @@ float mxExpressionSlider::getRawValue( int barnum ) const
 
 float mxExpressionSlider::getValue( int barnum ) const
 {
-	float scale = 1.0;
+	float scale = 1.0f;
 	if (m_bPaired)
 	{
 		// if it's paired, this is assuming that m_flCurrent[0] holds the max value, 
 		// and m_flCurrent[1] is a weighting from 0 to 1, with 0.5 being even
-		if (barnum == 0 && m_flCurrent[ 1 ] > 0.5)
+		if (barnum == 0 && m_flCurrent[ 1 ] > 0.5f)
 		{
-			scale = (1.0 - m_flCurrent[ 1 ]) / 0.5;
+			scale = (1.0f - m_flCurrent[ 1 ]) / 0.5f;
 		}
-		else if (barnum == 1 && m_flCurrent[ 1 ] < 0.5)
+		else if (barnum == 1 && m_flCurrent[ 1 ] < 0.5f)
 		{
-			scale = (m_flCurrent[ 1 ] / 0.5);
+			scale = (m_flCurrent[ 1 ] / 0.5f);
 		}
 	}
 
@@ -375,7 +374,7 @@ void mxExpressionSlider::DrawThumb( int barnum, HDC& dc )
 			b = GetRValue( clr );
 
 			// boost colors toward red if we are not at 0.5
-			float boost = 2.0 * ( fabs( frac - 0.5f ) );
+			float boost = 2.0f * ( fabs( frac - 0.5f ) );
 
 			r = r + ( 255 - r ) * boost;
 			g = ( 1 - boost ) * g;
@@ -472,7 +471,7 @@ void mxExpressionSlider::DrawTitle( HDC &dc )
 	InflateRect( &rc, -5, -2 );
 
 	char sz[ 128 ];
-	sprintf( sz, "%s", getLabel() );
+	V_sprintf_safe( sz, "%s", getLabel() );
 
 	HFONT fnt, oldfont;
 
@@ -601,7 +600,7 @@ void mxExpressionSlider::MoveThumb( int barnum, int xpos, bool finish )
 		WPARAM wp;
 
 		wp = MAKEWPARAM( finish ? SB_ENDSCROLL : SB_THUMBPOSITION, barnum );
-		lp = (long)getHandle();
+		lp = (LPARAM)getHandle();
 
 		SendMessage( parent, WM_HSCROLL, wp, lp );
 	}
@@ -643,7 +642,7 @@ int mxExpressionSlider::handleEvent( mxEvent *event )
 						WPARAM wp;
 
 						wp = MAKEWPARAM( SB_ENDSCROLL, m_nCurrentBar );
-						lp = (long)getHandle();
+						lp = (LPARAM)getHandle();
 
 						SendMessage( parent, WM_HSCROLL, wp, lp );
 					}

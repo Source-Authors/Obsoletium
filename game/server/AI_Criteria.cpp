@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "AI_Criteria.h"
 #include "ai_speech.h"
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "engine/IEngineSound.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -97,7 +97,7 @@ int AI_CriteriaSet::FindCriterionIndex( const char *name ) const
 {
 	CritEntry_t search;
 	search.criterianame = name;
-	int idx = m_Lookup.Find( search );
+	auto idx = m_Lookup.Find( search );
 	if ( idx == m_Lookup.InvalidIndex() )
 		return -1;
 
@@ -112,7 +112,7 @@ int AI_CriteriaSet::FindCriterionIndex( const char *name ) const
 const char *AI_CriteriaSet::GetName( int index ) const
 {
 	static char namebuf[ 128 ];
-	if ( index < 0 || index >= (int)m_Lookup.Count() )
+	if ( index < 0 || index >= m_Lookup.Count() )
 		return "";
 
 	const CritEntry_t *entry = &m_Lookup[ index ];
@@ -127,7 +127,7 @@ const char *AI_CriteriaSet::GetName( int index ) const
 //-----------------------------------------------------------------------------
 const char *AI_CriteriaSet::GetValue( int index ) const
 {
-	if ( index < 0 || index >= (int)m_Lookup.Count() )
+	if ( index < 0 || index >= m_Lookup.Count() )
 		return "";
 
 	const CritEntry_t *entry = &m_Lookup[ index ];
@@ -141,7 +141,7 @@ const char *AI_CriteriaSet::GetValue( int index ) const
 //-----------------------------------------------------------------------------
 float AI_CriteriaSet::GetWeight( int index ) const
 {
-	if ( index < 0 || index >= (int)m_Lookup.Count() )
+	if ( index < 0 || index >= m_Lookup.Count() )
 		return 1.0f;
 
 	const CritEntry_t *entry = &m_Lookup[ index ];
@@ -151,11 +151,11 @@ float AI_CriteriaSet::GetWeight( int index ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void AI_CriteriaSet::Describe()
+void AI_CriteriaSet::Describe() const
 {
-	for ( short i = m_Lookup.FirstInorder(); i != m_Lookup.InvalidIndex(); i = m_Lookup.NextInorder( i ) )
+	for ( auto i = m_Lookup.FirstInorder(); i != m_Lookup.InvalidIndex(); i = m_Lookup.NextInorder( i ) )
 	{
-		CritEntry_t *entry = &m_Lookup[ i ];
+		const CritEntry_t *entry = &m_Lookup[ i ];
 
 		if ( entry->weight != 1.0f )
 		{
@@ -228,11 +228,10 @@ AI_Response &AI_Response::operator=( const AI_Response &from )
 	V_strcpy_safe( m_szMatchingRule, from.m_szMatchingRule );
 
 	delete m_pCriteria;
-	m_pCriteria = NULL;
 
 	// Copy criteria.
-	if (from.m_pCriteria)
-		m_pCriteria = new AI_CriteriaSet(*from.m_pCriteria);
+	m_pCriteria = from.m_pCriteria
+		? new AI_CriteriaSet(*from.m_pCriteria) : nullptr;
 
 	m_Params = from.m_Params;
 
@@ -269,7 +268,7 @@ void AI_Response::Init( ResponseType_t type, const char *responseName, const AI_
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void AI_Response::Describe()
+void AI_Response::Describe() const
 {
 	if ( m_pCriteria )
 	{

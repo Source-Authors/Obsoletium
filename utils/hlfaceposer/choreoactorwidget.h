@@ -73,8 +73,8 @@ public:
 	// Manipulate channels
 	void						AddChannel( CChoreoChannelWidget *channel );
 	void						RemoveChannel( CChoreoChannelWidget *channel );
-	CChoreoChannelWidget		*GetChannel( int num );
-	int							GetNumChannels( void );
+	CChoreoChannelWidget		*GetChannel( intp num );
+	intp						GetNumChannels( void );
 
 	// Override height because we can be open/collapsed and we contain the channels
 	virtual int					GetItemHeight( void );

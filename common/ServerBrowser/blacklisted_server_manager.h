@@ -11,11 +11,11 @@
 #pragma once
 #endif
 
-#include "platform.h"
+#include "tier0/platform.h"
 #include "netadr.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
-#define BLACKLIST_DEFAULT_SAVE_FILE			"cfg/server_blacklist.txt"
+constexpr inline char BLACKLIST_DEFAULT_SAVE_FILE[]{"cfg/server_blacklist.txt"};
 
 class gameserveritem_t;
 
@@ -31,7 +31,7 @@ struct blacklisted_server_t
 //-----------------------------------------------------------------------------
 // Purpose: Collection of blacklisted servers
 //-----------------------------------------------------------------------------
-class CBlacklistedServerManager
+class CBlacklistedServerManager final
 {
 public:
 	CBlacklistedServerManager();

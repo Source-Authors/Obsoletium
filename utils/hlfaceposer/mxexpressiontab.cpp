@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "hlfaceposer.h"
 #include "mxExpressionTab.h"
+#include "hlfaceposer.h"
 #include "mdlviewer.h"
 #include "expressions.h"
 
@@ -55,7 +55,7 @@ void mxExpressionTab::ShowRightClickMenu( int mx, int my )
 // Purpose: 
 // Output : int	
 //-----------------------------------------------------------------------------
-int	mxExpressionTab::getSelectedIndex () const
+intp	mxExpressionTab::getSelectedIndex () const
 {
 	// Convert based on override index
 	return m_nSelected;

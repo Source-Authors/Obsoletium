@@ -71,7 +71,7 @@ static CBasePlayer* FindPlayerByName(const char *pTestName)
 }
 #endif
 
-static void VoiceServerDebug( const char *pFmt, ... )
+static void VoiceServerDebug( PRINTF_FORMAT_STRING const char *pFmt, ... )
 {
 	char msg[4096];
 	va_list marker;
@@ -80,7 +80,7 @@ static void VoiceServerDebug( const char *pFmt, ... )
 		return;
 
 	va_start( marker, pFmt );
-	_vsnprintf( msg, sizeof(msg), pFmt, marker );
+	V_vsprintf_safe( msg, pFmt, marker );
 	va_end( marker );
 
 	Msg( "%s", msg );

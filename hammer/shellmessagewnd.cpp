@@ -13,17 +13,17 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "Shell.h"
 #include "ShellMessageWnd.h"
+#include "Shell.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 
-static const char *g_pszClassName = "Worldcraft_ShellMessageWnd";
+static constexpr char g_pszClassName[] = "Worldcraft_ShellMessageWnd";
 
 
-BEGIN_MESSAGE_MAP(CShellMessageWnd, CWnd)
+BEGIN_MESSAGE_MAP(CShellMessageWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CShellMessageWnd)
 	ON_WM_COPYDATA()
 	//}}AFX_MSG_MAP
@@ -50,11 +50,11 @@ bool CShellMessageWnd::Create(void)
 
 	if (!AfxRegisterClass(&wndcls))
 	{
-		AfxMessageBox("Could not register the Hammer shell message window class.");
-		return(false);
+		AfxMessageBox("Could not register the Hammer shell message window class.", MB_ICONERROR);
+		return false;
 	}
 
-	return(CWnd::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
+	return(__super::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
 }
 
 

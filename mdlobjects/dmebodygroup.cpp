@@ -36,8 +36,8 @@ void CDmeBodyGroup::OnDestruction()
 //-----------------------------------------------------------------------------
 CDmeLODList *CDmeBodyGroup::FindBodyPart( const char *pName )
 {
-	int nCount = m_BodyParts.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_BodyParts.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeLODList *pLODList = CastElement< CDmeLODList >( m_BodyParts[ i ] );
 		if ( !pLODList )

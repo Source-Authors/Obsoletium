@@ -34,7 +34,13 @@ enum
 
 
 void EditorUtil_ConvertPath(CString &str, bool bSave);
-void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bSave);
+void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_CAP(destSize) char *szDest, intp destSize, bool bSave);
+
+template<intp destSize>
+inline void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_ARRAY char (&szDest)[destSize], bool bSave)
+{
+	EditorUtil_TransferPath( pDlg, nIDC, szDest, destSize, bSave );
+}
 
 
 COPTBuild::COPTBuild()
@@ -49,7 +55,7 @@ COPTBuild::COPTBuild()
 
 void COPTBuild::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COPTBuild)
 	DDX_Control(pDX, IDC_BSPDIR, m_cBSPDir);
 	DDX_Control(pDX, IDC_VIS, m_cVIS);
@@ -137,7 +143,7 @@ void COPTBuild::OnSelchangeConfigs()
 		return;
 
 	// get pointer to the configuration
-	m_pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(iCurSel));
+	m_pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
 
 	// update dialog data
 	EditorUtil_TransferPath(this, IDC_BSP, m_pConfig->szBSP, false);
@@ -176,7 +182,7 @@ void COPTBuild::UpdateConfigList()
 
 BOOL COPTBuild::OnInitDialog() 
 {
-	CPropertyPage::OnInitDialog();
+	__super::OnInitDialog();
 	
 	UpdateConfigList();
 	SetModified(TRUE);
@@ -188,7 +194,7 @@ BOOL COPTBuild::OnApply()
 {
 	SaveInfo(m_pConfig);
 	
-	return CPropertyPage::OnApply();
+	return __super::OnApply();
 }
 
 BOOL COPTBuild::HandleInsertParm(UINT nID)

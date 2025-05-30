@@ -250,7 +250,7 @@ void C_ScriptIntro::ClientThink( void )
 	float flPerc = 1.0;
 	if ( (m_flNextBlendTime - m_flBlendStartTime) != 0 )
 	{
-		flPerc = clamp( (gpGlobals->curtime - m_flBlendStartTime) / (m_flNextBlendTime - m_flBlendStartTime), 0, 1 );
+		flPerc = clamp( (gpGlobals->curtime - m_flBlendStartTime) / (m_flNextBlendTime - m_flBlendStartTime), 0.f, 1.f );
 	}
 
 	// Detect when we're finished blending

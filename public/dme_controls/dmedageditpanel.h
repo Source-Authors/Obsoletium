@@ -48,7 +48,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CDmeDagEditPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeDagEditPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeDagEditPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -56,7 +56,7 @@ public:
 	virtual ~CDmeDagEditPanel();
 
 	// Overriden methods of vgui::Panel
-	virtual void Paint();
+	void Paint() override;
 
 	// Sets the current scene + animation list
 	void SetDmeElement( CDmeDag *pScene );

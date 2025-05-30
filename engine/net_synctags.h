@@ -32,7 +32,7 @@ inline void SyncTag_Read( bf_read *pBuf, const char *pWantedTag )
 	if ( net_synctags.GetInt() )
 	{
 		char testTag[512];
-		pBuf->ReadString( testTag, sizeof( testTag ) );
+		pBuf->ReadString( testTag );
 		
 		if ( stricmp( testTag, pWantedTag ) != 0 )
 		{

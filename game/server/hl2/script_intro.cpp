@@ -338,7 +338,8 @@ void CScriptIntro::InputFadeTo( inputdata_t &inputdata )
 		Warning("%s (%s) received FadeTo input without an alpha. Syntax: <fade alpha> <fade duration>\n", GetClassname(), GetDebugName() );
 		return;
 	}
-	float flAlpha = atof( pszParam );
+	// dimhotepus: atof -> strtof
+	float flAlpha = strtof(pszParam, nullptr);
 
 	// Get the fade duration
 	pszParam = strtok(NULL," ");
@@ -350,7 +351,8 @@ void CScriptIntro::InputFadeTo( inputdata_t &inputdata )
 
 	// Set the two variables
 	m_flFadeAlpha = flAlpha;
-	m_flFadeDuration = atof( pszParam );
+	// dimhotepus: atof -> strtof
+	m_flFadeDuration = strtof( pszParam, nullptr );
 
 	//Msg("%.2f INPUT FADE: Fade to %.2f. End at %.2f\n", gpGlobals->curtime, m_flFadeAlpha.Get(), gpGlobals->curtime + m_flFadeDuration.Get() );
 }

@@ -6,16 +6,17 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "bsplighting.h"
 #include "materialsystem/imaterialsystem.h"
 #include "istudiorender.h"
 #include "material.h"
 #include "materialsystem/imesh.h"
 #include "disp_common.h"
-#include "bsplighting.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "filesystem.h"
 #include "hammer.h"
 #include "tier0/dbg.h"
+#include "bspflags.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -267,7 +268,7 @@ bool CBSPLighting::Load( char const *pFilename )
 
 
 	// Set lightmap texture coordinates.
-	for( int iFace=0; iFace < faces.Size(); iFace++ )
+	for( int iFace=0; iFace < faces.Count(); iFace++ )
 	{
 		CFace *pFace = &faces[iFace];
 		CStoredFace *pStoredFace = &m_StoredFaces[iFace];
@@ -435,7 +436,7 @@ bool CBSPLighting::CheckForNewLightmaps()
 		meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
 
 		// texcoord 1 is lightmaptexcoord for fixed function.
-		static int yOffset = 30;
+		constexpr int yOffset = 30;
 
 		meshBuilder.TexCoord2f( 1, 0.0f, 0.0f );
 		meshBuilder.Position3f( 0.0f, yOffset, 0.0f );
@@ -688,11 +689,11 @@ void CBSPLighting::BuildLMGroups(
 						}
 
 						// Generate the vert list.
-						for( int iVert=0; iVert < pDisp->m_Verts.Count(); iVert++ )
+						for( auto &vert : pDisp->m_Verts )
 						{
-							mb.Position3fv( (float*)&pDisp->m_Verts[iVert].m_vPos );
-							mb.TexCoord2fv( 0, (float*)&pDisp->m_Verts[iVert].m_vTexCoords );
-							mb.TexCoord2fv( 1, (float*)&pDisp->m_Verts[iVert].m_vLightCoords );
+							mb.Position3fv( (float*)&vert.m_vPos );
+							mb.TexCoord2fv( 0, (float*)&vert.m_vTexCoords );
+							mb.TexCoord2fv( 1, (float*)&vert.m_vLightCoords );
 							
 							if( bNeedsBumpmap )
 								mb.TexCoord2f ( 2, pStoredFace->m_BumpSTexCoordOffset, 0 );
@@ -700,7 +701,7 @@ void CBSPLighting::BuildLMGroups(
 							mb.AdvanceVertex();
 						}
 
-						iCurBaseVert += pDisp->m_Verts.Count();;
+						iCurBaseVert += pDisp->m_Verts.Count();
 					}
 				}
 		
@@ -840,7 +841,7 @@ void CBSPLighting::ReloadLightmaps()
 bool CBSPLighting::LoadVRADDLL( char const *pFilename )
 {
 	// Load VRAD's DLL.
-	m_hVRadDLL = Sys_LoadModule( "vrad_dll.dll" );
+	m_hVRadDLL = Sys_LoadModule( "vrad_dll" DLL_EXT_STRING );
 	if( !m_hVRadDLL )
 		return false;
 

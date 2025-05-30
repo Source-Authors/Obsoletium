@@ -28,16 +28,18 @@ public:
 	}
 
 	// save data type interface
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
 	{
 		int *pStringIndex = (int *)fieldInfo.pField;
 		const char *pString = m_pStringTable->GetString( *pStringIndex );
-		int nLen = Q_strlen( pString ) + 1;
-		pSave->WriteInt( &nLen );
+		intp nLen = V_strlen( pString ) + 1;
+		Assert(nLen <= std::numeric_limits<int>::max());
+		int len = static_cast<int>(nLen);
+		pSave->WriteInt( &len );
 		pSave->WriteString( pString );
 	}
 	
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
 		int *pStringIndex = (int *)fieldInfo.pField;
 		int nLen = pRestore->ReadInt();
@@ -46,13 +48,13 @@ public:
 		*pStringIndex = m_pStringTable->AddString( CBaseEntity::IsServer(), pTemp );
 	}
 	
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
 		int *pStringIndex = (int *)fieldInfo.pField;
 		*pStringIndex = INVALID_STRING_INDEX;
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
 		int *pStringIndex = (int *)fieldInfo.pField;
 		return *pStringIndex == INVALID_STRING_INDEX;

@@ -86,19 +86,6 @@ $Project "tier0"
 		$File	"dynfunction.cpp"
 		$File	"etwprof.cpp"			[$WINDOWS]
 		$File	"fasttimer.cpp"
-		$File "InterlockedCompareExchange128.masm" [$WIN64]
-		{
-			$Configuration
-			{   
-				$CustomBuildStep
-				{
-					// General
-					$CommandLine                "ml64.exe /nologo /c /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE$(InputPath)$QUOTE"
-					$Description                "Compiling $(InputName).masm"
-					$Outputs                    "$(IntDir)\$(InputName).obj"
-				}
-			}
-		}
 		$File	"mem.cpp"
 		$File	"mem_helpers.cpp"
 		$File	"memdbg.cpp"
@@ -143,7 +130,7 @@ $Project "tier0"
 		$File	"../tier1/pathmatch.cpp" [$LINUXALL]
 	}
 
-	$folder	"Header Files"
+	$Folder	"Header Files"
 	{
 		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
@@ -186,6 +173,11 @@ $Project "tier0"
 		$File	"$SRCDIR\public\tier0\wchartypes.h"
 		$File	"$SRCDIR\public\tier0\xbox_codeline_defines.h"
 		$File	"mem_helpers.h"
+	}
+
+	$Folder "Debugger Visualizers" [$WINDOWS]
+	{
+		$File	"tier0.natvis"
 	}
 	
 	$Folder "Manifest Files" [$WINDOWS]

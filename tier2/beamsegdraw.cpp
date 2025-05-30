@@ -90,14 +90,19 @@ inline void CBeamSegDraw::SpecifySeg( const Vector &vecCameraPos, const Vector &
 
 		if ( m_nSegsDrawn > 1 )
 		{
-			int nBase = ( ( m_nSegsDrawn - 2 ) * 2 ) + m_nMeshVertCount;
+			const int nBase = ( ( m_nSegsDrawn - 2 ) * 2 ) + m_nMeshVertCount;
+			// dimhotepus: Check nBase is in index range.
+			Assert(nBase >= std::numeric_limits<unsigned short>::min() &&
+				   nBase <= std::numeric_limits<unsigned short>::max());
 
-			m_pMeshBuilder->FastIndex( nBase );
-			m_pMeshBuilder->FastIndex( nBase + 1 );
-			m_pMeshBuilder->FastIndex( nBase + 2 );
-			m_pMeshBuilder->FastIndex( nBase + 1 );
-			m_pMeshBuilder->FastIndex( nBase + 3 );
-			m_pMeshBuilder->FastIndex( nBase + 2 );
+			const unsigned short usBase = static_cast<unsigned short>(nBase);
+
+			m_pMeshBuilder->FastIndex( usBase );
+			m_pMeshBuilder->FastIndex( usBase + 1 );
+			m_pMeshBuilder->FastIndex( usBase + 2 );
+			m_pMeshBuilder->FastIndex( usBase + 1 );
+			m_pMeshBuilder->FastIndex( usBase + 3 );
+			m_pMeshBuilder->FastIndex( usBase + 2 );
 		}
 	}
 	else

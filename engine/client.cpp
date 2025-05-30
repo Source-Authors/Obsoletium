@@ -31,14 +31,11 @@
 #include "MapReslistGenerator.h"
 #include "DownloadListGenerator.h"
 #include "GameEventManager.h"
-#include "host_phonehome.h"
-#include "vgui_baseui_interface.h"
 #include "clockdriftmgr.h"
 #include "snd_audio_source.h"
 #include "vgui_controls/Controls.h"
 #include "vgui/ILocalize.h"
 #include "download.h"
-#include "checksum_engine.h"
 #include "ModelInfo.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/materialsystem_config.h"
@@ -124,54 +121,45 @@ A LAN server will know not to allows more then xxx users with the same CD Key
 */
 const char *CClientState::GetCDKeyHash( void )
 {
-	if ( IsPC() )
+	char szKeyBuffer[256]; // Keys are about 13 chars long.	
+	static char szHashedKeyBuffer[64];
+
+	bool bDedicated = false;
+	if (bDedicated)
 	{
-		char szKeyBuffer[256]; // Keys are about 13 chars long.	
-		static char szHashedKeyBuffer[64];
-		int nKeyLength;
-		bool bDedicated = false;
-
-		MD5Context_t ctx;
-		unsigned char digest[16]; // The MD5 Hash
-
-		nKeyLength = Q_snprintf( szKeyBuffer, sizeof( szKeyBuffer ), "%s", registry->ReadString( "key", "" ) );
-
-		if (bDedicated)
-		{
-			ConMsg("Key has no meaning on dedicated server...\n");
-			return "";
-		}
-
-		if ( nKeyLength == 0 )
-		{
-			nKeyLength = 13;
-			Q_strncpy( szKeyBuffer, "1234567890123", sizeof( szKeyBuffer ) );
-			Assert( Q_strlen( szKeyBuffer ) == nKeyLength );
-
-			DevMsg( "Missing CD Key from registry, inserting blank key\n" );
-
-			registry->WriteString( "key", szKeyBuffer );
-		}
-
-		if (nKeyLength <= 0 ||
-			nKeyLength >= 256 )
-		{
-			ConMsg("Bogus key length on CD Key...\n");
-			return "";
-		}
-
-		// Now get the md5 hash of the key
-		memset( &ctx, 0, sizeof( ctx ) );
-		memset( digest, 0, sizeof( digest ) );
-		
-		MD5Init(&ctx);
-		MD5Update(&ctx, (unsigned char*)szKeyBuffer, nKeyLength);
-		MD5Final(digest, &ctx);
-		Q_strncpy ( szHashedKeyBuffer, MD5_Print ( digest, sizeof( digest ) ), sizeof( szHashedKeyBuffer ) );
-		return szHashedKeyBuffer;
+		ConMsg("Key has no meaning on dedicated server...\n");
+		return "";
 	}
 
-	return "12345678901234567890123456789012";
+	int nKeyLength = V_sprintf_safe( szKeyBuffer, "%s", registry->ReadString( "key", "" ) );
+	if ( nKeyLength == 0 )
+	{
+		nKeyLength = 13;
+		V_strcpy_safe( szKeyBuffer, "1234567890123" );
+		Assert( Q_strlen( szKeyBuffer ) == nKeyLength );
+
+		DevMsg( "Missing CD Key from registry, inserting blank key\n" );
+
+		registry->WriteString( "key", szKeyBuffer );
+	}
+
+	if (nKeyLength <= 0 || nKeyLength >= 256 )
+	{
+		ConMsg("Bogus key length on CD Key...\n");
+		return "";
+	}
+	
+	MD5Context_t ctx;
+	unsigned char digest[16]; // The MD5 Hash
+	// Now get the md5 hash of the key
+	memset( &ctx, 0, sizeof( ctx ) );
+	memset( digest, 0, sizeof( digest ) );
+
+	MD5Init(&ctx);
+	MD5Update(&ctx, szKeyBuffer, nKeyLength);
+	MD5Final(digest, &ctx);
+	V_strcpy_safe( szHashedKeyBuffer, MD5_Print ( digest ) );
+	return szHashedKeyBuffer;
 }
 
 void CClientState::SendClientInfo( void )
@@ -312,8 +300,6 @@ bool CClientState::SetSignonState ( int state, int count )
 				COM_TimestampedLog( "LevelInitPreEntity: start %d", state );
 				g_ClientDLL->LevelInitPreEntity(mapname);
 				COM_TimestampedLog( "LevelInitPreEntity: end %d", state );
-
-				phonehome->Message( IPhoneHome::PHONE_MSG_MAPSTART, mapname );
 
 				audiosourcecache->LevelInit( mapname );
 
@@ -644,8 +630,8 @@ float CClientState::GetClientInterpAmount()
 	float flInterp = s_cl_interp->GetFloat();
 
 	const ConVar_ServerBounded *pBounded = static_cast<const ConVar_ServerBounded*>( s_cl_interp_ratio );
-	if ( pBounded )
-		flInterpRatio = pBounded->GetFloat();
+	flInterpRatio = pBounded->GetFloat();
+
 	//#define FIXME_INTERP_RATIO
 	return max( flInterpRatio / cl_updaterate->GetFloat(), flInterp );
 }
@@ -1169,7 +1155,7 @@ void CClientState::AddCustomFile( int slot, const char *resourceFile)
 	bool bCopy = true;
 	CCustomFilename filehex( crcValue );
 	char szAbsFilename[ MAX_PATH ];
-	if ( g_pFileSystem->RelativePathToFullPath( filehex.m_Filename, "game", szAbsFilename, sizeof(szAbsFilename), FILTER_CULLPACK ) )
+	if ( g_pFileSystem->RelativePathToFullPath_safe( filehex.m_Filename, "game", szAbsFilename, FILTER_CULLPACK ) )
 	{
 		// check if existing file already has same CRC, 
 		// then we don't need to copy it anymore
@@ -1193,7 +1179,7 @@ void CClientState::AddCustomFile( int slot, const char *resourceFile)
 
 		// Make sure dest directory exists
 		char szParentDir[ MAX_PATH ];
-		V_ExtractFilePath( filehex.m_Filename, szParentDir, sizeof(szParentDir) );
+		V_ExtractFilePath( filehex.m_Filename, szParentDir );
 		g_pFileSystem->CreateDirHierarchy( szParentDir, "download" );
 
 		// Save it
@@ -1516,7 +1502,7 @@ void CClientState::CheckUpdatingSteamResources()
 
 						if ( !allowSoundDownloads )
 						{
-							Q_ExtractFileExtension( fname, extension, sizeof( extension ) );
+							V_ExtractFileExtension( fname, extension );
 							if ( !Q_strcasecmp( extension, "wav" ) || !Q_strcasecmp( extension, "mp3" ) )
 							{
 								continue;
@@ -1526,7 +1512,7 @@ void CClientState::CheckUpdatingSteamResources()
 						if ( !allowNonMaps )
 						{
 							// The user wants maps only.
-							Q_ExtractFileExtension( fname, extension, sizeof( extension ) );
+							V_ExtractFileExtension( fname, extension );
 
 							// If the extension is not bsp, skip it.
 							if ( Q_strcasecmp( extension, "bsp" ) )
@@ -1604,46 +1590,6 @@ void CClientState::CheckFileCRCsWithServer()
 //! Rich has pointed out that we really need pure server client work to be something that the client
 //! cannot easily bypass.  Currently that is the case.  But I need to ship the SteamPipe conversion now.
 //! We can revisit pure server security after that has shipped.
-//
-//	VPROF_( "CheckFileCRCsWithServer", 1, VPROF_BUDGETGROUP_OTHER_NETWORKING, false, BUDGETFLAG_CLIENT );
-//	const float flBatchInterval = 1.0f / 5.0f;
-//	const int nBatchSize = 5;
-//
-//	// Don't do this yet..
-//	if ( !m_bCheckCRCsWithServer )
-//		return;
-//
-//	if ( m_nSignonState != SIGNONSTATE_FULL )
-//		return;
-//
-//	// Only send a batch every so often.
-//	float flCurTime = Plat_FloatTime();
-//	if ( (flCurTime - m_flLastCRCBatchTime) < flBatchInterval )
-//		return;
-//
-//	m_flLastCRCBatchTime = flCurTime;
-//
-//	CUnverifiedFileHash rgUnverifiedFiles[nBatchSize];
-//	int count = g_pFileSystem->GetUnverifiedFileHashes( rgUnverifiedFiles, ARRAYSIZE( rgUnverifiedFiles ) );
-//	if ( count == 0 )
-//		return;
-//
-//	// Send the messages to the server.
-//	for ( int i=0; i < count; i++ )
-//	{
-//		CLC_FileCRCCheck crcCheck;
-//		V_strncpy( crcCheck.m_szPathID, rgUnverifiedFiles[i].m_PathID, sizeof( crcCheck.m_szPathID ) );
-//		V_strncpy( crcCheck.m_szFilename, rgUnverifiedFiles[i].m_Filename, sizeof( crcCheck.m_szFilename ) );
-//		crcCheck.m_nFileFraction = rgUnverifiedFiles[i].m_nFileFraction;
-//		crcCheck.m_MD5 = rgUnverifiedFiles[i].m_FileHash.m_md5contents;
-//		crcCheck.m_CRCIOs = rgUnverifiedFiles[i].m_FileHash.m_crcIOSequence;
-//		crcCheck.m_eFileHashType = rgUnverifiedFiles[i].m_FileHash.m_eFileHashType;
-//		crcCheck.m_cbFileLen = rgUnverifiedFiles[i].m_FileHash.m_cbFileLen;
-//		crcCheck.m_nPackFileNumber = rgUnverifiedFiles[i].m_FileHash.m_nPackFileNumber;
-//		crcCheck.m_PackFileID = rgUnverifiedFiles[i].m_FileHash.m_PackFileID;
-//
-//		m_NetChannel->SendNetMsg( crcCheck );
-//	}
 }
 
 

@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxLabel.h"
+#include "mxtk/mxlabel.h"
 #include <windows.h>
 
 

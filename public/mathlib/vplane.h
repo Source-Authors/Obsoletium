@@ -16,51 +16,53 @@
 
 #include "mathlib/vector.h"
 
-typedef int SideType;
-
 // Used to represent sides of things like planes.
-#define	SIDE_FRONT	0
-#define	SIDE_BACK	1
-#define	SIDE_ON		2
+enum SideType : int
+{
+	SIDE_FRONT = 0,
+	SIDE_BACK = 1,
+	SIDE_ON = 2,
+	SIDE_CROSS = -2  // necessary for polylib.cpp
+};
 
-#define VP_EPSILON	0.01f
+constexpr inline vec_t VP_EPSILON{0.01f};
 
-
+// Plane.
 class VPlane
 {
 public:
-				VPlane() : m_Normal(), m_Dist(0) {}
-				VPlane(const Vector &vNormal, vec_t dist);
+	VPlane() : m_Normal(), m_Dist(0) {}
+	VPlane(const Vector &vNormal, vec_t dist);
 
-	void		Init(const Vector &vNormal, vec_t dist);
+	void Init(const Vector &vNormal, vec_t dist);
 
 	// Return the distance from the point to the plane.
-	vec_t		DistTo(const Vector &vVec) const;
+	[[nodiscard]] vec_t DistTo(const Vector &vVec) const;
 
 	// Copy.
-	VPlane&		operator=(const VPlane &thePlane);
+	VPlane& operator=(const VPlane &thePlane);
 	VPlane(const VPlane &thePlane);
 
 	// Returns SIDE_ON, SIDE_FRONT, or SIDE_BACK.
 	// The epsilon for SIDE_ON can be passed in.
-	SideType	GetPointSide(const Vector &vPoint, vec_t sideEpsilon=VP_EPSILON) const;
+	[[nodiscard]] SideType	GetPointSide(const Vector &vPoint, vec_t sideEpsilon=VP_EPSILON) const;
 
 	// Returns SIDE_FRONT or SIDE_BACK.
-	SideType	GetPointSideExact(const Vector &vPoint) const;
+	[[nodiscard]] SideType	GetPointSideExact(const Vector &vPoint) const;
 
 	// Classify the box with respect to the plane.
 	// Returns SIDE_ON, SIDE_FRONT, or SIDE_BACK
-	SideType	BoxOnPlaneSide(const Vector &vMin, const Vector &vMax) const;
+	[[nodiscard]] SideType	BoxOnPlaneSide(const Vector &vMin, const Vector &vMax) const;
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 	// Flip the plane.
-	VPlane		Flip();
+	[[nodiscard]] VPlane		Flip();
 
 	// Get a point on the plane (normal*dist).
-	Vector		GetPointOnPlane() const;
+	[[nodiscard]] Vector		GetPointOnPlane() const;
 
 	// Snap the specified point to the plane (along the plane's normal).
-	Vector		SnapPointToPlane(const Vector &vPoint) const;
+	[[nodiscard]] Vector		SnapPointToPlane(const Vector &vPoint) const;
 #endif
 
 public:
@@ -70,7 +72,7 @@ public:
 #ifdef VECTOR_NO_SLOW_OPERATIONS
 private:
 	// No copy constructors allowed if we're in optimal mode
-	VPlane(const VPlane& vOther);
+	VPlane(const VPlane&) = delete;
 #endif
 };
 
@@ -127,15 +129,12 @@ inline Vector VPlane::SnapPointToPlane(const Vector &vPoint) const
 
 inline SideType VPlane::GetPointSide(const Vector &vPoint, vec_t sideEpsilon) const
 {
-	vec_t fDist;
-
-	fDist = DistTo(vPoint);
-	if(fDist >= sideEpsilon)
+	vec_t fDist = DistTo(vPoint);
+	if (fDist >= sideEpsilon)
 		return SIDE_FRONT;
-	else if(fDist <= -sideEpsilon)
+	if (fDist <= -sideEpsilon)
 		return SIDE_BACK;
-	else
-		return SIDE_ON;
+	return SIDE_ON;
 }
 
 inline SideType VPlane::GetPointSideExact(const Vector &vPoint) const
@@ -149,7 +148,6 @@ inline SideType VPlane::GetPointSideExact(const Vector &vPoint) const
 // performance critical code.
 inline SideType VPlane::BoxOnPlaneSide(const Vector &vMin, const Vector &vMax) const
 {
-	int i, firstSide, side;
 	TableVector vPoints[8] = 
 	{
 		{ vMin.x, vMin.y, vMin.z },
@@ -163,13 +161,13 @@ inline SideType VPlane::BoxOnPlaneSide(const Vector &vMin, const Vector &vMax) c
 		{ vMax.x, vMax.y, vMin.z },
 	};
 
-	firstSide = GetPointSideExact(vPoints[0]);
-	for(i=1; i < 8; i++)
+	SideType firstSide = GetPointSideExact(vPoints[0]);
+	for (const auto &p : vPoints)
 	{
-		side = GetPointSideExact(vPoints[i]);
+		SideType side = GetPointSideExact(p);
 
 		// Does the box cross the plane?
-		if(side != firstSide)
+		if (side != firstSide)
 			return SIDE_ON;
 	}
 

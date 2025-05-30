@@ -220,9 +220,8 @@ void CCreateMultiplayerGameBotPage::OnApplyChanges()
 	UpdateValue( m_pSavedData, "bot_chatter", chatterArg[ m_chatterCombo->GetActiveItem() ] );
 
 	// set bot_prefix
-	#define BUF_LENGTH 256
-	char entryBuffer[ BUF_LENGTH ];
-	m_prefixEntry->GetText( entryBuffer, BUF_LENGTH );
+	char entryBuffer[ 256 ];
+	m_prefixEntry->GetText( entryBuffer );
 	UpdateValue( m_pSavedData, "bot_prefix", entryBuffer );
 }
 

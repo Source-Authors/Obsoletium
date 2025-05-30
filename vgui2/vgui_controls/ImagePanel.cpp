@@ -5,15 +5,14 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include <vgui_controls/ImagePanel.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IBorder.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
-#include <vgui/IBorder.h>
-#include <KeyValues.h>
 
-#include <vgui_controls/ImagePanel.h>
 #include <vgui_controls/Image.h>
 #include <vgui_controls/Controls.h>
 
@@ -268,7 +267,8 @@ void ImagePanel::GetSettings(KeyValues *outResourceData)
 		outResourceData->SetString("border", GetBorder()->GetName());
 	}
 
-	outResourceData->GetInt("positionImage", m_bPositionImage );
+	// dimhotepus: Set position image.
+	outResourceData->SetInt("positionImage", m_bPositionImage );
 	outResourceData->SetInt("scaleImage", m_bScaleImage);
 	outResourceData->SetFloat("scaleAmount", m_fScaleAmount);
 	outResourceData->SetInt("tileImage", m_bTileImage);
@@ -376,7 +376,7 @@ void ImagePanel::ApplySchemeSettings( IScheme *pScheme )
 const char *ImagePanel::GetDescription()
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, string image, string border, string fillcolor, bool scaleImage", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, string image, string border, string fillcolor, bool scaleImage", BaseClass::GetDescription());
 	return buf;
 }
 

@@ -21,11 +21,11 @@ class CDmeKeyboardInput : public CDmeInput
 	DEFINE_ELEMENT( CDmeKeyboardInput, CDmeInput );
 
 public:
-	virtual bool IsDirty(); // ie needs to operate
-	virtual void Operate();
+	bool IsDirty() override; // ie needs to operate
+	void Operate() override;
 
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs );
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) override;
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 protected:
 	CDmaVar< bool > *m_keys;

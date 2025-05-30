@@ -5,22 +5,22 @@
 //=============================================================================
 
 #include "stdafx.h"
+#include "ArchDlg.h"
 #include "hammer.h"
 #include "hammer_mathlib.h"
-#include "ArchDlg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 
-static LPCTSTR pszSection = "Arch";
+constexpr inline TCHAR pszSection[]{TEXT("Arch")};
 
 extern void MakeArc(float x1, float y1, float x2, float y2, int npoints, 
 					 float start_ang, float fArc, float points[][2]);
 
 
 CArchDlg::CArchDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
-	: CDialog(CArchDlg::IDD, pParent)
+	: CBaseDlg(CArchDlg::IDD, pParent)
 {
 	bmins = boxmins;
 	bmaxs = boxmaxs;
@@ -33,14 +33,18 @@ CArchDlg::CArchDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
 	m_fAngle = 0.0f;
 	//}}AFX_DATA_INIT
 
+	m_iMaxWallWidth = 0;
+
 	// load up old defaults
 	CString str;
 	m_iWallWidth = AfxGetApp()->GetProfileInt(pszSection, "Wall Width", 32);
 	str = AfxGetApp()->GetProfileString(pszSection, "Arc_", "180");
-	m_fArc = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fArc = strtof(str, nullptr);
 	m_iSides = AfxGetApp()->GetProfileInt(pszSection, "Sides", 8);
 	str = AfxGetApp()->GetProfileString(pszSection, "Start Angle_", "0");
-	m_fAngle = atof(str);
+	// dimhotepus: atof -> strtof.
+	m_fAngle = strtof(str, nullptr);
 	m_iAddHeight = AfxGetApp()->GetProfileInt(pszSection, "Add Height", 0);
 }
 
@@ -60,7 +64,7 @@ void CArchDlg::SaveValues()
 
 void CArchDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CArchDlg)
 	DDX_Control(pDX, IDC_ANGLESPIN, m_cStartAngleSpin);
@@ -85,7 +89,7 @@ void CArchDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CArchDlg, CDialog)
+BEGIN_MESSAGE_MAP(CArchDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CArchDlg)
 	ON_EN_CHANGE(IDC_ARC, OnChangeArc)
 	ON_BN_CLICKED(IDC_CIRCLE, OnCircle)
@@ -120,7 +124,7 @@ void CArchDlg::OnUpdateWallwidth()
 
 BOOL CArchDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	m_cArcSpin.SetRange(8, 360);
 	m_cSidesSpin.SetRange(3, 100);
@@ -137,7 +141,7 @@ void CArchDlg::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 	
-	// Do not call CDialog::OnPaint() for painting messages
+	// Do not call __super::OnPaint() for painting messages
 	CBrush black(RGB(0,0,0));
 	CBrush grey(RGB(128,128,128));
 
@@ -192,12 +196,12 @@ void CArchDlg::DrawArch(CDC* pDC)
 	pt.x = rcItem.left + rcItem.Width()  / 2;
 	pt.y = rcItem.top  + rcItem.Height() / 2;
 
-	if (bmaxs[0] - bmins[0])
+	if (bmaxs[0] != bmins[0])
 		fScaleX = rcItem.Width()/(bmaxs[0] - bmins[0]);
 	else
 		fScaleX = 1.0f;
 	
-	if (bmaxs[1] - bmins[1])
+	if (bmaxs[1] != bmins[1])
 		fScaleY = rcItem.Height()/(bmaxs[1] - bmins[1]);
 	else
 		fScaleY = 1.0f;
@@ -229,15 +233,15 @@ void CArchDlg::DrawArch(CDC* pDC)
 	BOOL bCreateSouthFace = TRUE;
 	float fCenter[3];
 	for (int i = 0; i < 3; i++)
-		fCenter[i] = (bmins[i] + bmaxs[i])/2.0;
+		fCenter[i] = (bmins[i] + bmaxs[i])/2.0f;
 	
 	if((iWallWidth*2+8)  >= (bmaxs[0] - bmins[0]) ||
 		(iWallWidth*2+8) >= (bmaxs[1] - bmins[1]))
 	{
-		for(int i = 0; i < ARC_MAX_POINTS; i++)
+		for(auto &p : fInnerPoints)
 		{
-			fInnerPoints[i][0] = fCenter[0];
-			fInnerPoints[i][1] = fCenter[1];
+			p[0] = fCenter[0];
+			p[1] = fCenter[1];
 		}
 		bCreateSouthFace = FALSE;
 	}

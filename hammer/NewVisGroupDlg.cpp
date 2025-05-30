@@ -18,7 +18,7 @@ static const unsigned int g_uSelChangeMsg = ::RegisterWindowMessage(GROUPLIST_MS
 static BOOL s_bLastHideObjects = TRUE;
 
 
-BEGIN_MESSAGE_MAP(CNewVisGroupDlg, CDialog)
+BEGIN_MESSAGE_MAP(CNewVisGroupDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CNewVisGroupDlg)
 	ON_REGISTERED_MESSAGE(g_uSelChangeMsg, OnSelChangeGroupList)
 	ON_COMMAND(IDC_PLACE_IN_EXISTING_VISGROUP, OnPlaceInExistingVisGroup)
@@ -32,7 +32,7 @@ END_MESSAGE_MAP()
 // Input  : pParent - 
 //-----------------------------------------------------------------------------
 CNewVisGroupDlg::CNewVisGroupDlg(CString &str, CWnd *pParent)
-	: CDialog(CNewVisGroupDlg::IDD, pParent)
+	: CBaseDlg(CNewVisGroupDlg::IDD, pParent)
 {
 	m_pPickedVisGroup = NULL;
 
@@ -48,7 +48,7 @@ CNewVisGroupDlg::CNewVisGroupDlg(CString &str, CWnd *pParent)
 //-----------------------------------------------------------------------------
 void CNewVisGroupDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CNewVisGroupDlg)
 	DDX_Check(pDX, IDC_REMOVE_FROM_ALL, m_bRemoveFromOtherGroups);
 	DDX_Check(pDX, IDC_HIDE_OBJECTS, m_bHideObjects);
@@ -64,7 +64,7 @@ BOOL CNewVisGroupDlg::OnInitDialog(void)
 {
 	m_bHideObjects = s_bLastHideObjects;
 	
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	CButton *pButton = (CButton *)GetDlgItem(IDC_CREATE_NEW_VISGROUP);
 	pButton->SetCheck(1);
@@ -93,7 +93,7 @@ void CNewVisGroupDlg::GetName(CString &str)
 //-----------------------------------------------------------------------------
 void CNewVisGroupDlg::OnOK() 
 {
-	CDialog::OnOK();
+	__super::OnOK();
 	s_bLastHideObjects = m_bHideObjects;
 }
 

@@ -44,7 +44,7 @@ public:
 //-----------------------------------------------------------------------------
 class CParticleSystemPropertiesPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CParticleSystemPropertiesPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CParticleSystemPropertiesPanel, vgui::EditablePanel );
 
 	// Sends the message 'ParticleSystemModified' when the particle system was modified in any way
 	// Sends the message 'ParticleFunctionSelChanged' when the selected particle function changed

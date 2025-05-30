@@ -5,17 +5,13 @@
 // $NoKeywords: $
 //=============================================================================
 
-//#include "..\..\serverbrowser\pch_serverbrowser.h"
+#include "blacklisted_server_manager.h"
 
-#undef _snprintf	// needed since matchmakingtypes.h inlines a bare _snprintf
-
-#include "convar.h"
+#include "tier1/convar.h"
 #include "KeyValues.h"
 #include "filesystem.h"
 #include "steam/steamclientpublic.h"
 #include "steam/matchmakingtypes.h"
-#include <time.h>
-#include "blacklisted_server_manager.h"
 
 
 //-----------------------------------------------------------------------------
@@ -43,7 +39,7 @@ void CBlacklistedServerManager::Reset( void )
 //-----------------------------------------------------------------------------
 int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, bool bResetTimes )
 {
-	KeyValues *pKV = new KeyValues( "serverblacklist" );
+	KeyValuesAD pKV( "serverblacklist" );
 	if ( !pKV->LoadFromFile( g_pFullFileSystem, pszFilename, "MOD" ) )
 		return 0;
 
@@ -64,18 +60,23 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 		const char *pszNetAddr = pData->GetString( "addr" );
 		if ( pszNetAddr && pszNetAddr[0] && pszName && pszName[0] )
 		{
+			netadr_t netadr;
+			if ( !netadr.SetFromString(pszNetAddr) )
+			{
+				Warning( "%s: %s is not a IPv4 address, skipping add to black list.\n", pszFilename, pszNetAddr );
+				continue;
+			}
+
 			auto iIdx = m_Blacklist.AddToTail();
 
 			m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
-			V_strncpy( m_Blacklist[iIdx].m_szServerName, pszName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
+			V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, pszName );
 			m_Blacklist[iIdx].m_ulTimeBlacklistedAt = ulDate;
-			m_Blacklist[iIdx].m_NetAdr.SetFromString( pszNetAddr );
+			m_Blacklist[iIdx].m_NetAdr = netadr;
 
 			++count;
 		}
 	}
-
-	pKV->deleteThis();
 
 	return count;
 }
@@ -86,11 +87,11 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 //-----------------------------------------------------------------------------
 void CBlacklistedServerManager::SaveToFile( const char *pszFilename )
 {
-	KeyValues *pKV = new KeyValues( "serverblacklist" );
+	KeyValuesAD pKV( "serverblacklist" );
 
 	for ( auto &bl : m_Blacklist )
 	{
-		KeyValues *pSubKey = new KeyValues( "server" );
+		auto *pSubKey = new KeyValues( "server" );
 		pSubKey->SetString( "name", bl.m_szServerName );
 		pSubKey->SetInt( "date", bl.m_ulTimeBlacklistedAt );
 		pSubKey->SetString( "addr", bl.m_NetAdr.ToString() );
@@ -98,8 +99,6 @@ void CBlacklistedServerManager::SaveToFile( const char *pszFilename )
 	}
 
 	pKV->SaveToFile( g_pFullFileSystem, pszFilename, "MOD" );
-
-	pKV->deleteThis();
 }
 
 
@@ -116,7 +115,7 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( gameserveritem_t &se
  		return NULL;
 
 	auto iIdx = m_Blacklist.AddToTail();
-	V_strncpy( m_Blacklist[iIdx].m_szServerName, server.GetName(), sizeof( m_Blacklist[iIdx].m_szServerName ) );
+	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, server.GetName() );
 
 	time_t today;
 	time( &today );
@@ -140,13 +139,11 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
  		return NULL;
 
 	auto iIdx = m_Blacklist.AddToTail();
-
-	V_strncpy( m_Blacklist[iIdx].m_szServerName, serverName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
+	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, serverName );
 
 	time_t today;
 	time( &today );
 	m_Blacklist[iIdx].m_ulTimeBlacklistedAt = today;
-
 	m_Blacklist[iIdx].m_NetAdr = netAdr;
 	m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;
 
@@ -159,15 +156,18 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 //-----------------------------------------------------------------------------
 blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverName, const char *netAddressString, uint32 timestamp )
 {
-	netadr_t netAdr( netAddressString );
+	netadr_t netAdr;
+	// dimhotepus: If not net address, return.
+	if ( !netAdr.SetFromString( netAddressString ) )
+		return NULL;
 
 	// Don't let them add reserved addresses to their blacklists
 	if ( netAdr.IsReservedAdr() )
 		return NULL;
 
 	auto iIdx = m_Blacklist.AddToTail();
+	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, serverName );
 
-	V_strncpy( m_Blacklist[iIdx].m_szServerName, serverName, sizeof( m_Blacklist[iIdx].m_szServerName ) );
 	m_Blacklist[iIdx].m_ulTimeBlacklistedAt = timestamp;
 	m_Blacklist[iIdx].m_NetAdr = netAdr;
 	m_Blacklist[iIdx].m_nServerID = m_iNextServerID++;

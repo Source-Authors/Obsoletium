@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 #include "utlvector.h"
 #include "MapClass.h"
@@ -28,7 +29,7 @@ enum FindReplaceIn_t
 };
 
 
-class CSearchReplaceDlg : public CDialog
+class CSearchReplaceDlg : public CBaseDlg
 {
 // Construction
 public:

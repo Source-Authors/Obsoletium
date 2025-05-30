@@ -10,15 +10,14 @@ using BOOL = int;
 using HANDLE = void *;
 
 using SECURITY_ATTRIBUTES = struct _SECURITY_ATTRIBUTES;
-using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES*;
+using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES *;
 
 extern "C" {
-__declspec(dllimport) _Ret_maybenull_ HANDLE
-    __stdcall CreateMutexW(_In_opt_ LPSECURITY_ATTRIBUTES lpMutexAttributes,
-                           _In_ BOOL bInitialOwner,
-                           _In_opt_ const wchar_t *lpName);
-__declspec(dllimport) BOOL
-    __stdcall CloseHandle(_In_ _Post_ptr_invalid_ HANDLE hObject);
+__declspec(dllimport) _Ret_maybenull_ HANDLE __stdcall CreateMutexW(
+    _In_opt_ LPSECURITY_ATTRIBUTES lpMutexAttributes, _In_ BOOL bInitialOwner,
+    _In_opt_ const wchar_t *lpName);
+__declspec(dllimport) BOOL __stdcall CloseHandle(
+    _In_ _Post_ptr_invalid_ HANDLE hObject);
 
 __declspec(dllimport) unsigned long __stdcall WaitForSingleObject(
     _In_ HANDLE hHandle, _In_ unsigned long dwMilliseconds);
@@ -37,12 +36,15 @@ constexpr inline unsigned long kWaitAbandoned{0x00000080L};
 #include <fcntl.h>
 #endif
 
+#include "tier0/icommandline.h"
+#include "tier1/strtools.h"
+
 namespace se::launcher {
 
 // App multirun.
 class ScopedAppMultiRun {
  public:
-  ScopedAppMultiRun() noexcept
+  explicit ScopedAppMultiRun(ICommandLine *command_line) noexcept
 #if defined(WIN32)
       // don't allow more than one instance to run
       : mutex_{::CreateMutexW(nullptr, 0, L"hl2_singleton_mutex")}
@@ -80,8 +82,8 @@ class ScopedAppMultiRun {
       tmp_directory = "/tmp";
     }
 
-    V_snprintf(lock_file_name_, sizeof(lock_file_name_),
-               "%s/source_engine_%u.lock", tmp_directory, gameCRC);
+    V_sprintf_safe(lock_file_name_, "%s/source_engine_%u.lock", tmp_directory,
+                   gameCRC);
 
     lock_handle_ = open(lock_file_name_, O_WRONLY | O_CREAT, 0666);
     if (lock_handle_ == -1) {
@@ -116,8 +118,7 @@ class ScopedAppMultiRun {
       return;
     }
 #else
-    V_snprintf(lock_file_name_, sizeof(lock_file_name_),
-               "/tmp/source_engine_%u.lock", gameCRC);
+    V_sprintf_safe(lock_file_name_, "/tmp/source_engine_%u.lock", gameCRC);
 
     lock_handle_ =
         open(lock_file_name_,
@@ -171,7 +172,11 @@ class ScopedAppMultiRun {
     if (lock_handle_ != -1) {
       close(lock_handle_);
       lock_handle_ = -1;
-      unlink(lock_file_name_);
+
+      if (unlink(lock_file_name_)) {
+        Warning("Unable to remove lock file '%s': %s.\n", lock_file_name_,
+                std::generic_category().message(errno).c_str());
+      }
     }
 #endif
   }

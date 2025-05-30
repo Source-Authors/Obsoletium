@@ -87,7 +87,7 @@ void SpewToFile( char const* pFmt, ... )
 	va_list args;
 
 	va_start( args, pFmt );
-	int len = Q_vsnprintf( temp, sizeof( temp ), pFmt, args );
+	int len = V_vsprintf_safe( temp, pFmt, args );
 	va_end( args );
 	Assert( len < 2048 );
 
@@ -272,7 +272,7 @@ void CL_FlushEntityPacket( CClientFrame *packet, char const *errorString, ... )
 
 	// Spit out an error.
 	va_start(marker, errorString);
-	Q_vsnprintf(str, sizeof(str), errorString, marker);
+	V_vsprintf_safe(str, errorString, marker);
 	va_end(marker);
 	
 	ConMsg("%s", str);

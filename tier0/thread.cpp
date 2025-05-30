@@ -38,11 +38,11 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 	CONTEXT ctx;
 	ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 	X86HardwareBreakpointState_t *pState = &s_BreakpointState;
-	ctx.Dr0 = (DWORD) pState->pAddress[0];
-	ctx.Dr1 = (DWORD) pState->pAddress[1];
-	ctx.Dr2 = (DWORD) pState->pAddress[2];
-	ctx.Dr3 = (DWORD) pState->pAddress[3];
-	ctx.Dr7 = (DWORD) 0;
+	ctx.Dr0 = (DWORD) (DWORD_PTR) pState->pAddress[0];
+	ctx.Dr1 = (DWORD) (DWORD_PTR) pState->pAddress[1];
+	ctx.Dr2 = (DWORD) (DWORD_PTR) pState->pAddress[2];
+	ctx.Dr3 = (DWORD) (DWORD_PTR) pState->pAddress[3];
+	ctx.Dr7 = (DWORD) (DWORD_PTR) 0;
 	for ( int i = 0; i < 4; ++i )
 	{
 		if ( pState->pAddress[i] && pState->nWatchBytes[i] )
@@ -54,7 +54,7 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 				ctx.Dr7 |= 1 << (16 + i*4);
 			switch ( pState->nWatchBytes[i] )
 			{
-			case 1: ctx.Dr7 |= 0<<(18 + i*4); break;
+			case 1: ctx.Dr7 |= 0<<(18 + i*4); break; //-V684
 			case 2: ctx.Dr7 |= 1<<(18 + i*4); break;
 			case 4: ctx.Dr7 |= 3<<(18 + i*4); break;
 			case 8: ctx.Dr7 |= 2<<(18 + i*4); break;
@@ -80,8 +80,11 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 	}
 }
 
-static DWORD STDCALL ThreadProcX86SetDataBreakpoints( LPVOID pvParam )
+static unsigned STDCALL ThreadProcX86SetDataBreakpoints( void* pvParam )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("SetX86DataBreaks");
+
 	if ( pvParam )
 	{
 		X86ApplyBreakpointsToThread( *(unsigned long*)pvParam );
@@ -175,7 +178,7 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	}
 	
 
-	HANDLE hWorkThread = CreateThread( NULL, NULL, &ThreadProcX86SetDataBreakpoints, NULL, 0, NULL );
+	HANDLE hWorkThread = (HANDLE)_beginthreadex( NULL, 0, &ThreadProcX86SetDataBreakpoints, NULL, 0, NULL );
 	if ( hWorkThread )
 	{
 		WaitForSingleObject( hWorkThread, INFINITE );
@@ -194,7 +197,7 @@ void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 	}
 	else
 	{
-		HANDLE hWorkThread = CreateThread( NULL, NULL, &ThreadProcX86SetDataBreakpoints, &dwThreadID, 0, NULL );
+		HANDLE hWorkThread = (HANDLE)_beginthreadex( NULL, 0, &ThreadProcX86SetDataBreakpoints, &dwThreadID, 0, NULL );
 		if ( hWorkThread )
 		{
 			WaitForSingleObject( hWorkThread, INFINITE );

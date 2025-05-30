@@ -8,6 +8,8 @@
 #include "stdafx.h"
 #include "bsplightingthread.h"
 
+#include "tier0/threadtools.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -18,46 +20,23 @@
 // --------------------------------------------------------------------------- //
 IBSPLightingThread* CreateBSPLightingThread( IVRadDLL *pDLL )
 {
-	CBSPLightingThread *pRet = new CBSPLightingThread;
-
-	if( pRet->Init( pDLL ) )
+	auto *pRet = new CBSPLightingThread;
+	if ( pRet->Init( pDLL ) )
 	{
 		return pRet;
 	}
-	else
-	{
-		delete pRet;
-		return 0;
-	}
+
+	delete pRet;
+	return 0;
 }
 
-DWORD WINAPI ThreadMainLoop_Static( LPVOID lpParameter )
+static unsigned __stdcall ThreadMainLoop_Static( void* lpParameter )
 {
+	// dimhotepus: Add thread name to simplify debugging.
+	ThreadSetDebugName("BSPLighting");
+
 	return ((CBSPLightingThread*)lpParameter)->ThreadMainLoop();
 }
-
-
-// --------------------------------------------------------------------------- //
-// Static helpers.
-// --------------------------------------------------------------------------- //
-
-class CCSLock
-{
-public:
-					CCSLock( CRITICAL_SECTION *pCS )
-					{
-						EnterCriticalSection( pCS );
-						m_pCS = pCS;
-					}
-
-					~CCSLock()
-					{
-						LeaveCriticalSection( m_pCS );
-					}
-
-	CRITICAL_SECTION *m_pCS;
-};
-
 
 
 // --------------------------------------------------------------------------- //
@@ -66,10 +45,8 @@ public:
 
 CBSPLightingThread::CBSPLightingThread()
 {
-	InitializeCriticalSection( &m_CS );
-	
+	m_pVRadDLL = nullptr;
 	m_hThread = 0;
-	m_ThreadID = 0;
 	
 	m_ThreadCmd = THREADCMD_NONE;
 	m_ThreadState = STATE_IDLE;
@@ -93,8 +70,6 @@ CBSPLightingThread::~CBSPLightingThread()
 		CloseHandle( m_hThread );
 		m_hThread = NULL;
 	}
-
-	DeleteCriticalSection( &m_CS );
 }
 
 
@@ -110,7 +85,7 @@ void CBSPLightingThread::StartLighting( char const *pVMFFileWithEntities )
 	Interrupt();
 
 	// Store the VMF file data for the thread.
-	int len = strlen( pVMFFileWithEntities ) + 1;
+	intp len = strlen( pVMFFileWithEntities ) + 1;
 	m_VMFFileWithEntities.CopyArray( pVMFFileWithEntities, len );
 
 	// Tell the thread to start lighting.
@@ -119,7 +94,7 @@ void CBSPLightingThread::StartLighting( char const *pVMFFileWithEntities )
 }
 
 
-int CBSPLightingThread::GetCurrentState()
+int CBSPLightingThread::GetCurrentState() const
 {
 	return GetThreadState();
 }
@@ -147,13 +122,13 @@ bool CBSPLightingThread::Init( IVRadDLL *pDLL )
 {
 	m_pVRadDLL = pDLL;
 
-	m_hThread = CreateThread(
-		NULL,
+	m_hThread = (HANDLE)_beginthreadex(
+		nullptr,
 		0,
 		ThreadMainLoop_Static,
 		this,
 		0,
-		&m_ThreadID );
+		nullptr );
 
 	if( !m_hThread )
 		return false;
@@ -191,33 +166,25 @@ DWORD CBSPLightingThread::ThreadMainLoop()
 
 int CBSPLightingThread::GetThreadCmd()
 {
-	CCSLock lock( &m_CS );
-
-	int ret = m_ThreadCmd;
-	m_ThreadCmd = THREADCMD_NONE;
-
-	return ret;
+	return m_ThreadCmd.exchange(THREADCMD_NONE);
 }
 
 
 void CBSPLightingThread::SetThreadCmd( int cmd )
 {
-	CCSLock lock( &m_CS );
-	m_ThreadCmd = cmd;
+	m_ThreadCmd.store(cmd, std::memory_order::memory_order_relaxed);
 }
 
 
-int CBSPLightingThread::GetThreadState()
+int CBSPLightingThread::GetThreadState() const
 {
-	CCSLock lock( &m_CS );
-	return m_ThreadState;
+	return m_ThreadState.load(std::memory_order::memory_order_relaxed);
 }
 
 
 void CBSPLightingThread::SetThreadState( int state )
 {
-	CCSLock lock( &m_CS );
-	m_ThreadState = state;
+	m_ThreadState.store(state, std::memory_order::memory_order_relaxed);
 }
 
 

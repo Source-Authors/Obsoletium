@@ -967,7 +967,7 @@ void CNPC_BaseScanner::MoveExecute_Alive(float flInterval)
 	UpdateHead( flInterval );
 
 	// Control the tail based on our vertical travel
-	float tailPerc = clamp( GetCurrentVelocity().z, -150, 250 );
+	float tailPerc = clamp( GetCurrentVelocity().z, -150.f, 250.f );
 	tailPerc = SimpleSplineRemapVal( tailPerc, -150, 250, -25, 80 );
 
 	SetPoseParameter( m_nPoseTail, tailPerc );
@@ -1564,9 +1564,9 @@ void CNPC_BaseScanner::ClampMotorForces( Vector &linear, AngularImpulse &angular
 	// limit reaction forces
 	if ( m_nFlyMode != SCANNER_FLY_DIVE )
 	{
-		linear.x = clamp( linear.x, -500, 500 );
-		linear.y = clamp( linear.y, -500, 500 );
-		linear.z = clamp( linear.z, -500, 500 );
+		linear.x = clamp( linear.x, -500.f, 500.f );
+		linear.y = clamp( linear.y, -500.f, 500.f );
+		linear.z = clamp( linear.z, -500.f, 500.f );
 	}
 
 	// If we're dive bombing, we need to drop faster than normal

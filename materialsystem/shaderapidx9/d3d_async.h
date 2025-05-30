@@ -737,7 +737,7 @@ public:
 	FORCEINLINE void SetScissorRect( const RECT *pScissorRect )
 	{
 		RECORD_COMMAND( DX8_SET_SCISSOR_RECT, 1 );
-		RECORD_STRUCT( pScissorRect, 4 * sizeof(LONG) );
+		RECORD_STRUCT( pScissorRect, sizeof( *pScissorRect ) );
 #if SHADERAPI_USE_SMP
 		if ( ASyncMode() )
 		{

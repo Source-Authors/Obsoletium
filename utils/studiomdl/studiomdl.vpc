@@ -6,6 +6,9 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro NVTRISTRIPSSRCDIR	"$SRCDIR\thirdparty\nvtristrip"
+$Macro NVTRISTRIPOUTDIRDEBUG		"$NVTRISTRIPSSRCDIR\out\Debug"
+$Macro NVTRISTRIPOUTDIRRELEASE		"$NVTRISTRIPSSRCDIR\out\Release"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
@@ -13,42 +16,64 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common,..\nvtristriplib,$SRCDIR\Game_Shared"
+		$AdditionalIncludeDirectories		"$BASE,..\common,$NVTRISTRIPSSRCDIR"
 		$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE"
 	}
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE winmm.lib"
+		$AdditionalDependencies				"$BASE winmm.lib User32.lib"
 	}
 }
 
-$Project "Studiomdl"
+$Configuration	"Debug"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$NVTRISTRIPOUTDIRDEBUG"
+	
+		$AdditionalDependencies				"$BASE nvTriStrip.lib" [$WINDOWS]
+	}
+}
+
+$Configuration	"Release"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$NVTRISTRIPOUTDIRRELEASE"
+	
+		$AdditionalDependencies				"$BASE nvTriStrip.lib" [$WINDOWS]
+	}
+}
+
+
+$Project "studiomdl"
 {
 	$Folder	"Source Files"
 	{
-		$File	"$SRCDIR\public\bone_setup.cpp"
 		$File	"..\common\cmdlib.cpp"
-		$File	"collisionmodel.cpp"
+		$File	"..\common\fileSystem_tools.cpp"
+		$File	"..\common\physdll.cpp"
+		$File	"..\common\scriplib.cpp"
+		$File	"..\common\tools_minidump.cpp"
+		$File	"$SRCDIR\common\studiobyteswap.cpp"
+		$File	"$SRCDIR\public\bone_setup.cpp"
 		$File	"$SRCDIR\public\CollisionUtils.cpp"
-		$File	"dmxsupport.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"..\common\FileSystem_Tools.cpp"
-		$File	"HardwareMatrixState.cpp"
-		$File	"HardwareVertexCache.cpp"
 		$File	"$SRCDIR\public\interpolatortypes.cpp"
 		$File	"$SRCDIR\public\mdlobjects\mdlobjects.cpp"
 		$File	"$SRCDIR\public\movieobjects\movieobjects_compiletools.cpp"
+		$File	"$SRCDIR\public\studio.cpp"
+		$File	"collisionmodel.cpp"
+		$File	"dmxsupport.cpp"
+		$File	"HardwareMatrixState.cpp"
+		$File	"HardwareVertexCache.cpp"
 		$File	"mrmsupport.cpp"
 		$File	"objsupport.cpp"
 		$File	"optimize.cpp"
 		$File	"perfstats.cpp"
-		$File	"..\common\physdll.cpp"
-		$File	"..\common\scriplib.cpp"
 		$File	"simplify.cpp"
-		$File	"$SRCDIR\public\studio.cpp"
-		$File	"$SRCDIR\common\studiobyteswap.cpp"
 		$File	"studiomdl.cpp"
 		$File	"UnifyLODs.cpp"
 		$File	"v1support.cpp"
@@ -58,22 +83,24 @@ $Project "Studiomdl"
 
 	$Folder	"Header Files"
 	{
+		$File	"$NVTRISTRIPSSRCDIR\NvTriStrip.h"
 		$File	"..\common\cmdlib.h"
-		$File	"collisionmodel.h"
-		$File	"FileBuffer.h"
-		$File	"..\common\FileSystem_Tools.h"
-		$File	"HardwareMatrixState.h"
-		$File	"HardwareVertexCache.h"
-		$File	"..\NvTriStripLib\NvTriStrip.h"
-		$File	"perfstats.h"
+		$File	"..\common\fileSystem_tools.h"
 		$File	"..\common\physdll.h"
 		$File	"..\common\scriplib.h"
+		$File	"..\common\tools_minidump.h"
+		$File	"collisionmodel.h"
+		$File	"FileBuffer.h"
+		$File	"HardwareMatrixState.h"
+		$File	"HardwareVertexCache.h"
+		$File	"perfstats.h"
 		$File	"studiomdl.h"
 		$File	"checkuv.h"
 	}
 
 	$Folder	"Public Header Files"
 	{
+		$File	"$SRCDIR\common\studiobyteswap.h"
 		$File	"$SRCDIR\public\gametrace.h"
 		$File	"$SRCDIR\public\filesystem.h"
 		$File	"$SRCDIR\public\filesystem_helpers.h"
@@ -111,7 +138,6 @@ $Project "Studiomdl"
 		$File	"$SRCDIR\public\tier0\platform.h"
 		$File	"$SRCDIR\public\tier0\protected_things.h"
 		$File	"$SRCDIR\public\vstdlib\random.h"
-		$File	"$SRCDIR\common\studiobyteswap.h"
 		$File	"$SRCDIR\public\string_t.h"
 		$File	"$SRCDIR\public\tier1\strtools.h"
 		$File	"$SRCDIR\public\studio.h"
@@ -143,7 +169,6 @@ $Project "Studiomdl"
 		$Lib mathlib
 		$Lib mdlobjects
 		$Lib movieobjects
-		$Lib nvtristrip
 		$Lib tier2
 		$Lib tier3
 	}

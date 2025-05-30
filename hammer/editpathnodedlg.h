@@ -11,13 +11,14 @@
 #pragma once
 #endif
 
+#include "windows/base_dlg.h"
 #include "resource.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
 // CEditPathNodeDlg dialog
 
-class CEditPathNodeDlg : public CDialog
+class CEditPathNodeDlg : public CBaseDlg
 {
 // Construction
 public:

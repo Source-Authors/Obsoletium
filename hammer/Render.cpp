@@ -6,14 +6,15 @@
 //===========================================================================//
 
 #include "stdafx.h"
+#include "Render.h"
+
 #include "MapDoc.h"
 #include <VGuiMatSurface/IMatSystemSurface.h>
 #include "mathlib/vmatrix.h"
-#include "Render.h"
 #include "Camera.h"
 #include "Material.h"
 #include "materialsystem/imesh.h"
-#include "datacache\imdlcache.h"
+#include "datacache/imdlcache.h"
 #include "hammer.h"
 #include "hammer_mathlib.h"
 #include "vgui_controls/Controls.h"
@@ -22,7 +23,6 @@
 #include "IStudioRender.h"
 #include "builddisp.h"
 #include "mapview.h"
-#include "material.h"
 #include <renderparm.h>
 #include "materialsystem/IMaterialSystemHardwareConfig.h"
 #include "vphysics_interface.h"
@@ -53,7 +53,7 @@ CRender::CRender(void)
 		if ( !s_bOnce )
 		{
 			s_bOnce = true;
-			MessageBox( NULL, "Failed to load the default scheme file. The map views may be missing some visual elements.", "Error", MB_OK | MB_ICONEXCLAMATION );
+			MessageBox( NULL, "Failed to load the default scheme file. The map views may be missing some visual elements.", "Hammer - Error", MB_OK | MB_ICONEXCLAMATION );
 		}
 	}
 	
@@ -91,6 +91,8 @@ CRender::CRender(void)
 	m_nInstanceCount = 0;
 	m_InstanceSelectionDepth = 0;
 
+	m_bRenderModeLightPreviewRaytracedMaterialsReferenced = false;
+
 	PushInstanceData( NULL, Vector( 0.0f, 0.0f, 0.0f ), QAngle( 0.0f, 0.0f, 0.0f ) ); // always add a default state
 
 	UpdateStudioRenderConfig( false, false );
@@ -108,7 +110,7 @@ CRender::~CRender(void)
 //			InstanceAngles - the rotation of the instance
 // Output : none
 //-----------------------------------------------------------------------------
-void CRender::PushInstanceData( CMapInstance *pInstanceClass, Vector &InstanceOrigin, QAngle &InstanceAngles )
+void CRender::PushInstanceData( CMapInstance *pInstanceClass, const Vector &InstanceOrigin, const QAngle &InstanceAngles )
 {
 	TInstanceState	InstanceState;
 	matrix3x4_t		Instance3x4Matrix;
@@ -396,7 +398,7 @@ void CRender::DrawText( const char *text, int x, int y, int nFlags )
 
 	mbstowcs( unicode, text, ARRAYSIZE(unicode) );
 
-	int len = min( 127, Q_strlen( text ) );
+	int len = min( (ptrdiff_t)127, Q_strlen( text ) );
 
 	Assert( m_DefaultFont != vgui::INVALID_FONT );
 	bool bJustifyText = nFlags & ( TEXT_JUSTIFY_LEFT | TEXT_JUSTIFY_TOP | TEXT_JUSTIFY_HORZ_CENTER | TEXT_JUSTIFY_VERT_CENTER );
@@ -775,12 +777,12 @@ void CRender::DrawCircle( const Vector &vCenter, const Vector &vNormal, float fl
 
 	meshBuilder.Begin( m_pMesh, MATERIAL_LINE_LOOP, nSegments );
 
-	float invDelta = 2.0f * M_PI / nSegments;
+	float invDelta = 2.0f * M_PI_F / nSegments;
 	for ( int i = 0; i < nSegments; ++i )
 	{
 		float flRadians = i * invDelta;
-		float ca = cos( flRadians );
-		float sa = sin( flRadians );
+		float sa, ca;
+		DirectX::XMScalarSinCos(&sa, &ca, flRadians);
 
 		// Rotate it around the circle
 		Vector vertex = vCenter + (ca*vx) + (sa*vy);
@@ -797,12 +799,13 @@ void CRender::DrawCircle( Vector2D &vCenter, float fRadius, int nSegments, unsig
 {
 	meshBuilder.Begin( m_pMesh, MATERIAL_LINE_LOOP, nSegments );
 
-	float invDelta = 2.0f * M_PI / nSegments;
+	float invDelta = 2.0f * M_PI_F / nSegments;
 	for ( int i = 0; i < nSegments; ++i )
 	{
 		float flRadians = i * invDelta;
-		float ca = cos( flRadians );
-		float sa = sin( flRadians );
+		float sa, ca;
+
+		DirectX::XMScalarSinCos(&sa, &ca, flRadians);
 
 		// Rotate it around the circle
 		float x = vCenter.x + (fRadius * ca);
@@ -914,51 +917,53 @@ void CRender::DrawPlane( const Vector &p0, const Vector &p1, const Vector &p2, c
 	m_pMesh->Draw();
 }
 
-void CRender::DrawFilledRect( Vector2D& ul, Vector2D& lr, unsigned char *pColor, bool bBorder )
+void CRender::DrawFilledRect( const Vector2D& ul, const Vector2D& lr, unsigned char *pColor, bool bBorder )
 {
 	static Color black(0,0,0,255);
+
+	Vector2D ull = ul, lrr = lr;
 
 	meshBuilder.Begin( m_pMesh, MATERIAL_QUADS, bBorder?2:1 );
 
 	if ( bBorder )
 	{
  		meshBuilder.Color4ubv( (byte*)&black );
-		meshBuilder.Position3f( ul.x, ul.y, 0 );
+		meshBuilder.Position3f( ull.x, ull.y, 0 );
 		meshBuilder.AdvanceVertex();
 
 		meshBuilder.Color4ubv( (byte*)&black );
-		meshBuilder.Position3f( lr.x, ul.y, 0 );
+		meshBuilder.Position3f( lrr.x, ull.y, 0 );
 		meshBuilder.AdvanceVertex();
 
 		meshBuilder.Color4ubv( (byte*)&black );
-		meshBuilder.Position3f( lr.x, lr.y, 0 );
+		meshBuilder.Position3f( lrr.x, lrr.y, 0 );
 		meshBuilder.AdvanceVertex();
 
 		meshBuilder.Color4ubv( (byte*)&black );
-		meshBuilder.Position3f( ul.x, lr.y, 0 );
+		meshBuilder.Position3f( ull.x, lrr.y, 0 );
 		meshBuilder.AdvanceVertex();
 
 
-		ul.x+=1;
-		ul.y+=1;
-		lr.x-=1;
-		lr.y-=1;
+		ull.x+=1;
+		ull.y+=1;
+		lrr.x-=1;
+		lrr.y-=1;
 	}
 
 	meshBuilder.Color4ubv( pColor );
-	meshBuilder.Position3f( ul.x, ul.y, 0 );
+	meshBuilder.Position3f( ull.x, ull.y, 0 );
 	meshBuilder.AdvanceVertex();
 
 	meshBuilder.Color4ubv( pColor );
-	meshBuilder.Position3f( lr.x, ul.y, 0 );
+	meshBuilder.Position3f( lrr.x, ull.y, 0 );
 	meshBuilder.AdvanceVertex();
 
 	meshBuilder.Color4ubv( pColor );
-	meshBuilder.Position3f( lr.x, lr.y, 0 );
+	meshBuilder.Position3f( lrr.x, lrr.y, 0 );
 	meshBuilder.AdvanceVertex();
 
 	meshBuilder.Color4ubv( pColor );
-	meshBuilder.Position3f( ul.x, lr.y, 0 );
+	meshBuilder.Position3f( ull.x, lrr.y, 0 );
 	meshBuilder.AdvanceVertex();
 
 	meshBuilder.End();
@@ -1371,7 +1376,7 @@ bool CRender::GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
 	{
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "Missing material '%s'. Go to Tools | Options | Game Configurations and verify that your game directory is correct.", pName );
-		MessageBox( NULL, str, "FATAL ERROR", MB_OK );
+		MessageBox( NULL, str, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
 		return false;
 	}
 }

@@ -110,7 +110,7 @@ void CPhysicsObject::Init( const CPhysCollide *pCollisionModel, IVP_Real_Object 
 	m_gameIndex = 0;
 	m_sleepState = OBJ_SLEEP;		// objects start asleep
 	m_callbacks = CALLBACK_GLOBAL_COLLISION|CALLBACK_GLOBAL_FRICTION|CALLBACK_FLUID_TOUCH|CALLBACK_GLOBAL_TOUCH|CALLBACK_GLOBAL_COLLIDE_STATIC|CALLBACK_DO_FLUID_SIMULATION;
-	m_activeIndex = 0xFFFF;
+	m_activeIndex = std::numeric_limits<intp>::max();
 	m_pShadow = NULL;
 	m_shadowTempGravityDisable = false;
 	m_forceSilentDelete = false;
@@ -646,9 +646,9 @@ Vector CPhysicsObject::GetInvInertia( void ) const
 void CPhysicsObject::SetInertia( const Vector &inertia )
 {
 	IVP_U_Float_Point ri; ConvertDirectionToIVP( inertia, ri );
-	ri.k[0] = IVP_Inline_Math::fabsd(ri.k[0]);
-	ri.k[1] = IVP_Inline_Math::fabsd(ri.k[1]);
-	ri.k[2] = IVP_Inline_Math::fabsd(ri.k[2]);
+	ri.k[0] = fabs(ri.k[0]);
+	ri.k[1] = fabs(ri.k[1]);
+	ri.k[2] = fabs(ri.k[2]);
 
 	m_pObject->get_core()->set_rotation_inertia( &ri );
 }
@@ -1218,16 +1218,16 @@ float CPhysicsObject::GetDragInDirection( const IVP_U_Float_Point &velocity ) co
 	const IVP_U_Matrix *m_world_f_core = m_pObject->get_core()->get_m_world_f_core_PSI();
 	m_world_f_core->vimult3( &velocity, &local );
 
-	return m_dragCoefficient * IVP_Inline_Math::fabsd( local.k[0] * m_dragBasis.x ) + 
-		IVP_Inline_Math::fabsd( local.k[1] * m_dragBasis.y ) + 
-		IVP_Inline_Math::fabsd( local.k[2] * m_dragBasis.z );
+	return m_dragCoefficient * fabs( local.k[0] * m_dragBasis.x ) + 
+		fabs( local.k[1] * m_dragBasis.y ) + 
+		fabs( local.k[2] * m_dragBasis.z );
 }
 
 float CPhysicsObject::GetAngularDragInDirection( const IVP_U_Float_Point &angVelocity ) const
 {
-	return m_angDragCoefficient * IVP_Inline_Math::fabsd( angVelocity.k[0] * m_angDragBasis.x ) + 
-		IVP_Inline_Math::fabsd( angVelocity.k[1] * m_angDragBasis.y ) + 
-		IVP_Inline_Math::fabsd( angVelocity.k[2] * m_angDragBasis.z );
+	return m_angDragCoefficient * fabs( angVelocity.k[0] * m_angDragBasis.x ) + 
+		fabs( angVelocity.k[1] * m_angDragBasis.y ) + 
+		fabs( angVelocity.k[2] * m_angDragBasis.z );
 }
 
 const char *CPhysicsObject::GetName() const
@@ -1471,7 +1471,7 @@ bool CPhysicsObject::IsAttachedToConstraint( bool bExternalOnly ) const
 	return false;
 }
 
-static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, int materialIndex, objectparams_t *pParams, bool isStatic )
+static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, intp materialIndex, objectparams_t *pParams, bool isStatic )
 {
 	objectTemplate.mass = clamp( pParams->mass, VPHYSICS_MIN_MASS, VPHYSICS_MAX_MASS );
 
@@ -1514,7 +1514,7 @@ static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, int ma
 	objectTemplate.auto_check_rot_inertia = pParams->rotInertiaLimit;
 }
 
-CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, int materialIndex, const Vector &position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
+CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, intp materialIndex, const Vector &position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
 {
 	if ( materialIndex < 0 )
 	{
@@ -1587,7 +1587,7 @@ CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CP
 	return pObject;
 }
 
-CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float radius, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic )
+CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float radius, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic )
 {
 	IVP_U_Quat rotation;
 	IVP_U_Point pos;
@@ -1644,7 +1644,7 @@ public:
 	{
 		char nameBuf[1024];
 		int nameLen = pRestore->ReadInt();
-		pRestore->ReadString( nameBuf, sizeof(nameBuf), nameLen );
+		pRestore->ReadString( nameBuf, nameLen );
 		int *pMaterialIndex = (int *)fieldInfo.pField;
 		*pMaterialIndex = physprops->GetSurfaceIndex( nameBuf );
 		if ( *pMaterialIndex < 0 )

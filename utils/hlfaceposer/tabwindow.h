@@ -43,17 +43,17 @@ public:
 	
 	// MANIPULATORS
 	virtual void		add (const char *item);
-	virtual void		select (int index);
-	virtual void		remove (int index);
+	virtual void		select (intp index);
+	virtual void		remove (intp index);
 	virtual void		removeAll ();
 	virtual void		setPrefix( int item, char const *prefix );
 
 	// ACCESSORS
-	virtual int			getItemCount () const;
-	virtual int			getSelectedIndex () const;
+	virtual intp		getItemCount () const;
+	virtual intp		getSelectedIndex () const;
 
-	virtual char const	*getLabel( int item );
-	virtual char const	*getPrefix( int item );
+	virtual char const	*getLabel( intp item );
+	virtual char const	*getPrefix( intp item );
 	virtual void		ShowRightClickMenu( int mx, int my ) = 0;
 
 	void				SetColor( int index, COLORREF clr );
@@ -65,8 +65,8 @@ public:
 	void				SetRowHeight( int rowheight );
 
 protected:
-	void				GetTabRect( const RECT& rcClient, RECT& tabRect, int tabNum );
-	virtual void		DrawTab( CChoreoWidgetDrawHelper& drawHelper, RECT& rcClient, int tabnum, bool selected = false );
+	void				GetTabRect( const RECT& rcClient, RECT& tabRect, intp tabNum );
+	virtual void		DrawTab( CChoreoWidgetDrawHelper& drawHelper, RECT& rcClient, intp tabnum, bool selected = false );
 
 	int					RecomputeLayout( int windowWidth, bool dolayout = true );
 
@@ -83,12 +83,12 @@ protected:
 		RECT			rect;
 	};
 
-	int						GetItemUnderMouse( int mx, int my );
+	intp					GetItemUnderMouse( int mx, int my );
 
 	CUtlVector <CETItem>	m_Items;
 	int						m_nRowsRequired;
 
-	int						m_nSelected;
+	intp					m_nSelected;
 
 	int						m_nTabWidth;
 	int						m_nPixelDelta;

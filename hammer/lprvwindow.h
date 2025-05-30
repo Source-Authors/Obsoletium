@@ -10,16 +10,17 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 #include "utlvector.h"
 
 
-class CLightingPreviewResultsWindow : public CWnd
+class CLightingPreviewResultsWindow : public CBaseWnd
 {
 public:
 	CLightingPreviewResultsWindow();
 	virtual ~CLightingPreviewResultsWindow();
 
-	void Create(CWnd *pParentWnd );
+	void Create( CWnd *pParentWnd, const char *pszTitle );
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CLightingPreviewResultsWindow)

@@ -57,7 +57,7 @@
 
 void SV_DetermineMulticastRecipients( bool usepas, const Vector& origin, CBitVec< ABSOLUTE_PLAYER_LIMIT >& playerbits );
 
-int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, int maxcount, int maxitemlength, char maplist[][ 64 ] );
+intp MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, intp maxcount, intp maxitemlength, char maplist[][ 64 ] );
 
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
 
@@ -342,7 +342,7 @@ public:
 
 	bool IsInternalBuild( void ) override
 	{
-		return !phonehome->IsExternalBuild();
+		return !IsExternalBuild();
 	}
 
 	//-----------------------------------------------------------------------------
@@ -634,7 +634,7 @@ public:
 	//
 	// Request engine to allocate "cb" bytes on the entity's private data pointer.
 	//
-	void *PvAllocEntPrivateData(long cb) override
+	void *PvAllocEntPrivateData(size_t cb) override
 	{
 		return calloc( 1, cb );
 	}
@@ -649,12 +649,9 @@ public:
 		// set the memory to a known value
 		int size = _msize( pEntity );
 		memset( pEntity, 0xDD, size );
-#endif		
+#endif
 		
-		if ( pEntity )
-		{
-			free( pEntity );
-		}
+		free( pEntity );
 	}
 	
 	void *SaveAllocMemory(size_t num, size_t size) override
@@ -916,7 +913,7 @@ public:
 		static char	szOut[1024];
 		
 		va_start(argptr, szFmt);
-		Q_vsnprintf(szOut, sizeof( szOut ), szFmt, argptr);
+		V_vsprintf_safe(szOut, szFmt, argptr);
 		va_end(argptr);
 
 		if ( szOut[0] == 0 )
@@ -1184,7 +1181,7 @@ public:
 		va_list		argptr;
 		char		text[4096];
 		va_start (argptr, fmt);
-		Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+		V_vsprintf_safe(text, fmt, argptr);
 		va_end (argptr);
 
 		::Con_NPrintf( pos, "%s", text );
@@ -1198,7 +1195,7 @@ public:
 		va_list		argptr;
 		char		text[4096];
 		va_start (argptr, fmt);
-		Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+		V_vsprintf_safe(text, fmt, argptr);
 		va_end (argptr);
 
 		::Con_NXPrintf( info, "%s", text );
@@ -1292,11 +1289,11 @@ public:
 	}
 	
 	// Get a keyvalue for s specified client
-	const char *GetClientConVarValue( int clientIndex, const char *name ) override
+	const char *GetClientConVarValue( intp clientIndex, const char *name ) override
 	{
 		if ( clientIndex < 1 || clientIndex > sv.GetClientCount() )
 		{
-			DevMsg( 1, "GetClientConVarValue: player invalid index %i\n", clientIndex );
+			DevMsg( 1, "GetClientConVarValue: player invalid index %zd\n", clientIndex );
 			return "";
 		}
 
@@ -1577,7 +1574,7 @@ public:
 	int GetClusterCount() override
 	{
 		CCollisionBSPData *pBSPData = GetCollisionBSPData();
-		if ( pBSPData && pBSPData->map_vis )
+		if ( pBSPData->map_vis )
 			return pBSPData->map_vis->numclusters;
 		return 0;
 	}
@@ -1585,7 +1582,7 @@ public:
 	int GetAllClusterBounds( bbox_t *pBBoxList, int maxBBox ) override
 	{
 		CCollisionBSPData *pBSPData = GetCollisionBSPData();
-		if ( pBSPData && pBSPData->map_vis && host_state.worldbrush )
+		if ( pBSPData->map_vis && host_state.worldbrush )
 		{
 			// clamp to max clusters in the map
 			if ( maxBBox > pBSPData->map_vis->numclusters )

@@ -13,11 +13,11 @@
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "matsys_controls/matsyscontrols.h"
 #include "vgui/IVGui.h"
-#include "vgui_controls/propertypage.h"
-#include "vgui_controls/propertysheet.h"
-#include "vgui_controls/textentry.h"
-#include "vgui_controls/splitter.h"
-#include "vgui_controls/checkbutton.h"
+#include "vgui_controls/PropertyPage.h"
+#include "vgui_controls/PropertySheet.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Splitter.h"
+#include "vgui_controls/CheckButton.h"
 #include "matsys_controls/colorpickerpanel.h"
 #include "particles/particles.h"
 #include "tier1/KeyValues.h"
@@ -344,13 +344,13 @@ void CParticleSystemPanel::OnPaint3D()
 //-----------------------------------------------------------------------------
 class CControlPointPage : public vgui::PropertyPage
 {
-	DECLARE_CLASS_SIMPLE( CControlPointPage, vgui::PropertyPage );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CControlPointPage, vgui::PropertyPage );
 
 public:
 	// constructor, destructor
 	CControlPointPage( vgui::Panel *pParent, const char *pName, CParticleSystemPanel *pParticleSystemPanel );
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	void CreateControlPointControls( );
 

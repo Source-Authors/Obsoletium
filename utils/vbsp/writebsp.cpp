@@ -15,6 +15,7 @@
 #include "utilmatlib.h"
 #include "utldict.h"
 #include "map.h"
+#include "bspflags.h"
 
 int		c_nofaces;
 int		c_facenodes;
@@ -757,7 +758,7 @@ void CompactTexdataArray( texdatamap_t *pMap )
 
 		// get old string and re-add to table
 		const char *pString = &oldStringData[oldStringTable[oldTexData[i].nameStringTableID]];
-		int nameIndex = TexDataStringTable_AddOrFindString( pString );
+		intp nameIndex = TexDataStringTable_AddOrFindString( pString );
 		// copy old texdata and fixup with new name in compacted table
 		dtexdata[numtexdata] = oldTexData[i];
 		dtexdata[numtexdata].nameStringTableID = nameIndex;
@@ -961,12 +962,12 @@ void SetModelNumbers (void)
 
 		if ( !IsFuncOccluder(i) )
 		{
-			sprintf (value, "*%i", models);
+			V_sprintf_safe (value, "*%i", models);
 			models++;
 		}
 		else
 		{
-			sprintf (value, "");
+			value[0] = '\0';
 		}
 		SetKeyValue (&entities[i], "model", value);
 	}
@@ -982,7 +983,6 @@ SetLightStyles
 void SetLightStyles (void)
 {
 	int		stylenum;
-	char	*t;
 	entity_t	*e;
 	int		i, j;
 	char	value[10];
@@ -997,7 +997,7 @@ void SetLightStyles (void)
 	{
 		e = &entities[i];
 
-		t = ValueForKey (e, "classname");
+		const char *t = ValueForKey (e, "classname");
 		if (Q_strncasecmp (t, "light", 5))
 			continue;
 
@@ -1017,11 +1017,11 @@ void SetLightStyles (void)
 		{
 			if (stylenum == MAX_SWITCHED_LIGHTS)
 				Error ("Too many switched lights (error at light %s), max = %d", t, MAX_SWITCHED_LIGHTS);
-			strcpy (lighttargets[j], t);
+			V_strcpy_safe(lighttargets[j], t);
 			stylenum++;
 		}
-		sprintf (value, "%i", 32 + j);
-		char *pCurrentStyle = ValueForKey( e, "style" );
+		V_sprintf_safe (value, "%i", 32 + j);
+		const char *pCurrentStyle = ValueForKey( e, "style" );
 		// the designer has set a default lightstyle as well as making the light switchable
 		if ( pCurrentStyle )
 		{
@@ -1095,8 +1095,11 @@ void EmitBrushes (void)
 						break;
 				if (i == b->numsides)
 				{
+					// dimhotepus: Ensure has brushes.
+					if (numbrushsides < 1)
+						Error ("numbrushsides < 1");
 					if (numbrushsides >= MAX_MAP_BRUSHSIDES)
-						Error ("MAX_MAP_BRUSHSIDES");
+						Error ("numbrushsides >= MAX_MAP_BRUSHSIDES");
 
 					dbrushsides[numbrushsides].planenum = planenum;
 					dbrushsides[numbrushsides].texinfo =
@@ -1123,7 +1126,6 @@ void BeginBSPFile (void)
 	numfaces = 0;
 	numnodes = 0;
 	numbrushsides = 0;
-	numvertexes = 0;
 	numleaffaces = 0;
 	numleafbrushes = 0;
 	numsurfedges = 0;
@@ -1183,7 +1185,7 @@ void DiscoverMacroTextures()
 				tempDict.Insert( pMacroTextureName, 0 );
 			}
 
-			int stringID = TexDataStringTable_AddOrFindString( pMacroTextureName );
+			intp stringID = TexDataStringTable_AddOrFindString( pMacroTextureName );
 			g_FaceMacroTextureInfos[iFace].m_MacroTextureNameID = (unsigned short)stringID;
 		}
 		else
@@ -1285,8 +1287,8 @@ void EndBSPFile (void)
 	DiscoverMacroTextures();
 
 	char fileName[1024];
-	V_strncpy( fileName, source, sizeof( fileName ) );
-	V_DefaultExtension( fileName, ".bsp", sizeof( fileName ) );
+	V_strcpy_safe( fileName, source );
+	V_DefaultExtension( fileName, ".bsp" );
 	Msg ("Writing %s\n", fileName);
 	WriteBSPFile (fileName);
 }
@@ -1389,13 +1391,24 @@ int PointLeafnum ( dmodel_t* pModel, const Vector& p )
 
 
 //-----------------------------------------------------------------------------
-// Adds a noew to the bounding box
+// Adds a node to the bounding box
 //-----------------------------------------------------------------------------
 static void AddNodeToBounds(int node, CUtlVector<int>& skipAreas, Vector& mins, Vector& maxs)
 {
+	static int prevNode = INT_MIN;
+
 	// not a leaf
 	if (node >= 0)
 	{
+		// dimhotepus: Prevent stack overflow due to infinite recursion for empty maps.
+		if (prevNode == node)
+		{
+			Warning("Overflow bounds by node %d, skipping the rest.\n", node);
+			return;
+		}
+
+		prevNode = node;
+
 		AddNodeToBounds( dnodes[node].children[0], skipAreas, mins, maxs );
 		AddNodeToBounds( dnodes[node].children[1], skipAreas, mins, maxs );
 	}
@@ -1425,7 +1438,7 @@ static void AddNodeToBounds(int node, CUtlVector<int>& skipAreas, Vector& mins, 
 			if (tex.flags & (SURF_SKY | SURF_NODRAW))
 				continue;
 
-			unsigned int firstedge = dfaces[face].firstedge;
+			int firstedge = dfaces[face].firstedge;
 			Assert( firstedge >= 0 );
 
 			for (int j = 0; j < dfaces[face].numedges; ++j)
@@ -1433,8 +1446,6 @@ static void AddNodeToBounds(int node, CUtlVector<int>& skipAreas, Vector& mins, 
 				Assert( firstedge+j < numsurfedges );
 				int edge = abs(dsurfedges[firstedge+j]); 
 				dedge_t* pEdge = &dedges[edge];
-				Assert( pEdge->v[0] >= 0 );
-				Assert( pEdge->v[1] >= 0 );
 				AddPointToBounds (dvertexes[pEdge->v[0]].point, mins, maxs);
 				AddPointToBounds (dvertexes[pEdge->v[1]].point, mins, maxs);
 			}
@@ -1537,13 +1548,13 @@ void ComputeBoundsNoSkybox( )
 	// Add the bounds to the worldspawn data
 	for (int i = 0; i < num_entities; ++i)
 	{
-		char* pEntity = ValueForKey(&entities[i], "classname");
+		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!strcmp(pEntity, "worldspawn"))
 		{
 			char	string[32];
-			sprintf (string, "%i %i %i", (int)mins[0], (int)mins[1], (int)mins[2]);
+			V_sprintf_safe (string, "%i %i %i", (int)mins[0], (int)mins[1], (int)mins[2]);
 			SetKeyValue (&entities[i], "world_mins", string);
-			sprintf (string, "%i %i %i", (int)maxs[0], (int)maxs[1], (int)maxs[2]);
+			V_sprintf_safe (string, "%i %i %i", (int)maxs[0], (int)maxs[1], (int)maxs[2]);
 			SetKeyValue (&entities[i], "world_maxs", string);
 			break;
 		}

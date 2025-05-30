@@ -5,66 +5,11 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include "riff.h"
-#include <stdio.h>
-#include <string.h>
+#include "tier2/riff.h"
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: Test code that implements the interface on stdio
-//-----------------------------------------------------------------------------
-class StdIOReadBinary : public IFileReadBinary
-{
-public:
-	intp open( const char *pFileName )
-	{
-		return (intp)fopen( pFileName, "rb" );
-	}
-
-	int read( void *pOutput, int size, intp file )
-	{
-		FILE *fp = (FILE *)file;
-
-		return fread( pOutput, size, 1, fp );
-	}
-
-	void seek( intp file, int pos )
-	{
-		fseek( (FILE *)file, pos, SEEK_SET );
-	}
-
-	unsigned int tell( intp file )
-	{
-		return ftell( (FILE *)file );
-	}
-
-	unsigned int size( intp file )
-	{
-		FILE *fp = (FILE *)file;
-		if ( !fp )
-			return 0;
-
-		unsigned int pos = ftell( fp );
-		fseek( fp, 0, SEEK_END );
-		unsigned int size = ftell( fp );
-
-		fseek( fp, pos, SEEK_SET );
-		return size;
-	}
-
-	void close( intp file )
-	{
-		FILE *fp = (FILE *)file;
-
-		fclose( fp );
-	}
-};
-#endif
-
 
 #define RIFF_ID MAKEID('R','I','F','F')
 
@@ -77,16 +22,15 @@ public:
 InFileRIFF::InFileRIFF( const char *pFileName, IFileReadBinary &io ) : m_io(io)
 {
 	m_file = m_io.open( pFileName );
-	
-	int riff = 0;
-	if ( !m_file )
+	// dimhotepus: Different io's report different failure values.
+	if ( !m_file || m_file == -1 )
 	{
 		m_riffSize = 0;
 		m_riffName = 0;
 		return;
 	}
 
-	riff = ReadInt();
+	int riff = ReadInt();
 	if ( riff != RIFF_ID )
 	{
 		fprintf( stderr, "Not a RIFF File [%s]\n", pFileName );
@@ -169,14 +113,16 @@ OutFileRIFF::OutFileRIFF( const char *pFileName, IFileWriteBinary &io ) : m_io( 
 {
 	m_file = m_io.create( pFileName );
 
-	if ( !m_file )
-		return;
+	m_riffName = 0;
+	m_riffSize = 0;
+	m_nNamePos = 0;
+	m_bUseIncorrectLISETLength = false;
+	m_nLISETSize = 0;
+	
+	if (!m_file) return;
 
 	int riff = RIFF_ID;
 	m_io.write( &riff, 4, m_file );
-
-	m_riffName = 0;
-	m_riffSize = 0;
 	m_nNamePos = m_io.tell( m_file );
 
 	// Save room for the size and name now
@@ -184,9 +130,6 @@ OutFileRIFF::OutFileRIFF( const char *pFileName, IFileWriteBinary &io ) : m_io( 
 
 	// Write out the name
 	WriteInt( RIFF_WAVE );
-
-	m_bUseIncorrectLISETLength = false;
-	m_nLISETSize = 0;
 }
 
 OutFileRIFF::~OutFileRIFF( void )
@@ -396,10 +339,7 @@ int IterateRIFF::ChunkReadInt( void )
 IterateOutputRIFF::IterateOutputRIFF( OutFileRIFF &riff )
 : m_riff( riff )
 {
-	if ( !m_riff.IsValid() )
-		return;
-
-	m_start = m_riff.PositionGet();
+	m_start = m_riff.IsValid() ? m_riff.PositionGet() : -1;
 	m_size = -1;
 	m_chunkName = UINT_MAX;
 	m_chunkSize = -1;

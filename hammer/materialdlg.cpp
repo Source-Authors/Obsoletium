@@ -16,7 +16,7 @@
 //
 // Face Smoothing Dialog Functions
 //
-BEGIN_MESSAGE_MAP( CFaceSmoothingDlg, CDialog )
+BEGIN_MESSAGE_MAP( CFaceSmoothingDlg, CBaseDlg )
 	//{{AFX_MSG_MAP(CFaceSmoothingDlg)
 	ON_COMMAND_EX( ID_SMOOTHING_GROUP_1, OnButtonGroup )
 	ON_COMMAND_EX( ID_SMOOTHING_GROUP_2, OnButtonGroup )
@@ -59,7 +59,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CFaceSmoothingDlg::CFaceSmoothingDlg( CWnd *pParent ) : CDialog( CFaceSmoothingDlg::IDD, pParent )
+CFaceSmoothingDlg::CFaceSmoothingDlg( CWnd *pParent ) : CBaseDlg( CFaceSmoothingDlg::IDD, pParent )
 {
 	InitButtonIDs();
 }
@@ -78,7 +78,7 @@ BOOL CFaceSmoothingDlg::OnInitDialog( void )
 {
 	static bool bInit = false;
 
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if ( bInit )
 	{
@@ -312,7 +312,7 @@ void CFaceSmoothingDlg::CheckGroupButtons( int *pGroupCounts, int nFaceCount )
 
 //=============================================================================
 
-BEGIN_MESSAGE_MAP( CFaceSmoothingVisualDlg, CDialog )
+BEGIN_MESSAGE_MAP( CFaceSmoothingVisualDlg, CBaseDlg )
 	//{{AFX_MSG_MAP(CFaceSmoothingVisualDlg)
 	ON_COMMAND_EX( ID_SG_VISUAL_1, OnButtonGroup )
 	ON_COMMAND_EX( ID_SG_VISUAL_2, OnButtonGroup )
@@ -352,7 +352,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CFaceSmoothingVisualDlg::CFaceSmoothingVisualDlg( CWnd *pParent ) : CDialog( CFaceSmoothingDlg::IDD, pParent )
+CFaceSmoothingVisualDlg::CFaceSmoothingVisualDlg( CWnd *pParent ) : CBaseDlg( CFaceSmoothingDlg::IDD, pParent )
 {
 	InitButtonIDs();
 }
@@ -369,7 +369,7 @@ CFaceSmoothingVisualDlg::~CFaceSmoothingVisualDlg()
 //-----------------------------------------------------------------------------
 BOOL CFaceSmoothingVisualDlg::OnInitDialog( void )
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 //	SetWindowPos( &wndTop, m_DialogPosRect.left, m_DialogPosRect.top,
 //		m_DialogPosRect.Width(), m_DialogPosRect.Height(), SWP_NOZORDER );

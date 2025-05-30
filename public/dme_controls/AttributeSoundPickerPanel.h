@@ -26,7 +26,7 @@
 //-----------------------------------------------------------------------------
 class CAttributeSoundPickerPanel : public CAttributeBasePickerPanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeSoundPickerPanel, CAttributeBasePickerPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeSoundPickerPanel, CAttributeBasePickerPanel );
 
 public:
 	CAttributeSoundPickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
@@ -34,7 +34,7 @@ public:
 
 private:
 	MESSAGE_FUNC_PARAMS( OnSoundSelected, "SoundSelected", kv );
-	virtual void ShowPickerDialog();
+	void ShowPickerDialog() override;
 };
 
 

@@ -250,10 +250,9 @@ bool CBaseVMPIFileSystem::Precache(const char *pFileName, const char *pPathID) {
 bool CBaseVMPIFileSystem::ReadFile(const char *pFileName, const char *pPath,
                                    CUtlBuffer &buf, int nMaxBytes,
                                    int nStartingByte, FSAllocFunc_t pfnAlloc) {
-  const char *pReadFlags = "rb";
-  if (buf.IsText() && !buf.ContainsCRLF()) pReadFlags = "rt";
+  const bool bBinary = !(buf.IsText() && !buf.ContainsCRLF());
 
-  FileHandle_t fp = Open(pFileName, buf.IsText() ? "rt" : "rb", pPath);
+  FileHandle_t fp = Open(pFileName, bBinary ? "rb" : "rt", pPath);
   if (!fp) return false;
 
   int nBytesToRead = Size(fp);
@@ -274,10 +273,9 @@ bool CBaseVMPIFileSystem::ReadFile(const char *pFileName, const char *pPath,
 
 bool CBaseVMPIFileSystem::WriteFile(const char *pFileName, const char *pPath,
                                     CUtlBuffer &buf) {
-  const char *pWriteFlags = "wb";
-  if (buf.IsText() && !buf.ContainsCRLF()) pWriteFlags = "wt";
+  const bool bBinary = !(buf.IsText() && !buf.ContainsCRLF());
 
-  FileHandle_t fp = Open(pFileName, buf.IsText() ? "wt" : "wb", pPath);
+  FileHandle_t fp = Open(pFileName, bBinary ? "wb" : "wt", pPath);
   if (!fp) return false;
 
   int nBytesWritten = Write(buf.Base(), buf.TellPut(), fp);

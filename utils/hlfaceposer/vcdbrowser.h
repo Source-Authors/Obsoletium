@@ -11,11 +11,11 @@
 #endif
 
 #include "mxtk/mxListView.h"
-#include "commctrl.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
+#include "tier1/UtlSortVector.h"
 #include "faceposertoolwindow.h"
 #include "filesystem.h"
-#include "tier1/UtlSortVector.h"
+#include <commctrl.h>
 
 class CVCDList;
 class CUtlSymbolTree;

@@ -524,7 +524,9 @@ void CMapOverview::DrawMapTexture()
 		Vertex_t( MapToPanel ( Vector2D(0,OVERVIEW_MAP_SIZE-1) ), Vector2D(0,1) )
 	};
 
-	int alpha = 255.0f * overview_alpha.GetFloat(); clamp( alpha, 1, 255 );
+	int alpha = 255.0f * overview_alpha.GetFloat();
+	// dimhotepus: Apply clamp for alpha.
+	alpha = clamp( alpha, 1, 255 );
 	
 	surface()->DrawSetColor( 255,255,255, alpha );
 	surface()->DrawSetTexture( m_nMapTextureID );
@@ -669,7 +671,7 @@ bool CMapOverview::DrawIcon( MapObject_t *obj )
 	{
 		wchar_t iconText[ MAX_PLAYER_NAME_LENGTH*2 ];
 
-		g_pVGuiLocalize->ConvertANSIToUnicode( text, iconText, sizeof( iconText ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( text, iconText );
 
 		int wide, tall;
 		surface()->GetTextSize( m_hIconFont, iconText, wide, tall );
@@ -680,12 +682,12 @@ bool CMapOverview::DrawIcon( MapObject_t *obj )
 		// draw black shadow text
 		surface()->DrawSetTextColor( 0, 0, 0, 255 );
 		surface()->DrawSetTextPos( x+1, y );
-		surface()->DrawPrintText( iconText, wcslen(iconText) );
+		surface()->DrawPrintText( iconText, V_wcslen(iconText) );
 
 		// draw name in color 
 		surface()->DrawSetTextColor( textColor->r(), textColor->g(), textColor->b(), 255 );
 		surface()->DrawSetTextPos( x, y );
-		surface()->DrawPrintText( iconText, wcslen(iconText) );
+		surface()->DrawPrintText( iconText, V_wcslen(iconText) );
 	}
 
 	return true;

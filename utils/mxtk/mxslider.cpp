@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxSlider.h"
+#include "mxtk/mxslider.h"
 #include <windows.h>
 #include <commctrl.h>
 
@@ -26,7 +26,7 @@ public:
 
 
 mxSlider::mxSlider (mxWindow *parent, int x, int y, int w, int h, int id, int style)
-: mxWidget (parent, x, y, w, h)
+: mxWidget (parent, x, y, w, h), m_min(FLT_MIN), m_max (FLT_MAX), m_ticks (-1)
 {
 	if (!parent)
 		return;
@@ -41,10 +41,10 @@ mxSlider::mxSlider (mxWindow *parent, int x, int y, int w, int h, int id, int st
 
 	void *handle = (void *) CreateWindowEx (0, TRACKBAR_CLASS, "", dwStyle,
 				x, y, w, h, hwndParent,
-				(HMENU) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	
 	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
-	SetWindowLong ((HWND) handle, GWL_USERDATA, (LONG) this);
+	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this);
 
 	setHandle (handle);
 	setType (MX_SLIDER);
@@ -92,7 +92,7 @@ mxSlider::setSteps (int line, int page)
 float
 mxSlider::getValue () const
 {
-	int ivalue = SendMessage ((HWND) getHandle (), TBM_GETPOS, 0, 0L);
+	LRESULT ivalue = SendMessage ((HWND) getHandle (), TBM_GETPOS, 0, 0L);
 	return (ivalue / (float)m_ticks) * (m_max - m_min) + m_min;
 }
 

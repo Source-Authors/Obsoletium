@@ -1,31 +1,28 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef FILEBUFFER_H
-#define FILEBUFFER_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_UTILS_STUDIOMDL_FILE_BUFFER_H_
+#define SE_UTILS_STUDIOMDL_FILE_BUFFER_H_
 
+#include "tier0/dbg.h"
 #include "tier1/smartptr.h"
-#include "tier2/p4helpers.h"
+// dimhotepus: Drop P4.
+// #include "tier2/p4helpers.h"
 
 class CFileBuffer
 {
 public:
-	CFileBuffer( int size )
+	explicit CFileBuffer( intp size )
 	{
 		m_pData = new unsigned char[size];
+
 #ifdef _DEBUG
 		m_pUsed = new const char *[size];
 		memset( m_pUsed, 0, size * sizeof( const char * ) );
 #endif
+
 		m_Size = size;
 		m_pCurPos = m_pData;
+
 #ifdef _DEBUG
 		memset( m_pData, 0xbaadf00d, size );
 #endif
@@ -33,64 +30,68 @@ public:
 	~CFileBuffer()
 	{
 		delete [] m_pData;
+
 #ifdef _DEBUG
 		delete [] m_pUsed;
 #endif
 	}
 
 #ifdef _DEBUG
-	void TestWritten( int EndOfFileOffset )
+	void TestWritten( intp EndOfFileOffset )
 	{
 		if ( !g_quiet )
 		{
 			printf( "testing to make sure that the whole file has been written\n" );
 		}
-		int i;
-		for( i = 0; i < EndOfFileOffset; i++ )
+
+		for( intp i = 0; i < EndOfFileOffset; i++ )
 		{
 			if( !m_pUsed[i] )
 			{
-				printf( "offset %d not written, end of file invalid!\n", i );
-				assert( 0 );
+				fprintf( stderr, "offset %zd not written, end of file invalid!\n", i );
+				Assert( 0 );
 			}
 		}
 	}
 #endif
 	
-	void WriteToFile( const char *fileName, int size )
+	bool WriteToFile( const char *fileName, intp size )
 	{
-		CPlainAutoPtr< CP4File > spFile( g_p4factory->AccessFile( fileName ) );
-		spFile->Edit();
+		// dimhotepus: Drop P4.
+		//CPlainAutoPtr< CP4File > spFile( g_p4factory->AccessFile( fileName ) );
+		//spFile->Edit();
+
 		FILE *fp = fopen( fileName, "wb" );
 		if( !fp )
 		{
 			MdlWarning( "Can't open \"%s\" for writing!\n", fileName );
-			return;
+			return false;
 		}
 
-		fwrite( m_pData, 1, size, fp );
+		bool ok = static_cast<intp>(fwrite( m_pData, 1, size, fp )) == size;
 		
 		fclose( fp );
-		spFile->Add();
+		//spFile->Add();
+
+		// dimhotepus: Report status.
+		return ok;
 	}
 	
-	void WriteAt( int offset, void *data, int size, const char *name )
+	void WriteAt( intp offset, void *data, intp size, const char *name )
 	{
-//		printf( "WriteAt: \"%s\" offset: %d end: %d size: %d\n", name, offset, offset + size - 1, size );
 		m_pCurPos = m_pData + offset;
 
 #ifdef _DEBUG
-		int i;
 		const char **used = m_pUsed + offset;
 		bool bitched = false;
-		for( i = 0; i < size; i++ )
+		for( intp i = 0; i < size; i++ )
 		{
 			if( used[i] )
 			{
 				if( !bitched )
 				{
-					printf( "overwrite at %d! (overwriting \"%s\" with \"%s\")\n", i + offset, used[i], name );
-					assert( 0 );
+					fprintf( stderr, "overwrite at %zd! (overwriting \"%s\" with \"%s\")\n", i + offset, used[i], name );
+					Assert( 0 );
 					bitched = true;
 				}
 			}
@@ -103,29 +104,31 @@ public:
 
 		Append( data, size );
 	}
-	int GetOffset( void )
+	intp GetOffset( void )
 	{
 		return m_pCurPos - m_pData;
 	}
-	void *GetPointer( int offset )
+	void *GetPointer( intp offset )
 	{
 		return m_pData + offset;
 	}
 private:
-	void Append( void *data, int size )
+	void Append( void *data, intp size )
 	{
-		assert( m_pCurPos + size - m_pData < m_Size );
+		Assert( m_pCurPos + size - m_pData < m_Size );
 		memcpy( m_pCurPos, data, size );
 		m_pCurPos += size;
 	}
-	CFileBuffer(); // undefined
-	int m_Size;
+
+	CFileBuffer() = delete;
+
+	intp m_Size;
 	unsigned char *m_pData;
 	unsigned char *m_pCurPos;
+
 #ifdef _DEBUG
 	const char **m_pUsed;
 #endif
 };
-	
 
-#endif // FILEBUFFER_H
+#endif  // !SE_UTILS_STUDIOMDL_FILE_BUFFER_H_

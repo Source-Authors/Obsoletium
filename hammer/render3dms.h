@@ -12,7 +12,7 @@
 
 #include "Render.h"
 #include "mathlib/Vector4D.h"
-#include "utlpriorityqueue.h"
+#include "tier1/utlpriorityqueue.h"
 #include "mapclass.h"
 #include "lpreview_thread.h"
 #include "shaderapi/ishaderapi.h"
@@ -182,8 +182,8 @@ public:
 	void StartRenderFrame(void);
 	void EndRenderFrame(void);
 
-	virtual	void						PushInstanceData( CMapInstance *pInstanceClass, Vector &InstanceOrigin, QAngle &InstanceAngles );
-	virtual	void						PopInstanceData( void );
+	void						PushInstanceData( CMapInstance *pInstanceClass, const Vector &InstanceOrigin, const QAngle &InstanceAngles ) override;
+	void						PopInstanceData( void ) override;
 
 	void ResetFocus();
 

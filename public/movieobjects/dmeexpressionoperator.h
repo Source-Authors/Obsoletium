@@ -33,15 +33,15 @@
 class CExpressionCalculator
 {
 public:
-	CExpressionCalculator( const char *expr = NULL ) : m_expr( expr ) {}
+	explicit CExpressionCalculator( const char *expr = NULL ) : m_expr( expr ) {}
 	void SetExpression( const char *expr ) 
 	{
 		m_expr = expr;
 	}
 
 	void SetVariable( const char *var, float value );
-	void SetVariable( int nVariableIndex, float value );
-	int FindVariableIndex( const char *var );
+	void SetVariable( intp nVariableIndex, float value );
+	intp FindVariableIndex( const char *var );
 
 	bool Evaluate( float &value );
 
@@ -49,8 +49,8 @@ public:
 	bool BuildVariableListFromExpression( );
 
 	// Iterate over variables
-	int VariableCount();
-	const char *VariableName( int nIndex );
+	intp VariableCount();
+	const char *VariableName( intp nIndex );
 
 private:
 	bool ParseExpr		 ( const char *&expr );
@@ -85,10 +85,10 @@ class CDmeExpressionOperator : public CDmeOperator
 	DEFINE_ELEMENT( CDmeExpressionOperator, CDmeOperator );
 
 public:
-	virtual void Operate();
+	void Operate() override;
 
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs );
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) override;
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 	void		SetSpewResult( bool state );
 

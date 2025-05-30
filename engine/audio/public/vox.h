@@ -15,6 +15,8 @@
 #define VOX_H
 #pragma once
 
+#include "tier0/platform.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,11 +38,26 @@ extern const char		*VOX_SentenceNameFromIndex( int sentencenum );
 extern float			VOX_SentenceLength( int sentence_num );
 extern const char		*VOX_GroupNameFromIndex( int groupIndex );
 extern int				VOX_GroupIndexFromName( const char *pGroupName );
-extern int				VOX_GroupPick( int isentenceg, char *szfound, int strLen );
-extern int				VOX_GroupPickSequential( int isentenceg, char *szfound, int szfoundLen, int ipick, int freset );
+extern int				VOX_GroupPick( intp isentenceg, OUT_Z_CAP(strLen) char *szfound, intp strLen );
+extern int				VOX_GroupPickSequential( intp isentenceg, OUT_Z_CAP(szfoundLen) char *szfound, intp szfoundLen, int ipick, int freset );
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __cplusplus
+template<intp strLen>
+inline int VOX_GroupPick( intp isentenceg, OUT_Z_ARRAY char (&szfound)[strLen] )
+{
+	return VOX_GroupPick( isentenceg, szfound, strLen );
+}
+
+template <intp szfoundLen>
+int VOX_GroupPickSequential( intp isentenceg, OUT_Z_ARRAY char (&szfound)[szfoundLen], int ipick, int freset )
+{
+	return VOX_GroupPickSequential( isentenceg, szfound, szfoundLen, ipick, freset );
+}
+
 #endif
 
 #endif // VOX_H

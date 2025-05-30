@@ -1005,7 +1005,7 @@ void CStudioRender::RetireDecal( DecalModelList_t &list, DecalId_t nRetireID, in
 //-----------------------------------------------------------------------------
 // Adds a decal to the history list
 //-----------------------------------------------------------------------------
-int CStudioRender::AddDecalToMaterialList( DecalMaterial_t* pMaterial )
+unsigned short CStudioRender::AddDecalToMaterialList( DecalMaterial_t* pMaterial )
 {
 	DecalList_t& decalList = pMaterial->m_Decals;
 	return decalList.AddToTail();
@@ -1194,33 +1194,12 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 		return;
 	}
 
-	if ( !IsX360() )
-	{
-		buildInfo.m_pMeshVertices = (MeshVertexInfo_t*)stackalloc( nMeshCount * sizeof(MeshVertexInfo_t) );	
-		int nVertexCount = ComputeVertexAllocation( iMaxLOD, body, list.m_pHardwareData, buildInfo.m_pMeshVertices );
-		buildInfo.m_pVertexBuffer = (DecalBuildVertexInfo_t*)stackalloc( nVertexCount * sizeof(DecalBuildVertexInfo_t) );
-	}
-	else
-	{
-		// Don't allocate on the stack
-		buildInfo.m_pMeshVertices = (MeshVertexInfo_t*)malloc( nMeshCount * sizeof(MeshVertexInfo_t) );	
-		int nVertexCount = ComputeVertexAllocation( iMaxLOD, body, list.m_pHardwareData, buildInfo.m_pMeshVertices );
-		buildInfo.m_pVertexBuffer = (DecalBuildVertexInfo_t*)malloc( nVertexCount * sizeof(DecalBuildVertexInfo_t) );
-	}
+	buildInfo.m_pMeshVertices = (MeshVertexInfo_t*)stackalloc( nMeshCount * sizeof(MeshVertexInfo_t) );	
+	int nVertexCount = ComputeVertexAllocation( iMaxLOD, body, list.m_pHardwareData, buildInfo.m_pMeshVertices );
+	buildInfo.m_pVertexBuffer = (DecalBuildVertexInfo_t*)stackalloc( nVertexCount * sizeof(DecalBuildVertexInfo_t) );
 
 	// Project all mesh vertices
 	ProjectDecalsOntoMeshes( buildInfo, nMeshCount );
-
-	if ( IsX360() )
-	{
-		while ( g_nTotalDecalVerts * sizeof(DecalVertex_t) > 256*1024 && m_DecalLRU.Head() != m_DecalLRU.InvalidIndex() )
-		{
-			DecalId_t nRetireID = m_DecalLRU[ m_DecalLRU.Head() ].m_nDecalId;
-			StudioDecalHandle_t hRetire = m_DecalLRU[ m_DecalLRU.Head() ].m_hDecalHandle;
-			DecalModelList_t &modelList = m_DecalList[(intp)hRetire];
-			RetireDecal( modelList, nRetireID, modelList.m_pHardwareData->m_RootLOD, modelList.m_pHardwareData->m_NumLODs );
-		}
-	}
 
 	// Check to see if we have too many decals on this model
 	// This assumes that every decal is applied to the root lod at least 
@@ -1302,7 +1281,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 			intp decalIndexCount = buildInfo.m_pDecalMaterial->m_Indices.Count() - prevIndexCount;
 			Assert(decalIndexCount > 0);
 
-			int decalIndex = AddDecalToMaterialList( buildInfo.m_pDecalMaterial );
+			unsigned short decalIndex = AddDecalToMaterialList( buildInfo.m_pDecalMaterial );
 			Decal_t& decal = buildInfo.m_pDecalMaterial->m_Decals[decalIndex];
 			decal.m_VertexCount = buildInfo.m_VertexCount;
 			decal.m_IndexCount = decalIndexCount;

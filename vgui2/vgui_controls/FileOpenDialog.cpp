@@ -5,17 +5,15 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include <vgui_controls/FileOpenDialog.h>
 
-#define PROTECTED_THINGS_DISABLE
-
-#if !defined( _X360 ) && defined( WIN32 )
+#if defined( WIN32 )
 #include "winlite.h"
 #include <shellapi.h>
 #elif defined( POSIX )
-#include <stdlib.h>
+#include <cstdlib>
 #define _stat stat
 #define _wcsnicmp wcsncmp
-#elif defined( _X360 )
 #else
 #error "Please define your platform"
 #endif
@@ -26,16 +24,14 @@
 
 #include "tier1/utldict.h"
 #include "tier1/utlstring.h"
+#include <tier1/KeyValues.h>
 
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-#include <KeyValues.h>
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IInput.h>
-
-#include <vgui_controls/FileOpenDialog.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ComboBox.h>
@@ -47,11 +43,6 @@
 #include <vgui_controls/ImageList.h>
 #include <vgui_controls/MenuItem.h>
 #include <vgui_controls/Tooltip.h>
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#undef GetCurrentDirectory
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -187,11 +178,11 @@ static int ListFileModifiedSortFunc(ListPanel *pPanel, const ListPanelItem &item
 	// NOTE: Backward order to get most recent files first
 	return ListBaseInteger64SortFunc( pPanel, item2, item1, "modifiedint_low", "modifiedint_high" );
 }
-static int ListFileCreatedSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
-{
-	// NOTE: Backward order to get most recent files first
-	return ListBaseInteger64SortFunc( pPanel, item2, item1, "createdint_low", "createdint_high" );
-}
+//static int ListFileCreatedSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
+//{
+//	// NOTE: Backward order to get most recent files first
+//	return ListBaseInteger64SortFunc( pPanel, item2, item1, "createdint_low", "createdint_high" );
+//}
 static int ListFileAttributesSortFunc(ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
 {
 	return ListBaseStringSortFunc( pPanel, item1, item2, "attributes" );
@@ -269,6 +260,7 @@ int FileCompletionEdit::AddItem(const char *itemText, KeyValues *userData)
 	// when the menu item is selected it will send the custom message "SetText"
 	return m_pDropDown->AddMenuItem(itemText, new KeyValues("SetText", "text", itemText), this, userData);
 }
+
 int FileCompletionEdit::AddItem(const wchar_t *itemText, KeyValues *userData)
 {
 	// add the element to the menu
@@ -278,7 +270,7 @@ int FileCompletionEdit::AddItem(const wchar_t *itemText, KeyValues *userData)
 
 	// get an ansi version for the menuitem name
 	char ansi[128];
-	g_pVGuiLocalize->ConvertUnicodeToANSI(itemText, ansi, sizeof(ansi));
+	g_pVGuiLocalize->ConvertUnicodeToANSI(itemText, ansi);
 	return m_pDropDown->AddMenuItem(ansi, kv, this, userData);
 }
 
@@ -324,7 +316,7 @@ void FileCompletionEdit::OnSetText(const wchar_t *newtext)
 {
 	// see if the combobox text has changed, and if so, post a message detailing the new text
 	wchar_t wbuf[255];
-	GetText( wbuf, 254 );
+	GetText( wbuf );
 	
 	if ( wcscmp(wbuf, newtext) )
 	{
@@ -443,7 +435,7 @@ void FileCompletionEdit::OnMenuItemHighlight( int itemID )
 	char wbuf[80];
 	if ( m_pDropDown->IsValidMenuID(itemID) )
 	{
-		m_pDropDown->GetMenuItem(itemID)->GetText(wbuf, 80);
+		m_pDropDown->GetMenuItem(itemID)->GetText(wbuf);
 	}
 	else
 	{
@@ -647,7 +639,7 @@ void FileOpenDialog::Init( const char *title, KeyValues *pContextKeyValues )
 
 	// Set our starting path to the current directory
 	char pLocalPath[255];
-	g_pFullFileSystem->GetCurrentDirectory( pLocalPath , 255 );
+	g_pFullFileSystem->GetCurrentDirectory( pLocalPath );
 	if ( !pLocalPath[0] || ( IsOSX() && V_strlen(pLocalPath) <= 2 ) )
 	{
 		const char *pszHomeDir = getenv( "HOME" );
@@ -857,16 +849,16 @@ void FileOpenDialog::OnNewFolder()
 void FileOpenDialog::OnOpenInExplorer()
 {
 	char pCurrentDirectory[MAX_PATH];
-	GetCurrentDirectory( pCurrentDirectory, sizeof(pCurrentDirectory) );
+	GetCurrentDirectory( pCurrentDirectory );
 #if !defined( _X360 ) && defined( WIN32 )
 	ShellExecute( NULL, NULL, pCurrentDirectory, NULL, NULL, SW_SHOWNORMAL );
-#elif defined( OSX )
-	char szCmd[ MAX_PATH * 2];
-	Q_snprintf( szCmd, sizeof(szCmd), "/usr/bin/open \"%s\"", pCurrentDirectory );
-	::system( szCmd );
+#else
+	char szCmd[MAX_PATH * 2];
+#if defined( OSX )
+	V_sprintf_safe( szCmd, "/usr/bin/open \"%s\"", pCurrentDirectory );
 #elif defined( LINUX )
-	char szCmd[ MAX_PATH * 2 ];	
-	Q_snprintf( szCmd, sizeof(szCmd), "xdg-open \"%s\" &", pCurrentDirectory );
+	V_sprintf_safe( szCmd, "xdg-open \"%s\" &", pCurrentDirectory );
+#endif
 	::system( szCmd );
 #endif
 }
@@ -920,7 +912,7 @@ void FileOpenDialog::SetStartDirectoryContext( const char *pStartDirContext, con
 	{
 		// Set our starting path to the current directory
 		char pLocalPath[255];
-		g_pFullFileSystem->GetCurrentDirectory( pLocalPath, 255 );
+		g_pFullFileSystem->GetCurrentDirectory( pLocalPath );
 		SetStartDirectory( pLocalPath );
 	}
 }
@@ -940,7 +932,7 @@ void FileOpenDialog::SetStartDirectory( const char *dir )
 	if ( m_nStartDirContext != s_StartDirContexts.InvalidIndex() )
 	{
 		char pDirBuf[MAX_PATH];
-		GetCurrentDirectory( pDirBuf, sizeof(pDirBuf) );
+		GetCurrentDirectory( pDirBuf );
 		s_StartDirContexts[ m_nStartDirContext ] = pDirBuf;
 	}
 
@@ -953,7 +945,7 @@ void FileOpenDialog::SetStartDirectory( const char *dir )
 //-----------------------------------------------------------------------------
 void FileOpenDialog::AddFilter( const char *filter, const char *filterName, bool bActive, const char *pFilterInfo  )
 {
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete("item");
+	KeyValuesAD kv("item");
 	kv->SetString( "filter", filter );
 	kv->SetString( "filterinfo", pFilterInfo );
 	int itemID = m_pFileTypeCombo->AddItem(filterName, kv);
@@ -977,7 +969,7 @@ void FileOpenDialog::DoModal( bool bUnused )
 //-----------------------------------------------------------------------------
 // Purpose: Gets the directory this is currently in
 //-----------------------------------------------------------------------------
-void FileOpenDialog::GetCurrentDirectory(char *buf, int bufSize)
+void FileOpenDialog::GetCurrentDirectory(char *buf, intp bufSize)
 {
 	// get the text from the text entry
 	m_pFullPathEdit->GetText(buf, bufSize);
@@ -987,7 +979,7 @@ void FileOpenDialog::GetCurrentDirectory(char *buf, int bufSize)
 //-----------------------------------------------------------------------------
 // Purpose: Get the last selected file name
 //-----------------------------------------------------------------------------
-void FileOpenDialog::GetSelectedFileName(char *buf, int bufSize)
+void FileOpenDialog::GetSelectedFileName(char *buf, intp bufSize)
 {
 	m_pFileNameEdit->GetText(buf, bufSize);
 }
@@ -999,15 +991,15 @@ void FileOpenDialog::GetSelectedFileName(char *buf, int bufSize)
 void FileOpenDialog::NewFolder( char const *folderName )
 {
 	char pCurrentDirectory[MAX_PATH];
-	GetCurrentDirectory( pCurrentDirectory, sizeof(pCurrentDirectory) );
+	GetCurrentDirectory( pCurrentDirectory );
 
 	char pFullPath[MAX_PATH];
 	char pNewFolderName[MAX_PATH];
-	Q_strncpy( pNewFolderName, folderName, sizeof(pNewFolderName) );
+	V_strcpy_safe( pNewFolderName, folderName );
 	int i = 2;
 	do
 	{
-		Q_MakeAbsolutePath( pFullPath, sizeof(pFullPath), pNewFolderName, pCurrentDirectory );
+		V_MakeAbsolutePath( pFullPath, pNewFolderName, pCurrentDirectory );
 		if ( !g_pFullFileSystem->FileExists( pFullPath, NULL ) &&
 			 !g_pFullFileSystem->IsDirectory( pFullPath, NULL ) )
 		{
@@ -1016,7 +1008,7 @@ void FileOpenDialog::NewFolder( char const *folderName )
 			return;
 		}
 
-		Q_snprintf( pNewFolderName, sizeof(pNewFolderName), "%s%d", folderName, i );
+		V_sprintf_safe( pNewFolderName, "%s%d", folderName, i );
 		++i;
 	} while ( i <= 999 );
 }
@@ -1030,9 +1022,9 @@ void FileOpenDialog::MoveUpFolder()
 	char fullpath[MAX_PATH * 4];
 	GetCurrentDirectory(fullpath, sizeof(fullpath) - MAX_PATH);
 
-	Q_StripLastDir( fullpath, sizeof( fullpath ) );
+	V_StripLastDir( fullpath );
 	// append a trailing slash
-	Q_AppendSlash( fullpath, sizeof( fullpath ) );
+	V_AppendSlash( fullpath );
 
 	SetStartDirectory(fullpath);
 	PopulateFileList();
@@ -1047,7 +1039,7 @@ void FileOpenDialog::ValidatePath()
 {
 	char fullpath[MAX_PATH * 4];
 	GetCurrentDirectory(fullpath, sizeof(fullpath) - MAX_PATH);
-	Q_RemoveDotSlashes( fullpath );
+	V_RemoveDotSlashes( fullpath );
 
 	// when statting a directory on Windows, you want to include
 	// the terminal slash exactly when you are statting a root
@@ -1065,8 +1057,8 @@ void FileOpenDialog::ValidatePath()
 	if ( ( 0 == _stat( fullpath, &buf ) ) &&
 		( 0 != ( buf.st_mode & S_IFDIR ) ) )
 	{
-		Q_AppendSlash( fullpath, sizeof( fullpath ) );
-		Q_strncpy(m_szLastPath, fullpath, sizeof(m_szLastPath));
+		V_AppendSlash( fullpath );
+		V_strcpy_safe(m_szLastPath, fullpath);
 	}
 	else
 	{
@@ -1162,7 +1154,7 @@ void FileOpenDialog::PopulateFileList()
 	char currentDir[MAX_PATH * 4];
 	char dir[MAX_PATH * 4];
 	char filterList[MAX_FILTER_LENGTH+1];
-	GetCurrentDirectory(currentDir, sizeof(dir));
+	GetCurrentDirectory(currentDir);
 
 	KeyValues *combokv = m_pFileTypeCombo->GetActiveItemUserData();
 	if (combokv)
@@ -1177,7 +1169,7 @@ void FileOpenDialog::PopulateFileList()
 	
 	
 	char *filterPtr = filterList;
-	KeyValues *kv = new KeyValues("item");
+	KeyValuesAD kv("item");
 
 	if ( m_DialogType != FOD_SELECT_DIRECTORY )
 	{
@@ -1238,8 +1230,8 @@ void FileOpenDialog::PopulateFileList()
 
 					kv->SetString( "attributes", g_pFullFileSystem->IsFileWritable( pFullPath )? "" : "R" );
 
-					long fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
-					g_pFullFileSystem->FileTimeToString( pszFileModified, sizeof( pszFileModified ), fileModified );
+					time_t fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
+					g_pFullFileSystem->FileTimeToString( pszFileModified, fileModified );
 					kv->SetString( "modified", pszFileModified );
 
 //					kv->SetString( "created", GetFileTimetamp( findData.ftCreationTime ) );
@@ -1254,7 +1246,7 @@ void FileOpenDialog::PopulateFileList()
 	}
 
 	// find all the directories
-	GetCurrentDirectory( dir, sizeof(dir) );
+	GetCurrentDirectory( dir );
 	Q_strncat(dir, "*", sizeof( dir ), COPY_ALL_CHARACTERS);
 	
 	const char *pszFileName = g_pFullFileSystem->FindFirst( dir, &findHandle );
@@ -1277,8 +1269,8 @@ void FileOpenDialog::PopulateFileList()
 			
 			kv->SetString( "attributes", g_pFullFileSystem->IsFileWritable( pFullPath )? "" : "R" );
 
-			long fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
-			g_pFullFileSystem->FileTimeToString( pszFileModified, sizeof( pszFileModified ), fileModified );
+			time_t fileModified = g_pFullFileSystem->GetFileTime( pFullPath );
+			g_pFullFileSystem->FileTimeToString( pszFileModified, fileModified );
 			kv->SetString( "modified", pszFileModified );
 
 //			kv->SetString( "created", GetFileTimetamp( findData.ftCreationTime ) );
@@ -1290,7 +1282,6 @@ void FileOpenDialog::PopulateFileList()
 	}
 	g_pFullFileSystem->FindClose( findHandle );
 
-	kv->deleteThis();
 	m_pFileList->SortList();
 }
 
@@ -1344,16 +1335,18 @@ bool FileOpenDialog::ExtensionMatchesFilter( const char *pExt )
 //-----------------------------------------------------------------------------
 // Choose the first non *.* filter in the filter list
 //-----------------------------------------------------------------------------
-void FileOpenDialog::ChooseExtension( char *pExt, int nBufLen )
+void FileOpenDialog::ChooseExtension( OUT_Z_CAP(nBufLen) char *pExt, intp nBufLen )
 {
-	pExt[0] = 0;
+	// dimhotepus: Always zero-terminate.
+	if ( nBufLen > 0 )
+		pExt[0] = 0;
 
 	KeyValues *combokv = m_pFileTypeCombo->GetActiveItemUserData();
 	if ( !combokv )
 		return;
 
 	char filterList[MAX_FILTER_LENGTH+1];
-	Q_strncpy( filterList, combokv->GetString("filter", "*"), MAX_FILTER_LENGTH );
+	V_strcpy_safe( filterList, combokv->GetString("filter", "*") );
 
 	char *filterPtr = filterList;
 	while ((filterPtr != NULL) && (*filterPtr != 0))
@@ -1397,7 +1390,7 @@ void FileOpenDialog::SaveFileToStartDirContext( const char *pFullPath )
 
 	char pPath[MAX_PATH];
 	pPath[0] = 0;
-	Q_ExtractFilePath( pFullPath, pPath, sizeof(pPath) );
+	V_ExtractFilePath( pFullPath, pPath );
 	s_StartDirContexts[ m_nStartDirContext ] = pPath;
 }
 
@@ -1436,7 +1429,7 @@ void FileOpenDialog::OnSelectFolder()
 
 	// construct a file path
 	char pFileName[MAX_PATH];
-	GetSelectedFileName( pFileName, sizeof( pFileName ) );
+	GetSelectedFileName( pFileName );
 
 	Q_StripTrailingSlash( pFileName );
 
@@ -1461,7 +1454,7 @@ void FileOpenDialog::OnSelectFolder()
 	if ( !Q_IsAbsolutePath( pFileName ) )
 	{
 		GetCurrentDirectory(pFullPath, sizeof(pFullPath) - MAX_PATH);
-		strcat( pFullPath, pFileName );
+		V_strcat_safe( pFullPath, pFileName );
 		if ( !pFileName[0] )
 		{
 			Q_StripTrailingSlash( pFullPath );
@@ -1496,11 +1489,11 @@ void FileOpenDialog::OnOpen()
 
 	// construct a file path
 	char pFileName[MAX_PATH];
-	GetSelectedFileName( pFileName, sizeof( pFileName ) );
+	GetSelectedFileName( pFileName );
 
 	intp nLen = Q_strlen( pFileName );
 	bool bSpecifiedDirectory = ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) && (!IsOSX() || ( !Q_stristr( pFileName, ".app" ) ) );
-	Q_StripTrailingSlash( pFileName );
+	V_StripTrailingSlash( pFileName );
 
 	if ( !stricmp(pFileName, "..") )
 	{
@@ -1523,8 +1516,8 @@ void FileOpenDialog::OnOpen()
 	if ( !Q_IsAbsolutePath( pFileName ) )
 	{
 		GetCurrentDirectory(pFullPath, sizeof(pFullPath) - MAX_PATH);
-		Q_AppendSlash( pFullPath, sizeof( pFullPath ) );
-		strcat(pFullPath, pFileName);
+		V_AppendSlash( pFullPath );
+		V_strcat_safe(pFullPath, pFileName);
 		if ( !pFileName[0] )
 		{
 			Q_StripTrailingSlash( pFullPath );
@@ -1532,7 +1525,7 @@ void FileOpenDialog::OnOpen()
 	}
 	else
 	{
-		Q_strncpy( pFullPath, pFileName, sizeof(pFullPath) );
+		V_strcpy_safe( pFullPath, pFileName );
 	}
 
 	Q_StripTrailingSlash( pFullPath );
@@ -1543,7 +1536,7 @@ void FileOpenDialog::OnOpen()
 #ifdef _WIN32
 	if ( Q_strlen( pFullPath ) == 2 )
 	{
-		Q_AppendSlash( pFullPath, ssize( pFullPath ) );
+		V_AppendSlash( pFullPath );
 	}
 #endif
 
@@ -1555,7 +1548,7 @@ void FileOpenDialog::OnOpen()
 		// it's a directory; change to the specified directory
 		if ( !bSpecifiedDirectory )
 		{
-			Q_AppendSlash( pFullPath, ssize( pFullPath ) );
+			V_AppendSlash( pFullPath );
 		}
 		SetStartDirectory( pFullPath );
 
@@ -1578,11 +1571,11 @@ void FileOpenDialog::OnOpen()
 
 	// Append suffix of the first filter that isn't *.*
 	char extension[512];
-	Q_ExtractFileExtension( pFullPath, extension, sizeof(extension) );
+	V_ExtractFileExtension( pFullPath, extension );
 	if ( !ExtensionMatchesFilter( extension ) )
 	{
-		ChooseExtension( extension, sizeof(extension) );
-		Q_SetExtension( pFullPath, extension, sizeof(pFullPath) );
+		ChooseExtension( extension );
+		V_SetExtension( pFullPath, extension );
 	}
 
 	if ( g_pFullFileSystem->FileExists( pFullPath ) )
@@ -1614,10 +1607,10 @@ void FileOpenDialog::OnOpen()
 void FileOpenDialog::PopulateFileNameCompletion()
 {
 	char buf[80];
-	m_pFileNameEdit->GetText(buf, 80);
+	m_pFileNameEdit->GetText(buf);
 	wchar_t wbuf[80];
-	m_pFileNameEdit->GetText(wbuf, 80);
-	int bufLen = wcslen(wbuf);
+	m_pFileNameEdit->GetText(wbuf);
+	intp bufLen = V_wcslen(wbuf);
 
 	// delete all items before we check if there's even a string
 	m_pFileNameEdit->DeleteAllItems();

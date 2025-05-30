@@ -5,25 +5,24 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include "resource.h"
 #include "Splash.h"
 
-
-#define SPLASH_MIN_SHOW_TIME_MS	500
-
+#include "resource.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-// Sorry Tom...   :(
-//#define HAMMER_TIME 1
+constexpr inline int SPLASH_MIN_SHOW_TIME_MS{500};
+
+// dimhotepus: Reenable Hammer Time playing for first time.
+#define HAMMER_TIME 1
 #ifdef HAMMER_TIME
 #include <io.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "StatusBarIDs.h"
 
-unsigned char g_CantTouchThis[] = 
+static constexpr unsigned char g_CantTouchThis[] = 
 {
 	0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x01, 0x00, 0x0B, 0x00, 0xF0, 0x4D, 0x54,
 	0x72, 0x6B, 0x00, 0x00, 0x00, 0x13, 0x00, 0xFF, 0x58, 0x04, 0x04, 0x02, 0x18, 0x08, 0x00, 0xFF,
@@ -72,78 +71,77 @@ unsigned char g_CantTouchThis[] =
 
 #include <mmsystem.h> 
 
-int m_uiMIDIPlayerID = 0;
-
-void CloseMIDIPlayer()
+static void CloseMIDIPlayer(MCIDEVICEID deviceId)
 {
 	// Close the MIDI player, if possible
-	if (m_uiMIDIPlayerID != 0)
+	if (deviceId != 0)
 	{
-	  mciSendCommand(m_uiMIDIPlayerID, MCI_CLOSE, 0, NULL);
-	  m_uiMIDIPlayerID = 0;
+	  mciSendCommand(deviceId, MCI_CLOSE, 0, NULL);
 	}
 }
-void PlayMIDISong(LPTSTR szMIDIFileName, BOOL bRestart)
+static MCIDEVICEID PlayMIDISong(LPCTSTR szMIDIFileName, BOOL bRestart)
 {
-	// See if the MIDI player needs to be opened
-	if (m_uiMIDIPlayerID == 0)
-	{
-	  // Open the MIDI player by specifying the device and filename
-	  MCI_OPEN_PARMS mciOpenParms;
-	  mciOpenParms.lpstrDeviceType = "sequencer";
-	  mciOpenParms.lpstrElementName = szMIDIFileName;
-	  if (mciSendCommand(NULL, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
-		(DWORD)&mciOpenParms) == 0)
-		// Get the ID for the MIDI player
-		m_uiMIDIPlayerID = mciOpenParms.wDeviceID;
-	  else
-		// There was a problem, so just return
-		return;
-	}
+	MCIDEVICEID deviceId = 0;
 
-	// Restart the MIDI song, if necessary
-	if (bRestart)
-	{
-	  MCI_SEEK_PARMS mciSeekParms;
-	  if (mciSendCommand(m_uiMIDIPlayerID, MCI_SEEK, MCI_SEEK_TO_START,
-		(DWORD)&mciSeekParms) != 0)
-		// There was a problem, so close the MIDI player
-		CloseMIDIPlayer();
-	}
+	// See if the MIDI player needs to be opened
+	// Open the MIDI player by specifying the device and filename
+	MCI_OPEN_PARMS mciOpenParms = {};
+	mciOpenParms.lpstrDeviceType = "sequencer";
+	mciOpenParms.lpstrElementName = szMIDIFileName;
+	if (mciSendCommand(NULL, MCI_OPEN, MCI_OPEN_TYPE | MCI_OPEN_ELEMENT,
+		(DWORD_PTR)&mciOpenParms) == 0)
+		// Get the ID for the MIDI player
+		deviceId = mciOpenParms.wDeviceID;
+	else
+		// There was a problem, so just return
+		return deviceId;
 
 	// Play the MIDI song
-	MCI_PLAY_PARMS mciPlayParms;
-	if (mciSendCommand(m_uiMIDIPlayerID, MCI_PLAY, MCI_WAIT,
-	  (DWORD)&mciPlayParms) != 0)
-	  // There was a problem, so close the MIDI player
-	  CloseMIDIPlayer();
+	MCI_PLAY_PARMS mciPlayParms = {};
+	mciSendCommand(deviceId, MCI_PLAY, MCI_WAIT, (DWORD_PTR)&mciPlayParms);
+
+	return deviceId;
 }
 
-void CantTouchThisThread( void * )
+static unsigned __stdcall CantTouchThisThread( void * )
 {
-	int file = _open( "hamrtime.mid", _O_BINARY| _O_CREAT | _O_RDWR, _S_IREAD | _S_IWRITE );
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("HammerTime!");
+
+	constexpr char songName[] = "hamrtime.mid";
+
+	int file = _open( songName, _O_BINARY| _O_CREAT | _O_RDWR, _S_IREAD | _S_IWRITE );
 	if ( file != -1 )
 	{
 		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer time!" );
-		SetStatusText(SBI_PROMPT, "Stop, Hammer time!");
-		bool fPlay = ( _write( file, g_CantTouchThis, sizeof( g_CantTouchThis ) ) == sizeof( g_CantTouchThis ) );
+		// dimhotepus: Comment as threaded access to control is not allowed.
+		//SetStatusText(SBI_PROMPT, "Stop, Hammer time!");
+
+		bool fPlay = _write( file, g_CantTouchThis, sizeof( g_CantTouchThis ) ) == sizeof( g_CantTouchThis );
 		_close( file );
-		PlayMIDISong("hamrtime.mid", false );
-		CloseMIDIPlayer();
-		_unlink( "hamrtime.mid" );
-		SetStatusText(SBI_PROMPT, "You can't touch this");
+		if (fPlay)
+		{
+			CloseMIDIPlayer( PlayMIDISong( songName, false ) );
+		}
+		_unlink( songName );
+
+		// dimhotepus: Comment as threaded access to control is not allowed.
+		//SetStatusText(SBI_PROMPT, "You can't touch this");
 		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer" );
-		Sleep(1500);
-		SetStatusText(SBI_PROMPT, "For Help, press F1");
+		// dimhotepus: Comment as threaded access to control is not allowed.
+		// Sleep(1500);
+		//SetStatusText(SBI_PROMPT, "For Help, press F1");
 	}
+
+	return 0;
 }
 
-void CantTouchThis()
+static void CantTouchThis()
 {
 	if ( !AfxGetApp()->GetProfileInt("General", "Hammer time", 0))
 	{
 		AfxGetApp()->WriteProfileInt("General", "Hammer time", 1);
-		_beginthread( CantTouchThisThread, 0, NULL );
+		_beginthreadex( nullptr, 0, CantTouchThisThread, 0, 0, nullptr );
 	}
 }
 
@@ -156,7 +154,7 @@ static CSplashWnd *s_pSplashWnd = NULL;
 static bool s_bShowSplashWnd = true;
 
 
-BEGIN_MESSAGE_MAP(CSplashWnd, CWnd)
+BEGIN_MESSAGE_MAP(CSplashWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CSplashWnd)
 	ON_WM_CREATE()
 	ON_WM_PAINT()
@@ -215,6 +213,7 @@ void CSplashWnd::ShowSplashScreen(CWnd* pParentWnd /*= NULL*/)
 	else
 	{
 		delete s_pSplashWnd;
+		s_pSplashWnd = nullptr;
 	}
 }
 
@@ -244,7 +243,7 @@ void CSplashWnd::HideSplashScreen()
 //-----------------------------------------------------------------------------
 // Purpose: Guarantees that the splash screen stays up long enough to see.
 //-----------------------------------------------------------------------------
-void CSplashWnd::OnTimer(UINT nIDEvent)
+void CSplashWnd::OnTimer(UINT_PTR nIDEvent)
 {
 	m_bMinTimerExpired = true;
 	KillTimer(nIDEvent);
@@ -324,7 +323,7 @@ void CSplashWnd::PostNcDestroy()
 //-----------------------------------------------------------------------------
 int CSplashWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CWnd::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	// Center the window.

@@ -56,7 +56,7 @@ public:
 	virtual bool				IsLooped()					{return false;}
 	virtual bool				IsStreaming()				{return true;}
 	virtual bool				IsStereoWav()				{return false;}
-	virtual int					GetCacheStatus()			{return AUDIO_IS_LOADED;}
+	virtual CAudioSource::AudioStatus	GetCacheStatus()			{return AUDIO_IS_LOADED;}
 	virtual void				CacheLoad()					{}
 	virtual void				CacheUnload()				{}
 	virtual CSentence			*GetSentence()				{return NULL;}
@@ -311,12 +311,12 @@ int VoiceSE_StartChannel(
 	{
 		params.bUpdatePositions = true;
 		params.soundlevel = SNDLVL_TALKING;
-		params.soundsource = iEntity;
+		params.soundsource = static_cast<SoundSource>(iEntity);
 	}
 	else
 	{
 		params.soundlevel = SNDLVL_IDLE;
-		params.soundsource = nViewEntityIndex;
+		params.soundsource = static_cast<SoundSource>(nViewEntityIndex);
 	}
 
 

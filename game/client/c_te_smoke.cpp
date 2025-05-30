@@ -66,7 +66,7 @@ static inline void RecordSmoke( const Vector &start, float flScale, int nFrameRa
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_SMOKE );
  		msg->SetString( "name", "TE_Smoke" );
@@ -78,7 +78,6 @@ static inline void RecordSmoke( const Vector &start, float flScale, int nFrameRa
 		msg->SetInt( "framerate", nFrameRate );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

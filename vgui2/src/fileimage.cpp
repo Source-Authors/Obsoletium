@@ -5,11 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-
-#include <string.h>
 #include "fileimage.h"
 
-#include "winlite.h"
 #include "vgui_internal.h"
 #include "filesystem.h"
 

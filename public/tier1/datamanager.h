@@ -11,8 +11,8 @@
 #endif
 
 #include "tier0/threadtools.h"
-#include "utlmultilist.h"
-#include "utlvector.h"
+#include "tier1/utlmultilist.h"
+#include "tier1/utlvector.h"
 
 FORWARD_DECLARE_HANDLE( memhandle_t );
 
@@ -33,7 +33,7 @@ public:
 	void					TouchResource( memhandle_t handle );
 	void					MarkAsStale( memhandle_t handle );		// move to head of LRU
 
-	int						LockCount( memhandle_t handle );
+	[[nodiscard]] int						LockCount( memhandle_t handle );
 	int						BreakLock( memhandle_t handle );
 	int						BreakAllLocks();
 
@@ -41,24 +41,24 @@ public:
 	// type-safe implementation in derived class
 	//void					*GetResource_NoLock( memhandle_t handle );
 
-	unsigned int			TargetSize();
-	unsigned int			AvailableSize();
-	unsigned int			UsedSize();
+	[[nodiscard]] size_t					TargetSize() const;
+	[[nodiscard]] size_t					AvailableSize() const;
+	[[nodiscard]] size_t					UsedSize() const;
 
-	void					NotifySizeChanged( memhandle_t handle, unsigned int oldSize, unsigned int newSize );
+	void					NotifySizeChanged( memhandle_t handle, size_t oldSize, size_t newSize );
 
-	void					SetTargetSize( unsigned int targetSize );
+	void					SetTargetSize( size_t targetSize );
 
 	// NOTE: flush is equivalent to Destroy
-	unsigned int			FlushAllUnlocked();
-	unsigned int			FlushToTargetSize();
-	unsigned int			FlushAll();
-	unsigned int			Purge( unsigned int nBytesToPurge );
-	unsigned int			EnsureCapacity( unsigned int size );
+	size_t					FlushAllUnlocked();
+	size_t					FlushToTargetSize();
+	size_t					FlushAll();
+	size_t					Purge( size_t nBytesToPurge );
+	size_t					EnsureCapacity( size_t size );
 
 	// Thread lock
 	virtual void			Lock() {}
-	virtual bool			TryLock() { return true; }
+	[[nodiscard]] virtual bool			TryLock() { return true; }
 	virtual void			Unlock() {}
 
 	// Iteration
@@ -73,7 +73,7 @@ public:
 protected:
 	// derived class must call these to implement public API
 	unsigned short			CreateHandle( bool bCreateLocked );
-	memhandle_t				StoreResourceInHandle( unsigned short memoryIndex, void *pStore, unsigned int realSize );
+	memhandle_t				StoreResourceInHandle( unsigned short memoryIndex, void *pStore, size_t realSize );
 	void					*GetResource_NoLock( memhandle_t handle );
 	void					*GetResource_NoLockNoLRUTouch( memhandle_t handle );
 	void					*LockResource( memhandle_t handle );
@@ -81,17 +81,17 @@ protected:
 	// NOTE: you must call this from the destructor of the derived class! (will assert otherwise)
 	void					FreeAllLists()	{ FlushAll(); m_listsAreFreed = true; }
 
-							CDataManagerBase( unsigned int maxSize );
+	explicit				CDataManagerBase( size_t maxSize );
 	virtual					~CDataManagerBase();
 	
 	
-	inline unsigned int		MemTotal_Inline() const { return m_targetMemorySize; }
-	inline unsigned int		MemAvailable_Inline() const { return m_targetMemorySize - m_memUsed; }
-	inline unsigned int		MemUsed_Inline() const { return m_memUsed; }
+	inline size_t			MemTotal_Inline() const { return m_targetMemorySize; }
+	inline size_t			MemAvailable_Inline() const { return m_targetMemorySize - m_memUsed; }
+	inline size_t			MemUsed_Inline() const { return m_memUsed; }
 
 // Implemented by derived class:
 	virtual void			DestroyResourceStorage( void * ) = 0;
-	virtual unsigned int	GetRealSize( void * ) = 0;
+	virtual size_t			GetRealSize( void * ) = 0;
 
 	memhandle_t				ToHandle( unsigned short index );
 	unsigned short			FromHandle( memhandle_t handle );
@@ -114,8 +114,8 @@ protected:
 		void	*pStore;
 	};
 
-	unsigned int m_targetMemorySize;
-	unsigned int m_memUsed;
+	size_t m_targetMemorySize;
+	size_t m_memUsed;
 
 	CUtlMultiList< resource_lru_element_t, unsigned short >  m_memoryLists;
 	
@@ -133,7 +133,7 @@ class CDataManager : public CDataManagerBase
 	typedef CDataManagerBase BaseClass;
 public:
 
-	CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>( unsigned int size = (unsigned)-1 ) : BaseClass(size) {}
+	CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>( size_t size = std::numeric_limits<size_t>::max() ) : BaseClass(size) {}
 	
 
 	~CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>()
@@ -151,7 +151,7 @@ public:
 			return StoragePointer(pLock)->GetData();
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	// Use GetData() to translate pointer to LOCK_TYPE
@@ -162,7 +162,7 @@ public:
 		{
 			return StoragePointer(pLock)->GetData();
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	// Use GetData() to translate pointer to LOCK_TYPE
@@ -174,7 +174,7 @@ public:
 		{
 			return StoragePointer(pLock)->GetData();
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	// Wrapper to match implementation of allocation with typed storage & alloc params.
@@ -187,9 +187,9 @@ public:
 	}
 
 	// Iteration. Must lock first
-	memhandle_t GetFirstUnlocked()
+	[[nodiscard]] memhandle_t GetFirstUnlocked()
 	{
-		unsigned node = m_memoryLists.Head(m_lruList);
+		auto node = m_memoryLists.Head(m_lruList);
 		if ( node == m_memoryLists.InvalidIndex() )
 		{
 			return INVALID_MEMHANDLE;
@@ -197,9 +197,9 @@ public:
 		return ToHandle( node );
 	}
 
-	memhandle_t GetFirstLocked()
+	[[nodiscard]] memhandle_t GetFirstLocked()
 	{
-		unsigned node = m_memoryLists.Head(m_lockList);
+		auto node = m_memoryLists.Head(m_lockList);
 		if ( node == m_memoryLists.InvalidIndex() )
 		{
 			return INVALID_MEMHANDLE;
@@ -207,14 +207,14 @@ public:
 		return ToHandle( node );
 	}
 
-	memhandle_t GetNext( memhandle_t hPrev )
+	[[nodiscard]] memhandle_t GetNext( memhandle_t hPrev )
 	{
 		if ( hPrev == INVALID_MEMHANDLE )
 		{
 			return INVALID_MEMHANDLE;
 		}
 
-		unsigned short iNext = m_memoryLists.Next( FromHandle( hPrev ) );
+		auto iNext = m_memoryLists.Next( FromHandle( hPrev ) );
 		if ( iNext == m_memoryLists.InvalidIndex() ) 
 		{
 			return INVALID_MEMHANDLE;
@@ -223,9 +223,9 @@ public:
 		return ToHandle( iNext );
 	}
 
-	MUTEX_TYPE &AccessMutex()	{ return m_mutex; }
+	[[nodiscard]] MUTEX_TYPE &AccessMutex()	{ return m_mutex; }
 	void Lock() override { m_mutex.Lock(); }
-	bool TryLock() override { return m_mutex.TryLock(); }
+	[[nodiscard]] bool TryLock() override { return m_mutex.TryLock(); }
 	void Unlock() override { m_mutex.Unlock(); }
 
 private:
@@ -239,7 +239,7 @@ private:
 		StoragePointer(pStore)->DestroyResource();
 	}
 	
-	unsigned int GetRealSize( void *pStore ) override
+	size_t GetRealSize( void *pStore ) override
 	{
 		return StoragePointer(pStore)->Size();
 	}
@@ -251,12 +251,17 @@ private:
 
 inline unsigned short CDataManagerBase::FromHandle( memhandle_t handle )
 {
-	unsigned int fullWord = (unsigned int)(size_t)handle;
+	Assert((uintp)handle <= std::numeric_limits<unsigned>::max() || handle == INVALID_MEMHANDLE);
+
+	unsigned int fullWord = (unsigned int)(uintp)handle; //-V221
 	unsigned short serial = fullWord>>16;
 	unsigned short index = fullWord & 0xFFFF;
+
 	index--;
+
 	if ( m_memoryLists.IsValidIndex(index) && m_memoryLists[index].serial == serial )
 		return index;
+
 	return m_memoryLists.InvalidIndex();
 }
 

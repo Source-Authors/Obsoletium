@@ -16,20 +16,17 @@
 #include "shadersystem.h"
 #include "materialsystem/imaterialproxyfactory.h"
 #include "IHardwareConfigInternal.h"
-#include "utlsymbol.h"
-#include <malloc.h>
+#include "tier1/utlsymbol.h"
 #include "filesystem.h"
-#include <KeyValues.h>
-#include "mempool.h"
+#include <tier1/KeyValues.h>
+#include "tier1/mempool.h"
 #include "shaderapi/ishaderutil.h"
 #include "vtf/vtf.h"
 #include "tier1/strtools.h"
-#include <ctype.h>
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 #include "mathlib/vmatrix.h"
 #include "texturemanager.h"
 #include "itextureinternal.h"
-#include "mempool.h"
 #include "tier1/callqueue.h"
 #include "cmaterial_queuefriendly.h"
 #include "ifilelist.h"
@@ -108,7 +105,7 @@ public:
 	bool	IsTwoSided();
 
 	int		GetNumPasses( void );
-	intp		GetTextureMemoryBytes( void );
+	intp	GetTextureMemoryBytes( void );
 
 	void	SetUseFixedFunctionBakedLighting( bool bEnable );
 
@@ -456,24 +453,17 @@ CMaterial::CMaterial( char const* materialName, const char *pTextureGroupName, K
 {
 	m_Reflectivity.Init( 0.2f, 0.2f, 0.2f );
 	intp len = Q_strlen(materialName);
-	char* pTemp = (char*)_alloca( len + 1 );
+	char* pTemp = stackallocT( char, len + 1 );
 
 	// Strip off the extension
 	Q_StripExtension( materialName, pTemp, len+1 );
 	Q_strlower( pTemp );
 
-#if defined( _X360 )
-	// material names are expected to be forward slashed for correct sort and find behavior!
-	// assert now to track alternate or regressed path that is source of inconsistency
-	Assert( strchr( pTemp, '\\' ) == NULL );
-#endif
-
 	// Convert it to a symbol
 	m_Name = pTemp;
 
 #if defined( _DEBUG )
-	m_pDebugName = new char[strlen(pTemp) + 1];
-	Q_strncpy( m_pDebugName, pTemp, strlen(pTemp) + 1 );
+	m_pDebugName = V_strdup(pTemp);
 #endif
 
 	m_bShouldReloadFromWhitelist = false;
@@ -592,14 +582,14 @@ void CMaterial::SetShaderAndParams( KeyValues *pKeyValues )
 		}
 	}
 
-	KeyValues *pLoadedKeyValues = new KeyValues( "vmt" );
+	KeyValuesAD pLoadedKeyValues( "vmt" );
 	if ( pLoadedKeyValues->LoadFromFile( g_pFullFileSystem, pFileName, pPathID ) )
 	{
 		// Load succeeded, check if it's a patch file
 		if ( V_stricmp( pLoadedKeyValues->GetName(), "patch" ) == 0 )
 		{
 			// it's a patch file, recursively build up patch keyvalues
-			KeyValues *pPatchKeyValues = new KeyValues( "vmt_patch" );
+			KeyValuesAD pPatchKeyValues( "vmt_patch" );
 			bool bSuccess = AccumulateRecursiveVmtPatches( *pPatchKeyValues, NULL, *pLoadedKeyValues, pPathID, NULL );
 			if ( bSuccess )
 			{
@@ -608,10 +598,8 @@ void CMaterial::SetShaderAndParams( KeyValues *pKeyValues )
 				// Apply accumulated patches to final vmt
 				ApplyPatchKeyValues( *m_pVMTKeyValues, *pPatchKeyValues );
 			}
-			pPatchKeyValues->deleteThis();
 		}
 	}
-	pLoadedKeyValues->deleteThis();
 
 	if ( g_pShaderDevice->IsUsingGraphics() )
 	{
@@ -803,7 +791,7 @@ void CMaterial::CleanUpMaterialProxy()
 		return;
 
 	// Clean up material proxies
-	for ( int i = m_ProxyInfo.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_ProxyInfo.Count() - 1; i >= 0; i-- )
 	{
 		IMaterialProxy *pProxy = m_ProxyInfo[ i ];
 
@@ -875,7 +863,8 @@ static int FindMaterialVar( IShader* pShader, char const* pVarName )
 //-----------------------------------------------------------------------------
 // Creates a vector material var
 //-----------------------------------------------------------------------------
-int ParseVectorFromKeyValueString( KeyValues *pKeyValue, const char *pMaterialName, float vecVal[4] )
+static int ParseVectorFromKeyValueString( KeyValues *pKeyValue,
+	const char *pMaterialName, const char *pVarName, float vecVal[4] )
 {
 	char const* pScan = pKeyValue->GetString();
 	bool divideBy255 = false;
@@ -925,7 +914,8 @@ int ParseVectorFromKeyValueString( KeyValues *pKeyValue, const char *pMaterialNa
 		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
-			Warning( "Error in .VMT file: error parsing vector element \"%s\" in \"%s\"\n", pKeyValue->GetName(), pMaterialName );
+			Warning( "Error in .VMT file (%s): error parsing vector element \"%s\" in \"%s\"\n",
+				pMaterialName, pKeyValue->GetName(), pVarName );
 			return 0;
 		}
 
@@ -948,7 +938,7 @@ static IMaterialVar* CreateVectorMaterialVarFromKeyValue( IMaterial* pMaterial, 
 {
 	char const *pszName = GetVarName( pKeyValue );
 	float vecVal[4];
-	int nDim = ParseVectorFromKeyValueString( pKeyValue, pszName, vecVal );
+	int nDim = ParseVectorFromKeyValueString( pKeyValue, pMaterial->GetName(), pszName, vecVal );
 	if ( nDim == 0 )
 		return NULL;
 
@@ -1590,11 +1580,11 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 			if ( Q_stricmp( GetName(), pFallbackMaterial ) )
 			{
 				// Gotta copy it off; clearing the keyvalues will blow the string away
-				Q_strncpy( pFallbackMaterialNameBuf, pFallbackMaterial, 256 );
+				V_strcpy_safe( pFallbackMaterialNameBuf, pFallbackMaterial );
 				keyValues.Clear();
 				if( !LoadVMTFile( keyValues, patchKeyValues, pFallbackMaterialNameBuf, UsesUNCFileName(), NULL ) )
 				{
-					Warning( "CMaterial::PrecacheVars: error loading vmt file %s for %s\n", pFallbackMaterialNameBuf, GetName() );
+					Warning( "CMaterial::PrecacheVars: error loading fallback vmt file %s for %s\n", pFallbackMaterialNameBuf, GetName() );
 					keyValues = *(((CMaterial *)g_pErrorMaterial)->m_pVMTKeyValues);
 				}
 			}
@@ -2139,16 +2129,16 @@ void CMaterial::DecideShouldReloadFromWhitelist( IFileList *pFilesToReload )
 		return;
 
 	char vmtFilename[MAX_PATH];
-	V_ComposeFileName( "materials", GetName(), vmtFilename, sizeof( vmtFilename ) );
-	V_strncat( vmtFilename, ".vmt", sizeof( vmtFilename ) );
+	V_ComposeFileName( "materials", GetName(), vmtFilename );
+	V_strcat_safe( vmtFilename, ".vmt" );
 
 	// Check if either this file or any of the files it included need to be reloaded.
 	bool bShouldReload = pFilesToReload->IsFileInList( vmtFilename );
 	if ( !bShouldReload )
 	{
-		for ( int i=0; i < m_VMTIncludes.Count(); i++ )
+		for ( intp i=0; i < m_VMTIncludes.Count(); i++ )
 		{
-			g_pFullFileSystem->String( m_VMTIncludes[i], vmtFilename, sizeof( vmtFilename ) );
+			g_pFullFileSystem->String( m_VMTIncludes[i], vmtFilename );
 			if ( pFilesToReload->IsFileInList( vmtFilename ) )
 			{
 				bShouldReload = true;
@@ -2168,8 +2158,8 @@ void CMaterial::ReloadFromWhitelistIfMarked()
 	#ifdef PURE_SERVER_DEBUG_SPEW
 	{
 		char vmtFilename[MAX_PATH];
-		V_ComposeFileName( "materials", GetName(), vmtFilename, sizeof( vmtFilename ) );
-		V_strncat( vmtFilename, ".vmt", sizeof( vmtFilename ) );
+		V_ComposeFileName( "materials", GetName(), vmtFilename );
+		V_strcat_safe( vmtFilename, ".vmt" );
 		Msg( "Reloading %s due to pure server whitelist change\n", GetName() );
 	}
 	#endif
@@ -3002,7 +2992,7 @@ void CMaterial::CallBindProxy( void *proxyData )
 	case 2:
 		// alpha mod all....
 		{
-			float value = ( sin( 2.0f * M_PI_F * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
+			float value = static_cast<float>( sin( 2.0 * M_PI * Plat_FloatTime() / 10.0 ) * 0.5f ) + 0.5f;
 			m_pShaderParams[ALPHA]->SetFloatValue( value );
 		}
 		break;
@@ -3010,7 +3000,7 @@ void CMaterial::CallBindProxy( void *proxyData )
 	case 3:
 		// color mod all...
 		{
-			float value = ( sin( 2.0f * M_PI_F * Plat_FloatTime() / 10.0f ) * 0.5f ) + 0.5f;
+			float value = static_cast<float>( sin( 2.0 * M_PI * Plat_FloatTime() / 10.0 ) * 0.5f ) + 0.5f;
 			m_pShaderParams[COLOR]->SetVecValue( value, 1.0f, 1.0f );
 		}
 		break;

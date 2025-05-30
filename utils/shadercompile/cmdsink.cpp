@@ -13,8 +13,8 @@ CResponseFiles::CResponseFiles(char const *szFileResult,
       m_lenResult(0),
       m_dataResult(nullptr),
       m_dataListing(nullptr) {
-  sprintf(m_szFileResult, szFileResult);
-  sprintf(m_szFileListing, szFileListing);
+  V_sprintf_safe(m_szFileResult, szFileResult);
+  V_sprintf_safe(m_szFileListing, szFileListing);
 }
 
 CResponseFiles::~CResponseFiles() {

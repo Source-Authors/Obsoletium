@@ -20,7 +20,7 @@ class CPlayerContextMenu : public vgui::Menu
 {
 public:
 	CPlayerContextMenu(vgui::Panel *parent);
-	~CPlayerContextMenu();
+	virtual ~CPlayerContextMenu();
 
 	// call this to activate the menu
 	void ShowMenu(vgui::Panel *target, unsigned int serverID);

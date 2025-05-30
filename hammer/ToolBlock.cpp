@@ -6,6 +6,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolBlock.h"
+
 #include "History.h"
 #include "MainFrm.h"
 #include "MapDefs.h"
@@ -14,15 +16,16 @@
 #include "MapView3D.h"
 #include "Options.h"
 #include "StatusBarIDs.h"
-#include "ToolBlock.h"
 #include "ToolManager.h"
 #include "vgui/Cursor.h"
 #include "Selection.h"
+#include "windows/base_wnd.h"
 
-
-class CToolBlockMessageWnd : public CWnd
+class CToolBlockMessageWnd : public CBaseWnd
 {
 	public:
+		// dimhotepus: Init members in ctor.
+		CToolBlockMessageWnd() : m_pToolBlock{nullptr}, m_pView2D{nullptr} {}
 
 		bool Create(void);
 		void PreMenu2D(CToolBlock *pTool, CMapView2D *pView);
@@ -46,7 +49,7 @@ static CToolBlockMessageWnd s_wndToolMessage;
 static const char *g_pszClassName = "ValveEditor_BlockToolWnd";
 
 
-BEGIN_MESSAGE_MAP(CToolBlockMessageWnd, CWnd)
+BEGIN_MESSAGE_MAP(CToolBlockMessageWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CToolMessageWnd)
 	ON_COMMAND(ID_CREATEOBJECT, OnCreateObject)
 	//}}AFX_MSG_MAP
@@ -71,7 +74,7 @@ bool CToolBlockMessageWnd::Create(void)
 		return(false);
 	}
 
-	return(CWnd::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
+	return(__super::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
 }
 
 
@@ -303,7 +306,7 @@ bool CToolBlock::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &v
 	if ( uConstraints & constrainSnap )
 		m_pDocument->Snap(vecWorld,uConstraints);
 
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
 	SetStatusText(SBI_COORDS, szBuf);
 	
 	if ( IsTranslating() )
@@ -425,7 +428,7 @@ void CToolBlock::CreateMapObject(CMapView *pView)
 
 	if (!(bmaxs[0] - bmins[0]) || !(bmaxs[1] - bmins[1]) || !(bmaxs[2] - bmins[2]))
 	{
-		AfxMessageBox("The box is empty.");
+		AfxMessageBox("The box is empty.", MB_ICONERROR);
 		SetEmpty();
 		return;
 	}

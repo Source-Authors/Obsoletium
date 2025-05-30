@@ -1,23 +1,17 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-
-#include "basetypes.h"
-#include "sound.h"
-#include "snd_fixedint.h"
 
 #ifndef SOUND_PRIVATE_H
 #define SOUND_PRIVATE_H
-#pragma once
+
+#include "tier0/basetypes.h"
+#include "sound.h"
+#include "snd_fixedint.h"
 
 // Forward declarations
 struct portable_samplepair_t;
 struct channel_t;
-typedef int SoundSource;
 class CAudioSource;
 struct channel_t;
 class CSfxTable;

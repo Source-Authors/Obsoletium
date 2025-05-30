@@ -7,6 +7,11 @@
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
+$Macro LUABASEDIR			"$SRCDIR\thirdparty\lua"
+$Macro LUASRCDIR			"$LUABASEDIR\lua-5.4.7\include"
+$Macro LUAOUTDIRDEBUG		"$LUABASEDIR\out\lua-5.4.7\Debug"
+$Macro LUAOUTDIRRELEASE		"$LUABASEDIR\out\lua-5.4.7\Release"
+
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
 $Configuration
@@ -17,7 +22,57 @@ $Configuration
 	}
 }
 
-$Project "Dmxedit"
+$Configuration	"Debug"
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$LUASRCDIR"
+		$PreprocessorDefinitions		"$BASE;LUA_BUILD_AS_DLL=1"
+	}
+
+	$Linker
+	{
+		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRDEBUG"
+		$AdditionalDependencies			"$BASE Advapi32.lib User32.lib lua_shared.lib"
+	}
+
+	$PostBuildEvent
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $LUAOUTDIRDEBUG\lua_shared.dll $OUTBINDIR\lua_shared.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $LUAOUTDIRDEBUG\lua_shared.pdb COPY $LUAOUTDIRDEBUG\lua_shared.pdb $OUTBINDIR\lua_shared.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
+	}
+}
+
+$Configuration	"Release"
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$LUASRCDIR"
+		$PreprocessorDefinitions		"$BASE;LUA_BUILD_AS_DLL=1"
+	}
+
+	$Linker
+	{
+		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRRELEASE"
+		$AdditionalDependencies			"$BASE Advapi32.lib User32.lib lua_shared.lib"
+	}
+
+	$PostBuildEvent
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $LUAOUTDIRRELEASE\lua_shared.dll $OUTBINDIR\lua_shared.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $LUAOUTDIRRELEASE\lua_shared.pdb COPY $LUAOUTDIRRELEASE\lua_shared.pdb $OUTBINDIR\lua_shared.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
+	}
+}
+
+$Project "dmxedit"
 {
 	$Folder	"Source Files"
 	{
@@ -28,9 +83,11 @@ $Project "Dmxedit"
 
 		$Folder "External"
 		{
-			$File	"$SRCDIR\public\movieobjects/movieobjects.cpp"
+			$File	"$SRCDIR\public\movieobjects\movieobjects.cpp"
 			$File	"$SRCDIR\public\interpolatortypes.cpp"
 			$File	"$SRCDIR\public\interpolatortypes.h"
+			$File	"..\common\tools_minidump.h"
+			$File	"..\common\tools_minidump.cpp"
 		}
 	}
 
@@ -48,6 +105,6 @@ $Project "Dmxedit"
 		$Lib mathlib
 		$Lib tier2
 		$Lib tier3
-		$Lib $LIBCOMMON\lua
+		$Libexternal	"$LUAOUTDIRRELEASE/lua_shared"
 	}
 }

@@ -76,15 +76,21 @@ void CAttributeElementPickerPanel::Refresh()
 
 	if ( element )
 	{
+		// dimhotepus: Handle conversion failure (should not happen).
 		char idstr[ 37 ];
-		UniqueIdToString( element->GetId(), idstr, sizeof( idstr ) );
+		if ( !UniqueIdToString( element->GetId(), idstr ) )
+		{
+			AssertMsg( "Unable to convert ID to string for '%s' element.", element->GetName() );
+			V_strcpy_safe( idstr, "N/A" );
+		}
+
 		if ( m_bShowMemoryUsage )
 		{
-			Q_snprintf( elemText, sizeof( elemText ), "%s %s %.3fMB", element->GetTypeString(), idstr, element->EstimateMemoryUsage() / float( 1 << 20 ) );
+			V_sprintf_safe( elemText, "%s %s %.3fMB", element->GetTypeString(), idstr, element->EstimateMemoryUsage() / float( 1 << 20 ) );
 		}
 		else
 		{
-			Q_snprintf( elemText, sizeof( elemText ), "%s %s", element->GetTypeString(), idstr );
+			V_sprintf_safe( elemText, "%s %s", element->GetTypeString(), idstr );
 		}
 	}
 
@@ -107,11 +113,11 @@ void CAttributeElementPickerPanel::ShowPickerDialog()
 	CUtlVector< DmePickerInfo_t > vec;
 	if ( ElementPropertiesChoices()->GetElementChoiceList( pInfo->GetChoiceType(), GetPanelElement(), GetAttributeName(), IsArrayEntry(), choices ) )
 	{
-		int c = choices.Count();
+		intp c = choices.Count();
 		vec.EnsureCapacity( c );
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
-			int j = vec.AddToTail( );
+			intp j = vec.AddToTail( );
 			vec[j].m_hElement = choices[i].m_pValue->GetHandle();
 			vec[j].m_pChoiceString = choices[i].m_pChoiceString;
 		}

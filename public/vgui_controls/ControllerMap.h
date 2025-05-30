@@ -12,8 +12,8 @@
 #endif
 
 #include "Panel.h"
-#include "utlmap.h"
-#include "utlsymbol.h"
+#include "tier1/utlmap.h"
+#include "tier1/utlsymbol.h"
 
 class CControllerMap : public vgui::Panel
 {
@@ -42,7 +42,7 @@ private:
 		CUtlSymbol	text;
 		CUtlSymbol	icon;
 	};
-	CUtlMap< int, button_t > m_buttonMap;
+	CUtlMap< int, button_t, int > m_buttonMap;
 };
 
 #endif // CONTROLLERMAP_H

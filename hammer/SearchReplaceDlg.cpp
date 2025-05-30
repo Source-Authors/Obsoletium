@@ -6,11 +6,11 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "SearchReplaceDlg.h"
 #include "History.h"
 #include "GlobalFunctions.h"
 #include "MapDoc.h"
 #include "MapWorld.h"
-#include "SearchReplaceDlg.h"
 #include "hammer.h"
 #include "Selection.h"
 
@@ -80,8 +80,12 @@ bool MatchString(const char *pszString, FindObject_t &FindObject)
 //			pszOut - String to check.
 //			FindObject - Search criteria, including string to search for.
 //-----------------------------------------------------------------------------
-bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, const char *pszReplace)
+template<intp outSize>
+static bool ReplaceString(OUT_Z_ARRAY char (&pszOut)[outSize], const char *pszIn, FindObject_t &FindObject, const char *pszReplace)
 {
+	if (outSize > 0)
+		pszOut[0] = '\0';
+
 	//
 	// Whole matches are simple, just strcpy the replacement string into the out buffer.
 	//
@@ -89,13 +93,13 @@ bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, co
 	{
 		if (FindObject.bCaseSensitive && (!strcmp(pszIn, FindObject.strFindText)))
 		{
-			strcpy(pszOut, pszReplace);
+			V_strcpy_safe(pszOut, pszReplace);
 			return true;
 		}
 
 		if (!stricmp(pszIn, FindObject.strFindText))
 		{
-			strcpy(pszOut, pszReplace);
+			V_strcpy_safe(pszOut, pszReplace);
 			return true;
 		}
 	}
@@ -115,7 +119,7 @@ bool ReplaceString(char *pszOut, const char *pszIn, FindObject_t &FindObject, co
 
 	if (pszStart != NULL)
 	{
-		int nOffset = pszStart - pszIn;
+		ptrdiff_t nOffset = pszStart - pszIn;
 
 		strncpy(pszOut, pszIn, nOffset);
 		pszOut += nOffset;
@@ -223,7 +227,7 @@ bool FindCheck(CMapClass *pObject, FindObject_t &FindObject)
 	//
 	// Search keyvalues.
 	//
-	for ( int i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for ( auto i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		const char *pszValue = pEntity->GetKeyValue(i);
 		if (pszValue && MatchString(pszValue, FindObject))
@@ -267,7 +271,7 @@ int FindReplace(CMapEntity *pEntity, FindObject_t &FindObject, const char *pszRe
 	//
 	// Replace keyvalues.
 	//
-	for ( int i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for ( auto i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		const char *pszValue = pEntity->GetKeyValue(i);
 		char szNewValue[MAX_PATH];
@@ -311,7 +315,7 @@ int FindReplace(CMapEntity *pEntity, FindObject_t &FindObject, const char *pszRe
 }
 
 
-BEGIN_MESSAGE_MAP(CSearchReplaceDlg, CDialog)
+BEGIN_MESSAGE_MAP(CSearchReplaceDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CSearchReplaceDlg)
 	ON_WM_SHOWWINDOW()
 	ON_COMMAND_EX(IDC_FIND_NEXT, OnFindReplace)
@@ -326,7 +330,7 @@ END_MESSAGE_MAP()
 // Input  : pParent - 
 //-----------------------------------------------------------------------------
 CSearchReplaceDlg::CSearchReplaceDlg(CWnd *pParent)
-	: CDialog(CSearchReplaceDlg::IDD, pParent)
+	: CBaseDlg(CSearchReplaceDlg::IDD, pParent)
 {
 	m_bNewSearch = true;
 
@@ -345,7 +349,7 @@ CSearchReplaceDlg::CSearchReplaceDlg(CWnd *pParent)
 //-----------------------------------------------------------------------------
 BOOL CSearchReplaceDlg::Create(CWnd *pwndParent)
 {
-	return CDialog::Create(CSearchReplaceDlg::IDD, pwndParent);
+	return __super::Create(CSearchReplaceDlg::IDD, pwndParent);
 }
 
 
@@ -355,7 +359,7 @@ BOOL CSearchReplaceDlg::Create(CWnd *pwndParent)
 //-----------------------------------------------------------------------------
 void CSearchReplaceDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CSearchReplaceDlg)
 	DDX_Check(pDX, IDC_VISIBLES_ONLY, m_bVisiblesOnly);
@@ -540,7 +544,7 @@ BOOL CSearchReplaceDlg::OnFindReplace(UINT uCmd)
 			{
 				CString str;
 				str.Format("Finished searching for '%s'.", m_strFindText.GetBuffer());
-				MessageBox(str, "Find/Replace Text", MB_OK);
+				MessageBox(str, "Hammer - Find/Replace Text", MB_OK | MB_ICONINFORMATION);
 
 				// TODO: put the old selection back
 			}
@@ -548,7 +552,7 @@ BOOL CSearchReplaceDlg::OnFindReplace(UINT uCmd)
 			{
 				CString str;
 				str.Format("Replaced %d occurrences of the string '%s' with '%s'.", nReplaceCount, m_strFindText.GetBuffer(), m_strReplaceText.GetBuffer());
-				MessageBox(str, "Find/Replace Text", MB_OK);
+				MessageBox(str, "Hammer - Find/Replace Text", MB_OK | MB_ICONINFORMATION);
 			}
 
 			m_bNewSearch = true;
@@ -595,5 +599,5 @@ void CSearchReplaceDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 		UpdateData(FALSE);
 	}
 
-	CDialog::OnShowWindow(bShow, nStatus);
+	__super::OnShowWindow(bShow, nStatus);
 }

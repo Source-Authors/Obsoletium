@@ -49,7 +49,7 @@ public:
 	virtual void BonusMapUnlock( const char *pchFileName = NULL, const char *pchMapName = NULL );
 	virtual void BonusMapComplete( const char *pchFileName = NULL, const char *pchMapName = NULL );
 	virtual void BonusMapChallengeUpdate( const char *pchFileName, const char *pchMapName, const char *pchChallengeName, int iBest );
-	virtual void BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName );
+	void BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName ) override;
 	virtual void BonusMapChallengeObjectives( int &iBronze, int &iSilver, int &iGold );
 	virtual void BonusMapDatabaseSave( void );
 	virtual int BonusMapNumAdvancedCompleted( void );
@@ -98,6 +98,10 @@ public:
 	virtual void SetMainMenuOverride( vgui::VPANEL panel );
 	// Client DLL is telling us that a main menu command was issued, probably from its custom main menu panel
 	virtual void SendMainMenuCommand( const char *pszCommand );
+
+	void BonusMapChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,
+		OUT_Z_CAP(mapSize) char *pchMapName, intp mapSize,
+		OUT_Z_CAP(challengeSize) char *pchChallengeName, intp challengeSize ) override;
 
 	// state
 	bool IsInLevel();

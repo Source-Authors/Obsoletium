@@ -81,6 +81,6 @@ public:
 
 } // namespace vgui
 
-#define VGUI_INPUTINTERNAL_INTERFACE_VERSION "VGUI_InputInternal001"
+constexpr inline char VGUI_INPUTINTERNAL_INTERFACE_VERSION[]{"VGUI_InputInternal002"};
 
 #endif // IINPUTINTERNAL_H

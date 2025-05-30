@@ -27,7 +27,7 @@ namespace vgui
 
 class CMDLPanel;
 
-const int MAX_SELECTED_MODELS = 2;
+constexpr inline int MAX_SELECTED_MODELS = 2;
 
 //-----------------------------------------------------------------------------
 // Purpose: Main app window

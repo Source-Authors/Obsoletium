@@ -5,20 +5,20 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/ProgressBox.h>
+
+#include <tier1/KeyValues.h>
+
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/ProgressBox.h>
-
-#include <stdio.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -38,7 +38,7 @@ ProgressBox::ProgressBox(const char *title, const char *text, const char *pszUnk
 	}
 	else
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode(title, m_wszTitleString, sizeof(m_wszTitleString));
+		g_pVGuiLocalize->ConvertANSIToUnicode(title, m_wszTitleString);
 	}
 
 	m_pMessageLabel = new Label(this, NULL, pszUnknownTimeString);
@@ -235,13 +235,13 @@ void ProgressBox::UpdateTitle()
 	wchar_t completion[64];
 	if ((int)(m_flCurrentProgress * 100.0f) > 0)
 	{
-		_snwprintf(completion, sizeof(completion) / sizeof(wchar_t), L"- %d%% complete", (int)(m_flCurrentProgress * 100.0f));
+		V_swprintf_safe(completion, L"- %d%% complete", (int)(m_flCurrentProgress * 100.0f));
 	}
 	else
 	{
 		completion[0] = 0;
 	}
-	g_pVGuiLocalize->ConstructString(unicode, sizeof(unicode), m_wszTitleString, 1, completion);
+	g_pVGuiLocalize->ConstructString_safe(unicode, m_wszTitleString, 1, completion);
 	SetTitle(unicode, true);
 }
 
@@ -254,10 +254,10 @@ void ProgressBox::OnThink()
 	if (m_flFirstProgressUpdate >= 0.0f && m_wcsInfoString[0])
 	{
 		wchar_t timeRemaining[128];
-		if (ProgressBar::ConstructTimeRemainingString(timeRemaining, sizeof(timeRemaining), m_flFirstProgressUpdate, (float)system()->GetFrameTime(), m_flCurrentProgress, m_flLastProgressUpdate, true))
+		if (ProgressBar::ConstructTimeRemainingString(timeRemaining, m_flFirstProgressUpdate, (float)system()->GetFrameTime(), m_flCurrentProgress, m_flLastProgressUpdate, true))
 		{
 			wchar_t unicode[256];
-			g_pVGuiLocalize->ConstructString(unicode, sizeof(unicode), m_wcsInfoString, 1, timeRemaining);
+			g_pVGuiLocalize->ConstructString_safe(unicode, m_wcsInfoString, 1, timeRemaining);
 			m_pMessageLabel->SetText(unicode);
 		}
 		else

@@ -89,6 +89,7 @@ public:
 	virtual void BonusMapUnlock( const char *pchFileName = NULL, const char *pchMapName = NULL ) = 0;
 	virtual void BonusMapComplete( const char *pchFileName = NULL, const char *pchMapName = NULL ) = 0;
 	virtual void BonusMapChallengeUpdate( const char *pchFileName, const char *pchMapName, const char *pchChallengeName, int iBest ) = 0;
+	[[deprecated("Use BonusMapChallengeNames2 as former doesn't check bounds")]]
 	virtual void BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName ) = 0;
 	virtual void BonusMapChallengeObjectives( int &iBronze, int &iSilver, int &iGold ) = 0;
 	virtual void BonusMapDatabaseSave( void ) = 0;
@@ -114,8 +115,13 @@ public:
 	virtual void SetMainMenuOverride( vgui::VPANEL panel ) = 0;
 	// Client DLL is telling us that a main menu command was issued, probably from its custom main menu panel
 	virtual void SendMainMenuCommand( const char *pszCommand ) = 0;
+
+	// dimhotepus: Bounds-checking version
+	virtual void BonusMapChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,
+		OUT_Z_CAP(mapSize) char *pchMapName, intp mapSize,
+		OUT_Z_CAP(challengeSize) char *pchChallengeName, intp challengeSize ) = 0;
 };
 
-#define GAMEUI_INTERFACE_VERSION "GameUI011"
+constexpr inline char GAMEUI_INTERFACE_VERSION[]{"GameUI011"};
 
 #endif // IGAMEUI_H

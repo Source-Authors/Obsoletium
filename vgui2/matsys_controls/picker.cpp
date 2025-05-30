@@ -78,9 +78,8 @@ void CPicker::OnKeyCodePressed( KeyCode code )
 {
 	if (( code == KEY_UP ) || ( code == KEY_DOWN ) || ( code == KEY_PAGEUP ) || ( code == KEY_PAGEDOWN ))
 	{
-		KeyValues *pMsg = new KeyValues("KeyCodePressed", "code", code);
+		KeyValuesAD pMsg( new KeyValues("KeyCodePressed", "code", code) );
 		vgui::ipanel()->SendMessage( m_pPickerBrowser->GetVPanel(), pMsg, GetVPanel());
-		pMsg->deleteThis();
 	}
 	else
 	{
@@ -101,7 +100,7 @@ void CPicker::SetStringList( const PickerList_t &list )
 	for ( int i = 0; i < nCount; ++i )
 	{
 		const char *pPickerName = list[i].m_pChoiceString;
-		KeyValues *kv = new KeyValues( "node", "choice", pPickerName );
+		KeyValuesAD kv( new KeyValues( "node", "choice", pPickerName ) );
 		if ( m_Type == PICKER_CHOICE_STRING )
 		{
 			kv->SetString( "value", list[i].m_pChoiceValue ); 
@@ -114,7 +113,7 @@ void CPicker::SetStringList( const PickerList_t &list )
 
 		if ( m_Type == PICKER_CHOICE_STRING )
 		{
-			KeyValues *pDrag = new KeyValues( "drag", "text", list[i].m_pChoiceValue );
+			KeyValuesAD pDrag( new KeyValues( "drag", "text", list[i].m_pChoiceValue ) );
 			if ( m_pPickerTextType )
 			{
 				pDrag->SetString( "texttype", m_pPickerTextType );

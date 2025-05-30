@@ -12,7 +12,7 @@
 
 #define MAX_TAG_CHARACTERS			128
 
-class TagInfoLabel : public vgui::URLLabel
+class TagInfoLabel final : public vgui::URLLabel
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( TagInfoLabel, vgui::URLLabel );
 public:
@@ -37,7 +37,7 @@ public:
 // Purpose: Internet games with tags
 //-----------------------------------------------------------------------------
 
-class CCustomGames : public CInternetGames
+class CCustomGames final : public CInternetGames
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CCustomGames, CInternetGames );
 public:

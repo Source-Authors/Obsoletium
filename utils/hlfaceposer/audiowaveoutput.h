@@ -26,6 +26,8 @@ public:
 	int				submit_mixer_sample;
 };
 
+using WAVEHDR = struct wavehdr_tag;
+
 class CAudioBuffer
 {
 public:
@@ -60,6 +62,8 @@ public:
 private:
 	portable_samplepair_t		m_paintbuffer[ PAINTBUFFER_SIZE ];
 };
+
+FORWARD_DECLARE_HANDLE(HWAVEOUT);
 
 class CAudioWaveOutput : public CAudioOutput
 {

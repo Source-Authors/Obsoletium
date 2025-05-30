@@ -23,7 +23,7 @@ class CInternetGames : public CBaseGamesPage
 
 public:
 	CInternetGames( vgui::Panel *parent, const char *panelName = "InternetGames", EPageType eType = eInternetServer );
-	~CInternetGames();
+	virtual ~CInternetGames();
 
 	// property page handlers
 	void OnPageShow() override;

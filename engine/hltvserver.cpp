@@ -771,7 +771,7 @@ int	CHLTVServer::GetHLTVSlot( void )
 	return m_nPlayerSlot;
 }
 
-float CHLTVServer::GetOnlineTime( void )
+double CHLTVServer::GetOnlineTime( void )
 {
 	return max(0.0, net_time - m_flStartTime);
 }
@@ -1225,7 +1225,7 @@ void CHLTVServer::EntityPVSCheck( CClientFrame *pFrame )
 
 	CFrameSnapshot * pSnapshot = pFrame->GetSnapshot();	
 
-	Assert ( pSnapshot->m_pHLTVEntityData != NULL );
+	Assert ( pSnapshot && pSnapshot->m_pHLTVEntityData != NULL );
 
 	int nDirectorEntity = m_Director->GetPVSEntity();
     	
@@ -1698,7 +1698,7 @@ bool CHLTVServer::ProcessConnectionlessPacket( netpacket_t * packet )
 	{
 	case A2S_INFO:
 		char rgchInfoPostfix[64];
-		msg.ReadString( rgchInfoPostfix, sizeof( rgchInfoPostfix ) );
+		msg.ReadString( rgchInfoPostfix );
 		if ( !Q_stricmp( rgchInfoPostfix, A2S_KEY_STRING_STEAM ) )
 		{
 			ReplyInfo( packet->from );
@@ -2030,7 +2030,7 @@ int CHLTVServer::GetProtocolVersion()
 void CHLTVServer::ReplyInfo( const netadr_t &adr )
 {
 	static char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	Q_FileBase( com_gamedir, gamedir );
 
 	CUtlBuffer buf;
 	buf.EnsureCapacity( 2048 );
@@ -2144,7 +2144,7 @@ CON_COMMAND( tv_status, "Show SourceTV server status." )
 	float	in, out;
 	char	gd[MAX_OSPATH];
 
-	Q_FileBase( com_gamedir, gd, sizeof( gd ) );
+	Q_FileBase( com_gamedir, gd );
 
 	if ( !hltv || !hltv->IsActive() )
 	{
@@ -2325,7 +2325,7 @@ CON_COMMAND( tv_record, "Starts SourceTV demo recording." )
 	Q_strncpy( name, args[1], sizeof( name ) );
 
 	// add .dem if not already set by user
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	Q_DefaultExtension( name, ".dem" );
 
 	hltv->m_DemoRecorder.StartRecording( name, false );
 }
@@ -2415,9 +2415,9 @@ void EditDemo_f( const CCommand &args )
 	//
 	char name[ MAX_OSPATH ];
 
-	Q_strncpy( name, args[1], sizeof( name ) );
+	V_strcpy_safe( name, args[1] );
 
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	Q_DefaultExtension( name, ".dem" );
 
 	hltv->m_ClientState.m_bSaveMemory = true;
 

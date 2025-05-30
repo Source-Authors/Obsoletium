@@ -5,12 +5,11 @@
 //=============================================================================
 
 #include "stdafx.h"
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
-#include <fstream>
-#pragma warning(pop)
-#include "hammer.h"
 #include "TextureWindow.h"
+
+#include <fstream>
+
+#include "hammer.h"
 #include "TextureBrowser.h"
 #include "CustomMessages.h"
 #include "IEditorTexture.h"
@@ -24,13 +23,13 @@
 #include <tier0/memdbgon.h>
 
 
-const DWORD NO_FILE_FILTER = 0xFFFFFFF0L;
-const int iPadding = 4;
-const int iTexNameFontHeight = 7;
-const int iTexIconHeight = 12;
+constexpr inline DWORD NO_FILE_FILTER = 0xFFFFFFF0L;
+constexpr inline int iPadding = 4;
+constexpr inline int iTexNameFontHeight = 7;
+constexpr inline int iTexIconHeight = 12;
 
 
-BEGIN_MESSAGE_MAP(CTextureWindow, CWnd)
+BEGIN_MESSAGE_MAP(CTextureWindow, CBaseWnd)
 	//{{AFX_MSG_MAP(CTextureWindow)
 	ON_WM_PAINT()
 	ON_WM_SIZE()
@@ -50,6 +49,13 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CTextureWindow::CTextureWindow(void)
 {
+	total_x = -1;
+	total_y = -1;
+
+	iDisplaySizeX = -1;
+	iDisplaySizeY = -1;
+	iTexNameCharWidth = -1;
+
 	bFirstPaint = TRUE;
 
 	m_szFilter[0] = '\0';
@@ -86,7 +92,7 @@ void CTextureWindow::Create(CWnd *pParentWnd, RECT& rect)
 {
 	static CString TextureWndClassName;
 
-	iDisplaySize = 64;
+	iDisplaySizeX = iDisplaySizeY = 64;
 
 	if(TextureWndClassName.IsEmpty())
 	{
@@ -108,8 +114,10 @@ void CTextureWindow::Create(CWnd *pParentWnd, RECT& rect)
 		TexFont.CreatePointFont(iTexNameFontHeight * 10, "Courier New");
 
 	CDC *pDC = GetDC();
-	pDC->SelectObject(&TexFont);
+	CFont* old = pDC->SelectObject(TexFont);
 	pDC->GetCharWidth('A', 'A', &iTexNameCharWidth);
+	// dimhotepus: Restore old font.
+	pDC->SelectObject(old);
 	ReleaseDC(pDC);
 }
 
@@ -212,7 +220,7 @@ BOOL CTextureWindow::EnumTexturePositions(TWENUMPOS *pTE, BOOL bStart)
 		// dvs: inefficient, the specific list should control the loop, not act as a filter
 		if (m_pSpecificList != NULL)
 		{
-			int nIndex = m_pSpecificList->Find(pTE->pTex);
+			intp nIndex = m_pSpecificList->Find(pTE->pTex);
 			if (nIndex == -1)
 				continue;
 	
@@ -297,8 +305,8 @@ BOOL CTextureWindow::EnumTexturePositions(TWENUMPOS *pTE, BOOL bStart)
 doresize:
 
 	SetRect( &texrect, pTE->cur_x, pTE->cur_y,
-		pTE->cur_x + iDisplaySize,
-		pTE->cur_y + iDisplaySize );
+		pTE->cur_x + iDisplaySizeX,
+		pTE->cur_y + iDisplaySizeY );
 
 	// if we've got one texture on this row already, and this one goes out of 
 	// the client area, jump to the next row. we want to have at least one texture on 
@@ -328,10 +336,12 @@ doresize:
 //					64 to display as 64 x 64 textures.
 //					128 to display as 128 x 128 textures.
 //					512 to display as 512 x 512 textures
+//					1024 to display as 1024 x 1024 textures
 //-----------------------------------------------------------------------------
-void CTextureWindow::SetDisplaySize(int iSize)
+void CTextureWindow::SetDisplaySize(int iSizeX, int iSizeY)
 {
-	iDisplaySize = iSize;
+	iDisplaySizeX = iSizeX;
+	iDisplaySizeY = iSizeY;
 	UpdateScrollSizes();
 	SelectTexture(szCurTexture, FALSE);
 	RedrawWindow();
@@ -451,7 +461,7 @@ void CTextureWindow::UpdateScrollSizes(void)
 	SetScrollInfo(SB_VERT, &si, TRUE);
 
 	char szbuf[100];
-	sprintf(szbuf, "Size = %d %d\n", total_y, TE.clientrect.bottom);
+	V_sprintf_safe(szbuf, "Size = %d %d\n", total_y, TE.clientrect.bottom);
 	TRACE0(szbuf);
 }
 
@@ -464,7 +474,7 @@ void CTextureWindow::OnPaint(void)
 	CPaintDC dc(this); // device context for painting
 
 	// setup font
-	dc.SelectObject(&TexFont);
+	CFont *old = dc.SelectObject(TexFont);
 	dc.SetTextColor(RGB(255, 255, 255));
 	//dc.SetBkColor(RGB(0,0,0));
 	dc.SetBkMode(TRANSPARENT);
@@ -519,7 +529,7 @@ void CTextureWindow::OnPaint(void)
 		if (bFirst)
 		{
 			bFirst = FALSE;
-			strcpy(szFirstDrawnTexture, szDrawTexture);
+			V_strcpy_safe(szFirstDrawnTexture, szDrawTexture);
 		}
 
 		// next texture & position
@@ -535,6 +545,8 @@ void CTextureWindow::OnPaint(void)
 		// select first texture
 		SelectTexture(szFirstDrawnTexture);
 	}
+	// dimhotepus: Restore old font.
+	dc.SelectObject(old);
 }
 
 
@@ -770,6 +782,7 @@ void CTextureWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	int iVertPos = GetScrollPos(SB_VERT);
 
 	char szNewTexture[128];
+	szNewTexture[0] = '\0';
 
 	point += CPoint(iHorzPos, iVertPos);
 
@@ -796,7 +809,7 @@ void CTextureWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	HighlightCurTexture();
 
 	// highlight new texture
-	strcpy(szCurTexture, szNewTexture);
+	V_strcpy_safe(szCurTexture, szNewTexture);
 	rectHighlight = CRect(&TE.texrect);
 	rectHighlight.InflateRect(2, 4);
 	HighlightCurTexture();

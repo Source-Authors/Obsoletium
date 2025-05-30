@@ -396,7 +396,7 @@ void C_SteamJet::RenderParticles( CParticleRenderIterator *pIterator )
 		TransformParticle(m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos);
 		float sortKey = tPos.z;
 
-		float lifetimeT = pParticle->m_Lifetime / (pParticle->m_DieTime + 0.001);
+		float lifetimeT = pParticle->m_Lifetime / (pParticle->m_DieTime + 0.001f);
 		float fRamp = lifetimeT * (STEAMJET_NUMRAMPS-1);
 		int iRamp = (int)fRamp;
 		float fraction = fRamp - iRamp;

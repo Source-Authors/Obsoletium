@@ -5,7 +5,7 @@
 //
 //=============================================================================
 
-#include "generichash.h"
+#include "tier1/generichash.h"
 
 #include <ctype.h>
 #include <cstdlib>
@@ -317,8 +317,8 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 	// 'm' and 'r' are mixing constants generated offline.
 	// They're not really 'magic', they just happen to work well.
 
-	const uint32 m = 0x5bd1e995;
-	const int r = 24;
+	constexpr uint32 m = 0x5bd1e995;
+	constexpr int r = 24;
 
 	// Initialize the hash to a 'random' value
 
@@ -348,7 +348,9 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 	switch(len)
 	{
 	case 3: h ^= data[2] << 16;
+        [[fallthrough]];
 	case 2: h ^= data[1] << 8;
+        [[fallthrough]];
 	case 1: h ^= data[0];
 		h *= m;
 	}
@@ -366,9 +368,9 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 #define TOLOWERU( c ) ( ( uint32 ) ( ( ( (c) >= 'A' ) && ( (c) <= 'Z' ) )? (c) + 32 : (c) ) )
 uint32 MurmurHash2LowerCase( char const *pString, uint32 nSeed )
 {
-	intp nLen = ( intp )strlen( pString );
+	size_t nLen = strlen( pString );
 	char *p = ( char * ) stackalloc( nLen + 1 );
-	for( intp i = 0; i < nLen ; i++ )
+	for( size_t i = 0; i < nLen ; i++ )
 	{
 		p[i] = TOLOWERU( pString[i] );
 	}
@@ -384,8 +386,8 @@ uint64 MurmurHash64( const void * key, int len, uint32 seed )
 	// 'm' and 'r' are mixing constants generated offline.
 	// They're not really 'magic', they just happen to work well.
 
-	const uint32 m = 0x5bd1e995;
-	const int r = 24;
+	constexpr uint32 m = 0x5bd1e995;
+	constexpr int r = 24;
 
 	// Initialize the hash to a 'random' value
 
@@ -420,7 +422,9 @@ uint64 MurmurHash64( const void * key, int len, uint32 seed )
 	switch(len)
 	{
 	case 3: h2 ^= ((uint8*)data)[2] << 16;
+        [[fallthrough]];
 	case 2: h2 ^= ((uint8*)data)[1] << 8;
+        [[fallthrough]];
 	case 1: h2 ^= ((uint8*)data)[0];
 			h2 *= m;
 	}

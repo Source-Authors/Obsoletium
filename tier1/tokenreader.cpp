@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include "tokenreader.h"
+#include "tier1/tokenreader.h"
 
 #include <cctype>
 #include <cstdio>
@@ -37,7 +37,7 @@ TokenReader::TokenReader()
 bool TokenReader::Open(const char *pszFilename)
 {
 	open(pszFilename, std::ios::in | std::ios::binary );
-	Q_strncpy(m_szFilename, pszFilename, sizeof( m_szFilename ) );
+	V_strcpy_safe(m_szFilename, pszFilename);
 	m_nLine = 1;
 	m_nErrorCount = 0;
 	m_bStuffed = false;
@@ -62,8 +62,8 @@ void TokenReader::Close()
 const char *TokenReader::Error(char *error, ...)
 {
 	static char szErrorBuf[256];
-	Q_snprintf(szErrorBuf, sizeof( szErrorBuf ), "File %s, line %d: ", m_szFilename, m_nLine);
-	Q_strncat(szErrorBuf, error, sizeof( szErrorBuf ), COPY_ALL_CHARACTERS );
+	V_sprintf_safe(szErrorBuf, "File %s, line %d: ", m_szFilename, m_nLine);
+	V_strcat_safe(szErrorBuf, error );
 	m_nErrorCount++;
 	return(szErrorBuf);
 }
@@ -75,7 +75,7 @@ const char *TokenReader::Error(char *error, ...)
 //			nSize - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::GetString(char *pszStore, ptrdiff_t nSize)
+trtoken_t TokenReader::GetString(char *pszStore, intp nSize)
 {
 	if (nSize <= 0)
 	{
@@ -199,12 +199,9 @@ trtoken_t TokenReader::GetString(char *pszStore, ptrdiff_t nSize)
 trtoken_t TokenReader::NextTokenDynamic(char **ppszStore)
 {
 	char szTempBuffer[8192];
-	trtoken_t eType = NextToken(szTempBuffer, sizeof(szTempBuffer));
 
-	ptrdiff_t len = Q_strlen(szTempBuffer) + 1;
-	*ppszStore = new char [len];
-	Assert( *ppszStore );
-	Q_strncpy(*ppszStore, szTempBuffer, len );
+	trtoken_t eType = NextToken(szTempBuffer);
+	*ppszStore = V_strdup(szTempBuffer);
 
 	return(eType);
 }
@@ -215,8 +212,12 @@ trtoken_t TokenReader::NextTokenDynamic(char **ppszStore)
 // Input  : pszStore - Pointer to a string that will receive the token.
 // Output : Returns the type of token that was read, or TOKENERROR.
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
+trtoken_t TokenReader::NextToken(OUT_Z_CAP(nSize) char *pszStore, intp nSize)
 {
+	// dimhotepus: Always zero-terminate.
+	if (nSize > 0)
+		pszStore[0] = '\0';
+
 	char *pStart = pszStore;
 
 	if (!is_open())
@@ -246,7 +247,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		return TOKENEOF;
 	}
 
-	char ch = get();
+	int ch = get();
 
 	//
 	// Look for all the valid operators.
@@ -271,9 +272,14 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		case '}':
 		case '\\':
 		{
-			pszStore[0] = ch;
-			pszStore[1] = 0;
-			return OPERATOR;
+			if (nSize >= 2)
+			{
+				pszStore[0] = static_cast<char>(ch);
+				pszStore[1] = '\0';
+				return OPERATOR;
+			}
+			// dimhotepus: Handle buffer overflow.
+			return TOKENSTRINGTOOLONG;
 		}
 	}
 
@@ -294,7 +300,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		{
 			if ( (pszStore - pStart + 1) < nSize )
 			{
-				*pszStore = ch;
+				*pszStore = static_cast<char>(ch);
 				pszStore++;
 			}
 
@@ -316,7 +322,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 		//
 		// Put back the non-numeric character for the next call.
 		//
-		putback(ch);
+		putback(static_cast<char>(ch));
 		*pszStore = '\0';
 		return INTEGER;
 	}
@@ -329,7 +335,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 	{
 		if ( (pszStore - pStart + 1) < nSize )
 		{
-			*pszStore = ch;
+			*pszStore = static_cast<char>(ch);
 			pszStore++;
 		}
 
@@ -339,7 +345,7 @@ trtoken_t TokenReader::NextToken(char *pszStore, ptrdiff_t nSize)
 	//
 	// Put back the non-identifier character for the next call.
 	//
-	putback(ch);
+	putback(static_cast<char>(ch));
 	*pszStore = '\0';
 	return IDENT;
 }
@@ -357,7 +363,7 @@ void TokenReader::IgnoreTill(trtoken_t ttype, const char *pszToken)
 
 	while(1)
 	{
-		_ttype = NextToken(szBuf, sizeof(szBuf));
+		_ttype = NextToken(szBuf);
 		if(_ttype == TOKENEOF)
 			return;
 		if(_ttype == ttype)
@@ -380,7 +386,7 @@ void TokenReader::IgnoreTill(trtoken_t ttype, const char *pszToken)
 void TokenReader::Stuff(trtoken_t eType, const char *pszToken)
 {
 	m_eStuffed = eType;
-	Q_strncpy(m_szStuffed, pszToken, sizeof( m_szStuffed ) );
+	V_strcpy_safe(m_szStuffed, pszToken );
 	m_bStuffed = true;
 }
 
@@ -394,7 +400,7 @@ void TokenReader::Stuff(trtoken_t eType, const char *pszToken)
 bool TokenReader::Expecting(trtoken_t ttype, const char *pszToken)
 {
 	char szBuf[1024];
-	if (NextToken(szBuf, sizeof(szBuf)) != ttype || !IsToken(pszToken, szBuf))
+	if (NextToken(szBuf) != ttype || !IsToken(pszToken, szBuf))
 	{
 		return false;
 	}
@@ -407,11 +413,11 @@ bool TokenReader::Expecting(trtoken_t ttype, const char *pszToken)
 // Input  : pszStore - 
 // Output : 
 //-----------------------------------------------------------------------------
-trtoken_t TokenReader::PeekTokenType(char *pszStore, ptrdiff_t maxlen )
+trtoken_t TokenReader::PeekTokenType(OUT_Z_CAP(maxlen) char *pszStore, intp maxlen )
 {
 	if (!m_bStuffed)
 	{
-		m_eStuffed = NextToken(m_szStuffed, sizeof(m_szStuffed));
+		m_eStuffed = NextToken(m_szStuffed);
 		m_bStuffed = true;
 	}
 	
@@ -436,7 +442,7 @@ bool TokenReader::SkipWhiteSpace(void)
 
 	while (true)
 	{
-		char ch = get();
+		int ch = get();
 
 		if ((ch == ' ') || (ch == '\t') || (ch == '\r') || (ch == 0))
 		{
@@ -476,7 +482,7 @@ bool TokenReader::SkipWhiteSpace(void)
 			//
 			// It is a worthy character. Put it back.
 			//
-			putback(ch);
+			putback(static_cast<char>(ch));
 			return(bCombineStrings);
 		}
 	}

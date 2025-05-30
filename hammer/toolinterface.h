@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+// dimhotepus: Add ChunkFileResult_t for strongly typed interface
+#include "chunkfile.h"
 
 class CMapView2D;
 class CMapView3D;
@@ -24,8 +26,6 @@ class CChunkFile;
 class CSaveInfo;
 
 #define	HANDLE_RADIUS		4
-
-enum ChunkFileResult_t;
 
 
 enum ToolID_t
@@ -104,8 +104,8 @@ public:
 	virtual ToolID_t GetToolID(void) { return TOOL_NONE; }
 
 	virtual const char* GetVMFChunkName() { return NULL; }
-	virtual ChunkFileResult_t LoadVMF(CChunkFile *pFile) { return (ChunkFileResult_t)0; /*ChunkFile_Ok*/ }
-	virtual ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo) { return (ChunkFileResult_t)0 ; /*ChunkFile_Ok*/ }
+	[[nodiscard]] virtual ChunkFileResult_t LoadVMF(CChunkFile *pFile) { return ChunkFile_Ok; }
+	[[nodiscard]] virtual ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo) { return ChunkFile_Ok; }
 	//
 	// Messages sent by the 3D view:
 	//

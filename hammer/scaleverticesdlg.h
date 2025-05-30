@@ -14,10 +14,13 @@
 // ScaleVerticesDlg.h : header file
 //
 
+#include "windows/base_dlg.h"
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CScaleVerticesDlg dialog
 
-class CScaleVerticesDlg : public CDialog
+class CScaleVerticesDlg : public CBaseDlg
 {
 // Construction
 public:

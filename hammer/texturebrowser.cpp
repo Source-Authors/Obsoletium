@@ -5,11 +5,10 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "TextureBrowser.h"
+
 #include <oleauto.h>
 #include <oaidl.h>
-#if _MSC_VER < 1300
-#include <afxpriv.h>
-#endif
 #include "CustomMessages.h"
 #include "GlobalFunctions.h"
 #include "History.h"
@@ -19,7 +18,6 @@
 #include "MapDoc.h"
 #include "MapWorld.h"
 #include "ReplaceTexDlg.h"
-#include "TextureBrowser.h"
 #include "TextureSystem.h"
 #include "hammer.h"
 #include "Selection.h"
@@ -35,7 +33,7 @@ int CTextureBrowser::m_nFilterHistory;
 char CTextureBrowser::m_szLastKeywords[MAX_PATH];
 
 
-BEGIN_MESSAGE_MAP(CTextureBrowser, CDialog)
+BEGIN_MESSAGE_MAP(CTextureBrowser, CBaseDlg)
 	//{{AFX_MSG_MAP(CTextureBrowser)
 	ON_WM_SIZE()
 	ON_CBN_SELENDOK(IDC_TEXTURESIZE, OnSelendokTexturesize)
@@ -66,12 +64,12 @@ END_MESSAGE_MAP()
 // Input  : pParent - 
 //-----------------------------------------------------------------------------
 CTextureBrowser::CTextureBrowser(CWnd* pParent)
-	: CDialog(IDD, pParent)
+	: CBaseDlg(IDD, pParent)
 {
 	m_szNameFilter[0] = '\0';
 	szInitialTexture[0] = '\0';
 	m_bFilterChanged = FALSE;
-	m_uLastFilterChange = 0xffffffff;
+	m_uLastFilterChange = (time_t)-1;
 	m_bUsed = FALSE;
 	m_szLastKeywords[0] = '\0';
 }
@@ -86,7 +84,7 @@ void CTextureBrowser::OnSize(UINT nType, int cx, int cy)
 {
 	if (nType == SIZE_MINIMIZED || !IsWindow(m_cTextureWindow.m_hWnd))
 	{
-		CDialog::OnSize(nType, cx, cy);
+		__super::OnSize(nType, cx, cy);
 		return;
 	}
 	
@@ -177,7 +175,7 @@ void CTextureBrowser::OnSize(UINT nType, int cx, int cy)
 		}
 	}
 
-	CDialog::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 }
 
 
@@ -220,7 +218,7 @@ void CTextureBrowser::OnClose(void)
 {
 	WriteSettings();
 	SaveAndExit();
-	CDialog::OnCancel();
+	__super::OnCancel();
 }
 
 
@@ -231,7 +229,7 @@ void CTextureBrowser::OnCancel()
 {
 	WriteSettings();
 	SaveAndExit();
-	CDialog::OnCancel();
+	__super::OnCancel();
 }
 
 
@@ -253,7 +251,7 @@ void CTextureBrowser::OnUsed()
 //-----------------------------------------------------------------------------
 void CTextureBrowser::SetInitialTexture(LPCTSTR pszTexture)
 {
-	strcpy(szInitialTexture, pszTexture);
+	V_strcpy_safe(szInitialTexture, pszTexture);
 }
 
 
@@ -268,13 +266,17 @@ void CTextureBrowser::OnSelendokTexturesize()
 	switch(iCurSel)
 	{
 	case 0:
-		m_cTextureWindow.SetDisplaySize(128);
+		m_cTextureWindow.SetDisplaySize(128, 128);
 		break;
 	case 1:
-		m_cTextureWindow.SetDisplaySize(256);
+		m_cTextureWindow.SetDisplaySize(256, 256);
 		break;
 	case 2:
-		m_cTextureWindow.SetDisplaySize(512);
+		m_cTextureWindow.SetDisplaySize(512, 512);
+		break;
+	// dimhotepus: Add 1024x1024 view for new textures.
+	case 3:
+		m_cTextureWindow.SetDisplaySize(1024, 1024);
 		break;
 	}
 }
@@ -285,7 +287,7 @@ void CTextureBrowser::OnSelendokTexturesize()
 //-----------------------------------------------------------------------------
 BOOL CTextureBrowser::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// Iterate all the active textures for debugging.
 	//int nCount = g_Textures.GetActiveTextureCount();
@@ -461,7 +463,7 @@ void CTextureBrowser::OnUpdateKeywordsNOW()
 // Purpose: Timer used to control updates when the filter terms change.
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CTextureBrowser::OnTimer(UINT nIDEvent) 
+void CTextureBrowser::OnTimer(UINT_PTR nIDEvent) 
 {
 	if (!m_bFilterChanged)
 	{
@@ -487,7 +489,7 @@ void CTextureBrowser::OnTimer(UINT nIDEvent)
 		SetTimer(nIDEvent, 500, NULL);
 	}
 
-	CDialog::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 }
 
 
@@ -590,7 +592,7 @@ void CTextureBrowser::SetFilter(const char *pszFilter)
 {
 	if (pszFilter)
 	{
-		strcpy(m_szNameFilter, pszFilter);
+		V_strcpy_safe(m_szNameFilter, pszFilter);
 	}
 	else
 	{

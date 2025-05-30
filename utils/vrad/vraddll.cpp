@@ -5,14 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
-//#include <strstrea.h>
 #include "vraddll.h"
+
 #include "bsplib.h"
 #include "vrad.h"
 #include "map_shared.h"
 #include "lightmap.h"
 #include "threads.h"
 
+#include "winlite.h"
 
 static CUtlVector<unsigned char> g_LastGoodLightData;
 static CUtlVector<unsigned char> g_FacesTouched;
@@ -78,7 +79,7 @@ dat g_Dats[] =
 int CalcDatSize()
 {
 	int ret = 0;
-	int count = sizeof( g_Dats ) / sizeof( g_Dats[0] );
+	constexpr int count = sizeof( g_Dats ) / sizeof( g_Dats[0] );
 	
 	int i;
 	for( i=1; i < count; i++ )
@@ -190,7 +191,7 @@ bool CVRadDLL::DoIncrementalLight( char const *pVMFFile )
 	// set up sky cameras
 	ProcessSkyCameras();
 		
-	g_bInterrupt = false;
+	g_bInterrupt.store(false, std::memory_order::memory_order_relaxed);
 	if( RadWorld_Go() )
 	{
 		// Save off the last finished lighting results for the BSP.
@@ -202,7 +203,7 @@ bool CVRadDLL::DoIncrementalLight( char const *pVMFFile )
 	}
 	else
 	{
-		g_iCurFace = 0;
+		g_iCurFace.store(0, std::memory_order::memory_order_relaxed);
 		return false;
 	}
 }
@@ -231,13 +232,13 @@ bool CVRadDLL::Serialize()
 
 float CVRadDLL::GetPercentComplete()
 {
-	return (float)g_iCurFace / numfaces;
+	return static_cast<float>(g_iCurFace.load(std::memory_order::memory_order_relaxed) / numfaces);
 }
 
 
 void CVRadDLL::Interrupt()
 {
-	g_bInterrupt = true;
+	g_bInterrupt.store(true, std::memory_order::memory_order_relaxed);
 }
 
 

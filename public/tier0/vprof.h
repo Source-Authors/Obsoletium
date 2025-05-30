@@ -22,92 +22,104 @@
 // Profiling instrumentation macros
 //
 
-#define MAXCOUNTERS 256
+constexpr inline int MAXCOUNTERS = 256;
 
 
 #ifdef VPROF_ENABLED
 
 #define VPROF_VTUNE_GROUP
 
-#define	VPROF( name )						VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0)
-#define	VPROF_ASSERT_ACCOUNTED( name )		VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, true, 0)
-#define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags )		VPROF_##detail(name,group, bAssertAccounted, budgetFlags)
+#define	VPROF_( name, detail, group, bAssertAccounted, budgetFlags ) \
+	VPROF_##detail(name, group, bAssertAccounted, budgetFlags)
+#define	VPROF( name ) \
+	VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0)
+#define	VPROF_ASSERT_ACCOUNTED( name ) \
+	VPROF_(name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, true, 0)
 
-#define VPROF_BUDGET( name, group )					VPROF_BUDGET_FLAGS(name, group, BUDGETFLAG_OTHER)
-#define VPROF_BUDGET_FLAGS( name, group, flags )	VPROF_(name, 0, group, false, flags)
+#define VPROF_BUDGET_FLAGS( name, group, flags ) \
+	VPROF_(name, 0, group, false, flags)
+#define VPROF_BUDGET( name, group ) \
+	VPROF_BUDGET_FLAGS(name, group, BUDGETFLAG_OTHER)
 
 #define VPROF_SCOPE_BEGIN( tag )	do { VPROF( tag )
 #define VPROF_SCOPE_END()			} while (0)
 
 #define VPROF_ONLY( expression )	expression
 
-#define VPROF_ENTER_SCOPE( name )			g_VProfCurrentProfile.EnterScope( name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0 )
-#define VPROF_EXIT_SCOPE()					g_VProfCurrentProfile.ExitScope()
+#define VPROF_ENTER_SCOPE( name ) \
+	g_VProfCurrentProfile.EnterScope( name, 1, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, false, 0 )
+#define VPROF_EXIT_SCOPE() \
+	g_VProfCurrentProfile.ExitScope()
 
-#define VPROF_BUDGET_GROUP_ID_UNACCOUNTED 0
+constexpr inline int VPROF_BUDGET_GROUP_ID_UNACCOUNTED{0};
 
 
 // Budgetgroup flags. These are used with VPROF_BUDGET_FLAGS.
 // These control which budget panels the groups show up in.
 // If a budget group uses VPROF_BUDGET, it gets the default 
 // which is BUDGETFLAG_OTHER.
-#define BUDGETFLAG_CLIENT	(1<<0)		// Shows up in the client panel.
-#define BUDGETFLAG_SERVER	(1<<1)		// Shows up in the server panel.
-#define BUDGETFLAG_OTHER	(1<<2)		// Unclassified (the client shows these but the dedicated server doesn't).
-#define BUDGETFLAG_HIDDEN	(1<<15)
-#define BUDGETFLAG_ALL		0xFFFF
-
+// dimhotepus: Defines -> enum.
+enum {
+	BUDGETFLAG_CLIENT =	(1<<0),		// Shows up in the client panel.
+	BUDGETFLAG_SERVER = (1<<1),		// Shows up in the server panel.
+	BUDGETFLAG_OTHER  = (1<<2),		// Unclassified (the client shows these but the dedicated server doesn't).
+	BUDGETFLAG_HIDDEN = (1<<15),
+	BUDGETFLAG_ALL	  = 0xFFFF
+};
 
 // NOTE: You can use strings instead of these defines. . they are defined here and added
 // in vprof.cpp so that they are always in the same order.
-#define VPROF_BUDGETGROUP_OTHER_UNACCOUNTED			_T("Unaccounted")
-#define VPROF_BUDGETGROUP_WORLD_RENDERING			_T("World Rendering")
-#define VPROF_BUDGETGROUP_DISPLACEMENT_RENDERING	_T("Displacement_Rendering")
-#define VPROF_BUDGETGROUP_GAME						_T("Game")
-#define VPROF_BUDGETGROUP_NPCS						_T("NPCs")
-#define VPROF_BUDGETGROUP_SERVER_ANIM				_T("Server Animation")
-#define VPROF_BUDGETGROUP_PHYSICS					_T("Physics")
-#define VPROF_BUDGETGROUP_STATICPROP_RENDERING		_T("Static_Prop_Rendering")
-#define VPROF_BUDGETGROUP_MODEL_RENDERING			_T("Other_Model_Rendering")
-#define VPROF_BUDGETGROUP_MODEL_FAST_PATH_RENDERING _T("Fast Path Model Rendering")
-#define VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING		_T("Brush_Model_Rendering")
-#define VPROF_BUDGETGROUP_SHADOW_RENDERING			_T("Shadow_Rendering")
-#define VPROF_BUDGETGROUP_DETAILPROP_RENDERING		_T("Detail_Prop_Rendering")
-#define VPROF_BUDGETGROUP_PARTICLE_RENDERING		_T("Particle/Effect_Rendering")
-#define VPROF_BUDGETGROUP_ROPES						_T("Ropes")
-#define VPROF_BUDGETGROUP_DLIGHT_RENDERING			_T("Dynamic_Light_Rendering")
-#define VPROF_BUDGETGROUP_OTHER_NETWORKING			_T("Networking")
-#define VPROF_BUDGETGROUP_CLIENT_ANIMATION			_T("Client_Animation")
-#define VPROF_BUDGETGROUP_OTHER_SOUND				_T("Sound")
-#define VPROF_BUDGETGROUP_OTHER_VGUI				_T("VGUI")
-#define VPROF_BUDGETGROUP_OTHER_FILESYSTEM			_T("FileSystem")
-#define VPROF_BUDGETGROUP_PREDICTION				_T("Prediction")
-#define VPROF_BUDGETGROUP_INTERPOLATION				_T("Interpolation")
-#define VPROF_BUDGETGROUP_SWAP_BUFFERS				_T("Swap_Buffers")
-#define VPROF_BUDGETGROUP_PLAYER					_T("Player")
-#define VPROF_BUDGETGROUP_OCCLUSION					_T("Occlusion")
-#define VPROF_BUDGETGROUP_OVERLAYS					_T("Overlays")
-#define VPROF_BUDGETGROUP_TOOLS						_T("Tools")
-#define VPROF_BUDGETGROUP_LIGHTCACHE				_T("Light_Cache")
-#define VPROF_BUDGETGROUP_DISP_HULLTRACES			_T("Displacement_Hull_Traces")
-#define VPROF_BUDGETGROUP_TEXTURE_CACHE				_T("Texture_Cache")
-#define VPROF_BUDGETGROUP_REPLAY					_T("Replay")
-#define VPROF_BUDGETGROUP_PARTICLE_SIMULATION		_T("Particle Simulation")
-#define VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING	_T("Flashlight Shadows")
-#define VPROF_BUDGETGROUP_CLIENT_SIM				_T("Client Simulation") // think functions, tempents, etc.
-#define VPROF_BUDGETGROUP_STEAM						_T("Steam") 
-#define VPROF_BUDGETGROUP_CVAR_FIND					_T("Cvar_Find") 
-#define VPROF_BUDGETGROUP_CLIENTLEAFSYSTEM			_T("ClientLeafSystem")
-#define VPROF_BUDGETGROUP_JOBS_COROUTINES			_T("Jobs/Coroutines")
-#define VPROF_BUDGETGROUP_SLEEPING					_T("Sleeping")
-#define VPROF_BUDGETGROUP_THREADINGMAIN				_T("ThreadingMain")
-#define VPROF_BUDGETGROUP_HTMLSURFACE				_T("HTMLSurface")
-#define VPROF_BUDGETGROUP_VGUI						VPROF_BUDGETGROUP_HTMLSURFACE
-#define VPROF_BUDGETGROUP_TENFOOT					VPROF_BUDGETGROUP_HTMLSURFACE
-#define VPROF_BUDGETGROUP_STEAMUI					VPROF_BUDGETGROUP_HTMLSURFACE
-#define VPROF_BUDGETGROUP_ATTRIBUTES				_T("Attributes")
-#define VPROF_BUDGETGROUP_FINDATTRIBUTE				_T("FindAttribute")
-#define VPROF_BUDGETGROUP_FINDATTRIBUTEUNSAFE		_T("FindAttributeUnsafe")
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_UNACCOUNTED[] =		_T("Unaccounted");
+constexpr inline tchar VPROF_BUDGETGROUP_WORLD_RENDERING[] =		_T("World Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_DISPLACEMENT_RENDERING[] = _T("Displacement_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_GAME[]					  = _T("Game");
+constexpr inline tchar VPROF_BUDGETGROUP_NPCS[]					  = _T("NPCs");
+constexpr inline tchar VPROF_BUDGETGROUP_SERVER_ANIM[]			  = _T("Server Animation");
+constexpr inline tchar VPROF_BUDGETGROUP_PHYSICS[]				  = _T("Physics");
+constexpr inline tchar VPROF_BUDGETGROUP_STATICPROP_RENDERING[]	  = _T("Static_Prop_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_MODEL_RENDERING[]		  = _T("Other_Model_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_MODEL_FAST_PATH_RENDERING[] = _T("Fast Path Model Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING[]		= _T("Brush_Model_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_SHADOW_RENDERING[]	=		_T("Shadow_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_DETAILPROP_RENDERING[]	=	_T("Detail_Prop_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_PARTICLE_RENDERING[] =		_T("Particle/Effect_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_ROPES[] =					_T("Ropes");
+constexpr inline tchar VPROF_BUDGETGROUP_DLIGHT_RENDERING[]	=		_T("Dynamic_Light_Rendering");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_NETWORKING[]	=		_T("Networking");
+constexpr inline tchar VPROF_BUDGETGROUP_CLIENT_ANIMATION[] =		_T("Client_Animation");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_SOUND[] =			_T("Sound");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_VGUI[] = 			_T("VGUI");
+constexpr inline tchar VPROF_BUDGETGROUP_OTHER_FILESYSTEM[]	=		_T("FileSystem");
+constexpr inline tchar VPROF_BUDGETGROUP_PREDICTION[] =				_T("Prediction");
+constexpr inline tchar VPROF_BUDGETGROUP_INTERPOLATION[] =			_T("Interpolation");
+constexpr inline tchar VPROF_BUDGETGROUP_SWAP_BUFFERS[] =			_T("Swap_Buffers");
+constexpr inline tchar VPROF_BUDGETGROUP_PLAYER[] = 				_T("Player");
+constexpr inline tchar VPROF_BUDGETGROUP_OCCLUSION[] =				_T("Occlusion");
+constexpr inline tchar VPROF_BUDGETGROUP_OVERLAYS[]	=				_T("Overlays");
+constexpr inline tchar VPROF_BUDGETGROUP_TOOLS[] = 					_T("Tools");
+constexpr inline tchar VPROF_BUDGETGROUP_LIGHTCACHE[] = 			_T("Light_Cache");
+constexpr inline tchar VPROF_BUDGETGROUP_DISP_HULLTRACES[] =		_T("Displacement_Hull_Traces");
+constexpr inline tchar VPROF_BUDGETGROUP_TEXTURE_CACHE[] =			_T("Texture_Cache");
+constexpr inline tchar VPROF_BUDGETGROUP_REPLAY[] =					_T("Replay");
+constexpr inline tchar VPROF_BUDGETGROUP_PARTICLE_SIMULATION[] =	_T("Particle Simulation");
+constexpr inline tchar VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING[] =	_T("Flashlight Shadows");
+constexpr inline tchar VPROF_BUDGETGROUP_CLIENT_SIM[] =				_T("Client Simulation"); // think functions, tempents, etc.
+constexpr inline tchar VPROF_BUDGETGROUP_STEAM[] = 					_T("Steam");
+constexpr inline tchar VPROF_BUDGETGROUP_CVAR_FIND[] =				_T("Cvar_Find");
+constexpr inline tchar VPROF_BUDGETGROUP_CLIENTLEAFSYSTEM[] = 		_T("ClientLeafSystem");
+constexpr inline tchar VPROF_BUDGETGROUP_JOBS_COROUTINES[] =		_T("Jobs/Coroutines");
+constexpr inline tchar VPROF_BUDGETGROUP_SLEEPING[] =				_T("Sleeping");
+constexpr inline tchar VPROF_BUDGETGROUP_THREADINGMAIN[] =			_T("ThreadingMain");
+constexpr inline tchar VPROF_BUDGETGROUP_HTMLSURFACE[] =			_T("HTMLSurface");
+// dimhotepus: tchar[] -> tchar*
+constexpr inline auto VPROF_BUDGETGROUP_VGUI =						VPROF_BUDGETGROUP_HTMLSURFACE;
+// dimhotepus: tchar[] -> tchar*
+constexpr inline auto VPROF_BUDGETGROUP_TENFOOT =					VPROF_BUDGETGROUP_HTMLSURFACE;
+// dimhotepus: tchar[] -> tchar*
+constexpr inline auto VPROF_BUDGETGROUP_STEAMUI =					VPROF_BUDGETGROUP_HTMLSURFACE;
+constexpr inline tchar VPROF_BUDGETGROUP_ATTRIBUTES[] =				_T("Attributes");
+constexpr inline tchar VPROF_BUDGETGROUP_FINDATTRIBUTE[] = 			_T("FindAttribute");
+constexpr inline tchar VPROF_BUDGETGROUP_FINDATTRIBUTEUNSAFE[] =	_T("FindAttributeUnsafe");
 
 //-------------------------------------
 
@@ -122,28 +134,35 @@
 #define VPROF_VAR_NAME_INTERNAL( a, b )		VPROF_VAR_NAME_INTERNAL_CAT( a, b )
 #define VPROF_VAR_NAME( a )					VPROF_VAR_NAME_INTERNAL( a, __LINE__ )
 
-#define	VPROF_0(name,group,assertAccounted,budgetFlags)	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "(%s)%s", group, name ); CVProfScope VPROF_VAR_NAME( VProf_ )(name, 0, group, assertAccounted, budgetFlags);
+#define	VPROF_0(name,group,assertAccounted,budgetFlags) \
+	tmZone( TELEMETRY_LEVEL2, TMZF_NONE, "(%s)%s", group, name ); \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 0, group, assertAccounted, budgetFlags);
 
 #if VPROF_LEVEL > 0 
-#define	VPROF_1(name,group,assertAccounted,budgetFlags)	tmZone( TELEMETRY_LEVEL3, TMZF_NONE, "(%s)%s", group, name ); CVProfScope VPROF_VAR_NAME( VProf_ )(name, 1, group, assertAccounted, budgetFlags);
+#define	VPROF_1(name,group,assertAccounted,budgetFlags) \
+	tmZone( TELEMETRY_LEVEL3, TMZF_NONE, "(%s)%s", group, name ); \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 1, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_1(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
 
 #if VPROF_LEVEL > 1 
-#define	VPROF_2(name,group,assertAccounted,budgetFlags)	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 2, group, assertAccounted, budgetFlags);
+#define	VPROF_2(name,group,assertAccounted,budgetFlags) \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 2, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_2(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
 
 #if VPROF_LEVEL > 2 
-#define	VPROF_3(name,group,assertAccounted,budgetFlags)	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 3, group, assertAccounted, budgetFlags);
+#define	VPROF_3(name,group,assertAccounted,budgetFlags) \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 3, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_3(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
 
 #if VPROF_LEVEL > 3 
-#define	VPROF_4(name,group,assertAccounted,budgetFlags)	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 4, group, assertAccounted, budgetFlags);
+#define	VPROF_4(name,group,assertAccounted,budgetFlags) \
+	CVProfScope VPROF_VAR_NAME( VProf_ )(name, 4, group, assertAccounted, budgetFlags);
 #else
 #define	VPROF_4(name,group,assertAccounted,budgetFlags)	((void)0)
 #endif
@@ -173,8 +192,16 @@
 
 //-------------------------------------
 
-#define VPROF_INCREMENT_COUNTER(name,amount)			do { static CVProfCounter _counter( name ); _counter.Increment( amount ); } while( 0 )
-#define VPROF_INCREMENT_GROUP_COUNTER(name,group,amount)			do { static CVProfCounter _counter( name, group ); _counter.Increment( amount ); } while( 0 )
+#define VPROF_INCREMENT_COUNTER(name,amount) \
+	do { \
+		static CVProfCounter _counter( name ); \
+		_counter.Increment( amount ); \
+	} while( 0 )
+#define VPROF_INCREMENT_GROUP_COUNTER(name,group,amount) \
+	do { \
+		static CVProfCounter _counter( name, group ); \
+		_counter.Increment( amount ); \
+	} while( 0 )
 
 #else
 
@@ -212,8 +239,8 @@
 
 class DBG_CLASS CVProfNode 
 {
-friend class CVProfRecorder;
-friend class CVProfile;
+	friend class CVProfRecorder;
+	friend class CVProfile;
 
 public:
 	CVProfNode( const tchar * pszName, int detailLevel, CVProfNode *pParent, const tchar *pBudgetGroupName, int budgetFlags );
@@ -271,8 +298,9 @@ public:
 	// Not used in the common case...
 	void SetCurFrameTime( unsigned long milliseconds );
 	
-	void SetClientData( int iClientData )	{ m_iClientData = iClientData; }
-	int GetClientData() const				{ return m_iClientData; }
+	// dimhotepus: Use intp instead of int for user data.
+	void SetClientData( intp iClientData )	{ m_iClientData = iClientData; }
+	intp GetClientData() const				{ return m_iClientData; }
 
 #ifdef DBGFLAG_VALIDATE
 	void Validate( CValidator &validator, tchar *pchName );		// Validate our internal structures
@@ -348,8 +376,8 @@ private:
 	CVProfNode *m_pSibling;
 
 	int m_BudgetGroupID;
-	
-	int m_iClientData;
+
+	intp m_iClientData;
 	int m_iUniqueNodeID;
 };
 
@@ -469,14 +497,17 @@ public:
 	void HideBudgetGroup( int budgetGroupID, bool bHide = true );
 	void HideBudgetGroup( const char *pszName, bool bHide = true ) { HideBudgetGroup( BudgetGroupNameToBudgetGroupID( pszName), bHide ); }
 
-	intp *FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup=COUNTER_GROUP_DEFAULT  );
+	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
+	uintp *FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup=COUNTER_GROUP_DEFAULT  );
 	void ResetCounters( CounterGroup_t eCounterGroup );
 	
 	int GetNumCounters( void ) const;
 	
 	const tchar *GetCounterName( int index ) const;
-	intp GetCounterValue( int index ) const;
-	const tchar *GetCounterNameAndValue( int index, intp &val ) const;
+	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
+	uintp GetCounterValue( int index ) const;
+	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
+	const tchar *GetCounterNameAndValue( int index, uintp &val ) const;
 	CounterGroup_t GetCounterGroup( int index ) const;
 
 	// Performance monitoring events.
@@ -540,7 +571,7 @@ protected:
 	bool		m_bPMEInit;
 	bool		m_bPMEEnabled;
 
-	intp m_Counters[MAXCOUNTERS];
+	uintp m_Counters[MAXCOUNTERS];
 	char m_CounterGroups[MAXCOUNTERS]; // (These are CounterGroup_t's).
 	tchar *m_CounterNames[MAXCOUNTERS];
 	int m_NumCounters;
@@ -897,7 +928,7 @@ inline void CVProfile::Stop()
 
 //-------------------------------------
 
-inline void CVProfile::EnterScope( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, bool bAssertAccounted, int budgetFlags )
+inline void CVProfile::EnterScope( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, [[maybe_unused]] bool bAssertAccounted, int budgetFlags )
 {
 	if ( ( m_enabled != 0 || !m_fAtRoot ) && InTargetThread() ) // if became disabled, need to unwind back to root before stopping
 	{
@@ -1069,18 +1100,46 @@ class CVProfCounter
 {
 public:
 	CVProfCounter( const tchar *pName, CounterGroup_t group=COUNTER_GROUP_DEFAULT )
+		: m_pName{ pName },
+		  m_pCounter{ g_VProfCurrentProfile.FindOrCreateCounter( pName, group ) }
 	{
-		m_pCounter = g_VProfCurrentProfile.FindOrCreateCounter( pName, group );
 		Assert( m_pCounter );
 	}
 	~CVProfCounter() = default;
 	void Increment( intp val ) 
 	{ 
 		Assert( m_pCounter );
-		*m_pCounter += val; 
+
+		// dimhotepus: Check overflows / underflows.
+		if (val >= 0)
+		{
+			[[maybe_unused]] constexpr auto maxCounterValue = std::numeric_limits<
+				std::remove_pointer_t<decltype(m_pCounter)>
+			>::max();
+
+			AssertMsg( maxCounterValue - static_cast<uintp>(val) >=	*m_pCounter,
+				"%s counter overflow. %zu (total) + %zd (value) > %zu (max).",
+				m_pName,
+				*m_pCounter,
+				val,
+				maxCounterValue );
+
+			*m_pCounter += val;
+		}
+		else
+		{
+			AssertMsg( *m_pCounter >= static_cast<uintp>(-val),
+				"%s counter underflow. %zu (total) < %zd (value).",
+				m_pName,
+				*m_pCounter,
+				val );
+
+			*m_pCounter -= -val;
+		}
 	}
 private:
-	intp *m_pCounter;
+	const tchar *m_pName;
+	uintp *m_pCounter;
 };
 
 #endif

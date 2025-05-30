@@ -20,10 +20,6 @@
 #include "utilmatlib.h"
 #include "ChunkFile.h"
 
-#ifdef WIN32
-#pragma warning( disable: 4706 )
-#endif
-
 class CUtlBuffer;
 
 #define	MAX_BRUSH_SIDES	128
@@ -279,7 +275,12 @@ public:
 	static char			m_InstancePath[ MAX_PATH ];
 	static void			SetInstancePath( const char *pszInstancePath );
 	static const char	*GetInstancePath( void ) { return m_InstancePath; }
-	static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, char *pszOutFileName );
+	static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_CAP(outFileNameSize) char *pszOutFileName, intp outFileNameSize );
+	template<intp outFileNameSize>
+	static bool			DeterminePath( const char *pszBaseFileName, const char *pszInstanceFileName, OUT_Z_ARRAY char (&pszOutFileName)[outFileNameSize] )
+	{
+		return DeterminePath( pszBaseFileName, pszInstanceFileName, pszOutFileName, outFileNameSize );
+	}
 
 	void				CheckForInstances( const char *pszFileName );
 	void				MergeInstance( entity_t *pInstanceEntity, CMapFile *Instance );
@@ -367,7 +368,7 @@ extern	bool		g_bAllowDetailCracks;
 extern	bool		g_bNoVirtualMesh;
 extern	char		outbase[32];
 
-extern	char	source[1024];
+extern	char	source[512];
 extern char		mapbase[ 64 ];
 extern CUtlVector<int> g_SkyAreas;
 
@@ -391,7 +392,7 @@ extern	textureref_t	textureref[MAX_MAP_TEXTURES];
 
 int	FindMiptex (const char *name);
 
-int TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& origin);
+intp TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& origin);
 int GetSurfaceProperties2( MaterialSystemMaterial_t matID, const char *pMatName );
 
 extern int g_SurfaceProperties[MAX_MAP_TEXDATA];
@@ -597,9 +598,9 @@ int FindTexData( const char *pName );
 int FindOrCreateTexData( const char *pName );
 // Add a clone of an existing texdata with a new name
 int AddCloneTexData( dtexdata_t *pExistingTexData, char const *cloneTexDataName );
-int FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
+intp FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
 int FindAliasedTexData( const char *pName, dtexdata_t *sourceTexture );
-int FindTexInfo( const texinfo_t &searchTexInfo );
+intp FindTexInfo( const texinfo_t &searchTexInfo );
 
 //=============================================================================
 // normals.c
@@ -607,7 +608,7 @@ void SaveVertexNormals( void );
 
 //=============================================================================
 // cubemap.cpp
-void Cubemap_InsertSample( const Vector& origin, int size );
+void Cubemap_InsertSample( const Vector& origin, byte size );
 void Cubemap_CreateDefaultCubemaps( void );
 void Cubemap_SaveBrushSides( const char *pSideListStr );
 void Cubemap_FixupBrushSidesMaterials( void );

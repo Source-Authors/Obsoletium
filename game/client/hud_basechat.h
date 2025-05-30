@@ -86,8 +86,8 @@ enum TextColor
 struct TextRange
 {
 	TextRange() { preserveAlpha = false; }
-	int start;
-	int end;
+	intp start;
+	intp end;
 	Color color;
 	bool preserveAlpha;
 };
@@ -140,7 +140,7 @@ public:
 	vgui::HFont		GetFont() { return m_hFont; }
 
 	Color			GetTextColor( void ) { return m_clrText; }
-	void			SetNameLength( int iLength ) { m_iNameLength = iLength;	}
+	void			SetNameLength( intp iLength ) { m_iNameLength = iLength;	}
 	void			SetNameColor( Color cColor ){ m_clrNameColor = cColor; 	}
 		
 	virtual void	PerformFadeout( void );
@@ -148,10 +148,10 @@ public:
 	virtual			void Colorize( int alpha = 255 );								///< Re-inserts the text in the appropriate colors at the given alpha
 
 
-	void			SetNameStart( int iStart ) { m_iNameStart = iStart;	}
+	void			SetNameStart( intp iStart ) { m_iNameStart = iStart;	}
 
 protected:
-	int				m_iNameLength;
+	intp			m_iNameLength;
 	vgui::HFont		m_hFont;
 
 	Color			m_clrText;
@@ -162,7 +162,7 @@ protected:
 	CUtlVector< TextRange > m_textRanges;
 	wchar_t					*m_text;
 
-	int				m_iNameStart;
+	intp			m_iNameStart;
 	
 private:
 	float			m_flStartTime;

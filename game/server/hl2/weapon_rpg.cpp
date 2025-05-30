@@ -1143,7 +1143,7 @@ void CAPCMissile::SetGuidanceHint( const char *pHintName )
 //-----------------------------------------------------------------------------
 void CAPCMissile::DoExplosion( void )
 {
-	if ( GetWaterLevel() != 0 )
+	if ( GetWaterLevel() != WaterLevel::WL_NotInWater )
 	{
 		CEffectData data;
 		data.m_vOrigin = WorldSpaceCenter();
@@ -1457,7 +1457,8 @@ void CWeaponRPG::Precache( void )
 	PrecacheScriptSound( "Missile.Accelerate" );
 
 	// Laser dot...
-	PrecacheModel( "sprites/redglow1.vmt" );
+	// dimhotepus: Do not precache laser dot twice.
+	// PrecacheModel( "sprites/redglow1.vmt" );
 	PrecacheModel( RPG_LASER_SPRITE );
 	PrecacheModel( RPG_BEAM_SPRITE );
 

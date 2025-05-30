@@ -503,7 +503,7 @@ bool C_BasePlayer::AudioStateIsUnderwater( Vector vecMainViewOrigin )
 		return (cont & MASK_WATER);
 	}
 
-	return ( GetWaterLevel() >= WL_Eyes );
+	return ( GetWaterLevel() >= WaterLevel::WL_Eyes );
 }
 
 bool C_BasePlayer::IsHLTV() const
@@ -1325,7 +1325,7 @@ extern float UTIL_WaterLevel( const Vector &position, float minz, float maxz );
 void C_BasePlayer::CreateWaterEffects( void )
 {
 	// Must be completely submerged to bother
-	if ( GetWaterLevel() < 3 )
+	if ( GetWaterLevel() < WaterLevel::WL_Eyes )
 	{
 		m_bResampleWaterSurface = true;
 		return;
@@ -1393,7 +1393,7 @@ void C_BasePlayer::CreateWaterEffects( void )
 		pParticle->m_uchStartAlpha	= 255;
 		pParticle->m_uchEndAlpha	= 0;
 		
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -0.5f, 0.5f );
 	}
 }
@@ -2242,16 +2242,16 @@ void C_BasePlayer::PlayPlayerJingle()
 		return;
 
 	char soundhex[ 16 ];
-	Q_binarytohex( (byte *)&info.customFiles[1], sizeof( info.customFiles[1] ), soundhex, sizeof( soundhex ) );
+	V_binarytohex( info.customFiles[1], soundhex );
 
 	// See if logo has been downloaded.
 	char fullsoundname[ 512 ];
-	Q_snprintf( fullsoundname, sizeof( fullsoundname ), "sound/temp/%s.wav", soundhex );
+	V_sprintf_safe( fullsoundname, "sound/temp/%s.wav", soundhex );
 
 	if ( !filesystem->FileExists( fullsoundname ) )
 	{
 		char custname[ 512 ];
-		Q_snprintf( custname, sizeof( custname ), "download/user_custom/%c%c/%s.dat", soundhex[0], soundhex[1], soundhex );
+		V_sprintf_safe( custname, "download/user_custom/%c%c/%s.dat", soundhex[0], soundhex[1], soundhex );
 		// it may have been downloaded but not copied under materials folder
 		if ( !filesystem->FileExists( custname ) )
 			return; // not downloaded yet
@@ -2263,7 +2263,7 @@ void C_BasePlayer::PlayPlayerJingle()
 			return;
 	}
 
-	Q_snprintf( fullsoundname, sizeof( fullsoundname ), "temp/%s.wav", soundhex );
+	V_sprintf_safe( fullsoundname, "temp/%s.wav", soundhex );
 
 	CLocalPlayerFilter filter;
 

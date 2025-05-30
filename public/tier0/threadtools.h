@@ -173,13 +173,13 @@ PLATFORM_INTERFACE void ThreadDetach( ThreadHandle_t );
 PLATFORM_INTERFACE void ThreadSetDebugName( ThreadId_t id, const char *pszName );
 inline void ThreadSetDebugName( const char *pszName ) { ThreadSetDebugName( static_cast<ThreadId_t>(-1), pszName ); }
 
-PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, ptrdiff_t nAffinityMask );
+PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, intp nAffinityMask );
 
 //-----------------------------------------------------------------------------
 
 enum ThreadWaitResult_t
 {
-	TW_FAILED = 0xffffffff, // WAIT_FAILED
+	TW_FAILED = 0xffffffff, // WAIT_FAILED //-V112
 	TW_TIMEOUT = 0x00000102, // WAIT_TIMEOUT
 };
 
@@ -288,18 +288,18 @@ inline unsigned ThreadInterlockedExchangeSubtract( long volatile *p, long value 
 
 #if defined( USE_INTRINSIC_INTERLOCKED ) && !defined( _WIN64 )
 #define TIPTR()
-inline void *ThreadInterlockedExchangePointer( void * volatile *p, void *value )							{ return (void *)_InterlockedExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value) ); }
-inline void *ThreadInterlockedCompareExchangePointer( void * volatile *p, void *value, void *comperand )	{ return (void *)_InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ); }
-inline bool ThreadInterlockedAssignPointerIf( void * volatile *p, void *value, void *comperand )			{ return ( _InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ) == reinterpret_cast<long>(comperand) ); }
+inline void *ThreadInterlockedExchangePointer( void * volatile *p, void *value )							{ return (void *)_InterlockedExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value) ); } //-V114 //-V205 //-V204
+inline void *ThreadInterlockedCompareExchangePointer( void * volatile *p, void *value, void *comperand )	{ return (void *)_InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ); } //-V114 //-V205 //-V204
+inline bool ThreadInterlockedAssignPointerIf( void * volatile *p, void *value, void *comperand )			{ return ( _InterlockedCompareExchange( reinterpret_cast<long volatile *>(p), reinterpret_cast<long>(value), reinterpret_cast<long>(comperand) ) == reinterpret_cast<long>(comperand) ); } //-V114 //-V205
 #else
 PLATFORM_INTERFACE void *ThreadInterlockedExchangePointer( void * volatile *, void *value ) NOINLINE;
 PLATFORM_INTERFACE void *ThreadInterlockedCompareExchangePointer( void * volatile *, void *value, void *comperand ) NOINLINE;
 PLATFORM_INTERFACE bool ThreadInterlockedAssignPointerIf( void * volatile *, void *value, void *comperand ) NOINLINE;
 #endif
 
-inline void const *ThreadInterlockedExchangePointerToConst( void const * volatile *p, void const *value )							{ return ThreadInterlockedExchangePointer( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ) );  }
-inline void const *ThreadInterlockedCompareExchangePointerToConst( void const * volatile *p, void const *value, void const *comperand )	{ return ThreadInterlockedCompareExchangePointer( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ), const_cast < void * > ( comperand ) ); }
-inline bool ThreadInterlockedAssignPointerToConstIf( void const * volatile *p, void const *value, void const *comperand )			{ return ThreadInterlockedAssignPointerIf( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ), const_cast < void * > ( comperand ) ); }
+[[deprecated("Evil const_casts. Use non-const version.")]] inline void const *ThreadInterlockedExchangePointerToConst( void const * volatile *p, void const *value )							{ return ThreadInterlockedExchangePointer( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ) );  } //-V2018
+[[deprecated("Evil const_casts. Use non-const version.")]] inline void const *ThreadInterlockedCompareExchangePointerToConst( void const * volatile *p, void const *value, void const *comperand )	{ return ThreadInterlockedCompareExchangePointer( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ), const_cast < void * > ( comperand ) ); } //-V2018
+[[deprecated("Evil const_casts. Use non-const version.")]] inline bool ThreadInterlockedAssignPointerToConstIf( void const * volatile *p, void const *value, void const *comperand )			{ return ThreadInterlockedAssignPointerIf( const_cast < void * volatile * > ( p ), const_cast < void * > ( value ), const_cast < void * > ( comperand ) ); } //-V2018
 
 #if defined( PLATFORM_64BITS )
 #if defined (_WIN32) && defined( _XM_SSE_INTRINSICS_ )
@@ -403,130 +403,130 @@ PLATFORM_INTERFACE void ThreadNotifySyncReleasing(void *p);
 #ifndef NO_THREAD_LOCAL
 
 class PLATFORM_CLASS CThreadLocalBase
-	{
+{
 public:
-		CThreadLocalBase();
-		~CThreadLocalBase();
+	CThreadLocalBase();
+	~CThreadLocalBase();
 
-		void * Get() const;
-		void   Set(void *);
+	void * Get() const;
+	void   Set(void *);
 
 private:
 #ifdef _WIN32
 	uint32 m_index;
 #elif POSIX
-		pthread_key_t m_index;
+	pthread_key_t m_index;
 #endif
-	};
+};
 
 	//---------------------------------------------------------
 
 #ifndef __AFXTLS_H__
 
-	template <typename T>
-	class CThreadLocal : public CThreadLocalBase
+template <typename T>
+class CThreadLocal : public CThreadLocalBase
+{
+public:
+	CThreadLocal()
 	{
-	public:
-		CThreadLocal()
-		{
-			COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
-		}
+		COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
+	}
 
-		T Get() const
+	T Get() const
+	{
+		if constexpr (std::is_pointer_v<T>)
 		{
-			if constexpr (std::is_pointer_v<T>)
-			{
-				return reinterpret_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
-			}
-			else
-			{
-				return static_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
-			}
+			return reinterpret_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
 		}
+		else
+		{
+			return static_cast<T>( reinterpret_cast<intp>( CThreadLocalBase::Get() ) );
+		}
+	}
 
-		void Set(T val)
+	void Set(T val)
+	{
+		if constexpr (std::is_pointer_v<T>)
 		{
-			if constexpr (std::is_pointer_v<T>)
-			{
-				CThreadLocalBase::Set( reinterpret_cast<void *>( reinterpret_cast<intp>( val ) ) );
-			}
-			else
-			{
-				CThreadLocalBase::Set( reinterpret_cast<void *>( static_cast<intp>( val ) ) );
-			}
+			CThreadLocalBase::Set( reinterpret_cast<void *>( reinterpret_cast<intp>( val ) ) );
 		}
-	};
+		else
+		{
+			CThreadLocalBase::Set( reinterpret_cast<void *>( static_cast<intp>( val ) ) );
+		}
+	}
+};
 
 #endif
 
 	//---------------------------------------------------------
 
 template <typename T = intp>
-	class CThreadLocalInt : public CThreadLocal<T>
-	{
-	public:
+class CThreadLocalInt : public CThreadLocal<T>
+{
+public:
 	CThreadLocalInt()
 	{
 		COMPILE_TIME_ASSERT( sizeof(T) >= sizeof(int) );
 		COMPILE_TIME_ASSERT( sizeof(T) <= sizeof(void *) );
 	}
-
+	
 	operator T() const { return this->Get(); }
 	T	operator=( T i ) { this->Set( i ); return i; }
-
+	
 	T operator++()					{ T i = this->Get(); this->Set( ++i ); return i; }
 	T operator++(int)				{ T i = this->Get(); this->Set( i + 1 ); return i; }
-
+	
 	T operator--()					{ T i = this->Get(); this->Set( --i ); return i; }
 	T operator--(int)				{ T i = this->Get(); this->Set( i - 1 ); return i; }
-	};
+};
 
+//---------------------------------------------------------
 
-	//---------------------------------------------------------
+template <class T>
+class CThreadLocalPtr : private CThreadLocalBase
+{
+public:
+	CThreadLocalPtr() = default;
 
-	template <class T>
-	class CThreadLocalPtr : private CThreadLocalBase
-	{
-	public:
-		CThreadLocalPtr() = default;
+	operator const void *() const							{ return static_cast<T *>(Get()); }
+	operator void *()										{ return static_cast<T *>(Get()); }
 
-		operator const void *() const          					{ return static_cast<T *>(Get()); }
-		operator void *()                      					{ return static_cast<T *>(Get()); }
+	operator const T *() const								{ return static_cast<T *>(Get()); }
+	operator const T *()									{ return static_cast<T *>(Get()); }
+	operator T *()											{ return static_cast<T *>(Get()); }
 
-		operator const T *() const							    { return static_cast<T *>(Get()); }
-		operator const T *()          							{ return static_cast<T *>(Get()); }
-		operator T *()											{ return static_cast<T *>(Get()); }
+	int			operator=( int i )							{ AssertMsg( i == 0, "Only nullptr allowed on integer assign" ); Set( nullptr ); return 0; }
+	nullptr_t	operator=( std::nullptr_t i )				{ Set( nullptr ); return nullptr; }
+	T *			operator=( T *p )							{ Set( p ); return p; }
 
-		int			operator=( int i )							{ AssertMsg( i == 0, "Only nullptr allowed on integer assign" ); Set( nullptr ); return 0; }
-		T *			operator=( T *p )							{ Set( p ); return p; }
+	bool        operator !() const							{ return (!Get()); }
+	bool        operator!=( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() != nullptr); }
+	bool        operator==( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() == nullptr); }
+	bool		operator==( const void *p ) const			{ return (Get() == p); }
+	bool		operator!=( const void *p ) const			{ return (Get() != p); }
+	bool		operator==( const T *p ) const				{ return operator==((const void*)p); }
+	bool		operator!=( const T *p ) const				{ return operator!=((const void*)p); }
 
-		bool        operator !() const							{ return (!Get()); }
-		bool        operator!=( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() != nullptr); }
-		bool        operator==( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() == nullptr); }
-		bool		operator==( const void *p ) const			{ return (Get() == p); }
-		bool		operator!=( const void *p ) const			{ return (Get() != p); }
-		bool		operator==( const T *p ) const				{ return operator==((void*)p); }
-		bool		operator!=( const T *p ) const				{ return operator!=((void*)p); }
+	T *  		operator->()								{ return (T *)Get(); }
+	T &  		operator *()								{ return *((T *)Get()); }
 
-		T *  		operator->()								{ return (T *)Get(); }
-		T &  		operator *()								{ return *((T *)Get()); }
+	const T *   operator->() const							{ return (T *)Get(); }
+	const T &   operator *() const							{ return *((T *)Get()); }
 
-		const T *   operator->() const							{ return (T *)Get(); }
-		const T &   operator *() const							{ return *((T *)Get()); }
+	const T &	operator[]( size_t i ) const				{ return *((T *)Get() + i); }
+	T &			operator[]( size_t i )						{ return *((T *)Get() + i); }
 
-		const T &	operator[]( size_t i ) const					{ return *((T *)Get() + i); }
-		T &			operator[]( size_t i )							{ return *((T *)Get() + i); }
-
-	private:
-		// Disallowed operations
-		CThreadLocalPtr( T *pFrom );
-		CThreadLocalPtr( const CThreadLocalPtr<T> &from );
-		T **operator &();
-		T * const *operator &() const;
-		void operator=( const CThreadLocalPtr<T> &from );
-		bool operator==( const CThreadLocalPtr<T> &p ) const;
-		bool operator!=( const CThreadLocalPtr<T> &p ) const;
-	};
+private:
+	// Disallowed operations
+	CThreadLocalPtr( T *pFrom ) = delete;
+	CThreadLocalPtr( const CThreadLocalPtr<T> &from ) = delete;
+	T **operator &() = delete;
+	T * const *operator &() const = delete;
+	void operator=( const CThreadLocalPtr<T> &from ) = delete;
+	bool operator==( const CThreadLocalPtr<T> &p ) const = delete;
+	bool operator!=( const CThreadLocalPtr<T> &p ) const = delete;
+};
 
 #endif // NO_THREAD_LOCAL
 #endif // !__AFXTLS_H__
@@ -623,15 +623,15 @@ public:
 
 	T *operator=( T *newValue )		{ m_value.exchange(newValue); return newValue; }
 
-	CInterlockedPtr& operator+=( ptrdiff_t add )	{ m_value += add; return *this; }
-	CInterlockedPtr& operator-=( ptrdiff_t subtract )	{ m_value -= subtract; return *this; }
+	CInterlockedPtr& operator+=( intp add )	{ m_value += add; return *this; }
+	CInterlockedPtr& operator-=( intp subtract )	{ m_value -= subtract; return *this; }
 
-	T *operator+( ptrdiff_t rhs ) const		{ return m_value.load() + rhs; }
-	T *operator-( ptrdiff_t rhs ) const		{ return m_value.load() - rhs; }
+	T *operator+( intp rhs ) const		{ return m_value.load() + rhs; }
+	T *operator-( intp rhs ) const		{ return m_value.load() - rhs; }
 	T *operator+( size_t rhs ) const		{ return m_value.load() + rhs; }
 	T *operator-( size_t rhs ) const		{ return m_value.load() - rhs; }
-	ptrdiff_t operator-( T *p ) const		{ return m_value.load() - p; }
-	ptrdiff_t operator-( const CInterlockedPtr<T> &p ) const { return m_value.load() - p.m_value.load(); }
+	intp operator-( T *p ) const		{ return m_value.load() - p; }
+	intp operator-( const CInterlockedPtr<T> &p ) const { return m_value.load() - p.m_value.load(); }
 
 private:
 	std::atomic<T *> m_value;
@@ -709,19 +709,15 @@ public:
 
 private:
 	// Disallow copying
-	CThreadMutex( const CThreadMutex & );
-	CThreadMutex &operator=( const CThreadMutex & );
+	CThreadMutex( const CThreadMutex & ) = delete;
+	CThreadMutex &operator=( const CThreadMutex & ) = delete;
 
-#if defined( _WIN32 )
+#if defined(_WIN32)
 	// Efficient solution to breaking the windows.h dependency, invariant is tested.
-#ifdef _WIN64
-	#define TT_SIZEOF_CRITICALSECTION 40	
+#if defined(_WIN64)
+	#define TT_SIZEOF_CRITICALSECTION 40
 #else
-#ifndef _X360
 	#define TT_SIZEOF_CRITICALSECTION 24
-#else
-	#define TT_SIZEOF_CRITICALSECTION 28
-#endif // !_XBOX
 #endif // _WIN64
 	byte m_CriticalSection[TT_SIZEOF_CRITICALSECTION];
 #elif defined(POSIX)
@@ -940,7 +936,7 @@ template <class MUTEX_TYPE = CThreadMutex>
 class CAutoLockT
 {
 public:
-	FORCEINLINE CAutoLockT( MUTEX_TYPE &lock, const char* pMutexName, const char* pFilename, int nLineNum, uint64 minReportDurationUs )
+	FORCEINLINE CAutoLockT( MUTEX_TYPE &lock, const char* pMutexName, const char* pFilename, int nLineNum, [[maybe_unused]] uint64 minReportDurationUs )
 	: m_lock( const_cast< typename V_remove_const< MUTEX_TYPE >::type & >( lock ) )
 	, m_pMutexName( pMutexName )
 	, m_pFilename( pFilename )
@@ -980,18 +976,18 @@ private:
 	const char* m_pMutexName;
 	const char* m_pFilename;
 	int m_nLineNum;
-	bool m_bOwned;	 // Did owenership of the lock pass to another instance?
+	bool m_bOwned;	 // Did ownership of the lock pass to another instance?
 
 #ifdef RAD_TELEMETRY_ENABLED
 	TmU64 m_uLockMatcher;
 #endif
 
 	// Disallow copying
-	CAutoLockT<MUTEX_TYPE>( const CAutoLockT<MUTEX_TYPE> & );
-	CAutoLockT<MUTEX_TYPE> &operator=( const CAutoLockT<MUTEX_TYPE> & );
+	CAutoLockT<MUTEX_TYPE>( const CAutoLockT<MUTEX_TYPE> & ) = delete;
+	CAutoLockT<MUTEX_TYPE> &operator=( const CAutoLockT<MUTEX_TYPE> & ) = delete;
 
 	// No move assignment because no default construction.
-	CAutoLockT<MUTEX_TYPE> &operator=( CAutoLockT<MUTEX_TYPE> && );
+	CAutoLockT<MUTEX_TYPE> &operator=( CAutoLockT<MUTEX_TYPE> && ) = delete;
 };
 
 typedef CAutoLockT<CThreadMutex> CAutoLock;
@@ -1065,8 +1061,8 @@ protected:
 #endif
 
 private:
-	CThreadSyncObject( const CThreadSyncObject & );
-	CThreadSyncObject &operator=( const CThreadSyncObject & );
+	CThreadSyncObject( const CThreadSyncObject & ) = delete;
+	CThreadSyncObject &operator=( const CThreadSyncObject & ) = delete;
 };
 
 
@@ -1096,8 +1092,8 @@ public:
 	bool Release(long releaseCount = 1, long * pPreviousCount = nullptr );
 
 private:
-	CThreadSemaphore(const CThreadSemaphore &);
-	CThreadSemaphore &operator=(const CThreadSemaphore &);
+	CThreadSemaphore(const CThreadSemaphore &) = delete;
+	CThreadSemaphore &operator=(const CThreadSemaphore &) = delete;
 };
 
 
@@ -1125,8 +1121,8 @@ public:
 	void SetTrace( bool )				{}
 
 private:
-	CThreadFullMutex( const CThreadFullMutex & );
-	CThreadFullMutex &operator=( const CThreadFullMutex & );
+	CThreadFullMutex( const CThreadFullMutex & ) = delete;
+	CThreadFullMutex &operator=( const CThreadFullMutex & ) = delete;
 };
 #endif
 
@@ -1156,8 +1152,8 @@ public:
 	bool Wait( uint32 dwTimeout = TT_INFINITE );
 
 private:
-	CThreadEvent( const CThreadEvent & );
-	CThreadEvent &operator=( const CThreadEvent & );
+	CThreadEvent( const CThreadEvent & ) = delete;
+	CThreadEvent &operator=( const CThreadEvent & ) = delete;
 };
 
 // Hard-wired manual event for use in array declarations
@@ -1180,7 +1176,8 @@ inline int ThreadWaitForEvents( int nEvents, CThreadEvent * const *pEvents, bool
 	return WAIT_TIMEOUT;
 #else
 	HANDLE handles[64];
-	for ( int i = 0; i < min( nEvents, static_cast<int>(ssize(handles)) ); i++ )
+	// dimhotepus: Prevent overflow of handles buffer.
+	for ( intp i = 0; i < min( static_cast<intp>(nEvents), ssize(handles) ); i++ )
 		handles[i] = pEvents[i]->GetHandle();
 	return ThreadWaitForObjects( min( nEvents, static_cast<int>(ssize(handles)) ), handles, bWaitAll, timeout );
 #endif
@@ -1216,7 +1213,7 @@ private:
 #ifdef WIN32
 	CThreadFastMutex m_mutex;
 #else
-	CThreadMutex m_mutex;	
+	CThreadMutex m_mutex;
 #endif
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
@@ -1237,7 +1234,11 @@ private:
 class ALIGN8 PLATFORM_CLASS CThreadSpinRWLock : public CAlignedNewDelete<8>
 {
 public:
-	CThreadSpinRWLock()	{ COMPILE_TIME_ASSERT( sizeof( LockInfo_t ) == sizeof( int64 ) ); Assert( (intp)this % 8 == 0 ); memset( this, 0, sizeof( *this ) ); }
+	CThreadSpinRWLock() : m_lockInfo{}
+	{
+		COMPILE_TIME_ASSERT( sizeof( LockInfo_t ) == sizeof( int64 ) );
+		Assert( (intp)this % 8 == 0 );
+	}
 
 	bool TryLockForWrite();
 	bool TryLockForRead();
@@ -1256,20 +1257,19 @@ public:
 
 private:
 	struct LockInfo_t
-		{
-			ThreadId_t	m_writerId;
-			int		m_nReaders;
-		};
+	{
+		ThreadId_t	m_writerId;
+		int		m_nReaders;
+	};
 
-	bool AssignIf( const LockInfo_t &newValue, const LockInfo_t &comperand );
+	bool AssignIf( const LockInfo_t &newValue, LockInfo_t &comperand );
 	bool TryLockForWrite( const ThreadId_t threadId );
 	void SpinLockForWrite( const ThreadId_t threadId );
-
-	volatile LockInfo_t m_lockInfo;
-
+	
+	// DLL export looks safe. 
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
-  // DLL export looks safe. 
 	MSVC_DISABLE_WARNING(4251)
+	std::atomic<LockInfo_t> m_lockInfo;
 	CInterlockedInt m_nWriters;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 } ALIGN8_POST;
@@ -1424,8 +1424,8 @@ private:
 	static unsigned __stdcall ThreadProc( void * pv );
 
 	// make copy constructor and assignment operator inaccessible
-	CThread( const CThread & );
-	CThread &operator=( const CThread & );
+	CThread( const CThread & ) = delete;
+	CThread &operator=( const CThread & ) = delete;
 
 #ifdef _WIN32
 	HANDLE 	m_hThread;
@@ -1538,13 +1538,13 @@ protected:
 	int WaitForReply( unsigned timeout, WaitFunc_t );
 
 private:
-	CWorkerThread( const CWorkerThread & );
-	CWorkerThread &operator=( const CWorkerThread & );
+	CWorkerThread( const CWorkerThread & ) = delete;
+	CWorkerThread &operator=( const CWorkerThread & ) = delete;
 
 	CThreadEvent	m_EventSend;
 	CThreadEvent	m_EventComplete;
 
-	unsigned        m_Param;
+	unsigned		m_Param;
 	CFunctor		*m_pParamFunctor;
 	int				m_ReturnVal;
 };
@@ -1704,7 +1704,7 @@ inline bool CThreadMutex::AssertOwnedByCurrentThread() const
 
 //---------------------------------------------------------
 
-inline void CThreadMutex::SetTrace( bool bTrace )
+inline void CThreadMutex::SetTrace( [[maybe_unused]] bool bTrace )
 {
 #ifdef THREAD_MUTEX_TRACING_ENABLED
 	m_bTrace = bTrace;
@@ -1802,32 +1802,34 @@ inline void CThreadRWLock::UnlockRead()
 //
 //-----------------------------------------------------------------------------
 
-inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, const LockInfo_t &comperand )
+inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, LockInfo_t &comperand ) //-V835
 {
-	return ThreadInterlockedAssignIf64( (volatile int64 *)&m_lockInfo, *((const int64 *)&newValue), *((const int64 *)&comperand) );
+	return m_lockInfo.compare_exchange_strong(comperand, newValue);
 }
 
 inline bool CThreadSpinRWLock::TryLockForWrite( const ThreadId_t threadId )
 {
+	auto lockInfo = m_lockInfo.load();
+
 	// In order to grab a write lock, there can be no readers and no owners of the write lock
-	if ( m_lockInfo.m_nReaders > 0 || ( m_lockInfo.m_writerId && m_lockInfo.m_writerId != threadId ) )
+	if ( lockInfo.m_nReaders > 0 || ( lockInfo.m_writerId && lockInfo.m_writerId != threadId ) )
 	{
 		return false;
 	}
 
-	static const LockInfo_t oldValue = { 0, 0 };
-	LockInfo_t newValue = { threadId, 0 };
-	const bool bSuccess = AssignIf( newValue, oldValue );
+	LockInfo_t oldValue{0UL, 0};
+	LockInfo_t newValue{threadId, 0};
 
+	const bool bSuccess = AssignIf( newValue, oldValue );
 	return bSuccess;
 }
 
 inline bool CThreadSpinRWLock::TryLockForWrite()
 {
-  ++m_nWriters;
+	++m_nWriters;
 	if ( !TryLockForWrite( ThreadGetCurrentId() ) )
 	{
-    --m_nWriters;
+		--m_nWriters;
 		return false;
 	}
 	return true;
@@ -1839,22 +1841,12 @@ inline bool CThreadSpinRWLock::TryLockForRead()
 	{
 		return false;
 	}
-	// In order to grab a write lock, the number of readers must not change and no thread can own the write
-	LockInfo_t oldValue;
-	LockInfo_t newValue;
 
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
-		oldValue.m_writerId = 0;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
-		newValue.m_writerId = 0;
+	// In order to grab a write lock, the number of readers must not change and no thread can own the write
+	LockInfo_t oldValue{0UL, m_lockInfo.load().m_nReaders};
+	LockInfo_t newValue{0UL, oldValue.m_nReaders + 1};
 
 	const bool bSuccess = AssignIf( newValue, oldValue );
-#if defined(_X360)
-	if ( bSuccess )
-	{
-		// X360TBD: Serious perf implications. Not Yet. __sync();
-	}
-#endif
 	return bSuccess;
 }
 
@@ -1872,7 +1864,7 @@ inline void CThreadSpinRWLock::LockForWrite()
 }
 
 // read data from a memory address
-template<class T> FORCEINLINE T ReadVolatileMemory( T const *pPtr )
+template<class T> [[nodiscard]] FORCEINLINE T ReadVolatileMemory( T const *pPtr )
 {
 	volatile const T * pVolatilePtr = ( volatile const T * ) pPtr;
 	return *pVolatilePtr;
@@ -1885,7 +1877,7 @@ template<typename T>
 class Singleton
 {
 public:
-	T *GetInstance()
+	[[nodiscard]] T *GetInstance()
 	{
 		T *tmp{m_instance.load(std::memory_order_relaxed)};
 		std::atomic_thread_fence(std::memory_order_acquire);

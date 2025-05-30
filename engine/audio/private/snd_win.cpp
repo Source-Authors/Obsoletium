@@ -159,8 +159,6 @@ IAudioDevice *IAudioDevice::AutoDetectInit()
 #error "Please define your platform"
 #endif
 
-	snd_firsttime = false;
-
 	if ( !pDevice )
 	{
 		if ( snd_firsttime )
@@ -168,6 +166,8 @@ IAudioDevice *IAudioDevice::AutoDetectInit()
 
 		return Audio_GetNullDevice();
 	}
+
+	snd_firsttime = false;
 
 	return pDevice;
 }

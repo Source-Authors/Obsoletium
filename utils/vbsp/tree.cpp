@@ -7,7 +7,7 @@
 //=============================================================================//
 #include "vbsp.h"
 
-extern	int	c_nodes;
+#include "bspflags.h"
 
 void RemovePortalFromNode (portal_t *portal, node_t *l);
 
@@ -90,8 +90,6 @@ void FreeTree_r (node_t *node)
 	if (node->volume)
 		FreeBrush (node->volume);
 
-	if (numthreads == 1)
-		c_nodes--;
 	free (node);
 }
 

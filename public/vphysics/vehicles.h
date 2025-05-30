@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "tier0/platform.h"
 #include "datamap.h"
 
 
@@ -73,19 +74,19 @@ struct vehicle_debugcarsystem_t
 
 struct vehicleparams_t;
 
-class IPhysicsVehicleController
+abstract_class IPhysicsVehicleController
 {
 public:
 	virtual ~IPhysicsVehicleController() {}
 	// call this from the game code with the control parameters
 	virtual void Update( float dt, vehicle_controlparams_t &controls ) = 0;
-	virtual const vehicle_operatingparams_t &GetOperatingParams() = 0;
-	virtual const vehicleparams_t &GetVehicleParams() = 0;
-	virtual vehicleparams_t &GetVehicleParamsForChange() = 0;
-	virtual float UpdateBooster(float dt) = 0;
-	virtual int GetWheelCount(void) = 0;
-	virtual IPhysicsObject *GetWheel(int index) = 0;
-	virtual bool GetWheelContactPoint( int index, Vector *pContactPoint, int *pSurfaceProps ) = 0;
+	[[nodiscard]] virtual const vehicle_operatingparams_t &GetOperatingParams() = 0;
+	[[nodiscard]] virtual const vehicleparams_t &GetVehicleParams() = 0;
+	[[nodiscard]] virtual vehicleparams_t &GetVehicleParamsForChange() = 0;
+	[[nodiscard]] virtual float UpdateBooster(float dt) = 0;
+	[[nodiscard]] virtual int GetWheelCount(void) = 0;
+	[[nodiscard]] virtual IPhysicsObject *GetWheel(int index) = 0;
+	[[nodiscard]] virtual bool GetWheelContactPoint( int index, Vector *pContactPoint, int *pSurfaceProps ) = 0;
 	virtual void SetSpringLength(int wheelIndex, float length) = 0;
 	virtual void SetWheelFriction(int wheelIndex, float friction) = 0;
 
@@ -93,7 +94,7 @@ public:
 	virtual void OnVehicleExit( void ) = 0;
 
 	virtual void SetEngineDisabled( bool bDisable ) = 0;
-	virtual bool IsEngineDisabled( void ) = 0;
+	[[nodiscard]] virtual bool IsEngineDisabled( void ) = 0;
 
 	// Debug
 	virtual void GetCarSystemDebugData( vehicle_debugcarsystem_t &debugCarSystem ) = 0;

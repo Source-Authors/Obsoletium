@@ -5,6 +5,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolMorph.h"
+
 #include "GlobalFunctions.h"
 #include "History.h"
 #include "materialsystem/imaterialsystem.h"
@@ -18,7 +20,6 @@
 #include "Material.h"
 #include "ObjectProperties.h"
 #include "ToolManager.h"
-#include "ToolMorph.h"
 #include "Options.h"
 #include "Render2D.h"
 #include "StatusBarIDs.h"
@@ -37,8 +38,10 @@
 //			pMorph - Morph tool.
 // Output : Returns TRUE to continue enumerating.
 //-----------------------------------------------------------------------------
-static BOOL AddToMorph(CMapSolid *pSolid, Morph3D *pMorph)
+static BOOL AddToMorph(CMapClass *mp, DWORD_PTR ctx)
 {
+	auto *pSolid = reinterpret_cast<CMapSolid *>(mp);
+	auto *pMorph = reinterpret_cast<Morph3D *>(ctx);
 	pMorph->SelectObject(pSolid, scSelect);
 	return TRUE;
 }
@@ -49,23 +52,28 @@ static BOOL AddToMorph(CMapSolid *pSolid, Morph3D *pMorph)
 //-----------------------------------------------------------------------------
 Morph3D::Morph3D(void)
 {
+	SetDrawColors(Options.colors.clrToolHandle, Options.colors.clrToolMorph);
+
 	m_SelectedType = shtNothing;
+	memset(&m_MorphHandle, 0, sizeof(m_MorphHandle));
+	m_OrigHandlePos.Init();
+
+	m_bLButtonDownControlState = false;	
+	m_vLastMouseMovement.Init();
+	m_bHit = false;
+
+	memset(&m_DragHandle, 0, sizeof(m_DragHandle));
+
+	m_bMorphing = false;
+	m_bMovingSelected = false;
+	
 	m_HandleMode = hmBoth;
 	m_bBoxSelecting = false;
 	m_bScaling = false;
-	m_pOrigPosList = NULL;
-	
-	m_vLastMouseMovement.Init();
-
-	m_bHit = false;
 	m_bUpdateOrg = false;
-	m_bLButtonDownControlState = false;
 
-	SetDrawColors(Options.colors.clrToolHandle, Options.colors.clrToolMorph);
-
-	memset(&m_DragHandle, 0, sizeof(m_DragHandle));
-	m_bMorphing = false;
-	m_bMovingSelected = false;
+	m_pOrigPosList = nullptr;
+	m_ScaleOrg.Init();
 }
 
 
@@ -102,7 +110,7 @@ void Morph3D::OnActivate()
 			{
 				SelectObject((CMapSolid *)pobj, scSelect);
 			}
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)AddToMorph, (DWORD)this, MAPCLASS_TYPE(CMapSolid));
+			pobj->EnumChildren(AddToMorph, (DWORD_PTR)this, MAPCLASS_TYPE(CMapSolid));
 		}
 
 		m_pDocument->SelectObject(NULL, scClear|scSaveChanges );
@@ -206,7 +214,7 @@ bool Morph3D::CanDeselectList( void )
 			if ( !pSSolid->IsValidWithDisps() )
 			{
 				// Ask
-				if( AfxMessageBox( "Invalid solid, destroy displacement(s)?", MB_YESNO ) == IDYES )
+				if( AfxMessageBox( "Invalid solid, destroy displacement(s)?", MB_YESNO | MB_ICONQUESTION ) == IDYES )
 				{
 					// Destroy the displacement data.
 					pSSolid->DestroyDisps();
@@ -613,8 +621,12 @@ void Morph3D::SelectHandle(MORPHHANDLE *pInfo, UINT cmd)
 
 		return;	// nothing else to do here
 	}
+
+	// dimhotepus: If no info, can't continue.
+	if (!pInfo) return;
 	
 	SSHANDLEINFO hi;
+	// dimhotepus: Check info is present.
 	if (!pInfo->pStrucSolid->GetHandleInfo(&hi, pInfo->ssh))
 	{
 		// Can't find the handle info, bail.
@@ -622,7 +634,7 @@ void Morph3D::SelectHandle(MORPHHANDLE *pInfo, UINT cmd)
 		return;
 	}
 
-	if(hi.Type != m_SelectedType)
+	if (hi.Type != m_SelectedType)
 		SelectHandle(NULL, scClear);	// clear selection first
 
 	m_SelectedType = hi.Type;
@@ -1016,7 +1028,7 @@ void Morph3D::FinishTranslation(bool bSave)
 				if(iConfirm == -1)
 				{
 					// ask
-					if(AfxMessageBox("Merge vertices?", MB_YESNO) == IDYES)
+					if(AfxMessageBox("Merge vertices?", MB_YESNO | MB_ICONQUESTION) == IDYES)
 						iConfirm = 1;
 					else
 						iConfirm = 0;
@@ -1703,7 +1715,7 @@ bool Morph3D::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &vPoi
 	//
 	char szBuf[128];
 	m_pDocument->Snap(vecWorld,uConstraints);
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert] );
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert] );
 	SetStatusText(SBI_COORDS, szBuf);
 
 	if ( m_bMouseDown[MOUSE_LEFT] )

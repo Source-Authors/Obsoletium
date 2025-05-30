@@ -54,8 +54,8 @@ void TE_BeamEnts( IRecipientFilter& filter, float delay,
 	int r, int g, int b, int a, int speed )
 {
 	beams->CreateBeamEnts( start, end, modelindex, haloindex, 0.0f, 
-		life, width, endWidth, fadeLength, amplitude, a, 0.1 * (float)speed, 
-		startframe, 0.1 * (float)framerate, r, g, b );
+		life, width, endWidth, fadeLength, amplitude, a, 0.1f * speed, 
+		startframe, 0.1f * framerate, r, g, b );
 }
 
 //-----------------------------------------------------------------------------
@@ -65,8 +65,8 @@ void TE_BeamEnts( IRecipientFilter& filter, float delay,
 void C_TEBeamEnts::PostDataUpdate( DataUpdateType_t updateType )
 {
 	beams->CreateBeamEnts( m_nStartEntity, m_nEndEntity, m_nModelIndex, m_nHaloIndex, 0.0f, 
-		m_fLife, m_fWidth,  m_fEndWidth, m_nFadeLength, m_fAmplitude, a, 0.1 * m_nSpeed, 
-		m_nStartFrame, 0.1 * m_nFrameRate, r, g, b );
+		m_fLife, m_fWidth,  m_fEndWidth, m_nFadeLength, m_fAmplitude, a, 0.1f * m_nSpeed, 
+		m_nStartFrame, 0.1f * m_nFrameRate, r, g, b );
 }
 
 // Expose the TE to the engine.

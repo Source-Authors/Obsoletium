@@ -39,7 +39,7 @@ namespace OptimizedModel
 //-----------------------------------------------------------------------------
 // Reference to a loaded studiomdl 
 //-----------------------------------------------------------------------------
-typedef unsigned short MDLHandle_t;
+using MDLHandle_t = unsigned short;
 
 enum
 {
@@ -116,7 +116,7 @@ public:
 	virtual studiohdr_t *GetStudioHdr( MDLHandle_t handle ) = 0;
 	virtual studiohwdata_t *GetHardwareData( MDLHandle_t handle ) = 0;
 	virtual vcollide_t *GetVCollide( MDLHandle_t handle ) = 0;
-	virtual unsigned char *GetAnimBlock( MDLHandle_t handle, int nBlock ) = 0;
+	virtual unsigned char *GetAnimBlock( MDLHandle_t handle, intp nBlock ) = 0;
 	virtual virtualmodel_t *GetVirtualModel( MDLHandle_t handle ) = 0;
 	virtual intp GetAutoplayList( MDLHandle_t handle, unsigned short **pOut ) = 0;
 	virtual vertexFileHeader_t *GetVertexData( MDLHandle_t handle ) = 0;
@@ -164,7 +164,7 @@ public:
 //-----------------------------------------------------------------------------
 // The main MDL cacher 
 //-----------------------------------------------------------------------------
-#define MDLCACHE_INTERFACE_VERSION "MDLCache004"
+constexpr inline char MDLCACHE_INTERFACE_VERSION[]{"MDLCache004"};
  
 abstract_class IMDLCache : public IAppSystem
 {
@@ -187,7 +187,7 @@ public:
 	virtual studiohdr_t *GetStudioHdr( MDLHandle_t handle ) = 0;
 	virtual studiohwdata_t *GetHardwareData( MDLHandle_t handle ) = 0;
 	virtual vcollide_t *GetVCollide( MDLHandle_t handle ) = 0;
-	virtual unsigned char *GetAnimBlock( MDLHandle_t handle, int nBlock ) = 0;
+	virtual unsigned char *GetAnimBlock( MDLHandle_t handle, intp nBlock ) = 0;
 	virtual virtualmodel_t *GetVirtualModel( MDLHandle_t handle ) = 0;
 	virtual intp GetAutoplayList( MDLHandle_t handle, unsigned short **pOut ) = 0;
 	virtual vertexFileHeader_t *GetVertexData( MDLHandle_t handle ) = 0;
@@ -228,7 +228,7 @@ public:
 	virtual void FinishPendingLoads() = 0;
 
 	virtual vcollide_t *GetVCollideEx( MDLHandle_t handle, bool synchronousLoad = true ) = 0;
-	virtual bool GetVCollideSize( MDLHandle_t handle, int *pVCollideSize ) = 0;
+	virtual bool GetVCollideSize( MDLHandle_t handle, size_t *pVCollideSize ) = 0;
 
 	virtual bool GetAsyncLoad( MDLCacheDataType_t type ) = 0;
 	virtual bool SetAsyncLoad( MDLCacheDataType_t type, bool bAsync ) = 0;

@@ -20,7 +20,7 @@
 static BOOL CountObject(CMapClass *pobj);
 
 
-BEGIN_MESSAGE_MAP(CMapInfoDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMapInfoDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CMapInfoDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -173,7 +173,7 @@ void CMapInfoDlg::CountTexture(IEditorTexture *pTex)
 //-----------------------------------------------------------------------------
 void CMapInfoDlg::DoDataExchange(CDataExchange *pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CMapInfoDlg)
 	DDX_Control(pDX, IDC_FACES, m_Faces);
 	DDX_Control(pDX, IDC_SOLIDS, m_Solids);
@@ -192,7 +192,7 @@ void CMapInfoDlg::DoDataExchange(CDataExchange *pDX)
 //-----------------------------------------------------------------------------
 BOOL CMapInfoDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	
 	m_uSolidCount = 0;
 	m_uPointEntityCount = 0;
@@ -221,7 +221,7 @@ BOOL CMapInfoDlg::OnInitDialog(void)
 	m_UniqueTextures.SetWindowText(szBuf);
 
 	ultoa(m_uTextureMemory, szBuf, 10);
-	sprintf(szBuf, "%u bytes (%.2f MB)", m_uTextureMemory, (float)m_uTextureMemory / 1024000.0);
+	V_sprintf_safe(szBuf, "%u bytes (%.2f MB)", m_uTextureMemory, (float)m_uTextureMemory / 1024000.0);
 	m_TextureMemory.SetWindowText(szBuf);
 	
 	return TRUE;

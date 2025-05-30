@@ -16,18 +16,18 @@ enum
 {
 	INTERPOLATE_DEFAULT = 0,
 	INTERPOLATE_CATMULL_ROM_NORMALIZEX,
-	INTERPOLATE_EASE_IN,								
-	INTERPOLATE_EASE_OUT,								
-	INTERPOLATE_EASE_INOUT,			
-	INTERPOLATE_BSPLINE,							
-	INTERPOLATE_LINEAR_INTERP,				
-	INTERPOLATE_KOCHANEK_BARTELS,			
-	INTERPOLATE_KOCHANEK_BARTELS_EARLY,	
+	INTERPOLATE_EASE_IN,
+	INTERPOLATE_EASE_OUT,
+	INTERPOLATE_EASE_INOUT,
+	INTERPOLATE_BSPLINE,
+	INTERPOLATE_LINEAR_INTERP,
+	INTERPOLATE_KOCHANEK_BARTELS,
+	INTERPOLATE_KOCHANEK_BARTELS_EARLY,
 	INTERPOLATE_KOCHANEK_BARTELS_LATE,
 	INTERPOLATE_SIMPLE_CUBIC,
 
 	INTERPOLATE_CATMULL_ROM,
-	INTERPOLATE_CATMULL_ROM_NORMALIZE,	
+	INTERPOLATE_CATMULL_ROM_NORMALIZE,
 	INTERPOLATE_CATMULL_ROM_TANGENT,
 
 	INTERPOLATE_EXPONENTIAL_DECAY,
@@ -37,10 +37,20 @@ enum
 	NUM_INTERPOLATE_TYPES,
 };
 
-#define MAKE_CURVE_TYPE( left, right )      ( ( right ) & 0xff ) | ( ( ( left ) & 0xff ) << 8 )
+[[nodiscard]] constexpr inline unsigned short MAKE_CURVE_TYPE( unsigned char left, unsigned char right )
+{
+	return (right & 0xff) | ((left & 0xff) << 8);
+}
 
-#define GET_RIGHT_CURVE(w)           ( ( w ) & 0xff )
-#define GET_LEFT_CURVE(w)           ( ( ( w ) >> 8) & 0xff )
+[[nodiscard]] constexpr inline unsigned char GET_RIGHT_CURVE( unsigned short w )
+{
+	return w & 0xff;
+}
+
+[[nodiscard]] constexpr inline unsigned char GET_LEFT_CURVE( unsigned short w )
+{
+	return (w >> 8) & 0xff;
+}
 
 // Presets used by faceposer
 enum
@@ -66,8 +76,8 @@ const char	*Interpolator_NameForCurveType( int type, bool printname );
 void		Interpolator_CurveInterpolatorsForType( int type, int& inbound, int& outbound );
 int			Interpolator_CurveTypeForHotkey( int key );
 
-int			Interpolator_InterpolatorForName( char const *name );
-char const	*Interpolator_NameForInterpolator( int type, bool printname );
+unsigned char	Interpolator_InterpolatorForName( char const *name );
+char const	*Interpolator_NameForInterpolator( unsigned char type, bool printname );
 
 void		Interpolator_GetKochanekBartelsParams( int interpolatorType, float& tension, float& bias, float& continuity );
 

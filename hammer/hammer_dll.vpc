@@ -6,6 +6,9 @@
 
 $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro LIBJPEGSRCDIR	"$SRCDIR\thirdparty\libjpeg-turbo"
+$Macro LIBJPEGSRC2DIR	"$LIBJPEGSRCDIR\out"
+$Macro LIBJPEGOUTDIR	"$LIBJPEGSRCDIR\out\Release"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -13,7 +16,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\common\shaderdll,$SRCDIR\common\iostream;$SRCDIR\dx9sdk\include;$SRCDIR\engine;$SRCDIR\game\shared;$SRCDIR\utils\common;$SRCDIR\thirdparty\libjpeg-turbo;$SRCDIR\thirdparty\libjpeg-turbo\out"
+		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\dx9sdk\include;$SRCDIR\engine;$SRCDIR\game\shared;$SRCDIR\utils\common;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR"
 		$PreprocessorDefinitions			"$BASE;VALVE;PROTECTED_THINGS_DISABLE;VERSION_SAFE_STEAM_API_INTERFACES;NO_WARN_MBCS_MFC_DEPRECATION"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
 		$AdditionalOptions					"$BASE /EHa"
@@ -110,6 +113,14 @@ $Project "hammer_dll"
 		$File	"AutoSelCombo.h"
 		$File	"Axes2.cpp"
 		$File	"Axes2.h"
+		$File	"$SRCDIR\common\windows\base_dlg.h"
+		$File	"$SRCDIR\common\windows\base_dlg.cpp"
+		$File	"$SRCDIR\common\windows\base_wnd.h"
+		$File	"$SRCDIR\common\windows\base_wnd.cpp"
+		$File	"$SRCDIR\common\windows\bitmap_scale.h"
+		$File	"$SRCDIR\common\windows\bitmap_scale.cpp"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.cpp"
 		$File	"BlockArray.h"
 		$File	"BoundBox.cpp"
 		$File	"BoundBox.h"
@@ -203,8 +214,6 @@ $Project "hammer_dll"
 		$File	"Keyboard.cpp"
 		$File	"Keyboard.h"
 		$File	"$SRCDIR\public\KeyFrame\keyframe.h"
-		$File	"ListBoxEx.cpp"
-		$File	"ListBoxEx.h"
 		$File	"LoadSave_MAP.cpp"
 		$File	"LoadSave_RMF.cpp"
 		$File	"lpreview_thread.cpp"
@@ -296,7 +305,6 @@ $Project "hammer_dll"
 		$File	"SaveInfo.h"
 		$File	"ScenePreviewDlg.cpp"
 		$File	"ScenePreviewDlg.h"
-		$File	"SearchBox.h"
 		$File	"Selection.cpp"
 		$File	"Shell.h"
 		$File	"SoundBrowser.cpp"
@@ -338,7 +346,8 @@ $Project "hammer_dll"
 		$File	"TitleWnd.cpp"
 		$File	"TitleWnd.h"
 		$File	"Tooldefs.h"
-		$File	"$SRCDIR\public\maya\valveMaya\Undo.h"
+		// dimhotepus: Comment missing header.
+		// $File	"$SRCDIR\public\maya\valveMaya\Undo.h"
 		$File	"VGuiWnd.cpp"
 		$File	"VGuiWnd.h"
 		$File	"ViewerSettings.h"
@@ -643,7 +652,6 @@ $Project "hammer_dll"
 		$File	"$SRCDIR\public\cmodel.h"
 		$File	"$SRCDIR\common\ConfigManager.h"
 		$File	"$SRCDIR\public\const.h"
-		$File	"dispview.h"
 		$File	"$SRCDIR\public\fgdlib\EntityDefs.h"
 		$File	"$SRCDIR\public\filesystem.h"
 		$File	"FilteredComboBox.h"
@@ -695,11 +703,12 @@ $Project "hammer_dll"
 		$Lib mathlib
 		$Lib matsys_controls
 		$Lib raytrace
-		$ImpLib steam_api
+		// dimhotepus: No Steam.
+		$ImpLib steam_api [!$NO_STEAM]
 		$Lib tier2
 		$Lib tier3
 		$Lib vgui_controls
-		$Lib "$LIBCOMMON/jpeg-static"
+		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static"
 	}
 
 	$File	"whatsnew.txt"

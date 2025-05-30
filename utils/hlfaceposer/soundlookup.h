@@ -11,7 +11,10 @@
 #endif
 
 #include "basedialogparams.h"
-#include "utlvector.h"
+#include "tier0/basetypes.h"
+#include "tier1/utlvector.h"
+
+FORWARD_DECLARE_HANDLE(HWND);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -28,6 +31,6 @@ struct CSoundLookupParams : public CBaseDialogParams
 };
 
 // Display/create dialog
-int SoundLookup( CSoundLookupParams *params, HWND parent );
+intp SoundLookup( CSoundLookupParams *params, HWND parent );
 
 #endif // SOUNDLOOKUP_H

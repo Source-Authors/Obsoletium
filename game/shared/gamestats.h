@@ -15,7 +15,7 @@
 #include "igamesystem.h"
 //#include "steamworks_gamestats.h"
 
-const int GAMESTATS_VERSION = 1;
+constexpr inline int GAMESTATS_VERSION = 1;
 
 enum StatSendType_t
 {

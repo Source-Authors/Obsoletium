@@ -8,10 +8,12 @@
 // MapErrorsDlg.h : header file
 //
 
+#include "windows/base_dlg.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CMapErrorsDlg dialog
 
-class CMapErrorsDlg : public CDialog
+class CMapErrorsDlg : public CBaseDlg
 {
 // Construction
 public:

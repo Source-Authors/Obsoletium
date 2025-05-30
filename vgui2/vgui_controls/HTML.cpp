@@ -8,19 +8,21 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/HTML.h>
+
+#include "OfflineMode.h"
+#include "filesystem.h"
+#include "qlimits.h"
+
 #include "vgui_controls/pch_vgui_controls.h"
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/MessageBox.h>
 
-#include "filesystem.h"
-#include "qlimits.h"
 #include "../vgui2/src/vgui_key_translation.h"
 
 #undef PostMessage
 #undef MessageBox
-
-#include "OfflineMode.h"
 
 // memdbgon must be the last include file in a .cpp file
 #include "tier0/memdbgon.h"
@@ -389,7 +391,7 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 			}
 			g_pFullFileSystem->GetLocalCopy( baseDir ); // put this file on disk for IE to load
 
-			g_pFullFileSystem->GetLocalPath( baseDir, fileLocation, sizeof(fileLocation) );
+			g_pFullFileSystem->GetLocalPath_safe( baseDir, fileLocation );
 			Q_snprintf(htmlLocation, sizeof(htmlLocation), "file://%s", fileLocation);
 
 			if (m_SteamAPIContext.SteamHTMLSurface())
@@ -822,7 +824,7 @@ void HTML::OnKeyCodeTyped(KeyCode code)
 			if ( input()->IsKeyDown(KEY_LCONTROL) || input()->IsKeyDown(KEY_RCONTROL) )
 			{
 				// pass control-tab to parent (through baseclass)
-				BaseClass::OnKeyTyped( code );
+				BaseClass::OnKeyTyped( static_cast<wchar_t>(code) );
 				return;
 			}
 			break;
@@ -852,12 +854,12 @@ void HTML::OnMouseWheeled(int delta)
 	if (_vbar )
 	{
 		int val = _vbar->GetValue();
-		val -= (delta * 100.0f/3.0f ); // 100 for every 3 lines matches chromes code
+		val -= static_cast<int>(delta * 100.f / 3); // 100 for every 3 lines matches chromes code
 		_vbar->SetValue(val);
 	}
 
 	if (m_SteamAPIContext.SteamHTMLSurface())
-		m_SteamAPIContext.SteamHTMLSurface()->MouseWheel( m_unBrowserHandle, delta* 100.0f/3.0f );
+		m_SteamAPIContext.SteamHTMLSurface()->MouseWheel( m_unBrowserHandle, static_cast<int>(delta * 100.f / 3) );
 }
 
 
@@ -868,7 +870,7 @@ void HTML::AddCustomURLHandler(const char *customProtocolName, vgui::Panel *targ
 {
 	intp index = m_CustomURLHandlers.AddToTail();
 	m_CustomURLHandlers[index].hPanel = target;
-	Q_strncpy(m_CustomURLHandlers[index].url, customProtocolName, sizeof(m_CustomURLHandlers[index].url));
+	V_strcpy_safe(m_CustomURLHandlers[index].url, customProtocolName);
 }
 
 
@@ -1196,7 +1198,7 @@ void HTML::OnEditNewLine( Panel *pPanel )
 void HTML::OnTextChanged( Panel *pPanel )
 {
 	char rgchText[2048];
-	m_pFindBar->GetText( rgchText, sizeof( rgchText ) );
+	m_pFindBar->GetText( rgchText );
 	Find( rgchText );
 }
 

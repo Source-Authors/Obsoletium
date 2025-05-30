@@ -11,8 +11,8 @@
 #endif
 
 #include "igameserverdata.h"
-#include "utlbuffer.h"
-#include "utllinkedlist.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utllinkedlist.h"
 
 class CRConServer;
 
@@ -23,24 +23,24 @@ public:
 	CServerRemoteAccess();
 
 	// handles a request
-	virtual void WriteDataRequest( ra_listener_id listener, const void *buffer, int bufferSize );
-	void WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, const void *buffer, int bufferSize);
+	void WriteDataRequest( ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize ) override;
+	void WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize);
 
 	// gets return value from the server
 	// returns the number of bytes read
-	virtual int ReadDataResponse( ra_listener_id listener, void *buffer, int bufferSize);
-	int GetDataResponseSize( ra_listener_id listener );
+	intp ReadDataResponse( ra_listener_id listener, IN_BYTECAP(bufferSize) void *buffer, intp bufferSize) override;
+	intp GetDataResponseSize( ra_listener_id listener );
 
 	// sends a message to all the watching admin UI's
 	void SendMessageToAdminUI( ra_listener_id listenerID, const char *message);
 
-	void SendVProfData( ra_listener_id listenerID, bool bGroupData, void *data, int len );
+	void SendVProfData( ra_listener_id listenerID, bool bGroupData, IN_BYTECAP(len) void *data, intp len );
 
-	virtual ra_listener_id GetNextListenerID( bool authConnection, const netadr_t *adr = NULL );
-	virtual void RegisterAdminUIID( ra_listener_id listener ) { m_AdminUIID = listener; }
+	ra_listener_id GetNextListenerID( bool authConnection, const netadr_t *adr = NULL ) override;
+	void RegisterAdminUIID( ra_listener_id listener ) override { m_AdminUIID = listener; }
 
-	ra_listener_id GetAdminUIID() { return m_AdminUIID; }
-	void GetStatsString(char *buf, int bufSize); // also used by the 'stats' command
+	ra_listener_id GetAdminUIID() const { return m_AdminUIID; }
+	void GetStatsString(OUT_Z_CAP(bufSize) char *buf, intp bufSize); // also used by the 'stats' command
 
 	void UploadScreenshot( const char *pFileName );
 
@@ -55,7 +55,7 @@ private:
 	void CheckPassword( CRConServer *pNetworkListener, ra_listener_id listener, int requestID, const char *password );
 	void BadPassword( CRConServer *pNetworkListener, ra_listener_id listener );
 	void LogCommand(  ra_listener_id listener, const char *msg );
-	void SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, void *pData, int nDataLen );
+	void SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, IN_BYTECAP(nDataLen) void *pData, intp nDataLen );
 
 	// specific value requests
 	void GetUserBanList(CUtlBuffer &value);
@@ -79,11 +79,11 @@ private:
 	};
 	
 	CUtlLinkedList<ListenerStore_t, int>	m_ListenerIDs;
-	ra_listener_id				m_NextListenerID;
+	
+	intp m_iBytesSent;
+	intp m_iBytesReceived;
 
-	int m_nScreenshotListener;
-	int m_iBytesSent;
-	int m_iBytesReceived;
+	ra_listener_id				m_nScreenshotListener;
 	ra_listener_id				m_AdminUIID;
 };
 

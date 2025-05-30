@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include "byteswap.h"
+#include "tier1/byteswap.h"
 
 #ifdef CByteswap
 #undef CByteswap
@@ -15,40 +15,40 @@
 // Copy a single field from the input buffer to the output buffer, swapping the bytes if necessary
 //-----------------------------------------------------------------------------
 template<bool isBigEndian>
-void CByteswap<isBigEndian>::SwapFieldToTargetEndian( void* pOutputBuffer, void *pData, typedescription_t *pField )
+void CByteswap<isBigEndian>::SwapFieldToTargetEndian( void* pOutputBuffer, const void *pData, typedescription_t *pField )
 {
 	switch ( pField->fieldType )
 	{
 	case FIELD_CHARACTER:
-		SwapBufferToTargetEndian<char>( (char*)pOutputBuffer, (char*)pData, pField->fieldSize );
+		SwapBufferToTargetEndian<char>( (char*)pOutputBuffer, (const char*)pData, pField->fieldSize );
 		break;
 
 	case FIELD_BOOLEAN:
-		SwapBufferToTargetEndian<bool>( (bool*)pOutputBuffer, (bool*)pData, pField->fieldSize );
+		SwapBufferToTargetEndian<bool>( (bool*)pOutputBuffer, (const bool*)pData, pField->fieldSize );
 		break;
 
 	case FIELD_SHORT:
-		SwapBufferToTargetEndian<short>( (short*)pOutputBuffer, (short*)pData, pField->fieldSize );
+		SwapBufferToTargetEndian<short>( (short*)pOutputBuffer, (const short*)pData, pField->fieldSize );
 		break;
 
 	case FIELD_FLOAT:
-		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (uint*)pData, pField->fieldSize );
+		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (const uint*)pData, pField->fieldSize );
 		break;
 
 	case FIELD_INTEGER:
-		SwapBufferToTargetEndian<int>( (int*)pOutputBuffer, (int*)pData, pField->fieldSize );
+		SwapBufferToTargetEndian<int>( (int*)pOutputBuffer, (const int*)pData, pField->fieldSize );
 		break;
 
 	case FIELD_VECTOR:
-		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (uint*)pData, pField->fieldSize * 3 );
+		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (const uint*)pData, pField->fieldSize * 3 );
 		break;
 
 	case FIELD_VECTOR2D:
-		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (uint*)pData, pField->fieldSize * 2 );
+		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (const uint*)pData, pField->fieldSize * 2 );
 		break;
 
 	case FIELD_QUATERNION:
-		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (uint*)pData, pField->fieldSize * 4 );
+		SwapBufferToTargetEndian<uint>( (uint*)pOutputBuffer, (const uint*)pData, pField->fieldSize * 4 );
 		break;
 
 	case FIELD_EMBEDDED:
@@ -75,7 +75,7 @@ void CByteswap<isBigEndian>::SwapFieldToTargetEndian( void* pOutputBuffer, void 
 // Write a block of fields. Works a bit like the saverestore code.  
 //-----------------------------------------------------------------------------
 template<bool isBigEndian>
-void CByteswap<isBigEndian>::SwapFieldsToTargetEndian( void *pOutputBuffer, void *pBaseData, datamap_t *pDataMap)
+void CByteswap<isBigEndian>::SwapFieldsToTargetEndian( void *pOutputBuffer, const void *pBaseData, datamap_t *pDataMap)
 {
 	// deal with base class first
 	if ( pDataMap->baseMap )

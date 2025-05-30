@@ -93,7 +93,7 @@ IMaterial *CMaterial_QueueFriendly::GetMaterialPage( void )
 
 void CMaterial_QueueFriendly::IncrementReferenceCount( void )
 {
-	Assert( ThreadInMainThread() );
+	// dimhotepus: Drop thread in main thread check as we thread-safe now.
 	++m_nReferenceCount;
 	m_pRealTimeVersion->IncrementReferenceCount();
 }
@@ -226,7 +226,7 @@ IMaterialVar **CMaterial_QueueFriendly::GetShaderParams( void )
 
 void CMaterial_QueueFriendly::DecrementReferenceCount( void )
 {
-	Assert( ThreadInMainThread() );
+	// dimhotepus: Drop thread in main thread check as we thread-safe now.
 	--m_nReferenceCount;
 	QUEUE_MATERIAL_CALL( DecrementReferenceCount );
 }

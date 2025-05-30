@@ -20,12 +20,9 @@
 // version:        1.2
 //
 // email:          mete@swissquake.ch
-// web:            http://www.swissquake.ch/chumbalum-soft/
+// web:            https://www.chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include "ViewerSettings.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -65,7 +62,6 @@ int
 LoadViewerSettings (const char *filename)
 {
 	FILE *file = fopen (filename, "rb");
-
 	if (!file)
 		return 0;
 
@@ -81,7 +77,6 @@ int
 SaveViewerSettings (const char *filename)
 {
 	FILE *file = fopen (filename, "wb");
-
 	if (!file)
 		return 0;
 

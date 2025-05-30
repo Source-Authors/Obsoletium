@@ -80,7 +80,7 @@ static inline void RecordBloodStream( const Vector &start, const Vector &directi
 	{
 		Color clr( r, g, b, a );
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_BLOOD_STREAM );
  		msg->SetString( "name", "TE_BloodStream" );
@@ -95,7 +95,6 @@ static inline void RecordBloodStream( const Vector &start, const Vector &directi
 		msg->SetInt( "amount", amount );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

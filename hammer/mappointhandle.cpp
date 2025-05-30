@@ -76,7 +76,7 @@ CMapPointHandle::CMapPointHandle(void)
 CMapPointHandle::CMapPointHandle(const char *pszKey, bool bDrawLineToParent)
 {
 	Initialize();
-	strcpy(m_szKeyName, pszKey);
+	V_strcpy_safe(m_szKeyName, pszKey);
 	m_bDrawLineToParent = bDrawLineToParent;
 }
 
@@ -150,7 +150,7 @@ CMapClass *CMapPointHandle::CopyFrom(CMapClass *pObject, bool bUpdateDependencie
 
 	CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
-	strcpy(m_szKeyName, pFrom->m_szKeyName);
+	V_strcpy_safe(m_szKeyName, pFrom->m_szKeyName);
 
 	return(this);
 }
@@ -251,7 +251,7 @@ void CMapPointHandle::Render2D(CRender2D *pRender)
 		pRender->SetTextColor(GetRValue(Options.colors.clrToolHandle), GetGValue(Options.colors.clrToolHandle), GetBValue(Options.colors.clrToolHandle) );
 		
 		char szText[100];
-		sprintf(szText, "(%0.f, %0.f, %0.f)", m_Origin.x, m_Origin.y, m_Origin.z);
+		V_sprintf_safe(szText, "(%0.f, %0.f, %0.f)", m_Origin.x, m_Origin.y, m_Origin.z);
 		pRender->DrawText(szText, ptText.x, ptText.y, CRender2D::TEXT_JUSTIFY_LEFT);
 	}
 
@@ -365,7 +365,7 @@ void CMapPointHandle::UpdateParentKey(void)
 		if (pEntity != NULL)
 		{
 			char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-			sprintf(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
+			V_sprintf_safe(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
 			pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 
 		}

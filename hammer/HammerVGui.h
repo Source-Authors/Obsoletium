@@ -15,8 +15,8 @@ extern IMatSystemSurface *g_pMatSystemSurface;
 class CHammerVGui
 {
 public:
-	CHammerVGui(void);
-	~CHammerVGui(void);
+	CHammerVGui();
+	~CHammerVGui() = default;
 
 	bool Init( HWND hWindow );
 	void Simulate();

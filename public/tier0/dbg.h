@@ -170,7 +170,9 @@ enum SpewRetval_t
 typedef SpewRetval_t (*SpewOutputFunc_t)( SpewType_t spewType, const tchar *pMsg );
 
 /* Used to redirect spew output */
-DBG_INTERFACE void   SpewOutputFunc( SpewOutputFunc_t func );
+DBG_INTERFACE void SpewOutputFunc(SpewOutputFunc_t func);
+// dimhotepus: Add ^ which returns old spew.
+DBG_INTERFACE SpewOutputFunc_t SpewOutputFunc2(SpewOutputFunc_t func);
 
 /* Used to get the current spew output function */
 DBG_INTERFACE SpewOutputFunc_t GetSpewOutputFunc( void );
@@ -180,6 +182,27 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 
 /* Same as the default spew func, but returns SPEW_ABORT for asserts */
 DBG_INTERFACE SpewRetval_t DefaultSpewFuncAbortOnAsserts( SpewType_t type, const tchar *pMsg );
+
+class ScopedSpewOutputFunc
+{
+public:
+  explicit ScopedSpewOutputFunc(SpewOutputFunc_t new_spew)
+	  : m_old_spew{SpewOutputFunc2(new_spew)}
+  {
+  }
+  ~ScopedSpewOutputFunc()
+  {
+	  SpewOutputFunc2(m_old_spew);
+  }
+
+  ScopedSpewOutputFunc(ScopedSpewOutputFunc &) = delete;
+  ScopedSpewOutputFunc& operator=(ScopedSpewOutputFunc &) = delete;
+  ScopedSpewOutputFunc(ScopedSpewOutputFunc &&) = delete;
+  ScopedSpewOutputFunc& operator=(ScopedSpewOutputFunc &&) = delete;
+
+private:
+  const SpewOutputFunc_t m_old_spew;
+};
 
 /* Should be called only inside a SpewOutputFunc_t, returns groupname, level, color */
 DBG_INTERFACE const tchar* GetSpewOutputGroup( void );
@@ -212,6 +235,8 @@ DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsEnabled );
 // Provides a callback that is called on asserts regardless of spew levels
 typedef void (*AssertFailedNotifyFunc_t)( const char *pchFile, int nLine, const char *pchMessage );
 DBG_INTERFACE void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func );
+// dimhotepus: Add ^ which returns old assert failed notify.
+DBG_INTERFACE AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc2( AssertFailedNotifyFunc_t func );
 DBG_INTERFACE void CallAssertFailedNotifyFunc( const char *pchFile, int nLine, const char *pchMessage );
 
 /* True if -hushasserts was passed on command line. */
@@ -243,12 +268,14 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 			if (!!(_exp)) { 													\
 			} else {																\
 				_SpewInfo( SPEW_ASSERT, __TFILE__, __LINE__ );				\
-				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _msg ));	\
-				CallAssertFailedNotifyFunc( __TFILE__, __LINE__, _msg );					\
+				const auto _movedMsg = std::move(_msg);				\
+				const tchar *_message = static_cast<const tchar *>( _movedMsg );				\
+				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _message ));	\
+				CallAssertFailedNotifyFunc( __TFILE__, __LINE__, _message );					\
 				_executeExp; 												\
 				if ( retAssert == SPEW_DEBUGGER)									\
 				{															\
-					if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( __TFILE__, __LINE__, _msg ) ) \
+					if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( __TFILE__, __LINE__, _message ) ) \
 					{														\
 						DebuggerBreak();									\
 					}														\
@@ -281,7 +308,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 
 #define  AssertFatal( _exp )									_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), ((void)0), true )
 #define  AssertFatalOnce( _exp )								_AssertMsgOnce( _exp, _T("Assertion Failed: ") _T(#_exp), true )
-#define  AssertFatalMsg( _exp, _msg, ... )						_AssertMsg( _exp, (const tchar *)CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), true )
+#define  AssertFatalMsg( _exp, _msg, ... )						_AssertMsg( _exp, CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), true )
 #define  AssertFatalMsgOnce( _exp, _msg )						_AssertMsgOnce( _exp, _msg, true )
 #define  AssertFatalFunc( _exp, _f )							_AssertMsg( _exp, _T("Assertion Failed: " _T(#_exp), _f, true )
 #define  AssertFatalEquals( _exp, _expectedValue )				AssertFatalMsg2( (_exp) == (_expectedValue), _T("Expected %d but got %d!"), (_expectedValue), (_exp) ) 
@@ -330,7 +357,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #ifdef DBGFLAG_ASSERT
 
 #define  Assert( _exp )           							_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), ((void)0), false )
-#define  AssertMsg( _exp, _msg, ... )  						_AssertMsg( _exp, (const tchar *)CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), false )
+#define  AssertMsg( _exp, _msg, ... )  						_AssertMsg( _exp, CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), false )
 #define  AssertOnce( _exp )       							_AssertMsgOnce( _exp, _T("Assertion Failed: ") _T(#_exp), false )
 #define  AssertMsgOnce( _exp, _msg )  						_AssertMsgOnce( _exp, _msg, false )
 #define  AssertFunc( _exp, _f )   							_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), _f, false )
@@ -566,8 +593,8 @@ public:
 // 3. You use assert_cast to verify it in the second DLL boundary (where it also could've been created).
 #ifdef _DEBUG
 template<typename DEST_POINTER_TYPE, typename SOURCE_POINTER_TYPE>
-inline DEST_POINTER_TYPE assert_cast(SOURCE_POINTER_TYPE* pSource)
-{
+inline std::enable_if_t<std::is_pointer_v<DEST_POINTER_TYPE>, DEST_POINTER_TYPE>
+assert_cast(SOURCE_POINTER_TYPE *pSource) {
     Assert( static_cast<DEST_POINTER_TYPE>(pSource) == dynamic_cast<DEST_POINTER_TYPE>(pSource) );
     return static_cast<DEST_POINTER_TYPE>(pSource);
 }
@@ -587,15 +614,15 @@ DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp maxchar = 0xFFFF
 
 #ifdef DBGFLAG_ASSERT
 
-FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )	    { _AssertValidReadPtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		{ _AssertValidWritePtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	{ _AssertValidReadWritePtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidReadPtr(const void *ptr, intp count = 1) { Assert(!count || ptr); }
+FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		{ Assert( !count || ptr ); }
+FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	{ Assert( !count || ptr ); }
 
 #else
 
-FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )			 { }
-FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		     { }
-FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	     { }
+FORCEINLINE void AssertValidReadPtr( const void*, [[maybe_unused]] intp count = 1 )			 { }
+FORCEINLINE void AssertValidWritePtr( const void*, [[maybe_unused]] intp count = 1 )		     { }
+FORCEINLINE void AssertValidReadWritePtr( const void*, [[maybe_unused]] intp count = 1 )	     { }
 #define AssertValidStringPtr AssertValidReadPtr
 
 #endif
@@ -645,7 +672,7 @@ public:
 	{ 
 		va_list arg_ptr;
 
-		va_start(arg_ptr, pszFormat);
+		va_start(arg_ptr, pszFormat); //-V2019 //-V2018
 		_vsntprintf(m_szBuf, sizeof(m_szBuf)-1, pszFormat, arg_ptr);
 		va_end(arg_ptr);
 

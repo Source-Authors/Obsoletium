@@ -5,11 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
-#define PROTECTED_THINGS_DISABLE
+#include <vgui_controls/Slider.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/MouseCode.h>
-#include <KeyValues.h>
 #include <vgui/IBorder.h>
 #include <vgui/IInput.h>
 #include <vgui/ISystem.h>
@@ -17,7 +17,6 @@
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 
-#include <vgui_controls/Slider.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/TextImage.h>
 
@@ -28,7 +27,7 @@ using namespace vgui;
 
 DECLARE_BUILD_FACTORY( Slider );
 
-static const float NOB_SIZE = 8.0f;
+static constexpr inline float NOB_SIZE = 8.0f;
 
 //-----------------------------------------------------------------------------
 // Purpose: Create a slider bar with ticks underneath it
@@ -310,13 +309,13 @@ void Slider::GetSettings(KeyValues *outResourceData)
 	char buf[256];
 	if (_leftCaption)
 	{
-		_leftCaption->GetUnlocalizedText(buf, sizeof(buf));
+		_leftCaption->GetUnlocalizedText(buf);
 		outResourceData->SetString("leftText", buf);
 	}
 	
 	if (_rightCaption)
 	{
-		_rightCaption->GetUnlocalizedText(buf, sizeof(buf));
+		_rightCaption->GetUnlocalizedText(buf);
 		outResourceData->SetString("rightText", buf);
 	}
 }

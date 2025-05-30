@@ -6,12 +6,12 @@
 //
 //=============================================================================//
 
-#include "kvpacker.h"
+#include "tier1/kvpacker.h"
 
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 
 #include "tier0/dbg.h"
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -91,7 +91,7 @@ bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 		{
 		case KeyValues::TYPE_NONE:
 			{
-				if( !WriteAsBinary( dat->GetFirstSubKey(), buffer ) )
+				if ( !WriteAsBinary( dat->GetFirstSubKey(), buffer ) )
 					return false;
 				break;
 			}

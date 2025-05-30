@@ -14,8 +14,8 @@
 
 static const int k_cubMemBlockPrefixSize = sizeof(uint32);
 
-#define ALLOCSIZE_TO_LOOKUP( cubAlloc ) ( (cubAlloc - 1) >> 5 )
-#define LOOKUP_TO_ALLOCSIZE( iLookup ) ( (iLookup << 5) + 1 )
+#define ALLOCSIZE_TO_LOOKUP( cubAlloc ) ( ((cubAlloc) - 1) >> 5 )
+#define LOOKUP_TO_ALLOCSIZE( iLookup ) ( ((iLookup) << 5) + 1 )
 
 
 //-----------------------------------------------------------------------------

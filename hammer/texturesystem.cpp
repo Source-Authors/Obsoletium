@@ -8,6 +8,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "TextureSystem.h"
+
 #include <process.h>
 #include <io.h>
 #include <sys\stat.h>
@@ -18,7 +20,6 @@
 #include "MapDoc.h"
 #include "Material.h"			// Specific IEditorTexture implementation
 #include "Options.h"
-#include "TextureSystem.h"
 #include "WADTexture.h"			// Specific IEditorTexture implementation
 #include "WADTypes.h"
 #include "hammer.h"
@@ -31,11 +32,8 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
-
-#define _GraphicCacheAllocate(n)	malloc(n)
-#define IsSortChr(ch) ((ch == '-') || (ch == '+'))
+[[nodiscard]] constexpr inline bool IsSortChr(char ch) { return ch == '-' || ch == '+'; }
 
 
 //-----------------------------------------------------------------------------
@@ -64,7 +62,7 @@ CTextureSystem g_Textures;
 //-----------------------------------------------------------------------------
 // CMaterialFileChangeWatcher implementation.
 //-----------------------------------------------------------------------------
-void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, int context )
+void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, intp context )
 {
 	m_pTextureSystem = pSystem;
 	m_Context = context;
@@ -72,14 +70,18 @@ void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, int context )
 	m_Watcher.Init( this );
 	
 	char searchPaths[1024 * 16];
-	if ( g_pFullFileSystem->GetSearchPath( "GAME", false, searchPaths, sizeof( searchPaths ) ) > 0 )
+	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths ) > 0 )
 	{
 		CUtlVector<char*> searchPathList;
 		V_SplitString( searchPaths, ";", searchPathList );
 
-		for ( int i=0; i < searchPathList.Count(); i++ )
+		for ( auto *searchPath : searchPathList )
 		{
-			m_Watcher.AddDirectory( searchPathList[i], "materials", true );
+			// dimhotepus: Do not watch VPKs (from mods) as they are not directories.
+			if ( !V_strEndsWith( searchPath, ".vpk" ) )
+			{
+				m_Watcher.AddDirectory( searchPath, "materials", true );
+			}
 		}
 		
 		searchPathList.PurgeAndDeleteElements();
@@ -188,7 +190,7 @@ void CTextureSystem::FreeAllTextures()
 // Input  : pTexture - Pointer to texture to add.
 // Output : Returns the index of the texture in the master texture list.
 //-----------------------------------------------------------------------------
-int CTextureSystem::AddTexture(IEditorTexture *pTexture)
+intp CTextureSystem::AddTexture(IEditorTexture *pTexture)
 {
 	return m_Textures.AddToTail(pTexture);
 }
@@ -285,7 +287,7 @@ IEditorTexture *CTextureSystem::FindActiveTexture(LPCSTR pszInputName, int *piIn
 	// The .vmf file format gets confused if there are backslashes in material names,
 	// so make sure they're all using forward slashes here.
 	char szName[MAX_PATH];
-	Q_StrSubst( pszInputName, "\\", "/", szName, sizeof( szName ) );
+	V_StrSubst( pszInputName, "\\", "/", szName );
 	const char *pszName = szName;
 	IEditorTexture *pTex = NULL;
 	//
@@ -327,9 +329,9 @@ IEditorTexture *CTextureSystem::FindActiveTexture(LPCSTR pszInputName, int *piIn
 		iIndex = 0;
 		char szBuf[512];
 
-		sprintf(szBuf, "textures\\%s", pszName);
+		V_sprintf_safe(szBuf, "textures\\%s", pszName);
 
-		for (int i = strlen(szBuf) -1; i >= 0; i--)
+		for (intp i = strlen(szBuf) -1; i >= 0; i--)
 		{
 			if (szBuf[i] == '/')
 				szBuf[i] = '\\';
@@ -404,7 +406,7 @@ void CTextureSystem::AddMRU(IEditorTexture *pTex)
 	if (!m_pActiveContext)
 		return;
 
-	int nIndex = m_pActiveContext->MRU.Find(pTex);
+	intp nIndex = m_pActiveContext->MRU.Find(pTex);
 	if (nIndex != -1)
 	{
 		m_pActiveContext->MRU.Remove(nIndex);
@@ -439,7 +441,7 @@ void CTextureSystem::InformPaletteChanged()
 //-----------------------------------------------------------------------------
 TextureContext_t *CTextureSystem::FindTextureContextForConfig(CGameConfig *pConfig)
 {
-	for (int i = 0; i < m_TextureContexts.Count(); i++)
+	for (intp i = 0; i < m_TextureContexts.Count(); i++)
 	{
 		if (m_TextureContexts.Element(i).pConfig == pConfig)
 		{
@@ -479,10 +481,10 @@ void CTextureSystem::SetActiveGroup(const char *pcszName)
 		return;
 
 	char szBuf[MAX_PATH];
-	sprintf(szBuf, "textures\\%s", pcszName);
+	V_sprintf_safe(szBuf, "textures\\%s", pcszName);
 
-	int iCount = m_pActiveContext->Groups.Count();
-	for (int i = 0; i < iCount; i++)
+	intp iCount = m_pActiveContext->Groups.Count();
+	for (intp i = 0; i < iCount; i++)
 	{
 		CTextureGroup *pGroup = m_pActiveContext->Groups.Element(i);
 		if (!strcmpi(pGroup->GetName(), pcszName))
@@ -506,7 +508,7 @@ void CTextureSystem::SetActiveGroup(const char *pcszName)
 void HammerFileSystem_ReportSearchPath( const char *szPathID )
 {
 	char szSearchPath[ 4096 ];
-	g_pFullFileSystem->GetSearchPath( szPathID, true, szSearchPath, sizeof( szSearchPath ) );
+	g_pFullFileSystem->GetSearchPath_safe( szPathID, true, szSearchPath );
 
 	Msg( mwStatus, "------------------------------------------------------------------" );
 
@@ -531,7 +533,7 @@ void HammerFileSystem_SetGame( const char *pExeDir, const char *pModDir )
 
 	char buf[MAX_PATH];
 
-	Q_snprintf( buf, MAX_PATH, "%s\\hl2", pExeDir );
+	V_sprintf_safe( buf, "%s\\hl2", pExeDir );
 	g_pFullFileSystem->AddSearchPath( buf, "GAME", PATH_ADD_TO_HEAD );
 
 	if ( pModDir && *pModDir != '\0' )
@@ -611,11 +613,11 @@ void CTextureSystem::LoadMaterials(CGameConfig *pConfig)
 	m_pActiveContext->Groups.AddToTail(pGroup);
 
 	// Add all the materials to the group.
-	CMaterial::EnumerateMaterials( this, "materials", (int)pGroup, INCLUDE_WORLD_MATERIALS );
+	CMaterial::EnumerateMaterials( this, "materials", (intp)pGroup, INCLUDE_WORLD_MATERIALS );
 	
 	// Watch the materials directory recursively...
 	CMaterialFileChangeWatcher *pWatcher = new CMaterialFileChangeWatcher;
-	pWatcher->Init( this, (int)pGroup );
+	pWatcher->Init( this, (intp)pGroup );
 	m_ChangeWatchers.AddToTail( pWatcher );
 
 	Assert( m_pCubemapTexture == NULL );
@@ -631,9 +633,9 @@ void CTextureSystem::LoadMaterials(CGameConfig *pConfig)
 	
 	// Get the nodraw texture.
 	m_pNoDrawTexture = NULL;
-	for ( int i=0; i < m_Textures.Count(); i++ )
+	for ( intp i=0; i < m_Textures.Count(); i++ )
 	{
-		if ( V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 || V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 )
+		if ( V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 )
 		{
 			m_pNoDrawTexture = m_Textures[i];
 			break;
@@ -657,16 +659,16 @@ void CTextureSystem::RebindDefaultCubeMap()
 
 void CTextureSystem::UpdateFileChangeWatchers()
 {
-	for ( int i=0; i < m_ChangeWatchers.Count(); i++ )
+	for ( intp i=0; i < m_ChangeWatchers.Count(); i++ )
 		m_ChangeWatchers[i]->Update();
 }
 
 
-void CTextureSystem::OnFileChange( const char *pFilename, int context, CTextureSystem::EFileType eFileType )
+void CTextureSystem::OnFileChange( const char *pFilename, intp context, CTextureSystem::EFileType eFileType )
 {
 	// It requires the forward slashes later...
 	char fixedSlashes[MAX_PATH];
-	V_StrSubst( pFilename, "\\", "/", fixedSlashes, sizeof( fixedSlashes ) );	
+	V_StrSubst( pFilename, "\\", "/", fixedSlashes );
 
 	// Get rid of the extension.
 	if ( V_strlen( fixedSlashes ) < 5 )
@@ -715,7 +717,7 @@ void CTextureSystem::OnFileChange( const char *pFilename, int context, CTextureS
 //-----------------------------------------------------------------------------
 void CTextureSystem::ReloadMaterialsUsingTexture( ITexture *pTestTexture )
 {
-	for ( int i=0; i < m_Textures.Count(); i++ )
+	for ( intp i=0; i < m_Textures.Count(); i++ )
 	{
 		IEditorTexture *pEditorTex = m_Textures[i];
 		IMaterial *pMat = pEditorTex->GetMaterial( false );
@@ -748,7 +750,7 @@ void CTextureSystem::ReloadMaterialsUsingTexture( ITexture *pTestTexture )
 bool CTextureSystem::GetFileTypeFromFilename( const char *pFilename, CTextureSystem::EFileType *pFileType )
 {
 	char strRight[16];
-	V_StrRight( pFilename, 4, strRight, sizeof( strRight ) );
+	V_StrRight( pFilename, 4, strRight );
 	if ( V_stricmp( strRight, ".vmt" ) == 0 )
 	{
 		*pFileType = CTextureSystem::k_eFileTypeVMT;
@@ -770,7 +772,7 @@ void CTextureSystem::ReloadTextures( const char *pFilterName )
 {
 	MaterialSystemInterface()->ReloadMaterials( pFilterName );
 
-	for ( int i = 0; i < m_Textures.Count(); i++ )
+	for ( intp i = 0; i < m_Textures.Count(); i++ )
 	{
 		if ( !Q_stristr( pFilterName, m_Textures[i]->GetName() ) )
 			continue;
@@ -1033,7 +1035,7 @@ DWORD CTextureSystem::LoadGraphicsFile(const char *pFilename)
 	// Is this a WAD file?
 	//
 	DWORD dwAttrib = GetFileAttributes(pFilename);
-	if (dwAttrib == 0xFFFFFFFF)
+	if (dwAttrib == INVALID_FILE_ATTRIBUTES)
 	{
 		return(0);
 	}
@@ -1120,8 +1122,8 @@ bool CTextureSystem::HasTexturesForConfig(CGameConfig *pConfig)
 	if (!pContext)
 		return false;
 
-	int nCount = pContext->Groups.Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pContext->Groups.Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CTextureGroup *pGroup = pContext->Groups.Element(i);
 		if (pGroup->GetTextureFormat() == pConfig->GetTextureFormat())
@@ -1137,7 +1139,7 @@ bool CTextureSystem::HasTexturesForConfig(CGameConfig *pConfig)
 //-----------------------------------------------------------------------------
 // Used to add all the world materials into the material list
 //-----------------------------------------------------------------------------
-bool CTextureSystem::EnumMaterial( const char *pMaterialName, int nContext )
+bool CTextureSystem::EnumMaterial( const char *pMaterialName, intp nContext )
 {
 	CTextureGroup *pGroup = (CTextureGroup *)nContext;
 	CMaterial *pMaterial = CMaterial::CreateMaterial(pMaterialName, false);
@@ -1187,9 +1189,7 @@ void CTextureSystem::RegisterTextureKeywords( IEditorTexture *pTexture )
 
 			if (!bFound)
 			{
-				char *pszKeyword = new char[strlen(pch) + 1];
-				strcpy(pszKeyword, pch);
-				m_Keywords.AddToTail(pszKeyword);
+				m_Keywords.AddToTail(V_strdup(pch));
 			}
 
 			pch = strtok(NULL, " ,;");
@@ -1217,7 +1217,7 @@ void CTextureSystem::LazyLoadTextures()
 TextureContext_t *CTextureSystem::AddTextureContext()
 {
 	// Allocate a new texture context.
-	int nIndex = m_TextureContexts.AddToTail();
+	intp nIndex = m_TextureContexts.AddToTail();
 
 	// Add the group to this config's list of texture groups.
 	TextureContext_t *pContext = &m_TextureContexts.Element(nIndex);
@@ -1237,9 +1237,15 @@ void CTextureSystem::OpenSource( const char *pMaterialName )
 	Q_snprintf( pRelativePath, MAX_PATH, "materials/%s.vmt", pMaterialName );
 
 	char pFullPath[MAX_PATH];
-	if ( g_pFullFileSystem->GetLocalPath( pRelativePath, pFullPath, MAX_PATH ) )
+	if ( g_pFullFileSystem->GetLocalPath_safe( pRelativePath, pFullPath ) )
 	{
-		ShellExecute( NULL, "open", pFullPath, NULL, NULL, SW_SHOWNORMAL );
+		if (HINSTANCE(32) > ShellExecute( NULL, "open", pFullPath, NULL, NULL, SW_SHOWNORMAL ))
+		{
+			CString format;
+			format.Format("The texture '%s' couldn't be opened. Looks like it is inside VPK file.", pFullPath);
+
+			AfxMessageBox(format, MB_ICONEXCLAMATION);
+		}
 	}
 }
 
@@ -1250,7 +1256,7 @@ void CTextureSystem::OpenSource( const char *pMaterialName )
 //-----------------------------------------------------------------------------
 CTextureGroup::CTextureGroup(const char *pszName)
 {
-	strcpy(m_szName, pszName);
+	V_strcpy_safe(m_szName, pszName);
 	m_eTextureFormat = tfNone;
 	m_nTextureToLoad = 0;
 }
@@ -1307,7 +1313,7 @@ IEditorTexture *CTextureGroup::GetTexture(int nIndex)
 //-----------------------------------------------------------------------------
 IEditorTexture *CTextureGroup::GetTexture( char const* pName )
 {
-	for (int i = 0; i < m_Textures.Count(); i++)
+	for (intp i = 0; i < m_Textures.Count(); i++)
 	{
 		if (!strcmp(pName, m_Textures[i]->GetName()))
 			return m_Textures[i];

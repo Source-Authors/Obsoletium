@@ -584,7 +584,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 #ifdef CSTRIKE_DLL
 	else if ( enginetrace->GetPointContents( knee ) & MASK_WATER )  // we want to use the knee for Cstrike, not the waist
 #else
-	else if ( GetWaterLevel() == WL_Waist )
+	else if ( GetWaterLevel() == WaterLevel::WL_Waist )
 #endif // CSTRIKE_DLL
 	{
 		static int iSkipStep = 0;
@@ -603,7 +603,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 		fvol = 0.65;
 		SetStepSoundTime( STEPSOUNDTIME_WATER_KNEE, bWalking );
 	}
-	else if ( GetWaterLevel() == WL_Feet )
+	else if ( GetWaterLevel() == WaterLevel::WL_Feet )
 	{
 		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "water" ) );
 		fvol = bWalking ? 0.2f : 0.5f;
@@ -792,15 +792,15 @@ void CBasePlayer::SetStepSoundTime( stepsoundtimes_t iStepSoundTime, bool bWalki
 	{
 	case STEPSOUNDTIME_NORMAL:
 	case STEPSOUNDTIME_WATER_FOOT:
-		m_flStepSoundTime = bWalking ? 400 : 300;
+		m_flStepSoundTime = bWalking ? 400.f : 300.f;
 		break;
 
 	case STEPSOUNDTIME_ON_LADDER:
-		m_flStepSoundTime = 350;
+		m_flStepSoundTime = 350.f;
 		break;
 
 	case STEPSOUNDTIME_WATER_KNEE:
-		m_flStepSoundTime = 600;
+		m_flStepSoundTime = 600.f;
 		break;
 
 	default:
@@ -811,7 +811,7 @@ void CBasePlayer::SetStepSoundTime( stepsoundtimes_t iStepSoundTime, bool bWalki
 	// UNDONE: need defined numbers for run, walk, crouch, crouch run velocities!!!!	
 	if ( ( GetFlags() & FL_DUCKING) || ( GetMoveType() == MOVETYPE_LADDER ) )
 	{
-		m_flStepSoundTime += 100;
+		m_flStepSoundTime += 100.f;
 	}
 }
 
@@ -1096,10 +1096,10 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 	// try the hit entity if there is one, or the ground entity if there isn't.
 	CBaseEntity *pNearest = NULL;
 
-	const int NUM_TANGENTS = 8;
+	constexpr int NUM_TANGENTS = 8;
 	// trace a box at successive angles down
 	//							forward, 45 deg, 30 deg, 20 deg, 15 deg, 10 deg, -10, -15
-	const float tangents[NUM_TANGENTS] = { 0, 1, 0.57735026919f, 0.3639702342f, 0.267949192431f, 0.1763269807f, -0.1763269807f, -0.267949192431f };
+	constexpr float tangents[NUM_TANGENTS] = { 0, 1, 0.57735026919f, 0.3639702342f, 0.267949192431f, 0.1763269807f, -0.1763269807f, -0.267949192431f };
 	for ( int i = 0; i < NUM_TANGENTS; i++ )
 	{
 		if ( i == 0 )
@@ -1465,7 +1465,7 @@ void CBasePlayer::SmoothViewOnStairs( Vector& eyeOrigin )
 
 		m_flOldPlayerZ += steptime * 150 * dir;
 
-		const float stepSize = 18.0f;
+		constexpr float stepSize = 18.0f;
 
 		if ( dir > 0 )
 		{
@@ -1985,7 +1985,7 @@ bool CBasePlayer::SetFOV( CBaseEntity *pRequester, int FOV, float zoomRate, int 
 //-----------------------------------------------------------------------------
 void CBasePlayer::UpdateUnderwaterState( void )
 {
-	if ( GetWaterLevel() == WL_Eyes )
+	if ( GetWaterLevel() == WaterLevel::WL_Eyes )
 	{
 		if ( IsPlayerUnderwater() == false )
 		{
@@ -1999,7 +1999,7 @@ void CBasePlayer::UpdateUnderwaterState( void )
 		SetPlayerUnderwater( false );
 	}
 
-	if ( GetWaterLevel() == 0 )
+	if (GetWaterLevel() == WaterLevel::WL_NotInWater )
 	{
 		if ( GetFlags() & FL_INWATER )
 		{

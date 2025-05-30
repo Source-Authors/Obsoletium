@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_Interrupt( CEventParams *params );
+intp EventProperties_Interrupt( CEventParams *params );
 
 #endif // EVENTPROPERTIES_INTERRUPT_H

@@ -33,10 +33,19 @@ private:
 // Support functions
 //-----------------------------------------------------------------------------
 
-#define LOG2_BITS_PER_INT	5
-#define BITS_PER_INT (CHAR_BIT * sizeof(int))
+template<typename T, size_t bits = CHAR_BIT * sizeof(T)>
+constexpr inline size_t Log2Bits() noexcept
+{
+	if (bits > 1)
+		return 1 + Log2Bits<T, (bits >> 1u)>();
+	else
+		return 0;
+}
 
-#if _WIN32 && !defined(_X360)
+constexpr inline int BITS_PER_INT{CHAR_BIT * sizeof(int)};
+constexpr inline int LOG2_BITS_PER_INT{Log2Bits<int>()};
+
+#if _WIN32
 #include <intrin.h>
 #pragma intrinsic(_BitScanForward)
 #endif
@@ -46,18 +55,10 @@ inline int FirstBitInWord( unsigned int elem, int offset )
 #if _WIN32
 	if ( !elem )
 		return -1;
-#if defined( _X360 )
-	// this implements CountTrailingZeros() / BitScanForward()
-	unsigned int mask = elem-1;
-	unsigned int comp = ~elem;
-	elem = mask & comp;
-	return (32 - _CountLeadingZeros(elem)) + offset;
-#else
+
 	unsigned long out;
 	_BitScanForward(&out, elem);
 	return out + offset;
-#endif
-
 #else
 	static unsigned firstBitLUT[256] = 
 	{
@@ -99,8 +100,9 @@ inline int FirstBitInWord( unsigned int elem, int offset )
 
 //-------------------------------------
 
-template <typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
-inline unsigned GetEndMask( T numBits ) 
+template <typename T>
+inline std::enable_if_t<sizeof(T) <= sizeof(unsigned), unsigned>
+GetEndMask( T numBits ) 
 { 
 	static unsigned bitStringEndMasks[] = 
 	{
@@ -141,8 +143,9 @@ inline unsigned GetEndMask( T numBits )
 	return bitStringEndMasks[numBits % BITS_PER_INT]; 
 }
 
-template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
-constexpr inline T GetBitForBitnum( T bitNum ) 
+template<typename T>
+constexpr inline std::enable_if_t<sizeof(T) <= sizeof(unsigned), T>
+GetBitForBitnum( T bitNum ) 
 { 
 	T bitsForBitnum[] = 
 	{
@@ -183,8 +186,9 @@ constexpr inline T GetBitForBitnum( T bitNum )
 	return bitsForBitnum[ (bitNum) & (BITS_PER_INT-1) ]; 
 }
 
-template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
-inline T GetBitForBitnumByte( T bitNum ) 
+template<typename T>
+inline std::enable_if_t<sizeof(T) <= sizeof(unsigned), T>
+GetBitForBitnumByte( T bitNum ) 
 { 
 	static T bitsForBitnum[] =
 	{
@@ -201,16 +205,12 @@ inline T GetBitForBitnumByte( T bitNum )
 	return bitsForBitnum[ bitNum & 7 ];
 }
 
-template<typename T, typename = std::enable_if_t<sizeof(T) <= sizeof(unsigned)>>
-constexpr inline T CalcNumIntsForBits( T numBits )	{ return (numBits + (BITS_PER_INT-1)) / BITS_PER_INT; }
+template<typename T>
+constexpr inline std::enable_if_t<sizeof(T) <= sizeof(unsigned), T>
+CalcNumIntsForBits( T numBits )	{ return (numBits + (BITS_PER_INT-1)) / BITS_PER_INT; }
 
-#ifdef _X360
-#define BitVec_Bit( bitNum ) GetBitForBitnum( bitNum )
-#define BitVec_BitInByte( bitNum ) GetBitForBitnumByte( bitNum )
-#else
 #define BitVec_Bit( bitNum ) ( 1 << ( (bitNum) & (BITS_PER_INT-1) ) )
 #define BitVec_BitInByte( bitNum ) ( 1 << ( (bitNum) & 7 ) )
-#endif
 #define BitVec_Int( bitNum ) ( (bitNum) >> LOG2_BITS_PER_INT )
 
 
@@ -406,9 +406,7 @@ private:
 class CVarBitVec : public CBitVecT< CVarBitVecBase<unsigned short> >
 {
 public:
-	CVarBitVec()
-	{
-	}
+	CVarBitVec() = default;
 	
 	CVarBitVec(int numBits)
 	 : CBitVecT< CVarBitVecBase<unsigned short> >(static_cast<unsigned short>(numBits))
@@ -426,9 +424,7 @@ public:
 class CLargeVarBitVec : public CBitVecT< CVarBitVecBase<int> >
 {
 public:
-	CLargeVarBitVec()
-	{
-	}
+	CLargeVarBitVec() = default;
 
 	CLargeVarBitVec(int numBits)
 		: CBitVecT< CVarBitVecBase<int> >(numBits)
@@ -453,7 +449,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-typedef CBitVec<32> CDWordBitVec;
+typedef CBitVec<32> CDWordBitVec; //-V112
 
 //-----------------------------------------------------------------------------
 
@@ -578,7 +574,7 @@ template <class BASE_OPS>
 inline CBitVecT<BASE_OPS>::CBitVecT()
 {
 	// undef this is ints are not 4 bytes
-	COMPILE_TIME_ASSERT( sizeof(int)==4 );
+	COMPILE_TIME_ASSERT( sizeof(int)==4 ); //-V112
 	
 	// Initialize bitstring by clearing all bits
 	ClearAll();
@@ -590,7 +586,7 @@ inline CBitVecT<BASE_OPS>::CBitVecT(typename BASE_OPS::BitCountType numBits)
  : BASE_OPS( numBits )
 {
 	// undef this is ints are not 4 bytes
-	COMPILE_TIME_ASSERT( sizeof(int)==4 );
+	COMPILE_TIME_ASSERT( sizeof(int)==4 ); //-V112
 	
 	// Initialize bitstring by clearing all bits
 	ClearAll();

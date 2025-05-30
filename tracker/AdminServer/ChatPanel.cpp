@@ -9,7 +9,7 @@
 #include "RemoteServer.h"
 
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/RichText.h>
@@ -75,9 +75,9 @@ void CChatPanel::OnSendChat()
 {
 	// build a chat command and send it to the server
 	char chat_text[512];
-	strcpy(chat_text, "say ");
+	V_strcpy_safe(chat_text, "say ");
 	m_pEnterChatPanel->GetText(chat_text + 4, sizeof(chat_text) - 4);
-	if (strlen("say ") != strlen(chat_text))
+	if (ssize("say ") - 1 != strlen(chat_text))
 	{
 		RemoteServer().SendCommand(chat_text);
 

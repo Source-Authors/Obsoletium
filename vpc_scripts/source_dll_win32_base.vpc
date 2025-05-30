@@ -26,7 +26,7 @@ $Configuration
 {
 	$General
 	{
-		$TargetName	"$OUTBINNAME"
+		$TargetName							"$OUTBINNAME"
 	}
 
 	$Compiler
@@ -37,7 +37,7 @@ $Configuration
 
 	$Compiler [$WIN32]
 	{
-		$EnableEnhancedInstructionSet	"Streaming SIMD Extensions 2 (/arch:SSE2)"
+		$EnableEnhancedInstructionSet		"Streaming SIMD Extensions 2 (/arch:SSE2)"
 	}
 	
 	$Linker
@@ -52,33 +52,38 @@ $Configuration
 		$AdditionalOptions					"$BASE /HIGHENTROPYVA"	[$WIN64]
 		// Suppress this pointless warning using the undocumented /ignore linker switch
 		// schemalib.lib(schemaclassinfo.obj) : warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
-		// $AdditionalOptions					"$BASE /ignore:4221"
+		// $AdditionalOptions				"$BASE /ignore:4221"
 	}
 	
 	$PreBuildEvent
 	{
-		$CommandLine		"if EXIST $OUTBINDIR\$(TargetFileName) for /f $QUOTEdelims=$QUOTE %%A in ('attrib $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE') do set valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
-							"set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
-							"if $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE del /q $QUOTE$(TargetDir)$QUOTE$(TargetFileName)" "\n" \
+		$CommandLine		"IF EXIST $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE (" "\n" \
+							"	FOR /f $QUOTEdelims=$QUOTE %%A IN ('ATTRIB $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE') DO SET valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
+							")" "\n" \
+							"SET valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
+							"IF $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE (" "\n" \
+							"   DEL /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
+							")" "\n" \
 							"$CRCCHECK" "\n"
 	}
 
 	$PostBuildEvent [!$ANALYZE]
 	{
-		$CommandLine		"if not exist $QUOTE$OUTBINDIR$QUOTE mkdir $QUOTE$OUTBINDIR$QUOTE" "\n" 
-		$CommandLine		"$BASE" "copy $QUOTE$(TargetDir)$(TargetFileName)$QUOTE $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE" "\n" \
-							"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
-							"if exist $QUOTE$(TargetDir)$(TargetName).map$QUOTE copy $QUOTE$(TargetDir)$(TargetName).map$QUOTE $OUTBINDIR\$(TargetName).map" "\n" 
-		$CommandLine		"$BASE" "copy $QUOTE$(IntDir)$(TargetName).pdb$QUOTE $OUTBINDIR\$(TargetName).pdb" "\n" \
-							"if ERRORLEVEL 1 goto BuildEventFailed" "\n" \
-							"goto BuildEventOK" "\n" \
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" 
+		$CommandLine		"$BASE" "COPY $QUOTE$(TargetDir)$(TargetFileName)$QUOTE $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE" "\n" \
+							"IF ERRORLEVEL 1 goto BuildEventFailed" "\n" \
+							// "SignTool sign /f $QUOTE$(SolutionDir)devtools\certificates\dev\local-dev-app-sign.pfx$QUOTE /p $QUOTEK)(#JF*56U8$RJO_)P#6NJP762OKAE$QUOTE /fd SHA512 /td SHA512 /tr http://timestamp.sectigo.com $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE" "\n" \
+							// "IF ERRORLEVEL 1 goto BuildEventFailed" "\n" \
+							"IF EXIST $QUOTE$(TargetDir)$(TargetName).map$QUOTE COPY $QUOTE$(TargetDir)$(TargetName).map$QUOTE $OUTBINDIR\$(TargetName).map" "\n"
+		$CommandLine		"$BASE" "COPY $QUOTE$(IntDir)$(TargetName).pdb$QUOTE $OUTBINDIR\$(TargetName).pdb" "\n" \
+							"IF ERRORLEVEL 1 goto BuildEventFailed" "\n" \
+							"GOTO BuildEventOK" "\n" \
 							":BuildEventFailed" "\n" \
-							"echo *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***" "\n" \
-							"del /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
-							"exit 1" "\n" \
+							"ECHO *** ERROR! PostBuildStep FAILED for $(ProjectName)! $(TargetFileName) is probably running. ***" "\n" \
+							"DEL /q $QUOTE$(TargetDir)$(TargetFileName)$QUOTE" "\n" \
+							"EXIT 1" "\n" \
 							":BuildEventOK" "\n" 
-
-		$Description		"Publishing to $OUTBINDIR"
+		$Description		"Publishing $(TargetFileName) to $OUTBINDIR"
 		$ExcludedFromBuild	"No"
 	}
 }

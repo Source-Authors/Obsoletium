@@ -154,7 +154,7 @@ void C_CitadelEnergyCore::UpdateIdle( float percentage )
 		sParticle->m_flDieTime		= 0.5f;
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
 		int alpha = 255 * percentage;
@@ -202,7 +202,7 @@ void C_CitadelEnergyCore::UpdateCharging( float percentage )
 		sParticle->m_flDieTime		= 0.1f;
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
 		int alpha = 255;
@@ -263,7 +263,7 @@ void C_CitadelEnergyCore::UpdateCharging( float percentage )
 		sParticle->m_flDieTime		= 0.5f;
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
 		int alpha = 255 * percentage;
@@ -309,7 +309,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 	sParticle->m_flDieTime		= 0.2f;
 	sParticle->m_flLifetime		= 0.0f;
 
-	sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+	sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 	sParticle->m_flRollDelta	= 0.0f;
 
 	constexpr int alpha = 128;
@@ -338,7 +338,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 		sParticle->m_flDieTime		= 0.2f;
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
 		constexpr int alpha1 = 100;
@@ -401,7 +401,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 		sParticle->m_flDieTime		= 0.5f;
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
 		constexpr unsigned char alpha2 = 255;

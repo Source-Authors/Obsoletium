@@ -78,7 +78,7 @@ public:
 	void		StopTimer( int iHintID );
 
 private:
-	int			GetTimerIndex( int iHintID );
+	intp		GetTimerIndex( int iHintID ) const;
 
 private:
 	struct hintmessagetime_t

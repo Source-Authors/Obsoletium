@@ -10,6 +10,7 @@
 #include "DispColl_Common.h"
 #include "radial.h"
 #include "CollisionUtils.h"
+#include "bspflags.h"
 #include "tier0\dbg.h"
 
 #define SAMPLE_BBOX_SLOP		5.0f
@@ -70,10 +71,7 @@ bool CVRADDispColl::Create( CCoreDispInfo *pDisp )
 	// a better world-space uniform approx. due to the non-linear nature
 	// of the displacement surface in uv-space
 	dface_t *pFace = &g_pFaces[m_iParent];
-	if( pFace )
-	{
-		CalcSampleRadius2AndBox( pFace );	
-	}
+	CalcSampleRadius2AndBox( pFace );	
 
 	return true;
 }
@@ -85,9 +83,6 @@ void CVRADDispColl::CalcSampleRadius2AndBox( dface_t *pFace )
 {
 	// Get the luxel sample size.
 	texinfo_t *pTexInfo = &texinfo[pFace->texinfo];
-	Assert ( pTexInfo );
-	if ( !pTexInfo )
-		return;
 
 	// Todo: Width = Height now, should change all the code to look at one value.
 	Vector vecTmp( pTexInfo->lightmapVecsLuxelsPerWorldUnits[0][0],
@@ -390,14 +385,14 @@ float CVRADDispColl::CreateParentPatches( void )
 	// Get the number of displacement subdivisions.
 	int nInterval = GetWidth();
 
-	Vector vecPoints[4];
+	Vector vecPoints[4] = {};
 	vecPoints[0].Init( m_aVerts[0].x, m_aVerts[0].y, m_aVerts[0].z );
 	vecPoints[1].Init( m_aVerts[(nInterval*(nInterval-1))].x, m_aVerts[(nInterval*(nInterval-1))].y, m_aVerts[(nInterval*(nInterval-1))].z );
 	vecPoints[2].Init( m_aVerts[((nInterval*nInterval)-1)].x, m_aVerts[((nInterval*nInterval)-1)].y, m_aVerts[((nInterval*nInterval)-1)].z );
 	vecPoints[3].Init( m_aVerts[(nInterval-1)].x, m_aVerts[(nInterval-1)].y, m_aVerts[(nInterval-1)].z );
 
 	// Create and initialize the patch.
-	int iPatch = g_Patches.AddToTail();
+	intp iPatch = g_Patches.AddToTail();
 	if ( iPatch == g_Patches.InvalidIndex() )
 		return flTotalArea;
 
@@ -418,7 +413,7 @@ float CVRADDispColl::CreateParentPatches( void )
 // Input  : iParentPatch - 
 //			nLevel - 
 //-----------------------------------------------------------------------------
-void CVRADDispColl::CreateChildPatchesFromRoot( int iParentPatch, int *pChildPatch )
+void CVRADDispColl::CreateChildPatchesFromRoot( intp iParentPatch, intp (&pChildPatch)[2] )
 {
 	// Initialize the child patch indices.
 	pChildPatch[0] = g_Patches.InvalidIndex();
@@ -429,8 +424,6 @@ void CVRADDispColl::CreateChildPatchesFromRoot( int iParentPatch, int *pChildPat
 
 	// Get the parent patch.
 	CPatch *pParentPatch = &g_Patches[iParentPatch];
-	if ( !pParentPatch )
-		return;
 
 	// Split along the longest edge.
 	Vector vecEdges[4];
@@ -525,17 +518,15 @@ void CVRADDispColl::CreateChildPatchesFromRoot( int iParentPatch, int *pChildPat
 // Input  : flMinArea - 
 // Output : float
 //-----------------------------------------------------------------------------
-void CVRADDispColl::CreateChildPatches( int iParentPatch, int nLevel )
+void CVRADDispColl::CreateChildPatches( intp iParentPatch, int nLevel )
 {
 	// Get the parent patch.
 	CPatch *pParentPatch = &g_Patches[iParentPatch];
-	if ( !pParentPatch )
-		return;
 
 	// The root face is a quad - special case.
 	if ( pParentPatch->winding->numpoints == 4 )
 	{
-		int iChildPatch[2];
+		intp iChildPatch[2];
 		CreateChildPatchesFromRoot( iParentPatch, iChildPatch );
 		if ( iChildPatch[0] != g_Patches.InvalidIndex() && iChildPatch[1] != g_Patches.InvalidIndex() )
 		{
@@ -611,7 +602,7 @@ void CVRADDispColl::CreateChildPatches( int iParentPatch, int nLevel )
 	}
 
 	// Create and initialize the children patches.
-	int iChildPatch[2] = { -1, -1 };
+	intp iChildPatch[2] = { -1, -1 };
 	for ( int iChild = 0; iChild < 2; ++iChild )
 	{
 		iChildPatch[iChild] = g_Patches.AddToTail();
@@ -646,12 +637,10 @@ void CVRADDispColl::CreateChildPatches( int iParentPatch, int nLevel )
 // Input  : flMinArea - 
 // Output : float
 //-----------------------------------------------------------------------------
-void CVRADDispColl::CreateChildPatchesSub( int iParentPatch )
+void CVRADDispColl::CreateChildPatchesSub( intp iParentPatch )
 {
 	// Get the parent patch.
 	CPatch *pParentPatch = &g_Patches[iParentPatch];
-	if ( !pParentPatch )
-		return;
 
 	// Calculate the the area of the patch (triangle!).
 	Assert( pParentPatch->winding->numpoints == 3 );
@@ -733,7 +722,7 @@ void CVRADDispColl::CreateChildPatchesSub( int iParentPatch )
 
 
 	// Create and initialize the children patches.
-	int iChildPatch[2] = { 0, 0 };
+	intp iChildPatch[2] = { 0, 0 };
 	int nChildIndices[3] = { -1, -1, -1 };
 	for ( int iChild = 0; iChild < 2; ++iChild )
 	{
@@ -796,7 +785,7 @@ int	PlaneTypeForNormal (Vector& normal)
 //			&flArea - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CVRADDispColl::InitParentPatch( int iPatch, Vector *pPoints, float &flArea )
+bool CVRADDispColl::InitParentPatch( intp iPatch, Vector *pPoints, float &flArea )
 {
 	// Get the current patch.
 	CPatch *pPatch = &g_Patches[iPatch];
@@ -901,12 +890,10 @@ bool CVRADDispColl::InitParentPatch( int iPatch, Vector *pPoints, float &flArea 
 //			&vecNormal - 
 //			flArea - 
 //-----------------------------------------------------------------------------
-bool CVRADDispColl::InitPatch( int iPatch, int iParentPatch, int iChild, Vector *pPoints, int *pIndices, float &flArea )
+bool CVRADDispColl::InitPatch( intp iPatch, intp iParentPatch, int iChild, Vector (&pPoints)[3], int (&pIndices)[3], float &flArea )
 {
 	// Get the current patch.
 	CPatch *pPatch = &g_Patches[iPatch];
-	if ( !pPatch )
-		return false;
 
 	// Clear the patch data.
 	memset( pPatch, 0, sizeof( CPatch ) );
@@ -1066,7 +1053,7 @@ void CVRADDispColl::AddPolysForRayTrace( void )
 	if ( !( m_nContents & MASK_OPAQUE ) )
 		return;
 
-	for ( int ndxTri = 0; ndxTri < m_aTris.Size(); ndxTri++ )
+	for ( intp ndxTri = 0; ndxTri < m_aTris.Count(); ndxTri++ )
 	{
 		CDispCollTri *tri = m_aTris.Base() + ndxTri;
 		int v[3];

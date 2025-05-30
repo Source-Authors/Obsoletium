@@ -20,7 +20,7 @@
 class CToolTrace : public CBaseTrace
 {
 public:
-	CToolTrace() {}
+	CToolTrace() = default;
 
 	Vector		mins;
 	Vector		maxs;
@@ -36,7 +36,7 @@ private:
 
 
 // 1/32 epsilon to keep floating point happy
-#define	DIST_EPSILON	(0.03125)
+#define	DIST_EPSILON	(0.03125f)
 
 // JAYHL2: This used to be -1, but that caused lots of epsilon issues
 // around slow sloping planes.  Perhaps Quake2 limited maps to a certain
@@ -151,7 +151,7 @@ public:
 void TestLine( const FourVectors& start, const FourVectors& stop,
                fltx4 *pFractionVisible, int static_prop_index_to_ignore )
 {
-	FourRays myrays;
+	FourRays myrays = {};
 	myrays.origin = start;
 	myrays.direction = stop;
 	myrays.direction -= myrays.origin;
@@ -352,7 +352,7 @@ void DM_ClipBoxToBrush( CToolTrace *trace, const Vector& mins, const Vector& max
 void TestLine_DoesHitSky( FourVectors const& start, FourVectors const& stop,
 	fltx4 *pFractionVisible, bool canRecurse, int static_prop_to_skip, bool bDoDebug )
 {
-	FourRays myrays;
+	FourRays myrays = {};
 	myrays.origin = start;
 	myrays.direction = stop;
 	myrays.direction -= myrays.origin;
@@ -405,7 +405,7 @@ void TestLine_DoesHitSky( FourVectors const& start, FourVectors const& stop,
 					int cam;
 					for (cam = 0; cam < num_sky_cameras; ++cam)
 					{
-						FourVectors skystart, skytrans, skystop;
+						FourVectors skystart, skystop;
 						skystart.DuplicateVector( sky_cameras[cam].origin );
 						skystop = start;
 						skystop *= sky_cameras[cam].world_to_sky;
@@ -603,7 +603,7 @@ void AddBrushesForRayTrace( void )
 	CUtlVector<int> brushList;
 	GetBrushes_r ( dmodels[0].headnode, brushList );
 
-	for ( int i = 0; i < brushList.Size(); i++ )
+	for ( int i = 0; i < brushList.Count(); i++ )
 	{
 		dbrush_t *brush = &dbrushes[brushList[i]];
 		AddBrushToRaytraceEnvironment ( brush, identity );
@@ -637,7 +637,7 @@ void AddBrushesForRayTrace( void )
 				v = dedges[surfEdge].v[0];
 
 			if ( v >= ARRAYSIZE( dvertexes ) )
-				Error( "***** ERROR! v(%u) >= ARRAYSIZE( dvertexes(%d) )!", ( unsigned int )v, ARRAYSIZE( dvertexes ) );
+				Error( "***** ERROR! v(%u) >= ARRAYSIZE( dvertexes(%zu) )!", ( unsigned int )v, ARRAYSIZE( dvertexes ) );
 
 			dvertex_t *dv = &dvertexes[v];
 			points[j] = dv->point;

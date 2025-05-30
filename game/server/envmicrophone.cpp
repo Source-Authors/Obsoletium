@@ -403,9 +403,14 @@ void CEnvMicrophone::Think(void)
 					fHearSound = true;
 				}
 			}
-		}
 
-		nSound = pCurrentSound->NextSound();
+			nSound = pCurrentSound->NextSound();
+		}
+		else
+		{
+			// dimhotepus: Break if no current sound.
+			break;
+		}
 	}
 
 	if( fHearSound )

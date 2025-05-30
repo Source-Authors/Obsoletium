@@ -7,7 +7,7 @@
 
 
 #include "stdafx.h"
-#include "tslist.h"
+#include "tier0/tslist.h"
 #include <workthreadpool.h>
 #include <gclogger.h>
 
@@ -74,7 +74,7 @@ int CWorkThread::Run()
 	CWorkThreadPool *pPool = m_pThreadPool;
 
 	int nIterations = 0;
-	const int nMaxFastIterations = 4;
+	constexpr int nMaxFastIterations = 4;
 	while ( !m_bExitThread )
 	{
 #if 0 // game vprof doesn't yet support TLS'd vprof instances, until new vprof code is ported
@@ -83,7 +83,7 @@ int CWorkThread::Run()
 			pProfile->MarkFrame( GetName() );
 #endif
 #endif
-		pPool->m_cActiveThreads++;
+		++pPool->m_cActiveThreads;
 
 		nIterations = 0;
 		while ( (pPool->BNeverSetEventOnAdd() && nIterations < nMaxFastIterations) || nIterations == 0 )
@@ -106,9 +106,9 @@ int CWorkThread::Run()
 
 					CFastTimer fastTimer;
 					fastTimer.Start();
-					pWorkItem->m_bRunning = true;
+					pWorkItem->m_bRunning.store(true, std::memory_order::memory_order_acq_rel);
 					bool bSuccess = pWorkItem->ThreadProcess( this );
-					pWorkItem->m_bRunning = false;
+					pWorkItem->m_bRunning.store(false, std::memory_order::memory_order_acq_rel);
 					fastTimer.End();
 					CCycleCount cycleCount = fastTimer.GetDuration();
 					pWorkItem->SetCycleCount(cycleCount);
@@ -167,7 +167,7 @@ int CWorkThread::Run()
 			}
 		}
 
-		pPool->m_cActiveThreads--;
+		--pPool->m_cActiveThreads;
 
 		// wait for a new work item to arrive in the queue, check the counts first just to be sure
 		{
@@ -219,7 +219,8 @@ CWorkThreadPool::CWorkThreadPool( const char *pszThreadName )
 	m_cMaxThreads( 0 ),
 	m_pWorkThreadConstructor( NULL ),
 	m_cSuccesses( 0 ),
-	m_cFailures( 0 )
+	m_cFailures( 0 ),
+	m_cRetries( 0 )
 {
 	Assert( pszThreadName != NULL );
 	Q_strncpy( m_szThreadNamePfx, pszThreadName, sizeof( m_szThreadNamePfx ) );
@@ -382,7 +383,7 @@ void CWorkThreadPool::StopWorkThreads()
 		}
 #endif
 
-		const uint k_uJoinTimeoutMillisec = 10000; // 10 seconds seems pretty arbitrary.
+		constexpr uint k_uJoinTimeoutMillisec = 10000; // 10 seconds seems pretty arbitrary.
 
 		CWorkThread *pWorkThread = m_WorkThreads[0];
 		bool bJoined = pWorkThread->Join( k_uJoinTimeoutMillisec );

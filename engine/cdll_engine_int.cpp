@@ -903,7 +903,7 @@ void CEngineClient::Con_NPrintf( int pos, const char *fmt, ... )
 	va_list		argptr;
 	char		text[4096];
 	va_start (argptr, fmt);
-	Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
 	::Con_NPrintf( pos, "%s", text );
@@ -914,7 +914,7 @@ void CEngineClient::Con_NXPrintf( const struct con_nprint_s *info, const char *f
 	va_list		argptr;
 	char		text[4096];
 	va_start (argptr, fmt);
-	Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
 	::Con_NXPrintf( info, "%s", text );
@@ -1357,10 +1357,6 @@ void CEngineClient::GetUILanguage( char *dest, int destlen )
 	if ( pStr )
 	{
 		V_strncpy( dest, pStr, destlen );
-	}
-	else if ( IsX360() )
-	{
-		dest[0] = 0;
 	}
 }
 
@@ -1817,7 +1813,7 @@ void ClientDLL_Init( void )
 
 		if ( !g_ClientDLL->Init(g_AppSystemFactory, g_AppSystemFactory, &g_ClientGlobalVariables ) )
 		{
-			Sys_Error("Client.dll Init() in library client failed.");
+			Sys_Error("Client" DLL_EXT_STRING " Init() in library client failed.");
 		}
 
 		if ( g_ClientFactory )
@@ -1868,7 +1864,7 @@ void ClientDLL_Init( void )
 				// Replay dll should be loaded by this point
 				if ( !g_pReplay )
 				{
-					Sys_Error( "Replay.dll was not loaded" );
+					Sys_Error( "Replay" DLL_EXT_STRING " was not loaded" );
 				}
 
 				// Get pointer to client-side replay interface implementation
@@ -1971,12 +1967,14 @@ void ClientDLL_Shutdown( void )
 //-----------------------------------------------------------------------------
 void ClientDLL_Unload()
 {
-	FileSystem_UnloadModule( g_ClientDLLModule );
-
-	g_ClientDLL = NULL;
-	g_ClientDLLModule = NULL;
+	// dimhotepus: In reverse order.
 	g_pClientRenderTargets = NULL;
+	g_pClientVR = NULL;
+	g_ClientDLL = NULL;
+	g_ClientFactory = NULL;
+	g_ClientDLLModule = NULL;
 
+	FileSystem_UnloadModule( g_ClientDLLModule );
 }
 
 //-----------------------------------------------------------------------------
@@ -2132,7 +2130,7 @@ bool CEngineClient::StartDemoRecording( const char *pszFilename, const char *psz
 	}
 
 	// remove .dem extension if it exists
-	Q_StripExtension( szTemp, szFinal, sizeof( szFinal ) );
+	Q_StripExtension( szTemp, szFinal );
 
 	// record it
 	demorecorder->StartRecording( szFinal, false );
@@ -2199,7 +2197,7 @@ void CEngineClient::TakeScreenshot( const char *pszFilename, const char *pszFold
 		V_sprintf_safe( szFinal, "%s", pszFilename );
 	}
 
-	V_SetExtension( szFinal, ".tga", sizeof( szFinal ) ); 
+	V_SetExtension( szFinal, ".tga" ); 
 
 	videomode->TakeSnapshotTGA( szFinal );
 

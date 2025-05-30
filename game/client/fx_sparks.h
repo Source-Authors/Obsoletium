@@ -45,18 +45,18 @@ inline void Color32ToFloat4( float colorOut[4], const color32 & colorIn )
 
 inline void FloatToColor32( color32 &out, float r, float g, float b, float a )
 {
-	out.r = r * 255;
-	out.g = g * 255;
-	out.b = b * 255;
-	out.a = a * 255;
+	out.r = static_cast<byte>(r * 255);
+	out.g = static_cast<byte>(g * 255);
+	out.b = static_cast<byte>(b * 255);
+	out.a = static_cast<byte>(a * 255);
 }
 
 inline void Float4ToColor32( color32 &out, float colorIn[4] )
 {
-	out.r = colorIn[0] * 255;
-	out.g = colorIn[1] * 255;
-	out.b = colorIn[2] * 255;
-	out.a = colorIn[3] * 255;
+	out.r = static_cast<byte>(colorIn[0] * 255);
+	out.g = static_cast<byte>(colorIn[1] * 255);
+	out.b = static_cast<byte>(colorIn[2] * 255);
+	out.a = static_cast<byte>(colorIn[3] * 255);
 }
 
 inline void Color32Init( color32 &out, byte r, byte g, byte b, byte a )

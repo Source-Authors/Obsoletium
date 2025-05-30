@@ -10,20 +10,27 @@
 #pragma once
 #endif
 
+#include "windows/base_wnd.h"
 #include "mathlib/vector.h"
 
 
 class CAngleCombo;
 
 
-class CAngleBox : public CWnd
+class CAngleBox : public CBaseWnd
 {
 public:
 	CAngleBox();
 	virtual ~CAngleBox();
 
 	bool GetAngles(QAngle &vecAngles);
-	char *GetAngles(char *szAngles);
+	char *GetAngles(char *szAngles, intp size);
+
+	template<intp size>
+	char *GetAngles(char (&szAngles)[size])
+	{
+		return GetAngles(szAngles, size);
+	}
 
 	void SetAngles(const QAngle &vecAngles, bool bRedraw = true);
 	void SetAngles(const char *szAngles, bool bRedraw = true);
@@ -31,7 +38,8 @@ public:
 	void SetDifferent(bool bDifferent, bool bRedraw = true);
 	inline void SetEditControl(CAngleCombo *pEdit);
 
-	char *GetAngleEditText(char *szBuf);
+	// dimhotepus: Add buffer size arg to prevent overflows.
+	char *GetAngleEditText(char *szBuf, ptrdiff_t len);
 
 	void Enable(bool bEnable);
 	void Show(bool bShow);

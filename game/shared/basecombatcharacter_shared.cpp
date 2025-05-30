@@ -414,7 +414,7 @@ bool CBaseCombatCharacter::IsAbleToSee( const CBaseEntity *pEntity, FieldOfViewC
 #if defined(GAME_DLL) && defined(TERROR)
 	if ( flDistToOther > NavObscureRange.GetFloat() )
 	{
-		const float flMaxDistance = 100.0f;
+		constexpr float flMaxDistance = 100.0f;
 		TerrorNavArea *pTargetArea = static_cast< TerrorNavArea* >( TheNavMesh->GetNearestNavArea( vecTargetPosition, false, flMaxDistance ) );
 		if ( !pTargetArea || pTargetArea->HasSpawnAttributes( TerrorNavArea::SPAWN_OBSCURED ) )
 			return false;
@@ -551,7 +551,7 @@ bool CBaseCombatCharacter::ComputeTargetIsInDarkness( const Vector &vecEyePositi
 		return false;
 
 	// Check light info
-	const float flMinLightIntensity = 0.1f;
+	constexpr float flMinLightIntensity = 0.1f;
 
 	if ( !pTargetNavArea || ( pTargetNavArea->GetLightIntensity() >= flMinLightIntensity ) )
 		return false;
@@ -566,7 +566,7 @@ bool CBaseCombatCharacter::ComputeTargetIsInDarkness( const Vector &vecEyePositi
 	UTIL_TraceLine( vecTargetPos, vecTargetPos + vecSightDirection * 32768.0f, MASK_L4D_VISION, &lightingFilter, &result );
 	if ( ( result.fraction < 1.0f ) && ( ( result.surface.flags & SURF_SKY ) == 0 ) )	
 	{
-		const float flMaxDistance = 100.0f;
+		constexpr float flMaxDistance = 100.0f;
 		TerrorNavArea *pFarArea = (TerrorNavArea *)TheNavMesh->GetNearestNavArea( result.endpos, false, flMaxDistance );
 
 		// Target is in darkness, the wall behind him is too, and we are too far away

@@ -83,7 +83,7 @@ bool CToolDecal::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D &
 	//
 	CMapDoc *pDoc = pView->GetMapDoc();
 
-	ULONG ulFace;
+	unsigned ulFace;
 	CMapClass *pObject;
 
 	if ((pObject = pView->NearestObjectAt( vPoint, ulFace)) != NULL)

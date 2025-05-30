@@ -216,10 +216,8 @@ int CMessageCharsPanel::AddText(
 	int len;
 
 	va_start(argptr, messageID);
-	len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
-
-	data[ MAX_MESSAGECHARSPANEL_LEN - 1 ] = 0;
 
 	CMessageCharsPanel::message_t *msg = AllocMessage();
 	if ( !msg )
@@ -390,10 +388,8 @@ public:
 		int len;
 
 		va_start(argptr, messageID);
-		len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+		len = V_vsprintf_safe(data, fmt, argptr);
 		va_end(argptr);
-
-		data[ MAX_MESSAGECHARSPANEL_LEN - 1 ] = 0;
 
 		if ( !messageCharsPanel )
 			return x;
@@ -447,10 +443,8 @@ public:
 		int len;
 
 		va_start(argptr, fmt);
-		len = Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+		len = V_vsprintf_safe(data, fmt, argptr);
 		va_end(argptr);
-
-		data[ MAX_MESSAGECHARSPANEL_LEN - 1 ] = 0;
 
 		messageCharsPanel->GetTextExtents( hCustomFont, width, height, data );
 	}

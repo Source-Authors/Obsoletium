@@ -278,7 +278,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 				yDir = yvec;
 				float yScale = VectorNormalize( yDir ) * 0.75f;
 
-				int numParticles = clamp( 4.0f * fadePerc, 1, 3 );
+				int numParticles = clamp( 4.0f * fadePerc, 1.f, 3.f );
 
 				for ( int j = 0; j < numParticles; j++ )
 				{
@@ -295,7 +295,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 					sParticle->m_flDieTime		= 0.2f;
 					sParticle->m_flLifetime		= 0.0f;
 
-					sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+					sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 					sParticle->m_flRollDelta	= Helper_RandomFloat( -2.0f, 2.0f );
 
 					unsigned char alpha = 40;
@@ -331,7 +331,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		sParticle->m_flDieTime		= 0.1f;
 		sParticle->m_flLifetime		= 0.0f;
 
-		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+		sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
 		unsigned char alpha = 255;
@@ -383,7 +383,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 			sParticle->m_flDieTime		= 0.5f;
 			sParticle->m_flLifetime		= 0.0f;
 
-			sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+			sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 			sParticle->m_flRollDelta	= 0.0f;
 
 			unsigned char alpha = 255;

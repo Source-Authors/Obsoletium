@@ -309,8 +309,8 @@ static inline void DecodeColorBlock( CDestPixel *pOutputImage, DXTColBlock *pCol
 	int r,n;
 
 	// bit masks = 00000011, 00001100, 00110000, 11000000
-	const dword masks[] = { 3 << 0, 3 << 2, 3 << 4, 3 << 6 };
-	const int   shift[] = { 0, 2, 4, 6 };
+	constexpr dword masks[] = { 3 << 0, 3 << 2, 3 << 4, 3 << 6 };
+	constexpr int   shift[] = { 0, 2, 4, 6 };
 
 	// r steps through lines in y
 	for ( r=0; r < 4; r++, pOutputImage += width-4 )	// no width*4 as dword ptr inc will *4
@@ -392,7 +392,7 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 
 	// first two rows of 4 pixels each:
 	// pRows = (Alpha3BitRows*) & ( pAlphaBlock->stuff[0] );
-	const dword mask = 0x00000007;		// bits = 00 00 01 11
+	constexpr dword mask = 0x00000007;		// bits = 00 00 01 11
 
 	dword bits = *( (dword*) & ( pAlphaBlock->stuff[0] ));
 
@@ -500,7 +500,7 @@ static void ConvertFromDXT1( const uint8 *src, CDestPixel *dst, int width, int h
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -562,7 +562,7 @@ static void ConvertFromDXT5( const uint8 *src, CDestPixel *dst, int width, int h
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -642,7 +642,7 @@ static void ConvertFromDXT5IgnoreAlpha( const uint8 *src, CDestPixel *dst, int w
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );
@@ -714,7 +714,7 @@ static void ConvertFromATIxN( const uint8 *src, CDestPixel *dst, int width, int 
 		width = ( width + 3 ) & ~3;
 		height = ( height + 3 ) & ~3;
 		realDst = dst;
-		dst = ( CDestPixel * )_alloca( static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof( CDestPixel ) );
+		dst = stackallocT( CDestPixel, static_cast<size_t>(width) * static_cast<size_t>(height) );
 		Assert( dst );
 	}
 	Assert( !( width % 4 ) );

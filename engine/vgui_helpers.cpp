@@ -113,10 +113,9 @@ bool IncrementalUpdateTree(
 		if ( iRoot == -1 )
 		{
 			// Add a root if there isn't one yet.
-			KeyValues *pTempValues = new KeyValues( "" );
+			KeyValuesAD pTempValues( "" );
 			pTempValues->SetString( "Text", "" );
 			iRoot = pTree->AddItem( pTempValues, iRoot );
-			pTempValues->deleteThis();
 		}
 	}
 
@@ -158,8 +157,8 @@ void CopyListPanelToClipboard( vgui::ListPanel *pListPanel )
 			wchar_t tempTextWC[512];
 			char tempText[512];
 
-			pListPanel->GetCellText( iCur, i, tempTextWC, sizeof( tempTextWC ) );
-			g_pVGuiLocalize->ConvertUnicodeToANSI( tempTextWC, tempText, sizeof( tempText ) );
+			pListPanel->GetCellText( iCur, i, tempTextWC );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( tempTextWC, tempText );
 
 			textBuf.AddMultipleToTail( strlen( tempText ), tempText );
 		}

@@ -58,17 +58,14 @@ private:
 };
 
 
-inline CBoneAccessor::CBoneAccessor()
-{
-	m_pAnimating = NULL;
-	m_pBones = NULL;
-	m_ReadableBones = m_WritableBones = 0;
+inline CBoneAccessor::CBoneAccessor() : CBoneAccessor{nullptr} {
 }
 
 inline CBoneAccessor::CBoneAccessor( matrix3x4_t *pBones )
 {
-	m_pAnimating = NULL;
+	m_pAnimating = nullptr;
 	m_pBones = pBones;
+	m_ReadableBones = m_WritableBones = 0;
 }
 
 #if defined( CLIENT_DLL )
@@ -109,10 +106,7 @@ inline const matrix3x4_t& CBoneAccessor::GetBone( int iBone ) const
 
 inline const matrix3x4_t& CBoneAccessor::operator[]( int iBone ) const
 {
-#if defined( CLIENT_DLL ) && defined( _DEBUG )
-	SanityCheckBone( iBone, true );
-#endif
-	return m_pBones[iBone];
+	return GetBone(iBone);
 }
 
 inline matrix3x4_t& CBoneAccessor::GetBoneForWrite( int iBone )

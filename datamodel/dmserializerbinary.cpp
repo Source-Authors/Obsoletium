@@ -52,12 +52,12 @@ public:
     
 private:
 	// Methods related to serialization
-	void SerializeElementIndex( CUtlBuffer& buf, CDmElementSerializationDictionary& list, DmElementHandle_t hElement, DmFileId_t fileid );
-	void SerializeElementAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute );
-	void SerializeElementArrayAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute );
-	bool SerializeAttributes( CUtlBuffer& buf, CDmElementSerializationDictionary& list, unsigned short *symbolToIndexMap, CDmElement *pElement );
-	bool SaveElementDict( CUtlBuffer& buf, unsigned short *symbolToIndexMap, CDmElement *pElement );
-	bool SaveElement( CUtlBuffer& buf, CDmElementSerializationDictionary& dict, unsigned short *symbolToIndexMap, CDmElement *pElement);
+	[[nodiscard]] bool SerializeElementIndex( CUtlBuffer& buf, CDmElementSerializationDictionary& list, DmElementHandle_t hElement, DmFileId_t fileid );
+	[[nodiscard]] bool SerializeElementAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute );
+	[[nodiscard]] bool SerializeElementArrayAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute );
+	[[nodiscard]] bool SerializeAttributes( CUtlBuffer& buf, CDmElementSerializationDictionary& list, unsigned short *symbolToIndexMap, CDmElement *pElement );
+	[[nodiscard]] bool SaveElementDict( CUtlBuffer& buf, unsigned short *symbolToIndexMap, CDmElement *pElement );
+	[[nodiscard]] bool SaveElement( CUtlBuffer& buf, CDmElementSerializationDictionary& dict, unsigned short *symbolToIndexMap, CDmElement *pElement);
 
 	// Methods related to unserialization
 	DmElementHandle_t UnserializeElementIndex( CUtlBuffer &buf, CUtlVector<CDmElement*> &elementList );
@@ -82,8 +82,9 @@ void InstallBinarySerializer( IDataModel *pFactory )
 //-----------------------------------------------------------------------------
 // Write out the index of the element to avoid looks at read time
 //-----------------------------------------------------------------------------
-void CDmSerializerBinary::SerializeElementIndex( CUtlBuffer& buf, CDmElementSerializationDictionary& list, DmElementHandle_t hElement, DmFileId_t fileid )
+bool CDmSerializerBinary::SerializeElementIndex( CUtlBuffer& buf, CDmElementSerializationDictionary& list, DmElementHandle_t hElement, DmFileId_t fileid )
 {
+	bool ok = true;
 	if ( hElement == DMELEMENT_HANDLE_INVALID )
 	{
 		buf.PutInt( ELEMENT_INDEX_NULL ); // invalid handle
@@ -101,7 +102,7 @@ void CDmSerializerBinary::SerializeElementIndex( CUtlBuffer& buf, CDmElementSeri
 			{
 				buf.PutInt( ELEMENT_INDEX_EXTERNAL );
 				char idstr[ 40 ];
-				UniqueIdToString( pElement->GetId(), idstr, sizeof( idstr ) );
+				ok = UniqueIdToString( pElement->GetId(), idstr );
 				buf.PutString( idstr );
 			}
 		}
@@ -113,7 +114,7 @@ void CDmSerializerBinary::SerializeElementIndex( CUtlBuffer& buf, CDmElementSeri
 			{
 				buf.PutInt( ELEMENT_INDEX_EXTERNAL );
 				char idstr[ 40 ];
-				UniqueIdToString( *pId, idstr, sizeof( idstr ) );
+				ok = UniqueIdToString( *pId, idstr );
 				buf.PutString( idstr );
 			}
 			else
@@ -122,32 +123,38 @@ void CDmSerializerBinary::SerializeElementIndex( CUtlBuffer& buf, CDmElementSeri
 			}
 		}
 	}
+
+	return ok;
 }
 
 
 //-----------------------------------------------------------------------------
 // Writes out element attributes
 //-----------------------------------------------------------------------------
-void CDmSerializerBinary::SerializeElementAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute )
+bool CDmSerializerBinary::SerializeElementAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute )
 {
-	SerializeElementIndex( buf, list, pAttribute->GetValue< DmElementHandle_t >(), pAttribute->GetOwner()->GetFileId() );
+	return SerializeElementIndex( buf, list, pAttribute->GetValue< DmElementHandle_t >(), pAttribute->GetOwner()->GetFileId() );
 }
 
 
 //-----------------------------------------------------------------------------
 // Writes out element array attributes
 //-----------------------------------------------------------------------------
-void CDmSerializerBinary::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute )
+bool CDmSerializerBinary::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmElementSerializationDictionary& list, CDmAttribute *pAttribute )
 {
 	DmFileId_t fileid = pAttribute->GetOwner()->GetFileId();
 	CDmrElementArray<> vec( pAttribute );
+
+	bool ok = true;
 
 	intp nCount = vec.Count();
 	buf.PutInt( nCount );
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		SerializeElementIndex( buf, list, vec.GetHandle(i), fileid );
+		ok = SerializeElementIndex( buf, list, vec.GetHandle(i), fileid ) && ok;
 	}
+
+	return ok;
 }
 
 
@@ -158,7 +165,7 @@ bool CDmSerializerBinary::SerializeAttributes( CUtlBuffer& buf, CDmElementSerial
 {
 	// Collect the attributes to be written
 	CDmAttribute **ppAttributes = ( CDmAttribute** )_alloca( pElement->AttributeCount() * sizeof( CDmAttribute* ) );
-	int nAttributes = 0;
+	intp nAttributes = 0;
 	for ( CDmAttribute *pAttribute = pElement->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 	{
 		if ( pAttribute->IsFlagSet( FATTRIB_DONTSAVE | FATTRIB_STANDARD ) )
@@ -167,9 +174,10 @@ bool CDmSerializerBinary::SerializeAttributes( CUtlBuffer& buf, CDmElementSerial
 		ppAttributes[ nAttributes++ ] = pAttribute;
 	}
 
+	bool ok = true;
 	// Now write them all out in reverse order, since FirstAttribute is actually the *last* attribute for perf reasons
 	buf.PutInt( nAttributes );
-	for ( int i = nAttributes - 1; i >= 0; --i )
+	for ( intp i = nAttributes - 1; i >= 0; --i )
 	{
 		CDmAttribute *pAttribute = ppAttributes[ i ];
 		Assert( pAttribute );
@@ -179,27 +187,27 @@ bool CDmSerializerBinary::SerializeAttributes( CUtlBuffer& buf, CDmElementSerial
 		switch( pAttribute->GetType() )
 		{
 		default:
- 			pAttribute->Serialize( buf );
+ 			ok = pAttribute->Serialize( buf ) && ok;
 			break;
 
 		case AT_ELEMENT:
-			SerializeElementAttribute( buf, list, pAttribute );
+			ok = SerializeElementAttribute( buf, list, pAttribute ) && ok;
 			break;
 
 		case AT_ELEMENT_ARRAY:
-			SerializeElementArrayAttribute( buf, list, pAttribute );
+			ok = SerializeElementArrayAttribute( buf, list, pAttribute ) && ok;
 			break;
 		}
 	}
 
-	return buf.IsValid();
+	return ok && buf.IsValid();
 }
 
 
 bool CDmSerializerBinary::SaveElement( CUtlBuffer& buf, CDmElementSerializationDictionary& list, unsigned short *symbolToIndexMap, CDmElement *pElement )
 {
-	SerializeAttributes( buf, list, symbolToIndexMap, pElement );
-	return buf.IsValid();
+	bool ok = SerializeAttributes( buf, list, symbolToIndexMap, pElement );
+	return ok && buf.IsValid();
 }
 
 bool CDmSerializerBinary::SaveElementDict( CUtlBuffer& buf, unsigned short *symbolToIndexMap, CDmElement *pElement )
@@ -254,27 +262,29 @@ bool CDmSerializerBinary::Serialize( CUtlBuffer &outBuf, CDmElement *pRoot )
 
 	// write out the symbol table for this file (may be significantly smaller than datamodel's full symbol table)
 	outBuf.PutShort( nUsedSymbols );
-	for ( int si = 0; si < nUsedSymbols; ++si )
+	for ( unsigned short si = 0; si < nUsedSymbols; ++si )
 	{
 		UtlSymId_t sym = indexToSymbolMap[ si ];
 		const char *pStr = g_pDataModel->GetString( sym );
 		outBuf.PutString( pStr );
 	}
 
+	bool ok = true;
+
 	// First write out the dictionary of all elements (to avoid later stitching up in unserialize)
 	outBuf.PutInt( dict.RootElementCount() );
 	for ( i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
 	{
-		SaveElementDict( outBuf, symbolToIndexMap, dict.GetRootElement( i ) );
+		ok = SaveElementDict( outBuf, symbolToIndexMap, dict.GetRootElement( i ) ) && ok;
 	}
 
 	// Now write out the attributes of each of those elements
 	for ( i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
 	{
-		SaveElement( outBuf, dict, symbolToIndexMap, dict.GetRootElement( i ) );
+		ok = SaveElement( outBuf, dict, symbolToIndexMap, dict.GetRootElement( i ) ) && ok;
 	}
 
-	return true;
+	return ok;
 }
 
 
@@ -290,8 +300,9 @@ DmElementHandle_t CDmSerializerBinary::UnserializeElementIndex( CUtlBuffer &buf,
 		char idstr[ 40 ];
 		buf.GetString( idstr );
 		DmObjectId_t id;
-		UniqueIdFromString( &id, idstr, sizeof( idstr ) );
-		return g_pDataModelImp->FindOrCreateElementHandle( id );
+		return UniqueIdFromString( &id, idstr )
+			? g_pDataModelImp->FindOrCreateElementHandle( id ) 
+			: DMELEMENT_HANDLE_INVALID;
 	}
 
 	Assert( nElementIndex >= 0 || nElementIndex == ELEMENT_INDEX_NULL );
@@ -468,7 +479,7 @@ bool CDmSerializerBinary::Unserialize( CUtlBuffer &buf, const char *pEncodingNam
 
 		nStrings = buf.GetShort();
 		symbolTable = ( UtlSymId_t* )stackalloc( nStrings * sizeof( UtlSymId_t ) );
-		for ( int i = 0; i < nStrings; ++i )
+		for ( unsigned short i = 0; i < nStrings; ++i )
 		{
 			buf.GetString( stringBuf );
 			symbolTable[ i ] = g_pDataModel->GetSymbol( stringBuf );
@@ -487,18 +498,18 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 	*ppRoot = NULL;
 
 	// Read in the element count.
-	int nElementCount = buf.GetInt();
+	intp nElementCount = buf.GetInt();
 	if ( !nElementCount )
 		return true;
 
-	int nMaxIdConflicts = min( nElementCount, g_pDataModel->GetAllocatedElementCount() );
-	int nExpectedIdCopyConflicts = ( idConflictResolution == CR_FORCE_COPY || idConflictResolution == CR_COPY_NEW ) ? nMaxIdConflicts : 0;
-	int nBuckets = min( 0x10000, max( 16, nExpectedIdCopyConflicts / 16 ) ); // CUtlHash can only address up to 65k buckets
+	intp nMaxIdConflicts = min( nElementCount, g_pDataModel->GetAllocatedElementCount() );
+	intp nExpectedIdCopyConflicts = ( idConflictResolution == CR_FORCE_COPY || idConflictResolution == CR_COPY_NEW ) ? nMaxIdConflicts : 0;
+	intp nBuckets = min( (intp)0x10000, max( (intp)16, nExpectedIdCopyConflicts / 16 ) ); // CUtlHash can only address up to 65k buckets
 	CUtlHash< DmIdPair_t > idmap( nBuckets, 0, 0, DmIdPair_t::Compare, DmIdPair_t::HashKey );
 
 	// Read + create all elements
 	CUtlVector<CDmElement*> elementList( (intp)0, nElementCount );
-	for ( int i = 0; i < nElementCount; ++i )
+	for ( intp i = 0; i < nElementCount; ++i )
 	{
 		char pName[2048];
 		DmObjectId_t id;
@@ -517,16 +528,22 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 		}
 
 		buf.GetString( pName );
-		buf.Get( &id, sizeof(DmObjectId_t) );
+		buf.Get( id );
 
 		if ( idConflictResolution == CR_FORCE_COPY )
 		{
 			DmIdPair_t idpair;
 			CopyUniqueId( id, &idpair.m_oldId );
-			CreateUniqueId( &idpair.m_newId );
-			idmap.Insert( idpair );
+			if ( CreateUniqueId( &idpair.m_newId ) )
+			{
+				idmap.Insert( idpair );
 
-			CopyUniqueId( idpair.m_newId, &id );
+				CopyUniqueId( idpair.m_newId, &id );
+			}
+			else
+			{
+				Warning("Unable to create uuid for CR_FORCE_COPY conflicted uuid.\n");
+			}
 		}
 
 		DmElementHandle_t hElement = DMELEMENT_HANDLE_INVALID;
@@ -550,8 +567,14 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 			{
 				DmIdPair_t idpair;
 				CopyUniqueId( id, &idpair.m_oldId );
-				CreateUniqueId( &idpair.m_newId );
-				idmap.Insert( idpair );
+				if ( CreateUniqueId( &idpair.m_newId ) )
+				{
+					idmap.Insert( idpair );
+				}
+				else
+				{
+					Warning( "Unable to create uuid for CR_COPY_NEW conflicted uuid.\n" );
+				}
 
 				hElement = CreateElementWithFallback( pType, pName, fileid, idpair.m_newId );
 			}
@@ -574,13 +597,13 @@ bool CDmSerializerBinary::UnserializeElements( CUtlBuffer &buf, DmFileId_t filei
 	*ppRoot = elementList[ 0 ];
 
 	// Now read all attributes
-	for ( int i = 0; i < nElementCount; ++i )
+	for ( intp i = 0; i < nElementCount; ++i )
 	{
 		CDmElement *pInternal = elementList[ i ];
 		UnserializeAttributes( buf, pInternal->GetFileId() == fileid ? pInternal : NULL, elementList, symbolTable );
 	}
 
-	for ( int i = 0; i < nElementCount; ++i )
+	for ( intp i = 0; i < nElementCount; ++i )
 	{
 		CDmElement *pElement = elementList[ i ];
 		if ( pElement->GetFileId() == fileid )

@@ -85,7 +85,7 @@ void CGizmo::Initialize(void)
 #define GIZMO_HANDLE_WIDTH	4
 
 void CGizmo::DrawGizmoAxis(CRender3D *pRender, Vector& Origin, 
-						   Vector& EndPoint, int red, int green, int blue, 
+						   Vector& EndPoint, unsigned char red, unsigned char green, unsigned char blue, 
 						   unsigned int uAxisHandle)
 {
 	CCamera *pCamera = pRender->GetCamera();
@@ -110,8 +110,8 @@ void CGizmo::DrawGizmoAxis(CRender3D *pRender, Vector& Origin,
 	//
 	// Draw the first segment of the gizmo axis.
 	//
-	VectorMA(Origin, 0.1, Axis, Start);
-	VectorMA(Origin, 0.25, Axis, End);
+	VectorMA(Origin, 0.1f, Axis, Start);
+	VectorMA(Origin, 0.25f, Axis, End);
 	
 	pRender->BindTexture( g_pAxisTexture );
 	
@@ -331,12 +331,12 @@ void CGizmo::Render(CRender3D *pRender)
 	static BoundBox UniformScaleBox;
 	Vector Mins;
 	Vector Maxs;
-	Mins[0] = m_Position[0] - m_fAxisLength * 0.1;
-	Mins[1] = m_Position[1] - m_fAxisLength * 0.1;
-	Mins[2] = m_Position[2] - m_fAxisLength * 0.1;
-	Maxs[0] = m_Position[0] + m_fAxisLength * 0.1;
-	Maxs[1] = m_Position[1] + m_fAxisLength * 0.1;
-	Maxs[2] = m_Position[2] + m_fAxisLength * 0.1;
+	Mins[0] = m_Position[0] - m_fAxisLength * 0.1f;
+	Mins[1] = m_Position[1] - m_fAxisLength * 0.1f;
+	Mins[2] = m_Position[2] - m_fAxisLength * 0.1f;
+	Maxs[0] = m_Position[0] + m_fAxisLength * 0.1f;
+	Maxs[1] = m_Position[1] + m_fAxisLength * 0.1f;
+	Maxs[2] = m_Position[2] + m_fAxisLength * 0.1f;
 	UniformScaleBox.ResetBounds();
 	UniformScaleBox.UpdateBounds(Mins, Maxs);
 

@@ -8,7 +8,7 @@
 #include "vbsp.h"
 #include "detail.h"
 #include "utlvector.h"
-#include <assert.h>
+#include "bspflags.h"
 
 face_t *NewFaceFromFace (face_t *f);
 face_t *ComputeVisibleBrushSides( bspbrush_t *list );
@@ -115,8 +115,8 @@ bool MergeFace_r( node_t *node, face_t *face, face_t *original )
 		if ( onwinding )
 		{
 			// face is in the split plane, go down the appropriate side according to the facing direction
-			assert( frontwinding == NULL );
-			assert( backwinding == NULL );
+			Assert( frontwinding == NULL );
+			Assert( backwinding == NULL );
 
 			if ( DotProduct( g_MainMap->mapplanes[face->planenum].normal, g_MainMap->mapplanes[node->planenum].normal ) > 0 )
 			{
@@ -272,7 +272,6 @@ void FilterBrushesIntoTree( tree_t *out, bspbrush_t *brushes )
 //-----------------------------------------------------------------------------
 face_t *MergeDetailTree( tree_t *worldtree, int brush_start, int brush_end )
 {
-	int			start;
 	bspbrush_t	*detailbrushes = NULL;
 	face_t		*pFaces = NULL;
 	face_t		*pLeafFaceList = NULL;
@@ -281,24 +280,24 @@ face_t *MergeDetailTree( tree_t *worldtree, int brush_start, int brush_end )
 	detailbrushes = MakeBspBrushList (brush_start, brush_end, g_MainMap->map_mins, g_MainMap->map_maxs, ONLY_DETAIL );
 	if (detailbrushes)
 	{
-		start = Plat_FloatTime();
-		Msg("Chop Details...");
+		double start = Plat_FloatTime();
+		Msg("\nChop Details...");
 		// if there are detail brushes, chop them against each other
 		if (!nocsg)
 			detailbrushes = ChopBrushes (detailbrushes);
 
-		Msg("done (%d)\n", (int)(Plat_FloatTime() - start) );
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 		// Now mark the visible sides so we can eliminate all detail brush sides
 		// that are covered by other detail brush sides
 		// NOTE: This still leaves detail brush sides that are covered by the world. (these are removed in the merge operation)
-		Msg("Find Visible Detail Sides...");
+		Msg("\nFind Visible Detail Sides...");
 		pFaces = ComputeVisibleBrushSides( detailbrushes );
 		TryMergeFaceList( &pFaces );
 		SubdivideFaceList( &pFaces );
-		Msg("done (%d)\n", (int)(Plat_FloatTime() - start) );
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 
 		start = Plat_FloatTime();
-		Msg("Merging details...");
+		Msg("\nMerging details...");
 		// Merge the detail solids and faces into the world tree
 		// Merge all of the faces into the world tree
 		pLeafFaceList = FilterFacesIntoTree( worldtree, pFaces );
@@ -307,7 +306,7 @@ face_t *MergeDetailTree( tree_t *worldtree, int brush_start, int brush_end )
 		FreeFaceList( pFaces );
 		FreeBrushList(detailbrushes);
 
-		Msg("done (%d)\n", (int)(Plat_FloatTime() - start) );
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 	}
 
 	return pLeafFaceList;
@@ -380,7 +379,7 @@ bool ClipFaceToBrush( face_t *pFace, bspbrush_t *pbrush, face_t **pOutputList )
 			}
 		}
 
-		for ( i = 0; i < sortedSides.Size(); i++ )
+		for ( i = 0; i < sortedSides.Count(); i++ )
 		{
 			int index = sortedSides[i];
 			if ( index == foundSide )
@@ -418,7 +417,7 @@ bool ClipFaceToBrush( face_t *pFace, bspbrush_t *pbrush, face_t **pOutputList )
 		FreeFace( currentface );
 
 		// if we made it all the way through and didn't produce any fragments then the whole face was clipped away
-		if ( !*pOutputList && i == sortedSides.Size() )
+		if ( !*pOutputList && i == sortedSides.Count() )
 		{
 			return true;
 		}
@@ -440,6 +439,8 @@ face_t *MakeBrushFace( side_t *originalSide, winding_t *winding )
 	f->split[0] = f->split[1] = NULL;
 	f->w = CopyWinding( winding );
 	f->originalface = originalSide;
+	// dimhotepus: Ensure original smoothing groups work.
+	f->smoothingGroups = originalSide->smoothingGroups;
 	//
 	// save material info
 	//

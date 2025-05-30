@@ -63,7 +63,7 @@ class CMapSprite : public CMapHelper
 
 		bool IsVisualElement(void) { return(true); }
 		
-		const char* GetDescription() { return("Sprite"); }
+		const char* GetDescription() const override { return("Sprite"); }
 
 		void OnParentKeyChanged(const char* szKey, const char* szValue);
 

@@ -3,7 +3,6 @@
 // Purpose: 
 //
 //=============================================================================
-//#include "studio.h"
 #include "studio.h"
 #include "datacache/imdlcache.h"
 #include "datamodel/dmelementfactoryhelper.h"
@@ -30,7 +29,7 @@ virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)((intp)virtualModel&0xffff) );
 }
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
+byte *studiohdr_t::GetAnimBlock( intp i ) const
 {
 	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)((intp)virtualModel&0xffff), i );
 }
@@ -41,6 +40,12 @@ intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 }
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
+{
+	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)((intp)cache&0xffff) );
+}
+
+// dimhotepus: Add const-correct API.
+studiohdr_t *virtualgroup_t::GetStudioHdr( void )
 {
 	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)((intp)cache&0xffff) );
 }

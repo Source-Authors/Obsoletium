@@ -2786,7 +2786,7 @@ ChunkFileResult_t CMapDisp::LoadDispDistancesKeyCallback(const char *szKey, cons
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pDisp->GetPower()) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -2833,7 +2833,7 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetsKeyCallback(const char *szKey, const 
 	if( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pDisp->GetPower() ) + 1;
 		int nRow = atoi( &szKey[3] );
@@ -2891,7 +2891,7 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetNormalsKeyCallback(const char *szKey, 
 	if( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pDisp->GetPower() ) + 1;
 		int nRow = atoi( &szKey[3] );
@@ -3031,7 +3031,7 @@ ChunkFileResult_t CMapDisp::LoadDispAlphasKeyCallback(const char *szKey, const c
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pDisp->GetPower()) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -3071,7 +3071,7 @@ ChunkFileResult_t CMapDisp::LoadDispTriangleTagsKeyCallback(const char *szKey, c
 	if ( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int nCols = ( 1 << pDisp->GetPower() );
 		int nRow = atoi( &szKey[3] );
@@ -3107,7 +3107,7 @@ ChunkFileResult_t CMapDisp::LoadDispAllowedVertsKeyCallback( const char *szKey, 
 	if ( !strnicmp( szKey, "10", 2 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 		
 		int iValue = 0;
 
@@ -3150,7 +3150,7 @@ ChunkFileResult_t CMapDisp::LoadDispNormalsKeyCallback(const char *szKey, const 
 	if (!strnicmp(szKey, "row", 3))
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy(szBuf, szValue);
+		V_strcpy_safe(szBuf, szValue);
 
 		int nCols = (1 << pDisp->GetPower()) + 1;
 		int nRow = atoi(&szKey[3]);
@@ -3281,7 +3281,7 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	}
 #endif
 
-	if( eResult == ChunkFile_Ok )
+	if ( eResult == ChunkFile_Ok )
 	{
 		eResult = pFile->WriteKeyValueFloat( "elevation", elevation );
 	}
@@ -3318,17 +3318,17 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 					if (!bFirst)
 					{
-						strcat(szBuf, " ");
+						V_strcat_safe(szBuf, " ");
 					}
 
 					bFirst = false;
 					m_CoreDispInfo.GetFieldVector( nIndex, vectorFieldVector );
-					sprintf(szTemp, "%g %g %g", (double)vectorFieldVector[0], (double)vectorFieldVector[1], (double)vectorFieldVector[2]);
-					strcat(szBuf, szTemp);
+					V_sprintf_safe(szTemp, "%g %g %g", (double)vectorFieldVector[0], (double)vectorFieldVector[1], (double)vectorFieldVector[2]);
+					V_strcat_safe(szBuf, szTemp);
 				}
 
 				char szKey[10];
-				sprintf(szKey, "row%d", nRow);
+				V_sprintf_safe(szKey, "row%d", nRow);
 				eResult = pFile->WriteKeyValue(szKey, szBuf);
 			}
 		}
@@ -3366,17 +3366,17 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 					if (!bFirst)
 					{
-						strcat(szBuf, " ");
+						V_strcat_safe(szBuf, " ");
 					}
 
 					bFirst = false;
 					dispDistance = m_CoreDispInfo.GetFieldDistance( nIndex ); 
-					sprintf(szTemp, "%g", (double)dispDistance);
-					strcat(szBuf, szTemp);
+					V_sprintf_safe(szTemp, "%g", (double)dispDistance);
+					V_strcat_safe(szBuf, szTemp);
 				}
 
 				char szKey[10];
-				sprintf(szKey, "row%d", nRow);
+				V_sprintf_safe(szKey, "row%d", nRow);
 				eResult = pFile->WriteKeyValue(szKey, szBuf);
 			}
 		}
@@ -3414,17 +3414,17 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 					if (!bFirst)
 					{
-						strcat(szBuf, " ");
+						V_strcat_safe(szBuf, " ");
 					}
 
 					bFirst = false;
 					m_CoreDispInfo.GetSubdivPosition( nIndex, subdivPos );
-					sprintf(szTemp, "%g %g %g", (double)subdivPos[0], (double)subdivPos[1], (double)subdivPos[2]);
-					strcat(szBuf, szTemp);
+					V_sprintf_safe(szTemp, "%g %g %g", (double)subdivPos[0], (double)subdivPos[1], (double)subdivPos[2]);
+					V_strcat_safe(szBuf, szTemp);
 				}
 
 				char szKey[10];
-				sprintf(szKey, "row%d", nRow);
+				V_sprintf_safe(szKey, "row%d", nRow);
 				eResult = pFile->WriteKeyValue(szKey, szBuf);
 			}
 		}
@@ -3462,17 +3462,17 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 					if (!bFirst)
 					{
-						strcat(szBuf, " ");
+						V_strcat_safe(szBuf, " ");
 					}
 
 					bFirst = false;
 					m_CoreDispInfo.GetSubdivNormal( nIndex, subdivNormal );
-					sprintf(szTemp, "%g %g %g", (double)subdivNormal[0], (double)subdivNormal[1], (double)subdivNormal[2]);
-					strcat(szBuf, szTemp);
+					V_sprintf_safe(szTemp, "%g %g %g", (double)subdivNormal[0], (double)subdivNormal[1], (double)subdivNormal[2]);
+					V_strcat_safe(szBuf, szTemp);
 				}
 
 				char szKey[10];
-				sprintf(szKey, "row%d", nRow);
+				V_sprintf_safe(szKey, "row%d", nRow);
 				eResult = pFile->WriteKeyValue(szKey, szBuf);
 			}
 		}
@@ -3510,17 +3510,17 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 					if (!bFirst)
 					{
-						strcat(szBuf, " ");
+						V_strcat_safe(szBuf, " ");
 					}
 
 					bFirst = false;
 					alpha = m_CoreDispInfo.GetAlpha( nIndex );
-					sprintf(szTemp, "%g", (double)alpha);
-					strcat(szBuf, szTemp);
+					V_sprintf_safe(szTemp, "%g", (double)alpha);
+					V_strcat_safe(szBuf, szTemp);
 				}
 
 				char szKey[10];
-				sprintf(szKey, "row%d", nRow);
+				V_sprintf_safe(szKey, "row%d", nRow);
 				eResult = pFile->WriteKeyValue(szKey, szBuf);
 			}
 		}
@@ -3557,21 +3557,21 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 
 					if ( !bFirst )
 					{
-						strcat( szBuf, " " );
+						V_strcat_safe( szBuf, " " );
 					}
 					bFirst = false;
 
 					nTriTag = m_CoreDispInfo.GetTriTagValue( iTri );
-					sprintf( szTemp, "%d", (int)nTriTag );
-					strcat( szBuf, szTemp );
+					V_sprintf_safe( szTemp, "%d", (int)nTriTag );
+					V_strcat_safe( szBuf, szTemp );
 
 					nTriTag = m_CoreDispInfo.GetTriTagValue( iTri + 1 );
-					sprintf( szTemp, " %d", (int)nTriTag );
-					strcat( szBuf, szTemp );
+					V_sprintf_safe( szTemp, " %d", (int)nTriTag );
+					V_strcat_safe( szBuf, szTemp );
 				}
 
 				char szKey[10];
-				sprintf( szKey, "row%d", iRow );
+				V_sprintf_safe( szKey, "row%d", iRow );
 				eResult = pFile->WriteKeyValue( szKey, szBuf );
 			}
 		}
@@ -3598,16 +3598,16 @@ ChunkFileResult_t CMapDisp::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 			{
 				if ( iCount != 0 )
 				{
-					strcat( szBuf, " " );
+					V_strcat_safe( szBuf, " " );
 				}
 				
 				unsigned long ulValue = m_CoreDispInfo.AllowedVerts_GetDWord( iCount );
-				sprintf( szTemp, "%d", ( int )ulValue );
-				strcat( szBuf, szTemp );
+				V_sprintf_safe( szTemp, "%d", ( int )ulValue );
+				V_strcat_safe( szBuf, szTemp );
 			}
 			
 			char szKey[8];
-			sprintf( szKey, "%d", nCount );
+			V_sprintf_safe( szKey, "%d", nCount );
 			eResult = pFile->WriteKeyValue( szKey, szBuf );
 		}
 
@@ -4320,7 +4320,7 @@ int CMapDisp::CollideWithDispTri( const Vector &rayStart, const Vector &rayEnd, 
 bool CMapDisp::SaveDXF(ExportDXFInfo_s *pInfo)
 {
 	char szName[128];
-	sprintf(szName, "OBJECT%03d", pInfo->nObject);
+	V_sprintf_safe(szName, "OBJECT%03d", pInfo->nObject);
 
 	// count number of triangulated faces
 	int nVertCount = GetSize();

@@ -72,9 +72,9 @@ public:
 	CModelBrowser *m_pBrowser;
 };
 
-IMPLEMENT_DYNAMIC(CModelBrowser, CDialog)
+IMPLEMENT_DYNAMIC(CModelBrowser, CBaseDlg)
 CModelBrowser::CModelBrowser(CWnd* pParent /*=NULL*/)
-	: CDialog(CModelBrowser::IDD, pParent)
+	: CBaseDlg(CModelBrowser::IDD, pParent)
 {
 	m_pPicker = new CMDLPicker( NULL );
 	m_pStatusLine = new vgui::TextEntry( NULL, "StatusLine" );
@@ -90,7 +90,7 @@ CModelBrowser::~CModelBrowser()
 void CModelBrowser::SetModelName( const char *pModelName )
 {
 	char pszTempModelName[255];
-	strcpy( pszTempModelName, pModelName );
+	V_strcpy_safe( pszTempModelName, pModelName );
 
 	char * pszSelectedModel = strchr( pszTempModelName, '/' );
 	if( pszSelectedModel)
@@ -183,7 +183,7 @@ void CModelBrowser::SaveLoadSettings( bool bSave )
 
 void CModelBrowser::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 }
 
 void CModelBrowser::Resize()
@@ -204,17 +204,17 @@ void CModelBrowser::OnSize(UINT nType, int cx, int cy)
 {
 	if (nType == SIZE_MINIMIZED || !IsWindow(m_VGuiWindow.m_hWnd) )
 	{
-		CDialog::OnSize(nType, cx, cy);
+		__super::OnSize(nType, cx, cy);
 		return;
 	}
 
 	Resize();
 
-	CDialog::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 }
 
 
-BEGIN_MESSAGE_MAP(CModelBrowser, CDialog)
+BEGIN_MESSAGE_MAP(CModelBrowser, CBaseDlg)
 	ON_WM_SIZE()
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
@@ -227,7 +227,7 @@ BOOL CModelBrowser::PreTranslateMessage( MSG* pMsg )
 
 BOOL CModelBrowser::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_VGuiWindow.Create( NULL, _T("ModelViewer"), WS_VISIBLE|WS_CHILD, CRect(0,0,100,100), this, 1001);
 
@@ -267,7 +267,7 @@ void CModelBrowser::OnDestroy()
 	// model browser destoys our defualt cube map, reload it
 	g_Textures.RebindDefaultCubeMap();
 
-	CDialog::OnDestroy();
+	__super::OnDestroy();
 }
 
 void CModelBrowser::Show()

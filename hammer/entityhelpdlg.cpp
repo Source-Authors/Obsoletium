@@ -16,7 +16,7 @@
 static CEntityHelpDlg *g_pHelpDlg = NULL;
 
 
-BEGIN_MESSAGE_MAP(CEntityHelpDlg, CDialog)
+BEGIN_MESSAGE_MAP(CEntityHelpDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CEntityHelpDlg)
 	ON_WM_DESTROY()
 	ON_WM_CLOSE()
@@ -33,11 +33,12 @@ void CEntityHelpDlg::ShowEntityHelpDialog(void)
 	if (g_pHelpDlg == NULL)
 	{
 		g_pHelpDlg = new CEntityHelpDlg;
-		g_pHelpDlg->Create(IDD_ENTITY_HELP);
 	}
 
 	if (g_pHelpDlg != NULL)
 	{
+		// dimhotepus: No null dereference.
+		g_pHelpDlg->Create(IDD_ENTITY_HELP);
 		g_pHelpDlg->ShowWindow(SW_SHOW);
 	}
 }
@@ -59,9 +60,10 @@ void CEntityHelpDlg::SetEditGameClass(GDclass *pClass)
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
 CEntityHelpDlg::CEntityHelpDlg(CWnd *pwndParent)
-	: CDialog(CEntityHelpDlg::IDD, pwndParent)
+	: CBaseDlg(CEntityHelpDlg::IDD, pwndParent)
 {
 	m_pHelpText = NULL;
+	m_pClass = NULL;
 }
 
 
@@ -70,6 +72,8 @@ CEntityHelpDlg::CEntityHelpDlg(CWnd *pwndParent)
 //-----------------------------------------------------------------------------
 CEntityHelpDlg::~CEntityHelpDlg(void)
 {
+	// dimhotepus: Delete text.
+	delete m_pHelpText;
 	g_pHelpDlg = NULL;
 }
 
@@ -80,7 +84,7 @@ CEntityHelpDlg::~CEntityHelpDlg(void)
 //-----------------------------------------------------------------------------
 void CEntityHelpDlg::DoDataExchange(CDataExchange *pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 
 	//{{AFX_DATA_MAP(CEntityHelpDlg)
 	//}}AFX_DATA_MAP
@@ -105,7 +109,7 @@ int CEntityHelpDlg::GetTextWidth(const char *pszText, CDC *pDC)
 		}
 
 		CGdiObject *pOldFont = pDC->SelectStockObject(DEFAULT_GUI_FONT);
-		CSize Size = pDC->GetTabbedTextExtent(pszText, strlen(pszText), 0, NULL);
+		CSize Size = pDC->GetTabbedTextExtent(pszText, V_strlen(pszText), 0, NULL);
 		pDC->SelectObject(pOldFont);
 
 		if (bRelease)
@@ -172,7 +176,7 @@ void CEntityHelpDlg::OnDestroy(void)
 //-----------------------------------------------------------------------------
 BOOL CEntityHelpDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 	m_pHelpText = new CRichEditCtrlEx;
 	m_pHelpText->SubclassDlgItem(IDC_HELP_TEXT, this);
 	m_pHelpText->enable();
@@ -361,7 +365,7 @@ void CEntityHelpDlg::UpdateHelp(void)
 //-----------------------------------------------------------------------------
 void CEntityHelpDlg::OnSize( UINT nType, int cx, int cy )
 {
-	CDialog::OnSize(nType, cx, cy);
+	__super::OnSize(nType, cx, cy);
 
 	if (m_pHelpText != NULL)
 	{

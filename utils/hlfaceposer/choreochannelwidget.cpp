@@ -5,10 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <stdio.h>
+#include "choreochannelwidget.h"
 #include <mxtk/mxPopupMenu.h>
 #include "hlfaceposer.h"
-#include "choreochannelwidget.h"
 #include "choreoeventwidget.h"
 #include "choreoactorwidget.h"
 #include "choreochannel.h"
@@ -45,7 +44,7 @@ CChoreoChannelWidget::CChoreoChannelWidget( CChoreoActorWidget *parent )
 //-----------------------------------------------------------------------------
 CChoreoChannelWidget::~CChoreoChannelWidget( void )
 {
-	for ( int i = 0 ; i < m_Events.Size(); i++ )
+	for ( intp i = 0 ; i < m_Events.Count(); i++ )
 	{
 		CChoreoEventWidget *e = m_Events[ i ];
 		delete e;
@@ -108,7 +107,7 @@ static bool EventStartTimeLessFunc( CChoreoEventWidget * const &p1, CChoreoEvent
 	return e1->GetStartTime() < e2->GetStartTime();
 }
 
-void CChoreoChannelWidget::LayoutEventInRow( CChoreoEventWidget *event, int row, RECT& rc )
+void CChoreoChannelWidget::LayoutEventInRow( CChoreoEventWidget *event, intp row, RECT& rc )
 {
 	int itemHeight = BaseClass::GetItemHeight();
 
@@ -151,21 +150,20 @@ static bool EventCollidesWithRows( CUtlLinkedList< CChoreoEventWidget *, int >& 
 	return false;
 }
 
-int CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
+intp CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 {
 	CUtlRBTree< CChoreoEventWidget * >  sorted( 0, 0, EventStartTimeLessFunc );
 
 	CUtlVector< CUtlLinkedList< CChoreoEventWidget *, int > >	rows;
 
-	int i;
 	// Sort items
-	int c = m_Events.Size();
-	for ( i = 0; i < c; i++ )
+	intp c = m_Events.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		sorted.Insert( m_Events[ i ] );
 	}
 
-	for ( i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
+	for ( auto i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
 	{
 		CChoreoEventWidget *event = sorted[ i ];
 		Assert( event );
@@ -184,10 +182,10 @@ int CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 		}
 
 		// Does it come totally after what's in rows[0]?
-		int rowCount = rows.Count();
+		intp rowCount = rows.Count();
 		bool addrow = true;
 
-		for ( int j = 0; j < rowCount; j++ )
+		for ( intp j = 0; j < rowCount; j++ )
 		{
 			CUtlLinkedList< CChoreoEventWidget *, int >& list = rows[ j ];
 
@@ -207,7 +205,7 @@ int CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 		if ( addrow )
 		{
 			// Add a new row
-			int idx = rows.AddToTail();
+			intp idx = rows.AddToTail();
 			CUtlLinkedList< CChoreoEventWidget *, int >& list = rows[ idx ];
 			list.AddToHead( event );
 			if ( layout )
@@ -217,13 +215,13 @@ int CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 		}
 	}
 
-	return max( 1, rows.Count() );
+	return max( (intp)1, rows.Count() );
 }
 
 int	CChoreoChannelWidget::GetItemHeight( void )
 {
 	int itemHeight = BaseClass::GetItemHeight();
-	int stackCount = GetVerticalStackingCount( false, NULL );
+	intp stackCount = GetVerticalStackingCount( false, NULL );
 
 	CheckHasAudio();
 
@@ -244,7 +242,7 @@ bool CChoreoChannelWidget::CheckHasAudio()
 {
 	m_bHasAudio = false;
 	// Create objects for children
-	for ( int i = 0; i < m_Events.Size(); i++ )
+	for ( intp i = 0; i < m_Events.Count(); i++ )
 	{
 		CChoreoEventWidget *event = m_Events[ i ];
 		if ( event->GetEvent()->GetType() == CChoreoEvent::SPEAK )
@@ -335,7 +333,7 @@ void CChoreoChannelWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 
 	if ( !channel->GetActive() )
 	{
-		strcpy( n, "(inactive)" );
+		V_strcpy_safe( n, "(inactive)" );
 
 		RECT rcInactive = rcName;
 		int len = drawHelper.CalcTextWidth( "Arial", m_pView->GetFontSize(), 500, n );
@@ -367,7 +365,7 @@ void CChoreoChannelWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 		}
 	}
 
-	for ( int j =  GetNumEvents()-1; j >= 0; j-- )
+	for ( intp j =  GetNumEvents()-1; j >= 0; j-- )
 	{
 		CChoreoEventWidget *event = GetEvent( j );
 		if ( event )
@@ -399,7 +397,7 @@ void CChoreoChannelWidget::RenderCloseCaptionInfo( CChoreoWidgetDrawHelper& draw
 	}
 
 	// Walk the events looking for SPEAK events (esp if marked as MASTER with >= 1 slave)
-	for ( int j =  GetNumEvents()-1; j >= 0; j-- )
+	for ( intp j =  GetNumEvents()-1; j >= 0; j-- )
 	{
 		CChoreoEventWidget *event = GetEvent( j );
 		CChoreoEvent *e = event->GetEvent();
@@ -548,7 +546,7 @@ void CChoreoChannelWidget::RenderCloseCaptions( CChoreoWidgetDrawHelper& drawHel
 	}
 
 	// Walk the events looking for SPEAK events (esp if marked as MASTER with >= 1 slave)
-	for ( int j =  GetNumEvents()-1; j >= 0; j-- )
+	for ( intp j =  GetNumEvents()-1; j >= 0; j-- )
 	{
 		CChoreoEventWidget *event = GetEvent( j );
 		CChoreoEvent *e = event->GetEvent();
@@ -630,7 +628,7 @@ void CChoreoChannelWidget::RemoveEvent( CChoreoEventWidget *event )
 // Input  : num - 
 // Output : CChoreoEventWidget
 //-----------------------------------------------------------------------------
-CChoreoEventWidget *CChoreoChannelWidget::GetEvent( int num )
+CChoreoEventWidget *CChoreoChannelWidget::GetEvent( intp num )
 {
 	return m_Events[ num ];
 }
@@ -639,9 +637,9 @@ CChoreoEventWidget *CChoreoChannelWidget::GetEvent( int num )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoChannelWidget::GetNumEvents( void )
+intp CChoreoChannelWidget::GetNumEvents( void )
 {
-	return m_Events.Size();
+	return m_Events.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -697,10 +695,10 @@ int CChoreoChannelWidget::GetChannelItemUnderMouse( int mx, int my )
 
 	CUtlVector< CloseCaptionInfo > vecSelectors;
 	GetCloseCaptions( vecSelectors );
-	int c = vecSelectors.Count();
+	intp c = vecSelectors.Count();
 	if ( vecSelectors.Count() > 0 )
 	{
-		int i;
+		intp i;
 		for ( i = 0; i < c; ++i )
 		{
 			CloseCaptionInfo& check = vecSelectors[ i ];
@@ -742,8 +740,8 @@ void CChoreoChannelWidget::HandleSelectorClicked()
 
 void CChoreoChannelWidget::SetUsingCombinedFieldByTokenName( char const *token, bool usingcombinedfile )
 {
-	int c = GetNumEvents();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetNumEvents();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CChoreoEvent *e = GetEvent( i )->GetEvent();
 		if ( !Q_stricmp( e->GetCloseCaptionToken(), token ) )
@@ -813,10 +811,10 @@ void CChoreoChannelWidget::RenderCloseCaptionSelectors( CChoreoWidgetDrawHelper&
 {
 	CUtlVector< CloseCaptionInfo > vecSelectors;
 	GetCloseCaptions( vecSelectors );
-	int c = vecSelectors.Count();
+	intp c = vecSelectors.Count();
 	if ( vecSelectors.Count() > 0 )
 	{
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
 			CloseCaptionInfo& check = vecSelectors[ i ];
 
@@ -847,8 +845,8 @@ void CChoreoChannelWidget::RenderCloseCaptionSelectors( CChoreoWidgetDrawHelper&
 			}
 
 			POINT startpt;
-			startpt.x = ( rc.left + rc.right ) * 0.5;
-			startpt.y = ( rc.top + rc.bottom ) * 0.5;
+			startpt.x = ( rc.left + rc.right ) / 2;
+			startpt.y = ( rc.top + rc.bottom ) / 2;
 		
 			drawHelper.DrawCircle( 
 				clr,
@@ -873,7 +871,7 @@ void CChoreoChannelWidget::GetCloseCaptions( CUtlVector< CloseCaptionInfo >& sel
 	selectors.RemoveAll();
 
 	// Walk the events looking for SPEAK events (esp if marked as MASTER with >= 1 slave)
-	for ( int j =  GetNumEvents()-1; j >= 0; j-- )
+	for ( intp j =  GetNumEvents()-1; j >= 0; j-- )
 	{
 		CChoreoEventWidget *event = GetEvent( j );
 		CChoreoEvent *e = event->GetEvent();
@@ -942,8 +940,8 @@ void CChoreoChannelWidget::RenderCloseCaptionExpandCollapseRect( CChoreoWidgetDr
 void CChoreoChannelWidget::GetMasterAndSlaves( CChoreoEvent *master, CUtlVector< CChoreoEvent * >& fulllist )
 {
 	// Old
-	int c = GetNumEvents();
-	int i;
+	intp c = GetNumEvents();
+	intp i;
 	for ( i = 0; i < c; ++i )
 	{
 		CChoreoEvent *e = GetEvent( i )->GetEvent();

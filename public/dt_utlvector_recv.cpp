@@ -84,7 +84,7 @@ RecvProp RecvPropUtlVector(
 	ResizeUtlVectorFn fn,
 	EnsureCapacityFn ensureFn,
 	int nMaxElements,											// Max # of elements in the array. Keep this as low as possible.
-	RecvProp pArrayProp
+	const RecvProp &pArrayProp
 	)
 {
 	RecvProp ret;

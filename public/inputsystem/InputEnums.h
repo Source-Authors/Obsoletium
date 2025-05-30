@@ -101,7 +101,7 @@ struct InputEvent_t
 
 #define MAX_STEAM_CONTROLLERS 8
 
-typedef enum
+enum sKey_t
 {
 	SK_NULL,
 	SK_BUTTON_A,
@@ -147,7 +147,7 @@ typedef enum
 	SK_VBUTTON_F11,
 	SK_VBUTTON_F12,
 	SK_MAX_KEYS
-} sKey_t;
+};
 
 enum ESteamPadAxis
 {

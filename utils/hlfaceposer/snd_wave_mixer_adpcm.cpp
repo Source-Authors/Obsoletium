@@ -5,18 +5,15 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-#pragma warning( disable: 4201 )
-#include <mmsystem.h>
-#pragma warning( default: 4201 )
-
-#include <mmreg.h>
-#include "snd_wave_source.h"
-#include "snd_wave_mixer_adpcm.h"
 #include "snd_wave_mixer_private.h"
+#include "snd_wave_mixer_adpcm.h"
+#include "snd_wave_source.h"
 #include "hlfaceposer.h"
+
+#include "winlite.h"
+
+#include <mmsystem.h>
+#include <mmreg.h>
 
 // max size of ADPCM block in bytes
 #define MAX_BLOCK_SIZE	4096

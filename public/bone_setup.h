@@ -355,12 +355,11 @@ float Studio_SetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 // converts a global 0..1 pose parameter into the local sequences blending value
 void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, int iSequence, int iLocalIndex, float &flSetting, int &index );
 
-void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight );
-int Studio_MaxFrame( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
-float Studio_FPS( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
-float Studio_CPS( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int iSequence, const float poseParameter[] );
-float Studio_Duration( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[] );
-void Studio_MovementRate( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], Vector *pVec );
+void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight );
+int Studio_MaxFrame( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
+float Studio_FPS( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
+float Studio_CPS( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[] );
+float Studio_Duration( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
 
 // void Studio_Movement( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], Vector *pVec );
 
@@ -371,13 +370,12 @@ bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flC
 bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaMovement, QAngle &deltaAngle );
 bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, int iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity );
 float Studio_FindSeqDistance( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flDist );
-float Studio_FindSeqVelocity( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flVelocity );
 int Studio_FindAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName );
 int Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName );
 int Studio_BoneIndexByName( const CStudioHdr *pStudioHdr, const char *pName );
 const char *Studio_GetDefaultSurfaceProps( CStudioHdr *pstudiohdr );
 float Studio_GetMass( CStudioHdr *pstudiohdr );
-const char *Studio_GetKeyValueText( const CStudioHdr *pStudioHdr, int iSequence );
+const char *Studio_GetKeyValueText( const CStudioHdr *pStudioHdr, intp iSequence );
 
 FORWARD_DECLARE_HANDLE( memhandle_t );
 struct bonecacheparams_t

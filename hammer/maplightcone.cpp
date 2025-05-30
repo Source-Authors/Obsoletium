@@ -47,11 +47,11 @@ CMapClass *CMapLightCone::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		const char *pszKeyName = pHelperInfo->GetParameter(0);
 		if (pszKeyName != NULL)
 		{
-			strcpy(new1->m_szInnerConeKeyName, pszKeyName);
+			V_strcpy_safe(new1->m_szInnerConeKeyName, pszKeyName);
 		}
 		else
 		{
-			strcpy(new1->m_szInnerConeKeyName, "_inner_cone");
+			V_strcpy_safe(new1->m_szInnerConeKeyName, "_inner_cone");
 		}
 
 		//
@@ -61,11 +61,11 @@ CMapClass *CMapLightCone::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		pszKeyName = pHelperInfo->GetParameter(1);
 		if (pszKeyName != NULL)
 		{
-			strcpy(new1->m_szOuterConeKeyName, pszKeyName);
+			V_strcpy_safe(new1->m_szOuterConeKeyName, pszKeyName);
 		}
 		else
 		{
-			strcpy(new1->m_szOuterConeKeyName, "_cone");
+			V_strcpy_safe(new1->m_szOuterConeKeyName, "_cone");
 		}
 
 		//
@@ -75,11 +75,11 @@ CMapClass *CMapLightCone::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		pszKeyName = pHelperInfo->GetParameter(2);
 		if (pszKeyName != NULL)
 		{
-			strcpy(new1->m_szColorKeyName, pszKeyName);
+			V_strcpy_safe(new1->m_szColorKeyName, pszKeyName);
 		}
 		else
 		{
-			strcpy(new1->m_szColorKeyName, "_light");
+			V_strcpy_safe(new1->m_szColorKeyName, "_light");
 		}
 
 		pszKeyName = pHelperInfo->GetParameter(3);
@@ -104,17 +104,28 @@ CMapLightCone::CMapLightCone(void)
 	m_fQuadraticAttn = 1;
 	m_fLinearAttn = 0;
 	m_fConstantAttn = 0;
-	m_bPitchSet = false;
-	m_fPitch = 0;
-	m_fFocus = 1;
-	m_flPitchScale = 1;
 
+	m_fFiftyPercentDistance = -1;	// disabled - use attenuation
+	m_fZeroPercentDistance = -1;
+
+	m_LightColor.Init();
 	m_fBrightness = 100;
+
 	m_fInnerConeAngle = 0;
 	m_fOuterConeAngle = 45;
 
-	m_fFiftyPercentDistance = -1;							// disabled - use attenuation
 	m_Angles.Init();
+
+	m_bPitchSet = false;
+	m_fPitch = 0;
+
+	m_fFocus = 1;
+	m_flPitchScale = 1;
+
+	m_szColorKeyName[0] = '\0';
+	m_szInnerConeKeyName[0] = '\0';
+	m_szOuterConeKeyName[0] = '\0';
+
 	SignalUpdate( EVTYPE_LIGHTING_CHANGED );
 }
 

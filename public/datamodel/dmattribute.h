@@ -91,7 +91,8 @@ public:
 	const void					*GetValueUntyped() const; 
 
 	// Sets the attribute value
-	template< class T > void SetValue( const T &value );
+	template< class T > std::enable_if_t<!std::is_enum_v<T>> SetValue( const T &value );
+	template< class E > std::enable_if_t<std::is_enum_v<E>> SetValue( const E &value );
 	template< class E > void SetValue( E* pValue );
 	void	SetValue( const void *pValue, size_t nSize );
 
@@ -133,9 +134,9 @@ public:
 	// Serialization of a single element. 
 	// First version of UnserializeElement adds to tail if it worked
 	// Second version overwrites, but does not add, the element at the specified index 
-	bool	SerializeElement( int nElement, CUtlBuffer &buf ) const;
+	bool	SerializeElement( intp nElement, CUtlBuffer &buf ) const;
 	bool	UnserializeElement( CUtlBuffer &buf );
-	bool	UnserializeElement( int nElement, CUtlBuffer &buf );
+	bool	UnserializeElement( intp nElement, CUtlBuffer &buf );
 
 	// Does this attribute serialize on multiple lines?
 	bool	SerializesOnMultipleLines() const;
@@ -148,7 +149,7 @@ public:
 	void	NotifyWhenChanged( DmElementHandle_t h, bool bNotify );
 
 	// estimate memory overhead
-	int		EstimateMemoryUsage( TraversalDepth_t depth ) const;
+	intp	EstimateMemoryUsage( TraversalDepth_t depth ) const;
 
 private:
 	// Class factory
@@ -199,7 +200,7 @@ private:
 	CDmAttribute **GetNextAttributeRef();
 
 	// Implementational function used for memory consumption estimation computation
-	int EstimateMemoryUsageInternal( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, int *pCategories ) const;
+	intp EstimateMemoryUsageInternal( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, intp *pCategories ) const;
 
 	// Called by elements after unserialization of their attributes is complete
 	void OnUnserializationFinished();
@@ -250,6 +251,12 @@ inline const char *CDmAttribute::GetName() const
 inline UtlSymId_t CDmAttribute::GetNameSymbol() const
 {
 	return m_Name;
+}
+
+template <class E>
+inline std::enable_if_t<std::is_enum_v<E>> CDmAttribute::SetValue(const E &value)
+{
+	SetValue(static_cast<std::underlying_type_t<E>>(value));
 }
 
 
@@ -344,7 +351,7 @@ inline void CDmAttribute::SetValue( E* pValue )
 template<>
 inline void CDmAttribute::SetValue( const char *pValue )
 {
-	int nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
+	intp nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
 	CUtlString str( pValue, nLen );
 	return SetValue( str );
 }
@@ -586,7 +593,7 @@ inline CDmAttribute* CDmElement::SetValue( const char *pAttributeName, E* pEleme
 template<>
 inline CDmAttribute* CDmElement::SetValue( const char *pAttributeName, const char *pValue )
 {
-	int nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
+	intp nLen = pValue ? Q_strlen( pValue ) + 1 : 0;
 	CUtlString str( pValue, nLen );
 	return SetValue( pAttributeName, str );
 }

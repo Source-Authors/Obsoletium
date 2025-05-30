@@ -63,7 +63,7 @@ CParticleEffect::~CParticleEffect( void )
 #if !defined( _XBOX )
 	if ( ( m_nToolParticleEffectId != TOOLPARTICLESYSTEMID_INVALID ) && clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "OldParticleSystem_Destroy" );
+		KeyValuesAD msg( "OldParticleSystem_Destroy" );
 		msg->SetInt( "id", m_nToolParticleEffectId );
 		msg->SetFloat( "time", gpGlobals->curtime );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );

@@ -7,7 +7,7 @@
 #ifndef SAVERESTORE_UTLRBTREE_H
 #define SAVERESTORE_UTLRBTREE_H
 
-#include "utlrbtree.h"
+#include "tier1/utlrbtree.h"
 #include "isaverestore.h"
 #include "saverestore_utlclass.h"
 
@@ -17,7 +17,7 @@
 
 //-------------------------------------
 
-template <class UTLRBTREE, int FIELD_TYPE>
+template <class UTLRBTREE, fieldtype_t FIELD_TYPE>
 class CUtlRBTreeDataOps : public CDefSaveRestoreOps
 {
 public:
@@ -26,12 +26,12 @@ public:
 		UTLCLASS_SAVERESTORE_VALIDATE_TYPE( FIELD_TYPE );
 	}
 
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
-	{		
-		datamap_t *pTreeTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLRBTREE *)NULL );
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
+	{
+		datamap_t *pTreeTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLRBTREE *)nullptr );
 		typedescription_t dataDesc = 
 		{
-			(fieldtype_t)FIELD_TYPE, 
+			FIELD_TYPE, 
 			"elem", 
 			{ 0, 0 },
 			1, 
@@ -57,17 +57,17 @@ public:
 #endif
 		};
 		
-		UTLRBTREE *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
+		auto *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
 
 		pSave->StartBlock();
 		
 		int nElems = pUtlRBTree->Count();
 		pSave->WriteInt( &nElems, 1 );
 
-		typename UTLRBTREE::IndexType_t i = pUtlRBTree->FirstInorder();
+		auto i = pUtlRBTree->FirstInorder();
 		while ( i != pUtlRBTree->InvalidIndex() )
 		{
-			typename UTLRBTREE::ElemType_t &elem = pUtlRBTree->Element( i );
+			auto &elem = pUtlRBTree->Element( i );
 
 			pSave->WriteAll( &elem, &dataMap );
 
@@ -76,12 +76,12 @@ public:
 		pSave->EndBlock();
 	}
 	
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
-		datamap_t *pTreeTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLRBTREE *)NULL );
+		datamap_t *pTreeTypeDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLRBTREE *)nullptr );
 		typedescription_t dataDesc = 
 		{
-			(fieldtype_t)FIELD_TYPE, 
+			FIELD_TYPE, 
 			"elems", 
 			{ 0, 0 },
 			1, 
@@ -107,7 +107,7 @@ public:
 #endif
 		};
 		
-		UTLRBTREE *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
+		auto *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
 
 		pRestore->StartBlock();
 
@@ -123,23 +123,23 @@ public:
 		pRestore->EndBlock();
 	}
 	
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		UTLRBTREE *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
+		auto *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
 		pUtlRBTree->RemoveAll();
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		UTLRBTREE *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
-		return ( pUtlRBTree->Count() == 0 );
+		auto *pUtlRBTree = (UTLRBTREE *)fieldInfo.pField;
+		return pUtlRBTree->Count() == 0;
 	}
 	
 };
 
 //-------------------------------------
 
-template <int FIELD_TYPE>
+template <fieldtype_t FIELD_TYPE>
 class CUtlRBTreeDataopsInstantiator
 {
 public:

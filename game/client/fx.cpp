@@ -67,7 +67,7 @@ public:
 	{
 		m_flLifetime += gpGlobals->frametime;
 		
-		const float flTotalLifetime = 0.1f;
+		constexpr float flTotalLifetime = 0.1f;
 
 		if ( m_flLifetime < flTotalLifetime )
 		{
@@ -283,7 +283,7 @@ void FX_MuzzleEffect(
 		pParticle->m_uchEndAlpha	= 0;
 		pParticle->m_uchStartSize	= random->RandomInt( 4, 8 ) * flScale;
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize*2;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -4.0f, 4.0f );
 	}
 	*/
@@ -389,7 +389,7 @@ void FX_MuzzleEffectAttached(
 	// NOTE: Particle system destruction message will be sent by the particle effect itself.
 	int nId = pSimple->AllocateToolParticleEffectId();
 
-	KeyValues *msg = new KeyValues( "OldParticleSystem_Create" );
+	KeyValuesAD msg( "OldParticleSystem_Create" );
 	msg->SetString( "name", "FX_MuzzleEffectAttached" );
 	msg->SetInt( "id", nId );
 	msg->SetFloat( "time", gpGlobals->curtime );
@@ -457,7 +457,6 @@ void FX_MuzzleEffectAttached(
 	pUpdaters->FindKey( "DmeSizeUpdater", true );
 */
 	ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-	msg->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -560,7 +559,7 @@ void FX_Smoke( const Vector &origin, const QAngle &angles, float scale, int numP
 		unsigned char particlecolor[3];
 		if ( !pColor )
 		{
-			int color = random->RandomInt( 64, 164 );
+			byte color = static_cast<byte>(random->RandomInt( 64, 164 ));
 			particlecolor[0] = color;
 			particlecolor[1] = color;
 			particlecolor[2] = color;
@@ -580,7 +579,7 @@ void FX_Smoke( const Vector &origin, const QAngle &angles, float scale, int numP
 		}
 
 		// Scale
-		int iSize = random->RandomInt( 4, 8 ) * scale;
+		float flSize = random->RandomFloat( 4, 8 ) * scale;
 
 		// Roll
 		float flRoll = random->RandomFloat( 0.0f, 360.0f );
@@ -588,7 +587,7 @@ void FX_Smoke( const Vector &origin, const QAngle &angles, float scale, int numP
 
 		//pParticle->m_uchEndSize		= pParticle->m_uchStartSize*2;
 
-		FX_Smoke( origin, vecVelocity, iSize, 1, random->RandomFloat( 0.5f, 1.0f ), particlecolor, alpha, "particle/particle_smokegrenade", flRoll, flRollDelta );
+		FX_Smoke( origin, vecVelocity, flSize, 1, random->RandomFloat( 0.5f, 1.0f ), particlecolor, alpha, "particle/particle_smokegrenade", flRoll, flRollDelta );
 	}
 }
 
@@ -674,19 +673,19 @@ public:
 			pParticle->m_vecVelocity = vecVelocity;
 
 			// Randomize the color a little
-			int color[3][2];
+			byte color[3][2];
 			for( int j = 0; j < 3; ++j )
 			{
-				color[j][0] = MAX( 0, m_SpurtColor[j] - 64 );
-				color[j][1] = MIN( 255, m_SpurtColor[j] + 64 );
+				color[j][0] = static_cast<byte>(MAX( 0, m_SpurtColor[j] - 64 ));
+				color[j][1] = static_cast<byte>(MIN( 255, m_SpurtColor[j] + 64 ));
 			}
-			pParticle->m_uchColor[0] = random->RandomInt( color[0][0], color[0][1] );
-			pParticle->m_uchColor[1] = random->RandomInt( color[1][0], color[1][1] );
-			pParticle->m_uchColor[2] = random->RandomInt( color[2][0], color[2][1] );
+			pParticle->m_uchColor[0] = static_cast<byte>(random->RandomInt( color[0][0], color[0][1] ));
+			pParticle->m_uchColor[1] = static_cast<byte>(random->RandomInt( color[1][0], color[1][1] ));
+			pParticle->m_uchColor[2] = static_cast<byte>(random->RandomInt( color[2][0], color[2][1] ));
 
 			pParticle->m_uchStartAlpha = m_SpurtColor[3];
 			pParticle->m_uchEndAlpha = 0;
-			pParticle->m_uchStartSize = RandomInt( 50, 60 );
+			pParticle->m_uchStartSize = static_cast<byte>(RandomInt( 50, 60 ));
 			pParticle->m_uchEndSize = pParticle->m_uchStartSize*3;
 			pParticle->m_flRoll	= RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta = RandomFloat( -4.0f, 4.0f );
@@ -843,7 +842,7 @@ void FX_GunshipMuzzleEffect( const Vector &origin, const QAngle &angles, float s
 
 	pParticle->m_vecVelocity.Init();
 
-	pParticle->m_uchStartSize	= random->RandomInt( 40, 50 );
+	pParticle->m_uchStartSize	= static_cast<byte>(random->RandomInt( 40, 50 ));
 	pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
 
 	pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
@@ -1108,7 +1107,7 @@ void FX_Tesla( const CTeslaInfo &teslaInfo )
 					pParticle->m_uchColor[0]	= MIN( 1.0f, color[0] * colorRamp ) * 255.0f;
 					pParticle->m_uchColor[1]	= MIN( 1.0f, color[1] * colorRamp ) * 255.0f;
 					pParticle->m_uchColor[2]	= MIN( 1.0f, color[2] * colorRamp ) * 255.0f;
-					pParticle->m_uchStartSize	= RandomInt( 6,13 );
+					pParticle->m_uchStartSize	= static_cast<byte>( RandomInt( 6,13 ) );
 					pParticle->m_uchEndSize		= pParticle->m_uchStartSize - 2;
 					pParticle->m_uchStartAlpha	= 255;
 					pParticle->m_uchEndAlpha	= 10;

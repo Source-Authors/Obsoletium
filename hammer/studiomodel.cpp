@@ -5,16 +5,13 @@
 //=============================================================================//
 
 #include "stdafx.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <malloc.h>
+#include "StudioModel.h"
+
 #include "mapdoc.h"
 #include "MapWorld.h"
 #include "Material.h"
 #include "Render2D.h"
 #include "Render3D.h"
-#include "StudioModel.h"
 #include "ViewerSettings.h"
 #include "materialsystem/imesh.h"
 #include "TextureSystem.h"
@@ -38,7 +35,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable : 4244) // double to float
 
 
 
@@ -165,23 +161,19 @@ StudioModel *CStudioModelCache::CreateModel(const char *pszModelPath)
 BOOL CStudioModelCache::AddModel(StudioModel *pModel, const char *pszModelPath)
 {
 	//
-	// Copy the model pointer.
-	//
-	m_Cache[m_nItems].pModel = pModel;
-
-	//
 	// Allocate space for and copy the model path.
 	//
-	m_Cache[m_nItems].pszPath = new char [strlen(pszModelPath) + 1];
-	if (m_Cache[m_nItems].pszPath != NULL)
-	{
-		strcpy(m_Cache[m_nItems].pszPath, pszModelPath);
-	}
-	else
+	m_Cache[m_nItems].pszPath = V_strdup( pszModelPath );
+	if (m_Cache[m_nItems].pszPath == NULL)
 	{
 		return(FALSE);
 	}
-
+	
+	//
+	// Copy the model pointer.
+	//
+	// dimhotepus: Do it after path is copied as latter may fail.
+	m_Cache[m_nItems].pModel = pModel;
 	m_Cache[m_nItems].nRefCount = 1;
 
 	m_nItems++;
@@ -274,14 +266,18 @@ void CStudioFileChangeWatcher::Init()
 	m_Watcher.Init( this );
 	
 	char searchPaths[1024 * 16];
-	if ( g_pFullFileSystem->GetSearchPath( "GAME", false, searchPaths, sizeof( searchPaths ) ) > 0 )
+	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths ) > 0 )
 	{
 		CUtlVector<char*> searchPathList;
 		V_SplitString( searchPaths, ";", searchPathList );
 
-		for ( int i=0; i < searchPathList.Count(); i++ )
+		for ( auto *searchPath : searchPathList )
 		{
-			m_Watcher.AddDirectory( searchPathList[i], "models", true );
+			// dimhotepus: Do not watch VPKs (from mods) as they are not directories.
+			if ( !V_strEndsWith( searchPath, ".vpk" ) )
+			{
+				m_Watcher.AddDirectory( searchPath, "models", true );
+			}
 		}
 		
 		searchPathList.PurgeAndDeleteElements();
@@ -295,7 +291,7 @@ void CStudioFileChangeWatcher::Init()
 void CStudioFileChangeWatcher::OnFileChange( const char *pRelativeFilename, const char *pFullFilename )
 {
 	char relativeFilename[MAX_PATH];
-	V_ComposeFileName( "models", pRelativeFilename, relativeFilename, sizeof( relativeFilename ) );
+	V_ComposeFileName( "models", pRelativeFilename, relativeFilename );
 	V_FixSlashes( relativeFilename );
 	
 	// Check the cache.
@@ -322,7 +318,7 @@ void CStudioFileChangeWatcher::OnFileChange( const char *pRelativeFilename, cons
 			V_strncpy( filename, tempFilename, sizeof( filename ) );
 
 		// Now we've got the filename with any extension or "dx80"-type stuff at the end.
-		V_strncat( filename, ".mdl", sizeof( filename ) );
+		V_strcat_safe( filename, ".mdl" );
 		
 		// Queue up the list of changes because if they copied all the files for a model,
 		// we'd like to only reload it once.
@@ -425,10 +421,8 @@ StudioModel::StudioModel(void) : m_pModelName(0)
 StudioModel::~StudioModel(void)
 {
 	FreeModel();
-	if (m_pModelName)
-	{
-		delete[] m_pModelName;
-	}
+
+	delete []m_pModelName;
 	delete m_pStudioHdr;
 
 	delete []m_pPosePos;
@@ -497,7 +491,10 @@ void StudioModel::SetUpBones( bool bUpdatePose, matrix3x4_t *pBoneToWorld )
 
 	for (int i = 0; i < pStudioHdr->numbones(); i++) 
 	{
-		if ( CalcProceduralBone( pStudioHdr, i, CBoneAccessor( pBoneToWorld ) ))
+		// dimhotepus: Assign to var as passed by ref.
+		CBoneAccessor boneAccessor( pBoneToWorld );
+
+		if ( CalcProceduralBone( pStudioHdr, i, boneAccessor ))
 			continue;
 
 		matrix3x4_t	bonematrix;
@@ -593,7 +590,6 @@ void StudioModel::DrawModel3D( CRender3D *pRender, float flAlpha, bool bWirefram
 		AngleMatrix(m_angles, fCurrentMatrix);
 		ConcatTransforms(matrix.As3x4(), fCurrentMatrix, fMatrixNew);
 
-		QAngle newAngles;
 		MatrixAngles(fMatrixNew, m_angles);
 
 		matrix3x4_t boneToWorld[MAXSTUDIOBONES];
@@ -656,7 +652,6 @@ void StudioModel::DrawModel2D( CRender2D *pRender, float flAlpha, bool bWireFram
 		AngleMatrix(m_angles, fCurrentMatrix);
 		ConcatTransforms(matrix.As3x4(), fCurrentMatrix, fMatrixNew);
 
-		QAngle newAngles;
 		MatrixAngles(fMatrixNew, m_angles);
 	}
 
@@ -765,13 +760,8 @@ bool StudioModel::LoadModel( const char *modelname )
 	if (m_pModelName != modelname)
 	{
 		// Copy over the model name; we'll need it later...
-		if (m_pModelName)
-		{
-			delete[] m_pModelName;
-		}
-
-		m_pModelName = new char[strlen(modelname) + 1];
-		strcpy( m_pModelName, modelname );
+		delete[] m_pModelName;
+		m_pModelName = V_strdup( modelname );
 	}
 
 	m_MDLHandle = g_pMDLCache->FindMDL( modelname );
@@ -841,12 +831,15 @@ int StudioModel::GetSequenceCount( void )
 // Input  : nIndex - 
 //			szName - 
 //-----------------------------------------------------------------------------
-void StudioModel::GetSequenceName( int nIndex, char *szName )
+void StudioModel::GetSequenceName( int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize )
 {
+	if (nameSize > 0)
+		szName[0] = '\0';
+
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if (nIndex < pStudioHdr->GetNumSeq())
 	{
-		strcpy(szName, pStudioHdr->pSeqdesc(nIndex).pszLabel());
+		V_strncpy(szName, pStudioHdr->pSeqdesc(nIndex).pszLabel(), nameSize);
 	}
 }
 
@@ -977,14 +970,14 @@ void StudioModel::GetSequenceInfo( float *pflFrameRate, float *pflGroundSpeed )
 
 	if (t > 0)
 	{
-		*pflFrameRate = 1.0 / t;
+		*pflFrameRate = 1.0f / t;
 		*pflGroundSpeed = 0; // sqrt( pseqdesc->linearmovement[0]*pseqdesc->linearmovement[0]+ pseqdesc->linearmovement[1]*pseqdesc->linearmovement[1]+ pseqdesc->linearmovement[2]*pseqdesc->linearmovement[2] );
 		// *pflGroundSpeed = *pflGroundSpeed * pseqdesc->fps / (pseqdesc->numframes - 1);
 	}
 	else
 	{
-		*pflFrameRate = 1.0;
-		*pflGroundSpeed = 0.0;
+		*pflFrameRate = 1.0f;
+		*pflGroundSpeed = 0.0f;
 	}
 }
 

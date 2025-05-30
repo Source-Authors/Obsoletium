@@ -38,7 +38,8 @@ public:
 	virtual	IServer	*GetBaseServer() = 0; // get Replay base server interface
 	virtual	IReplayDirector *GetDirector() = 0;	// get director interface
 	virtual	int		GetReplaySlot() = 0; // return entity index-1 of Replay in game
-	virtual float	GetOnlineTime() = 0; // seconds since broadcast started
+	// dimhotepus: float -> double.
+	virtual double	GetOnlineTime() = 0; // seconds since broadcast started
 	virtual void	BroadcastEvent(IGameEvent *event) = 0; // send a director command to all specs
 	virtual bool	IsRecording() = 0;
 	virtual void	StartRecording() = 0;

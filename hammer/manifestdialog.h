@@ -9,15 +9,16 @@
 #define MANIFESTDIALOG_H
 #pragma once
 
-#include "afxcmn.h"
-#include "afxwin.h"
+#include "windows/base_dlg.h"
+#include <afxcmn.h>
+#include <afxwin.h>
 #include "HammerBar.h"
 
 class CManifestMap;
 
 
 // CManifestMove dialog
-class CManifestMove : public CDialog
+class CManifestMove : public CBaseDlg
 {
 	DECLARE_DYNAMIC(CManifestMove)
 
@@ -125,7 +126,7 @@ public:
 
 // CManifestMapDlg dialog
 
-class CManifestMapDlg : public CDialog
+class CManifestMapDlg : public CBaseDlg
 {
 	DECLARE_DYNAMIC(CManifestMapDlg)
 
@@ -156,7 +157,7 @@ public:
 
 // CManifestCheckin dialog
 
-class CManifestCheckin : public CDialog
+class CManifestCheckin : public CBaseDlg
 {
 	DECLARE_DYNAMIC(CManifestCheckin)
 

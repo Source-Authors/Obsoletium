@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "dme_controls/AttributeDetailTypePickerPanel.h"
+#include "dme_controls/attributedetailtypepickerpanel.h"
 #include "dme_controls/AttributeTextEntry.h"
 #include "tier1/KeyValues.h"
 #include "filesystem.h"
@@ -41,7 +41,7 @@ void CAttributeDetailTypePickerPanel::AddDetailTypesToList( PickerList_t &list )
 	{
 		for ( KeyValues *sub = pDetailTypes->GetFirstTrueSubKey(); sub != NULL; sub = sub->GetNextTrueSubKey() )
 		{
-			int i = list.AddToTail( );
+			intp i = list.AddToTail( );
 			list[i].m_pChoiceString = sub->GetName();
 			list[i].m_pChoiceValue = sub->GetName();
 		}

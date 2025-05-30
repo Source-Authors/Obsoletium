@@ -82,7 +82,7 @@ public:
 
 	
 	// Num elements
-	size_t Count() const								{ return m_Tree.Count(); }
+	I Count() const								{ return m_Tree.Count(); }
 	
 	// Max "size" of the vector
 	IndexType_t  MaxElement() const							{ return m_Tree.MaxElement(); }
@@ -94,7 +94,7 @@ public:
 	bool  IsValid() const									{ return m_Tree.IsValid(); }
 	
 	// Invalid index
-	static IndexType_t InvalidIndex()						{ return CTree::InvalidIndex(); }
+	static constexpr IndexType_t InvalidIndex()				{ return CTree::InvalidIndex(); }
 	
 	// Sets the less func
 	void SetLessFunc( LessFunc_t func )

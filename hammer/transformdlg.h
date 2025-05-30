@@ -14,10 +14,12 @@
 // TransformDlg.h : header file
 //
 
+#include "windows/base_dlg.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CTransformDlg dialog
 
-class CTransformDlg : public CDialog
+class CTransformDlg : public CBaseDlg
 {
 // Construction
 public:

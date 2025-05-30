@@ -724,7 +724,7 @@ int CAudioMixerWave::MixDataToDevice_( IAudioDevice *pDevice, channel_t *pChanne
 			// Verify that we won't get a buffer overrun.
 			Assert( floor( sampleFraction + RoundToFixedPoint(rate, (outputSampleCount-1), bInterpolated_pitch) ) <= samples_loaded );
 
-			int saveIndex = MIX_GetCurrentPaintbufferIndex();
+			intp saveIndex = MIX_GetCurrentPaintbufferIndex();
 			for ( intp i = 0 ; i < g_paintBuffers.Count(); i++ )
 			{
 				if ( g_paintBuffers[i].factive )

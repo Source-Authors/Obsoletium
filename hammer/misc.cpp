@@ -6,8 +6,11 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "globalfunctions.h"
+
 #include <direct.h>
 #include <time.h>
+
 #include "MapSolid.h"
 #include "mapworld.h"
 
@@ -43,7 +46,7 @@ void NotifyDuplicates(CMapSolid *pSolid)
 	if(DoesContainDuplicates(pSolid))
 	{
 		if(IDNO == AfxMessageBox("Duplicate Plane! Do you want more messages?", 
-			MB_YESNO))
+			MB_YESNO | MB_ICONQUESTION))
 		{
 			bCheckDupes = FALSE;
 		}
@@ -76,7 +79,11 @@ int mychdir(LPCTSTR pszDir)
 	if(_chdir(pszDir) == -1)
 	{
 		// change back to original disk
-		_chdrive(curdrive);
+		if (_chdrive(curdrive) == -1)
+		{
+			Warning( "Unable to change back drive %d.\n", curdrive );
+		}
+
 		return -1;
 	}
 

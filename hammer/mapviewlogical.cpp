@@ -281,7 +281,7 @@ void CMapViewLogical::PopulateConnectionList( )
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapViewLogical::OnTimer(UINT nIDEvent) 
+void CMapViewLogical::OnTimer(UINT_PTR nIDEvent) 
 {
 	if ( nIDEvent == TIMER_CONNECTIONUPDATE )
 	{

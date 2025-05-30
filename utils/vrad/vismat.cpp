@@ -155,7 +155,7 @@ void PvsForOrigin (Vector& org, byte *pvs)
 }
 
 
-void TestPatchToPatch( int ndxPatch1, int ndxPatch2, int head, transfer_t *transfers, CTransferMaker &transferMaker, int iThread )
+void TestPatchToPatch( intp ndxPatch1, intp ndxPatch2, int head, transfer_t *transfers, CTransferMaker &transferMaker, int iThread )
 {
 	Vector tmp;
 
@@ -283,7 +283,7 @@ void AddDispsToClusterTable( void )
 
 				if( pPatch->clusterNumber != g_Patches.InvalidIndex() )
 				{
-					int ndxDisp = g_ClusterDispFaces[pPatch->clusterNumber].dispFaces.Find( ndxFace );
+					intp ndxDisp = g_ClusterDispFaces[pPatch->clusterNumber].dispFaces.Find( ndxFace );
 					if( ndxDisp == -1 )
 					{
 						ndxDisp = g_ClusterDispFaces[pPatch->clusterNumber].dispFaces.AddToTail();
@@ -345,7 +345,7 @@ void BuildVisRow (int patchnum, byte *pvs, int head, transfer_t *transfers, CTra
 			}
 		}
 
-		int dispCount = g_ClusterDispFaces[j].dispFaces.Size();
+		int dispCount = g_ClusterDispFaces[j].dispFaces.Count();
 		for( int ndxDisp = 0; ndxDisp < dispCount; ndxDisp++ )
 		{
 			int ndxFace = g_ClusterDispFaces[j].dispFaces[ndxDisp];

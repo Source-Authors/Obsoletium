@@ -55,7 +55,7 @@ public:
 	};
 
 	// resolve internal data from changed attributes
-	virtual void Resolve();
+	void Resolve() override;
 
 	// Returns the number of joints per vertex
 	int JointCount() const;
@@ -102,11 +102,11 @@ public:
 
 	// Adds a new vertex, returns the vertex index
 	// NOTE: This will also add vertex indices for DmeMeshDeltaData
-	int AddVertexData( FieldIndex_t nFieldIndex, int nCount );
+	intp AddVertexData( FieldIndex_t nFieldIndex, intp nCount );
 
 	// Sets vertex data
-	void SetVertexData( FieldIndex_t nFieldIndex, int nFirstVertex, int nCount, DmAttributeType_t valueType, const void *pData );
-	void SetVertexIndices( FieldIndex_t nFieldIndex, int nFirstIndex, int nCount, const int *pIndices );
+	void SetVertexData( FieldIndex_t nFieldIndex, intp nFirstVertex, intp nCount, DmAttributeType_t valueType, const void *pData );
+	void SetVertexIndices( FieldIndex_t nFieldIndex, intp nFirstIndex, intp nCount, const int *pIndices );
 
 	// Removes all vertex data associated with a particular field
 	void RemoveAllVertexData( FieldIndex_t nFieldIndex );
@@ -145,12 +145,12 @@ public:
 	void FlipVCoordinate( bool bFlip );
 
 	// Returns an inverse map from vertex data index to vertex index
-	const CUtlVector< int > &FindVertexIndicesFromDataIndex( FieldIndex_t nFieldIndex, int nDataIndex );
-	const CUtlVector< int > &FindVertexIndicesFromDataIndex( StandardFields_t nFieldIndex, int nDataIndex );
+	const CUtlVector< int > &FindVertexIndicesFromDataIndex( FieldIndex_t nFieldIndex, intp nDataIndex );
+	const CUtlVector< int > &FindVertexIndicesFromDataIndex( StandardFields_t nFieldIndex, intp nDataIndex );
 
-	int FieldCount() const;
+	intp FieldCount() const;
 
-	const char *FieldName( int i ) const;
+	const char *FieldName( intp i ) const;
 
 	void CopyFrom( CDmeVertexDataBase *pSrc );
 
@@ -302,7 +302,7 @@ public:
 	int AddVertexIndices( int nCount );
 
 private:
-	virtual bool IsVertexDeltaData() const { return false; }
+	bool IsVertexDeltaData() const override { return false; }
 };
 
 
@@ -327,7 +327,7 @@ public:
 	CDmaVar< bool > m_bCorrected;
 
 private:
-	virtual bool IsVertexDeltaData() const { return true; }
+	bool IsVertexDeltaData() const override { return true; }
 
 	// Computes max positional delta length
 	float ComputeMaxDeflection( );

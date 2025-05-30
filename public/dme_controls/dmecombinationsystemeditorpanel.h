@@ -38,7 +38,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CDmeCombinationSystemEditorPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeCombinationSystemEditorPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeCombinationSystemEditorPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -69,7 +69,7 @@ private:
 //-----------------------------------------------------------------------------
 class CDmeCombinationSystemEditorFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDmeCombinationSystemEditorFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeCombinationSystemEditorFrame, vgui::Frame );
 
 public:
 	CDmeCombinationSystemEditorFrame( vgui::Panel *pParent, const char *pTitle );
@@ -79,7 +79,7 @@ public:
 	void SetCombinationOperator( CDmeCombinationOperator *pComboSystem );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 private:
     MESSAGE_FUNC( OnDmeElementChanged, "DmeElementChanged" );

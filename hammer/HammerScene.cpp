@@ -61,7 +61,7 @@ void CSceneTokenProcessor::Error( const char *fmt, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	vsprintf( string, fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 
 	Warning( "%s", string );
@@ -73,10 +73,11 @@ static CSceneTokenProcessor g_TokenProcessor;
 //-----------------------------------------------------------------------------
 // Purpose: Normally implemented in cmdlib.cpp but we don't want that in Hammer.
 //-----------------------------------------------------------------------------
-char *ExpandPath (char *path)
+// dimhotepus: Make const version.
+const char *ExpandPath (const char *path)
 {
 	static char fullpath[ 512 ];
-	g_pFullFileSystem->RelativePathToFullPath( path, "GAME", fullpath, sizeof( fullpath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( path, "GAME", fullpath );
 	return fullpath;
 }
 
@@ -88,7 +89,7 @@ char *ExpandPath (char *path)
 // is $include in scriptlib, if this function returns 0, $include will
 // behave the way it did before this change
 //-----------------------------------------------------------------------------
-int CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
+intp CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
 {
 	return 0;
 }
@@ -103,7 +104,12 @@ int LoadFile( const char *filename, void **bufferptr )
 	if ( FILESYSTEM_INVALID_HANDLE != f )
 	{
 		int length = g_pFullFileSystem->Size( f );
-		void *buffer = malloc (length+1);
+		void *buffer = malloc(length+1);
+		if (!buffer)
+		{
+			*bufferptr = NULL;
+			return 0;
+		}
 		((char *)buffer)[length] = 0;
 		g_pFullFileSystem->Read( buffer, length, f );
 		g_pFullFileSystem->Close (f);

@@ -13,6 +13,7 @@
 #include "utlrbtree.h"
 #include "mathlib/VMatrix.h"
 #include "macro_texture.h"
+#include "bspflags.h"
 
 
 void WorldToLuxelSpace( lightinfo_t const *l, Vector const &world, Vector2D &coord )
@@ -98,10 +99,10 @@ void AddDirectToRadial( radial_t *rad,
 	{
 		for( t = t_min; t < t_max; t++ )
 		{
-			float s0 = max( coordmins[0] - s, -1.0 );
-			float t0 = max( coordmins[1] - t, -1.0 );
-			float s1 = min( coordmaxs[0] - s, 1.0 );
-			float t1 = min( coordmaxs[1] - t, 1.0 );
+			float s0 = max( coordmins[0] - s, -1.0f );
+			float t0 = max( coordmins[1] - t, -1.0f );
+			float s1 = min( coordmaxs[0] - s, 1.0f );
+			float t1 = min( coordmaxs[1] - t, 1.0f );
 
 			area = (s1 - s0) * (t1 - t0);
 
@@ -112,9 +113,9 @@ void AddDirectToRadial( radial_t *rad,
 
 				r = max( ds, dt );
 
-				if (r < 0.1)
+				if (r < 0.1f)
 				{
-					r = area / 0.1;
+					r = area / 0.1f;
 				}
 				else
 				{
@@ -176,8 +177,8 @@ void AddBouncedToRadial( radial_t *rad,
 	distt = (coordmaxs[1] - coordmins[1]);
 
 	// patches less than a luxel in size could be mistakeningly filtered, so clamp.
-	dists = max( 1.0, dists );
-	distt = max( 1.0, distt );
+	dists = max( 1.0f, dists );
+	distt = max( 1.0f, distt );
 
 	// find possible domain of patch influence
   	s_min = ( int )( coord[0] - dists * RADIALDIST );
@@ -258,9 +259,8 @@ void PatchLightmapCoordRange( radial_t *rad, int ndxPatch, Vector2D &mins, Vecto
 
 radial_t *AllocateRadial( int facenum )
 {
-	radial_t *rad;
-
-	rad = ( radial_t* )calloc( 1, sizeof( *rad ) );
+	radial_t *rad = ( radial_t* )calloc( 1, sizeof( *rad ) );
+	if (!rad) return nullptr;
 
 	rad->facenum = facenum;
 	InitLightinfo( &rad->l, facenum );
@@ -273,8 +273,7 @@ radial_t *AllocateRadial( int facenum )
 
 void FreeRadial( radial_t *rad )
 {
-	if (rad)
-		free( rad );
+	free( rad );
 }
 
 
@@ -515,7 +514,7 @@ bool SampleRadial( radial_t *rad, Vector& pnt, LightingValue_t light[NUM_BUMP_VE
 		if (rad->weight[i] > WEIGHT_EPS)
 		{
 			light[bumpSample]= rad->light[bumpSample][i];
-			light[bumpSample].Scale( 1.0 / rad->weight[i] );
+			light[bumpSample].Scale( 1.0f / rad->weight[i] );
 		}
 		else
 		{
@@ -563,61 +562,29 @@ void GetRandomColor( unsigned char *color )
 	color[2] = ( unsigned char )( rand() * ( 255.0f / VALVE_RAND_MAX ) ); 
 }
 
-
-#if 0
-// debugging! -- not accurate!
-void DumpLuxels( facelight_t *pFaceLight, Vector *luxelColors, int ndxFace )
-{
-	static FileHandle_t pFpLuxels = NULL;
-
-	ThreadLock();
-
-	if( !pFpLuxels )
-	{
-		pFpLuxels = g_pFileSystem->Open( "luxels.txt", "w" );
-	}
-
-	dface_t *pFace = &g_pFaces[ndxFace];
-	bool bDisp = ( pFace->dispinfo != -1 );
-
-	for( int ndx = 0; ndx < pFaceLight->numluxels; ndx++ )
-	{
-		WriteWinding( pFpLuxels, pFaceLight->sample[ndx].w, luxelColors[ndx] );
-		if( bDumpNormals && bDisp )
-		{
-			WriteNormal( pFpLuxels, pFaceLight->luxel[ndx], pFaceLight->luxelNormals[ndx], 15.0f, Vector( 255, 255, 0 ) );
-		}
-	}
-
-	ThreadUnlock();
-}
-#endif
-
-
 static FileHandle_t pFileLuxels[4] = { NULL, NULL, NULL, NULL };
 
 void DumpDispLuxels( int iFace, Vector &color, int iLuxel, int nBump )
 {
+	char szFileName[512];
+
 	// Lock the thread and dump the luxel data.
-	ThreadLock();
+	ScopedThreadsLock lock;
 
 	// Get the face and facelight data.
 	facelight_t *pFaceLight = &facelight[iFace];
 
 	// Open the luxel files.
-	char szFileName[512];
 	for ( int iBump = 0; iBump < ( NUM_BUMP_VECTS+1 ); ++iBump )
 	{
 		if ( pFileLuxels[iBump] == NULL )
 		{
-			sprintf( szFileName, "luxels_bump%d.txt", iBump );
+			V_sprintf_safe( szFileName, "luxels_bump%d.txt", iBump );
 			pFileLuxels[iBump] = g_pFileSystem->Open( szFileName, "w" );
 		}
 	}
 
 	WriteWinding( pFileLuxels[nBump], pFaceLight->sample[iLuxel].w, color );
-
-	ThreadUnlock();
 }
 
 void CloseDispLuxels()

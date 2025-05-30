@@ -18,7 +18,7 @@ $Configuration
 	}
 }
 
-$Project "Mxtoolkitwin32"
+$Project "mxtoolkitwin32"
 {
 	$Folder	"Source Files"
 	{

@@ -19,8 +19,6 @@
 #include "vgui_controls/Label.h"
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/Button.h"
-#include "vgui_controls/Button.h"
-#include "vgui_controls/PanelListPanel.h"
 #include "vgui_controls/QueryBox.h"
 
 #include <stdio.h>
@@ -94,11 +92,11 @@ public:
 	{
 		// set the bitmap to display
 		char tga[_MAX_PATH];
-		Q_strncpy( tga, item.szMapFileName, sizeof(tga) );
-		char *ext = strstr( tga, ".txt" );
+		V_strcpy_safe( tga, item.szMapFileName );
+		char *ext = strstr( tga, ".sav" );
 		if ( ext )
 		{
-			strcpy( ext, ".tga" );
+			V_strncpy( ext, ".tga", 5 );
 		}
 		m_pCommentaryScreenshot->SetTGA( tga );
 
@@ -197,7 +195,7 @@ void CLoadCommentaryDialog::OnCommand( const char *command )
 {
 	if ( !Q_stricmp( command, "loadcommentary" ) )
 	{
-		int itemIndex = GetSelectedItemIndex();
+		intp itemIndex = GetSelectedItemIndex();
 		if ( m_CommentaryItems.IsValidIndex(itemIndex) )
 		{
 			const char *mapName = m_CommentaryItems[itemIndex].szMapName;
@@ -248,13 +246,13 @@ void CLoadCommentaryDialog::CreateCommentaryItemList()
 //-----------------------------------------------------------------------------
 // Purpose: returns the save file name of the selected item
 //-----------------------------------------------------------------------------
-int CLoadCommentaryDialog::GetSelectedItemIndex()
+intp CLoadCommentaryDialog::GetSelectedItemIndex()
 {
 	CCommentaryItemPanel *panel = dynamic_cast<CCommentaryItemPanel *>(m_pGameList->GetSelectedPanel());
 	if ( panel )
 	{
 		// find the panel in the list
-		for ( int i = 0; i < m_CommentaryItems.Count(); i++ )
+		for ( intp i = 0; i < m_CommentaryItems.Count(); i++ )
 		{
 			if ( i == panel->GetListItemID() )
 			{
@@ -301,7 +299,11 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 	g_pFullFileSystem->FindClose( handle );
 
 	// sort the save list
-	qsort( m_CommentaryItems.Base(), m_CommentaryItems.Count(), sizeof(CommentaryItem_t), &SaveGameSortFunc );
+	std::sort( m_CommentaryItems.begin(), m_CommentaryItems.end(), []( const CommentaryItem_t &s1, const CommentaryItem_t &s2 )
+	{
+		// Sort by map name
+		return Q_stricmp( s1.szPrintName, s2.szPrintName ) < 0;
+	});
 
 	// add to the list
 	for ( int saveIndex = 0; saveIndex < m_CommentaryItems.Count() && saveIndex < MAX_LISTED_COMMENTARY_ITEMS; saveIndex++ )
@@ -341,11 +343,9 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 		return;
 
 	// load the file as keyvalues
-	KeyValues *pData = new KeyValues( "commentary_data" );
-
-	if ( false == pData->LoadFromFile( g_pFullFileSystem, pszFileName, "MOD" ) )
+	KeyValuesAD pData( "commentary_data" );
+	if ( !pData->LoadFromFile( g_pFullFileSystem, pszFileName, "MOD" ) )
 	{
-		pData->deleteThis();
 		return;
 	}
 	
@@ -358,10 +358,10 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 			//Msg( "track found: %s %s\n", track->GetString("map", "?"), track->GetString( "description", "asdf" ) );
 
 			CommentaryItem_t item;
-			Q_strncpy( item.szMapFileName, pszFileName, sizeof(item.szMapFileName) );
-			Q_strncpy( item.szMapName, track->GetString( "map", "" ), sizeof(item.szMapName) );
-			Q_strncpy( item.szPrintName, track->GetString( "printname", "" ), sizeof(item.szPrintName) );
-			Q_strncpy( item.szDescription, track->GetString( "description", "" ), sizeof(item.szDescription) );
+			V_strcpy_safe( item.szMapFileName, pszFileName );
+			V_strcpy_safe( item.szMapName, track->GetString( "map", "" ) );
+			V_strcpy_safe( item.szPrintName, track->GetString( "printname", "" ) );
+			V_strcpy_safe( item.szDescription, track->GetString( "description", "" ) );
 
 			//item.iChannel = track->GetInt( "channel" );
 
@@ -371,36 +371,23 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 	else
 	{
 		CommentaryItem_t item;
-		Q_strncpy( item.szMapFileName, pszFileName, sizeof(item.szMapFileName) );
+		V_strcpy_safe( item.szMapFileName, pszFileName );
 
 		char mapname[_MAX_PATH];
-		Q_strncpy( mapname, pszFileName, sizeof(item.szMapName) );
+		V_strcpy_safe( mapname, pszFileName );
 		char *ext = strstr( mapname, "_commentary" );
 		if ( !ext )
 			return;
 		
 		*ext = '\0';
-		Q_FileBase( mapname, item.szMapName, sizeof(item.szMapName) );
+		V_FileBase( mapname, item.szMapName );
 
-		Q_strncpy( item.szPrintName, "No trackinfo found.", sizeof(item.szPrintName) );
-		Q_strncpy( item.szDescription, "No trackinfo found.", sizeof(item.szDescription) );
+		V_strcpy_safe( item.szPrintName, "No trackinfo found." );
+		V_strcpy_safe( item.szDescription, "No trackinfo found." );
 		m_CommentaryItems.AddToTail( item );
 	}
-
-	return;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: timestamp sort function for savegames
-//-----------------------------------------------------------------------------
-int CLoadCommentaryDialog::SaveGameSortFunc( const void *lhs, const void *rhs )
-{
-	// Sort by map name
-	const CommentaryItem_t *s1 = (const CommentaryItem_t *)lhs;
-	const CommentaryItem_t *s2 = (const CommentaryItem_t *)rhs;
-
-	return Q_stricmp( s1->szPrintName, s2->szPrintName );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: One item has been selected

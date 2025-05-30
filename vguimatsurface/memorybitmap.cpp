@@ -14,7 +14,7 @@
 #include "materialsystem/itexture.h"
 #include "bitmap/imageformat.h"
 #include "vtf/vtf.h"
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 #include "TextureDictionary.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

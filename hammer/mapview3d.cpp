@@ -151,21 +151,14 @@ CMapView3D::CMapView3D(void)
 //-----------------------------------------------------------------------------
 CMapView3D::~CMapView3D(void)
 {
-	if (m_pCamera != NULL)
-	{
-		delete m_pCamera;
-	}
-
+	delete m_pCamera;
 	if (m_pRender != NULL)
 	{
 		m_pRender->ShutDown();
 		delete m_pRender;
 	}
 
-	if (m_pwndTitle != NULL)
-	{
-		delete m_pwndTitle;
-	}
+	delete m_pwndTitle;
 }
 
 //-----------------------------------------------------------------------------
@@ -298,16 +291,16 @@ void CMapView3D::SetDrawType(DrawType_t eDrawType)
 		//		if ( pMapDoc )
 		//		{
 		//			const char *pFullPathName = pMapDoc->GetPathName();
-		//			if ( pFullPathName && pFullPathName[0] )
+		//			if ( pFullPathName && !Q_isempty(pFullPathName) )
 		//			{
 		//				char buf[MAX_PATH];
-		//				Q_FileBase( pFullPathName, buf,	MAX_PATH );
+		//				Q_FileBase( pFullPathName, buf );
 		//	
 		//				// Don't do it if we're untitled
 		//				//if ( !Q_stristr( buf, "untitled" ) )
 		//				{
 		//					g_pEngineAPI->SetEngineWindow( m_hWnd );
-		//					//g_pEngineAPI->SetMap( buf );
+		//					g_pEngineAPI->SetMap( buf );
 		//					g_pEngineAPI->ActivateSimulation( true );
 		//				}
 		//			}
@@ -586,12 +579,14 @@ void CMapView3D::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case '2':
 		{
 			float fBack = m_pCamera->GetFarClip();
-			if ((fBack <= 9000) && (fBack > 1000))
+			// dimhotepus: Bump 9000 -> 19000
+			if ((fBack <= 19000) && (fBack > 1000))
 			{
 				m_pCamera->SetFarClip(fBack + 1000);
 				Options.view3d.iBackPlane = fBack;
 			}
-			else if (fBack < 10000)
+			// dimhotepus: Bump 10000 -> 20000
+			else if (fBack < 20000)
 			{
 				m_pCamera->SetFarClip(fBack + 250);
 				Options.view3d.iBackPlane = fBack;
@@ -1217,7 +1212,7 @@ void CMapView3D::UpdateView(int nFlags)
 //			ulFace - Index of face in object that was hit.
 // Output : Returns a pointer to the CMapClass object at the coordinates, NULL if none.
 //-----------------------------------------------------------------------------
-CMapClass *CMapView3D::NearestObjectAt( const Vector2D &vPoint, ULONG &ulFace, unsigned int nFlags, VMatrix *pLocalMatrix )
+CMapClass *CMapView3D::NearestObjectAt( const Vector2D &vPoint, unsigned int &ulFace, unsigned int nFlags, VMatrix *pLocalMatrix )
 {
 	ulFace = 0;
 	if (m_pRender == NULL)

@@ -402,11 +402,10 @@ void CJobMgr::PassMsgToJob( CJob &job, IMsgNetPacket *pNetPacket, const JobMsgIn
 	if ( job.GetPauseReason() != k_EJobPauseReasonNetworkMsg )
 	{
 		AssertMsg3( false, "CJobMgr::PassMsgToJob() job %s received unexpected message %s when paused for %s\n", job.GetName(), PchMsgNameFromEMsg( jobMsgInfo.m_eMsg ), job.GetPauseReasonDescription() );
-	}
 
-	// In case of error, we need to throw this message away
-	if ( job.GetPauseReason() != k_EJobPauseReasonNetworkMsg )
+		// In case of error, we need to throw this message away
 		return;
+	}
 
 	// Add the packet and resume the job
 	job.AddPacketToList( pNetPacket, jobMsgInfo.m_JobIDSource );
@@ -1367,11 +1366,11 @@ bool CJobMgr::BLaunchJobFromNetworkMsg( void *pParent, const JobMsgInfo_t &jobMs
 
 			// Create the job
 			CJob *job = pJobType->m_pJobFactory( pParent, NULL );
-
+			
+			AssertMsg1( job, "Job factory returned NULL for job named '%s'!\n", pJobType->m_pchName );
 			// Safety check
 			if ( job == NULL )
 			{
-				AssertMsg1( job, "Job factory returned NULL for job named '%s'!\n", pJobType->m_pchName );
 				return false;
 			}
 
@@ -1396,10 +1395,10 @@ bool CJobMgr::BLaunchJobFromNetworkMsg( void *pParent, const JobMsgInfo_t &jobMs
 			// Create the job
 			CJob *job = pJobType->m_pJobFactory( pParent, NULL );
 
+			AssertMsg3( job, "Job factory returned NULL for job msg %d, server type %d (named '%s')!\n", (int)jobMsgInfo.m_eMsg, (int)jobMsgInfo.m_eServerType, pJobType->m_pchName );
 			// Safety check
 			if ( job == NULL )
 			{
-				AssertMsg3( job, "Job factory returned NULL for job msg %d, server type %d (named '%s')!\n", (int)jobMsgInfo.m_eMsg, (int)jobMsgInfo.m_eServerType, pJobType->m_pchName );
 				return false;
 			}
 

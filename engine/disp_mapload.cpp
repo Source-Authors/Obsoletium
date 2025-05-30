@@ -379,8 +379,8 @@ void DispInfo_CreateEmptyStaticBuffers( model_t *pWorld, const ddispinfo_t *pMap
 	// For each combo, create empty buffers.
 	for( auto *pCombo : g_DispGroups )
 	{
-		int nTotalVerts=0, nTotalIndices=0;
-		int iStart = 0;
+		intp nTotalVerts=0, nTotalIndices=0;
+		intp iStart = 0;
 		for( intp iDisp=0; iDisp < pCombo->m_DispInfos.Count(); iDisp++ )
 		{
 			const ddispinfo_t *pMapDisp = &pMapDisps[pCombo->m_DispInfos[iDisp]];

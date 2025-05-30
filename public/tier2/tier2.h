@@ -65,12 +65,51 @@ void DisconnectTier2Libraries();
 void InitDefaultFileSystem(void);
 void ShutdownDefaultFileSystem(void);
 
+// dimhotepus: Add RAII wrapper over InitDefaultFileSystem.
+class ScopedDefaultFileSystem
+{
+public:
+  ScopedDefaultFileSystem()
+  {
+	InitDefaultFileSystem();
+  }
+  ~ScopedDefaultFileSystem()
+  {
+	ShutdownDefaultFileSystem();
+  }
+
+  ScopedDefaultFileSystem(ScopedDefaultFileSystem &) = delete;
+  ScopedDefaultFileSystem(ScopedDefaultFileSystem &&) = delete;
+  ScopedDefaultFileSystem& operator=(ScopedDefaultFileSystem &) = delete;
+  ScopedDefaultFileSystem& operator=(ScopedDefaultFileSystem &&) = delete;
+};
+
 
 //-----------------------------------------------------------------------------
 // for simple utilities using valve libraries, call the entry point below in main(). It will
 // init a filesystem for you, init mathlib, and create the command line.
 //-----------------------------------------------------------------------------
 void InitCommandLineProgram( int argc, char **argv );
+void ShutdownCommandLineProgram();
+
+// dimhotepus: Add RAII wrapper over InitCommandLineProgram.
+class ScopedCommandLineProgram
+{
+public:
+  ScopedCommandLineProgram( int argc, char **argv )
+  {
+	InitCommandLineProgram( argc, argv );
+  }
+  ~ScopedCommandLineProgram()
+  {
+	ShutdownCommandLineProgram();
+  }
+
+  ScopedCommandLineProgram(ScopedCommandLineProgram &) = delete;
+  ScopedCommandLineProgram(ScopedCommandLineProgram &&) = delete;
+  ScopedCommandLineProgram& operator=(ScopedCommandLineProgram &) = delete;
+  ScopedCommandLineProgram& operator=(ScopedCommandLineProgram &&) = delete;
+};
 
 
 //-----------------------------------------------------------------------------

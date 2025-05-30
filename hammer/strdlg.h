@@ -8,10 +8,13 @@
 // StrDlg.h : header file
 //
 
+#include "windows/base_dlg.h"
+#include "resource.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CStrDlg dialog
 
-class CStrDlg : public CDialog
+class CStrDlg : public CBaseDlg
 {
 // Construction
 public:

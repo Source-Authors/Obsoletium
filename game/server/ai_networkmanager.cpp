@@ -45,7 +45,7 @@ inline void DebugConnectMsg( int node1, int node2, const char *pszFormat, ... )
 		char string[ 2048 ];
 		va_list argptr;
 		va_start( argptr, pszFormat );
-		Q_vsnprintf( string, sizeof(string), pszFormat, argptr );
+		V_vsprintf_safe( string, pszFormat, argptr );
 		va_end( argptr );
 
 		DevMsg( "%s", string );
@@ -503,30 +503,13 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 
 	Q_strncat( szNrpFilename, "/", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 	Q_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
-	Q_strncat( szNrpFilename, IsX360() ? ".360.ain" : ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
+	Q_strncat( szNrpFilename, ".ain", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 
 	MEM_ALLOC_CREDIT();
 
 	// Read the file in one gulp
 	CUtlBuffer buf;
 	bool bHaveAIN = false;
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		// .ain was loaded anonymously by bsp, should be ready
-		void *pData;
-		int nDataSize;
-		if ( g_pQueuedLoader->ClaimAnonymousJob( szNrpFilename, &pData, &nDataSize ) )
-		{
-			if ( nDataSize != 0 )
-			{
-				buf.Put( pData, nDataSize );
-				bHaveAIN = true;
-			}
-			filesystem->FreeOptimalReadBuffer( pData );
-		}
-	}
-	
-
 
 	if ( !bHaveAIN && !filesystem->ReadFile( szNrpFilename, "game", buf ) )
 	{
@@ -630,12 +613,8 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 
 		CAI_Node *new_node = m_pNetwork->AddNode( origin, yaw );
 
-		buf.Get( new_node->m_flVOffset, sizeof(new_node->m_flVOffset) );
+		buf.Get( new_node->m_flVOffset );
 		new_node->m_eNodeType = (NodeType_e)buf.GetChar();
-		if ( IsX360() )
-		{
-			buf.SeekGet( CUtlBuffer::SEEK_CURRENT, 3 );
-		}
 
 		new_node->m_eNodeInfo = buf.GetUnsignedShort();
 		new_node->m_zone = buf.GetShort();

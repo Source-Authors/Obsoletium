@@ -5,14 +5,14 @@
 //=============================================================================
 
 #include "dme_controls/DmeSourceDCCFilePanel.h"
-#include "dme_controls/DmePanel.h"
+#include "dme_controls/dmepanel.h"
 #include "movieobjects/dmedccmakefile.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/ListPanel.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/InputDialog.h"
 #include "vgui_controls/MessageBox.h"
-#include "vgui/keycode.h"
+#include "vgui/KeyCode.h"
 #include "tier1/KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -93,8 +93,8 @@ void CDmeSourceDCCFilePanel::RefreshDCCObjectList( )
 	if ( !m_hSourceDCCFile.Get() )
 		return;
 
-	int nCount = m_hSourceDCCFile->m_RootDCCObjects.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_hSourceDCCFile->m_RootDCCObjects.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		KeyValues *pItemKeys = new KeyValues( "node", "dccobject", m_hSourceDCCFile->m_RootDCCObjects.Get(i) );
 		pItemKeys->SetInt( "dccObjectIndex", i );
@@ -232,7 +232,7 @@ void CDmeSourceDCCFilePanel::OnDCCObjectAdded( const char *pDCCObjectName, KeyVa
 	if ( CheckForDuplicateNames( pDCCObjectName ) )
 		return;
 
-	int nIndex = -1;
+	intp nIndex = -1;
 	{
 		CDisableUndoScopeGuard guard;
 		nIndex = m_hSourceDCCFile->m_RootDCCObjects.AddToTail( pDCCObjectName );
@@ -319,8 +319,8 @@ bool CDmeSourceDCCFilePanel::CheckForDuplicateNames( const char *pDCCObjectName,
 	// Look for the existence of this source already
 	if ( pDCCObjectName[0] )
 	{
-		int nCount = m_hSourceDCCFile->m_RootDCCObjects.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = m_hSourceDCCFile->m_RootDCCObjects.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			if ( i == nDCCObjectSkipIndex )
 				continue;

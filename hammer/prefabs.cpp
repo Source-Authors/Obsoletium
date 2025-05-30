@@ -16,8 +16,10 @@
 
 #include "stdafx.h"
 #include "Prefabs.h"
+
 #include "Prefab3D.h"
 #include "hammer.h"
+
 #include <io.h>
 #include <fcntl.h>
 
@@ -31,18 +33,18 @@ CPrefabList CPrefab::MRU;
 CPrefabLibraryList CPrefabLibrary::PrefabLibraryList;
 
 
-static char *pLibHeader = "Worldcraft Prefab Library\r\n\x1a";
-static float fLibVersion = 0.1f;
+constexpr inline char pLibHeader[]{ "Worldcraft Prefab Library\r\n\x1a" };
+constexpr inline float fLibVersion{ 0.1f };
 
 
-typedef struct
+struct PrefabHeader
 {
 	DWORD dwOffset;
 	DWORD dwSize;
 	char szName[31];
 	char szNotes[MAX_NOTES];
 	int iType;
-} PrefabHeader;
+};
 
 
 typedef struct
@@ -88,8 +90,13 @@ CPrefabLibrary *CreatePrefabLibrary(const char *szFile)
 CPrefab::CPrefab()
 {
 	static DWORD dwRunningID = 1;
+
 	// assign running ID
 	dwID = dwRunningID++;
+	dwLibID = 0;
+	dwFileOffset = 0;
+	dwFileSize = 0;
+
 	PrefabList.AddTail(this);
 
 	// assign blank name/notes
@@ -209,7 +216,8 @@ CPrefab::pfiletype_t CPrefab::CheckFileType(LPCTSTR pszFilename)
 	std::fstream file(pszFilename, std::ios::in | std::ios::binary);
 
 	// read first 16 bytes of file
-	char szBuf[255];
+	// dimhotepus: alignas(float)
+	alignas(float) char szBuf[255];
 	file.read(szBuf, 16);
 
 	// check 1: RMF
@@ -251,6 +259,7 @@ CPrefabLibrary::CPrefabLibrary()
 	static DWORD dwRunningID = 1;
 	// assign running ID
 	dwID = dwRunningID++;
+	m_eType = LibType_None;
 	m_szName[0] = '\0';
 	szNotes[0] = '\0';
 }
@@ -297,7 +306,7 @@ static int __cdecl SortPrefabs(CPrefab *a, CPrefab *b)
 //-----------------------------------------------------------------------------
 void CPrefabLibrary::Sort(void)
 {
-	int nPrefabs = Prefabs.GetCount();
+	intp nPrefabs = Prefabs.GetCount();
 	if (nPrefabs < 2)
 	{
 		return;
@@ -310,7 +319,7 @@ void CPrefabLibrary::Sort(void)
 	//
 	POSITION p = ENUM_START;
 	CPrefab *pPrefab = EnumPrefabs(p);
-	int iPrefab = 0;
+	intp iPrefab = 0;
 	while (pPrefab != NULL)
 	{
 		TmpPrefabArray[iPrefab++] = pPrefab;
@@ -326,7 +335,7 @@ void CPrefabLibrary::Sort(void)
 	// Store back in list in sorted order.
 	//
 	Prefabs.RemoveAll();
-	for (int i = 0; i < nPrefabs; i++)
+	for (intp i = 0; i < nPrefabs; i++)
 	{
 		Prefabs.AddTail(TmpPrefabArray[i]);
 	}
@@ -342,7 +351,7 @@ void CPrefabLibrary::Sort(void)
 void CPrefabLibrary::SetNameFromFilename(LPCTSTR pszFilename)
 {
 	const char *cp = strrchr(pszFilename, '\\');
-	strcpy(m_szName, cp ? (cp + 1) : pszFilename);
+	V_strcpy_safe(m_szName, cp ? (cp + 1) : pszFilename);
 	char *p = strchr(m_szName, '.');
 	if (p != NULL)
 	{
@@ -360,10 +369,7 @@ void CPrefabLibrary::FreeAllLibraries(void)
 	while (pos != NULL)
 	{
 		CPrefabLibrary *pPrefabLibrary = PrefabLibraryList.GetNext(pos);
-		if (pPrefabLibrary != NULL)
-		{
-			delete pPrefabLibrary;
-		}
+		delete pPrefabLibrary;
 	}
 
 	PrefabLibraryList.RemoveAll();
@@ -396,7 +402,7 @@ void CPrefabLibrary::LoadAllLibraries()
 		pLibrary->Load(szDir);
 	}
 
-	strcat(szDir, "\\*.*");
+	V_strcat_safe(szDir, "\\*.*");
 
 	WIN32_FIND_DATA fd;
 	HANDLE hnd = FindFirstFile(szDir, &fd);
@@ -411,7 +417,7 @@ void CPrefabLibrary::LoadAllLibraries()
 	{
 		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (fd.cFileName[0] != '.'))
 		{
-			sprintf(szFile, "%s\\%s", szDir, fd.cFileName);
+			V_sprintf_safe(szFile, "%s\\%s", szDir, fd.cFileName);
 
 			pLibrary = FindOpenLibrary(szFile);
 			if (pLibrary == NULL)
@@ -517,6 +523,32 @@ CPrefabLibrary *CPrefabLibrary::FindOpenLibrary(LPCTSTR pszFilename)
 
 
 //-----------------------------------------------------------------------------
+// Purpose:
+// Input  : pLibrary -
+// Output :
+//-----------------------------------------------------------------------------
+void CPrefabLibrary::AddLibrary(CPrefabLibrary *pLibrary)
+{
+	PrefabLibraryList.AddTail(pLibrary);
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose:
+// Input  : pLibrary -
+// Output :
+//-----------------------------------------------------------------------------
+void CPrefabLibrary::RemoveLibrary(CPrefabLibrary *pLibrary)
+{
+	POSITION pos = PrefabLibraryList.Find(pLibrary);
+	if (pos)
+	{
+		PrefabLibraryList.RemoveAt(pos);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
 // Purpose: Enumerates the prefab libraries of a given type.
 // Input  : p - Iterator.
 //			eType - Type of library to return, LibType_None returns all
@@ -548,6 +580,7 @@ CPrefabLibrary *CPrefabLibrary::EnumLibraries(POSITION &p, LibraryType_t eType)
 //-----------------------------------------------------------------------------
 CPrefabLibraryRMF::CPrefabLibraryRMF()
 {
+	m_dwDirOffset = 0;
 }
 
 
@@ -590,8 +623,8 @@ int CPrefabLibraryRMF::Load(LPCTSTR pszFilename)
 	char szBuf[128];
 
 	// read string header
-	m_file.read(szBuf, strlen(pLibHeader));
-	if(strncmp(szBuf, pLibHeader, strlen(pLibHeader)))
+	m_file.read(szBuf, std::size(pLibHeader) - 1);
+	if(strncmp(szBuf, pLibHeader, std::size(pLibHeader) - 1))
 	{
 		// return
 		return -1;
@@ -600,7 +633,7 @@ int CPrefabLibraryRMF::Load(LPCTSTR pszFilename)
 	// read binary header
 	PrefabLibraryHeader plh;
 	m_file.read((char*)&plh, sizeof(plh));
-	strcpy(szNotes, plh.szNotes);
+	V_strcpy_safe(szNotes, plh.szNotes);
 
 	// set name from filename
 	SetNameFromFilename(pszFilename);
@@ -645,6 +678,12 @@ int CPrefabLibraryRMF::Load(LPCTSTR pszFilename)
 //-----------------------------------------------------------------------------
 bool CPrefabLibraryRMF::DeleteFile(void)
 {
+	// dimhotepus: Close in case we opened it.
+	if ( m_file.is_open() )
+	{
+		m_file.close();
+	}
+
 	return(remove(m_strOpenFileName) == 0);
 }
 
@@ -682,7 +721,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 		plh.dwNumEntries = Prefabs.GetCount();
 		plh.fVersion = fLibVersion;
 		plh.dwDirOffset = m_dwDirOffset;
-		strcpy(plh.szNotes, szNotes);
+		V_strcpy_safe(plh.szNotes, szNotes);
 		file.write((char*)&plh, sizeof plh);
 
 		// recreate a directory and write it
@@ -724,17 +763,18 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 			CHammer *pApp = (CHammer*) AfxGetApp();
 			pApp->GetDirectory(DIR_PREFABS, szNewFilename);
 
-			sprintf(szNewFilename + strlen(szNewFilename), "\\%s.ol", m_szName);
+			const intp newFileNameLen = V_strlen(szNewFilename);
 
+			V_snprintf(szNewFilename + newFileNameLen, ssize(szNewFilename) - newFileNameLen, "\\%s.ol", m_szName);
 			// make a name
 			m_strOpenFileName = szNewFilename;
 		}
 
-		strcpy(szFile, m_strOpenFileName);
+		V_strcpy_safe(szFile, m_strOpenFileName);
 	}
 	else
 	{
-		strcpy(szFile, pszFilename);
+		V_strcpy_safe(szFile, pszFilename);
 		SetNameFromFilename(pszFilename);
 	}
 
@@ -748,11 +788,11 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 
 	// write binary header
 	// save current position so we can seek back and rewrite it
-	DWORD dwBinaryHeaderOffset = file.tellp();
+	std::streampos dwBinaryHeaderOffset = file.tellp();
 	PrefabLibraryHeader plh;
 	plh.dwNumEntries = Prefabs.GetCount();
 	plh.fVersion = fLibVersion;
-	strcpy(plh.szNotes, szNotes);
+	V_strcpy_safe(plh.szNotes, szNotes);
 	file.write((char*)&plh, sizeof plh);
 
 	// allocate memory for directory
@@ -841,13 +881,15 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 int CPrefabLibraryRMF::SetName(LPCTSTR pszName)
 {
 	// set szName
-	strcpy(m_szName, pszName);
+	V_strcpy_safe(m_szName, pszName);
 
 	char szNewFilename[MAX_PATH];
 	CHammer *pApp = (CHammer*) AfxGetApp();
 	pApp->GetDirectory(DIR_PREFABS, szNewFilename);
 
-	sprintf(szNewFilename + strlen(szNewFilename), "\\%s.ol", pszName);
+	const intp newFileNameLen = V_strlen(szNewFilename);
+
+	V_snprintf(szNewFilename + newFileNameLen, ssize(szNewFilename) - newFileNameLen, "\\%s.ol", pszName);
 
 	if(m_file.is_open())
 	{
@@ -857,7 +899,7 @@ int CPrefabLibraryRMF::SetName(LPCTSTR pszName)
 	else
 	{
 		// ensure destination name doesn't exist already - 
-		if(GetFileAttributes(szNewFilename) != 0xFFFFFFFF)
+		if(GetFileAttributes(szNewFilename) != INVALID_FILE_ATTRIBUTES)
 			return 0;	// exists.
 	}
 
@@ -875,6 +917,7 @@ int CPrefabLibraryRMF::SetName(LPCTSTR pszName)
 //-----------------------------------------------------------------------------
 CPrefabLibraryVMF::CPrefabLibraryVMF()
 {
+	m_szFolderName[0] = '\0';
 }
 
 
@@ -906,7 +949,7 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 	FreePrefabs();
 
 	SetNameFromFilename(pszFilename);
-	strcpy(m_szFolderName, pszFilename);
+	V_strcpy_safe(m_szFolderName, pszFilename);
 
 	m_eType = LibType_HalfLife2;
 
@@ -916,8 +959,8 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 	// Read the prefabs - they are stored as individual VMF files.
 	//
 	char szDir[MAX_PATH];
-	strcpy(szDir, pszFilename);
-	strcat(szDir, "\\*.vmf");
+	V_strcpy_safe(szDir, pszFilename);
+	V_strcat_safe(szDir, "\\*.vmf");
 
 	WIN32_FIND_DATA fd;
 	HANDLE hnd = FindFirstFile(szDir, &fd);
@@ -937,8 +980,8 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 			// Build the full path to the prefab file.
 			//
 			char szFile[MAX_PATH];
-			strcpy(szFile, szDir);
-			strcat(szFile, fd.cFileName);
+			V_strcpy_safe(szFile, szDir);
+			V_strcat_safe(szFile, fd.cFileName);
 
 			CPrefabVMF *pPrefab = new CPrefabVMF;
 			pPrefab->SetFilename(szFile);
@@ -984,7 +1027,7 @@ int CPrefabLibraryVMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 int CPrefabLibraryVMF::SetName(LPCTSTR pszName)
 {
 	// dvs: rename the folder - or maybe don't implement for VMF prefabs
-	strcpy(m_szName, pszName);
+	V_strcpy_safe(m_szName, pszName);
 	return 1;
 }
 

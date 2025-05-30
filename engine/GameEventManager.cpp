@@ -50,7 +50,8 @@ CGameEvent::CGameEvent( CGameEventDescriptor *descriptor )
 
 CGameEvent::~CGameEvent()
 {
-	m_pDataKeys->deleteThis();
+	if (m_pDataKeys)
+		m_pDataKeys->deleteThis();
 }
 
 bool CGameEvent::GetBool( const char *keyName, bool defaultValue)
@@ -220,15 +221,15 @@ bool CGameEventManager::ParseEventList(SVC_GameEventList *msg)
 	{
 		int id = msg->m_DataIn.ReadUBitLong( MAX_EVENT_BITS );
 		char name[MAX_EVENT_NAME_LENGTH];
-		msg->m_DataIn.ReadString( name, sizeof(name) );
-        		
+		msg->m_DataIn.ReadString( name );
+
 		CGameEventDescriptor *descriptor = GetEventDescriptor( name );
 
 		if ( !descriptor )
 		{
 			// event unknown to client, skip data
 			while ( msg->m_DataIn.ReadUBitLong( 3 ) )
-				msg->m_DataIn.ReadString( name, sizeof(name) );
+				msg->m_DataIn.ReadString( name );
 
 			continue;
 		}
@@ -243,7 +244,7 @@ bool CGameEventManager::ParseEventList(SVC_GameEventList *msg)
 
 		while ( datatype != TYPE_LOCAL )
 		{
-			msg->m_DataIn.ReadString( name, sizeof(name) );
+			msg->m_DataIn.ReadString( name );
 			descriptor->keys->SetInt( name, datatype );
 
 			datatype = msg->m_DataIn.ReadUBitLong( 3 );
@@ -317,7 +318,7 @@ IGameEvent *CGameEventManager::CreateEvent( const char *name, bool bForce )
 	}
 
 	// create & return the new event 
-	return new CGameEvent ( descriptor );
+	return CreateEvent( descriptor );
 }
 
 bool CGameEventManager::FireEvent( IGameEvent *event, bool bServerOnly )
@@ -551,7 +552,7 @@ IGameEvent *CGameEventManager::UnserializeEvent( bf_read *buf)
 		switch ( type )
 		{
 			case TYPE_LOCAL		: break; // ignore 
-			case TYPE_STRING	: if ( buf->ReadString( databuf, sizeof(databuf) ) )
+			case TYPE_STRING	: if ( buf->ReadString( databuf ) )
 									event->SetString( keyName, databuf );
 								  break;
 			case TYPE_FLOAT		: event->SetFloat( keyName, buf->ReadFloat() ); break;
@@ -633,9 +634,7 @@ int CGameEventManager::LoadEventsFromFile( const char * filename )
 		m_EventFileNames.AddToTail( id );
 	}
 
-	KeyValues * key = new KeyValues(filename);
-	KeyValues::AutoDelete autodelete_key( key );
-
+	KeyValuesAD key(filename);
 	if  ( !key->LoadFromFile( g_pFileSystem, filename, "GAME" ) )
 		return false;
 
@@ -751,9 +750,17 @@ bool CGameEventManager::RegisterEvent( KeyValues * event)
 		intp index = m_GameEvents.AddToTail();
 		descriptor =  &m_GameEvents.Element(index);
 
-		AssertMsg2( V_strlen( event->GetName() ) <= MAX_EVENT_NAME_LENGTH, "Event named '%s' exceeds maximum name length %d", event->GetName(), MAX_EVENT_NAME_LENGTH );
+		// dimhotepus: Check for event name overflow correctly.
+		const bool overflow = V_strlen( event->GetName() ) >= ssize(descriptor->name);
+		if (overflow)
+		{
+			AssertMsg2( false, "Event named '%s' exceeds maximum name length %zd.\n",
+				event->GetName(), ssize(descriptor->name) );
+			Warning("Event named '%s' exceeds maximum name length %zd.\n",
+				event->GetName(), ssize(descriptor->name) );
+		}
 
-		Q_strncpy( descriptor->name, event->GetName(), MAX_EVENT_NAME_LENGTH );	
+		V_strcpy_safe( descriptor->name, event->GetName() );
 	}
 	else
 	{

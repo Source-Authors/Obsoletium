@@ -253,9 +253,9 @@ private:
 
 	void InternalFree( google::protobuf::Message *pMsg ) override
 	{
+		Assert( NULL != pMsg );
 		if ( NULL == pMsg )
 		{
-			Assert( NULL != pMsg );
 			return;
 		}
 

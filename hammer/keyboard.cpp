@@ -34,17 +34,12 @@ static KeyMap_t ModifierKeyTable[] =
 //-----------------------------------------------------------------------------
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
-CKeyboard::CKeyboard(void)
+CKeyboard::CKeyboard()
 {
+	memset(g_uPhysicalKeyState, 0, sizeof(g_uPhysicalKeyState));
+	memset(g_uLogicalKeyState, 0, sizeof(g_uLogicalKeyState));
+	memset(g_uKeyMap, 0, sizeof(g_uKeyMap));
 	g_uKeyMaps = 0;	
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Destructor.
-//-----------------------------------------------------------------------------
-CKeyboard::~CKeyboard(void)
-{
 }
 
 

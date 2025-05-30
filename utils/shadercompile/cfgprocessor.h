@@ -9,6 +9,7 @@
 #include <cstdint>  // uint64_t
 #include <memory>   // std::unique_ptr
 
+#include "tier0/platform.h"
 #include "tier1/smartptr.h"
 
 // clang-format off
@@ -59,7 +60,14 @@ using ComboHandle = struct {
 ComboHandle Combo_GetCombo(uint64_t command_no);
 ComboHandle Combo_GetNext(uint64_t &command_no, ComboHandle &rhCombo,
                           uint64_t iCommandEnd);
-void Combo_FormatCommand(ComboHandle combo, char *buffer);
+void Combo_FormatCommand(ComboHandle combo, OUT_Z_CAP(buffer_size) char *buffer, intp buffer_size);
+
+template<intp bufferSize>
+void Combo_FormatCommand(ComboHandle combo, OUT_Z_ARRAY char (&buffer)[bufferSize])
+{
+    Combo_FormatCommand(combo, buffer, bufferSize);
+}
+
 uint64_t Combo_GetCommandNum(ComboHandle combo);
 uint64_t Combo_GetComboNum(ComboHandle combo);
 CfgEntryInfo const *Combo_GetEntryInfo(ComboHandle combo);

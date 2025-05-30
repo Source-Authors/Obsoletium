@@ -935,9 +935,9 @@ void CDmeMesh::DrawWireframeFaceSet( CDmeFaceSet *pFaceSet, matrix3x4_t *pPoseTo
 	const int nFaceSetIndices = pFaceSet->NumIndices();
 	const int *pFaceSetIndices = pFaceSet->GetIndices();
 
-	int vR = 0;
-	int vG = 0;
-	int vB = 0;
+	unsigned char vR = 0;
+	unsigned char vG = 0;
+	unsigned char vB = 0;
 
 	if ( pDrawSettings )
 	{
@@ -1071,17 +1071,17 @@ void CDmeMesh::Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSet
 //-----------------------------------------------------------------------------
 // Face sets
 //-----------------------------------------------------------------------------
-int CDmeMesh::FaceSetCount() const
+intp CDmeMesh::FaceSetCount() const
 {
 	return m_FaceSets.Count();
 }
 
-CDmeFaceSet *CDmeMesh::GetFaceSet( int faceSetIndex )
+CDmeFaceSet *CDmeMesh::GetFaceSet( intp faceSetIndex )
 {
 	return m_FaceSets[ faceSetIndex ];
 }
 
-const CDmeFaceSet *CDmeMesh::GetFaceSet( int faceSetIndex ) const
+const CDmeFaceSet *CDmeMesh::GetFaceSet( intp faceSetIndex ) const
 {
 	return m_FaceSets[ faceSetIndex ];
 }
@@ -1091,7 +1091,7 @@ void CDmeMesh::AddFaceSet( CDmeFaceSet *faceSet )
 	m_FaceSets.AddToTail( faceSet );
 }
 
-void CDmeMesh::RemoveFaceSet( int faceSetIndex )
+void CDmeMesh::RemoveFaceSet( intp faceSetIndex )
 {
 	m_FaceSets.Remove( faceSetIndex );
 }
@@ -1225,7 +1225,7 @@ const CDmeVertexData *CDmeMesh::GetBindBaseState() const
 //-----------------------------------------------------------------------------
 // Delta states
 //-----------------------------------------------------------------------------
-int CDmeMesh::DeltaStateCount() const
+intp CDmeMesh::DeltaStateCount() const
 {
 	return m_DeltaStates.Count();
 }
@@ -1234,7 +1234,7 @@ int CDmeMesh::DeltaStateCount() const
 //-----------------------------------------------------------------------------
 // Returns the delta 
 //-----------------------------------------------------------------------------
-CDmeVertexDeltaData *CDmeMesh::GetDeltaState( int nDeltaIndex ) const
+CDmeVertexDeltaData *CDmeMesh::GetDeltaState( intp nDeltaIndex ) const
 {
 	if ( nDeltaIndex < 0 || nDeltaIndex >= m_DeltaStates.Count() )
 		return NULL;
@@ -1346,7 +1346,7 @@ CDmeVertexDeltaData *CDmeMesh::FindOrCreateDeltaState( const char *pInDeltaName 
 // Finds a delta state index by comparing names, if it can't be found
 // searches for all permutations of the delta name
 //-----------------------------------------------------------------------------
-int CDmeMesh::FindDeltaStateIndex( const char *pInDeltaName ) const
+intp CDmeMesh::FindDeltaStateIndex( const char *pInDeltaName ) const
 {
 	const char *pDeltaName = pInDeltaName;
 
@@ -1357,8 +1357,8 @@ int CDmeMesh::FindDeltaStateIndex( const char *pInDeltaName ) const
 		pDeltaName = SortDeltaName( pInDeltaName, pDeltaNameBuf, nDeltaNameBufLen );
 	}
 
-	int dn = DeltaStateCount();
-	for ( int di = 0; di < dn; ++di )
+	intp dn = DeltaStateCount();
+	for ( intp di = 0; di < dn; ++di )
 	{
 		CDmeVertexDeltaData *pDeltaState = GetDeltaState( di );
 		if ( !Q_stricmp( pDeltaName, pDeltaState->GetName() ) )
@@ -1372,7 +1372,7 @@ int CDmeMesh::FindDeltaStateIndex( const char *pInDeltaName ) const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void CDmeMesh::SetDeltaStateWeight( int nDeltaIndex, MeshDeltaWeightType_t type, float flMorphWeight )
+void CDmeMesh::SetDeltaStateWeight( intp nDeltaIndex, MeshDeltaWeightType_t type, float flMorphWeight )
 {
 	if ( nDeltaIndex < m_DeltaStateWeights[type].Count() )
 	{
@@ -1384,7 +1384,7 @@ void CDmeMesh::SetDeltaStateWeight( int nDeltaIndex, MeshDeltaWeightType_t type,
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void CDmeMesh::SetDeltaStateWeight( int nDeltaIndex, MeshDeltaWeightType_t type, float flLeftWeight, float flRightWeight )
+void CDmeMesh::SetDeltaStateWeight( intp nDeltaIndex, MeshDeltaWeightType_t type, float flLeftWeight, float flRightWeight )
 {
 	if ( nDeltaIndex < m_DeltaStateWeights[type].Count() )
 	{
@@ -1549,16 +1549,16 @@ IMesh *CDmeMesh::CreateHwMesh( CDmeFaceSet *pFaceSet )
 //-----------------------------------------------------------------------------
 // Compute triangulated indices
 //-----------------------------------------------------------------------------
-void CDmeMesh::ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDmeFaceSet *pFaceSet, int nFirstIndex, int *pIndices, int nOutCount )
+void CDmeMesh::ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDmeFaceSet *pFaceSet, intp nFirstIndex, int *pIndices, intp nOutCount )
 {
 	// FIXME: Come up with a more efficient way of computing this
 	// This involves a bunch of recomputation of distances
 	float flMinDistance = FLT_MAX;
-	int nMinIndex = 0;
-	int nVertexCount = pFaceSet->GetNextPolygonVertexCount( nFirstIndex );
+	intp nMinIndex = 0;
+	intp nVertexCount = pFaceSet->GetNextPolygonVertexCount( nFirstIndex );
 
 	// Optimization for quads + triangles.. it's totally symmetric
-	int nLoopCount = nVertexCount;
+	intp nLoopCount = nVertexCount;
 	if ( nVertexCount <= 3 )
 	{
 		nLoopCount = 0;
@@ -1568,13 +1568,13 @@ void CDmeMesh::ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDm
 		nLoopCount = 2;
 	}
 
-	for ( int i = 0; i < nLoopCount; ++i )
+	for ( intp i = 0; i < nLoopCount; ++i )
 	{
 		float flDistance = 0.0f;
 		const Vector &vecCenter = pBaseState->GetPosition( pFaceSet->GetIndex( nFirstIndex+i ) );
-		for ( int j = 2; j < nVertexCount-1; ++j )
+		for ( intp j = 2; j < nVertexCount-1; ++j )
 		{
-			int vi = ( i + j ) % nVertexCount;
+			intp vi = ( i + j ) % nVertexCount;
 			const Vector &vecEdge = pBaseState->GetPosition( pFaceSet->GetIndex( nFirstIndex+vi ) );
 			flDistance += vecEdge.DistTo( vecCenter );
 		}
@@ -1588,8 +1588,8 @@ void CDmeMesh::ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDm
 	 
 	// Compute the triangulation indices
 	Assert( nOutCount == ( nVertexCount - 2 ) * 3 );
-	int nOutIndex = 0;
-	for ( int i = 1; i < nVertexCount - 1; ++i )
+	intp nOutIndex = 0;
+	for ( intp i = 1; i < nVertexCount - 1; ++i )
 	{
 		pIndices[nOutIndex++] = pFaceSet->GetIndex( nFirstIndex + nMinIndex );
 		pIndices[nOutIndex++] = pFaceSet->GetIndex( nFirstIndex + ((nMinIndex + i) % nVertexCount) );
@@ -1604,17 +1604,17 @@ void CDmeMesh::ComputeTriangulatedIndices( const CDmeVertexData *pBaseState, CDm
 void CDmeMesh::BuildTriangleMap( const CDmeVertexData *pBaseState, CDmeFaceSet* pFaceSet, CUtlVector<Triangle_t>& triangles, CUtlVector< CUtlVector<int> >* pVertToTriMap )
 {
 	// prepare indices
-	int nFirstIndex = 0;
-	int nIndexCount = pFaceSet->NumIndices();
+	intp nFirstIndex = 0;
+	intp nIndexCount = pFaceSet->NumIndices();
 	while ( nFirstIndex < nIndexCount )
 	{
-		int nVertexCount = pFaceSet->GetNextPolygonVertexCount( nFirstIndex );
+		intp nVertexCount = pFaceSet->GetNextPolygonVertexCount( nFirstIndex );
 		if ( nVertexCount >= 3 )
 		{
-			int nOutCount = ( nVertexCount-2 ) * 3;
+			intp nOutCount = ( nVertexCount-2 ) * 3;
 			int *pIndices = (int*)_alloca( nOutCount * sizeof(int) );
 			ComputeTriangulatedIndices( pBaseState, pFaceSet, nFirstIndex, pIndices, nOutCount );
-			for ( int ii = 0; ii < nOutCount; ii += 3 )
+			for ( intp ii = 0; ii < nOutCount; ii += 3 )
 			{
 				intp t = triangles.AddToTail();
 				Triangle_t& triangle = triangles[t];
@@ -1642,8 +1642,8 @@ void CDmeMesh::BuildTriangleMap( const CDmeVertexData *pBaseState, CDmeFaceSet* 
 void CDmeMesh::ComputeTriangleTangets( const CDmeVertexData *pVertexData, CUtlVector<Triangle_t>& triangles )
 {
 	// Calculate the tangent space for each triangle.
-	int nTriangleCount = triangles.Count();
-	for ( int triID = 0; triID < nTriangleCount; triID++ )
+	intp nTriangleCount = triangles.Count();
+	for ( intp triID = 0; triID < nTriangleCount; triID++ )
 	{
 		Triangle_t &triangle = triangles[triID];
 
@@ -1682,8 +1682,8 @@ void CDmeMesh::ComputeAverageTangent( CDmeVertexData *pVertexData, bool bSmoothT
 		Vector sVect, tVect;
 		sVect.Init( 0.0f, 0.0f, 0.0f );
 		tVect.Init( 0.0f, 0.0f, 0.0f );
-		int nTriangleCount = triangleList.Count();
-		for ( int triID = 0; triID < nTriangleCount; triID++ )
+		intp nTriangleCount = triangleList.Count();
+		for ( intp triID = 0; triID < nTriangleCount; triID++ )
 		{
 			Triangle_t &tri = triangles[ triangleList[triID] ];
 			sVect += tri.m_vecTangentS;
@@ -1704,8 +1704,8 @@ void CDmeMesh::ComputeAverageTangent( CDmeVertexData *pVertexData, bool bSmoothT
 					continue;
 
 				CUtlVector<int> &triangleList2 = vertToTriMap[vertID2];
-				int nTriangleCount2 = triangleList2.Count();
-				for ( int triID2 = 0; triID2 < nTriangleCount2; triID2++ )
+				intp nTriangleCount2 = triangleList2.Count();
+				for ( intp triID2 = 0; triID2 < nTriangleCount2; triID2++ )
 				{
 					Triangle_t &tri2 = triangles[ triangleList2[triID2] ];
 					sVect += tri2.m_vecTangentS;
@@ -1756,8 +1756,8 @@ void CDmeMesh::BuildVertToTriMap( const CDmeVertexData *pVertexData, CUtlVector<
 {
 	vertToTriMap.AddMultipleToTail( pVertexData->VertexCount() );
 
-	int nCount = FaceSetCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = FaceSetCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeFaceSet *pFaceSet = GetFaceSet( i );
 		BuildTriangleMap( pVertexData, pFaceSet, triangles, &vertToTriMap );
@@ -1790,8 +1790,8 @@ void CDmeMesh::ComputeDefaultTangentData( CDmeVertexData *pVertexData, bool bSmo
 	CUtlVector< CUtlVector<int> > vertToTriMap;
 	vertToTriMap.AddMultipleToTail( pVertexData->VertexCount() );
 
-	int nCount = FaceSetCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = FaceSetCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeFaceSet *pFaceSet = GetFaceSet( i );
 		BuildTriangleMap( pVertexData, pFaceSet, triangles, &vertToTriMap );
@@ -1816,8 +1816,8 @@ void CDmeMesh::ComputeDefaultTangentData( CDmeVertexData *pVertexData, bool bSmo
 //-----------------------------------------------------------------------------
 void CDmeMesh::ComputeDefaultTangentData( bool bSmoothTangents )
 {
-	const int nBaseStateCount = m_BaseStates.Count();
-	for ( int i = 0; i < nBaseStateCount; ++i )
+	const intp nBaseStateCount = m_BaseStates.Count();
+	for ( intp i = 0; i < nBaseStateCount; ++i )
 	{
 		if ( m_BaseStates[i] && m_BaseStates[i]->NeedsTangentData() )
 		{
@@ -1841,8 +1841,8 @@ void ComputeDefaultTangentData( CDmeDag *pDag, bool bSmoothTangents )
 		pMesh->ComputeDefaultTangentData( bSmoothTangents );
 	}
 
-	int nChildCount = pDag->GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pDag->GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		ComputeDefaultTangentData( pDag->GetChild( i ), bSmoothTangents );
 	}
@@ -1852,13 +1852,13 @@ void ComputeDefaultTangentData( CDmeDag *pDag, bool bSmoothTangents )
 //-----------------------------------------------------------------------------
 // Compute the dimensionality of the delta state (how many inputs affect it)
 //-----------------------------------------------------------------------------
-int CDmeMesh::ComputeDeltaStateDimensionality( int nDeltaIndex )
+intp CDmeMesh::ComputeDeltaStateDimensionality( intp nDeltaIndex )
 {
 	CDmeVertexDeltaData *pDeltaState = GetDeltaState( nDeltaIndex );
 	const char *pDeltaStateName = pDeltaState->GetName();
 
 	const char *pUnderBar = pDeltaStateName;
-	int nDimensions = 0;
+	intp nDimensions = 0;
 	while ( pUnderBar )
 	{
 		++nDimensions;
@@ -3261,12 +3261,18 @@ CDmeVertexDeltaData *CDmeMesh::ModifyOrCreateDeltaStateFromBaseState( const char
 		UniqueId_t id;
 		char idBuf[ MAX_PATH ];
 
+		int counter = 0;
 		CDmeVertexData *pTmpBaseState = NULL;
 		do 
 		{
-			CreateUniqueId( &id );
-			UniqueIdToString( id, idBuf, sizeof( idBuf ) );
-			pTmpBaseState = FindBaseState( idBuf );
+			// dimhotepus: Try to create uuid up to 10 times to prevent infinite cycle.
+			if ( CreateUniqueId( &id ) && UniqueIdToString( id, idBuf ) )
+				pTmpBaseState = FindBaseState( idBuf );
+			else
+				++counter;
+
+			if (counter == 10)
+				return NULL;
 		} while( pTmpBaseState != NULL );
 
 		pTmpBaseState = FindOrCreateBaseState( idBuf );
@@ -3548,7 +3554,7 @@ int CSelectionHelper::BinarySearch( int vIndex ) const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void CDmeMesh::GrowSelection( int nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp )
+void CDmeMesh::GrowSelection( intp nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp )
 {
 	if ( nSize <= 0 || !pSelection )
 		return;
@@ -3556,7 +3562,7 @@ void CDmeMesh::GrowSelection( int nSize, CDmeSingleIndexedComponent *pSelection,
 	CUtlVector< int > sIndices;
 	CUtlVector< float > sWeights;
 	pSelection->GetComponents( sIndices, sWeights );
-	const int nVertices = sIndices.Count();
+	const intp nVertices = sIndices.Count();
 
 	CDmMeshComp *pMeshComp = pPassedMeshComp ? pPassedMeshComp : new CDmMeshComp( this );
 
@@ -3564,7 +3570,7 @@ void CDmeMesh::GrowSelection( int nSize, CDmeSingleIndexedComponent *pSelection,
 
 	CSelectionHelper sHelper;
 
-	for ( int i = 0; i < nVertices; ++i )
+	for ( intp i = 0; i < nVertices; ++i )
 	{
 		const int nNeighbours = pMeshComp->FindNeighbouringVerts( sIndices[ i ], neighbours );
 		for ( int j = 0; j < nNeighbours; ++j )
@@ -3597,7 +3603,7 @@ void CDmeMesh::GrowSelection( int nSize, CDmeSingleIndexedComponent *pSelection,
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void CDmeMesh::ShrinkSelection( int nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp )
+void CDmeMesh::ShrinkSelection( intp nSize, CDmeSingleIndexedComponent *pSelection, CDmMeshComp *pPassedMeshComp )
 {
 	if ( nSize <= 0 || !pSelection )
 		return;
@@ -3605,7 +3611,7 @@ void CDmeMesh::ShrinkSelection( int nSize, CDmeSingleIndexedComponent *pSelectio
 	CUtlVector< int > sIndices;
 	CUtlVector< float > sWeights;
 	pSelection->GetComponents( sIndices, sWeights );
-	const int nVertices = sIndices.Count();
+	const intp nVertices = sIndices.Count();
 
 	CDmMeshComp *pMeshComp = pPassedMeshComp ? pPassedMeshComp : new CDmMeshComp( this );
 
@@ -3613,7 +3619,7 @@ void CDmeMesh::ShrinkSelection( int nSize, CDmeSingleIndexedComponent *pSelectio
 
 	CSelectionHelper sHelper;
 
-	for ( int i = 0; i < nVertices; ++i )
+	for ( intp i = 0; i < nVertices; ++i )
 	{
 		bool hasSelectedNeighbour = false;
 		bool hasUnselectedNeighbour = false;
@@ -4837,13 +4843,13 @@ static bool CollapseRedundantBaseNormals( CDmeVertexData *pDmeVertexData, CUtlVe
 		intp nNewNormalDataIndex = newNormalData.Count();
 
 		const CUtlVector< int > &vertexIndices = pDmeVertexData->FindVertexIndicesFromDataIndex( CDmeVertexData::FIELD_POSITION, i );
-		for ( int j = 0; j < vertexIndices.Count(); ++j )
+		for ( intp j = 0; j < vertexIndices.Count(); ++j )
 		{
 			bool bUnique = true;
 			const int nVertexIndex = vertexIndices[j];
 			const Vector &vNormal = oldNormalData[ oldNormalIndices[ vertexIndices[j] ] ];
 
-			for ( int k = nNewNormalDataIndex; k < newNormalData.Count(); ++k )
+			for ( intp k = nNewNormalDataIndex; k < newNormalData.Count(); ++k )
 			{
 				if ( DotProduct( vNormal, newNormalData[k] ) > flNormalBlend )
 				{
@@ -4873,13 +4879,13 @@ static bool CollapseRedundantBaseNormals( CDmeVertexData *pDmeVertexData, CUtlVe
 		return false;
 
 	normalMap.SetCount( oldNormalData.Count() );
-	for ( int i = 0; i < normalMap.Count(); ++i )
+	for ( intp i = 0; i < normalMap.Count(); ++i )
 	{
 		normalMap[i] = -1;
 	}
 
 	Assert( newNormalIndices.Count() == oldNormalIndices.Count() );
-	for ( int i = 0; i < oldNormalIndices.Count(); ++i )
+	for ( intp i = 0; i < oldNormalIndices.Count(); ++i )
 	{
 		if ( normalMap[ oldNormalIndices[i] ] == -1 )
 		{
@@ -4921,12 +4927,12 @@ static bool CollapseRedundantBaseNormalsAggressive( CDmeVertexData *pDmeVertexDa
 
 	CUtlVector< Vector > newNormalData;
 
-	for ( int i = 0; i < oldNormalData.Count(); ++i )
+	for ( intp i = 0; i < oldNormalData.Count(); ++i )
 	{
 		bool bUnique = true;
 		const Vector &vNormal = oldNormalData[ i ];
 
-		for ( int j = 0; j < newNormalData.Count(); ++j )
+		for ( intp j = 0; j < newNormalData.Count(); ++j )
 		{
 			if ( DotProduct( vNormal, newNormalData[j] ) > flNormalBlend )
 			{
@@ -4949,7 +4955,7 @@ static bool CollapseRedundantBaseNormalsAggressive( CDmeVertexData *pDmeVertexDa
 	CUtlVector< int > newNormalIndices;
 	newNormalIndices.SetCount( oldNormalIndices.Count() );
 
-	for ( int i = 0; i < oldNormalIndices.Count(); ++i )
+	for ( intp i = 0; i < oldNormalIndices.Count(); ++i )
 	{
 		newNormalIndices[i] = normalMap[ oldNormalIndices[i] ];
 	}

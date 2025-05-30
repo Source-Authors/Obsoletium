@@ -28,7 +28,6 @@ int workcount;
 bool pacifier;
 
 bool enable_threads;
-bool enter;
 
 HANDLE g_ThreadHandles[MAX_THREADS];
 
@@ -86,11 +85,10 @@ void ThreadWorker(int iThread, void *pUserData) {
 class ScopedThreadsLock::Impl {
  public:
   explicit Impl(ScopedCriticalSection &section) noexcept
-      : section_{section}, lock_{section.Lock()} {}
+      : lock_{section.Lock()} {}
   ~Impl() noexcept = default;
 
  private:
-  ScopedCriticalSection &section_;
   ScopedCriticalSectionLock lock_;
 };
 
@@ -148,7 +146,10 @@ void ThreadSetDefault() {
 }
 
 // This runs in the thread and dispatches a RunThreadsFn call.
-static DWORD WINAPI InternalRunThreadsFn(void *arg) {
+static unsigned WINAPI InternalRunThreadsFn(void *arg) {
+  // dimhotepus: Add thread name to aid debugging.
+  ThreadSetDebugName("RunWorker");
+
   auto *args = static_cast<RunThreadArgs *>(arg);
 
   args->run_func(args->thread_no, args->user_data);
@@ -170,9 +171,9 @@ void RunThreads_Start(RunThreadsFn fn, void *pUserData,
     args.user_data = pUserData;
     args.run_func = fn;
 
-    DWORD dwDummy;
+    // dimhotepus: Use _beginthreadex instead of CreateThread as former initializes CRT.
     HANDLE thread{
-        CreateThread(NULL, 0, InternalRunThreadsFn, &args, 0, &dwDummy)};
+        reinterpret_cast<HANDLE>(_beginthreadex(NULL, 0, InternalRunThreadsFn, &args, 0, nullptr))};
     if (!thread) continue;
 
     switch (ePriority) {
@@ -228,7 +229,8 @@ void RunThreadsOn(int workcnt, qboolean showpacifier, RunThreadsFn fn,
 
   if (pacifier) {
     EndPacifier(false);
-    printf(" (%.2f)\n", end - start);
+    // dimhotepus: Fix formatting.
+    Msg(" (%.2fs)", end - start);
     // dimhotepus: Add new line on end.
     Msg("\n");
   }

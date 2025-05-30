@@ -63,7 +63,7 @@ public:
 		int nMemories = pMemMap->Count();
 		pSave->WriteInt( &nMemories );
 		
-		for ( CAI_Enemies::CMemMap::IndexType_t i = pMemMap->FirstInorder(); i != pMemMap->InvalidIndex(); i = pMemMap->NextInorder( i ) )
+		for ( auto i = pMemMap->FirstInorder(); i != pMemMap->InvalidIndex(); i = pMemMap->NextInorder( i ) )
 		{
 			pSave->WriteAll( (*pMemMap)[i] );
 		}
@@ -95,7 +95,7 @@ public:
 	{
 		CAI_Enemies::CMemMap *pMemMap = (CAI_Enemies::CMemMap *)fieldInfo.pField;
 		
-		for ( CAI_Enemies::CMemMap::IndexType_t i = pMemMap->FirstInorder(); i != pMemMap->InvalidIndex(); i = pMemMap->NextInorder( i ) )
+		for ( auto i = pMemMap->FirstInorder(); i != pMemMap->InvalidIndex(); i = pMemMap->NextInorder( i ) )
 		{
 			delete (*pMemMap)[i];
 		}
@@ -163,7 +163,7 @@ CAI_Enemies::CAI_Enemies(void)
 
 CAI_Enemies::~CAI_Enemies()
 {
-	for ( CMemMap::IndexType_t i = m_Map.FirstInorder(); i != m_Map.InvalidIndex(); i = m_Map.NextInorder( i ) )
+	for ( auto i = m_Map.FirstInorder(); i != m_Map.InvalidIndex(); i = m_Map.NextInorder( i ) )
 	{
 		delete m_Map[i];
 	}
@@ -175,7 +175,7 @@ CAI_Enemies::~CAI_Enemies()
 
 AI_EnemyInfo_t *CAI_Enemies::GetFirst( AIEnemiesIter_t *pIter )
 {
-	CMemMap::IndexType_t i = m_Map.FirstInorder();
+	auto i = m_Map.FirstInorder();
 	*pIter = (AIEnemiesIter_t)(uintp)i;
 
 	if ( i == m_Map.InvalidIndex() )
@@ -191,7 +191,7 @@ AI_EnemyInfo_t *CAI_Enemies::GetFirst( AIEnemiesIter_t *pIter )
 
 AI_EnemyInfo_t *CAI_Enemies::GetNext( AIEnemiesIter_t *pIter )
 {
-	CMemMap::IndexType_t i = (CMemMap::IndexType_t)((uintp)(*pIter));
+	auto i = (CMemMap::IndexType_t)((uintp)(*pIter));
 
 	if ( i == m_Map.InvalidIndex() )
 		return NULL;
@@ -214,7 +214,7 @@ AI_EnemyInfo_t *CAI_Enemies::Find( const CBaseEntity *pEntity, bool bTryDangerMe
 	if ( pEntity == AI_UNKNOWN_ENEMY )
 		pEntity = NULL;
 
-	CMemMap::IndexType_t i = m_Map.Find( pEntity );
+	auto i = m_Map.Find( pEntity );
 	if ( i == m_Map.InvalidIndex() )
 	{
 		if ( !bTryDangerMemory || ( i = m_Map.Find( NULL ) ) == m_Map.InvalidIndex() )
@@ -229,7 +229,7 @@ AI_EnemyInfo_t *CAI_Enemies::Find( const CBaseEntity *pEntity, bool bTryDangerMe
 
 AI_EnemyInfo_t *CAI_Enemies::GetDangerMemory()
 {
-	CMemMap::IndexType_t i = m_Map.Find( NULL );
+	auto i = m_Map.Find( NULL );
 	if ( i == m_Map.InvalidIndex() )
 		return NULL;
 	Assert(m_Map[i]->bDangerMemory == true);
@@ -279,12 +279,12 @@ void CAI_Enemies::RefreshMemories(void)
 	// Check each record
 	// -------------------
 	
-	CMemMap::IndexType_t i = m_Map.FirstInorder();
+	auto i = m_Map.FirstInorder();
 	while ( i != m_Map.InvalidIndex() )
 	{	
 		AI_EnemyInfo_t *pMemory = m_Map[i];
 		
-		CMemMap::IndexType_t iNext = m_Map.NextInorder( i ); // save so can remove
+		auto iNext = m_Map.NextInorder( i ); // save so can remove
 		if ( ShouldDiscardMemory( pMemory ) )
 		{
 			delete pMemory;
@@ -414,7 +414,7 @@ bool CAI_Enemies::HasMemory( CBaseEntity *pEnemy )
 //-----------------------------------------------------------------------------
 void CAI_Enemies::ClearMemory(CBaseEntity *pEnemy)
 {
-	CMemMap::IndexType_t i = m_Map.Find( pEnemy );
+	auto i = m_Map.Find( pEnemy );
 	if ( i != m_Map.InvalidIndex() )
 	{
 		delete m_Map[i];

@@ -39,22 +39,25 @@ using namespace vgui;
 
 extern const char *COM_GetModDirectory( void );
 
-
-bool ConstructFullImagePath( const char *pCurrentPath, const char *pchImageName, char *pchImageFileName )
+template<intp imageFileNameSize>
+static bool ConstructFullImagePath(
+	IN_Z const char *pCurrentPath,
+	IN_Z const char *pchImageName,
+	OUT_Z_ARRAY char (&pchImageFileName)[imageFileNameSize] )
 {
 	char *ext = Q_strstr( pchImageName , ".tga" );
 	if ( ext )
 	{
 		// Use the specified image
 		if ( pchImageName[ 0 ] != '.' )
-			Q_snprintf( pchImageFileName, _MAX_PATH, "%s", pchImageName );
+			V_sprintf_safe( pchImageFileName, "%s", pchImageName );
 		else
-			Q_snprintf( pchImageFileName, _MAX_PATH, "%s/%s", pCurrentPath, pchImageName );
+			V_sprintf_safe( pchImageFileName, "%s/%s", pCurrentPath, pchImageName );
 
 		return true;
 	}
 
-	Q_strcpy( pchImageFileName, pchImageName );
+	V_strcpy_safe( pchImageFileName, pchImageName );
 
 	return false;
 }
@@ -122,7 +125,7 @@ public:
 			{
 				// Didn't specify an image name, so pair it with the name of this file
 				char szImpliedTgaName[_MAX_PATH];
-				Q_snprintf( szImpliedTgaName, sizeof( szImpliedTgaName ), "%s.tga", map.szMapFileName );
+				V_sprintf_safe( szImpliedTgaName, "%s.tga", map.szMapFileName );
 				bIsTGA = ConstructFullImagePath( pCurrentPath, szImpliedTgaName, szImageFileName );
 
 				// if it doesn't exist use default bonus map icon
@@ -388,7 +391,7 @@ void CBonusMapsDialog::CreateBonusMapsList()
 //-----------------------------------------------------------------------------
 // Purpose: returns the save file name of the selected item
 //-----------------------------------------------------------------------------
-int CBonusMapsDialog::GetSelectedItemBonusMapIndex()
+intp CBonusMapsDialog::GetSelectedItemBonusMapIndex()
 {
 	CBonusMapPanel *panel = dynamic_cast<CBonusMapPanel *>(m_pGameList->GetSelectedPanel());
 	if ( panel && panel->GetBonusMapListItemID() < BonusMapsDatabase()->BonusCount() )
@@ -603,9 +606,9 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 	if ( iBest != -1 )
 	{
 		Q_snprintf( szBuff, sizeof( szBuff ), "%i", iBest );
-		g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2, sizeof( szWideBuff2 ) );
-		g_pVGuiLocalize->ConstructString( szWideBuff, sizeof( szWideBuff ), g_pVGuiLocalize->Find( "#GameUI_BonusMapsBest" ), 1, szWideBuff2 );
-		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff, sizeof( szBuff ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
+		g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsBest" ), 1, szWideBuff2 );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
 
 		SetControlString( "ChallengeBestLabel", szBuff );
 		SetControlVisible( "ChallengeBestLabel", true );
@@ -617,9 +620,9 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 	if ( iNext != -1 )
 	{
 		Q_snprintf( szBuff, sizeof( szBuff ), "%i", iNext );
-		g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2, sizeof( szWideBuff2 ) );
-		g_pVGuiLocalize->ConstructString( szWideBuff, sizeof( szWideBuff ), g_pVGuiLocalize->Find( "#GameUI_BonusMapsGoal" ), 1, szWideBuff2 );
-		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff, sizeof( szBuff ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
+		g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsGoal" ), 1, szWideBuff2 );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
 
 		SetControlString( "ChallengeNextLabel", szBuff );
 		SetControlVisible( "ChallengeNextLabel", true );
@@ -682,7 +685,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 {
 	if ( !stricmp( command, "loadbonusmap" ) )
 	{
-		int mapIndex = GetSelectedItemBonusMapIndex();
+		intp mapIndex = GetSelectedItemBonusMapIndex();
 		if ( BonusMapsDatabase()->IsValidIndex( mapIndex ) )
 		{
 			BonusMapDescription_t *pBonusMap = BonusMapsDatabase()->GetBonusData( mapIndex );
@@ -760,7 +763,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 		BuildMapsList();
 
 		m_pChallengeSelection->RemoveAll();
-		m_pChallengeSelection->AddItem( "<Select A Challenge>", new KeyValues( "ChallengeSelection", "challenge", -1 ) );
+		m_pChallengeSelection->AddItem( "<Select A Challenge>", KeyValuesAD( new KeyValues( "ChallengeSelection", "challenge", -1 ) ) );
 
 		RefreshDialog( NULL );
 
@@ -941,8 +944,7 @@ void CBonusMapsDialog::OnPanelSelected()
 		int iSelectedChallenge = GetSelectedChallenge();
 
 		m_pChallengeSelection->RemoveAll();
-
-		m_pChallengeSelection->AddItem( "<Select A Challenge>", new KeyValues( "ChallengeSelection", "challenge", -1 ) );
+		m_pChallengeSelection->AddItem( "<Select A Challenge>", KeyValuesAD( new KeyValues( "ChallengeSelection", "challenge", -1 ) ) );
 
 		int iFoundSimilar = 0;
 
@@ -955,7 +957,7 @@ void CBonusMapsDialog::OnPanelSelected()
 			if ( pChallenge->iType != -1 )
 				iType = pChallenge->iType;
 
-			m_pChallengeSelection->AddItem( pChallenge->szName, new KeyValues( "ChallengeSelection", "challenge", iType ) );
+			m_pChallengeSelection->AddItem( pChallenge->szName, KeyValuesAD( new KeyValues( "ChallengeSelection", "challenge", iType ) ) );
 
 			if ( iSelectedChallenge == iNumChallenges )
 				iFoundSimilar = iNumChallenges + 1;

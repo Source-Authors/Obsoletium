@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cmath>
 
+#include "tier1/strtools.h"
 #include "mathlib/vector.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -46,19 +47,32 @@ FloatCubeMap_t::FloatCubeMap_t(char const *basename)
 	for(int f=0;f<6;f++)
 	{
 		char fnamebuf[512];
-		sprintf(fnamebuf,namepts[f],basename);
-		face_maps[f].LoadFromPFM(fnamebuf);
+		V_sprintf_safe(fnamebuf,namepts[f],basename);
+		if (!face_maps[f].LoadFromPFM(fnamebuf))
+		{
+			fprintf(stderr, "Unable to load #%d cubemap from PFM '%s'.\n", f, fnamebuf);
+		}
 	}
 }
 
-void FloatCubeMap_t::WritePFMs(char const *basename) const
+bool FloatCubeMap_t::WritePFMs(char const *basename) const
 {
+	char fnamebuf[512];
+
+	bool ok = true;
 	for(int f=0;f<6;f++)
 	{
-		char fnamebuf[512];
-		sprintf(fnamebuf,namepts[f],basename);
-		face_maps[f].WritePFM(fnamebuf);
+		V_sprintf_safe(fnamebuf,namepts[f],basename);
+
+		if (!face_maps[f].WritePFM(fnamebuf))
+		{
+			ok = false;
+			fprintf(stderr, "Unable to write #%d cubemap to PFM '%s'.\n", f, fnamebuf);
+		}
 	}
+
+	return ok;
+
 }
 
 Vector FloatCubeMap_t::PixelDirection(int face, int x, int y) const
@@ -117,5 +131,3 @@ void FloatCubeMap_t::Resample( FloatCubeMap_t &out, float flPhongExponent )
 			}
 	}
 }
-
-						

@@ -76,10 +76,10 @@ void CClientThinkList::SetNextClientThink( ClientThinkHandle_t hThink, float flN
 	if ( m_bInThinkLoop )
 	{
 		// Queue up all changes
-		intp i = m_aChangeList.AddToTail();
-		m_aChangeList[i].m_hEnt = INVALID_CLIENTENTITY_HANDLE;
-		m_aChangeList[i].m_hThink = hThink;
-		m_aChangeList[i].m_flNextTime = flNextTime;
+		auto &change = m_aChangeList[m_aChangeList.AddToTail()];
+		change.m_hEnt = INVALID_CLIENTENTITY_HANDLE;
+		change.m_hThink = hThink;
+		change.m_flNextTime = flNextTime;
 		return;
 	}
 
@@ -110,10 +110,10 @@ void CClientThinkList::SetNextClientThink( ClientEntityHandle_t hEnt, float flNe
 	if ( m_bInThinkLoop )
 	{
 		// Queue up all changes
-		intp i = m_aChangeList.AddToTail();
-		m_aChangeList[i].m_hEnt = hEnt;
-		m_aChangeList[i].m_hThink = hThink;
-		m_aChangeList[i].m_flNextTime = flNextTime;
+		auto &change = m_aChangeList[m_aChangeList.AddToTail()];
+		change.m_hEnt = hEnt;
+		change.m_hThink = hThink;
+		change.m_flNextTime = flNextTime;
 		return;
 	}
 
@@ -145,10 +145,10 @@ void CClientThinkList::RemoveThinkable( ClientThinkHandle_t hThink )
 	if ( m_bInThinkLoop )
 	{
 		// Queue up all changes
-		intp i = m_aChangeList.AddToTail();
-		m_aChangeList[i].m_hEnt = INVALID_CLIENTENTITY_HANDLE;
-		m_aChangeList[i].m_hThink = hThink;
-		m_aChangeList[i].m_flNextTime = CLIENT_THINK_NEVER;
+		auto &change = m_aChangeList[m_aChangeList.AddToTail()];
+		change.m_hEnt = INVALID_CLIENTENTITY_HANDLE;
+		change.m_hThink = hThink;
+		change.m_flNextTime = CLIENT_THINK_NEVER;
 		return;
 	}
 

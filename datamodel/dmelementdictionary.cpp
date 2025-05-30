@@ -128,7 +128,7 @@ DmElementHandle_t CDmElementDictionary::SetElementId( DmElementDictHandle_t hDic
 		// if ChangeElementId returns a handle, the id has been changed
 		if ( newHandle != hElement )
 		{
-			int i = m_Dict.Find( hElement );
+			auto i = m_Dict.Find( hElement );
 			if ( i != m_Dict.InvalidIndex() )
 			{
 				m_Dict[ i ] = newHandle;
@@ -165,7 +165,7 @@ DmElementHandle_t CDmElementDictionary::SetElementId( DmElementDictHandle_t hDic
 		newHandle = g_pDataModelImp->ChangeElementId( hElement, oldId, newId );
 		Assert( newHandle == hExistingElement );
 
-		int i = m_Dict.Find( hElement );
+		auto i = m_Dict.Find( hElement );
 		if ( i != m_Dict.InvalidIndex() )
 		{
 			m_Dict[ i ] = newHandle;
@@ -236,7 +236,7 @@ void CDmElementDictionary::HookUpElementArrayAttributes()
 		}
 	}
 
-	for ( int i = 0; i < n; ++i )
+	for ( intp i = 0; i < n; ++i )
 	{
 		Assert( m_ArrayAttributes[i].m_pAttribute->GetType() == AT_ELEMENT_ARRAY );
 
@@ -407,9 +407,9 @@ void CDmElementSerializationDictionary::Clear()
 //-----------------------------------------------------------------------------
 // How many root elements do we have?
 //-----------------------------------------------------------------------------
-int CDmElementSerializationDictionary::RootElementCount() const
+intp CDmElementSerializationDictionary::RootElementCount() const
 {
-	int nCount = 0;
+	intp nCount = 0;
 	DmElementDictHandle_t h = m_Dict.FirstInorder();
 	while( h != m_Dict.InvalidIndex() )
 	{
@@ -433,7 +433,7 @@ DmElementDictHandle_t CDmElementSerializationDictionary::FirstRootElement() cons
 	// NOTE: I don't have to use First/NextInorder here because there
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
-	intp nCount = m_Dict.Count();
+	DmElementDictHandle_t nCount = m_Dict.Count();
 	for ( DmElementDictHandle_t h = 0; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )
@@ -450,7 +450,7 @@ DmElementDictHandle_t CDmElementSerializationDictionary::NextRootElement( DmElem
 	// are guaranteed to be no removals from the dictionary.
 	// Also, using inorder traversal won't get my actual root element to be first in the file
 	++h;
-	intp nCount = m_Dict.Count();
+	DmElementDictHandle_t nCount = m_Dict.Count();
 	for ( ; h < nCount; ++h )
 	{
 		if ( m_Dict[h].m_bRoot )

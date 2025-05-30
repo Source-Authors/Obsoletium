@@ -21,7 +21,7 @@ class CDmeInput : public CDmeOperator
 	DEFINE_ELEMENT( CDmeInput, CDmeOperator );
 
 public:
-	virtual bool IsDirty(); // ie needs to operate
+	bool IsDirty() override; // ie needs to operate
 };
 
 

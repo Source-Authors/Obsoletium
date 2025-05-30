@@ -245,7 +245,8 @@ void CProfileHierarchyPanel::ColumnPanels_t::Refresh( KeyValues *kv )
 
 CProfileHierarchyPanel::CProfileHierarchyPanel(vgui::Panel *parent, const char *panelName)
  : BaseClass(parent,panelName),
-	m_Panels( 0, 0, PanelsLessFunc )
+	m_Panels( 0, 0, PanelsLessFunc ),
+	m_itemFont{vgui::INVALID_FONT}
 {
 }
 
@@ -328,15 +329,15 @@ void CProfileHierarchyPanel::ModifyItem( KeyValues *data, int itemIndex )
 	info.Refresh( data );
 }
 
-int CProfileHierarchyPanel::AddItem( KeyValues *data, int parentItemIndex, ColumnPanels_t& columnPanels )
+intp CProfileHierarchyPanel::AddItem( KeyValues *data, int parentItemIndex, ColumnPanels_t& columnPanels )
 {
-	int itemIndex = GetTree()->AddItem( data, parentItemIndex );
+	intp itemIndex = GetTree()->AddItem( data, parentItemIndex );
 	columnPanels.treeViewItem = itemIndex;
 	
 	ColumnPanels_t search;
 	search.treeViewItem = itemIndex;
 
-	int idx = m_Panels.Find( search );
+	const auto idx = m_Panels.Find( search );
 	if ( idx == m_Panels.InvalidIndex() )
 	{
 		m_Panels.Insert( columnPanels );
@@ -690,6 +691,7 @@ void CVProfPanel::OnTextChanged( KeyValues *data )
 {
 	Panel *pPanel = reinterpret_cast<vgui::Panel *>( data->GetPtr("panel") );
 	vgui::ComboBox *pBox = dynamic_cast<vgui::ComboBox *>( pPanel );
+	Assert( pBox );
 
 	if( pBox == m_pVProfCategory ) 
 	{
@@ -825,7 +827,7 @@ void CVProfPanel::ExpandGroupRecursive( int nBudgetGroupID, CVProfNode *pNode )
 		{
 			if( pTempNode->GetParent() )
 			{
-				int id = pTempNode->GetParent()->GetClientData();
+				intp id = pTempNode->GetParent()->GetClientData();
 				m_pHierarchy->ExpandItem( id, true );
 			}
 			pTempNode = pTempNode->GetParent();
@@ -924,7 +926,7 @@ int CVProfPanel::UpdateVProfTreeEntry( KeyValues *pKeyValues, CVProfNode *pNode,
 	pKeyValues->SetFloat( "Time", avgLessChildren );
 
 	// Add or modify a line in the hierarchy
-	int id = pNode->GetClientData();
+	intp id = pNode->GetClientData();
 	if ( id == -1 )
 	{
 		CProfileHierarchyPanel::ColumnPanels_t cp;
@@ -1031,7 +1033,7 @@ void CVProfPanel::UpdateProfile( float filteredtime )
 			m_pVProfile->Pause();
 		}
 
-		KeyValues * pVal = new KeyValues("");
+		KeyValuesAD pVal("");
 		
 		if ( !m_pHierarchy->GetTree()->GetItemCount() )
 		{
@@ -1052,8 +1054,6 @@ void CVProfPanel::UpdateProfile( float filteredtime )
 		{
 			FillTree( pVal, pStartNode, m_RootItem );
 		}
-		
-		pVal->deleteThis();
 
 		if( bEnabled )
 		{

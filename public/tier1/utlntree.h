@@ -13,8 +13,8 @@
 #pragma once
 #endif
 
-#include "basetypes.h"
-#include "utlmemory.h"
+#include "tier0/basetypes.h"
+#include "tier1/utlmemory.h"
 #include "tier0/dbg.h"
 
 

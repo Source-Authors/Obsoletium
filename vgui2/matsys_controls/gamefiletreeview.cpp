@@ -57,12 +57,11 @@ void CGameFileTreeView::RefreshFileList()
 	SetFgColor(Color(216, 222, 211, 255));
 
 	// add the base node
-	KeyValues *pkv = new KeyValues( "root" );
+	KeyValuesAD pkv( "root" );
 	pkv->SetString( "text", m_RootFolderName );
 	pkv->SetInt( "root", 1 );
 	pkv->SetInt( "expand", 1 );
 	int iRoot = AddItem( pkv, GetRootItemIndex() );
-	pkv->deleteThis();
 	ExpandItem( iRoot, true );
 }
 
@@ -159,7 +158,7 @@ void CGameFileTreeView::AddDirectoriesOfNode( int itemIndex, const char *pFilePa
 		bool bIsDirectory = g_pFullFileSystem->FindIsDirectory( findHandle );
 		if ( bIsDirectory && Q_strnicmp( pszFileName, ".", 2 ) && Q_strnicmp( pszFileName, "..", 3 ) )
 		{
-			KeyValues *kv = new KeyValues( "node", "text", pszFileName );
+			KeyValuesAD kv( new KeyValues( "node", "text", pszFileName ) );
 			 
 			char pFullPath[MAX_PATH];
 			Q_snprintf( pFullPath, sizeof(pFullPath), "%s/%s", pFilePath, pszFileName );
@@ -173,7 +172,6 @@ void CGameFileTreeView::AddDirectoriesOfNode( int itemIndex, const char *pFilePa
 			kv->SetInt( "image", IMAGE_FOLDER );
 
 			int itemID = AddItem(kv, itemIndex);
- 			kv->deleteThis();
 
 			// mark directories in orange
 			SetItemColorForDirectories( itemID );
@@ -204,7 +202,7 @@ void CGameFileTreeView::AddFilesOfNode( int itemIndex, const char *pFilePath, co
 	{
 		if ( !g_pFullFileSystem->FindIsDirectory( findHandle ) )
 		{
-			KeyValues *kv = new KeyValues( "node", "text", pszFileName );
+			KeyValuesAD kv( new KeyValues( "node", "text", pszFileName ) );
 
 			char pFullPath[MAX_PATH];
 			Q_snprintf( pFullPath, MAX_PATH, "%s\\%s", pFilePath, pszFileName );
@@ -212,7 +210,6 @@ void CGameFileTreeView::AddFilesOfNode( int itemIndex, const char *pFilePath, co
 			kv->SetInt( "image", IMAGE_FILE );
 
 			AddItem(kv, itemIndex);
-			kv->deleteThis();
 		}
 
 		pszFileName = g_pFullFileSystem->FindNext( findHandle );

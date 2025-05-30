@@ -57,7 +57,7 @@ void PASCAL DDV_FOVRange(CDataExchange *pDX, int value)
 //-----------------------------------------------------------------------------
 void COPTView3D::DoDataExchange(CDataExchange* pDX)
 {
-	CPropertyPage::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(COPTView3D)
 	DDX_Control(pDX, IDC_BACKTEXT, m_cBackText);
 	DDX_Control(pDX, IDC_BACKPLANE, m_cBackPlane);
@@ -80,11 +80,12 @@ void COPTView3D::DoDataExchange(CDataExchange* pDX)
 	DDV_FOVRange(pDX, Options.view3d.fFOV);
 	//}}AFX_DATA_MAP
 
-	m_cBackPlane.SetRange(500, 10000, TRUE);
-	m_ModelDistance.SetRange(0, 10000, TRUE);
-	m_DetailDistance.SetRange(0, 10000, TRUE);
-	m_ForwardSpeedMax.SetRange(100, 10000, TRUE);
-	m_TimeToMaxSpeed.SetRange(0, 10000, TRUE);
+	// dimhotepus: Bump max 10000 -> 20000
+	m_cBackPlane.SetRange(500, 20000, TRUE);
+	m_ModelDistance.SetRange(0, 20000, TRUE);
+	m_DetailDistance.SetRange(0, 20000, TRUE);
+	m_ForwardSpeedMax.SetRange(100, 20000, TRUE);
+	m_TimeToMaxSpeed.SetRange(0, 20000, TRUE);
 
 	//
 	// If going from controls to data.
@@ -155,7 +156,7 @@ BOOL COPTView3D::OnInitDialog(void)
 {
 	m_bOldFilterTextures = Options.view3d.bFilterTextures;
 
-	CPropertyPage::OnInitDialog();
+	__super::OnInitDialog();
 	return TRUE;
 }
 
@@ -172,7 +173,7 @@ BOOL COPTView3D::OnApply(void)
 	}
 
 	Options.PerformChanges(COptions::secView3D);
-	return CPropertyPage::OnApply();
+	return __super::OnApply();
 }
 
 
@@ -263,7 +264,7 @@ void COPTView3D::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar *pScrollBar)
 		m_TimeToMaxSpeedText.SetWindowText(str);
 	}
 
-	CPropertyPage::OnHScroll(nSBCode, nPos, pScrollBar);
+	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 

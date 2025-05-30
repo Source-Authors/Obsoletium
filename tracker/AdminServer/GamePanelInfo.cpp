@@ -21,7 +21,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/Cursor.h>
 #include <vgui/ILocalize.h>
 
@@ -37,13 +37,13 @@
 #include "tier0/icommandline.h"
 
 #include <proto_oob.h>
-#include <netadr.h>
+#include <tier1/netadr.h>
 
 using namespace vgui;
 
-static const long RETRY_TIME = 10000;		// refresh server every 10 seconds
-static const long MAP_CHANGE_TIME = 20000;		// refresh 20 seconds after a map change 
-static const long RESTART_TIME = 60000;		// refresh 60 seconds after a "_restart"
+static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 seconds
+static constexpr inline long MAP_CHANGE_TIME = 20000;		// refresh 20 seconds after a map change 
+static constexpr inline long RESTART_TIME = 60000;		// refresh 60 seconds after a "_restart"
 
 #include "IManageServer.h"
 
@@ -142,9 +142,9 @@ void CGamePanelInfo::SetNewTitle(bool connectionFailed, const char *additional_t
 	}
 
 	wchar_t serverName[256];
-	g_pVGuiLocalize->ConvertANSIToUnicode(additional_text, serverName, sizeof(serverName));
+	g_pVGuiLocalize->ConvertANSIToUnicode(additional_text, serverName);
 	wchar_t title[256];
-	g_pVGuiLocalize->ConstructString(title, sizeof(title), g_pVGuiLocalize->Find(localized_title), 1, serverName);
+	g_pVGuiLocalize->ConstructString_safe(title, g_pVGuiLocalize->Find(localized_title), 1, serverName);
 	
 	SetTitle(title, true);
 }
@@ -258,16 +258,16 @@ void CGamePanelInfo::AddToConsole(const char *msg)
 	if (m_pServerLogPanel)
 	{
 		// hack, look for restart message
-		if (*msg == 3 && !strncmp(msg + 1, "MasterRequestRestart", strlen("MasterRequestRestart")))
+		if (*msg == 3 && !strncmp(msg + 1, "MasterRequestRestart", ssize("MasterRequestRestart") - 1))
 		{
 			OnMasterRequestRestart();
 		}
-		else if (*msg == 3 && !strncmp(msg + 1, "MasterOutOfDate", strlen("MasterOutOfDate")))
+		else if (*msg == 3 && !strncmp(msg + 1, "MasterOutOfDate", ssize("MasterOutOfDate") - 1))
 		{
 			const char *details = strstr( msg, "MasterOutOfDate" );
 			if ( details )
 			{
-				OnMasterOutOfDate(details + strlen("MasterOutOfDate"));
+				OnMasterOutOfDate(details + ssize("MasterOutOfDate") - 1);
 			}
 		}
 		else
@@ -280,14 +280,16 @@ void CGamePanelInfo::AddToConsole(const char *msg)
 
 void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 {
-#if !defined(_DEBUG)
-
+	// dimhotepus: Show even in debug as need same behavior.
 	// open a dialog informing user that they need to restart the server
 	if (!m_hOutOfDateQueryBox.Get())
 	{
-		char *fullmsg = (char *) _alloca( strlen(msg) + strlen( "\n\nDo you wish to shutdown now?\n") + 1 );
+		const size_t msgLen = strlen(msg) + ssize("\n\nDo you wish to shutdown now?\n");
+		char *fullmsg = stackallocT( char, msgLen );
 
-		_snprintf( fullmsg, strlen(msg) + strlen( "\n\nDo you wish to shutdown now?\n") + 1 , "%s\n\nDo you wish to shutdown now?\n", msg );
+		// _snprintf -> strcpy + strcat
+		V_strncpy( fullmsg, msg, msgLen );
+		V_strncat( fullmsg, "\n\nDo you wish to shutdown now?\n", msgLen );
 		m_hOutOfDateQueryBox = new QueryBox("Server restart pending", fullmsg);
 		m_hOutOfDateQueryBox->AddActionSignalTarget(this);
 		m_hOutOfDateQueryBox->SetOKCommand(new KeyValues("RestartServer"));
@@ -298,8 +300,6 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 		// reshow the existing window
 		m_hOutOfDateQueryBox->Activate();
 	}
-
-#endif // !defined(_DEBUG)
 }
 
 //-----------------------------------------------------------------------------
@@ -307,8 +307,7 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 //-----------------------------------------------------------------------------
 void CGamePanelInfo::OnMasterRequestRestart()
 {
-#if !defined(_DEBUG)
-
+	// dimhotepus: Show even in debug as need same behavior.
 	// open a dialog informing user that they need to restart the server
 	if (!m_hRestartQueryBox.Get())
 	{
@@ -322,8 +321,6 @@ void CGamePanelInfo::OnMasterRequestRestart()
 		// reshow the existing window
 		m_hRestartQueryBox->Activate();
 	}
-
-#endif // !defined(_DEBUG)
 }
 
 //-----------------------------------------------------------------------------

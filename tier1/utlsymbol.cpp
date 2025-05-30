@@ -17,9 +17,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define INVALID_STRING_INDEX CStringPoolIndex( 0xFFFF, 0xFFFF )
+#define DEFINE_INVALID_STRING_INDEX                                  \
+  constexpr CUtlSymbolTable::CStringPoolIndex INVALID_STRING_INDEX( \
+    (unsigned short)0xFFFFU, (unsigned short)0xFFFFU)
 
-#define MIN_STRING_POOL_SIZE	(intp)2048
+constexpr inline intp MIN_STRING_POOL_SIZE{2048};
 
 //-----------------------------------------------------------------------------
 // globals
@@ -58,7 +60,7 @@ public:
 	~CCleanupUtlSymbolTable()
 	{
 		delete CUtlSymbol::s_pSymbolTable;
-		CUtlSymbol::s_pSymbolTable = NULL;
+		CUtlSymbol::s_pSymbolTable = nullptr;
 	}
 };
 
@@ -120,6 +122,8 @@ inline const char* CUtlSymbolTable::StringFromIndex( const CStringPoolIndex &ind
 
 bool CUtlSymbolTable::CLess::operator()( const CStringPoolIndex &i1, const CStringPoolIndex &i2 ) const
 {
+	DEFINE_INVALID_STRING_INDEX;
+
 	// Need to do pointer math because CUtlSymbolTable is used in CUtlVectors, and hence
 	// can be arbitrarily moved in memory on a realloc. Yes, this is portable. In reality,
 	// right now at least, because m_LessFunc is the first member of CUtlRBTree, and m_Lookup
@@ -160,7 +164,9 @@ CUtlSymbolTable::~CUtlSymbolTable()
 
 
 CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
-{	
+{
+	DEFINE_INVALID_STRING_INDEX;
+
 	if (!pString)
 		return CUtlSymbol();
 	
@@ -172,7 +178,7 @@ CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 	UtlSymId_t idx = m_Lookup.Find( INVALID_STRING_INDEX );
 
 #ifdef _DEBUG
-	m_pUserSearchString = NULL;
+	m_pUserSearchString = nullptr;
 #endif
 
 	return CUtlSymbol( idx );
@@ -265,15 +271,23 @@ void CUtlSymbolTable::RemoveAll()
 {
 	m_Lookup.Purge();
 	
-	for ( intp i=0; i < m_StringPools.Count(); i++ )
-		free( m_StringPools[i] );
+	for ( auto *pool : m_StringPools )
+		free( pool );
 
 	m_StringPools.RemoveAll();
 }
 
 
 
-class CUtlFilenameSymbolTable::HashTable : public CUtlStableHashtable<CUtlConstString>
+class CUtlFilenameSymbolTable::HashTable
+	: public CUtlStableHashtable
+	<
+		CUtlConstString,
+		empty_t,
+		DefaultHashFunctor<CUtlConstString>,
+		DefaultEqualFunctor<CUtlConstString>,
+		uint32
+	>
 {
 };
 
@@ -309,17 +323,17 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 
 	// Fix slashes+dotslashes and make lower case first..
 	char fn[ MAX_PATH ];
-	Q_strncpy( fn, pFileName, sizeof( fn ) );
-	Q_RemoveDotSlashes( fn );
+	V_strcpy_safe( fn, pFileName );
+	V_RemoveDotSlashes( fn );
 #ifdef _WIN32
-	Q_strlower( fn );
+	V_strlower( fn );
 #endif
 
 	// Split the filename into constituent parts
 	char basepath[ MAX_PATH ];
-	Q_ExtractFilePath( fn, basepath, sizeof( basepath ) );
+	V_ExtractFilePath( fn, basepath );
 	char filename[ MAX_PATH ];
-	Q_strncpy( filename, fn + Q_strlen( basepath ), sizeof( filename ) );
+	V_strcpy_safe( filename, fn + V_strlen( basepath ) );
 
 	// not found, lock and look again
 	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
@@ -335,22 +349,22 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 {
 	if ( !pFileName )
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// Fix slashes+dotslashes and make lower case first..
 	char fn[ MAX_PATH ];
-	Q_strncpy( fn, pFileName, sizeof( fn ) );
-	Q_RemoveDotSlashes( fn );
+	V_strcpy_safe( fn, pFileName );
+	V_RemoveDotSlashes( fn );
 #ifdef _WIN32
-	Q_strlower( fn );
+	V_strlower( fn );
 #endif
 
 	// Split the filename into constituent parts
 	char basepath[ MAX_PATH ];
-	Q_ExtractFilePath( fn, basepath, sizeof( basepath ) );
+	V_ExtractFilePath( fn, basepath );
 	char filename[ MAX_PATH ];
-	Q_strncpy( filename, fn + Q_strlen( basepath ), sizeof( filename ) );
+	V_strcpy_safe( filename, fn + V_strlen( basepath ) );
 
 	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
 
@@ -362,7 +376,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 	m_lock.UnlockRead();
 
 	if ( handle.path == 0 || handle.file == 0 )
-		return NULL;
+		return nullptr;
 
 	return *( FileNameHandle_t * )( &handle );
 }
@@ -372,9 +386,11 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 // Input  : handle - 
 // Output : const char
 //-----------------------------------------------------------------------------
-bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, char *buf, intp buflen )
+bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen )
 {
-	buf[0] = '\0';
+	// dimhotepus: Write only if have space.
+	if (buflen > 0)
+		buf[0] = '\0';
 
 	static_assert(alignof(FileNameHandle_t*) == alignof(FileNameHandleInternal_t*));
 
@@ -385,8 +401,6 @@ bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, char *buf,
 	}
 
 	m_lock.LockForRead();
-	//const char *path = m_StringPool.HandleToString(internal->path);
-	//const char *fn = m_StringPool.HandleToString(internal->file);
 	const char *path = (*m_Strings)[ internal->path - 1 ].Get();
 	const char *fn = (*m_Strings)[ internal->file - 1].Get();
 	m_lock.UnlockRead();

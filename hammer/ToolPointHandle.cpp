@@ -5,6 +5,8 @@
 //=============================================================================//
 
 #include "stdafx.h"
+#include "ToolPointHandle.h"
+
 #include "History.h"
 #include "MainFrm.h"			// FIXME: For ObjectProperties
 #include "MapDoc.h"
@@ -14,16 +16,18 @@
 #include "Render2D.h"
 #include "StatusBarIDs.h"		// For SetStatusText
 #include "ToolManager.h"
-#include "ToolPointHandle.h"
 #include "Selection.h"
+#include "windows/base_wnd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 
-class CToolPointHandleMsgWnd : public CWnd
+class CToolPointHandleMsgWnd : public CBaseWnd
 {
 	public:
+		// dimhotepus: Add ctor to set members.
+		CToolPointHandleMsgWnd() : m_pToolPointHandle{nullptr}, m_pView2D{nullptr} {}
 
 		bool Create(void);
 		void PreMenu2D(CToolPointHandle *pTool, CMapView2D *pView);
@@ -47,7 +51,7 @@ static CToolPointHandleMsgWnd s_wndToolMessage;
 static const char *g_pszClassName = "ValveEditor_PointHandleToolWnd";
 
 
-BEGIN_MESSAGE_MAP(CToolPointHandleMsgWnd, CWnd)
+BEGIN_MESSAGE_MAP(CToolPointHandleMsgWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CToolPointHandleMsgWnd)
 	ON_COMMAND(ID_CENTER_ON_ENTITY, OnCenter)
 	//}}AFX_MSG_MAP
@@ -72,7 +76,7 @@ bool CToolPointHandleMsgWnd::Create(void)
 		return(false);
 	}
 
-	return(CWnd::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
+	return(__super::CreateEx(0, g_pszClassName, g_pszClassName, 0, CRect(0, 0, 10, 10), NULL, 0) == TRUE);
 }
 
 
@@ -185,7 +189,7 @@ bool CToolPointHandle::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vecto
 	// Update the status bar and the views.
 	//
 	char szBuf[128];
-	sprintf(szBuf, " @%.0f, %.0f ", m_pPoint->m_Origin[pView->axHorz], m_pPoint->m_Origin[pView->axVert]);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", m_pPoint->m_Origin[pView->axHorz], m_pPoint->m_Origin[pView->axVert]);
 	SetStatusText(SBI_COORDS, szBuf);
 
 	m_pDocument->UpdateAllViews( MAPVIEW_UPDATE_TOOL );

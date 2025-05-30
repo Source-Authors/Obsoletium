@@ -7,7 +7,7 @@
 
 #include "dme_controls/dmecombinationsystemeditorpanel.h"
 #include "dme_controls/dmepanel.h"
-#include "dme_controls/elementpropertiestree.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "dme_controls/dmecontrols_utils.h"
 #include "movieobjects/dmecombinationoperator.h"
 #include "vgui_controls/ListPanel.h"
@@ -204,16 +204,16 @@ static bool ImportCombinationData( vgui::Panel* pParent, CDmeCombinationOperator
 //-----------------------------------------------------------------------------
 class CDmeInputControlListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeInputControlListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeInputControlListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmeInputControlListPanel( vgui::Panel *pParent, const char *pName, CDmeCombinationControlsPanel *pComboPanel );
 
-	virtual void OnCreateDragData( KeyValues *msg );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msgList );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msgList );
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
+	void OnCreateDragData( KeyValues *msg ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msgList ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msgList ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
 private:
 	CDmeCombinationControlsPanel *m_pComboPanel;
@@ -231,14 +231,14 @@ private:
 //-----------------------------------------------------------------------------
 class CDmeRawControlListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeRawControlListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeRawControlListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmeRawControlListPanel( vgui::Panel *pParent, const char *pName, CDmeCombinationControlsPanel *pComboPanel );
 
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
 
 private:
 	MESSAGE_FUNC( OnNewWrinkleText, "TextNewLine" );	
@@ -258,7 +258,7 @@ private:
 //-----------------------------------------------------------------------------
 class CDmeCombinationControlsPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeCombinationControlsPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeCombinationControlsPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -913,8 +913,8 @@ void CDmeCombinationControlsPanel::BuildSelectedControlLists(
 //-----------------------------------------------------------------------------
 bool CDmeCombinationControlsPanel::HasDuplicateControlName( const char *pControlName, CUtlVector< CUtlString >& retiredControlNames )
 {
-	int i;
-	int nRetiredControlNameCount = retiredControlNames.Count();
+	intp i;
+	intp nRetiredControlNameCount = retiredControlNames.Count();
 	for ( i = 0; i < nRetiredControlNameCount; ++i )
 	{
 		if ( !Q_stricmp( retiredControlNames[i], pControlName ) )
@@ -956,8 +956,8 @@ void CDmeCombinationControlsPanel::PerformGroupControls( const char *pGroupedCon
 		return;
 
 	// Delete old controls
-	int nRetiredControlNameCount = controlNames.Count();
-	for ( int i = 0; i < nRetiredControlNameCount; ++i )
+	intp nRetiredControlNameCount = controlNames.Count();
+	for ( intp i = 0; i < nRetiredControlNameCount; ++i )
 	{
 		m_hCombinationOperator->RemoveControl( controlNames[i] );
 	}
@@ -965,8 +965,8 @@ void CDmeCombinationControlsPanel::PerformGroupControls( const char *pGroupedCon
 	// Create new control
 	ControlIndex_t nNewControl = m_hCombinationOperator->FindOrCreateControl( pGroupedControlName, bIsStereo );
 	m_hCombinationOperator->SetEyelidControl( nNewControl, bIsEyelid );
-	int nGroupedControlCount = rawControlNames.Count();
-	for ( int i = 0; i < nGroupedControlCount; ++i )
+	intp nGroupedControlCount = rawControlNames.Count();
+	for ( intp i = 0; i < nGroupedControlCount; ++i )
 	{
 		m_hCombinationOperator->AddRawControl( nNewControl, rawControlNames[i] );
 	}
@@ -1053,23 +1053,23 @@ void CDmeCombinationControlsPanel::OnUngroupControls( )
 
 	// NOTE: It's illegal to use a grouped control name which already exists
 	// assuming it's not in the list of grouped control names we're going to group together
-	int nRawControlCount = rawControlNames.Count();
-	for ( int i = 0; i < nRawControlCount; ++i )
+	intp nRawControlCount = rawControlNames.Count();
+	for ( intp i = 0; i < nRawControlCount; ++i )
 	{
 		if ( HasDuplicateControlName( rawControlNames[i], controlNames ) )
 			return;
 	}
 
 	// Delete old controls
-	int nRetiredControlNameCount = controlNames.Count();
-	for ( int i = 0; i < nRetiredControlNameCount; ++i )
+	intp nRetiredControlNameCount = controlNames.Count();
+	for ( intp i = 0; i < nRetiredControlNameCount; ++i )
 	{
 		m_hCombinationOperator->RemoveControl( controlNames[i] );
 	}
 
 	// Create new control (this will also create raw controls with the same name)
-	int nGroupedControlCount = rawControlNames.Count();
-	for ( int i = 0; i < nGroupedControlCount; ++i )
+	intp nGroupedControlCount = rawControlNames.Count();
+	for ( intp i = 0; i < nGroupedControlCount; ++i )
 	{
 		const int nControlIndex = m_hCombinationOperator->FindOrCreateControl( rawControlNames[i], bIsStereo, true );
 		m_hCombinationOperator->SetEyelidControl( nControlIndex, bIsEyelid );
@@ -1093,8 +1093,8 @@ void CDmeCombinationControlsPanel::OnToggleStereoControl( )
 	bool bIsStereo = false;
 	BuildSelectedControlLists( false, controlNames, rawControlNames, &bIsStereo );
 
-	int nControlCount = controlNames.Count();
-	for ( int i = 0; i < nControlCount; ++i )
+	intp nControlCount = controlNames.Count();
+	for ( intp i = 0; i < nControlCount; ++i )
 	{
 		ControlIndex_t nControlIndex = m_hCombinationOperator->FindControlIndex( controlNames[i] );
 		m_hCombinationOperator->SetStereoControl( nControlIndex, !bIsStereo );
@@ -1118,8 +1118,8 @@ void CDmeCombinationControlsPanel::OnToggleEyelidControl()
 	bool bIsEyelid = false;
 	BuildSelectedControlLists( false, controlNames, rawControlNames, NULL, &bIsEyelid );
 
-	int nControlCount = controlNames.Count();
-	for ( int i = 0; i < nControlCount; ++i )
+	intp nControlCount = controlNames.Count();
+	for ( intp i = 0; i < nControlCount; ++i )
 	{
 		ControlIndex_t nControlIndex = m_hCombinationOperator->FindControlIndex( controlNames[i] );
 		m_hCombinationOperator->SetEyelidControl( nControlIndex, !bIsEyelid );
@@ -1164,7 +1164,7 @@ void CDmeCombinationControlsPanel::OnFileSelected( KeyValues *kv )
 void CDmeCombinationControlsPanel::OnImportCombination()
 {
 	char pStartingDir[MAX_PATH];
-	GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+	GetModContentSubdirectory( "models", pStartingDir );
 
 	vgui::FileOpenDialog *pDialog = new vgui::FileOpenDialog( this, "Select File to Import", true, new KeyValues( "ImportControls" ) );
 	pDialog->SetStartDirectoryContext( "combination_system_import", pStartingDir );
@@ -1369,7 +1369,8 @@ void CDmeRawControlListPanel::OnNewWrinkleText()
 	m_pWrinkleEdit->GetText( szEditText, MAX_PATH );
 	m_pWrinkleEdit->SetVisible( false );
 
-	float flWrinkleScale = atof( szEditText );
+	// dimhotepus: atof -> strtof.
+	float flWrinkleScale = strtof( szEditText, nullptr );
 	if ( m_bIsWrinkle )
 	{
 		flWrinkleScale = -flWrinkleScale;
@@ -1385,7 +1386,7 @@ void CDmeRawControlListPanel::OnNewWrinkleText()
 //-----------------------------------------------------------------------------
 class CRawControlPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CRawControlPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CRawControlPickerFrame, vgui::Frame );
 
 public:
 	CRawControlPickerFrame( vgui::Panel *pParent, const char *pTitle );
@@ -1395,7 +1396,7 @@ public:
 	void DoModal( CDmeCombinationOperator *pCombinationOperator, CDmeCombinationDominationRule *pRule, bool bSuppressed, KeyValues *pContextKeyValues );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 private:
 	// Refreshes the list of raw controls
@@ -1544,7 +1545,7 @@ void CRawControlPickerFrame::OnCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 class CDmeCombinationDominationRulesPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeCombinationDominationRulesPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeCombinationDominationRulesPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -1779,7 +1780,7 @@ void CDmeCombinationDominationRulesPanel::OnFileSelected( KeyValues *kv )
 void CDmeCombinationDominationRulesPanel::OnImportDominationRules()
 {
 	char pStartingDir[MAX_PATH];
-	GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+	GetModContentSubdirectory( "models", pStartingDir );
 
 	vgui::FileOpenDialog *pDialog = new vgui::FileOpenDialog( this, "Select File to Import", true, new KeyValues( "ImportDominationRules" ) );
 	pDialog->SetStartDirectoryContext( "combination_system_import", pStartingDir );

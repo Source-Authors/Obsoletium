@@ -88,15 +88,15 @@ void CAttributeTextPanel::Refresh()
 	char buf[ 512 ];
 	if ( IsArrayType( GetAttributeType() ) )
 	{
-		int count = GetAttributeArrayCount();
+		intp count = GetAttributeArrayCount();
 		if ( m_bShowMemoryUsage )
 		{
 			CDmAttribute *pAttr = GetPanelElement()->GetAttribute( GetAttributeName() );
-			Q_snprintf( buf, sizeof( buf ), "%d items %.3fMB", count, pAttr->EstimateMemoryUsage( TD_DEEP )  / float( 1 << 20 ) );
+			Q_snprintf( buf, sizeof( buf ), "%zd items %.3fMB", count, pAttr->EstimateMemoryUsage( TD_DEEP )  / float( 1 << 20 ) );
 		}
 		else
 		{
-			Q_snprintf( buf, sizeof( buf ), "%d items", count );
+			Q_snprintf( buf, sizeof( buf ), "%zd items", count );
 		}
 		m_pData->SetText( buf );
 		m_pData->SetEnabled(false);

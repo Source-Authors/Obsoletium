@@ -5,13 +5,13 @@
 //===========================================================================//
 
 #include "stdafx.h"
+
 #include <io.h>
-#include <stdlib.h>
 #include <direct.h>
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
+
+#include <cstdlib>
 #include <fstream>
-#pragma warning(pop)
+
 #include "BuildNum.h"
 #include "EditGameConfigs.h"
 #include "Splash.h"
@@ -31,7 +31,6 @@
 #include "GlobalFunctions.h"
 #include "Shell.h"
 #include "ShellMessageWnd.h"
-#include "Options.h"
 #include "TextureSystem.h"
 #include "ToolManager.h"
 #include "Hammer.h"
@@ -57,8 +56,11 @@
 #include "lpreview_thread.h"
 #include "inputsystem/iinputsystem.h"
 #include "datacache/idatacache.h"
+#include "windows/base_dlg.h"
+#ifndef NO_STEAM
 #include "steam/steam_api.h"
-#include "p4lib/ip4.h"
+#endif
+// #include "p4lib/ip4.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -98,8 +100,8 @@ void EditorUtil_ConvertPath(CString &str, bool bSave);
 
 static bool bMakeLib = false;
 
-static float fSequenceVersion = 0.2f;
-static char *pszSequenceHdr = "Worldcraft Command Sequences\r\n\x1a";
+static constexpr inline float fSequenceVersion = 0.2f;
+static constexpr char pszSequenceHdr[] = "Worldcraft Command Sequences\r\n\x1a";
 
 
 CHammer theApp;
@@ -113,8 +115,10 @@ CMessageWnd *g_pwndMessage = NULL;
 CMessageQueue<MessageToLPreview> g_HammerToLPreviewMsgQueue;
 CMessageQueue<MessageFromLPreview> g_LPreviewToHammerMsgQueue;
 ThreadHandle_t g_LPreviewThread;
+#ifndef NO_STEAM
 CSteamAPIContext g_SteamAPIContext;
 CSteamAPIContext *steamapicontext = &g_SteamAPIContext;
+#endif
 
 
 bool	CHammer::m_bIsNewDocumentVisible = true;
@@ -149,7 +153,7 @@ struct MinidumpWrapperHelper_t
 
 static void MinidumpWrapperHelper( void *arg )
 {
-	MinidumpWrapperHelper_t *info = (MinidumpWrapperHelper_t *)arg;
+	auto *info = (MinidumpWrapperHelper_t *)arg;
 	info->m_iRetVal = info->m_pfn( info->m_pParam );
 }
 
@@ -180,19 +184,19 @@ static int WrapFunctionWithMinidumpHandler( int (*pfn)(void *pParam), void *pPar
 // Input  : fmt - format specifier.
 //			... - arguments to format.
 //-----------------------------------------------------------------------------
-void DBG(const char *fmt, ...)
+void DBG(PRINTF_FORMAT_STRING const char *fmt, ...)
 {
     char ach[128];
     va_list va;
 
     va_start(va, fmt);
-    vsprintf(ach, fmt, va);
+    V_vsprintf_safe(ach, fmt, va);
     va_end(va);
     OutputDebugString(ach);
 }
 
 
-void Msg(int type, const char *fmt, ...)
+void Msg(int type, PRINTF_FORMAT_STRING const char *fmt, ...)
 {
 	if ( !g_pwndMessage )
 		return;
@@ -201,7 +205,7 @@ void Msg(int type, const char *fmt, ...)
 	char szBuf[512];
 
  	va_start(vl, fmt);
-	int len = _vsnprintf(szBuf, 512, fmt, vl);
+	int len = V_vsprintf_safe(szBuf, fmt, vl);
 	va_end(vl);
 
 	if ((type == mwError) || (type == mwWarning))
@@ -422,10 +426,16 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 CHammer::CHammer(void)
 {
+	pMapDocTemplate = nullptr;
+	pManifestDocTemplate = nullptr;
+
+	m_bClosing = false;
 	m_bActiveApp = true;
 	m_SuppressVideoAllocation = false;
 	m_bForceRenderNextFrame = false;
-	m_bClosing = false;
+
+	m_szAppDir[0] = '\0';
+	m_szAutosaveDir[0] = '\0';
 }
 
 
@@ -446,25 +456,24 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	if ( !BaseClass::Connect( factory ) )
 		return false;
 
-//	bool bCVarOk = ConnectStudioRenderCVars( factory );
 	g_pFileSystem = ( IBaseFileSystem * )factory( BASEFILESYSTEM_INTERFACE_VERSION, NULL );
 	g_pStudioRender = ( IStudioRender * )factory( STUDIO_RENDER_INTERFACE_VERSION, NULL );
 	g_pEngineAPI = ( IEngineAPI * )factory( VENGINE_LAUNCHER_API_VERSION, NULL );
 	g_pMDLCache = (IMDLCache*)factory( MDLCACHE_INTERFACE_VERSION, NULL );
-	p4 = ( IP4 * )factory( P4_INTERFACE_VERSION, NULL );
+	// dimhotepus: No Perforce.
+	// p4 = ( IP4 * )factory( P4_INTERFACE_VERSION, NULL );
     g_Factory = factory;
 
 	if ( !g_pMDLCache || !g_pFileSystem || !g_pFullFileSystem || !materials || !g_pMaterialSystemHardwareConfig || !g_pStudioRender )
 		return false;
 
 	// ensure we're in the same directory as the .EXE
-	char *p;
 	GetModuleFileName(NULL, m_szAppDir, MAX_PATH);
-	p = strrchr(m_szAppDir, '\\');
+	char *p = strrchr(m_szAppDir, '\\');
 	if(p)
 	{
-		// chop off \wc.exe
-		p[0] = 0;
+		// chop off \hammer.exe
+		p[0] = '\0';
 	}
 
 	if ( IsRunningInEngine() )
@@ -483,10 +492,12 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	CHammerCmdLine cmdInfo;
 	ParseCommandLine(cmdInfo);
 	
+#ifndef NO_STEAM
 	// Set up SteamApp() interface (for checking app ownership)
 	SteamAPI_InitSafe();
 	SteamAPI_SetTryCatchCallbacks( false ); // We don't use exceptions, so tell steam not to use try/catch in callback handlers
 	g_SteamAPIContext.Init();
+#endif
 
 	// Load the options
 	// NOTE: Have to do this now, because we need it before Inits() are called 
@@ -552,11 +563,11 @@ bool CHammer::HammerOnIdle(long count)
 // Purpose: Adds a backslash to the end of a string if there isn't one already.
 // Input  : psz - String to add the backslash to.
 //-----------------------------------------------------------------------------
-static void EnsureTrailingBackslash(char *psz)
+static void EnsureTrailingBackslash(char *psz, ptrdiff_t size)
 {
 	if ((psz[0] != '\0') && (psz[strlen(psz) - 1] != '\\'))
 	{
-		strcat(psz, "\\");
+		V_strncat(psz, "\\", size);
 	}
 }
 
@@ -601,22 +612,26 @@ void CHammer::EndImportSettings(void)
 // Input  : dir - Enumerated directory to retrieve.
 //			p - Pointer to buffer that receives the full path to the directory.
 //-----------------------------------------------------------------------------
-void CHammer::GetDirectory(DirIndex_t dir, char *p)
+void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, ptrdiff_t size) const
 {
+	// dimhotepus: Always zero-terminate
+	if (size > 0)
+		p[0] = '\0';
+
 	switch (dir)
 	{
 		case DIR_PROGRAM:
 		{
-			strcpy(p, m_szAppDir);
-			EnsureTrailingBackslash(p);
+			V_strncpy(p, m_szAppDir, size);
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 
 		case DIR_PREFABS:
 		{
-			strcpy(p, m_szAppDir);
-			EnsureTrailingBackslash(p);
-			strcat(p, "Prefabs");
+			V_strncpy(p, m_szAppDir, size);
+			EnsureTrailingBackslash(p, size);
+			V_strncat(p, "Prefabs", size);
 
 			//
 			// Make sure the prefabs directory exists.
@@ -634,8 +649,8 @@ void CHammer::GetDirectory(DirIndex_t dir, char *p)
 		//
 		case DIR_GAME_EXE:
 		{
-			strcpy(p, g_pGameConfig->m_szGameExeDir);
-			EnsureTrailingBackslash(p);
+			V_strncpy(p, g_pGameConfig->m_szGameExeDir, size);
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 
@@ -645,8 +660,8 @@ void CHammer::GetDirectory(DirIndex_t dir, char *p)
 		//
 		case DIR_MOD:
 		{
-			strcpy(p, g_pGameConfig->m_szModDir);
-			EnsureTrailingBackslash(p);
+			V_strncpy(p, g_pGameConfig->m_szModDir, size);
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 
@@ -656,16 +671,16 @@ void CHammer::GetDirectory(DirIndex_t dir, char *p)
 		//
 		case DIR_MATERIALS:
 		{
-			strcpy(p, g_pGameConfig->m_szModDir);
-			EnsureTrailingBackslash(p);
-			Q_strcat(p, "materials\\", MAX_PATH);
+			V_strncpy(p, g_pGameConfig->m_szModDir, size);
+			EnsureTrailingBackslash(p, size);
+			V_strcat(p, "materials\\", MAX_PATH);
 			break;
 		}
 
 		case DIR_AUTOSAVE:
 		{			
-            strcpy( p, m_szAutosaveDir );
-			EnsureTrailingBackslash(p);			
+            V_strncpy( p, m_szAutosaveDir, size );
+			EnsureTrailingBackslash(p, size);			
 			break;
 		}
 	}
@@ -677,7 +692,7 @@ void CHammer::SetDirectory(DirIndex_t dir, const char *p)
 	{
 		case DIR_AUTOSAVE:
 		{
-			strcpy( m_szAutosaveDir, p );
+			V_strcpy_safe( m_szAutosaveDir, p );
 			break;
 		}
 	}
@@ -693,7 +708,7 @@ COLORREF CHammer::GetProfileColor(const char *pszSection, const char *pszKey, in
 	CString strDefault;
 	CString strReturn;
 	char szBuff[128];
-	sprintf(szBuff, "%i %i %i", r, g, b);
+	V_sprintf_safe(szBuff, "%i %i %i", r, g, b);
 
 	strDefault = szBuff;
 
@@ -708,7 +723,7 @@ COLORREF CHammer::GetProfileColor(const char *pszSection, const char *pszKey, in
 	pStart = szBuff;
 	pCurrent = pStart;
 	
-	strcpy( szBuff, (char *)(LPCSTR)strReturn );
+	V_strcpy_safe(szBuff, (LPCSTR)strReturn);
 
 	while (*pCurrent && *pCurrent != ' ')
 		pCurrent++;
@@ -742,7 +757,9 @@ void CHammer::OpenURL(const char *pszURL, HWND hwnd)
 {
 	if (HINSTANCE(32) > ::ShellExecute(hwnd, "open", pszURL, NULL, NULL, 0))
 	{
-		AfxMessageBox("The website couldn't be opened.");
+		CString format;
+		format.Format("The website '%s' couldn't be opened.", pszURL);
+		AfxMessageBox(format, MB_ICONEXCLAMATION);
 	}
 }
 
@@ -753,8 +770,12 @@ void CHammer::OpenURL(const char *pszURL, HWND hwnd)
 void CHammer::OpenURL(UINT nID, HWND hwnd)
 {
 	CString str;
-	str.LoadString(nID);
-	OpenURL(str, hwnd);
+	const BOOL rc{str.LoadString(nID)};
+	// dimhotepus: Open URL only if found.
+	if (rc)
+	{
+		OpenURL(str, hwnd);
+	}
 }
 
 
@@ -781,12 +802,12 @@ void CHammer::Help(const char *pszTopic)
 		// Build the full topic with which to launch the help application.
 		//
 		char szParam[2 * MAX_PATH];
-		strcpy(szParam, szHelpDir);
-		strcat(szParam, "wc.chm");
+		V_strcpy_safe(szParam, szHelpDir);
+		V_strcat_safe(szParam, "wc.chm");
 		if (pszTopic != NULL)
 		{
-			strcat(szParam, "::/");
-			strcat(szParam, pszTopic);
+			V_strcat_safe(szParam, "::/");
+			V_strcat_safe(szParam, pszTopic);
 		}
 
 		//
@@ -798,8 +819,8 @@ void CHammer::Help(const char *pszTopic)
 	if (hResult <= (HINSTANCE)32)
 	{
 		char szError[MAX_PATH];
-		sprintf(szError, "The help system could not be launched. The the following error was returned:\n%s (0x%X)", GetErrorString(), hResult);
-		AfxMessageBox(szError);
+		V_sprintf_safe(szError, "The help system could not be launched. The the following error was returned:\n%s (0x%X)", GetErrorString(), hResult);
+		AfxMessageBox(szError, MB_ICONERROR);
 	}
 	*/
 }
@@ -814,7 +835,7 @@ static SpewRetval_t HammerDbgOutput( SpewType_t spewType, char const *pMsg )
 	switch( spewType )
 	{
 	case SPEW_ERROR:
-		MessageBox( NULL, (LPCTSTR)pMsg, "Fatal Error", MB_OK | MB_ICONINFORMATION );
+		MessageBox( NULL, pMsg, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
 #ifdef _DEBUG
 		return SPEW_DEBUGGER;
 #else
@@ -849,7 +870,7 @@ void UpdatePrefabs_Init()
  
 		if (dwChangeHandle == INVALID_HANDLE_VALUE) 
 		{
-			ExitProcess(GetLastError()); 
+			::exit(::GetLastError()); 
 		}
 	}
 }	 
@@ -873,7 +894,7 @@ void UpdatePrefabs()
 
 		if (FindNextChangeNotification(dwChangeHandle) == FALSE)
 		{
-			ExitProcess(GetLastError()); 
+			exit(::GetLastError()); 
 		}
 	}
 }
@@ -989,9 +1010,10 @@ bool CHammer::Check16BitColor()
 	if (hDC)
 	{
 		int bpp = GetDeviceCaps(hDC, BITSPIXEL);
-		if (bpp < 15)
+		// dimhotepus: Correctly check BPP is 16+
+		if (bpp < 16)
 		{
-			AfxMessageBox("Your screen must be in 16-bit color or higher to run Hammer.");
+			AfxMessageBox("Your screen must be in 16-bit color or higher to run Hammer.", MB_ICONERROR);
 			return false;
 		}
 		::DeleteDC(hDC);
@@ -1019,7 +1041,9 @@ int CHammer::StaticHammerInternalInit( void *pParam )
 InitReturnVal_t CHammer::HammerInternalInit()
 {
 	SpewOutputFunc( HammerDbgOutput );
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
+
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
+
 	InitReturnVal_t nRetVal = BaseClass::Init();
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
@@ -1046,10 +1070,10 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	// HL Shell class name
     wndcls.lpszClassName = "VALVEWORLDCRAFT";
 
-    // Register it, exit if it fails    
+    // Register it, exit if it fails
 	if(!AfxRegisterClass(&wndcls))
 	{
-		AfxMessageBox("Could not register Hammer's main window class");
+		AfxMessageBox("Could not register Hammer's main window class.", MB_ICONERROR);
 		return INIT_FAILED;
 	}
 
@@ -1125,7 +1149,11 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	//
 	CMainFrame *pMainFrame = new CMainFrame;
 	if (!pMainFrame->LoadFrame(IDR_MAINFRAME))
+	{
+		// dimhotepus: Free on error.
+		delete pMainFrame;
 		return INIT_FAILED;
+	}
 
 	m_pMainWnd = pMainFrame;
 
@@ -1199,12 +1227,11 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	if ( Options.general.bClosedCorrectly == FALSE )
 	{
 		CString strLastGoodSave = APP()->GetProfileString("General", "Last Good Save", "");
-        
 		if ( strLastGoodSave.GetLength() != 0 )
 		{
 			char msg[1024];
-			V_snprintf( msg, sizeof( msg ), "Hammer did not shut down correctly the last time it was used.\nWould you like to load the last saved file?\n(%s)", (const char*)strLastGoodSave );
-			if ( AfxMessageBox( msg, MB_YESNO ) == IDYES )
+			V_sprintf_safe( msg, "Hammer did not shut down correctly the last time it was used.\n\nWould you like to load the last saved file?\n(%s)", strLastGoodSave.GetString() );
+			if ( AfxMessageBox( msg, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{
 				LoadLastGoodSave();
 			}
@@ -1239,7 +1266,11 @@ int CHammer::InternalMainLoop()
 {	
 	MSG msg;
 
+#ifdef PLATFORM_64BITS
+	g_pDataCache->SetSize( 256 * 1024 * 1024 );
+#else
 	g_pDataCache->SetSize( 128 * 1024 * 1024 );
+#endif
 
 	// For tracking the idle time state
 	bool bIdle = true;
@@ -1280,8 +1311,6 @@ int CHammer::InternalMainLoop()
 			}
 		}
 	}
-
-	Assert(0);  // not reachable
 }
 
 //-----------------------------------------------------------------------------
@@ -1294,7 +1323,7 @@ void CHammer::Shutdown()
 		MessageToLPreview StopMsg( LPREVIEW_MSG_EXIT );
 		g_HammerToLPreviewMsgQueue.QueueMessage( StopMsg );
 		ThreadJoin( g_LPreviewThread );
-		g_LPreviewThread = 0;
+		g_LPreviewThread = nullptr;
 	}
 
 #ifdef VPROF_HAMMER
@@ -1308,8 +1337,8 @@ void CHammer::Shutdown()
 	UnloadFileSystemDialogModule();
 
 	// Delete the command sequences.
-	int nSequenceCount = m_CmdSequences.GetSize();
-	for (int i = 0; i < nSequenceCount; i++)
+	intp nSequenceCount = m_CmdSequences.GetSize();
+	for (intp i = 0; i < nSequenceCount; i++)
 	{
 		CCommandSequence *pSeq = m_CmdSequences[i];
 		if ( pSeq != NULL )
@@ -1325,6 +1354,10 @@ void CHammer::Shutdown()
 	g_Sounds.ShutDown();
 
 	materials->ModShutdown();
+
+	// dimhotepus: Unlink spew debug output.
+	SpewOutputFunc(nullptr);
+
 	BaseClass::Shutdown();
 }
 
@@ -1423,7 +1456,7 @@ bool CHammer::IsNewDocumentVisible( void )
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 
-class CAboutDlg : public CDialog
+class CAboutDlg : public CBaseDlg
 {
 public:
 	CAboutDlg();
@@ -1454,7 +1487,7 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
+CAboutDlg::CAboutDlg() : CBaseDlg(CAboutDlg::IDD)
 {
 	//{{AFX_DATA_INIT(CAboutDlg)
 	//}}AFX_DATA_INIT
@@ -1467,7 +1500,7 @@ CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 //-----------------------------------------------------------------------------
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAboutDlg)
 	DDX_Control(pDX, IDC_REDHERRING, m_cRedHerring);
 	DDX_Control(pDX, IDC_ORDER, m_Order);
@@ -1483,9 +1516,12 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 void CAboutDlg::OnOrder() 
 {
 	char szBuf[MAX_PATH];
-	GetWindowsDirectory(szBuf, MAX_PATH);
-	strcat(szBuf, "\\notepad.exe");
-	_spawnl(_P_NOWAIT, szBuf, szBuf, "order.txt", NULL);
+	unsigned bufferSize = GetWindowsDirectory(szBuf, MAX_PATH);
+	if (bufferSize != 0 && bufferSize <= std::size(szBuf))
+	{
+		V_strcat_safe(szBuf, "\\notepad.exe");
+		_spawnl(_P_NOWAIT, szBuf, szBuf, "order.txt", NULL);
+	}
 }
 
 
@@ -1540,7 +1576,7 @@ void Encode( char *pstring, char *pkey, int strLen )
 //-----------------------------------------------------------------------------
 BOOL CAboutDlg::OnInitDialog(void)
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	m_Order.SetRedraw(FALSE);
 
@@ -1566,7 +1602,7 @@ BOOL CAboutDlg::OnInitDialog(void)
 		char szTemp2[MAX_PATH];
 		int nBuild = build_number();
 		pWnd->GetWindowText(szTemp1, sizeof(szTemp1));
-		sprintf(szTemp2, szTemp1, nBuild);
+		V_sprintf_safe(szTemp2, szTemp1, nBuild);
 		pWnd->SetWindowText(szTemp2);
 	}
 
@@ -1576,7 +1612,7 @@ BOOL CAboutDlg::OnInitDialog(void)
 #ifdef SDK_BUILD
 	char szTemp[MAX_PATH];
 	GetWindowText(szTemp, sizeof(szTemp));
-	strcat(szTemp, " SDK");
+	V_strcat_safe(szTemp, " SDK");
 	SetWindowText(szTemp);
 #endif // SDK_BUILD
 
@@ -1584,7 +1620,7 @@ BOOL CAboutDlg::OnInitDialog(void)
 }
 
 
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
+BEGIN_MESSAGE_MAP(CAboutDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CAboutDlg)
 	ON_BN_CLICKED(IDC_ORDER, OnOrder)
 	//}}AFX_MSG_MAP
@@ -1625,18 +1661,19 @@ void CHammer::OnFileNew(void)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CHammer::OnFileOpen(void)
+void CHammer::OnFileOpen()
 {
 	static char szInitialDir[MAX_PATH] = "";
 	if (szInitialDir[0] == '\0')
 	{
-		strcpy(szInitialDir, g_pGameConfig->szMapDir);
+		V_strcpy_safe(szInitialDir, g_pGameConfig->szMapDir);
 	}
 
 	// TODO: need to prevent (or handle) opening VMF files when using old map file formats
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf;*.vmm)|*.vmf;*.vmm|Valve Map Files Autosave (*.vmf_autosave)|*.vmf_autosave|Worldcraft RMFs (*.rmf)|*.rmf|Worldcraft Maps (*.map)|*.map||");
 	dlg.m_ofn.lpstrInitialDir = szInitialDir;
-	int iRvl = dlg.DoModal();
+	dlg.m_ofn.lpstrTitle = "Open Valve Map | Valve Map Autosave | Worldcraft RMF | Worldcraft Map File";
+	INT_PTR iRvl = dlg.DoModal();
 
 	if (iRvl == IDCANCEL)
 	{
@@ -1650,7 +1687,7 @@ void CHammer::OnFileOpen(void)
 	int nSlash = str.ReverseFind('\\');
 	if (nSlash != -1)
 	{
-		strcpy(szInitialDir, str.Left(nSlash));
+		V_strcpy_safe(szInitialDir, str.Left(nSlash));
 	}
 
 	if (str.Find('.') == -1)
@@ -1694,12 +1731,12 @@ void CHammer::OnFileOpen(void)
 //-----------------------------------------------------------------------------
 CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName) 
 {
-	if(GetFileAttributes(lpszFileName) == 0xFFFFFFFF)
+	if(GetFileAttributes(lpszFileName) == INVALID_FILE_ATTRIBUTES)
 	{
 		CString		Message;
 
-		Message = "The file " + CString( lpszFileName ) + " does not exist.";
-		AfxMessageBox( Message );
+		Message = "The file '" + CString( lpszFileName ) + "' does not exist.";
+		AfxMessageBox( Message, MB_ICONERROR );
 
 		return NULL;
 	}
@@ -1710,9 +1747,9 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 	if ( pMapDoc )
 	{
 		CMapDoc::SetActiveMapDoc( pMapDoc );
-
 	}
-	if( pDoc && Options.general.bLoadwinpos && Options.general.bIndependentwin)
+
+	if ( pDoc && Options.general.bLoadwinpos && Options.general.bIndependentwin)
 	{
 		::GetMainWnd()->LoadWindowStates();
 	}
@@ -1726,16 +1763,16 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 		pMapDoc->ShowWindow( true );
 	}
 
-	if ( pDoc && ((CMapDoc *)pDoc)->IsAutosave() )
+	if ( pMapDoc->IsAutosave() )
 	{			
 		char szRenameMessage[MAX_PATH+MAX_PATH+256];
-		CString newMapPath = *((CMapDoc *)pDoc)->AutosavedFrom();
+		CString newMapPath = *pMapDoc->AutosavedFrom();
 
-		sprintf( szRenameMessage, "This map was loaded from an autosave file.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
+		V_sprintf_safe( szRenameMessage, "This map was loaded from an autosave file.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
 
-		if ( AfxMessageBox( szRenameMessage, MB_YESNO ) == IDYES )
+		if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 		{			
-			((CMapDoc *)pDoc)->SetPathName( newMapPath );		
+			pMapDoc->SetPathName( newMapPath );
 		}			
 	}
 
@@ -1801,7 +1838,7 @@ void CHammer::LoadSequences(void)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "CmdSeq.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir ); 
 	std::ifstream file(szFullPath, std::ios::in | std::ios::binary);
 	
 	if(!file.is_open())
@@ -1810,26 +1847,28 @@ void CHammer::LoadSequences(void)
 	// skip past header & version
 	float fThisVersion;
 
-	file.seekg(strlen(pszSequenceHdr));
+	file.seekg(std::size(pszSequenceHdr) - 1);
 	file.read((char*)&fThisVersion, sizeof fThisVersion);
 
 	// read number of sequences
 	DWORD dwSize;
-	int nSeq;
-
 	file.read((char*)&dwSize, sizeof dwSize);
-	nSeq = dwSize;
 
-	for(int i = 0; i < nSeq; i++)
+	intp nSeq = dwSize;
+
+	for(intp i = 0; i < nSeq; i++)
 	{
 		CCommandSequence *pSeq = new CCommandSequence;
-		file.read(pSeq->m_szName, 128);
+		file.read(pSeq->m_szName, std::size(pSeq->m_szName));
 
 		// read commands in sequence
 		file.read((char*)&dwSize, sizeof dwSize);
-		int nCmd = dwSize;
+
+		intp nCmd = dwSize;
 		CCOMMAND cmd;
-		for(int iCmd = 0; iCmd < nCmd; iCmd++)
+		memset( &cmd, 0, sizeof(cmd) );
+
+		for(intp iCmd = 0; iCmd < nCmd; iCmd++)
 		{
 			if(fThisVersion < 0.2f)
 			{
@@ -1856,32 +1895,32 @@ void CHammer::SaveSequences(void)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "CmdSeq.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir ); 
 	std::ofstream file( szFullPath, std::ios::out | std::ios::binary );
 
 	// write header
-	file.write(pszSequenceHdr, Q_strlen(pszSequenceHdr));
+	file.write(pszSequenceHdr, std::size(pszSequenceHdr) - 1);
 	// write out version
 	file.write((char*)&fSequenceVersion, sizeof(float));
 
 	// write out each sequence..
-	int i, nSeq = m_CmdSequences.GetSize();
+	intp nSeq = m_CmdSequences.GetSize();
 	DWORD dwSize = nSeq;
 	file.write((char*)&dwSize, sizeof dwSize);
-	for(i = 0; i < nSeq; i++)
+	for(intp i = 0; i < nSeq; i++)
 	{
 		CCommandSequence *pSeq = m_CmdSequences[i];
 
 		// write name of sequence
-		file.write(pSeq->m_szName, 128);
+		file.write(pSeq->m_szName, std::size(pSeq->m_szName));
 		// write number of commands
-		int nCmd = pSeq->m_Commands.GetSize();
+		intp nCmd = pSeq->m_Commands.GetSize();
 		dwSize = nCmd;
 		file.write((char*)&dwSize, sizeof dwSize);
 		// write commands .. 
-		for(int iCmd = 0; iCmd < nCmd; iCmd++)
+		for(intp iCmd = 0; iCmd < nCmd; iCmd++)
 		{
-			CCOMMAND &cmd = pSeq->m_Commands[iCmd];
+			const CCOMMAND &cmd = pSeq->m_Commands[iCmd];
 			file.write((char*)&cmd, sizeof cmd);
 		}
 	}
@@ -1913,9 +1952,9 @@ void CHammer::UpdateLighting(CMapDoc *pDoc)
 	if ( pLighting )
 	{
 		// Update 5x / second.
-		static DWORD lastTime = 0;
+		static ULONGLONG lastTime = 0;
 
-		DWORD curTime = GetTickCount();
+		ULONGLONG curTime = GetTickCount64();
 		if ( curTime - lastTime < 200 )
 		{
 			curPercent = lastPercent; // no change
@@ -1942,7 +1981,7 @@ void CHammer::UpdateLighting(CMapDoc *pDoc)
 	else if( curPercent != lastPercent )
 	{
 		char str[256];
-		sprintf( str, "%.2f%%", curPercent / 100.0f );
+		V_sprintf_safe( str, "%.2f%%", curPercent / 100.0f );
 		SetStatusText( SBI_LIGHTPROGRESS, str );
 	}
 
@@ -2283,7 +2322,7 @@ void CHammer::Autosave( void )
    
 		CString strSaveName = strAutosaveDirectory + strMapTitle + strAutosaveNumber + strExtension + "_autosave";
 
-		pDoc->SaveVMF( (char *)strSaveName.GetBuffer(), SAVEFLAGS_AUTOSAVE );
+		pDoc->SaveVMF( strSaveName.GetBuffer(), SAVEFLAGS_AUTOSAVE );
 		//don't autosave again unless they make changes
 		pDoc->SetAutosaveFlag( FALSE ); 
 
@@ -2300,8 +2339,10 @@ void CHammer::Autosave( void )
 			WIN32_FIND_DATA fileData = autosaveFiles.Element( nFirstElementIndex );
 			DWORD dwOldestFileSize =  fileData.nFileSizeLow;
 			char filename[MAX_PATH];
-			strcpy( filename, fileData.cFileName );
+			V_strcpy_safe( filename, fileData.cFileName );
+
 			DeleteFile( strAutosaveDirectory + filename );
+
 			dwTotalAutosaveDirectorySize -= dwOldestFileSize;
 			autosaveFiles.RemoveAt( nFirstElementIndex );			
 		}
@@ -2328,17 +2369,17 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 	char szRootDir[MAX_PATH];
 	if ( szAutosaveDirectory )
 	{
-		strcpy( szRootDir, szAutosaveDirectory );
-		EnsureTrailingBackslash( szRootDir );
+		V_strcpy_safe( szRootDir, szAutosaveDirectory );
+		EnsureTrailingBackslash( szRootDir, std::size(szRootDir) );
 	}
 	else
 	{
 		APP()->GetDirectory(DIR_AUTOSAVE, szRootDir);
 	}
 
-	if ( szRootDir[0] == 0 )
+	if ( Q_isempty( szRootDir ) )
 	{
-		AfxMessageBox( "No autosave directory has been selected.\nThe autosave feature will be disabled until a directory is entered.", MB_OK );
+		AfxMessageBox( "No autosave directory has been selected.\nThe autosave feature will be disabled until a directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 		return false;
 	}
 	CString strAutosaveDirectory( szRootDir );	
@@ -2346,7 +2387,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		EditorUtil_ConvertPath(strAutosaveDirectory, true);
 		if ( ( strAutosaveDirectory[1] != ':' ) || ( strAutosaveDirectory[2] != '\\' ) )
 		{
-			AfxMessageBox( "The current autosave directory does not have an absolute path.\nThe autosave feature will be disabled until a new directory is entered.", MB_OK );
+			AfxMessageBox( "The current autosave directory does not have an absolute path.\nThe autosave feature will be disabled until a new directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 			return false;
 		}
 	}
@@ -2363,11 +2404,10 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 
 	if ( hDir == INVALID_HANDLE_VALUE )
 	{
-
 		bool bDirResult = CreateDirectory( strAutosaveDirectory, NULL );
 		if ( !bDirResult )
 		{
-			AfxMessageBox( "The current autosave directory does not exist and could not be created.  \nThe autosave feature will be disabled until a new directory is entered.", MB_OK );
+			AfxMessageBox( "The current autosave directory does not exist and could not be created.\nThe autosave feature will be disabled until a new directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 			return false;
 		}
 	}    
@@ -2388,12 +2428,12 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		{
 			 if ( GetLastError() == ERROR_ACCESS_DENIED )
 			 {
-				 AfxMessageBox( "The autosave directory is marked as read only.  Please remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK );
+				 AfxMessageBox( "The autosave directory is marked as read only.\n\nPlease remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
 				 return false;
 			 }
 			 else
 			 {
-				 AfxMessageBox( "There is a problem with the autosave directory.  Please select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK );
+				 AfxMessageBox( "There is a problem with the autosave directory.\n\nPlease select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
 				 return false;
 			 }
 
@@ -2415,7 +2455,7 @@ void CHammer::LoadLastGoodSave( void )
 {	
 	CString strLastGoodSave = APP()->GetProfileString("General", "Last Good Save", "");
 	char szMapDir[MAX_PATH];
-	strcpy(szMapDir, g_pGameConfig->szMapDir);
+	V_strcpy_safe(szMapDir, g_pGameConfig->szMapDir);
 	CDocument *pCurrentDoc;
 
 	if ( !strLastGoodSave.IsEmpty() )
@@ -2424,7 +2464,7 @@ void CHammer::LoadLastGoodSave( void )
 
 		if ( !pCurrentDoc )
 		{
-			AfxMessageBox( "There was an error loading the last saved file.", MB_OK );
+			AfxMessageBox( "There was an error loading the last saved file.", MB_OK | MB_ICONERROR );
 			return;
 		}
 		
@@ -2435,24 +2475,25 @@ void CHammer::LoadLastGoodSave( void )
 		{
 			//This handles the case where someone recovers from a crash and tries to load an autosave file that doesn't have the new autosave chunk in it
 			//It assumes the file should go into the gameConfig map directory
-			char szRenameMessage[MAX_PATH+MAX_PATH+256];
-			char szLastSaveCopy[MAX_PATH];
-			Q_strcpy( szLastSaveCopy, strLastGoodSave );		
+			char szRenameMessage[MAX_PATH+MAX_PATH+256], szLastSaveCopy[MAX_PATH];
+			V_strcpy_safe( szLastSaveCopy, strLastGoodSave );		
+
 			char *pszFileName = Q_strrchr( strLastGoodSave, '\\') + 1;
 			char *pszFileNameEnd = Q_strrchr( strLastGoodSave, '_');
 			if ( !pszFileNameEnd )
 			{
 				pszFileNameEnd = Q_strrchr( strLastGoodSave, '.');
 			}
-			strcpy( pszFileNameEnd, ".vmf" );
+			V_strncpy( pszFileNameEnd, ".vmf",
+				strLastGoodSave.GetLength() - (pszFileNameEnd - strLastGoodSave.GetBuffer()) );
 			CString newMapPath( szMapDir );
 			newMapPath.Append( "\\" );
 			newMapPath.Append( pszFileName );
-			sprintf( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
+			V_sprintf_safe( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
 
-			if ( AfxMessageBox( szRenameMessage, MB_YESNO ) == IDYES )
+			if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{			
-				pCurrentDoc->SetPathName( newMapPath );		
+				pCurrentDoc->SetPathName( newMapPath );
 			}		
 		}
 	}

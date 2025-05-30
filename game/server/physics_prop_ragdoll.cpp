@@ -537,7 +537,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 //-----------------------------------------------------------------------------
 bool CRagdollProp::HasPhysgunInteraction( const char *pszKeyName, const char *pszValue )
 {
-  KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD modelKeyValues("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey("physgun_interactions");

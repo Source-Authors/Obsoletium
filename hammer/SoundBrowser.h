@@ -13,13 +13,15 @@
 // SoundBrowser.h : header file
 //
 
+#include "resource.h"
+#include "windows/base_dlg.h"
 #include "soundsystem.h"
 #include "AutoSelCombo.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CSoundBrowser dialog
 
-class CSoundBrowser : public CDialog
+class CSoundBrowser : public CBaseDlg
 {
 // Construction
 public:
@@ -42,7 +44,7 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CSoundBrowser)
 	public:
-	virtual int DoModal();
+	virtual INT_PTR DoModal();
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
@@ -64,7 +66,7 @@ protected:
 	afx_msg void OnAutoplay();
 	afx_msg void OnBnClickedStopsound();
 	afx_msg void OnRefreshSounds();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnOpenSource();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
@@ -78,7 +80,7 @@ private:
 	bool ShowSoundInList( const char *pSoundName );
 	void OnFilterChanged( const char *pFilter );
 
-	DWORD m_uLastFilterChange;
+	time_t m_uLastFilterChange;
 	BOOL m_bFilterChanged;
 
 	BOOL m_bSoundPlayed;			// used so we can do a timer query to keep disable the stop sound button

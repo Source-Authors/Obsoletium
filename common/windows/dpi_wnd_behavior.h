@@ -13,14 +13,14 @@ FORWARD_DECLARE_HANDLE(HWND);
 typedef unsigned __int64 UINT_PTR, *PUINT_PTR;
 typedef __int64 LONG_PTR, *PLONG_PTR;
 #else
-typedef unsigned int UINT_PTR, *PUINT_PTR;
-typedef long LONG_PTR, *PLONG_PTR;
+typedef unsigned int UINT_PTR, *PUINT_PTR; //-V677
+typedef long LONG_PTR, *PLONG_PTR; //-V677
 #endif
 
 /* Types use for passing & returning polymorphic values */
-typedef UINT_PTR WPARAM;
-typedef LONG_PTR LPARAM;
-typedef LONG_PTR LRESULT;
+typedef UINT_PTR WPARAM; //-V677
+typedef LONG_PTR LPARAM; //-V677
+typedef LONG_PTR LRESULT; //-V677
 
 namespace se::windows::ui {
 
@@ -29,7 +29,7 @@ namespace se::windows::ui {
  */
 class CDpiWindowBehavior {
  public:
-  CDpiWindowBehavior();
+  explicit CDpiWindowBehavior(bool applyDpiOnCreate = true);
 
   /**
    * @brief Callback on WM_CREATE.
@@ -37,12 +37,14 @@ class CDpiWindowBehavior {
    * @return TRUE if success, FALSE otherwise.
    */
   BOOL OnCreateWindow(HWND window);
+
   /**
    * @brief Callback on WM_DESTROY.
    */
   void OnDestroyWindow();
+
   /**
-   * @brief Callback of WM_DPICHANGED.
+   * @brief Callback on WM_DPICHANGED.
    * @param wParam WPARAM.
    * @param lParam LPARAM.
    * @return 0 on handled, non 0 otherwise.
@@ -50,16 +52,33 @@ class CDpiWindowBehavior {
   LRESULT OnWindowDpiChanged(WPARAM wParam, LPARAM lParam);
 
   /**
-   * @brief X DPI.
-   * @return 
+   * @brief Apply current DPI to window and children.
    */
-  [[nodiscard]] unsigned GetDpiX() const { return m_current_dpi_x; }
+  BOOL ApplyDpiToWindow(bool recompute_window_size);
 
   /**
-   * @brief Y DPI.
-   * @return 
+   * @brief Previous X DPI.
+   * @return
    */
-  [[nodiscard]] unsigned GetDpiY() const { return m_current_dpi_y; }
+  [[nodiscard]] unsigned GetPreviousDpiX() const { return m_previous_dpi_x; }
+
+  /**
+   * @brief Previous Y DPI.
+   * @return
+   */
+  [[nodiscard]] unsigned GetPreviousDpiY() const { return m_previous_dpi_y; }
+
+  /**
+   * @brief Current X DPI.
+   * @return
+   */
+  [[nodiscard]] unsigned GetCurrentDpiX() const { return m_current_dpi_x; }
+
+  /**
+   * @brief Current Y DPI.
+   * @return
+   */
+  [[nodiscard]] unsigned GetCurrentDpiY() const { return m_current_dpi_y; }
 
   /**
    * @brief Apply scaling on X axis.
@@ -78,8 +97,10 @@ class CDpiWindowBehavior {
  private:
   HWND m_window_handle;
 
-  unsigned m_current_dpi_x;
-  unsigned m_current_dpi_y;
+  unsigned m_previous_dpi_x, m_previous_dpi_y;
+  unsigned m_current_dpi_x, m_current_dpi_y;
+
+  const bool m_apply_dpi_on_create;
 };
 
 }  // namespace se::windows::ui

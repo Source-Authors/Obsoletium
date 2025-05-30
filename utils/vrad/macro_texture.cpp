@@ -86,7 +86,7 @@ void InitMacroTexture( const char *pBSPFilename )
 	int i = 0;
 	for (i; i < num_entities; ++i)
 	{
-		char* pEntity = ValueForKey(&entities[i], "classname");
+		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if( !strcmp(pEntity, "worldspawn") )
 		{
 			GetVectorForKey( &entities[i], "world_mins", g_MacroWorldMins );
@@ -104,8 +104,8 @@ void InitMacroTexture( const char *pBSPFilename )
 
 	// Load the macro texture that is mapped onto everything.
 	char mapName[512], vtfFilename[512];
-	Q_FileBase( pBSPFilename, mapName, sizeof( mapName ) );
-	Q_snprintf( vtfFilename, sizeof( vtfFilename ), "materials/macro/%s/base.vtf", mapName );
+	Q_FileBase( pBSPFilename, mapName );
+	V_sprintf_safe( vtfFilename, "materials/macro/%s/base.vtf", mapName );
 	g_pGlobalMacroTextureData = LoadMacroTextureFile( vtfFilename );
 
 	
@@ -140,20 +140,19 @@ void InitMacroTexture( const char *pBSPFilename )
 
 inline Vector SampleMacroTexture( const CMacroTextureData *t, const Vector &vWorldPos )
 {
-	int ix = (int)RemapVal( vWorldPos.x, g_MacroWorldMins.x, g_MacroWorldMaxs.x, 0, t->m_Width-0.00001 );
-	int iy = (int)RemapVal( vWorldPos.y, g_MacroWorldMins.y, g_MacroWorldMaxs.y, 0, t->m_Height-0.00001 );
+	int ix = (int)RemapVal( vWorldPos.x, g_MacroWorldMins.x, g_MacroWorldMaxs.x, 0, t->m_Width-0.00001f );
+	int iy = (int)RemapVal( vWorldPos.y, g_MacroWorldMins.y, g_MacroWorldMaxs.y, 0, t->m_Height-0.00001f );
 	ix = clamp( ix, 0, t->m_Width-1 );
 	iy = t->m_Height - 1 - clamp( iy, 0, t->m_Height-1 );
 
 	const unsigned char *pInputColor = &t->m_ImageData[(iy*t->m_Width + ix) * 4];
-	return Vector( pInputColor[0] / 255.0, pInputColor[1] / 255.0, pInputColor[2] / 255.0 );
+	return Vector( pInputColor[0] / 255.0f, pInputColor[1] / 255.0f, pInputColor[2] / 255.0f );
 }
 
 
 void ApplyMacroTextures( int iFace, const Vector &vWorldPos, Vector &outLuxel )
 {
 	// Add the global macro texture.
-	Vector vGlobal;
 	if ( g_pGlobalMacroTextureData )
 		outLuxel *= SampleMacroTexture( g_pGlobalMacroTextureData, vWorldPos );
 

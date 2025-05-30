@@ -47,7 +47,7 @@ void CLabeledCommandComboBox::AddItem( char const *text, char const *engineComma
 		wchar_t *localized = g_pVGuiLocalize->Find(text);
 		if (localized)
 		{
-			g_pVGuiLocalize->ConvertUnicodeToANSI(localized, item->name, sizeof(item->name));
+			g_pVGuiLocalize->ConvertUnicodeToANSI(localized, item->name);
 		}
 	}
 

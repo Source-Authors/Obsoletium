@@ -6,11 +6,10 @@
 //
 //=============================================================================//
 
-#include <mxtk/mxWindow.h>
 #include "mxBitmapWindow.h"
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <mxtk/mxwindow.h>
 #include "tier0/dbg.h"
+#include "winlite.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -21,12 +21,20 @@
 #define CHAR_SPATIALSTEREO	')'		// as one of 1st 2 chars in name, indicates spatialized stereo wav
 #define CHAR_FAST_PITCH		'}'		// as one of 1st 2 chars in name, forces low quality, non-interpolated pitch shift
 
-inline bool IsSoundChar(char c)
+constexpr inline bool IsSoundChar(char c)
 {
-	bool b;
-
-	b = (c == CHAR_STREAM || c == CHAR_USERVOX || c == CHAR_SENTENCE || c == CHAR_DRYMIX || c == CHAR_OMNI );
-	b = b || (c == CHAR_DOPPLER || c == CHAR_DIRECTIONAL || c == CHAR_DISTVARIANT || c == CHAR_SPATIALSTEREO || c == CHAR_FAST_PITCH );
+	bool b =
+		c == CHAR_STREAM ||
+		c == CHAR_USERVOX ||
+		c == CHAR_SENTENCE ||
+		c == CHAR_DRYMIX ||
+		c == CHAR_OMNI;
+	b = b ||
+		c == CHAR_DOPPLER ||
+		c == CHAR_DIRECTIONAL ||
+		c == CHAR_DISTVARIANT ||
+		c == CHAR_SPATIALSTEREO ||
+		c == CHAR_FAST_PITCH;
 
 	return b;
 }
@@ -34,32 +42,28 @@ inline bool IsSoundChar(char c)
 // return pointer to first valid character in file name
 // by skipping over CHAR_STREAM...CHAR_DRYMIX
 
-inline char *PSkipSoundChars(const char *pch)
+inline const char *PSkipSoundChars(const char *pch)
 {
-	char *pcht = (char *)pch;
-
 	while ( 1 )
 	{
-		if (!IsSoundChar(*pcht))
+		if (!IsSoundChar(*pch))
 			break;
-		pcht++;
+		pch++;
 	}
 
-	return pcht;
+	return pch;
 }
 
 
 inline bool TestSoundChar(const char *pch, char c)
 {
-	char *pcht = (char *)pch;
-
 	while ( 1 )
 	{
-		if (!IsSoundChar(*pcht))
+		if (!IsSoundChar(*pch))
 			break;
-		if (*pcht == c)
+		if (*pch == c)
 			return true;
-		pcht++;
+		pch++;
 	}
 
 	return false;

@@ -18,8 +18,8 @@ class CPhysicsObject;
 class CPhysicsEnvironment;
 class IVP_Real_Object;
 
-bool ShouldOverrideWheelContactFriction( float *pFrictionOut, IVP_Real_Object *pivp0, IVP_Real_Object *pivp1, IVP_U_Float_Point *pNormal );
+[[nodiscard]] bool ShouldOverrideWheelContactFriction( float *pFrictionOut, IVP_Real_Object *pivp0, IVP_Real_Object *pivp1, IVP_U_Float_Point *pNormal );
 
-IPhysicsVehicleController *CreateVehicleController( CPhysicsEnvironment *pEnv, CPhysicsObject *pBodyObject, const vehicleparams_t &params, unsigned int nVehicleType, IPhysicsGameTrace *pGameTrace );
+[[nodiscard]] IPhysicsVehicleController *CreateVehicleController( CPhysicsEnvironment *pEnv, CPhysicsObject *pBodyObject, const vehicleparams_t &params, unsigned int nVehicleType, IPhysicsGameTrace *pGameTrace );
 
 #endif // PHYSICS_VEHICLE_H

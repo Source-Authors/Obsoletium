@@ -324,7 +324,7 @@ void CBaseProp::CalculateBlockLOS( void )
 //-----------------------------------------------------------------------------
 int CBaseProp::ParsePropData( void )
 {
-  KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD modelKeyValues("");
 	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		return PARSE_FAILED_NO_DATA;
@@ -2031,7 +2031,7 @@ void CDynamicProp::CreateBoneFollowers()
 	if ( m_BoneFollowerManager.GetNumBoneFollowers() )
 		return;
 
-	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD modelKeyValues("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		// Do we have a bone follower section?
@@ -2812,7 +2812,7 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 //-----------------------------------------------------------------------------
 bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 {
-  KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD modelKeyValues("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
@@ -2835,7 +2835,7 @@ bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 //-----------------------------------------------------------------------------
 float CPhysicsProp::GetCarryDistanceOffset( void )
 {
-	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD modelKeyValues("");
 	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
@@ -3740,7 +3740,7 @@ void CBasePropDoor::CalcDoorSounds()
 	{
 		// Otherwise, use the sounds specified by the model keyvalues. These are looked up
 		// based on skin and hardware.
-		KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+		KeyValuesAD modelKeyValues("");
 		if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 		{
 			KeyValues *pkvDoorSounds = modelKeyValues->FindKey("door_options");

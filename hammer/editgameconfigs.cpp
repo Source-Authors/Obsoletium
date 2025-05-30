@@ -23,26 +23,27 @@
 
 CEditGameConfigs::CEditGameConfigs(BOOL bSelectOnly, 
 								   CWnd* pParent /*=NULL*/)
-	: CDialog(CEditGameConfigs::IDD, pParent)
+	: CBaseDlg(CEditGameConfigs::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CEditGameConfigs)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 
 	m_bSelectOnly = bSelectOnly;
+	m_pSelectedGame = nullptr;
 }
 
 
 void CEditGameConfigs::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditGameConfigs)
 	DDX_Control(pDX, IDC_CONFIGS, m_cConfigs);
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CEditGameConfigs, CDialog)
+BEGIN_MESSAGE_MAP(CEditGameConfigs, CBaseDlg)
 	//{{AFX_MSG_MAP(CEditGameConfigs)
 	ON_BN_CLICKED(IDC_ADD, OnAdd)
 	ON_BN_CLICKED(IDC_COPY, OnCopy)
@@ -65,7 +66,7 @@ void CEditGameConfigs::OnAdd()
 
 	// add a new game config
 	CGameConfig *pConfig = Options.configs.AddConfig();
-	strcpy(pConfig->szName, dlg.m_string);
+	V_strcpy_safe(pConfig->szName, dlg.m_string);
 
 	FillConfigList(pConfig->dwID);
 }
@@ -76,8 +77,8 @@ void CEditGameConfigs::OnCopy()
 	if(iCurSel == CB_ERR)
 		return;
 
-	CGameConfig *pConfig = Options.configs.FindConfig(
-		m_cConfigs.GetItemData(iCurSel));
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(
+		m_cConfigs.GetItemData(iCurSel)));
 
 	CGameConfig *pNewConfig = Options.configs.AddConfig();
 	pNewConfig->CopyFrom(pConfig);
@@ -92,8 +93,8 @@ void CEditGameConfigs::OnRemove()
 		return;
 
 	int iArrayIndex;
-	CGameConfig *pConfig = Options.configs.FindConfig(
-		m_cConfigs.GetItemData(iCurSel), &iArrayIndex);
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(
+		m_cConfigs.GetItemData(iCurSel)), &iArrayIndex);
 
 	// check to see if any docs use this game - if so, can't
 	//  delete it.
@@ -105,7 +106,7 @@ void CEditGameConfigs::OnRemove()
 			AfxMessageBox("You can't delete this game configuration now\n"
 				"because some loaded documents are using it.\n"
 				"If you want to delete it, you must close those\n"
-				"documents first.");
+				"documents first.", MB_ICONERROR);
 			return;
 		}
 	}
@@ -116,7 +117,7 @@ void CEditGameConfigs::OnRemove()
 	if ( Options.configs.nConfigs <= 1 )
 	{
 		if ( AfxMessageBox( "At least one configuration must be present!\n"
-							"Would you like to reset to the default configurations?", MB_YESNO ) == IDNO )
+							"Would you like to reset to the default configurations?", MB_YESNO | MB_ICONQUESTION ) == IDNO )
 		{
 			return;
 		}
@@ -152,7 +153,7 @@ void CEditGameConfigs::FillConfigList(DWORD dwSelectID)
 	
 	if(m_cConfigs.GetCurSel() != LB_ERR && dwCurID == 0xFFFFFFFF)
 	{
-		dwCurID = m_cConfigs.GetItemData(m_cConfigs.GetCurSel());
+		dwCurID = static_cast<DWORD>(m_cConfigs.GetItemData(m_cConfigs.GetCurSel()));
 	}
 
 	m_cConfigs.ResetContent();
@@ -187,13 +188,13 @@ void CEditGameConfigs::OnSelchangeConfigs()
 	if(iCurSel == LB_ERR)
 		return;
 
-	m_pSelectedGame = Options.configs.FindConfig(
-		m_cConfigs.GetItemData(iCurSel));
+	m_pSelectedGame = Options.configs.FindConfig(static_cast<DWORD>(
+		m_cConfigs.GetItemData(iCurSel)));
 }
 
 BOOL CEditGameConfigs::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if(m_bSelectOnly)
 	{

@@ -27,7 +27,7 @@ public:
 
 	// budgetFlagsFilter is a combination of BUDGETFLAG_ defines that filters out which budget groups we are interested in.
 	CBudgetPanelShared( vgui::Panel *pParent, const char *pElementName, int budgetFlagsFilter );
-	~CBudgetPanelShared();
+	virtual ~CBudgetPanelShared();
 
 	// Override this to set the window position.
 	virtual void SetupCustomConfigData( CBudgetPanelConfigData &data );
@@ -35,9 +35,9 @@ public:
 	virtual void SetTimeLabelText();
 	virtual void SetHistoryLabelText();
 
-	virtual void PaintBackground();
-	virtual void Paint( void );
-	virtual void PostChildPaint();
+	void PaintBackground() override;
+	void Paint( void ) override;
+	void PostChildPaint() override;
 
 	virtual void SnapshotVProfHistory( float filteredtime  );
 

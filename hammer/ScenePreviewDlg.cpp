@@ -5,8 +5,9 @@
 //=============================================================================
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "ScenePreviewDlg.h"
+
+#include "hammer.h"
 #include "choreoscene.h"
 #include "soundsystem.h"
 
@@ -17,7 +18,7 @@
 #define WM_SCENEPREVIEW_IDLE	(WM_USER+1)
 
 
-BEGIN_MESSAGE_MAP(CScenePreviewDlg, CDialog)
+BEGIN_MESSAGE_MAP(CScenePreviewDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CScenePreviewDlg)
 	ON_BN_CLICKED(IDCANCEL, OnCancel)
 	//}}AFX_MSG_MAP
@@ -25,7 +26,7 @@ END_MESSAGE_MAP()
 
 
 CScenePreviewDlg::CScenePreviewDlg( CChoreoScene *pScene, const char *pFilename, CWnd* pParent /*=NULL*/ )
-	: CDialog(CScenePreviewDlg::IDD, pParent)
+	: CBaseDlg(CScenePreviewDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CScenePreviewDlg)
 	m_pScene = pScene;
@@ -33,6 +34,7 @@ CScenePreviewDlg::CScenePreviewDlg( CChoreoScene *pScene, const char *pFilename,
 	m_hExitThreadEvent = NULL;
 	m_hIdleEventHandledEvent = NULL;
 	m_hIdleThread = NULL;
+	m_flStartTime = 0;
 	V_strncpy( m_SceneFilename, pFilename, sizeof( m_SceneFilename ) );
 }
 
@@ -60,7 +62,7 @@ void CScenePreviewDlg::EndThread()
 
 BOOL CScenePreviewDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	// Setup the control showing the scene name.
 	CString str;
@@ -90,14 +92,17 @@ BOOL CScenePreviewDlg::OnInitDialog()
 	// Create our idle thread.
 	m_hExitThreadEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
 	m_hIdleEventHandledEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
-	m_hIdleThread = CreateThread( NULL, 0, &CScenePreviewDlg::StaticIdleThread, this, 0, NULL );
+	m_hIdleThread = (HANDLE)_beginthreadex( NULL, 0, &CScenePreviewDlg::StaticIdleThread, this, 0, NULL );
 	
 	return TRUE;
 }
 
 
-DWORD CScenePreviewDlg::StaticIdleThread( LPVOID pParameter )
+unsigned __stdcall CScenePreviewDlg::StaticIdleThread( void *pParameter )
 {
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName("ScenePreview");
+
 	return ((CScenePreviewDlg*)pParameter)->IdleThread();
 }
 
@@ -188,7 +193,7 @@ LRESULT CScenePreviewDlg::DefWindowProc( UINT message, WPARAM wParam, LPARAM lPa
 		return 0;
 	}
 	
-	return CDialog::DefWindowProc( message, wParam, lParam );
+	return __super::DefWindowProc( message, wParam, lParam );
 }
 
 

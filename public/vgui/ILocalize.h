@@ -19,6 +19,6 @@ namespace vgui
 	class ILocalize : public ::ILocalize { };		// backwards compatability with vgui::ILocalize declarations
 }
 
-#define VGUI_LOCALIZE_INTERFACE_VERSION "VGUI_Localize005"
+constexpr inline char VGUI_LOCALIZE_INTERFACE_VERSION[]{"VGUI_Localize005"};
 
 #endif // ILOCALIZE_H

@@ -45,7 +45,8 @@ private:
 	class CQueuedPacket
 	{
 	public:
-		uint32				m_unSendTime;
+		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+		uint64				m_unSendTime;
 		const void 			*m_pChannel;  // We don't actually use the channel
 		socket_handle		m_Socket;
 		CUtlVector<char>	to;	// sockaddr
@@ -159,14 +160,15 @@ void CQueuedPacketSender::QueuePacket( INetChannel *pChan, SOCKET s, const char 
 	AUTO_LOCK( m_QueuedPacketsCS );
 
 	// We'll pull all packets we should have sent by now and send them out right away
-	uint32 msNow = Plat_MSTime();
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	uint64 mcsNow = Plat_USTime();
 
 	int nMaxQueuedPackets = 1024;
 	if ( m_QueuedPackets.Count() < nMaxQueuedPackets )
 	{
 		// Add this packet to the queue.
 		CQueuedPacket *pPacket = new CQueuedPacket;
-		pPacket->m_unSendTime = msNow + msecDelay;
+		pPacket->m_unSendTime = mcsNow + msecDelay * 1000LLU;
 		pPacket->m_Socket = s;
 		pPacket->m_pChannel = pChan;
 		pPacket->buf.CopyArray( (char*)buf, len );
@@ -211,23 +213,24 @@ int CQueuedPacketSender::Run()
 			AUTO_LOCK( m_QueuedPacketsCS );
 		
 			// We'll pull all packets we should have sent by now and send them out right away
-			uint32 msNow = Plat_MSTime();
+			// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+			uint64 mcsNow = Plat_USTime();
 
 			bool bTrace = net_queue_trace.GetInt() == NET_QUEUED_PACKET_THREAD_DEBUG_VALUE;
 
 			while ( m_QueuedPackets.Count() > 0 )
 			{
 				CQueuedPacket *pPacket = m_QueuedPackets.ElementAtHead();
-				if ( pPacket->m_unSendTime > msNow )
+				if ( pPacket->m_unSendTime > mcsNow )
 				{
 					// Sleep until next we need this packet
-					waitInterval = pPacket->m_unSendTime - msNow;
+					waitInterval = (pPacket->m_unSendTime - mcsNow) / 1000;
 					// Emit ETW events to help with diagnosing network throttling issues as
 					// these often have a severe effect on load times in Dota.
 					ETWMark1I( "CQueuedPacketSender::Run sleeping (ms)", waitInterval );
 					if ( bTrace )
 					{
-						Warning( "SQ:  sleeping for %u msecs at %f\n", waitInterval, Plat_FloatTime() );
+						Warning( "SQ:  sleeping for %u ms at %f\n", waitInterval, Plat_FloatTime() );
 					}
 					break;
 				}

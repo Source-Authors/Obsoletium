@@ -16,6 +16,11 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\portal;.\hl2;.\episodic;$SRCDIR\game\shared\Multiplayer;$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\portal;.\portal"
 		$PreprocessorDefinitions		"$BASE;PORTAL;HL2_DLL;HL2_EPISODIC;USES_SAVERESTORE"
 	}
+
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\portal"
+	}
 }
 
 $Project "Server (Portal)"

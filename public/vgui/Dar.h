@@ -12,8 +12,8 @@
 #pragma once
 #endif
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <vgui/VGUI.h>
 #include "tier1/utlvector.h"
 

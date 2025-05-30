@@ -53,7 +53,7 @@ bool CToolPickAngles::OnLMouseUp3D(CMapView3D *pView, UINT nFlags, const Vector2
 //-----------------------------------------------------------------------------
 bool CToolPickAngles::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D &vPoint)
 {
-	unsigned long ulFace;
+	unsigned ulFace;
 	CMapClass *pObject = pView->NearestObjectAt( vPoint, ulFace);
 	if (pObject != NULL)
 	{

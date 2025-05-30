@@ -195,7 +195,7 @@ public:
 	const ShadowShaderState_t *CurrentShadowShaderState() const;
 
 	// Return the current shapshot
-	int CurrentSnapshot() const { return m_CurrentSnapshotId; }
+	StateSnapshot_t CurrentSnapshot() const { return m_CurrentSnapshotId; }
 
 	CurrentState_t& CurrentState() { return m_CurrentState; }
 
@@ -224,7 +224,7 @@ private:
 		INVALID_TRANSITION_OP = 0xFFFFFF
 	};
 
-	typedef short ShadowStateId_t;
+	typedef intp ShadowStateId_t;
 
 	// For the transition table
 	struct TransitionList_t
@@ -304,10 +304,10 @@ private:
 	void AddTextureTransition( TextureStateFunc_t func, int stage );
 
 	// Apply a transition
-	void ApplyTransition( TransitionList_t& list, int snapshot );
+	void ApplyTransition( TransitionList_t& list, StateSnapshot_t snapshot );
 
 	// Creates an entry in the transition table
-	void CreateTransitionTableEntry( int to, int from );
+	void CreateTransitionTableEntry( ShadowStateId_t to, ShadowStateId_t from );
 
 	// Checks if a state is valid
 	bool TestShadowState( const ShadowState_t& state, const ShadowShaderState_t &shaderState );
@@ -316,7 +316,7 @@ private:
 	void PerformShadowStateOverrides( );
 
 	// Applies the transition list
-	void ApplyTransitionList( int snapshot, int nFirstOp, int nOpCount );
+	void ApplyTransitionList( StateSnapshot_t snapshot, int nFirstOp, int nOpCount );
 
 	// Apply shader state (stuff that doesn't lie in the transition table)
 	void ApplyShaderState( const ShadowState_t &shadowState, const ShadowShaderState_t &shaderState );

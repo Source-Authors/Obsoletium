@@ -78,7 +78,13 @@ protected:
 	DWORD GetDrawFlags() { return m_dwDrawFlags; }
 	void SetDrawColors(COLORREF dwHandleColor, COLORREF dwBoxColor);
 
-	virtual void GetStatusString(char *pszBuf);
+	virtual void GetStatusString(char *pszBuf, intp bufSize);
+	template<intp size>
+	void GetStatusString(char (&buffer)[size])
+	{
+		GetStatusString(buffer, size);
+	}
+
     unsigned long UpdateCursor(CMapView *pView, const Vector &vHandleHit, TransformMode_t eTransformMode);
 
 	void HandleToWorld( Vector &vWorld, const Vector &vHandle, const Vector *pCustomHandleBox = NULL);

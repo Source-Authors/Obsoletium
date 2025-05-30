@@ -13,11 +13,12 @@
 //=============================================================================
 
 #include "stdafx.h"
+#include "SSolid.h"
+
 #include "BrushOps.h"
 #include "GameConfig.h"
 #include "MapSolid.h"
 #include "MapWorld.h"
-#include "SSolid.h"
 #include "StockSolids.h"
 #include "Options.h"
 #include "WorldSize.h"
@@ -65,14 +66,14 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 
 	if(!nPoints)
 	{
-		strcpy(pInfo->szDescription, "no points");
+		V_strcpy_safe(pInfo->szDescription, "no points");
 		pInfo->iPoint = -2;
 		return FALSE;
 	}
 
 	if(nPoints < 3)
 	{
-		strcpy(pInfo->szDescription, "fewer than three points");
+		V_strcpy_safe(pInfo->szDescription, "fewer than three points");
 		pInfo->iPoint = -2;
 		return FALSE;
 	}
@@ -87,7 +88,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 		{
 			if (p1[j] > MAX_COORD_INTEGER || p1[j] < MIN_COORD_INTEGER)
 			{
-				strcpy(pInfo->szDescription, "out of range");
+				V_strcpy_safe(pInfo->szDescription, "out of range");
 				return FALSE;
 			}
 		}
@@ -96,7 +97,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 		d = DotProduct (p1, *pNormal) - dist;
 		if (d < -ON_PLANE_EPSILON || d > ON_PLANE_EPSILON)
 		{
-			strcpy(pInfo->szDescription, "point off plane");
+			V_strcpy_safe(pInfo->szDescription, "point off plane");
 			return FALSE;
 		}
 
@@ -106,7 +107,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 
 		if (VectorLength (dir) < MIN_EDGE_LENGTH_EPSILON)
 		{
-			strcpy(pInfo->szDescription, "edge is too small");
+			V_strcpy_safe(pInfo->szDescription, "edge is too small");
 			return FALSE;
 		}
 
@@ -123,7 +124,7 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector* pNormal, float dist, CCheckF
 			d = DotProduct (Points[j], edgenormal);
 			if (d > edgedist)
 			{
-				strcpy(pInfo->szDescription, "face is not convex");
+				V_strcpy_safe(pInfo->szDescription, "face is not convex");
 				return FALSE;
 			}
 		}
@@ -154,7 +155,9 @@ CSSolid::CSSolid()
 //-----------------------------------------------------------------------------
 CSSolid::~CSSolid()
 {
-	memset(this, 0, sizeof(this));
+	// dimhotepus: WTF?
+	constexpr size_t membersOffset = offsetof(CSSolid, m_nVertices);
+	memset(reinterpret_cast<byte*>(this) + membersOffset, 0, sizeof(*this) - membersOffset);
 }
 
 
@@ -183,7 +186,7 @@ BOOL CSSolid::GetHandleInfo(SSHANDLEINFO *pInfo, SSHANDLE id)
 
 		pInfo->Type = shtVertex;
 		pInfo->iIndex = i;
-		pInfo->pData = PVOID(& m_Vertices[i]);
+		pInfo->pData = & m_Vertices[i];
 		pInfo->p2DHandle = & m_Vertices[i];
 		pInfo->pos = m_Vertices[i].pos;
 
@@ -206,7 +209,7 @@ BOOL CSSolid::GetHandleInfo(SSHANDLEINFO *pInfo, SSHANDLE id)
 	}
 
 	// try faces ..
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		if(m_Faces[i].id != id)
 			continue;	// not this one
@@ -356,10 +359,12 @@ Vector * CSSolid::CreatePointList(CSSFace & face)
 
 		if(!edgeCur || !edgeNext)
 		{
+			// dimhotepus: Free points on error.
+			delete[] pts;
 			CString str;
 			str.Format("Conversion error!\n"
 				"edgeCur = %p, edgeNext = %p", edgeCur, edgeNext);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONERROR);
 			return NULL;
 		}
 
@@ -367,10 +372,12 @@ Vector * CSSolid::CreatePointList(CSSFace & face)
 
 		if(!hVertex)
 		{
+			// dimhotepus: Free points on error.
+			delete[] pts;
 			CString str;
 			str.Format("Conversion error!\n"
 				"hVertex = %08X", hVertex);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONERROR);
 			return NULL;
 		}
 
@@ -462,7 +469,7 @@ CMapSolid *CSSolid::Detach()
 //-----------------------------------------------------------------------------
 bool CSSolid::HasDisps( void )
 {
-	for ( int iFace = 0; iFace < m_nFaces; ++iFace )
+	for ( short iFace = 0; iFace < m_nFaces; ++iFace )
 	{
 		CSSFace *pFace = &m_Faces[iFace];
 		if ( pFace->m_hDisp != EDITDISPHANDLE_INVALID )
@@ -481,7 +488,7 @@ bool CSSolid::IsValidWithDisps( void )
 	if ( !HasDisps() )
 		return true;
 
-	for ( int iFace = 0; iFace < m_nFaces; ++iFace )
+	for ( short iFace = 0; iFace < m_nFaces; ++iFace )
 	{
 		// Get the face(s) that have displacements.
 		CSSFace *pFace = &m_Faces[iFace];
@@ -509,7 +516,7 @@ bool CSSolid::IsValidWithDisps( void )
 //-----------------------------------------------------------------------------
 void CSSolid::DestroyDisps( void )
 {
-	for ( int iFace = 0; iFace < m_nFaces; ++iFace )
+	for ( short iFace = 0; iFace < m_nFaces; ++iFace )
 	{
 		CSSFace *pFace = &m_Faces[iFace];
 		if ( pFace->m_hDisp != EDITDISPHANDLE_INVALID )
@@ -547,7 +554,7 @@ void CSSolid::ToMapSolid(CMapSolid *p)
 	unsigned char r, g, b;
 	pSolid->GetRenderColor( r,g,b );
 
-	for (int i = 0; i < m_nFaces; i++)
+	for (short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &pFace = m_Faces[i];
 		CMapFace SolidFace;
@@ -605,6 +612,7 @@ void CSSolid::ToMapSolid(CMapSolid *p)
 
 CSSFace* CSSolid::AddFace(int* piNewIndex)
 {
+	Assert(m_nFaces < SHRT_MAX);
 	m_Faces.SetCount(++m_nFaces);
 	if(piNewIndex)
 		piNewIndex[0] = m_nFaces-1;
@@ -767,7 +775,7 @@ void CSSolid::FromMapSolid(CMapSolid *p, bool bSkipDisplacementFaces)
 					// YWB try filling in front side
 					//  rather than Assert(0) crash
 					pEdge->Faces[0] = pFace->id;
-					AfxMessageBox("Edge with both face id's already filled, skipping...");
+					AfxMessageBox("Edge with both face id's already filled, skipping...", MB_ICONINFORMATION);
 				}
 			}
 
@@ -874,7 +882,7 @@ void CSSolid::MoveSelectedHandles(const Vector &Delta)
 // check faces for irregularities ->
 void CSSolid::CheckFaces()
 {
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &face = m_Faces[i];
 
@@ -888,7 +896,7 @@ void CSSolid::CheckFaces()
 		{
 			CString str;
 			str.Format("face %d - %s", i, cfi.szDescription);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONINFORMATION);
 		}
 
 		delete[] pts;
@@ -1058,7 +1066,7 @@ DoNextFace:
 		goto DoNextFace;
 	}
 
-	delete phVertexList;
+	delete[] phVertexList;
 
 	return(TRUE);
 }
@@ -1202,7 +1210,7 @@ DoNextFace:
 	delete phVertexList;
 
 	// ** now regular faces **
-	for(int iFace = 0; iFace < m_nFaces; iFace++)
+	for(short iFace = 0; iFace < m_nFaces; iFace++)
 	{
 		CSSFace *pUpdFace = &m_Faces[iFace];
 
@@ -1269,7 +1277,7 @@ void CSSolid::DeleteEdge(int iEdge)
 	memset(&m_Edges[m_nEdges], 0, sizeof(CSSEdge));
 
 	// kill all references to this edge in faces
-	for(int f = 0; f < m_nFaces; f++)
+	for(short f = 0; f < m_nFaces; f++)
 	{
 		CSSFace& face = m_Faces[f];
 		for(int e = 0; e < face.nEdges; e++)
@@ -1298,7 +1306,7 @@ void CSSolid::DeleteVertex(int iVertex)
 }
 
 
-void CSSolid::DeleteFace(int iFace)
+void CSSolid::DeleteFace(short iFace)
 {
 	// Destroy the displacement if there is one.
 	CSSFace *pFace = &m_Faces[iFace];
@@ -1311,10 +1319,12 @@ void CSSolid::DeleteFace(int iFace)
 		}
 	}
 
-	for(int i2 = iFace; i2 < m_nFaces-1; i2++)
+	for(short i2 = iFace; i2 < m_nFaces-1; i2++)
 	{
 		memcpy(&m_Faces[i2], &m_Faces[i2+1], sizeof(CSSFace));
 	}
+	Assert(m_nFaces > 0);
+
 	--m_nFaces;
 
 	m_Faces[m_nFaces].Init();
@@ -1514,7 +1524,7 @@ DoEdges:
 			SSHANDLE id2 = edge2.id;
 			SSHANDLE id1 = edge.id;
 
-			for(int f = 0; f < m_nFaces; f++)
+			for(short f = 0; f < m_nFaces; f++)
 			{
 				CSSFace& face = m_Faces[f];
 				for(int ef = 0; ef < face.nEdges; ef++)
@@ -1535,7 +1545,7 @@ DoEdges:
 	}
 
 	// delete concurrent edge references in face
-	for(int f = 0; f < m_nFaces; f++)
+	for(short f = 0; f < m_nFaces; f++)
 	{
 		CSSFace& face = m_Faces[f];
 
@@ -1607,8 +1617,10 @@ CSSFace::~CSSFace(void)
 		EditDispMgr()->Destroy( m_hDisp );
 		m_hDisp = EDITDISPHANDLE_INVALID;
 	}
-
-	memset(this, 0, sizeof(this));
+	
+	// dimhotepus: WTF?
+	constexpr size_t membersOffset = offsetof(CSSFace, Edges);
+	memset(reinterpret_cast<byte*>(this) + membersOffset, 0, sizeof(*this) - membersOffset);
 }
 
 
@@ -1626,7 +1638,9 @@ CSSEdge::CSSEdge(void)
 //-----------------------------------------------------------------------------
 CSSEdge::~CSSEdge()
 {
-	memset(this, 0, sizeof(this));
+	// dimhotepus: WTF?
+	constexpr size_t membersOffset = offsetof(CSSEdge, hvStart);
+	memset(reinterpret_cast<byte*>(this) + membersOffset, 0, sizeof(*this) - membersOffset);
 }
 
 
@@ -1668,11 +1682,11 @@ void CSSVertex::GetPosition(Vector& Position)
 void CSSolid::SerializeDXF(FILE *stream, int nObject)
 {
 	char szName[128];
-	sprintf(szName, "OBJECT%03d", nObject);
+	V_sprintf_safe(szName, "OBJECT%03d", nObject);
 
 	// count number of triangulated faces
 	int nTriFaces = 0;
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &face = m_Faces[i];
 		nTriFaces += face.nEdges-2;
@@ -1688,7 +1702,7 @@ void CSSolid::SerializeDXF(FILE *stream, int nObject)
 	}
 
 	// triangulate each face and write
-	for(int i = 0; i < m_nFaces; i++)
+	for(short i = 0; i < m_nFaces; i++)
 	{
 		CSSFace &face = m_Faces[i];
 		PINT pVerts = CreatePointIndexList(face);
@@ -1705,6 +1719,9 @@ void CSSolid::SerializeDXF(FILE *stream, int nObject)
 				v == (face.nEdges-3) ? pVerts[v+2] : -pVerts[v+2]
 				);
 		}
+
+		// dimhotepus: Fix vertices leak.
+		delete[] pVerts;
 	}
 
 	fprintf(stream, "0\nSEQEND\n8\n%s\n", szName);

@@ -10,6 +10,8 @@
 #pragma once
 #endif
 
-char	*VarArgs( char *format, ... );
+#include "tier0/annotations.h"
+
+char	*VarArgs( PRINTF_FORMAT_STRING char *format, ... );
 
 #endif // GAMEUI_UTIL_H

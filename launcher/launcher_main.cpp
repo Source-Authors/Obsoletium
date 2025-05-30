@@ -101,7 +101,8 @@ SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
     default:
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Source Launcher - Error",
                                message, nullptr);
-      _exit(1);
+      // dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
+      exit(ENOTRECOVERABLE);
   }
 }
 
@@ -123,7 +124,7 @@ void GetBaseDirectory(ICommandLine *command_line,
                       __out_z char (&base_directory)[MAX_PATH]) {
   base_directory[0] = '\0';
 
-  if (!base_directory[0] && GetExecutableName(base_directory)) {
+  if (GetExecutableName(base_directory)) {
     char *buffer = strrchr(base_directory, '\\');
 
     if (buffer && *buffer) *(buffer + 1) = '\0';
@@ -148,7 +149,8 @@ void GetBaseDirectory(ICommandLine *command_line,
 
 #ifdef WIN32
 BOOL WINAPI ConsoleCtrlHandler(DWORD ctrl_type) {
-  TerminateProcess(GetCurrentProcess(), 2);
+  // dimhotepus: 2 -> ERROR_CONTROL_C_EXIT
+  TerminateProcess(GetCurrentProcess(), ERROR_CONTROL_C_EXIT);
   return TRUE;
 }
 #endif
@@ -179,9 +181,7 @@ void TryToLoadSteamOverlayDLL() {
   // First, check if the module is already loaded, perhaps because we were run
   // from Steam directly
   HMODULE hMod = GetModuleHandle("GameOverlayRenderer" DLL_EXT_STRING);
-  if (hMod) {
-    return;
-  }
+  if (hMod) return;
 
   if (0 == GetEnvironmentVariableA("SteamGameId", NULL, 0)) {
     // Initializing the Steam client API has the side effect of setting up the
@@ -192,8 +192,8 @@ void TryToLoadSteamOverlayDLL() {
       if (pchSteamInstallPath) {
         char rgchSteamPath[MAX_PATH];
         V_ComposeFileName(pchSteamInstallPath,
-                          "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath,
-                          ssize(rgchSteamPath));
+                          "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath);
+
         // This could fail, but we can't fix it if it does so just ignore
         // failures
         LoadLibrary(rgchSteamPath);
@@ -253,7 +253,7 @@ void RemoveParametersOverrides(ICommandLine *command_line) {
 }
 
 #ifdef WIN32
-bool ApplyProcessPriorityClass(ICommandLine *command_line) {
+bool ApplyProcessPriorityClass(const ICommandLine *command_line) {
   // Make low priority?
   if (command_line->CheckParm("-low")) {
     return !!SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
@@ -385,11 +385,10 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // slam things to en_US.UTF-8.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::launcher::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (Q_stricmp(se::launcher::ScopedAppLocale::GetCurrentLocale(),
-                kEnUsUtf8Locale)) {
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::launcher::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
   }
 
 #ifdef POSIX
@@ -442,7 +441,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // Can only run one windowed source app at a time.
-  const se::launcher::ScopedAppMultiRun scoped_app_multi_run;
+  const se::launcher::ScopedAppMultiRun scoped_app_multi_run{CommandLine()};
   if (!scoped_app_multi_run.is_single_run()) {
     // Allow the user to explicitly say they want to be able to run multiple
     // instances of the source mutex.  Useful for side-by-side comparisons of
@@ -450,8 +449,8 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     const bool allow_multirun{command_line->CheckParm("-multirun") != nullptr};
     if (!allow_multirun) {
       Error(
-          "Oops, the game is already launched\n\nSorry, but only "
-          "single game can run at the same time.");
+          "Oops, the game is already launched.\n\nSorry, but only single game "
+          "can run at the same time.");
 
 #ifdef WIN32
       return ERROR_SINGLE_INSTANCE_APP;
@@ -488,7 +487,8 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   const se::common::windows::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
   if (scoped_winsock.errc()) {
     Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
-            scoped_winsock.errc(), scoped_winsock.errc().message().c_str());
+            scoped_winsock.errc().value(),
+            scoped_winsock.errc().message().c_str());
   }
 
   if (!ApplyProcessPriorityClass(command_line)) {
@@ -519,13 +519,11 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 
   // Figure out the directory the executable is running from and make that be
   // the current working directory.
-#ifdef WIN32
-  if (_chdir(base_directory)) {
-#else
   if (chdir(base_directory)) {
-#endif
+    int rc = errno;
     Warning("Unable to change current directory to %s: %s.", base_directory,
-            std::generic_category().message(errno).c_str());
+            std::generic_category().message(rc).c_str());
+    return rc;
   }
 
   // This call is to emulate steam's injection of the GameOverlay DLL into our

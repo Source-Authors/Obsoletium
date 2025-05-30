@@ -109,7 +109,7 @@ CMapSprite *CMapSprite::CreateMapSprite(const char *pszSpritePath)
 
 		// HACK: Remove the extension, this is for backward compatability
 		// It's trying to load a .spr, but we're giving it a .vmt.
-		strcpy( szPath, pszSpritePath );
+		V_strcpy_safe( szPath, pszSpritePath );
 		char* pDot = strrchr( szPath, '.' );
 		if (pDot)
 			*pDot = 0;

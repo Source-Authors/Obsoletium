@@ -1,21 +1,9 @@
-//=============================================================================
-//
-//========= Copyright Valve Corporation, All rights reserved. ============//
-// The contents may be used and/or copied only with the written permission of
-// Valve, L.L.C., or in accordance with the terms and conditions stipulated in
-// the agreement/contract under which the contents have been supplied.
-//
-// $Header: $
-// $NoKeywords: $
+// Copyright Valve Corporation, All rights reserved.
 //
 // Converts from any one DMX file format to another
 // Can also output SMD or a QCI header from DMX input
-//
-//=============================================================================
-
 #ifndef DMXEDIT_H
 #define DMXEDIT_H
-
 
 // Valve includes
 #include "movieobjects/dmemesh.h"
@@ -693,20 +681,13 @@ public:
 		va_list marker;
 
 		va_start( marker, pFormat );
-#ifdef _WIN32
-		int len = _vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#elif LINUX
-		int len = vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#else
-#error "define vsnprintf type."
-#endif
+		int len = V_vsprintf_safe( tmpBuf, pFormat, marker );
 		va_end( marker );
 
 		// Len < 0 represents an overflow
 		if( len < 0 )
 		{
 			len = sizeof( tmpBuf ) - 1;
-			tmpBuf[sizeof( tmpBuf ) - 1] = 0;
 		}
 
 		if ( GetLineNumber() >= 0 )
@@ -735,20 +716,13 @@ public:
 		va_list marker;
 
 		va_start( marker, pFormat );
-#ifdef _WIN32
-		int len = _vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#elif LINUX
-		int len = vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#else
-#error "define vsnprintf type."
-#endif
+		int len = V_vsprintf_safe( tmpBuf, pFormat, marker );
 		va_end( marker );
 
 		// Len < 0 represents an overflow
 		if( len < 0 )
 		{
 			len = sizeof( tmpBuf ) - 1;
-			tmpBuf[sizeof( tmpBuf ) - 1] = 0;
 		}
 
 		if ( GetLineNumber() >= 0 )
@@ -774,20 +748,13 @@ public:
 		va_list marker;
 
 		va_start( marker, pFormat );
-#ifdef _WIN32
-		int len = _vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#elif LINUX
-		int len = vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#else
-#error "define vsnprintf type."
-#endif
+		int len = V_vsprintf_safe( tmpBuf, pFormat, marker );
 		va_end( marker );
 
 		// Len < 0 represents an overflow
 		if( len < 0 )
 		{
 			len = sizeof( tmpBuf ) - 1;
-			tmpBuf[sizeof( tmpBuf ) - 1] = 0;
 		}
 
 		m_errorString = tmpBuf;
@@ -874,7 +841,7 @@ protected:
 //=============================================================================
 //
 //=============================================================================
-typedef int ( * LuaFunc_t ) ( lua_State * );
+using LuaFunc_t = int ( * ) ( lua_State * );
 
 
 //=============================================================================
@@ -968,4 +935,4 @@ protected:
 };
 
 
-#endif // DMXEDIT_H
+#endif  // DMXEDIT_H

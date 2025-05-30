@@ -191,8 +191,11 @@ private:
 class CTriggerMoved : public IPartitionEnumerator
 {
 public:
-	CTriggerMoved( bool accurateBboxTriggerChecks ) : m_TouchedEntities( 8, 8 )
+	explicit CTriggerMoved( bool accurateBboxTriggerChecks ) : m_TouchedEntities( 8, 8 )
 	{
+		m_pTriggerEntity = nullptr;
+		m_pTrigger = nullptr;
+		m_triggerSolidFlags = 0;
 		m_bAccurateBBoxCheck = accurateBboxTriggerChecks;
 	}
 

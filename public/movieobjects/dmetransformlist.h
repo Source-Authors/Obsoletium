@@ -22,9 +22,9 @@ class CDmeTransformList : public CDmElement
 	DEFINE_ELEMENT( CDmeTransformList, CDmElement );
 
 public:
-	int GetTransformCount() const;
-	CDmeTransform *GetTransform( int nIndex );
-	void SetTransform( int nIndex, const matrix3x4_t& mat );
+	intp GetTransformCount() const;
+	CDmeTransform *GetTransform( intp nIndex );
+	void SetTransform( intp nIndex, const matrix3x4_t& mat );
 
 	CDmaElementArray<CDmeTransform> m_Transforms;
 };
@@ -33,12 +33,12 @@ public:
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline int CDmeTransformList::GetTransformCount() const
+inline intp CDmeTransformList::GetTransformCount() const
 {
 	return m_Transforms.Count();
 }
 
-inline CDmeTransform *CDmeTransformList::GetTransform( int nIndex )
+inline CDmeTransform *CDmeTransformList::GetTransform( intp nIndex )
 {
 	return m_Transforms[nIndex];
 }

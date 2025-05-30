@@ -62,12 +62,12 @@ class CDmeDCCMakefile : public CDmeMakefile
 	DEFINE_ELEMENT( CDmeDCCMakefile, CDmeMakefile );
 
 public:
-	virtual void GetOutputs( CUtlVector<CUtlString> &fullPaths );
+	void GetOutputs( CUtlVector<CUtlString> &fullPaths ) override;
 
 private:
-	virtual CDmElement *CreateOutputElement( );
-	virtual void DestroyOutputElement( CDmElement *pOutput );
-	virtual const char *GetOutputDirectoryID() { return "makefiledir:..\\dmx"; }
+	CDmElement *CreateOutputElement( ) override;
+	void DestroyOutputElement( CDmElement *pOutput ) override;
+	const char *GetOutputDirectoryID() override { return "makefiledir:..\\dmx"; }
 	bool m_bFlushFile;
 };
 
@@ -90,8 +90,8 @@ class CDmeXSIMakefile : public CDmeDCCMakefile
 
 public:
 	// Compiling is just exporting the data in the file
-	virtual DmeMakefileType_t *GetMakefileType();
-	virtual DmeMakefileType_t* GetSourceTypes();
+	DmeMakefileType_t *GetMakefileType() override;
+	DmeMakefileType_t* GetSourceTypes() override;
 };
 
 
@@ -104,8 +104,8 @@ class CDmeMayaModelMakefile : public CDmeMayaMakefile
 
 public:
 	// Compiling is just exporting the data in the file
-	virtual DmeMakefileType_t *GetMakefileType();
-	virtual DmeMakefileType_t* GetSourceTypes();
+	DmeMakefileType_t *GetMakefileType() override;
+	DmeMakefileType_t* GetSourceTypes() override;
 };
 
 class CDmeMayaAnimationMakefile : public CDmeMayaMakefile
@@ -114,8 +114,8 @@ class CDmeMayaAnimationMakefile : public CDmeMayaMakefile
 
 public:
 	// Compiling is just exporting the data in the file
-	virtual DmeMakefileType_t *GetMakefileType();
-	virtual DmeMakefileType_t* GetSourceTypes();
+	DmeMakefileType_t *GetMakefileType() override;
+	DmeMakefileType_t* GetSourceTypes() override;
 };
 
 

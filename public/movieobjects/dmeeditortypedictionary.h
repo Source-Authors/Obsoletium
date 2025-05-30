@@ -64,8 +64,8 @@ public:
 	void SetChoiceType( const char *pChoiceType );
 
 	// Gets the choices
-	int GetChoiceCount() const;
-	const char *GetChoiceString( int nIndex ) const;
+	intp GetChoiceCount() const;
+	const char *GetChoiceString( intp nIndex ) const;
 	const char *GetChoiceType() const;
 	bool HasChoiceType() const;
 

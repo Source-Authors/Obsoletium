@@ -7,10 +7,6 @@
 
 #include "pch_serverbrowser.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
 using namespace vgui;
 
 #define FILTER_ALLSERVERS			0
@@ -23,8 +19,6 @@ using namespace vgui;
 
 #define MAX_MAP_NAME	128
 const char *COM_GetModDirectory();
-
-#undef wcscat
 
 ConVar sb_mod_suggested_maxplayers( "sb_mod_suggested_maxplayers", "0", FCVAR_HIDDEN );
 ConVar sb_filter_incompatible_versions( "sb_filter_incompatible_versions",
@@ -80,14 +74,14 @@ inline char *CloneString( const char *str )
 
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
+			V_StripLastDir( modDir );
 			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
@@ -674,7 +668,7 @@ void CBaseGamesPage::CreateFilters()
 	m_pQuickListCheckButton = new CCheckBoxWithStatus(this, "QuickListCheck", "");
 	m_pReplayFilterCheck = new CheckButton(this, "ReplayFilterCheck", "");
 
-	KeyValues *pkv = new KeyValues("mod", "gamedir", "", "appid", NULL );
+	KeyValuesAD pkv( new KeyValues("mod", "gamedir", "", "appid", NULL ) );
 	m_pGameFilter->AddItem("#ServerBrowser_All", pkv);
 
 	for (int i = 0; i < ModList().ModCount(); i++)
@@ -684,8 +678,6 @@ void CBaseGamesPage::CreateFilters()
 		int iItemID = m_pGameFilter->AddItem(ModList().GetModName(i), pkv);
 		m_mapGamesFilterItem.Insert( ModList().GetAppID(i).ToUint64(), iItemID );
 	}
-	pkv->deleteThis();
-
 }
 
 
@@ -838,15 +830,15 @@ void CBaseGamesPage::ServerResponded( HServerListRequest hReq, int iServer )
 //-----------------------------------------------------------------------------
 void CBaseGamesPage::ServerResponded( int iServer, gameserveritem_t *pServerItem )
 {
-	int iServerMap = m_mapServers.Find( iServer );
+	auto iServerMap = m_mapServers.Find( iServer );
 	if ( iServerMap == m_mapServers.InvalidIndex() )
 	{
 		netadr_t netAdr( pServerItem->m_NetAdr.GetIP(), pServerItem->m_NetAdr.GetConnectionPort() );
-		int iServerIP = m_mapServerIP.Find( netAdr );
+		auto iServerIP = m_mapServerIP.Find( netAdr );
 		if ( iServerIP != m_mapServerIP.InvalidIndex() )
 		{
 			// if we already had this entry under another index remove the old entry
-			int iServerMap = m_mapServers.Find( m_mapServerIP[ iServerIP ] );
+			auto iServerMap = m_mapServers.Find( m_mapServerIP[ iServerIP ] );
 			if ( iServerMap != m_mapServers.InvalidIndex() )
 			{
 				serverdisplay_t &server = m_mapServers[ iServerMap ];
@@ -1178,7 +1170,7 @@ void CBaseGamesPage::ApplyGameFilters()
 			// re-add item to list
 			if ( !m_pGameList->IsValidItemID( server.m_iListID ) )
 			{
-				KeyValues *kv = new KeyValues("Server");
+				KeyValuesAD kv("Server");
 				kv->SetString("name", pServer->GetName());
 				kv->SetString("map", pServer->m_szMap);
 				kv->SetString("GameDir", pServer->m_szGameDir);
@@ -1207,7 +1199,6 @@ void CBaseGamesPage::ApplyGameFilters()
 				kv->SetInt("Replay", IsReplayServer( *pServer ) ? m_nImageIndexReplay : 0);
 				
 				server.m_iListID = m_pGameList->AddItem(kv, server.m_iServerID, false, false);
-				kv->deleteThis();
 			}
 			
 			// make sure the server is visible
@@ -1232,9 +1223,9 @@ void CBaseGamesPage::UpdateStatus()
 		wchar_t count[128];
 		wchar_t blacklistcount[128];
 
-		_snwprintf( count, std::size(count), L"%d", m_pGameList->GetItemCount() );
-		_snwprintf( blacklistcount, std::size(blacklistcount), L"%d", m_iServersBlacklisted );
-		g_pVGuiLocalize->ConstructString( header, sizeof( header ), g_pVGuiLocalize->Find( "#ServerBrowser_ServersCountWithBlacklist"), 2, count, blacklistcount );
+		V_swprintf_safe( count, L"%d", m_pGameList->GetItemCount() );
+		V_swprintf_safe( blacklistcount, L"%d", m_iServersBlacklisted );
+		g_pVGuiLocalize->ConstructString_safe( header, g_pVGuiLocalize->Find( "#ServerBrowser_ServersCountWithBlacklist"), 2, count, blacklistcount );
 		m_pGameList->SetColumnHeaderText( k_nColumn_Name, header);
 	}
 	else
@@ -1290,12 +1281,12 @@ void CBaseGamesPage::UpdateFilterSettings()
 	Q_strlower(m_szGameFilter);
 
 	// map
-	m_pMapFilter->GetText(m_szMapFilter, sizeof(m_szMapFilter) - 1);
+	m_pMapFilter->GetText(m_szMapFilter);
 	Q_strlower(m_szMapFilter);
 
 	// max player
 	char buf[256];
-	m_pMaxPlayerFilter->GetText(buf, sizeof(buf));
+	m_pMaxPlayerFilter->GetText(buf);
 	if (buf[0])
 	{
 		m_iMaxPlayerFilter = atoi(buf);
@@ -1306,7 +1297,7 @@ void CBaseGamesPage::UpdateFilterSettings()
 	}
 
 	// ping
-	m_pPingFilter->GetText(buf, sizeof(buf));
+	m_pPingFilter->GetText(buf);
 	if (buf[0])
 	{
 		m_iPingFilter = atoi(buf + 2);
@@ -1448,26 +1439,26 @@ void CBaseGamesPage::RecalculateFilterString()
 	if (m_szGameFilter[0])
 	{
 		Q_UTF8ToUnicode( ModList().GetModNameForModDir( m_iLimitToAppID ), tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_iSecureFilter == FILTER_SECURESERVERSONLY)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescSecureOnly" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescSecureOnly" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 	else if (m_iSecureFilter == FILTER_INSECURESERVERSONLY)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescInsecureOnly" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescInsecureOnly" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_pLocationFilter->GetActiveItem() > 0)
 	{
-		m_pLocationFilter->GetText(tempUnicode, sizeof(tempUnicode));
-		wcscat( unicode, tempUnicode );
-		wcscat( unicode, spacerUnicode );
+		m_pLocationFilter->GetText(tempUnicode);
+		V_wcscat_safe( unicode, tempUnicode );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_iPingFilter)
@@ -1475,12 +1466,12 @@ void CBaseGamesPage::RecalculateFilterString()
 		char tmpBuf[16];
 		V_to_chars( tmpBuf, m_iPingFilter );
 
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescLatency" ) );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescLatency" ) );
 		Q_UTF8ToUnicode( " < ", tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
 		Q_UTF8ToUnicode(tmpBuf, tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );	
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, tempUnicode );	
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if ( m_iMaxPlayerFilter )
@@ -1488,42 +1479,42 @@ void CBaseGamesPage::RecalculateFilterString()
 		char tmpBuf[16];
 		V_to_chars( tmpBuf, m_iMaxPlayerFilter );
 
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescMaxPlayers" ) );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescMaxPlayers" ) );
 		Q_UTF8ToUnicode( " <= ", tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
 		Q_UTF8ToUnicode(tmpBuf, tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );	
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, tempUnicode );	
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterNoFullServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotFull" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotFull" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterNoEmptyServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotEmpty" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNotEmpty" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterNoPasswordedServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNoPassword" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescNoPassword" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_bFilterReplayServers)
 	{
-		wcscat( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescReplays" ) );
-		wcscat( unicode, spacerUnicode );
+		V_wcscat_safe( unicode, g_pVGuiLocalize->Find( "#ServerBrowser_FilterDescReplays" ) );
+		V_wcscat_safe( unicode, spacerUnicode );
 	}
 
 	if (m_szMapFilter[0])
 	{
 		Q_UTF8ToUnicode( m_szMapFilter, tempUnicode, iTempUnicodeSize );
-		wcscat( unicode, tempUnicode );
+		V_wcscat_safe( unicode, tempUnicode );
 	}
 
 	m_pFilterString->SetText(unicode);
@@ -1630,7 +1621,7 @@ bool CBaseGamesPage::CheckSecondaryFilters( gameserveritem_t &server )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-uint32 CBaseGamesPage::GetServerFilters( MatchMakingKeyValuePair_t **pFilters )
+intp CBaseGamesPage::GetServerFilters( MatchMakingKeyValuePair_t **pFilters )
 {
 	*pFilters = m_vecServerFilters.Base();
 	return m_vecServerFilters.Count();
@@ -1873,7 +1864,7 @@ void CBaseGamesPage::StartRefresh()
 
 	ClearServerList();
 	MatchMakingKeyValuePair_t *pFilters;
-	int nFilters = GetServerFilters( &pFilters );
+	intp nFilters = GetServerFilters( &pFilters );
 
 	if ( m_hRequest )
 	{
@@ -2172,10 +2163,10 @@ void CBaseGamesPage::OnBeginConnect()
 				wchar_t wszServerMaxPlayers[12];
 				wchar_t wszDesignedMaxPlayers[12];
 				wchar_t wszGameName[256];
-				_snwprintf( wszServerMaxPlayers, std::size(wszServerMaxPlayers), L"%d", iMaxCount );
-				_snwprintf( wszDesignedMaxPlayers, std::size(wszDesignedMaxPlayers), L"%d", iMaxP );
+				V_swprintf_safe( wszServerMaxPlayers, L"%d", iMaxCount );
+				V_swprintf_safe( wszDesignedMaxPlayers, L"%d", iMaxP );
 				Q_UTF8ToUnicode( ModList().GetModNameForModDir( m_iLimitToAppID ), wszGameName, ssize(wszGameName) );
-				g_pVGuiLocalize->ConstructString( wszWarning, sizeof( wszWarning ), g_pVGuiLocalize->Find( "#ServerBrowser_ServerWarning_MaxPlayers"), 4, wszServerMaxPlayers, wszGameName, wszDesignedMaxPlayers, wszDesignedMaxPlayers );
+				g_pVGuiLocalize->ConstructString_safe( wszWarning, g_pVGuiLocalize->Find( "#ServerBrowser_ServerWarning_MaxPlayers"), 4, wszServerMaxPlayers, wszGameName, wszDesignedMaxPlayers, wszDesignedMaxPlayers );
 				dlg->SetDialogVariable( "warning", wszWarning );
 
 				return;

@@ -112,7 +112,7 @@ protected:
 	bool				HasAttribute() const;
 
 	// Returns the attribute array count
-	int					GetAttributeArrayCount() const;
+	intp				GetAttributeArrayCount() const;
 
 	// Are we editing an entry in an attribute array?
 	bool				IsArrayEntry() const;

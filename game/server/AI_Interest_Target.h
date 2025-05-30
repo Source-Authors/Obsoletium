@@ -56,9 +56,9 @@ public:
 	void Add( CBaseEntity *pTarget, float flImportance, float flDuration, float flRamp );
 	void Add( const Vector &vecPosition, float flImportance, float flDuration, float flRamp );
 	void Add( CBaseEntity *pTarget, const Vector &vecPosition, float flImportance, float flDuration, float flRamp );
-	int Find( CBaseEntity *pTarget )
+	intp Find( CBaseEntity *pTarget )
 	{
-		int i;
+		intp i;
 		for ( i = 0; i < Count(); i++)
 		{
 			if (pTarget == (*this)[i].m_hTarget)
@@ -69,7 +69,7 @@ public:
 	
 	void Cleanup( void )
 	{
-		int i;
+		intp i;
 		for (i = Count() - 1; i >= 0; i--)
 		{
 			if (!Element(i).IsActive())

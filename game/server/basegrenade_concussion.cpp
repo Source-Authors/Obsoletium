@@ -51,7 +51,7 @@ void CBaseGrenadeConcussion::FallThink(void)
 
 	SetNextThink( gpGlobals->curtime + random->RandomFloat(0.05, 0.1) );
 
-	if (GetWaterLevel() != 0)
+	if (GetWaterLevel() != WaterLevel::WL_NotInWater)
 	{
 		SetAbsVelocity( GetAbsVelocity() * 0.5 );
 	}

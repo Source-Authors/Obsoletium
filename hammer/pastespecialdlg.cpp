@@ -8,7 +8,6 @@
 #include "hammer.h"
 #include "PasteSpecialDlg.h"
 
-#pragma warning(disable:4244)
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -18,7 +17,7 @@ static LPCTSTR pszIni = "Paste Special";
 
 
 CPasteSpecialDlg::CPasteSpecialDlg(CWnd* pParent /*=NULL*/, BoundBox* pBox)
-	: CDialog(CPasteSpecialDlg::IDD, pParent)
+	: CBaseDlg(CPasteSpecialDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPasteSpecialDlg)
 	m_iCopies = 1;
@@ -49,9 +48,10 @@ CPasteSpecialDlg::CPasteSpecialDlg(CWnd* pParent /*=NULL*/, BoundBox* pBox)
 
 	str = App->GetProfileString(pszIni, "Rotate", "0 0 0");
 	p = str.GetBuffer(0);
-	m_fRotateX = atof(p);
-	m_fRotateY = atof(strchr(p, ' ')+1);
-	m_fRotateZ = atof(strrchr(p, ' ')+1);
+	// dimhotepus: atof -> strtof.
+	m_fRotateX = strtof(p, nullptr);
+	m_fRotateY = strtof(strchr(p, ' ')+1, nullptr);
+	m_fRotateZ = strtof(strrchr(p, ' ')+1, nullptr);
 
 	m_bCenterOriginal = App->GetProfileInt(pszIni, "Center", TRUE);
 
@@ -90,12 +90,12 @@ BOOL CPasteSpecialDlg::OnInitDialog()
 	BOOL bEnable = m_bAddPrefix ? TRUE : FALSE;
 	GetDlgItem( IDC_PASTE_SPECIAL_PREFIX_TEXT )->EnableWindow( bEnable );
 	
-	return CDialog::OnInitDialog();
+	return __super::OnInitDialog();
 }
 
 void CPasteSpecialDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CPasteSpecialDlg)
 	DDX_Text(pDX, IDC_COPIES, m_iCopies);
 	DDV_MinMaxInt(pDX, m_iCopies, 1, 256);
@@ -117,7 +117,7 @@ void CPasteSpecialDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CPasteSpecialDlg, CDialog)
+BEGIN_MESSAGE_MAP(CPasteSpecialDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CPasteSpecialDlg)
 	ON_BN_CLICKED(IDC_GETOFFSETX, OnGetoffsetx)
 	ON_BN_CLICKED(IDC_GETOFFSETY, OnGetoffsety)

@@ -20,7 +20,7 @@ class CDialogCvarChange : public vgui::Frame
 {
 public:
 	CDialogCvarChange(vgui::Panel *parent);
-	~CDialogCvarChange();
+	virtual ~CDialogCvarChange();
 
 	// initializes the dialog and brings it to the foreground
 	void Activate(const char *cvarName, const char *curValue, const char *type, const char *question);
@@ -39,8 +39,8 @@ public:
 	void SetLabelText(const char *textEntryName, const char *text);
 
 private:
-	virtual void OnCommand(const char *command);
-	virtual void OnClose();
+	void OnCommand(const char *command) override;
+	void OnClose() override;
 
 	vgui::Label *m_pInfoLabel;
 	vgui::Label *m_pCvarLabel;

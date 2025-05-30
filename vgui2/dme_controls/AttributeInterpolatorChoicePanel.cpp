@@ -41,8 +41,8 @@ void CAttributeInterpolatorChoicePanel::PopulateComboBoxes( vgui::ComboBox *pCom
 	pComboBox[ 1 ]->DeleteAllItems();
 
 	// Fill in the choices
-	int c = NUM_INTERPOLATE_TYPES;
-	for ( int i = 0; i < c; ++i )
+	unsigned char c = NUM_INTERPOLATE_TYPES;
+	for ( unsigned char i = 0; i < c; ++i )
 	{
 		KeyValues *kv = new KeyValues( "entry" );
 		kv->SetInt( "value", i );
@@ -83,8 +83,8 @@ void CAttributeInterpolatorChoicePanel::SetComboBoxesFromAttribute( vgui::ComboB
 	int nValue	= GetAttributeValue<int>();
 
 	// Decompose
-	int leftPart	= GET_LEFT_CURVE( nValue );
-	int rightPart	= GET_RIGHT_CURVE( nValue );
+	unsigned char leftPart	= GET_LEFT_CURVE( nValue );
+	unsigned char rightPart	= GET_RIGHT_CURVE( nValue );
 
 	pComboBox[ 0 ]->SetText( Interpolator_NameForInterpolator( leftPart, true ) );
 	pComboBox[ 1 ]->SetText( Interpolator_NameForInterpolator( rightPart, true ) );

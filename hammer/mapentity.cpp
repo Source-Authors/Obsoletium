@@ -540,9 +540,11 @@ CMapClass *CMapEntity::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 	//
 	const char *pszOldTargetName = CEditGameClass::GetKeyValue("targetname");
 	char szOldTargetName[MAX_IO_NAME_LEN];
+	szOldTargetName[0] = '\0';
+
 	if (pszOldTargetName != NULL)
 	{
-		strcpy(szOldTargetName, pszOldTargetName);
+		V_strcpy_safe(szOldTargetName, pszOldTargetName);
 	}
 
 	CEditGameClass::CopyFrom(pFrom);
@@ -596,14 +598,14 @@ void CMapEntity::Debug(void)
 //			in it. Otherwise returns a buffer with "<classname>" in it.
 // Output : String description of the entity.
 //-----------------------------------------------------------------------------
-const char* CMapEntity::GetDescription(void)
+const char* CMapEntity::GetDescription(void) const
 {
 	static char szBuf[128];
 	const char *pszName = GetKeyValue("targetname");
 
 	if (pszName != NULL)
 	{
-		sprintf(szBuf, "%s - %s", pszName, GetClassName());
+		V_sprintf_safe(szBuf, "%s - %s", pszName, GetClassName());
 	}
 	else
 	{
@@ -794,7 +796,7 @@ ChunkFileResult_t CMapEntity::LoadSolidCallback(CChunkFile *pFile, CMapEntity *p
 // Purpose: Sets this entity's origin and updates the bounding box.
 // Input  : o - Origin to set.
 //-----------------------------------------------------------------------------
-void CMapEntity::SetOrigin(Vector& o)
+void CMapEntity::SetOrigin(const Vector& o)
 {
 	Vector vecOrigin;
 	GetOrigin(vecOrigin);
@@ -842,9 +844,10 @@ void CMapEntity::RemoveHelpers(bool bRemoveSolids)
 //-----------------------------------------------------------------------------
 // Building targetnames which deal with *
 //-----------------------------------------------------------------------------
-static inline void BuildNewTargetName( const char *pOldName, const char *pNewName, char *pBuffer )
+template<intp bufferSize>
+static inline void BuildNewTargetName( const char *pOldName, const char *pNewName, OUT_Z_ARRAY char (&pBuffer)[bufferSize] )
 {
-	strcpy(pBuffer, pNewName);
+	V_strcpy_safe(pBuffer, pNewName);
 
 	// If we matched a key value that contains wildcards, preserve the
 	// wildcards when we replace the name.
@@ -1117,7 +1120,7 @@ void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 		// keyvalues and our pointer might become bad.
 		//
 		char szClassName[MAX_CLASS_NAME_LEN];
-		strcpy(szClassName, pszValue);
+		V_strcpy_safe(szClassName, pszValue);
 		SetClass(szClassName, true);
 
 		//
@@ -1254,7 +1257,7 @@ void CMapEntity::DeleteKeyValue(LPCSTR pszKey)
 	const char *pszOld = GetKeyValue(pszKey);
 	if (pszOld != NULL)
 	{
-		strcpy(szOldValue, pszOld);
+		V_strcpy_safe(szOldValue, pszOld);
 	}
 	else
 	{
@@ -1710,7 +1713,11 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	// Begin this entity's scope.
 	//
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok)
+	{
 	eResult = pFile->BeginChunk("entity");
+	}
 
 	//
 	// Save the entity's ID.
@@ -1732,17 +1739,20 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	// If this is a point entity of an unknown type or a point entity that doesn't
 	// declare an origin key, save our origin.
 	//
-	if (IsPlaceholder() && (!IsClass() || GetClass()->VarForName("origin") == NULL))
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok && IsPlaceholder() && (!IsClass() || GetClass()->VarForName("origin") == NULL))
 	{
 		char szOrigin[80];
-		sprintf(szOrigin, "%g %g %g", (double)m_Origin[0], (double)m_Origin[1], (double)m_Origin[2]);
-		pFile->WriteKeyValue("origin", szOrigin);
+		V_sprintf_safe(szOrigin, "%g %g %g", (double)m_Origin[0], (double)m_Origin[1], (double)m_Origin[2]);
+		eResult = pFile->WriteKeyValue("origin", szOrigin);
 	}
 
 	//
 	// Save all our descendents.
 	//
-	eResult = ChunkFile_Ok;
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok)
+	{
 	EnumChildrenPos_t pos;
 	CMapClass *pChild = GetFirstDescendent(pos);
 	while ((pChild != NULL) && (eResult == ChunkFile_Ok))
@@ -1751,7 +1761,9 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 		{
 			eResult = pChild->SaveVMF(pFile, pSaveInfo);
 		}
+
 		pChild = GetNextDescendent(pos);
+	}
 	}
 
 	//
@@ -1767,13 +1779,15 @@ ChunkFileResult_t CMapEntity::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	//
 	if (eResult == ChunkFile_Ok)
 	{
-		pFile->EndChunk();
+		// dimhotepus: Check result.
+		eResult = pFile->EndChunk();
 	}
 
 	//
 	// End the hidden chunk if we began it.
 	//
-	if (!IsVisible())
+	// dimhotepus: Check result.
+	if (eResult == ChunkFile_Ok && !IsVisible())
 	{
 		eResult = pFile->EndChunk();
 	}

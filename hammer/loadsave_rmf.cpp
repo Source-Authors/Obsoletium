@@ -42,7 +42,10 @@ float GetFileVersion() { return fThisVersion; }
 
 static void WriteString(std::fstream& file, LPCTSTR pszString)
 {
-	BYTE cLen = strlen(pszString)+1;
+	// dimhotepus: Check string is in range.
+	size_t len = strlen(pszString)+1;
+	Assert(len <= UCHAR_MAX);
+	BYTE cLen = static_cast<BYTE>(len);
 	file.write((char*)&cLen, 1);
 	file.write(pszString, cLen);
 }
@@ -242,13 +245,13 @@ int CMapFace::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		{
 			char szBuf[MAX_PATH];
 			char *psz;
-			strcpy(szBuf, texture.texture);
+			V_strcpy_safe(szBuf, texture.texture);
 			psz = strstr(szBuf, "textures\\");
 			if (psz)
 			{
 				memset(texture.texture, 0, sizeof(texture.texture));
-				psz += strlen("textures\\");
-				strcpy(texture.texture, psz);
+				psz += ssize("textures\\") - 1;
+				V_strcpy_safe(texture.texture, psz);
 			}
 		}
 		
@@ -488,7 +491,7 @@ int CEditGameClass::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		//
 		// Write the keyvalues.
 		//
-		for ( int z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
+		for ( auto z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
 		{
 			MDkeyvalue KeyValue = m_KeyValues.GetKeyValue(z);
 
@@ -806,7 +809,7 @@ int CMapWorld::SerializeRMF(std::fstream &file, BOOL fIsStoring)
 			CString str;
 			str.Format("Oops! SerializeRMF() v%1.1f tried to load a file v%1.1f. Aborting.",
 				fVersion, fThisVersion);
-			AfxMessageBox(str);
+			AfxMessageBox(str, MB_ICONERROR);
 			return -1;
 		}
 
@@ -817,7 +820,7 @@ int CMapWorld::SerializeRMF(std::fstream &file, BOOL fIsStoring)
 			file.read(buf, 3);
 			if(strncmp(buf, "RMF", 3))
 			{
-				AfxMessageBox("Invalid file type.");
+				AfxMessageBox("Invalid file type. Expected *.rmf.", MB_ICONERROR);
 				return -1;
 			}
 		}
@@ -841,7 +844,7 @@ int CMapWorld::SerializeRMF(std::fstream &file, BOOL fIsStoring)
 		ReadString(file, buf);
 		if(strcmp(buf, GetType()))
 		{
-			AfxMessageBox("Invalid file type.");
+			AfxMessageBox("Invalid file type.", MB_ICONERROR);
 			return -1;
 		}
 
@@ -912,7 +915,7 @@ FatalError:
 	{
 		// file-is-corrupt error
 		str.Format("The file is corrupt.");
-		AfxMessageBox(str);
+		AfxMessageBox(str, MB_ICONERROR);
 		
 		return -1;
 	}
@@ -920,7 +923,7 @@ FatalError:
 	// OS error.
 	str.Format("The OS reported an error %s the file: %s",
 		fIsStoring ? "saving" : "loading", strerror(errno));
-	AfxMessageBox(str);
+	AfxMessageBox(str, MB_ICONERROR);
 
 	return -1;
 }

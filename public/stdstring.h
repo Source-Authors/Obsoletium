@@ -44,7 +44,7 @@ public:
 	{
 		std::string *pString = (std::string *)fieldInfo.pField;
 		char szString[MAX_SAVE_LEN];
-		pRestore->ReadString( szString, sizeof(szString), 0 );
+		pRestore->ReadString( szString, 0 );
 		szString[MAX_SAVE_LEN - 1] = 0;
 		pString->assign( szString );
 	}

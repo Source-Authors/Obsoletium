@@ -1,7 +1,6 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by hammer.rc
+// Used by Hammer.rc
 //
 #define IDB_SPLASHOLD                   1
 #define IDS_ERROR_PLAYING               1
@@ -954,7 +953,7 @@
 #define IDC_CHECK3                      1657
 #define ID_DISP_NORAY_COLL              1657
 #define IDC_FOV                         1659
-#define IDC_LIGHT_CONE_LENGTH			1660
+#define IDC_LIGHT_CONE_LENGTH           1660
 #define IDC_BUTTON2                     1661
 #define IDC_STOPSOUND                   1661
 #define IDC_SAVING_TEXT                 1662
@@ -1291,11 +1290,12 @@
 #define ID_VERSIONCONTROL_ADD           33281
 #define ID_VERSIONCONTROL_ADDMANIFEST   33282
 #define ID_VERSIONCONTROL_CHECKOUTMANIFEST 33283
-#define ID_VIEW_QUICKHIDE				33285
-#define ID_VIEW_QUICKHIDEUNSELECTED		33286
-#define ID_VIEW_QUICKUNHIDE				33287
-#define ID_TOGGLE_RADIUSCULLING			33288
-#define ID_VIEW_QUICKHIDEVISGROUP		33289
+#define ID_VIEW_QUICKHIDE               33285
+#define ID_VIEW_QUICKHIDEUNSELECTED     33286
+#define ID_VIEW_QUICKUNHIDE             33287
+#define ID_TOGGLE_RADIUSCULLING         33288
+#define ID_VIEW_QUICKHIDEVISGROUP       33289
+//#define ID_VIEW_3DENGINE                33290
 #define IDS_NOPLAYERSTART               40000
 #define IDS_MIXEDFACES                  40001
 #define IDS_DUPLICATEPLANES             40002
@@ -1360,14 +1360,15 @@
 #define ID_VIEW_MANIFEST_BAR            0xE811
 #define ID_HDR                          0xf000
 #define IDC_LPRVWINDOW                  0xf010
+#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Hammer World Editor Computation Kernel"
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        354
-#define _APS_NEXT_COMMAND_VALUE         33290
+#define _APS_NEXT_RESOURCE_VALUE        355
+#define _APS_NEXT_COMMAND_VALUE         33291
 #define _APS_NEXT_CONTROL_VALUE         1696
 #define _APS_NEXT_SYMED_VALUE           116
 #endif

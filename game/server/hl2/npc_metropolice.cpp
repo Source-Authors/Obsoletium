@@ -1172,24 +1172,24 @@ CBaseEntity *CNPC_MetroPolice::GetShootTarget()
 //-----------------------------------------------------------------------------
 
 // Ranges across which to tune fire rates
-const float MIN_PISTOL_MODIFY_DIST = 15 * 12;
-const float MAX_PISTOL_MODIFY_DIST = 150 * 12;
+constexpr inline float MIN_PISTOL_MODIFY_DIST = 15 * 12;
+constexpr inline float MAX_PISTOL_MODIFY_DIST = 150 * 12;
 
 // Range for rest period minimums
-const float MIN_MIN_PISTOL_REST_INTERVAL = 0.6;
-const float MAX_MIN_PISTOL_REST_INTERVAL = 1.2;
+constexpr inline float MIN_MIN_PISTOL_REST_INTERVAL = 0.6;
+constexpr inline float MAX_MIN_PISTOL_REST_INTERVAL = 1.2;
 
 // Range for rest period maximums
-const float MIN_MAX_PISTOL_REST_INTERVAL = 1.2;
-const float MAX_MAX_PISTOL_REST_INTERVAL = 2.0;
+constexpr inline float MIN_MAX_PISTOL_REST_INTERVAL = 1.2;
+constexpr inline float MAX_MAX_PISTOL_REST_INTERVAL = 2.0;
 
 // Range for burst minimums
-const int 	MIN_MIN_PISTOL_BURST = 2;
-const int 	MAX_MIN_PISTOL_BURST = 4;
+constexpr inline int 	MIN_MIN_PISTOL_BURST = 2;
+constexpr inline int 	MAX_MIN_PISTOL_BURST = 4;
 
 // Range for burst maximums
-const int 	MIN_MAX_PISTOL_BURST = 5;
-const int 	MAX_MAX_PISTOL_BURST = 8;
+constexpr inline int 	MIN_MAX_PISTOL_BURST = 5;
+constexpr inline int 	MAX_MAX_PISTOL_BURST = 8;
 
 void CNPC_MetroPolice::OnUpdateShotRegulator( )
 {
@@ -1303,14 +1303,14 @@ Vector CNPC_MetroPolice::StitchAimTarget( const Vector &posSrc, bool bNoisy )
 	if ( !IsEnemyInAnAirboat() )
 	{
 		Vector vecBodyTarget;
-		if ( ( GetEnemy()->GetWaterLevel() == 0 ) && ( GetEnemy()->GetFlags() & FL_ONGROUND ) )
+		if ( ( GetEnemy()->GetWaterLevel() == WaterLevel::WL_NotInWater ) && ( GetEnemy()->GetFlags() & FL_ONGROUND ) )
 		{
 			GetEnemy()->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.08f ), &vecBodyTarget );
 			return vecBodyTarget;
 		}
 
 		// Underwater? Just use the normal thing
-		if ( GetEnemy()->GetWaterLevel() == 3 )
+		if ( GetEnemy()->GetWaterLevel() == WaterLevel::WL_Eyes )
 			return GetShootTarget()->BodyTarget( posSrc, bNoisy );
 
 		// Trace down...
@@ -2390,7 +2390,7 @@ void CNPC_MetroPolice::FireBullets( const FireBulletsInfo_t &info )
 
 			// This makes it so that if the player gets hit underwater, 
 			// he won't take damage if his viewpoint is above water.
-			if ( !IsEnemyInAnAirboat() && ( pPlayer->GetWaterLevel() != 3 ) )
+			if ( !IsEnemyInAnAirboat() && ( pPlayer->GetWaterLevel() != WaterLevel::WL_Eyes ) )
 			{
 				actualInfo.m_nFlags |= FIRE_BULLETS_DONT_HIT_UNDERWATER;
 			}
@@ -4571,7 +4571,7 @@ void CNPC_MetroPolice::StartTask( const Task_t *pTask )
 		{
 			if( !( m_spawnflags & SF_METROPOLICE_NOCHATTER ) )
 			{
-				if( GetEnemy() && GetEnemy()->GetWaterLevel() > 0 )
+				if( GetEnemy() && GetEnemy()->GetWaterLevel() > WaterLevel::WL_NotInWater )
 				{
 					EmitSound( "NPC_MetroPolice.WaterSpeech" );
 				}

@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-template <class UTLMAP, int KEY_TYPE, int FIELD_TYPE>
+template <class UTLMAP, fieldtype_t KEY_TYPE, fieldtype_t FIELD_TYPE>
 class CUtlMapDataOps : public CDefSaveRestoreOps
 {
 public:
@@ -24,14 +24,14 @@ public:
 		UTLCLASS_SAVERESTORE_VALIDATE_TYPE( FIELD_TYPE );
 	}
 
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
-	{		
-		datamap_t *pKeyDatamap = CTypedescDeducer<KEY_TYPE>::Deduce( (UTLMAP *)NULL );
-		datamap_t *pFieldDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLMAP *)NULL );
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
+	{
+		datamap_t *pKeyDatamap = CTypedescDeducer<KEY_TYPE>::Deduce( (UTLMAP *)nullptr );
+		datamap_t *pFieldDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLMAP *)nullptr );
 		typedescription_t dataDesc[] = 
 		{
 			{
-				(fieldtype_t)KEY_TYPE, 
+				KEY_TYPE, 
 				"K", 
 				{ 0, 0 },
 				1, 
@@ -47,7 +47,7 @@ public:
 			},
 			
 			{
-				(fieldtype_t)FIELD_TYPE, 
+				FIELD_TYPE, 
 				"T", 
 				{ offsetof(typename UTLMAP::Node_t, elem), 0 },
 				1, 
@@ -77,17 +77,17 @@ public:
 #endif
 		};
 
-		typename UTLMAP::CTree *pUtlRBTree = ((UTLMAP *)fieldInfo.pField)->AccessTree();
+		auto *pUtlRBTree = ((UTLMAP *)fieldInfo.pField)->AccessTree();
 
 		pSave->StartBlock();
 		
 		int nElems = pUtlRBTree->Count();
 		pSave->WriteInt( &nElems, 1 );
 
-		typename UTLMAP::CTree::IndexType_t i = pUtlRBTree->FirstInorder();
+		auto i = pUtlRBTree->FirstInorder();
 		while ( i != pUtlRBTree->InvalidIndex() )
 		{
-			typename UTLMAP::CTree::ElemType_t &elem = pUtlRBTree->Element( i );
+			auto &elem = pUtlRBTree->Element( i );
 
 			pSave->WriteAll( &elem, &dataMap );
 
@@ -96,14 +96,14 @@ public:
 		pSave->EndBlock();
 	}
 	
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
-		datamap_t *pKeyDatamap = CTypedescDeducer<KEY_TYPE>::Deduce( (UTLMAP *)NULL );
-		datamap_t *pFieldDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLMAP *)NULL );
+		datamap_t *pKeyDatamap = CTypedescDeducer<KEY_TYPE>::Deduce( (UTLMAP *)nullptr );
+		datamap_t *pFieldDatamap = CTypedescDeducer<FIELD_TYPE>::Deduce( (UTLMAP *)nullptr );
 		typedescription_t dataDesc[] = 
 		{
 			{
-				(fieldtype_t)KEY_TYPE, 
+				KEY_TYPE, 
 				"K", 
 				{ 0, 0 },
 				1, 
@@ -119,7 +119,7 @@ public:
 			},
 			
 			{
-				(fieldtype_t)FIELD_TYPE, 
+				FIELD_TYPE, 
 				"T", 
 				{ offsetof(typename UTLMAP::Node_t, elem), 0 },
 				1, 
@@ -149,7 +149,7 @@ public:
 #endif
 		};
 
-		UTLMAP *pUtlMap = ((UTLMAP *)fieldInfo.pField);
+		auto *pUtlMap = ((UTLMAP *)fieldInfo.pField);
 
 		pRestore->StartBlock();
 
@@ -165,15 +165,15 @@ public:
 		pRestore->EndBlock();
 	}
 	
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		UTLMAP *pUtlMap = (UTLMAP *)fieldInfo.pField;
+		auto *pUtlMap = (UTLMAP *)fieldInfo.pField;
 		pUtlMap->RemoveAll();
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
-		UTLMAP *pUtlMap = (UTLMAP *)fieldInfo.pField;
+		auto *pUtlMap = (UTLMAP *)fieldInfo.pField;
 		return ( pUtlMap->Count() == 0 );
 	}
 	
@@ -181,7 +181,7 @@ public:
 
 //-------------------------------------
 
-template <int KEYTYPE, int FIELD_TYPE>
+template <fieldtype_t KEYTYPE, fieldtype_t FIELD_TYPE>
 class CUtlMapDataopsInstantiator
 {
 public:

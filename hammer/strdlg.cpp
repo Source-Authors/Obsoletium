@@ -9,8 +9,8 @@
 //
 
 #include "stdafx.h"
-#include "hammer.h"
 #include "StrDlg.h"
+#include "hammer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -20,7 +20,7 @@
 
 CStrDlg::CStrDlg(DWORD dwFlags, LPCTSTR pszString, LPCTSTR pszPrompt, 
 				 LPCTSTR pszTitle)
-	: CDialog(CStrDlg::IDD, NULL)
+	: CBaseDlg(CStrDlg::IDD, NULL)
 {
 	//{{AFX_DATA_INIT(CStrDlg)
 	m_string = _T("");
@@ -38,7 +38,7 @@ CStrDlg::CStrDlg(DWORD dwFlags, LPCTSTR pszString, LPCTSTR pszPrompt,
 
 void CStrDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	__super::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_PROMPT, m_strPrompt);
 	DDX_Text(pDX, IDC_EDIT, m_string);
 	DDX_Control(pDX, IDC_EDIT, m_cEdit);
@@ -47,7 +47,7 @@ void CStrDlg::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-BEGIN_MESSAGE_MAP(CStrDlg, CDialog)
+BEGIN_MESSAGE_MAP(CStrDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CStrDlg)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -64,7 +64,7 @@ void CStrDlg::SetRange(int iLow, int iHigh, int iIncrement_)
 
 BOOL CStrDlg::OnInitDialog() 
 {
-	CDialog::OnInitDialog();
+	__super::OnInitDialog();
 
 	if(dwFlags & Spin)	// enable spin
 	{

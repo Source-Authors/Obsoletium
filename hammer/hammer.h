@@ -52,6 +52,7 @@ enum DirIndex_t
 class CCommandSequence
 {
 	public:
+		CCommandSequence(){ memset( m_szName, 0, sizeof(m_szName) ); }
 
 		CCommandArray m_Commands;
 		char m_szName[128];
@@ -119,7 +120,12 @@ public:
 	virtual int Run(void);
 	//}}AFX_VIRTUAL
 
-	void GetDirectory(DirIndex_t dir, char *p);
+	void GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, intp size) const;
+	template<intp dirSize>
+	void GetDirectory(DirIndex_t dir, OUT_Z_ARRAY char (&p)[dirSize]) const
+	{
+		GetDirectory(dir, p, dirSize);
+	}
 	void SetDirectory(DirIndex_t dir, const char *p);
 
 	COLORREF GetProfileColor(const char *pszSection, const char *pszKey, int r, int g, int b);
@@ -214,10 +220,10 @@ extern IEngineAPI	*g_pEngineAPI;
 extern CreateInterfaceFn g_Factory;
 bool IsRunningInEngine();
 
-// event update system - lets you check for events such as gemoetry modification for updating stuff.
+// event update system - lets you check for events such as geometry modification for updating stuff.
 void SignalUpdate(int ev);									// EVTYPE_xx
 int GetUpdateCounter(int ev);									// return timestamp
-float GetUpdateTime(int ev);									// return floating point time event was signalled
+double GetUpdateTime(int ev);									// return floating point time event was signalled
 void SignalGlobalUpdate(void);								// flag ALL events, such as on map load
 
 #define EVTYPE_FACE_CHANGED 0
