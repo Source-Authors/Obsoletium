@@ -13,8 +13,8 @@ class CPhysicsObject;
 class IPhysicsShadowController;
 class IPhysicsPlayerController;
 
-extern IPhysicsShadowController *CreateShadowController( CPhysicsObject *pObject, bool allowTranslation, bool allowRotation );
-extern IPhysicsPlayerController *CreatePlayerController( CPhysicsObject *pObject );
+[[nodiscard]] extern IPhysicsShadowController *CreateShadowController( CPhysicsObject *pObject, bool allowTranslation, bool allowRotation );
+[[nodiscard]] extern IPhysicsPlayerController *CreatePlayerController( CPhysicsObject *pObject );
 extern void DestroyPlayerController( IPhysicsPlayerController *pController );
 
 
@@ -51,7 +51,7 @@ struct shadowcontrol_params_t
 };
 
 
-float ComputeShadowControllerHL( CPhysicsObject *pObject, const hlshadowcontrol_params_t &params, float secondsToArrival, float dt );
-float ComputeShadowControllerIVP( IVP_Real_Object *pivp, shadowcontrol_params_t &params, float secondsToArrival, float dt );
+[[nodiscard]] float ComputeShadowControllerHL( CPhysicsObject *pObject, const hlshadowcontrol_params_t &params, float secondsToArrival, float dt );
+[[nodiscard]] float ComputeShadowControllerIVP( IVP_Real_Object *pivp, shadowcontrol_params_t &params, float secondsToArrival, float dt );
 
 #endif // PHYSICS_SHADOW_H

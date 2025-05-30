@@ -6,9 +6,11 @@
 //=============================================================================//
 
 #include "vgui_controls/ControllerMap.h"
+
+#include "tier1/KeyValues.h"
+
 #include "vgui/ISurface.h"
 #include "vgui/KeyCode.h"
-#include "KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

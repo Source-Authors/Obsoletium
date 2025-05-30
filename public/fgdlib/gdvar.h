@@ -10,7 +10,7 @@
 #pragma once
 
 #include "tier1/utlvector.h"
-#include "tier1/TokenReader.h" // dvs: for MAX_STRING. Fix.
+#include "tier1/tokenreader.h" // dvs: for MAX_STRING. Fix.
 
 
 class MDkeyvalue;
@@ -93,14 +93,14 @@ class GDinputvariable
 		inline GDIV_TYPE GetType() const { return m_eType; }
 		const char *GetTypeText(void) const;
 		
-		inline void GetDefault(int *pnStore, ptrdiff_t storeLen) const
+		inline void GetDefault(int *pnStore, intp storeLen) const
 		{
 			// dimhotepus: Ensure buffer has room.
 			if (storeLen > 0)
 				pnStore[0] = m_nDefault;
 		}
 
-		inline void GetDefault(char *pszStore, ptrdiff_t storeLen) const
+		inline void GetDefault(char *pszStore, intp storeLen) const
 		{ 
 			V_strncpy(pszStore, m_szDefault, storeLen); 
 		}
@@ -132,7 +132,7 @@ class GDinputvariable
 		// for choices/flags:
 		CUtlVector<GDIVITEM> m_Items;
 
-		static char *m_pszEmpty;
+		static const char *m_pszEmpty;
 
 		char m_szName[MAX_IDENT];
 		char m_szLongName[MAX_STRING];

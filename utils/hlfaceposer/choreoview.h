@@ -12,7 +12,7 @@
 
 
 #include <mxtk/mx.h>
-#include <mxtk/mxWindow.h>
+#include <mxtk/mxwindow.h>
 #include "mxBitmapButton.h"
 #include "utlvector.h"
 #include "ChoreoWidget.h"

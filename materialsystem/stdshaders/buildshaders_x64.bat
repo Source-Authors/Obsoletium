@@ -29,11 +29,12 @@ set SrcDirBase=..\..
 set ChangeToDir=../../../game/bin/x64
 set shaderDir=shaders
 set SDKArgs=-nompi
-set SHADERINCPATH=vshtmp9/... fxctmp9/...
+set SHADERINCPATH=include/...
 
 
 set DIRECTX_SDK_VER=pc09.00
 set DIRECTX_SDK_BIN_DIR=dx9sdk\utilities\x64
+set DIRECTX_SDK_BIN_DEP=dx9sdk\utilities\x64\D3DX9_43.dll
 
 if /i "%2" == "-dx9_30" goto dx_sdk_dx9_30
 if /i "%2" == "-dx10" goto dx_sdk_dx10
@@ -42,10 +43,12 @@ goto dx_sdk_end
 :dx_sdk_dx9_30
 			set DIRECTX_SDK_VER=pc09.30
 			set DIRECTX_SDK_BIN_DIR=dx10sdk\utilities\dx9_30\x64
+			set DIRECTX_SDK_BIN_DEP=dx10sdk\utilities\dx9_30\x64\D3DX9_43.dll
 			goto dx_sdk_end
 :dx_sdk_dx10
 			set DIRECTX_SDK_VER=pc10.00
 			set DIRECTX_SDK_BIN_DIR=dx10sdk\utilities\dx10_40\x64
+			set DIRECTX_SDK_BIN_DEP=
 			goto dx_sdk_end
 :dx_sdk_end
 
@@ -167,6 +170,9 @@ if /i "%DIRECTX_SDK_VER%" == "pc10.00" (
 )
 
 echo %SrcDirBase%\%DIRECTX_SDK_BIN_DIR%\dx_proxy.dll >> filestocopy.txt
+if defined DIRECTX_SDK_BIN_DEP (
+	echo %SrcDirBase%\%DIRECTX_SDK_BIN_DEP% >> filestocopy.txt
+)
 
 echo %SrcDirBase%\..\game\bin\x64\shadercompile.exe >> filestocopy.txt
 echo %SrcDirBase%\..\game\bin\x64\shadercompile_dll.dll >> filestocopy.txt

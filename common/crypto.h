@@ -48,7 +48,7 @@ public:
 		m_cubData = 0;
 	}
 
-	void Set( uint8 *pubData, size_t cubData )
+	void Set( const uint8 *pubData, size_t cubData )
 	{
 		if ( !pubData || !cubData )
 			return;

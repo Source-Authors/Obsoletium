@@ -140,22 +140,22 @@ const CommandResponse_t			cuMaxCommandResponse
 typedef u32								ContextID_t;
 
 // This is the version of the protocol used by latest-build clients.
-const ProtocolVersion_t			cuCurrentProtocolVersion		= 1;
+constexpr inline ProtocolVersion_t			cuCurrentProtocolVersion		= 1;
 
 // This is the minimum protocol version number that the client must 
 // be able to speak in order to communicate with the server.
 // The client sends its protocol version this before every command, and if we 
 // don't support that version anymore then we tell it nicely.  The client 
 // should respond by doing an auto-update.
-const ProtocolVersion_t			cuRequiredProtocolVersion		= 1;
+constexpr inline ProtocolVersion_t			cuRequiredProtocolVersion		= 1;
 
 
 namespace Commands
 {
-	const Command_t				cuGracefulClose					= 0;
-	const Command_t				cuSendGameStats					= 1;
-	const Command_t				cuNumCommands					= 2;
-	const Command_t				cuNoCommandReceivedYet			= cuMaxCommand;
+	constexpr inline Command_t				cuGracefulClose					= 0;
+	constexpr inline Command_t				cuSendGameStats					= 1;
+	constexpr inline Command_t				cuNumCommands					= 2;
+	constexpr inline Command_t				cuNoCommandReceivedYet			= cuMaxCommand;
 }
 
 
@@ -172,12 +172,12 @@ namespace HarvestFileCommand
 	// Legal values defined by ESendMethod
 	typedef u32							SendMethod_t;
 
-	const CommandResponse_t		cuOkToSendFile					= 0;
-	const CommandResponse_t		cuFileTooBig					= 1;
-	const CommandResponse_t		cuInvalidSendMethod				= 2;
-	const CommandResponse_t		cuInvalidMaxCompressedChunkSize	= 3;
-	const CommandResponse_t		cuInvalidGameStatsContext		= 4;
-	const uint							cuNumCommandResponses			= 5;
+	constexpr inline CommandResponse_t		cuOkToSendFile					= 0;
+	constexpr inline CommandResponse_t		cuFileTooBig					= 1;
+	constexpr inline CommandResponse_t		cuInvalidSendMethod				= 2;
+	constexpr inline CommandResponse_t		cuInvalidMaxCompressedChunkSize	= 3;
+	constexpr inline CommandResponse_t		cuInvalidGameStatsContext		= 4;
+	constexpr inline uint					cuNumCommandResponses			= 5;
 }
 
 //#############################################################################
@@ -395,7 +395,7 @@ public:
 #endif
 			char hex[ 17 ];
 			Q_memset( hex, 0, sizeof( hex ) );
-			Q_binarytohex( (const byte *)&newId, sizeof( newId ), hex, sizeof( hex ) );
+			V_binarytohex( newId, hex );
 
 			// If running at Valve, copy in the users name here
 			if ( Steam3Client().SteamUtils() && ( Steam3Client().SteamUser()->BLoggedOn() ) && 
@@ -487,8 +487,8 @@ public:
 
 		params.m_uEngineBuildNumber		= build_number();
 		Q_strncpy( params.m_sExecutableName, "hl2.exe", sizeof( params.m_sExecutableName ) );
-		Q_FileBase( com_gamedir, params.m_sGameDirectory, sizeof( params.m_sGameDirectory ) );
-		Q_FileBase( mapname, params.m_sMapName, sizeof( params.m_sMapName ) );
+		Q_FileBase( com_gamedir, params.m_sGameDirectory );
+		Q_FileBase( mapname, params.m_sMapName );
 		params.m_uStatsBlobVersion		= blobversion;
 		params.m_uStatsBlobSize			= blobsize;
 		params.m_pStatsBlobData			= ( void * )pvBlobData;
@@ -521,14 +521,14 @@ void UpdateProgress( const TGameStatsParameters & params, char const *fmt, ... )
 	char str[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( str, sizeof( str ) - 1, fmt, argptr );
+	V_vsprintf_safe( str, fmt, argptr );
 	va_end( argptr );
 
 	char outstr[ 2060 ];
-	Q_snprintf( outstr, sizeof( outstr ), "(%u): %s", params.m_uProgressContext, str );
+	V_sprintf_safe( outstr, "(%u): %s", params.m_uProgressContext, str );
 
 	TGameStatsProgress progress;
-	Q_strncpy( progress.m_sStatus, outstr, sizeof( progress.m_sStatus ) );
+	V_strcpy_safe( progress.m_sStatus, outstr );
 
 	// Invoke the callback
 	( *params.m_pOptionalProgressFunc )( params.m_uProgressContext, progress );
@@ -1036,7 +1036,12 @@ EGameStatsUploadStatus Win32UploadGameStatsBlocking
 #endif
 
 			netadr_t GameStatsHarvesterFSMIPAddress;
-			GameStatsHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr );
+			if ( !GameStatsHarvesterFSMIPAddress.SetFromSockadr( (struct sockaddr *)&adr ) )
+			{
+				// dimhotepus: Handle invalid address.
+				UpdateProgress( rGameStatsParameters, "Request denied, server IP:port pair is not IPv4 address." );
+				return eGameStatsUploadFailed;
+			}
 
 			UpdateProgress( rGameStatsParameters, "Server requested game stats upload to %s.", GameStatsHarvesterFSMIPAddress.ToString() );
 

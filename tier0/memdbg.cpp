@@ -9,11 +9,11 @@
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"
 #include "mem_helpers.h"
-#ifdef _WIN32
+
+#if defined(_WIN32)
 #include "winlite.h"
 #include <crtdbg.h>
-#endif
-#ifdef OSX
+#elif defined(OSX)
 #include <malloc/malloc.h>
 #include <mach/mach.h>
 #include <stdlib.h>
@@ -25,8 +25,9 @@
 #include <unordered_set>
 #include <climits>
 #include "tier0/threadtools.h"
+
 #if ( !defined(_DEBUG) && defined(USE_MEM_DEBUG) )
-#pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't check this in!")
+#pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't commit this!")
 #endif
 #if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
 
@@ -42,7 +43,7 @@
 #define DebugFree	free
 
 #ifdef WIN32
-int g_DefaultHeapFlags = _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF );
+static const int g_DefaultHeapFlags = _CrtSetDbgFlag( _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_ALLOC_MEM_DF );
 #endif
 
 #if defined( _MEMTEST )
@@ -247,7 +248,7 @@ inline int WalkStack( void **ppAddresses, int nMaxAddresses, [[maybe_unused]] in
 //-----------------------------------------------------------------------------
 
 // The size of the no-man's land used in unaligned and aligned allocations:
-static size_t const no_mans_land_size = 4;
+static constexpr inline size_t no_mans_land_size = 4;
 
 // NOTE: This exactly mirrors the dbg header in the MSDEV crt
 // eventually when we write our own allocator, we can kill this
@@ -297,7 +298,7 @@ DbgMemHeader_t *GetCrtDbgMemHeader( void *pMem )
 }
 #endif
 
-inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
+static inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
 {
 #ifdef OSX
 	void *pAllocedMem = malloc_zone_malloc( malloc_default_zone(), nSize + sizeof(DbgMemHeader_t) );
@@ -338,7 +339,7 @@ inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
 #endif // LINUX || WIN32
 }
 
-inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName, int nLine )
+static inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName, int nLine )
 {
 	if ( !pMem )
 		return InternalMalloc( nNewSize, pFileName, nLine );
@@ -375,7 +376,7 @@ inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pFileName
 #endif // LINUX || WIN32
 }
 
-inline void InternalFree( void *pMem )
+static inline void InternalFree( void *pMem )
 {
 	if ( !pMem )
 		return;
@@ -384,17 +385,15 @@ inline void InternalFree( void *pMem )
 #if !defined( _DEBUG ) || defined( POSIX )
 #ifdef OSX
 	malloc_zone_free( malloc_default_zone(), pMem );
-#elif LINUX
-	free( pInternalMem );
 #else
-	free( pInternalMem );	
+	free( pInternalMem );
 #endif
 #else
 	_free_dbg( pInternalMem, _NORMAL_BLOCK );
 #endif
 }
 
-inline size_t InternalMSize( void *pMem )
+static inline size_t InternalMSize( void *pMem )
 {
 	//$ TODO. For Linux, we could use 'int size = malloc_usable_size( pMem )'...
 #if defined(POSIX)
@@ -409,7 +408,7 @@ inline size_t InternalMSize( void *pMem )
 #endif	
 }
 
-inline size_t InternalLogicalSize( void *pMem )
+static inline size_t InternalLogicalSize( void *pMem )
 {
 #if defined(POSIX)
 	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( pMem );
@@ -488,7 +487,7 @@ class CDbgMemAlloc final : public IMemAlloc
 {
 public:
 	CDbgMemAlloc();
-	virtual ~CDbgMemAlloc();
+	~CDbgMemAlloc();
 
 	// Release versions
 	void *Alloc( size_t nSize ) override;
@@ -538,7 +537,22 @@ public:
 	void CompactHeap() override
 	{
 #if defined( _DEBUG )
-		HeapCompact( GetProcessHeap(), 0 );
+		// dimhotepus: Cleanup caches and decommit if possible.
+		// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
+		// in the process with a low-fragmentation heap (LFH) will have their caches
+		// optimized, and the memory will be decommitted if possible.
+		//
+		// See
+		// https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation
+		HEAP_OPTIMIZE_RESOURCES_INFORMATION information{
+		    HEAP_OPTIMIZE_RESOURCES_CURRENT_VERSION, 0U};
+		const BOOL ok = ::HeapSetInformation(
+		    nullptr, HeapOptimizeResources, &information, sizeof(information));
+
+		const size_t largestFreeBytes = ::HeapCompact( ::GetProcessHeap(), 0 );
+
+		Msg( "Compacted heap. Largest free block is %zu bytes, optimize heap %s.\n",
+			largestFreeBytes, ok ? "OK" : "FAIL" );
 #endif
 	}
 
@@ -672,8 +686,8 @@ private:
 
 	// FIXME: specify a spew output func for dumping stats
 	// Stat output
-	void DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info );
-	void DumpFileStats();
+	void DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info ) const;
+	void DumpFileStats() const;
 	void DumpStats() override;
 	void DumpStatsFileBase( char const *pchFileBase ) override;
 	void DumpBlockStats( void *p ) override;
@@ -694,11 +708,11 @@ private:
 	size_t				m_sMemoryAllocFailed;
 };
 
-static char const *g_pszUnknown = "unknown";
+static constexpr inline char g_pszUnknown[]{"unknown"};
 
 //-----------------------------------------------------------------------------
 
-constexpr int DBG_INFO_STACK_DEPTH = 32;
+static constexpr inline int DBG_INFO_STACK_DEPTH = 32;
 
 struct DbgInfoStack_t
 {
@@ -752,7 +766,7 @@ static FILE* s_DbgFile;
 static void DefaultHeapReportFunc( char const *pFormat, ... )
 {
 	va_list args;
-	va_start( args, pFormat );
+	va_start( args, pFormat ); //-V2018 //-V2019
 	vfprintf( s_DbgFile, pFormat, args );
 	va_end( args );
 }
@@ -770,7 +784,7 @@ CDbgMemAlloc::CDbgMemAlloc() : m_pStatMap{nullptr}, m_pFilenames{nullptr}, m_sMe
 
 	if ( !IsDebug() )
 	{
-		Plat_DebugString( "USE_MEM_DEBUG is enabled in a release build. Don't check this in!\n" );
+		Plat_DebugString( "USE_MEM_DEBUG is enabled in a release build. Don't commit this!\n" );
 	}
 }
 
@@ -791,6 +805,14 @@ void CDbgMemAlloc::Initialize()
 		// dimhotepus: Allocate reasonable amount.
 		m_pStatMap->reserve( 2048 + 1024 );
 		m_bInitialized = true;
+
+		// Enable application termination (breakpoint) on heap corruption. This is
+		// better than trying to patch it up and continue, both from a security and
+		// a bug-finding point of view. Do this always on Windows since the heap is
+		// used by video drivers and other in-proc components.
+#if defined(PLATFORM_WINDOWS_PC)
+		HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
+#endif
 	}
 }
 
@@ -1045,7 +1067,7 @@ CDbgMemAlloc::MemInfo_t &CDbgMemAlloc::FindOrCreateEntry( const char *pFileName,
 	// retval.first->second == the MemInfo_t that's part of the StatMapIter_t 
 	// dimhotepus: Insert if not found.
 	return m_pStatMap
-		->emplace( MemInfoKey_t( pFileName, line ), MemInfo_t() )
+		->try_emplace( MemInfoKey_t( pFileName, line ), MemInfo_t() )
 		.first->second;
 }
 
@@ -1117,8 +1139,7 @@ void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, s
 	Assert( info.m_nCurrentCount != 0 );
 
 	// It is technically legal for code to request allocations of zero bytes, and there are a number of places in our code
-	// that do. So only assert that nLogicalSize >= 0. https://stackoverflow.com/questions/1087042/c-new-int0-will-it-allocate-memory
-	Assert( nLogicalSize >= 0 );
+	// that do.
 	Assert( info.m_nCurrentSize >= nLogicalSize );
 	--info.m_nCurrentCount;
 	info.m_nCurrentSize -= nLogicalSize;
@@ -1201,6 +1222,13 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 
 	m_Timer.Start();
 	void *pMem = InternalMalloc( nSize, pFileName, nLine );
+	if ( !pMem )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+		
+		pMem = InternalMalloc( nSize, pFileName, nLine );
+	}
 	m_Timer.End();
 
 	if ( pMem )
@@ -1233,6 +1261,13 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, in
 
 	m_Timer.Start();
 	pMem = InternalRealloc( pMem, nSize, pFileName, nLine );
+	if ( !pMem )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+
+		pMem = InternalRealloc( pMem, nSize, pFileName, nLine );
+	}
 	m_Timer.End();
 
 	if ( pMem )
@@ -1417,7 +1452,7 @@ void CDbgMemAlloc::DumpBlockStats( void *p )
 //-----------------------------------------------------------------------------
 // Stat output
 //-----------------------------------------------------------------------------
-void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info )
+void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info ) const
 {
 	m_OutputFunc("%s, line %i\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%d",
 		pAllocationName,
@@ -1445,7 +1480,7 @@ void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const Mem
 //-----------------------------------------------------------------------------
 // Stat output
 //-----------------------------------------------------------------------------
-void CDbgMemAlloc::DumpFileStats()
+void CDbgMemAlloc::DumpFileStats() const
 {
 	if ( !m_pStatMap )
 		return;
@@ -1465,10 +1500,10 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	HEAP_LOCK();
 
 	char szFileName[MAX_PATH];
-	static int s_FileCount = 0;
+	static unsigned s_FileCount = 0;
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
-		_snprintf( szFileName, std::size( szFileName ), "%s%d.txt", pchFileBase, s_FileCount );
+		_snprintf( szFileName, std::size( szFileName ), "%s%u.txt", pchFileBase, s_FileCount );
 		szFileName[ std::size(szFileName) - 1 ] = '\0';
 
 		++s_FileCount;
@@ -1744,44 +1779,6 @@ static void override_free_hook(struct _malloc_zone_t *zone, void *ptr)
     
     set_override_hooks(); 
 } 
-
-
-/*
- 
- These are func's we could optionally override right now on OSX but don't need to
- 
- static size_t override_size_hook(struct _malloc_zone_t *zone, const void *ptr)
- {
- set_osx_hooks();  
- DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( (void *)ptr );
- set_override_hooks(); 
- if ( *((int*)pInternalMem->m_Reserved) == 0xf00df00d )
- {
- return pInternalMem->nLogicalSize;
- }
- return 0;
- } 
- 
- 
- static void *override_calloc_hook(struct _malloc_zone_t *zone, size_t num_items, size_t size )
- {
- void *ans = override_malloc_hook( zone, num_items*size );
- if ( !ans )
- return 0;
- memset( ans, 0x0, num_items*size );
- return ans;
- }
- 
- static void *override_valloc_hook(struct _malloc_zone_t *zone, size_t size )
- {
- return override_calloc_hook( zone, 1, size );
- }
- 
- static void override_destroy_hook(struct _malloc_zone_t *zone)
- {
- }
- */
-
 
 static inline void unprotect_malloc_zone( malloc_zone_t *malloc_zone )
 {

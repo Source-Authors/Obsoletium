@@ -28,7 +28,7 @@ LONG __stdcall DefaultToolsExceptionFilter(EXCEPTION_POINTERS *ptrs) {
   }
 
   return WriteMiniDumpUsingExceptionInfo(ptrs->ExceptionRecord->ExceptionCode,
-                                         ptrs, minidump_type)
+                                         ptrs, to_underlying(minidump_type))
              ? EXCEPTION_CONTINUE_SEARCH
              : EXCEPTION_EXECUTE_HANDLER;
 }

@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "interface.h"
+#include "tier1/interface.h"
 #include "appframework/IAppSystem.h"
 
 // the file cache can support persisting some calcs
@@ -21,7 +21,7 @@ struct SceneCachedData_t
 	int				sceneId;
 };
 
-class ISceneFileCache : public IAppSystem
+abstract_class ISceneFileCache : public IAppSystem
 {
 public:
 
@@ -38,6 +38,6 @@ public:
 	virtual void		Reload() = 0;
 };
 
-#define SCENE_FILE_CACHE_INTERFACE_VERSION "SceneFileCache002"
+constexpr inline char SCENE_FILE_CACHE_INTERFACE_VERSION[]{"SceneFileCache002"};
 
 #endif // ISCENEFILECACHE_H

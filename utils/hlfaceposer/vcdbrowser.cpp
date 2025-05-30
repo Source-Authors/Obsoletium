@@ -5,9 +5,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <windows.h>
-#include "resource.h"
 #include "vcdbrowser.h"
+#include "resource.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "filesystem.h"
 #include "tabwindow.h"
@@ -16,6 +15,8 @@
 #include "UtlBuffer.h"
 #include "ChoreoEvent.h"
 #include "ChoreoView.h"
+
+#include "winlite.h"
 
 CVCDBrowser	*g_pVCDBrowser = NULL;
 
@@ -125,13 +126,13 @@ public:
 			cur = FindOrAddChildItem( cur, check );
 		}
 
-		setUserData( cur, (void *)pathId );
+		setUserData( cur, (void *)(intp)pathId );
 	}
 
 	char const *GetSelectedPath( void )
 	{
 		mxTreeViewItem *tvi = getSelectedItem();
-		unsigned int id = (unsigned int)getUserData( tvi );
+		int id = (int)(intp)getUserData( tvi );
 
 		if ( id < 0 || id >= m_Paths.Count() )
 		{
@@ -472,7 +473,7 @@ void CVCDBrowser::OpenVCD( const FileNameHandle_t& handle )
 	if ( filesystem->String( handle, fn, sizeof( fn ) ) )
 	{
 		char pFullPath[MAX_PATH];
-		const char *pFileName = filesystem->RelativePathToFullPath( fn, "GAME", pFullPath, sizeof(pFullPath) );
+		const char *pFileName = filesystem->RelativePathToFullPath_safe( fn, "GAME", pFullPath );
 		if ( !pFileName )
 		{
 			pFileName = fn;
@@ -487,8 +488,7 @@ void CVCDBrowser::OpenVCD( const FileNameHandle_t& handle )
 //-----------------------------------------------------------------------------
 bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CNameLessFunc >& soundlist, char const* pDirectoryName, int nDirectoryNameLen )
 {
-	char *pWildCard;
-	pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
+	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
 	Q_snprintf( pWildCard, nDirectoryNameLen + 7, "%s/*.vcd", pDirectoryName );
 
 	if ( !filesystem )
@@ -504,7 +504,7 @@ bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CN
 		{
 			// Strip off the 'sound/' part of the name.
 			char *pFileNameWithPath;
-			int nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
+			intp nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
 			pFileNameWithPath = (char *)stackalloc( nAllocSize );
 			Q_snprintf(	pFileNameWithPath, nAllocSize, "%s/%s", &pDirectoryName[ SCENES_PREFIX_LEN ], pFileName ); 
 			Q_strnlwr( pFileNameWithPath, nAllocSize );

@@ -214,7 +214,7 @@ public:
 // Interface to allow the particle system to call back into the client
 //-----------------------------------------------------------------------------
 
-#define PARTICLE_SYSTEM_QUERY_INTERFACE_VERSION "VParticleSystemQuery001"
+constexpr inline char PARTICLE_SYSTEM_QUERY_INTERFACE_VERSION[]{"VParticleSystemQuery001"};
 
 class IParticleSystemQuery : public IAppSystem
 {
@@ -515,7 +515,7 @@ enum ParticleOperatorId_t
 //-----------------------------------------------------------------------------
 // Class factory for particle operators
 //-----------------------------------------------------------------------------
-class IParticleOperatorDefinition
+abstract_class IParticleOperatorDefinition
 {
 public:
 	virtual const char *GetName() const = 0;
@@ -591,13 +591,13 @@ public:
 	}
 
 	// a particle simulator does this
-	virtual void Operate( CParticleCollection *pParticles, float flOpStrength, void *pContext ) const
+	virtual void Operate( [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] float flOpStrength, [[maybe_unused]] void *pContext ) const
 	{
 	}
 
 	// a renderer overrides this
-	virtual void Render( IMatRenderContext *pRenderContext, 
-						 CParticleCollection *pParticles, void *pContext ) const
+	virtual void Render( [[maybe_unused]] IMatRenderContext *pRenderContext, 
+						 [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] void *pContext ) const
 	{
 	}
 
@@ -606,12 +606,12 @@ public:
 		return true;
 	}
 
-	virtual void RenderUnsorted( CParticleCollection *pParticles, void *pContext, IMatRenderContext *pRenderContext, CMeshBuilder &meshBuilder, int nVertexOffset, int nFirstParticle, int nParticleCount ) const
+	virtual void RenderUnsorted( [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] void *pContext, [[maybe_unused]] IMatRenderContext *pRenderContext, [[maybe_unused]] CMeshBuilder &meshBuilder, [[maybe_unused]] int nVertexOffset, [[maybe_unused]] int nFirstParticle, [[maybe_unused]] int nParticleCount ) const
 	{
 	}
 
 	// Returns the number of verts + indices to render
-	virtual int GetParticlesToRender( CParticleCollection *pParticles, void *pContext, int nFirstParticle, int nRemainingVertices, int nRemainingIndices, int *pVertsUsed, int *pIndicesUsed ) const
+	virtual int GetParticlesToRender( [[maybe_unused]] CParticleCollection *pParticles, [[maybe_unused]] void *pContext, [[maybe_unused]] int nFirstParticle, [[maybe_unused]] int nRemainingVertices, [[maybe_unused]] int nRemainingIndices, int *pVertsUsed, int *pIndicesUsed ) const
 	{
 		*pVertsUsed = 0;
 		*pIndicesUsed = 0;

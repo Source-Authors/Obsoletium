@@ -176,10 +176,10 @@ bool FileSystem_UseVProjectBinDir( bool bEnable );
 // This is used by all things that use the application framework:
 // Note that the application framework automatically takes care of step 1 if you use CSteamApplication.
 // Step 1: Ask filesystem_init for the name of the filesystem DLL to load
-[[nodiscard]] FSReturnCode_t FileSystem_GetFileSystemDLLName( char *pFileSystemDLL, size_t nMaxLen, bool &bSteam );
+[[nodiscard]] FSReturnCode_t FileSystem_GetFileSystemDLLName( OUT_Z_CAP(nMaxLen) char *pFileSystemDLL, size_t nMaxLen, bool &bSteam );
 
 template<size_t max_size>
-[[nodiscard]] FSReturnCode_t FileSystem_GetFileSystemDLLName( char (&dll_name)[max_size], bool &is_steam )
+[[nodiscard]] FSReturnCode_t FileSystem_GetFileSystemDLLName( OUT_Z_ARRAY char (&dll_name)[max_size], bool &is_steam )
 {
 	return FileSystem_GetFileSystemDLLName( dll_name, max_size, is_steam );
 }
@@ -207,10 +207,10 @@ void FileSystem_AddSearchPath_Platform( IFileSystem *pFileSystem, const char *sz
 // dimhotepus: Return old file system error mode.
 FSErrorMode_t FileSystem_SetErrorMode( FSErrorMode_t errorMode = FS_ERRORMODE_VCONFIG );
 
-[[nodiscard]] bool FileSystem_GetExecutableDir( char *exedir, unsigned exeDirLen );
+[[nodiscard]] bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned exeDirLen );
 
 template<size_t max_size>
-[[nodiscard]] bool FileSystem_GetExecutableDir( char (&exedir)[max_size] )
+[[nodiscard]] bool FileSystem_GetExecutableDir( OUT_Z_ARRAY char (&exedir)[max_size] )
 {
 	return FileSystem_GetExecutableDir( exedir, max_size );
 }
@@ -224,7 +224,7 @@ void FileSystem_ClearSteamEnvVars();
 [[nodiscard]] const char *FileSystem_GetLastErrorString();
 
 template <int outSize>
-[[nodiscard]] bool Q_getwd(char (&out)[outSize])
+[[nodiscard]] bool Q_getwd(OUT_Z_ARRAY char (&out)[outSize])
 {
 	[[nodiscard]] bool Q_getwd(char *out, int size);
 	return Q_getwd( out, outSize );

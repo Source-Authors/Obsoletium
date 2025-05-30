@@ -149,38 +149,38 @@ public:
 	virtual char const	*GetUserName();
 	virtual char const	*GetUserName_Display();
 
-	virtual ptrdiff_t			GetNameCount();
-	virtual char const	*GetName( ptrdiff_t index );
+	virtual intp			GetNameCount();
+	virtual char const	*GetName( intp index );
 
-	virtual ptrdiff_t			GetDisplayNameCount();
-	virtual char const  *GetDisplayName( ptrdiff_t index );
+	virtual intp			GetDisplayNameCount();
+	virtual char const  *GetDisplayName( intp index );
 
 	virtual char const	*GetDisplayNameForUserName( char const *username );
 	virtual char const  *GetUserNameForDisplayName( char const *display );
 
-	virtual ptrdiff_t			GetSeverityCount();
-	virtual char const	*GetSeverity( ptrdiff_t index );
+	virtual intp			GetSeverityCount();
+	virtual char const	*GetSeverity( intp index );
 
-	virtual ptrdiff_t			GetPriorityCount();
-	virtual char const	*GetPriority( ptrdiff_t index );
+	virtual intp			GetPriorityCount();
+	virtual char const	*GetPriority( intp index );
 
-	virtual ptrdiff_t			GetAreaCount();
-	virtual char const	*GetArea( ptrdiff_t index );
+	virtual intp			GetAreaCount();
+	virtual char const	*GetArea( intp index );
 
-	virtual ptrdiff_t			GetAreaMapCount();
-	virtual char const	*GetAreaMap( ptrdiff_t );
+	virtual intp			GetAreaMapCount();
+	virtual char const	*GetAreaMap( intp );
 
-	virtual ptrdiff_t			GetMapNumberCount();
-	virtual char const	*GetMapNumber( ptrdiff_t );
+	virtual intp			GetMapNumberCount();
+	virtual char const	*GetMapNumber( intp );
 
-	virtual ptrdiff_t			GetReportTypeCount();
-	virtual char const	*GetReportType( ptrdiff_t );
+	virtual intp			GetReportTypeCount();
+	virtual char const	*GetReportType( intp );
 
 	virtual char const *GetRepositoryURL( void ) { return NULL; }
 	virtual char const *GetSubmissionURL( void ) { return NULL; }
 
-	virtual ptrdiff_t			GetLevelCount(ptrdiff_t) { return 0; }
-	virtual char const	*GetLevel(ptrdiff_t, ptrdiff_t ) { return ""; }
+	virtual intp			GetLevelCount(intp) { return 0; }
+	virtual char const	*GetLevel(intp, intp ) { return ""; }
 
 // Submission API
 	virtual void		StartNewBugReport();
@@ -309,12 +309,12 @@ char const *CBugReporter::GetUserName_Display()
 	return GetUserName();
 }
 
-ptrdiff_t CBugReporter::GetNameCount()
+intp CBugReporter::GetNameCount()
 {
 	return 1;
 }
 
-char const *CBugReporter::GetName( ptrdiff_t index )
+char const *CBugReporter::GetName( intp index )
 {
 	if ( index < 0 || index >= 1 )
 		return "<<Invalid>>";
@@ -322,12 +322,12 @@ char const *CBugReporter::GetName( ptrdiff_t index )
 	return GetUserName();
 }
 
-ptrdiff_t CBugReporter::GetDisplayNameCount()
+intp CBugReporter::GetDisplayNameCount()
 {
 	return 1;
 }
 
-char const *CBugReporter::GetDisplayName( ptrdiff_t index ) //-V524
+char const *CBugReporter::GetDisplayName( intp index ) //-V524
 {
 	if ( index < 0 || index >= 1 )
 		return "<<Invalid>>";
@@ -345,12 +345,12 @@ char const *CBugReporter::GetUserNameForDisplayName( char const *display )
 	return display;
 }
 
-ptrdiff_t CBugReporter::GetSeverityCount()
+intp CBugReporter::GetSeverityCount()
 {
 	return m_Severity.Count();
 }
 
-char const *CBugReporter::GetSeverity( ptrdiff_t index )
+char const *CBugReporter::GetSeverity( intp index )
 {
 	if ( index < 0 || index >= m_Severity.Count() )
 		return "<<Invalid>>";
@@ -358,52 +358,52 @@ char const *CBugReporter::GetSeverity( ptrdiff_t index )
 	return m_BugStrings.String( m_Severity[ index ] );
 }
 
-ptrdiff_t CBugReporter::GetPriorityCount()
+intp CBugReporter::GetPriorityCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetPriority( ptrdiff_t )
+char const *CBugReporter::GetPriority( intp )
 {
 	return "<<Invalid>>";
 }
 
-ptrdiff_t CBugReporter::GetAreaCount()
+intp CBugReporter::GetAreaCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetArea( ptrdiff_t )
+char const *CBugReporter::GetArea( intp )
 {
 	return "<<Invalid>>";
 }
 
-ptrdiff_t CBugReporter::GetAreaMapCount()
+intp CBugReporter::GetAreaMapCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetAreaMap( ptrdiff_t )
+char const *CBugReporter::GetAreaMap( intp )
 {
 	return "<<Invalid>>";
 }
 
-ptrdiff_t CBugReporter::GetMapNumberCount()
+intp CBugReporter::GetMapNumberCount()
 {
 	return 0;
 }
 
-char const *CBugReporter::GetMapNumber( ptrdiff_t )
+char const *CBugReporter::GetMapNumber( intp )
 {
 	return "<<Invalid>>";
 }
 
-ptrdiff_t CBugReporter::GetReportTypeCount()
+intp CBugReporter::GetReportTypeCount()
 {
 	return m_ReportType.Count();
 }
 
-char const *CBugReporter::GetReportType( ptrdiff_t index )
+char const *CBugReporter::GetReportType( intp index )
 {
 	if ( index < 0 || index >= m_ReportType.Count() )
 		return "<<Invalid>>";
@@ -698,7 +698,7 @@ void CBugReporter::SetGameDirectory( char const *pchGamedir )
 {
 	Assert( m_pBug );
 
-	Q_FileBase( pchGamedir, m_pBug->gamedir, sizeof( m_pBug->gamedir ) );
+	V_FileBase( pchGamedir, m_pBug->gamedir );
 }
 
 void CBugReporter::SetRAM( int ram )

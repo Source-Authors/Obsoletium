@@ -224,13 +224,13 @@ inline T const& CUtlMultiList<T,I>::Element( I i ) const
 }
 
 template <class T, class I>
-inline T& CUtlMultiList<T,I>::operator[]( I i )        
+inline T& CUtlMultiList<T,I>::operator[]( I i )         //-V524
 { 
 	return m_Memory[i].m_Element; 
 }
 
 template <class T, class I>
-inline T const& CUtlMultiList<T,I>::operator[]( I i ) const 
+inline T const& CUtlMultiList<T,I>::operator[]( I i ) const  //-V524
 {
 	return m_Memory[i].m_Element; 
 }
@@ -755,8 +755,9 @@ void  CUtlMultiList<T,I>::RemoveAll()
 	// Clear everything else out
 	for (I list = m_List.Head(); list != m_List.InvalidIndex(); list = m_List.Next(list) )
 	{
-		m_List[list].m_Head = InvalidIndex(); 
-		m_List[list].m_Tail = InvalidIndex();
+		constexpr auto invalidIndex = InvalidIndex();
+		m_List[list].m_Head = invalidIndex; 
+		m_List[list].m_Tail = invalidIndex;
 		m_List[list].m_Count = 0;
 	}
 

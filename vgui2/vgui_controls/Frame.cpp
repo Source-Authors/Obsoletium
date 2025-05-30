@@ -5,10 +5,11 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <math.h> // for ceil()
-#define PROTECTED_THINGS_DISABLE
+#include "vgui_controls/Frame.h"
 
 #include "tier1/utlstring.h"
+#include "tier1/KeyValues.h"
+
 #include "vgui/Cursor.h"
 #include "vgui/MouseCode.h"
 #include "vgui/IBorder.h"
@@ -21,24 +22,19 @@
 
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/Controls.h"
-#include "vgui_controls/Frame.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/MenuButton.h"
 #include "vgui_controls/TextImage.h"
-
-#include "KeyValues.h"
-
-#include <stdio.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
 
-static const int DEFAULT_SNAP_RANGE = 10; // number of pixels distance before the frame will snap to an edge
-static const int CAPTION_TITLE_BORDER = 7;
-static const int CAPTION_TITLE_BORDER_SMALL = 0;
+static constexpr int DEFAULT_SNAP_RANGE = 10; // number of pixels distance before the frame will snap to an edge
+static constexpr int CAPTION_TITLE_BORDER = 7;
+static constexpr int CAPTION_TITLE_BORDER_SMALL = 0;
 
 namespace
 {
@@ -144,7 +140,7 @@ namespace
 			_frame->Repaint();
 		}
 		
-		void OnCursorMoved(int x, int y)
+		void OnCursorMoved(int x, int y) override
 		{
 			if (!_dragging)
 				return;
@@ -162,7 +158,7 @@ namespace
 			_frame->Repaint();
 		}
 		
-		void OnMousePressed(MouseCode code)
+		void OnMousePressed(MouseCode code) override
 		{
 			if (code == MOUSE_LEFT)
 			{ 
@@ -189,7 +185,7 @@ namespace
 			}
 		}
 
-		void OnMouseDoublePressed(MouseCode code)
+		void OnMouseDoublePressed(MouseCode code) override
 		{
 			GetParent()->OnMouseDoublePressed(code);
 		}
@@ -1172,7 +1168,7 @@ void Frame::OnFrameFocusChanged(bool bHasFocus)
 
 int Frame::GetDraggerSize()
 {
-	const int DRAGGER_SIZE = 5;
+	constexpr int DRAGGER_SIZE = 5;
 	if ( m_bSmallCaption )
 	{
 		return 3;
@@ -1183,7 +1179,7 @@ int Frame::GetDraggerSize()
 
 int Frame::GetCornerSize()
 {
-	const int CORNER_SIZE = 8;
+	constexpr int CORNER_SIZE = 8;
 	if ( m_bSmallCaption )
 	{
 		return 6;
@@ -1194,7 +1190,7 @@ int Frame::GetCornerSize()
 
 int Frame::GetBottomRightSize()
 {
-	const int BOTTOMRIGHTSIZE = 18;
+	constexpr int BOTTOMRIGHTSIZE = 18;
 	if ( m_bSmallCaption )
 	{
 		return 12;
@@ -1205,7 +1201,7 @@ int Frame::GetBottomRightSize()
 
 int Frame::GetCaptionHeight()
 {
-	const int CAPTIONHEIGHT = 23;
+	constexpr int CAPTIONHEIGHT = 23;
 	if ( m_bSmallCaption )
 	{
 		return 12;
@@ -1345,7 +1341,7 @@ void Frame::SetTitle(const char *title, bool surfaceTitle)
 	}
 	else
 	{
-		g_pVGuiLocalize->ConvertANSIToUnicode( newTitle, unicodeText, sizeof(unicodeText) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( newTitle, unicodeText );
 	}
 
 	if (surfaceTitle)
@@ -1786,7 +1782,7 @@ void Frame::GetSettings(KeyValues *outResourceData)
 	if (_title)
 	{
 		char buf[256];
-		_title->GetUnlocalizedText( buf, 255 );
+		_title->GetUnlocalizedText( buf );
 		if (buf[0])
 		{
 			outResourceData->SetString("title", buf);
@@ -2280,7 +2276,7 @@ void Frame::OnDialogVariablesChanged( KeyValues *dialogVariables )
 	{
 		// reconstruct the string from the variables
 		wchar_t buf[1024];
-		g_pVGuiLocalize->ConstructString(buf, sizeof(buf), index, dialogVariables);
+		g_pVGuiLocalize->ConstructString_safe(buf, index, dialogVariables);
 		SetTitle(buf, true);
 	}
 }

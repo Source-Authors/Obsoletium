@@ -217,8 +217,8 @@ void AvoidPushawayProps( CBaseCombatCharacter *pPlayer, CUserCmd *pCmd )
 		if ( pInterface && pInterface->GetMultiplayerPhysicsMode() != PHYSICS_MULTIPLAYER_SOLID )
 			continue;
 
-		const float minMass = 10.0f; // minimum mass that can push a player back
-		const float maxMass = 30.0f; // cap at a decently large value
+		constexpr float minMass = 10.0f; // minimum mass that can push a player back
+		constexpr float maxMass = 30.0f; // cap at a decently large value
 		float mass = maxMass;
 		if ( pInterface )
 		{
@@ -236,7 +236,7 @@ void AvoidPushawayProps( CBaseCombatCharacter *pPlayer, CUserCmd *pCmd )
 		Vector vPushAway = (nearestPlayerPoint - nearestPropPoint);
 		float flDist = VectorNormalize( vPushAway );
 
-		const float MaxPushawayDistance = 5.0f;
+		constexpr float MaxPushawayDistance = 5.0f;
 		if ( flDist > MaxPushawayDistance && !pPlayer->CollisionProp()->IsPointInBounds( nearestPropPoint ) )
 		{
 			continue;

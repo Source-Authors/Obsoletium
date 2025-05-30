@@ -5,7 +5,10 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#define PROTECTED_THINGS_DISABLE
+
+#include <vgui_controls/TreeViewListControl.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/Cursor.h>
 #include <vgui/IScheme.h>
@@ -13,11 +16,9 @@
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 #include <vgui/IBorder.h>
 
-#include <vgui_controls/TreeViewListControl.h>
 #include <vgui_controls/ScrollBar.h>
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/TreeView.h>
@@ -86,7 +87,7 @@ void CTreeViewListControl::SetNumColumns( int nColumns )
 	InvalidateLayout();
 }
 
-int CTreeViewListControl::GetNumColumns() const
+intp CTreeViewListControl::GetNumColumns() const
 {
 	return m_Columns.Count();
 }
@@ -191,8 +192,8 @@ void CTreeViewListControl::RecalculateRows_R( int index )
 	if ( !m_pTree->IsItemExpanded( index ) )
 		return;
 	
-	int nChildren = m_pTree->GetNumChildren( index );
-	for ( int i=0; i < nChildren; i++ )
+	intp nChildren = m_pTree->GetNumChildren( index );
+	for ( intp i=0; i < nChildren; i++ )
 	{
 		int iChild = m_pTree->GetChild( index, i );
 		RecalculateRows_R( iChild );
@@ -285,7 +286,7 @@ void CTreeViewListControl::DrawTitleBars()
 		const char *pTitleString = m_Columns[i].m_Title.String();
 
 		wchar_t unicodeString[1024];
-		g_pVGuiLocalize->ConvertANSIToUnicode( pTitleString, unicodeString, sizeof(unicodeString) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pTitleString, unicodeString );
 	
 		int wide, tall;
 		surface()->GetTextSize( m_TitleBarFont, unicodeString, wide, tall );

@@ -478,8 +478,8 @@ static KeyValues * FindMatchingGroup( KeyValues *pSrc, KeyValues *pMatch )
 
 static void OverrideKeyValues( KeyValues *pDst, KeyValues *pSrc )
 {
-	KeyValues *pSrcGroup = NULL;
-	for ( pSrcGroup = pSrc->GetFirstTrueSubKey(); pSrcGroup; pSrcGroup = pSrcGroup->GetNextTrueSubKey() )
+	for ( KeyValues *pSrcGroup = pSrc->GetFirstTrueSubKey();
+		pSrcGroup; pSrcGroup = pSrcGroup->GetNextTrueSubKey() )
 	{
 		// Match each group in pSrc to one in pDst containing the same "name" value:
 		KeyValues * pDstGroup = FindMatchingGroup( pDst, pSrcGroup );
@@ -518,16 +518,14 @@ KeyValues *CShaderDeviceMgrBase::ReadDXSupportKeyValues()
 	}
 
 	char pTempPath[1024];
-	if ( g_pFullFileSystem->GetSearchPath( "GAME", false, pTempPath, sizeof(pTempPath) ) > 1 )
+	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, pTempPath ) > 1 )
 	{
 		// Is there a mod-specific override file?
-		KeyValues *pOverride = new KeyValues( "dxsupport_override" );
+		KeyValuesAD pOverride( "dxsupport_override" );
 		if ( pOverride->LoadFromFile( g_pFullFileSystem, SUPPORT_CFG_OVERRIDE_FILE, "GAME" ) )
 		{
 			OverrideKeyValues( pCfg, pOverride );
 		}
-
-		pOverride->deleteThis();
 	}
 
 	m_pDXSupport = pCfg;

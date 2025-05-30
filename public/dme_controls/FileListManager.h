@@ -13,7 +13,7 @@
 #endif
 
 #include "datamodel/idatamodel.h"
-#include "vgui_controls/listpanel.h"
+#include "vgui_controls/ListPanel.h"
 #include "vgui_controls/Frame.h"
 #include "vgui/KeyCode.h"
 
@@ -31,15 +31,15 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CFileListManager : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CFileListManager , vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFileListManager , vgui::ListPanel );
 
 public:
 	CFileListManager( vgui::Panel *parent );
 
 	virtual void Refresh();
-	virtual void OnCommand( const char *cmd );
-	virtual void OnThink();
-	virtual void OnMousePressed( vgui::MouseCode code );
+	void OnCommand( const char *cmd ) override;
+	void OnThink() override;
+	void OnMousePressed( vgui::MouseCode code ) override;
 
 protected:
 	MESSAGE_FUNC_PARAMS( OnOpenContextMenu, "OpenContextMenu", pParams );
@@ -68,14 +68,14 @@ protected:
 //-----------------------------------------------------------------------------
 class CFileManagerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CFileManagerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFileManagerFrame, vgui::Frame );
 
 public:
 	CFileManagerFrame( vgui::Panel *parent );
 
 	virtual void Refresh();
-	virtual void OnCommand( const char *cmd );
-	virtual void PerformLayout();
+	void OnCommand( const char *cmd ) override;
+	void PerformLayout() override;
 
 protected:
 	CFileListManager *m_pFileListManager;

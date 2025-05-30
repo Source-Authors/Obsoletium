@@ -99,7 +99,7 @@ void CBenchmarkResults::StopBenchmark()
 	V_sprintf_safe( szFilename, "%s\\%s", DEFAULT_RESULTS_FOLDER, m_szFilename );
 
 	// write out the data as keyvalues
-	auto kv = KeyValues::AutoDelete( "benchmark" );
+	KeyValuesAD kv( "benchmark" );
 	kv->SetFloat( "framerate", averageFramerate );
 	kv->SetInt( "build", build_number() );
 
@@ -115,8 +115,8 @@ void CBenchmarkResults::StopBenchmark()
 //-----------------------------------------------------------------------------
 void CBenchmarkResults::SetResultsFilename( const char *pFilename )
 {
-	Q_strncpy( m_szFilename, pFilename, sizeof( m_szFilename ) );
-	Q_DefaultExtension( m_szFilename, ".txt", sizeof( m_szFilename ) );
+	V_strcpy_safe( m_szFilename, pFilename );
+	Q_DefaultExtension( m_szFilename, ".txt" );
 }
 
 //-----------------------------------------------------------------------------
@@ -161,7 +161,7 @@ void CBenchmarkResults::Upload()
 	char szFilename[256];
 	V_sprintf_safe( szFilename, "%s\\%s", DEFAULT_RESULTS_FOLDER, m_szFilename );
 
-	auto kv = KeyValues::AutoDelete( "benchmark" );
+	KeyValuesAD kv( "benchmark" );
 	if ( kv->LoadFromFile( g_pFileSystem, szFilename, "MOD" ) )
 	{
 		// this sends the data to the Steam CSER

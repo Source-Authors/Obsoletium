@@ -1501,7 +1501,7 @@ void CRender3D::EndRenderFrame(void)
 			char szText[100];
 			Vector ViewPoint;
 			GetCamera()->GetViewPoint(ViewPoint);
-			int nLen = sprintf(szText, "FPS=%3.2f Pos=[%.f %.f %.f]", m_fFrameRate, ViewPoint[0], ViewPoint[1], ViewPoint[2]);
+			int nLen = V_sprintf_safe(szText, "FPS %3.2f @ Pos [%.2f %.2f %.2f]", m_fFrameRate, ViewPoint[0], ViewPoint[1], ViewPoint[2]);
 			TextOut(m_WinData.hDC, 2, 18, szText, nLen);
 		}
 	}

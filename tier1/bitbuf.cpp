@@ -356,7 +356,7 @@ void bf_write::WriteVarInt64( uint64 data )
 			}
 		}
 
-		AssertFatalMsg( false, "Can't get here." );
+		UNREACHABLE();
 
 		size10: target[9] = static_cast<uint8>((part2 >>  7) | 0x80);
 		size9 : target[8] = static_cast<uint8>((part2      ) | 0x80);
@@ -727,7 +727,7 @@ void bf_write::WriteLongLong(int64 val)
 
 	// dimhotepus: Fix writing int64 bits in LP64 model.
 	// Insert the two DWORDS according to network endian
-	const short endianIndex = 0x0100;
+	constexpr short endianIndex = 0x0100;
 	byte *idx = (byte*)&endianIndex;
 	WriteUBitLong(pLongs[*idx++], sizeof(uint32) * CHAR_BIT);
 	WriteUBitLong(pLongs[*idx], sizeof(uint32) * CHAR_BIT);
@@ -855,7 +855,7 @@ unsigned int bf_read::CheckReadUBitLong(int numbits)
 	return r;
 }
 
-void bf_read::ReadBits(void *pOutData, int nBits)
+void bf_read::ReadBits(void *pOutData, intp nBits)
 {
 #if defined( BB_PROFILING )
 	VPROF( "bf_read::ReadBits" );
@@ -1317,7 +1317,7 @@ int64 bf_read::ReadLongLong()
 	
 	// dimhotepus: Fix reading int64 bits in LP64 model.
 	// Read the two DWORDs according to network endian
-	const short endianIndex = 0x0100;
+	constexpr short endianIndex = 0x0100;
 	const byte *idx = (const byte*)&endianIndex;
 	pLongs[*idx++] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);
 	pLongs[*idx] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);
@@ -1336,18 +1336,18 @@ float bf_read::ReadFloat()
 	return ret;
 }
 
-bool bf_read::ReadBytes(void *pOut, int nBytes)
+bool bf_read::ReadBytes( OUT_CAP(nBytes) void *pOut, intp nBytes)
 {
 	ReadBits(pOut, nBytes << 3);
 	return !IsOverflowed();
 }
 
-bool bf_read::ReadString( char *pStr, int maxLen, bool bLine, int *pOutNumChars )
+bool bf_read::ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine, intp *pOutNumChars )
 {
 	Assert( maxLen != 0 );
 
 	bool bTooSmall = false;
-	int iChar = 0;
+	intp iChar = 0;
 	while(1)
 	{
 		char val = ReadChar();
@@ -1382,8 +1382,8 @@ char* bf_read::ReadAndAllocateString( bool *pOverflow )
 {
 	char str[2048];
 	
-	int nChars;
-	bool bOverflow = !ReadString( str, sizeof( str ), false, &nChars );
+	intp nChars;
+	bool bOverflow = !ReadString( str, ssize(str), false, &nChars );
 	if ( pOverflow )
 		*pOverflow = bOverflow;
 

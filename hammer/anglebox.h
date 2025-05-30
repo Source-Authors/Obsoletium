@@ -24,7 +24,13 @@ public:
 	virtual ~CAngleBox();
 
 	bool GetAngles(QAngle &vecAngles);
-	char *GetAngles(char *szAngles);
+	char *GetAngles(char *szAngles, intp size);
+
+	template<intp size>
+	char *GetAngles(char (&szAngles)[size])
+	{
+		return GetAngles(szAngles, size);
+	}
 
 	void SetAngles(const QAngle &vecAngles, bool bRedraw = true);
 	void SetAngles(const char *szAngles, bool bRedraw = true);

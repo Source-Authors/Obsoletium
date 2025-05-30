@@ -266,7 +266,10 @@ void CServerBrowserDialog::LoadUserData()
 void CServerBrowserDialog::SaveUserData()
 {
 	m_pSavedData->Clear();
-	m_pSavedData->LoadFromFile( g_pFullFileSystem, "ServerBrowser.vdf", "CONFIG");
+	if ( !m_pSavedData->LoadFromFile( g_pFullFileSystem, "ServerBrowser.vdf", "CONFIG") )
+	{
+		Msg( "ServerBrowser.vdf is not present. Creating one.\n" );
+	}
 
 	// set the current tab
 	if (m_pGameList == m_pSpectateGames)
@@ -339,7 +342,7 @@ void CServerBrowserDialog::UpdateStatusText(const char *fmt, ...)
 		char str[ 1024 ];
 		va_list argptr;
 		va_start( argptr, fmt );
-		_vsnprintf( str, sizeof(str), fmt, argptr );
+		V_vsprintf_safe( str, fmt, argptr );
 		va_end( argptr );
 
 		m_pStatusLabel->SetText( str );

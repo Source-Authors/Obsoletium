@@ -134,6 +134,11 @@ public:
 	virtual void DeleteAllItems();	// obselete, use RemoveAll();
 
 	virtual void GetCellText(int itemID, int column, OUT_Z_BYTECAP(bufferSizeInBytes) wchar_t *buffer, int bufferSizeInBytes); // returns the data held by a specific cell
+	template<intp bufferSize>
+	void GetCellText(int itemID, int column, OUT_Z_ARRAY wchar_t (&buffer)[bufferSize]) // returns the data held by a specific cell
+	{
+		GetCellText( itemID, column, buffer, static_cast<int>(sizeof(wchar_t)) * bufferSize );
+	}
 	virtual IImage *GetCellImage(int itemID, int column); //, ImagePanel *&buffer); // returns the image held by a specific cell
 
 	// Use these until they return InvalidItemID to iterate all the items.

@@ -623,8 +623,8 @@ void CL_DispatchSound( const SoundInfo_t &sound )
 	}
 
 	StartSoundParams_t params;
-	params.staticsound = (sound.nChannel == CHAN_STATIC) ? true : false;
-	params.soundsource = sound.nEntityIndex;
+	params.staticsound = sound.nChannel == CHAN_STATIC;
+	params.soundsource = static_cast<SoundSource>(sound.nEntityIndex);
 	params.entchannel = params.staticsound ? CHAN_STATIC : sound.nChannel;
 	params.pSfx = pSfx;
 	params.origin = sound.vOrigin;
@@ -1306,7 +1306,7 @@ void CL_TakeSnapshotAndSwap()
 			bool bSaveValue = cl_savescreenshotstosteam.GetBool();
 			cl_savescreenshotstosteam.SetValue( false );
 
-			Q_snprintf( filename, sizeof( filename ), "screenshots/%s.jpg", cl_snapshotname );
+			V_sprintf_safe( filename, "screenshots/%s.jpg", cl_snapshotname );
 			videomode->TakeSnapshotJPEG( filename, cl_jpegquality );
 
 			cl_savescreenshotstosteam.SetValue( bSaveValue );
@@ -1315,34 +1315,34 @@ void CL_TakeSnapshotAndSwap()
 		{
 			if ( world && world->GetModel() )
 			{
-				Q_FileBase( modelloader->GetName( ( model_t *)world->GetModel() ), base, sizeof( base ) );
+				Q_FileBase( modelloader->GetName( world->GetModel() ), base );
 			}
 			else
 			{
-				Q_strncpy( base, "Snapshot", sizeof( base ) );
+				V_strcpy_safe( base, "Snapshot" );
 			}
 
 			char extension[MAX_OSPATH];
-			Q_snprintf( extension, sizeof( extension ), "%s.%s", GetPlatformExt(), cl_takejpeg ? "jpg" : "tga" );
+			V_sprintf_safe( extension, "%s.%s", GetPlatformExt(), cl_takejpeg ? "jpg" : "tga" );
 
 			// Using a subdir? If so, create it
 			if ( cl_snapshot_subdirname[0] )
 			{
-				Q_snprintf( filename, sizeof( filename ), "screenshots/%s/%s", base, cl_snapshot_subdirname );
+				V_sprintf_safe( filename, "screenshots/%s/%s", base, cl_snapshot_subdirname );
 				g_pFileSystem->CreateDirHierarchy( filename, "DEFAULT_WRITE_PATH" );
 			}
 
 			if ( cl_snapshotname[0] )
 			{
-				Q_strncpy( base, cl_snapshotname, sizeof( base ) );
-				Q_snprintf( filename, sizeof( filename ), "screenshots/%s%s", base, extension );
+				V_strcpy_safe( base, cl_snapshotname );
+				V_sprintf_safe( filename, "screenshots/%s%s", base, extension );
 
 				int iNumber = 0;
 				char renamedfile[MAX_OSPATH];
 
 				while ( 1 )
 				{
-					Q_snprintf( renamedfile, sizeof( renamedfile ), "screenshots/%s_%04d%s", base, iNumber++, extension );	
+					V_sprintf_safe( renamedfile, "screenshots/%s_%04d%s", base, iNumber++, extension );	
 					if( !g_pFileSystem->GetFileTime( renamedfile ) )
 						break;
 				}
@@ -1360,11 +1360,11 @@ void CL_TakeSnapshotAndSwap()
 				{
 					if ( cl_snapshot_subdirname[0] )
 					{
-						Q_snprintf( filename, sizeof( filename ), "screenshots/%s/%s/%s%04d%s", base, cl_snapshot_subdirname, base, cl_snapshotnum++, extension  );
+						V_sprintf_safe( filename, "screenshots/%s/%s/%s%04d%s", base, cl_snapshot_subdirname, base, cl_snapshotnum++, extension  );
 					}
 					else
 					{
-						Q_snprintf( filename, sizeof( filename ), "screenshots/%s%04d%s", base, cl_snapshotnum++, extension  );
+						V_sprintf_safe( filename, "screenshots/%s%04d%s", base, cl_snapshotnum++, extension  );
 					}
 
 					if( !g_pFileSystem->GetFileTime( filename ) )
@@ -1422,7 +1422,7 @@ void CL_StartMovie( const char *filename, int flags, int nWidth, int nHeight, fl
 	host_framerate.SetValue( flFrameRate );
 
 	cl_movieinfo.Reset();
-	Q_strncpy( cl_movieinfo.moviename, filename, sizeof( cl_movieinfo.moviename ) );
+	V_strcpy_safe( cl_movieinfo.moviename, filename );
 	cl_movieinfo.type = flags;
 	cl_movieinfo.jpeg_quality = nJpegQuality;
 
@@ -1461,15 +1461,15 @@ void CL_StartMovie( const char *filename, int flags, int nWidth, int nHeight, fl
 					theFps.SetFPS( RoundFloatToInt( flFrameRate ), false );
 	 			} 	
 
-				const int nSize = 256;
+				constexpr int nSize = 256;
 				CFmtStrN<nSize> fmtFullFilename( "%s%c%s", com_gamedir, CORRECT_PATH_SEPARATOR, filename );
 
 				char szFullFilename[nSize];
-				V_FixupPathName( szFullFilename, nSize, fmtFullFilename.Access() );
+				V_FixupPathName( szFullFilename, fmtFullFilename.Access() );
 #ifdef USE_WEBM_FOR_REPLAY
-				V_DefaultExtension( szFullFilename, ".webm", sizeof( szFullFilename ) );
+				V_DefaultExtension( szFullFilename, ".webm" );
 #else
-				V_DefaultExtension( szFullFilename, ".mp4", sizeof( szFullFilename ) );
+				V_DefaultExtension( szFullFilename, ".mp4" );
 #endif
 
 				g_pVideoRecorder->CreateNewMovieFile( szFullFilename, cl_movieinfo.DoVideoSound() );
@@ -2308,7 +2308,7 @@ void CL_GetBackgroundLevelName( char *pszBackgroundName, int bufSize, bool bMapN
 {
 	Q_strncpy( pszBackgroundName, DEFAULT_BACKGROUND_NAME, bufSize );
 
-	KeyValues *pChapterFile = new KeyValues( pszBackgroundName );
+	KeyValuesAD pChapterFile( pszBackgroundName );
 
 	if ( pChapterFile->LoadFromFile( g_pFileSystem, "scripts/ChapterBackgrounds.txt" ) )
 	{
@@ -2369,8 +2369,6 @@ void CL_GetBackgroundLevelName( char *pszBackgroundName, int bufSize, bool bMapN
 			Q_strncpy( pszBackgroundName, pLoadChapter->GetString(), bufSize );
 		}
 	}
-
-	pChapterFile->deleteThis();
 }
 
 //-----------------------------------------------------------------------------

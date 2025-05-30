@@ -15,6 +15,7 @@
 #define SND_AUDIO_SOURCE_H
 #pragma once
 
+#include "tier0/platform.h"
 
 // fixed point stuff for real-time resampling
 #define FIX_BITS			28
@@ -77,8 +78,8 @@ public:
 	virtual bool	GetActive( void ) = 0;
 	virtual void	SetActive( bool active ) = 0;
 
-	virtual void	SetModelIndex( int index ) = 0;
-	virtual int		GetModelIndex( void ) const = 0;
+	virtual void	SetModelIndex( intp index ) = 0;
+	virtual intp	GetModelIndex( void ) const = 0;
 
 	virtual void	SetDirection( bool forward ) = 0;
 	virtual bool	GetDirection( void ) const = 0;
@@ -115,7 +116,7 @@ public:
 	virtual int					GetNumChannels() = 0;
 	virtual bool				IsStereoWav( void ) = 0;
 
-	virtual CSentence			*GetSentence( void ) { return NULL; };
+	virtual CSentence			*GetSentence( void ) { return nullptr; };
 };
 
 

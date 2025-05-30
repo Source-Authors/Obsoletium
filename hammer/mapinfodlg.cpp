@@ -221,7 +221,7 @@ BOOL CMapInfoDlg::OnInitDialog(void)
 	m_UniqueTextures.SetWindowText(szBuf);
 
 	ultoa(m_uTextureMemory, szBuf, 10);
-	sprintf(szBuf, "%u bytes (%.2f MB)", m_uTextureMemory, (float)m_uTextureMemory / 1024000.0);
+	V_sprintf_safe(szBuf, "%u bytes (%.2f MB)", m_uTextureMemory, (float)m_uTextureMemory / 1024000.0);
 	m_TextureMemory.SetWindowText(szBuf);
 	
 	return TRUE;

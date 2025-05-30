@@ -23,14 +23,14 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CAnimGroupTree : public TreeView
 {
-	DECLARE_CLASS_SIMPLE( CAnimGroupTree, TreeView );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAnimGroupTree, TreeView );
 public:
 	CAnimGroupTree( Panel *parent, const char *panelName, CBaseAnimSetControlGroupPanel *groupPanel );
 	virtual ~CAnimGroupTree();
 
-	virtual bool IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void GenerateContextMenu( int itemIndex, int x, int y );
+	bool IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void GenerateContextMenu( int itemIndex, int x, int y ) override;
 
 private:
 	MESSAGE_FUNC( OnImportAnimation, "ImportAnimation" );
@@ -109,11 +109,11 @@ void CAnimGroupTree::OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& ms
 
 void CAnimGroupTree::OnImportAnimation()
 {
-	PostMessage( m_pGroupPanel->m_hEditor, new KeyValues( "ImportAnimation", "visibleOnly", "1" ), 0.0f );
+	PostMessage( m_pGroupPanel->m_hEditor->GetVPanel(), new KeyValues( "ImportAnimation", "visibleOnly", "1" ), 0.0f );
 }
 
 // override to open a custom context menu on a node being selected and right-clicked
-void CAnimGroupTree::GenerateContextMenu( int itemIndex, int x, int y )
+void CAnimGroupTree::GenerateContextMenu( [[maybe_unused]] int itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y )
 {
 	CleanupContextMenu();
 	m_hContextMenu = new Menu( this, "ActionMenu" );
@@ -190,7 +190,7 @@ void CBaseAnimSetControlGroupPanel::OnTreeViewItemSelected( int itemIndex )
 		return;
 
 	// Build the list of selected groups, and notify the attribute slider panel
-	CUtlVector< int > selection;
+	CUtlVector< intp > selection;
 	m_hGroups->GetSelectedItems( selection );
 
 	const CDmaElementArray<> &groups = m_AnimSet->GetSelectionGroups();

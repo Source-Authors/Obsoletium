@@ -17,7 +17,7 @@
 
 
 #ifndef INCLUDED_MXWIDGET
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #endif
 
 
@@ -38,8 +38,8 @@ public:
 
 	// MANIPULATORS
 	void add (const char *item);
-	void select (int index);
-	void remove (int index);
+	void select (intp index);
+	void remove (intp index);
 	void removeAll ();
 
 	// ACCESSORS

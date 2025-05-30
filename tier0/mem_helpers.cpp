@@ -60,7 +60,7 @@ static void InitializeToFeeFee( void *pMem, size_t nSize )
 	auto *pCurDWord = reinterpret_cast<std::uint32_t *>(pCurQWord);
 	size_t nDWords{(nSize & (sizeof(std::uint64_t) - 1)) / sizeof(std::uint32_t)};
 #else
-	auto *pCurDWord = static_cast<std::uint32_t *>(pMem);
+	auto *pCurDWord = static_cast<std::uint32_t *>(pMem); //-V206
 	size_t nDWords{nSize / sizeof(std::uint32_t)};
 #endif
 
@@ -72,12 +72,12 @@ static void InitializeToFeeFee( void *pMem, size_t nSize )
 		--nDWords;
 	}
 	
-	auto *pCurChar = reinterpret_cast<std::uint8_t *>(pCurDWord);
+	auto *pCurChar = reinterpret_cast<std::uint8_t *>(pCurDWord); //-V206
 	size_t nBytes{nSize & (sizeof(std::uint32_t) - 1)};
 	size_t iOffset = 0;
 	while ( nBytes )
 	{
-		*pCurChar = reinterpret_cast<const std::uint8_t *>(&g_u32FFeeFFee)[iOffset];
+		*pCurChar = reinterpret_cast<const std::uint8_t *>(&g_u32FFeeFFee)[iOffset]; //-V206
 
 		++iOffset;
 		--nBytes;

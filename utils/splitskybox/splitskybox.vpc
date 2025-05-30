@@ -43,5 +43,6 @@ $Project "splitskybox"
 	$Folder	"Link Libraries"
 	{
 		$Lib tier2
+		$Lib bitmap
 	}
 }

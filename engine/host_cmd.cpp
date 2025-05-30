@@ -151,7 +151,7 @@ public:
 			m_szLine[len+1] = '\0';
 		}
 
-		V_strncat( m_szLine, pszText, sizeof( m_szLine ) );
+		V_strcat_safe( m_szLine, pszText );
 		m_curPosition += columnWidth + 1;
 	}
 
@@ -390,7 +390,7 @@ void Host_Client_Printf(const char *fmt, ...)
 	char		string[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe (string, fmt, argptr);
 	va_end (argptr);
 
 	host_client->ClientPrintf( "%s", string );
@@ -398,7 +398,7 @@ void Host_Client_Printf(const char *fmt, ...)
 
 #define LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(seconds) \
 	{ \
-		static float g_flLastTime__Limit[ABSOLUTE_PLAYER_LIMIT] = { 0.0f }; /* we don't have access to any of the three MAX_PLAYERS #define's here unfortunately */ \
+		static double g_flLastTime__Limit[ABSOLUTE_PLAYER_LIMIT] = { 0.0 }; /* we don't have access to any of the three MAX_PLAYERS #define's here unfortunately */ \
 		int playerindex = cmd_clientslot; \
 		if ( playerindex >= 0 && playerindex < ssize(g_flLastTime__Limit) && realtime - g_flLastTime__Limit[playerindex] > (seconds) ) \
 		{ \
@@ -433,7 +433,7 @@ CON_COMMAND( status, "Display map and connection status." )
 		print = Host_Client_Printf;
 
 		// limit this to once per 5 seconds
-		LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0F);
+		LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0);
 	}
 
 	// ============================================================
@@ -616,7 +616,7 @@ CON_COMMAND( ping, "Display ping to server." )
 		return;
 	}
 	// limit this to once per 5 seconds
-	LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0F);
+	LIMIT_PER_CLIENT_COMMAND_EXECUTION_ONCE_PER_INTERVAL(5.0);
 
 	host_client->ClientPrintf( "Client ping times:\n" );
 
@@ -1453,42 +1453,51 @@ DEBUGGING TOOLS
 CON_COMMAND( memory, "Print memory stats." )
 {
 #if !defined(NO_MALLOC_OVERRIDE)
-	ConMsg( "Heap Used:\n" );
-	int nTotal = MemAlloc_GetSize( 0 );
-	if (nTotal == -1)
+	ConMsg( "Heap Memory Used:\n" );
+
+	const size_t nTotal{MemAlloc_GetSize(0)};
+	if (nTotal == std::numeric_limits<size_t>::max())
 	{
 		ConMsg( "Corrupted!\n" );
 	}
 	else
 	{
-		ConMsg( "%5.2f MiB (%d bytes)\n", nTotal/(1024.0f*1024.0f), nTotal );
+		ConMsg( "%11s (%zu bytes)\n", V_pretifymem( nTotal, 2, true ), nTotal );
 	}
 #endif
 
 #ifdef VPROF_ENABLED
-	ConMsg("\nVideo Memory Used:\n");
-	CVProfile *pProf = &g_VProfCurrentProfile;
-	intp prefixLen = ssize( "TexGroup_Global_" ) - 1;
-	float total = 0.0f;
-	for ( int i=0; i < pProf->GetNumCounters(); i++ )
+	ConMsg("GPU Memory Used:\n");
+
+	constexpr char kGroupNamePrefix[]{"TexGroup_Global_"};
+	constexpr intp kGroupNamePrefixLen{ssize( kGroupNamePrefix ) - 1};
+	constexpr float kMibsMultiplier{1.0f / (1024.0f*1024.0f)};
+
+	const CVProfile &profile{g_VProfCurrentProfile};
+	float totalMibs{0.0f};
+	
+	for ( int i = 0; i < profile.GetNumCounters(); i++ )
 	{
-		if ( pProf->GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
+		if ( profile.GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
 		{
-			float value = pProf->GetCounterValue( i ) * (1.0f/(1024.0f*1024.0f) );
-			total += value;
-			const char *pName = pProf->GetCounterName( i );
-			if ( !Q_strnicmp( pName, "TexGroup_Global_", prefixLen ) )
+			const float counterMibs = profile.GetCounterValue( i ) * kMibsMultiplier;
+
+			totalMibs += counterMibs;
+
+			const char *counterName = profile.GetCounterName( i );
+			if ( !Q_strnicmp( counterName, kGroupNamePrefix, kGroupNamePrefixLen ) )
 			{
-				pName += prefixLen;
+				counterName += kGroupNamePrefixLen;
 			}
-			ConMsg( "%5.2f MiB: %s\n", value, pName );
+
+			ConMsg( "%7.2f MiB: %s\n", counterMibs, counterName );
 		}
 	}
 	ConMsg("------------------\n");
-	ConMsg( "%5.2f MiB: total\n", total );
+	ConMsg( "%7.2f MiB: total\n", totalMibs );
 #endif
 
-	ConMsg( "\nHunk Memory Used:\n" );
+	ConMsg( "Hunk Memory Used:\n" );
 	Hunk_Print();
 }
 
@@ -1858,9 +1867,10 @@ CON_COMMAND_F( incrementvar, "Increment specified convar value.", FCVAR_DONTRECO
 	}
 
 	float currentValue = var->GetFloat();
-	float startValue = atof( args[ 2 ] );
-	float endValue = atof( args[ 3 ] );
-	float delta = atof( args[ 4 ] );
+	// dimhotepus: atof -> strtof.
+	float startValue = strtof( args[ 2 ], nullptr );
+	float endValue = strtof( args[ 3 ], nullptr );
+	float delta = strtof( args[ 4 ], nullptr );
 	float newValue = currentValue + delta;
 	if( newValue > endValue )
 	{
@@ -1904,9 +1914,10 @@ CON_COMMAND_F( multvar, "Multiply specified convar value.", FCVAR_DONTRECORD )
 	}
 
 	float currentValue = var->GetFloat();
-	float startValue = atof( args[ 2 ] );
-	float endValue = atof( args[ 3 ] );
-	float factor = atof( args[ 4 ] );
+	// dimhotepus: atof -> strtof.
+	float startValue = strtof( args[ 2 ], nullptr );
+	float endValue = strtof( args[ 3 ], nullptr );
+	float factor = strtof( args[ 4 ], nullptr );
 	float newValue = currentValue * factor;
 	if( newValue > endValue )
 	{

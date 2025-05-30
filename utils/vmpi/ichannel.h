@@ -5,6 +5,7 @@
 #ifndef SRC_UTILS_VMPI_ICHANNEL_H_
 #define SRC_UTILS_VMPI_ICHANNEL_H_
 
+#include "tier1/basetypes.h"
 #include "tier1/utlvector.h"
 
 struct IChannel {
@@ -14,12 +15,11 @@ struct IChannel {
   virtual void Release() = 0;
 
   // Send data to the destination.
-  virtual bool Send(const void *pData, ptrdiff_t len) = 0;
+  virtual bool Send(const void *pData, intp len) = 0;
 
   // This version puts all the chunks into one packet and ships it off.
-  virtual bool SendChunks(void const *const *pChunks,
-                          const ptrdiff_t *pChunkLengths,
-                          ptrdiff_t nChunks) = 0;
+  virtual bool SendChunks(void const *const *pChunks, const intp *pChunkLengths,
+                          intp nChunks) = 0;
 
   // Check for any packets coming in from the destination.
   // Returns false if no packet was received.

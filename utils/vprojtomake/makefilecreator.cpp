@@ -158,7 +158,7 @@ bool CMakefileCreator::FileWrite(FileHandle_t f,
   V_sprintf_safe(stringBuf, fmt, args);
   va_end(args);
 
-  const ptrdiff_t size = Q_strlen(stringBuf);
+  const intp size = Q_strlen(stringBuf);
   const bool ok = g_pFileSystem->Write(stringBuf, size, f) == size;
 
   if (!ok) {

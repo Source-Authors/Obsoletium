@@ -28,7 +28,8 @@ protected:
 	void OnThink() override;
 
 private:
-	float m_flUpdateTime;
+	// dimhotepus: float -> double.
+	double m_flUpdateTime;
 	typedef CVarListPropertyPage BaseClass;
 };
 

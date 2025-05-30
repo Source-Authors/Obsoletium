@@ -33,6 +33,8 @@
 #include "icvar.h"
 #include "filesystem/IQueuedLoader.h"
 
+#include "scoped_app_locale.h"
+
 extern CTextConsoleUnix console;
 
 namespace se::dedicated {
@@ -54,28 +56,28 @@ class UnixSystem : public ISystem {
 
   void ConsoleOutput(char *string) override;
   char *ConsoleInput(int index, char *buf, size_t buflen) override;
-  void Printf(const char *fmt, ...) override;
+  void Printf(PRINTF_FORMAT_STRING const char *fmt, ...) override;
 };
 
 UnixSystem::~UnixSystem() {}
 
 void UnixSystem::ErrorMessage(int level, const char *msg) {
   Error("%s\n", msg);
-
-  exit(-1);
+  // dimhotepus: 1 -> EOTHER.
+  exit(EOTHER);
 }
 
 void UnixSystem::UpdateStatus(int force) {}
 
 void UnixSystem::ConsoleOutput(char *string) { console.Print(string); }
 
-void UnixSystem::Printf(const char *fmt, ...) {
+void UnixSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
   // Dump text to debugging console.
   va_list argptr;
   char message[1024];
 
   va_start(argptr, fmt);
-  Q_vsnprintf(message, sizeof(message), fmt, argptr);
+  V_vsprintf_safe(message, fmt, argptr);
   va_end(argptr);
 
   // Get Current text and append it.
@@ -134,6 +136,22 @@ int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system);
  * @return Exit code.
  */
 DLL_EXPORT int DedicatedMain(int argc, char *argv[]) {
+  // Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also sets
+  // LANG to en_US.UTF-8 before starting up (in info.plist I believe).
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  //
+  // Need to double check that localization for libcef is handled correctly when
+  // slam things to en_US.UTF-8.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    Warning("setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
+
   se::dedicated::UnixSystem system;
   return se::dedicated::BootMain(argc, argv, &system);
 }

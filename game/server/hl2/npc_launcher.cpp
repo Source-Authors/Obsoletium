@@ -294,7 +294,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 		pGrenade->Launch(this,pEnemy,vLaunchVelocity,m_flHomingSpeed,GetGravity(),m_nSmokeTrail);
 	}
 
-	CPASAttenuationFilter filter( this, 0.3 );
+	CPASAttenuationFilter filter( this, 0.3f );
 
 	EmitSound_t ep;
 	ep.m_nChannel = CHAN_WEAPON;
@@ -305,7 +305,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 
 	if (m_bSmokeLaunch)
 	{
-		UTIL_Smoke(GetAbsOrigin(), random->RandomInt(20,30), random->RandomInt(10,15));
+		UTIL_Smoke(GetAbsOrigin(), random->RandomFloat(20,30), random->RandomFloat(10,15));
 	}
 	m_flNextAttack = gpGlobals->curtime + LAUNCHER_REST_TIME;
 

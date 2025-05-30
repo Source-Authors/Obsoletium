@@ -41,9 +41,9 @@
 
 using namespace vgui;
 
-static const long RETRY_TIME = 10000;		// refresh server every 10 seconds
-static const long MAP_CHANGE_TIME = 20000;		// refresh 20 seconds after a map change 
-static const long RESTART_TIME = 60000;		// refresh 60 seconds after a "_restart"
+static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 seconds
+static constexpr inline long MAP_CHANGE_TIME = 20000;		// refresh 20 seconds after a map change 
+static constexpr inline long RESTART_TIME = 60000;		// refresh 60 seconds after a "_restart"
 
 #include "IManageServer.h"
 
@@ -142,9 +142,9 @@ void CGamePanelInfo::SetNewTitle(bool connectionFailed, const char *additional_t
 	}
 
 	wchar_t serverName[256];
-	g_pVGuiLocalize->ConvertANSIToUnicode(additional_text, serverName, sizeof(serverName));
+	g_pVGuiLocalize->ConvertANSIToUnicode(additional_text, serverName);
 	wchar_t title[256];
-	g_pVGuiLocalize->ConstructString(title, sizeof(title), g_pVGuiLocalize->Find(localized_title), 1, serverName);
+	g_pVGuiLocalize->ConstructString_safe(title, g_pVGuiLocalize->Find(localized_title), 1, serverName);
 	
 	SetTitle(title, true);
 }
@@ -285,7 +285,7 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 	if (!m_hOutOfDateQueryBox.Get())
 	{
 		const size_t msgLen = strlen(msg) + ssize("\n\nDo you wish to shutdown now?\n");
-		char *fullmsg = (char *) _alloca( msgLen );
+		char *fullmsg = stackallocT( char, msgLen );
 
 		// _snprintf -> strcpy + strcat
 		V_strncpy( fullmsg, msg, msgLen );

@@ -153,8 +153,7 @@ static int CreateExecutionMarker()
 		nIndex = g_ExecutionMarkers.Find( nRandomNumber );
 	} while ( nIndex != g_ExecutionMarkers.InvalidIndex() );
 
-	auto i = g_ExecutionMarkers.AddToTail( nRandomNumber );
-	return g_ExecutionMarkers[i];
+	return g_ExecutionMarkers[g_ExecutionMarkers.AddToTail( nRandomNumber )];
 }
 
 static bool FindAndRemoveExecutionMarker( int iCode )
@@ -432,7 +431,7 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 	char *retval = NULL;
 
 	char temp[ 512 ];
-	Q_strncpy( temp, param, sizeof( temp ) );
+	V_strcpy_safe( temp, param );
 	Q_FixSlashes( temp );
 	Q_strlower( temp );
 
@@ -447,13 +446,13 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 			 ! CommandLine()->FindParm(va( "+%s", info.command_to_issue ) ) )
 		{
 			// Translate if haven't already got one of these commands
-			Q_strncpy( sz, temp, sizeof( sz ) );
-			Q_FileBase( sz, temp, sizeof( sz ) );
+			V_strcpy_safe( sz, temp );
+			V_FileBase( sz, temp );
 
-			Q_snprintf( sz, sizeof( sz ), "%s %s", info.command_to_issue, temp );
+			V_sprintf_safe( sz, "%s %s", info.command_to_issue, temp );
 			retval = sz;
 			break;
-		}		
+		}
 	}
 
 	// return null if no translation, otherwise return commands
@@ -543,6 +542,15 @@ bool IsValidFileExtension( const char *pszFilename )
 		 Q_strstr( pszFilename, ".com" ) ||
 		 Q_strstr( pszFilename, ".bat" ) ||
 		 Q_strstr( pszFilename, ".dll" ) ||
+		// dimhotepus: Ban POSIX user/kernel shared objects.
+#if defined(OSX)
+		 Q_strstr( pszFilename, ".so" ) ||
+		 Q_strstr( pszFilename, ".dylib" ) ||
+		 Q_strstr( pszFilename, ".kext" ) ||
+#elif defined(_LINUX)
+		 Q_strstr(pszFilename, ".so") ||
+		 Q_strstr(pszFilename, ".ko") ||
+#endif
 		 Q_strstr( pszFilename, ".ini" ) ||
 		 Q_strstr( pszFilename, ".gcf" ) ||
 		 Q_strstr( pszFilename, ".sys" ) ||
@@ -572,13 +580,12 @@ void Cmd_Exec_f( const CCommand &args )
 		ConMsg( "exec <filename>: execute a script file\n" );
 		return;
 	}
-
+	
+	const char *pPathID = "MOD";
 	const char *szFile = args[1];
 
-	const char *pPathID = "MOD";
-
-	Q_snprintf( fileName, sizeof( fileName ), "//%s/cfg/%s", pPathID, szFile );
-	Q_DefaultExtension( fileName, ".cfg", sizeof( fileName ) );
+	V_sprintf_safe( fileName, "//%s/cfg/%s", pPathID, szFile );
+	V_DefaultExtension( fileName, ".cfg" );
 
 	// check path validity
 	if ( !COM_IsValidPath( fileName ) )
@@ -594,8 +601,6 @@ void Cmd_Exec_f( const CCommand &args )
 		return;
 	}
 
-	// 360 doesn't need to do costly existence checks
-	if ( IsPC() )
 	{
 		if ( g_pFileSystem->FileExists( fileName ) )
 		{

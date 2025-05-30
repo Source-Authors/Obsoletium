@@ -509,20 +509,10 @@ void CAchievementMgr::LevelInitPreEntity()
 	// client and server have map names available in different forms (full path on client, just file base name on server), 
 	// cache it in base file name form here so we don't have to have different code paths each time we access it
 #ifdef CLIENT_DLL	
-	Q_FileBase( engine->GetLevelName(), m_szMap, ARRAYSIZE( m_szMap ) );
+	V_FileBase( engine->GetLevelName(), m_szMap );
 #else
 	Q_strncpy( m_szMap, gpGlobals->mapname.ToCStr(), ARRAYSIZE( m_szMap ) );
 #endif // CLIENT_DLL
-
-	if ( IsX360() )
-	{
-		// need to remove the .360 extension on the end of the map name
-		char *pExt = Q_stristr( m_szMap, ".360" );
-		if ( pExt )
-		{
-			*pExt = '\0';
-		}
-	}
 
 	// look through all achievements, see which ones we want to have listen for events
 	FOR_EACH_MAP( m_mapAchievement, iAchievement )
@@ -692,15 +682,15 @@ void CAchievementMgr::DownloadUserData()
 
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
-			intp dirlen = Q_strlen( modDir );
+			V_StripLastDir( modDir );
+			intp dirlen = V_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}
@@ -803,7 +793,7 @@ void CAchievementMgr::LoadGlobalState()
     // HPE_END
     //=============================================================================
 
-	KeyValues::AutoDelete pKV = KeyValues::AutoDelete("GameState");
+	KeyValuesAD pKV("GameState");
 	if ( pKV->LoadFromFile( filesystem, szFilename, "MOD" ) )
 	{
 		KeyValues *pNode = pKV->GetFirstSubKey();
@@ -1071,7 +1061,7 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 	if ( sv_nostats.GetBool() )
 	{
 		// prevent message spam
-		const float fNotificationCooldown = 60.0f;
+		constexpr float fNotificationCooldown = 60.0f;
 		static float fNextNotification = 0.0f;
 		if (gpGlobals->curtime >= fNextNotification)
 		{

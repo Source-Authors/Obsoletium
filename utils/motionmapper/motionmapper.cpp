@@ -27,6 +27,8 @@
 
 #include "tools_minidump.h"
 
+#include "tier0/memdbgon.h"
+
 namespace {
 
 bool g_quiet = false;
@@ -245,7 +247,7 @@ int Grab_Nodes(s_node_t *pnodes) {
     if (sscanf(g_szLine, "%d \"%1023[^\"]\" %d", &index, name, &parent) == 3) {
       // check for duplicated bones
       /*
-      if (strlen(pnodes[index].name) != 0)
+      if (!Q_isempty(pnodes[index].name))
       {
               MdlError( "bone \"%s\" exists more than once\n", name );
       }
@@ -528,10 +530,11 @@ int material_to_texture(int material) {
   return -1;
 }
 
-int lookup_texture(char *texturename, int maxlen) {
+template<intp maxlen>
+int lookup_texture(char (&texturename)[maxlen]) {
   int i;
 
-  Q_StripExtension(texturename, texturename, maxlen);
+  V_StripExtension(texturename, texturename);
 
   for (i = 0; i < g_numtextures; i++) {
     if (stricmp(g_texture[i].name, texturename) == 0) {
@@ -873,7 +876,7 @@ void Grab_Triangles(s_source_t *psource) {
       continue;
     }
 
-    texture = lookup_texture(texturename, sizeof(texturename));
+    texture = lookup_texture(texturename);
     psource->texmap[texture] = texture;  // hack, make it 1:1
     material = use_texture_as_material(texture);
 
@@ -971,19 +974,18 @@ s_source_t *Load_Source(char const *name, const char *ext, bool reverse,
   // Sanity check file and init
   Assert(name);
   intp namelen = V_strlen(name) + 1;
-  char *pTempName = (char *)_alloca(namelen);
-  char xext[32];
   int result = false;
 
   // Local copy of filename
-  strcpy(pTempName, name);
+  V_strdup_stack(name, pTempName);
 
+  char xext[32];
   // Sanity check file extension?
-  Q_ExtractFileExtension(pTempName, xext, sizeof(xext));
+  V_ExtractFileExtension(pTempName, xext);
   if (xext[0] == '\0') {
     V_strcpy_safe(xext, ext);
   } else {
-    Q_StripExtension(pTempName, pTempName, namelen);
+    V_StripExtension(pTempName, pTempName, namelen);
   }
 
   // allocate space and whatnot
@@ -997,8 +999,7 @@ s_source_t *Load_Source(char const *name, const char *ext, bool reverse,
 
   // more ext sanity check
   if ((!result && xext[0] == '\0') || stricmp(xext, "smd") == 0) {
-    Q_snprintf(g_szFilename, sizeof(g_szFilename), "%s%s.smd", cddir[numdirs],
-               pTempName);
+    V_sprintf_safe(g_szFilename, "%s%s.smd", cddir[numdirs], pTempName);
     V_strcpy_safe(g_source[g_numsources]->filename, g_szFilename);
 
     // Import part, load smd file
@@ -1676,12 +1677,6 @@ s_template_t *Load_Template(char *name) {
       numSplit++;
     }
     if (numSplit < 1 || *sp[0] == '\n') continue;
-
-    // int numRead = sscanf( g_szLine, "%s %s %s", cmd, &option, &option2 );
-
-    // // Blank line
-    // if ((numRead == EOF) || (numRead == 0))
-    // continue;
 
     // commands
     char *cmd;
@@ -2509,13 +2504,9 @@ limbRootOffsetScale 0.0 0.0 1.0\n\
 
 void PrintHeader() {
 #ifdef PLATFORM_64BITS
-  vprint(stdout, 0,
-         "Valve Software - motionmapper [64 bit] (%s)\n",
-         __DATE__);
+  vprint(stdout, 0, "Valve Software - motionmapper [64 bit] (%s)\n", __DATE__);
 #else
-  vprint(stdout, 0,
-         "Valve Software - motionmapper (%s)\n",
-         __DATE__);
+  vprint(stdout, 0, "Valve Software - motionmapper (%s)\n", __DATE__);
 #endif
   vprint(stdout, 0,
          "--- Maps motion from one animation/skeleton onto another skeleton "
@@ -2893,7 +2884,7 @@ int main(int argc, char **argv) {
   // Init filesystem hooey
   const ScopedFileSystem scoped_file_system{g_outfile};
   // ??
-  Q_FileBase(g_outfile, g_outfile, sizeof(g_outfile));
+  Q_FileBase(g_outfile, g_outfile);
 
   // Verbose stuff
   if (!g_quiet) {
@@ -2901,7 +2892,7 @@ int main(int argc, char **argv) {
   }
 
   // ??
-  Q_DefaultExtension(g_outfile, ".smd", sizeof(g_outfile));
+  Q_DefaultExtension(g_outfile, ".smd");
 
   // Verbose stuff
   if (!g_quiet) {
@@ -2940,7 +2931,7 @@ int main(int argc, char **argv) {
   // Save output (ref skeleton & animation data);
   Save_SMD(fullpath, pMappedAnimation);
 
-  Q_StripExtension(filenames[outputanim].String(), outname, sizeof(outname));
+  Q_StripExtension(filenames[outputanim].String(), outname);
 
   // Verbose stuff
   if (!g_quiet) vprint(stdout, 0, "\nCompleted \"%s\"\n", g_outfile);

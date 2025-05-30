@@ -62,7 +62,8 @@ private:
 
 	CPlayerContextMenu *m_pPlayerContextMenu;
 
-	float m_flUpdateTime;
+	// dimhotepus: float -> double.
+	double m_flUpdateTime;
 };
 
 #endif // PLAYERPANEL_H

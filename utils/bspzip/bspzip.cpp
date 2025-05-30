@@ -136,12 +136,12 @@ int main(int argc, char **argv) {
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char zipName[MAX_PATH] = {0};
     V_strcpy_safe(zipName, pActionArgs[1]);
-    Q_DefaultExtension(zipName, ".zip", sizeof(zipName));
+    Q_DefaultExtension(zipName, ".zip");
 
     ExtractZipFileFromBSP(bspName, zipName);
   } else if ((stricmp(pAction, "-extractfiles") == 0) && nActionArgs == 2) {
@@ -153,12 +153,12 @@ int main(int argc, char **argv) {
     // the .vmt are non-streamed and therefore remain, referenced normally as
     // part of the bsp search path
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    V_DefaultExtension(bspName, ".bsp");
 
     char targetPathName[MAX_PATH] = {0};
     V_strcpy_safe(targetPathName, pActionArgs[1]);
-    Q_AppendSlash(targetPathName, sizeof(targetPathName));
+    V_AppendSlash(targetPathName);
 
     printf("\nOpening bsp file: %s.\n", bspName);
     LoadBSPFile(bspName);
@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
 
         V_strcpy_safe(targetName, targetPathName);
         V_strcat_safe(targetName, relativeName);
-        Q_FixSlashes(targetName, '\\');
+        V_FixSlashes(targetName, '\\');
 
         SafeCreatePath(targetName);
 
@@ -214,12 +214,12 @@ int main(int argc, char **argv) {
     // the .vmt are non-streamed and therefore remain, referenced normally as
     // part of the bsp search path
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    V_DefaultExtension(bspName, ".bsp");
 
     char targetPathName[MAX_PATH] = {0};
     V_strcpy_safe(targetPathName, pActionArgs[1]);
-    Q_AppendSlash(targetPathName, sizeof(targetPathName));
+    V_AppendSlash(targetPathName);
 
     printf("\nOpening bsp file: %s.\n", bspName);
     LoadBSPFile(bspName);
@@ -247,7 +247,7 @@ int main(int argc, char **argv) {
 
         V_strcpy_safe(targetName, targetPathName);
         V_strcat_safe(targetName, relativeName);
-        Q_FixSlashes(targetName, '\\');
+        V_FixSlashes(targetName, '\\');
 
         SafeCreatePath(targetName);
 
@@ -273,8 +273,8 @@ int main(int argc, char **argv) {
     // necessary for xbox process
     // the cubemaps are deleted as they cannot yet be streamed out of the bsp
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    V_DefaultExtension(bspName, ".bsp");
 
     printf("\nOpening bsp file: %s.\n", bspName);
     LoadBSPFile(bspName);
@@ -310,8 +310,8 @@ int main(int argc, char **argv) {
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char relativePrefixName[MAX_PATH] = {0};
     V_strcpy_safe(relativePrefixName, pActionArgs[1]);
@@ -320,8 +320,8 @@ int main(int argc, char **argv) {
     V_strcpy_safe(filelistName, pActionArgs[2]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[3]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[3]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     char fullpathName[MAX_PATH] = {0};
     FILE *fp = fopen(filelistName, "r");
@@ -362,8 +362,8 @@ int main(int argc, char **argv) {
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     LoadBSPFile(bspName);
     PrintBSPPackDirectory();
@@ -372,8 +372,8 @@ int main(int argc, char **argv) {
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char relativeName[MAX_PATH] = {0};
     V_strcpy_safe(relativeName, pActionArgs[1]);
@@ -382,8 +382,8 @@ int main(int argc, char **argv) {
     V_strcpy_safe(fullpathName, pActionArgs[2]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[3]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[3]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
     LoadBSPFile(bspName);
@@ -394,15 +394,15 @@ int main(int argc, char **argv) {
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char filelistName[MAX_PATH] = {0};
     V_strcpy_safe(filelistName, pActionArgs[1]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[2]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[2]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
 
@@ -450,15 +450,15 @@ int main(int argc, char **argv) {
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char filelistName[MAX_PATH] = {0};
     V_strcpy_safe(filelistName, pActionArgs[1]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[2]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[2]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
 
@@ -523,8 +523,8 @@ int main(int argc, char **argv) {
     const ScopedFileSystem scopedFileSystem(pFile);
 
     char szAbsBSPPath[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(szAbsBSPPath, sizeof(szAbsBSPPath), pFile);
-    Q_DefaultExtension(szAbsBSPPath, ".bsp", sizeof(szAbsBSPPath));
+    V_MakeAbsolutePath(szAbsBSPPath, pFile);
+    Q_DefaultExtension(szAbsBSPPath, ".bsp");
 
     return RepackBSP(szAbsBSPPath, bCompress) ? 0 : -1;
   } else {

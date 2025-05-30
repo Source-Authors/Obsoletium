@@ -2152,7 +2152,7 @@ void CNPC_CombineGunship::Flight( void )
 			// Strongly constrain to an n unit pipe around the current path
 			// by damping out all impulse forces that would push us further from the pipe
 			float flAmount = (flDistFromPath - GUNSHIP_OUTER_NAV_DIST) / 200.0f;
-			flAmount = clamp( flAmount, 0, 1 );
+			flAmount = clamp( flAmount, 0.f, 1.f );
 			VectorMA( accel, flAmount * 200.0f, vecDelta, accel );
 		}
 	}
@@ -2166,7 +2166,7 @@ void CNPC_CombineGunship::Flight( void )
 	if ( m_lifeState != LIFE_DYING || m_hCrashTarget == NULL )
 	{
 		// don't fall faster than 0.2G or climb faster than 2G
-		accel.z = clamp( accel.z, 384 * 0.2, 384 * 2.0 );
+		accel.z = clamp( accel.z, 384 * 0.2f, 384 * 2.0f );
 	}
 
 	Vector forward, right, up;
@@ -2181,8 +2181,8 @@ void CNPC_CombineGunship::Flight( void )
 	float goalRoll = RAD2DEG( asinf( DotProduct( right, goalUp ) ) );
 
 	// clamp goal orientations
-	goalPitch = clamp( goalPitch, -45, 60 );
-	goalRoll = clamp( goalRoll, -45, 45 );
+	goalPitch = clamp( goalPitch, -45.f, 60.f );
+	goalRoll = clamp( goalRoll, -45.f, 45.f );
 
 	// calc angular accel needed to hit goal pitch in dt time.
 	dt = 0.6;
@@ -2191,10 +2191,10 @@ void CNPC_CombineGunship::Flight( void )
 	goalAngAccel.y = 2.0f * (AngleDiff( goalYaw, AngleNormalize( GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
 	goalAngAccel.z = 2.0f * (AngleDiff( goalRoll, AngleNormalize( GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
-	goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
-	//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );
-	goalAngAccel.y = clamp( goalAngAccel.y, -120, 120 );
-	goalAngAccel.z = clamp( goalAngAccel.z, -300, 300 );
+	goalAngAccel.x = clamp( goalAngAccel.x, -300.f, 300.f );
+	//goalAngAccel.y = clamp( goalAngAccel.y, -60.f, 60.f );
+	goalAngAccel.y = clamp( goalAngAccel.y, -120.f, 120.f );
+	goalAngAccel.z = clamp( goalAngAccel.z, -300.f, 300.f );
 
 	// limit angular accel changes to similate mechanical response times
 	dt = 0.1;
@@ -2203,9 +2203,9 @@ void CNPC_CombineGunship::Flight( void )
 	angAccelAccel.y = (goalAngAccel.y - m_vecAngAcceleration.y) / dt;
 	angAccelAccel.z = (goalAngAccel.z - m_vecAngAcceleration.z) / dt;
 
-	angAccelAccel.x = clamp( angAccelAccel.x, -1000, 1000 );
-	angAccelAccel.y = clamp( angAccelAccel.y, -1000, 1000 );
-	angAccelAccel.z = clamp( angAccelAccel.z, -1000, 1000 );
+	angAccelAccel.x = clamp( angAccelAccel.x, -1000.f, 1000.f );
+	angAccelAccel.y = clamp( angAccelAccel.y, -1000.f, 1000.f );
+	angAccelAccel.z = clamp( angAccelAccel.z, -1000.f, 1000.f );
 
 	m_vecAngAcceleration += angAccelAccel * 0.1;
 
@@ -2222,7 +2222,7 @@ void CNPC_CombineGunship::Flight( void )
 
 	//angVel.y = clamp( angVel.y, -60, 60 );
 	//angVel.y = clamp( angVel.y, -120, 120 );
-	angVel.y = clamp( angVel.y, -120, 120 );
+	angVel.y = clamp( angVel.y, -120.f, 120.f );
 
 	SetLocalAngularVelocity( angVel );
 
@@ -2381,12 +2381,12 @@ void CNPC_CombineGunship::UpdateRotorSoundPitch( int iPitch )
 		float flDistance = (pPlayer->WorldSpaceCenter() - pos).Length2DSqr();
 
 		// Fade in exhaust when we're far from the player
-		float flVolume = clamp( RemapVal( flDistance, (900*900), (1800*1800), 1, 0 ), 0, 1 );
-		controller.SoundChangeVolume( m_pAirExhaustSound, flVolume * GetRotorVolume(), 0.1 );
+		float flVolume = clamp( RemapVal( flDistance, (900*900), (1800*1800), 1, 0 ), 0.f, 1.f );
+		controller.SoundChangeVolume( m_pAirExhaustSound, flVolume * GetRotorVolume(), 0.1f );
 
 		// Fade in the blast when it's close to the player (in 2D)
-		flVolume = clamp( RemapVal( flDistance, (600*600), (700*700), 1, 0 ), 0, 1 );
-		controller.SoundChangeVolume( m_pAirBlastSound, flVolume * GetRotorVolume(), 0.1 );
+		flVolume = clamp( RemapVal( flDistance, (600*600), (700*700), 1, 0 ), 0.f, 1.f );
+		controller.SoundChangeVolume( m_pAirBlastSound, flVolume * GetRotorVolume(), 0.1f );
 	}
 
 	BaseClass::UpdateRotorSoundPitch( iPitch );
@@ -2649,7 +2649,8 @@ void CNPC_CombineGunship::UpdateEnemyTarget( void )
 
 	float yawDiff = UTIL_AngleDiff( lastChaseAngles[YAW], chaseAngles[YAW] );
 
-	int	maxYaw;
+	// dimhotepus: int -> float
+	float	maxYaw;
 	if ( bTargettingPlayer )
 	{
 		maxYaw = 6;
@@ -2943,11 +2944,11 @@ int	CNPC_CombineGunship::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 		int iHealthIncrements = sk_gunship_health_increments.GetInt();
 		if ( g_pGameRules->IsSkillLevel( SKILL_EASY ) )
 		{
-			iHealthIncrements = ceil( iHealthIncrements * 0.5f );
+			iHealthIncrements = iHealthIncrements / 2;
 		}
 		else if ( g_pGameRules->IsSkillLevel( SKILL_HARD ) )
 		{
-			iHealthIncrements = floor( iHealthIncrements * 1.5f );
+			iHealthIncrements = iHealthIncrements * 3 / 2;
 		}
 		info.SetDamage( ( GetMaxHealth() / (float)iHealthIncrements ) + 1 );
 		
@@ -3077,7 +3078,7 @@ void CNPC_CombineGunship::StopCannonBurst( void )
 
 	// Reduce the burst time when we get lower in health
 	float flPerc = (float)GetHealth() / (float)GetMaxHealth();
-	float flDelay = clamp( flPerc * m_flBurstDelay, 0.5, m_flBurstDelay );
+	float flDelay = clamp( flPerc * m_flBurstDelay, 0.5f, m_flBurstDelay );
 
 	// If we didn't finish the burst, don't wait so long
 	flPerc = 1.0f - (m_iBurstSize / sk_gunship_burst_size.GetFloat());

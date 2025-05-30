@@ -4,9 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+#include "ExpressionProperties.h"
 #include <mxtk/mx.h>
 #include "resource.h"
-#include "ExpressionProperties.h"
 #include "mdlviewer.h"
 
 static CExpressionParams g_Params;
@@ -63,11 +63,11 @@ static BOOL CALLBACK ExpressionPropertiesDialogProc ( HWND hwndDlg, UINT uMsg, W
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int ExpressionProperties( CExpressionParams *params )
+intp ExpressionProperties( CExpressionParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_EXPRESSIONPROPERTIES ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)ExpressionPropertiesDialogProc );

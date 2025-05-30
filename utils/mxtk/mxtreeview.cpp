@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxTreeView.h"
+#include "mxtk/mxtreeview.h"
 #include <windows.h>
 #include <commctrl.h>
 
@@ -206,7 +206,7 @@ const char*
 mxTreeView::getLabel (mxTreeViewItem *item) const
 {
 	static char label[256];
-	strcpy (label, "");
+	label[0] = '\0';
 
 	if (!d_this)
 		return label;

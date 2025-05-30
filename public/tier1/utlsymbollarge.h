@@ -17,7 +17,6 @@
 #include "tier1/utltshash.h"
 #include "tier1/stringpool.h"
 #include "tier0/vprof.h"
-#include "tier1/utltshash.h"
 
 //-----------------------------------------------------------------------------
 // CUtlSymbolTableLarge:
@@ -31,7 +30,7 @@
 
 typedef intp UtlSymLargeId_t;
 
-#define UTL_INVAL_SYMBOL_LARGE  ((UtlSymLargeId_t)~0)
+constexpr inline UtlSymLargeId_t UTL_INVAL_SYMBOL_LARGE{(UtlSymLargeId_t)~0};
 
 class CUtlSymbolLarge
 {
@@ -59,46 +58,46 @@ public:
 	}
 
 	// operator==
-	bool operator==( CUtlSymbolLarge const& src ) const 
+	[[nodiscard]] bool operator==( CUtlSymbolLarge const& src ) const 
 	{ 
 		return u.m_Id == src.u.m_Id; 
 	}
 
 	// operator==
-	bool operator==( UtlSymLargeId_t const& src ) const 
+	[[nodiscard]] bool operator==( UtlSymLargeId_t const& src ) const 
 	{ 
 		return u.m_Id == src; 
 	}
 
 	// operator==
-	bool operator!=( CUtlSymbolLarge const& src ) const 
+	[[nodiscard]] bool operator!=( CUtlSymbolLarge const& src ) const 
 	{ 
 		return u.m_Id != src.u.m_Id; 
 	}
 
 	// operator==
-	bool operator!=( UtlSymLargeId_t const& src ) const 
+	[[nodiscard]] bool operator!=( UtlSymLargeId_t const& src ) const 
 	{ 
 		return u.m_Id != src; 
 	}
 
 	// Gets at the symbol
-	operator UtlSymLargeId_t const() const 
+	[[nodiscard]] operator UtlSymLargeId_t const() const 
 	{ 
 		return u.m_Id; 
 	}
 
 	// Gets the string associated with the symbol
-	inline const char* String( ) const
+	[[nodiscard]] inline const char* String( ) const
 	{
 		if ( u.m_Id == UTL_INVAL_SYMBOL_LARGE )
 			return "";
 		return u.m_pAsString;
 	}
 
-	inline bool IsValid() const
+	[[nodiscard]] inline bool IsValid() const
 	{
-		return u.m_Id != UTL_INVAL_SYMBOL_LARGE ? true : false;
+		return u.m_Id != UTL_INVAL_SYMBOL_LARGE;
 	}
 
 private:
@@ -129,22 +128,22 @@ struct CUtlSymbolTableLargeBaseTreeEntry_t
 	// Variable length string data
 	char								m_String[1];
 
-	bool IsEmpty() const
+	[[nodiscard]] bool IsEmpty() const
 	{
 		return ( ( m_Hash == 0 ) && ( 0 == m_String[0] ) );
 	}
 
-	char const *String() const
+	[[nodiscard]] const char *String() const
 	{
-		return (const char *)&m_String[ 0 ];
+		return &m_String[0];
 	}
 
-	CUtlSymbolLarge ToSymbol() const
+	[[nodiscard]] CUtlSymbolLarge ToSymbol() const
 	{
 		return reinterpret_cast< UtlSymLargeId_t >( String() );
 	}
 	
-	LargeSymbolTableHashDecoration_t HashValue() const
+	[[nodiscard]] LargeSymbolTableHashDecoration_t HashValue() const
 	{
 		return m_Hash;
 	}
@@ -155,8 +154,8 @@ class CTreeEntryLess
 {
 public:
 	CTreeEntryLess( int ignored = 0 ) {} // permits default initialization to NULL in CUtlRBTree
-	bool operator!() const { return false; }
-	bool operator()( CUtlSymbolTableLargeBaseTreeEntry_t * const &left, CUtlSymbolTableLargeBaseTreeEntry_t * const &right ) const
+	[[nodiscard]] bool operator!() const { return false; }
+	[[nodiscard]] bool operator()( CUtlSymbolTableLargeBaseTreeEntry_t * const &left, CUtlSymbolTableLargeBaseTreeEntry_t * const &right ) const
 	{
 		// compare the hashes
 		if ( left->m_Hash == right->m_Hash )
@@ -193,11 +192,11 @@ public:
 	{
 		return CNonThreadsafeTreeType::Insert( entry );
 	}
-	inline intp Find( CUtlSymbolTableLargeBaseTreeEntry_t *entry ) const
+	[[nodiscard]] inline intp Find( CUtlSymbolTableLargeBaseTreeEntry_t *entry ) const
 	{
 		return CNonThreadsafeTreeType::Find( entry );
 	}
-	inline constexpr intp InvalidIndex() const
+	[[nodiscard]] inline constexpr intp InvalidIndex() const
 	{
 		return CNonThreadsafeTreeType::InvalidIndex();
 	}
@@ -220,22 +219,22 @@ template < int BUCKET_COUNT, class KEYTYPE, bool CASEINSENSITIVE >
 class CCThreadsafeTreeHashMethod
 {
 public:
-	static int Hash( const KEYTYPE &key, int nBucketMask )
+	[[nodiscard]] static std::enable_if_t<std::is_pointer_v<KEYTYPE>, int> Hash( const KEYTYPE &key, int nBucketMask )
 	{
 		uint32 nHash = key->HashValue();
 		return ( nHash & nBucketMask );
 	}
 
-	static bool Compare( CUtlSymbolTableLargeBaseTreeEntry_t * const &lhs, CUtlSymbolTableLargeBaseTreeEntry_t * const &rhs )
+	[[nodiscard]] static bool Compare( CUtlSymbolTableLargeBaseTreeEntry_t * const &lhs, CUtlSymbolTableLargeBaseTreeEntry_t * const &rhs )
 	{
 		if ( lhs->m_Hash != rhs->m_Hash )
 			return false;
 		if ( !CASEINSENSITIVE )
 		{
-			return ( !Q_strcmp( lhs->String(), rhs->String() ) ? true : false );
+			return !V_strcmp( lhs->String(), rhs->String() );
 		}
 
-		return ( !Q_stricmp( lhs->String(), rhs->String() ) ? true : false );
+		return !V_stricmp( lhs->String(), rhs->String() );
 	}
 };
 
@@ -256,8 +255,7 @@ class CThreadsafeTree : public CUtlTSHash< CUtlSymbolTableLargeBaseTreeEntry_t *
 public:
 	typedef CUtlTSHash< CUtlSymbolTableLargeBaseTreeEntry_t *, 2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CCThreadsafeTreeHashMethod< 2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CASEINSENSITIVE > > CThreadsafeTreeType;
 
-	CThreadsafeTree() : 
-		CThreadsafeTreeType( 32 ) 
+	CThreadsafeTree() : CThreadsafeTreeType( 32 ) 
 	{
 	}
 	inline void Commit() 
@@ -268,11 +266,11 @@ public:
 	{
 		return CThreadsafeTreeType::Insert( entry, entry );
 	}
-	inline intp Find( CUtlSymbolTableLargeBaseTreeEntry_t *entry )
+	[[nodiscard]] inline intp Find( CUtlSymbolTableLargeBaseTreeEntry_t *entry )
 	{
 		return CThreadsafeTreeType::Find( entry );
 	}
-	inline constexpr intp InvalidIndex() const
+	[[nodiscard]] inline constexpr intp InvalidIndex() const
 	{
 		return CThreadsafeTreeType::InvalidHandle();
 	}
@@ -303,12 +301,12 @@ public:
 	CUtlSymbolLarge AddString( const char* pString );
 
 	// Finds the symbol for pString
-	CUtlSymbolLarge Find( const char* pString ) const;
+	[[nodiscard]] CUtlSymbolLarge Find( const char* pString ) const;
 	
 	// Remove all symbols in the table.
 	void  RemoveAll();
 
-	intp GetNumStrings( void ) const
+	[[nodiscard]] intp GetNumStrings( void ) const
 	{
 		return m_Lookup.Count();
 	}
@@ -324,15 +322,13 @@ public:
 		return m_Lookup.GetElements( nFirstElement, nCount, pElements );
 	}
 
-	uint64 GetMemoryUsage() const
+	[[nodiscard]] uint64 GetMemoryUsage() const
 	{
 		uint64 unBytesUsed = 0u;
 
-		for ( intp i=0; i < m_StringPools.Count(); i++ )
+		for ( auto *pool : m_StringPools )
 		{
-			StringPool_t *pPool = m_StringPools[i];
-
-			unBytesUsed += pPool->m_TotalLen;
+			unBytesUsed += pool->m_TotalLen;
 		}
 		return unBytesUsed;
 	}
@@ -353,7 +349,7 @@ protected:
 	CUtlVector< StringPool_t * > m_StringPools;
 
 private:
-	intp FindPoolWithSpace( intp len ) const;
+	[[nodiscard]] intp FindPoolWithSpace( intp len ) const;
 };
 
 //-----------------------------------------------------------------------------
@@ -478,10 +474,9 @@ inline void CUtlSymbolTableLargeBase<TreeType, CASEINSENSITIVE, POOL_SIZE>::Remo
 {
 	m_Lookup.Purge();
 
-	for ( intp i=0; i < m_StringPools.Count(); i++ )
+	for ( auto *pool : m_StringPools )
 	{
-		StringPool_t * pString = m_StringPools[i];
-		free( pString );
+		free( pool );
 	}
 
 	m_StringPools.RemoveAll();

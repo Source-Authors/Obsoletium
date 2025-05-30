@@ -28,9 +28,9 @@ using namespace vgui;
 
 DECLARE_BUILD_FACTORY( CMDLPanel );
 
-static const int THUMBNAIL_SAFE_ZONE_SIZE = 512;
-static const int THUMBNAIL_SAFE_ZONE_HEIGHT = 92;
-static const float THUMBNAIL_SAFE_ZONE_HEIGHT_SCALE = (float)THUMBNAIL_SAFE_ZONE_HEIGHT / THUMBNAIL_SAFE_ZONE_SIZE;
+static constexpr inline int THUMBNAIL_SAFE_ZONE_SIZE = 512;
+static constexpr inline int THUMBNAIL_SAFE_ZONE_HEIGHT = 92;
+static constexpr inline float THUMBNAIL_SAFE_ZONE_HEIGHT_SCALE = (float)THUMBNAIL_SAFE_ZONE_HEIGHT / THUMBNAIL_SAFE_ZONE_SIZE;
 
 //-----------------------------------------------------------------------------
 // Purpose: Keeps a global clock to autoplay sequences to run from

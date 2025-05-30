@@ -35,9 +35,15 @@ struct ElementPathItem_t
 	}
 
 	// only uses hElement so that it can be used to search for elements
-	bool operator==( const ElementPathItem_t &that ) const
+	[[nodiscard]] constexpr bool operator==( const ElementPathItem_t &that ) const
 	{
 		return hElement == that.hElement;
+	}
+
+	// only uses hElement so that it can be used to search for elements
+	[[nodiscard]] constexpr bool operator!=( const ElementPathItem_t &that ) const
+	{
+		return !(*this == that);
 	}
 
 	DmElementHandle_t hElement;
@@ -511,17 +517,17 @@ int DmeEstimateMemorySize( T* )
 		}																						\
 		void OnConstruction();																	\
 		void OnDestruction();																	\
-		virtual void PerformConstruction()														\
+		void PerformConstruction() override														\
 		{																						\
 			BaseClass::PerformConstruction();													\
 			OnConstruction();																	\
 		}																						\
-		virtual void PerformDestruction()														\
+		void PerformDestruction() override														\
 		{																						\
 			OnDestruction();																	\
 			BaseClass::PerformDestruction();													\
 		}																						\
-		virtual int AllocatedSize() const { return DmeEstimateMemorySize( this ); }				\
+		int AllocatedSize() const override { return DmeEstimateMemorySize( this ); }			\
 																								\
 	private:																					\
 		typedef baseClassName BaseClass; 														\
@@ -532,7 +538,7 @@ int DmeEstimateMemorySize( T* )
 //-----------------------------------------------------------------------------
 #define DEFINE_ELEMENT( className, baseClassName )	\
 	public:											\
-		virtual bool IsA( UtlSymId_t typeSymbol ) const	\
+		bool IsA( UtlSymId_t typeSymbol ) const override	\
 		{											\
 			return IsA_Implementation( typeSymbol );\
 		}											\
@@ -548,7 +554,7 @@ int DmeEstimateMemorySize( T* )
 			return IsA( Y::GetStaticTypeSymbol() ); \
 		}											\
 													\
-		virtual int GetInheritanceDepth( UtlSymId_t typeSymbol ) const	\
+		int GetInheritanceDepth( UtlSymId_t typeSymbol ) const override	\
 		{											\
 			return GetInheritanceDepth_Implementation( typeSymbol, 0 );	\
 		}											\
@@ -567,17 +573,15 @@ int DmeEstimateMemorySize( T* )
 			baseClassName( handle, pElementTypeName, id, pElementName, fileid )					\
 		{																						\
 		}																						\
-		virtual ~className()																	\
-		{																						\
-		}																						\
+		virtual ~className() = default;															\
 		void OnConstruction();																	\
 		void OnDestruction();																	\
-		virtual void PerformConstruction()														\
+		void PerformConstruction() override														\
 		{																						\
 			BaseClass::PerformConstruction();													\
 			OnConstruction();																	\
 		}																						\
-		virtual void PerformDestruction()														\
+		void PerformDestruction() override														\
 		{																						\
 			OnDestruction();																	\
 			BaseClass::PerformDestruction();													\
@@ -600,12 +604,12 @@ int DmeEstimateMemorySize( T* )
 				return nCurrentDepth;															\
 			return BaseClass::GetInheritanceDepth_Implementation( typeSymbol, nCurrentDepth+1 );\
 		}																						\
-		virtual int AllocatedSize() const { return DmeEstimateMemorySize( this ); }				\
+		int AllocatedSize() const override { return DmeEstimateMemorySize( this ); }			\
 																								\
 	private:																					\
 		typedef baseClassName BaseClass; 														\
 		template <class Y> friend class CDmElementFactory;										\
-		template <class Y> friend class CDmAbstractElementFactory;										\
+		template <class Y> friend class CDmAbstractElementFactory;								\
 		static CUtlSymbol m_classType
 
 #define IMPLEMENT_ELEMENT( className ) \

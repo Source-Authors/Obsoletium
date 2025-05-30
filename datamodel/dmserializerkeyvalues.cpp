@@ -445,7 +445,7 @@ bool CDmSerializerKeyValues::Unserialize( CUtlBuffer &buf, const char *pEncoding
 
 	*ppRoot = NULL;
 
-	KeyValues *kv = new KeyValues( "keyvalues file" );
+	KeyValuesAD kv( "keyvalues file" );
 	if ( !kv )
 		return false;
 
@@ -461,6 +461,5 @@ bool CDmSerializerKeyValues::Unserialize( CUtlBuffer &buf, const char *pEncoding
 
 	m_fileid = DMFILEID_INVALID;
 
-	kv->deleteThis();
 	return bOk;
 }

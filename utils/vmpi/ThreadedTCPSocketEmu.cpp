@@ -10,7 +10,7 @@
 #include "winlite.h"
 #include "tcpsocket.h"
 #include "IThreadedTCPSocket.h"
-#include "ThreadHelpers.h"
+#include "threadhelpers.h"
 
 
 
@@ -38,7 +38,7 @@ public:
 		Term();
 	}
 
-	void Init( IThreadedTCPSocket *pSocket )
+	void Init( IThreadedTCPSocket *pSocket ) override
 	{
 		m_pSocket = pSocket;
 	}
@@ -63,7 +63,7 @@ public:
 private:
 
 
-	virtual void OnPacketReceived( CTCPPacket *pPacket )
+	void OnPacketReceived( CTCPPacket *pPacket ) override
 	{
 		CCriticalSectionLock csLock( &m_RecvPacketsCS );
 		csLock.Lock();
@@ -73,12 +73,13 @@ private:
 	}
 
 
-	virtual void OnError( int errorCode, const char *pErrorString )
+	void OnError( int errorCode, const char *pErrorString ) override
 	{
 		CCriticalSectionLock csLock( &m_ErrorStringCS );
 		csLock.Lock();
 
 		m_ErrorString.CopyArray( pErrorString, strlen( pErrorString ) + 1 );
+		m_ErrorCode = errorCode;
 		m_bError = true;
 	}
 
@@ -87,7 +88,7 @@ private:
 public:
 	
 	// This is used for connecting.
-	virtual ITCPSocketHandler* CreateNewHandler()
+	ITCPSocketHandler* CreateNewHandler() override
 	{
 		return this;
 	}
@@ -96,18 +97,18 @@ public:
 // ITCPSocket implementation.
 public:
 
-	virtual void	Release()
+	void	Release() override
 	{
 		delete this;
 	}
 
-	virtual bool	BindToAny( const unsigned short port )
+	bool	BindToAny( const unsigned short port ) override
 	{
 		m_LocalPort = port;
 		return true;
 	}
 
-	virtual bool	BeginConnect( const IpV4 &addr )
+	bool	BeginConnect( const IpV4 &addr ) override
 	{
 		// They should have "bound" to a port before trying to connect.
 		Assert( m_LocalPort != 0xFFFF );
@@ -120,10 +121,10 @@ public:
 			IpV4( 0, 0, 0, 0, m_LocalPort ),
 			this );
 
-		return m_pConnectSocket != 0;			
+		return m_pConnectSocket != 0;
 	}
 
-	virtual bool UpdateConnect()
+	bool UpdateConnect() override
 	{
 		Assert( !m_pSocket );
 		if ( !m_pConnectSocket )
@@ -152,7 +153,7 @@ public:
 		}
 	}
 
-	virtual bool	IsConnected()
+	bool	IsConnected() override
 	{
 		if ( m_bError )
 		{
@@ -165,7 +166,7 @@ public:
 		}
 	}
 
-	virtual void	GetDisconnectReason( CUtlVector<char> &reason )
+	void	GetDisconnectReason( CUtlVector<char> &reason ) override
 	{
 		CCriticalSectionLock csLock( &m_ErrorStringCS );
 		csLock.Lock();
@@ -173,7 +174,7 @@ public:
 		reason = m_ErrorString;
 	}
 
-	virtual bool	Send( const void *pData, ptrdiff_t size ) override
+	bool	Send( const void *pData, ptrdiff_t size ) override
 	{
 		Assert( m_pSocket );
 		if ( !m_pSocket )
@@ -182,7 +183,7 @@ public:
 		return m_pSocket->Send( pData, size );
 	}
 
-	virtual bool	SendChunks( void const * const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks )
+	bool	SendChunks( void const * const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks ) override
 	{
 		Assert( m_pSocket );
 		if ( !m_pSocket || !m_pSocket->IsValid() )
@@ -191,7 +192,7 @@ public:
 		return m_pSocket->SendChunks( pChunks, pChunkLengths, nChunks );
 	}
 
-	virtual bool	Recv( CUtlVector<unsigned char> &data, double flTimeout )
+	bool	Recv( CUtlVector<unsigned char> &data, double flTimeout ) override
 	{
 		// Use our m_RecvPacketsEvent event to determine if there is data to receive yet.
 		DWORD nMilliseconds = (DWORD)( flTimeout * 1000.0f );
@@ -242,6 +243,7 @@ private:
 
 	CCriticalSection m_ErrorStringCS;
 	CUtlVector<char> m_ErrorString;
+	int m_ErrorCode;
 	bool m_bError; // Set to true when there's an error. Next chance we get in the main thread, we'll close the socket.
 };
 

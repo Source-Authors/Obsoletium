@@ -110,7 +110,7 @@ struct ThreadPoolStartParams_t
 	{
 		bExecOnThreadPoolThreadsOnly = false;
 
-		bUseAffinityTable = ( pAffinities != nullptr ) && ( fDistribute == TRS_TRUE ) && ( nThreads != UINT_MAX );
+		bUseAffinityTable = ( pAffinities != nullptr ) && ( fDistribute == TRS_TRUE ) && ( nThreads != -1 );
 		if ( bUseAffinityTable )
 		{
 			// user supplied an optional 1:1 affinity mapping to override normal distribute behavior

@@ -153,7 +153,7 @@ public:
 	virtual void		RemoveEdict( edict_t *e ) = 0;
 	
 	// Memory allocation for entity class data
-	virtual void		*PvAllocEntPrivateData( long cb ) = 0;
+	virtual void		*PvAllocEntPrivateData( size_t cb ) = 0;
 	virtual void		FreeEntPrivateData( void *pEntity ) = 0;
 
 	// Save/restore uses a special memory allocator (which zeroes newly allocated memory, etc.)
@@ -233,7 +233,7 @@ public:
 	virtual edict_t		*CreateFakeClient( const char *netname ) = 0;
 
 	// Get a convar keyvalue for s specified client
-	virtual const char	*GetClientConVarValue( int clientIndex, const char *name ) = 0;
+	virtual const char	*GetClientConVarValue( intp clientIndex, const char *name ) = 0;
 	
 	// Parse a token from a file
 	virtual const char	*ParseFile( const char *data, char *token, int maxlen ) = 0;

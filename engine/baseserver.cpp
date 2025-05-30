@@ -319,7 +319,7 @@ bool CBaseServer::CheckChallengeNr( netadr_t &adr, int nChallengeValue )
 	uint64 challenge = ((uint64)adr.GetIPNetworkByteOrder() << 32) + m_CurrentRandomNonce;
 	CRC32_t hash;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	if ( (int)hash == nChallengeValue )
 		return true;
@@ -329,7 +329,7 @@ bool CBaseServer::CheckChallengeNr( netadr_t &adr, int nChallengeValue )
 	challenge += m_LastRandomNonce;
 	hash = 0;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	if ( (int)hash == nChallengeValue )
 		return true;
@@ -711,9 +711,9 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				if ( !s_connectRateChecker.CheckIP( packet->from ) )
 					return false;
 
-				msg.ReadString( name, sizeof(name) );
-				msg.ReadString( password, sizeof(password) );
-				msg.ReadString( productVersion, sizeof(productVersion) );
+				msg.ReadString( name );
+				msg.ReadString( password );
+				msg.ReadString( productVersion );
 				
 //				bool bClientPlugins = ( msg.ReadByte() > 0 );
 
@@ -746,7 +746,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				if ( authProtocol == PROTOCOL_STEAM )
 				{
 					int keyLen = msg.ReadShort();
-					if ( keyLen < 0 || keyLen > static_cast<int>(sizeof(cdkey)) )
+					if ( keyLen < 0 || keyLen > static_cast<intp>(sizeof(cdkey)) )
 					{
 						RejectConnection( packet->from, clientChallenge, "#GameUI_ServerRejectBadSteamKey" );
 						break;
@@ -757,7 +757,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				}
 				else
 				{
-					msg.ReadString( cdkey, sizeof(cdkey) );
+					msg.ReadString( cdkey );
 					ConnectClient( packet->from, protocol, challengeNr, clientChallenge, authProtocol, name, password, cdkey, strlen(cdkey) );
 				}
 			}
@@ -936,7 +936,7 @@ void CBaseServer::UserInfoChanged( int nClientIndex )
 void CBaseServer::FillServerInfo(SVC_ServerInfo &serverinfo)
 {
 	static char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	V_FileBase( com_gamedir, gamedir );
 
 	serverinfo.m_nProtocol		= PROTOCOL_VERSION;
 	serverinfo.m_nServerCount	= GetSpawnCount();
@@ -1069,7 +1069,7 @@ int CBaseServer::GetChallengeNr (netadr_t &adr)
 	uint64 challenge = ((uint64)adr.GetIPNetworkByteOrder() << 32) + m_CurrentRandomNonce;
 	CRC32_t hash;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	return (int)hash;
 }
@@ -2137,7 +2137,7 @@ void CBaseServer::BroadcastPrintf (const char *fmt, ...)
 	char		string[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe (string, fmt, argptr);
 	va_end (argptr);
 
 	SVC_Print print( string );
@@ -2398,7 +2398,7 @@ void CBaseServer::RecalculateTags( void )
 	// Games without this interface will have no tagged cvars besides "increased_maxplayers"
 	if ( serverGameTags )
 	{
-		auto pKV = KeyValues::AutoDelete( "GameTags" );
+		KeyValuesAD pKV( "GameTags" );
 
 		serverGameTags->GetTaggedConVarList( pKV );
 

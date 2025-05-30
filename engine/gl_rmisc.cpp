@@ -58,7 +58,7 @@ For program optimization
 void R_TimeRefresh_f (void)
 {
 	int			i;
-	float		start, stop, time;
+	double		start, stop, time;
 	CViewSetup		view;
 
 	materials->Flush( true );

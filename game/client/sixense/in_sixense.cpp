@@ -1420,7 +1420,7 @@ bool SixenseInput::InMenuMode()
 	bool cstrike_panel_visible = false;
 
 #if defined( CSTRIKE15 ) // csgo
-	const int num_panels = 16;
+	constexpr int num_panels = 16;
 	char *panel_names[] = {
 		PANEL_OVERVIEW,		
 		PANEL_CLASS,		
@@ -1440,7 +1440,7 @@ bool SixenseInput::InMenuMode()
 		PANEL_SURVEY				
 	};
 #else // css
-	const int num_panels = 15;
+	constexpr int num_panels = 15;
 	char *panel_names[] = {
 		PANEL_OVERVIEW,		
 		PANEL_CLASS,		
@@ -1734,7 +1734,7 @@ bool SixenseInput::SixenseFrame( float flFrametime, CUserCmd *pCmd )
 
 
 	static float filtered_frametime = 0.0f;
-	const float frametime_filt_param = 0.99f;
+	constexpr float frametime_filt_param = 0.99f;
 	filtered_frametime = filtered_frametime * frametime_filt_param + flFrametime * 1000.0f * ( 1.0f - frametime_filt_param );
 
 
@@ -1793,7 +1793,7 @@ void SixenseInput::CheckWeaponForScope()
 
 			if( pCSWeapon )
 			{
-				const float min_fov = 45.0f;
+				constexpr float min_fov = 45.0f;
 
 				if ( pCSWeapon->HasScope() && (pPlayer->GetFOV() < min_fov) )
 				{
@@ -3261,7 +3261,7 @@ void SixenseInput::SixenseUpdateMouseCursor()
 #endif
 #ifdef TF_CLIENT_DLL
 	
-	const int str_len = 128;
+	constexpr int str_len = 128;
 	static char window_name[str_len] = "\0";
 
 	if( window_name[0] == '\0' )
@@ -3411,7 +3411,7 @@ void SixenseInput::SixenseUpdateMouseCursor()
 
 			static Vector2 last_pixel_pos;
 
-			const float mouse_filter_val = 0.8f;
+			constexpr float mouse_filter_val = 0.8f;
 
 			if ( filtered_pixel_pos == Vector2( -999, -999 ) )
 			{

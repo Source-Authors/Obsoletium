@@ -54,8 +54,7 @@ const char *GetLiblistFallbackDir(const char *pszGameDir) {
     while (!g_pFullFileSystem->EndOfFile(hFile)) {
       // get a single line
       szLine[0] = 0;
-      g_pFullFileSystem->ReadLine(szLine, sizeof(szLine) - 1, hFile);
-      szLine[sizeof(szLine) - 1] = 0;
+      g_pFullFileSystem->ReadLine(szLine, hFile);
 
       if (!strnicmp(szLine, "fallback_dir", 12)) {
         // we got the line, get the value between the quotes
@@ -327,7 +326,7 @@ const char *ToString(int val) {
 void CCreateMultiplayerGameServerPage::OnCommand(const char *cmd) {
   char cvars[1024];
   int secure = GetControlInt("SecureCheck", 1);
-  m_pNumPlayers->GetText(cvars, 1024);
+  m_pNumPlayers->GetText(cvars);
   m_iMaxPlayers = atoi(cvars);
   V_strcpy_safe(m_szHostName, GetControlString("ServerNameEdit", ""));
   V_strcpy_safe(m_szPassword, GetControlString("RCONPasswordEdit", ""));
@@ -486,9 +485,9 @@ void CCreateMultiplayerGameServerPage::LoadMODList() {
 
   // add steam games
   if (CommandLine()->CheckParm("-steam")) {
-    const char *pSteamGamesFilename = "hlds_steamgames.vdf";
+    constexpr char pSteamGamesFilename[] = "hlds_steamgames.vdf";
 
-    KeyValues *gamesFile = new KeyValues(pSteamGamesFilename);
+    KeyValuesAD gamesFile(pSteamGamesFilename);
 
     if (gamesFile->LoadFromFile(g_pFullFileSystem, pSteamGamesFilename, NULL)) {
       for (KeyValues *kv = gamesFile->GetFirstSubKey(); kv != NULL;
@@ -501,8 +500,6 @@ void CCreateMultiplayerGameServerPage::LoadMODList() {
         AddMod(pGameDir, pSteamGamesFilename, kv);
       }
     }
-    gamesFile->deleteThis();
-    gamesFile = NULL;
   }
 
   // For backward compatibility, check inside the dedicated server's own
@@ -561,15 +558,12 @@ void CCreateMultiplayerGameServerPage::LoadPossibleMod(
   if (!g_pFullFileSystem->FileExists(gameInfoFilename)) return;
 
   // don't want to add single player games to the list
-  KeyValues *pGameInfo = new KeyValues("GameInfo");
+  KeyValuesAD pGameInfo("GameInfo");
   bool loadedFile =
       pGameInfo->LoadFromFile(g_pFullFileSystem, gameInfoFilename);
   if (!loadedFile) return;
 
   AddMod(pGameDirName, gameInfoFilename, pGameInfo);
-
-  pGameInfo->deleteThis();
-  pGameInfo = NULL;
 }
 
 void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
@@ -607,13 +601,10 @@ void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
     if (!gameName) Error("%s missing 'game' key.", pGameInfoFilename);
 
     // add to drop-down combo and mod list
-    KeyValues *kv = pGameInfo->MakeCopy();
+    KeyValuesAD kv(pGameInfo->MakeCopy());
     kv->SetString("gamedir", pGameDirName);
 
     m_pGameCombo->AddItem(gameName, kv);
-
-    kv->deleteThis();
-    kv = NULL;
   }
 }
 
@@ -626,7 +617,7 @@ int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
   // UNDONE: steam wants this done in a special way, need to support that
   FileFindHandle_t findHandle = NULL;
   char szSearch[256];
-  sprintf(szSearch, "%s/maps/*.bsp", pszMod);
+  V_sprintf_safe(szSearch, "%s/maps/*.bsp", pszMod);
 
   int iMapsFound = 0;
 
@@ -731,7 +722,7 @@ void CCreateMultiplayerGameServerPage::LoadMapList() {
 // Purpose: returns the name of the map selected from the map combo
 //-----------------------------------------------------------------------------
 const char *CCreateMultiplayerGameServerPage::GetMapName() {
-  m_pMapList->GetText(m_szMapName, DATA_STR_LENGTH);
+  m_pMapList->GetText(m_szMapName);
   return m_szMapName;
 }
 
@@ -771,7 +762,7 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
     }
 
     // update the game name
-    m_pGameCombo->GetText(m_szGameName, sizeof(m_szGameName));
+    m_pGameCombo->GetText(m_szGameName);
 
     // Copy the gamedir into m_szMod.
     KeyValues *gameData = m_pGameCombo->GetActiveItemUserData();
@@ -787,9 +778,12 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
       m_pGameInfo->deleteThis();
     }
     char liblist[1024];
-    Q_snprintf(liblist, sizeof(liblist) - 1, "%s\\gameinfo.txt", m_szMod);
+    V_sprintf_safe(liblist, "%s\\gameinfo.txt", m_szMod);
     m_pGameInfo = new KeyValues("GameInfo");
-    m_pGameInfo->LoadFromFile(g_pFullFileSystem, liblist);
+    if ( !m_pGameInfo->LoadFromFile(g_pFullFileSystem, liblist) )
+    {
+        Warning( "Unable to load game info from '%s'.\n", liblist );
+    }
 
     // redo the hostname with the new game name
     if (updateHostname) {

@@ -800,8 +800,7 @@ void CMatSystemSurface::PushMakeCurrent(VPANEL pPanel, bool useInSets)
 
 	g_pVGuiPanel->GetClipRect(pPanel, clipRect[0], clipRect[1], clipRect[2], clipRect[3]);
 
-	intp i = m_PaintStateStack.AddToTail();
-	PaintState_t &paintState = m_PaintStateStack[i];
+	PaintState_t &paintState = m_PaintStateStack[m_PaintStateStack.AddToTail()];
 	paintState.m_pPanel = pPanel;
 
 	// Determine corrected top left origin
@@ -1782,7 +1781,7 @@ bool CMatSystemSurface::IsFontAdditive(HFont font)
 //-----------------------------------------------------------------------------
 // Purpose: returns the abc widths of a single character
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
+void CMatSystemSurface::GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c)
 {
 	FontManager().GetCharABCwide(font, ch, a, b, c);
 }
@@ -1790,7 +1789,7 @@ void CMatSystemSurface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &
 //-----------------------------------------------------------------------------
 // Purpose: returns the pixel width of a single character
 //-----------------------------------------------------------------------------
-int CMatSystemSurface::GetCharacterWidth(HFont font, int ch)
+int CMatSystemSurface::GetCharacterWidth(HFont font, wchar_t ch)
 {
 	return FontManager().GetCharacterWidth(font, ch);
 }
@@ -1822,7 +1821,7 @@ bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fon
 
 	char fullPath[MAX_PATH];
 	// windows needs an absolute path for ttf
-	bool bFound = g_pFullFileSystem->GetLocalPath( fontFileName, fullPath, sizeof( fullPath ) );
+	bool bFound = g_pFullFileSystem->GetLocalPath_safe( fontFileName, fullPath );
 	if ( !bFound )
 	{
 		char output[512];
@@ -3550,12 +3549,12 @@ int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, i
 	DrawSetTextPos( x, y );
 	DrawSetTextColor( r, g, b, a );
 
-	Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	V_vsprintf_safe(data, fmt, argptr);
 
 	DrawSetTextFont( font );
 
 	wchar_t szconverted[ 1024 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted, 1024 );
+	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted );
 	DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 	int totalLength = DrawTextLen( font, data );
@@ -3738,7 +3737,7 @@ void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int
 		DrawSetTextPos( x, y );
 
 		wchar_t szconverted[ 1024 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted, 1024 );
+		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted );
 		DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 		// Leave room for space, too
@@ -3857,12 +3856,12 @@ void CMatSystemSurface::MovePopupToFront(VPANEL panel)
 	{
 		if ( !g_pVGuiPanel->HasParent(panel, input()->GetAppModalSurface()) )
 		{
-			HPanel p = ivgui()->PanelToHandle( input()->GetAppModalSurface() );
-			index = m_PopupList.Find( p );
+			HPanel pn = ivgui()->PanelToHandle( input()->GetAppModalSurface() );
+			index = m_PopupList.Find( pn );
 			if ( index != m_PopupList.InvalidIndex() )
 			{
 				m_PopupList.Remove( index );
-				m_PopupList.AddToTail( p );
+				m_PopupList.AddToTail( pn );
 			}
 		}
 	}
@@ -4308,10 +4307,10 @@ vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath 
 		if ( info.szTypeName[ 0 ] != 0 )
 		{
 			char ext[ 32 ];
-			Q_ExtractFileExtension( pFullPath, ext, sizeof( ext ) );
+			V_ExtractFileExtension( pFullPath, ext );
 
 			char lookup[ 512 ];
-			Q_snprintf( lookup, sizeof( lookup ), "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
+			V_sprintf_safe( lookup, "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
 			
 			// Now check the dictionary
 			unsigned short idx = m_FileTypeImages.Find( lookup );

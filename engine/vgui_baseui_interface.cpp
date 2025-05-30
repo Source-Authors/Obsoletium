@@ -1398,7 +1398,7 @@ void CEngineVGui::UpdateCustomProgressBar( float progress, const wchar_t *desc )
 		return;
 
 	char ansi[1024];
-	g_pVGuiLocalize->ConvertUnicodeToANSI( desc, ansi, sizeof( ansi ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( desc, ansi );
 
 	if ( staticGameUIFuncs->UpdateProgressBar( progress, ansi ) )
 	{
@@ -1821,8 +1821,8 @@ void VGui_PlaySound( const char *pFileName )
 		S_MarkUISound( pSound );
 
 		StartSoundParams_t params;
-		params.staticsound = IsX360() ? true : false;
-		params.soundsource = cl.m_nViewEntity;
+		params.staticsound = false;
+		params.soundsource = static_cast<SoundSource>(cl.m_nViewEntity);
 		params.entchannel = CHAN_AUTO;
 		params.pSfx = pSound;
 		params.origin = vDummyOrigin;

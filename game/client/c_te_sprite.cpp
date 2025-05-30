@@ -83,7 +83,7 @@ static inline void RecordSprite( const Vector& start, int nModelIndex,
 		const model_t* pModel = (nModelIndex != 0) ? modelinfo->GetModel( nModelIndex ) : NULL;
 		const char *pModelName = pModel ? modelinfo->GetModelName( pModel ) : "";
 
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_SPRITE_SINGLE );
  		msg->SetString( "name", "TE_Sprite" );
@@ -96,7 +96,6 @@ static inline void RecordSprite( const Vector& start, int nModelIndex,
  		msg->SetInt( "brightness", nBrightness );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

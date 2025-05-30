@@ -13,6 +13,6 @@
 
 class CEventParams;
 
-int EventProperties_Expression( CEventParams *params );
+intp EventProperties_Expression( CEventParams *params );
 
 #endif // EVENTPROPERTIES_EXPRESSION_H

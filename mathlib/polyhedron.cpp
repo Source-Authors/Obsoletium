@@ -266,7 +266,7 @@ CPolyhedron *ClipPolyhedron( const CPolyhedron *pExistingPolyhedron, const float
 
 		for( int i = 0; i != iPlaneCount; ++i )
 		{
-			Vector vNormal = *((Vector *)&pOutwardFacingPlanes[(i * 4) + 0]);
+			const Vector vNormal = *((const Vector *)&pOutwardFacingPlanes[(i * 4) + 0]);
 			float fPlaneDist = pOutwardFacingPlanes[(i * 4) + 3];
 
 			for( int j = 0; j != pExistingPolyhedron->iVertexCount; ++j )
@@ -509,10 +509,10 @@ Vector FindPointInPlanes( const float *pPlanes, int planeCount )
 
 	for ( int i = 0; i < planeCount; i++ )
 	{
-		float fD = DotProduct( *(Vector *)&pPlanes[i*4], point ) - pPlanes[i*4 + 3];
+		float fD = DotProduct( *(const Vector *)&pPlanes[i*4], point ) - pPlanes[i*4 + 3];
 		if ( fD < 0 )
 		{
-			point -= fD * (*(Vector *)&pPlanes[i*4]);
+			point -= fD * (*(const Vector *)&pPlanes[i*4]);
 		}
 	}
 	return point;
@@ -555,7 +555,7 @@ bool FindConvexShapeLooseAABB( const float *pInwardFacingPlanes, int iPlaneCount
 
 	for ( int i = 0; i < iPlaneCount; i++ )
 	{
-		Vector *pPlaneNormal = (Vector *)&pInwardFacingPlanes[i*4];
+		const Vector *pPlaneNormal = (const Vector *)&pInwardFacingPlanes[i*4];
 		float fPlaneDist = pInwardFacingPlanes[(i*4) + 3];
 
 		if( vertsIn == NULL )
@@ -912,7 +912,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 		pDeadLineLinkCollection = NULL;
 		pDeadPolygonCollection = NULL;
 
-		Vector vNormal = *((Vector *)&pOutwardFacingPlanes[(iCurrentPlane * 4) + 0]);
+		const Vector vNormal = *((const Vector *)&pOutwardFacingPlanes[(iCurrentPlane * 4) + 0]);
 		/*double vNormalAsDouble[3];
 		vNormalAsDouble[0] = vNormal.x;
 		vNormalAsDouble[1] = vNormal.y;
@@ -1399,12 +1399,11 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 #endif
 
 			GeneratePolyhedronFromPlanes_LineLL *pLastLineLink;
-			GeneratePolyhedronFromPlanes_Polygon *pWorkPolygon;			
+			GeneratePolyhedronFromPlanes_Polygon *pWorkPolygon;
 			GeneratePolyhedronFromPlanes_LineLL *pTestLine;
 
 #ifdef _DEBUG
 			GeneratePolyhedronFromPlanes_Polygon *pLastWorkPolygon = NULL;
-			GeneratePolyhedronFromPlanes_Point *pLastWorkPoint = NULL;
 #endif
 
 			if( pActivePolygonWalk )
@@ -1607,7 +1606,6 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 #ifdef _DEBUG
 					pLastWorkPolygon = pWorkPolygon;
-					pLastWorkPoint = pWorkPoint;
 #endif
 					//move to the next point
 					pWorkPoint = pJoinLine->pPoints[0];
@@ -1667,7 +1665,6 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 #ifdef _DEBUG
 					pLastWorkPolygon = pWorkPolygon;
-					pLastWorkPoint = pWorkPoint;
 #endif
 
 					pWorkPoint = pTestLine->pLine->pPoints[pTestLine->iReferenceIndex];

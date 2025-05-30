@@ -11,10 +11,7 @@
 #pragma once
 #endif
 
-#ifndef VECTOR_H
 #include "mathlib/vector.h"
-#endif
-
 #include "tier1/utlvector.h"
 
 #include "tier0/memdbgon.h"
@@ -81,7 +78,7 @@ public:
 		SIZE = 0
 	};
 
-	static constexpr int FieldSize( )
+	[[nodiscard]] static constexpr int FieldSize( )
 	{
 		return 0;
 	}
@@ -441,11 +438,12 @@ public:
 		}
 	}
 	
-	const char *GenerateName( const char *pszIdentifier )
+	[[nodiscard]] const char *GenerateName( const char *pszIdentifier )
 	{
-		char *pBuf = new char[m_nLenBase + strlen(pszIdentifier) + 1];
-		strcpy( pBuf, m_pszBase );
-		strcat( pBuf, pszIdentifier );
+		intp bufferSize = m_nLenBase + V_strlen(pszIdentifier) + 1;
+		char *pBuf = new char[bufferSize];
+		V_strncpy( pBuf, m_pszBase, bufferSize );
+		V_strncat( pBuf, pszIdentifier, bufferSize );
 		m_Names.AddToTail( pBuf );
 		return pBuf;
 	}

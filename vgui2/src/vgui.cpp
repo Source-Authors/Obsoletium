@@ -5,6 +5,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include <vgui/IVGui.h>
+
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include <vgui/VGUI.h>
 #include <vgui/Dar.h>
@@ -12,29 +14,20 @@
 #include <vgui/IPanel.h>
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
 #include <vgui/IClientPanel.h>
 #include <vgui/IScheme.h>
-#include <KeyValues.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <malloc.h>
+#include <tier1/KeyValues.h>
 #include <tier0/dbg.h>
 #include <tier1/utlhandletable.h>
 #include "vgui_internal.h"
 #include "VPanel.h"
 #include "IMessageListener.h"
 #include "tier3/tier3.h"
-#include "utllinkedlist.h"
-#include "utlpriorityqueue.h"
-#include "utlvector.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/utlpriorityqueue.h"
+#include "tier1/utlvector.h"
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 #undef GetCursorPos // protected_things.h defines this, and it makes it so we can't access g_pInput->GetCursorPos.
 
@@ -228,7 +221,8 @@ private:
 	int m_nReentrancyCount;
 
 	CUtlVector< Tick_t * > m_TickSignalVec;
-	CUtlLinkedList< Context_t >	m_Contexts;
+	// dimhotepus: unsigned short -> HContext
+	CUtlLinkedList< Context_t, HContext >	m_Contexts;
 
 	HContext m_hContext;
 	Context_t m_DefaultContext;
@@ -839,16 +833,6 @@ bool CVGui::DispatchMessages()
 					g_pInput->UpdateCursorPosInternal( nXPos, nYPos );
 				}
 			}
-#ifdef _X360
-			else if ( messageItem->_messageTo == 0xFFFFFFFE ) // special tag to always give message to the active key focus
-			{
-				VPanel *vto = (VPanel *) g_pInput->GetCalculatedFocus();
-				if (vto)
-				{
-					vto->SendMessage(params, g_pIVgui->HandleToPanel(messageItem->_from));
-				}
-			}
-#endif
 			else
 			{
 				VPanel *vto = (VPanel *)g_pIVgui->HandleToPanel(messageItem->_messageTo);
@@ -1059,7 +1043,7 @@ void CVGui::DPrintf(const char* format,...)
 	va_list argList;
 
 	va_start(argList,format);
-	Q_vsnprintf(buf,sizeof( buf ), format,argList);
+	V_vsprintf_safe(buf, format, argList);
 	va_end(argList);
 
 	Plat_DebugString(buf);
@@ -1075,7 +1059,7 @@ void CVGui::DPrintf2(const char* format,...)
 	va_list argList;
 	static int ctr=0;
 
-	Q_snprintf(buf,sizeof( buf ), "%d:",ctr++ );
+	V_sprintf_safe(buf, "%d:", ctr++ );
 
 	va_start(argList,format);
 	Q_vsnprintf(buf+strlen(buf),sizeof( buf )-strlen(buf),format,argList);

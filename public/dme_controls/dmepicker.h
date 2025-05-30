@@ -41,7 +41,7 @@ struct DmePickerInfo_t
 //-----------------------------------------------------------------------------
 class CDmePicker : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmePicker, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePicker, vgui::EditablePanel );
 
 public:
 	CDmePicker( vgui::Panel *pParent );
@@ -51,7 +51,7 @@ public:
 	virtual void Activate( const CUtlVector< DmePickerInfo_t >& vec );
 
 	// Forward arrow keys to the list
-	virtual void OnKeyCodePressed( vgui::KeyCode code );
+	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	// Returns the selceted DmElement
 	CDmElement *GetSelectedDme( );
@@ -74,14 +74,14 @@ private:
 //-----------------------------------------------------------------------------
 class CDmePickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDmePickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePickerFrame, vgui::Frame );
 
 public:
 	CDmePickerFrame( vgui::Panel *pParent, const char *pTitle );
 	~CDmePickerFrame();
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	// Purpose: Activate the dialog
 	// the message "DmeSelected" will be sent if one was picked

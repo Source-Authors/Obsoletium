@@ -6,13 +6,11 @@
 //
 //===========================================================================//
 #include "cbase.h"
-#include <stdio.h>
-#include <string.h>
+#include "hlfaceposer.h"
 #include <sys/stat.h>
 #include "filesystem.h"
 #include "mxtk/mx.h"
 #include "mxStatusWindow.h"
-#include "filesystem.h"
 #include "StudioModel.h"
 #include "ControlPanel.h"
 #include "MDLViewer.h"
@@ -60,7 +58,7 @@ bool FPFullpathFileExists( const char *filename )
 char *FacePoser_MakeWindowsSlashes( char *pname )
 {
 	static char returnString[ 4096 ];
-	strcpy( returnString, pname );
+	V_strcpy_safe( returnString, pname );
 	pname = returnString;
 
 	while ( *pname ) 
@@ -136,7 +134,7 @@ void SetCloseCaptionLanguageId( int id, bool force /* = false */ )
 }
 
 
-char *va( const char *fmt, ... )
+char *va( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[32][1024];
@@ -145,18 +143,18 @@ char *va( const char *fmt, ... )
 	outbuffer++;
 	va_start( args, fmt );
 	vprintf( fmt, args );
-	vsprintf( output[ outbuffer & 31 ], fmt, args );
+	V_vsprintf_safe( output[ outbuffer & 31 ], fmt, args );
 	return output[ outbuffer & 31 ];
 }
 
-void Con_Printf( const char *fmt, ... )
+void Con_Printf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
 
 	va_start( args, fmt );
 	vprintf( fmt, args );
-	vsprintf( output, fmt, args );
+	V_vsprintf_safe( output, fmt, args );
 
 	if ( !g_pStatusWindow )
 	{
@@ -166,14 +164,14 @@ void Con_Printf( const char *fmt, ... )
 	g_pStatusWindow->StatusPrint( CONSOLE_COLOR, false, output );
 }
 
-void Con_ColorPrintf( COLORREF rgb, const char *fmt, ... )
+void Con_ColorPrintf( COLORREF rgb, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
 
 	va_start( args, fmt );
 	vprintf( fmt, args );
-	vsprintf( output, fmt, args );
+	V_vsprintf_safe( output, fmt, args );
 
 	if ( !g_pStatusWindow )
 	{
@@ -183,14 +181,14 @@ void Con_ColorPrintf( COLORREF rgb, const char *fmt, ... )
 	g_pStatusWindow->StatusPrint( rgb, false, output );
 }
 
-void Con_ErrorPrintf( const char *fmt, ... )
+void Con_ErrorPrintf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
 
 	va_start( args, fmt );
 	vprintf( fmt, args );
-	vsprintf( output, fmt, args );
+	V_vsprintf_safe( output, fmt, args );
 
 	if ( !g_pStatusWindow )
 	{
@@ -211,7 +209,7 @@ void MakeFileWriteable( const char *filename )
 	char *pFullPath;
 	if ( !Q_IsAbsolutePath( filename ) )
 	{
-		pFullPath = (char*)filesystem->RelativePathToFullPath( filename, NULL, pFullPathBuf, sizeof(pFullPathBuf) );
+		pFullPath = (char*)filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
 	}
 	else
 	{
@@ -238,7 +236,7 @@ bool IsFileWriteable( const char *filename )
 	char *pFullPath;
 	if ( !Q_IsAbsolutePath( filename ) )
 	{
-		pFullPath = (char*)filesystem->RelativePathToFullPath( filename, NULL, pFullPathBuf, sizeof(pFullPathBuf) );
+		pFullPath = (char*)filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
 	}
 	else
 	{
@@ -280,26 +278,26 @@ void FPCopyFile( const char *source, const char *dest, bool bCheckOut )
 	char fullpaths[ MAX_PATH ];
 	char fullpathd[ MAX_PATH ];
 
-	if ( !Q_IsAbsolutePath( source ) )
+	if ( !V_IsAbsolutePath( source ) )
 	{
-		filesystem->RelativePathToFullPath( source, NULL, fullpaths, sizeof(fullpaths) );
+		filesystem->RelativePathToFullPath_safe( source, NULL, fullpaths );
 	}
 	else
 	{
-		Q_strncpy( fullpaths, source, sizeof(fullpaths) );
+		V_strcpy_safe( fullpaths, source );
 	}
 
-	Q_strncpy( fullpathd, fullpaths, MAX_PATH );
+	V_strcpy_safe( fullpathd, fullpaths );
 	char *pSubdir = Q_stristr( fullpathd, source );
 	if ( pSubdir )
 	{
 		*pSubdir = 0;
 	}
-	Q_AppendSlash( fullpathd, MAX_PATH );
-	Q_strncat( fullpathd, dest, MAX_PATH, MAX_PATH );
+	V_AppendSlash( fullpathd );
+	V_strcat_safe( fullpathd, dest );
 
-	Q_FixSlashes( fullpaths );
-	Q_FixSlashes( fullpathd );
+	V_FixSlashes( fullpaths );
+	V_FixSlashes( fullpathd );
 
 	if ( bCheckOut )
 	{
@@ -380,51 +378,51 @@ void FacePoser_LoadWindowPositions( char const *name, bool& visible, int& x, int
 	char subkey[ 512 ];
 	int v;
 
-	Q_snprintf( subkey, sizeof( subkey ), "%s - visible", name );
+	V_sprintf_safe( subkey, "%s - visible", name );
 	LoadViewerSettingsInt( subkey, &v );
 	visible = v ? true : false;
 	
-	Q_snprintf( subkey, sizeof( subkey ), "%s - locked", name );
+	V_sprintf_safe( subkey, "%s - locked", name );
 	LoadViewerSettingsInt( subkey, &v );
 	locked = v ? true : false;
 
-	Q_snprintf( subkey, sizeof( subkey ), "%s - zoomed", name );
+	V_sprintf_safe( subkey, "%s - zoomed", name );
 	LoadViewerSettingsInt( subkey, &v );
 	zoomed = v ? true : false;
 
-	Q_snprintf( subkey, sizeof( subkey ), "%s - x", name );
+	V_sprintf_safe( subkey, "%s - x", name );
 	LoadViewerSettingsInt( subkey, &x );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - y", name );
+	V_sprintf_safe( subkey, "%s - y", name );
 	LoadViewerSettingsInt( subkey, &y );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - width", name );
+	V_sprintf_safe( subkey, "%s - width", name );
 	LoadViewerSettingsInt( subkey, &w );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - height", name );
+	V_sprintf_safe( subkey, "%s - height", name );
 	LoadViewerSettingsInt( subkey, &h );
 }
 
 void FacePoser_SaveWindowPositions( char const *name, bool visible, int x, int y, int w, int h, bool locked, bool zoomed )
 {
 	char subkey[ 512 ];
-	Q_snprintf( subkey, sizeof( subkey ), "%s - visible", name );
+	V_sprintf_safe( subkey, "%s - visible", name );
 	SaveViewerSettingsInt( subkey, visible );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - locked", name );
+	V_sprintf_safe( subkey, "%s - locked", name );
 	SaveViewerSettingsInt( subkey, locked );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - x", name );
+	V_sprintf_safe( subkey, "%s - x", name );
 	SaveViewerSettingsInt( subkey, x );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - y", name );
+	V_sprintf_safe( subkey,  "%s - y", name );
 	SaveViewerSettingsInt( subkey, y );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - width", name );
+	V_sprintf_safe( subkey,  "%s - width", name );
 	SaveViewerSettingsInt( subkey, w );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - height", name );
+	V_sprintf_safe( subkey,  "%s - height", name );
 	SaveViewerSettingsInt( subkey, h );
-	Q_snprintf( subkey, sizeof( subkey ), "%s - zoomed", name );
+	V_sprintf_safe( subkey,  "%s - zoomed", name );
 	SaveViewerSettingsInt( subkey, zoomed );
 }
 
 static char g_PhonemeRoot[ MAX_PATH ] = { 0 };
 void FacePoser_SetPhonemeRootDir( char const *pchRootDir )
 {
-	Q_strncpy( g_PhonemeRoot, pchRootDir, sizeof( g_PhonemeRoot ) );
+	V_strcpy_safe( g_PhonemeRoot, pchRootDir );
 }
 
 //-----------------------------------------------------------------------------
@@ -449,14 +447,14 @@ void FacePoser_EnsurePhonemesLoaded( void )
 	for ( int i = 0 ; i < ARRAYSIZE( ext ); ++i )
 	{
 		char clname[ 256 ];
-		Q_snprintf( clname, sizeof( clname ), "%sphonemes%s", g_PhonemeRoot, ext[ i ] );
-		Q_FixSlashes( clname );
-		Q_strlower( clname );
+		V_sprintf_safe( clname, "%sphonemes%s", g_PhonemeRoot, ext[ i ] );
+		V_FixSlashes( clname );
+		V_strlower( clname );
 
 		if ( !expressions->FindClass( clname, false ) )
 		{
 			char clfile[ MAX_PATH ];
-			Q_snprintf( clfile, sizeof( clfile ), "expressions/%sphonemes%s.txt", g_PhonemeRoot, ext[ i ] );
+			V_sprintf_safe( clfile, "expressions/%sphonemes%s.txt", g_PhonemeRoot, ext[ i ] );
 			Q_FixSlashes( clfile );
 			Q_strlower( clfile );
 

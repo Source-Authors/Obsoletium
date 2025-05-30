@@ -189,9 +189,9 @@ static DirectX::XMVECTOR XM_CALLCONV VectorTransform( DirectX::FXMVECTOR vin1, c
 	DirectX::XMVECTOR vin2 = DirectX::XMVectorSet( in2[0][3], in2[1][3], in2[2][3], 0.0f );
 	DirectX::XMVECTOR vdot = DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ), //-V2002
 		0.0f
 	);
 
@@ -232,21 +232,21 @@ static DirectX::XMVECTOR XM_CALLCONV VectorITransform( DirectX::FXMVECTOR vin1, 
 
 	return DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
 				DirectX::XMVectorMultiply( vin1t, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0f ) )
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
 				DirectX::XMVectorMultiply( vin1t, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0f ) )
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
@@ -278,9 +278,9 @@ static DirectX::XMVECTOR XM_CALLCONV VectorRotate( DirectX::XMVECTOR vin1, const
 {
 	return DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 1 ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVector3Dot( vin1, DirectX::XMLoadFloat4( in2.XmBase() + 2 ) ) ), //-V2002
 		0.0f
 	);
 }
@@ -372,7 +372,7 @@ void XM_CALLCONV MatrixCopy( const matrix3x4_t& in, matrix3x4_t& out )
 //-----------------------------------------------------------------------------
 bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance )
 {
-	DirectX::XMVECTOR vtol = DirectX::XMVectorReplicate( flTolerance );
+	DirectX::XMVECTOR vtol = DirectX::XMVectorReplicate( flTolerance ); //-V2002
 
 	for ( int i = 0; i < 3; ++i )
 	{
@@ -722,23 +722,20 @@ quotient must fit in 32 bits.
 ====================
 */
 
-void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient,
+void XM_CALLCONV FloorDivMod (float numer, float denom, int *quotient,
 		int *rem)
 {
 	Assert( s_bMathlibInitialized );
-	int		q, r;
-	double	x;
 
 #ifdef PARANOID
-	if (denom <= 0.0)
-		Sys_Error ("FloorDivMod: bad denominator %d\n", denom);
-
-//	if ((floor(numer) != numer) || (floor(denom) != denom))
-//		Sys_Error ("FloorDivMod: non-integer numer or denom %f %f\n",
-//				numer, denom);
+	if (denom <= 0.0f)
+		Sys_Error ("FloorDivMod: bad denominator %f.\n", denom);
 #endif
 
-	if (numer >= 0.0)
+	int q, r;
+	float x;
+
+	if (numer >= 0.0f)
 	{
 
 		x = floor(numer / denom);
@@ -747,9 +744,7 @@ void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient,
 	}
 	else
 	{
-		//
 		// perform operations with positive values, and fix mod to make floor-based
-		//
 		x = floor(-numer / denom);
 		q = -(int)x;
 		r = Floor2Int(-numer - (x * denom));
@@ -804,7 +799,7 @@ bool XM_CALLCONV IsDenormal( float val )
 }
 
 // dimhotepus: use byte as expected type is byte.
-byte SignbitsForPlane (cplane_t *out)
+byte SignbitsForPlane (const cplane_t *out)
 {
 	// for fast box on planeside test
 	byte bits = 0;
@@ -1053,7 +1048,7 @@ int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *p )
 		break;
 	}
 
-	DirectX::XMVECTOR planeDist = DirectX::XMVectorReplicate( p->dist );
+	DirectX::XMVECTOR planeDist = DirectX::XMVectorReplicate( p->dist ); //-V2002
 
 	int sides = 0;
 
@@ -1447,14 +1442,24 @@ void XM_CALLCONV ClearBounds (Vector& mins, Vector& maxs)
 
 void XM_CALLCONV AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs)
 {
-	for (int i=0 ; i<3 ; i++)
-	{
-		vec_t val = v[i];
-		if (val < mins[i])
-			mins[i] = val;
-		if (val > maxs[i])
-			maxs[i] = val;
-	}
+	// dimhotepus: Unroll loop for speed.
+	vec_t val = v.x;
+	if (val < mins.x)
+		mins.x = val;
+	if (val > maxs.x)
+		maxs.x = val;
+
+	val = v.y;
+	if (val < mins.y)
+		mins.y = val;
+	if (val > maxs.y)
+		maxs.y = val;
+	
+	val = v.z;
+	if (val < mins.z)
+		mins.z = val;
+	if (val > maxs.z)
+		maxs.z = val;
 }
 
 // solve a x^2 + b x + c = 0
@@ -1665,21 +1670,21 @@ void XM_CALLCONV QuaternionAlign( const Quaternion &p, const Quaternion &q, Quat
 	// decide if one of the quaternions is backwards
 	float a = 0;
 	float b = 0;
-	for (i = 0; i < 4; i++) 
+	for (i = 0; i < 4; i++)  //-V112
 	{
 		a += (p[i]-q[i])*(p[i]-q[i]);
 		b += (p[i]+q[i])*(p[i]+q[i]);
 	}
 	if (a > b) 
 	{
-		for (i = 0; i < 4; i++) 
+		for (i = 0; i < 4; i++)  //-V112
 		{
 			qt[i] = -q[i];
 		}
 	}
 	else if (&qt != &q)
 	{
-		for (i = 0; i < 4; i++) 
+		for (i = 0; i < 4; i++)  //-V112
 		{
 			qt[i] = q[i];
 		}
@@ -1734,7 +1739,7 @@ void XM_CALLCONV QuaternionIdentityBlend( const Quaternion &p, float t, Quaterni
 		t = -t;
 	}
 
-	result = DirectX::XMVectorSetW( result, DirectX::XMVectorGetW( result ) + t );
+	result = DirectX::XMVectorSetW( result, DirectX::XMVectorGetW( result ) + t ); //-V2002
 
 	DirectX::XMStoreFloat4( qt.XmBase(), QuaternionNormalizeSIMD( result ) );
 }
@@ -1850,7 +1855,7 @@ float XM_CALLCONV QuaternionNormalize( Quaternion &q )
 
 	DirectX::XMStoreFloat4( q.XmBase(), normalized );
 
-	return DirectX::XMVectorGetX( DirectX::XMQuaternionLength( qsimd ) );
+	return DirectX::XMVectorGetX( DirectX::XMQuaternionLength( qsimd ) ); //-V2002
 }
 
 // dimhotepus: QuaternionNormalize without length.
@@ -1924,7 +1929,7 @@ float XM_CALLCONV QuaternionDotProduct( const Quaternion &p, const Quaternion &q
 	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 
-	return DirectX::XMVectorGetX( DirectX::XMQuaternionDot( psimd, qsimd ) );
+	return DirectX::XMVectorGetX( DirectX::XMQuaternionDot( psimd, qsimd ) ); //-V2002
 }
 
 
@@ -3011,7 +3016,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Ve
 	DirectX::XMVECTOR newCenter  = VectorIRotate( oldCenter, transform );
 	DirectX::XMVECTOR newExtents = DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
@@ -3025,7 +3030,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Ve
 				)
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
@@ -3039,7 +3044,7 @@ void XM_CALLCONV IRotateAABB( const matrix3x4_t &transform, Vector vecMinsIn, Ve
 				)
 			)
 		),
-		DirectX::XMVectorGetX
+		DirectX::XMVectorGetX //-V2002
 		(
 			DirectX::XMVectorSum
 			(
@@ -3623,7 +3628,7 @@ int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dis
 	VectorSubtract (outVerts[3], vup, outVerts[3]);	// down
 
 	// The four corners form a planar quadrilateral normal to "normal"
-	return 4;
+	return 4; //-V112
 }
 
 //-----------------------------------------------------------------------------
@@ -3638,8 +3643,8 @@ int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dis
 
 int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon )
 {
-	vec_t	*dists = (vec_t *)stackalloc( sizeof(vec_t) * vertCount * 4 ); //4x vertcount should cover all cases
-	int		*sides = (int *)stackalloc( sizeof(vec_t) * vertCount * 4 );
+	vec_t	 *dists = stackallocT( vec_t, vertCount * 4 ); //4x vertcount should cover all cases
+	SideType *sides = stackallocT( SideType, vertCount * 4 );
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;
@@ -3728,8 +3733,8 @@ int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVert
 
 int XM_CALLCONV ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon )
 {
-	double	*dists = (double *)stackalloc( sizeof(double) * vertCount * 4 ); //4x vertcount should cover all cases
-	int		*sides = (int *)stackalloc( sizeof(double) * vertCount * 4 );
+	double	 *dists = stackallocT( double, vertCount * 4 ); //4x vertcount should cover all cases
+	SideType *sides = stackallocT( SideType, vertCount * 4 );
 	int		counts[3];
 	double	dot;
 	int		i, j;

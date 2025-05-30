@@ -7,7 +7,7 @@
 #include "dme_controls/dmepanel.h"
 #include "tier1/KeyValues.h"
 #include "dme_controls/dmecontrols.h"
-#include "vgui_controls/combobox.h"
+#include "vgui_controls/ComboBox.h"
 #include "datamodel/dmelement.h"
 #include "dme_controls/dmecontrols_utils.h"
 
@@ -345,8 +345,8 @@ void CDmePanel::OnViewedElementChanged( KeyValues *kv )
 	while ( --nCount >= 0 )
 	{
 		int nItemID = m_pEditorNames->GetItemIDFromRow( nCount );
-		KeyValues *kv = m_pEditorNames->GetItemUserData( nItemID );
-		if ( Q_stricmp( m_CurrentEditorName, kv->GetString( "editorName" ) ) )
+		KeyValues *kvs = m_pEditorNames->GetItemUserData( nItemID );
+		if ( Q_stricmp( m_CurrentEditorName, kvs->GetString( "editorName" ) ) )
 		{
 			m_pEditorNames->DeleteItem( nItemID );
 		}
@@ -519,12 +519,12 @@ CBaseDmePanelFactory::CBaseDmePanelFactory( const char *pElementType, const char
 			// Collision found! If this is not an override, then we've been overridden
 			if ( !bIsOverride )
 			{
-				AssertMsg( pFactory->m_bIsOverride, ( "Two DmePanel factories have the same name (\"%s\") + type (\"%s\")!\n", pElementType, pEditorName ) );
+				AssertMsg( pFactory->m_bIsOverride, "Two DmePanel factories have the same name (\"%s\") + type (\"%s\")!\n", pElementType, pEditorName );
 				return;
 			}
 
 			// If this *is* an override, replace the previous version
-			AssertMsg( !pFactory->m_bIsOverride, ( "Two DmePanel factories have the same name (\"%s\") + type (\"%s\")!\n", pElementType, pEditorName ) );
+			AssertMsg( !pFactory->m_bIsOverride, "Two DmePanel factories have the same name (\"%s\") + type (\"%s\")!\n", pElementType, pEditorName );
 			if ( pPrevFactory )
 			{
 				pPrevFactory->m_pNext = pFactory->m_pNext;

@@ -199,7 +199,7 @@ void CSteam3Server::Activate( EServerType serverType )
 	m_eServerType = serverType;
 
 	char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	Q_FileBase( com_gamedir, gamedir );
 
 	// Figure out the game port. If we're doing a SrcTV relay, then ignore the NS_SERVER port and don't tell Steam that we have a game server.
 	uint16 usGamePort = 0;
@@ -612,7 +612,7 @@ void CSteam3Server::OnValidateAuthTicketResponse( ValidateAuthTicketResponse_t *
 	else
 	{
 		char msg[ 512 ];
-		sprintf( msg, "\"%s<%i><%s><>\" STEAM USERID validated\n", client->GetClientName(), client->GetUserID(), client->GetNetworkIDString() );
+		V_sprintf_safe( msg, "\"%s<%i><%s><>\" STEAM USERID validated\n", client->GetClientName(), client->GetUserID(), client->GetNetworkIDString() );
 
 		DevMsg( "%s", msg );
 		g_Log.Printf( "%s", msg );

@@ -442,8 +442,8 @@ void DownsampleRGBToRGBAImage(
 	int destWidth,
 	int destHeight )
 {
-	int srcPixelSize = 3;
-	int destPixelSize = 4;
+	constexpr int srcPixelSize = 3;
+	constexpr int destPixelSize = 4;
 	destData.SetSize( destWidth * destHeight * destPixelSize );
 	memset( destData.Base(), 0xFF, destWidth * destHeight * destPixelSize );
 
@@ -519,9 +519,10 @@ int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bI
 	if ( bIsDir )
 		return m_iLabel_Folder;
 
-	CString extension = name.Right( 4 );
+	// dimhotepus: Honor .jpeg.
+	CString extension = name.Right( 5 );
 	extension.MakeLower();
-	if ( extension == ".jpg" || extension == ".jpeg" )
+	if ( extension.Right( 4 ) == ".jpg" || extension == ".jpeg" )
 	{
 		pInfo->m_pBitmap = SetupJpegLabel( m_pFileSystem, m_CurrentDir + "\\" + name, PREVIEW_IMAGE_SIZE, GetPathID() );
 		if ( pInfo->m_pBitmap )
@@ -541,11 +542,12 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 	CUtlDict<int,int> jpgFiles;
 	for ( int i=0; i < files.Count(); i++ )
 	{
-		CString extension = files[i].Right( 4 );
+		// dimhotepus: Honor .jpeg.
+		CString extension = files[i].Right( 5 );
 		extension.MakeLower();
-		if ( extension == ".jpg" || extension == ".jpeg" )
+		if ( extension.Right( 4 ) == ".jpg" || extension == ".jpeg" )
 		{
-			CString base = files[i].Left( files[i].GetLength() - 4 );
+			CString base = files[i].Left( files[i].GetLength() - (extension == ".jpg" ? 4 : 5) );
 			jpgFiles.Insert( base, 1 );
 		}
 	}
@@ -553,11 +555,11 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 	// Now look for all mdls and remove them if they have a jpg.
 	for ( int i=0; i < files.Count(); i++ )
 	{
-		CString extension = files[i].Right( 4 );
+		CString extension = files[i].Right( 4 ); //-V112
 		extension.MakeLower();
 		if ( extension == ".mdl" )
 		{
-			CString base = files[i].Left( files[i].GetLength() - 4 );
+			CString base = files[i].Left( files[i].GetLength() - 4 ); //-V112
 			if ( jpgFiles.Find( base ) != -1 )
 			{
 				files.Remove( i );
@@ -775,7 +777,7 @@ void CFileSystemOpenDlg::OnUpButton()
 {
 	char str[MAX_PATH];
 	V_strcpy_safe( str, m_CurrentDir );
-	Q_StripLastDir( str, sizeof( str ) );
+	V_StripLastDir( str );
 
 	if ( Q_isempty( str ) )
 		V_strcpy_safe( str, "." );
@@ -915,7 +917,7 @@ public:
 		}
 
 		char pFileNameBuf[MAX_PATH];
-		const char *pFileName = m_pDialog->m_pFileSystem->RelativePathToFullPath( m_pDialog->m_CurrentDir, m_pDialog->m_PathIDString, pFileNameBuf, MAX_PATH );
+		const char *pFileName = m_pDialog->m_pFileSystem->RelativePathToFullPath_safe( m_pDialog->m_CurrentDir, m_pDialog->m_PathIDString, pFileNameBuf );
 		V_strcat_safe( pFileNameBuf, "\\" );
 	
 		// Build the list of file filters.
@@ -957,7 +959,7 @@ public:
 		while ( dlg.DoModal() == IDOK )
 		{
 			// Make sure we can make this into a relative path.
-			if ( m_pDialog->m_pFileSystem->FullPathToRelativePath( dlg.GetPathName(), m_RelativeFilename, sizeof( m_RelativeFilename ) ) )
+			if ( m_pDialog->m_pFileSystem->FullPathToRelativePath_safe( dlg.GetPathName(), m_RelativeFilename ) )
 			{
 				// Replace .jpg or .jpeg extension with .mdl?
 				char *pEnd = m_RelativeFilename;

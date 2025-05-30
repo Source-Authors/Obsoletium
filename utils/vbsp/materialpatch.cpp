@@ -68,8 +68,7 @@ const char *GetOriginalMaterialNameForPatchedMaterial( const char *pPatchMateria
 
 void CreateMaterialPatchRecursive( KeyValues *pOriginalKeyValues, KeyValues *pPatchKeyValues, int nKeys, const MaterialPatchInfo_t *pInfo )
 {
-	int i;
-	for( i = 0; i < nKeys; i++ )
+	for( int i = 0; i < nKeys; i++ )
 	{
 		const char *pVal = pOriginalKeyValues->GetString( pInfo[i].m_pKey, NULL );
 		if( !pVal )
@@ -78,8 +77,7 @@ void CreateMaterialPatchRecursive( KeyValues *pOriginalKeyValues, KeyValues *pPa
 			continue;
 		pPatchKeyValues->SetString( pInfo[i].m_pKey, pInfo[i].m_pValue );
 	}
-	KeyValues *pScan;
-	for( pScan = pOriginalKeyValues->GetFirstTrueSubKey(); pScan; pScan = pScan->GetNextTrueSubKey() )
+	for( auto *pScan = pOriginalKeyValues->GetFirstTrueSubKey(); pScan; pScan = pScan->GetNextTrueSubKey() )
 	{
 		CreateMaterialPatchRecursive( pScan, pPatchKeyValues->FindKey( pScan->GetName(), true ), nKeys, pInfo );
 	}
@@ -101,7 +99,7 @@ void CreateMaterialPatch( const char *pOriginalMaterialName, const char *pNewMat
 
 //	printf( "Creating material patch file %s which points at %s\n", newVMTFile, oldVMTFile );
 
-	KeyValues *kv = new KeyValues( "patch" );
+	KeyValuesAD kv( "patch" );
 	if ( !kv )
 	{
 		Error( "Couldn't allocate KeyValues for %s!!!", pNewMaterialName );
@@ -116,17 +114,15 @@ void CreateMaterialPatch( const char *pOriginalMaterialName, const char *pNewMat
 	{
 		char name[512];
 		V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pOriginalMaterialName ) );
-		KeyValues *origkv = new KeyValues( "blah" );
+		KeyValuesAD origkv( "blah" );
 
 		if ( !origkv->LoadFromFile( g_pFileSystem, name ) )
 		{
-			origkv->deleteThis();
 			Assert( 0 );
 			return;
 		}
 
 		CreateMaterialPatchRecursive( origkv, section, nKeys, pInfo );
-		origkv->deleteThis();
 	}
 	else
 	{
@@ -142,9 +138,6 @@ void CreateMaterialPatch( const char *pOriginalMaterialName, const char *pNewMat
 
 	// Add to pak file for this .bsp
 	AddBufferToPak( GetPakFile(), pNewVMTFile, (void*)buf.Base(), buf.TellPut(), true );
-
-	// Cleanup
-	kv->deleteThis();
 }
 
 
@@ -166,8 +159,7 @@ void CreateMaterialPatch( const char *pOriginalMaterialName, const char *pNewMat
 //-----------------------------------------------------------------------------
 static bool DoesMaterialHaveKey( KeyValues *pKeyValues, const char *pKeyName )
 {
-	const char *pVal;
-	pVal = pKeyValues->GetString( pKeyName, NULL );
+	const char *pVal = pKeyValues->GetString( pKeyName, NULL );
 	if ( pVal != NULL  )
 		return true;
 
@@ -185,8 +177,7 @@ static bool DoesMaterialHaveKey( KeyValues *pKeyValues, const char *pKeyName )
 //-----------------------------------------------------------------------------
 static bool DoesMaterialHaveKeyValuePair( KeyValues *pKeyValues, const char *pKeyName, const char *pSearchValue )
 {
-	const char *pVal;
-	pVal = pKeyValues->GetString( pKeyName, NULL );
+	const char *pVal = pKeyValues->GetString( pKeyName, NULL );
 	if ( pVal != NULL && ( Q_stricmp( pSearchValue, pVal ) == 0 ) )
 		return true;
 
@@ -206,17 +197,14 @@ bool DoesMaterialHaveKey( const char *pMaterialName, const char *pKeyName )
 {
 	char name[512];
 	V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
-	KeyValues *kv = new KeyValues( "blah" );
+	KeyValuesAD kv( "blah" );
 
 	if ( !kv->LoadFromFile( g_pFileSystem, name ) )
 	{
-		kv->deleteThis();
 		return NULL;
 	}
 
 	bool retVal = DoesMaterialHaveKey( kv, pKeyName );
-
-	kv->deleteThis();
 	return retVal;
 }
 
@@ -227,17 +215,14 @@ bool DoesMaterialHaveKeyValuePair( const char *pMaterialName, const char *pKeyNa
 {
 	char name[512];
 	V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
-	KeyValues *kv = new KeyValues( "blah" );
+	KeyValuesAD kv( "blah" );
 
 	if ( !kv->LoadFromFile( g_pFileSystem, name ) )
 	{
-		kv->deleteThis();
 		return NULL;
 	}
 
 	bool retVal = DoesMaterialHaveKeyValuePair( kv, pKeyName, pSearchValue );
-
-	kv->deleteThis();
 	return retVal;
 }
 
@@ -248,12 +233,11 @@ bool GetValueFromMaterial( const char *pMaterialName, const char *pKey, char *pV
 {
 	char name[512];
 	V_sprintf_safe( name, "materials/%s.vmt", GetOriginalMaterialNameForPatchedMaterial( pMaterialName ) );
-	KeyValues *kv = new KeyValues( "blah" );
+	KeyValuesAD kv( "blah" );
 
 	if ( !kv->LoadFromFile( g_pFileSystem, name ) )
 	{
 //		Assert( 0 );
-		kv->deleteThis();
 		return NULL;
 	}
 
@@ -263,7 +247,6 @@ bool GetValueFromMaterial( const char *pMaterialName, const char *pKey, char *pV
 		Q_strncpy( pValue, pTmpValue, len );
 	}
 
-	kv->deleteThis();
 	return ( pTmpValue != NULL );
 }
 

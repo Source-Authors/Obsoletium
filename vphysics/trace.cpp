@@ -130,7 +130,7 @@ static unsigned short GetPackedIndex( const IVP_Compact_Ledge *pLedge, const IVP
 	const IVP_Compact_Triangle *RESTRICT pTri = pLedge->get_first_triangle();
 	const IVP_Compact_Edge *RESTRICT pEdge = pTri->get_edge( 0 );
 	int best = pEdge->get_start_point_index();
-	float bestDot = pPoints[best].dot_product( &dir );
+	IVP_DOUBLE bestDot = pPoints[best].dot_product( &dir );
 	int triCount = pLedge->get_n_triangles();
 	const IVP_Compact_Triangle *RESTRICT pBestTri = pTri;
 	// this loop will early out, but keep it from being infinite
@@ -147,7 +147,7 @@ static unsigned short GetPackedIndex( const IVP_Compact_Ledge *pLedge, const IVP
 		int vert = stopVert;
 		do
 		{
-			float dot = pPoints[vert].dot_product( &dir );
+			IVP_DOUBLE dot = pPoints[vert].dot_product( &dir );
 			if ( dot > bestDot )
 			{
 				bestDot = dot;
@@ -234,7 +234,7 @@ void InitLeafmap( IVP_Compact_Ledge *pLedge, leafmap_t *pLeafmapOut )
 						// mark each vert in the list
 						const IVP_Compact_Edge *pEdge = pTri->get_edge( j );
 						int v = pEdge->get_start_point_index();
-						hasVert[v-minV] = true;
+						hasVert[v-minV] = 1;
 					}
 				}
 				// now find the vertex spans and encode them
@@ -323,8 +323,7 @@ public:
 	CTraceIVP( const CPhysCollide *pCollide, const Vector &origin, const QAngle &angles );
 	~CTraceIVP()
 	{
-		if ( m_pVisitHash )
-			FreeVisitHash(m_pVisitHash);
+		FreeVisitHash(m_pVisitHash);
 	}
 	unsigned short SupportMap( const Vector &dir, Vector *pOut ) const override;
 	Vector GetVertByIndex( int index ) const override;
@@ -366,7 +365,7 @@ public:
 
 	inline void TransformPositionFromLocal( const IVP_U_Float_Point &local, Vector &out ) const
 	{
-		VectorTransform( *(Vector *)&local, *((const matrix3x4_t *)&m_ivpLocalToHLWorld), out );
+		VectorTransform( *(const Vector *)&local.k, m_ivpLocalToHLWorld, out );
 	}
 
 #if USE_VERT_CACHE
@@ -728,13 +727,13 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		IVP_U_Float_Point mapdir;
 		TransformDirectionToLocal( dir, mapdir );
 		// just iterate the range if one is specified
-		int startPoint = m_pLeafmap->startVert[0];
-		int pointCount = m_pLeafmap->vertCount;
-		float bestDot = pPoints[startPoint].dot_product(&mapdir);
+		unsigned short startPoint = m_pLeafmap->startVert[0];
+		unsigned short pointCount = m_pLeafmap->vertCount;
+		IVP_DOUBLE bestDot = pPoints[startPoint].dot_product(&mapdir);
 		int best = startPoint;
-		for ( int i = 1; i < pointCount; i++ )
+		for ( unsigned short i = 1; i < pointCount; i++ )
 		{
-			float dot = pPoints[startPoint+i].dot_product(&mapdir);
+			IVP_DOUBLE dot = pPoints[startPoint+i].dot_product(&mapdir);
 			if ( dot > bestDot )
 			{
 				bestDot = dot;
@@ -745,7 +744,7 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		TransformPositionFromLocal( pPoints[best], *pOut ); // transform point position to world space
 		return best;
 	}
-	else
+	
 	{
 		VPROF("SupportMap_Walk");
 		const IVP_U_Float_Point *pPoints = m_pLedge->get_point_array();
@@ -755,13 +754,12 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		Assert( m_pVisitHash );
 		m_pVisitHash->NewVisit();
 
-		float dot;
 		int triIndex = 0, edgeIndex = 0;
 		GetStartVert( m_pLeafmap, mapdir, triIndex, edgeIndex );
 		const IVP_Compact_Triangle *RESTRICT pTri = m_pLedge->get_first_triangle() + triIndex;
 		const IVP_Compact_Edge *RESTRICT pEdge = pTri->get_edge( edgeIndex );
 		int best = pEdge->get_start_point_index();
-		float bestDot = pPoints[best].dot_product( &mapdir );
+		IVP_DOUBLE bestDot = pPoints[best].dot_product( &mapdir );
 		m_pVisitHash->VisitVert(best);
 
 		// This should never happen.  MAX_CONVEX_VERTS is very large (millions), none of our
@@ -783,7 +781,7 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 				{
 					// this lets us skip doing dot products on this vert
 					m_pVisitHash->VisitVert(vert);
-					dot = pPoints[vert].dot_product( &mapdir );
+					IVP_DOUBLE dot = pPoints[vert].dot_product( &mapdir );
 					if ( dot > bestDot )
 					{
 						bestDot = dot;
@@ -801,25 +799,6 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 				break;
 		}
 
-		// code to do the brute force method with no hill-climbing
-#if 0
-		for ( i = 0; i < triCount; i++ )
-		{
-			pTri = m_pLedge->get_first_triangle() + i;
-			for ( int j = 0; j < 3; j++ )
-			{
-				pEdge = pTri->get_edge( j );
-				int test = pEdge->get_start_point_index();
-				dot = pPoints[test].dot_product( &mapdir );
-				if ( dot > bestDot )
-				{
-					Assert(0);		// shouldn't hit this unless the hill-climb is broken
-					bestDot = dot;
-					best = test;
-				}
-			}
-		}
-#endif
 		TransformPositionFromLocal( pPoints[best], *pOut ); // transform point position to world space
 
 		return best;
@@ -893,9 +872,9 @@ unsigned short CTraceAABB::SupportMap( const Vector &dir, Vector *pOut ) const
 		return 0;
 	}
 	// index is formed by the 3-bit bitfield SzSySx (negative is 1, positive is 0)
-	unsigned short x = ((*((unsigned int *)&dir.x)) & 0x80000000UL) >> 31;
-	unsigned short y = ((*((unsigned int *)&dir.y)) & 0x80000000UL) >> 31;
-	unsigned short z = ((*((unsigned int *)&dir.z)) & 0x80000000UL) >> 31;
+	unsigned short x = ((*((const unsigned int *)&dir.x)) & 0x80000000UL) >> 31;
+	unsigned short y = ((*((const unsigned int *)&dir.y)) & 0x80000000UL) >> 31;
+	unsigned short z = ((*((const unsigned int *)&dir.z)) & 0x80000000UL) >> 31;
 	pOut->x = m_x[x];
 	pOut->y = m_y[y];
 	pOut->z = m_z[z];
@@ -1017,6 +996,7 @@ class CTraceSolver
 {
 public:
 	CTraceSolver( trace_t *ptr, ITraceObject *sweepobject, CTraceRay *ray, ITraceObject *obstacle, const Vector &axis )
+		: m_pointClosestToIntersection{axis}
 	{
 		m_pTotalTrace = ptr;
 		m_sweepObject = sweepobject;
@@ -1025,7 +1005,6 @@ public:
 		m_ray = ray;
 		m_traceLength = 0;
 		m_totalTraceLength = max( ray->m_baseLength, 1e-8f );
-		m_pointClosestToIntersection = axis;
 		m_epsilon = g_PhysicsUnits.collisionSweepEpsilon;
 	}
 
@@ -1220,7 +1199,7 @@ loop_without_store:
 			const IVP_Compact_Ledgetree_Node *node0 = node->left_son();
 			center.set(node0->center.k);
 			// if we don't insert, this is larger than any quad distance
-			float lastDist = 1e16f;
+			IVP_DOUBLE lastDist = 1e23;
 			if ( SweepHitsSphereOS( &center, node0->radius ) )
 			{
 				lastDist = m_rayStartOS.quad_distance_to(&center);
@@ -1237,7 +1216,7 @@ loop_without_store:
 				{
 					// can hit, push on stack
 					auto index = list.AddToTail();
-					float dist1 = m_rayStartOS.quad_distance_to(&center);
+					IVP_DOUBLE dist1 = m_rayStartOS.quad_distance_to(&center);
 					if ( lastDist < dist1 )
 					{
 						node = node0;

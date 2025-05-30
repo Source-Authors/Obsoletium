@@ -217,10 +217,9 @@ public:
 
 	void PutObject( T *pInfo )
 	{
-		auto *pElem = reinterpret_cast<unsigned char *>(pInfo);
-		pElem -= offsetof(TSPoolNode_t, elem);
-		auto *pNode = reinterpret_cast<TSPoolNode_t *>(pElem);
-
+		// dimhotepus: Fix put object.
+		auto *pNode = new TSPoolNode_t;
+		pNode->elem = *pInfo;
 		CTSListBase::Push( pNode );
 	}
 
@@ -473,7 +472,7 @@ public:
 
 		m_Count.store(0, std::memory_order::memory_order_relaxed );
 		
-		 // list always contains a dummy node
+		// list always contains a dummy node
 		m_Head.value.pNode = m_Tail.value.pNode = new Node_t;
 		m_Head.value.pNode->SetNextNode(End());
 		m_Head.value.sequence = m_Tail.value.sequence = 0;
@@ -485,7 +484,7 @@ public:
 
 		Assert( m_Count.load( std::memory_order::memory_order_relaxed ) == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
-		Assert( m_Head.value.pNode->GetNextNode() == End() );
+		Assert( m_Head.value.pNode->GetNextNode() == End() ); //-V2002
 
 		delete m_Head.value.pNode;
 	}
@@ -510,7 +509,7 @@ public:
 
 		Assert( m_Count.load() == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
-		Assert( m_Head.value.pNode->GetNextNode() == End() );
+		Assert( m_Head.value.pNode->GetNextNode() == End() ); //-V2002
 
 		m_Head.value.sequence = m_Tail.value.sequence = 0;
 	}
@@ -534,7 +533,7 @@ public:
 		{
 			bool bResult = true;
 			int nNodes = 0;
-			if ( m_Tail.value.pNode->GetNextNode() != End() )
+			if ( m_Tail.value.pNode->GetNextNode() != End() ) //-V2002
 			{
 				DebuggerBreakIfDebugging();
 				bResult = false;
@@ -553,7 +552,7 @@ public:
 			while ( pNode != End() )
 			{
 				nNodes++;
-				pNode = pNode->GetNextNode();
+				pNode = pNode->GetNextNode(); //-V2002
 			}
 
 			nNodes--;// skip dummy node
@@ -574,18 +573,6 @@ public:
 #else
 		return true;
 #endif
-	}
-
-	void FinishPush( Node_t *pNode, const NodeLink_t &oldTail )
-	{
-		NodeLink_t newTail;
-
-		newTail.value.pNode = pNode;
-		newTail.value.sequence = oldTail.value.sequence + 1;
-
-		ThreadMemoryBarrier();
-
-		InterlockedCompareExchangeNodeLink( &m_Tail, newTail, oldTail );
 	}
 
 	Node_t *Push( Node_t *pNode )
@@ -612,7 +599,7 @@ public:
 			else
 			{
 				// Another thread is trying to push, help it along
-				FinishPush( oldTail.value.pNode->GetNextNode(), oldTail );
+				FinishPush( oldTail.value.pNode->GetNextNode(), oldTail ); //-V2002
 			}
 		}
 
@@ -650,7 +637,7 @@ public:
 			ThreadMemoryBarrier(); // need a barrier to prevent reordering of these assignments
 			head.value.pNode	= *pHeadNode;
 			tailSequence		= pTail->value.sequence;
-			pNext				= head.value.pNode->GetNextNode();
+			pNext				= head.value.pNode->GetNextNode(); //-V2002
 
 			// Checking pNext only to force optimizer to not reorder the assignment
 			// to pNext and the compare of the sequence
@@ -700,11 +687,6 @@ public:
 		return head.value.pNode;
 	}
 
-	void FreeNode( Node_t *pNode )
-	{
-		m_FreeNodes.Push( pNode );
-	}
-
 	void PushItem( const T &init )
 	{
 		auto *pNode = static_cast<Node_t *>(m_FreeNodes.Pop());
@@ -736,6 +718,15 @@ public:
 	}
 
 private:
+	NodeLink_t m_Head;
+	NodeLink_t m_Tail;
+
+	std::atomic_int m_Count;
+	
+	CTSListBase m_FreeNodes;
+
+	Node_t m_end;
+
 	// just need a unique signifier
 	Node_t *End() { return &m_end; }
 
@@ -748,15 +739,20 @@ private:
 	{
 		return ThreadInterlockedAssignIf64x128( &pLink->value64x128, value.value64x128, comperand.value64x128 );
 	}
-
-	NodeLink_t m_Head;
-	NodeLink_t m_Tail;
-
-	std::atomic_int m_Count;
 	
-	CTSListBase m_FreeNodes;
+	void FinishPush( Node_t *pNode, const NodeLink_t &oldTail )
+	{
+		NodeLink_t newTail;
 
-	Node_t m_end;
+		newTail.value.pNode = pNode;
+		newTail.value.sequence = oldTail.value.sequence + 1;
+
+		ThreadMemoryBarrier();
+
+		InterlockedCompareExchangeNodeLink( &m_Tail, newTail, oldTail );
+	}
+
+	void FreeNode(Node_t *pNode) { m_FreeNodes.Push(pNode); }
 };
 
 #endif  // TIER0_TSLIST_H_

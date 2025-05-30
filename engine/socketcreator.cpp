@@ -172,8 +172,8 @@ void CSocketCreator::ProcessAccept()
 	}
 
 	netadr_t adr;
-	adr.SetFromSockadr( &sa );
-	if ( m_pListener && !m_pListener->ShouldAcceptSocket( newSocket, adr ) )
+	if ( m_pListener &&
+		 ( !adr.SetFromSockadr( &sa ) || !m_pListener->ShouldAcceptSocket( newSocket, adr ) ) )
 	{
 		closesocket( newSocket );
 		return;
@@ -248,7 +248,7 @@ intp CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 		tv.tv_usec = 0;
 		tv.tv_sec = 1;
 		FD_ZERO( &writefds );
-		FD_SET( static_cast<u_int>( hSocket ), &writefds );
+		FD_SET( static_cast<uintp>( hSocket ), &writefds );
 		if ( select ( hSocket + 1, NULL, &writefds, NULL, &tv ) < 1 ) // block for at most 1 second
 		{
 			closesocket( hSocket );		// took too long to connect to, give up

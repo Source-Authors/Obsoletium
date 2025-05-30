@@ -268,12 +268,14 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 			if (!!(_exp)) { 													\
 			} else {																\
 				_SpewInfo( SPEW_ASSERT, __TFILE__, __LINE__ );				\
-				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _msg ));	\
-				CallAssertFailedNotifyFunc( __TFILE__, __LINE__, _msg );					\
+				const auto _movedMsg = std::move(_msg);				\
+				const tchar *_message = static_cast<const tchar *>( _movedMsg );				\
+				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _message ));	\
+				CallAssertFailedNotifyFunc( __TFILE__, __LINE__, _message );					\
 				_executeExp; 												\
 				if ( retAssert == SPEW_DEBUGGER)									\
 				{															\
-					if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( __TFILE__, __LINE__, _msg ) ) \
+					if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( __TFILE__, __LINE__, _message ) ) \
 					{														\
 						DebuggerBreak();									\
 					}														\
@@ -306,7 +308,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 
 #define  AssertFatal( _exp )									_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), ((void)0), true )
 #define  AssertFatalOnce( _exp )								_AssertMsgOnce( _exp, _T("Assertion Failed: ") _T(#_exp), true )
-#define  AssertFatalMsg( _exp, _msg, ... )						_AssertMsg( _exp, (const tchar *)CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), true )
+#define  AssertFatalMsg( _exp, _msg, ... )						_AssertMsg( _exp, CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), true )
 #define  AssertFatalMsgOnce( _exp, _msg )						_AssertMsgOnce( _exp, _msg, true )
 #define  AssertFatalFunc( _exp, _f )							_AssertMsg( _exp, _T("Assertion Failed: " _T(#_exp), _f, true )
 #define  AssertFatalEquals( _exp, _expectedValue )				AssertFatalMsg2( (_exp) == (_expectedValue), _T("Expected %d but got %d!"), (_expectedValue), (_exp) ) 
@@ -355,7 +357,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #ifdef DBGFLAG_ASSERT
 
 #define  Assert( _exp )           							_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), ((void)0), false )
-#define  AssertMsg( _exp, _msg, ... )  						_AssertMsg( _exp, (const tchar *)CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), false )
+#define  AssertMsg( _exp, _msg, ... )  						_AssertMsg( _exp, CDbgFmtMsg( _msg, ##__VA_ARGS__ ), ((void)0), false )
 #define  AssertOnce( _exp )       							_AssertMsgOnce( _exp, _T("Assertion Failed: ") _T(#_exp), false )
 #define  AssertMsgOnce( _exp, _msg )  						_AssertMsgOnce( _exp, _msg, false )
 #define  AssertFunc( _exp, _f )   							_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), _f, false )
@@ -612,9 +614,9 @@ DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp maxchar = 0xFFFF
 
 #ifdef DBGFLAG_ASSERT
 
-FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )	    { _AssertValidReadPtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		{ _AssertValidWritePtr( (void*)ptr, count ); }
-FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	{ _AssertValidReadWritePtr( (void*)ptr, count ); }
+FORCEINLINE void AssertValidReadPtr(const void *ptr, intp count = 1) { Assert(!count || ptr); }
+FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		{ Assert( !count || ptr ); }
+FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	{ Assert( !count || ptr ); }
 
 #else
 
@@ -670,7 +672,7 @@ public:
 	{ 
 		va_list arg_ptr;
 
-		va_start(arg_ptr, pszFormat);
+		va_start(arg_ptr, pszFormat); //-V2019 //-V2018
 		_vsntprintf(m_szBuf, sizeof(m_szBuf)-1, pszFormat, arg_ptr);
 		va_end(arg_ptr);
 

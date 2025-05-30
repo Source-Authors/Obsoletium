@@ -17,10 +17,12 @@
 #pragma once
 #endif
 
-#include "HelperInfo.h"
-#include "TokenReader.h"
-#include "GDVar.h"
-#include "InputOutput.h"
+#include <cstring>
+
+#include "helperinfo.h"
+#include "tier1/tokenreader.h"
+#include "gdvar.h"
+#include "inputoutput.h"
 #include "Color.h"
 #include "mathlib/vector.h"
 

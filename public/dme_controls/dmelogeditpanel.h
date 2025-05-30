@@ -35,7 +35,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CDmeLogEditPanel : public CCurveEditorPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeLogEditPanel, CCurveEditorPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeLogEditPanel, CCurveEditorPanel );
 
 public:
 	enum LogField_t
@@ -70,13 +70,13 @@ public:
 
 protected:
 	// Control points + values...
-	virtual intp FindOrAddControlPoint( float flIn, float flTolerance, float flOut );
-	virtual intp FindControlPoint( float flIn, float flTolerance );
-	virtual intp ModifyControlPoint( intp nPoint, float flIn, float flOut );
-	virtual void RemoveControlPoint( intp nPoint );
-	virtual float GetValue( float flIn );
-	virtual intp ControlPointCount();
-	virtual void GetControlPoint( intp nPoint, float *pIn, float *pOut );
+	intp FindOrAddControlPoint( float flIn, float flTolerance, float flOut ) override;
+	intp FindControlPoint( float flIn, float flTolerance ) override;
+	intp ModifyControlPoint( intp nPoint, float flIn, float flOut ) override;
+	void RemoveControlPoint( intp nPoint ) override;
+	float GetValue( float flIn ) override;
+	intp ControlPointCount() override;
+	void GetControlPoint( intp nPoint, float *pIn, float *pOut ) override;
 
 private:
 	// Converts normalized values to int time
@@ -140,14 +140,14 @@ int CDmeLogEditPanel::ModifyKey( int nPoint, DmeTime_t initialTime, DmeTime_t ti
 //-----------------------------------------------------------------------------
 class CDmeLogEditFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDmeLogEditFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeLogEditFrame, vgui::Frame );
 
 public:
 	CDmeLogEditFrame( vgui::Panel *pParent, const char *pTitle );
 	~CDmeLogEditFrame();
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 	// Purpose: Activate the dialog
 	// the message "LogEdited" will be sent if ok was hit

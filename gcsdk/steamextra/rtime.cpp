@@ -326,12 +326,6 @@ const char* CRTime::Render( char (&buf)[k_RTimeRenderBufferSize] ) const
 //-----------------------------------------------------------------------------
 const char* CRTime::Render( const RTime32 rTime32, char (&buf)[k_RTimeRenderBufferSize] )
 {
-	if ( !buf )
-	{
-		Assert( buf );
-		return nullptr;
-	}
-
 	// The return value string contains exactly 26 characters and has the form:	Wed Jan 02 02:03:55 1980\n\0
 	time_t tTime = rTime32;
 	char pchTime[32];
@@ -663,12 +657,6 @@ RTime32 CRTime::RTime32FromRFC3339UTCString( const char* pchValue )
 // STATIC
 const char* CRTime::RTime32ToRFC3339UTCString( const RTime32 rTime32, char (&buf)[k_RTimeRenderBufferSize] )
 {
-	if ( !buf )
-	{
-		Assert( buf );
-		return nullptr;
-	}
-
 	// Store the result in a temporary buffer, so that you can use several in a single printf.
 	time_t tTime = rTime32; 
 	struct tm tmStruct;
@@ -680,7 +668,7 @@ const char* CRTime::RTime32ToRFC3339UTCString( const RTime32 rTime32, char (&buf
 	if ( rTime32 == k_RTime32Infinite )
 		return "Infinite time value";
 
-	if ( rTime32 < k_RTime32MinValid || !ptm )
+	if ( rTime32 < k_RTime32MinValid )
 		return "Invalid time value";
 
 	Q_snprintf( buf, k_RTimeRenderBufferSize, "%04u-%02u-%02uT%02u:%02u:%02uZ", ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec );	
@@ -746,11 +734,6 @@ RTime32 CRTime::RTime32FromString( const char* pszValue )
 // STATIC
 const char* CRTime::RTime32ToString( const RTime32 rTime32, char (&buf)[k_RTimeRenderBufferSize], bool bNoPunct /*=false*/, bool bOnlyDate /*= false*/ )
 {
-	if ( !buf )
-	{
-		return nullptr;
-	}
-
 	// Store the result in a temporary buffer, so that you can use several in a single printf.
 	time_t tTime = rTime32; 
 	struct tm tmStruct;
@@ -764,7 +747,7 @@ const char* CRTime::RTime32ToString( const RTime32 rTime32, char (&buf)[k_RTimeR
 	if ( rTime32 == k_RTime32Infinite )
 		return "Infinite time value";
 
-	if ( rTime32 < k_RTime32MinValid || !ptm )
+	if ( rTime32 < k_RTime32MinValid )
 		return "Invalid time value";
 
 	if ( bOnlyDate )
@@ -792,11 +775,6 @@ const char* CRTime::RTime32ToString( const RTime32 rTime32, char (&buf)[k_RTimeR
 // STATIC
 const char* CRTime::RTime32ToDayString( const RTime32 rTime32, char (&buf)[k_RTimeRenderBufferSize], bool bGMT )
 {
-	if ( !buf )
-	{
-		return nullptr;
-	}
-
 	// Store the result in a temporary buffer, so that you can use several in a single printf.
 	time_t tTime = rTime32; 
 	struct tm tmStruct;

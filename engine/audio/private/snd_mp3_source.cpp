@@ -335,10 +335,10 @@ CAudioSourceMP3Cache::~CAudioSourceMP3Cache( void )
 	CacheUnload();
 }
 
-int CAudioSourceMP3Cache::GetCacheStatus( void )
+CAudioSourceMP3Cache::AudioStatus CAudioSourceMP3Cache::GetCacheStatus( void )
 {
 	bool bCacheValid;
-	int loaded = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid ) ? AUDIO_IS_LOADED : AUDIO_NOT_LOADED;
+	AudioStatus loaded = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid ) ? AUDIO_IS_LOADED : AUDIO_NOT_LOADED;
 	if ( !bCacheValid )
 	{
 		wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );

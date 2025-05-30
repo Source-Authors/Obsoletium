@@ -4,19 +4,9 @@
 //
 //=============================================================================//
 
-#define PROTECTED_THINGS_DISABLE
-
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ComboBox.h>
 #include <vgui_controls/DirectorySelectDialog.h>
-#include <vgui_controls/TreeView.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui/Cursor.h>
-#include <KeyValues.h>
-#include <vgui/IInput.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
+
+#include <tier1/KeyValues.h>
 #include <filesystem.h>
 
 #ifdef WIN32
@@ -24,8 +14,20 @@
 #include <stdio.h>
 #include <io.h>
 #endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <vgui/Cursor.h>
+#include <vgui/IInput.h>
+#include <vgui/ISurface.h>
+#include <vgui/ISystem.h>
+
+#include <vgui_controls/Button.h>
+#include <vgui_controls/ComboBox.h>
+#include <vgui_controls/TreeView.h>
+#include <vgui_controls/ImageList.h>
+#include <vgui_controls/MessageBox.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -240,8 +242,8 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 		lpszSubDirName = MoveToNextSubDir( lpszSubDirName, &nPathIncr );
 
 		// Get the span between the last subdir and the new one
-		Q_StrLeft( lpszLastSubDirName, nPathIncr, subDirName, sizeof(subDirName) );
-		Q_StripTrailingSlash( subDirName );
+		V_StrLeft( lpszLastSubDirName, nPathIncr, subDirName );
+		V_StripTrailingSlash( subDirName );
 
 		// Increment where we are in the string for use later
 		nPathPos += nPathIncr;
@@ -260,8 +262,8 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 				nItemIndex = nChild;
 
 				// Get the full path (starting from the drive letter) up to our current subdir
-				Q_strncpy( subDirName, workPath, nPathPos );
-				Q_AppendSlash( subDirName, sizeof(subDirName) );
+				V_strncpy( subDirName, workPath, nPathPos );
+				V_AppendSlash( subDirName );
 
 				// Expand the tree node and populate its subdirs for our next iteration
 				ExpandTreeNode( subDirName, nItemIndex );
@@ -338,7 +340,7 @@ void DirectorySelectDialog::BuildDriveChoices()
 	char drives[256] = { 0 };
 	int len = system()->GetAvailableDrives(drives, sizeof(drives));
 	char *pBuf = drives;
-	KeyValues *kv = new KeyValues("drive");
+	KeyValuesAD kv("drive");
 	for (int i = 0; i < len / 4; i++)
 	{
 		kv->SetString("drive", pBuf);
@@ -350,7 +352,6 @@ void DirectorySelectDialog::BuildDriveChoices()
 
 		pBuf += 4;
 	}
-	kv->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -362,7 +363,7 @@ void DirectorySelectDialog::BuildDirTree()
 	m_pDirTree->RemoveAll();
 
 	// dimhotepus: Do not leak KevValues.
-	auto kv = KeyValues::AutoDelete(new KeyValues("root", "Text", m_szCurrentDrive));
+	KeyValuesAD kv(new KeyValues("root", "Text", m_szCurrentDrive));
 	// add in a root
 	int rootIndex = m_pDirTree->AddItem(kv, -1);
 
@@ -383,7 +384,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 
 	// get all the subfolders of the current drive
 	char searchString[512];
-	sprintf(searchString, "%s*.*", path);
+	V_sprintf_safe(searchString, "%s*.*", path);
 
 	FileFindHandle_t h;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );
@@ -392,7 +393,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 		if ( !Q_stricmp( pFileName, ".." ) || !Q_stricmp( pFileName, "." ) )
 			continue;
 
-		KeyValues::AutoDelete kv = KeyValues::AutoDelete("item");
+		KeyValuesAD kv("item");
 		kv->SetString("Text", pFileName);
 		// set the folder image
 		kv->SetInt("Image", 1);
@@ -409,7 +410,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 bool DirectorySelectDialog::DoesDirectoryHaveSubdirectories(const char *path, const char *dir)
 {
 	char searchString[512];
-	sprintf(searchString, "%s%s\\*.*", path, dir);
+	V_sprintf_safe(searchString, "%s%s\\*.*", path, dir);
 
 	FileFindHandle_t h;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );
@@ -506,10 +507,10 @@ void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 
 		// create the new directory underneath
 		V_strcat_safe(fullPath, dir);
-		if (_mkdir(fullPath) == 0)
+		if (_mkdir(fullPath) == 0 || errno == EEXIST)
 		{
 			// add new path to tree view
-			KeyValues *kv = new KeyValues("item");
+			KeyValuesAD kv("item");
 			kv->SetString("Text", dir);
 			// set the folder image
 			kv->SetInt("Image", 1);

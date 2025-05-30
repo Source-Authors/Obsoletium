@@ -82,17 +82,17 @@ public:
 	void			Init( const CPhysCollide *pCollisionModel, IVP_Real_Object *pObject, int materialIndex, float volume, float drag, float angDrag );
 
 	// IPhysicsObject functions
-	bool			IsStatic() const override;
-	bool			IsAsleep() const override;
-	bool			IsTrigger() const override;
-	bool			IsFluid() const override;
-	bool			IsHinged() const override { return (m_hingedAxis != 0) ? true : false; }
-	bool			IsCollisionEnabled() const override;
-	bool			IsGravityEnabled() const override;
-	bool			IsDragEnabled() const override;
-	bool			IsMotionEnabled() const override;
-	bool			IsMoveable() const override;
-	bool			IsAttachedToConstraint( bool bExternalOnly ) const override;
+	[[nodiscard]] bool			IsStatic() const override;
+	[[nodiscard]] bool			IsAsleep() const override;
+	[[nodiscard]] bool			IsTrigger() const override;
+	[[nodiscard]] bool			IsFluid() const override;
+	[[nodiscard]] bool			IsHinged() const override { return (m_hingedAxis != 0) ? true : false; }
+	[[nodiscard]] bool			IsCollisionEnabled() const override;
+	[[nodiscard]] bool			IsGravityEnabled() const override;
+	[[nodiscard]] bool			IsDragEnabled() const override;
+	[[nodiscard]] bool			IsMotionEnabled() const override;
+	[[nodiscard]] bool			IsMoveable() const override;
+	[[nodiscard]] bool			IsAttachedToConstraint( bool bExternalOnly ) const override;
 
 
 	void			EnableCollisions( bool enable ) override;
@@ -105,11 +105,11 @@ public:
 	void			SetGameData( void *pAppData ) override;
 	void			*GetGameData( void ) const override;
 	void			SetCallbackFlags( unsigned short callbackflags ) override;
-	unsigned short	GetCallbackFlags( void ) const override;
+	[[nodiscard]] unsigned short	GetCallbackFlags( void ) const override;
 	void			SetGameFlags( unsigned short userFlags ) override;
-	unsigned short	GetGameFlags( void ) const override;
+	[[nodiscard]] unsigned short	GetGameFlags( void ) const override;
 	void			SetGameIndex( unsigned short gameIndex ) override;
-	unsigned short	GetGameIndex( void ) const override;
+	[[nodiscard]] unsigned short	GetGameIndex( void ) const override;
 
 	void			Wake() override;
 	void			WakeNow();
@@ -118,26 +118,26 @@ public:
 	void			RecheckContactPoints() override;
 
 	void			SetMass( float mass ) override;
-	float			GetMass( void ) const override;
-	float			GetInvMass( void ) const override;
+	[[nodiscard]] float			GetMass( void ) const override;
+	[[nodiscard]] float			GetInvMass( void ) const override;
 	void			SetInertia( const Vector &inertia ) override;
-	Vector			GetInertia( void ) const override;
-	Vector			GetInvInertia( void ) const override;
+	[[nodiscard]] Vector			GetInertia( void ) const override;
+	[[nodiscard]] Vector			GetInvInertia( void ) const override;
 
 	void			GetDamping( float *speed, float *rot ) const override;
 	void			SetDamping( const float *speed, const float *rot ) override;
 	void			SetDragCoefficient( float *pDrag, float *pAngularDrag ) override;
 	void			SetBuoyancyRatio( float ratio ) override;
-	int				GetMaterialIndex() const override { return GetMaterialIndexInternal(); }
+	[[nodiscard]] int				GetMaterialIndex() const override { return GetMaterialIndexInternal(); }
 	void			SetMaterialIndex( int materialIndex ) override;
-	inline int		GetMaterialIndexInternal( void ) const { return m_materialIndex; }
+	[[nodiscard]] inline int		GetMaterialIndexInternal( void ) const { return m_materialIndex; }
 
-	unsigned int	GetContents() const override { return m_contentsMask; }
+	[[nodiscard]] unsigned int	GetContents() const override { return m_contentsMask; }
 	void			SetContents( unsigned int contents ) override;
 
-	float			GetSphereRadius() const override;
+	[[nodiscard]] float			GetSphereRadius() const override;
 	Vector			GetMassCenterLocalSpace() const override;
-	float			GetEnergy() const override;
+	[[nodiscard]] float			GetEnergy() const override;
 
 	void			SetPosition( const Vector &worldPosition, const QAngle &angles, bool isTeleport = false ) override;
 	void			SetPositionMatrix( const matrix3x4_t& matrix, bool isTeleport = false ) override;
@@ -161,68 +161,68 @@ public:
 	void			ApplyTorqueCenter( const AngularImpulse & ) override;
 	void			CalculateForceOffset( const Vector &forceVector, const Vector &worldPosition, Vector *centerForce, AngularImpulse *centerTorque ) const override;
 	void			CalculateVelocityOffset( const Vector &forceVector, const Vector &worldPosition, Vector *centerVelocity, AngularImpulse *centerAngularVelocity ) const override;
-	float			CalculateLinearDrag( const Vector &unitDirection ) const override;
-	float			CalculateAngularDrag( const Vector &objectSpaceRotationAxis ) const override;
+	[[nodiscard]] float			CalculateLinearDrag( const Vector &unitDirection ) const override;
+	[[nodiscard]] float			CalculateAngularDrag( const Vector &objectSpaceRotationAxis ) const override;
 
-	bool			GetContactPoint( Vector *contactPoint, IPhysicsObject **contactObject ) const override;
+	[[nodiscard]] bool			GetContactPoint( Vector *contactPoint, IPhysicsObject **contactObject ) const override;
 	void			SetShadow( float maxSpeed, float maxAngularSpeed, bool allowPhysicsMovement, bool allowPhysicsRotation ) override;
 	void			UpdateShadow( const Vector &targetPosition, const QAngle &targetAngles, bool tempDisableGravity, float timeOffset ) override;
 	void			RemoveShadowController() override;
-	int				GetShadowPosition( Vector *position, QAngle *angles ) const override;
-	IPhysicsShadowController *GetShadowController( void ) const override;
-	float			ComputeShadowControl( const hlshadowcontrol_params_t &params, float secondsToArrival, float dt ) override;
+	[[nodiscard]] int			GetShadowPosition( Vector *position, QAngle *angles ) const override;
+	[[nodiscard]] IPhysicsShadowController *GetShadowController( void ) const override;
+	[[nodiscard]] float			ComputeShadowControl( const hlshadowcontrol_params_t &params, float secondsToArrival, float dt ) override;
 
-	const CPhysCollide	*GetCollide( void ) const override;
-	char const		*GetName() const override;
+	[[nodiscard]] const CPhysCollide	*GetCollide( void ) const override;
+	[[nodiscard]] char const		*GetName() const override;
 
-	float			GetDragInDirection( const IVP_U_Float_Point &dir ) const;
-	float			GetAngularDragInDirection( const IVP_U_Float_Point &angVelocity ) const;
+	[[nodiscard]] float			GetDragInDirection( const IVP_U_Float_Point &dir ) const;
+	[[nodiscard]] float			GetAngularDragInDirection( const IVP_U_Float_Point &angVelocity ) const;
 	void			BecomeTrigger() override;
 	void			RemoveTrigger() override;
 	void			BecomeHinged( int localAxis ) override;
 	void			RemoveHinged() override;
 
-	IPhysicsFrictionSnapshot *CreateFrictionSnapshot() override;
+	[[nodiscard]] IPhysicsFrictionSnapshot *CreateFrictionSnapshot() override;
 	void			DestroyFrictionSnapshot( IPhysicsFrictionSnapshot *pSnapshot ) override;
 
 	void			OutputDebugInfo() const override;
 
 	// local functions
-	inline	IVP_Real_Object *GetObject( void ) const { return m_pObject; }
-	inline int		CallbackFlags( void ) const { return m_callbacks; }
+	[[nodiscard]] inline	IVP_Real_Object *GetObject( void ) const { return m_pObject; }
+	[[nodiscard]] inline int		CallbackFlags( void ) const { return m_callbacks; }
 	inline void		AddCallbackFlags( unsigned short flags ) { m_callbacks |= flags; }
 	inline void		RemoveCallbackFlags( unsigned short flags ) { m_callbacks &= ~flags; }
-	inline bool		HasTouchedDynamic();
+	[[nodiscard]] inline bool		HasTouchedDynamic();
 	inline void		SetTouchedDynamic();
 	void			NotifySleep( void );
 	void			NotifyWake( void );
-	int				GetSleepState( void ) const { return m_sleepState; }
+	[[nodiscard]] int				GetSleepState( void ) const { return m_sleepState; }
 	inline void		ForceSilentDelete() { m_forceSilentDelete = true; }
 
-	inline int		GetActiveIndex( void ) const { return m_activeIndex; }
-	inline void		SetActiveIndex( int index ) { m_activeIndex = index; }
-	inline float	GetBuoyancyRatio( void ) const { return m_buoyancyRatio; }
+	[[nodiscard]] inline intp		GetActiveIndex( void ) const { return m_activeIndex; }
+	inline void		SetActiveIndex( intp index ) { m_activeIndex = index; }
+	[[nodiscard]] inline float	GetBuoyancyRatio( void ) const { return m_buoyancyRatio; }
 	// returns true if the mass center is set to the default for the collision model
-	bool			IsMassCenterAtDefault() const;
+	[[nodiscard]] bool			IsMassCenterAtDefault() const;
 
 	// is this object simulated, or controlled by game logic?
-	bool			IsControlledByGame() const;
+	[[nodiscard]] bool			IsControlledByGame() const;
 
-	IVP_SurfaceManager *GetSurfaceManager( void ) const;
+	[[nodiscard]] IVP_SurfaceManager *GetSurfaceManager( void ) const;
 
 	void			WriteToTemplate( vphysics_save_cphysicsobject_t &objectTemplate );
 	void			InitFromTemplate( CPhysicsEnvironment *pEnvironment, void *pGameData, const vphysics_save_cphysicsobject_t &objectTemplate );
 
-	CPhysicsEnvironment	*GetVPhysicsEnvironment();
-	const CPhysicsEnvironment	*GetVPhysicsEnvironment() const;
+	[[nodiscard]] CPhysicsEnvironment	*GetVPhysicsEnvironment();
+	[[nodiscard]] const CPhysicsEnvironment	*GetVPhysicsEnvironment() const;
 
 private:
 	// NOTE: Local to vphysics, used to save/restore shadow controller
 	void			RestoreShadowController( IPhysicsShadowController *pShadowController );
 	friend bool		RestorePhysicsObject( const physrestoreparams_t &params, CPhysicsObject **ppObject );
 
-	bool			IsControlling( const IVP_Controller *pController ) const;
-	float			GetVolume() const;
+	[[nodiscard]] bool			IsControlling( const IVP_Controller *pController ) const;
+	[[nodiscard]] float			GetVolume() const;
 	void			SetVolume( float volume );
 	
 	// the mass has changed, recompute the drag information
@@ -250,8 +250,10 @@ private:
 	unsigned short	m_gameIndex;
 
 private:
-	unsigned short	m_materialIndex;
-	unsigned short	m_activeIndex;
+	// dimhotepus: unsigned short -> intp
+	intp	m_activeIndex;
+	// dimhotepus: unsigned short -> int
+	int		m_materialIndex;
 
 	unsigned short	m_callbacks;
 	unsigned short	m_gameFlags;
@@ -262,7 +264,7 @@ private:
 	float			m_dragCoefficient;
 	float			m_angDragCoefficient;
 
-	friend CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, int materialIndex, const Vector &position, const QAngle& angles, objectparams_t *pParams, bool isStatic );
+	friend CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, intp materialIndex, const Vector &position, const QAngle& angles, objectparams_t *pParams, bool isStatic );
 	friend bool CPhysicsEnvironment::TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment ); //need direct access to m_pShadow for Portal mod's physics object transfer system
 };
 
@@ -278,10 +280,10 @@ inline void CPhysicsObject::SetTouchedDynamic()
 	m_hasTouchedDynamic = true;
 }
 
-extern CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic );
-extern CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float radius, int materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic );
+[[nodiscard]] extern CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CPhysCollide *pCollisionModel, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic );
+[[nodiscard]] extern CPhysicsObject *CreatePhysicsSphere( CPhysicsEnvironment *pEnvironment, float radius, intp materialIndex, const Vector &position, const QAngle &angles, objectparams_t *pParams, bool isStatic );
 extern void PostRestorePhysicsObject();
-extern IPhysicsObject *CreateObjectFromBuffer( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions );
+[[nodiscard]] extern IPhysicsObject *CreateObjectFromBuffer( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions );
 extern IPhysicsObject *CreateObjectFromBuffer_UseExistingMemory( CPhysicsEnvironment *pEnvironment, void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, CPhysicsObject *pExistingMemory );
 
 #endif // PHYSICS_OBJECT_H

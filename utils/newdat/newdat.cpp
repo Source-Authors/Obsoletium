@@ -10,7 +10,7 @@
 #include "tier1/strtools.h"
 #include "posix_file_stream.h"
 
-#undef min
+#include "tier0/memdbgon.h"
 
 namespace {
 
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 
   char file_name[MAX_PATH];
   // Get the filename without the extension
-  Q_StripExtension(argv[1], file_name, std::size(file_name));
+  V_StripExtension(argv[1], file_name);
 
   char md5_file_name[MAX_PATH];
   V_sprintf_safe(md5_file_name, "%s.md5", file_name);

@@ -99,8 +99,8 @@ void CSteamID::SetFromString( const char *pchSteamID, EUniverse eDefaultUniverse
 		if (*pchSteamID == '-' || *pchSteamID == ':')
 			pchSteamID++; // skip the optional - or :
 
-		if ( strchr( pchSteamID, '(' ) )
-			sscanf( strchr( pchSteamID, '(' ), "(%u)", &nInstance );
+		if ( const char *left = strchr( pchSteamID, '(' ); left )
+			sscanf( left, "(%u)", &nInstance );
 		const char *pchColon = strchr( pchSteamID, ':' );
 		if ( pchColon && *pchColon != 0 && strchr( pchColon+1, ':' ))
 		{
@@ -413,8 +413,7 @@ bool CSteamID::SetFromStringStrict( const char *pchSteamID, EUniverse eDefaultUn
     }
     if ( unIdx > 1 )
     {
-        if ( unVal[0] >= k_EUniverseInvalid &&
-             unVal[0] < k_EUniverseMax )
+        if ( unVal[0] < k_EUniverseMax )
         {
             eUniverse = (EUniverse)unVal[0];
             if ( eUniverse == k_EUniverseInvalid )
@@ -526,9 +525,9 @@ const char * CSteamID::Render() const
 	// longest length of returned string is k_cBufLen
 	//	[A:%u:%u:%u]
 	//	 %u == 10 * 3 + 6 == 36, plus terminator == 37
-	const int k_cBufLen = 37;
+	constexpr int k_cBufLen = 37;
 
-	const int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
+	constexpr int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
 	static char rgchBuf[k_cBufs][k_cBufLen];
 	static int nBuf = 0;
 	char * pchBuf = rgchBuf[nBuf];	// get pointer to current static buf
@@ -706,9 +705,9 @@ CGameID::CGameID( const char *pchGameID )
 const char * CGameID::Render() const
 {
 	// longest buffer is log10(2**64) == 20 + 1 == 21
-	const int k_cBufLen = 21;
+	constexpr inline int k_cBufLen = 21;
 
-	const int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
+	constexpr inline int k_cBufs = 4;	// # of static bufs to use (so people can compose output with multiple calls to Render() )
 	static char rgchBuf[k_cBufs][k_cBufLen];
 	static int nBuf = 0;
 	char * pchBuf = rgchBuf[nBuf];	// get pointer to current static buf

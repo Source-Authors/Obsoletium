@@ -12,16 +12,16 @@
 
 #include "tier0/memdbgon.h"
 
-constexpr inline int IA{16807};
-constexpr inline int IM{2147483647};
-constexpr inline int IQ{127773};
-constexpr inline int IR{2836};
+constexpr inline int IA{16807}; //-V707
+constexpr inline int IM{2147483647}; //-V707
+constexpr inline int IQ{127773}; //-V707
+constexpr inline int IR{2836}; //-V707
 constexpr inline int NDIV{1 + (IM - 1) / NTAB};
 constexpr inline unsigned long MAX_RANDOM_RANGE{0x7FFFFFFFUL};
 
 // fran1 -- return a random floating-point number on the interval [0,1)
 //
-constexpr inline float AM{1.0f / IM};
+constexpr inline float AM{1.0f / IM}; //-V707
 constexpr inline float EPS{1.2e-7f};
 constexpr inline float RNMX{1.0f - EPS};
 
@@ -206,6 +206,7 @@ int CUniformRandomStream::RandomInt( int iLow, int iHigh )
 //
 //-----------------------------------------------------------------------------
 CGaussianRandomStream::CGaussianRandomStream( IUniformRandomStream *pUniformStream )
+	: m_flRandomValue{0.0f}
 {
 	AttachToStream( pUniformStream );
 }

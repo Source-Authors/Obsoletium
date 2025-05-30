@@ -33,14 +33,12 @@ CommandMenu::CommandMenu( Panel *parent, const char *panelName, IViewPort * view
 
 bool CommandMenu::LoadFromFile( const char * fileName)	// load menu from KeyValues
 {
-	KeyValues * kv = new KeyValues(fileName);
-
+	KeyValuesAD kv(fileName);
 	if  ( !kv->LoadFromFile( g_pFullFileSystem, fileName, "GAME" ) )
 		return false;
 
 	bool ret = LoadFromKeyValues( kv );
 
-	kv->deleteThis();
 	return ret;
 }
 
@@ -264,9 +262,9 @@ bool CommandMenu::LoadFromKeyValues( KeyValues * params )
 	if ( !params )
 		return false;
 
-	Q_snprintf( m_CurrentTeam, 4, "%i", GetLocalPlayerTeam() );
+	V_sprintf_safe( m_CurrentTeam, "%i", GetLocalPlayerTeam() );
 
-	Q_FileBase( engine->GetLevelName(), m_CurrentMap, sizeof(m_CurrentMap) );
+	V_FileBase( engine->GetLevelName(), m_CurrentMap );
 	
 	if ( params != m_MenuKeys )
 	{

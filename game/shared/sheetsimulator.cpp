@@ -79,19 +79,19 @@ void CSheetSimulator::Init( int w, int h, int fixedPointCount )
 
 void CSheetSimulator::AddSpring( int p1, int p2, float restLength )
 {
-	intp spring = m_Springs.AddToTail();
-	m_Springs[spring].m_Particle1 = p1;
-	m_Springs[spring].m_Particle2 = p2;
-	m_Springs[spring].m_RestLength = restLength;
+	auto &spring = m_Springs[m_Springs.AddToTail()];
+	spring.m_Particle1 = p1;
+	spring.m_Particle2 = p2;
+	spring.m_RestLength = restLength;
 }
 
 void CSheetSimulator::AddFixedPointSpring( int fixedPoint, int p, float restLength )
 {
 	Assert( fixedPoint < m_FixedPointCount );
-	intp spring = m_Springs.AddToTail();
-	m_Springs[spring].m_Particle1 = p;
-	m_Springs[spring].m_Particle2 = -(fixedPoint+1);
-	m_Springs[spring].m_RestLength = restLength;
+	auto &spring = m_Springs[m_Springs.AddToTail()];
+	spring.m_Particle1 = p;
+	spring.m_Particle2 = -(fixedPoint+1);
+	spring.m_RestLength = restLength;
 }
 
 //-----------------------------------------------------------------------------
@@ -396,7 +396,7 @@ void CSheetSimulator::InitPosition( int i )
 		// collision plane
 		Vector delta;
 		VectorSubtract( m_ControlPoints[i], m_Origin, delta );
-		int maxdist = VectorNormalize( delta ); 
+		float maxdist = VectorNormalize( delta ); 
 		float dist = (m_pCollisionPlanes[i].dist - DotProduct( m_Origin, m_pCollisionPlanes[i].normal )) / 
 			DotProduct( delta, m_pCollisionPlanes[i].normal );
 

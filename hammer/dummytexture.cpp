@@ -62,14 +62,14 @@ const char *CDummyTexture::GetFileName() const
 // Input  : pszKeywords - Buffer to receive keywords, NULL to query string length.
 // Output : Returns the number of characters in the keyword string.
 //-----------------------------------------------------------------------------
-int CDummyTexture::GetKeywords(char *pszKeywords) const
+intp CDummyTexture::GetKeywords(OUT_Z_CAP(keywordsSize) char *pszKeywords, intp keywordsSize) const
 {
 	if (pszKeywords != NULL)
 	{
 		*pszKeywords = '\0';
 	}
 
-	return(0);
+	return 0;
 }
 
 
@@ -79,7 +79,7 @@ int CDummyTexture::GetKeywords(char *pszKeywords) const
 // Output : 
 //-----------------------------------------------------------------------------
 // dvs: move into a common place for CWADTexture & CDummyTexture
-int CDummyTexture::GetShortName(char *pszName) const
+intp CDummyTexture::GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const
 {
 	char szBuf[MAX_PATH];
 
@@ -97,24 +97,24 @@ int CDummyTexture::GetShortName(char *pszName) const
 		}
 		else
 		{
-			psz += strlen("textures\\");
+			psz += ssize("textures\\") - 1;
 		}
 
-		strcpy(pszName, psz);
+		V_strncpy(pszName, psz, nameSize);
 
 		// remove extension
 		char *pszExtension = strstr(pszName, ".wal");
 		if (pszExtension)
 		{
-			*pszExtension = 0;
+			*pszExtension = '\0';
 		}
 	}
 	else
 	{
-		strcpy(pszName, m_szName);
+		V_strncpy(pszName, m_szName, nameSize);
 	}
 
-	return(strlen(pszName));
+	return V_strlen(pszName);
 }
 
 

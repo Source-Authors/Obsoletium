@@ -22,7 +22,7 @@ public:
 	CVarEditDialog(vgui::Panel *parent, const char *name);
 	virtual ~CVarEditDialog();
 
-	void Activate(vgui::Panel *actionSignalTarget, KeyValues *rules);
+	void Activate(vgui::Panel *actionSignalTarget, const KeyValues *rules);
 
 protected:
 	void OnCommand(const char *command) override;

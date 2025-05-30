@@ -735,7 +735,7 @@ int C_EntityDissolve::DrawModel( int flags )
 			
 			sParticle->m_flLifetime		= 0.0f;
 
-			sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+			sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 
 			unsigned char alpha = 255;
 
@@ -762,7 +762,7 @@ int C_EntityDissolve::DrawModel( int flags )
 			sParticle->m_flDieTime		= 0.1f;
 			sParticle->m_flLifetime		= 0.0f;
 
-			sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+			sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 			sParticle->m_flRollDelta	= Helper_RandomFloat( -2.0f, 2.0f );
 
 			unsigned char alpha = 255;

@@ -494,7 +494,7 @@ constexpr inline char BASEFILESYSTEM_INTERFACE_VERSION[]{"VBaseFileSystem011"};
 abstract_class IBaseFileSystem
 {
 public:
-	virtual int				Read( void* pOutput, int size, FileHandle_t file ) = 0;
+	virtual int				Read( OUT_BYTECAP(size) void* pOutput, int size, FileHandle_t file ) = 0;
 	virtual int				Write( void const* pInput, int size, FileHandle_t file ) = 0;
 
 	// if pathID is nullptr, all paths will be searched for the file
@@ -514,7 +514,8 @@ public:
 	virtual bool			IsFileWritable( char const *pFileName, const char *pPathID = nullptr ) = 0;
 	virtual bool			SetFileWritable( char const *pFileName, bool writable, const char *pPathID = nullptr ) = 0;
 
-	virtual long			GetFileTime( const char *pFileName, const char *pPathID = nullptr ) = 0;
+	// dimhotepus: long -> time_t
+	virtual time_t			GetFileTime( const char *pFileName, const char *pPathID = nullptr ) = 0;
 
 	//--------------------------------------------------------
 	// Reads/writes files to utlbuffers. Use this for optimal read performance when doing open/read/close
@@ -529,7 +530,7 @@ public:
 // Main file system interface
 //-----------------------------------------------------------------------------
 
-#define FILESYSTEM_INTERFACE_VERSION			"VFileSystem022"
+constexpr inline char FILESYSTEM_INTERFACE_VERSION[]{"VFileSystem022"};
 
 abstract_class IFileSystem : public IAppSystem, public IBaseFileSystem
 {
@@ -584,10 +585,10 @@ public:
 
 	// Returns the search path, each path is separated by ;s. Returns the length of the string returned
 	// Prefer using the GetSearchPath_safe template wrapper to calling this directly
-	virtual int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
+	virtual int				GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars ) = 0;
 	template <size_t maxLenInChars> int GetSearchPath_safe( const char *pathID, bool bGetPackFiles, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return GetSearchPath( pathID, bGetPackFiles, pDest, (int)maxLenInChars );
+		return GetSearchPath( pathID, bGetPackFiles, pDest, maxLenInChars );
 	}
 
 	// interface for custom pack files > 4Gb
@@ -609,7 +610,14 @@ public:
 	// File I/O and info
 	virtual bool			IsDirectory( const char *pFileName, const char *pathID = nullptr ) = 0;
 
-	virtual void			FileTimeToString( char* pStrip, int maxCharsIncludingTerminator, long fileTime ) = 0;
+	// dimhotepus: long -> time_t
+	virtual void			FileTimeToString( OUT_Z_CAP(maxChars) char* pStrip, intp maxChars, time_t fileTime ) = 0;
+
+	template<intp bufferSize>
+	void FileTimeToString( OUT_Z_ARRAY char (&buffer)[bufferSize], time_t fileTime )
+	{
+		FileTimeToString( buffer, bufferSize, fileTime );
+	}
 
 	//--------------------------------------------------------
 	// Open file operations
@@ -621,7 +629,13 @@ public:
 
 	virtual bool			EndOfFile( FileHandle_t file ) = 0;
 
-	virtual char			*ReadLine( char *pOutput, int maxChars, FileHandle_t file ) = 0;
+	virtual char			*ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars, FileHandle_t file ) = 0;
+	template<int maxChars>
+	char *ReadLine( OUT_Z_ARRAY char (&pOutput)[maxChars], FileHandle_t file )
+	{
+		return ReadLine( pOutput, maxChars, file );
+	}
+
 	virtual int				FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... ) = 0;
 
 	//--------------------------------------------------------
@@ -668,18 +682,29 @@ public:
 	virtual bool			FullPathToRelativePath( const char *pFullpath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
 	template <size_t maxLenInChars> bool FullPathToRelativePath_safe( const char *pFullpath, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return FullPathToRelativePath( pFullpath, pDest, (int)maxLenInChars );
+		return FullPathToRelativePath( pFullpath, pDest, (int)maxLenInChars ); //-V2001
 	}
 
 	// Gets the current working directory
-	virtual bool			GetCurrentDirectory( char* pDirectory, int maxlen ) = 0;
+	virtual bool			GetCurrentDirectory( OUT_Z_CAP(maxlen) char* pDirectory, int maxlen ) = 0;
+
+	template<int maxLen>
+	bool GetCurrentDirectory( OUT_Z_ARRAY char (&pDirectory)[maxLen] )
+	{
+		return GetCurrentDirectory( pDirectory, maxLen );
+	}
 
 	//--------------------------------------------------------
 	// Filename dictionary operations
 	//--------------------------------------------------------
 
 	virtual FileNameHandle_t	FindOrAddFileName( char const *pFileName ) = 0;
-	virtual bool				String( const FileNameHandle_t& handle, char *buf, int buflen ) = 0;
+	virtual bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen ) = 0;
+	template<intp bufferSize>
+	bool String( const FileNameHandle_t& handle, OUT_Z_ARRAY char (&buf)[bufferSize] )
+	{
+		return String( handle, buf, bufferSize );
+	}
 
 	//--------------------------------------------------------
 	// Asynchronous file operations
@@ -770,7 +795,7 @@ public:
 	virtual FileHandle_t	OpenEx( const char *pFileName, const char *pOptions, unsigned flags = 0, const char *pathID = nullptr, char **ppszResolvedFilename = nullptr ) = 0;
 
 	// Extended version of read provides more context to allow for more optimal reading
-	virtual int				ReadEx( void* pOutput, int sizeDest, int size, FileHandle_t file ) = 0;
+	virtual int				ReadEx( OUT_BYTECAP(sizeDest) void* pOutput, int sizeDest, int size, FileHandle_t file ) = 0;
 	virtual int				ReadFileEx( const char *pFileName, const char *pPath, void **ppBuf, bool bNullTerminate = false, bool bOptimalAlloc = false, int nMaxBytes = 0, int nStartingByte = 0, FSAllocFunc_t pfnAlloc = nullptr ) = 0;
 
 	virtual FileNameHandle_t	FindFileName( char const *pFileName ) = 0;
@@ -800,7 +825,7 @@ public:
 	// Otherwise, it'll just fall through to the regular KeyValues loading routines
 	virtual KeyValues	*LoadKeyValues( KeyValuesPreloadType_t type, char const *filename, char const *pPathID = nullptr ) = 0;
 	virtual bool		LoadKeyValues( KeyValues& head, KeyValuesPreloadType_t type, char const *filename, char const *pPathID = nullptr ) = 0;
-	virtual bool		ExtractRootKeyName( KeyValuesPreloadType_t type, char *outbuf, size_t bufsize, char const *filename, char const *pPathID = nullptr ) = 0;
+	virtual bool		ExtractRootKeyName( KeyValuesPreloadType_t type, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize, char const *filename, char const *pPathID = nullptr ) = 0;
 
 	virtual FSAsyncStatus_t	AsyncWrite(const char *pFileName, const void *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend = false, FSAsyncControl_t *pControl = nullptr ) = 0;
 	virtual FSAsyncStatus_t	AsyncWriteFile(const char *pFileName, const CUtlBuffer *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend = false, FSAsyncControl_t *pControl = nullptr ) = 0;
@@ -818,7 +843,7 @@ public:
 	// Optimal IO operations
 	//--------------------------------------------------------
 	virtual bool		GetOptimalIOConstraints( FileHandle_t hFile, unsigned *pOffsetAlign, unsigned *pSizeAlign, unsigned *pBufferAlign ) = 0;
-	inline unsigned		GetOptimalReadSize( FileHandle_t hFile, unsigned nLogicalSize );
+	unsigned			GetOptimalReadSize( FileHandle_t hFile, unsigned nLogicalSize );
 	virtual void		*AllocOptimalReadBuffer( FileHandle_t hFile, unsigned nSize = 0, unsigned nOffset = 0 ) = 0;
 	virtual void		FreeOptimalReadBuffer( void * ) = 0;
 
@@ -831,13 +856,15 @@ public:
 	// Returns true on success, otherwise false if it can't be resolved
 	// Prefer using the FullPathToRelativePathEx_safe template wrapper to calling this directly
 	virtual bool		FullPathToRelativePathEx( const char *pFullpath, const char *pPathId, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
-	template <size_t maxLenInChars> bool FullPathToRelativePathEx_safe( const char *pFullpath, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
+	template <size_t maxLenInChars> bool FullPathToRelativePathEx_safe( const char *pFullpath, const char *pPathId, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return FullPathToRelativePathEx( pFullpath, pDest, (int)maxLenInChars );
+		return FullPathToRelativePathEx( pFullpath, pPathId, pDest, (int)maxLenInChars );
 	}
 
 	virtual int			GetPathIndex( const FileNameHandle_t &handle ) = 0;
-	virtual long		GetPathTime( const char *pPath, const char *pPathID ) = 0;
+
+	// dimhotepus: long -> time_t
+	virtual time_t		GetPathTime( const char *pPath, const char *pPathID ) = 0;
 
 	virtual DVDMode_t	GetDVDMode() = 0;
 
@@ -942,8 +969,8 @@ public:
 	int m_nLength;
 
 private:
-	CMemoryFileBacking( const CMemoryFileBacking& ); // not defined
-	CMemoryFileBacking& operator=( const CMemoryFileBacking& ); // not defined
+	CMemoryFileBacking( const CMemoryFileBacking& ) = delete;
+	CMemoryFileBacking& operator=( const CMemoryFileBacking& ) = delete;
 };
 
 //-----------------------------------------------------------------------------
@@ -959,7 +986,7 @@ inline unsigned IFileSystem::GetOptimalReadSize( FileHandle_t hFile, unsigned nL
 { 
 	unsigned align; 
 	if ( GetOptimalIOConstraints( hFile, &align, nullptr, nullptr ) ) 
-		return AlignValue( nLogicalSize, align );
+		return AlignValue( nLogicalSize, align ); //-V106
 	else
 		return nLogicalSize;
 }

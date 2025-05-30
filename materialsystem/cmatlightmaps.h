@@ -33,7 +33,7 @@ typedef unsigned short MaterialHandle_t;
 //-----------------------------------------------------------------------------
 // Manager of material system lightmaps
 //-----------------------------------------------------------------------------
-const int COUNT_DYNAMIC_LIGHTMAP_PAGES = 1;
+constexpr inline int COUNT_DYNAMIC_LIGHTMAP_PAGES = 1;
 
 class CMatLightmaps
 {

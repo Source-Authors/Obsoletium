@@ -76,16 +76,16 @@ SCRIPT_LOADED_CALLBACK SetScriptLoadedCallback( SCRIPT_LOADED_CALLBACK pfnNewScr
 AddScriptToStack
 ==============
 */
-void AddScriptToStack (char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_ABSOLUTE_PATH)
+void AddScriptToStack (const char *filename, ScriptPathMode_t pathMode = SCRIPT_USE_ABSOLUTE_PATH)
 {
 	script++;
 	if (script == &scriptstack[MAX_INCLUDES])
 		Error ("script file exceeded MAX_INCLUDES");
 	
 	if ( pathMode == SCRIPT_USE_RELATIVE_PATH )
-		Q_strncpy( script->filename, filename, sizeof( script->filename ) );
+		V_strcpy_safe( script->filename, filename );
 	else
-		Q_strncpy (script->filename, ExpandPath (filename), sizeof( script->filename ) );
+		V_strcpy_safe( script->filename, ExpandPath (filename) );
 
 	int size = LoadFile (script->filename, (void **)&script->buffer);
 
@@ -184,7 +184,7 @@ void DefineMacro( char *macroname )
 		}
 	}
 
-	ptrdiff_t size = (cp - script->script_p);
+	intp size = (cp - script->script_p);
 
 	pmacro->buffer = (char *)malloc( size + 1);
 	if (!pmacro->buffer) Error("Out of memory in macro buffer");
@@ -265,7 +265,7 @@ bool AddMacroToStack( char *macroname )
 	script = pnext;
 	V_strcpy_safe( script->filename, pmacro->filename );
 
-	ptrdiff_t size = pmacro->end_p - pmacro->buffer;
+	intp size = pmacro->end_p - pmacro->buffer;
 	script->buffer = (char *)malloc( size + 1 );
 	if (!script->buffer) return false;
 	memcpy( script->buffer, pmacro->buffer, size );
@@ -525,7 +525,7 @@ static void FindFileAbsoluteList( CUtlVector< CUtlString > &outAbsolutePathNames
 
 	for ( const char *pszFoundFile = g_pFullFileSystem->FindFirst( pszFindName, &hFile ); pszFoundFile && hFile != FILESYSTEM_INVALID_FIND_HANDLE; pszFoundFile = g_pFullFileSystem->FindNext( hFile ) )
 	{
-		V_ComposeFileName( szPath, pszFoundFile, szResult, sizeof( szResult ) );
+		V_ComposeFileName( szPath, pszFoundFile, szResult );
 		outAbsolutePathNames.AddToTail( szResult );
 	}
 
@@ -1021,7 +1021,7 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 		if ( ptr )
 		{
 			*ptr = '\0';
-			if ( _mkdir( dirPath ) ) return false;
+			if ( _mkdir( dirPath ) && errno != EEXIST ) return false;
 			*ptr = '\\';
 		}
 	}
@@ -1052,8 +1052,8 @@ bool CScriptLib::WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer,
 //-----------------------------------------------------------------------------
 int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB )
 {
-	time_t timeA = g_pFullFileSystem->GetFileTime( (char *)pFilenameA );
-	time_t timeB = g_pFullFileSystem->GetFileTime( (char *)pFilenameB );
+	time_t timeA = g_pFullFileSystem->GetFileTime( pFilenameA );
+	time_t timeB = g_pFullFileSystem->GetFileTime( pFilenameB );
 
 	if ( timeA == -1)
 	{
@@ -1106,7 +1106,6 @@ char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, in
 //-----------------------------------------------------------------------------
 void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 {
-#if !defined( _X360 )
 	const char *pEnv = getenv( "temp" );
 	if ( !pEnv )
 	{
@@ -1117,19 +1116,19 @@ void CScriptLib::DeleteTemporaryFiles( const char *pFileMask )
 	{
 		char tempPath[MAX_PATH];
 		V_strcpy_safe( tempPath, pEnv );
-		V_AppendSlash( tempPath, sizeof( tempPath ) );
+		V_AppendSlash( tempPath );
 		V_strcat_safe( tempPath, pFileMask );
 
 		CUtlVector<fileList_t> fileList;
 		FindFiles( tempPath, false, fileList );
-		for ( intp i=0; i<fileList.Count(); i++ )
+		for ( auto &l : fileList )
 		{
-			_unlink( fileList[i].fileName.String() );
+			if (unlink(l.fileName.String())) {
+				Warning("Unable to remove temp file '%s': %s.\n", l.fileName.String(),
+						std::generic_category().message(errno).c_str());
+			}
 		}
 	}
-#else
-	AssertOnce( !"CScriptLib::DeleteTemporaryFiles:  Not avail on 360\n" );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1280,8 +1279,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 	if ( !dirCount )
 	{
 		// add directory name to search tree
-		intp j = dirList.AddToTail();
-		dirList[j].Set( pDirPath );
+		dirList[dirList.AddToTail()].Set( pDirPath );
 		return;
 	}
 
@@ -1291,8 +1289,7 @@ void CScriptLib::RecurseFileTree_r( const char* pDirPath, int depth, CUtlVector<
 		RecurseFileTree_r( fileList[i].fileName.String(), depth+1, dirList );
 	}
 
-	intp j = dirList.AddToTail();
-	dirList[j].Set( pDirPath );
+	dirList[dirList.AddToTail()].Set( pDirPath );
 }
 
 //-----------------------------------------------------------------------------
@@ -1309,8 +1306,8 @@ intp CScriptLib::FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_
 	V_StripFilename( dirPath );
 
 	// get pattern only
-	V_FileBase( pFileMask, pattern, sizeof( pattern ) );
-	V_ExtractFileExtension( pFileMask, extension, sizeof( extension ) );
+	V_FileBase( pFileMask, pattern );
+	V_ExtractFileExtension( pFileMask, extension );
 	if ( extension[0] )
 	{
 		V_strcat_safe( pattern, "." );

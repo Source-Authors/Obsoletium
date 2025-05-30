@@ -68,7 +68,8 @@ enum
 //-----------------------------------------------------------------------------
 // Used for the creation Flags field of CreateShadow
 //-----------------------------------------------------------------------------
-enum ShadowCreateFlags_t
+// dimhotepus: int -> unsigned short
+enum ShadowCreateFlags_t : unsigned short
 {
 	SHADOW_CACHE_VERTS =  ( 1 << 0 ),
 	SHADOW_FLASHLIGHT =   ( 1 << 1 ),
@@ -103,8 +104,9 @@ struct FlashlightState_t;
 abstract_class IShadowMgr
 {
 public:
+	// dimhotepus: int flags -> ShadowCreateFlags_t
 	// Create, destroy shadows (see ShadowCreateFlags_t for creationFlags)
-	virtual ShadowHandle_t CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags ) = 0;
+	virtual ShadowHandle_t CreateShadow( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags ) = 0;
 	virtual void DestroyShadow( ShadowHandle_t handle ) = 0;
 
 	// Resets the shadow material (useful for shadow LOD.. doing blobby at distance) 
@@ -176,7 +178,8 @@ public:
 	virtual void DrawFlashlightDepthTexture( ) = 0;
 
 	virtual void AddFlashlightRenderable( ShadowHandle_t shadow, IClientRenderable *pRenderable ) = 0;
-	virtual ShadowHandle_t CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, int creationFlags ) = 0;
+	// dimhotepus: int flags ->ShadowCreateFlags_t
+	virtual ShadowHandle_t CreateShadowEx( IMaterial* pMaterial, IMaterial* pModelMaterial, void* pBindProxy, ShadowCreateFlags_t creationFlags ) = 0;
 
 	virtual void SetFlashlightDepthTexture( ShadowHandle_t shadowHandle, ITexture *pFlashlightDepthTexture, unsigned char ucShadowStencilBit ) = 0;
 

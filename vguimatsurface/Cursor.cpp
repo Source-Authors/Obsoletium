@@ -152,9 +152,9 @@ vgui::HCursor CUserCursorManager::CreateCursorFromFile( char const *curOrAniFile
 	g_pFullFileSystem->GetLocalCopy( fn );
 
 	char fullpath[ 512 ];
-	g_pFullFileSystem->RelativePathToFullPath( fn, pPathID, fullpath, sizeof( fullpath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( fn, pPathID, fullpath );
 	
-	HCURSOR newCursor = (HCURSOR)LoadCursorFromFile( fullpath );
+	HCURSOR newCursor = LoadCursorFromFile( fullpath );
 	cursorIndex = m_UserCursors.Insert( fn, newCursor );
 	return cursorIndex | USER_CURSOR_MASK;
 }

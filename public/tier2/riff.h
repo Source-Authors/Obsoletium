@@ -15,7 +15,7 @@
 #define RIFF_H
 #pragma once
 
-#include <cstddef>
+#include "tier0/basetypes.h"
 #include "tier0/commonmacros.h"
 
 
@@ -26,12 +26,12 @@
 class IFileReadBinary
 {
 public:
-	virtual ptrdiff_t open( const char *pFileName ) = 0;
-	virtual int read( void *pOutput, int size, ptrdiff_t file ) = 0;
-	virtual void close( ptrdiff_t file ) = 0;
-	virtual void seek( ptrdiff_t file, int pos ) = 0;
-	virtual unsigned int tell( ptrdiff_t file ) = 0;
-	virtual unsigned int size( ptrdiff_t file ) = 0;
+	[[nodiscard]] virtual intp open( const char *pFileName ) = 0;
+	virtual int read( void *pOutput, int size, intp file ) = 0;
+	virtual void close( intp file ) = 0;
+	virtual void seek( intp file, int pos ) = 0;
+	[[nodiscard]] virtual unsigned int tell( intp file ) = 0;
+	[[nodiscard]] virtual unsigned int size( intp file ) = 0;
 };
 
 
@@ -44,20 +44,20 @@ public:
 	InFileRIFF( const char *pFileName, IFileReadBinary &io );
 	~InFileRIFF( void );
 
-	unsigned int RIFFName( void ) { return m_riffName; }
-	unsigned int RIFFSize( void ) { return m_riffSize; }
+	[[nodiscard]] unsigned int RIFFName() const { return m_riffName; }
+	[[nodiscard]] unsigned int RIFFSize() const { return m_riffSize; }
 
-	int		ReadInt( void );
+	[[nodiscard]] int		ReadInt();
 	int		ReadData( void *pOutput, int dataSize );
-	int		PositionGet( void );
+	[[nodiscard]] int		PositionGet();
 	void	PositionSet( int position );
-	bool	IsValid( void ) { return m_file != 0; }
+	[[nodiscard]] bool	IsValid() const { return m_file != 0; }
 
 private:
 	const InFileRIFF & operator=( const InFileRIFF & ) = delete;
 
 	IFileReadBinary		&m_io;
-	ptrdiff_t			m_file;
+	intp				m_file;
 	unsigned int		m_riffName;
 	unsigned int		m_riffSize;
 };
@@ -72,18 +72,18 @@ public:
 	IterateRIFF( InFileRIFF &riff, int size );
 	IterateRIFF( IterateRIFF &parent );
 
-	bool			ChunkAvailable( void );
-	bool			ChunkNext( void );
+	[[nodiscard]] bool			ChunkAvailable();
+	bool			ChunkNext();
 
-	unsigned int	ChunkName( void );
-	unsigned int	ChunkSize( void );
+	[[nodiscard]] unsigned int	ChunkName();
+	[[nodiscard]] unsigned int	ChunkSize();
 	int				ChunkRead( void *pOutput );
 	int				ChunkReadPartial( void *pOutput, int dataSize );
-	int				ChunkReadInt( void );
-	int				ChunkFilePosition( void ) { return m_chunkPosition; }
+	[[nodiscard]] int				ChunkReadInt();
+	[[nodiscard]] int				ChunkFilePosition() const { return m_chunkPosition; }
 
 private:
-	const IterateRIFF & operator=( const IterateRIFF & );
+	const IterateRIFF & operator=( const IterateRIFF & ) = delete;
 
 	void	ChunkSetup( void );
 	void	ChunkClear( void );
@@ -100,11 +100,11 @@ private:
 class IFileWriteBinary
 {
 public:
-	virtual ptrdiff_t create( const char *pFileName ) = 0;
-	virtual int write( void *pData, int size, ptrdiff_t file ) = 0;
-	virtual void close( ptrdiff_t file ) = 0;
-	virtual void seek( ptrdiff_t file, int pos ) = 0;
-	virtual unsigned int tell( ptrdiff_t file ) = 0;
+	[[nodiscard]] virtual intp create( const char *pFileName ) = 0;
+	virtual int write( void *pData, int size, intp file ) = 0;
+	virtual void close( intp file ) = 0;
+	virtual void seek( intp file, int pos ) = 0;
+	[[nodiscard]] virtual unsigned int tell( intp file ) = 0;
 };
 //-----------------------------------------------------------------------------
 // Purpose: Used to write a RIFF format file
@@ -117,9 +117,9 @@ public:
 
 	bool	WriteInt( int number );
 	bool 	WriteData( void *pOutput, int dataSize );
-	int		PositionGet( void );
+	[[nodiscard]] int		PositionGet();
 	void	PositionSet( int position );
-	bool	IsValid( void ) { return m_file != 0; }
+	[[nodiscard]] bool	IsValid() const { return m_file != 0; }
 	
 	void    HasLISETData( int position );
 
@@ -127,7 +127,7 @@ private:
 	const OutFileRIFF & operator=( const OutFileRIFF & ) = delete;
 
 	IFileWriteBinary	&m_io;
-	ptrdiff_t			m_file;
+	intp				m_file;
 	unsigned int		m_riffName;
 	unsigned int		m_riffSize;
 	unsigned int		m_nNamePos;
@@ -155,9 +155,9 @@ public:
 	void			ChunkWriteInt( int number );
 	void			ChunkWriteData( void *pOutput, int size );
 
-	int				ChunkFilePosition( void ) { return m_chunkPosition; }
+	[[nodiscard]] int	ChunkFilePosition() const { return m_chunkPosition; }
 
-	unsigned int	ChunkGetPosition( void );
+	[[nodiscard]] unsigned int	ChunkGetPosition();
 	void			ChunkSetPosition( int position );
 
 	void			CopyChunkData( IterateRIFF& input );
@@ -166,7 +166,7 @@ public:
 
 private:
 
-	const IterateOutputRIFF & operator=( const IterateOutputRIFF & );
+	const IterateOutputRIFF & operator=( const IterateOutputRIFF & ) = delete;
 
 	OutFileRIFF			&m_riff;
 	int					m_start;
@@ -178,16 +178,16 @@ private:
 	int					m_chunkStart;
 };
 
-#define RIFF_ID					MAKEID('R','I','F','F')
-#define RIFF_WAVE				MAKEUID('W','A','V','E')
-#define WAVE_FMT				MAKEID('f','m','t',' ')
-#define WAVE_DATA				MAKEID('d','a','t','a')
-#define WAVE_FACT				MAKEID('f','a','c','t')
-#define WAVE_CUE				MAKEID('c','u','e',' ')
-#define WAVE_SAMPLER			MAKEID('s','m','p','l')
-#define WAVE_VALVEDATA			MAKEID('V','D','A','T')
-#define WAVE_PADD				MAKEID('P','A','D','D')
-#define WAVE_LIST				MAKEID('L','I','S','T') 
+constexpr inline int RIFF_ID{MAKEID('R', 'I', 'F', 'F')};
+constexpr inline unsigned RIFF_WAVE{MAKEUID('W', 'A', 'V', 'E')};
+constexpr inline int WAVE_FMT{MAKEID('f', 'm', 't', ' ')};
+constexpr inline int WAVE_DATA{MAKEID('d','a','t','a')};
+constexpr inline int WAVE_FACT{MAKEID('f','a','c','t')};
+constexpr inline int WAVE_CUE{MAKEID('c','u','e',' ')};
+constexpr inline int WAVE_SAMPLER{MAKEID('s','m','p','l')};
+constexpr inline int WAVE_VALVEDATA{MAKEID('V','D','A','T')};
+constexpr inline int WAVE_PADD{MAKEID('P','A','D','D')};
+constexpr inline int WAVE_LIST{MAKEID('L','I','S','T')}; 
 
 #ifndef WAVE_FORMAT_PCM
 #define WAVE_FORMAT_PCM			0x0001

@@ -71,7 +71,8 @@ private:
 	vgui::Button *m_pImportButton;
 
 	CBanContextMenu *m_pBanContextMenu;
-	float m_flUpdateTime;
+	// dimhotepus: float -> double.
+	double m_flUpdateTime;
 	bool m_bPageViewed;
 };
 

@@ -33,21 +33,21 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeElementPickerPanel : public CBaseAttributePanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeElementPickerPanel, CBaseAttributePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeElementPickerPanel, CBaseAttributePanel );
 
 public:
 	CAttributeElementPickerPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
 
-	virtual void OnCommand( const char *cmd );
-	virtual void PerformLayout();
+	void OnCommand( const char *cmd ) override;
+	void PerformLayout() override;
 
-	virtual void PostConstructor();
-	virtual void Apply();
+	void PostConstructor() override;
+	void Apply() override;
 
 private:
 	// Inherited classes must implement this
-	virtual	Panel *GetDataPanel();
-	virtual void Refresh();
+	Panel *GetDataPanel() override;
+	void Refresh() override;
 
 	MESSAGE_FUNC_PARAMS( OnDmeSelected, "DmeSelected", kv );
 	virtual void ShowPickerDialog();

@@ -1682,7 +1682,7 @@ void CSSVertex::GetPosition(Vector& Position)
 void CSSolid::SerializeDXF(FILE *stream, int nObject)
 {
 	char szName[128];
-	sprintf(szName, "OBJECT%03d", nObject);
+	V_sprintf_safe(szName, "OBJECT%03d", nObject);
 
 	// count number of triangulated faces
 	int nTriFaces = 0;

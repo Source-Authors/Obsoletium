@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxProgressBar.h"
+#include "mxtk/mxprogressbar.h"
 #include <windows.h>
 #include <commctrl.h>
 

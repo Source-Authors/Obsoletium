@@ -11,11 +11,11 @@
 #endif
 
 // Don't ever change these values, or face all kinds of subtle gameplay changes
-const float k_flMaxVelocity = 2000.0f;
-const float k_flMaxAngularVelocity = 360.0f * 10.0f;
+constexpr inline float k_flMaxVelocity = 2000.0f;
+constexpr inline float k_flMaxAngularVelocity = 360.0f * 10.0f;
 
-const float DEFAULT_MIN_FRICTION_MASS = 10.0f;
-const float DEFAULT_MAX_FRICTION_MASS = 2500.0f;
+constexpr inline float DEFAULT_MIN_FRICTION_MASS = 10.0f;
+constexpr inline float DEFAULT_MAX_FRICTION_MASS = 2500.0f;
 struct physics_performanceparams_t
 {
 	int		maxCollisionsPerObjectPerTimestep;		// object will be frozen after this many collisions (visual hitching vs. CPU cost)

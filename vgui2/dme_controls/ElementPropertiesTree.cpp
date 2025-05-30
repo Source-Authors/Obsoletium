@@ -6,14 +6,14 @@
 //
 //=============================================================================//
 
-#include "dme_controls/elementpropertiestree.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "tier1/KeyValues.h"
 #include "datamodel/dmelement.h"
 
 #include "vgui/IInput.h"
 #include "vgui/ISurface.h"
 #include "vgui/ISystem.h"
-#include "vgui/IVgui.h"
+#include "vgui/IVGui.h"
 #include "vgui/Cursor.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/ComboBox.h"
@@ -26,9 +26,9 @@
 #include "vgui_controls/ScrollBar.h"
 #include "movieobjects/dmeeditortypedictionary.h"
 #include "dme_controls/AttributeTextPanel.h"
-#include "dme_controls/DmePanel.h"
+#include "dme_controls/dmepanel.h"
 #include "dme_controls/dmecontrols_utils.h"
-#include "tier1/ConVar.h"
+#include "tier1/convar.h"
 #include "tier2/fileutils.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -50,26 +50,26 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CElementTree : public TreeView
 {
-	DECLARE_CLASS_SIMPLE( CElementTree, TreeView );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CElementTree, TreeView );
 public:
 	CElementTree( CElementPropertiesTreeInternal *parent, const char *panelName );
 	~CElementTree();
 
-	virtual void OnCommand( const char *cmd );
-	virtual void ApplySchemeSettings( IScheme *pScheme );
-	virtual void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false );
-	virtual void GenerateChildrenOfNode(int itemIndex);
+	void OnCommand( const char *cmd ) override;
+	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false ) override;
+	void GenerateChildrenOfNode(int itemIndex) override;
 	// override to open a custom context menu on a node being selected and right-clicked
-	virtual void GenerateContextMenu( int itemIndex, int x, int y );
+	void GenerateContextMenu( int itemIndex, int x, int y ) override;
 
-	virtual void GenerateDragDataForItem( int itemIndex, KeyValues *msg );
+	void GenerateDragDataForItem( int itemIndex, KeyValues *msg ) override;
 
-	virtual void OnLabelChanged( int itemIndex, const char *oldString, const char *newString );
+	void OnLabelChanged( int itemIndex, const char *oldString, const char *newString ) override;
 
-	virtual bool IsItemDroppable( int m_ItemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void OnItemDropped( int m_ItemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist );
-	virtual HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist );
+	bool IsItemDroppable( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void OnItemDropped( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
+	HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
 
 	ScrollBar	*GetScrollBar();
 
@@ -206,7 +206,7 @@ CElementTreeViewListControl::CElementTreeViewListControl( Panel *pParent, const 
 
 int CElementTreeViewListControl::AddItem( KeyValues *data, bool allowLabelEditing, int parentItemIndex, CUtlVector< vgui::Panel * >& columnPanels )
 {
-	int itemIndex = GetTree()->AddItem( data, parentItemIndex );
+	intp itemIndex = GetTree()->AddItem( data, parentItemIndex );
 	if ( allowLabelEditing )
 	{
 		GetTree()->SetLabelEditingAllowed( itemIndex, allowLabelEditing );
@@ -309,9 +309,8 @@ void CElementTreeViewListControl::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 // Purpose: Handle mouse drag resize of tree column (hack)
 //-----------------------------------------------------------------------------
-void CElementTreeViewListControl::OnCursorMoved(int x, int y)
+void CElementTreeViewListControl::OnCursorMoved(int x, [[maybe_unused]] int y)
 {
-
 	if ( ( x > m_iTreeColumnWidth - 12 ) &&
 		 ( x < m_iTreeColumnWidth + 12 ) )
 	{
@@ -433,25 +432,19 @@ void CElementTreeViewListControl::PostChildPaint()
 
 	if ( m_bDrawGrid )
 	{
-		int numColumns = GetNumColumns();
+		intp numColumns = GetNumColumns();
 		intp rows = GetNumRows();
 
 		int vbarTop, nItemsVisible;
 		bool hbarVisible = false;
 		GetTree()->GetVBarInfo( vbarTop, nItemsVisible, hbarVisible );
 
-		int vBarWidth = 0;
-		if ( nItemsVisible <= rows )
-		{
-			vBarWidth = 21;
-		}
-
 		if ( hbarVisible )
 		{
 			--nItemsVisible;
 		}
 
-		for ( int col = 0; col < numColumns; ++col )
+		for ( intp col = 0; col < numColumns; ++col )
 		{
 			for ( intp row = 0; row < rows; ++row )
 			{
@@ -682,7 +675,7 @@ KeyValues *CElementTreeViewListControl::GetItemData(int itemIndex)
 
 class CHistoryMenuButton : public MenuButton
 {
-DECLARE_CLASS_SIMPLE( CHistoryMenuButton, MenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CHistoryMenuButton, MenuButton );
 public:
 	CHistoryMenuButton( Panel *parent, const char *panelName, const char *text, CElementPropertiesTreeInternal *tree, int whichMenu );
 
@@ -721,13 +714,13 @@ void CHistoryMenuButton::OnShowMenu( Menu *menu )
 
 class CSearchComboBox : public ComboBox
 {
-	DECLARE_CLASS_SIMPLE( CSearchComboBox, ComboBox );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CSearchComboBox, ComboBox );
 public:
 
 	CSearchComboBox( CElementPropertiesTreeInternal *tree, vgui::Panel *parent, const char *panelName, int numLines, bool allowEdit );
 
-	virtual void OnMenuItemSelected();
-	virtual void OnShowMenu(Menu *menu);
+	void OnMenuItemSelected() override;
+	void OnShowMenu(Menu *menu) override;
 
 private:
 
@@ -770,17 +763,17 @@ void CSearchComboBox::OnMenuItemSelected()
 
 class CPropertiesTreeToolbar : public Panel
 {
-	DECLARE_CLASS_SIMPLE( CPropertiesTreeToolbar, Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPropertiesTreeToolbar, Panel );
 public:
 	CPropertiesTreeToolbar( vgui::Panel *parent, const char *panelName, CElementPropertiesTreeInternal *tree );
 
-	virtual void ApplySchemeSettings( IScheme *scheme );
+	void ApplySchemeSettings( IScheme *scheme ) override;
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	MESSAGE_FUNC( OnTextNewLine, "TextNewLine" );
 
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 	void			UpdateButtonState();
 private:
@@ -939,9 +932,10 @@ void CPropertiesTreeToolbar::PerformLayout()
 CElementPropertiesTreeInternal::CElementPropertiesTreeInternal( 
 	vgui::Panel *parent, IDmNotify *pNotify, CDmElement *pObject, bool autoApply /* = true */, CDmeEditorTypeDictionary *pDict /* = NULL */ ) :
 	BaseClass( parent, "ElementPropertiesTree" ),
-	m_pNotify( pNotify ),
 	m_hTypeDictionary( pDict ),
-	m_bAutoApply( autoApply ), m_bShowMemoryUsage( false )
+	m_pNotify( pNotify ),
+	m_bAutoApply( autoApply ),
+	m_bShowMemoryUsage( false )
 {
 	m_hObject = pObject;
 	m_bSuppressHistoryUpdates = false;
@@ -1098,7 +1092,7 @@ void CElementPropertiesTreeInternal::OnRename()
 
 void CElementPropertiesTreeInternal::OnCopy()
 {
-	CUtlVector< int > selected;
+	CUtlVector< intp > selected;
 	m_pTree->GetTree()->GetSelectedItems( selected ) ;
 	intp c = selected.Count();
 	if ( c <= 0 )
@@ -1191,7 +1185,7 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 
 void CElementPropertiesTreeInternal::OnPaste_( bool reference )
 {
-	CUtlVector< int > selected;
+	CUtlVector< intp > selected;
 	m_pTree->GetTree()->GetSelectedItems( selected ) ;
 	intp c = selected.Count();
 	if ( !c )
@@ -1760,7 +1754,7 @@ void CElementPropertiesTreeInternal::OnNavBack( uint64 item )
 	if ( c <= 1 )
 		return;
 
-	if ( item == -1 )
+	if ( item == std::numeric_limits<uint64>::max() )
 	{
 		if ( m_nCurrentHistoryPosition >= c - 1 )
 			return;
@@ -1787,7 +1781,7 @@ void CElementPropertiesTreeInternal::OnNavForward( uint64 item )
 	if ( c <= 0 )
 		return;
 
-	if ( item == -1 )
+	if ( item == std::numeric_limits<uint64>::max() )
 	{
 		if ( m_nCurrentHistoryPosition <= 0 )
 			return;
@@ -1812,7 +1806,7 @@ bool CElementPropertiesTreeInternal::BuildExpansionListToFindElement_R(
 	CDmElement *owner, 
 	CDmElement *element, 
 	const char *attributeName, 
-	int arrayIndex, 
+	intp arrayIndex, 
 	CUtlVector< intp >& expandIndices
 	)
 {
@@ -2699,7 +2693,7 @@ void CElementPropertiesTreeInternal::OnShowFileDialog( KeyValues *params )
 	FileOpenDialog *pDialog = new FileOpenDialog( this, pTitle, bOpenOnly, pContext->MakeCopy() );
 
 	char pStartingDir[ MAX_PATH ];
-	GetModSubdirectory( NULL, pStartingDir, sizeof( pStartingDir ) );
+	GetModSubdirectory( NULL, pStartingDir );
 	Q_StripTrailingSlash( pStartingDir );
 
 	pDialog->SetStartDirectoryContext( pTitle, pStartingDir );
@@ -2948,7 +2942,7 @@ struct DataModelFilenameArray
 	}
 };
 
-void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, int y )
+void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y )
 {
 	KeyValues *data = m_pTree->GetItemData( itemIndex );
 	if ( !data )
@@ -3253,7 +3247,8 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, int x, 
 		}
 
 		char filename[ MAX_PATH ];
-		V_GenerateUniqueName( filename, sizeof( filename ), "unnamed", DataModelFilenameArray() );
+		[[maybe_unused]] const bool ok = V_GenerateUniqueName( filename, "unnamed", DataModelFilenameArray() );
+		AssertMsg(ok, "Unable to create unique name for file.");
 
 		menu->AddMenuItem( "<new file>", new KeyValues( "OnChangeFile", "filename", filename ), this );
 	}
@@ -4102,7 +4097,7 @@ void CElementPropertiesTreeInternal::SetTreeEntryDimState(  )
 //-----------------------------------------------------------------------------
 // Adds a single entry into the tree
 //-----------------------------------------------------------------------------
-void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, int nArrayIndex, AttributeWidgets_t &widgets )
+void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, intp nArrayIndex, AttributeWidgets_t &widgets )
 {
 	char pText[ 512 ];
 	bool bEditableLabel = false;
@@ -4203,7 +4198,7 @@ void CElementPropertiesTreeInternal::SetupWidgetInfo( AttributeWidgetInfo_t *pIn
 //-----------------------------------------------------------------------------
 // Adds a single editable attributes of the element to the tree
 //-----------------------------------------------------------------------------
-void CElementPropertiesTreeInternal::InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, int nArrayIndex )
+void CElementPropertiesTreeInternal::InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex )
 {
 	const char *attributeName = pAttribute->GetName();
 	NOTE_UNUSED( attributeName );
@@ -4473,12 +4468,10 @@ IMPLEMENT_DMEPANEL_FACTORY( CDmeElementPanel, DmElement, "DmeElementDefault", "D
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4355)
 CDmeElementPanel::CDmeElementPanel( vgui::Panel *pParent, const char *pPanelName ) :
 	BaseClass( pParent, this, NULL )
 {
 }
-#pragma warning (default:4355)
 
 
 //-----------------------------------------------------------------------------

@@ -2204,8 +2204,9 @@ void CBaseVSShader::InitUnlitGeneric_DX8(
 // Take 0..1 seed and map to (u, v) coordinate to be used in shadow filter jittering...
 void CBaseVSShader::HashShadow2DJitter( const float fJitterSeed, float *fU, float* fV )
 {
-	const int nTexRes = 32;
-	int nSeed = fmod (fJitterSeed, 1.0f) * nTexRes * nTexRes;
+	constexpr int nTexRes = 32;
+	constexpr int nTexResx2 = nTexRes * nTexRes;
+	int nSeed = fmod (fJitterSeed, 1.0f) * nTexResx2;
 
 	int nRow = nSeed / nTexRes;
 	int nCol = nSeed % nTexRes;

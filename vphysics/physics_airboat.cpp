@@ -35,9 +35,9 @@
 #define AIRBOAT_WATER_DRAG_FORWARD_BACK		0.005f
 #define AIRBOAT_WATER_DRAG_UP_DOWN			0.0025f
 
-#define AIRBOAT_GROUND_DRAG_LEFT_RIGHT		2.0
-#define AIRBOAT_GROUND_DRAG_FORWARD_BACK	1.0
-#define AIRBOAT_GROUND_DRAG_UP_DOWN			0.8
+#define AIRBOAT_GROUND_DRAG_LEFT_RIGHT		2.0f
+#define AIRBOAT_GROUND_DRAG_FORWARD_BACK	1.0f
+#define AIRBOAT_GROUND_DRAG_UP_DOWN			0.8f
 
 #define AIRBOAT_DRY_FRICTION_SCALE		0.6f		// unitless, reduces our friction on all surfaces other than water
 
@@ -396,7 +396,7 @@ void CPhysics_Airboat::do_raycasts_gameside( int nRaycastCount, IVP_Ray_Solver_T
 
 			pImpacts[iRaycast].nSurfaceProps = trace.surface.surfaceProps;
 
-			if (pImpacts[iRaycast].vecImpactNormalWS.k[1] < -0.707)
+			if (pImpacts[iRaycast].vecImpactNormalWS.k[1] < -0.707)  // > 270 degrees
 			{
 				// dampening is 1/t, where t is how long it takes to come to a complete stop
 				pImpacts[iRaycast].flDampening = pSurfaceData->physics.dampening;
@@ -564,7 +564,7 @@ bool CPhysics_Airboat::PostRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplate
 		IVP_Raycast_Airboat_Wheel *pPontoonPoint = get_wheel( IVP_POS_WHEEL( iPoint ) );
 		IVP_Raycast_Airboat_Impact *pImpact = &pImpacts[iPoint];
 		IVP_Ray_Solver_Template *pRaySolver = &pRaySolverTemplates[iPoint];
-		if ( !pPontoonPoint || !pImpact || !pRaySolver )
+		if ( !pPontoonPoint )
 			continue;
 
 		// Copy the ray length back, it may have changed.
@@ -783,7 +783,7 @@ void CPhysics_Airboat::DoSimulationDrag( IVP_Raycast_Airboat_Impact *pImpacts,
 	{
 		// Get data at raycast position.
 		IVP_Raycast_Airboat_Impact *pImpact = &pImpacts[iPoint];
-		if ( !pImpact || !pImpact->bImpact )
+		if ( !pImpact->bImpact )
 			continue;
 
 		if ( pImpact->bImpactWater )
@@ -1076,9 +1076,6 @@ int CPhysics_Airboat::CountSurfaceContactPoints( IVP_Raycast_Airboat_Impact *pIm
 	{
 		// Get data at raycast position.
 		IVP_Raycast_Airboat_Impact *pImpact = &pImpacts[iPoint];
-		if ( !pImpact )
-			continue;
-
 		if ( pImpact->bImpact )
 		{
 			nContacts++;
@@ -1696,9 +1693,7 @@ void CPhysics_Airboat::InitRaycastCarWheels( const IVP_Template_Car_System *pCar
 
 		do_steering_wheel( IVP_POS_WHEEL( iWheel ), 0.0f );
 		
-		pRaycastWheel->wheel_is_fixed = IVP_FALSE;	
 		pRaycastWheel->max_rotation_speed = pCarSystemTemplate->wheel_max_rotation_speed[iWheel>>1];
-
 		pRaycastWheel->wheel_is_fixed = IVP_TRUE;
     }
 }

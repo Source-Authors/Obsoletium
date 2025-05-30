@@ -5,6 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include "vgui/ILocalize.h"
 
 #if defined( POSIX )
 #include <iconv.h>
@@ -15,7 +16,6 @@
 #include "filesystem.h"
 
 #include "vgui_internal.h"
-#include "vgui/ILocalize.h"
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
 
@@ -23,13 +23,9 @@
 #include "tier1/utlrbtree.h"
 #include "tier1/utlsymbol.h"
 #include "tier1/utlstring.h"
+#include "tier1/byteswap.h"
 #include "UnicodeFileHelpers.h"
 #include "tier0/icommandline.h"
-#include "byteswap.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -286,8 +282,8 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 	search.symPathID = pPathID ? pPathID : "";
 	search.bIncludeFallbacks = bIncludeFallbackSearchPaths;
 
-	int lfc = m_LocalizationFiles.Count();
-	for ( int lf = 0; lf < lfc; ++lf )
+	intp lfc = m_LocalizationFiles.Count();
+	for ( intp lf = 0; lf < lfc; ++lf )
 	{
 		LocalizationFileInfo_t& entry = m_LocalizationFiles[ lf ];
 		if ( !Q_stricmp( entry.symName.String(), fileName ) )
@@ -305,7 +301,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 	// We do this manually instead of just asking for the first match to support bIncludeFallbackSearchPaths
 	char searchPaths[ MAX_PATH*50 ] = { 0 }; // allow for 50 search paths
 
-	Verify( g_pFullFileSystem->GetSearchPath( pPathID, true, searchPaths, sizeof( searchPaths ) ) < static_cast<int>(sizeof(searchPaths)) );
+	Verify( g_pFullFileSystem->GetSearchPath_safe( pPathID, true, searchPaths ) < static_cast<int>(sizeof(searchPaths)) );
 
 	CUtlSymbolTable				pathStrings;
 	CUtlVector< CUtlSymbol >	searchList;
@@ -322,9 +318,9 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		{
 			char fullpath[MAX_PATH];
 			V_strcpy_safe( fullpath, path );
-			V_AppendSlash( fullpath, sizeof(fullpath) );
+			V_AppendSlash( fullpath );
 			V_strcat_safe( fullpath, fileName );
-			Q_FixSlashes( fullpath );
+			V_FixSlashes( fullpath );
 			//Q_strlower( fullpath ); // NO! This screws up Linux
 
 			CUtlSymbol sym = pathStrings.AddString( fullpath );
@@ -428,7 +424,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		{
 			// read the key and the value
 			ucs2 keytoken[128];
-			ucs2 *pchNewdata = ReadUnicodeToken(data, keytoken, ssize(keytoken), bQuoted);
+			ucs2 *pchNewdata = ReadUnicodeToken(data, keytoken, bQuoted);
 			if (!keytoken[0])
 				break;	// we've hit the null terminator
 
@@ -450,7 +446,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 			}
 
 			ucs2 valuetoken[ MAX_LOCALIZED_CHARS ];
-			data = ReadUnicodeToken(data, valuetoken, MAX_LOCALIZED_CHARS, bQuoted);
+			data = ReadUnicodeToken(data, valuetoken, bQuoted);
 			if (!valuetoken[0] && !bQuoted)
 				break;	// we've hit the null terminator
 			
@@ -488,7 +484,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 						// Check for a conditional tag
 						bool bAccepted = true;
 						ucs2 conditional[ MAX_LOCALIZED_CHARS ];
-						ucs2 *tempData = ReadUnicodeToken(data, conditional, MAX_LOCALIZED_CHARS, bQuoted);
+						ucs2 *tempData = ReadUnicodeToken(data, conditional, bQuoted);
 						const size_t conditional_length = wcslen(conditional);
 						// dimhotepus: Add $!<cond> support as required.
 						if ( !bQuoted &&
@@ -647,11 +643,11 @@ bool CLocalizedStringTable::SaveToFile( const char *szFileName )
 
 	// write out the first string
 	static wchar_t unicodeString[1024];
-	int strLength = ConvertANSIToUnicode(startStr, unicodeString, sizeof(unicodeString));
+	int strLength = ConvertANSIToUnicode(startStr, unicodeString);
 	if (!strLength)
 		return false;
 
-	g_pFullFileSystem->Write(unicodeString, wcslen( unicodeString ) * sizeof(wchar_t), file);
+	g_pFullFileSystem->Write(unicodeString, V_wcslen( unicodeString ) * static_cast<int>(sizeof(wchar_t)), file);
 
 	// convert our spacing characters to unicode
 //	wchar_t unicodeSpace = L' '; 
@@ -671,20 +667,20 @@ bool CLocalizedStringTable::SaveToFile( const char *szFileName )
 		wchar_t *value = GetValueByIndex(idx);
 
 		// convert the name to a unicode string
-		ConvertANSIToUnicode(name, unicodeString, sizeof(unicodeString));
+		ConvertANSIToUnicode(name, unicodeString);
 
 		g_pFullFileSystem->Write(&unicodeTab, sizeof(wchar_t), file);
 
 		// write out
 		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
-		g_pFullFileSystem->Write(unicodeString, wcslen( unicodeString ) * sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeString, V_wcslen( unicodeString ) * static_cast<int>(sizeof(wchar_t)), file);
 		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
 
 		g_pFullFileSystem->Write(&unicodeTab, sizeof(wchar_t), file);
 		g_pFullFileSystem->Write(&unicodeTab, sizeof(wchar_t), file);
 
 		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
-		g_pFullFileSystem->Write(value, wcslen(value) * sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(value, V_wcslen(value) * static_cast<int>(sizeof(wchar_t)), file);
 		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
 
 		g_pFullFileSystem->Write(&unicodeCR, sizeof(wchar_t), file);
@@ -692,7 +688,7 @@ bool CLocalizedStringTable::SaveToFile( const char *szFileName )
 	}
 
 	// write end string
-	strLength = ConvertANSIToUnicode(endStr, unicodeString, sizeof(unicodeString));
+	strLength = ConvertANSIToUnicode(endStr, unicodeString);
 	g_pFullFileSystem->Write(unicodeString, strLength * sizeof(wchar_t), file);
 
 	g_pFullFileSystem->Close(file);
@@ -984,7 +980,7 @@ void CLocalizedStringTable::SetValueByIndex(StringIndex_t index, wchar_t *newVal
 	else
 	{
 		// copy the string into the old position
-		wcscpy(wstr, newValue);		
+		V_wcsncpy(wstr, newValue, (oldLen + 1) * static_cast<intp>(sizeof(wchar_t)));
 	}
 }
 
@@ -1009,8 +1005,8 @@ const char *CLocalizedStringTable::GetLocalizationFileName(int index)
 //-----------------------------------------------------------------------------
 bool CLocalizedStringTable::LocalizationFileIsLoaded(const char *name)
 {
-	int c = m_LocalizationFiles.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_LocalizationFiles.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( !Q_stricmp( m_LocalizationFiles[ i ].symName.String(), name ) )
 			return true;

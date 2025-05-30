@@ -139,7 +139,7 @@ WORD SetConsoleTextColor(int red, int green, int blue, int intensity) {
   return ret;
 }
 
-void RestoreConsoleTextColor(WORD color) {
+void RestoreConsoleTextColor(unsigned short color) {
   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
                           color | g_BackgroundFlags);
 
@@ -155,7 +155,8 @@ void Error(char const *pMsg, ...) {
   vprintf(pMsg, marker);
   va_end(marker);
 
-  exit(-1);
+  // dimhotepus: -1 -> EOTHER
+  exit(EOTHER);
 }
 
 #else
@@ -174,9 +175,9 @@ static const char *PrefixMessageGroup(
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+    V_sprintf_safe(out, "[%s] %s", out_group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    V_sprintf_safe(out, "%s", message);
   }
 
   return out;
@@ -260,7 +261,8 @@ SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
     RestoreConsoleTextColor(old);
   }
 
-  if (type == SPEW_ERROR) CmdLib_Exit(1);
+  // dimhotepus: 1 -> ENOTRECOVERABLE.
+  if (type == SPEW_ERROR) CmdLib_Exit(ENOTRECOVERABLE);
 
   return retVal;
 }
@@ -280,7 +282,7 @@ void SetSpewFunctionLogFile(char const *pFilename) {
   g_pLogFile = g_pFileSystem->Open(pFilename, "a");
 
   Assert(g_pLogFile);
-  if (!g_pLogFile) Error("Can't create LogFile:\"%s\"\n", pFilename);
+  if (!g_pLogFile) Error("Can't create log file '%s'.\n", pFilename);
 
   CmdLib_FPrintf(g_pLogFile, "\n\n\n");
 }
@@ -345,10 +347,10 @@ void ExpandWildcards(int *argc, char ***argv) {
     intptr_t handle = _findfirst(path, &fileinfo);
     if (handle == -1) return;
 
-    Q_ExtractFilePath(path, filebase, sizeof(filebase));
+    V_ExtractFilePath(path, filebase);
 
     do {
-      sprintf(filename, "%s%s", filebase, fileinfo.name);
+      V_sprintf_safe(filename, "%s%s", filebase, fileinfo.name);
 
       ex_argv[ex_argc++] = copystring(filename);
     } while (_findnext(handle, &fileinfo) != -1);
@@ -372,7 +374,7 @@ void qprintf(PRINTF_FORMAT_STRING const char *format, ...) {
   va_start(argptr, format);
 
   char str[2048];
-  Q_vsnprintf(str, sizeof(str), format, argptr);
+  V_vsprintf_safe(str, format, argptr);
 
 #if defined(CMDLIB_NODBGLIB)
   printf("%s", str);
@@ -403,21 +405,21 @@ char *ExpandArg(char *path) {
   if (path[0] != '/' && path[0] != '\\' && path[1] != ':') {
     CmdLib_getwd(full, sizeof(full));
 
-    Q_strncat(full, path, sizeof(full), COPY_ALL_CHARACTERS);
+    V_strcat_safe(full, path);
   } else {
-    Q_strncpy(full, path, sizeof(full));
+    V_strcpy_safe(full, path);
   }
 
   return full;
 }
 
-char *ExpandPath(char *path) {
+const char *ExpandPath(const char *path) {
   static char full[1024];
   if (path[0] == '/' || path[0] == '\\' || path[1] == ':') {
     return path;
   }
 
-  sprintf(full, "%s%s", qdir, path);
+  V_sprintf_safe(full, "%s%s", qdir, path);
   return full;
 }
 
@@ -450,13 +452,14 @@ void GetHourMinuteSecondsString(int nInputSeconds, char *pOut, int outLen) {
 }
 
 void Q_mkdir(char *path) {
-#if defined(_WIN32) || defined(WIN32)
-  if (mkdir(path) != -1) return;
+#if defined(_WIN32)
+  if (!mkdir(path) || errno == EEXIST) return;
 #else
-  if (mkdir(path, 0777) != -1) return;
+  if (!mkdir(path, 0777) || errno == EEXIST) return;
 #endif
 
-  Error("mkdir failed %s\n", path);
+  Error( "Unable to create directory '%s': %s.\n",
+      path, std::generic_category().message(errno).c_str() );
 }
 
 void CmdLib_InitFileSystem(const char *pFilename, int maxMemoryUsage) {
@@ -536,9 +539,9 @@ void CmdLib_AddBasePath(const char *pPath) {
 bool CmdLib_HasBasePath(const char *pFileName_, intp &pathLength) {
   pathLength = 0;
 
-  char *pFileName = (char *)_alloca(strlen(pFileName_) + 1);
-  strcpy(pFileName, pFileName_);
-  Q_FixSlashes(pFileName);
+  V_strdup_stack(pFileName_, pFileName);
+
+  V_FixSlashes(pFileName);
 
   for (intp i = 0; i < g_NumBasePaths; i++) {
     // see if we can rip the base off of the filename.
@@ -566,7 +569,7 @@ intp CmdLib_ExpandWithBasePaths(CUtlVector<CUtlString> &expandedPathList,
   intp nPathLength = 0;
 
   // Kind of redundant but it's how CmdLib_HasBasePath needs things
-  pszPath = ExpandPath(const_cast<char *>(pszPath));
+  pszPath = ExpandPath(pszPath);
 
   if (CmdLib_HasBasePath(pszPath, nPathLength)) {
     pszPath = pszPath + nPathLength;
@@ -730,7 +733,7 @@ void SafeCreatePath(char *path) {
     ptr = strchr(ptr + 1, '\\');
     if (ptr) {
       *ptr = '\0';
-      _mkdir(path);
+      Q_mkdir(path);
       *ptr = '\\';
     }
   }

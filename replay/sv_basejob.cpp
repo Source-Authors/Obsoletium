@@ -24,7 +24,7 @@ void CBaseJob::SetError( int nError, const char *pError )
 
 	if ( pError )
 	{
-		V_strcpy( m_szError, pError );
+		V_strcpy_safe( m_szError, pError );
 	}
 }
 

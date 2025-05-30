@@ -177,8 +177,21 @@ InitReturnVal_t CMatRenderContextBase::Init( )
 			nSize = 4400 * 1024;
 		}
 
-		sm_RenderData[0].Init( nSize, nCommitSize, 0, 32 );
-		sm_RenderData[1].Init( nSize, nCommitSize, 0, 32 );
+		// dimhotepus: Check initialization succeeded.
+		if ( !sm_RenderData[0].Init( nSize, nCommitSize, 0, 32 ) )
+		{
+			Warning( "Render allocator #1 unable to allocate %d virtual bytes.\n", nSize );
+			return INIT_FAILED;
+		}
+		
+		// dimhotepus: Check initialization succeeded.
+		if ( !sm_RenderData[1].Init( nSize, nCommitSize, 0, 32 ) )
+		{
+			// * 2 to honor sm_RenderData[0].
+			Warning( "Render allocator #2 unable to allocate %d virtual bytes.\n", nSize * 2 );
+			return INIT_FAILED;
+		}
+
 		sm_nRenderStack = 0;
 		sm_nRenderLockCount = 0;
 	}
@@ -658,13 +671,13 @@ void CMatRenderContextBase::GetWorldSpaceCameraVectors( Vector *pVecForward, Vec
 	}
 }
 
-void *CMatRenderContextBase::LockRenderData( int nSizeInBytes )
+void *CMatRenderContextBase::LockRenderData( intp nSizeInBytes )
 {
 	MEM_ALLOC_CREDIT();
 	void *pDest = sm_RenderData[ sm_nRenderStack ].Alloc( nSizeInBytes, false );
 	if ( !pDest )
 	{
-		ExecuteNTimes( 10, Warning( "MaterialSystem: Out of memory in render data!\n" ) );
+		ExecuteNTimes( 10, Warning( "MaterialSystem: Out of memory in render data (%zd bytes alloc failed)!\n", nSizeInBytes ) );
 	}
 	AddRefRenderData();
 	return pDest;
@@ -1004,9 +1017,7 @@ void CMatRenderContextBase::OnAsyncCreateTextureFromRenderTarget( ITexture* pSrc
 	pRecipient->AddRef();
 
 	// Also, need to allocate a copy of the string and use that one s.t. the caller doesn't have to worry about it.
-	char* pDstNameCopy = new char[ V_strlen( *ppDstName ) + 1 ];
-	V_strcpy( pDstNameCopy, *ppDstName );
-	( *ppDstName ) = pDstNameCopy;
+	*ppDstName = V_strdup( *ppDstName );
 }
 
 // Map and unmap a texture. The pRecipient->OnAsyncMapComplete is called when complete. 
@@ -2128,11 +2139,9 @@ static int CompareVertexFormats( VertexFormat_t Fmt1, VertexFormat_t Fmt2 )
 
 int CMatRenderContext::CompareMaterialCombos( IMaterial *pMaterial1, IMaterial *pMaterial2, int lightMapID1, int lightMapID2 )
 {
-	pMaterial1 = ((IMaterialInternal *)pMaterial1)->GetRealTimeVersion(); //always work with the real time version of materials internally.
-	pMaterial2 = ((IMaterialInternal *)pMaterial2)->GetRealTimeVersion(); //always work with the real time version of materials internally.
+	IMaterialInternal *pMat1 = ((IMaterialInternal *)pMaterial1)->GetRealTimeVersion(); //always work with the real time version of materials internally.
+	IMaterialInternal *pMat2 = ((IMaterialInternal *)pMaterial2)->GetRealTimeVersion(); //always work with the real time version of materials internally.
 
-	IMaterialInternal *pMat1 = (IMaterialInternal *)pMaterial1;
-	IMaterialInternal *pMat2 = (IMaterialInternal *)pMaterial2;
 	ShaderRenderState_t *pState1 = pMat1->GetRenderState();
 	ShaderRenderState_t *pState2 = pMat2->GetRenderState();
 	int dPass = pState2->m_pSnapshots->m_nPassCount - pState1->m_pSnapshots->m_nPassCount;

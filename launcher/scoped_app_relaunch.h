@@ -26,7 +26,10 @@ class ScopedAppRelaunch {
 #ifndef WIN32
     struct stat st;
     if (!stat(kRelaunchFilePath, &st)) {
-      unlink(kRelaunchFilePath);
+      if (unlink(kRelaunchFilePath)) {
+        Warning("Unable to remove relaunch file '%s': %s.\n", kRelaunchFilePath,
+                std::generic_category().message(errno).c_str());
+      }
     }
 #endif
   }

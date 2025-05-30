@@ -240,9 +240,9 @@ static KeyValues *HandleKeyValuesMacro_Insert( KeyValues *pkvInsert, KeyValues *
 		pkvNew->deleteThis();
 	}
 
-	for ( intp i = 0; i < newKeyList.Count(); ++i )
+	for ( auto *kv : newKeyList )
 	{
-		HandleKeyValuesMacros( pkvParent, newKeyList[i] );
+		HandleKeyValuesMacros( pkvParent, kv );
 	}
 
 	return pkvReturn;

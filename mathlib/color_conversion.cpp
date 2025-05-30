@@ -199,7 +199,7 @@ void XM_CALLCONV BuildGammaTable( float gamma, float texGamma, float brightness,
 		{
 			overbrightFactor = 0.5;
 		}
-		else if ( overbright == 4 )
+		else if ( overbright == 4 ) //-V112
 		{
 			overbrightFactor = 0.25;
 		}

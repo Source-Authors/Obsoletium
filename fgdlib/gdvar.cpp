@@ -5,8 +5,8 @@
 #include "fgdlib/gdvar.h"
 
 #include "fgdlib/fgdlib.h"
-#include "fgdlib/GameData.h"
-#include "fgdlib/WCKeyValues.h"
+#include "fgdlib/gamedata.h"
+#include "fgdlib/wckeyvalues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -15,7 +15,7 @@
 struct TypeMap_t
 {
 	GDIV_TYPE eType;		// The enumeration of this type.
-	char *pszName;			// The name of this type.
+	const char *pszName;	// The name of this type.
 	trtoken_t eStoreAs;		// How this type is stored (STRING, INTEGER, etc).
 };
 
@@ -59,7 +59,7 @@ static constexpr TypeMap_t TypeMap[] =
 };
 
 
-char *GDinputvariable::m_pszEmpty = "";
+const char *GDinputvariable::m_pszEmpty = "";
 
 
 //-----------------------------------------------------------------------------
@@ -132,9 +132,7 @@ GDinputvariable &GDinputvariable::operator =(GDinputvariable &Other)
 	delete [] m_pszDescription;
 	if (Other.m_pszDescription != NULL)
 	{
-		const ptrdiff_t len = strlen(Other.m_pszDescription) + 1;
-		m_pszDescription = new char[len];
-		V_strncpy(m_pszDescription, Other.m_pszDescription, len);
+		m_pszDescription = V_strdup(Other.m_pszDescription);
 	}
 	else
 	{
@@ -223,7 +221,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 {
 	char szToken[128];
 
-	if (!GDGetToken(tr, m_szName, sizeof(m_szName), IDENT))
+	if (!GDGetToken(tr, m_szName, IDENT))
 	{
 		return FALSE;
 	}
@@ -234,7 +232,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 	}
 
 	// check for "reportable" marker
-	trtoken_t ttype = tr.NextToken(szToken, sizeof(szToken));
+	trtoken_t ttype = tr.NextToken(szToken);
 	if (ttype == OPERATOR)
 	{
 		if (!strcmp(szToken, "*"))
@@ -248,7 +246,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 	}
 
 	// get type
-	if (!GDGetToken(tr, szToken, sizeof(szToken), IDENT))
+	if (!GDGetToken(tr, szToken, IDENT))
 	{
 		return FALSE;
 	}
@@ -271,20 +269,21 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 	//
 	// Look ahead at the next token.
 	//
-	ttype = tr.PeekTokenType(szToken,sizeof(szToken));
+	ttype = tr.PeekTokenType(szToken);
 
 	//
 	// Check for the "readonly" specifier.
 	//
 	if ((ttype == IDENT) && IsToken(szToken, "readonly"))
 	{
-		tr.NextToken(szToken, sizeof(szToken));
+		// dimhotepus: Skip readonly token.
+		(void)tr.NextToken(szToken);
 		m_bReadOnly = true;
 
 		//
 		// Look ahead at the next token.
 		//
-		ttype = tr.PeekTokenType(szToken,sizeof(szToken));
+		ttype = tr.PeekTokenType(szToken);
 	}
 
 	//
@@ -295,7 +294,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		//
 		// Eat the ':'.
 		//
-		tr.NextToken(szToken, sizeof(szToken));
+		(void)tr.NextToken(szToken);
 
 		if (m_eType == ivFlags)
 		{
@@ -306,7 +305,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		//
 		// Get the long name.
 		//
-		if (!GDGetToken(tr, m_szLongName, sizeof(m_szLongName), STRING))
+		if (!GDGetToken(tr, m_szLongName, STRING))
 		{
 			return(FALSE);
 		}
@@ -314,7 +313,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		//
 		// Look ahead at the next token.
 		//
-		ttype = tr.PeekTokenType(szToken,sizeof(szToken));
+		ttype = tr.PeekTokenType(szToken);
 
 		//
 		// Check for the ':' indicating a default value.
@@ -324,12 +323,12 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			//
 			// Eat the ':'.
 			//
-			tr.NextToken(szToken, sizeof(szToken));
+			(void)tr.NextToken(szToken);
 
 			//
 			// Look ahead at the next token.
 			//
-			ttype = tr.PeekTokenType(szToken,sizeof(szToken));
+			ttype = tr.PeekTokenType(szToken);
 			if (ttype == OPERATOR && IsToken(szToken, ":"))
 			{
 				//
@@ -347,14 +346,14 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 
 				if (eStoreAs == STRING)
 				{
-					if (!GDGetToken(tr, m_szDefault, sizeof(m_szDefault), STRING))
+					if (!GDGetToken(tr, m_szDefault, STRING))
 					{
 						return(FALSE);
 					}
 				}
 				else if (eStoreAs == INTEGER)
 				{
-					if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+					if (!GDGetToken(tr, szToken, INTEGER))
 					{
 						return(FALSE);
 					}
@@ -365,7 +364,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 				//
 				// Look ahead at the next token.
 				//
-				ttype = tr.PeekTokenType(szToken,sizeof(szToken));
+				ttype = tr.PeekTokenType(szToken);
 			}
 		}
 
@@ -377,7 +376,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			//
 			// Eat the ':'.
 			//
-			tr.NextToken(szToken, sizeof(szToken));
+			(void)tr.NextToken(szToken);
 
 			//
 			// Read the description.
@@ -397,7 +396,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			//
 			// Look ahead at the next token.
 			//
-			ttype = tr.PeekTokenType(szToken,sizeof(szToken));
+			ttype = tr.PeekTokenType(szToken);
 		}
 	}
 	else
@@ -448,14 +447,14 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 
 		while (1)
 		{
-			ttype = tr.PeekTokenType();
+			ttype = tr.PeekTokenType(nullptr, 0);
 			if (ttype != INTEGER)
 			{
 				break;
 			}
 
 			// store bitflag value
-			GDGetToken(tr, szToken, sizeof(szToken), INTEGER);
+			GDGetToken(tr, szToken, INTEGER);
 			// dimhotepus: Expect bitflag to be present.
 			if ( sscanf( szToken, "%lu", &ivi.iValue ) != 1 )
 			{
@@ -469,7 +468,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			}
 
 			// get description
-			if (!GDGetToken(tr, szToken, sizeof(szToken), STRING))
+			if (!GDGetToken(tr, szToken, STRING))
 			{
 				return FALSE;
 			}
@@ -482,7 +481,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			}
 
 			// get default setting
-			if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+			if (!GDGetToken(tr, szToken, INTEGER))
 			{
 				return FALSE;
 			}
@@ -508,14 +507,14 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 
 		while (1)
 		{
-			ttype = tr.PeekTokenType();
+			ttype = tr.PeekTokenType(nullptr, 0);
 			if ((ttype != INTEGER) && (ttype != STRING))
 			{
 				break;
 			}
 
 			// store choice value
-			GDGetToken(tr, szToken, sizeof(szToken), ttype);
+			GDGetToken(tr, szToken, ttype);
 			ivi.iValue = 0;
 			V_strcpy_safe(ivi.szValue, szToken);
 
@@ -526,7 +525,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			}
 
 			// get description
-			if (!GDGetToken(tr, szToken, sizeof(szToken), STRING))
+			if (!GDGetToken(tr, szToken, STRING))
 			{
 				return FALSE;
 			}
@@ -685,7 +684,8 @@ void GDinputvariable::ToKeyValue(MDkeyvalue *pkv)
 	}
 	else if (eStoreAs == INTEGER)
 	{
-		itoa(m_nValue, pkv->szValue, 10);
+		// dimhotepus: itoa -> V_to_chars.
+		V_to_chars(pkv->szValue, m_nValue, 10);
 	}
 }
 

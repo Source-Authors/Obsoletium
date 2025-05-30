@@ -80,7 +80,7 @@ private:
 // Instance singleton and expose interface to rest of code
 //-----------------------------------------------------------------------------
 static CCommandLine g_CmdLine;
-ICommandLine *CommandLine()
+ICommandLine *CommandLine_Tier0()
 {
 	return &g_CmdLine;
 }
@@ -155,7 +155,7 @@ void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, size_
 			*pDst++ = static_cast<char>( c );
 			
 			// Don't go past the end, and allow for our terminating space character AND a terminating null character.
-			if ( (pDst - pDestStart) >= ((ptrdiff_t)maxDestLen-2) )
+			if ( (pDst - pDestStart) >= ((intp)maxDestLen-2) )
 				break;
 
 			// Get the next character, if there are more
@@ -246,7 +246,7 @@ void CCommandLine::CreateCmdLine( const char *commandline )
 		}	
 		
 		// Don't go past the end.
-		if ( (pDst - szFull) >= (static_cast<ptrdiff_t>(sizeof( szFull )) - 1) )
+		if ( (pDst - szFull) >= (ssize( szFull ) - 1) )
 			break;
 
 		*pDst++ = *pSrc++;
@@ -366,9 +366,13 @@ void CCommandLine::RemoveParm( const char *pszParm )
 		}
 		else
 		{
-			// Clear out rest of string.
-			n = pnextparam - found;
-			memset( found, 0, n );
+			// dimhotepus: Handle nullptr.
+			if ( pnextparam )
+			{
+				// Clear out rest of string.
+				n = pnextparam - found;
+				memset( found, 0, n );
+			}
 		}
 	}
 	

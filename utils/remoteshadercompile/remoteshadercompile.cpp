@@ -18,6 +18,8 @@
 #include <thread>
 #include <vector>
 
+#include "tier0/memdbgon.h"
+
 namespace {
 
 constexpr inline int kDefaultSendBufferSize{40000};

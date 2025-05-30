@@ -337,7 +337,7 @@ void CDataModel::DisplayMemoryStats( )
 	}
 
 	// Sort
-	DmMemorySortInfo_t* pSortInfo = (DmMemorySortInfo_t*)_alloca( typeHistogram.Count() * sizeof(DmMemorySortInfo_t) );
+	DmMemorySortInfo_t* pSortInfo = stackallocT( DmMemorySortInfo_t, typeHistogram.Count() );
 	decltype(typeHistogram.FirstInorder()) nCount = 0;
 	for ( auto i = typeHistogram.FirstInorder(); typeHistogram.IsValidIndex( i ); i = typeHistogram.NextInorder( i ) )
 	{
@@ -614,7 +614,7 @@ bool CDataModel::SaveToFile( char const *pFileName, char const *pPathID, const c
 {
 	// NOTE: This guarantees full path names for pathids
 	char pFullPath[ MAX_PATH ];
-	if ( !GenerateFullPath( pFileName, pPathID, pFullPath, sizeof( pFullPath ) ) )
+	if ( !GenerateFullPath( pFileName, pPathID, pFullPath ) )
 	{
 		Warning( "CDataModel: Unable to generate full path for file %s\n", pFileName );
 		return false;
@@ -643,13 +643,13 @@ DmFileId_t CDataModel::RestoreFromFile( char const *pFileName, char const *pPath
 {
 	// NOTE: This guarantees full path names for pathids
 	char pFullPath[ MAX_PATH ];
-	if ( !GenerateFullPath( pFileName, pPathID, pFullPath, sizeof( pFullPath ) ) )
+	if ( !GenerateFullPath( pFileName, pPathID, pFullPath ) )
 	{
 		Warning( "CDataModel: Unable to generate full path for file %s\n", pFileName );
 		return DMFILEID_INVALID;
 	}
 
-	char *pTemp = (char*)_alloca( DMX_MAX_HEADER_LENGTH + 1 );
+	char *pTemp = stackallocT( char, DMX_MAX_HEADER_LENGTH + 1 );
 	CUtlBuffer typeBuf( pTemp, DMX_MAX_HEADER_LENGTH );
 	if ( !g_pFullFileSystem->ReadFile( pFullPath, pPathID, typeBuf, DMX_MAX_HEADER_LENGTH ) )
 	{
@@ -675,8 +675,8 @@ DmFileId_t CDataModel::RestoreFromFile( char const *pFileName, char const *pPath
 		}
 
 		// non-dmx file importers don't have versions or encodings, just formats
-		V_strncpy( pHeader->encodingName, pFormatHint, sizeof( pHeader->encodingName ) );
-		V_strncpy( pHeader->formatName,   pFormatHint, sizeof( pHeader->formatName ) );
+		V_strcpy_safe( pHeader->encodingName, pFormatHint );
+		V_strcpy_safe( pHeader->formatName,   pFormatHint );
 	}
 
 	bool bIsBinary = IsEncodingBinary( pHeader->encodingName );
@@ -786,7 +786,7 @@ bool CDataModel::ReadDMXHeader( CUtlBuffer &inBuf, DmxHeader_t *pHeader ) const
 	inBuf.SetBufferType( true, !bIsText || bHasCRLF );
 
 	char headerStr[ DMX_MAX_HEADER_LENGTH ];
-	bool bOk = inBuf.ParseToken( DMX_VERSION_STARTING_TOKEN, DMX_VERSION_ENDING_TOKEN, headerStr, sizeof( headerStr ) );
+	bool bOk = inBuf.ParseToken( DMX_VERSION_STARTING_TOKEN, DMX_VERSION_ENDING_TOKEN, headerStr );
 	if ( bOk )
 	{
 #ifdef _WIN32
@@ -794,9 +794,11 @@ bool CDataModel::ReadDMXHeader( CUtlBuffer &inBuf, DmxHeader_t *pHeader ) const
 			pHeader->encodingName, DMX_MAX_FORMAT_NAME_MAX_LENGTH, &( pHeader->nEncodingVersion ),
 			pHeader->formatName, DMX_MAX_FORMAT_NAME_MAX_LENGTH, &( pHeader->nFormatVersion ) );
 #else
-		int nAssigned = sscanf( headerStr, "encoding %s %d format %s %d\n",
+		int nAssigned = sscanf( headerStr, "encoding %63s %d format %63s %d\n",
 			pHeader->encodingName, &( pHeader->nEncodingVersion ),
 			pHeader->formatName, &( pHeader->nFormatVersion ) );
+		pHeader->encodingName[ssize(pHeader->encodingName) - 1] = '\0';
+		pHeader->formatName[ssize(pHeader->formatName) - 1] = '\0';
 #endif
 		bOk = nAssigned == 4;
 	}
@@ -804,7 +806,7 @@ bool CDataModel::ReadDMXHeader( CUtlBuffer &inBuf, DmxHeader_t *pHeader ) const
 	if ( !bOk )
 	{
 		inBuf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
-		bOk = inBuf.ParseToken( DMX_LEGACY_VERSION_STARTING_TOKEN, DMX_LEGACY_VERSION_ENDING_TOKEN, pHeader->formatName, DMX_MAX_FORMAT_NAME_MAX_LENGTH );
+		bOk = inBuf.ParseToken( DMX_LEGACY_VERSION_STARTING_TOKEN, DMX_LEGACY_VERSION_ENDING_TOKEN, pHeader->formatName );
 		if ( bOk )
 		{
 			const char *pEncoding = GetEncodingFromLegacyFormat( pHeader->formatName );
@@ -928,15 +930,15 @@ bool CDataModel::Unserialize( CUtlBuffer &inBuf, const char *pEncodingName, cons
 	if ( !m_bOnlyCreateUntypedElements && !bIsCurrentVersion )
 	{
 		char path[ 256 ];
-		V_ExtractFilePath( pFileName, path, sizeof( path ) );
+		V_ExtractFilePath( pFileName, path );
 
 		char tempFileName[ 256 ];
 		if ( !V_IsAbsolutePath( path ) )
 		{
-			g_pFullFileSystem->GetCurrentDirectory( path, sizeof( path ) );
+			g_pFullFileSystem->GetCurrentDirectory( path );
 		}
 
-		V_ComposeFileName( path, "_temp_conversion_file_.dmx", tempFileName, sizeof( tempFileName ) );
+		V_ComposeFileName( path, "_temp_conversion_file_.dmx", tempFileName );
 		V_RemoveDotSlashes( tempFileName );
 
 		const char *pDestEncodingName = "binary";
@@ -1846,9 +1848,8 @@ CDmElement* CDataModel::CreateElement( const DmElementReference_t &ref, const ch
 
 	// Create a new id if we weren't given one to use
 	DmObjectId_t newId;
-	if ( !pObjectID )
+	if ( !pObjectID && CreateUniqueId( &newId ) )
 	{
-		CreateUniqueId( &newId );
 		pObjectID = &newId;
 	}
 

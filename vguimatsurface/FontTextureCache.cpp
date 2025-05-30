@@ -128,7 +128,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 
 	if ( FontManager().IsBitmapFont( font ) )
 	{
-		const int MAX_BITMAP_CHARS = 256;
+		constexpr int MAX_BITMAP_CHARS = 256;
 		if ( numChars > MAX_BITMAP_CHARS )
 		{
 			// Increase MAX_BITMAP_CHARS

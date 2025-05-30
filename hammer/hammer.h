@@ -120,9 +120,9 @@ public:
 	virtual int Run(void);
 	//}}AFX_VIRTUAL
 
-	void GetDirectory(DirIndex_t dir, char *p, ptrdiff_t size);
-	template<ptrdiff_t dirSize>
-	void GetDirectory(DirIndex_t dir, char (&p)[dirSize])
+	void GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, intp size) const;
+	template<intp dirSize>
+	void GetDirectory(DirIndex_t dir, OUT_Z_ARRAY char (&p)[dirSize]) const
 	{
 		GetDirectory(dir, p, dirSize);
 	}

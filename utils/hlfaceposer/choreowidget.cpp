@@ -4,7 +4,6 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
 #include "choreowidget.h"
 #include "choreoview.h"
 
@@ -33,7 +32,7 @@ void CChoreoWidget::operator delete( void *pMem )
 {
 	widgets--;
 	// set the memory to a known value
-	int size = _msize( pMem );
+	size_t size = _msize( pMem );
 	memset( pMem, 0xfe, size );
 
 	// get the engine to free the memory

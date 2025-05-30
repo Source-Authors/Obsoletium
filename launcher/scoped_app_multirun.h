@@ -172,7 +172,11 @@ class ScopedAppMultiRun {
     if (lock_handle_ != -1) {
       close(lock_handle_);
       lock_handle_ = -1;
-      unlink(lock_file_name_);
+
+      if (unlink(lock_file_name_)) {
+        Warning("Unable to remove lock file '%s': %s.\n", lock_file_name_,
+                std::generic_category().message(errno).c_str());
+      }
     }
 #endif
   }

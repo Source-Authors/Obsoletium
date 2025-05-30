@@ -93,7 +93,7 @@ static void BlendFlexValues( AttributeValue_t *pResult, const AttributeValue_t &
 //-----------------------------------------------------------------------------
 class CAttributeSliderTextEntry : public TextEntry
 {
-	DECLARE_CLASS_SIMPLE( CAttributeSliderTextEntry, TextEntry );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeSliderTextEntry, TextEntry );
 
 public:
 	CAttributeSliderTextEntry( CAttributeSlider *slider, const char *panelName ) :
@@ -103,7 +103,7 @@ public:
 	}
 
 	MESSAGE_FUNC_PARAMS( OnKillFocus, "KillFocus", kv );
-	virtual void OnMouseWheeled( int delta );
+	void OnMouseWheeled( int delta ) override;
 
 private:
 	CAttributeSlider *m_pSlider;
@@ -125,16 +125,16 @@ CAttributeSlider::CAttributeSlider( CBaseAnimSetAttributeSliderPanel *parent, co
 	BaseClass( (Panel *)parent, panelName ), 
 	m_pParent( parent ),
 	m_pWhite( NULL ),
+	m_pRightTextField( 0 ),
+	m_flPreviewGoalTime( -1.0f ),
+	m_flFaderAmount( 1.0f ),
+	m_bCursorInsidePanel( false ),
+	m_bRampUp( false ),
 	m_bPreviewEnabled( false ),
 	m_bSimplePreviewOnly( true ),
-	m_bCursorInsidePanel( false ),
-	m_flPreviewGoalTime( -1.0f ),
-	m_bRampUp( false ),
 	m_bFaderBeingDragged( false ),
-	m_flFaderAmount( 1.0f ),
 	m_bIsLogPreviewControl( false ),
-	m_bSelected( false ),
-	m_pRightTextField( 0 )
+	m_bSelected( false )
 {
 	m_SliderMode = SLIDER_MODE_NONE;
 	m_hControl = pControl;
@@ -303,8 +303,9 @@ float CAttributeSlider::GetControlDefaultValue( AnimationControlType_t type ) co
 		return m_hControl->GetValue<float>( "defaultBalance" );
 	case ANIM_CONTROL_MULTILEVEL:
 		return m_hControl->GetValue<float>( "defaultMultilevel" );
+	default:
+		return 0.0f;
 	}
-	return 0.0f;
 }
 
 
@@ -921,6 +922,11 @@ void CAttributeSlider::GetControlRect( Rect_t *pRect, AnimationControlType_t typ
 		pRect->width = cw;
 		pRect->height = min( ch, sh );
 		break;
+
+	// dimhotepus: Assert on unknown type.
+	default:
+		AssertMsg(false, "Unsupported animation control type %d.", type);
+		break;
 	}
 }
 
@@ -1162,7 +1168,8 @@ void CAttributeSlider::PaintCircularControl( float flValue, const Rect_t& rect )
 	float frac = 0.0f;
 	float step = 180.0f / (float)( maxTrianges );
 	float ang = 0.0f;
-	float clamp = 360.0f;
+	// dimhotepus: Comment unused var.
+	//float clamp = 360.0f;
 	int numTriangles = 0;
 	float radius = CIRCULAR_CONTROL_RADIUS;
 
@@ -1179,7 +1186,7 @@ void CAttributeSlider::PaintCircularControl( float flValue, const Rect_t& rect )
 	{
 		frac = 1.0f - ( flValue / 0.5f );
 		numTriangles = (int)( frac * ( maxTrianges ) + 0.5f );
-		clamp = 180.0f;
+		//clamp = 180.0f;
 		step = -step;
 		ang = 360.0f;
 	}
@@ -1187,7 +1194,7 @@ void CAttributeSlider::PaintCircularControl( float flValue, const Rect_t& rect )
 	{
 		frac = ( flValue - 0.5f ) / 0.5f;
 		numTriangles = (int)( frac * ( maxTrianges ) + 0.5f );
-		clamp = 180.0f;
+		//clamp = 180.0f;
 	}
 
 	if ( numTriangles == 0 )

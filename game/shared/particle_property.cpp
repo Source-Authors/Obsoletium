@@ -134,7 +134,7 @@ CNewParticleEffect *CParticleProperty::Create( const char *pszParticleName, Part
 	bool bRequestedBatch = ( nBatchMode == 2 ) || ( ( nBatchMode == 1 ) && pDef && pDef->ShouldBatch() ); 
 	if ( ( iAttachType == PATTACH_CUSTOMORIGIN ) && bRequestedBatch )
 	{
-		int iIndex = FindEffect( pszParticleName );
+		intp iIndex = FindEffect( pszParticleName );
 		if ( iIndex >= 0 )
 		{
 			CNewParticleEffect *pEffect = m_ParticleEffects[iIndex].pParticleEffect.GetObject();
@@ -182,7 +182,7 @@ void CParticleProperty::AddControlPoint( CNewParticleEffect *pEffect, int iPoint
 		iAttachment = GetParticleAttachment( pEntity, pszAttachmentName, pEffect->GetEffectName() );
 	}
 
-	for ( int i = 0; i < m_ParticleEffects.Count(); i++ )
+	for ( intp i = 0; i < m_ParticleEffects.Count(); i++ )
 	{
 		if ( m_ParticleEffects[i].pParticleEffect == pEffect )
 		{
@@ -194,7 +194,7 @@ void CParticleProperty::AddControlPoint( CNewParticleEffect *pEffect, int iPoint
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CParticleProperty::AddControlPoint( int iEffectIndex, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, int iAttachmentPoint, Vector vecOriginOffset )
+void CParticleProperty::AddControlPoint( intp iEffectIndex, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, int iAttachmentPoint, Vector vecOriginOffset )
 {
 	Assert( iEffectIndex >= 0 && iEffectIndex < m_ParticleEffects.Count() );
 	ParticleEffectList_t *pEffect = &m_ParticleEffects[iEffectIndex];
@@ -232,8 +232,8 @@ void CParticleProperty::AddControlPoint( int iEffectIndex, int iPoint, C_BaseEnt
 //-----------------------------------------------------------------------------
 void CParticleProperty::ReplaceParticleEffect( CNewParticleEffect *pOldEffect, CNewParticleEffect *pNewEffect )
 {
-	int nCount = m_ParticleEffects.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleEffects.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pOldEffect != m_ParticleEffects[i].pParticleEffect.GetObject() )
 			continue;
@@ -248,7 +248,7 @@ void CParticleProperty::ReplaceParticleEffect( CNewParticleEffect *pOldEffect, C
 // Purpose: Set the parent of a given control point to the index of some other
 //			control point.
 //-----------------------------------------------------------------------------
-void CParticleProperty::SetControlPointParent( int iEffectIndex, int whichControlPoint, int parentIdx )
+void CParticleProperty::SetControlPointParent( intp iEffectIndex, int whichControlPoint, int parentIdx )
 {
 
 }
@@ -274,8 +274,8 @@ void CParticleProperty::StopEmission( CNewParticleEffect *pEffect, bool bWakeOnS
 	{
 		// Stop all effects
 		float flNow = g_pParticleSystemMgr->GetLastSimulationTime();
-		int nCount = m_ParticleEffects.Count();
-		for ( int i = nCount-1; i >= 0; i-- )
+		intp nCount = m_ParticleEffects.Count();
+		for ( intp i = nCount-1; i >= 0; i-- )
 		{
 			CNewParticleEffect *pTmp = m_ParticleEffects[i].pParticleEffect.GetObject();
 			bool bRemoveSystem = bRemoveInstantly || ( bDestroyAsleepSystems && ( flNow >= pTmp->m_flNextSleepTime ) );
@@ -297,7 +297,7 @@ void CParticleProperty::StopEmissionAndDestroyImmediately( CNewParticleEffect *p
 {
 	if ( pEffect )
 	{
-		int iIndex = FindEffect( pEffect );
+		intp iIndex = FindEffect( pEffect );
 		//Assert( iIndex != -1 );
 		if ( iIndex != -1 )
 		{
@@ -311,8 +311,8 @@ void CParticleProperty::StopEmissionAndDestroyImmediately( CNewParticleEffect *p
 	else
 	{
 		// Immediately destroy all effects
-		int nCount = m_ParticleEffects.Count();
-		for ( int i = nCount-1; i >= 0; i-- )
+		intp nCount = m_ParticleEffects.Count();
+		for ( intp i = nCount-1; i >= 0; i-- )
 		{
 			CNewParticleEffect *pTmp = m_ParticleEffects[i].pParticleEffect.GetObject();
 			m_ParticleEffects.Remove( i );
@@ -338,14 +338,14 @@ void CParticleProperty::StopParticlesInvolving( CBaseEntity *pEntity )
 	// we should have died while dormant. Remove ourselves immediately.
 	bool bRemoveInstantly = (m_iDormancyChangedAtFrame == gpGlobals->framecount);
 	
-	int nCount = m_ParticleEffects.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleEffects.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// for each effect...
 		ParticleEffectList_t &part = m_ParticleEffects[i];
 		// look through all the control points to see if any mention the given object
-		int cpCount = part.pControlPoints.Count();
-		for (int j = 0; j < cpCount ; ++j )
+		intp cpCount = part.pControlPoints.Count();
+		for (intp j = 0; j < cpCount ; ++j )
 		{
 			// if any control points respond to the given handle...
 			if (part.pControlPoints[j].hEntity == entHandle)
@@ -382,8 +382,8 @@ void CParticleProperty::StopParticlesNamed( const char *pszEffectName, bool bFor
 	// force remove particles instantly if caller specified
 	bRemoveInstantly |= bForceRemoveInstantly;
 
-	int nCount = m_ParticleEffects.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleEffects.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// for each effect...
 		CNewParticleEffect *pParticleEffect = m_ParticleEffects[i].pParticleEffect.GetObject();
@@ -410,16 +410,16 @@ void CParticleProperty::StopParticlesWithNameAndAttachment( const char *pszEffec
 	// force remove particles instantly if caller specified
 	bRemoveInstantly |= bForceRemoveInstantly;
 
-	int nCount = m_ParticleEffects.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleEffects.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// for each effect...
 		ParticleEffectList_t *pParticleEffectList = &m_ParticleEffects[i];
 		CNewParticleEffect *pParticleEffect = pParticleEffectList->pParticleEffect.GetObject();
 		if (pParticleEffect->m_pDef() == pDef)
 		{
-			int nControlPointCount = pParticleEffectList->pControlPoints.Count();
-			for ( int j = 0; j < nControlPointCount; ++j )
+			intp nControlPointCount = pParticleEffectList->pControlPoints.Count();
+			for ( intp j = 0; j < nControlPointCount; ++j )
 			{
 				if ( pParticleEffectList->pControlPoints[j].iAttachmentPoint == iAttachmentPoint )
 				{
@@ -436,7 +436,7 @@ void CParticleProperty::StopParticlesWithNameAndAttachment( const char *pszEffec
 //-----------------------------------------------------------------------------
 void CParticleProperty::OnParticleSystemUpdated( CNewParticleEffect *pEffect, float flTimeDelta )
 {
-	int iIndex = FindEffect( pEffect );
+	intp iIndex = FindEffect( pEffect );
 	Assert( iIndex != -1 );
 	if ( iIndex == -1 )
 		return;
@@ -460,7 +460,7 @@ void CParticleProperty::OnParticleSystemUpdated( CNewParticleEffect *pEffect, fl
 //-----------------------------------------------------------------------------
 void CParticleProperty::OnParticleSystemDeleted( CNewParticleEffect *pEffect )
 {
-	int iIndex = FindEffect( pEffect );
+	intp iIndex = FindEffect( pEffect );
 	if ( iIndex == -1 )
 		return;
 
@@ -476,8 +476,8 @@ void CParticleProperty::OwnerSetDormantTo( bool bDormant )
 {
 	m_iDormancyChangedAtFrame = gpGlobals->framecount;
 
-	int nCount = m_ParticleEffects.Count();
-	for ( int i = 0; i < nCount; i++ )
+	intp nCount = m_ParticleEffects.Count();
+	for ( intp i = 0; i < nCount; i++ )
 	{
 		//m_ParticleEffects[i].pParticleEffect->SetShouldSimulate( !bDormant );
 		m_ParticleEffects[i].pParticleEffect->SetDormant( bDormant );
@@ -488,9 +488,9 @@ void CParticleProperty::OwnerSetDormantTo( bool bDormant )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CParticleProperty::FindEffect( CNewParticleEffect *pEffect )
+intp	CParticleProperty::FindEffect( CNewParticleEffect *pEffect )
 {
-	for ( int i = 0; i < m_ParticleEffects.Count(); i++ )
+	for ( intp i = 0; i < m_ParticleEffects.Count(); i++ )
 	{
 		if ( m_ParticleEffects[i].pParticleEffect == pEffect )
 			return i;
@@ -499,9 +499,9 @@ int	CParticleProperty::FindEffect( CNewParticleEffect *pEffect )
 	return -1;
 }
 
-int CParticleProperty::FindEffect( const char *pEffectName, int nStart /*= 0*/ )
+intp CParticleProperty::FindEffect( const char *pEffectName, intp nStart /*= 0*/ )
 {
-	for ( int i = nStart; i < m_ParticleEffects.Count(); i++ )
+	for ( intp i = nStart; i < m_ParticleEffects.Count(); i++ )
 	{
 		if ( !Q_stricmp( m_ParticleEffects[i].pParticleEffect->GetName(), pEffectName ) )
 			return i;
@@ -514,7 +514,7 @@ int CParticleProperty::FindEffect( const char *pEffectName, int nStart /*= 0*/ )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CParticleProperty::UpdateParticleEffect( ParticleEffectList_t *pEffect, bool bInitializing, int iOnlyThisControlPoint )
+void CParticleProperty::UpdateParticleEffect( ParticleEffectList_t *pEffect, bool bInitializing, intp iOnlyThisControlPoint )
 {
 	if ( iOnlyThisControlPoint != -1 )
 	{
@@ -523,7 +523,7 @@ void CParticleProperty::UpdateParticleEffect( ParticleEffectList_t *pEffect, boo
 	}
 
 	// Loop through our control points and update them all
-	for ( int i = 0; i < pEffect->pControlPoints.Count(); i++ )
+	for ( intp i = 0; i < pEffect->pControlPoints.Count(); i++ )
 	{
 		UpdateControlPoint( pEffect, i, bInitializing );
 	}
@@ -534,7 +534,7 @@ extern void FormatViewModelAttachment( Vector &vOrigin, bool bInverse );
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int iPoint, bool bInitializing )
+void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, intp iPoint, bool bInitializing )
 {
 	ParticleControlPoint_t *pPoint = &pEffect->pControlPoints[iPoint];
 
@@ -680,8 +680,8 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 //-----------------------------------------------------------------------------
 void CParticleProperty::DebugPrintEffects( void )
 {
-	int nCount = m_ParticleEffects.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleEffects.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// for each effect...
 		CNewParticleEffect *pParticleEffect = m_ParticleEffects[i].pParticleEffect.GetObject();
@@ -689,7 +689,7 @@ void CParticleProperty::DebugPrintEffects( void )
 		if ( !pParticleEffect )
 			continue;
 	
-		Msg( "(%d)  EffectName \"%s\"  Dormant? %s  Emission Stopped? %s \n",
+		Msg( "(%zd)  EffectName \"%s\"  Dormant? %s  Emission Stopped? %s \n",
 			i,
 			pParticleEffect->GetEffectName(),
 			( pParticleEffect->m_bDormant ) ? "yes" : "no",

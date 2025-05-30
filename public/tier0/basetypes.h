@@ -7,7 +7,8 @@
 #include "tier0/wchartypes.h"
 
 #include <cstdint>
-#include <limits>  // std::numeric_limits
+#include <cstddef>  // std::ptrdiff_t
+#include <limits>   // std::numeric_limits
 
 #include "tier0/valve_off.h"
 
@@ -29,11 +30,6 @@
 #define XBOX_CODELINE_ONLY() Error_Compiling_Code_Only_Valid_in_Xbox_Codeline
 #endif
 
-// cstdio
-#ifndef NULL
-#define NULL 0
-#endif
-
 #define ExecuteNTimes( nTimes, x )	   \
 	{								   \
 		static int executeCount__{0};  \
@@ -48,7 +44,14 @@
 template <typename T>
 [[nodiscard]] constexpr inline T AlignValue( T val, uintptr_t alignment )
 {
-	return (T)( ( (uintptr_t)val + alignment - 1 ) & ~( alignment - 1 ) );
+	if constexpr (std::is_pointer_v<T>)
+	{
+		return reinterpret_cast<T>( ( reinterpret_cast<uintptr_t>(val) + alignment - 1 ) & ~( alignment - 1 ) );
+	}
+	else
+	{
+		return static_cast<T>( ( static_cast<uintptr_t>(val) + alignment - 1 ) & ~( alignment - 1 ) );
+	}
 }
 
 
@@ -138,6 +141,24 @@ template< typename T >
 #define TRUE (!FALSE)
 #endif
 
+using int8 = int8_t;
+using uint8 = uint8_t;
+
+using int16 = int16_t;
+using uint16 = uint16_t;
+
+using int32 = int32_t;
+using uint32 = uint32_t;
+
+using int64 = int64_t;
+using uint64 = uint64_t;
+
+// intp is an integer that can accomodate a pointer
+// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
+using intp = std::ptrdiff_t;
+// uintp is an unsigned integer that can accomodate a pointer
+// (ie, sizeof(uintp) >= sizeof(unsigned int) && sizeof(uintp) >= sizeof(void *)
+using uintp = std::size_t;
 
 #ifndef DONT_DEFINE_BOOL // Needed for Cocoa stuff to compile.
 using BOOL = int;
@@ -397,11 +418,11 @@ protected:
 	inline Type  operator^  ( Type  a, Type b ) { return static_cast<Type>( to_underlying( a ) ^ to_underlying( b ) ); } \
 	inline Type  operator<< ( Type  a, int  b ) { return static_cast<Type>( to_underlying( a ) << b ); } \
 	inline Type  operator>> ( Type  a, int  b ) { return static_cast<Type>( to_underlying( a ) >> b ); } \
-	inline Type &operator|= ( Type &a, Type b ) { return a = a |  b; } \
-	inline Type &operator&= ( Type &a, Type b ) { return a = a &  b; } \
-	inline Type &operator^= ( Type &a, Type b ) { return a = a ^  b; } \
-	inline Type &operator<<=( Type &a, int  b ) { return a = a << b; } \
-	inline Type &operator>>=( Type &a, int  b ) { return a = a >> b; } \
+	inline Type &operator|= ( Type &a, Type b ) { return a = static_cast<Type>( to_underlying( a ) |  to_underlying( b ) ); } \
+	inline Type &operator&= ( Type &a, Type b ) { return a = static_cast<Type>( to_underlying( a ) &  to_underlying( b ) ); } \
+	inline Type &operator^= ( Type &a, Type b ) { return a = static_cast<Type>( to_underlying( a ) ^  to_underlying( b ) ); } \
+	inline Type &operator<<=( Type &a, int  b ) { return a = static_cast<Type>( to_underlying( a ) << b ); } \
+	inline Type &operator>>=( Type &a, int  b ) { return a = static_cast<Type>( to_underlying( a ) >> b ); } \
 	inline Type  operator~( Type a ) { return static_cast<Type>( ~to_underlying( a ) ); }
 
 // defines increment/decrement operators for enums for easy iteration

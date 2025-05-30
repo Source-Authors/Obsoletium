@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "mathlib/mathlib.h"
+#include "bitmap/float_bm.h"
 #include "bitmap/tgawriter.h"
 #include "vtf/vtf.h"
 
@@ -26,39 +27,9 @@
 #include "../common/tools_minidump.h"
 #include "posix_file_stream.h"
 
+#include "tier0/memdbgon.h"
+
 namespace {
-
-// HDRFIXME: move this somewhere else.
-bool PFMWrite(float *img, const char *file_path, int width, int height) {
-  // dimhotepus: Use RAII FILE wrapper.
-  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "wb");
-  if (errc) {
-    Warning("Unable to open '%s' for writing: %s.\n", file_path,
-            errc.message().c_str());
-    return false;
-  }
-
-  std::tie(std::ignore, errc) =
-      f.print("PF\n%d %d\n-1.000000\n", width, height);
-  if (errc) {
-    Warning("Unable to write header to '%s': %s.\n", file_path,
-            errc.message().c_str());
-    return false;
-  }
-
-  for (int i = height - 1; i >= 0; i--) {
-    float *row = &img[3 * width * i];
-
-    std::tie(std::ignore, errc) = f.write(row, width * sizeof(float) * 3, 1);
-    if (errc) {
-      Warning("Unable to write row to '%s': %s.\n", file_path,
-              errc.message().c_str());
-      return false;
-    }
-  }
-
-  return true;
-}
 
 SpewRetval_t VTF2TGAOutputFunc(SpewType_t spewType, char const *pMsg) {
   if (spewType == SPEW_ERROR || spewType == SPEW_WARNING) {
@@ -91,7 +62,7 @@ int main(int argc, char **argv) {
 
   CommandLine()->CreateCmdLine(argc, argv);
   MathLib_Init(2.2f, 2.2f, 0.0f, 1, false, false, false, false);
-  InitDefaultFileSystem();
+  const ScopedDefaultFileSystem scoped_default_file_system;
 
   const char *vtf_file_name{CommandLine()->ParmValue("-i")};
   const char *tga_file_name{CommandLine()->ParmValue("-o")};
@@ -106,18 +77,18 @@ int main(int argc, char **argv) {
             std::generic_category().message(errno).c_str());
     return 1;
   }
-  Q_StripTrailingSlash(cwd);
+  V_StripTrailingSlash(cwd);
 
   char buffer[MAX_PATH];
-  if (!Q_IsAbsolutePath(tga_file_name)) {
+  if (!V_IsAbsolutePath(tga_file_name)) {
     V_sprintf_safe(buffer, "%s\\%s", cwd, tga_file_name);
   } else {
     V_strcpy_safe(buffer, tga_file_name);
   }
-  Q_FixSlashes(buffer);
+  V_FixSlashes(buffer);
 
   char out_file_base[MAX_PATH];
-  Q_StripExtension(buffer, out_file_base, MAX_PATH);
+  V_StripExtension(buffer, out_file_base);
 
   char actual_vtf_file_name[MAX_PATH];
   V_strcpy_safe(actual_vtf_file_name, vtf_file_name);
@@ -135,17 +106,20 @@ int main(int argc, char **argv) {
 
   int64 size;
   std::tie(size, errc) = f.size();
-  if (errc) {
+  if (errc || size > std::numeric_limits<intp>::max()) {
     Error("Unable to get size of '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
     exit(errc.value());
   }
 
+  intp correct_size = static_cast<intp>(size);
+
   CUtlBuffer vtf_buffer;
-  vtf_buffer.EnsureCapacity(size);
+  vtf_buffer.EnsureCapacity(correct_size);
 
   size_t bytes_read;
-  std::tie(bytes_read, errc) = f.read(vtf_buffer.Base(), size, 1, size);
+  std::tie(bytes_read, errc) =
+      f.read(vtf_buffer.Base(), correct_size, 1, correct_size);
   if (errc) {
     Error("Unable to read '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
@@ -235,7 +209,7 @@ int main(int argc, char **argv) {
           // Construct output filename
           std::unique_ptr<char[]> temp_name =
               std::make_unique<char[]>(tga_name_size + 13);
-          Q_strncpy(temp_name.get(), out_file_base, tga_name_size + 1);
+          V_strncpy(temp_name.get(), out_file_base, tga_name_size + 1);
 
           char *ext = Q_strrchr(temp_name.get(), '.');
           if (ext) ext = 0;
@@ -243,33 +217,31 @@ int main(int argc, char **argv) {
           if (src_is_cubemap) {
             Assert(pTex->Depth() == 1);  // shouldn't this be 1 instead of 0?
 
-            Q_strcat(temp_name.get(), cube_face_names[cube_face_no],
+            V_strcat(temp_name.get(), cube_face_names[cube_face_no],
                      tga_name_size + 13);
           }
 
           if (src_frame_count > 1) {
             char pTemp[4];
             V_sprintf_safe(pTemp, "%03d", frame_no);
-            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+            V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
 
           if (last_mip_level != 0) {
             char pTemp[8];
             V_sprintf_safe(pTemp, "_mip%d", mip_level_no);
-            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+            V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
 
           if (pTex->Depth() > 1) {
             char pTemp[6];
             V_sprintf_safe(pTemp, "_z%03d", z);
-            Q_strcat(temp_name.get(), pTemp, tga_name_size + 13);
+            V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
 
-          if (src_format == IMAGE_FORMAT_RGBA16161616F) {
-            Q_strcat(temp_name.get(), ".pfm", tga_name_size + 13);
-          } else {
-            Q_strcat(temp_name.get(), ".tga", tga_name_size + 13);
-          }
+          V_strcat(temp_name.get(),
+                   src_format == IMAGE_FORMAT_RGBA16161616F ? ".pfm" : ".tga",
+                   tga_name_size + 13);
 
           unsigned char *src_data =
               pTex->ImageData(frame_no, cube_face_no, mip_level_no, 0, 0, z);
@@ -297,7 +269,7 @@ int main(int argc, char **argv) {
           std::unique_ptr<unsigned char[]> dst_data =
               std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired(
                   mip_width, mip_height, 1, dst_format, false));
-          if (!ImageLoader::ConvertImageFormat(src_data, src_format,
+          if (!ImageLoader::ConvertImageFormat(src_data, src_format, //-V1051
                                                dst_data.get(), dst_format,
                                                mip_width, mip_height, 0, 0)) {
             Error("Error converting '%s' from '%s' to '%s'.\n",
@@ -348,26 +320,24 @@ int main(int argc, char **argv) {
                                           mip_height, dst_format, dst_format)) {
               Error("Unable to write TGA in format '%s'.\n",
                     ImageLoader::GetName(dst_format));
-              exit(-1);
+              return EIO;
             }
 
             if (!g_pFullFileSystem->WriteFile(temp_name.get(), nullptr,
                                               outBuffer)) {
               Error("Unable to write result '%s'.\n", temp_name.get());
-              exit(-1);
+              return EIO;
             }
           } else {
             if (!PFMWrite((float *)dst_data.get(), temp_name.get(), mip_width,
                           mip_height)) {
-              exit(-1);
+              return EIO;
             }
           }
         }
       }
     }
   }
-
-  ShutdownDefaultFileSystem();
 
   return 0;
 }

@@ -80,7 +80,7 @@ void CreateWorldVertexTransitionPatchedMaterial( const char *pOriginalMaterialNa
 	}
 }
 
-int CreateBrushVersionOfWorldVertexTransitionMaterial( int originalTexInfo )
+intp CreateBrushVersionOfWorldVertexTransitionMaterial( int originalTexInfo )
 {
 	// Don't make cubemap tex infos for nodes
 	if ( originalTexInfo == TEXINFO_NODE )
@@ -116,7 +116,7 @@ int CreateBrushVersionOfWorldVertexTransitionMaterial( int originalTexInfo )
 	newTexInfo = *pTexInfo;
 	newTexInfo.texdata = nTexDataID;
 
-	int nTexInfoID = -1;
+	intp nTexInfoID = -1;
 
 	// See if we need to make a new texinfo
 	bool bHasTexInfo = false;

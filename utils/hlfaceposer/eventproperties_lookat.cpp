@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <mxtk/mx.h>
-#include <stdio.h>
-#include "resource.h"
+#include "eventproperties_lookat.h"
 #include "EventProperties.h"
+#include <mxtk/mx.h>
+#include "resource.h"
 #include "mdlviewer.h"
 #include <commctrl.h>
 
@@ -200,9 +200,11 @@ BOOL CEventPropertiesLookAtDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARA
 
 				char szTime[ 32 ];
 				GetDlgItemText( m_hDialog, IDC_STARTTIME, szTime, sizeof( szTime ) );
-				g_Params.m_flStartTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flStartTime = strtof( szTime, nullptr );
 				GetDlgItemText( m_hDialog, IDC_ENDTIME, szTime, sizeof( szTime ) );
-				g_Params.m_flEndTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flEndTime = strtof( szTime, nullptr );
 
 				// Parse tokens from tags
 				ParseTags( &g_Params );
@@ -280,8 +282,8 @@ BOOL CEventPropertiesLookAtDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARA
 			if ( control == GetControl( IDC_SLIDER_YAW ) ||
 				 control == GetControl( IDC_SLIDER_PITCH ) )
 			{
-				g_Params.yaw = (float)SendMessage( GetControl( IDC_SLIDER_YAW ), TBM_GETPOS, 0, 0 );
-				g_Params.pitch = (float)SendMessage( GetControl( IDC_SLIDER_PITCH ), TBM_GETPOS, 0, 0 );
+				g_Params.yaw = (int)SendMessage( GetControl( IDC_SLIDER_YAW ), TBM_GETPOS, 0, 0 );
+				g_Params.pitch = (int)SendMessage( GetControl( IDC_SLIDER_PITCH ), TBM_GETPOS, 0, 0 );
 
 				SetPitchYawText( &g_Params );
 
@@ -312,11 +314,11 @@ BOOL CEventPropertiesLookAtDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARA
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int EventProperties_LookAt( CEventParams *params )
+intp EventProperties_LookAt( CEventParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_EVENTPROPERTIES_LOOKAT ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)EventPropertiesLookAtDialogProc );

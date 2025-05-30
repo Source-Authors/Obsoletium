@@ -10,9 +10,6 @@
 #pragma once
 #endif
 
-#include <ctype.h>
-#include <float.h>
-#include <windows.h>
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 
 #define CONSOLE_COLOR RGB( 82, 173, 216 )
@@ -30,6 +27,8 @@ char *va( PRINTF_FORMAT_STRING const char *fmt, ... );
 
 char const *GetGameDirectory(); // e.g. u:\main\game\ep2
 char const *GetGameDirectorySimple();  // e.g.  ep2
+
+using COLORREF = unsigned long;
 
 void Con_Printf( PRINTF_FORMAT_STRING const char *fmt, ... );
 void Con_ColorPrintf( COLORREF clr, PRINTF_FORMAT_STRING const char *fmt, ... );

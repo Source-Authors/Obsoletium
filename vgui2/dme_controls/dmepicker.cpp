@@ -4,14 +4,14 @@
 //
 //=============================================================================
 
-#include "dme_controls/DmePicker.h"
+#include "dme_controls/dmepicker.h"
 #include "tier1/KeyValues.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/ListPanel.h"
 #include "vgui_controls/Button.h"
 #include "datamodel/dmelement.h"
 #include "vgui/ISurface.h"
-#include "vgui/iinput.h"
+#include "vgui/IInput.h"
 #include "dme_controls/dmecontrols_utils.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

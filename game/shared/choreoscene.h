@@ -31,8 +31,8 @@ class IChoreoStringPool;
 #define MIN_SCENE_FPS		10
 #define MAX_SCENE_FPS		240
 
-#define SCENE_BINARY_TAG		MAKEID( 'b', 'v', 'c', 'd' )
-#define SCENE_BINARY_VERSION	0x04
+constexpr inline int SCENE_BINARY_TAG{MAKEID( 'b', 'v', 'c', 'd' )};
+constexpr inline int SCENE_BINARY_VERSION{0x04};
 
 //-----------------------------------------------------------------------------
 // Purpose: Container for choreographed scene of events for actors
@@ -149,7 +149,7 @@ public:
 	intp			FindActorIndex( CChoreoActor *actor );
 
 	// Swap actors in the data
-	void			SwapActors( int a1, int a2 );
+	void			SwapActors( intp a1, intp a2 );
 
 	// General data access
 	intp			GetNumEvents() const;
@@ -202,9 +202,9 @@ public:
 	float			SnapTime( float t );
 
 	intp				GetSceneRampCount( void ) const { return m_SceneRamp.GetCount(); };
-	CExpressionSample *GetSceneRamp( int index ) { return m_SceneRamp.Get( index ); };
+	CExpressionSample *GetSceneRamp( intp index ) { return m_SceneRamp.Get( index ); };
 	CExpressionSample *AddSceneRamp( float time, float value, bool selected ) { return m_SceneRamp.Add( time, value, selected ); };
-	void			DeleteSceneRamp( int index ) { m_SceneRamp.Delete( index ); };
+	void			DeleteSceneRamp( intp index ) { m_SceneRamp.Delete( index ); };
 	void			ClearSceneRamp( void ) { m_SceneRamp.Clear(); };
 	void			ResortSceneRamp( void ) { m_SceneRamp.Resort( this ); };
 
@@ -395,7 +395,13 @@ abstract_class IChoreoStringPool
 {
 public:
 	virtual short	FindOrAddString( const char *pString ) = 0;
-	virtual bool	GetString( short stringId, char *buff, intp buffSize ) = 0; 	
+	virtual bool	GetString( short stringId, OUT_Z_CAP(buffSize) char *buff, intp buffSize ) = 0;
+
+	template<intp buffSize>
+	bool GetString( short stringId, OUT_Z_ARRAY char (&buff)[buffSize] )
+	{
+		return GetString( stringId, buff, buffSize );
+	}
 };
 
 CChoreoScene *ChoreoLoadScene( 

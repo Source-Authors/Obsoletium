@@ -71,8 +71,8 @@ static int s_DefaultQualityPreset = 1;
 
 //-----------------------------------------------------------------------------
 
-static const int s_QualityRange = 4;
-static const int s_QualityInterval = 100 / s_QualityRange;
+static constexpr inline int s_QualityRange = 4;
+static constexpr inline int s_QualityInterval = 100 / s_QualityRange;
 
 //-----------------------------------------------------------------------------
 

@@ -317,7 +317,7 @@ CPhysCollide *CPhysCollide::UnserializeFromBuffer( const char *pBuffer, unsigned
 		switch( pHeader->modelType )
 		{
 		case COLLIDE_POLY:
-			return new CPhysCollideCompactSurface( (compactsurfaceheader_t *)pHeader, index, swap );
+			return new CPhysCollideCompactSurface( (const compactsurfaceheader_t *)pHeader, index, swap );
 		case COLLIDE_MOPP:
 #if ENABLE_IVP_MOPP
 			return new CPhysCollideMopp( (moppheader_t *)pHeader );
@@ -796,7 +796,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	IVP_Compact_Ledge *pLedge = (IVP_Compact_Ledge *)pConvex;
 	int iTriangles = pLedge->get_n_triangles();
 
-	PolyhedronMesh_Triangle *pTriangles = (PolyhedronMesh_Triangle *)stackalloc( iTriangles * sizeof( PolyhedronMesh_Triangle ) );
+	PolyhedronMesh_Triangle *pTriangles = stackallocT( PolyhedronMesh_Triangle, iTriangles );
 	
 	int iHighestPointIndex = 0;
 	const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle();
@@ -820,7 +820,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	++iHighestPointIndex;
 
 	//apparently points might be shared between ledges and not all points will be used. So now we get to compress them into a smaller set
-	int *pPointRemapping = (int *)stackalloc( iHighestPointIndex * sizeof( int ) );
+	int *pPointRemapping = stackallocT( int, iHighestPointIndex );
 	memset( pPointRemapping, 0, iHighestPointIndex * sizeof( int ) );
 	for( int i = 0; i != iTriangles; ++i )
 	{
@@ -855,7 +855,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	}
 	
 
-	bool *bLinks = (bool *)stackalloc( iNumPoints * iNumPoints * sizeof( bool ) );
+	bool *bLinks = stackallocT( bool, iNumPoints * iNumPoints );
 	memset( bLinks, 0, iNumPoints * iNumPoints * sizeof( bool ) );
 
 	int iLinkCount = 0;
@@ -985,8 +985,8 @@ int CPhysicsCollision::GetConvexesUsedInCollideable( const CPhysCollide *pCollid
 
 void CPhysicsCollision::ConvexesFromConvexPolygon( const Vector &vPolyNormal, const Vector *pPoints, int iPointCount, CPhysConvex **pOutput )
 {
-	IVP_U_Point *pIVP_Points = (IVP_U_Point *)stackalloc( sizeof( IVP_U_Point ) * iPointCount );
-	IVP_U_Point **pTriangulator = (IVP_U_Point **)stackalloc( sizeof( IVP_U_Point * ) * iPointCount );
+	IVP_U_Point *pIVP_Points = stackallocT( IVP_U_Point, iPointCount );
+	IVP_U_Point **pTriangulator = stackallocT( IVP_U_Point*, iPointCount );
 	IVP_U_Point **pRead = pTriangulator;
 	IVP_U_Point **pWrite = pTriangulator;
 
@@ -1338,11 +1338,10 @@ bool CPhysicsCollision::IsBBoxCache( CPhysCollide *pCollide )
 
 void CPhysicsCollision::AddBBoxCache( CPhysCollideCompactSurface *pCollide, const Vector &mins, const Vector &maxs )
 {
-	auto index = m_bboxCache.AddToTail();
-	bboxcache_t *pCache = &m_bboxCache[index];
-	pCache->pCollide = pCollide;
-	pCache->mins = mins;
-	pCache->maxs = maxs;
+	bboxcache_t &pCache = m_bboxCache[m_bboxCache.AddToTail()];
+	pCache.pCollide = pCollide;
+	pCache.mins = mins;
+	pCache.maxs = maxs;
 }
 
 CPhysCollideCompactSurface *CPhysicsCollision::GetBBoxCache( const Vector &mins, const Vector &maxs )
@@ -1646,7 +1645,7 @@ void CPhysicsCollision::VCollideLoad( vcollide_t *pOutput, int solidCount, const
 
 		if (size > currentSize || !tmpbuf)
 		{
-			delete[] tmpbuf;
+				delete[] tmpbuf;
 			tmpbuf = new char[size];
 			currentSize = size;
 		}
@@ -1682,7 +1681,7 @@ void CPhysicsCollision::VCollideUnload( vcollide_t *pVCollide )
 			if ( !pEnv )
 				break;
 
-			if ( pEnv->IsCollisionModelUsed( (CPhysCollide *)pVCollide->solids[i] ) )
+			if ( pEnv->IsCollisionModelUsed( (const CPhysCollide *)pVCollide->solids[i] ) )
 			{
  				AssertMsg(0, "Freed collision model while in use!!!\n");
 				return;

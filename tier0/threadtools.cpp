@@ -303,7 +303,7 @@ bool ThreadSetPriority( ThreadHandle_t hThread, int priority )
 
 //-----------------------------------------------------------------------------
 
-void ThreadSetAffinity( ThreadHandle_t hThread, ptrdiff_t nAffinityMask )
+void ThreadSetAffinity( ThreadHandle_t hThread, intp nAffinityMask )
 {
 	if ( !hThread )
 	{
@@ -408,11 +408,11 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 #endif
 
 #ifdef _WIN32
-	if ( Plat_IsInDebugSession() )
+	// dimhotepus: Always set thread debug name, not just for debug session.
 	{
 		HANDLE handle = OpenThread( STANDARD_RIGHTS_READ | THREAD_SET_INFORMATION,
 			FALSE,
-			id != -1 ? id : GetThreadId( GetCurrentThread() ) );
+			id != std::numeric_limits<ThreadId_t>::max() ? id : GetThreadId( GetCurrentThread() ) );
 		if ( handle )
 		{
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
@@ -423,35 +423,34 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 			Assert( wcharsNeeded == wcharsConverted );
 			description[descriptionSize / sizeof(wchar_t) - 1] = L'\0';
 
-			SetThreadDescription( handle, description );
+			::SetThreadDescription( handle, description );
 
-			CloseHandle( handle );
+			::CloseHandle( handle );
 		}
 	}
 #elif defined( _LINUX )
 	// As of glibc v2.12, we can use pthread_setname_np.
-	typedef int (pthread_setname_np_func)(pthread_t, const char *);
-	static pthread_setname_np_func *s_pthread_setname_np_func = (pthread_setname_np_func *)dlsym(RTLD_DEFAULT, "pthread_setname_np");
+	if ( id == std::numeric_limits<ThreadId_t>::max() )
+		id = pthread_self();
 
-	if ( s_pthread_setname_np_func )
+	// The thread name is a meaningful C language string, whose length is
+	// restricted to 16 characters, including the terminating null byte ('\0').
+	char szThreadName[ 16 ];
+	strncpy( szThreadName, pszName, std::size( szThreadName ) );
+	szThreadName[ std::size( szThreadName ) - 1 ] = 0;
+
+	pthread_setname_np( id, szThreadName );
+#elif defined( OSX )
+	// dimhotepus: MacOS only supports set name for current thread.
+	if ( id == ThreadGetCurrentId() || id == std::numeric_limits<ThreadId_t>::max() )
 	{
-		if ( id == (ThreadId_t)-1 )
-			id = pthread_self();
-
-		/* 
-			pthread_setname_np() in phthread_setname.c has the following code:
-		
-			#define TASK_COMM_LEN 16
-			  size_t name_len = strlen (name);
-			  if (name_len >= TASK_COMM_LEN)
-				return ERANGE;
-		
-			So we need to truncate the threadname to 16 or the call will just fail.
-		*/
-		char szThreadName[ 16 ];
+		// The thread name is a meaningful C language string, whose length is
+		// restricted to 64 characters, including the terminating null byte ('\0').
+		char szThreadName[ 64 ];
 		strncpy( szThreadName, pszName, std::size( szThreadName ) );
 		szThreadName[ std::size( szThreadName ) - 1 ] = 0;
-		(*s_pthread_setname_np_func)( id, szThreadName );
+
+		pthread_setname_np( szThreadName );
 	}
 #endif
 }
@@ -924,7 +923,8 @@ int64 ThreadInterlockedCompareExchange64( int64 volatile *pDest, int64 value, in
 {
 	Assert( (size_t)pDest % 8 == 0 );
 
-#if defined(_WIN64) || defined (_X360)
+#if defined(_WIN32)
+	// Both x86 and x86-64.
 	return InterlockedCompareExchange64( pDest, value, comperand );
 #else
 	__asm 
@@ -946,24 +946,7 @@ bool ThreadInterlockedAssignIf64(volatile int64 *pDest, int64 value, int64 compe
 {
 	Assert( (size_t)pDest % 8 == 0 );
 
-#if defined(PLATFORM_WINDOWS_PC32 )
-	__asm
-	{
-		lea esi,comperand;
-		lea edi,value;
-
-		mov eax,[esi];
-		mov edx,4[esi];
-		mov ebx,[edi];
-		mov ecx,4[edi];
-		mov esi,pDest;
-		lock cmpxchg8b [esi];			
-		mov eax,0;
-		setz al;
-	}
-#else
 	return ( ThreadInterlockedCompareExchange64( pDest, value, comperand ) == comperand ); 
-#endif
 }
 
 #if defined( PLATFORM_64BITS )
@@ -1488,14 +1471,14 @@ void CThreadSpinRWLock::LockForRead()
 	int i;
 
 	// In order to grab a read lock, the number of readers must not change and no thread can own the write lock
-	LockInfo_t oldValue{0, m_lockInfo.m_nReaders};
+	LockInfo_t oldValue{0, m_lockInfo.load().m_nReaders};
 	LockInfo_t newValue{0, oldValue.m_nReaders + 1};
 
 	if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
 		return;
 
 	ThreadPause();
-	oldValue.m_nReaders = m_lockInfo.m_nReaders;
+	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 	newValue.m_nReaders = oldValue.m_nReaders + 1;
 
 	for ( i = 1000; i != 0; --i )
@@ -1503,7 +1486,7 @@ void CThreadSpinRWLock::LockForRead()
 		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
 			return;
 		ThreadPause();
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
@@ -1513,7 +1496,7 @@ void CThreadSpinRWLock::LockForRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 0 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
@@ -1523,7 +1506,7 @@ void CThreadSpinRWLock::LockForRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 1 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 }
@@ -1532,19 +1515,14 @@ void CThreadSpinRWLock::UnlockRead()
 {
 	int i;
 
-	Assert( m_lockInfo.m_nReaders > 0 && m_lockInfo.m_writerId == 0 );
-	LockInfo_t oldValue;
-	LockInfo_t newValue;
-
-	oldValue.m_nReaders = m_lockInfo.m_nReaders;
-	oldValue.m_writerId = 0;
-	newValue.m_nReaders = oldValue.m_nReaders - 1;
-	newValue.m_writerId = 0;
-
+	Assert( m_lockInfo.load().m_nReaders > 0 && m_lockInfo.load().m_writerId == 0 );
+	LockInfo_t oldValue{0UL, m_lockInfo.load().m_nReaders};
+	LockInfo_t newValue{0UL, oldValue.m_nReaders - 1};
+	
 	if( AssignIf( newValue, oldValue ) )
 		return;
 	ThreadPause();
-	oldValue.m_nReaders = m_lockInfo.m_nReaders;
+	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 	newValue.m_nReaders = oldValue.m_nReaders - 1;
 
 	for ( i = 500; i != 0; --i )
@@ -1552,7 +1530,7 @@ void CThreadSpinRWLock::UnlockRead()
 		if( AssignIf( newValue, oldValue ) )
 			return;
 		ThreadPause();
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 
@@ -1562,7 +1540,7 @@ void CThreadSpinRWLock::UnlockRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 0 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 
@@ -1572,19 +1550,16 @@ void CThreadSpinRWLock::UnlockRead()
 			return;
 		ThreadPause();
 		ThreadSleep( 1 );
-		oldValue.m_nReaders = m_lockInfo.m_nReaders;
+		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 }
 
 void CThreadSpinRWLock::UnlockWrite()
 {
-	Assert( m_lockInfo.m_writerId == ThreadGetCurrentId()  && m_lockInfo.m_nReaders == 0 );
+	Assert( m_lockInfo.load().m_writerId == ThreadGetCurrentId() && m_lockInfo.load().m_nReaders == 0 );
 	alignas(int64) static const LockInfo_t newValue = { 0, 0 };
-#if defined(_X360)
-	// X360TBD: Serious Perf implications, not yet. __sync();
-#endif
-	ThreadInterlockedExchange64(  (volatile int64 *)&m_lockInfo, *((const int64 *)&newValue) );
+	m_lockInfo.exchange(newValue);
 	--m_nWriters;
 }
 
@@ -1628,7 +1603,12 @@ CThread::~CThread()
 			Msg( "Illegal termination of worker thread! Threads must negotiate an end to the thread before the CThread object is destroyed.\n" ); 
 #ifdef _WIN32
 
-			DoNewAssertDialog( __FILE__, __LINE__, "Illegal termination of worker thread! Threads must negotiate an end to the thread before the CThread object is destroyed.\n" );
+			if ( DoNewAssertDialog( __FILE__, __LINE__,
+				"Illegal termination of worker thread! Threads must negotiate an end to the thread before the CThread object is destroyed.\n" ) )
+			{
+				// dimhotepus: If user want to break debugger then do it.
+				DebuggerBreakIfDebugging();
+			}
 #endif
 			if ( GetCurrentCThread() == this )
 			{
@@ -1931,7 +1911,7 @@ unsigned int CThread::Suspend()
 #ifdef _WIN32
   // dimhotepus: x64 support.
 #ifndef PLATFORM_64BITS
-  return SuspendThread(m_hThread) != static_cast<DWORD>(-1);
+  return SuspendThread(m_hThread) != static_cast<DWORD>(-1); //-V720
 #else
   return Wow64SuspendThread(m_hThread) != static_cast<DWORD>(-1);
 #endif

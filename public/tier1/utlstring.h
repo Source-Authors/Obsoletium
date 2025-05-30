@@ -61,7 +61,7 @@ public:
 public:
 	CUtlString();
 	CUtlString( const char *pString );
-	CUtlString( const char *pString, ptrdiff_t length );
+	CUtlString( const char *pString, intp length );
 	CUtlString( const CUtlString& string );
 
 	// Support moving of CUtlString objects.
@@ -105,19 +105,19 @@ public:
 	// at most nChars (even if pValue is longer).  If nChars
 	// is >strlen(pValue) it will copy past the end, don't do it
 	// Does nothing if pValue == String()
-	void		SetDirect( const char *pValue, ptrdiff_t nChars );
+	void		SetDirect( const char *pValue, intp nChars );
 
 	// for compatibility switching items from UtlSymbol
 	const char  *String() const { return Get(); } //-V524
 
 	// Returns strlen
-	ptrdiff_t			Length() const;
+	intp			Length() const;
 	// IsEmpty() is more efficient than Length() == 0
 	bool		IsEmpty() const;
 
 	// Sets the length (used to serialize into the buffer )
 	// Note: If nLen != 0, then this adds an extra byte for a null-terminator.	
-	void		SetLength( ptrdiff_t nLen );
+	void		SetLength( intp nLen );
 	char		*GetForModify();
 	void		Clear();
 	void		Purge();
@@ -125,7 +125,7 @@ public:
 	// Case Change
 	void		ToLower();
 	void		ToUpper();
-	void		Append( const char *pAddition, ptrdiff_t nChars );
+	void		Append( const char *pAddition, intp nChars );
 
 	void		Append( const char *pchAddition );
 	void		Append( const char chAddition ) { char temp[2] = { chAddition, 0 }; Append( temp ); }
@@ -163,7 +163,7 @@ public:
 
 	bool MatchesPattern( const CUtlString &Pattern, int nFlags = 0 ) const;		// case SENSITIVE, use * for wildcard in pattern string
 
-	char operator[]( ptrdiff_t i ) const;
+	char operator[]( intp i ) const;
 
 #if ! defined(SWIG)
 	// Don't let SWIG see the PRINTF_FORMAT_STRING attribute or it will complain.
@@ -181,11 +181,11 @@ public:
 	// Get a copy of part of the string.
 	// If you only specify nStart, it'll go from nStart to the end.
 	// You can use negative numbers and it'll wrap around to the start.
-	CUtlString Slice( ptrdiff_t nStart=0, ptrdiff_t nEnd=PTRDIFF_MAX ) const;
+	CUtlString Slice( intp nStart=0, intp nEnd=PTRDIFF_MAX ) const;
 
 	// Get a substring starting from the left or the right side.
-	CUtlString Left( ptrdiff_t nChars ) const;
-	CUtlString Right( ptrdiff_t nChars ) const;
+	CUtlString Left( intp nChars ) const;
+	CUtlString Right( intp nChars ) const;
 
 	// Get a string with all instances of one character replaced with another.
 	CUtlString Replace( char cFrom, char cTo ) const;
@@ -279,7 +279,7 @@ inline CUtlString::CUtlString( const char *pString )
 	Set( pString );
 }
 
-inline CUtlString::CUtlString( const char *pString, ptrdiff_t length )
+inline CUtlString::CUtlString( const char *pString, intp length )
 : m_pString( nullptr )
 {
 	SetDirect( pString, length );
@@ -296,7 +296,7 @@ inline CUtlString::~CUtlString()
 	Purge();
 }
 
-inline ptrdiff_t CUtlString::Length() const
+inline intp CUtlString::Length() const
 {
 	if (m_pString)
 	{
@@ -342,10 +342,10 @@ class StringFuncs
 public:
 	static T		*Duplicate( const T *pValue );
 	// Note that this function takes a character count, and does not guarantee null-termination.
-	static void		 Copy( T *out_pOut, const T *pIn, ptrdiff_t iLengthInChars );
+	static void		 Copy( T *out_pOut, const T *pIn, intp iLengthInChars );
 	static int		 Compare( const T *pLhs, const T *pRhs );
 	static int		 CaselessCompare( const T *pLhs, const T *pRhs );
-	static ptrdiff_t		 Length( const T *pValue );
+	static intp		 Length( const T *pValue );
 	static const T  *FindChar( const T *pStr, const T cSearch );
 	static const T	*EmptyString();
 	static const T	*NullDebugString();
@@ -357,10 +357,10 @@ class StringFuncs<char>
 public:
 	static char		  *Duplicate( const char *pValue ) { return strdup( pValue ); }
 	// Note that this function takes a character count, and does not guarantee null-termination.
-	static void		   Copy( OUT_CAP(iLengthInChars) char *out_pOut, const char *pIn, ptrdiff_t iLengthInChars ) { strncpy( out_pOut, pIn, iLengthInChars ); }
+	static void		   Copy( OUT_CAP(iLengthInChars) char *out_pOut, const char *pIn, intp iLengthInChars ) { strncpy( out_pOut, pIn, iLengthInChars ); }
 	static int		   Compare( const char *pLhs, const char *pRhs ) { return strcmp( pLhs, pRhs ); }
 	static int		   CaselessCompare( const char *pLhs, const char *pRhs ) { return Q_strcasecmp( pLhs, pRhs ); }
-	static ptrdiff_t		   Length( const char *pValue ) { return strlen( pValue ); }
+	static intp		   Length( const char *pValue ) { return strlen( pValue ); }
 	static const char *FindChar( const char *pStr, const char cSearch ) { return strchr( pStr, cSearch ); }
 	static const char *EmptyString() { return ""; }
 	static const char *NullDebugString() { return "(null)"; }
@@ -372,10 +372,10 @@ class StringFuncs<wchar_t>
 public:
 	static wchar_t		 *Duplicate( const wchar_t *pValue ) { return wcsdup( pValue ); }
 	// Note that this function takes a character count, and does not guarantee null-termination.
-	static void			  Copy( OUT_CAP(iLengthInChars) wchar_t *out_pOut, const wchar_t  *pIn, ptrdiff_t iLengthInChars ) { wcsncpy( out_pOut, pIn, iLengthInChars ); }
+	static void			  Copy( OUT_CAP(iLengthInChars) wchar_t *out_pOut, const wchar_t  *pIn, intp iLengthInChars ) { wcsncpy( out_pOut, pIn, iLengthInChars ); }
 	static int			  Compare( const wchar_t *pLhs, const wchar_t *pRhs ) { return wcscmp( pLhs, pRhs ); }
 	static int			  CaselessCompare( const wchar_t *pLhs, const wchar_t *pRhs ); // no implementation?
-	static ptrdiff_t			  Length( const wchar_t *pValue ) { return wcslen( pValue ); }
+	static intp			  Length( const wchar_t *pValue ) { return wcslen( pValue ); }
 	static const wchar_t *FindChar( const wchar_t *pStr, const wchar_t cSearch ) { return wcschr( pStr, cSearch ); }
 	static const wchar_t *EmptyString() { return L""; }
 	static const wchar_t *NullDebugString() { return L"(null)"; }
@@ -429,7 +429,8 @@ public:
 	typedef const T *AltArgumentType_t;
 
 protected:
-	const T *m_pString;
+	// dimhotepus: const T* -> T* as it is not a const! See Set API
+	T *m_pString;
 };
 
 template < typename T >
@@ -437,7 +438,7 @@ void CUtlConstStringBase<T>::Set( const T *pValue )
 {
 	if ( pValue != m_pString )
 	{
-		free( ( void* ) m_pString );
+		free( m_pString );
 		m_pString = pValue && pValue[0] ? StringFuncs<T>::Duplicate( pValue ) : NULL;
 	}
 }

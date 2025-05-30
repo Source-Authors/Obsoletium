@@ -58,7 +58,7 @@ bool GetPersistentEnvironmentVariable( const char *pName, char *pReturn, int siz
 void SetPersistentEnvironmentVariable( const char *pName, const char *pValue )
 {
 	HKEY hregkey; 
-	DWORD dwReturnValue = 0;
+	DWORD_PTR dwReturnValue = 0;
 
 	// Changed from HKEY_LOCAL_MACHINE to HKEY_CURRENT_USER
 	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
@@ -100,12 +100,12 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 	if (bExpand)
 	{
 		// Replace the tokens with the full strings
-		if (Q_StrSubst(str, szSteamUserDirToken, strSteamUserDir, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, szSteamUserDirToken, strSteamUserDir, szPathOut))
 		{
 			str = szPathOut;
 		}
 
-		if (Q_StrSubst(str, szSteamDirToken, strSteamDir, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, szSteamDirToken, strSteamDir, szPathOut))
 		{
 			str = szPathOut;
 		}
@@ -114,12 +114,12 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 	{
 		// Replace the full strings with the tokens
 		// Go from longest paths to shortest paths to insure the most brief expression.
-		if (Q_StrSubst(str, strSteamUserDir, szSteamUserDirToken, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, strSteamUserDir, szSteamUserDirToken, szPathOut))
 		{
 			str = szPathOut;
 		}
 
-		if (Q_StrSubst(str, strSteamDir, szSteamDirToken, szPathOut, sizeof(szPathOut)))
+		if (V_StrSubst(str, strSteamDir, szSteamDirToken, szPathOut))
 		{
 			str = szPathOut;
 		}
@@ -131,8 +131,11 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 // Purpose: Exchanges path data between a CString and an edit control, converting
 //			the Steam path to %STEAM% and back.
 //-----------------------------------------------------------------------------
-void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand)
+void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_CAP(destSize) char *szDest, intp destSize, bool bExpand)
 {
+	if (destSize > 0)
+		szDest[0] = '\0';
+
 	CWnd *pwnd = pDlg->GetDlgItem(nIDC);
 	if (!pwnd)
 		return;
@@ -143,7 +146,7 @@ void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand
 	{
 		pwnd->GetWindowText(str);
 		EditorUtil_ConvertPath(str, true);
-		strcpy(szDest, str);
+		V_strncpy(szDest, str, destSize);
 	}
 	else
 	{
@@ -151,6 +154,13 @@ void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, char *szDest, bool bExpand
 		EditorUtil_ConvertPath(str, false);
 		pwnd->SetWindowText(str);
 	}
+}
+
+
+template<intp destSize>
+inline void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_ARRAY char (&szDest)[destSize], bool bSave)
+{
+	EditorUtil_TransferPath( pDlg, nIDC, szDest, destSize, bSave );
 }
 
 
@@ -397,7 +407,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 
 	// load info from newly selected config into controls
 	int iCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(iCurSel));
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
 
 	BOOL bKillFields = FALSE;
 	if (pConfig == NULL)
@@ -466,7 +476,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 	m_cCordonTexture.SetWindowText(pConfig->GetCordonTexture());
 	
 	char szText[100];
-	sprintf(szText, "%g", pConfig->GetDefaultTextureScale());
+	V_sprintf_safe(szText, "%g", pConfig->GetDefaultTextureScale());
 	m_cDefaultTextureScale.SetWindowText(szText);
 
 	SetDlgItemInt(IDC_DEFAULT_LIGHTMAP_SCALE, pConfig->GetDefaultLightmapScale(), FALSE);
@@ -489,8 +499,8 @@ void COPTConfigs::UpdateEntityLists(void)
 
 	CGameConfig *pConfig = m_pLastSelConfig;
 
-	int nCount = pConfig->GD.GetClassCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pConfig->GD.GetClassCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDclass *pClass = pConfig->GD.GetClass(i);
 		if (pClass->IsBaseClass())
@@ -539,7 +549,7 @@ void UpdateConfigList(CComboBox &combo)
 	DWORD dwSelID = 0xffffffff;
 	if (iCurSel != CB_ERR)
 	{
-		dwSelID = combo.GetItemData(iCurSel);
+		dwSelID = static_cast<DWORD>(combo.GetItemData(iCurSel));
 	}
 
 	combo.ResetContent();
@@ -562,7 +572,7 @@ void UpdateConfigList(CComboBox &combo)
 	int nSelIndex = -1;
 	for (int i = 0; i < Options.configs.nConfigs; i++)
 	{
-		DWORD dwData = combo.GetItemData(i);
+		DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
 		if (dwData == dwSelID)
 		{
 			nSelIndex = i;
@@ -589,7 +599,7 @@ void SelectActiveConfig(CComboBox &combo)
 			int nCount = combo.GetCount();
 			for (int i = 0; i < nCount; i++)
 			{
-				DWORD dwData = combo.GetItemData(i);
+				DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
 				if (pConfig->dwID == dwData)
 				{
 					nSelIndex = i;
@@ -652,7 +662,7 @@ BOOL COPTConfigs::OnInitDialog(void)
 	UpdateConfigList();
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	m_pInitialSelectedConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(nCurSel));
+	m_pInitialSelectedConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	m_strInitialGameDir.Empty();
 	if (m_pInitialSelectedConfig)
@@ -695,7 +705,7 @@ BOOL COPTConfigs::OnApply(void)
 	SaveInfo(m_pLastSelConfig);
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(m_cConfigs.GetItemData(nCurSel));
+	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	if ( pConfig != NULL && ConfigChanged( pConfig ) )
 	{

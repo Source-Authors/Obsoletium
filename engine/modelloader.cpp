@@ -443,7 +443,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 		V_strcpy_safe( s_szMapName, pMapModel->strName );
 	}
 
-	s_MapFileHandle = g_pFileSystem->OpenEx( s_szMapName, "rb", IsX360() ? FSOPEN_NEVERINPACK : 0, IsX360() ? "GAME" : NULL );
+	s_MapFileHandle = g_pFileSystem->OpenEx( s_szMapName, "rb", 0, NULL );
 	if ( s_MapFileHandle == FILESYSTEM_INVALID_HANDLE )
 	{
 		Host_Error( "CMapLoadHelper::Init, unable to open %s\n", s_szMapName );
@@ -538,47 +538,8 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 //-----------------------------------------------------------------------------
 void CMapLoadHelper::InitFromMemory( model_t *pMapModel, const void *pData, int nDataSize )
 {
-	// valid for 360 only 
-	// 360 has reorganized bsp format and no external lump files
-	Assert( IsX360() && pData && nDataSize );
-
-	if ( ++s_nMapLoadRecursion > 1 )
-	{
-		return;
-	}
-
-	s_pMap = NULL;
-	s_MapFileHandle = FILESYSTEM_INVALID_HANDLE;
-	V_memset( &s_MapHeader, 0, sizeof( s_MapHeader ) );
-	V_memset( &s_MapLumpFiles, 0, sizeof( s_MapLumpFiles ) );
-
-	V_strcpy_safe( s_szMapName, pMapModel->strName );
-	V_FileBase( s_szMapName, s_szLoadName, sizeof( s_szLoadName ) );
-
-	s_MapBuffer.SetExternalBuffer( (void *)pData, nDataSize, nDataSize );
-
-	V_memcpy( &s_MapHeader, pData, sizeof( dheader_t ) );
-
-	if ( s_MapHeader.ident != IDBSPHEADER )
-	{
-		Host_Error( "CMapLoadHelper::Init, map %s has wrong identifier\n", s_szMapName );
-		return;
-	}
-
-	if ( s_MapHeader.version < MINBSPVERSION || s_MapHeader.version > BSPVERSION )
-	{
-		Host_Error( "CMapLoadHelper::Init, map %s has wrong version (%i when expecting %i)\n", s_szMapName, s_MapHeader.version, BSPVERSION );
-		return;
-	}
-
-	// Store map version
-	g_ServerGlobalVariables.mapversion = s_MapHeader.mapRevision;
-
-#ifndef SWDS
-	InitDLightGlobals( s_MapHeader.version );
-#endif
-
-	s_pMap = &g_ModelLoader.m_worldBrushData;
+	// valid for 360 only
+	Assert( false );
 }
 
 //-----------------------------------------------------------------------------
@@ -621,43 +582,6 @@ void CMapLoadHelper::Shutdown( void )
 		s_MapBuffer.SetExternalBuffer( NULL, 0, 0 );
 	}
 }
-
-
-//-----------------------------------------------------------------------------
-// Free the lighting lump (increases free memory during loading on 360)
-//-----------------------------------------------------------------------------
-void CMapLoadHelper::FreeLightingLump( void )
-{
-	if ( IsX360() && ( s_MapFileHandle == FILESYSTEM_INVALID_HANDLE ) && s_MapBuffer.Base() )
-	{
-		int lightingLump = LumpSize( LUMP_LIGHTING_HDR ) ? LUMP_LIGHTING_HDR : LUMP_LIGHTING;
-		// Should never have both lighting lumps on 360
-		Assert( ( lightingLump == LUMP_LIGHTING ) || ( LumpSize( LUMP_LIGHTING ) == 0 ) );
-
-		if ( LumpSize( lightingLump ) )
-		{
-			// Check that the lighting lump is the last one in the BSP
-			int lightingOffset = LumpOffset( lightingLump );
-			for ( int i = 0;i < HEADER_LUMPS; i++ )
-			{
-				if ( ( LumpOffset( i ) > lightingOffset ) && ( i != LUMP_PAKFILE ) )
-				{
-					Warning( "CMapLoadHelper: Cannot free lighting lump (should be last before the PAK lump). Regenerate the .360.bsp file with the latest version of makegamedata." );
-					return;
-				}
-			}
-
-			// Flag the lighting chunk as gone from the BSP (principally, this sets 'filelen' to 0)
-			V_memset( &s_MapHeader.lumps[ lightingLump ], 0, sizeof( lump_t ) );
-
-			// Shrink the buffer to free up the space that was used by the lighting lump
-			void * shrunkBuffer = realloc( s_MapBuffer.Base(), lightingOffset );
-			Assert( shrunkBuffer == s_MapBuffer.Base() ); // A shrink would surely never move!!!
-			s_MapBuffer.SetExternalBuffer( shrunkBuffer, lightingOffset, lightingOffset );
-		}
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // Returns the size of a particular lump without loading it...
@@ -838,7 +762,8 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 		           "Map's '%s' lump %d header has size %d != LZMA header size %d for compressed lump", s_szMapName, lumpToLoad, lump->uncompressedSize, m_nLumpSize );
 
 		m_pUncompressedData = (unsigned char *)malloc( m_nLumpSize );
-		CLZMA::Uncompress( m_pData, m_pUncompressedData );
+		// dimhotepus: Add out size to prevent overflows.
+		CLZMA::Uncompress( m_pData, m_pUncompressedData, m_nLumpSize );
 
 		m_pData = m_pUncompressedData;
 	}
@@ -874,7 +799,7 @@ worldbrushdata_t *CMapLoadHelper::GetMap( void )
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CMapLoadHelper::GetMapName( void )
+const char *CMapLoadHelper::GetMapName() const
 {
 	return s_szMapName;
 }
@@ -899,7 +824,7 @@ char *CMapLoadHelper::GetLoadName( void )
 // Purpose: 
 // Output : byte
 //-----------------------------------------------------------------------------
-byte *CMapLoadHelper::LumpBase( void )
+byte *CMapLoadHelper::LumpBase()
 {
 	return m_pData;
 }
@@ -908,12 +833,12 @@ byte *CMapLoadHelper::LumpBase( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CMapLoadHelper::LumpSize()
+int CMapLoadHelper::LumpSize() const
 {
 	return m_nLumpSize;
 }
 
-int CMapLoadHelper::LumpOffset()
+int CMapLoadHelper::LumpOffset() const
 {
 	return m_nLumpOffset;
 }
@@ -993,8 +918,7 @@ void Map_CheckFeatureFlags()
 	if ( CMapLoadHelper::LumpSize( LUMP_MAP_FLAGS ) > 0 )
 	{
 		CMapLoadHelper lh( LUMP_MAP_FLAGS );
-		dflagslump_t flags_lump;
-		flags_lump = *( (dflagslump_t *)( lh.LumpBase() ) );
+		dflagslump_t flags_lump = *lh.LumpBase<dflagslump_t>();
 
 		// check if loaded map has baked static prop lighting
 		g_bLoadedMapHasBakedPropLighting = 
@@ -1084,17 +1008,12 @@ void Mod_LoadLighting( CMapLoadHelper &lh )
 		return;
 	}
 
-	Assert( lh.LumpSize() % sizeof( ColorRGBExp32 ) == 0 );
+	// dimhotepus: Checked in AllocateLightingData
+	// Assert( lh.LumpSize() % sizeof( ColorRGBExp32 ) == 0 );
 	Assert ( lh.LumpVersion() != 0 );
 
 	AllocateLightingData( lh.GetMap(), lh.LumpSize() );
 	memcpy( lh.GetMap()->lightdata, lh.LumpBase(), lh.LumpSize());
-
-	if ( IsX360() )
-	{
-		// Free the lighting lump, to increase the amount of memory free during the rest of loading
-		CMapLoadHelper::FreeLightingLump();
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1111,14 +1030,13 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 	}
 	int numworldlights = lh.LumpSize() / sizeof( dworldlight_t );
 	lh.GetMap()->numworldlights = numworldlights;
-	lh.GetMap()->worldlights = Hunk_AllocName<dworldlight_t>( numworldlights, va( "%s [%s]", lh.GetLoadName(), "worldlights" ) );
-	memcpy (lh.GetMap()->worldlights, lh.LumpBase(), lh.LumpSize());
+	lh.GetMap()->worldlights = Hunk_AllocName<dworldlight_t>( numworldlights, va( "%s [%s]", lh.GetLoadName(), "worldlights" ), false );
+	memcpy( lh.GetMap()->worldlights, lh.LumpBase(), numworldlights * sizeof( dworldlight_t ) );
 #if !defined( SWDS )
 	if ( r_lightcache_zbuffercache.GetInt() )
 	{
-		size_t zbufSize = lh.GetMap()->numworldlights * sizeof( lightzbuffer_t );
-		lh.GetMap()->shadowzbuffers = Hunk_AllocName<lightzbuffer_t>( numworldlights, va( "%s [%s]", lh.GetLoadName(), "shadowzbuffers" ) );
-		memset( lh.GetMap()->shadowzbuffers, 0, zbufSize );		// mark empty
+		// mark empty
+		lh.GetMap()->shadowzbuffers = Hunk_AllocName<lightzbuffer_t>( numworldlights, va( "%s [%s]", lh.GetLoadName(), "shadowzbuffers" ), true );
 	}
 #endif
 
@@ -1164,29 +1082,22 @@ void Mod_LoadWorldlights( CMapLoadHelper &lh, bool bIsHDR )
 //-----------------------------------------------------------------------------
 void Mod_LoadVertices( void )
 {
-	dvertex_t	*in;
-	mvertex_t	*out;
-	int			i, count;
-
 	CMapLoadHelper lh( LUMP_VERTEXES );
 
-	in = (dvertex_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dvertex_t>();
 	if ( lh.LumpSize() % sizeof(*in) )
-	{
 		Host_Error( "Mod_LoadVertices: funny lump size in %s", lh.GetMapName() );
-	}
-	count = lh.LumpSize() / sizeof(*in);
-	out = Hunk_AllocName<mvertex_t>( count, va( "%s [%s]", lh.GetLoadName(), "vertexes" ) );
+
+	int count = lh.LumpSize() / sizeof(*in);
+	mvertex_t *out = Hunk_AllocName<mvertex_t>( count, va( "%s [%s]", lh.GetLoadName(), "vertexes" ), false );
+
+	// dimhotepus: Directly copy to speedup.
+	static_assert(sizeof(mvertex_t) == sizeof(dvertex_t));
+	static_assert(offsetof(mvertex_t, position) == offsetof(dvertex_t, point));
+	memcpy(out, in, count * sizeof(dvertex_t) );
 
 	lh.GetMap()->vertexes = out;
 	lh.GetMap()->numvertexes = count;
-
-	for ( i=0 ; i<count ; i++, in++, out++)
-	{
-		out->position[0] = in->point[0];
-		out->position[1] = in->point[1];
-		out->position[2] = in->point[2];
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1199,10 +1110,9 @@ static float RadiusFromBounds (Vector& mins, Vector& maxs)
 {
 	Vector	corner;
 
-	for (int i=0 ; i<3 ; i++)
-	{
-		corner[i] = max( fabsf(mins[i]), fabsf(maxs[i]) );
-	}
+	corner[0] = max( fabsf(mins[0]), fabsf(maxs[0]) );
+	corner[1] = max( fabsf(mins[1]), fabsf(maxs[1]) );
+	corner[2] = max( fabsf(mins[2]), fabsf(maxs[2]) );
 
 	return VectorLength( corner );
 }
@@ -1212,22 +1122,20 @@ static float RadiusFromBounds (Vector& mins, Vector& maxs)
 //-----------------------------------------------------------------------------
 void Mod_LoadSubmodels( CUtlVector<mmodel_t> &submodelList )
 {
-	dmodel_t	*in;
-	int			i, j, count;
-
 	CMapLoadHelper lh( LUMP_MODELS );
 
-	in = (dmodel_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dmodel_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error("Mod_LoadSubmodels: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
+
+	int count = lh.LumpSize() / sizeof(*in);
 
 	submodelList.SetCount( count );
 	lh.GetMap()->numsubmodels = count;
 
-	for ( i=0 ; i<count ; i++, in++)
+	for ( int i=0 ; i<count ; i++, in++)
 	{
-		for (j=0 ; j<3 ; j++)
+		for ( int j=0 ; j<3 ; j++)
 		{	// spread the mins / maxs by a pixel
 			submodelList[i].mins[j] = in->mins[j] - 1;
 			submodelList[i].maxs[j] = in->maxs[j] + 1;
@@ -1245,30 +1153,27 @@ void Mod_LoadSubmodels( CUtlVector<mmodel_t> &submodelList )
 // Purpose: 
 // Output : medge_t *Mod_LoadEdges
 //-----------------------------------------------------------------------------
-medge_t *Mod_LoadEdges ( void )
+std::unique_ptr<medge_t[]> Mod_LoadEdges()
 {
-	dedge_t *in;
-	medge_t *out;
-	int 	i, count;
-
 	CMapLoadHelper lh( LUMP_EDGES );
 
-	in = (dedge_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dedge_t>();
 	if (lh.LumpSize() % sizeof(*in))
-		Host_Error ("Mod_LoadEdges: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
-	medge_t *pedges = new medge_t[count];
+		Host_Error( "Mod_LoadEdges: funny lump size in %s", lh.GetMapName() );
 
-	out = pedges;
+	int count = lh.LumpSize() / sizeof(*in);
+	std::unique_ptr<medge_t[]> medges = std::make_unique<medge_t[]>(count);
 
-	for ( i=0 ; i<count ; i++, in++, out++)
+	medge_t *out = medges.get();
+
+	for ( int i=0 ; i<count ; i++, in++, out++)
 	{
 		out->v[0] = in->v[0];
 		out->v[1] = in->v[1];
 	}
 
 	// delete this in the loader
-	return pedges;
+	return medges;
 }
 
 
@@ -1301,24 +1206,24 @@ void Mod_LoadOcclusion( void )
 			b->numoccluders = buf.GetInt();
 			if (b->numoccluders)
 			{
-				int nSize = b->numoccluders * sizeof(doccluderdata_t);
 				b->occluders = Hunk_AllocName<doccluderdata_t>( b->numoccluders, "occluder data" );
+				int nSize = b->numoccluders * sizeof(doccluderdata_t);
 				buf.Get( b->occluders, nSize );
 			}
 
 			b->numoccluderpolys = buf.GetInt();
 			if (b->numoccluderpolys)
 			{
+				b->occluderpolys = Hunk_AllocName<doccluderpolydata_t>( b->numoccluderpolys, "occluder poly data" );
 				int nSize = b->numoccluderpolys * sizeof(doccluderpolydata_t);
-				b->occluderpolys = (doccluderpolydata_t*)Hunk_AllocName( nSize, "occluder poly data" );
 				buf.Get( b->occluderpolys, nSize );
 			}
 
 			b->numoccludervertindices = buf.GetInt();
 			if (b->numoccludervertindices)
 			{
+				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
 				int nSize = b->numoccludervertindices * sizeof(int);
-				b->occludervertindices = (int*)Hunk_AllocName( nSize, "occluder vertices" );
 				buf.Get( b->occludervertindices, nSize );
 			}
 		}
@@ -1329,13 +1234,12 @@ void Mod_LoadOcclusion( void )
 			b->numoccluders = buf.GetInt();
 			if (b->numoccluders)
 			{
-				int nSize = b->numoccluders * sizeof(doccluderdata_t);
-				b->occluders = (doccluderdata_t*)Hunk_AllocName( nSize, "occluder data" );
+				b->occluders = Hunk_AllocName<doccluderdata_t>( b->numoccluders, "occluder data" );
 
 				doccluderdataV1_t temp;
 				for ( int i = 0; i < b->numoccluders; ++i )
 				{
-					buf.Get( &temp, sizeof(doccluderdataV1_t) );
+					buf.Get( temp );
 					memcpy( &b->occluders[i], &temp, sizeof(doccluderdataV1_t) );
 					b->occluders[i].area = 1;
 				}
@@ -1344,16 +1248,16 @@ void Mod_LoadOcclusion( void )
 			b->numoccluderpolys = buf.GetInt();
 			if (b->numoccluderpolys)
 			{
+				b->occluderpolys = Hunk_AllocName<doccluderpolydata_t>( b->numoccluderpolys, "occluder poly data" );
 				int nSize = b->numoccluderpolys * sizeof(doccluderpolydata_t);
-				b->occluderpolys = (doccluderpolydata_t*)Hunk_AllocName( nSize, "occluder poly data" );
 				buf.Get( b->occluderpolys, nSize );
 			}
 
 			b->numoccludervertindices = buf.GetInt();
 			if (b->numoccludervertindices)
 			{
+				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
 				int nSize = b->numoccludervertindices * sizeof(int);
-				b->occludervertindices = (int*)Hunk_AllocName( nSize, "occluder vertices" );
 				buf.Get( b->occludervertindices, nSize );
 			}
 		}
@@ -1391,27 +1295,24 @@ void Mod_LoadTexdata( void )
 //-----------------------------------------------------------------------------
 void Mod_LoadTexinfo( void )
 {
-	texinfo_t *in;
-	mtexinfo_t *out;
-	int 	i, j, count;
 	// UNDONE: Fix this
-
 	CMapLoadHelper lh( LUMP_TEXINFO );
 
-	in = (texinfo_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<texinfo_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadTexinfo: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
-	out = (mtexinfo_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "texinfo" ) );
+
+	int count = lh.LumpSize() / sizeof(*in);
+	mtexinfo_t *out = Hunk_AllocName<mtexinfo_t>( count, va( "%s [%s]", lh.GetLoadName(), "texinfo" ) );
 
 	s_pMap->texinfo = out;
 	s_pMap->numtexinfo = count;
 
 	bool loadtextures = mat_loadtextures.GetBool();
 
-	for ( i=0 ; i<count ; ++i, ++in, ++out )
+	for ( int i=0 ; i<count ; ++i, ++in, ++out )
 	{
-		for (j=0; j<2; ++j)
+		for ( int j=0; j<2; ++j)
 		{
 			for (int k=0 ; k<4 ; ++k)
 			{
@@ -1507,7 +1408,7 @@ static void CheckSurfaceLighting( SurfaceHandle_t surfID, worldbrushdata_t *pBru
 		}
 		unsigned char color[4];
 		LinearToGamma( color, maxLight.Base() );
-		const int minLightVal = 1;
+		constexpr int minLightVal = 1;
 		if ( color[0] <= minLightVal && color[1] <= minLightVal && color[2] <= minLightVal )
 		{
 			// found a lightmap that is too dark, remove it and shift over the subsequent maps/styles
@@ -1598,7 +1499,7 @@ void Mod_LoadVertNormals( void )
 	CMapLoadHelper lh( LUMP_VERTNORMALS );
 
     // get a pointer to the vertex normal data.
-	Vector *pVertNormals = ( Vector * )lh.LumpBase();
+	Vector *pVertNormals = lh.LumpBase<Vector>();
 
     //
     // verify vertnormals data size
@@ -1607,8 +1508,8 @@ void Mod_LoadVertNormals( void )
         Host_Error( "Mod_LoadVertNormals: funny lump size in %s!\n", lh.GetMapName() );
 
     int count = lh.LumpSize() / sizeof(*pVertNormals);
-	Vector *out = (Vector *)Hunk_AllocName( lh.LumpSize(), va( "%s [%s]", lh.GetLoadName(), "vertnormals" ) );
-	memcpy( out, pVertNormals, lh.LumpSize() );
+	Vector *out = Hunk_AllocName<Vector>( count, va( "%s [%s]", lh.GetLoadName(), "vertnormals" ), false );
+	memcpy( out, pVertNormals, count * sizeof(Vector) );
 	
 	lh.GetMap()->vertnormals = out;
 	lh.GetMap()->numvertnormals = count;
@@ -1623,11 +1524,11 @@ void Mod_LoadVertNormalIndices( void )
 	CMapLoadHelper lh( LUMP_VERTNORMALINDICES );
 
     // get a pointer to the vertex normal data.
-	unsigned short *pIndices = ( unsigned short * )lh.LumpBase();
+	unsigned short *pIndices = lh.LumpBase<unsigned short>();
 
 	int count = lh.LumpSize() / sizeof(*pIndices);
-	unsigned short *out = (unsigned short *)Hunk_AllocName( lh.LumpSize(), va( "%s [%s]", lh.GetLoadName(), "vertnormalindices" ) );
-	memcpy( out, pIndices, lh.LumpSize() );
+	unsigned short *out = Hunk_AllocName<unsigned short>( count, va( "%s [%s]", lh.GetLoadName(), "vertnormalindices" ), false );
+	memcpy( out, pIndices, count * sizeof(unsigned short) );
 	
 	lh.GetMap()->vertnormalindices = out;
 	lh.GetMap()->numvertnormalindices = count;
@@ -1650,27 +1551,24 @@ void Mod_LoadVertNormalIndices( void )
 //-----------------------------------------------------------------------------
 void Mod_LoadPrimitives( void )
 {
-	dprimitive_t	*in;
-	mprimitive_t	*out;
-	int				i, count;
-
 	CMapLoadHelper lh( LUMP_PRIMITIVES );
 
-	in = (dprimitive_t *)lh.LumpBase();
+	dprimitive_t *in = lh.LumpBase<dprimitive_t>();
 	if (lh.LumpSize() % sizeof(*in))
-		Host_Error ("Mod_LoadPrimitives: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
-	out = (mprimitive_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "primitives" ) );
-	memset( out, 0, count * sizeof( mprimitive_t ) );
+		Host_Error ("Mod_LoadPrimitives: funny lump size in %s", lh.GetMapName());
+
+	int count = lh.LumpSize() / sizeof(*in);
+	mprimitive_t *out = Hunk_AllocName<mprimitive_t>( count, va( "%s [%s]", lh.GetLoadName(), "primitives" ) );
 
 	lh.GetMap()->primitives = out;
 	lh.GetMap()->numprimitives = count;
-	for ( i=0 ; i<count ; i++, in++, out++)
+
+	for ( int i=0 ; i<count ; i++, in++, out++)
 	{
+		out->type			= in->type;
 		out->firstIndex		= in->firstIndex;
 		out->firstVert		= in->firstVert;
 		out->indexCount		= in->indexCount;
-		out->type			= in->type;
 		out->vertCount		= in->vertCount;
 	}
 }
@@ -1683,22 +1581,19 @@ void Mod_LoadPrimitives( void )
 //-----------------------------------------------------------------------------
 void Mod_LoadPrimVerts( void )
 {
-	dprimvert_t		*in;
-	mprimvert_t		*out;
-	int				i, count;
-
 	CMapLoadHelper lh( LUMP_PRIMVERTS );
 
-	in = (dprimvert_t *)lh.LumpBase();
+	dprimvert_t *in = lh.LumpBase<dprimvert_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadPrimVerts: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
-	out = (mprimvert_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "primverts" ) );
-	memset( out, 0, count * sizeof( mprimvert_t ) );
+
+	int count = lh.LumpSize() / sizeof(*in);
+	mprimvert_t *out = Hunk_AllocName<mprimvert_t>( count, va( "%s [%s]", lh.GetLoadName(), "primverts" ) );
 
 	lh.GetMap()->primverts = out;
 	lh.GetMap()->numprimverts = count;
-	for ( i=0 ; i<count ; i++, in++, out++)
+
+	for ( int i=0 ; i<count ; i++, in++, out++)
 	{
 		out->pos = in->pos;
 	}
@@ -1712,23 +1607,19 @@ void Mod_LoadPrimVerts( void )
 //-----------------------------------------------------------------------------
 void Mod_LoadPrimIndices( void )
 {
-	unsigned short	*in;
-	unsigned short	*out;
-	int				count;
-
 	CMapLoadHelper lh( LUMP_PRIMINDICES );
 
-	in = (unsigned short *)lh.LumpBase();
+	unsigned short *in = lh.LumpBase<unsigned short>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadPrimIndices: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
-	out = (unsigned short *)Hunk_AllocName( count*sizeof(*out), va("%s [%s]", lh.GetLoadName(), "primindices" ) );
-	memset( out, 0, count * sizeof( unsigned short ) );
+
+	int count = lh.LumpSize() / sizeof(*in);
+	unsigned short *out = Hunk_AllocName<unsigned short>( count, va("%s [%s]", lh.GetLoadName(), "primindices" ), false );
+
+	memcpy( out, in, count * sizeof( unsigned short ) );
 
 	lh.GetMap()->primindices = out;
 	lh.GetMap()->numprimindices = count;
-
-	memcpy( out, in, count * sizeof( unsigned short ) );
 }
 
 
@@ -1752,7 +1643,7 @@ void Mod_LoadLump(
 	*nElements = lh.LumpSize() / elementSize;
 
 	// Make room for the data and copy the data in.
-	*ppData = Hunk_AllocName( lh.LumpSize(), loadname );
+	*ppData = Hunk_AllocName( lh.LumpSize(), loadname, false );
 	memcpy( *ppData, lh.LumpBase(), lh.LumpSize() );
 }
 
@@ -1792,21 +1683,21 @@ bool Mod_LoadSurfaceLightingV1( msurfacelighting_t *pLighting, dface_t *in, Colo
 	return ((pLighting->m_nStyles[0] != 0) && (pLighting->m_nStyles[0] != 255)) || (pLighting->m_nStyles[1] != 255);
 }
 
-void *Hunk_AllocNameAlignedClear_( intp size, intp alignment, const char *pHunkName )
+template<intp alignment>
+void *Hunk_AllocNameAlignedClear_( intp size, const char *pHunkName )
 {
-	Assert(IsPowerOfTwo(alignment));
-	void *pMem = Hunk_AllocName( alignment + size, pHunkName );
-	memset( pMem, 0, size + alignment );
-	pMem = (void *)( ( ( ( uintp )pMem ) + (alignment-1) ) & ~(alignment-1) );
+	static_assert(IsPowerOfTwo(alignment));
 
-	return pMem;
+	void *pMem = Hunk_AllocName( alignment + size, pHunkName );
+
+	return AlignValue( pMem, alignment );
 }
 
 // Allocates a block of T from the hunk.  Aligns as specified and clears the memory
-template< typename T > 
-T *Hunk_AllocNameAlignedClear( intp count, intp alignment, const char *pHunkName )
+template< typename T, intp alignment > 
+T *Hunk_AllocNameAlignedClear( intp count, const char *pHunkName )
 {
-	return static_cast<T *>(Hunk_AllocNameAlignedClear_( alignment + count * sizeof(T), alignment, pHunkName ));
+	return static_cast<T *>(Hunk_AllocNameAlignedClear_<alignment>( count * sizeof(T), pHunkName ));
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1816,7 +1707,6 @@ T *Hunk_AllocNameAlignedClear( intp count, intp alignment, const char *pHunkName
 //-----------------------------------------------------------------------------
 void Mod_LoadFaces( void )
 {
-	dface_t		*in;
 	int			count, surfnum;
 	int			planenum;
 	int			ti, di;
@@ -1829,7 +1719,7 @@ void Mod_LoadFaces( void )
 	}
 	CMapLoadHelper lh( face_lump_to_load );
 	
-	in = (dface_t *)lh.LumpBase();
+	dface_t *in = lh.LumpBase<dface_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadFaces: funny lump size in %s",lh.GetMapName());
 	count = lh.LumpSize() / sizeof(*in);
@@ -1845,16 +1735,16 @@ void Mod_LoadFaces( void )
 	static_assert( sizeof(msurfacelighting_t) == 32 );
 #endif
 
-	msurface1_t *out1 = Hunk_AllocNameAlignedClear< msurface1_t >( count, 16, va( "%s [%s]", lh.GetLoadName(), "surface1" ) );
-	msurface2_t *out2 = Hunk_AllocNameAlignedClear< msurface2_t >( count, 32, va( "%s [%s]", lh.GetLoadName(), "surface2" ) );
+	msurface1_t *out1 = Hunk_AllocNameAlignedClear< msurface1_t, 16 >( count, va( "%s [%s]", lh.GetLoadName(), "surface1" ) );
+	msurface2_t *out2 = Hunk_AllocNameAlignedClear< msurface2_t, 32 >( count, va( "%s [%s]", lh.GetLoadName(), "surface2" ) );
 
-	msurfacelighting_t *pLighting = Hunk_AllocNameAlignedClear< msurfacelighting_t >( count, 32, va( "%s [%s]", lh.GetLoadName(), "surfacelighting" ) );
+	msurfacelighting_t *pLighting = Hunk_AllocNameAlignedClear< msurfacelighting_t, 32 >( count, va( "%s [%s]", lh.GetLoadName(), "surfacelighting" ) );
 
 	worldbrushdata_t *pBrushData = lh.GetMap();
 	pBrushData->surfaces1 = out1;
 	pBrushData->surfaces2 = out2;
 	pBrushData->surfacelighting = pLighting;
-	pBrushData->surfacenormals = Hunk_AllocNameAlignedClear< msurfacenormal_t >( count, 2, va( "%s [%s]", lh.GetLoadName(), "surfacenormal" ) );
+	pBrushData->surfacenormals = Hunk_AllocNameAlignedClear< msurfacenormal_t, 2 >( count, va( "%s [%s]", lh.GetLoadName(), "surfacenormal" ) );
 	pBrushData->numsurfaces = count;
 
 	for ( surfnum=0 ; surfnum<count ; ++surfnum, ++in, ++out1, ++out2, ++pLighting )
@@ -2019,11 +1909,11 @@ void Mod_LoadNodes( void )
 
 	CMapLoadHelper lh( LUMP_NODES );
 
-	in = (dnode_t *)lh.LumpBase();
+	in = lh.LumpBase<dnode_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadNodes: funny lump size in %s",lh.GetMapName());
 	count = lh.LumpSize() / sizeof(*in);
-	out = (mnode_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "nodes" ) );
+	out = Hunk_AllocName<mnode_t>( count, va( "%s [%s]", lh.GetLoadName(), "nodes" ) );
 
 	lh.GetMap()->nodes = out;
 	lh.GetMap()->numnodes = count;
@@ -2095,18 +1985,18 @@ void Mod_LoadLeafs_Version_0( CMapLoadHelper &lh )
 	mleaf_t 	*out;
 	int			i, j, count, p;
 
-	in = (dleaf_version_0_t *)lh.LumpBase();
+	in = lh.LumpBase<dleaf_version_0_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadLeafs: funny lump size in %s",lh.GetMapName());
 	count = lh.LumpSize() / sizeof(*in);
-	out = (mleaf_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "leafs" ) );
+	out = Hunk_AllocName<mleaf_t>( count, va( "%s [%s]", lh.GetLoadName(), "leafs" ) );
 
 	lh.GetMap()->leafs = out;
 	lh.GetMap()->numleafs = count;
 
 	// one sample per leaf
-	lh.GetMap()->m_pLeafAmbient = (mleafambientindex_t *)Hunk_AllocName( count * sizeof(*lh.GetMap()->m_pLeafAmbient), "LeafAmbient" );
-	lh.GetMap()->m_pAmbientSamples = (mleafambientlighting_t *)Hunk_AllocName( count * sizeof(*lh.GetMap()->m_pAmbientSamples), "LeafAmbientSamples" );
+	lh.GetMap()->m_pLeafAmbient = Hunk_AllocName<mleafambientindex_t>( count, "LeafAmbient" );
+	lh.GetMap()->m_pAmbientSamples = Hunk_AllocName<mleafambientlighting_t>( count, "LeafAmbientSamples" );
 	mleafambientindex_t *pTable = lh.GetMap()->m_pLeafAmbient;
 	mleafambientlighting_t *pSamples = lh.GetMap()->m_pAmbientSamples;
 
@@ -2161,11 +2051,11 @@ void Mod_LoadLeafs_Version_1( CMapLoadHelper &lh, CMapLoadHelper &ambientLightin
 	mleaf_t 	*out;
 	int			i, j, count, p;
 
-	in = (dleaf_t *)lh.LumpBase();
+	in = lh.LumpBase<dleaf_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadLeafs: funny lump size in %s",lh.GetMapName());
 	count = lh.LumpSize() / sizeof(*in);
-	out = (mleaf_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "leafs" ) );
+	out = Hunk_AllocName<mleaf_t>( count, va( "%s [%s]", lh.GetLoadName(), "leafs" ) );
 
 	lh.GetMap()->leafs = out;
 	lh.GetMap()->numleafs = count;
@@ -2176,12 +2066,12 @@ void Mod_LoadLeafs_Version_1( CMapLoadHelper &lh, CMapLoadHelper &ambientLightin
 		CompressedLightCube *inLightCubes = NULL;
 		if ( ambientLightingLump.LumpSize() )
 		{
-			inLightCubes = ( CompressedLightCube * )ambientLightingLump.LumpBase();
+			inLightCubes = ambientLightingLump.LumpBase<CompressedLightCube>();
 			Assert( ambientLightingLump.LumpSize() % sizeof( CompressedLightCube ) == 0 );
 			Assert( ambientLightingLump.LumpSize() / sizeof( CompressedLightCube ) == lh.LumpSize() / sizeof( dleaf_t ) );
 		}
-		lh.GetMap()->m_pLeafAmbient = (mleafambientindex_t *)Hunk_AllocName( count * sizeof(*lh.GetMap()->m_pLeafAmbient), "LeafAmbient" );
-		lh.GetMap()->m_pAmbientSamples = (mleafambientlighting_t *)Hunk_AllocName( count * sizeof(*lh.GetMap()->m_pAmbientSamples), "LeafAmbientSamples" );
+		lh.GetMap()->m_pLeafAmbient = Hunk_AllocName<mleafambientindex_t>( count, "LeafAmbient" );
+		lh.GetMap()->m_pAmbientSamples = Hunk_AllocName<mleafambientlighting_t>( count, "LeafAmbientSamples" );
 		mleafambientindex_t *pTable = lh.GetMap()->m_pLeafAmbient;
 		mleafambientlighting_t *pSamples = lh.GetMap()->m_pAmbientSamples;
 		Vector gray(0.5, 0.5, 0.5);
@@ -2211,8 +2101,8 @@ void Mod_LoadLeafs_Version_1( CMapLoadHelper &lh, CMapLoadHelper &ambientLightin
 		Assert( ambientLightingLump.LumpSize() % sizeof( dleafambientlighting_t ) == 0 );
 		Assert( ambientLightingTable.LumpSize() % sizeof( dleafambientindex_t ) == 0 );
 		Assert((ambientLightingTable.LumpSize() / sizeof(dleafambientindex_t)) == (unsigned)count);	// should have one of these per leaf
-		lh.GetMap()->m_pLeafAmbient = (mleafambientindex_t *)Hunk_AllocName( ambientLightingTable.LumpSize(), "LeafAmbient" );
-		lh.GetMap()->m_pAmbientSamples = (mleafambientlighting_t *)Hunk_AllocName( ambientLightingLump.LumpSize(), "LeafAmbientSamples" );
+		lh.GetMap()->m_pLeafAmbient = (mleafambientindex_t *)Hunk_AllocName( ambientLightingTable.LumpSize(), "LeafAmbient", false );
+		lh.GetMap()->m_pAmbientSamples = (mleafambientlighting_t *)Hunk_AllocName( ambientLightingLump.LumpSize(), "LeafAmbientSamples", false );
 		Q_memcpy( lh.GetMap()->m_pLeafAmbient, ambientLightingTable.LumpBase(), ambientLightingTable.LumpSize() );
 		Q_memcpy( lh.GetMap()->m_pAmbientSamples, ambientLightingLump.LumpBase(), ambientLightingLump.LumpSize() );
 	}
@@ -2302,11 +2192,11 @@ void Mod_LoadLeafWaterData( void )
 
 	CMapLoadHelper lh( LUMP_LEAFWATERDATA );
 
-	in = (dleafwaterdata_t *)lh.LumpBase();
+	in = lh.LumpBase<dleafwaterdata_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadLeafs: funny lump size in %s",lh.GetMapName());
 	count = lh.LumpSize() / sizeof(*in);
-	out = (mleafwaterdata_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "leafwaterdata" ) );
+	out = Hunk_AllocName<mleafwaterdata_t>( count, va( "%s [%s]", lh.GetLoadName(), "leafwaterdata" ) );
 
 	lh.GetMap()->leafwaterdata = out;
 	lh.GetMap()->numleafwaterdata = count;
@@ -2346,11 +2236,11 @@ void Mod_LoadCubemapSamples( void )
 
 	V_strcpy_safe( loadName, lh.GetLoadName() );
 
-	in = (dcubemapsample_t *)lh.LumpBase();
+	in = lh.LumpBase<dcubemapsample_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadCubemapSamples: funny lump size in %s",lh.GetMapName());
 	count = lh.LumpSize() / sizeof(*in);
-	out = (mcubemapsample_t *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "cubemapsample" ) );
+	out = Hunk_AllocName<mcubemapsample_t>( count, va( "%s [%s]", lh.GetLoadName(), "cubemapsample" ) );
 
 	lh.GetMap()->m_pCubemapSamples = out;
 	lh.GetMap()->m_nCubemapSamples = count;
@@ -2430,7 +2320,7 @@ void Mod_LoadLeafMinDistToWater( void )
 {
 	CMapLoadHelper lh( LUMP_LEAFMINDISTTOWATER );
 
-	unsigned short *pTmp = ( unsigned short * )lh.LumpBase();
+	unsigned short *pTmp = lh.LumpBase<unsigned short>();
 
 	int i;
 	bool foundOne = false;
@@ -2453,15 +2343,12 @@ void Mod_LoadLeafMinDistToWater( void )
 	}
 	else
 	{
-		int		count;
-		unsigned short	*in;
-		unsigned short	*out;
-
-		in = (unsigned short *)lh.LumpBase();
+		unsigned short	*in = lh.LumpBase<unsigned short>();
 		if (lh.LumpSize() % sizeof(*in))
 			Host_Error ("Mod_LoadLeafMinDistToWater: funny lump size in %s",lh.GetMapName());
-		count = lh.LumpSize() / sizeof(*in);
-		out = (unsigned short *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "leafmindisttowater" ) );
+
+		int count = lh.LumpSize() / sizeof(*in);
+		unsigned short	*out = Hunk_AllocName<unsigned short>( count, va( "%s [%s]", lh.GetLoadName(), "leafmindisttowater" ), false );
 
 		memcpy( out, in, sizeof( out[0] ) * count );
 		lh.GetMap()->m_LeafMinDistToWater = out;
@@ -2478,7 +2365,7 @@ void Mod_LoadMarksurfaces( void )
 
 	CMapLoadHelper lh( LUMP_LEAFFACES );
 	
-	in = (unsigned short *)lh.LumpBase();
+	in = lh.LumpBase<unsigned short>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadMarksurfaces: funny lump size in %s",lh.GetMapName());
 	count = lh.LumpSize() / sizeof(*in);
@@ -2504,7 +2391,7 @@ void Mod_LoadMarksurfaces( void )
 	}
 
 	// now allocate the permanent list, and copy the non-terrain, non-nodraw surfs into it
-	SurfaceHandle_t *surfList = (SurfaceHandle_t *)Hunk_AllocName( realCount*sizeof(SurfaceHandle_t), va( "%s [%s]", lh.GetLoadName(), "surfacehandle" ) );
+	SurfaceHandle_t *surfList = Hunk_AllocName<SurfaceHandle_t>( realCount, va( "%s [%s]", lh.GetLoadName(), "surfacehandle" ) );
 
 	int outCount = 0;
 	mleaf_t *pLeaf = pBrushData->leafs;
@@ -2558,27 +2445,24 @@ void Mod_LoadMarksurfaces( void )
 //			*l - 
 //			*loadname - 
 //-----------------------------------------------------------------------------
-void Mod_LoadSurfedges( medge_t *pedges )
+void Mod_LoadSurfedges( std::unique_ptr<medge_t[]> &pedges )
 {	
-	int		i, count;
-	int		*in;
-	unsigned short *out;
-	
 	CMapLoadHelper lh( LUMP_SURFEDGES );
 
-	in = (int *)lh.LumpBase();
+	int *in = lh.LumpBase<int>();
 	if (lh.LumpSize() % sizeof(*in))
 		Host_Error ("Mod_LoadSurfedges: funny lump size in %s",lh.GetMapName());
-	count = lh.LumpSize() / sizeof(*in);
+
+	int count = lh.LumpSize() / sizeof(*in);
 	if (count < 1 || count >= MAX_MAP_SURFEDGES)
-		Host_Error ("Mod_LoadSurfedges: bad surfedges count in %s: %i",
-		lh.GetMapName(), count);
-	out = (unsigned short *)Hunk_AllocName( count*sizeof(*out), va( "%s [%s]", lh.GetLoadName(), "surfedges" ) );
+		Host_Error ("Mod_LoadSurfedges: bad surfedges count in %s: %i",lh.GetMapName(), count);
+
+	unsigned short *out = Hunk_AllocName<unsigned short>( count, va( "%s [%s]", lh.GetLoadName(), "surfedges" ) );
 
 	lh.GetMap()->vertindices = out;
 	lh.GetMap()->numvertindices = count;
 
-	for ( i=0 ; i<count ; i++)
+	for ( int i=0 ; i<count ; i++)
 	{
 		int edge = in[i];
 		int index = 0;
@@ -2589,8 +2473,6 @@ void Mod_LoadSurfedges( medge_t *pedges )
 		}
 		out[i] = pedges[edge].v[index];
 	}
-
-	delete[] pedges;
 }
 
 //-----------------------------------------------------------------------------
@@ -2735,14 +2617,16 @@ bool Mod_LoadGameLump( int lumpId, void *pOutBuffer, int size )
 
 	// We'll fall though to here through here if we're compressed
 	bool bResult = false;
-	if ( !CLZMA::IsCompressed( pData ) || CLZMA::GetActualSize( (unsigned char *)pData ) != g_GameLumpDict[i].uncompressedSize )
+	if ( !CLZMA::IsCompressed( pData ) ||
+		  CLZMA::GetActualSize( pData ) != g_GameLumpDict[i].uncompressedSize )
 	{
 		Warning( "Failed loading game lump %i: lump claims to be compressed but metadata does not match\n", lumpId );
 	}
 	else
 	{
 		// uncompress directly into caller's buffer
-		size_t outputLength = CLZMA::Uncompress( pData, (unsigned char *)pOutBuffer );
+		// dimhotepus: Add out size to prevent overflows.
+		size_t outputLength = CLZMA::Uncompress( pData, pOutBuffer, dataLength );
 		bResult = ( outputLength > 0 && outputLength == g_GameLumpDict[i].uncompressedSize );
 	}
 
@@ -2771,10 +2655,10 @@ void Mod_LoadGameLumpDict( void )
 	unsigned int lhSize = (unsigned int)Max( lh.LumpSize(), 0 );
 	if ( lhSize >= sizeof( dgamelumpheader_t ) )
 	{
-		dgamelumpheader_t* pGameLumpHeader = (dgamelumpheader_t*)lh.LumpBase();
+		dgamelumpheader_t* pGameLumpHeader = lh.LumpBase<dgamelumpheader_t>();
 
 		// Ensure (lumpsize * numlumps + headersize) doesn't overflow
-		const int nMaxGameLumps = ( INT_MAX - sizeof( dgamelumpheader_t ) ) / sizeof( dgamelump_t );
+		constexpr int nMaxGameLumps = ( INT_MAX - sizeof( dgamelumpheader_t ) ) / sizeof( dgamelump_t );
 		if ( pGameLumpHeader->lumpCount < 0 ||
 		     pGameLumpHeader->lumpCount > nMaxGameLumps ||
 		     sizeof( dgamelumpheader_t ) + sizeof( dgamelump_t ) * pGameLumpHeader->lumpCount > lhSize )
@@ -3077,7 +2961,7 @@ class CResourcePreloadModel : public CResourcePreload
 				// 360 reads its specialized bsp into memory,
 				// up to the pack lump, which is guranateed last
 				char szLoadName[MAX_PATH];
-				V_FileBase( pMapModel->strName, szLoadName, sizeof( szLoadName ) );
+				V_FileBase( pMapModel->strName, szLoadName );
 				CMapLoadHelper::Init( pMapModel, szLoadName );
 				int nBytesToRead = CMapLoadHelper::LumpOffset( LUMP_PAKFILE );
 				CMapLoadHelper::Shutdown();
@@ -3111,7 +2995,7 @@ class CResourcePreloadModel : public CResourcePreload
 			MEM_ALLOC_CREDIT_( "CResourcePreloadModel(MDL)" );
 
 			char szFilename[MAX_PATH];
-			V_ComposeFileName( "models", pName, szFilename, sizeof( szFilename ) );			
+			V_ComposeFileName( "models", pName, szFilename );
 	
 			// find model or create empty entry
 			model_t *pModel = g_ModelLoader.FindModel( szFilename );
@@ -3508,7 +3392,7 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 	double st = Plat_FloatTime();
 
 	// Set the name of the current model we are loading
-	Q_FileBase( mod->strName, m_szLoadName, sizeof( m_szLoadName ) );
+	Q_FileBase( mod->strName, m_szLoadName );
 
 	// load the file
 	if ( developer.GetInt() > 1 )
@@ -3558,10 +3442,10 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 
 			// the map may have explicit texture exclusion
 			// the texture state needs to be established before any loading work
-			if ( IsX360() || mat_excludetextures.GetBool() )
+			if ( mat_excludetextures.GetBool() )
 			{
 				char szExcludePath[MAX_PATH];
-				sprintf( szExcludePath, "//MOD/maps/%s_exclude.lst", m_szLoadName );
+				V_sprintf_safe( szExcludePath, "//MOD/maps/%s_exclude.lst", m_szLoadName );
 				g_pMaterialSystem->SetExcludedTextures( szExcludePath );
 			}
 
@@ -3647,7 +3531,7 @@ static void BuildSpriteLoadName( const char *pName, char *pOut, int outLen, bool
 	else
 	{
 		char szBase[MAX_PATH];
-		Q_FileBase( pName, szBase, sizeof( szBase ) );
+		Q_FileBase( pName, szBase );
 		Q_snprintf( pOut, outLen, "sprites/%s", szBase );
 	}
 	
@@ -3671,8 +3555,8 @@ int CModelLoader::GetModelFileSize( char const *name )
 	if ( Q_stristr( model->strName, ".spr" ) || Q_stristr( model->strName, ".vmt" ) )
 	{
 		char spritename[ MAX_PATH ];
-		Q_StripExtension( va( "materials/%s", model->strName.String() ), spritename, MAX_PATH );
-		Q_DefaultExtension( spritename, ".vmt", sizeof( spritename ) );
+		Q_StripExtension( va( "materials/%s", model->strName.String() ), spritename );
+		Q_DefaultExtension( spritename, ".vmt" );
 
 		size = COM_FileSize( spritename );
 	}
@@ -4371,11 +4255,13 @@ void CModelLoader::Map_LoadModel( model_t *mod )
 	COM_TimestampedLog( "  Mod_LoadVertices" );
 	Mod_LoadVertices();
 	
-	COM_TimestampedLog( "  Mod_LoadEdges" );
-	medge_t *pedges = Mod_LoadEdges();
+	{
+		COM_TimestampedLog( "  Mod_LoadEdges" );
+		std::unique_ptr<medge_t[]> pedges = Mod_LoadEdges();
 
-	COM_TimestampedLog( "  Mod_LoadSurfedges" );
-	Mod_LoadSurfedges( pedges );
+		COM_TimestampedLog( "  Mod_LoadSurfedges" );
+		Mod_LoadSurfedges( pedges );
+	}
 
 	COM_TimestampedLog( "  Mod_LoadPlanes" );
 	Mod_LoadPlanes();
@@ -4906,9 +4792,11 @@ void CModelLoader::DumpVCollideStats()
 	}
 	size_t bboxSize;
 	intp bboxCount;
-	physcollision->GetBBoxCacheSize( &bboxSize, &bboxCount );
-	Msg( "%8zu bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
-	totalVCollideMemory += bboxSize;
+	if ( physcollision->GetBBoxCacheSize( &bboxSize, &bboxCount ) )
+	{
+		Msg( "%8zu bytes BBox physics: %zd boxes\n", bboxSize, bboxCount );
+		totalVCollideMemory += bboxSize;
+	}
 	Msg( "--------------\n%8zu bytes total VCollide Memory\n", totalVCollideMemory );
 }
 
@@ -5055,11 +4943,6 @@ void CModelLoader::Studio_UnloadModel( model_t *pModel )
 	// leave these flags alone since we are going to return from alt-tab at some point.
 	//	Assert( !( mod->needload & FMODELLOADER_REFERENCEMASK ) );
 	pModel->nLoadFlags &= ~( FMODELLOADER_LOADED | FMODELLOADER_LOADED_BY_PRELOAD );
-	if ( IsX360() )
-	{
-		// 360 doesn't need to keep the reference flags, but the PC does
-		pModel->nLoadFlags &= ~FMODELLOADER_REFERENCEMASK;
-	}
 
 #ifdef DBGFLAG_ASSERT
 	int nRef = 
@@ -5193,7 +5076,7 @@ void CModelLoader::Map_LoadDisplacements( model_t *pModel, bool bRestoring )
 		return;
 	}
 	
-	Q_FileBase( pModel->strName, m_szLoadName, sizeof( m_szLoadName ) );
+	Q_FileBase( pModel->strName, m_szLoadName );
 	CMapLoadHelper::Init( pModel, m_szLoadName );
 
     DispInfo_LoadDisplacements( pModel, bRestoring );
@@ -5294,16 +5177,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 		return false;
 	}
 
-	FileHandle_t mapfile;
-
-	if ( IsX360() )
-	{
-		char szMapName360[MAX_PATH];
-		UpdateOrCreate( szMapFile, szMapName360, sizeof( szMapName360 ), false );
-		V_strcpy_safe( szMapFile, szMapName360 );
-	}
-
-	mapfile = g_pFileSystem->OpenEx( szMapFile, "rb", IsX360() ? FSOPEN_NEVERINPACK : 0, "GAME" );
+	FileHandle_t mapfile = g_pFileSystem->OpenEx( szMapFile, "rb", 0, "GAME" );
 	if ( mapfile != FILESYSTEM_INVALID_HANDLE )
 	{
 		dheader_t header;
@@ -5578,7 +5452,7 @@ void CModelLoader::FinishDynamicModelLoadIfReady( CDynamicModelInfo *pDyn, model
 			dyn.m_nLoadFlags |= CDynamicModelInfo::ALLREADY;
 
 			// Reverse order; UnregisterModelLoadCallback does a FastRemove that swaps from back
-			for ( int i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
+			for ( intp i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
 			{
 				uintptr_t callbackID = dyn.m_Callbacks[ i ];
 				bool bClientOnly = (bool)(callbackID & 1);
@@ -5590,7 +5464,7 @@ void CModelLoader::FinishDynamicModelLoadIfReady( CDynamicModelInfo *pDyn, model
 		else
 		{
 			// Reverse order; UnregisterModelLoadCallback does a FastRemove that swaps from back
-			for ( int i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
+			for ( intp i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
 			{
 				uintptr_t callbackID = dyn.m_Callbacks[ i ];
 				bool bClientOnly = (bool)(callbackID & 1);

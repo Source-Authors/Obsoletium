@@ -54,7 +54,7 @@ public:
 	bool					IsLooped( void ) override;
 	bool					IsStereoWav( void ) override;
 	bool					IsStreaming( void ) override;
-	int						GetCacheStatus( void ) override;
+	CAudioSource::AudioStatus			GetCacheStatus( void ) override;
 	int						ConvertLoopedPosition( int samplePosition );
 	void					CacheLoad( void ) override;
 	void					CacheUnload( void ) override;

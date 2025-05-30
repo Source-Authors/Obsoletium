@@ -28,7 +28,7 @@ CServerConfigPanel::CServerConfigPanel(vgui::Panel *parent, const char *name, co
 		//!! always load from server if on a remote connection
 	}
 
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ void CServerConfigPanel::OnResetData()
 {
 	RefreshVarList();
 	// update every minute
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 1.0f);
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------

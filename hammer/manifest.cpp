@@ -370,7 +370,7 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 		return false;
 	}
 
-	V_StripExtension( pszFileName, m_ManifestDir, sizeof( m_ManifestDir ) );
+	V_StripExtension( pszFileName, m_ManifestDir );
 	V_strcat_safe( m_ManifestDir, "\\" );
 
 	CChunkFile File;
@@ -688,7 +688,7 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 		eResult = File.Close();
 	}
 
-	V_StripExtension( pszFileName, m_ManifestDir, sizeof( m_ManifestDir ) );
+	V_StripExtension( pszFileName, m_ManifestDir );
 	CreateDirectory( m_ManifestDir, NULL );
 	V_strcat_safe( m_ManifestDir, "\\" );
 
@@ -941,10 +941,10 @@ void CManifest::SetModifiedFlag( BOOL bModified )
 // Input  : pManifestMapFileName - the relative name of the sub map
 // Output : pOutputPath - the full path to the sub map
 //-----------------------------------------------------------------------------
-void CManifest::GetFullMapPath( const char *pManifestMapFileName, char *pOutputPath )
+void CManifest::GetFullMapPath( const char *pManifestMapFileName, OUT_Z_CAP(outSize) char *pOutputPath, intp outSize )
 {
-	strcpy( pOutputPath, m_ManifestDir );
-	strcat( pOutputPath, pManifestMapFileName );
+	V_strncpy( pOutputPath, m_ManifestDir, outSize );
+	V_strncat( pOutputPath, pManifestMapFileName, outSize );
 }
 
 
@@ -1298,7 +1298,7 @@ bool CManifest::AddExistingMap( const char *pszFileName, bool bFromInstance )
 		char	ManifestFile[ MAX_PATH ];
 
 		V_strcpy_safe( ManifestFile, pszFileName );
-		V_SetExtension( ManifestFile, ".vmm", sizeof( ManifestFile ) );
+		V_SetExtension( ManifestFile, ".vmm" );
 
 		m_bRelocateSave = true;
 		OnSaveDocument( ManifestFile );

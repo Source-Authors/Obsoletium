@@ -445,7 +445,7 @@ bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool 
 			return false;
 		}
 
-		int index = pSocketData->m_OutstandingSends.AddToTail();
+		auto index = pSocketData->m_OutstandingSends.AddToTail();
 		pSocketData->m_OutstandingSends[index].Put( data, len );
 		return true;
 	}
@@ -553,8 +553,7 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 		}
 
 		// add the new rcon
-		intp index = m_failedRcons.AddToTail();
-		failedRcon = &m_failedRcons[index];
+		failedRcon = &m_failedRcons[m_failedRcons.AddToTail()];
 		failedRcon->adr = adr;
 		failedRcon->badPasswordCount = 0;
 		failedRcon->badPasswordTimes.RemoveAll();

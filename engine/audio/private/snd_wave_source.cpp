@@ -423,7 +423,7 @@ bool CAudioSourceWave::IsStreaming( void )
 }
 
 
-int CAudioSourceWave::GetCacheStatus( void )
+CAudioSource::AudioStatus CAudioSourceWave::GetCacheStatus( void )
 {
 	return AUDIO_IS_LOADED;
 }
@@ -826,7 +826,7 @@ public:
 	virtual int				ZeroCrossingBefore( int sample );
 	virtual int				ZeroCrossingAfter( int sample );
 
-	virtual int				GetCacheStatus( void );
+	virtual CAudioSource::AudioStatus			GetCacheStatus( void );
 	virtual void			CacheLoad( void );
 	virtual void			CacheUnload( void );
 
@@ -1195,28 +1195,21 @@ void CAudioSourceMemWave::ParseDataChunk( IterateRIFF &walk )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-int CAudioSourceMemWave::GetCacheStatus( void )
+CAudioSource::AudioStatus CAudioSourceMemWave::GetCacheStatus( void )
 {
 	VPROF("CAudioSourceMemWave::GetCacheStatus");
 
-	if ( IsPC() || !IsX360() )
+	// NOTE: This will start the load if it isn't started
+	bool bCacheValid;
+	bool bCompleted = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
+	if ( !bCacheValid )
 	{
-		// NOTE: This will start the load if it isn't started
-		bool bCacheValid;
-		bool bCompleted = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
-		if ( !bCacheValid )
-		{
-			wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
-		}
-		if ( bCompleted )
-			return AUDIO_IS_LOADED;
-		if ( wavedatacache->IsDataLoadInProgress( m_hCache ) )
-			return AUDIO_LOADING;
+		wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
 	}
-	else
-	{
-		return wavedatacache->IsStreamedDataReady( m_hStream ) ? AUDIO_IS_LOADED : AUDIO_NOT_LOADED;
-	}
+	if ( bCompleted )
+		return AUDIO_IS_LOADED;
+	if ( wavedatacache->IsDataLoadInProgress( m_hCache ) )
+		return AUDIO_LOADING;
 
 	return AUDIO_NOT_LOADED;
 }
@@ -1226,58 +1219,19 @@ int CAudioSourceMemWave::GetCacheStatus( void )
 //-----------------------------------------------------------------------------
 void CAudioSourceMemWave::CacheLoad( void )
 {
-	if ( IsPC() || !IsX360() )
+	// Commence lazy load?
+	if ( m_hCache != 0 )
 	{
-		// Commence lazy load?
-		if ( m_hCache != 0 )
+		bool bCacheValid;
+		wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
+		if ( !bCacheValid )
 		{
-			bool bCacheValid;
-			wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
-			if ( !bCacheValid )
-			{
-				wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
-			}
-			return;
+			wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );
 		}
-
-		m_hCache = wavedatacache->AsyncLoadCache( m_pSfx->GetFileName(), m_dataSize, m_dataStart );
+		return;
 	}
-	else
-	{
-		if ( m_hStream == INVALID_STREAM_HANDLE )
-		{
-			// memory wave is resident
-			const char *pFilename = m_pSfx->GetFileName();
-			streamFlags_t streamFlags = STREAMED_FROMDVD;
-			char szFilename[MAX_PATH];
-			if ( m_format == WAVE_FORMAT_XMA || m_format == WAVE_FORMAT_PCM )
-			{
-				V_strcpy_safe( szFilename, pFilename );
-				V_SetExtension( szFilename, ".360.wav", sizeof( szFilename ) );
-				pFilename = szFilename;
 
-				// memory resident xma waves use the queued loader
-				// restricting to XMA due to not correctly running a post ConvertSamples, which is not an issue for XMA
-				if ( g_pQueuedLoader->IsMapLoading() )
-				{
-					// hint the wave data cache
-					streamFlags |= STREAMED_QUEUEDLOAD;
-				}
-			}
-
-			// open stream to load as a single monolithic buffer
-			m_hStream = wavedatacache->OpenStreamedLoad( pFilename, m_dataSize, m_dataStart, 0, -1, m_dataSize, 1, streamFlags );
-			if ( m_hStream != INVALID_STREAM_HANDLE && !( streamFlags & STREAMED_QUEUEDLOAD ) )
-			{
-				// block and finish load, convert data once right now
-				char *pWaveData = (char *)wavedatacache->GetStreamedDataPointer( m_hStream, true );
-				if ( pWaveData )
-				{
-					ConvertSamples( pWaveData, m_dataSize/m_sampleSize );
-				}
-			}
-		}
-	}
+	m_hCache = wavedatacache->AsyncLoadCache( m_pSfx->GetFileName(), m_dataSize, m_dataStart );
 }
 
 //-----------------------------------------------------------------------------
@@ -1285,20 +1239,9 @@ void CAudioSourceMemWave::CacheLoad( void )
 //-----------------------------------------------------------------------------
 void CAudioSourceMemWave::CacheUnload( void )
 {
-	if ( IsPC() || !IsX360() )
+	if ( m_hCache != 0 )
 	{
-		if ( m_hCache != 0 )
-		{
-			wavedatacache->Unload( m_hCache );
-		}
-	}
-	else
-	{
-		if ( m_hStream != INVALID_STREAM_HANDLE )
-		{
-			wavedatacache->CloseStreamedLoad( m_hStream );
-			m_hStream = INVALID_STREAM_HANDLE;
-		}
+		wavedatacache->Unload( m_hCache );
 	}
 }
 
@@ -1310,42 +1253,30 @@ void CAudioSourceMemWave::CacheUnload( void )
 char *CAudioSourceMemWave::GetDataPointer( void )
 {
 	char *pWaveData = NULL;
+	bool bSamplesConverted = false;
 
-	if ( IsPC() || !IsX360() )
+	if ( m_hCache == 0 )
 	{
-		bool bSamplesConverted = false;
-
-		if ( m_hCache == 0 )
-		{
-			// not in cache, start loading
-			CacheLoad();
-		}
-
-		// mount the requested data, blocks if necessary
-		wavedatacache->GetDataPointer( 
-			m_hCache, 
-			m_pSfx->GetFileName(), 
-			m_dataSize, 
-			m_dataStart, 
-			(void **)&pWaveData, 
-			0, 
-			&bSamplesConverted );
-
-		// If we have reloaded data from disk (async) and we haven't converted the samples yet, do it now
-		// FIXME:  Is this correct for stereo wavs?
-		if ( pWaveData && !bSamplesConverted )
-		{
-			ConvertSamples( pWaveData, m_dataSize/m_sampleSize );
-			wavedatacache->SetPostProcessed( m_hCache, true );
-		}
+		// not in cache, start loading
+		CacheLoad();
 	}
-	else
+
+	// mount the requested data, blocks if necessary
+	wavedatacache->GetDataPointer( 
+		m_hCache, 
+		m_pSfx->GetFileName(), 
+		m_dataSize, 
+		m_dataStart, 
+		(void **)&pWaveData, 
+		0, 
+		&bSamplesConverted );
+
+	// If we have reloaded data from disk (async) and we haven't converted the samples yet, do it now
+	// FIXME:  Is this correct for stereo wavs?
+	if ( pWaveData && !bSamplesConverted )
 	{
-		if ( m_hStream != INVALID_STREAM_HANDLE )
-		{
-			// expected to be valid, unless failure during setup
-			pWaveData = (char *)wavedatacache->GetStreamedDataPointer( m_hStream, true );
-		}
+		ConvertSamples( pWaveData, m_dataSize/m_sampleSize );
+		wavedatacache->SetPostProcessed( m_hCache, true );
 	}
 
 	return pWaveData;
@@ -1367,7 +1298,7 @@ public:
 	void			ParseChunk( IterateRIFF &walk, int chunkName );
 	bool			IsStreaming( void ) { return true; }
 
-	virtual int		GetCacheStatus( void );
+	virtual CAudioSource::AudioStatus		GetCacheStatus( void );
 
 	// IWaveStreamSource
 	virtual int UpdateLoopingSamplePosition( int samplePosition )
@@ -1428,7 +1359,6 @@ CAudioSourceStreamWave::~CAudioSourceStreamWave( void )
 //-----------------------------------------------------------------------------
 CAudioMixer *CAudioSourceStreamWave::CreateMixer( int initialStreamPosition )
 {
-	char fileName[MAX_PATH];
 	const char *pFileName = m_pSfx->GetFileName();
 	
 	// BUGBUG: Source constructs the IWaveData, mixer frees it, fix this?
@@ -1436,10 +1366,7 @@ CAudioMixer *CAudioSourceStreamWave::CreateMixer( int initialStreamPosition )
 	if ( pWaveData )
 	{
 		CAudioMixer *pMixer = CreateWaveMixer( pWaveData, m_format, m_channels, m_bits, initialStreamPosition );
-		if ( pMixer )
-		{
-			return pMixer;
-		}
+		if ( pMixer ) return pMixer;
 
 		// no mixer, delete the stream buffer/instance
 		delete pWaveData;
@@ -1553,7 +1480,7 @@ int CAudioSourceStreamWave::GetOutputData( void **, int, int, char [AUDIOSOURCE_
 	return 0;
 }
 
-int CAudioSourceStreamWave::GetCacheStatus( void )
+CAudioSource::AudioStatus CAudioSourceStreamWave::GetCacheStatus( void )
 {
 	if ( !m_dataSize || !m_dataStart )
 	{
@@ -2161,7 +2088,7 @@ bool CAudioSourceCache::Init( size_t memSize )
 		char szSearchPath[ MAX_PATH ];
 		V_strcpy_safe( szSearchPath, vecSearchPaths[idxSearchPath] );
 		V_FixSlashes( szSearchPath );
-		V_AppendSlash( szSearchPath, sizeof(szSearchPath ) );
+		V_AppendSlash( szSearchPath );
 
 		// See if we already have a cache for this search path.
 		bool bFound = false;
@@ -2201,11 +2128,10 @@ CAudioSourceCache::SearchPathCache *CAudioSourceCache::FindCacheForSearchPath( c
 
 CAudioSourceCache::SearchPathCache *CAudioSourceCache::CreateCacheForSearchPath( const char *pszSearchPath )
 {
-
 	// Make sure search path ends in a slash
 	char szSearchPath[ MAX_PATH ];
 	V_strcpy_safe( szSearchPath, pszSearchPath );
-	V_AppendSlash( szSearchPath, sizeof(szSearchPath) );
+	V_AppendSlash( szSearchPath );
 
 	// Set the filename for the cache.
 	UtlCachedFileDataType_t eOutOfDateMethod = UTL_CACHED_FILE_USE_FILESIZE;
@@ -2276,7 +2202,7 @@ unsigned int CAudioSourceCache::AsyncLookaheadMetaChecksum( void )
 	CRC32_Init( &crc );
 
 	float f = SND_ASYNC_LOOKAHEAD_SECONDS;
-	CRC32_ProcessBuffer( &crc, &f, sizeof( f ) );
+	CRC32_ProcessBuffer( &crc, f );
 	// Finish
 	CRC32_Final( &crc );
 
@@ -2323,7 +2249,7 @@ CAudioSourceCache::SearchPathCache *CAudioSourceCache::LookUpCacheEntry( const c
 
 	// Get absolute filename.  This thing had better exist in the filesystem somewhere
 	char szAbsFilename[ 1024 ];
-	if ( !g_pFullFileSystem->RelativePathToFullPath( szRelFilename, "game", szAbsFilename, sizeof(szAbsFilename) ) )
+	if ( !g_pFullFileSystem->RelativePathToFullPath_safe( szRelFilename, "game", szAbsFilename ) )
 	{
 		return NULL;
 	}
@@ -2423,7 +2349,7 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 
 	// Get absolute path
 	char szAbsPath[ MAX_PATH ];
-	V_MakeAbsolutePath( szAbsPath, sizeof(szAbsPath), pszSearchPath );
+	V_MakeAbsolutePath( szAbsPath, pszSearchPath );
 	V_FixSlashes( szAbsPath );
 
 	// Add a search path to the filesystem.  We'll add one search path as a kludge so we
@@ -2451,7 +2377,7 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 	// the file, wherein the proper path to the file is /foo/bar.vpk, but the *search path* should be /foo/bar.vpk/
 	char szAsSearchPath[MAX_PATH] = { 0 };
 	V_strncpy( szAsSearchPath, szAbsPath, sizeof( szAsSearchPath ) );
-	V_AppendSlash( szAsSearchPath, sizeof( szAsSearchPath ) );
+	V_AppendSlash( szAsSearchPath );
 
 	SearchPathCache *pCache = FindCacheForSearchPath( szAsSearchPath );
 	if ( !pCache )
@@ -2495,7 +2421,7 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 		CAudioSourceCachedInfo::s_bIsPrecacheSound = true;
 		CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_WAV;
 		char szExt[ 10 ] = { 0 };
-		V_ExtractFileExtension( pszFilename, szExt, sizeof( szExt ) );
+		V_ExtractFileExtension( pszFilename, szExt );
 		if ( V_stricmp( szExt, "mp3" ) == 0 )
 		{
 			CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_MP3;

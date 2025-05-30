@@ -5,6 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 #include "cbase.h"
+#include "IFileLoader.h"
 #include "sentence.h"
 #include "wavefile.h"
 #include "tier2/riff.h"
@@ -12,7 +13,8 @@
 #include <io.h>
 #include <fcntl.h>
 #include <sys/types.h>
-#include "IFileLoader.h"
+
+#include "winlite.h"
 
 bool SceneManager_LoadSentenceFromWavFileUsingIO( char const *wavfile, CSentence& sentence, IFileReadBinary& io );
 
@@ -22,57 +24,57 @@ bool SceneManager_LoadSentenceFromWavFileUsingIO( char const *wavfile, CSentence
 class ThreadIOReadBinary : public IFileReadBinary
 {
 public:
-	int open( const char *pFileName )
+	intp open( const char *pFileName )
 	{
 		char filename[ 512 ];
 		// POSSIBLE BUG:  THIS MIGHT NOT BE THREAD SAFE!!!
-		filesystem->RelativePathToFullPath( pFileName, "GAME", filename, sizeof( filename ) );
-		return (int)_open( filename, _O_BINARY | _O_RDONLY );
+		filesystem->RelativePathToFullPath_safe( pFileName, "GAME", filename );
+		return (intp)_open( filename, _O_BINARY | _O_RDONLY );
 	}
 
-	int read( void *pOutput, int size, int file )
+	int read( void *pOutput, int size, intp file )
 	{
-		if ( !file )
+		if ( file == -1 )
 			return 0;
 
-		return _read( file, pOutput, size );
+		return _read( (int)file, pOutput, size );
 	}
 
-	void seek( int file, int pos )
+	void seek( intp file, int pos )
 	{
-		if ( !file )
+		if ( file == -1 )
 			return;
 
-		_lseek( file, pos, SEEK_SET );
+		_lseek( (int)file, pos, SEEK_SET );
 	}
 
-	unsigned int tell( int file )
+	unsigned int tell( intp file )
 	{
-		if ( !file )
+		if ( file == -1 )
 			return 0;
 
-		return _tell( file );
+		return _tell( (int)file );
 	}
 
-	unsigned int size( int file )
+	unsigned int size( intp file )
 	{
-		if ( !file )
+		if ( file == -1 )
 			return 0;
 
-		long curpos = tell( file );
-		_lseek( file, 0, SEEK_END );
-		int s = tell( file );
-		_lseek( file, curpos, SEEK_SET );
+		unsigned int curpos = tell( file );
+		_lseek( (int)file, 0, SEEK_END );
+		unsigned int s = tell( file );
+		_lseek( (int)file, curpos, SEEK_SET );
 
 		return s;
 	}
 
-	void close( int file )
+	void close( intp file )
 	{
-		if ( !file )
+		if ( file == -1 )
 			return;
 
-		_close( file );
+		_close( (int)file );
 	}
 };
 
@@ -104,7 +106,7 @@ public:
 	virtual 				~CFileLoaderThread( void );
 
 	// Sockets add/remove themselves via their constructor
-	virtual void			AddWaveFilesToThread( CUtlVector< CWaveFile * >& wavefiles );
+	void					AddWaveFilesToThread( CUtlVector< CWaveFile * >& wavefiles ) override;
 
 	// Lock changes to wavefile list, etc.
 	virtual void			Lock( void );
@@ -115,13 +117,13 @@ public:
 	virtual HANDLE			GetShutdownHandle( void );
 
 	// Caller should call lock before accessing any of these methods and unlock afterwards!!!
-	virtual	int				ProcessCompleted();
+	intp			ProcessCompleted() override;
 
-	int						DoThreadWork();
+	int				DoThreadWork();
 
-	virtual	void			Start();
+	void			Start() override;
 
-	virtual int				GetPendingLoadCount();
+	int				GetPendingLoadCount() override;
 private:
 	// Critical section used for synchronizing access to wavefile list
 	CRITICAL_SECTION		cs;
@@ -134,8 +136,6 @@ private:
 	CUtlVector< SentenceRequest	* > m_Completed;
 	// Thread handle
 	HANDLE					m_hThread;
-	// Thread id
-	DWORD					m_nThreadId;
 	// Event to set when we want to tell the thread to shut itself down
 	HANDLE					m_hShutdown;
 
@@ -156,7 +156,7 @@ extern IFileLoader *fileloader = &g_WaveLoader;
 
 int CFileLoaderThread::DoThreadWork()
 {
-	int i;
+	intp i;
 	// Check for shutdown event
 	if ( WAIT_OBJECT_0 == WaitForSingleObject( GetShutdownHandle(), 0 ) )
 	{
@@ -166,7 +166,7 @@ int CFileLoaderThread::DoThreadWork()
 	// No changes to list right now
 	Lock();
 	// Move new items to work list
-	int newItems = m_FileList.Count();
+	intp newItems = m_FileList.Count();
 	for ( i = 0; i < newItems; i++ )
 	{
 		// Move to pending and issue async i/o calls
@@ -180,11 +180,11 @@ int CFileLoaderThread::DoThreadWork()
 	// Done adding new work items
 	Unlock();
 
-	int remaining = m_Pending.Count();
+	intp remaining = m_Pending.Count();
 	if ( !remaining )
 		return 1;
 
-	int workitems = remaining; // min( remaining, 1000 );
+	intp workitems = remaining; // min( remaining, 1000 );
 
 	CUtlVector< SentenceRequest * > transfer;
 
@@ -222,7 +222,7 @@ int CFileLoaderThread::DoThreadWork()
 
 	// Now move to completed list
 	Lock();
-	int c = transfer.Count();
+	intp c = transfer.Count();
 
 	for ( i = 0; i < c; ++i )
 	{
@@ -244,11 +244,11 @@ int CFileLoaderThread::DoThreadWork()
 	return 1;
 }
 
-int CFileLoaderThread::ProcessCompleted()
+intp CFileLoaderThread::ProcessCompleted()
 {
 	Lock();
-	int c = m_Completed.Count();
-	for ( int i = c - 1; i >= 0 ; i-- )
+	intp c = m_Completed.Count();
+	for ( intp i = c - 1; i >= 0 ; i-- )
 	{
 		SentenceRequest *r = m_Completed[ i ];
 
@@ -268,10 +268,13 @@ int CFileLoaderThread::ProcessCompleted()
 //-----------------------------------------------------------------------------
 // Purpose: Main winsock processing thread
 // Input  : threadobject - 
-// Output : static DWORD WINAPI
+// Output : unsigned int
 //-----------------------------------------------------------------------------
-static DWORD WINAPI FileLoaderThreadFunc( LPVOID threadobject )
+// dimhotepus: CreateThread -> beginthreadex for CRT support.
+static unsigned int __stdcall FileLoaderThreadFunc( void* threadobject )
 {
+	ThreadSetDebugName("WaveFileLoader");
+
 	// Get pointer to CFileLoaderThread object
 	CFileLoaderThread *wavefilethread = ( CFileLoaderThread * )threadobject;
 	Assert( wavefilethread );
@@ -287,10 +290,8 @@ static DWORD WINAPI FileLoaderThreadFunc( LPVOID threadobject )
 			break;
 
 		// Yield a small bit of time to main app
-		Sleep( 10 );
+		ThreadSleep( 10 );
 	}
-
-	ExitThread( 0 );
 
 	return 0;
 }
@@ -325,7 +326,15 @@ CFileLoaderThread::CFileLoaderThread( void )
 //-----------------------------------------------------------------------------
 void CFileLoaderThread::Start()
 {
-	m_hThread = CreateThread( NULL, 0, FileLoaderThreadFunc, (void *)this, 0, &m_nThreadId );
+	// dimhotepus: CreateThread -> beginthreadex for CRT support.
+	m_hThread = (HANDLE)_beginthreadex(
+		nullptr,
+		0,
+		FileLoaderThreadFunc,
+		this,
+		0,
+		nullptr );
+
 	Assert( m_hThread );
 }
 
@@ -372,8 +381,8 @@ HANDLE CFileLoaderThread::GetShutdownHandle( void )
 void CFileLoaderThread::AddWaveFilesToThread( CUtlVector< CWaveFile * >& wavefiles )
 {
 	Lock();
-	int c = wavefiles.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = wavefiles.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		SentenceRequest *request = new SentenceRequest;
 		request->wavefile = wavefiles[ i ];

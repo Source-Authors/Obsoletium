@@ -16,7 +16,7 @@
 #include "appframework/IAppSystem.h"
 
 
-class IVTex : public IAppSystem
+abstract_class IVTex : public IAppSystem
 {
 public:
 	// For use by command-line tools
@@ -26,7 +26,6 @@ public:
 	virtual int VTex( CreateInterfaceFn filesystemFactory, const char *pGameDir, int argc, char **argv ) = 0;
 };
 
-#define IVTEX_VERSION_STRING "VTEX_003"
-
+constexpr inline char IVTEX_VERSION_STRING[]{"VTEX_003"};
 
 #endif // IVTEX_H

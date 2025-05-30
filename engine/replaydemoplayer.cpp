@@ -50,7 +50,7 @@ CReplayDemoPlayer::CReplayDemoPlayer()
 	m_nCurReplayIndex( 0 ),
 	m_bInStartPlayback( false ),
 	m_bStopCommandEncountered( false ),
-	m_flStartRenderTime( 0.0f ),
+	m_flStartRenderTime( 0.0 ),
 	m_bFullSignonStateReached( false )
 {
 }
@@ -256,18 +256,18 @@ bool CReplayDemoPlayer::StartPlayback( const char *pFilename, bool bAsTimeDemo )
 
 		// Start recording the movie
 		char szIdealFilename[ MAX_OSPATH ];
-		V_FileBase( pFilename, szIdealFilename, sizeof( szIdealFilename ) );
+		V_FileBase( pFilename, szIdealFilename );
 		V_strcat_safe( szIdealFilename, va( "_%i", pReplay->m_nSpawnTick ) );
-		V_SetExtension( szIdealFilename, pExtension, sizeof( szIdealFilename ) );
+		V_SetExtension( szIdealFilename, pExtension );
 
 		char szRenderPath[ MAX_OSPATH ];
-		V_snprintf( szRenderPath, sizeof( szRenderPath ), "%s%c%s%c%s%c%s",
+		V_sprintf_safe( szRenderPath, "%s%c%s%c%s%c%s",
 			com_gamedir, CORRECT_PATH_SEPARATOR, SUBDIR_REPLAY, CORRECT_PATH_SEPARATOR,
 			SUBDIR_CLIENT, CORRECT_PATH_SEPARATOR, SUBDIR_RENDERED
 		);
 
 		char szActualFilename[ MAX_OSPATH ];
-		Replay_GetFirstAvailableFilename( szActualFilename, sizeof( szActualFilename ), szIdealFilename,
+		Replay_GetFirstAvailableFilename( szActualFilename, szIdealFilename,
 			pExtension, szRenderPath, 0 );
 
 		// Create an entry in the movie manager & save to disk
@@ -283,7 +283,7 @@ bool CReplayDemoPlayer::StartPlayback( const char *pFilename, bool bAsTimeDemo )
 			const CReplayPerformance *pPerformance = pReplay->GetPerformance( pPlaybackInfo->m_iPerformance );	AssertMsg( pPerformance, "Performance should always be valid!" );
 			if ( pPerformance )
 			{
-				V_wcsncpy( wszMovieTitle, pPerformance->m_wszTitle, sizeof( wszMovieTitle ) );
+				V_wcscpy_safe( wszMovieTitle, pPerformance->m_wszTitle );
 			}
 		}
 		m_pMovie->SetMovieTitle( wszMovieTitle );
@@ -343,7 +343,7 @@ void CReplayDemoPlayer::PlayNextReplay()
 	{
 		// Remove extension
 		char szBasename[ MAX_OSPATH ];
-		V_StripExtension( pFilename, szBasename, sizeof( szBasename ) );
+		V_StripExtension( pFilename, szBasename );
 		extern IBaseClientDLL *g_ClientDLL;
 		g_ClientDLL->OnDemoPlaybackStart( szBasename );
 	}
@@ -432,7 +432,7 @@ void CReplayDemoPlayer::StopPlayback()
 		m_pMovie->SetIsRendered( true );
 		
 		// Compute the time it took to render
-		m_pMovie->SetRenderTime( MAX( 0.0f, realtime - m_flStartRenderTime ) );
+		m_pMovie->SetRenderTime( static_cast<float>(MAX( 0.0, realtime - m_flStartRenderTime )) );
 
 		// Sets the recorded date & time of the movie
 		m_pMovie->CaptureRecordTime();

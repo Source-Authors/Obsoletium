@@ -545,7 +545,7 @@ struct leafnums_t
 int CM_BoxLeafnums( leafnums_t &context, const Vector &center, const Vector &extents, int nodenum )
 {
 	int leafCount = 0;
-	const int NODELIST_MAX = 1024;
+	constexpr int NODELIST_MAX = 1024;
 	int nodeList[NODELIST_MAX];
 	int nodeReadIndex = 0;
 	int nodeWriteIndex = 0;
@@ -617,87 +617,6 @@ int	CM_BoxLeafnums ( const Vector& mins, const Vector& maxs, int *list, int list
 
 	return leafCount;
 }
-
-// UNDONE: This is a version that returns only leaves with valid clusters
-// UNDONE: Use this in the PVS calcs for networking
-#if 0
-int CM_BoxClusters( leafnums_t * RESTRICT pContext, const Vector &center, const Vector &extents, int nodenum )
-{
-	const int NODELIST_MAX = 1024;
-	int nodeList[NODELIST_MAX];
-	int nodeReadIndex = 0;
-	int nodeWriteIndex = 0;
-	cplane_t *RESTRICT plane;
-	cnode_t	 *RESTRICT node;
-	int prev_topnode = -1;
-	int leafCount = 0;
-	while (1)
-	{
-		if (nodenum < 0)
-		{
-			int leafIndex = -1 - nodenum;
-			// This handles the case when the box lies completely
-			// within a single node. In that case, the top node should be
-			// the parent of the leaf
-			if (pContext->leafTopNode == -1)
-				pContext->leafTopNode = prev_topnode;
-
-			if (leafCount < pContext->leafMaxCount)
-			{
-				cleaf_t *RESTRICT pLeaf = &pContext->pBSPData->map_leafs[leafIndex];
-				if ( pLeaf->cluster >= 0 )
-				{
-					pContext->pLeafList[leafCount] = leafIndex;
-					leafCount++;
-				}
-			}
-			if ( nodeReadIndex == nodeWriteIndex )
-				return leafCount;
-			nodenum = nodeList[nodeReadIndex];
-			nodeReadIndex = (nodeReadIndex+1) & (NODELIST_MAX-1);
-		}
-		else
-		{
-			node = &pContext->pBSPData->map_rootnode[nodenum];
-			plane = node->plane;
-			float d0 = DotProduct( plane->normal, center ) - plane->dist;
-			float d1 = DotProductAbs( plane->normal, extents );
-			prev_topnode = nodenum;
-			if (d0 >= d1)
-				nodenum = node->children[0];
-			else if (d0 < -d1)
-				nodenum = node->children[1];
-			else
-			{	// go down both
-				if (pContext->leafTopNode == -1)
-					pContext->leafTopNode = nodenum;
-				nodenum = node->children[0];
-				nodeList[nodeWriteIndex] = node->children[1];
-				nodeWriteIndex = (nodeWriteIndex+1) & (NODELIST_MAX-1);
-				// check for overflow of the ring buffer
-				Assert(nodeWriteIndex != nodeReadIndex);
-			}
-		}
-	}
-}
-
-int	CM_BoxClusters_headnode ( CCollisionBSPData *pBSPData, const Vector& mins, const Vector& maxs, int *list, int listsize, int nodenum, int *topnode)
-{
-	leafnums_t context;
-	context.pLeafList = list;
-	context.leafTopNode = -1;
-	context.leafMaxCount = listsize;
-	Vector center = 0.5f * (mins + maxs);
-	Vector extents = maxs - center;
-	context.pBSPData = pBSPData;
-
-	int leafCount = CM_BoxClusters( &context, center, extents, nodenum );
-	if (topnode)
-		*topnode = context.leafTopNode;
-
-	return leafCount;
-}
-#endif
 
 static int FASTCALL CM_BrushPointContents( CCollisionBSPData *pBSPData, const Vector &vPos, cbrush_t *pBrush )
 {
@@ -811,8 +730,8 @@ BOX TRACING
 // Custom SIMD implementation for box brushes
 
 const fltx4 Four_DistEpsilons={DIST_EPSILON,DIST_EPSILON,DIST_EPSILON,DIST_EPSILON};
-alignas(16) const int32 g_CubeFaceIndex0[4] = {0, 1, 2, -1};
-alignas(16) const int32 g_CubeFaceIndex1[4] = {3, 4, 5, -1};
+alignas(16) const uint32_t g_CubeFaceIndex0[4] = {0, 1, 2, std::numeric_limits<uint32_t>::max()};
+alignas(16) const uint32_t g_CubeFaceIndex1[4] = {3, 4, 5, std::numeric_limits<uint32_t>::max()};
 bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, cboxbrush_t *pBox )
 {
 	// Suppress floating-point exceptions in this function because invDelta's
@@ -876,8 +795,8 @@ bool IntersectRayWithBoxBrush( TraceInfo_t *pTraceInfo, const cbrush_t *pBrush, 
 		tmins = MulSIMD( offsetMinsExpanded, invDelta );
 		tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 
-		fltx4 minface0 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex0 ) );
-		fltx4 minface1 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex1 ) );
+		fltx4 minface0 = DirectX::XMLoadInt4A( g_CubeFaceIndex0 );
+		fltx4 minface1 = DirectX::XMLoadInt4A( g_CubeFaceIndex1 );
 		fltx4 faceMask = CmpLeSIMD( tmins, tmaxs );
 		mint = MinSIMD( tmins, tmaxs );
 		maxt = MaxSIMD( tmins, tmaxs );
@@ -1040,8 +959,8 @@ bool IntersectRayWithBox( const Ray_t &ray, const VectorAligned &inInvDelta, con
 		tmins = MulSIMD( offsetMinsExpanded, invDelta );
 		tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
 
-		fltx4 minface0 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex0 ) );
-		fltx4 minface1 = DirectX::XMLoadInt4A( reinterpret_cast<const uint32_t *>( &g_CubeFaceIndex1 ) );
+		fltx4 minface0 = DirectX::XMLoadInt4A( g_CubeFaceIndex0 );
+		fltx4 minface1 = DirectX::XMLoadInt4A( g_CubeFaceIndex1 );
 		fltx4 faceMask = CmpLeSIMD( tmins, tmaxs );
 		mint = MinSIMD( tmins, tmaxs );
 		maxt = MaxSIMD( tmins, tmaxs );
@@ -1699,7 +1618,7 @@ static inline void CM_ComputeTraceEndpoints( const Ray_t& ray, trace_t& tr )
 //-----------------------------------------------------------------------------
 void CM_RayLeafnums_r( const Ray_t &ray, CCollisionBSPData *pBSPData, int iNode, 
 					  float p1f, float p2f, const Vector &vecPoint1, const Vector &vecPoint2,
-					  int *pLeafList, int nMaxLeafCount, int &nLeafCount )
+					  int *pLeafList, intp nMaxLeafCount, intp &nLeafCount )
 {
 	cnode_t		*pNode = NULL;
 	cplane_t	*pPlane = NULL;
@@ -1846,7 +1765,7 @@ void CM_RayLeafnums_r( const Ray_t &ray, CCollisionBSPData *pBSPData, int iNode,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CM_RayLeafnums( const Ray_t &ray, int *pLeafList, int nMaxLeafCount, int &nLeafCount  )
+void CM_RayLeafnums( const Ray_t &ray, int *pLeafList, intp nMaxLeafCount, intp &nLeafCount  )
 {
 	CCollisionBSPData *pBSPData = GetCollisionBSPData();
 	if ( !pBSPData->numnodes )
@@ -2044,7 +1963,7 @@ static inline void CM_UnsweptBoxTrace( TraceInfo_t *pTraceInfo, const Ray_t& ray
 //-----------------------------------------------------------------------------
 // Purpose: Ray/Hull trace against the world without the RecursiveHullTrace
 //-----------------------------------------------------------------------------
-void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, int nLeafCount, int nBrushMask,
+void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, intp nLeafCount, int nBrushMask,
 							     bool bComputeEndpoint, trace_t &trace )
 {
 	// For multi-check avoidance.
@@ -2084,7 +2003,7 @@ void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, int nLeafCoun
 		Vector vecBoxMax( ( ray.m_Start.x + ray.m_Extents.x + 1 ), ( ray.m_Start.y + ray.m_Extents.y + 1 ), ( ray.m_Start.z + ray.m_Extents.z + 1 ) );
 
 		bool bFoundNonSolidLeaf = false;
-		for ( int iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
+		for ( intp iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
 		{
 			if ( ( pTraceInfo->m_pBSPData->map_leafs[pLeafList[iLeaf]].contents & CONTENTS_SOLID ) == 0 )
 			{
@@ -2105,7 +2024,7 @@ void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, int nLeafCoun
 	}
 	else
 	{
-		for ( int iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
+		for ( intp iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
 		{
 			// NOTE: startFrac and endFrac are not really used.
 			if ( pTraceInfo->m_ispoint )

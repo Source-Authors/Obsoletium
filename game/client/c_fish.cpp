@@ -178,7 +178,7 @@ void C_Fish::ClientThink()
 			m_angles.z = m_deathAngle * t;
 
 			// float to surface
-			const float fudge = 2.0f;
+			constexpr float fudge = 2.0f;
 			if (m_pos.z < m_waterLevel - fudge)
 			{
 				m_vel.z += (1.0f - t) * m_buoyancy * deltaT;
@@ -201,28 +201,28 @@ void C_Fish::ClientThink()
 			m_angles.z = m_deathAngle * t;
 
 			// keep near water surface
-			const float sub = 0.5f;
+			constexpr float sub = 0.5f;
 			m_vel.z += 10.0f * (m_waterLevel - m_pos.z - sub) * deltaT;
 
 			// bob on surface
-			const float rollAmp = 5.0f;
-			const float rollFreq = 2.33f;
+			constexpr float rollAmp = 5.0f;
+			constexpr float rollFreq = 2.33f;
 			m_angles.z += rollAmp * sin( rollFreq * (gpGlobals->curtime + 10.0f * entindex()) ) * deltaT;
 
-			const float rollAmp2 = 7.0f;
-			const float rollFreq2 = 4.0f;
+			constexpr float rollAmp2 = 7.0f;
+			constexpr float rollFreq2 = 4.0f;
 			m_angles.x += rollAmp2 * sin( rollFreq2 * (gpGlobals->curtime + 10.0f * entindex()) ) * deltaT;
 
-			const float bobAmp = 0.75f;
-			const float bobFreq = 4.0f;
+			constexpr float bobAmp = 0.75f;
+			constexpr float bobFreq = 4.0f;
 			m_vel.z += bobAmp * sin( bobFreq * (gpGlobals->curtime + 10.0f * entindex()) ) * deltaT;
 
-			const float bobAmp2 = 0.75f;
-			const float bobFreq2 = 3.333f;
+			constexpr float bobAmp2 = 0.75f;
+			constexpr float bobFreq2 = 3.333f;
 			m_vel.z += bobAmp2 * sin( bobFreq2 * (gpGlobals->curtime + 10.0f * entindex()) ) * deltaT;
 
 			// decay movement speed to zero
-			const float drag = 1.0f;
+			constexpr float drag = 1.0f;
 			m_vel.z -= drag * m_vel.z * deltaT;
 
 			break;
@@ -246,7 +246,7 @@ void C_Fish::ClientThink()
 				m_wigglePhase += m_wiggleRate * deltaT;
 
 				// wiggle decay
-				const float wiggleDecay = 5.0f;
+				constexpr float wiggleDecay = 5.0f;
 				m_wiggleRate -= wiggleDecay * deltaT;
 
 				m_angles.y += wiggle;
@@ -264,16 +264,16 @@ void C_Fish::ClientThink()
 	if (m_localLifeState == LIFE_ALIVE)
 	{
 		// if error is far above average, start swimming
-		const float wiggleThreshold = 2.0f;
+		constexpr float wiggleThreshold = 2.0f;
 		if (errorLen - m_averageError > wiggleThreshold)
 		{
 			// if error is large, we must have started swimming
-			const float swimTime = 5.0f;
+			constexpr float swimTime = 5.0f;
 			m_wiggleTimer.Start( swimTime );
 
 			m_wiggleRate = 2.0f * errorLen;
 
-			const float maxWiggleRate = 30.0f;
+			constexpr float maxWiggleRate = 30.0f;
 			if (m_wiggleRate > maxWiggleRate)
 			{
 				m_wiggleRate = maxWiggleRate;
@@ -305,7 +305,7 @@ void C_Fish::ClientThink()
 
 	// keep fish motion smooth by correcting towards actual server position
 	// NOTE: This only tracks XY motion
-	const float maxError = 20.0f;
+	constexpr float maxError = 20.0f;
 	float errorT = errorLen / maxError;
 	if (errorT > 1.0f)
 	{

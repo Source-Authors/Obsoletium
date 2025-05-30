@@ -106,7 +106,7 @@ private:
 		float maxIn,minIn,maxOut,minOut; // max and min bandwidths
 		float maxFPS,minFPS;
 		float minPing,maxPing;
-		float maxPlayers,minPlayers;
+		int maxPlayers,minPlayers;
 
 		bool cpu,fps,net_i,ping,net_o,players;
 		intervals timeBetween;
@@ -125,7 +125,7 @@ private:
 	friend CGraphsImage; // so it can use the intervals enum
 
 	vgui::Label *GetLabel(const char *name);
-	void SetAxisLabels(Color c,char *max,char *mid,char *min);
+	void SetAxisLabels(Color c,const char *max,const char *mid,const char *min);
 
 	// msg handlers 
 	MESSAGE_FUNC( OnCheckButton, "CheckButtonChecked" );
@@ -148,7 +148,8 @@ private:
 	vgui::ComboBox *m_pTimeCombo;
 	vgui::ComboBox *m_pVertCombo;
 
-	float m_flNextStatsUpdateTime;
+	// dimhotepus: float -> double.
+	double m_flNextStatsUpdateTime;
 };
 
 #endif // GRAPHPANEL_H

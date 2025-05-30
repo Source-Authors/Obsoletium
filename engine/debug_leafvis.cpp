@@ -39,7 +39,7 @@ struct leafvis_t
 	int						numentitychars;
 	int						leafIndex;
 };
-const int MAX_LEAF_PVERTS = 128;
+constexpr inline int MAX_LEAF_PVERTS = 128;
 
 // Only allocate this after it is turned on
 leafvis_t *g_LeafVis = NULL;

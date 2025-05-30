@@ -61,7 +61,7 @@ void CUndoManager::SetSuppressingNotify( bool bSuppress )
 	m_bSuppressingNotify = bSuppress;
 }
 
-void CUndoManager::Trace( const char *fmt, ... )
+void CUndoManager::Trace( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	if ( !m_bTrace )
 		return;
@@ -69,9 +69,8 @@ void CUndoManager::Trace( const char *fmt, ... )
 	char str[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( str, sizeof( str ) - 1, fmt, argptr );
+	V_vsprintf_safe ( str, fmt, argptr );
 	va_end( argptr );
-	str[ sizeof( str ) - 1 ] = 0;
 
 	char spaces[ 128 ];
 	Q_memset( spaces, 0, sizeof( spaces ) );

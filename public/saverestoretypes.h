@@ -207,7 +207,7 @@ public:
 	void		SetCurrentEntityContext(CBaseEntity *pEntity) { m_pCurrentEntity = pEntity; }
 
 	int NumEntities()						{ return tableCount; }
-	entitytable_t *GetEntityInfo( int i )	{ return (pTable + i); }
+	entitytable_t *GetEntityInfo( intp i )	{ return (pTable + i); }
 	float GetBaseTime() const				{ return levelInfo.time; }
 	Vector GetLandmark() const				{ return ( levelInfo.fUseLandmark ) ? levelInfo.vecLandmarkOffset : vec3_origin; }
 

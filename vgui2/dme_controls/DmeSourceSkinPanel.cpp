@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "dme_controls/DmeSourceSkinPanel.h"
-#include "dme_controls/DmePanel.h"
+#include "dme_controls/dmepanel.h"
 #include "movieobjects/dmemdlmakefile.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/CheckButton.h"

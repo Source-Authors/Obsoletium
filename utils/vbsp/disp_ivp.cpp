@@ -28,14 +28,14 @@ static CUtlVector<disp_grid_t> gDispGridList;
 disp_grid_t &FindOrInsertGrid( int gridIndex )
 {
 	// linear search is slow, but only a few grids will be present
-	for ( int i = gDispGridList.Count()-1; i >= 0; i-- )
+	for ( intp i = gDispGridList.Count()-1; i >= 0; i-- )
 	{
 		if ( gDispGridList[i].gridIndex == gridIndex )
 		{
 			return gDispGridList[i];
 		}
 	}
-	int index = gDispGridList.AddToTail();
+	intp index = gDispGridList.AddToTail();
 	gDispGridList[index].gridIndex = gridIndex;
 
 	// must be empty
@@ -176,7 +176,7 @@ void Disp_AddCollisionModels( CUtlVector<CPhysCollisionEntry *> &collisionList, 
 						nProp = nProp2;
 					}
 				}
-				int nMaterialIndex = RemapWorldMaterial( nProp );
+				intp nMaterialIndex = RemapWorldMaterial( nProp );
 				physcollision->PolysoupAddTriangle( pTerrainPhysics, tmpVerts[0], tmpVerts[1], tmpVerts[2], nMaterialIndex );
 			}
 		}

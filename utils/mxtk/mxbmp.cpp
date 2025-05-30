@@ -13,7 +13,7 @@
 
 // lbmlib.c
 
-#include "mxtk/mxBmp.h"
+#include "mxtk/mxbmp.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

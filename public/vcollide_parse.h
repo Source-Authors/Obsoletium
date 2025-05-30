@@ -29,19 +29,6 @@ struct fluid_t
 	char surfaceprop[512];
 
 	fluidparams_t params;
-
-	fluid_t() = default;
-	fluid_t( fluid_t const& src ) : params(src.params)
-	{
-		index = src.index;
-	}
-	fluid_t &operator=(const fluid_t &f) 
-	{
-		index = f.index;
-		params = f.params;
-
-		return *this;
-	}
 };
 
 //-----------------------------------------------------------------------------
@@ -61,8 +48,8 @@ abstract_class IVPhysicsKeyParser
 public:
 	virtual ~IVPhysicsKeyParser() {}
 
-	virtual const char *GetCurrentBlockName() = 0;
-	virtual bool		Finished() = 0;
+	[[nodiscard]] virtual const char *GetCurrentBlockName() = 0;
+	[[nodiscard]] virtual bool		Finished() = 0;
 	virtual void		ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKeyHandler ) = 0;
 	virtual void		ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKeyHandler ) = 0;
 	virtual void		ParseRagdollConstraint( constraint_ragdollparams_t *pConstraint, IVPhysicsKeyHandler *unknownKeyHandler ) = 0;

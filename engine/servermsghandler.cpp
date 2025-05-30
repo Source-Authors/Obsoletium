@@ -577,8 +577,7 @@ void CClientState::ProcessSoundsWithProtoVersion( SVC_Sounds *msg, CUtlVector< S
 	
 	for ( int i = 0; i < msg->m_nNumSounds; i++ )
 	{
-		intp nSound = sounds.AddToTail();
-		SoundInfo_t *pSound = &(sounds[ nSound ]);
+		SoundInfo_t *pSound = &(sounds[ sounds.AddToTail() ]);
 
 		pSound->ReadDelta( pDeltaSound, msg->m_DataIn, nProtoVersion );
 

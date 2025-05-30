@@ -212,8 +212,8 @@ public:
 	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address
-	T* Base()												{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); }
-	const T* Base() const									{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); }
+	T* Base()											{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); } //-V106
+	const T* Base() const								{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); } //-V106
 
 	// element access
 	// Use unsigned math and inlined checks to improve performance.
@@ -263,7 +263,7 @@ public:
 	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 private:
-	char m_Memory[ SIZE*sizeof(T) + nAlignment ];
+	char m_Memory[ SIZE*sizeof(T) + nAlignment ]; //-V104
 };
 
 #if defined(POSIX)
@@ -287,9 +287,7 @@ public:
 	// constructor, destructor
 	CUtlMemoryConservative( intp nGrowSize = 0, intp nInitSize = 0 ) : m_pMemory( NULL )
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		m_nCurAllocSize = 0;
-#endif
 	}
 	CUtlMemoryConservative( T* pMemory, intp numElements ) = delete;
 	~CUtlMemoryConservative()								{ free( m_pMemory ); }
@@ -314,18 +312,12 @@ public:
 	// Size
 	FORCEINLINE void RememberAllocSize( size_t sz )
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		m_nCurAllocSize = sz;
-#endif
 	}
 
 	size_t AllocSize( void ) const
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		return m_nCurAllocSize;
-#else
-		return ( m_pMemory ) ? g_pMemAlloc->GetSize( m_pMemory ) : 0;
-#endif
 	}
 
 	intp NumAllocated() const
@@ -391,10 +383,7 @@ public:
 
 private:
 	T *m_pMemory;
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 	size_t m_nCurAllocSize;
-#endif
-
 };
 
 
@@ -651,7 +640,7 @@ inline bool CUtlMemory<T,I>::IsIdxValid( I i ) const
 //-----------------------------------------------------------------------------
 // Grows the memory
 //-----------------------------------------------------------------------------
-inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowSize, intp nNewSize, intp nBytesItem )
+[[nodiscard]] constexpr inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowSize, intp nNewSize, intp nBytesItem )
 {
 	if ( nGrowSize )
 	{ 
@@ -662,20 +651,13 @@ inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowS
 		if ( !nAllocationCount )
 		{
 			// Compute an allocation which is at least as big as a cache line...
+			// dimhotepus: Actually cache line size on modern CPUs (2010+) is 64 bytes, but it allocates too much.
 			nAllocationCount = (31 + nBytesItem) / nBytesItem;
 		}
 
 		while (nAllocationCount < nNewSize)
 		{
-#ifndef _X360
 			nAllocationCount *= 2;
-#else
-			intp nNewAllocationCount = ( nAllocationCount * 9) / 8; // 12.5 %
-			if ( nNewAllocationCount > nAllocationCount )
-				nAllocationCount = nNewAllocationCount;
-			else
-				nAllocationCount *= 2;
-#endif
 		}
 	}
 
@@ -703,9 +685,9 @@ void CUtlMemory<T,I>::Grow( intp num )
 	intp nNewAllocationCount = UtlMemory_CalcNewAllocationCount( m_nAllocationCount, m_nGrowSize, nAllocationRequested, sizeof(T) );
 
 	// if m_nAllocationRequested wraps index type I, recalculate
-	if ( ( intp )( I )nNewAllocationCount < nAllocationRequested )
+	if ( nNewAllocationCount < nAllocationRequested )
 	{
-		if ( ( intp )( I )nNewAllocationCount == 0 && ( intp )( I )( nNewAllocationCount - 1 ) >= nAllocationRequested )
+		if ( nNewAllocationCount == 0 && ( intp )( I )( nNewAllocationCount - 1 ) >= nAllocationRequested )
 		{
 			--nNewAllocationCount; // deal w/ the common case of m_nAllocationCount == MAX_USHORT + 1
 		}
@@ -887,7 +869,7 @@ private:
 template< class T, unsigned nAlignment >
 void *CUtlMemoryAligned<T, nAlignment>::Align( const void *pAddr )
 {
-	size_t nAlignmentMask = nAlignment - 1;
+	const size_t nAlignmentMask = nAlignment - 1; //-V101
 	return (void*)( ((size_t)pAddr + nAlignmentMask) & (~nAlignmentMask) );
 }
 
@@ -910,7 +892,7 @@ CUtlMemoryAligned<T, nAlignment>::CUtlMemoryAligned( intp nGrowSize, intp nInitA
 	{
 		UTLMEMORY_TRACK_ALLOC();
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)_aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)_aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 }
 
@@ -999,13 +981,13 @@ void CUtlMemoryAligned<T, nAlignment>::Grow( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 }
@@ -1036,12 +1018,12 @@ inline void CUtlMemoryAligned<T, nAlignment>::EnsureCapacity( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 }
 

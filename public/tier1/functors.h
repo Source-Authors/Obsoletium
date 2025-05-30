@@ -272,15 +272,16 @@ abstract_class CFunctor : public IRefCounted
 {
 public:
 	CFunctor()
-	{
 #ifdef DEBUG
-		m_nUserID = 0;
+     : m_nUserID{}
 #endif
+	{
 	}
+
 	// Add a virtual destructor to silence the clang warning.
 	// This is harmless but not important since the only derived class
 	// doesn't have a destructor.
-	virtual ~CFunctor() {}
+	virtual ~CFunctor() = default;
 
 	virtual void operator()() = 0;
 
@@ -316,12 +317,13 @@ public:
 	CLateBoundPtr( T **ppObject )
 		: m_ppObject( ppObject )
 	{
+		Assert( ppObject );
 	}
 
-	T *operator->() { return *m_ppObject;	}
-	T &operator *() { return **m_ppObject;	}
-	operator T *() const { return (T*)(*m_ppObject);	}
-	operator void *() { return *m_ppObject;	}
+	[[nodiscard]] T *operator->() { return *m_ppObject;	}
+	[[nodiscard]] T &operator *() { return **m_ppObject;	}
+	[[nodiscard]] operator T *() const { return *m_ppObject;	}
+	[[nodiscard]] operator void *() { return *m_ppObject;	}
 
 private:
 	T **m_ppObject;
@@ -381,7 +383,7 @@ protected:
 
 	void OnCall()
 	{
-		Assert( (void *)m_pObject != NULL );
+		Assert( static_cast<void *>(m_pObject) != nullptr );
 	}
 
 	FUNCTION_TYPE m_pfnProxied;
@@ -577,7 +579,7 @@ public:
 		template <typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
 		inline CFunctor *CreateFunctor( FUNCTION_RETTYPE (*pfnProxied)( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
 		{ \
-			typedef FUNCTION_RETTYPE (*Func_t)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N); \
+			using Func_t = FUNCTION_RETTYPE (*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N); \
 			return new (m_pAllocator->Alloc( sizeof(CFunctor##N<Func_t FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>) )) CFunctor##N<Func_t FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>( pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ); \
 		}
 

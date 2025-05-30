@@ -115,8 +115,8 @@ bool MergeFace_r( node_t *node, face_t *face, face_t *original )
 		if ( onwinding )
 		{
 			// face is in the split plane, go down the appropriate side according to the facing direction
-			assert( frontwinding == NULL );
-			assert( backwinding == NULL );
+			Assert( frontwinding == NULL );
+			Assert( backwinding == NULL );
 
 			if ( DotProduct( g_MainMap->mapplanes[face->planenum].normal, g_MainMap->mapplanes[node->planenum].normal ) > 0 )
 			{
@@ -286,7 +286,7 @@ face_t *MergeDetailTree( tree_t *worldtree, int brush_start, int brush_end )
 		if (!nocsg)
 			detailbrushes = ChopBrushes (detailbrushes);
 
-		Msg("done (%.2fs)", Plat_FloatTime() - start );
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 		// Now mark the visible sides so we can eliminate all detail brush sides
 		// that are covered by other detail brush sides
 		// NOTE: This still leaves detail brush sides that are covered by the world. (these are removed in the merge operation)
@@ -294,7 +294,7 @@ face_t *MergeDetailTree( tree_t *worldtree, int brush_start, int brush_end )
 		pFaces = ComputeVisibleBrushSides( detailbrushes );
 		TryMergeFaceList( &pFaces );
 		SubdivideFaceList( &pFaces );
-		Msg("done (%.2fs)", Plat_FloatTime() - start );
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 
 		start = Plat_FloatTime();
 		Msg("\nMerging details...");
@@ -306,7 +306,7 @@ face_t *MergeDetailTree( tree_t *worldtree, int brush_start, int brush_end )
 		FreeFaceList( pFaces );
 		FreeBrushList(detailbrushes);
 
-		Msg("done (%.2fs)", Plat_FloatTime() - start );
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 	}
 
 	return pLeafFaceList;

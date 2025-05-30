@@ -50,11 +50,11 @@ public:
 	virtual void WaitUntilProcessCompletes( ProcessHandle_t hProcess ) = 0;
 
 	// Methods used to write input into a process
-	virtual intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, ptrdiff_t nBufLen ) = 0;
+	virtual intp SendProcessInput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) = 0;
 
 	// Methods used to read	output back from a process
-	virtual ptrdiff_t GetProcessOutputSize( ProcessHandle_t hProcess ) = 0;
-	virtual ptrdiff_t GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, ptrdiff_t nBufLen ) = 0;
+	virtual intp GetProcessOutputSize( ProcessHandle_t hProcess ) = 0;
+	virtual intp GetProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen ) = 0;
 	
 	// Returns the exit code for the process. Doesn't work unless the process is complete
 	virtual int GetProcessExitCode( ProcessHandle_t hProcess ) = 0;

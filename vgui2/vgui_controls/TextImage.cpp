@@ -5,22 +5,19 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <malloc.h>
+#include <vgui_controls/TextImage.h>
+
+#include "tier0/dbg.h"
+#include <tier1/KeyValues.h>
 
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>
-#include <KeyValues.h>
 
-#include <vgui_controls/TextImage.h>
 #include <vgui_controls/Controls.h>
 
-#include "tier0/dbg.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
@@ -165,7 +162,7 @@ void TextImage::SetText(const char *text)
 
 	// convert the ansi string to unicode and use that
 	wchar_t unicode[1024];
-	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode, sizeof(unicode));
+	g_pVGuiLocalize->ConvertANSIToUnicode(text, unicode);
 	SetText(unicode);
 }
 
@@ -216,7 +213,7 @@ void TextImage::SetText(const wchar_t *unicode, bool bClearUnlocalizedSymbol)
 	m_LineXIndent.RemoveAll();
 
 	// store the text as unicode
-	wcscpy(_utext, unicode);
+	V_wcsncpy(_utext, unicode, _textBufferLen * static_cast<intp>(sizeof(wchar_t)));
 
 	m_bRecalculateTruncation = true;
 }
@@ -224,14 +221,14 @@ void TextImage::SetText(const wchar_t *unicode, bool bClearUnlocalizedSymbol)
 //-----------------------------------------------------------------------------
 // Purpose: Gets the text in the textImage
 //-----------------------------------------------------------------------------
-void TextImage::GetText(char *buffer, int bufferSize)
+void TextImage::GetText(OUT_Z_CAP(bufferSize) char *buffer, int bufferSize)
 {
 	g_pVGuiLocalize->ConvertUnicodeToANSI(_utext, buffer, bufferSize);
 
 	if ( m_bAllCaps )
 	{
 		// Uppercase all the letters
-		for ( intp i = Q_strlen( buffer ); i >= 0; --i )
+		for ( intp i = V_strlen( buffer ); i >= 0; --i )
 		{
 			buffer[ i ] = toupper( buffer[ i ] );
 		}
@@ -241,14 +238,14 @@ void TextImage::GetText(char *buffer, int bufferSize)
 //-----------------------------------------------------------------------------
 // Purpose: Gets the text in the textImage
 //-----------------------------------------------------------------------------
-void TextImage::GetText(wchar_t *buffer, int bufLenInBytes)
+void TextImage::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buffer, int bufLenInBytes)
 {
-	wcsncpy(buffer, _utext, bufLenInBytes / sizeof(wchar_t));
+	V_wcsncpy(buffer, _utext, bufLenInBytes);
 
 	if ( m_bAllCaps )
 	{
 		// Uppercase all the letters
-		for ( int i = Q_wcslen( buffer ) - 1; i >= 0; --i )
+		for ( intp i = V_wcslen( buffer ) - 1; i >= 0; --i )
 		{
 			buffer[ i ] = towupper( buffer[ i ] );
 		}
@@ -258,7 +255,7 @@ void TextImage::GetText(wchar_t *buffer, int bufLenInBytes)
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-void TextImage::GetUnlocalizedText(char *buffer, int bufferSize)
+void TextImage::GetUnlocalizedText(OUT_Z_CAP(bufferSize) char *buffer, int bufferSize)
 {
 	if (_unlocalizedTextSymbol != INVALID_LOCALIZE_STRING_INDEX)
 	{
@@ -420,7 +417,7 @@ void TextImage::Paint()
 			{
 				surface()->DrawSetTextPos(x + px, y + py);
 				surface()->DrawUnicodeChar('.');
-				x += surface()->GetCharacterWidth(font, '.');
+				x += surface()->GetCharacterWidth(font, L'.');
 			}
 			break;
 		}
@@ -746,7 +743,7 @@ void TextImage::RecalculateEllipsesPosition()
 			m_bRenderUsingFallbackFont = true;
 		}
 		
-		int ellipsesWidth = 3 * surface()->GetCharacterWidth(font, '.');
+		int ellipsesWidth = 3 * surface()->GetCharacterWidth(font, L'.');
 		int x = 0;
 
 		for (wchar_t *wsz = _utext; *wsz != 0; wsz++)

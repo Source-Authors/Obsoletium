@@ -78,7 +78,7 @@ CDmeJoint *CDmeModel::AddJoint( const char *pJointName, CDmeDag *pParent )
 //-----------------------------------------------------------------------------
 // Returns the number of joint transforms we know about
 //-----------------------------------------------------------------------------
-int CDmeModel::GetJointTransformCount() const
+intp CDmeModel::GetJointTransformCount() const
 {
 	return m_JointTransforms.Count();
 }
@@ -102,7 +102,7 @@ intp CDmeModel::GetJointTransformIndex( CDmeTransform *pTransform ) const
 //-----------------------------------------------------------------------------
 // Determines joint transform index	given a joint
 //-----------------------------------------------------------------------------
-int CDmeModel::GetJointTransformIndex( CDmeDag *pJoint ) const
+intp CDmeModel::GetJointTransformIndex( CDmeDag *pJoint ) const
 {
 	return GetJointTransformIndex( pJoint->GetTransform() );
 }
@@ -127,8 +127,8 @@ const CDmeTransform *CDmeModel::GetJointTransform( int nIndex ) const
 //-----------------------------------------------------------------------------
 CDmeTransformList *CDmeModel::FindBaseState( const char *pBaseStateName )
 {
-	int nCount = m_BaseStates.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_BaseStates.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( m_BaseStates[i]->GetName(), pBaseStateName ) )
 			return m_BaseStates[i];
@@ -150,11 +150,11 @@ void CDmeModel::CaptureJointsToBaseState( const char *pBaseStateName )
 	}
 
 	// Make the transform list have the correct number of elements
-	int nJointCount = m_JointTransforms.Count();
-	int nCurrentCount = pTransformList->GetTransformCount();
+	intp nJointCount = m_JointTransforms.Count();
+	intp nCurrentCount = pTransformList->GetTransformCount();
 	if ( nJointCount > nCurrentCount )
 	{
-		for ( int i = nCurrentCount; i < nJointCount; ++i )
+		for ( intp i = nCurrentCount; i < nJointCount; ++i )
 		{
 			CDmeTransform *pTransform = CreateElement<CDmeTransform>( m_JointTransforms[i]->GetName(), pTransformList->GetFileId() );
 			pTransformList->m_Transforms.AddToTail( pTransform );
@@ -166,7 +166,7 @@ void CDmeModel::CaptureJointsToBaseState( const char *pBaseStateName )
 	}
 
 	// Copy the state over
-	for ( int i = 0; i < nJointCount; ++i )
+	for ( intp i = 0; i < nJointCount; ++i )
 	{
 		matrix3x4_t mat;
 		m_JointTransforms[i]->GetTransform( mat );
@@ -183,7 +183,7 @@ void CDmeModel::LoadJointTransform( CDmeDag *pJoint, CDmeTransformList *pBindPos
 	CDmeTransform *pTransform = pJoint->GetTransform();
 
 	// Determines joint transform index; no index, no traversing lower in the hierarchy
-	int nJointIndex = GetJointTransformIndex( pTransform );
+	intp nJointIndex = GetJointTransformIndex( pTransform );
 	if ( nJointIndex < 0 )
 		return;
 
@@ -218,8 +218,8 @@ void CDmeModel::LoadJointTransform( CDmeDag *pJoint, CDmeTransformList *pBindPos
 	}
 	MatrixCopy( bindPoseToWorld, s_PoseToWorld[ nJointIndex ] );
 
-	int nChildCount = pJoint->GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pJoint->GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeDag *pChildJoint = pJoint->GetChild(i);
 		if ( !pChildJoint )
@@ -235,7 +235,7 @@ void CDmeModel::LoadJointTransform( CDmeDag *pJoint, CDmeTransformList *pBindPos
 //-----------------------------------------------------------------------------
 CDmeModel::SetupBoneRetval_t CDmeModel::SetupBoneMatrixState( const matrix3x4_t& shapeToWorld, bool bForceSoftwareSkin )
 {
-	int nJointCount = m_JointTransforms.Count();
+	intp nJointCount = m_JointTransforms.Count();
 	if ( nJointCount <= 0 )
 		return NO_SKIN_DATA;
 
@@ -250,8 +250,8 @@ CDmeModel::SetupBoneRetval_t CDmeModel::SetupBoneMatrixState( const matrix3x4_t&
 	matrix3x4_t parentToBindPose;
 	SetIdentityMatrix( parentToBindPose );
 
-	int nChildCount = GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeDag *pChildJoint = GetChild(i);
 		if ( !pChildJoint )

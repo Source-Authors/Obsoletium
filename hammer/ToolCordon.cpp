@@ -136,7 +136,7 @@ bool Cordon3D::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &vPo
 
 	m_pDocument->Snap(vecWorld,uConstraints);
 
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
 	SetStatusText(SBI_COORDS, szBuf);
 	
 	if ( IsTranslating() )

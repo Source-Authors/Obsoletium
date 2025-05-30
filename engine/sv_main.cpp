@@ -58,7 +58,6 @@
 #include "sv_steamauth.h"
 #include "sv_plugin.h"
 #include "DownloadListGenerator.h"
-#include "sv_steamauth.h"
 #include "LocalNetworkBackdoor.h"
 #include "cvar.h"
 #include "enginethreads.h"
@@ -67,7 +66,6 @@
 #include "pure_server.h"
 #include "datacache/idatacache.h"
 #include "filesystem/IQueuedLoader.h"
-#include "vstdlib/jobthread.h"
 #include "SourceAppInfo.h"
 #include "cl_rcon.h"
 #include "host_state.h"
@@ -335,7 +333,7 @@ static void SpewToFile( const char* pFmt, ... )
 	va_list args;
 
 	va_start( args, pFmt );
-	int len = Q_vsnprintf( temp, sizeof( temp ), pFmt, args );
+	int len = V_vsnprintf( temp, sizeof( temp ), pFmt, args );
 	va_end( args );
 	Assert( len < 2048 );
 
@@ -430,11 +428,11 @@ void CGameServer::CreateEngineStringTables( void )
 	if ( 0 )
 	{
 		bUseFilenameTables = true;
-		Q_snprintf( szDownloadableFileTablename, 255, ":%s", DOWNLOADABLE_FILE_TABLENAME );
-		Q_snprintf( szModelPrecacheTablename, 255, ":%s", MODEL_PRECACHE_TABLENAME );
-		Q_snprintf( szGenericPrecacheTablename, 255, ":%s", GENERIC_PRECACHE_TABLENAME );
-		Q_snprintf( szSoundPrecacheTablename, 255, ":%s", SOUND_PRECACHE_TABLENAME );
-		Q_snprintf( szDecalPrecacheTablename, 255, ":%s", DECAL_PRECACHE_TABLENAME );		
+		V_sprintf_safe( szDownloadableFileTablename, ":%s", DOWNLOADABLE_FILE_TABLENAME );
+		V_sprintf_safe( szModelPrecacheTablename, ":%s", MODEL_PRECACHE_TABLENAME );
+		V_sprintf_safe( szGenericPrecacheTablename, ":%s", GENERIC_PRECACHE_TABLENAME );
+		V_sprintf_safe( szSoundPrecacheTablename, ":%s", SOUND_PRECACHE_TABLENAME );
+		V_sprintf_safe( szDecalPrecacheTablename, ":%s", DECAL_PRECACHE_TABLENAME );		
 	} 	
 
 	m_pDownloadableFileTable = m_StringTables->CreateStringTableEx( 
@@ -508,14 +506,16 @@ void CGameServer::CreateEngineStringTables( void )
 	// create an empty lightstyle table with unique index names
 	for ( i = 0; i<MAX_LIGHTSTYLES; i++ )
 	{
-		char name[8]; Q_snprintf( name, 8, "%i", i );
+		// dimhotepus: Q_snprintf -> V_to_chars
+		char name[8]; V_to_chars( name, i );
 		j = m_pLightStyleTable->AddString( true, name );
 		Assert( j==i ); // indices must match 
 	}
 
 	for ( i = 0; i<GetMaxClients(); i++ )
 	{
-		char name[8]; Q_snprintf( name, 8, "%i", i );
+		// dimhotepus: Q_snprintf -> V_to_chars
+		char name[8]; V_to_chars( name, i );
 		j = m_pUserInfoTable->AddString( true, name );
 		Assert( j==i ); // indices must match 
 	}
@@ -2313,7 +2313,7 @@ void CGameServer::ReloadWhitelist( const char *pMapName )
 
 	// There's a magic number we use in the steam.inf in P4 that we don't update.
 	// We can use this to detect if they are running out of P4, and if so, don't use the whitelist
-	const char *pszVersionInP4 = "2000";
+	constexpr char pszVersionInP4[]{"2000"};
 	if ( !Q_strcmp( GetSteamInfIDVersionInfo().szVersionString, pszVersionInP4 ) )
 		return;
 
@@ -2325,20 +2325,18 @@ void CGameServer::ReloadWhitelist( const char *pMapName )
 	// Load user whitelists, if allowed
 	if ( GetSvPureMode() == 1 )
 	{
-		
 		// Load the per-map whitelist.
-		const char *pMapWhitelistSuffix = "_whitelist.txt";
+		constexpr char pMapWhitelistSuffix[]{"_whitelist.txt"};
 		char testFilename[MAX_PATH] = "maps";
-		V_AppendSlash( testFilename, sizeof( testFilename ) );
-		V_strncat( testFilename, pMapName, sizeof( testFilename ) );
-		V_strncat( testFilename, pMapWhitelistSuffix, sizeof( testFilename ) );
+
+		V_AppendSlash( testFilename );
+		V_strcat_safe( testFilename, pMapName );
+		V_strcat_safe( testFilename, pMapWhitelistSuffix );
 		
-		KeyValues *kv = new KeyValues( "" );
+		KeyValuesAD kv( "" );
 		if ( kv->LoadFromFile( g_pFileSystem, testFilename ) )
 			m_pPureServerWhitelist->LoadCommandsFromKeyValues( kv );
-		kv->deleteThis();
 	}
-
 }
 
 

@@ -349,7 +349,7 @@ void CMapPlayerHullHandle::UpdateParentKey(void)
 		if (pEntity != NULL)
 		{
 			char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-			sprintf(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
+			V_sprintf_safe(szValue, "%g %g %g", (double)m_Origin.x, (double)m_Origin.y, (double)m_Origin.z);
 			pEntity->NotifyChildKeyChanged(this, m_szKeyName, szValue);
 
 		}

@@ -111,7 +111,7 @@ static inline int SHClip( CDecalVert *pDecalClipVerts, int vertCount, CDecalVert
 	return outCount;
 }
 
-const float DECAL_CLIP_EPSILON = 0.01f;
+constexpr float DECAL_CLIP_EPSILON = 0.01f;
 
 CDecalVert* R_DoDecalSHClip( CDecalVert *pInVerts, CDecalVert *pOutVerts, decal_t *pDecal, int nStartVerts, const Vector &vecNormal )
 {

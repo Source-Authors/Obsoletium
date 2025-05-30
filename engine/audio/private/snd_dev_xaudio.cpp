@@ -66,7 +66,7 @@ void DebugWarn(PRINTF_FORMAT_STRING const char *format, ...) {
 
   va_list argptr;
   va_start(argptr, format);
-  V_vsnprintf(tmp, ssize(tmp), format, argptr);
+  V_vsprintf_safe(tmp, format, argptr);
   va_end(argptr);
 
   char buffer[512];

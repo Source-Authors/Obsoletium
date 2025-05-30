@@ -2335,12 +2335,18 @@ DmFileId_t CreateUniqueFileId()
 	UniqueId_t uniqueId;
 	char fileIdBuf[ MAX_PATH ];
 
+	int counter = 0;
+
 	do 
 	{
-		CreateUniqueId( &uniqueId );
-		UniqueIdToString( uniqueId, fileIdBuf, sizeof( fileIdBuf ) );
+		// dimhotepus: Try to create uuid up to 10 times to prevent infinite cycle.
+		if ( CreateUniqueId( &uniqueId ) && UniqueIdToString( uniqueId, fileIdBuf ) )
+			fileId = g_pDataModel->GetFileId( fileIdBuf );
+		else
+			++counter;
 
-		fileId = g_pDataModel->GetFileId( fileIdBuf );
+		if (counter == 10)
+			return DMFILEID_INVALID;
 	} while( fileId != DMFILEID_INVALID );
 
 	return g_pDataModel->FindOrCreateFileId( fileIdBuf );
@@ -2366,7 +2372,7 @@ bool CreateExpressionFile( const char *pExpressionFile, const CUtlVector< CUtlSt
 		return false;
 
 	char expName[ MAX_PATH ];
-	Q_FileBase( pExpressionFile, expName, sizeof( expName ) );
+	V_FileBase( pExpressionFile, expName );
 
 	CDmePresetGroup *pDstPresetGroup = CreateElement< CDmePresetGroup >( expName, CreateUniqueFileId() );
 	if ( !pDstPresetGroup )
@@ -2468,8 +2474,8 @@ bool CreateExpressionFile( const char *pExpressionFile, const CUtlVector< CUtlSt
 	char buf[ MAX_PATH ];
 	char buf1[ MAX_PATH ];
 	Q_strncpy( buf, pExpressionFile, sizeof( buf ) );
-	Q_SetExtension( buf, ".txt", sizeof( buf ) );
-	Q_ExtractFilePath( buf, buf1, sizeof( buf1 ) );
+	V_SetExtension( buf, ".txt" );
+	V_ExtractFilePath( buf, buf1 );
 	Q_FixSlashes( buf1 );
 	g_pFullFileSystem->CreateDirHierarchy( buf1 );
 
@@ -2480,8 +2486,8 @@ bool CreateExpressionFile( const char *pExpressionFile, const CUtlVector< CUtlSt
 
 	pDstPresetGroup->ExportToTXT( buf, NULL, pComboOp );
 
-	Q_SetExtension( buf, ".vfe", sizeof( buf ) );
-	Q_ExtractFilePath( buf, buf1, sizeof( buf1 ) );
+	V_SetExtension( buf, ".vfe" );
+	V_ExtractFilePath( buf, buf1 );
 	Q_FixSlashes( buf1 );
 	g_pFullFileSystem->CreateDirHierarchy( buf1 );
 

@@ -40,7 +40,7 @@ $Project "bitmap"
 
 $Project "Browser"
 {
-	"Tracker\Browser\Browser.vpc" [$WINDOWS]
+	"tracker\Browser\Browser.vpc" [$WINDOWS]
 }
 
 $Project "bsppack"
@@ -82,11 +82,6 @@ $Project "bugreporter_filequeue"
 $Project "captioncompiler"
 {
 	"utils\captioncompiler\captioncompiler.vpc" [$WINDOWS]
-}
-
-$Project "cardstats"
-{
-	"utils\videocardstats\cardstats.vpc" [$WINDOWS]
 }
 
 $Project "choreoobjects"
@@ -798,7 +793,7 @@ $Project "serverbrowser"
 
 $Project "ServerMonitor"
 {
-	"Tracker\ServerMonitor\ServerMonitor.vpc" [$WINDOWS]
+	"tracker\ServerMonitor\ServerMonitor.vpc" [$WINDOWS]
 }
 
 $Project "serverplugin_empty"
@@ -943,7 +938,7 @@ $Project "splitskybox"
 
 $Project "sqldb_mysql"
 {
-	"Tracker\sqldb_mysql\sqldb_mysql.vpc" [$WINDOWS]
+	"tracker\sqldb_mysql\sqldb_mysql.vpc" [$WINDOWS]
 }
 
 $Project "sqlwrapper"

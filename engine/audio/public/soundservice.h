@@ -15,12 +15,11 @@
 class Vector;
 class QAngle;
 class CAudioSource;
-typedef int SoundSource;
 struct SpatializationInfo_t;
 typedef void *FileNameHandle_t;
 struct StartSoundParams_t;
 
-#include "utlrbtree.h"
+#include "tier1/utlrbtree.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Services required by the audio system to function, this facade
@@ -77,7 +76,7 @@ public:
 
 	//---------------------------------
 	//---------------------------------
-	virtual bool IsPlayer( SoundSource source ) = 0;
+	virtual bool IsPlayer( enum SoundSource source ) = 0;
 
 	//---------------------------------
 	//---------------------------------
@@ -118,10 +117,6 @@ public:
 	virtual void		OnSoundStopped( int guid, int soundsource, int channel, char const *soundname ) = 0;
 
 	virtual bool		GetToolSpatialization( int iUserData, int guid, SpatializationInfo_t& info ) = 0;
-
-#if defined( _XBOX )
-	virtual bool		ShouldSuppressNonUISounds() = 0;
-#endif
 
 	virtual char const *GetUILanguage() = 0;
 };

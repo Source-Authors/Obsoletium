@@ -77,7 +77,7 @@ void CFXLine::Draw( double frametime )
 	float alpha = m_FXData.m_flStartAlpha + ( ( m_FXData.m_flEndAlpha - m_FXData.m_flStartAlpha ) * scaleTimePerc );
 	alpha = clamp( alpha, 0.0f, 1.0f );
 
-	color.a *= alpha;
+	color.a = static_cast<byte>(color.a * alpha);
 
 	// Start
 	VectorMA( m_FXData.m_vecStart, -scale, cross, tmp );

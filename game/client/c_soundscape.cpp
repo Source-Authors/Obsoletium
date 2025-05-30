@@ -23,7 +23,7 @@
 // This test will flag any circular references and bail.
 #define MAX_SOUNDSCAPE_RECURSION	8
 
-const float DEFAULT_SOUND_RADIUS = 36.0f;
+constexpr inline float DEFAULT_SOUND_RADIUS = 36.0f;
 // Keep an array of all looping sounds so they can be faded in/out
 // OPTIMIZE: Get a handle/pointer to the engine's sound channel instead 
 //			of searching each frame!
@@ -270,11 +270,7 @@ void Soundscape_Update( audioparams_t &audio )
 void C_SoundscapeSystem::AddSoundScapeFile( const char *filename )
 {
 	KeyValues *script = new KeyValues( filename );
-#ifndef _XBOX
 	if ( script->LoadFromFile( filesystem, filename ) )
-#else
-	if ( filesystem->LoadKeyValues( *script, IFileSystem::TYPE_SOUNDSCAPE, filename, "GAME" ) )
-#endif
 	{
 		// parse out all of the top level sections and save their names
 		KeyValues *pKeys = script;
@@ -310,7 +306,7 @@ bool C_SoundscapeSystem::Init()
 		mapSoundscapeFilename = VarArgs( "scripts/soundscapes_%s.txt", mapname );
 	}
 
-	KeyValues *manifest = new KeyValues( SOUNDSCAPE_MANIFEST_FILE );
+	KeyValuesAD manifest( SOUNDSCAPE_MANIFEST_FILE );
 	if ( filesystem->LoadKeyValues( *manifest, IFileSystem::TYPE_SOUNDSCAPE, SOUNDSCAPE_MANIFEST_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -339,8 +335,6 @@ bool C_SoundscapeSystem::Init()
 	{
 		Error( "Unable to load manifest file '%s'\n", SOUNDSCAPE_MANIFEST_FILE );
 	}
-
-	manifest->deleteThis();
 
 	return true;
 }
@@ -580,11 +574,9 @@ void C_SoundscapeSystem::UpdateAudioParams( audioparams_t &audio )
 // Called when a soundscape is activated (leading edge of becoming the active soundscape)
 void C_SoundscapeSystem::StartNewSoundscape( KeyValues *pSoundscape )
 {
-	int i;
-
 	// Reset the system
 	// fade out the current loops
-	for ( i = m_loopingSounds.Count()-1; i >= 0; --i )
+	for ( intp i = m_loopingSounds.Count()-1; i >= 0; --i )
 	{
 		m_loopingSounds[i].volumeTarget = 0;
 		if ( !pSoundscape )
@@ -808,7 +800,8 @@ void C_SoundscapeSystem::ProcessPlayLooping( KeyValues *pAmbient, const subsound
 
 void C_SoundscapeSystem::TouchSoundFile( char const *wavefile )
 {
-	filesystem->GetFileTime( VarArgs( "sound/%s", PSkipSoundChars( wavefile ) ), "GAME" );
+	// dimhotepus: Touch here to load metadata.
+	(void)filesystem->GetFileTime( VarArgs( "sound/%s", PSkipSoundChars( wavefile ) ), "GAME" );
 }
 
 // start a new looping sound
@@ -853,8 +846,8 @@ void C_SoundscapeSystem::TouchSoundFiles()
 	if ( !CommandLine()->FindParm( "-makereslists" ) )
 		return;
 
-	int c = m_soundscapes.Count();
-	for ( int i = 0; i < c ; ++i )
+	intp c = m_soundscapes.Count();
+	for ( intp i = 0; i < c ; ++i )
 	{
 		TouchWaveFiles( m_soundscapes[ i ] );
 	}
@@ -1294,7 +1287,7 @@ void C_SoundscapeSystem::UpdateRandomSounds( float gameTime )
 
 	m_nextRandomTime = gameTime + 3600;	// add some big time to check again (an hour)
 
-	for ( int i = m_randomSounds.Count()-1; i >= 0; i-- )
+	for ( intp i = m_randomSounds.Count()-1; i >= 0; i-- )
 	{
 		// time to play?
 		if ( gameTime >= m_randomSounds[i].nextPlayTime )

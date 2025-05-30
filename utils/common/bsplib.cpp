@@ -3143,7 +3143,7 @@ void UnparseEntities (void)
 			V_strcpy_safe (value, ep->value);
 			StripTrailing (value);
 				
-			sprintf(line, "\"%s\" \"%s\"\n", key, value);
+			V_sprintf_safe(line, "\"%s\" \"%s\"\n", key, value);
 			buffer.PutString( line );
 		}
 		buffer.PutString("}\n");
@@ -3185,7 +3185,7 @@ void SetKeyValue(entity_t *ent, const char *key, const char *value)
 	ep->value = copystring(value);
 }
 
-const char 	*ValueForKey (entity_t *ent, char *key)
+const char 	*ValueForKey (entity_t *ent, const char *key)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
 		if (!Q_stricmp (ep->key, key) )
@@ -3193,13 +3193,13 @@ const char 	*ValueForKey (entity_t *ent, char *key)
 	return "";
 }
 
-vec_t	FloatForKey (entity_t *ent, char *key)
+vec_t	FloatForKey (entity_t *ent, const char *key)
 {
 	const char *k = ValueForKey (ent, key);
 	return strtof(k, nullptr);
 }
 
-vec_t	FloatForKeyWithDefault (entity_t *ent, char *key, float default_value)
+vec_t	FloatForKeyWithDefault (entity_t *ent, const char *key, float default_value)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
 		if (!Q_stricmp (ep->key, key) )
@@ -3209,7 +3209,7 @@ vec_t	FloatForKeyWithDefault (entity_t *ent, char *key, float default_value)
 
 
 
-int		IntForKey (entity_t *ent, char *key)
+int		IntForKey (entity_t *ent, const char *key)
 {
 	const char *k = ValueForKey (ent, key);
 	return atol(k);
@@ -3251,7 +3251,7 @@ static constexpr const char* GetVector3FormatSpecifier() {
 
 	return "";
 };
-static constexpr const char *GetAnglesFormatSpecifier() {
+static constexpr const char *GetAnglesFormatSpecifier() { //-V524
 	if constexpr (std::is_same_v<float, vector_type_t>)
 		return "%f %f %f";
 
@@ -3261,7 +3261,7 @@ static constexpr const char *GetAnglesFormatSpecifier() {
 	return "";
 };
 
-void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
+void 	GetVectorForKey (entity_t *ent, const char *key, Vector& vec)
 {
 	const char *k = ValueForKey (ent, key);
 	vector_type_t v1 = 0, v2 = 0, v3 = 0;
@@ -3276,7 +3276,7 @@ void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec)
 	vec[2] = v3;
 }
 
-void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
+void 	GetVector2DForKey (entity_t *ent, const char *key, Vector2D& vec)
 {
 	const char *k = ValueForKey (ent, key);
 	vector_type_t v1 = 0, v2 = 0;
@@ -3290,7 +3290,7 @@ void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec)
 	vec[1] = v2;
 }
 
-void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& angle)
+void 	GetAnglesForKey (entity_t *ent, const char *key, QAngle& angle)
 {
 	const char *k = ValueForKey (ent, key);
 	vector_type_t v1 = 0, v2 = 0, v3 = 0;
@@ -3896,7 +3896,7 @@ static bool CRC_MapFile(dheader_t *header, CRC32_t *crcvalue, const char *pszFil
 bool SetHDRMode( bool bHDR )
 {
 	bool bOldHDR = std::exchange(g_bHDR, bHDR);
-	if ( bHDR )
+	if ( bHDR ) //-V1051
 	{
 		pdlightdata = &dlightdataHDR;
 		g_pLeafAmbientLighting = &g_LeafAmbientLightingHDR;
@@ -4108,7 +4108,7 @@ void ConvertPakFileContents( const char *pInFilename )
 		else
 		{
 			// converted filename
-			V_StripExtension( relativeName, relativeName, sizeof( relativeName ) );
+			V_StripExtension( relativeName, relativeName );
 			V_strcat_safe( relativeName, ".360" );
 			V_strcat_safe( relativeName, pExt );
 			AddBufferToPak( newPakFile, relativeName, targetBuf.Base(), targetBuf.TellMaxPut(), false, IZip::eCompressionType_None );
@@ -4569,7 +4569,8 @@ bool CompressGameLump( dheader_t *pInBSPHeader, dheader_t *pOutBSPHeader, CUtlBu
 				{
 					unsigned int actualSize = CLZMA::GetActualSize( pCompressedLump );
 					inputBuffer.EnsureCapacity( actualSize );
-					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
+					// dimhotepus: Add out size to prevent overflows.
+					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>(), actualSize );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
 					if ( outSize != actualSize )
 					{
@@ -4709,8 +4710,10 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 				unsigned int headerSize = static_cast<unsigned>(pSortedLump->pLump->uncompressedSize);
 				if ( CLZMA::IsCompressed( pCompressedLump ) && headerSize == CLZMA::GetActualSize( pCompressedLump ) )
 				{
-					inputBuffer.EnsureCapacity( CLZMA::GetActualSize( pCompressedLump ) );
-					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>() );
+					unsigned size = CLZMA::GetActualSize( pCompressedLump );
+					inputBuffer.EnsureCapacity( size );
+					// dimhotepus: Add out size to prevent overflows.
+					size_t outSize = CLZMA::Uncompress( pCompressedLump, inputBuffer.Base<unsigned char>(), size );
 					inputBuffer.SeekPut( CUtlBuffer::SEEK_CURRENT, outSize );
 					if ( outSize != headerSize )
 					{
@@ -5242,8 +5245,8 @@ bool GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList
 	}
 
 	char szBspName[MAX_PATH];
-	V_FileBase( pBSPFilename, szBspName, sizeof( szBspName ) );
-	V_SetExtension( szBspName, ".bsp", sizeof( szBspName ) );
+	V_FileBase( pBSPFilename, szBspName );
+	V_SetExtension( szBspName, ".bsp" );
 
 	// get embedded pak files, and internals
 	char szFilename[MAX_PATH];
@@ -5264,8 +5267,8 @@ bool GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList
 	{
 		const char *pName = TexDataStringTable_GetString( dtexdata[i].nameStringTableID );
 
-		V_ComposeFileName( "materials", pName, szFilename, sizeof( szFilename ) );
-		V_SetExtension( szFilename, ".vmt", sizeof( szFilename ) );
+		V_ComposeFileName( "materials", pName, szFilename );
+		V_SetExtension( szFilename, ".vmt" );
 
 		pList->AddToTail( szFilename );
 	}

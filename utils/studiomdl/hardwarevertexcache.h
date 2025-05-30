@@ -1,18 +1,9 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef HARDWAREVERTEXCACHE_H
-#define HARDWAREVERTEXCACHE_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_UTILS_STUDIOMDL_HARDWARE_VERTEX_CACHE_H_
+#define SE_UTILS_STUDIOMDL_HARDWARE_VERTEX_CACHE_H_
 
-// emulate a hardware post T&L vertex fifo
-
+// Emulate a hardware post T&L vertex fifo
 class CHardwareVertexCache
 {
 public:
@@ -29,4 +20,4 @@ private:
 	int m_NumEntries;
 };
 
-#endif // HARDWAREVERTEXCACHE_H
+#endif  // !SE_UTILS_STUDIOMDL_HARDWARE_VERTEX_CACHE_H_

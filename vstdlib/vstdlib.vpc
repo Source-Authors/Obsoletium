@@ -31,23 +31,23 @@ $Configuration
 		$AdditionalDependencies		"$BASE odbc32.lib odbccp32.lib"			[$WINDOWS]
 
 		// pc publishes the import library directly
-		$ImportLibrary				"$LIBPUBLIC\$(TargetName).lib"	[$WINDOWS]
+		$ImportLibrary				"$LIBPUBLIC\$(TargetName).lib"			[$WINDOWS]
 
 		// Suppress this warning using the undocumented /ignore linker switch
 		// tier1.lib(KeyValues.obj) : warning LNK4217: locally defined symbol _KeyValuesSystem imported in function "public: static int __cdecl KeyValues::GetSymbolForStringClassic(char const *,bool)" (?GetSymbolForStringClassic@KeyValues@@SAHPBD_N@Z)
 		$AdditionalOptions			"$BASE /ignore:4217" [$WINDOWS]
 
-		$SystemLibraries            "iconv" [$OSXALL]
-		$SystemFrameworks			"CoreServices" [$OSXALL]																			
-		$GCC_ExtraLinkerFlags		"-all_load" [$OSXALL]
+		$SystemLibraries			"iconv"				[$OSXALL]
+		$SystemFrameworks			"CoreServices"		[$OSXALL]
+		$GCC_ExtraLinkerFlags		"-all_load"			[$OSXALL]
 
-        $ImportLibrary				"$LIBPUBLIC\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[$POSIX]
+		$ImportLibrary				"$LIBPUBLIC\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[$POSIX]
 		$OutputFile					"$(OBJ_DIR)/$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT" [$POSIX]
 	}
 	
 	$General [$POSIX]
 	{
-		$GameOutputFile                                 "$OUTBINDIR/$_IMPLIB_DLL_PREFIX$OUTBINNAME$_DLL_EXT"
+		$GameOutputFile				"$OUTBINDIR/$_IMPLIB_DLL_PREFIX$OUTBINNAME$_DLL_EXT"
 	}
 }
 
@@ -100,4 +100,3 @@ $Project "vstdlib"
 		$Lib   "coroutine_osx"  [$OSXALL]
 	}
 }
-

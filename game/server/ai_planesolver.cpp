@@ -101,7 +101,7 @@ bool CAI_PlaneSolver::MoveLimit( Navigation_t navType, const Vector &target, boo
 
 	CAI_MoveProbe *pProbe = m_pNpc->GetMoveProbe();
 	return pProbe->MoveLimit( navType, GetLocalOrigin(), target, contents, 
-		m_pNpc->GetNavTargetEntity(), (fCheckStep) ? 100 : 0, 
+		m_pNpc->GetNavTargetEntity(), (fCheckStep) ? 100.f : 0.f, 
 							  flags, 
 							  pMoveTrace );
 }
@@ -239,7 +239,7 @@ void CAI_PlaneSolver::GenerateSuggestionFromTrace( const AILocalMoveGoal_t &goal
 	}
 	
 	float clearDist = probeDist - moveTrace.flDistObstructed;
-	float pctBlocked = 1.0 - ( clearDist / probeDist );
+	float pctBlocked = 1.0f - ( clearDist / probeDist );
 	
 	float weight = CalculateRegulationWeight( moveTrace, pctBlocked );
 
@@ -271,7 +271,7 @@ void CAI_PlaneSolver::GenerateSuggestionFromTrace( const AILocalMoveGoal_t &goal
 		favorRight = ( crossProduct.z < 0 );
 	}
 	
-	float thirdSpan = arcSpan / 3.0;
+	float thirdSpan = arcSpan / 3.0f;
 	float favoredWeight = weight * pctBlocked;
 	
 	suggestion.Set( type, weight,
@@ -300,7 +300,7 @@ void CAI_PlaneSolver::CalcYawsFromOffset( float yawScanCenter, float spanPerProb
 {
 	if ( probeOffset != 0 )
 	{
-		float sign = ( probeOffset > 0 ) ? 1 : -1;
+		float sign = ( probeOffset > 0 ) ? 1.f : -1.f;
 
 		*pYawCenter = yawScanCenter + probeOffset * spanPerProbe;
 		if ( *pYawCenter < 0 )
@@ -329,7 +329,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 		Vector minsSelf, maxsSelf;
 		m_pNpc->CollisionProp()->WorldSpaceSurroundingBounds( &minsSelf, &maxsSelf );
-		float radiusSelf = (minsSelf.AsVector2D() - maxsSelf.AsVector2D()).Length() * 0.5;
+		float radiusSelf = (minsSelf.AsVector2D() - maxsSelf.AsVector2D()).Length() * 0.5f;
 
 		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
@@ -339,9 +339,9 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 				Vector mins, maxs;
 				
 				pAI->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
-				if ( mins.z < maxsSelf.z + 12.0 && maxs.z > minsSelf.z - 12.0 )
+				if ( mins.z < maxsSelf.z + 12.0f && maxs.z > minsSelf.z - 12.0f )
 				{
-					float radius = (mins.AsVector2D() - maxs.AsVector2D()).Length() * 0.5;
+					float radius = (mins.AsVector2D() - maxs.AsVector2D()).Length() * 0.5f;
 					float distance = ( pAI->GetAbsOrigin().AsVector2D() - m_pNpc->GetAbsOrigin().AsVector2D() ).Length();
 					if ( distance - radius < radiusSelf + probeDist )
 					{
@@ -746,7 +746,7 @@ bool CAI_PlaneSolver::GenerateCircleObstacleSuggestions( const AILocalMoveGoal_t
 	Vector mins, maxs;
 
 	m_pNpc->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
-	float radiusNpc = (mins.AsVector2D() - maxs.AsVector2D()).Length() * 0.5;
+	float radiusNpc = (mins.AsVector2D() - maxs.AsVector2D()).Length() * 0.5f;
 	
 	for ( int i = 0; i < m_Obstacles.Count(); i++ )
 	{

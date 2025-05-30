@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxCheckBox.h"
+#include "mxtk/mxcheckbox.h"
 #include <windows.h>
 
 

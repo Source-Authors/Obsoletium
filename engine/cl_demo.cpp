@@ -199,7 +199,7 @@ void DemoOverlay::DrawOverlay( float fSetting )
 			) : OVR_NONE;
 	}
 
-	int const idx = 1;
+	constexpr int idx = 1;
 
 	if ( OVR_NONE == maskDrawnOverlay &&
 		 OVR_NONE != m_maskDrawnOverlay )
@@ -555,7 +555,7 @@ void CDemoRecorder::StartupDemoFile( void )
 
 	// make sure the .dem extension is still present
 	char ext[10];
-	Q_ExtractFileExtension( demoFileName, ext, sizeof( ext ) );
+	V_ExtractFileExtension( demoFileName, ext );
 	if ( Q_strcasecmp( ext, "dem" ) )
 	{
 		ConMsg( "StartupDemoFile: invalid filename.\n" );
@@ -585,16 +585,16 @@ void CDemoRecorder::StartupDemoFile( void )
 
 	dh->demoprotocol = DEMO_PROTOCOL;
 	dh->networkprotocol = PROTOCOL_VERSION;
-	Q_strncpy(dh->demofilestamp, DEMO_HEADER_ID, sizeof(dh->demofilestamp) );
+	V_strcpy_safe( dh->demofilestamp, DEMO_HEADER_ID );
 
-	Q_FileBase( modelloader->GetName( host_state.worldmodel ), dh->mapname, sizeof( dh->mapname ) );
+	Q_FileBase( modelloader->GetName( host_state.worldmodel ), dh->mapname );
 
 	char szGameDir[MAX_OSPATH];
-	Q_strncpy(szGameDir, com_gamedir, sizeof( szGameDir ) );
-	Q_FileBase ( szGameDir, dh->gamedirectory, sizeof( dh->gamedirectory ) );
+	V_strcpy_safe(szGameDir, com_gamedir );
+	Q_FileBase ( szGameDir, dh->gamedirectory );
 
-	Q_strncpy( dh->servername, cl.m_szRetryAddress, sizeof( dh->servername ) );
-	Q_strncpy( dh->clientname, cl_name.GetString(), sizeof( dh->clientname ) );
+	V_strcpy_safe( dh->servername, cl.m_szRetryAddress );
+	V_strcpy_safe( dh->clientname, cl_name.GetString() );
 
 	
 	// get size	signon data size
@@ -1968,7 +1968,7 @@ static bool ComputeNextIncrementalDemoFilename( char *name, int namesize )
 
 	char basename[ MAX_OSPATH ];
 
-	Q_StripExtension( name, basename, sizeof( basename ) );
+	Q_StripExtension( name, basename );
 
 	// Start looking for a valid name
 	int i = 0;
@@ -2001,9 +2001,9 @@ void CL_ListDemo_f( const CCommand &args )
 	// Find the file
 	char name[MAX_OSPATH];
 
-	Q_snprintf (name, sizeof(name), "%s", args[1]);
+	V_strcpy_safe (name, args[1]);
 	
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	Q_DefaultExtension( name, ".dem" );
 
 	ConMsg ("Demo contents for %s:\n", name);
 
@@ -2107,7 +2107,7 @@ CON_COMMAND_F( record, "Record a demo.", FCVAR_DONTRECORD )
 	}
 
 	// remove .dem extension if user added it
-	Q_StripExtension( args[1], name, sizeof( name ) );
+	Q_StripExtension( args[1], name );
 	
 	if ( incremental )
 	{
@@ -2137,8 +2137,8 @@ void CL_PlayDemo_f( const CCommand &args )
 
 	// Get the demo filename
 	char name[ MAX_OSPATH ];
-	Q_strncpy( name, args[1], sizeof( name ) );
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	V_strcpy_safe( name, args[1] );
+	Q_DefaultExtension( name, ".dem" );
 
 	// set current demo player to replay demo player?
 	demoplayer = g_pClientDemoPlayer;
@@ -2150,7 +2150,7 @@ void CL_PlayDemo_f( const CCommand &args )
 	{
 		// Remove extension
 		char basename[ MAX_OSPATH ];
-		V_StripExtension( name, basename, sizeof( basename ) );
+		V_StripExtension( name, basename );
 		g_ClientDLL->OnDemoPlaybackStart( basename );
 	}
 	else
@@ -2175,11 +2175,11 @@ void CL_TimeDemo_f( const CCommand &args )
 
 	if( args.ArgC() >= 3 )
 	{
-		Q_strncpy( g_pStatsFile, args[ 2 ], sizeof( g_pStatsFile ) );
+		V_strcpy_safe( g_pStatsFile, args[ 2 ] );
 	}
 	else
 	{
-		Q_strncpy( g_pStatsFile, "UNKNOWN", sizeof( g_pStatsFile ) );
+		V_strcpy_safe( g_pStatsFile, "UNKNOWN" );
 	}
 
 	// set current demo player to client demo player
@@ -2187,8 +2187,8 @@ void CL_TimeDemo_f( const CCommand &args )
 	
 	// open the demo file
 	char name[ MAX_OSPATH ];
-	Q_strncpy (name, args[1], sizeof( name ) );
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	V_strcpy_safe (name, args[1] );
+	Q_DefaultExtension( name, ".dem" );
 
 	if ( !demoplayer->StartPlayback( name, true ) )
 	{
@@ -2224,8 +2224,8 @@ void CL_BenchFrame_f( const CCommand &args )
 	
 	// open the demo file
 	char name[ MAX_OSPATH ];
-	Q_strncpy (name, args[1], sizeof( name ) );
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	V_strcpy_safe (name, args[1] );
+	Q_DefaultExtension( name, ".dem" );
 
 	if ( !demoplayer->StartPlayback( name, true ) )
 	{

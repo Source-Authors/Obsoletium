@@ -206,7 +206,7 @@ void CSessionOptionsDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 //---------------------------------------------------------------------
 void CSessionOptionsDialog::SetupSession( void )
 {
-	KeyValues *pKeys = new KeyValues( "SessionKeys" );
+	KeyValuesAD pKeys( "SessionKeys" );
 
 	// Send user-selected properties and contexts
 	for ( int i = 0; i < m_Menu.GetItemCount(); ++i )
@@ -224,7 +224,8 @@ void CSessionOptionsDialog::SetupSession( void )
 		pProperty->SetInt( "type", prop.nType );
 		pProperty->SetString( "valuestring", prop.szValue );
 		pProperty->SetString( "valuetype", prop.szValueType );
-		pProperty->SetInt( "optionindex", pItem->GetActiveOptionIndex() );
+		// dimhotpeus: int -> uint64.
+		pProperty->SetUint64( "optionindex", pItem->GetActiveOptionIndex() );
 	}
 
 	// Send contexts and properties parsed from the resource file
@@ -241,7 +242,6 @@ void CSessionOptionsDialog::SetupSession( void )
 
 	// Matchmaking will make a copy of these keys
 	matchmaking->SetSessionProperties( pKeys );
-	pKeys->deleteThis();
 }
 
 //-----------------------------------------------------------------
@@ -342,7 +342,8 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 			KeyValues *pKey = m_pDialogKeys->FindKey( pID );
 			if ( pKey )
 			{
-				pItemKeys->SetInt( "activeoption", pKey->GetInt( "optionindex" ) );	
+				// dimhotpeus: int -> uint64.
+				pItemKeys->SetUint64( "activeoption", pKey->GetUint64( "optionindex" ) );	
 			}
 		}
 	}
@@ -360,7 +361,8 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 			const char *pID	= pItemKeys->GetString( "id", "NULL" );
 			if ( !Q_stricmp( pID, "PROPERTY_GAME_SIZE" ) )
 			{
-				pItemKeys->SetInt( "activeoption", GetMaxPlayersRecommendedOption() );
+				// dimhotpeus: int -> uint64.
+				pItemKeys->SetUint64( "activeoption", GetMaxPlayersRecommendedOption() );
 			}
 		}
 	}

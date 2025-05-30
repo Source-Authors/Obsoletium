@@ -159,15 +159,9 @@ void CSoundEmitterSystemBase::Shutdown()
 //-----------------------------------------------------------------------------
 static void AccumulateFileNameAndTimestampIntoChecksum( CRC32_t *crc, char const *filename )
 {
-	if ( IsX360() )
-	{
-		// this is an expensive i/o operation due to search path fall through
-		// 360 doesn't need or use the checksums
-		return;
-	}
-
-	long ft = filesystem->GetFileTime( filename, "GAME" );
-	CRC32_ProcessBuffer( crc, &ft, sizeof( ft ) );
+	// dimhotepus: Note CRC32 output depends on time_t size!
+	time_t ft = filesystem->GetFileTime( filename, "GAME" );
+	CRC32_ProcessBuffer( crc, ft );
 	CRC32_ProcessBuffer( crc, filename, Q_strlen( filename ) );
 }
 
@@ -192,7 +186,7 @@ bool CSoundEmitterSystemBase::InternalModInit()
 	CRC32_t crc;
 	CRC32_Init( &crc );
 
-	KeyValues *manifest = new KeyValues( MANIFEST_FILE );
+	KeyValuesAD manifest( MANIFEST_FILE );
 	if ( filesystem->LoadKeyValues( *manifest, IFileSystem::TYPE_SOUNDEMITTER, MANIFEST_FILE, "GAME" ) )
 	{
 		AccumulateFileNameAndTimestampIntoChecksum( &crc, MANIFEST_FILE );
@@ -229,7 +223,6 @@ bool CSoundEmitterSystemBase::InternalModInit()
 	{
 		Error( "Unable to load manifest file '%s'\n", MANIFEST_FILE );
 	}
-	manifest->deleteThis();
 
 	CRC32_Final( &crc );
 
@@ -622,13 +615,10 @@ void CSoundEmitterSystemBase::GenderExpandString( char const *actormodel, char c
 void CSoundEmitterSystemBase::LoadGlobalActors()
 {
 	// Now load the global actor list from the scripts/globalactors.txt file
-	KeyValues *allActors = NULL;
-	
-	allActors = new KeyValues( "allactors" );
+	KeyValuesAD allActors( "allactors" );
 	if ( allActors->LoadFromFile( filesystem, "scripts/global_actors.txt", NULL ) )
 	{
-		KeyValues *pvkActor;
-		for ( pvkActor = allActors->GetFirstSubKey(); pvkActor != NULL; pvkActor = pvkActor->GetNextKey() )
+		for ( auto *pvkActor = allActors->GetFirstSubKey(); pvkActor != NULL; pvkActor = pvkActor->GetNextKey() )
 		{
 			UtlHashHandle_t idx = m_ActorGenders.Find( pvkActor->GetName() );
 			if ( idx == m_ActorGenders.InvalidHandle() )
@@ -652,7 +642,6 @@ void CSoundEmitterSystemBase::LoadGlobalActors()
 			}
 		}
 	}
-	allActors->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -666,7 +655,7 @@ gender_t CSoundEmitterSystemBase::GetActorGender( char const *actormodel )
 	actor[0] = 0;
 	if ( actormodel )
 	{
-		Q_FileBase( actormodel, actor, sizeof( actor ) );
+		V_FileBase( actormodel, actor );
 	}
 
 	UtlHashHandle_t idx = m_ActorGenders.Find( actor );
@@ -839,7 +828,7 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 	int duplicatedReplacements = 0;
 
 	// Open the soundscape data file, and abort if we can't
-	KeyValues *kv = new KeyValues( "" );
+	KeyValuesAD kv( "" );
 	if ( filesystem->LoadKeyValues( *kv, IFileSystem::TYPE_SOUNDEMITTER, filename, "GAME" ) )
 	{
 		// parse out all of the top level sections and save their names
@@ -900,12 +889,6 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 					{
 						InitSoundInternalParameters( pKeys->GetName(), pKeys, m_Sounds[ lookup ]->m_SoundParams );
 					}
-#if 0
-					else
-					{
-					 	DevMsg( "CSoundEmitterSystem::AddSoundsFromFile(%s):  Entry %s duplicated, skipping\n", filename, pKeys->GetName() );
-					}
-#endif
 				}
 				else
 				{
@@ -917,8 +900,6 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 			}
 			pKeys = pKeys->GetNextKey();
 		}
-
-		kv->deleteThis();
 	}
 	else
 	{
@@ -929,8 +910,6 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 
 		// Discard
 		m_SoundKeyValues.Remove( scriptindex );
-
-		kv->deleteThis();
 
 		return;
 	}
@@ -953,10 +932,9 @@ void CSoundEmitterSystemBase::AddSoundsFromFile( const char *filename, bool bPre
 //-----------------------------------------------------------------------------
 void CSoundEmitterSystemBase::ReloadSoundEntriesInList( IFileList *pFilesToReload )
 {
-	int i, c;
-	c = m_SoundKeyValues.Count();
+	intp c = m_SoundKeyValues.Count();
 	CUtlVector< const char * > processed;
-	for ( i = 0; i < c ; i++ )
+	for ( intp i = 0; i < c ; i++ )
 	{
 		const char *pszFileName = GetSoundScriptName( i );
 		if ( pszFileName && pszFileName[0] )
@@ -1113,7 +1091,7 @@ const char *CSoundEmitterSystemBase::GetSourceFileForSound( int index ) const
 		return "";
 	}
 	static char fn[ 512 ];
-	if ( filesystem->String( m_SoundKeyValues[ scriptindex ].hFilename, fn, sizeof( fn ) ))
+	if ( filesystem->String( m_SoundKeyValues[ scriptindex ].hFilename, fn ))
 	{
 		return fn;
 	}
@@ -1260,7 +1238,7 @@ const char *CSoundEmitterSystemBase::GetSoundScriptName( int index ) const
 		return NULL;
 
 	static char fn[ 512 ];
-	if ( filesystem->String( m_SoundKeyValues[ index ].hFilename, fn, sizeof( fn ) ) )
+	if ( filesystem->String( m_SoundKeyValues[ index ].hFilename, fn ) )
 	{
 		return fn;
 	}

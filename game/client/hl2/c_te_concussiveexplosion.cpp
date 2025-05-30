@@ -68,7 +68,7 @@ static inline void RecordConcussiveExplosion( const Vector& start, const Vector 
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_CONCUSSIVE_EXPLOSION );
  		msg->SetString( "name", "TE_ConcussiveExplosion" );
@@ -81,7 +81,6 @@ static inline void RecordConcussiveExplosion( const Vector& start, const Vector 
 		msg->SetFloat( "directionz", vecDirection.z );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

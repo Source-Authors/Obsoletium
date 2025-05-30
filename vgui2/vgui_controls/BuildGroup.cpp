@@ -1,50 +1,34 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
- //========= Copyright ?1996-2003, Valve LLC, All rights reserved. ============
-//
 // The copyright to the contents herein is the property of Valve, L.L.C.
 // The contents may be used and/or copied only with the written permission of
 // Valve, L.L.C., or in accordance with the terms and conditions stipulated in
 // the agreement/contract under which the contents have been supplied.
 //
-// Purpose: 
-//
-// $NoKeywords: $
 //=============================================================================
 
+#include <vgui_controls/BuildGroup.h>
 
-#include <stdio.h>
-#define PROTECTED_THINGS_DISABLE
+#include "filesystem.h"
+#include "const.h"
 
-#include "utldict.h"
+#include "tier0/icommandline.h"
+#include "tier1/utldict.h"
+#include <tier1/KeyValues.h>
 
 #include <vgui/KeyCode.h>
 #include <vgui/Cursor.h>
 #include <vgui/MouseCode.h>
-#include <KeyValues.h>
 #include <vgui/IInput.h>
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 #include <vgui/ISurface.h>
 
-#include <vgui_controls/BuildGroup.h>
 #include <vgui_controls/Panel.h>
 #include <vgui_controls/PHandle.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/MessageBox.h>
-#include "filesystem.h"
-#include "tier0/icommandline.h"
-#include "const.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -747,7 +731,8 @@ Panel *BuildGroup::CreateBuildDialog( void )
 {
 	// request the panel
 	Panel *buildDialog = NULL;
-	KeyValues *data = new KeyValues("BuildDialog");
+	// dimhotepus: Do not leak KeyValues.
+	KeyValuesAD data("BuildDialog");
 	data->SetPtr("BuildGroupPtr", this);
 	if (m_pBuildContext->RequestInfo(data))
 	{
@@ -1002,14 +987,12 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 
 	// save off the resource name
 	delete [] m_pResourceName;
-	m_pResourceName = new char[strlen(controlResourceName) + 1];
-	strcpy(m_pResourceName, controlResourceName);
+	m_pResourceName = V_strdup(controlResourceName);
 
 	if (pathID)
 	{
 		delete [] m_pResourcePathID;
-		m_pResourcePathID = new char[strlen(pathID) + 1];
-		strcpy(m_pResourcePathID, pathID);
+		m_pResourcePathID = V_strdup(pathID);
 	}
 
 	// delete any controls not in both files
@@ -1193,13 +1176,13 @@ bool BuildGroup::SaveControlSettings( void )
 	bool bSuccess = false;
 	if ( m_pResourceName )
 	{
-		KeyValues *rDat = new KeyValues( m_pResourceName );
+		KeyValuesAD rDat( m_pResourceName );
 
 		// get the data from our controls
 		GetSettings( rDat );
 		
 		char fullpath[ 512 ];
-		g_pFullFileSystem->RelativePathToFullPath( m_pResourceName, m_pResourcePathID, fullpath, sizeof( fullpath ) );
+		g_pFullFileSystem->RelativePathToFullPath_safe( m_pResourceName, m_pResourcePathID, fullpath );
 
 		// save the data out to a file
 		bSuccess = rDat->SaveToFile( g_pFullFileSystem, fullpath, NULL );
@@ -1208,8 +1191,6 @@ bool BuildGroup::SaveControlSettings( void )
 			MessageBox *dlg = new MessageBox("BuildMode - Error saving file", "Error: Could not save changes.  File is most likely read only.");
 			dlg->DoModal();
 		}
-
-		rDat->deleteThis();
 	}
 
 	return bSuccess;
@@ -1354,11 +1335,10 @@ Panel *BuildGroup::NewControl( KeyValues *controlKeys, int x, int y)
 	if (controlKeys)
 	{
 //		Warning( "Creating new control \"%s\" of type \"%s\"\n", controlKeys->GetString( "fieldName" ), controlKeys->GetString( "ControlName" ) );
-		KeyValues *keyVal = new KeyValues("ControlFactory", "ControlName", controlKeys->GetString("ControlName"));
+		KeyValuesAD keyVal( new KeyValues("ControlFactory", "ControlName", controlKeys->GetString("ControlName")) );
 		m_pBuildContext->RequestInfo(keyVal);
 		// returns NULL on failure
 		newPanel = (Panel *)keyVal->GetPtr("PanelPtr");
-		keyVal->deleteThis();
 	}
 	else
 	{

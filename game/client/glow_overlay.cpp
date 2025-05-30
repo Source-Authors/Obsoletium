@@ -286,11 +286,11 @@ void CGlowOverlay::CalcSpriteColorAndSize(
 {
 	// The overlay is largest and completely translucent at g_flOverlayRange.
 	// When the dot product is 1, then it's smaller and more opaque.
-	const float flSizeAtOverlayRangeMul = 150;
-	const float flSizeAtOneMul = 70;
+	constexpr float flSizeAtOverlayRangeMul = 150;
+	constexpr float flSizeAtOneMul = 70;
 	
-	const float flOpacityAtOverlayRange = 0;
-	const float flOpacityAtOne = 1;
+	constexpr float flOpacityAtOverlayRange = 0;
+	constexpr float flOpacityAtOne = 1;
 
 	// Figure out how big and how opaque it will be.
 	*flHorzSize = RemapValClamped( 
@@ -327,7 +327,7 @@ void CGlowOverlay::CalcBasis(
 	Vector &vUp,
 	Vector &vRight )
 {
-	const float flOverlayDist = 100;	
+	constexpr float flOverlayDist = 100;	
 	vBasePt = CurrentViewOrigin() + vToGlow * flOverlayDist;
 	
 	vUp.Init( 0, 0, 1 );

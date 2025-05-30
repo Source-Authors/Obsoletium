@@ -191,10 +191,10 @@ DmeTime_t DmeTime_t::TimeAtPrevFrame( DmeFramerate_t framerate ) const
 
 int DmeTime_t::RoundSecondsToTMS( float sec )
 {
-	return floor( 10000.0f * sec + 0.5f ); // round at half-tms boundary
+	return static_cast<int>(floor( 10000.0f * sec + 0.5f )); // round at half-tms boundary
 }
 
 int DmeTime_t::RoundSecondsToTMS( double sec )
 {
-	return floor( 10000.0 * sec + 0.5 ); // round at half-tms boundary
+	return static_cast<int>(floor( 10000.0 * sec + 0.5 )); // round at half-tms boundary
 }

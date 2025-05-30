@@ -154,8 +154,9 @@ static void VTexError( const char *pFormat, ... )
 	{
 		fprintf( stderr, "ERROR: %s", str );
 		Pause();
-		exit( 1 );
-	}	
+		// dimhotepus: 1 -> EOTHER
+		exit(EOTHER);
+	}
 }
 
 
@@ -234,9 +235,10 @@ struct VTexConfigInfo_t
 		m_nStartFrame = -1;
 		m_nEndFrame = -1;
 		m_nFlags = 0;
+		m_flBumpScale = 1.0f;
+		m_LookDir = LOOK_DOWN_X;
 		m_bNormalToDuDv = false;
 		m_bAlphaToLuminance = false;
-		m_flBumpScale = 1.0f;
 		m_bDuDv = false;
 		m_flAlphaThreshhold = -1.0f;
 		m_flAlphaHiFreqThreshhold = -1.0f;
@@ -548,7 +550,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 		if ( !stricmp( pKeyValue, "alpha" ) || !stricmp( pKeyValue, "a" ) )
 			iDecayChannel = 3;
 
-		if ( iDecayChannel >= 0 && iDecayChannel < 4 )
+		if ( iDecayChannel >= 0 )
 		{
 			m_vtfProcOptions.flags0 |= ( VtfProcessingOptions::OPT_DECAY_R | VtfProcessingOptions::OPT_DECAY_EXP_R ) << iDecayChannel;
 			m_vtfProcOptions.numNotDecayMips[iDecayChannel] = 0;
@@ -856,7 +858,7 @@ void MakeSrcFileName( char (&pSrcName)[src_size], unsigned int flags, const char
 			V_strcpy_safe( tempBuf, pFullNameWithoutExtension );
 
 			char *pNormalString = Q_stristr( tempBuf, "_dudv" );
-			Q_strcpy( pNormalString, "_normal" );
+			V_strcpy( pNormalString, "_normal" );
 			pFullNameWithoutExtension = tempBuf;
 		}
 		else
@@ -1533,9 +1535,10 @@ static bool LoadSourceImages( IVTFTexture *pTexture, const char *pFullNameWithou
 	bool bGenerateSpheremaps = false;
 
 	// The input file name here is simply for error reporting
-	char *pInputFileName = ( char * )stackalloc( strlen( pFullNameWithoutExtension ) + strlen( GetSourceExtension() ) + 1 );
-	strcpy( pInputFileName, pFullNameWithoutExtension );
-	strcat( pInputFileName, GetSourceExtension() );
+	intp sizeFileName = strlen( pFullNameWithoutExtension ) + strlen( GetSourceExtension() ) + 1;
+	char *pInputFileName = stackallocT( char, sizeFileName );
+	V_strncpy( pInputFileName, pFullNameWithoutExtension, sizeFileName );
+	V_strncat( pInputFileName, GetSourceExtension(), sizeFileName );
 
 	int nFrameCount;
 	bool bAnimated = !( info.m_nStartFrame == -1 || info.m_nEndFrame == -1 );
@@ -1746,8 +1749,8 @@ static void SetTextureLodData( IVTFTexture *pTexture, VTexConfigInfo_t const &in
 static void AttachShtFile( const char *pFullNameWithoutExtension, IVTFTexture *pTexture, CRC32_t *puiHash )
 {
 	char shtName[MAX_PATH];
-	Q_strncpy( shtName, pFullNameWithoutExtension, sizeof(shtName) );
-	Q_SetExtension( shtName, ".sht", sizeof(shtName) );
+	V_strcpy_safe( shtName, pFullNameWithoutExtension );
+	Q_SetExtension( shtName, ".sht" );
 
 	struct	_stat statBuf;
 	if( _stat( shtName, &statBuf ) == -1 )
@@ -1833,7 +1836,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 		}
 
 		size_t numDataBytes;
-		void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
+		const void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
 		if ( !pCrcData || numDataBytes != sizeof( CRC32_t ) )
 		{
 			fprintf( stderr, "OLD TEXTURE FORMAT: %s\n", dstFileName );
@@ -1861,7 +1864,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 			if ( spExistingVtf->Unserialize( bufFile ) )
 			{
 				size_t numDataBytes;
-				void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
+				const void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
 				if ( pCrcData && numDataBytes == sizeof( CRC32_t ) )
 				{
 					CRC32_t crcFile = * reinterpret_cast< CRC32_t const * >( pCrcData );
@@ -2011,7 +2014,7 @@ static bool GetKeyValueFromBuffer( CUtlBuffer &buffer, char (&key)[key_size], ch
 
 	while( buffer.GetBytesRemaining() )
 	{
-		buffer.GetLine( buf, sizeof( buf ) );
+		buffer.GetLine( buf );
 
 		// Scanning algorithm
 		char *pComment = strpbrk( buf, "#\n\r" );
@@ -2047,19 +2050,19 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 {
 	// Tries to load .txt, then .psd
 
-	size_t lenBaseName = strlen( pFileBaseName );
-	char *pFileName = ( char * )stackalloc( lenBaseName + strlen( ".tga" ) + 1 );
-	strcpy( pFileName, pFileBaseName );
-	strcat( pFileName, ".tga" );
+	intp lenBaseName = V_strlen( pFileBaseName );
+	intp sizeFileName = lenBaseName + std::size( ".tga" );
+	char *pFileName = stackallocT( char, sizeFileName );
+	V_strncpy( pFileName, pFileBaseName, sizeFileName );
+	V_strncat( pFileName, ".tga", sizeFileName );
 
 	bool bOK = false;
 
 	info.m_LookDir = LOOK_DOWN_Z;
 
-	
 	// Try TGA file with config
 	memcpy( pFileName + lenBaseName, ".tga", 4 );
-	if ( !bOK && !g_bNoTga && ( 00 == access( pFileName, 00 ) ) ) // TGA file exists
+	if ( !g_bNoTga && ( 00 == access( pFileName, 00 ) ) ) // TGA file exists
 	{
 		g_eMode = Mode::eModeTGA;
 
@@ -2303,8 +2306,8 @@ static bool GetOutputDir( const char *inputName, char (&outputDir)[out_size] )
 	{
 		// Is inputName a relative path?
 		char buf[MAX_PATH];
-		Q_MakeAbsolutePath( buf, sizeof( buf ), inputName, NULL );
-		Q_FixSlashes( buf );
+		V_MakeAbsolutePath( buf, inputName, NULL );
+		V_FixSlashes( buf );
 
 		char szSearch[MAX_PATH] = { 0 };
 		V_snprintf( szSearch, sizeof( szSearch ), "materialsrc%c", CORRECT_PATH_SEPARATOR );
@@ -2317,7 +2320,7 @@ static bool GetOutputDir( const char *inputName, char (&outputDir)[out_size] )
 		V_strcpy_safe( outputDir, gamedir );
 		V_strcat_safe( outputDir, "materials/" );
 		V_strcat_safe( outputDir, pTmp );
-		Q_StripFilename( outputDir );
+		V_StripFilename( outputDir );
 	}
 	if( !g_Quiet )
 	{
@@ -2330,7 +2333,7 @@ static bool IsCube( const char *inputName )
 {
 	char tgaName[MAX_PATH];
 	// Do Strcmp for ".hdr" to make sure we aren't ripping too much stuff off.
-	Q_StripExtension( inputName, tgaName, MAX_PATH );
+	Q_StripExtension( inputName, tgaName );
 
 	const char *pInputExtension = inputName + V_strlen( tgaName );
 	V_strcat_safe( tgaName, "rt", MAX_PATH );
@@ -2383,7 +2386,7 @@ static int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedi
 		_splitpath( wfd.cFileName, NULL, NULL, fname, ext );
 
 		// Not the type we want.
-		if ( stricmp( ext, extension ) )
+		if ( stricmp( ext, extension ) != 0 )
 			return FF_DONTPROCESS;
 
 		// Check for .vmt
@@ -2415,7 +2418,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 {
 	char outputDir[1024];
 	Q_FixSlashes( pInputBaseName, '/' );
-	Q_StripExtension( pInputBaseName, pInputBaseName, maxlen );
+	Q_StripExtension( pInputBaseName, pInputBaseName );
 
 	if ( CommandLine()->FindParm( "-deducepath" ) )
 	{
@@ -2471,7 +2474,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 	else if (!g_UseGameDir)
 	{
 		V_strcpy_safe(outputDir, pInputBaseName);
-		Q_StripFilename(outputDir);
+		V_StripFilename(outputDir);
 	}
 
 	// Usage:
@@ -2483,7 +2486,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 		printf( "Quick convert of '%s'...\n", pInputBaseName );
 
 		char chFileNameConvert[ 512 ];
-		sprintf( chFileNameConvert, "%s.vtf", pInputBaseName );
+		V_sprintf_safe( chFileNameConvert, "%s.vtf", pInputBaseName );
 
 		IVTFTexture *pVtf = CreateVTFTexture();
 		CUtlBuffer bufFile;
@@ -2560,7 +2563,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 	if( g_ShaderName )
 	{
 		char buf[1024];
-		sprintf( buf, "%s/%s.vmt", outputDir, pBaseName );
+		V_sprintf_safe( buf, "%s/%s.vmt", outputDir, pBaseName );
 		const char *tmp = Q_stristr( outputDir, "materials" );
 		FILE *fp;
 		if( tmp )
@@ -2673,7 +2676,7 @@ public:
 		}
 
 		V_strcpy_safe( gamedir, pGameDir );
-		Q_AppendSlash( gamedir, sizeof( gamedir ) );
+		V_AppendSlash( gamedir );
 
 		// When being used embedded in a host app, we don't want to blow away the host app's command line
 		CUtlString original_cmd_line( CommandLine()->GetCmdLine() );
@@ -2716,7 +2719,7 @@ bool CSuggestGameDirHelper::MySuggestFn( CFSSteamSetupInfo const *pFsSteamSetupI
 
 	for ( size_t k = 0; k < m_numInputFiles; ++ k )
 	{
-		Q_MakeAbsolutePath( pchPathBuffer, nBufferLength, m_pszInputFiles[ k ] );
+		V_MakeAbsolutePath( pchPathBuffer, nBufferLength, m_pszInputFiles[ k ] );
 		return true;
 	}
 
@@ -2993,7 +2996,7 @@ int CVTex::VTex( int argc, char **argv )
 
 		_splitpath( pInputBaseName, NULL, NULL, NULL, ext ); //find extension wanted
 
-		if ( !Q_ExtractFilePath ( pInputBaseName, basedir, sizeof( basedir ) ) )
+		if ( !V_ExtractFilePath ( pInputBaseName, basedir ) )
 			V_strcpy_safe( basedir, ".\\" );
 
 		V_sprintf_safe( search, "%s\\*.*", basedir );
@@ -3020,10 +3023,7 @@ int CVTex::VTex( int argc, char **argv )
 				iFFType = Find_Files( wfd, hResult, basedir, ext );
 			}
 
-			if ( iFFType == 0 )
-			{
-				FindClose( hResult );
-			}
+			FindClose( hResult );
 		}
 #endif
 

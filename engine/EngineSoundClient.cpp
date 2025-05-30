@@ -269,11 +269,6 @@ void CEngineSoundClient::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 	{
 		// this sound was played directly on the client, use its clock sync
 		delay = S_ComputeDelayForSoundtime( soundtime, CLOCK_SYNC_CLIENT );
-#if 0
-		static float lastSoundTime = 0;
-		Msg("[%.3f] Play %s at %.3f %.1fsms delay\n", soundtime - lastSoundTime, pSample, soundtime, delay * 1000.0f );
-		lastSoundTime = soundtime;
-#endif
 		// anything over 250ms is assumed to be intentional skipping
 		if ( delay <= 0 && delay > -0.250f )
 		{
@@ -284,7 +279,7 @@ void CEngineSoundClient::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 
 	StartSoundParams_t params;
 	params.staticsound = iChannel == CHAN_STATIC;
-	params.soundsource = iSoundSource;
+	params.soundsource = static_cast<SoundSource>(iSoundSource);
 	params.entchannel = iChannel;
 	params.pSfx = pSound;
 	params.origin = *pOrigin;

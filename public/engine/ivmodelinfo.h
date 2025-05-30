@@ -133,7 +133,7 @@ public:
 	virtual const studiohdr_t		*FindModel( const studiohdr_t *pStudioHdr, void **cache, const char *modelname ) const = 0;
 	virtual const studiohdr_t		*FindModel( void *cache ) const = 0;
 	virtual	virtualmodel_t			*GetVirtualModel( const studiohdr_t *pStudioHdr ) const = 0;
-	virtual byte					*GetAnimBlock( const studiohdr_t *pStudioHdr, int iBlock ) const = 0;
+	virtual byte					*GetAnimBlock( const studiohdr_t *pStudioHdr, intp iBlock ) const = 0;
 
 	// Available on client only!!!
 	virtual void					GetModelMaterialColorAndLighting( const model_t *model, Vector const& origin,

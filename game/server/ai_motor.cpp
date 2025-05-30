@@ -431,7 +431,7 @@ float CAI_Motor::MinStoppingDist( float flMinResult )
 		// assuming linear deceleration, how long till my V hits 0?
 		float t = GetCurSpeed() / flDecelRate;
 		// and how far will I travel? (V * t - 1/2 A t^2)
-		float flDist = GetCurSpeed() * t - 0.5 * flDecelRate * t * t;
+		float flDist = GetCurSpeed() * t - 0.5f * flDecelRate * t * t;
 	
 		// this should always be some reasonable non-zero distance
 		if (flDist > flMinResult)
@@ -577,7 +577,7 @@ AIMotorMoveResult_t CAI_Motor::MoveFlyExecute( const AILocalMoveGoal_t &move, AI
 	float flNewSpeed = GetIdealSpeed();
 	SetMoveVel( move.dir * flNewSpeed );
 
-	float flTotal = 0.5 * (GetCurSpeed() + flNewSpeed) * GetMoveInterval();
+	float flTotal = 0.5f * (GetCurSpeed() + flNewSpeed) * GetMoveInterval();
 
 	float distance = move.maxDist;
 

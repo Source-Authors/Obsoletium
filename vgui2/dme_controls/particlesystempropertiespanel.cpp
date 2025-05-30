@@ -4,18 +4,18 @@
 //
 //===========================================================================//
 
-#include "dme_controls/ParticleSystemPropertiesPanel.h"
+#include "dme_controls/particlesystempropertiespanel.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
 #include "vgui/IVGui.h"
-#include "vgui_controls/button.h"
-#include "vgui_controls/listpanel.h"
-#include "vgui_controls/splitter.h"
-#include "vgui_controls/messagebox.h"
-#include "vgui_controls/combobox.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/Splitter.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/ComboBox.h"
 #include "datamodel/dmelement.h"
 #include "movieobjects/dmeparticlesystemdefinition.h"
-#include "dme_controls/elementpropertiestree.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "matsys_controls/picker.h"
 #include "dme_controls/dmecontrols_utils.h"
 #include "dme_controls/particlesystempanel.h"
@@ -35,7 +35,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CParticleFunctionPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CParticleFunctionPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CParticleFunctionPickerFrame, vgui::Frame );
 
 public:
 	CParticleFunctionPickerFrame( vgui::Panel *pParent, const char *pTitle );
@@ -45,7 +45,7 @@ public:
 	void DoModal( CDmeParticleSystemDefinition *pParticleSystem, ParticleFunctionType_t type, KeyValues *pContextKeyValues );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 private:
 	// Refreshes the list of particle functions
@@ -233,7 +233,7 @@ void CParticleFunctionPickerFrame::OnCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 class CParticleChildrenPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CParticleChildrenPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CParticleChildrenPickerFrame, vgui::Frame );
 
 public:
 	CParticleChildrenPickerFrame( vgui::Panel *pParent, const char *pTitle, IParticleSystemPropertiesPanelQuery *pQuery );
@@ -243,7 +243,7 @@ public:
 	void DoModal( CDmeParticleSystemDefinition *pParticleSystem, KeyValues *pContextKeyValues );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 private:
 	// Refreshes the list of children particle systems
@@ -404,7 +404,7 @@ void CParticleChildrenPickerFrame::OnCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 class CParticleFunctionBrowser : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CParticleFunctionBrowser, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CParticleFunctionBrowser, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -412,7 +412,7 @@ public:
 	virtual ~CParticleFunctionBrowser();
 
 	// Inherited from Panel
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
 	void SetParticleFunctionProperties( CDmeElementPanel *pPanel );
 	void SetParticleSystem( CDmeParticleSystemDefinition *pOp );
@@ -1060,7 +1060,7 @@ void CParticleSystemPropertiesPanel::OnTextChanged( )
 //-----------------------------------------------------------------------------
 class CParticleSystemDmePanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CParticleSystemDmePanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CParticleSystemDmePanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor

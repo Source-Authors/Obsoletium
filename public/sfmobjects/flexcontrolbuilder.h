@@ -73,7 +73,8 @@ private:
 	{
 		CDmeFloatLog *m_pLog;
 		DmeTime_t m_GlobalOffset;
-		double m_flGlobalScale;
+		// dimhotepus: double -> float.
+		float m_flGlobalScale;
 	};
 
 	struct ControlInfo_t
@@ -140,8 +141,8 @@ private:
 	void ConvertExistingLRLogs( ExistingLogInfo_t *pLogs, CDmeFilmClip *pClip, CDmeChannel *pLeftChannel, CDmeChannel *pRightChannel );
 
 	// Computes a global offset and scale to convert from log time to global time
-	void ComputeChannelTimeTransform( DmeTime_t *pOffset, double *pScale, CDmeChannelsClip *pChannelsClip );
-	bool ComputeChannelTimeTransform( DmeTime_t *pOffset, double *pScale, CDmeFilmClip* pClip, CDmeChannel* pChannel );
+	void ComputeChannelTimeTransform( DmeTime_t *pOffset, float *pScale, CDmeChannelsClip *pChannelsClip );
+	bool ComputeChannelTimeTransform( DmeTime_t *pOffset, float *pScale, CDmeFilmClip* pClip, CDmeChannel* pChannel );
 
 	// Initializes the fields of a flex control
 	void InitializeFlexControl( ControlInfo_t &info );

@@ -190,7 +190,7 @@ void DBG(PRINTF_FORMAT_STRING const char *fmt, ...)
     va_list va;
 
     va_start(va, fmt);
-    vsprintf(ach, fmt, va);
+    V_vsprintf_safe(ach, fmt, va);
     va_end(va);
     OutputDebugString(ach);
 }
@@ -205,7 +205,7 @@ void Msg(int type, PRINTF_FORMAT_STRING const char *fmt, ...)
 	char szBuf[512];
 
  	va_start(vl, fmt);
-	int len = _vsnprintf(szBuf, 512, fmt, vl);
+	int len = V_vsprintf_safe(szBuf, fmt, vl);
 	va_end(vl);
 
 	if ((type == mwError) || (type == mwWarning))
@@ -612,8 +612,12 @@ void CHammer::EndImportSettings(void)
 // Input  : dir - Enumerated directory to retrieve.
 //			p - Pointer to buffer that receives the full path to the directory.
 //-----------------------------------------------------------------------------
-void CHammer::GetDirectory(DirIndex_t dir, char *p, ptrdiff_t size)
+void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, ptrdiff_t size) const
 {
+	// dimhotepus: Always zero-terminate
+	if (size > 0)
+		p[0] = '\0';
+
 	switch (dir)
 	{
 		case DIR_PROGRAM:
@@ -669,7 +673,7 @@ void CHammer::GetDirectory(DirIndex_t dir, char *p, ptrdiff_t size)
 		{
 			V_strncpy(p, g_pGameConfig->m_szModDir, size);
 			EnsureTrailingBackslash(p, size);
-			Q_strcat(p, "materials\\", MAX_PATH);
+			V_strcat(p, "materials\\", MAX_PATH);
 			break;
 		}
 
@@ -704,7 +708,7 @@ COLORREF CHammer::GetProfileColor(const char *pszSection, const char *pszKey, in
 	CString strDefault;
 	CString strReturn;
 	char szBuff[128];
-	sprintf(szBuff, "%i %i %i", r, g, b);
+	V_sprintf_safe(szBuff, "%i %i %i", r, g, b);
 
 	strDefault = szBuff;
 
@@ -815,7 +819,7 @@ void CHammer::Help(const char *pszTopic)
 	if (hResult <= (HINSTANCE)32)
 	{
 		char szError[MAX_PATH];
-		sprintf(szError, "The help system could not be launched. The the following error was returned:\n%s (0x%X)", GetErrorString(), hResult);
+		V_sprintf_safe(szError, "The help system could not be launched. The the following error was returned:\n%s (0x%X)", GetErrorString(), hResult);
 		AfxMessageBox(szError, MB_ICONERROR);
 	}
 	*/
@@ -1598,7 +1602,7 @@ BOOL CAboutDlg::OnInitDialog(void)
 		char szTemp2[MAX_PATH];
 		int nBuild = build_number();
 		pWnd->GetWindowText(szTemp1, sizeof(szTemp1));
-		sprintf(szTemp2, szTemp1, nBuild);
+		V_sprintf_safe(szTemp2, szTemp1, nBuild);
 		pWnd->SetWindowText(szTemp2);
 	}
 
@@ -1834,7 +1838,7 @@ void CHammer::LoadSequences(void)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "CmdSeq.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir ); 
 	std::ifstream file(szFullPath, std::ios::in | std::ios::binary);
 	
 	if(!file.is_open())
@@ -1891,7 +1895,7 @@ void CHammer::SaveSequences(void)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "CmdSeq.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir ); 
 	std::ofstream file( szFullPath, std::ios::out | std::ios::binary );
 
 	// write header
@@ -1977,7 +1981,7 @@ void CHammer::UpdateLighting(CMapDoc *pDoc)
 	else if( curPercent != lastPercent )
 	{
 		char str[256];
-		sprintf( str, "%.2f%%", curPercent / 100.0f );
+		V_sprintf_safe( str, "%.2f%%", curPercent / 100.0f );
 		SetStatusText( SBI_LIGHTPROGRESS, str );
 	}
 
@@ -2318,7 +2322,7 @@ void CHammer::Autosave( void )
    
 		CString strSaveName = strAutosaveDirectory + strMapTitle + strAutosaveNumber + strExtension + "_autosave";
 
-		pDoc->SaveVMF( (char *)strSaveName.GetBuffer(), SAVEFLAGS_AUTOSAVE );
+		pDoc->SaveVMF( strSaveName.GetBuffer(), SAVEFLAGS_AUTOSAVE );
 		//don't autosave again unless they make changes
 		pDoc->SetAutosaveFlag( FALSE ); 
 
@@ -2373,7 +2377,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		APP()->GetDirectory(DIR_AUTOSAVE, szRootDir);
 	}
 
-	if ( szRootDir[0] == 0 )
+	if ( Q_isempty( szRootDir ) )
 	{
 		AfxMessageBox( "No autosave directory has been selected.\nThe autosave feature will be disabled until a directory is entered.", MB_OK | MB_ICONEXCLAMATION );
 		return false;
@@ -2471,20 +2475,21 @@ void CHammer::LoadLastGoodSave( void )
 		{
 			//This handles the case where someone recovers from a crash and tries to load an autosave file that doesn't have the new autosave chunk in it
 			//It assumes the file should go into the gameConfig map directory
-			char szRenameMessage[MAX_PATH+MAX_PATH+256];
-			char szLastSaveCopy[MAX_PATH];
+			char szRenameMessage[MAX_PATH+MAX_PATH+256], szLastSaveCopy[MAX_PATH];
 			V_strcpy_safe( szLastSaveCopy, strLastGoodSave );		
+
 			char *pszFileName = Q_strrchr( strLastGoodSave, '\\') + 1;
 			char *pszFileNameEnd = Q_strrchr( strLastGoodSave, '_');
 			if ( !pszFileNameEnd )
 			{
 				pszFileNameEnd = Q_strrchr( strLastGoodSave, '.');
 			}
-			strcpy( pszFileNameEnd, ".vmf" );
+			V_strncpy( pszFileNameEnd, ".vmf",
+				strLastGoodSave.GetLength() - (pszFileNameEnd - strLastGoodSave.GetBuffer()) );
 			CString newMapPath( szMapDir );
 			newMapPath.Append( "\\" );
 			newMapPath.Append( pszFileName );
-			sprintf( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
+			V_sprintf_safe( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
 
 			if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{			

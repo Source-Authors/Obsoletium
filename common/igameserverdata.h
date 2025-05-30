@@ -27,10 +27,16 @@ abstract_class IGameServerData : public IBaseInterface
 {
 public:
 	// writes out a request
-	virtual void WriteDataRequest( ra_listener_id listener, const void *buffer, intp bufferSize) = 0;
+	virtual void WriteDataRequest( ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize) = 0;
 
 	// returns the number of bytes read
-	virtual intp ReadDataResponse( ra_listener_id listener, void *buffer, intp bufferSize) = 0;
+	virtual intp ReadDataResponse( ra_listener_id listener, IN_BYTECAP(bufferSize) void *buffer, intp bufferSize) = 0;
+
+	template<typename T, intp bufferSize>
+	intp ReadDataResponse( ra_listener_id listener, T (&buffer)[bufferSize] )
+	{
+		return ReadDataResponse( listener, &buffer, bufferSize );
+	}
 
 	// get a handle to refer to this connection to the gameserver data interface
 	// is authConnection is true the SERVERDATA_AUTH command needs to succeed before other commands

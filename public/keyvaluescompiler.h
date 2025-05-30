@@ -145,13 +145,13 @@ public:
 
 	KeyValues	*Instance( char const *kvfilename );
 	bool		InstanceInPlace( KeyValues& head, char const *kvfilename );
-	bool		LookupKeyValuesRootKeyName( char const *kvfilename, char *outbuf, size_t bufsize );
+	bool		LookupKeyValuesRootKeyName( char const *kvfilename, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize );
 
 	int			First() const;
 	int			Next( int i ) const;
 	int			InvalidIndex() const;
 
-	void		GetFileName( int index, char *buf, size_t bufsize );
+	void		GetFileName( int index, OUT_Z_CAP(bufsize) char *buf, intp bufsize );
 
 private:
 

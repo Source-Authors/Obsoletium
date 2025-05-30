@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include "matsys_controls/PotteryWheelPanel.h"
+#include "matsys_controls/potterywheelpanel.h"
 #include "datamodel/dmattributetypes.h"
 #include "particles/particles.h"
 
@@ -46,7 +46,7 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CParticleSystemPanel : public CPotteryWheelPanel
 {
-	DECLARE_CLASS_SIMPLE( CParticleSystemPanel, CPotteryWheelPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CParticleSystemPanel, CPotteryWheelPanel );
 
 public:
 	// constructor, destructor
@@ -71,8 +71,8 @@ public:
 	// Indicates which helper to draw
 	void SetRenderedHelper( CDmeParticleFunction *pOp );
 
-	virtual void OnTick();
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+	void OnTick() override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	// Accessor for control point values
 	const Vector& GetControlPointValue( int nControlPoint ) const;
@@ -88,7 +88,7 @@ private:
 	void DrawCullBounds();
  
 	// paint it!
-	virtual void OnPaint3D();
+	void OnPaint3D() override;
 
 private:
 	bool m_bRenderBounds : 1;
@@ -135,7 +135,7 @@ inline void CParticleSystemPanel::SetControlPointValue( int nControlPoint, const
 //-----------------------------------------------------------------------------
 class CParticleSystemPreviewPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CParticleSystemPreviewPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CParticleSystemPreviewPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -146,7 +146,7 @@ public:
 	void SetParticleSystem( CDmeParticleSystemDefinition *pDef );
 	void SetParticleFunction( CDmeParticleFunction *pFunction );
 	void SetDmeElement( CDmeParticleSystemDefinition *pDef );
-	virtual void OnThink();
+	void OnThink() override;
 
 private:
 	MESSAGE_FUNC_PARAMS( OnCheckButtonChecked, "CheckButtonChecked", params );

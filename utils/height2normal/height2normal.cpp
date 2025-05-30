@@ -31,20 +31,20 @@ void Pause() {
   }
 }
 
-bool ImageRGBA8888HasAlpha(unsigned char *pImage, int numTexels) {
-  int i;
-  for (i = 0; i < numTexels; i++) {
-    if (pImage[i * 4 + 3] != 255) {
-      return true;
-    }
+[[nodiscard]] bool ImageRGBA8888HasAlpha(unsigned char *pImage, int numTexels) {
+  for (int i = 0; i < numTexels; i++) {
+    if (pImage[i * 4 + 3] != 255) return true;
   }
+
   return false;
 }
 
-bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key, char **val) {
+[[nodiscard]] bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key,
+                                         char **val) {
   char stringBuf[2048];
   while (buf.IsValid()) {
-    buf.GetLine(stringBuf, sizeof(stringBuf));
+    buf.GetLine(stringBuf);
+
     char *scan = stringBuf;
     // search for the first quote for the key.
     while (1) {
@@ -52,14 +52,18 @@ bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key, char **val) {
         *key = ++scan;
         break;
       }
+
       if (*scan == '#') {
         goto next_line;  // comment
       }
+
       if (*scan == '\0') {
         goto next_line;  // end of line.
       }
+
       scan++;
     }
+
     // read the key until another quote.
     while (1) {
       if (*scan == '\"') {
@@ -67,25 +71,32 @@ bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key, char **val) {
         scan++;
         break;
       }
+
       if (*scan == '\0') {
         goto next_line;
       }
+
       scan++;
     }
+
     // search for the first quote for the value.
     while (1) {
       if (*scan == '\"') {
         *val = ++scan;
         break;
       }
+
       if (*scan == '#') {
         goto next_line;  // comment
       }
+
       if (*scan == '\0') {
         goto next_line;  // end of line.
       }
+
       scan++;
     }
+
     // read the value until another quote.
     while (1) {
       if (*scan == '\"') {
@@ -94,9 +105,11 @@ bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key, char **val) {
         // got a key and a value, so get the hell out of here.
         return true;
       }
+
       if (*scan == '\0') {
         goto next_line;
       }
+
       scan++;
     }
   next_line:;
@@ -104,68 +117,67 @@ bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key, char **val) {
   return false;
 }
 
-void LoadConfigFile(const char *pFileName, float *bumpScale, int *startFrame,
-                    int *endFrame) {
+[[nodiscard]] bool LoadConfigFile(const char *pFileName, float *bumpScale,
+                                  int *startFrame, int *endFrame) {
   CUtlBuffer buf((intp)0, 0, CUtlBuffer::TEXT_BUFFER);
-  if (!g_pFullFileSystem->ReadFile(pFileName, NULL, buf)) {
-    fprintf(stderr, "Can't open %s.\n", pFileName);
-    Pause();
-    exit(EIO);
-  }
+  if (!g_pFullFileSystem->ReadFile(pFileName, nullptr, buf)) return false;
 
-  char *key = NULL;
-  char *val = NULL;
+  char *key = nullptr, *val = nullptr;
+
   while (GetKeyValueFromBuffer(buf, &key, &val)) {
     if (stricmp(key, "bumpscale") == 0) {
       // dimhotepus: atof -> strtof.
       *bumpScale = strtof(val, nullptr);
     }
+
     if (stricmp(key, "startframe") == 0) {
       *startFrame = atoi(val);
     } else if (stricmp(key, "endframe") == 0) {
       *endFrame = atoi(val);
     }
   }
+
+  return true;
 }
 
-void Usage() {
+[[noreturn]] void Usage() {
   fprintf(stderr,
           "Usage: height2normal [-nopause] [-quiet] tex1_normal.txt "
           "tex2_normal.txt . . .\n");
   fprintf(stderr,
-          "-quiet   : don't print anything out, don't pause for input\n");
-  fprintf(stderr, "-nopause : don't pause for input\n");
+          "-quiet   : don't print anything out, don't pause for input\n"
+          "-nopause : don't pause for input\n");
   Pause();
   exit(EINVAL);
 }
 
-void ProcessFiles(const char *pNormalFileNameWithoutExtension, int startFrame,
+void ProcessFiles(const char *normalFileNameWithoutExtension, int startFrame,
                   int endFrame, float bumpScale) {
-  static char heightTGAFileName[1024];
-  static char normalTGAFileName[1024];
-  static char buffer[1024];
+  static char heightTGAFileName[1024], normalTGAFileName[1024], buffer[1024];
+
   bool animated = !(startFrame == -1 || endFrame == -1);
   int numFrames = endFrame - startFrame + 1;
-  int frameID;
 
-  for (frameID = 0; frameID < numFrames; frameID++) {
+  for (int frameID = 0; frameID < numFrames; frameID++) {
     if (animated) {
       V_sprintf_safe(normalTGAFileName, "%s%03d.tga",
-                     pNormalFileNameWithoutExtension, frameID + startFrame);
+                     normalFileNameWithoutExtension, frameID + startFrame);
     } else {
       V_sprintf_safe(normalTGAFileName, "%s.tga",
-                     pNormalFileNameWithoutExtension);
+                     normalFileNameWithoutExtension);
     }
-    if (!Q_stristr(pNormalFileNameWithoutExtension, "_normal")) {
-      fprintf(stderr, "ERROR: config file name must end in _normal.txt\n");
+
+    V_strcpy_safe(buffer, normalFileNameWithoutExtension);
+
+    // Strip '_normal' off the end because we're looking for '_height'
+    char *underscore = Q_stristr(buffer, "_normal");
+    if (!underscore) {
+      fprintf(stderr, "config file '%s' name must end in _normal.txt\n",
+              buffer);
       return;
     }
 
-    strcpy(buffer, pNormalFileNameWithoutExtension);
-
-    // Strip '_normal' off the end because we're looking for '_height'
-    char *pcUnderscore = Q_stristr(buffer, "_normal");
-    *pcUnderscore = NULL;
+    *underscore = '\0';
 
     if (animated) {
       V_sprintf_safe(heightTGAFileName, "%s_height%03d.tga", buffer,
@@ -174,57 +186,70 @@ void ProcessFiles(const char *pNormalFileNameWithoutExtension, int startFrame,
       V_sprintf_safe(heightTGAFileName, "%s_height.tga", buffer);
     }
 
-    enum ImageFormat imageFormat;
-    int width, height;
-    float sourceGamma;
     CUtlBuffer buf;
-    if (!g_pFullFileSystem->ReadFile(heightTGAFileName, NULL, buf)) {
-      fprintf(stderr, "%s not found.\n", heightTGAFileName);
+    if (!g_pFullFileSystem->ReadFile(heightTGAFileName, nullptr, buf)) {
+      fprintf(stderr, "'%s' not found.\n", heightTGAFileName);
       return;
     }
 
+    ImageFormat imageFormat;
+    int width, height;
+    float sourceGamma;
     if (!TGALoader::GetInfo(buf, &width, &height, &imageFormat, &sourceGamma)) {
       fprintf(stderr, "error in %s.\n", heightTGAFileName);
       return;
     }
 
-    intp memRequired =
+    intp size =
         ImageLoader::GetMemRequired(width, height, 1, IMAGE_FORMAT_IA88, false);
-    unsigned char *pImageIA88 = new unsigned char[memRequired];
+    std::unique_ptr<byte[]> ia88 = std::make_unique<byte[]>(size);
 
     buf.SeekGet(CUtlBuffer::SEEK_HEAD, 0);
-    TGALoader::Load(pImageIA88, buf, width, height, IMAGE_FORMAT_IA88,
-                    sourceGamma, false);
+    if (!TGALoader::Load(ia88.get(), buf, width, height, IMAGE_FORMAT_IA88,
+                         sourceGamma, false)) {
+      fprintf(stderr, "error in %s.\n", heightTGAFileName);
+      return;
+    }
 
-    memRequired = ImageLoader::GetMemRequired(width, height, 1,
-                                              IMAGE_FORMAT_RGBA8888, false);
-    unsigned char *pImageRGBA8888 = new unsigned char[memRequired];
-    ImageLoader::ConvertIA88ImageToNormalMapRGBA8888(pImageIA88, width, height,
-                                                     pImageRGBA8888, bumpScale);
+    size = ImageLoader::GetMemRequired(width, height, 1, IMAGE_FORMAT_RGBA8888,
+                                       false);
+    std::unique_ptr<byte[]> rgba8888 = std::make_unique<byte[]>(size);
+
+    ImageLoader::ConvertIA88ImageToNormalMapRGBA8888(ia88.get(), width, height,
+                                                     rgba8888.get(), bumpScale);
 
     CUtlBuffer normalBuf;
-    ImageLoader::NormalizeNormalMapRGBA8888(pImageRGBA8888, width * height);
-    if (ImageRGBA8888HasAlpha(pImageRGBA8888, width * height)) {
-      TGAWriter::WriteToBuffer(pImageRGBA8888, normalBuf, width, height,
-                               IMAGE_FORMAT_RGBA8888, IMAGE_FORMAT_RGBA8888);
+    ImageLoader::NormalizeNormalMapRGBA8888(rgba8888.get(), width * height);
+
+    if (ImageRGBA8888HasAlpha(rgba8888.get(), width * height)) {
+      if (!TGAWriter::WriteToBuffer(rgba8888.get(), normalBuf, width, height,
+                                    IMAGE_FORMAT_RGBA8888,
+                                    IMAGE_FORMAT_RGBA8888)) {
+        fprintf(stderr, "unable to convert to alpha RGBA8888 image %s.\n",
+                heightTGAFileName);
+        return;
+      }
     } else {
-      memRequired = ImageLoader::GetMemRequired(width, height, 1,
-                                                IMAGE_FORMAT_RGB888, false);
-      unsigned char *pImageRGB888 = new unsigned char[memRequired];
-      ImageLoader::ConvertImageFormat(pImageRGBA8888, IMAGE_FORMAT_RGBA8888,
-                                      pImageRGB888, IMAGE_FORMAT_RGB888, width,
+      size = ImageLoader::GetMemRequired(width, height, 1, IMAGE_FORMAT_RGB888,
+                                         false);
+      std::unique_ptr<byte[]> rgb888 = std::make_unique<byte[]>(size);
+
+      ImageLoader::ConvertImageFormat(rgba8888.get(), IMAGE_FORMAT_RGBA8888,
+                                      rgb888.get(), IMAGE_FORMAT_RGB888, width,
                                       height, 0, 0);
-      TGAWriter::WriteToBuffer(pImageRGB888, normalBuf, width, height,
-                               IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888);
-      delete[] pImageRGB888;
+
+      if (!TGAWriter::WriteToBuffer(rgb888.get(), normalBuf, width, height,
+                                    IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888)) {
+        fprintf(stderr, "unable to convert to alpha RGB888 image %s.\n",
+                heightTGAFileName);
+        return;
+      }
     }
+
     if (!g_pFullFileSystem->WriteFile(normalTGAFileName, NULL, normalBuf)) {
       fprintf(stderr, "unable to write %s.\n", normalTGAFileName);
       return;
     }
-
-    delete[] pImageIA88;
-    delete[] pImageRGBA8888;
   }
 }
 
@@ -241,21 +266,21 @@ int main(int argc, char **argv) {
   Msg("\nValve Software - height2normal (%s)\n", __DATE__);
 #endif
 
-  if (argc < 2) {
-    Usage();
-  }
+  if (argc < 2) Usage();
 
   MathLib_Init(2.2f, 2.2f, 0.0f, 2);
-  InitDefaultFileSystem();
+
+  const ScopedDefaultFileSystem scoped_default_file_system;
 
   int i = 1;
   while (i < argc) {
     if (stricmp(argv[i], "-quiet") == 0) {
       i++;
       g_Quiet = true;
-      g_NoPause = true;  // no point in pausing if we aren't going to print
-                         // anything out.
+      // no point in pausing if we aren't going to print anything out.
+      g_NoPause = true;
     }
+
     if (stricmp(argv[i], "-nopause") == 0) {
       i++;
       g_NoPause = true;
@@ -264,58 +289,60 @@ int main(int argc, char **argv) {
     }
   }
 
-  char pCurrentDirectory[MAX_PATH];
-  if (_getcwd(pCurrentDirectory, sizeof(pCurrentDirectory)) == NULL) {
-    fprintf(stderr, "Unable to get the current directory.\n");
+  char cwd[MAX_PATH];
+  if (!_getcwd(cwd, ssize(cwd))) {
+    fprintf(stderr, "unable to get the current directory: %s.\n",
+            std::generic_category().message(errno).c_str());
     return -1;
   }
 
-  Q_FixSlashes(pCurrentDirectory);
-  Q_StripTrailingSlash(pCurrentDirectory);
+  V_FixSlashes(cwd);
+  V_StripTrailingSlash(cwd);
 
   for (; i < argc; i++) {
     static char normalFileNameWithoutExtension[1024];
-    char *pFileName;
-    if (!Q_IsAbsolutePath(argv[i])) {
-      V_sprintf_safe(normalFileNameWithoutExtension, "%s\\%s",
-                     pCurrentDirectory, argv[i]);
-      pFileName = normalFileNameWithoutExtension;
+
+    char *fileName;
+    if (!V_IsAbsolutePath(argv[i])) {
+      V_sprintf_safe(normalFileNameWithoutExtension, "%s\\%s", cwd, argv[i]);
+
+      fileName = normalFileNameWithoutExtension;
     } else {
-      pFileName = argv[i];
+      fileName = argv[i];
     }
 
-    if (!g_Quiet) {
-      printf("file: %s\n", pFileName);
-    }
+    if (!g_Quiet) printf("file: %s\n", fileName);
 
     float bumpScale = -1.0f;
     int startFrame = -1;
     int endFrame = -1;
-    LoadConfigFile(pFileName, &bumpScale, &startFrame, &endFrame);
-    if (bumpScale == -1.0f) {
-      fprintf(stderr, "Must specify \"bumpscale\" in config file.\n");
+    if (!LoadConfigFile(fileName, &bumpScale, &startFrame, &endFrame)) {
+      fprintf(stderr, "unable to load '%s'.\n", fileName);
       Pause();
-      continue;
-    }
-    if ((startFrame == -1 && endFrame != -1) ||
-        (startFrame != -1 && endFrame == -1)) {
-      fprintf(stderr,
-              "ERROR: If you use startframe, you must use endframe, and vice "
-              "versa.\n");
-      Pause();
-      continue;
-    }
-    if (!g_Quiet) {
-      printf("\tbumpscale: %f\n", bumpScale);
+      return EIO;
     }
 
-    Q_StripExtension(pFileName, normalFileNameWithoutExtension,
-                     sizeof(normalFileNameWithoutExtension));
+    if (bumpScale == -1.0f) {
+      fprintf(stderr, "must specify \"bumpscale\" in config file.\n");
+      Pause();
+      continue;
+    }
+
+    if ((startFrame == -1 && endFrame != -1) ||
+        (startFrame != -1 && endFrame == -1)) {
+      fprintf(
+          stderr,
+          "if you use startframe, you must use endframe, and vice versa.\n");
+      Pause();
+      continue;
+    }
+
+    if (!g_Quiet) printf("\tbumpscale: %f\n", bumpScale);
+
+    V_StripExtension(fileName, normalFileNameWithoutExtension);
     ProcessFiles(normalFileNameWithoutExtension, startFrame, endFrame,
                  bumpScale);
   }
-
-  ShutdownDefaultFileSystem();
 
   return 0;
 }

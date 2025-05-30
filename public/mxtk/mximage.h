@@ -54,10 +54,10 @@ public:
 	bool create (int w, int h, int pixelSize)
 	{
 		if (data)
-			delete[] data;
+			delete[] (byte*)data;
 
 		if (palette)
-			delete[] palette;
+			delete[] (byte*)palette;
 
 		data = new byte[w * h * pixelSize / 8];
 		if (!data)
@@ -69,7 +69,7 @@ public:
 			palette = new byte[768];
 			if (!palette)
 			{
-				delete[] data;
+				delete[] (byte*)data;
 				return false;
 			}
 		}
@@ -86,10 +86,10 @@ public:
 	void destroy ()
 	{
 		if (data)
-			delete[] data;
+			delete[] (byte*)data;
 
 		if (palette)
-			delete[] palette;
+			delete[] (byte*)palette;
 
 		data = palette = 0;
 		width = height = bpp = 0;

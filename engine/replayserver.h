@@ -124,7 +124,8 @@ public: // IReplayServer interface:
 	virtual IServer	*GetBaseServer();
 	virtual IReplayDirector *GetDirector() { return NULL; }
 	virtual int		GetReplaySlot(); // return entity index-1 of Replay in game
-	virtual float	GetOnlineTime(); // seconds since broadcast started
+	// dimhotepus: float -> double
+	virtual double	GetOnlineTime(); // seconds since broadcast started
 	virtual void	BroadcastEvent( IGameEvent * ) { }
 	virtual bool	IsRecording()	{ return m_DemoRecorder.IsRecording(); }
 	virtual void	StartRecording();

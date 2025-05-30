@@ -317,8 +317,8 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 	// 'm' and 'r' are mixing constants generated offline.
 	// They're not really 'magic', they just happen to work well.
 
-	const uint32 m = 0x5bd1e995;
-	const int r = 24;
+	constexpr uint32 m = 0x5bd1e995;
+	constexpr int r = 24;
 
 	// Initialize the hash to a 'random' value
 
@@ -386,8 +386,8 @@ uint64 MurmurHash64( const void * key, int len, uint32 seed )
 	// 'm' and 'r' are mixing constants generated offline.
 	// They're not really 'magic', they just happen to work well.
 
-	const uint32 m = 0x5bd1e995;
-	const int r = 24;
+	constexpr uint32 m = 0x5bd1e995;
+	constexpr int r = 24;
 
 	// Initialize the hash to a 'random' value
 

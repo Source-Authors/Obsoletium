@@ -27,7 +27,7 @@
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/CheckButton.h>
 
-#define STATS_UPDATE_RATE	5.0f
+constexpr inline double STATS_UPDATE_RATE{5.0};
 
 
 // colors for the various graph lines+controls
@@ -141,7 +141,7 @@ void CGraphPanel::OnTick()
 	if (m_flNextStatsUpdateTime > system()->GetFrameTime())
 		return;
 
-	m_flNextStatsUpdateTime = (float)system()->GetFrameTime() + STATS_UPDATE_RATE;
+	m_flNextStatsUpdateTime = system()->GetFrameTime() + STATS_UPDATE_RATE;
 	RemoteServer().RequestValue(this, "stats");	
 }
 
@@ -175,8 +175,12 @@ void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 	{
 		// parse the stats out of the response
 		Points_t p;
-		float uptime, users;
-		sscanf(response, "%f %f %f %f %f %f %f", &p.cpu, &p.in, &p.out, &uptime, &users, &p.fps, &p.players);
+		// dimhotepus: float -> int.
+		int uptime, users;
+		// format: CPU percent (float), Bandwidth in (float), Bandwidth out (float),
+		// uptime (mins, int), changelevels (int), framerate (float), total players (int),
+		// total connections (int)
+		sscanf(response, "%f %f %f %i %i %f %f", &p.cpu, &p.in, &p.out, &uptime, &users, &p.fps, &p.players);
 		p.cpu = p.cpu / 100; // its given as a value between 0<x<100, we want 0<x<1
 		p.ping = 0;
 		p.time = (float)system()->GetCurrentTime();
@@ -188,7 +192,7 @@ void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 		SetControlString("TotalUsersLabel", timeText);
 
 		// mark the vert combo has changed to force it to update graph ranges
-		m_pVertCombo->GetText(timeText, 64);
+		m_pVertCombo->GetText(timeText);
 		OnTextChanged(m_pVertCombo, timeText);
 	}
 }
@@ -422,7 +426,7 @@ CGraphPanel::CGraphsImage::CGraphsImage(): vgui::Image(), points()
 	timeBetween = SECONDS;
 	net_i=net_o=fps=cpu=ping=players=false;
 	numAvgs=0;
-	memset(&avgPoint,0x0,sizeof(Points_t));
+	BitwiseClear(avgPoint);
 }
 
 //-----------------------------------------------------------------------------
@@ -580,7 +584,7 @@ bool CGraphPanel::CGraphsImage::AddPoint(const Points_t &p)
 
 	if(recalcBounds) 
 	{
-		for(int i=0;i<points.Count();i++)
+		for(intp i=0;i<points.Count();i++)
 		{
 			CheckBounds(points[i]);
 		}
@@ -591,7 +595,7 @@ bool CGraphPanel::CGraphsImage::AddPoint(const Points_t &p)
 
 	points.AddToTail(avgPoint);
 	
-	memset(&avgPoint,0x0,sizeof(Points_t));
+	BitwiseClear(avgPoint);
 
 	return true;
 }
@@ -657,42 +661,42 @@ void CGraphPanel::OnTextChanged(Panel *panel, const char *text)
 		else if (strstr(text, "FPS"))
 		{
 			m_pGraphs->GetFPSLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 			SetAxisLabels(m_pGraphs->GetFPSColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "In"))
 		{
 			m_pGraphs->GetInLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 
 			SetAxisLabels(m_pGraphs->GetInColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "Out"))
 		{
 			m_pGraphs->GetOutLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 			SetAxisLabels(m_pGraphs->GetOutColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "Ping"))
 		{
 			m_pGraphs->GetPingLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 			SetAxisLabels(m_pGraphs->GetPingColor(), maxText, midText, minText);
 		}
 		else if (strstr(text, "Players"))
 		{
 			m_pGraphs->GetPlayerLimits(maxVal, minVal);
-			sprintf(maxText,"%0.2f", maxVal);
-			sprintf(midText,"%0.2f", (maxVal - minVal) / 2);
-			sprintf(minText,"%0.2f", minVal);
+			V_sprintf_safe(maxText,"%0.2f", maxVal);
+			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
+			V_sprintf_safe(minText,"%0.2f", minVal);
 
 			SetAxisLabels(m_pGraphs->GetPlayersColor(), maxText, midText, minText);
 		}
@@ -702,7 +706,7 @@ void CGraphPanel::OnTextChanged(Panel *panel, const char *text)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CGraphPanel::SetAxisLabels(Color c, char *max, char *mid, char *min)
+void CGraphPanel::SetAxisLabels(Color c, const char *max, const char *mid, const char *min)
 {
 	Label *lab;
 	lab= GetLabel("AxisMax");

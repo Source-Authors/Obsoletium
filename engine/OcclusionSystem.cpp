@@ -31,11 +31,7 @@
 //-----------------------------------------------------------------------------
 // Used to visualizes what the occlusion system is doing.
 //-----------------------------------------------------------------------------
-#ifdef _X360
-#define DEFAULT_MIN_OCCLUDER_AREA  70.0f
-#else
 #define DEFAULT_MIN_OCCLUDER_AREA  5.0f
-#endif
 #define DEFAULT_MAX_OCCLUDEE_AREA  5.0f
 
 
@@ -86,8 +82,9 @@ public:
 		float m_flDxDy;				// Change in x per unit in y.
 		float m_flOODy;
 		float m_flX;
-		short m_nLeaveSurfID;		// Unique index of the surface this is a part of
-		short m_nEnterSurfID;		// Unique index of the surface this is a part of
+		// dimhotepus: short -> intp
+		intp m_nLeaveSurfID;		// Unique index of the surface this is a part of
+		intp m_nEnterSurfID;		// Unique index of the surface this is a part of
 		WingedEdge_t *m_pPrevActiveEdge;
 		WingedEdge_t *m_pNextActiveEdge;
 	};
@@ -99,15 +96,15 @@ public:
 	void Clear();
 
 	// Iteration
-	int EdgeCount() const;
-	WingedEdge_t &WingedEdge( int i );
+	intp EdgeCount() const;
+	WingedEdge_t &WingedEdge( intp i );
 
 	// Adds an edge
-	int AddEdge( );
-	int AddEdge( const Vector &vecStartVert, const Vector &vecEndVert, int nLeaveSurfID, int nEnterSurfID );
+	intp AddEdge( );
+	intp AddEdge( const Vector &vecStartVert, const Vector &vecEndVert, intp nLeaveSurfID, intp nEnterSurfID );
 
 	// Adds a surface
-	int AddSurface( const cplane_t &plane );
+	intp AddSurface( const cplane_t &plane );
 
 	// Does this edge list occlude another winged edge list?
 	bool IsOccludingEdgeList( CWingedEdgeList &testList );
@@ -173,7 +170,7 @@ private:
 
 	// Next discontinuity..
 	float m_flNextDiscontinuity;
-	int m_nCurrentEdgeIndex;
+	intp m_nCurrentEdgeIndex;
 
 	CUtlVector< WingedEdge_t > m_WingedEdges;
 	CUtlVector< Surface_t > m_Surfaces;
@@ -227,12 +224,12 @@ void CWingedEdgeList::Clear()
 //-----------------------------------------------------------------------------
 // Iterate over the winged edges
 //-----------------------------------------------------------------------------
-inline int CWingedEdgeList::EdgeCount() const 
+inline intp CWingedEdgeList::EdgeCount() const 
 { 
 	return m_WingedEdges.Count(); 
 }
 
-inline CWingedEdgeList::WingedEdge_t &CWingedEdgeList::WingedEdge( int i )
+inline CWingedEdgeList::WingedEdge_t &CWingedEdgeList::WingedEdge( intp i )
 {
 	return m_WingedEdges[i];
 }
@@ -241,7 +238,7 @@ inline CWingedEdgeList::WingedEdge_t &CWingedEdgeList::WingedEdge( int i )
 //-----------------------------------------------------------------------------
 // Adds new edges
 //-----------------------------------------------------------------------------
-inline int CWingedEdgeList::AddEdge( )
+inline intp CWingedEdgeList::AddEdge( )
 {
 	intp i = m_WingedEdges.AddToTail();
 
@@ -252,14 +249,13 @@ inline int CWingedEdgeList::AddEdge( )
 	return i;
 }
 
-int CWingedEdgeList::AddEdge( const Vector &vecStartVert, const Vector &vecEndVert, int nLeaveSurfID, int nEnterSurfID )
+intp CWingedEdgeList::AddEdge( const Vector &vecStartVert, const Vector &vecEndVert, intp nLeaveSurfID, intp nEnterSurfID )
 {
 	// This is true if we've clipped to the near clip plane
 	Assert( (vecStartVert.z >= 0.0) && (vecEndVert.z >= 0.0) );
 
 	// Don't bother adding edges with dy == 0
-	float dy;
-	dy = vecEndVert.y - vecStartVert.y;
+	float dy = vecEndVert.y - vecStartVert.y;
 	if (dy == 0.0f)
 		return -1;
 
@@ -282,7 +278,7 @@ int CWingedEdgeList::AddEdge( const Vector &vecStartVert, const Vector &vecEndVe
 //-----------------------------------------------------------------------------
 // Adds new surfaces
 //-----------------------------------------------------------------------------
-int CWingedEdgeList::AddSurface( const cplane_t &plane )
+intp CWingedEdgeList::AddSurface( const cplane_t &plane )
 {
 	intp i = m_Surfaces.AddToTail();
 	m_Surfaces[i].m_Plane = plane;
@@ -341,8 +337,8 @@ void CWingedEdgeList::CheckConsistency()
 	float flLastX = -FLT_MAX;
 	float flLastDxDy = 0;
 
-	int nEdgeCount = EdgeCount();
-	for ( int i = 0; i < nEdgeCount; ++i )
+	intp nEdgeCount = EdgeCount();
+	for ( intp i = 0; i < nEdgeCount; ++i )
 	{
 		WingedEdge_t *pEdge = &WingedEdge(i);
 		Assert( pEdge->m_vecPosition.y >= flLastY );
@@ -366,7 +362,7 @@ void CWingedEdgeList::CheckConsistency()
 	while ( flCurrentY != FLT_MAX )
 	{
 		// Make sure all edges have correct Xs + enter + leave surfaces..
-		int nCurrentSurfID = -1;
+		intp nCurrentSurfID = -1;
 		float flX = -FLT_MAX;
 		WingedEdge_t *pCurEdge = FirstActiveEdge();
 		while ( !AtListEnd( pCurEdge ) )
@@ -460,11 +456,11 @@ void CWingedEdgeList::SpewActiveEdgeList( float y, bool bHex )
 	{
 		if (!bHex)
 		{
-			Msg( "(%d %.3f [%d/%d]) ", (int)(pEdge - m_WingedEdges.Base()), pEdge->m_flX, pEdge->m_nLeaveSurfID, pEdge->m_nEnterSurfID );
+			Msg( "(%zd %.3f [%zd/%zd]) ", pEdge - m_WingedEdges.Base(), pEdge->m_flX, pEdge->m_nLeaveSurfID, pEdge->m_nEnterSurfID );
 		}
 		else
 		{
-			Msg( "(%d %X [%d/%d]) ", (int)(pEdge - m_WingedEdges.Base()), *(int*)&pEdge->m_flX, pEdge->m_nLeaveSurfID, pEdge->m_nEnterSurfID );
+			Msg( "(%zd %X [%zd/%zd]) ", pEdge - m_WingedEdges.Base(), *(int*)&pEdge->m_flX, pEdge->m_nLeaveSurfID, pEdge->m_nEnterSurfID );
 		}
 		pEdge = pEdge->m_pNextActiveEdge;
 	}
@@ -509,7 +505,7 @@ bool CWingedEdgeList::AdvanceActiveEdgeList( float flCurrY )
 		}
 	}
 
-	int nEdgeCount = EdgeCount();
+	intp nEdgeCount = EdgeCount();
 	if ( m_nCurrentEdgeIndex == nEdgeCount )
 		return (m_flNextDiscontinuity != FLT_MAX);
 
@@ -764,9 +760,8 @@ void CWingedEdgeList::Visualize( unsigned char *pColor )
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_LINES, m_WingedEdges.Count() );
 
-	int i;
-	int nCount = m_WingedEdges.Count();
-	for ( i = nCount; --i >= 0; )
+	intp nCount = m_WingedEdges.Count();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		WingedEdge_t *pEdge = &m_WingedEdges[i];
 		meshBuilder.Position3fv( pEdge->m_vecPosition.Base() );
@@ -810,7 +805,7 @@ public:
 		float m_flDxDy;				// Change in x per unit in y.
 		float m_flOODy;
 		float m_flX;
-		int   m_nSurfID;			// Unique index of the surface this is a part of
+		intp  m_nSurfID;			// Unique index of the surface this is a part of
 
 		// Active edge list
 		Edge_t *m_pPrevActiveEdge;
@@ -821,11 +816,11 @@ public:
 	CEdgeList();
 
 	// Insertion
-	void AddEdge( Vector **ppEdgeVertices, int nSurfID );
+	void AddEdge( Vector **ppEdgeVertices, intp nSurfID );
 
 	// Surface ID management
-	int AddSurface( const cplane_t &plane );
-	void SetSurfaceArea( int nSurfID, float flArea );
+	intp AddSurface( const cplane_t &plane );
+	void SetSurfaceArea( intp nSurfID, float flArea );
 
 	// Removal
 	void RemoveAll();
@@ -835,10 +830,10 @@ public:
 	void Visualize( unsigned char *pColor );
 
 	// Access
-	int EdgeCount() const;
-	int ActualEdgeCount() const;
-	const Edge_t &EdgeFromSortIndex( int nSortIndex ) const;
-	Edge_t &EdgeFromSortIndex( int nSortIndex );
+	intp EdgeCount() const;
+	intp ActualEdgeCount() const;
+	const Edge_t &EdgeFromSortIndex( intp nSortIndex ) const;
+	Edge_t &EdgeFromSortIndex( intp nSortIndex );
 
 	// Is the test edge list occluded by this edge list
 	bool IsOccludingEdgeList( CEdgeList &testList );
@@ -856,15 +851,16 @@ private:
 		float m_flOOz;
 		Surface_t *m_pPrevSurface;
 		Surface_t *m_pNextSurface;
-		int m_nSurfID;
+		intp m_nSurfID;
 		float m_flArea;			// Area in screen space
 	};
 
 	struct ReduceInfo_t
 	{
-		short m_hEdge;
-		short m_nWingedEdge;
+		// dimhotepus: short -> intp + reorder members.
+		intp m_nWingedEdge;
 		const Edge_t *m_pEdge;
+		short m_hEdge;
 	};
 
 	enum
@@ -876,7 +872,7 @@ private:
 	 
 private:
 	// Gets an edge
-	const Edge_t &Edge( int nIndex ) const;
+	const Edge_t &Edge( intp nIndex ) const;
 
 	// Active edges...
 	const Edge_t *FirstActiveEdge( ) const;
@@ -904,7 +900,7 @@ private:
 	float ComputeZValue( const Surface_t *pSurface, float x, float y ) const;
 
 	// Computes a point at a specified y value along an edge
-	void ComputePointAlongEdge( const Edge_t *pEdge, int nSurfID, float y, Vector *pPoint ) const;
+	void ComputePointAlongEdge( const Edge_t *pEdge, intp nSurfID, float y, Vector *pPoint ) const;
 
 	// Inserts an edge into the active edge list, sorted by X
 	void InsertActiveEdge( Edge_t *pPrevEdge, Edge_t *pInsertEdge );
@@ -939,13 +935,12 @@ private:
 	// Checks consistency of the edge list...
 	void CheckConsistency();
 
-	class EdgeLess
+	struct EdgeLess
 	{
-	public:
         bool Less( const intp& src1, const intp& src2, void *pCtx );
 	};
 
-	static int __cdecl SurfCompare( const void *elem1, const void *elem2 );
+	static bool __cdecl SurfCompare( const intp elem1, const intp elem2 );
 
 private:
 	// Used to sort surfaces by screen area
@@ -960,12 +955,12 @@ private:
 
 	// Surfaces
 	CUtlVector< Surface_t > m_Surfaces;
-	CUtlVector< int > m_SurfaceSort;
+	CUtlVector< intp > m_SurfaceSort;
 	Surface_t m_StartSurfTerminal;
 	Surface_t m_EndSurfTerminal;
 
 	// Active edges
-	int m_nCurrentEdgeIndex;
+	intp m_nCurrentEdgeIndex;
 	float m_flNextDiscontinuity;
 
 	// List of edges on the current Y scan-line
@@ -977,8 +972,8 @@ private:
 	// Reduce list
 	ReduceInfo_t *m_pNewReduceInfo;
 	ReduceInfo_t *m_pPrevReduceInfo;
-	int m_nNewReduceCount;
-	int m_nPrevReduceCount;
+	intp m_nNewReduceCount;
+	intp m_nPrevReduceCount;
 };
 
 		
@@ -1054,27 +1049,27 @@ CEdgeList::CEdgeList() : m_Edges( (intp)0, 32 ), m_OrigSortIndices( (intp)0, 32 
 //-----------------------------------------------------------------------------
 // iteration
 //-----------------------------------------------------------------------------
-inline int CEdgeList::EdgeCount() const
+inline intp CEdgeList::EdgeCount() const
 {
 	return m_Edges.Count();
 }
 
-inline int CEdgeList::ActualEdgeCount() const
+inline intp CEdgeList::ActualEdgeCount() const
 {
 	return m_SortIndices.Count();
 }
 
-inline const CEdgeList::Edge_t &CEdgeList::EdgeFromSortIndex( int nSortIndex ) const
+inline const CEdgeList::Edge_t &CEdgeList::EdgeFromSortIndex( intp nSortIndex ) const
 {
 	return m_Edges[ m_SortIndices[nSortIndex] ];
 }
 
-inline CEdgeList::Edge_t &CEdgeList::EdgeFromSortIndex( int nSortIndex )
+inline CEdgeList::Edge_t &CEdgeList::EdgeFromSortIndex( intp nSortIndex )
 {
 	return m_Edges[ m_SortIndices[nSortIndex] ];
 }
 
-inline const CEdgeList::Edge_t &CEdgeList::Edge( int nIndex ) const
+inline const CEdgeList::Edge_t &CEdgeList::Edge( intp nIndex ) const
 {
 	return m_Edges[ nIndex ];
 }
@@ -1156,7 +1151,7 @@ void CEdgeList::CleanupCurrentSurfaceList()
 	}
 }
 
-inline void CEdgeList::SetSurfaceArea( int nSurfID, float flArea )
+inline void CEdgeList::SetSurfaceArea( intp nSurfID, float flArea )
 {
 	m_Surfaces[nSurfID].m_flArea = flArea;
 }
@@ -1176,12 +1171,11 @@ inline float CEdgeList::ComputeZValue( const Surface_t *pSurface, float x, float
 //-----------------------------------------------------------------------------
 // Computes a point at a specified y value along an edge
 //-----------------------------------------------------------------------------
-inline void CEdgeList::ComputePointAlongEdge( const Edge_t *pEdge, int nSurfID, float y, Vector *pPoint ) const
+inline void CEdgeList::ComputePointAlongEdge( const Edge_t *pEdge, intp nSurfID, float y, Vector *pPoint ) const
 {
 	Assert( (y >= pEdge->m_vecPosition.y) && (y <= pEdge->m_vecPositionEnd.y) );
 
-	float t;
-	t = (y - pEdge->m_vecPosition.y) * pEdge->m_flOODy;
+	float t = (y - pEdge->m_vecPosition.y) * pEdge->m_flOODy;
 	pPoint->x = pEdge->m_vecPosition.x + ( pEdge->m_vecPositionEnd.x - pEdge->m_vecPosition.x ) * t;
 	pPoint->y = y;
 	pPoint->z = ComputeZValue( &m_Surfaces[nSurfID], pPoint->x, y );
@@ -1191,7 +1185,7 @@ inline void CEdgeList::ComputePointAlongEdge( const Edge_t *pEdge, int nSurfID, 
 //-----------------------------------------------------------------------------
 // Surface ID management
 //-----------------------------------------------------------------------------
-int CEdgeList::AddSurface( const cplane_t &plane )
+intp CEdgeList::AddSurface( const cplane_t &plane )
 {
 	intp nIndex = m_Surfaces.AddToTail();
 
@@ -1211,7 +1205,7 @@ int CEdgeList::AddSurface( const cplane_t &plane )
 //-----------------------------------------------------------------------------
 // Insertion
 //-----------------------------------------------------------------------------
-void CEdgeList::AddEdge( Vector **ppEdgeVertices, int nSurfID )
+void CEdgeList::AddEdge( Vector **ppEdgeVertices, intp nSurfID )
 {
 	int nMinIndex = ( ppEdgeVertices[0]->y >= ppEdgeVertices[1]->y );
 
@@ -1246,19 +1240,12 @@ void CEdgeList::AddEdge( Vector **ppEdgeVertices, int nSurfID )
 // Used to sort the surfaces
 //-----------------------------------------------------------------------------
 thread_local CEdgeList::Surface_t *CEdgeList::s_pSortSurfaces = NULL;
-int __cdecl CEdgeList::SurfCompare( const void *elem1, const void *elem2 )
+bool CEdgeList::SurfCompare( const intp nSurfID1, const intp nSurfID2 )
 {
-	int nSurfID1 = *(int*)elem1;
 	float flArea1 = s_pSortSurfaces[nSurfID1].m_flArea;
-
-	int nSurfID2 = *(int*)elem2;
 	float flArea2 = s_pSortSurfaces[nSurfID2].m_flArea;
 
-	if (flArea1 > flArea2)
-		return -1;
-	if (flArea1 < flArea2)
-		return 1;
-	return 0;
+	return flArea1 > flArea2;
 }
 
 
@@ -1271,7 +1258,7 @@ void CEdgeList::CullSmallOccluders()
 	// Sort the surfaces by screen area, in descending order
 	intp nSurfCount = m_Surfaces.Count();
 	s_pSortSurfaces = m_Surfaces.Base();
-	qsort( m_SurfaceSort.Base(), nSurfCount, sizeof(int), SurfCompare );
+	std::sort( m_SurfaceSort.begin(), m_SurfaceSort.end(), SurfCompare );
 
 	// We're going to keep the greater of r_occludermin + All surfaces with a screen area >= r_occluderarea
 	int nMinSurfaces = r_occludermincount.GetInt();
@@ -1283,13 +1270,12 @@ void CEdgeList::CullSmallOccluders()
 		flMinScreenArea = OcclusionSystem()->MinOccluderArea() * 0.02f;
 	}
 
-	bool *bUseSurface = (bool*)stackalloc( nSurfCount * sizeof(bool) );
+	bool *bUseSurface = stackallocT( bool, nSurfCount );
 	memset( bUseSurface, 0, nSurfCount * sizeof(bool) );
 	
-	intp i;
-	for ( i = 0; i < nSurfCount; ++i )
+	for ( intp i = 0; i < nSurfCount; ++i )
 	{
-		int nSurfID = m_SurfaceSort[i];
+		intp nSurfID = m_SurfaceSort[i];
 		if (( m_Surfaces[ nSurfID ].m_flArea < flMinScreenArea ) && (i >= nMinSurfaces ))
 			break;
 		bUseSurface[nSurfID] = true;
@@ -1300,7 +1286,7 @@ void CEdgeList::CullSmallOccluders()
 	intp nEdgeCount = m_OrigSortIndices.Count();
 	m_SortIndices.RemoveAll();
 	m_SortIndices.EnsureCapacity( nEdgeCount );
-	for( i = 0; i < nEdgeCount; ++i )
+	for( intp i = 0; i < nEdgeCount; ++i )
 	{
 		intp nEdgeIndex = m_OrigSortIndices[i];
 		if ( bUseSurface[ m_Edges[ nEdgeIndex ].m_nSurfID ] )
@@ -1465,7 +1451,7 @@ void CEdgeList::IntroduceSingleActiveEdge( const Edge_t *pEdge, float flCurrY )
 //-----------------------------------------------------------------------------
 void CEdgeList::IntroduceNewActiveEdges( float y )
 {
-	int nEdgeCount = ActualEdgeCount();
+	intp nEdgeCount = ActualEdgeCount();
 	if ( m_nCurrentEdgeIndex == nEdgeCount )
 		return;
 
@@ -1508,16 +1494,14 @@ void CEdgeList::IntroduceNewActiveEdges( float y )
 void CEdgeList::ReduceActiveEdgeList( CWingedEdgeList &wingedEdgeList, float flMinY, float flMaxY )
 {
 	// Surface lists should be empty
-	int i;
-
 #ifdef DEBUG_OCCLUSION_SYSTEM
-	for ( i = m_Surfaces.Count(); --i >= 0; )
+	for ( intp i = m_Surfaces.Count(); --i >= 0; )
 	{
 		Assert( m_Surfaces[i].m_pNextSurface == NULL );
 	}
 #endif
 
-	int nLeaveSurfID = -1;
+	intp nLeaveSurfID = -1;
 	const Edge_t *pCurEdge = FirstActiveEdge();
 	const Edge_t *pNextEdge;
 
@@ -1544,7 +1528,7 @@ void CEdgeList::ReduceActiveEdgeList( CWingedEdgeList &wingedEdgeList, float flM
 
 		// If there's more than one overlapping surface at this point,
 		// we can eliminate some edges.
-		int nEnterSurfID = TopSurface()->m_nSurfID;
+		intp nEnterSurfID = TopSurface()->m_nSurfID;
 
 		// No change in the top surface? No edges needed...
 		if ( nLeaveSurfID == nEnterSurfID )
@@ -1552,7 +1536,8 @@ void CEdgeList::ReduceActiveEdgeList( CWingedEdgeList &wingedEdgeList, float flM
 
 		Assert( ( nLeaveSurfID != -1 ) || ( nEnterSurfID != -1 )  );
 
-		int nEdgeSurfID = ( nEnterSurfID != -1 ) ? nEnterSurfID : nLeaveSurfID;
+		intp nEdgeSurfID = ( nEnterSurfID != -1 ) ? nEnterSurfID : nLeaveSurfID;
+		intp i;
 
 		// Seam up edges...
 		for ( i = m_nPrevReduceCount; --i >= 0; )
@@ -1831,11 +1816,11 @@ void CEdgeList::SpewActiveEdgeList( float y, bool bHex)
 	{
 		if (!bHex)
 		{
-			Msg( "(%d %.3f [%d]) ", (int)(pEdge - m_Edges.Base()), pEdge->m_flX, pEdge->m_nSurfID );
+			Msg( "(%zd %.3f [%zd]) ", pEdge - m_Edges.Base(), pEdge->m_flX, pEdge->m_nSurfID );
 		}
 		else
 		{
-			Msg( "(%d %X [%d]) ", (int)(pEdge - m_Edges.Base()), *(int*)&pEdge->m_flX, pEdge->m_nSurfID );
+			Msg( "(%zd %X [%zd]) ", pEdge - m_Edges.Base(), *(int*)&pEdge->m_flX, pEdge->m_nSurfID );
 		}
 		pEdge = pEdge->m_pNextActiveEdge;
 	}
@@ -1869,22 +1854,21 @@ void CEdgeList::CheckConsistency()
 //-----------------------------------------------------------------------------
 void CEdgeList::ReduceActiveList( CWingedEdgeList &newEdgeList )
 {
-	int nEdgeCount = ActualEdgeCount();
+	intp nEdgeCount = ActualEdgeCount();
 	if ( nEdgeCount == 0 )
 		return;
 
 	// Copy the surfaces over
-	int nCount = m_Surfaces.Count();
 //	newEdgeList.m_Surfaces.EnsureCapacity( nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( auto &surface : m_Surfaces )
 	{
-		newEdgeList.AddSurface( m_Surfaces[i].m_Plane );
+		newEdgeList.AddSurface( surface.m_Plane );
 	}
 
 	Edge_t *pEdgeCrossings[MAX_EDGE_CROSSINGS];
 	ReduceInfo_t *pBuf[2];
-	pBuf[0] = (ReduceInfo_t*)stackalloc( nEdgeCount * sizeof(ReduceInfo_t) );
-	pBuf[1] = (ReduceInfo_t*)stackalloc( nEdgeCount * sizeof(ReduceInfo_t) );
+	pBuf[0] = stackallocT( ReduceInfo_t, nEdgeCount );
+	pBuf[1] = stackallocT( ReduceInfo_t, nEdgeCount );
 	m_nPrevReduceCount = m_nNewReduceCount = 0;
 	int nIndex = 0;
 
@@ -2012,8 +1996,7 @@ void CEdgeList::Visualize( unsigned char *pColor )
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_LINES, m_Edges.Count() );
 
-	int i;
-	for ( i = m_Edges.Count(); --i >= 0; )
+	for ( intp i = m_Edges.Count(); --i >= 0; )
 	{
 		meshBuilder.Position3fv( m_Edges[i].m_vecPosition.Base() );
 		meshBuilder.Color4ubv( pColor );
@@ -2079,7 +2062,7 @@ private:
 	int ClipPolygonToNearPlane( Vector **ppVertices, int nVertexCount, Vector **ppOutVerts, bool *pClipped ) const;
 
 	// Project world-space verts + add into the edge list
-	void AddPolygonToEdgeList( CEdgeList &edgeList, Vector **ppPolygon, int nCount, int nSurfID, bool bClipped );
+	void AddPolygonToEdgeList( CEdgeList &edgeList, Vector **ppPolygon, int nCount, intp nSurfID, bool bClipped );
 
 	// Computes the plane equation of a polygon in screen space from a camera-space plane
 	void ComputeScreenSpacePlane( const cplane_t &cameraSpacePlane, cplane_t *pScreenSpacePlane );
@@ -2340,7 +2323,7 @@ void COcclusionSystem::StitchClippedVertices( Vector *pVertices, int nCount )
 		if ( fabs( pVertices[i].z ) > 1e-3 )
 			continue;
 
-		int j;
+		intp j;
 		for ( j = m_ClippedVerts.Count(); --j >= 0; )
 		{
 			if ( VectorsAreEqual( pVertices[i], m_ClippedVerts[j], 1e-3 ) )
@@ -2363,15 +2346,15 @@ void COcclusionSystem::StitchClippedVertices( Vector *pVertices, int nCount )
 //-----------------------------------------------------------------------------
 // Project world-space verts + add into the edge list
 //-----------------------------------------------------------------------------
-void COcclusionSystem::AddPolygonToEdgeList( CEdgeList &edgeList, Vector **ppPolygon, int nCount, int nSurfID, bool bClipped )
+void COcclusionSystem::AddPolygonToEdgeList( CEdgeList &edgeList, Vector **ppPolygon, int nCount, intp nSurfID, bool bClipped )
 {
 	// Transform the verts into projection space
 	// Transform into projection space (extra logic here is to simply guarantee that we project each vert exactly once)
 	int nMaxClipVerts = (nCount * 4);
 	int nClipCount, nClipCount1;
-	Vector **ppClipVertex = (Vector**)stackalloc( nMaxClipVerts * sizeof(Vector*) );
-	Vector **ppClipVertex1 = (Vector**)stackalloc( nMaxClipVerts * sizeof(Vector*) );
-	Vector *pVecProjectedVertex = (Vector*)stackalloc( nCount * sizeof(Vector) );
+	Vector **ppClipVertex = stackallocT( Vector*, nMaxClipVerts );
+	Vector **ppClipVertex1 = stackallocT( Vector*, nMaxClipVerts );
+	Vector *pVecProjectedVertex = stackallocT( Vector, nCount );
 
 	int k;
 	for ( k = 0; k < nCount; ++k )
@@ -2498,8 +2481,8 @@ void COcclusionSystem::RecomputeOccluderEdgeList()
 				continue;
 
 			// Clip to the near plane (has to be done in world space)
-			Vector **ppSurfVerts = (Vector**)stackalloc( ( nVertexCount ) * sizeof(Vector*) );
-			Vector **ppClipVerts = (Vector**)stackalloc( ( nVertexCount * 2 ) * sizeof(Vector*) );
+			Vector **ppSurfVerts = stackallocT( Vector*, nVertexCount );
+			Vector **ppClipVerts = stackallocT( Vector*, nVertexCount * 2 );
 			for ( k = 0; k < nVertexCount; ++k )
 			{
 				int nVertIndex = pIndices[nFirstVertexIndex + k];
@@ -2516,7 +2499,7 @@ void COcclusionSystem::RecomputeOccluderEdgeList()
 			cplane_t cameraSpacePlane;
 			MatrixTransformPlane( m_WorldToCamera, surfPlane, cameraSpacePlane );
 			ComputeScreenSpacePlane( cameraSpacePlane, &projectionSpacePlane ); 
-			int nEdgeSurfID = m_EdgeList.AddSurface( projectionSpacePlane );
+			intp nEdgeSurfID = m_EdgeList.AddSurface( projectionSpacePlane );
 
 			// Transform into projection space (extra logic here is to simply guarantee that we project each vert exactly once)
 			AddPolygonToEdgeList( m_EdgeList, ppClipVerts, nClipCount, nEdgeSurfID, bClipped );
@@ -2751,14 +2734,13 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	// Compute the 8 box verts, and transform them into projective space...
 	// NOTE: We'd want to project them *after* the plane test if there were
 	// no frustum culling.
-	int i;
 	Vector pVecProjectedVertex[8];
 
 	// NOTE: The code immediately below is an optimized version of this loop
 	// The optimization takes advantage of the fact that the verts are all
 	// axis aligned.
 //	Vector vecBoxVertex;
-//	for ( i = 0; i < 8; ++i )
+//	for ( int i = 0; i < 8; ++i )
 //	{
 //		vecBoxVertex.x = pCornerVert[ (i & 0x1) ]->x;
 //		vecBoxVertex.y = pCornerVert[ (i & 0x2) >> 1 ]->y;
@@ -2768,7 +2750,7 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 //			return false;
 //	}
 
-	Vector4D vecProjVert[8];
+	Vector4D vecProjVert[ssize(pVecProjectedVertex)];
 	Vector4D vecDeltaProj[3];
 	Vector4D vecAbsMins4D( vecAbsMins.x, vecAbsMins.y, vecAbsMins.z, 1.0f );
 	Vector4DMultiply( m_WorldToProjection, vecAbsMins4D, vecProjVert[0] );
@@ -2784,7 +2766,7 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	if ( pVecProjectedVertex[0].z <= 0.0f )
 		return false;
 
-	for ( i = 1; i < 8; ++i )
+	for ( int i = 1; i < ssize(s_pSourceIndices); ++i )
 	{
 		int nIndex = s_pSourceIndices[i];
 		int nDelta = s_pDeltaIndices[i];
@@ -2805,8 +2787,8 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 
 	// Determine which faces + edges are visible...
 	++m_nTests;
-	int pSurfInd[6];
-	for ( i = 0; i < 6; ++i )
+	intp pSurfInd[6];
+	for ( int i = 0; i < ssize(pSurfInd); ++i )
 	{
 		int nDim = ( i >> 1 );
 		int nInd = i & 0x1;
@@ -2823,7 +2805,7 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 		float flPlaneDist = (*pCornerVert[nInd])[ nDim ] * flSign;
 		MatrixTransformAxisAlignedPlane( m_WorldToCamera, nDim, flSign, flPlaneDist, cameraSpacePlane );
 		ComputeScreenSpacePlane( cameraSpacePlane, &projectionSpacePlane ); 
-		int nSurfID = s_WingedTestEdgeList.AddSurface( projectionSpacePlane );
+		intp nSurfID = s_WingedTestEdgeList.AddSurface( projectionSpacePlane );
 		pSurfInd[i] = nSurfID;
 
 		// Mark edges as being used...
@@ -2835,10 +2817,10 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	}
 
 	// Sort edges by minimum Y + dx/dy...
-	int pEdgeSort[12];
+	int pEdgeSort[ssize(s_pEdges)];
 	CUtlSortVector< int, WingedEdgeLessFunc > edgeSort( pEdgeSort, 12 );
 	edgeSort.SetLessContext( pVecProjectedVertex );
-	for ( i = 0; i < 12; ++i )
+	for ( int i = 0; i < ssize(s_pEdges); ++i )
 	{
 		// Skip non-visible edges
 		EdgeInfo_t *pEdge = &s_pEdges[i];
@@ -2850,8 +2832,8 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 	}
 
 	// Now add them into the winged edge list, in sorted order...
-	int nEdgeCount = edgeSort.Count();
-	for ( i = 0; i < nEdgeCount; ++i )
+	intp nEdgeCount = edgeSort.Count();
+	for ( intp i = 0; i < nEdgeCount; ++i )
 	{
 		EdgeInfo_t *pEdge = &s_pEdges[edgeSort[i]];
 
@@ -2860,8 +2842,8 @@ bool COcclusionSystem::IsOccluded( const Vector &vecAbsMins, const Vector &vecAb
 		// would be visited in *clockwise* order
 		const Vector &startVert = pVecProjectedVertex[pEdge->m_nVert[pEdge->m_nMinVert]];
 		const Vector &endVert = pVecProjectedVertex[pEdge->m_nVert[1 - pEdge->m_nMinVert]];
-		int nLeaveSurfID = pSurfInd[ pEdge->m_nFace[pEdge->m_nMinVert] ];
-		int nEnterSurfID = pSurfInd[ pEdge->m_nFace[1 - pEdge->m_nMinVert] ];
+		intp nLeaveSurfID = pSurfInd[ pEdge->m_nFace[pEdge->m_nMinVert] ];
+		intp nEnterSurfID = pSurfInd[ pEdge->m_nFace[1 - pEdge->m_nMinVert] ];
 
 		s_WingedTestEdgeList.AddEdge( startVert, endVert, nLeaveSurfID, nEnterSurfID );
 	}
@@ -2912,8 +2894,7 @@ void VisualizeQueuedEdges( )
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_LINES, g_EdgeVisualization.Count() );
 
-	int i;
-	for ( i = g_EdgeVisualization.Count(); --i >= 0; )
+	for ( intp i = g_EdgeVisualization.Count(); --i >= 0; )
 	{
 		EdgeVisualizationInfo_t &info = g_EdgeVisualization[i];
 

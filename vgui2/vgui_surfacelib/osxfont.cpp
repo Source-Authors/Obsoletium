@@ -285,7 +285,7 @@ bool COSXFont::Create( const char *windowsFontName, int tall, int weight, int bl
 	m_pContextMemory = new char[ (int)bytesPerRow * m_iHeight ];
 	Q_memset( m_pContextMemory, 0x0, (int)( bytesPerRow * m_iHeight ) );
 
-	const size_t bitsPerComponent = 8;
+	constexpr size_t bitsPerComponent = 8;
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 	m_ContextRef = CGBitmapContextCreate(
 						  m_pContextMemory,
@@ -547,12 +547,12 @@ void COSXFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned cha
 //-----------------------------------------------------------------------------
 // Purpose: gets the abc widths for a character
 //-----------------------------------------------------------------------------
-void COSXFont::GetCharABCWidths( int ch, int &a, int &b, int &c )
+void COSXFont::GetCharABCWidths( wchar_t ch, int &a, int &b, int &c )
 {
 	Assert( IsValid() );
 
 	// Look for it in the cache.
-	abc_cache_t finder = { (wchar_t)ch };
+	abc_cache_t finder = { ch };
 
 	unsigned short i = m_ExtendedABCWidthsCache.Find( finder );
 	if ( m_ExtendedABCWidthsCache.IsValidIndex( i ) )

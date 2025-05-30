@@ -23,30 +23,30 @@ SubProcessKernelObjects::~SubProcessKernelObjects() { Close(); }
 
 BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
   char chBufferName[0x100] = {0};
-  sprintf(chBufferName, "%s_msec", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_msec", szBaseName);
 
-  // 4Mb for a piece
-  m_hMemorySection =
-      CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0,
-                        4 * 1024 * 1024, chBufferName);
+  m_hMemorySection = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr,
+                                       PAGE_READWRITE, 0, Size(), chBufferName);
   if (nullptr != m_hMemorySection) {
     if (ERROR_ALREADY_EXISTS == GetLastError()) {
       CloseHandle(m_hMemorySection);
       m_hMemorySection = nullptr;
 
-      Assert(0 && "CreateFileMapping - already exists!\n");
+      Error("Unable to create file mapping for '%s'. It is already exists.",
+            chBufferName);
     }
   }
 
-  sprintf(chBufferName, "%s_mtx", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_mtx", szBaseName);
   m_hMutex = CreateMutex(nullptr, FALSE, chBufferName);
 
-  for (int k = 0; k < 2; ++k) {
-    sprintf(chBufferName, "%s_evt%d", szBaseName, k);
+  // Child
+  V_sprintf_safe(chBufferName, "%s_evt0", szBaseName);
+  m_hEvent[0] = CreateEvent(nullptr, FALSE, FALSE, chBufferName);
 
-    m_hEvent[k] = CreateEvent(nullptr, FALSE, (k ? TRUE /* = master */ : FALSE),
-                              chBufferName);
-  }
+  // Master
+  V_sprintf_safe(chBufferName, "%s_evt1", szBaseName);
+  m_hEvent[1] = CreateEvent(nullptr, FALSE, TRUE, chBufferName);
 
   return IsValid();
 }
@@ -54,14 +54,14 @@ BOOL SubProcessKernelObjects::Create(char const *szBaseName) {
 BOOL SubProcessKernelObjects::Open(char const *szBaseName) {
   char chBufferName[0x100] = {0};
 
-  sprintf(chBufferName, "%s_msec", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_msec", szBaseName);
   m_hMemorySection = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, chBufferName);
 
-  sprintf(chBufferName, "%s_mtx", szBaseName);
+  V_sprintf_safe(chBufferName, "%s_mtx", szBaseName);
   m_hMutex = OpenMutex(MUTEX_ALL_ACCESS, FALSE, chBufferName);
 
   for (int k = 0; k < 2; ++k) {
-    sprintf(chBufferName, "%s_evt%d", szBaseName, k);
+    V_sprintf_safe(chBufferName, "%s_evt%d", szBaseName, k);
     m_hEvent[k] = OpenEvent(EVENT_ALL_ACCESS, FALSE, chBufferName);
   }
 
@@ -73,12 +73,13 @@ BOOL SubProcessKernelObjects::IsValid() const {
 }
 
 void SubProcessKernelObjects::Close() {
-  if (m_hMemorySection) CloseHandle(m_hMemorySection);
+  // In reverse order.
+  for (int k = 0; k < 2; ++k)
+    if (m_hEvent[k]) CloseHandle(m_hEvent[k]);
 
   if (m_hMutex) CloseHandle(m_hMutex);
 
-  for (int k = 0; k < 2; ++k)
-    if (m_hEvent[k]) CloseHandle(m_hEvent[k]);
+  if (m_hMemorySection) CloseHandle(m_hMemorySection);
 }
 
 //
@@ -89,7 +90,7 @@ void *SubProcessKernelObjects_Memory::Lock() {
   // Wait for our turn to act
   for (unsigned iWaitAttempt = 0; iWaitAttempt < 13u; ++iWaitAttempt) {
     DWORD dwWait =
-        ::WaitForSingleObject(m_pObjs->m_hEvent[m_pObjs->m_dwCookie], 10000);
+        ::WaitForSingleObject(m_pObjs->m_hEvent[m_pObjs->m_dwCookie], 10000u);
 
     switch (dwWait) {
       case WAIT_OBJECT_0: {
@@ -118,8 +119,9 @@ void *SubProcessKernelObjects_Memory::Lock() {
 
       case WAIT_TIMEOUT: {
         char chMsg[0x100];
-        sprintf(chMsg, "th%08X> WAIT_TIMEOUT in Memory::Lock (attempt %d).\n",
-                GetCurrentThreadId(), iWaitAttempt);
+        V_sprintf_safe(chMsg,
+                       "th%08X> WAIT_TIMEOUT in Memory::Lock (attempt %d).\n",
+                       GetCurrentThreadId(), iWaitAttempt);
         OutputDebugString(chMsg);
       }
         continue;  // retry
@@ -222,9 +224,9 @@ int ShaderCompile_Subprocess_Main(char const *subprocess_data) {
       return 0;
     }
 
-    se::shader_compile::command_sink::IResponse *response{nullptr};
-    if (se::shader_compile::fxc_intercept::TryExecuteCommand(command,
-                                                             &response)) {
+    std::unique_ptr<se::shader_compile::command_sink::IResponse> response{
+        se::shader_compile::fxc_intercept::TryExecuteCommand(command)};
+    if (response) {
       byte *bytes = static_cast<byte *>(mem);
 
       // Result
@@ -251,8 +253,6 @@ int ShaderCompile_Subprocess_Main(char const *subprocess_data) {
       } else {
         *(bytes++) = 0;
       }
-
-      response->Release();
     } else {
       ZeroMemory(mem, 4 * sizeof(DWORD));
     }

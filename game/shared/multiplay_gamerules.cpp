@@ -149,7 +149,7 @@ ConVar nextlevel( "nextlevel",
 #endif
 
 #ifndef CLIENT_DLL
-int CMultiplayRules::m_nMapCycleTimeStamp = 0;
+time_t CMultiplayRules::m_nMapCycleTimeStamp = 0;
 int CMultiplayRules::m_nMapCycleindex = 0;
 CUtlVector<char*> CMultiplayRules::m_MapList;
 #endif
@@ -1180,7 +1180,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		DetermineMapCycleFilename( mapcfile, sizeof(mapcfile), false );
 
 		// Check the time of the mapcycle file and re-populate the list of level names if the file has been modified
-		const int nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "MOD" );
+		const time_t nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "MOD" );
 
 		if ( 0 == nMapCycleTimeStamp )
 		{
@@ -1423,7 +1423,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 		FreeMapCycleFileVector( m_MapList );
 
-		const int nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "GAME" );
+		const time_t nMapCycleTimeStamp = filesystem->GetPathTime( mapcfile, "GAME" );
 		m_nMapCycleTimeStamp = nMapCycleTimeStamp;
 
 		// Repopulate map list from mapcycle file
@@ -1466,7 +1466,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		if ( g_pStringTableServerMapCycleMvM )
 		{
 			ConVarRef tf_mvm_missioncyclefile( "tf_mvm_missioncyclefile" );
-			KeyValues *pKV = new KeyValues( tf_mvm_missioncyclefile.GetString() );
+			KeyValuesAD pKV( tf_mvm_missioncyclefile.GetString() );
 			if ( pKV->LoadFromFile( g_pFullFileSystem, tf_mvm_missioncyclefile.GetString(), "MOD" ) )
 			{
 				CUtlVector<CUtlString> mapList;
@@ -1509,8 +1509,6 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 					g_pStringTableServerMapCycleMvM->AddString( CBaseEntity::IsServer(), "ServerMapCycleMvM", sFileList.Length() + 1, sFileList.String() );
 				}
-
-				pKV->deleteThis();
 			}
 		}
 #endif
@@ -1557,7 +1555,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//-----------------------------------------------------------------------------
 	void CMultiplayRules::LoadVoiceCommandScript( void )
 	{
-		KeyValues *pKV = new KeyValues( "VoiceCommands" );
+		KeyValuesAD pKV( "VoiceCommands" );
 
 		if ( pKV->LoadFromFile( filesystem, "scripts/voicecommands.txt", "GAME" ) )
 		{
@@ -1601,8 +1599,6 @@ ConVarRef suitcharger( "sk_suitcharger" );
 				}
 			}
 		}
-
-		pKV->deleteThis();
 	}
 
 #ifndef CLIENT_DLL

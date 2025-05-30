@@ -49,7 +49,7 @@ static char s_pTokenBuf[KEYVALUES_TOKEN_SIZE];
 
 
 // a simple class to keep track of a stack of valid parsed symbols
-const int MAX_ERROR_STACK = 64;
+constexpr inline int MAX_ERROR_STACK = 64;
 class CKeyValuesErrorStack
 {
 public:
@@ -2036,6 +2036,11 @@ KeyValues *KeyValues::MakeCopy( void ) const
 		newKeyValue->m_sValue = new char[sizeof(uint64)];
 		Q_memcpy( newKeyValue->m_sValue, m_sValue, sizeof(uint64) );
 		break;
+
+		// dimhotepus: Do nothing.
+	case TYPE_NONE:
+	case TYPE_NUMTYPES:
+		break;
 	}
 
 	// recursively copy subkeys
@@ -2694,7 +2699,8 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 		return false;
 
 	// Write subkeys:
-	
+	bool ok = true;
+
 	// loop through all our peers
 	for ( KeyValues *dat = this; dat != NULL; dat = dat->m_pPeer )
 	{
@@ -2709,7 +2715,8 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 		{
 		case TYPE_NONE:
 			{
-				dat->m_pSub->WriteAsBinary( buffer );
+				// dimhotepus: Store write failure.
+				ok = dat->m_pSub->WriteAsBinary( buffer ) && ok;
 				break;
 			}
 		case TYPE_STRING:
@@ -2773,7 +2780,7 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 	// write tail, marks end of peers
 	buffer.PutUnsignedChar( TYPE_NUMTYPES ); 
 
-	return buffer.IsValid();
+	return ok && buffer.IsValid();
 }
 
 // read KeyValues from binary buffer, returns true if parsing was successful
@@ -2797,6 +2804,8 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 	KeyValues	*dat = this;
 	types_t		type = (types_t)buffer.GetUnsignedChar();
 	
+	bool ok = true;
+
 	// loop through all our peers
 	while ( true )
 	{
@@ -2817,7 +2826,8 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 		case TYPE_NONE:
 			{
 				dat->m_pSub = new KeyValues("");
-				dat->m_pSub->ReadAsBinary( buffer, nStackDepth + 1 );
+				// dimhotepus: Store read failure.
+				ok = dat->m_pSub->ReadAsBinary( buffer, nStackDepth + 1 ) && ok;
 				break;
 			}
 		case TYPE_STRING:
@@ -2891,7 +2901,7 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 		dat = dat->m_pPeer;
 	}
 
-	return buffer.IsValid();
+	return ok && buffer.IsValid();
 }
 
 #include "tier0/memdbgoff.h"

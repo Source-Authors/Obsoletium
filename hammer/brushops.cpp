@@ -33,7 +33,7 @@ constexpr inline int MAX_POINTS_ON_WINDING	= 128;
 void Error(char* fmt, ...)
 {
 	char str[300];
-	sprintf(str, fmt, (&fmt)+1);
+	V_sprintf_safe(str, fmt, (&fmt)+1);
 	Msg(mwError, str);
 }
 
@@ -151,7 +151,7 @@ Frees the input winding.
 winding_t *ClipWinding (winding_t *in, PLANE *split)
 {
 	float	dists[MAX_POINTS_ON_WINDING];
-	int		sides[MAX_POINTS_ON_WINDING];
+	SideType	sides[MAX_POINTS_ON_WINDING];
 	int		counts[3];
 	float	dot;
 	int		i, j;

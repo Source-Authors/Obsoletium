@@ -53,8 +53,10 @@ static unsigned SSBumpCalculationThreadFN( void * ctx1 )
 
 	RayStream ray_trace_stream_ctx;
 
-	RayTracingSingleResult * rslts = new
-		RayTracingSingleResult[ctx->ret_bm->Width * ctx->nrays_to_trace_per_pixel];
+	auto rslts = std::make_unique<RayTracingSingleResult[]>(ctx->ret_bm->Width * ctx->nrays_to_trace_per_pixel);
+	if ( !rslts )
+		Error("Unable to allocate ray tracing internals for bitmap of width %d with %d rays to trace per pixel.\n",
+			ctx->ret_bm->Width, ctx->nrays_to_trace_per_pixel);
 
 
 	for( int y = ctx->min_y; y <= ctx->max_y; y++ )
@@ -95,8 +97,8 @@ static unsigned SSBumpCalculationThreadFN( void * ctx1 )
 				{
 					if ( ctx->nrays_to_trace_per_pixel )
 					{
-						RayTracingSingleResult *this_rslt =
-							rslts + ctx->nrays_to_trace_per_pixel * ( x );
+						RayTracingSingleResult * RESTRICT this_rslt =
+							rslts.get() + ctx->nrays_to_trace_per_pixel * ( x );
 						for( int r = 0; r < ctx->nrays_to_trace_per_pixel; r++ )
 						{
 							float dot;
@@ -131,13 +133,15 @@ static unsigned SSBumpCalculationThreadFN( void * ctx1 )
 			}
 		}
 	}
-	delete[] rslts;
 	return 0;
 }
 
-void FloatBitMap_t::ComputeVertexPositionsAndNormals( float flHeightScale, Vector **ppPosOut, Vector **ppNormalOut ) const
+void FloatBitMap_t::ComputeVertexPositionsAndNormals( float flHeightScale, Vector * RESTRICT *ppPosOut, Vector * RESTRICT *ppNormalOut ) const
 {
-	Vector *verts = new Vector[Width * Height];
+	Vector * RESTRICT verts = new Vector[Width * Height];
+	if (!verts)
+		Error("Unable to allocate vertex pos & normals for bitmap %dx%d.\n", Width, Height);
+
 	// first, calculate vertex positions
 	for( int y = 0; y < Height; y++ )
 		for( int x = 0; x < Width; x++ )
@@ -148,7 +152,10 @@ void FloatBitMap_t::ComputeVertexPositionsAndNormals( float flHeightScale, Vecto
 			out->z = flHeightScale * Pixel( x, y, 3 );
 		}
 
-	Vector *normals = new Vector[Width * Height];
+	Vector * RESTRICT normals = new Vector[Width * Height];
+	if (!verts)
+		Error("Unable to allocate vertex pos & normals for bitmap %dx%d.\n", Width, Height);
+
 	// now, calculate normals, smoothed
 	for( int y = 0; y < Height; y++ )
 		for( int x = 0; x < Width; x++ )
@@ -198,17 +205,20 @@ void FloatBitMap_t::ComputeVertexPositionsAndNormals( float flHeightScale, Vecto
 	*ppNormalOut = normals;
 }
 
-FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel(
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel(
 	float bump_scale, int nrays_to_trace_per_pixel, 
 	uint32 nOptionFlags ) const
 {
+	FloatBitMap_t * ret = new FloatBitMap_t( Width, Height );
+	if (!ret)
+		Error("Unable to allocate bitmap %dx%d for self shadow bump map.\n", Width, Height);
 
 	// first, add all the triangles from the height map to the "world".
 	// we will make multiple copies to handle wrapping
 	int tcnt = 1;
 
-	Vector * verts;
-	Vector * normals;
+	Vector * RESTRICT verts;
+	Vector * RESTRICT normals;
 	ComputeVertexPositionsAndNormals( bump_scale, & verts, & normals );
 
 	RayTracingEnvironment rtEnv;
@@ -270,10 +280,11 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 	// note that there is no reason inter-bounced lighting could not be folded into this
 	// calculation.
 
-	FloatBitMap_t * ret = new FloatBitMap_t( Width, Height );
+ 	auto trace_directions = std::make_unique<Vector[]>(nrays_to_trace_per_pixel);
+	if (!ret)
+		Error("Unable to allocate %d ray trace directions for bitmap %dx%d for self shadow bump map.\n",
+			nrays_to_trace_per_pixel, Width, Height);
 
-
-	Vector *trace_directions=new Vector[nrays_to_trace_per_pixel];
 	DirectionalSampler_t my_sphere_sampler;
 	for( int r=0; r < nrays_to_trace_per_pixel; r++)
 	{
@@ -290,7 +301,7 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 	ctxs[0].src_bm = this;
 	ctxs[0].nrays_to_trace_per_pixel = nrays_to_trace_per_pixel;
 	ctxs[0].bump_scale = bump_scale;
-	ctxs[0].trace_directions = trace_directions;
+	ctxs[0].trace_directions = trace_directions.get();
 	ctxs[0].normals = normals;
 	ctxs[0].min_y = 0;
 	ctxs[0].max_y = Height - 1;
@@ -332,18 +343,23 @@ FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInAlphaChannel
 	}
 	
 	delete[] verts;
-	delete[] trace_directions;
 	delete[] normals;
 	return ret;												// destructor will clean up rtenv
 }
 
 // generate a conventional normal map from a source with height stored in alpha.
-FloatBitMap_t *FloatBitMap_t::ComputeBumpmapFromHeightInAlphaChannel( float bump_scale ) const
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::ComputeBumpmapFromHeightInAlphaChannel( float bump_scale ) const
 {
-	Vector *verts;
-	Vector *normals;
+	Vector * RESTRICT verts;
+	Vector * RESTRICT normals;
 	ComputeVertexPositionsAndNormals( bump_scale, &verts, &normals );
+
 	FloatBitMap_t *ret=new FloatBitMap_t( Width, Height );
+	if (!ret)
+		Error("Unable to allocate bitmap %dx%d for normal map.\n", Width, Height);
+
+	if (!ret) return nullptr;
+
 	for( int y = 0; y < Height; y++ )
 		for( int x = 0; x < Width; x++ )
 		{

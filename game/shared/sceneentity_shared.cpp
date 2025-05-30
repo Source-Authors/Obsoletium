@@ -41,7 +41,7 @@ void Scene_Printf( const char *pFormat, ... )
 	char msg[8192];
 
 	va_start(marker, pFormat);
-	Q_vsnprintf(msg, sizeof(msg), pFormat, marker);
+	V_vsprintf_safe(msg, pFormat, marker);
 	va_end(marker);	
 	
 	Msg( "%8.3f[%d] %s:  %s", gpGlobals->curtime, gpGlobals->tickcount, CBaseEntity::IsServer() ? "sv" : "cl", msg );
@@ -100,12 +100,12 @@ bool CSceneTokenProcessor::TokenAvailable( void )
 // Input  : *fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CSceneTokenProcessor::Error( const char *fmt, ... )
+void CSceneTokenProcessor::Error( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( string, sizeof(string), fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 
 	Warning( "%s", string );

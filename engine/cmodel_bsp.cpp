@@ -306,7 +306,7 @@ void CollisionBSPData_LoadTextures( CCollisionBSPData *pBSPData )
 	CMapLoadHelper lh( LUMP_TEXDATA );
 
 	CMapLoadHelper lhStringData( LUMP_TEXDATA_STRING_DATA );
-	const char *pStringData = ( const char * )lhStringData.LumpBase();
+	const char *pStringData = lhStringData.LumpBase<const char>();
 
 	CMapLoadHelper lhStringTable( LUMP_TEXDATA_STRING_TABLE );
 	if( lhStringTable.LumpSize() % sizeof( int ) )
@@ -315,19 +315,16 @@ void CollisionBSPData_LoadTextures( CCollisionBSPData *pBSPData )
 			pBSPData->map_name, lhStringTable.LumpSize(), sizeof(int) );
 	}
 
-	int *pStringTable = ( int * )lhStringTable.LumpBase();
+	int *pStringTable = lhStringTable.LumpBase<int>();
 
-	dtexdata_t	*in;
-	int			i, count;
-	IMaterial	*material;
-
-	in = (dtexdata_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dtexdata_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' textures size %d is not multiple of sizeof(int) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(int) );
 	}
-	count = lh.LumpSize() / sizeof(*in);
+
+	int count = lh.LumpSize() / sizeof(*in);
 	if (count < 1)
 	{
 		Sys_Error( "Map '%s' has no textures", pBSPData->map_name );
@@ -339,31 +336,29 @@ void CollisionBSPData_LoadTextures( CCollisionBSPData *pBSPData )
 	}
 
 	pBSPData->map_surfaces.Attach( count, Hunk_Alloc<csurface_t>( count ) );
-
 	pBSPData->numtextures = count;
 
 	pBSPData->map_texturenames = Hunk_Alloc<char>( lhStringData.LumpSize(), false );
 	memcpy( pBSPData->map_texturenames, pStringData, lhStringData.LumpSize() );
  
-	for ( i=0 ; i<count ; i++, in++ )
+	for ( int i=0 ; i<count ; i++, in++ )
 	{
 		Assert( in->nameStringTableID >= 0 );
 		Assert( pStringTable[in->nameStringTableID] >= 0 );
 
 		const char *pInName = &pStringData[pStringTable[in->nameStringTableID]];
-		int index = pInName - pStringData;
+		intp index = pInName - pStringData;
 		
 		csurface_t *out = &pBSPData->map_surfaces[i];
 		out->name = &pBSPData->map_texturenames[index];
 		out->surfaceProps = 0;
 		out->flags = 0;
 
-		material = materials->FindMaterial( pBSPData->map_surfaces[i].name, TEXTURE_GROUP_WORLD, true );
+		IMaterial *material = materials->FindMaterial( pBSPData->map_surfaces[i].name, TEXTURE_GROUP_WORLD, true );
 		if ( !IsErrorMaterial( material ) )
 		{
-			IMaterialVar *var;
 			bool varFound;
-			var = material->FindVar( "$surfaceprop", &varFound, false );
+			IMaterialVar *var = material->FindVar( "$surfaceprop", &varFound, false );
 			if ( varFound )
 			{
 				const char *pProps = var->GetStringValue();
@@ -381,11 +376,10 @@ void CollisionBSPData_LoadTexinfo( CCollisionBSPData *pBSPData,
 {
 	CMapLoadHelper lh( LUMP_TEXINFO );
 
-	texinfo_t	*in;
 	unsigned short	out;
 	int			i, count;
 
-	in = (texinfo_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<texinfo_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' texinfo size %d is not multiple of sizeof(texinfo) %zu",
@@ -425,10 +419,9 @@ void CollisionBSPData_LoadTexinfo( CCollisionBSPData *pBSPData,
 void CollisionBSPData_LoadLeafs_Version_0( CCollisionBSPData *pBSPData, CMapLoadHelper &lh )
 {
 	int			i;
-	dleaf_version_0_t 	*in;
 	int			count;
 	
-	in = (dleaf_version_0_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dleaf_version_0_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' leaf V0 size %d is not multiple of sizeof(dleaf_version_0) %zu",
@@ -487,17 +480,15 @@ void CollisionBSPData_LoadLeafs_Version_0( CCollisionBSPData *pBSPData, CMapLoad
 void CollisionBSPData_LoadLeafs_Version_1( CCollisionBSPData *pBSPData, CMapLoadHelper &lh )
 {
 	int			i;
-	dleaf_t 	*in;
-	int			count;
 	
-	in = (dleaf_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dleaf_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' leaf V1 size %d is not multiple of sizeof(dleaf_version_1) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
 	}
 
-	count = lh.LumpSize() / sizeof(*in);
+	int count = lh.LumpSize() / sizeof(*in);
 	if (count < 1)
 	{
 		Sys_Error( "Map '%s' has no leafs V1", pBSPData->map_name );
@@ -572,10 +563,9 @@ void CollisionBSPData_LoadLeafBrushes( CCollisionBSPData *pBSPData )
 	CMapLoadHelper lh( LUMP_LEAFBRUSHES );
 
 	int			i;
-	unsigned short 	*in;
 	int			count;
 	
-	in = (unsigned short *)lh.LumpBase();
+	auto *in = lh.LumpBase<unsigned short>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' leaf brushes size %d is not multiple of sizeof(unsigned short) %zu",
@@ -611,11 +601,10 @@ void CollisionBSPData_LoadPlanes( CCollisionBSPData *pBSPData )
 	CMapLoadHelper lh( LUMP_PLANES );
 
 	int			i, j;
-	dplane_t 	*in;
 	int			count;
 	int			bits;
 	
-	in = (dplane_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dplane_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' planes size %d is not multiple of sizeof(dplane) %zu",
@@ -665,17 +654,14 @@ void CollisionBSPData_LoadBrushes( CCollisionBSPData *pBSPData )
 {
 	CMapLoadHelper lh( LUMP_BRUSHES );
 
-	dbrush_t	*in;
-	int			i, count;
-	
-	in = (dbrush_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dbrush_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' brushes size %d is not multiple of sizeof(dbrush) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
 	}
 
-	count = lh.LumpSize() / sizeof(*in);
+	int count = lh.LumpSize() / sizeof(*in);
 	if (count > MAX_MAP_BRUSHES)
 	{
 		Sys_Error( "Map '%s' has too many brushes (%d > max %d)",
@@ -683,10 +669,9 @@ void CollisionBSPData_LoadBrushes( CCollisionBSPData *pBSPData )
 	}
 
 	pBSPData->map_brushes.Attach( count, Hunk_Alloc<cbrush_t>( count ) );
-
 	pBSPData->numbrushes = count;
 
-	for (i=0 ; i<count ; i++, in++)
+	for (int i=0 ; i<count ; i++, in++)
 	{
 		cbrush_t *out = &pBSPData->map_brushes[i];
 		out->firstbrushside = in->firstside;
@@ -749,9 +734,8 @@ void CollisionBSPData_LoadBrushSides( CCollisionBSPData *pBSPData, CUtlVector<un
 	CMapLoadHelper lh( LUMP_BRUSHSIDES );
 
 	int				i, j;
-	dbrushside_t 	*in;
 
-	in = (dbrushside_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dbrushside_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' brush sides size %d is not multiple of sizeof(dbrushside) %zu",
@@ -849,10 +833,9 @@ void CollisionBSPData_LoadSubmodels( CCollisionBSPData *pBSPData )
 {
 	CMapLoadHelper lh( LUMP_MODELS );
 
-	dmodel_t	*in;
 	int			i, j, count;
 
-	in = (dmodel_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dmodel_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' models size %d is not multiple of sizeof(dmodel) %zu",
@@ -890,10 +873,9 @@ void CollisionBSPData_LoadNodes( CCollisionBSPData *pBSPData )
 {
 	CMapLoadHelper lh( LUMP_NODES );
 
-	dnode_t		*in;
 	int			i, j, count;
 	
-	in = (dnode_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dnode_t>();
 	if (lh.LumpSize() % sizeof(*in))
 		Sys_Error( "Map '%s' nodes size %d is not multiple of sizeof(dnode) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -930,10 +912,9 @@ void CollisionBSPData_LoadAreas( CCollisionBSPData *pBSPData )
 	CMapLoadHelper lh( LUMP_AREAS );
 
 	int			i;
-	darea_t 	*in;
 	int			count;
 
-	in = (darea_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<darea_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' areas size %d is not multiple of sizeof(darea) %zu",
@@ -968,10 +949,9 @@ void CollisionBSPData_LoadAreaPortals( CCollisionBSPData *pBSPData )
 {
 	CMapLoadHelper lh( LUMP_AREAPORTALS );
 
-	dareaportal_t 	*in;
 	int				count;
 
-	in = (dareaportal_t *)lh.LumpBase();
+	auto *in = lh.LumpBase<dareaportal_t>();
 	if (lh.LumpSize() % sizeof(*in))
 	{
 		Sys_Error( "Map '%s' area portals size %d is not multiple of sizeof(dareaportal) %zu",
@@ -998,7 +978,7 @@ void CollisionBSPData_LoadAreaPortals( CCollisionBSPData *pBSPData )
 	pBSPData->numareaportals = count;
 	pBSPData->map_areaportals.Attach( count, Hunk_Alloc<dareaportal_t>( count ) );
 
-	Assert( count * sizeof(dareaportal_t) >= lh.LumpSize() ); 
+	Assert( count * static_cast<intp>(sizeof(dareaportal_t)) >= lh.LumpSize() ); 
 	memcpy( pBSPData->map_areaportals.Base(), in, lh.LumpSize() );
 }
 
@@ -1096,7 +1076,7 @@ void CollisionBSPData_LoadPhysics( CCollisionBSPData *pBSPData )
 		}
 		
 		// avoid infinite loop on badly formed file
-		if ( (int)(ptr - basePtr) > lh.LumpSize() )
+		if ( (intp)(ptr - basePtr) > lh.LumpSize() )
 			break;
 
 	} while ( physModel.dataSize > 0 );
@@ -1116,7 +1096,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
     // get the vertex data
     //
  	CMapLoadHelper lhv( LUMP_VERTEXES );
-	dvertex_t *pVerts = ( dvertex_t* )lhv.LumpBase();
+	auto *pVerts = lhv.LumpBase<dvertex_t>();
 	if ( lhv.LumpSize() % sizeof( dvertex_t ) )
 		Sys_Error( "Map '%s' vertexes size %d is not multiple of sizeof(dvertex) %zu",
 			pBSPData->map_name, lhv.LumpSize(), sizeof(dvertex_t) );
@@ -1125,7 +1105,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
     // get the edge data
     //
  	CMapLoadHelper lhe( LUMP_EDGES );
-    dedge_t *pEdges = ( dedge_t* )lhe.LumpBase();
+    auto *pEdges = lhe.LumpBase<dedge_t>();
     if ( lhe.LumpSize() % sizeof( dedge_t ) )
 		Sys_Error( "Map '%s' edges size %d is not multiple of sizeof(dedge) %zu",
 			pBSPData->map_name, lhe.LumpSize(), sizeof(dedge_t) );
@@ -1134,7 +1114,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
     // get surf edges data
     //
     CMapLoadHelper lhs( LUMP_SURFEDGES );
-    int *pSurfEdges = ( int* )lhs.LumpBase();
+    int *pSurfEdges = lhs.LumpBase<int>();
     if ( lhs.LumpSize() % sizeof( int ) )
 		Sys_Error( "Map '%s' surface edges size %d is not multiple of sizeof(int) %zu",
 			pBSPData->map_name, lhs.LumpSize(), sizeof(int) );
@@ -1149,7 +1129,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
 		face_lump_to_load = LUMP_FACES_HDR;
 	}
 	CMapLoadHelper lhf( face_lump_to_load );
-    dface_t *pFaces = ( dface_t* )lhf.LumpBase();
+    auto *pFaces = lhf.LumpBase<dface_t>();
     if ( lhf.LumpSize() % sizeof( dface_t ) )
 		Sys_Error( "Map '%s' faces size %d is not multiple of sizeof(dface) %zu",
 			pBSPData->map_name, lhf.LumpSize(), sizeof(dface_t) );
@@ -1163,7 +1143,7 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
     // get texinfo data
     //
  	CMapLoadHelper lhti( LUMP_TEXINFO );
-    texinfo_t *pTexinfoList = ( texinfo_t* )lhti.LumpBase();
+    auto *pTexinfoList = lhti.LumpBase<texinfo_t>();
     if ( lhti.LumpSize() % sizeof( texinfo_t ) )
 		Sys_Error( "Map '%s' tex infos size %d is not multiple of sizeof(texinfo) %zu",
 			pBSPData->map_name, lhti.LumpSize(), sizeof(texinfo_t) );
@@ -1316,7 +1296,8 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
 	}
 
 	CMapLoadHelper lhDispPhys( LUMP_PHYSDISP );
-	dphysdisp_t *pDispPhys = (dphysdisp_t *)lhDispPhys.LumpBase();
+	auto *pDispPhys = lhDispPhys.LumpBase<dphysdisp_t>();
+
 	// create the vphysics collision models for each displacement
 	CM_CreateDispPhysCollide( pDispPhys, lhDispPhys.LumpSize() );
 }

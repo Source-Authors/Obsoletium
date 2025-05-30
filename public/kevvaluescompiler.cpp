@@ -16,7 +16,7 @@ bool CRunTimeKeyValuesStringTable::ReadStringTable( int numStrings, CUtlBuffer& 
 	CUtlVector< int > offsets;
 	offsets.EnsureCapacity( numStrings );
 
-	offsets.CopyArray( (int *)( buf.PeekGet() ), numStrings );
+	offsets.CopyArray( (const int *)( buf.PeekGet() ), numStrings );
 
 	// Skip over data
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, buf.TellGet() + numStrings * sizeof( int ) );
@@ -97,7 +97,7 @@ void CCompiledKeyValuesWriter::AppendKeyValuesFile( char const *filename )
 	kvf.firstElement = m_Data.Count();
 
 	{
-		auto kv = KeyValues::AutoDelete( filename );
+		KeyValuesAD kv( filename );
 		if ( kv->LoadFromFile( g_pFullFileSystem, filename ) )
 		{
 			// Add to dictionary
@@ -201,7 +201,7 @@ int CCompiledKeyValuesReader::InvalidIndex() const
 	return m_Dict.InvalidIndex();
 }
 
-void CCompiledKeyValuesReader::GetFileName( int index, char *buf, size_t bufsize )
+void CCompiledKeyValuesReader::GetFileName( int index, OUT_Z_CAP(bufsize) char *buf, intp bufsize )
 {
 	Assert( buf );
 	buf[ 0 ] = 0;
@@ -413,11 +413,11 @@ KeyValues *CCompiledKeyValuesReader::Instance( char const *kvfilename )
 	return CreateFromData( info );
 }
 
-bool CCompiledKeyValuesReader::LookupKeyValuesRootKeyName( char const *kvfilename, char *outbuf, size_t bufsize )
+bool CCompiledKeyValuesReader::LookupKeyValuesRootKeyName( char const *kvfilename, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize )
 {
 	char sz[ 512 ];
-	Q_strncpy( sz, kvfilename, sizeof( sz ) );
-	Q_FixSlashes( sz );
+	V_strcpy_safe( sz, kvfilename );
+	V_FixSlashes( sz );
 
 	FileInfo_t search;
 	search.hFile = g_pFullFileSystem->FindOrAddFileName( sz );
@@ -425,11 +425,13 @@ bool CCompiledKeyValuesReader::LookupKeyValuesRootKeyName( char const *kvfilenam
 	auto idx = m_Dict.Find( search );
 	if ( idx == m_Dict.InvalidIndex() )
 	{
+		// dimhotepus: Ensure zero-terminate.
+		if (bufsize) outbuf[0] = '\0';
 		return false;
 	}
 
 	const FileInfo_t& info = m_Dict[ idx ];
 
-	Q_strncpy( outbuf, m_StringTable.Lookup( m_Data[ info.nFirstIndex ].key ), bufsize );
+	V_strncpy( outbuf, m_StringTable.Lookup( m_Data[ info.nFirstIndex ].key ), bufsize );
 	return true;
 }

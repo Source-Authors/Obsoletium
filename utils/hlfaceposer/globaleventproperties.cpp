@@ -4,10 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <mxtk/mx.h>
-#include <stdio.h>
-#include "resource.h"
 #include "GlobalEventProperties.h"
+#include <mxtk/mx.h>
+#include "resource.h"
 #include "mdlviewer.h"
 #include "hlfaceposer.h"
 #include "choreoevent.h"
@@ -37,7 +36,7 @@ static void ExtractAutoStateFromParams( CGlobalEventParams *params )
 		if ( TokenAvailable() )
 		{
 			GetToken( false );
-			strcpy( params->m_szType, token );
+			V_strcpy_safe( params->m_szType, token );
 		}
 
 		params->m_flWaitTime = 0.0f;
@@ -53,11 +52,11 @@ static void CreateAutoStateFromControls( CGlobalEventParams *params )
 {
 	if ( params->m_bAutomate )
 	{
-		sprintf( params->m_szAction, "automate %s %f", params->m_szType, params->m_flWaitTime );
+		V_sprintf_safe( params->m_szAction, "automate %s %f", params->m_szType, params->m_flWaitTime );
 	}
 	else
 	{
-		sprintf( params->m_szAction, "noaction" );
+		V_sprintf_safe( params->m_szAction, "noaction" );
 	}
 }
 
@@ -155,7 +154,8 @@ static BOOL CALLBACK GlobalEventPropertiesDialogProc( HWND hwndDlg, UINT uMsg, W
 				SendMessage( GetDlgItem( hwndDlg, IDC_CB_AUTOACTION ), WM_GETTEXT, (WPARAM)sizeof( g_Params.m_szType ), (LPARAM)g_Params.m_szType );
 
 				GetDlgItemText( hwndDlg, IDC_DURATION, szTime, sizeof( szTime ) );
-				g_Params.m_flWaitTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flWaitTime = strtof( szTime, nullptr );
 
 				g_Params.m_bAutomate = SendMessage( GetDlgItem( hwndDlg, IDC_CHECK_AUTOCHECK ), BM_GETCHECK, 0, 0 ) == BST_CHECKED ? true : false;
 
@@ -164,7 +164,8 @@ static BOOL CALLBACK GlobalEventPropertiesDialogProc( HWND hwndDlg, UINT uMsg, W
 				GetDlgItemText( hwndDlg, IDC_EVENTNAME, g_Params.m_szName, sizeof( g_Params.m_szName ) );
 
 				GetDlgItemText( hwndDlg, IDC_STARTTIME, szTime, sizeof( szTime ) );
-				g_Params.m_flStartTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flStartTime = strtof( szTime, nullptr );
 				
 				char szLoop[ 32 ];
 				GetDlgItemText( hwndDlg, IDC_LOOPCOUNT, szLoop, sizeof( szLoop ) );
@@ -190,11 +191,11 @@ static BOOL CALLBACK GlobalEventPropertiesDialogProc( HWND hwndDlg, UINT uMsg, W
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int GlobalEventProperties( CGlobalEventParams *params )
+intp GlobalEventProperties( CGlobalEventParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_GLOBALEVENTPROPERTIES ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)GlobalEventPropertiesDialogProc );

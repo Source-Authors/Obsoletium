@@ -23,24 +23,24 @@ public:
 	CServerRemoteAccess();
 
 	// handles a request
-	void WriteDataRequest( ra_listener_id listener, const void *buffer, intp bufferSize ) override;
-	void WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, const void *buffer, intp bufferSize);
+	void WriteDataRequest( ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize ) override;
+	void WriteDataRequest( CRConServer *pNetworkListener, ra_listener_id listener, IN_BYTECAP(bufferSize) const void *buffer, intp bufferSize);
 
 	// gets return value from the server
 	// returns the number of bytes read
-	intp ReadDataResponse( ra_listener_id listener, void *buffer, intp bufferSize) override;
+	intp ReadDataResponse( ra_listener_id listener, IN_BYTECAP(bufferSize) void *buffer, intp bufferSize) override;
 	intp GetDataResponseSize( ra_listener_id listener );
 
 	// sends a message to all the watching admin UI's
 	void SendMessageToAdminUI( ra_listener_id listenerID, const char *message);
 
-	void SendVProfData( ra_listener_id listenerID, bool bGroupData, void *data, intp len );
+	void SendVProfData( ra_listener_id listenerID, bool bGroupData, IN_BYTECAP(len) void *data, intp len );
 
 	ra_listener_id GetNextListenerID( bool authConnection, const netadr_t *adr = NULL ) override;
 	void RegisterAdminUIID( ra_listener_id listener ) override { m_AdminUIID = listener; }
 
 	ra_listener_id GetAdminUIID() const { return m_AdminUIID; }
-	void GetStatsString(char *buf, intp bufSize); // also used by the 'stats' command
+	void GetStatsString(OUT_Z_CAP(bufSize) char *buf, intp bufSize); // also used by the 'stats' command
 
 	void UploadScreenshot( const char *pFileName );
 
@@ -55,7 +55,7 @@ private:
 	void CheckPassword( CRConServer *pNetworkListener, ra_listener_id listener, int requestID, const char *password );
 	void BadPassword( CRConServer *pNetworkListener, ra_listener_id listener );
 	void LogCommand(  ra_listener_id listener, const char *msg );
-	void SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, void *pData, intp nDataLen );
+	void SendResponseToClient( ra_listener_id listenerID, ServerDataResponseType_t type, IN_BYTECAP(nDataLen) void *pData, intp nDataLen );
 
 	// specific value requests
 	void GetUserBanList(CUtlBuffer &value);

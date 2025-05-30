@@ -182,13 +182,13 @@ END_DATADESC()
 //			... - 
 // Output : static void
 //-----------------------------------------------------------------------------
-void LocalScene_Printf( const char *pFormat, ... )
+void LocalScene_Printf( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list marker;
 	char msg[8192];
 
 	va_start(marker, pFormat);
-	Q_vsnprintf(msg, sizeof(msg), pFormat, marker);
+	V_vsprintf_safe(msg, pFormat, marker);
 	va_end(marker);	
 
 	Scene_Printf( "%s", msg );

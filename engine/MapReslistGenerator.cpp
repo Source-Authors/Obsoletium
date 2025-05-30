@@ -339,7 +339,7 @@ void CMapReslistGenerator::BuildEngineLogFromReslist()
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{
-		intp nTokenSize = buffer.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+		intp nTokenSize = buffer.ParseToken( &breakSet, szToken );
 		if ( nTokenSize <= 0 )
 		{
 			break;
@@ -484,12 +484,11 @@ void CMapReslistGenerator::OnLevelLoadStart(const char *levelName)
 	OnResourcePrecached( path );
 
 	bool useNodeGraph = true;
-	KeyValues *modinfo = new KeyValues("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		useNodeGraph = modinfo->GetInt( "nodegraph", 1 ) != 0;
 	}
-	modinfo->deleteThis();
 
 	if ( useNodeGraph )
 	{
@@ -619,14 +618,14 @@ void CMapReslistGenerator::OnModelPrecached(const char *relativePathFileName)
 		// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
 		char file[_MAX_PATH];
 
-		if (!Q_strnicmp(relativePathFileName, "materials", strlen("materials")))
+		if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 		{
-			Q_strncpy(file, relativePathFileName, sizeof(file));
+			V_strcpy_safe(file, relativePathFileName);
 		}
 		else
 		{
 			// prepend the materials directory
-			Q_snprintf(file, sizeof(file), "materials\\%s", relativePathFileName);
+			V_sprintf_safe(file, "materials\\%s", relativePathFileName);
 		}
 		OnResourcePrecached(file);
 
@@ -657,14 +656,14 @@ void CMapReslistGenerator::OnSoundPrecached(const char *relativePathFileName)
 
 	// prepend the sound/ directory if necessary
 	char file[_MAX_PATH];
-	if (!Q_strnicmp(relativePathFileName, "sound", strlen("sound")))
+	if (!Q_strnicmp(relativePathFileName, "sound", ssize("sound") - 1))
 	{
-		Q_strncpy(file, relativePathFileName, sizeof(file));
+		V_strcpy_safe(file, relativePathFileName);
 	}
 	else
 	{
 		// prepend the sound directory
-		Q_snprintf(file, sizeof(file), "sound\\%s", relativePathFileName);
+		V_sprintf_safe(file, "sound\\%s", relativePathFileName);
 	}
 
 	OnResourcePrecached(file);
@@ -687,7 +686,7 @@ void CMapReslistGenerator::OnResourcePrecached(const char *relativePathFileName)
 		return;
 
 	char fullPath[_MAX_PATH];
-	if (g_pFileSystem->GetLocalPath(relativePathFileName, fullPath, sizeof(fullPath)))
+	if (g_pFileSystem->GetLocalPath_safe(relativePathFileName, fullPath))
 	{
 		OnResourcePrecachedFullPath(fullPath);
 	}

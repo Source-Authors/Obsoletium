@@ -397,6 +397,8 @@ void ScratchPad_DrawSphere(
 		}
 		else
 		{
+			const float sinHalfSliceAngle = sinf( flHalfSliceAngle );
+
 			for ( int iSubPt=0; iSubPt < nSubDivs; iSubPt++ )
 			{
 				float flHalfAngle = M_PI_F * (float)iSubPt / (nSubDivs - 1);
@@ -409,8 +411,8 @@ void ScratchPad_DrawSphere(
 				}
 				else
 				{
-					pt.x = cosf( flAngle ) * sinf( flHalfSliceAngle );
-					pt.y = sinf( flAngle ) * sinf( flHalfSliceAngle );
+					pt.x = cosf( flAngle ) * sinHalfSliceAngle;
+					pt.y = sinf( flAngle ) * sinHalfSliceAngle;
 					pt.z = cosf( flHalfSliceAngle );
 					
 					pt *= flRadius;

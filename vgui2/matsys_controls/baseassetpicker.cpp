@@ -122,14 +122,13 @@ void CAssetTreeView::OpenRoot()
 
 	// add the base node
 	const char *pRootDir = m_DirectoryStructure[ m_DirectoryStructure.Root() ];
-	KeyValues *pkv = new KeyValues( "root" );
+	KeyValuesAD pkv( "root" );
 	pkv->SetString( "text", m_RootFolderName.Get() );
 	pkv->SetInt( "root", 1 );
 	pkv->SetInt( "expand", 1 );
 	pkv->SetInt( "dirHandle", m_DirectoryStructure.Root() );
 	pkv->SetString( "path", pRootDir );
 	int iRoot = AddItem( pkv, GetRootItemIndex() );
-	pkv->deleteThis();
 	ExpandItem( iRoot, true );
 }
 
@@ -188,7 +187,7 @@ void CAssetTreeView::SetItemColorForDirectories( int nItemID )
 void CAssetTreeView::AddDirectoryToTreeView( int nParentItemIndex, const char *pFullParentPath, DirHandle_t hPath )
 {
 	const char *pDirName = m_DirectoryStructure[hPath].Get();
-	KeyValues *kv = new KeyValues( "node", "text", pDirName );
+	KeyValuesAD kv( new KeyValues( "node", "text", pDirName ) );
 
 	char pFullPath[MAX_PATH];
 	Q_snprintf( pFullPath, sizeof( pFullPath ), "%s/%s", pFullParentPath, pDirName );
@@ -201,7 +200,6 @@ void CAssetTreeView::AddDirectoryToTreeView( int nParentItemIndex, const char *p
 	kv->SetInt( "dirHandle", hPath );
 
 	int nItemID = AddItem( kv, nParentItemIndex );
-	kv->deleteThis();
 
 	// mark directories in orange
 	SetItemColorForDirectories( nItemID );
@@ -532,7 +530,7 @@ void CAssetCache::BuildModList()
 		Q_FixSlashes( pPath );
 
 		char pModName[ MAX_PATH ];
-		Q_FileBase( pPath, pModName, sizeof( pModName ) );
+		V_FileBase( pPath, pModName );
 
 		// Always start in an asset-specific directory
 //		char pAssetPath[MAX_PATH];
@@ -566,7 +564,7 @@ void CAssetCache::AddAssetToList( CachedAssetList_t& list, const char *pAssetNam
 bool CAssetCache::DoesExtensionMatch( CachedAssetList_t& info, const char *pFileName )
 {
 	char pChildExt[MAX_PATH];
-	Q_ExtractFileExtension( pFileName, pChildExt, sizeof(pChildExt) );
+	V_ExtractFileExtension( pFileName, pChildExt );
 
 	// Check the extension matches
 	int nCount = info.m_Ext.Count();
@@ -597,7 +595,7 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 	while ( pszFileName )
 	{
 		char pRelativeChildPath[MAX_PATH];
-		Q_snprintf( pRelativeChildPath, MAX_PATH, "%s\\%s", pFilePath, pszFileName );
+		V_sprintf_safe( pRelativeChildPath, "%s\\%s", pFilePath, pszFileName );
 
 		if ( g_pFullFileSystem->FindIsDirectory( list.m_hFind ) )
 		{
@@ -622,7 +620,7 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 			if ( DoesExtensionMatch( list, pszFileName ) )
 			{
 				char pFullAssetPath[MAX_PATH];
-				g_pFullFileSystem->RelativePathToFullPath( pRelativeChildPath, "GAME", pFullAssetPath, sizeof(pFullAssetPath) );
+				g_pFullFileSystem->RelativePathToFullPath_safe( pRelativeChildPath, "GAME", pFullAssetPath );
 
 				int nModIndex = -1;
 				for ( int i = 0; i < nModCount; ++i )
@@ -683,7 +681,7 @@ bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 		if ( list.m_hFind == FILESYSTEM_INVALID_FIND_HANDLE )
 		{
 			char pSearchString[MAX_PATH];
-			Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pFilePath );
+			V_sprintf_safe( pSearchString, "%s\\*", pFilePath );
 
 			// get the list of files
 			pStartingFile = g_pFullFileSystem->FindFirstEx( pSearchString, "GAME", &list.m_hFind );
@@ -1060,9 +1058,8 @@ void CBaseAssetPicker::OnKeyCodePressed( KeyCode code )
 {
 	if (( code == KEY_UP ) || ( code == KEY_DOWN ) || ( code == KEY_PAGEUP ) || ( code == KEY_PAGEDOWN ))
 	{
-		KeyValues *pMsg = new KeyValues("KeyCodePressed", "code", code);
+		KeyValuesAD pMsg( new KeyValues("KeyCodePressed", "code", code) );
 		vgui::ipanel()->SendMessage( m_pAssetBrowser->GetVPanel(), pMsg, GetVPanel());
-		pMsg->deleteThis();
 	}
 	else
 	{
@@ -1112,19 +1109,18 @@ void CBaseAssetPicker::AddAssetToList( int nAssetIndex )
 
 	bool bInRootDir = !strchr( info.m_AssetName, '\\' ) && !strchr( info.m_AssetName, '/' );
 
-	KeyValues *kv = new KeyValues( "node", "asset", info.m_AssetName );
+	KeyValuesAD kv( new KeyValues( "node", "asset", info.m_AssetName ) );
 	kv->SetString( "mod", s_AssetCache.ModInfo( info.m_nModIndex ).m_ModName );
 	kv->SetInt( "modIndex", info.m_nModIndex );
 	kv->SetInt( "root", bInRootDir );
 	int nItemID = m_pAssetBrowser->AddItem( kv, 0, false, false );
-	kv->deleteThis();
 	
 	if ( m_pAssetBrowser->GetSelectedItemsCount() == 0 && !Q_strcmp( m_SelectedAsset, info.m_AssetName ) )
 	{
 		m_pAssetBrowser->SetSelectedCell( nItemID, 0 );
 	}
 
-	KeyValues *pDrag = new KeyValues( "drag", "text", info.m_AssetName );
+	KeyValuesAD pDrag( new KeyValues( "drag", "text", info.m_AssetName ) );
 	if ( m_pAssetTextType )
 	{
 		pDrag->SetString( "texttype", m_pAssetTextType );
@@ -1204,12 +1200,12 @@ void CBaseAssetPicker::BuildAssetNameList( )
 	s_AssetCache.BuildModList();
 
 	m_pModSelector->RemoveAll();
-	m_pModSelector->AddItem( "All Mods", new KeyValues( "Mod", "mod", -1 ) );
+	m_pModSelector->AddItem( "All Mods", KeyValuesAD( new KeyValues( "Mod", "mod", -1 ) ) );
 	int nModCount = s_AssetCache.ModCount();
 	for ( int i = 0; i < nModCount; ++i )
 	{
 		const char *pModName = s_AssetCache.ModInfo( i ).m_ModName;
-		m_pModSelector->AddItem( pModName, new KeyValues( "Mod", "mod", i ) );
+		m_pModSelector->AddItem( pModName, KeyValuesAD( new KeyValues( "Mod", "mod", i ) ) );
 	}
 	m_pModSelector->ActivateItemByRow( 0 );
 
@@ -1381,7 +1377,7 @@ void CBaseAssetPicker::OnTextChanged( KeyValues *pKeyValues )
 	if ( pSource == m_pFilter )
 	{
 		int nLength = m_pFilter->GetTextLength();
-		char *pNewFilter = (char*)_alloca( (nLength+1) * sizeof(char) );
+		char *pNewFilter = stackallocT( char, nLength+1 );
 		if ( nLength > 0 )
 		{
 			m_pFilter->GetText( pNewFilter, nLength+1 );

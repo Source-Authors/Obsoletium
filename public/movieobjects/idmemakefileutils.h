@@ -24,7 +24,7 @@ class CDmElement;
 //-----------------------------------------------------------------------------
 // Interface version
 //-----------------------------------------------------------------------------
-#define DMEMAKEFILE_UTILS_INTERFACE_VERSION "VDmeMakeFileUtils001"
+constexpr inline char DMEMAKEFILE_UTILS_INTERFACE_VERSION[]{"VDmeMakeFileUtils001"};
 
 
 //-----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public:
 	virtual intp GetCompileOutputSize() = 0;
 
 	// Updates the compilation
-	virtual CompilationState_t UpdateCompilation( char *pOutputBuf, int nBufLen ) = 0;
+	virtual CompilationState_t UpdateCompilation( char *pOutputBuf, intp nBufLen ) = 0;
 
 	// Aborts the compilation
 	virtual void AbortCurrentCompilation() = 0;

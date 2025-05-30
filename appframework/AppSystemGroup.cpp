@@ -43,8 +43,8 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 {
 	// Remove the extension when creating the name.
 	size_t nLen = V_strlen( pDLLName ) + 1;
-	char *pModuleName = (char*)stackalloc( nLen );
-	Q_StripExtension( pDLLName, pModuleName, nLen );
+	char *pModuleName = stackallocT( char, nLen );
+	V_StripExtension( pDLLName, pModuleName, nLen );
 
 	// See if we already loaded it...
 	for ( auto i = m_Modules.Count(); --i >= 0; ) 
@@ -353,7 +353,7 @@ void *AppSystemCreateInterfaceFn(const char *pName, int *pReturnCode)
 	void *pInterface = s_pCurrentAppSystem->FindSystem( pName );
 	if ( pReturnCode )
 	{
-		*pReturnCode = pInterface ? IFACE_OK : IFACE_FAILED;
+		*pReturnCode = pInterface ? to_underlying(IFACE_OK) : to_underlying(IFACE_FAILED);
 	}
 	return pInterface;
 }
@@ -448,7 +448,7 @@ int CAppSystemGroup::OnStartup()
 		return -1;
 	}
 
-	return nRetVal;
+	return to_underlying(nRetVal);
 }
 
 void CAppSystemGroup::OnShutdown()
@@ -573,6 +573,6 @@ bool CSteamAppSystemGroup::SetupSearchPaths( const char *pStartingDir, bool bOnl
 		return false;
 
 	FileSystem_AddSearchPath_Platform( fsInfo.m_pFileSystem, steamInfo.m_GameInfoPath );
-	Q_strncpy( m_pGameInfoPath, steamInfo.m_GameInfoPath, sizeof(m_pGameInfoPath) );
+	V_strcpy_safe( m_pGameInfoPath, steamInfo.m_GameInfoPath );
 	return true;
 }

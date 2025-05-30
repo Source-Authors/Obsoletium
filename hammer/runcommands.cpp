@@ -27,18 +27,37 @@ bool IsRunningCommands() { return s_bRunsCommands; }
 
 static char *pszDocPath, *pszDocName, *pszDocExt;
 
-void FixGameVars(char *pszSrc, char *pszDst, BOOL bUseQuotes)
+void FixGameVars(char *pszSrc, OUT_Z_CAP(dstSize) char *pszDst, intp dstSize, BOOL bUseQuotes)
 {
+	if (!dstSize) Error("Unable to fix game vars for zero size buffer.\n");
+
+	pszDst[0] = '\0';
+
+	char *pszEnd = pszDst + dstSize;
 	// run through the parms list and substitute $variable strings for
 	//  the real thing
 	char *pSrc = pszSrc, *pDst = pszDst;
 	BOOL bInQuote = FALSE;
 	while(pSrc[0])
-	{	
+	{
+		if (pDst == pszEnd)
+		{
+			Warning( "Unable to fix game vars. Buffer size is %zd which is not enough.\n", dstSize );
+			pDst[-1] = '\0';
+			return;
+		}
+
 		if(pSrc[0] == '$')	// found a parm
 		{
 			if(pSrc[1] == '$')	// nope, it's a single symbol
 			{
+				if (pDst == pszEnd)
+				{
+					Warning( "Unable to fix game vars. Buffer size is %zd which is not enough.\n", dstSize );
+					pDst[-1] = '\0';
+					return;
+				}
+
 				*pDst++ = '$';
 				++pSrc;
 			}
@@ -49,6 +68,13 @@ void FixGameVars(char *pszSrc, char *pszDst, BOOL bUseQuotes)
 				
 				if (!bInQuote && bUseQuotes)
 				{
+					if (pDst == pszEnd)
+					{
+						Warning( "Unable to fix game vars. Buffer size is %zd which is not enough.\n", dstSize );
+						pDst[-1] = '\0';
+						return;
+					}
+
 					// not in quote, and subbing a variable.. start quote
 					*pDst++ = '\"';
 					bInQuote = TRUE;
@@ -57,61 +83,61 @@ void FixGameVars(char *pszSrc, char *pszDst, BOOL bUseQuotes)
 				if(!strnicmp(pSrc, "file", 4))
 				{
 					pSrc += 4;
-					strcpy(pDst, pszDocName);
+					V_strncpy(pDst, pszDocName, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "ext", 3))
 				{
 					pSrc += 3;
-					strcpy(pDst, pszDocExt);
+					V_strncpy(pDst, pszDocExt, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "path", 4))
 				{
 					pSrc += 4;
-					strcpy(pDst, pszDocPath);
+					V_strncpy(pDst, pszDocPath, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "exedir", 6))
 				{
 					pSrc += 6;
-					strcpy(pDst, g_pGameConfig->m_szGameExeDir);
+					V_strncpy(pDst, g_pGameConfig->m_szGameExeDir, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "bspdir", 6))
 				{
 					pSrc += 6;
-					strcpy(pDst, g_pGameConfig->szBSPDir);
+					V_strncpy(pDst, g_pGameConfig->szBSPDir, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "bsp_exe", 7))
 				{
 					pSrc += 7;
-					strcpy(pDst, g_pGameConfig->szBSP);
+					V_strncpy(pDst, g_pGameConfig->szBSP, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "vis_exe", 7))
 				{
 					pSrc += 7;
-					strcpy(pDst, g_pGameConfig->szVIS);
+					V_strncpy(pDst, g_pGameConfig->szVIS, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "light_exe", 9))
 				{
 					pSrc += 9;
-					strcpy(pDst, g_pGameConfig->szLIGHT);
+					V_strncpy(pDst, g_pGameConfig->szLIGHT, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if(!strnicmp(pSrc, "game_exe", 8))
 				{
 					pSrc += 8;
-					strcpy(pDst, g_pGameConfig->szExecutable);
+					V_strncpy(pDst, g_pGameConfig->szExecutable, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 				else if (!strnicmp(pSrc, "gamedir", 7))
 				{
 					pSrc += 7;
-					strcpy(pDst, g_pGameConfig->m_szModDir);
+					V_strncpy(pDst, g_pGameConfig->m_szModDir, pszEnd - pDst);
 					pDst += strlen(pDst);
 				}
 			}
@@ -121,12 +147,34 @@ void FixGameVars(char *pszSrc, char *pszDst, BOOL bUseQuotes)
 			if(*pSrc == ' ' && bInQuote)
 			{
 				bInQuote = FALSE;
+
+				if (pDst == pszEnd)
+				{
+					Warning( "Unable to fix game vars. Buffer size is %zd which is not enough.\n", dstSize );
+					pDst[-1] = '\0';
+					return;
+				}
+
 				*pDst++ = '\"';	// close quotes
+			}
+
+			if (pDst == pszEnd)
+			{
+				Warning( "Unable to fix game vars. Buffer size is %zd which is not enough.\n", dstSize );
+				pDst[-1] = '\0';
+				return;
 			}
 
 			// just copy the char into the destination buffer
 			*pDst++ = *pSrc++;
 		}
+	}
+
+	if(pDst == pszEnd)
+	{
+		Warning( "Unable to fix game vars. Buffer size is %zd which is not enough.\n", dstSize );
+		pDst[-1] = '\0';
+		return;
 	}
 
 	if(bInQuote)
@@ -135,15 +183,27 @@ void FixGameVars(char *pszSrc, char *pszDst, BOOL bUseQuotes)
 		*pDst++ = '\"';	// close quotes
 	}
 
-	pDst[0] = 0;
+	if (pDst == pszEnd)
+	{
+		Warning( "Unable to fix game vars. Buffer size is %zd which is not enough.\n", dstSize );
+		pDst[-1] = '\0';
+		return;
+	}
+
+	pDst[0] = '\0';
 }
 
-static void RemoveQuotes(char *pBuf)
+static void RemoveQuotes(IN_Z_CAP(bufferSize) char *pBuf, intp bufferSize)
 {
-	if(pBuf[0] == '\"')
-		strcpy(pBuf, pBuf+1);
-	if(pBuf[strlen(pBuf)-1] == '\"')
-		pBuf[strlen(pBuf)-1] = 0;
+	if (Q_isempty(pBuf)) return;
+
+	if (pBuf[0] == '"')
+		V_memmove(pBuf, pBuf + 1, bufferSize - 1);
+
+	const size_t end = strlen(pBuf) - 1;
+
+	if (pBuf[end] == '"')
+		pBuf[end] = '\0';
 }
 
 LPCTSTR GetErrorString()
@@ -176,8 +236,10 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	//  create two sets of buffers - one set with the long filename
 	//  and one set with the 8.3 format.
 
-	char szDocLongPath[MAX_PATH] = {0}, szDocLongName[MAX_PATH] = {0}, 
+	static char szDocLongPath[MAX_PATH] = {0}, szDocLongName[MAX_PATH] = {0}, 
 		szDocLongExt[MAX_PATH] = {0};
+	szDocLongPath[0] = szDocLongName[0] = szDocLongExt[0];
+
 	char szDocShortPath[MAX_PATH] = {0}, szDocShortName[MAX_PATH] = {0}, 
 		szDocShortExt[MAX_PATH] = {0};
 
@@ -237,7 +299,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 		pszDocName = szDocLongName;
 		pszDocPath = szDocLongPath;
 		
-		char szNewParms[MAX_PATH*5], szNewRun[MAX_PATH*5];
+		static char szNewParms[MAX_PATH*5], szNewRun[MAX_PATH*5];
+		szNewParms[0] = szNewRun[0] = '\0';
 
 		// HACK: force the spawnv call for launching the game
 		if (!Q_stricmp(cmd.szRun, "$game_exe"))
@@ -322,8 +385,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 
 				if(cmd.iSpecialCmd == CCCopyFile && iArg == 3)
 				{
-					RemoveQuotes(ppParms[1]);
-					RemoveQuotes(ppParms[2]);
+					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
+					RemoveQuotes(ppParms[2], ssize(ppParms) - 2);
 					
 					// don't copy if we're already there
 					if (stricmp(ppParms[1], ppParms[2]) != 0 && 
@@ -335,7 +398,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				}
 				else if(cmd.iSpecialCmd == CCDelFile && iArg == 2)
 				{
-					RemoveQuotes(ppParms[1]);
+					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
 					if(!DeleteFile(ppParms[1]))
 					{
 						bError = TRUE;
@@ -344,8 +407,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				}
 				else if(cmd.iSpecialCmd == CCRenameFile && iArg == 3)
 				{
-					RemoveQuotes(ppParms[1]);
-					RemoveQuotes(ppParms[2]);
+					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
+					RemoveQuotes(ppParms[2], ssize(ppParms) - 2);
 					if(rename(ppParms[1], ppParms[2]))
 					{
 						bError = TRUE;
@@ -354,7 +417,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				}
 				else if(cmd.iSpecialCmd == CCChangeDir && iArg == 2)
 				{
-					RemoveQuotes(ppParms[1]);
+					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
 					if(mychdir(ppParms[1]) == -1)
 					{
 						bError = TRUE;
@@ -380,14 +443,14 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				// uses the current working directory to search).
 				char szDir[MAX_PATH];
 				Q_strncpy(szDir, szNewRun, sizeof(szDir));
-				Q_StripFilename(szDir);
+				V_StripFilename(szDir);
 
 				mychdir(szDir);
 
 				// YWB Force asynchronous operation so that engine doesn't hang on
 				//  exit???  Seems to work.
 				// spawnv doesn't like quotes
-				RemoveQuotes(szNewRun);
+				RemoveQuotes(szNewRun, ssize(szNewRun));
 				_spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, ppParms);
 			}
 		}

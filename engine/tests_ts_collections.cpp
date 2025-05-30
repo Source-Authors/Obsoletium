@@ -103,7 +103,7 @@ class TSListContainer final : public ITestContainer<T> {
 };
 
 void ClearBuckets() {
-  for (ptrdiff_t i{0}; i < NUM_TEST; ++i) {
+  for (intp i{0}; i < NUM_TEST; ++i) {
     g_pTestBuckets[i].store(0, std::memory_order::memory_order_relaxed);
   }
 }

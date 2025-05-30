@@ -34,7 +34,7 @@ inline void RangeCheck( const T &value, int, int )
 	if ( ThreadInMainThread() && g_bDoRangeChecks )
 	{
 		// Ignore the min/max stuff for now.. just make sure it's not a NAN.
-		Assert( _finite( value ) );
+		Assert( std::isfinite( value ) );
 	}
 #endif
 }
@@ -64,7 +64,7 @@ public:
 		*this = value;
 	}
 
-	T GetRaw() const
+	[[nodiscard]] T GetRaw() const
 	{
 		return m_Val;
 	}
@@ -78,7 +78,7 @@ public:
 			m_Val = maxValue;
 	}
 
-	inline operator const T&() const
+	[[nodiscard]] inline operator const T&() const
 	{
 		return m_Val;
 	}

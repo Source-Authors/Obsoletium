@@ -62,7 +62,7 @@ static inline void RecordSparks( const Vector &start, int nMagnitude, int nTrail
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_SPARKS );
  		msg->SetString( "name", "TE_Sparks" );
@@ -77,7 +77,6 @@ static inline void RecordSparks( const Vector &start, int nMagnitude, int nTrail
 		msg->SetInt( "traillength", nTrailLength );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

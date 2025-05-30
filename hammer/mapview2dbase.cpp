@@ -767,7 +767,7 @@ void CMapView2DBase::UpdateStatusBar()
 		return;
 
 	char szBuf[128];
-	sprintf(szBuf, " Zoom: %.2f ", m_fZoom);
+	V_sprintf_safe(szBuf, " Zoom: %.2f ", m_fZoom);
 	SetStatusText(SBI_GRIDZOOM, szBuf);
 }
 
@@ -1701,7 +1701,7 @@ void CMapView2DBase::OnRButtonDown(UINT nFlags, CPoint point)
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapView2DBase::OnTimer(UINT nIDEvent) 
+void CMapView2DBase::OnTimer(UINT_PTR nIDEvent) 
 {
 	if ( nIDEvent == TIMER_SCROLLVIEW )
 	{

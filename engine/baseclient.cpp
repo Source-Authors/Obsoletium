@@ -16,9 +16,11 @@
 #include "GameEventManager.h"
 #include "LocalNetworkBackdoor.h"
 #include "dt_send_eng.h"
+
 #ifndef SWDS
 #include "vgui_baseui_interface.h"
 #endif
+
 #include "sv_remoteaccess.h" // NotifyDedicatedServerUI()
 #include "MapReslistGenerator.h"
 #include "sv_steamauth.h"
@@ -26,8 +28,8 @@
 #include "iregistry.h"
 #include "sv_main.h"
 #include "hltvserver.h"
-#include <ctype.h>
-#if defined( REPLAY_ENABLED )
+
+#ifdef REPLAY_ENABLED
 #include "replay_internal.h"
 #endif
 
@@ -81,14 +83,7 @@ void CBaseClient::SetRate(int nRate, bool bForce )
 
 int	CBaseClient::GetRate( void ) const
 {
-	if ( m_NetChannel )
-	{
-		return m_NetChannel->GetDataRate(); 
-	}
-	else
-	{
-		return 0;
-	}
+	return m_NetChannel ? m_NetChannel->GetDataRate() : 0; 
 }
 
 bool CBaseClient::FillUserInfo( player_info_s &userInfo )
@@ -122,7 +117,7 @@ bool CBaseClient::FillUserInfo( player_info_s &userInfo )
 // Input  : *fmt -
 //			... -
 //-----------------------------------------------------------------------------
-void CBaseClient::ClientPrintf (const char *fmt, ...)
+void CBaseClient::ClientPrintf (PRINTF_FORMAT_STRING const char *fmt, ...)
 {
 	if ( !m_NetChannel )
 	{
@@ -133,7 +128,7 @@ void CBaseClient::ClientPrintf (const char *fmt, ...)
 	char		string[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe (string, fmt,argptr);
 	va_end (argptr);
 
 	SVC_Print print(string);
@@ -601,7 +596,7 @@ void CBaseClient::Connect( const char * szName, int nUserID, INetChannel *pNetCh
 //			*fmt -
 //			... -
 //-----------------------------------------------------------------------------
-void CBaseClient::Disconnect( const char *fmt, ... )
+void CBaseClient::Disconnect( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 	char		string[1024];
@@ -1114,7 +1109,7 @@ void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
 	char buf[ 64 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( buf, sizeof( buf ), fmt, argptr );
+	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
 	Spike_t t;
@@ -1132,7 +1127,7 @@ void CBaseClient::TraceNetworkMsg( int nBits, char const *fmt, ... )
 	char buf[ 64 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( buf, sizeof( buf ), fmt, argptr );
+	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
 	Spike_t t;

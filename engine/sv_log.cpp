@@ -469,7 +469,7 @@ void CLog::Printf( const char *fmt, ... )
 	}
 
 	va_start ( argptr, fmt );
-	Q_vsnprintf ( string, sizeof( string ), fmt, argptr );
+	V_vsprintf_safe ( string, fmt, argptr );
 	va_end   ( argptr );
 
 	Print( string );
@@ -540,7 +540,7 @@ void CLog::FireGameEvent( IGameEvent *event )
 
 	if ( Q_strcmp(name, "server_spawn") == 0 )
 	{
-		Printf( "Started map \"%s\" (CRC \"%s\")\n", sv.GetMapName(), MD5_Print( sv.worldmapMD5.bits, MD5_DIGEST_LENGTH ) );
+		Printf( "Started map \"%s\" (CRC \"%s\")\n", sv.GetMapName(), MD5_Print( sv.worldmapMD5.bits ) );
 	}
 
 	else if ( Q_strcmp(name, "server_shutdown") == 0 )

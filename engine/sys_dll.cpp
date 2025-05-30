@@ -155,6 +155,7 @@ IServerGameTags *serverGameTags = NULL;
 //			ft2 - 
 // Output : int
 //-----------------------------------------------------------------------------
+// dimhotepus: long -> time_t
 int Sys_CompareFileTime( time_t ft1, time_t ft2 )
 {
 	if ( ft1 < ft2 )
@@ -320,7 +321,7 @@ void Sys_Printf(const char *fmt, ...)
 	char		text[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe (text, fmt, argptr);
 	va_end (argptr);
 		
 	if ( developer.GetInt() )
@@ -385,7 +386,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 	char		text[1024];
 	static      bool bReentry = false; // Don't meltdown
 
-	Q_vsnprintf( text, sizeof( text ), error, argsList );
+	V_vsprintf_safe( text, error, argsList );
 
 	if ( bReentry )
 	{
@@ -496,9 +497,11 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 #if defined(_WIN32)
 	// We don't want global destructors in our process OR in any DLL to get executed.
 	// _exit() avoids calling global destructors in our module, but not in other DLLs.
-	TerminateProcess( GetCurrentProcess(), 100 );
+	// dimhotepus: 100 -> ENOTRECOVERABLE
+	TerminateProcess( GetCurrentProcess(), ENOTRECOVERABLE );
 #else
-	_exit( 100 );
+	// dimhotepus: 100 -> ENOTRECOVERABLE
+	_exit( ENOTRECOVERABLE );
 #endif
 }
 
@@ -685,8 +688,7 @@ static void AddSpewRecord( char const *pMsg )
 		g_SpewHistory.Remove( g_SpewHistory.Head() );
 	}
 
-	auto i = g_SpewHistory.AddToTail();
-	g_SpewHistory[ i ].Format( "%d(%f):  %s", g_nSpewLines++, Plat_FloatTime(), pMsg );
+	g_SpewHistory[ g_SpewHistory.AddToTail() ].Format( "%d(%f):  %s", g_nSpewLines++, Plat_FloatTime(), pMsg );
 
 	s_bReentrancyGuard = false;
 }
@@ -1023,7 +1025,7 @@ static bool LoadThisDll( const char *szDllFilename, bool bIsServerOnly )
 	// this will have to be undone when we want mods to be able to run
 	if ((pDLL = g_pFileSystem->LoadModule(szDllFilename, "GAMEBIN", false)) == NULL)
 	{
-		ConMsg("Failed to load %s\n", szDllFilename);
+		ConWarning("Failed to load %s\n", szDllFilename);
 		goto IgnoreThisDLL;
 	}
 
@@ -1124,7 +1126,7 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 
 	{
 		// Listing file for this game.
-		KeyValues::AutoDelete modinfo = KeyValues::AutoDelete("modinfo");
+		KeyValuesAD modinfo("modinfo");
 		MEM_ALLOC_CREDIT();
 		if (modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt"))
 		{
@@ -1345,15 +1347,15 @@ void Sys_CreateFileAssociations( int count, FileAssociationInfo *list )
 #if defined(_WIN32)
 	char appname[ 512 ];
 
-	GetModuleFileName( 0, appname, sizeof( appname ) );
+	Plat_GetModuleFilename( appname, sizeof( appname ) );
 	Q_FixSlashes( appname );
 	Q_strlower( appname );
 
 	char quoted_appname_with_arg[ 512 ];
 	V_sprintf_safe(quoted_appname_with_arg, "\"%s\" \"%%1\"", appname );
 	char base_exe_name[ 256 ];
-	Q_FileBase( appname, base_exe_name, sizeof( base_exe_name) );
-	Q_DefaultExtension( base_exe_name, ".exe", sizeof( base_exe_name ) );
+	Q_FileBase( appname, base_exe_name );
+	Q_DefaultExtension( base_exe_name, ".exe" );
 
 	// HKEY_CLASSES_ROOT/Valve.Source/shell/open/command == "u:\tf2\hl2.exe" "%1" quoted
 	Sys_SetRegKeyValueUnderRoot( HKEY_CLASSES_ROOT, va( "%s\\shell\\open\\command", SOURCE_ENGINE_APP_CLASS ), "", quoted_appname_with_arg );

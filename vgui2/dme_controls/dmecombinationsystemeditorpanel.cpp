@@ -7,7 +7,7 @@
 
 #include "dme_controls/dmecombinationsystemeditorpanel.h"
 #include "dme_controls/dmepanel.h"
-#include "dme_controls/elementpropertiestree.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "dme_controls/dmecontrols_utils.h"
 #include "movieobjects/dmecombinationoperator.h"
 #include "vgui_controls/ListPanel.h"
@@ -204,16 +204,16 @@ static bool ImportCombinationData( vgui::Panel* pParent, CDmeCombinationOperator
 //-----------------------------------------------------------------------------
 class CDmeInputControlListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeInputControlListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeInputControlListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmeInputControlListPanel( vgui::Panel *pParent, const char *pName, CDmeCombinationControlsPanel *pComboPanel );
 
-	virtual void OnCreateDragData( KeyValues *msg );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msgList );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msgList );
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
+	void OnCreateDragData( KeyValues *msg ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msgList ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msgList ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
 private:
 	CDmeCombinationControlsPanel *m_pComboPanel;
@@ -231,14 +231,14 @@ private:
 //-----------------------------------------------------------------------------
 class CDmeRawControlListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeRawControlListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeRawControlListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmeRawControlListPanel( vgui::Panel *pParent, const char *pName, CDmeCombinationControlsPanel *pComboPanel );
 
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
 
 private:
 	MESSAGE_FUNC( OnNewWrinkleText, "TextNewLine" );	
@@ -258,7 +258,7 @@ private:
 //-----------------------------------------------------------------------------
 class CDmeCombinationControlsPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeCombinationControlsPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeCombinationControlsPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -1164,7 +1164,7 @@ void CDmeCombinationControlsPanel::OnFileSelected( KeyValues *kv )
 void CDmeCombinationControlsPanel::OnImportCombination()
 {
 	char pStartingDir[MAX_PATH];
-	GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+	GetModContentSubdirectory( "models", pStartingDir );
 
 	vgui::FileOpenDialog *pDialog = new vgui::FileOpenDialog( this, "Select File to Import", true, new KeyValues( "ImportControls" ) );
 	pDialog->SetStartDirectoryContext( "combination_system_import", pStartingDir );
@@ -1386,7 +1386,7 @@ void CDmeRawControlListPanel::OnNewWrinkleText()
 //-----------------------------------------------------------------------------
 class CRawControlPickerFrame : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CRawControlPickerFrame, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CRawControlPickerFrame, vgui::Frame );
 
 public:
 	CRawControlPickerFrame( vgui::Panel *pParent, const char *pTitle );
@@ -1396,7 +1396,7 @@ public:
 	void DoModal( CDmeCombinationOperator *pCombinationOperator, CDmeCombinationDominationRule *pRule, bool bSuppressed, KeyValues *pContextKeyValues );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
 private:
 	// Refreshes the list of raw controls
@@ -1545,7 +1545,7 @@ void CRawControlPickerFrame::OnCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 class CDmeCombinationDominationRulesPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CDmeCombinationDominationRulesPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmeCombinationDominationRulesPanel, vgui::EditablePanel );
 
 public:
 	// constructor, destructor
@@ -1780,7 +1780,7 @@ void CDmeCombinationDominationRulesPanel::OnFileSelected( KeyValues *kv )
 void CDmeCombinationDominationRulesPanel::OnImportDominationRules()
 {
 	char pStartingDir[MAX_PATH];
-	GetModContentSubdirectory( "models", pStartingDir, sizeof(pStartingDir) );
+	GetModContentSubdirectory( "models", pStartingDir );
 
 	vgui::FileOpenDialog *pDialog = new vgui::FileOpenDialog( this, "Select File to Import", true, new KeyValues( "ImportDominationRules" ) );
 	pDialog->SetStartDirectoryContext( "combination_system_import", pStartingDir );

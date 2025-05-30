@@ -877,7 +877,7 @@ public:
 	bool Init();
 	void Shutdown();
 
-	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen );
+	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen );
 
 	struct staticPropAsyncContext_t
 	{
@@ -1024,8 +1024,8 @@ class CResourcePreloadPropLighting : public CResourcePreload
 
 		char szBasename[MAX_PATH];
 		char szFilename[MAX_PATH];
-		V_FileBase( pName, szBasename, sizeof( szBasename ) );
-		V_snprintf( szFilename, sizeof( szFilename ), "%s%s.vhv", szBasename, GetPlatformExt() );
+		V_FileBase( pName, szBasename );
+		V_sprintf_safe( szFilename, "%s%s.vhv", szBasename, GetPlatformExt() );
 
 		// static props have the same name across maps
 		// can check if loading the same map and early out if data present
@@ -1131,7 +1131,7 @@ void CModelRender::SuppressEngineLighting( bool bSuppress )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen )
+bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen )
 {
 	CColorMeshData *pColorMeshData = (CColorMeshData *)pItem;
 	g_pFileSystem->String( pColorMeshData->m_fnHandle, pDest, nMaxLen );
@@ -1903,7 +1903,7 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, info.m_pStudioHdr->pszName() );
 	Q_snprintf( buf, sizeof( buf ), "lod: %d/%d\n", results.m_nLODUsed+1, ( int )info.m_pHardwareData->m_NumLODs );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
-	Q_snprintf( buf, sizeof( buf ), "tris: %d\n",  results.m_ActualTriCount );
+	Q_snprintf( buf, sizeof( buf ), "tris: %zd\n",  results.m_ActualTriCount );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
 	Q_snprintf( buf, sizeof( buf ), "hardware bones: %d\n",  results.m_NumHardwareBones );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
@@ -2797,7 +2797,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 #ifndef SWDS
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 	CMatRenderContextPtr pRenderContext( materials );
-	const int MAX_OBJECTS = 1024;
+	constexpr int MAX_OBJECTS = 1024;
 	CUtlSortVector<robject_t, CRobjectLess> objectList( (intp)0, MAX_OBJECTS);
 	CUtlVectorFixedGrowable<rmodel_t, 256> modelList;
 	CUtlVectorFixedGrowable<short,256> lightObjects;
@@ -3844,19 +3844,6 @@ static void StaticPropColorTexelCallback( const FileAsyncRequest_t &request, int
 	s_ModelRender.StaticPropColorTexelCallback( request.pContext, request.pData, numReadBytes, asyncStatus );
 }
 
-
-//-----------------------------------------------------------------------------
-// Queued loader callback
-// Called from async i/o thread - must spend minimal cycles in this context
-//-----------------------------------------------------------------------------
-static void QueuedLoaderCallback_PropLighting( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError )
-{
-	// translate error
-	FSAsyncStatus_t asyncStatus = ( loaderError == LOADERERROR_NONE ? FSASYNC_OK : FSASYNC_ERR_READING );
-
-	// mimic async i/o completion
-	s_ModelRender.StaticPropColorMeshCallback( pContext, pData, nSize, asyncStatus );
-}
 
 //-----------------------------------------------------------------------------
 // Loads the serialized static prop color data.

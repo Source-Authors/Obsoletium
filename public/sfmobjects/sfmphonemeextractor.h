@@ -10,10 +10,10 @@
 #pragma once
 #endif
 
-#include "phonemeextractor/PhonemeExtractor.h"
-#include "tier1/UtlString.h"
+#include "phonemeextractor/phonemeextractor.h"
+#include "tier1/utlstring.h"
 #include "sentence.h"
-#include "dme_controls/logpreview.h"
+#include "dme_controls/LogPreview.h"
 
 
 //-----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ extern ISFMPhonemeExtractor *sfm_phonemeextractor;
 // inline methods of CExtractInfo
 //-----------------------------------------------------------------------------
 inline CExtractInfo::CExtractInfo() : m_pClip( 0 ), m_pSound( 0 ),
-	m_bSentenceValid( false ), m_bUseSentence( false ), m_flDuration( 0.0f )
+	m_bUseSentence( false ), m_flDuration( 0.0f ), m_bSentenceValid( false )
 {
 }
 

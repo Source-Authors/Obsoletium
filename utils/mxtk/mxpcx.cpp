@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxPcx.h"
+#include "mxtk/mxpcx.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,9 +24,9 @@ mxPcxRead (const char *filename)
     if (!file)
         return 0;
 
-	mxPcxHeader header;
-    if (fread (&header, sizeof (mxPcxHeader), 1, file) == -1)
-	{
+    mxPcxHeader header;
+    if (fread (&header, sizeof (mxPcxHeader), 1, file) == 0)
+    {
         fclose (file);
         return 0;
     }
@@ -57,7 +57,7 @@ mxPcxRead (const char *filename)
 		return 0;
 	}
 
-    if (fread ((byte *) image->palette, sizeof (byte), 768, file) == -1)
+    if (fread ((byte *) image->palette, sizeof (byte), 768, file) == 0)
 	{
         fclose (file);
         return 0;

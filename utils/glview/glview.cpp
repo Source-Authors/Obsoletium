@@ -1,5 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 //
+// Program that displays visleaves.  It has been deprecated in the Orange Box
+// (Source 2007) by Hammer's Map > Load Portal File feature.  Despite that,
+// glview is still available for games made after Orange Box.
+//
 // See https://developer.valvesoftware.com/wiki/Glview
 //
 // YWB:  3/13/98
@@ -22,6 +26,7 @@
 //
 // I sped up the KB movement and turn speed, too.
 
+#define NOMINMAX
 #include <gl/gl.h>
 #include <gl/glu.h>
 
@@ -35,6 +40,7 @@
 #include "physdll.h"
 #include "phyfile.h"
 #include "vphysics_interface.h"
+#include "tools_minidump.h"
 
 #include "glos.h"
 #include "resource.h"
@@ -85,7 +91,7 @@ void DrawDisplacementData();
   char text[1024];
 
   va_start(argptr, error);
-  vsprintf(text, error, argptr);
+  V_vsprintf_safe(text, error, argptr);
   va_end(argptr);
 
   MessageBox(nullptr, text, "Visleaf Camera View - Error",
@@ -98,8 +104,8 @@ Vector origin{32, 32, 48};
 float angles[3];
 Vector forward;
 Vector vup, vpn, vright;
-float width = 1024;
-float height = 768;
+int width = 1024;
+int height = 768;
 
 float g_flMovementSpeed = 320.f;        // Units / second (run speed of HL)
 constexpr inline float SPEED_TURN{90};  // Degrees / second
@@ -147,8 +153,8 @@ void Cam_MouseMoved() {
     RECT rect;
     ::GetWindowRect(camerawindow, &rect);
 
-    rect.top = max(0, rect.top);
-    rect.left = max(0, rect.left);
+    rect.top = max(0L, rect.top);
+    rect.left = max(0L, rect.left);
 
     int centerx = (rect.left + rect.right) / 2;
     int centery = (rect.top + rect.bottom) / 2;
@@ -646,13 +652,13 @@ void ReadPHYFile(const char *name, phyviewparams_t &params) {
 
 void ReadPolyFile(const char *name) {
   char ext[4];
-  Q_ExtractFileExtension(name, ext, 4);
+  V_ExtractFileExtension(name, ext);
 
   bool isPHY = !Q_stricmp(ext, "phy");
   if (isPHY) {
-    CreateInterfaceFn physicsFactory = GetPhysicsFactory();
-    physcollision = (IPhysicsCollision *)physicsFactory(
-        VPHYSICS_COLLISION_INTERFACE_VERSION, NULL);
+    CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
+    physcollision =
+        physicsFactory(VPHYSICS_COLLISION_INTERFACE_VERSION, nullptr);
     if (physcollision) {
       phyviewparams_t params;
       params.Defaults();
@@ -789,60 +795,61 @@ void DrawDisplacementData() {
   }
 
   int halfCount = dispPointCount / 2;
-  int width = sqrt((float)halfCount);
+  int halfWidth = static_cast<int>(sqrt((float)halfCount));
 
   glDisable(GL_CULL_FACE);
 
   glColor3f(0.0f, 0.0f, 1.0f);
-  for (i = 0; i < width - 1; i++) {
-    for (j = 0; j < width - 1; j++) {
+  for (i = 0; i < halfWidth - 1; i++) {
+    for (j = 0; j < halfWidth - 1; j++) {
       glBegin(GL_POLYGON);
-      glVertex3f(dispPoints[i * width + j][0], dispPoints[i * width + j][1],
-                 dispPoints[i * width + j][2]);
-      glVertex3f(dispPoints[(i + 1) * width + j][0],
-                 dispPoints[(i + 1) * width + j][1],
-                 dispPoints[(i + 1) * width + j][2]);
-      glVertex3f(dispPoints[(i + 1) * width + (j + 1)][0],
-                 dispPoints[(i + 1) * width + (j + 1)][1],
-                 dispPoints[(i + 1) * width + (j + 1)][2]);
-      glVertex3f(dispPoints[i * width + (j + 1)][0],
-                 dispPoints[i * width + (j + 1)][1],
-                 dispPoints[i * width + (j + 1)][2]);
+      glVertex3f(dispPoints[i * halfWidth + j][0],
+                 dispPoints[i * halfWidth + j][1],
+                 dispPoints[i * halfWidth + j][2]);
+      glVertex3f(dispPoints[(i + 1) * halfWidth + j][0],
+                 dispPoints[(i + 1) * halfWidth + j][1],
+                 dispPoints[(i + 1) * halfWidth + j][2]);
+      glVertex3f(dispPoints[(i + 1) * halfWidth + (j + 1)][0],
+                 dispPoints[(i + 1) * halfWidth + (j + 1)][1],
+                 dispPoints[(i + 1) * halfWidth + (j + 1)][2]);
+      glVertex3f(dispPoints[i * halfWidth + (j + 1)][0],
+                 dispPoints[i * halfWidth + (j + 1)][1],
+                 dispPoints[i * halfWidth + (j + 1)][2]);
       glEnd();
     }
   }
 
   glColor3f(0.0f, 1.0f, 0.0f);
-  for (i = 0; i < width - 1; i++) {
-    for (j = 0; j < width - 1; j++) {
+  for (i = 0; i < halfWidth - 1; i++) {
+    for (j = 0; j < halfWidth - 1; j++) {
       glBegin(GL_POLYGON);
-      glVertex3f(dispPoints[i * width + j][0] +
-                     (dispNormals[i * width + j][0] * 150.0f),
-                 dispPoints[i * width + j][1] +
-                     (dispNormals[i * width + j][1] * 150.0f),
-                 dispPoints[i * width + j][2] +
-                     (dispNormals[i * width + j][2] * 150.0f));
+      glVertex3f(dispPoints[i * halfWidth + j][0] +
+                     (dispNormals[i * halfWidth + j][0] * 150.0f),
+                 dispPoints[i * halfWidth + j][1] +
+                     (dispNormals[i * halfWidth + j][1] * 150.0f),
+                 dispPoints[i * halfWidth + j][2] +
+                     (dispNormals[i * halfWidth + j][2] * 150.0f));
 
-      glVertex3f(dispPoints[(i + 1) * width + j][0] +
-                     (dispNormals[(i + 1) * width + j][0] * 150.0f),
-                 dispPoints[(i + 1) * width + j][1] +
-                     (dispNormals[(i + 1) * width + j][1] * 150.0f),
-                 dispPoints[(i + 1) * width + j][2] +
-                     (dispNormals[(i + 1) * width + j][2] * 150.0f));
+      glVertex3f(dispPoints[(i + 1) * halfWidth + j][0] +
+                     (dispNormals[(i + 1) * halfWidth + j][0] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + j][1] +
+                     (dispNormals[(i + 1) * halfWidth + j][1] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + j][2] +
+                     (dispNormals[(i + 1) * halfWidth + j][2] * 150.0f));
 
-      glVertex3f(dispPoints[(i + 1) * width + (j + 1)][0] +
-                     (dispNormals[(i + 1) * width + (j + 1)][0] * 150.0f),
-                 dispPoints[(i + 1) * width + (j + 1)][1] +
-                     (dispNormals[(i + 1) * width + (j + 1)][1] * 150.0f),
-                 dispPoints[(i + 1) * width + (j + 1)][2] +
-                     (dispNormals[(i + 1) * width + (j + 1)][2] * 150.0f));
+      glVertex3f(dispPoints[(i + 1) * halfWidth + (j + 1)][0] +
+                     (dispNormals[(i + 1) * halfWidth + (j + 1)][0] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + (j + 1)][1] +
+                     (dispNormals[(i + 1) * halfWidth + (j + 1)][1] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + (j + 1)][2] +
+                     (dispNormals[(i + 1) * halfWidth + (j + 1)][2] * 150.0f));
 
-      glVertex3f(dispPoints[i * width + (j + 1)][0] +
-                     (dispNormals[i * width + (j + 1)][0] * 150.0f),
-                 dispPoints[i * width + (j + 1)][1] +
-                     (dispNormals[i * width + (j + 1)][1] * 150.0f),
-                 dispPoints[i * width + (j + 1)][2] +
-                     (dispNormals[i * width + (j + 1)][2] * 150.0f));
+      glVertex3f(dispPoints[i * halfWidth + (j + 1)][0] +
+                     (dispNormals[i * halfWidth + (j + 1)][0] * 150.0f),
+                 dispPoints[i * halfWidth + (j + 1)][1] +
+                     (dispNormals[i * halfWidth + (j + 1)][1] * 150.0f),
+                 dispPoints[i * halfWidth + (j + 1)][2] +
+                     (dispNormals[i * halfWidth + (j + 1)][2] * 150.0f));
       glEnd();
     }
   }
@@ -850,36 +857,36 @@ void DrawDisplacementData() {
   glDisable(GL_DEPTH_TEST);
 
   glColor3f(0.0f, 0.0f, 1.0f);
-  for (i = 0; i < width - 1; i++) {
-    for (j = 0; j < width - 1; j++) {
+  for (i = 0; i < halfWidth - 1; i++) {
+    for (j = 0; j < halfWidth - 1; j++) {
       glBegin(GL_LINE_LOOP);
-      glVertex3f(dispPoints[i * width + j][0] +
-                     (dispNormals[i * width + j][0] * 150.0f),
-                 dispPoints[i * width + j][1] +
-                     (dispNormals[i * width + j][1] * 150.0f),
-                 dispPoints[i * width + j][2] +
-                     (dispNormals[i * width + j][2] * 150.0f));
+      glVertex3f(dispPoints[i * halfWidth + j][0] +
+                     (dispNormals[i * halfWidth + j][0] * 150.0f),
+                 dispPoints[i * halfWidth + j][1] +
+                     (dispNormals[i * halfWidth + j][1] * 150.0f),
+                 dispPoints[i * halfWidth + j][2] +
+                     (dispNormals[i * halfWidth + j][2] * 150.0f));
 
-      glVertex3f(dispPoints[(i + 1) * width + j][0] +
-                     (dispNormals[(i + 1) * width + j][0] * 150.0f),
-                 dispPoints[(i + 1) * width + j][1] +
-                     (dispNormals[(i + 1) * width + j][1] * 150.0f),
-                 dispPoints[(i + 1) * width + j][2] +
-                     (dispNormals[(i + 1) * width + j][2] * 150.0f));
+      glVertex3f(dispPoints[(i + 1) * halfWidth + j][0] +
+                     (dispNormals[(i + 1) * halfWidth + j][0] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + j][1] +
+                     (dispNormals[(i + 1) * halfWidth + j][1] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + j][2] +
+                     (dispNormals[(i + 1) * halfWidth + j][2] * 150.0f));
 
-      glVertex3f(dispPoints[(i + 1) * width + (j + 1)][0] +
-                     (dispNormals[(i + 1) * width + (j + 1)][0] * 150.0f),
-                 dispPoints[(i + 1) * width + (j + 1)][1] +
-                     (dispNormals[(i + 1) * width + (j + 1)][1] * 150.0f),
-                 dispPoints[(i + 1) * width + (j + 1)][2] +
-                     (dispNormals[(i + 1) * width + (j + 1)][2] * 150.0f));
+      glVertex3f(dispPoints[(i + 1) * halfWidth + (j + 1)][0] +
+                     (dispNormals[(i + 1) * halfWidth + (j + 1)][0] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + (j + 1)][1] +
+                     (dispNormals[(i + 1) * halfWidth + (j + 1)][1] * 150.0f),
+                 dispPoints[(i + 1) * halfWidth + (j + 1)][2] +
+                     (dispNormals[(i + 1) * halfWidth + (j + 1)][2] * 150.0f));
 
-      glVertex3f(dispPoints[i * width + (j + 1)][0] +
-                     (dispNormals[i * width + (j + 1)][0] * 150.0f),
-                 dispPoints[i * width + (j + 1)][1] +
-                     (dispNormals[i * width + (j + 1)][1] * 150.0f),
-                 dispPoints[i * width + (j + 1)][2] +
-                     (dispNormals[i * width + (j + 1)][2] * 150.0f));
+      glVertex3f(dispPoints[i * halfWidth + (j + 1)][0] +
+                     (dispNormals[i * halfWidth + (j + 1)][0] * 150.0f),
+                 dispPoints[i * halfWidth + (j + 1)][1] +
+                     (dispNormals[i * halfWidth + (j + 1)][1] * 150.0f),
+                 dispPoints[i * halfWidth + (j + 1)][2] +
+                     (dispNormals[i * halfWidth + (j + 1)][2] * 150.0f));
       glEnd();
     }
   }
@@ -1142,7 +1149,7 @@ void AppRender() {
 }
 
 SpewRetval_t GlViewSpew(SpewType_t type, const char *pMsg) {
-  OutputDebugString(pMsg);
+  Plat_DebugString(pMsg);
 
   if (type == SPEW_ASSERT) return SPEW_DEBUGGER;
   if (type == SPEW_ERROR) return SPEW_ABORT;
@@ -1154,6 +1161,10 @@ SpewRetval_t GlViewSpew(SpewType_t type, const char *pMsg) {
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
                    _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps;
+
   CommandLine()->CreateCmdLine(Plat_GetCommandLine());
 
   if (CommandLine()->ParmCount() == 0) Error("Please specify file to view.\n");
@@ -1175,14 +1186,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
     g_nLeafHighlight = CommandLine()->ParmValue("-leafhighlight", -1);
   }
 
-  g_flMovementSpeed = CommandLine()->ParmValue("-speed", 320);
+  g_flMovementSpeed =
+      static_cast<float>(CommandLine()->ParmValue("-speed", 320));
 
   if (CommandLine()->CheckParm("-disp")) {
     ReadDisplacementFile(pFileName);
     g_bDisp = TRUE;
   }
 
-  SpewOutputFunc(GlViewSpew);
+  const ScopedSpewOutputFunc scoped_spew_output(GlViewSpew);
 
   // Any chunk of original left is the filename.
   if (pFileName && pFileName[0] && !g_bDisp) {

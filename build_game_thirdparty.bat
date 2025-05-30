@@ -98,7 +98,7 @@ if ERRORLEVEL 1 (
 POPD
 
 
-SET ZLIB_SOURCE_DIR=%cd%\thirdparty\zlib
+SET ZLIB_SOURCE_DIR="%cd%\thirdparty\zlib"
 
 
 REM Build libpng.
@@ -201,6 +201,29 @@ if ERRORLEVEL 1 (
 cmake --build . --config Release
 if ERRORLEVEL 1 (
   ECHO cmake --build for thirdparty\SDL failed.
+  EXIT /B 1
+)
+POPD
+
+
+REM Build nvtristrip.
+MKDIR thirdparty\nvtristrip\out
+PUSHD thirdparty\nvtristrip\out
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% ..
+if ERRORLEVEL 1 (
+  ECHO cmake generation for thirdparty\nvtristrip failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Release
+if ERRORLEVEL 1 (
+  ECHO cmake --build Release for thirdparty\nvtristrip failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Debug
+if ERRORLEVEL 1 (
+  ECHO cmake --build Debug for thirdparty\nvtristrip failed.
   EXIT /B 1
 )
 POPD

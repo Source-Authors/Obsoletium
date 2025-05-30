@@ -40,7 +40,7 @@ inline int InternalCheckDeclareClass( [[maybe_unused]] const char *pClassName, [
 	// This is triggered by IMPLEMENT_SERVER_CLASS. It does DLLClassName::CheckDeclareClass( #DLLClassName ).
 	// If they didn't do a DECLARE_CLASS in DLLClassName, then it'll be calling its base class's version
 	// and the class names won't match.
-	Assert( (void*)pClassName == (void*)pClassNameMatch );
+	Assert( pClassName == pClassNameMatch );
 	return 0;
 }
 
@@ -685,6 +685,7 @@ private:
 			NetworkStateChanged(); \
 			return m_Value; \
 		} \
+		constexpr intp Size() const { return length; }; \
 	protected: \
 		inline void NetworkStateChanged() \
 		{ \

@@ -13,8 +13,6 @@
 #include "filesystem.h"
 #include <vstdlib/IKeyValuesSystem.h>
 
-#include <stdio.h>
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

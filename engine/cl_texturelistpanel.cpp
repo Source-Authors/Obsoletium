@@ -538,23 +538,29 @@ static bool ShallWarnTx( KeyValues *kv, ITexture *tx )
 	return false;
 }
 
-static void FmtCommaNumber( char *pchBuffer, unsigned int uiNumber )
+template<intp bufferSize>
+static void FmtCommaNumber( char (&pchBuffer)[bufferSize], unsigned int uiNumber )
 {
-	pchBuffer[0] = 0;
-	for ( unsigned int uiDivisor = 1024 * 1024 * 1024; uiDivisor > 0; uiDivisor /= 1024 )
+	pchBuffer[0] = '\0';
+	for ( unsigned int uiDivisor = 1024u * 1024 * 1024; uiDivisor > 0; uiDivisor /= 1024u )
 	{
 		if ( uiNumber > uiDivisor )
 		{
-			unsigned int uiPrint = ( uiNumber / uiDivisor ) % 1024;
-			sprintf( pchBuffer + strlen( pchBuffer ), ( uiNumber / uiDivisor < 1024 ) ? "%d," : "%03d,", uiPrint );
+			unsigned int uiPrint = ( uiNumber / uiDivisor ) % 1024u;
+
+			intp bufferLen = V_strlen(pchBuffer);
+
+			V_snprintf( pchBuffer + bufferLen,
+				bufferSize - bufferLen,
+				( uiNumber / uiDivisor < 1024u ) ? "%u," : "%03u,", uiPrint );
 		}
 	}
 
 	intp len = V_strlen( pchBuffer );
 	if ( !len )
-		sprintf( pchBuffer, "0" );
+		V_sprintf_safe( pchBuffer, "0" );
 	else if ( pchBuffer[ len - 1 ] == ',' )
-		pchBuffer[ len - 1 ] = 0;
+		pchBuffer[ len - 1 ] = '\0';
 }
 
 namespace
@@ -630,8 +636,8 @@ static bool SaveTextureImage( char const *szTextureName )
 		return false;
 	}
 
-	V_FileBase( szTextureName, baseName, ARRAYSIZE( baseName ) );
-	Q_snprintf( fileName, ARRAYSIZE( fileName ), "//MOD/tex_%s.tga", baseName );
+	V_FileBase( szTextureName, baseName );
+	V_sprintf_safe( fileName, "//MOD/tex_%s.tga", baseName );
 
 	bRet = pMatTexture->SaveToFile( fileName );
 
@@ -877,8 +883,8 @@ void CVmtTextEntry::OpenVmtSelected()
 			*( pchNext ++ ) = 0;
 
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vmt", pchName );
-		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+		V_sprintf_safe( chResolveNameArg, "materials/%s.vmt", pchName );
+		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 
 		if ( szResolvedName )
 			vgui::system()->ShellExecuteEx( "open", szResolvedName, "" );
@@ -886,15 +892,19 @@ void CVmtTextEntry::OpenVmtSelected()
 }
 
 #ifdef IS_WINDOWS_PC
-bool IsSpaceOrQuote( char val )
+static bool IsSpaceOrQuote( char val )
 {
 	return (isspace(val) || val == '\"');
 }
 
-static bool SetBufferValue( char *chTxtFileBuffer, size_t nTxtFileBufferLen, char const *szLookupKey, char const *szNewValue )
+static bool SetBufferValue( INOUT_Z_CAP(nTxtFileBufferSize) char *chTxtFileBuffer,
+	size_t nTxtFileBufferSize,
+	IN_Z char const *szLookupKey,
+	IN_Z char const *szNewValue )
 {
 	bool bResult = false;
 
+	size_t nTxtFileBufferLen = strlen( chTxtFileBuffer );
 	size_t lenTmp = strlen( szNewValue );
 
 	for ( char *pch = chTxtFileBuffer;
@@ -930,12 +940,13 @@ static bool SetBufferValue( char *chTxtFileBuffer, size_t nTxtFileBufferLen, cha
 	if ( !bResult )
 	{
 		char *pchAdd = chTxtFileBuffer + nTxtFileBufferLen;
-		// dimhotepus: strcpy + strlen -> strcat.
-		strcat( pchAdd, "\n" );
-		strcat( pchAdd, szLookupKey );
-		strcat( pchAdd, " " );
-		strcat( pchAdd, szNewValue );
-		strcat( pchAdd, "\n" );
+		const intp bufferSize = nTxtFileBufferSize - strlen(pchAdd);
+		// dimhotepus: strcpy + strlen -> V_strcat.
+		V_strcat( pchAdd, "\n", bufferSize );
+		V_strcat( pchAdd, szLookupKey, bufferSize );
+		V_strcat( pchAdd, " ", bufferSize );
+		V_strcat( pchAdd, szNewValue, bufferSize );
+		V_strcat( pchAdd, "\n", bufferSize );
 		bResult = true;
 	}
 
@@ -945,7 +956,8 @@ static bool SetBufferValue( char *chTxtFileBuffer, size_t nTxtFileBufferLen, cha
 // Replaces the first occurrence of "szFindData" with "szNewData"
 // Returns the remaining buffer past the replaced data or NULL if
 // no replacement occurred.
-static char * BufferReplace( char *buf, char const *szFindData, char const *szNewData )
+template<intp bufSize>
+static char * BufferReplace( char (&buf)[bufSize], char const *szFindData, char const *szNewData )
 {
 	size_t len = strlen( buf ), lFind = strlen( szFindData ), lNew = strlen( szNewData );
 	if ( char *pBegin = strstr( buf, szFindData ) )
@@ -1315,7 +1327,7 @@ void CRenderTextureEditor::PerformLayout()
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
 		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vtf", m_pInfo->GetString( KEYNAME_NAME ) );
-		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 		if ( szResolvedName )
 		{
 			m_pExplore->SetVisible( true );
@@ -1365,17 +1377,18 @@ void CRenderTextureEditor::PerformLayout()
 }
 
 #ifdef IS_WINDOWS_PC
-bool GetTextureContentPath( const char *pszVTF, char *szTextureContentPath, int nBufSize )
+template<intp nBufSize>
+bool GetTextureContentPath( const char *pszVTF, OUT_Z_ARRAY char (&szTextureContentPath)[nBufSize] )
 {
 	char vhRelVTF[MAX_PATH];
-	Q_snprintf( vhRelVTF, sizeof( vhRelVTF ) - 1, "materials/%s.vtf", pszVTF );
+	V_sprintf_safe( vhRelVTF, "materials/%s.vtf", pszVTF );
 
 	ConVarRef mat_texture_list_content_path( "mat_texture_list_content_path" );
 	if ( !mat_texture_list_content_path.GetString()[0] )
 	{
-		szTextureContentPath = const_cast< char * >( g_pFileSystem->RelativePathToFullPath( vhRelVTF, "game", szTextureContentPath, nBufSize - 1 ) );
+		const char *path = g_pFileSystem->RelativePathToFullPath_safe( vhRelVTF, "game", szTextureContentPath );
 
-		if ( !szTextureContentPath )
+		if ( !path )
 		{
 			Warning( " texture '%s' is not loaded from file system.\n", pszVTF );
 			return false;
@@ -1389,10 +1402,10 @@ bool GetTextureContentPath( const char *pszVTF, char *szTextureContentPath, int 
 	}
 	else
 	{
-		V_strncpy( szTextureContentPath, mat_texture_list_content_path.GetString(), MAX_PATH );
-		V_strncat( szTextureContentPath, "/", MAX_PATH );
-		V_strncat( szTextureContentPath, pszVTF, MAX_PATH );
-		V_strncat( szTextureContentPath, ".vtf", MAX_PATH );
+		V_strcpy_safe( szTextureContentPath, mat_texture_list_content_path.GetString() );
+		V_strcat_safe( szTextureContentPath, "/" );
+		V_strcat_safe( szTextureContentPath, pszVTF );
+		V_strcat_safe( szTextureContentPath, ".vtf" );
 	}
 
 	return true;
@@ -1406,11 +1419,11 @@ void CRenderTextureEditor::OnCommand( const char *command )
 	if ( !stricmp( command, "Explore" ) && m_pInfo )
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vtf", m_pInfo->GetString( KEYNAME_NAME ) );
-		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+		V_sprintf_safe( chResolveNameArg, "materials/%s.vtf", m_pInfo->GetString( KEYNAME_NAME ) );
+		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 
 		char params[256];
-		Q_snprintf( params, sizeof( params ) - 1, "/E,/SELECT,%s", szResolvedName );
+		V_sprintf_safe( params, "/E,/SELECT,%s", szResolvedName );
 		vgui::system()->ShellExecuteEx( "open", "explorer.exe", params );
 	}
 
@@ -1515,7 +1528,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		bool bNewNoMip = !(pMatTexture->GetFlags() & TEXTUREFLAGS_NOMIP);
 
 		char szFileName[MAX_PATH];
-		if ( !GetTextureContentPath( szTextureFile, szFileName, sizeof(szFileName) ) )
+		if ( !GetTextureContentPath( szTextureFile, szFileName ) )
 			return;
 
 		// Figure out what kind of source content is there:
@@ -1525,18 +1538,18 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		char *pExtPut = szFileName + strlen( szFileName ) - (ssize( ".vtf" ) - 1); // compensating the TEXTURE_FNAME_EXTENSION(.vtf) extension
 
 		// 1.tga
-		sprintf( pExtPut, ".tga" );
+		V_strcpy( pExtPut, ".tga" );
 		if ( g_pFullFileSystem->FileExists( szFileName ) )
 		{
 			// Have tga - pump in the txt file
-			sprintf( pExtPut, ".txt" );
+			V_strcpy( pExtPut, ".txt" );
 
 			CUtlBuffer bufTxtFileBuffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			g_pFullFileSystem->ReadFile( szFileName, 0, bufTxtFileBuffer );
 			for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
 			// Now fix maxwidth/maxheight settings
-			SetBufferValue( bufTxtFileBuffer.Base<char>(), strlen( bufTxtFileBuffer.Base<const char>() ), "nomip", bNewNoMip ? "1" : "0" );
+			SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "nomip", bNewNoMip ? "1" : "0" );
 			bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 			// Check out or add the file
@@ -1558,12 +1571,12 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		else
 		{
 			// 2.psd
-			sprintf( pExtPut, ".psd" );
+			V_strcpy( pExtPut, ".psd" );
 			if ( g_pFullFileSystem->FileExists( szFileName ) )
 			{
 				char chCommand[MAX_PATH];
 				char szTxtFileName[MAX_PATH] = {0};
-				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName, sizeof( szTxtFileName ) );
+				GetModSubdirectory( "tmp_lod_psdinfo.txt", szTxtFileName );
 				V_sprintf_safe( chCommand, "/C psdinfo \"%s\" > \"%s\"", szFileName, szTxtFileName);
 				vgui::system()->ShellExecuteEx( "open", "cmd.exe", chCommand );
 				Sys_Sleep( 200 );
@@ -1573,7 +1586,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 				for ( int k = 0; k < 1024; ++ k ) bufTxtFileBuffer.PutChar( 0 );
 
 				// Now fix maxwidth/maxheight settings
-				SetBufferValue( bufTxtFileBuffer.Base<char>(), strlen( bufTxtFileBuffer.Base<const char>() ), "nomip", bNewNoMip ? "1" : "0" );
+				SetBufferValue( bufTxtFileBuffer.Base<char>(), bufTxtFileBuffer.Size(), "nomip", bNewNoMip ? "1" : "0" );
 				bufTxtFileBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, strlen( bufTxtFileBuffer.Base<const char>() ) );
 
 				// Check out or add the file
@@ -1600,7 +1613,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 			else
 			{
 				// 3. - error
-				sprintf( pExtPut, "" );
+				V_strcpy( pExtPut, "" );
 				Warning( " '%s' : doesn't specify a valid TGA or PSD file!\n", szFileName );
 				return;
 			}
@@ -1626,15 +1639,15 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		char const *szTextureFile = m_pInfo->GetString( KEYNAME_NAME );
 
 		char szContentFilename[MAX_PATH];
-		if ( !GetTextureContentPath( szTextureFile, szContentFilename, sizeof(szContentFilename) ) )
+		if ( !GetTextureContentPath( szTextureFile, szContentFilename ) )
 			return;
 
 		char pGameDir[MAX_OSPATH];
-		COM_GetGameDir( pGameDir, sizeof( pGameDir ) );
+		COM_GetGameDir( pGameDir );
 
 		// Check out the VTF
 		char szVTFFilename[MAX_PATH];
-		Q_snprintf( szVTFFilename, sizeof( szVTFFilename ) - 1, "%s/materials/%s.vtf", pGameDir, szTextureFile );
+		V_sprintf_safe( szVTFFilename, "%s/materials/%s.vtf", pGameDir, szTextureFile );
 		g_p4factory->SetOpenFileChangeList( "Texture LOD Autocheckout" );
 		CP4AutoEditFile autop4_edit( szVTFFilename );
 
@@ -1771,8 +1784,8 @@ void CRenderTextureEditor::Paint()
 	y += TILE_BORDER;
 
 	char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-	Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vtf", szTextureFile );
-	char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+	V_sprintf_safe( chResolveNameArg, "materials/%s.vtf", szTextureFile );
+	char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 
 	char const *szPrintFilePrefix = szResolvedName ? "" : "[?]/";
 	char const *szPrintFileName = szResolvedName ? szResolvedName : szTextureFile;
@@ -2238,7 +2251,7 @@ fmtlenreduce:
 	g_pMatSystemSurface->DrawFilledRect( x - TILE_BORDER/2, y, x + TILE_BORDER/2 + TILE_SIZE, y + TILE_TEXT );
 
 	char chInfoText[256] = { 0 };
-	sprintf( chInfoText, "%s KiB  %dx%d  %.*s%s  %s",
+	V_sprintf_safe( chInfoText, "%s KiB  %dx%d  %.*s%s  %s",
 		chSizeBuf,
 		iTxWidth, iTxHeight,
 		static_cast<int>(iTxFormatLen), szTxFormat, szTxFormatSuffix,
@@ -2919,7 +2932,7 @@ void CTextureListPanel::UpdateTotalUsageLabel()
 	}
 
 	wchar_t unicodeString[1024];
-	g_pVGuiLocalize->ConvertANSIToUnicode( data, unicodeString, sizeof( unicodeString ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( data, unicodeString );
 
 	m_pTotalUsageLabel->SetText( unicodeString );
 }
@@ -3180,8 +3193,7 @@ void CTextureListPanel::Paint()
 	if ( m_pFilteringChk->IsSelected() && m_pFilteringText->GetTextLength() )
 	{
 		char chFilterString[ MAX_PATH ];
-		m_pFilteringText->GetText( chFilterString, sizeof( chFilterString ) - 1 );
-		chFilterString[ sizeof( chFilterString ) - 1 ] = 0;
+		m_pFilteringText->GetText( chFilterString );
 		KeepKeysMatchingFilter( textureList.Get(), chFilterString );
 	}
 
@@ -3213,8 +3225,8 @@ void CTextureListPanel::Paint()
 		if ( m_pResolveTexturePath->IsSelected() )
 		{
 			char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-			Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vtf", pCur->GetString( KEYNAME_NAME ) );
-			char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+			V_sprintf_safe( chResolveNameArg, "materials/%s.vtf", pCur->GetString( KEYNAME_NAME ) );
+			char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 			if ( szResolvedName )
 			{
 				pCur->SetString( KEYNAME_PATH, szResolvedName );

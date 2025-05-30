@@ -1229,7 +1229,7 @@ void CBounceBomb::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t re
 
 			// Try to scatter NPCs without panicking them. Make a move away sound up around their 
 			// ear level.
-			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetAbsOrigin() + Vector( 0, 0, 60), 32.0f, 0.2f );
+			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetAbsOrigin() + Vector( 0, 0, 60), 32, 0.2f );
 			return;
 		}
 		else

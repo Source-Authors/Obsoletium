@@ -34,6 +34,8 @@
 #include "console/conproc.h"
 #include "console/textconsole.h"
 
+#include "scoped_app_locale.h"
+
 namespace se::dedicated {
 
 extern CTextConsoleWin32 console;
@@ -126,7 +128,7 @@ void WindowsSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
   char message[1024];
 
   va_start(argptr, fmt);
-  Q_vsnprintf(message, sizeof(message), fmt, argptr);
+  V_vsprintf_safe(message, fmt, argptr);
   va_end(argptr);
 
   // Get current text and append it.
@@ -247,6 +249,22 @@ class ScopedThreadSEHTranslator {
 DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
                              int cmd_show) {
   SetAppInstance(instance);
+
+  // Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also sets
+  // LANG to en_US.UTF-8 before starting up (in info.plist I believe).
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  //
+  // Need to double check that localization for libcef is handled correctly when
+  // slam things to en_US.UTF-8.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    Warning("setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
 
   const CPUInformation *cpu_info{GetCPUInformation()};
   if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||

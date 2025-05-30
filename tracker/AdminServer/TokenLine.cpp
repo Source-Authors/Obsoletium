@@ -96,7 +96,7 @@ char * TokenLine::GetToken(int i)
 
 // if the given parm is not present return NULL
 // otherwise return the address of the following token, or an empty string
-char* TokenLine::CheckToken(char * parm)
+char* TokenLine::CheckToken(const char * parm)
 {
 	for (int i = 0 ; i < m_tokenNumber; i ++)
 	{
@@ -136,14 +136,14 @@ char* TokenLine::GetRestOfLine(int i)
 
 TokenLine::TokenLine(char * string)
 {
-	memset(m_token, 0, sizeof(m_token));
+	BitwiseClear(m_token);
 	SetLine(string);
 }
 
 TokenLine::TokenLine()
 {
-	memset(m_tokenBuffer, 0, sizeof(m_tokenBuffer));
-	memset(m_fullLine, 0, sizeof(m_fullLine));
-	memset(m_token, 0, sizeof(m_token));
+	BitwiseClear(m_tokenBuffer);
+	BitwiseClear(m_fullLine);
+	BitwiseClear(m_token);
 	m_tokenNumber = 0;
 }

@@ -80,6 +80,8 @@ private:
 	static int GetListIndex( UtlHandle_t handle );
 	static UtlHandle_t CreateHandle( unsigned int nSerial, unsigned int nIndex );
 	const EntryType_t *GetEntry( UtlHandle_t handle, bool checkValidity ) const;
+	// dimhotepus: Add non-const version to prevent const-away casts.
+	EntryType_t *GetEntry( UtlHandle_t handle, bool checkValidity );
 
 	int m_nValidHandles;
 	CUtlVector< EntryType_t > m_list;
@@ -155,7 +157,7 @@ void CUtlHandleTable<T, HandleBits>::RemoveHandle( UtlHandle_t handle )
 template< class T, int HandleBits >
 void CUtlHandleTable<T, HandleBits>::SetHandle( UtlHandle_t handle, T *pData )
 {
-	EntryType_t *entry = const_cast< EntryType_t* >( GetEntry( handle, false ) );
+	EntryType_t *entry = GetEntry( handle, false );
 	Assert( entry );
 	if ( entry == NULL )
 		return;
@@ -297,6 +299,33 @@ const typename CUtlHandleTable<T, HandleBits>::EntryType_t *CUtlHandleTable<T, H
 
 	return &entry;
 }
+
+
+//-----------------------------------------------------------------------------
+// Looks up a entry by handle
+//-----------------------------------------------------------------------------
+template< class T, int HandleBits >
+typename CUtlHandleTable<T, HandleBits>::EntryType_t *CUtlHandleTable<T, HandleBits>::GetEntry( UtlHandle_t handle, bool checkValidity )
+{
+	if ( handle == UTLHANDLE_INVALID )
+		return NULL;
+
+	int nIndex = GetListIndex( handle );
+	Assert( nIndex < m_list.Count() );
+	if ( nIndex >= m_list.Count() )
+		return NULL;
+
+	EntryType_t &entry = m_list[ nIndex ];
+	if ( entry.m_nSerial != GetSerialNumber( handle ) )
+		return NULL;
+
+	if ( checkValidity &&
+		( 1 == entry.nInvalid ) )
+		return NULL;
+
+	return &entry;
+}
+
 
 template< class T, int HandleBits >
 void CUtlHandleTable<T, HandleBits>::MarkHandleInvalid( UtlHandle_t handle )

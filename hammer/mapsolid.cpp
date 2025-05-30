@@ -965,7 +965,8 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 			{
 				DeleteFace(nFace);
 
-				memcpy(useplane + nFace, useplane + nFace + 1, MAPSOLID_MAX_FACES - (nFace + 1));
+				// dimhotepus: memcpy -> memmove as src and dest overlaps! 
+				memmove(useplane + nFace, useplane + nFace + 1, MAPSOLID_MAX_FACES - (nFace + 1));
 			}
 		}
 	}

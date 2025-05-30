@@ -5,12 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-
-#include <cstdio>
-#include <cmath>
+#include <vgui/IScheme.h>
 
 #include <vgui/VGUI.h>
-#include <vgui/IScheme.h>
 #include <tier1/KeyValues.h>
 #include <vgui/ISurface.h>
 #include <vgui/IPanel.h>
@@ -371,9 +368,7 @@ HScheme  CSchemeManager::LoadSchemeFromFileEx( VPANEL sizingPanel, const char *f
 		return hScheme;
 	}
 
-	KeyValues *data;
-	data = new KeyValues("Scheme");
-
+	KeyValues *data = new KeyValues("Scheme");
 	data->UsesEscapeSequences( true );	// VGUI uses this
 	
 	// Look first in game directory
@@ -715,9 +710,9 @@ void CScheme::LoadFonts()
 						if ( pRange )
 						{
 							bUseRange = true;
-							sscanf( pRange->GetString(), "%x %x", &nRangeMin, &nRangeMax );
-
-							if ( nRangeMin > nRangeMax )
+							// dimhotepus: Check font range is valid before swap.
+							if ( sscanf( pRange->GetString(), "%x %x", &nRangeMin, &nRangeMax ) == 2 &&
+								 nRangeMin > nRangeMax )
 							{
 								std::swap(nRangeMin, nRangeMax);
 							}
@@ -1010,10 +1005,10 @@ void CScheme::LoadBorders()
 			Assert(border);
 
 			// add an entry that just references the existing border
-			auto i = m_BorderList.AddToTail();
-			m_BorderList[i].border = border;
-			m_BorderList[i].bSharedBorder = true;
-			m_BorderList[i].borderSymbol = kv->GetNameSymbol();
+			auto &vborder = m_BorderList[m_BorderList.AddToTail()];
+			vborder.border = border;
+			vborder.bSharedBorder = true;
+			vborder.borderSymbol = kv->GetNameSymbol();
 		}
 	}
 	

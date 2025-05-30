@@ -352,13 +352,13 @@ void ReceivePortalFlow( uint64 iWorkUnit, MessageBuffer *pBuf, int iWorker )
 }
 
 
-DWORD WINAPI PortalMCThreadFn( LPVOID p )
+unsigned WINAPI PortalMCThreadFn( void* p )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("VmpiVvis");
 
 	CUtlVector<char> data;
-	data.SetSize( portalbytes + 128 );
+	data.SetCount( static_cast<intp>(portalbytes) + 128 );
 
 	DWORD waitTime = 0;
 	while ( WaitForSingleObject( g_MCThreadExitEvent.GetEventHandle(), waitTime ) != WAIT_OBJECT_0 )
@@ -372,7 +372,7 @@ DWORD WINAPI PortalMCThreadFn( LPVOID p )
 		else
 		{
 			// These lengths must match exactly what is sent in ReceivePortalFlow.
-			if ( len == 2 + sizeof( g_PortalMCThreadUniqueID ) + sizeof( int ) + portalbytes )
+			if ( len == 2 + static_cast<int>(sizeof( g_PortalMCThreadUniqueID )) + static_cast<int>(sizeof( int )) + portalbytes )
 			{
 				// Perform more validation...
 				if ( data[0] == VMPI_VVIS_PACKET_ID && data[1] == VMPI_PORTALFLOW_RESULTS )
@@ -405,7 +405,7 @@ void MCThreadCleanupFn()
 {
 	g_MCThreadExitEvent.SetEvent();
 }
-		
+
 
 // --------------------------------------------------------------------------------- //
 // Cheesy hack to let them stop the job early and keep the results of what has
@@ -540,7 +540,7 @@ void RunMPIPortalFlow()
 		CUniformRandomStream randomStream;
 		randomStream.SetSeed( cnt.GetMicroseconds() );
 
-		g_PortalMCAddr.port = randomStream.RandomInt( 22000, 25000 ); // Pulled out of something else.
+		g_PortalMCAddr.port = static_cast<uint16_t>(randomStream.RandomInt( 22000, 25000 )); // Pulled out of something else.
 		g_PortalMCAddr.ip[0] = (unsigned char)RandomInt( 225, 238 );
 		g_PortalMCAddr.ip[1] = (unsigned char)RandomInt( 0, 255 );
 		g_PortalMCAddr.ip[2] = (unsigned char)RandomInt( 0, 255 );
@@ -550,7 +550,7 @@ void RunMPIPortalFlow()
 		int i=0;
 		for ( i; i < 5; i++ )
 		{
-			if ( g_pPortalMCSocket->BindToAny( randomStream.RandomInt( 20000, 30000 ) ) )
+			if ( g_pPortalMCSocket->BindToAny( static_cast<unsigned short>( randomStream.RandomInt( 20000, 30000 ) ) ) )
 				break;
 		}
 		if ( i == 5 )
@@ -579,19 +579,18 @@ void RunMPIPortalFlow()
 		}
 
 		// Make a thread to listen for the data on the multicast socket.
-		DWORD dwDummy = 0;
 		g_MCThreadExitEvent.Init( false, false );
 
 		// Make sure we kill the MC thread if the app exits ungracefully.
 		CmdLib_AtCleanup( MCThreadCleanupFn );
 		
-		g_hMCThread = CreateThread( 
-			NULL,
+		g_hMCThread = reinterpret_cast<HANDLE>(_beginthreadex( 
+			nullptr,
 			0,
 			PortalMCThreadFn,
-			NULL,
+			nullptr,
 			0,
-			&dwDummy );
+			nullptr ));
 
 		if ( !g_hMCThread )
 		{

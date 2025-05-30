@@ -85,7 +85,7 @@ static void BlendFlexValues( AttributeValue_t *pResult, const AttributeValue_t &
 //-----------------------------------------------------------------------------
 class CPresetSideFilterSlider : public Slider
 {
-	DECLARE_CLASS_SIMPLE( CPresetSideFilterSlider, Slider );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPresetSideFilterSlider, Slider );
 
 public:
 	CPresetSideFilterSlider( CBaseAnimSetAttributeSliderPanel *pParent, const char *panelName );
@@ -95,21 +95,23 @@ public:
 	void		SetPos( float frac );
 
 protected:
-	virtual void Paint();
-	virtual void PaintBackground();
-	virtual void ApplySchemeSettings( IScheme *scheme );
-	virtual void GetTrackRect( int &x, int &y, int &w, int &h );
-	virtual void OnMousePressed(MouseCode code);
-	virtual void OnMouseDoublePressed(MouseCode code);
+	void Paint() override;
+	void PaintBackground() override;
+	void ApplySchemeSettings( IScheme *scheme ) override;
+	void GetTrackRect( int &x, int &y, int &w, int &h ) override;
+	void OnMousePressed(MouseCode code) override;
+	void OnMouseDoublePressed(MouseCode code) override;
 
 private:
-	CBaseAnimSetAttributeSliderPanel	*m_pParent;
+	// dimhotepus: Comment unused field.
+	//CBaseAnimSetAttributeSliderPanel	*m_pParent;
 
 	Color			m_ZeroColor;
 	Color			m_TextColor;
 	Color			m_TextColorFocus;
 	TextImage		*m_pName;
-	float			m_flCurrent;
+	// dimhotepus: Comment unused field.
+	// float			m_flCurrent;
 };
 
 
@@ -117,7 +119,7 @@ private:
 // Constructor, destructor
 //-----------------------------------------------------------------------------
 CPresetSideFilterSlider::CPresetSideFilterSlider( CBaseAnimSetAttributeSliderPanel *parent, const char *panelName ) :
-	BaseClass( (Panel *)parent, panelName ), m_pParent( parent )
+	BaseClass( (Panel *)parent, panelName ) // dimhotepus: Comment unused field. , m_pParent( parent )
 {
 	SetRange( 0, 1000 );
 	SetDragOnRepositionNob( true );
@@ -230,11 +232,11 @@ void CPresetSideFilterSlider::PaintBackground()
 CBaseAnimSetAttributeSliderPanel::CBaseAnimSetAttributeSliderPanel( vgui::Panel *parent, const char *className, CBaseAnimationSetEditor *editor ) :
 	BaseClass( parent, className ),
 	m_flEstimatedValue( 0.0f ),
+	m_nFaderChangeFlags( 0 ),
+	m_bRequestedNewPreview( false ),
 	m_ChannelToSliderLookup( 0, 0, ChannelToSliderLookup_t::Less ),
 	m_flRecomputePreviewTime( -1.0 ),
-	m_bRequestedNewPreview( false ),
-	m_flPrevTime( 0.0 ),
-	m_nFaderChangeFlags( 0 )
+	m_flPrevTime( 0.0 )
 {
 	m_hEditor = editor;
 
@@ -275,7 +277,7 @@ void CBaseAnimSetAttributeSliderPanel::OnCommand( const char *pCommand )
 	BaseClass::OnCommand( pCommand );
 }
 
-void CBaseAnimSetAttributeSliderPanel::StampValueIntoLogs( CDmElement *control, AnimationControlType_t type, float flValue )
+void CBaseAnimSetAttributeSliderPanel::StampValueIntoLogs( CDmElement *, AnimationControlType_t, float )
 {
 }
 

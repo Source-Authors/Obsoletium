@@ -5,29 +5,18 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
-
 #include "vgui_controls/BitmapImagePanel.h"
+
+#include "tier1/KeyValues.h"
+
 #include "vgui/ISurface.h"
 #include "vgui/IScheme.h"
 #include "vgui/IBorder.h"
-#include "KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
-
-//-----------------------------------------------------------------------------
-/**
- * Simple utility function to allocate memory and duplicate a string
- */
-static inline char *CloneString( const char *str )
-{
-	char *cloneStr = new char [ strlen(str)+1 ];
-	strcpy( cloneStr, str );
-	return cloneStr;
-}
 
 DECLARE_BUILD_FACTORY_DEFAULT_TEXT( CBitmapImagePanel, BitmapImagePanel );
 
@@ -51,7 +40,7 @@ CBitmapImagePanel::CBitmapImagePanel( Panel *parent, char const *panelName,
 	if ( filename && filename[ 0 ] )
 	{
 		m_pImage = scheme()->GetImage( filename, NULL );
-		m_pszImageName = CloneString( filename );
+		m_pszImageName = V_strdup( filename );
 	}
 
 	m_bgColor = Color(255, 255, 255, 255);
@@ -193,7 +182,7 @@ void CBitmapImagePanel::setTexture( char const *filename, bool hardwareFiltered 
 	if ( filename && filename[ 0 ] )
 	{
 		m_pImage = scheme()->GetImage( filename, m_hardwareFiltered );
-		m_pszImageName = CloneString( filename );
+		m_pszImageName = V_strdup( filename );
 	}
 	else
 	{
@@ -269,7 +258,7 @@ void CBitmapImagePanel::ApplySettings(KeyValues *inResourceData)
 	const char *colorName = inResourceData->GetString("imagecolor", "");
 	if (*colorName)
 	{
-		m_pszColorName = CloneString( colorName );
+		m_pszColorName = V_strdup( colorName );
 		InvalidateLayout(false,true); // force ApplySchemeSettings to run
 	}
 

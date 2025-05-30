@@ -141,7 +141,7 @@ void CMaterialDict::RemoveAllMaterialsFromMaterialList()
 
 void CMaterialDict::RemoveAllMaterials()
 {
-	Assert( ThreadInMainThread() );
+	AUTO_LOCK(m_MaterialDictMutex);
 
 	// First remove all the subrect materials, because they'll point at their material pages.
 	MaterialHandle_t iNext;

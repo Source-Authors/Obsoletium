@@ -46,13 +46,13 @@ public:
 	CUtlCharConversion( char nEscapeChar, const char *pDelimiter, intp nCount, ConversionArray_t *pArray );
 	virtual ~CUtlCharConversion() {}
 
-	char GetEscapeChar() const;
-	const char *GetDelimiter() const;
-	intp GetDelimiterLength() const;
+	[[nodiscard]] char GetEscapeChar() const;
+	[[nodiscard]] const char *GetDelimiter() const;
+	[[nodiscard]] intp GetDelimiterLength() const;
 
-	const char *GetConversionString( char c ) const;
-	intp GetConversionLength( char c ) const;
-	intp MaxConversionLength() const;
+	[[nodiscard]] const char *GetConversionString( char c ) const;
+	[[nodiscard]] intp GetConversionLength( char c ) const;
+	[[nodiscard]] intp MaxConversionLength() const;
 
 	// Finds a conversion for the passed-in string, returns length
 	virtual char FindConversion( const char *pString, intp *pLength ) const;
@@ -90,12 +90,12 @@ protected:
 //-----------------------------------------------------------------------------
 // Character conversions for C strings
 //-----------------------------------------------------------------------------
-CUtlCharConversion *GetCStringCharConversion();
+[[nodiscard]] CUtlCharConversion *GetCStringCharConversion();
 
 //-----------------------------------------------------------------------------
 // Character conversions for quoted strings, with no escape sequences
 //-----------------------------------------------------------------------------
-CUtlCharConversion *GetNoEscCharConversion();
+[[nodiscard]] CUtlCharConversion *GetNoEscCharConversion();
 
 
 //-----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ public:
 	// This one isn't actually defined so that we catch contructors that are trying to pass a bool in as the third param.
 	CUtlBuffer( const void *pBuffer, intp size, bool crap ) = delete;
 
-	unsigned char	GetFlags() const;
+	[[nodiscard]] unsigned char	GetFlags() const;
 
 	// NOTE: This will assert if you attempt to recast it in a way that
 	// is not compatible. The only valid conversion is binary-> text w/CRLF
@@ -148,7 +148,7 @@ public:
 
 	// Attaches the buffer to external memory....
 	void			SetExternalBuffer( void* pMemory, intp nSize, intp nInitialPut, int nFlags = 0 );
-	bool			IsExternallyAllocated() const;
+	[[nodiscard]] bool			IsExternallyAllocated() const;
 	// Takes ownership of the passed memory, including freeing it when this buffer is destroyed.
 	void			AssumeMemory( void *pMemory, intp nSize, intp nInitialPut, int nFlags = 0 );
 
@@ -161,8 +161,6 @@ public:
 
 	FORCEINLINE void ActivateByteSwappingIfBigEndian()
 	{
-		if ( IsX360() )
-			ActivateByteSwapping( true );
 	}
 
 
@@ -182,29 +180,44 @@ public:
 	//		read for strings until a null character is reached.
 	// Text mode: it'll parse the file, turning text #s into real numbers.
 	//		GetString will read a string until a space is reached
-	char			GetChar( );
-	unsigned char	GetUnsignedChar( );
-	short			GetShort( );
-	unsigned short	GetUnsignedShort( );
-	int				GetInt( );
-	int64			GetInt64( );
-	int				GetIntHex( );
-	unsigned int	GetUnsignedInt( );
-	uint64			GetUint64( );
-	float			GetFloat( );
-	double			GetDouble( );
-	template <size_t maxLenInChars> void GetString( char( &pString )[maxLenInChars] )
+	[[nodiscard]] char			GetChar( );
+	[[nodiscard]] unsigned char	GetUnsignedChar( );
+	[[nodiscard]] short			GetShort( );
+	[[nodiscard]] unsigned short	GetUnsignedShort( );
+	[[nodiscard]] int				GetInt( );
+	[[nodiscard]] int64			GetInt64( );
+	[[nodiscard]] int				GetIntHex( );
+	[[nodiscard]] unsigned int	GetUnsignedInt( );
+	[[nodiscard]] uint64			GetUint64( );
+	[[nodiscard]] float			GetFloat( );
+	[[nodiscard]] double			GetDouble( );
+	template <size_t maxLenInChars> void GetString( OUT_Z_ARRAY char( &pString )[maxLenInChars] )
 	{
 		GetStringInternal( pString, maxLenInChars );
 	}
 
-	void GetStringManualCharCount( char *pString, size_t maxLenInChars )
+	void GetStringManualCharCount( OUT_Z_CAP(maxLenInChars) char *pString, size_t maxLenInChars )
 	{
 		GetStringInternal( pString, maxLenInChars );
 	}
 
-	void			Get( void* pMem, intp size );
-	void			GetLine( char* pLine, intp nMaxChars = 0 );
+	bool Get( OUT_BYTECAP(size) void* pMem, intp size );
+	template<typename T>
+	std::enable_if_t<!std::is_pointer_v<T>, bool> Get( T &mem )
+	{
+		return Get( &mem, static_cast<intp>(sizeof(T)) );
+	}
+	template<typename T, intp size>
+	bool Get( T (&mem)[size] )
+	{
+		return Get( &mem, static_cast<intp>(sizeof(T)) * size );
+	}
+	void GetLine( char* pLine, intp nMaxChars = 0 );
+	template<intp maxSize>
+	void GetLine( char (&pLine)[maxSize] )
+	{
+		GetLine( pLine, maxSize );
+	}
 
 	// Used for getting objects that have a byteswap datadesc defined
 	template <typename T> void GetObjects( T *dest, intp count = 1 );
@@ -216,13 +229,13 @@ public:
 	// This version of GetString converts \" to \\ and " to \, etc.
 	// It also reads a " at the beginning and end of the string
 	void			GetDelimitedString( CUtlCharConversion *pConv, char *pString, intp nMaxChars = 0 );
-	char			GetDelimitedChar( CUtlCharConversion *pConv );
+	[[nodiscard]] char			GetDelimitedChar( CUtlCharConversion *pConv );
 
 	// This will return the # of characters of the string about to be read out
 	// NOTE: The count will *include* the terminating 0!!
 	// In binary mode, it's the number of characters until the next 0
 	// In text mode, it's the number of characters until the next space.
-	intp				PeekStringLength();
+	[[nodiscard]] intp				PeekStringLength();
 
 	// This version of PeekStringLength converts \" to \\ and " to \, etc.
 	// It also reads a " at the beginning and end of the string
@@ -232,7 +245,7 @@ public:
 	// Specifying false for bActualSize will return the pre-translated number of characters
 	// including the delimiters and the escape characters. So, \n counts as 2 characters when bActualSize == false
 	// and only 1 character when bActualSize == true
-	intp				PeekDelimitedStringLength( CUtlCharConversion *pConv, bool bActualSize = true );
+	[[nodiscard]] intp				PeekDelimitedStringLength( CUtlCharConversion *pConv, bool bActualSize = true );
 
 	// Just like scanf, but doesn't work in binary mode
 	intp				Scanf( SCANF_FORMAT_STRING const char* pFmt, ... );
@@ -250,16 +263,36 @@ public:
 	// (skipping whitespace that leads + trails both delimiters).
 	// If successful, the get index is advanced and the function returns true,
 	// otherwise the index is not advanced and the function returns false.
-	bool			ParseToken( const char *pStartingDelim, const char *pEndingDelim, char* pString, intp nMaxLen );
+	[[nodiscard]] bool			ParseToken( const char *pStartingDelim, const char *pEndingDelim, char* pString, intp nMaxLen );
+
+	// (For text buffers only)
+	// Parse a token from the buffer:
+	// Grab all text that lies between a starting delimiter + ending delimiter
+	// (skipping whitespace that leads + trails both delimiters).
+	// If successful, the get index is advanced and the function returns true,
+	// otherwise the index is not advanced and the function returns false.
+	template<intp size>
+	[[nodiscard]] bool ParseToken( const char *pStartingDelim, const char *pEndingDelim, char (&pString)[size] )
+	{
+		return ParseToken( pStartingDelim, pEndingDelim, pString, size );
+	}
 
 	// Advance the get index until after the particular string is found
 	// Do not eat whitespace before starting. Return false if it failed
 	// String test is case-insensitive.
-	bool			GetToken( const char *pToken );
+	[[nodiscard]] bool			GetToken( const char *pToken );
 
 	// Parses the next token, given a set of character breaks to stop at
 	// Returns the length of the token parsed in bytes (-1 if none parsed)
-	intp				ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
+	[[nodiscard]] intp			ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
+
+	// Parses the next token, given a set of character breaks to stop at
+	// Returns the length of the token parsed in bytes (-1 if none parsed)
+	template<intp size>
+	[[nodiscard]] intp ParseToken( characterset_t *pBreaks, char (&pTokenBuf)[size], bool bParseComments = true )
+	{
+		return ParseToken( pBreaks, pTokenBuf, size, bParseComments );
+	}
 
 	// Write stuff in
 	// Binary mode: it'll just write the bits directly in, and strings will be
@@ -279,6 +312,11 @@ public:
 	void			PutDouble( double d );
 	void			PutString( const char* pString );
 	void			Put( const void* pMem, intp size );
+	template<typename T> 
+	std::enable_if_t<!std::is_pointer_v<T>> Put( const T &pMem )
+	{
+		Put( &pMem, static_cast<intp>( sizeof(pMem) ) );
+	}
 
 	// Used for putting objects that have a byteswap datadesc defined
 	template <typename T> void PutObjects( T *src, intp count = 1 );
@@ -293,53 +331,53 @@ public:
 	void			VaPrintf( const char* pFmt, va_list list );
 
 	// What am I writing (put)/reading (get)?
-	void* PeekPut( intp offset = 0 );
-	const void* PeekGet( intp offset = 0 ) const;
-	const void* PeekGet( intp nMaxSize, intp nOffset );
+	[[nodiscard]] void* PeekPut( intp offset = 0 );
+	[[nodiscard]] const void* PeekGet( intp offset = 0 ) const;
+	[[nodiscard]] const void* PeekGet( intp nMaxSize, intp nOffset );
 
 	// Where am I writing (put)/reading (get)?
-	intp TellPut( ) const;
-	intp TellGet( ) const;
+	[[nodiscard]] intp TellPut( ) const;
+	[[nodiscard]] intp TellGet( ) const;
 
 	// What's the most I've ever written?
-	intp TellMaxPut( ) const;
+	[[nodiscard]] intp TellMaxPut( ) const;
 
 	// How many bytes remain to be read?
 	// NOTE: This is not accurate for streaming text files; it overshoots
-	intp GetBytesRemaining() const;
+	[[nodiscard]] intp GetBytesRemaining() const;
 
 	// Change where I'm writing (put)/reading (get)
 	void SeekPut( SeekType_t type, intp offset );
 	void SeekGet( SeekType_t type, intp offset );
 
 	// Buffer base
-	const void* Base() const;
-	void* Base();
+	[[nodiscard]] const void* Base() const;
+	[[nodiscard]] void* Base();
 	template<typename T>
-	const T* Base() const { return static_cast<const T*>(Base()); }
+	[[nodiscard]] const T* Base() const { return static_cast<const T*>(Base()); }
 	template<typename T>
-	T* Base() { return static_cast<T*>(Base()); }
+	[[nodiscard]] T* Base() { return static_cast<T*>(Base()); }
 	// Returns the base as a const char*, only valid in text mode.
-	const char *String() const;
+	[[nodiscard]] const char *String() const;
 
 	// memory allocation size, does *not* reflect size written or read,
 	//	use TellPut or TellGet for that
-	intp Size() const;
+	[[nodiscard]] intp Size() const;
 
 	// Am I a text buffer?
-	bool IsText() const;
+	[[nodiscard]] bool IsText() const;
 
 	// Can I grow if I'm externally allocated?
-	bool IsGrowable() const;
+	[[nodiscard]] bool IsGrowable() const;
 
 	// Am I valid? (overflow or underflow error), Once invalid it stays invalid
-	bool IsValid() const;
+	[[nodiscard]] bool IsValid() const;
 
 	// Do I contain carriage return/linefeeds? 
-	bool ContainsCRLF() const;
+	[[nodiscard]] bool ContainsCRLF() const;
 
 	// Am I read-only
-	bool IsReadOnly() const;
+	[[nodiscard]] bool IsReadOnly() const;
 
 	// Converts a buffer from a CRLF buffer to a CR buffer (and back)
 	// Returns false if no conversion was necessary (and outBuf is left untouched)
@@ -364,44 +402,44 @@ protected:
 
 	void SetOverflowFuncs( UtlBufferOverflowFunc_t getFunc, UtlBufferOverflowFunc_t putFunc );
 
-	bool OnPutOverflow( intp nSize );
-	bool OnGetOverflow( intp nSize );
+	[[nodiscard]] bool OnPutOverflow( intp nSize );
+	[[nodiscard]] bool OnGetOverflow( intp nSize );
 
 protected:
 	// Checks if a get/put is ok
-	bool CheckPut( intp size );
-	bool CheckGet( intp size );
+	[[nodiscard]] bool CheckPut( intp size );
+	[[nodiscard]] bool CheckGet( intp size );
 
 	void AddNullTermination( );
 
 	// Methods to help with pretty-printing
-	bool WasLastCharacterCR();
+	[[nodiscard]] bool WasLastCharacterCR();
 	void PutTabs();
 
 	// Help with delimited stuff
-	char GetDelimitedCharInternal( CUtlCharConversion *pConv );
+	[[nodiscard]] char GetDelimitedCharInternal( CUtlCharConversion *pConv );
 	void PutDelimitedCharInternal( CUtlCharConversion *pConv, char c );
 
 	// Default overflow funcs
-	bool PutOverflow( intp nSize );
-	bool GetOverflow( intp nSize );
+	[[nodiscard]] bool PutOverflow( intp nSize );
+	[[nodiscard]] bool GetOverflow( intp nSize );
 
 	// Does the next bytes of the buffer match a pattern?
-	bool PeekStringMatch( intp nOffset, const char *pString, intp nLen );
+	[[nodiscard]] bool PeekStringMatch( intp nOffset, const char *pString, intp nLen );
 
 	// Peek size of line to come, check memory bound
-	intp	PeekLineLength();
+	[[nodiscard]] intp	PeekLineLength();
 
 	// How much whitespace should I skip?
-	intp PeekWhiteSpace( intp nOffset );
+	[[nodiscard]] intp PeekWhiteSpace( intp nOffset );
 
 	// Checks if a peek get is ok
-	bool CheckPeekGet( intp nOffset, intp nSize );
+	[[nodiscard]] bool CheckPeekGet( intp nOffset, intp nSize );
 
 	// Call this to peek arbitrarily long into memory. It doesn't fail unless
 	// it can't read *anything* new
-	bool CheckArbitraryPeekGet( intp nOffset, intp &nIncrement );
-	void GetStringInternal( char *pString, size_t maxLenInChars );
+	[[nodiscard]] bool CheckArbitraryPeekGet( intp nOffset, intp &nIncrement );
+	void GetStringInternal( OUT_Z_CAP(maxLenInChars) char *pString, size_t maxLenInChars );
 
 	template <typename T> void GetType( T& dest, const char *pszFmt );
 	template <typename T> void GetTypeBin( T& dest );
@@ -418,9 +456,6 @@ protected:
 	unsigned char m_Error;
 	unsigned char m_Flags;
 	unsigned char m_Reserved;  //-V730_NOINIT
-#if defined( _X360 )
-	unsigned char pad;
-#endif
 
 	intp m_nTab;
 	intp m_nMaxPut;
@@ -564,7 +599,7 @@ public:
 	// @returns	ptr-to-zero-terminated-line		if line was successfully read and buffer modified
 	//			NULL							when EOF is reached or error occurs
 	//
-	char * InplaceGetLinePtr();
+	[[nodiscard]] char * InplaceGetLinePtr();
 };
 
 
@@ -606,11 +641,11 @@ inline void CUtlBuffer::GetObject( T *dest )
 	{
 		if ( !m_Byteswap.IsSwappingBytes() || ( sizeof( T ) == 1 ) )
 		{
-			*dest = *(T *)PeekGet();
+			*dest = *(const T *)PeekGet();
 		}
 		else
 		{
-			m_Byteswap.SwapFieldsToTargetEndian<T>( dest, (T*)PeekGet() );
+			m_Byteswap.SwapFieldsToTargetEndian<T>( dest, (const T*)PeekGet() );
 		}
 		m_Get += sizeof(T);	
 	}
@@ -638,18 +673,18 @@ inline void CUtlBuffer::GetTypeBin( T &dest )
 	{
 		if ( !m_Byteswap.IsSwappingBytes() || ( sizeof( T ) == 1 ) )
 		{
-			dest = *(T *)PeekGet();
+			dest = *(const T *)PeekGet();
 		}
 		else
 		{
-			m_Byteswap.SwapBufferToTargetEndian<T>( &dest, (T*)PeekGet() );
+			m_Byteswap.SwapBufferToTargetEndian<T>( &dest, (const T*)PeekGet() );
 		}
-		m_Get += sizeof(T);	
-	}		
+		m_Get += sizeof(T);
+	}
 	else
 	{
 		dest = 0;
-	}					
+	}
 }
 
 template <>

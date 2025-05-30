@@ -270,7 +270,7 @@ void CStudioRenderContext::LoadMaterials( studiohdr_t *phdr,
 			if ( pCdTexture[0] == CORRECT_PATH_SEPARATOR || pCdTexture[0] == INCORRECT_PATH_SEPARATOR )
 				++pCdTexture;
 
-			V_ComposeFileName( pCdTexture, textureName, szPath, sizeof( szPath ) );
+			V_ComposeFileName( pCdTexture, textureName, szPath );
 
 			if ( phdr->flags & STUDIOHDR_FLAGS_OBSOLETE )
 			{
@@ -418,10 +418,10 @@ int CStudioRenderContext::CountFlexedVertices( mstudiomesh_t* pMesh, OptimizedMo
 // Determine if any strip groups shouldn't be morphed
 //-----------------------------------------------------------------------------
 static int* s_pVertexCount;
-static int SortVertCount( const void *arg1, const void *arg2 )
+static bool SortVertCount( int arg1, int arg2 )
 {
 	/* Compare all of both strings: */
-	return s_pVertexCount[*( const int* )arg2] - s_pVertexCount[*( const int* )arg1];
+	return s_pVertexCount[arg2] - s_pVertexCount[arg1] < 0;
 }
 
 #define MIN_HWMORPH_FLEX_COUNT 200
@@ -458,7 +458,7 @@ void CStudioRenderContext::DetermineHWMorphing( mstudiomodel_t *pModel, Optimize
 
 	// FIXME: We should do this at studiomdl time?
 	// Certainly counting the # of flexed vertices can be done at studiomdl time.
-	int *pVertexCount = (int*)_alloca( nFlexedStripGroup * sizeof(int) );
+	int *pVertexCount = stackallocT( int, nFlexedStripGroup );
 	int nCount = 0;
 	for ( int k = 0; k < pModel->nummeshes; ++k )
 	{
@@ -475,15 +475,15 @@ void CStudioRenderContext::DetermineHWMorphing( mstudiomodel_t *pModel, Optimize
 		}
 	}
 
-	int *pSortedVertexIndices = (int*)_alloca( nFlexedStripGroup * sizeof(int) );
+	int *pSortedVertexIndices = stackallocT( int, nFlexedStripGroup);
 	for ( int i = 0; i < nFlexedStripGroup; ++i )
 	{
 		pSortedVertexIndices[i] = i;
 	}
 	s_pVertexCount = pVertexCount;
-	qsort( pSortedVertexIndices, nCount, sizeof(int), SortVertCount );
+	std::sort( pSortedVertexIndices, pSortedVertexIndices + nCount, SortVertCount );
 
-	bool *pSuppressHWMorph = (bool*)_alloca( nFlexedStripGroup * sizeof(bool) ); 
+	bool *pSuppressHWMorph = stackallocT( bool, nFlexedStripGroup ); 
 	memset(	pSuppressHWMorph, 1, nFlexedStripGroup * sizeof(bool) );
 	for ( int i = 0; i < nMaxHWMorphBatchCount; ++i )
 	{
@@ -1647,7 +1647,7 @@ int CStudioRenderContext::GetMaterialList( studiohdr_t *pStudioHdr, int count, I
 			if ( pCdTexture[0] == CORRECT_PATH_SEPARATOR || pCdTexture[0] == INCORRECT_PATH_SEPARATOR )
 				++pCdTexture;
 
-			V_ComposeFileName( pCdTexture, textureName, szPath, sizeof( szPath ) );
+			V_ComposeFileName( pCdTexture, textureName, szPath );
 
 			if ( pStudioHdr->flags & STUDIOHDR_FLAGS_OBSOLETE )
 			{
@@ -1815,11 +1815,11 @@ void CStudioRenderContext::GetPerfStats( DrawModelResults_t *pResults, const Dra
 			{
 				pSpewBuf->Printf( "        numPasses:%d\n", numPasses );
 			}
-			int bytes = pMaterial->GetTextureMemoryBytes();
+			intp bytes = pMaterial->GetTextureMemoryBytes();
 			pResults->m_TextureMemoryBytes += bytes;
 			if( pSpewBuf )
 			{
-				pSpewBuf->Printf( "        texture memory: %d (Only valid in a rendering app)\n", bytes );
+				pSpewBuf->Printf( "        texture memory: %zd (Only valid in a rendering app)\n", bytes );
 			}
 
 			// Iterate over all stripgroups
@@ -2015,8 +2015,8 @@ void CStudioRenderContext::SetLocalLights( int nLightCount, const LightDesc_t *p
 	{
 		int i;
 		int nMaxLightCount = g_pMaterialSystemHardwareConfig->MaxNumLights();
-		int nLightCount = min( m_RC.m_NumLocalLights, nMaxLightCount );
-		for( i = 0; i < nLightCount; i++ )
+		int nLocalLightCount = min( m_RC.m_NumLocalLights, nMaxLightCount );
+		for( i = 0; i < nLocalLightCount; i++ )
 		{
 			pRenderContext->SetLight( i, m_RC.m_LocalLights[i] );
 		}

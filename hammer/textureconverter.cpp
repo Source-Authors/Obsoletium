@@ -399,7 +399,7 @@ bool CTextureConverter::TextureNameMatchesMaterialName( const char * pszTextureN
 	}
 
 	// No '/' found in the VMT name, or the name ended in a '/'.  This shouldn't happen.
-	if ( ( pszPartialMaterialName == NULL ) || strlen( pszPartialMaterialName ) == 0 )
+	if ( ( pszPartialMaterialName == NULL ) || Q_isempty( pszPartialMaterialName ) )
 		return false;
 
 	if ( stricmp( pszTextureName, pszPartialMaterialName ) == 0 )
@@ -573,7 +573,7 @@ void CTextureConverter::MsgConvertFace( CMapFace * pFace, PRINTF_FORMAT_STRING c
 	pFace->GetCenter( vecFaceCenter );
 
 	va_start( ptr, format );
-	_vsnprintf( message, 1024, format, ptr );
+	V_vsprintf_safe( message, format, ptr );
 	va_end( ptr );
 
 	Msg(	mwStatus,
@@ -603,7 +603,7 @@ void CTextureConverter::MsgConvertDecal( CMapEntity * pEnt, PRINTF_FORMAT_STRING
 	pEnt->GetOrigin( vecOrigin );
 
 	va_start( ptr, format );
-	_vsnprintf( message, 1024, format, ptr );
+	V_vsprintf_safe( message, format, ptr );
 	va_end( ptr );
 
 	Msg(	mwStatus,

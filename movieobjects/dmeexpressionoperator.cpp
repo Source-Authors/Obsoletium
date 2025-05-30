@@ -43,7 +43,7 @@ bool ParseString( const char *&expr, const char *str )
 	return false;
 }
 
-bool ParseStringList( const char *&expr, const char **pOps, int &nOp )
+bool ParseStringList( const char *&expr, const char **pOps, intp &nOp )
 {
 	while ( nOp-- )
 	{
@@ -53,7 +53,7 @@ bool ParseStringList( const char *&expr, const char **pOps, int &nOp )
 	return false;
 }
 
-bool ParseStringList( const char *&expr, const CUtlVector< CUtlString > &strings, int &nOp )
+bool ParseStringList( const char *&expr, const CUtlVector< CUtlString > &strings, intp &nOp )
 {
 	while ( nOp-- )
 	{
@@ -63,10 +63,10 @@ bool ParseStringList( const char *&expr, const CUtlVector< CUtlString > &strings
 	return false;
 }
 
-int FindString( const CUtlVector< CUtlString > &strings, const char *str )
+intp FindString( const CUtlVector< CUtlString > &strings, const char *str )
 {
-	uint sn = strings.Count();
-	for ( uint si = 0; si < sn; ++si )
+	intp sn = strings.Count();
+	for ( intp si = 0; si < sn; ++si )
 	{
 		if ( !Q_strcmp( str, strings[ si ] ) )
 			return si;
@@ -87,21 +87,21 @@ public:
 	}
 
 private:
-	int m_stacksize;
+	intp m_stacksize;
 	const char* m_startingExpr;
 };
 
 
 
 
-void CExpressionCalculator::SetVariable( int nVariableIndex, float value )
+void CExpressionCalculator::SetVariable( intp nVariableIndex, float value )
 {
 	m_varValues[ nVariableIndex ] = value;
 }
 
 void CExpressionCalculator::SetVariable( const char *var, float value )
 {
-	int vi = FindString( m_varNames, var );
+	intp vi = FindString( m_varNames, var );
 	if ( vi >= 0 )
 	{
 		m_varValues[ vi ] = value;
@@ -113,7 +113,7 @@ void CExpressionCalculator::SetVariable( const char *var, float value )
 	}
 }
 
-int CExpressionCalculator::FindVariableIndex( const char *var )
+intp CExpressionCalculator::FindVariableIndex( const char *var )
 {
 	return FindString( m_varNames, var );
 }
@@ -157,12 +157,12 @@ bool CExpressionCalculator::BuildVariableListFromExpression( )
 //-----------------------------------------------------------------------------
 // Iterate over variables
 //-----------------------------------------------------------------------------
-int CExpressionCalculator::VariableCount()
+intp CExpressionCalculator::VariableCount()
 {
 	return m_varNames.Count();
 }
 
-const char *CExpressionCalculator::VariableName( int nIndex )
+const char *CExpressionCalculator::VariableName( intp nIndex )
 {
 	return m_varNames[nIndex];
 }
@@ -260,7 +260,7 @@ bool CExpressionCalculator::ParseEquality( const char *&expr )
 	}
 
 	const char *pOps[] = { "==", "!=" };
-	int nOp = 2;
+	intp nOp = 2;
 
 	ParseState_t ps1( m_stack, expr );
 	if ( ParseStringList( expr, pOps, nOp ) &&
@@ -295,7 +295,7 @@ bool CExpressionCalculator::ParseLessGreater( const char *&expr )
 	}
 
 	const char *pOps[] = { "<", ">", "<=", ">=" };
-	int nOp = 4;
+	intp nOp = 4;
 
 	ParseState_t ps1( m_stack, expr );
 	if ( ParseStringList( expr, pOps, nOp ) &&
@@ -336,7 +336,7 @@ bool CExpressionCalculator::ParseAddSub( const char *&expr )
 	}
 
 	const char *pOps[] = { "+", "-" };
-	int nOp = 2;
+	intp nOp = 2;
 
 	ParseState_t ps1( m_stack, expr );
 	if ( ParseStringList( expr, pOps, nOp ) &&
@@ -371,7 +371,7 @@ bool CExpressionCalculator::ParseDivMul( const char *&expr )
 	}
 
 	const char *pOps[] = { "*", "/", "%" };
-	int nOp = 3;
+	intp nOp = 3;
 
 	ParseState_t ps1( m_stack, expr );
 	if ( ParseStringList( expr, pOps, nOp ) &&
@@ -404,7 +404,7 @@ bool CExpressionCalculator::ParseUnary( const char *&expr )
 	ParseState_t ps( m_stack, expr );
 
 	const char *pOps[] = { "+", "-", "!" };
-	int nOp = 3;
+	intp nOp = 3;
 
 	if ( ParseStringList( expr, pOps, nOp ) &&
 		ParseUnary( expr ) )
@@ -446,7 +446,7 @@ bool CExpressionCalculator::ParsePrimary( const char *&expr )
 	}
 
 	ps.Reset( m_stack, expr );
-	int nVar = m_varNames.Count();
+	intp nVar = m_varNames.Count();
 	if ( ParseStringList( expr, m_varNames, nVar) )
 	{
 		m_stack.Push( m_varValues[ nVar ] );
@@ -485,7 +485,7 @@ bool CExpressionCalculator::ParsePrimary( const char *&expr )
 		++expr;
 	}
 
-	int nLen = (size_t)expr - (size_t)pStart;
+	intp nLen = (size_t)expr - (size_t)pStart;
 	char *pVariableName = (char*)_alloca( nLen+1 );
 	memcpy( pVariableName, pStart, nLen );
 	pVariableName[nLen] = 0;
@@ -525,7 +525,7 @@ bool CExpressionCalculator::Parse1ArgFunc( const char *&expr )
 		"abs", "sqr", "sqrt", "sin", "asin", "cos", "acos", "tan",
 		"exp", "log", "dtor", "rtod", "floor", "ceiling", "round", "sign"
 	};
-	int nFunc = 16;
+	intp nFunc = 16;
 
 	if ( ParseStringList( expr, pFuncs, nFunc ) &&
 		ParseString( expr, "(" ) &&
@@ -601,7 +601,7 @@ bool CExpressionCalculator::Parse2ArgFunc( const char *&expr )
 	ParseState_t ps( m_stack, expr );
 
 	const char *pFuncs[] = { "min", "max", "atan2", "pow" };
-	int nFunc = 4;
+	intp nFunc = 4;
 
 	if ( ParseStringList( expr, pFuncs, nFunc ) &&
 		ParseString( expr, "(" ) &&
@@ -670,7 +670,7 @@ bool CExpressionCalculator::Parse3ArgFunc( const char *&expr )
 	ParseState_t ps( m_stack, expr );
 
 	const char *pFuncs[] = { "inrange", "clamp", "ramp", "lerp", "cramp", "clerp", "elerp", "noise" };
-	int nFunc = 8;
+	intp nFunc = 8;
 
 	if ( ParseStringList( expr, pFuncs, nFunc ) &&
 		ParseString( expr, "(" ) &&
@@ -702,7 +702,7 @@ bool CExpressionCalculator::Parse3ArgFunc( const char *&expr )
 			m_stack.Push( lerp( f1, f2, f3 ) );
 			break;
 		case 4: // cramp
-			m_stack.Push( clamp( ramp( f1, f2, f3 ), 0, 1 ) );
+			m_stack.Push( clamp( ramp( f1, f2, f3 ), 0.f, 1.f ) );
 			break;
 		case 5: // clerp
 			m_stack.Push( clamp( lerp( f1, f2, f3 ), f2, f3 ) );
@@ -735,7 +735,7 @@ bool CExpressionCalculator::Parse5ArgFunc( const char *&expr )
 	ParseState_t ps( m_stack, expr );
 
 	const char *pFuncs[] = { "rescale", "crescale" };
-	int nFunc = 2;
+	intp nFunc = 2;
 
 	if ( ParseStringList( expr, pFuncs, nFunc ) &&
 		ParseString( expr, "(" ) &&

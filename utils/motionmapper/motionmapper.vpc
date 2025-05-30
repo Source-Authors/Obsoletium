@@ -7,7 +7,8 @@
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 $Macro NVTRISTRIPSSRCDIR	"$SRCDIR\thirdparty\nvtristrip"
-$Macro NVTRISTRIPOUTDIR		"$NVTRISTRIPSSRCDIR\out"
+$Macro NVTRISTRIPOUTDIRDEBUG		"$NVTRISTRIPSSRCDIR\out\Debug"
+$Macro NVTRISTRIPOUTDIRRELEASE		"$NVTRISTRIPSSRCDIR\out\Release"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
@@ -22,6 +23,26 @@ $Configuration
 	$Linker
 	{
 		$AdditionalDependencies				"$BASE winmm.lib"
+	}
+}
+
+$Configuration	"Debug"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$NVTRISTRIPOUTDIRDEBUG"
+	
+		$AdditionalDependencies				"$BASE nvTriStrip.lib" [$WINDOWS]
+	}
+}
+
+$Configuration	"Release"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$NVTRISTRIPOUTDIRRELEASE"
+	
+		$AdditionalDependencies				"$BASE nvTriStrip.lib" [$WINDOWS]
 	}
 }
 
@@ -85,7 +106,6 @@ $Project "motionmapper"
 	$Folder	"Link Libraries"
 	{
 		$Lib mathlib
-		$Libexternal	"$NVTRISTRIPOUTDIR\nvTriStrip"
 		$Lib tier2
 	}
 }

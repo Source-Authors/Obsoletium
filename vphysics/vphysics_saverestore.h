@@ -83,37 +83,37 @@ extern CVPhysPtrUtlVectorSaveRestoreOps g_VPhysPtrUtlVectorSaveRestoreOps;
 typedef bool (*PhysSaveFunc_t)( const physsaveparams_t &params, void *pCastedObject ); // second parameter for convenience
 typedef bool (*PhysRestoreFunc_t)( const physrestoreparams_t &params, void **ppCastedObject );
 
-bool SavePhysicsObject( const physsaveparams_t &params, CPhysicsObject *pObject );
-bool RestorePhysicsObject( const physrestoreparams_t &params, CPhysicsObject **ppObject );
+[[nodiscard]] bool SavePhysicsObject( const physsaveparams_t &params, CPhysicsObject *pObject );
+[[nodiscard]] bool RestorePhysicsObject( const physrestoreparams_t &params, CPhysicsObject **ppObject );
 
-bool SavePhysicsFluidController( const physsaveparams_t &params, CPhysicsFluidController *pFluidObject );
-bool RestorePhysicsFluidController( const physrestoreparams_t &params, CPhysicsFluidController **ppFluidObject );
+[[nodiscard]] bool SavePhysicsFluidController( const physsaveparams_t &params, CPhysicsFluidController *pFluidObject );
+[[nodiscard]] bool RestorePhysicsFluidController( const physrestoreparams_t &params, CPhysicsFluidController **ppFluidObject );
 
-bool SavePhysicsSpring( const physsaveparams_t &params, CPhysicsSpring *pSpring );
-bool RestorePhysicsSpring( const physrestoreparams_t &params, CPhysicsSpring **ppSpring );
+[[nodiscard]] bool SavePhysicsSpring( const physsaveparams_t &params, CPhysicsSpring *pSpring );
+[[nodiscard]] bool RestorePhysicsSpring( const physrestoreparams_t &params, CPhysicsSpring **ppSpring );
 
-bool SavePhysicsConstraint( const physsaveparams_t &params, CPhysicsConstraint *pConstraint );
-bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstraint **ppConstraint );
+[[nodiscard]] bool SavePhysicsConstraint( const physsaveparams_t &params, CPhysicsConstraint *pConstraint );
+[[nodiscard]] bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstraint **ppConstraint );
 
-bool SavePhysicsConstraintGroup( const physsaveparams_t &params, CPhysicsConstraintGroup *pConstraintGroup );
-bool RestorePhysicsConstraintGroup( const physrestoreparams_t &params, CPhysicsConstraintGroup **ppConstraintGroup );
+[[nodiscard]] bool SavePhysicsConstraintGroup( const physsaveparams_t &params, CPhysicsConstraintGroup *pConstraintGroup );
+[[nodiscard]] bool RestorePhysicsConstraintGroup( const physrestoreparams_t &params, CPhysicsConstraintGroup **ppConstraintGroup );
 void PostRestorePhysicsConstraintGroup();
 
-bool SavePhysicsShadowController( const physsaveparams_t &params, IPhysicsShadowController *pShadowController );
-bool RestorePhysicsShadowController( const physrestoreparams_t &params, IPhysicsShadowController **ppShadowController );
-bool RestorePhysicsShadowControllerInternal( const physrestoreparams_t &params, IPhysicsShadowController **ppShadowController, CPhysicsObject *pObject );
+[[nodiscard]] bool SavePhysicsShadowController( const physsaveparams_t &params, IPhysicsShadowController *pShadowController );
+[[nodiscard]] bool RestorePhysicsShadowController( const physrestoreparams_t &params, IPhysicsShadowController **ppShadowController );
+[[nodiscard]] bool RestorePhysicsShadowControllerInternal( const physrestoreparams_t &params, IPhysicsShadowController **ppShadowController, CPhysicsObject *pObject );
 
-bool SavePhysicsPlayerController( const physsaveparams_t &params, CPlayerController *pPlayerController );
-bool RestorePhysicsPlayerController( const physrestoreparams_t &params, CPlayerController **ppPlayerController );
+[[nodiscard]] bool SavePhysicsPlayerController( const physsaveparams_t &params, CPlayerController *pPlayerController );
+[[nodiscard]] bool RestorePhysicsPlayerController( const physrestoreparams_t &params, CPlayerController **ppPlayerController );
 
-bool SavePhysicsMotionController( const physsaveparams_t &params, IPhysicsMotionController *pMotionController );
-bool RestorePhysicsMotionController( const physrestoreparams_t &params, IPhysicsMotionController **ppMotionController );
+[[nodiscard]] bool SavePhysicsMotionController( const physsaveparams_t &params, IPhysicsMotionController *pMotionController );
+[[nodiscard]] bool RestorePhysicsMotionController( const physrestoreparams_t &params, IPhysicsMotionController **ppMotionController );
 
-bool SavePhysicsVehicleController( const physsaveparams_t &params, CVehicleController *pVehicleController );
-bool RestorePhysicsVehicleController( const physrestoreparams_t &params, CVehicleController **ppVehicleController );
+[[nodiscard]] bool SavePhysicsVehicleController( const physsaveparams_t &params, CVehicleController *pVehicleController );
+[[nodiscard]] bool RestorePhysicsVehicleController( const physrestoreparams_t &params, CVehicleController **ppVehicleController );
 
 //-----------------------------------------------------------------------------
 
-ISaveRestoreOps* MaterialIndexDataOps();
+[[nodiscard]] ISaveRestoreOps* MaterialIndexDataOps();
 
 #endif // VPHYSICS_SAVERESTORE_H

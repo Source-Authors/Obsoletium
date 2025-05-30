@@ -74,7 +74,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 			#ifdef TCHAR_IS_WCHAR
 				::GetModuleFileNameW( nullptr, rgchModuleName, std::size(rgchModuleName) );
 			#else
-				::GetModuleFileName( nullptr, rgchModuleName, std::size(rgchModuleName) );
+				Plat_GetModuleFilename( rgchModuleName, static_cast<int>( ssize(rgchModuleName) ) );
 			#endif
 
 			// strip off the rest of the path from the .exe name
@@ -186,7 +186,10 @@ bool WriteMiniDumpUsingExceptionInfo(
 			// Ensure null-termination.
 			rgchFailedFileName[ std::size(rgchFailedFileName) - 1 ] = '\0';
 			// dimhotepus: If rename failed, well, do nothing.
-			(void)rename( rgchFileName, rgchFailedFileName );
+			if ( rename( rgchFileName, rgchFailedFileName ) )
+			{
+				Warning( "Unable to rename '%s' to '%s'.\n", rgchFileName, rgchFailedFileName );
+			}
 		}
 	}
 
@@ -212,11 +215,11 @@ void InternalWriteMiniDumpUsingExceptionInfo( unsigned int uStructuredExceptionC
 
 	// First try to write it with all the indirectly referenced memory (ie: a large file).
 	// If that doesn't work, then write a smaller one.
-	int iType = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
-	if ( !WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, (MINIDUMP_TYPE)iType, pszFilenameSuffix ) )
+	constexpr int iType = static_cast<int>(MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory);
+	if ( !WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, iType, pszFilenameSuffix ) )
 	{
-		iType = MiniDumpWithDataSegs;
-		WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, (MINIDUMP_TYPE)iType, pszFilenameSuffix );
+		constexpr int iType2 = static_cast<int>(MiniDumpWithDataSegs);
+		WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, iType2, pszFilenameSuffix );
 	}
 }
 
@@ -434,7 +437,8 @@ int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 	}
 	__except ( g_pfnWriteMiniDump( GetExceptionCode(), GetExceptionInformation(), GetExceptionCodeName( GetExceptionCode() ) ), EXCEPTION_EXECUTE_HANDLER )
 	{
-		TerminateProcess( GetCurrentProcess(), EXIT_FAILURE ); // die, die RIGHT NOW! (don't call exit() so destructors will not get run)
+		// dimhotepus: EXIT_FAILURE -> EOTHER
+		TerminateProcess( GetCurrentProcess(), EOTHER ); // die, die RIGHT NOW! (don't call exit() so destructors will not get run)
 	}
 
 	// if we get here, we definitely are not in an exception handler
@@ -615,9 +619,8 @@ void MinidumpUserStreamInfoSetHeader( const char *pFormat, ... )
 {
 	va_list marker;
 
-	va_start( marker, pFormat );
-	_vsnprintf( g_UserStreamInfoHeader, std::size( g_UserStreamInfoHeader ), pFormat, marker );
-	g_UserStreamInfoHeader[ std::size( g_UserStreamInfoHeader ) - 1 ] = 0;
+	va_start( marker, pFormat ); //-V2018 //-V2019
+	vsnprintf( g_UserStreamInfoHeader, std::size( g_UserStreamInfoHeader ), pFormat, marker );
 	va_end( marker );
 }
 
@@ -634,9 +637,8 @@ void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 	pData[ DataSize - 1 ] = '\0';
 	size_t HeaderLen = strlen( pData );
 
-	va_start( marker, pFormat );
-	_vsnprintf( pData + HeaderLen, DataSize - HeaderLen, pFormat, marker );
-	pData[ DataSize - 1 ] = 0;
+	va_start( marker, pFormat ); //-V2018 //-V2019
+	vsnprintf( pData + HeaderLen, DataSize - HeaderLen, pFormat, marker );
 	va_end( marker );
 
 	// Bump up index, and go back to 0 if we've hit the end.

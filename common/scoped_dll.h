@@ -17,17 +17,16 @@
 FORWARD_DECLARE_HANDLE(HINSTANCE);
 using HMODULE = HINSTANCE;
 
-using FARPROC = ptrdiff_t(__stdcall *)();
+using FARPROC = intp(__stdcall *)();
 
 extern "C" {
 
-__declspec(dllimport) _Ret_maybenull_ HMODULE
-    __stdcall LoadLibraryExA(_In_ const char *lpLibFileName,
-                             _Reserved_ void *hFile,
-                             _In_ unsigned long dwFlags);
+__declspec(dllimport) _Ret_maybenull_ HMODULE __stdcall LoadLibraryExA(
+    _In_ const char *lpLibFileName, _Reserved_ void *hFile,
+    _In_ unsigned long dwFlags);
 __declspec(dllimport) int __stdcall FreeLibrary(_In_ HMODULE hLibModule);
-__declspec(dllimport) FARPROC
-    __stdcall GetProcAddress(_In_ HMODULE hModule, _In_ const char *lpProcName);
+__declspec(dllimport) FARPROC __stdcall GetProcAddress(
+    _In_ HMODULE hModule, _In_ const char *lpProcName);
 
 __declspec(dllimport) _Check_return_ unsigned long __stdcall GetLastError();
 
@@ -88,13 +87,14 @@ class ScopedDll {
     if (dll_) {
 #ifdef _WIN32
       // Force exit when unload failure.
-      if (!::FreeLibrary(dll_)) exit(static_cast<int>(::GetLastError()));
+      if (!::FreeLibrary(dll_)) exit(static_cast<int>(::GetLastError())); //-V2014
 #else
       // Force exit when unload failure.
       if (::dlclose(dll_)) {
         fprintf(stderr, "Failed to close the %s: %s.\n", dll_path_,
                 ::dlerror());
-        exit(1);
+        // dimhotepus: 1 -> EOTHER.
+        exit(EOTHER); //-V2014
       }
 #endif
     }
@@ -106,14 +106,16 @@ class ScopedDll {
   GetFunction(const char *name) const noexcept {
 #ifdef _WIN32
     F f = reinterpret_cast<F>(::GetProcAddress(dll_, name));
-#else
-    F f = reinterpret_cast<F>(::dlsym(dll_, name));
-#endif
-
     if (f == nullptr) {
       return {nullptr, std::error_code{static_cast<int>(::GetLastError()),
                                        std::system_category()}};
     }
+#else
+    F f = reinterpret_cast<F>(::dlsym(dll_, name));
+    if (f == nullptr) {
+      return {nullptr, std::error_code{EINVAL, std::generic_category()}};
+    }
+#endif
 
     return {f, std::error_code{}};
   }

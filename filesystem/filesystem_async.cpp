@@ -163,7 +163,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
+		auto iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		m_map[iEntry]->AddRef();
 		return m_map[iEntry];
@@ -178,7 +178,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
+		auto iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		m_map[iEntry]->AddRef();
 	}
@@ -192,7 +192,7 @@ public:
 
 		AUTO_LOCK( m_mutex );
 
-		int iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
+		auto iEntry = (CUtlMap<CUtlString, AsyncOpenedFile_t>::IndexType_t)(intp)item;
 		Assert( m_map.IsValidIndex( iEntry ) );
 		if ( m_map[iEntry]->Release() == 0 )
 		{
@@ -274,9 +274,10 @@ public:
 #if defined( TRACK_BLOCKING_IO )
 		m_Timer.Start();
 #endif
-		pszFilename = strdup( fromRequest.pszFilename );
-		Q_FixSlashes( const_cast<char*>( pszFilename ) );
+		char *fileName = strdup( fromRequest.pszFilename );
+		Q_FixSlashes( fileName );
 
+		pszFilename = fileName;
 		pContext = this;
 		pfnCallback = InterceptCallback;
 
@@ -342,7 +343,7 @@ public:
 		{
 			int iPrevPriority = ThreadGetPriority();
 			ThreadSetPriority( 2 );
-			retval = BaseFileSystem()->SyncRead( *this );
+			retval = to_underlying(BaseFileSystem()->SyncRead( *this ));
 			ThreadSetPriority( iPrevPriority );
 		}
 
@@ -472,7 +473,7 @@ public:
 #if defined( TRACK_BLOCKING_IO )
 		bool oldState = BaseFileSystem()->SetAllowSynchronousLogging( false );
 #endif
-		JobStatus_t retval = BaseFileSystem()->SyncWrite( m_pszFilename, m_pData, m_nBytes, false, m_bAppend );
+		JobStatus_t retval = to_underlying(BaseFileSystem()->SyncWrite( m_pszFilename, m_pData, m_nBytes, false, m_bAppend ) );
 
 #if defined( TRACK_BLOCKING_IO )
 		m_Timer.End();
@@ -538,10 +539,14 @@ public:
 #if defined( TRACK_BLOCKING_IO )
 		m_Timer.Start();
 #endif
-		m_pszAppendTo = strdup( pszAppendTo );
-		m_pszAppendFrom = strdup( pszAppendFrom );
-		Q_FixSlashes( const_cast<char*>( m_pszAppendTo ) );
-		Q_FixSlashes( const_cast<char*>( m_pszAppendFrom ) );
+		char *appendTo = strdup( pszAppendTo );
+		Q_FixSlashes( appendTo );
+		m_pszAppendTo = appendTo;
+
+		char *appendFrom = strdup( pszAppendFrom );
+		Q_FixSlashes( appendFrom );
+		m_pszAppendFrom = appendFrom;
+
 		g_nAsyncWriteJobs++;
 
 		SetFlags( GetFlags() | JF_SERIAL );
@@ -562,7 +567,7 @@ public:
 #if defined( TRACK_BLOCKING_IO )
 		bool oldState = BaseFileSystem()->SetAllowSynchronousLogging( false );
 #endif
-		JobStatus_t retval = BaseFileSystem()->SyncAppendFile( m_pszAppendTo, m_pszAppendFrom );
+		JobStatus_t retval = to_underlying( BaseFileSystem()->SyncAppendFile( m_pszAppendTo, m_pszAppendFrom ) );
 
 #if defined( TRACK_BLOCKING_IO )
 		m_Timer.End();
@@ -603,7 +608,7 @@ public:
 #if defined( TRACK_BLOCKING_IO )
 		bool oldState = BaseFileSystem()->SetAllowSynchronousLogging( false );
 #endif
-		JobStatus_t retval = BaseFileSystem()->SyncGetFileSize( *this );
+		JobStatus_t retval = to_underlying( BaseFileSystem()->SyncGetFileSize( *this ) );
 #if defined( TRACK_BLOCKING_IO )
 		m_Timer.End();
 		FileBlockingItem item( FILESYSTEM_BLOCKING_ASYNCHRONOUS, Describe(), m_Timer.GetDuration().GetSeconds(), FileBlockingItem::FB_ACCESS_SIZE );
@@ -1136,12 +1141,12 @@ FSAsyncStatus_t CBaseFileSystem::AsyncAbort( FSAsyncControl_t hControl )
 		Assert( pReadJob->m_pOwnerFileSystem == this );
 
 		FSAsyncStatus_t status = (FSAsyncStatus_t)pReadJob->GetStatus();
-		if ( status == (FSAsyncStatus_t)JOB_STATUS_INPROGRESS) {
+		if ( status == FSASYNC_STATUS_INPROGRESS ) {
 
 			// Slam the status.  The default behaviour doesn't change the status
 			// if the task is in progess for some reason
-			status = (FSAsyncStatus_t)JOB_STATUS_ABORTED;
-			pReadJob->SlamStatus( status );
+			status = FSASYNC_STATUS_ABORTED;
+			pReadJob->SlamStatus( JOB_STATUS_ABORTED );
 
 			// Tell fetcher to abort job
 			Assert( pReadJob->m_hCustomFetcherHandle );
@@ -1271,7 +1276,7 @@ FSAsyncStatus_t CBaseFileSystem::SyncRead( const FileAsyncRequest_t &request )
 	if ( !pHeldFile || pHeldFile->hFile == FILESYSTEM_INVALID_HANDLE )
 	{
 		hFile = OpenEx( request.pszFilename, "rb", 0, request.pszPathID );
-		if ( pHeldFile )
+		if ( pHeldFile ) //-V1051
 		{
 			pHeldFile->hFile = hFile;
 		}
@@ -1379,7 +1384,7 @@ FSAsyncStatus_t CBaseFileSystem::SyncGetFileSize( const FileAsyncRequest_t &requ
 //-----------------------------------------------------------------------------
 FSAsyncStatus_t CBaseFileSystem::SyncWrite(const char *pszFilename, const void *pSrc, int nSrcBytes, bool bFreeMemory, bool bAppend )
 {
-	FileHandle_t hFile = OpenEx( pszFilename, ( bAppend ) ? "ab+" : "wb", IsX360() ? FSOPEN_NEVERINPACK : 0, NULL );
+	FileHandle_t hFile = OpenEx( pszFilename, ( bAppend ) ? "ab+" : "wb", 0, NULL );
 	if ( hFile )
 	{
 		SetBufferSize( hFile, 0 );

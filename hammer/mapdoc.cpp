@@ -1098,7 +1098,7 @@ CMapEntity *CMapDoc::FindEntity(const char *pszClassName, float x, float y, floa
 		FindEntity_t FindInfo;
 
 		memset(&FindInfo, 0, sizeof(FindInfo));
-		strcpy(FindInfo.szClassName, pszClassName);
+		V_strcpy_safe(FindInfo.szClassName, pszClassName);
 
 		// dvs: HACK - only find by integer coordinates because the editor rounds
 		//		entity origins when saving the MAP file.
@@ -1210,8 +1210,11 @@ void CMapDoc::OnViewGotoCoords()
 			CenterViewsOn(posVec);
 			return;
 		}
-		if ( sscanf( dlg.m_string, "%s %f %f %f%s %s %f %f %f", setposString, &posVec.x, &posVec.y, &posVec.z, semicolonString, setangString, &angVec.x, &angVec.y, &angVec.z ) == 9 )
+		if ( sscanf( dlg.m_string, "%254s %f %f %f%1s %254s %f %f %f", setposString, &posVec.x, &posVec.y, &posVec.z, semicolonString, setangString, &angVec.x, &angVec.y, &angVec.z ) == 9 )
 		{
+			setposString[ssize(setposString) - 1] = '\0';
+			semicolonString[ssize(semicolonString) - 1] = '\0';
+			setangString[ssize(setangString) - 1] = '\0';
 			posVec.z += HALF_LIFE_2_EYE_HEIGHT;			
 			CenterViewsOn( posVec );
 			Set3DViewsPosAng( posVec, angVec );
@@ -2050,7 +2053,7 @@ void CMapDoc::CollapseInstances( bool bOnlySelected )
 					SetActiveMapDoc( this ); // just in case the last instance copy forces the map to close, we need to make ourselves active again
 
 					InstanceCount++;
-					sprintf( temp, "AutoInstance%d-", InstanceCount );
+					V_sprintf_safe( temp, "AutoInstance%d-", InstanceCount );
 
 					pEntity->GetOrigin( origin );
 					pEntity->GetAngles( angles );
@@ -2076,7 +2079,7 @@ void CMapDoc::CollapseInstances( bool bOnlySelected )
 	UpdateAllViews( MAPVIEW_UPDATE_SELECTION | MAPVIEW_UPDATE_TOOL | MAPVIEW_RENDER_NOW );
 
 	char temp[ 256 ];
-	sprintf( temp, "A total of %d instances were collapsed into the main map.", InstanceCount );
+	V_sprintf_safe( temp, "A total of %d instances were collapsed into the main map.", InstanceCount );
 
 	AfxMessageBox( temp, MB_OK | MB_ICONEXCLAMATION );
 }
@@ -2089,7 +2092,7 @@ void CMapDoc::CollapseInstances( bool bOnlySelected )
 // Output : Result - returns the $variable if it exists
 //			returns the string index after the variable if one is found, otherwise -1 if not found
 //-----------------------------------------------------------------------------
-int FindInstanceParm( char *Text, int StartPos, CString &Result )
+int FindInstanceParm( char *Text, ptrdiff_t StartPos, CString &Result )
 {
 	char	*found;
 
@@ -2203,12 +2206,12 @@ void CMapDoc::PopulateInstanceParms( CMapEntity *pEntity )
 			{
 				char tempKey[ 128 ];
 
-				sprintf( tempKey, "parm%d", j );
+				V_sprintf_safe( tempKey, "parm%d", j );
 				if ( pEntity->GetKeyValue( tempKey ) == NULL )
 				{
 					char	tempValue[ MAX_KEYVALUE_LEN ];
 
-					sprintf( tempValue, "%s string", (const char*)ParmList[ i ] );
+					V_sprintf_safe( tempValue, "%s string", (const char*)ParmList[ i ] );
 					pEntity->SetKeyValue( tempKey, tempValue );
 					break;
 				}
@@ -2280,12 +2283,12 @@ void CMapDoc::PopulateInstance( CMapEntity *pEntity )
 				{
 					char tempKey[ MAX_KEYVALUE_LEN ];
 
-					sprintf( tempKey, "replace%02d", j );
+					V_sprintf_safe( tempKey, "replace%02d", j );
 					if ( pEntity->GetKeyValue( tempKey ) == NULL )
 					{
 						char	tempValue[ MAX_KEYVALUE_LEN ];
 
-						strcpy( tempValue, pValue );
+						V_strcpy_safe( tempValue, pValue );
 						strcpy( &tempValue[ len ], " ???" );
 
 						pEntity->SetKeyValue( tempKey, tempValue );
@@ -5407,12 +5410,12 @@ void CMapDoc::OnFileSaveAs(void)
 		if (str.ReverseFind('.') != -1)
 		{
 			str = str.Left(str.ReverseFind('.'));
-			strcpy(szBaseDir, str);
-			Q_StripFilename(szBaseDir);
+			V_strcpy_safe(szBaseDir, str);
+			V_StripFilename(szBaseDir);
 		}
 		else if (szBaseDir[0] =='\0')
 		{
-			strcpy(szBaseDir, m_pGame->szMapDir);
+			V_strcpy_safe(szBaseDir, m_pGame->szMapDir);
 		}
 
 		char *pszFilter;
@@ -5475,8 +5478,8 @@ void CMapDoc::OnFileSaveAs(void)
 		//
 		// Save the default directory for next time.
 		//
-		strcpy(szBaseDir, str);
-		Q_StripFilename(szBaseDir);
+		V_strcpy_safe(szBaseDir, str);
+		V_StripFilename(szBaseDir);
 
 		bSave = true;
 
@@ -5904,22 +5907,22 @@ void CMapDoc::OnFileRunmap(void)
 	// Change to the game drive and directory.
 	//cmd.iSpecialCmd = CCChangeDir;
 	//Q_snprintf( cmd.szParms, sizeof(cmd.szParms), "\"%s\"", m_pGame->m_szGameExeDir);
-	//strcpy(cmd.szRun, "Change Directory");
+	//V_strcpy_safe(cmd.szRun, "Change Directory");
 	//cmds.Add(cmd);
 	//cmd.iSpecialCmd = 0;
 
 	// bsp
 	if ((dlg.m_iQBSP) && (m_pGame->szBSP[0] != '\0'))
 	{
-		strcpy(cmd.szRun, "$bsp_exe");
-		sprintf(cmd.szParms, "-game $gamedir %s$path\\$file.$ext", dlg.m_iQBSP == 2 ? "-onlyents " : "");
+		V_strcpy_safe(cmd.szRun, "$bsp_exe");
+		V_sprintf_safe(cmd.szParms, "-game $gamedir %s$path\\$file.$ext", dlg.m_iQBSP == 2 ? "-onlyents " : "");
 
 		// check for bsp existence only in quake maps, because
 		// we're using the editor's utilities
 		if (g_pGameConfig->mapformat == mfQuake)
 		{
 			cmd.bEnsureCheck = TRUE;
-			strcpy(cmd.szEnsureFn, "$path\\$file.bsp");
+			V_strcpy_safe(cmd.szEnsureFn, "$path\\$file.bsp");
 		}
 
 		cmds.Add(cmd);
@@ -5930,23 +5933,23 @@ void CMapDoc::OnFileRunmap(void)
 	// vis
 	if ((dlg.m_iVis) && (m_pGame->szVIS[0] != '\0'))
 	{
-		strcpy(cmd.szRun, "$vis_exe");
-		sprintf(cmd.szParms, "-game $gamedir %s$path\\$file", dlg.m_iVis == 2 ? "-fast " : "");
+		V_strcpy_safe(cmd.szRun, "$vis_exe");
+		V_sprintf_safe(cmd.szParms, "-game $gamedir %s$path\\$file", dlg.m_iVis == 2 ? "-fast " : "");
 		cmds.Add(cmd);
 	}
 
 	// rad
 	if ((dlg.m_iLight) && (m_pGame->szLIGHT[0] != '\0'))
 	{
-		strcpy(cmd.szRun, "$light_exe");
-		sprintf(cmd.szParms, "%s -game $gamedir %s$path\\$file", dlg.m_bHDRLight ? "-both" : "", dlg.m_iLight == 2 ? "-noextra " : "" );
+		V_strcpy_safe(cmd.szRun, "$light_exe");
+		V_sprintf_safe(cmd.szParms, "%s -game $gamedir %s$path\\$file", dlg.m_bHDRLight ? "-both" : "", dlg.m_iLight == 2 ? "-noextra " : "" );
 		cmds.Add(cmd);
 	}
 
 	// Copy BSP file to BSP directory for running
 	cmd.iSpecialCmd = CCCopyFile;
-	strcpy(cmd.szRun, "Copy File");
-	sprintf(cmd.szParms, "$path\\$file.bsp $bspdir\\$file.bsp");
+	V_strcpy_safe(cmd.szRun, "Copy File");
+	V_sprintf_safe(cmd.szParms, "$path\\$file.bsp $bspdir\\$file.bsp");
 	cmds.Add(cmd);
 	cmd.iSpecialCmd = 0;
 
@@ -5959,8 +5962,8 @@ void CMapDoc::OnFileRunmap(void)
 		//When running under steam, use applaunch always because if a user forgets to run the game they're trying to launch, it will fail
 		//with an obscure error they won't understand.
 		{
-			strcpy(cmd.szRun, "$game_exe");
-			sprintf(cmd.szParms, "-game $gamedir %s +map $file -steam", (const char*)dlg.m_strQuakeParms);
+			V_strcpy_safe(cmd.szRun, "$game_exe");
+			V_sprintf_safe(cmd.szParms, "-game $gamedir %s +map $file -steam", (const char*)dlg.m_strQuakeParms);
 		}
 
 		cmds.Add(cmd);
@@ -6805,7 +6808,7 @@ void CMapDoc::OnEditPastespecial(void)
 	Options.SetLockingTextures(TRUE);
 
 	bool bMakeNamesUnique = (dlg.m_bMakeEntityNamesUnique == TRUE);
-	const char *pszPrefix = (dlg.m_bAddPrefix == TRUE) ? dlg.m_strPrefix : "";
+	const char *pszPrefix = (dlg.m_bAddPrefix == TRUE) ? dlg.m_strPrefix.GetString() : "";
 
 	for (int i = 0; i < dlg.m_iCopies; i++)
 	{
@@ -6928,8 +6931,11 @@ void CMapDoc::OnUpdateUndoRedo(CCmdUI *pCmdUI)
 // Input  : pObject - 
 //			pWorld - 
 //-----------------------------------------------------------------------------
-bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldTargetName, CMapWorld *pWorld)
+bool CMapDoc::ExpandTargetNameKeywords(OUT_Z_BYTECAP(newTargetNameSize) char *szNewTargetName, intp newTargetNameSize, const char *szOldTargetName, CMapWorld *pWorld)
 {
+	if (newTargetNameSize > 0)
+		szNewTargetName[0] = '\0';
+
 	const char *pszKeyword = strstr(szOldTargetName, "&i");
 	if (pszKeyword == nullptr) return false;
 
@@ -6939,7 +6945,7 @@ bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldT
 	szPrefix[pszKeyword - szOldTargetName] = '\0';
 	const size_t nPrefixLen = strlen(szPrefix);
 
-	strcpy(szSuffix, pszKeyword + 2);
+	V_strcpy_safe(szSuffix, pszKeyword + 2);
 	const size_t nSuffixLen = strlen(szSuffix);
 
 	int nHighestIndex = 0;
@@ -7000,7 +7006,7 @@ bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldT
 					}
 				}
 
-		sprintf(szNewTargetName, "%s%d%s", szPrefix, nHighestIndex + 1, szSuffix);
+	V_snprintf(szNewTargetName, newTargetNameSize, "%s%d%s", szPrefix, nHighestIndex + 1, szSuffix);
 	
 		return(true);
 	}
@@ -7012,8 +7018,15 @@ bool CMapDoc::ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldT
 // Input  : pObject - 
 //			pWorld - 
 //-----------------------------------------------------------------------------
-bool CMapDoc::DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld, char *szOldKeyword, char *szNewKeyword)
+bool CMapDoc::DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld,
+	OUT_Z_CAP(oldKeywordSize) char *szOldKeyword, intp oldKeywordSize,
+	OUT_Z_CAP(newKeywordSize) char *szNewKeyword, intp newKeywordSize)
 {
+	if (oldKeywordSize)
+		szOldKeyword[0] = '\0';
+	if (newKeywordSize)
+		szNewKeyword[0] = '\0';
+
 	CEditGameClass *pEditGameClass = dynamic_cast <CEditGameClass *>(pObject);
 	if (pEditGameClass != NULL)
 	{
@@ -7023,15 +7036,15 @@ bool CMapDoc::DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld, char *szOl
 			char szNewTargetName[MAX_PATH];
 			if (ExpandTargetNameKeywords(szNewTargetName, pszOldTargetName, pWorld))
 			{
-				strcpy(szOldKeyword, pszOldTargetName);
-				strcpy(szNewKeyword, szNewTargetName);
+				V_strncpy(szOldKeyword, pszOldTargetName, oldKeywordSize);
+				V_strncpy(szNewKeyword, szNewTargetName, newKeywordSize);
 				pEditGameClass->SetKeyValue("targetname", szNewTargetName);
-				return(true);
+				return true;
 			}
 		}
 	}
 
-	return(false);
+	return false;
 }
 
 
@@ -7039,8 +7052,11 @@ bool CMapDoc::DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld, char *szOl
 // Gets this object's name if it has one. Returns false if it has none.
 //-----------------------------------------------------------------------------
 template<ptrdiff_t size>
-static bool GetName( CMapClass *pObject, char (&szName)[size] )
+static bool GetName( CMapClass *pObject, OUT_Z_ARRAY char (&szName)[size] )
 {
+	if (size > 0)
+		szName[0] = '\0';
+
 	CEditGameClass *pEditGameClass = dynamic_cast <CEditGameClass *>( pObject );
 	if ( pEditGameClass == NULL )
 		return false;
@@ -7052,14 +7068,6 @@ static bool GetName( CMapClass *pObject, char (&szName)[size] )
 	V_strcpy_safe( szName, pszName );
 
 	return true;
-}
-
-static const char *CopyName( const char * pszString )
-{
-	int length = Q_strlen(pszString)+1;
-	char *pNewString = new char[length];
-	Q_memcpy( pNewString, pszString, length );
-	return pNewString;
 }
 
 static bool FindName( CUtlVector<const char*>*pList, const char * pszString )
@@ -7093,7 +7101,7 @@ void CMapDoc::RenameEntities( CMapClass *pRoot, CMapWorld *pWorld, bool bMakeUni
 	// find all names we have to replace
 	if ( GetName( pRoot, szName ) )
 	{
-		oldNames.AddToTail( CopyName(szName) );
+		oldNames.AddToTail( V_strdup(szName) );
 	}
 
 	// Expand keywords in this object's children as well.
@@ -7107,7 +7115,7 @@ void CMapDoc::RenameEntities( CMapClass *pRoot, CMapWorld *pWorld, bool bMakeUni
 		{
 			if ( !FindName( &oldNames, szName) )
 			{
-				oldNames.AddToTail( CopyName(szName) );
+				oldNames.AddToTail( V_strdup(szName) );
 			}
 		}
 		pChild = pRoot->GetNextDescendent( pos );
@@ -8027,8 +8035,8 @@ static BOOL ReplaceTexFunc(CMapSolid *pSolid, ReplaceTexInfo_t *pInfo)
 					// create a new string
 					char szNewTex[128];
 					V_strcpy_safe(szNewTex, pszFaceTex);
-					strcpy(szNewTex + int(p - pszFaceTex), pInfo->szReplace);
-					V_strcat_safe(szNewTex, pszFaceTex + int(p - pszFaceTex) + pInfo->iFindLen);
+					strcpy(szNewTex + intp(p - pszFaceTex), pInfo->szReplace);
+					V_strcat_safe(szNewTex, pszFaceTex + intp(p - pszFaceTex) + pInfo->iFindLen);
 					pFace->SetTexture(szNewTex, pInfo->m_bRescaleTextureCoordinates);
 					++pInfo->nReplaced;
 				}
@@ -8074,8 +8082,8 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 
 	// set up info struct to pass to callback
 	ReplaceTexInfo_t info;
-	strcpy(info.szFind, pszFind);
-	strcpy(info.szReplace, pszReplace);
+	V_strcpy_safe(info.szFind, pszFind);
+	V_strcpy_safe(info.szReplace, pszReplace);
 	info.pDoc = this;
 	info.bHidden = bHidden;
 	if (iAction & 0x100)
@@ -8091,7 +8099,7 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 
 	info.iAction = iAction;
 	info.nReplaced = 0;
-	info.iFindLen = strlen(pszFind);
+	info.iFindLen = V_strlen(pszFind);
 	info.pWorld = m_pWorld;
 	info.m_bRescaleTextureCoordinates = bRescaleTextureCoordinates;
 
@@ -8475,7 +8483,7 @@ void CMapDoc::CenterOriginsRecursive(CMapClass *pObject)
 
 			// dvs: make key parse/unparse code common to Hammer and the engine
 			char szOrigin[50];
-			sprintf(szOrigin, "%g %g %g", vecCenter.x, vecCenter.y, vecCenter.z);
+			V_sprintf_safe(szOrigin, "%g %g %g", vecCenter.x, vecCenter.y, vecCenter.z);
 			pEntity->SetKeyValue("origin", szOrigin);
 		}
 	}
@@ -10004,7 +10012,7 @@ ChunkFileResult_t CMapDoc::SaveVersionInfoVMF(CChunkFile *pFile, bool bIsAutoSav
 		{
 			char szOriginalName[MAX_PATH];
 			V_strcpy_safe( szOriginalName, GetPathName() );
-			if ( strlen( szOriginalName ) == 0 )
+			if ( Q_isempty( szOriginalName ) )
 			{
 				V_strcpy_safe(szOriginalName, g_pGameConfig->szMapDir);
 				V_strcat_safe(szOriginalName, "\\untitled.vmf");	
@@ -10855,16 +10863,16 @@ void CMapDoc::InternalEnableLightPreview( bool bCustomFilename )
 	}
 	
 	if( pLastSlash )
-		strcpy( fileName, pLastSlash );
+		V_strcpy_safe( fileName, pLastSlash );
 	else
-		strcpy( fileName, p );
+		V_strcpy_safe( fileName, p );
 
 	strFile.ReleaseBuffer();
 
 
 	// Use <mod directory> + "/maps/" + <filename>
 	char fullPath[MAX_PATH*2];
-	sprintf( fullPath, "%s\\maps\\%s", g_pGameConfig->m_szModDir, fileName );
+	V_sprintf_safe( fullPath, "%s\\maps\\%s", g_pGameConfig->m_szModDir, fileName );
 
 	
 	// Only do the dialog if they said to or if the default BSP file doesn't exist.
@@ -11726,7 +11734,7 @@ void CMapDoc::OnInstancingCheckOutManifest( )
 	//{
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not check out manifest: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
+		V_sprintf_safe( temp, "Could not check out manifest: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 	//}
 }
@@ -11751,7 +11759,7 @@ void CMapDoc::OnInstancingAddManifest( )
 	// {
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not check out manifest: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
+		V_sprintf_safe( temp, "Could not check out manifest: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 	//}
 }

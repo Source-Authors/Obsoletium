@@ -13,7 +13,7 @@
 #include "datamodel/dmehandle.h"
 #include "vgui_controls/EditablePanel.h"
 #include "dme_controls/AnimSetAttributeValue.h"
-#include "dme_controls/logpreview.h"
+#include "dme_controls/LogPreview.h"
 #include "movieobjects/dmechannel.h"
 #include "dme_controls/BaseAnimSetPresetFaderPanel.h"
 
@@ -50,7 +50,7 @@ enum
 //-----------------------------------------------------------------------------
 class CBaseAnimSetAttributeSliderPanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CBaseAnimSetAttributeSliderPanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseAnimSetAttributeSliderPanel, vgui::EditablePanel );
 public:
 	CBaseAnimSetAttributeSliderPanel( vgui::Panel *parent, const char *className, CBaseAnimationSetEditor *editor );
 
@@ -72,7 +72,7 @@ public:
 	virtual CDmeFilmClip				*GetCurrentShot();
 	virtual CDmeFilmClip				*GetCurrentMovie();
 
-	virtual void ApplySchemeSettings( vgui::IScheme *scheme );
+	void ApplySchemeSettings( vgui::IScheme *scheme ) override;
 
 	CUtlVector< LogPreview_t >			*GetActiveTransforms();
 
@@ -114,11 +114,11 @@ public:
 
 protected:
 
-	virtual void OnThink();
-	virtual void OnCommand( const char *pCommand );
-	virtual bool		ApplySliderValues( bool force );
+	void OnThink() override;
+	void OnCommand( const char *pCommand ) override;
+	virtual bool ApplySliderValues( bool force );
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	KEYBINDING_FUNC( deselectall, KEY_ESCAPE, 0, OnKBDeselectAll, "#deselectall_help", 0 );
 

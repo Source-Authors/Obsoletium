@@ -255,9 +255,9 @@ inline AI_MoveSuggestion_t::AI_MoveSuggestion_t( AI_MoveSuggType_t newType, floa
 
 //-------------------------------------
 
-inline void AI_MoveSuggestion_t::Set( AI_MoveSuggType_t newType, float newWeight, const AI_Arc_t &arc, CBaseEntity *pEntity )
+inline void AI_MoveSuggestion_t::Set( AI_MoveSuggType_t newType, float newWeight, const AI_Arc_t &arc1, CBaseEntity *pEntity )
 {
-	Set( newType, newWeight, arc.center, arc.span, pEntity );
+	Set( newType, newWeight, arc1.center, arc1.span, pEntity );
 }
 
 //-----------------------------------------------------------------------------

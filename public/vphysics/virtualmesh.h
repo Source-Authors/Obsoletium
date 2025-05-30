@@ -11,7 +11,7 @@
 #endif
 
 // NOTE: These are fixed length to make it easy to fill these out without memory allocation or storage
-const int MAX_VIRTUAL_TRIANGLES = 1024;
+constexpr inline int MAX_VIRTUAL_TRIANGLES = 1024;
 struct virtualmeshlist_t
 {
 	Vector			*pVerts;
@@ -36,6 +36,7 @@ public:
 	virtual void GetWorldspaceBounds( void *userData, Vector *pMins, Vector *pMaxs ) = 0;
 	virtual void GetTrianglesInSphere( void *userData, const Vector &center, float radius, virtualmeshtrianglelist_t *pList ) = 0;
 };
+
 struct virtualmeshparams_t
 {
 	IVirtualMeshEvent	*pMeshEventHandler;

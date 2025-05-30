@@ -160,8 +160,7 @@ inline bool ValidStackAddress( void *pAddress, const void *pNoLessThan, const vo
 intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
 {
 	//Only tested in windows. This function won't work with frame pointer omission enabled. "vpc /nofpo" all projects
-#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) && (defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -465,7 +464,7 @@ public:
 		((PSYMBOL_INFO)genericbuffer)->MaxNameLen = MAX_SYM_NAME;
 
 		DWORD64 dwDisplacement;
-		if( m_pSymFromAddr( m_hProcess, (DWORD64)pAddress, &dwDisplacement, (PSYMBOL_INFO)genericbuffer) )
+		if( m_pSymFromAddr( m_hProcess, (DWORD64)(uintp)pAddress, &dwDisplacement, (PSYMBOL_INFO)genericbuffer) )
 		{
 			strncpy( pSymbolNameOut, ((PSYMBOL_INFO)genericbuffer)->Name, iMaxSymbolNameLength );
 			pSymbolNameOut[iMaxSymbolNameLength - 1] = 0;
@@ -492,7 +491,7 @@ public:
 		imageHelpLine64.FileName = szBuffer;
 
 		DWORD dwDisplacement;
-		if( m_pSymGetLineFromAddr64( m_hProcess, (DWORD64)pAddress, &dwDisplacement, &imageHelpLine64 ) )
+		if( m_pSymGetLineFromAddr64( m_hProcess, (DWORD64)(uintp)pAddress, &dwDisplacement, &imageHelpLine64 ) )
 		{
 			strncpy( pFileNameOut, imageHelpLine64.FileName, iMaxFileNameLength );
 			pFileNameOut[iMaxFileNameLength - 1] = 0;
@@ -514,7 +513,7 @@ public:
 
 		moduleInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
 
-		if ( m_pSymGetModuleInfo64( m_hProcess, (DWORD64)pAddress, &moduleInfo ) )
+		if ( m_pSymGetModuleInfo64( m_hProcess, (DWORD64)(uintp)pAddress, &moduleInfo ) )
 		{
 			strncpy( pModuleNameOut, moduleInfo.ModuleName, iMaxModuleNameLength );
 			pModuleNameOut[iMaxModuleNameLength - 1] = 0;
@@ -543,7 +542,7 @@ public:
 		*pWrite = '\0';
 		intp iLength;
 
-		if( style & TSISTYLEFLAG_MODULENAME )
+		if( style & to_underlying(TSISTYLEFLAG_MODULENAME) )
 		{
 			if( !this->GetModuleNameFromAddress( pAddress, pWrite, iTranslationBufferLength ) )
 			{
@@ -558,7 +557,7 @@ public:
 			if( iTranslationBufferLength < 2 )
 				return false; //need more buffer
 
-			if( style & TSISTYLEFLAG_SYMBOLNAME )
+			if( style & to_underlying(TSISTYLEFLAG_SYMBOLNAME) )
 			{
 				*pWrite = '!';
 				++pWrite;
@@ -578,7 +577,7 @@ public:
 			}
 			return true;
 		}
-		else if( style & TSISTYLEFLAG_SYMBOLNAME )
+		else if( style & to_underlying(TSISTYLEFLAG_SYMBOLNAME) )
 		{
 			iLength = (intp)strlen( pWrite );
 			pWrite += iLength;
@@ -589,7 +588,10 @@ public:
 			*pWrite = '\0'; //symbol name lookup worked, but unwanted, discard
 		}
 
-		if( style & (TSISTYLEFLAG_FULLPATH | TSISTYLEFLAG_SHORTPATH | TSISTYLEFLAG_LINE | TSISTYLEFLAG_LINEANDOFFSET) )
+		if( style & (to_underlying(TSISTYLEFLAG_FULLPATH) |
+			to_underlying(TSISTYLEFLAG_SHORTPATH) |
+			to_underlying(TSISTYLEFLAG_LINE) |
+			to_underlying(TSISTYLEFLAG_LINEANDOFFSET)) )
 		{
 			if( pWrite != pTranslationOut ) //if we've written anything yet, separate the printed data from the file name and line
 			{
@@ -609,7 +611,7 @@ public:
 			char szFileName[MAX_PATH];
 			if( this->GetFileAndLineFromAddress( pAddress, szFileName, MAX_PATH, iLine, &iDisplacement ) )
 			{
-				if( style & TSISTYLEFLAG_FULLPATH )
+				if( style & to_underlying(TSISTYLEFLAG_FULLPATH) )
 				{
 					iLength = (intp)strlen( szFileName );
 					if ( iTranslationBufferLength < iLength + 1 )
@@ -619,7 +621,7 @@ public:
 					pWrite += iLength;
 					iTranslationBufferLength -= iLength;
 				}
-				else if( style & TSISTYLEFLAG_SHORTPATH )
+				else if( style & to_underlying(TSISTYLEFLAG_SHORTPATH) )
 				{
 					//shorten the path and copy
 					iLength = (intp)strlen( szFileName );
@@ -652,9 +654,9 @@ public:
 					iTranslationBufferLength -= iLength;
 				}
 
-				if( style & (TSISTYLEFLAG_LINE | TSISTYLEFLAG_LINEANDOFFSET) )
+				if( style & (to_underlying(TSISTYLEFLAG_LINE) | to_underlying(TSISTYLEFLAG_LINEANDOFFSET)) )
 				{
-					int nBytesWritten = _snprintf( pWrite, iTranslationBufferLength, ((style & TSISTYLEFLAG_LINEANDOFFSET) && (iDisplacement != 0)) ? "(%d) + %d bytes" : "(%d)", iLine, iDisplacement );
+					int nBytesWritten = _snprintf( pWrite, iTranslationBufferLength, ((style & to_underlying(TSISTYLEFLAG_LINEANDOFFSET)) && (iDisplacement != 0)) ? "(%d) + %d bytes" : "(%d)", iLine, iDisplacement );
 					if ( nBytesWritten < 0 )
 					{
 						*pWrite = '\0'; // if we can't write all of the line/lineandoffset, don't write any at all
@@ -1005,8 +1007,7 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
-#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) && (defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -1031,8 +1032,10 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 
 		if( iParentStackTraceLength > 0 )
 		{
-			m_pParentStackTrace = new void * [iParentStackTraceLength];
-			memcpy( (void **)m_pParentStackTrace, pParentStackTrace, sizeof( void * ) * iParentStackTraceLength );
+			void **stackTrace = new void * [iParentStackTraceLength];
+			memcpy( stackTrace, pParentStackTrace, sizeof( void * ) * iParentStackTraceLength );
+
+			m_pParentStackTrace = stackTrace;
 		}
 	}	
 
@@ -1060,8 +1063,7 @@ CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pP
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	//miniature version of GetCallStack_Fast()
-#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) &&\
-	(defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
+#if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) && (defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
 	void *pStackCrawlEBP;
 	__asm
 	{
@@ -1170,14 +1172,14 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 //	>= 0 is the decoded data size
 //	INT_MIN (most negative value possible) indicates an improperly formatted string (not our data)
 //	all other negative values are the negative of how much dest buffer size is necessary.
-intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, char **ppParseFinishOut )
+intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, const char **ppParseFinishOut )
 {
 	const uint8 *pDecodeRead = (const uint8 *)pString;
 
 	if( (pDecodeRead[0] < 0x80) || (pDecodeRead[1] < 0x80) || (pDecodeRead[2] < 0x80) || (pDecodeRead[3] < 0x80) )
 	{
 		if( ppParseFinishOut != NULL )
-			*ppParseFinishOut = (char *)pString;
+			*ppParseFinishOut = pString;
 
 		return INT_MIN; //Don't know what the string is, but it's not our format
 	}
@@ -1198,7 +1200,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 		if( pDecodeRead[i] < 0x80 ) //encoded data always has MSB set
 		{
 			if( ppParseFinishOut != NULL )
-				*ppParseFinishOut = (char *)pString;
+				*ppParseFinishOut = pString;
 
 			return INT_MIN; //either not our data, or part of the string is missing
 		}
@@ -1207,7 +1209,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 	if( iDestBufferSize < iDecodedSize )
 	{
 		if( ppParseFinishOut != NULL )
-			*ppParseFinishOut = (char *)pDecodeRead;
+			*ppParseFinishOut = reinterpret_cast<const char*>(pDecodeRead);
 
 		return -iDecodedSize; //dest buffer not big enough to hold the data
 	}
@@ -1235,7 +1237,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 	}
 
 	if( ppParseFinishOut != NULL )
-		*ppParseFinishOut = (char *)pDecodeRead;
+		*ppParseFinishOut = reinterpret_cast<const char*>(pDecodeRead);
 
 	return iDecodedSize;	
 }

@@ -54,7 +54,7 @@ public:
 	virtual bool				IsLooped( void ) { return false; }
 	virtual bool				IsStereoWav( void ) { return false; }
 	virtual bool				IsStreaming( void ) { return false; } 
-	virtual int					GetCacheStatus( void ) { return AUDIO_IS_LOADED; }
+	virtual AudioStatus			GetCacheStatus( void ) { return AUDIO_IS_LOADED; }
 	virtual void				CacheLoad( void ) {}
 	virtual void				CacheUnload( void ) {}
 	virtual CSentence			*GetSentence( void ) { return NULL; }
@@ -159,7 +159,7 @@ public:
 	CAudioSourceMP3Cache( CSfxTable *pSfx, CAudioSourceCachedInfo *info );
 	~CAudioSourceMP3Cache( void );
 
-	int						GetCacheStatus( void ) override;
+	AudioStatus				GetCacheStatus( void ) override;
 	void					CacheLoad( void ) override;
 	void					CacheUnload( void ) override;
 	// NOTE: "samples" are bytes for MP3

@@ -11,13 +11,14 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxWidget.h"
+#include "mxtk/mxwidget.h"
 #include "tier0/dbg.h"
 #include <windows.h>
 #include <commctrl.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "tier1/strtools.h"
 
 void mxTab_resizeChild (HWND hwnd);
 void mx_addWidget (mxWidget *widget);
@@ -36,7 +37,7 @@ public:
 
 
 
-mxWidget::mxWidget (mxWindow *parent, int x, int y, int w, int h, const char *label)
+mxWidget::mxWidget (mxWindow *parent, [[maybe_unused]] int x, [[maybe_unused]] int y, [[maybe_unused]] int w, [[maybe_unused]] int h, const char *label)
 {
 	d_this = new mxWidget_i;
 
@@ -140,7 +141,7 @@ mxWidget::setLabel (PRINTF_FORMAT_STRING const char *format, ... )
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	vsprintf (string, format,argptr);
+	V_vsprintf_safe (string, format, argptr);
 	va_end (argptr);
 
 	if (d_this->d_hwnd)

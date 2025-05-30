@@ -499,7 +499,7 @@ public:
 
 				int sizeData = 0;//pRestore->SkipHeader();
 				char szName[MAPKEY_MAXLENGTH];
-				pRestore->ReadString( szName, MAPKEY_MAXLENGTH, sizeData );
+				pRestore->ReadString( szName, sizeData );
 				pNewTemplate->pszName = strdup( szName );
 				//sizeData = pRestore->SkipHeader();
 				pNewTemplate->pszMapData = (char *)malloc( pNewTemplate->iMapDataLength );

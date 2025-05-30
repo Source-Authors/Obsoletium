@@ -9,8 +9,6 @@
 // dimhotepus: ASAN doesn't support default alloc functions replacement.
 #if !defined(__SANITIZE_ADDRESS__) && !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-#undef PROTECTED_THINGS_ENABLE   // allow use of _vsnprintf
-
 #if defined( _WIN32 )
 #include "winlite.h"
 #endif
@@ -45,31 +43,35 @@
 #endif
 
 #if defined( _WIN32 )
-const char *MakeModuleFileName()
+// dimhotepus: Use static buffer to prevent heap leaks.
+const char *MakeModuleFileName(_Out_z_cap_(MAX_PATH) char (&moduleName)[MAX_PATH])
 {
+	moduleName[0] = '\0';
 	if ( g_pMemAlloc && g_pMemAlloc->IsDebugHeap() )
 	{
-		char *pszModuleName = (char *)HeapAlloc( GetProcessHeap(), 0, MAX_PATH ); // small leak, debug only
-		if (pszModuleName)
+		MEMORY_BASIC_INFORMATION mbi;
+		static int dummy;
+		if ( VirtualQuery( &dummy, &mbi, sizeof(mbi) ) )
 		{
-			MEMORY_BASIC_INFORMATION mbi;
-			static int dummy;
-			if ( VirtualQuery( &dummy, &mbi, sizeof(mbi) ) )
-			{
-				GetModuleFileName( static_cast<HMODULE>(mbi.AllocationBase), pszModuleName, MAX_PATH );
-				char *pDot = strrchr( pszModuleName, '.' );
-				if ( pDot )
-				{
-					char *pSlash = strrchr( pszModuleName, '\\' );
-					if ( pSlash )
-					{
-						pszModuleName = pSlash + 1;
-						*pDot = '\0';
-					}
-				}
+			// dimhotepus: Correctly handle insufficient buffer errors.
+			SetLastError(ERROR_SUCCESS);
+			GetModuleFileName( static_cast<HMODULE>(mbi.AllocationBase), moduleName, std::size(moduleName) );
+			if ( GetLastError() != ERROR_SUCCESS )
+				Error( "Unable to get module 0x%p path, %zu buffer size is not enough.\n",
+					mbi.AllocationBase, std::size(moduleName) );
 
-				return pszModuleName;
+			char *pDot = strrchr( moduleName, '.' );
+			if ( pDot )
+			{
+				char *pSlash = strrchr( moduleName, '\\' );
+				if ( pSlash )
+				{
+					memmove( moduleName, pSlash + 1, moduleName + std::size(moduleName) - pSlash - 1 );
+					*pDot = '\0';
+				}
 			}
+
+			return moduleName;
 		}
 	}
 	return nullptr;
@@ -94,8 +96,11 @@ const char *GetModuleFileName()
 		return nullptr;
 #endif
 
-	static const char *pszOwner = MakeModuleFileName();
-	return pszOwner;
+	// dimhotepus: Simplify getting
+	static char owner[MAX_PATH];
+	if (owner[0]) return owner;
+
+	return MakeModuleFileName(owner);
 }
 
 
@@ -141,10 +146,8 @@ inline void *ReallocUnattributed( void *pMem, size_t nSize )
 // end up in a recursion (as g_pMemAlloc->Alloc() calls malloc)
 #if _MSC_VER >= 1900
 #define SUPPRESS_INVALID_PARAMETER_NO_INFO
-#define ALLOC_CALL  __declspec(restrict) __declspec(allocator)
 #define FREE_CALL 
 #else
-#define ALLOC_CALL
 #define FREE_CALL
 #endif
 
@@ -331,13 +334,6 @@ void *__cdecl _expand
 	return nullptr;
 }
 
-unsigned int _amblksiz = 16; //BYTES_PER_PARA;
-
-#if _MSC_VER >= 1400
-HANDLE _crtheap = (HANDLE)1;	// PatM Can't be 0 or CRT pukes
-int __active_heap = 1;
-#endif //  _MSC_VER >= 1400
-
 size_t __cdecl _get_sbh_threshold()
 {
 	return 0;
@@ -443,7 +439,7 @@ void *__cdecl operator new( size_t nSize )
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL)
 _Post_writable_byte_size_(size) __declspec(allocator)
-void *__cdecl operator new( size_t size, ::std::nothrow_t const & ) noexcept
+void *__cdecl operator new( size_t size, ::std::nothrow_t const & ) noexcept //-V835
 {
 	return AllocUnattributed( size );
 }
@@ -459,7 +455,7 @@ void *__cdecl operator new[]( size_t nSize )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void *__cdecl operator new[]( size_t nSize, std::nothrow_t const& ) noexcept
+void *__cdecl operator new[]( size_t nSize, std::nothrow_t const& ) noexcept //-V835
 {
 	return AllocUnattributed( nSize );
 }
@@ -473,7 +469,7 @@ void* __cdecl operator new( std::size_t nSize, std::align_val_t align )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept
+void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
@@ -485,7 +481,7 @@ void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
-void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept
+void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
@@ -504,7 +500,7 @@ void __cdecl operator delete( void* pMem, std::align_val_t align ) noexcept
 	MemAlloc_FreeAligned( pMem );
 }
 
-void __cdecl operator delete( void* pMem, std::align_val_t align, std::nothrow_t const& ) noexcept
+void __cdecl operator delete( void* pMem, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 #ifdef _WIN32
 	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
@@ -546,7 +542,7 @@ void __cdecl operator delete[]( void* ptr, std::align_val_t align ) noexcept
 	MemAlloc_FreeAligned(ptr);
 }
 
-void __cdecl operator delete[]( void* ptr, std::align_val_t align, std::nothrow_t const& ) noexcept
+void __cdecl operator delete[]( void* ptr, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 #ifdef _WIN32
 	// dimhotepus: Windows allocator has 16 bytes alignment by default, so use default free.
@@ -609,7 +605,7 @@ void __cdecl operator delete( void *pMem ) noexcept
 	g_pMemAlloc->Free( pMem );
 }
 
-void __cdecl operator delete( void *block, ::std::nothrow_t const & ) noexcept
+void __cdecl operator delete( void *block, ::std::nothrow_t const & ) noexcept //-V835
 {
 	g_pMemAlloc->Free( block );
 }
@@ -784,13 +780,13 @@ ALLOC_CALL void *__cdecl _aligned_malloc_base( size_t size, size_t align )
 
 inline void *MemAlloc_Unalign( void *pMemBlock )
 {
-	alignas(unsigned **) unsigned *pAlloc = (unsigned *)pMemBlock;
+	alignas(unsigned **) unsigned *pAlloc = static_cast<unsigned *>(pMemBlock);
 
 	// pAlloc points to the pointer to starting of the memory block
-	pAlloc = (unsigned *)(((size_t)pAlloc & ~(sizeof( void * ) - 1)) - sizeof( void * ));
+	pAlloc = reinterpret_cast<unsigned *>((reinterpret_cast<uintp>(pAlloc) & ~(sizeof( void * ) - 1)) - sizeof( void * ));
 
 	// pAlloc is the pointer to the start of memory block
-	return *((unsigned **)pAlloc);
+	return *(reinterpret_cast<unsigned **>(pAlloc)); //-V114
 }
 
 ALLOC_CALL void *__cdecl _aligned_realloc_base( void *ptr, size_t size, size_t align )
@@ -802,11 +798,11 @@ ALLOC_CALL void *__cdecl _aligned_realloc_base( void *ptr, size_t size, size_t a
 	}
 
 	void *pNew = MemAlloc_AllocAligned( size, align );
-	if ( ptr )
+	if ( pNew && ptr )
 	{
 		void *ptrUnaligned = MemAlloc_Unalign( ptr );
 		size_t oldSize = g_pMemAlloc->GetSize( ptrUnaligned );
-		size_t oldOffset = (uintp)ptr - (uintp)ptrUnaligned;
+		size_t oldOffset = reinterpret_cast<uintp>(ptr) - reinterpret_cast<uintp>(ptrUnaligned);
 		size_t copySize = oldSize - oldOffset;
 		if ( copySize > size )
 			copySize = size;
@@ -1019,7 +1015,8 @@ void __cdecl WriteMiniDumpOrBreak( int , const char *pchName )
 	{
 		WriteMiniDump( pchName );
 		// Call Plat_ExitProcess so we don't continue in a bad state. 
-		TerminateProcess(GetCurrentProcess(), 1);
+		// dimhotepus: 1 -> EINVAL as it is EINVAL case.
+		TerminateProcess(GetCurrentProcess(), EINVAL);
 	}
 }
 
@@ -1035,14 +1032,16 @@ char *Wide2Multibyte( const wchar_t* wide )
 	{
 		const size_t expected_count{ wcstombs( nullptr, wide, 0 ) };
 		char *mb{ new char[expected_count] };
-		const size_t actual_count{ wcstombs( mb, wide, expected_count ) };
+		[[maybe_unused]] const size_t actual_count{ wcstombs( mb, wide, expected_count ) };
 
 		Assert(expected_count == actual_count);
-
-		return mb;
+		if (expected_count == actual_count)
+		{
+			return mb;
+		}
 	}
 
-	return new char[4]{"NA"};
+	return new char[4]{"NA"}; //-V112
 }
 
 void VInvalidParameterHandler( const wchar_t* expression,
@@ -1320,8 +1319,9 @@ int __cdecl _CrtDbgReport
 	va_list args;
 	if ( szFormat )
 	{
-		va_start( args, szFormat );
-		_vsnprintf( output, sizeof( output )-1, szFormat, args );
+		va_start( args, szFormat ); //-V2019 //-V2018
+		// The vsnprintf function always writes a null terminator, even if it truncates the output.
+		vsnprintf( output, sizeof( output ), szFormat, args );
 		va_end( args );
 	}
 	else
@@ -1406,7 +1406,7 @@ _CRT_REPORT_HOOK __cdecl _CrtSetReportHook
 	_In_opt_ _CRT_REPORT_HOOK pfnNewHook
 )
 {
-	return reinterpret_cast<_CRT_REPORT_HOOK>( g_pMemAlloc->CrtSetReportHook( reinterpret_cast<void*>(pfnNewHook) ) );
+	return reinterpret_cast<_CRT_REPORT_HOOK>( g_pMemAlloc->CrtSetReportHook( reinterpret_cast<void*>(pfnNewHook) ) ); //-V206
 }
 
 int __cdecl _CrtSetReportHook2

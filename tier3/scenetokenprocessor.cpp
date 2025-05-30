@@ -23,7 +23,7 @@ public:
 	const char	*CurrentToken( void ) override;
 	bool		GetToken( bool crossline ) override;
 	bool		TokenAvailable( void ) override;
-	void		Error( const char *fmt, ... ) override;
+	void		Error( PRINTF_FORMAT_STRING const char *fmt, ... ) override;
 	void		SetBuffer( char *buffer );
 private:
 
@@ -167,12 +167,12 @@ bool CSceneTokenProcessor::TokenAvailable( void )
 // Input  : *fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CSceneTokenProcessor::Error( const char *fmt, ... )
+void CSceneTokenProcessor::Error( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( string, sizeof(string), fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 
 	Warning( "%s", string );

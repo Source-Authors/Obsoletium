@@ -903,7 +903,7 @@ void CEngineClient::Con_NPrintf( int pos, const char *fmt, ... )
 	va_list		argptr;
 	char		text[4096];
 	va_start (argptr, fmt);
-	Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
 	::Con_NPrintf( pos, "%s", text );
@@ -914,7 +914,7 @@ void CEngineClient::Con_NXPrintf( const struct con_nprint_s *info, const char *f
 	va_list		argptr;
 	char		text[4096];
 	va_start (argptr, fmt);
-	Q_vsnprintf(text, sizeof( text ), fmt, argptr);
+	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
 	::Con_NXPrintf( info, "%s", text );
@@ -2130,7 +2130,7 @@ bool CEngineClient::StartDemoRecording( const char *pszFilename, const char *psz
 	}
 
 	// remove .dem extension if it exists
-	Q_StripExtension( szTemp, szFinal, sizeof( szFinal ) );
+	Q_StripExtension( szTemp, szFinal );
 
 	// record it
 	demorecorder->StartRecording( szFinal, false );
@@ -2197,7 +2197,7 @@ void CEngineClient::TakeScreenshot( const char *pszFilename, const char *pszFold
 		V_sprintf_safe( szFinal, "%s", pszFilename );
 	}
 
-	V_SetExtension( szFinal, ".tga", sizeof( szFinal ) ); 
+	V_SetExtension( szFinal, ".tga" ); 
 
 	videomode->TakeSnapshotTGA( szFinal );
 

@@ -318,9 +318,9 @@ bool CClientTools::DrawSprite( IClientRenderable *pRenderable, float scale, floa
 				return false;
 
 			//Fade out the sprite depending on distance from the view origin.
-			r *= blend;
-			g *= blend;
-			b *= blend;
+			r = static_cast<byte>(r * blend);
+			g = static_cast<byte>(g * blend);
+			b = static_cast<byte>(b * blend);
 
 			render->SetBlend( blend );
 		}
@@ -555,9 +555,8 @@ void CClientTools::OnEntityDeleted( CBaseEntity *pEntity )
 	if ( m_bInRecordingMode )
 	{
 		// Send deletion message to tool interface
-		KeyValues *kv = new KeyValues( "deleted" );
+		KeyValuesAD kv( "deleted" );
 		ToolFramework_PostToolMessage( handle, kv );
-		kv->deleteThis();
 	}
 
 	DetachFromEntity( pEntity );
@@ -571,9 +570,8 @@ void CClientTools::OnEntityCreated( CBaseEntity *pEntity )
 	HTOOLHANDLE h = AttachToEntity( pEntity );
 
 	// Send deletion message to tool interface
-	KeyValues *kv = new KeyValues( "created" );
+	KeyValuesAD kv( "created" );
 	ToolFramework_PostToolMessage( h, kv );
-	kv->deleteThis();
 }
 
 HTOOLHANDLE CClientTools::GetToolHandleForEntityByIndex( int entindex )

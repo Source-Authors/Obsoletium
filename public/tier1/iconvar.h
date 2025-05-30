@@ -105,11 +105,11 @@ public:
 	virtual void SetValue( int nValue ) = 0;
 
 	// Return name of command
-	virtual const char *GetName( void ) const = 0;
+	[[nodiscard]] virtual const char *GetName( void ) const = 0;
 
 	// Accessors.. not as efficient as using GetState()/GetInfo()
 	// if you call these methods multiple times on the same IConVar
-	virtual bool IsFlagSet( int nFlag ) const = 0;
+	[[nodiscard]] virtual bool IsFlagSet( int nFlag ) const = 0;
 };
 
 

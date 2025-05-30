@@ -65,6 +65,25 @@ void DisconnectTier2Libraries();
 void InitDefaultFileSystem(void);
 void ShutdownDefaultFileSystem(void);
 
+// dimhotepus: Add RAII wrapper over InitDefaultFileSystem.
+class ScopedDefaultFileSystem
+{
+public:
+  ScopedDefaultFileSystem()
+  {
+	InitDefaultFileSystem();
+  }
+  ~ScopedDefaultFileSystem()
+  {
+	ShutdownDefaultFileSystem();
+  }
+
+  ScopedDefaultFileSystem(ScopedDefaultFileSystem &) = delete;
+  ScopedDefaultFileSystem(ScopedDefaultFileSystem &&) = delete;
+  ScopedDefaultFileSystem& operator=(ScopedDefaultFileSystem &) = delete;
+  ScopedDefaultFileSystem& operator=(ScopedDefaultFileSystem &&) = delete;
+};
+
 
 //-----------------------------------------------------------------------------
 // for simple utilities using valve libraries, call the entry point below in main(). It will
@@ -73,6 +92,7 @@ void ShutdownDefaultFileSystem(void);
 void InitCommandLineProgram( int argc, char **argv );
 void ShutdownCommandLineProgram();
 
+// dimhotepus: Add RAII wrapper over InitCommandLineProgram.
 class ScopedCommandLineProgram
 {
 public:

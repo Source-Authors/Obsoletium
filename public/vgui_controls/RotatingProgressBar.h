@@ -49,7 +49,8 @@ namespace vgui
 
 		float m_flLastAngle;
 
-		float m_flTickDelay;
+		// dimhotepus: float -> int
+		int m_flTickDelay;
 		float m_flApproachSpeed;
 
 		float m_flRotOriginX;

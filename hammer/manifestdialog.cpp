@@ -84,8 +84,8 @@ void CManifestMove::OnOK()
 
 	m_FriendlyNameControl.GetWindowText( m_FriendlyName );
 	m_FileNameControl.GetWindowText( m_FileName );
-	strcpy( FullFileName, m_FileName );
-	V_SetExtension( FullFileName, ".vmf", sizeof( FullFileName ) );
+	V_strcpy_safe( FullFileName, m_FileName );
+	V_SetExtension( FullFileName, ".vmf" );
 	m_FileName = FullFileName;
 	m_CenterContents = ( m_CenterContentsControl.GetCheck() == BST_CHECKED );
 }
@@ -107,9 +107,9 @@ void CManifestMove::OnEnChangeManifestFilename()
 			char		FullFileName[ MAX_PATH ];
 
 			m_FileNameControl.GetWindowText( m_FileName );
-			strcpy( FullFileName, m_FileName );
+			V_strcpy_safe( FullFileName, m_FileName );
 			GetDlgItem( IDOK )->EnableWindow( FullFileName[ 0 ] != 0 );
-			V_SetExtension( FullFileName, ".vmf", sizeof( FullFileName ) );
+			V_SetExtension( FullFileName, ".vmf" );
 			m_FileName = FullFileName;
 			pManifest->GetFullMapPath( m_FileName, FullFileName );
 
@@ -518,7 +518,7 @@ void CManifestListBox::OnVersionControlCheckOut()
 	//{
 		char temp[ 2048 ];
 		
-		sprintf( temp, "Could not check out map: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
+		V_sprintf_safe( temp, "Could not check out map: %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 	// }
 	// else
@@ -582,7 +582,7 @@ void CManifestListBox::OnVersionControlAdd()
 	//{
 		char temp[ 2048 ];
 
-		sprintf( temp, "Could not add map: %s",  /*p4->GetLastError()*/ "Perforce support is disabled" );
+		V_sprintf_safe( temp, "Could not add map: %s",  /*p4->GetLastError()*/ "Perforce support is disabled" );
 		AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 	//}
 	//else
@@ -1168,7 +1168,7 @@ void CManifestCheckin::OnBnClickedOk()
 		// {
 			char temp[ 2048 ];
 
-			sprintf( temp, "Could not check in map(s): %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
+			V_sprintf_safe( temp, "Could not check in map(s): %s", /*p4->GetLastError()*/ "Perforce support is disabled" );
 			AfxMessageBox( temp, MB_ICONHAND | MB_OK );
 
 			return;

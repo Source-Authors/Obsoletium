@@ -25,8 +25,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-const float MAX_SPRITE_SCALE = 64.0f;
-const float MAX_GLOW_PROXY_SIZE = 64.0f;
+constexpr inline float MAX_SPRITE_SCALE = 64.0f;
+constexpr inline float MAX_GLOW_PROXY_SIZE = 64.0f;
 
 LINK_ENTITY_TO_CLASS( env_sprite, CSprite );
 LINK_ENTITY_TO_CLASS( env_sprite_oriented, CSpriteOriented );

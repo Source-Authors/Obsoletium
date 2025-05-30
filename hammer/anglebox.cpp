@@ -180,11 +180,11 @@ bool CAngleBox::GetAngles(QAngle &vecAngles)
 // Input  : szAngles - Buffer to receive angles string.
 // Output : Returns 'szAngles'.
 //-----------------------------------------------------------------------------
-char *CAngleBox::GetAngles(char *szAngles)
+char *CAngleBox::GetAngles(char *szAngles, intp size)
 {
 	QAngle vecAngles;
 	GetAngles(vecAngles);
-	sprintf(szAngles, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
+	V_snprintf(szAngles, size, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
 	return(szAngles);
 }
 

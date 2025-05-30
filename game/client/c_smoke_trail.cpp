@@ -174,13 +174,12 @@ C_SmokeTrail::~C_SmokeTrail()
 {
 	if ( ToolsEnabled() && clienttools->IsInRecordingMode() && m_pSmokeEmitter.IsValid() && m_pSmokeEmitter->GetToolParticleEffectId() != TOOLPARTICLESYSTEMID_INVALID )
 	{
-		KeyValues *msg = new KeyValues( "OldParticleSystem_ActivateEmitter" );
+		KeyValuesAD msg( "OldParticleSystem_ActivateEmitter" );
 		msg->SetInt( "id", m_pSmokeEmitter->GetToolParticleEffectId() );
 		msg->SetInt( "emitter", 0 );
 		msg->SetInt( "active", false );
 		msg->SetFloat( "time", gpGlobals->curtime );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 
 	if ( m_pParticleMgr )
@@ -350,7 +349,7 @@ void C_SmokeTrail::Update( float fTimeDelta )
 		pParticle->m_uchStartAlpha	= alpha * 255; 
 		pParticle->m_uchEndAlpha	= 0;
 			
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= random->RandomFloat( -1.0f, 1.0f );
     }
 }
@@ -396,7 +395,7 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
 	{
 		int nId = m_pSmokeEmitter->AllocateToolParticleEffectId();
 
-		KeyValues *oldmsg = new KeyValues( "OldParticleSystem_Create" );
+		KeyValuesAD oldmsg( "OldParticleSystem_Create" );
 		oldmsg->SetString( "name", "C_SmokeTrail" );
 		oldmsg->SetInt( "id", nId );
 		oldmsg->SetFloat( "time", gpGlobals->curtime );
@@ -473,34 +472,32 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
 
 		KeyValues *pUpdaters = pEmitter->FindKey( "updaters", true );
 	    
-		pUpdaters->FindKey( "DmePositionVelocityUpdater", true );
-		pUpdaters->FindKey( "DmeRollUpdater", true );
+		(void)pUpdaters->FindKey( "DmePositionVelocityUpdater", true );
+		(void)pUpdaters->FindKey( "DmeRollUpdater", true );
 
 		KeyValues *pRollSpeedUpdater = pUpdaters->FindKey( "DmeRollSpeedAttenuateUpdater", true );
 		pRollSpeedUpdater->SetFloat( "attenuation", 1.0f - 8.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "attenuationTme", 1.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "minRollSpeed", 0.5f );
 
-		pUpdaters->FindKey( "DmeAlphaSineUpdater", true );
-		pUpdaters->FindKey( "DmeColorUpdater", true );
-		pUpdaters->FindKey( "DmeSizeUpdater", true );
+		(void)pUpdaters->FindKey( "DmeAlphaSineUpdater", true );
+		(void)pUpdaters->FindKey( "DmeColorUpdater", true );
+		(void)pUpdaters->FindKey( "DmeSizeUpdater", true );
 
 		KeyValues *pEmitter2 = pEmitter->MakeCopy();
 		pEmitter2->SetString( "material", "particle/particle_noisesphere" );
 		pEmitterParent2->AddSubKey( pEmitter2 );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, oldmsg );
-		oldmsg->deleteThis();
 	}
 	else 
 	{
-		KeyValues *oldmsg = new KeyValues( "OldParticleSystem_ActivateEmitter" );
+		KeyValuesAD oldmsg( "OldParticleSystem_ActivateEmitter" );
 		oldmsg->SetInt( "id", m_pSmokeEmitter->GetToolParticleEffectId() );
 		oldmsg->SetInt( "emitter", 0 );
 		oldmsg->SetInt( "active", bEmitterActive );
 		oldmsg->SetFloat( "time", gpGlobals->curtime );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, oldmsg );
-		oldmsg->deleteThis();
 	}
 }
 
@@ -704,7 +701,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 
 		pParticle->m_uchStartSize	= (random->RandomFloat( 5.0f, 6.0f ) * (12-(i))/9) * flScale;
 		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
-		pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 		pParticle->m_flRollDelta	= 0.0f;
 	}
 
@@ -765,7 +762,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 				pParticle->m_uchStartAlpha	= alpha * 255; 
 				pParticle->m_uchEndAlpha	= 0;
 				
-				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+				pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 				pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 			}
 		}
@@ -812,7 +809,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 				pParticle->m_uchStartAlpha	= 255;
 				pParticle->m_uchEndAlpha	= 0;
 				
-				pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+				pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 				pParticle->m_flRollDelta	= random->RandomFloat( -8.0f, 8.0f );
 			}
 		}
@@ -868,7 +865,7 @@ void SporeEffect::UpdateVelocity( SimpleParticle *pParticle, float timeDelta )
 Vector SporeEffect::UpdateColor( const SimpleParticle *pParticle )
 {
 	Vector	color;
-	float	ramp = ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) );//1.0f - ( pParticle->m_flLifetime / pParticle->m_flDieTime );
+	float	ramp = ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI_F * (pParticle->m_flLifetime / pParticle->m_flDieTime) );//1.0f - ( pParticle->m_flLifetime / pParticle->m_flDieTime );
 
 	color[0] = ( (float) pParticle->m_uchColor[0] * ramp ) / 255.0f;
 	color[1] = ( (float) pParticle->m_uchColor[1] * ramp ) / 255.0f;
@@ -1028,7 +1025,7 @@ void C_SporeExplosion::AddParticles( void )
 	}
 
 	//Add smokey bits
-	offset.Random( -(m_flSpawnRadius * 0.5), (m_flSpawnRadius * 0.5) );
+	offset.Random( -(m_flSpawnRadius * 0.5f), (m_flSpawnRadius * 0.5f) );
 	sParticle = (SimpleParticle *) m_pSporeEffect->AddParticle( sizeof(SimpleParticle), g_Mat_DustPuff[1], GetAbsOrigin()+offset );
 
 	if ( sParticle == NULL )
@@ -1299,7 +1296,7 @@ void C_SporeTrail::AddParticles( void )
 		return;
 
 	sParticle->m_Pos			= offset;
-	sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
+	sParticle->m_flRoll			= Helper_RandomFloat( 0, 360 );
 	sParticle->m_flRollDelta	= Helper_RandomFloat( -2.0f, 2.0f );
 
 	sParticle->m_flLifetime		= 0.0f;
@@ -1582,7 +1579,7 @@ void C_FireTrail::Update( float fTimeDelta )
 			pParticle->m_uchStartAlpha	= 64; 
 			pParticle->m_uchEndAlpha	= 0;
 			
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -16.0f, 16.0f );
 		}
 	}
@@ -1687,13 +1684,12 @@ C_DustTrail::~C_DustTrail()
 {
 	if ( ToolsEnabled() && clienttools->IsInRecordingMode() && m_pDustEmitter.IsValid() && m_pDustEmitter->GetToolParticleEffectId() != TOOLPARTICLESYSTEMID_INVALID )
 	{
-		KeyValues *msg = new KeyValues( "OldParticleSystem_ActivateEmitter" );
+		KeyValuesAD msg( "OldParticleSystem_ActivateEmitter" );
 		msg->SetInt( "id", m_pDustEmitter->GetToolParticleEffectId() );
 		msg->SetInt( "emitter", 0 );
 		msg->SetInt( "active", false );
 		msg->SetFloat( "time", gpGlobals->curtime );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 
 	if ( m_pParticleMgr )
@@ -1927,7 +1923,7 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 	{
 		int nId = m_pDustEmitter->AllocateToolParticleEffectId();
 
-		KeyValues *oldmsg = new KeyValues( "OldParticleSystem_Create" );
+		KeyValuesAD oldmsg( "OldParticleSystem_Create" );
 		oldmsg->SetString( "name", "C_DustTrail" );
 		oldmsg->SetInt( "id", nId );
 		oldmsg->SetFloat( "time", gpGlobals->curtime );
@@ -1995,29 +1991,27 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 		pSize->SetFloat( "maxEndSize", m_EndSize );
 
 		KeyValues *pUpdaters = pEmitter->FindKey( "updaters", true );
-		pUpdaters->FindKey( "DmePositionVelocityDecayUpdater", true );
-		pUpdaters->FindKey( "DmeRollUpdater", true );
+		(void)pUpdaters->FindKey( "DmePositionVelocityDecayUpdater", true );
+		(void)pUpdaters->FindKey( "DmeRollUpdater", true );
 
 		KeyValues *pRollSpeedUpdater = pUpdaters->FindKey( "DmeRollSpeedAttenuateUpdater", true );
 		pRollSpeedUpdater->SetFloat( "attenuation", 1.0f - 8.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "attenuationTme", 1.0f / 30.0f );
 		pRollSpeedUpdater->SetFloat( "minRollSpeed", 0.5f );
 
-		pUpdaters->FindKey( "DmeAlphaSineRampUpdater", true );
-		pUpdaters->FindKey( "DmeColorUpdater", true );
-		pUpdaters->FindKey( "DmeSizeUpdater", true );
+		(void)pUpdaters->FindKey( "DmeAlphaSineRampUpdater", true );
+		(void)pUpdaters->FindKey( "DmeColorUpdater", true );
+		(void)pUpdaters->FindKey( "DmeSizeUpdater", true );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, oldmsg );
-		oldmsg->deleteThis();
 	}
 	else 
 	{
-		KeyValues *oldmsg = new KeyValues( "OldParticleSystem_ActivateEmitter" );
+		KeyValuesAD oldmsg( "OldParticleSystem_ActivateEmitter" );
 		oldmsg->SetInt( "id", m_pDustEmitter->GetToolParticleEffectId() );
 		oldmsg->SetInt( "emitter", 0 );
 		oldmsg->SetInt( "active", bEmitterActive );
 		oldmsg->SetFloat( "time", gpGlobals->curtime );
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, oldmsg );
-		oldmsg->deleteThis();
 	}
 }

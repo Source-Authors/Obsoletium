@@ -6,7 +6,8 @@
 //===========================================================================//
 
 #include <vgui_controls/Controls.h>
-#include <locale.h>
+
+#include <clocale>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -38,7 +39,7 @@ bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *, int )
 		Error( "Must include memoverride.cpp in your project." );
 #endif
 	}
-#endif	
+#endif
 	// keep a record of this module name
 	V_strcpy_safe(g_szControlsModuleName, moduleName);
 

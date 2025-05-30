@@ -32,7 +32,7 @@ class CDmeSequenceList : public CDmeMdlList
 	DEFINE_ELEMENT( CDmeSequenceList, CDmeMdlList );
 
 public:
-	virtual CDmAttribute *GetListAttr() { return m_Sequences.GetAttribute(); }
+	CDmAttribute *GetListAttr() override { return m_Sequences.GetAttribute(); }
 
 	CDmaElementArray< CDmeSequence > m_Sequences;
 

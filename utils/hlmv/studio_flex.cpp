@@ -36,7 +36,7 @@ int LocalLinearToTexture( float v )
 // hack!  Should probably use the gamma stuff in mathlib since we already linking it.
 float LocalTextureToLinear( int c )
 {
-	return pow( c / 255.0, 2.2 );
+	return pow( c / 255.0f, 2.2f );
 }
 
 

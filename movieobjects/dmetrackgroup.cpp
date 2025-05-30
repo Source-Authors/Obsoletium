@@ -6,7 +6,6 @@
 
 #include "movieobjects/dmetrackgroup.h"
 
-#include <limits.h>
 #include "tier0/dbg.h"
 #include "datamodel/dmelementfactoryhelper.h"
 #include "movieobjects/dmetrack.h"
@@ -32,7 +31,7 @@ void CDmeTrackGroup::OnConstruction()
 	m_bMute.Init( this, "mute" );
 	m_nDisplaySize.InitAndSet( this, "displaySize", 110 );
 	m_bMinimized.InitAndSet( this, "minimized", true );
-	m_nMaxTrackCount = INT_MAX;
+	m_nMaxTrackCount = std::numeric_limits<intp>::max();
 	m_Volume.InitAndSet( this, "volume", 1.0 );
 
 }
@@ -48,7 +47,7 @@ void CDmeTrackGroup::OnDestruction()
 //-----------------------------------------------------------------------------
 // Max track count
 //-----------------------------------------------------------------------------
-void CDmeTrackGroup::SetMaxTrackCount( int nCount )
+void CDmeTrackGroup::SetMaxTrackCount( intp nCount )
 {
 	m_nMaxTrackCount = nCount;
 }
@@ -178,7 +177,7 @@ void CDmeTrackGroup::RemoveTrack( intp nIndex )
 
 void CDmeTrackGroup::RemoveTrack( CDmeTrack *pTrack )
 {
-	int i = GetTrackIndex( pTrack );
+	intp i = GetTrackIndex( pTrack );
 	if ( i >= 0 )
 	{
 		m_Tracks.Remove( i );
@@ -227,7 +226,7 @@ CDmeTrack *CDmeTrackGroup::FindTrack( const char *pTrackName ) const
 	return NULL;
 }
 
-int CDmeTrackGroup::GetTrackIndex( CDmeTrack *pTrack ) const
+intp CDmeTrackGroup::GetTrackIndex( CDmeTrack *pTrack ) const
 {
 	intp nTracks = m_Tracks.Count();
 	for ( intp i = 0 ; i < nTracks; ++i )
@@ -317,7 +316,7 @@ CDmeTrack *CDmeTrackGroup::ChangeTrack( CDmeClip *pClip, const char *pNewTrack )
 //-----------------------------------------------------------------------------
 CDmeTrack *CDmeTrackGroup::FindTrackForClip( CDmeClip *pClip ) const
 {
-	int nTrackIndex = -1;
+	intp nTrackIndex = -1;
 	if ( !FindTrackForClip( pClip, &nTrackIndex, NULL ) )
 		return NULL;
 
@@ -325,7 +324,7 @@ CDmeTrack *CDmeTrackGroup::FindTrackForClip( CDmeClip *pClip ) const
 }
 
 
-bool CDmeTrackGroup::FindTrackForClip( CDmeClip *pClip, int *pTrackIndex, int *pClipIndex ) const
+bool CDmeTrackGroup::FindTrackForClip( CDmeClip *pClip, intp *pTrackIndex, intp *pClipIndex ) const
 {
 	DmeClipType_t type = pClip->GetClipType();
 	intp c = GetTrackCount();
@@ -338,8 +337,8 @@ bool CDmeTrackGroup::FindTrackForClip( CDmeClip *pClip, int *pTrackIndex, int *p
 		if ( pTrack->GetClipType() != type )
 			continue;
 
-		int nClipCount = pTrack->GetClipCount();
-		for ( int j = 0; j < nClipCount; ++j )
+		intp nClipCount = pTrack->GetClipCount();
+		for ( intp j = 0; j < nClipCount; ++j )
 		{
 			if ( pTrack->GetClip( j ) == pClip )
 			{
@@ -487,9 +486,9 @@ void CDmeTrackGroup::SortTracksByType()
 //-----------------------------------------------------------------------------
 // Returns the flattened clip count
 //-----------------------------------------------------------------------------
-int CDmeTrackGroup::GetSubClipCount() const
+intp CDmeTrackGroup::GetSubClipCount() const
 {
-	int nCount = 0;
+	intp nCount = 0;
 	DMETRACKGROUP_FOREACH_CLIP_START( this, pTrack, pClip )
 		++nCount;
 	DMETRACKGROUP_FOREACH_CLIP_END()
@@ -498,7 +497,7 @@ int CDmeTrackGroup::GetSubClipCount() const
 
 void CDmeTrackGroup::GetSubClips( CDmeClip **ppClips )
 {
-	int nCount = 0;
+	intp nCount = 0;
 	DMETRACKGROUP_FOREACH_CLIP_START( this, pTrack, pClip )
 		ppClips[nCount++] = pClip;
 	DMETRACKGROUP_FOREACH_CLIP_END()

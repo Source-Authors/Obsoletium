@@ -107,7 +107,7 @@ CPhysicsMotionController::CPhysicsMotionController( IMotionEvent *pHandler, CPhy
 {
 	m_handler = pHandler;
 	m_pVEnv = pVEnv;
-	SetPriority( MEDIUM_PRIORITY );
+	CPhysicsMotionController::SetPriority( MEDIUM_PRIORITY );
 }
 
 CPhysicsMotionController::~CPhysicsMotionController( void )

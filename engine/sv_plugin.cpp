@@ -220,11 +220,6 @@ CServerPlugin::~CServerPlugin() = default;
 //---------------------------------------------------------------------------------
 void CServerPlugin::LoadPlugins()
 {
-	if ( IsX360() )
-	{
-		return;
-	}
-
 	m_Plugins.PurgeAndDeleteElements();
 
 	char const *findfn = Sys_FindFirst( "addons/*.vdf", NULL, 0 );
@@ -237,12 +232,15 @@ void CServerPlugin::LoadPlugins()
 			continue;
 		}
 	
-		KeyValues::AutoDelete pluginsFile = KeyValues::AutoDelete("Plugins");
-		pluginsFile->LoadFromFile( g_pFileSystem, va("addons/%s", findfn), "MOD" );
-
-		if ( pluginsFile->GetString("file", NULL) ) 
+		KeyValuesAD pluginsFile("Plugins");
+		// dimhotepus: Check plugin KVs are loaded.
+		if ( pluginsFile->LoadFromFile( g_pFileSystem, va("addons/%s", findfn), "MOD" ) )
 		{
-			LoadPlugin(pluginsFile->GetString("file"));
+			const char *fileName = pluginsFile->GetString("file", NULL);
+			if ( fileName ) 
+			{
+				LoadPlugin(fileName);
+			}
 		}
 
 		// move to next item

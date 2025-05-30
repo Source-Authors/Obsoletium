@@ -461,7 +461,7 @@ void CTextureWindow::UpdateScrollSizes(void)
 	SetScrollInfo(SB_VERT, &si, TRUE);
 
 	char szbuf[100];
-	sprintf(szbuf, "Size = %d %d\n", total_y, TE.clientrect.bottom);
+	V_sprintf_safe(szbuf, "Size = %d %d\n", total_y, TE.clientrect.bottom);
 	TRACE0(szbuf);
 }
 
@@ -782,6 +782,7 @@ void CTextureWindow::OnLButtonDown(UINT nFlags, CPoint point)
 	int iVertPos = GetScrollPos(SB_VERT);
 
 	char szNewTexture[128];
+	szNewTexture[0] = '\0';
 
 	point += CPoint(iHorzPos, iVertPos);
 

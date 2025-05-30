@@ -31,7 +31,7 @@ struct ExportInfo_t
 //-----------------------------------------------------------------------------
 // Used to transform channel data into export time
 //-----------------------------------------------------------------------------
-static void ComputeExportChannelScaleBias( double *pScale, DmeTime_t *pBias, ExportInfo_t &info, CDmeChannel *pChannel )
+static void ComputeExportChannelScaleBias( float *pScale, DmeTime_t *pBias, ExportInfo_t &info, CDmeChannel *pChannel )
 {
 	DmeClipStack_t channelToGlobal;
 	if ( pChannel->BuildClipStack( &channelToGlobal, info.m_pMovie, info.m_pShot ) )
@@ -62,7 +62,7 @@ static void AddLogLayerForExport( ExportInfo_t &info, CDmElement *pRoot, const c
 	CDmrElementArray<> animations( pRoot, "animations" );
 
 	DmeTime_t tBias;
-	double flScale;
+	float flScale;
 	ComputeExportChannelScaleBias( &flScale, &tBias, info, pChannel );
 
 	// Only export the base layer
@@ -107,7 +107,7 @@ static void ExportAnimations( ExportInfo_t &info, CDmElement *pRoot )
 			if ( pValueLog && pBalanceLog && pValueLog->GetNumLayers() != 0 && pBalanceLog->GetNumLayers() != 0 ) 
 			{
 				DmeTime_t tValueBias, tBalanceBias;
-				double flValueScale, flBalanceScale;
+				float flValueScale, flBalanceScale;
 				ComputeExportChannelScaleBias( &flValueScale, &tValueBias, info, pValueChannel );
 				ComputeExportChannelScaleBias( &flBalanceScale, &tBalanceBias, info, pBalanceChannel );
 
@@ -132,11 +132,11 @@ static void ExportAnimations( ExportInfo_t &info, CDmElement *pRoot )
 				pBalanceLogLayer->RemoveKeysOutsideRange( info.m_tExportStart, info.m_tExportEnd );
 
 				char pControlName[512];
-				Q_snprintf( pControlName, sizeof(pControlName), "value_%s", pControl->GetName() );
+				V_sprintf_safe( pControlName, "value_%s", pControl->GetName() );
 				pValueLogLayer->SetName( pControlName );
 				animations.AddToTail( pValueLogLayer ); 
 
-				Q_snprintf( pControlName, sizeof(pControlName), "balance_%s", pControl->GetName() );
+				V_sprintf_safe( pControlName, "balance_%s", pControl->GetName() );
 				pBalanceLogLayer->SetName( pControlName );
 				animations.AddToTail( pBalanceLogLayer ); 
 			}
@@ -150,7 +150,7 @@ static void ExportAnimations( ExportInfo_t &info, CDmElement *pRoot )
 		if ( pControl->GetValue<bool>( "multi" ) )
 		{
 			char pControlName[512];
-			Q_snprintf( pControlName, sizeof(pControlName), "multi_%s", pControl->GetName() );
+			V_sprintf_safe( pControlName, "multi_%s", pControl->GetName() );
 			CDmeChannel *pMultiChannel = pControl->GetValueElement<CDmeChannel>( "multilevelchannel" );
 			AddLogLayerForExport( info, pRoot, pControlName, pMultiChannel );
 		}
@@ -166,8 +166,8 @@ static void ExportSounds( ExportInfo_t &info, CDmElement *pRoot, CDmeClip *pClip
 	CDmrElementArray<> sounds( pRoot, "sounds", true );
 
 	DmeClipStack_t soundToGlobal;
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeSoundClip, pTrackGroup, pTrack, pSoundClip )
@@ -206,8 +206,8 @@ static void ExportSounds_R( ExportInfo_t &info, CDmElement *pRoot, CDmeClip *pCl
 
 	// Recurse
 	DmeClipStack_t childToGlobal;
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_START( pTrackGroup, pTrack, pChild )

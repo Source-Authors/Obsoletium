@@ -30,9 +30,9 @@ class HaltonSequenceGenerator_t
 public:
 	HaltonSequenceGenerator_t(int base);					//< base MUST be prime, >=2
 
-	float GetElement(int element);
+	[[nodiscard]] float GetElement(int element);
 
-	inline float NextValue(void)
+	[[nodiscard]] inline float NextValue(void)
 	{
 		return GetElement(seed++);
 	}
@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	Vector NextValue(void)
+	[[nodiscard]] Vector NextValue(void)
 	{
 		float zvalue=zdot.NextValue();
 		zvalue=2*zvalue-1.0f;								// map from 0..1 to -1..1

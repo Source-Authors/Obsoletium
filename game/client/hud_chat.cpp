@@ -56,10 +56,10 @@ void CHudChat::MsgFunc_SayText2( bf_read &msg )
 	ReadLocalizedString( msg, szBuf[3], sizeof( szBuf[3] ), true );
 	ReadLocalizedString( msg, szBuf[4], sizeof( szBuf[4] ), true );
 
-	g_pVGuiLocalize->ConstructString( szBuf[5], sizeof( szBuf[5] ), msg_text, 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
+	g_pVGuiLocalize->ConstructString_safe( szBuf[5], msg_text, 4, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 
 	char ansiString[512];
-	g_pVGuiLocalize->ConvertUnicodeToANSI( ConvertCRtoNL( szBuf[5] ), ansiString, sizeof( ansiString ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( ConvertCRtoNL( szBuf[5] ), ansiString );
 
 	if ( bWantsToChat )
 	{
@@ -85,8 +85,8 @@ void CHudChat::MsgFunc_SayText( bf_read &msg )
 {
 	char szString[256];
 
-	msg.ReadByte(); // client ID
-	msg.ReadString( szString, sizeof(szString) );
+	(void)msg.ReadByte(); // client ID
+	msg.ReadString( szString );
 	Printf( CHAT_FILTER_NONE, "%s", szString );
 }
 
@@ -109,31 +109,31 @@ void CHudChat::MsgFunc_TextMsg( bf_read &msg )
 	int msg_dest = msg.ReadByte();
 	static char szBuf[6][256];
 
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 	char *msg_text = hudtextmessage->LookupString( szString, &msg_dest );
 	Q_strncpy( szBuf[0], msg_text, sizeof( szBuf[0] ) );
 	msg_text = szBuf[0];
 
 	// keep reading strings and using C format strings for subsituting the strings into the localised text string
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 	char *sstr1 = hudtextmessage->LookupString( szString );
 	Q_strncpy( szBuf[1], sstr1, sizeof( szBuf[1] ) );
 	sstr1 = szBuf[1];
 
 	StripEndNewlineFromString( sstr1 );  // these strings are meant for subsitution into the main strings, so cull the automatic end newlines
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 	char *sstr2 = hudtextmessage->LookupString( szString );
 	Q_strncpy( szBuf[2], sstr2, sizeof( szBuf[2] ) );
 	sstr2 = szBuf[2];
 	
 	StripEndNewlineFromString( sstr2 );
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 	char *sstr3 = hudtextmessage->LookupString( szString );
 	Q_strncpy( szBuf[3], sstr3, sizeof( szBuf[3] ) );
 	sstr3 = szBuf[3];
 
 	StripEndNewlineFromString( sstr3 );
-	msg.ReadString( szString, sizeof(szString) );
+	msg.ReadString( szString );
 	char *sstr4 = hudtextmessage->LookupString( szString );
 	Q_strncpy( szBuf[4], sstr4, sizeof( szBuf[4] ) );
 	sstr4 = szBuf[4];

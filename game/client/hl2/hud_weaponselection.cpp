@@ -761,7 +761,7 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 			DrawBox( xpos, ypos, boxWide, boxTall, selectedColor, alpha, number );
 
 			// draw icon
-			col[3] *= (alpha / 255.0f);
+			col[3] = static_cast<byte>(col[3] * alpha / 255.0f);
 			if ( pWeapon->GetSpriteActive() )
 			{
 				// find the center of the box to draw in
@@ -827,7 +827,7 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 			int	y_offs;
 
 			// draw icon
-			col[3] *= (alpha / 255.0f);
+			col[3] = static_cast<byte>(col[3] * alpha / 255.0f);
 
 			if ( pWeapon->GetSpriteInactive() )
 			{
@@ -882,7 +882,7 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 					else
 					{
 						// draw a percentage of the last one
-						col[3] *= fl;
+						col[3] = static_cast<byte>(col[3] * fl);
 						pWeapon->GetSpriteActive()->DrawSelf( xpos + x_offs, ypos + y_offs, col );
 					}
 				}
@@ -916,16 +916,15 @@ void CHudWeaponSelection::DrawLargeWeaponBox( C_BaseCombatWeapon *pWeapon, bool 
 		if ( tempString )
 		{
 #ifdef WIN32
-			_snwprintf(text, sizeof(text)/sizeof(wchar_t) - 1, L"%s", tempString);
+			V_swprintf_safe(text, L"%s", tempString);
 #else
-			_snwprintf(text, sizeof(text)/sizeof(wchar_t) - 1, L"%S", tempString);
+			V_swprintf_safe(text, L"%S", tempString);
 #endif
-			text[sizeof(text)/sizeof(wchar_t) - 1] = 0;
 		}
 		else
 		{
 			// string wasn't found by g_pVGuiLocalize->Find()
-			g_pVGuiLocalize->ConvertANSIToUnicode(weaponInfo.szPrintName, text, sizeof(text));
+			g_pVGuiLocalize->ConvertANSIToUnicode(weaponInfo.szPrintName, text);
 		}
 
 		surface()->DrawSetTextColor( col );
@@ -1008,7 +1007,7 @@ void CHudWeaponSelection::DrawBox(int x, int y, int wide, int tall, Color color,
 	if (number >= 0)
 	{
 		Color numberColor = m_NumberColor;
-		numberColor[3] *= normalizedAlpha / 255.0f;
+		numberColor[3] = static_cast<byte>(numberColor[3] * normalizedAlpha / 255.0f);
 		surface()->DrawSetTextColor(numberColor);
 		surface()->DrawSetTextFont(m_hNumberFont);
 		wchar_t wch = '0' + number;

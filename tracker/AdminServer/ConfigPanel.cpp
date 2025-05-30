@@ -25,7 +25,7 @@
 
 using namespace vgui;
 
-static const long RETRY_TIME = 10000;		// refresh server every 10 seconds
+static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 seconds
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -153,11 +153,11 @@ void CConfigPanel::OnCommand(const char *command)
 		char timeText[20];
 		int time,timeGraphs;
 
-		m_pRefreshTextEntry->GetText(timeText,20);
+		m_pRefreshTextEntry->GetText(timeText);
 		sscanf(timeText,"%i",&time);
 	
-		memset(timeText, 0x0, sizeof(timeText));
-		m_pGraphsRefreshTimeTextEntry->GetText(timeText, 20);
+		BitwiseClear(timeText);
+		m_pGraphsRefreshTimeTextEntry->GetText(timeText);
 		sscanf(timeText,"%i",&timeGraphs);
 
 

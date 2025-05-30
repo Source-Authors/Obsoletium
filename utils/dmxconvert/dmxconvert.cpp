@@ -19,6 +19,8 @@
 #include "filesystem.h"
 #include "../common/tools_minidump.h"
 
+#include "tier0/memdbgon.h"
+
 class CDmElement;
 
 namespace {

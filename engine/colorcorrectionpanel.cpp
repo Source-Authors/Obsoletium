@@ -42,8 +42,8 @@
 
 using namespace vgui;
 
-const int g_nPreviewImageWidth  = 128;
-const int g_nPreviewImageHeight =  96;
+constexpr inline int g_nPreviewImageWidth  = 128;
+constexpr inline int g_nPreviewImageHeight =  96;
 
 ConVar mat_colorcorrection( "mat_colorcorrection", "0", FCVAR_ARCHIVE );
 ConVar mat_colcorrection_disableentities( "mat_colcorrection_disableentities", "0" );
@@ -166,7 +166,7 @@ void CPrecisionSlider::SetEnabled( bool state )
 void CPrecisionSlider::OnTextNewLine( KeyValues *data )
 {
 	char buf[256];
-	m_pTextEntry->GetText( buf, 256 );
+	m_pTextEntry->GetText( buf );
 
 	int value = 0;
 	sscanf( buf, "%d", &value );
@@ -4323,7 +4323,7 @@ void CNewOperationDialog::OnCommand( const char *command )
 		if( m_pName->GetTextLength()>0 )
 		{
 			char buf[256];
-			m_pName->GetText( buf, 256 );
+			m_pName->GetText( buf );
 			newOp->SetName( buf );
 		}
 
@@ -4520,7 +4520,7 @@ void COperationListPanel::OnMouseDoublePressed( MouseCode code )
 void COperationListPanel::OnTextNewLine( KeyValues *data )
 {
 	char newName[256];
-	m_pNameEditPanel->GetText( newName, 256 );
+	m_pNameEditPanel->GetText( newName );
 
 	if( m_nEditItem!=-1 )
 	{
@@ -4891,7 +4891,7 @@ void CColorOperationListPanel::PopulateList( )
 		IColorOperation *op = m_OperationList.GetOperation( i );
 		if( op )
 		{
-			KeyValues *kv = new KeyValues( "operation", "layer", op->GetName() );
+			KeyValuesAD kv(new KeyValues( "operation", "layer", op->GetName() ));
 			kv->SetInt( "image", (op->IsEnabled())?1:0 );
 			
 			m_pOperationListPanel->AddItem( kv, (uintp)op, false, false );

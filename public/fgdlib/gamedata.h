@@ -11,8 +11,8 @@
 #endif
 
 #include <fstream>
-#include "GDClass.h"
-#include "InputOutput.h"
+#include "gdclass.h"
+#include "inputoutput.h"
 #include "tier1/tokenreader.h"
 #include "tier1/utlstring.h"
 #include "tier1/utlvector.h"
@@ -83,8 +83,18 @@ class GameData
 		inline GDclass *GetClass(intp nIndex) const;
 
 		GDclass *BeginInstanceRemap( const char *pszClassName, const char *pszInstancePrefix, Vector &Origin, QAngle &Angle );
-		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
-		bool	RemapNameField( const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup );
+		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, intp outLen, TNameFixup NameFixup );
+		template<intp outSize>
+		bool	RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_ARRAY char (&pszOutValue)[outSize], TNameFixup NameFixup )
+		{
+			return RemapKeyValue( pszKey, pszInValue, pszOutValue, outSize, NameFixup );
+		}
+		bool	RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, intp outLen, TNameFixup NameFixup );
+		template<intp outSize>
+		bool	RemapNameField( const char *pszInValue, OUT_Z_ARRAY char (&pszOutValue)[outSize], TNameFixup NameFixup )
+		{
+			return RemapNameField ( pszInValue, pszOutValue, outSize, NameFixup );
+		}
 		bool	LoadFGDMaterialExclusions( TokenReader &tr );
 		bool	LoadFGDAutoVisGroups( TokenReader &tr );
 		
@@ -151,7 +161,12 @@ int GameData::GetMaxMapCoord() const
 GameDataMessageFunc_t GDSetMessageFunc(GameDataMessageFunc_t pFunc);
 bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...);
 bool GDSkipToken(TokenReader &tr, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);
-bool GDGetToken(TokenReader &tr, char *pszStore, int nSize, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);
+bool GDGetToken(TokenReader &tr, OUT_Z_CAP(nSize) char *pszStore, intp nSize, trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL);
+template<intp size>
+bool GDGetToken(TokenReader &tr, OUT_Z_ARRAY char (&pszStore)[size], trtoken_t ttexpecting = TOKENNONE, const char *pszExpecting = NULL)
+{
+	return GDGetToken(tr, pszStore, size, ttexpecting, pszExpecting);
+}
 bool GDGetTokenDynamic(TokenReader &tr, char **pszStore, trtoken_t ttexpecting, const char *pszExpecting = NULL);
 
 

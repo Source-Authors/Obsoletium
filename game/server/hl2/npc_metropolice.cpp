@@ -1172,24 +1172,24 @@ CBaseEntity *CNPC_MetroPolice::GetShootTarget()
 //-----------------------------------------------------------------------------
 
 // Ranges across which to tune fire rates
-const float MIN_PISTOL_MODIFY_DIST = 15 * 12;
-const float MAX_PISTOL_MODIFY_DIST = 150 * 12;
+constexpr inline float MIN_PISTOL_MODIFY_DIST = 15 * 12;
+constexpr inline float MAX_PISTOL_MODIFY_DIST = 150 * 12;
 
 // Range for rest period minimums
-const float MIN_MIN_PISTOL_REST_INTERVAL = 0.6;
-const float MAX_MIN_PISTOL_REST_INTERVAL = 1.2;
+constexpr inline float MIN_MIN_PISTOL_REST_INTERVAL = 0.6;
+constexpr inline float MAX_MIN_PISTOL_REST_INTERVAL = 1.2;
 
 // Range for rest period maximums
-const float MIN_MAX_PISTOL_REST_INTERVAL = 1.2;
-const float MAX_MAX_PISTOL_REST_INTERVAL = 2.0;
+constexpr inline float MIN_MAX_PISTOL_REST_INTERVAL = 1.2;
+constexpr inline float MAX_MAX_PISTOL_REST_INTERVAL = 2.0;
 
 // Range for burst minimums
-const int 	MIN_MIN_PISTOL_BURST = 2;
-const int 	MAX_MIN_PISTOL_BURST = 4;
+constexpr inline int 	MIN_MIN_PISTOL_BURST = 2;
+constexpr inline int 	MAX_MIN_PISTOL_BURST = 4;
 
 // Range for burst maximums
-const int 	MIN_MAX_PISTOL_BURST = 5;
-const int 	MAX_MAX_PISTOL_BURST = 8;
+constexpr inline int 	MIN_MAX_PISTOL_BURST = 5;
+constexpr inline int 	MAX_MAX_PISTOL_BURST = 8;
 
 void CNPC_MetroPolice::OnUpdateShotRegulator( )
 {

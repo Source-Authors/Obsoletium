@@ -5,18 +5,16 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <ctype.h>
+#include <vgui_controls/Label.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
-#include <KeyValues.h>
 
-#include <vgui_controls/Label.h>
 #include <vgui_controls/Image.h>
 #include <vgui_controls/TextImage.h>
 #include <vgui_controls/Controls.h>
@@ -259,7 +257,7 @@ void Label::OnMousePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 // Purpose: Return the text in the label
 //-----------------------------------------------------------------------------
-void Label::GetText(char *textOut, int bufferLen)
+void Label::GetText(OUT_Z_BYTECAP(bufferLen) char *textOut, int bufferLen)
 {
 	_textImage->GetText(textOut, bufferLen);
 }
@@ -267,7 +265,7 @@ void Label::GetText(char *textOut, int bufferLen)
 //-----------------------------------------------------------------------------
 // Purpose: Return the text in the label
 //-----------------------------------------------------------------------------
-void Label::GetText(wchar_t *textOut, int bufLenInBytes)
+void Label::GetText(OUT_Z_BYTECAP(bufLenInBytes) wchar_t *textOut, int bufLenInBytes)
 {
 	_textImage->GetText(textOut, bufLenInBytes);
 }
@@ -333,7 +331,7 @@ void Label::OnDialogVariablesChanged(KeyValues *dialogVariables )
 	{
 		// reconstruct the string from the variables
 		wchar_t buf[1024];
-		g_pVGuiLocalize->ConstructString(buf, sizeof(buf), index, dialogVariables);
+		g_pVGuiLocalize->ConstructString_safe(buf, index, dialogVariables);
 		SetText(buf);
 	}
 }
@@ -786,7 +784,7 @@ bool Label::RequestInfo(KeyValues *outputData)
 	if (!stricmp(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[256];
-		_textImage->GetText(wbuf, 255);
+		_textImage->GetText(wbuf);
 		outputData->SetWString("text", wbuf);
 		return true;
 	}
@@ -820,10 +818,11 @@ void Label::OnSetText(KeyValues *params)
 intp Label::AddImage(IImage *image, int offset)
 {
 	intp newImage = _imageDar.AddToTail();
-	_imageDar[newImage].image = image;
-	_imageDar[newImage].offset = (short)offset;
-	_imageDar[newImage].xpos = -1;
-	_imageDar[newImage].width = -1;
+	auto &dar = _imageDar[newImage];
+	dar.image = image;
+	dar.offset = (short)offset;
+	dar.xpos = -1;
+	dar.width = -1;
 	InvalidateLayout();
 	return newImage;
 }
@@ -851,7 +850,7 @@ void Label::ResetToSimpleTextImage()
 //			By default there is a TextImage in position 0
 //			Set the contents of an IImage in the IImage array.
 //-----------------------------------------------------------------------------
-void Label::SetImageAtIndex(int index, IImage *image, int offset)
+void Label::SetImageAtIndex(intp index, IImage *image, int offset)
 {
 	EnsureImageCapacity(index);
 //	Assert( image );
@@ -867,7 +866,7 @@ void Label::SetImageAtIndex(int index, IImage *image, int offset)
 //-----------------------------------------------------------------------------
 // Purpose: Get an IImage in the IImage array.
 //-----------------------------------------------------------------------------
-IImage *Label::GetImageAtIndex(int index)
+IImage *Label::GetImageAtIndex(intp index)
 {
 	if ( _imageDar.IsValidIndex( index ) )
 		return _imageDar[index].image;
@@ -877,7 +876,7 @@ IImage *Label::GetImageAtIndex(int index)
 //-----------------------------------------------------------------------------
 // Purpose: Get the number of images in the array.
 //-----------------------------------------------------------------------------
-int Label::GetImageCount()
+intp Label::GetImageCount()
 {
 	return _imageDar.Count();
 }
@@ -888,14 +887,14 @@ int Label::GetImageCount()
 // Input  : newIndex - 
 // Output : int - the index the default text image was previously in
 //-----------------------------------------------------------------------------
-int Label::SetTextImageIndex(int newIndex)
+intp Label::SetTextImageIndex(intp newIndex)
 {
 	if (newIndex == _textImageIndex)
 		return _textImageIndex;
 
 	EnsureImageCapacity(newIndex);
 
-	int oldIndex = _textImageIndex;
+	intp oldIndex = _textImageIndex;
 	if ( _textImageIndex >= 0 )
 	{
 		_imageDar[_textImageIndex].image = NULL;
@@ -911,7 +910,7 @@ int Label::SetTextImageIndex(int newIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Ensure that the maxIndex will be a valid index
 //-----------------------------------------------------------------------------
-void Label::EnsureImageCapacity(int maxIndex)
+void Label::EnsureImageCapacity(intp maxIndex)
 {
 	while (_imageDar.Count() <= maxIndex)
 	{
@@ -922,7 +921,7 @@ void Label::EnsureImageCapacity(int maxIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Set the offset in pixels before the image
 //-----------------------------------------------------------------------------
-void Label::SetImagePreOffset(int index, int preOffset)
+void Label::SetImagePreOffset(intp index, int preOffset)
 {
 	if (_imageDar.IsValidIndex(index) && _imageDar[index].offset != preOffset)
 	{
@@ -1060,7 +1059,7 @@ void Label::GetSettings( KeyValues *outResourceData )
 
 	// label settings
 	char buf[256];
-	_textImage->GetUnlocalizedText( buf, 255 );
+	_textImage->GetUnlocalizedText( buf );
 	if (!strnicmp(buf, "#var_", 5))
 	{
 		// strip off the variable prepender on save
@@ -1133,7 +1132,7 @@ void Label::ApplySettings( KeyValues *inResourceData )
 		{
 			// it's a variable, set it to be a special variable localized string
 			wchar_t unicodeVar[256];
-			g_pVGuiLocalize->ConvertANSIToUnicode(labelText, unicodeVar, sizeof(unicodeVar));
+			g_pVGuiLocalize->ConvertANSIToUnicode(labelText, unicodeVar);
 
 			char var[256];
 			V_sprintf_safe(var, "#var_%s", labelText);

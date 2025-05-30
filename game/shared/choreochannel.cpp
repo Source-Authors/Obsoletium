@@ -548,7 +548,7 @@ void CChoreoChannel::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChore
 bool CChoreoChannel::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, CChoreoActor *pActor, IChoreoStringPool *pStringPool )
 {
 	char sz[ 256 ];
-	pStringPool->GetString( buf.GetShort(), sz, sizeof( sz ) );
+	pStringPool->GetString( buf.GetShort(), sz );
 	SetName( sz );
 
 	intp numEvents = buf.GetUnsignedChar();

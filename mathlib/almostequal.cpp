@@ -36,7 +36,7 @@ namespace {
 [[nodiscard]] inline int FloatAs2ComplementInt(float a) {
   int i{FloatAsInt(a)};
 
-  if (i < 0) i = 0x80000000 - i;
+  if (i < 0) i = 0x80000000 - i; //-V112
 
   return i;
 }
@@ -51,7 +51,7 @@ namespace {
 
   // An infinity has an exponent of 255 (shift left 23 positions) and
   // a zero mantissa.  There are two infinities - positive and negative.
-  return (FloatAsInt(a) & 0x7FFFFFFF) == kInfAsInt;
+  return (FloatAsInt(a) & 0x7FFFFFFF) == kInfAsInt; //-V112
 }
 
 /**
@@ -76,7 +76,7 @@ namespace {
  */
 [[nodiscard]] inline int BitSign(float a) {
   // The sign bit of a number is the high bit.
-  return FloatAsInt(a) & 0x80000000;
+  return FloatAsInt(a) & 0x80000000; //-V112
 }
 
 }  // namespace

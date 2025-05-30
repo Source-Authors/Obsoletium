@@ -172,7 +172,7 @@ void CDmeTrack::AddClip( CDmeClip *clip )
 	}
 }
 
-void CDmeTrack::RemoveClip( int i )
+void CDmeTrack::RemoveClip( intp i )
 {
 	// NOTE: Removal shouldn't cause sort order or fixup to become invalid
 	CSuppressAutoFixup suppress( this, SUPPRESS_OVERLAP_FIXUP | SUPPRESS_DIRTY_ORDERING );
@@ -182,7 +182,7 @@ void CDmeTrack::RemoveClip( int i )
 bool CDmeTrack::RemoveClip( CDmeClip *clip )
 {
 	Assert( clip->GetClipType() == GetClipType() );
-	int i = FindClip( clip );
+	intp i = FindClip( clip );
 	if ( i != -1 )
 	{
 		RemoveClip( i );
@@ -230,11 +230,11 @@ void CDmeTrack::SetSoloTrack( )
 //-----------------------------------------------------------------------------
 // Methods related to finding clips
 //-----------------------------------------------------------------------------
-int CDmeTrack::FindClip( CDmeClip *clip )
+intp CDmeTrack::FindClip( CDmeClip *clip ) const
 {
 	Assert( clip->GetClipType() == GetClipType() );
-	int c = m_Clips.Count();
-	for ( int i = c - 1; i >= 0; --i )
+	intp c = m_Clips.Count();
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		if ( m_Clips[ i ] == clip )
 			return i;
@@ -244,8 +244,8 @@ int CDmeTrack::FindClip( CDmeClip *clip )
 
 CDmeClip *CDmeTrack::FindNamedClip( const char *name )
 {
-	int c = m_Clips.Count();
-	for ( int i = c - 1; i >= 0; --i )
+	intp c = m_Clips.Count();
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		CDmeClip *child = m_Clips[ i ];
 		if ( child && !Q_stricmp( child->GetName(), name ) )
@@ -266,8 +266,8 @@ void CDmeTrack::FindClipsAtTime( DmeTime_t time, DmeClipSkipFlag_t flags, CUtlVe
 	if ( ( flags & DMESKIP_MUTED ) && IsMute() )
 		return;
 
-	int nClipCount = GetClipCount();
-	for ( int j = 0; j < nClipCount; ++j )
+	intp nClipCount = GetClipCount();
+	for ( intp j = 0; j < nClipCount; ++j )
 	{
 		CDmeClip *pSubClip = GetClip( j );
 		if ( !pSubClip )
@@ -290,8 +290,8 @@ void CDmeTrack::FindClipsIntersectingTime( DmeTime_t startTime, DmeTime_t endTim
 	if ( ( flags & DMESKIP_MUTED ) && IsMute() )
 		return;
 
-	int nClipCount = GetClipCount();
-	for ( int j = 0; j < nClipCount; ++j )
+	intp nClipCount = GetClipCount();
+	for ( intp j = 0; j < nClipCount; ++j )
 	{
 		CDmeClip *pSubClip = GetClip( j );
 		if ( !pSubClip )
@@ -316,8 +316,8 @@ void CDmeTrack::FindClipsWithinTime( DmeTime_t startTime, DmeTime_t endTime, Dme
 	if ( ( flags & DMESKIP_MUTED ) && IsMute() )
 		return;
 
-	int nClipCount = GetClipCount();
-	for ( int j = 0; j < nClipCount; ++j )
+	intp nClipCount = GetClipCount();
+	for ( intp j = 0; j < nClipCount; ++j )
 	{
 		CDmeClip *pSubClip = GetClip( j );
 		if ( !pSubClip )
@@ -345,8 +345,8 @@ void CDmeTrack::ShiftAllClips( DmeTime_t dt )
 
 	CSuppressAutoFixup suppress( this, SUPPRESS_OVERLAP_FIXUP | SUPPRESS_DIRTY_ORDERING );
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = m_Clips[ i ];
 		pSubClip->SetStartTime( pSubClip->GetStartTime() + dt );
@@ -358,8 +358,8 @@ void CDmeTrack::ShiftAllClipsAfter( DmeTime_t startTime, DmeTime_t dt, bool bTes
 	if ( dt == DmeTime_t( 0 ) )
 		return;
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		DmeTime_t testTime = bTestStartingTime ? pSubClip->GetStartTime() : pSubClip->GetEndTime();
@@ -375,8 +375,8 @@ void CDmeTrack::ShiftAllClipsBefore( DmeTime_t endTime, DmeTime_t dt, bool bTest
 	if ( dt == DmeTime_t( 0 ) )
 		return;
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		DmeTime_t testTime = bTestEndingTime ? pSubClip->GetEndTime() : pSubClip->GetStartTime();
@@ -401,8 +401,8 @@ void CDmeTrack::ShiftAllFilmClipsAfter( CDmeClip *pClip, DmeTime_t dt, bool bShi
 	// This algorithm requires sorted clips
 	SortClipsByStartTime();
 
-	int c = GetClipCount();
-	for ( int i = c; --i >= 0; )
+	intp c = GetClipCount();
+	for ( intp i = c; --i >= 0; )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		if ( pSubClip == pClip )
@@ -429,8 +429,8 @@ void CDmeTrack::ShiftAllFilmClipsBefore( CDmeClip *pClip, DmeTime_t dt, bool bSh
 	// This algorithm requires sorted clips
 	SortClipsByStartTime();
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 
@@ -477,13 +477,13 @@ void CDmeTrack::SortClipsByStartTime( )
 		return;
 	m_Flags.SetFlag( IS_SORTED );
 
-	int c = GetClipCount();
+	intp c = GetClipCount();
 	if ( c <= 1 )
 		return;
 
 	DmeTime_t lastTime;
 	SortInfo_t *pSortInfo = (SortInfo_t*)_alloca( c * sizeof(SortInfo_t) );
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip(i);
 		pSortInfo[i].m_startTime = pSubClip ? pSubClip->GetStartTime() : DmeTime_t::InvalidTime();
@@ -504,7 +504,7 @@ void CDmeTrack::SortClipsByStartTime( )
 
 	m_Clips.RemoveAll();
 
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		m_Clips.AddToTail( pSortInfo[i].m_pClip );
 	}
@@ -516,7 +516,7 @@ void CDmeTrack::SortClipsByStartTime( )
 //-----------------------------------------------------------------------------
 void CDmeTrack::FixOverlaps()
 {
-	int c = GetClipCount();
+	intp c = GetClipCount();
 	if ( c <= 1 )
 		return;
 
@@ -525,9 +525,9 @@ void CDmeTrack::FixOverlaps()
 	CSuppressAutoFixup suppress( this, SUPPRESS_OVERLAP_FIXUP | SUPPRESS_DIRTY_ORDERING );
 
 	// Cull NULL clips
-	int nActualCount = 0;
+	intp nActualCount = 0;
 	CDmeClip **pClips = (CDmeClip**)_alloca( c * sizeof(CDmeClip*) );
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pCurr = GetClip( i );
 		if ( pCurr && ((i == 0) || (pClips[i-1] != pCurr)) )
@@ -540,7 +540,7 @@ void CDmeTrack::FixOverlaps()
 		return;
 
 	CDmeClip *pPrev = pClips[0];
-	for ( int i = 1; i < nActualCount; ++i )
+	for ( intp i = 1; i < nActualCount; ++i )
 	{
 		CDmeClip *pCurr = pClips[i];
 
@@ -568,8 +568,8 @@ CDmeClip* CDmeTrack::FindFilmClipAtTime( DmeTime_t localTime )
 	// This algorithm requires sorted clips
 	SortClipsByStartTime();
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		if ( pSubClip && pSubClip->GetStartTime() <= localTime && pSubClip->GetEndTime() > localTime )
@@ -591,8 +591,8 @@ CDmeClip* CDmeTrack::FindFirstFilmClipIntesectingTime( DmeTime_t localStartTime,
 	// This algorithm requires sorted clips
 	SortClipsByStartTime();
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		if ( !pSubClip )
@@ -649,8 +649,8 @@ CDmeClip* CDmeTrack::FindPrevFilmClip( CDmeClip *pClip )
 	// Probably doesn't matter though, since there will usually not be a ton of tracks
 	CDmeClip *pPrevClip = NULL;
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		if ( pSubClip == pClip )
@@ -676,8 +676,8 @@ CDmeClip* CDmeTrack::FindNextFilmClip( CDmeClip *pClip )
 
 	CDmeClip *pNextClip = NULL;
 
-	int c = GetClipCount();
-	for ( int i = c; --i >= 0; )
+	intp c = GetClipCount();
+	for ( intp i = c; --i >= 0; )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		if ( pSubClip == pClip )
@@ -701,8 +701,8 @@ void CDmeTrack::FindAdjacentFilmClips( CDmeClip *pClip, CDmeClip *&pPrevClip, CD
 	// This algorithm requires sorted clips
 	SortClipsByStartTime();
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		if ( pSubClip == pClip )
@@ -732,8 +732,8 @@ void CDmeTrack::FindAdjacentFilmClips( DmeTime_t localTime, CDmeClip *&pPrevClip
 	// This algorithm requires sorted clips
 	SortClipsByStartTime();
 
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pSubClip = GetClip( i );
 		if ( localTime >= pSubClip->GetEndTime() )
@@ -761,8 +761,8 @@ void CDmeTrack::FillAllGapsWithSlugs( const char *pSlugName, DmeTime_t startTime
 
 	// Create temporary slugs to fill in the gaps
 	bool bSlugAdded = false;
-	int c = GetClipCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = GetClipCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeClip *pFilmClip = GetClip(i);
 		DmeTime_t clipStartTime = pFilmClip->GetStartTime();

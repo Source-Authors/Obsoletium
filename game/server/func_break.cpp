@@ -370,7 +370,7 @@ void CBreakable::MaterialSoundRandom( int entindex, Materials soundMaterial, flo
 	if ( !GetParametersForSound( soundname, params, NULL ) )
 		return;
 
-	CPASAttenuationFilter filter( CBaseEntity::Instance( entindex ), params.soundlevel );
+	CPASAttenuationFilter filter( CBaseEntity::Instance( entindex ), SNDLVL_TO_ATTN( params.soundlevel ) );
 
 
 	EmitSound_t ep;

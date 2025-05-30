@@ -83,7 +83,7 @@ void VGUIMessageBox( vgui::Panel *pParent, const char *pTitle, const char *pMsg,
 	char msg[4096];
 	va_list marker;
 	va_start( marker, pMsg );
-	Q_vsnprintf( msg, sizeof( msg ), pMsg, marker );
+	V_vsprintf_safe( msg, pMsg, marker );
 	va_end( marker );
 
 	vgui::MessageBox *dlg = new CModalPreserveMessageBox( pTitle, msg, pParent );
@@ -119,25 +119,25 @@ void QCInfo::SyncFromControls()
 	bAutomass = ((CheckButton *)pTargetField)->IsSelected();
 
 	pTargetField = pQCGenerator->FindChildByName( "massField" );
-	((TextEntry *)pTargetField)->GetText(tempText, MAX_PATH);
+	((TextEntry *)pTargetField)->GetText( tempText );
 	// dimhotepus: atof -> strtof
 	fMass = strtof(tempText, nullptr);
 
 	pTargetField = pQCGenerator->FindChildByName( "scaleField" );
-	((TextEntry *)pTargetField)->GetText(tempText, MAX_PATH);
+	((TextEntry *)pTargetField)->GetText( tempText );
 	// dimhotepus: atof -> strtof
 	fScale = strtof(tempText, nullptr);
 
     pTargetField = pQCGenerator->FindChildByName( "collisionSMDField" );
-	((TextEntry *)pTargetField)->GetText( tempText, MAX_PATH );	
+	((TextEntry *)pTargetField)->GetText( tempText );
 	V_strcpy_safe( pszCollisionPath, tempText );
 
 	pTargetField = pQCGenerator->FindChildByName( "surfacePropertyDropDown" );
-	((ComboBox *)pTargetField)->GetText( tempText, MAX_PATH );
+	((ComboBox *)pTargetField)->GetText( tempText );
     V_strcpy_safe( pszSurfaceProperty, tempText );
 
 	pTargetField = pQCGenerator->FindChildByName( "materialsField" );
-	((TextEntry *)pTargetField)->GetText( tempText, MAX_PATH );
+	((TextEntry *)pTargetField)->GetText( tempText );
 	V_strcpy_safe( pszMaterialPath, tempText );
 
 	LODs.RemoveAll();
@@ -197,7 +197,7 @@ void QCInfo::SyncToControls()
 	int numItems = ((ComboBox *)pTargetField)->GetItemCount();
 	for( int i = 0; i < numItems; i++ )
 	{
-		((ComboBox *)pTargetField)->GetItemText( i, tempText, MAX_PATH );
+		((ComboBox *)pTargetField)->GetItemText( i, tempText );
 		if ( !Q_strcmp( tempText, pszSurfaceProperty ) )
 		{
 			((ComboBox *)pTargetField)->SetItemEnabled( i, true );
@@ -583,7 +583,7 @@ bool CQCGenerator::GenerateQCFile()
 	char szGamePath[MAX_PATH];
 	
 	char studiomdlPath[512];
-	g_pFullFileSystem->RelativePathToFullPath( "studiomdl.bat", NULL, studiomdlPath, sizeof( studiomdlPath ));
+	g_pFullFileSystem->RelativePathToFullPath_safe( "studiomdl.bat", NULL, studiomdlPath );
 
 	// dimhotepus: Check token is present.
 	if ( !GetVConfigRegistrySetting( GAMEDIR_TOKEN, szGamePath ) )
@@ -631,7 +631,6 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 
 	bool bFoundReference = false;
 	bool bFoundCollision = false;
-	bool bFoundLOD = false;
 
 	//iterate through .smd files
 	const char *startName = pszScene;
@@ -663,15 +662,13 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 
 			if ( !strncmp( filenameEnd, "_lod", 4) )
 			{
-				bFoundLOD = true;
-
 				//we found an LOD smd.
 				char lodName[255];
 				V_sprintf_safe( lodName, "lod%d", currentLOD );
 
 				// we found an LOD
 				// dimhotepus: Do not leak KeyValues.
-				auto newKv = KeyValues::AutoDelete(new KeyValues( lodName, "SMD", filename, "LOD", "10" ));
+				KeyValuesAD newKv(new KeyValues( lodName, "SMD", filename, "LOD", "10" ));
 				m_pLODPanel->AddItem( newKv, currentLOD, false, false );
 
 				currentLOD++;
@@ -754,7 +751,7 @@ void CQCGenerator::OnNewLODText()
 	}
 	
 	wchar_t szEditText[MAX_PATH];
-	m_pLODEdit->GetText( szEditText, MAX_PATH );
+	m_pLODEdit->GetText( szEditText );
 
 	pListItem->SetWString( name, szEditText );
 

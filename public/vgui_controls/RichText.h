@@ -34,8 +34,20 @@ public:
 	// text manipulation
 	virtual void SetText(const char *text);
 	virtual void SetText(const wchar_t *text);
-	void GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, int bufLenInBytes);
-	void GetText(int offset, OUT_Z_BYTECAP(bufLenInBytes) char *pch, int bufLenInBytes);
+	
+	void GetText(intp offset, OUT_Z_BYTECAP(bufLenInBytes) wchar_t *buf, intp bufLenInBytes);
+	template<intp size> 
+	void GetText(intp offset, OUT_Z_ARRAY wchar_t (&buf)[size] )
+	{
+		GetText( offset, buf, size * sizeof(buf[0]) );
+	}
+
+	void GetText(intp offset, OUT_Z_CAP(bufLenInBytes) char *pch, intp bufLenInBytes);
+	template<intp size>
+	void GetText(intp offset, OUT_Z_ARRAY char (&buf)[size])
+	{
+		GetText( offset, buf, size * sizeof(buf[0]) );
+	}
 
 	// configuration
 	void SetFont(HFont font);
@@ -200,7 +212,8 @@ private:
 
 	struct TFade
 	{
-		float flFadeStartTime;
+		// dimhotepus: float -> double
+		double flFadeStartTime;
 		float flFadeLength;
 		float flFadeSustain;
 		byte  iOriginalAlpha;
@@ -218,7 +231,7 @@ private:
 		TFade fade;
 
 		// position in TextStream that these changes take effect
-		int textStreamIndex;
+		intp textStreamIndex;
 	};
 
 	bool m_bResetFades;

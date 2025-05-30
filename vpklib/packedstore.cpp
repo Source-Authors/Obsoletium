@@ -269,7 +269,7 @@ static void StripTrailingString( char *pszBuf, const char *pszStrip )
 		*pExpectedPos = '\0';
 }
 
-CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, IBaseFileSystem *pFS, bool bOpenForWrite ):m_PackedStoreReadCache( pFS )
+CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, intp fnameSize, IBaseFileSystem *pFS, bool bOpenForWrite ):m_PackedStoreReadCache( pFS )
 {
 	Init();
 	m_pFileSystem = pFS;
@@ -281,7 +281,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, IBaseFile
 		V_strcpy_safe( m_pszFileBaseName, pFileBasename );
 		StripTrailingString( m_pszFileBaseName, ".vpk" );
 		StripTrailingString( m_pszFileBaseName, "_dir" );
-		sprintf( pszFName, "%s_dir.vpk", m_pszFileBaseName );
+		V_snprintf( pszFName, fnameSize, "%s_dir.vpk", m_pszFileBaseName );
 #ifdef _WIN32
 		Q_strlower( pszFName );
 #endif
@@ -295,7 +295,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, IBaseFile
 		else
 		{
 			m_bUseDirFile = false;
-			sprintf( pszFName, "%s.vpk", m_pszFileBaseName );
+			V_snprintf( pszFName, fnameSize, "%s.vpk", m_pszFileBaseName );
 			dirFile.Open( pszFName );
 		}
 
@@ -421,16 +421,16 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, IBaseFile
 				dirFile.MustRead( m_Signature.Base(), cubSignature );
 			}
 		}
-		Q_MakeAbsolutePath( m_pszFullPathName, sizeof( m_pszFullPathName ), m_pszFileBaseName );
+		V_MakeAbsolutePath( m_pszFullPathName, m_pszFileBaseName );
 		V_strcat_safe( m_pszFullPathName, ".vpk" );
 		//Q_strlower( m_pszFullPathName ); // NO!  this screws up linux.
-		Q_FixSlashes( m_pszFullPathName );
+		V_FixSlashes( m_pszFullPathName );
 	}
 	BuildHashTables();
 }
 
 
-void CPackedStore::GetDataFileName( char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const
+void CPackedStore::GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const
 {
 	if ( nFileNumber == VPKFILENUMBER_EMBEDDED_IN_DIR_FILE )
 	{
@@ -483,7 +483,7 @@ CPackedStore::~CPackedStore( void )
 void SplitFileComponents( char const *pFileName, char (&pDirOut)[MAX_PATH], char (&pBaseOut)[MAX_PATH], char (&pExtOut)[MAX_PATH] )
 {
 	char pTmpDirOut[MAX_PATH];
-	V_ExtractFilePath( pFileName, pTmpDirOut, ssize(pTmpDirOut) );
+	V_ExtractFilePath( pFileName, pTmpDirOut );
 	// now, pTmpDirOut to pDirOut, except when we find more then one '\' in a row, only output one
 	char *pOutDirPtr = pDirOut;
 	for( char *pDirInPtr = pTmpDirOut; *pDirInPtr; pDirInPtr++ )
@@ -752,7 +752,7 @@ void CPackedStore::Write( void )
 
 
 	// Fetch actual name to write
-	GetDataFileName( szOutFileName, sizeof(szOutFileName), VPKFILENUMBER_EMBEDDED_IN_DIR_FILE );
+	GetDataFileName( szOutFileName, VPKFILENUMBER_EMBEDDED_IN_DIR_FILE );
 
 	// Now actually write the data to disk
 	COutputFile dirFile( szOutFileName );
@@ -791,7 +791,7 @@ CPackedStore::ESignatureCheckResult CPackedStore::CheckSignature( intp nSignatur
 	}
 
 	char szFilename[ MAX_PATH ];
-	GetDataFileName( szFilename, sizeof( szFilename ), VPKFILENUMBER_EMBEDDED_IN_DIR_FILE );
+	GetDataFileName( szFilename, VPKFILENUMBER_EMBEDDED_IN_DIR_FILE );
 
 	// Read the data
 	CUtlBuffer bufSignedData;
@@ -898,12 +898,12 @@ bool CPackedStoreReadCache::CheckMd5Result( CachedVPKRead_t &cachedVPKRead )
 	if ( Q_memcmp( &cachedVPKRead.m_md5Value, &chunkHashFraction.m_md5contents, sizeof( MD5Value_t ) ) != 0	)
 	{
 		char szFilename[ 512 ];
-		m_pPackedStore->GetDataFileName( szFilename, sizeof(szFilename), cachedVPKRead.m_nPackFileNumber );
+		m_pPackedStore->GetDataFileName( szFilename, cachedVPKRead.m_nPackFileNumber );
 
 		char szCalculated[ MD5_DIGEST_LENGTH*2 + 4 ];
 		char szExpected[ MD5_DIGEST_LENGTH*2 + 4 ];
-		V_binarytohex( cachedVPKRead.m_md5Value.bits, MD5_DIGEST_LENGTH, szCalculated, sizeof(szCalculated) );
-		V_binarytohex( chunkHashFraction.m_md5contents.bits, MD5_DIGEST_LENGTH, szExpected, sizeof(szExpected) );
+		V_binarytohex( cachedVPKRead.m_md5Value.bits, szCalculated );
+		V_binarytohex( chunkHashFraction.m_md5contents.bits, szExpected );
 
 		Warning(
 			"Corruption detected in %s\n"
@@ -1127,7 +1127,7 @@ void CPackedStore::GetPackFileLoadErrorSummary( CUtlString &sErrors )
 		char szDataFileName[MAX_PATH];
 		CPackedStoreFileHandle fhandle = GetHandleForHashingFiles();
 		fhandle.m_nFileNumber = m_PackedStoreReadCache.m_listCachedVPKReadsFailed[i].m_nPackFileNumber;
-		fhandle.GetPackFileName( szDataFileName, sizeof(szDataFileName) );
+		fhandle.GetPackFileName( szDataFileName );
 		const char *pszFileName = V_GetFileName( szDataFileName );
 
 		CUtlString sTemp;
@@ -1139,18 +1139,16 @@ void CPackedStore::GetPackFileLoadErrorSummary( CUtlString &sErrors )
 		sErrors += sTemp ;
 		
 		char hex[sizeof(MD5Value_t)*2 + 1 ];
-		Q_binarytohex( m_PackedStoreReadCache.m_listCachedVPKReadsFailed[i].m_md5Value.bits, 
-					sizeof(MD5Value_t),	hex, sizeof( hex ) );
+		V_binarytohex( m_PackedStoreReadCache.m_listCachedVPKReadsFailed[i].m_md5Value.bits, hex );
 
 		ChunkHashFraction_t chunkHashFraction;
 		FindFileHashFraction( m_PackedStoreReadCache.m_listCachedVPKReadsFailed[i].m_nPackFileNumber, m_PackedStoreReadCache.m_listCachedVPKReadsFailed[i].m_nFileFraction, chunkHashFraction );
 
 		char hex2[sizeof(MD5Value_t)*2 + 1 ];
-		Q_binarytohex( chunkHashFraction.m_md5contents.bits, 
-			sizeof(MD5Value_t),	hex2, sizeof( hex2 ) );
+		V_binarytohex( chunkHashFraction.m_md5contents.bits, hex2 );
 		sTemp.Format( "Last Md5 Value %s Should be %s \n", hex, hex2 );
 
-		sErrors += sTemp ;
+		sErrors += sTemp;
 	}
 
 }
@@ -1306,7 +1304,7 @@ void CPackedStore::DiscardChunkHashes( intp iChunkFileIndex )
 void CPackedStore::HashChunkFile( int iChunkFileIndex )
 {
 	AUTO_LOCK( m_Mutex );
-	static const int k_nFileFractionSize = 0x00100000; // 1 MiB
+	constexpr int k_nFileFractionSize = 0x00100000; // 1 MiB
 
 	// Purge any hashes we already have for this chunk.
 	DiscardChunkHashes( iChunkFileIndex );
@@ -1367,7 +1365,7 @@ void CPackedStore::ComputeChunkHash( MD5Value_t &md5ChunkHashes )
 	MD5Context_t ctx;
 	memset(&ctx, 0, sizeof(MD5Context_t));
 	MD5Init(&ctx);
-	MD5Update(&ctx, (uint8 *)m_vecChunkHashFraction.Base(), m_vecChunkHashFraction.Count()*sizeof(m_vecChunkHashFraction[0]) );
+	MD5Update(&ctx, m_vecChunkHashFraction.Base(), m_vecChunkHashFraction.Count()*sizeof(m_vecChunkHashFraction[0]) );
 	MD5Final( md5ChunkHashes.bits, &ctx);
 }
 
@@ -1421,7 +1419,7 @@ bool CPackedStore::FindFileHashFraction( int nPackFileNumber, int nFileFraction,
 	return true;
 }
 
-void CPackedStore::GetPackFileName( CPackedStoreFileHandle &handle, char *pchFileNameOut, int cchFileNameOut ) const
+void CPackedStore::GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut ) const
 {
 	GetDataFileName( pchFileNameOut, cchFileNameOut, handle.m_nFileNumber );
 }
@@ -1442,7 +1440,7 @@ FileHandleTracker_t & CPackedStore::GetFileHandle( int nFileNumber )
 	{
 		// no luck finding the handle - need a new one
 		char pszDataFileName[MAX_PATH];
-		GetDataFileName( pszDataFileName, sizeof(pszDataFileName), nFileNumber );
+		GetDataFileName( pszDataFileName, nFileNumber );
 
 		handle.m_nCurOfs = 0;
 #ifdef IS_WINDOWS_PC
@@ -1524,7 +1522,7 @@ void CPackedStore::AddFileToDirectory( const VPKContentFileInfo_t &info )
 	int nNumDataParts = 1;
 	intp nFileDataSize = s_FileHeaderSize( pszBase, nNumDataParts, info.m_iPreloadSize );
 	intp nTotalHeaderSize = ( intp )( nFileDataSize + ( 2 + strlen( pszExt ) ) + ( 2 + strlen( pszDir ) ) );
-	char *pBuf = ( char * ) stackalloc( nTotalHeaderSize );
+	char *pBuf = stackallocT( char, nTotalHeaderSize );
 	char *pOut = pBuf;
 	strcpy( pOut, pszExt );
 	pOut += strlen( pszExt );
@@ -1651,7 +1649,7 @@ ePackedStoreAddResultCode CPackedStore::AddFile( char const *pFile, uint16 nMeta
 			dirEntry.m_idxChunk = m_nHighestChunkFileIndex;
 
 			// Append to most recent chunk
-			GetDataFileName( szDataFileName, sizeof(szDataFileName), m_nHighestChunkFileIndex );
+			GetDataFileName( szDataFileName, m_nHighestChunkFileIndex );
 			dirEntry.m_iOffsetInChunk = g_pFullFileSystem->Size( szDataFileName );
 			if ( (int)dirEntry.m_iOffsetInChunk <= 0 ) // technical wrong, but we shouldn't have 2GB chunks.  (Sort of defeats the whole purpose.)
 			{
@@ -1674,7 +1672,7 @@ ePackedStoreAddResultCode CPackedStore::AddFile( char const *pFile, uint16 nMeta
 		m_nHighestChunkFileIndex = MAX( m_nHighestChunkFileIndex, dirEntry.m_idxChunk );
 
 		// write the actual data
-		GetDataFileName( szDataFileName, sizeof(szDataFileName), dirEntry.m_idxChunk );
+		GetDataFileName( szDataFileName, dirEntry.m_idxChunk );
 		FileHandle_t fHandle = m_pFileSystem->Open( szDataFileName, "rb+" );
 		if ( !fHandle && dirEntry.m_iOffsetInChunk == 0 )
 			fHandle = m_pFileSystem->Open( szDataFileName, "wb" );
@@ -1721,11 +1719,11 @@ intp CPackedStore::GetFileList( const char *pWildCard, CUtlStringList &outFilena
 	// Parse the wildcard string into a base and extension used for string comparisons
 	if ( pWildCard )
 	{
-		V_ExtractFilePath( pWildCard, szWildCardPath, sizeof( szWildCardPath ) );
+		V_ExtractFilePath( pWildCard, szWildCardPath );
 		V_FixSlashes( szWildCardPath, '/' );
 
-		V_FileBase( pWildCard, szWildCardBase, sizeof( szWildCardBase ) );
-		V_ExtractFileExtension( pWildCard, szWildCardExt, sizeof( szWildCardExt ) );
+		V_FileBase( pWildCard, szWildCardBase );
+		V_ExtractFileExtension( pWildCard, szWildCardExt );
 
 		// Remove '*' from the base and extension strings so that the string comparison calls will match
 		char *pcStar = strchr( szWildCardBase, '*' );
@@ -1740,7 +1738,7 @@ intp CPackedStore::GetFileList( const char *pWildCard, CUtlStringList &outFilena
 		// for each extension
 		char pszCurExtension[MAX_PATH];
 		if ( pData[0] != ' ' )
-			sprintf( pszCurExtension, ".%s", pData );
+			V_sprintf_safe( pszCurExtension, ".%s", pData );
 		else
 			pszCurExtension[0] = 0;
 		// now, iterate over all directories associated with this extension
@@ -1749,7 +1747,7 @@ intp CPackedStore::GetFileList( const char *pWildCard, CUtlStringList &outFilena
 		{
 			char pszCurDir[MAX_PATH];
 			if ( pData[0] != ' ' )
-				sprintf( pszCurDir, "%s/", pData );
+				V_sprintf_safe( pszCurDir, "%s/", pData );
 			else
 				pszCurDir[0] = 0;
 			pData += 1 + strlen( pData );					// skip dir name
@@ -1760,20 +1758,21 @@ intp CPackedStore::GetFileList( const char *pWildCard, CUtlStringList &outFilena
 				if ( bFormattedOutput )
 				{
 					CFileHeaderFixedData const *pHeader = reinterpret_cast< CFileHeaderFixedData const *>( pData + 1 + strlen( pData ) );
-					sprintf( pszFNameOut, "%s%s%s crc=0x%x metadatasz=%d", pszCurDir, pData, pszCurExtension, pHeader->m_nFileCRC, pHeader->m_nMetaDataSize );
+					V_sprintf_safe( pszFNameOut, "%s%s%s crc=0x%x metadatasz=%d", pszCurDir, pData, pszCurExtension, pHeader->m_nFileCRC, pHeader->m_nMetaDataSize );
 					CFilePartDescr const *pPart = &( pHeader->m_PartDescriptors[0] );
 					while( pPart->m_nFileNumber != PACKFILEINDEX_END )
 					{
-						sprintf( pszFNameOut + strlen( pszFNameOut )," fnumber=%d ofs=0x%x sz=%d",
+						const intp outLen = V_strlen( pszFNameOut );
+						V_snprintf( pszFNameOut + outLen, ssize(pszFNameOut) - outLen, " fnumber=%d ofs=0x%x sz=%d",
 								 pPart->m_nFileNumber, pPart->m_nFileDataOffset, pPart->m_nFileDataSize );
 						pPart++;
 					}
 				}
 				else
 				{
- 					V_strncpy( pszFNameOut, pszCurDir, sizeof( pszFNameOut ) );
- 					V_strncat( pszFNameOut, pData, sizeof( pszFNameOut ) );
- 					V_strncat( pszFNameOut, pszCurExtension, sizeof( pszFNameOut ) );
+ 					V_strcpy_safe( pszFNameOut, pszCurDir );
+ 					V_strcat_safe( pszFNameOut, pData );
+ 					V_strcat_safe( pszFNameOut, pszCurExtension );
 				}
 				SkipFile( pData );
 
@@ -1786,9 +1785,9 @@ intp CPackedStore::GetFileList( const char *pWildCard, CUtlStringList &outFilena
 					char szFNameOutBase[64];
 					char szFNameOutExt[20];
 
-					V_ExtractFilePath( pszFNameOut, szFNameOutPath, sizeof( szFNameOutPath ) );
-					V_FileBase( pszFNameOut, szFNameOutBase, sizeof( szFNameOutBase ) );
-					V_ExtractFileExtension( pszFNameOut, szFNameOutExt, sizeof( szFNameOutExt ) );
+					V_ExtractFilePath( pszFNameOut, szFNameOutPath );
+					V_FileBase( pszFNameOut, szFNameOutBase );
+					V_ExtractFileExtension( pszFNameOut, szFNameOutExt );
 
 					matches =  !V_strnicmp( szFNameOutPath, szWildCardPath, sizeof( szWildCardPath ) );
 					matches = matches && ( !V_strlen( szWildCardExt ) || bNoExtWildcard ? 0 == V_strnicmp( szFNameOutExt, szWildCardExt, strlen( szWildCardExt ) ) : 0 != V_stristr(szFNameOutExt, szWildCardExt ) );
@@ -1798,9 +1797,7 @@ intp CPackedStore::GetFileList( const char *pWildCard, CUtlStringList &outFilena
 				// Add the file to the output list
 				if ( matches )
 				{
-					char *pFName = new char[1 + strlen( pszFNameOut ) ];
-					strcpy( pFName, pszFNameOut );
-					outFilenames.AddToTail( pFName );
+					outFilenames.AddToTail( V_strdup( pszFNameOut ) );
 				}
 			}
 			pData++;												// skip end marker
@@ -1864,7 +1861,7 @@ void CPackedStore::BuildFindFirstCache()
 	{
 		char szFilePath[MAX_PATH];
 
-		V_ExtractFilePath( allVPKFiles[i], szFilePath, sizeof( szFilePath ) );
+		V_ExtractFilePath( allVPKFiles[i], szFilePath );
 		Q_StripTrailingSlash( szFilePath );
 		
 		// New directory
@@ -1921,11 +1918,11 @@ intp CPackedStore::GetFileAndDirLists( const char *pWildCard, CUtlStringList &ou
 		//
 		// Parse the wildcard string into a base and extension used for string comparisons
 		//
-		V_ExtractFilePath( pWildCard, szWildCardPath, sizeof( szWildCardPath ) );
+		V_ExtractFilePath( pWildCard, szWildCardPath );
 		V_FixSlashes( szWildCardPath, '/' );
 
-		V_FileBase( pWildCard, szWildCardBase, sizeof( szWildCardBase ) );
-		V_ExtractFileExtension( pWildCard, szWildCardExt, sizeof( szWildCardExt ) );
+		V_FileBase( pWildCard, szWildCardBase );
+		V_ExtractFileExtension( pWildCard, szWildCardExt );
 
 		// From the pattern, we now have the directory path up to the file pattern, the filename base, and the filename 
 		// extension.
@@ -2030,8 +2027,8 @@ intp CPackedStore::GetFileAndDirLists( const char *pWildCard, CUtlStringList &ou
 					char szFNameOutBase[64];
 					char szFNameOutExt[20];
 
-					V_FileBase( filesInDirectory[iFile], szFNameOutBase, sizeof( szFNameOutBase ) );
-					V_ExtractFileExtension( filesInDirectory[iFile], szFNameOutExt, sizeof( szFNameOutExt ) );
+					V_FileBase( filesInDirectory[iFile], szFNameOutBase );
+					V_ExtractFileExtension( filesInDirectory[iFile], szFNameOutExt );
 
 					// Since we have a sorted list we can optimize using the return code of the compare
 					int c = V_strnicmp( szWildCardBase, szFNameOutBase, nLenWildcardBase );

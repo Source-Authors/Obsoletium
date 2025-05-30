@@ -4,6 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+
+#include "netapi.h"
+
 #ifdef _WIN32
 #include "winsock.h"
 typedef int socklen_t;
@@ -14,12 +17,12 @@ typedef int socklen_t;
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-
 #else
 #error "Please define your platform"
 #endif
 
-#include "netapi.h"
+#include "tier1/strtools.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -99,11 +102,11 @@ char *CNetAPI::AdrToString( netadr_t *a )
 	{
 		if ( a->type == NA_LOOPBACK )
 		{
-			sprintf (s, "loopback");
+			V_sprintf_safe (s, "loopback");
 		}
 		else if ( a->type == NA_IP )
 		{
-			sprintf(s, "%i.%i.%i.%i:%i", a->ip[0], a->ip[1], a->ip[2], a->ip[3], ntohs( a->port ) );
+			V_sprintf_safe(s, "%i.%i.%i.%i:%i", a->ip[0], a->ip[1], a->ip[2], a->ip[3], ntohs( a->port ) );
 		}
 	}
 	return s;
@@ -128,7 +131,7 @@ static bool StringToSockaddr( const char *s, struct sockaddr *sadr )
 	p->sin_family = AF_INET;
 	p->sin_port = 0;
 
-	strcpy (copy, s);
+	V_strcpy_safe (copy, s);
 
 	// strip off a trailing :port if present
 	for ( colon = copy ; *colon ; colon++ )

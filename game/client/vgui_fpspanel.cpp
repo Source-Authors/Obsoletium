@@ -19,20 +19,31 @@
 #include "steam/steam_api.h"
 #include "tier0/cpumonitoring.h"
 
-#ifdef _WIN32
-#include "winlite.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// dimhotepus: Add callback to adjust fps panel size.
+void OnShowFpsChangeCallback( IConVar* var, const char* pOldValue, float flOldValue );
 // dimhotepus: Restrict cl_show* as boolean vars.
-static ConVar cl_showfps( "cl_showfps", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Draw fps meter at top of screen (1 = fps, 2 = smooth fps)", true, 0, true, 2 );
+static ConVar cl_showfps( "cl_showfps", "0", FCVAR_ALLOWED_IN_COMPETITIVE, "Draw fps meter at top of screen (1 = fps, 2 = smooth fps)", true, 0, true, 2, OnShowFpsChangeCallback );
 static ConVar cl_showpos( "cl_showpos", "0", 0, "Draw current position at top of screen", true, 0, true, 1 );
-static ConVar cl_showbattery( "cl_showbattery", "0", 0, "Draw current battery level at top of screen when on battery power", true, 0, true, 1 );
+static ConVar cl_showbattery( "cl_showbattery", "0", FCVAR_ALLOWED_IN_COMPETITIVE , "Draw current battery level at top of screen when on battery power", true, 0, true, 1 );
 
 extern bool g_bDisplayParticlePerformance;
-int GetParticlePerformance();
+int64_t GetParticlePerformance();
+
+#ifdef _WIN32
+typedef struct _SYSTEM_POWER_STATUS {
+    BYTE ACLineStatus;
+    BYTE BatteryFlag;
+    BYTE BatteryLifePercent;
+    BYTE SystemStatusFlag;
+    DWORD BatteryLifeTime;
+    DWORD BatteryFullLifeTime;
+}   SYSTEM_POWER_STATUS, *LPSYSTEM_POWER_STATUS;
+
+extern "C" __declspec(dllimport) BOOL __stdcall GetSystemPowerStatus(LPSYSTEM_POWER_STATUS lpSystemPowerStatus);
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -51,12 +62,14 @@ public:
 	void	OnTick( void ) override;
 
 	virtual bool	ShouldDraw( void );
+	
+	// dimhotepus: To adjust size.
+	void ComputeSize( void );
 
 protected:
 	MESSAGE_FUNC_INT_INT_OVERRIDE( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
 
 private:
-	void ComputeSize( void );
 	void InitAverages()
 	{
 		m_AverageFPS = -1;
@@ -124,23 +137,35 @@ void CFPSPanel::ComputeSize( void )
 	int wide, tall;
 	vgui::ipanel()->GetSize(GetVParent(), wide, tall );
 
-	int x = wide - FPS_PANEL_WIDTH;
+	// dimhotepus: Make FPS panel proportional.
+	int width = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), FPS_PANEL_WIDTH );
+	if ( cl_showfps.GetInt() == 1 )
+	{
+		width = width / 1.70f;
+	}
+
+	int x = wide - width;
 	int y = 0;
 
 	SetPos( x, y );
-	SetSize( FPS_PANEL_WIDTH, 4 * vgui::surface()->GetFontTall( m_hFont ) + 8 );
+	
+	// dimhotepus: Make FPS panel proportional.
+	const int height = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(),
+		4 * vgui::surface()->GetFontTall( m_hFont ) + 8 );
+
+	SetSize( width, height );
 }
 
 void CFPSPanel::ApplySchemeSettings(vgui::IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 
-	m_hFont = pScheme->GetFont( "DefaultFixedOutline" );
-	Assert( m_hFont );
+	// dimhotepus: Make FPS panel proportional.
+	m_hFont = pScheme->GetFont( "DefaultFixedOutline", true );
+	Assert(m_hFont);
 
 	ComputeSize();
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -163,8 +188,9 @@ bool CFPSPanel::ShouldDraw( void )
 	if ( g_bDisplayParticlePerformance )
 		return true;
 
+	// dimhotepus: Should not draw if no battery shown, too.
 	if ( ( !cl_showfps.GetInt() || ( gpGlobals->absoluteframetime <= 0 ) ) &&
-		 ( !cl_showpos.GetInt() ) )
+		 ( !cl_showpos.GetInt() ) && ( !cl_showbattery.GetInt() )  )
 	{
 		m_bLastDraw = false;
 		return false;
@@ -243,14 +269,14 @@ void CFPSPanel::Paint()
 
 	if ( g_bDisplayParticlePerformance )
 	{
-		int nPerf = GetParticlePerformance();
+		int64_t nPerf = GetParticlePerformance();
 		if ( nPerf )
 		{
 			unsigned char ucColor[3]={ 0,255,0 };
 			g_pMatSystemSurface->DrawColoredText(
 				m_hFont, x, 42,
 				ucColor[0], ucColor[1], ucColor[2],
-				255, "Particle Performance Metric : %d", (nPerf + 50) / 100 );
+				255, "Particle Performance Metric : %lld", (nPerf + 50) / 100 );
 		}
 	}
 	float realFrameTime = gpGlobals->realtime - m_lastRealTime;
@@ -259,13 +285,16 @@ void CFPSPanel::Paint()
 	{
 		if ( m_lastRealTime != -1.0f )
 		{
+			// dimhotepus: TF2 backport, do not show path to map, just show map name.
+			const char *pszMapName = V_GetFileName( engine->GetLevelName() );
+
 			i++;
 
 			int nFps = -1;
 			unsigned char ucColor[3];
 			if ( cl_showfps.GetInt() == 2 )
 			{
-				const float NewWeight  = 0.1f;
+				constexpr float NewWeight = 0.1f;
 				float NewFrame = 1.0f / realFrameTime;
 
 				if ( m_AverageFPS < 0.0f )
@@ -273,39 +302,43 @@ void CFPSPanel::Paint()
 					m_AverageFPS = NewFrame;
 					m_high = (int)m_AverageFPS;
 					m_low = (int)m_AverageFPS;
-				} 
+				}
 				else
-				{				
+				{
 					m_AverageFPS *= ( 1.0f - NewWeight ) ;
 					m_AverageFPS += ( ( NewFrame ) * NewWeight );
 				}
 			
 				int NewFrameInt = (int)NewFrame;
 				if( NewFrameInt < m_low ) m_low = NewFrameInt;
-				if( NewFrameInt > m_high ) m_high = NewFrameInt;	
+				if( NewFrameInt > m_high ) m_high = NewFrameInt;
 
 				nFps = static_cast<int>( m_AverageFPS );
 				float frameMS = realFrameTime * 1000.0f;
 				GetFPSColor( nFps, ucColor );
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps (%3i, %3i) %.1f ms on %s", nFps, m_low, m_high, frameMS, engine->GetLevelName() );
+				// dimhotepus: Use 4 width for frame time (2 digits, dot and 1 digit) to draw FPS on same place.
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps (%3i, %3i) %4.1f ms on %s", nFps, m_low, m_high, frameMS, pszMapName );
 			} 
 			else
 			{
 				m_AverageFPS = -1;
 				nFps = static_cast<int>( 1.0f / realFrameTime );
 				GetFPSColor( nFps, ucColor );
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps on %s", nFps, engine->GetLevelName() );
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2, ucColor[0], ucColor[1], ucColor[2], 255, "%3i fps on %s", nFps, pszMapName );
 			}
 
 			const CPUFrequencyResults frequency = GetCPUFrequencyResults();
 			double currentTime = Plat_FloatTime();
-			const double displayTime = 5.0; // Display frequency results for this long.
+			constexpr double displayTime = 5.0; // Display frequency results for this long.
 			if ( frequency.m_GHz > 0 && frequency.m_timeStamp + displayTime > currentTime )
 			{
-				int lineHeight = vgui::surface()->GetFontTall( m_hFont );
+				int fontTall = vgui::surface()->GetFontTall( m_hFont );
+
 				// Optionally print out the CPU frequency monitoring data.
 				GetCPUColor( frequency.m_percentage, ucColor );
-				g_pMatSystemSurface->DrawColoredText( m_hFont, x, lineHeight + 2, ucColor[0], ucColor[1], ucColor[2], 255, "CPU frequency percent: %3.1f%%   Min percent: %3.1f%%", frequency.m_percentage, frequency.m_lowestPercentage );
+				g_pMatSystemSurface->DrawColoredText( m_hFont, x, 2 + i * (fontTall + 2), ucColor[0], ucColor[1], ucColor[2], 255, "CPU frequency percent: %3.1f%%   Min percent: %3.1f%%", frequency.m_percentage, frequency.m_lowestPercentage );
+
+				i++;
 			}
 		}
 	}
@@ -351,6 +384,9 @@ void CFPSPanel::Paint()
 											  255, 255, 255, 255, 
 											  "vel:  %.2f", 
 											  vel.Length() );
+
+		// dimhotepus: Allow battery info do not overlap.
+		i++;
 	}
 	
 	if ( cl_showbattery.GetInt() > 0 )
@@ -417,10 +453,25 @@ public:
 			fpsPanel = NULL;
 		}
 	}
+
+	// dimhotepus: Expose panel.
+	CFPSPanel* GetPanel()
+	{
+		return fpsPanel;
+	}
 };
 
 static CFPS g_FPSPanel;
 IFPSPanel *fps = &g_FPSPanel;
+
+void OnShowFpsChangeCallback( IConVar* var, const char* pOldValue, float flOldValue )
+{
+	CFPSPanel* panel = g_FPSPanel.GetPanel();
+	if (panel != nullptr)
+	{
+		panel->ComputeSize();
+	}
+}
 
 #if defined( TRACK_BLOCKING_IO ) && !defined( _RETAIL )
 

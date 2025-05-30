@@ -290,16 +290,16 @@ bool CValveVideoServices::DisconnectVideoLibraries()
 }
 
 
-ptrdiff_t CValveVideoServices::DestroyAllVideoInterfaces()
+intp CValveVideoServices::DestroyAllVideoInterfaces()
 {
-	ptrdiff_t n = m_RecorderList.Count() + m_MaterialList.Count();
+	intp n = m_RecorderList.Count() + m_MaterialList.Count();
 
-	for ( ptrdiff_t i = m_RecorderList.Count() -1; i >= 0; i-- )
+	for ( intp i = m_RecorderList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoRecorder( (IVideoRecorder*) m_RecorderList[i].m_pObject );
 	}
 
-	for ( ptrdiff_t i = m_MaterialList.Count() -1; i >= 0; i-- )
+	for ( intp i = m_MaterialList.Count() -1; i >= 0; i-- )
 	{
 		DestroyVideoMaterial( (IVideoMaterial*) m_MaterialList[i].m_pObject );
 	}
@@ -861,7 +861,7 @@ VideoResult_t CValveVideoServices::ResolveToPlayableVideoFile( const char *pFile
 			}
 			else 
 			{
-				fileFound = ( g_pFullFileSystem->RelativePathToFullPath( pFileName, pPathID, ActualFilePath, sizeof( ActualFilePath ) ) != nullptr );
+				fileFound = ( g_pFullFileSystem->RelativePathToFullPath_safe( pFileName, pPathID, ActualFilePath ) != nullptr );
 			}
 		}
 		else	// The specified video system does not support this (required) feature
@@ -925,7 +925,7 @@ search_for_video:
 						{
 							
 							// Start with any optional path we got...
-							V_ExtractFilePath( pFileName, ActualFilePath, sizeof( ActualFilePath ) );
+							V_ExtractFilePath( pFileName, ActualFilePath );
 							// Append the search match file							
 							V_strncat( ActualFilePath, pMatchingFile, sizeof( ActualFilePath ) );
 							
@@ -1164,8 +1164,9 @@ bool CVideoCommonServices::CalculateVideoDimensions( int videoWidth, int videoHe
 					
 					curWidth = (int)  ( curWidth * scale + 0.35f );
 					curHeight = (int) ( curHeight * scale + 0.35f );
-					clamp( curWidth, 0, displayWidth );
-					clamp( curHeight, 0, displayHeight );
+					// dimhotepus: Fix clamping.
+					curWidth = clamp( curWidth, 0, displayWidth );
+					curHeight = clamp( curHeight, 0, displayHeight );
 					goto finish;
 				}
 			
@@ -1197,8 +1198,9 @@ bool CVideoCommonServices::CalculateVideoDimensions( int videoWidth, int videoHe
 				
 				curWidth = (int)  ( curWidth * scale + 0.35f );
 				curHeight = (int) ( curHeight * scale + 0.35f );
-				clamp( curWidth, 0, displayWidth );
-				clamp( curHeight, 0, displayHeight );
+				// dimhotepus: Fix clamping.
+				curWidth = clamp( curWidth, 0, displayWidth );
+				curHeight = clamp( curHeight, 0, displayHeight );
 				goto finish;
 			}
 		}
@@ -1252,7 +1254,7 @@ float CVideoCommonServices::GetSystemVolume()
 {
 	ConVarRef volumeConVar( "volume" );
 	float sysVolume = volumeConVar.IsValid() ? volumeConVar.GetFloat() : 1.0f;
-	clamp( sysVolume, 0.0f, 1.0f);
+	sysVolume = clamp( sysVolume, 0.0f, 1.0f);
 
 	return sysVolume;
 }

@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include "utlrbtree.h"
+#include "tier1/utlrbtree.h"
 #include "tier1/utlvector.h"
 
 //-----------------------------------------------------------------------------
@@ -26,13 +26,13 @@ public:
 	CStringPool();
 	~CStringPool();
 
-	size_t Count() const;
+	[[nodiscard]] size_t Count() const;
 
-	const char * Allocate( const char *pszValue );
+	[[nodiscard]] const char * Allocate( const char *pszValue );
 	void FreeAll();
 
 	// searches for a string already in the pool
-	const char * Find( const char *pszValue );
+	[[nodiscard]] const char * Find( const char *pszValue );
 
 protected:
 	typedef CUtlRBTree<const char *, unsigned short> CStrSet;
@@ -77,14 +77,14 @@ public:
 
 	void			FreeAll();
 
-	char			*FindString( const char* pIntrinsic ); 
-	char			*ReferenceString( const char* pIntrinsic );
+	[[nodiscard]] char			*FindString( const char* pIntrinsic ); 
+	[[nodiscard]] char			*ReferenceString( const char* pIntrinsic );
 	void			DereferenceString( const char* pIntrinsic );
 
 	// These are only reliable if there are less than 64k strings in your string pool
-	unsigned short	FindStringHandle( const char* pIntrinsic ); 
-	unsigned short	ReferenceStringHandle( const char* pIntrinsic );
-	char			*HandleToString( unsigned short handle );
+	[[nodiscard]] unsigned short	FindStringHandle( const char* pIntrinsic ); 
+	[[nodiscard]] unsigned short	ReferenceStringHandle( const char* pIntrinsic );
+	[[nodiscard]] char			*HandleToString( unsigned short handle );
 	void			SpewStrings();
 };
 

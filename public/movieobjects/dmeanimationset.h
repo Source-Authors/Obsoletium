@@ -33,19 +33,22 @@ public:
 	CDmElement *FindControlValue( const char *pControlName );
 	CDmElement *FindOrAddControlValue( const char *pControlName );
 	void RemoveControlValue( const char *pControlName );
-	bool IsReadOnly();
+	bool IsReadOnly() const;
 	void CopyControlValuesFrom( CDmePreset *pSource );
 
 	// See the enumeration above
-	void SetProceduralPresetType( int nType );
+	// dimhotepus: int -> DmeProceduralPresetType
+	void SetProceduralPresetType( DmeProceduralPresetType nType );
 	bool IsProcedural() const;
-	int GetProceduralPresetType() const;
+	// dimhotepus: int -> DmeProceduralPresetType
+	DmeProceduralPresetType GetProceduralPresetType() const;
 
 private:
-	int FindControlValueIndex( const char *pControlName );
+	intp FindControlValueIndex( const char *pControlName );
 
 	CDmaElementArray< CDmElement > m_ControlValues;
-	CDmaVar< int > m_nProceduralType;
+	// dimhotepus: int -> DmeProceduralPresetType
+	CDmaVar< DmeProceduralPresetType > m_nProceduralType;
 };
 
 
@@ -78,9 +81,9 @@ public:
 	CDmaString m_SourcePresetGroup;
 
 	const char *FindSourcePreset( const char *pDestPresetName );
-	int GetRemapCount();
-	const char *GetRemapSource( int i );
-	const char *GetRemapDest( int i );
+	intp GetRemapCount();
+	const char *GetRemapSource( intp i );
+	const char *GetRemapDest( intp i );
 	void AddRemap( const char *pSourcePresetName, const char *pDestPresetName );
 	void RemoveAll();
 
@@ -104,7 +107,8 @@ public:
 	CDmaElementArray< CDmePreset > &GetPresets();			// raw access to the array
 	const CDmaElementArray< CDmePreset > &GetPresets() const;
 	CDmePreset *FindPreset( const char *pPresetName );
-	CDmePreset *FindOrAddPreset( const char *pPresetName, int nProceduralType = PROCEDURAL_PRESET_NOT );
+	// dimhotepus: int -> DmeProceduralPresetType
+	CDmePreset *FindOrAddPreset( const char *pPresetName, DmeProceduralPresetType nProceduralType = PROCEDURAL_PRESET_NOT );
 	bool RemovePreset( CDmePreset *pPreset );
 	void MovePresetUp( CDmePreset *pPreset );
 	void MovePresetDown( CDmePreset *pPreset );
@@ -122,7 +126,7 @@ public:
 	bool ExportToVFE( const char *pFilename, CDmeAnimationSet *pAnimationSet = NULL, CDmeCombinationOperator *pComboOp = NULL ) const;
 
 private:
-	int FindPresetIndex( CDmePreset *pGroupName );
+	intp FindPresetIndex( CDmePreset *pGroupName );
 
 	CDmaElementArray< CDmePreset > m_Presets; // "presets"
 };
@@ -156,7 +160,8 @@ public:
 	void MovePresetGroupDown( CDmePresetGroup *pPresetGroup );
 	void MovePresetGroupInFrontOf( CDmePresetGroup *pPresetGroup, CDmePresetGroup *pInFrontOf );
 
-	CDmePreset *FindOrAddPreset( const char *pGroupName, const char *pPresetName, int nProceduralType = PROCEDURAL_PRESET_NOT );
+	// dimhotepus: int -> DmeProceduralPresetType
+	CDmePreset *FindOrAddPreset( const char *pGroupName, const char *pPresetName, DmeProceduralPresetType nProceduralType = PROCEDURAL_PRESET_NOT );
 	bool RemovePreset( CDmePreset *pPreset );
 
 	const CDmaElementArray< CDmeBookmark > &GetBookmarks() const;
@@ -165,7 +170,7 @@ public:
 	CDmElement *FindSelectionGroup( const char *pSelectionGroupName );
 	CDmElement *FindOrAddSelectionGroup( const char *pSelectionGroupName );
 
-	virtual void OnElementUnserialized();
+	void OnElementUnserialized() override;
 
 	void CollectOperators( CUtlVector< DmElementHandle_t > &operators );
 	void AddOperator( CDmeOperator *pOperator );
@@ -174,8 +179,8 @@ public:
 	void EnsureProceduralPresets();
 
 private:
-	int FindPresetGroupIndex( CDmePresetGroup *pGroup );
-	int FindPresetGroupIndex( const char *pGroupName );
+	intp FindPresetGroupIndex( CDmePresetGroup *pGroup );
+	intp FindPresetGroupIndex( const char *pGroupName );
 
 	CDmaElementArray< CDmElement >			m_Controls;			// "controls"
 	CDmaElementArray< CDmElement >			m_SelectionGroups;	// "selectionGroups"

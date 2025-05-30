@@ -456,7 +456,7 @@ void COP_Output::AddEntityConnections(CMapEntity *pEntity, bool bFirst)
 				// Build the string for the delay.
 				float fDelay = pConnection->GetDelay();
 				char szTemp[MAX_PATH];
-				sprintf(szTemp, "%.2f", fDelay);
+				V_sprintf_safe(szTemp, "%.2f", fDelay);
 				m_ListCtrl.SetItemText(nItemCount, DELAY_COLUMN, szTemp);
 
 				// Fire once
@@ -471,7 +471,7 @@ void COP_Output::AddEntityConnections(CMapEntity *pEntity, bool bFirst)
 				pOutputConn->m_pConnList->AddToTail(pConnection);
 				pOutputConn->m_pEntityList->AddToTail(pEntity);
 				pOutputConn->m_bOwnedByAll		= true;
-				m_ListCtrl.SetItemData(nItemCount, (DWORD)pOutputConn);
+				m_ListCtrl.SetItemData(nItemCount, (DWORD_PTR)pOutputConn);
 				
 				nItemCount++;
 			}
@@ -605,7 +605,7 @@ void COP_Output::UpdateEditControls(void)
 
 		CEdit *pDelayEdit = ( CEdit* )GetDlgItem( IDC_EDIT_CONN_DELAY );
 		char szTemp[MAX_PATH];
-		sprintf(szTemp, "%.2f", m_fDelay);
+		V_sprintf_safe(szTemp, "%.2f", m_fDelay);
 		pDelayEdit->SetWindowText(szTemp);
 		
 		CComboBox* pParamEdit = ( CComboBox* )GetDlgItem( IDC_EDIT_CONN_PARAM );
@@ -1500,11 +1500,11 @@ void COP_Output::UpdateColumnHeaderText(int nColumn, bool bIsSortColumn, SortDir
 	Column.cchTextMax = sizeof(szHeaderText);
 	m_ListCtrl.GetColumn(nColumn, &Column);
 
-	int nMarker = 0;
+	ptrdiff_t nMarker = 0;
 
 	if (szHeaderText[0] != '\0')
 	{
-		nMarker = strlen(szHeaderText) - 1;
+		nMarker = V_strlen(szHeaderText) - 3;
 		char chMarker = szHeaderText[nMarker];
 
 		if ((chMarker == '>') || (chMarker == '<'))
@@ -1908,8 +1908,8 @@ void COP_Output::AddEntityOutputs(CMapEntity *pEntity)
 	GDclass *pClass = pEntity->GetClass();
 	if (pClass != NULL)
 	{
-		int nCount = pClass->GetOutputCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pClass->GetOutputCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CClassOutput *pOutput = pClass->GetOutput(i);
 			int nIndex = m_ComboOutput.AddString(pOutput->GetName());
@@ -1939,7 +1939,7 @@ void COP_Output::FillInputList(void)
 	m_ComboInput.ResetContent();
 
 	// CUtlVector<GDclass*> classCache;
-	CUtlRBTree<int,int> classCache;
+	CUtlRBTree<GDclass*,int> classCache;
 	SetDefLessFunc( classCache );
 	
 	FOR_EACH_OBJ( *m_pMapEntityList, pos )
@@ -1959,16 +1959,16 @@ void COP_Output::FillInputList(void)
 			continue;
 
 		// check if class was already added
-		if ( classCache.Find( (int)pClass ) != -1 )
+		if ( classCache.Find( pClass ) != -1 )
 			continue;
 
-		classCache.Insert( (int)pClass );
+		classCache.Insert( pClass );
 			
 		//
 		// Add this class' inputs to the list.
 		//
-		int nCount = pClass->GetInputCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pClass->GetInputCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CClassInput *pInput = pClass->GetInput(i);
 			bool bAddInput = true;

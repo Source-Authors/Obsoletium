@@ -449,7 +449,7 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 					// Now, if the interposing object is physics, block some explosion force based on its mass.
 					if( pBlockingEntity->VPhysicsGetObject() )
 					{
-						const float MASS_ABSORB_ALL_DAMAGE = 350.0f;
+						constexpr float MASS_ABSORB_ALL_DAMAGE = 350.0f;
 						float flMass = pBlockingEntity->VPhysicsGetObject()->GetMass();
 						float scale = flMass / MASS_ABSORB_ALL_DAMAGE;
 

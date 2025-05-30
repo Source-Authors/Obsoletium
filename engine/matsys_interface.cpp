@@ -260,7 +260,7 @@ static int ReadVideoConfigInt( const char *pName, int nDefault )
 	AUTO_LOCK( g_VideoConfigMutex );
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	bool bFileExists = pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	// We probably didn't have one on disk yet, just bail.  It'll get created soon.
@@ -268,7 +268,6 @@ static int ReadVideoConfigInt( const char *pName, int nDefault )
 		return nDefault;
 	
 	int nInt = pVideoConfig->GetInt( pName, nDefault );
-	pVideoConfig->deleteThis();
 	return nInt;
 #else
 	return registry->ReadInt( pName, nDefault );
@@ -281,7 +280,7 @@ static void ReadVideoConfigInt( const char *pName, int *pEntry )
 	AUTO_LOCK( g_VideoConfigMutex );
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	bool bFileExists = pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	// We probably didn't have one on disk yet, just bail.  It'll get created soon.
@@ -292,8 +291,6 @@ static void ReadVideoConfigInt( const char *pName, int *pEntry )
 	{
 		*pEntry = pVideoConfig->GetInt( pName, 0 );
 	}
-
-	pVideoConfig->deleteThis();
 #else
 	if ( registry->ReadInt( pName, -1 ) != -1 )
 	{
@@ -309,7 +306,7 @@ static const char *ReadVideoConfigString( const char *pName, const char *pDefaul
 	static char szRetString[ 255 ];
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	bool bFileExists = pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	// We probably didn't have one on disk yet, just bail.  It'll get created soon.
@@ -318,7 +315,6 @@ static const char *ReadVideoConfigString( const char *pName, const char *pDefaul
 	
 	const char *pString = pVideoConfig->GetString( pName, pDefault );
 	Q_strncpy( szRetString, pString, sizeof(szRetString) );
-	pVideoConfig->deleteThis();
 	return szRetString;
 #else
 	return registry->ReadString( pName, pDefault );
@@ -333,13 +329,12 @@ static void WriteVideoConfigInt( const char *pName, int nEntry )
 	AUTO_LOCK( g_VideoConfigMutex );
 	
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	pVideoConfig->SetInt( pName, nEntry );
 	
 	pVideoConfig->SaveToFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD", false, false, true );
-	pVideoConfig->deleteThis();
 #else
 	registry->WriteInt( pName, nEntry );
 #endif
@@ -352,13 +347,12 @@ static void WriteVideoConfigString( const char *pName, const char *pString )
 	AUTO_LOCK( g_VideoConfigMutex );
 
 	// Try to make a keyvalues from the cfg file
-	KeyValues *pVideoConfig = new KeyValues( "videoconfig" );
+	KeyValuesAD pVideoConfig( "videoconfig" );
 	pVideoConfig->LoadFromFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD" );
 	
 	pVideoConfig->SetString( pName, pString );
 	
 	pVideoConfig->SaveToFile( g_pFullFileSystem, MOD_VIDEO_CONFIG_SETTINGS, "MOD", false, false, true );
-	pVideoConfig->deleteThis();
 #else
 	registry->WriteString( pName, pString );
 #endif
@@ -1043,7 +1037,7 @@ static ITexture *CreateBuildCubemaps16BitTexture( void )
 static ITexture *CreateQuarterSizedFBTexture( int n, unsigned int iRenderTargetFlags )
 {
 	char nbuf[20];
-	sprintf(nbuf,"_rt_SmallFB%d",n);
+	V_sprintf_safe(nbuf,"_rt_SmallFB%d",n);
 
 	ImageFormat fmt=materials->GetBackBufferFormat();
 	if ( g_pMaterialSystemHardwareConfig->GetHDRType() == HDR_TYPE_FLOAT )
@@ -1059,7 +1053,7 @@ static ITexture *CreateQuarterSizedFBTexture( int n, unsigned int iRenderTargetF
 static ITexture *CreateTeenyFBTexture( int n )
 {
 	char nbuf[20];
-	sprintf(nbuf,"_rt_TeenyFB%d",n);
+	V_sprintf_safe(nbuf,"_rt_TeenyFB%d",n);
 
 	ImageFormat fmt = materials->GetBackBufferFormat();
 	if ( g_pMaterialSystemHardwareConfig->GetHDRType() == HDR_TYPE_FLOAT )
@@ -1075,7 +1069,7 @@ static ITexture *CreateFullFrameFBTexture( int textureIndex, int iExtraFlags = 0
 	char textureName[256];
 	if ( textureIndex > 0 )
 	{
-		sprintf( textureName, "_rt_FullFrameFB%d", textureIndex );
+		V_sprintf_safe( textureName, "_rt_FullFrameFB%d", textureIndex );
 	}
 	else
 	{
@@ -1819,9 +1813,9 @@ void BuildMSurfaceVertexArrays( worldbrushdata_t *pBrushData, SurfaceHandle_t su
 }
 #endif // NEWMESH
 
-static int VertexCountForSurfaceList( const CMSurfaceSortList &list, const surfacesortgroup_t &group )
+static intp VertexCountForSurfaceList( const CMSurfaceSortList &list, const surfacesortgroup_t &group )
 {
-	int vertexCount = 0;
+	intp vertexCount = 0;
 	MSL_FOREACH_SURFACE_IN_GROUP_BEGIN(list, group, surfID)
 		vertexCount += MSurf_VertCount(surfID);
 	MSL_FOREACH_SURFACE_IN_GROUP_END();
@@ -1854,7 +1848,7 @@ static VertexFormat_t GetUncompressedFormat( const IMaterial * pMaterial )
 	return ( pMaterial->GetVertexFormat() & ~VERTEX_FORMAT_COMPRESSED );
 }
 
-static intp FindOrAddMesh( IMaterial *pMaterial, int vertexCount )
+static intp FindOrAddMesh( IMaterial *pMaterial, intp vertexCount )
 {
 	VertexFormat_t format = GetUncompressedFormat( pMaterial );
 
@@ -1998,7 +1992,7 @@ void WorldStaticMeshCreate( void )
 	for ( intp i = 0; i < g_WorldStaticMeshes.Count(); i++ )
 	{
 		const surfacesortgroup_t &group = matSortArray.GetGroupForSortID(0,i);
-		int vertexCount = VertexCountForSurfaceList( matSortArray, group );
+		intp vertexCount = VertexCountForSurfaceList( matSortArray, group );
 
 		SurfaceHandle_t surfID = matSortArray.GetSurfaceAtHead( group );
 		g_WorldStaticMeshes[i] = NULL;
@@ -2045,7 +2039,7 @@ void WorldStaticMeshCreate( void )
 			g_VBAllocTracker->TrackMeshAllocations( "WorldStaticMeshCreate" );
 		VertexFormat_t vertexFormat = ComputeWorldStaticMeshVertexFormat( g_Meshes[i].pMaterial );
 		g_Meshes[i].pMesh = pRenderContext->CreateStaticMesh( vertexFormat, TEXTURE_GROUP_STATIC_VERTEX_BUFFER_WORLD, g_Meshes[i].pMaterial );
-		int vertBufferIndex = 0;
+		intp vertBufferIndex = 0;
 		// NOTE: Index count is zero because this will be a static vertex buffer!!!
 		CMeshBuilder meshBuilder;
 		meshBuilder.Begin( g_Meshes[i].pMesh, MATERIAL_TRIANGLES, g_Meshes[i].vertCount, 0 );

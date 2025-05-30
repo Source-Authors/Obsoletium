@@ -153,4 +153,9 @@ $Project "tier1"
 		$File	"$SRCDIR\public\tier1\utlbinaryblock.h"
 		$File	"$SRCDIR\common\xbox\xboxstubs.h"				[$WINDOWS]
 	}
+
+	$Folder "Debugger Visualizers" [$WINDOWS]
+	{
+		$File	"tier1.natvis"
+	}
 }

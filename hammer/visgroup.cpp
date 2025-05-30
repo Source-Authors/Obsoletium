@@ -84,8 +84,15 @@ ChunkFileResult_t CVisGroup::LoadKeyCallback(const char *szKey, const char *szVa
 	{
 		unsigned char r, g, b;
 
-		CChunkFile::ReadKeyValueColor(szValue, r, g, b);
-		pGroup->SetColor(r, g, b);
+		// dimhotepus: Check color is read.
+		if (CChunkFile::ReadKeyValueColor(szValue, r, g, b))
+		{
+			pGroup->SetColor(r, g, b);
+		}
+		else
+		{
+			return(ChunkFile_UnexpectedSymbol);
+		}
 	}
 	else if (!stricmp(szKey, "visible"))
 	{

@@ -25,7 +25,7 @@ struct RenderTarget_t
 class CTextureCompositor : public ITextureCompositor
 {
 public:
-	CTextureCompositor( int _width, int _height, int nTeam, const char* pCompositeName, uint64 nRandomSeed, uint32 nTexCompositeCreateFlags );
+	CTextureCompositor( int width, int height, int nTeam, const char* pCompositeName, uint64 nRandomSeed, uint32 nTexCompositeCreateFlags );
 
 	virtual int AddRef() override;
 	virtual int Release() override;
@@ -38,9 +38,9 @@ public:
 
 	void Resolve();
 
-	void Error( bool _retry, PRINTF_FORMAT_STRING const char* _debugDevMsg, ... );
+	void Error( bool retry, PRINTF_FORMAT_STRING const char* debugDevMsg, ... );
 
-	void SetRootStage( CTCStage* _rootStage ); 
+	void SetRootStage( CTCStage* rootStage ); 
 
 	ITexture* AllocateCompositorRenderTarget( );
 	void ReleaseCompositorRenderTarget( ITexture* _tex );

@@ -93,10 +93,6 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 		g_hTier0Instance = module;
 
 		InitTime();
-
-#ifdef DEBUG
-		MemDbgDllMain( module, fdwReason, lpvReserved );
-#endif
 		
 		// dimhotepus: Do not notify on thread creation for performance.
 		DisableThreadLibraryCalls(module);
@@ -106,6 +102,10 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 		// dimhotepus: Cleanup instance.
 		g_hTier0Instance = nullptr;
 	}
+
+#ifdef DEBUG
+	MemDbgDllMain( module, fdwReason, lpvReserved );
+#endif
 
 	return TRUE;
 }
@@ -314,27 +314,22 @@ static INT_PTR CALLBACK AssertDialogProc(
 				case IDC_IGNORE_NUMLINES:
 				case IDC_IGNORE_NUMTIMES:
 					return TRUE;
-
-				default:
-				{
-					// dimhotepus: Cant use Assert here as recursive assert causes crash.
-					DebuggerBreakIfDebugging();
-					return TRUE;
-				}
-			}
-
-			case WM_KEYDOWN:
-			{
-				// Escape?
-				if ( wParam == 2 )
+					
+				// dimhotepus: Explicitly handle ESC.
+				case IDC_ESCAPE_DIALOG:
 				{
 					// Ignore this assert.
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
-			}
 
-			return TRUE;
+				default:
+				{
+					// dimhotepus: Cant use Assert here as recursive assert causes crash.
+					DebuggerBreakIfDebugging();
+					return FALSE;
+				}
+			}
 		}
 
 		case WM_DPICHANGED:

@@ -96,11 +96,12 @@ IClientNetworkable* CClientEntityList::GetClientNetworkable( int entnum )
 {
 	Assert( entnum >= 0 );
 	Assert( entnum < MAX_EDICTS );
+	// dimhotepus: entnum is server-controllable, fix exploit
+	// https://ctf.re/source-engine/exploitation/2021/05/01/source-engine-2/.
 	if ( entnum < 0 || entnum >= MAX_EDICTS )
 	{
-		return NULL;
+		return nullptr;
 	}
-
 	return m_EntityCacheInfo[entnum].m_pNetworkable;
 }
 
@@ -311,9 +312,14 @@ void CClientEntityList::RemoveListenerEntity( IClientEntityListener *pListener )
 void CClientEntityList::OnAddEntity( IHandleEntity *pEnt, CBaseHandle handle )
 {
 	int entnum = handle.GetEntryIndex();
+
+	// dimhotepus: Check entnum is in range as server-controllable.
+	if ( entnum < 0 || entnum >= ssize(m_EntityCacheInfo) )
+		return;
+
 	EntityCacheInfo_t *pCache = &m_EntityCacheInfo[entnum];
 
-	if ( entnum >= 0 && entnum < MAX_EDICTS )
+	if ( entnum < MAX_EDICTS )
 	{
 		// Update our counters.
 		m_iNumServerEnts++;
@@ -346,7 +352,7 @@ void CClientEntityList::OnAddEntity( IHandleEntity *pEnt, CBaseHandle handle )
 		}
 
 		//DevMsg(2,"Created %s\n", pBaseEnt->GetClassname() );
-		for ( int i = m_entityListeners.Count()-1; i >= 0; i-- )
+		for ( intp i = m_entityListeners.Count()-1; i >= 0; i-- )
 		{
 			m_entityListeners[i]->OnEntityCreated( pBaseEntity );
 		}
@@ -424,9 +430,14 @@ CON_COMMAND( cl_removeentity_backtrace_dump, "Dump backtraces for client OnRemov
 void CClientEntityList::OnRemoveEntity( IHandleEntity *pEnt, CBaseHandle handle )
 {
 	int entnum = handle.GetEntryIndex();
+	
+	// dimhotepus: Check entnum is in range as server-controllable.
+	if ( entnum < 0 || entnum >= ssize(m_EntityCacheInfo) )
+		return;
+
 	EntityCacheInfo_t *pCache = &m_EntityCacheInfo[entnum];
 
-	if ( entnum >= 0 && entnum < MAX_EDICTS )
+	if ( entnum < MAX_EDICTS )
 	{
 		// This is a networkable ent. Clear out our cache info for it.
 		pCache->m_pNetworkable = NULL;
@@ -461,7 +472,7 @@ void CClientEntityList::OnRemoveEntity( IHandleEntity *pEnt, CBaseHandle handle 
 		}
 
 		//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
-		for ( int i = m_entityListeners.Count()-1; i >= 0; i-- )
+		for ( intp i = m_entityListeners.Count()-1; i >= 0; i-- )
 		{
 			m_entityListeners[i]->OnEntityDeleted( pBaseEntity );
 		}

@@ -128,7 +128,7 @@ public:
 	void InitLowResImage( int nWidth, int nHeight, ImageFormat fmt ) override;
 
 	void *SetResourceData( uint32 eType, void const *pData, size_t nDataSize ) override;
-	void *GetResourceData( uint32 eType, size_t *pDataSize ) const override;
+	const void *GetResourceData( uint32 eType, size_t *pDataSize ) const override;
 
 	// Locates the resource entry info if it's present, easier than crawling array types
 	bool HasResourceEntry( uint32 eType ) const override;
@@ -226,7 +226,7 @@ public:
 	void FixCubemapFaceOrientation( ) override;
 
 	// Normalize the top mip level if necessary
-	virtual void NormalizeTopMipLevel();
+	void NormalizeTopMipLevel();
 	
 	// Generates mipmaps from the base mip levels
 	void GenerateMipmaps() override;

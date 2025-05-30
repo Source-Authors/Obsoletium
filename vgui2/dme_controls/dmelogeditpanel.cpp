@@ -6,8 +6,8 @@
 
 #include "dme_controls/dmelogeditpanel.h"
 #include "movieobjects/dmelog.h"
-#include "vgui_controls/button.h"
-#include "vgui_controls/combobox.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ComboBox.h"
 #include "tier1/KeyValues.h"
 
 using namespace vgui;

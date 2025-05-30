@@ -23,10 +23,10 @@ class CachedFileData final {
   unsigned GetDataLen() const;
 
   unsigned AddRef() {
-    return m_numRefs.fetch_add(1, std::memory_order::memory_order_relaxed);
+    return m_numRefs.fetch_add(1, std::memory_order::memory_order_relaxed) + 1;
   }
   unsigned Release() {
-    return m_numRefs.fetch_sub(1, std::memory_order::memory_order_relaxed);
+    return m_numRefs.fetch_sub(1, std::memory_order::memory_order_relaxed) - 1;
   }
 
   bool IsValid() const;
@@ -43,7 +43,7 @@ class CachedFileData final {
 
   unsigned char m_data[1];  // file data spans further
 
-  CachedFileData() = default;
+  CachedFileData() : m_numDataBytes{0} { m_chFilename[0] = '\0'; }
 };
 
 class FileCache final {

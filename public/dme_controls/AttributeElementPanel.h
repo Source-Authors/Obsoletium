@@ -33,17 +33,17 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CAttributeElementPanel : public CBaseAttributePanel
 {
-	DECLARE_CLASS_SIMPLE( CAttributeElementPanel, CBaseAttributePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeElementPanel, CBaseAttributePanel );
 
 public:
 	CAttributeElementPanel( vgui::Panel *parent, const AttributeWidgetInfo_t &info );
 
-	virtual void PostConstructor();
-	virtual void Apply();
+	void PostConstructor() override;
+	void Apply() override;
 
 protected:
-	virtual vgui::Panel *GetDataPanel();
-	virtual void OnCreateDragData( KeyValues *msg );
+	vgui::Panel *GetDataPanel() override;
+	void OnCreateDragData( KeyValues *msg ) override;
 
 	MESSAGE_FUNC(OnTextChanged, "TextChanged")
 	{
@@ -51,7 +51,7 @@ protected:
 	}
 
 private:
-	virtual void Refresh();
+	void Refresh() override;
 
 	CAttributeTextEntry		*m_pData;
 	bool					m_bShowMemoryUsage;

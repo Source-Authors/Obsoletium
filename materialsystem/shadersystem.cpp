@@ -81,8 +81,8 @@ public:
 	virtual void		DrawElements( IShader *pShader, IMaterialVar **params, ShaderRenderState_t* pShaderState, VertexCompressionType_t vertexCompression, uint32 nVarChangeID );
 
 	// Used to iterate over all shaders for editing purposes
-	virtual int			ShaderCount() const;
-	virtual int			GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const;
+	virtual intp		ShaderCount() const;
+	virtual int			GetShaders( int nFirstShader, int nMaxCount, OUT_CAP(nMaxCount) IShader **ppShaderList ) const;
 
 	// Methods of IShaderInit
 	virtual void		LoadTexture( IMaterialVar *pTextureVar, const char *pTextureGroupName, int nAdditionalCreationFlags = 0 );
@@ -309,12 +309,13 @@ void CShaderSystem::LoadAllShaderDLLs( )
 
 	// Loads local defined or statically linked shaders
 	intp i = m_ShaderDLLs.AddToHead();
+	auto &dll = m_ShaderDLLs[i];
 
-	m_ShaderDLLs[i].m_pFileName     = new char[1];
-	m_ShaderDLLs[i].m_pFileName[0]  = 0;
-	m_ShaderDLLs[i].m_hInstance     = nullptr;
-	m_ShaderDLLs[i].m_pShaderDLL    = GetShaderDLLInternal();
-	m_ShaderDLLs[i].m_bModShaderDLL = false;
+	dll.m_pFileName     = new char[1];
+	dll.m_pFileName[0]  = 0;
+	dll.m_hInstance     = nullptr;
+	dll.m_pShaderDLL    = GetShaderDLLInternal();
+	dll.m_bModShaderDLL = false;
 
 	// Add the shaders to the dictionary of shaders...
 	SetupShaderDictionary( i );
@@ -359,14 +360,14 @@ void CShaderSystem::LoadAllShaderDLLs( )
 
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
+			V_StripLastDir( modDir );
 			intp dirlen = Q_strlen( modDir );
 			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
@@ -377,9 +378,6 @@ const char *COM_GetModDirectory()
 
 void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 {
-	if ( IsX360() )
-		return;
-
 	// Don't do this for Valve mods. They don't need them, and attempting to load them is an opportunity for cheaters to get their code into the process
 	const char *pGameDir = COM_GetModDirectory();
 	if ( !Q_stricmp( pGameDir, "hl2" ) || !Q_stricmp( pGameDir, "cstrike" ) || !Q_stricmp( pGameDir, "cstrike_beta" ) ||
@@ -398,7 +396,7 @@ void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 	int dxStart = 6;
 	for ( int i = dxStart; i <= dxSupportLevel; ++i )
 	{
-		Q_snprintf( buf, sizeof( buf ), "game_shader_dx%d%s", i, DLL_EXT_STRING );
+		V_sprintf_safe( buf, "game_shader_dx%d%s", i, DLL_EXT_STRING );
 		LoadShaderDLL( buf, pModShaderPathID, true );
 	}
 
@@ -407,7 +405,7 @@ void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 	const char *pFilename = g_pFullFileSystem->FindFirstEx( "game_shader_generic*", pModShaderPathID, &findHandle );
 	while ( pFilename )
 	{
-		Q_snprintf( buf, sizeof( buf ), "%s%s", pFilename, DLL_EXT_STRING );
+		V_sprintf_safe( buf, "%s%s", pFilename, DLL_EXT_STRING );
 		LoadShaderDLL( buf, pModShaderPathID, true );
 
 		pFilename = g_pFullFileSystem->FindNext( findHandle );
@@ -449,7 +447,7 @@ extern "C"
 void CShaderSystem::VerifyBaseShaderDLL( CSysModule *pModule )
 {
 #if defined( _WIN32 ) && !defined( _X360 )
-	const char *pErrorStr = "Corrupt save data settings.";
+	const char *pErrorStr = "Corrupt shader DLL.";
 
 	unsigned char *testData1 = new unsigned char[SHADER_DLL_VERIFY_DATA_LEN1];
 
@@ -545,9 +543,7 @@ bool CShaderSystem::LoadShaderDLL( const char *pFullPath, const char *pPathID, b
 	else
 	{
 		nShaderDLLIndex = m_ShaderDLLs.AddToTail();
-		intp nLen = Q_strlen(pFullPath) + 1;
-		m_ShaderDLLs[nShaderDLLIndex].m_pFileName = new char[ nLen ];
-		Q_strncpy( m_ShaderDLLs[nShaderDLLIndex].m_pFileName, pFullPath, nLen );
+		m_ShaderDLLs[nShaderDLLIndex].m_pFileName = V_strdup(pFullPath);
 	}
 
 	// Ok, the shader DLL's good!
@@ -680,9 +676,9 @@ void CShaderSystem::SetupShaderDictionary( intp nShaderDLLIndex )
 {
 	// We could have put the shader dictionary into each shader DLL
 	// I'm not sure if that makes this system any less secure than it already is
-	int i;
+	intp i;
 	ShaderDLLInfo_t &info = m_ShaderDLLs[nShaderDLLIndex];
-	int nCount = info.m_pShaderDLL->ShaderCount();
+	intp nCount = info.m_pShaderDLL->ShaderCount();
 	for ( i = 0; i < nCount; ++i )
 	{
 		IShader *pShader = info.m_pShaderDLL->GetShader( i );
@@ -696,12 +692,11 @@ void CShaderSystem::SetupShaderDictionary( intp nShaderDLLIndex )
 		// Make sure it doesn't try to override another shader DLL's names.
 		if ( info.m_bModShaderDLL )
 		{
-			for ( intp iTestDLL=0; iTestDLL < m_ShaderDLLs.Count(); iTestDLL++ )
+			for ( const auto &pTestDLL : m_ShaderDLLs )
 			{
-				ShaderDLLInfo_t *pTestDLL = &m_ShaderDLLs[iTestDLL];
-				if ( !pTestDLL->m_bModShaderDLL )
+				if ( !pTestDLL.m_bModShaderDLL )
 				{
-					if ( pTestDLL->m_ShaderDict.Find( pShaderName ) != pTestDLL->m_ShaderDict.InvalidIndex() )
+					if ( pTestDLL.m_ShaderDict.Find( pShaderName ) != pTestDLL.m_ShaderDict.InvalidIndex() )
 					{ 
 						Error( "Game shader '%s' trying to override a base shader '%s'.", info.m_pFileName, pShaderName );
 					}
@@ -744,12 +739,12 @@ IShader* CShaderSystem::FindShader( char const* pShaderName )
 //-----------------------------------------------------------------------------
 // Used to iterate over all shaders for editing purposes
 //-----------------------------------------------------------------------------
-int CShaderSystem::ShaderCount() const
+intp CShaderSystem::ShaderCount() const
 {
 	return GetShaders( 0, 65536, NULL );
 }
 
-int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const
+int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const
 {
 	CUtlSymbolTable	uniqueNames( 0, 512, true ); 
 
@@ -954,8 +949,7 @@ void CShaderSystem::PrepForShaderDraw( IShader *pShader,
 	Assert( !m_pRenderState );
 	Assert( !m_SaveSpewOutput );
 
-	m_SaveSpewOutput = GetSpewOutputFunc();
-	SpewOutputFunc( MySpewOutputFunc );
+	m_SaveSpewOutput = SpewOutputFunc2( MySpewOutputFunc );
 
 	m_pRenderState = pRenderState;
 	m_nModulation = nModulation;
@@ -966,8 +960,8 @@ void CShaderSystem::DoneWithShaderDraw()
 {
 	SpewOutputFunc( m_SaveSpewOutput );
 	PrintBufferedSpew();
-	m_SaveSpewOutput = NULL;
 
+	m_SaveSpewOutput = NULL;
 	m_pRenderState = NULL;
 }
 

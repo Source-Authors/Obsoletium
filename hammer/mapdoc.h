@@ -655,8 +655,43 @@ class CMapDoc : public CDocument
 		//
 		// Expands %i keyword in prefab targetnames to generate unique targetnames for this map.
 		//
-		bool ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldTargetName, CMapWorld *pWorld);
-		bool DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld, char *szOldKeyword, char *szNewKeyword);
+		bool ExpandTargetNameKeywords
+		(
+			OUT_Z_BYTECAP(newTargetNameSize) char *szNewTargetName,
+			intp newTargetNameSize,
+			const char *szOldTargetName,
+			CMapWorld *pWorld
+		);
+		template<intp newTargetNameSize>
+		bool ExpandTargetNameKeywords
+		(
+			OUT_Z_ARRAY char (&szNewTargetName)[newTargetNameSize],
+			const char *szOldTargetName,
+			CMapWorld *pWorld
+		)
+		{
+			return ExpandTargetNameKeywords(szNewTargetName, newTargetNameSize, szOldTargetName, pWorld);
+		}
+		bool DoExpandKeywords
+		(
+			CMapClass *pObject,
+			CMapWorld *pWorld,
+			OUT_Z_CAP(oldKeywordSize) char *szOldKeyword,
+			intp oldKeywordSize,
+			OUT_Z_CAP(newKeywordSize) char *szNewKeyword,
+			intp newKeywordSize
+		);
+		template<intp oldKeywordSize, intp newKeywordSize>
+		bool DoExpandKeywords
+		(
+			CMapClass* pObject,
+			CMapWorld* pWorld,
+			OUT_Z_ARRAY char (&szOldKeyword)[oldKeywordSize],
+			OUT_Z_ARRAY char (&szNewKeyword)[newKeywordSize]
+		)
+		{
+			return DoExpandKeywords(pObject, pWorld, szOldKeyword, oldKeywordSize, szNewKeyword, newKeywordSize);
+		}
 
 		// Renames all named entities in pRoot
 		void RenameEntities( CMapClass *pRoot, CMapWorld *pWorld, bool bMakeUnique, const char *pszPrefix );

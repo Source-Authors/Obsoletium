@@ -185,7 +185,7 @@ public:
 						char szString[256];
 						_snwprintf( wzTime, sizeof( wzTime ), L"%d", nTime );
 						g_pVGuiLocalize->ConstructString_safe( wzString, g_pVGuiLocalize->Find( "#GameUI_PausedTimer" ), 1, wzTime );
-						g_pVGuiLocalize->ConvertUnicodeToANSI( wzString, szString, sizeof( szString ) );
+						g_pVGuiLocalize->ConvertUnicodeToANSI( wzString, szString );
 						m_pPauseDiscPanel->SetText( szString );
 					
 						m_nPrevTimeRemaining = nTime;

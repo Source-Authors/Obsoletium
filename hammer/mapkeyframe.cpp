@@ -425,7 +425,7 @@ void CMapKeyFrame::RecalculateTimeFromSpeed( void )
 	if ( ent )
 	{
 		char buf[16];
-		sprintf( buf, "%.2f", newTime );
+		V_sprintf_safe( buf, "%.2f", newTime );
 		ent->SetKeyValue( "NextTime", buf );
 		ent->OnParentKeyChanged( "NextTime", buf );
 	}

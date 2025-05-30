@@ -3472,8 +3472,8 @@ CParticleCollection *CParticleSystemMgr::CreateParticleCollection( const DmObjec
 	if ( !pDef )
 	{
 		char pBuf[256];
-		UniqueIdToString( id, pBuf, sizeof(pBuf) );
-		Warning( "Attempted to create unknown particle system id %s\n", pBuf );
+		Warning( "Attempted to create unknown particle system id %s\n",
+                        UniqueIdToString(id, pBuf) ? pBuf : "N/A" );
 		return NULL;
 	}
 
@@ -3653,8 +3653,7 @@ void CParticleSystemMgr::BuildBatchList( intp iRenderCache, IMatRenderContext *p
 	int nRemainingVertices = nMaxVertices;
 	int nRemainingIndices = nMaxIndices;
 
-	intp i = batches.AddToTail();
-	Batch_t* pBatch = &batches[i];
+	Batch_t* pBatch = &batches[batches.AddToTail()];
 	pBatch->m_nVertCount = 0;
 	pBatch->m_nIndexCount = 0;
 

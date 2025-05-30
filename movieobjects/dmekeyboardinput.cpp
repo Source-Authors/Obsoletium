@@ -27,8 +27,8 @@ struct KeyInfo
 	const char *str;
 };
 
-const uint g_nKeys = 48;
-const KeyInfo g_keyInfo[ g_nKeys ] =
+constexpr inline uint g_nKeys = 48;
+constexpr KeyInfo g_keyInfo[ g_nKeys ] =
 {
 	{ KEY_0, "0" },
 	{ KEY_1, "1" },

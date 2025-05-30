@@ -81,7 +81,7 @@ void CDmeSingleIndexedComponent::Resolve()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmeSingleIndexedComponent::Count() const
+intp CDmeSingleIndexedComponent::Count() const
 {
 	return IsComplete() ? m_CompleteCount.Get() : m_Components.Count();
 }
@@ -114,7 +114,7 @@ void CDmeSingleIndexedComponent::AddComponent( int component, float weight /*= 1
 	if ( IsComplete() )
 		return;
 
-	const int index( BinarySearch( component ) );
+	const intp index( BinarySearch( component ) );
 	Assert( index >= 0 );
 	Assert( index <= m_Components.Count() );
 	if ( index == m_Components.Count() )
@@ -140,8 +140,8 @@ void CDmeSingleIndexedComponent::AddComponent( int component, float weight /*= 1
 //-----------------------------------------------------------------------------
 void CDmeSingleIndexedComponent::AddComponents( const CUtlVector< int > &components )
 {
-	const int nComponents( components.Count() );
-	for ( int i( 0 ); i < nComponents; ++i )
+	const intp nComponents( components.Count() );
+	for ( intp i( 0 ); i < nComponents; ++i )
 	{
 		AddComponent( components[ i ] );
 	}
@@ -154,8 +154,8 @@ void CDmeSingleIndexedComponent::AddComponents( const CUtlVector< int > &compone
 void CDmeSingleIndexedComponent::AddComponents(
 	const CUtlVector< int > &components, const CUtlVector< float > &weights )
 {
-	const int nComponents( min( components.Count(), weights.Count() ) );
-	for ( int i( 0 ); i < nComponents; ++i )
+	const intp nComponents( min( components.Count(), weights.Count() ) );
+	for ( intp i( 0 ); i < nComponents; ++i )
 	{
 		AddComponent( components[ i ], weights[ i ] );
 	}
@@ -169,7 +169,7 @@ void CDmeSingleIndexedComponent::RemoveComponent( int component )
 {
 	Assert( !IsComplete() );	// TODO: Convert from complete to complete - component
 
-	const int cIndex = BinarySearch( component );
+	const intp cIndex = BinarySearch( component );
 	if ( cIndex >= m_Components.Count() || m_Components[ cIndex ] != component )	// Component not in selection
 		return;
 
@@ -181,7 +181,7 @@ void CDmeSingleIndexedComponent::RemoveComponent( int component )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CDmeSingleIndexedComponent::GetComponent( int index, int &component, float &weight ) const
+bool CDmeSingleIndexedComponent::GetComponent( intp index, int &component, float &weight ) const
 {
 	if ( index < Count() )
 	{
@@ -210,12 +210,12 @@ void CDmeSingleIndexedComponent::GetComponents( CUtlVector< int > &components, C
 {
 	if ( IsComplete() )
 	{
-		const int nComponents = Count();
+		const intp nComponents = Count();
 
 		int *pComponents = reinterpret_cast< int * >( alloca( nComponents * sizeof( int ) ) );
 		float *pWeights = reinterpret_cast< float * >( alloca( nComponents * sizeof( float ) ) );
 
-		for ( int i = 0; i < nComponents; ++i )
+		for ( intp i = 0; i < nComponents; ++i )
 		{
 			pComponents[ i ] = i;
 			pWeights[ i ] = 1.0f;
@@ -242,11 +242,11 @@ void CDmeSingleIndexedComponent::GetComponents( CUtlVector< int > &components ) 
 {
 	if ( IsComplete() )
 	{
-		const int nComponents = Count();
+		const intp nComponents = Count();
 
 		int *pComponents = reinterpret_cast< int * >( alloca( nComponents * sizeof( int ) ) );
 
-		for ( int i = 0; i < nComponents; ++i )
+		for ( intp i = 0; i < nComponents; ++i )
 		{
 			pComponents[ i ] = i;
 		}
@@ -299,14 +299,14 @@ inline void CDmeSingleIndexedComponent::Clear()
 // index if it's found or if it's not found, returns the index at which it
 // should be inserted to maintain the sorted order of the component list
 //-----------------------------------------------------------------------------
-int CDmeSingleIndexedComponent::BinarySearch( int component ) const
+intp CDmeSingleIndexedComponent::BinarySearch( int component ) const
 {
 	const CUtlVector< int > &components( m_Components.Get() );
-	const int nComponents( components.Count() );
+	const intp nComponents( components.Count() );
 
-	int left( 0 );
-	int right( nComponents - 1 );
-	int mid;
+	intp left( 0 );
+	intp right( nComponents - 1 );
+	intp mid;
 
 	while ( left <= right )
 	{
@@ -337,7 +337,7 @@ bool CDmeSingleIndexedComponent::HasComponent( int component ) const
 	if ( IsComplete() )
 		return true;
 
-	const int cIndex = BinarySearch( component );
+	const intp cIndex = BinarySearch( component );
 	if ( cIndex >= m_Components.Count() )
 		return false;
 
@@ -355,7 +355,7 @@ bool CDmeSingleIndexedComponent::GetWeight( int component, float &weight ) const
 {
 	Assert( !IsComplete() );
 
-	const int cIndex = BinarySearch( component );
+	const intp cIndex = BinarySearch( component );
 	if ( cIndex >= m_Components.Count() )
 		return false;
 
@@ -374,11 +374,11 @@ bool CDmeSingleIndexedComponent::GetWeight( int component, float &weight ) const
 //-----------------------------------------------------------------------------
 void CDmeSingleIndexedComponent::Subtract( const CDmeSingleIndexedComponent &rhs )
 {
-	const int nLhs = Count();
-	const int nRhs = rhs.Count();
+	const intp nLhs = Count();
+	const intp nRhs = rhs.Count();
 
-	int l = 0;
-	int r = 0;
+	intp l = 0;
+	intp r = 0;
 
 	if ( IsComplete() )
 	{
@@ -430,11 +430,11 @@ void CDmeSingleIndexedComponent::Subtract( const CDmeSingleIndexedComponent &rhs
 //-----------------------------------------------------------------------------
 void CDmeSingleIndexedComponent::Add( const CDmeSingleIndexedComponent &rhs )
 {
-	int nLhs = Count();
-	const int nRhs = rhs.Count();
+	intp nLhs = Count();
+	const intp nRhs = rhs.Count();
 
-	int l = 0;
-	int r = 0;
+	intp l = 0;
+	intp r = 0;
 
 	if ( IsComplete() )
 	{
@@ -481,9 +481,9 @@ void CDmeSingleIndexedComponent::Add( const CDmeSingleIndexedComponent &rhs )
 	else
 	{
 		CUtlVector< int > newComponents;
-		newComponents.EnsureCapacity( nLhs + nRhs * 0.5 );	// Just an estimate assuming 50% of the components in rhs aren't in lhs
+		newComponents.EnsureCapacity( nLhs + nRhs / 2 );	// Just an estimate assuming 50% of the components in rhs aren't in lhs
 		CUtlVector< float > newWeights;
-		newWeights.EnsureCapacity( nLhs  + nRhs * 0.5 );	// Just an estimate
+		newWeights.EnsureCapacity( nLhs  + nRhs / 2 );	// Just an estimate
 
 		while ( l < nLhs || r < nRhs )
 		{
@@ -526,11 +526,11 @@ void CDmeSingleIndexedComponent::Add( const CDmeSingleIndexedComponent &rhs )
 //-----------------------------------------------------------------------------
 void CDmeSingleIndexedComponent::Intersection( const CDmeSingleIndexedComponent &rhs )
 {
-	const int nLhs = Count();
-	const int nRhs = rhs.Count();
+	const intp nLhs = Count();
+	const intp nRhs = rhs.Count();
 
-	int l = 0;
-	int r = 0;
+	intp l = 0;
+	intp r = 0;
 
 	if ( IsComplete() )
 	{

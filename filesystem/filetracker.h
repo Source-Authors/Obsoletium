@@ -178,7 +178,8 @@ private:
 #ifdef SUPPORT_PACKED_STORE
 	CThreadEvent m_threadEventWorkToDo;
 	CThreadEvent m_threadEventWorkCompleted;
-	volatile bool m_bThreadShouldRun;
+	// dimhotepus: volatile bool -> std::atomic_bool
+	std::atomic_bool m_bThreadShouldRun;
 	ThreadHandle_t m_hWorkThread;
 
 	CTSQueue< StuffToMD5_t >				m_PendingJobs;

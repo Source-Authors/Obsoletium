@@ -325,7 +325,7 @@ void ProcessWorldModel (void)
 	// this turns portals with one solid side into faces
 	// it also subdivides each face if necessary to fit max lightmap dimensions
 	MakeFaces (tree->headnode);
-	Msg("done (%.2fs)", Plat_FloatTime() - start );
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 
 	if (glview)
 	{
@@ -343,25 +343,35 @@ void ProcessWorldModel (void)
 	start = Plat_FloatTime();
 
 	Msg("\n");
-	Msg("FixTjuncs...\n");
+	Msg("FixTjuncs...");
 	
 	// This unifies the vertex list for all edges (splits collinear edges to remove t-junctions)
 	// It also welds the list of vertices out of each winding/portal and rounds nearly integer verts to integer
 	pLeafFaceList = FixTjuncs (tree->headnode, pLeafFaceList);
+	
+	// dimhotepus: Add fix tjuncs time log.
+	Msg("(%.2fs)", Plat_FloatTime() - start );
 
 	// this merges all of the solid nodes that have separating planes
 	if (!noprune)
 	{
-		Msg("PruneNodes...\n");
+		Msg("\n");
+		Msg("PruneNodes...");
+
 		PruneNodes (tree->headnode);
+
+		// dimhotepus: Add prune nodes time log.
+		Msg("(%.2fs)", Plat_FloatTime() - start );
 	}
 
 //	Msg( "SplitSubdividedFaces...\n" );
 //	SplitSubdividedFaces( tree->headnode );
-
-	Msg("WriteBSP...\n");
-	WriteBSP (tree->headnode, pLeafFaceList);
-	Msg("done (%.2fs)\n", Plat_FloatTime() - start );
+	
+	Msg("\n");
+	Msg("Write BSP...");
+	WriteBSP(tree->headnode, pLeafFaceList);
+	Msg("(%.2fs)", Plat_FloatTime() - start );
+	Msg("\n");
 
 	if (!leaked)
 	{
@@ -590,7 +600,7 @@ static void EmitOccluderBrushes()
 			continue;
 
 		// Output only those parts of the occluder tree which are a part of the brush
-		int nOccluder = g_OccluderData.AddToTail();
+		intp nOccluder = g_OccluderData.AddToTail();
 		doccluderdata_t &occluderData = g_OccluderData[ nOccluder ];
 		occluderData.firstpoly = g_OccluderPolyData.Count();
 		occluderData.mins.Init( FLT_MAX, FLT_MAX, FLT_MAX );
@@ -600,10 +610,10 @@ static void EmitOccluderBrushes()
 
 		// NOTE: If you change the algorithm by which occluder numbers are allocated,
 		// then you must also change FixupOnlyEntsOccluderEntities() below
-		sprintf (str, "%i", nOccluder);
+		V_sprintf_safe (str, "%i", nOccluder);
 		SetKeyValue (&entities[entity_num], "occludernumber", str);
 
-		int nIndex = g_OccluderInfo.AddToTail();
+		intp nIndex = g_OccluderInfo.AddToTail();
 		g_OccluderInfo[nIndex].m_nOccluderEntityIndex = entity_num;
 		
 		sideList.RemoveAll();
@@ -633,7 +643,7 @@ static void EmitOccluderBrushes()
 				pEmitted[i] = entity_num;
 #endif
 
-				int k = g_OccluderPolyData.AddToTail();
+				intp k = g_OccluderPolyData.AddToTail();
 				doccluderpolydata_t *pOccluderPoly = &g_OccluderPolyData[k];
 
 				pOccluderPoly->planenum = f->planenum;
@@ -753,7 +763,7 @@ void FixupOnlyEntsOccluderEntities()
 
 		// NOTE: If you change the algorithm by which occluder numbers are allocated above,
 		// then you must also change this
-		sprintf (str, "%i", nOccluder);
+		V_sprintf_safe (str, "%i", nOccluder);
 		SetKeyValue (&entities[entity_num], "occludernumber", str);
 		++nOccluder;
 	}
@@ -886,8 +896,8 @@ int RunVBSP( int argc, char **argv )
 	CommandLine()->CreateCmdLine( argc, argv );
 	const ScopedFileSystem scopedFileSystem( argv[ argc - 1 ] );
 
-	Q_StripExtension( ExpandArg( argv[ argc - 1 ] ), source, sizeof( source ) );
-	Q_FileBase( source, mapbase, sizeof( mapbase ) );
+	Q_StripExtension( ExpandArg( argv[ argc - 1 ] ), source );
+	Q_FileBase( source, mapbase );
 	strlwr( mapbase );
 
 	// Depends on ScopedFileSystem.
@@ -908,9 +918,9 @@ int RunVBSP( int argc, char **argv )
 	V_strcat_safe( mapFile, ".bsp" );
 
 #ifdef PLATFORM_64BITS
-	Msg( "Valve Software - vbsp.exe [64 bit] (%s)\n", __DATE__ );
+	Msg( "Valve Software - vbsp [64 bit] (%s)\n", __DATE__ );
 #else
-	Msg( "Valve Software - vbsp.exe (%s)\n", __DATE__ );
+	Msg( "Valve Software - vbsp (%s)\n", __DATE__ );
 #endif
 
 	int i;
@@ -1027,7 +1037,8 @@ int RunVBSP( int argc, char **argv )
 #if 0
 		else if (!Q_stricmp(argv[i], "-maxlightmapdim"))
 		{
-			g_maxLightmapDimension = atof(argv[i+1]);
+			// dimhotepus: atof -> strtof.
+			g_maxLightmapDimension = strtof(argv[i+1], nullptr);
 			Msg ("--max-lightmap-dimension: %f\n", g_maxLightmapDimension);
 			i++;
 		}
@@ -1162,9 +1173,10 @@ int RunVBSP( int argc, char **argv )
 			Msg( "--full-minidumps: true\n" );
 			se::utils::common::EnableFullMinidumps( true );
 		}
-		else if ( !Q_stricmp( argv[i], "-embed" ) && i < argc - 1 )
+		// dimhotpeus: Check arg is in bounds first.
+		else if ( i < argc - 1 && !Q_stricmp( argv[i], "-embed" ) )
 		{
-			V_MakeAbsolutePath( g_szEmbedDir, sizeof( g_szEmbedDir ), argv[++i], "." );
+			V_MakeAbsolutePath( g_szEmbedDir, argv[++i], "." );
 			V_FixSlashes( g_szEmbedDir );
 			if ( !V_RemoveDotSlashes( g_szEmbedDir ) )
 			{
@@ -1322,7 +1334,7 @@ int RunVBSP( int argc, char **argv )
 
 	V_sprintf_safe( materialPath, "%smaterials", gamedir );
 	InitMaterialSystem( materialPath, CmdLib_GetFileSystemFactory() );
-	Msg( "materialPath: %s\n", materialPath );
+	Msg( "Path to materials directory: %s.\n", materialPath );
 
 	char path[MAX_FILEPATH];
 	// delete portal and line files
@@ -1336,10 +1348,10 @@ int RunVBSP( int argc, char **argv )
 	const char *pszExtension = V_GetFileExtension( name );
 	if ( !pszExtension )
 	{
-		V_SetExtension( name, ".vmm", sizeof( name ) );
+		V_SetExtension( name, ".vmm" );
 		if ( !FileExists( name ) )
 		{
-			V_SetExtension( name, ".vmf", sizeof( name ) );
+			V_SetExtension( name, ".vmf" );
 		}
 	}
 

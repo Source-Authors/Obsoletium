@@ -5,19 +5,18 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <ctype.h>
-#include <stdio.h>
-#include <utlvector.h>
+#include <vgui_controls/BuildModeDialog.h>
+
+#include <tier1/utlvector.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
 #include <vgui/MouseCode.h>
 
-#include <vgui_controls/BuildModeDialog.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/Button.h>
@@ -305,7 +304,7 @@ public:
 				EditablePanel *ep = dynamic_cast < EditablePanel * >( p );
 				if ( ep && ep->GetBuildGroup() )
 				{
-					KeyValues *kv = new KeyValues( "Panel" );
+					KeyValuesAD kv( "Panel" );
 					kv->SetPtr( "ptr", p );
 					char const *text = ep->GetName() ? ep->GetName() : "unnamed";
 					menu->AddMenuItem( text, new KeyValues("SetText", "text", text), GetParent(), kv );
@@ -322,7 +321,7 @@ public:
 				EditablePanel *ep = dynamic_cast < EditablePanel * >( m_hContext->GetChild( i ) );
 				if ( ep && ep->IsVisible() && ep->GetBuildGroup() )
 				{
-					KeyValues *kv = new KeyValues( "Panel" );
+					KeyValuesAD kv( "Panel" );
 					kv->SetPtr( "ptr", ep );
 					char const *text = ep->GetName() ? ep->GetName() : "unnamed";
 					menu->AddMenuItem( text, new KeyValues("SetText", "text", text), GetParent(), kv );
@@ -868,7 +867,7 @@ void BuildModeDialog::UpdateEditControl(PanelItem_t &panelItem, const char *dats
 		default:
 			{
 				wchar_t unicode[512];
-				g_pVGuiLocalize->ConvertANSIToUnicode(datstring, unicode, sizeof(unicode));
+				g_pVGuiLocalize->ConvertANSIToUnicode(datstring, unicode);
 				panelItem.m_EditPanel->SetText(unicode);
 			}
 			break;
@@ -952,11 +951,11 @@ void BuildModeDialog::ApplyDataToControls()
 	char fieldName[512];
 	if (m_pPanelList->m_PanelList[0].m_EditPanel)
 	{
-		m_pPanelList->m_PanelList[0].m_EditPanel->GetText(fieldName, sizeof(fieldName));
+		m_pPanelList->m_PanelList[0].m_EditPanel->GetText(fieldName);
 	}
 	else
 	{
-		m_pPanelList->m_PanelList[0].m_EditButton->GetText(fieldName, sizeof(fieldName));
+		m_pPanelList->m_PanelList[0].m_EditButton->GetText(fieldName);
 	}
 
 	// check to see if any buildgroup panels have this name
@@ -977,7 +976,8 @@ void BuildModeDialog::ApplyDataToControls()
 
 	// create a section to store settings
 	// m_pPanelList->m_pResourceData->getSection( m_pCurrentPanel->GetName(), true );
-	KeyValues *dat = new KeyValues( m_pCurrentPanel->GetName() );
+	// dimhteopus: Fix KeyValues leak.
+	KeyValuesAD dat( m_pCurrentPanel->GetName() );
 
 	// loop through the textedit filling in settings
 	for ( const auto &p : m_pPanelList->m_PanelList )
@@ -986,11 +986,11 @@ void BuildModeDialog::ApplyDataToControls()
 		char buf[512];
 		if (p.m_EditPanel)
 		{
-			p.m_EditPanel->GetText(buf, sizeof(buf));
+			p.m_EditPanel->GetText(buf);
 		}
 		else
 		{
-			p.m_EditButton->GetText(buf, sizeof(buf));
+			p.m_EditButton->GetText(buf);
 		}
 
 		switch (p.m_iType)
@@ -1100,8 +1100,7 @@ void BuildModeDialog::DoPaste()
 //-----------------------------------------------------------------------------
 KeyValues *BuildModeDialog::StoreSettings()
 {
-	KeyValues *storedSettings;
-	storedSettings = new KeyValues( m_pCurrentPanel->GetName() );
+	KeyValues *storedSettings = new KeyValues( m_pCurrentPanel->GetName() );
 
 	// loop through the textedit filling in settings
 	for ( const auto &panel : m_pPanelList->m_PanelList )
@@ -1110,11 +1109,11 @@ KeyValues *BuildModeDialog::StoreSettings()
 		char buf[512];
 		if (panel.m_EditPanel)
 		{
-			panel.m_EditPanel->GetText(buf, sizeof(buf));
+			panel.m_EditPanel->GetText(buf);
 		}
 		else
 		{
-			panel.m_EditButton->GetText(buf, sizeof(buf));
+			panel.m_EditButton->GetText(buf);
 		}
 
 		switch (panel.m_iType)
@@ -1159,7 +1158,7 @@ void BuildModeDialog::OnTextChanged( Panel *panel )
 	{
 		// reload file if it's changed
 		char newFile[512];
-		m_pFileSelectionCombo->GetText(newFile, sizeof(newFile));
+		m_pFileSelectionCombo->GetText(newFile);
 
 		if (stricmp(newFile, m_pBuildGroup->GetResourceName()) != 0)
 		{
@@ -1173,7 +1172,7 @@ void BuildModeDialog::OnTextChanged( Panel *panel )
 	if (panel == m_pAddNewControlCombo)
 	{
 		char buf[40];
-		m_pAddNewControlCombo->GetText(buf, 40);
+		m_pAddNewControlCombo->GetText(buf);
 		if (stricmp(buf, "None") != 0)
 		{	
 			OnNewControl(buf);

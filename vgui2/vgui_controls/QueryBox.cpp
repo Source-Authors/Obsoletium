@@ -8,9 +8,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include <vgui_controls/QueryBox.h>
+
 #include <vgui/KeyCode.h>
 
-#include <vgui_controls/QueryBox.h>
 #include <vgui_controls/TextImage.h>
 
 // memdbgon must be the last include file in a .cpp file!!!

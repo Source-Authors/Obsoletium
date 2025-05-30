@@ -108,9 +108,9 @@ void CMessageWnd::AddMsg(MWMSGTYPE type, TCHAR* msg)
 
 	// format message
 	MWMSGSTRUCT mws;	
-	mws.MsgLen = strlen(msg);
+	mws.MsgLen = V_strlen(msg);
 	mws.type = type;
-	Assert(mws.MsgLen <= (sizeof(mws.szMsg) / sizeof(TCHAR)));
+	Assert(mws.MsgLen < ssize(mws.szMsg));
 	_tcscpy(mws.szMsg, msg);
 
 	// Add the message, growing the array as necessary

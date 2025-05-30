@@ -482,7 +482,9 @@ const char *Replay_GetDownloadURL()
 //     pBaseURL = "http://some.base.url:8080"
 //     pURLPath = "/a/path/here.txt"
 //----------------------------------------------------------------------------------------
-void Replay_CrackURL( const char *pURL, char *pBaseURLOut, char *pURLPathOut )
+void Replay_CrackURL( IN_Z const char *pURL,
+	OUT_Z_CAP(baseOutSize) char *pBaseURLOut, intp baseOutSize,
+	OUT_Z_CAP(pathOutSize) char *pURLPathOut, intp pathOutSize )
 {
 	const char *pColon;
 	const char *pURLPath;
@@ -503,13 +505,17 @@ void Replay_CrackURL( const char *pURL, char *pBaseURLOut, char *pURLPathOut )
 
 	// Copies "http[s]://<address>:<port>
 	pURLPath = V_strstr( pColon, "/" );
-	V_strncpy( pBaseURLOut, pURL, pURLPath - pURL + 1 );
-	V_strcpy( pURLPathOut, pURLPath );
+	V_strncpy( pBaseURLOut, pURL, std::min(baseOutSize, pURLPath - pURL + 1) );
+	V_strncpy( pURLPathOut, pURLPath, pathOutSize );
 
 	return;
 
 fail:
 	AssertMsg( 0, "Replay_CrackURL() was passed an invalid URL and has failed.  This should never happen." );
+
+	// dimhotepus: Ensure zero-termination.
+	if (baseOutSize > 0) pBaseURLOut[0] = '\0';
+	if (pathOutSize > 0) pURLPathOut[0] = '\0';
 }
 
 #ifndef DEDICATED

@@ -1479,25 +1479,16 @@ void CStudioRender::R_StudioSoftwareProcessMesh( mstudiomesh_t* pmesh, CMeshBuil
 		bool bNeedsTangentSpace, bool bDX8Vertex, IMaterial *pMaterial )
 {
 	unsigned int nAlphaMask = RoundFloatToInt( r_blend * 255.0f ); 
-	nAlphaMask = clamp( nAlphaMask, 0, 255 );
+	nAlphaMask = clamp( nAlphaMask, 0u, 255u );
 	nAlphaMask <<= 24;
 
 	// FIXME: Use function pointers to simplify this?!?
-	int idx;
-	if ( IsPC() )
-	{
-		idx	= bDX8Vertex * 24 + bNeedsTangentSpace * 12 + doFlex * 6 + MathLib_SSEEnabled() * 3 + lighting;
-	}
-	else
-	{
-		idx = bNeedsTangentSpace * 6 + doFlex * 3 + lighting;
-	}
-
+	int idx	= bDX8Vertex * 24 + bNeedsTangentSpace * 12 + doFlex * 6 + MathLib_SSEEnabled() * 3 + to_underlying(lighting);
 	const mstudio_meshvertexdata_t *pVertData = GetFatVertexData( pmesh, m_pStudioHdr );
 	if ( pVertData )
 	{
 		// invoke the software mesh processing handler
-		g_SoftwareProcessMeshFunc[idx]( pVertData, m_PoseToWorld, m_VertexCache, meshBuilder, numVertices, pGroupToMesh, nAlphaMask, pMaterial ); 
+		g_SoftwareProcessMeshFunc[idx]( pVertData, m_PoseToWorld, m_VertexCache, meshBuilder, numVertices, pGroupToMesh, nAlphaMask, pMaterial );
 	}
 }
 
@@ -1930,7 +1921,7 @@ int CStudioRender::R_StudioDrawGroupHWSkin( IMatRenderContext *pRenderContext, s
 
 #if PIX_ENABLE
 	char szPIXEventName[128];
-	sprintf( szPIXEventName, "R_StudioDrawGroupHWSkin (%s)", m_pStudioHdr->name );	// PIX
+	V_sprintf_safe( szPIXEventName, "R_StudioDrawGroupHWSkin (%s)", m_pStudioHdr->name );	// PIX
 	PIXEVENT( pRenderContext, szPIXEventName );
 #endif
 

@@ -12,7 +12,7 @@
 #endif
 
 #include "tier0/basetypes.h"
-#include <mxtk/mxWindow.h>
+#include <mxtk/mxwindow.h>
 #include <mxtk/mxCheckBox.h>
 
 FORWARD_DECLARE_HANDLE(HDC);

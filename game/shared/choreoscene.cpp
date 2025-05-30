@@ -71,7 +71,7 @@ void CChoreoScene::choreoprintf(int level, PRINTF_FORMAT_STRING const char *fmt,
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	Q_vsnprintf( string, sizeof(string), fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 
 	while ( level-- > 0 )
@@ -497,7 +497,7 @@ void CChoreoScene::SceneMsg( PRINTF_FORMAT_STRING const char *pFormat, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, pFormat );
-	Q_vsnprintf( string, sizeof(string), pFormat, argptr );
+	V_vsprintf_safe( string, pFormat, argptr );
 	va_end( argptr );
 
 	if ( m_pfnPrint )
@@ -683,8 +683,7 @@ void CCurveData::Parse( ISceneTokenProcessor *tokenizer, ICurveDataAccessor *dat
 		float value = strtof(tokenizer->CurrentToken(), nullptr);
 		
 		// Add to counter
-		intp idx = samples.AddToTail();
-		CExpressionSample *s = &samples[ idx ];
+		CExpressionSample *s = &samples[ samples.AddToTail() ];
 			
 		s->time			= time;
 		s->value		= value;
@@ -886,9 +885,7 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 				float value = strtof(tokenizer->CurrentToken(), nullptr);
 				
 				// Add to counter
-				intp idx = samples[ samplecount ].AddToTail();
-				
-				CExpressionSample *s = &samples[ samplecount ][ idx ];
+				CExpressionSample *s = &samples[ samplecount ][ samples[ samplecount ].AddToTail() ];
 				
 				if ( samples_use_realtime )
 				{
@@ -2975,13 +2972,9 @@ intp CChoreoScene::FindActorIndex( CChoreoActor *actor )
 // Input  : a1 - 
 //			a2 - 
 //-----------------------------------------------------------------------------
-void CChoreoScene::SwapActors( int a1, int a2 )
+void CChoreoScene::SwapActors( intp a1, intp a2 )
 {
-	CChoreoActor *temp;
-
-	temp = m_Actors[ a1 ];
-	m_Actors[ a1 ] = m_Actors[ a2 ];
-	m_Actors[ a2 ] = temp;
+	std::swap( m_Actors[ a1 ], m_Actors[ a2 ] );
 }
 
 //-----------------------------------------------------------------------------
@@ -3884,11 +3877,10 @@ bool CChoreoScene::RestoreFromBinaryBuffer( CUtlBuffer& buf, char const *filenam
 		return false;
 
 	// Skip the CRC
-	buf.GetInt();
+	(void)buf.GetInt();
 
-	int i;
-	int eventCount = buf.GetUnsignedChar();
-	for ( i = 0; i < eventCount; ++i )
+	auto eventCount = buf.GetUnsignedChar();
+	for ( decltype(eventCount) i = 0; i < eventCount; ++i )
 	{
 		MEM_ALLOC_CREDIT();
 		CChoreoEvent *e = AllocEvent();
@@ -3902,8 +3894,8 @@ bool CChoreoScene::RestoreFromBinaryBuffer( CUtlBuffer& buf, char const *filenam
 		return false;
 	}
 
-	int actorCount = buf.GetUnsignedChar();
-	for ( i = 0; i < actorCount; ++i )
+	auto actorCount = buf.GetUnsignedChar();
+	for ( decltype(eventCount) i = 0; i < actorCount; ++i )
 	{
 		CChoreoActor *a = AllocActor();
 		Assert( a );

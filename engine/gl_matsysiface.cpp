@@ -114,10 +114,9 @@ CON_COMMAND_F( mat_edit, "Bring up the material under the crosshair in the edito
 		{
 			ConMsg( "editing material \"%s\"\n", pMaterial->GetName() );
 
-			KeyValues *pKeyValues = new KeyValues( "EditMaterial" );
+			KeyValuesAD pKeyValues( "EditMaterial" );
 			pKeyValues->SetString( "material", pMaterial->GetName() );
 			pToolSystem->PostMessage( 0, pKeyValues );
-			pKeyValues->deleteThis();
 		}
 	}
 }
@@ -148,8 +147,8 @@ CON_COMMAND_F( mat_crosshair_edit, "open the material under the crosshair in the
 	else
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vmt", pMaterial->GetName() );
-		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+		V_sprintf_safe( chResolveNameArg, "materials/%s.vmt", pMaterial->GetName() );
+		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 		if ( p4 )
 		{
 			CP4AutoEditAddFile autop4( szResolvedName );
@@ -175,10 +174,10 @@ CON_COMMAND_F( mat_crosshair_explorer, "open the material under the crosshair in
 	else
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vmt", pMaterial->GetName() );
-		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath( chResolveNameArg, "game", chResolveName, sizeof( chResolveName ) - 1 );
+		V_sprintf_safe( chResolveNameArg, "materials/%s.vmt", pMaterial->GetName() );
+		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 		char params[256];
-		Q_snprintf( params, sizeof( params ) - 1, "/E,/SELECT,%s", szResolvedName );
+		V_sprintf_safe( params, "/E,/SELECT,%s", szResolvedName );
 		vgui::system()->ShellExecuteEx( "open", "explorer.exe", params );
 	}
 }
@@ -485,11 +484,13 @@ struct sortmap_t
 
 IMatRenderContext *pSortMapRenderContext;
 
-int __cdecl SortMapCompareFunc( const void *pElem0, const void *pElem1 )
+bool __cdecl SortMapCompareFunc( const sortmap_t &pMap0, const sortmap_t &pMap1 )
 {
-	const sortmap_t *pMap0 = (const sortmap_t *)pElem0;
-	const sortmap_t *pMap1 = (const sortmap_t *)pElem1;
-	return pSortMapRenderContext->CompareMaterialCombos( pMap0->info.material, pMap1->info.material, pMap0->info.lightmapPageID, pMap1->info.lightmapPageID );
+	return pSortMapRenderContext->CompareMaterialCombos
+	(
+		pMap0.info.material, pMap1.info.material,
+		pMap0.info.lightmapPageID, pMap1.info.lightmapPageID
+	) < 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -504,9 +505,8 @@ void MaterialSystem_CreateSortinfo( void )
 	Assert( materialSortInfoArray );
 	materials->GetSortInfo( materialSortInfoArray );
 
-	int i = 0;
-	sortmap_t *pMap = (sortmap_t *)_alloca( sizeof(sortmap_t) * nSortIDs );
-	for ( i = 0; i < nSortIDs; i++ )
+	sortmap_t *pMap = stackallocT( sortmap_t, nSortIDs );
+	for ( int i = 0; i < nSortIDs; i++ )
 	{
 		pMap[i].info = materialSortInfoArray[i];
 		pMap[i].index = i;
@@ -515,10 +515,11 @@ void MaterialSystem_CreateSortinfo( void )
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pSortMapRenderContext = pRenderContext;
 
-	qsort( pMap, nSortIDs, sizeof( sortmap_t ), SortMapCompareFunc );
+	// dimhotepus: qsort -> sort
+	std::sort( pMap, pMap + nSortIDs, SortMapCompareFunc );
 
-	int *pSortIDRemap = (int *)_alloca( sizeof(int) * nSortIDs );
-	for ( i = 0; i < nSortIDs; i++ )
+	int *pSortIDRemap = stackallocT( int, nSortIDs );
+	for ( int i = 0; i < nSortIDs; i++ )
 	{
 		materialSortInfoArray[i] = pMap[i].info;
 		pSortIDRemap[pMap[i].index] = i;
@@ -746,7 +747,7 @@ void BuildBrushModelVertexArray(worldbrushdata_t *pBrushData, SurfaceHandle_t su
 }
 #endif // SWDS
 
-void CMSurfaceSortList::Init( int maxSortIDs, int minMaterialLists )
+void CMSurfaceSortList::Init( int maxSortIDs, intp minMaterialLists )
 {
 	m_list.RemoveAll();
 	m_list.EnsureCapacity(minMaterialLists);
@@ -812,7 +813,7 @@ void CMSurfaceSortList::EnsureMaxSortIDs( int newMaxSortIDs )
 {
 	if ( newMaxSortIDs > m_maxSortIDs )
 	{
-		int oldMax = m_maxSortIDs;
+		intp oldMax = m_maxSortIDs;
 		// compute new size, expand by minimum of 256
 		newMaxSortIDs += 255;
 		newMaxSortIDs -= (newMaxSortIDs&255);
@@ -826,13 +827,13 @@ void CMSurfaceSortList::EnsureMaxSortIDs( int newMaxSortIDs )
 		{
 			for ( int j = newMaxSortIDs; --j >= 0; )
 			{
-				int newIndex = (i * newMaxSortIDs) + j;
+				intp newIndex = (i * newMaxSortIDs) + j;
 				if ( j < oldMax )
 				{
 					// when i == 0, the group indices overlap so they don't need to be remapped
 					if ( i != 0 )
 					{
-						int oldIndex = (i * oldMax) + j;
+						intp oldIndex = (i * oldMax) + j;
 						MarkGroupNotUsed(newIndex);
 						if ( IsGroupUsed(oldIndex) )
 						{
@@ -862,7 +863,7 @@ void CMSurfaceSortList::EnsureMaxSortIDs( int newMaxSortIDs )
 void CMSurfaceSortList::AddSurfaceToTail( msurface2_t *pSurface, int sortGroup, int sortID )
 {
 	Assert(sortGroup<MAX_MAT_SORT_GROUPS);
-	int index = groupOffset[sortGroup] + sortID;
+	intp index = groupOffset[sortGroup] + sortID;
 	surfacesortgroup_t *pGroup = &m_groups[index];
 	if ( !IsGroupUsed(index) )
 	{
@@ -870,7 +871,7 @@ void CMSurfaceSortList::AddSurfaceToTail( msurface2_t *pSurface, int sortGroup, 
 		InitGroup(pGroup);
 	}
 	materiallist_t *pList = NULL;
-	short prevIndex = -1;
+	intp prevIndex = -1;
 	int vertCount = MSurf_VertCount(pSurface);
 	int triangleCount = vertCount - 2;
 	pGroup->triangleCount += triangleCount;
@@ -901,7 +902,7 @@ void CMSurfaceSortList::AddSurfaceToTail( msurface2_t *pSurface, int sortGroup, 
 	else
 	{
 		// allocate a new block
-		short nextBlock = m_list.AddToTail();
+		intp nextBlock = m_list.AddToTail();
 		if ( prevIndex >= 0 )
 		{
 			m_list[prevIndex].nextBlock = nextBlock;

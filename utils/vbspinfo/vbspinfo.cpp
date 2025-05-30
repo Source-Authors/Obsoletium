@@ -8,7 +8,7 @@
 
 #include "bsplib.h"
 
-#include <inttypes.h>
+#include <cinttypes>
 
 #include "mathlib/mathlib.h"
 #include "tier0/icommandline.h"
@@ -22,6 +22,8 @@
 #include "cmdlib.h"
 
 #include "posix_file_stream.h"
+
+#include "tier0/memdbgon.h"
 
 extern int num_entities;
 extern entity_t entities[MAX_MAP_ENTITIES];
@@ -38,7 +40,8 @@ int g_TotalTreeDepth;
 float g_TotalVariance;
 
 float g_ySpacing = -1;  // (set by code)
-double g_xSpacing = 1.0;
+// dimhotepus: double -> float.
+constexpr inline float g_xSpacing = 1.0f;
 
 void CalculateTreeInfo_R(int iNode, int depth) {
   dnode_t *pNode = &dnodes[iNode];
@@ -106,7 +109,7 @@ void DrawTreeToScratchPad() {
 
   int maxDepth = 0;
   CalcTreeDepth_R(dmodels[0].headnode, 0, maxDepth);
-  double flXSpace = (1u << min(maxDepth, 14)) * g_xSpacing;
+  float flXSpace = (1u << min(maxDepth, 14)) * g_xSpacing;
   g_ySpacing = (flXSpace / maxDepth) / 4;
 
   DrawTreeToScratchPad_R(pPad, dmodels[0].headnode,
@@ -121,14 +124,12 @@ struct WorldTextureStats_t {
   int refCount;
 };
 
-int WorldTextureCompareFunc(const void *t1, const void *t2) {
-  auto *pStat1 = (WorldTextureStats_t *)t1;
-  auto *pStat2 = (WorldTextureStats_t *)t2;
+bool WorldTextureCompareFunc(const WorldTextureStats_t &pStat1,
+                             const WorldTextureStats_t &pStat2) {
+  if (pStat1.refCount < pStat2.refCount) return false;
+  if (pStat1.refCount > pStat2.refCount) return true;
 
-  if (pStat1->refCount < pStat2->refCount) return 1;
-  if (pStat1->refCount > pStat2->refCount) return -1;
-
-  return 0;
+  return false;
 }
 
 void PrintWorldTextureStats(FILE *fp) {
@@ -147,8 +148,7 @@ void PrintWorldTextureStats(FILE *fp) {
     stats[texdataID].refCount++;
   }
 
-  qsort(stats, numtexdata, sizeof(WorldTextureStats_t),
-        WorldTextureCompareFunc);
+  std::sort(stats, stats + numtexdata, WorldTextureCompareFunc);
   for (int i = 0; i < numtexdata; i++) {
     const char *pTextureName = TexDataStringTable_GetString(
         dtexdata[stats[i].texdataID].nameStringTableID);
@@ -361,7 +361,7 @@ int main(int argc, char **argv) {
     }
 
     V_strcpy_safe(source, argv[i]);
-    Q_DefaultExtension(source, ".bsp", sizeof(source));
+    Q_DefaultExtension(source, ".bsp");
     V_strcpy_safe(source, ExpandPath(source));
 
     int64_t size = 0;

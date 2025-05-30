@@ -213,8 +213,8 @@ public:
 	{
 		memset(m_StaticPrecalc_LocalLight, 0, sizeof(m_StaticPrecalc_LocalLight));
 		m_StaticPrecalc_NumLocalLights = 0;
-		next = bucket = 0xFFFF;
-		lru_prev = lru_next = 0xFFFF;
+		next = bucket = USHRT_MAX;
+		lru_prev = lru_next = USHRT_MAX;
 		x = y = z = INT_MIN;
 	}
 
@@ -304,7 +304,9 @@ static Vector s_Grayscale( 0.299f, 0.587f, 0.114f );
 
 inline static unsigned short GetLightCacheIndex( const lightcache_t *pCache )
 {
-	return pCache - lightcache;
+	const intp offset = pCache - lightcache;
+	Assert(offset <= USHRT_MAX);
+	return static_cast<unsigned short>(offset);
 }
 
 inline static lightcache_t& GetLightLRUHead()

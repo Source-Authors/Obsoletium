@@ -23,7 +23,7 @@ CServerInfoPanel::CServerInfoPanel(vgui::Panel *parent, const char *name) : CVar
 	LoadControlSettings("Admin/GamePanelInfo.res", "PLATFORM");
 	LoadVarList("Admin/MainServerConfig.vdf");
 	m_iLastUptimeDisplayed = 0;
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 	m_bMapListRetrieved = false;
 	RemoteServer().AddServerMessageHandler(this, "UpdatePlayers");
 	RemoteServer().AddServerMessageHandler(this, "UpdateMap");
@@ -56,12 +56,13 @@ void CServerInfoPanel::OnThink()
 	}
 
 	// check uptime count
-	int time = m_iLastUptimeReceived + (int)(vgui::system()->GetFrameTime() - m_flLastUptimeReceiveTime);
+	double time = m_iLastUptimeReceived + (vgui::system()->GetFrameTime() - m_flLastUptimeReceiveTime);
 	if (time != m_iLastUptimeDisplayed)
 	{
 		m_iLastUptimeDisplayed = time;
 		char timeText[64];
-		V_sprintf_safe(timeText, "%0.1i:%0.2i:%0.2i:%0.2i", (time / 3600) / 24, (time / 3600), (time / 60) % 60, time % 60);
+		V_sprintf_safe(timeText, "%0.1i:%0.2i:%0.2i:%0.2i",
+			(time / 3600) / 24, (time / 3600), static_cast<int>(time / 60) % 60, static_cast<int>(time) % 60);
 		SetControlString("UpTimeText", timeText);
 	}
 }
@@ -89,7 +90,7 @@ void CServerInfoPanel::OnResetData()
 	RemoteServer().RequestValue(this, "ipaddress");
 
 	// update once every minute
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 1.0f);
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,7 +111,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 		buf[0] = 0;
 		if (m_iMaxPlayers > 0)
 		{
-			sprintf(buf, "%d / %d", m_iPlayerCount, m_iMaxPlayers);
+			V_sprintf_safe(buf, "%d / %d", m_iPlayerCount, m_iMaxPlayers);
 		}
 		SetControlString("PlayersText", buf);
 	}
@@ -125,7 +126,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 	else if (!stricmp(value, "UpdateMap") || !stricmp(value, "UpdatePlayers"))
 	{
 		// server has indicated a change, force an update
-		m_flUpdateTime = 0.0f;
+		m_flUpdateTime = 0.0;
 	}
 	else if (!stricmp(value, "maplist"))
 	{
@@ -139,7 +140,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 	{
 		// record uptime for extrapolation
 		m_iLastUptimeReceived = atoi(response);
-		m_flLastUptimeReceiveTime = (float)system()->GetFrameTime();
+		m_flLastUptimeReceiveTime = system()->GetFrameTime();
 	}
 	else if (!stricmp(value, "ipaddress"))
 	{
@@ -277,8 +278,7 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 		// add to the list string that aren't comments
 		if (nameSize > 0 && !(customString[0] == '/' && customString[1] == '/'))
 		{
-			intp i = mapArray.AddToTail();
-			mapArray[i] = customString;
+			mapArray[mapArray.AddToTail()] = customString;
 		}
 	}
 }

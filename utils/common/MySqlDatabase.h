@@ -52,7 +52,7 @@ public:
 private:
 
 	// threading data
-	bool m_bRunThread;
+	std::atomic_bool m_bRunThread;
 	CRITICAL_SECTION *m_pcsThread;
 	CRITICAL_SECTION *m_pcsInQueue;
 	CRITICAL_SECTION *m_pcsOutQueue;

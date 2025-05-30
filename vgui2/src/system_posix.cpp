@@ -6,16 +6,16 @@
 //=============================================================================//
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 
 #include <vgui/VGUI.h>
 #include <vgui/ISystem.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include "tier0/vcrmode.h"
@@ -25,7 +25,6 @@
 #include "vgui_internal.h"
 #include "filesystem_helpers.h"
 #include "vgui_key_translation.h"
-#include "filesystem.h"
 
 #ifdef OSX
 #include <Carbon/Carbon.h>
@@ -72,11 +71,11 @@ public:
 
 	virtual void ShellExecute(const char *command, const char *file);
 
-	virtual int GetClipboardTextCount();
-	virtual void SetClipboardText(const char *text, int textLen);
-	virtual void SetClipboardText(const wchar_t *text, int textLen);
-	virtual int GetClipboardText(int offset, char *buf, int bufLen);
-	virtual int GetClipboardText(int offset, wchar_t *buf, int bufLen);
+	virtual intp GetClipboardTextCount();
+	virtual void SetClipboardText(const char *text, intp textLen);
+	virtual void SetClipboardText(const wchar_t *text, intp textLen);
+	virtual intp GetClipboardText(int offset, char *buf, intp bufLen);
+	virtual intp GetClipboardText(int offset, wchar_t *buf, intp bufLen);
 
 	virtual void SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 );
 
@@ -318,7 +317,7 @@ void CSystem::ShellExecuteEx( const char *command, const char *file, const char 
 	ShellExecute( command, file );
 }
 
-void CSystem::SetClipboardText(const char *text, int textLen)
+void CSystem::SetClipboardText(const char *text, intp textLen)
 {
 #ifdef OSX
 	PasteboardSynchronize( m_PasteBoardRef );
@@ -360,7 +359,7 @@ void CSystem::SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 )
 //-----------------------------------------------------------------------------
 // Purpose: Puts unicode text into the clipboard
 //-----------------------------------------------------------------------------
-void CSystem::SetClipboardText(const wchar_t *text, int textLen)
+void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 {
 	char *charStr = (char *)malloc( textLen * 4 );
 
@@ -380,7 +379,7 @@ void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 	free( charStr );
 }
 
-int CSystem::GetClipboardTextCount()
+intp CSystem::GetClipboardTextCount()
 {
 #ifdef OSX
 	ItemCount count;
@@ -426,7 +425,7 @@ int CSystem::GetClipboardTextCount()
 #endif
 }
 
-int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
+intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
 {
 	Assert( !offset );
 
@@ -476,7 +475,7 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 //-----------------------------------------------------------------------------
 // Purpose: Retrieves unicode text from the clipboard
 //-----------------------------------------------------------------------------
-int CSystem::GetClipboardText(int offset, wchar_t *buf, int bufLen)
+intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
 {
 	Assert( !offset );
 

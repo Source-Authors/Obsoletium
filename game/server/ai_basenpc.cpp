@@ -2204,8 +2204,6 @@ float	CAI_BaseNPC::GetHintDelay( short sHintType )
 //-----------------------------------------------------------------------------
 CBaseGrenade* CAI_BaseNPC::IncomingGrenade(void)
 {
-	int				iDist;
-
 	AIEnemiesIter_t iter;
 	for( AI_EnemyInfo_t *pEMemory = GetEnemies()->GetFirst(&iter); pEMemory != NULL; pEMemory = GetEnemies()->GetNext(&iter) )
 	{
@@ -2220,7 +2218,7 @@ CBaseGrenade* CAI_BaseNPC::IncomingGrenade(void)
 			continue;
 
 		// Check if it's near me
-		iDist = ( pBG->GetAbsOrigin() - GetAbsOrigin() ).Length();
+		float iDist = ( pBG->GetAbsOrigin() - GetAbsOrigin() ).Length();
 		if ( iDist <= NPC_GRENADE_FEAR_DIST )
 			return pBG;
 
@@ -3985,9 +3983,7 @@ void CAI_BaseNPC::NPCThink( void )
 					color = 96;
 
 				Vector right;
-				Vector vecPoint;
-
-				vecPoint = EyePosition() + Vector( 0, 0, 12 );
+				Vector vecPoint = EyePosition() + Vector( 0, 0, 12 );
 				GetVectors( NULL, &right, NULL );
 				NDebugOverlay::Line( vecPoint, vecPoint + Vector( 0, 0, 64 ), color, 0, 0, false , 1.0 );
 				NDebugOverlay::Line( vecPoint, vecPoint + Vector( 0, 0, 16 ) + right * 16, color, 0, 0, false , 1.0 );
@@ -6498,7 +6494,7 @@ float CAI_BaseNPC::ThrowLimit(	const Vector &vecStart,
 
 	// Calculate the total time of the jump minus a tiny fraction
 	float jumpTime		= (vecStart - vecEnd).Length2D()/rawJumpVel.Length2D();
-	float timeStep		= jumpTime / 10.0;
+	float timeStep		= jumpTime / 10.0f;
 
 	Vector gravity = Vector(0,0,fGravity);
 
@@ -8815,7 +8811,7 @@ void CAI_BaseNPC::DrawDebugGeometryOverlays(void)
 				CBaseCombatCharacter *npcEnemy = (eMemory->hEnemy)->MyCombatCharacterPointer();
 				if (npcEnemy)
 				{
-					float	r,g,b;
+					int	r,g,b;
 					char	debugText[255];
 					debugText[0] = NULL;
 
@@ -9883,7 +9879,7 @@ int CAI_BaseNPC::PlaySentence( const char *pszSentence, float delay, float volum
 		if ( pszSentence[0] == '!' )
 		{
 			sentenceIndex = SENTENCEG_Lookup( pszSentence );
-			CPASAttenuationFilter filter( this, soundlevel );
+			CPASAttenuationFilter filter( this, SNDLVL_TO_ATTN( soundlevel ) );
 			CBaseEntity::EmitSentenceByIndex( filter, entindex(), CHAN_VOICE, sentenceIndex, volume, soundlevel, 0, PITCH_NORM );
 		}
 		else
@@ -10986,7 +10982,7 @@ int CAI_BaseNPC::Save( ISave &save )
 		Q_strncpy( saveHeader.szSchedule, pszSchedule, sizeof( saveHeader.szSchedule ) );
 
 		CRC32_Init( &saveHeader.scheduleCrc );
-		CRC32_ProcessBuffer( &saveHeader.scheduleCrc, (void *)m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
+		CRC32_ProcessBuffer( &saveHeader.scheduleCrc, m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
 		CRC32_Final( &saveHeader.scheduleCrc );
 	}
 	else
@@ -11179,7 +11175,7 @@ int CAI_BaseNPC::Restore( IRestore &restore )
 		{
 			CRC32_t scheduleCrc;
 			CRC32_Init( &scheduleCrc );
-			CRC32_ProcessBuffer( &scheduleCrc, (void *)m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
+			CRC32_ProcessBuffer( &scheduleCrc, m_pSchedule->GetTaskList(), m_pSchedule->NumTasks() * sizeof(Task_t) );
 			CRC32_Final( &scheduleCrc );
 
 			if ( scheduleCrc != saveHeader.scheduleCrc )
@@ -11228,7 +11224,7 @@ void CAI_BaseNPC::RestoreConditions( IRestore &restore, CAI_ScheduleBits *pCondi
 	char szCondition[256];
 	for (;;)
 	{
-		restore.ReadString( szCondition, sizeof(szCondition), 0 );
+		restore.ReadString( szCondition, 0 );
 		if ( !szCondition[0] )
 			break;
 		int iCondition = GetSchedulingSymbols()->ConditionSymbolToId( szCondition );
@@ -12947,7 +12943,7 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 		return;
 
 	// Parse the model's key values and find any dynamic interactions
-	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD modelKeyValues("");
 	CUtlBuffer buf( 1024, 0, CUtlBuffer::TEXT_BUFFER );
 
 	if (! modelinfo->GetModelKeyValue( GetModel(), buf ))

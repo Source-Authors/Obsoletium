@@ -143,9 +143,9 @@ static int SeedFileLineHash( int seedvalue, const char *sharedname, int addition
 
 	CRC32_Init( &retval );
 
-	CRC32_ProcessBuffer( &retval, (void *)&seedvalue, sizeof( int ) );
-	CRC32_ProcessBuffer( &retval, (void *)&additionalSeed, sizeof( int ) );
-	CRC32_ProcessBuffer( &retval, (void *)sharedname, Q_strlen( sharedname ) );
+	CRC32_ProcessBuffer( &retval, seedvalue );
+	CRC32_ProcessBuffer( &retval, additionalSeed );
+	CRC32_ProcessBuffer( &retval, sharedname, Q_strlen( sharedname ) );
 	
 	CRC32_Final( &retval );
 
@@ -690,7 +690,7 @@ void UTIL_ClipTraceToPlayers( const Vector& vecAbsStart, const Vector& vecAbsEnd
 	trace_t playerTrace;
 	Ray_t ray;
 	float smallestFraction = tr->fraction;
-	const float maxRange = 60.0f;
+	constexpr float maxRange = 60.0f;
 
 	ray.Init( vecAbsStart, vecAbsEnd );
 
@@ -1019,13 +1019,13 @@ void UTIL_DecodeICE( unsigned char * buffer, int size, const unsigned char *key)
 #endif
 
 // work-around since client header doesn't like inlined gpGlobals->curtime
-float IntervalTimer::Now( void ) const
+double IntervalTimer::Now( void ) const
 {
 	return gpGlobals->curtime;
 }
 
 // work-around since client header doesn't like inlined gpGlobals->curtime
-float CountdownTimer::Now( void ) const
+double CountdownTimer::Now( void ) const
 {
 	return gpGlobals->curtime;
 }
@@ -1364,10 +1364,10 @@ const char *UTIL_GetRandomSoundFromEntry( const char* pszEntryName )
 Color FloatRGBAToColor( float r, float g, float b, float a )
 {
 	return Color(
-		(unsigned char)clamp(r + .5f, 0.0, 255.0f),
-		(unsigned char)clamp(g + .5f, 0.0, 255.0f),
-		(unsigned char)clamp(b + .5f, 0.0, 255.0f),
-		(unsigned char)clamp(a + .5f, 0.0, 255.0f)
+		(unsigned char)clamp(r + .5f, 0.0f, 255.0f),
+		(unsigned char)clamp(g + .5f, 0.0f, 255.0f),
+		(unsigned char)clamp(b + .5f, 0.0f, 255.0f),
+		(unsigned char)clamp(a + .5f, 0.0f, 255.0f)
 	);
 }
 

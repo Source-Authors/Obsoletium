@@ -401,7 +401,7 @@ public:
 				}
 				while ( i < nIndices )
 				{
-					int nToCopy = min( ssize(tempIndices), (ptrdiff_t)nIndices - i );
+					int nToCopy = min( ssize(tempIndices), (intp)nIndices - i );
 					for ( int j = 0; j < nToCopy; j++ )
 					{
 						tempIndices[j] = pIndexData[i+j] + desc.m_nFirstVertex;
@@ -1547,7 +1547,7 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 		}
 
 		// Now crash.
-		*(volatile uint64 *)0 = status << 32 | m_Vertices.GetUsed();
+		*(volatile uint64 *)nullptr = status << 32 | m_Vertices.GetUsed();
 	}
 #endif
 	return (byte *) pResult;
@@ -1592,7 +1592,7 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 		}
 
 		// Now crash.
-		*(volatile uint64 *)0 = status << 32 | m_Indices.GetUsed();
+		*(volatile uint64 *)nullptr = status << 32 | m_Indices.GetUsed();
 	}
 #endif
 	return (uint16 *) pResult;

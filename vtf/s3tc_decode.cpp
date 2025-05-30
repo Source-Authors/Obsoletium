@@ -123,8 +123,8 @@ void S3TC_BuildPalette( ImageFormat format, const char *pS3Block, S3RGBA palette
 
 S3PaletteIndex S3TC_GetPixelPaletteIndex( ImageFormat format, const char *pS3Block, int x, int y )
 {
-	Assert( x >= 0 && x < 4 );
-	Assert( y >= 0 && y < 4 );
+	Assert( x >= 0 && x < 4 ); //-V112
+	Assert( y >= 0 && y < 4 ); //-V112
 	int iQuadPixel = y*4 + x;
 	S3PaletteIndex ret = { 0, 0 };
 
@@ -151,8 +151,8 @@ S3PaletteIndex S3TC_GetPixelPaletteIndex( ImageFormat format, const char *pS3Blo
 
 void S3TC_SetPixelPaletteIndex( ImageFormat format, char *pS3Block, int x, int y, S3PaletteIndex iPaletteIndex )
 {
-	Assert( x >= 0 && x < 4 );
-	Assert( y >= 0 && y < 4 );
+	Assert( x >= 0 && x < 4 ); //-V112
+	Assert( y >= 0 && y < 4 ); //-V112
 	Assert( iPaletteIndex.m_ColorIndex >= 0 && iPaletteIndex.m_ColorIndex < 4 );
 	Assert( iPaletteIndex.m_AlphaIndex >= 0 && iPaletteIndex.m_AlphaIndex < 8 );
 
@@ -201,7 +201,7 @@ char* S3TC_GetBlock(
 	int xBlock,
 	int yBlock )
 {
-	return (char*)S3TC_GetBlock( (const void *)pCompressed, format, nBlocksWidth, xBlock, yBlock );
+	return (char*)S3TC_GetBlock( pCompressed, format, nBlocksWidth, xBlock, yBlock );
 }
 
 
@@ -213,7 +213,7 @@ void GenerateRepresentativePalette(
 	[[maybe_unused]] char mergedBlocks[16*MAX_S3TC_BLOCK_BYTES]
 	)
 {
-	Error( "GenerateRepresentativePalette: not implemented" );	
+	Error( "GenerateRepresentativePalette: not implemented" );
 #if 0														// this code was ifdefed out. no idea under what circumstances it was meant to be called.
 
 	Assert( nBlocks == 2 || nBlocks == 3 );
@@ -297,7 +297,7 @@ void S3TC_MergeBlocks(
 			{
 				for ( int y=0; y < 4; y++ )
 				{
-					int iBaseBit = (y*nBlocks*4 + x + iBlock*4) * 2;
+					int iBaseBit = (y*nBlocks*4 + x + iBlock*4) * 2; //-V112
 					
 					S3PaletteIndex index = {0, 0};
 					index.m_ColorIndex = ReadBitInt<unsigned>( pBase, iBaseBit, 2 );
@@ -332,7 +332,7 @@ void S3TC_MergeBlocks(
 			{
 				for ( int y=0; y < 4; y++ )
 				{
-					int iBasePixel = (y*nBlocks*4 + x + iBlock*4);
+					int iBasePixel = (y*nBlocks*4 + x + iBlock*4); //-V112
 					
 					S3PaletteIndex index;
 					index.m_ColorIndex = ReadBitInt<unsigned>( pColorBits, iBasePixel * 2, 2 );

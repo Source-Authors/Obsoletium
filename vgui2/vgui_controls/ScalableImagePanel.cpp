@@ -5,15 +5,13 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include <vgui_controls/ScalableImagePanel.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IBorder.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
-#include <vgui/IBorder.h>
-#include <KeyValues.h>
-
-#include <vgui_controls/ScalableImagePanel.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

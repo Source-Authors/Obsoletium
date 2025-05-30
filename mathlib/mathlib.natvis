@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- mathlib/compressed_vector.h -->
+
+  <Type Name="Vector32">
+    <DisplayString>({x}, {y}, {z}, scale={expScale[exp]})</DisplayString>
+  </Type>
+
+  <Type Name="Vector48">
+    <DisplayString>({x}, {y}, {z})</DisplayString>
+  </Type>
+  
+  <Type Name="Vector2d32">
+    <DisplayString>({x}, {y})</DisplayString>
+  </Type>
+
+  <Type Name="Normal32">
+    <DisplayString>({x}, {y}, is_negative={zneg == 1})</DisplayString>
+  </Type>
+  
+  <Type Name="Quaternion64">
+    <AlternativeType Name="Quaternion48" />
+    <AlternativeType Name="Quaternion32" />
+    <DisplayString>({x}, {y}, {z}, is_negative={wneg == 1})</DisplayString>
+  </Type>
+
+  <Type Name="float16">
+    <AlternativeType Name="float16_with_assign" />
+    <DisplayString>(bits={m_storage.rawWord})</DisplayString>
+  </Type>
+
+  <!-- mathlib/IceKey.h -->
+
+  <Type Name="IceKey">
+    <DisplayString>(size={_size}, rounds={_rounds})</DisplayString>
+  </Type>
+
+  <!-- mathlib/mathlib.h -->  
+
+  <Type Name="matrix3x4_t">
+    <DisplayString>({m_flMatVal[0][0]}, {m_flMatVal[0][1]}, {m_flMatVal[0][2]}, {m_flMatVal[0][3]}...)</DisplayString>
+      <Expand>
+        <Item Name="[0]">m_flMatVal[0]</Item>
+        <Item Name="[1]">m_flMatVal[1]</Item>
+        <Item Name="[2]">m_flMatVal[2]</Item>
+      </Expand>
+  </Type>
+
+  <Type Name="ColorRGBExp32">
+    <DisplayString>(r={(unsigned)r}, g={(unsigned)g}, b={(unsigned)b}, exp={(unsigned)exponent})</DisplayString>
+  </Type>
+
+  <!-- mathlib/simdvectormatrix.h -->
+
+  <Type Name="CSIMDVectorMatrix">
+    <DisplayString>({m_nWidth}x{m_nHeight})</DisplayString>
+      <Expand>
+        <Item Name="[width]">m_nWidth</Item>
+        <Item Name="[height]">m_nHeight</Item>
+        <Item Name="[data]" Condition="m_pData != nullptr">*m_pData</Item>
+      </Expand>
+  </Type>
+
+  <Type Name="i32x4">
+    <DisplayString>({m128_i32[0]}, {m128_i32[1]}, {m128_i32[2]}, {m128_i32[3]})</DisplayString>
+  </Type>
+
+  <Type Name="FourVectors">
+    <DisplayString>({x}, {y}, {z})</DisplayString>
+  </Type>
+
+  <!-- mathlib/vector2d.h -->
+
+  <Type Name="Vector2D">
+    <DisplayString>({x}, {y})</DisplayString>
+  </Type>
+
+  <!-- mathlib/vector.h -->
+
+  <Type Name="Vector">
+    <AlternativeType Name="ShortVector" />
+    <AlternativeType Name="TableVector" />
+    <AlternativeType Name="RadianEuler" />
+    <AlternativeType Name="QAngle" />
+    <DisplayString>({x}, {y}, {z})</DisplayString>
+  </Type>
+
+  <!-- mathlib/vector4d.h -->
+
+  <Type Name="Vector4D">
+    <AlternativeType Name="IntVector4D" />
+    <AlternativeType Name="VectorAligned" />
+    <AlternativeType Name="Quaternion" />
+    <AlternativeType Name="QuaternionAligned" />
+    <DisplayString>({x}, {y}, {z}, {w})</DisplayString>
+  </Type>
+
+  <!-- mathlib/vmatrix.h -->
+
+  <Type Name="VMatrix">
+    <DisplayString>({m[0][0]}, {m[0][1]}, {m[0][2]}, {m[0][3]}...)</DisplayString>
+      <Expand>
+        <Item Name="[0]">m[0]</Item>
+        <Item Name="[1]">m[1]</Item>
+        <Item Name="[2]">m[2]</Item>
+        <Item Name="[3]">m[3]</Item>
+      </Expand>
+  </Type>
+
+  <!-- mathlib/vplane.h -->
+
+  <Type Name="VPlane">
+    <DisplayString>(normal={m_Normal}, dist={m_Dist})</DisplayString>
+      <Expand>
+        <Item Name="[normal]">m_Normal</Item>
+        <Item Name="[distance]">m_Dist</Item>
+      </Expand>
+  </Type>
+</AutoVisualizer>

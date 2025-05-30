@@ -42,8 +42,11 @@ CBaseParticleEntity::~CBaseParticleEntity( void )
 #if defined( CLIENT_DLL )
 	if ( ToolsEnabled() && ( m_nToolParticleEffectId != TOOLPARTICLESYSTEMID_INVALID ) && clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "ParticleSystem_Destroy" );
+		KeyValuesAD msg( "ParticleSystem_Destroy" );
 		msg->SetInt( "id", m_nToolParticleEffectId );
+
+		// dimhotepus: Notify tools particle system destroyed as in particles_new.
+		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
 		m_nToolParticleEffectId = TOOLPARTICLESYSTEMID_INVALID; 
 	}
 #endif

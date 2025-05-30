@@ -24,7 +24,7 @@ class CBaseDialog;
 
 struct sessionProperty_t
 {
-	static const int MAX_KEY_LEN = 64;
+	static constexpr inline int MAX_KEY_LEN = 64;
 	byte		nType;
 	char		szID[MAX_KEY_LEN];
 	char		szValue[MAX_KEY_LEN];
@@ -158,12 +158,12 @@ public:
 	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	void	SetFocus( const bool bActive ) override;
 
-	void			SetOptionFocus( unsigned int idx );
+	void			SetOptionFocus( intp idx );
 	void			SetOptionFocusNext();
 	void			SetOptionFocusPrev();
 
 	void					AddOption( const char *pLabelText, const sessionProperty_t &option );
-	int						GetActiveOptionIndex();
+	intp					GetActiveOptionIndex();
 	const sessionProperty_t &GetActiveOption();
 
 	void			DeleteAllOptions()
@@ -173,7 +173,7 @@ public:
 		m_nActiveOption = m_Options.InvalidIndex();
 	}
 private:
-	int				m_nActiveOption;
+	intp			m_nActiveOption;
 	int				m_nOptionsXPos;
 	int				m_nOptionsMinWide;
 	int				m_nOptionsLeftMargin;
@@ -310,7 +310,7 @@ public:
 	int					GetItemCount();
 	int					GetActiveItemIndex();
 	int					GetActiveColumnIndex();
-	int					GetActiveOptionIndex( int idx );
+	intp				GetActiveOptionIndex( int idx );
 	int					GetVisibleItemCount();
 	int					GetVisibleColumnCount();
 	int					GetFirstUnlockedColumnIndex();

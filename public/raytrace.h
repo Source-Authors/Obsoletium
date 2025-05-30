@@ -5,11 +5,10 @@
 #define RAYTRACE_H
 
 #include <tier0/platform.h>
+#include <tier1/utlvector.h>
 #include <mathlib/vector.h>
 #include <mathlib/ssemath.h>
 #include <mathlib/lightdesc.h>
-#include <assert.h>
-#include <tier1/utlvector.h>
 #include <mathlib/mathlib.h>
 #include <bspfile.h>
 

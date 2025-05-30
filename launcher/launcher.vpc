@@ -63,10 +63,10 @@ $Project "launcher"
 		$File	"boot_app_system_group.h"
 		$File	"resource_listing.h"
 		$File	"vcr_helpers.h"
-		$File	"scoped_app_locale.h"
 		$File	"scoped_app_multirun.h"
 		$File	"scoped_app_relaunch.h"
 		$File	"scoped_heap_leak_dumper.h"
+		$File	"$SRCDIR/common/scoped_app_locale.h"
 		$File	"$SRCDIR/common/windows/scoped_com.h" [$WINDOWS]
 		$File	"$SRCDIR/common/windows/scoped_timer_resolution.h" [$WINDOWS]
 		$File	"$SRCDIR/common/windows/scoped_winsock.h" [$WINDOWS]

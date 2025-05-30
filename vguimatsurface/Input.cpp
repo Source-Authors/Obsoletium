@@ -97,9 +97,9 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 		s_hLastHWnd = hwnd;
 		event.m_nType = IE_IMESetWindow;
 #ifdef PLATFORM_64BITS
-		event.m_nData = static_cast<int>((reinterpret_cast<ptrdiff_t>(s_hLastHWnd) >> 32) & 0xFFFFFFFF);
+		event.m_nData = static_cast<int>((reinterpret_cast<intp>(s_hLastHWnd) >> 32) & 0xFFFFFFFF);
 #endif
-		event.m_nData2 = static_cast<int>((reinterpret_cast<ptrdiff_t>(s_hLastHWnd)) & 0xFFFFFFFF);
+		event.m_nData2 = static_cast<int>((reinterpret_cast<intp>(s_hLastHWnd)) & 0xFFFFFFFF);
 		g_pInputSystem->PostUserEvent( event );
 	}
 
@@ -466,11 +466,11 @@ bool InputHandleInputEvent( const InputEvent_t &event )
 	case IE_IMESetWindow:
 	{
 #ifdef PLATFORM_64BITS
-		ptrdiff_t hi = static_cast<ptrdiff_t>(event.m_nData) << 32;
+		intp hi = static_cast<intp>(event.m_nData) << 32;
 #else
-		ptrdiff_t hi = 0;
+		intp hi = 0;
 #endif
-		ptrdiff_t low  = static_cast<ptrdiff_t>(static_cast<ptrdiff_t>(event.m_nData2) & 0xFFFFFFFF);
+		intp low  = static_cast<intp>(static_cast<intp>(event.m_nData2) & 0xFFFFFFFF);
 		g_pIInput->SetIMEWindow( (void *)(hi | low) );
 		return true;
 	}

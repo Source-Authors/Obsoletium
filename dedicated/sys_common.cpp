@@ -155,11 +155,12 @@ SpewRetval_t DedicatedSpewOutputFunc(SpewType_t spewType, char const *pMsg) {
       MessageBox(nullptr, message, "Srcds - Fatal Error",
                  MB_OK | MB_TASKMODAL | MB_ICONERROR);
     }
-
-    ::TerminateProcess(::GetCurrentProcess(), 1);
+    // dimhotepus: 1 -> ENOTRECOVERABLE
+    ::TerminateProcess(::GetCurrentProcess(), ENOTRECOVERABLE);
 #elif POSIX
     fflush(stdout);
-    _exit(1);
+    // dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
+    exit(ENOTRECOVERABLE);
 #endif
 
     return SPEW_ABORT;

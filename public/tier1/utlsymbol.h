@@ -30,7 +30,7 @@ class CUtlSymbolTableMT;
 //-----------------------------------------------------------------------------
 typedef unsigned short UtlSymId_t;
 
-#define UTL_INVAL_SYMBOL  ((UtlSymId_t)~0)
+constexpr inline UtlSymId_t UTL_INVAL_SYMBOL{(UtlSymId_t)~0};
 
 class CUtlSymbol
 {
@@ -47,6 +47,8 @@ public:
 	// operator==
 	bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
 	bool operator==( const char* pStr ) const;
+	// dimhotepus: Compare with nullptr.
+	bool operator==( std::nullptr_t ) const { return m_Id == UTL_INVAL_SYMBOL; }
 	
 	// Is valid?
 	bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
@@ -115,15 +117,14 @@ protected:
 	class CStringPoolIndex
 	{
 	public:
-		inline CStringPoolIndex() = default;
+		constexpr inline CStringPoolIndex() : CStringPoolIndex{0, 0} {}
 
-		inline CStringPoolIndex( unsigned short iPool, unsigned short iOffset )
+		constexpr inline CStringPoolIndex( unsigned short iPool, unsigned short iOffset )
+			: m_iPool{iPool}, m_iOffset{iOffset}
 		{
-			m_iPool = iPool;
-			m_iOffset = iOffset;
 		}
 
-		inline bool operator==( const CStringPoolIndex &other )	const
+		constexpr inline bool operator==( const CStringPoolIndex &other ) const
 		{
 			return m_iPool == other.m_iPool && m_iOffset == other.m_iOffset;
 		}
@@ -262,8 +263,14 @@ public:
 	~CUtlFilenameSymbolTable();
 	FileNameHandle_t	FindOrAddFileName( const char *pFileName );
 	FileNameHandle_t	FindFileName( const char *pFileName );
-	intp					PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
-	bool				String( const FileNameHandle_t& handle, char *buf, intp buflen );
+	intp				PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
+	bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen );
+	template<intp bufferSize>
+	bool				String( const FileNameHandle_t& handle, OUT_Z_ARRAY char (&buf)[bufferSize] )
+	{
+		return String( handle, buf, bufferSize );
+	}
+
 	void				RemoveAll();
 
 private:

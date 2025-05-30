@@ -893,8 +893,8 @@ public:
 	const CDispCornerNeighbors*	GetCornerNeighbors( int iCorner ) const	{ return GetSurface()->GetCornerNeighbors( iCorner ); }
 	const CDispNeighbor*	GetEdgeNeighbor( int iEdge ) const	{ return GetSurface()->GetEdgeNeighbor( iEdge ); }
 
-	void SetListIndex( int nIndex )		{ m_nListIndex = nIndex; } 
-	int GetListIndex( void )			{ return m_nListIndex; }
+	void SetListIndex( intp nIndex )		{ m_nListIndex = nIndex; } 
+	intp GetListIndex( void ) const			{ return m_nListIndex; }
 
 	CBitVec<MAX_DISPVERTS>&			GetAllowedVerts()		{ return m_AllowedVerts; }
 	const CBitVec<MAX_DISPVERTS>&	GetAllowedVerts() const	{ return m_AllowedVerts; }
@@ -946,7 +946,7 @@ private:
 
 	CBitVec<MAX_DISPVERTS>	m_AllowedVerts;		// Built in VBSP. Defines which verts are allowed to exist based on what the neighbors are.
 
-	int					m_nListIndex;
+	intp					m_nListIndex;
 
 	//=========================================================================
 	//

@@ -66,7 +66,7 @@ void CFlexControlBuilder::BuildDesiredFlexControlList( CDmeGameModel *pGameModel
 
 		FlexControllerInfo_t& info = m_FlexControllerInfo[j];
 		mstudioflexcontroller_t *pFlex = cHdr.pFlexcontroller( i );
-		Q_strncpy( info.m_pFlexControlName, pFlex->pszName(), sizeof( info.m_pFlexControlName ) );
+		V_strcpy_safe( info.m_pFlexControlName, pFlex->pszName() );
 		info.m_nGlobalIndex = g_pGlobalFlexController->FindGlobalFlexController( pFlex->pszName() );
 		info.m_flDefaultValue = 0.0f;
 		if ( pFlex->max != pFlex->min )
@@ -103,7 +103,7 @@ void CFlexControlBuilder::BuildDesiredControlList( CDmeGameModel *pGameModel )
 			controlInfo.m_bIsStereo = true;
 			controlInfo.m_pControllerIndex[ OUTPUT_RIGHT ] = i;
 			controlInfo.m_pControllerIndex[ OUTPUT_LEFT ] = i+1;
-			Q_strncpy( controlInfo.m_pControlName, pFlexName + 6, sizeof(controlInfo.m_pControlName) );
+			V_strcpy_safe( controlInfo.m_pControlName, pFlexName + 6 );
 
 			// Convert default values into value/balance
 			LeftRightToValueBalance( &controlInfo.m_pDefaultValue[ CONTROL_VALUE ], 
@@ -118,7 +118,7 @@ void CFlexControlBuilder::BuildDesiredControlList( CDmeGameModel *pGameModel )
 			controlInfo.m_bIsStereo = false;
 			controlInfo.m_pControllerIndex[ OUTPUT_MONO ] = i;
 			controlInfo.m_pControllerIndex[ OUTPUT_LEFT ] = -1;
-			Q_strncpy( controlInfo.m_pControlName, pFlexName, sizeof(controlInfo.m_pControlName) );
+			V_strcpy_safe( controlInfo.m_pControlName, pFlexName );
 			controlInfo.m_pDefaultValue[ CONTROL_VALUE ] = info.m_flDefaultValue;
 			controlInfo.m_pDefaultValue[ CONTROL_BALANCE ] = 0.5f;
 		}
@@ -335,13 +335,13 @@ void CFlexControlBuilder::GetExistingMonoLog( ExistingLogInfo_t *pExistingLog,
 //-----------------------------------------------------------------------------
 CDmeChannelsClip* CFlexControlBuilder::FindChannelsClipContainingChannel( CDmeFilmClip *pClip, CDmeChannel *pSearch )
 {
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeChannelsClip, pTrackGroup, pTrack, pChannelsClip )
 
-			intp nChannels = pChannelsClip->m_Channels.Count();
+		intp nChannels = pChannelsClip->m_Channels.Count();
 		for ( intp j = 0; j < nChannels; ++j )
 		{
 			CDmeChannel *pChannel = pChannelsClip->m_Channels[ j ];
@@ -358,7 +358,7 @@ CDmeChannelsClip* CFlexControlBuilder::FindChannelsClipContainingChannel( CDmeFi
 //-----------------------------------------------------------------------------
 // Computes a global offset and scale to convert from log time to global time
 //-----------------------------------------------------------------------------
-void CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, double *pScale, CDmeChannelsClip *pChannelsClip )
+void CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, float *pScale, CDmeChannelsClip *pChannelsClip )
 {
 	// Determine the global time of the start + end of the log
 	DmeClipStack_t srcStack;
@@ -370,7 +370,7 @@ void CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, doubl
 	*pScale = duration.GetSeconds();
 }
 
-bool CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, double *pScale, CDmeFilmClip* pClip, CDmeChannel* pChannel )
+bool CFlexControlBuilder::ComputeChannelTimeTransform( DmeTime_t *pOffset, float *pScale, CDmeFilmClip* pClip, CDmeChannel* pChannel )
 {
 	CDmeChannelsClip *pChannelsClip = FindChannelsClipContainingChannel( pClip, pChannel );
 	if ( !pChannelsClip )
@@ -439,7 +439,7 @@ static void AddKeyToLogs( CDmeTypedLog< float > *valueLog, CDmeTypedLog< float >
 	balanceLog->SetKey( keyTime, balance );
 }
 
-static void ConvertLRToVBLog( CDmeFloatLog *pValueLog, CDmeFloatLog *pBalanceLog, CDmeFloatLog *pLeftLog, CDmeFloatLog *pRightLog, DmeTime_t rightOffset, double flRightScale )
+static void ConvertLRToVBLog( CDmeFloatLog *pValueLog, CDmeFloatLog *pBalanceLog, CDmeFloatLog *pLeftLog, CDmeFloatLog *pRightLog, DmeTime_t rightOffset, float flRightScale )
 {
 	intp lc = pLeftLog->GetKeyCount();
 	intp rc = pRightLog->GetKeyCount();
@@ -499,13 +499,13 @@ void CFlexControlBuilder::ConvertExistingLRLogs( ExistingLogInfo_t *pLogs,
 
 	// Compute a scale + offset to transform the right log to get it in the same space as the left log
 	DmeTime_t leftOffset, rightOffset;
-	double flLeftScale, flRightScale;
+	float flLeftScale, flRightScale;
 	if ( !ComputeChannelTimeTransform( &leftOffset, &flLeftScale, pClip, pLeftChannel ) )
 		return;
 	if ( !ComputeChannelTimeTransform( &rightOffset, &flRightScale, pClip, pRightChannel ) )
 		return;
 
-	flRightScale = ( flRightScale != 0.0f ) ? flLeftScale / flRightScale : 1.0;
+	flRightScale = ( flRightScale != 0.0f ) ? flLeftScale / flRightScale : 1.0f;
 	rightOffset = leftOffset - DmeTime_t( rightOffset.GetSeconds() * flRightScale );
 
 	pLogs[CONTROL_VALUE].m_pLog = CreateElement< CDmeFloatLog >( "value" );
@@ -561,8 +561,8 @@ void CFlexControlBuilder::GetExistingStereoLog( ExistingLogInfo_t *pLogs, CDmeFi
 //-----------------------------------------------------------------------------
 void CFlexControlBuilder::FixupExistingFlexControlLogList( CDmeFilmClip *pCurrentClip, CDmeGameModel *pGameModel )
 {
-	int nTrackGroups = pCurrentClip->GetTrackGroupCount();
-	for ( int gi = 0; gi < nTrackGroups; ++gi )
+	intp nTrackGroups = pCurrentClip->GetTrackGroupCount();
+	for ( intp gi = 0; gi < nTrackGroups; ++gi )
 	{
 		CDmeTrackGroup *pTrackGroup = pCurrentClip->GetTrackGroup( gi );
 		if ( !pTrackGroup )
@@ -696,12 +696,12 @@ void CFlexControlBuilder::BuildFlexControllerOps( CDmeGameModel *pGameModel, CDm
 
 	// Create a channel which passes from the control value to the global flex controller
 	char pName[ 256 ];
-	Q_snprintf( pName, sizeof( pName ), "%s_flex_channel", fcInfo.m_pFlexControlName );
+	V_sprintf_safe( pName, "%s_flex_channel", fcInfo.m_pFlexControlName );
 	info.m_ppControlChannel[field] = pChannelsClip->CreatePassThruConnection( pName, 
 		info.m_pControl, flexInfo.m_pControlAttributeName, pFlexControllerOp, "flexWeight" );
 
 	// NOTE: The animation set slider panel looks for these custom attributes
-	Q_snprintf( pName, sizeof(pName), "%schannel", flexInfo.m_pControlLinkAttributeName );
+	V_sprintf_safe( pName, "%schannel", flexInfo.m_pControlLinkAttributeName );
 	info.m_pControl->SetValue( pName, info.m_ppControlChannel[field] );
 
 	// Switch the channel into play mode by default
@@ -749,18 +749,18 @@ void CFlexControlBuilder::BuildStereoFlexControllerOps( CDmeAnimationSet *pAnima
 			fcInfo.m_pFlexControlName, fcInfo.m_nGlobalIndex );
 
 		// Now create a channel which connects the output of the stereo op to the flex controller op
-		Q_snprintf( pResultName, sizeof( pResultName ), "result_%s", s_pStereoOutputPrefix[ i ] );
-		Q_snprintf( pChannelName, sizeof( pChannelName ), "%s_flex_channel", fcInfo.m_pFlexControlName );
+		V_sprintf_safe( pResultName, "result_%s", s_pStereoOutputPrefix[ i ] );
+		V_sprintf_safe( pChannelName, "%s_flex_channel", fcInfo.m_pFlexControlName );
 		pChannelsClip->CreatePassThruConnection( pChannelName, pStereoCalcOp, 
 			pResultName, pFlexControllerOp, "flexWeight" );
 
 		// Create a channel which connects the control to the input of the stereo op
-		Q_snprintf( pChannelName, sizeof( pChannelName ), "%s_%s_channel", info.m_pControlName, s_pStereoInputPrefix[ i ] );
+		V_sprintf_safe( pChannelName, "%s_%s_channel", info.m_pControlName, s_pStereoInputPrefix[ i ] );
 		info.m_ppControlChannel[i] = pChannelsClip->CreatePassThruConnection( pChannelName, 
 			info.m_pControl, s_pStereoInputPrefix[ i ], pStereoCalcOp, s_pStereoInputPrefix[ i ] );
 
 		// NOTE: The animation set slider panel looks for these custom attributes
-		Q_snprintf( pChannelName, sizeof(pChannelName), "%schannel", s_pStereoInputPrefix[ i ] );
+		V_sprintf_safe( pChannelName, "%schannel", s_pStereoInputPrefix[ i ] );
 		info.m_pControl->SetValue( pChannelName, info.m_ppControlChannel[i] );
 
 		// Switch the channel into play mode by default
@@ -864,9 +864,9 @@ void CFlexControlBuilder::CreateFlexControls( CDmeAnimationSet *pAnimationSet )
 void CFlexControlBuilder::SetupLogs( CDmeChannelsClip *pChannelsClip, bool bUseExistingLogs )
 {
 	DmeTime_t targetOffset;
-	double flTargetScale;
+	float flTargetScale;
 	ComputeChannelTimeTransform( &targetOffset, &flTargetScale, pChannelsClip );
-	double flOOTargetScale = ( flTargetScale != 0.0 ) ? 1.0 / flTargetScale : 1.0;
+	float flOOTargetScale = ( flTargetScale != 0.0 ) ? 1.0f / flTargetScale : 1.0f;
 
 	// Build the infrastructure of the ops that connect that control to the dmegamemodel
 	intp c = m_ControlInfo.Count();

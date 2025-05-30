@@ -167,8 +167,8 @@ enum
 
 struct DrawModelResults_t
 {
-	int m_ActualTriCount; 
-	int m_TextureMemoryBytes;
+	intp m_ActualTriCount; 
+	intp m_TextureMemoryBytes;
 	int m_NumHardwareBones;
 	int m_NumBatches;
 	int m_NumMaterials;
@@ -256,7 +256,7 @@ struct model_array_instance_t
 // code expectes data to be dynamic and invokes cache callback prior to iterative access.
 // virtualModel is member passed in via studiohdr_t and passed back for model identification.
 //-----------------------------------------------------------------------------
-#define STUDIO_DATA_CACHE_INTERFACE_VERSION "VStudioDataCache005"
+constexpr inline char STUDIO_DATA_CACHE_INTERFACE_VERSION[]{"VStudioDataCache005"};
  
 abstract_class IStudioDataCache : public IAppSystem
 {
@@ -269,7 +269,7 @@ public:
 //-----------------------------------------------------------------------------
 // Studio render interface
 //-----------------------------------------------------------------------------
-#define STUDIO_RENDER_INTERFACE_VERSION "VStudioRender025"
+constexpr inline char STUDIO_RENDER_INTERFACE_VERSION[]{"VStudioRender025"};
 
 abstract_class IStudioRender : public IAppSystem
 {

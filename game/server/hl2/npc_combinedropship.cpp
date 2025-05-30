@@ -137,8 +137,8 @@ enum LandingState_t
 };
 
 
-#define DROPSHIP_NEAR_SOUND_MIN_DISTANCE 1000
-#define DROPSHIP_NEAR_SOUND_MAX_DISTANCE 2500
+#define DROPSHIP_NEAR_SOUND_MIN_DISTANCE 1000.f
+#define DROPSHIP_NEAR_SOUND_MAX_DISTANCE 2500.f
 #define DROPSHIP_GROUND_WASH_MIN_ALTITUDE 100.0f
 #define DROPSHIP_GROUND_WASH_MAX_ALTITUDE 750.0f
 
@@ -1250,13 +1250,13 @@ void CNPC_CombineDropship::Flight( void )
 				// Strongly constrain to an n unit pipe around the current path
 				// by damping out all impulse forces that would push us further from the pipe
 				float flAmount = (flDistFromPath - 200) / 200.0f;
-				flAmount = clamp( flAmount, 0, 1 );
+				flAmount = clamp( flAmount, 0.f, 1.f );
 				VectorMA( accel, flAmount * 200.0f, vecDelta, accel );
 			}
 		}
 
 		// don't fall faster than 0.2G or climb faster than 2G
-		accel.z = clamp( accel.z, 384 * 0.2, 384 * 2.0 );
+		accel.z = clamp( accel.z, 384 * 0.2f, 384 * 2.0f );
 
 		Vector goalUp = accel;
 		VectorNormalize( goalUp );
@@ -1267,8 +1267,8 @@ void CNPC_CombineDropship::Flight( void )
 		float goalRoll = RAD2DEG( asinf( DotProduct( right, goalUp ) ) );
 
 		// clamp goal orientations
-		goalPitch = clamp( goalPitch, -45, 60 );
-		goalRoll = clamp( goalRoll, -45, 45 );
+		goalPitch = clamp( goalPitch, -45.f, 60.f );
+		goalRoll = clamp( goalRoll, -45.f, 45.f );
 
 		// calc angular accel needed to hit goal pitch in dt time.
 		dt = 0.6;
@@ -1277,10 +1277,10 @@ void CNPC_CombineDropship::Flight( void )
 		goalAngAccel.y = 2.0F * (AngleDiff( goalYaw, AngleNormalize( GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
 		goalAngAccel.z = 2.0F * (AngleDiff( goalRoll, AngleNormalize( GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
-		goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
-		//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );
-		goalAngAccel.y = clamp( goalAngAccel.y, -120, 120 );
-		goalAngAccel.z = clamp( goalAngAccel.z, -300, 300 );
+		goalAngAccel.x = clamp( goalAngAccel.x, -300.f, 300.f );
+		//goalAngAccel.y = clamp( goalAngAccel.y, -60.f, 60.f );
+		goalAngAccel.y = clamp( goalAngAccel.y, -120.f, 120.f );
+		goalAngAccel.z = clamp( goalAngAccel.z, -300.f, 300.f );
 
 		// limit angular accel changes to simulate mechanical response times
 		dt = 0.1;
@@ -1289,9 +1289,9 @@ void CNPC_CombineDropship::Flight( void )
 		angAccelAccel.y = (goalAngAccel.y - m_vecAngAcceleration.y) / dt;
 		angAccelAccel.z = (goalAngAccel.z - m_vecAngAcceleration.z) / dt;
 
-		angAccelAccel.x = clamp( angAccelAccel.x, -1000, 1000 );
-		angAccelAccel.y = clamp( angAccelAccel.y, -1000, 1000 );
-		angAccelAccel.z = clamp( angAccelAccel.z, -1000, 1000 );
+		angAccelAccel.x = clamp( angAccelAccel.x, -1000.f, 1000.f );
+		angAccelAccel.y = clamp( angAccelAccel.y, -1000.f, 1000.f );
+		angAccelAccel.z = clamp( angAccelAccel.z, -1000.f, 1000.f );
 
 		m_vecAngAcceleration += angAccelAccel * 0.1F;
 
@@ -1308,7 +1308,7 @@ void CNPC_CombineDropship::Flight( void )
 
 		//angVel.y = clamp( angVel.y, -60, 60 );
 		//angVel.y = clamp( angVel.y, -120, 120 );
-		angVel.y = clamp( angVel.y, -120, 120 );
+		angVel.y = clamp( angVel.y, -120.f, 120.f );
 
 		SetLocalAngularVelocity( angVel );
 
@@ -2938,7 +2938,7 @@ bool CNPC_CombineDropship::FireCannonRound( void )
 
 	// Fire the bullet
 	int ammoType = GetAmmoDef()->Index("CombineCannon"); 
-	FireBullets( 1, vecMuzzle, vecAimDir, VECTOR_CONE_2DEGREES, 8192, ammoType, 1, -1, -1, sk_npc_dmg_dropship.GetInt() );
+	FireBullets( 1, vecMuzzle, vecAimDir, VECTOR_CONE_2DEGREES, 8192, ammoType, 1, -1, -1, sk_npc_dmg_dropship.GetFloat() );
 
 	return true;
 }

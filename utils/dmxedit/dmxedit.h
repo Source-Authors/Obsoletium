@@ -681,20 +681,13 @@ public:
 		va_list marker;
 
 		va_start( marker, pFormat );
-#ifdef _WIN32
-		int len = _vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#elif LINUX
-		int len = vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#else
-#error "define vsnprintf type."
-#endif
+		int len = V_vsprintf_safe( tmpBuf, pFormat, marker );
 		va_end( marker );
 
 		// Len < 0 represents an overflow
 		if( len < 0 )
 		{
 			len = sizeof( tmpBuf ) - 1;
-			tmpBuf[sizeof( tmpBuf ) - 1] = 0;
 		}
 
 		if ( GetLineNumber() >= 0 )
@@ -723,20 +716,13 @@ public:
 		va_list marker;
 
 		va_start( marker, pFormat );
-#ifdef _WIN32
-		int len = _vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#elif LINUX
-		int len = vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#else
-#error "define vsnprintf type."
-#endif
+		int len = V_vsprintf_safe( tmpBuf, pFormat, marker );
 		va_end( marker );
 
 		// Len < 0 represents an overflow
 		if( len < 0 )
 		{
 			len = sizeof( tmpBuf ) - 1;
-			tmpBuf[sizeof( tmpBuf ) - 1] = 0;
 		}
 
 		if ( GetLineNumber() >= 0 )
@@ -762,20 +748,13 @@ public:
 		va_list marker;
 
 		va_start( marker, pFormat );
-#ifdef _WIN32
-		int len = _vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#elif LINUX
-		int len = vsnprintf( tmpBuf, sizeof( tmpBuf ) - 1, pFormat, marker );
-#else
-#error "define vsnprintf type."
-#endif
+		int len = V_vsprintf_safe( tmpBuf, pFormat, marker );
 		va_end( marker );
 
 		// Len < 0 represents an overflow
 		if( len < 0 )
 		{
 			len = sizeof( tmpBuf ) - 1;
-			tmpBuf[sizeof( tmpBuf ) - 1] = 0;
 		}
 
 		m_errorString = tmpBuf;

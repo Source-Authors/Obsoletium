@@ -162,7 +162,7 @@ void CChoreoActor::RemoveAllChannels()
 // Input  : c1 - 
 //			c2 - 
 //-----------------------------------------------------------------------------
-void CChoreoActor::SwapChannels( int c1, int c2 )
+void CChoreoActor::SwapChannels( intp c1, intp c2 )
 {
 	std::swap( m_Channels[ c1 ], m_Channels[ c2 ] );
 }
@@ -172,9 +172,9 @@ void CChoreoActor::SwapChannels( int c1, int c2 )
 // Input  : *channel - 
 // Output : int
 //-----------------------------------------------------------------------------
-ptrdiff_t CChoreoActor::FindChannelIndex( CChoreoChannel *channel )
+intp CChoreoActor::FindChannelIndex( CChoreoChannel *channel )
 {
-	ptrdiff_t i{ 0 };
+	intp i{ 0 };
 	for ( auto *ch : m_Channels )
 	{
 		if ( channel == ch )
@@ -266,19 +266,13 @@ void CChoreoActor::SaveToBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoS
 		channel->SaveToBuffer( buf, pScene, pStringPool );
 	}
 
-	/*
-	if ( !Q_isempty( a->GetFacePoserModelName() ) )
-	{
-		FilePrintf( buf, level + 1, "faceposermodel \"%s\"\n", a->GetFacePoserModelName() );
-	}
-	*/
 	buf.PutChar( GetActive() ? 1 : 0 );
 }
 
 bool CChoreoActor::RestoreFromBuffer( CUtlBuffer& buf, CChoreoScene *pScene, IChoreoStringPool *pStringPool )
 {
 	char sz[ 256 ];
-	pStringPool->GetString( buf.GetShort(), sz, sizeof( sz ) );
+	pStringPool->GetString( buf.GetShort(), sz );
 
 	SetName( sz );
 

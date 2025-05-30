@@ -13,6 +13,8 @@
 #include "tier1/strtools.h" 
 #include "vcollide_parse_private.h"
 
+#include <array>  // std::size
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -133,14 +135,14 @@ public:
 	}
 	bool IsReservedMaterialIndex( int materialIndex ) const;
 	virtual const char *GetReservedMaterialName( int materialIndex ) const;
-	int	GetReservedFallBack( int materialIndex ) const;
+	intp GetReservedFallBack( int materialIndex ) const;
 
 	intp GetReservedSurfaceIndex( const char *pPropertyName ) const;
 
 	// The database is derived from the IVP material class
 	const IVP_Material *GetIVPMaterial( int materialIndex ) const;
 	IVP_Material *GetIVPMaterial( int materialIndex ) override;
-	int GetIVPMaterialIndex( const IVP_Material *pIVP ) const override;
+	intp GetIVPMaterialIndex( const IVP_Material *pIVP ) const override;
 	IVP_Material_Manager *GetIVPManager( void ) override { return &m_ivpManager; }
 
 	const char *GetNameString( CUtlSymbol name ) const
@@ -152,7 +154,7 @@ private:
 	const CSurface	*GetInternalSurface( intp materialIndex ) const;
 	CSurface	*GetInternalSurface( intp materialIndex );
 	
-	void			CopyPhysicsProperties( CSurface *pOut, int baseIndex );
+	void			CopyPhysicsProperties( CSurface *pOut, intp baseIndex );
 	bool			AddFileToDatabase( const char *pFilename );
 
 private:
@@ -161,7 +163,7 @@ private:
 	CUtlVector<CUtlSymbol>		m_fileList;
 	CIVPMaterialManager			m_ivpManager;
 	bool						m_init;
-	int							m_shadowFallback;
+	intp						m_shadowFallback;
 };
 
 
@@ -365,7 +367,7 @@ IVP_Material *CPhysicsSurfaceProps::GetIVPMaterial( int materialIndex )
 }
 
 
-int	CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
+intp CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
 {
 	switch( materialIndex )
 	{
@@ -377,9 +379,9 @@ int	CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
 }
 
 
-int CPhysicsSurfaceProps::GetIVPMaterialIndex( const IVP_Material *pIVP ) const
+intp CPhysicsSurfaceProps::GetIVPMaterialIndex( const IVP_Material *pIVP ) const
 {
-	intp index = (const CSurface *)pIVP - m_props.Base();
+	intp index = static_cast<const CSurface *>(pIVP) - m_props.Base();
 	if ( index >= 0 && index < m_props.Count() )
 		return index;
 
@@ -387,7 +389,7 @@ int CPhysicsSurfaceProps::GetIVPMaterialIndex( const IVP_Material *pIVP ) const
 }
 
 
-void CPhysicsSurfaceProps::CopyPhysicsProperties( CSurface *pOut, int baseIndex )
+void CPhysicsSurfaceProps::CopyPhysicsProperties( CSurface *pOut, intp baseIndex )
 {
 	const CSurface *pSurface = GetInternalSurface( baseIndex );
 	if ( pSurface )
@@ -416,7 +418,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 			CSurface prop;
 			memset( &prop.data, 0, sizeof(prop.data) );
 			prop.m_name = m_strings.AddString( key );
-			int baseMaterial = GetSurfaceIndex( key );
+			intp baseMaterial = GetSurfaceIndex( key );
 			if ( baseMaterial < 0 )
 			{
 				baseMaterial = GetSurfaceIndex( "default" );
@@ -431,7 +433,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 				{
 					// already in the database, don't add again, override values instead
 					const char *pOverride = m_strings.String(prop.m_name);
-					int propIndex = GetSurfaceIndex( pOverride );
+					intp propIndex = GetSurfaceIndex( pOverride );
 					if (  propIndex >= 0 )
 					{
 						CSurface *pSurface = GetInternalSurface( propIndex );

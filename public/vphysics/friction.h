@@ -22,18 +22,18 @@ abstract_class IPhysicsFrictionSnapshot
 public:
 	virtual ~IPhysicsFrictionSnapshot() {}
 
-	virtual bool IsValid() = 0;
+	[[nodiscard]] virtual bool IsValid() = 0;
 
 	// Object 0 is this object, Object 1 is the other object
-	virtual IPhysicsObject *GetObject( int index ) = 0;
-	virtual int GetMaterial( int index ) = 0;
+	[[nodiscard]] virtual IPhysicsObject *GetObject( int index ) = 0;
+	[[nodiscard]] virtual intp GetMaterial( int index ) = 0;
 
 	virtual void GetContactPoint( Vector &out ) = 0;
 	
 	// points away from source object
 	virtual void GetSurfaceNormal( Vector &out ) = 0;
-	virtual float GetNormalForce() = 0;
-	virtual float GetEnergyAbsorbed() = 0;
+	[[nodiscard]] virtual float GetNormalForce() = 0;
+	[[nodiscard]] virtual float GetEnergyAbsorbed() = 0;
 
 	// recompute friction (useful if dynamically altering materials/mass)
 	virtual void RecomputeFriction() = 0;
@@ -45,7 +45,7 @@ public:
 
 	// Move to the next friction data for this object
 	virtual void NextFrictionData() = 0;
-	virtual float GetFrictionCoefficient() = 0;
+	[[nodiscard]] virtual float GetFrictionCoefficient() = 0;
 };
 
 

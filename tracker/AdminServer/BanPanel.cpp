@@ -56,7 +56,7 @@ CBanPanel::CBanPanel(vgui::Panel *parent, const char *name) : PropertyPage(paren
 	m_pBanContextMenu = new CBanContextMenu(this);
 	m_pBanContextMenu->SetVisible(false);
 
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 	m_bPageViewed = false;
 
 	LoadControlSettings("Admin/BanPanel.res", "PLATFORM");
@@ -80,7 +80,7 @@ void CBanPanel::OnPageShow()
 	{
 		m_bPageViewed = true;
 		// force update on first page view
-		m_flUpdateTime = 0.0f;
+		m_flUpdateTime = 0.0;
 	}
 }
 
@@ -90,8 +90,8 @@ void CBanPanel::OnPageShow()
 void CBanPanel::OnResetData()
 {
 	RemoteServer().RequestValue(this, "banlist");
-	// update once every 5 minutes
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 5.0f);
+	// update once every 1 minute
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -136,7 +136,7 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 		{
 			id[std::size(id) - 1] = '\0';
 
-			auto ban = KeyValues::AutoDelete("ban");
+			KeyValuesAD ban("ban");
 
 			// determine type
 			if (IsIPAddress(id))
@@ -164,9 +164,10 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 			m_pBanListPanel->AddItem(ban, 0, false, false);
 
 			// move to the next item
-			response = (const char *)strchr(response, '\n');
+			response = strchr(response, '\n');
 			if (!response)
 				break;
+
 			response++;
 		}
 	}
@@ -237,13 +238,13 @@ void CBanPanel::RemoveBan()
 	{
 		// build the message
 		wchar_t id[256];
-		g_pVGuiLocalize->ConvertANSIToUnicode(kv->GetString("id"), id, sizeof(id));
+		g_pVGuiLocalize->ConvertANSIToUnicode(kv->GetString("id"), id);
 		wchar_t message[256];
-		g_pVGuiLocalize->ConstructString(message, sizeof(message), g_pVGuiLocalize->Find("#Ban_Remove_Msg"), 1, id);
+		g_pVGuiLocalize->ConstructString_safe(message, g_pVGuiLocalize->Find("#Ban_Remove_Msg"), 1, id);
 
 		// activate the confirmation dialog
 		QueryBox *box = new QueryBox(g_pVGuiLocalize->Find("#Ban_Title_Remove"), message);
-		box->SetOKCommand(new KeyValues("removebanbyid", "id", kv->GetString("id")));
+		box->SetOKCommand(new KeyValues("removebanbyid", "id", kv->GetString("id"))); //-V2017
 		box->AddActionSignalTarget(this);
 		box->DoModal();
 	}
@@ -311,7 +312,8 @@ void CBanPanel::ChangeBanTimeByID(const char *id, const char *newtime)
 		return;
 
 	// if the newtime string is not valid, then set it to 0 (permanent ban)
-	if (!newtime || atof(newtime) < 0.001)
+	// dimhotepus: atof -> strtof
+	if (!newtime || strtof(newtime, nullptr) < 0.001)
 	{
 		newtime = "0";
 	}

@@ -495,11 +495,11 @@ void CMapSweptPlayerHull::UpdateParentKey(void)
 		PostUpdate(Notify_Changed);
 
 		char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-		sprintf(szValue, "%g %g %g", (double)vecOrigin1.x, (double)vecOrigin1.y, (double)vecOrigin1.z );
+		V_sprintf_safe(szValue, "%g %g %g", (double)vecOrigin1.x, (double)vecOrigin1.y, (double)vecOrigin1.z );
 		pEntity->NotifyChildKeyChanged(this, "point0", szValue);
 		pEntity->NotifyChildKeyChanged(this, "origin", szValue);
 
-		sprintf(szValue, "%g %g %g", (double)vecOrigin2.x, (double)vecOrigin2.y, (double)vecOrigin2.z);
+		V_sprintf_safe(szValue, "%g %g %g", (double)vecOrigin2.x, (double)vecOrigin2.y, (double)vecOrigin2.z);
 		pEntity->NotifyChildKeyChanged(this, "point1", szValue);
 	}
 }

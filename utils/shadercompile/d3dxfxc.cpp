@@ -10,6 +10,7 @@
 #include "dx_proxy/dx_proxy.h"
 
 #include <d3dcompiler.h>
+#include <comdef.h>
 #include "com_ptr.h"
 
 #include "tier0/icommandline.h"
@@ -23,7 +24,47 @@ static constexpr size_t kFxcCommandSize{std::size(kFxcCommand) - 1};
 
 namespace {
 
-class HLSLCompilerResponse final : public se::shader_compile::command_sink::IResponse {
+// dimhotepus: Allow to report non DirectX compiler errors in blobs.
+class ErrorD3DBlob final : public ID3DBlob {
+ public:
+  explicit ErrorD3DBlob(std::string &&error) noexcept
+      : m_error{std::move(error)}, m_ref_counter{1} {}
+  ~ErrorD3DBlob() noexcept = default;
+
+  // IUnknown
+  STDMETHODIMP QueryInterface(REFIID iid, LPVOID *ppv) override {
+    if (!ppv) return E_POINTER;
+
+    if (IsEqualGUID(iid, __uuidof(ID3DBlob))) {
+      auto *blob = static_cast<ID3DBlob *>(this);
+      blob->AddRef();
+      *ppv = blob;
+      return S_OK;
+    }
+
+    return E_NOINTERFACE;
+  }
+  STDMETHODIMP_(ULONG) AddRef() override {
+    return m_ref_counter.fetch_add(1, std::memory_order::memory_order_relaxed);
+  }
+  STDMETHODIMP_(ULONG) Release() override {
+    const ULONG rc =
+        m_ref_counter.fetch_sub(1, std::memory_order::memory_order_acq_rel);
+    if (rc == 0) delete this;
+    return rc;
+  }
+
+  // ID3DBlob
+  STDMETHODIMP_(LPVOID) GetBufferPointer() override { return m_error.data(); }
+  STDMETHODIMP_(SIZE_T) GetBufferSize() override { return m_error.length(); }
+
+ private:
+  std::string m_error;
+  std::atomic_ulong m_ref_counter;
+};
+
+class HLSLCompilerResponse final
+    : public se::shader_compile::command_sink::IResponse {
  public:
   HLSLCompilerResponse(se::win::com::com_ptr<ID3DBlob> shader,
                        se::win::com::com_ptr<ID3DBlob> errors, HRESULT hr);
@@ -48,34 +89,35 @@ class HLSLCompilerResponse final : public se::shader_compile::command_sink::IRes
  private:
   se::win::com::com_ptr<ID3DBlob> shader_;
   se::win::com::com_ptr<ID3DBlob> listing_;
-  HRESULT hr_;
+  const HRESULT hr_;
 };
 
 HLSLCompilerResponse::HLSLCompilerResponse(
     se::win::com::com_ptr<ID3DBlob> shader,
     se::win::com::com_ptr<ID3DBlob> errors, HRESULT hr)
-    : shader_(std::move(shader)), listing_(std::move(errors)), hr_(hr) {}
+    : shader_(std::move(shader)), listing_(std::move(errors)), hr_(hr) {
+  // dimhotepus: Report error if no errors blob.
+  if (!listing_ && FAILED(hr)) {
+    auto err = _com_error{hr};
+    auto msg = std::string{err.ErrorMessage()};
+    listing_.Attach(new ErrorD3DBlob{std::move(msg)});
+  }
+}
 
 // Perform a fast shader file compilation.
 //
-// TODO: Avoid writing "shader.o" and "output.txt" files to avoid extra
-// filesystem access.
-//
-// @param pszFilename		the filename to compile (e.g.
+// @param file_name	filename to compile (e.g.
 // "debugdrawenvmapmask_vs20.fxc")
-// @param pMacros			null-terminated array of macro-defines
-// @param shader_model		shader model for compilation
-static void FastShaderCompile(const char *file_name,
-                              const D3D_SHADER_MACRO *macroses,
-                              const char *shader_model,
-                              se::shader_compile::command_sink::IResponse **response) {
-  if (!response) return;
-
+// @param macroses null-terminated array of macro-defines
+// @param shader_model shader model for compilation
+static std::unique_ptr<se::shader_compile::command_sink::IResponse>
+FastShaderCompile(const char *file_name, const D3D_SHADER_MACRO *macroses,
+                  const char *shader_model) {
   // DxProxyModule.
   static se::dx_proxy::DxProxyModule d3dProxyModule;
 
   constexpr unsigned kCommonFlags{
-      D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS  // |
+      /* D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS  // |
                                                                      // Gfa
       /* D3DCOMPILE_AVOID_FLOW_CONTROL */};
 
@@ -100,8 +142,8 @@ static void FastShaderCompile(const char *file_name,
                                                "main", shader_model, flags1, 0,
                                                &shader, &errors)};
 
-  *response =
-      new HLSLCompilerResponse(std::move(shader), std::move(errors), hr);
+  return std::make_unique<HLSLCompilerResponse>(std::move(shader),
+                                                std::move(errors), hr);
 }
 
 };  // namespace
@@ -114,15 +156,15 @@ static void FastShaderCompile(const char *file_name,
 // /DNUMDYNAMICCOMBOS=4 /DFLAGS=0x0 /DNUM_BONES=1 /Dmain=main /Emain /Tvs_2_0
 // /DSHADER_MODEL_VS_2_0=1 /nologo /Foshader.o
 // debugdrawenvmapmask_vs20.fxc>output.txt 2>&1"
-void ExecuteCommand(const char *in_command, se::shader_compile::command_sink::IResponse **response) {
+static std::unique_ptr<se::shader_compile::command_sink::IResponse>
+ExecuteCommand(const char *in_command) {
   // Expect that the command passed is exactly "fxc.exe"
   Assert(!strncmp(in_command, kFxcCommand, kFxcCommandSize));
 
   in_command += kFxcCommandSize;
 
   // A duplicate portion of memory for modifications
-  char *editable_command{
-      strcpy((char *)alloca(strlen(in_command) + 1), in_command)};
+  V_strdup_stack(in_command, editable_command);
 
   // Macros to be defined
   CUtlVector<D3D_SHADER_MACRO> macros{(intp)0, 4};
@@ -188,7 +230,8 @@ void ExecuteCommand(const char *in_command, se::shader_compile::command_sink::IR
   // Determine the file name (at the end of the command line before
   // redirection).
   char const *file_name = "";
-  if (const char *redirect_command{strstr(in_command, ">output.txt ")}) {
+  if (const char *redirect_command{
+          strstr(in_command, ">" kShaderCompilerOutputName " ")}) {
     size_t offset = redirect_command - in_command;
 
     editable_command[offset] = '\0';
@@ -201,22 +244,24 @@ void ExecuteCommand(const char *in_command, se::shader_compile::command_sink::IR
   }
 
   // Compile the stuff.
-  FastShaderCompile(file_name, macros.Base(), out_shader_model, response);
+  return FastShaderCompile(file_name, macros.Base(), out_shader_model);
 }
 
-bool TryExecuteCommand(const char *command, se::shader_compile::command_sink::IResponse **response) {
+std::unique_ptr<se::shader_compile::command_sink::IResponse> TryExecuteCommand(
+    const char *command) {
   static int dummy{(Msg("[shadercompile] Using new faster Vitaliy's "
                         "implementation.\n"),
                     1)};
 
-  const bool ok{!strncmp(command, se::shader_compile::fxc_intercept::kFxcCommand,
+  const bool ok{!strncmp(command,
+                         se::shader_compile::fxc_intercept::kFxcCommand,
                          se::shader_compile::fxc_intercept::kFxcCommandSize)};
   if (ok) {
     // Trap "fxc.exe" so that we did not spawn extra process every time
-    se::shader_compile::fxc_intercept::ExecuteCommand(command, response);
+    return se::shader_compile::fxc_intercept::ExecuteCommand(command);
   }
 
-  return ok;
+  return nullptr;
 }
 
 };  // namespace se::shader_compile::fxc_intercept

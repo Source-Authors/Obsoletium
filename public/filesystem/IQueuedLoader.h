@@ -110,7 +110,7 @@ public:
 #define LOADER_DETAIL_LATECOMPLETIONS	(1<<2)
 #define LOADER_DETAIL_PURGES			(1<<3)
 
-#define QUEUEDLOADER_INTERFACE_VERSION		"QueuedLoaderVersion004"
+constexpr inline char QUEUEDLOADER_INTERFACE_VERSION[]{"QueuedLoaderVersion004"};
 abstract_class IQueuedLoader : public IAppSystem
 {
 public:

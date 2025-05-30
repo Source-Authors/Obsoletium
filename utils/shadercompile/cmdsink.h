@@ -16,7 +16,6 @@ namespace se::shader_compile::command_sink {
  */
 struct IResponse {
   virtual ~IResponse() = default;
-  virtual void Release() { delete this; }
 
   // Returns whether the command succeeded
   virtual bool Succeeded() const = 0;

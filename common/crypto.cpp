@@ -55,7 +55,7 @@
 #undef Verify
 #define VPROF_BUDGETGROUP_ENCRYPTION				_T("Encryption")
 #define SPEW_CRYPTO "crypto"
-const int k_cMedBuff = 1024;					// medium buffer 
+constexpr inline int k_cMedBuff = 1024;					// medium buffer 
 
 #if defined(GNUC)
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -714,7 +714,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 	if ( bRet )
 	{
 		// invalid ciphertext or key
-		if ( memcmp( &hmacActual, pHMAC, sizeof( SHADigest_t ) ) )
+		if ( memcmp( &hmacActual, pHMAC, sizeof( SHADigest_t ) ) != 0 )
 			return false;
 		
 		bRet = SymmetricDecrypt( pubEncryptedData, cubCiphertext, pubPlaintextData, pcubPlaintextData, rgubKey, k_nSymmetricKeyLen );
@@ -1215,7 +1215,7 @@ bool CCrypto::HexDecode( const char *pchData, uint8 *pubDecodedData, size_t *pcu
 	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
 	HexDecoder hexDecoder( &pArraySinkOutput );
-	hexDecoder.Put( (byte *) pchData, strlen( pchData ) );
+	hexDecoder.Put( (const byte *) pchData, strlen( pchData ) );
 	hexDecoder.MessageEnd();
 
 	size_t len = pArraySinkOutput.TotalPutLength();
@@ -1231,7 +1231,7 @@ bool CCrypto::HexDecode( const char *pchData, uint8 *pubDecodedData, size_t *pcu
 }
 
 
-static const int k_LineBreakEveryNGroups = 18; // line break every 18 groups of 4 characters (every 72 characters)
+static constexpr inline int k_LineBreakEveryNGroups = 18; // line break every 18 groups of 4 characters (every 72 characters)
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns the expected buffer size that should be passed to Base64Encode.
@@ -1681,7 +1681,7 @@ bool CCrypto::BGzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuffe
 		StringSink sink{gzip_output};
 		Gzip zip{&sink};
 		StringSource src( pubData, cubData, true, &zip );
-		bufOutput.Set( (uint8*)gzip_output.c_str(), gzip_output.length() );
+		bufOutput.Set( (const uint8*)gzip_output.c_str(), gzip_output.length() );
 	}
 	catch( ... )
 	{
@@ -1700,7 +1700,7 @@ bool CCrypto::BGunzipBuffer( const uint8 *pubData, size_t cubData, CCryptoOutBuf
 		StringSink sink{gunzip_output};
 		Gunzip unzip{&sink};
 		StringSource src( pubData, cubData, true, &unzip ); 
-		bufOutput.Set( (uint8*)gunzip_output.c_str(), gunzip_output.length() );
+		bufOutput.Set( (const uint8*)gunzip_output.c_str(), gunzip_output.length() );
 	}
 	catch( ... )
 	{
@@ -1741,6 +1741,9 @@ public:
 CCustomHexEncoder::CCustomHexEncoder( const char *pchEncodingTable )
 {
 	m_bValidEncoding = false;
+
+	BitwiseClear(m_rgnDecodingTable);
+
 	if ( strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
 	{
 		memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
@@ -1750,6 +1753,7 @@ CCustomHexEncoder::CCustomHexEncoder( const char *pchEncodingTable )
 	}
 	else
 	{
+		BitwiseClear(m_rgubEncodingTable);
 		AssertMsg( false, "CCrypto::CustomHexEncoder: Improper encoding table\n" );
 	}
 }
@@ -1818,7 +1822,7 @@ bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, size
 	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: HexEncoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
 	HexDecoderTKS hexDecoder( &pArraySinkOutput, (const int *)m_rgnDecodingTable );
-	hexDecoder.Put( (byte *) pchData, strlen( pchData ) );
+	hexDecoder.Put( (const byte *) pchData, strlen( pchData ) );
 	hexDecoder.MessageEnd();
 
 	size_t len = pArraySinkOutput.TotalPutLength();
@@ -1843,6 +1847,9 @@ bool CCustomHexEncoder::Decode( const char *pchData, uint8 *pubDecodedData, size
 CCustomBase32Encoder::CCustomBase32Encoder( const char *pchEncodingTable )
 {
 	m_bValidEncoding = false;
+	
+	BitwiseClear(m_rgnDecodingTable);
+
 	if ( strlen( pchEncodingTable ) == sizeof( m_rgubEncodingTable ) )
 	{
 		memcpy( m_rgubEncodingTable, pchEncodingTable, sizeof( m_rgubEncodingTable ) );
@@ -1852,6 +1859,7 @@ CCustomBase32Encoder::CCustomBase32Encoder( const char *pchEncodingTable )
 	}
 	else
 	{
+		BitwiseClear(m_rgubEncodingTable);
 		AssertMsg( false, "CCrypto::CustomBase32Encoder: Improper encoding table\n" );
 	}
 }
@@ -1920,7 +1928,7 @@ bool CCustomBase32Encoder::Decode( const char *pchData, uint8 *pubDecodedData, s
 	ArraySink pArraySinkOutput( pubDecodedData, *pcubDecodedData );
 	// Note: Base32Encoder now owns the pointer to pOutputSink and will free it when the encoder goes out of scope and destructs
 	Base32DecoderTKS base32Decoder( &pArraySinkOutput, (const int *)m_rgnDecodingTable );
-	base32Decoder.Put( (byte *) pchData, strlen( pchData ) );
+	base32Decoder.Put( (const byte *) pchData, strlen( pchData ) );
 	base32Decoder.MessageEnd();
 
 	size_t len = pArraySinkOutput.TotalPutLength();

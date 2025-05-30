@@ -2,10 +2,10 @@
 //
 //=============================================================================
 
-#include "fgdlib/GameData.h"
+#include "fgdlib/gamedata.h"
 
-#include "WorldSize.h"
-#include "fgdlib/HelperInfo.h"
+#include "worldsize.h"
+#include "fgdlib/helperinfo.h"
 #include "filesystem_tools.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
@@ -43,7 +43,7 @@ GameDataMessageFunc_t GDSetMessageFunc(GameDataMessageFunc_t pFunc)
 //			pszExpecting - 
 // Output : 
 //-----------------------------------------------------------------------------
-static bool DoGetToken(TokenReader &tr, char **ppszStore, int nSize, trtoken_t ttexpecting, const char *pszExpecting)
+static bool DoGetToken(TokenReader &tr, char **ppszStore, intp nSize, trtoken_t ttexpecting, const char *pszExpecting)
 {
 	trtoken_t ttype;
 
@@ -87,7 +87,7 @@ static bool DoGetToken(TokenReader &tr, char **ppszStore, int nSize, trtoken_t t
 		// We didn't get the expected token type but no expected
 		// string was specified.
 		//
-		char *pszTokenName;
+		const char *pszTokenName;
 		switch (ttexpecting)
 		{
 			case IDENT:
@@ -144,7 +144,7 @@ bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...)
 	char szBuf[128];
 	va_list vl;
 	va_start(vl, error);
-	vsprintf(szBuf, error, vl);
+	V_vsprintf_safe(szBuf, error, vl);
 	va_end(vl);
 
 	const auto msgFunc = g_pMsgFunc.load(std::memory_order::memory_order_relaxed);
@@ -178,11 +178,15 @@ bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...)
 // Output : Returns TRUE if the operation succeeded, FALSE if there was an error.
 //			If there was an error, the error will be reported in the message window.
 //-----------------------------------------------------------------------------
-bool GDGetToken(TokenReader &tr, char *pszStore, int nSize, trtoken_t ttexpecting, const char *pszExpecting)
+bool GDGetToken(TokenReader &tr, OUT_Z_CAP(nSize) char *pszStore, intp nSize, trtoken_t ttexpecting, const char *pszExpecting)
 {
 	Assert(pszStore != NULL);
 	if (pszStore != NULL)
 	{
+		// dimhotepus: Always zero-terminate.
+		if (nSize > 0)
+			pszStore[0] = '\0';
+
 		return DoGetToken(tr, &pszStore, nSize, ttexpecting, pszExpecting);
 	}
 
@@ -292,7 +296,7 @@ BOOL GameData::Load(const char *pszFilename)
 			break;
 		}
 
-		ttype = tr.NextToken(szToken, sizeof(szToken));
+		ttype = tr.NextToken(szToken);
 
 		if(ttype == TOKENEOF)
 			break;
@@ -304,7 +308,7 @@ BOOL GameData::Load(const char *pszFilename)
 		}
 
 		// check what kind it is, and parse a new object
-		if (tr.NextToken(szToken, sizeof(szToken)) != IDENT)
+		if (tr.NextToken(szToken) != IDENT)
 		{
 			if(!GDError(tr, "expected identifier after @"))
 				return FALSE;
@@ -373,17 +377,17 @@ BOOL GameData::Load(const char *pszFilename)
 		}
 		else if (IsToken(szToken, "include"))
 		{
-			if (GDGetToken(tr, szToken, sizeof(szToken), STRING))
+			if (GDGetToken(tr, szToken, STRING))
 			{
 				// Let's assume it's in the same directory.
 				char justPath[MAX_PATH], loadFilename[MAX_PATH];
-				if ( Q_ExtractFilePath( pszFilename, justPath, sizeof( justPath ) ) )
+				if ( V_ExtractFilePath( pszFilename, justPath ) )
 				{
-					Q_snprintf( loadFilename, sizeof( loadFilename ), "%s%s", justPath, szToken );
+					V_sprintf_safe( loadFilename, "%s%s", justPath, szToken );
 				}
 				else
 				{
-					Q_strncpy( loadFilename, szToken, sizeof( loadFilename ) );
+					V_strcpy_safe( loadFilename, szToken );
 				}
 
 				// First try our fully specified directory
@@ -457,7 +461,7 @@ bool GameData::ParseMapSize(TokenReader &tr)
 	}
 
 	char szToken[128];
-	if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+	if (!GDGetToken(tr, szToken, INTEGER))
 	{
 		return false;
 	}
@@ -468,7 +472,7 @@ bool GameData::ParseMapSize(TokenReader &tr)
 		return false;
 	}
 
-	if (!GDGetToken(tr, szToken, sizeof(szToken), INTEGER))
+	if (!GDGetToken(tr, szToken, INTEGER))
 	{
 		return false;
 	}
@@ -537,11 +541,8 @@ GDclass *GameData::BeginInstanceRemap( const char *pszClassName, const char *psz
 
 	V_strcpy_safe( m_InstancePrefix, pszInstancePrefix );
 
-	if ( m_InstanceClass )
-	{
-		delete m_InstanceClass;
-		m_InstanceClass = NULL;
-	}
+	delete m_InstanceClass;
+	m_InstanceClass = NULL;
 
 	if ( strcmpi( pszClassName, "info_overlay_accessor" ) == 0 )
 	{	// yucky hack for a made up entity in the bsp process
@@ -609,7 +610,7 @@ static bool CUtlType_LessThan( const GDIV_TYPE &type1, const GDIV_TYPE &type2 )
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
+bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, intp outLen, TNameFixup NameFixup )
 {
 	if ( RemapOperation.Count() == 0 )
 	{
@@ -624,19 +625,27 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 
 	if ( !m_InstanceClass )
 	{
+		// dimhotepus: Zero-terminate on failure.
+		if ( outLen > 0 )
+			pszOutValue[0] = '\0';
 		return false;
 	}
 
 	GDinputvariable *KVVar = m_InstanceClass->VarForName( pszKey );
 	if ( !KVVar )
 	{
+		if ( outLen > 0 )
+			pszOutValue[0] = '\0';
 		return false;
 	}
 
 	GDIV_TYPE	KVType = KVVar->GetType();
-	auto			KVRemapIndex = RemapOperation.Find( KVType );
+	auto		KVRemapIndex = RemapOperation.Find( KVType );
 	if ( KVRemapIndex == RemapOperation.InvalidIndex() )
 	{
+		// dimhotepus: Zero-terminate on failure.
+		if ( outLen > 0 )
+			pszOutValue[0] = '\0';
 		return false;
 	}
 
@@ -716,7 +725,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, char *
 // Output : returns true if the value changed
 //			pszOutValue - the new value if changed
 //-----------------------------------------------------------------------------
-bool GameData::RemapNameField( const char *pszInValue, char *pszOutValue, ptrdiff_t outLen, TNameFixup NameFixup )
+bool GameData::RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *pszOutValue, intp outLen, TNameFixup NameFixup )
 {
 	V_strncpy( pszOutValue, pszInValue, outLen );
 
@@ -730,6 +739,10 @@ bool GameData::RemapNameField( const char *pszInValue, char *pszOutValue, ptrdif
 
 			case NAME_FIXUP_POSTFIX:
 				V_snprintf( pszOutValue, outLen, "%s-%s", pszInValue, m_InstancePrefix );
+				break;
+
+				// dimhotepus: Handle all enum values.
+			case NAME_FIXUP_NONE:
 				break;
 		}
 	}
@@ -754,11 +767,11 @@ bool GameData::LoadFGDMaterialExclusions( TokenReader &tr )
 		char szToken[128];
 		bool bMatchFound = false;
 
-		if ( tr.PeekTokenType( szToken, sizeof( szToken ) ) == OPERATOR )
+		if ( tr.PeekTokenType( szToken ) == OPERATOR )
 		{
 			break;
 		}
-		else if ( GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+		else if ( GDGetToken( tr, szToken, STRING ) )
 		{		
 			// Make sure we haven't loaded this from another FGD
 			for ( int i = 0; i < m_FGDMaterialExclusions.Count(); i++ )
@@ -807,7 +820,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 	if ( GDSkipToken( tr, OPERATOR, "=" ) )
 	{
 		// We expect a name
-		if ( !GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+		if ( !GDGetToken( tr, szToken, STRING ) )
 		{
 			return( FALSE );
 		}
@@ -825,7 +838,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 	// Handle the Class(es) -- Brush Entities, Occluders, Lights
 	while ( 1 )
 	{
-		if ( GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+		if ( GDGetToken( tr, szToken, STRING ) )
 		{
 			cindex = m_FGDAutoVisGroups[gindex].m_Classes.AddToTail();
 			auto &vgclass = m_FGDAutoVisGroups[gindex].m_Classes[cindex];
@@ -840,12 +853,12 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 			// Parse objects/entities -- func_detail, point_template, light_spot
 			while ( 1 )
 			{
-				if ( tr.PeekTokenType( szToken, sizeof( szToken ) ) == OPERATOR )
+				if ( tr.PeekTokenType( szToken ) == OPERATOR )
 				{
 					break;
 				}
 
-				if ( !GDGetToken( tr, szToken, sizeof( szToken ), STRING ) )
+				if ( !GDGetToken( tr, szToken, STRING ) )
 				{
 					return( FALSE );
 				}
@@ -860,7 +873,7 @@ bool GameData::LoadFGDAutoVisGroups( TokenReader &tr )
 			}
 
 			// See if we have another Class coming up
-			if ( tr.PeekTokenType( szToken, sizeof( szToken ) ) == STRING )
+			if ( tr.PeekTokenType( szToken ) == STRING )
 			{
 				continue;
 			}

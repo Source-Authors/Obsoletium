@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "tier0/platform.h"
 #include "interval.h"
+#include "tier0/platform.h"
 #include "tier1/strtools.h"
 #include "vstdlib/random.h"
 

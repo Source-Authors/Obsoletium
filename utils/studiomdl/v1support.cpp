@@ -6,21 +6,10 @@
 //
 //=============================================================================//
 
-//
-// studiomdl.c: generates a studio .mdl file from a .qc script
-// sources/<scriptname>.mdl.
-//
-
-
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4237 )
-#pragma warning( disable : 4305 )
-
-
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <sys/stat.h>
-#include <math.h>
 
 #include "cmdlib.h"
 #include "scriplib.h"
@@ -183,7 +172,7 @@ void ParseFaceData( s_source_t *psource, int material, s_face_t *pFace )
 		// VectorNormalize( normal );
 
 		// invert v
-		t[1] = 1.0 - t[1];
+		t[1] = 1.0f - t[1];
 
 		if (i == 9 || iCount == 0)
 		{
@@ -326,7 +315,9 @@ int Load_SMD ( s_source_t *psource )
 
 	while (GetLineInput()) 
 	{
-		int numRead = sscanf( g_szLine, "%s %d", cmd, &option );
+		// dimhotepus: Prevent overflow for scanning command.
+		int numRead = sscanf( g_szLine, "%1023s %d", cmd, &option );
+		cmd[ssize(cmd) - 1] = '\0';
 
 		// Blank line
 		if ((numRead == EOF) || (numRead == 0))

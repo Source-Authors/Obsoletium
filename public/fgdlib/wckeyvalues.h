@@ -191,7 +191,7 @@ typedef WCKeyValuesT<WCKVBase_Vector> WCKeyValuesVector;
 template<class Base>
 inline const char *WCKeyValuesT<Base>::GetKey(unsigned short nIndex) const
 {
-	return(m_KeyValues.Element(nIndex).szKey);
+	return(this->m_KeyValues.Element(nIndex).szKey);
 }
 
 
@@ -203,7 +203,7 @@ inline const char *WCKeyValuesT<Base>::GetKey(unsigned short nIndex) const
 template<class Base>
 inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex)
 {
-	return(m_KeyValues.Element(nIndex));
+	return(this->m_KeyValues.Element(nIndex));
 }
 
 
@@ -215,7 +215,7 @@ inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex)
 template<class Base>
 inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex) const
 {
-	return(m_KeyValues.Element(nIndex));
+	return(this->m_KeyValues.Element(nIndex));
 }
 
 
@@ -226,7 +226,7 @@ inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex) 
 template<class Base>
 inline const char *WCKeyValuesT<Base>::GetValue(unsigned short nIndex) const
 {
-	return(m_KeyValues.Element(nIndex).szValue);
+	return(this->m_KeyValues.Element(nIndex).szValue);
 }
 
 

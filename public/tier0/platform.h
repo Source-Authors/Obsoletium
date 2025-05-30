@@ -29,7 +29,11 @@
 #include <new>
 
 #include <cstring>  // std::memset
-#include <cstddef>  // std::ptrdiff_t, std::size
+#include <cstddef>  // std::size
+
+#if defined(__GCC__) && (defined(__i386__) || defined(__x86_64__))
+#include <x86intrin.h>  // __rdtsc, __rdtscp
+#endif
 
 #include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
@@ -101,25 +105,6 @@
 #else
 	#error "Please define your platform"
 #endif
-
-using int8 = int8_t;
-using uint8 = uint8_t;
-
-using int16 = int16_t;
-using uint16 = uint16_t;
-
-using int32 = int32_t;
-using uint32 = uint32_t;
-
-using int64 = int64_t;
-using uint64 = uint64_t;
-
-// intp is an integer that can accomodate a pointer
-// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
-using intp = std::ptrdiff_t;
-// uintp is an unsigned integer that can accomodate a pointer
-// (ie, sizeof(uintp) >= sizeof(unsigned int) && sizeof(uintp) >= sizeof(void *)
-using uintp = std::size_t;
 
 #if !defined( _WIN32 )
 using HWND = void *;
@@ -356,8 +341,20 @@ typedef void * HINSTANCE;
 //-----------------------------------------------------------------------------
 // Convert int<-->pointer, avoiding 32/64-bit compiler warnings:
 //-----------------------------------------------------------------------------
-#define INT_TO_POINTER( i ) (void *)( ( i ) + (char *)NULL )
-#define POINTER_TO_INT( p ) ( (int)(uintp)( p ) )
+template<typename T>
+constexpr inline std::enable_if_t<std::is_integral_v<T>, void*> INT_TO_POINTER(T i) noexcept {
+	if constexpr (std::is_unsigned_v<T>) {
+		return reinterpret_cast<void*>(static_cast<uintp>(i));
+	}
+	return reinterpret_cast<void*>(static_cast<intp>(i));
+}
+template <typename R, typename T>
+constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) noexcept {
+	if constexpr (std::is_unsigned_v<R>) {
+		return static_cast<uint>(reinterpret_cast<uintp>(p));
+	}
+	return static_cast<int>(reinterpret_cast<intp>(p));
+}
 
 
 //-----------------------------------------------------------------------------
@@ -377,6 +374,9 @@ typedef void * HINSTANCE;
 	#define mallocsize( _p )		( _msize( _p ) )
 #endif
 
+// dimhotepus: Add type-safe interface.
+#define stackallocT( type_, _size )		static_cast<type_*>( stackalloc( sizeof(type_) * (_size) ) )
+
 #define  stackfree( _p )			0
 
 // Linux had a few areas where it didn't construct objects in the same order that Windows does.
@@ -392,6 +392,10 @@ typedef void * HINSTANCE;
 	#define RESTRICT __restrict
 	#define RESTRICT_FUNC __declspec(restrict)
 	#define FMTFUNCTION( a, b )
+
+	// dimhotepus: Allow compiler optimize allocated pointer access.
+	#define ALLOC_CALL RESTRICT_FUNC __declspec(allocator)
+	#define FREE_CALL
 #elif defined(GNUC)
 	#define SELECTANY __attribute__((weak))
 	#if defined(LINUX) && !defined(DEDICATED)
@@ -403,11 +407,19 @@ typedef void * HINSTANCE;
 	// squirrel.h does a #define printf DevMsg which leads to warnings when we try
 	// to use printf as the prototype format function. Using __printf__ instead.
 	#define FMTFUNCTION( fmtargnumber, firstvarargnumber ) __attribute__ (( format( __printf__, fmtargnumber, firstvarargnumber )))
+
+	// dimhotepus: Allow compiler optimize allocated pointer access.
+	#define ALLOC_CALL
+	#define FREE_CALL
 #else
 	#define SELECTANY static
 	#define RESTRICT
 	#define RESTRICT_FUNC
 	#define FMTFUNCTION( a, b )
+
+	// dimhotepus: Allow compiler optimize allocated pointer access.
+	#define ALLOC_CALL
+	#define FREE_CALL
 #endif
 
 #if defined( _WIN32 )
@@ -450,6 +462,11 @@ typedef void * HINSTANCE;
 	#define  STDCALL				__stdcall
 	#define  FASTCALL				__fastcall
 	#define  FORCEINLINE			__forceinline
+	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
+	// this macro lets us not force inlining in that case
+	#define  FORCEINLINE_TEMPLATE		__forceinline
+#else
+	#define FORCEINLINE inline __attribute__((always_inline))
 	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
 	// this macro lets us not force inlining in that case
 	#define  FORCEINLINE_TEMPLATE		__forceinline
@@ -737,7 +754,7 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 
 // If a swapped float passes through the fpu, the bytes may get changed.
 // Prevent this by swapping floats as DWORDs.
-#define SafeSwapFloat( pOut, pIn )	(*((uint*)pOut) = DWordSwap( *((uint*)pIn) ))
+#define SafeSwapFloat( pOut, pIn )	(*((uint*)pOut) = DWordSwap( *((const uint*)pIn) ))
 
 #if defined(VALVE_LITTLE_ENDIAN)
 
@@ -786,23 +803,23 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 // @Note (toml 05-02-02): this technique expects the compiler to
 // optimize the expression and eliminate the other path. On any new
 // platform/compiler this should be tested.
-inline short BigShort( short val )		{ int test = 1; return ( *(char *)&test == 1 ) ? WordSwap( val )  : val; }
-inline uint16 BigWord( uint16 val )		{ int test = 1; return ( *(char *)&test == 1 ) ? WordSwap( val )  : val; }
-inline long BigLong( long val )			{ int test = 1; return ( *(char *)&test == 1 ) ? DWordSwap( val ) : val; }
-inline uint32 BigDWord( uint32 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? DWordSwap( val ) : val; }
-inline short LittleShort( short val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : WordSwap( val ); }
-inline uint16 LittleWord( uint16 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : WordSwap( val ); }
-inline long LittleLong( long val )		{ int test = 1; return ( *(char *)&test == 1 ) ? val : DWordSwap( val ); }
-inline uint32 LittleDWord( uint32 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : DWordSwap( val ); }
-inline uint64 LittleQWord( uint64 val )	{ int test = 1; return ( *(char *)&test == 1 ) ? val : QWordSwap( val ); }
+inline short BigShort( short val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; } //-V206
+inline uint16 BigWord( uint16 val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; } //-V206
+inline long BigLong( long val )			{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; } //-V206
+inline uint32 BigDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; } //-V206
+inline short LittleShort( short val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); } //-V206
+inline uint16 LittleWord( uint16 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); } //-V206
+inline long LittleLong( long val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); } //-V206
+inline uint32 LittleDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); } //-V206
+inline uint64 LittleQWord( uint64 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : QWordSwap( val ); } //-V206
 inline short SwapShort( short val )					{ return WordSwap( val ); }
 inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
 inline long SwapLong( long val )					{ return DWordSwap( val ); }
 inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
 
 // Pass floats by pointer for swapping to avoid truncation in the fpu
-inline void BigFloat( float *pOut, const float *pIn )		{ int test = 1; ( *(char *)&test == 1 ) ? SafeSwapFloat( pOut, pIn ) : ( *pOut = *pIn ); }
-inline void LittleFloat( float *pOut, const float *pIn )	{ int test = 1; ( *(char *)&test == 1 ) ? ( *pOut = *pIn ) : SafeSwapFloat( pOut, pIn ); }
+inline void BigFloat( float *pOut, const float *pIn )		{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? SafeSwapFloat( pOut, pIn ) : ( *pOut = *pIn ); } //-V206
+inline void LittleFloat( float *pOut, const float *pIn )	{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? ( *pOut = *pIn ) : SafeSwapFloat( pOut, pIn ); } //-V206
 inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, pIn ); }
 
 #endif
@@ -851,7 +868,7 @@ PLATFORM_INTERFACE bool				Plat_IsInBenchmarkMode();
 
 
 PLATFORM_INTERFACE double			Plat_FloatTime();		// Returns time in seconds since the module was loaded.
-PLATFORM_INTERFACE [[deprecated("Overlows in 49.7 days.")]] uint32			Plat_MSTime();			// Time in milliseconds.
+PLATFORM_INTERFACE uint32			Plat_MSTime();			// Time in milliseconds.
 PLATFORM_INTERFACE uint64			Plat_USTime();			// Time in microseconds.
 PLATFORM_INTERFACE char *			Plat_ctime( const time_t *timep, char *buf, size_t bufsize );
 PLATFORM_INTERFACE void				Plat_GetModuleFilename( char *pOut, int nMaxBytes );
@@ -874,24 +891,90 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 
 #if defined( _WIN32 )
 	extern "C" unsigned __int64 __rdtsc();
+	extern "C" unsigned __int64 __rdtscp(unsigned *aux);
 	#pragma intrinsic(__rdtsc)
+	#pragma intrinsic(__rdtscp)
 #endif
 
-inline uint64 Plat_Rdtsc()
+FORCEINLINE uint64_t Plat_Rdtsc()
 {
-#if defined( _WIN64 ) || defined ( _WIN32 )
-	return __rdtsc();
-#elif defined( __i386__ )
-	uint64 val;
-	__asm__ __volatile__ ( "rdtsc" : "=A" (val) );
-	return val;
-#elif defined( __x86_64__ )
-	uint32 lo, hi;
-	__asm__ __volatile__ ( "rdtsc" : "=a" (lo), "=d" (hi));
-	return ( ( ( uint64 )hi ) << 32 ) | lo;
-#else
-#error "Please define your platform"
-#endif
+	// See https://www.felixcloutier.com/x86/rdtsc
+	// 
+	// The RDTSC instruction is not a serializing instruction.  It does not
+	// necessarily wait until all previous instructions have been executed
+	// before reading the counter.  Similarly, subsequent instructions may begin
+	// execution before the read operation is performed.  The following items
+	// may guide software seeking to order executions of RDTSC:
+	// * If software requires RDTSC to be executed only after all previous
+	// instructions have executed and all previous loads are globally visible,
+	// it can execute LFENCE immediately before RDTSC.
+	// * If software requires RDTSC to be executed only after all previous
+	// instructions have executed and all previous loads and stores are globally
+	// visible, it can execute the sequence MFENCE;LFENCE immediately before
+	// RDTSC.
+	// * If software requires RDTSC to be executed prior to execution of any
+	// subsequent instruction (including any memory accesses), it can execute
+	// the sequence LFENCE immediately after RDTSC.
+	//
+	// We do not mfence before as for timing only ordering matters, not finished
+	// memory stores are ok.
+	// Ensure no reordering aka acquire barrier.
+	_mm_lfence();
+	const uint64_t tsc{__rdtsc()};
+	// Ensure no reordering aka acquire barrier.
+	_mm_lfence();
+	return tsc;
+}
+
+FORCEINLINE uint64_t Plat_Rdtscp(uint32_t &coreId)
+{
+	// See https://www.felixcloutier.com/x86/rdtscp
+	// 
+	// The RDTSCP instruction is not a serializing instruction, but it does wait
+	// until all previous instructions have executed and all previous loads are
+	// globally visible.  But it does not wait for previous stores to be
+	// globally visible, and subsequent instructions may begin execution before
+	// the read operation is performed.  The following items may guide software
+	// seeking to order executions of RDTSCP:
+	// * If software requires RDTSCP to be executed only after all previous
+	// stores are globally visible, it can execute MFENCE immediately before
+	// RDTSCP.
+	// * If software requires RDTSCP to be executed prior to execution of any
+	// subsequent instruction (including any memory accesses), it can execute
+	// LFENCE immediately after RDTSCP.
+	//
+	// We do not mfence before as for timing only ordering matters, not finished
+	// memory stores are ok. 
+	const uint64_t tsc{__rdtscp(&coreId)};
+	// Ensure no reordering aka acquire barrier.
+	_mm_lfence();
+	return tsc;
+}
+
+inline uint64_t Plat_MeasureRtscpOverhead()
+{
+	uint32_t coreIdStart, coreIdEnd;
+	uint64_t overheads[64];
+	for (size_t i{0}; i < std::size(overheads);)
+	{
+		uint64_t start = Plat_Rdtscp(coreIdStart);
+		uint64_t end = Plat_Rdtscp(coreIdEnd);
+		// Usually tsc synced over cores (constant_tsc), but due to UEFI / CPU
+		// bugs all is possible.  So expect clock is monotonic only on a single
+		// core.
+		if (coreIdStart == coreIdEnd)
+		{
+			 overheads[i++] = end - start;
+		}
+	}
+
+	// median.
+	std::nth_element(std::begin(overheads),
+		std::begin(overheads) + std::size(overheads) / 2,
+		std::end(overheads));
+	uint64_t median = overheads[std::size(overheads) / 2];
+
+	return median;
 }
 
 // b/w compatibility
@@ -911,6 +994,45 @@ std::enable_if_t<!std::is_trivially_copyable_v<T>>
 constexpr BitwiseCopy(const T* src, T* dest, size_t size) noexcept
 {
   std::copy_n(src, size, dest);
+}
+
+// is_trivially_default_constructible - that last one is important, because some
+// TriviallyCopyable types still want to be able to control their contents.  For
+// example, such a type could have a private int variable that is always 5,
+// initialized in its default constructor.
+//
+// See https://stackoverflow.com/questions/53339268/what-trait-concept-can-guarantee-memsetting-an-object-is-well-defined
+template<typename T>
+std::enable_if_t<std::is_trivially_copyable_v<T> && std::is_trivially_constructible_v<T>>
+BitwiseClear(T &src) noexcept
+{
+  std::memset(&src, 0, sizeof(T));
+}
+
+// is_trivially_default_constructible - that last one is important, because some
+// TriviallyCopyable types still want to be able to control their contents.  For
+// example, such a type could have a private int variable that is always 5,
+// initialized in its default constructor.
+//
+// See https://stackoverflow.com/questions/53339268/what-trait-concept-can-guarantee-memsetting-an-object-is-well-defined
+template<typename T, size_t size>
+std::enable_if_t<std::is_trivially_copyable_v<T> && std::is_trivially_constructible_v<T>>
+BitwiseClear(T (&src)[size]) noexcept
+{
+  std::memset(src, 0, sizeof(src));
+}
+
+// is_trivially_default_constructible - that last one is important, because some
+// TriviallyCopyable types still want to be able to control their contents.  For
+// example, such a type could have a private int variable that is always 5,
+// initialized in its default constructor.
+//
+// See https://stackoverflow.com/questions/53339268/what-trait-concept-can-guarantee-memsetting-an-object-is-well-defined
+template<typename T>
+std::enable_if_t<std::is_trivially_copyable_v<T> && std::is_trivially_constructible_v<T>>
+BitwiseClear(T *src, size_t size) noexcept
+{
+  std::memset(src, 0, size);
 }
 
 // Protect against bad auto operator=
@@ -972,10 +1094,14 @@ struct MemoryInformation
 {
 	int m_nStructVersion;
 
+	// Total physical RAM in MiBs.
 	uint m_nPhysicalRamMbTotal;
+	// Available physical RAM in MiBs.
 	uint m_nPhysicalRamMbAvailable;
 	
+	// Total virtual RAM in MiBs.
 	uint m_nVirtualRamMbTotal;
+	// Available virtual RAM in MiBs.
 	uint m_nVirtualRamMbAvailable;
 
 	inline MemoryInformation()

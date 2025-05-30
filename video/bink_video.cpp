@@ -47,7 +47,7 @@ VideoFileExtensionInfo_t s_BinkExtensions[] =
 	{ ".bik", VideoSystem::BINK,  VideoSystemFeature::PLAY_VIDEO_FILE_IN_MATERIAL | VideoSystemFeature::PLAY_VIDEO_FILE_FULL_SCREEN },
 };
 
-constexpr ptrdiff_t s_BinkExtensionCount = ssize( s_BinkExtensions );
+constexpr intp s_BinkExtensionCount = ssize( s_BinkExtensions );
 constexpr VideoSystemFeature_t	CBinkVideoSubSystem::DEFAULT_FEATURE_SET = VideoSystemFeature::PLAY_VIDEO_FILE_IN_MATERIAL;
 
 // ===========================================================================

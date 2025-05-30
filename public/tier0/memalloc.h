@@ -178,8 +178,8 @@ inline void *MemAlloc_AllocAligned( size_t size, size_t align )
 	if ( (pAlloc = static_cast<unsigned char*>(g_pMemAlloc->Alloc( sizeof(void *) + align + size ) )) == nullptr)
 		return nullptr;
 
-	unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
-	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc;
+	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;
 }
@@ -195,8 +195,8 @@ inline void *MemAlloc_AllocAligned( size_t size, size_t align, const char *pszFi
 	if ( (pAlloc = static_cast<unsigned char*>(g_pMemAlloc->Alloc( sizeof(void *) + align + size, pszFile, nLine ) )) == nullptr)
 		return nullptr;
 
-	unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
-	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc;
+	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;
 }
@@ -212,8 +212,8 @@ inline void *MemAlloc_AllocAlignedUnattributed( size_t size, size_t align )
 	if ( (pAlloc = static_cast<unsigned char*>(MemAlloc_Alloc( sizeof(void *) + align + size ) )) == nullptr)
 		return nullptr;
 
-	unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
-	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc;
+	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;
 }
@@ -229,8 +229,8 @@ inline void *MemAlloc_AllocAlignedFileLine( size_t size, size_t align, const cha
 	if ( (pAlloc = static_cast<unsigned char*>(MemAlloc_Alloc( sizeof(void *) + align + size, pszFile, nLine ) )) == nullptr)
 		return nullptr;
 
-	unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
-	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc;
+	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;
 }
@@ -250,7 +250,7 @@ inline void *MemAlloc_ReallocAligned( void *ptr, size_t size, size_t align )
 	// Figure out the actual allocation point
 	void *pAlloc = ptr;
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 
 	// See if we have enough space
 	size_t nOffset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(pAlloc);
@@ -279,7 +279,7 @@ inline void MemAlloc_FreeAligned( void *pMemBlock )
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
 
 	// pAlloc is the pointer to the start of memory block
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 	g_pMemAlloc->Free( pAlloc );
 }
 
@@ -294,7 +294,7 @@ inline void MemAlloc_FreeAligned( void *pMemBlock, const char *pFileName, int nL
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
 
 	// pAlloc is the pointer to the start of memory block
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 	g_pMemAlloc->Free( pAlloc, pFileName, nLine );
 }
 
@@ -309,7 +309,7 @@ inline size_t MemAlloc_GetSizeAligned( void *pMemBlock )
 	pAlloc = reinterpret_cast<void *>((reinterpret_cast<size_t>(pAlloc) & ~( sizeof(void *) - 1 ) ) - sizeof(void *));
 
 	// pAlloc is the pointer to the start of memory block
-	pAlloc = *reinterpret_cast<void **>(pAlloc);
+	pAlloc = *reinterpret_cast<void **>(pAlloc); //-V206
 	return g_pMemAlloc->GetSize( pAlloc ) - ( static_cast<byte *>(pMemBlock) - static_cast<byte *>(pAlloc) );
 }
 
@@ -343,7 +343,7 @@ inline size_t MemAlloc_GetSizeAligned( void *pMemBlock )
 #define MemAlloc_SaveDebugInfo( pvDebugInfo ) g_pMemAlloc->SaveDebugInfo( pvDebugInfo )
 #define MemAlloc_RestoreDebugInfo( pvDebugInfo ) g_pMemAlloc->RestoreDebugInfo( pvDebugInfo )
 #define MemAlloc_InitDebugInfo( pvDebugInfo, pchRootFileName, nLine ) g_pMemAlloc->InitDebugInfo( pvDebugInfo, pchRootFileName, nLine )
-#define MemAlloc_GetSize( x ) g_pMemAlloc->GetSize( x );
+#define MemAlloc_GetSize( x ) g_pMemAlloc->GetSize( x )
 //-----------------------------------------------------------------------------
 
 class CMemAllocAttributeAlloction

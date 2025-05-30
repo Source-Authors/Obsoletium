@@ -17,29 +17,30 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\out\build;.\;$SRCDIR\engine"
-		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include" [$SDL]
-		$PreprocessorDefinitions			"$BASE;DEDICATED;LAUNCHERONLY;SUPPORT_PACKED_STORE"
+		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include" [$SDL]
+		$PreprocessorDefinitions		"$BASE;DEDICATED;LAUNCHERONLY;SUPPORT_PACKED_STORE"
 		// dimhotepus: Enable exceptions + SEH as we use them in a single place
-		$EnableC++Exceptions				"Yes with SEH Exceptions (/EHa)"
+		$EnableC++Exceptions			"Yes with SEH Exceptions (/EHa)"
 	}
 
 	$Linker
 	{
-		$AdditionalDependencies					"$BASE Shell32.lib wsock32.lib odbc32.lib odbccp32.lib winmm.lib User32.lib"
-		$SystemLibraries						"iconv;edit;curses" [$OSXALL]
-		$SystemFrameworks						"AppKit" [$OSXALL]
-		// dimhotepus: Delay load user32 only when needed.  Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
-		$DelayLoadedDLL							"$BASE User32.dll"
+		$AdditionalDependencies			"$BASE Shell32.lib wsock32.lib odbc32.lib odbccp32.lib winmm.lib User32.lib"
+		$SystemLibraries			"iconv;edit;curses" [$OSXALL]
+		$SystemFrameworks			"AppKit" [$OSXALL]
+		// dimhotepus: Delay load user32 only when needed.
+		// Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
+		$DelayLoadedDLL				"$BASE User32.dll"
 	}
 
 	$PostBuildEvent [!$ANALYZE && $SDL]
 	{
-		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
-							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"$BASE"
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"	\
+					"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"	\
+					"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n"	\
+					"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"	\
+					"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n"	\
+					"$BASE"
 	}
 }
 
@@ -56,8 +57,6 @@ $Project "dedicated"
 			}
 		}
 		$File	"filesystem.cpp"
-		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"$SRCDIR\common\netapi.cpp"
 		$File	"sys_common.cpp"
 		$File	"sys_ded.cpp"
 		$File	"sys_windows.cpp" [$WINDOWS]
@@ -68,11 +67,14 @@ $Project "dedicated"
 			{
 				$Compiler
 				{
-					$AdditionalOptions					"/EHa"
+					$AdditionalOptions				"/EHa"
 					$EnableC++Exceptions				"Yes (/EHsc)"
 				}
 			}
 		}
+
+		$File	"$SRCDIR\public\filesystem_init.cpp"
+		$File	"$SRCDIR\common\netapi.cpp"
 		
 		$Folder	"Console"
 		{
@@ -84,21 +86,21 @@ $Project "dedicated"
 
 		$Folder	"VGUI" [$WINDOWS]
 		{
+			$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 			$File	"vgui\CreateMultiplayerGameServerPage.cpp"
 			$File	"vgui\MainPanel.cpp"
-			$File	"$SRCDIR\public\vgui_controls\vgui_controls.cpp"
 			$File	"vgui\vguihelpers.cpp"
 		}
 
 		$Folder	"FileSystem"
 		{
+			$File	"$SRCDIR\public\zip_utils.cpp"
 			$File	"$SRCDIR\filesystem\filetracker.cpp"
 			$File	"$SRCDIR\filesystem\basefilesystem.cpp"
 			$File	"$SRCDIR\filesystem\packfile.cpp"
 			$File	"$SRCDIR\filesystem\filesystem_async.cpp"
 			$File	"$SRCDIR\filesystem\filesystem_stdio.cpp"
 			$File	"$SRCDIR\filesystem\QueuedLoader.cpp"
-			$File	"$SRCDIR\public\zip_utils.cpp"
 			$File	"$SRCDIR\filesystem\linux_support.cpp" [$POSIX]
 		}
 	}
@@ -106,35 +108,35 @@ $Project "dedicated"
 	$Folder	"Header Files"
 	{
 		$File	"args_win.h" [$WINDOWS]
+		$File	"dedicated.h"
+		$File	"isystem.h"
+		$File	"$SRCDIR\common\IAdminServer.h"
+		$File	"$SRCDIR\common\IManageServer.h"
+		$File	"$SRCDIR\common\netapi.h"
+		$File	"$SRCDIR\common\GameUI\ObjectList.h"
 		$File	"$SRCDIR\filesystem\filetracker.h"
 		$File	"$SRCDIR\filesystem\threadsaferefcountedobject.h"
-		$File	"$SRCDIR\public\ifilelist.h"
+		$File	"$SRCDIR\public\appframework\IAppSystem.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\tier0\commonmacros.h"
 		$File	"$SRCDIR\public\tier0\dbg.h"
-		$File	"dedicated.h"
-		$File	"$SRCDIR\public\engine_hlds_api.h"
-		$File	"$SRCDIR\public\tier0\fasttimer.h"
-		$File	"$SRCDIR\public\filesystem.h"
-		$File	"$SRCDIR\common\IAdminServer.h"
-		$File	"$SRCDIR\public\appframework\IAppSystem.h"
 		$File	"$SRCDIR\public\tier0\icommandline.h"
-		$File	"$SRCDIR\public\idedicatedexports.h"
-		$File	"$SRCDIR\common\IManageServer.h"
-		$File	"$SRCDIR\public\tier1\interface.h"
-		$File	"isystem.h"
-		$File	"$SRCDIR\public\mathlib\mathlib.h"
-		$File	"$SRCDIR\common\netapi.h"
-		$File	"$SRCDIR\common\GameUI\ObjectList.h"
+		$File	"$SRCDIR\public\tier0\fasttimer.h"
 		$File	"$SRCDIR\public\tier0\platform.h"
 		$File	"$SRCDIR\public\tier0\protected_things.h"
-		$File	"$SRCDIR\public\string_t.h"
-		$File	"$SRCDIR\public\tier1\strtools.h"
 		$File	"$SRCDIR\public\tier0\vcr_shared.h"
 		$File	"$SRCDIR\public\tier0\vcrmode.h"
+		$File	"$SRCDIR\public\tier1\interface.h"
+		$File	"$SRCDIR\public\tier1\strtools.h"
+		$File	"$SRCDIR\public\mathlib\mathlib.h"
 		$File	"$SRCDIR\public\mathlib\vector.h"
 		$File	"$SRCDIR\public\mathlib\vector2d.h"
 		$File	"$SRCDIR\public\vstdlib\vstdlib.h"
+		$File	"$SRCDIR\public\ifilelist.h"
+		$File	"$SRCDIR\public\engine_hlds_api.h"
+		$File	"$SRCDIR\public\filesystem.h"
+		$File	"$SRCDIR\public\idedicatedexports.h"
+		$File	"$SRCDIR\public\string_t.h"
 
 		$Folder	"Console Headers"
 		{

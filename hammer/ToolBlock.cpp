@@ -306,7 +306,7 @@ bool CToolBlock::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &v
 	if ( uConstraints & constrainSnap )
 		m_pDocument->Snap(vecWorld,uConstraints);
 
-	sprintf(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
+	V_sprintf_safe(szBuf, " @%.0f, %.0f ", vecWorld[pView->axHorz], vecWorld[pView->axVert]);
 	SetStatusText(SBI_COORDS, szBuf);
 	
 	if ( IsTranslating() )

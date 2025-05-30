@@ -524,9 +524,9 @@ int	CReplayServer::GetReplaySlot( void )
 	return m_nPlayerSlot;
 }
 
-float CReplayServer::GetOnlineTime( void )
+double CReplayServer::GetOnlineTime( void )
 {
-	return MAX(0.0, net_time - m_flStartTime);
+	return max(0.0, net_time - m_flStartTime);
 }
 
 void CReplayServer::FireGameEvent(IGameEvent *event)
@@ -910,9 +910,7 @@ CClientFrame *CReplayServer::GetDeltaFrame( int nTick )
 			return m_FrameCache[iFrame].pFrame;
 	}
 
-	intp i = m_FrameCache.AddToTail();
-
-	CReplayFrameCacheEntry_s &entry = m_FrameCache[i];
+	CReplayFrameCacheEntry_s &entry = m_FrameCache[m_FrameCache.AddToTail()];
 
 	entry.nTick = nTick;
 	entry.pFrame = GetClientFrame( nTick ); //expensive

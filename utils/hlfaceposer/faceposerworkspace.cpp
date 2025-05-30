@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <windows.h>
-#include <stdio.h>
-#include "tier1/strtools.h"
 #include "ifaceposerworkspace.h"
+#include "tier1/strtools.h"
+
+#include "winlite.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -115,7 +115,7 @@ int CWorkspaceFiles::GetNumStoredFiles( int type )
 const char *CWorkspaceFiles::GetStoredFile( int type, int number )
 {
 	char szKeyName[ 256 ];
-	sprintf( szKeyName, "%s\\%04i", NameForType( type ), number );
+	V_sprintf_safe( szKeyName, "%s\\%04i", NameForType( type ), number );
 
 	static char filename[ 256 ];
 	filename[ 0 ] = 0;
@@ -131,7 +131,7 @@ void CWorkspaceFiles::StartStoringFiles( int type )
 void CWorkspaceFiles::FinishStoringFiles( int type )
 {
 	char szKeyName[ 256 ];
-	sprintf( szKeyName, "%s\\total", NameForType( type ) );
+	V_sprintf_safe( szKeyName, "%s\\total", NameForType( type ) );
 
 	WriteInt( szKeyName, m_nStoredFiles[ type ] );
 }
@@ -139,7 +139,7 @@ void CWorkspaceFiles::FinishStoringFiles( int type )
 void CWorkspaceFiles::StoreFile( int type, const char *filename )
 {
 	char szKeyName[ 256 ];
-	sprintf( szKeyName, "%s\\%04i", NameForType( type ), m_nStoredFiles[ type ]++ );
+	V_sprintf_safe( szKeyName, "%s\\%04i", NameForType( type ), m_nStoredFiles[ type ]++ );
 
 	WriteString( szKeyName, filename );
 }
@@ -241,7 +241,7 @@ bool CWorkspaceFiles::WriteString( const char *szSubKey, const char *value )
 	LONG lResult;           // Registry function result code
 	DWORD dwSize;           // Size of element data
 
-	dwSize = strlen( value ) + 1;
+	dwSize = static_cast<unsigned>(strlen( value )) + 1;
 
 	lResult = RegSetValueEx(
 		m_hKeyMain,		// handle to key

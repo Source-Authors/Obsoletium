@@ -162,7 +162,7 @@ StateSnapshot_t CTransitionTable::CreateStateSnapshot( ShadowStateId_t shadowSta
 	SnapshotDictEntry_t insert;
 
 	CRC32_Init(	&insert.m_nChecksum );
-	CRC32_ProcessBuffer( &insert.m_nChecksum, &shaderState, sizeof(SnapshotShaderState_t) );
+	CRC32_ProcessBuffer( &insert.m_nChecksum, shaderState );
 	CRC32_Final( &insert.m_nChecksum );
 
 	insert.m_nSnapshot = snapshotId;
@@ -209,7 +209,7 @@ CTransitionTable::ShadowStateId_t CTransitionTable::CreateShadowState( const Sha
 	ShadowStateDictEntry_t insert;
 
 	CRC32_Init(	&insert.m_nChecksum );
-	CRC32_ProcessBuffer( &insert.m_nChecksum, &m_ShadowStateList[newShaderState], sizeof(ShadowState_t) );
+	CRC32_ProcessBuffer( &insert.m_nChecksum, m_ShadowStateList[newShaderState] );
 	CRC32_Final( &insert.m_nChecksum );
 
 	insert.m_nShadowStateId = newShaderState;
@@ -227,7 +227,7 @@ CTransitionTable::ShadowStateId_t CTransitionTable::FindShadowState( const Shado
 	ShadowStateDictEntry_t find;
 
 	CRC32_Init(	&find.m_nChecksum );
-	CRC32_ProcessBuffer( &find.m_nChecksum, &currentState, sizeof(ShadowState_t) );
+	CRC32_ProcessBuffer( &find.m_nChecksum, currentState );
 	CRC32_Final( &find.m_nChecksum );
 	
 	intp nDictCount = m_ShadowStateDict.Count();
@@ -271,7 +271,7 @@ StateSnapshot_t CTransitionTable::FindStateSnapshot( ShadowStateId_t id, const S
 	SnapshotDictEntry_t find;
 
 	CRC32_Init(	&find.m_nChecksum );
-	CRC32_ProcessBuffer( &find.m_nChecksum, &temp, sizeof(temp) );
+	CRC32_ProcessBuffer( &find.m_nChecksum, temp );
 	CRC32_Final( &find.m_nChecksum );
 
 	intp nDictCount = m_SnapshotDict.Count();
@@ -369,7 +369,7 @@ static bool g_SpewTransitions = false;
 		if (g_SpewTransitions)											\
 		{																\
 			char buf[128];												\
-			sprintf( buf, "Apply %s : %d\n", #_d3dState, static_cast<int>(shaderState.m_ ## _state) ); \
+			V_sprintf_safe( buf, "Apply %s : %d\n", #_d3dState, static_cast<int>(shaderState.m_ ## _state) ); \
 			Plat_DebugString(buf);										\
 		}																\
 	}
@@ -380,7 +380,7 @@ static bool g_SpewTransitions = false;
 		if (g_SpewTransitions)											\
 		{																\
 			char buf[128];												\
-			sprintf( buf, "Apply Tex %s (%d): %d\n", #_d3dState, _stage, shaderState.m_TextureStage[_stage].m_ ## _state ); \
+			V_sprintf_safe( buf, "Apply Tex %s (%d): %d\n", #_d3dState, _stage, shaderState.m_TextureStage[_stage].m_ ## _state ); \
 			Plat_DebugString(buf);										\
 		}																\
 	}
@@ -391,7 +391,7 @@ static bool g_SpewTransitions = false;
 		if (g_SpewTransitions)											\
 		{																\
 			char buf[128];												\
-			sprintf( buf, "Apply SamplerSate %s (%d): %d\n", #_d3dState, stage, shaderState.m_SamplerState[_stage].m_ ## _state ); \
+			V_sprintf_safe( buf, "Apply SamplerSate %s (%d): %d\n", #_d3dState, stage, shaderState.m_SamplerState[_stage].m_ ## _state ); \
 			Plat_DebugString(buf);										\
 		}																\
 	}
@@ -547,7 +547,7 @@ void CTransitionTable::ApplySRGBWriteEnable( const ShadowState_t& shaderState  )
 	if (g_SpewTransitions)											
 	{																
 		char buf[128];												
-		sprintf( buf, "Apply %s : %d\n", "D3DRS_SRGBWRITEENABLE", shaderState.m_SRGBWriteEnable );
+		V_sprintf_safe( buf, "Apply %s : %d\n", "D3DRS_SRGBWRITEENABLE", shaderState.m_SRGBWriteEnable );
 		Plat_DebugString(buf);										
 	}																
 #endif
@@ -926,7 +926,7 @@ void ApplyFogMode( const ShadowState_t& state, int arg )
 {
 #ifdef RECORDING
 	char buf[1024];
-	sprintf( buf, "ApplyFogMode( %s )", ShaderFogModeToString( state.m_FogMode ) );
+	V_sprintf_safe( buf, "ApplyFogMode( %s )", ShaderFogModeToString( state.m_FogMode ) );
 	RECORD_DEBUG_STRING( buf );
 #endif
 

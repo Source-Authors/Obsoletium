@@ -323,12 +323,12 @@ public:
 class CUtlVectorUltraConservativeAllocator
 {
 public:
-	static void *Alloc( size_t nSize )
+	[[nodiscard]] ALLOC_CALL static void *Alloc( size_t nSize )
 	{
 		return malloc( nSize );
 	}
 
-	static void *Realloc( void *pMem, size_t nSize )
+	[[nodiscard]] ALLOC_CALL static void *Realloc( void *pMem, size_t nSize )
 	{
 		return realloc( pMem, nSize );
 	}
@@ -338,7 +338,7 @@ public:
 		free( pMem );
 	}
 
-	static size_t GetSize( void *pMem )
+	[[nodiscard]] static size_t GetSize( void *pMem )
 	{
 		return mallocsize( pMem );
 	}
@@ -351,7 +351,7 @@ class CUtlVectorUltraConservative : private A
 public:
 	// Don't inherit from base_vector_t because multiple-inheritance increases
 	// class size!
-	enum { IsUtlVector = true }; // Used to match this at compiletime 		
+	enum { IsUtlVector = true }; // Used to match this at compiletime
 
 	CUtlVectorUltraConservative()
 	{
@@ -377,6 +377,21 @@ public:
 	{
 		return (i >= 0) && (i < Count());
 	}
+
+	// dimhotepus: Add STL compatible member functions. 
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	T* begin()					{ return Base(); }
+	const T* begin() const		{ return Base(); }
+	
+	// dimhotepus: Add STL compatible member functions. 
+	T *end()					{ return Base() + Count(); }
+	const T *end() const		{ return Base() + Count(); }
+
+	// dimhotepus: Add CUtlVector compatible member functions. 
+	// Gets the base address (can change when adding elements!)
+	T* Base()								{ return m_pData->m_Elements; }
+	const T* Base() const					{ return m_pData->m_Elements; }
 
 	T& operator[]( intp i )
 	{
@@ -411,15 +426,17 @@ public:
 		}
 		if ( m_pData == StaticData() )
 		{
-			m_pData = (Data_t *)A::Alloc( sizeof(Data_t) + ( num * sizeof(T) ) );
+			m_pData = (Data_t *)A::Alloc( sizeof(Data_t) + ( num * sizeof(T) ) ); //-V119
 			if (m_pData)
 			{
 				m_pData->m_Size = 0;
+				// dimhotepus: Initialize elements.
+				m_pData->m_Elements = reinterpret_cast<T*>(m_pData + 1);
 			}
 		}
 		else
 		{
-			intp nNeeded = sizeof(Data_t) + ( num * sizeof(T) );
+			intp nNeeded = sizeof(Data_t) + ( num * sizeof(T) ); //-V119
 			intp nHave = A::GetSize( m_pData );
 			if ( nNeeded > nHave )
 			{
@@ -427,6 +444,8 @@ public:
 				if (tmp)
 				{
 					m_pData = tmp;
+					// dimhotepus: Initialize elements.
+					m_pData->m_Elements = reinterpret_cast<T*>(m_pData + 1);
 				}
 				else
 				{
@@ -750,14 +769,16 @@ template< typename T, class A >
 inline T& CUtlVector<T, A>::Random()
 {
 	Assert( m_Size > 0 );
-	return m_Memory[ RandomInt( 0, m_Size - 1 ) ];
+	const int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
+	return m_Memory[ RandomInt( 0, upperBound ) ];
 }
 
 template< typename T, class A >
 inline const T& CUtlVector<T, A>::Random() const
 {
 	Assert( m_Size > 0 );
-	return m_Memory[ RandomInt( 0, m_Size - 1 ) ];
+	const int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
+	return m_Memory[ RandomInt( 0, upperBound ) ];
 }
 
 
@@ -1451,7 +1472,7 @@ void CUtlVector<T, A>::Validate( CValidator &validator, char *pchName )
 
 // A vector class for storing pointers, so that the elements pointed to by the pointers are deleted
 // on exit.
-template<class T> class CUtlVectorAutoPurge : public CUtlVector< T, CUtlMemory< T, intp> >
+template<class T> class CUtlVectorAutoPurge : public CUtlVector< std::enable_if_t<std::is_pointer_v<T>, T>, CUtlMemory< T, intp> >
 {
 public:
 	~CUtlVectorAutoPurge( void )
@@ -1463,7 +1484,7 @@ public:
 
 // A vector class for storing pointers, so that the elements pointed to by the pointers are deleted
 // on exit.
-template<class T> class CUtlVectorAutoPurgeArray : public CUtlVector< T, CUtlMemory< T, intp> >
+template<class T> class CUtlVectorAutoPurgeArray : public CUtlVector< std::enable_if_t<std::is_pointer_v<T>, T>, CUtlMemory< T, intp> >
 {
 public:
 	~CUtlVectorAutoPurgeArray( void )
@@ -1480,9 +1501,7 @@ class CUtlStringList : public CUtlVectorAutoPurgeArray< char *>
 public:
 	void CopyAndAddToTail( char const *pString )			// clone the string and add to the end
 	{
-		char *pNewStr = new char[1 + strlen( pString )];
-		V_strcpy( pNewStr, pString );
-		AddToTail( pNewStr );
+		AddToTail( V_strdup( pString ) );
 	}
 
 	static int __cdecl SortFunc( char * const * sz1, char * const * sz2 )
@@ -1510,6 +1529,12 @@ public:
 	void SplitString2( char const *pString, const char **pSeparators, intp nSeparators )
 	{
 		V_SplitString2( pString, pSeparators, nSeparators, *this );
+	}
+
+	template<intp separatorsSize>
+	void SplitString2( char const *pString, const char * (&pSeparators)[separatorsSize] )
+	{
+		SplitString2( pString, pSeparators, separatorsSize );
 	}
 private:
 	CUtlStringList( const CUtlStringList &other ); // copying directly will cause double-release of the same strings; maybe we need to do a deep copy, but unless and until such need arises, this will guard against double-release

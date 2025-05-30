@@ -51,7 +51,7 @@ enum
 //-----------------------------------------------------------------------------
 // Main engine interface to launcher + tools
 //-----------------------------------------------------------------------------
-#define VENGINE_LAUNCHER_API_VERSION "VENGINE_LAUNCHER_API_VERSION004"
+constexpr inline char VENGINE_LAUNCHER_API_VERSION[]{"VENGINE_LAUNCHER_API_VERSION004"};
 
 abstract_class IEngineAPI : public IAppSystem
 {
