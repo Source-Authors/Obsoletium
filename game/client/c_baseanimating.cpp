@@ -789,6 +789,12 @@ C_BaseAnimating::~C_BaseAnimating()
 		m_pAttachedTo->RemoveBoneAttachment( this );
 		m_pAttachedTo = NULL;
 	}
+
+	if ( m_pScaledCollidable )
+	{
+		UTIL_RemoveScaledPhysCollide( m_pScaledCollidable );
+		m_pScaledCollidable = NULL;
+	}
 }
 
 bool C_BaseAnimating::UsesPowerOfTwoFrameBufferTexture( void )
@@ -5157,9 +5163,18 @@ void C_BaseAnimating::Simulate()
 	}
 }
 
-
 bool C_BaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
+	if ( GetModelScale() != 1.0f )
+	{
+		if ( m_pScaledCollidable != NULL )
+		{
+			physcollision->TraceBox( ray, m_pScaledCollidable, GetAbsOrigin(), GetAbsAngles(), &tr );
+		
+			return tr.DidHit();
+		}
+	}
+
 	if ( ray.m_IsRay && IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
 	{
 		if (!TestHitboxes( ray, fContentsMask, tr ))
@@ -6705,4 +6720,23 @@ void C_BaseAnimating::MoveBoneAttachments( C_BaseAnimating* attachTarget )
 			m_BoneAttachments.Remove(0);
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Update Collisions. (Same way it's done serverside. We only update it when Activate is called)
+//-----------------------------------------------------------------------------
+void C_BaseAnimating::Activate()
+{
+	if ( GetModelScale() != 1.0f )
+	{
+		if ( m_pScaledCollidable )
+		{
+			UTIL_RemoveScaledPhysCollide( m_pScaledCollidable );
+			m_pScaledCollidable = NULL;
+		}
+
+		m_pScaledCollidable = UTIL_GetScaledPhysCollide( GetModelIndex(), GetModelScale() );
+	}
+
+	BaseClass::Activate();
 }
