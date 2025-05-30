@@ -853,6 +853,9 @@ protected:
 	/// Remove a custom fetch job from the list (and release our reference)
 	friend class CFileAsyncReadJob;
 	void RemoveAsyncCustomFetchJob( CFileAsyncReadJob *pJob );
+
+	char m_pBaseDir[MAX_PATH];
+	int m_iBaseLength;
 };
 
 inline const CUtlSymbol& CBaseFileSystem::CPathIDInfo::GetPathID() const
